@@ -24,9 +24,9 @@ def test_rules_and_prompts():
     ver_prompt = get_verifier_system_prompt()
     assert "I see" in sys_prompt
     assert "Rozumiem" in sys_prompt
-    assert "Widzę" in sys_prompt
-    assert "FUNDAMENTY PRZEKŁADU AUDIOWIZUALNEGO" in sys_prompt
+    assert "KANON PRZEKŁADU AUDIOWIZUALNEGO" in sys_prompt
     assert "Arkadiusza Belczyka" in ver_prompt
+    assert "ODNOMINALIZOWANIE" in sys_prompt
     print(" -> PASSED: Reguły i prompty systemowe są kompletne.")
 
 def test_pydantic_schemas():

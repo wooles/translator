@@ -6,38 +6,62 @@ zasadach adaptacji japońskich tytułów grzecznościowych oraz Netflix Polish T
 """
 
 BELCZYK_AVT_MASTER_CANON = """
-FUNDAMENTY PRZEKŁADU AUDIOWIZUALNEGO (KANON WG ARKADIUSZA BELCZYKA):
-1. EKWIWALENCJA FUNKCJONALNA (SZTUKA PRZEKŁADU SENSU, A NIE SŁÓW):
-   - Dialog w filmie to żywa, potoczna mowa polska. Widz ma słyszeć naturalne polskie kwestie, a nie dosłowny przekład angielskiego czy japońskiego tekstu.
-   - Bezwzględny zakaz tłumaczenia dosłownego (1 do 1) i kalkowania struktur składniowych.
+KOMPLEKSOWY KANON PRZEKŁADU AUDIOWIZUALNEGO (WG ARKADIUSZA BELCZYKA, JERZEGO PIEŃKOSA I NORM POLSKIEGO DIALOGU FILMOWEGO):
 
-2. TRZY TECHNIKI KONDENSACJI TEKSTU (Belczyk):
-   A. Amputacja fatyczna:
-      - Bezlitosne usuwanie pustych zapchajdziur ("You know", "I mean", "Basically", "Like", "As a matter of fact", "Well"), jeśli nie wnoszą treści.
-   B. Kondensacja syntaktyczna:
-      - Zastępowanie rozwlekłych zdań podrzędnych zwięzłymi imiesłowami lub konstrukcjami (np. "Kiedy byliśmy w szkole..." -> "W szkole...").
-   C. Elipsa sytuacyjna:
-      - Pomijanie informacji widocznych na ekranie (jeśli postać wręcza klucze i mówi "Here are your keys", po polsku wystarczy: "Proszę" lub "Masz").
+FILAR I: ODNOMINALIZOWANIE I WERBALIZACJA (CZASOWNIK ZAMIAST RZECZOWNIKA):
+- Język angielski jest językiem nominalnym (rzeczownikowym), polski – dynamicznym i czasownikowym.
+- Bezwzględnie zamieniaj sztuczne konstrukcje rzeczownikowe na naturalne, giętkie czasowniki:
+  * "put together this story / come up with a story" -> "wpaść na to", "poskładać to", "wymyślić to" (ZAKAZ: "ułożyć tę historię").
+  * "make a decision" -> "zdecydować", "postanowić" (ZAKAZ: "podjąć decyzję").
+  * "take a look" -> "spojrzeć", "zerknąć" (ZAKAZ: "rzucić okiem / wziąć spojrzenie").
+  * "have a chat / talk" -> "pogadać", "porozmawiać" (ZAKAZ: "odbyć rozmowę").
+  * "do the cleaning" -> "posprzątać" (ZAKAZ: "zrobić sprzątanie").
+  * "give an answer" -> "odpowiedzieć" (ZAKAZ: "dać odpowiedź").
+  * "make an appearance" -> "zjawić się", "pokazać się" (ZAKAZ: "zrobić pojawienie się").
+  * "reach an agreement" -> "dogadać się", "porozumieć się" (ZAKAZ: "osiągnąć porozumienie").
 
-3. REKONSTRUKCJA CAŁEGO ZDANIA (SENTENCE-LEVEL FLOW):
-   - Kwestie rozbite na 2-4 linijki napisu muszą tworzyć jedno bezbłędne, płynne gramatycznie i logicznie zdanie z naturalnym polskim szykiem wyrazów.
+FILAR II: ZASADA ANAFORY, PRO-FORM I ZAIMKA "TO / NA TO" (ZAKAZ POWTÓRZEŃ TEMATU):
+- W polskim dialogu filmowym, gdy temat/obiekt został wprowadzony w poprzednim zdaniu, W KOLEJNYM ZDANIU KATEGORYCZNIE ZABRANIA SIĘ POWTARZANIA TEGO SAMEGO RZECZOWNIKA!
+- Należy zastosować zaimek wskazujący ("to", "na to", "o tym", "z tym", "go", "ją"), czasownik frazowy lub elipsę:
+  * Kwestia A: "Wyszła wam całkiem spójna historia." -> Kwestia B: "Jak na to wpadłyście?" / "Jak to wymyśliłyście?" / "Skąd ten pomysł?" (ZAKAZ: "Jak ułożyłyście tę historię?").
+  * Kwestia A: "A jakie mangi lubicie?" -> Kwestia B: "Ja wolę tytuły pełne akcji." / "Te z dużą dawką humoru." (ZAKAZ: "lubię pełne akcji mangi").
+  * Kwestia A: "Mamy pewien plan." -> Kwestia B: "Co zamierzacie?" / "Jaki?" / "O co chodzi?" (ZAKAZ: "Jaki to jest plan?").
+  * Kwestia A: "Widziałeś ten film?" -> Kwestia B: "Jeszcze nie, a dobry?" (ZAKAZ: "Nie widziałem tego filmu").
+  * Kwestia A: "Kupiłem nowy telefon." -> Kwestia B: "I jak się sprawdza?" (ZAKAZ: "I jak podoba ci się ten telefon?").
 
-4. ZASADA ANAFORY, ZAIMKA "TO / NA TO" I ZAKAZ POWTÓRZEŃ TEMATU:
-   - Gdy temat/rzeczownik został nazwany w poprzednim zdaniu, W KOLEJNYM ZDANIU TEGO SAMEGO LUB INNEGO MÓWCY BEZWZGLĘDNIE ZABRANIA SIĘ POWTARZANIA TEGO RZECZOWNIKA!
-   - Zastąp go zaimkiem wskazującym ("to", "na to", "z tym", "o tym"), czasownikiem frazowym lub elipsą:
-     * BŁĄD ❌: "Wyszła wam całkiem spójna historia. [...] Jak ułożyłyście tę historię?" (Drewniane powtórzenie słowa historia).
-     * POPRAWNIE ✔️: "Wyszła wam całkiem spójna historia. [...] Jak na to wpadłyście?" / "Jak to wymyśliłyście?" / "Jak to poskładałyście?".
-     * BŁĄD ❌: "A jakie mangi wy dwie lubicie? [...] Ja uwielbiam pełne akcji mangi."
-     * POPRAWNIE ✔️: "A jakie mangi wy dwie lubicie? [...] Ja uwielbiam tytuły pełne akcji." / "Ja uwielbiam te z dużą dawką akcji."
-     * BŁĄD ❌: "Widziałeś ten film? Nie, nie widziałem tego filmu."
-     * POPRAWNIE ✔️: "Widziałeś ten film? Nie, jeszcze nie." / "Nie, a dobry?".
-     * BŁĄD ❌: "Mamy pewien plan. Jaki to jest plan?"
-     * POPRAWNIE ✔️: "Mamy pewien plan. Co zamierzacie?" / "Jaki?" / "O co chodzi?".
+FILAR III: NATURALNE POLSKIE KOLOKACJE PYTAJĄCE I SYTUACYJNE (ZAMIAST KALK SŁOWNIKOWYCH):
+- "How did you put this together / come up with it?" -> "Jak na to wpadłeś?", "Jak to wymyśliłeś?", "Skąd ten pomysł?".
+- "What makes you say that?" -> "Skąd ci to przyszło do głowy?", "Dlaczego tak uważasz?", "Czemu tak sądzisz?" (ZAKAZ: "Co sprawia, że tak mówisz?").
+- "What brings you here?" -> "Co cię sprowadza?", "Co tu robisz?" (ZAKAZ: "Co cię tu przynosi?").
+- "What do you say we...?" -> "A może byśmy...", "Co powiesz na...?", "Chcesz skoczyć na...?".
+- "How are you holding up?" -> "Jak się trzymasz?", "Dajesz radę?".
+- "What are you getting at?" -> "Do czego zmierzasz?", "O co ci chodzi?".
+- "What difference does it make?" -> "A co za różnica?", "Co to zmienia?".
+- "What took you so long?" -> "Gdzieś ty był?", "Czemu tak długo?".
+- "How did you manage to...?" -> "Jak ci się udało...?", "Jak dałeś radę...?".
 
-5. NATURALNE POLSKIE KOLOKACJE PYTAJĄCE (ZAMIAST KALK SŁOWNIKOWYCH):
-   - "How did you put this story/idea together?" -> "Jak na to wpadłyście?", "Jak to poskładałyście?", "Skąd ten pomysł?".
-   - "How did you manage to do this?" -> "Jak wam się to udało?", "Jak to zrobiłyście?".
-   - "What do you think about this thing?" -> "Co o tym myślisz?", "I jak wrażenia?".
+FILAR IV: ELIMINACJA SZTUCZNYCH CZASOWNIKÓW POSIŁKOWYCH I ANITYCZNOŚCI:
+- "I was able to find it" -> "Znalazłem", "Udało mi się znaleźć" (ZAKAZ: "Byłem w stanie to znaleźć").
+- "I started to cry / laugh" -> "Rozpłakałem się", "Rozśmiałem się" (ZAKAZ: "Zacząłem płakać / śmiać się").
+- "I feel like doing X" -> "Mam ochotę na X", "Chcę X" (ZAKAZ: "Czuję się jak robienie X").
+- "I have a feeling that..." -> "Coś mi mówi, że...", "Wydaje mi się, że..." (ZAKAZ: "Mam uczucie że").
+- "It looks like it's going to rain" -> "Zbiera się na deszcz", "Chyba będzie padać" (ZAKAZ: "Wygląda jakby miało padać").
+
+FILAR V: ELIMINACJA ZBĘDNYCH ZAIMKÓW DZIERŻAWCZYCH I OSOBOWYCH:
+- Angielski wymaga zaimka przy każdej części ciała i własności. Po polsku relacja wynika z kontekstu:
+  * "I put my hands in my pockets" -> "Włożyłem ręce do kieszeni" (ZAKAZ: "moje ręce do moich kieszeni").
+  * "She talked with her sister" -> "Rozmawiała z siostrą" (ZAKAZ: "ze swoją siostrą").
+  * "Close your eyes" -> "Zamknij oczy" (ZAKAZ: "twoje oczy").
+  * "I broke my leg" -> "Złamałem nogę" (ZAKAZ: "moją nogę").
+  * "I think that..." -> "Myślę, że..." (ZAKAZ: "Ja myślę, że...").
+
+FILAR VI: KONDENSACJA I RYTM DIALOGU (AMPUTACJA FATYCZNA I ELIPSA):
+- Bezlitosne usuwanie waty słownej ("You know", "I mean", "Basically", "Like", "Well").
+- Pomijanie informacji widocznych na ekranie (jeśli postać podaje herbatę, mówi: "Proszę" lub "Pij", a nie "Przyniosłam ci herbatę").
+
+FILAR VII: NATURALNY POLSKI SZYK ZDANIA (STRUKTURA TEMAT-REMAT):
+- W języku polskim najważniejsza NOWA informacja ląduje na KOŃCU zdania (remat), a punkt wyjścia na początku.
+- Zmieniaj sztywny angielski szyk SVO na elastyczną polską frazę.
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
