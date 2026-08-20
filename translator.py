@@ -660,7 +660,7 @@ class MultimodalTranslator:
                         romaji_line = " | ".join(romaji_samples)
                         if len(romaji_line) > 75:
                             romaji_line = romaji_line[:72] + "..."
-                        pbar.write(f" ├─ [Whisper STT] Słyszę: \"{romaji_line}\"")
+                        pbar.write(f" ├─ [Odsłuch JP] \"{romaji_line}\"")
 
                 # 4. Wywołanie Gemini (Obraz + Japońskie Audio + Tekst)
                 contents: List[Any] = []
