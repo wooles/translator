@@ -290,6 +290,13 @@ def test_manga_canon():
     assert jjk_canon["glossary"]["Domain Expansion"] == "Rozszerzenie Domeny"
     assert jjk_canon["publisher"] == "Wydawnictwo Waneko"
 
+    # Test dopasowania Golden Kamuy
+    gk_canon = registry.find_canon_for_series("[Erai-raws] Golden Kamuy - 01 [1080p]")
+    assert gk_canon is not None
+    assert gk_canon["glossary"]["Immortal Sugimoto"] == "Nieśmiertelny Sugimoto"
+    assert gk_canon["glossary"]["Hinna hinna"] == "Hinna, hinna (podziękowanie za dar jedzenia u Ajnów)"
+    assert gk_canon["publisher"] == "Wydawnictwo Waneko"
+
     # Test formatowania promptu
     prompt_chunk = registry.format_canon_for_prompt(jjk_canon)
     assert "Rozszerzenie Domeny" in prompt_chunk

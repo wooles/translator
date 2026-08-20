@@ -216,6 +216,217 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Anya -> Yor": "mamo",
             "Loid -> Yor": "Yor / pani Yor (oficjalnie)"
         }
+    },
+    "golden_kamuy": {
+        "title": "Golden Kamuy",
+        "aliases": ["golden kamuy", "golden kamuy s4", "golden kamuy s3", "golden kamuy s2", "golden kamuy s1"],
+        "publisher": "Wydawnictwo Waneko",
+        "glossary": {
+            "Immortal Sugimoto": "Nieśmiertelny Sugimoto",
+            "7th Division": "7. Dywizja (Siódma Dywizja Cesarskiej Armii)",
+            "Lieutenant Tsurumi": "Porucznik Tsurumi",
+            "Asirpa": "Asirpa",
+            "Kotan": "Kotan (osada Ajnów)",
+            "Chitatap": "Chitatap",
+            "Hinna hinna": "Hinna, hinna (podziękowanie za dar jedzenia u Ajnów)",
+            "Kamuy": "Kamuj (duch / bóstwo u Ajnów)",
+            "Type 30 Rifle": "Karabin Typ 30 (Arisaka)",
+            "Type 38 Rifle": "Karabin Typ 38 (Arisaka)",
+            "Matagi": "Matagi (tradycyjny myśliwy z północy)",
+            "Abashiri Prison": "Więzienie w Abashiri",
+            "Tattooed Convicts": "Wytatuowani skazańcy",
+            "Noppera-bou / Faceless Man": "Beztwarzowiec / Noppera-bo",
+            "Ainu Gold": "Złoto Ajnów",
+            "Surku": "Surku (trucizna z tojadu)"
+        },
+        "character_forms": {
+            "Sugimoto -> Asirpa": "Asirpa / na ty",
+            "Asirpa -> Sugimoto": "Sugimoto / na ty",
+            "Soldiers -> Tsurumi": "panie poruczniku",
+            "Shiraishi -> Sugimoto": "Sugimoto / Nieśmiertelny"
+        }
+    },
+    "fullmetal_alchemist": {
+        "title": "Fullmetal Alchemist (Stalowy Alchemik)",
+        "aliases": ["fullmetal alchemist", "fullmetal alchemist brotherhood", "fma", "fmab"],
+        "publisher": "Wydawnictwo J.P.Fantastica",
+        "glossary": {
+            "State Alchemist": "Państwowy Alchemik",
+            "Fullmetal Alchemist": "Stalowy Alchemik",
+            "Flame Alchemist": "Płomienny Alchemik",
+            "Equivalent Exchange": "Zasada Równorzędnej Wymiany",
+            "Philosopher's Stone": "Kamień Filozoficzny",
+            "Homunculus": "Homunkulus",
+            "Amestris": "Amestris",
+            "Automail": "Automail (proteza mechaniczna)",
+            "Transmutation Circle": "Krąg Transmutacyjny"
+        },
+        "character_forms": {
+            "Ed -> Al": "Al / na ty",
+            "Al -> Ed": "bracie",
+            "Roy -> Ed": "Fullmetal / Edwardzie"
+        }
+    },
+    "berserk": {
+        "title": "Berserk",
+        "aliases": ["berserk"],
+        "publisher": "Wydawnictwo J.P.Fantastica",
+        "glossary": {
+            "Band of the Hawk": "Drużyna Sokoła",
+            "Dragonslayer": "Pogromca Smoków (miecz Gutsa)",
+            "God Hand": "Ręka Boga",
+            "Behelit": "Behelit / Jajo Króla",
+            "Brand of Sacrifice": "Piętno Ofiary",
+            "Black Swordsman": "Czarny Szermierz",
+            "Apostle": "Apostoł",
+            "Eclipse": "Zaćmienie"
+        },
+        "character_forms": {
+            "Guts -> Griffith": "Griffith / na ty",
+            "Casca -> Griffith": "Griffith / dowódco"
+        }
+    },
+    "monster": {
+        "title": "Monster",
+        "aliases": ["monster", "naoki urasawa monster"],
+        "publisher": "Wydawnictwo Hanami",
+        "glossary": {
+            "Kinderheim 511": "Sierociniec Kinderheim 511",
+            "Unnamed Monster": "Bezimienny Potwór",
+            "Dr. Tenma": "Doktor Tenma",
+            "Inspector Lunge": "Inspektor Lunge"
+        },
+        "character_forms": {
+            "Tenma -> Nina": "Nina / na ty",
+            "Lunge -> Tenma": "doktorze Tenma"
+        }
+    },
+    "one_piece": {
+        "title": "One Piece",
+        "aliases": ["one piece", "op"],
+        "publisher": "Wydawnictwo J.P.Fantastica",
+        "glossary": {
+            "Straw Hat Pirates": "Piraci Słomkowego Kapelusza",
+            "Grand Line": "Grand Line",
+            "Devil Fruit": "Diabelski Owoc",
+            "Haki": "Haki (Wola)",
+            "Conqueror's Haki": "Królewskie Haki / Haki Zdobywcy",
+            "Marine / Navy": "Marynarka Wojenna",
+            "Admiral": "Admirał",
+            "Warlords of the Sea / Shichibukai": "Królewscy Wojownicy Mórz (Shichibukai)",
+            "All Blue": "All Blue"
+        },
+        "character_forms": {
+            "Zoro -> Luffy": "Luffy / kapitanie",
+            "Sanji -> Nami": "pani Nami / Nami-san"
+        }
+    },
+    "tokyo_ghoul": {
+        "title": "Tokyo Ghoul",
+        "aliases": ["tokyo ghoul", "tokyo ghoul re"],
+        "publisher": "Wydawnictwo Waneko",
+        "glossary": {
+            "CCG / Commission of Counter Ghoul": "Biuro Przeciwdziałania Ghouli (CCG)",
+            "Quinque": "Quinque (broń anty-ghoul)",
+            "Kagune": "Kagune",
+            "Kakuhou": "Kakuhou",
+            "One-Eyed Ghoul": "Jednooki Ghoul",
+            "Anteiku": "Kawiarnia Anteiku",
+            "Aogiri Tree": "Drzewo Aogiri",
+            "Ghoul Investigator": "Śledczy ds. Ghouli"
+        },
+        "character_forms": {
+            "Kaneki -> Touka": "Touka / na ty",
+            "Touka -> Kaneki": "Kaneki / na ty"
+        }
+    },
+    "bungou_stray_dogs": {
+        "title": "Bungou Stray Dogs (Bezpańscy Literaci)",
+        "aliases": ["bungou stray dogs", "bungo stray dogs", "bsd"],
+        "publisher": "Wydawnictwo Waneko",
+        "glossary": {
+            "Armed Detective Agency": "Zbrojna Agencja Detektywistyczna",
+            "Port Mafia": "Portowa Mafia",
+            "No Longer Human": "Zatracenie (Zatracenie człowieka)",
+            "Rashomon": "Rashomon",
+            "Beast Beneath the Moonlight": "Bestia w blasku księżyca",
+            "The Guild": "Gildia",
+            "Special Division for Unusual Powers": "Wydział ds. Zdolności Specjalnych"
+        },
+        "character_forms": {
+            "Atsushi -> Dazai": "panie Dazai",
+            "Akutagawa -> Dazai": "panie Dazai (z nabożnym szacunkiem)",
+            "Dazai -> Kunikida": "Kunikida / na ty"
+        }
+    },
+    "blue_lock": {
+        "title": "Blue Lock",
+        "aliases": ["blue lock"],
+        "publisher": "Wydawnictwo Waneko",
+        "glossary": {
+            "Blue Lock": "Projekt Blue Lock",
+            "Egoist": "Egoista",
+            "Ego Jinpachi": "Jinpachi Ego",
+            "Flow": "Stan Flow / Pełne Skupienie",
+            "Metavision": "Metawizja"
+        },
+        "character_forms": {
+            "Isagi -> Bachira": "Bachira / na ty",
+            "Rin -> Isagi": "cieciu / śmieciu / Isagi"
+        }
+    },
+    "haikyuu": {
+        "title": "Haikyu!! (Haikyuu!!)",
+        "aliases": ["haikyuu", "haikyu", "haikyuu!!", "haikyu!!"],
+        "publisher": "Wydawnictwo Studio JG",
+        "glossary": {
+            "Karasuno High": "Liceum Karasuno",
+            "Quick Attack": "Szybki atak (Atak z pierwszej)",
+            "Minus Tempo Attack": "Atak w tempie minusowym",
+            "Libero": "Libero",
+            "Setter": "Rozgrywający",
+            "Wing Spiker": "Skrzydłowy / Przyjmujący",
+            "Middle Blocker": "Środkowy bloku",
+            "Spring Tournament / Harukou": "Turniej Wiosenny (Harukou)"
+        },
+        "character_forms": {
+            "Hinata -> Kageyama": "Kageyama / na ty",
+            "Hinata -> Tsukishima": "Tsukishima / na ty",
+            "Hinata -> Daichi": "kapitanie / panie Daichi"
+        }
+    },
+    "oshi_no_ko": {
+        "title": "Moja Gwiazda (Oshi no Ko)",
+        "aliases": ["oshi no ko", "my star"],
+        "publisher": "Wydawnictwo Studio JG",
+        "glossary": {
+            "B-Komachi": "Grupa Idol B-Komachi",
+            "Strawberry Productions": "Strawberry Productions",
+            "Lalalie Theatrical Company": "Teatr Lalalie",
+            "Aqua": "Aqua",
+            "Ruby": "Ruby",
+            "Ai Hoshino": "Ai Hoshino"
+        },
+        "character_forms": {
+            "Aqua -> Ruby": "Ruby / na ty",
+            "Ruby -> Aqua": "Aqua / braciszku",
+            "Kana -> Aqua": "Aqua / na ty"
+        }
+    },
+    "bocchi_the_rock": {
+        "title": "Bocchi the Rock!",
+        "aliases": ["bocchi the rock", "bocchi the rock!"],
+        "publisher": "Wydawnictwo Studio JG",
+        "glossary": {
+            "Kessoku Band": "Kessoku Band",
+            "guitarhero": "guitarhero",
+            "Live House STARRY": "Klub STARRY",
+            "Bocchi": "Bocchi / Hitori"
+        },
+        "character_forms": {
+            "Nijika -> Hitori": "Bocchi-chan / Bocchi",
+            "Hitori -> Nijika": "Nijika-chan / pani Nijiko (z lękiem)"
+        }
     }
 }
 

@@ -603,7 +603,22 @@ class MultimodalTranslator:
             )
 
         # 0c. Sprawdzenie Oficjalnego Kanonu Polskiego Wydania Mangi (Waneko, JPF, Studio JG, Hanami itp.)
-        manga_canon_entry = self.manga_canon.find_canon_for_series(series_title)
+        candidates_to_match = [series_title]
+        if anime_meta:
+            if anime_meta.get("title_romaji"): candidates_to_match.append(anime_meta["title_romaji"])
+            if anime_meta.get("title_english"): candidates_to_match.append(anime_meta["title_english"])
+        if subs_path:
+            candidates_to_match.append(Path(subs_path).stem)
+        if video_path:
+            candidates_to_match.append(Path(video_path).stem)
+
+        manga_canon_entry = None
+        for cand in candidates_to_match:
+            if cand:
+                manga_canon_entry = self.manga_canon.find_canon_for_series(cand)
+                if manga_canon_entry:
+                    break
+
         manga_canon_str = ""
         if manga_canon_entry:
             manga_canon_str = self.manga_canon.format_canon_for_prompt(manga_canon_entry)
