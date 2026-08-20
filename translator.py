@@ -330,12 +330,13 @@ class MultimodalTranslator:
 
     def _call_gemini_with_retry(self, contents: List[Any], schema_class) -> Any:
         """
-        Bezpieczne wywołanie API z automatyczną obsługą chwilowych limitów minutowych (429).
+        Bezpieczne wywołanie API z automatyczną obsługą chwilowych limitów minutowych (429) i przeciążeń (503).
+        Cierpliwie ponawia próby aż do pomyślnego wykonania w najwyższej jakości.
         """
-        max_retries = 10
-        base_delay = 5
+        attempt = 0
 
-        for attempt in range(max_retries):
+        while True:
+            attempt += 1
             try:
                 response = self.client.models.generate_content(
                     model=self.model,
@@ -358,23 +359,19 @@ class MultimodalTranslator:
                 is_rate_limit = "429" in err_str or "quota" in err_str or "resource_exhausted" in err_str or "rate" in err_str
                 
                 if is_unavailable:
-                    wait_time = base_delay * (attempt + 1) + 2
+                    wait_time = min(5 + attempt * 3, 30)
                     print(f"\n[Tłumacz / Faza 1]: Chwilowe przeciążenie serwerów Google (503 UNAVAILABLE na {self.model}).")
                     print(f"  ⏳ Utrzymuję najwyższą jakość modelu bez redukcji.")
-                    print(f"  Odczekuję {wait_time}s i ponawiam próbę ({attempt + 1}/{max_retries})...")
+                    print(f"  Odczekuję {wait_time}s i ponawiam próbę #{attempt}...")
                     time.sleep(wait_time)
                 elif is_rate_limit:
-                    wait_time = base_delay * (attempt + 1) + 4
-                    print(f"\n[Limit minutowy Google / 429 na {self.model}]: Chwila przerwy na reset limitu ({wait_time}s)... Wznawiam automatycznie.")
+                    wait_time = min(6 + attempt * 3, 35)
+                    print(f"\n[Limit minutowy Google / 429 na {self.model}]: Chwila przerwy na reset limitu ({wait_time}s)... Wznawiam automatycznie (próba #{attempt}).")
                     time.sleep(wait_time)
                 else:
-                    if attempt < max_retries - 1:
-                        time.sleep(3)
-                    else:
-                        print(f"\n[Błąd Krytyczny API]: {e}")
-                        raise e
-
-        return None
+                    wait_time = min(4 + attempt * 2, 20)
+                    print(f"\n[Tłumacz / Faza 1]: Ponawianie próby #{attempt} za {wait_time}s ({e})...")
+                    time.sleep(wait_time)
 
     def translate_file(
         self,

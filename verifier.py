@@ -62,9 +62,10 @@ class DialogueVerifier:
         prompt_text = "\n".join(prompt_lines)
 
         import time
-        max_attempts = 10
+        attempt = 0
 
-        for attempt in range(max_attempts):
+        while True:
+            attempt += 1
             try:
                 response = self.client.models.generate_content(
                     model=self.model,
@@ -93,26 +94,11 @@ class DialogueVerifier:
                 is_rate_limit = "429" in err_str or "quota" in err_str or "resource_exhausted" in err_str
                 
                 if is_unavailable or is_rate_limit:
-                    wait_sec = (attempt + 1) * 4
+                    wait_sec = min(5 + attempt * 3, 30)
                     print(f"\n[Script Doctor / Redakcja]: Chwilowe przeciążenie serwerów Google (503/429 na {self.model}).")
-                    print(f"  ⏳ Utrzymuję najwyższą jakość PRO bez przełączania na niższe modele.")
-                    print(f"  Odczekuję {wait_sec}s przed ponowną próbą ({attempt + 1}/{max_attempts})...")
+                    print(f"  ⏳ Utrzymuję najwyższą jakość PRO. Czekam {wait_sec}s na wolny slot serwera (próba #{attempt})...")
                     time.sleep(wait_sec)
                 else:
-                    if attempt < max_attempts - 1:
-                        wait_sec = (attempt + 1) * 3
-                        print(f"\n[Script Doctor]: Ponawianie próby za {wait_sec}s po napotkaniu błędu ({e})...")
-                        time.sleep(wait_sec)
-                    else:
-                        print(f"\n[Script Doctor]: Nie udało się zredagować paczki dialogów po {max_attempts} próbach ({e}).")
-
-        print("[Script Doctor]: Zachowano wstępne tłumaczenie paczki po wyczerpaniu limitu prób.")
-        return [
-            RefinedLine(
-                id=item["id"],
-                original_en=item["en"],
-                refined_pl=item["pl"],
-                changes_made="Brak weryfikacji (błąd zapytania)"
-            )
-            for item in batch_items
-        ]
+                    wait_sec = min(4 + attempt * 2, 20)
+                    print(f"\n[Script Doctor]: Ponawianie próby #{attempt} za {wait_sec}s ({e})...")
+                    time.sleep(wait_sec)
