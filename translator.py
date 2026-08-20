@@ -570,9 +570,13 @@ class MultimodalTranslator:
         episode_profile_str = format_episode_profile_for_prompt(episode_profile)
 
         # 0b. Inicjalizacja i wczytanie Biblii Serialu (Pamięć Międzyodcinkowa Sezonu)
-        series_title = anime_context.get("title", "") if anime_context else ""
-        if not series_title and subs_path:
-            series_title = Path(subs_path).stem.split(" - ")[0].replace("[ASW]", "").replace("[Erai-raws]", "").strip()
+        series_title = ""
+        if anime_meta:
+            series_title = anime_meta.get("title_romaji") or anime_meta.get("title_english") or ""
+        if not series_title:
+            ref_path = video_path or subs_path or ""
+            if ref_path:
+                series_title = Path(ref_path).stem.split(" - ")[0].replace("[ASW]", "").replace("[Erai-raws]", "").strip()
         self.series_bible = SeriesBible(anime_title=series_title)
         if episode_profile:
             char_dict = {c.name: f"{c.gender} ({c.role}, {c.honorific_form})" for c in episode_profile.characters}
