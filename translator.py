@@ -448,6 +448,8 @@ class MultimodalTranslator:
         if not subs_file.exists():
             raise FileNotFoundError(f"Nie znaleziono pliku napisów: {subs_path}")
 
+        is_ass = not str(subs_file).lower().endswith(".srt")
+
         try:
             subs = pysubs2.load(str(subs_file), encoding="utf-8")
         except UnicodeDecodeError:
