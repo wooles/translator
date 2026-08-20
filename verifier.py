@@ -105,10 +105,10 @@ class DialogueVerifier:
                 
                 if is_unavailable or is_rate_limit:
                     wait_sec = min(5 + attempt * 3, 30)
-                    print(f"\n[Script Doctor / Redakcja]: Chwilowe przeciążenie serwerów Google (503/429 na {self.model}).")
+                    print(f"\n[Redaktor Dialogów / Redakcja]: Chwilowe przeciążenie serwerów Google (503/429 na {self.model}).")
                     print(f"  ⏳ Utrzymuję najwyższą jakość PRO. Czekam {wait_sec}s na wolny slot serwera (próba #{attempt})...")
                     time.sleep(wait_sec)
                 else:
                     wait_sec = min(4 + attempt * 2, 20)
-                    print(f"\n[Script Doctor]: Ponawianie próby #{attempt} za {wait_sec}s ({e})...")
+                    print(f"\n[Redaktor Dialogów]: Ponawianie próby #{attempt} za {wait_sec}s ({e})...")
                     time.sleep(wait_sec)

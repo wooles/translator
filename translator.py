@@ -729,9 +729,9 @@ class MultimodalTranslator:
                         "visual_details": vtype["visual_details"]
                     })
 
-                # 6. Opcjonalna II faza weryfikatora
+                # 6. Opcjonalna II faza weryfikatora (Redakcja Literacka)
                 if self.enable_verifier and hasattr(self, 'verifier'):
-                    pbar.set_postfix_str("Faza 2 (Script Doctor Pro)...")
+                    pbar.set_postfix_str("Faza 2 (Redakcja Dialogów Pro)...")
                     refined_lines: List[RefinedLine] = self.verifier.verify_batch(
                         batch_items=pass1_items,
                         scene_summary=scene_desc or "",
@@ -740,7 +740,7 @@ class MultimodalTranslator:
                     refined_dict = {r.id: sanitize_sub_text(r.refined_pl) for r in refined_lines}
                     for r in refined_lines:
                         if r.changes_made:
-                            pbar.write(f" └─ [Script Doctor] {r.changes_made}")
+                            pbar.write(f" └─ [Redaktor Dialogów] {r.changes_made}")
                     for item in pass1_items:
                         raw_final = sanitize_sub_text(refined_dict.get(item["id"], item["pl"]))
                         final_text, fixes = AVTLinter.lint_and_fix_line(

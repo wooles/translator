@@ -2,7 +2,7 @@
 
 Inteligentne narzędzie w języku Python wykorzystujące modele **Gemini (Flash & Gemini 3.1 Pro)** oraz lokalny silnik **Whisper STT** do profesjonalnego tłumaczenia napisów filmowych i anime z języka angielskiego/japońskiego na język polski.
 
-Oparte na **Kanonie Przekładu Audiowizualnego Arkadiusza Belczyka**, **Wizualnym OCR kadrów (1080p)**, **Słowniczku i Profilerze Odcinka**, **Pamięci Tłumaczeniowej (10 342 autentycznych par dialogowych)** oraz **dwufazowej architekturze redakcyjnej (Script Doctor)**.
+Oparte na **Kanonie Przekładu Audiowizualnego Arkadiusza Belczyka**, **Wizualnym OCR kadrów (1080p)**, **Słowniczku i Profilerze Odcinka**, **Pamięci Tłumaczeniowej (10 342 autentycznych par dialogowych)** oraz **dwufazowej architekturze redakcyjnej (Redaktor Dialogów)**.
 
 ---
 
@@ -35,7 +35,7 @@ Skrypt automatycznie:
    * Odczytuje napisy w tle, tablice szkolne, telefony i dymki mangowe (`いいよね〜`).
 4. **Kanon Przekładu Audiowizualnego Arkadiusza Belczyka**:
    * Eliminacja zaimków „Ja”, naturalny szyk wyrazów, formuły Aisatsu (*Tadaima!* $\rightarrow$ *„Wróciłam!”*), eliminacja powtórzeń leksykalnych.
-5. **Dwufazowa Redakcja Dialogów (Master Script Doctor)**:
+5. **Dwufazowa Redakcja Dialogów (Master Redaktor Dialogów)**:
    * **Faza 1**: Tłumaczenie multimodalne (Obraz + Audio + Whisper + Kontekst EN).
    * **Faza 2**: Redakcja przez wirtualnego redaktora dialogów (Gemini 3.1 Pro / Flash) dbającego o kunszt literacki i brak kalek.
 
@@ -45,8 +45,8 @@ Skrypt automatycznie:
 
 Przy uruchomieniu masz do wyboru 3 profile:
 * **[1] STANDARDOWY**: Ultraszybki, 100% darmowy (Flash-Lite).
-* **[2] STUDYJNY FLASH**: 100% darmowy, wysoka jakość (Flash + Flash Script Doctor).
-* **[3] MASTER PRO ⭐**: Jakość kinowa studia dubbingu (Flash + Gemini 3.1 Pro Script Doctor z głębokim wnioskowaniem).
+* **[2] STUDYJNY FLASH**: 100% darmowy, wysoka jakość (Flash + Flash Redaktor Dialogów).
+* **[3] MASTER PRO ⭐**: Jakość kinowa studia dubbingu (Flash + Gemini 3.1 Pro Redaktor Dialogów z głębokim wnioskowaniem).
 
 ---
 
