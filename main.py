@@ -294,40 +294,51 @@ def main():
         except (EOFError, KeyboardInterrupt):
             keep_honorifics = default_env
 
-    # Wybór profilu tłumaczenia (Standardowy Flash vs Studyjny Hybrydowy)
-    model_p1 = args.model
+    from model_resolver import resolve_best_models
+    from google import genai
+    
+    # Dynamiczne wykrywanie najnowszych i najlepszych wersji modeli Gemini
+    api_key_check = os.getenv("GEMINI_API_KEY")
+    temp_client = genai.Client(api_key=api_key_check) if api_key_check else None
+    best_models = resolve_best_models(temp_client)
+
+    # Wybór profilu tłumaczenia
+    model_p1 = args.model if args.model != "gemini-3.5-flash-lite" else None
     model_p2 = args.model_phase2
 
     if args.profile == "pro" or args.profile == "master":
-        model_p1 = "gemini-3.5-flash"
-        model_p2 = "gemini-3.1-pro-preview"
+        model_p1 = best_models["flash"]
+        model_p2 = best_models["pro"]
     elif args.profile == "studio":
-        model_p1 = "gemini-3.5-flash-lite"
-        model_p2 = "gemini-3.5-flash"
+        model_p1 = best_models["flash_lite"]
+        model_p2 = best_models["flash"]
     elif args.profile == "standard":
-        model_p1 = "gemini-3.5-flash-lite"
-        model_p2 = "gemini-3.5-flash-lite"
-    elif not model_p2:
-        print("\n" + "─" * 65)
-        print("  WYBÓR PROFILU JAKOŚCI TŁUMACZENIA:")
-        print("  [1] STANDARDOWY      [Flash-Lite - 100% Darmowy, szybki]")
-        print("  [2] STUDYJNY FLASH   [Flash + Flash Script Doctor - 100% Darmowy, wysoka jakość]")
-        print("  [3] MASTER PRO ⭐   [Flash + Gemini 3.1 Pro Script Doctor - bezkompromisowa jakość kinowa (~0,05 zł/odc)]")
-        print("─" * 65)
+        model_p1 = best_models["flash_lite"]
+        model_p2 = best_models["flash_lite"]
+    elif not model_p2 and not model_p1:
+        print("\n" + "─" * 68)
+        print("  WYBÓR PROFILU JAKOŚCI TŁUMACZENIA (Auto-wykrywanie najnowszych modeli):")
+        print(f"  [1] STANDARDOWY      [{best_models['flash_lite']} - 100% Darmowy, szybki]")
+        print(f"  [2] STUDYJNY FLASH   [{best_models['flash_lite']} + {best_models['flash']} Script Doctor - 100% Free]")
+        print(f"  [3] MASTER PRO ⭐   [{best_models['flash']} + {best_models['pro']} Script Doctor - Jakość Kinowa]")
+        print("─" * 68)
         try:
             prof_choice = input("  Twój wybór [1 / 2 / 3] (Wciśnij Enter dla 3): ").strip()
             if prof_choice == "1":
-                model_p1 = "gemini-3.5-flash-lite"
-                model_p2 = "gemini-3.5-flash-lite"
+                model_p1 = best_models["flash_lite"]
+                model_p2 = best_models["flash_lite"]
             elif prof_choice == "2":
-                model_p1 = "gemini-3.5-flash-lite"
-                model_p2 = "gemini-3.5-flash"
+                model_p1 = best_models["flash_lite"]
+                model_p2 = best_models["flash"]
             else:
-                model_p1 = "gemini-3.5-flash"
-                model_p2 = "gemini-3.1-pro-preview"
+                model_p1 = best_models["flash"]
+                model_p2 = best_models["pro"]
         except (EOFError, KeyboardInterrupt):
-            model_p1 = "gemini-3.5-flash"
-            model_p2 = "gemini-3.1-pro-preview"
+            model_p1 = best_models["flash"]
+            model_p2 = best_models["pro"]
+    else:
+        model_p1 = model_p1 or best_models["flash"]
+        model_p2 = model_p2 or best_models["pro"]
 
     use_whisper = not args.no_whisper
 

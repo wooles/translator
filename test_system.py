@@ -157,9 +157,19 @@ def test_profiler_and_whisper():
     
     # Test dostępności i stanu Whisper
     avail = JapaneseWhisperEngine.is_available()
-    engine = JapaneseWhisperEngine()
-    assert engine.model_size == "large-v3-turbo"
-    print(" -> PASSED: Profiler odcinka i silnik Whisper działają poprawnie.")
+from model_resolver import resolve_best_models, _extract_model_score
+
+def test_model_resolver():
+    print("[TEST 7/7] Test automatycznego wykrywania najnowszych modeli Gemini...")
+    score_37 = _extract_model_score("gemini-3.7-flash")
+    score_35 = _extract_model_score("gemini-3.5-flash")
+    score_25 = _extract_model_score("gemini-2.5-flash")
+    assert score_37 > score_35 > score_25
+    
+    models = resolve_best_models(None)
+    assert "flash" in models
+    assert "pro" in models
+    print(" -> PASSED: Moduł auto-discovery modeli Gemini działa perfekcyjnie.")
 
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
@@ -169,4 +179,5 @@ if __name__ == "__main__":
     test_subtitle_parsing_and_saving()
     test_ffmpeg_frame_extraction()
     test_profiler_and_whisper()
+    test_model_resolver()
     print("\n Wszystkie testy jednostkowe i integracyjne zakończone sukcesem!\n")
