@@ -102,6 +102,14 @@ FILAR XIII: SŁOWNIK EMOCJONALNYCH REAKCJI I WYKRZYKNIKÓW ANIME:
 - "Mendou kusai" -> "Ale mi się nie chce...", "Co za udręka...", "Męczące to...".
 - "Yada / Ya da!" -> "Nie ma mowy!", "Nie chcę!", "O nie!".
 - "Bikkuri shita!" -> "Ale mnie wystraszyłaś!", "Aż podskoczyłam!".
+
+FILAR XIV: POPRAWNOŚĆ REKCJI PRZYCZYN ZGONU I TERMINOLOGII MEDYCZNEJ:
+- Zdarzenia nagłe, wylewy, udary, krwotoki i urazy (hemorrhage, stroke, cardiac arrest, injuries):
+  * W języku polskim nagłe incydenty medyczne łączą się z wyrażeniami "z powodu", "wskutek", "w wyniku" lub konstrukcją opisową:
+    -> BŁĄD ❌: "Zmarła na wylew zaraz po porodzie.", "Zmarł na krwotok.", "Zmarł na atak serca.", "Zmarł na obrażenia."
+    -> POPRAWNIE ✔️: "Zmarła z powodu wylewu zaraz po porodzie.", "Zmarła wskutek wylewu...", "Zmarła w wyniku krwotoku mózgowego...", "Zmarł na zawał (serca).", "Zmarł w wyniku odniesionych obrażeń."
+  * "Brain hemorrhage" -> "wylew", "krwotok mózgowy", "udar krwotoczny".
+  * "Heart attack" -> "zawał serca", "zawał" (ZAKAZ: "atak serca").
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -500,6 +508,9 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
 13. POPRAWNOŚĆ PŁCI (ŻEŃSKA DLA UCZENNIC) I ZAKAZ HALUCYNACJI DZIERŻAWCZYCH:
    - W dialogach między uczennicami/kobietami bezwzględnie stosuj formy ŻEŃSKIE ("Głupia jesteś?", "Oszalałaś?", "Zrobiłaś to?", "Jesteś pewna?"). ZAKAZ form męskich ("Głupi jesteś?")!
    - Kwestie typu "[Imię]'s dad / mom / manga" tłumacz DOKŁADNIE w 3. osobie ("Tata Akafuku!", "Manga pani Teshimy!"). BEZWZGLĘDNY ZAKAZ zamiany na 1. osobę ("to mój tata")!
+14. POPRAWNOŚĆ PRZYCZYN ZGONU I MEDYCYNY:
+   - "Died of a brain hemorrhage" -> "zmarła z powodu wylewu", "zmarła wskutek wylewu" (ZAKAZ: "zmarła na wylew").
+   - "Heart attack" -> "zawał serca", "zawał" (ZAKAZ: "atak serca").
 
 {BELCZYK_AVT_MASTER_CANON}
 

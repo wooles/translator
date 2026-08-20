@@ -31,6 +31,16 @@ class AVTLinter:
         (r"\b[Pp]oniosło klapę\b", "Nie wyszło"),
         (r"\b[Ww]asz [Hh]onor\b", "Wysoki Sądzie"),
         
+        # Poprawność medyczna i rekcja przyczyn zgonu (zmarł z powodu wylewu / wskutek wylewu)
+        (r"\b[Zz]marła na wylew\b", "zmarła z powodu wylewu"),
+        (r"\b[Zz]marł na wylew\b", "zmarł z powodu wylewu"),
+        (r"\b[Uu]marła na wylew\b", "zmarła z powodu wylewu"),
+        (r"\b[Uu]marł na wylew\b", "zmarł z powodu wylewu"),
+        (r"\b[Zz]marła na krwotok\b", "zmarła wskutek krwotoku"),
+        (r"\b[Zz]marł na krwotok\b", "zmarł wskutek krwotoku"),
+        (r"\b[Zz]marła na atak serca\b", "zmarła na zawał"),
+        (r"\b[Zz]marł na atak serca\b", "zmarł na zawał"),
+        
         # Eliminacja zbędnego "Ja " na początku zdania
         (r"^Ja myślę, że\b", "Myślę, że"),
         (r"^Ja wiem, że\b", "Wiem, że"),

@@ -188,6 +188,10 @@ def test_avt_linter():
     # Test korekty rodzaju męskiego na żeński u dziewcząt
     t3, f3 = AVTLinter.lint_and_fix_line("Głupi jesteś?", is_all_girls_scene=True)
     assert t3 == "Głupia jesteś?"
+    
+    # Test korekty rekcji przyczyny zgonu (wylew / atak serca)
+    t4, f4 = AVTLinter.lint_and_fix_line("Natsuki zmarła na wylew zaraz po porodzie.")
+    assert t4 == "Natsuki zmarła z powodu wylewu zaraz po porodzie."
     print(" -> PASSED: AVT Linter bezbłędnie wyłapuje i koryguje kalki i formy.")
 
 if __name__ == "__main__":
