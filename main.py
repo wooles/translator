@@ -150,8 +150,8 @@ def main():
     parser.add_argument(
         "--batch-size", "-b",
         type=int,
-        default=int(os.getenv("BATCH_SIZE", "14")),
-        help="Liczba kwestii dialogowych w jednej paczce (domyślnie: 14)"
+        default=int(os.getenv("BATCH_SIZE", "24")),
+        help="Liczba kwestii dialogowych w jednej paczce (domyślnie: 24)"
     )
     parser.add_argument(
         "--no-verify",
@@ -345,8 +345,8 @@ def main():
         print("\n" + "─" * 68)
         print("  WYBÓR PROFILU JAKOŚCI TŁUMACZENIA (Auto-wykrywanie najnowszych modeli):")
         print(f"  [1] STANDARDOWY      [{best_models['flash_lite']} - 100% Darmowy, szybki]")
-        print(f"  [2] STUDYJNY FLASH   [{best_models['flash_lite']} + {best_models['flash']} Redaktor Dialogów - 100% Free]")
-        print(f"  [3] MASTER PRO ⭐   [{best_models['flash']} + {best_models['pro']} Redaktor Dialogów - Jakość Kinowa]")
+        print(f"  [2] STUDYJNY FLASH   [{best_models['flash']} + Redakcja Flash - Ekstremalnie tani (~0,06 zł/odc)]")
+        print(f"  [3] MASTER PRO ⭐   [{best_models['flash']} + {best_models['pro']} Redakcja Pro - Jakość Kinowa (~0,25 zł/odc)]")
         print("─" * 68)
         try:
             prof_choice = input("  Twój wybór [1 / 2 / 3] (Wciśnij Enter dla 3): ").strip()
@@ -354,7 +354,7 @@ def main():
                 model_p1 = best_models["flash_lite"]
                 model_p2 = best_models["flash_lite"]
             elif prof_choice == "2":
-                model_p1 = best_models["flash_lite"]
+                model_p1 = best_models["flash"]
                 model_p2 = best_models["flash"]
             else:
                 model_p1 = best_models["flash"]

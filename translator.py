@@ -179,7 +179,7 @@ class MultimodalTranslator:
         api_key: Optional[str] = None,
         model: str = "gemini-3.5-flash-lite",
         model_phase2: Optional[str] = None,
-        batch_size: int = 14,
+        batch_size: int = 24,
         enable_verifier: bool = True,
         max_image_width: int = 540,
         keep_honorifics: bool = True,
@@ -615,34 +615,25 @@ class MultimodalTranslator:
                         except Exception:
                             pass
 
-                # 2b. Ekstrakcja wycinka oryginalnego japońskiego audio (16kHz WAV) + Błyskawiczna transkrypcja Whisper
+                # 2b. Ekstrakcja wycinka audio i Błyskawiczna LOKALNA transkrypcja Whisper (100% Offline / 0 zł)
                 temp_audio_file = None
-                audio_parts = []
                 whisper_transcriptions: Dict[int, str] = {}
-                if video_path and os.path.exists(video_path):
+                if video_path and os.path.exists(video_path) and self.whisper:
                     try:
                         batch_start = untranslated_in_batch[0][1].start
                         batch_end = untranslated_in_batch[-1][1].end
-                        # Przesyłamy wycinek dźwiękowy jeśli długość sceny <= 85 sek
-                        if 0 < (batch_end - batch_start) <= 85000:
+                        if 0 < (batch_end - batch_start) <= 120000:
                             temp_audio_file = extract_audio_slice(
                                 video_path=video_path,
                                 start_ms=batch_start,
                                 end_ms=batch_end
                             )
-                            with open(temp_audio_file, "rb") as af:
-                                audio_bytes = af.read()
-                            if audio_bytes:
-                                audio_parts.append(types.Part.from_bytes(data=audio_bytes, mime_type="audio/wav"))
-
-                            # Szybka lokalna transkrypcja Whisper (1 szybki przebieg dla całej sceny)
-                            if self.whisper:
-                                events_tuples = [(idx + 1, item[1]) for idx, item in enumerate(untranslated_in_batch)]
-                                whisper_transcriptions = self.whisper.transcribe_batch_scene(
-                                    scene_wav_path=temp_audio_file,
-                                    batch_start_ms=batch_start,
-                                    events=events_tuples
-                                )
+                            events_tuples = [(idx + 1, item[1]) for idx, item in enumerate(untranslated_in_batch)]
+                            whisper_transcriptions = self.whisper.transcribe_batch_scene(
+                                scene_wav_path=temp_audio_file,
+                                batch_start_ms=batch_start,
+                                events=events_tuples
+                            )
                     except Exception:
                         pass
 
@@ -656,7 +647,7 @@ class MultimodalTranslator:
                     whisper_transcriptions=whisper_transcriptions
                 )
 
-                # 4. Wywołanie Gemini (Obraz + Japońskie Audio + Tekst)
+                # 4. Wywołanie Gemini (Obraz + Tekst ze słuchu Whisper) - Zero opłat za streaming audio do Google!
                 contents: List[Any] = []
                 # Podgląd statusu Whisper w konsoli (Romaji fonetyczne - czytelne na każdym terminalu)
                 if whisper_transcriptions:
@@ -668,10 +659,9 @@ class MultimodalTranslator:
                             romaji_line = romaji_line[:72] + "..."
                         pbar.write(f" ├─ [Odsłuch JP] \"{romaji_line}\"")
 
-                # 4. Wywołanie Gemini (Obraz + Japońskie Audio + Tekst)
+                # 4. Wywołanie Gemini (Obraz + Tekst)
                 contents: List[Any] = []
                 contents.extend(image_contents)
-                contents.extend(audio_parts)
                 contents.append(prompt_text)
 
                 pbar.set_postfix_str("Faza 1 (Wizja + Audio)...")
