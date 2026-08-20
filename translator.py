@@ -60,6 +60,11 @@ from profiler import EpisodeProfiler, EpisodeProfile, format_episode_profile_for
 from whisper_engine import JapaneseWhisperEngine
 from avt_linter import AVTLinter
 from romaji_helper import to_romaji
+from series_memory import SeriesBible
+from avt_formatter import split_subtitle_syntactically, calculate_cps
+from prosody_engine import AudioProsodyEngine
+from speaker_diarizer import SpeakerVoiceClassifier
+from typesetting_matcher import TypesettingColorMatcher
 
 def extract_typesetting_tags(raw_text: str) -> Tuple[str, str]:
     """
@@ -245,10 +250,14 @@ class MultimodalTranslator:
         lookahead_events: List[Tuple[int, pysubs2.SSAEvent, str, str]] = None,
         anime_context_str: str = "",
         episode_profile_str: str = "",
-        whisper_transcriptions: Optional[Dict[int, str]] = None
+        whisper_transcriptions: Optional[Dict[int, str]] = None,
+        series_bible_str: str = "",
+        prosody_tags: Optional[Dict[int, str]] = None,
+        speaker_tags: Optional[Dict[int, str]] = None
     ) -> str:
         """
         Tworzy tekst promptu dla danej paczki kwestii wraz z:
+        - Biblią Serialu (Pamięć Międzyodcinkowa)
         - Profilem odcinka (Słowniczek i Macierz Relacji)
         - Kontekstem fabuły z bazy AniList
         - Wzorcami z Pamięci Tłumaczeniowej (Translation Memory)
@@ -256,16 +265,22 @@ class MultimodalTranslator:
         - Historią poprzednich dialogów
         - Podglądem nadchodzących kwestii (Lookahead Window)
         - Japońską transkrypcją mowy ze słuchu (Whisper STT)
+        - Cechami prozodii audio (szept/krzyk) i klasyfikacją głosu (diarizacja)
+        - Ostrzeżeniami tempa czytania CPS
         """
         lines = []
 
-        # 0. Słowniczek i Macierz Relacji z Profilera Odcinka (lub kontekst AniList w razie braku profilera)
+        # 0a. Ciągłość terminologiczna z Biblii Serialu
+        if series_bible_str:
+            lines.append(series_bible_str)
+
+        # 0b. Słowniczek i Macierz Relacji z Profilera Odcinka (lub kontekst AniList w razie braku profilera)
         if episode_profile_str:
             lines.append(episode_profile_str)
         elif anime_context_str:
             lines.append(anime_context_str)
 
-        # 0b. Złote przykłady z Pamięci Tłumaczeniowej (Translation Memory)
+        # 0c. Złote przykłady z Pamięci Tłumaczeniowej (Translation Memory)
         if self.tm:
             try:
                 batch_queries = [item[2] for item in batch_events]
@@ -302,6 +317,15 @@ class MultimodalTranslator:
             start_str = pysubs2.time.ms_to_str(event.start)
             end_str = pysubs2.time.ms_to_str(event.end)
             vtype = detect_event_visual_type(event, ts_prefix)
+            duration_s = max(0.2, (event.end - event.start) / 1000.0)
+            cps, is_fast = calculate_cps(clean_text, event.start, event.end)
+
+            acoustic_cues = []
+            if speaker_tags and (idx + 1) in speaker_tags:
+                acoustic_cues.append(f"Głos: {speaker_tags[idx + 1]}")
+            if prosody_tags and (idx + 1) in prosody_tags:
+                acoustic_cues.append(f"Ton: {prosody_tags[idx + 1]}")
+            acoustic_str = f" [{', '.join(acoustic_cues)}]" if acoustic_cues else ""
 
             if vtype["is_sign"]:
                 lines.append(f"Kwestia [ID: {idx + 1}] [TYP: 🖼️ {vtype['type_label']}] (Czas: {start_str} - {end_str}, Cechy: {vtype['visual_details']}):")
@@ -310,7 +334,9 @@ class MultimodalTranslator:
                 lines.append(f"  BEZWZGLĘDNY ZAKAZ wklejania tu fragmentów dialogów mówionych przez postacie!")
             else:
                 speaker_name = event.name if event.name else "Postać"
-                lines.append(f"Kwestia [ID: {idx + 1}] [TYP: 💬 {vtype['type_label']}] (Czas: {start_str} - {end_str}, Mówca: '{speaker_name}'):")
+                lines.append(f"Kwestia [ID: {idx + 1}] [TYP: 💬 {vtype['type_label']}] (Czas: {start_str} - {end_str}, Mówca: '{speaker_name}'){acoustic_str}:")
+                if is_fast:
+                    lines.append(f"  ⚠️ TEMPO CPS ({cps:.1f} z/s, czas {duration_s:.1f}s): Szybka kwestia! Zastosuj zwięzłą kondensację Belczyka.")
 
             if whisper_transcriptions and idx + 1 in whisper_transcriptions:
                 jp_text = whisper_transcriptions[idx + 1]
@@ -542,6 +568,24 @@ class MultimodalTranslator:
             cache_path=profile_cache_path
         )
         episode_profile_str = format_episode_profile_for_prompt(episode_profile)
+
+        # 0b. Inicjalizacja i wczytanie Biblii Serialu (Pamięć Międzyodcinkowa Sezonu)
+        series_title = anime_context.get("title", "") if anime_context else ""
+        if not series_title and subs_path:
+            series_title = Path(subs_path).stem.split(" - ")[0].replace("[ASW]", "").replace("[Erai-raws]", "").strip()
+        self.series_bible = SeriesBible(anime_title=series_title)
+        if episode_profile:
+            char_dict = {c.name: f"{c.gender} ({c.role}, {c.honorific_form})" for c in episode_profile.characters}
+            gloss_dict = {g.term_en: g.translation_pl for g in episode_profile.glossary}
+            self.series_bible.update_from_episode_profile(
+                episode_name=Path(subs_path).stem if subs_path else "Odcinek",
+                characters=char_dict,
+                glossary=gloss_dict
+            )
+        series_bible_str = self.series_bible.format_for_prompt()
+        if series_bible_str:
+            print(f"  📚 [Biblia Serialu]: Wczytano ciągłość sezonu dla serii '{series_title or self.series_bible.slug}'")
+
         if episode_profile:
             if episode_profile.setting_and_era:
                 print(f"  🏛️  [Filar XV - Epoka i Realia Świata]: {episode_profile.setting_and_era}")
@@ -613,10 +657,12 @@ class MultimodalTranslator:
                         except Exception:
                             pass
 
-                # 2b. Ekstrakcja wycinka audio i Błyskawiczna LOKALNA transkrypcja Whisper (100% Offline / 0 zł)
+                # 2b. Ekstrakcja wycinka audio i Błyskawiczna LOKALNA transkrypcja Whisper + Prozodia + Diarizacja (100% Offline / 0 zł)
                 temp_audio_file = None
                 whisper_transcriptions: Dict[int, str] = {}
-                if video_path and os.path.exists(video_path) and self.whisper:
+                prosody_tags: Dict[int, str] = {}
+                speaker_tags: Dict[int, str] = {}
+                if video_path and os.path.exists(video_path):
                     try:
                         batch_start = untranslated_in_batch[0][1].start
                         batch_end = untranslated_in_batch[-1][1].end
@@ -627,22 +673,42 @@ class MultimodalTranslator:
                                 end_ms=batch_end
                             )
                             events_tuples = [(idx + 1, item[1]) for idx, item in enumerate(untranslated_in_batch)]
-                            whisper_transcriptions = self.whisper.transcribe_batch_scene(
-                                scene_wav_path=temp_audio_file,
+                            
+                            # 1. Lokalna transkrypcja Whisper
+                            if self.whisper:
+                                whisper_transcriptions = self.whisper.transcribe_batch_scene(
+                                    scene_wav_path=temp_audio_file,
+                                    batch_start_ms=batch_start,
+                                    events=events_tuples
+                                )
+
+                            # 2. Lokalna analiza prozodii (RMS dBFS / szept / krzyk)
+                            prosody_tags = AudioProsodyEngine.analyze_scene_prosody(
+                                wav_path=temp_audio_file,
+                                batch_start_ms=batch_start,
+                                events=events_tuples
+                            )
+
+                            # 3. Lokalna diarizacja i szacowanie barwy głosu F0
+                            speaker_tags = SpeakerVoiceClassifier.classify_scene_speakers(
+                                wav_path=temp_audio_file,
                                 batch_start_ms=batch_start,
                                 events=events_tuples
                             )
                     except Exception:
                         pass
 
-                # 3. Prompt tekstowy z bazą wiedzy AniList, rejestrem postaci i lookaheadem
+                # 3. Prompt tekstowy z bazą wiedzy AniList, rejestrem postaci, lookaheadem i cechami fonicznymi
                 prompt_text = self._prepare_batch_prompt(
                     untranslated_in_batch,
                     history,
                     lookahead_events=lookahead_events,
                     anime_context_str=anime_context_str,
                     episode_profile_str=episode_profile_str,
-                    whisper_transcriptions=whisper_transcriptions
+                    whisper_transcriptions=whisper_transcriptions,
+                    series_bible_str=series_bible_str,
+                    prosody_tags=prosody_tags,
+                    speaker_tags=speaker_tags
                 )
 
                 # 4. Wywołanie Gemini (Obraz + Tekst ze słuchu Whisper) - Zero opłat za streaming audio do Google!
@@ -699,6 +765,8 @@ class MultimodalTranslator:
                     speaker_gender = None
                     notes = ""
                     vtype = detect_event_visual_type(event, ts_prefix)
+                    cps, is_fast = calculate_cps(clean_en, event.start, event.end)
+                    cps_warn = f"Tempo CPS: {cps:.1f} (czas {(event.end - event.start)/1000.0:.1f}s)" if is_fast else ""
 
                     if batch_response:
                         for tr in batch_response.translations:
@@ -717,6 +785,9 @@ class MultimodalTranslator:
                         "en": clean_en,
                         "pl": pl_candidate,
                         "speaker_gender": speaker_gender,
+                        "speaker_voice": speaker_tags.get(batch_id, ""),
+                        "prosody": prosody_tags.get(batch_id, ""),
+                        "cps_warning": cps_warn,
                         "notes": notes,
                         "is_sign": vtype["is_sign"],
                         "visual_type": vtype["type_label"],
@@ -745,8 +816,9 @@ class MultimodalTranslator:
                         )
                         for fix in fixes:
                             pbar.write(f" 🛡️ [AVT Linter] {fix}")
-                        translated_results[item["orig_idx"]] = final_text
-                        history.append({"en": item["en"], "pl": final_text})
+                        formatted_final = split_subtitle_syntactically(final_text, max_line_len=42, is_ass=is_ass)
+                        translated_results[item["orig_idx"]] = formatted_final
+                        history.append({"en": item["en"], "pl": formatted_final})
                 else:
                     for item in pass1_items:
                         raw_final = sanitize_sub_text(item["pl"])
@@ -758,15 +830,15 @@ class MultimodalTranslator:
                         )
                         for fix in fixes:
                             pbar.write(f" 🛡️ [AVT Linter] {fix}")
-                        translated_results[item["orig_idx"]] = final_text
-                        history.append({"en": item["en"], "pl": final_text})
+                        formatted_final = split_subtitle_syntactically(final_text, max_line_len=42, is_ass=is_ass)
+                        translated_results[item["orig_idx"]] = formatted_final
+                        history.append({"en": item["en"], "pl": formatted_final})
 
                 # Harmonizacja równoczesnych napisów ekranowych (chmurka + dialog o identycznej treści EN)
                 en_to_best_pl: Dict[str, str] = {}
                 for item in pass1_items:
                     en_norm = item["en"].strip().lower()
                     pl_res = translated_results.get(item["orig_idx"], "")
-                    # Preferujemy wersje niebędące kalką "to robi"
                     if pl_res and "to robi" not in pl_res.lower():
                         en_to_best_pl[en_norm] = pl_res
 

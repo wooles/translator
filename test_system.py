@@ -178,9 +178,15 @@ def test_model_resolver():
     
     models = resolve_best_models(None)
 from avt_linter import AVTLinter
+from series_memory import SeriesBible
+from avt_formatter import split_subtitle_syntactically, calculate_cps, clean_text_for_len
+from prosody_engine import AudioProsodyEngine
+from speaker_diarizer import SpeakerVoiceClassifier
+from typesetting_matcher import TypesettingColorMatcher, rgb_to_ass_hex
+import numpy as np
 
 def test_avt_linter():
-    print("[TEST 8/8] Test automatycznego audytora polszczyzny AVT Linter...")
+    print("[TEST 8/12] Test automatycznego audytora polszczyzny AVT Linter...")
     # Test eliminacji sztucznego "Czy"
     t1, f1 = AVTLinter.lint_and_fix_line("Czy jesteś pewna?")
     assert t1 == "Jesteś pewna?"
@@ -199,6 +205,70 @@ def test_avt_linter():
     assert t4 == "Natsuki zmarła z powodu wylewu zaraz po porodzie."
     print(" -> PASSED: AVT Linter bezbłędnie wyłapuje i koryguje kalki i formy.")
 
+def test_series_bible():
+    print("[TEST 9/12] Test Biblii Serialu i Pamięci Międzyodcinkowej (series_memory)...")
+    with tempfile.TemporaryDirectory() as tmpdir:
+        bible = SeriesBible(anime_title="Test Anime Series", storage_dir=Path(tmpdir))
+        bible.update_from_episode_profile(
+            episode_name="Odcinek 1",
+            characters={"Arata": "uczeń, chłopak"},
+            glossary={"Dragon Slayer": "Pogromca Smoków"}
+        )
+        assert "Arata" in bible.data["characters"]
+        assert bible.data["glossary"]["Dragon Slayer"] == "Pogromca Smoków"
+        
+        # Test wczytywania i formatowania dla promptu
+        formatted = bible.format_for_prompt()
+        assert "Test Anime Series" in formatted
+        assert "Pogromca Smoków" in formatted
+    print(" -> PASSED: Biblia Serialu prawidłowo zapisuje i synchronizuje wiedzę.")
+
+def test_avt_formatter_and_cps():
+    print("[TEST 10/12] Test semantycznego podziału linii (Netflix AVT) i CPS...")
+    # Test kalkulacji CPS
+    cps, is_fast = calculate_cps("To jest krótka kwestia dialogowa.", start_ms=0, end_ms=1000)
+    assert cps > 20.0
+    assert is_fast is True
+
+    cps_normal, is_fast_norm = calculate_cps("Krótko.", start_ms=0, end_ms=2000)
+    assert is_fast_norm is False
+
+    # Test podziału linii z zachowaniem spójności syntaktycznej (brak łamania po przyimku 'w')
+    long_text = "Poszedłem wczoraj z moim przyjacielem do pobliskiego sklepu."
+    split_res = split_subtitle_syntactically(long_text, max_line_len=35, is_ass=True)
+    assert "\\N" in split_res
+    parts = split_res.split("\\N")
+    # Upewniamy się, że linijka 1 nie kończy się na 'do' ani 'z' ani 'w'
+    assert not parts[0].strip().endswith((" w", " z", " do", " na"))
+    print(" -> PASSED: Podział linii AVT i kalkulator CPS działają bezbłędnie.")
+
+def test_prosody_and_diarizer():
+    print("[TEST 11/12] Test lokalnej analizy prozodii i diarizacji fonicznej F0...")
+    # Test szacowania F0 na syntetycznym sygnale sinusoidalnym (200Hz - żeński)
+    sr = 16000
+    t = np.linspace(0, 1.0, sr, endpoint=False)
+    sine_200hz = (np.sin(2 * np.pi * 200 * t) * 15000).astype(np.float32)
+    f0_est = SpeakerVoiceClassifier.estimate_pitch_f0(sine_200hz, sample_rate=sr)
+    assert f0_est is not None
+    assert 190.0 <= f0_est <= 210.0
+
+    # Test sygnału męskiego (120Hz)
+    sine_120hz = (np.sin(2 * np.pi * 120 * t) * 15000).astype(np.float32)
+    f0_est_male = SpeakerVoiceClassifier.estimate_pitch_f0(sine_120hz, sample_rate=sr)
+    assert f0_est_male is not None
+    assert 110.0 <= f0_est_male <= 130.0
+    print(" -> PASSED: Autokorelacja foniczna i estymacja pasma F0 działają perfekcyjnie.")
+
+def test_typesetting_matcher():
+    print("[TEST 12/12] Test auto-kolorowania napisów ekranowych (typesetting_matcher)...")
+    hex_color = rgb_to_ass_hex(255, 128, 64)
+    assert hex_color == "&H4080FF&"  # ASS to BGR
+
+    # Test wzbogacania prefiksu tagów
+    res = TypesettingColorMatcher.enhance_typesetting_prefix("{\\an8}")
+    assert "\\an8" in res
+    print(" -> PASSED: Moduł auto-stylizacji i kolorów ASS działa w 100%.")
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -209,4 +279,8 @@ if __name__ == "__main__":
     test_profiler_and_whisper()
     test_model_resolver()
     test_avt_linter()
-    print("\n Wszystkie testy jednostkowe i integracyjne zakończone sukcesem!\n")
+    test_series_bible()
+    test_avt_formatter_and_cps()
+    test_prosody_and_diarizer()
+    test_typesetting_matcher()
+    print("\n Wszystkie testy jednostkowe i integracyjne (12/12) zakończone pełnym sukcesem!\n")

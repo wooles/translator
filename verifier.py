@@ -50,11 +50,14 @@ class DialogueVerifier:
         for item in batch_items:
             type_tag = f" [🖼️ {item['visual_type']}]" if item.get("is_sign") else " [💬 DIALOG MÓWIONY]"
             gender_info = f" (Mówca: {item.get('speaker_gender')})" if item.get('speaker_gender') else ""
+            voice_info = f" [Głos: {item.get('speaker_voice')}]" if item.get('speaker_voice') else ""
+            prosody_info = f" [Ton: {item.get('prosody')}]" if item.get('prosody') else ""
+            cps_info = f" [⏱️ {item.get('cps_warning')}]" if item.get('cps_warning') else ""
             notes_info = f" [Notatki: {item.get('notes')}]" if item.get('notes') else ""
             visual_info = f" [Położenie/Styl: {item.get('visual_details')}]" if item.get('visual_details') else ""
             
             prompt_lines.append(
-                f"- [ID: {item['id']}]{type_tag}{gender_info}{visual_info}\n"
+                f"- [ID: {item['id']}]{type_tag}{gender_info}{voice_info}{prosody_info}{cps_info}{visual_info}\n"
                 f"  EN: {item['en']}\n"
                 f"  Wstępne PL: {item['pl']}{notes_info}"
             )
