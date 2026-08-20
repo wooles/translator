@@ -681,7 +681,7 @@ class MultimodalTranslator:
                             desc = f"{char.gender} ({char.role or 'postać'})"
                             self.character_registry[char.name] = desc
                 if batch_response and batch_response.scene_description:
-                    pbar.write(f" ├─ [Kadr/Scena] {batch_response.scene_description}")
+                    pbar.write(f" ├─ [Kontekst] {batch_response.scene_description}")
 
                 # Czyszczenie klatek i audio tymczasowego
                 for fpath in temp_frames:
