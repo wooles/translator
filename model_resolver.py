@@ -23,17 +23,13 @@ def _extract_model_score(model_name: str) -> Tuple[int, int, int]:
     """
     clean_name = model_name.replace("models/", "").lower()
     
-    # Wykrywanie numerów wersji np. 3.7, 3.5, 4.0, 2.5
+    # Wykrywanie numerów wersji np. 3.7, 3.6, 3.5, 4.0, 2.5
     match = re.search(r"gemini-(\d+)(?:\.(\d+))?(?:\.(\d+))?", clean_name)
     if match:
         major = int(match.group(1))
         minor = int(match.group(2)) if match.group(2) else 0
         patch = int(match.group(3)) if match.group(3) else 0
         return (major, minor, patch)
-    
-    # Obsługa aliasów 'latest'
-    if "latest" in clean_name:
-        return (99, 0, 0)
         
     return (0, 0, 0)
 
@@ -42,13 +38,13 @@ def resolve_best_models(client: Optional[genai.Client] = None) -> Dict[str, str]
     """
     Automatycznie analizuje dostępne modele w Google AI Studio dla danego klucza API
     i zwraca słownik z najnowszymi wersjami dla każdej klasy:
-    - 'flash': Najnowszy, najpotężniejszy model Flash (np. gemini-3.7-flash)
+    - 'flash': Najnowszy, najpotężniejszy model Flash (np. gemini-3.7-flash lub gemini-3.6-flash)
     - 'flash_lite': Najszybszy, lekki model Flash-Lite (np. gemini-3.5-flash-lite)
     - 'pro': Flagowy model klasy Pro (np. gemini-3.1-pro-preview)
     """
     # Domyślne sprawdzone modele bazowe (fallback)
     defaults = {
-        "flash": "gemini-3.7-flash",
+        "flash": "gemini-3.6-flash",
         "flash_lite": "gemini-3.5-flash-lite",
         "pro": "gemini-3.1-pro-preview"
     }
@@ -63,7 +59,8 @@ def resolve_best_models(client: Optional[genai.Client] = None) -> Dict[str, str]
         flash_lite_candidates = []
         pro_candidates = []
 
-        excluded_keywords = ["image", "tts", "audio", "live", "robotics", "embedding", "customtools"]
+        # Odrzucamy modele specjalizowane oraz niestabilne, nieoznaczone wersją aliasy -latest
+        excluded_keywords = ["image", "tts", "audio", "live", "robotics", "embedding", "customtools", "latest"]
 
         for m in raw_models:
             name = m.name.replace("models/", "")
