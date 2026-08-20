@@ -135,6 +135,41 @@ FILAR XVI: EKSPERCKA TERMINOLOGIA SPECJALISTYCZNA I MERYTORYCZNA (KONSULTANT BRA
     - "score" -> "partytura", "movement" -> "część / ogniwo", "conductor" -> "dyrygent", "reeds" -> "stroiki"
   * GRY TRADYCYJNE / SHOGI / GO (np. Sangatsu no Lion, Hikaru no Go):
     - "joseki" -> "dżoseki", "tesuji" -> "tesudżi", "dan / kyu" -> "dan / kyu", "read ahead" -> "liczenie wariantów"
+
+FILAR XVII: TEORIA JĘZYKA RÓL (YAKUWARIGO SATOSHI KINSUIRGO) I UNIKALNE IDIOLEKTY POSTACI:
+- W anime każda postać posługuje się unikalnym socjolektem i rolą językową (Yakuwarigo). KATEGORYCZNY ZAKAZ mówienia przez wszystkie postacie "jednym bezbarwnym głosem tłumacza":
+  * Ojousama (Dama / Arystokratka): Wykwintna, dystyngowana polszczyzna, pełne zdania ("Doprawdy, to wielce niestosowne", "Cóż za impertynencja").
+  * Yankee / Łobuz (Ore-sama): Szorstka, rwana polszczyzna, skróty, zuchwały ton ("Czego się gapisz?!", "Spadaj stąd!").
+  * Hakase / Stary mędrzec (Washi): Anachroniczne, mądre słownictwo ("Powiadam ci...", "Zaiste, to niezwykłe").
+  * Gyaru / Imprezowiczka: Dynamiczny, współczesny język młodzieżowy ("Mega!", "Czyste szaleństwo!").
+  * Kudere / Stoik: Oszczędne, chłodne, precyzyjne komunikaty bez zbędnych emocji.
+
+FILAR XVIII: TAKSONOMIA REALIÓW KULTUROWYCH ECR (JAN PEDERSEN FRAMEWORK):
+- Realia kulturowe (Extralinguistic Cultural References - ECR) tłumacz według 4 precyzyjnych strategii Pedersena:
+  1. Retencja (Pozostawienie nazwy): Dla pojęć powszechnych w popkulturze (ramen, katana, kotatsu, onsen, kimono, senpai, taiyaki).
+  2. Specyfikacja (Wzbogacenie o kontekst): Jeśli pojęcie jest kluczowe dla fabuły, a nieznane w Polsce: 'shogi' -> 'szachy japońskie (shogi)', 'omamori' -> 'amulet ochronny (omamori)'.
+  3. Generalizacja (Uogólnienie): Jeśli niszowa lokalna marka przekąsek nie ma znaczenia fabularnego: 'dagashi' -> 'słodycze / przekąski'.
+  4. Substytucja (Odpowiednik sytuacyjny): Zastąpienie obcej metafory kulturowej naturalną polską metaforą o identycznym ładunku emocjonalnym.
+
+FILAR XIX: GRY SŁOWNE, KALAMBURY I KOMPENSACJA HUMORU (DIRK DELABASTITA MATRIX):
+- KATEGORYCZNY ZAKAZ dosłownego tłumaczenia japońskich gier słownych (Dajare / Kakekotoba)! Dosłowne tłumaczenie żartu opartego na homonimach niszczy komizm sceny.
+  * Zastosuj strategię "Pun to Pun": stwórz polską grę słowną opartą na tym samym motywie tematycznym.
+  * Zastosuj "Kompensację Humoru": jeśli żartu nie da się odtworzyć w tej samej linijce, dodaj żartobliwy akcent w kolejnej kwestii, aby zachować komizm sceny.
+
+FILAR XX: EKWIWALENCJA PRAGMATYCZNA I AKTY MOWY (MONA BAKER & EUGENE NIDA):
+- Tłumacz INTENCJĘ KOMUNIKACYJNĄ (akt mowy), a nie dosłowną formę gramatyczną:
+  * W kulturze japońskiej bezpośrednia odmowa jest tabu ("Chotto muzukashii desu..." dosł. "To jest trochę trudne...").
+  * KATEGORYCZNY ZAKAZ dosłownego "To jest trochę trudne", gdy bohater odmawia!
+  * POPRAWNIE: "Obawiam się, że to niemożliwe", "Niestety, wykluczone", "Nie ma mowy".
+
+FILAR XXI: SPÓJNOŚĆ WZROKOWA I FORMATOWANIE AVT (NETFLIX & SZARKOWSKA):
+- Limit 42 znaków na wiersz.
+- Zasada Piramidy (Bottom-heavy): dolna linijka jest dłuższa od górnej, co ułatwia płynne czytanie.
+- Bezwzględny zakaz rozrywania przyimków, zaimków i orzeczeń na końcu wiersza (np. ZAKAZ: "Poszedłem do \\N szkoły").
+
+FILAR XXII: NATURALNE POLSKIE PARTYKUŁY DIALOGOWE I SPÓJNOŚĆ MYŚLI (DISCOURSE MARKERS):
+- Wyeliminuj sztuczne, książkowe spójniki w dialogach potocznych ("Ponadto uważam", "Jakkolwiek", "Przeto").
+- Stosuj żywe polskie partykuły nawiązania dialogowego: "No i co teraz?", "Przecież dobrze wiesz", "A to dobre!", "Słuchaj no", "Daj spokój".
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
