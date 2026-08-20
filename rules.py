@@ -22,9 +22,22 @@ FUNDAMENTY PRZEKŁADU AUDIOWIZUALNEGO (KANON WG ARKADIUSZA BELCZYKA):
 3. REKONSTRUKCJA CAŁEGO ZDANIA (SENTENCE-LEVEL FLOW):
    - Kwestie rozbite na 2-4 linijki napisu muszą tworzyć jedno bezbłędne, płynne gramatycznie i logicznie zdanie z naturalnym polskim szykiem wyrazów.
 
-4. ELIMINACJA POWTÓRZEŃ LEKSYKALNYCH (EFEKT ECHO):
-   - W języku polskim powtarzanie tego samego rzeczownika w pytaniu i odpowiedzi (np. "manga... mangi") jest rażącym błędem stylistycznym.
-   - Stosuj synonimy kontekstowe (tytuł, seria, komiks, historia) lub elipsę ("Ja wolę te pełne akcji").
+4. ZASADA ANAFORY, ZAIMKA "TO / NA TO" I ZAKAZ POWTÓRZEŃ TEMATU:
+   - Gdy temat/rzeczownik został nazwany w poprzednim zdaniu, W KOLEJNYM ZDANIU TEGO SAMEGO LUB INNEGO MÓWCY BEZWZGLĘDNIE ZABRANIA SIĘ POWTARZANIA TEGO RZECZOWNIKA!
+   - Zastąp go zaimkiem wskazującym ("to", "na to", "z tym", "o tym"), czasownikiem frazowym lub elipsą:
+     * BŁĄD ❌: "Wyszła wam całkiem spójna historia. [...] Jak ułożyłyście tę historię?" (Drewniane powtórzenie słowa historia).
+     * POPRAWNIE ✔️: "Wyszła wam całkiem spójna historia. [...] Jak na to wpadłyście?" / "Jak to wymyśliłyście?" / "Jak to poskładałyście?".
+     * BŁĄD ❌: "A jakie mangi wy dwie lubicie? [...] Ja uwielbiam pełne akcji mangi."
+     * POPRAWNIE ✔️: "A jakie mangi wy dwie lubicie? [...] Ja uwielbiam tytuły pełne akcji." / "Ja uwielbiam te z dużą dawką akcji."
+     * BŁĄD ❌: "Widziałeś ten film? Nie, nie widziałem tego filmu."
+     * POPRAWNIE ✔️: "Widziałeś ten film? Nie, jeszcze nie." / "Nie, a dobry?".
+     * BŁĄD ❌: "Mamy pewien plan. Jaki to jest plan?"
+     * POPRAWNIE ✔️: "Mamy pewien plan. Co zamierzacie?" / "Jaki?" / "O co chodzi?".
+
+5. NATURALNE POLSKIE KOLOKACJE PYTAJĄCE (ZAMIAST KALK SŁOWNIKOWYCH):
+   - "How did you put this story/idea together?" -> "Jak na to wpadłyście?", "Jak to poskładałyście?", "Skąd ten pomysł?".
+   - "How did you manage to do this?" -> "Jak wam się to udało?", "Jak to zrobiłyście?".
+   - "What do you think about this thing?" -> "Co o tym myślisz?", "I jak wrażenia?".
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -374,8 +387,9 @@ ZASADA UCHA POLSKIEGO WIDZA I KONDENSACJI BELCZYKA:
 KRYTYCZNA LISTA KONTROLNA BELCZYKA:
 1. RELACJE SPOŁECZNE I TYTUŁY (-sensei / -san):
    - Uczeń mówiący o nauczycielu/nauczycielce (-sensei) MUSI użyć formy grzecznościowej ("pani Teshima", "mangi pani Teshimy", "Proszę pani!"). ZAKAZ mówienia o nauczycielu samym nazwiskiem jak o koledze ("mangi Teshimy")!
-2. ELIMINACJA POWTÓRZEŃ LEKSYKALNYCH (EFEKT ECHO):
-   - Zastąp powtórzone rzeczowniki w sąsiednich linijkach synonimami ("manga" -> "tytuły", "serie", "komiksy") lub zastosuj elipsę ("Ja uwielbiam pełne akcji i emocji").
+2. ELIMINACJA POWTÓRZEŃ LEKSYKALNYCH I ANAFORA (ZAIMEK 'TO / NA TO'):
+   - Jeśli w zdaniu A padł rzeczownik (np. "Wyszła wam całkiem spójna historia"), W KOLEJNYM ZDANIU B (np. "Jak ułożyłyście tę historię?") BEZWZGLĘDNIE ZABRANIA SIĘ POWTARZANIA TEGO SAMEGO SŁOWA!
+   - Zastąp je zaimkiem ("Jak na to wpadłyście?", "Jak to wymyśliłyście?", "Jak to poskładałyście?"), elipsą lub synonimem ("mangi" -> "tytuły", "serie").
 3. ELIMINACJA PRZESYTU ZAIMKA "JA":
    - Usuń zbędne "Ja" na początku zdań ("Ja myślę" -> "Myślę", "Ja wiem" -> "Wiem").
 4. AMERYKANIZMY I DROBIAZGI:
@@ -408,6 +422,9 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
 10. PERSPEKTYWA GRAMATYCZNA I KTO MÓWI (1. OSOBA VS 2. OSOBA):
    - Upewnij się, czy kwestia nie jest deklaracją/obietnicą mówiących bohaterów (1. osoba: "My przejdziemy...", "Sami uzbieramy...").
    - BEZWZGLĘDNY ZAKAZ mylenia perspektywy: gdy uczennica z zaciśniętą pięścią krzyczy do nauczycielki o planach klubu, MUSI być 1. osoba: "Na cyfrowy przejdziemy, jak same uzbieramy!", a NIE 2. osoba: "Na cyfrowy przejdziecie...".
+11. NATURALNE FRAZY PYTAJĄCE I KOLOKACJE:
+   - "How did you put this story together?" / "How did you come up with it?" -> "Jak na to wpadłyście?", "Jak to wymyśliłyście?", "Skąd ten pomysł?" (ZAKAZ dosłownego: "Jak ułożyłyście tę historię?").
+   - "How did you do that?" -> "Jak ci się to udało?", "Jak to zrobiłaś?".
 
 {BELCZYK_AVT_MASTER_CANON}
 
