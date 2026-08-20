@@ -196,6 +196,11 @@ ELIMINACJA KALEK SKŁADNIOWYCH, IDIOMÓW I PUŁAPEK TŁUMACZENIA DOSŁOWNEGO (1:
 - Gdy w tym samym momencie na ekranie pojawia się napis w dymku/chmurce (Sign) oraz dialog mówiony o tej samej treści angielskiej:
   * Obie kwestie muszą być ze sobą w 100% spójne i naturalne (np. "Jego prace są świetne." / "Świetnie rysuje.").
   * ZAKAZ tworzenia dziwacznych zlepków na jednym kadrze (np. "Świetnie rysuje" obok bezsensownego "Świetnie to robi").
+
+4. GRAMATYKA LICZEBNIKÓW W TYTUŁACH I NAZWACH FORMACJI (CZTEREJ CESARZE VS CZWORO CESARZY):
+- Liczebniki męskoosobowe i główne (dorosłe postacie, wojownicy, cesarze, królowie):
+  * W mianowniku: "Czterej Cesarze", "Trzej Królowie", "Czterej Jeźdźcy Apokalipsy", "Trzej Muszkieterowie" (ZAKAZ: "Czworo Cesarzy" / "Czworo Królów" - liczebnik zbiorowy 'czworo' stosuje się do dzieci, istot niedorosłych lub pluralia tantum, jak 'czworo dzieci', 'dwoje drzwi').
+  * W dopełniaczu / bierniku / składni z czasownikiem: "Czterech Cesarzy" ("Terytorium Czterech Cesarzy", "W Nowym Świecie rządzi czterech cesarzy").
 """
 
 SYNTACTIC_CALQUES_GUIDE = SYNTACTIC_CALQUES_AND_IDIOMS
