@@ -36,6 +36,7 @@ class EpisodeProfile(BaseModel):
     setting_and_era: str = Field(default="", description="Epoka historyczna, czas i miejsce akcji (np. 'XIII wiek, Imperium Mongolskie', 'Współczesne Tokio')")
     domain_expertise: str = Field(default="", description="Specjalistyczna dziedzina wiedzy i profesjonalna terminologia branżowa (np. 'Enologia / Sommelierstwo: terminologia winiarska, szczepy, apelacje', 'Szachy / Shogi')")
     dialogue_stylization: str = Field(default="", description="Wytyczne stylizacji rejestru języka i zakazy/nakazy słownictwa dla tej epoki")
+    manga_canon_source: Optional[str] = Field(default="", description="Oficjalne polskie wydawnictwo mangi (np. Waneko, J.P.Fantastica, Studio JG, Hanami), jeśli seria była wydana w Polsce")
     tone_and_genre: str = Field(description="Rejestr i ton dialogów (np. 'szlachetny epos historyczny', 'profesjonalny dramat sommeliera', 'lekkie młodzieżowe anime')")
     characters: List[CharacterRelationship] = Field(default_factory=list, description="Macierz relacji i form grzecznościowych między bohaterami")
     glossary: List[GlossaryTerm] = Field(default_factory=list, description="Słowniczek kluczowych pojęć, tytułów, nazw własnych i terminów specjalistycznych")
@@ -48,6 +49,8 @@ def format_episode_profile_for_prompt(profile: Optional[EpisodeProfile]) -> str:
         return ""
 
     lines = ["=== SŁOWNICZEK, REALIA ŚWIATA, DZIEDZINA I MACIERZ RELACJI (PROFILER ODCINKA) ==="]
+    if profile.manga_canon_source:
+        lines.append(f"📖 Oficjalny polski kanon mangowy: {profile.manga_canon_source}")
     if profile.setting_and_era:
         lines.append(f"🏛️ Epoka i realia świata: {profile.setting_and_era}")
     if profile.domain_expertise:
@@ -74,7 +77,7 @@ def format_episode_profile_for_prompt(profile: Optional[EpisodeProfile]) -> str:
         for conv in profile.key_conventions:
             lines.append(f"- {conv}")
 
-    lines.append("================================================================================\n")
+    lines.append("=================================================================================\n")
     return "\n".join(lines)
 
 
@@ -102,7 +105,7 @@ class EpisodeProfiler:
                 logger.warning(f"Błąd odczytu cache profilu ({e}), generowanie na nowo...")
 
         prompt = f"""Jesteś Głównym Reżyserem i Konsultantem Merytorycznym Lokalizacji Anime.
-Twoim zadaniem jest wstępna analiza całego odcinka na podstawie poniższych dialogów i metadanych, aby stworzyć kompletny PROFIL ODCINKA, ustalić REALIA ŚWIATA, SPECJALISTYCZNĄ DZIEDZINĘ WIEDZY (np. winiarstwo/enologia, medycyna, muzyka klasyczna, shogi, kulinaria) ORAZ REJESTR STYLIZACJI DIALOGÓW.
+Twoim zadaniem jest wstępna analiza całego odcinka na podstawie poniższych dialogów i metadanych, aby stworzyć kompletny PROFIL ODCINKA, ustalić REALIA ŚWIATA, SPECJALISTYCZNĄ DZIEDZINĘ WIEDZY (np. winiarstwo/enologia, medycyna, muzyka klasyczna, shogi, kulinaria), OFICJALNY KANON POLSKIEGO WYDANIA MANGI (jeśli seria wyszła w Polsce) ORAZ REJESTR STYLIZACJI DIALOGÓW.
 
 METADANE Z BAZY ANILIST:
 {anime_metadata_str}
@@ -113,10 +116,11 @@ PRÓBKA KWESTII DIALOGOWYCH Z ODCINKA:
 ZADANIE:
 1. Zidentyfikuj EPOKĘ HISTORYCZNĄ ORAZ MIEJSCE AKCJI (np. "XIII wiek, Imperium Mongolskie / dwór chanów", "Okres Edo w feudalnej Japonii", "Współczesna szkoła w Tokio", "Średniowieczny świat fantasy").
 2. Zidentyfikuj NISZOWĄ DZIEDZINĘ WIEDZY / TEMATYKĘ SPECJALISTYCZNĄ (np. "Enologia i Sommelierstwo (Wino / Winiarstwo) - terminologia: szczepy, apelacje, roczniki, taniny, kupaż", "Medycyna", "Muzyka klasyczna", "Shogi").
-3. Ustal WYTYCZNE STYLIZACJI JĘZYKOWEJ dla tej epoki i dziedziny (np. dla wina: używanie fachowych polskich pojęć enologicznych, dla epoki dawnej: ZAKAZ współczesnego slangu).
-4. Zidentyfikuj kluczowe postacie, ich role oraz ustal, jak powinny się do siebie zwracać po polsku (kto per 'pan/pani', kto 'Wasza Dostojność / Chanie', kto po imieniu).
-5. Wyodrębnij specyficzne pojęcia epokowe, branżowe terminy specjalistyczne, tytuły dzieł, nazwy win/potraw/miejsc i ustal dla nich bezbłędne, polskie tłumaczenie.
-6. Określ ton i rejestr językowy dialogów.
+3. OFICJALNY POLSKI KANON MANGOWY: Jeśli to anime posiada oficjalny polski przekład mangowy (np. z wydawnictw Waneko, J.P.Fantastica, Studio JG, Hanami, Kotori, Dango, Egmont), zidentyfikuj wydawnictwo w 'manga_canon_source' oraz bezwzględnie włącz do słowniczka oficjalne polskie nazwy technik, magii, krain, formacji bojowych, organizacji i rang z polskich tomików papierowych.
+4. Ustal WYTYCZNE STYLIZACJI JĘZYKOWEJ dla tej epoki i dziedziny (np. dla wina: używanie fachowych polskich pojęć enologicznych, dla epoki dawnej: ZAKAZ współczesnego slangu).
+5. Zidentyfikuj kluczowe postacie, ich role oraz ustal, jak powinny się do siebie zwracać po polsku (kto per 'pan/pani', kto 'Wasza Dostojność / Chanie', kto po imieniu).
+6. Wyodrębnij specyficzne pojęcia epokowe, branżowe terminy specjalistyczne, tytuły dzieł, nazwy win/potraw/miejsc i ustal dla nich bezbłędne, polskie tłumaczenie.
+7. Określ ton i rejestr językowy dialogów.
 
 Zwróć wynik w formacie JSON zgodnym ze schematem EpisodeProfile."""
 

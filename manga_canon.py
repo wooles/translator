@@ -427,6 +427,223 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Nijika -> Hitori": "Bocchi-chan / Bocchi",
             "Hitori -> Nijika": "Nijika-chan / pani Nijiko (z lękiem)"
         }
+    },
+    "dragon_ball": {
+        "title": "Dragon Ball",
+        "aliases": ["dragon ball", "dragon ball z", "dragon ball super", "dbz", "dbs"],
+        "publisher": "Wydawnictwo J.P.Fantastica",
+        "glossary": {
+            "Kamehameha": "Kamehameha",
+            "Super Saiyan": "Super Saiyanin",
+            "Dragon Balls": "Smocze Kule",
+            "Senzu Bean": "Fasolka Senzu",
+            "Spirit Bomb / Genki Dama": "Kula Genki Dama",
+            "Capsule Corp": "Capsule Corporation"
+        },
+        "character_forms": {
+            "Goku -> Vegeta": "Vegeta / na ty",
+            "Vegeta -> Goku": "Kakarotto"
+        }
+    },
+    "naruto": {
+        "title": "Naruto / Naruto Shippuuden",
+        "aliases": ["naruto", "naruto shippuden", "naruto shippuuden", "boruto"],
+        "publisher": "Wydawnictwo J.P.Fantastica",
+        "glossary": {
+            "Hidden Leaf Village / Konoha": "Wioska Ukrytego Liścia (Konoha)",
+            "Hokage": "Hokage",
+            "Rasengan": "Rasengan",
+            "Shadow Clone Jutsu": "Technika Klonowania Cienia",
+            "Nine-Tailed Fox / Kurama": "Dziewięcioogoniasty Lis (Kyuubi / Kurama)",
+            "Chidori": "Chidori / Piorunochwyt",
+            "Sharingan": "Szaringan",
+            "Akatsuki": "Akatsuki"
+        },
+        "character_forms": {
+            "Naruto -> Kakashi": "panie Kakashi / Kakashi-sensei",
+            "Naruto -> Sasuke": "Sasuke / na ty",
+            "Sakura -> Sasuke": "Sasuke-kun / Sasuke"
+        }
+    },
+    "bleach": {
+        "title": "Bleach",
+        "aliases": ["bleach", "bleach thousand year blood war", "bleach tybw"],
+        "publisher": "Wydawnictwo J.P.Fantastica",
+        "glossary": {
+            "Soul Reaper / Shinigami": "Żniwiarz Dusz (Shinigami)",
+            "Soul Society": "Społeczność Dusz (Soul Society)",
+            "Zanpakuto": "Zanpakuto",
+            "Bankai": "Bankai",
+            "Shikai": "Shikai",
+            "Hollow": "Pusty (Hollow)",
+            "Espada": "Espada",
+            "Quincy": "Quincy",
+            "Getsuga Tenshou": "Getsuga Tenshou"
+        },
+        "character_forms": {
+            "Ichigo -> Rukia": "Rukia / na ty",
+            "Rukia -> Ichigo": "Ichigo / durniu"
+        }
+    },
+    "death_note": {
+        "title": "Death Note (Notatnik Śmierci)",
+        "aliases": ["death note"],
+        "publisher": "Wydawnictwo J.P.Fantastica",
+        "glossary": {
+            "Death Note": "Notatnik Śmierci",
+            "Shinigami": "Shinigami (Bóg Śmierci)",
+            "Kira": "Kira",
+            "Shinigami Eyes": "Oczy Shinigami",
+            "L": "L / Ryuzaki"
+        },
+        "character_forms": {
+            "Light -> L": "Ryuzaki / na ty",
+            "L -> Light": "panie Yagami / Light"
+        }
+    },
+    "jojo": {
+        "title": "JoJo's Bizarre Adventure",
+        "aliases": ["jojo", "jojos bizarre adventure", "jojo no kimyou na bouken", "stardust crusaders", "golden wind", "stone ocean"],
+        "publisher": "Wydawnictwo J.P.Fantastica",
+        "glossary": {
+            "Stand": "Stand",
+            "Hamon / Ripple": "Fale Hamon",
+            "Speedwagon Foundation": "Fundacja Speedwagona",
+            "Stone Mask": "Kamienna Maska",
+            "Dio": "Dio Brando"
+        },
+        "character_forms": {
+            "Jotaro -> Joseph": "stary / dziadku",
+            "Polnareff -> Jotaro": "Jotaro / na ty"
+        }
+    },
+    "dandadan": {
+        "title": "DanDaDan",
+        "aliases": ["dandadan", "dan da dan"],
+        "publisher": "Wydawnictwo Studio JG",
+        "glossary": {
+            "Turbo Granny": "Turbo Babcia",
+            "Serpoians": "Kosmici Serpo",
+            "Spirit / Yokai": "Yokai / Duch",
+            "Cursed Ball": "Złota Kula"
+        },
+        "character_forms": {
+            "Momo -> Okarun": "Okarun / na ty",
+            "Okarun -> Momo": "Ayase-san / Momo"
+        }
+    },
+    "kaiju_no_8": {
+        "title": "Kaiju No. 8",
+        "aliases": ["kaiju no 8", "kaiju no. 8", "kaiju no.8"],
+        "publisher": "Wydawnictwo Studio JG",
+        "glossary": {
+            "Kaiju": "Kaiju (Potwór)",
+            "Defense Force": "Siły Samoobrony",
+            "Unleashed Combat Power": "Uwolniona Siła Bojowa",
+            "Monster Sweeper": "Sprzątacze Kaiju"
+        },
+        "character_forms": {
+            "Kafka -> Reno": "Reno / na ty",
+            "Mina -> Kafka": "Kafka / panie Hibino"
+        }
+    },
+    "solo_leveling": {
+        "title": "Solo Leveling (Tylko ja awansuję)",
+        "aliases": ["solo leveling", "ore dake level up na ken"],
+        "publisher": "Wydawnictwo Studio JG",
+        "glossary": {
+            "Hunter": "Łowca",
+            "Shadow Monarch": "Monarcha Cieni",
+            "Arise": "Powstań",
+            "D-Rank / S-Rank": "Ranga D / Ranga S",
+            "Dungeon Break": "Przełamanie Lochu",
+            "Shadow Soldiers": "Żołnierze Cienia"
+        },
+        "character_forms": {
+            "Jinwoo -> Shadows": "Powstańcie / do ataku"
+        }
+    },
+    "mushoku_tensei": {
+        "title": "Mushoku Tensei: Przegrany bezrobotny",
+        "aliases": ["mushoku tensei", "jobless reincarnation"],
+        "publisher": "Wydawnictwo Studio JG",
+        "glossary": {
+            "Mana Disaster / Teleportation Incident": "Incydent Teleportacyjny (Katastrofa Many)",
+            "Superd": "Plemię Superdów",
+            "Dragon God Orsted": "Smoczy Bóg Orsted",
+            "Ruijerd of the Dead End": "Ruijerd z Dead End",
+            "Magic University of Ranoa": "Uniwersytet Magii Ranoa"
+        },
+        "character_forms": {
+            "Rudeus -> Eris": "pani Eris / Eris",
+            "Rudeus -> Roxy": "mistrzyni Roxy / bogini Roxy"
+        }
+    },
+    "made_in_abyss": {
+        "title": "Made in Abyss",
+        "aliases": ["made in abyss"],
+        "publisher": "Wydawnictwo Kotori",
+        "glossary": {
+            "Abyss": "Otchłań",
+            "Delver / Cave Raider": "Eksplorator / Grabieżca Jaskiń",
+            "White Whistle": "Biały Gwizdek",
+            "Curse of the Abyss": "Klątwa Otchłani",
+            "Relic": "Relikt",
+            "Orth": "Miasto Orth"
+        },
+        "character_forms": {
+            "Riko -> Reg": "Reg / na ty",
+            "Nanachi -> Riko": "Riko / na ty"
+        }
+    },
+    "overlord": {
+        "title": "Overlord",
+        "aliases": ["overlord", "overlord iv", "overlord iii", "overlord ii"],
+        "publisher": "Wydawnictwo Kotori",
+        "glossary": {
+            "Great Tomb of Nazarick": "Wielki Grobowiec Nazarick",
+            "Supreme Being": "Najwyższa Istota",
+            "Floor Guardian": "Strażnik Piętra",
+            "Ainz Ooal Gown": "Ainz Ooal Gown",
+            "Sorcerer Kingdom": "Królestwo Magii",
+            "World Item": "Przedmiot Światowy"
+        },
+        "character_forms": {
+            "Guardians -> Ainz": "Władco Ainz / Lordzie Ainz",
+            "Ainz -> Guardians": "po imieniu"
+        }
+    },
+    "hells_paradise": {
+        "title": "Piekielny Raj (Jigokuraku / Hell's Paradise)",
+        "aliases": ["jigokuraku", "hells paradise", "hell's paradise"],
+        "publisher": "Wydawnictwo Waneko",
+        "glossary": {
+            "Elixir of Immortality": "Eliksir Nieśmiertelności",
+            "Asaemon": "Klan Yamada Asaemon",
+            "Gabimaru the Hollow": "Gabimaru Pusty",
+            "Tao": "Energia Tao",
+            "Lord Tensen": "Lord Tensen"
+        },
+        "character_forms": {
+            "Sagiri -> Gabimaru": "Gabimaru / na ty",
+            "Gabimaru -> Sagiri": "Sagiri / na ty"
+        }
+    },
+    "tokyo_revengers": {
+        "title": "Tokyo Revengers",
+        "aliases": ["tokyo revengers"],
+        "publisher": "Wydawnictwo Waneko",
+        "glossary": {
+            "Tokyo Manji Gang / Toman": "Gang Tokyo Manji (Toman)",
+            "Commander": "Naczelny Dowódca / Prezydent Tomana",
+            "Vice-Commander": "Wicedowódca",
+            "Time Leap": "Skok w czasie",
+            "Mikey the Invincible": "Niezwyciężony Mikey"
+        },
+        "character_forms": {
+            "Takemichi -> Mikey": "Mikey-kun / Mikey",
+            "Draken -> Mikey": "Mikey / na ty"
+        }
     }
 }
 
