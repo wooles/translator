@@ -19,7 +19,7 @@ from verifier import RefinedLine, RefinedBatchResponse
 from translator import LineTranslation, BatchTranslationResponse, sanitize_sub_text
 
 def test_rules_and_prompts():
-    print("[TEST 1/5] Sprawdzanie reguł anty-kalek i promptów...")
+    print("[TEST 1/13] Sprawdzanie kompletności 29 Filarów AVT i promptów...")
     sys_prompt = get_translation_system_prompt()
     ver_prompt = get_verifier_system_prompt()
     assert "I see" in sys_prompt
@@ -27,7 +27,11 @@ def test_rules_and_prompts():
     assert "KANON PRZEKŁADU AUDIOWIZUALNEGO" in sys_prompt
     assert "Arkadiusza Belczyka" in ver_prompt
     assert "ODNOMINALIZOWANIE" in sys_prompt
-    print(" -> PASSED: Reguły i prompty systemowe są kompletne.")
+    assert "FILAR XXIII: KANON POLSKICH WYDAŃ MANGOWYCH" in sys_prompt
+    assert "FILAR XXIV: NADMIAROWOŚĆ INTERSEMIOTYCZNA" in sys_prompt
+    assert "FILAR XXIX: ODWRÓCENIE POLARYZACJI SEMANTYCZNEJ W SARKAZMIE" in sys_prompt
+    assert "FILAR XXIX: ODWRÓCENIE POLARYZACJI SEMANTYCZNEJ W SARKAZMIE" in ver_prompt
+    print(" -> PASSED: Kompletny Kanon 29 Filarów AVT jest aktywny w obu fazach tłumaczenia.")
 
 def test_pydantic_schemas():
     print("[TEST 2/5] Weryfikacja schematów Pydantic...")

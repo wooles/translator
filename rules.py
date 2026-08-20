@@ -175,6 +175,34 @@ FILAR XXIII: KANON POLSKICH WYDAŃ MANGOWYCH I TRANSMEDIALNA SPÓJNOŚĆ (TRANSM
 - Gdy seria posiada oficjalny polski przekład mangowy (np. Waneko, J.P.Fantastica, Studio JG, Hanami, Kotori):
   * BEZWZGLĘDNIE zachowaj ustalone w polskim wydaniu papierowym nazwy technik, magii, krain, formacji bojowych i rang (np. "Rozszerzenie Domeny", "Przeklęta Energia", "Korpus Zwiadowczy", "Wielki Generał", "Państwo Środka").
   * RÓŻNICA AVT vs MANGA: Zachowaj kanoniczną terminologię, ale przestrzegaj rygoru zwięzłości napisów filmowych (limit 17 CPS i 42 znaków). Nie przenoś tasiemcowych zdań z dymków komiksu bez uprzedniej kondensacji składniowej.
+
+FILAR XXIV: NADMIAROWOŚĆ INTERSEMIOTYCZNA (JORGE DÍAZ CINTAS & HENRIK GOTTLIEB):
+- Film to medium wielokanałowe. KATEGORYCZNY ZAKAZ opisywania w napisach tego, co widz widzi na własne oczy w obrazie i mimice.
+  * Jeśli postać podaje klucze i mówi długie zdanie, po polsku wystarczy: "Trzymaj" lub "Twoje klucze".
+  * Wykorzystuj synergię obrazu, aby skrócić tekst i dać widzowi czas na patrzenie na akcję.
+
+FILAR XXV: MIMETYZM STANÓW PSYCHICZNYCH I SYMBOLE DŹWIĘKOWE (GITAIGO & GISEIGO):
+- Japońskie wyrazy naśladowcze nastrojów i odczuć tłumacz na soczyste polskie metafory sensoryczne i somatyczne:
+  * "doki-doki suru" -> "serce podchodzi mi do gardła", "serce mi wali" (ZAKAZ: "stresuję się", "moje serce robi doki doki").
+  * "ira-ira suru" -> "aż mnie nosi", "szlag mnie trafia".
+  * "waku-waku suru" -> "płonę z ciekawości", "aż mnie skręca z podekscytowania".
+  * "jiro-jiro miru" -> "gapi się jak sęp", "pożera wzrokiem".
+
+FILAR XXVI: PRZEŁAMANIE REJESTRU I DRAMATURGIA FORMY (POLITENESS SHIFT & KEIGO BREAKDOWN):
+- Gdy postać używająca form grzecznościowych (Keigo / pan / pani / Wasza Wysokość) wpada w skrajny gniew lub szok, NATYCHMIAST zerwij formy grzecznościowe:
+  * Przejdź na bezpośrednie, ostre "ty" lub rzuć wykrzyknikiem, aby oddać skok dramatyczny sceny.
+
+FILAR XXVII: STANDARD WIELOGŁOSU W KADRZE (NETFLIX DUAL-SPEAKER FORMATTING):
+- Gdy w jednej kwestii odzywają się dwie postacie jednocześnie lub naprzemiennie:
+  * Zastosuj myślnik ze spacją ("- ") na początku KAŻDEJ z wypowiedzi w osobnej linii:
+    "- Idziesz już?\\N- Daj mi chwilę."
+
+FILAR XXVIII: ŚWIADOMOŚĆ RUCHU UST I KADENCJA WYKAZOWA (LIP-FLAP CADENCE AWARENESS):
+- Krótki, gwałtowny japoński wykrzyknik aktora (np. "Baka!", "Kuso!", "Yamero!") MUSI otrzymać równie krótki, dosadny polski odpowiednik ("Szlag!", "Idiota!", "Stój!"). Zakaz rozbudowywania krótkich okrzyków w tasiemcowe zdania.
+
+FILAR XXIX: ODWRÓCENIE POLARYZACJI SEMANTYCZNEJ W SARKAZMIE (SARCASTIC INVERSION & IRONY MARKERS):
+- Japoński sarkazm maskowany przesadną uprzejmością uzbrój w polskie partykuły ironii:
+  * "No doprawdy, wielkie dzięki za pomoc...", "Akurat ci uwierzę...", "Cudownie, po prostu wspaniale...".
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
