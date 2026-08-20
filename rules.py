@@ -74,6 +74,34 @@ FILAR IX: ZAKAZ HALUCYNACJI PRZYNALEŻNOŚCI I ZAIMKÓW DZIERŻAWCZYCH (3. OSOBA
   * Oznacza to DOKŁADNIE tę nazwaną postać w 3. osobie ("Tata Akafuku!", "Ojciec Akafuku!", "Manga pani Teshimy!", "Dom Kokoro!", "Rysunek Minami!").
   * BEZWZGLĘDNY ZAKAZ zamiany imienia innej osoby na zaimki 1. osoby (np. KARDYNALNY BŁĄD ❌: przetłumaczenie "Akafuku's dad!" na "to mój tata"!).
   * Wykrzyknik zaskoczonej koleżanki (Kokoro) na widok groźnego ojca Akafuku to: "Tata Akafuku!" / "Ojciec Akafuku!".
+
+FILAR X: PYTANIA POTOCZNE I ELIMINACJA SZTUCZNEGO "CZY" (Wg Agnieszki Szarkowskiej i Belczyka):
+- W potocznym dialogu filmowym NIE zaczyna się każdego pytania od "Czy...". Pytania rozstrzygnięcia tworzy się intonacją:
+  * BŁĄD ❌: "Czy jesteś pewna?", "Czy widziałaś to?", "Czy idziesz z nami?", "Czy to prawda?".
+  * POPRAWNIE ✔️: "Jesteś pewna?", "Widziałaś to?", "Idziesz z nami?", "To prawda?" / "Serio?".
+  * Partykułę "Czy" zachowaj WYŁĄCZNIE w pytaniach alternatywnych ("Kawa czy herbata?") lub w bardzo oficjalnym tonie.
+
+FILAR XI: DEPASYWIZACJA (STRONA BIERNA -> CZYNNA / BEZOSOBOWA - Wg Tomasza Tomaszkiewicza):
+- Angielską stronę bierną kategorycznie zastępuj polską stroną czynną lub formami bezosobowymi:
+  * "It was decided that..." -> "Ustaliliśmy, że..." / "Zdecydowaliśmy, że..." (ZAKAZ: "Zostało zdecydowane").
+  * "He was given an award" -> "Dostał nagrodę" / "Wręczono mu nagrodę" (ZAKAZ: "Została mu dana").
+  * "The car was stolen" -> "Ukradli samochód" / "Skradziono samochód" (ZAKAZ: "Samochód został skradziony").
+
+FILAR XII: ELIMINACJA NADMIARU ZAIMKA WZGLĘDNEGO "KTÓRY / KTÓRA":
+- Unikaj tworzenia ciężkich zdań podrzędnych z "który" w mowie potocznej. Stosuj kondensację lub zwięzłe formy przymiotnikowe.
+
+FILAR XIII: SŁOWNIK EMOCJONALNYCH REAKCJI I WYKRZYKNIKÓW ANIME:
+- "Maji de?" / "Gachi de?" -> "Serio?!", "Naprawdę?!", "Bez jaj!".
+- "Uso!" / "Uso desho?!" -> "Nie gadaj!", "Nie wierzę!", "Żartujesz!".
+- "Sasuga!" -> "I to jest klasa!", "Wiedziałam!", "Jak zawsze niezawodna!".
+- "Yatta!" -> "Udało się!", "Mamy to!", "Super!", "Ekstra!".
+- "Baka!" / "Aho!" -> "Durna!", "Głupia!", "Idiotka!" (dla dziewczyny) / "Palant!", "Kretyn!" (dla chłopaka).
+- "Chotto matte!" -> "Czekaj no!", "Chwila!", "Zaraz!".
+- "Doushita no?" -> "Co jest?", "Co się stało?", "Coś nie tak?".
+- "Ikinari?!" -> "Tak z nienacka?!", "Tak nagle?!".
+- "Mendou kusai" -> "Ale mi się nie chce...", "Co za udręka...", "Męczące to...".
+- "Yada / Ya da!" -> "Nie ma mowy!", "Nie chcę!", "O nie!".
+- "Bikkuri shita!" -> "Ale mnie wystraszyłaś!", "Aż podskoczyłam!".
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """

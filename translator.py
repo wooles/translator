@@ -40,6 +40,7 @@ from metadata import get_anime_context, format_anime_context_for_prompt
 from memory import TranslationMemory, format_translation_memory_for_prompt
 from profiler import EpisodeProfiler, EpisodeProfile, format_episode_profile_for_prompt
 from whisper_engine import JapaneseWhisperEngine
+from avt_linter import AVTLinter
 
 def extract_typesetting_tags(raw_text: str) -> Tuple[str, str]:
     """
@@ -665,12 +666,28 @@ class MultimodalTranslator:
                         if r.changes_made:
                             pbar.write(f" └─ [Script Doctor] {r.changes_made}")
                     for item in pass1_items:
-                        final_text = sanitize_sub_text(refined_dict.get(item["id"], item["pl"]))
+                        raw_final = sanitize_sub_text(refined_dict.get(item["id"], item["pl"]))
+                        final_text, fixes = AVTLinter.lint_and_fix_line(
+                            text=raw_final,
+                            speaker_gender=item.get("speaker_gender"),
+                            is_all_girls_scene=True,
+                            is_sign=item.get("is_sign", False)
+                        )
+                        for fix in fixes:
+                            pbar.write(f" 🛡️ [AVT Linter] {fix}")
                         translated_results[item["orig_idx"]] = final_text
                         history.append({"en": item["en"], "pl": final_text})
                 else:
                     for item in pass1_items:
-                        final_text = sanitize_sub_text(item["pl"])
+                        raw_final = sanitize_sub_text(item["pl"])
+                        final_text, fixes = AVTLinter.lint_and_fix_line(
+                            text=raw_final,
+                            speaker_gender=item.get("speaker_gender"),
+                            is_all_girls_scene=True,
+                            is_sign=item.get("is_sign", False)
+                        )
+                        for fix in fixes:
+                            pbar.write(f" 🛡️ [AVT Linter] {fix}")
                         translated_results[item["orig_idx"]] = final_text
                         history.append({"en": item["en"], "pl": final_text})
 

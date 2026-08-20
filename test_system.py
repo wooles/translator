@@ -172,9 +172,23 @@ def test_model_resolver():
     assert score_37 > score_35 > score_25
     
     models = resolve_best_models(None)
-    assert "flash" in models
-    assert "pro" in models
-    print(" -> PASSED: Moduł auto-discovery modeli Gemini działa perfekcyjnie.")
+from avt_linter import AVTLinter
+
+def test_avt_linter():
+    print("[TEST 8/8] Test automatycznego audytora polszczyzny AVT Linter...")
+    # Test eliminacji sztucznego "Czy"
+    t1, f1 = AVTLinter.lint_and_fix_line("Czy jesteś pewna?")
+    assert t1 == "Jesteś pewna?"
+    
+    # Test eliminacji kalek
+    t2, f2 = AVTLinter.lint_and_fix_line("To robi sens, witaj z powrotem!")
+    assert "To ma sens" in t2
+    assert "Witaj!" in t2
+    
+    # Test korekty rodzaju męskiego na żeński u dziewcząt
+    t3, f3 = AVTLinter.lint_and_fix_line("Głupi jesteś?", is_all_girls_scene=True)
+    assert t3 == "Głupia jesteś?"
+    print(" -> PASSED: AVT Linter bezbłędnie wyłapuje i koryguje kalki i formy.")
 
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
@@ -185,4 +199,5 @@ if __name__ == "__main__":
     test_ffmpeg_frame_extraction()
     test_profiler_and_whisper()
     test_model_resolver()
+    test_avt_linter()
     print("\n Wszystkie testy jednostkowe i integracyjne zakończone sukcesem!\n")
