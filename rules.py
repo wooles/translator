@@ -68,6 +68,12 @@ FILAR VIII: BEZWZGLĘDNE ROZRÓŻNIENIE NAPISÓW EKRANOWYCH (SIGNS / TYPESETTING
   * MUSI być przetłumaczona jako SAMODZIELNY TYTUŁ LUB NAZWA (np. "The Princess's Favor" / "姫様のご寵愛" -> "Łaska księżniczki" / "Faworyta księżniczki").
   * KATEGORYCZNY ZAKAZ wklejania w pole napisu ekranowego fragmentów wypowiedzi mówionych przez postacie (np. BŁĄD ❌: wklejenie do tytułu mangi "I w ten sposób zewnętrzne ramki...").
   * Równoczesny dialog mówiony na dole ekranu (np. "And that's the borders done." -> "I w ten sposób zewnętrzne ramki mamy gotowe.") jest ODRĘBNĄ KWESTIĄ i nie wolno ich ze sobą mieszać!
+
+FILAR IX: ZAKAZ HALUCYNACJI PRZYNALEŻNOŚCI I ZAIMKÓW DZIERŻAWCZYCH (3. OSOBA VS 1. OSOBA):
+- Kiedy w kwestii pojawia się imię postaci w dopełniaczu (np. "Akafuku's dad!", "Sensei's manga!", "Kokoro's house!", "Minami's drawing!"):
+  * Oznacza to DOKŁADNIE tę nazwaną postać w 3. osobie ("Tata Akafuku!", "Ojciec Akafuku!", "Manga pani Teshimy!", "Dom Kokoro!", "Rysunek Minami!").
+  * BEZWZGLĘDNY ZAKAZ zamiany imienia innej osoby na zaimki 1. osoby (np. KARDYNALNY BŁĄD ❌: przetłumaczenie "Akafuku's dad!" na "to mój tata"!).
+  * Wykrzyknik zaskoczonej koleżanki (Kokoro) na widok groźnego ojca Akafuku to: "Tata Akafuku!" / "Ojciec Akafuku!".
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -336,8 +342,14 @@ def get_anime_conventions_guide(keep_honorifics: bool = True) -> str:
 
     return f"""
 SPECYFIKA PRZEKŁADU ANIME, GŁOSU ORAZ JĘZYKA JAPOŃSKIEGO:
-1. PŁEĆ I ZAIMKI:
-   - "ore", "boku" -> styl męski / chłopięcy (męskie formy przeszłe: "zrobiłem", "poszedłem").
+1. PŁEĆ I ZAIMKI (ŻELAZNA ZASADA ŻEŃSKOOSOBOWOŚCI OBSADY):
+   - W anime o uczennicach / klubach szkolnych, gdzie głównymi bohaterkami są dziewczyny:
+     * Wszelkie pytania i zwroty w 2. osobie skierowane do koleżanki ("Are you dumb / stupid?", "Are you sure?", "Did you see that?") MUSZĄ MIEĆ FORMĘ ŻEŃSKĄ:
+       -> BŁĄD ❌: "Głupi jesteś?", "Jesteś pewien?", "Widziałeś to?".
+       -> POPRAWNIE ✔️: "Głupia jesteś?" / "Oszalałaś?", "Jesteś pewna?", "Widziałaś to?".
+     * Formy 1. osoby mówiącej dziewczyny: "poszłam", "zrobiłam", "pomyślałam" (ZAKAZ: "poszedłem", "zrobiłem").
+   - Kategoryczny zakaz domyślnego używania rodzaju męskiego w dialogach między dziewczętami/kobietami!
+   - "ore", "boku" -> styl męski / chłopięcy (męskie formy: "zrobiłem", "poszedłem").
    - "watashi", "atashi" -> styl damski lub neutralny/oficjalny (żeńskie formy: "zrobiłam", "poszłam").
 {honorifics_text}
 3. KORELACJA Z JAPOŃSKĄ MOWĄ I AUDIO:
@@ -457,6 +469,9 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
    - "How did you do that?" -> "Jak ci się to udało?", "Jak to zrobiłaś?".
 12. ROZDZIAŁ NAPISÓW EKRANOWYCH OD MÓWIONYCH DIALOGÓW:
    - Upewnij się, że kwestie typu NAPIS EKRANOWY / TYTUŁ (Sign/Typesetting - np. tytuł mangi 'The Princess's Favor') są przetłumaczone jako samodzielny tytuł ('Łaska księżniczki'), a nie jako część zdania dialogu mówionego (np. BŁĄD: 'I w ten sposób zewnętrzne ramki...').
+13. POPRAWNOŚĆ PŁCI (ŻEŃSKA DLA UCZENNIC) I ZAKAZ HALUCYNACJI DZIERŻAWCZYCH:
+   - W dialogach między uczennicami/kobietami bezwzględnie stosuj formy ŻEŃSKIE ("Głupia jesteś?", "Oszalałaś?", "Zrobiłaś to?", "Jesteś pewna?"). ZAKAZ form męskich ("Głupi jesteś?")!
+   - Kwestie typu "[Imię]'s dad / mom / manga" tłumacz DOKŁADNIE w 3. osobie ("Tata Akafuku!", "Manga pani Teshimy!"). BEZWZGLĘDNY ZAKAZ zamiany na 1. osobę ("to mój tata")!
 
 {BELCZYK_AVT_MASTER_CANON}
 
