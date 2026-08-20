@@ -123,16 +123,18 @@ Zwróć wynik w formacie JSON zgodnym ze schematem EpisodeProfile."""
         import time
         attempt = 0
 
-        # Pula równorzędnych modeli flagowych w tej samej najwyższej generacji
+        # Pula wyłącznie dwóch absolutnie najnowszych modeli flagowych (Gemini 3.7 i 3.6 Flash)
         candidate_models = [self.model]
         if "flash" in self.model.lower():
-            for m in ["gemini-3.7-flash", "gemini-3.6-flash", "gemini-3.5-flash"]:
+            for m in ["gemini-3.7-flash", "gemini-3.6-flash"]:
                 if m not in candidate_models:
                     candidate_models.append(m)
         elif "pro" in self.model.lower():
             for m in ["gemini-3.1-pro-preview"]:
                 if m not in candidate_models:
                     candidate_models.append(m)
+        # Ograniczenie do maksymalnie 2 najnowszych modeli
+        candidate_models = candidate_models[:2]
 
         current_model_idx = 0
 
