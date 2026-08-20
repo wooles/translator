@@ -93,7 +93,7 @@ if (-not $ApiKey -or $ApiKey -eq "twój_klucz_api_tutaj") {
     Write-Host "  Podaj swój klucz GEMINI_API_KEY (uzyskany z https://aistudio.google.com/):" -ForegroundColor Cyan
     $ApiKey = Read-Host "  Klucz API"
     if ($ApiKey) {
-        $EnvContent = "GEMINI_API_KEY=$ApiKey`nGEMINI_MODEL=gemini-3.5-flash`nBATCH_SIZE=14`nENABLE_VERIFIER=true`nKEEP_HONORIFICS=false"
+        $EnvContent = "GEMINI_API_KEY=$ApiKey`nGEMINI_MODEL=gemini-3.7-flash`nBATCH_SIZE=24`nENABLE_VERIFIER=true`nKEEP_HONORIFICS=true"
         Set-Content -Path $EnvFile -Value $EnvContent -Encoding UTF8
         Write-Host "  -> Zapisano klucz w pliku .env" -ForegroundColor Green
     }

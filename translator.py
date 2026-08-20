@@ -259,12 +259,10 @@ class MultimodalTranslator:
         """
         lines = []
 
-        # 0. Słowniczek i Macierz Relacji z Profilera Odcinka
+        # 0. Słowniczek i Macierz Relacji z Profilera Odcinka (lub kontekst AniList w razie braku profilera)
         if episode_profile_str:
             lines.append(episode_profile_str)
-
-        # 0a. Kontekst z bazy AniList
-        if anime_context_str:
+        elif anime_context_str:
             lines.append(anime_context_str)
 
         # 0b. Złote przykłady z Pamięci Tłumaczeniowej (Translation Memory)

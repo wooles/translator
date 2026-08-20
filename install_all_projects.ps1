@@ -118,7 +118,7 @@ if (Test-Path $TranslatorDir) {
         Write-Host "  Podaj swój klucz GEMINI_API_KEY dla Tłumacza:" -ForegroundColor Yellow
         $ApiKey = Read-Host "  GEMINI_API_KEY"
         if ($ApiKey) {
-            "GEMINI_API_KEY=$ApiKey`nGEMINI_MODEL=gemini-3.5-flash`nBATCH_SIZE=14`nENABLE_VERIFIER=true`nKEEP_HONORIFICS=false" | Out-File -FilePath $TrEnv -Encoding UTF8
+            "GEMINI_API_KEY=$ApiKey`nGEMINI_MODEL=gemini-3.7-flash`nBATCH_SIZE=24`nENABLE_VERIFIER=true`nKEEP_HONORIFICS=true" | Out-File -FilePath $TrEnv -Encoding UTF8
         }
     }
     # Indeksowanie bazy
