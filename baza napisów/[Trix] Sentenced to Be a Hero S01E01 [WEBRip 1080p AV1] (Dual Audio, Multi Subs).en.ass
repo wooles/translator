@@ -1,0 +1,28 @@
+[Script Info]
+Title: Default Aegisub File
+ScriptType: v4.00+
+WrapStyle: 0
+PlayResX: 640
+PlayResY: 360
+ScaledBorderAndShadow: yes
+Video Aspect Ratio: 0
+Video Zoom: 8
+YCbCr Matrix: TV.601
+LayoutResX: 640
+LayoutResY: 360
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,SPOverrideF,25,&H00FFFFFF,&H000000FF,&H00000000,&HA0000000,-1,0,0,0,100,100,0,0,1,1.2,0.5,2,20,20,20,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:14.24,0:00:22.63,Default,sign,0,0,0,,{\fad(0,1000)\fnGeorgia\bord0\shad0\b1\fscx85\blur0.4\fs10\pos(325,84)\clip(264.5,59,272.5,84)\t(100,850,\clip(264.5,59,378.5,85.5)}The "Hero Penalty"
+Dialogue: 0,0:00:14.24,0:00:22.63,Default,sign,0,0,0,,{\fad(0,1000)\fnGeorgia\bord0\shad0\b1\fscx85\blur0.4\fs10\pos(325,110.5)\clip(210.5,93,220.5,114)\t(300,2350,\clip(210.5,93,435.5,117.5))}is the greatest form of criminal punishment there is.
+Dialogue: 0,0:00:14.24,0:00:22.63,Default,sign,0,0,0,,{\fad(0,1000)\fnGeorgia\bord0\shad0\b1\fscx85\blur0.4\fs10\pos(325,137)\clip(231,123.5,236.5,139)\t(500,2200,\clip(231,123.5,415.5,141.5))}Heroes stand on the front lines of the battle
+Dialogue: 0,0:00:14.24,0:00:22.63,Default,sign,0,0,0,,{\fad(0,1000)\fnGeorgia\bord0\shad0\b1\fscx85\blur0.4\fs10\pos(325,162)\clip(220,148.5,226.5,167)\t(940,2650,\clip(220,148.5,426,167))}with the Demon Blight, and are denied even death
+Dialogue: 0,0:00:14.24,0:00:22.63,Default,sign,0,0,0,,{\fad(0,1000)\fnGeorgia\bord0\shad0\b1\fscx85\blur0.4\fs10)\pos(325,190)\clip(273,176.5,279.5,190.5)\t(1100,2350,\clip(273,176.5,375,197))}in this perpetual fight.
+Dialogue: 0,0:00:07.32,0:00:22.63,Default,sign,0,0,0,,{\fad(1000,1000)\fnGeorgia\bord0\shad0\b1\fscx85\blur0.4\fs10\c&H283741&\t(3148,4270,\c&H676669&)\t(4270,5270,\c&HD5D3D5&)\alpha&HFF&\t(9600,9601,\alpha&H00&)\pos(325,253)\clip(251.5,236,256,257.5)\t(9800,11000,\clip(251.5,236,395.5,259.5))}The punishment's term is eternal
+Dialogue: 0,0:26:18.26,0:26:21.47,Default,sign,0,0,0,,{\shad0\bord1\blur0.3\fs22\fnArial\fscx95\pos(319,318)\3c&H251A10&\c&HEDE7DD&}Going to take the loot from the Holy Knights, working solo.
+Dialogue: 0,0:57:54.81,0:58:00.08,Default,sign,0,0,0,,{\fad(200,0)\fnGeorgia\b1\fscx90\bord0\shad0\blur0.3\fs45\pos(320,130)\c&H010712&}Sentenced to Be a Hero
+

@@ -1,0 +1,367 @@
+[Script Info]
+Title: English (US)
+ScriptType: v4.00+
+WrapStyle: 0
+PlayResX: 640
+PlayResY: 360
+ScaledBorderAndShadow: yes
+Video Aspect Ratio: 0
+Video Zoom: 8
+YCbCr Matrix: TV.601
+LayoutResX: 640
+LayoutResY: 360
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Roboto Medium,26,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1.3,0,2,20,20,23,0
+Style: Default - italics,Roboto Medium,26,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,-1,0,0,100,100,0,0,1,1.3,0,2,20,20,23,0
+Style: Default - flashback,Roboto Medium,26,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1.3,0,2,20,20,23,0
+Style: Default - margin,Roboto Medium,26,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1.3,0,2,20,20,23,0
+Style: Title,Trebuchet MS,20,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,2,0,7,40,40,60,0
+Style: Disclaimer,Trebuchet MS,14,&H00C2C2C4,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,0,1,390,10,60,0
+Style: Setting,Times New Roman,18,&H002F2721,&H000000FF,&H00DFE3E1,&H00000000,-1,0,0,0,100,100,0,0,1,2,0,8,20,20,20,0
+Style: SettingW,Times New Roman,18,&H002F2721,&H000000FF,&H00FFFFFF,&H00000000,-1,0,0,0,100,100,0,0,1,2,0,8,20,20,20,0
+Style: NameR,Times New Roman,16,&H002F2721,&H000000FF,&H00CED3D1,&H00000000,-1,0,0,0,100,100,0,0,1,2,0,8,230,20,20,0
+Style: NameL,Times New Roman,16,&H002F2721,&H000000FF,&H00CED3D1,&H00000000,-1,0,0,0,100,100,0,0,1,2,0,8,20,240,20,0
+Style: SignA,Times New Roman,18,&H00D4D5D2,&H000000FF,&H00313025,&H00000000,-1,0,0,0,100,100,0,0,1,2,0,8,20,20,20,0
+Style: overlap,Roboto Medium,26,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1.3,0,2,20,20,23,0
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:02:11.77,0:02:14.61,Setting,sign,0,0,0,,{\blur2\bord1\fad(274,1)\pos(320,220)\fscx65}Unified Year 1927, May 26th, Imperial Capital Berun Central Station
+Dialogue: 0,0:02:14.69,0:02:19.91,Disclaimer,sign,0,0,0,,{\an1\fad(488,475)\an1\pos(82,325)\fs9\q2\blur2\fsp.2}This story is a work of fiction. People, organizations, locations, laws, names, etc. have no relation to any real-life counterparts.
+Dialogue: 0,0:02:23.32,0:02:26.26,Default,Zettour,0,0,0,,Is ours the type of relationship \Nwhere you have to see me off?
+Dialogue: 0,0:02:26.26,0:02:29.44,Default,Rudersdorf,0,0,0,,I almost never get to see you \Nin an embarrassing position.
+Dialogue: 0,0:02:29.44,0:02:31.85,Default,Rudersdorf,0,0,0,,I refuse to miss the opportunity.
+Dialogue: 0,0:02:36.21,0:02:40.22,Title,sign,0,0,0,,{\pos(361,137)}Episode Five\NUnlucky Draw
+Dialogue: 0,0:02:36.77,0:02:39.45,Default,Rudersdorf,0,0,0,,You had an unlucky draw, huh?
+Dialogue: 0,0:02:40.44,0:02:42.23,Default,Zettour,0,0,0,,There's no helping it.
+Dialogue: 0,0:02:42.23,0:02:45.53,Default,Zettour,0,0,0,,I was the one who went against\Nhigh leadership.
+Dialogue: 0,0:02:46.40,0:02:48.33,Default - flashback,Zettour,0,0,0,,The government itself may fall.
+Dialogue: 0,0:02:49.08,0:02:51.98,Default - flashback,Zettour,0,0,0,,...the Imperial Family \Nitself may be in danger.
+Dialogue: 0,0:02:52.18,0:02:55.34,Default,Zettour,0,0,0,,I expected to be relieved of my position\Nas Deputy Chief of War Affairs, but...
+Dialogue: 0,0:02:55.79,0:02:58.53,Default,Zettour,0,0,0,,I'm surprised to see \NI'm only being transferred.
+Dialogue: 0,0:02:59.70,0:03:01.99,Default,Rudersdorf,0,0,0,,I'm not being sent anywhere.
+Dialogue: 0,0:03:03.52,0:03:06.69,Default,Rudersdorf,0,0,0,,Even though we both went \Nagainst leadership.
+Dialogue: 0,0:03:06.69,0:03:08.53,Default,Rudersdorf,0,0,0,,It's not fair at all.
+Dialogue: 0,0:03:08.53,0:03:10.64,Default,Zettour,0,0,0,,We're soldiers.
+Dialogue: 0,0:03:10.64,0:03:13.09,Default,Zettour,0,0,0,,We have no choice but to obey \Nthe will of the nation.
+Dialogue: 0,0:03:13.84,0:03:17.33,Default,Rudersdorf,0,0,0,,There's no one else in Strategic HQ
+Dialogue: 0,0:03:19.03,0:03:23.48,Default,Rudersdorf,0,0,0,,with your political skills or \Nunderstanding of the operation.
+Dialogue: 0,0:03:25.48,0:03:27.88,Default,Zettour,0,0,0,,And you'll have no one to complain to.
+Dialogue: 0,0:03:28.84,0:03:30.23,Default,Rudersdorf,0,0,0,,That's right.
+Dialogue: 0,0:03:30.23,0:03:33.14,Default,Rudersdorf,0,0,0,,I really don't think \Nwe can do without you...
+Dialogue: 0,0:03:34.33,0:03:35.76,Default,Zettour,0,0,0,,It seems it's time.
+Dialogue: 0,0:03:39.78,0:03:41.66,Default,Rudersdorf,0,0,0,,I'll leave the East to you.
+Dialogue: 0,0:03:41.96,0:03:45.28,Default,Rudersdorf,0,0,0,,We'll win this war together.
+Dialogue: 0,0:03:45.28,0:03:47.78,Default,Zettour,0,0,0,,Yeah, that's right.
+Dialogue: 0,0:03:48.16,0:03:49.70,Default,Rudersdorf,0,0,0,,I'll pray for your good luck.
+Dialogue: 0,0:03:49.70,0:03:52.41,Default,Rudersdorf,0,0,0,,Come back as a victorious general.
+Dialogue: 0,0:03:52.41,0:03:55.59,Default,Zettour,0,0,0,,Get the expensive booze and cigars ready.
+Dialogue: 0,0:03:55.59,0:03:57.33,Default,Zettour,0,0,0,,I'll drive you bankrupt.
+Dialogue: 0,0:04:07.87,0:04:10.23,Default,Rudersdorf,0,0,0,,Win the war together, huh?
+Dialogue: 0,0:04:11.96,0:04:16.27,Default,Rudersdorf,0,0,0,,Even a single failure will \Nput the Empire in danger.
+Dialogue: 0,0:04:16.93,0:04:21.17,Default,Rudersdorf,0,0,0,,No matter how many times the Federation \Nfails, it will keep coming back.
+Dialogue: 0,0:04:26.03,0:04:28.87,Default,Rudersdorf,0,0,0,,It's not fair at all.
+Dialogue: 0,0:04:33.36,0:04:38.37,Default - italics,Zettour,0,0,0,,A military officer can be sent \Nanywhere alone with a single order.
+Dialogue: 0,0:04:38.37,0:04:41.70,Default - italics,Zettour,0,0,0,,But my influence in the East is limited.
+Dialogue: 0,0:04:41.70,0:04:44.39,Default - italics,Zettour,0,0,0,,I have no pieces to play \Nat all, realistically.
+Dialogue: 0,0:04:45.94,0:04:49.27,Default,Zettour,0,0,0,,No, I do have one.
+Dialogue: 0,0:04:49.30,0:04:51.35,Setting,sign,0,0,0,,{\blur2\bord1\fad(274,1)\pos(320,220)\fscx73}Eastern Battlefront Imperial Eastern Theater Frontline Base
+Dialogue: 0,0:04:54.96,0:05:00.11,Default - italics,Tanya,0,0,0,,Why? Why am I being summoned \Nby Eastern Theater Command?
+Dialogue: 0,0:05:00.11,0:05:02.20,Default - italics,Tanya,0,0,0,,Something to do with the peace talks?
+Dialogue: 0,0:05:02.20,0:05:05.36,Default - italics,Tanya,0,0,0,,But then why aren't we being \Ngiven a ceasefire order?
+Dialogue: 0,0:05:05.36,0:05:10.79,Default - italics,Tanya,0,0,0,,The Ildoa observer said that a ceasefire \Nwas just a matter of time...
+Dialogue: 0,0:05:12.44,0:05:17.06,Default - italics,Tanya,0,0,0,,Well, there's no way we can \Ncontinue the war, regardless.
+Dialogue: 0,0:05:17.51,0:05:21.51,Default - italics,Tanya,0,0,0,,Anybody capable of making logical \Ndecisions would know that.
+Dialogue: 0,0:05:22.24,0:05:25.06,Default - italics,Tanya,0,0,0,,The brass can't possibly be that stu...
+Dialogue: 0,0:05:25.79,0:05:26.85,Default,Tanya,0,0,0,,huh?
+Dialogue: 0,0:05:28.34,0:05:32.35,Default,Zettour,0,0,0,,It's been a long time, \NLt. Colonel Degurechaff.
+Dialogue: 0,0:05:39.55,0:05:43.82,Default,Tanya,0,0,0,,S-Sir, what are you doing here?
+Dialogue: 0,0:05:44.23,0:05:47.13,Default,Zettour,0,0,0,,Strategic HQ has sent me into exile.
+Dialogue: 0,0:05:47.13,0:05:49.41,Default,Zettour,0,0,0,,I'll be here from now on.
+Dialogue: 0,0:05:49.66,0:05:54.54,Default - italics,Tanya,0,0,0,,E-Exiled? The boss of my \Nfaction has screwed up?!
+Dialogue: 0,0:05:55.69,0:05:57.62,Default,Zettour,0,0,0,,Is something wrong?
+Dialogue: 0,0:05:57.62,0:06:00.79,Default,Tanya,0,0,0,,Sorry! I was just dizzy \Nfrom lack of sleep...
+Dialogue: 0,0:06:00.79,0:06:02.88,Default - italics,Tanya,0,0,0,,Shit! Shit! Shit!
+Dialogue: 0,0:06:02.88,0:06:05.71,Default - italics,Tanya,0,0,0,,My whole career plan is in danger!
+Dialogue: 0,0:06:05.71,0:06:09.74,Default - italics,Tanya,0,0,0,,I was counting on my faction's boss to \Nwrite me a letter of recommendation!
+Dialogue: 0,0:06:09.74,0:06:14.39,Default - italics,Tanya,0,0,0,,No, wait. If there's a peace treaty, \Nmaybe I won't need it...
+Dialogue: 0,0:06:14.72,0:06:15.48,Default,Tanya,0,0,0,,By the way...
+Dialogue: 0,0:06:15.48,0:06:17.47,Default,Zettour,0,0,0,,Peace negotiations have \Nbroken down, you see.
+Dialogue: 0,0:06:18.96,0:06:24.73,Default,Zettour,0,0,0,,High leadership wants more victories to \Nensure better conditions in the deal.
+Dialogue: 0,0:06:24.73,0:06:28.60,Default,Zettour,0,0,0,,I was opposed to this, so they \Ngot angry and sent me here.
+Dialogue: 0,0:06:28.60,0:06:31.70,Default - italics,Tanya,0,0,0,,Wh-What?!
+Dialogue: 0,0:06:31.70,0:06:35.34,Default - italics,Tanya,0,0,0,,The peace negotiations broke down, \Nand the leadership hates my boss!
+Dialogue: 0,0:06:35.34,0:06:36.88,Default - italics,Tanya,0,0,0,,This is as bad as it could possibly get!
+Dialogue: 0,0:06:37.23,0:06:38.93,Default,Zettour,0,0,0,,Hey. Hey.
+Dialogue: 0,0:06:38.93,0:06:39.87,Default,Zettour,0,0,0,,Are you okay?
+Dialogue: 0,0:06:40.26,0:06:44.03,Default,Tanya,0,0,0,,Sorry! I got a little dizzy from shock...
+Dialogue: 0,0:06:44.94,0:06:46.60,Default,Zettour,0,0,0,,That won't do.
+Dialogue: 0,0:06:46.60,0:06:50.55,Default,Zettour,0,0,0,,I'm going to need you to work \Neven harder than before.
+Dialogue: 0,0:06:50.55,0:06:54.31,Default - italics,Tanya,0,0,0,,They're still going to \Noverwork me, even now?
+Dialogue: 0,0:06:54.31,0:06:57.71,Default,Zettour,0,0,0,,Now, due to the political \Ncircumstances I just described,
+Dialogue: 0,0:06:57.71,0:07:02.29,Default,Zettour,0,0,0,,I'll be working on a large-scale \Noffensive in the East.
+Dialogue: 0,0:07:02.97,0:07:05.28,Default,Rerugen,0,0,0,,The Andromeda Project?
+Dialogue: 0,0:07:05.69,0:07:09.76,Default,Rudersdorf,0,0,0,,The main goal of the operation is to \Nensure better conditions in a peace deal.
+Dialogue: 0,0:07:10.23,0:07:13.94,Default,Rudersdorf,0,0,0,,And that means crushing \Nthe enemy's will to resist.
+Dialogue: 0,0:07:14.63,0:07:16.79,Default,Rudersdorf,0,0,0,,Specifically, we've \Ndecided to take control
+Dialogue: 0,0:07:16.79,0:07:19.79,Default,Rudersdorf,0,0,0,,of the Federation army's \Nresource-producing areas.
+Dialogue: 0,0:07:20.17,0:07:24.72,Default,Rudersdorf,0,0,0,,We'll be splitting the Eastern army into \NA Group, which will handle the offensive,
+Dialogue: 0,0:07:24.72,0:07:28.55,Default,Rudersdorf,0,0,0,,and B Group, which will \Nmaintain the battle lines.
+Dialogue: 0,0:07:28.55,0:07:32.29,Default,Rudersdorf,0,0,0,,A strikes. B defends.
+Dialogue: 0,0:07:32.29,0:07:35.05,Default,Rudersdorf,0,0,0,,If this operation works,
+Dialogue: 0,0:07:35.05,0:07:39.70,Default,Rudersdorf,0,0,0,,it will maintain our forces' ability \Nto fight while weakening the enemy's.
+Dialogue: 0,0:07:39.70,0:07:43.25,Default,Rudersdorf,0,0,0,,It should help us in negotiations.
+Dialogue: 0,0:07:43.25,0:07:46.25,Default,Rerugen,0,0,0,,And General Zettour has headed to the East
+Dialogue: 0,0:07:46.25,0:07:49.82,Default,Rerugen,0,0,0,,to observe and take command of B Group.
+Dialogue: 0,0:07:49.82,0:07:52.21,Default,Rudersdorf,0,0,0,,It's de facto exile, actually.
+Dialogue: 0,0:07:52.21,0:07:56.77,Default,Rudersdorf,0,0,0,,The high leadership doesn't \Nlike being talked down.
+Dialogue: 0,0:07:57.62,0:08:00.40,Default,Rerugen,0,0,0,,I understand the operation.
+Dialogue: 0,0:08:00.40,0:08:03.71,Default,Rerugen,0,0,0,,But negotiations in Ildoa...
+Dialogue: 0,0:08:05.14,0:08:08.60,Default,Rudersdorf,0,0,0,,Are to be temporarily stopped, I'm told.
+Dialogue: 0,0:08:09.86,0:08:13.32,Default,Rudersdorf,0,0,0,,If leadership wants a win, \Nthen we have to win.
+Dialogue: 0,0:08:13.71,0:08:15.51,Default,Rudersdorf,0,0,0,,No matter what.
+Dialogue: 0,0:08:16.71,0:08:18.64,Default,Zettour,0,0,0,,I'll ask for your honest opinion.
+Dialogue: 0,0:08:18.64,0:08:21.86,Default,Zettour,0,0,0,,What do you think of \Nthe Andromeda Project?
+Dialogue: 0,0:08:22.83,0:08:27.35,Default,Tanya,0,0,0,,Honestly, it's nothing short of reckless.
+Dialogue: 0,0:08:28.22,0:08:30.10,Default,Zettour,0,0,0,,Continue.
+Dialogue: 0,0:08:30.38,0:08:34.56,Default,Tanya,0,0,0,,B Group's assigned territory \Nis already far too large.
+Dialogue: 0,0:08:34.56,0:08:36.62,Default,Tanya,0,0,0,,They don't have the men for it.
+Dialogue: 0,0:08:36.62,0:08:39.98,Default,Tanya,0,0,0,,And if A Group's offensive succeeds,
+Dialogue: 0,0:08:39.98,0:08:43.18,Default,Tanya,0,0,0,,it will only mean more territory \Nfor them to defend.
+Dialogue: 0,0:08:43.18,0:08:46.25,Default,Tanya,0,0,0,,B Group is a rubber band, \Nstretched to its breaking point.
+Dialogue: 0,0:08:46.87,0:08:48.62,Default,Tanya,0,0,0,,You don't need scissors to snap it.
+Dialogue: 0,0:08:48.62,0:08:50.95,Default,Tanya,0,0,0,,A single poke from a needle could do it.
+Dialogue: 0,0:08:51.30,0:08:55.64,Default,Tanya,0,0,0,,And if I may, I dislike \Nthe project's name.
+Dialogue: 0,0:08:55.98,0:08:57.71,Default,Zettour,0,0,0,,The project's name?
+Dialogue: 0,0:08:58.17,0:09:03.22,Default,Tanya,0,0,0,,The name suggests a distant horizon, \Nor the stars in outer space.
+Dialogue: 0,0:09:03.22,0:09:07.03,Default,Tanya,0,0,0,,It's romantic, in a way, but I \Nfind it far too distant a goal.
+Dialogue: 0,0:09:08.36,0:09:10.10,Default,Zettour,0,0,0,,An excellent point!
+Dialogue: 0,0:09:10.10,0:09:14.78,Default,Zettour,0,0,0,,The one who named it may look rough, \Nbut they're surprisingly delicate.
+Dialogue: 0,0:09:16.88,0:09:20.17,Default,Zettour,0,0,0,,Your points are all logical.
+Dialogue: 0,0:09:20.17,0:09:23.91,Default,Zettour,0,0,0,,But unfortunately, we aren't \Nallowed to make any changes.
+Dialogue: 0,0:09:23.91,0:09:27.41,Default,Zettour,0,0,0,,Come up with a defense plan for B Group.
+Dialogue: 0,0:09:27.41,0:09:29.71,Default,Tanya,0,0,0,,A plan?
+Dialogue: 0,0:09:30.19,0:09:32.91,Default,Zettour,0,0,0,,What do we need for a successful defense?
+Dialogue: 0,0:09:33.67,0:09:38.68,Default,Tanya,0,0,0,,The initiative. Without the \Ninitiative, we have nothing.
+Dialogue: 0,0:09:38.68,0:09:40.61,Default,Zettour,0,0,0,,An unchanging fact of warfare.
+Dialogue: 0,0:09:40.61,0:09:42.94,Default,Zettour,0,0,0,,The question is, how do we get it?
+Dialogue: 0,0:09:42.94,0:09:46.17,Default,Tanya,0,0,0,,It's hard to say since \Nwe're on the inferior side...
+Dialogue: 0,0:09:46.52,0:09:48.52,Default,Tanya,0,0,0,,Let's aim for a counterattack.
+Dialogue: 0,0:09:48.52,0:09:50.74,Default,Tanya,0,0,0,,We'll lure the enemy in with a decoy
+Dialogue: 0,0:09:50.74,0:09:52.94,Default,Tanya,0,0,0,,and wipe them out when \Nthey're overextended.
+Dialogue: 0,0:09:53.41,0:09:55.11,Default,Zettour,0,0,0,,Easier said than done.
+Dialogue: 0,0:09:55.11,0:09:58.93,Default,Tanya,0,0,0,,Yes. We need something they'll feel \Nis worth taking the chance on.
+Dialogue: 0,0:09:58.93,0:10:02.81,Default,Tanya,0,0,0,,And the decoy will have to have \Nthe tenacity to stay in the fight
+Dialogue: 0,0:10:02.81,0:10:04.61,Default,Tanya,0,0,0,,until the fish has swallowed the lure.
+Dialogue: 0,0:10:04.91,0:10:07.29,Default,Zettour,0,0,0,,That, I don't think we \Nneed to worry about.
+Dialogue: 0,0:10:07.29,0:10:10.38,Default,Zettour,0,0,0,,I have a card I can play.
+Dialogue: 0,0:10:10.70,0:10:14.71,Default - italics,Tanya,0,0,0,,I don't know who he's referring to, \Nbut I feel bad for them.
+Dialogue: 0,0:10:15.28,0:10:20.63,Default,Tanya,0,0,0,,We'll also need hunters who can destroy \Nthe enemy once they've engaged the decoy.
+Dialogue: 0,0:10:20.63,0:10:25.12,Default,Zettour,0,0,0,,Hmm... what spare forces \Ndo we have in the East?
+Dialogue: 0,0:10:25.12,0:10:28.89,Default,Zettour,0,0,0,,B Group does have \Na mechanized division...
+Dialogue: 0,0:10:28.89,0:10:31.48,Default,Zettour,0,0,0,,But we can't let them go easily.
+Dialogue: 0,0:10:31.48,0:10:36.26,Default,Zettour,0,0,0,,Which means our only easily available \Nforces are your combat team.
+Dialogue: 0,0:10:37.51,0:10:42.37,Default,Zettour,0,0,0,,Oh, don't worry. I'm a hard man to \Nwork for, but I won't ask for that.
+Dialogue: 0,0:10:42.37,0:10:44.50,Default,Tanya,0,0,0,,I appreciate your concern, sir!
+Dialogue: 0,0:10:44.50,0:10:47.24,Default,Zettour,0,0,0,,Oh, no need to thank me.
+Dialogue: 0,0:10:47.56,0:10:51.48,Default,Zettour,0,0,0,,You're going to be the bait, after all.
+Dialogue: 0,0:10:51.48,0:10:56.67,Default,Zettour,0,0,0,,Even I can't ask you to be both \Nthe bait and the hunter.
+Dialogue: 0,0:10:56.67,0:11:02.67,Default,Tanya,0,0,0,,Um... I'm... the bait?
+Dialogue: 0,0:11:02.67,0:11:04.40,Default,Zettour,0,0,0,,This was your idea.
+Dialogue: 0,0:11:04.40,0:11:07.35,Default,Zettour,0,0,0,,Of course I'll ask you to \Nbe the one to carry it out.
+Dialogue: 0,0:11:08.03,0:11:10.99,Default,Zettour,0,0,0,,The bait is the group that put \Ntheir capital city to the torch.
+Dialogue: 0,0:11:10.99,0:11:13.78,Default,Zettour,0,0,0,,I've little doubt they'll bite.
+Dialogue: 0,0:11:19.62,0:11:22.79,Default,Zettour,0,0,0,,But I suppose we don't \Nhave enough forces?
+Dialogue: 0,0:11:22.79,0:11:26.12,Default,Zettour,0,0,0,,Even if we did use that \Nmechanized division...
+Dialogue: 0,0:11:26.12,0:11:28.12,Default,Tanya,0,0,0,,That's correct!
+Dialogue: 0,0:11:28.12,0:11:29.88,Default,Tanya,0,0,0,,While I do hate to say it,
+Dialogue: 0,0:11:29.88,0:11:33.36,Default,Tanya,0,0,0,,it seems my idea has \Nlittle chance of working,
+Dialogue: 0,0:11:33.36,0:11:35.44,Default,Tanya,0,0,0,,so I'll come up with another one!
+Dialogue: 0,0:11:35.44,0:11:36.04,Default,Tanya,0,0,0,,Bye!
+Dialogue: 0,0:11:36.81,0:11:39.75,Default,Zettour,0,0,0,,I'll use one of your companies!
+Dialogue: 0,0:11:43.27,0:11:45.13,Default,Zettour,0,0,0,,Did you not hear me?
+Dialogue: 0,0:11:45.13,0:11:47.59,Default,Zettour,0,0,0,,Give me one of your mage companies.
+Dialogue: 0,0:11:47.59,0:11:48.98,Default,Zettour,0,0,0,,That'll be enough.
+Dialogue: 0,0:11:48.98,0:11:51.11,Default,Tanya,0,0,0,,We're splitting our forces?
+Dialogue: 0,0:11:51.11,0:11:52.05,Default,Zettour,0,0,0,,Indeed.
+Dialogue: 0,0:11:52.05,0:11:56.74,Default,Tanya,0,0,0,,I-If I may, sir, my companies \Naren't just normal companies!
+Dialogue: 0,0:11:56.74,0:12:00.87,Default,Tanya,0,0,0,,And if we're going to be on defense, \Nwe need mages to have any chance!
+Dialogue: 0,0:12:00.87,0:12:03.25,Default,Tanya,0,0,0,,It'll be like having \Nour limbs ripped off.
+Dialogue: 0,0:12:03.25,0:12:05.99,Default,Zettour,0,0,0,,Don't worry. Lots of \Npeople have lost a limb.
+Dialogue: 0,0:12:05.99,0:12:10.23,Default,Tanya,0,0,0,,Y-You insist on taking \None of my companies?
+Dialogue: 0,0:12:10.23,0:12:14.04,Default,Zettour,0,0,0,,Otherwise, I won't be able to \Nsave you when you're surrounded.
+Dialogue: 0,0:12:20.30,0:12:24.63,Default,Tanya,0,0,0,,If you'll take Grantz, one of my \Nyoung lieutenants, and his unit...
+Dialogue: 0,0:12:25.20,0:12:26.57,Default,Zettour,0,0,0,,Thank you.
+Dialogue: 0,0:12:26.57,0:12:28.14,Default,Zettour,0,0,0,,Now, as for the specifics...
+Dialogue: 0,0:12:29.00,0:12:31.63,Default,Zettour,0,0,0,,Look. This is the spot.
+Dialogue: 0,0:12:31.94,0:12:34.78,Default,Tanya,0,0,0,,Soldim 528?
+Dialogue: 0,0:12:34.78,0:12:38.57,Default,Zettour,0,0,0,,It was originally a \NFederation rail depot.
+Dialogue: 0,0:12:38.57,0:12:42.49,Default,Zettour,0,0,0,,The Empire occupied it during Iron Hammer,
+Dialogue: 0,0:12:42.49,0:12:45.78,Default,Zettour,0,0,0,,but the units stationed there were pulled,\Nand it's essentially abandoned.
+Dialogue: 0,0:12:46.30,0:12:50.51,Default,Zettour,0,0,0,,It's located along rail routes \Nand can serve as a supply depot.
+Dialogue: 0,0:12:50.51,0:12:54.55,Default,Zettour,0,0,0,,The enemy would love to recapture it.
+Dialogue: 0,0:12:54.87,0:12:58.76,Default,Zettour,0,0,0,,You're going to be there to welcome them.
+Dialogue: 0,0:12:58.76,0:13:01.88,Default,Zettour,0,0,0,,You must defend the location at \Nall costs until your allies arrive.
+Dialogue: 0,0:13:01.88,0:13:06.17,Default,Tanya,0,0,0,,Wait! I need permission \Nto retreat if I feel...
+Dialogue: 0,0:13:06.17,0:13:07.13,Default,Zettour,0,0,0,,Impossible.
+Dialogue: 0,0:13:07.85,0:13:09.22,Default,Zettour,0,0,0,,Defend it at all costs.
+Dialogue: 0,0:13:17.31,0:13:24.82,Setting,sign,0,0,0,,{\blur2\bord1\pos(320,220)\fs12}Allied Kingdom Military Intelligence Colonel\N{\fs20}Sir Isaac Dustin Drake
+Dialogue: 0,0:13:17.70,0:13:20.34,Default,Drake,0,0,0,,It's been a long time, Uncle.
+Dialogue: 0,0:13:21.03,0:13:22.85,Default,Isaac,0,0,0,,William.
+Dialogue: 0,0:13:22.85,0:13:24.83,Default,Isaac,0,0,0,,As always, you seem upset.
+Dialogue: 0,0:13:24.83,0:13:29.49,Default,Drake,0,0,0,,Yes. Our unit's problem child \Nhas made a friend, you see.
+Dialogue: 0,0:13:30.51,0:13:35.89,Default,Drake,0,0,0,,I would appreciate it if Major General \NHabergram would take them off our hands.
+Dialogue: 0,0:13:37.96,0:13:40.12,Default,Isaac,0,0,0,,I brought you a little gift, at least.
+Dialogue: 0,0:13:40.12,0:13:43.11,Default,Isaac,0,0,0,,I smuggled it in past Federation customs.
+Dialogue: 0,0:13:43.11,0:13:45.10,Default,Isaac,0,0,0,,Scotch from home.
+Dialogue: 0,0:13:45.10,0:13:46.79,Default,Drake,0,0,0,,How kind of you...
+Dialogue: 0,0:13:50.05,0:13:52.00,Default,Isaac,0,0,0,,Burn it once you've read it.
+Dialogue: 0,0:13:52.00,0:13:54.29,Default,Isaac,0,0,0,,It's the latest information from Ultra.
+Dialogue: 0,0:13:54.63,0:13:55.93,Default,Drake,0,0,0,,Ultra...
+Dialogue: 0,0:13:56.33,0:13:59.96,Default,Drake,0,0,0,,That spy of ours high up in the Empire?
+Dialogue: 0,0:14:00.60,0:14:02.32,Default,Drake,0,0,0,,Can they be trusted?
+Dialogue: 0,0:14:02.32,0:14:04.72,Default,Isaac,0,0,0,,You've heard what the \NEmpire's up to, right?
+Dialogue: 0,0:14:04.72,0:14:08.01,Default,Drake,0,0,0,,Yes. Codename "Andromeda"?
+Dialogue: 0,0:14:08.01,0:14:10.05,Default,Drake,0,0,0,,We've been told to join the fight.
+Dialogue: 0,0:14:10.50,0:14:13.46,Default,Isaac,0,0,0,,Ultra says that conflict \Nbetween the Empire's military
+Dialogue: 0,0:14:13.46,0:14:15.84,Default,Isaac,0,0,0,,and civilian leadership is \Nwhat's driving Andromeda.
+Dialogue: 0,0:14:15.84,0:14:18.22,Default,Drake,0,0,0,,Well, that's good news.
+Dialogue: 0,0:14:18.22,0:14:20.45,Default,Drake,0,0,0,,But even knowing that...
+Dialogue: 0,0:14:20.45,0:14:22.61,Default,Isaac,0,0,0,,The fight ended with an officer
+Dialogue: 0,0:14:22.61,0:14:26.45,Default,Isaac,0,0,0,,from their strategic HQ being \Nsent to the eastern theater.
+Dialogue: 0,0:14:28.24,0:14:31.31,Default,Isaac,0,0,0,,Lieutenant General Hans von Zettour.
+Dialogue: 0,0:14:31.31,0:14:32.96,Default,Isaac,0,0,0,,A hard man to deal with.
+Dialogue: 0,0:14:32.96,0:14:34.34,Default,Drake,0,0,0,,How so?
+Dialogue: 0,0:14:34.34,0:14:35.85,Default,Drake,0,0,0,,Is he talented?
+Dialogue: 0,0:14:35.85,0:14:38.61,Default,Isaac,0,0,0,,He is. Terrifyingly so.
+Dialogue: 0,0:14:38.61,0:14:41.48,Default,Isaac,0,0,0,,If you happen to see him \Non the battlefield...
+Dialogue: 0,0:14:41.82,0:14:44.83,Default,Isaac,0,0,0,,Kill him. At all costs.
+Dialogue: 0,0:14:54.77,0:14:58.59,Default,Zettour,0,0,0,,We'd been assuming that \NFederation air power
+Dialogue: 0,0:14:58.59,0:15:00.83,Default,Zettour,0,0,0,,was destroyed during Iron Hammer...
+Dialogue: 0,0:15:01.32,0:15:04.92,Default,Zettour,0,0,0,,But the Unified States have \Nsupplied them with a new air force.
+Dialogue: 0,0:15:04.92,0:15:09.20,Default,Zettour,0,0,0,,Andromeda's falling apart already, huh?
+Dialogue: 0,0:15:09.74,0:15:12.50,Default,Zettour,0,0,0,,I'm sure he's not getting \Na moment of sleep.
+Dialogue: 0,0:15:15.57,0:15:17.11,Default,Rudersdorf,0,0,0,,What's going on?
+Dialogue: 0,0:15:17.11,0:15:19.85,Default,Rudersdorf,0,0,0,,Why haven't we finalized \Nthings with Foreign Affairs?
+Dialogue: 0,0:15:19.85,0:15:25.19,Default,Officer,0,0,0,,G-General Zettour was unofficially acting \Nas a bridge with civilian leadership...
+Dialogue: 0,0:15:25.19,0:15:26.78,Default,Officer,0,0,0,,But now...
+Dialogue: 0,0:15:28.15,0:15:31.66,Default,Rudersdorf,0,0,0,,So what happened to that \Nfleet of unknown ships?
+Dialogue: 0,0:15:31.66,0:15:35.65,Default,Officer,0,0,0,,The north seas fleet says that \Nmore and more are coming...
+Dialogue: 0,0:15:35.65,0:15:36.66,Default - italics,Rudersdorf,0,0,0,,Shit.
+Dialogue: 0,0:15:36.66,0:15:40.42,Default - italics,Rudersdorf,0,0,0,,We can't have our subs \Njust sink them all?
+Dialogue: 0,0:15:40.42,0:15:46.13,Default - italics,Officer,0,0,0,,Our legal experts say it would \Nlikely violate international law...
+Dialogue: 0,0:15:46.13,0:15:48.04,Default,Rudersdorf,0,0,0,,I needed to know this sooner!
+Dialogue: 0,0:15:54.52,0:15:56.09,Default,Uger,0,0,0,,It's Lieutenant Colonel Uger.
+Dialogue: 0,0:15:58.76,0:16:02.77,Setting,sign,0,0,0,,{\blur2\bord1\pos(320,220)\fs12}Imperial Strategic HQ Railway Command\N{\fs20}Maximilian Johann von Uger
+Dialogue: 0,0:15:59.78,0:16:02.77,Default,Uger,0,0,0,,The Allied Kingdom did \Nanother night bombing raid
+Dialogue: 0,0:16:02.77,0:16:06.34,Default,Uger,0,0,0,,on our industrial areas to the west.
+Dialogue: 0,0:16:06.34,0:16:08.86,Default,Uger,0,0,0,,We're putting together a damage report...
+Dialogue: 0,0:16:08.86,0:16:12.11,Default,Uger,0,0,0,,But we don't have enough \Nplanes to stop them all.
+Dialogue: 0,0:16:12.11,0:16:14.92,Default,Uger,0,0,0,,Our industrial productivity \Nis falling as a result.
+Dialogue: 0,0:16:14.92,0:16:17.46,Default,Uger,0,0,0,,We're already seeing problems \Nsupplying the Andromeda Project...
+Dialogue: 0,0:16:16.26,0:16:18.51,Default,Rudersdorf,0,0,0,,{\an8}Why are you so damn serious?
+Dialogue: 0,0:16:20.57,0:16:23.89,Default,Rudersdorf,0,0,0,,All you do is read me those damn reports.
+Dialogue: 0,0:16:23.89,0:16:26.32,Default,Rudersdorf,0,0,0,,You can't even tell me a single joke?
+Dialogue: 0,0:16:28.02,0:16:29.85,Default,Uger,0,0,0,,I'm sorry.
+Dialogue: 0,0:16:31.03,0:16:34.21,Default,Loria,0,0,0,,Is this... Is this true?
+Dialogue: 0,0:16:34.21,0:16:36.42,Default,Man,0,0,0,,Yes, Comrade Loria.
+Dialogue: 0,0:16:36.42,0:16:40.72,Default,Man,0,0,0,,The Devil of the Rhine is \Ncommanding the area in question.
+Dialogue: 0,0:16:40.72,0:16:43.85,Default,Loria,0,0,0,,The little slut!
+Dialogue: 0,0:16:43.85,0:16:47.57,Default,Loria,0,0,0,,Is she tempting me?
+Dialogue: 0,0:16:47.57,0:16:49.74,Default,Man,0,0,0,,Yes, they're a ridiculous bunch.
+Dialogue: 0,0:16:49.74,0:16:52.43,Default,Man,0,0,0,,We should contact the army \Nand have them deal with it.
+Dialogue: 0,0:16:52.43,0:16:55.61,Default,Loria,0,0,0,,Contact them? Have them deal with it?
+Dialogue: 0,0:16:56.75,0:16:58.25,Default,Loria,0,0,0,,Don't be stupid!
+Dialogue: 0,0:16:58.25,0:16:59.90,Default,Loria,0,0,0,,We'll take her alive ourselves!
+Dialogue: 0,0:16:59.90,0:17:02.04,Default,Man,0,0,0,,Take her alive?
+Dialogue: 0,0:17:02.04,0:17:04.78,Default,Loria,0,0,0,,If she dies in battle, \Nshe becomes a hero!
+Dialogue: 0,0:17:04.78,0:17:07.87,Default,Loria,0,0,0,,She needs to be made an \Nexample of at a trial!
+Dialogue: 0,0:17:07.87,0:17:10.01,Default,Loria,0,0,0,,Don't let her get away! Don't kill her!
+Dialogue: 0,0:17:10.01,0:17:12.01,Default,Loria,0,0,0,,Get her alive!
+Dialogue: 0,0:17:17.26,0:17:19.26,Setting,sign,0,0,0,,{\blur2\bord1\pos(320,220)}Eastern Theater Soldim 528
+Dialogue: 0,0:17:25.53,0:17:29.67,Default,Weiss,0,0,0,,We expected to be surrounded, \Nbut I didn't expect this many men.
+Dialogue: 0,0:17:30.10,0:17:33.52,Default,Tanya,0,0,0,,I guess we should've expected this \Nafter what we did to Moskva.
+Dialogue: 0,0:17:33.52,0:17:36.52,Default,Tanya,0,0,0,,Damn it. I'm jealous of Lt. Grantz.
+Dialogue: 0,0:17:36.52,0:17:40.03,Default,Visha,0,0,0,,I hope he doesn't screw something up \Nwhen he's working with the general.
+Dialogue: 0,0:17:40.03,0:17:44.00,Default,Tanya,0,0,0,,Quite possibly. If we're lucky, \Nit just ends with him being fired.
+Dialogue: 0,0:17:44.00,0:17:46.20,Default,Visha,0,0,0,,Something worse might happen?!
+Dialogue: 0,0:17:48.47,0:17:51.83,Default - italics,Tanya,0,0,0,,Reinforcements are coming, right?
+Dialogue: 0,0:17:52.34,0:17:54.59,Setting,sign,0,0,0,,{\blur2\bord1\pos(320,220)\fscx57}Eastern Battlefront Imperial Eastern Theater Forward Base Strategy Room
+Dialogue: 0,0:17:52.92,0:17:54.61,Default,Man,0,0,0,,Message from Rerugen Combat Team!
+Dialogue: 0,0:17:54.61,0:17:58.98,Default,Man,0,0,0,,Soldim 528 has been surrounded \Nby multiple Federation units!
+Dialogue: 0,0:17:59.22,0:18:00.37,Default,Man,0,0,0,,What?
+Dialogue: 0,0:18:00.37,0:18:03.10,Default,Man,0,0,0,,That's not the enemy advance \Nroute we expected!
+Dialogue: 0,0:18:03.10,0:18:05.23,Default,Man,0,0,0,,What were our scouts and \Nobservation lines doing?
+Dialogue: 0,0:18:10.04,0:18:11.39,Default,Soldier,0,0,0,,There's too many of them!
+Dialogue: 0,0:18:11.39,0:18:13.74,Default,Soldier,0,0,0,,We're outnumbered! They'll swarm us!
+Dialogue: 0,0:18:13.74,0:18:16.35,Default,Visha,0,0,0,,Our first defense lines \Nare about to be overrun!
+Dialogue: 0,0:18:16.35,0:18:19.28,Default,Tanya,0,0,0,,They're that deep already?! \NIt's too soon!
+Dialogue: 0,0:18:19.28,0:18:21.69,Default,Tanya,0,0,0,,Hold fast! Buy as much time as we can!
+Dialogue: 0,0:18:22.07,0:18:23.21,Default - italics,Tanya,0,0,0,,This is bad.
+Dialogue: 0,0:18:23.21,0:18:25.97,Default - italics,Tanya,0,0,0,,They're getting into \Nthe city far too fast.
+Dialogue: 0,0:18:26.42,0:18:27.96,Default,Tanya,0,0,0,,All units, situation report!
+Dialogue: 0,0:18:27.96,0:18:30.75,Default,Ahrens,0,0,0,,We've pulled back and \Nconcealed our armor!
+Dialogue: 0,0:18:30.75,0:18:32.49,Default,Ahrens,0,0,0,,No damage!
+Dialogue: 0,0:18:32.49,0:18:34.23,Default,Meybert,0,0,0,,Same for our artillery!
+Dialogue: 0,0:18:34.23,0:18:37.63,Default,Meybert,0,0,0,,We're conserving it, except for those \Nunits who went to assist the infantry.
+Dialogue: 0,0:18:37.63,0:18:41.43,Default,Tanya,0,0,0,,I never thought I'd hear \Nthose words from you.
+Dialogue: 0,0:18:41.43,0:18:44.52,Default,Visha,0,0,0,,Lieutenant Colonel!\NLieutenant Tospan has a suggestion!
+Dialogue: 0,0:18:44.52,0:18:47.02,Default,Tanya,0,0,0,,What? Lieutenant Tospan?
+Dialogue: 0,0:18:47.02,0:18:50.39,Default,Tanya,0,0,0,,He's not going to do something \Nstupid again, is he?
+Dialogue: 0,0:18:50.77,0:18:52.38,Default,Tanya,0,0,0,,This is Lieutenant Colonel Degurechaff!
+Dialogue: 0,0:18:52.38,0:18:53.15,Default - italics,Tospan,0,0,0,,Ma'am!
+Dialogue: 0,0:18:53.36,0:18:56.09,Default,Tospan,0,0,0,,I want to receive an \Norder from you, ma'am!
+Dialogue: 0,0:18:56.09,0:18:58.65,Default - italics,Tanya,0,0,0,,I gave you your orders already.
+Dialogue: 0,0:18:58.65,0:19:01.99,Default,Tospan,0,0,0,,Yes. But military doctrine tells us
+Dialogue: 0,0:19:01.99,0:19:05.67,Default,Tospan,0,0,0,,that we should withdraw in \Nthe face of a force this size.
+Dialogue: 0,0:19:05.67,0:19:08.16,Default - italics,Tospan,0,0,0,,So I hoped you could use your authority
+Dialogue: 0,0:19:08.16,0:19:10.70,Default - italics,Tospan,0,0,0,,as commanding officer to \Ntell us to hold the position!
+Dialogue: 0,0:19:11.46,0:19:13.49,Default,Tanya,0,0,0,,Good, good.
+Dialogue: 0,0:19:13.80,0:19:15.58,Default,Tanya,0,0,0,,I like you, Lieutenant!
+Dialogue: 0,0:19:15.58,0:19:17.89,Default,Tanya,0,0,0,,I'll send a written order to \Ndefend the position immediately!
+Dialogue: 0,0:19:17.89,0:19:19.96,Default,Tospan,0,0,0,,Yes, understood!
+Dialogue: 0,0:19:22.35,0:19:24.31,Default - italics,Tanya,0,0,0,,What's wrong, Lieutenant Tospan?
+Dialogue: 0,0:19:24.80,0:19:30.22,Default,Tospan,0,0,0,,Their heavy artillery! They're \Nfiring it on top of their own men!
+Dialogue: 0,0:19:30.82,0:19:32.98,Default,Tanya,0,0,0,,That's disgusting.
+Dialogue: 0,0:19:32.98,0:19:35.31,Default,Tanya,0,0,0,,They see their own infantry \Nas expendable pawns?
+Dialogue: 0,0:19:35.31,0:19:36.24,Default - italics,Meybert,0,0,0,,Lieutenant Colonel!
+Dialogue: 0,0:19:36.68,0:19:38.63,Default,Meybert,0,0,0,,We are prepared to fire back!
+Dialogue: 0,0:19:38.63,0:19:40.80,Default,Tanya,0,0,0,,No. We'll stop them with our mages.
+Dialogue: 0,0:19:41.28,0:19:44.22,Default,Tanya,0,0,0,,Major Weiss, knock out \Nthe enemy's artillery shells!
+Dialogue: 0,0:19:44.22,0:19:46.59,Default,Weiss,0,0,0,,Are you serious, Lieutenant Colonel?
+Dialogue: 0,0:19:46.59,0:19:50.95,Default - italics,Tanya,0,0,0,,I believe I had you trained on it \Nwhen we formed the battalion.
+Dialogue: 0,0:19:51.52,0:19:55.50,Default,Weiss,0,0,0,,We don't have enough men. Two companies \Ncan't cover the whole area.
+Dialogue: 0,0:19:55.50,0:20:00.25,Default,Tanya,0,0,0,,Major Weiss, you're the oldest one here. \NI can't have you acting like that.
+Dialogue: 0,0:20:00.25,0:20:02.67,Default - italics,Tanya,0,0,0,,Or do you need to be re-educated?
+Dialogue: 0,0:20:07.09,0:20:09.23,Default,Weiss,0,0,0,,No, not at all!
+Dialogue: 0,0:20:09.23,0:20:10.90,Default,Weiss,0,0,0,,Companies 2 and 3!
+Dialogue: 0,0:20:10.90,0:20:13.40,Default,Weiss,0,0,0,,We'll shoot down the artillery shells \Nand knock out their artillery!
+Dialogue: 0,0:20:13.40,0:20:14.73,Default,Weiss,0,0,0,,Follow me!
+Dialogue: 0,0:20:14.77,0:20:17.48,Setting,sign,0,0,0,,{\blur2\bord1\fad(274,1)\pos(320,220)\fscx80}Federation Offensive Command Post
+Dialogue: 0,0:20:20.13,0:20:23.22,Default,Drake,0,0,0,,May I ask you to take the lead?
+Dialogue: 0,0:20:28.46,0:20:30.49,Default,Neumann,0,0,0,,Federation mages?
+Dialogue: 0,0:20:30.49,0:20:33.37,Default,Neumann,0,0,0,,Are those the volunteers \Nwe fought at Tiegenhoff?!
+Dialogue: 0,0:20:33.37,0:20:36.20,Default,Weiss,0,0,0,,Stand fast! Prepare penetrator spells!
+Dialogue: 0,0:20:43.84,0:20:45.46,Default,Tanya,0,0,0,,02! Situation report!
+Dialogue: 0,0:20:45.74,0:20:48.35,Default - italics,Tanya,0,0,0,,02! Situation report! What are you doing?
+Dialogue: 0,0:21:08.07,0:21:10.87,Default - italics,Tanya,0,0,0,,Weiss! What's wrong? Weiss!
+Dialogue: 0,0:22:43.56,0:22:45.41,Default,Uger,0,0,0,,Goodnight.
+Dialogue: 0,0:22:50.51,0:22:52.16,Default,Rerugen,0,0,0,,Lieutenant Colonel Uger?
+Dialogue: 0,0:22:52.74,0:22:55.13,Default,Uger,0,0,0,,Oh, Colonel Rerugen.
+Dialogue: 0,0:22:55.13,0:22:58.23,Default,Rerugen,0,0,0,,It's been a while since \Nwe've met in person.
+Dialogue: 0,0:22:58.23,0:22:59.82,Default,Rerugen,0,0,0,,Have you lost weight?
+Dialogue: 0,0:22:59.82,0:23:00.93,Default,Uger,0,0,0,,Yes.
+Dialogue: 0,0:23:00.93,0:23:03.06,Default,Uger,0,0,0,,As have you...
+Dialogue: 0,0:23:03.06,0:23:05.85,Default,Rerugen,0,0,0,,We both have difficult jobs.
+Dialogue: 0,0:23:05.85,0:23:07.69,Default,Rerugen,0,0,0,,Why don't we get a drink?
+Dialogue: 0,0:23:07.69,0:23:09.89,Default,Uger,0,0,0,,Unfortunately, I still have work...
+Dialogue: 0,0:23:09.89,0:23:12.19,Default - italics,Rudersdorf,0,0,0,,Why are you so damn serious?
+Dialogue: 0,0:23:13.68,0:23:15.24,Default,Uger,0,0,0,,Colonel Rerugen!
+Dialogue: 0,0:23:21.36,0:23:23.05,Default,Rerugen,0,0,0,,Lieutenant Colonel Uger...
+Dialogue: 0,0:23:23.76,0:23:27.62,Default,Rerugen,0,0,0,,I didn't take you for the type.
+Dialogue: 0,0:23:27.62,0:23:32.01,Default,Rerugen,0,0,0,,For someone with a wife and kids, \Nand a position of responsibility,
+Dialogue: 0,0:23:32.01,0:23:34.73,Default,Rerugen,0,0,0,,to say something like that here without \Nknowing who else could be around.
+Dialogue: 0,0:23:36.01,0:23:40.09,Title,sign,0,0,0,,{\pos(363,164)}Next Time\NDecoy
+

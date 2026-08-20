@@ -1,0 +1,375 @@
+[Script Info]
+Title: English (US)
+ScriptType: v4.00+
+WrapStyle: 0
+ScaledBorderAndShadow: yes
+PlayResX: 640
+PlayResY: 360
+YCbCr Matrix: TV.601
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Roboto Medium,22,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1.3,0,2,20,20,23,1
+Style: Main,Roboto Medium,26,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1.3,0,2,20,20,23,1
+Style: Italics,Roboto Medium,26,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,-1,0,0,100,100,0,0,1,1.3,0,2,20,20,23,1
+Style: Flashback,Roboto Medium,26,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1.3,0,2,20,20,23,1
+Style: Flashback_Italics,Roboto Medium,26,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,-1,0,0,100,100,0,0,1,1.3,0,2,20,20,23,1
+Style: Main_Top,Roboto Medium,26,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1.3,0,8,20,20,23,1
+Style: Italics_Top,Roboto Medium,26,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,-1,0,0,100,100,0,0,1,1.3,0,8,20,20,23,1
+Style: Flashback_Top,Roboto Medium,26,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1.3,0,8,20,20,23,1
+Style: Flashback_Italics_Top,Roboto Medium,26,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,-1,0,0,100,100,0,0,1,1.3,0,8,20,20,23,1
+Style: Sign_Basic,Trebuchet MS,24,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,1,2,10,10,18,1
+Style: OpeningQuote,Times New Roman,16,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,0,0,8,10,10,65,1
+Style: QuoteAttribution,Times New Roman,16,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,3,359,86,125,1
+Style: Settings,Times New Roman,18,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,110,110,0,0,1,0.75,0,2,10,10,70,1
+Style: sign_18260_230_Tokyo_Metropolit,Times New Roman,12,&H00546A4D,&H000000FF,&H00B6E0C0,&H00000000,-1,0,0,0,100,100,0,0,1,4,0,7,70,20,117,1
+Style: sign_18272_231_At_this_school__,Times New Roman,13,&H004C684D,&H000000FF,&H00B6E0C0,&H00000000,-1,0,0,0,100,100,0,0,1,4,0,7,94,0,226,1
+Style: Credits Point list,Times New Roman,15,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,2,7,310,20,40,1
+Style: Class Point List,Times New Roman,16,&H00E5E967,&H000000FF,&H00615437,&H00000000,-1,0,0,0,100,100,0,0,1,4,0,7,40,421,20,1
+Style: sign_34416_398_Abandon_all_hope,Times New Roman,18,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,0,0,8,126,196,68,1
+Style: sign_139_2_Dante_Alighieri_,Times New Roman,14,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,3,114,108,126,1
+Style: sign_34416_427_Kierkegaard___Wo,Times New Roman,14,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,3,339,106,108,1
+Style: sign_34416_426_Every_man_has_in,Times New Roman,16,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,0,0,8,140,214,18,1
+Style: sign_34188_421_Summer_Special_T,Times New Roman,12,&H00F6E6B2,&H000000FF,&H00BF9F71,&H00000000,-1,0,0,0,100,100,0,0,1,4,0,8,161,316,52,1
+Style: sign_34188_422_Class_A,Times New Roman,12,&H00F6E6B2,&H000000FF,&H00BF9F71,&H00000000,-1,0,0,0,100,100,0,0,1,4,0,7,222,373,128,1
+Style: sign_34188_423_Class_B,Times New Roman,12,&H00F6E6B2,&H000000FF,&H00BF9F71,&H00000000,-1,0,0,0,100,100,0,0,1,4,0,7,240,356,178,1
+Style: sign_34188_424_Class_C,Times New Roman,12,&H00F6E6B2,&H000000FF,&H00BF9F71,&H00000000,-1,0,0,0,100,100,0,0,1,4,0,1,260,335,121,1
+Style: sign_34188_425_Class_D,Times New Roman,12,&H00F6E6B2,&H000000FF,&H00BF9F71,&H00000000,-1,0,0,0,100,100,0,0,1,4,0,1,272,323,71,1
+Style: sign_34417_368_What_people_comm,Times New Roman,16,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,0,0,8,79,85,68,1
+Style: sign_34417_369_Schopenhauer__Ph,Times New Roman,14,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,3,323,74,114,1
+Style: sign_3430_6_Test__Day_2,Times New Roman,22,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,0,0,8,260,260,20,1
+Style: sign_1583_3_Schopenhauer__Ph,Times New Roman,14,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,3,20,108,124,1
+Style: sign_1484_2_Genius,Times New Roman,16,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,0,0,8,10,78,66,1
+Style: sign_1521_9_Classroom_of_the,Consolas,40,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,10,0,1,0,0,5,5,5,0,1
+Style: sign_40_1_Every_man_has_in,Times New Roman,16,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,0,0,8,179,207,20,1
+Style: sign_140_2_Kierkegaard___Wo,Times New Roman,14,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,3,359,86,98,1
+Style: sign_22854_247_Point_Transfer,Times New Roman,14,&H00FFFFFF,&H000000FF,&H008A644F,&H00000000,-1,0,0,0,100,100,0,0,1,2,0,9,300,47,60,1
+Style: sign_22854_248_Point_Transfer_i,Times New Roman,14,&H00FDFF33,&H000000FF,&H008A644F,&H00000000,-1,0,0,0,100,100,0,0,1,2,0,8,20,20,125,1
+Style: S4_Ep_Title,Times New Roman,20,&H00FFFFFF,&H000000FF,&H00000000,&H5A000000,-1,0,0,0,100,100,0,0,1,0,2,3,10,34,50,1
+Style: S4_Show_Title,Georgia,20,&H00000000,&H000000FF,&H00FFFFFF,&H00000000,0,0,0,0,100,100,0,0,3,4,0,8,10,10,18,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:01.40,0:00:09.03,Main,Hosen,0,0,0,,So? According to Nanase, \Nyou want my class's help.
+Dialogue: 0,0:00:09.57,0:00:11.00,Main,Horikita,0,0,0,,Not quite.
+Dialogue: 0,0:00:11.78,0:00:15.16,Main,Horikita,0,0,0,,I told her I'm willing \Nto work with your class.
+Dialogue: 0,0:00:15.89,0:00:20.16,Main,Horikita,0,0,0,,No hierarchy. An alliance of equals.
+Dialogue: 0,0:00:20.63,0:00:22.72,Main,Hosen,0,0,0,,Gotcha.
+Dialogue: 0,0:00:22.72,0:00:27.17,Main,Hosen,0,0,0,,So you're not gonna bring up the \Nfact that you're a year ahead of us.
+Dialogue: 0,0:00:27.59,0:00:32.17,Main,Hosen,0,0,0,,Smart of you not to try \Nplaying the senpai card.
+Dialogue: 0,0:00:32.86,0:00:34.70,Main,Horikita,0,0,0,,I recognize that there are
+Dialogue: 0,0:00:34.70,0:00:39.54,Main,Horikita,0,0,0,,a significant number of first-years who \Ndon't care if their classmates struggle.
+Dialogue: 0,0:00:40.15,0:00:45.35,Main,Horikita,0,0,0,,But moving forward, you'll inevitably \Nreach a point when you'll need their aid.
+Dialogue: 0,0:00:45.82,0:00:51.19,Main,Hosen,0,0,0,,"So let's work together to \Nmake sure no one fails"?
+Dialogue: 0,0:00:52.95,0:00:58.45,Main,Hosen,0,0,0,,Okay to assume that you're \NClass 2-D's leader?
+Dialogue: 0,0:00:58.67,0:01:00.95,Main,Horikita,0,0,0,,You're free to see things that way.
+Dialogue: 0,0:01:01.39,0:01:04.99,Main,Hosen,0,0,0,,Then as leader, I'll give you a warning.
+Dialogue: 0,0:01:05.81,0:01:12.55,Main,Hosen,0,0,0,,I didn't come here to work with you \Nunder your so-called "equality."
+Dialogue: 0,0:01:13.05,0:01:14.65,Main,Horikita,0,0,0,,What are you hoping for, then?
+Dialogue: 0,0:01:15.39,0:01:18.47,Main,Horikita,0,0,0,,Did you think I would \Npay you private points?
+Dialogue: 0,0:01:18.83,0:01:21.86,Main,Hosen,0,0,0,,Yeah. Damn straight you'll pay.
+Dialogue: 0,0:01:22.26,0:01:24.82,Main,Hosen,0,0,0,,That's the only way this goes anywhere.
+Dialogue: 0,0:01:25.85,0:01:27.54,Main,Horikita,0,0,0,,I'm afraid I must repeat myself.
+Dialogue: 0,0:01:28.04,0:01:30.41,Main,Horikita,0,0,0,,My proposal is an alliance of equals.
+Dialogue: 0,0:01:31.34,0:01:35.43,Main,Horikita,0,0,0,,It would be inappropriate for either \Nside to offer payment to the other.
+Dialogue: 0,0:01:36.28,0:01:37.82,Main,Hosen,0,0,0,,In that case...
+Dialogue: 0,0:01:38.89,0:01:42.83,Main,Hosen,0,0,0,,I guess I'll just be going, then.
+Dialogue: 0,0:01:54.55,0:02:00.35,S4_Show_Title,sign,0,0,0,,{\fad(1800,0)}Classroom of the Elite 4th Season 2nd Year 1st Term
+Dialogue: 0,0:03:04.41,0:03:10.96,S4_Show_Title,sign,0,0,0,,{\fad(450,0)}Classroom of the Elite 4th Season 2nd Year 1st Term
+Dialogue: 0,0:03:16.26,0:03:18.68,S4_Ep_Title,title,0,0,0,,{\fad(875,550)\an2\pos(320,310)}#4 To Whom the Blade Turns
+Dialogue: 0,0:03:19.08,0:03:20.22,Main,Nanase,0,0,0,,Wait!
+Dialogue: 0,0:03:20.81,0:03:25.94,Main,Nanase,0,0,0,,Hosen-kun, I think you should listen \Nto what Horikita-senpai has to say.
+Dialogue: 0,0:03:26.35,0:03:28.47,Main,Hosen,0,0,0,,Don't see why I should bother.
+Dialogue: 0,0:03:29.05,0:03:30.54,Main,Nanase,0,0,0,,I do.
+Dialogue: 0,0:03:30.54,0:03:34.47,Main,Nanase,0,0,0,,At this rate, our class \Nwill be unable to unify.
+Dialogue: 0,0:03:34.82,0:03:36.98,Main,Hosen,0,0,0,,What are you, stupid?
+Dialogue: 0,0:03:37.50,0:03:41.59,Main,Hosen,0,0,0,,There's not a damn thing I get \Nout of agreeing to her offer.
+Dialogue: 0,0:03:42.36,0:03:46.24,Main,Nanase,0,0,0,,I don't think your strategy is a bad one—
+Dialogue: 0,0:03:46.24,0:03:49.50,Main,Nanase,0,0,0,,intentionally staying neutral and \Npassing on early negotiations
+Dialogue: 0,0:03:49.82,0:03:52.25,Main,Nanase,0,0,0,,to give us a better negotiating position.
+Dialogue: 0,0:03:53.00,0:03:57.00,Main,Hosen,0,0,0,,Tell me one thing I get out \Nof working with Horikita here.
+Dialogue: 0,0:03:57.53,0:03:59.51,Main,Nanase,0,0,0,,Trust.
+Dialogue: 0,0:03:59.93,0:04:01.99,Main,Hosen,0,0,0,,Trust, huh?
+Dialogue: 0,0:04:02.68,0:04:06.51,Main,Hosen,0,0,0,,Bunch of head-in-the-clouds \Nbullshit, if you ask me.
+Dialogue: 0,0:04:07.13,0:04:10.33,Main,Nanase,0,0,0,,If you turn the second-years \Nagainst you now,
+Dialogue: 0,0:04:10.33,0:04:13.38,Main,Nanase,0,0,0,,and a similar test comes up in the future,
+Dialogue: 0,0:04:13.38,0:04:19.02,Main,Nanase,0,0,0,,we may end up unable to secure partners, \Nno matter how many points we offer.
+Dialogue: 0,0:04:19.02,0:04:23.78,Main,Hosen,0,0,0,,You think I'm scared of \Neating the penalty for that?
+Dialogue: 0,0:04:24.11,0:04:26.23,Main,Nanase,0,0,0,,I'm sure the penalty itself \Nwouldn't be a problem.
+Dialogue: 0,0:04:26.84,0:04:29.91,Main,Nanase,0,0,0,,But what if the partner you end \Nup with intentionally does poorly?
+Dialogue: 0,0:04:30.44,0:04:32.54,Main,Nanase,0,0,0,,You wouldn't be able to avoid expulsion.
+Dialogue: 0,0:04:33.95,0:04:37.47,Main,Hosen,0,0,0,,You think someone here has the balls \Nto get expelled to take me down?
+Dialogue: 0,0:04:37.79,0:04:42.80,Main,Nanase,0,0,0,,In this school, it seems there's a \Nsystem known as protection points.
+Dialogue: 0,0:04:43.02,0:04:46.05,Main,Horikita,0,0,0,,Yes, they're a special kind \Nof point that allows you
+Dialogue: 0,0:04:46.47,0:04:47.91,Main,Horikita,0,0,0,,to nullify expulsion a single time.
+Dialogue: 0,0:04:48.61,0:04:51.92,Main,Horikita,0,0,0,,If the partner you end up \Nwith has a protection point,
+Dialogue: 0,0:04:51.92,0:04:56.06,Main,Horikita,0,0,0,,they could excise you from the school \Nwithout any risk to themselves.
+Dialogue: 0,0:04:56.65,0:05:02.19,Main,Nanase,0,0,0,,Which means it's best to establish \Ntrust now, while we can.
+Dialogue: 0,0:05:02.57,0:05:04.30,Main,Hosen,0,0,0,,I get it.
+Dialogue: 0,0:05:04.30,0:05:06.04,Main,Hosen,0,0,0,,You idiots rubbed a couple \Nbrain cells together
+Dialogue: 0,0:05:06.04,0:05:08.03,Main,Hosen,0,0,0,,to figure out a way to threaten me.
+Dialogue: 0,0:05:08.60,0:05:11.79,Main,Hosen,0,0,0,,Sorry to ruin your sad excuse for a plan,
+Dialogue: 0,0:05:12.50,0:05:15.41,Main,Hosen,0,0,0,,but I'm not doing anything as equals.
+Dialogue: 0,0:05:16.06,0:05:17.81,Main,Horikita,0,0,0,,What do you expect to do, then?
+Dialogue: 0,0:05:18.33,0:05:21.80,Main,Horikita,0,0,0,,We won't change our perception \Nof our classes as equals.
+Dialogue: 0,0:05:22.02,0:05:25.05,Main,Hosen,0,0,0,,Yeah, you made that clear.
+Dialogue: 0,0:05:25.55,0:05:31.06,Main,Hosen,0,0,0,,But I don't think we'd \Nactually be equal at all.
+Dialogue: 0,0:05:31.49,0:05:36.81,Main,Horikita,0,0,0,,If you're so sure, then for my reference, \Nwhat is it that you propose?
+Dialogue: 0,0:05:37.22,0:05:40.06,Main,Hosen,0,0,0,,A million private points.
+Dialogue: 0,0:05:40.51,0:05:42.97,Main,Hosen,0,0,0,,Hand it over to me as collateral.
+Dialogue: 0,0:05:43.53,0:05:50.42,Main,Hosen,0,0,0,,If I need your help for something \Nlater, I'll gladly pay it all back.
+Dialogue: 0,0:05:50.91,0:05:54.58,Main,Hosen,0,0,0,,If "trust" is so important to you,
+Dialogue: 0,0:05:54.89,0:05:57.13,Main,Hosen,0,0,0,,that's not such a big ask, is it?
+Dialogue: 0,0:05:58.27,0:06:01.75,Italics,Ayanokoji,0,0,0,,Hosen skillfully got \Nhis offer on the table.
+Dialogue: 0,0:06:02.15,0:06:04.26,Italics,Ayanokoji,0,0,0,,He's more than just a musclehead.
+Dialogue: 0,0:06:04.71,0:06:09.01,Italics,Ayanokoji,0,0,0,,Like Ryuen, he's capable \Nof rather devious scheming.
+Dialogue: 0,0:06:09.64,0:06:13.06,Main,Horikita,0,0,0,,I acknowledge the logic of your proposal.
+Dialogue: 0,0:06:13.38,0:06:16.27,Main,Horikita,0,0,0,,But I can't agree to those terms.
+Dialogue: 0,0:06:16.53,0:06:20.04,Main,Hosen,0,0,0,,Gotcha. Too bad.
+Dialogue: 0,0:06:20.74,0:06:23.57,Main,Hosen,0,0,0,,I thought I'd be generous \Nand toss you a lifeline,
+Dialogue: 0,0:06:23.57,0:06:25.85,Main,Hosen,0,0,0,,but I guess we've hit a roadblock again.
+Dialogue: 0,0:06:26.93,0:06:28.28,Main,Horikita,0,0,0,,It appears so.
+Dialogue: 0,0:06:33.91,0:06:35.51,Main,Sudo,0,0,0,,You son of a—
+Dialogue: 0,0:06:35.51,0:06:36.91,Main,Horikita,0,0,0,,Don't do it, Sudo-kun!
+Dialogue: 0,0:06:37.41,0:06:39.66,Main,Sudo,0,0,0,,What do you expect me to do?!
+Dialogue: 0,0:06:42.20,0:06:44.82,Main,Horikita,0,0,0,,If you're that upset about \Nreaching an impasse,
+Dialogue: 0,0:06:44.82,0:06:47.67,Main,Horikita,0,0,0,,you should have come \Nup with a better idea.
+Dialogue: 0,0:06:48.20,0:06:49.15,Main,Horikita,0,0,0,,Let's go.
+Dialogue: 0,0:06:50.43,0:06:51.70,Main,Sudo,0,0,0,,You sure about this?!
+Dialogue: 0,0:06:55.29,0:06:57.06,Main,Nanase,0,0,0,,Are you sure about this, Hosen-kun?
+Dialogue: 0,0:07:04.65,0:07:06.19,Main,Hosen,0,0,0,,Hold up.
+Dialogue: 0,0:07:06.93,0:07:12.57,Main,Horikita,0,0,0,,I won't change my position as long as you \Ninsist on making unreasonable demands.
+Dialogue: 0,0:07:12.98,0:07:14.47,Main,Hosen,0,0,0,,Fine, gotcha.
+Dialogue: 0,0:07:14.83,0:07:18.36,Main,Hosen,0,0,0,,I'll order my class to pair up with yours.
+Dialogue: 0,0:07:18.87,0:07:20.78,Main,Hosen,0,0,0,,So give me some points.
+Dialogue: 0,0:07:20.78,0:07:22.33,Main,Hosen,0,0,0,,Two million.
+Dialogue: 0,0:07:23.05,0:07:24.25,Main,Horikita,0,0,0,,Two million?
+Dialogue: 0,0:07:24.62,0:07:26.59,Main,Horikita,0,0,0,,You've shown your true colors.
+Dialogue: 0,0:07:26.59,0:07:31.02,Main,Hosen,0,0,0,,It's the only way for your \Nclass to avoid expulsion.
+Dialogue: 0,0:07:31.67,0:07:34.34,Main,Hosen,0,0,0,,You won't gain anything by cheaping out.
+Dialogue: 0,0:07:34.74,0:07:36.60,Main,Horikita,0,0,0,,This is getting us nowhere.
+Dialogue: 0,0:07:38.22,0:07:42.50,Main,Hosen,0,0,0,,Fine, fine. I'll consider your offer.
+Dialogue: 0,0:07:42.50,0:07:44.83,Main,Horikita,0,0,0,,That's quite a sudden change of heart.
+Dialogue: 0,0:07:44.83,0:07:50.13,Main,Hosen,0,0,0,,Why wouldn't I try to squeeze out \Nthe best terms for myself first?
+Dialogue: 0,0:07:50.13,0:07:54.49,Main,Horikita,0,0,0,,Then you'll accept my terms \Nfor an alliance of equals?
+Dialogue: 0,0:07:54.82,0:07:58.64,Main,Hosen,0,0,0,,Yeah. Let's talk it out, no more violence.
+Dialogue: 0,0:07:58.64,0:08:01.45,Main,Hosen,0,0,0,,But people might see us here.
+Dialogue: 0,0:08:01.85,0:08:03.25,Main,Hosen,0,0,0,,Let's go somewhere else.
+Dialogue: 0,0:08:03.61,0:08:06.96,Main,Horikita,0,0,0,,Very well. I'll give you ten minutes.
+Dialogue: 0,0:08:06.96,0:08:09.87,Main,Hosen,0,0,0,,Gotcha. I'll show you to the spot.
+Dialogue: 0,0:08:13.30,0:08:16.78,Main,Horikita,0,0,0,,Our offer on the table hasn't changed.
+Dialogue: 0,0:08:18.03,0:08:19.43,Main,Hosen,0,0,0,,Yeah, so mine is...
+Dialogue: 0,0:08:19.74,0:08:21.43,Main,Hosen,0,0,0,,Three million.
+Dialogue: 0,0:08:22.17,0:08:27.81,Main,Hosen,0,0,0,,Hand it straight to me, and I'll \Nsave you dumb assholes right now.
+Dialogue: 0,0:08:28.04,0:08:29.81,Main,Sudo,0,0,0,,You're screwing with us!
+Dialogue: 0,0:08:30.12,0:08:31.78,Main,Hosen,0,0,0,,Nah, I'm dead serious.
+Dialogue: 0,0:08:32.31,0:08:37.32,Main,Hosen,0,0,0,,I wouldn't have reopened \Nnegotiations otherwise.
+Dialogue: 0,0:08:37.80,0:08:40.98,Main,Horikita,0,0,0,,It was a mistake to even entertain this.
+Dialogue: 0,0:08:43.25,0:08:44.33,Main,Sudo,0,0,0,,Suzune!
+Dialogue: 0,0:08:45.70,0:08:46.83,Main,Horikita,0,0,0,,What are you—
+Dialogue: 0,0:08:56.76,0:09:00.51,Main,Hosen,0,0,0,,Let's see how much fight \Nyou've got in you.
+Dialogue: 0,0:09:01.56,0:09:03.35,Main,Sudo,0,0,0,,You're on.
+Dialogue: 0,0:09:03.35,0:09:07.48,Main,Sudo,0,0,0,,I won't hold back against an \Nasshole who'd hurt Suzune!
+Dialogue: 0,0:09:12.42,0:09:15.11,Main,Horikita,0,0,0,,What... What do you think you're doing?!
+Dialogue: 0,0:09:15.55,0:09:16.86,Main,Nanase,0,0,0,,Horikita-senpai.
+Dialogue: 0,0:09:17.27,0:09:21.83,Main,Nanase,0,0,0,,I believe things at this school have \Nchanged a bit from how they were before.
+Dialogue: 0,0:09:22.15,0:09:27.37,Main,Nanase,0,0,0,,We first-years know the current \Nsituation better than you do.
+Dialogue: 0,0:09:27.59,0:09:28.88,Main,Horikita,0,0,0,,What are you talking about?
+Dialogue: 0,0:09:28.88,0:09:32.58,Main,Nanase,0,0,0,,A few representatives of \Nthe first-years received
+Dialogue: 0,0:09:32.58,0:09:35.62,Main,Nanase,0,0,0,,an explanation directly \Nfrom President Nagumo—
+Dialogue: 0,0:09:36.47,0:09:40.68,Main,Nanase,0,0,0,,that, this year, he was going to make \Nthe school even more of a meritocracy.
+Dialogue: 0,0:09:41.14,0:09:42.39,Main,Horikita,0,0,0,,That's ridiculous!
+Dialogue: 0,0:09:43.42,0:09:45.64,Italics,Horikita,0,0,0,,He's even allowing fights \Nbetween students?!
+Dialogue: 0,0:09:48.59,0:09:52.06,Main,Hosen,0,0,0,,Hey, Sudo. Have a look \Nat Horikita over there.
+Dialogue: 0,0:09:52.53,0:09:55.67,Main,Hosen,0,0,0,,She looks pretty damn pissed.
+Dialogue: 0,0:09:57.14,0:09:59.03,Main_Top,Sudo,0,0,0,,Y-You...
+Dialogue: 0,0:09:57.49,0:10:01.01,Italics,Ayanokoji,0,0,0,,He has far more real-life \Nfighting experience than Sudo.
+Dialogue: 0,0:10:01.77,0:10:05.54,Italics,Ayanokoji,0,0,0,,I see. That's why even Ryuen didn't \Nwant to get physical with him.
+Dialogue: 0,0:10:13.56,0:10:14.33,Main,Hosen,0,0,0,,So...
+Dialogue: 0,0:10:14.71,0:10:16.72,Main,Hosen,0,0,0,,You wanna go strength for strength?
+Dialogue: 0,0:10:17.05,0:10:19.97,Main,Horikita,0,0,0,,Fighting like this isn't helping anyone!
+Dialogue: 0,0:10:29.15,0:10:35.23,Italics,Ayanokoji,0,0,0,,Does Hosen really think he can gain \Nthe upper hand through sheer violence?
+Dialogue: 0,0:10:36.04,0:10:40.11,Italics,Ayanokoji,0,0,0,,No, I don't think he's that stupid.
+Dialogue: 0,0:10:41.22,0:10:43.29,Italics,Ayanokoji,0,0,0,,Then by starting this fight...
+Dialogue: 0,0:10:44.51,0:10:47.35,Italics,Ayanokoji,0,0,0,,What does Hosen hope to accomplish?
+Dialogue: 0,0:10:48.37,0:10:54.88,Main,Hosen,0,0,0,,Well, your big, strong bodyguard \Nis down for the count.
+Dialogue: 0,0:10:55.13,0:10:59.25,Main,Horikita,0,0,0,,Did you think you could break \Nour spirits with violence?
+Dialogue: 0,0:11:00.25,0:11:02.82,Main,Hosen,0,0,0,,I'm gonna beat you down so hard,
+Dialogue: 0,0:11:02.82,0:11:06.53,Main,Hosen,0,0,0,,you'll be begging me to \Nlet you sign an agreement.
+Dialogue: 0,0:11:07.31,0:11:10.77,Main,Horikita,0,0,0,,Very well. Then I'll stop you myself.
+Dialogue: 0,0:11:11.07,0:11:12.95,Main,Hosen,0,0,0,,Ain't that something?
+Dialogue: 0,0:11:13.32,0:11:15.27,Main,Hosen,0,0,0,,If you wanna show me what you've got...
+Dialogue: 0,0:11:15.53,0:11:18.21,Main,Hosen,0,0,0,,I'll be happy to see it!
+Dialogue: 0,0:11:25.73,0:11:29.52,Main,Hosen,0,0,0,,Pretty nice moves, I gotta say!
+Dialogue: 0,0:11:31.25,0:11:32.75,Main,Sudo,0,0,0,,S-Suzune!
+Dialogue: 0,0:11:37.90,0:11:40.02,Main,Hosen,0,0,0,,Hey, Horikita.
+Dialogue: 0,0:11:40.02,0:11:42.51,Main,Hosen,0,0,0,,Let's make an agreement.
+Dialogue: 0,0:11:42.97,0:11:44.53,Main,Hosen,0,0,0,,You give me five million.
+Dialogue: 0,0:11:45.16,0:11:48.18,Main,Hosen,0,0,0,,Then all of this ends.
+Dialogue: 0,0:11:48.41,0:11:50.68,Main,Horikita,0,0,0,,Th-This is absurd.
+Dialogue: 0,0:11:51.48,0:11:54.81,Main,Horikita,0,0,0,,Ayanokoji-kun, call the teachers!
+Dialogue: 0,0:11:54.81,0:11:57.07,Main,Hosen,0,0,0,,Wouldn't do that if I were you.
+Dialogue: 0,0:11:57.55,0:12:03.82,Main,Hosen,0,0,0,,Unless you want her \Ninjuries to get way worse.
+Dialogue: 0,0:12:04.63,0:12:07.51,Main,Hosen,0,0,0,,Horikita, I'm giving you one last chance.
+Dialogue: 0,0:12:07.51,0:12:11.64,Main,Hosen,0,0,0,,Agree to my terms and get \Nme the points I want,
+Dialogue: 0,0:12:11.64,0:12:14.58,Main,Hosen,0,0,0,,or I'll kill Ayanokoji.
+Dialogue: 0,0:12:15.78,0:12:17.34,Main,Horikita,0,0,0,,What in the world are you...
+Dialogue: 0,0:12:17.62,0:12:24.09,Main,Hosen,0,0,0,,If you don't agree, I'll skewer Ayanokoji.
+Dialogue: 0,0:12:24.09,0:12:28.72,Main,Hosen,0,0,0,,And that's on the light end of \Nthings I'd do to get points.
+Dialogue: 0,0:12:29.09,0:12:30.84,Main,Nanase,0,0,0,,That's enough!
+Dialogue: 0,0:12:31.29,0:12:34.48,Main,Nanase,0,0,0,,I've made up my mind! \NI refuse to accept your methods!
+Dialogue: 0,0:12:34.74,0:12:38.23,Main,Hosen,0,0,0,,Clear out, Nanase. I'm doing this.
+Dialogue: 0,0:12:38.70,0:12:40.73,Main,Nanase,0,0,0,,I'm sorry, Horikita-senpai.
+Dialogue: 0,0:12:41.21,0:12:44.41,Main,Nanase,0,0,0,,You were never going to be able to \Nmake an agreement with Hosen-kun.
+Dialogue: 0,0:12:45.57,0:12:50.74,Main,Nanase,0,0,0,,You came up with the alliance idea \Nbased on the things Hosen-kun said to you.
+Dialogue: 0,0:12:51.46,0:12:55.78,Main,Nanase,0,0,0,,But it was all just bait to get you here.
+Dialogue: 0,0:12:55.78,0:12:58.25,Main,Hosen,0,0,0,,Shut your damn mouth already.
+Dialogue: 0,0:12:58.91,0:13:03.54,Main,Hosen,0,0,0,,If I take down Ayanokoji, \Nour class gets a huge deposit.
+Dialogue: 0,0:13:03.94,0:13:07.05,Main,Hosen,0,0,0,,You know how far that'll put us ahead.
+Dialogue: 0,0:13:07.05,0:13:08.64,Main,Nanase,0,0,0,,That's true.
+Dialogue: 0,0:13:09.48,0:13:11.16,Main,Nanase,0,0,0,,But I haven't yet determined
+Dialogue: 0,0:13:11.16,0:13:16.77,Main,Nanase,0,0,0,,if Ayanokoji-senpai is worthy \Nof being targeted that way!
+Dialogue: 0,0:13:17.16,0:13:19.77,Main,Hosen,0,0,0,,You think I give a damn what you think?
+Dialogue: 0,0:13:20.10,0:13:23.34,Main,Hosen,0,0,0,,If you're gonna try to stop me, \Nyou can get the hell out!
+Dialogue: 0,0:13:24.28,0:13:25.28,Main,Hosen,0,0,0,,Now...
+Dialogue: 0,0:13:25.56,0:13:31.16,Main,Hosen,0,0,0,,Let's go, Ayanokoji!
+Dialogue: 0,0:13:41.83,0:13:44.80,Main,Hosen,0,0,0,,You... Ayanokoji...
+Dialogue: 0,0:13:45.33,0:13:51.29,Main,Ayanokoji,0,0,0,,This knife—this petty knife—\Nis the one that I bought.
+Dialogue: 0,0:13:51.88,0:13:53.81,Main,Hosen,0,0,0,,What're you talking about?
+Dialogue: 0,0:13:54.30,0:13:58.84,Main,Ayanokoji,0,0,0,,You'd lure us out here and \Nescalate things into a fight.
+Dialogue: 0,0:13:59.64,0:14:02.52,Main,Ayanokoji,0,0,0,,After seeing my classmates \Nhurt, I'd fly into a rage
+Dialogue: 0,0:14:02.98,0:14:06.65,Main,Ayanokoji,0,0,0,,and stab you with a knife \NI happened to bring with me.
+Dialogue: 0,0:14:07.31,0:14:09.57,Main,Ayanokoji,0,0,0,,That's the sequence of events \Nyou wanted to paint, right?
+Dialogue: 0,0:14:10.50,0:14:14.58,Main,Ayanokoji,0,0,0,,That's not how you hold a knife \Nwhen you want to stab someone else.
+Dialogue: 0,0:14:15.03,0:14:19.33,Main,Ayanokoji,0,0,0,,You even turned the blade upside-down \Nso it would look like I stabbed you.
+Dialogue: 0,0:14:20.97,0:14:26.59,Main,Hosen,0,0,0,,And after figuring that out, you were \Ncrazy enough to come let me stab you?
+Dialogue: 0,0:14:26.82,0:14:30.04,Main,Ayanokoji,0,0,0,,It was the best way to get you to stop.
+Dialogue: 0,0:14:30.52,0:14:32.52,Main,Ayanokoji,0,0,0,,Besides, you did the same thing.
+Dialogue: 0,0:14:32.93,0:14:36.10,Main,Ayanokoji,0,0,0,,You expected to leave \Nthis fight badly injured.
+Dialogue: 0,0:14:36.57,0:14:41.10,Main,Ayanokoji,0,0,0,,It seems there's some kind \Nof special test in play here,
+Dialogue: 0,0:14:41.90,0:14:45.66,Main,Ayanokoji,0,0,0,,issued only to certain members \Nof the first-year class.
+Dialogue: 0,0:14:46.95,0:14:48.84,Main,Ayanokoji,0,0,0,,And the object of that test...
+Dialogue: 0,0:14:49.23,0:14:51.62,Main,Ayanokoji,0,0,0,,is to get me expelled.
+Dialogue: 0,0:14:53.26,0:14:57.16,Main,Hosen,0,0,0,,How'd you know this was your knife?
+Dialogue: 0,0:14:57.73,0:15:00.20,Main,Ayanokoji,0,0,0,,I've done some investigating of my own.
+Dialogue: 0,0:15:00.61,0:15:02.02,Main,Ayanokoji,0,0,0,,As of yesterday,
+Dialogue: 0,0:15:02.02,0:15:04.88,Main,Ayanokoji,0,0,0,,I was the only one who'd bought \Na knife of this particular make.
+Dialogue: 0,0:15:04.88,0:15:06.94,Main,Hosen,0,0,0,,What the hell?
+Dialogue: 0,0:15:06.94,0:15:08.13,Main,Hosen,0,0,0,,Who the hell are you?!
+Dialogue: 0,0:15:08.66,0:15:10.17,Main,Ayanokoji,0,0,0,,What to do now, then?
+Dialogue: 0,0:15:10.68,0:15:14.64,Main,Ayanokoji,0,0,0,,Even if it is my knife, \Nyou're the one who stabbed me.
+Dialogue: 0,0:15:14.89,0:15:18.95,Main,Ayanokoji,0,0,0,,If you can't talk your way out of \Nthis, you'll be expelled, Hosen.
+Dialogue: 0,0:15:19.95,0:15:22.90,Main,Hosen,0,0,0,,So you planned that part out, too...
+Dialogue: 0,0:15:25.15,0:15:26.66,Main,Sudo,0,0,0,,Ayanokoji!
+Dialogue: 0,0:15:26.66,0:15:28.69,Main,Horikita,0,0,0,,A-Are you all right?
+Dialogue: 0,0:15:29.07,0:15:30.40,Main,Ayanokoji,0,0,0,,I'm fine.
+Dialogue: 0,0:15:30.76,0:15:33.66,Main,Hosen,0,0,0,,How much did you know?
+Dialogue: 0,0:15:34.22,0:15:40.06,Main,Ayanokoji,0,0,0,,My suspicions first arose when I went \Nshopping at the mall with Amasawa.
+Dialogue: 0,0:15:40.65,0:15:44.90,Main,Horikita,0,0,0,,Amasawa-san? She's involved in this?
+Dialogue: 0,0:15:45.22,0:15:52.43,Main,Ayanokoji,0,0,0,,Yes. A clerk there saw another student \Nstop Hosen from buying the same knife.
+Dialogue: 0,0:15:53.05,0:15:55.65,Main,Ayanokoji,0,0,0,,You're the one who thought \Nup the general plan,
+Dialogue: 0,0:15:56.01,0:15:58.75,Main,Ayanokoji,0,0,0,,but Amasawa's the one who refined it.
+Dialogue: 0,0:15:59.50,0:16:04.10,Main,Ayanokoji,0,0,0,,She knew it would be best if the \Nknife used was one I'd bought myself.
+Dialogue: 0,0:16:04.56,0:16:07.04,Main,Ayanokoji,0,0,0,,And her coming to my apartment
+Dialogue: 0,0:16:07.04,0:16:10.82,Main,Ayanokoji,0,0,0,,to find her hair tie was a convenient \Nexcuse to steal the knife.
+Dialogue: 0,0:16:10.82,0:16:12.72,Main,Ayanokoji,0,0,0,,She was careful not to get \Nher fingerprints on it
+Dialogue: 0,0:16:12.72,0:16:14.82,Main,Ayanokoji,0,0,0,,before giving it to you.
+Dialogue: 0,0:16:16.28,0:16:20.35,Main,Hosen,0,0,0,,It was a damn mistake to work \Nwith a woman I barely knew.
+Dialogue: 0,0:16:20.95,0:16:25.83,Main,Ayanokoji,0,0,0,,No, Amasawa's the reason \Nyour plan got this far.
+Dialogue: 0,0:16:26.65,0:16:28.94,Main,Ayanokoji,0,0,0,,It would have fallen apart \Nmuch sooner without her.
+Dialogue: 0,0:16:29.98,0:16:35.09,Main,Ayanokoji,0,0,0,,Hosen, I'm willing to keep \Nthis just between us.
+Dialogue: 0,0:16:35.70,0:16:37.60,Main,Hosen,0,0,0,,The hell do you mean by that?
+Dialogue: 0,0:16:38.05,0:16:42.39,Main,Ayanokoji,0,0,0,,In exchange, I have two requests.
+Dialogue: 0,0:16:43.25,0:16:48.36,Main,Ayanokoji,0,0,0,,One, I want the Class Ds to form \Nan alliance on equal footing.
+Dialogue: 0,0:16:48.83,0:16:55.86,Main,Ayanokoji,0,0,0,,Two, I want you to be my partner \Non the upcoming special test.
+Dialogue: 0,0:16:57.45,0:17:00.94,Italics,Ayanokoji,0,0,0,,Hosen is my ideal partner.
+Dialogue: 0,0:17:01.37,0:17:03.36,Italics,Ayanokoji,0,0,0,,It's hard to imagine
+Dialogue: 0,0:17:03.36,0:17:06.76,Italics,Ayanokoji,0,0,0,,a White Room student being willing \Nto attract so much attention.
+Dialogue: 0,0:17:08.68,0:17:12.34,Main,Hosen,0,0,0,,Nice, nice work, Ayanokoji-senpai.
+Dialogue: 0,0:17:12.68,0:17:15.86,Main,Hosen,0,0,0,,I've never gone toe-to-toe with \Nsomeone who excited me like this.
+Dialogue: 0,0:17:16.23,0:17:20.35,Main,Hosen,0,0,0,,I can see it wouldn't be any fun to \Nbeat you into line with my fists.
+Dialogue: 0,0:17:20.79,0:17:24.05,Main,Hosen,0,0,0,,I'll kill you sooner or later, \Nso look forward to that.
+Dialogue: 0,0:17:28.09,0:17:34.97,Italics,Ayanokoji,0,0,0,,The next Monday, Nanase and Horikita \Nnegotiated an equal alliance,
+Dialogue: 0,0:17:34.97,0:17:37.06,Italics,Ayanokoji,0,0,0,,and all partnerships were established.
+Dialogue: 0,0:17:37.54,0:17:40.03,Italics,Ayanokoji,0,0,0,,We completed the special \Ntest without issue,
+Dialogue: 0,0:17:40.03,0:17:43.79,Italics,Ayanokoji,0,0,0,,and on May 1st, \Nthe results were announced.
+Dialogue: 0,0:17:45.29,0:17:47.79,Sign_Basic,sign,0,0,0,,{\pos(320,82)\an8\fnTimes New Roman\b1\c&H19120B&\3c&HFDFCF4&\shad0\fs20}Special Test  Results
+Dialogue: 0,0:17:45.29,0:17:47.79,Sign_Basic,sign,0,0,0,,{\an8\fnTimes New Roman\b1\c&H19120B&\3c&HFDFCF4&\shad0\pos(323,128)\fs20}Math
+Dialogue: 0,0:17:45.29,0:17:47.79,Sign_Basic,sign,0,0,0,,{\fnTimes New Roman\b1\c&H19120B&\3c&HFDFCF4&\shad0\fs20\pos(144,134.667)\fs14\bord0}Class D
+Dialogue: 0,0:17:45.29,0:17:47.79,Sign_Basic,sign,0,0,0,,{\an4\fnTimes New Roman\b1\c&H19120B&\3c&HF9F9FA&\shad0\fs13\pos(198,182)}Ayanokoji Kiyotaka
+Dialogue: 0,0:17:45.29,0:17:47.79,Sign_Basic,sign,0,0,0,,{\an4\fnTimes New Roman\b1\c&H19120B&\3c&HD2D2D0&\shad0\fs13\pos(198,220)}Horikita Suzune
+Dialogue: 0,0:17:45.29,0:17:47.79,Sign_Basic,sign,0,0,0,,{\an4\fnTimes New Roman\b1\c&H19120B&\3c&HEFEEF0&\shad0\fs13\pos(198,258)}Yukimura Teruhiko
+Dialogue: 0,0:17:45.29,0:17:47.79,Sign_Basic,sign,0,0,0,,{\an4\fnTimes New Roman\b1\c&H19120B&\3c&HC0BEBC&\shad0\fs13\pos(198,298)}Wang Mei-yu
+Dialogue: 0,0:17:45.29,0:17:47.79,Sign_Basic,sign,0,0,0,,{\an4\fnTimes New Roman\b1\c&H19120B&\3c&HD0CECE&\shad0\fs13\pos(198,339)}Ishikura Kayoko
+Dialogue: 0,0:17:48.60,0:17:50.34,Main,Horikita,0,0,0,,I won't make excuses.
+Dialogue: 0,0:17:50.82,0:17:52.05,Main,Horikita,0,0,0,,As frustrating as it is,
+Dialogue: 0,0:17:52.52,0:17:57.80,Main,Horikita,0,0,0,,I've been forced to acknowledge \Nyour superiority twice in a row.
+Dialogue: 0,0:17:58.58,0:18:00.80,Main,Horikita,0,0,0,,I admit defeat.
+Dialogue: 0,0:18:01.16,0:18:04.06,Main,Horikita,0,0,0,,More importantly, regarding Nanase-san...
+Dialogue: 0,0:18:05.59,0:18:10.33,Flashback,Horikita,0,0,0,,So your friendly advances toward \Nus were all part of the act?
+Dialogue: 0,0:18:10.77,0:18:15.08,Flashback,Nanase,0,0,0,,I really did want to work \Nwith you, Horikita-senpai.
+Dialogue: 0,0:18:15.08,0:18:16.07,Flashback,Nanase,0,0,0,,However...
+Dialogue: 0,0:18:16.67,0:18:21.32,Flashback,Nanase,0,0,0,,The plan to take down Ayanokoji-senpai \Nwas still the priority.
+Dialogue: 0,0:18:21.80,0:18:23.46,Flashback,Horikita,0,0,0,,Why would you do that?
+Dialogue: 0,0:18:24.73,0:18:27.61,Flashback,Nanase,0,0,0,,"Ayanokoji Kiyotaka of Class 2-D."
+Dialogue: 0,0:18:28.10,0:18:30.96,Flashback,Nanase,0,0,0,,"Any student responsible for expelling him
+Dialogue: 0,0:18:30.96,0:18:34.01,Flashback,Nanase,0,0,0,,will be awarded \N20 million private points."
+Dialogue: 0,0:18:34.59,0:18:39.34,Flashback,Nanase,0,0,0,,That is the special test we were given.
+Dialogue: 0,0:18:39.62,0:18:41.59,Flashback,Sudo,0,0,0,,What the hell is that?
+Dialogue: 0,0:18:41.97,0:18:46.60,Flashback,Horikita,0,0,0,,Who issued such a ridiculous test?
+Dialogue: 0,0:18:49.15,0:18:52.42,Flashback,Nanase,0,0,0,,I've told you what you need to know.
+Dialogue: 0,0:18:52.76,0:18:54.73,Flashback,Nanase,0,0,0,,Ayanokoji-senpai will know
+Dialogue: 0,0:18:54.73,0:19:00.86,Flashback,Nanase,0,0,0,,to be extremely cautious around \Nfirst-years aside from us.
+Dialogue: 0,0:19:01.55,0:19:04.71,Flashback,Horikita,0,0,0,,I'm going to need more than that from you!
+Dialogue: 0,0:19:04.71,0:19:05.87,Flashback,Horikita,0,0,0,,You hurt Ayanokoji—
+Dialogue: 0,0:19:06.16,0:19:07.26,Flashback,Ayanokoji,0,0,0,,It's fine.
+Dialogue: 0,0:19:07.79,0:19:11.88,Flashback,Ayanokoji,0,0,0,,What she's told us about the \Nsituation is more than enough.
+Dialogue: 0,0:19:11.88,0:19:17.38,Flashback,Nanase,0,0,0,,Still, that's not the only \Nreason I helped Hosen-kun.
+Dialogue: 0,0:19:17.99,0:19:19.13,Flashback,Nanase,0,0,0,,I also didn't believe
+Dialogue: 0,0:19:19.13,0:19:24.39,Flashback,Nanase,0,0,0,,that Ayanokoji-senpai was \Nworthy of this school.
+Dialogue: 0,0:19:25.29,0:19:27.39,Main,Horikita,0,0,0,,If what she said is true...
+Dialogue: 0,0:19:27.63,0:19:31.05,Main,Chabashira,0,0,0,,There you are, Ayanokoji.
+Dialogue: 0,0:19:32.59,0:19:34.23,Main,Horikita,0,0,0,,I'll head back for now.
+Dialogue: 0,0:19:34.60,0:19:38.65,Main,Horikita,0,0,0,,We'll speak another day about \Nour test score agreement.
+Dialogue: 0,0:19:39.34,0:19:41.40,Main,Ayanokoji,0,0,0,,How can I help you?
+Dialogue: 0,0:19:41.78,0:19:45.16,Main,Chabashira,0,0,0,,Acting Chairman Tsukishiro \Nwants to see you.
+Dialogue: 0,0:19:45.93,0:19:49.16,Main,Tsukishiro,0,0,0,,April has reached its end.
+Dialogue: 0,0:19:49.70,0:19:54.04,Main,Tsukishiro,0,0,0,,Have you figured out which is \Nthe student who was sent here?
+Dialogue: 0,0:19:54.79,0:19:55.85,Main,Ayanokoji,0,0,0,,Unfortunately not.
+Dialogue: 0,0:19:56.30,0:19:59.18,Main,Tsukishiro,0,0,0,,You admitted that very easily.
+Dialogue: 0,0:19:59.62,0:20:02.55,Main,Ayanokoji,0,0,0,,I don't want to make any \Ndeclarations unless I'm sure.
+Dialogue: 0,0:20:03.24,0:20:04.37,Main,Tsukishiro,0,0,0,,I see.
+Dialogue: 0,0:20:05.32,0:20:09.51,Main,Tsukishiro,0,0,0,,That means they've integrated very well.
+Dialogue: 0,0:20:10.44,0:20:14.68,Main,Ayanokoji,0,0,0,,I haven't sensed the unique \Npresence of a White Room student.
+Dialogue: 0,0:20:15.42,0:20:17.94,Main,Ayanokoji,0,0,0,,They've covered their scent completely.
+Dialogue: 0,0:20:18.23,0:20:22.56,Main,Tsukishiro,0,0,0,,These last few months, \Nthey've been put through a curriculum
+Dialogue: 0,0:20:22.56,0:20:25.45,Main,Tsukishiro,0,0,0,,to blend in perfectly with \Nhigh school students, I'm told.
+Dialogue: 0,0:20:25.93,0:20:29.81,Main,Tsukishiro,0,0,0,,The fact that you couldn't \Nidentify them at a glance...
+Dialogue: 0,0:20:30.61,0:20:33.96,Main,Tsukishiro,0,0,0,,I'll count that as a victory for now.
+Dialogue: 0,0:20:34.67,0:20:36.57,Main,Tsukishiro,0,0,0,,You're free to leave now.
+Dialogue: 0,0:20:37.21,0:20:40.31,Main,Ayanokoji,0,0,0,,Did you encounter unexpected \Ntrouble with them?
+Dialogue: 0,0:20:40.97,0:20:44.41,Main,Tsukishiro,0,0,0,,What makes you think that?
+Dialogue: 0,0:20:45.27,0:20:48.72,Main,Ayanokoji,0,0,0,,You wanted the White Room \Nstudent to have me expelled,
+Dialogue: 0,0:20:48.72,0:20:52.02,Main,Ayanokoji,0,0,0,,but they didn't follow through.
+Dialogue: 0,0:20:52.65,0:20:55.34,Main,Ayanokoji,0,0,0,,That's the only explanation \NI can think of.
+Dialogue: 0,0:20:55.86,0:21:00.48,Main,Tsukishiro,0,0,0,,That's certainly an interesting theory.
+Dialogue: 0,0:21:00.87,0:21:03.78,Main,Tsukishiro,0,0,0,,Very well. I admit it.
+Dialogue: 0,0:21:04.68,0:21:09.37,Main,Tsukishiro,0,0,0,,The student in question ignored \Nthe plan I laid out for them.
+Dialogue: 0,0:21:09.90,0:21:12.37,Main,Tsukishiro,0,0,0,,Be careful, Ayanokoji-kun.
+Dialogue: 0,0:21:12.90,0:21:16.62,Main,Tsukishiro,0,0,0,,The choice to bring the \NWhite Room student here...
+Dialogue: 0,0:21:17.03,0:21:19.00,Main,Tsukishiro,0,0,0,,was not my decision.
+Dialogue: 0,0:21:19.72,0:21:24.33,Main,Tsukishiro,0,0,0,,There's a chance the higher-ups \Nare plotting something.
+Dialogue: 0,0:21:26.26,0:21:31.51,Italics,Ayanokoji,0,0,0,,Tsukishiro and the White Room student \Naren't a united front, then.
+Dialogue: 0,0:21:31.98,0:21:36.27,Italics,Ayanokoji,0,0,0,,Or was that another lie to throw me off?
+Dialogue: 0,0:21:36.27,0:21:42.95,Flashback,Tsukishiro,0,0,0,,And if that student is ignoring \Neven your father's directives,
+Dialogue: 0,0:21:43.32,0:21:47.93,Flashback,Tsukishiro,0,0,0,,a day may come when you wish \Nyou had settled for expulsion.
+Dialogue: 0,0:21:48.92,0:21:54.10,Flashback,Tsukishiro,0,0,0,,The jealousy and hatred the \Nstudent feels toward you,
+Dialogue: 0,0:21:54.10,0:21:56.61,Flashback,Tsukishiro,0,0,0,,the White Room's masterpiece, \Nare unrelenting.
+Dialogue: 0,0:21:57.67,0:22:01.67,Flashback,Tsukishiro,0,0,0,,What will they do to you \Nif left to their own devices?
+Dialogue: 0,0:22:02.25,0:22:05.39,Flashback,Tsukishiro,0,0,0,,I shudder just thinking about it.
+Dialogue: 0,0:22:06.19,0:22:09.89,Sign_Basic,sign,0,0,0,,{\fad(459,0)\pos(313,64)\an8\fnTimes New Roman\b1\c&H312729&\bord0\shad0}Special Test  Overall Rankings
+Dialogue: 0,0:22:06.19,0:22:09.89,Sign_Basic,sign,0,0,0,,{\fad(459,0)\pos(56,139)\an4\fnTimes New Roman\b1\c&H312729&\bord0\shad0\fsp2}1st         Class 2-A                 Average 725 points
+Dialogue: 0,0:22:06.19,0:22:09.89,Sign_Basic,sign,0,0,0,,{\fad(459,0)\pos(56,205)\an4\fnTimes New Roman\b1\c&H312729&\bord0\shad0\fsp2}2nd         Class 2-C                Average 673 points
+Dialogue: 0,0:22:06.19,0:22:09.89,Sign_Basic,sign,0,0,0,,{\fad(459,0)\pos(56,271)\an4\fnTimes New Roman\b1\c&H312729&\bord0\shad0\fsp2}3rd         Class 2-D                Average 640 points
+Dialogue: 0,0:22:06.19,0:22:09.89,Sign_Basic,sign,0,0,0,,{\fad(459,0)\pos(56,340)\an4\fnTimes New Roman\b1\c&H312729&\bord0\shad0\fsp2}4th         Class 2-B                 Average 621 points
+

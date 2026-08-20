@@ -1,0 +1,372 @@
+[Script Info]
+Title: English (US)
+ScriptType: v4.00+
+WrapStyle: 0
+ScaledBorderAndShadow: yes
+YCbCr Matrix: TV.601
+PlayResX: 640
+PlayResY: 360
+
+[Aegisub Project Garbage]
+Last Style Storage: Default
+Audio File: CR_Gachiakuta_S1E24.0_GACSIM0024_354949_video_ja-jp_J3352115.mp4
+Video File: CR_Gachiakuta_S1E24.0_GACSIM0024_354949_video_ja-jp_J3352115.mp4
+Video AR Mode: 4
+Video AR Value: 1.777778
+Video Zoom Percent: 2.500000
+Active Line: 309
+Video Position: 30594
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Roboto Medium,26,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1.3,0,2,20,20,23,0
+Style: main,Roboto Medium,26,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1.3,0,2,20,20,23,0
+Style: top,Roboto Medium,26,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1.3,0,8,20,20,23,0
+Style: italics,Roboto Medium,26,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,-1,0,0,100,100,0,0,1,1.3,0,2,20,20,23,0
+Style: italicstop,Roboto Medium,26,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,-1,0,0,100,100,0,0,1,1.3,0,8,20,20,23,0
+Style: flashback,Roboto Medium,26,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1.3,0,2,20,20,23,1
+Style: flashback italics,Roboto Medium,26,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,-1,0,0,100,100,0,0,1,1.3,0,2,20,20,23,1
+Style: flashbacktop,Roboto Medium,26,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1.3,0,8,20,20,23,0
+Style: flashbackitalicstop,Roboto Medium,26,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,-1,0,0,100,100,0,0,1,1.3,0,8,20,20,23,0
+Style: overlap,Roboto Medium,26,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1.3,0,2,20,20,23,0
+Style: overlaptop,Roboto Medium,26,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1.3,0,8,20,20,23,0
+Style: overlap italics,Roboto Medium,26,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,-1,0,0,100,100,0,0,1,1.3,0,2,20,20,23,0
+Style: sign_Arial,Arial,20,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,2,2,2,30,30,20,1
+Style: sign_ArialBlack,Arial Black,20,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,2,2,2,30,30,20,1
+Style: sign_CourierNew,Courier New,20,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,2,2,2,30,30,20,1
+Style: sign_ComicSansMS,Comic Sans MS,20,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,2,2,2,30,30,20,1
+Style: sign_Georgia,Georgia,20,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,2,2,2,30,30,20,1
+Style: sign_Impact,Impact,20,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,2,30,30,20,1
+Style: sign_TimesNewRoman,Times New Roman,20,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,2,2,2,30,30,20,1
+Style: sign_TrebuchetMS,Trebuchet MS,20,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,2,2,2,30,30,20,1
+Style: sign_Verdana,Verdana,20,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,2,2,2,30,30,20,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:13.70,0:00:15.37,main,Zanka,0,0,0,,What's with you?
+Dialogue: 0,0:00:16.29,0:00:17.62,main,Rudo,0,0,0,,Zanka!
+Dialogue: 0,0:00:18.54,0:00:21.67,main,Rudo,0,0,0,,Are you sure you should be up and about?
+Dialogue: 0,0:00:21.67,0:00:24.75,main,Zanka,0,0,0,,Can't stay cooped up in a room all day long.
+Dialogue: 0,0:00:26.13,0:00:29.59,main,Zanka,0,0,0,,And it's awkward having someone \Nsleeping in the next bed.
+Dialogue: 0,0:00:29.59,0:00:30.59,main,Rudo,0,0,0,,The next bed?
+Dialogue: 0,0:00:32.93,0:00:35.18,main,Zanka,0,0,0,,You wanna go offer support?
+Dialogue: 0,0:00:36.43,0:00:40.16,main,Rudo,0,0,0,,Well, uh... yes, but...
+Dialogue: 0,0:00:40.16,0:00:43.44,main,Rudo,0,0,0,,I'm not sure I'm the right person to do it.
+Dialogue: 0,0:00:43.44,0:00:46.65,main,Zanka,0,0,0,,First, I'll tell you somethin' \Nyou might be forgettin'.
+Dialogue: 0,0:00:48.53,0:00:50.51,main,Zanka,0,0,0,,You wanna search for Amo, right?
+Dialogue: 0,0:00:56.98,0:01:00.55,main,Zanka,0,0,0,,To be honest, I don't give \Na damn about that girl.
+Dialogue: 0,0:01:00.55,0:01:04.29,main,Zanka,0,0,0,,But it kinda seems like the two \Nof you resonated in that desert,
+Dialogue: 0,0:01:04.29,0:01:07.96,main,Zanka,0,0,0,,enough that you lashed out at that \NRaider guy to find out if she was safe.
+Dialogue: 0,0:01:07.96,0:01:10.88,main,Zanka,0,0,0,,Have you thought about what happens after?
+Dialogue: 0,0:01:11.63,0:01:14.93,main,Zanka,0,0,0,,I ain't saying you oughta search for Amo first.
+Dialogue: 0,0:01:15.76,0:01:21.23,main,Zanka,0,0,0,,I can tell you don't know how \Nto hold your hand out yet.
+Dialogue: 0,0:01:22.73,0:01:24.94,main,Zanka,0,0,0,,So go learn about it.
+Dialogue: 0,0:01:24.94,0:01:27.90,main,Zanka,0,0,0,,Quit mopin' around with this \N"I'm not the right guy" crap.
+Dialogue: 0,0:01:27.90,0:01:30.36,main,Zanka,0,0,0,,If you wanna help, go do it already.
+Dialogue: 0,0:01:30.95,0:01:35.12,main,Zanka,0,0,0,,Even if you don't know how it's done, \Nyou've seen a million examples here.
+Dialogue: 0,0:01:36.66,0:01:39.83,main,Zanka,0,0,0,,It ain't like you can look \Nfor Amo all by yourself,
+Dialogue: 0,0:01:39.83,0:01:42.29,main,Zanka,0,0,0,,so I'll help you when you go.
+Dialogue: 0,0:01:42.71,0:01:45.88,main,Zanka,0,0,0,,But go talk to Remlin first.
+Dialogue: 0,0:01:46.29,0:01:48.80,main,Zanka,0,0,0,,Once you get enough of that under your belt,
+Dialogue: 0,0:01:48.80,0:01:51.97,main,Zanka,0,0,0,,maybe you'll be able to have fun \Nwith your team like ya wanted.
+Dialogue: 0,0:01:58.43,0:02:00.81,main,Rudo,0,0,0,,I'll try it. Thanks.
+Dialogue: 0,0:02:04.65,0:02:07.69,italics,Zanka,0,0,0,,Man, I went and talked his ear off.
+Dialogue: 0,0:02:09.11,0:02:14.32,italics,Zanka,0,0,0,,Even if revenge were his number one goal, \Nit'd be no business of mine.
+Dialogue: 0,0:02:14.91,0:02:15.91,italics,Zanka,0,0,0,,But...
+Dialogue: 0,0:02:18.95,0:02:23.12,italics,Zanka,0,0,0,,Right now, for Rudo to be \Nfocused only on revenge...
+Dialogue: 0,0:02:24.08,0:02:25.54,italics,Zanka,0,0,0,,It feels like a waste.
+Dialogue: 0,0:02:41.52,0:02:45.27,main,Rudo,0,0,0,,I've never drawn a single decent picture!
+Dialogue: 0,0:02:46.77,0:02:53.13,main,Rudo,0,0,0,,So I have no idea how you feel \Nor what to say to you!
+Dialogue: 0,0:02:56.11,0:02:58.66,main,Rudo,0,0,0,,So I was hoping...
+Dialogue: 0,0:02:59.83,0:03:01.95,main,Rudo,0,0,0,,I won't ask you to teach me to draw, \Nbut I at least want to be
+Dialogue: 0,0:03:01.95,0:03:03.83,main,Rudo,0,0,0,,where I'm not embarrassed \Nto have people see it,
+Dialogue: 0,0:03:03.83,0:03:05.75,main,Rudo,0,0,0,,so I was hoping you could give me some tips,
+Dialogue: 0,0:03:05.75,0:03:08.54,main,Rudo,0,0,0,,and I never got to see \Nyour art in Canvas Town,
+Dialogue: 0,0:03:08.54,0:03:11.09,main,Rudo,0,0,0,,so I'd love to go and see it \Nwhen we've got some free time.
+Dialogue: 0,0:03:17.34,0:03:20.01,main,Remlin,0,0,0,,Man, you had a lot to say!
+Dialogue: 0,0:03:22.76,0:03:25.79,italics,Rudo,0,0,0,,Does that mean I made the right call?
+Dialogue: 0,0:03:38.95,0:03:42.87,main,Corvus,0,0,0,,Now, I'm giving you all a mission.
+Dialogue: 0,0:03:46.41,0:03:49.92,main,Corvus,0,0,0,,Go on a field trip to Canvas Town.
+Dialogue: 0,0:03:48.04,0:03:52.00,sign_ArialBlack,title,0,0,0,,{\shad0\bord0\fs10\fad(351,1)\pos(320,180)}Episode 24
+Dialogue: 0,0:03:48.04,0:03:52.00,sign_ArialBlack,title,0,0,0,,{\an8\fs35\shad0\bord0\fscx65\fad(351,1)\pos(320,220)}Field Trip
+Dialogue: 0,0:05:28.27,0:05:30.27,main,Guita,0,0,0,,Got me a feather!
+Dialogue: 0,0:05:31.85,0:05:35.56,main,Guita,0,0,0,,Can you get more than me \Nbefore we reach Canvas Town?
+Dialogue: 0,0:05:37.73,0:05:39.82,italics,Rudo,0,0,0,,Why is this happening?
+Dialogue: 0,0:05:40.24,0:05:42.49,sign_ArialBlack,sign,0,0,0,,{\an8}Two Hours Earlier
+Dialogue: 0,0:05:58.13,0:05:59.51,flashback,Corvus,0,0,0,,Well, well.
+Dialogue: 0,0:05:59.51,0:06:01.59,flashback,Corvus,0,0,0,,Isn't this a charming scene?
+Dialogue: 0,0:06:02.30,0:06:07.22,flashback,Remlin,0,0,0,,Rudo wanted to cheer me up, so he \Nasked me to teach him how to draw!
+Dialogue: 0,0:06:07.22,0:06:09.64,flashback,Remlin,0,0,0,,So we all decided to draw together!
+Dialogue: 0,0:06:09.64,0:06:11.14,flashback,Rudo,0,0,0,,Don't tell him!
+Dialogue: 0,0:06:11.14,0:06:12.68,flashback,Corvus,0,0,0,,Really?
+Dialogue: 0,0:06:12.68,0:06:14.23,flashback,Corvus,0,0,0,,What are you drawing, Rudo?
+Dialogue: 0,0:06:14.52,0:06:15.69,flashback,Remlin,0,0,0,,This!
+Dialogue: 0,0:06:15.02,0:06:17.06,flashback,Rudo,0,0,0,,Hey! Don't show him that!
+Dialogue: 0,0:06:17.56,0:06:18.69,sign_Arial,sign,0,0,0,,{\c&H141414&\3c&HEFECE8&\shad0\bord4\fs25\pos(157,269)}Regto
+Dialogue: 0,0:06:18.94,0:06:21.90,flashback,Corvus,0,0,0,,It's certainly... artistic.
+Dialogue: 0,0:06:21.90,0:06:25.20,flashback,Semiu,0,0,0,,I see being adept at recycling doesn't \Nnecessarily mean you can make things.
+Dialogue: 0,0:06:26.62,0:06:29.83,flashback,Guita,0,0,0,,Remlin, right? What're you drawing?!
+Dialogue: 0,0:06:31.54,0:06:33.21,flashback,Remlin,0,0,0,,My time has come!
+Dialogue: 0,0:06:33.21,0:06:37.84,flashback,Remlin,0,0,0,,The time for me to add my art \Nto the historic spellcasters' mural!
+Dialogue: 0,0:06:37.84,0:06:39.09,flashback,Corvus,0,0,0,,Mural?
+Dialogue: 0,0:06:39.84,0:06:43.38,flashback,Corvus,0,0,0,,Oh, yes, of course. The mural.
+Dialogue: 0,0:06:44.05,0:06:47.84,flashback,Corvus,0,0,0,,There's a big mural in Canvas Town \Nthat spellcasters add to,
+Dialogue: 0,0:06:47.84,0:06:49.60,flashback,Corvus,0,0,0,,to depict their thoughts and ideals.
+Dialogue: 0,0:06:50.18,0:06:54.98,flashback,Remlin,0,0,0,,We all put an image right in the center \Nthat represents our generation!
+Dialogue: 0,0:06:55.31,0:06:59.06,flashback,Remlin,0,0,0,,It's gonna be a huge job!
+Dialogue: 0,0:07:02.53,0:07:07.45,flashback,Remlin,0,0,0,,But it won't be easy to draw \Nin a place like that by myself.
+Dialogue: 0,0:07:07.45,0:07:10.58,flashback,Mayor,0,0,0,,Don't forget to buy enough ink.
+Dialogue: 0,0:07:10.99,0:07:17.83,flashback,Mayor,0,0,0,,I'll help as well, but it's up to you \Nto get the people and materials you need.
+Dialogue: 0,0:07:18.17,0:07:21.09,flashback,Remlin,0,0,0,,The sad fate of the creator.
+Dialogue: 0,0:07:21.09,0:07:23.01,flashback,Guita,0,0,0,,He's all shaggy!
+Dialogue: 0,0:07:23.34,0:07:24.34,flashback,Guita,0,0,0,,A shaggy guy?
+Dialogue: 0,0:07:24.34,0:07:26.47,flashback,Rudo,0,0,0,,He's not a shaggy guy. He's...
+Dialogue: 0,0:07:26.47,0:07:28.14,flashback,Guita,0,0,0,,Dear, good work!
+Dialogue: 0,0:07:28.14,0:07:29.30,flashback,Rudo,0,0,0,,It's better than mine.
+Dialogue: 0,0:07:29.30,0:07:30.30,flashback,Remlin,0,0,0,,Come on.
+Dialogue: 0,0:07:30.30,0:07:31.31,flashback,Corvus,0,0,0,,Now...
+Dialogue: 0,0:07:32.35,0:07:34.65,flashback,Corvus,0,0,0,,I'm giving you all a mission.
+Dialogue: 0,0:07:35.48,0:07:38.40,flashback,Corvus,0,0,0,,Go on a field trip to Canvas Town.
+Dialogue: 0,0:07:40.77,0:07:41.90,flashback,Rudo,0,0,0,,A field trip?
+Dialogue: 0,0:07:41.90,0:07:45.44,flashback,Enjin,0,0,0,,A field trip? You mean on foot, Boss?
+Dialogue: 0,0:07:45.86,0:07:49.82,flashback,Corvus,0,0,0,,Don't worry. It'll just be the four kids.
+Dialogue: 0,0:07:49.82,0:07:50.74,flashback,Semiu,0,0,0,,Boss?!
+Dialogue: 0,0:07:50.74,0:07:54.12,flashback,Semiu,0,0,0,,They were only just attacked by the Raiders!
+Dialogue: 0,0:07:54.12,0:07:55.87,flashback,Semiu,0,0,0,,Even with adults along—
+Dialogue: 0,0:07:55.87,0:07:57.25,flashback,Corvus,0,0,0,,Don't worry.
+Dialogue: 0,0:07:57.75,0:08:00.71,flashback,Corvus,0,0,0,,These kids don't need adults to be strong.
+Dialogue: 0,0:08:01.25,0:08:06.22,flashback,Corvus,0,0,0,,And Rudo, the oldest, will protect the others.
+Dialogue: 0,0:08:07.34,0:08:08.55,flashback,Corvus,0,0,0,,Right?
+Dialogue: 0,0:08:09.51,0:08:14.43,flashback,Corvus,0,0,0,,A field trip is training. \NIt's an important step in your growth.
+Dialogue: 0,0:08:14.79,0:08:17.68,flashback,Corvus,0,0,0,,Take it one step at a time.
+Dialogue: 0,0:08:17.68,0:08:20.77,main,Guita,0,0,0,,Two feathers. Three feathers. Four feathers.
+Dialogue: 0,0:08:20.77,0:08:22.11,main,Remlin,0,0,0,,I can't keep up!
+Dialogue: 0,0:08:22.61,0:08:25.19,italics,Rudo,0,0,0,,I'm the oldest here.
+Dialogue: 0,0:08:25.94,0:08:28.74,italics,Rudo,0,0,0,,My mission is to protect them!
+Dialogue: 0,0:08:29.53,0:08:32.78,main,Rudo,0,0,0,,If anyone wants a fight, \Nthey'll have to get through me!
+Dialogue: 0,0:08:32.78,0:08:35.16,main,Remlin,0,0,0,,This town sells good ink, right?
+Dialogue: 0,0:08:36.66,0:08:40.00,main,Enjin,0,0,0,,Of course, we're tagging along too.
+Dialogue: 0,0:08:40.75,0:08:43.79,main,Bro,0,0,0,,Are you sure the kids will be \Nall right on their own?
+Dialogue: 0,0:08:44.17,0:08:46.34,main,Enjin,0,0,0,,Don't worry so much.
+Dialogue: 0,0:08:46.34,0:08:51.35,main,Enjin,0,0,0,,They did more than us in that \Nhuge trash beast. They'll be fine.
+Dialogue: 0,0:08:53.43,0:08:55.35,flashback,Bundus,0,0,0,,Arkha Corvus...
+Dialogue: 0,0:08:55.35,0:08:56.68,flashback,Bundus,0,0,0,,Who is he?
+Dialogue: 0,0:08:57.39,0:08:59.23,main,Bro,0,0,0,,At a time like this...
+Dialogue: 0,0:08:59.23,0:09:01.56,main,Bro,0,0,0,,just what is the boss thinking?
+Dialogue: 0,0:09:01.56,0:09:06.53,main,Bro,0,0,0,,It's almost like he's using Rudo \Nas bait to lure out Raiders.
+Dialogue: 0,0:09:01.90,0:09:04.11,top,Remlin,0,0,0,,There's a good shop there...
+Dialogue: 0,0:09:06.53,0:09:12.32,main,Enjin,0,0,0,,You'd have to be a real moron to jump into \Na trap full of bait labeled "take one."
+Dialogue: 0,0:09:12.70,0:09:16.70,main,Enjin,0,0,0,,Anyone that stupid wouldn't \Nmake it far as a bandit!
+Dialogue: 0,0:09:16.70,0:09:17.83,main,Enjin,0,0,0,,Huh?
+Dialogue: 0,0:09:19.58,0:09:21.00,main,Enjin,0,0,0,,Huh?!
+Dialogue: 0,0:09:25.13,0:09:27.38,main,Semiu,0,0,0,,You're looking very concerned \Nabout your appearance.
+Dialogue: 0,0:09:27.63,0:09:30.24,main,Semiu,0,0,0,,Is something happening today, boss?
+Dialogue: 0,0:09:32.01,0:09:37.06,main,Corvus,0,0,0,,I have a feeling some very elegant guests \Nwill be ringing our doorbell soon.
+Dialogue: 0,0:09:43.15,0:09:44.02,main,Semiu,0,0,0,,What?!
+Dialogue: 0,0:09:44.02,0:09:45.52,italics,Shikage,0,0,0,,Semiu! Semiu!
+Dialogue: 0,0:09:45.52,0:09:47.44,main,Semiu,0,0,0,,I've never heard you scream like that!
+Dialogue: 0,0:09:47.44,0:09:49.23,main,Semiu,0,0,0,,Is there an issue with our security?
+Dialogue: 0,0:09:49.23,0:09:50.69,main,Shikage,0,0,0,,Th-Th-They're here!
+Dialogue: 0,0:09:50.69,0:09:53.32,main,Shikage,0,0,0,,They're finally here!
+Dialogue: 0,0:09:53.32,0:09:56.83,main,Shikage,0,0,0,,The polar opposite of the Cleaners \Nwho specialize in trash beasts...
+Dialogue: 0,0:09:56.83,0:10:00.33,main,Shikage,0,0,0,,The guardians of order who keep \Ntheir fellow humans in line!
+Dialogue: 0,0:10:00.33,0:10:02.79,main,Shikage,0,0,0,,The punishers of criminals!
+Dialogue: 0,0:10:05.21,0:10:10.94,main,Shikage,0,0,0,,It looks like they got word that \Nwe're holding a living Sphereite...
+Dialogue: 0,0:10:16.47,0:10:18.55,main,Enjin,0,0,0,,We've got a moron on our hands.
+Dialogue: 0,0:10:30.36,0:10:31.86,italics,Semiu,0,0,0,,That explains that.
+Dialogue: 0,0:10:32.49,0:10:35.70,italics,Semiu,0,0,0,,He knew this would happen, \Nso he sent the children...
+Dialogue: 0,0:10:35.70,0:10:38.18,italics,Semiu,0,0,0,,No, he sent Rudo away.
+Dialogue: 0,0:10:39.08,0:10:41.38,italics,Semiu,0,0,0,,Direct contact from the Hell Guard...
+Dialogue: 0,0:10:44.67,0:10:48.71,main,Kyouka,0,0,0,,We've had some rather \Nextreme weather of late.
+Dialogue: 0,0:10:48.71,0:10:52.89,main,Kyouka,0,0,0,,For instance, the first \Ntrash storm in six years.
+Dialogue: 0,0:10:53.38,0:10:56.13,main,Corvus,0,0,0,,Even on the Ground, \Nwhere there are no clear days,
+Dialogue: 0,0:10:56.13,0:11:00.03,main,Corvus,0,0,0,,you never want to see waste flying \Nfrequently through the air.
+Dialogue: 0,0:11:00.81,0:11:04.37,main,Corvus,0,0,0,,All we humans can do is \Ndeal with it as best we can.
+Dialogue: 0,0:11:05.52,0:11:08.23,main,Corvus,0,0,0,,If this is the will of some higher being,
+Dialogue: 0,0:11:08.23,0:11:11.36,main,Corvus,0,0,0,,we're not even allowed to struggle against it.
+Dialogue: 0,0:11:13.24,0:11:15.49,main,Kyouka,0,0,0,,You're completely right.
+Dialogue: 0,0:11:15.49,0:11:18.82,main,Kyouka,0,0,0,,A giant trash beast large enough \Nto cover a whole city—
+Dialogue: 0,0:11:18.82,0:11:22.74,main,Kyouka,0,0,0,,it was the cause of damage \Nin many nearby towns.
+Dialogue: 0,0:11:23.33,0:11:26.58,main,Kyouka,0,0,0,,The damage from the\N trash storm itself was minor.
+Dialogue: 0,0:11:26.58,0:11:32.59,main,Kyouka,0,0,0,,The problem was a series of injuries \Ndue to parts of the flying trash beast.
+Dialogue: 0,0:11:32.88,0:11:36.88,main,Kyouka,0,0,0,,When a trash beast you're fighting \Ndeals injury to others,
+Dialogue: 0,0:11:36.88,0:11:40.39,main,Kyouka,0,0,0,,you're supposed to report it to us immediately.
+Dialogue: 0,0:11:41.35,0:11:43.85,main,Kyouka,0,0,0,,You've been highly negligent, Cleaners.
+Dialogue: 0,0:11:43.85,0:11:48.56,main,Kyouka,0,0,0,,If you don't have a sufficient explanation\N for why you didn't follow the rules,
+Dialogue: 0,0:11:48.56,0:11:52.11,main,Kyouka,0,0,0,,the Hell Guard will have to become \Nmore involved in your operations.
+Dialogue: 0,0:11:56.45,0:11:58.11,main,Corvus,0,0,0,,You're right.
+Dialogue: 0,0:11:58.49,0:12:02.41,main,Corvus,0,0,0,,It's my fault that ordinary people were harmed.
+Dialogue: 0,0:12:03.33,0:12:05.52,main,Corvus,0,0,0,,Still, I find this strange.
+Dialogue: 0,0:12:06.00,0:12:08.79,main,Corvus,0,0,0,,The Hell Guard, which has\Nnever offered us a warning,
+Dialogue: 0,0:12:08.79,0:12:12.17,main,Corvus,0,0,0,,even if our reports are filed a week later,
+Dialogue: 0,0:12:12.17,0:12:15.30,main,Corvus,0,0,0,,is suddenly knocking on our door \Nafter a mere four days.
+Dialogue: 0,0:12:16.47,0:12:20.89,main,Corvus,0,0,0,,And I doubt you'd come here \Npersonally over something so trivial.
+Dialogue: 0,0:12:22.93,0:12:26.07,main,Corvus,0,0,0,,Why don't we get down to brass tacks?
+Dialogue: 0,0:12:26.48,0:12:29.46,main,Corvus,0,0,0,,First Squad Captain of\N the Hell Guard's Red Horns...
+Dialogue: 0,0:12:30.19,0:12:32.07,main,Corvus,0,0,0,,Kyouka Nijiku.
+Dialogue: 0,0:12:34.48,0:12:36.82,main,Kyouka,0,0,0,,We're here to take in the Sphereite.
+Dialogue: 0,0:12:38.28,0:12:39.65,main,Rudo,0,0,0,,Hole Town?
+Dialogue: 0,0:12:39.65,0:12:42.66,main,Remlin,0,0,0,,Yeah, that's this city's name.
+Dialogue: 0,0:12:43.03,0:12:45.79,main,Remlin,0,0,0,,It's famous for its ink.
+Dialogue: 0,0:12:45.79,0:12:49.66,main,Remlin,0,0,0,,They say a special oil wells up\Nfrom holes in the rocky land.
+Dialogue: 0,0:12:49.66,0:12:54.04,main,Remlin,0,0,0,,They process it to make an ink \Nthat keeps its color a long time!
+Dialogue: 0,0:12:54.46,0:12:56.76,main,Remlin,0,0,0,,But be careful!
+Dialogue: 0,0:12:56.76,0:13:00.30,main,Remlin,0,0,0,,There's so much stuff here, \Nit can be really distracting!
+Dialogue: 0,0:13:00.30,0:13:05.60,main,Remlin,0,0,0,,Kids coming here without chaperones \Nare basically asking to be kidnapped!
+Dialogue: 0,0:13:06.60,0:13:09.43,italics,Rudo,0,0,0,,I must protect them!
+Dialogue: 0,0:13:10.23,0:13:12.10,main,Guita,0,0,0,,Hey, they got ice cream!
+Dialogue: 0,0:13:12.10,0:13:13.48,main,Rudo,0,0,0,,Ice cream?!
+Dialogue: 0,0:13:13.48,0:13:14.52,main,Rudo,0,0,0,,How much is it?
+Dialogue: 0,0:13:14.52,0:13:15.90,main,Merchant,0,0,0,,Seventy apiece.
+Dialogue: 0,0:13:15.90,0:13:17.19,main,Rudo,0,0,0,,Sold!
+Dialogue: 0,0:13:17.48,0:13:20.86,top,Remlin,0,0,0,,He goes for the sugar right away.
+Dialogue: 0,0:13:17.48,0:13:20.20,main,Fu,0,0,0,,Kids from the Cleaners.
+Dialogue: 0,0:13:20.86,0:13:22.24,top,Guita,0,0,0,,You want some, Dear?
+Dialogue: 0,0:13:20.86,0:13:25.20,main,Fu,0,0,0,,And that Sphereite, Rudo, \Nthat Zodyl was interested in.
+Dialogue: 0,0:13:25.45,0:13:28.16,main,Fu,0,0,0,,That Zodyl was interested in...
+Dialogue: 0,0:13:28.16,0:13:29.88,main,Fu,0,0,0,,Zodyl was...
+Dialogue: 0,0:13:30.91,0:13:33.71,main,Fu,0,0,0,,Zodyl?!
+Dialogue: 0,0:13:34.21,0:13:39.59,main,Fu,0,0,0,,Oh, that's right! He left me behind!
+Dialogue: 0,0:13:40.47,0:13:43.93,main,Fu,0,0,0,,He hasn't contacted me, \Nand it's awkward for me to contact him...
+Dialogue: 0,0:13:43.93,0:13:46.18,main,Fu,0,0,0,,Darn it! I need orders!
+Dialogue: 0,0:13:46.18,0:13:49.51,main,Fu,0,0,0,,Someone give me orders already!
+Dialogue: 0,0:13:50.48,0:13:53.93,main,Hii,0,0,0,,Quit moping, you spineless little parasite!
+Dialogue: 0,0:13:54.35,0:13:56.98,main,Hii,0,0,0,,You've found your next host,
+Dialogue: 0,0:13:56.98,0:13:59.98,main,Hii,0,0,0,,so go talk to them already, you worm!
+Dialogue: 0,0:14:00.57,0:14:03.20,main,Fu,0,0,0,,You're right. Totally right.
+Dialogue: 0,0:14:03.20,0:14:07.16,main,Hii,0,0,0,,You really are helpless without me, huh?
+Dialogue: 0,0:14:09.08,0:14:11.04,main,Fu,0,0,0,,Of course, Master Hii.
+Dialogue: 0,0:14:11.04,0:14:15.08,main,Fu,0,0,0,,I'll always act on the orders of others.
+Dialogue: 0,0:14:15.08,0:14:16.42,main,Fu,0,0,0,,So...
+Dialogue: 0,0:14:16.71,0:14:21.01,main,Fu,0,0,0,,Next, I'll get Enjin from the Cleaners \Nto order me around!
+Dialogue: 0,0:14:24.84,0:14:26.22,main,Bro,0,0,0,,Hey.
+Dialogue: 0,0:14:26.22,0:14:29.93,main,Hii,0,0,0,,So go make contact with them already!
+Dialogue: 0,0:14:29.93,0:14:30.97,main,Fu,0,0,0,,Right!
+Dialogue: 0,0:14:31.22,0:14:33.48,main,Fu,0,0,0,,Huh? They're gone...
+Dialogue: 0,0:14:33.48,0:14:34.94,main,Guita,0,0,0,,Rudo!
+Dialogue: 0,0:14:36.48,0:14:38.11,main,Guita,0,0,0,,Cut it out!
+Dialogue: 0,0:14:38.11,0:14:40.23,main,Guita,0,0,0,,We don't have any more money!
+Dialogue: 0,0:14:40.63,0:14:42.37,main,Guita,0,0,0,,Dear! Get his legs!
+Dialogue: 0,0:14:43.11,0:14:45.24,main,Guita,0,0,0,,What's wrong with you, Rudo?!
+Dialogue: 0,0:14:45.24,0:14:47.62,main,Remlin,0,0,0,,The ice cream turned him feral!
+Dialogue: 0,0:14:47.62,0:14:49.58,main,Guita,0,0,0,,No more sweets, Rudo!
+Dialogue: 0,0:14:49.58,0:14:51.29,main,Guita,0,0,0,,We're out of money!
+Dialogue: 0,0:14:51.29,0:14:53.46,main,Guita,0,0,0,,Do you really love sweet stuff that much?!
+Dialogue: 0,0:15:11.31,0:15:14.06,main,Fu,0,0,0,,The Cleaners... are scary.
+Dialogue: 0,0:15:14.06,0:15:16.65,main,Hii,0,0,0,,Don't back out now, you moron!
+Dialogue: 0,0:15:16.65,0:15:18.48,main,Hii,0,0,0,,They're no worse than the Raiders!
+Dialogue: 0,0:15:18.48,0:15:22.79,main,Fu,0,0,0,,R-Right. I can tell myself\N they're like Jabber...
+Dialogue: 0,0:15:24.28,0:15:25.95,main,Fu,0,0,0,,There's someone there.
+Dialogue: 0,0:15:26.61,0:15:28.11,main,Kidnapper,0,0,0,,Hey, kids.
+Dialogue: 0,0:15:28.11,0:15:30.37,main,Kidnapper,0,0,0,,You want more candy, do you?
+Dialogue: 0,0:15:30.37,0:15:32.95,main,Hii,0,0,0,,Hey, that's a kidnapper!
+Dialogue: 0,0:15:33.41,0:15:39.17,main,Kidnapper,0,0,0,,I've got lots of candy back home, \Nif you'd like to come join me...
+Dialogue: 0,0:15:39.92,0:15:42.17,main,Hii,0,0,0,,Hey, look! It's the kidnapper playbook!
+Dialogue: 0,0:15:43.21,0:15:44.42,main,Rudo,0,0,0,,Candy.
+Dialogue: 0,0:15:45.13,0:15:46.59,main,Rudo,0,0,0,,Lots of...
+Dialogue: 0,0:15:47.80,0:15:50.85,main,Hii,0,0,0,,Hey, look! He's just gonna go with the guy!
+Dialogue: 0,0:15:50.85,0:15:53.26,main,Fu,0,0,0,,I don't want that!
+Dialogue: 0,0:15:53.26,0:15:55.11,main,Fu,0,0,0,,My next host...
+Dialogue: 0,0:15:55.52,0:15:57.73,main,Fu,0,0,0,,Maybe I should save him?
+Dialogue: 0,0:15:59.06,0:16:00.23,main,Rudo,0,0,0,,You don't...
+Dialogue: 0,0:16:01.69,0:16:03.23,main,Rudo,0,0,0,,smell.
+Dialogue: 0,0:16:13.79,0:16:19.39,main,Rudo,0,0,0,,You don't smell like sweets at all!
+Dialogue: 0,0:16:19.87,0:16:26.26,main,Rudo,0,0,0,,You lying old bastard!
+Dialogue: 0,0:16:29.13,0:16:30.93,main,Remlin,0,0,0,,Yeah, that guy was a kidnapper.
+Dialogue: 0,0:16:30.93,0:16:33.01,main,Remlin,0,0,0,,Nice work, Rudo!
+Dialogue: 0,0:16:33.01,0:16:36.27,main,Guita,0,0,0,,Takes some real guts to try to kidnap {\i1}us{\i0}!
+Dialogue: 0,0:16:36.52,0:16:38.67,main,Guita,0,0,0,,That guy deserved to have his dick torn off!
+Dialogue: 0,0:16:39.69,0:16:41.77,main,Remlin,0,0,0,,Don't rub his back, Dear!
+Dialogue: 0,0:16:41.77,0:16:43.71,main,Remlin,0,0,0,,You're making him feel better.
+Dialogue: 0,0:16:44.61,0:16:47.98,main,Hii,0,0,0,,Maybe we should make contact \Nat their destination.
+Dialogue: 0,0:16:54.20,0:16:57.25,main,Guita,0,0,0,,It's my second time in Canvas Town!
+Dialogue: 0,0:16:57.25,0:16:58.96,main,Rudo,0,0,0,,There's more art now.
+Dialogue: 0,0:17:01.88,0:17:03.79,main,Remlin,0,0,0,,You absolute monsters.
+Dialogue: 0,0:17:03.79,0:17:10.13,sign_ComicSansMS,sign,0,0,0,,{\an8\move(80,275,145,275)\shad0}Canvas Town
+Dialogue: 0,0:17:03.79,0:17:10.13,sign_ComicSansMS,sign,0,0,0,,{\move(325,290,390,290)\frz7.37\shad0}Hole Town
+Dialogue: 0,0:17:03.79,0:17:10.13,sign_ComicSansMS,sign,0,0,0,,{\an8\move(495,170,550,170)\shad0}Cleaners
+Dialogue: 0,0:17:04.38,0:17:07.38,main,Remlin,0,0,0,,It was 16 kilometers from Hole Town to here.
+Dialogue: 0,0:17:07.38,0:17:09.22,main,Remlin,0,0,0,,We had to walk all that way...
+Dialogue: 0,0:17:10.13,0:17:13.05,main,Remlin,0,0,0,,Why don't you look tired, Cleaners?!
+Dialogue: 0,0:17:13.36,0:17:16.77,main,Guita,0,0,0,,We Cleaners gotta walk all \Naround the trash all day!
+Dialogue: 0,0:17:16.77,0:17:18.68,main,Remlin,0,0,0,,You're monsters!
+Dialogue: 0,0:17:18.68,0:17:21.10,main,Mayor,0,0,0,,You've got a lot to learn, Remlin.
+Dialogue: 0,0:17:21.94,0:17:25.23,main,Mayor,0,0,0,,Gob used to walk all over by himself.
+Dialogue: 0,0:17:25.65,0:17:28.39,main,Mayor,0,0,0,,Either way, good work, everyone!
+Dialogue: 0,0:17:28.74,0:17:29.82,main,Remlin,0,0,0,,You used a car, didn't you?!
+Dialogue: 0,0:17:29.82,0:17:32.74,main,Remlin,0,0,0,,You look so well rested! \NYou totally took a car back, right?!
+Dialogue: 0,0:17:32.74,0:17:36.12,main,Mayor,0,0,0,,If you're going to keep making art, \Nyou need to build up stamina.
+Dialogue: 0,0:17:36.12,0:17:39.00,main,Remlin,0,0,0,,I hate hearing that, you asshole!
+Dialogue: 0,0:17:37.41,0:17:41.62,top,Rudo,0,0,0,,So, where's this historic \Nspellcasters' mural?
+Dialogue: 0,0:17:41.62,0:17:44.13,main,Mayor,0,0,0,,Don't be hasty, now.
+Dialogue: 0,0:17:44.50,0:17:49.46,main,Mayor,0,0,0,,It's getting dark, and you can \Nstay the night here in town too.
+Dialogue: 0,0:17:49.46,0:17:52.34,main,Mayor,0,0,0,,Lodging and meals are on me.
+Dialogue: 0,0:17:52.34,0:17:54.05,main,Guita,0,0,0,,Yay!
+Dialogue: 0,0:17:54.05,0:17:56.60,main,Guita,0,0,0,,Just don't give Rudo any sweets.
+Dialogue: 0,0:17:56.60,0:17:58.64,main,Guita,0,0,0,,It makes him super annoying!
+Dialogue: 0,0:17:56.60,0:17:57.47,overlap,Remlin,0,0,0,,Rudo.
+Dialogue: 0,0:17:59.39,0:18:02.69,main,Remlin,0,0,0,,What do you imagine \Nwhen you hear the word "mural"?
+Dialogue: 0,0:18:02.69,0:18:06.73,main,Rudo,0,0,0,,A picture drawn on a wall, right?
+Dialogue: 0,0:18:08.73,0:18:09.86,main,Remlin,0,0,0,,Figured.
+Dialogue: 0,0:18:21.08,0:18:23.33,main,Rudo,0,0,0,,I-It's on the ceiling?!
+Dialogue: 0,0:18:24.46,0:18:26.50,main,Remlin,0,0,0,,Didn't realize, huh?
+Dialogue: 0,0:18:26.50,0:18:29.59,main,Remlin,0,0,0,,This is the historic spellcasters' mural!
+Dialogue: 0,0:18:29.92,0:18:32.59,main,Remlin,0,0,0,,Everyone assumes it's a wall \Nand looks for that.
+Dialogue: 0,0:18:32.59,0:18:36.09,main,Remlin,0,0,0,,And when you show them this, \Nthey all say the same thing...
+Dialogue: 0,0:18:36.09,0:18:37.80,main,Remlin,0,0,0,,"It's above us?!"
+Dialogue: 0,0:18:37.80,0:18:38.93,main,Remlin,0,0,0,,Right?
+Dialogue: 0,0:18:39.39,0:18:46.15,main,Remlin,0,0,0,,The first spellcaster, Macaca Icol, \Nloved seeing their faces in that moment.
+Dialogue: 0,0:18:46.81,0:18:47.94,main,Rudo,0,0,0,,Well, that's fine.
+Dialogue: 0,0:18:47.94,0:18:52.40,main,Rudo,0,0,0,,But by calling it a wall thing, \Nyou're just lying to prank people, right?
+Dialogue: 0,0:18:52.40,0:18:55.32,main,Remlin,0,0,0,,It's not a lie! Look!
+Dialogue: 0,0:18:55.32,0:18:57.82,main,Remlin,0,0,0,,The art comes down to the walls too, see?!
+Dialogue: 0,0:18:57.82,0:19:02.12,main,Enjin,0,0,0,,Hey, it's easier to see at night.
+Dialogue: 0,0:19:02.37,0:19:04.33,main,Remlin,0,0,0,,Did you come in a car too?
+Dialogue: 0,0:19:05.08,0:19:06.54,main,Bro,0,0,0,,No, no!
+Dialogue: 0,0:19:06.54,0:19:09.59,main,Bro,0,0,0,,We were watching over you guys!
+Dialogue: 0,0:19:10.46,0:19:13.84,main,Enjin,0,0,0,,Is that furthest one back by Gob?
+Dialogue: 0,0:19:13.84,0:19:14.97,main,Remlin,0,0,0,,Yeah!
+Dialogue: 0,0:19:15.26,0:19:17.59,main,Mayor,0,0,0,,The pictures by each of the spellcasters
+Dialogue: 0,0:19:17.59,0:19:22.47,main,Mayor,0,0,0,,reflect their feelings \Nand the times they live in.
+Dialogue: 0,0:19:22.47,0:19:25.98,main,Mayor,0,0,0,,This is how we record our history.
+Dialogue: 0,0:19:26.48,0:19:29.61,main,Remlin,0,0,0,,I'm gonna draw my picture just past Gob's!
+Dialogue: 0,0:19:29.61,0:19:32.61,main,Remlin,0,0,0,,Which means the picture \Non the opposite side...
+Dialogue: 0,0:19:33.03,0:19:36.91,main,Remlin,0,0,0,,That's the one drawn by Macaca Icol, \Nthe first spellcaster!
+Dialogue: 0,0:19:40.93,0:19:43.37,main,Enjin,0,0,0,,My neck needs a rest.
+Dialogue: 0,0:19:44.04,0:19:47.50,main,Enjin,0,0,0,,The art seems to carry a lot of meaning.
+Dialogue: 0,0:19:47.83,0:19:49.96,main,Remlin,0,0,0,,That one was five generations back.
+Dialogue: 0,0:20:03.36,0:20:06.94,main,Rudo,0,0,0,,What is that mark doing here?!
+Dialogue: 0,0:20:07.56,0:20:09.48,main,Rudo,0,0,0,,The mark of the Watchman Series...
+Dialogue: 0,0:20:09.94,0:20:12.83,main,Rudo,0,0,0,,The mark that's on my gloves!
+Dialogue: 0,0:20:15.69,0:20:18.45,main,Kyouka,0,0,0,,We're here to take in the Sphereite.
+Dialogue: 0,0:20:19.07,0:20:24.05,main,Kyouka,0,0,0,,We need to learn more about the Sphere.
+Dialogue: 0,0:20:24.54,0:20:31.54,main,Kyouka,0,0,0,,His history, his race, even his DNA... \Nwe'll get it all from him.
+Dialogue: 0,0:20:31.91,0:20:36.63,main,Kyouka,0,0,0,,For the Ground. \NFor our comrades and our ancestors,
+Dialogue: 0,0:20:36.63,0:20:40.05,main,Kyouka,0,0,0,,we must know more about the relationship \Nbetween Sphere and Ground.
+Dialogue: 0,0:20:40.72,0:20:44.93,main,Kyouka,0,0,0,,We hope to be the generation \Nthat fills in the blank years,
+Dialogue: 0,0:20:44.93,0:20:47.18,main,Kyouka,0,0,0,,Arkha Corvus.
+Dialogue: 0,0:20:48.52,0:20:50.94,main,Corvus,0,0,0,,I can't give you the Sphereite.
+Dialogue: 0,0:20:51.19,0:20:53.65,main,Corvus,0,0,0,,He's a member of the Cleaners.
+Dialogue: 0,0:20:53.65,0:20:56.69,main,Corvus,0,0,0,,He's actively doing work for us.
+Dialogue: 0,0:20:57.57,0:21:00.95,main,Corvus,0,0,0,,He also hasn't committed \Nany crimes on the Ground,
+Dialogue: 0,0:21:01.32,0:21:05.58,main,Corvus,0,0,0,,so "taking him in" seems \Ninappropriate, doesn't it?
+Dialogue: 0,0:21:06.95,0:21:10.92,main,Corvus,0,0,0,,Putting pressure on innocent people, \Njudging them based solely on their race...
+Dialogue: 0,0:21:11.75,0:21:16.00,main,Corvus,0,0,0,,The first-generation Hell Guard \Nwho act as your guiding light...
+Dialogue: 0,0:21:16.00,0:21:17.96,main,Corvus,0,0,0,,I'd like to know if that's \Nwhat they taught you.
+Dialogue: 0,0:21:19.80,0:21:21.01,main,Remlin,0,0,0,,Rudo!
+Dialogue: 0,0:21:21.51,0:21:24.60,main,Remlin,0,0,0,,Why do you have something \Nwith that mark on it?
+Dialogue: 0,0:21:24.60,0:21:28.22,main,Remlin,0,0,0,,Are you a fan of the old undertaker?
+Dialogue: 0,0:21:28.22,0:21:30.23,main,Rudo,0,0,0,,U-Undertaker?
+Dialogue: 0,0:21:30.23,0:21:33.48,main,Remlin,0,0,0,,Oh, no? You don't know about him?
+Dialogue: 0,0:21:33.81,0:21:38.23,main,Remlin,0,0,0,,Those are the logos of the friends \Nof the original spellcaster, Macaca Icol.
+Dialogue: 0,0:21:38.57,0:21:41.03,main,Remlin,0,0,0,,There are some of 'em \Nwhose names we don't know,
+Dialogue: 0,0:21:41.03,0:21:43.36,main,Remlin,0,0,0,,but we do know it for that person.
+Dialogue: 0,0:21:43.36,0:21:45.99,main,Remlin,0,0,0,,One of Macaca Icol's best friends,
+Dialogue: 0,0:21:45.99,0:21:48.70,main,Remlin,0,0,0,,the "Undertaker," Canis Surebrec.
+Dialogue: 0,0:21:53.46,0:21:54.75,main,Rudo,0,0,0,,My...
+Dialogue: 0,0:21:57.50,0:22:01.60,main,Rudo,0,0,0,,My name is Rudo Surebrec.
+Dialogue: 0,0:22:03.02,0:22:05.02,sign_ArialBlack,sign,0,0,0,,{\an8}Translation: Elizabeth Ellis\NTiming: Mariana Martinez
+Dialogue: 0,0:22:05.02,0:22:07.02,sign_ArialBlack,sign,0,0,0,,{\an8}Editing: Alicia Ashby\NQuality Control: William Haggard
+Dialogue: 0,0:22:07.03,0:22:09.03,sign_ArialBlack,sign,0,0,0,,{\an8}Final Quality Control: Sriram Gurunathan
+Dialogue: 0,0:23:46.82,0:23:47.99,main,Amo,0,0,0,,Rudo...
+

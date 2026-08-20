@@ -1,0 +1,281 @@
+[Script Info]
+Title: [Erai-raws]
+ScriptType: v4.00+
+WrapStyle: 0
+ScaledBorderAndShadow: yes
+PlayResX: 640
+PlayResY: 360
+LayoutResX: 640
+LayoutResY: 360
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: main,Trebuchet MS,24,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,1,2,10,10,18,0
+Style: italics,Trebuchet MS,24,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,-1,0,0,100,100,0,0,1,2,1,2,10,10,18,0
+Style: flashback,Trebuchet MS,24,&H00FFFFFF,&H000000FF,&H00400000,&H00400000,0,0,0,0,100,100,0,0,1,2,1,2,10,10,18,1
+Style: overlap,Trebuchet MS,24,&H007FD3F2,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,1,2,10,10,18,0
+Style: sign_Arial,Arial,20,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,2,2,2,30,30,20,1
+Style: Episode Title,Times New Roman,30,&H00000000,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,0,0,2,30,30,20,0
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:03.16,0:00:06.16,main,Subaru,0,0,0,,I'm not... letting anyone kill me.
+Dialogue: 0,0:00:12.92,0:00:15.31,main,Subaru,0,0,0,,It really is a desert.
+Dialogue: 0,0:00:31.55,0:00:33.61,main,Subaru,0,0,0,,Wh-What the hell is that thing?!
+Dialogue: 0,0:00:41.58,0:00:42.48,main,Subaru,0,0,0,,No!
+Dialogue: 0,0:01:02.67,0:01:04.25,main,Subaru,0,0,0,,What the hell?
+Dialogue: 0,0:01:04.74,0:01:07.83,main,Subaru,0,0,0,,What am I even supposed to do?
+Dialogue: 0,0:01:08.39,0:01:12.06,main,Subaru,0,0,0,,Answer me, Subaru Natsuki!
+Dialogue: 0,0:01:16.63,0:01:18.54,main,Subaru,0,0,0,,No! No! No!
+Dialogue: 0,0:01:21.56,0:01:25.27,main,Subaru,0,0,0,,Someone... Someone help me!
+Dialogue: 0,0:01:51.32,0:01:53.64,main,Subaru,0,0,0,,I'm underneath... the desert?
+Dialogue: 0,0:02:05.33,0:02:06.40,main,Subaru,0,0,0,,Shit...
+Dialogue: 0,0:02:06.40,0:02:08.53,main,Subaru,0,0,0,,Shit, shit, shit!
+Dialogue: 0,0:02:08.53,0:02:10.37,main,Subaru,0,0,0,,What the hell?! What the hell?!
+Dialogue: 0,0:02:10.37,0:02:12.73,main,Subaru,0,0,0,,What the hell do you want from me?!
+Dialogue: 0,0:03:50.41,0:03:53.31,main,Subaru,0,0,0,,That's the third one.
+Dialogue: 0,0:03:57.29,0:03:58.99,main,Subaru,0,0,0,,How long has it been?
+Dialogue: 0,0:03:59.44,0:04:01.74,main,Subaru,0,0,0,,Three hours? Four hours?
+Dialogue: 0,0:04:14.00,0:04:14.96,main,Subaru,0,0,0,,Ow...
+Dialogue: 0,0:04:16.71,0:04:17.86,main,Subaru,0,0,0,,Damn it!
+Dialogue: 0,0:04:44.70,0:04:46.26,main,Subaru,0,0,0,,Screw you!
+Dialogue: 0,0:04:46.26,0:04:50.32,main,Subaru,0,0,0,,Why?! Why do you have to be in my way?!
+Dialogue: 0,0:04:52.77,0:04:54.31,main,Subaru,0,0,0,,Wh... What the...
+Dialogue: 0,0:04:54.85,0:04:58.04,main,Subaru,0,0,0,,Damn it, stop screwing with me!
+Dialogue: 0,0:05:02.17,0:05:03.03,main,Subaru,0,0,0,,Huh?
+Dialogue: 0,0:05:10.96,0:05:13.76,main,Subaru,0,0,0,,I did all that running...
+Dialogue: 0,0:05:14.53,0:05:16.67,main,Subaru,0,0,0,,and running... and running...
+Dialogue: 0,0:05:21.02,0:05:22.05,main,Subaru,0,0,0,,I'm done.
+Dialogue: 0,0:05:23.53,0:05:25.29,main,Subaru,0,0,0,,I'll just kill you.
+Dialogue: 0,0:05:35.60,0:05:38.30,main,Subaru,0,0,0,,I don't know who you are...
+Dialogue: 0,0:05:39.86,0:05:41.95,main,Subaru,0,0,0,,but I'll kill you.
+Dialogue: 0,0:05:41.95,0:05:45.15,main,Subaru,0,0,0,,I swear I'm gonna kill you.
+Dialogue: 0,0:05:45.60,0:05:49.25,main,Subaru,0,0,0,,Kill you... Kill you... Kill you...
+Dialogue: 0,0:05:49.91,0:05:51.12,main,Subaru,0,0,0,,Kill you...
+Dialogue: 0,0:05:51.36,0:05:52.29,main,Subaru,0,0,0,,Kill you...
+Dialogue: 0,0:05:52.60,0:05:53.45,main,Subaru,0,0,0,,Kill you...
+Dialogue: 0,0:05:53.75,0:05:54.62,main,Subaru,0,0,0,,Kill you...
+Dialogue: 0,0:05:54.88,0:05:55.79,main,Subaru,0,0,0,,Kill you...
+Dialogue: 0,0:05:56.00,0:05:56.96,main,Subaru,0,0,0,,Kill you...
+Dialogue: 0,0:05:57.12,0:05:58.33,main,Subaru,0,0,0,,Kill you...
+Dialogue: 0,0:05:58.92,0:06:01.85,main,Subaru,0,0,0,,Kill you... Kill you... Kill you...
+Dialogue: 0,0:06:01.85,0:06:07.51,main,Subaru,0,0,0,,Kill you, kill you, kill you, kill you,\Nkill you, kill you, kill you, kill you...
+Dialogue: 0,0:06:38.45,0:06:42.29,main,Subaru,0,0,0,,So... it wasn't Shaula, then...
+Dialogue: 0,0:06:45.77,0:06:48.47,main,Subaru,0,0,0,,Beatrice and Meili are kids.
+Dialogue: 0,0:06:48.47,0:06:49.72,main,Subaru,0,0,0,,They'd be easy.
+Dialogue: 0,0:06:50.19,0:06:52.93,main,Subaru,0,0,0,,Emilia didn't seem that wary of me.
+Dialogue: 0,0:06:53.33,0:06:57.06,main,Subaru,0,0,0,,In that sense, the most dangerous \Nones are Ram and Echidna.
+Dialogue: 0,0:06:57.52,0:06:59.21,main,Subaru,0,0,0,,Julius, too.
+Dialogue: 0,0:06:59.21,0:07:02.44,main,Subaru,0,0,0,,It'd be great if he'd\N just die on his own...
+Dialogue: 0,0:07:03.31,0:07:04.44,main,Subaru,0,0,0,,Huh?
+Dialogue: 0,0:07:46.48,0:07:49.73,main,Subaru,0,0,0,,The only ones I haven't seen \Nare Emilia and Beatrice.
+Dialogue: 0,0:07:49.73,0:07:51.94,main,Subaru,0,0,0,,One of those two is—
+Dialogue: 0,0:07:56.12,0:07:57.42,main,Subaru,0,0,0,,Oh, it's you?
+Dialogue: 0,0:08:10.91,0:08:12.48,main,Subaru,0,0,0,,Stop following me!
+Dialogue: 0,0:08:12.48,0:08:15.26,main,Subaru,0,0,0,,I don't have time to play with you!
+Dialogue: 0,0:08:15.26,0:08:19.22,main,Subaru,0,0,0,,I have to kill everyone who's still alive!
+Dialogue: 0,0:08:21.18,0:08:25.01,main,Subaru,0,0,0,,If you're gonna get in my way, then...
+Dialogue: 0,0:08:39.79,0:08:40.60,main,Subaru,0,0,0,,Damn it!
+Dialogue: 0,0:08:40.60,0:08:43.41,main,Subaru,0,0,0,,Damn it! Damn it, damn it, damn it!
+Dialogue: 0,0:08:43.41,0:08:46.08,main,Subaru,0,0,0,,What the hell?! What the hell is this?!
+Dialogue: 0,0:08:46.08,0:08:48.79,main,Subaru,0,0,0,,You and all the others...
+Dialogue: 0,0:08:48.79,0:08:51.05,main,Subaru,0,0,0,,the dead bodies and\Nthe ones who are alive...
+Dialogue: 0,0:08:51.05,0:08:52.77,main,Subaru,0,0,0,,What the hell are you thinking?!
+Dialogue: 0,0:08:52.77,0:08:54.18,main,Subaru,0,0,0,,What are you trying to do?!
+Dialogue: 0,0:08:54.60,0:08:57.43,main,Subaru,0,0,0,,I don't give a shit about any of you!
+Dialogue: 0,0:08:57.89,0:09:01.39,main,Subaru,0,0,0,,You're all just shoving \Nyour problems onto me!
+Dialogue: 0,0:09:01.39,0:09:04.14,main,Subaru,0,0,0,,If you're all so\Npreoccupied with yourselves,
+Dialogue: 0,0:09:04.14,0:09:06.16,main,Subaru,0,0,0,,what about me?!
+Dialogue: 0,0:09:07.16,0:09:10.52,main,Subaru,0,0,0,,I'm busy with my own damn problems, too!
+Dialogue: 0,0:09:18.22,0:09:22.19,main,Subaru,0,0,0,,Why can't you just... leave me alone?
+Dialogue: 0,0:09:22.74,0:09:27.17,main,Subaru,0,0,0,,Just leave me all by myself!
+Dialogue: 0,0:09:36.94,0:09:38.89,main,Subaru,0,0,0,,Ow! Are you—
+Dialogue: 0,0:10:05.25,0:10:06.41,main,Subaru,0,0,0,,No!
+Dialogue: 0,0:10:06.41,0:10:08.12,main,Subaru,0,0,0,,I don't wanna die!
+Dialogue: 0,0:10:10.72,0:10:12.80,main,Subaru,0,0,0,,Lizard!
+Dialogue: 0,0:10:35.86,0:10:37.70,main,Subaru,0,0,0,,What... the...
+Dialogue: 0,0:10:39.79,0:10:43.22,main,Subaru,0,0,0,,Just what the hell are you?
+Dialogue: 0,0:10:45.37,0:10:48.99,main,Voice,0,0,0,,Try to figure it out next time,
+Dialogue: 0,0:10:48.99,0:10:50.76,main,Voice,0,0,0,,hero.
+Dialogue: 0,0:10:57.41,0:10:58.43,main,Emilia,0,0,0,,Subaru!
+Dialogue: 0,0:10:59.13,0:11:01.51,main,Emilia,0,0,0,,Hey, Subaru! Are you all right?
+Dialogue: 0,0:11:01.92,0:11:04.31,main,Subaru,0,0,0,,Emi...lia...
+Dialogue: 0,0:11:04.67,0:11:06.58,main,Emilia,0,0,0,,Oh, what a relief!
+Dialogue: 0,0:11:06.58,0:11:08.82,main,Emilia,0,0,0,,I was so worried about you!
+Dialogue: 0,0:11:13.29,0:11:13.98,main,Emilia,0,0,0,,Subaru?
+Dialogue: 0,0:11:15.62,0:11:16.73,main,Emilia,0,0,0,,What is it?
+Dialogue: 0,0:11:19.07,0:11:21.52,main,Beatrice,0,0,0,,He's still half-asleep, I suppose.
+Dialogue: 0,0:11:21.52,0:11:25.32,main,Beatrice,0,0,0,,How very easygoing, especially \Nafter he worried us so much.
+Dialogue: 0,0:11:27.36,0:11:28.42,main,Subaru,0,0,0,,You!
+Dialogue: 0,0:11:30.96,0:11:33.44,main,Beatrice,0,0,0,,I'm not happy with this, I suppose!
+Dialogue: 0,0:11:33.44,0:11:37.09,main,Beatrice,0,0,0,,Emilia and Betty were\Nthe ones who found him!
+Dialogue: 0,0:11:38.18,0:11:39.51,main,Emilia,0,0,0,,Now, don't sulk.
+Dialogue: 0,0:11:39.51,0:11:43.86,main,Emilia,0,0,0,,What's wrong with it? Subaru \Nand Patrasche are really close.
+Dialogue: 0,0:11:47.04,0:11:48.14,main,Emilia,0,0,0,,Hey, Subaru...
+Dialogue: 0,0:11:48.49,0:11:50.60,main,Emilia,0,0,0,,Are you sure you're feeling all right?
+Dialogue: 0,0:11:50.60,0:11:54.44,main,Subaru,0,0,0,,Yeah, I'm totally fine. No prob.
+Dialogue: 0,0:11:54.44,0:11:56.61,main,Subaru,0,0,0,,I guess all the tiredness\Nfinally got to me.
+Dialogue: 0,0:11:56.61,0:11:59.59,main,Subaru,0,0,0,,People fall asleep all the time, y'know?
+Dialogue: 0,0:11:59.59,0:12:00.53,main,Emilia,0,0,0,,I see...
+Dialogue: 0,0:12:01.00,0:12:03.32,main,Emilia,0,0,0,,But when you feel tired, tell us.
+Dialogue: 0,0:12:03.66,0:12:05.63,main,Emilia,0,0,0,,You mustn't push yourself too hard.
+Dialogue: 0,0:12:09.49,0:12:11.58,italics,Subaru INT,0,0,0,,It's gonna make things risky,
+Dialogue: 0,0:12:11.58,0:12:15.04,italics,Subaru INT,0,0,0,,but I won't tell them about \Nmy memory loss this time.
+Dialogue: 0,0:12:15.52,0:12:20.20,italics,Subaru INT,0,0,0,,I want to find out if it's connected \Nto the reason I keep getting killed.
+Dialogue: 0,0:12:20.20,0:12:25.79,italics,Subaru INT,0,0,0,,Frankly, I could see killing someone over \Nsomething you don't want them to remember,
+Dialogue: 0,0:12:25.79,0:12:29.89,italics,Subaru INT,0,0,0,,but it's hard to imagine killing \Nsomeone because they forgot something.
+Dialogue: 0,0:12:32.58,0:12:33.69,main,Emilia,0,0,0,,Subaru.
+Dialogue: 0,0:12:34.20,0:12:36.90,main,Emilia,0,0,0,,You've got that wrinkle \Non your forehead again.
+Dialogue: 0,0:12:38.52,0:12:42.51,main,Subaru,0,0,0,,What did I do for her to get \Nthat close with me, anyway?
+Dialogue: 0,0:12:44.86,0:12:49.08,italics,Subaru INT,0,0,0,,I didn't find their bodies, but...
+Dialogue: 0,0:12:49.08,0:12:52.45,flashback,Voice FB,0,0,0,,Try to figure it out next time,
+Dialogue: 0,0:12:52.77,0:12:54.37,flashback,Voice FB,0,0,0,,hero.
+Dialogue: 0,0:12:55.00,0:12:57.87,italics,Subaru INT,0,0,0,,That voice didn't belong\Nto either of them.
+Dialogue: 0,0:12:57.87,0:13:00.87,italics,Subaru INT,0,0,0,,In fact, no one in this group sounds like—
+Dialogue: 0,0:12:59.92,0:13:00.87,overlap,Ram,0,0,0,,Barusu.
+Dialogue: 0,0:13:03.28,0:13:06.32,main,Ram,0,0,0,,Stop spacing out and help me fetch water.
+Dialogue: 0,0:13:06.32,0:13:08.34,main,Ram,0,0,0,,Oops, sorry.
+Dialogue: 0,0:13:08.34,0:13:10.18,main,Ram,0,0,0,,I hear you were sleeping in the archive.
+Dialogue: 0,0:13:10.79,0:13:13.42,main,Ram,0,0,0,,You shouldn't try anything stupid.
+Dialogue: 0,0:13:13.42,0:13:15.27,main,Ram,0,0,0,,You'll only trouble those around you.
+Dialogue: 0,0:13:15.63,0:13:18.01,main,Subaru,0,0,0,,Yeah, I know I shouldn't have done it.
+Dialogue: 0,0:13:18.01,0:13:20.63,main,Subaru,0,0,0,,Sorry for making you worry, too.
+Dialogue: 0,0:13:20.63,0:13:23.02,main,Ram,0,0,0,,Worry about you? Why would I?
+Dialogue: 0,0:13:23.02,0:13:24.86,main,Subaru,0,0,0,,For my safety, I guess?
+Dialogue: 0,0:13:25.52,0:13:27.78,main,Shaula,0,0,0,,Good morning, Master!
+Dialogue: 0,0:13:27.78,0:13:30.47,main,Shaula,0,0,0,,Did you sleep well last night?
+Dialogue: 0,0:13:32.62,0:13:35.41,main,Shaula,0,0,0,,I slept great, thanks for asking!
+Dialogue: 0,0:13:35.41,0:13:37.50,main,Shaula,0,0,0,,I had a dream about the past, actually!
+Dialogue: 0,0:13:37.50,0:13:41.63,main,Shaula,0,0,0,,It was you and me, and my mom, and...
+Dialogue: 0,0:13:41.63,0:13:45.23,main,Subaru,0,0,0,,Okay, okay, I get it. You \Ncan tell me about it later.
+Dialogue: 0,0:13:45.23,0:13:49.40,main,Subaru,0,0,0,,Anyway, did you notice anything about \Nme when you saw me this morning?
+Dialogue: 0,0:13:49.40,0:13:51.48,main,Shaula,0,0,0,,This morning?
+Dialogue: 0,0:13:51.48,0:13:53.78,main,Shaula,0,0,0,,You looked as sexy as ever!
+Dialogue: 0,0:13:53.78,0:13:55.89,main,Shaula,0,0,0,,I've been waiting 400 \Nyears for you to propose!
+Dialogue: 0,0:13:55.89,0:13:58.36,main,Subaru,0,0,0,,You've got some real patience.
+Dialogue: 0,0:13:58.36,0:14:00.64,main,Subaru,0,0,0,,Well, if you didn't notice \Nanything, it's all good.
+Dialogue: 0,0:14:00.64,0:14:01.80,main,Shaula,0,0,0,,Really?
+Dialogue: 0,0:14:14.79,0:14:17.18,main,Subaru,0,0,0,,Shaula, I have a favor to ask.
+Dialogue: 0,0:14:17.18,0:14:19.25,main,Shaula,0,0,0,,Huh? What is it?
+Dialogue: 0,0:14:20.78,0:14:21.71,main,Subaru,0,0,0,,Julius.
+Dialogue: 0,0:14:23.42,0:14:25.92,main,Subaru,0,0,0,,I want to talk about what \Nhappened last night.
+Dialogue: 0,0:14:26.48,0:14:28.35,main,Subaru,0,0,0,,Just the two of us, you know?
+Dialogue: 0,0:14:31.79,0:14:34.39,main,Julius,0,0,0,,About... last night?
+Dialogue: 0,0:14:34.96,0:14:38.01,main,Julius,0,0,0,,I thought that conversation was over.
+Dialogue: 0,0:14:38.01,0:14:39.69,main,Julius,0,0,0,,Do you disagree?
+Dialogue: 0,0:14:39.69,0:14:41.35,main,Subaru,0,0,0,,Yeah, I sure do.
+Dialogue: 0,0:14:41.35,0:14:44.86,main,Subaru,0,0,0,,I wasn't satisfied with \Nthat in the slightest.
+Dialogue: 0,0:14:48.24,0:14:50.78,main,Julius,0,0,0,,Satisfied, eh?
+Dialogue: 0,0:14:50.78,0:14:53.03,main,Julius,0,0,0,,I see. That's very like you.
+Dialogue: 0,0:14:53.85,0:14:56.88,main,Julius,0,0,0,,But do you not feel that's \Na bit too selfish of you?
+Dialogue: 0,0:14:56.88,0:15:00.06,main,Subaru,0,0,0,,You don't look satisfied \Nwith how it ended, either.
+Dialogue: 0,0:15:00.06,0:15:03.38,main,Subaru,0,0,0,,We're both holding on to \Nsomething that pisses us off,
+Dialogue: 0,0:15:03.38,0:15:05.65,main,Subaru,0,0,0,,and you expect me to just live with it?
+Dialogue: 0,0:15:05.65,0:15:07.31,main,Subaru,0,0,0,,Like hell I can.
+Dialogue: 0,0:15:07.31,0:15:10.80,main,Julius,0,0,0,,Well, then, what other choice do we have?
+Dialogue: 0,0:15:11.44,0:15:14.47,main,Julius,0,0,0,,My feelings are exactly \Nas I told you last night.
+Dialogue: 0,0:15:14.47,0:15:17.19,main,Julius,0,0,0,,I have nothing further to say.
+Dialogue: 0,0:15:17.76,0:15:21.54,main,Julius,0,0,0,,Because I knew nothing at all of the \Nsecret between you and Lady Anastasia—
+Dialogue: 0,0:15:21.54,0:15:23.90,main,Julius,0,0,0,,that is, you and Echidna.
+Dialogue: 0,0:15:24.52,0:15:27.48,main,Subaru,0,0,0,,The secret... between me and Echidna?
+Dialogue: 0,0:15:27.48,0:15:30.54,main,Julius,0,0,0,,I understand that you meant no harm.
+Dialogue: 0,0:15:31.22,0:15:34.86,main,Julius,0,0,0,,And I spoke with Echidna, \Nthough not nearly enough.
+Dialogue: 0,0:15:34.86,0:15:36.64,main,Julius,0,0,0,,She can be trusted.
+Dialogue: 0,0:15:37.12,0:15:40.52,main,Julius,0,0,0,,Rather, there is no other \Noption but to trust her.
+Dialogue: 0,0:15:41.20,0:15:43.63,main,Julius,0,0,0,,If I hope to save Lady Anastasia,
+Dialogue: 0,0:15:43.63,0:15:46.34,main,Julius,0,0,0,,then I have to bet on the possibility.
+Dialogue: 0,0:15:48.64,0:15:50.32,main,Julius,0,0,0,,Even if we get her back
+Dialogue: 0,0:15:50.98,0:15:54.14,main,Julius,0,0,0,,and she doesn't remember who I am...
+Dialogue: 0,0:15:54.95,0:15:56.86,main,Subaru,0,0,0,,What... do you mean?
+Dialogue: 0,0:15:58.03,0:15:59.03,main,Julius,0,0,0,,Honestly...
+Dialogue: 0,0:15:59.92,0:16:03.34,main,Julius,0,0,0,,Please don't make me feel any \Nmore pathetic in your presence.
+Dialogue: 0,0:16:07.83,0:16:11.78,main,Julius,0,0,0,,When you mentioned what happened \Nlast night, it frightened me a bit.
+Dialogue: 0,0:16:12.32,0:16:15.80,main,Julius,0,0,0,,I didn't know what I would \Ndo if you apologized to me.
+Dialogue: 0,0:16:16.25,0:16:19.75,main,Subaru,0,0,0,,If I... apologized?
+Dialogue: 0,0:16:20.07,0:16:24.26,main,Julius,0,0,0,,If you had, how would I have responded?
+Dialogue: 0,0:16:25.03,0:16:28.13,main,Julius,0,0,0,,There's no way to know now, however.
+Dialogue: 0,0:16:43.56,0:16:46.73,main,Shaula,0,0,0,,Master, you sure you want \Nto leave things like that?
+Dialogue: 0,0:16:47.05,0:16:48.42,main,Subaru,0,0,0,,Yeah.
+Dialogue: 0,0:16:48.42,0:16:52.24,main,Subaru,0,0,0,,Seems like Julius had nothing to do \Nwith what happened in the archive.
+Dialogue: 0,0:16:52.24,0:16:56.26,main,Subaru,0,0,0,,Except now he's even more suspicious \Nof who I was yesterday.
+Dialogue: 0,0:16:56.26,0:16:58.12,main,Shaula,0,0,0,,I don't really get it,
+Dialogue: 0,0:16:58.12,0:17:00.74,main,Shaula,0,0,0,,but was I useful to you?
+Dialogue: 0,0:17:01.08,0:17:02.75,main,Subaru,0,0,0,,Yeah. You totally were.
+Dialogue: 0,0:17:03.23,0:17:08.00,main,Subaru,0,0,0,,I was able to confront Julius without \Nfear because you were there.
+Dialogue: 0,0:17:09.81,0:17:11.87,main,Shaula,0,0,0,,Glad to hear it!
+Dialogue: 0,0:17:11.87,0:17:14.76,main,Shaula,0,0,0,,Well, then, Master, Master...
+Dialogue: 0,0:17:14.76,0:17:18.51,main,Shaula,0,0,0,,I want a big hug as a reward!
+Dialogue: 0,0:17:18.51,0:17:19.38,main,Subaru,0,0,0,,Not doing that.
+Dialogue: 0,0:17:19.38,0:17:21.37,main,Shaula,0,0,0,,What?! That's so mean!
+Dialogue: 0,0:17:21.37,0:17:24.16,main,Shaula,0,0,0,,You said you'd give me any reward I wanted
+Dialogue: 0,0:17:24.16,0:17:26.87,main,Shaula,0,0,0,,as long as it wasn't way out of bounds!
+Dialogue: 0,0:17:26.87,0:17:29.84,main,Subaru,0,0,0,,And that goes beyond the \Nboundaries of my innocence.
+Dialogue: 0,0:17:31.36,0:17:38.36,main,Subaru,0,0,0,,So just what were you doing to be \Ntargeted and by whom, Subaru Natsuki?
+Dialogue: 0,0:17:39.10,0:17:41.47,main,Subaru,0,0,0,,I'm stuck at an impasse.
+Dialogue: 0,0:17:41.47,0:17:43.71,main,Subaru,0,0,0,,I'm starting to think\NI should ask Patrasche.
+Dialogue: 0,0:17:43.71,0:17:46.08,main,Shaula,0,0,0,,What? The land dragon?
+Dialogue: 0,0:17:46.08,0:17:48.53,main,Shaula,0,0,0,,I don't like her. She keeps glaring at me.
+Dialogue: 0,0:17:48.53,0:17:51.91,main,Subaru,0,0,0,,Hey! I won't let you badmouth Patrasche!
+Dialogue: 0,0:17:51.91,0:17:54.95,main,Subaru,0,0,0,,Even if badmouthing anyone was acceptable,
+Dialogue: 0,0:17:54.95,0:17:57.55,main,Subaru,0,0,0,,Patrasche is the only one \NI won't let you badmouth!
+Dialogue: 0,0:17:57.55,0:18:01.35,main,Shaula,0,0,0,,Master, just how much has that \Nland dragon emasculated you?
+Dialogue: 0,0:18:01.35,0:18:05.42,main,Subaru,0,0,0,,So on that note, you and I are done here.
+Dialogue: 0,0:18:05.42,0:18:06.56,main,Subaru,0,0,0,,See ya.
+Dialogue: 0,0:18:06.56,0:18:10.39,main,Shaula,0,0,0,,What?! You just turned a \Nblind eye to my reward!
+Dialogue: 0,0:18:10.39,0:18:12.69,main,Shaula,0,0,0,,But I will not lose heart!
+Dialogue: 0,0:18:12.69,0:18:17.54,main,Shaula,0,0,0,,To be a woman who's convenient \Nto you is my reason for living!
+Dialogue: 0,0:18:19.45,0:18:24.29,main,Subaru,0,0,0,,What about Subaru Natsuki \Nmakes him worth all that?
+Dialogue: 0,0:18:25.58,0:18:26.75,main,Shaula,0,0,0,,Master?
+Dialogue: 0,0:18:26.75,0:18:28.21,main,Subaru,0,0,0,,Oh, damn it!
+Dialogue: 0,0:18:34.13,0:18:38.56,main,Subaru,0,0,0,,You don't have to think about \Nbeing convenient to me.
+Dialogue: 0,0:18:38.56,0:18:40.11,main,Subaru,0,0,0,,I'm sorry.
+Dialogue: 0,0:18:42.27,0:18:43.70,main,Shaula,0,0,0,,Master...
+Dialogue: 0,0:18:47.53,0:18:51.47,main,Subaru,0,0,0,,Having you there with me \Nwas a big help. That's all.
+Dialogue: 0,0:18:52.86,0:18:54.10,main,Shaula,0,0,0,,Master...
+Dialogue: 0,0:18:55.78,0:18:56.77,main,Shaula,0,0,0,,At long last...
+Dialogue: 0,0:18:57.57,0:19:01.24,main,Shaula,0,0,0,,you're ready to love me?!
+Dialogue: 0,0:19:02.14,0:19:03.77,main,Subaru,0,0,0,,My boundaries!
+Dialogue: 0,0:19:16.55,0:19:19.30,main,Subaru,0,0,0,,If the way they all acted was phony,
+Dialogue: 0,0:19:19.30,0:19:22.21,main,Subaru,0,0,0,,I don't know what I'm supposed to believe.
+Dialogue: 0,0:19:25.68,0:19:29.35,main,Subaru,0,0,0,,I guess Patrasche really is \Nthe only one I can trust.
+Dialogue: 0,0:19:30.58,0:19:34.91,main,Subaru,0,0,0,,Maybe I'd be happier living in a \Nparadise for just me and her—
+Dialogue: 0,0:19:34.91,0:19:36.98,main,Meili,0,0,0,,Uh-oh. I heard that.
+Dialogue: 0,0:19:36.98,0:19:37.57,main,Subaru,0,0,0,,Wha?!
+Dialogue: 0,0:19:39.78,0:19:43.92,main,Meili,0,0,0,,So you want to run somewhere \Nfar away with Patrasche?
+Dialogue: 0,0:19:43.92,0:19:47.77,main,Meili,0,0,0,,Beatrice and Big Sister would \Ncry if they heard that.
+Dialogue: 0,0:19:47.77,0:19:50.00,main,Subaru,0,0,0,,It was just a bad joke.
+Dialogue: 0,0:19:50.00,0:19:52.35,main,Subaru,0,0,0,,Forget about it. In every sense.
+Dialogue: 0,0:19:52.35,0:19:54.16,main,Meili,0,0,0,,Yeah, sure.
+Dialogue: 0,0:19:54.16,0:19:58.76,main,Meili,0,0,0,,But even if that's how you really \Nfeel, I won't laugh at you.
+Dialogue: 0,0:19:59.16,0:20:03.51,main,Meili,0,0,0,,I've lived with mabeasts \Nall my life, remember?
+Dialogue: 0,0:20:03.51,0:20:05.10,main,Subaru,0,0,0,,Mabeasts...
+Dialogue: 0,0:20:05.84,0:20:08.27,main,Subaru,0,0,0,,So it's kinda like you\Nwere raised by wolves?
+Dialogue: 0,0:20:09.65,0:20:12.23,main,Meili,0,0,0,,You said that yesterday, too.
+Dialogue: 0,0:20:12.23,0:20:14.80,main,Meili,0,0,0,,My mom was incredibly strict.
+Dialogue: 0,0:20:14.80,0:20:19.00,main,Meili,0,0,0,,And Elsa, the one I was around \Nall the time, was really lax,
+Dialogue: 0,0:20:19.00,0:20:21.96,main,Meili,0,0,0,,so there was a lot I had to take care of.
+Dialogue: 0,0:20:21.96,0:20:25.50,main,Subaru,0,0,0,,Okay, wait, wait! You keep putting \Nmore and more holes in my brain!
+Dialogue: 0,0:20:25.50,0:20:27.24,main,Subaru,0,0,0,,Look, I'm busy right now.
+Dialogue: 0,0:20:27.24,0:20:28.99,main,Subaru,0,0,0,,Go play with Shaula or something.
+Dialogue: 0,0:20:28.99,0:20:31.03,main,Meili,0,0,0,,The half-naked lady?
+Dialogue: 0,0:20:31.03,0:20:32.69,main,Meili,0,0,0,,I'm fine with that,
+Dialogue: 0,0:20:32.69,0:20:35.21,main,Meili,0,0,0,,but you're the one I have \Nbusiness with right now.
+Dialogue: 0,0:20:35.75,0:20:37.04,main,Subaru,0,0,0,,Me?
+Dialogue: 0,0:20:46.00,0:20:48.35,main,Meili,0,0,0,,What you said yesterday...
+Dialogue: 0,0:20:48.35,0:20:51.56,main,Meili,0,0,0,,How seriously should I take that?
+Dialogue: 0,0:20:56.26,0:20:57.20,main,Subaru,0,0,0,,Ow...
+Dialogue: 0,0:21:01.19,0:21:02.97,main,Subaru,0,0,0,,What is this?
+Dialogue: 0,0:21:12.85,0:21:14.16,main,Subaru,0,0,0,,You're kidding me...
+Dialogue: 0,0:21:15.12,0:21:17.03,main,Subaru,0,0,0,,No way! No way! No way!
+Dialogue: 0,0:21:17.03,0:21:17.83,main,Subaru,0,0,0,,No way!
+Dialogue: 0,0:21:18.16,0:21:19.26,main,Subaru,0,0,0,,Meili!
+Dialogue: 0,0:21:19.26,0:21:21.05,main,Subaru,0,0,0,,Hey! Meili!
+Dialogue: 0,0:21:22.88,0:21:24.38,main,Subaru,0,0,0,,Meili! Meili!
+Dialogue: 0,0:21:24.38,0:21:25.64,main,Subaru,0,0,0,,Damn it!
+Dialogue: 0,0:21:29.23,0:21:30.76,main,Subaru,0,0,0,,Damn it! Damn it!
+Dialogue: 0,0:21:36.30,0:21:37.28,main,Subaru,0,0,0,,I...
+Dialogue: 0,0:21:41.18,0:21:42.42,main,Subaru,0,0,0,,killed her?
+Dialogue: 0,0:21:44.21,0:21:47.03,main,Subaru,0,0,0,,But why... would I...
+Dialogue: 0,0:22:02.55,0:22:06.17,sign_Arial,Text,0,0,0,,{\an8\c&H29253B&\3c&H7D8685&\bord4\shad0\fs25}Subaru Natsuki Was Here
+Dialogue: 0,0:22:07.05,0:22:09.93,Episode Title,Title,0,0,0,,{\an8\c&H010089&\fs40}Empty Shell
+

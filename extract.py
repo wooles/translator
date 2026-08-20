@@ -1,0 +1,157 @@
+"""
+Moduł ekstrakcji napisów oraz klatek wideo z użyciem ffmpeg i Pillow.
+"""
+
+import os
+import json
+import subprocess
+import tempfile
+from pathlib import Path
+from typing import List, Dict, Optional, Any
+from PIL import Image
+
+def get_video_streams_info(video_path: str) -> Dict[str, Any]:
+    """
+    Pobiera informacje o strumieniach audio i napisów z pliku wideo za pomocą ffprobe/ffmpeg.
+    """
+    cmd = [
+        "ffprobe",
+        "-v", "quiet",
+        "-print_format", "json",
+        "-show_streams",
+        "-show_format",
+        video_path
+    ]
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        return json.loads(result.stdout)
+    except Exception:
+        # Fallback jeśli ffprobe nie jest dostępny w PATH: spróbuj ffmpeg
+        return {}
+
+def list_subtitle_tracks(video_path: str) -> List[Dict[str, Any]]:
+    """
+    Zwraca listę dostępnych ścieżek napisów w pliku wideo.
+    """
+    info = get_video_streams_info(video_path)
+    sub_tracks = []
+    if "streams" in info:
+        sub_idx = 0
+        for s in info["streams"]:
+            if s.get("codec_type") == "subtitle":
+                tags = s.get("tags", {})
+                lang = tags.get("language", "und")
+                title = tags.get("title", f"Ścieżka {sub_idx + 1}")
+                codec = s.get("codec_name", "unknown")
+                sub_tracks.append({
+                    "sub_index": sub_idx,
+                    "stream_index": s.get("index"),
+                    "language": lang,
+                    "title": title,
+                    "codec": codec
+                })
+                sub_idx += 1
+    return sub_tracks
+
+def extract_embedded_subtitles(video_path: str, sub_index: int = 0, output_path: Optional[str] = None) -> str:
+    """
+    Wyciąga wbudowaną ścieżkę napisów z pliku wideo do pliku tymczasowego lub wskazanego pliku .srt/.ass.
+    """
+    if not output_path:
+        suffix = ".ass"
+        tmp = tempfile.NamedTemporaryFile(suffix=suffix, delete=False)
+        tmp.close()
+        output_path = tmp.name
+
+    cmd = [
+        "ffmpeg",
+        "-y",
+        "-i", video_path,
+        "-map", f"0:s:{sub_index}",
+        output_path
+    ]
+    subprocess.run(cmd, capture_output=True, text=True, check=True)
+    return output_path
+
+def extract_frame_at_timestamp(
+    video_path: str,
+    timestamp_ms: int,
+    output_path: Optional[str] = None,
+    max_width: int = 800
+) -> str:
+    """
+    Wyciąga klatkę wideo z podanego znacznika czasu (w milisekundach),
+    optymalizuje jej rozmiar i zapisuje jako JPEG.
+    """
+    if not output_path:
+        tmp = tempfile.NamedTemporaryFile(suffix=".jpg", delete=False)
+        tmp.close()
+        output_path = tmp.name
+
+    sec = max(0.0, timestamp_ms / 1000.0)
+    # Wyciągamy klatkę za pomocą ffmpeg
+    cmd = [
+        "ffmpeg",
+        "-y",
+        "-ss", f"{sec:.3f}",
+        "-i", video_path,
+        "-vframes", "1",
+        "-q:v", "2",
+        output_path
+    ]
+    subprocess.run(cmd, capture_output=True, text=True, check=True)
+
+    # Optymalizacja klatki za pomocą Pillow (skalowanie dla oszczędności tokenów i szybkości)
+    try:
+        with Image.open(output_path) as img:
+            img = img.convert("RGB")
+            width, height = img.size
+            if width > max_width:
+                new_height = int((max_width / width) * height)
+                img = img.resize((max_width, new_height), Image.Resampling.LANCZOS)
+            img.save(output_path, "JPEG", quality=72, optimize=True)
+    except Exception as e:
+        pass
+
+    return output_path
+
+def extract_audio_slice(
+    video_path: str,
+    start_ms: int,
+    end_ms: int,
+    output_path: Optional[str] = None
+) -> str:
+    """
+    Wyciąga krótki, lekki wycinek ścieżki dźwiękowej (16kHz mono WAV) dla danej sceny/paczki dialogowej.
+    Pozwala modelowi Gemini na bezpośrednie słuchanie oryginalnego japońskiego dubbingu.
+    """
+    if not output_path:
+        tmp = tempfile.NamedTemporaryFile(suffix=".wav", delete=False)
+        tmp.close()
+        output_path = tmp.name
+
+    start_sec = max(0.0, (start_ms - 200) / 1000.0)  # 200ms bufor na początek głosu
+    duration_sec = max(0.8, (end_ms - start_ms + 400) / 1000.0)  # bufor na wybrzmienie
+
+    # -ss przed -i dla błyskawicznego skoku, 16kHz mono WAV
+    cmd = [
+        "ffmpeg",
+        "-y",
+        "-ss", f"{start_sec:.3f}",
+        "-t", f"{duration_sec:.3f}",
+        "-i", video_path,
+        "-vn",
+        "-ac", "1",
+        "-ar", "16000",
+        output_path
+    ]
+    try:
+        subprocess.run(cmd, capture_output=True, text=True, check=True)
+        return output_path
+    except Exception as e:
+        if os.path.exists(output_path):
+            try:
+                os.remove(output_path)
+            except OSError:
+                pass
+        raise e

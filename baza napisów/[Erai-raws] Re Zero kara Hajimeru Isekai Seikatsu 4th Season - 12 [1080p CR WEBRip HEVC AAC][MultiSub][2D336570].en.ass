@@ -1,0 +1,384 @@
+[Script Info]
+Title: [Erai-raws]
+ScriptType: v4.00+
+WrapStyle: 0
+PlayResX: 640
+PlayResY: 360
+LayoutResX: 640
+LayoutResY: 360
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: TopCenter,Trebuchet MS,24,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,2,1,8,0010,0010,0018,0
+Style: BottomCenter,Trebuchet MS,24,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,2,1,2,0010,0010,0018,0
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:01.29,0:00:03.17,BottomCenter,,0000,0000,0000,,I'm back.
+Dialogue: 0,0:00:03.25,0:00:04.25,BottomCenter,,0000,0000,0000,,Subaru?
+Dialogue: 0,0:00:04.33,0:00:05.71,BottomCenter,,0000,0000,0000,,Are you all right? Can you get up?
+Dialogue: 0,0:00:05.79,0:00:07.04,BottomCenter,,0000,0000,0000,,Can you talk?
+Dialogue: 0,0:00:14.83,0:00:15.75,BottomCenter,,0000,0000,0000,,Emilia.
+Dialogue: 0,0:00:15.83,0:00:19.25,BottomCenter,,0000,0000,0000,,Emilia isn't the only one\Nwho was worried about you!
+Dialogue: 0,0:00:21.58,0:00:23.50,BottomCenter,,0000,0000,0000,,What's that look about, I suppose?
+Dialogue: 0,0:00:23.58,0:00:27.08,BottomCenter,,0000,0000,0000,,It's as if you can't believe the\Nadorable Betty is standing before y—
+Dialogue: 0,0:00:27.17,0:00:30.42,BottomCenter,,0000,0000,0000,,Beatrice! Beatrice! Beatrice!
+Dialogue: 0,0:00:30.50,0:00:32.04,BottomCenter,,0000,0000,0000,,Wh-Wh-What?!
+Dialogue: 0,0:00:32.13,0:00:34.42,BottomCenter,,0000,0000,0000,,This is too sudden, I suppose!
+Dialogue: 0,0:00:34.50,0:00:36.71,BottomCenter,,0000,0000,0000,,You... You...
+Dialogue: 0,0:00:37.38,0:00:39.58,BottomCenter,,0000,0000,0000,,Your face makes me feel so at ease!
+Dialogue: 0,0:00:39.67,0:00:41.67,BottomCenter,,0000,0000,0000,,It's so cute that\NI feel like I'm back home!
+Dialogue: 0,0:00:41.75,0:00:43.17,BottomCenter,,0000,0000,0000,,I could fall in love!
+Dialogue: 0,0:00:43.25,0:00:46.33,BottomCenter,,0000,0000,0000,,I really don't want to believe\Nyou meant that as a compliment!
+Dialogue: 0,0:00:46.42,0:00:49.79,BottomCenter,,0000,0000,0000,,Come on, Subaru. Don't start messing\Nwith us the moment you wake up.
+Dialogue: 0,0:00:49.88,0:00:53.38,BottomCenter,,0000,0000,0000,,We still don't even know\Nwhy you passed out...
+Dialogue: 0,0:00:55.46,0:00:56.42,BottomCenter,,0000,0000,0000,,Subaru?
+Dialogue: 0,0:01:03.71,0:01:05.29,BottomCenter,,0000,0000,0000,,What's wrong, I suppose?
+Dialogue: 0,0:01:05.38,0:01:08.50,BottomCenter,,0000,0000,0000,,It's all right. Betty is here.
+Dialogue: 0,0:01:12.54,0:01:14.29,BottomCenter,,0000,0000,0000,,Don't cry, Subaru.
+Dialogue: 0,0:01:14.88,0:01:17.21,BottomCenter,,0000,0000,0000,,Just take slow, deep breaths.
+Dialogue: 0,0:01:17.71,0:01:18.75,BottomCenter,,0000,0000,0000,,Calm down.
+Dialogue: 0,0:01:19.29,0:01:23.92,BottomCenter,,0000,0000,0000,,Beatrice and I are both\Nright here with you.
+Dialogue: 0,0:03:04.46,0:03:05.83,BottomCenter,,0000,0000,0000,,So, yeah...
+Dialogue: 0,0:03:05.92,0:03:08.75,BottomCenter,,0000,0000,0000,,It seems like I lost my\Nmemories in the archive.
+Dialogue: 0,0:03:08.83,0:03:11.54,BottomCenter,,0000,0000,0000,,This might cause a lot\Nof trouble for you guys,
+Dialogue: 0,0:03:11.63,0:03:14.33,BottomCenter,,0000,0000,0000,,but I'd appreciate your understanding.
+Dialogue: 0,0:03:14.42,0:03:17.75,BottomCenter,,0000,0000,0000,,I'm sure you're all very\Nworried about Subaru.
+Dialogue: 0,0:03:18.25,0:03:21.17,BottomCenter,,0000,0000,0000,,But we all need\Nto keep ourselves together,
+Dialogue: 0,0:03:21.25,0:03:24.04,BottomCenter,,0000,0000,0000,,because no one feels more\Nanxious than he does right now.
+Dialogue: 0,0:03:24.13,0:03:25.54,BottomCenter,,0000,0000,0000,,It doesn't look that way to me.
+Dialogue: 0,0:03:26.13,0:03:28.88,BottomCenter,,0000,0000,0000,,What I want to know is: what kind\Nof stupid act is this, Barusu?
+Dialogue: 0,0:03:28.96,0:03:30.71,BottomCenter,,0000,0000,0000,,It's not an act.
+Dialogue: 0,0:03:30.79,0:03:33.88,BottomCenter,,0000,0000,0000,,I'm being super serious about\Ntelling you all the truth.
+Dialogue: 0,0:03:33.96,0:03:36.42,BottomCenter,,0000,0000,0000,,My heart's about to\Nexplode from the anxiety.
+Dialogue: 0,0:03:36.50,0:03:38.25,BottomCenter,,0000,0000,0000,,Very slick.
+Dialogue: 0,0:03:38.33,0:03:39.96,BottomCenter,,0000,0000,0000,,You speak in that flippant tone\Nand expect us to believe—
+Dialogue: 0,0:03:40.04,0:03:44.04,BottomCenter,,0000,0000,0000,,Subaru has no reason to\Ntell such sick lies.
+Dialogue: 0,0:03:44.38,0:03:46.75,BottomCenter,,0000,0000,0000,,You should know that, I suppose.
+Dialogue: 0,0:03:50.08,0:03:55.63,BottomCenter,,0000,0000,0000,,Honestly, Big Brother, you're\Njust hopeless, aren't you?
+Dialogue: 0,0:03:56.79,0:03:58.58,BottomCenter,,0000,0000,0000,,What's with that reaction?
+Dialogue: 0,0:03:59.08,0:04:01.71,BottomCenter,,0000,0000,0000,,You look like you just saw a ghost.
+Dialogue: 0,0:04:01.79,0:04:03.83,BottomCenter,,0000,0000,0000,,Talk about rude.
+Dialogue: 0,0:04:04.79,0:04:05.71,BottomCenter,,0000,0000,0000,,Meili...
+Dialogue: 0,0:04:05.79,0:04:09.71,BottomCenter,,0000,0000,0000,,Oh? So you remember my name, huh?
+Dialogue: 0,0:04:09.79,0:04:13.13,BottomCenter,,0000,0000,0000,,So what {\i1}did{\i0} you forget, then?
+Dialogue: 0,0:04:13.21,0:04:16.67,BottomCenter,,0000,0000,0000,,I lost what they call episodic memory.
+Dialogue: 0,0:04:16.75,0:04:19.29,BottomCenter,,0000,0000,0000,,I remember the names of\Nmost people and things,
+Dialogue: 0,0:04:19.38,0:04:23.17,BottomCenter,,0000,0000,0000,,but my memories of experiences I've\Nbeen through with others are murky.
+Dialogue: 0,0:04:23.88,0:04:27.29,BottomCenter,,0000,0000,0000,,Does that include, say,\Nwhat happened yesterday?
+Dialogue: 0,0:04:29.29,0:04:30.21,BottomCenter,,0000,0000,0000,,Yeah.
+Dialogue: 0,0:04:30.29,0:04:32.25,BottomCenter,,0000,0000,0000,,Yesterday, eh?
+Dialogue: 0,0:04:33.04,0:04:36.04,BottomCenter,,0000,0000,0000,,Well... yes, I suppose so.
+Dialogue: 0,0:04:36.13,0:04:38.08,BottomCenter,,0000,0000,0000,,Really, Master? Again?
+Dialogue: 0,0:04:38.46,0:04:42.38,BottomCenter,,0000,0000,0000,,How many times are you gonna forget me?
+Dialogue: 0,0:04:42.46,0:04:45.79,BottomCenter,,0000,0000,0000,,Frankly, it's still a bit\Ndifficult to accept...
+Dialogue: 0,0:04:46.63,0:04:51.50,BottomCenter,,0000,0000,0000,,but it's likely there's a trap in this\Ntower that left Natsuki in this state.
+Dialogue: 0,0:04:51.58,0:04:53.67,BottomCenter,,0000,0000,0000,,I think we should come to terms with that.
+Dialogue: 0,0:04:53.75,0:04:55.75,BottomCenter,,0000,0000,0000,,Yeah. The archive is the most suspicious,
+Dialogue: 0,0:04:55.83,0:04:59.17,BottomCenter,,0000,0000,0000,,since that's where Emilia-chan\Nand Beatrice found me.
+Dialogue: 0,0:04:59.25,0:05:02.25,BottomCenter,,0000,0000,0000,,It was a pretty shady\Nplace to begin with, too.
+Dialogue: 0,0:05:02.33,0:05:03.17,BottomCenter,,0000,0000,0000,,"Chan"...
+Dialogue: 0,0:05:04.21,0:05:06.75,BottomCenter,,0000,0000,0000,,Anyway, sorry I scared you all like that.
+Dialogue: 0,0:05:07.29,0:05:09.21,BottomCenter,,0000,0000,0000,,I'm sure we all need\Ntime to process things,
+Dialogue: 0,0:05:09.29,0:05:10.96,BottomCenter,,0000,0000,0000,,so let's take a break.
+Dialogue: 0,0:05:11.38,0:05:15.21,BottomCenter,,0000,0000,0000,,I'll go with Ram to fetch\Nwater in the meantime.
+Dialogue: 0,0:05:16.96,0:05:18.38,BottomCenter,,0000,0000,0000,,Let's go, Ram.
+Dialogue: 0,0:05:18.46,0:05:21.83,BottomCenter,,0000,0000,0000,,You look like you were just about\Nto ask me to go with you, anyway.
+Dialogue: 0,0:05:23.13,0:05:24.46,BottomCenter,,0000,0000,0000,,So lewd.
+Dialogue: 0,0:05:26.63,0:05:29.88,BottomCenter,,0000,0000,0000,,So what was the idea behind that\Nridiculous farce back there?
+Dialogue: 0,0:05:30.17,0:05:33.21,BottomCenter,,0000,0000,0000,,Ram, it's true that I lost my memory.
+Dialogue: 0,0:05:33.29,0:05:36.33,BottomCenter,,0000,0000,0000,,It's not a lie, a grift, or an evil plot.
+Dialogue: 0,0:05:38.17,0:05:39.75,BottomCenter,,0000,0000,0000,,My memory is gone.
+Dialogue: 0,0:05:39.83,0:05:43.92,BottomCenter,,0000,0000,0000,,I don't remember anything but your\Nnames and the relationships we had.
+Dialogue: 0,0:05:44.00,0:05:44.96,BottomCenter,,0000,0000,0000,,Stop it.
+Dialogue: 0,0:05:45.04,0:05:49.83,BottomCenter,,0000,0000,0000,,I know we came to this tower to\Nget back a bunch of stuff we lost,
+Dialogue: 0,0:05:49.92,0:05:52.25,BottomCenter,,0000,0000,0000,,and that we're trying to\Nget through its exams.
+Dialogue: 0,0:05:52.33,0:05:53.75,BottomCenter,,0000,0000,0000,,But that's all.
+Dialogue: 0,0:05:54.17,0:05:56.25,BottomCenter,,0000,0000,0000,,- My motive is—\N- Stop it, Barusu.
+Dialogue: 0,0:05:56.33,0:05:58.58,BottomCenter,,0000,0000,0000,,- No more.\N- And Rem, too... I—
+Dialogue: 0,0:05:58.67,0:05:59.75,BottomCenter,,0000,0000,0000,,Barusu!
+Dialogue: 0,0:06:03.79,0:06:05.46,BottomCenter,,0000,0000,0000,,What are you playing at?
+Dialogue: 0,0:06:05.54,0:06:06.54,BottomCenter,,0000,0000,0000,,What are these...
+Dialogue: 0,0:06:06.63,0:06:08.96,BottomCenter,,0000,0000,0000,,these ridiculous lies?!
+Dialogue: 0,0:06:10.08,0:06:12.08,BottomCenter,,0000,0000,0000,,They're not lies.
+Dialogue: 0,0:06:12.58,0:06:14.71,BottomCenter,,0000,0000,0000,,So you're telling me to believe you?
+Dialogue: 0,0:06:15.21,0:06:17.79,BottomCenter,,0000,0000,0000,,To believe something as stupid as...
+Dialogue: 0,0:06:17.88,0:06:21.13,BottomCenter,,0000,0000,0000,,as you forgetting Rem?!
+Dialogue: 0,0:06:23.21,0:06:25.46,BottomCenter,,0000,0000,0000,,I'm going to get Rem back.
+Dialogue: 0,0:06:27.38,0:06:28.88,BottomCenter,,0000,0000,0000,,Who do you think you are?
+Dialogue: 0,0:06:28.96,0:06:32.13,BottomCenter,,0000,0000,0000,,Get her back? You don't\Neven remember her, do you?!
+Dialogue: 0,0:06:32.21,0:06:34.83,BottomCenter,,0000,0000,0000,,Barusu... You forgot Rem!
+Dialogue: 0,0:06:35.21,0:06:36.67,BottomCenter,,0000,0000,0000,,I'll still get her back!
+Dialogue: 0,0:06:36.96,0:06:39.88,BottomCenter,,0000,0000,0000,,Rem, and my memories, too! All of it!
+Dialogue: 0,0:06:40.25,0:06:41.96,BottomCenter,,0000,0000,0000,,I'll do every damn thing there is to do,
+Dialogue: 0,0:06:42.08,0:06:43.67,BottomCenter,,0000,0000,0000,,and then we'll all go home!
+Dialogue: 0,0:06:45.21,0:06:48.96,BottomCenter,,0000,0000,0000,,We deserve that much, at least.
+Dialogue: 0,0:06:49.08,0:06:51.67,BottomCenter,,0000,0000,0000,,Considering everything we've\Nbeen through in this tower...
+Dialogue: 0,0:06:52.04,0:06:53.04,BottomCenter,,0000,0000,0000,,Barusu?
+Dialogue: 0,0:06:56.50,0:06:59.83,BottomCenter,,0000,0000,0000,,Ram, I'm going to get Rem\Nand my memories back.
+Dialogue: 0,0:07:00.54,0:07:02.54,BottomCenter,,0000,0000,0000,,I need you to help me do that.
+Dialogue: 0,0:07:04.33,0:07:06.46,BottomCenter,,0000,0000,0000,,I need help from all of you!
+Dialogue: 0,0:07:06.54,0:07:10.08,BottomCenter,,0000,0000,0000,,I get that you might never\Nforgive me for forgetting Rem.
+Dialogue: 0,0:07:10.17,0:07:11.83,BottomCenter,,0000,0000,0000,,But I promise you this.
+Dialogue: 0,0:07:12.42,0:07:13.38,BottomCenter,,0000,0000,0000,,What?
+Dialogue: 0,0:07:14.21,0:07:15.75,BottomCenter,,0000,0000,0000,,I will see this through.
+Dialogue: 0,0:07:15.83,0:07:19.58,BottomCenter,,0000,0000,0000,,If I give up, you can do\Nwhatever you want to me.
+Dialogue: 0,0:07:20.08,0:07:23.58,BottomCenter,,0000,0000,0000,,It'll be my penance for being\Ncareless enough to lose my memories
+Dialogue: 0,0:07:23.67,0:07:26.67,BottomCenter,,0000,0000,0000,,and making you cry.
+Dialogue: 0,0:07:37.50,0:07:39.50,BottomCenter,,0000,0000,0000,,I'm not crying. Don't be stupid.
+Dialogue: 0,0:07:39.88,0:07:44.58,BottomCenter,,0000,0000,0000,,C-Come on! It took a lot of\Ncourage for me to say all that!
+Dialogue: 0,0:07:44.67,0:07:46.13,BottomCenter,,0000,0000,0000,,What part of that took courage?
+Dialogue: 0,0:07:46.21,0:07:48.17,BottomCenter,,0000,0000,0000,,You were just getting\Nyourself all worked up.
+Dialogue: 0,0:07:48.25,0:07:50.96,BottomCenter,,0000,0000,0000,,Also, a promise from {\i1}you{\i0}?\NDon't make me laugh.
+Dialogue: 0,0:07:51.08,0:07:53.96,BottomCenter,,0000,0000,0000,,How many promises did I\Nbreak up until yesterday?!
+Dialogue: 0,0:07:54.08,0:07:55.67,BottomCenter,,0000,0000,0000,,How many have you kept?
+Dialogue: 0,0:07:55.75,0:07:57.58,BottomCenter,,0000,0000,0000,,That's easier to count?!
+Dialogue: 0,0:07:58.88,0:08:02.88,BottomCenter,,0000,0000,0000,,Man, this Subaru Natsuki\Nreally is worthless, huh?
+Dialogue: 0,0:08:02.96,0:08:05.63,BottomCenter,,0000,0000,0000,,Why'd you even bring me to this tower?
+Dialogue: 0,0:08:05.71,0:08:07.17,BottomCenter,,0000,0000,0000,,You butted in.
+Dialogue: 0,0:08:07.25,0:08:10.75,BottomCenter,,0000,0000,0000,,Also, you did have a knack\Nfor running your mouth.
+Dialogue: 0,0:08:10.83,0:08:12.96,BottomCenter,,0000,0000,0000,,You could be counted on\Nto handle odd jobs, too.
+Dialogue: 0,0:08:13.08,0:08:14.54,BottomCenter,,0000,0000,0000,,What else?
+Dialogue: 0,0:08:14.63,0:08:16.83,BottomCenter,,0000,0000,0000,,I have short legs, my memory's bad,
+Dialogue: 0,0:08:16.92,0:08:19.33,BottomCenter,,0000,0000,0000,,I'm a picky eater, and I\Ndon't know when to give up.
+Dialogue: 0,0:08:19.75,0:08:22.58,BottomCenter,,0000,0000,0000,,You had short legs, your memory\Nwas bad, you were a picky eater,
+Dialogue: 0,0:08:22.67,0:08:24.17,BottomCenter,,0000,0000,0000,,and you didn't know when to give up.
+Dialogue: 0,0:08:24.25,0:08:25.54,BottomCenter,,0000,0000,0000,,Yeah, of course.
+Dialogue: 0,0:08:26.00,0:08:27.04,BottomCenter,,0000,0000,0000,,And...
+Dialogue: 0,0:08:28.71,0:08:30.54,BottomCenter,,0000,0000,0000,,you cared about Rem.
+Dialogue: 0,0:08:33.92,0:08:37.17,BottomCenter,,0000,0000,0000,,Barusu, you've truly forgotten Rem, right?
+Dialogue: 0,0:08:38.00,0:08:38.83,BottomCenter,,0000,0000,0000,,Yeah.
+Dialogue: 0,0:08:39.21,0:08:41.79,BottomCenter,,0000,0000,0000,,Barusu, you're truly going\Nto remember her, right?
+Dialogue: 0,0:08:41.88,0:08:43.83,BottomCenter,,0000,0000,0000,,Yeah. I will.
+Dialogue: 0,0:08:43.92,0:08:46.08,BottomCenter,,0000,0000,0000,,Not just Rem, but everything else, too.
+Dialogue: 0,0:08:49.42,0:08:52.29,BottomCenter,,0000,0000,0000,,Very well. I'll overlook this.
+Dialogue: 0,0:08:52.38,0:08:53.79,BottomCenter,,0000,0000,0000,,On your feet, Barusu.
+Dialogue: 0,0:09:02.75,0:09:03.75,BottomCenter,,0000,0000,0000,,I was...
+Dialogue: 0,0:09:04.21,0:09:07.75,BottomCenter,,0000,0000,0000,,Subaru Natsuki was definitely here, right?
+Dialogue: 0,0:09:09.00,0:09:13.75,BottomCenter,,0000,0000,0000,,Silly. He's just temporarily\Ninvisible at the moment.
+Dialogue: 0,0:09:14.29,0:09:16.92,BottomCenter,,0000,0000,0000,,Like a flower buried under the cold snow,
+Dialogue: 0,0:09:17.00,0:09:20.00,BottomCenter,,0000,0000,0000,,he'll show himself once the\Nsnowy season has passed.
+Dialogue: 0,0:09:22.42,0:09:25.63,BottomCenter,,0000,0000,0000,,I'm sure that's all there is to it.
+Dialogue: 0,0:09:42.29,0:09:43.83,BottomCenter,,0000,0000,0000,,Last time...
+Dialogue: 0,0:09:44.38,0:09:46.17,BottomCenter,,0000,0000,0000,,and the time before that...
+Dialogue: 0,0:09:46.25,0:09:48.50,BottomCenter,,0000,0000,0000,,this place was a complete mess.
+Dialogue: 0,0:09:50.33,0:09:53.58,BottomCenter,,0000,0000,0000,,It'll happen again and soon.
+Dialogue: 0,0:09:54.08,0:09:56.58,BottomCenter,,0000,0000,0000,,I have to stop it.
+Dialogue: 0,0:10:00.63,0:10:01.46,BottomCenter,,0000,0000,0000,,So...
+Dialogue: 0,0:10:02.42,0:10:03.75,BottomCenter,,0000,0000,0000,,for starters...
+Dialogue: 0,0:10:06.88,0:10:07.71,BottomCenter,,0000,0000,0000,,Huh?!
+Dialogue: 0,0:10:08.08,0:10:10.79,BottomCenter,,0000,0000,0000,,Wait! Wait! Wait! Wait! Wait!
+Dialogue: 0,0:10:17.33,0:10:18.50,BottomCenter,,0000,0000,0000,,Whoa, there!
+Dialogue: 0,0:10:19.29,0:10:21.38,BottomCenter,,0000,0000,0000,,Don't go taking that fall in my place.
+Dialogue: 0,0:10:22.04,0:10:24.67,BottomCenter,,0000,0000,0000,,Now, let's talk.
+Dialogue: 0,0:10:24.75,0:10:28.54,BottomCenter,,0000,0000,0000,,I'm gonna need you to take\Nresponsibility for killing me.
+Dialogue: 0,0:10:31.25,0:10:33.58,BottomCenter,,0000,0000,0000,,Responsibility for killing you?
+Dialogue: 0,0:10:33.67,0:10:36.46,BottomCenter,,0000,0000,0000,,You're being weird again, Big Brother.
+Dialogue: 0,0:10:36.83,0:10:40.63,BottomCenter,,0000,0000,0000,,After all, if I really wanted to kill you,
+Dialogue: 0,0:10:40.71,0:10:43.63,BottomCenter,,0000,0000,0000,,wouldn't it have been much\Neasier to do it outside?
+Dialogue: 0,0:10:43.71,0:10:47.08,BottomCenter,,0000,0000,0000,,Yeah, I'm sure you had\Nplenty of opportunities,
+Dialogue: 0,0:10:47.17,0:10:49.04,BottomCenter,,0000,0000,0000,,but you didn't do it.
+Dialogue: 0,0:10:49.13,0:10:50.75,BottomCenter,,0000,0000,0000,,Right? So—
+Dialogue: 0,0:10:50.83,0:10:56.96,BottomCenter,,0000,0000,0000,,If your intent to kill me didn't exist\Nuntil this morning, that's different.
+Dialogue: 0,0:10:57.54,0:11:02.25,BottomCenter,,0000,0000,0000,,Or should I say sometime after the whole\Nchain reaction that started last night?
+Dialogue: 0,0:11:03.04,0:11:04.00,BottomCenter,,0000,0000,0000,,Don't tell me...
+Dialogue: 0,0:11:04.33,0:11:09.25,BottomCenter,,0000,0000,0000,,Were you lying about losing your\Nmemories just to set me up?
+Dialogue: 0,0:11:09.33,0:11:11.25,BottomCenter,,0000,0000,0000,,Don't get the wrong idea, Meili.
+Dialogue: 0,0:11:11.58,0:11:14.13,BottomCenter,,0000,0000,0000,,It's no lie that I lost my memory.
+Dialogue: 0,0:11:14.21,0:11:15.88,BottomCenter,,0000,0000,0000,,It's true, which is why this is serious.
+Dialogue: 0,0:11:15.96,0:11:20.38,BottomCenter,,0000,0000,0000,,That in itself brings up\Nsome questions, but...
+Dialogue: 0,0:11:20.96,0:11:24.04,BottomCenter,,0000,0000,0000,,How are you planning to\Nfinish me off, then?
+Dialogue: 0,0:11:24.13,0:11:26.79,BottomCenter,,0000,0000,0000,,Are you gonna push me off\Nthese stairs for revenge?
+Dialogue: 0,0:11:26.88,0:11:29.38,BottomCenter,,0000,0000,0000,,My mean little beasties\Naren't with me now, so...
+Dialogue: 0,0:11:29.46,0:11:32.92,BottomCenter,,0000,0000,0000,,I have no intention of\Nkilling or hurting you.
+Dialogue: 0,0:11:33.75,0:11:37.13,BottomCenter,,0000,0000,0000,,I intend to treat you the same\Nas I have been for all this time.
+Dialogue: 0,0:11:37.88,0:11:41.71,BottomCenter,,0000,0000,0000,,Thankfully, I stopped your crime\Nbefore you could carry it out,
+Dialogue: 0,0:11:41.79,0:11:45.63,BottomCenter,,0000,0000,0000,,so as long as I don't tell anyone,\Nwe can pretend it never happened.
+Dialogue: 0,0:11:46.04,0:11:47.29,BottomCenter,,0000,0000,0000,,Wh-What are you...
+Dialogue: 0,0:11:47.38,0:11:50.83,BottomCenter,,0000,0000,0000,,But now you understand, right?
+Dialogue: 0,0:11:50.92,0:11:53.96,BottomCenter,,0000,0000,0000,,It's gonna be pretty risky\Nto try to do anything to me.
+Dialogue: 0,0:11:54.08,0:11:56.83,BottomCenter,,0000,0000,0000,,If you still want to try, well...
+Dialogue: 0,0:11:56.92,0:11:58.50,BottomCenter,,0000,0000,0000,,let's at least talk it over.
+Dialogue: 0,0:11:59.00,0:12:02.38,BottomCenter,,0000,0000,0000,,If something's bothering you,\NI'll listen as best I can.
+Dialogue: 0,0:12:03.71,0:12:04.88,BottomCenter,,0000,0000,0000,,Bothering me?
+Dialogue: 0,0:12:05.58,0:12:06.96,BottomCenter,,0000,0000,0000,,Bothering me?
+Dialogue: 0,0:12:07.08,0:12:10.25,BottomCenter,,0000,0000,0000,,If anything bothers me,\Nit's this situation right now!
+Dialogue: 0,0:12:10.33,0:12:11.96,BottomCenter,,0000,0000,0000,,I can't believe you!
+Dialogue: 0,0:12:12.04,0:12:16.33,BottomCenter,,0000,0000,0000,,You don't even know\Nwhat I was trying to do!
+Dialogue: 0,0:12:16.42,0:12:18.67,BottomCenter,,0000,0000,0000,,This makes no sense otherwise!
+Dialogue: 0,0:12:19.38,0:12:21.54,BottomCenter,,0000,0000,0000,,Because if you did...
+Dialogue: 0,0:12:21.63,0:12:24.96,BottomCenter,,0000,0000,0000,,It was an unpredictable act on your part.
+Dialogue: 0,0:12:25.08,0:12:26.96,BottomCenter,,0000,0000,0000,,Just an impulse.
+Dialogue: 0,0:12:27.08,0:12:31.75,BottomCenter,,0000,0000,0000,,You just don't have any other\Nway of resolving problems.
+Dialogue: 0,0:12:32.08,0:12:34.21,BottomCenter,,0000,0000,0000,,And that's not your fault.
+Dialogue: 0,0:12:35.38,0:12:38.46,BottomCenter,,0000,0000,0000,,Because... murder is a habit.
+Dialogue: 0,0:12:39.42,0:12:41.71,BottomCenter,,0000,0000,0000,,Don't talk like you know anything!
+Dialogue: 0,0:12:42.25,0:12:45.04,BottomCenter,,0000,0000,0000,,What... What the hell...
+Dialogue: 0,0:12:45.13,0:12:47.92,BottomCenter,,0000,0000,0000,,could you possibly know about me?!
+Dialogue: 0,0:12:48.00,0:12:49.33,BottomCenter,,0000,0000,0000,,I do know.
+Dialogue: 0,0:12:50.13,0:12:53.54,BottomCenter,,0000,0000,0000,,Meili, I know all about you.
+Dialogue: 0,0:12:53.63,0:12:55.42,BottomCenter,,0000,0000,0000,,This might sound creepy,
+Dialogue: 0,0:12:55.50,0:13:01.54,BottomCenter,,0000,0000,0000,,but I doubt there's anyone in this\Nworld who knows you better than I do.
+Dialogue: 0,0:13:03.17,0:13:04.50,BottomCenter,,0000,0000,0000,,Elsa Granhiert.
+Dialogue: 0,0:13:05.96,0:13:09.67,BottomCenter,,0000,0000,0000,,She's the reason you tried\Nto kill me, right?
+Dialogue: 0,0:13:13.58,0:13:16.50,BottomCenter,,0000,0000,0000,,I won't... let anyone...
+Dialogue: 0,0:13:21.17,0:13:23.25,BottomCenter,,0000,0000,0000,,talk as if they understand me.
+Dialogue: 0,0:13:28.54,0:13:33.13,BottomCenter,,0000,0000,0000,,{\i1}I think Elsa Granhiert was{\i0}\N{\i1}an unbelievable woman.{\i0}
+Dialogue: 0,0:13:37.83,0:13:39.92,BottomCenter,,0000,0000,0000,,I've been told to bring you back.
+Dialogue: 0,0:13:40.46,0:13:42.67,BottomCenter,,0000,0000,0000,,So you'll be coming with me.
+Dialogue: 0,0:13:55.83,0:13:56.75,BottomCenter,,0000,0000,0000,,What's wrong?
+Dialogue: 0,0:13:57.21,0:13:59.25,BottomCenter,,0000,0000,0000,,Stop that. It tickles.
+Dialogue: 0,0:14:03.92,0:14:07.83,BottomCenter,,0000,0000,0000,,I'm not too particular\Nabout clothing, either,
+Dialogue: 0,0:14:07.92,0:14:10.17,BottomCenter,,0000,0000,0000,,but you are definitely a strange one.
+Dialogue: 0,0:14:12.29,0:14:13.96,BottomCenter,,0000,0000,0000,,So very temperamental.
+Dialogue: 0,0:14:14.54,0:14:17.92,BottomCenter,,0000,0000,0000,,Aren't you, Meili?\NIt seems that's your name.
+Dialogue: 0,0:14:18.83,0:14:21.04,BottomCenter,,0000,0000,0000,,It's stitched into those\Nrags you were wearing.
+Dialogue: 0,0:14:21.13,0:14:23.25,BottomCenter,,0000,0000,0000,,They might belong to someone else,
+Dialogue: 0,0:14:23.33,0:14:25.13,BottomCenter,,0000,0000,0000,,but not having a name to\Ncall you is inconvenient, so...
+Dialogue: 0,0:14:26.58,0:14:28.08,BottomCenter,,0000,0000,0000,,You are Meili.
+Dialogue: 0,0:14:28.63,0:14:31.04,BottomCenter,,0000,0000,0000,,That's what I'm going to call you.
+Dialogue: 0,0:14:31.63,0:14:36.13,BottomCenter,,0000,0000,0000,,If you say you lost everything,\Nforgot everything,
+Dialogue: 0,0:14:36.21,0:14:40.50,BottomCenter,,0000,0000,0000,,then why don't I teach you?
+Dialogue: 0,0:14:41.29,0:14:47.13,BottomCenter,,0000,0000,0000,,That's a mother's job, after all.
+Dialogue: 0,0:14:49.79,0:14:54.33,BottomCenter,,0000,0000,0000,,{\i1}I think Elsa Granhiert{\i0}\N{\i1}was a detestable woman.{\i0}
+Dialogue: 0,0:14:55.83,0:14:57.46,BottomCenter,,0000,0000,0000,,Are you shivering?
+Dialogue: 0,0:14:58.33,0:15:00.00,BottomCenter,,0000,0000,0000,,Perhaps you're cold?
+Dialogue: 0,0:15:06.17,0:15:08.63,BottomCenter,,0000,0000,0000,,Stop that. It tickles.
+Dialogue: 0,0:15:09.21,0:15:10.54,BottomCenter,,0000,0000,0000,,{\i1}I saw every job through.{\i0}
+Dialogue: 0,0:15:11.63,0:15:13.83,BottomCenter,,0000,0000,0000,,{\i1}I modeled my methods after Elsa's.{\i0}
+Dialogue: 0,0:15:14.79,0:15:16.71,BottomCenter,,0000,0000,0000,,{\i1}I learned to speak.{\i0}
+Dialogue: 0,0:15:16.79,0:15:19.50,BottomCenter,,0000,0000,0000,,{\i1}I modeled my speech after Elsa's.{\i0}
+Dialogue: 0,0:15:20.25,0:15:22.42,BottomCenter,,0000,0000,0000,,{\i1}I even wore clothes.{\i0}
+Dialogue: 0,0:15:22.50,0:15:25.75,BottomCenter,,0000,0000,0000,,{\i1}I modeled my fashion sense after Elsa's.{\i0}
+Dialogue: 0,0:15:26.50,0:15:30.75,BottomCenter,,0000,0000,0000,,{\i1}And I kept all that secret from Elsa.{\i0}
+Dialogue: 0,0:15:32.33,0:15:36.17,BottomCenter,,0000,0000,0000,,{\i1}I think Elsa Granhiert{\i0}\N{\i1}was a dreadful woman.{\i0}
+Dialogue: 0,0:15:36.46,0:15:40.13,BottomCenter,,0000,0000,0000,,Meili, could you braid my\Nhair? I can't be bothered.
+Dialogue: 0,0:15:42.04,0:15:43.96,BottomCenter,,0000,0000,0000,,Meili, are you listening?
+Dialogue: 0,0:15:44.04,0:15:46.42,BottomCenter,,0000,0000,0000,,I asked you to braid my hair.
+Dialogue: 0,0:15:46.50,0:15:48.54,BottomCenter,,0000,0000,0000,,Yes, I heard you.
+Dialogue: 0,0:15:48.63,0:15:50.88,BottomCenter,,0000,0000,0000,,Honestly, you're such a slob.
+Dialogue: 0,0:16:00.50,0:16:01.50,BottomCenter,,0000,0000,0000,,Grr.
+Dialogue: 0,0:16:01.58,0:16:04.21,BottomCenter,,0000,0000,0000,,Excuse me? That tickles.
+Dialogue: 0,0:16:04.75,0:16:05.88,BottomCenter,,0000,0000,0000,,Grr.
+Dialogue: 0,0:16:06.71,0:16:08.17,BottomCenter,,0000,0000,0000,,You're such a funny girl.
+Dialogue: 0,0:16:11.50,0:16:16.08,BottomCenter,,0000,0000,0000,,{\i1}I didn't want her to disappear after{\i0}\N{\i1}she'd become a huge presence in my mind.{\i0}
+Dialogue: 0,0:16:16.63,0:16:23.29,BottomCenter,,0000,0000,0000,,{\i1}She had become an unbelievable,{\i0}\N{\i1}detestable, dreadful part of my life.{\i0}
+Dialogue: 0,0:16:24.00,0:16:25.79,BottomCenter,,0000,0000,0000,,{\i1}Not even just "a part."{\i0}
+Dialogue: 0,0:16:25.88,0:16:28.25,BottomCenter,,0000,0000,0000,,{\i1}She was so much bigger than that.{\i0}
+Dialogue: 0,0:16:29.38,0:16:32.46,BottomCenter,,0000,0000,0000,,{\i1}So if that all had to be exposed...{\i0}
+Dialogue: 0,0:16:32.54,0:16:34.21,BottomCenter,,0000,0000,0000,,{\i1}If it had to be trampled on...{\i0}
+Dialogue: 0,0:16:34.92,0:16:38.21,BottomCenter,,0000,0000,0000,,{\i1}If Elsa Granhiert had to be killed...{\i0}
+Dialogue: 0,0:16:39.63,0:16:41.54,BottomCenter,,0000,0000,0000,,{\i1}then Meili Portroute...{\i0}
+Dialogue: 0,0:16:46.38,0:16:50.88,BottomCenter,,0000,0000,0000,,It would've been so much better\Nif you had just let me end it.
+Dialogue: 0,0:16:50.96,0:16:52.88,BottomCenter,,0000,0000,0000,,Yeah, sorry.
+Dialogue: 0,0:16:52.96,0:16:56.25,BottomCenter,,0000,0000,0000,,But while most people take off their\Nshoes when entering someone's home,
+Dialogue: 0,0:16:56.33,0:17:01.38,BottomCenter,,0000,0000,0000,,it's the Natsuki family way to just\Nbarge right into the hearts of others.
+Dialogue: 0,0:17:03.54,0:17:05.83,BottomCenter,,0000,0000,0000,,You wanted to avenge her?
+Dialogue: 0,0:17:06.83,0:17:08.42,BottomCenter,,0000,0000,0000,,I don't know.
+Dialogue: 0,0:17:08.50,0:17:11.96,BottomCenter,,0000,0000,0000,,Even if that's the case, Elsa...
+Dialogue: 0,0:17:12.04,0:17:13.96,BottomCenter,,0000,0000,0000,,...wouldn't have wanted that.
+Dialogue: 0,0:17:14.67,0:17:16.58,BottomCenter,,0000,0000,0000,,I know that much.
+Dialogue: 0,0:17:19.08,0:17:22.50,BottomCenter,,0000,0000,0000,,Why do you keep trying to help me?
+Dialogue: 0,0:17:22.83,0:17:24.63,BottomCenter,,0000,0000,0000,,I've already forgotten almost everything.
+Dialogue: 0,0:17:24.71,0:17:28.96,BottomCenter,,0000,0000,0000,,If I lost you, too, that'd be\None more thing for me to miss.
+Dialogue: 0,0:17:29.04,0:17:30.25,BottomCenter,,0000,0000,0000,,I guess that's why.
+Dialogue: 0,0:17:31.38,0:17:35.79,BottomCenter,,0000,0000,0000,,Meili, I get that you don't know\Nwhat to do with your own feelings.
+Dialogue: 0,0:17:35.88,0:17:40.54,BottomCenter,,0000,0000,0000,,But I doubt you're gonna be able\Nto find all the answers right away.
+Dialogue: 0,0:17:40.63,0:17:42.71,BottomCenter,,0000,0000,0000,,So let me handle things here.
+Dialogue: 0,0:17:43.29,0:17:44.88,BottomCenter,,0000,0000,0000,,I won't let things go bad.
+Dialogue: 0,0:17:44.96,0:17:48.67,BottomCenter,,0000,0000,0000,,Or at least, I'll do my best\Nnot to let them go bad.
+Dialogue: 0,0:17:49.04,0:17:52.08,BottomCenter,,0000,0000,0000,,As long as that's what you want, too.
+Dialogue: 0,0:17:52.63,0:17:54.63,BottomCenter,,0000,0000,0000,,I can't... believe that.
+Dialogue: 0,0:17:55.38,0:17:58.63,BottomCenter,,0000,0000,0000,,It's easy for you to\Nsay whatever you want.
+Dialogue: 0,0:17:58.71,0:18:00.96,BottomCenter,,0000,0000,0000,,Then don't consider it a promise with me.
+Dialogue: 0,0:18:01.08,0:18:03.83,BottomCenter,,0000,0000,0000,,Consider it a promise with all of us.
+Dialogue: 0,0:18:04.79,0:18:06.75,BottomCenter,,0000,0000,0000,,Yes. It's all right.
+Dialogue: 0,0:18:07.63,0:18:11.00,BottomCenter,,0000,0000,0000,,I was listening, so I'm a\Nwitness to that promise.
+Dialogue: 0,0:18:14.17,0:18:16.42,BottomCenter,,0000,0000,0000,,You're a lifesaver, Emilia-chan!
+Dialogue: 0,0:18:16.50,0:18:18.79,BottomCenter,,0000,0000,0000,,Frankly, I didn't even feel\Nlike I was alive.
+Dialogue: 0,0:18:18.88,0:18:20.67,BottomCenter,,0000,0000,0000,,That's what I should be saying!
+Dialogue: 0,0:18:20.75,0:18:22.33,BottomCenter,,0000,0000,0000,,I can't believe you tried\Nto jump with her!
+Dialogue: 0,0:18:22.42,0:18:25.67,BottomCenter,,0000,0000,0000,,I thought my heart was going\Nto leap out of my chest!
+Dialogue: 0,0:18:25.75,0:18:26.79,BottomCenter,,0000,0000,0000,,Big Sister...
+Dialogue: 0,0:18:27.33,0:18:29.42,BottomCenter,,0000,0000,0000,,You were... listening?
+Dialogue: 0,0:18:29.50,0:18:34.46,BottomCenter,,0000,0000,0000,,Yes. Subaru said he wanted me\Nto help if you got into trouble.
+Dialogue: 0,0:18:37.46,0:18:39.42,BottomCenter,,0000,0000,0000,,Listen, Meili.
+Dialogue: 0,0:18:39.50,0:18:42.75,BottomCenter,,0000,0000,0000,,I believe what Subaru said.
+Dialogue: 0,0:18:42.83,0:18:45.38,BottomCenter,,0000,0000,0000,,So I want you to believe him, too.
+Dialogue: 0,0:18:45.46,0:18:46.88,BottomCenter,,0000,0000,0000,,Believe us both.
+Dialogue: 0,0:18:47.83,0:18:53.46,BottomCenter,,0000,0000,0000,,This tower in the sand is too small a\Nplace for you to make any big decisions.
+Dialogue: 0,0:18:53.54,0:18:57.54,BottomCenter,,0000,0000,0000,,Look for your answers once we're\Nout of here and in a bigger place.
+Dialogue: 0,0:18:57.63,0:19:00.67,BottomCenter,,0000,0000,0000,,We'll all do our very best, too.
+Dialogue: 0,0:19:03.58,0:19:07.58,BottomCenter,,0000,0000,0000,,I don't want to forget about Elsa.
+Dialogue: 0,0:19:08.25,0:19:09.83,BottomCenter,,0000,0000,0000,,Yeah. That's fine.
+Dialogue: 0,0:19:09.92,0:19:12.92,BottomCenter,,0000,0000,0000,,There's no need to\Nforget someone you like.
+Dialogue: 0,0:19:13.00,0:19:18.33,BottomCenter,,0000,0000,0000,,Though... it might be better if you\Ndidn't try to do things the way she did.
+Dialogue: 0,0:19:22.25,0:19:24.38,BottomCenter,,0000,0000,0000,,I see. It appears you took care of things.
+Dialogue: 0,0:19:24.83,0:19:27.42,BottomCenter,,0000,0000,0000,,Not a bad job. My compliments.
+Dialogue: 0,0:19:27.50,0:19:29.75,BottomCenter,,0000,0000,0000,,Perhaps I don't need to say it,
+Dialogue: 0,0:19:29.83,0:19:33.92,BottomCenter,,0000,0000,0000,,but she has been waiting most\Nanxiously for your return.
+Dialogue: 0,0:19:34.00,0:19:36.33,BottomCenter,,0000,0000,0000,,You're right. You didn't need to say that.
+Dialogue: 0,0:19:36.42,0:19:38.04,BottomCenter,,0000,0000,0000,,Learn some restraint, Echidna.
+Dialogue: 0,0:19:38.13,0:19:42.79,BottomCenter,,0000,0000,0000,,This is the attitude you take the moment\Nyou find out I'm controlling this body.
+Dialogue: 0,0:19:42.88,0:19:44.25,BottomCenter,,0000,0000,0000,,Just how I want it.
+Dialogue: 0,0:19:44.33,0:19:46.75,BottomCenter,,0000,0000,0000,,Frankly, I was beside myself with worry.
+Dialogue: 0,0:19:47.08,0:19:50.21,BottomCenter,,0000,0000,0000,,I held it in because Subaru\Nasked me to, I suppose.
+Dialogue: 0,0:19:52.63,0:19:55.63,BottomCenter,,0000,0000,0000,,But are you really\Nsure about this, Master?
+Dialogue: 0,0:19:55.71,0:19:58.33,BottomCenter,,0000,0000,0000,,She tried to kill you, y'know.
+Dialogue: 0,0:19:58.42,0:20:01.00,BottomCenter,,0000,0000,0000,,You really don't think\Nshe should be punished?
+Dialogue: 0,0:20:02.29,0:20:06.38,BottomCenter,,0000,0000,0000,,It's fine. Meili's already\Nbeen through her punishment.
+Dialogue: 0,0:20:06.46,0:20:10.25,BottomCenter,,0000,0000,0000,,Things turned out this\Nway because no one ever
+Dialogue: 0,0:20:10.33,0:20:13.92,BottomCenter,,0000,0000,0000,,taught her why she was being punished.
+Dialogue: 0,0:20:14.00,0:20:16.13,BottomCenter,,0000,0000,0000,,So I'm gonna teach her that going forward.
+Dialogue: 0,0:20:16.21,0:20:18.42,BottomCenter,,0000,0000,0000,,I'll need your help, too, of course.
+Dialogue: 0,0:20:18.50,0:20:19.46,BottomCenter,,0000,0000,0000,,Mine?
+Dialogue: 0,0:20:19.54,0:20:23.21,BottomCenter,,0000,0000,0000,,Well, sure. Everyone in this\Ntower is gonna be her textbook.
+Dialogue: 0,0:20:23.29,0:20:26.67,BottomCenter,,0000,0000,0000,,So don't do anything that\Nwould set a bad example.
+Dialogue: 0,0:20:26.75,0:20:29.63,BottomCenter,,0000,0000,0000,,Me, too?
+Dialogue: 0,0:20:29.71,0:20:32.08,BottomCenter,,0000,0000,0000,,Master and me...
+Dialogue: 0,0:20:33.79,0:20:35.38,BottomCenter,,0000,0000,0000,,Uh, what's with you?
+Dialogue: 0,0:20:35.46,0:20:36.71,BottomCenter,,0000,0000,0000,,Nothing!
+Dialogue: 0,0:20:36.79,0:20:39.63,BottomCenter,,0000,0000,0000,,I'll raise her up into a model\Ncitizen! Just you watch!
+Dialogue: 0,0:20:39.71,0:20:41.04,BottomCenter,,0000,0000,0000,,Hey, Big Brother!
+Dialogue: 0,0:20:41.13,0:20:44.29,BottomCenter,,0000,0000,0000,,You put weird ideas in the naked\Nlady's head again, didn't you?!
+Dialogue: 0,0:20:44.38,0:20:48.04,BottomCenter,,0000,0000,0000,,So I can take this to mean\Nthat she is not an issue?
+Dialogue: 0,0:20:48.13,0:20:49.50,BottomCenter,,0000,0000,0000,,Yep, that's right.
+Dialogue: 0,0:20:49.58,0:20:52.33,BottomCenter,,0000,0000,0000,,Although what happens from\Nnow on is up to Meili,
+Dialogue: 0,0:20:52.42,0:20:55.04,BottomCenter,,0000,0000,0000,,who's gonna grow up watching our backs.
+Dialogue: 0,0:20:55.46,0:20:58.25,BottomCenter,,0000,0000,0000,,So don't let your back\Nlook spineless, yeah?
+Dialogue: 0,0:20:59.13,0:21:02.29,BottomCenter,,0000,0000,0000,,I see. It's a matter of appearances.
+Dialogue: 0,0:21:02.38,0:21:03.88,BottomCenter,,0000,0000,0000,,In that case, you can count on me.
+Dialogue: 0,0:21:03.96,0:21:06.21,BottomCenter,,0000,0000,0000,,I expect the best, Mr. Knight!
+Dialogue: 0,0:21:06.58,0:21:09.96,BottomCenter,,0000,0000,0000,,You and I are the closest things\Nshe has to a father, after all.
+Dialogue: 0,0:21:11.83,0:21:14.88,BottomCenter,,0000,0000,0000,,Then we will have to\Ngive it our best effort.
+Dialogue: 0,0:21:14.96,0:21:16.33,BottomCenter,,0000,0000,0000,,Yeah! Bring it on!
+Dialogue: 0,0:21:16.42,0:21:19.50,BottomCenter,,0000,0000,0000,,Th-That's right! I'm going\Nto treat Meili as...
+Dialogue: 0,0:21:21.54,0:21:25.33,TopCenter,,0000,0000,0000,,FROM NOW ON
+Dialogue: 0,0:21:26.96,0:21:28.29,BottomCenter,,0000,0000,0000,,Just a suggestion...
+Dialogue: 0,0:21:28.71,0:21:31.17,BottomCenter,,0000,0000,0000,,but why don't we put my\Namnesia aside for now?
+Dialogue: 0,0:21:31.25,0:21:32.21,BottomCenter,,0000,0000,0000,,What?
+Dialogue: 0,0:21:32.67,0:21:36.33,BottomCenter,,0000,0000,0000,,I'm really happy that you want\Nto help me get my memory back,
+Dialogue: 0,0:21:36.42,0:21:40.50,BottomCenter,,0000,0000,0000,,but no one here believes the tower\Nhad nothing to do with it, right?
+Dialogue: 0,0:21:41.21,0:21:45.50,BottomCenter,,0000,0000,0000,,I'm saying there's some connection\Nbetween this tower and my amnesia.
+Dialogue: 0,0:21:46.46,0:21:50.63,BottomCenter,,0000,0000,0000,,In other words, if we meet the\Nrequirements to conquer the tower,
+Dialogue: 0,0:21:50.71,0:21:53.83,BottomCenter,,0000,0000,0000,,we'll find the reason for\Nyour amnesia in the process,
+Dialogue: 0,0:21:53.92,0:21:55.96,BottomCenter,,0000,0000,0000,,and maybe even the key to fixing it.
+Dialogue: 0,0:21:56.25,0:21:57.29,BottomCenter,,0000,0000,0000,,Is that it?
+Dialogue: 0,0:21:57.38,0:21:59.50,BottomCenter,,0000,0000,0000,,Yes, yes! Exactly!
+Dialogue: 0,0:22:00.42,0:22:01.42,BottomCenter,,0000,0000,0000,,Of course...
+Dialogue: 0,0:22:02.00,0:22:05.50,BottomCenter,,0000,0000,0000,,that doesn't mean I think\NI should just stay this way.
+Dialogue: 0,0:22:05.58,0:22:08.25,BottomCenter,,0000,0000,0000,,But I want to do what we came here to do.
+Dialogue: 0,0:22:09.75,0:22:13.38,BottomCenter,,0000,0000,0000,,I'll endure the difficulty\Nthis time... but...
+Dialogue: 0,0:22:14.00,0:22:15.00,BottomCenter,,0000,0000,0000,,But?
+Dialogue: 0,0:22:16.58,0:22:21.79,BottomCenter,,0000,0000,0000,,Let me worry about you more than anyone\Nelse every now and then, all right?
+Dialogue: 0,0:22:21.88,0:22:23.79,BottomCenter,,0000,0000,0000,,Uh... sorry.
+Dialogue: 0,0:22:24.88,0:22:27.54,BottomCenter,,0000,0000,0000,,Emilia said what I was\Ngoing to say, I suppose.
+Dialogue: 0,0:22:27.63,0:22:29.25,BottomCenter,,0000,0000,0000,,You'd better reflect long\Nand hard on this.
+Dialogue: 0,0:22:29.33,0:22:31.04,BottomCenter,,0000,0000,0000,,Yeah, I know.
+Dialogue: 0,0:22:31.13,0:22:33.54,BottomCenter,,0000,0000,0000,,And what, specifically,\Nare we going to do?
+Dialogue: 0,0:22:33.83,0:22:37.29,BottomCenter,,0000,0000,0000,,First of all, we need\Nto get past the exams.
+Dialogue: 0,0:22:37.38,0:22:43.04,BottomCenter,,0000,0000,0000,,And the best way to do that is to figure\Nout what Reid's weakness is, right?
+Dialogue: 0,0:22:43.50,0:22:44.50,BottomCenter,,0000,0000,0000,,So...
+Dialogue: 0,0:22:45.46,0:22:49.92,BottomCenter,,0000,0000,0000,,why don't we all search the\Narchive for Reid's book?
+

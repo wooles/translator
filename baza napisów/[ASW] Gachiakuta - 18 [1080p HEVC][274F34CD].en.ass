@@ -1,0 +1,209 @@
+[Script Info]
+Title: English (US)
+Original Translation: 
+Original Editing: 
+Original Timing: 
+Synch Point: 
+Script Updated By: 
+Update Details: 
+ScriptType: v4.00+
+Collisions: Normal
+PlayResX: 640
+PlayResY: 360
+WrapStyle: 0
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Roboto Medium,26,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1.3,0,2,20,20,23,0
+Style: main,Roboto Medium,26,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1.3,0,2,20,20,23,0
+Style: top,Roboto Medium,26,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1.3,0,8,20,20,23,0
+Style: italics,Roboto Medium,26,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,-1,0,0,100,100,0,0,1,1.3,0,2,20,20,23,0
+Style: italicstop,Roboto Medium,26,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,-1,0,0,100,100,0,0,1,1.3,0,8,20,20,23,0
+Style: flashback,Roboto Medium,26,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1.3,0,2,20,20,23,1
+Style: flashback italics,Roboto Medium,26,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,-1,0,0,100,100,0,0,1,1.3,0,2,20,20,23,1
+Style: flashbacktop,Roboto Medium,26,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1.3,0,8,20,20,23,0
+Style: flashbackitalicstop,Roboto Medium,26,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,-1,0,0,100,100,0,0,1,1.3,0,8,20,20,23,0
+Style: overlap,Roboto Medium,26,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1.3,0,2,20,20,23,0
+Style: overlaptop,Roboto Medium,26,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1.3,0,8,20,20,23,0
+Style: overlap italics,Roboto Medium,26,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,-1,0,0,100,100,0,0,1,1.3,0,2,20,20,23,0
+Style: sign_Arial,Arial,20,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,2,2,2,30,30,20,1
+Style: sign_ArialBlack,Trebuchet MS,20,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,2,2,2,30,30,20,1
+Style: sign_CourierNew,Trebuchet MS,20,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,2,2,2,30,30,20,1
+Style: sign_ComicSansMS,Comic Sans MS,20,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,2,2,2,30,30,20,1
+Style: sign_Georgia,Trebuchet MS,20,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,2,2,2,30,30,20,1
+Style: sign_Impact,Trebuchet MS,20,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,2,30,30,20,1
+Style: sign_TimesNewRoman,Times New Roman,20,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,2,2,2,30,30,20,1
+Style: sign_TrebuchetMS,Trebuchet MS,20,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,2,2,2,30,30,20,1
+Style: sign_Verdana,Verdana,20,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,2,2,2,30,30,20,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:32.85,0:00:38.68,main,Jabber,0,0,0,,The party can't last forever, Zanka old pal.
+Dialogue: 0,0:00:45.36,0:00:48.90,main,Jabber,0,0,0,,Guess I'd better offer you up \Nto the trash beast now.
+Dialogue: 0,0:00:59.62,0:01:04.67,main,Jabber,0,0,0,,Good ol' Jabber carried out \Nhis mission like a champ!
+Dialogue: 0,0:01:12.18,0:01:16.18,main,Jabber,0,0,0,,Can't wait to get my reward from the boss!
+Dialogue: 0,0:01:29.78,0:01:31.45,main,Jabber,0,0,0,,The hell?!
+Dialogue: 0,0:03:11.55,0:03:12.92,main,Fu,0,0,0,,Crap.
+Dialogue: 0,0:03:14.09,0:03:20.22,main,Fu,0,0,0,,Crap, crap, crap, crap, crap...
+Dialogue: 0,0:03:21.10,0:03:24.64,main,Fu,0,0,0,,People might be finishing \Ntheir fights already.
+Dialogue: 0,0:03:25.81,0:03:30.48,main,Fu,0,0,0,,I-If I don't hurry, I'll end up dead last...
+Dialogue: 0,0:03:30.81,0:03:33.82,main,Fu,0,0,0,,But... Does that mean I have to start?
+Dialogue: 0,0:03:34.90,0:03:37.95,main,Fu,0,0,0,,I don't know how to start a fight.
+Dialogue: 0,0:03:38.95,0:03:41.08,main,Fu,0,0,0,,Wh-Wh-What do I do?!
+Dialogue: 0,0:03:43.49,0:03:45.08,main,Fu,0,0,0,,H-Hey...
+Dialogue: 0,0:03:45.08,0:03:48.58,main,Fu,0,0,0,,S-So, m-mi-mister...
+Dialogue: 0,0:03:48.58,0:03:50.33,main,Enjin,0,0,0,,Mimister?
+Dialogue: 0,0:03:50.33,0:03:52.59,main,Fu,0,0,0,,My name... um...
+Dialogue: 0,0:03:53.09,0:03:54.38,main,Fu,0,0,0,,What was it again?
+Dialogue: 0,0:03:55.17,0:03:58.38,main,Fu,0,0,0,,Ah, um, Fu Oros...tor...
+Dialogue: 0,0:03:58.38,0:04:00.64,main,Enjin,0,0,0,,Umfuoros?
+Dialogue: 0,0:04:01.05,0:04:03.68,main,Enjin,0,0,0,,Got it. I'm Enjin.
+Dialogue: 0,0:04:09.10,0:04:14.69,main,Fu,0,0,0,,M-Mr. Zodyl... m-my boss... \Ntold me this thing...
+Dialogue: 0,0:04:14.69,0:04:20.16,main,Fu,0,0,0,,"We've gotta make the other Cleaners \Nwe brought here into offerings."
+Dialogue: 0,0:04:20.45,0:04:22.12,italics,Enjin,0,0,0,,Offerings?
+Dialogue: 0,0:04:22.12,0:04:24.79,main,Fu,0,0,0,,I know I can do that...
+Dialogue: 0,0:04:24.79,0:04:28.79,main,Fu,0,0,0,,but he told me to get it done \Nbefore the other Raiders do.
+Dialogue: 0,0:04:29.54,0:04:32.25,main,Fu,0,0,0,,If... I end up in last place...
+Dialogue: 0,0:04:40.13,0:04:44.01,main,Fu,0,0,0,,S-So... I gotta get our fight started already!
+Dialogue: 0,0:04:47.98,0:04:49.64,main,Fu,0,0,0,,Y-Yeah!
+Dialogue: 0,0:04:51.94,0:04:55.86,main,Fu,0,0,0,,So anyway, could you \Nplease maybe hit me first?!
+Dialogue: 0,0:05:13.58,0:05:15.09,main,Enjin,0,0,0,,That'll be a no.
+Dialogue: 0,0:05:17.59,0:05:19.59,sign_ComicSansMS,sign,0,0,0,,{\an8\c&HACB4AE&\fs30}A little while earlier...
+Dialogue: 0,0:05:53.54,0:05:57.50,sign_ArialBlack,title,0,0,0,,{\pos(320,135)\shad0\bord0\fs8\fad(351,1)}Episode 18
+Dialogue: 0,0:05:53.54,0:05:57.50,sign_ArialBlack,title,0,0,0,,{\an8\pos(323,220)\fs35\shad0\bord0\fad(351,1)\fscx75}Oh Zap, Totes Legit
+Dialogue: 0,0:06:14.31,0:06:18.11,main,Noerde,0,0,0,,Using wind to throw my hair off \Nwithout touching it?
+Dialogue: 0,0:06:18.82,0:06:21.32,main,Noerde,0,0,0,,But how long will that work?
+Dialogue: 0,0:06:39.63,0:06:42.97,main,Noerde,0,0,0,,You wretch! Don't you turn your back on me!
+Dialogue: 0,0:06:53.10,0:06:54.69,main,Noerde,0,0,0,,You're trying my last nerve!
+Dialogue: 0,0:06:55.19,0:06:57.02,main,Noerde,0,0,0,,You think you can sneak around
+Dialogue: 0,0:06:59.65,0:07:02.99,main,Noerde,0,0,0,,and catch me unawares?!
+Dialogue: 0,0:07:07.03,0:07:10.20,main,Noerde,0,0,0,,You slippery little snake!
+Dialogue: 0,0:07:10.87,0:07:13.95,main,Noerde,0,0,0,,I truly despise women like you!
+Dialogue: 0,0:07:14.41,0:07:16.08,main,Noerde,0,0,0,,Come out this instant!
+Dialogue: 0,0:07:16.12,0:07:20.21,main,Noerde,0,0,0,,Are you not also a warrior \Nwho chose the path of battle?!
+Dialogue: 0,0:07:20.21,0:07:25.38,main,Noerde,0,0,0,,A true warrior would face me head-on!
+Dialogue: 0,0:07:26.93,0:07:29.01,main,Riyo,0,0,0,,I was right on the money.
+Dialogue: 0,0:07:29.01,0:07:31.68,main,Riyo,0,0,0,,Your little zappy-zap mode...
+Dialogue: 0,0:07:33.14,0:07:35.93,main,Riyo,0,0,0,,It's got a time limit, doesn't it?!
+Dialogue: 0,0:07:41.65,0:07:42.94,italics,Riyo,0,0,0,,She dodged it?
+Dialogue: 0,0:08:01.67,0:08:05.55,main,Noerde,0,0,0,,I wasn't about to let you cut my hair twice.
+Dialogue: 0,0:08:06.42,0:08:11.09,main,Noerde,0,0,0,,Just as one learns to perform \Nfiery Latin dances in heels,
+Dialogue: 0,0:08:11.09,0:08:16.27,main,Noerde,0,0,0,,I can move my hair \Nas if it has nerve endings.
+Dialogue: 0,0:08:16.77,0:08:20.15,main,Noerde,0,0,0,,How long do you think I've had this long hair?
+Dialogue: 0,0:08:20.15,0:08:21.94,main,Noerde,0,0,0,,Don't take me lightly!
+Dialogue: 0,0:08:24.44,0:08:26.07,main,Riyo,0,0,0,,You're pretty legit.
+Dialogue: 0,0:08:27.03,0:08:31.45,main,Riyo,0,0,0,,I've never met someone \Nwith such pride in their long hair.
+Dialogue: 0,0:08:31.82,0:08:34.33,main,Noerde,0,0,0,,But you're right...
+Dialogue: 0,0:08:34.87,0:08:39.58,main,Noerde,0,0,0,,The static electricity charged \Nby Milet here does have a time limit.
+Dialogue: 0,0:08:39.87,0:08:42.46,main,Noerde,0,0,0,,I can willingly put it out as well,
+Dialogue: 0,0:08:42.46,0:08:46.21,main,Noerde,0,0,0,,but I can't get it to last longer \Nthan a minute or two.
+Dialogue: 0,0:08:47.17,0:08:49.17,main,Noerde,0,0,0,,It's not all-powerful.
+Dialogue: 0,0:08:49.88,0:08:53.10,main,Riyo,0,0,0,,Well, hey, I'm glad to hear that.
+Dialogue: 0,0:08:53.89,0:08:57.43,main,Riyo,0,0,0,,I thought maybe wind \Nmight be your weak point...
+Dialogue: 0,0:08:57.81,0:09:02.52,main,Riyo,0,0,0,,I was getting kind of nervous I might \Nhave to get these windmills working!
+Dialogue: 0,0:09:03.56,0:09:06.61,main,Riyo,0,0,0,,Nice to know the time limit \Nis your weak point instead.
+Dialogue: 0,0:09:08.82,0:09:11.28,main,Noerde,0,0,0,,You're optimistic, Riyo.
+Dialogue: 0,0:09:11.95,0:09:15.03,main,Noerde,0,0,0,,I know how to compensate for my weak point.
+Dialogue: 0,0:09:15.03,0:09:16.99,main,Noerde,0,0,0,,That's what makes me a warrior.
+Dialogue: 0,0:09:26.34,0:09:27.84,italics,Riyo,0,0,0,,The way she moves...
+Dialogue: 0,0:09:28.13,0:09:30.47,main,Riyo,0,0,0,,Noerde! What was your last job?
+Dialogue: 0,0:09:34.05,0:09:36.93,main,Noerde,0,0,0,,I lived in a village of women \Nin the southern lands...
+Dialogue: 0,0:09:37.35,0:09:41.89,main,Noerde,0,0,0,,The warrior tribe, Sileia!
+Dialogue: 0,0:09:43.81,0:09:45.98,main,Riyo,0,0,0,,Sorry! Never heard of it.
+Dialogue: 0,0:09:45.98,0:09:48.48,main,Noerde,0,0,0,,That's unsurprising.
+Dialogue: 0,0:09:49.36,0:09:52.65,main,Noerde,0,0,0,,It was destroyed a long time ago!
+Dialogue: 0,0:09:59.45,0:10:03.96,main,Noerde,0,0,0,,The way you move isn't suited \Nto a large weapon like that.
+Dialogue: 0,0:10:08.25,0:10:10.84,main,Riyo,0,0,0,,Nah, it totally is.
+Dialogue: 0,0:10:11.76,0:10:15.18,main,Riyo,0,0,0,,But I'll admit...
+Dialogue: 0,0:10:16.22,0:10:20.18,main,Riyo,0,0,0,,I'm much better fighting alone.
+Dialogue: 0,0:10:23.69,0:10:25.73,main,Noerde,0,0,0,,Who the hell are you?
+Dialogue: 0,0:10:26.61,0:10:28.07,main,Riyo,0,0,0,,I'm Riyo.
+Dialogue: 0,0:13:02.59,0:13:05.10,main,Noerde,0,0,0,,You weren't a kitten after all.
+Dialogue: 0,0:13:09.35,0:13:10.35,main,Noerde,0,0,0,,But...
+Dialogue: 0,0:13:11.69,0:13:14.36,main,Noerde,0,0,0,,You're still just a kitty-cat.
+Dialogue: 0,0:13:20.74,0:13:22.11,main,Riyo,0,0,0,,Hey.
+Dialogue: 0,0:13:22.36,0:13:25.99,main,Riyo,0,0,0,,No one could hear a cry \Nfor help from here, right?
+Dialogue: 0,0:13:26.41,0:13:30.21,main,Noerde,0,0,0,,No. There's no escape from here.
+Dialogue: 0,0:13:31.08,0:13:32.67,main,Riyo,0,0,0,,I see.
+Dialogue: 0,0:13:33.92,0:13:36.34,main,Riyo,0,0,0,,No one can hear, huh?
+Dialogue: 0,0:13:37.50,0:13:40.55,main,Noerde,0,0,0,,Don't worry. Once this is over,
+Dialogue: 0,0:13:40.84,0:13:43.51,main,Noerde,0,0,0,,you'll be offered up \Nalongside your companions.
+Dialogue: 0,0:13:46.14,0:13:47.43,main,Noerde,0,0,0,,Hey...
+Dialogue: 0,0:14:35.02,0:14:36.40,main,Noerde,0,0,0,,Why...
+Dialogue: 0,0:14:36.98,0:14:39.36,main,Noerde,0,0,0,,Why do you have that thing?!
+Dialogue: 0,0:14:40.69,0:14:44.78,main,Riyo,0,0,0,,Enjin said I can't kill people anymore.
+Dialogue: 0,0:14:45.66,0:14:49.16,main,Riyo,0,0,0,,So I was trying really hard \Nto fight without killing you.
+Dialogue: 0,0:14:49.70,0:14:53.46,main,Riyo,0,0,0,,But you're just too strong, \Nso I ended up having to use it.
+Dialogue: 0,0:14:54.87,0:14:57.88,main,Riyo,0,0,0,,Thankfully, it seems like nobody can hear it.
+Dialogue: 0,0:14:58.13,0:15:00.50,main,Riyo,0,0,0,,I want to finish things here \Nso I can get going.
+Dialogue: 0,0:15:01.92,0:15:05.80,main,Riyo,0,0,0,,I have to protect my team from the enemy.
+Dialogue: 0,0:15:08.01,0:15:12.31,main,Riyo,0,0,0,,Don't worry. Those scissors \Nare my only vital instrument.
+Dialogue: 0,0:15:12.31,0:15:15.89,main,Riyo,0,0,0,,I'll never stain them with blood again.
+Dialogue: 0,0:15:16.44,0:15:18.81,main,Riyo,0,0,0,,That's a promise I made a long time ago.
+Dialogue: 0,0:15:19.56,0:15:22.78,main,Riyo,0,0,0,,This is an ordinary gun I got \Nfrom my boss at my last job.
+Dialogue: 0,0:15:23.44,0:15:25.28,main,Riyo,0,0,0,,A parting gift.
+Dialogue: 0,0:15:25.82,0:15:27.74,main,Noerde,0,0,0,,Don't tell me, you're...
+Dialogue: 0,0:15:28.70,0:15:30.33,main,Noerde,0,0,0,,a professional killer?!
+Dialogue: 0,0:15:38.88,0:15:43.09,main,Riyo,0,0,0,,That's going to have to \Nbe our little secret, okay?
+Dialogue: 0,0:15:44.21,0:15:48.47,main,Riyo,0,0,0,,Lucky for you, Enjin's got me on a leash now.
+Dialogue: 0,0:15:48.47,0:15:50.43,main,Riyo,0,0,0,,That means you get to live.
+Dialogue: 0,0:15:51.22,0:15:54.39,main,Riyo,0,0,0,,You can't move now, \Nbut I made sure it was a flesh wound.
+Dialogue: 0,0:15:54.39,0:15:57.23,main,Riyo,0,0,0,,Make sure that manhole kid saves you.
+Dialogue: 0,0:15:59.48,0:16:03.32,main,Riyo,0,0,0,,I'm gonna go look for the rest of my team now.
+Dialogue: 0,0:16:07.65,0:16:09.95,main,Riyo,0,0,0,,You know where they are?
+Dialogue: 0,0:16:13.66,0:16:18.79,italics,Noerde,0,0,0,,I just assumed the Cleaners \Nwould like to keep their hands clean...
+Dialogue: 0,0:16:23.55,0:16:26.51,italics,Noerde,0,0,0,,There's some real dirty bastards there.
+Dialogue: 0,0:16:30.14,0:16:36.10,main,Riyo,0,0,0,,Only the manhole kid and the Raiders' boss \Nknow where they are, huh?
+Dialogue: 0,0:16:37.35,0:16:41.23,main,Riyo,0,0,0,,And she said these pipes link \Ntogether like blood vessels...
+Dialogue: 0,0:16:41.56,0:16:44.11,main,Riyo,0,0,0,,Won't be easy to find them.
+Dialogue: 0,0:17:03.17,0:17:06.13,flashback,Riyo,0,0,0,,I wanna know more about you.
+Dialogue: 0,0:17:06.13,0:17:07.21,flashback,Riyo,0,0,0,,Okay?
+Dialogue: 0,0:17:10.13,0:17:13.14,main,Riyo,0,0,0,,I still don't know how Rudo will end up.
+Dialogue: 0,0:17:24.31,0:17:25.48,main,Riyo,0,0,0,,But...
+Dialogue: 0,0:17:34.66,0:17:35.74,flashback,Riyo,0,0,0,,Enjin.
+Dialogue: 0,0:17:36.37,0:17:40.12,flashback,Riyo,0,0,0,,Why don't I go and ask her what's what?
+Dialogue: 0,0:17:41.21,0:17:44.17,flashback,Rudo,0,0,0,,Let's you and me learn \Nto hold our hands out to others.
+Dialogue: 0,0:17:45.67,0:17:46.92,flashback,Rudo,0,0,0,,Together.
+Dialogue: 0,0:17:53.68,0:17:56.60,main,Riyo,0,0,0,,Could have just let her be.
+Dialogue: 0,0:17:58.39,0:18:00.89,sign_ComicSansMS,sign,0,0,0,,{\an8\c&HACB4AE&\fs30}Back to the Present
+Dialogue: 0,0:18:01.39,0:18:03.31,main,Jabber,0,0,0,,The hell?!
+Dialogue: 0,0:18:21.08,0:18:24.54,main,Riyo,0,0,0,,You're too stubborn to die, I'm sure.
+Dialogue: 0,0:18:30.38,0:18:33.47,main,Riyo,0,0,0,,Zanka? You okay?
+Dialogue: 0,0:18:35.30,0:18:37.26,main,Riyo,0,0,0,,Hey.
+Dialogue: 0,0:18:38.47,0:18:42.23,main,Riyo,0,0,0,,Oh, you're alive. Awesome.
+Dialogue: 0,0:18:42.23,0:18:45.19,main,Riyo,0,0,0,,Looks like he hit you \Nwith a pretty nasty toxin.
+Dialogue: 0,0:18:46.40,0:18:49.15,main,Riyo,0,0,0,,Guess we'd better get you out of here.
+Dialogue: 0,0:18:54.99,0:18:58.16,main,Riyo,0,0,0,,We need to get back and get you patched up.
+Dialogue: 0,0:19:15.80,0:19:17.43,main,Cthoni,0,0,0,,Jabber won.
+Dialogue: 0,0:19:18.14,0:19:19.97,main,Cthoni,0,0,0,,Noerde lost.
+Dialogue: 0,0:19:19.97,0:19:25.06,main,Cthoni,0,0,0,,Fu's still waiting for the umbrella-wielder \Nto make the first move.
+Dialogue: 0,0:19:26.06,0:19:31.98,main,Cthoni,0,0,0,,Bundus is talking to the "father-son" duo, \Ntrying to get info about the Cleaners' leader.
+Dialogue: 0,0:19:33.57,0:19:34.78,main,Zodyl,0,0,0,,Rudo.
+Dialogue: 0,0:19:36.11,0:19:39.37,main,Zodyl,0,0,0,,You Cleaners are tougher than I expected.
+Dialogue: 0,0:19:39.37,0:19:40.87,main,Rudo,0,0,0,,What's that supposed to mean?!
+Dialogue: 0,0:19:40.87,0:19:42.87,main,Rudo,0,0,0,,What are you doing to them?
+Dialogue: 0,0:19:43.20,0:19:45.00,main,Zodyl,0,0,0,,We should get moving.
+Dialogue: 0,0:20:07.39,0:20:09.81,main,Rudo,0,0,0,,Dammit... You...
+Dialogue: 0,0:20:09.81,0:20:12.36,main,Rudo,0,0,0,,Quit tossing me around!
+Dialogue: 0,0:20:12.36,0:20:16.15,main,Rudo,0,0,0,,You still haven't told me where we are,
+Dialogue: 0,0:20:16.15,0:20:18.66,main,Rudo,0,0,0,,why you're here, or what you want from me!
+Dialogue: 0,0:20:19.57,0:20:21.99,main,Rudo,0,0,0,,I'm gonna pound you, asshole!
+Dialogue: 0,0:20:21.99,0:20:26.45,main,Zodyl,0,0,0,,You just can't do anything \Nwithout cursing and flailing, can you?
+Dialogue: 0,0:20:27.29,0:20:29.96,main,Zodyl,0,0,0,,I made you an offer.
+Dialogue: 0,0:20:29.96,0:20:33.13,main,Zodyl,0,0,0,,"Want to take the Sphere down with me?"
+Dialogue: 0,0:20:34.21,0:20:37.88,main,Zodyl,0,0,0,,It's not your mouth \Nyou should be working right now.
+Dialogue: 0,0:20:38.51,0:20:42.55,main,Zodyl,0,0,0,,It's your brain—considering whether to accept.
+Dialogue: 0,0:20:44.10,0:20:48.60,main,Zodyl,0,0,0,,Are you the kind of person who can't \Ndo anything unless it's all laid out for you?
+Dialogue: 0,0:20:49.94,0:20:52.48,main,Zodyl,0,0,0,,Should I prepare a picture book?
+Dialogue: 0,0:20:53.82,0:20:57.28,main,Rudo,0,0,0,,Well, I've got one thing worked out!
+Dialogue: 0,0:20:58.44,0:21:00.82,main,Rudo,0,0,0,,You're just the kind of asshole I hate!
+Dialogue: 0,0:21:04.08,0:21:08.29,main,Zodyl,0,0,0,,I wish a more level-headed Sphereite \Nhad fallen down here instead.
+Dialogue: 0,0:21:14.88,0:21:18.97,main,Zodyl,0,0,0,,I doubt you have anything to contribute \Nregarding a plan to reach the Sphere.
+Dialogue: 0,0:21:20.51,0:21:23.09,main,Zodyl,0,0,0,,Allow me to show you, then.
+Dialogue: 0,0:21:41.49,0:21:44.12,main,Zodyl,0,0,0,,The Watchman series—
+Dialogue: 0,0:21:47.74,0:21:49.83,main,Zodyl,0,0,0,,Your gloves.
+Dialogue: 0,0:21:50.71,0:21:52.50,main,Zodyl,0,0,0,,My coat.
+Dialogue: 0,0:21:53.54,0:21:56.00,main,Zodyl,0,0,0,,And these boots.
+Dialogue: 0,0:21:57.96,0:22:03.30,main,Zodyl,0,0,0,,I was trying to create my own entries \Nin the Watchman series.
+

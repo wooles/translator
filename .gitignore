@@ -1,0 +1,41 @@
+# Environment & Secrets (BEZWZGLĘDNIE CHRONIONE)
+.env
+*.env
+.venv/
+env/
+venv/
+
+# AI Models & Large Weights (1.5GB+)
+.models/
+models/
+
+# Database & Checkpoints
+*.checkpoint.json
+*.profile.json
+*.db
+*.sqlite
+*.sqlite3
+
+# Temporary Media & Subtitles
+temp/
+*.tmp
+*.log
+frames/
+test_output/
+*.pl.srt
+*.pl.ass
+*.wav
+*.mp3
+*.mkv
+*.mp4
+*.avi
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# OS files
+.DS_Store
+Thumbs.db

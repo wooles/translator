@@ -1,0 +1,400 @@
+[Script Info]
+Title: [Erai-raws]
+ScriptType: v4.00+
+WrapStyle: 0
+PlayResX: 640
+PlayResY: 360
+LayoutResX: 640
+LayoutResY: 360
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,SPOverrideF,25,&H00FFFFFF,&H000000FF,&H00000000,&HA0000000,-1,0,0,0,100,100,0,0,1,1.2,0.5,2,20,20,20,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:00.72,0:00:03.19,Default,COMET,0,0,0,,Welcome to the world of the Gnosia!
+Dialogue: 0,0:00:04.17,0:00:05.57,Default,YURI,0,0,0,,Gnosia?
+Dialogue: 0,0:00:05.57,0:00:09.99,Default,COMET,0,0,0,,So, I'm really good at seeing through lies, \Nbut I suck at lying myself.
+Dialogue: 0,0:00:10.50,0:00:11.45,Default,YURI,0,0,0,,Huh?
+Dialogue: 0,0:00:12.01,0:00:14.55,Default,COMET,0,0,0,,That's why I'm gonna \Napologize in advance. Sorry!
+Dialogue: 0,0:00:14.55,0:00:17.04,Default,COMET,0,0,0,,If it looks like I'm done for, \Njust abandon me.
+Dialogue: 0,0:00:19.07,0:00:20.35,Default,YURI,0,0,0,,A Gnosia...
+Dialogue: 0,0:00:20.98,0:00:23.39,Default,YURI,0,0,0,,I'm... a Gnosia?!
+Dialogue: 0,0:02:09.20,0:02:14.12,Default,SIGN,0,0,0,,{\an8}EPISODE 9: WORLD OF GNOSIA
+Dialogue: 0,0:01:59.62,0:02:02.90,Default,COMET,0,0,0,,By the way, there's one more of us. \NSha-ming is also a Gnosia.
+Dialogue: 0,0:02:04.43,0:02:07.75,Default,COMET,0,0,0,,If the real Engineer steps \Nforward during the meeting,
+Dialogue: 0,0:02:07.75,0:02:11.37,Default,COMET,0,0,0,,I'm also supposed to claim Engineer.
+Dialogue: 0,0:02:12.32,0:02:14.74,Default,COMET,0,0,0,,I'm not really confident \NI can pull it off, though.
+Dialogue: 0,0:02:15.98,0:02:17.46,Default,COMET,0,0,0,,Anyway, I'm gonna get going.
+Dialogue: 0,0:02:17.77,0:02:20.67,Default,COMET,0,0,0,,We don't want people to suspect us, \Nso we should go separately.
+Dialogue: 0,0:02:20.67,0:02:22.98,Default,COMET,0,0,0,,Well, see you in the main control room.
+Dialogue: 0,0:02:23.33,0:02:24.56,Default,YURI,0,0,0,,Wait.
+Dialogue: 0,0:02:25.75,0:02:28.18,Default,YURI,0,0,0,,Comet, um...
+Dialogue: 0,0:02:28.18,0:02:29.76,Default,YURI,0,0,0,,You're really okay with this?
+Dialogue: 0,0:02:29.76,0:02:34.11,Default,YURI,0,0,0,,Deceiving everyone like this \Nand trying to take over the ship.
+Dialogue: 0,0:02:36.10,0:02:37.63,Default,COMET,0,0,0,,Right?
+Dialogue: 0,0:02:38.26,0:02:41.80,Default,COMET,0,0,0,,I'd be lying if I said I didn't feel \Nat all bad about it, but...
+Dialogue: 0,0:02:42.26,0:02:45.63,Default,COMET,0,0,0,,I don't want to die. \NEven if this is the hand I've been dealt.
+Dialogue: 0,0:02:47.08,0:02:52.08,Default,CHIPIE,0,0,0,,But even after becoming a Gnosia, \Nmy desire to be a cat didn't suddenly change.
+Dialogue: 0,0:02:52.48,0:02:55.24,Default,SETSU,0,0,0,,But just promise me this.
+Dialogue: 0,0:02:55.24,0:02:58.95,Default,SETSU,0,0,0,,No matter the world line, I want you \Nto play your role to the best of your ability.
+Dialogue: 0,0:03:05.52,0:03:08.24,Default,YURI,0,0,0,,{\i1}So this is everyone.
+Dialogue: 0,0:03:11.17,0:03:12.22,Default,SETSU,0,0,0,,All right.
+Dialogue: 0,0:03:12.22,0:03:15.09,Default,SETSU,0,0,0,,It looks like we're all here, \Nso let's get started.
+Dialogue: 0,0:03:15.09,0:03:16.19,Default,SETSU,0,0,0,,LeVi.
+Dialogue: 0,0:03:16.19,0:03:17.55,Default,LEVI,0,0,0,,{\i1}As you wish.
+Dialogue: 0,0:03:21.68,0:03:24.39,Default,SETSU,0,0,0,,Out of the ten of us who \Nescaped onto this ship,
+Dialogue: 0,0:03:24.70,0:03:28.11,Default,SETSU,0,0,0,,there are three Gnosia infectees.
+Dialogue: 0,0:03:28.11,0:03:30.69,Default,SHIGEMICHI,0,0,0,,Wait, seriously? Three of them?!
+Dialogue: 0,0:03:30.69,0:03:35.32,Default,RACIO,0,0,0,,So considering we will lose one during \Nthe meeting and another during the warp,
+Dialogue: 0,0:03:35.32,0:03:38.13,Default,RACIO,0,0,0,,after two days, we will have \Nlost four, leaving just six.
+Dialogue: 0,0:03:38.49,0:03:43.04,Default,RACIO,0,0,0,,If there are three Gnosia remaining \Nat that point, we're done for.
+Dialogue: 0,0:03:43.04,0:03:45.37,Default,COMET,0,0,0,,What? So we only have two days?
+Dialogue: 0,0:03:45.65,0:03:48.58,Default,YURIKO,0,0,0,,It simply means we'll have to \Nidentify them without delay.
+Dialogue: 0,0:03:48.58,0:03:51.18,Default,YURIKO,0,0,0,,Who is the Engineer? \NDeclare yourself at once.
+Dialogue: 0,0:03:51.18,0:03:54.83,Default,SQ,0,0,0,,You'll never believe this, \Nbut cute li'l SQ is the Engineer!
+Dialogue: 0,0:03:54.83,0:03:56.56,Default,SQ,0,0,0,,If there are Gnosia around,
+Dialogue: 0,0:03:56.56,0:03:59.81,Default,SQ,0,0,0,,I'll go bam, bam, \Nand find 'em just like that!
+Dialogue: 0,0:04:00.68,0:04:02.77,Default,SETSU,0,0,0,,Is anyone else going to claim Engineer?
+Dialogue: 0,0:04:05.80,0:04:07.89,Default,COMET,0,0,0,,Hey, something's wrong here.
+Dialogue: 0,0:04:07.89,0:04:10.65,Default,COMET,0,0,0,,I should be the only \NEngineer on this ship...
+Dialogue: 0,0:04:11.23,0:04:13.40,Default,COMET,0,0,0,,even if I'm terrible with machines.
+Dialogue: 0,0:04:13.72,0:04:16.57,Default,SHA-MING,0,0,0,,Which means one of these two is a Gnosia.
+Dialogue: 0,0:04:16.98,0:04:19.45,Default,SHA-MING,0,0,0,,Man, talk about a pain in the ass.
+Dialogue: 0,0:04:19.83,0:04:23.40,Default,YURI,0,0,0,,{\i1}They're participating in \Nthe meeting like normal.
+Dialogue: 0,0:04:23.40,0:04:25.35,Default,YURI,0,0,0,,{\i1}I have to say something, too.
+Dialogue: 0,0:04:25.35,0:04:28.72,Default,YURI,0,0,0,,LeVi, is there a Doctor or Guardian Angel?
+Dialogue: 0,0:04:28.72,0:04:33.44,Default,LEVI,0,0,0,,{\i1}Affirmative. Both a Doctor and a \NGuardian Angel have been appointed.
+Dialogue: 0,0:04:33.44,0:04:35.43,Default,LEVI,0,0,0,,{\i1}Though I am unaware of who they might be.
+Dialogue: 0,0:04:35.98,0:04:37.90,Default,SETSU,0,0,0,,Is anyone going to claim either role?
+Dialogue: 0,0:04:38.47,0:04:43.26,Default,RACIO,0,0,0,,The Doctor is only useful after someone \Nhas been put into cold sleep.
+Dialogue: 0,0:04:43.26,0:04:46.10,Default,RACIO,0,0,0,,And it's too risky for the Guardian \NAngel to out themselves.
+Dialogue: 0,0:04:46.10,0:04:48.88,Default,RACIO,0,0,0,,It makes perfect sense for them \Nto stay silent right now.
+Dialogue: 0,0:04:48.88,0:04:50.97,Default,YURI,0,0,0,,Was anyone on Guard Duty?
+Dialogue: 0,0:04:50.97,0:04:53.95,Default,LEVI,0,0,0,,{\i1}It appears that no one was on Guard Duty.
+Dialogue: 0,0:04:53.95,0:04:59.92,Default,OTOME,0,0,0,,In other words, any of us could be a Gnosia.
+Dialogue: 0,0:05:00.41,0:05:02.92,Default,YURI,0,0,0,,{\i1}Which will make us that \Nmuch harder to identify.
+Dialogue: 0,0:05:02.92,0:05:05.46,Default,YURI,0,0,0,,{\i1}This is all very much in our favor.
+Dialogue: 0,0:05:06.33,0:05:08.50,Default,SHIGEMICHI,0,0,0,,Then how're we gonna identify any of them?
+Dialogue: 0,0:05:08.50,0:05:10.69,Default,SHIGEMICHI,0,0,0,,Guess we just gotta pick whoever \Nlooks most suspicious—
+Dialogue: 0,0:05:10.69,0:05:12.80,Default,SHIGEMICHI,0,0,0,,Whoa! This has way too much sugar!
+Dialogue: 0,0:05:12.80,0:05:16.26,Default,YURIKO,0,0,0,,By that logic, you're asking \Nto be the one frozen.
+Dialogue: 0,0:05:16.53,0:05:17.95,Default,SHIGEMICHI,0,0,0,,Wait, really?
+Dialogue: 0,0:05:17.95,0:05:20.20,Default,YURI,0,0,0,,{\i1}What Shigemichi is saying is true, though.
+Dialogue: 0,0:05:20.20,0:05:23.10,Default,YURI,0,0,0,,{\i1}We don't have much to identify \Nanyone by on the first day.
+Dialogue: 0,0:05:23.10,0:05:25.11,Default,YURI,0,0,0,,{\i1}We'll just have to go \Nwith first impressions.
+Dialogue: 0,0:05:25.11,0:05:27.52,Default,SETSU,0,0,0,,I actually have a proposal, \Nif you'll all listen.
+Dialogue: 0,0:05:27.52,0:05:28.44,Default,YURI,0,0,0,,{\i1}Setsu?
+Dialogue: 0,0:05:28.77,0:05:31.95,Default,SETSU,0,0,0,,They say a lie comes out in one's \Nexpressions and mannerisms,
+Dialogue: 0,0:05:31.95,0:05:34.52,Default,SETSU,0,0,0,,so could you all say...
+Dialogue: 0,0:05:35.00,0:05:37.16,Default,SETSU,0,0,0,,that you're human?
+Dialogue: 0,0:05:38.31,0:05:41.71,Default,SHA-MING,0,0,0,,Sure. I'm just a plain ol' human.
+Dialogue: 0,0:05:41.71,0:05:44.58,Default,YURIKO,0,0,0,,Yes, I am human. Unfortunately.
+Dialogue: 0,0:05:44.58,0:05:47.84,Default,SQ,0,0,0,,Me next! Precious li'l SQ is human!
+Dialogue: 0,0:05:47.84,0:05:50.90,Default,RACIO,0,0,0,,I can't say that I approve of this method.
+Dialogue: 0,0:05:50.90,0:05:54.55,Default,RACIO,0,0,0,,Though I'm human, \Nso it's no skin off my back.
+Dialogue: 0,0:05:54.55,0:05:58.02,Default,OTOME,0,0,0,,Can I... actually call myself human?
+Dialogue: 0,0:05:58.02,0:06:00.60,Default,OTOME,0,0,0,,Well, I'm certainly not Gnosia, at least.
+Dialogue: 0,0:06:00.60,0:06:02.80,Default,JINA,0,0,0,,I'm... human.
+Dialogue: 0,0:06:02.80,0:06:06.14,Default,,0,0,0,,{\an8}CHECKING FOR CAVITIES...
+Dialogue: 0,0:06:03.29,0:06:06.15,Default,SHIGEMICHI,0,0,0,,I'm human, no matter what anyone else says!
+Dialogue: 0,0:06:06.42,0:06:08.62,Default,YURI,0,0,0,,{\i1}Crap. Well done, Setsu.
+Dialogue: 0,0:06:08.62,0:06:11.56,Default,YURI,0,0,0,,{\i1}This is a great way \Nto catch the Gnosia in a lie.
+Dialogue: 0,0:06:12.07,0:06:13.11,Default,SETSU,0,0,0,,Yuri.
+Dialogue: 0,0:06:13.11,0:06:16.12,Default,YURI,0,0,0,,Me? I'm human, of course.
+Dialogue: 0,0:06:16.49,0:06:20.12,Default,YURI,0,0,0,,{\i1}Did they see through me? \NOr was I convincing enough?
+Dialogue: 0,0:06:20.43,0:06:24.44,Default,COMET,0,0,0,,I-I really don't like being forced\N to say stuff like that...
+Dialogue: 0,0:06:24.79,0:06:26.33,Default,SETSU,0,0,0,,So you're refusing to say it?
+Dialogue: 0,0:06:26.56,0:06:29.00,Default,COMET,0,0,0,,No, not exactly...
+Dialogue: 0,0:06:29.26,0:06:32.20,Default,YURI,0,0,0,,{\i1}Crap... Her timing couldn't be worse.
+Dialogue: 0,0:06:32.20,0:06:33.86,Default,LEVI,0,0,0,,{\i1}There are five minutes remaining.
+Dialogue: 0,0:06:33.86,0:06:37.78,Default,YURI,0,0,0,,{\i1}Anyone who looks suspicious right at the end \Nhas a high chance of getting voted out.
+Dialogue: 0,0:06:37.78,0:06:39.00,Default,YURI,0,0,0,,{\i1}I need to do something.
+Dialogue: 0,0:06:39.00,0:06:43.47,Default,YURI,0,0,0,,For now, let's hold off on voting \Nfor the two who've claimed Engineer.
+Dialogue: 0,0:06:43.47,0:06:45.35,Default,SHIGEMICHI,0,0,0,,Huh? Why, though?
+Dialogue: 0,0:06:45.35,0:06:51.48,Default,RACIO,0,0,0,,It'd be a huge loss for the human side \Nif we froze the real Engineer, so I agree.
+Dialogue: 0,0:06:51.48,0:06:54.32,Default,SQ,0,0,0,,Ooh, like, way to go, Yurinchy!
+Dialogue: 0,0:06:54.32,0:06:56.68,Default,SQ,0,0,0,,I'm definitely feelin' your love \Nall the way over here!
+Dialogue: 0,0:06:57.53,0:07:02.61,Default,YURI,0,0,0,,I think this is the best path forward \Nwe have... to defeat the Gnosia.
+Dialogue: 0,0:07:06.32,0:07:09.53,Default,YURI,0,0,0,,{\i1}Before I knew it, I was lying \Nlike it was second nature.
+Dialogue: 0,0:07:09.53,0:07:12.30,Default,YURI,0,0,0,,{\i1}I was trying to fool them. All of them...
+Dialogue: 0,0:07:12.78,0:07:13.91,Default,YURI,0,0,0,,{\i1}All of the humans.
+Dialogue: 0,0:07:13.91,0:07:16.33,Default,LEVI,0,0,0,,{\i1}The votes will now be tallied.
+Dialogue: 0,0:07:31.28,0:07:35.62,Default,LEVI,0,0,0,,{\i1}Jina will be put into cold sleep.
+Dialogue: 0,0:07:37.23,0:07:40.40,Default,SETSU,0,0,0,,I'm sorry, but rules are rules.
+Dialogue: 0,0:07:40.79,0:07:44.09,Default,JINA,0,0,0,,It's okay. I'm actually a little relieved.
+Dialogue: 0,0:07:44.09,0:07:47.33,Default,JINA,0,0,0,,Now I don't have to worry about \Nbeing attacked by the Gnosia.
+Dialogue: 0,0:07:47.64,0:07:48.81,Default,YURI,0,0,0,,Jina...
+Dialogue: 0,0:07:49.76,0:07:54.41,Default,JINA,0,0,0,,I'd rather take my own life \Nthan be eliminated by a Gnosia.
+Dialogue: 0,0:07:54.81,0:07:58.65,Default,YURI,0,0,0,,Are you that afraid of being \Nattacked by the Gnosia?
+Dialogue: 0,0:07:58.65,0:08:00.46,Default,JINA,0,0,0,,Yes, I am.
+Dialogue: 0,0:08:00.46,0:08:03.89,Default,JINA,0,0,0,,Having to abandon my body while my \Nsoul goes off to somewhere unknown...
+Dialogue: 0,0:08:03.89,0:08:06.16,Default,JINA,0,0,0,,If that's really what \Nhappens, I'd rather die.
+Dialogue: 0,0:08:06.84,0:08:09.21,Default,JINA,0,0,0,,Well... Goodnight.
+Dialogue: 0,0:08:16.57,0:08:19.66,Default,YURI,0,0,0,,{\i1}Is this... really okay?
+Dialogue: 0,0:08:28.48,0:08:30.52,Default,YURI,0,0,0,,{\i1}It filled up a little more.
+Dialogue: 0,0:08:33.56,0:08:36.04,Default,SQ,0,0,0,,Yo! Yo, yo!
+Dialogue: 0,0:08:36.37,0:08:39.52,Default,SQ,0,0,0,,Ooh, you're awake. Got a minute?
+Dialogue: 0,0:08:39.52,0:08:41.01,Default,YURI,0,0,0,,Wh-What is it?
+Dialogue: 0,0:08:41.01,0:08:44.60,Default,SQ,0,0,0,,Well, I just wanted to thank you.
+Dialogue: 0,0:08:45.16,0:08:47.76,Default,SQ,0,0,0,,Thanks for protecting me earlier.
+Dialogue: 0,0:08:47.76,0:08:50.55,Default,SQ,0,0,0,,Your love really shot through my heart!
+Dialogue: 0,0:08:50.55,0:08:53.30,Default,YURI,0,0,0,,Er, I was just...
+Dialogue: 0,0:08:53.30,0:08:57.18,Default,SQ,0,0,0,,I've gotta, like, check someone \Nout as the Engineer tonight,
+Dialogue: 0,0:08:57.18,0:09:01.07,Default,SQ,0,0,0,,but I was just curious \Nwho you'd choose, Yurinchy.
+Dialogue: 0,0:09:01.68,0:09:02.98,Default,SQ,0,0,0,,Well?
+Dialogue: 0,0:09:03.97,0:09:09.07,Default,YURI,0,0,0,,{\i1}She... trusts me? If I can use \Nthis to our advantage...
+Dialogue: 0,0:09:09.33,0:09:11.79,Default,SQ,0,0,0,,Look at you, all lost in \Nthought starin' at me.
+Dialogue: 0,0:09:12.09,0:09:13.65,Default,SQ,0,0,0,,You're way too adorbs.
+Dialogue: 0,0:09:13.99,0:09:16.14,Default,YURI,0,0,0,,Er, um...
+Dialogue: 0,0:09:16.71,0:09:17.99,Default,YURI,0,0,0,,{\i1}What should I do?
+Dialogue: 0,0:09:18.48,0:09:23.01,Default,YURI,0,0,0,,{\i1}If I manage to get the real Engineer on \Nour side, it'll give us a huge advantage.
+Dialogue: 0,0:09:23.99,0:09:24.96,Default,YURI,0,0,0,,{\i1}But...
+Dialogue: 0,0:09:29.28,0:09:32.02,Default,YURI,0,0,0,,Either one of us could be Gnosia,
+Dialogue: 0,0:09:32.02,0:09:34.10,Default,YURI,0,0,0,,so it's best we don't say \Nmore than we need to.
+Dialogue: 0,0:09:34.76,0:09:36.46,Default,SQ,0,0,0,,I see...
+Dialogue: 0,0:09:36.46,0:09:37.84,Default,SQ,0,0,0,,Boo!
+Dialogue: 0,0:09:37.84,0:09:39.70,Default,SQ,0,0,0,,You're no fun.
+Dialogue: 0,0:09:44.11,0:09:46.24,Default,YURI,0,0,0,,{\i1}Man, I'm terrible at this.
+Dialogue: 0,0:09:47.02,0:09:49.67,Default,LEVI,0,0,0,,{\i1}Beginning warp countdown.
+Dialogue: 0,0:09:49.67,0:09:55.07,Default,LEVI,0,0,0,,{\i1}Ten, nine, eight, seven, six, five,
+Dialogue: 0,0:09:55.52,0:09:59.67,Default,LEVI,0,0,0,,{\i1}four, three, two, one.
+Dialogue: 0,0:10:04.59,0:10:05.83,Default,YURI,0,0,0,,The sound...
+Dialogue: 0,0:10:09.94,0:10:11.95,Default,SHA-MING,0,0,0,,It's party time...
+Dialogue: 0,0:10:12.55,0:10:13.77,Default,SHA-MING,0,0,0,,partner.
+Dialogue: 0,0:10:20.57,0:10:23.77,Default,YURI,0,0,0,,{\i1}So this is the world of the Gnosia.
+Dialogue: 0,0:10:23.77,0:10:27.89,Default,SHA-MING,0,0,0,,Man... it sure is quiet \Nin this world of frozen time.
+Dialogue: 0,0:10:28.25,0:10:32.36,Default,COMET,0,0,0,,Oh, maybe that's why it feels so nostalgic.
+Dialogue: 0,0:10:32.72,0:10:34.16,Default,YURI,0,0,0,,Nostalgic?
+Dialogue: 0,0:10:35.61,0:10:36.55,Default,COMET,0,0,0,,So...
+Dialogue: 0,0:10:37.24,0:10:39.11,Default,COMET,0,0,0,,Who are we eliminating today?
+Dialogue: 0,0:10:40.13,0:10:41.83,Default,SHA-MING,0,0,0,,Could we eliminate Otome?
+Dialogue: 0,0:10:42.21,0:10:43.55,Default,YURI,0,0,0,,Otome?
+Dialogue: 0,0:10:43.55,0:10:46.32,Default,SHA-MING,0,0,0,,If—I'm just sayin' if—
+Dialogue: 0,0:10:46.32,0:10:48.92,Default,SHA-MING,0,0,0,,we happen to mess up and Otome survives,
+Dialogue: 0,0:10:48.92,0:10:51.47,Default,SHA-MING,0,0,0,,she's just gonna go back \Nto the research lab, right?
+Dialogue: 0,0:10:51.47,0:10:53.29,Default,SHA-MING,0,0,0,,As a lab animal.
+Dialogue: 0,0:10:53.80,0:10:57.35,Default,YURI,0,0,0,,But Otome said the researchers \Nare good people...
+Dialogue: 0,0:10:57.35,0:10:58.94,Default,SHA-MING,0,0,0,,The hell they are.
+Dialogue: 0,0:10:58.94,0:11:03.06,Default,SHA-MING,0,0,0,,No matter how intellectualized she is, \Nshe's still just an experiment to them.
+Dialogue: 0,0:11:03.06,0:11:05.21,Default,SHA-MING,0,0,0,,When they're done with her, \Nthey'll throw her out.
+Dialogue: 0,0:11:05.21,0:11:07.36,Default,SHA-MING,0,0,0,,Though I'm sure Otome \Ndoesn't realize that herself.
+Dialogue: 0,0:11:07.82,0:11:09.36,Default,COMET,0,0,0,,What do you wanna do?
+Dialogue: 0,0:11:11.03,0:11:14.65,Default,YURI,0,0,0,,Okay, let's choose Otome.
+Dialogue: 0,0:11:19.21,0:11:20.58,Default,SHA-MING,0,0,0,,Here we go.
+Dialogue: 0,0:11:20.58,0:11:21.42,Default,YURI,0,0,0,,Yeah.
+Dialogue: 0,0:11:21.92,0:11:24.66,Default,YURI,0,0,0,,{\i1}Is this what happens when you're infected?
+Dialogue: 0,0:11:25.17,0:11:26.66,Default,YURI,0,0,0,,{\i1}I sort of understand...
+Dialogue: 0,0:11:27.32,0:11:29.11,Default,YURI,0,0,0,,{\i1}what I'm supposed to do.
+Dialogue: 0,0:11:45.69,0:11:47.77,Default,SHA-MING,0,0,0,,I wonder what's crueler in the end.
+Dialogue: 0,0:11:49.39,0:11:52.89,Default,SHA-MING,0,0,0,,Gettin' taken out like this \Nwithout even knowin' it...
+Dialogue: 0,0:11:53.41,0:11:58.43,Default,SHA-MING,0,0,0,,Or knowin' that it's gonna happen.
+Dialogue: 0,0:12:05.62,0:12:07.82,Default,YURI,0,0,0,,Is it over now?
+Dialogue: 0,0:12:07.82,0:12:08.76,Default,SHA-MING,0,0,0,,Yeah.
+Dialogue: 0,0:12:13.72,0:12:17.10,Default,SHA-MING,0,0,0,,Tomorrow, I'm pretty sure the \Nreal Doctor will step forward.
+Dialogue: 0,0:12:17.57,0:12:20.98,Default,SHA-MING,0,0,0,,Yuri, Setsu and the others really like you,
+Dialogue: 0,0:12:20.98,0:12:23.27,Default,SHA-MING,0,0,0,,so you shouldn't do anythin' risky.
+Dialogue: 0,0:12:23.27,0:12:24.27,Default,YURI,0,0,0,,Then...
+Dialogue: 0,0:12:24.27,0:12:28.99,Default,SHA-MING,0,0,0,,I'm gonna become Doctor Sha-ming \Nand make a huge mess.
+Dialogue: 0,0:12:28.99,0:12:30.36,Default,SHA-MING,0,0,0,,You better back me up.
+Dialogue: 0,0:12:31.86,0:12:32.89,Default,SHA-MING,0,0,0,,Bye, now.
+Dialogue: 0,0:12:38.49,0:12:40.51,Default,COMET,0,0,0,,What should I do?
+Dialogue: 0,0:12:40.51,0:12:43.85,Default,COMET,0,0,0,,I have to make my report \Nas the Engineer tomorrow.
+Dialogue: 0,0:12:43.85,0:12:45.16,Default,YURI,0,0,0,,Oh, right.
+Dialogue: 0,0:12:45.16,0:12:49.47,Default,COMET,0,0,0,,Should I say that someone is a Gnosia \Nand drive them into a corner?
+Dialogue: 0,0:12:50.11,0:12:52.80,Default,YURI,0,0,0,,No. Both Racio and Yuriko are still here.
+Dialogue: 0,0:12:52.80,0:12:55.83,Default,YURI,0,0,0,,If you blatantly lie, there's a good \Nchance they'll see through you.
+Dialogue: 0,0:12:55.83,0:12:58.61,Default,YURI,0,0,0,,Tomorrow, let's just say one \Nof the humans is human.
+Dialogue: 0,0:12:58.61,0:13:00.39,Default,COMET,0,0,0,,What? Really?
+Dialogue: 0,0:13:00.39,0:13:06.39,Default,YURI,0,0,0,,Yeah. If neither Engineer is lying, \Nit'll be harder for them to decide.
+Dialogue: 0,0:13:06.39,0:13:08.17,Default,YURI,0,0,0,,That'll work for tomorrow.
+Dialogue: 0,0:13:08.17,0:13:10.94,Default,COMET,0,0,0,,Man... What a relief.
+Dialogue: 0,0:13:10.94,0:13:12.69,Default,YURI,0,0,0,,You were worried?
+Dialogue: 0,0:13:12.69,0:13:14.40,Default,COMET,0,0,0,,Well, I told you, remember?
+Dialogue: 0,0:13:14.40,0:13:18.87,Default,COMET,0,0,0,,I'm really good at seeing through \Npeople's lies, but I'm awful at lying.
+Dialogue: 0,0:13:18.87,0:13:20.68,Default,COMET,0,0,0,,Okay, good.
+Dialogue: 0,0:13:20.68,0:13:23.68,Default,COMET,0,0,0,,If I don't have to lie, I don't have \Nto worry about getting caught.
+Dialogue: 0,0:13:23.68,0:13:24.34,Default,COMET,0,0,0,,See ya.
+Dialogue: 0,0:13:26.14,0:13:27.28,Default,YURI,0,0,0,,Comet.
+Dialogue: 0,0:13:27.28,0:13:28.99,Default,COMET,0,0,0,,Hm? What's up?
+Dialogue: 0,0:13:28.99,0:13:31.43,Default,YURI,0,0,0,,Do you... really want to win?
+Dialogue: 0,0:13:31.43,0:13:33.09,Default,YURI,0,0,0,,Even as a Gnosia?
+Dialogue: 0,0:13:35.37,0:13:39.72,Default,COMET,0,0,0,,On the planet I'm from, to force us to adapt \Nto the environment when we're kids,
+Dialogue: 0,0:13:39.72,0:13:41.67,Default,COMET,0,0,0,,they toss us into a cave...
+Dialogue: 0,0:13:42.84,0:13:44.07,Default,COMET,0,0,0,,for years.
+Dialogue: 0,0:13:44.89,0:13:50.14,Default,COMET,0,0,0,,That place is super quiet, \Njust like the world we're in now. But...
+Dialogue: 0,0:13:52.37,0:13:54.95,Default,COMET,0,0,0,,Most of the people there just die, \None after another.
+Dialogue: 0,0:14:20.92,0:14:23.76,Default,COMET,0,0,0,,After seeing that, I decided...
+Dialogue: 0,0:14:23.76,0:14:27.15,Default,COMET,0,0,0,,that if I survived, I'd \Ngo explore the universe.
+Dialogue: 0,0:14:27.41,0:14:30.65,Default,COMET,0,0,0,,Though leaving the planet \Nwas already hard enough.
+Dialogue: 0,0:14:30.65,0:14:35.19,Default,COMET,0,0,0,,After becoming a Gnosia, \NI thought it might not be possible anymore...
+Dialogue: 0,0:14:35.82,0:14:39.31,Default,COMET,0,0,0,,But if we take over this ship, \NI can still achieve my dream, right?
+Dialogue: 0,0:14:40.43,0:14:41.53,Default,YURI,0,0,0,,You can.
+Dialogue: 0,0:14:42.07,0:14:45.10,Default,YURI,0,0,0,,{\i1}That's right. For everyone who can't loop...
+Dialogue: 0,0:14:45.10,0:14:46.07,Default,COMET,0,0,0,,Really?
+Dialogue: 0,0:14:46.07,0:14:49.04,Default,YURI,0,0,0,,{\i1}This is their one and only world.
+Dialogue: 0,0:14:49.91,0:14:53.50,Default,YURI,0,0,0,,Let's take over this ship \Nand explore the universe.
+Dialogue: 0,0:14:54.26,0:14:55.96,Default,COMET,0,0,0,,Are you serious?
+Dialogue: 0,0:14:55.96,0:14:56.96,Default,YURI,0,0,0,,Yeah.
+Dialogue: 0,0:14:57.43,0:15:01.13,Default,COMET,0,0,0,,Oh, just so you know, \NI'm gonna be the captain.
+Dialogue: 0,0:15:01.13,0:15:05.13,Default,COMET,0,0,0,,So, Yuri, you can be... my first mate!
+Dialogue: 0,0:15:05.71,0:15:06.63,Default,YURI,0,0,0,,Sure.
+Dialogue: 0,0:15:13.90,0:15:15.21,Default,SHA-MING,0,0,0,,So Otome's...
+Dialogue: 0,0:15:15.21,0:15:17.56,Default,LEVI,0,0,0,,{\i1}Affirmative. I do not sense her presence.
+Dialogue: 0,0:15:18.04,0:15:22.10,Default,SQ,0,0,0,,If only the Guardian Angel, like, \Nangel'd it up the way they were meant to...
+Dialogue: 0,0:15:22.10,0:15:27.10,Default,YURIKO,0,0,0,,We knew this would happen as long \Nas Gnosia infectees remained.
+Dialogue: 0,0:15:27.58,0:15:28.59,Default,YURIKO,0,0,0,,Let us begin.
+Dialogue: 0,0:15:28.94,0:15:32.03,Default,SETSU,0,0,0,,Right. Let's begin the meeting.
+Dialogue: 0,0:15:32.80,0:15:36.05,Default,SETSU,0,0,0,,Okay, I'd like to start \Nwith the reports today.
+Dialogue: 0,0:15:36.35,0:15:38.09,Default,SETSU,0,0,0,,As the Doctor, I'll report first.
+Dialogue: 0,0:15:38.09,0:15:40.82,Default,SHIGEMICHI,0,0,0,,Oh? You're the Doctor, Setsu?
+Dialogue: 0,0:15:40.82,0:15:43.87,Default,SETSU,0,0,0,,Yeah, though I didn't say \Nanything the first day.
+Dialogue: 0,0:15:43.87,0:15:45.57,Default,YURI,0,0,0,,{\i1}So Setsu's the Doctor...
+Dialogue: 0,0:15:45.57,0:15:46.76,Default,SHA-MING,0,0,0,,Not so fast.
+Dialogue: 0,0:15:47.04,0:15:49.68,Default,SHA-MING,0,0,0,,I'm the real Doctor.
+Dialogue: 0,0:15:50.00,0:15:53.96,Default,SHA-MING,0,0,0,,Which means you've just \Nmade yourself an enemy.
+Dialogue: 0,0:15:53.96,0:15:55.93,Default,SETSU,0,0,0,,And I'm perfectly fine with that.
+Dialogue: 0,0:15:56.54,0:15:58.75,Default,SHA-MING,0,0,0,,Yeesh, you sure don't like me.
+Dialogue: 0,0:15:58.75,0:16:02.40,Default,SHA-MING,0,0,0,,But maybe that means you're \Nactually just that interested in me.
+Dialogue: 0,0:16:03.17,0:16:06.09,Default,SHA-MING,0,0,0,,I'm gonna make my report. Jina was a Gnosia.
+Dialogue: 0,0:16:06.09,0:16:08.70,Default,SHA-MING,0,0,0,,My sensors are sharp as hell, y'know.
+Dialogue: 0,0:16:09.46,0:16:12.08,Default,SETSU,0,0,0,,Jina was human. Without a doubt.
+Dialogue: 0,0:16:12.08,0:16:13.12,Default,YURIKO,0,0,0,,Oho...
+Dialogue: 0,0:16:13.53,0:16:17.16,Default,RACIO,0,0,0,,Which means that one of them is lying.
+Dialogue: 0,0:16:17.16,0:16:19.51,Default,RACIO,0,0,0,,Though that was to be expected.
+Dialogue: 0,0:16:19.82,0:16:23.62,Default,YURI,0,0,0,,{\i1}Now it's been confirmed \Nthat one of them is lying.
+Dialogue: 0,0:16:23.62,0:16:27.50,Default,YURI,0,0,0,,{\i1}If they suspect Sha-ming even a little bit, \Nhe's absolutely going to get voted out.
+Dialogue: 0,0:16:28.02,0:16:30.56,Default,YURI,0,0,0,,{\i1}I need to skillfully guide this meeting.
+Dialogue: 0,0:16:30.88,0:16:33.64,Default,SETSU,0,0,0,,Next, let's hear the Engineers' reports.
+Dialogue: 0,0:16:33.64,0:16:36.65,Default,SQ,0,0,0,,Okey-dokey! Sergeant SQ reporting in!
+Dialogue: 0,0:16:36.65,0:16:39.90,Default,SQ,0,0,0,,Believe it or not, I checked out Setsu!
+Dialogue: 0,0:16:40.17,0:16:41.50,Default,YURI,0,0,0,,{\i1}She checked Setsu...
+Dialogue: 0,0:16:41.50,0:16:44.73,Default,RACIO,0,0,0,,And the result? Quit wasting \Ntime and tell us already!
+Dialogue: 0,0:16:44.73,0:16:49.62,Default,SQ,0,0,0,,Yes, Captain! I detected no Gnosia, \Nand therefore Setsu is human!
+Dialogue: 0,0:16:50.03,0:16:51.66,Default,SETSU,0,0,0,,What about you, Comet?
+Dialogue: 0,0:16:51.66,0:16:54.37,Default,COMET,0,0,0,,Huh? I...
+Dialogue: 0,0:16:56.09,0:16:58.74,Default,YURI,0,0,0,,Tomorrow, let's just say one \Nof the humans is human.
+Dialogue: 0,0:16:59.08,0:17:03.62,Default,YURI,0,0,0,,{\i1}Wait. Even if they're human, \Nif she actually chooses...
+Dialogue: 0,0:17:03.62,0:17:04.71,Default,COMET,0,0,0,,I...
+Dialogue: 0,0:17:05.01,0:17:08.59,Default,COMET,0,0,0,,I also checked Setsu. I got the same result.
+Dialogue: 0,0:17:08.59,0:17:10.98,Default,COMET,0,0,0,,Setsu is definitely human.
+Dialogue: 0,0:17:12.47,0:17:13.35,Default,COMET,0,0,0,,Huh?
+Dialogue: 0,0:17:13.35,0:17:15.05,Default,SETSU,0,0,0,,That means...
+Dialogue: 0,0:17:15.05,0:17:17.02,Default,SHIGEMICHI,0,0,0,,What? What does that mean?
+Dialogue: 0,0:17:17.29,0:17:19.53,Default,RACIO,0,0,0,,Hah. You don't understand?
+Dialogue: 0,0:17:19.53,0:17:23.52,Default,RACIO,0,0,0,,Just now, both of the Engineers \Ndetermined Setsu to be human.
+Dialogue: 0,0:17:24.81,0:17:28.85,Default,RACIO,0,0,0,,So we can say with complete certainty \Nthat Setsu is a definite human.
+Dialogue: 0,0:17:28.85,0:17:30.42,Default,RACIO,0,0,0,,Which also means...
+Dialogue: 0,0:17:31.62,0:17:34.04,Default,SHIGEMICHI,0,0,0,,...that Sha-ming is a Gnosia.
+Dialogue: 0,0:17:36.03,0:17:37.50,Default,SHA-MING,0,0,0,,Wait, wait, wait!
+Dialogue: 0,0:17:37.50,0:17:40.15,Default,SHA-MING,0,0,0,,We can't rule out the possibility \Nthat someone's wrong here!
+Dialogue: 0,0:17:40.15,0:17:42.85,Default,SHA-MING,0,0,0,,Maybe the real Engineer hasn't \Nmade themselves known yet!
+Dialogue: 0,0:17:42.85,0:17:47.83,Default,RACIO,0,0,0,,But that would mean that both of \Nthe claimed Engineers are Gnosia.
+Dialogue: 0,0:17:47.83,0:17:49.50,Default,RACIO,0,0,0,,Do you really think that's a possibility?
+Dialogue: 0,0:17:49.76,0:17:51.73,Default,SHA-MING,0,0,0,,Er, but I mean...
+Dialogue: 0,0:17:51.73,0:17:52.62,Default,YURI,0,0,0,,{\i1}It's no use.
+Dialogue: 0,0:17:52.62,0:17:55.53,Default,YURI,0,0,0,,{\i1}If we try to intervene now, \Nwe'll only expose ourselves.
+Dialogue: 0,0:17:55.81,0:17:57.94,Default,SHA-MING,0,0,0,,Oh, fine.
+Dialogue: 0,0:18:03.48,0:18:06.70,Default,SHA-MING,0,0,0,,I'm so sorry!
+Dialogue: 0,0:18:13.50,0:18:15.25,Default,COMET,0,0,0,,It's all my fault.
+Dialogue: 0,0:18:15.25,0:18:19.81,Default,COMET,0,0,0,,I thought that if I picked Setsu, no \None would think I was suspicious.
+Dialogue: 0,0:18:19.81,0:18:23.44,Default,YURI,0,0,0,,No, it's my fault for giving \Nyou vague instructions.
+Dialogue: 0,0:18:24.51,0:18:26.62,Default,COMET,0,0,0,,This really sucks.
+Dialogue: 0,0:18:27.74,0:18:30.17,Default,YURI,0,0,0,,More importantly, now we need \Nto think about tomorrow.
+Dialogue: 0,0:18:30.58,0:18:31.95,Default,COMET,0,0,0,,Tomorrow?
+Dialogue: 0,0:18:31.95,0:18:34.53,Default,YURI,0,0,0,,You want to survive and \Ngo on adventures, right?
+Dialogue: 0,0:18:35.33,0:18:36.58,Default,COMET,0,0,0,,Yuri...
+Dialogue: 0,0:18:37.61,0:18:41.05,Default,YURI,0,0,0,,The Doctor will check to see if \NSha-ming was a Gnosia tomorrow,
+Dialogue: 0,0:18:41.48,0:18:43.53,Default,YURI,0,0,0,,and it'll be confirmed that he was.
+Dialogue: 0,0:18:43.91,0:18:44.67,Default,COMET,0,0,0,,Right...
+Dialogue: 0,0:18:44.67,0:18:47.53,Default,YURI,0,0,0,,Then the most likely thing they'll do next
+Dialogue: 0,0:18:47.53,0:18:51.78,Default,YURI,0,0,0,,is determine which of the two Engineers, \Nyou or SQ, is the Gnosia.
+Dialogue: 0,0:18:52.51,0:18:55.42,Default,COMET,0,0,0,,Does that mean they're gonna \Nask me lots of questions?
+Dialogue: 0,0:18:55.42,0:18:56.57,Default,YURI,0,0,0,,Yeah.
+Dialogue: 0,0:18:56.57,0:18:59.34,Default,YURI,0,0,0,,I'd like to help you, but it'd be dangerous
+Dialogue: 0,0:18:59.34,0:19:02.25,Default,YURI,0,0,0,,if I did too much and they suspected \Nwe were working together.
+Dialogue: 0,0:19:02.54,0:19:03.78,Default,COMET,0,0,0,,This is hopeless.
+Dialogue: 0,0:19:03.78,0:19:07.92,Default,COMET,0,0,0,,Racio and Yuriko are going to ask me weird \Nthings to try and catch me in a lie, right?
+Dialogue: 0,0:19:07.92,0:19:11.30,Default,COMET,0,0,0,,I told you. I'm really bad at lying.
+Dialogue: 0,0:19:11.64,0:19:13.38,Default,YURI,0,0,0,,Even so, you're just going to have to try.
+Dialogue: 0,0:19:13.38,0:19:15.42,Default,YURI,0,0,0,,I'll try to think of what they might ask...
+Dialogue: 0,0:19:17.18,0:19:19.25,Default,YURI,0,0,0,,You're bad at lying...
+Dialogue: 0,0:19:19.64,0:19:21.88,Default,COMET,0,0,0,,Yeah, and?
+Dialogue: 0,0:19:22.51,0:19:23.68,Default,YURI,0,0,0,,There's a way.
+Dialogue: 0,0:19:23.68,0:19:27.57,Default,YURI,0,0,0,,There's a way to use our mistake \Nto turn things around.
+Dialogue: 0,0:19:29.56,0:19:31.98,Default,RACIO,0,0,0,,So Shigemichi was eliminated...
+Dialogue: 0,0:19:31.98,0:19:34.52,Default,YURIKO,0,0,0,,Hmph. His was a truly \Ninsignificant existence.
+Dialogue: 0,0:19:34.52,0:19:36.62,Default,YURIKO,0,0,0,,Now, start the banquet.
+Dialogue: 0,0:19:37.87,0:19:41.61,Default,SETSU,0,0,0,,All right, let's begin. \NFirst, I'll make my report.
+Dialogue: 0,0:19:41.61,0:19:43.90,Default,SETSU,0,0,0,,As the Doctor, I investigated Sha-ming.
+Dialogue: 0,0:19:43.90,0:19:45.79,Default,SETSU,0,0,0,,Sha-ming was a Gnosia.
+Dialogue: 0,0:19:45.79,0:19:48.07,Default,RACIO,0,0,0,,Not that you really needed to check.
+Dialogue: 0,0:19:48.07,0:19:51.70,Default,YURIKO,0,0,0,,Which means that the matter \Nof which Engineer is fake
+Dialogue: 0,0:19:51.70,0:19:54.34,Default,YURIKO,0,0,0,,is probably the next thing \Nwe should make clear.
+Dialogue: 0,0:19:54.68,0:19:57.22,Default,SQ,0,0,0,,Yeah, I saw this one coming.
+Dialogue: 0,0:19:57.22,0:20:00.37,Default,COMET,0,0,0,,Huh? Does that mean I'm suspicious?
+Dialogue: 0,0:20:00.99,0:20:04.33,Default,YURI,0,0,0,,Just reply calmly like you usually do.
+Dialogue: 0,0:20:04.33,0:20:08.24,Default,YURI,0,0,0,,If you become emotional at all, \Nthey'll think you're hiding something.
+Dialogue: 0,0:20:08.56,0:20:11.80,Default,RACIO,0,0,0,,I've actually been thinking about that.
+Dialogue: 0,0:20:11.80,0:20:12.78,Default,RACIO,0,0,0,,LeVi.
+Dialogue: 0,0:20:12.78,0:20:14.23,Default,LEVI,0,0,0,,{\i1}As you wish.
+Dialogue: 0,0:20:14.66,0:20:17.83,Default,RACIO,0,0,0,,These are the voting results \Nfor day one and day two.
+Dialogue: 0,0:20:17.83,0:20:20.13,Default,RACIO,0,0,0,,Take a look at day one.
+Dialogue: 0,0:20:20.61,0:20:26.27,Default,RACIO,0,0,0,,SQ voted for Comet, but Comet voted for me.
+Dialogue: 0,0:20:26.99,0:20:31.34,Default,RACIO,0,0,0,,If Comet was the real Engineer, \Nshe would know for certain that SQ,
+Dialogue: 0,0:20:31.34,0:20:33.67,Default,RACIO,0,0,0,,who had also claimed Engineer, was a Gnosia.
+Dialogue: 0,0:20:33.67,0:20:36.13,Default,RACIO,0,0,0,,So why didn't you vote for her?
+Dialogue: 0,0:20:36.13,0:20:38.77,Default,COMET,0,0,0,,Well, um...
+Dialogue: 0,0:20:38.77,0:20:40.36,Default,YURI,0,0,0,,{\i1}I'd expect nothing less from Racio.
+Dialogue: 0,0:20:40.36,0:20:43.14,Default,YURI,0,0,0,,{\i1}They're logically pursuing \Nwhatever seems contradictory.
+Dialogue: 0,0:20:43.59,0:20:45.26,Default,YURI,0,0,0,,{\i1}But that's exactly how...
+Dialogue: 0,0:20:45.97,0:20:47.26,Default,YURI,0,0,0,,{\i1}we can trick them!
+Dialogue: 0,0:20:47.60,0:20:49.82,Default,YURI,0,0,0,,I thought the same thing, too.
+Dialogue: 0,0:20:49.82,0:20:51.02,Default,COMET,0,0,0,,Yuri...
+Dialogue: 0,0:20:51.02,0:20:54.31,Default,YURI,0,0,0,,But when you think about it logically, \Nit just doesn't make any sense.
+Dialogue: 0,0:20:54.58,0:20:55.73,Default,SETSU,0,0,0,,What do you mean?
+Dialogue: 0,0:20:55.73,0:20:59.20,Default,YURI,0,0,0,,Do you all remember the reports \Nfrom the Engineers yesterday?
+Dialogue: 0,0:20:59.20,0:21:03.76,Default,YURI,0,0,0,,Back then, Comet reported \Nthat Setsu was human
+Dialogue: 0,0:21:03.76,0:21:06.92,Default,YURI,0,0,0,,only after SQ reported the same thing.
+Dialogue: 0,0:21:07.29,0:21:08.42,Default,YURIKO,0,0,0,,And?
+Dialogue: 0,0:21:08.42,0:21:09.89,Default,YURI,0,0,0,,Isn't that strange?
+Dialogue: 0,0:21:09.89,0:21:12.13,Default,YURI,0,0,0,,Reporting that Setsu was human at that point
+Dialogue: 0,0:21:12.13,0:21:14.30,Default,YURI,0,0,0,,also confirmed that Sha-ming was a Gnosia.
+Dialogue: 0,0:21:14.57,0:21:19.84,Default,YURI,0,0,0,,If Comet was a Gnosia, she went out \Nof her way to sell out her own ally
+Dialogue: 0,0:21:20.28,0:21:22.82,Default,YURI,0,0,0,,in a situation where she \Ncould've lied all she wanted to.
+Dialogue: 0,0:21:23.66,0:21:24.65,Default,RACIO,0,0,0,,Hm.
+Dialogue: 0,0:21:25.02,0:21:27.53,Default,YURI,0,0,0,,I thought it might've been some strategy,
+Dialogue: 0,0:21:27.53,0:21:30.30,Default,YURI,0,0,0,,but there's no angle from \Nwhich it benefits the Gnosia.
+Dialogue: 0,0:21:30.30,0:21:33.52,Default,RACIO,0,0,0,,Meaning... Comet isn't a Gnosia.
+Dialogue: 0,0:21:33.81,0:21:35.15,Default,SETSU,0,0,0,,Which means...
+Dialogue: 0,0:21:35.15,0:21:36.02,Default,SQ,0,0,0,,Huh?
+Dialogue: 0,0:21:36.32,0:21:40.83,Default,SQ,0,0,0,,Wait, do you all think \Nprecious li'l SQ is sus now?
+Dialogue: 0,0:21:57.68,0:22:00.63,Default,YURI,0,0,0,,Now this spaceship belongs to you, Comet.
+Dialogue: 0,0:22:01.12,0:22:03.40,Default,YURI,0,0,0,,So where shall we go, Captain?
+Dialogue: 0,0:22:05.14,0:22:06.74,Default,COMET,0,0,0,,Let's see...
+Dialogue: 0,0:22:06.74,0:22:07.90,Default,COMET,0,0,0,,Hey, first mate.
+Dialogue: 0,0:22:08.25,0:22:09.23,Default,YURI,0,0,0,,Yes, ma'am!
+Dialogue: 0,0:22:09.99,0:22:12.19,Default,COMET,0,0,0,,Will you accompany me on this adventure?
+Dialogue: 0,0:22:14.95,0:22:16.05,Default,YURI,0,0,0,,Of course.
+Dialogue: 0,0:22:18.84,0:22:20.87,Default,COMET,0,0,0,,You're just like me, Yuri.
+Dialogue: 0,0:22:21.52,0:22:23.36,Default,COMET,0,0,0,,You're terrible at lying.
+Dialogue: 0,0:22:23.36,0:22:24.59,Default,YURI,0,0,0,,Huh?
+Dialogue: 0,0:22:24.59,0:22:27.18,Default,COMET,0,0,0,,I told you that I'm really \Ngood at seeing through lies.
+Dialogue: 0,0:22:27.53,0:22:31.40,Default,YURI,0,0,0,,Let's take over this ship \Nand explore the universe.
+Dialogue: 0,0:22:33.08,0:22:36.34,Default,COMET,0,0,0,,I already knew the first time you said it.
+Dialogue: 0,0:22:36.94,0:22:38.87,Default,COMET,0,0,0,,Why did you lie like that?
+Dialogue: 0,0:22:38.87,0:22:40.83,Default,YURI,0,0,0,,Er, um...
+Dialogue: 0,0:22:40.83,0:22:44.16,Default,YURI,0,0,0,,No! I'm not lying. It's just...
+Dialogue: 0,0:22:44.16,0:22:45.23,Default,COMET,0,0,0,,Yuri.
+Dialogue: 0,0:22:46.78,0:22:47.81,Default,COMET,0,0,0,,I like you.
+Dialogue: 0,0:22:53.74,0:22:55.79,Default,COMET,0,0,0,,Could you tell that was a lie?
+Dialogue: 0,0:22:55.79,0:22:57.28,Default,YURI,0,0,0,,Y-Yeah...
+Dialogue: 0,0:22:57.28,0:23:02.27,Default,COMET,0,0,0,,That's just it. Seeing through lies \Ndoesn't mean you can read minds.
+Dialogue: 0,0:23:02.61,0:23:07.14,Default,COMET,0,0,0,,I know that you won't stay with me, \Nbut I don't know why.
+Dialogue: 0,0:23:07.92,0:23:09.04,Default,COMET,0,0,0,,So I'm just gonna say...
+Dialogue: 0,0:23:09.43,0:23:10.94,Default,COMET,0,0,0,,how I really feel.
+Dialogue: 0,0:23:12.78,0:23:14.40,Default,COMET,0,0,0,,I don't like you...
+Dialogue: 0,0:23:16.77,0:23:18.01,Default,COMET,0,0,0,,I love you.
+

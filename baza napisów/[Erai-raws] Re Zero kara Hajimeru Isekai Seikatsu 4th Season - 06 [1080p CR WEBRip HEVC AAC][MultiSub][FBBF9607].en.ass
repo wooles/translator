@@ -1,0 +1,346 @@
+[Script Info]
+Title: [Erai-raws]
+ScriptType: v4.00+
+WrapStyle: 0
+ScaledBorderAndShadow: yes
+PlayResX: 640
+PlayResY: 360
+LayoutResX: 640
+LayoutResY: 360
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: main,Trebuchet MS,24,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,1,2,10,10,18,0
+Style: top,Trebuchet MS,24,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,1,8,10,10,18,0
+Style: italics,Trebuchet MS,24,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,-1,0,0,100,100,0,0,1,2,1,2,10,10,18,0
+Style: flashback,Trebuchet MS,24,&H00FFFFFF,&H000000FF,&H00400000,&H00400000,0,0,0,0,100,100,0,0,1,2,1,2,10,10,18,1
+Style: overlap,Trebuchet MS,24,&H007FD3F2,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,1,2,10,10,18,0
+Style: Episode Title,Times New Roman,30,&H00000000,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,0,0,2,30,30,20,0
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:02.47,0:00:06.27,italics,Julius INT,0,0,0,,I'm sure no one would believe it.
+Dialogue: 0,0:00:09.23,0:00:12.45,flashback,Subaru,0,0,0,,Nice to meet you, members \Nof the council of elders.
+Dialogue: 0,0:00:12.45,0:00:14.36,flashback,Subaru,0,0,0,,My name is Subaru Natsuki.
+Dialogue: 0,0:00:14.36,0:00:18.20,flashback,Subaru,0,0,0,,I am a manservant in Roswaal's mansion, \Nand I serve as this candidate's...
+Dialogue: 0,0:00:18.20,0:00:21.13,flashback,Subaru,0,0,0,,Lady Emilia's best knight!
+Dialogue: 0,0:02:03.47,0:02:05.72,main,Reid,0,0,0,,I ain't got no name to give.
+Dialogue: 0,0:02:06.30,0:02:07.84,main,Reid,0,0,0,,I'm just...
+Dialogue: 0,0:02:07.84,0:02:09.40,main,Reid,0,0,0,,a stick swinger.
+Dialogue: 0,0:02:21.30,0:02:23.00,main,Reid,0,0,0,,The hell's your deal?
+Dialogue: 0,0:02:23.00,0:02:26.20,main,Reid,0,0,0,,Throwin' a sword at me? \NYou got a death wish?
+Dialogue: 0,0:02:27.00,0:02:31.71,main,Julius,0,0,0,,To attack an unarmed man is an act \Nthat would disgrace any knight.
+Dialogue: 0,0:02:31.98,0:02:34.68,main,Reid,0,0,0,,Hah! Don't make me laugh!
+Dialogue: 0,0:02:35.40,0:02:38.72,main,Julius,0,0,0,,I hope you do not\Ncome to regret those words!
+Dialogue: 0,0:02:43.08,0:02:45.84,main,Reid,0,0,0,,You thought I was unarmed?
+Dialogue: 0,0:02:45.84,0:02:47.85,main,Reid,0,0,0,,Look closer.
+Dialogue: 0,0:02:49.18,0:02:51.02,main,Julius,0,0,0,,Wooden... sticks?
+Dialogue: 0,0:02:51.02,0:02:53.61,main,Reid,0,0,0,,No, you idiot. They're chopsticks.
+Dialogue: 0,0:02:53.61,0:02:56.40,main,Reid,0,0,0,,I keep 'em on me in case \NI need a little snack.
+Dialogue: 0,0:02:56.87,0:03:00.08,main,Reid,0,0,0,,If I swing 'em just the right way,
+Dialogue: 0,0:03:00.08,0:03:04.45,main,Reid,0,0,0,,at just the right angle and \Njust the right speed...
+Dialogue: 0,0:03:04.45,0:03:08.95,main,Reid,0,0,0,,there's nothing I can't cut \Nthrough, even with chopsticks!
+Dialogue: 0,0:03:32.94,0:03:33.48,main,Subaru,0,0,0,,Julius!
+Dialogue: 0,0:03:33.48,0:03:34.31,main,Anastasia,0,0,0,,Jiwaldo!
+Dialogue: 0,0:03:39.10,0:03:43.11,main,Reid,0,0,0,,My sword can even\Ncut through light, y'know!
+Dialogue: 0,0:03:43.11,0:03:44.24,main,Anastasia,0,0,0,,Jiwaldo!
+Dialogue: 0,0:03:56.81,0:03:58.53,main,Anastasia,0,0,0,,Jiwaldo! Jiwaldo!
+Dialogue: 0,0:03:58.88,0:04:00.55,main,Reid,0,0,0,,You gotta aim better!
+Dialogue: 0,0:04:01.15,0:04:04.30,main,Reid,0,0,0,,You'll never get your \Npretty boy back that way!
+Dialogue: 0,0:04:04.30,0:04:07.36,main,Anastasia,0,0,0,,Jiwaldo! Jiwaldo! Jiwaldo!
+Dialogue: 0,0:04:07.36,0:04:09.86,main,Anastasia,0,0,0,,Jiwaldo! Jiwaldo!
+Dialogue: 0,0:04:10.99,0:04:12.18,main,Subaru,0,0,0,,Lady Anastasia!
+Dialogue: 0,0:04:12.73,0:04:13.89,main,Subaru,0,0,0,,That's enough!
+Dialogue: 0,0:04:14.40,0:04:15.72,main,Anastasia,0,0,0,,Jiwal...
+Dialogue: 0,0:04:19.14,0:04:21.19,main,Julius,0,0,0,,Lady Anastasia!
+Dialogue: 0,0:04:26.60,0:04:29.16,main,Reid,0,0,0,,You're just my kinda guy right now!
+Dialogue: 0,0:04:29.16,0:04:31.62,main,Reid,0,0,0,,You're gettin' me excited!
+Dialogue: 0,0:04:33.28,0:04:34.50,main,Julius,0,0,0,,Move aside!
+Dialogue: 0,0:04:45.72,0:04:47.41,main,Reid,0,0,0,,The hell is this?
+Dialogue: 0,0:04:47.41,0:04:49.64,main,Reid,0,0,0,,Don't make me laugh, man.
+Dialogue: 0,0:04:49.64,0:04:53.52,main,Reid,0,0,0,,If this is the best ya got, \Nyou're a real disappointment.
+Dialogue: 0,0:04:53.52,0:04:55.56,main,Reid,0,0,0,,You're boring me!
+Dialogue: 0,0:04:56.16,0:04:57.48,main,Julius,0,0,0,,I am...
+Dialogue: 0,0:04:57.48,0:05:00.44,main,Reid,0,0,0,,If you wanna get to that \Nwoman, I'll let ya go.
+Dialogue: 0,0:05:00.44,0:05:04.03,main,Reid,0,0,0,,Crawl into her nice, soft lap \Nto cry and beg for attention,
+Dialogue: 0,0:05:04.03,0:05:07.74,main,Reid,0,0,0,,you ugly, useless excuse for a knight!
+Dialogue: 0,0:05:13.22,0:05:14.20,main,Reid,0,0,0,,Take a nap.
+Dialogue: 0,0:05:23.54,0:05:24.76,main,Reid,0,0,0,,Now...
+Dialogue: 0,0:05:25.18,0:05:26.22,main,Reid,0,0,0,,who's next?
+Dialogue: 0,0:05:28.37,0:05:30.68,main,Emilia,0,0,0,,I'd just like to ask one question.
+Dialogue: 0,0:05:31.20,0:05:33.68,main,Emilia,0,0,0,,Didn't we just need to \Nmake you move one step?
+Dialogue: 0,0:05:34.11,0:05:35.71,main,Emilia,0,0,0,,You were running around lots.
+Dialogue: 0,0:05:35.71,0:05:37.37,main,Reid,0,0,0,,Don't take that at face value.
+Dialogue: 0,0:05:37.37,0:05:39.77,main,Reid,0,0,0,,I just said it to sound cool.
+Dialogue: 0,0:05:39.77,0:05:41.48,main,Reid,0,0,0,,You get it, don't ya?
+Dialogue: 0,0:05:41.48,0:05:44.61,main,Reid,0,0,0,,I guess not, you bein' a woman and all.
+Dialogue: 0,0:05:44.61,0:05:48.32,main,Reid,0,0,0,,A real hottie, too. You \Nshould go out with me.
+Dialogue: 0,0:05:48.32,0:05:51.12,main,Emilia,0,0,0,,I'm sorry. I don't understand \Nwhat you're saying.
+Dialogue: 0,0:05:51.12,0:05:54.87,main,Emilia,0,0,0,,Also, I don't think I \Ncould beat you in a fight.
+Dialogue: 0,0:05:54.87,0:05:56.71,main,Subaru,0,0,0,,E-Emilia?
+Dialogue: 0,0:05:58.32,0:06:00.24,main,Emilia,0,0,0,,You seem very strong.
+Dialogue: 0,0:06:00.24,0:06:02.06,main,Emilia,0,0,0,,I could see that by watching you.
+Dialogue: 0,0:06:02.54,0:06:05.76,main,Emilia,0,0,0,,But we have to get past this exam.
+Dialogue: 0,0:06:06.07,0:06:08.72,main,Emilia,0,0,0,,So please give us a way to win.
+Dialogue: 0,0:06:10.17,0:06:13.01,main,Emilia,0,0,0,,If I can make you take\Neven one step, we win.
+Dialogue: 0,0:06:13.60,0:06:15.22,main,Emilia,0,0,0,,That'll be our contest.
+Dialogue: 0,0:06:16.25,0:06:17.00,main,Emilia,0,0,0,,No?
+Dialogue: 0,0:06:18.69,0:06:22.07,main,Reid,0,0,0,,Damn, nice! I actually don't hate that!
+Dialogue: 0,0:06:22.07,0:06:24.49,main,Reid,0,0,0,,You're the biggest idiot \NI've seen since Tricia!
+Dialogue: 0,0:06:24.49,0:06:25.69,main,Reid,0,0,0,,I like you!
+Dialogue: 0,0:06:26.11,0:06:30.01,main,Reid,0,0,0,,Fine. If you make me take\None step, you win.
+Dialogue: 0,0:06:31.46,0:06:34.08,main,Emilia,0,0,0,,Take care of the two of them.
+Dialogue: 0,0:06:34.36,0:06:36.79,main,Subaru,0,0,0,,H-Hang on! You saw him just now!
+Dialogue: 0,0:06:36.79,0:06:37.94,main,Subaru,0,0,0,,You need a plan for—
+Dialogue: 0,0:06:37.94,0:06:39.39,main,Emilia,0,0,0,,Icebrand Arts.
+Dialogue: 0,0:06:47.00,0:06:48.29,main,Emilia,0,0,0,,Icicle Line.
+Dialogue: 0,0:06:50.32,0:06:53.18,main,Emilia,0,0,0,,Don't worry.\NI'll take this seriously, too.
+Dialogue: 0,0:06:53.18,0:06:56.81,main,Reid,0,0,0,,You're pretty stubborn for such a hottie.
+Dialogue: 0,0:06:57.21,0:06:59.44,main,Emilia,0,0,0,,I do what I can, the best I can.
+Dialogue: 0,0:06:59.44,0:07:02.69,main,Emilia,0,0,0,,That's how I learned to do \Nthings... from my knight!
+Dialogue: 0,0:07:25.20,0:07:27.74,main,Beatrice,0,0,0,,They're both all right, I suppose. But...
+Dialogue: 0,0:07:27.74,0:07:28.99,main,Subaru,0,0,0,,I know.
+Dialogue: 0,0:07:34.17,0:07:35.67,main,Subaru,0,0,0,,He's not moving.
+Dialogue: 0,0:08:20.14,0:08:21.60,main,Reid,0,0,0,,You're open!
+Dialogue: 0,0:08:26.72,0:08:27.27,main,Emilia,0,0,0,,Wha—
+Dialogue: 0,0:08:28.59,0:08:30.52,main,Reid,0,0,0,,Perks of fighting a hottie.
+Dialogue: 0,0:08:30.52,0:08:33.11,main,Reid,0,0,0,,Don't get mad over a little thing like—
+Dialogue: 0,0:08:44.61,0:08:45.75,main,Reid,0,0,0,,Ow!
+Dialogue: 0,0:08:45.75,0:08:48.00,main,Reid,0,0,0,,Wh-What the hell are you thinkin'?!
+Dialogue: 0,0:08:48.00,0:08:50.71,main,Reid,0,0,0,,Most chicks would lose their edge \Nafter bein' touched like that!
+Dialogue: 0,0:08:51.03,0:08:54.08,main,Emilia,0,0,0,,Huh? But all you did was touch me.
+Dialogue: 0,0:08:54.08,0:08:55.59,main,Emilia,0,0,0,,I mean, you were wide open.
+Dialogue: 0,0:08:55.59,0:08:58.64,main,Reid,0,0,0,,Oh, screw you! How the hell \Nwere you brought up, anyway?!
+Dialogue: 0,0:08:58.64,0:09:00.64,main,Reid,0,0,0,,What were your parents thinkin'?!
+Dialogue: 0,0:09:00.64,0:09:02.41,main,Emilia,0,0,0,,Did I say something strange?
+Dialogue: 0,0:09:02.41,0:09:04.81,main,Reid,0,0,0,,Yo! Do somethin' about this woman!
+Dialogue: 0,0:09:04.81,0:09:06.14,main,Reid,0,0,0,,Don't let her go outside!
+Dialogue: 0,0:09:06.14,0:09:07.57,main,Reid,0,0,0,,You're her attendant, aren't ya?!
+Dialogue: 0,0:09:07.57,0:09:11.37,main,Subaru,0,0,0,,Screw {\i1}you{\i0}, you prick!\NWhat are you trying to pull?!
+Dialogue: 0,0:09:11.37,0:09:14.17,main,Subaru,0,0,0,,You pervert! Shitbag! Sin Archbishop!
+Dialogue: 0,0:09:14.17,0:09:15.69,main,Subaru,0,0,0,,I will end you!
+Dialogue: 0,0:09:14.17,0:09:16.56,overlap,Beatrice,0,0,0,,Subaru! Calm down!
+Dialogue: 0,0:09:16.56,0:09:18.99,main,Beatrice,0,0,0,,I understand how you feel, \Nbut look, I suppose!
+Dialogue: 0,0:09:21.19,0:09:23.84,main,Subaru,0,0,0,,He moved! And more than just one step!
+Dialogue: 0,0:09:23.84,0:09:25.29,main,Emilia,0,0,0,,Oh! You're right!
+Dialogue: 0,0:09:25.29,0:09:27.75,main,Emilia,0,0,0,,I did it! I won!
+Dialogue: 0,0:09:27.75,0:09:30.46,main,Subaru,0,0,0,,A win is a win, no matter how it happened.
+Dialogue: 0,0:09:31.19,0:09:33.05,main,Subaru,0,0,0,,So what now?
+Dialogue: 0,0:09:33.56,0:09:35.84,main,Reid,0,0,0,,Well, that's how it goes.
+Dialogue: 0,0:09:35.84,0:09:37.76,main,Reid,0,0,0,,I said what I said.
+Dialogue: 0,0:09:37.76,0:09:39.97,main,Subaru,0,0,0,,Wait, you're admitting it?
+Dialogue: 0,0:09:39.97,0:09:43.46,main,Reid,0,0,0,,Just who the hell do you think I am?
+Dialogue: 0,0:09:43.46,0:09:47.48,main,Reid,0,0,0,,If I refuse to back down now, \Nit's just gonna make me look bad.
+Dialogue: 0,0:09:47.84,0:09:52.31,main,Subaru,0,0,0,,After the way you just lost, \Nyou couldn't look any worse.
+Dialogue: 0,0:09:52.31,0:09:54.20,main,Reid,0,0,0,,Shut yer trap, wuss!
+Dialogue: 0,0:09:54.20,0:09:56.95,main,Reid,0,0,0,,Anyway, the hottie wins.
+Dialogue: 0,0:09:56.95,0:09:58.76,main,Reid,0,0,0,,I'll let you pass.
+Dialogue: 0,0:09:58.76,0:10:00.69,main,Reid,0,0,0,,It is what it is.
+Dialogue: 0,0:10:06.17,0:10:09.66,main,Reid,0,0,0,,Well? Is the wuss gonna do the next one?
+Dialogue: 0,0:10:10.72,0:10:13.92,main,Reid,0,0,0,,Or is it gonna be one of the two brats?
+Dialogue: 0,0:10:14.55,0:10:17.13,main,Reid,0,0,0,,There are seven inside the tower.
+Dialogue: 0,0:10:17.63,0:10:21.09,main,Reid,0,0,0,,Your woman here is the \Nfirst one to make it out.
+Dialogue: 0,0:10:21.44,0:10:22.30,main,Subaru,0,0,0,,Huh?
+Dialogue: 0,0:10:22.71,0:10:26.73,main,Reid,0,0,0,,So who's gonna be next to get past me?
+Dialogue: 0,0:10:27.26,0:10:29.50,main,Reid,0,0,0,,Well, bro?
+Dialogue: 0,0:10:30.88,0:10:33.82,main,Ram,0,0,0,,So you came running back dejected?
+Dialogue: 0,0:10:34.22,0:10:36.78,main,Subaru,0,0,0,,Harsh, Big Sister.
+Dialogue: 0,0:10:36.78,0:10:38.98,main,Ram,0,0,0,,Stop talking like that.
+Dialogue: 0,0:10:38.98,0:10:42.49,main,Ram,0,0,0,,You'll make that sleeping girl's story \Nabout you being her master feel real.
+Dialogue: 0,0:10:42.49,0:10:45.48,main,Subaru,0,0,0,,Yikes, wouldn't want that.\NI'll be careful.
+Dialogue: 0,0:10:45.48,0:10:46.81,main,Ram,0,0,0,,So it was a crushing defeat.
+Dialogue: 0,0:10:46.81,0:10:50.40,main,Ram,0,0,0,,Only Lady Emilia could measure up to him.
+Dialogue: 0,0:10:50.40,0:10:51.88,main,Emilia,0,0,0,,Yes, I won.
+Dialogue: 0,0:10:52.36,0:10:54.06,main,Emilia,0,0,0,,Maybe I should go up alone?
+Dialogue: 0,0:10:54.06,0:10:56.45,main,Subaru,0,0,0,,No, I don't think that's a good idea.
+Dialogue: 0,0:10:56.45,0:10:59.13,main,Subaru,0,0,0,,It's, well... you know... dangerous.
+Dialogue: 0,0:10:59.52,0:11:01.22,main,Emilia,0,0,0,,I'll be very careful.
+Dialogue: 0,0:11:01.22,0:11:02.22,main,Subaru,0,0,0,,Dangerous.
+Dialogue: 0,0:11:02.22,0:11:03.31,main,Ram,0,0,0,,Dangerous.
+Dialogue: 0,0:11:03.31,0:11:04.22,main,Beatrice,0,0,0,,Dangerous indeed.
+Dialogue: 0,0:11:06.16,0:11:09.94,main,Subaru,0,0,0,,I just hope Julius isn't feeling too down.
+Dialogue: 0,0:11:10.32,0:11:11.32,main,Emilia,0,0,0,,You're worried?
+Dialogue: 0,0:11:11.95,0:11:12.90,main,Subaru,0,0,0,,Hard to say.
+Dialogue: 0,0:11:13.36,0:11:16.11,main,Subaru,0,0,0,,I mean, sure, I'm worried about him...
+Dialogue: 0,0:11:16.84,0:11:19.21,main,Subaru,0,0,0,,but it's not that simple, you know?
+Dialogue: 0,0:11:20.79,0:11:21.78,main,Subaru,0,0,0,,Also...
+Dialogue: 0,0:11:22.40,0:11:26.88,main,Subaru,0,0,0,,why did she try so hard to help Julius?
+Dialogue: 0,0:11:26.88,0:11:30.75,main,Ram,0,0,0,,I'm concerned for them, \Nbut the exam is important, too.
+Dialogue: 0,0:11:31.18,0:11:34.46,main,Ram,0,0,0,,If we don't get past it, we won't \Nfind a way to get Rem back.
+Dialogue: 0,0:11:34.77,0:11:38.94,main,Subaru,0,0,0,,To be completely honest, that \Nexaminer was insanely strong.
+Dialogue: 0,0:11:38.94,0:11:41.00,main,Subaru,0,0,0,,Maybe even on Reinhard's level.
+Dialogue: 0,0:11:41.00,0:11:43.43,main,Emilia,0,0,0,,Yeah. I think he was just that strong.
+Dialogue: 0,0:11:43.86,0:11:46.96,main,Ram,0,0,0,,Right now, there's only one person \Nin each nation who's strong enough
+Dialogue: 0,0:11:46.96,0:11:48.93,main,Ram,0,0,0,,to be called the best in the world.
+Dialogue: 0,0:11:49.21,0:11:51.94,main,Subaru,0,0,0,,Reinhard's the strongest in the kingdom...
+Dialogue: 0,0:11:51.94,0:11:55.23,main,Subaru,0,0,0,,so there's one like him in each \Nof the other three countries, too?
+Dialogue: 0,0:11:57.35,0:11:59.49,main,Ram,0,0,0,,The top general of the Vollachia Empire,
+Dialogue: 0,0:11:59.49,0:12:02.46,main,Ram,0,0,0,,the "Blue Lightning," Cecils Segmund.
+Dialogue: 0,0:12:03.60,0:12:06.58,main,Ram,0,0,0,,The "Mad Prince" of the \NHoly Kingdom of Gusteco.
+Dialogue: 0,0:12:07.27,0:12:10.96,main,Ram,0,0,0,,And the city-state of Kararagi \Nhas the "Admirer," Halibel.
+Dialogue: 0,0:12:11.54,0:12:14.25,main,Ram,0,0,0,,None of them fit the description \Nof the stick swinger.
+Dialogue: 0,0:12:14.25,0:12:18.00,main,Beatrice,0,0,0,,His outfit resembled the traditional \Nattire of Kararagi, I suppose.
+Dialogue: 0,0:12:18.00,0:12:20.01,main,Beatrice,0,0,0,,He was also a master at using chopsticks.
+Dialogue: 0,0:12:20.01,0:12:22.49,main,Subaru,0,0,0,,I'm not sure you could call him a master.
+Dialogue: 0,0:12:22.49,0:12:25.30,main,Subaru,0,0,0,,That's not even how chopsticks are used.
+Dialogue: 0,0:12:24.14,0:12:27.26,overlap,Meili,0,0,0,,Hey, you guys... Got a minute?
+Dialogue: 0,0:12:31.22,0:12:35.53,main,Shaula,0,0,0,,Master... Don't leave me alone...
+Dialogue: 0,0:12:35.53,0:12:37.94,main,Shaula,0,0,0,,I don't want to be lonely anymore...
+Dialogue: 0,0:12:37.94,0:12:41.06,main,Subaru,0,0,0,,Don't say sad stuff when \Nwe're just about to leave!
+Dialogue: 0,0:12:41.06,0:12:43.45,main,Subaru,0,0,0,,You're totally awake, aren't you?
+Dialogue: 0,0:12:43.45,0:12:44.91,main,Shaula,0,0,0,,Boo.
+Dialogue: 0,0:12:47.60,0:12:51.66,main,Shaula,0,0,0,,Huh? What are you guys doing here?
+Dialogue: 0,0:12:51.66,0:12:56.97,main,Shaula,0,0,0,,Last thing I remember was Master's flash\Nof insight getting us past the exam...
+Dialogue: 0,0:12:56.97,0:12:57.72,main,Shaula,0,0,0,,Is this a dream?
+Dialogue: 0,0:12:57.72,0:12:58.63,main,Subaru,0,0,0,,It's real.
+Dialogue: 0,0:12:59.55,0:13:04.87,main,Shaula,0,0,0,,Well, then Master hugged me and said, \Nlaughing, "I won't let you go again."
+Dialogue: 0,0:13:04.87,0:13:06.01,main,Subaru,0,0,0,,{\i1}That's{\i0} a dream!
+Dialogue: 0,0:13:06.34,0:13:09.77,main,Subaru,0,0,0,,You passed out the moment \Nthe second exam started.
+Dialogue: 0,0:13:09.77,0:13:12.16,main,Shaula,0,0,0,,Passed out? Me?
+Dialogue: 0,0:13:12.16,0:13:15.39,main,Shaula,0,0,0,,I'd never do anything that pathetic!
+Dialogue: 0,0:13:15.39,0:13:17.44,main,Subaru,0,0,0,,You don't remember?
+Dialogue: 0,0:13:17.44,0:13:20.27,main,Subaru,0,0,0,,We went up that long stairway \Nand into a white room...
+Dialogue: 0,0:13:20.77,0:13:21.73,main,Shaula,0,0,0,,Uh-huh.
+Dialogue: 0,0:13:21.73,0:13:25.49,main,Subaru,0,0,0,,Then, when I pulled out the sword, the \Nscenery changed, and a person appeared...
+Dialogue: 0,0:13:25.95,0:13:27.45,main,Shaula,0,0,0,,Uh-huh.
+Dialogue: 0,0:13:27.45,0:13:32.37,main,Subaru,0,0,0,,A guy with red hair and blue eyes who \Ncalled himself a "stick swinger."
+Dialogue: 0,0:13:32.80,0:13:36.62,main,Subaru,0,0,0,,Ow! Ow, ow, ow! You remember now?!
+Dialogue: 0,0:13:36.62,0:13:39.68,main,Shaula,0,0,0,,Wh-Wh-What is he doing here?!
+Dialogue: 0,0:13:39.68,0:13:44.40,main,Shaula,0,0,0,,He's alive! He really is \Na guy you just can't kill!
+Dialogue: 0,0:13:44.40,0:13:46.42,main,Subaru,0,0,0,,Huh?! What are you—
+Dialogue: 0,0:13:45.24,0:13:46.42,overlap,Shaula,0,0,0,,"Stick swinger"!
+Dialogue: 0,0:13:46.42,0:13:47.92,main,Shaula,0,0,0,,Reid the Stick Swinger!
+Dialogue: 0,0:13:47.92,0:13:49.93,main,Shaula,0,0,0,,That brute! That devil!
+Dialogue: 0,0:13:49.93,0:13:54.49,main,Shaula,0,0,0,,He came back alive just so \Nhe could fondle my boobs!
+Dialogue: 0,0:13:55.20,0:13:58.40,main,Subaru,0,0,0,,Reid? Wasn't Reid the guy who...
+Dialogue: 0,0:13:59.20,0:14:00.49,main,Ram,0,0,0,,Reid Astrea.
+Dialogue: 0,0:14:01.09,0:14:02.61,main,Ram,0,0,0,,The first Sword Saint.
+Dialogue: 0,0:14:06.19,0:14:08.53,main,Subaru,0,0,0,,Julius, sorry to bug you \Nwhen you're asleep.
+Dialogue: 0,0:14:09.14,0:14:12.20,main,Subaru,0,0,0,,We figured out who that guy \Nwas, and we need your...
+Dialogue: 0,0:14:14.24,0:14:16.25,main,Subaru,0,0,0,,That idiot!
+Dialogue: 0,0:14:23.12,0:14:28.59,main,Reid,0,0,0,,We're not just playin'\Naround this time, bro.
+Dialogue: 0,0:14:30.55,0:14:35.06,main,Julius,0,0,0,,I am Julius Juukulius of the \NLugunica Imperial Knights.
+Dialogue: 0,0:14:35.06,0:14:38.32,main,Reid,0,0,0,,So long as you keep throwin' \Naround that stupid title,
+Dialogue: 0,0:14:38.32,0:14:40.73,main,Reid,0,0,0,,you're not even worth my\Ntime to play with.
+Dialogue: 0,0:14:51.39,0:14:52.62,main,Reid,0,0,0,,Boring!
+Dialogue: 0,0:14:52.62,0:14:54.99,main,Reid,0,0,0,,Playing exactly by the book, aren't ya?!
+Dialogue: 0,0:15:01.92,0:15:03.04,main,Reid,0,0,0,,There ya go!
+Dialogue: 0,0:15:12.39,0:15:15.77,main,Reid,0,0,0,,Hmph! Damn, you're pathetic.
+Dialogue: 0,0:15:15.77,0:15:18.40,main,Reid,0,0,0,,How long have you been using a sword, anyway?
+Dialogue: 0,0:15:18.40,0:15:22.32,main,Reid,0,0,0,,It's only been three \Nmonths for me, y'know.
+Dialogue: 0,0:15:34.32,0:15:38.26,main,Julius,0,0,0,,I... will defeat you... right here and—
+Dialogue: 0,0:15:38.26,0:15:40.06,main,Reid,0,0,0,,Don't be dumb.
+Dialogue: 0,0:15:40.06,0:15:41.75,main,Reid,0,0,0,,You really think you can?
+Dialogue: 0,0:15:42.02,0:15:44.88,main,Reid,0,0,0,,You can't. Not you.
+Dialogue: 0,0:15:48.36,0:15:51.72,main,Reid,0,0,0,,You won't swing that sword enough \Nto reach me! You haven't yet!
+Dialogue: 0,0:15:51.72,0:15:54.09,main,Reid,0,0,0,,You're not good enough!
+Dialogue: 0,0:15:54.39,0:15:57.22,main,Reid,0,0,0,,This is no place for you!
+Dialogue: 0,0:15:57.22,0:16:01.43,main,Reid,0,0,0,,You're the wrong actor for this \Nscene! Nobody invited you!
+Dialogue: 0,0:16:06.97,0:16:09.82,main,Reid,0,0,0,,Nobody's watching a loser like you.
+Dialogue: 0,0:16:09.82,0:16:11.99,main,Reid,0,0,0,,Nobody expects anything of you.
+Dialogue: 0,0:16:12.39,0:16:16.29,main,Reid,0,0,0,,Don't get complacent thinkin' \NI'm just playin' around!
+Dialogue: 0,0:16:21.81,0:16:24.38,main,Reid,0,0,0,,Damn, you withstood that?
+Dialogue: 0,0:16:24.38,0:16:26.88,main,Reid,0,0,0,,You're just gettin' more and more boring.
+Dialogue: 0,0:16:39.36,0:16:42.06,main,Julius,0,0,0,,Right now...
+Dialogue: 0,0:16:43.85,0:16:45.40,main,Julius,0,0,0,,this strength...
+Dialogue: 0,0:16:48.16,0:16:49.89,main,Julius,0,0,0,,is the only thing I...
+Dialogue: 0,0:16:52.65,0:16:56.03,main,Reid,0,0,0,,Your hesitation's showing in\Nyour sword work.
+Dialogue: 0,0:16:57.27,0:16:59.78,main,Reid,0,0,0,,You're not worthy of the heavenly sword.
+Dialogue: 0,0:17:00.60,0:17:04.83,main,Reid,0,0,0,,You can't even manage to be a follower.
+Dialogue: 0,0:17:16.89,0:17:19.43,flashback,Subaru FB,0,0,0,,My eyes know just how strong you are!
+Dialogue: 0,0:17:19.64,0:17:21.43,flashback,Subaru FB,0,0,0,,My humiliation knows it!
+Dialogue: 0,0:17:21.89,0:17:24.14,flashback,Subaru FB,0,0,0,,No matter who else may forget!
+Dialogue: 0,0:17:25.44,0:17:27.06,flashback,Subaru FB,0,0,0,,Julius!
+Dialogue: 0,0:18:03.97,0:18:06.52,main,Julius,0,0,0,,It's... very shaky...
+Dialogue: 0,0:18:06.52,0:18:08.52,main,Subaru,0,0,0,,Oh, you're awake?
+Dialogue: 0,0:18:08.90,0:18:11.70,main,Julius,0,0,0,,I'm on your back?
+Dialogue: 0,0:18:11.70,0:18:13.14,main,Subaru,0,0,0,,That's right.
+Dialogue: 0,0:18:13.14,0:18:16.17,main,Subaru,0,0,0,,Just so you know, this is the \Nsecond time in not very long.
+Dialogue: 0,0:18:16.17,0:18:18.90,main,Subaru,0,0,0,,Do you know how it feels \Nto be doing this again
+Dialogue: 0,0:18:18.90,0:18:22.63,main,Subaru,0,0,0,,thirty minutes after saying I \Nnever wanted to do it again?
+Dialogue: 0,0:18:22.63,0:18:25.70,main,Julius,0,0,0,,No wonder I feel so uncomfortable.
+Dialogue: 0,0:18:25.70,0:18:28.16,main,Subaru,0,0,0,,You want me to drop you?
+Dialogue: 0,0:18:39.73,0:18:42.68,main,Julius,0,0,0,,Will Lady Anastasia be all right?
+Dialogue: 0,0:18:42.68,0:18:44.86,main,Subaru,0,0,0,,Her life's not in danger.
+Dialogue: 0,0:18:44.86,0:18:47.69,main,Subaru,0,0,0,,You came a lot closer\Nto death than she did.
+Dialogue: 0,0:18:47.69,0:18:49.02,main,Subaru,0,0,0,,Up against him...
+Dialogue: 0,0:18:49.62,0:18:53.91,main,Subaru,0,0,0,,You know, you're gonna be shocked when \Nyou find out who that eyepatch guy was.
+Dialogue: 0,0:18:52.41,0:18:53.91,top,Julius,0,0,0,,Reid Astrea.
+Dialogue: 0,0:18:54.40,0:18:56.43,main,Subaru,0,0,0,,Good on you for knowing.
+Dialogue: 0,0:18:56.43,0:18:58.35,main,Subaru,0,0,0,,I had to learn it from Shaula.
+Dialogue: 0,0:18:58.35,0:19:02.01,main,Julius,0,0,0,,I had a hunch the moment he called \Nhimself a "stick swinger,"
+Dialogue: 0,0:19:02.01,0:19:03.91,main,Julius,0,0,0,,but I couldn't be certain.
+Dialogue: 0,0:19:03.91,0:19:05.94,main,Julius,0,0,0,,I'm sorry I couldn't tell you.
+Dialogue: 0,0:19:05.94,0:19:06.89,main,Subaru,0,0,0,,It's fine.
+Dialogue: 0,0:19:12.64,0:19:13.46,main,Subaru,0,0,0,,Julius...
+Dialogue: 0,0:19:14.75,0:19:18.82,main,Subaru,0,0,0,,I'm gonna tell you this since you'll \Nfind out when we get back anyway.
+Dialogue: 0,0:19:18.82,0:19:21.36,main,Subaru,0,0,0,,After you and Lady Anastasia went down,
+Dialogue: 0,0:19:21.36,0:19:23.63,main,Subaru,0,0,0,,Emilia passed the exam.
+Dialogue: 0,0:19:24.64,0:19:29.44,main,Subaru,0,0,0,,But it wasn't like she matched her \Nopponent in strength or anything.
+Dialogue: 0,0:19:29.44,0:19:31.88,main,Subaru,0,0,0,,She just had a lot of coincidences \Nline up in her favor,
+Dialogue: 0,0:19:31.88,0:19:35.11,main,Subaru,0,0,0,,plus Emilia is just...\Nyou know... special.
+Dialogue: 0,0:19:35.48,0:19:39.57,main,Subaru,0,0,0,,So... I mean... don't get too excited.
+Dialogue: 0,0:19:40.64,0:19:41.78,main,Julius,0,0,0,,Excited?
+Dialogue: 0,0:19:42.24,0:19:45.02,main,Julius,0,0,0,,If Lady Emilia was able to pass the exam,
+Dialogue: 0,0:19:45.02,0:19:48.43,main,Julius,0,0,0,,then Reid the Sword Saint is \Nnot an insurmountable obstacle.
+Dialogue: 0,0:19:48.43,0:19:50.72,main,Julius,0,0,0,,That knowledge alone helps us immensely.
+Dialogue: 0,0:19:50.72,0:19:54.50,main,Subaru,0,0,0,,Y-Yeah, you're right. That's true.
+Dialogue: 0,0:19:55.11,0:19:57.27,main,Subaru,0,0,0,,So long as you realize that.
+Dialogue: 0,0:19:59.21,0:20:02.29,main,Julius,0,0,0,,Would you mind letting me down now?
+Dialogue: 0,0:20:02.29,0:20:05.97,main,Julius,0,0,0,,I fear I'll get sick if I have \Nto ride on your back any longer.
+Dialogue: 0,0:20:06.28,0:20:10.29,main,Subaru,0,0,0,,Emilia would kill me if she found out \NI made you walk while you're hurt.
+Dialogue: 0,0:20:10.29,0:20:12.64,main,Julius,0,0,0,,I'm awake. I can go\Ndown these stairs myself.
+Dialogue: 0,0:20:12.64,0:20:14.48,main,Subaru,0,0,0,,Little late for the tough act now.
+Dialogue: 0,0:20:14.48,0:20:17.85,main,Subaru,0,0,0,,Everyone already saw me\Ncarrying you earlier.
+Dialogue: 0,0:20:17.85,0:20:21.36,main,Subaru,0,0,0,,Except Shaula and Lady Anastasia, \Nthat is, since they were unconscious.
+Dialogue: 0,0:20:21.36,0:20:23.42,main,Julius,0,0,0,,Then that will be my reason.
+Dialogue: 0,0:20:23.42,0:20:25.42,main,Julius,0,0,0,,I can't let Lady Anastasia see—
+Dialogue: 0,0:20:25.42,0:20:27.67,main,Subaru,0,0,0,,Don't make it sound so forced.
+Dialogue: 0,0:20:27.67,0:20:28.68,main,Julius,0,0,0,,Put me down.
+Dialogue: 0,0:20:28.68,0:20:30.87,main,Subaru,0,0,0,,You know, you—
+Dialogue: 0,0:20:30.87,0:20:32.29,main,Julius,0,0,0,,I said put me down!
+Dialogue: 0,0:20:32.29,0:20:34.31,main,Subaru,0,0,0,,Whoa, hey! Hang on!
+Dialogue: 0,0:20:39.75,0:20:41.28,main,Subaru,0,0,0,,You...
+Dialogue: 0,0:20:41.28,0:20:43.47,main,Subaru,0,0,0,,You idiot! What are you even thinking?!
+Dialogue: 0,0:20:43.47,0:20:44.72,main,Julius,0,0,0,,Stay away!
+Dialogue: 0,0:20:48.31,0:20:49.64,main,Julius,0,0,0,,I can stand on my own.
+Dialogue: 0,0:20:51.89,0:20:53.93,main,Julius,0,0,0,,I do not need...
+Dialogue: 0,0:20:56.06,0:20:57.05,main,Julius,0,0,0,,your help!
+Dialogue: 0,0:21:08.02,0:21:09.72,main,Julius,0,0,0,,I told you.
+Dialogue: 0,0:21:10.44,0:21:13.92,main,Julius,0,0,0,,Standing up on my own is a simple matter.
+Dialogue: 0,0:21:15.29,0:21:20.67,main,Julius,0,0,0,,I may be a bit slow, but there's no \Nneed to put you through any trouble.
+Dialogue: 0,0:21:21.40,0:21:25.13,main,Julius,0,0,0,,Could you go on ahead and tell \Nthe others what happened?
+Dialogue: 0,0:21:25.72,0:21:28.31,main,Julius,0,0,0,,I will explain things to them myself.
+Dialogue: 0,0:21:28.31,0:21:33.50,main,Julius,0,0,0,,You need only tell them that you found me.
+Dialogue: 0,0:21:36.81,0:21:39.66,main,Subaru,0,0,0,,Oh, damn it! Damn it! Damn it! Damn it!
+Dialogue: 0,0:21:39.66,0:21:43.53,main,Subaru,0,0,0,,Idiots! You and I are both huge idiots!
+Dialogue: 0,0:21:44.21,0:21:45.09,main,Julius,0,0,0,,What are you—
+Dialogue: 0,0:21:45.09,0:21:47.87,main,Subaru,0,0,0,,Shut up! You can stand\Non your own, my ass!
+Dialogue: 0,0:21:47.87,0:21:50.74,main,Subaru,0,0,0,,I can plainly see how\Nhunched over you are!
+Dialogue: 0,0:21:51.14,0:21:53.87,main,Subaru,0,0,0,,You knew before that fight was over \Nthat you couldn't win, didn't you?
+Dialogue: 0,0:21:54.31,0:21:56.81,main,Subaru,0,0,0,,He beat you, kicked you,\Nknocked you down...
+Dialogue: 0,0:21:56.81,0:21:59.48,main,Subaru,0,0,0,,and you still had no choice but \Nto keep going after him, right?!
+Dialogue: 0,0:21:59.48,0:22:02.59,main,Subaru,0,0,0,,There was no other way to \Nget it out of your system!
+Dialogue: 0,0:22:03.14,0:22:07.34,main,Subaru,0,0,0,,Thanks to a certain someone, I \Nunderstand that damn well by now!
+Dialogue: 0,0:22:13.17,0:22:18.56,main,Subaru,0,0,0,,I won't talk as if I know how \Nyou really feel deep down.
+Dialogue: 0,0:22:18.56,0:22:22.48,main,Subaru,0,0,0,,But right now, there's no need for you
+Dialogue: 0,0:22:22.48,0:22:27.99,main,Subaru,0,0,0,,to try to get down this \Nlong-ass stairway alone.
+Dialogue: 0,0:22:27.99,0:22:31.70,main,Subaru,0,0,0,,I can spare a shoulder for you, and \NI won't even think of it as a favor.
+Dialogue: 0,0:22:32.87,0:22:35.29,main,Subaru,0,0,0,,Back then, I...
+Dialogue: 0,0:22:36.23,0:22:41.38,main,Subaru,0,0,0,,So I'm not gonna let you \Ngo down these stairs alone!
+Dialogue: 0,0:22:49.87,0:22:50.87,main,Julius,0,0,0,,Subaru.
+Dialogue: 0,0:22:51.33,0:22:52.32,main,Subaru,0,0,0,,What?
+Dialogue: 0,0:22:53.60,0:22:54.70,main,Julius,0,0,0,,I'm sorry.
+Dialogue: 0,0:22:56.01,0:22:57.20,main,Subaru,0,0,0,,Shut up.
+Dialogue: 0,0:23:04.40,0:23:05.61,italics,Julius INT,0,0,0,,I'm sure
+Dialogue: 0,0:23:07.94,0:23:10.10,italics,Julius INT,0,0,0,,no one would believe it.
+Dialogue: 0,0:23:11.30,0:23:17.37,italics,Julius INT,0,0,0,,The blowhard who made enemies of everyone \Nin the castle's great hall that day...
+Dialogue: 0,0:23:18.10,0:23:19.79,italics,Julius INT,0,0,0,,Even the very man who said it
+Dialogue: 0,0:23:20.35,0:23:22.39,italics,Julius INT,0,0,0,,couldn't hide his frivolous attitude
+Dialogue: 0,0:23:22.39,0:23:25.75,italics,Julius INT,0,0,0,,or the fact that he was riding \Non momentum when he said it.
+Dialogue: 0,0:23:27.44,0:23:28.62,italics,Julius INT,0,0,0,,No one...
+Dialogue: 0,0:23:31.72,0:23:32.69,italics,Julius INT,0,0,0,,No one...
+Dialogue: 0,0:23:35.05,0:23:40.06,Episode Title,Title,0,0,0,,{\an8\fs35\c&HAB4475&\t(720,2032\fs40)\t(907,2032,\c&H481A2E&)}Juli{\c&HFAA8C3&\t(907,2032,\c&HAB4475&)}u{\c&HAB4475&\t(907,2032,\c&H481A2E&)}s Juukulius
+Dialogue: 0,0:23:33.55,0:23:35.05,italics,Julius INT,0,0,0,,would believe
+Dialogue: 0,0:23:36.34,0:23:39.29,italics,Julius INT,0,0,0,,there was someone in that hall \Nwho was deeply moved by that.
+

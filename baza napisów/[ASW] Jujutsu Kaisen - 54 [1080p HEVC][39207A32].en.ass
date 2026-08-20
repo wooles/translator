@@ -1,0 +1,476 @@
+[Script Info]
+Title: English (US)
+ScriptType: v4.00+
+WrapStyle: 0
+PlayResX: 640
+PlayResY: 360
+ScaledBorderAndShadow: yes
+Video Aspect Ratio: 0
+Video Zoom: 8
+YCbCr Matrix: TV.601
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Roboto Medium,22,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1.3,0,2,20,20,23,1
+Style: Main,Roboto Medium,26,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1.3,0,2,20,20,23,1
+Style: Italics,Roboto Medium,26,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,-1,0,0,100,100,0,0,1,1.3,0,2,20,20,23,1
+Style: Flashback,Roboto Medium,26,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1.3,0,2,20,20,23,1
+Style: Flashback_Italics,Roboto Medium,26,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,-1,0,0,100,100,0,0,1,1.3,0,2,20,20,23,1
+Style: Narration,Roboto Medium,26,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,-1,0,0,100,100,0,0,1,1.3,0,2,20,20,23,1
+Style: Show_Title,Times New Roman,36,&H00000000,&H000000FF,&H0090D3CB,&H00000000,-1,0,0,0,100,150,0,0,1,2,0,8,10,10,18,1
+Style: Eyecatch_Title,Times New Roman,44,&H00070300,&H000000FF,&H009CE4E2,&H00000000,-1,0,0,0,100,150,0,0,1,2,0,8,10,10,18,1
+Style: Ep_Title,Times New Roman,24,&H00FFFFFF,&H000000FF,&H00000000,&H3C000000,-1,0,0,0,100,100,0,0,1,0,0,2,10,10,40,1
+Style: Ep_Title_Shadow,Times New Roman,24,&HFEFFFFFF,&H000000FF,&H00000000,&H3C000000,-1,0,0,0,100,100,0,0,1,0,1,3,10,28,50,1
+Style: Next_Ep_Title,Times New Roman,24,&H0AFFFFFF,&H000000FF,&H00000000,&H3C000000,-1,0,0,0,100,100,0,0,1,0,0,2,10,10,60,1
+Style: Sign_Basic,Trebuchet MS,24,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,1,2,10,10,18,1
+Style: Onscreen1,Times New Roman,16,&H00000000,&H000000FF,&H60FFFFFF,&H00000000,-1,0,0,0,100,100,0,0,1,3,0,2,10,10,10,1
+Style: Onscreen2,Times New Roman,16,&H00FFFFFF,&H000000FF,&H80000000,&H00000000,-1,0,0,0,100,100,0,0,1,3,0,2,10,10,10,1
+Style: Flashback_Top,Roboto Medium,26,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1.3,0,8,20,20,23,1
+Style: Player_Info,Trebuchet MS,18,&H0028412C,&H000000FF,&H0056C794,&H00000000,-1,0,0,0,100,100,0,0,1,2,0,2,10,10,320,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:09.55,0:00:10.74,Flashback,Kenjaku,0,0,0,,I'm sorry.
+Dialogue: 0,0:00:12.13,0:00:13.04,Flashback,Sasaki,0,0,0,,Who are you?
+Dialogue: 0,0:00:14.20,0:00:16.73,Flashback,Kenjaku,0,0,0,,The sorcerer who erected \Nthe barrier here.
+Dialogue: 0,0:00:17.40,0:00:19.25,Flashback,Kenjaku,0,0,0,,This spot has been chosen
+Dialogue: 0,0:00:20.00,0:00:21.89,Flashback,Kenjaku,0,0,0,,for people to kill each other in.
+Dialogue: 0,0:00:22.66,0:00:26.03,Flashback,Kenjaku,0,0,0,,Unfortunately, \Nthere's no real honor in it.
+Dialogue: 0,0:00:26.56,0:00:28.24,Flashback,Sasaki,0,0,0,,Kill each other?
+Dialogue: 0,0:00:29.72,0:00:33.05,Flashback,Sasaki,0,0,0,,Could you not do that in \Nmy neighborhood, please?
+Dialogue: 0,0:00:35.82,0:00:37.82,Flashback,Kenjaku,0,0,0,,You're funny.
+Dialogue: 0,0:00:38.51,0:00:42.07,Flashback,Kenjaku,0,0,0,,There's an old execution \Nsite not far from here.
+Dialogue: 0,0:00:42.07,0:00:44.24,Flashback,Kenjaku,0,0,0,,That serves as the center of the barrier.
+Dialogue: 0,0:00:44.69,0:00:47.03,Flashback,Kenjaku,0,0,0,,It covers a five- or six-kilometer radius.
+Dialogue: 0,0:00:47.71,0:00:51.02,Flashback,Kenjaku,0,0,0,,I went through great pains \Nto create this barrier,
+Dialogue: 0,0:00:51.02,0:00:54.05,Flashback,Kenjaku,0,0,0,,so I can't impose restrictions \Nthat are too unreasonable.
+Dialogue: 0,0:00:54.61,0:00:59.77,Flashback,Kenjaku,0,0,0,,Those of you who were inside the barrier \Nfrom the start have the right to leave it.
+Dialogue: 0,0:01:00.74,0:01:02.33,Flashback,Kenjaku,0,0,0,,Just once.
+Dialogue: 0,0:01:02.93,0:01:06.73,Flashback,Kenjaku,0,0,0,,If you wish, you could wake \Nup outside the barrier.
+Dialogue: 0,0:01:08.90,0:01:10.01,Flashback,Kenjaku,0,0,0,,Would you like to?
+Dialogue: 0,0:01:10.55,0:01:12.84,Flashback,Sasaki,0,0,0,,Wake up?
+Dialogue: 0,0:01:14.47,0:01:16.22,Flashback,Sasaki,0,0,0,,Is this a dream?
+Dialogue: 0,0:01:16.22,0:01:18.88,Flashback,Kenjaku,0,0,0,,You're in the space between \Ndreams and reality.
+Dialogue: 0,0:01:18.88,0:01:20.29,Flashback,Kenjaku,0,0,0,,It's a curse.
+Dialogue: 0,0:01:25.52,0:01:26.81,Flashback,Kenjaku,0,0,0,,Be careful.
+Dialogue: 0,0:01:26.81,0:01:28.26,Flashback,Kenjaku,0,0,0,,Take it slowly.
+Dialogue: 0,0:01:28.74,0:01:31.91,Flashback,Kenjaku,0,0,0,,The hasty ones are already outside.
+Dialogue: 0,0:01:59.42,0:02:00.83,Flashback,Kenjaku,0,0,0,,Oh, right.
+Dialogue: 0,0:02:00.83,0:02:02.76,Flashback,Kenjaku,0,0,0,,I nearly forgot to mention it.
+Dialogue: 0,0:02:04.23,0:02:07.51,Flashback,Kenjaku,0,0,0,,Thank you for being friends with my son.
+Dialogue: 0,0:02:06.25,0:02:07.30,Flashback,Iguchi,0,0,0,,Sasaki!
+Dialogue: 0,0:02:08.45,0:02:09.49,Flashback,Iguchi,0,0,0,,Sasaki!
+Dialogue: 0,0:02:10.05,0:02:11.26,Flashback,Iguchi,0,0,0,,Sasaki!
+Dialogue: 0,0:02:11.65,0:02:12.84,Flashback,Iguchi,0,0,0,,Sasaki!
+Dialogue: 0,0:02:15.48,0:02:16.72,Flashback,Sasaki,0,0,0,,Iguchi!
+Dialogue: 0,0:02:16.72,0:02:19.94,Flashback,Iguchi,0,0,0,,I'm so glad to see someone I know.
+Dialogue: 0,0:02:20.32,0:02:22.37,Sign_Basic,Screen,0,0,0,,{\fad(375,450)\bord.5\shad0\3a&H00&\fs10\pos(304,34)\an2\c&H000000&\3c&HFFFFFF&}My legs hurt...
+Dialogue: 0,0:02:20.32,0:02:22.37,Sign_Basic,Screen,0,0,0,,{\fad(375,450)\bord.5\shad0\fs10\an2\pos(234,45)\c&H000000&\3c&HFFFFFF&}My glasses are missing...
+Dialogue: 0,0:02:23.05,0:02:24.81,Flashback,Sasaki,0,0,0,,Where are we?
+Dialogue: 0,0:02:25.27,0:02:28.58,Flashback,Iguchi,0,0,0,,Somewhere between Kotodai \Nand Hirose Street.
+Dialogue: 0,0:02:28.58,0:02:30.03,Flashback,Iguchi,0,0,0,,More importantly, look.
+Dialogue: 0,0:02:30.37,0:02:31.63,Flashback,Iguchi,0,0,0,,What's your opinion on that?
+Dialogue: 0,0:02:32.13,0:02:33.70,Flashback,Iguchi,0,0,0,,As an occult club member?
+Dialogue: 0,0:02:35.34,0:02:40.51,Sign_Basic,Screen,0,0,0,,{\pos(317,310)\fnTimes New Roman\b1\bord0\shad0\fs20\1a&H22&}November 1, 06:02, Sendai Colony
+Dialogue: 0,0:02:34.54,0:02:36.98,Flashback_Top,Sasaki,0,0,0,,On that?
+Dialogue: 0,0:02:41.72,0:02:43.47,Flashback,Sasaki,0,0,0,,Can I talk about a dream?
+Dialogue: 0,0:02:44.29,0:02:45.72,Flashback,Iguchi,0,0,0,,Everyone's had it.
+Dialogue: 0,0:02:45.72,0:02:47.72,Flashback,Iguchi,0,0,0,,There was a guy with long \Nhair and a kasaya, right?
+Dialogue: 0,0:02:48.29,0:02:51.76,Flashback,Sasaki,0,0,0,,Then did he say something\Nabout his son to you, too?
+Dialogue: 0,0:02:51.76,0:02:54.43,Flashback,Iguchi,0,0,0,,Oh? No, first time hearing about that.
+Dialogue: 0,0:02:58.71,0:02:59.95,Flashback,Sasaki,0,0,0,,Itadori?
+Dialogue: 0,0:02:59.95,0:03:02.94,Ep_Title,Screen,0,0,0,,Episode 54\N{\fs30}Tokyo No. 1 Colony, Part 1
+Dialogue: 0,0:03:13.46,0:03:14.17,Show_Title,Screen,0,0,0,,{\c&H0200E9&\3c&H000000&}JUJUTSU KAISEN
+Dialogue: 0,0:03:37.43,0:03:41.60,Show_Title,Screen,0,0,0,,{\fad(0,650)\c&H2E2C2C&}JUJUTSU KAISEN\N{\fs12\c&HF3F3F3&\bord0\alpha&HFF&\t(237,736,1 \alpha&H00&)}The Culling Game Part 1
+Dialogue: 0,0:04:33.69,0:04:34.88,Flashback,Hakari,0,0,0,,For real?
+Dialogue: 0,0:04:35.23,0:04:37.42,Flashback,Hakari,0,0,0,,Gojo-san got sealed?
+Dialogue: 0,0:04:37.42,0:04:38.87,Flashback,Three,0,0,0,,For real.
+Dialogue: 0,0:04:41.48,0:04:43.39,Flashback,Hakari,0,0,0,,Damn!
+Dialogue: 0,0:04:43.39,0:04:45.70,Flashback,Panda,0,0,0,,Also, sorry to mention this as an aside,
+Dialogue: 0,0:04:45.70,0:04:47.26,Flashback,Panda,0,0,0,,but the principal's dead, too.
+Dialogue: 0,0:04:51.90,0:04:53.50,Flashback,Fushiguro,0,0,0,,Panda-senpai?
+Dialogue: 0,0:04:53.50,0:04:56.94,Flashback,Panda,0,0,0,,Sorry for not telling you, but it's true.
+Dialogue: 0,0:04:57.53,0:04:59.47,Flashback,Panda,0,0,0,,It's all right, Itadori.
+Dialogue: 0,0:04:59.47,0:05:01.07,Flashback,Panda,0,0,0,,He didn't die in Shibuya.
+Dialogue: 0,0:05:01.07,0:05:03.46,Flashback,Panda,0,0,0,,He fought with the higher-ups after that.
+Dialogue: 0,0:05:04.01,0:05:06.43,Flashback,Yuji,0,0,0,,That doesn't make it any better.
+Dialogue: 0,0:05:06.43,0:05:08.95,Flashback,Yuji,0,0,0,,The principal was your...
+Dialogue: 0,0:05:08.95,0:05:11.93,Flashback,Panda,0,0,0,,I'm including that in "it's all right."
+Dialogue: 0,0:05:11.93,0:05:13.08,Flashback,Panda,0,0,0,,Thanks, though.
+Dialogue: 0,0:05:13.65,0:05:17.81,Flashback,Hakari,0,0,0,,If you say so, then there's \Nnothing more for us to add.
+Dialogue: 0,0:05:17.81,0:05:18.71,Flashback,Kirara,0,0,0,,Yeah.
+Dialogue: 0,0:05:19.39,0:05:23.38,Flashback,Hakari,0,0,0,,Still, that's everyone who's \Nbeen good to me all at once...
+Dialogue: 0,0:05:23.38,0:05:24.84,Flashback,Hakari,0,0,0,,I haven't been this bummed out
+Dialogue: 0,0:05:24.84,0:05:28.34,Flashback,Hakari,0,0,0,,since I watched Yakul get shot\Nin the ass with an arrow.
+Dialogue: 0,0:05:28.34,0:05:30.85,Flashback,Three,0,0,0,,What a nice life you've lived.
+Dialogue: 0,0:05:30.85,0:05:35.11,Flashback,Hakari,0,0,0,,All right. I'll help you all \Nstop this Culling Game.
+Dialogue: 0,0:05:37.46,0:05:39.48,Flashback,Hakari,0,0,0,,Don't get me wrong, though.
+Dialogue: 0,0:05:39.95,0:05:42.28,Flashback,Hakari,0,0,0,,I'm not doing this out of sympathy.
+Dialogue: 0,0:05:42.28,0:05:44.19,Flashback,Hakari,0,0,0,,We're cutting a deal.
+Dialogue: 0,0:05:44.19,0:05:45.70,Flashback,Hakari,0,0,0,,Got me?
+Dialogue: 0,0:05:45.70,0:05:50.37,Flashback,Hakari,0,0,0,,Once we clean up this Culling Game, \Nit's your turn to help me.
+Dialogue: 0,0:05:50.37,0:05:55.01,Flashback,Panda,0,0,0,,You're trying to get in on the revisions \Nto the Jujutsu Regulations, right?
+Dialogue: 0,0:05:55.01,0:05:58.37,Flashback,Panda,0,0,0,,Now that the existence of \Ncurses has gone public,
+Dialogue: 0,0:05:58.37,0:06:01.37,Flashback,Panda,0,0,0,,there's sure to be some kind of revision,
+Dialogue: 0,0:06:01.80,0:06:04.18,Flashback,Panda,0,0,0,,but what exactly are you hoping for?
+Dialogue: 0,0:06:05.20,0:06:08.72,Flashback,Fushiguro,0,0,0,,Whatever it is, I doubt it'll \Nbe that hard to secure.
+Dialogue: 0,0:06:08.72,0:06:09.80,Flashback,Hakari,0,0,0,,Huh?!
+Dialogue: 0,0:06:09.80,0:06:13.68,Flashback,Hakari,0,0,0,,What would you know about it, \NSea Urchin Head?! Huh?!
+Dialogue: 0,0:06:13.99,0:06:17.06,Flashback,Fushiguro,0,0,0,,I'm the head of the Zen'in Clan.
+Dialogue: 0,0:06:14.73,0:06:17.06,Sign_Basic,Screen,0,0,0,,{\fad(450,0)\bord1\shad0\3a&H00&\fs14\b1\an2\c&H000000&\3c&HE5E5E5&\move(540,78,334,78)}Screw it,\NI'll use it where I can.
+Dialogue: 0,0:06:20.03,0:06:21.69,Flashback,Hakari,0,0,0,,Oh, yeah?
+Dialogue: 0,0:06:23.78,0:06:26.74,Flashback_Italics,Hakari,0,0,0,,Wait, wait, wait, wait, for real?!
+Dialogue: 0,0:06:26.74,0:06:27.95,Flashback_Italics,Hakari,0,0,0,,I'm sorry for the other two,
+Dialogue: 0,0:06:27.95,0:06:30.15,Flashback_Italics,Hakari,0,0,0,,but that's the most shocking \Nthing I've learned today!
+Dialogue: 0,0:06:30.15,0:06:32.56,Flashback_Italics,Hakari,0,0,0,,If I got the backing of one \Nof the big three families,
+Dialogue: 0,0:06:32.56,0:06:35.08,Flashback_Italics,Hakari,0,0,0,,I could easily influence the \Nrevisions to the regulations.
+Dialogue: 0,0:06:35.08,0:06:36.63,Flashback_Italics,Hakari,0,0,0,,The only problem would come later,
+Dialogue: 0,0:06:36.63,0:06:38.30,Flashback_Italics,Hakari,0,0,0,,in trying to keep the Zen'in Clan from
+Dialogue: 0,0:06:38.30,0:06:40.77,Flashback_Italics,Hakari,0,0,0,,getting involved in managing\Nthe fight club.
+Dialogue: 0,0:06:41.92,0:06:43.31,Flashback,Hakari,0,0,0,,Sea Urchin Head!
+Dialogue: 0,0:06:43.31,0:06:44.52,Flashback,Fushiguro,0,0,0,,It's Fushiguro.
+Dialogue: 0,0:06:44.52,0:06:45.68,Flashback,Hakari,0,0,0,,Fushiguro-kun!
+Dialogue: 0,0:06:50.07,0:06:51.82,Flashback,Hakari,0,0,0,,Let's be friends?
+Dialogue: 0,0:06:51.82,0:06:52.75,Flashback,Fushiguro,0,0,0,,Sure.
+Dialogue: 0,0:06:53.02,0:06:55.56,Sign_Basic,Screen,0,0,0,,{\fad(825,0)\fnGeorgia\c&H000000&\3c&H83A9B9&\shad0\fs18\pos(312,300)}The Next Day,\NThe Zen'in Clan Is Exterminated
+Dialogue: 0,0:06:55.56,0:06:59.61,Main,Panda,0,0,0,,Good. That just leaves deciding \Nwho's heading to which Colony.
+Dialogue: 0,0:06:59.61,0:07:01.21,Main,Panda,0,0,0,,Yuta went to Miyagi, right?
+Dialogue: 0,0:07:01.21,0:07:05.02,Main,Kogane,0,0,0,,Ding-dong, ding-dong, ding-dong, \Nding-dong, ding-dong, ding-dong!
+Dialogue: 0,0:07:05.02,0:07:10.19,Main,Kogane,0,0,0,,A Player has added a new \NRule to the Culling Game!
+Dialogue: 0,0:07:12.83,0:07:13.66,Onscreen2,Screen,0,0,0,,{\an8\3a&H00&}8: Players who do not show a\Nchange in points within 19 days of\Njoining or acquiring points\Nshall be stripped of their technique.
+Dialogue: 0,0:07:13.66,0:07:20.84,Onscreen2,Screen,0,0,0,,{\an8\fad(250,0)\3a&H00&}9: Players shall be able to view the \Nfollowing information on other players:\Nname, points, number of \Nrules added, current Colony.
+Dialogue: 0,0:07:10.19,0:07:13.99,Main,Kogane,0,0,0,,Rule 9: Players shall be able to view the \Nfollowing information on other players:
+Dialogue: 0,0:07:13.99,0:07:20.34,Main,Kogane,0,0,0,,name, points, number of \Nrules added, current colony.
+Dialogue: 0,0:07:21.11,0:07:22.68,Main,Kogane,0,0,0,,I am Kogane!
+Dialogue: 0,0:07:22.68,0:07:25.84,Main,Kogane,0,0,0,,A liaison between Players \Nand the Culling Game!
+Dialogue: 0,0:07:26.12,0:07:28.58,Main,Hakari,0,0,0,,Did that thing just change \Npersonality midway through?
+Dialogue: 0,0:07:28.58,0:07:31.76,Main,Kogane,0,0,0,,The first part was an announcement \Nfrom the Culling Game!
+Dialogue: 0,0:07:31.76,0:07:37.63,Main,Kogane,0,0,0,,Now I'm speaking as the personal liaison \Nattached to the Player Itadori Yuji!
+Dialogue: 0,0:07:39.01,0:07:42.05,Main,Yuji,0,0,0,,Tengen-sama did mention \Nsomething about that.
+Dialogue: 0,0:07:42.05,0:07:43.81,Main,Fushiguro,0,0,0,,Wait, this still isn't right!
+Dialogue: 0,0:07:43.81,0:07:47.19,Main,Fushiguro,0,0,0,,Why would Itadori be counted \Nas a Player already?
+Dialogue: 0,0:07:47.19,0:07:50.79,Main,Fushiguro,0,0,0,,Aside from those Kenjaku gave cursed \Ntechniques or cursed objects,
+Dialogue: 0,0:07:50.79,0:07:54.29,Main,Fushiguro,0,0,0,,the only Players should be \Nthose who have entered a Colony!
+Dialogue: 0,0:07:55.43,0:07:59.09,Flashback,Geto,0,0,0,,One type was people whom I had absorb \Ncursed objects like Yuji Itadori did...
+Dialogue: 0,0:07:57.79,0:07:59.81,Flashback_Top,Geto,0,0,0,,The cursed objects that I distributed \Nare what's left of the sorcerers
+Dialogue: 0,0:07:59.81,0:08:02.12,Flashback,Geto,0,0,0,,I've been secretly making\Npacts for a thousand years.
+Dialogue: 0,0:08:00.06,0:08:03.21,Flashback_Top,Geto,0,0,0,,Of course, I forged my pacts with \Nmore than just sorcerers...
+Dialogue: 0,0:08:03.21,0:08:05.69,Flashback,Gojo,0,0,0,,He's actually a human who really existed,
+Dialogue: 0,0:08:03.21,0:08:08.13,Sign_Basic,Screen,0,0,0,,{\an8\fnTimes New Roman\b1\c&HC7C7C8&\fs20}He's actually a human who really existed,\Nthough it was over a thousand years ago.
+Dialogue: 0,0:08:05.69,0:08:08.13,Flashback,Gojo,0,0,0,,though it was over a thousand years ago.
+Dialogue: 0,0:08:08.13,0:08:09.28,Main,Yuji,0,0,0,,Sukuna.
+Dialogue: 0,0:08:09.50,0:08:10.39,Sign_Basic,Screen,0,0,0,,{\fnComic Sans MS\c&H000000&\bord0\shad0\fs12\an9\pos(608,10)}Sukuna?
+Dialogue: 0,0:08:09.28,0:08:10.37,Main,Hakari,0,0,0,,Sukuna?
+Dialogue: 0,0:08:10.76,0:08:12.77,Main,Yuji,0,0,0,,I think Sukuna was one of the sorcerers
+Dialogue: 0,0:08:12.77,0:08:15.67,Main,Yuji,0,0,0,,who forged a pact with Kenjaku \Nand became a cursed object.
+Dialogue: 0,0:08:16.25,0:08:19.75,Italics,Fushiguro,0,0,0,,Is participation in the Culling Game \Nincluded in their pact, then?
+Dialogue: 0,0:08:20.10,0:08:21.85,Main,Fushiguro,0,0,0,,That's still strange, though.
+Dialogue: 0,0:08:22.26,0:08:24.85,Main,Fushiguro,0,0,0,,You swallowed Sukuna's finger \Nof your own free will.
+Dialogue: 0,0:08:24.85,0:08:26.03,Main,Fushiguro,0,0,0,,I witnessed it.
+Dialogue: 0,0:08:29.86,0:08:31.24,Main,Fushiguro,0,0,0,,We'll save that for later.
+Dialogue: 0,0:08:31.72,0:08:35.84,Main,Fushiguro,0,0,0,,Itadori, could you have Kogane pull up \Nthe Players' information right now?
+Dialogue: 0,0:08:37.31,0:08:39.50,Main,Fushiguro,0,0,0,,Kogane, can you?
+Dialogue: 0,0:08:39.50,0:08:40.65,Main,Kogane,0,0,0,,Sure can!
+Dialogue: 0,0:08:42.17,0:08:44.17,Main,Kogane,0,0,0,,Ta-da!
+Dialogue: 0,0:08:45.74,0:08:47.25,Main,Fushiguro,0,0,0,,This guy.
+Dialogue: 0,0:08:47.64,0:08:49.96,Main,Fushiguro,0,0,0,,So this guy originally had 200 points?
+Dialogue: 0,0:08:50.91,0:08:53.43,Main,Fushiguro,0,0,0,,I wonder what he was hoping \Nfor by adding a rule.
+Dialogue: 0,0:08:53.43,0:08:57.48,Main,Yuji,0,0,0,,At the very least, \Nhe's killed 40 people, right?
+Dialogue: 0,0:08:57.48,0:09:00.06,Main,Yuji,0,0,0,,So it's not going to be a \Nvery nice reason, yeah?
+Dialogue: 0,0:09:00.06,0:09:01.62,Main,Fushiguro,0,0,0,,Still, this means
+Dialogue: 0,0:09:01.62,0:09:05.68,Main,Fushiguro,0,0,0,,we might be able to progress through the \NCulling Game without killing anyone.
+Dialogue: 0,0:09:06.18,0:09:10.60,Main,Fushiguro,0,0,0,,Kogane, can you show a list of just \Nthe players with 100 points or more?
+Dialogue: 0,0:09:10.60,0:09:14.74,Main,Kogane,0,0,0,,I'm attached to Itadori Yuji, so...
+Dialogue: 0,0:09:14.74,0:09:16.36,Main,Yuji,0,0,0,,Oh, it's fine.
+Dialogue: 0,0:09:16.36,0:09:18.24,Main,Yuji,0,0,0,,Do what he asked.
+Dialogue: 0,0:09:18.24,0:09:20.24,Sign_Basic,Screen,0,0,0,,{\fnArial\b1\pos(190,115)\c&H182F23&\bord0\shad0}Searching
+Dialogue: 0,0:09:20.24,0:09:23.14,Main,Fushiguro,0,0,0,,Unless someone who got caught \Nup in this like Tsumiki did
+Dialogue: 0,0:09:23.14,0:09:25.81,Main,Fushiguro,0,0,0,,is in a rush to escape \Nthe barrier, then...
+Dialogue: 0,0:09:25.81,0:09:27.94,Main,Fushiguro,0,0,0,,The past sorcerers who have incarnated
+Dialogue: 0,0:09:27.94,0:09:31.10,Main,Fushiguro,0,0,0,,also just forged pacts with Kenjaku \Nfor their own reasons,
+Dialogue: 0,0:09:31.10,0:09:34.17,Main,Fushiguro,0,0,0,,so they're not necessarily \Nmotivated to do this.
+Dialogue: 0,0:09:34.52,0:09:38.52,Main,Fushiguro,0,0,0,,If there's anyone else with an excess \Nof points like Kashimo...
+Dialogue: 0,0:09:38.52,0:09:39.96,Main,Yuji,0,0,0,,Right!
+Dialogue: 0,0:09:39.96,0:09:43.91,Main,Yuji,0,0,0,,People who have over 100 points and \Nno intention of adding a rule!
+Dialogue: 0,0:09:43.91,0:09:45.27,Main,Yuji,0,0,0,,We can lean on them...
+Dialogue: 0,0:09:45.27,0:09:48.65,Main,Fushiguro,0,0,0,,...and make them add a rule to let \NTsumiki escape the Culling Game!
+Dialogue: 0,0:09:48.98,0:09:49.98,Main,Kogane,0,0,0,,Here you are.
+Dialogue: 0,0:09:49.99,0:09:52.14,Sign_Basic,Screen,0,0,0,,{\fnArial\b1\pos(190,115)\c&H182F23&\bord0\shad0}Searching
+Dialogue: 0,0:09:52.14,0:09:53.36,Player_Info,Screen,0,0,0,,{\pos(170,38)}Hajime Kashimo
+Dialogue: 0,0:09:52.14,0:09:53.36,Player_Info,Screen,0,0,0,,{\pos(300,62)\fs16}Points
+Dialogue: 0,0:09:52.14,0:09:53.36,Player_Info,Screen,0,0,0,,{\fs14\pos(466,64)}Rule Added
+Dialogue: 0,0:09:52.14,0:09:53.36,Player_Info,Screen,0,0,0,,{\pos(454,184)}Current Colony: Tokyo No. 2
+Dialogue: 0,0:09:52.14,0:09:53.36,Player_Info,Screen,0,0,0,,{\pos(170,198)}Hiromi Higuruma
+Dialogue: 0,0:09:52.14,0:09:53.36,Player_Info,Screen,0,0,0,,{\fs16\pos(300,220)}Points
+Dialogue: 0,0:09:52.14,0:09:53.36,Player_Info,Screen,0,0,0,,{\fs14\pos(466,220)}Rules Added
+Dialogue: 0,0:09:52.14,0:09:53.36,Player_Info,Screen,0,0,0,,{\pos(454,344)}Current Colony: Tokyo No. 1
+Dialogue: 1,0:09:52.16,0:09:53.36,Main,Fushiguro,0,0,0,,There's another one!
+Dialogue: 0,0:09:53.71,0:09:54.65,Main,Both,0,0,0,,Yeah!
+Dialogue: 0,0:09:55.18,0:09:57.71,Main,Fushiguro,0,0,0,,First, we'll have to take advantage \Nof the obstacle Rule 8 poses.
+Dialogue: 0,0:09:57.71,0:09:58.36,Main,Yuji,0,0,0,,Huh?
+Dialogue: 0,0:09:58.63,0:10:01.20,Main,Panda,0,0,0,,What was Rule 8 again?
+Dialogue: 0,0:10:01.20,0:10:04.71,Onscreen2,Screen,0,0,0,,{\an4\pos(46,90)}8: Players who do not show a\Nchange in points within 19 days
+Dialogue: 0,0:10:01.20,0:10:04.71,Onscreen2,Screen,0,0,0,,{\an4\pos(46,185)}of joining or acquiring points\Nshall be stripped of their technique.
+Dialogue: 0,0:10:01.52,0:10:04.71,Main,Fushiguro,0,0,0,,Players who do not show a change \Nin points within 19 days
+Dialogue: 0,0:10:04.71,0:10:20.85,Sign_Basic,Screen,0,0,0,,{\fs20\c&H111111&\bord2\shad0\fnTimes New Roman\b1\3c&HD4D4C9&\pos(106,256)}Day
+Dialogue: 0,0:10:04.71,0:10:20.85,Sign_Basic,Screen,0,0,0,,{\fs20\c&H111111&\bord2\shad0\fnTimes New Roman\b1\pos(456,256)\3c&HD4D4C9&}Day
+Dialogue: 0,0:10:04.71,0:10:06.60,Main,Fushiguro,0,0,0,,shall be stripped of their technique.
+Dialogue: 0,0:10:06.60,0:10:08.48,Main,Fushiguro,0,0,0,,It's the Rule that leads to death.
+Dialogue: 0,0:10:08.48,0:10:11.07,Main,Fushiguro,0,0,0,,So we add a Rule that says,
+Dialogue: 0,0:10:11.07,0:10:14.06,Main,Fushiguro,0,0,0,,"It is possible for Players to \Ntransfer points among each other."
+Dialogue: 0,0:10:14.64,0:10:17.37,Main,Fushiguro,0,0,0,,That way, if they keep passing \Npoints between each other,
+Dialogue: 0,0:10:17.37,0:10:20.22,Main,Fushiguro,0,0,0,,they can avoid being stripped \Nof their techniques and dying.
+Dialogue: 0,0:10:21.15,0:10:22.84,Main,Fushiguro,0,0,0,,Then, if possible, we add one more.
+Dialogue: 0,0:10:22.85,0:10:28.27,Onscreen2,Screen,0,0,0,,{\an4\pos(46,175}"Players may expend \Npoints to leave the Culling Game."
+Dialogue: 0,0:10:23.10,0:10:28.26,Main,Fushiguro,0,0,0,,We add a Rule like, "Players may expend \Npoints to leave the Culling Game."
+Dialogue: 0,0:10:28.26,0:10:32.65,Main,Hakari,0,0,0,,Wouldn't that conflict with the Rule \Nabout the continuation of the game?
+Dialogue: 0,0:10:32.65,0:10:34.40,Main,Fushiguro,0,0,0,,I think it would, too.
+Dialogue: 0,0:10:34.40,0:10:37.88,Main,Fushiguro,0,0,0,,But we might be able to get around \Nthat by adding a condition
+Dialogue: 0,0:10:37.88,0:10:40.77,Main,Fushiguro,0,0,0,,like dragging a non-Player into the \NCulling Game to take their place.
+Dialogue: 0,0:10:40.77,0:10:42.51,Main,Hakari,0,0,0,,True.
+Dialogue: 0,0:10:42.51,0:10:44.88,Main,Hakari,0,0,0,,Would Kogane be making the call on that?
+Dialogue: 0,0:10:44.88,0:10:48.03,Main,Yuji,0,0,0,,Either way, we know what \Nwe need to do now.
+Dialogue: 0,0:10:48.03,0:10:48.92,Main,Fushiguro,0,0,0,,Yeah.
+Dialogue: 0,0:10:48.92,0:10:53.01,Sign_Basic,Screen,0,0,0,,{\pos(320,205)\fnTimes New Roman\fs16\b1\c&H3459A4&\bord0\shad0}Angel
+Dialogue: 0,0:10:49.58,0:10:53.01,Main,Fushiguro,0,0,0,,While we're searching for the Angel \Nto break the Prison Realm's seal,
+Dialogue: 0,0:10:53.99,0:10:55.77,Main,Fushiguro,0,0,0,,we'll pursue Hajime Kashimo
+Dialogue: 0,0:10:56.75,0:10:58.01,Main,Fushiguro,0,0,0,,and Hiromi Higuruma,
+Dialogue: 0,0:10:59.01,0:11:00.07,Main,Fushiguro,0,0,0,,and hunt them down.
+Dialogue: 0,0:10:59.01,0:11:00.64,Onscreen1,Screen,0,0,0,,{\pos(320,185)}Persuade Players with 100 Points\Nand No Intention of Adding a Rule
+Dialogue: 0,0:10:59.22,0:11:00.64,Onscreen1,Screen,0,0,0,,{\fad(125,0)\pos(140,272)}Hunt Down Hajime Kashimo
+Dialogue: 0,0:10:59.22,0:11:00.64,Onscreen1,Screen,0,0,0,,{\fad(125,0)\pos(501,272)}Hunt Down Hiromi Higuruma
+Dialogue: 0,0:11:03.13,0:11:05.97,Main,Yuji,0,0,0,,Yeah, there's seriously no "Angel" on here.
+Dialogue: 0,0:11:06.34,0:11:08.22,Main,Panda,0,0,0,,That probably isn't her real name.
+Dialogue: 0,0:11:08.22,0:11:10.12,Main,Panda,0,0,0,,Just like you're not listed as Sukuna.
+Dialogue: 0,0:11:11.72,0:11:14.49,Main,Fushiguro,0,0,0,,Tengen-sama said she was \Nin eastern Tokyo...
+Dialogue: 0,0:11:14.49,0:11:16.90,Main,Fushiguro,0,0,0,,That would be Colony No. 2, then.
+Dialogue: 0,0:11:17.53,0:11:19.40,Main,Hakari,0,0,0,,You guys know what she looks like?
+Dialogue: 0,0:11:20.11,0:11:21.91,Main,Fushiguro,0,0,0,,Apparently, we'll know when see her.
+Dialogue: 0,0:11:21.91,0:11:23.97,Main,Hakari,0,0,0,,Is that gonna work out?
+Dialogue: 0,0:11:24.85,0:11:26.16,Main,Hakari,0,0,0,,Well, whatever.
+Dialogue: 0,0:11:26.16,0:11:28.17,Main,Hakari,0,0,0,,Panda and I will take Tokyo No. 2.
+Dialogue: 0,0:11:28.17,0:11:30.83,Main,Hakari,0,0,0,,Fushiguro-kyun and Itadori can take No. 1.
+Dialogue: 0,0:11:30.83,0:11:32.49,Main,Hakari,0,0,0,,Kirara, stand by outside the barriers.
+Dialogue: 0,0:11:32.49,0:11:33.62,Main,Kirara,0,0,0,,Huh?
+Dialogue: 0,0:11:33.62,0:11:34.71,Main,Hakari,0,0,0,,Sound good?
+Dialogue: 0,0:11:35.09,0:11:36.18,Main,Panda,0,0,0,,What's your reasoning?
+Dialogue: 0,0:11:36.18,0:11:38.50,Main,Hakari,0,0,0,,Just going by points, \Nthis Kashimo's the strongest one,
+Dialogue: 0,0:11:38.50,0:11:40.79,Main,Hakari,0,0,0,,so it makes sense for me to take him.
+Dialogue: 0,0:11:40.79,0:11:42.93,Main,Kirara,0,0,0,,I'm being excluded?
+Dialogue: 0,0:11:42.93,0:11:46.43,Main,Hakari,0,0,0,,You've got a keen nose, Panda, \Nso focus on finding the Angel.
+Dialogue: 0,0:11:47.27,0:11:49.72,Main,Hakari,0,0,0,,The fact that we haven't \Nalready heard from Okkotsu
+Dialogue: 0,0:11:49.72,0:11:52.45,Main,Hakari,0,0,0,,means we probably can't use cell \Nphones inside the barriers.
+Dialogue: 0,0:11:52.45,0:11:55.91,Main,Hakari,0,0,0,,So we'll want someone to keep tabs \Non what's going on outside them.
+Dialogue: 0,0:11:55.91,0:11:57.28,Main,Kirara,0,0,0,,Fine.
+Dialogue: 0,0:11:57.28,0:11:58.71,Main,Yuji,0,0,0,,Wait.
+Dialogue: 0,0:11:58.71,0:12:01.28,Main,Yuji,0,0,0,,It might be best for me and \NFushiguro to be split up.
+Dialogue: 0,0:12:01.28,0:12:02.08,Main,Yuji,0,0,0,,Sukuna is—
+Dialogue: 0,0:12:02.08,0:12:02.95,Main,Fushiguro,0,0,0,,Shut up.
+Dialogue: 0,0:12:03.34,0:12:04.70,Main,Yuji,0,0,0,,"Shut up"?!
+Dialogue: 0,0:12:04.70,0:12:07.95,Main,Fushiguro,0,0,0,,Our three senpai can't \Nchange their roles.
+Dialogue: 0,0:12:07.95,0:12:09.35,Main,Fushiguro,0,0,0,,So quit being selfish.
+Dialogue: 0,0:12:09.35,0:12:10.46,Main,Yuji,0,0,0,,Selfish?!
+Dialogue: 0,0:12:10.80,0:12:12.94,Main,Yuji,0,0,0,,I'm just worrying about you here!
+Dialogue: 0,0:12:12.94,0:12:15.72,Main,Fushiguro,0,0,0,,Are you going to say that every time?
+Dialogue: 0,0:12:15.72,0:12:18.29,Main,Fushiguro,0,0,0,,What a pain. Such a waste of time.
+Dialogue: 0,0:12:18.29,0:12:19.53,Main,Yuji,0,0,0,,Huh?!
+Dialogue: 0,0:12:19.53,0:12:20.79,Main,Panda,0,0,0,,Don't fight.
+Dialogue: 0,0:12:20.79,0:12:31.52,Sign_Basic,Screen,0,0,0,,{\fad(0,2175)\an7\fs16\b1\3c&HB7B0A4&\shad0\bord1\fnTimes New Roman}November 11th 12:00 Tokyo\N(Remaining Time Until Tsumiki\NMust Enter the Culling Game:\N7 Days 12 Hours)
+Dialogue: 0,0:12:22.20,0:12:24.61,Main,Kogane,0,0,0,,Hey, I'm Kogane!
+Dialogue: 0,0:12:24.61,0:12:30.46,Main,Kogane,0,0,0,,Inside this barrier is the Culling Game, \Nwhere Players fight to the death!
+Dialogue: 0,0:12:30.46,0:12:34.19,Main,Kogane,0,0,0,,Once you step inside, \Nyou, too, become a Player!
+Dialogue: 0,0:12:34.19,0:12:37.70,Main,Kogane,0,0,0,,Are you still willing to enter?!
+Dialogue: 0,0:12:37.70,0:12:38.32,Main,Hakari,0,0,0,,Yeah!
+Dialogue: 0,0:12:38.32,0:12:38.94,Main,Panda,0,0,0,,Yeah.
+Dialogue: 0,0:12:38.94,0:12:40.28,Main,Fushiguro,0,0,0,,No issues here.
+Dialogue: 0,0:12:43.66,0:12:45.99,Show_Title,screen,0,0,0,,{\pos(320,18)\shad1\be2\4c&H143F55&}JUJUTSU KAISEN
+Dialogue: 0,0:12:43.82,0:12:45.99,Italics,Hanyu,0,0,0,,Hey, Amai!
+Dialogue: 0,0:12:48.01,0:12:50.58,Italics,Hanyu,0,0,0,,I keep waiting for your signal!
+Dialogue: 0,0:12:50.88,0:12:54.76,Main,Amai,0,0,0,,Uh, well, I hear you,
+Dialogue: 0,0:12:54.76,0:12:57.34,Main,Amai,0,0,0,,but there's nothing I can \Ndo if no one's showing up.
+Dialogue: 0,0:12:57.34,0:12:58.11,Italics,Hanyu,0,0,0,,Huh?
+Dialogue: 0,0:12:59.19,0:13:02.30,Main,Hanyu,0,0,0,,Are you mouthing off to me now?
+Dialogue: 0,0:13:03.26,0:13:06.01,Main,Amai,0,0,0,,No! Look, I'm sorry!
+Dialogue: 0,0:13:06.01,0:13:07.35,Italics,Amai,0,0,0,,Please forgive me!
+Dialogue: 0,0:13:08.27,0:13:10.11,Main,Hanyu,0,0,0,,If you get too uppity,
+Dialogue: 0,0:13:12.06,0:13:13.77,Main,Hanyu,0,0,0,,I'll run you over.
+Dialogue: 0,0:13:14.88,0:13:17.51,Main,Fushiguro,0,0,0,,We need to be wary of the past \Nsorcerers who incarnated.
+Dialogue: 0,0:13:17.51,0:13:19.27,Main,Yuji,0,0,0,,My thoughts, too.
+Dialogue: 0,0:13:19.82,0:13:22.62,Main,Yuji,0,0,0,,But explain it to me \Nagain, Fushiguro-kun.
+Dialogue: 0,0:13:23.54,0:13:26.02,Main,Fushiguro,0,0,0,,Some of them are from \Na thousand years ago.
+Dialogue: 0,0:13:26.02,0:13:29.82,Main,Fushiguro,0,0,0,,Yet the value of a life was way different \Neven a hundred or two hundred years ago.
+Dialogue: 0,0:13:29.82,0:13:31.49,Main,Fushiguro,0,0,0,,Plus, they're sorcerers.
+Dialogue: 0,0:13:31.49,0:13:33.51,Main,Fushiguro,0,0,0,,Fighting and death are common for them.
+Dialogue: 0,0:13:33.51,0:13:34.97,Main,Fushiguro,0,0,0,,Some may want to die fighting.
+Dialogue: 0,0:13:35.36,0:13:38.48,Main,Fushiguro,0,0,0,,That might even be why they \Nforged a pact with Kenjaku.
+Dialogue: 0,0:13:39.15,0:13:42.28,Main,Fushiguro,0,0,0,,There's a strong chance that Higuruma \Nand Kashimo are past sorcerers.
+Dialogue: 0,0:13:42.82,0:13:44.88,Main,Fushiguro,0,0,0,,Don't expect a proper negotiation.
+Dialogue: 0,0:13:44.88,0:13:47.89,Main,Yuji,0,0,0,,Then the other aggressive ones are \Ngoing to be cursed spirits, huh?
+Dialogue: 0,0:13:48.24,0:13:49.61,Main,Fushiguro,0,0,0,,Especially at night.
+Dialogue: 0,0:13:50.23,0:13:54.01,Main,Fushiguro,0,0,0,,If they're a modern day sorcerer \Ndragged into this like Tsumiki,
+Dialogue: 0,0:13:54.00,0:13:57.15,Main,Fushiguro,0,0,0,,they actually might be open \Nto exchanging information.
+Dialogue: 0,0:13:59.05,0:14:00.98,Main,Kogane,0,0,0,,Hey, I'm Kogane!
+Dialogue: 0,0:14:01.36,0:14:06.95,Main,Kogane,0,0,0,,Inside this barrier is the Culling Game, \Nwhere Players fight to the death!
+Dialogue: 0,0:14:06.95,0:14:10.29,Main,Kogane,0,0,0,,Once you step inside, \Nyou, too, become a Player!
+Dialogue: 0,0:14:10.29,0:14:12.99,Main,Kogane,0,0,0,,Are you still willing to enter?!
+Dialogue: 0,0:14:12.99,0:14:15.41,Main,Fushiguro,0,0,0,,Yeah, no issues here.
+Dialogue: 0,0:14:17.07,0:14:20.37,Main,Kogane,0,0,0,,Megumi Fushiguro has \Njoined the Culling Game.
+Dialogue: 0,0:14:20.37,0:14:22.26,Main,Kogane,0,0,0,,Would you like to see the Rules?
+Dialogue: 0,0:14:22.26,0:14:24.50,Main,Fushiguro,0,0,0,,No need. I'm fine.
+Dialogue: 0,0:14:24.50,0:14:24.96,Main,Kogane,0,0,0,,Boo.
+Dialogue: 0,0:14:24.50,0:14:24.96,Sign_Basic,Screen,0,0,0,,{\c&H000000&\3c&HFFFFFF&\shad0\pos(102,200)}Boo...
+Dialogue: 0,0:14:25.24,0:14:26.03,Main,Fushiguro,0,0,0,,Itadori.
+Dialogue: 0,0:14:26.03,0:14:26.78,Main,Yuji,0,0,0,,Huh?
+Dialogue: 0,0:14:26.78,0:14:29.12,Main,Fushiguro,0,0,0,,First, we gather information on Higuruma.
+Dialogue: 0,0:14:29.69,0:14:30.62,Main,Fushiguro,0,0,0,,Let's go.
+Dialogue: 0,0:14:30.62,0:14:31.52,Main,Yuji,0,0,0,,Yeah!
+Dialogue: 0,0:14:37.13,0:14:38.35,Main,Yuji,0,0,0,,Fushiguro's gone?!
+Dialogue: 0,0:14:38.72,0:14:43.22,Narration,Narrator,0,0,0,,When a Player enters one of \Nthe Culling Game's barriers,
+Dialogue: 0,0:14:43.22,0:14:47.65,Narration,Narrator,0,0,0,,they're randomly teleported to one \Nof nine designated locations.
+Dialogue: 0,0:14:48.06,0:14:50.36,Narration,Narrator,0,0,0,,It was a rule of the barriers not included
+Dialogue: 0,0:14:50.36,0:14:52.83,Narration,Narrator,0,0,0,,in the general rules of the Culling Game.
+Dialogue: 0,0:14:52.83,0:14:55.45,Narration,Narrator,0,0,0,,But they were waiting in \Nthose nine locations...
+Dialogue: 0,0:14:55.45,0:14:56.67,Main,Amai,0,0,0,,Here's one!
+Dialogue: 0,0:14:57.01,0:15:01.59,Narration,Narration,0,0,0,,Players who targeted those disoriented \Nby this unmentioned phenomenon.
+Dialogue: 0,0:15:10.85,0:15:12.55,Narration,Narration,0,0,0,,Newbie-hunters.
+Dialogue: 0,0:15:14.13,0:15:16.49,Italics,Hanyu,0,0,0,,He's tough!
+Dialogue: 0,0:15:16.49,0:15:18.85,Italics,Hanyu,0,0,0,,This would have turned \Nmost into mincemeat.
+Dialogue: 0,0:15:18.85,0:15:20.60,Italics,Hanyu,0,0,0,,But he's still kicking.
+Dialogue: 0,0:15:20.60,0:15:22.23,Italics,Hanyu,0,0,0,,He's no ordinary person.
+Dialogue: 0,0:15:31.44,0:15:34.37,Main,Hanyu,0,0,0,,Darling, let's meet up.
+Dialogue: 0,0:15:37.71,0:15:39.82,Italics,Yuji,0,0,0,,She fell easily.
+Dialogue: 0,0:15:39.82,0:15:41.93,Italics,Yuji,0,0,0,,I need to ask her about Higuruma.
+Dialogue: 0,0:15:41.93,0:15:44.20,Italics,Yuji,0,0,0,,Then I have to find Fushiguro.
+Dialogue: 0,0:15:44.72,0:15:45.87,Main,Haba,0,0,0,,What the hell?!
+Dialogue: 0,0:15:46.77,0:15:49.09,Main,Haba,0,0,0,,What did you do to my woman?!
+Dialogue: 0,0:15:49.62,0:15:51.51,Main,Yuji,0,0,0,,Guess I can just ask him.
+Dialogue: 0,0:15:51.51,0:15:53.89,Italics,Amai,0,0,0,,Haba-san flew in.
+Dialogue: 0,0:15:53.89,0:15:55.93,Italics,Amai,0,0,0,,Was Hanyu-san taken out?
+Dialogue: 0,0:15:55.93,0:15:58.68,Italics,Amai,0,0,0,,I've seen him before...
+Dialogue: 0,0:15:59.75,0:16:01.13,Main,Amai,0,0,0,,Itadori?!
+Dialogue: 0,0:16:01.13,0:16:04.87,Main,Remi,0,0,0,,Ow! That hurts!
+Dialogue: 0,0:16:04.87,0:16:07.77,Main,Remi,0,0,0,,Why are you doing this?!
+Dialogue: 0,0:16:07.77,0:16:09.85,Main,Fushiguro,0,0,0,,You're the one who attacked me.
+Dialogue: 0,0:16:10.15,0:16:11.09,Italics,Fushiguro,0,0,0,,Damn it!
+Dialogue: 0,0:16:11.09,0:16:13.49,Italics,Fushiguro,0,0,0,,I didn't expect us to \Nget separated that way.
+Dialogue: 0,0:16:13.75,0:16:14.69,Main,Fushiguro,0,0,0,,Well?
+Dialogue: 0,0:16:15.92,0:16:17.96,Italics,Fushiguro,0,0,0,,Nue can't find him, either.
+Dialogue: 0,0:16:17.96,0:16:20.98,Italics,Fushiguro,0,0,0,,This Colony must be much \Nlarger than Shibuya.
+Dialogue: 0,0:16:20.98,0:16:23.19,Italics,Fushiguro,0,0,0,,We're probably over two kilometers apart.
+Dialogue: 0,0:16:23.81,0:16:25.87,Italics,Fushiguro,0,0,0,,But we both know where to head.
+Dialogue: 0,0:16:26.80,0:16:29.14,Main,Fushiguro,0,0,0,,Do you know a sorcerer named Higuruma?
+Dialogue: 0,0:16:29.68,0:16:33.62,Main,Remi,0,0,0,,Men think they can just beat women \Ninto listening to them, don't they?
+Dialogue: 0,0:16:33.62,0:16:34.67,Main,Fushiguro,0,0,0,,Answer me!
+Dialogue: 0,0:16:34.67,0:16:36.59,Main,Remi,0,0,0,,Yes. I'm sorry.
+Dialogue: 0,0:16:36.93,0:16:39.26,Main,Remi,0,0,0,,By Higuruma, you mean {\i1}that{\i0} guy, right?
+Dialogue: 0,0:16:39.26,0:16:40.78,Main,Remi,0,0,0,,The one with 100 points?
+Dialogue: 0,0:16:41.41,0:16:42.99,Main,Fushiguro,0,0,0,,Do you know where he is?
+Dialogue: 0,0:16:45.75,0:16:48.60,Main,Remi,0,0,0,,I see. So that's how it is.
+Dialogue: 0,0:17:01.44,0:17:03.07,Italics,Haba,0,0,0,,Damn brat!
+Dialogue: 0,0:17:03.07,0:17:05.26,Italics,Haba,0,0,0,,What physical prowess!
+Dialogue: 0,0:17:11.98,0:17:14.89,Italics,Yuji,0,0,0,,I thought I'd be in trouble with him \Nconstantly holding higher ground,
+Dialogue: 0,0:17:14.89,0:17:17.83,Italics,Yuji,0,0,0,,but that propeller's his \Nonly means of attack.
+Dialogue: 0,0:17:37.94,0:17:40.37,Italics,Yuji,0,0,0,,He keeps coming in close \Nto try to kill me.
+Dialogue: 0,0:17:40.37,0:17:42.12,Italics,Yuji,0,0,0,,I'll fight him indoors!
+Dialogue: 0,0:17:56.22,0:17:58.46,Main,Haba,0,0,0,,I'll turn you into a smoothie!
+Dialogue: 0,0:18:00.57,0:18:03.53,Italics,Yuji,0,0,0,,He's turned his head toward me!
+Dialogue: 0,0:18:05.68,0:18:07.58,Italics,Yuji,0,0,0,,That earlier airplane woman
+Dialogue: 0,0:18:07.58,0:18:10.24,Italics,Yuji,0,0,0,,was sturdy enough to smash \Nthrough buildings with me,
+Dialogue: 0,0:18:10.24,0:18:12.24,Italics,Yuji,0,0,0,,but she fell from such \Na simple thrown object.
+Dialogue: 0,0:18:12.68,0:18:14.96,Italics,Yuji,0,0,0,,Their hair is the core \Nof their technique,
+Dialogue: 0,0:18:14.96,0:18:17.83,Italics,Yuji,0,0,0,,so they're probably less sturdy the \Nfurther away from their hair you get.
+Dialogue: 0,0:18:18.28,0:18:19.56,Italics,Yuji,0,0,0,,Because of a pact?
+Dialogue: 0,0:18:19.56,0:18:23.03,Italics,Yuji,0,0,0,,But no matter how tough it may be, \Nit's still their head.
+Dialogue: 0,0:18:23.03,0:18:25.04,Italics,Yuji,0,0,0,,As long as I can attack it,
+Dialogue: 0,0:18:25.04,0:18:26.42,Italics,Yuji,0,0,0,,I can crack it open!
+Dialogue: 0,0:18:38.04,0:18:42.78,Main,Haba,0,0,0,,Broke your fist, did ya?\NYou just lost this battle!
+Dialogue: 0,0:18:51.58,0:18:54.60,Main,Yuji,0,0,0,,I didn't break anything. Ow.
+Dialogue: 0,0:18:54.60,0:18:57.02,Main,Remi,0,0,0,,I don't mind telling you,
+Dialogue: 0,0:18:57.02,0:18:59.61,Main,Remi,0,0,0,,but I want you to do me a favor in return.
+Dialogue: 0,0:19:01.33,0:19:02.69,Main,Fushiguro,0,0,0,,Spit it out.
+Dialogue: 0,0:19:02.69,0:19:05.32,Main,Remi,0,0,0,,Say it, pl...?
+Dialogue: 0,0:19:05.32,0:19:07.36,Main,Remi,0,0,0,,Tell me, pl...?
+Dialogue: 0,0:19:06.82,0:19:07.83,Main,Fushiguro,0,0,0,,Say it.
+Dialogue: 0,0:19:08.89,0:19:09.94,Main,Remi,0,0,0,,Fine.
+Dialogue: 0,0:19:11.67,0:19:13.62,Main,Remi,0,0,0,,Become my knight?
+Dialogue: 0,0:19:13.62,0:19:15.08,Main,Fushiguro,0,0,0,,Sure. That's fine.
+Dialogue: 0,0:19:17.26,0:19:19.74,Main,Remi,0,0,0,,Am I that much of a bore?
+Dialogue: 0,0:19:19.74,0:19:21.31,Main,Fushiguro,0,0,0,,I just don't have time.
+Dialogue: 0,0:19:21.31,0:19:22.54,Main,Fushiguro,0,0,0,,Hurry it up.
+Dialogue: 0,0:19:22.54,0:19:23.73,Main,Fushiguro,0,0,0,,Walk in front.
+Dialogue: 0,0:19:23.73,0:19:25.64,Main,Remi,0,0,0,,Do you even get it?!
+Dialogue: 0,0:19:26.04,0:19:29.89,Main,Remi,0,0,0,,My knight is supposed to \Nprotect me with his life!
+Dialogue: 0,0:19:30.80,0:19:33.27,Main,Fushiguro,0,0,0,,I will if you're telling me the truth.
+Dialogue: 0,0:19:35.20,0:19:37.71,Main,Yuji,0,0,0,,Hey, wake up.
+Dialogue: 0,0:19:37.71,0:19:40.86,Main,Yuji,0,0,0,,I want to ask you about a \Nsorcerer named Higuruma.
+Dialogue: 0,0:19:42.31,0:19:44.22,Main,Amai,0,0,0,,I-Itadori.
+Dialogue: 0,0:19:45.88,0:19:47.53,Main,Amai,0,0,0,,I know him.
+Dialogue: 0,0:19:48.18,0:19:50.28,Main,Amai,0,0,0,,That Higuruma guy.
+Dialogue: 0,0:19:51.19,0:19:54.66,Main,Fushiguro,0,0,0,,You know what will happen \Nif you're lying, right?
+Dialogue: 0,0:19:55.52,0:19:57.42,Italics,Fushiguro,0,0,0,,I'm not like Itadori.
+Dialogue: 0,0:19:57.42,0:19:59.83,Italics,Fushiguro,0,0,0,,I'm willing to earn those \N100 points on my own.
+Dialogue: 0,0:20:00.43,0:20:02.81,Sign_Basic,Screen,0,0,0,,{\pos(316.667,111.333)\c&H3C3336&\3c&H9A908E&\shad0\bord3\fs14\b1}Split Ahead
+Dialogue: 0,0:20:00.43,0:20:02.42,Main,Remi,0,0,0,,Stop calling me "you."
+Dialogue: 0,0:20:02.79,0:20:04.30,Main,Remi,0,0,0,,My name is Remi.
+Dialogue: 0,0:20:04.84,0:20:06.21,Main,Amai,0,0,0,,It's been a long time.
+Dialogue: 0,0:20:06.21,0:20:07.39,Main,Amai,0,0,0,,Do you remember me?
+Dialogue: 0,0:20:08.43,0:20:09.14,Main,Yuji,0,0,0,,Who are you?
+Dialogue: 0,0:20:09.58,0:20:11.71,Italics,Yuji,0,0,0,,How does he know my name?
+Dialogue: 0,0:20:12.22,0:20:13.44,Main,Amai,0,0,0,,Oh, sorry.
+Dialogue: 0,0:20:13.44,0:20:15.96,Main,Amai,0,0,0,,I guess it was just me \Nwho knew about you.
+Dialogue: 0,0:20:15.96,0:20:17.91,Main,Amai,0,0,0,,You were famous, you know.
+Dialogue: 0,0:20:18.31,0:20:19.77,Main,Amai,0,0,0,,The Tiger of West Middle School.
+Dialogue: 0,0:20:20.01,0:20:22.66,Main,Yuji,0,0,0,,Oh! You're from my hometown!
+Dialogue: 0,0:20:22.66,0:20:27.16,Sign_Basic,screen,0,0,0,,{\b1\c&H353334&\3c&H9B9390&\shad0\pos(320,222)}Split Ahead
+Dialogue: 0,0:20:23.90,0:20:27.22,Main,Fushiguro,0,0,0,,What, you're not a \Nsorcerer from the past?
+Dialogue: 0,0:20:27.53,0:20:31.55,Main,Remi,0,0,0,,Huh? Do I look that far behind the times?
+Dialogue: 0,0:20:31.84,0:20:34.28,Main,Fushiguro,0,0,0,,What's your reason for taking \Nthe initiative to fight, then?
+Dialogue: 0,0:20:34.83,0:20:36.16,Main,Remi,0,0,0,,Listen, you.
+Dialogue: 0,0:20:36.52,0:20:41.07,Main,Remi,0,0,0,,Average people who weren't Players \Ngot let out of the Colony,
+Dialogue: 0,0:20:41.60,0:20:44.81,Main,Remi,0,0,0,,but us Players who were in \Nthe Colony from the start
+Dialogue: 0,0:20:44.81,0:20:48.89,Main,Remi,0,0,0,,have had to participate in the \NCulling Game for twelve days already!
+Dialogue: 0,0:20:48.89,0:21:09.66,Sign_Basic,Screen,0,0,0,,{\b1\c&H353334&\3c&H9B9390&\shad0\move(320,224,320,278)\t(\fs30)}Split Ahead
+Dialogue: 0,0:20:49.26,0:20:52.29,Main,Remi,0,0,0,,I'm not doing this because I want to!
+Dialogue: 0,0:20:52.29,0:20:54.25,Main,Remi,0,0,0,,It's kill or be killed!
+Dialogue: 0,0:20:55.79,0:20:58.67,Main,Remi,0,0,0,,You'll get killed while you're trying \Nto find your reason to fight.
+Dialogue: 0,0:20:59.17,0:21:01.72,Main,Remi,0,0,0,,Anyone can figure that out \Nafter twelve days here.
+Dialogue: 0,0:21:02.45,0:21:05.48,Main,Remi,0,0,0,,I've seen plenty of people drown \Nin their power during that time.
+Dialogue: 0,0:21:06.12,0:21:09.67,Main,Remi,0,0,0,,So stop trying to differentiate between\Nthem as past or present sorcerers.
+Dialogue: 0,0:21:09.99,0:21:12.35,Italics,Fushiguro,0,0,0,,So the past sorcerers have inspired
+Dialogue: 0,0:21:12.35,0:21:14.91,Italics,Fushiguro,0,0,0,,even the modern-day sorcerers \Nto go into battle mode.
+Dialogue: 0,0:21:15.44,0:21:17.66,Italics,Fushiguro,0,0,0,,I might have given Itadori \Nbad advice, then.
+Dialogue: 0,0:21:18.12,0:21:20.81,Main,Yuji,0,0,0,,Are you sure? You were allies, right?
+Dialogue: 0,0:21:21.25,0:21:22.05,Main,Yuji,0,0,0,,With those two?
+Dialogue: 0,0:21:22.54,0:21:24.77,Main,Amai,0,0,0,,I was just their gofer.
+Dialogue: 0,0:21:24.77,0:21:26.82,Main,Amai,0,0,0,,They would have killed me at some point.
+Dialogue: 0,0:21:26.82,0:21:27.46,Main,Fushiguro,0,0,0,,Wait.
+Dialogue: 0,0:21:28.85,0:21:31.59,Main,Fushiguro,0,0,0,,Tell me where we're going already.
+Dialogue: 0,0:21:31.84,0:21:33.38,Main,Remi,0,0,0,,Look!
+Dialogue: 0,0:21:33.38,0:21:37.51,Main,Remi,0,0,0,,There's no guarantee that you won't \Nkill me after I tell you, right?
+Dialogue: 0,0:21:37.81,0:21:39.95,Main,Yuji,0,0,0,,I see. Uh...
+Dialogue: 0,0:21:39.95,0:21:41.29,Main,Amai,0,0,0,,Amai.
+Dialogue: 0,0:21:41.29,0:21:42.27,Main,Amai,0,0,0,,It's Rin Amai.
+Dialogue: 0,0:21:42.57,0:21:45.10,Main,Fushiguro,0,0,0,,What am I supposed to do if \Nyou die before I get there?
+Dialogue: 0,0:21:45.10,0:21:49.18,Main,Remi,0,0,0,,That's why! You need to! Protect me!
+Dialogue: 0,0:21:49.18,0:21:50.87,Main,Remi,0,0,0,,And use my name already!
+Dialogue: 0,0:21:50.87,0:21:52.29,Main,Fushiguro,0,0,0,,Anything could happen.
+Dialogue: 0,0:21:52.29,0:21:55.06,Main,Yuji,0,0,0,,Amai, where is Higuruma?
+Dialogue: 0,0:21:55.06,0:21:56.81,Main,Remi,0,0,0,,Well, fine.
+Dialogue: 0,0:21:56.81,0:21:58.57,Main,Remi,0,0,0,,I'll give you a rough idea.
+Dialogue: 0,0:21:58.57,0:22:01.48,Main,Amai,0,0,0,,The stronger people are gathered \Nwhere the city once thrived.
+Dialogue: 0,0:22:01.48,0:22:03.20,Main,Amai,0,0,0,,Since resources are in good supply there.
+Dialogue: 0,0:22:03.20,0:22:04.31,Main,Remi,0,0,0,,Higuruma is in...
+Dialogue: 0,0:22:03.81,0:22:04.88,Main,Amai,0,0,0,,Higuruma is in...
+Dialogue: 0,0:22:04.88,0:22:06.31,Main,Amai,0,0,0,,...Ikebukuro.
+Dialogue: 0,0:22:05.40,0:22:06.84,Main,Remi,0,0,0,,...Shinjuku.
+Dialogue: 0,0:22:06.84,0:22:07.68,Main,Amai,0,0,0,,Got it?
+Dialogue: 0,0:22:07.25,0:22:07.96,Main,Remi,0,0,0,,Got it?
+Dialogue: 0,0:23:40.68,0:23:44.43,Main,Higuruma,0,0,0,,I just sense potential \Nin the Culling Game.
+Dialogue: 0,0:23:44.43,0:23:45.77,Main,Yuji,0,0,0,,Every person in this nation will die.
+Dialogue: 0,0:23:45.77,0:23:48.09,Main,Reggie,0,0,0,,She deceived you.
+Dialogue: 0,0:23:48.09,0:23:49.44,Main,Amai,0,0,0,,I'm sorry, Itadori.
+Dialogue: 0,0:23:49.44,0:23:51.29,Main,Fushiguro,0,0,0,,A sorcerer connected to Kenjaku?!
+Dialogue: 0,0:23:51.29,0:23:52.28,Main,Yuji,0,0,0,,I want to talk.
+Dialogue: 0,0:23:52.28,0:23:53.98,Main,Higuruma,0,0,0,,We're having a retrial.
+Dialogue: 0,0:23:51.99,0:23:55.06,Next_Ep_Title,Screen,0,0,0,,Next Episode\N{\fs30}Tokyo No. 1 Colony, Part 2
+
