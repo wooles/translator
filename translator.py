@@ -427,6 +427,10 @@ class MultimodalTranslator:
             title_name = anime_meta.get("title_romaji") or anime_meta.get("title_english") or "Seria"
             char_count = len(anime_meta.get("characters", []))
             print(f"\n[Baza AniList] Rozpoznano serię: '{title_name}'")
+            if anime_meta.get("genres"):
+                print(f"[Baza AniList] Gatunki: {', '.join(anime_meta['genres'])}")
+            if anime_meta.get("setting_tags"):
+                print(f"[Baza AniList] 🏛️ Realia świata / Tagi epokowe: {', '.join(anime_meta['setting_tags'])}")
             print(f"[Baza AniList] Wczytano opis fabuły oraz {char_count} postaci z ich płcią i rolami.")
             
             # Wstępne wypełnienie rejestru postaci z bazy AniList
@@ -519,17 +523,29 @@ class MultimodalTranslator:
 
         all_dialogue_sample = "\n".join([f"{e.name or 'Postać'}: {sanitize_sub_text(e.text)}" for _, e, _, _ in raw_entries])
         
-        print("\n[Profiler Odcinka]: Analiza fabuły, relacji postaci i budowanie słowniczka...")
+        print("\n[Profiler Odcinka]: Analiza fabuły, relacji postaci, realiów epoki i budowanie słowniczka...")
         episode_profile = self.profiler.profile_episode(
             subs_text_sample=all_dialogue_sample,
             anime_metadata_str=anime_context_str,
             cache_path=profile_cache_path
         )
         episode_profile_str = format_episode_profile_for_prompt(episode_profile)
-        if episode_profile and episode_profile.characters:
-            print(f"  -> Rozpoznano relacje dla {len(episode_profile.characters)} par postaci, {len(episode_profile.glossary)} haseł słowniczka.")
+        if episode_profile:
+            if episode_profile.setting_and_era:
+                print(f"  🏛️  [Filar XV - Epoka i Realia Świata]: {episode_profile.setting_and_era}")
+            if episode_profile.dialogue_stylization:
+                print(f"  📜 [Filar XV - Stylizacja Językowa]: {episode_profile.dialogue_stylization}")
+            if episode_profile.tone_and_genre:
+                print(f"  🎭 [Ton i Rejestr Dialogów]: {episode_profile.tone_and_genre}")
+            if episode_profile.characters:
+                print(f"  👥 [Relacje i Etykieta]: Rozpoznano relacje dla {len(episode_profile.characters)} postaci.")
+            if episode_profile.glossary:
+                terms_preview = ", ".join([f"'{g.term_en}' -> '{g.translation_pl}'" for g in episode_profile.glossary[:3]])
+                if len(episode_profile.glossary) > 3:
+                    terms_preview += f" (+{len(episode_profile.glossary) - 3} więcej)"
+                print(f"  📖 [Słowniczek Odcinka]: {terms_preview}")
         if self.whisper:
-            print(f"  -> Lokalny silnik Whisper: AKTYWNY (model {self.whisper.model_size})")
+            print(f"  🎙️ [Lokalny Whisper STT]: AKTYWNY (model {self.whisper.model_size})")
 
         batches = [
             raw_entries[i:i + self.batch_size]
