@@ -204,6 +204,7 @@ def format_translation_memory_for_prompt(examples: List[Dict[str, str]]) -> str:
     lines.append("--- SPRAWDZONE PRZYKŁADY Z BAZY ANIME (PAMIĘĆ TŁUMACZENIOWA) ---")
     lines.append("Wzoruj się na poniższych autentycznych, naturalnych tłumaczeniach ludzkich:")
     for ex in examples:
-        lines.append(f" • EN: \"{ex['en']}\" -> PL: \"{ex['pl']}\"")
+        anime_tag = f"[{ex['anime']}] " if ex.get("anime") else ""
+        lines.append(f" • {anime_tag}EN: \"{ex['en']}\" -> PL: \"{ex['pl']}\"")
     lines.append("-----------------------------------------------------------------\n")
     return "\n".join(lines)
