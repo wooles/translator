@@ -110,6 +110,12 @@ FILAR XIV: POPRAWNOŚĆ REKCJI PRZYCZYN ZGONU I TERMINOLOGII MEDYCZNEJ:
     -> POPRAWNIE ✔️: "Zmarła z powodu wylewu zaraz po porodzie.", "Zmarła wskutek wylewu...", "Zmarła w wyniku krwotoku mózgowego...", "Zmarł na zawał (serca).", "Zmarł w wyniku odniesionych obrażeń."
   * "Brain hemorrhage" -> "wylew", "krwotok mózgowy", "udar krwotoczny".
   * "Heart attack" -> "zawał serca", "zawał" (ZAKAZ: "atak serca").
+
+FILAR XV: STYLIZACJA EPOKOWA, REALIA ŚWIATA I ELIMINACJA ANACHRONIZMÓW:
+- Gdy seria rozgrywa się w realiach historycznych (np. XIII wiek w Imperium Mongolskim / Tenmaku no Jaadugar, starożytne Chiny / Kingdom, wikingowie / Vinland Saga, okres Edo / Feudalna Japonia):
+  * KATEGORYCZNY ZAKAZ współczesnego slangu młodzieżowego ('spoko', 'masakra', 'wkręcasz mnie', 'luzik', 'siema').
+  * Dopasuj słownictwo do realiów epoki: 'władca / Chan', 'dwór', 'namiot / jurta', 'niedola', 'niewiasta', 'kupcy', 'wyprawa wojenna', 'zarządca'.
+  * Zachowaj hierarchię społeczną, dostojeństwo i formy szacunku dawnych epok ('Wasza Dostojność', 'Chanie', 'panie mój').
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -511,6 +517,8 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
 14. POPRAWNOŚĆ PRZYCZYN ZGONU I MEDYCYNY:
    - "Died of a brain hemorrhage" -> "zmarła z powodu wylewu", "zmarła wskutek wylewu" (ZAKAZ: "zmarła na wylew").
    - "Heart attack" -> "zawał serca", "zawał" (ZAKAZ: "atak serca").
+15. REALIA HISTORYCZNE I STYLIZACJA ŚWIATA:
+   - W seriach historycznych (np. XIII w. Imperium Mongolskie, starożytność, średniowiecze) BEZWZGLĘDNIE wyeliminuj nowoczesny slang młodzieżowy ('spoko', 'masakra', 'wkręcasz'). Dopasuj słownictwo do klimatu epoki.
 
 {BELCZYK_AVT_MASTER_CANON}
 

@@ -44,7 +44,7 @@ def fetch_anilist_metadata(title: str) -> Optional[Dict[str, Any]]:
     """
     query = """
     query ($search: String) {
-      Media (search: $search, type: ANIME) {
+      Media (search: $search) {
         id
         title {
           romaji
@@ -53,6 +53,15 @@ def fetch_anilist_metadata(title: str) -> Optional[Dict[str, Any]]:
         }
         description(asHtml: false)
         genres
+        tags {
+          name
+          category
+          rank
+        }
+        countryOfOrigin
+        startDate {
+          year
+        }
         characters(sort: [ROLE, RELEVANCE], perPage: 16) {
           edges {
             role
@@ -90,6 +99,21 @@ def fetch_anilist_metadata(title: str) -> Optional[Dict[str, Any]]:
             desc_raw = media.get("description") or ""
             desc_clean = re.sub(r"<[^>]+>", "", desc_raw).strip()
 
+            # Analiza tagów pod kątem kontekstu historycznego, epoki i realiów świata
+            raw_tags = media.get("tags", [])
+            tag_names = [t.get("name", "") for t in raw_tags if t.get("name")]
+            
+            # Wykrywanie kluczowych znaczników epoki i świata
+            historical_keywords = [
+                "historical", "mongol", "empire", "middle ages", "medieval", "edo period",
+                "feudal", "ancient", "war", "politics", "royalty", "samurai", "military",
+                "victorian", "shinsengumi", "meiji", "renaissance", "cyberpunk", "space opera"
+            ]
+            matched_setting_tags = [
+                t for t in tag_names
+                if any(k in t.lower() for k in historical_keywords)
+            ]
+
             characters = []
             for edge in media.get("characters", {}).get("edges", []):
                 node = edge.get("node", {})
@@ -118,6 +142,9 @@ def fetch_anilist_metadata(title: str) -> Optional[Dict[str, Any]]:
                 "title_english": media.get("title", {}).get("english"),
                 "title_native": media.get("title", {}).get("native"),
                 "genres": media.get("genres", []),
+                "tags": tag_names[:15],
+                "setting_tags": matched_setting_tags[:8],
+                "year": media.get("startDate", {}).get("year"),
                 "description": desc_clean,
                 "characters": characters
             }
@@ -137,13 +164,13 @@ def get_anime_context(filename_or_path: str) -> Optional[Dict[str, Any]]:
 
 def format_anime_context_for_prompt(meta: Dict[str, Any]) -> str:
     """
-    Formatuje pobrane metadane w czytelny blok tekstu do wstrzyknięcia do promptu LLM.
+    Formatuje pobrane metadane w czytelny blok tekstu z uwzględnieniem realiów historycznych i stylizacji.
     """
     if not meta:
         return ""
 
     lines = []
-    lines.append("=== KONTEKST SERII ANIME (Baza Wiedzy AniList) ===")
+    lines.append("=== KONTEKST SERII ANIME & REALIA HISTORYCZNE (AniList) ===")
     title_display = meta.get("title_romaji") or meta.get("title_english") or "Anime"
     if meta.get("title_english") and meta.get("title_english") != title_display:
         title_display += f" ({meta.get('title_english')})"
@@ -152,17 +179,29 @@ def format_anime_context_for_prompt(meta: Dict[str, Any]) -> str:
     if meta.get("genres"):
         lines.append(f"Gatunki: {', '.join(meta['genres'])}")
 
+    if meta.get("setting_tags"):
+        lines.append(f"🏛️ Epoka i realia świata: {', '.join(meta['setting_tags'])}")
+
     if meta.get("description"):
-        # Skracamy opis do 2-3 zdań dla oszczędności tokenów
         desc = meta["description"]
-        if len(desc) > 350:
-            desc = desc[:350].rsplit(".", 1)[0] + "."
-        lines.append(f"Opis fabuły: {desc}")
+        if len(desc) > 400:
+            desc = desc[:400].rsplit(".", 1)[0] + "."
+        lines.append(f"Opis tła fabularnego: {desc}")
+
+    # Wytyczne stylizacji w zależności od tła historycznego
+    is_historical = any(
+        t.lower() in ("historical", "mongol empire", "middle ages", "medieval", "edo period", "feudal japan", "ancient china", "samurai")
+        for t in (meta.get("genres", []) + meta.get("setting_tags", []))
+    )
+    if is_historical:
+        lines.append("⚠️ WYTYCZNA STYLIZACJI: Seria osadzona w realiach dawnych/historycznych!")
+        lines.append("   - Kategoryczny ZAKAZ współczesnego slangu młodzieżowego ('spoko', 'masakra', 'wkręcasz mnie').")
+        lines.append("   - Stosuj szlachetny, epokowy rejestr języka polskiego, dopasowany do hierarchii społecznej i kultury tamtych czasów.")
 
     if meta.get("characters"):
         lines.append("\nObsada i płeć bohaterów:")
         for c in meta["characters"][:12]:
             lines.append(f" • {c['name']} [{c.get('native_name') or ''}]: {c['gender']} ({c['role']})")
 
-    lines.append("==================================================\n")
+    lines.append("==========================================================\n")
     return "\n".join(lines)

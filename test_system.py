@@ -147,6 +147,8 @@ def test_profiler_and_whisper():
                 relationship_type="uczeń -> nauczycielka"
             )
         ],
+        setting_and_era="XIII wiek, Imperium Mongolskie / Dwór Chanów",
+        dialogue_stylization="Szlachetny rejestr epokowy, zakaz nowoczesnego slangu",
         glossary=[
             GlossaryTerm(
                 term_en="taiyaki",
@@ -159,6 +161,7 @@ def test_profiler_and_whisper():
     formatted = format_episode_profile_for_prompt(profile)
     assert "pani Teshima" in formatted
     assert "taiyaki" in formatted
+    assert "Imperium Mongolskie" in formatted
     
     # Test dostępności i stanu Whisper
     avail = JapaneseWhisperEngine.is_available()

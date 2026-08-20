@@ -33,7 +33,9 @@ class GlossaryTerm(BaseModel):
 
 class EpisodeProfile(BaseModel):
     episode_summary: str = Field(description="Krótkie 2-3 zdaniowe streszczenie fabuły i tonu odcinka")
-    tone_and_genre: str = Field(description="Rejestr i ton dialogów (np. 'lekkie młodzieżowe anime okruchy życia, potoczny humor')")
+    setting_and_era: str = Field(default="", description="Epoka historyczna, czas i miejsce akcji (np. 'XIII wiek, Imperium Mongolskie', 'Współczesne Tokio')")
+    dialogue_stylization: str = Field(default="", description="Wytyczne stylizacji rejestru języka i zakazy/nakazy słownictwa dla tej epoki")
+    tone_and_genre: str = Field(description="Rejestr i ton dialogów (np. 'szlachetny epos historyczny', 'lekkie młodzieżowe anime')")
     characters: List[CharacterRelationship] = Field(default_factory=list, description="Macierz relacji i form grzecznościowych między bohaterami")
     glossary: List[GlossaryTerm] = Field(default_factory=list, description="Słowniczek kluczowych pojęć, tytułów i nazw własnych odcinka")
     key_conventions: List[str] = Field(default_factory=list, description="Kluczowe wytyczne stylistyczne dla tego konkretnego odcinka")
@@ -44,7 +46,11 @@ def format_episode_profile_for_prompt(profile: Optional[EpisodeProfile]) -> str:
     if not profile:
         return ""
 
-    lines = ["=== SŁOWNICZEK I MACIERZ RELACJI ODCINKA (PROFILER ODCINKA) ==="]
+    lines = ["=== SŁOWNICZEK, REALIA HISTORYCZNE I MACIERZ RELACJI (PROFILER ODCINKA) ==="]
+    if profile.setting_and_era:
+        lines.append(f"🏛️ Epoka i realia świata: {profile.setting_and_era}")
+    if profile.dialogue_stylization:
+        lines.append(f"📜 Stylizacja językowa i rejestr: {profile.dialogue_stylization}")
     if profile.episode_summary:
         lines.append(f"Fabuła odcinka: {profile.episode_summary}")
     if profile.tone_and_genre:
@@ -65,7 +71,7 @@ def format_episode_profile_for_prompt(profile: Optional[EpisodeProfile]) -> str:
         for conv in profile.key_conventions:
             lines.append(f"- {conv}")
 
-    lines.append("===============================================================\n")
+    lines.append("==========================================================================\n")
     return "\n".join(lines)
 
 
@@ -92,8 +98,8 @@ class EpisodeProfiler:
             except Exception as e:
                 logger.warning(f"Błąd odczytu cache profilu ({e}), generowanie na nowo...")
 
-        prompt = f"""Jesteś Głównym Reżyserem Lokalizacji Anime.
-Twoim zadaniem jest wstępna analiza całego odcinka na podstawie poniższych dialogów i metadanych, aby stworzyć kompletny PROFIL ODCINKA dla tłumaczy.
+        prompt = f"""Jesteś Głównym Reżyserem i Konsultantem Historycznym Lokalizacji Anime.
+Twoim zadaniem jest wstępna analiza całego odcinka na podstawie poniższych dialogów i metadanych, aby stworzyć kompletny PROFIL ODCINKA, ustalić REALIA HISTORYCZNE ORAZ REJESTR STYLIZACJI DIALOGÓW.
 
 METADANE Z BAZY ANILIST:
 {anime_metadata_str}
@@ -102,9 +108,11 @@ PRÓBKA KWESTII DIALOGOWYCH Z ODCINKA:
 {subs_text_sample[:12000]}
 
 ZADANIE:
-1. Zidentyfikuj kluczowe postacie, ich role (nauczyciel, uczeń, kumpel, dziecko) oraz ustal, jak powinny się do siebie zwracać po polsku (kto per 'pan/pani', kto po imieniu / na 'ty').
-2. Wyodrębnij specyficzne pojęcia, tytuły dzieł, nazwy potraw lub miejsc, które pojawiają się w odcinku i ustal dla nich bezbłędne, polskie tłumaczenie.
-3. Określ ton i rejestr językowy dialogów.
+1. Zidentyfikuj EPOKĘ HISTORYCZNĄ ORAZ MIEJSCE AKCJI (np. "XIII wiek, Imperium Mongolskie / dwór chanów", "Okres Edo w feudalnej Japonii", "Współczesna szkoła w Tokio", "Średniowieczny świat fantasy").
+2. Ustal WYTYCZNE STYLIZACJI JĘZYKOWEJ dla tej epoki (np. dla epoki dawnej: ZAKAZ współczesnego slangu, szlachetny język, etykieta dworska/historyczna).
+3. Zidentyfikuj kluczowe postacie, ich role oraz ustal, jak powinny się do siebie zwracać po polsku (kto per 'pan/pani', kto 'Wasza Dostojność / Chanie', kto po imieniu).
+4. Wyodrębnij specyficzne pojęcia epokowe, tytuły dzieł, nazwy potraw, broni lub miejsc i ustal dla nich bezbłędne, polskie tłumaczenie.
+5. Określ ton i rejestr językowy dialogów.
 
 Zwróć wynik w formacie JSON zgodnym ze schematem EpisodeProfile."""
 
