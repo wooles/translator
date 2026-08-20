@@ -57,6 +57,11 @@ def test_sanitization_and_deduplication():
     corrupted_tag = "{\\t(2840,3799,\\"
     assert sanitize_sub_text(corrupted_tag) == ""
 
+    # Test konwersji kursywy HTML na format ASS
+    italic_html = "<i>Serio jej to pasuje?</i>"
+    assert sanitize_sub_text(italic_html, is_ass=True) == "{\\i1}Serio jej to pasuje?{\\i0}"
+    assert sanitize_sub_text(italic_html, is_ass=False) == "<i>Serio jej to pasuje?</i>"
+
     # Test usuwania znaczników pozycji
     pos_text = "{\\pos(100,200)\\an8}Wszyscy patrzą na Aratę"
     assert sanitize_sub_text(pos_text) == "Wszyscy patrzą na Aratę"

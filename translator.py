@@ -62,20 +62,35 @@ def extract_typesetting_tags(raw_text: str) -> Tuple[str, str]:
 
     return "", sanitize_sub_text(raw_text)
 
-def sanitize_sub_text(text: str) -> str:
+def sanitize_sub_text(text: str, is_ass: bool = True) -> str:
     """
-    Czyści tekst ze śmieci formatowania ASS, niedomkniętych nawiasów i zbędnych znaków.
+    Czyści tekst ze śmieci formatowania ASS, niedomkniętych nawiasów i zbędnych znaków,
+    jednocześnie poprawnie konwertując tagi HTML <i> / <b> na natywne formatowanie ASS {\\i1}...{\\i0}.
     """
     if not text:
         return ""
-    # Usunięcie wszelkich tagów klamrowych {...} (zamkniętych lub urwanych)
-    cleaned = re.sub(r"\{[^}]*\}?", "", text)
-    cleaned = re.sub(r"\{.*", "", cleaned)
-    # Usunięcie wiszących backslashy i komend ASS
-    cleaned = re.sub(r"\\(?:[a-zA-Z0-9&]+|\([^)]*\)?)?", "", cleaned)
+    
+    if is_ass:
+        # Konwersja <i> i <b> na format ASS {\i1} i {\b1}
+        text = re.sub(r"<i>(.*?)</i>", r"{\\i1}\1{\\i0}", text, flags=re.IGNORECASE)
+        text = re.sub(r"<b>(.*?)</b>", r"{\\b1}\1{\\b0}", text, flags=re.IGNORECASE)
+        # Usunięcie wszelkich pozostałych surowych tagów HTML
+        text = re.sub(r"</?[a-zA-Z][^>]*>", "", text)
+        # Usunięcie uszkodzonych tagów ASS (z zachowaniem {\i1}, {\i0}, {\b1}, {\b0})
+        text = re.sub(r"\{(?!(?:\\i[01]|\\b[01]))[^}]*\}?", "", text)
+        text = re.sub(r"\{[^\\]*$", "", text)
+    else:
+        # Dla SRT: konwersja tagów ASS na HTML
+        text = re.sub(r"\{\\i1\}(.*?)\{\\i0\}", r"<i>\1</i>", text)
+        text = re.sub(r"\{\\b1\}(.*?)\{\\b0\}", r"<b>\1</b>", text)
+        # Usunięcie wszelkich tagów klamrowych
+        text = re.sub(r"\{[^}]*\}?", "", text)
+        # Usunięcie niechcianych tagów HTML z wyjątkiem <i>, </i>, <b>, </b>
+        text = re.sub(r"</?(?!(?:i|b)\b)[a-zA-Z][^>]*>", "", text)
+
     # Normalizacja spacji i enterów
-    cleaned = re.sub(r"[ \t]+", " ", cleaned).strip()
-    return cleaned
+    text = re.sub(r"[ \t]+", " ", text).strip()
+    return text
 
 class CharacterInfo(BaseModel):
     name: str = Field(description="Imię lub określenie postaci (np. 'Arata', 'Minami', 'Nauczyciel')")
