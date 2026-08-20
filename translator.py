@@ -13,6 +13,24 @@ Zawiera mechanizmy:
 """
 
 import os
+import sys
+
+# Wymuszenie pełnej obsługi znaków UTF-8 (w tym japońskich znaków Kanji/Kana)
+if sys.platform == "win32":
+    try:
+        import ctypes
+        ctypes.windll.kernel32.SetConsoleOutputCP(65001)
+        ctypes.windll.kernel32.SetConsoleCP(65001)
+    except Exception:
+        pass
+    try:
+        if hasattr(sys.stdout, "reconfigure"):
+            sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        if hasattr(sys.stderr, "reconfigure"):
+            sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 import re
 import time
 import json
