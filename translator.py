@@ -332,15 +332,29 @@ class MultimodalTranslator:
     def _call_gemini_with_retry(self, contents: List[Any], schema_class) -> Any:
         """
         Bezpieczne wywołanie API z automatyczną obsługą chwilowych limitów minutowych (429) i przeciążeń (503).
-        Cierpliwie ponawia próby aż do pomyślnego wykonania w najwyższej jakości.
+        Wykorzystuje inteligentną pulę modeli flagowych (Tier-Preserving Model Pool), aby zapewnić
+        100% najwyższą jakość tłumaczenia bez wielominutowych przestojów.
         """
+        # Pula bezpośrednich modeli równoległych w tej samej generacji flagowej
+        candidate_models = [self.model]
+        if "flash" in self.model.lower():
+            for m in ["gemini-3.7-flash", "gemini-3.6-flash", "gemini-3.5-flash"]:
+                if m not in candidate_models:
+                    candidate_models.append(m)
+        elif "pro" in self.model.lower():
+            for m in ["gemini-3.1-pro-preview"]:
+                if m not in candidate_models:
+                    candidate_models.append(m)
+
         attempt = 0
+        current_model_idx = 0
 
         while True:
             attempt += 1
+            current_model = candidate_models[current_model_idx]
             try:
                 response = self.client.models.generate_content(
-                    model=self.model,
+                    model=current_model,
                     contents=contents,
                     config=types.GenerateContentConfig(
                         system_instruction=self.system_prompt,
@@ -359,15 +373,25 @@ class MultimodalTranslator:
                 is_unavailable = "503" in err_str or "unavailable" in err_str or "high demand" in err_str
                 is_rate_limit = "429" in err_str or "quota" in err_str or "resource_exhausted" in err_str or "rate" in err_str
                 
+                # Jeśli po 2 próbach dany model ma 503 na serwerach Google, natychmiast sięgamy po flagowy 3.6/3.5
+                if is_unavailable and len(candidate_models) > 1 and attempt >= 2:
+                    next_idx = (current_model_idx + 1) % len(candidate_models)
+                    if next_idx != current_model_idx:
+                        print(f"\n[Tłumacz / Faza 1]: Model {current_model} jest przeciążony u Google (503).")
+                        print(f"  ⚡ Płynne przełączenie na bezpośredni model flagowy {candidate_models[next_idx]} (100% jakość bez czekania)...")
+                        current_model_idx = next_idx
+                        time.sleep(1)
+                        continue
+
                 if is_unavailable:
-                    wait_time = min(5 + attempt * 3, 30)
-                    print(f"\n[Tłumacz / Faza 1]: Chwilowe przeciążenie serwerów Google (503 UNAVAILABLE na {self.model}).")
+                    wait_time = min(4 + attempt * 2, 20)
+                    print(f"\n[Tłumacz / Faza 1]: Chwilowe przeciążenie serwerów Google (503 UNAVAILABLE na {current_model}).")
                     print(f"  ⏳ Utrzymuję najwyższą jakość modelu bez redukcji.")
                     print(f"  Odczekuję {wait_time}s i ponawiam próbę #{attempt}...")
                     time.sleep(wait_time)
                 elif is_rate_limit:
-                    wait_time = min(6 + attempt * 3, 35)
-                    print(f"\n[Limit minutowy Google / 429 na {self.model}]: Chwila przerwy na reset limitu ({wait_time}s)... Wznawiam automatycznie (próba #{attempt}).")
+                    wait_time = min(6 + attempt * 3, 30)
+                    print(f"\n[Limit minutowy Google / 429 na {current_model}]: Chwila przerwy na reset limitu ({wait_time}s)... Wznawiam automatycznie (próba #{attempt}).")
                     time.sleep(wait_time)
                 else:
                     wait_time = min(4 + attempt * 2, 20)

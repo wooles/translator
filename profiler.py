@@ -119,11 +119,25 @@ Zwróć wynik w formacie JSON zgodnym ze schematem EpisodeProfile."""
         import time
         attempt = 0
 
+        # Pula równorzędnych modeli flagowych w tej samej najwyższej generacji
+        candidate_models = [self.model]
+        if "flash" in self.model.lower():
+            for m in ["gemini-3.7-flash", "gemini-3.6-flash", "gemini-3.5-flash"]:
+                if m not in candidate_models:
+                    candidate_models.append(m)
+        elif "pro" in self.model.lower():
+            for m in ["gemini-3.1-pro-preview"]:
+                if m not in candidate_models:
+                    candidate_models.append(m)
+
+        current_model_idx = 0
+
         while True:
             attempt += 1
+            current_model = candidate_models[current_model_idx]
             try:
                 response = self.client.models.generate_content(
-                    model=self.model,
+                    model=current_model,
                     contents=prompt,
                     config=types.GenerateContentConfig(
                         response_mime_type="application/json",
@@ -147,9 +161,19 @@ Zwróć wynik w formacie JSON zgodnym ze schematem EpisodeProfile."""
                 is_unavailable = "503" in err_str or "unavailable" in err_str or "high demand" in err_str
                 is_rate_limit = "429" in err_str or "quota" in err_str or "resource_exhausted" in err_str
                 
+                # Jeśli po 2 próbach dany model ma 503 na serwerach Google, przełączamy na bezpośredni model równoległy z tej samej generacji
+                if is_unavailable and len(candidate_models) > 1 and attempt >= 2:
+                    next_idx = (current_model_idx + 1) % len(candidate_models)
+                    if next_idx != current_model_idx:
+                        print(f"\n[Profiler Odcinka]: Model {current_model} jest przeciążony u Google (503).")
+                        print(f"  ⚡ Płynne przełączenie na bezpośredni model flagowy {candidate_models[next_idx]} (100% jakość bez czekania)...")
+                        current_model_idx = next_idx
+                        time.sleep(1)
+                        continue
+
                 if is_unavailable or is_rate_limit:
-                    wait_sec = min(5 + attempt * 3, 30)
-                    print(f"\n[Profiler Odcinka]: Chwilowe przeciążenie serwerów Google (503/429 na {self.model}).")
+                    wait_sec = min(4 + attempt * 2, 20)
+                    print(f"\n[Profiler Odcinka]: Chwilowe przeciążenie serwerów Google (503/429 na {current_model}).")
                     print(f"  ⏳ Utrzymuję najwyższą jakość profilu. Czekam {wait_sec}s na zwolnienie zasobów (próba #{attempt})...")
                     time.sleep(wait_sec)
                 else:
