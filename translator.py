@@ -441,6 +441,8 @@ class MultimodalTranslator:
                 print(f"[Baza AniList] Gatunki: {', '.join(anime_meta['genres'])}")
             if anime_meta.get("setting_tags"):
                 print(f"[Baza AniList] 🏛️ Realia świata / Tagi epokowe: {', '.join(anime_meta['setting_tags'])}")
+            if anime_meta.get("detected_domains"):
+                print(f"[Baza AniList] 🍷 Tematyka specjalistyczna: {', '.join(anime_meta['detected_domains'])}")
             print(f"[Baza AniList] Wczytano opis fabuły oraz {char_count} postaci z ich płcią i rolami.")
             
             # Wstępne wypełnienie rejestru postaci z bazy AniList
@@ -543,8 +545,10 @@ class MultimodalTranslator:
         if episode_profile:
             if episode_profile.setting_and_era:
                 print(f"  🏛️  [Filar XV - Epoka i Realia Świata]: {episode_profile.setting_and_era}")
+            if episode_profile.domain_expertise:
+                print(f"  🍷 [Filar XVI - Dziedzina Specjalistyczna]: {episode_profile.domain_expertise}")
             if episode_profile.dialogue_stylization:
-                print(f"  📜 [Filar XV - Stylizacja Językowa]: {episode_profile.dialogue_stylization}")
+                print(f"  📜 [Stylizacja Językowa]: {episode_profile.dialogue_stylization}")
             if episode_profile.tone_and_genre:
                 print(f"  🎭 [Ton i Rejestr Dialogów]: {episode_profile.tone_and_genre}")
             if episode_profile.characters:

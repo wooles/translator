@@ -116,6 +116,25 @@ FILAR XV: STYLIZACJA EPOKOWA, REALIA ŚWIATA I ELIMINACJA ANACHRONIZMÓW:
   * KATEGORYCZNY ZAKAZ współczesnego slangu młodzieżowego ('spoko', 'masakra', 'wkręcasz mnie', 'luzik', 'siema').
   * Dopasuj słownictwo do realiów epoki: 'władca / Chan', 'dwór', 'namiot / jurta', 'niedola', 'niewiasta', 'kupcy', 'wyprawa wojenna', 'zarządca'.
   * Zachowaj hierarchię społeczną, dostojeństwo i formy szacunku dawnych epok ('Wasza Dostojność', 'Chanie', 'panie mój').
+
+FILAR XVI: EKSPERCKA TERMINOLOGIA SPECJALISTYCZNA I MERYTORYCZNA (KONSULTANT BRANŻOWY):
+- Gdy anime porusza niszową tematykę specjalistyczną (np. winiarstwo, medycyna, muzyka klasyczna, shogi, zaawansowane kulinaria), BEZWZGLĘDNIE stosuj oficjalną, profesjonalną polską terminologię branżową zamiast amatorskich kalek słownikowych:
+  * ENOLOGIA / WINIARSTWO (np. Kami no Shizuku):
+    - "vintage" -> "rocznik"
+    - "grape variety" / "varietal" -> "szczep / odmiana winorośli"
+    - "blend" / "assemblage" -> "kupaż / asamblaż"
+    - "terroir" -> "terroir / siedlisko"
+    - "decant" / "decantation" -> "dekantacja / napowietrzanie"
+    - "body" (full-bodied / medium-bodied) -> "ciało wina / pełnia (wino pełne, zbalansowane)"
+    - "finish" -> "finisz / posmak"
+    - "tannins" -> "taniny / garbniki"
+    - "dry / semi-dry" -> "wytrawne / półwytrawne"
+    - "nose / bouquet" -> "nos / bukiet aromatyczny"
+    - "appellation" -> "apelacja (AOC, DOCG itp.)"
+  * MUZYKA KLASYCZNA (np. Nodame Cantabile, Hibike! Euphonium):
+    - "score" -> "partytura", "movement" -> "część / ogniwo", "conductor" -> "dyrygent", "reeds" -> "stroiki"
+  * GRY TRADYCYJNE / SHOGI / GO (np. Sangatsu no Lion, Hikaru no Go):
+    - "joseki" -> "dżoseki", "tesuji" -> "tesudżi", "dan / kyu" -> "dan / kyu", "read ahead" -> "liczenie wariantów"
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -524,6 +543,8 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
    - "Heart attack" -> "zawał serca", "zawał" (ZAKAZ: "atak serca").
 15. REALIA HISTORYCZNE I STYLIZACJA ŚWIATA:
    - W seriach historycznych (np. XIII w. Imperium Mongolskie, starożytność, średniowiecze) BEZWZGLĘDNIE wyeliminuj nowoczesny slang młodzieżowy ('spoko', 'masakra', 'wkręcasz'). Dopasuj słownictwo do klimatu epoki.
+16. TERMINOLOGIA SPECJALISTYCZNA I KONSULTACJA BRANŻOWA:
+   - W seriach o tematyce niszowej (winiarstwo, muzyka, medycyna, shogi, kulinaria) bezwzględnie stosuj oficjalną polską terminologię branżową (np. w winie: 'szczep', 'rocznik', 'apelacja', 'taniny', 'kupaż', 'ciało wina').
 
 {BELCZYK_AVT_MASTER_CANON}
 

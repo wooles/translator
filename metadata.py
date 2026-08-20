@@ -114,6 +114,24 @@ def fetch_anilist_metadata(title: str) -> Optional[Dict[str, Any]]:
                 if any(k in t.lower() for k in historical_keywords)
             ]
 
+            # Wykrywanie specyficznych dziedzin wiedzy i niszowej tematyki specjalistycznej
+            domain_keywords = {
+                "Enologia i Sommelierstwo (Wino / Winiarstwo)": ["wine", "alcohol", "sommelier", "winery", "vintage", "grape", "kami no shizuku", "drops of god"],
+                "Kulinaria i Gastronomia": ["food", "cooking", "culinary", "restaurant", "chef", "gourmet", "baking", "ramen"],
+                "Muzyka Klasyczna i Orkiestra": ["classical music", "music", "orchestra", "band", "instrument", "piano", "violin", "concert"],
+                "Tradycyjne Gry i Strategia": ["traditional games", "shogi", "go", "karuta", "mahjong", "chess"],
+                "Medycyna, Chirurgia i Farmacja": ["medicine", "medical", "doctor", "surgery", "hospital", "psychology", "disease"],
+                "Sztuki Walki i Boks": ["martial arts", "boxing", "judo", "kendo", "swordplay", "wrestling"],
+                "Prawo i Kryminalistyka": ["law", "police", "detective", "court", "crime", "investigation"],
+                "Lotnictwo i Kosmonautyka": ["aviation", "space", "astronomy", "pilot", "spaceship"],
+                "Militaria i Wojskowość": ["military", "tank", "navy", "warship", "firearms"]
+            }
+            detected_domains = []
+            all_text_lower = " ".join(tag_names + media.get("genres", []) + [desc_clean, title]).lower()
+            for dom_name, kw_list in domain_keywords.items():
+                if any(kw in all_text_lower for kw in kw_list):
+                    detected_domains.append(dom_name)
+
             characters = []
             for edge in media.get("characters", {}).get("edges", []):
                 node = edge.get("node", {})
@@ -144,6 +162,7 @@ def fetch_anilist_metadata(title: str) -> Optional[Dict[str, Any]]:
                 "genres": media.get("genres", []),
                 "tags": tag_names[:15],
                 "setting_tags": matched_setting_tags[:8],
+                "detected_domains": detected_domains[:3],
                 "year": media.get("startDate", {}).get("year"),
                 "description": desc_clean,
                 "characters": characters
@@ -170,7 +189,7 @@ def format_anime_context_for_prompt(meta: Dict[str, Any]) -> str:
         return ""
 
     lines = []
-    lines.append("=== KONTEKST SERII ANIME & REALIA HISTORYCZNE (AniList) ===")
+    lines.append("=== KONTEKST SERII ANIME, REALIA ŚWIATA & SPECJALIZACJA (AniList) ===")
     title_display = meta.get("title_romaji") or meta.get("title_english") or "Anime"
     if meta.get("title_english") and meta.get("title_english") != title_display:
         title_display += f" ({meta.get('title_english')})"
@@ -181,6 +200,10 @@ def format_anime_context_for_prompt(meta: Dict[str, Any]) -> str:
 
     if meta.get("setting_tags"):
         lines.append(f"🏛️ Epoka i realia świata: {', '.join(meta['setting_tags'])}")
+
+    if meta.get("detected_domains"):
+        lines.append(f"🍷 Dziedzina specjalistyczna / Tematyka: {', '.join(meta['detected_domains'])}")
+        lines.append("⚠️ WYTYCZNA BRANŻOWA (FILAR XVI): Bezwzględny nakaz stosowania oficjalnej, profesjonalnej polskiej terminologii branżowej (np. w winie: 'szczep', 'rocznik', 'apelacja', 'taniny', 'kupaż', 'ciało wina'). ZAKAZ amatorskich kalek!")
 
     if meta.get("description"):
         desc = meta["description"]
@@ -203,5 +226,5 @@ def format_anime_context_for_prompt(meta: Dict[str, Any]) -> str:
         for c in meta["characters"][:12]:
             lines.append(f" • {c['name']} [{c.get('native_name') or ''}]: {c['gender']} ({c['role']})")
 
-    lines.append("==========================================================\n")
+    lines.append("====================================================================\n")
     return "\n".join(lines)

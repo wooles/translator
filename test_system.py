@@ -148,6 +148,7 @@ def test_profiler_and_whisper():
             )
         ],
         setting_and_era="XIII wiek, Imperium Mongolskie / Dwór Chanów",
+        domain_expertise="Enologia i Sommelierstwo (Wino / Winiarstwo)",
         dialogue_stylization="Szlachetny rejestr epokowy, zakaz nowoczesnego slangu",
         glossary=[
             GlossaryTerm(
@@ -162,6 +163,7 @@ def test_profiler_and_whisper():
     assert "pani Teshima" in formatted
     assert "taiyaki" in formatted
     assert "Imperium Mongolskie" in formatted
+    assert "Enologia i Sommelierstwo" in formatted
     
     # Test dostępności i stanu Whisper
     avail = JapaneseWhisperEngine.is_available()

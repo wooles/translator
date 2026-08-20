@@ -34,10 +34,11 @@ class GlossaryTerm(BaseModel):
 class EpisodeProfile(BaseModel):
     episode_summary: str = Field(description="Krótkie 2-3 zdaniowe streszczenie fabuły i tonu odcinka")
     setting_and_era: str = Field(default="", description="Epoka historyczna, czas i miejsce akcji (np. 'XIII wiek, Imperium Mongolskie', 'Współczesne Tokio')")
+    domain_expertise: str = Field(default="", description="Specjalistyczna dziedzina wiedzy i profesjonalna terminologia branżowa (np. 'Enologia / Sommelierstwo: terminologia winiarska, szczepy, apelacje', 'Szachy / Shogi')")
     dialogue_stylization: str = Field(default="", description="Wytyczne stylizacji rejestru języka i zakazy/nakazy słownictwa dla tej epoki")
-    tone_and_genre: str = Field(description="Rejestr i ton dialogów (np. 'szlachetny epos historyczny', 'lekkie młodzieżowe anime')")
+    tone_and_genre: str = Field(description="Rejestr i ton dialogów (np. 'szlachetny epos historyczny', 'profesjonalny dramat sommeliera', 'lekkie młodzieżowe anime')")
     characters: List[CharacterRelationship] = Field(default_factory=list, description="Macierz relacji i form grzecznościowych między bohaterami")
-    glossary: List[GlossaryTerm] = Field(default_factory=list, description="Słowniczek kluczowych pojęć, tytułów i nazw własnych odcinka")
+    glossary: List[GlossaryTerm] = Field(default_factory=list, description="Słowniczek kluczowych pojęć, tytułów, nazw własnych i terminów specjalistycznych")
     key_conventions: List[str] = Field(default_factory=list, description="Kluczowe wytyczne stylistyczne dla tego konkretnego odcinka")
 
 
@@ -46,9 +47,11 @@ def format_episode_profile_for_prompt(profile: Optional[EpisodeProfile]) -> str:
     if not profile:
         return ""
 
-    lines = ["=== SŁOWNICZEK, REALIA HISTORYCZNE I MACIERZ RELACJI (PROFILER ODCINKA) ==="]
+    lines = ["=== SŁOWNICZEK, REALIA ŚWIATA, DZIEDZINA I MACIERZ RELACJI (PROFILER ODCINKA) ==="]
     if profile.setting_and_era:
         lines.append(f"🏛️ Epoka i realia świata: {profile.setting_and_era}")
+    if profile.domain_expertise:
+        lines.append(f"🍷 Dziedzina specjalistyczna: {profile.domain_expertise}")
     if profile.dialogue_stylization:
         lines.append(f"📜 Stylizacja językowa i rejestr: {profile.dialogue_stylization}")
     if profile.episode_summary:
@@ -62,7 +65,7 @@ def format_episode_profile_for_prompt(profile: Optional[EpisodeProfile]) -> str:
             lines.append(f"- {rel.speaker} -> {rel.listener}: {rel.address_form} ({rel.relationship_type})")
 
     if profile.glossary:
-        lines.append("\nUSTALONY SŁOWNICZEK POJĘĆ I TYTUŁÓW:")
+        lines.append("\nUSTALONY SŁOWNICZEK POJĘĆ I TERMINOLOGII BRANŻOWEJ:")
         for g in profile.glossary:
             lines.append(f"- '{g.term_en}' = '{g.translation_pl}' ({g.explanation})")
 
@@ -71,7 +74,7 @@ def format_episode_profile_for_prompt(profile: Optional[EpisodeProfile]) -> str:
         for conv in profile.key_conventions:
             lines.append(f"- {conv}")
 
-    lines.append("==========================================================================\n")
+    lines.append("================================================================================\n")
     return "\n".join(lines)
 
 
@@ -98,8 +101,8 @@ class EpisodeProfiler:
             except Exception as e:
                 logger.warning(f"Błąd odczytu cache profilu ({e}), generowanie na nowo...")
 
-        prompt = f"""Jesteś Głównym Reżyserem i Konsultantem Historycznym Lokalizacji Anime.
-Twoim zadaniem jest wstępna analiza całego odcinka na podstawie poniższych dialogów i metadanych, aby stworzyć kompletny PROFIL ODCINKA, ustalić REALIA HISTORYCZNE ORAZ REJESTR STYLIZACJI DIALOGÓW.
+        prompt = f"""Jesteś Głównym Reżyserem i Konsultantem Merytorycznym Lokalizacji Anime.
+Twoim zadaniem jest wstępna analiza całego odcinka na podstawie poniższych dialogów i metadanych, aby stworzyć kompletny PROFIL ODCINKA, ustalić REALIA ŚWIATA, SPECJALISTYCZNĄ DZIEDZINĘ WIEDZY (np. winiarstwo/enologia, medycyna, muzyka klasyczna, shogi, kulinaria) ORAZ REJESTR STYLIZACJI DIALOGÓW.
 
 METADANE Z BAZY ANILIST:
 {anime_metadata_str}
@@ -109,10 +112,11 @@ PRÓBKA KWESTII DIALOGOWYCH Z ODCINKA:
 
 ZADANIE:
 1. Zidentyfikuj EPOKĘ HISTORYCZNĄ ORAZ MIEJSCE AKCJI (np. "XIII wiek, Imperium Mongolskie / dwór chanów", "Okres Edo w feudalnej Japonii", "Współczesna szkoła w Tokio", "Średniowieczny świat fantasy").
-2. Ustal WYTYCZNE STYLIZACJI JĘZYKOWEJ dla tej epoki (np. dla epoki dawnej: ZAKAZ współczesnego slangu, szlachetny język, etykieta dworska/historyczna).
-3. Zidentyfikuj kluczowe postacie, ich role oraz ustal, jak powinny się do siebie zwracać po polsku (kto per 'pan/pani', kto 'Wasza Dostojność / Chanie', kto po imieniu).
-4. Wyodrębnij specyficzne pojęcia epokowe, tytuły dzieł, nazwy potraw, broni lub miejsc i ustal dla nich bezbłędne, polskie tłumaczenie.
-5. Określ ton i rejestr językowy dialogów.
+2. Zidentyfikuj NISZOWĄ DZIEDZINĘ WIEDZY / TEMATYKĘ SPECJALISTYCZNĄ (np. "Enologia i Sommelierstwo (Wino / Winiarstwo) - terminologia: szczepy, apelacje, roczniki, taniny, kupaż", "Medycyna", "Muzyka klasyczna", "Shogi").
+3. Ustal WYTYCZNE STYLIZACJI JĘZYKOWEJ dla tej epoki i dziedziny (np. dla wina: używanie fachowych polskich pojęć enologicznych, dla epoki dawnej: ZAKAZ współczesnego slangu).
+4. Zidentyfikuj kluczowe postacie, ich role oraz ustal, jak powinny się do siebie zwracać po polsku (kto per 'pan/pani', kto 'Wasza Dostojność / Chanie', kto po imieniu).
+5. Wyodrębnij specyficzne pojęcia epokowe, branżowe terminy specjalistyczne, tytuły dzieł, nazwy win/potraw/miejsc i ustal dla nich bezbłędne, polskie tłumaczenie.
+6. Określ ton i rejestr językowy dialogów.
 
 Zwróć wynik w formacie JSON zgodnym ze schematem EpisodeProfile."""
 
