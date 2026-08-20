@@ -307,9 +307,16 @@ SPECYFIKA PRZEKŁADU ANIME, GŁOSU ORAZ JĘZYKA JAPOŃSKIEGO:
    - "daijoubu" (大丈夫) = "wszystko w porządku", "nic mi nie jest", "spokojnie".
    - "naruhodo" (なるほど) = "rozumiem", "aha", "no tak".
    - "kami / kami-sama" (神 / 神様) = w mowie potocznej z uwielbieniem o kimś, kto pomógł/przyniósł jedzenie: "Bogini!", "Jesteś bóstwem!", "Zbawczyni!", "Anioł, nie kobieta!" (BEZWZGLĘDNY ZAKAZ: "Na zdrowie"!).
-4. ELIPTYCZNOŚĆ (DOMYŚLNY PODMIOT):
-   - Japoński pomija podmioty ("Zrobiłem to" zamiast "Ja zrobiłem to").
-   - Rekonstruuj podmiot (kto do kogo mówi) na podstawie klatki wideo i mimiki postaci.
+4. ELIPTYCZNOŚĆ (DOMYŚLNY PODMIOT) I ROZPOZNAWANIE MÓWCY:
+   - Japoński niemal zawsze pomija podmioty ("watashi", "anata", "watashitachi").
+   - KTO MÓWI NA KADRZE:
+     * Postać z OTWARTYMI USTAMI, krzycząca, zaciągająca pięści lub energicznie gestykulująca na kadrze TO POSTAĆ MÓWIĄCA!
+     * Postać z zamkniętymi ustami, stojąca naprzeciw i słuchająca TO SŁUCHACZ / ADRESAT!
+   - PERSPEKTYWA 1. OSOBY VS 2. OSOBY (DEKLARACJE, OBIETNICE I POSTANOWIENIA):
+     * Kiedy bohater/uczeń z zaciśniętą pięścią energicznie mówi do nauczyciela/dorosłego o planach grupy/klubu:
+       -> To jest DEKLARACJA WŁASNA w 1. osobie (l. mnoga: "My..." lub l. pojedyncza: "Ja...").
+       -> BŁĄD ❌: "Na cyfrowy przejdziecie, jak same uzbieracie." (Brzmi jak rozkaz nauczycielki do uczennic).
+       -> POPRAWNIE ✔️: "Na cyfrowy przejdziemy dopiero, jak same na to uzbieramy!" (1. os. l.mn.: "przejdziemy", "uzbieramy" - deklaracja determinacji dziewczyn z klubu mangi przed nauczycielką!).
 5. WIZUALNY OCR JAPOŃSKICH NAPISÓW EKRANOWYCH (SIGNS, CHMURKI, TABLICE):
    - Jako zaawansowane multimodalne AI, DOKŁADNIE ODCZYTUJ japońskie znaki (Kanji, Hiragana, Katakana) widoczne na załączonych kadrach wideo:
      * Chmurki i dymki dialogowe/reakcji (np. "いいよね〜" -> "Fajny jest, co?" / "Prawda?" / "Świetny jest, no nie?")
@@ -398,6 +405,9 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
    - "Give me a hand" -> "Pomóż mi" (ZAKAZ: "Daj mi rękę").
 9. HONORYFIKATORY:
    - {"ZACHOWAJ honoryfikatory (-kun, -chan, -san, -sensei) zgodnie z konwencją." if keep_honorifics else "ZASTĄP honoryfikatory naturalną polszczyzną (-sensei -> pani/pan [Nazwisko], -san -> pan/pani lub samo imię, -kun/-chan -> samo imię)."}
+10. PERSPEKTYWA GRAMATYCZNA I KTO MÓWI (1. OSOBA VS 2. OSOBA):
+   - Upewnij się, czy kwestia nie jest deklaracją/obietnicą mówiących bohaterów (1. osoba: "My przejdziemy...", "Sami uzbieramy...").
+   - BEZWZGLĘDNY ZAKAZ mylenia perspektywy: gdy uczennica z zaciśniętą pięścią krzyczy do nauczycielki o planach klubu, MUSI być 1. osoba: "Na cyfrowy przejdziemy, jak same uzbieramy!", a NIE 2. osoba: "Na cyfrowy przejdziecie...".
 
 {BELCZYK_AVT_MASTER_CANON}
 

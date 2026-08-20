@@ -507,10 +507,20 @@ class MultimodalTranslator:
 
                 # 4. Wywołanie Gemini (Obraz + Japońskie Audio + Tekst)
                 contents: List[Any] = []
+                # Podgląd statusu Whisper w konsoli
+                if whisper_transcriptions:
+                    jp_sample = " | ".join(list(whisper_transcriptions.values())[:2])
+                    if len(jp_sample) > 70:
+                        jp_sample = jp_sample[:67] + "..."
+                    pbar.write(f" ├─ [Whisper STT] Słyszę: 「{jp_sample}」")
+
+                # 4. Wywołanie Gemini (Obraz + Japońskie Audio + Tekst)
+                contents: List[Any] = []
                 contents.extend(image_contents)
                 contents.extend(audio_parts)
                 contents.append(prompt_text)
 
+                pbar.set_postfix_str("Faza 1 (Wizja + Audio)...")
                 batch_response = self._call_gemini_with_retry(
                     contents=contents,
                     schema_class=BatchTranslationResponse
@@ -522,6 +532,8 @@ class MultimodalTranslator:
                         if char.name:
                             desc = f"{char.gender} ({char.role or 'postać'})"
                             self.character_registry[char.name] = desc
+                if batch_response and batch_response.scene_description:
+                    pbar.write(f" ├─ [Kadr/Scena] {batch_response.scene_description}")
 
                 # Czyszczenie klatek i audio tymczasowego
                 for fpath in temp_frames:
@@ -567,12 +579,16 @@ class MultimodalTranslator:
 
                 # 6. Opcjonalna II faza weryfikatora
                 if self.enable_verifier and hasattr(self, 'verifier'):
+                    pbar.set_postfix_str("Faza 2 (Script Doctor Pro)...")
                     refined_lines: List[RefinedLine] = self.verifier.verify_batch(
                         batch_items=pass1_items,
                         scene_summary=scene_desc or "",
                         episode_profile_str=episode_profile_str
                     )
                     refined_dict = {r.id: sanitize_sub_text(r.refined_pl) for r in refined_lines}
+                    for r in refined_lines:
+                        if r.changes_made:
+                            pbar.write(f" └─ [Script Doctor] {r.changes_made}")
                     for item in pass1_items:
                         final_text = sanitize_sub_text(refined_dict.get(item["id"], item["pl"]))
                         translated_results[item["orig_idx"]] = final_text
