@@ -25,14 +25,23 @@ import logging
 import argparse
 import subprocess
 from pathlib import Path
-from dotenv import load_dotenv
-
-# Wyciszenie ostrzeżeń deweloperskich z biblioteki google_genai
-logging.getLogger("google_genai").setLevel(logging.ERROR)
-logging.getLogger("google_genai.models").setLevel(logging.ERROR)
-
 # Wczytanie zmiennych środowiskowych z .env
-load_dotenv()
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    # Wbudowany awaryjny parser pliku .env (gdyby python-dotenv nie był zainstalowany)
+    env_file = Path(__file__).parent / ".env"
+    if env_file.exists():
+        try:
+            with open(env_file, "r", encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith("#") and "=" in line:
+                        k, v = line.split("=", 1)
+                        os.environ.setdefault(k.strip(), v.strip().strip("'\""))
+        except Exception:
+            pass
 
 from extract import list_subtitle_tracks, extract_embedded_subtitles
 from translator import MultimodalTranslator
