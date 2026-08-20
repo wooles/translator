@@ -59,6 +59,7 @@ from memory import TranslationMemory, format_translation_memory_for_prompt
 from profiler import EpisodeProfiler, EpisodeProfile, format_episode_profile_for_prompt
 from whisper_engine import JapaneseWhisperEngine
 from avt_linter import AVTLinter
+from romaji_helper import to_romaji
 
 def extract_typesetting_tags(raw_text: str) -> Tuple[str, str]:
     """
@@ -601,12 +602,15 @@ class MultimodalTranslator:
 
                 # 4. Wywołanie Gemini (Obraz + Japońskie Audio + Tekst)
                 contents: List[Any] = []
-                # Podgląd statusu Whisper w konsoli
+                # Podgląd statusu Whisper w konsoli (Romaji fonetyczne - czytelne na każdym terminalu)
                 if whisper_transcriptions:
-                    jp_sample = " | ".join(list(whisper_transcriptions.values())[:2])
-                    if len(jp_sample) > 70:
-                        jp_sample = jp_sample[:67] + "..."
-                    pbar.write(f" ├─ [Whisper STT] Słyszę: 「{jp_sample}」")
+                    jp_raw_list = [v for v in whisper_transcriptions.values() if v]
+                    if jp_raw_list:
+                        romaji_samples = [to_romaji(text) for text in jp_raw_list[:2]]
+                        romaji_line = " | ".join(romaji_samples)
+                        if len(romaji_line) > 75:
+                            romaji_line = romaji_line[:72] + "..."
+                        pbar.write(f" ├─ [Whisper STT] Słyszę: \"{romaji_line}\"")
 
                 # 4. Wywołanie Gemini (Obraz + Japońskie Audio + Tekst)
                 contents: List[Any] = []
