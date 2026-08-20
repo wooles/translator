@@ -61,37 +61,52 @@ class DialogueVerifier:
 
         prompt_text = "\n".join(prompt_lines)
 
-        try:
-            response = self.client.models.generate_content(
-                model=self.model,
-                contents=[prompt_text],
-                config=types.GenerateContentConfig(
-                    system_instruction=self.system_prompt,
-                    response_mime_type="application/json",
-                    response_schema=RefinedBatchResponse,
-                    temperature=0.35,
+        import time
+        models_to_try = [self.model, "gemini-3.5-flash", "gemini-3.5-flash-lite", "gemini-2.5-flash"]
+        unique_models = []
+        for m in models_to_try:
+            if m and m not in unique_models:
+                unique_models.append(m)
+
+        for attempt in range(6):
+            current_model = unique_models[attempt % len(unique_models)]
+            try:
+                response = self.client.models.generate_content(
+                    model=current_model,
+                    contents=[prompt_text],
+                    config=types.GenerateContentConfig(
+                        system_instruction=self.system_prompt,
+                        response_mime_type="application/json",
+                        response_schema=RefinedBatchResponse,
+                        temperature=0.35,
+                    )
                 )
+
+                # Pobieramy sparsowany wynik
+                if hasattr(response, "parsed") and response.parsed is not None:
+                    parsed_obj: RefinedBatchResponse = response.parsed
+                    return parsed_obj.lines
+                
+                # Fallback z response.text jeśli SDK zwróciło surowy json
+                data = json.loads(response.text)
+                batch_resp = RefinedBatchResponse.model_validate(data)
+                return batch_resp.lines
+
+            except Exception as e:
+                err_str = str(e)
+                if "503" in err_str or "UNAVAILABLE" in err_str or "429" in err_str:
+                    wait_sec = (attempt + 1) * 3
+                    time.sleep(wait_sec)
+                else:
+                    time.sleep(2)
+
+        print("[Ostrzeżenie Weryfikatora]: Nie udało się zredagować paczki dialogów po 6 próbach. Zachowano wstępne tłumaczenie.")
+        return [
+            RefinedLine(
+                id=item["id"],
+                original_en=item["en"],
+                refined_pl=item["pl"],
+                changes_made="Brak weryfikacji (błąd zapytania)"
             )
-
-            # Pobieramy sparsowany wynik
-            if hasattr(response, "parsed") and response.parsed is not None:
-                parsed_obj: RefinedBatchResponse = response.parsed
-                return parsed_obj.lines
-            
-            # Fallback z response.text jeśli SDK zwróciło surowy json
-            data = json.loads(response.text)
-            batch_resp = RefinedBatchResponse.model_validate(data)
-            return batch_resp.lines
-
-        except Exception as e:
-            # W razie nieprzewidzianego błędu weryfikatora (np. limit API) zwracamy wersje wstępne
-            print(f"[Ostrzeżenie Weryfikatora]: Nie udało się zredagować paczki dialogów ({e}). Zachowano wstępne tłumaczenie.")
-            return [
-                RefinedLine(
-                    id=item["id"],
-                    original_en=item["en"],
-                    refined_pl=item["pl"],
-                    changes_made="Brak weryfikacji (błąd zapytania)"
-                )
-                for item in batch_items
-            ]
+            for item in batch_items
+        ]

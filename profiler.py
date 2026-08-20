@@ -108,33 +108,51 @@ ZADANIE:
 
 Zwróć wynik w formacie JSON zgodnym ze schematem EpisodeProfile."""
 
-        try:
-            response = self.client.models.generate_content(
-                model=self.model,
-                contents=prompt,
-                config=types.GenerateContentConfig(
-                    response_mime_type="application/json",
-                    response_schema=EpisodeProfile,
-                    temperature=0.2
+        import time
+        models_to_try = [self.model, "gemini-3.5-flash-lite", "gemini-3.5-flash", "gemini-2.5-flash"]
+        unique_models = []
+        for m in models_to_try:
+            if m and m not in unique_models:
+                unique_models.append(m)
+
+        for attempt in range(8):
+            current_model = unique_models[attempt % len(unique_models)]
+            try:
+                response = self.client.models.generate_content(
+                    model=current_model,
+                    contents=prompt,
+                    config=types.GenerateContentConfig(
+                        response_mime_type="application/json",
+                        response_schema=EpisodeProfile,
+                        temperature=0.2
+                    )
                 )
-            )
-            profile_data = json.loads(response.text)
-            profile = EpisodeProfile.model_validate(profile_data)
+                profile_data = json.loads(response.text)
+                profile = EpisodeProfile.model_validate(profile_data)
 
-            if cache_path:
-                try:
-                    with open(cache_path, "w", encoding="utf-8") as f:
-                        json.dump(profile.model_dump(), f, ensure_ascii=False, indent=2)
-                except Exception:
-                    pass
+                if cache_path:
+                    try:
+                        with open(cache_path, "w", encoding="utf-8") as f:
+                            json.dump(profile.model_dump(), f, ensure_ascii=False, indent=2)
+                    except Exception:
+                        pass
 
-            return profile
-        except Exception as e:
-            logger.error(f"Nie udało się wygenerować profilu odcinka: {e}")
-            return EpisodeProfile(
-                episode_summary="Odcinek anime",
-                tone_and_genre="Żywy język młodzieżowy / anime",
-                characters=[],
-                glossary=[],
-                key_conventions=[]
-            )
+                return profile
+            except Exception as e:
+                err_str = str(e)
+                if "503" in err_str or "UNAVAILABLE" in err_str or "429" in err_str:
+                    wait_sec = (attempt + 1) * 3
+                    logger.warning(f"Chwilowe przeciążenie serwerów Google (503/429 na {current_model}). Ponawianie próby za {wait_sec}s...")
+                    time.sleep(wait_sec)
+                else:
+                    logger.warning(f"Próba {attempt + 1}/8 generowania profilu na {current_model} nie powiodła się ({e}).")
+                    time.sleep(2)
+
+        logger.error("Wszystkie próby generowania profilu odcinka zostały wyczerpane. Zastosowano profil domyślny.")
+        return EpisodeProfile(
+            episode_summary="Odcinek anime",
+            tone_and_genre="Żywy język młodzieżowy / anime",
+            characters=[],
+            glossary=[],
+            key_conventions=[]
+        )
