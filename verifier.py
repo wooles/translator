@@ -62,17 +62,12 @@ class DialogueVerifier:
         prompt_text = "\n".join(prompt_lines)
 
         import time
-        models_to_try = [self.model, "gemini-3.5-flash", "gemini-3.5-flash-lite", "gemini-2.5-flash"]
-        unique_models = []
-        for m in models_to_try:
-            if m and m not in unique_models:
-                unique_models.append(m)
+        max_attempts = 10
 
-        for attempt in range(6):
-            current_model = unique_models[attempt % len(unique_models)]
+        for attempt in range(max_attempts):
             try:
                 response = self.client.models.generate_content(
-                    model=current_model,
+                    model=self.model,
                     contents=[prompt_text],
                     config=types.GenerateContentConfig(
                         system_instruction=self.system_prompt,
@@ -93,14 +88,25 @@ class DialogueVerifier:
                 return batch_resp.lines
 
             except Exception as e:
-                err_str = str(e)
-                if "503" in err_str or "UNAVAILABLE" in err_str or "429" in err_str:
-                    wait_sec = (attempt + 1) * 3
+                err_str = str(e).lower()
+                is_unavailable = "503" in err_str or "unavailable" in err_str or "high demand" in err_str
+                is_rate_limit = "429" in err_str or "quota" in err_str or "resource_exhausted" in err_str
+                
+                if is_unavailable or is_rate_limit:
+                    wait_sec = (attempt + 1) * 4
+                    print(f"\n[Script Doctor / Redakcja]: Chwilowe przeciążenie serwerów Google (503/429 na {self.model}).")
+                    print(f"  ⏳ Utrzymuję najwyższą jakość PRO bez przełączania na niższe modele.")
+                    print(f"  Odczekuję {wait_sec}s przed ponowną próbą ({attempt + 1}/{max_attempts})...")
                     time.sleep(wait_sec)
                 else:
-                    time.sleep(2)
+                    if attempt < max_attempts - 1:
+                        wait_sec = (attempt + 1) * 3
+                        print(f"\n[Script Doctor]: Ponawianie próby za {wait_sec}s po napotkaniu błędu ({e})...")
+                        time.sleep(wait_sec)
+                    else:
+                        print(f"\n[Script Doctor]: Nie udało się zredagować paczki dialogów po {max_attempts} próbach ({e}).")
 
-        print("[Ostrzeżenie Weryfikatora]: Nie udało się zredagować paczki dialogów po 6 próbach. Zachowano wstępne tłumaczenie.")
+        print("[Script Doctor]: Zachowano wstępne tłumaczenie paczki po wyczerpaniu limitu prób.")
         return [
             RefinedLine(
                 id=item["id"],

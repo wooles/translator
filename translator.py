@@ -336,11 +336,18 @@ class MultimodalTranslator:
 
             except Exception as e:
                 err_str = str(e).lower()
+                is_unavailable = "503" in err_str or "unavailable" in err_str or "high demand" in err_str
                 is_rate_limit = "429" in err_str or "quota" in err_str or "resource_exhausted" in err_str or "rate" in err_str
                 
-                if is_rate_limit:
+                if is_unavailable:
+                    wait_time = base_delay * (attempt + 1) + 2
+                    print(f"\n[Tłumacz / Faza 1]: Chwilowe przeciążenie serwerów Google (503 UNAVAILABLE na {self.model}).")
+                    print(f"  ⏳ Utrzymuję najwyższą jakość modelu bez redukcji.")
+                    print(f"  Odczekuję {wait_time}s i ponawiam próbę ({attempt + 1}/{max_retries})...")
+                    time.sleep(wait_time)
+                elif is_rate_limit:
                     wait_time = base_delay * (attempt + 1) + 4
-                    print(f"\n[Limit minutowy Google / 429]: Chwila przerwy na reset limitu ({wait_time}s)... Wznawiam automatycznie.")
+                    print(f"\n[Limit minutowy Google / 429 na {self.model}]: Chwila przerwy na reset limitu ({wait_time}s)... Wznawiam automatycznie.")
                     time.sleep(wait_time)
                 else:
                     if attempt < max_retries - 1:
