@@ -114,22 +114,47 @@ def fetch_anilist_metadata(title: str) -> Optional[Dict[str, Any]]:
                 if any(k in t.lower() for k in historical_keywords)
             ]
 
-            # Wykrywanie specyficznych dziedzin wiedzy i niszowej tematyki specjalistycznej
+            # Wykrywanie specyficznych dziedzin wiedzy i niszowej tematyki specjalistycznej (z granicami słów \b)
             domain_keywords = {
-                "Enologia i Sommelierstwo (Wino / Winiarstwo)": ["wine", "alcohol", "sommelier", "winery", "vintage", "grape", "kami no shizuku", "drops of god"],
-                "Kulinaria i Gastronomia": ["food", "cooking", "culinary", "restaurant", "chef", "gourmet", "baking", "ramen"],
-                "Muzyka Klasyczna i Orkiestra": ["classical music", "music", "orchestra", "band", "instrument", "piano", "violin", "concert"],
-                "Tradycyjne Gry i Strategia": ["traditional games", "shogi", "go", "karuta", "mahjong", "chess"],
-                "Medycyna, Chirurgia i Farmacja": ["medicine", "medical", "doctor", "surgery", "hospital", "psychology", "disease"],
-                "Sztuki Walki i Boks": ["martial arts", "boxing", "judo", "kendo", "swordplay", "wrestling"],
-                "Prawo i Kryminalistyka": ["law", "police", "detective", "court", "crime", "investigation"],
-                "Lotnictwo i Kosmonautyka": ["aviation", "space", "astronomy", "pilot", "spaceship"],
-                "Militaria i Wojskowość": ["military", "tank", "navy", "warship", "firearms"]
+                "Enologia i Sommelierstwo (Wino)": [
+                    r"\bwine\b", r"\bsommelier\b", r"\bwinery\b", r"\bvintages?\b",
+                    r"\bkami no shizuku\b", r"\bdrops of god\b", r"\benology\b", r"\boenology\b"
+                ],
+                "Kulinaria i Gastronomia": [
+                    r"\bcooking\b", r"\bculinary\b", r"\bgourmet\b", r"\bchef\b",
+                    r"\bbaking\b", r"\bpatisserie\b", r"\bshokugeki\b"
+                ],
+                "Muzyka Klasyczna i Orkiestra": [
+                    r"\bclassical music\b", r"\borchestra\b", r"\bphilharmonic\b",
+                    r"\bconcerto\b", r"\bsymphony\b", r"\bbrass band\b", r"\bviolinist\b", r"\bpianist\b"
+                ],
+                "Tradycyjne Gry i Strategia": [
+                    r"\btraditional games\b", r"\bshogi\b", r"\bkaruta\b", r"\bmahjong\b",
+                    r"\bchess\b", r"\bgame of go\b", r"\bgo game\b", r"\bbaduk\b", r"\bboard games?\b"
+                ],
+                "Medycyna, Chirurgia i Farmacja": [
+                    r"\bmedicine\b", r"\bmedical\b", r"\bsurgeon\b", r"\bsurgery\b",
+                    r"\bpharmacology\b", r"\bhospital\b"
+                ],
+                "Sztuki Walki i Boks": [
+                    r"\bmartial arts\b", r"\bboxing\b", r"\bjudo\b", r"\bkendo\b",
+                    r"\bkarate\b", r"\btaekwondo\b", r"\bwrestling\b"
+                ],
+                "Prawo i Kryminalistyka": [
+                    r"\bcourtroom\b", r"\battorney\b", r"\bprosecutor\b", r"\blawyer\b",
+                    r"\bcriminalistics\b"
+                ],
+                "Lotnictwo i Kosmonautyka": [
+                    r"\baviation\b", r"\bspacecraft\b", r"\bastronomy\b", r"\bspace exploration\b"
+                ],
+                "Militaria i Wojskowość": [
+                    r"\bwarship\b", r"\btankery\b", r"\barmored vehicles?\b", r"\bpanzer\b"
+                ]
             }
             detected_domains = []
             all_text_lower = " ".join(tag_names + media.get("genres", []) + [desc_clean, title]).lower()
-            for dom_name, kw_list in domain_keywords.items():
-                if any(kw in all_text_lower for kw in kw_list):
+            for dom_name, patterns in domain_keywords.items():
+                if any(re.search(pat, all_text_lower) for pat in patterns):
                     detected_domains.append(dom_name)
 
             characters = []
