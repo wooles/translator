@@ -70,6 +70,15 @@ if (-not (Get-Command dotnet -ErrorAction SilentlyContinue)) {
     winget install Microsoft.DotNet.SDK.8 --silent --accept-package-agreements --accept-source-agreements
 }
 
+# Błyskawiczne odświeżenie zmiennej PATH w bieżącej sesji po instalacji narzędzi winget
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+
+# Ponowne sprawdzenie komendy Python po odświeżeniu PATH
+if (-not $PythonCmd -or -not (Get-Command $PythonCmd -ErrorAction SilentlyContinue)) {
+    if (Get-Command python -ErrorAction SilentlyContinue) { $PythonCmd = "python" }
+    elseif (Get-Command py -ErrorAction SilentlyContinue) { $PythonCmd = "py" }
+}
+
 # ------------------------------------------------------------------------------
 # 3. Klonowanie repozytoriów z GitHuba
 # ------------------------------------------------------------------------------
@@ -124,6 +133,10 @@ if (Test-Path $TranslatorDir) {
     # Indeksowanie bazy
     if (Test-Path (Join-Path $TranslatorDir "index_baza.py")) {
         & $TrPython (Join-Path $TranslatorDir "index_baza.py")
+    }
+    # Autotesty systemu (12/12 testów AVT)
+    if (Test-Path (Join-Path $TranslatorDir "test_system.py")) {
+        & $TrPython (Join-Path $TranslatorDir "test_system.py")
     }
 }
 
