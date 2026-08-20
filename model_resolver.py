@@ -42,9 +42,9 @@ def resolve_best_models(client: Optional[genai.Client] = None) -> Dict[str, str]
     - 'flash_lite': Najszybszy, lekki model Flash-Lite (np. gemini-3.5-flash-lite)
     - 'pro': Flagowy model klasy Pro (np. gemini-3.1-pro-preview)
     """
-    # Domyślne sprawdzone modele bazowe (fallback)
+    # Domyślne sprawdzone modele bazowe (zawsze najwyższa jakość)
     defaults = {
-        "flash": "gemini-3.6-flash",
+        "flash": "gemini-3.7-flash",
         "flash_lite": "gemini-3.5-flash-lite",
         "pro": "gemini-3.1-pro-preview"
     }
