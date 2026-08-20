@@ -170,6 +170,11 @@ FILAR XXI: SPÓJNOŚĆ WZROKOWA I FORMATOWANIE AVT (NETFLIX & SZARKOWSKA):
 FILAR XXII: NATURALNE POLSKIE PARTYKUŁY DIALOGOWE I SPÓJNOŚĆ MYŚLI (DISCOURSE MARKERS):
 - Wyeliminuj sztuczne, książkowe spójniki w dialogach potocznych ("Ponadto uważam", "Jakkolwiek", "Przeto").
 - Stosuj żywe polskie partykuły nawiązania dialogowego: "No i co teraz?", "Przecież dobrze wiesz", "A to dobre!", "Słuchaj no", "Daj spokój".
+
+FILAR XXIII: KANON POLSKICH WYDAŃ MANGOWYCH I TRANSMEDIALNA SPÓJNOŚĆ (TRANSMEDIA CANON CONSISTENCY):
+- Gdy seria posiada oficjalny polski przekład mangowy (np. Waneko, J.P.Fantastica, Studio JG, Hanami, Kotori):
+  * BEZWZGLĘDNIE zachowaj ustalone w polskim wydaniu papierowym nazwy technik, magii, krain, formacji bojowych i rang (np. "Rozszerzenie Domeny", "Przeklęta Energia", "Korpus Zwiadowczy", "Wielki Generał", "Państwo Środka").
+  * RÓŻNICA AVT vs MANGA: Zachowaj kanoniczną terminologię, ale przestrzegaj rygoru zwięzłości napisów filmowych (limit 17 CPS i 42 znaków). Nie przenoś tasiemcowych zdań z dymków komiksu bez uprzedniej kondensacji składniowej.
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """

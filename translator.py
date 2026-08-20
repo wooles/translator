@@ -61,6 +61,7 @@ from whisper_engine import JapaneseWhisperEngine
 from avt_linter import AVTLinter
 from romaji_helper import to_romaji
 from series_memory import SeriesBible
+from manga_canon import MangaCanonRegistry
 from avt_formatter import split_subtitle_syntactically, calculate_cps
 from prosody_engine import AudioProsodyEngine
 from speaker_diarizer import SpeakerVoiceClassifier
@@ -243,6 +244,9 @@ class MultimodalTranslator:
         except Exception:
             self.tm = None
 
+        # Rejestr Oficjalnego Kanonu Polskich Wydań Mangowych (Waneko, JPF, Studio JG itp.)
+        self.manga_canon = MangaCanonRegistry()
+
     def _prepare_batch_prompt(
         self,
         batch_events: List[Tuple[int, pysubs2.SSAEvent, str, str]],
@@ -253,10 +257,12 @@ class MultimodalTranslator:
         whisper_transcriptions: Optional[Dict[int, str]] = None,
         series_bible_str: str = "",
         prosody_tags: Optional[Dict[int, str]] = None,
-        speaker_tags: Optional[Dict[int, str]] = None
+        speaker_tags: Optional[Dict[int, str]] = None,
+        manga_canon_str: str = ""
     ) -> str:
         """
         Tworzy tekst promptu dla danej paczki kwestii wraz z:
+        - Oficjalnym Kanonem Mangi (Wydawnictwa Waneko, JPF, Studio JG itp.)
         - Biblią Serialu (Pamięć Międzyodcinkowa)
         - Profilem odcinka (Słowniczek i Macierz Relacji)
         - Kontekstem fabuły z bazy AniList
@@ -270,7 +276,11 @@ class MultimodalTranslator:
         """
         lines = []
 
-        # 0a. Ciągłość terminologiczna z Biblii Serialu
+        # 0a. Oficjalny Kanon Polskiego Wydania Mangi
+        if manga_canon_str:
+            lines.append(manga_canon_str)
+
+        # 0b. Ciągłość terminologiczna z Biblii Serialu
         if series_bible_str:
             lines.append(series_bible_str)
 
@@ -591,6 +601,20 @@ class MultimodalTranslator:
                 characters=char_dict,
                 glossary=gloss_dict
             )
+
+        # 0c. Sprawdzenie Oficjalnego Kanonu Polskiego Wydania Mangi (Waneko, JPF, Studio JG, Hanami itp.)
+        manga_canon_entry = self.manga_canon.find_canon_for_series(series_title)
+        manga_canon_str = ""
+        if manga_canon_entry:
+            manga_canon_str = self.manga_canon.format_canon_for_prompt(manga_canon_entry)
+            print(f"  📚 [Kanon Mangi]: Wczytano oficjalną polską terminologię ({manga_canon_entry.get('publisher', 'Wydawnictwo')})")
+            if manga_canon_entry.get("glossary"):
+                self.series_bible.update_from_episode_profile(
+                    episode_name="Kanon Mangi",
+                    characters={},
+                    glossary=manga_canon_entry["glossary"]
+                )
+
         series_bible_str = self.series_bible.format_for_prompt()
         if series_bible_str:
             print(f"  📚 [Biblia Serialu]: Wczytano ciągłość sezonu dla serii '{series_title or self.series_bible.slug}'")
@@ -717,7 +741,8 @@ class MultimodalTranslator:
                     whisper_transcriptions=whisper_transcriptions,
                     series_bible_str=series_bible_str,
                     prosody_tags=prosody_tags,
-                    speaker_tags=speaker_tags
+                    speaker_tags=speaker_tags,
+                    manga_canon_str=manga_canon_str
                 )
 
                 # 4. Wywołanie Gemini (Obraz + Tekst ze słuchu Whisper) - Zero opłat za streaming audio do Google!

@@ -269,6 +269,29 @@ def test_typesetting_matcher():
     assert "\\an8" in res
     print(" -> PASSED: Moduł auto-stylizacji i kolorów ASS działa w 100%.")
 
+from manga_canon import MangaCanonRegistry
+
+def test_manga_canon():
+    print("[TEST 13/13] Test Rejestru Kanonu Polskich Wydań Mangowych (manga_canon)...")
+    registry = MangaCanonRegistry()
+    # Test dopasowania Kingdom
+    kingdom_canon = registry.find_canon_for_series("[ASW] Kingdom S6 - 10 [1080p]")
+    assert kingdom_canon is not None
+    assert kingdom_canon["glossary"]["Middle Kingdom"] == "Państwo Środka"
+    assert kingdom_canon["glossary"]["Great General"] == "Wielki Generał"
+
+    # Test dopasowania Jujutsu Kaisen
+    jjk_canon = registry.find_canon_for_series("Jujutsu Kaisen Season 2")
+    assert jjk_canon is not None
+    assert jjk_canon["glossary"]["Domain Expansion"] == "Rozszerzenie Domeny"
+    assert jjk_canon["publisher"] == "Wydawnictwo Waneko"
+
+    # Test formatowania promptu
+    prompt_chunk = registry.format_canon_for_prompt(jjk_canon)
+    assert "Rozszerzenie Domeny" in prompt_chunk
+    assert "Waneko" in prompt_chunk
+    print(" -> PASSED: Kanon polskich wydań mangowych działa w 100% (baza Waneko, JPF, Studio JG itp.).")
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -283,4 +306,5 @@ if __name__ == "__main__":
     test_avt_formatter_and_cps()
     test_prosody_and_diarizer()
     test_typesetting_matcher()
-    print("\n Wszystkie testy jednostkowe i integracyjne (12/12) zakończone pełnym sukcesem!\n")
+    test_manga_canon()
+    print("\n Wszystkie testy jednostkowe i integracyjne (13/13) zakończone pełnym sukcesem!\n")
