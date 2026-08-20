@@ -1,73 +1,68 @@
-# Multimodal Subtitle Translator (Gemini 3.7 Flash)
+# Multimodal Subtitle Translator (Studio Master Quality)
 
-Inteligentne narzędzie w języku Python wykorzystujące model **Gemini 3.7 Flash** do automatycznego tłumaczenia napisów filmowych i anime z języka angielskiego na język polski.
+Inteligentne narzędzie w języku Python wykorzystujące modele **Gemini (Flash & Gemini 3.1 Pro)** oraz lokalny silnik **Whisper STT** do profesjonalnego tłumaczenia napisów filmowych i anime z języka angielskiego/japońskiego na język polski.
 
-Narzędzie analizuje **klatki wideo (kontekst wizualny)** w momencie trwania kwestii dialogowych, dzięki czemu bezbłędnie dobiera formy gramatyczne (rodzaj męski/żeński/nijaki, relacje formalne/nieformalne) oraz posiada **dwufazowy potok z dedykowanym modułem redakcji dialogów**, który eliminuje kalki językowe (np. *"I see"* $\rightarrow$ *„Rozumiem”*, a nie *„Widzę”*).
-
----
-
-## Główne Funkcje
-
-1. **Analiza Wizualna Kadrów (Multimodal Context)**:
-   * Wyciąga klatkę wideo odpowiadającą mówiącej postaci.
-   * Ustala płeć mówcy i rozmówcy (np. *„Zrobiłem”* vs *„Zrobiłam”*, *„Cieszę się, że przyszedłeś”* vs *„przyszłaś”*).
-2. **Eliminacja Kalek Językowych (Anti-Calque Engine)**:
-   * Wbudowana baza reguł eliminująca sztuczne dosłowne tłumaczenia (np. *„To ma sens”* zamiast *„To robi sens”*, *„Wszystko w porządku?”* zamiast *„Jesteś w porządku?”*).
-3. **Dwufazowa Redakcja Dialogów (Dialogue Verifier)**:
-   * **Faza 1**: Tłumaczenie multimodalne z klatkami wideo i kontekstem sceny.
-   * **Faza 2**: Redakcja przez wirtualnego redaktora dialogów filmowych dbającego o naturalność polszczyzny i rytm czytania.
-4. **Wygodna Obsługa**:
-   * Przeciągnij i upuść plik wideo lub napisy na plik `translate_drag_and_drop.bat`.
-   * Automatyczna obsługa wbudowanych ścieżek w plikach `.mkv` / `.mp4` lub zewnętrznych plików `.srt` / `.ass`.
+Oparte na **Kanonie Przekładu Audiowizualnego Arkadiusza Belczyka**, **Wizualnym OCR kadrów (1080p)**, **Słowniczku i Profilerze Odcinka**, **Pamięci Tłumaczeniowej (10 342 autentycznych par dialogowych)** oraz **dwufazowej architekturze redakcyjnej (Script Doctor)**.
 
 ---
 
-## Szybki Start (Instalacja i Konfiguracja)
+## 🚀 Instalacja 1-Kliknięciem na Nowym Komputerze (1-Click Setup)
 
-### 1. Konfiguracja Klucza API
-1. Skopiuj plik `.env.example` do pliku `.env`:
-   ```bash
-   cp .env.example .env
-   ```
-2. Otwórz plik `.env` w dowolnym edytorze i wklej swój klucz API:
-   ```env
-   GEMINI_API_KEY=twoj_klucz_api_tutaj
-   ```
-   *(Klucz uzyskasz bezpłatnie na: [Google AI Studio](https://aistudio.google.com/))*
-
----
-
-## Sposoby Użycia
-
-### Opcja A: Przeciągnij i Upuść (Najprostsza)
-Przeciągnij dowolny plik wideo (np. `odcinek.mkv`) lub plik napisów (np. `napisy.srt`) i upuść go bezpośrednio na plik **`translate_drag_and_drop.bat`**.
-
-### Opcja B: Linia Poleceń (CLI)
-
-Uruchomienie w środowisku wirtualnym:
-
+Na nowym komputerze po pobraniu repozytorium wystarczy uruchomić:
 ```powershell
-# Pełne automatyczne tłumaczenie wideo z wbudowanymi napisami:
-.venv\Scripts\python main.py film.mkv
+# Opcja A (Najprostsza): Kliknij dwukrotnie plik:
+setup_new_pc.bat
 
-# Tłumaczenie z podglądem w odtwarzaczu (MPV/VLC) po zakończeniu:
-.venv\Scripts\python main.py film.mkv --play
-
-# Tłumaczenie z osobnym plikiem z napisami:
-.venv\Scripts\python main.py --video film.mp4 --subs napisy_en.srt
-
-# Szybkie tłumaczenie tekstowe (bez weryfikatora):
-.venv\Scripts\python main.py napisy.srt --no-verify
+# Opcja B (PowerShell):
+.\setup_new_pc.ps1
 ```
+Skrypt automatycznie:
+1. Sprawdzi i zainstaluje Pythona oraz FFmpeg.
+2. Utworzy środowisko `.venv` i zainstaluje wszystkie biblioteki.
+3. Skonfiguruje Twój klucz `GEMINI_API_KEY`.
+4. Zaindeksuje bazę Translation Memory (10 000+ wzorców).
+5. Przeprowadzi autotesty weryfikacyjne.
 
 ---
 
-## Struktura Projektu
+## 🌟 Kluczowe Funkcje i Architektura
 
-- [`main.py`](file:///c:/Users/Piotrek/Desktop/translator/main.py) – Główny interfejs wiersza poleceń (CLI) i wykrywanie ścieżek wideo/napisów.
-- [`translator.py`](file:///c:/Users/Piotrek/Desktop/translator/translator.py) – Silnik orkiestracji paczek dialogowych i zapytań do Gemini 3.7 Flash.
-- [`verifier.py`](file:///c:/Users/Piotrek/Desktop/translator/verifier.py) – Redaktor dialogów eliminujący kalki językowe i sztywny styl (Faza 2).
-- [`rules.py`](file:///c:/Users/Piotrek/Desktop/translator/rules.py) – Zbiór reguł anty-kalek, wytycznych wizualnych i promptów systemowych.
-- [`extract.py`](file:///c:/Users/Piotrek/Desktop/translator/extract.py) – Ekstrakcja klatek wideo i wbudowanych ścieżek napisów przez `ffmpeg`.
-- [`translate_drag_and_drop.bat`](file:///c:/Users/Piotrek/Desktop/translator/translate_drag_and_drop.bat) – Wygodny launcher dla Windows.
-- [`test_system.py`](file:///c:/Users/Piotrek/Desktop/translator/test_system.py) – Zestaw testów weryfikacyjnych.
+1. **Lokalna Transkrypcja Mowy Japońskiej (Whisper STT)**:
+   * Wyciąga oryginalną mowę japońską (Kanji/Kana) bezpośrednio z audio, eliminując błędy i uproszczenia w angielskich fansubach.
+2. **Profiler Odcinka (Pre-pass Episode Profiler & Glossary)**:
+   * Skanuje odcinek przed startem, ustala relacje między postaciami (kto per *„pani Teshima”*, kto na *„ty”*) oraz tworzy spójny słowniczek pojęć.
+3. **Wizualny OCR Klatek Wideo (1080p)**:
+   * Odczytuje napisy w tle, tablice szkolne, telefony i dymki mangowe (`いいよね〜`).
+4. **Kanon Przekładu Audiowizualnego Arkadiusza Belczyka**:
+   * Eliminacja zaimków „Ja”, naturalny szyk wyrazów, formuły Aisatsu (*Tadaima!* $\rightarrow$ *„Wróciłam!”*), eliminacja powtórzeń leksykalnych.
+5. **Dwufazowa Redakcja Dialogów (Master Script Doctor)**:
+   * **Faza 1**: Tłumaczenie multimodalne (Obraz + Audio + Whisper + Kontekst EN).
+   * **Faza 2**: Redakcja przez wirtualnego redaktora dialogów (Gemini 3.1 Pro / Flash) dbającego o kunszt literacki i brak kalek.
+
+---
+
+## 🎮 Profile Jakości w Menu CMD
+
+Przy uruchomieniu masz do wyboru 3 profile:
+* **[1] STANDARDOWY**: Ultraszybki, 100% darmowy (Flash-Lite).
+* **[2] STUDYJNY FLASH**: 100% darmowy, wysoka jakość (Flash + Flash Script Doctor).
+* **[3] MASTER PRO ⭐**: Jakość kinowa studia dubbingu (Flash + Gemini 3.1 Pro Script Doctor z głębokim wnioskowaniem).
+
+---
+
+## 💻 Użycie
+
+### Przeciągnij i Upuść (Windows):
+Przeciągnij plik wideo (`.mkv`, `.mp4`) lub napisy (`.srt`, `.ass`) na plik **`translate_drag_and_drop.bat`**.
+
+### Wiersz poleceń (CLI):
+```powershell
+# Tłumaczenie wideo w trybie Master Pro:
+.venv\Scripts\python main.py "film.mkv" --profile pro
+
+# Tłumaczenie z podglądem w odtwarzaczu (MPV/VLC):
+.venv\Scripts\python main.py "film.mkv" --play
+
+# Ekstrakcja napisów z wideo do pliku:
+.venv\Scripts\python extract_subtitles.py "film.mkv"
+```
