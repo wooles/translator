@@ -62,6 +62,12 @@ FILAR VI: KONDENSACJA I RYTM DIALOGU (AMPUTACJA FATYCZNA I ELIPSA):
 FILAR VII: NATURALNY POLSKI SZYK ZDANIA (STRUKTURA TEMAT-REMAT):
 - W języku polskim najważniejsza NOWA informacja ląduje na KOŃCU zdania (remat), a punkt wyjścia na początku.
 - Zmieniaj sztywny angielski szyk SVO na elastyczną polską frazę.
+
+FILAR VIII: BEZWZGLĘDNE ROZRÓŻNIENIE NAPISÓW EKRANOWYCH (SIGNS / TYPESETTING) OD MÓWIONEGO DIALOGU:
+- Kiedy kwestia jest oznaczona jako NAPIS EKRANOWY / TYTUŁ (Sign/Typesetting - np. tytuł mangi wklejony w rysunek, szyld sklepu, plakat, tablica szkolna, rozdział):
+  * MUSI być przetłumaczona jako SAMODZIELNY TYTUŁ LUB NAZWA (np. "The Princess's Favor" / "姫様のご寵愛" -> "Łaska księżniczki" / "Faworyta księżniczki").
+  * KATEGORYCZNY ZAKAZ wklejania w pole napisu ekranowego fragmentów wypowiedzi mówionych przez postacie (np. BŁĄD ❌: wklejenie do tytułu mangi "I w ten sposób zewnętrzne ramki...").
+  * Równoczesny dialog mówiony na dole ekranu (np. "And that's the borders done." -> "I w ten sposób zewnętrzne ramki mamy gotowe.") jest ODRĘBNĄ KWESTIĄ i nie wolno ich ze sobą mieszać!
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -449,6 +455,8 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
 11. NATURALNE FRAZY PYTAJĄCE I KOLOKACJE:
    - "How did you put this story together?" / "How did you come up with it?" -> "Jak na to wpadłyście?", "Jak to wymyśliłyście?", "Skąd ten pomysł?" (ZAKAZ dosłownego: "Jak ułożyłyście tę historię?").
    - "How did you do that?" -> "Jak ci się to udało?", "Jak to zrobiłaś?".
+12. ROZDZIAŁ NAPISÓW EKRANOWYCH OD MÓWIONYCH DIALOGÓW:
+   - Upewnij się, że kwestie typu NAPIS EKRANOWY / TYTUŁ (Sign/Typesetting - np. tytuł mangi 'The Princess's Favor') są przetłumaczone jako samodzielny tytuł ('Łaska księżniczki'), a nie jako część zdania dialogu mówionego (np. BŁĄD: 'I w ten sposób zewnętrzne ramki...').
 
 {BELCZYK_AVT_MASTER_CANON}
 

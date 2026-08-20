@@ -62,6 +62,50 @@ def extract_typesetting_tags(raw_text: str) -> Tuple[str, str]:
 
     return "", sanitize_sub_text(raw_text)
 
+def detect_event_visual_type(event: pysubs2.SSAEvent, ts_prefix: str) -> Dict[str, Any]:
+    """
+    Analizuje tagi ASS, pozycję, kąt obrotu, kolor oraz styl napisu,
+    aby precyzyjnie odróżnić napisy ekranowe (tytuły mang, znaki, plakaty, tablice)
+    od standardowych dialogów mówionych.
+    """
+    is_sign = False
+    details = []
+
+    style_lower = (event.style or "").lower()
+    name_lower = (event.name or "").lower()
+    ts_lower = (ts_prefix or "").lower()
+
+    if any(s in style_lower for s in ["sign", "title", "note", "top", "manga", "screen", "ts", "typesetting", "card"]):
+        is_sign = True
+        details.append(f"styl='{event.style}'")
+
+    if any(n in name_lower for n in ["sign", "title", "note", "typesetting", "screen"]):
+        is_sign = True
+        details.append(f"aktor='{event.name}'")
+
+    if r"\pos" in ts_lower:
+        is_sign = True
+        details.append("pozycjonowany na ekranie (\\pos)")
+
+    if r"\frz" in ts_lower or r"\org" in ts_lower:
+        is_sign = True
+        details.append("obrócony/wklejony w perspektywę mangi (\\frz)")
+
+    if any(an in ts_lower for an in [r"\an7", r"\an8", r"\an9", r"\an4", r"\an5", r"\an6"]):
+        is_sign = True
+        details.append("położenie poza dolnym marginesem (\\an)")
+
+    if r"\c&h" in ts_lower or r"\1c&h" in ts_lower:
+        is_sign = True
+        details.append("indywidualny kolor graficzny")
+
+    desc = ", ".join(details) if details else "standardowy dolny dialog"
+    return {
+        "is_sign": is_sign,
+        "type_label": "NAPIS EKRANOWY / TYTUŁ (Sign/Typesetting)" if is_sign else "MÓWIONY DIALOG POSTACI",
+        "visual_details": desc
+    }
+
 def sanitize_sub_text(text: str, is_ass: bool = True) -> str:
     """
     Czyści tekst ze śmieci formatowania ASS, niedomkniętych nawiasów i zbędnych znaków,
@@ -234,13 +278,23 @@ class MultimodalTranslator:
                      "Jeśli podano japońską transkrypcję (JP), opieraj sens bezpośrednio na japońskim oryginale! "
                      "BEZWZGLĘDNIE unikaj tłumaczenia 1:1, kalek i sztywnych definicji (np. 'That bombed' -> 'To mi nie wyszło', 'I'm home' -> 'Wróciłam!', 'I see' -> 'Rozumiem'):")
 
-        for idx, (original_idx, event, clean_text, _) in enumerate(batch_events):
+        for idx, (original_idx, event, clean_text, ts_prefix) in enumerate(batch_events):
             start_str = pysubs2.time.ms_to_str(event.start)
             end_str = pysubs2.time.ms_to_str(event.end)
-            lines.append(f"Kwestia [ID: {idx + 1}] (Czas: {start_str} - {end_str}):")
+            vtype = detect_event_visual_type(event, ts_prefix)
+
+            if vtype["is_sign"]:
+                lines.append(f"Kwestia [ID: {idx + 1}] [TYP: 🖼️ {vtype['type_label']}] (Czas: {start_str} - {end_str}, Cechy: {vtype['visual_details']}):")
+                lines.append(f"  ⚠️ UWAGA WIZUALNA: To jest NAPIS / TYTUŁ NA EKRANIE (np. tytuł mangi, rozdział, tablica, napis wklejony w kadr).")
+                lines.append(f"  Przetłumacz ten tekst jako SAMODZIELNY TYTUŁ/NAPIS (np. 'The Princess's Favor' / '姫様のご寵愛' -> 'Łaska księżniczki' / 'Faworyta księżniczki').")
+                lines.append(f"  BEZWZGLĘDNY ZAKAZ wklejania tu fragmentów dialogów mówionych przez postacie!")
+            else:
+                speaker_name = event.name if event.name else "Postać"
+                lines.append(f"Kwestia [ID: {idx + 1}] [TYP: 💬 {vtype['type_label']}] (Czas: {start_str} - {end_str}, Mówca: '{speaker_name}'):")
+
             if whisper_transcriptions and idx + 1 in whisper_transcriptions:
                 jp_text = whisper_transcriptions[idx + 1]
-                if jp_text:
+                if jp_text and not vtype["is_sign"]:
                     lines.append(f"  JP (Japoński oryginał z mowy): {jp_text}")
             lines.append(f"  EN (Napisy pomocnicze): {clean_text}")
 
@@ -566,11 +620,12 @@ class MultimodalTranslator:
                 pass1_items = []
                 scene_desc = batch_response.scene_description if batch_response else ""
 
-                for idx, (orig_idx, event, clean_en, _) in enumerate(untranslated_in_batch):
+                for idx, (orig_idx, event, clean_en, ts_prefix) in enumerate(untranslated_in_batch):
                     batch_id = idx + 1
                     pl_candidate = ""
                     speaker_gender = None
                     notes = ""
+                    vtype = detect_event_visual_type(event, ts_prefix)
 
                     if batch_response:
                         for tr in batch_response.translations:
@@ -589,7 +644,10 @@ class MultimodalTranslator:
                         "en": clean_en,
                         "pl": pl_candidate,
                         "speaker_gender": speaker_gender,
-                        "notes": notes
+                        "notes": notes,
+                        "is_sign": vtype["is_sign"],
+                        "visual_type": vtype["type_label"],
+                        "visual_details": vtype["visual_details"]
                     })
 
                 # 6. Opcjonalna II faza weryfikatora

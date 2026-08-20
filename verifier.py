@@ -48,10 +48,13 @@ class DialogueVerifier:
             prompt_lines.append(f"\n[Kontekst sceny]: {scene_summary}\n")
 
         for item in batch_items:
+            type_tag = f" [🖼️ {item['visual_type']}]" if item.get("is_sign") else " [💬 DIALOG MÓWIONY]"
             gender_info = f" (Mówca: {item.get('speaker_gender')})" if item.get('speaker_gender') else ""
             notes_info = f" [Notatki: {item.get('notes')}]" if item.get('notes') else ""
+            visual_info = f" [Położenie/Styl: {item.get('visual_details')}]" if item.get('visual_details') else ""
+            
             prompt_lines.append(
-                f"- [ID: {item['id']}]{gender_info}\n"
+                f"- [ID: {item['id']}]{type_tag}{gender_info}{visual_info}\n"
                 f"  EN: {item['en']}\n"
                 f"  Wstępne PL: {item['pl']}{notes_info}"
             )
