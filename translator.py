@@ -579,7 +579,10 @@ class MultimodalTranslator:
                 series_title = Path(ref_path).stem.split(" - ")[0].replace("[ASW]", "").replace("[Erai-raws]", "").strip()
         self.series_bible = SeriesBible(anime_title=series_title)
         if episode_profile:
-            char_dict = {c.name: f"{c.gender} ({c.role}, {c.honorific_form})" for c in episode_profile.characters}
+            char_dict = {}
+            for c in episode_profile.characters:
+                char_key = f"{c.speaker} -> {c.listener}" if c.listener else c.speaker
+                char_dict[char_key] = f"Zwrot: '{c.address_form}' ({c.relationship_type})"
             gloss_dict = {g.term_en: g.translation_pl for g in episode_profile.glossary}
             self.series_bible.update_from_episode_profile(
                 episode_name=Path(subs_path).stem if subs_path else "Odcinek",
