@@ -90,6 +90,16 @@ class DialogueVerifier:
 
             except Exception as e:
                 err_str = str(e).lower()
+                is_billing_exhausted = "prepayment" in err_str or "depleted" in err_str or ("billing" in err_str and "credit" in err_str)
+                if is_billing_exhausted:
+                    print("\n" + "!" * 75)
+                    print("  ❌ [BŁĄD KONTA GOOGLE AI STUDIO / PŁATNOŚCI]:")
+                    print("  Wyczerpały się środki przedpłacone (Prepayment Credits / Limit wydatków)!")
+                    print("  Komunikat Google: 'Your prepayment credits are depleted.'")
+                    print("  👉 Wejdź na https://aistudio.google.com/ i doładuj środki, aby kontynuować.")
+                    print("!" * 75 + "\n")
+                    raise RuntimeError("Wyczerpane środki na koncie Google AI Studio (Prepayment Credits Depleted).")
+
                 is_unavailable = "503" in err_str or "unavailable" in err_str or "high demand" in err_str
                 is_rate_limit = "429" in err_str or "quota" in err_str or "resource_exhausted" in err_str
                 
