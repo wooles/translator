@@ -1,0 +1,43 @@
+{
+  "anime_title": "Futsutsuka na Akujo dewa Gozaimasu ga",
+  "characters": {
+    "Shu Keigetsu (dusza Reirin) -> Kou Kenshuu (Cesarzowa)": {
+      "description": "Zwrot: 'Wasza Cesarska Mość' (Kandydatka klanowa -> Cesarzowa)"
+    },
+    "Kou Tousetsu -> Kou Kenshuu (Cesarzowa)": {
+      "description": "Zwrot: 'Wasza Cesarska Mość' (Główna dama dworu -> Cesarzowa)"
+    },
+    "Kou Kenshuu (Cesarzowa) -> Shu Keigetsu": {
+      "description": "Zwrot: 'Shu Keigetsu / ty' (Cesarzowa -> Kandydatka z niższego klanu)"
+    },
+    "Shin-U -> Kou Kenshuu": {
+      "description": "Zwrot: 'Wasza Cesarska Mość' (Kapitan gwardii -> Cesarzowa)"
+    },
+    "Shin-U -> Shu Keigetsu": {
+      "description": "Zwrot: 'Panienko Shu / Shu Keigetsu' (Oficer gwardii -> Dama dworu)"
+    },
+    "Leelee -> Shu Keigetsu": {
+      "description": "Zwrot: 'Panienko Keigetsu / Panienko' (Dama dworu / Służąca -> Jej pani)"
+    },
+    "Ei Gyoumei -> Służba / Gwardia": {
+      "description": "Zwrot: 'per wy / tryb rozkazujący' (Następca Tronu -> Podwładni)"
+    },
+    "Bunkou -> Shu Keigetsu": {
+      "description": "Zwrot: 'Panienko Shu' (Eunuch -> Kandydatka klanu Shu)"
+    }
+  },
+  "glossary": {
+    "Bow of Warding": "Łuk Odpędzania Zła",
+    "Eagle Eyes": "Sokole Oczy",
+    "Court Lady / Maiden": "Dama Dworu / Kandydatka (Dama z Klanu)",
+    "Noble Consort": "Szlachetna Małżonka / Szlachetna Konkubina",
+    "Water qi": "Qi wody / Energia wody",
+    "Violet Dragon's Spring": "Źródło Fioletowego Smoka",
+    "Apothecary": "Medyk / Aptekarz",
+    "Eunuch": "Eunuch"
+  },
+  "relationships": {},
+  "episodes_translated": [
+    "tmpc7zbcf40"
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "anime_title": "Kingdom S6",
+  "characters": {
+    "Wang Ben -> Mǎ Nanci": {
+      "description": "Zwrot: 'po imieniu: Mǎ Nanci / dowódco Zhao' (wrogowie / wrogowie na polu bitwy)"
+    },
+    "Fan Yang -> Wang Ben": {
+      "description": "Zwrot: 'panie Ben / paniczu Ben' (podwładny -> dowódca / pan feudalny)"
+    },
+    "Xin -> Wang Jian": {
+      "description": "Zwrot: 'generale Wang Jian' (podwładny -> naczelny wódz)"
+    },
+    "Wang Jian -> Xin": {
+      "description": "Zwrot: 'na ty / Xin' (wódz naczelny -> podwładny dowódca)"
+    },
+    "Bi -> Yang Duanhe": {
+      "description": "Zwrot: 'Wasza Wysokość / Pani' (sojusznik / dowódca niższy rangą -> Królowa Gór)"
+    },
+    "Yang Duanhe -> Bi": {
+      "description": "Zwrot: 'generale Bi' (królowa/sojuszniczka -> generał sprzymierzony)"
+    },
+    "Shun Shuishu -> Lozo": {
+      "description": "Zwrot: 'Królu Quanrong / Królu Lozo' (poseł/strateg Zhao -> władca Quanrong)"
+    },
+    "Lozo -> Shun Shuishu": {
+      "description": "Zwrot: 'na ty / człowieku z nizin' (bezwzględny król plemienny -> obcy poseł)"
+    }
+  },
+  "glossary": {
+    "Middle Kingdom": "Państwo Środka",
+    "Quanrong": "Quanrong",
+    "Xiongnu": "Xiongnu",
+    "Yu Feng Force": "Oddział Yu Feng",
+    "Le Hua Force": "Oddział Le Hua",
+    "Zhuhai Plain": "Równina Zhuhai",
+    "Laoyang": "Zamek Laoyang",
+    "flatland commander": "dowódca z nizin",
+    "Fangs of Laoyang": "Kły Laoyang",
+    "Great General": "Wielki Generał",
+    "Hi Shin Unit": "Oddział Hi Shin",
+    "Heavenly Kings": "Czterej Niebiańscy Królowie",
+    "Guan Dao / Glaive": "Glewia bojowa / Guandao",
+    "Glaive": "Glewia",
+    "Six Great Generals": "Sześciu Wielkich Generałów",
+    "State of Qin": "Państwo Qin",
+    "State of Zhao": "Państwo Zhao",
+    "State of Wei": "Państwo Wei",
+    "State of Chu": "Państwo Chu",
+    "State of Yan": "Państwo Yan",
+    "State of Han": "Państwo Han",
+    "State of Qi": "Państwo Qi",
+    "Zhuhai Plains": "Równina Zhuhai",
+    "Five Hundred-Man Commander": "Dowódca pięciuset ludzi",
+    "Thousand-Man Commander": "Dowódca tysiąca ludzi"
+  },
+  "relationships": {},
+  "episodes_translated": [
+    "tmpqhvb5j6p",
+    "tmp2s6g9x3n",
+    "tmppw33m3fl",
+    "tmpymtsp2tj",
+    "Kanon Mangi"
+  ]
+}

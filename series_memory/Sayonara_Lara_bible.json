@@ -1,0 +1,34 @@
+{
+  "anime_title": "Sayonara Lara",
+  "characters": {
+    "Lara -> Luca": {
+      "description": "Zwrot: 'na ty / po imieniu: Luca' (syrena -> licealista / obiekt uczuć)"
+    },
+    "Luca -> Lara": {
+      "description": "Zwrot: 'na ty / po imieniu: Lara' (licealista / artysta -> romantyczna fascynacja)"
+    },
+    "Mari -> Lara": {
+      "description": "Zwrot: 'na ty / po imieniu: Lara' (przyjaciółka / ludzka opiekunka)"
+    },
+    "Gon (Grace) -> Lara": {
+      "description": "Zwrot: 'na ty / po imieniu: Lara' (opiekunka / mentorka ze świata syren)"
+    },
+    "Leo -> Luca": {
+      "description": "Zwrot: 'braciszku / bracie' (młodszy brat -> starszy brat)"
+    },
+    "Leo -> Lara": {
+      "description": "Zwrot: 'Lara-chan / pani Lara' (młodszy brat Luca -> dziewczyna brata)"
+    }
+  },
+  "glossary": {
+    "Lake Biwa": "Jezioro Biwa",
+    "Biwako Terrace": "Biwako Terrace",
+    "Dagger": "Sztylet",
+    "Lake Biwa Fireworks Festival": "Festiwal Fajerwerków nad jeziorem Biwa",
+    "Cutting weight": "Zbijanie wagi / ścinanie wagi"
+  },
+  "relationships": {},
+  "episodes_translated": [
+    "tmptss49af2"
+  ]
+}

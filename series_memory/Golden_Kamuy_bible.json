@@ -1,0 +1,38 @@
+{
+  "anime_title": "Golden Kamuy",
+  "characters": {
+    "Saichi Sugimoto -> Asirpa": {
+      "description": "Zwrot: 'panno Asirpo / Asirpa-san' (towarzysze broni, lojalni partnerzy o silnej więzi opiekuńczej)"
+    },
+    "Asirpa -> Saichi Sugimoto": {
+      "description": "Zwrot: 'Sugimoto (po nazwisku, bez tytulatury)' (równorzędni partnerzy w wyprawie)"
+    },
+    "Usami -> Kadokura": {
+      "description": "Zwrot: 'naczelniku Kadokura / panie naczelniku' (żołnierz 7. Dywizji -> były strażnik/naczelnik więzienia Abashiri)"
+    },
+    "Tsukishima -> Koito": {
+      "description": "Zwrot: 'podporuczniku Koito / panie podporuczniku' (sierżant sztabowy -> bezpośredni przełożony oficer)"
+    },
+    "Kikuta -> Koito": {
+      "description": "Zwrot: 'podporuczniku Koito' (starszy chorąży -> młodszy stopniem oficer)"
+    },
+    "Kirawus -> Saichi Sugimoto": {
+      "description": "Zwrot: 'panie Sugimoto / Sugimoto-nispa' (sprzymierzeniec Ajnu -> Sugimoto (zwrot z szacunkiem))"
+    }
+  },
+  "glossary": {
+    "7th Division": "7. Dywizja (Siódma Dywizja)",
+    "Jack the Ripper": "Kuba Rozpruwacz",
+    "Type 30 rifle": "Karabin Typ 30 (Arisaka Typ 30)",
+    "Type 38 rifle": "Karabin Typ 38 (Arisaka Typ 38)",
+    "Firing pin": "Iglica",
+    "Surku / Wolfsbane": "Surku / Tojad",
+    "Aca": "Aca (Ojciec)",
+    "Nispa": "Nispa (Pan / Szanowny)",
+    "Menko": "Karty menko"
+  },
+  "relationships": {},
+  "episodes_translated": [
+    "tmp996h2his"
+  ]
+}
