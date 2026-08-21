@@ -301,6 +301,16 @@ FILAR XLV: MATRYCA PRAGMATYCZNA POTWIERDZEŃ, APROBACJI I AIZUCHI (CONVERSATIONA
     -> POPRAWNIE [OK]: "Rozumiem.", "Aha.", "Jasne.", "Teraz rozumiem."
   * 3. ZDZIWIENIE / ZAINTRYGOWANIE (Sou nan desu ka? / Sou ka? z intonacją rosnącą):
     -> POPRAWNIE [OK]: "Doprawdy?", "Naprawdę?", "Doprawdy tak jest?"
+
+FILAR XLVI: ZASADA YOBISUTE I ZAKAZ SZTUCZNEGO „PANA/PANI” PRZY SAMYM IMIENIU (ANTI-FALSE FORMALITY):
+- ZWROT PO SAMYM IMIENIU (Yobisute - Issei, Shizuku, Loulan, Arata):
+  * Gdy w audio lub tekście postać zwraca się do rozmówcy po SAMYM IMIENIU bez japońskich honoryfikatorów:
+    -> KARDYNALNY BŁĄD [X]: Dodawanie słowa "Pan/Pani" ("Pan Issei", "panie Issei", "pani Loulan").
+    -> POPRAWNIE [OK]: Zwracanie się bezpośrednio po imieniu na "ty": "Issei, co o tym myślisz?", "Shizuku, spróbuj tego wina!".
+- RELACJE BLISKIE, TOWARZYSKIE, RYWALIZUJĄCE I POSTACIE ZAGRANICZNE:
+  * Towarzysze podróży (np. Loulan -> Issei), rywale (Shizuku -> Issei), przyjaciele oraz cudzoziemcy nieznający sztywnej etykiety biurowej ZAWSZE mówią do siebie po imieniu na "ty".
+- KIEDY STOSUJEMY FORMĘ „PAN/PANI”:
+  * WYŁĄCZNIE przy formalnych zwrotach po NAZWISKU z honoryfikatorem (np. Tomine-sensei -> "pan Tomine", Kanzaki-san -> "pan Kanzaki") lub w oficjalnych relacjach urzędowych/kelner-klient.
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -729,9 +739,14 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
    - Kiedy postać potwierdza trafną uwagę rozmówcy (audio: 'Sou' / 'Sou ne' / 'Sou desu') i rozwija jego myśl (np. o winie/charakterze):
      -> KARDYNALNY BŁĄD [X]: "Rozumiem." (bierna kalka "I see", brzmiąca obco i urzędowo!).
      -> POPRAWNIE [OK]: "Otóż to.", "Właśnie tak.", "Zgadza się.", "Dokładnie tak."
+20. ZASADA YOBISUTE I ZAKAZ „PANA/PANI” PRZY SAMYM IMIENIU (FILAR XLVI):
+   - Kiedy postać zwraca się do rozmówcy po samym imieniu (np. Loulan do Isseia, Shizuku do Isseia, przyjaciele, rywale):
+     -> KARDYNALNY BŁĄD [X]: "Co pan czuje, panie Issei?" (sztuczny dystans niszczący dynamikę postaci!).
+     -> POPRAWNIE [OK]: "Co czujesz, Issei?" (bezpośrednio po imieniu na "ty").
      * "[Filar I - Odnominalizowanie] 'dokonał zabójstwa' -> 'zabił'"
      * "[Filar XLI - Notacja Liczebników] '3 dni' -> 'trzy dni'"
      * "[Filar XLV - Aprobata Aizuchi] 'Rozumiem' -> 'Otóż to' (potwierdzenie intuicji Shizuku)"
+     * "[Filar XLVI - Yobisute] Usunięto sztuczne 'panie Issei' -> 'Issei'"
      * "[Filar XXXVI - Prefabrykowana Mówioność] Zastąpiono sztuczny imiesłów żywą polszczyzną"
      * "[Filar XXXI - Rejestr i Wulgaryzmy] Ujednolicono surowy język żołnierski"
 

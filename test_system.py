@@ -41,7 +41,9 @@ def test_rules_and_prompts():
     assert "FILAR XLIV: CZASOWNIKI WEKTOROWE I CIĘCIA MONTAŻOWO-PRZESTRZENNE" in ver_prompt
     assert "FILAR XLV: MATRYCA PRAGMATYCZNA POTWIERDZEŃ, APROBACJI I AIZUCHI" in sys_prompt
     assert "FILAR XLV: MATRYCA PRAGMATYCZNA POTWIERDZEŃ, APROBACJI I AIZUCHI" in ver_prompt
-    print(" -> PASSED: Kompletny Kanon 45 Filarów AVT jest aktywny w obu fazach tłumaczenia.")
+    assert "FILAR XLVI: ZASADA YOBISUTE I ZAKAZ SZTUCZNEGO „PANA/PANI”" in sys_prompt
+    assert "FILAR XLVI: ZASADA YOBISUTE I ZAKAZ SZTUCZNEGO „PANA/PANI”" in ver_prompt
+    print(" -> PASSED: Kompletny Kanon 46 Filarów AVT jest aktywny w obu fazach tłumaczenia.")
 
 def test_pydantic_schemas():
     print("[TEST 2/5] Weryfikacja schematów Pydantic...")
