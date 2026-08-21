@@ -303,11 +303,24 @@ def test_manga_canon():
     assert gk_canon["glossary"]["Hinna hinna"] == "Hinna, hinna (podziękowanie za dar jedzenia u Ajnów)"
     assert gk_canon["publisher"] == "Wydawnictwo Waneko"
 
-    # Test formatowania promptu
     prompt_chunk = registry.format_canon_for_prompt(jjk_canon)
     assert "Rozszerzenie Domeny" in prompt_chunk
     assert "Waneko" in prompt_chunk
     print(" -> PASSED: Kanon polskich wydań mangowych działa w 100% (baza Waneko, JPF, Studio JG itp.).")
+
+def test_batch_queue():
+    print("[TEST 14/14] Test Kolejki Sezonowej (Batch Queue) i naturalnego sortowania...")
+    from main import natural_sort_key, collect_input_files
+    
+    # Test naturalnego sortowania odcinków
+    files = ["Kingdom_EP10.mkv", "Kingdom_EP2.mkv", "Kingdom_EP1.mkv", "Kingdom_EP20.mkv"]
+    sorted_files = sorted(files, key=natural_sort_key)
+    assert sorted_files == ["Kingdom_EP1.mkv", "Kingdom_EP2.mkv", "Kingdom_EP10.mkv", "Kingdom_EP20.mkv"]
+    
+    # Test zbierania pojedynczego pliku
+    res = collect_input_files([str(Path(__file__).parent / "requirements.txt")])
+    assert len(res) == 1
+    print(" -> PASSED: Kolejka Sezonowa i naturalny sorting odcinków działają bezbłędnie.")
 
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
@@ -324,4 +337,5 @@ if __name__ == "__main__":
     test_prosody_and_diarizer()
     test_typesetting_matcher()
     test_manga_canon()
-    print("\n Wszystkie testy jednostkowe i integracyjne (13/13) zakończone pełnym sukcesem!\n")
+    test_batch_queue()
+    print("\n Wszystkie testy jednostkowe i integracyjne (14/14) zakończone pełnym sukcesem!\n")

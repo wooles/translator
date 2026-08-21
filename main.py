@@ -24,6 +24,7 @@ if sys.platform == "win32":
 import logging
 import argparse
 import subprocess
+from typing import Optional, Tuple, List, Dict, Any
 from pathlib import Path
 # Wczytanie zmiennych środowiskowych z .env
 try:
@@ -103,14 +104,143 @@ def launch_player(video_path: str, subs_path: str):
 
     print("[Info] Nie znaleziono mpv/vlc w PATH. Otwórz plik wideo ręcznie w swoim ulubionym odtwarzaczu.")
 
+def natural_sort_key(s: str) -> list:
+    """Umożliwia naturalne sortowanie nazw plików i odcinków (np. 1, 2, ..., 10, 11)."""
+    import re
+    return [int(text) if text.isdigit() else text.lower() for text in re.split(r'(\d+)', str(s))]
+
+
+def collect_input_files(raw_inputs: list) -> list:
+    """
+    Zbiera i układa w kolejce pliki wideo, napisy lub całe foldery z odcinkami.
+    """
+    collected = []
+    seen = set()
+
+    for raw in raw_inputs:
+        if not raw:
+            continue
+        p = Path(raw)
+        if not p.exists():
+            continue
+        if p.is_dir():
+            # Przeszukiwanie całego folderu
+            for item in sorted(p.iterdir(), key=lambda x: natural_sort_key(x.name)):
+                if item.is_file():
+                    ext = item.suffix.lower()
+                    if ext in VIDEO_EXTENSIONS:
+                        if item.resolve() not in seen:
+                            collected.append(item)
+                            seen.add(item.resolve())
+                    elif ext in SUBTITLE_EXTENSIONS:
+                        has_video = any((item.parent / f"{item.stem}{vext}").exists() for vext in VIDEO_EXTENSIONS)
+                        if not has_video and item.resolve() not in seen:
+                            collected.append(item)
+                            seen.add(item.resolve())
+        elif p.is_file():
+            if p.resolve() not in seen:
+                collected.append(p)
+                seen.add(p.resolve())
+
+    return sorted(collected, key=lambda x: natural_sort_key(x.name))
+
+
+def resolve_episode_files(
+    input_path: Path,
+    args_subs: Optional[str] = None,
+    args_video: Optional[str] = None,
+    args_track: int = 0
+) -> Tuple[Optional[Path], Optional[Path], bool]:
+    """
+    Rozwiązuje powiązanie plik wideo <-> plik napisów dla pojedynczego odcinka.
+    Zwraca: (video_file, subs_file, temp_subs_extracted)
+    """
+    video_file: Optional[Path] = None
+    subs_file: Optional[Path] = None
+    temp_subs_extracted = False
+
+    ext = input_path.suffix.lower()
+
+    if ext in VIDEO_EXTENSIONS:
+        video_file = input_path
+        if args_subs:
+            subs_file = Path(args_subs)
+        else:
+            potential_subs = input_path.with_suffix(".srt")
+            potential_subs_en = input_path.parent / f"{input_path.stem}.en.srt"
+            potential_ass = input_path.with_suffix(".ass")
+
+            if potential_subs_en.exists():
+                subs_file = potential_subs_en
+                print(f"  [Wykryto napisy zewnętrzne]: {subs_file.name}")
+            elif potential_subs.exists():
+                subs_file = potential_subs
+                print(f"  [Wykryto napisy zewnętrzne]: {subs_file.name}")
+            elif potential_ass.exists():
+                subs_file = potential_ass
+                print(f"  [Wykryto napisy zewnętrzne]: {subs_file.name}")
+            else:
+                tracks = list_subtitle_tracks(str(video_file))
+                if not tracks:
+                    print(f"  [Błąd]: Plik {video_file.name} nie zawiera napisów wbudowanych ani zewnętrznych.")
+                    return None, None, False
+
+                chosen_track_idx = args_track
+                extracted_path = extract_embedded_subtitles(
+                    video_path=str(video_file),
+                    sub_index=chosen_track_idx
+                )
+                subs_file = Path(extracted_path)
+                temp_subs_extracted = True
+                print(f"  [Sukces]: Wyodrębniono wbudowane napisy ze ścieżki {chosen_track_idx}")
+
+    elif ext in SUBTITLE_EXTENSIONS:
+        subs_file = input_path
+        if args_video:
+            video_file = Path(args_video)
+        else:
+            stem = input_path.stem
+            if stem.endswith(".en"):
+                stem = stem[:-3]
+            for vext in VIDEO_EXTENSIONS:
+                cand = input_path.parent / f"{stem}{vext}"
+                if cand.exists():
+                    video_file = cand
+                    print(f"  [Wykryto powiązany plik wideo]: {video_file.name}")
+                    break
+
+    elif ext == ".json":
+        stem = input_path.stem
+        if stem.endswith(".checkpoint"):
+            stem = stem[:-11]
+        for vext in VIDEO_EXTENSIONS:
+            cand_video = input_path.parent / f"{stem}{vext}"
+            if cand_video.exists():
+                video_file = cand_video
+                tracks = list_subtitle_tracks(str(video_file))
+                if tracks:
+                    extracted_path = extract_embedded_subtitles(str(video_file), sub_index=0)
+                    subs_file = Path(extracted_path)
+                    temp_subs_extracted = True
+                    break
+        if not subs_file:
+            for sext in SUBTITLE_EXTENSIONS:
+                cand_subs = input_path.parent / f"{stem}{sext}"
+                if cand_subs.exists():
+                    subs_file = cand_subs
+                    break
+
+    return video_file, subs_file, temp_subs_extracted
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Multimodalny Tłumacz Napisów z angielskiego na polski z analizą klatek wideo (Gemini 3.7 Flash)"
     )
     parser.add_argument(
         "input",
-        nargs="?",
-        help="Ścieżka do pliku wideo (.mkv, .mp4) lub pliku z napisami (.srt, .ass)"
+        nargs="*",
+        help="Ścieżka do jednego lub wielu plików wideo (.mkv, .mp4), napisów (.srt, .ass) lub całego folderu z sezonem"
     )
     parser.add_argument(
         "--video", "-v",
@@ -177,124 +307,40 @@ def main():
     )
     parser.add_argument(
         "--output", "-o",
-        help="Ścieżka docelowa dla pliku z polskimi napisami"
+        help="Ścieżka docelowa dla pliku z polskimi napisami (dotyczy tylko pojedynczego pliku)"
     )
 
     args = parser.parse_args()
 
-    chosen_input = args.input
-    if not chosen_input:
+    raw_inputs = args.input if isinstance(args.input, list) and args.input else ([args.input] if args.input else [])
+    if not raw_inputs:
         print("[Info] Nie podano pliku jako argumentu. Otwieram okno wyboru pliku...")
         chosen_input = pick_file_gui()
         if not chosen_input:
             print("[Info] Nie wybrano żadnego pliku. Zamykam program.")
             sys.exit(0)
+        raw_inputs = [chosen_input]
 
-    input_path = Path(chosen_input)
-    if not input_path.exists():
-        print(f"[Błąd]: Podany plik nie istnieje: {chosen_input}")
+    # Zbieranie i sortowanie kolejki plików
+    queue = collect_input_files(raw_inputs)
+    if not queue:
+        print(f"[Błąd]: Nie znaleziono żadnych obsługiwanych plików wideo ani napisów.")
         sys.exit(1)
 
-    video_file: Optional[Path] = None
-    subs_file: Optional[Path] = None
-    temp_subs_extracted = False
+    total_episodes = len(queue)
+    is_season_queue = total_episodes > 1
 
-    ext = input_path.suffix.lower()
+    if is_season_queue:
+        print("\n" + "=" * 68)
+        print(f"  🎬 WYKRYTO KOLEJKĘ SEZONOWĄ: {total_episodes} ODCINKÓW DO PRZETŁUMACZENIA")
+        print("=" * 68)
+        for idx, item in enumerate(queue, 1):
+            print(f"  [{idx:02d}/{total_episodes:02d}] {item.name}")
+        print("=" * 68)
 
-    if ext in VIDEO_EXTENSIONS:
-        video_file = input_path
-        if args.subs:
-            subs_file = Path(args.subs)
-        else:
-            # Sprawdzamy czy w tym samym katalogu leży plik .srt o tej samej nazwie
-            potential_subs = input_path.with_suffix(".srt")
-            potential_subs_en = input_path.parent / f"{input_path.stem}.en.srt"
-            potential_ass = input_path.with_suffix(".ass")
-
-            if potential_subs_en.exists():
-                subs_file = potential_subs_en
-                print(f"[Wykryto napisy zewnętrzne]: {subs_file.name}")
-            elif potential_subs.exists():
-                subs_file = potential_subs
-                print(f"[Wykryto napisy zewnętrzne]: {subs_file.name}")
-            elif potential_ass.exists():
-                subs_file = potential_ass
-                print(f"[Wykryto napisy zewnętrzne]: {subs_file.name}")
-            else:
-                # Sprawdzamy wbudowane ścieżki w pliku wideo
-                tracks = list_subtitle_tracks(str(video_file))
-                if not tracks:
-                    print("[Błąd]: Plik wideo nie zawiera wbudowanych napisów i nie znaleziono pliku zewnętrznego .srt/.ass.")
-                    sys.exit(1)
-                
-                print(f"[Wykryto {len(tracks)} wbudowanych ścieżek napisów]:")
-                chosen_track_idx = args.track
-                for t in tracks:
-                    marker = " -> [WYBRANA]" if t["sub_index"] == chosen_track_idx else ""
-                    print(f"  Ścieżka {t['sub_index']}: Język={t['language']}, Tytuł={t['title']}, Format={t['codec']}{marker}")
-
-                extracted_path = extract_embedded_subtitles(
-                    video_path=str(video_file),
-                    sub_index=chosen_track_idx
-                )
-                subs_file = Path(extracted_path)
-                temp_subs_extracted = True
-                print(f"[Sukces]: Wyodrębniono wbudowane napisy ze ścieżki {chosen_track_idx}")
-
-    elif ext in SUBTITLE_EXTENSIONS:
-        subs_file = input_path
-        if args.video:
-            video_file = Path(args.video)
-        else:
-            # Szukamy powiązanego pliku wideo o zbliżonej nazwie w tym samym katalogu
-            stem = input_path.stem
-            if stem.endswith(".en"):
-                stem = stem[:-3]
-            for vext in VIDEO_EXTENSIONS:
-                cand = input_path.parent / f"{stem}{vext}"
-                if cand.exists():
-                    video_file = cand
-                    print(f"[Wykryto powiązany plik wideo]: {video_file.name}")
-                    break
-    elif ext == ".json":
-        print(f"[Autozapis]: Wykryto plik autozapisu JSON: {input_path.name}")
-        stem = input_path.stem
-        if stem.endswith(".checkpoint"):
-            stem = stem[:-11]
-
-        found = False
-        # Szukamy powiązanego pliku wideo
-        for vext in VIDEO_EXTENSIONS:
-            cand_video = input_path.parent / f"{stem}{vext}"
-            if cand_video.exists():
-                video_file = cand_video
-                tracks = list_subtitle_tracks(str(video_file))
-                if tracks:
-                    extracted_path = extract_embedded_subtitles(str(video_file), sub_index=0)
-                    subs_file = Path(extracted_path)
-                    temp_subs_extracted = True
-                    found = True
-                    print(f"[Powiązanie]: Znaleziono powiązany plik wideo: {video_file.name}")
-                    break
-        if not found:
-            # Szukamy powiązanego pliku napisów
-            for sext in SUBTITLE_EXTENSIONS:
-                cand_subs = input_path.parent / f"{stem}{sext}"
-                if cand_subs.exists():
-                    subs_file = cand_subs
-                    found = True
-                    print(f"[Powiązanie]: Znaleziono powiązany plik napisów: {subs_file.name}")
-                    break
-        if not found:
-            print(f"[Błąd]: Nie znaleziono pliku wideo ani napisów powiązanych z tym plikiem JSON: {stem}")
-            sys.exit(1)
-    else:
-        print(f"[Błąd]: Nieobsługiwany format pliku: {ext}")
-        sys.exit(1)
-
-    # Inicjalizacja tłumacza
+    # Inicjalizacja ustawień i modeli (zadawane TYLKO RAZ na początku dla całej kolejki)
     enable_verifier = not args.no_verify and os.getenv("ENABLE_VERIFIER", "true").lower() == "true"
-    
+
     # Wybór trybu honoryfikatorów: CLI -> Interaktywne menu w CMD -> .env
     if args.no_honorifics:
         keep_honorifics = False
@@ -323,12 +369,11 @@ def main():
     from model_resolver import resolve_best_models
     from google import genai
     
-    # Dynamiczne wykrywanie najnowszych i najlepszych wersji modeli Gemini
+    # Dynamiczne wykrywanie najnowszych modeli Gemini
     api_key_check = os.getenv("GEMINI_API_KEY")
     temp_client = genai.Client(api_key=api_key_check) if api_key_check else None
     best_models = resolve_best_models(temp_client)
 
-    # Wybór profilu tłumaczenia
     model_p1 = args.model if args.model != "gemini-3.5-flash-lite" else None
     model_p2 = args.model_phase2
 
@@ -382,41 +427,64 @@ def main():
         print("Upewnij się, że w pliku .env znajduje się poprawny GEMINI_API_KEY.")
         sys.exit(1)
 
-    print(f"\n=======================================================")
-    print(f"  Multimodal Video Subtitle Translator")
-    print(f"  Model Faza 1 (Tłumaczenie + Wizja): {model_p1}")
-    print(f"  Model Faza 2 (Redaktor Dialogów): {model_p2 if enable_verifier else 'Wyłączony'}")
-    print(f"  Honoryfikatory: {'ZACHOWAJ (Fansub)' if keep_honorifics else 'USUŃ (Czysta polszczyzna/Netflix)'}")
-    print(f"  Profiler Odcinka (Słowniczek): WŁĄCZONY")
-    print(f"  Plik napisów: {subs_file}")
-    print(f"  Plik wideo: {video_file if video_file else 'Brak (Tłumaczenie tekstowe)'}")
-    print(f"=======================================================\n")
+    completed_files = []
 
-    # Uruchomienie procesu tłumaczenia
-    final_output_path = args.output
-    if not final_output_path and video_file:
-        ext = subs_file.suffix if subs_file else ".ass"
-        final_output_path = str(video_file.parent / f"{video_file.stem}.pl{ext}")
+    # Główna pętla Kolejki Sezonowej
+    for ep_idx, target_path in enumerate(queue, 1):
+        if is_season_queue:
+            print("\n" + "═" * 70)
+            print(f"  📺 [KOLEJKA SEZONOWA: ODCINEK {ep_idx}/{total_episodes}] {target_path.name}")
+            print("═" * 70)
 
-    try:
-        result_subs_path = translator.translate_file(
-            subs_path=str(subs_file),
-            video_path=str(video_file) if video_file else None,
-            output_path=final_output_path
+        video_file, subs_file, temp_subs_extracted = resolve_episode_files(
+            input_path=target_path,
+            args_subs=args.subs,
+            args_video=args.video,
+            args_track=args.track
         )
-    finally:
-        # Usuwanie tymczasowego pliku z wyciągniętymi napisami
-        if temp_subs_extracted and subs_file and subs_file.exists():
-            try:
-                os.remove(str(subs_file))
-            except OSError:
-                pass
 
-    print(f"\n[Gotowe!]: Polskie napisy wygenerowane pomyślnie w:\n-> {result_subs_path}")
+        if not subs_file or not subs_file.exists():
+            print(f"  [Pominięto]: Nie udało się przygotować napisów dla {target_path.name}")
+            continue
 
-    # Uruchomienie odtwarzacza jeśli zażądano
-    if args.play and video_file and video_file.exists():
-        launch_player(str(video_file), result_subs_path)
+        final_output_path = args.output if (not is_season_queue and args.output) else None
+        if not final_output_path and video_file:
+            ext = subs_file.suffix if subs_file else ".ass"
+            final_output_path = str(video_file.parent / f"{video_file.stem}.pl{ext}")
+
+        try:
+            result_subs_path = translator.translate_file(
+                subs_path=str(subs_file),
+                video_path=str(video_file) if video_file else None,
+                output_path=final_output_path
+            )
+            completed_files.append((target_path.name, result_subs_path))
+            print(f"\n[Sukces odcinka {ep_idx}/{total_episodes}]: Zapisano w -> {result_subs_path}")
+        except Exception as e:
+            print(f"\n[Błąd podczas tłumaczenia {target_path.name}]: {e}")
+        finally:
+            if temp_subs_extracted and subs_file and subs_file.exists():
+                try:
+                    os.remove(str(subs_file))
+                except OSError:
+                    pass
+
+    # Podsumowanie końcowe
+    print("\n" + "=" * 70)
+    if is_season_queue:
+        print(f"  🎉 ZAKOŃCZONO KOLEJKĘ SEZONOWĄ: Przetłumaczono {len(completed_files)}/{total_episodes} odcinków!")
+        print("=" * 70)
+        for name, out in completed_files:
+            print(f"  ✔️ {name} -> {Path(out).name}")
+    else:
+        if completed_files:
+            print(f"  🎉 Pomyślnie przetłumaczono: {completed_files[0][1]}")
+    print("=" * 70 + "\n")
+
+    # Uruchomienie odtwarzacza (tylko w trybie pojedynczego pliku)
+    if not is_season_queue and args.play and queue and queue[0].suffix.lower() in VIDEO_EXTENSIONS and completed_files:
+        launch_player(str(queue[0]), completed_files[0][1])
+
 
 if __name__ == "__main__":
     main()
