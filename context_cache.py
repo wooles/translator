@@ -3,7 +3,7 @@
 Moduł Inteligentnego Zarządzania Pamięcią Kontekstu (Google Gemini Context Caching).
 Zapewnia 75% oszczędności kosztów na serwerach Google bez najmniejszego wpływu na jakość.
 Wbudowane zabezpieczenie SHA-256: Zmiana choćby jednej litery w Filarach natychmiast unieważnia stary cache i tworzy nowy.
-# TTL (Time-To-Live): 30 dni (2592000s) z automatycznym odnawianiem i czyszczeniem starych wersji.
+TTL (Time-To-Live): 30 dni (2592000s) z automatycznym odnawianiem i czyszczeniem starych wersji danego modelu.
 """
 
 import hashlib
@@ -23,10 +23,21 @@ _LOCAL_CACHE_REGISTRY: Dict[str, str] = {}
 
 class ContextCacheManager:
     @staticmethod
+    def _clean_model_name(model: str) -> str:
+        """Czyści i normalizuje nazwę modelu."""
+        return model.replace("models/", "").replace("-preview", "").replace(".", "_").replace("-", "_")
+
+    @staticmethod
     def get_content_hash(model: str, system_instruction: str) -> str:
         """Generuje unikalny skrót SHA-256 z modelu i pełnego tekstu reguł systemowych."""
         content = f"{model}::{system_instruction}"
         return hashlib.sha256(content.encode("utf-8")).hexdigest()[:16]
+
+    @classmethod
+    def invalidate_cache(cls, model: str, system_instruction: str):
+        """Usuwa wpis z lokalnego rejestru w razie błędu 403 lub unieważnienia."""
+        content_hash = cls.get_content_hash(model, system_instruction)
+        _LOCAL_CACHE_REGISTRY.pop(content_hash, None)
 
     @classmethod
     def get_or_create_cache(
@@ -38,7 +49,7 @@ class ContextCacheManager:
     ) -> Optional[str]:
         """
         Pobiera istniejący lub tworzy nowy CachedContent na serwerach Google z czasem wygasania 30 dni.
-        Automatycznie usuwa przestarzałe wersje z serwera, zapobiegając jakimkolwiek nadmiarowym opłatom.
+        Precyzyjnie izoluje cache pomiędzy modelami (Flash vs Pro) i usuwa tylko przestarzałe wersje TEGO SAMEGO modelu.
         """
         if not client or not system_instruction:
             return None
@@ -49,20 +60,22 @@ class ContextCacheManager:
         if content_hash in _LOCAL_CACHE_REGISTRY:
             return _LOCAL_CACHE_REGISTRY[content_hash]
 
-        display_name = f"avt_rules_{content_hash}"
+        model_clean = cls._clean_model_name(model)
+        display_name = f"avt_{model_clean}_{content_hash}"
+        model_prefix = f"avt_{model_clean}_"
 
-        # 2. Próba znalezienia istniejącego cache oraz czyszczenie starych wersji
+        # 2. Próba znalezienia istniejącego cache oraz czyszczenie starych wersji TEGO SAMEGO modelu
         try:
             if hasattr(client, "caches") and hasattr(client.caches, "list"):
                 matched_name = None
                 for existing in client.caches.list():
                     if existing.display_name == display_name:
                         matched_name = existing.name
-                    elif existing.display_name and existing.display_name.startswith("avt_rules_"):
-                        # Bezpieczne usunięcie nieaktualnej wersji z konta Google
+                    elif existing.display_name and existing.display_name.startswith(model_prefix):
+                        # Usuwamy wyłącznie starą wersję TEGO SAMEGO modelu (nie dotykając innych modeli!)
                         try:
                             client.caches.delete(name=existing.name)
-                            logger.info(f"[Context Cache]: Usunięto nieaktualną wersję cache: {existing.display_name}")
+                            logger.info(f"[Context Cache]: Usunięto przestarzałą wersję {existing.display_name}")
                         except Exception:
                             pass
 
@@ -86,7 +99,7 @@ class ContextCacheManager:
                     )
                 )
                 _LOCAL_CACHE_REGISTRY[content_hash] = cache.name
-                logger.info(f"[Context Cache]: Utworzono 30-dniowy cache serwerowy: {cache.name} (TTL: {ttl_seconds}s)")
+                logger.info(f"[Context Cache]: Utworzono 30-dniowy cache dla {model}: {cache.name} (TTL: {ttl_seconds}s)")
                 return cache.name
         except Exception as e:
             err_msg = str(e).lower()

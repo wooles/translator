@@ -105,6 +105,13 @@ class DialogueVerifier:
 
             except Exception as e:
                 err_str = str(e).lower()
+                is_cache_err = "403" in err_str or "cachedcontent" in err_str or "permission" in err_str
+                if is_cache_err and cached_name:
+                    from context_cache import ContextCacheManager
+                    ContextCacheManager.invalidate_cache(self.model, self.system_prompt)
+                    cached_name = None
+                    continue
+
                 is_billing_exhausted = "prepayment" in err_str or "depleted" in err_str or ("billing" in err_str and "credit" in err_str)
                 if is_billing_exhausted:
                     print("\n" + "!" * 75)
