@@ -87,15 +87,22 @@ def resolve_best_models(client: Optional[genai.Client] = None) -> Dict[str, str]
         pro_sorted = sorted(pro_candidates, key=_extract_model_score, reverse=True)
 
         best_flash = flash_sorted[0] if flash_sorted else defaults["flash"]
+        backup_flash = flash_sorted[1] if len(flash_sorted) > 1 else "gemini-3.6-flash"
         best_flash_lite = flash_lite_sorted[0] if flash_lite_sorted else defaults["flash_lite"]
         best_pro = pro_sorted[0] if pro_sorted else defaults["pro"]
 
         return {
             "flash": best_flash,
+            "flash_backup": backup_flash,
             "flash_lite": best_flash_lite,
             "pro": best_pro
         }
 
     except Exception as e:
         logger.warning(f"Nie udało się dynamicznie pobrać listy modeli ({e}). Użyto wersji stabilnych.")
-        return defaults
+        return {
+            "flash": defaults["flash"],
+            "flash_backup": "gemini-3.6-flash",
+            "flash_lite": defaults["flash_lite"],
+            "pro": defaults["pro"]
+        }

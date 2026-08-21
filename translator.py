@@ -372,18 +372,20 @@ class MultimodalTranslator:
         Wykorzystuje inteligentną pulę modeli flagowych (Tier-Preserving Model Pool), aby zapewnić
         100% najwyższą jakość tłumaczenia bez wielominutowych przestojów.
         """
-        # Pula wyłącznie dwóch absolutnie najnowszych modeli flagowych (Gemini 3.7 i 3.6 Flash)
+        # Pula dwóch najwyższych wersji Flash lub najwyższej wersji Pro
+        from model_resolver import resolve_best_models
+        active_models = resolve_best_models(self.client)
+
         candidate_models = [self.model]
         if "flash" in self.model.lower():
-            for m in ["gemini-3.7-flash", "gemini-3.6-flash"]:
-                if m not in candidate_models:
-                    candidate_models.append(m)
+            m1 = active_models.get("flash", "gemini-3.7-flash")
+            m2 = active_models.get("flash_backup", "gemini-3.6-flash")
+            candidate_models = [m1, m2] if m1 != m2 else [m1]
+            if self.model not in candidate_models:
+                candidate_models.insert(0, self.model)
         elif "pro" in self.model.lower():
-            for m in ["gemini-3.1-pro-preview"]:
-                if m not in candidate_models:
-                    candidate_models.append(m)
-        # Ograniczenie do maksymalnie 2 najnowszych modeli
-        candidate_models = candidate_models[:2]
+            m_pro = active_models.get("pro", "gemini-3.1-pro-preview")
+            candidate_models = [m_pro]
 
         attempt = 0
         current_model_idx = 0
@@ -449,12 +451,12 @@ class MultimodalTranslator:
                 is_unavailable = "503" in err_str or "unavailable" in err_str or "high demand" in err_str
                 is_rate_limit = "429" in err_str or "quota" in err_str or "resource_exhausted" in err_str or "rate" in err_str
                 
-                # Jeśli po 2 próbach dany model ma 503 na serwerach Google, natychmiast sięgamy po flagowy 3.6/3.5
-                if is_unavailable and len(candidate_models) > 1 and attempt >= 2:
+                # Błyskawiczny fallback między dwoma najwyższymi wersjami Flash przy 503
+                if is_unavailable and len(candidate_models) > 1:
                     next_idx = (current_model_idx + 1) % len(candidate_models)
                     if next_idx != current_model_idx:
-                        print(f"\n[Tłumacz / Faza 1]: Model {current_model} jest przeciążony u Google (503).")
-                        print(f"  [>>] Płynne przełączenie na bezpośredni model flagowy {candidate_models[next_idx]} (100% jakość bez czekania)...")
+                        print(f"\n[Tłumacz / Faza 1]: Model {current_model} zgłasza przeciążenie u Google (503 High Demand).")
+                        print(f"  [>>] Błyskawiczne przełączenie na drugi najwyższy model Flash: {candidate_models[next_idx]} (100% płynność)...")
                         current_model_idx = next_idx
                         time.sleep(1)
                         continue
