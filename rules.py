@@ -279,6 +279,16 @@ FILAR XLIII: MATRYCA TOŻSAMOŚCI I KAMUFLAŻU PŁCIOWEGO (GENDER-BENDER & DISGU
   * MONOLOG WEWNĘTRZNY / MYŚLI / NARRACJA: Prawdziwa płeć postaci ("O rany, prawie się wydałam...", "Gdyby to zobaczył, byłabym skończona").
   * STREFA POWIERNIKA (NA OSOBNOŚCI): Prawdziwa tożsamość w rozmowie 1-na-1 z osobą znającą tajemnicę ("Nie mogłam inaczej, doktorze"), z natychmiastowym powrotem do maski publicznej przy osobach trzecich.
   * ZAMIERZONE PRZEJĘZYCZENIA (GAGI KOMEDIOWE): Autentyczne polskie korekty w panice ("Zrobiłam... to znaczy zrobiłem wszystko!", "Chciałam... no, chciałem powiedzieć...").
+
+FILAR XLIV: CZASOWNIKI WEKTOROWE I CIĘCIA MONTAŻOWO-PRZESTRZENNE (DIRECTIONAL VERBS & SCENE TRANSITION ANCHORING):
+- CZASOWNIKI Z ASPEKTEM WEKTOROWYM (-TE KURU / -TE IKU):
+  * Japoński sufiks ~te kuru (np. 見えてきた - Mietekita, 聞こえてきた - Kikoetekita) oznacza FIZYCZNE PRZYBLIŻANIE SIĘ lub wyłanianie obiektu w polu widzenia/słyszenia ("Ukazał się!", "Już widać!", "Dochodzi nas dźwięk...").
+  * KARDYNALNY BŁĄD [X]: Tłumaczenie angielskiego "I can see it!" (gdy w audio pada "Mietekita!" na tle samolotu/podróży) jako metafory psychologicznej: "Widzę to po tobie / po panu!".
+  * POPRAWNIE [OK]: "Już widać!", "Widać cel!", "Już je widać!" (w odniesieniu do lądu/miasta wyłaniającego się zza chmur).
+- ZASADA KOTWICZENIA PRZYSZŁOŚCIOWEGO (LOOKAHEAD CROSS-CHECK):
+  * Gdy w bieżącej kwestii występuje zaimek "it / that" ("I can see it!"), a w następnych 2 linijkach rozmówca mówi o krajobrazie/celu ("Endless land... / Bezkresne lądy..."), zaimek "it" BEZWZGLĘDNIE odnosi się do krajobrazu w kadrze, a nie do osoby!
+- RESPEKTOWANIE CIĘĆ SCENICZNYCH (TIME/LOCATION JUMP):
+  * Jeśli między kwestią A a B następuje zmiana sceny (np. gabinet -> lecący samolot na niebie), kwestia B jest nową sytuacją plenerową, a NIE bezpośrednią ripostą do poprzedniej rozmowy!
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -698,6 +708,11 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
 17. OBOWIĄZEK ATRYBUCJI FILARU W POLU 'changes_made':
    - W polu 'changes_made' dla każdej poprawionej kwestii BEZWZGLĘDNIE podawaj numer i nazwę Filaru AVT, na podstawie którego dokonałeś korekty, np.:
      * "[Filar XXXIV - Relacje Rodzinne] Usunięto 'starszy bracie' -> 'brachu'"
+     * "[Filar XLIV - Czasowniki Wektorowe] 'Widzę to po panu' -> 'Już widać!' (po cięciu na samolot)"
+18. CIĘCIA MONTAŻOWE, CZASOWNIKI WEKTOROWE (-TE KURU / MIETEKITA) I DESYGNATY ZAIMKÓW:
+   - Kiedy po cięciu sceny (np. podróż, lecący samolot, plener) postać mówi "I can see it!" (audio: 'Mietekita!'):
+     -> KARDYNALNY BŁĄD [X]: "Widzę to po tobie / po panu" (zignorowanie obrazu i cięcia sceny!).
+     -> POPRAWNIE [OK]: "Już widać!", "Widać cel!", "Już je widać!" (zgodnie z obrazem i kolejnymi linijkami o krajobrazie/lądzie).
      * "[Filar I - Odnominalizowanie] 'dokonał zabójstwa' -> 'zabił'"
      * "[Filar XLI - Notacja Liczebników] '3 dni' -> 'trzy dni'"
      * "[Filar XXXVI - Prefabrykowana Mówioność] Zastąpiono sztuczny imiesłów żywą polszczyzną"

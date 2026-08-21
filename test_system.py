@@ -37,8 +37,9 @@ def test_rules_and_prompts():
     assert "FILAR XXXIX: EKWIWALENCJA EFEKTU EMOCJONALNEGO" in sys_prompt
     assert "FILAR XLII: AKUSTYCZNA KOHERENCJA REJESTRU WIEKOWEGO" in sys_prompt
     assert "FILAR XLIII: MATRYCA TOŻSAMOŚCI I KAMUFLAŻU PŁCIOWEGO" in sys_prompt
-    assert "FILAR XLIII: MATRYCA TOŻSAMOŚCI I KAMUFLAŻU PŁCIOWEGO" in ver_prompt
-    print(" -> PASSED: Kompletny Kanon 43 Filarów AVT jest aktywny w obu fazach tłumaczenia.")
+    assert "FILAR XLIV: CZASOWNIKI WEKTOROWE I CIĘCIA MONTAŻOWO-PRZESTRZENNE" in sys_prompt
+    assert "FILAR XLIV: CZASOWNIKI WEKTOROWE I CIĘCIA MONTAŻOWO-PRZESTRZENNE" in ver_prompt
+    print(" -> PASSED: Kompletny Kanon 44 Filarów AVT jest aktywny w obu fazach tłumaczenia.")
 
 def test_pydantic_schemas():
     print("[TEST 2/5] Weryfikacja schematów Pydantic...")
