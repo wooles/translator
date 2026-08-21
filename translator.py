@@ -389,15 +389,27 @@ class MultimodalTranslator:
             attempt += 1
             current_model = candidate_models[current_model_idx]
             try:
+                from context_cache import ContextCacheManager
+                cached_name = ContextCacheManager.get_or_create_cache(
+                    client=self.client,
+                    model=current_model,
+                    system_instruction=self.system_prompt,
+                    ttl_seconds=7200
+                )
+                gen_config_kwargs = {
+                    "response_mime_type": "application/json",
+                    "response_schema": schema_class,
+                    "temperature": 0.25,
+                }
+                if cached_name:
+                    gen_config_kwargs["cached_content"] = cached_name
+                else:
+                    gen_config_kwargs["system_instruction"] = self.system_prompt
+
                 response = self.client.models.generate_content(
                     model=current_model,
                     contents=contents,
-                    config=types.GenerateContentConfig(
-                        system_instruction=self.system_prompt,
-                        response_mime_type="application/json",
-                        response_schema=schema_class,
-                        temperature=0.25,
-                    )
+                    config=types.GenerateContentConfig(**gen_config_kwargs)
                 )
                 if hasattr(response, "parsed") and response.parsed is not None:
                     return response.parsed

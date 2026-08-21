@@ -48,11 +48,11 @@ class DialogueVerifier:
             prompt_lines.append(f"\n[Kontekst sceny]: {scene_summary}\n")
 
         for item in batch_items:
-            type_tag = f" [🖼️ {item['visual_type']}]" if item.get("is_sign") else " [💬 DIALOG MÓWIONY]"
+            type_tag = f" [[Napis] {item['visual_type']}]" if item.get("is_sign") else " [DIALOG]"
             gender_info = f" (Mówca: {item.get('speaker_gender')})" if item.get('speaker_gender') else ""
             voice_info = f" [Głos: {item.get('speaker_voice')}]" if item.get('speaker_voice') else ""
             prosody_info = f" [Ton: {item.get('prosody')}]" if item.get('prosody') else ""
-            cps_info = f" [⏱️ {item.get('cps_warning')}]" if item.get('cps_warning') else ""
+            cps_info = f" [CPS: {item.get('cps_warning')}]" if item.get('cps_warning') else ""
             notes_info = f" [Notatki: {item.get('notes')}]" if item.get('notes') else ""
             visual_info = f" [Położenie/Styl: {item.get('visual_details')}]" if item.get('visual_details') else ""
             
@@ -70,15 +70,27 @@ class DialogueVerifier:
         while True:
             attempt += 1
             try:
+                from context_cache import ContextCacheManager
+                cached_name = ContextCacheManager.get_or_create_cache(
+                    client=self.client,
+                    model=self.model,
+                    system_instruction=self.system_prompt,
+                    ttl_seconds=7200
+                )
+                gen_config_kwargs = {
+                    "response_mime_type": "application/json",
+                    "response_schema": RefinedBatchResponse,
+                    "temperature": 0.35,
+                }
+                if cached_name:
+                    gen_config_kwargs["cached_content"] = cached_name
+                else:
+                    gen_config_kwargs["system_instruction"] = self.system_prompt
+
                 response = self.client.models.generate_content(
                     model=self.model,
                     contents=[prompt_text],
-                    config=types.GenerateContentConfig(
-                        system_instruction=self.system_prompt,
-                        response_mime_type="application/json",
-                        response_schema=RefinedBatchResponse,
-                        temperature=0.35,
-                    )
+                    config=types.GenerateContentConfig(**gen_config_kwargs)
                 )
 
                 # Pobieramy sparsowany wynik
@@ -96,10 +108,10 @@ class DialogueVerifier:
                 is_billing_exhausted = "prepayment" in err_str or "depleted" in err_str or ("billing" in err_str and "credit" in err_str)
                 if is_billing_exhausted:
                     print("\n" + "!" * 75)
-                    print("  ❌ [BŁĄD KONTA GOOGLE AI STUDIO / PŁATNOŚCI]:")
+                    print("  [!] [BŁĄD KONTA GOOGLE AI STUDIO / PŁATNOŚCI]:")
                     print("  Wyczerpały się środki przedpłacone (Prepayment Credits / Limit wydatków)!")
                     print("  Komunikat Google: 'Your prepayment credits are depleted.'")
-                    print("  👉 Wejdź na https://aistudio.google.com/ i doładuj środki, aby kontynuować.")
+                    print("  -> Wejdź na https://aistudio.google.com/ i doładuj środki, aby kontynuować.")
                     print("!" * 75 + "\n")
                     raise RuntimeError("Wyczerpane środki na koncie Google AI Studio (Prepayment Credits Depleted).")
 
@@ -109,7 +121,7 @@ class DialogueVerifier:
                 if is_unavailable or is_rate_limit:
                     wait_sec = min(5 + attempt * 3, 30)
                     print(f"\n[Redaktor Dialogów / Redakcja]: Chwilowe przeciążenie serwerów Google (503/429 na {self.model}).")
-                    print(f"  ⏳ Utrzymuję najwyższą jakość PRO. Czekam {wait_sec}s na wolny slot serwera (próba #{attempt})...")
+                    print(f"  [..] Utrzymuję najwyższą jakość PRO. Czekam {wait_sec}s na wolny slot serwera (próba #{attempt})...")
                     time.sleep(wait_sec)
                 else:
                     wait_sec = min(4 + attempt * 2, 20)

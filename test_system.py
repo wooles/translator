@@ -322,6 +322,24 @@ def test_batch_queue():
     assert len(res) == 1
     print(" -> PASSED: Kolejka Sezonowa i naturalny sorting odcinków działają bezbłędnie.")
 
+def test_context_cache():
+    print("[TEST 15/15] Test Inteligentnego Zarządzania Pamięcią Kontekstu (Google Context Caching)...")
+    from context_cache import ContextCacheManager
+    
+    # 1. Test generowania hasha
+    h1 = ContextCacheManager.get_content_hash("gemini-3.7-flash", "FILAR I: ODNOMINALIZOWANIE")
+    h2 = ContextCacheManager.get_content_hash("gemini-3.7-flash", "FILAR I: ODNOMINALIZOWANIE")
+    assert h1 == h2
+    
+    # 2. Test natychmiastowej zmiany hasha przy modyfikacji reguł (Gwarancja świeżości Filarów)
+    h3 = ContextCacheManager.get_content_hash("gemini-3.7-flash", "FILAR I: ODNOMINALIZOWANIE (NOWA REGUŁA)")
+    assert h1 != h3
+    
+    # 3. Test bezpiecznego fallbacku przy braku klienta
+    res = ContextCacheManager.get_or_create_cache(None, "gemini-3.7-flash", "prompt", ttl_seconds=7200)
+    assert res is None
+    print(" -> PASSED: Context Caching SHA-256 i unieważnianie starych wersji działają perfekcyjnie.")
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -338,4 +356,5 @@ if __name__ == "__main__":
     test_typesetting_matcher()
     test_manga_canon()
     test_batch_queue()
-    print("\n Wszystkie testy jednostkowe i integracyjne (14/14) zakończone pełnym sukcesem!\n")
+    test_context_cache()
+    print("\n Wszystkie testy jednostkowe i integracyjne (15/15) zakończone pełnym sukcesem!\n")
