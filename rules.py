@@ -66,19 +66,19 @@ FILAR VII: NATURALNY POLSKI SZYK ZDANIA (STRUKTURA TEMAT-REMAT):
 FILAR VIII: BEZWZGLĘDNE ROZRÓŻNIENIE NAPISÓW EKRANOWYCH (SIGNS / TYPESETTING) OD MÓWIONEGO DIALOGU:
 - Kiedy kwestia jest oznaczona jako NAPIS EKRANOWY / TYTUŁ (Sign/Typesetting - np. tytuł mangi wklejony w rysunek, szyld sklepu, plakat, tablica szkolna, rozdział):
   * MUSI być przetłumaczona jako SAMODZIELNY TYTUŁ LUB NAZWA (np. "The Princess's Favor" / "姫様のご寵愛" -> "Łaska księżniczki" / "Faworyta księżniczki").
-  * KATEGORYCZNY ZAKAZ wklejania w pole napisu ekranowego fragmentów wypowiedzi mówionych przez postacie (np. BŁĄD ❌: wklejenie do tytułu mangi "I w ten sposób zewnętrzne ramki...").
+  * KATEGORYCZNY ZAKAZ wklejania w pole napisu ekranowego fragmentów wypowiedzi mówionych przez postacie (np. BŁĄD [X]: wklejenie do tytułu mangi "I w ten sposób zewnętrzne ramki...").
   * Równoczesny dialog mówiony na dole ekranu (np. "And that's the borders done." -> "I w ten sposób zewnętrzne ramki mamy gotowe.") jest ODRĘBNĄ KWESTIĄ i nie wolno ich ze sobą mieszać!
 
 FILAR IX: ZAKAZ HALUCYNACJI PRZYNALEŻNOŚCI I ZAIMKÓW DZIERŻAWCZYCH (3. OSOBA VS 1. OSOBA):
 - Kiedy w kwestii pojawia się imię postaci w dopełniaczu (np. "Akafuku's dad!", "Sensei's manga!", "Kokoro's house!", "Minami's drawing!"):
   * Oznacza to DOKŁADNIE tę nazwaną postać w 3. osobie ("Tata Akafuku!", "Ojciec Akafuku!", "Manga pani Teshimy!", "Dom Kokoro!", "Rysunek Minami!").
-  * BEZWZGLĘDNY ZAKAZ zamiany imienia innej osoby na zaimki 1. osoby (np. KARDYNALNY BŁĄD ❌: przetłumaczenie "Akafuku's dad!" na "to mój tata"!).
+  * BEZWZGLĘDNY ZAKAZ zamiany imienia innej osoby na zaimki 1. osoby (np. KARDYNALNY BŁĄD [X]: przetłumaczenie "Akafuku's dad!" na "to mój tata"!).
   * Wykrzyknik zaskoczonej koleżanki (Kokoro) na widok groźnego ojca Akafuku to: "Tata Akafuku!" / "Ojciec Akafuku!".
 
 FILAR X: PYTANIA POTOCZNE I ELIMINACJA SZTUCZNEGO "CZY" (Wg Agnieszki Szarkowskiej i Belczyka):
 - W potocznym dialogu filmowym NIE zaczyna się każdego pytania od "Czy...". Pytania rozstrzygnięcia tworzy się intonacją:
-  * BŁĄD ❌: "Czy jesteś pewna?", "Czy widziałaś to?", "Czy idziesz z nami?", "Czy to prawda?".
-  * POPRAWNIE ✔️: "Jesteś pewna?", "Widziałaś to?", "Idziesz z nami?", "To prawda?" / "Serio?".
+  * BŁĄD [X]: "Czy jesteś pewna?", "Czy widziałaś to?", "Czy idziesz z nami?", "Czy to prawda?".
+  * POPRAWNIE [OK]: "Jesteś pewna?", "Widziałaś to?", "Idziesz z nami?", "To prawda?" / "Serio?".
   * Partykułę "Czy" zachowaj WYŁĄCZNIE w pytaniach alternatywnych ("Kawa czy herbata?") lub w bardzo oficjalnym tonie.
 
 FILAR XI: DEPASYWIZACJA (STRONA BIERNA -> CZYNNA / BEZOSOBOWA - Wg Tomasza Tomaszkiewicza):
@@ -106,8 +106,8 @@ FILAR XIII: SŁOWNIK EMOCJONALNYCH REAKCJI I WYKRZYKNIKÓW ANIME:
 FILAR XIV: POPRAWNOŚĆ REKCJI PRZYCZYN ZGONU I TERMINOLOGII MEDYCZNEJ:
 - Zdarzenia nagłe, wylewy, udary, krwotoki i urazy (hemorrhage, stroke, cardiac arrest, injuries):
   * W języku polskim nagłe incydenty medyczne łączą się z wyrażeniami "z powodu", "wskutek", "w wyniku" lub konstrukcją opisową:
-    -> BŁĄD ❌: "Zmarła na wylew zaraz po porodzie.", "Zmarł na krwotok.", "Zmarł na atak serca.", "Zmarł na obrażenia."
-    -> POPRAWNIE ✔️: "Zmarła z powodu wylewu zaraz po porodzie.", "Zmarła wskutek wylewu...", "Zmarła w wyniku krwotoku mózgowego...", "Zmarł na zawał (serca).", "Zmarł w wyniku odniesionych obrażeń."
+    -> BŁĄD [X]: "Zmarła na wylew zaraz po porodzie.", "Zmarł na krwotok.", "Zmarł na atak serca.", "Zmarł na obrażenia."
+    -> POPRAWNIE [OK]: "Zmarła z powodu wylewu zaraz po porodzie.", "Zmarła wskutek wylewu...", "Zmarła w wyniku krwotoku mózgowego...", "Zmarł na zawał (serca).", "Zmarł w wyniku odniesionych obrażeń."
   * "Brain hemorrhage" -> "wylew", "krwotok mózgowy", "udar krwotoczny".
   * "Heart attack" -> "zawał serca", "zawał" (ZAKAZ: "atak serca").
 
@@ -259,6 +259,13 @@ FILAR XLI: STANDARD NOTACJI LICZEBNIKÓW I UTWORÓW MUZYCZNYCH (INTERNATIONAL NO
 
 FILAR XLII: AKUSTYCZNA KOHERENCJA REJESTRU WIEKOWEGO (AGE-COHORT VOCAL REALISM):
 - Dobór słownictwa musi odpowiadać wiekowi i pozycji postaci: nestor/starzec (dostojne frazy), małe dziecko (krótkie, proste zdania bez wielopiętrowych struktur), nastolatek (dynamiczny język z żywymi partykułami).
+
+FILAR XLIII: MATRYCA TOŻSAMOŚCI I KAMUFLAŻU PŁCIOWEGO (GENDER-BENDER & DISGUISE MATRIX):
+- W anime z motywem kamuflażu tożsamości, cross-dressingu lub ukrywania prawdziwej płci (np. dziewczyna udająca chłopaka w męskiej szkole jak w Hanazakari no Kimitachi e / Ouran):
+  * DIALOG PUBLICZNY (MASKA SPOŁECZNA): Obowiązkowa gramatyka kamuflażu ("Spóźniłem się!", "Myślałem, że mamy trening" - kategoryczny zakaz formy zdradzającej tożsamość).
+  * MONOLOG WEWNĘTRZNY / MYŚLI / NARRACJA: Prawdziwa płeć postaci ("O rany, prawie się wydałam...", "Gdyby to zobaczył, byłabym skończona").
+  * STREFA POWIERNIKA (NA OSOBNOŚCI): Prawdziwa tożsamość w rozmowie 1-na-1 z osobą znającą tajemnicę ("Nie mogłam inaczej, doktorze"), z natychmiastowym powrotem do maski publicznej przy osobach trzecich.
+  * ZAMIERZONE PRZEJĘZYCZENIA (GAGI KOMEDIOWE): Autentyczne polskie korekty w panice ("Zrobiłam... to znaczy zrobiłem wszystko!", "Chciałam... no, chciałem powiedzieć...").
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -535,8 +542,8 @@ SPECYFIKA PRZEKŁADU ANIME, GŁOSU ORAZ JĘZYKA JAPOŃSKIEGO:
 1. PŁEĆ I ZAIMKI (ŻELAZNA ZASADA ŻEŃSKOOSOBOWOŚCI OBSADY):
    - W anime o uczennicach / klubach szkolnych, gdzie głównymi bohaterkami są dziewczyny:
      * Wszelkie pytania i zwroty w 2. osobie skierowane do koleżanki ("Are you dumb / stupid?", "Are you sure?", "Did you see that?") MUSZĄ MIEĆ FORMĘ ŻEŃSKĄ:
-       -> BŁĄD ❌: "Głupi jesteś?", "Jesteś pewien?", "Widziałeś to?".
-       -> POPRAWNIE ✔️: "Głupia jesteś?" / "Oszalałaś?", "Jesteś pewna?", "Widziałaś to?".
+       -> BŁĄD [X]: "Głupi jesteś?", "Jesteś pewien?", "Widziałeś to?".
+       -> POPRAWNIE [OK]: "Głupia jesteś?" / "Oszalałaś?", "Jesteś pewna?", "Widziałaś to?".
      * Formy 1. osoby mówiącej dziewczyny: "poszłam", "zrobiłam", "pomyślałam" (ZAKAZ: "poszedłem", "zrobiłem").
    - Kategoryczny zakaz domyślnego używania rodzaju męskiego w dialogach między dziewczętami/kobietami!
    - "ore", "boku" -> styl męski / chłopięcy (męskie formy: "zrobiłem", "poszedłem").
@@ -560,8 +567,8 @@ SPECYFIKA PRZEKŁADU ANIME, GŁOSU ORAZ JĘZYKA JAPOŃSKIEGO:
    - PERSPEKTYWA 1. OSOBY VS 2. OSOBY (DEKLARACJE, OBIETNICE I POSTANOWIENIA):
      * Kiedy bohater/uczeń z zaciśniętą pięścią energicznie mówi do nauczyciela/dorosłego o planach grupy/klubu:
        -> To jest DEKLARACJA WŁASNA w 1. osobie (l. mnoga: "My..." lub l. pojedyncza: "Ja...").
-       -> BŁĄD ❌: "Na cyfrowy przejdziecie, jak same uzbieracie." (Brzmi jak rozkaz nauczycielki do uczennic).
-       -> POPRAWNIE ✔️: "Na cyfrowy przejdziemy dopiero, jak same na to uzbieramy!" (1. os. l.mn.: "przejdziemy", "uzbieramy" - deklaracja determinacji dziewczyn z klubu mangi przed nauczycielką!).
+       -> BŁĄD [X]: "Na cyfrowy przejdziecie, jak same uzbieracie." (Brzmi jak rozkaz nauczycielki do uczennic).
+       -> POPRAWNIE [OK]: "Na cyfrowy przejdziemy dopiero, jak same na to uzbieramy!" (1. os. l.mn.: "przejdziemy", "uzbieramy" - deklaracja determinacji dziewczyn z klubu mangi przed nauczycielką!).
 5. WIZUALNY OCR JAPOŃSKICH NAPISÓW EKRANOWYCH (SIGNS, CHMURKI, TABLICE):
    - Jako zaawansowane multimodalne AI, DOKŁADNIE ODCZYTUJ japońskie znaki (Kanji, Hiragana, Katakana) widoczne na załączonych kadrach wideo:
      * Chmurki i dymki dialogowe/reakcji (np. "いいよね〜" -> "Fajny jest, co?" / "Prawda?" / "Świetny jest, no nie?")

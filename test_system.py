@@ -19,7 +19,7 @@ from verifier import RefinedLine, RefinedBatchResponse
 from translator import LineTranslation, BatchTranslationResponse, sanitize_sub_text
 
 def test_rules_and_prompts():
-    print("[TEST 1/13] Sprawdzanie kompletności 42 Filarów AVT i promptów...")
+    print("[TEST 1/16] Sprawdzanie kompletności 43 Filarów AVT i promptów...")
     sys_prompt = get_translation_system_prompt()
     ver_prompt = get_verifier_system_prompt()
     assert "I see" in sys_prompt
@@ -36,8 +36,9 @@ def test_rules_and_prompts():
     assert "FILAR XXXVIII: NIEROZERWALNOŚĆ JEDNOSTEK SENSU" in sys_prompt
     assert "FILAR XXXIX: EKWIWALENCJA EFEKTU EMOCJONALNEGO" in sys_prompt
     assert "FILAR XLII: AKUSTYCZNA KOHERENCJA REJESTRU WIEKOWEGO" in sys_prompt
-    assert "FILAR XLII: AKUSTYCZNA KOHERENCJA REJESTRU WIEKOWEGO" in ver_prompt
-    print(" -> PASSED: Kompletny Kanon 42 Filarów AVT jest aktywny w obu fazach tłumaczenia.")
+    assert "FILAR XLIII: MATRYCA TOŻSAMOŚCI I KAMUFLAŻU PŁCIOWEGO" in sys_prompt
+    assert "FILAR XLIII: MATRYCA TOŻSAMOŚCI I KAMUFLAŻU PŁCIOWEGO" in ver_prompt
+    print(" -> PASSED: Kompletny Kanon 43 Filarów AVT jest aktywny w obu fazach tłumaczenia.")
 
 def test_pydantic_schemas():
     print("[TEST 2/5] Weryfikacja schematów Pydantic...")
