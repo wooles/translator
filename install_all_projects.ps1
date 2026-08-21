@@ -134,10 +134,16 @@ if (Test-Path $TranslatorDir) {
     if (Test-Path (Join-Path $TranslatorDir "index_baza.py")) {
         & $TrPython (Join-Path $TranslatorDir "index_baza.py")
     }
-    # Autotesty systemu (12/12 testów AVT)
+    # Autotesty systemu (13/13 testów AVT)
     if (Test-Path (Join-Path $TranslatorDir "test_system.py")) {
         & $TrPython (Join-Path $TranslatorDir "test_system.py")
     }
+
+    # Tworzenie wygodnego skrótu / pliku startowego .bat na Pulpicie
+    $DesktopPath = [System.IO.Path]::Combine($env:USERPROFILE, "Desktop")
+    $BatLauncher = Join-Path $DesktopPath "Uruchom Tłumacz Anime.bat"
+    $BatContent = "@echo off`nchcp 65001 >nul`ntitle Multimodal Anime Translator`ncd /d `"$TranslatorDir`"`ncall `"$TrVenv\Scripts\activate.bat`"`npython main.py %*`npause"
+    Set-Content -Path $BatLauncher -Value $BatContent -Encoding ASCII
 }
 
 # --- B. KALENDARZ (.NET) ---
@@ -176,5 +182,6 @@ Write-Host "  1. Translator: $RootProjectsDir\translator" -ForegroundColor White
 Write-Host "  2. Kalendarz:  $RootProjectsDir\kalendarz" -ForegroundColor White
 Write-Host "  3. Sorter:     $RootProjectsDir\sorter" -ForegroundColor White
 Write-Host ""
+Write-Host "Na Pulpicie utworzono skrót: 'Uruchom Tłumacz Anime.bat'" -ForegroundColor Yellow
 Write-Host "Wszystkie foldery możesz teraz bezpośrednio otworzyć w Antigravity!" -ForegroundColor Green
 Write-Host ""
