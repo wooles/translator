@@ -324,7 +324,7 @@ def test_batch_queue():
 
 def test_context_cache():
     print("[TEST 15/15] Test Inteligentnego Zarządzania Pamięcią Kontekstu (Google Context Caching)...")
-    from context_cache import ContextCacheManager
+    from context_cache import ContextCacheManager, DEFAULT_CACHE_TTL_SECONDS
     
     # 1. Test generowania hasha
     h1 = ContextCacheManager.get_content_hash("gemini-3.7-flash", "FILAR I: ODNOMINALIZOWANIE")
@@ -336,9 +336,30 @@ def test_context_cache():
     assert h1 != h3
     
     # 3. Test bezpiecznego fallbacku przy braku klienta
-    res = ContextCacheManager.get_or_create_cache(None, "gemini-3.7-flash", "prompt", ttl_seconds=86400)
+    res = ContextCacheManager.get_or_create_cache(None, "gemini-3.7-flash", "prompt", ttl_seconds=DEFAULT_CACHE_TTL_SECONDS)
     assert res is None
     print(" -> PASSED: Context Caching SHA-256 i unieważnianie starych wersji działają perfekcyjnie.")
+
+def test_pricing_guard():
+    print("[TEST 16/16] Test Strażnika Cennika i Kosztów Google API (pricing_guard)...")
+    from pricing_guard import PricingGuard
+    
+    # 1. Test szacowania kosztu dla profilu Standard (Free Tier)
+    assert PricingGuard.estimate_episode_cost_pln("1") == 0.00
+    
+    # 2. Test szacowania kosztu dla profilu Studyjny Flash (~0.08 zł)
+    cost_flash = PricingGuard.estimate_episode_cost_pln("2")
+    assert 0.05 <= cost_flash <= 0.12
+    
+    # 3. Test szacowania kosztu dla profilu Master Pro (~1.38 zł)
+    cost_pro = PricingGuard.estimate_episode_cost_pln("3")
+    assert 1.20 <= cost_pro <= 1.65
+    
+    # 4. Test generowania banera
+    banner = PricingGuard.get_pricing_status_banner()
+    assert "STATUS CENNIKA GOOGLE" in banner
+    assert "Context Cache" in banner
+    print(" -> PASSED: Strażnik cennika precyzyjnie kalkuluje i monitoruje koszty.")
 
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
@@ -357,4 +378,5 @@ if __name__ == "__main__":
     test_manga_canon()
     test_batch_queue()
     test_context_cache()
-    print("\n Wszystkie testy jednostkowe i integracyjne (15/15) zakończone pełnym sukcesem!\n")
+    test_pricing_guard()
+    print("\n Wszystkie testy jednostkowe i integracyjne (16/16) zakończone pełnym sukcesem!\n")
