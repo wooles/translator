@@ -232,6 +232,33 @@ FILAR XXXIV: PRZEKŁAD RELACJI RODZINNYCH (KINSHIP VS DIRECT ADDRESSING):
 
 FILAR XXXV: KADENCJA KOŃCOWA I PUENTOWANIE (PUNCHLINE ALIGNMENT):
 - W scenach komediowych i dramatycznych kluczowe słowo (puenta żartu lub oskarżenie) MUSI paść na sam koniec napisu, idealnie w momencie, gdy aktor urywa głos, by nie zdradzać puenty przedwcześnie.
+
+FILAR XXXVI: TEORIA PREFABRYKOWANEJ MÓWIONOŚCI (FREDERIC CHAUME & YVES GAMBIER):
+- Dialog filmowy to język napisany, by brzmieć tak, jakby w ogóle nie był napisany.
+  * KATEGORYCZNY ZAKAZ struktur podręcznikowych (imiesłowów przysłówkowych w mowie potocznej: "Idąc do szkoły, ujrzałem").
+  * Stosuj naturalną eliptyczność, żywą polszczyznę mówioną i asonanse ("Szedłem do szkoły i nagle patrzę...").
+
+FILAR XXXVII: ELIMINACJA NOŻYC OBRAZOWO-TEKSTOWYCH (TEXT-BILD-SCHERE):
+- Szyk wyrazów w napisie musi odpowiadać chronologii gestów na ekranie w ułamku sekundy.
+  * Jeśli bohater najpierw wyciąga miecz, a potem tnie linę, zdanie musi zaczynać się od miecza, a kończyć na cięciu, eliminując dysonans poznawczy.
+
+FILAR XXXVIII: NIEROZERWALNOŚĆ JEDNOSTEK SENSU (SINNABSCHNITTE):
+- Przy podziale na dwie linijki zakazuje się rozdzielania integralnych jednostek logicznych:
+  * ZAKAZ rozdzielania: przymiotnika od rzeczownika ("Wielki \\N Generał"), imienia od przydomka ("Kuba \\N Rozpruwacz") czy czasownika posiłkowego od orzeczenia.
+
+FILAR XXXIX: EKWIWALENCJA EFEKTU EMOCJONALNEGO (STANISŁAW BARAŃCZAK):
+- Lojalność wobec widza polega na wywołaniu DOKŁADNIE TAKIEJ SAMEJ REAKCJI EMOCJONALNEJ (śmiech przy komedii, ciarki przy grozie, wzruszenie przy dramacie), jaką miał widz japoński. Żart kulturowy zastąp polskim żartem o identycznej sile rażenia.
+
+FILAR XL: EKSPLIKACJA PODTEKSTU I KOMUNIKACJI WYSOKOKONTEKSTOWEJ (HARAGEI & CONTEXT UNPACKING):
+- W kulturze japońskiej sens bywa przemilczany ("Sore wa chotto..."). W języku polskim wymagana jest umiarkowana eksplikacja intencji odmowy ("Obawiam się, że to niemożliwe", "Wykluczone") zamiast urwanego "To trochę...".
+
+FILAR XLI: STANDARD NOTACJI LICZEBNIKÓW I UTWORÓW MUZYCZNYCH (INTERNATIONAL NOTATION):
+- Liczby od 1 do 10 w dialogach codziennych pisz ZAWSZE słownie ("trzy dni", "dwa miecze" - ZAKAZ: "3 dni", "2 miecze").
+- Liczby powyżej 10, godziny, daty i precyzyjne miary zapisuj cyframi ("o 15:30", "w 1907 roku", "50 kilometrów").
+- Teksty piosenek (Opening / Ending) formatuj kursywą z nutkami: ♪ Słowa piosenki ♪.
+
+FILAR XLII: AKUSTYCZNA KOHERENCJA REJESTRU WIEKOWEGO (AGE-COHORT VOCAL REALISM):
+- Dobór słownictwa musi odpowiadać wiekowi i pozycji postaci: nestor/starzec (dostojne frazy), małe dziecko (krótkie, proste zdania bez wielopiętrowych struktur), nastolatek (dynamiczny język z żywymi partykułami).
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -643,6 +670,13 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
    - W seriach historycznych (np. XIII w. Imperium Mongolskie, starożytność, średniowiecze) BEZWZGLĘDNIE wyeliminuj nowoczesny slang młodzieżowy ('spoko', 'masakra', 'wkręcasz'). Dopasuj słownictwo do klimatu epoki.
 16. TERMINOLOGIA SPECJALISTYCZNA I KONSULTACJA BRANŻOWA:
    - W seriach o tematyce niszowej (winiarstwo, muzyka, medycyna, shogi, kulinaria) bezwzględnie stosuj oficjalną polską terminologię branżową (np. w winie: 'szczep', 'rocznik', 'apelacja', 'taniny', 'kupaż', 'ciało wina').
+17. OBOWIĄZEK ATRYBUCJI FILARU W POLU 'changes_made':
+   - W polu 'changes_made' dla każdej poprawionej kwestii BEZWZGLĘDNIE podawaj numer i nazwę Filaru AVT, na podstawie którego dokonałeś korekty, np.:
+     * "[Filar XXXIV - Relacje Rodzinne] Usunięto 'starszy bracie' -> 'brachu'"
+     * "[Filar I - Odnominalizowanie] 'dokonał zabójstwa' -> 'zabił'"
+     * "[Filar XLI - Notacja Liczebników] '3 dni' -> 'trzy dni'"
+     * "[Filar XXXVI - Prefabrykowana Mówioność] Zastąpiono sztuczny imiesłów żywą polszczyzną"
+     * "[Filar XXXI - Rejestr i Wulgaryzmy] Ujednolicono surowy język żołnierski"
 
 {BELCZYK_AVT_MASTER_CANON}
 

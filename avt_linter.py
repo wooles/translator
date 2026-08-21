@@ -14,51 +14,55 @@ class AVTLinter:
     Automatyczny walidator i korektor mechanicznych kalek językowych w napisach filmowych.
     """
     
-    # Słownik automatycznych natychmiastowych podmian kalek
+    # Słownik automatycznych natychmiastowych podmian kalek z przypisaniem do Filarów AVT
     FIXED_REPLACEMENTS = [
-        # Amerykanizmy i kalki leksykalne
-        (r"\b[Ww]itaj z powrotem\b", "Witaj!"),
-        (r"\b[Mm]am taką nadzieję\b", "Mam nadzieję"),
-        (r"\b[Tt]o robi sens\b", "To ma sens"),
-        (r"\b[Nn]ie robi sensu\b", "To nie ma sensu"),
-        (r"\b[Jj]esteś w porządku\?", "Wszystko w porządku?"),
-        (r"\b[Bb]yłem w stanie to znaleźć\b", "Udało mi się to znaleźć"),
-        (r"\b[Bb]yłam w stanie to znaleźć\b", "Udało mi się to znaleźć"),
-        (r"\b[Ww]ygląda jakby miało padać\b", "Chyba będzie padać"),
-        (r"\b[Mm]am uczucie że\b", "Coś mi mówi, że"),
-        (r"\b[Ww]ydaje się być\b", "Wydaje się"),
-        (r"\b[Dd]aj mi rękę\b", "Pomóż mi"),
-        (r"\b[Pp]oniosło klapę\b", "Nie wyszło"),
-        (r"\b[Ww]asz [Hh]onor\b", "Wysoki Sądzie"),
+        # Amerykanizmy i kalki leksykalne (Filar IV / XXXVI)
+        (r"\b[Ww]itaj z powrotem\b", "Witaj!", "Filar IV/XXXVI - Eliminacja Kalek Amerykańskich"),
+        (r"\b[Mm]am taką nadzieję\b", "Mam nadzieję", "Filar IV - Czystość Idiomatyczna"),
+        (r"\b[Tt]o robi sens\b", "To ma sens", "Filar IV - Eliminacja Kalek"),
+        (r"\b[Nn]ie robi sensu\b", "To nie ma sensu", "Filar IV - Eliminacja Kalek"),
+        (r"\b[Jj]esteś w porządku\?", "Wszystko w porządku?", "Filar IV - Szablony Angielskie"),
+        (r"\b[Bb]yłem w stanie to znaleźć\b", "Udało mi się to znaleźć", "Filar IV - Konstrukcje Obce"),
+        (r"\b[Bb]yłam w stanie to znaleźć\b", "Udało mi się to znaleźć", "Filar IV - Konstrukcje Obce"),
+        (r"\b[Ww]ygląda jakby miało padać\b", "Chyba będzie padać", "Filar XXXII - Modalność Epistemiczna"),
+        (r"\b[Mm]am uczucie że\b", "Coś mi mówi, że", "Filar IV - Naturalność Mówiona"),
+        (r"\b[Ww]ydaje się być\b", "Wydaje się", "Filar IV - Konstrukcje Obce"),
+        (r"\b[Dd]aj mi rękę\b", "Pomóż mi", "Filar IV - Idiomatyka"),
+        (r"\b[Pp]oniosło klapę\b", "Nie wyszło", "Filar IV - Idiomatyka"),
+        (r"\b[Ww]asz [Hh]onor\b", "Wysoki Sądzie", "Filar XVI - Realia Sądownicze"),
         
-        # Poprawność medyczna i rekcja przyczyn zgonu (zmarł z powodu wylewu / wskutek wylewu)
-        (r"\b[Zz]marła na wylew\b", "zmarła z powodu wylewu"),
-        (r"\b[Zz]marł na wylew\b", "zmarł z powodu wylewu"),
-        (r"\b[Uu]marła na wylew\b", "zmarła z powodu wylewu"),
-        (r"\b[Uu]marł na wylew\b", "zmarł z powodu wylewu"),
-        (r"\b[Zz]marła na krwotok\b", "zmarła wskutek krwotoku"),
-        (r"\b[Zz]marł na krwotok\b", "zmarł wskutek krwotoku"),
-        (r"\b[Zz]marła na atak serca\b", "zmarła na zawał"),
-        (r"\b[Zz]marł na atak serca\b", "zmarł na zawał"),
+        # Relacje rodzinne (Filar XXXIV)
+        (r"\b[Ss]tarszy bracie\b", "brachu", "Filar XXXIV - Relacje Rodzinne"),
+        (r"\b[Ss]tarsza siostro\b", "siostra", "Filar XXXIV - Relacje Rodzinne"),
         
-        # Eliminacja zbędnego "Ja " na początku zdania
-        (r"^Ja myślę, że\b", "Myślę, że"),
-        (r"^Ja wiem, że\b", "Wiem, że"),
-        (r"^Ja uważam, że\b", "Uważam, że"),
-        (r"^Ja sądzę, że\b", "Sądzę, że"),
-        (r"^Ja widzę, że\b", "Widzę, że"),
+        # Poprawność medyczna i rekcja przyczyn zgonu (Filar XIV)
+        (r"\b[Zz]marła na wylew\b", "zmarła z powodu wylewu", "Filar XIV - Poprawność Medyczna"),
+        (r"\b[Zz]marł na wylew\b", "zmarł z powodu wylewu", "Filar XIV - Poprawność Medyczna"),
+        (r"\b[Uu]marła na wylew\b", "zmarła z powodu wylewu", "Filar XIV - Poprawność Medyczna"),
+        (r"\b[Uu]marł na wylew\b", "zmarł z powodu wylewu", "Filar XIV - Poprawność Medyczna"),
+        (r"\b[Zz]marła na krwotok\b", "zmarła wskutek krwotoku", "Filar XIV - Poprawność Medyczna"),
+        (r"\b[Zz]marł na krwotok\b", "zmarł wskutek krwotoku", "Filar XIV - Poprawność Medyczna"),
+        (r"\b[Zz]marła na atak serca\b", "zmarła na zawał", "Filar XIV - Poprawność Medyczna"),
+        (r"\b[Zz]marł na atak serca\b", "zmarł na zawał", "Filar XIV - Poprawność Medyczna"),
         
-        # Eliminacja sztucznego "Czy" na początku krótkich pytań potocznych (Zasada Szarkowskiej / Belczyka)
-        (r"^[Cc]zy jesteś pewna\?", "Jesteś pewna?"),
-        (r"^[Cc]zy jesteś pewien\?", "Jesteś pewien?"),
-        (r"^[Cc]zy wszystko w porządku\?", "Wszystko w porządku?"),
-        (r"^[Cc]zy to prawda\?", "To prawda?"),
-        (r"^[Cc]zy oszalałaś\?", "Oszalałaś?"),
-        (r"^[Cc]zy zgłupiałaś\?", "Zgłupiałaś?"),
-        (r"^[Cc]zy pójdziesz ze mną\?", "Pójdziesz ze mną?"),
-        (r"^[Cc]zy możemy już iść\?", "Możemy już iść?"),
-        (r"^[Cc]zy widziałaś to\?", "Widziałaś to?"),
-        (r"^[Cc]zy słyszałaś to\?", "Słyszałaś to?"),
+        # Eliminacja zbędnego "Ja " na początku zdania (Filar I / Belczyk)
+        (r"^Ja myślę, że\b", "Myślę, że", "Filar I - Eliminacja Zaimka Ja"),
+        (r"^Ja wiem, że\b", "Wiem, że", "Filar I - Eliminacja Zaimka Ja"),
+        (r"^Ja uważam, że\b", "Uważam, że", "Filar I - Eliminacja Zaimka Ja"),
+        (r"^Ja sądzę, że\b", "Sądzę, że", "Filar I - Eliminacja Zaimka Ja"),
+        (r"^Ja widzę, że\b", "Widzę, że", "Filar I - Eliminacja Zaimka Ja"),
+        
+        # Eliminacja sztucznego "Czy" na początku krótkich pytań potocznych (Filar X)
+        (r"^[Cc]zy jesteś pewna\?", "Jesteś pewna?", "Filar X - Pytania bez 'Czy'"),
+        (r"^[Cc]zy jesteś pewien\?", "Jesteś pewien?", "Filar X - Pytania bez 'Czy'"),
+        (r"^[Cc]zy wszystko w porządku\?", "Wszystko w porządku?", "Filar X - Pytania bez 'Czy'"),
+        (r"^[Cc]zy to prawda\?", "To prawda?", "Filar X - Pytania bez 'Czy'"),
+        (r"^[Cc]zy oszalałaś\?", "Oszalałaś?", "Filar X - Pytania bez 'Czy'"),
+        (r"^[Cc]zy zgłupiałaś\?", "Zgłupiałaś?", "Filar X - Pytania bez 'Czy'"),
+        (r"^[Cc]zy pójdziesz ze mną\?", "Pójdziesz ze mną?", "Filar X - Pytania bez 'Czy'"),
+        (r"^[Cc]zy możemy już iść\?", "Możemy już iść?", "Filar X - Pytania bez 'Czy'"),
+        (r"^[Cc]zy widziałaś to\?", "Widziałaś to?", "Filar X - Pytania bez 'Czy'"),
+        (r"^[Cc]zy słyszałaś to\?", "Słyszałaś to?", "Filar X - Pytania bez 'Czy'"),
     ]
 
     @classmethod
@@ -80,12 +84,15 @@ class AVTLinter:
         applied_fixes = []
 
         # 1. Automatyczne podmiany leksykalne i frazeologiczne
-        for pattern, repl in cls.FIXED_REPLACEMENTS:
+        for item in cls.FIXED_REPLACEMENTS:
+            pattern = item[0]
+            repl = item[1]
+            pillar_tag = item[2] if len(item) > 2 else "Filar IV - Reguły Belczyka"
             if re.search(pattern, modified):
                 modified = re.sub(pattern, repl, modified)
-                applied_fixes.append(f"Auto-korekta kalki: {pattern} -> {repl}")
+                applied_fixes.append(f"[{pillar_tag}] {pattern} -> {repl}")
 
-        # 2. Korekta płci gramatycznej dla scen dziewczęcych (All-girls cast)
+        # 2. Korekta płci gramatycznej dla scen dziewczęcych (Filar XIII)
         if is_all_girls_scene and not is_sign:
             gender_fixes = [
                 (r"\b[Gg]łupi jesteś\?", "Głupia jesteś?"),
@@ -101,7 +108,7 @@ class AVTLinter:
             for pattern, repl in gender_fixes:
                 if re.search(pattern, modified):
                     modified = re.sub(pattern, repl, modified)
-                    applied_fixes.append(f"Korekta żeńskoosobowości: {pattern} -> {repl}")
+                    applied_fixes.append(f"[Filar XIII - Płeć Żeńska w Obsadzie] {pattern} -> {repl}")
 
         # 3. Zabezpieczenie przed podwójnymi spacjami lub uciętymi znakami
         modified = re.sub(r"[ \t]+", " ", modified).strip()
