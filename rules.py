@@ -320,6 +320,13 @@ FILAR XLVII: ZACHOWANIE PODMIOTU KONTRASTOWEGO W ODPOWIEDZIACH (CONTRASTIVE FOCU
 - ROZRÓŻNIENIE PODMIOTU ZBĘDNEGO OD KONTRASTOWEGO:
   * Zaimki dzierżawcze usuwamy TYLKO przy czynnościach oczywistych ("włożył ręce do kieszeni").
   * W odpowiedziach na pytania rozstrzygające lub identyfikujące, podmiot "Moi / Moja / Moje" jest OGNISKIEM INFORMACYJNYM (Rematem) i MUSI pozostać w przekładzie!
+
+FILAR XLVIII: ZAKAZ HYBRYD HONORYFIKATYWNYCH (ANTI-DOUBLE HONORIFIC HYBRID):
+- ZAKAZ ŁĄCZENIA POLSKIEJ TYTULATURY Z JAPOŃSKĄ:
+  * Kiedy w audio pada japoński tytuł (np. "Sensei!", "Senpai!", "Teshima-sensei!"):
+    -> KARDYNALNY BŁĄD [X]: "Pani Sensei, skończyłam!", "Panie Sensei!", "Pani Senpai!" (groteskowy potworek językowy łączący dwie sprzeczne tytulatury!).
+    -> POPRAWNIE W TRYBIE ANIME [OK]: "Sensei, skończyłam!", "Teshima-sensei, skończyłam!", "Senpai!" (samo słowo Sensei niesie już pełny szacunek i nie wolno dodawać przed nim słowa 'Pani/Pan').
+    -> POPRAWNIE W TRYBIE NATURALNYM [OK]: "Pani Teshimo, skończyłam!", "Mistrzyni, skończyłam!", "Szefowo, skończyłam!".
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -756,11 +763,16 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
    - Kiedy postać odpowiada na pytanie o swoją rodzinę/pochodzenie ("My folks are out in..." / audio: "Watashi no..."):
      -> KARDYNALNY BŁĄD [X]: "Mieszkają na Izu Oshimie" (urwana forma bezosobowa gubiąca mówcę!).
      -> POPRAWNIE [OK]: "Moi rodzice mieszkają na Izu Oshimie." / "Moi mieszkają na Izu Oshimie."
+22. ZAKAZ HYBRYD HONORYFIKATYWNYCH (PANI SENSEI -> SENSEI) (FILAR XLVIII):
+   - Kiedy postać zwraca się do mangaki/mistrza/nauczyciela per 'Sensei' / 'Senpai':
+     -> KARDYNALNY BŁĄD [X]: "Pani Sensei, skończyłam!", "Panie Sensei!", "Pani Senpai!" (potworek łączący polską i japońską tytulaturę!).
+     -> POPRAWNIE [OK]: "Sensei, skończyłam!" / "Teshima-sensei, skończyłam!" (lub naturalnie: "Pani Teshimo, skończyłam!").
      * "[Filar I - Odnominalizowanie] 'dokonał zabójstwa' -> 'zabił'"
      * "[Filar XLI - Notacja Liczebników] '3 dni' -> 'trzy dni'"
      * "[Filar XLV - Aprobata Aizuchi] 'Rozumiem' -> 'Otóż to' (potwierdzenie intuicji Shizuku)"
      * "[Filar XLVI - Yobisute] Usunięto sztuczne 'panie Issei' -> 'Issei'"
      * "[Filar XLVII - Podmiot Kontrastowy] 'Mieszkają...' -> 'Moi rodzice mieszkają...'"
+     * "[Filar XLVIII - Anty-Hybryda] 'Pani Sensei' -> 'Sensei'"
      * "[Filar XXXVI - Prefabrykowana Mówioność] Zastąpiono sztuczny imiesłów żywą polszczyzną"
      * "[Filar XXXI - Rejestr i Wulgaryzmy] Ujednolicono surowy język żołnierski"
 

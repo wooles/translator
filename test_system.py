@@ -45,7 +45,9 @@ def test_rules_and_prompts():
     assert "FILAR XLVI: ZASADA YOBISUTE I ZAKAZ SZTUCZNEGO „PANA/PANI”" in ver_prompt
     assert "FILAR XLVII: ZACHOWANIE PODMIOTU KONTRASTOWEGO" in sys_prompt
     assert "FILAR XLVII: ZACHOWANIE PODMIOTU KONTRASTOWEGO" in ver_prompt
-    print(" -> PASSED: Kompletny Kanon 47 Filarów AVT jest aktywny w obu fazach tłumaczenia.")
+    assert "FILAR XLVIII: ZAKAZ HYBRYD HONORYFIKATYWNYCH" in sys_prompt
+    assert "FILAR XLVIII: ZAKAZ HYBRYD HONORYFIKATYWNYCH" in ver_prompt
+    print(" -> PASSED: Kompletny Kanon 48 Filarów AVT jest aktywny w obu fazach tłumaczenia.")
 
 def test_pydantic_schemas():
     print("[TEST 2/5] Weryfikacja schematów Pydantic...")
@@ -225,6 +227,10 @@ def test_avt_linter():
     # Test eliminacji tautologii honoryfikatywnej i Title Case (To pan, Młody Panie -> To ty, młody panie)
     t5, f5 = AVTLinter.lint_and_fix_line("To pan, Młody Panie.")
     assert t5 == "To ty, młody panie."
+    
+    # Test eliminacji hybryd honoryfikatywnych (Pani Sensei -> Sensei)
+    t6, f6 = AVTLinter.lint_and_fix_line("Pani Sensei, skończyłam!")
+    assert t6 == "Sensei, skończyłam!"
     print(" -> PASSED: AVT Linter bezbłędnie wyłapuje i koryguje kalki i formy.")
 
 def test_series_bible():

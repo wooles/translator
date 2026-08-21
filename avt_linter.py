@@ -43,6 +43,12 @@ class AVTLinter:
         (r"\b[Ww]asza [Ww]ysokość\b", "wasza wysokość", "Filar XLI - Ortografia Wołacza i Małe Litery"),
         (r"\b[Ss]tarszy bracie\b", "brachu", "Filar XXXIV - Relacje Rodzinne"),
         (r"\b[Ss]tarsza siostro\b", "siostra", "Filar XXXIV - Relacje Rodzinne"),
+        (r"\b[Pp]ani [Ss]ensei\b", "Sensei", "Filar XLVIII - Zakaz Hybryd Honoryfikatywnych"),
+        (r"\b[Pp]anie [Ss]ensei\b", "Sensei", "Filar XLVIII - Zakaz Hybryd Honoryfikatywnych"),
+        (r"\b[Pp]an [Ss]ensei\b", "Sensei", "Filar XLVIII - Zakaz Hybryd Honoryfikatywnych"),
+        (r"\b[Pp]ani [Ss]enpai\b", "Senpai", "Filar XLVIII - Zakaz Hybryd Honoryfikatywnych"),
+        (r"\b[Pp]anie [Ss]enpai\b", "Senpai", "Filar XLVIII - Zakaz Hybryd Honoryfikatywnych"),
+        (r"\b[Pp]an [Ss]enpai\b", "Senpai", "Filar XLVIII - Zakaz Hybryd Honoryfikatywnych"),
         
         # Poprawność medyczna i rekcja przyczyn zgonu (Filar XIV)
         (r"\b[Zz]marła na wylew\b", "zmarła z powodu wylewu", "Filar XIV - Poprawność Medyczna"),
