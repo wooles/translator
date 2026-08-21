@@ -946,6 +946,8 @@ class MultimodalTranslator:
         # Kopiowanie pełnego arkusza stylów (czcionki, kolory, położenie napisów)
         final_subs.styles = subs.styles.copy()
         final_subs.info = subs.info.copy()
+        # Wymuszenie WrapStyle: 2 (Brak samowolnego łamania przez odtwarzacz wideo)
+        final_subs.info["WrapStyle"] = "2"
 
         seen_events = set()
 
