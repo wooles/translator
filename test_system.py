@@ -361,9 +361,9 @@ def test_pricing_guard():
     cost_flash = PricingGuard.estimate_episode_cost_pln("2")
     assert 0.05 <= cost_flash <= 0.12
     
-    # 3. Test szacowania kosztu dla profilu Master Pro (~1.38 zł)
+    # 3. Test szacowania kosztu dla profilu Master Pro (~0.75 zł)
     cost_pro = PricingGuard.estimate_episode_cost_pln("3")
-    assert 1.20 <= cost_pro <= 1.65
+    assert 0.50 <= cost_pro <= 1.20
     
     # 4. Test generowania banera
     banner = PricingGuard.get_pricing_status_banner()

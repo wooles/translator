@@ -31,9 +31,9 @@ GOOGLE_API_RATES: Dict[str, Dict[str, float]] = {
     },
     "pro": {
         "name": "Gemini 3.1 Pro Preview",
-        "input_uncached": 2.00,
-        "input_cached": 0.50,    # -75% zniżki z Context Caching
-        "output": 12.00,
+        "input_uncached": 1.25,   # Oficjalna stawka Google API (dla zapytań <= 128k tokenów)
+        "input_cached": 0.3125,   # -75% zniżki z Context Caching
+        "output": 5.00,           # Oficjalna stawka Google API (dla wyjścia <= 128k tokenów)
         "storage_per_hour": 4.50,
         "is_free_tier": False
     }
@@ -83,8 +83,8 @@ class PricingGuard:
             rate_pro = GOOGLE_API_RATES["pro"]
 
             # Faza 1 (Wizja + Flash)
-            p1_cached_in = batches * system_prompt_tokens
-            p1_uncached_in = batches * (batch_input_tokens + 516)  # +2 klatki obrazu
+            p1_cached_in = (batches * system_prompt_tokens) if has_cache else 0
+            p1_uncached_in = batches * (batch_input_tokens + 516) + (0 if has_cache else batches * system_prompt_tokens)
             p1_out = batches * batch_output_tokens
             cost_p1_usd = (
                 (p1_cached_in / 1_000_000) * rate_flash["input_cached"] +
@@ -93,8 +93,8 @@ class PricingGuard:
             )
 
             # Faza 2 (Redakcja Pro 3.1 Preview)
-            p2_cached_in = batches * system_prompt_tokens
-            p2_uncached_in = batches * batch_input_tokens
+            p2_cached_in = (batches * system_prompt_tokens) if has_cache else 0
+            p2_uncached_in = (batches * batch_input_tokens) + (0 if has_cache else batches * system_prompt_tokens)
             p2_out = batches * 1200
             cost_p2_usd = (
                 (p2_cached_in / 1_000_000) * rate_pro["input_cached"] +
