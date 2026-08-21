@@ -289,6 +289,18 @@ FILAR XLIV: CZASOWNIKI WEKTOROWE I CIĘCIA MONTAŻOWO-PRZESTRZENNE (DIRECTIONAL 
   * Gdy w bieżącej kwestii występuje zaimek "it / that" ("I can see it!"), a w następnych 2 linijkach rozmówca mówi o krajobrazie/celu ("Endless land... / Bezkresne lądy..."), zaimek "it" BEZWZGLĘDNIE odnosi się do krajobrazu w kadrze, a nie do osoby!
 - RESPEKTOWANIE CIĘĆ SCENICZNYCH (TIME/LOCATION JUMP):
   * Jeśli między kwestią A a B następuje zmiana sceny (np. gabinet -> lecący samolot na niebie), kwestia B jest nową sytuacją plenerową, a NIE bezpośrednią ripostą do poprzedniej rozmowy!
+
+FILAR XLV: MATRYCA PRAGMATYCZNA POTWIERDZEŃ, APROBACJI I AIZUCHI (CONVERSATIONAL VALIDATION MATRIX):
+- ROZRÓŻNIENIE APROBACJI OD PRZYJĘCIA INFORMACJI:
+  * 1. APROBATA / POTWIERDZENIE HIPOTEZY ROZMÓWCY (Sou / Sou ne / Sou desu / Sou nan desu):
+    -> Gdy rozmówca wysuwa trafną uwagę/wniosek (np. "Wyczułem w winie trud osadników..."), a postać potwierdza jego rację i kontynuuje wywód ("Tutejsze wina mają właśnie taki charakter"):
+    -> KARDYNALNY BŁĄD [X]: Bierne, urzędowe "Rozumiem." (kalka angielskiego "I see / Right").
+    -> POPRAWNIE [OK]: "Otóż to.", "Właśnie tak.", "Zgadza się.", "Dokładnie tak.", "W rzeczy samej."
+  * 2. PRZYJĘCIE NOWEJ WIEDZY DO WIADOMOŚCI (Naruhodo / Sou ka / Wakatta):
+    -> Gdy postać dowiaduje się czegoś nowego, czego nie wiedziała:
+    -> POPRAWNIE [OK]: "Rozumiem.", "Aha.", "Jasne.", "Teraz rozumiem."
+  * 3. ZDZIWIENIE / ZAINTRYGOWANIE (Sou nan desu ka? / Sou ka? z intonacją rosnącą):
+    -> POPRAWNIE [OK]: "Doprawdy?", "Naprawdę?", "Doprawdy tak jest?"
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -713,8 +725,13 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
    - Kiedy po cięciu sceny (np. podróż, lecący samolot, plener) postać mówi "I can see it!" (audio: 'Mietekita!'):
      -> KARDYNALNY BŁĄD [X]: "Widzę to po tobie / po panu" (zignorowanie obrazu i cięcia sceny!).
      -> POPRAWNIE [OK]: "Już widać!", "Widać cel!", "Już je widać!" (zgodnie z obrazem i kolejnymi linijkami o krajobrazie/lądzie).
+19. MATRYCA APROBACJI (SOU NE / SOU VS ROZUMIEM) I AIZUCHI:
+   - Kiedy postać potwierdza trafną uwagę rozmówcy (audio: 'Sou' / 'Sou ne' / 'Sou desu') i rozwija jego myśl (np. o winie/charakterze):
+     -> KARDYNALNY BŁĄD [X]: "Rozumiem." (bierna kalka "I see", brzmiąca obco i urzędowo!).
+     -> POPRAWNIE [OK]: "Otóż to.", "Właśnie tak.", "Zgadza się.", "Dokładnie tak."
      * "[Filar I - Odnominalizowanie] 'dokonał zabójstwa' -> 'zabił'"
      * "[Filar XLI - Notacja Liczebników] '3 dni' -> 'trzy dni'"
+     * "[Filar XLV - Aprobata Aizuchi] 'Rozumiem' -> 'Otóż to' (potwierdzenie intuicji Shizuku)"
      * "[Filar XXXVI - Prefabrykowana Mówioność] Zastąpiono sztuczny imiesłów żywą polszczyzną"
      * "[Filar XXXI - Rejestr i Wulgaryzmy] Ujednolicono surowy język żołnierski"
 
