@@ -230,9 +230,14 @@ FILAR XXXIII: PRZESTRZENNA DEIKSA WZROKOWA (SPATIAL DEIXIS & KOSOADO):
   * Przedmiot daleko / na horyzoncie: używaj "tamto / tamten / tam".
   * Przedmiot w ręku / blisko: "to / ten tutaj". Zakaz powodowania dysonansu wzrokowego z kadrem.
 
-FILAR XXXIV: PRZEKŁAD RELACJI RODZINNYCH (KINSHIP VS DIRECT ADDRESSING):
-- ZAKAZ tłumaczenia japońskiego "Onii-chan / Onee-san" jako sztucznego "starszy bracie / starsza siostro"!
-  * Zastępuj to imieniem brata/siostry, zwrotem "braciszku / brachu / siostra" (w sytuacjach czułych/żartobliwych) lub pomijaj na rzecz naturalnego polskiego zdania.
+FILAR XXXIV: PRZEKŁAD RELACJI RODZINNYCH, FEUDALNYCH I ZASADA JEDNOKROTNEJ TYTULATURY (ANTI-HONORIFIC SPAM):
+- RELACJE RODZINNE: ZAKAZ tłumaczenia japońskiego "Onii-chan / Onee-san" jako sztucznego "starszy bracie / starsza siostro"! Zastępuj to imieniem brata/siostry, zwrotem "braciszku / brachu / siostra" (w sytuacjach czułych/żartobliwych) lub pomijaj na rzecz naturalnego polskiego zdania.
+- ETYKIETA FEUDALNA I ZASADA JEDNOKROTNEJ TYTULATURY (ZAKAZ PRZESYTU 'PAN / PANI'):
+  * W relacjach feudalnych, samurajskich, dworskich oraz bóstwo-dziedzic (np. kapłan/wasal do młodego lorda, doradca do generała):
+    -> ZASADA JEDNOKROTNEJ TYTULATURY: Szacunek nadaje zwrot tytularny użyty RAZ na początku lub na końcu wypowiedzi ("młody panie", "panie generale", "panie Tokiyuki").
+    -> KATEGORYCZNY ZAKAZ POWTARZANIA 'PAN/PANA/DLA PANA' W KAŻDYM ZDANIU: Wewnątrz monologu i kolejnych zdań stosuj naturalną 2. osobę ("przemierzasz", "gdyby cię pojmał", "zrobiłeś już dość") lub elipsę ("robi się tu zbyt niebezpiecznie" zamiast sztucznego "dla pana").
+    -> BŁĄD [X]: "Przemierza pan pole bitwy... gdyby pana pojmał... by zastawić na pana sieć... robi się tu dla pana niebezpiecznie... zrobił pan już dość, panie Tokiyuki." (8 razy pan - komiczny bełkot urzędowy!).
+    -> POPRAWNIE [OK]: "To ty, młody panie. Przemierzasz pole bitwy... gdyby cię pojmał... by zastawić na ciebie sieć... robi się tu zbyt niebezpiecznie. Zrobiłeś już dość, panie Tokiyuki."
 
 FILAR XXXV: KADENCJA KOŃCOWA I PUENTOWANIE (PUNCHLINE ALIGNMENT):
 - W scenach komediowych i dramatycznych kluczowe słowo (puenta żartu lub oskarżenie) MUSI paść na sam koniec napisu, idealnie w momencie, gdy aktor urywa głos, by nie zdradzać puenty przedwcześnie.
@@ -660,10 +665,11 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
    - "Are you okay / You good?" -> "Wszystko w porządku?" (ZAKAZ: "Jesteś w porządku?").
    - "Seems to be" -> "Wydaje się" (ZAKAZ: "Wydaje się być").
    - "Give me a hand" -> "Pomóż mi" (ZAKAZ: "Daj mi rękę").
-9. HONORYFIKATORY, ETYKIETA I ZAKAZ TAUTOLOGII („PAN... PANIE”):
+9. HONORYFIKATORY, ETYKIETA I ZAKAZ TAUTOLOGII („PAN... PANIE”) ORAZ PRZESYTU („ANTI-HONORIFIC SPAM”):
    - {"ZACHOWAJ honoryfikatory (-kun, -chan, -san, -sensei) zgodnie z konwencją." if keep_honorifics else "ZASTĄP honoryfikatory naturalną polszczyzną (-sensei -> pani/pan [Nazwisko], -san -> pan/pani lub samo imię, -kun/-chan -> samo imię)."}
    - KATEGORYCZNY ZAKAZ mówienia per 'pan/pani [Nazwisko]' (np. 'panie Minami') między uczniami i rówieśnikami w szkole! W polskim liceum/szkole koledzy i koleżanki mówią do siebie PO IMIENIU ('Arata, zdradzasz ją?!') lub po samym nazwisku ('Minami, zdradzasz ją?!'). Formę 'Pan/Pani' rezerwujemy WYŁĄCZNIE dla nauczycieli i osób dorosłych!
    - KATEGORYCZNY ZAKAZ TAUTOLOGII HONORYFIKATYWNYCH („To pan, Młody Panie” / „To pan, panie generale”)! Zastępuj je naturalnym zaimkiem bezpośrednim: „To ty, młody panie.” / „Właśnie ty, młody panie.”, a wołacze pisz z małej litery („młody panie”, „wasza wysokość”).
+   - ZASADA JEDNOKROTNEJ TYTULATURY W DIALOGACH FEUDALNYCH: Zakaz powtarzania 'pan/pana/dla pana' w każdym zdaniu wypowiedzi! Tytuł podaj raz („młody panie”), a wewnątrz monologu odmieniaj czasowniki w naturalnej 2. osobie („przemierzasz”, „gdyby cię pojmał”, „zrobiłeś już dość”).
 10. PERSPEKTYWA GRAMATYCZNA I KTO MÓWI (1. OSOBA VS 2. OSOBA):
    - Upewnij się, czy kwestia nie jest deklaracją/obietnicą mówiących bohaterów (1. osoba: "My przejdziemy...", "Sami uzbieramy...").
    - BEZWZGLĘDNY ZAKAZ mylenia perspektywy: gdy uczennica z zaciśniętą pięścią krzyczy do nauczycielki o planach klubu, MUSI być 1. osoba: "Na cyfrowy przejdziemy, jak same uzbieramy!", a NIE 2. osoba: "Na cyfrowy przejdziecie...".
