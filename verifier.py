@@ -24,6 +24,7 @@ class DialogueVerifier:
         self.model = model
         self.keep_honorifics = keep_honorifics
         self.system_prompt = get_verifier_system_prompt(keep_honorifics=keep_honorifics)
+        self.current_episode_tokens: Dict[str, Any] = {"prompt": 0, "cached": 0, "output": 0, "model": self.model}
 
     def verify_batch(
         self,
@@ -92,6 +93,13 @@ class DialogueVerifier:
                     contents=[prompt_text],
                     config=types.GenerateContentConfig(**gen_config_kwargs)
                 )
+
+                if hasattr(response, "usage_metadata") and response.usage_metadata:
+                    um = response.usage_metadata
+                    self.current_episode_tokens["prompt"] += getattr(um, "prompt_token_count", 0) or 0
+                    self.current_episode_tokens["cached"] += getattr(um, "cached_content_token_count", 0) or 0
+                    self.current_episode_tokens["output"] += getattr(um, "candidates_token_count", 0) or 0
+                    self.current_episode_tokens["model"] = self.model
 
                 # Pobieramy sparsowany wynik
                 if hasattr(response, "parsed") and response.parsed is not None:

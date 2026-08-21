@@ -6,7 +6,7 @@ oraz wyświetla transparentne podsumowanie finansowe i alerty o ewentualnych zmi
 """
 
 import os
-from typing import Dict, Any, Tuple
+from typing import Dict, Any, Tuple, Optional
 
 # Kurs bazowy USD/PLN
 DEFAULT_USD_PLN = 4.00
@@ -106,6 +106,61 @@ class PricingGuard:
             return round(total_pln, 2)
 
         return 0.08
+
+    @classmethod
+    def calculate_actual_cost_pln(
+        cls,
+        f1_stats: Dict[str, Any],
+        f2_stats: Optional[Dict[str, Any]] = None,
+        usd_pln: float = DEFAULT_USD_PLN
+    ) -> float:
+        """
+        Oblicza dokładny rzeczywisty koszt na podstawie przechwyconych usage_metadata z Google API.
+        """
+        total_usd = 0.0
+        
+        # Faza 1
+        m1 = f1_stats.get("model", "flash")
+        rate1 = GOOGLE_API_RATES["flash"]
+        if "pro" in m1.lower():
+            rate1 = GOOGLE_API_RATES["pro"]
+        elif "lite" in m1.lower():
+            rate1 = GOOGLE_API_RATES["flash_lite"]
+
+        cached1 = f1_stats.get("cached", 0)
+        prompt1 = f1_stats.get("prompt", 0)
+        uncached1 = max(0, prompt1 - cached1)
+        out1 = f1_stats.get("output", 0)
+
+        cost1 = (
+            (cached1 / 1_000_000) * rate1["input_cached"] +
+            (uncached1 / 1_000_000) * rate1["input_uncached"] +
+            (out1 / 1_000_000) * rate1["output"]
+        )
+        total_usd += cost1
+
+        # Faza 2 (jeśli była aktywna)
+        if f2_stats:
+            m2 = f2_stats.get("model", "pro")
+            rate2 = GOOGLE_API_RATES["pro"]
+            if "flash" in m2.lower() and "lite" not in m2.lower():
+                rate2 = GOOGLE_API_RATES["flash"]
+            elif "lite" in m2.lower():
+                rate2 = GOOGLE_API_RATES["flash_lite"]
+
+            cached2 = f2_stats.get("cached", 0)
+            prompt2 = f2_stats.get("prompt", 0)
+            uncached2 = max(0, prompt2 - cached2)
+            out2 = f2_stats.get("output", 0)
+
+            cost2 = (
+                (cached2 / 1_000_000) * rate2["input_cached"] +
+                (uncached2 / 1_000_000) * rate2["input_uncached"] +
+                (out2 / 1_000_000) * rate2["output"]
+            )
+            total_usd += cost2
+
+        return round(total_usd * usd_pln, 2)
 
     @classmethod
     def get_pricing_status_banner(cls) -> str:

@@ -247,6 +247,9 @@ class MultimodalTranslator:
         # Rejestr Oficjalnego Kanonu Polskich Wydań Mangowych (Waneko, JPF, Studio JG itp.)
         self.manga_canon = MangaCanonRegistry()
 
+        # Licznik rzeczywistych tokenów dla bieżącego odcinka
+        self.current_episode_tokens: Dict[str, Any] = {"prompt": 0, "cached": 0, "output": 0, "model": self.model}
+
     def _prepare_batch_prompt(
         self,
         batch_events: List[Tuple[int, pysubs2.SSAEvent, str, str]],
@@ -411,6 +414,14 @@ class MultimodalTranslator:
                     contents=contents,
                     config=types.GenerateContentConfig(**gen_config_kwargs)
                 )
+
+                if hasattr(response, "usage_metadata") and response.usage_metadata:
+                    um = response.usage_metadata
+                    self.current_episode_tokens["prompt"] += getattr(um, "prompt_token_count", 0) or 0
+                    self.current_episode_tokens["cached"] += getattr(um, "cached_content_token_count", 0) or 0
+                    self.current_episode_tokens["output"] += getattr(um, "candidates_token_count", 0) or 0
+                    self.current_episode_tokens["model"] = current_model
+
                 if hasattr(response, "parsed") and response.parsed is not None:
                     return response.parsed
                 else:
@@ -474,8 +485,11 @@ class MultimodalTranslator:
         Główna metoda tłumacząca plik z napisami z pełnym zachowaniem Typesettingu, stylów i timingu.
         """
         subs_file = Path(subs_path)
-        if not subs_file.exists():
-            raise FileNotFoundError(f"Nie znaleziono pliku napisów: {subs_path}")
+        # Reset rejestru postaci i liczników tokenów dla nowego odcinka
+        self.character_registry = {}
+        self.current_episode_tokens = {"prompt": 0, "cached": 0, "output": 0, "model": self.model}
+        if self.verifier:
+            self.verifier.current_episode_tokens = {"prompt": 0, "cached": 0, "output": 0, "model": self.verifier.model}
 
         is_ass = not str(subs_file).lower().endswith(".srt")
 
@@ -978,4 +992,17 @@ class MultimodalTranslator:
                 pass
 
         print(f"\n[Sukces] Przetłumaczone, wyczyszczone napisy z zachowanym Typesettingiem zapisano w: {output_path}")
+
+        # Obliczenie i wyświetlenie rzeczywistego kosztu odcinka na podstawie pobranych tokenów
+        try:
+            from pricing_guard import PricingGuard
+            f1_stats = self.current_episode_tokens
+            f2_stats = self.verifier.current_episode_tokens if self.verifier else None
+            actual_cost_pln = PricingGuard.calculate_actual_cost_pln(f1_stats, f2_stats)
+            print("─" * 60)
+            print(f"  💰 Rzeczywisty koszt tego odcinka: {actual_cost_pln:.2f} PLN")
+            print("─" * 60)
+        except Exception:
+            pass
+
         return output_path
