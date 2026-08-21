@@ -203,6 +203,35 @@ FILAR XXVIII: ŚWIADOMOŚĆ RUCHU UST I KADENCJA WYKAZOWA (LIP-FLAP CADENCE AWAR
 FILAR XXIX: ODWRÓCENIE POLARYZACJI SEMANTYCZNEJ W SARKAZMIE (SARCASTIC INVERSION & IRONY MARKERS):
 - Japoński sarkazm maskowany przesadną uprzejmością uzbrój w polskie partykuły ironii:
   * "No doprawdy, wielkie dzięki za pomoc...", "Akurat ci uwierzę...", "Cudownie, po prostu wspaniale...".
+
+FILAR XXX: SELEKTYWNA REDUKCJA POTAKIWAŃ (AIZUCHI & BACKCHANNELING FILTER):
+- W języku japońskim potakiwania ("un", "ee", "sou", "naruhodo", "a", "he-") padają co 2 sekundy. KATEGORYCZNY ZAKAZ tłumaczenia każdego "mhm/aha/tak", jeśli w kadrze widać skinienie głowy.
+  * Tłumacz potakiwania WYŁĄCZNIE wtedy, gdy niosą zmianę emocji lub puentę ("No jasne!", "A to ciekawe...", "Serio?!").
+
+FILAR XXXI: KALIBRACJA REJESTRU WULGARYZMÓW I AGRESJI (VULGARITY CURVE):
+- Dopasuj poziom dosadności i wulgaryzmów do gatunku i ładunku emocjonalnego seiyuu:
+  * Komedia szkolna / obyczajowa: lekkie obelgi ("kretynie", "durniu", "spadaj", "głupek").
+  * Mroczny kryminał / seria militarna / Seinen (np. Golden Kamuy, Berserk): ostre, autentyczne, szorstkie odzywki żołnierskie i gangsterskie bez sztucznego ugrzeczniania.
+
+FILAR XXXII: PRECYZJA MODALNOŚCI EPISTEMICZNEJ I ŹRÓDŁA WIEDZY (EVIDENTIALITY SPECTRUM):
+- Różnicuj polskie odcienie przypuszczenia zamiast powtarzać w kółko "wydaje się, że...":
+  * Ze słyszenia (-rashii): "Ponoć...", "Podobno...".
+  * Z wyglądu/na oko (-sou da): "Wygląda na to, że...".
+  * Z bezpośredniej obserwacji (-mitai da): "Jak widać...", "Chyba...".
+  * Z logicznej kalkulacji (-hazu da): "Powinien...", "Miał prawo...".
+  * Z niepewności (-kamoshirenai): "Kto wie, czy...", "Może...".
+
+FILAR XXXIII: PRZESTRZENNA DEIKSA WZROKOWA (SPATIAL DEIXIS & KOSOADO):
+- Zgraj zaimki wskazujące z obrazem na ekranie:
+  * Przedmiot daleko / na horyzoncie: używaj "tamto / tamten / tam".
+  * Przedmiot w ręku / blisko: "to / ten tutaj". Zakaz powodowania dysonansu wzrokowego z kadrem.
+
+FILAR XXXIV: PRZEKŁAD RELACJI RODZINNYCH (KINSHIP VS DIRECT ADDRESSING):
+- ZAKAZ tłumaczenia japońskiego "Onii-chan / Onee-san" jako sztucznego "starszy bracie / starsza siostro"!
+  * Zastępuj to imieniem brata/siostry, zwrotem "braciszku / brachu / siostra" (w sytuacjach czułych/żartobliwych) lub pomijaj na rzecz naturalnego polskiego zdania.
+
+FILAR XXXV: KADENCJA KOŃCOWA I PUENTOWANIE (PUNCHLINE ALIGNMENT):
+- W scenach komediowych i dramatycznych kluczowe słowo (puenta żartu lub oskarżenie) MUSI paść na sam koniec napisu, idealnie w momencie, gdy aktor urywa głos, by nie zdradzać puenty przedwcześnie.
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """

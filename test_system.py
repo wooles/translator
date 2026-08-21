@@ -19,7 +19,7 @@ from verifier import RefinedLine, RefinedBatchResponse
 from translator import LineTranslation, BatchTranslationResponse, sanitize_sub_text
 
 def test_rules_and_prompts():
-    print("[TEST 1/13] Sprawdzanie kompletności 29 Filarów AVT i promptów...")
+    print("[TEST 1/13] Sprawdzanie kompletności 35 Filarów AVT i promptów...")
     sys_prompt = get_translation_system_prompt()
     ver_prompt = get_verifier_system_prompt()
     assert "I see" in sys_prompt
@@ -29,9 +29,11 @@ def test_rules_and_prompts():
     assert "ODNOMINALIZOWANIE" in sys_prompt
     assert "FILAR XXIII: KANON POLSKICH WYDAŃ MANGOWYCH" in sys_prompt
     assert "FILAR XXIV: NADMIAROWOŚĆ INTERSEMIOTYCZNA" in sys_prompt
-    assert "FILAR XXIX: ODWRÓCENIE POLARYZACJI SEMANTYCZNEJ W SARKAZMIE" in sys_prompt
-    assert "FILAR XXIX: ODWRÓCENIE POLARYZACJI SEMANTYCZNEJ W SARKAZMIE" in ver_prompt
-    print(" -> PASSED: Kompletny Kanon 29 Filarów AVT jest aktywny w obu fazach tłumaczenia.")
+    assert "FILAR XXX: SELEKTYWNA REDUKCJA POTAKIWAŃ" in sys_prompt
+    assert "FILAR XXXI: KALIBRACJA REJESTRU WULGARYZMÓW" in sys_prompt
+    assert "FILAR XXXV: KADENCJA KOŃCOWA I PUENTOWANIE" in sys_prompt
+    assert "FILAR XXXV: KADENCJA KOŃCOWA I PUENTOWANIE" in ver_prompt
+    print(" -> PASSED: Kompletny Kanon 35 Filarów AVT jest aktywny w obu fazach tłumaczenia.")
 
 def test_pydantic_schemas():
     print("[TEST 2/5] Weryfikacja schematów Pydantic...")
