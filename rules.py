@@ -311,6 +311,15 @@ FILAR XLVI: ZASADA YOBISUTE I ZAKAZ SZTUCZNEGO „PANA/PANI” PRZY SAMYM IMIENI
   * Towarzysze podróży (np. Loulan -> Issei), rywale (Shizuku -> Issei), przyjaciele oraz cudzoziemcy nieznający sztywnej etykiety biurowej ZAWSZE mówią do siebie po imieniu na "ty".
 - KIEDY STOSUJEMY FORMĘ „PAN/PANI”:
   * WYŁĄCZNIE przy formalnych zwrotach po NAZWISKU z honoryfikatorem (np. Tomine-sensei -> "pan Tomine", Kanzaki-san -> "pan Kanzaki") lub w oficjalnych relacjach urzędowych/kelner-klient.
+
+FILAR XLVII: ZACHOWANIE PODMIOTU KONTRASTOWEGO W ODPOWIEDZIACH (CONTRASTIVE FOCUS & MY FOLKS):
+- PODMIOT KONTRASTOWY (ODPOWIEDŹ NA PYTANIE O RODZINĘ / PRZYNALEŻNOŚĆ):
+  * Kiedy postać odpowiada na pytanie o swoją rodzinę lub pochodzenie (np. "Where are your folks from?" -> "My folks are out in Izu Oshima" / audio: "Watashi no..."):
+    -> KARDYNALNY BŁĄD [X]: Nadgorliwe wycięcie podmiotu i zostawienie samego czasownika ("Mieszkają na Izu Oshimie" -> zniekształca sens i gubi osobę mówiącą!).
+    -> POPRAWNIE [OK]: Obowiązkowe zachowanie podmiotu: "Moi rodzice mieszkają na Izu Oshimie.", "Moi mieszkają na Izu Oshimie.", "Moja rodzina mieszka...".
+- ROZRÓŻNIENIE PODMIOTU ZBĘDNEGO OD KONTRASTOWEGO:
+  * Zaimki dzierżawcze usuwamy TYLKO przy czynnościach oczywistych ("włożył ręce do kieszeni").
+  * W odpowiedziach na pytania rozstrzygające lub identyfikujące, podmiot "Moi / Moja / Moje" jest OGNISKIEM INFORMACYJNYM (Rematem) i MUSI pozostać w przekładzie!
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -743,10 +752,15 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
    - Kiedy postać zwraca się do rozmówcy po samym imieniu (np. Loulan do Isseia, Shizuku do Isseia, przyjaciele, rywale):
      -> KARDYNALNY BŁĄD [X]: "Co pan czuje, panie Issei?" (sztuczny dystans niszczący dynamikę postaci!).
      -> POPRAWNIE [OK]: "Co czujesz, Issei?" (bezpośrednio po imieniu na "ty").
+21. PODMIOT KONTRASTOWY W ODPOWIEDZIACH (MY FOLKS / WATASHI NO) (FILAR XLVII):
+   - Kiedy postać odpowiada na pytanie o swoją rodzinę/pochodzenie ("My folks are out in..." / audio: "Watashi no..."):
+     -> KARDYNALNY BŁĄD [X]: "Mieszkają na Izu Oshimie" (urwana forma bezosobowa gubiąca mówcę!).
+     -> POPRAWNIE [OK]: "Moi rodzice mieszkają na Izu Oshimie." / "Moi mieszkają na Izu Oshimie."
      * "[Filar I - Odnominalizowanie] 'dokonał zabójstwa' -> 'zabił'"
      * "[Filar XLI - Notacja Liczebników] '3 dni' -> 'trzy dni'"
      * "[Filar XLV - Aprobata Aizuchi] 'Rozumiem' -> 'Otóż to' (potwierdzenie intuicji Shizuku)"
      * "[Filar XLVI - Yobisute] Usunięto sztuczne 'panie Issei' -> 'Issei'"
+     * "[Filar XLVII - Podmiot Kontrastowy] 'Mieszkają...' -> 'Moi rodzice mieszkają...'"
      * "[Filar XXXVI - Prefabrykowana Mówioność] Zastąpiono sztuczny imiesłów żywą polszczyzną"
      * "[Filar XXXI - Rejestr i Wulgaryzmy] Ujednolicono surowy język żołnierski"
 
