@@ -3,7 +3,7 @@
 Moduł Inteligentnego Zarządzania Pamięcią Kontekstu (Google Gemini Context Caching).
 Zapewnia 75% oszczędności kosztów na serwerach Google bez najmniejszego wpływu na jakość.
 Wbudowane zabezpieczenie SHA-256: Zmiana choćby jednej litery w Filarach natychmiast unieważnia stary cache i tworzy nowy.
-TTL (Time-To-Live): 2 godziny (7200s) z automatycznym wygasaniem po zakończeniu pracy.
+TTL (Time-To-Live): 24 godziny (86400s) z automatycznym wygasaniem.
 """
 
 import hashlib
@@ -31,10 +31,10 @@ class ContextCacheManager:
         client: genai.Client,
         model: str,
         system_instruction: str,
-        ttl_seconds: int = 7200
+        ttl_seconds: int = 86400
     ) -> Optional[str]:
         """
-        Pobiera istniejący lub tworzy nowy CachedContent na serwerach Google z czasem wygasania 2h (7200s).
+        Pobiera istniejący lub tworzy nowy CachedContent na serwerach Google z czasem wygasania 24h (86400s).
         Zwraca nazwę zasobu cache (np. 'cachedContents/12345') lub None w razie braku wsparcia.
         """
         if not client or not system_instruction:

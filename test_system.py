@@ -336,7 +336,7 @@ def test_context_cache():
     assert h1 != h3
     
     # 3. Test bezpiecznego fallbacku przy braku klienta
-    res = ContextCacheManager.get_or_create_cache(None, "gemini-3.7-flash", "prompt", ttl_seconds=7200)
+    res = ContextCacheManager.get_or_create_cache(None, "gemini-3.7-flash", "prompt", ttl_seconds=86400)
     assert res is None
     print(" -> PASSED: Context Caching SHA-256 i unieważnianie starych wersji działają perfekcyjnie.")
 

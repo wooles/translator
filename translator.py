@@ -394,7 +394,7 @@ class MultimodalTranslator:
                     client=self.client,
                     model=current_model,
                     system_instruction=self.system_prompt,
-                    ttl_seconds=7200
+                    ttl_seconds=86400
                 )
                 gen_config_kwargs = {
                     "response_mime_type": "application/json",
