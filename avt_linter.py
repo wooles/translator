@@ -31,7 +31,16 @@ class AVTLinter:
         (r"\b[Pp]oniosło klapę\b", "Nie wyszło", "Filar IV - Idiomatyka"),
         (r"\b[Ww]asz [Hh]onor\b", "Wysoki Sądzie", "Filar XVI - Realia Sądownicze"),
         
-        # Relacje rodzinne (Filar XXXIV)
+        # Relacje rodzinne i tytulatura feudalna (Filar II / XXXIV / XLI)
+        (r"\bTo pan, [Mm]łody [Pp]anie\b", "To ty, młody panie", "Filar II/XXXIV - Eliminacja Tautologii Honoryfikatywnej"),
+        (r"\bto pan, [Mm]łody [Pp]anie\b", "to ty, młody panie", "Filar II/XXXIV - Eliminacja Tautologii Honoryfikatywnej"),
+        (r"\bTo pan, młody panie\b", "To ty, młody panie", "Filar II/XXXIV - Eliminacja Tautologii Honoryfikatywnej"),
+        (r"\bto pan, młody panie\b", "to ty, młody panie", "Filar II/XXXIV - Eliminacja Tautologii Honoryfikatywnej"),
+        (r"\bTo pani, [Mm]łoda [Pp]ani\b", "To ty, młoda pani", "Filar II/XXXIV - Eliminacja Tautologii Honoryfikatywnej"),
+        (r"\bto pani, [Mm]łoda [Pp]ani\b", "to ty, młoda pani", "Filar II/XXXIV - Eliminacja Tautologii Honoryfikatywnej"),
+        (r"\b[Mm]łody [Pp]anie\b", "młody panie", "Filar XLI - Ortografia Wołacza i Małe Litery"),
+        (r"\b[Mm]łoda [Pp]ani\b", "młoda pani", "Filar XLI - Ortografia Wołacza i Małe Litery"),
+        (r"\b[Ww]asza [Ww]ysokość\b", "wasza wysokość", "Filar XLI - Ortografia Wołacza i Małe Litery"),
         (r"\b[Ss]tarszy bracie\b", "brachu", "Filar XXXIV - Relacje Rodzinne"),
         (r"\b[Ss]tarsza siostro\b", "siostra", "Filar XXXIV - Relacje Rodzinne"),
         

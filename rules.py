@@ -28,6 +28,10 @@ FILAR II: ZASADA ANAFORY, PRO-FORM I ZAIMKA "TO / NA TO" (ZAKAZ POWTÓRZEŃ TEMA
   * Kwestia A: "Mamy pewien plan." -> Kwestia B: "Co zamierzacie?" / "Jaki?" / "O co chodzi?" (ZAKAZ: "Jaki to jest plan?").
   * Kwestia A: "Widziałeś ten film?" -> Kwestia B: "Jeszcze nie, a dobry?" (ZAKAZ: "Nie widziałem tego filmu").
   * Kwestia A: "Kupiłem nowy telefon." -> Kwestia B: "I jak się sprawdza?" (ZAKAZ: "I jak podoba ci się ten telefon?").
+- KATEGORYCZNY ZAKAZ TAUTOLOGII HONORYFIKATYWNYCH („Pan... Panie”):
+  * Przy zwrocie do młodego dziedzica/przełożonego ("It's you, Young Lord"):
+    -> KARDYNALNY BŁĄD [X]: "To pan, Młody Panie." (Tautologiczne masło maślane i kalka Title Case!).
+    -> POPRAWNIE [OK]: "To ty, młody panie." / "Właśnie ty, młody panie." (Tytuł "młody panie" niesie szacunek i łączy się z zaimkiem "ty" oraz małą literą).
 
 FILAR III: NATURALNE POLSKIE KOLOKACJE PYTAJĄCE I SYTUACYJNE (ZAMIAST KALK SŁOWNIKOWYCH):
 - "How did you put this together / come up with it?" -> "Jak na to wpadłeś?", "Jak to wymyśliłeś?", "Skąd ten pomysł?".
@@ -656,9 +660,10 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
    - "Are you okay / You good?" -> "Wszystko w porządku?" (ZAKAZ: "Jesteś w porządku?").
    - "Seems to be" -> "Wydaje się" (ZAKAZ: "Wydaje się być").
    - "Give me a hand" -> "Pomóż mi" (ZAKAZ: "Daj mi rękę").
-9. HONORYFIKATORY I ETYKIETA SZKOLNA / RÓWIEŚNICZA:
+9. HONORYFIKATORY, ETYKIETA I ZAKAZ TAUTOLOGII („PAN... PANIE”):
    - {"ZACHOWAJ honoryfikatory (-kun, -chan, -san, -sensei) zgodnie z konwencją." if keep_honorifics else "ZASTĄP honoryfikatory naturalną polszczyzną (-sensei -> pani/pan [Nazwisko], -san -> pan/pani lub samo imię, -kun/-chan -> samo imię)."}
    - KATEGORYCZNY ZAKAZ mówienia per 'pan/pani [Nazwisko]' (np. 'panie Minami') między uczniami i rówieśnikami w szkole! W polskim liceum/szkole koledzy i koleżanki mówią do siebie PO IMIENIU ('Arata, zdradzasz ją?!') lub po samym nazwisku ('Minami, zdradzasz ją?!'). Formę 'Pan/Pani' rezerwujemy WYŁĄCZNIE dla nauczycieli i osób dorosłych!
+   - KATEGORYCZNY ZAKAZ TAUTOLOGII HONORYFIKATYWNYCH („To pan, Młody Panie” / „To pan, panie generale”)! Zastępuj je naturalnym zaimkiem bezpośrednim: „To ty, młody panie.” / „Właśnie ty, młody panie.”, a wołacze pisz z małej litery („młody panie”, „wasza wysokość”).
 10. PERSPEKTYWA GRAMATYCZNA I KTO MÓWI (1. OSOBA VS 2. OSOBA):
    - Upewnij się, czy kwestia nie jest deklaracją/obietnicą mówiących bohaterów (1. osoba: "My przejdziemy...", "Sami uzbieramy...").
    - BEZWZGLĘDNY ZAKAZ mylenia perspektywy: gdy uczennica z zaciśniętą pięścią krzyczy do nauczycielki o planach klubu, MUSI być 1. osoba: "Na cyfrowy przejdziemy, jak same uzbieramy!", a NIE 2. osoba: "Na cyfrowy przejdziecie...".

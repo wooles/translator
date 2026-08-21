@@ -214,6 +214,10 @@ def test_avt_linter():
     # Test korekty rekcji przyczyny zgonu (wylew / atak serca)
     t4, f4 = AVTLinter.lint_and_fix_line("Natsuki zmarła na wylew zaraz po porodzie.")
     assert t4 == "Natsuki zmarła z powodu wylewu zaraz po porodzie."
+    
+    # Test eliminacji tautologii honoryfikatywnej i Title Case (To pan, Młody Panie -> To ty, młody panie)
+    t5, f5 = AVTLinter.lint_and_fix_line("To pan, Młody Panie.")
+    assert t5 == "To ty, młody panie."
     print(" -> PASSED: AVT Linter bezbłędnie wyłapuje i koryguje kalki i formy.")
 
 def test_series_bible():
