@@ -965,6 +965,26 @@ class MultimodalTranslator:
                     pass
 
                 pbar.update(len(untranslated_in_batch))
+                
+                if progress_callback:
+                    try:
+                        from pricing_guard import PricingGuard
+                        f1_stats = self.current_episode_tokens
+                        f2_stats = self.verifier.current_episode_tokens if self.verifier else None
+                        cur_cost_pln = PricingGuard.calculate_actual_cost_pln(f1_stats, f2_stats)
+                        # Przygotowanie próbek przetłumaczonych linijek dla podglądu na żywo
+                        recent_previews = []
+                        for it in pass1_items:
+                            o_idx = it["orig_idx"]
+                            recent_previews.append({
+                                "id": o_idx + 1,
+                                "en": it["en"],
+                                "pl": translated_results.get(o_idx, "")
+                            })
+                        progress_callback(len(translated_results), total_lines, recent_previews, cur_cost_pln)
+                    except Exception:
+                        pass
+
                 time.sleep(2.0)
 
         # 7. Budowa końcowego pliku z zachowaniem stylów, pozycjonowania i typesettingu
