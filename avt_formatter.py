@@ -94,9 +94,9 @@ def split_subtitle_syntactically(text: str, max_line_len: int = MAX_LINE_LENGTH,
 
         # Kary za przekroczenie docelowej długości linii
         if len_left > max_line_len:
-            score -= (len_left - max_line_len) * 50.0
+            score -= (len_left - max_line_len) * 300.0
         if len_right > max_line_len:
-            score -= (len_right - max_line_len) * 50.0
+            score -= (len_right - max_line_len) * 300.0
 
         last_word_left = re.sub(r"[^\w]", "", left_words[-1].lower())
         first_word_right = re.sub(r"[^\w]", "", right_words[0].lower())
@@ -113,22 +113,22 @@ def split_subtitle_syntactically(text: str, max_line_len: int = MAX_LINE_LENGTH,
 
         # 3. Bonus za podział po znakach interpunkcyjnych kończących zdanie/frazę
         if left_words[-1].endswith((".", "!", "?", "...", ":", ";")):
-            score += 350.0
-        elif left_words[-1].endswith(","):
             score += 250.0
+        elif left_words[-1].endswith(","):
+            score += 150.0
         elif left_words[-1].endswith(("—", "-")):
-            score += 200.0
+            score += 120.0
 
         # 4. Bonus za podział przed spójnikami podrzędnymi
         if first_word_right in {"że", "bo", "ponieważ", "więc", "jeśli", "gdy", "kiedy", "chociaż", "dlatego", "który", "która", "które"}:
-            score += 180.0
+            score += 140.0
 
-        # 5. Zasada piramidy (Pyramiding): Dolny wiersz powinien być nieco dłuższy od górnego (lub zbliżony)
+        # 5. Zasada piramidy (Pyramiding - Netflix AVT): Dolny wiersz powinien być dłuższy od górnego (lub zbliżony)
         diff = len_right - len_left
-        if 0 <= diff <= 12:
-            score += 80.0
+        if 0 <= diff <= 16:
+            score += 250.0  # Bardzo wysoki bonus za prawidłową piramidę (dół dłuższy lub równy)
         elif diff < 0:
-            score -= abs(diff) * 3.0  # Kara za odwróconą piramidę
+            score -= abs(diff) * 25.0  # Surowa kara za odwróconą piramidę (góra dłuższa od dołu)
 
         # 6. Balans długości względem środka
         balance_penalty = abs(len_left - target_midpoint) * 2.0
