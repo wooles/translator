@@ -139,10 +139,9 @@ if (Test-Path $TranslatorDir) {
         & $TrPython (Join-Path $TranslatorDir "test_system.py")
     }
 
-    # Tworzenie wygodnego skrótu / pliku startowego .bat na Pulpicie
-    $DesktopPath = [System.IO.Path]::Combine($env:USERPROFILE, "Desktop")
-    $BatLauncher = Join-Path $DesktopPath "Uruchom Tłumacz Anime.bat"
-    $BatContent = "@echo off`nchcp 65001 >nul`ntitle Multimodal Anime Translator`ncd /d `"$TranslatorDir`"`ncall `"$TrVenv\Scripts\activate.bat`"`npython main.py %*`npause"
+    # Tworzenie / weryfikacja pliku startowego translate_drag_and_drop.bat w folderze translator
+    $BatLauncher = Join-Path $TranslatorDir "translate_drag_and_drop.bat"
+    $BatContent = "@echo off`nchcp 65001 >nul`nset `"PYTHONIOENCODING=utf-8`"`nset `"PYTHONUTF8=1`"`ntitle Multimodal Subtitle Translator (Gemini 3.7 Flash)`necho ========================================================`necho   Multimodal Video Subtitle Translator (Gemini 3.7 Flash)`necho ========================================================`necho.`nset `"SCRIPT_DIR=%~dp0`"`ncd /d `"%SCRIPT_DIR%`"`nif exist `"%SCRIPT_DIR%.venv\Scripts\python.exe`" (`n    `"%SCRIPT_DIR%.venv\Scripts\python.exe`" `"%SCRIPT_DIR%main.py`" %*`n) else (`n    echo [Info] Uruchamianie za pomoca python...`n    python `"%SCRIPT_DIR%main.py`" %*`n)`necho.`necho ========================================================`necho Proces zakonczony.`necho Nacisnij dowolny klawisz, aby zamknac to okno.`npause > nul`n"
     Set-Content -Path $BatLauncher -Value $BatContent -Encoding ASCII
 }
 
@@ -181,7 +180,6 @@ Write-Host "Lokalizacja projektów: $RootProjectsDir" -ForegroundColor Cyan
 Write-Host "  1. Translator: $RootProjectsDir\translator" -ForegroundColor White
 Write-Host "  2. Kalendarz:  $RootProjectsDir\kalendarz" -ForegroundColor White
 Write-Host "  3. Sorter:     $RootProjectsDir\sorter" -ForegroundColor White
-Write-Host ""
-Write-Host "Na Pulpicie utworzono skrót: 'Uruchom Tłumacz Anime.bat'" -ForegroundColor Yellow
+Write-Host "Gotowy plik do przeciągania wideo: '$RootProjectsDir\translator\translate_drag_and_drop.bat'" -ForegroundColor Yellow
 Write-Host "Wszystkie foldery możesz teraz bezpośrednio otworzyć w Antigravity!" -ForegroundColor Green
 Write-Host ""
