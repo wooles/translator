@@ -183,6 +183,9 @@ Write-Host "Lokalizacja projektów: $RootProjectsDir" -ForegroundColor Cyan
 Write-Host "  1. Translator: $RootProjectsDir\translator" -ForegroundColor White
 Write-Host "  2. Kalendarz:  $RootProjectsDir\kalendarz" -ForegroundColor White
 Write-Host "  3. Sorter:     $RootProjectsDir\sorter" -ForegroundColor White
-Write-Host "Gotowy plik do przeciągania wideo: '$RootProjectsDir\translator\translate_drag_and_drop.bat'" -ForegroundColor Yellow
+Write-Host ""
+Write-Host "  👉 Wersja Okienkowa GUI: '$RootProjectsDir\translator\run_gui.bat'" -ForegroundColor Cyan
+Write-Host "  👉 Wersja Konsolowa CMD:  '$RootProjectsDir\translator\translate_drag_and_drop.bat'" -ForegroundColor Yellow
+Write-Host ""
 Write-Host "Wszystkie foldery możesz teraz bezpośrednio otworzyć w Antigravity!" -ForegroundColor Green
 Write-Host ""
