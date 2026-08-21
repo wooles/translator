@@ -72,7 +72,7 @@ class ContextCacheManager:
                     )
                 )
                 _LOCAL_CACHE_REGISTRY[content_hash] = cache.name
-                print(f"  ⚡ [Context Cache]: Załadowano 42 Filary do szybkiej pamięci RAM serwera Google (Wygasa za {ttl_seconds // 3600}h, -75% kosztów).")
+                logger.info(f"[Context Cache]: Utworzono cache serwerowy: {cache.name} (TTL: {ttl_seconds}s)")
                 return cache.name
         except Exception as e:
             err_msg = str(e).lower()
