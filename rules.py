@@ -251,9 +251,13 @@ FILAR XXXVII: ELIMINACJA NOŻYC OBRAZOWO-TEKSTOWYCH (TEXT-BILD-SCHERE):
 - Szyk wyrazów w napisie musi odpowiadać chronologii gestów na ekranie w ułamku sekundy.
   * Jeśli bohater najpierw wyciąga miecz, a potem tnie linę, zdanie musi zaczynać się od miecza, a kończyć na cięciu, eliminując dysonans poznawczy.
 
-FILAR XXXVIII: NIEROZERWALNOŚĆ JEDNOSTEK SENSU (SINNABSCHNITTE):
-- Przy podziale na dwie linijki zakazuje się rozdzielania integralnych jednostek logicznych:
-  * ZAKAZ rozdzielania: przymiotnika od rzeczownika ("Wielki \\N Generał"), imienia od przydomka ("Kuba \\N Rozpruwacz") czy czasownika posiłkowego od orzeczenia.
+FILAR XXXVIII: NIEROZERWALNOŚĆ JEDNOSTEK SENSU I ZDAŃ ROZBITYCH WIELOKROPKIEM (SPLIT-SENTENCE SYNTACTIC COHESION & SINNABSCHNITTE):
+- PODZIAŁ WEWNĄTRZ NAPISU: Przy podziale na dwie linijki zakazuje się rozdzielania integralnych jednostek logicznych (przymiotnik od rzeczownika: "Wielki \\N Generał", imię od przydomka: "Kuba \\N Rozpruwacz", przyimek od rzeczownika: "w \\N lesie").
+- SPÓJNOŚĆ ZDANIA ROZBITEGO NA DWA KOLEJNE NAPISY (Z WIELOKROPKIEM `...`):
+  * Kiedy jedno zdanie ciągłe jest wypowiadane przez aktora przez dwa kolejne napisy (Kwestia A z `...` na końcu i Kwestia B z `...` na początku):
+    -> 1. ZAKAZ DUBLOWANIA ORZECZEŃ: Czasownik główny może paść TYLKO RAZ (albo w kwestii A, albo w kwestii B). Kategoryczny zakaz podwójnego orzeczenia (np. BŁĄD [X]: Kwestia A: "...potrafi być...", Kwestia B: "...bywają niezwykle groźne...").
+    -> 2. ŻELAZNA ZGODNOŚĆ LICZBY I RODZAJU: Jeśli podmiot w kwestii A jest w liczbie pojedynczej ("Taktyka..."), kwestia B MUSI być dokończona w liczbie pojedynczej ("...bywa niezwykle groźna, o ile zadziała.", a NIE w liczbie mnogiej "...bywają niezwykle groźne, o ile zadziałają.").
+    -> 3. TEST CAŁOŚCI: Zawsze przeczytaj kwestię A + kwestię B jako jedno całe zdanie. Musi ono tworzyć w 100% poprawną, naturalną całość gramatyczną!
 
 FILAR XXXIX: EKWIWALENCJA EFEKTU EMOCJONALNEGO (STANISŁAW BARAŃCZAK):
 - Lojalność wobec widza polega na wywołaniu DOKŁADNIE TAKIEJ SAMEJ REAKCJI EMOCJONALNEJ (śmiech przy komedii, ciarki przy grozie, wzruszenie przy dramacie), jaką miał widz japoński. Żart kulturowy zastąp polskim żartem o identycznej sile rażenia.
@@ -645,8 +649,11 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
    - "I hope so" -> "Oby!", "Mam nadzieję" (ZAKAZ: "Mam taką nadzieję").
    - "You said" -> "Mówiłeś, że..." (ZAKAZ: "Powiedziałeś że").
    - "Your Honor" -> "Wysoki Sądzie" (ZAKAZ: "Wasz Honor").
-5. PŁYNNOŚĆ I SZYK ZDANIA:
+5. PŁYNNOŚĆ, SZYK ZDANIA I SPÓJNOŚĆ ZDAŃ ROZBITYCH WIELOKROPKIEM (`...`):
    - Połącz rozbite linijki w logiczną całość z poprawnym polskim szykiem wyrazów i odmianą.
+   - SPÓJNOŚĆ ZDAŃ ROZBITYCH MIĘDZY DWOMA NAPISAMI: Gdy zdanie ciągnie się przez dwa napisy (z `...`), sprawdź bezwzględną zgodność liczby i formy orzeczenia!
+   - ZAKAZ DUBLOWANIA CZASOWNIKA (np. KARDYNALNY BŁĄD [X]: linijka A: "Taktyka... potrafi być...", linijka B: "...bywają niezwykle groźne, o ile zadziałają.").
+   - POPRAWNIE [OK]: linijka A: "Taktyka łamiąca reguły wojny...", linijka B: "...bywa niezwykle groźna, o ile zadziała.".
 6. FORMULARZE POWITAŃ (AISATSU):
    - "I'm home" -> MUSI być "Wróciłam!" / "Wróciłem!" / "Już jestem!" (ZAKAZ: "Już w domu").
    - "Welcome home" -> "Witaj w domu!", "Dobrze, że jesteś!".
