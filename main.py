@@ -450,7 +450,7 @@ def main():
         final_output_path = args.output if (not is_season_queue and args.output) else None
         if not final_output_path and video_file:
             ext = subs_file.suffix if subs_file else ".ass"
-            final_output_path = str(video_file.parent / f"{video_file.stem}.pl{ext}")
+            final_output_path = str(video_file.parent / f"{video_file.stem}{ext}")
 
         try:
             result_subs_path = translator.translate_file(

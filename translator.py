@@ -338,15 +338,15 @@ class MultimodalTranslator:
             acoustic_str = f" [{', '.join(acoustic_cues)}]" if acoustic_cues else ""
 
             if vtype["is_sign"]:
-                lines.append(f"Kwestia [ID: {idx + 1}] [TYP: 🖼️ {vtype['type_label']}] (Czas: {start_str} - {end_str}, Cechy: {vtype['visual_details']}):")
-                lines.append(f"  ⚠️ UWAGA WIZUALNA: To jest NAPIS / TYTUŁ NA EKRANIE (np. tytuł mangi, rozdział, tablica, napis wklejony w kadr).")
+                lines.append(f"Kwestia [ID: {idx + 1}] [TYP: [NAPIS] {vtype['type_label']}] (Czas: {start_str} - {end_str}, Cechy: {vtype['visual_details']}):")
+                lines.append(f"  (!) UWAGA WIZUALNA: To jest NAPIS / TYTUŁ NA EKRANIE (np. tytuł mangi, rozdział, tablica, napis wklejony w kadr).")
                 lines.append(f"  Przetłumacz ten tekst jako SAMODZIELNY TYTUŁ/NAPIS (np. 'The Princess's Favor' / '姫様のご寵愛' -> 'Łaska księżniczki' / 'Faworyta księżniczki').")
                 lines.append(f"  BEZWZGLĘDNY ZAKAZ wklejania tu fragmentów dialogów mówionych przez postacie!")
             else:
                 speaker_name = event.name if event.name else "Postać"
-                lines.append(f"Kwestia [ID: {idx + 1}] [TYP: 💬 {vtype['type_label']}] (Czas: {start_str} - {end_str}, Mówca: '{speaker_name}'){acoustic_str}:")
+                lines.append(f"Kwestia [ID: {idx + 1}] [TYP: [DIALOG] {vtype['type_label']}] (Czas: {start_str} - {end_str}, Mówca: '{speaker_name}'){acoustic_str}:")
                 if is_fast:
-                    lines.append(f"  ⚠️ TEMPO CPS ({cps:.1f} z/s, czas {duration_s:.1f}s): Szybka kwestia! Zastosuj zwięzłą kondensację Belczyka.")
+                    lines.append(f"  (!) TEMPO CPS ({cps:.1f} z/s, czas {duration_s:.1f}s): Szybka kwestia! Zastosuj zwięzłą kondensację Belczyka.")
 
             if whisper_transcriptions and idx + 1 in whisper_transcriptions:
                 jp_text = whisper_transcriptions[idx + 1]
@@ -409,10 +409,10 @@ class MultimodalTranslator:
                 is_billing_exhausted = "prepayment" in err_str or "depleted" in err_str or ("billing" in err_str and "credit" in err_str)
                 if is_billing_exhausted:
                     print("\n" + "!" * 75)
-                    print("  ❌ [BŁĄD KONTA GOOGLE AI STUDIO / PŁATNOŚCI]:")
+                    print("  [!] [BŁĄD KONTA GOOGLE AI STUDIO / PŁATNOŚCI]:")
                     print("  Wyczerpały się środki przedpłacone (Prepayment Credits / Limit wydatków)!")
                     print("  Komunikat Google: 'Your prepayment credits are depleted.'")
-                    print("  👉 Wejdź na https://aistudio.google.com/ i doładuj środki, aby kontynuować.")
+                    print("  -> Wejdź na https://aistudio.google.com/ i doładuj środki, aby kontynuować.")
                     print("!" * 75 + "\n")
                     raise RuntimeError("Wyczerpane środki na koncie Google AI Studio (Prepayment Credits Depleted).")
 
@@ -424,7 +424,7 @@ class MultimodalTranslator:
                     next_idx = (current_model_idx + 1) % len(candidate_models)
                     if next_idx != current_model_idx:
                         print(f"\n[Tłumacz / Faza 1]: Model {current_model} jest przeciążony u Google (503).")
-                        print(f"  ⚡ Płynne przełączenie na bezpośredni model flagowy {candidate_models[next_idx]} (100% jakość bez czekania)...")
+                        print(f"  [>>] Płynne przełączenie na bezpośredni model flagowy {candidate_models[next_idx]} (100% jakość bez czekania)...")
                         current_model_idx = next_idx
                         time.sleep(1)
                         continue
@@ -432,7 +432,7 @@ class MultimodalTranslator:
                 if is_unavailable:
                     wait_time = min(4 + attempt * 2, 20)
                     print(f"\n[Tłumacz / Faza 1]: Chwilowe przeciążenie serwerów Google (503 UNAVAILABLE na {current_model}).")
-                    print(f"  ⏳ Utrzymuję najwyższą jakość modelu bez redukcji.")
+                    print(f"  [..] Utrzymuję najwyższą jakość modelu bez redukcji.")
                     print(f"  Odczekuję {wait_time}s i ponawiam próbę #{attempt}...")
                     time.sleep(wait_time)
                 elif is_rate_limit:
@@ -478,9 +478,9 @@ class MultimodalTranslator:
             if anime_meta.get("genres"):
                 print(f"[Baza AniList] Gatunki: {', '.join(anime_meta['genres'])}")
             if anime_meta.get("setting_tags"):
-                print(f"[Baza AniList] 🏛️ Realia świata / Tagi epokowe: {', '.join(anime_meta['setting_tags'])}")
+                print(f"[Baza AniList] [Realia świata / Epoka]: {', '.join(anime_meta['setting_tags'])}")
             if anime_meta.get("detected_domains"):
-                print(f"[Baza AniList] 🍷 Tematyka specjalistyczna: {', '.join(anime_meta['detected_domains'])}")
+                print(f"[Baza AniList] [Dziedzina specjalistyczna]: {', '.join(anime_meta['detected_domains'])}")
             print(f"[Baza AniList] Wczytano opis fabuły oraz {char_count} postaci z ich płcią i rolami.")
             
             # Wstępne wypełnienie rejestru postaci z bazy AniList
@@ -622,7 +622,7 @@ class MultimodalTranslator:
         manga_canon_str = ""
         if manga_canon_entry:
             manga_canon_str = self.manga_canon.format_canon_for_prompt(manga_canon_entry)
-            print(f"  📚 [Kanon Mangi]: Wczytano oficjalną polską terminologię ({manga_canon_entry.get('publisher', 'Wydawnictwo')})")
+            print(f"  [Kanon Mangi]: Wczytano oficjalną polską terminologię ({manga_canon_entry.get('publisher', 'Wydawnictwo')})")
             if manga_canon_entry.get("glossary"):
                 self.series_bible.update_from_episode_profile(
                     episode_name="Kanon Mangi",
@@ -632,26 +632,26 @@ class MultimodalTranslator:
 
         series_bible_str = self.series_bible.format_for_prompt()
         if series_bible_str:
-            print(f"  📚 [Biblia Serialu]: Wczytano ciągłość sezonu dla serii '{series_title or self.series_bible.slug}'")
+            print(f"  [Biblia Serialu]: Wczytano ciągłość sezonu dla serii '{series_title or self.series_bible.slug}'")
 
         if episode_profile:
+            if not manga_canon_entry and episode_profile.manga_canon_source:
+                print(f"  [Kanon Mangi]: Rozpoznano oficjalny polski przekład ({episode_profile.manga_canon_source})")
             if episode_profile.setting_and_era:
-                print(f"  🏛️  [Filar XV - Epoka i Realia Świata]: {episode_profile.setting_and_era}")
+                print(f"  [Filar XV - Epoka i Realia Świata]: {episode_profile.setting_and_era}")
             if episode_profile.domain_expertise:
-                print(f"  🍷 [Filar XVI - Dziedzina Specjalistyczna]: {episode_profile.domain_expertise}")
+                print(f"  [Filar XVI - Dziedzina Specjalistyczna]: {episode_profile.domain_expertise}")
             if episode_profile.dialogue_stylization:
-                print(f"  📜 [Stylizacja Językowa]: {episode_profile.dialogue_stylization}")
+                print(f"  [Stylizacja Językowa]: {episode_profile.dialogue_stylization}")
             if episode_profile.tone_and_genre:
-                print(f"  🎭 [Ton i Rejestr Dialogów]: {episode_profile.tone_and_genre}")
+                print(f"  [Ton i Rejestr Dialogów]: {episode_profile.tone_and_genre}")
             if episode_profile.characters:
-                print(f"  👥 [Relacje i Etykieta]: Rozpoznano relacje dla {len(episode_profile.characters)} postaci.")
+                print(f"  [Relacje i Etykieta]: Rozpoznano relacje dla {len(episode_profile.characters)} postaci.")
             if episode_profile.glossary:
-                terms_preview = ", ".join([f"'{g.term_en}' -> '{g.translation_pl}'" for g in episode_profile.glossary[:3]])
-                if len(episode_profile.glossary) > 3:
-                    terms_preview += f" (+{len(episode_profile.glossary) - 3} więcej)"
-                print(f"  📖 [Słowniczek Odcinka]: {terms_preview}")
+                terms_preview = ", ".join([f"'{g.term_en}' -> '{g.translation_pl}'" for g in episode_profile.glossary])
+                print(f"  [Słowniczek Odcinka]: {terms_preview}")
         if self.whisper:
-            print(f"  🎙️ [Lokalny Whisper STT]: AKTYWNY (model {self.whisper.model_size})")
+            print(f"  [Lokalny Whisper STT]: AKTYWNY (model {self.whisper.model_size})")
 
         batches = [
             raw_entries[i:i + self.batch_size]
@@ -864,7 +864,7 @@ class MultimodalTranslator:
                             is_sign=item.get("is_sign", False)
                         )
                         for fix in fixes:
-                            pbar.write(f" 🛡️ [AVT Linter] {fix}")
+                            pbar.write(f"  [AVT Linter] {fix}")
                         formatted_final = split_subtitle_syntactically(final_text, max_line_len=42, is_ass=is_ass)
                         translated_results[item["orig_idx"]] = formatted_final
                         history.append({"en": item["en"], "pl": formatted_final})
@@ -878,7 +878,7 @@ class MultimodalTranslator:
                             is_sign=item.get("is_sign", False)
                         )
                         for fix in fixes:
-                            pbar.write(f" 🛡️ [AVT Linter] {fix}")
+                            pbar.write(f"  [AVT Linter] {fix}")
                         formatted_final = split_subtitle_syntactically(final_text, max_line_len=42, is_ass=is_ass)
                         translated_results[item["orig_idx"]] = formatted_final
                         history.append({"en": item["en"], "pl": formatted_final})
@@ -944,7 +944,10 @@ class MultimodalTranslator:
             if stem.endswith(".en"):
                 stem = stem[:-3]
             ext = subs_file.suffix
-            output_path = str(subs_file.parent / f"{stem}.pl{ext}")
+            if video_path:
+                output_path = str(Path(video_path).parent / f"{Path(video_path).stem}{ext}")
+            else:
+                output_path = str(subs_file.parent / f"{stem}{ext}")
 
         final_subs.save(output_path, encoding="utf-8")
         
