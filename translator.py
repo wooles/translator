@@ -575,24 +575,41 @@ class MultimodalTranslator:
             ])
 
         found_checkpoint_path = None
+        restored_f1_tokens = None
+        restored_f2_tokens = None
         for cand in candidate_checkpoints:
             if cand and cand.exists() and cand.is_file():
                 try:
                     with open(cand, "r", encoding="utf-8") as cp_file:
                         saved_data = json.load(cp_file)
                         if isinstance(saved_data, dict) and len(saved_data) > 0:
-                            translated_results = {int(k): str(v) for k, v in saved_data.items() if str(k).isdigit()}
+                            if "translated_results" in saved_data:
+                                translated_results = {int(k): str(v) for k, v in saved_data["translated_results"].items() if str(k).isdigit()}
+                                token_usage = saved_data.get("token_usage", {})
+                                restored_f1_tokens = token_usage.get("f1")
+                                restored_f2_tokens = token_usage.get("f2")
+                            else:
+                                translated_results = {int(k): str(v) for k, v in saved_data.items() if str(k).isdigit()}
                             if translated_results:
                                 found_checkpoint_path = cand
                                 break
                 except Exception:
                     pass
 
+        if restored_f1_tokens and isinstance(restored_f1_tokens, dict):
+            for k in ["prompt", "cached", "output"]:
+                self.current_episode_tokens[k] = self.current_episode_tokens.get(k, 0) + restored_f1_tokens.get(k, 0)
+        if restored_f2_tokens and isinstance(restored_f2_tokens, dict) and self.verifier:
+            for k in ["prompt", "cached", "output"]:
+                self.verifier.current_episode_tokens[k] = self.verifier.current_episode_tokens.get(k, 0) + restored_f2_tokens.get(k, 0)
+
         if found_checkpoint_path and translated_results:
             print("\n" + "═" * 60)
             print(f"  [AUTOZAPIS / WZNOWIENIE]: Znaleziono plik checkpointu!")
             print(f"  Plik: {found_checkpoint_path.name}")
             print(f"  Wczytano {len(translated_results)}/{total_lines} gotowych kwestii dialogowych.")
+            if restored_f1_tokens:
+                print(f"  Przywrócono stan zużycia tokenów z wcześniejszej sesji.")
             print("═" * 60 + "\n")
         else:
             print("[Autozapis]: Brak wcześniejszego checkpointu. Rozpoczynanie tłumaczenia.")
@@ -931,10 +948,17 @@ class MultimodalTranslator:
                         if "to robi" in cur_pl.lower():
                             translated_results[item["orig_idx"]] = en_to_best_pl[en_norm]
 
-                # Autozapis checkpointu po każdej przetłumaczonej paczce
+                # Autozapis checkpointu po każdej przetłumaczonej paczce (z zachowaniem liczników tokenów)
                 try:
+                    checkpoint_payload = {
+                        "translated_results": translated_results,
+                        "token_usage": {
+                            "f1": self.current_episode_tokens,
+                            "f2": self.verifier.current_episode_tokens if self.verifier else None
+                        }
+                    }
                     with open(checkpoint_path, "w", encoding="utf-8") as cp_file:
-                        json.dump(translated_results, cp_file, ensure_ascii=False)
+                        json.dump(checkpoint_payload, cp_file, ensure_ascii=False)
                 except Exception:
                     pass
 
@@ -995,14 +1019,14 @@ class MultimodalTranslator:
 
         print(f"\n[Sukces] Przetłumaczone, wyczyszczone napisy z zachowanym Typesettingiem zapisano w: {output_path}")
 
-        # Obliczenie i wyświetlenie rzeczywistego kosztu odcinka na podstawie pobranych tokenów
+        # Obliczenie i wyświetlenie łącznego rzeczywistego kosztu całego odcinka na podstawie tokenów
         try:
             from pricing_guard import PricingGuard
             f1_stats = self.current_episode_tokens
             f2_stats = self.verifier.current_episode_tokens if self.verifier else None
             actual_cost_pln = PricingGuard.calculate_actual_cost_pln(f1_stats, f2_stats)
             print("─" * 60)
-            print(f"  💰 Rzeczywisty koszt tego odcinka: {actual_cost_pln:.2f} PLN")
+            print(f"  💰 Rzeczywisty łączny koszt całego odcinka (100%): {actual_cost_pln:.2f} PLN")
             print("─" * 60)
         except Exception:
             pass
