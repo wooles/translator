@@ -23,7 +23,7 @@ from PySide6.QtWidgets import (
     QLabel, QPushButton, QProgressBar, QTextEdit, QTableWidget,
     QTableWidgetItem, QHeaderView, QRadioButton, QButtonGroup,
     QCheckBox, QFileDialog, QMessageBox, QDialog, QLineEdit,
-    QComboBox, QGroupBox, QSplitter, QFrame, QScrollArea
+    QComboBox, QGroupBox, QSplitter, QFrame, QScrollArea, QTabWidget
 )
 
 # Załadowanie zmiennych środowiskowych (.env)
@@ -36,6 +36,8 @@ from model_resolver import resolve_best_models
 from pricing_guard import PricingGuard
 from series_memory import SeriesBible
 from main import collect_input_files, resolve_episode_files
+from user_feedback import UserFeedbackManager
+from glossary_manager import GlossaryManager
 
 # ─────────────────────────────────────────────────────────────────────────────
 # STYLIZACJA DARK FLUENT DESIGN (QSS)
@@ -375,6 +377,282 @@ class SettingsDialog(QDialog):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# OKNO KOREKTY KWESTII I INTERAKTYWNEGO UCZENIA (UserCorrectionDialog)
+# ─────────────────────────────────────────────────────────────────────────────
+class UserCorrectionDialog(QDialog):
+    def __init__(self, orig_en: str, cur_pl: str, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("✍️ Korekta Kwestii i Uczenie AI")
+        self.resize(600, 420)
+        self.orig_en = orig_en
+        self.cur_pl = cur_pl
+        self.result_pl = cur_pl
+        self.setup_ui()
+
+    def setup_ui(self):
+        layout = QVBoxLayout(self)
+
+        # Oryginał EN
+        lbl_en = QLabel("Oryginał angielski / japoński:")
+        lbl_en.setStyleSheet("color: #a0aec0; font-weight: bold;")
+        layout.addWidget(lbl_en)
+        self.txt_orig = QLineEdit(self.orig_en)
+        self.txt_orig.setReadOnly(True)
+        layout.addWidget(self.txt_orig)
+
+        # Błędna propozycja (jak przetłumaczyło AI)
+        lbl_bad = QLabel("Wersja pierwotna AI (do poprawy):")
+        lbl_bad.setStyleSheet("color: #fc8181; font-weight: bold;")
+        layout.addWidget(lbl_bad)
+        self.txt_bad = QLineEdit(self.cur_pl)
+        layout.addWidget(self.txt_bad)
+
+        # Twoja idealna wersja (jak ma być)
+        lbl_good = QLabel("Twoja poprawna wersja (jak powinno brzmieć po polsku):")
+        lbl_good.setStyleSheet("color: #68d391; font-weight: bold;")
+        layout.addWidget(lbl_good)
+        self.txt_good = QLineEdit(self.cur_pl)
+        layout.addWidget(self.txt_good)
+
+        # Uzasadnienie reguły
+        lbl_reason = QLabel("Uzasadnienie / Zasada (dla promptu AI):")
+        lbl_reason.setStyleSheet("color: #90cdf4; font-weight: bold;")
+        layout.addWidget(lbl_reason)
+        self.txt_reason = QLineEdit("Unikaj dosłowności, stosuj naturalną polszczyznę mówioną")
+        layout.addWidget(self.txt_reason)
+
+        # Opcje zapisu
+        gb_opts = QGroupBox("Opcje Zapamiętywania")
+        opts_layout = QVBoxLayout(gb_opts)
+        self.chk_save_rule = QCheckBox("🧠 Zapisz jako Złotą Regułę AI (Few-Shot Prompting w kolejnych tłumaczeniach)")
+        self.chk_save_rule.setChecked(True)
+        self.chk_save_glossary = QCheckBox("📖 Zapisz do Słownika Deterministycznego (twarde wymuszenie słowa)")
+        opts_layout.addWidget(self.chk_save_rule)
+        opts_layout.addWidget(self.chk_save_glossary)
+        layout.addWidget(gb_opts)
+
+        # Przyciski
+        h_btns = QHBoxLayout()
+        h_btns.addStretch()
+        btn_cancel = QPushButton("Anuluj")
+        btn_cancel.clicked.connect(self.reject)
+        btn_save = QPushButton("💾 Zastosuj Korektę")
+        btn_save.setObjectName("PrimaryButton")
+        btn_save.clicked.connect(self.apply_correction)
+        h_btns.addWidget(btn_cancel)
+        h_btns.addWidget(btn_save)
+        layout.addLayout(h_btns)
+
+    def apply_correction(self):
+        good_text = self.txt_good.text().strip()
+        bad_text = self.txt_bad.text().strip()
+        reason = self.txt_reason.text().strip()
+        orig = self.txt_orig.text().strip()
+
+        if not good_text:
+            QMessageBox.warning(self, "Błąd", "Wprowadź poprawioną wersję tekstu!")
+            return
+
+        self.result_pl = good_text
+
+        # 1. Zapis do UserFeedbackManager
+        if self.chk_save_rule.isChecked():
+            try:
+                fb_mgr = UserFeedbackManager()
+                fb_mgr.add_feedback(
+                    original_en=orig,
+                    bad_pl=bad_text,
+                    good_pl=good_text,
+                    rule_reason=reason,
+                    scope="global"
+                )
+            except Exception as e:
+                print(f"[Błąd zapisu reguły]: {e}")
+
+        # 2. Zapis do GlossaryManager
+        if self.chk_save_glossary.isChecked() and orig:
+            try:
+                gloss_mgr = GlossaryManager()
+                gloss_mgr.add_term(src=orig, pl=good_text, desc=reason)
+            except Exception as e:
+                print(f"[Błąd zapisu słownika]: {e}")
+
+        QMessageBox.information(
+            self,
+            "Zapisano",
+            "Korekta została pomyślnie zastosowana i zapamiętana w bazie reguł!"
+        )
+        self.accept()
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# OKNO ZARZĄDZANIA REGUŁAMI I SŁOWNIKIEM (RulesAndGlossaryDialog)
+# ─────────────────────────────────────────────────────────────────────────────
+class RulesAndGlossaryDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("🧠 Baza Reguł Użytkownika i Słownik Deterministyczny")
+        self.resize(850, 520)
+        self.fb_mgr = UserFeedbackManager()
+        self.gloss_mgr = GlossaryManager()
+        self.setup_ui()
+
+    def setup_ui(self):
+        layout = QVBoxLayout(self)
+
+        self.tabs = QTabWidget()
+
+        # TAB 1: Złote Wzorce Użytkownika (Few-Shot)
+        tab_rules = QWidget()
+        rules_layout = QVBoxLayout(tab_rules)
+        
+        lbl_rules_info = QLabel("Złote Wzorce są wstrzykiwane z najwyższym priorytetem do promptu LLM (Few-Shot Learning):")
+        lbl_rules_info.setStyleSheet("color: #a0aec0;")
+        rules_layout.addWidget(lbl_rules_info)
+
+        self.table_rules = QTableWidget()
+        self.table_rules.setColumnCount(4)
+        self.table_rules.setHorizontalHeaderLabels(["Oryginał EN", "Błąd [X]", "Poprawne [OK]", "Uzasadnienie"])
+        self.table_rules.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
+        self.table_rules.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)
+        self.table_rules.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeToContents)
+        self.table_rules.horizontalHeader().setSectionResizeMode(3, QHeaderView.Stretch)
+        self.table_rules.setSelectionBehavior(QTableWidget.SelectRows)
+        rules_layout.addWidget(self.table_rules)
+
+        h_rule_btns = QHBoxLayout()
+        btn_add_rule = QPushButton("➕ Dodaj Regułę")
+        btn_add_rule.clicked.connect(self.add_manual_rule)
+        btn_del_rule = QPushButton("🗑️ Usuń Wybraną")
+        btn_del_rule.clicked.connect(self.delete_selected_rule)
+        h_rule_btns.addWidget(btn_add_rule)
+        h_rule_btns.addWidget(btn_del_rule)
+        h_rule_btns.addStretch()
+        rules_layout.addLayout(h_rule_btns)
+        self.tabs.addTab(tab_rules, "🧠 Złote Wzorce (Few-Shot)")
+
+        # TAB 2: Słownik Deterministyczny
+        tab_gloss = QWidget()
+        gloss_layout = QVBoxLayout(tab_gloss)
+
+        lbl_gloss_info = QLabel("Pojęcia ze słownika są deterministycznie wymuszane w post-processingu (100% gwarancji):")
+        lbl_gloss_info.setStyleSheet("color: #a0aec0;")
+        gloss_layout.addWidget(lbl_gloss_info)
+
+        self.table_gloss = QTableWidget()
+        self.table_gloss.setColumnCount(3)
+        self.table_gloss.setHorizontalHeaderLabels(["Pojęcie Źródłowe", "Wymagane Tłumaczenie PL", "Opis / Rola"])
+        self.table_gloss.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
+        self.table_gloss.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)
+        self.table_gloss.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)
+        self.table_gloss.setSelectionBehavior(QTableWidget.SelectRows)
+        gloss_layout.addWidget(self.table_gloss)
+
+        h_gloss_btns = QHBoxLayout()
+        btn_add_term = QPushButton("➕ Dodaj Termin")
+        btn_add_term.clicked.connect(self.add_manual_term)
+        btn_del_term = QPushButton("🗑️ Usuń Wybrany")
+        btn_del_term.clicked.connect(self.delete_selected_term)
+        h_gloss_btns.addWidget(btn_add_term)
+        h_gloss_btns.addWidget(btn_del_term)
+        h_gloss_btns.addStretch()
+        gloss_layout.addLayout(h_gloss_btns)
+        self.tabs.addTab(tab_gloss, "📖 Słownik Deterministyczny")
+
+        layout.addWidget(self.tabs)
+
+        # Zamknij
+        h_bottom = QHBoxLayout()
+        h_bottom.addStretch()
+        btn_close = QPushButton("Zamknij")
+        btn_close.clicked.connect(self.accept)
+        h_bottom.addWidget(btn_close)
+        layout.addLayout(h_bottom)
+
+        self.refresh_rules_table()
+        self.refresh_glossary_table()
+
+    def refresh_rules_table(self):
+        self.fb_mgr.load()
+        items = self.fb_mgr.list_all()
+        self.table_rules.setRowCount(len(items))
+        for r_idx, item in enumerate(items):
+            self.table_rules.setItem(r_idx, 0, QTableWidgetItem(item.get("original_en", "")))
+            self.table_rules.setItem(r_idx, 1, QTableWidgetItem(item.get("bad_pl", "")))
+            self.table_rules.setItem(r_idx, 2, QTableWidgetItem(item.get("good_pl", "")))
+            self.table_rules.setItem(r_idx, 3, QTableWidgetItem(item.get("rule_reason", "")))
+
+    def refresh_glossary_table(self):
+        self.gloss_mgr.load()
+        terms = self.gloss_mgr.global_terms
+        self.table_gloss.setRowCount(len(terms))
+        for r_idx, (src, info) in enumerate(terms.items()):
+            pl = info.get("pl", "") if isinstance(info, dict) else str(info)
+            desc = info.get("desc", "") if isinstance(info, dict) else ""
+            self.table_gloss.setItem(r_idx, 0, QTableWidgetItem(src))
+            self.table_gloss.setItem(r_idx, 1, QTableWidgetItem(pl))
+            self.table_gloss.setItem(r_idx, 2, QTableWidgetItem(desc))
+
+    def add_manual_rule(self):
+        dlg = UserCorrectionDialog("", "", self)
+        if dlg.exec():
+            self.refresh_rules_table()
+
+    def delete_selected_rule(self):
+        row = self.table_rules.currentRow()
+        if row < 0:
+            QMessageBox.warning(self, "Wybór", "Zaznacz regułę do usunięcia!")
+            return
+        items = self.fb_mgr.list_all()
+        if row < len(items):
+            item_id = items[row].get("id")
+            if item_id:
+                self.fb_mgr.remove_feedback(item_id)
+                self.refresh_rules_table()
+
+    def add_manual_term(self):
+        src, ok1 = QInputDialog_getText(self, "Nowy Termin", "Pojęcie źródłowe (np. angielskie/japońskie):")
+        if ok1 and src.strip():
+            pl, ok2 = QInputDialog_getText(self, "Tłumaczenie PL", f"Polskie tłumaczenie dla '{src}':")
+            if ok2 and pl.strip():
+                self.gloss_mgr.add_term(src.strip(), pl.strip())
+                self.refresh_glossary_table()
+
+    def delete_selected_term(self):
+        row = self.table_gloss.currentRow()
+        if row < 0:
+            QMessageBox.warning(self, "Wybór", "Zaznacz termin do usunięcia!")
+            return
+        src_item = self.table_gloss.item(row, 0)
+        if src_item:
+            self.gloss_mgr.remove_term(src_item.text())
+            self.refresh_glossary_table()
+
+
+def QInputDialog_getText(parent, title, label):
+    """Prosty dialog tekstowy zastępujący QInputDialog."""
+    dlg = QDialog(parent)
+    dlg.setWindowTitle(title)
+    dlg.resize(400, 150)
+    layout = QVBoxLayout(dlg)
+    layout.addWidget(QLabel(label))
+    txt = QLineEdit()
+    layout.addWidget(txt)
+    h_b = QHBoxLayout()
+    btn_ok = QPushButton("OK")
+    btn_ok.setObjectName("PrimaryButton")
+    btn_ok.clicked.connect(dlg.accept)
+    btn_c = QPushButton("Anuluj")
+    btn_c.clicked.connect(dlg.reject)
+    h_b.addStretch()
+    h_b.addWidget(btn_c)
+    h_b.addWidget(btn_ok)
+    layout.addLayout(h_b)
+    res = dlg.exec()
+    return txt.text(), res == QDialog.Accepted
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # GŁÓWNE OKNO APLIKACJI (MainWindow)
 # ─────────────────────────────────────────────────────────────────────────────
 class MainWindow(QMainWindow):
@@ -406,10 +684,13 @@ class MainWindow(QMainWindow):
         h_header.addWidget(lbl_title)
 
         h_header.addStretch()
+        btn_rules = QPushButton("🧠 Reguły i Słownik")
+        btn_rules.clicked.connect(self.open_rules_manager)
         btn_settings = QPushButton("⚙️ Ustawienia API")
         btn_settings.clicked.connect(self.open_settings)
         btn_bible = QPushButton("📚 Biblia Serialu")
         btn_bible.clicked.connect(self.open_series_bible)
+        h_header.addWidget(btn_rules)
         h_header.addWidget(btn_bible)
         h_header.addWidget(btn_settings)
         main_layout.addLayout(h_header)
@@ -514,7 +795,16 @@ class MainWindow(QMainWindow):
         self.table_live.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
         self.table_live.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
         self.table_live.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)
+        self.table_live.cellDoubleClicked.connect(self.on_live_cell_double_clicked)
         live_layout.addWidget(self.table_live)
+
+        h_live_btns = QHBoxLayout()
+        btn_edit_line = QPushButton("✍️ Popraw zaznaczoną kwestię (Ucz z korekty)")
+        btn_edit_line.clicked.connect(self.edit_selected_live_line)
+        h_live_btns.addWidget(btn_edit_line)
+        h_live_btns.addStretch()
+        live_layout.addLayout(h_live_btns)
+
         right_layout.addWidget(gb_live)
 
         # Konsola Logów
@@ -729,6 +1019,31 @@ class MainWindow(QMainWindow):
     def open_settings(self):
         dlg = SettingsDialog(self)
         dlg.exec()
+
+    def open_rules_manager(self):
+        dlg = RulesAndGlossaryDialog(self)
+        dlg.exec()
+
+    def on_live_cell_double_clicked(self, row: int, column: int):
+        self._open_correction_for_row(row)
+
+    def edit_selected_live_line(self):
+        row = self.table_live.currentRow()
+        if row < 0:
+            QMessageBox.warning(self, "Wybór", "Kliknij dwukrotnie lub zaznacz kwestię w tabeli, którą chcesz poprawić!")
+            return
+        self._open_correction_for_row(row)
+
+    def _open_correction_for_row(self, row: int):
+        if row < 0 or row >= self.table_live.rowCount():
+            return
+        orig_en = self.table_live.item(row, 1).text() if self.table_live.item(row, 1) else ""
+        cur_pl = self.table_live.item(row, 2).text() if self.table_live.item(row, 2) else ""
+        dlg = UserCorrectionDialog(orig_en=orig_en, cur_pl=cur_pl, parent=self)
+        if dlg.exec():
+            new_pl = dlg.result_pl
+            self.table_live.setItem(row, 2, QTableWidgetItem(new_pl))
+            self.log(f"✍️ Zastosowano korektę w linijce #{row + 1}: '{new_pl}'")
 
     def open_series_bible(self):
         QMessageBox.information(

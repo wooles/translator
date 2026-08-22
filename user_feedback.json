@@ -1,0 +1,47 @@
+[
+  {
+    "id": "init_1",
+    "original_en": "I hope so / I have hope",
+    "bad_pl": "Mam taką nadzieję / Mam nadzieję na to",
+    "good_pl": "Oby! / Mam nadzieję!",
+    "rule_reason": "W mowie potocznej unikamy sztucznego 'Mam taką nadzieję', stosujemy naturalne 'Oby!' lub zwięzłe 'Mam nadzieję'.",
+    "scope": "global",
+    "created_at": "2026-08-22 23:34:42"
+  },
+  {
+    "id": "init_2",
+    "original_en": "It makes sense / That makes sense",
+    "bad_pl": "To robi sens / Robi to sens",
+    "good_pl": "To ma sens / Ma to sens / Zrozumiałe",
+    "rule_reason": "Bezwzględny zakaz kalki 'robi sens'. Po polsku rzeczownik 'sens' łączy się wyłącznie z czasownikiem 'mieć'.",
+    "scope": "global",
+    "created_at": "2026-08-22 23:34:42"
+  },
+  {
+    "id": "init_3",
+    "original_en": "Welcome back",
+    "bad_pl": "Witaj z powrotem",
+    "good_pl": "Witaj! / Dobrze cię widzieć! / Wróciłeś!",
+    "rule_reason": "Zakaz amerykanizmu 'Witaj z powrotem'. Po polsku witamy osobę słowem 'Witaj!' lub 'Wróciłeś!'.",
+    "scope": "global",
+    "created_at": "2026-08-22 23:34:42"
+  },
+  {
+    "id": "init_4",
+    "original_en": "It's you, Young Lord",
+    "bad_pl": "To pan, Młody Panie.",
+    "good_pl": "To ty, młody panie.",
+    "rule_reason": "Tautologia 'pan... Panie' jest błędem. Używamy zaimka 'ty' i małej litery w wołaczu tytularnym.",
+    "scope": "global",
+    "created_at": "2026-08-22 23:34:42"
+  },
+  {
+    "id": "init_5",
+    "original_en": "Sensei, I'm done!",
+    "bad_pl": "Pani Sensei, skończyłam!",
+    "good_pl": "Sensei, skończyłam! / Pani Teshimo, skończyłam!",
+    "rule_reason": "Zakaz hybryd honoryfikatywnych 'Pani Sensei'. Albo sam japoński tytuł 'Sensei', albo polska forma 'Pani [Nazwisko]'.",
+    "scope": "global",
+    "created_at": "2026-08-22 23:34:42"
+  }
+]

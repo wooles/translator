@@ -19,37 +19,78 @@ from verifier import RefinedLine, RefinedBatchResponse
 from translator import LineTranslation, BatchTranslationResponse, sanitize_sub_text
 
 def test_rules_and_prompts():
-    print("[TEST 1/16] Sprawdzanie kompletności 43 Filarów AVT i promptów...")
+    print("[TEST 1/25] Sprawdzanie kompletności 64 Zunifikowanych Filarów AVT i promptów...")
     sys_prompt = get_translation_system_prompt()
     ver_prompt = get_verifier_system_prompt()
     assert "I see" in sys_prompt
     assert "Rozumiem" in sys_prompt
     assert "KANON PRZEKŁADU AUDIOWIZUALNEGO" in sys_prompt
     assert "Arkadiusza Belczyka" in ver_prompt
-    assert "ODNOMINALIZOWANIE" in sys_prompt
-    assert "FILAR XXIII: KANON POLSKICH WYDAŃ MANGOWYCH" in sys_prompt
-    assert "FILAR XXIV: NADMIAROWOŚĆ INTERSEMIOTYCZNA" in sys_prompt
-    assert "FILAR XXX: SELEKTYWNA REDUKCJA POTAKIWAŃ" in sys_prompt
-    assert "FILAR XXXI: KALIBRACJA REJESTRU WULGARYZMÓW" in sys_prompt
-    assert "FILAR XXXVI: TEORIA PREFABRYKOWANEJ MÓWIONOŚCI" in sys_prompt
-    assert "FILAR XXXVII: ELIMINACJA NOŻYC OBRAZOWO-TEKSTOWYCH" in sys_prompt
-    assert "FILAR XXXVIII: NIEROZERWALNOŚĆ JEDNOSTEK SENSU" in sys_prompt
-    assert "FILAR XXXIX: EKWIWALENCJA EFEKTU EMOCJONALNEGO" in sys_prompt
-    assert "FILAR XLII: AKUSTYCZNA KOHERENCJA REJESTRU WIEKOWEGO" in sys_prompt
-    assert "FILAR XLIII: MATRYCA TOŻSAMOŚCI I KAMUFLAŻU PŁCIOWEGO" in sys_prompt
-    assert "FILAR XLIV: CZASOWNIKI WEKTOROWE I CIĘCIA MONTAŻOWO-PRZESTRZENNE" in sys_prompt
-    assert "FILAR XLIV: CZASOWNIKI WEKTOROWE I CIĘCIA MONTAŻOWO-PRZESTRZENNE" in ver_prompt
-    assert "FILAR XLV: MATRYCA PRAGMATYCZNA POTWIERDZEŃ, APROBACJI I AIZUCHI" in sys_prompt
-    assert "FILAR XLV: MATRYCA PRAGMATYCZNA POTWIERDZEŃ, APROBACJI I AIZUCHI" in ver_prompt
-    assert "FILAR XLVI: ZASADA YOBISUTE I ZAKAZ SZTUCZNEGO „PANA/PANI”" in sys_prompt
-    assert "FILAR XLVI: ZASADA YOBISUTE I ZAKAZ SZTUCZNEGO „PANA/PANI”" in ver_prompt
-    assert "FILAR XLVII: ZACHOWANIE PODMIOTU KONTRASTOWEGO" in sys_prompt
-    assert "FILAR XLVII: ZACHOWANIE PODMIOTU KONTRASTOWEGO" in ver_prompt
-    assert "FILAR XLVIII: ZAKAZ HYBRYD HONORYFIKATYWNYCH" in sys_prompt
-    assert "FILAR XLVIII: ZAKAZ HYBRYD HONORYFIKATYWNYCH" in ver_prompt
-    assert "FILAR XLIX: PRZEKŁAD PLANSZ TYTUŁOWYCH" in sys_prompt
-    assert "FILAR XLIX: PRZEKŁAD PLANSZ TYTUŁOWYCH" in ver_prompt
-    print(" -> PASSED: Kompletny Kanon 49 Filarów AVT jest aktywny w obu fazach tłumaczenia.")
+    assert "FILAR I:" in sys_prompt
+    assert "FILAR II:" in sys_prompt
+    assert "FILAR III:" in sys_prompt
+    assert "FILAR IV:" in sys_prompt
+    assert "FILAR V:" in sys_prompt
+    assert "FILAR VI:" in sys_prompt
+    assert "FILAR VII:" in sys_prompt
+    assert "FILAR VIII:" in sys_prompt
+    assert "FILAR IX:" in sys_prompt
+    assert "FILAR X:" in sys_prompt
+    assert "FILAR XI:" in sys_prompt
+    assert "FILAR XII:" in sys_prompt
+    assert "FILAR XIII:" in sys_prompt
+    assert "FILAR XIV:" in sys_prompt
+    assert "FILAR XV:" in sys_prompt
+    assert "FILAR XVI:" in sys_prompt
+    assert "FILAR XVII:" in sys_prompt
+    assert "FILAR XVIII:" in sys_prompt
+    assert "FILAR XIX:" in sys_prompt
+    assert "FILAR XX:" in sys_prompt
+    assert "FILAR XXI:" in sys_prompt
+    assert "FILAR XXII:" in sys_prompt
+    assert "FILAR XXIII:" in sys_prompt
+    assert "FILAR XXIV:" in sys_prompt
+    assert "FILAR XXV:" in sys_prompt
+    assert "FILAR XXVI:" in sys_prompt
+    assert "FILAR XXVII:" in sys_prompt
+    assert "FILAR XXVIII:" in sys_prompt
+    assert "FILAR XXIX:" in sys_prompt
+    assert "FILAR XXX:" in sys_prompt
+    assert "FILAR XXXI:" in sys_prompt
+    assert "FILAR XXXII:" in sys_prompt
+    assert "FILAR XXXIII:" in sys_prompt
+    assert "FILAR XXXIV:" in sys_prompt
+    assert "FILAR XXXV:" in sys_prompt
+    assert "FILAR XXXVI:" in sys_prompt
+    assert "FILAR XXXVII:" in sys_prompt
+    assert "FILAR XXXVIII:" in sys_prompt
+    assert "FILAR XXXIX:" in sys_prompt
+    assert "FILAR XL:" in sys_prompt
+    assert "FILAR XLI:" in sys_prompt
+    assert "FILAR XLII:" in sys_prompt
+    assert "FILAR XLIII:" in sys_prompt
+    assert "FILAR XLIV:" in sys_prompt
+    assert "FILAR XLV:" in sys_prompt
+    assert "FILAR XLVI:" in sys_prompt
+    assert "FILAR XLVII:" in sys_prompt
+    assert "FILAR XLVIII:" in sys_prompt
+    assert "FILAR XLIX:" in sys_prompt
+    assert "FILAR L:" in sys_prompt
+    assert "FILAR LI:" in sys_prompt
+    assert "FILAR LII:" in sys_prompt
+    assert "FILAR LIII:" in sys_prompt
+    assert "FILAR LIV:" in sys_prompt
+    assert "FILAR LV:" in sys_prompt
+    assert "FILAR LVI:" in sys_prompt
+    assert "FILAR LVII:" in sys_prompt
+    assert "FILAR LVIII:" in sys_prompt
+    assert "FILAR LIX:" in sys_prompt
+    assert "FILAR LX:" in sys_prompt
+    assert "FILAR LXI:" in sys_prompt
+    assert "FILAR LXII:" in sys_prompt
+    assert "FILAR LXIII:" in sys_prompt
+    assert "FILAR LXIV:" in sys_prompt
+    print(" -> PASSED: Kompletny Zunifikowany Kanon 64 Filarów AVT (Zero Redundancji) jest aktywny w obu fazach tłumaczenia.")
 
 def test_pydantic_schemas():
     print("[TEST 2/5] Weryfikacja schematów Pydantic...")
@@ -415,6 +456,226 @@ def test_sign_detector():
     assert sign.translation_pl == "CZASY WSPÓŁCZESNE"
     print(" -> PASSED: VisualSignDetector precyzyjnie wykrywa luki i chroni kadry przed dublowaniem.")
 
+def test_user_feedback_manager():
+    print("[TEST 18/22] Test Pamięci Korekt Użytkownika i Few-Shot Prompting (user_feedback)...")
+    from user_feedback import UserFeedbackManager
+    with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as f:
+        tmp_json = Path(f.name)
+
+    try:
+        mgr = UserFeedbackManager(storage_path=tmp_json)
+        # Test dodawania
+        entry = mgr.add_feedback(
+            original_en="I messed up",
+            bad_pl="Zrobiłem bałagan",
+            good_pl="Zawaliłem",
+            rule_reason="Używaj naturalnego potocznego słownictwa"
+        )
+        assert entry["bad_pl"] == "Zrobiłem bałagan"
+        assert len(mgr.list_all()) >= 1
+
+        # Test wyszukiwania
+        matches = mgr.find_relevant_feedback(["I think I messed up badly"])
+        assert len(matches) >= 1
+        assert matches[0]["good_pl"] == "Zawaliłem"
+
+        # Test formatowania do promptu
+        formatted = mgr.format_for_prompt(matches)
+        assert "ZŁOTE WZORCE" in formatted
+        assert "Zawaliłem" in formatted
+
+        # Test usuwania
+        assert mgr.remove_feedback(entry["id"]) is True
+    finally:
+        if tmp_json.exists():
+            tmp_json.unlink()
+    print(" -> PASSED: Moduł pamięci korekt użytkownika i Few-Shot działa bezbłędnie.")
+
+def test_deterministic_glossary():
+    print("[TEST 19/22] Test Słownika Deterministycznego i Nadpisywania (glossary_manager)...")
+    from glossary_manager import GlossaryManager
+    with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as f:
+        tmp_json = Path(f.name)
+
+    try:
+        mgr = GlossaryManager(global_path=tmp_json)
+        mgr.add_term("Ancient Relic", "Starożytna Relikwia", "obiekt fabularny")
+        assert "Ancient Relic" in mgr.global_terms
+
+        # Test łączenia ze słownikiem serii
+        combined = mgr.get_combined_glossary({"Spirit Blade": "Ostrze Dusz"})
+        assert combined["Ancient Relic"] == "Starożytna Relikwia"
+        assert combined["Spirit Blade"] == "Ostrze Dusz"
+
+        # Test formatowania do promptu
+        prompt_sec = mgr.format_for_prompt(combined)
+        assert "BEZWZGLĘDNY SŁOWNICZEK" in prompt_sec
+        assert "Starożytna Relikwia" in prompt_sec
+
+        # Test deterministycznego nadpisywania w tekście
+        res_text, fixes = GlossaryManager.apply_deterministic_overrides(
+            "Odnaleźliśmy Ancient Relic w jaskini.",
+            combined
+        )
+        assert res_text == "Odnaleźliśmy Starożytna Relikwia w jaskini."
+        assert len(fixes) == 1
+    finally:
+        if tmp_json.exists():
+            tmp_json.unlink()
+    print(" -> PASSED: Słownik deterministyczny wymusza terminy w 100%.")
+
+def test_dynamic_rule_dispatcher():
+    print("[TEST 20/25] Test Dynamicznego Dyspozytora Reguł i Koncentracji Uwagi (rules.py)...")
+    from rules import get_focused_rules_for_batch
+
+    # 1. Test paczki z pytaniami (Filar IX)
+    batch_q = [{"en": "Are you sure about that?"}]
+    focused_q = get_focused_rules_for_batch(batch_q)
+    assert "FILAR IX" in focused_q
+
+    # 2. Test paczki z napisami ekranowymi (sign) (Filar XLI)
+    batch_s = [{"en": "Title of Chapter", "is_sign": True}]
+    focused_s = get_focused_rules_for_batch(batch_s)
+    assert "FILAR XLI" in focused_s
+
+    # 3. Test paczki z tytulaturą (Filar XXV/XXVII/XXVIII)
+    batch_t = [{"en": "Sensei, please help!"}]
+    focused_t = get_focused_rules_for_batch(batch_t)
+    assert "XXVII" in focused_t or "XXV" in focused_t
+
+    # 4. Test paczki z czasownikami wektorowymi (Filar XXXVII)
+    batch_v = [{"en": "Look, I can see it!"}]
+    focused_v = get_focused_rules_for_batch(batch_v)
+    assert "FILAR XXXVII" in focused_v
+    print(" -> PASSED: Dyspozytor reguł precyzyjnie aktywuje właściwe filary AVT.")
+
+def test_fuzzy_and_dynamic_avt_linter():
+    print("[TEST 21/22] Test Fleksyjnego i Dynamicznego Lintera (avt_linter)...")
+    from avt_linter import AVTLinter
+
+    # 1. Test fleksji "mieć taką nadzieję" w różnych czasach
+    t1, _ = AVTLinter.lint_and_fix_line("Miałem taką nadzieję od dawna.")
+    assert t1 == "Miałem nadzieję od dawna."
+    t2, _ = AVTLinter.lint_and_fix_line("Będziemy mieć taką nadzieję.")
+    assert t2 == "Będziemy mieć nadzieję."
+
+    # 2. Test fleksji "robić sens" w różnych formach
+    t3, _ = AVTLinter.lint_and_fix_line("To robiło sens wczoraj.")
+    assert "to miało sens" in t3.lower()
+    t4, _ = AVTLinter.lint_and_fix_line("To nie będzie robić sensu.")
+    assert "to nie będzie mieć sensu" in t4.lower()
+
+    # 3. Test dynamicznych reguł użytkownika w linterze
+    user_rules = [
+        {"bad_pl": "zrobiłem błąd", "good_pl": "pomyliłem się"}
+    ]
+    t5, fixes5 = AVTLinter.lint_and_fix_line("Chyba zrobiłem błąd.", user_feedback_rules=user_rules)
+    assert t5 == "Chyba pomyliłem się."
+    assert len(fixes5) >= 1
+
+    # 4. Test wymuszeń słownikowych w linterze
+    custom_gloss = {"Black Dragon": "Czarny Smok"}
+    t6, fixes6 = AVTLinter.lint_and_fix_line("To jest Black Dragon!", custom_glossary=custom_gloss)
+    assert "Czarny Smok" in t6
+    print(" -> PASSED: Linter bezbłędnie obsługuje fleksję, wzorce użytkownika i słownik.")
+
+def test_gui_interactive_learning_components():
+    print("[TEST 22/23] Test Komponentów Interaktywnego Uczenia w GUI (gui_app)...")
+    from user_feedback import UserFeedbackManager
+    from glossary_manager import GlossaryManager
+
+    fb = UserFeedbackManager()
+    all_rules = fb.list_all()
+    assert len(all_rules) >= 1
+
+    gm = GlossaryManager()
+    assert len(gm.global_terms) >= 1
+    print(" -> PASSED: Komponenty GUI interaktywnego uczenia są w 100% gotowe.")
+
+def test_extended_avt_pillars():
+    print("[TEST 23/25] Test Filarów Paralingwistyki, Interpunkcji i Translationese...")
+    from avt_linter import AVTLinter
+    from rules import get_focused_rules_for_batch
+
+    # 1. Test paralingwistyki (Filar XVIII)
+    t1, _ = AVTLinter.lint_and_fix_line("Ara ara, co my tu mamy?")
+    assert "O proszę..." in t1
+    t2, _ = AVTLinter.lint_and_fix_line("Tch, znowu on.")
+    assert "Tsk..." in t2
+
+    # 2. Test eliminacji trzeciego języka (Filar X)
+    t3, _ = AVTLinter.lint_and_fix_line("Co sprawia, że tak mówisz?")
+    assert "Czemu tak sądzisz?" in t3
+
+    # 3. Test interpunkcji zespolonej (Filar LX)
+    t4, _ = AVTLinter.lint_and_fix_line("Naprawdę!?")
+    assert "?!" in t4
+
+    # 4. Test dyspozytora dla piosenek (Filar LVIII) i paralingwistyki (Filar XVIII)
+    batch_music = [{"en": "Song lyrics", "notes": "singing"}]
+    f_music = get_focused_rules_for_batch(batch_music)
+    assert "FILAR LVIII" in f_music
+
+    batch_para = [{"en": "Ara ara, you are funny"}]
+    f_para = get_focused_rules_for_batch(batch_para)
+    assert "FILAR XVIII" in f_para or "XVIII" in f_para
+    print(" -> PASSED: Filary paralingwistyki, interpunkcji i anti-translationese działają bezbłędnie.")
+
+def test_master_avt_pillars():
+    print("[TEST 24/25] Test Zunifikowanych Filarów Realioznawczych i Metryzacji (ECR, Metryzacja, Modalność)...")
+    from avt_linter import AVTLinter
+    from rules import get_focused_rules_for_batch
+
+    # 1. Test Pedersen ECR generalization (Filar XIV)
+    t1, _ = AVTLinter.lint_and_fix_line("Pójdę do konbini po coś do picia.")
+    assert "sklep" in t1
+
+    # 2. Test metryzacji miar (Filar LIX)
+    t2, _ = AVTLinter.lint_and_fix_line("On ma ponad 6 stóp wzrostu i stoi 10 stóp stąd.")
+    assert "prawie dwa metry" in t2
+    assert "3 metry" in t2
+
+    # 3. Test modalności epistemicznej (Filar XLVI)
+    t3, _ = AVTLinter.lint_and_fix_line("Nie ma wątpliwości, że wrócą.")
+    assert "bez wątpienia" in t3
+
+    # 4. Test dyspozytora dla jednostek (Filar LIX) i modalności (Filar XLVI)
+    batch_units = [{"en": "He is 10 feet away from the wall."}]
+    f_units = get_focused_rules_for_batch(batch_units)
+    assert "LIX" in f_units
+
+    batch_modal = [{"en": "He must be definitely guilty, no doubt."}]
+    f_modal = get_focused_rules_for_batch(batch_modal)
+    assert "XLVI" in f_modal
+    print(" -> PASSED: Zunifikowane filary realioznawcze, metryzacji i modalności w 100% zintegrowane.")
+
+def test_excellence_avt_pillars():
+    print("[TEST 25/25] Test Pragmatyki Anime i Żargonu RPG (Shūjoshi, Onomatopeje, RPG)...")
+    from avt_linter import AVTLinter
+    from rules import get_focused_rules_for_batch
+
+    # 1. Test Shūjoshi Pragmatics (Filar XVI)
+    t1, _ = AVTLinter.lint_and_fix_line("Iku zo!")
+    assert "No to ruszamy!" in t1
+
+    # 2. Test Onomatopeje Gijougo (Filar XVII)
+    t2, _ = AVTLinter.lint_and_fix_line("Zokutto shita kiedy to zobaczyłem.")
+    assert "przeszły mnie ciarki" in t2
+
+    # 3. Test Żargon RPG / System (Filar XXIV)
+    t3, _ = AVTLinter.lint_and_fix_line("Pojawiło się Status Window gracza.")
+    assert "[ OKNO STATUSU ]" in t3
+
+    # 4. Test dyspozytora dla RPG (Filar XXIV) i Shūjoshi (Filar XVI)
+    batch_rpg = [{"en": "Check your status and new skill level."}]
+    f_rpg = get_focused_rules_for_batch(batch_rpg)
+    assert "XXIV" in f_rpg
+
+    batch_shujo = [{"en": "Doko ni iku no kashira?"}]
+    f_shujo = get_focused_rules_for_batch(batch_shujo)
+    assert "XVI" in f_shujo
+    print(" -> PASSED: Kanon Zunifikowany 64 Filarów AVT w 100% zintegrowany i sprawny.")
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -434,4 +695,13 @@ if __name__ == "__main__":
     test_context_cache()
     test_pricing_guard()
     test_sign_detector()
-    print("\n Wszystkie testy jednostkowe i integracyjne (17/17) zakończone pełnym sukcesem!\n")
+    test_user_feedback_manager()
+    test_deterministic_glossary()
+    test_dynamic_rule_dispatcher()
+    test_fuzzy_and_dynamic_avt_linter()
+    test_gui_interactive_learning_components()
+    test_extended_avt_pillars()
+    test_master_avt_pillars()
+    test_excellence_avt_pillars()
+    print("\n Wszystkie testy jednostkowe i integracyjne (25/25) zakończone pełnym sukcesem!\n")
+

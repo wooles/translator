@@ -1,0 +1,36 @@
+{
+  "anime_title": "Kore Kaite Shine",
+  "characters": {
+    "Rei Teshima -> Hebichika-sensei": {
+      "description": "Zwrot: 'pani Sensei / Sensei' (asystentka -> autorka i mistrzyni)"
+    },
+    "Hebichika-sensei -> Rei Teshima": {
+      "description": "Zwrot: 'nowicjuszka / Teshima-chan' (główna autorka -> nowa asystentka)"
+    },
+    "Hana -> Rei Teshima": {
+      "description": "Zwrot: 'Rei-chan / Teshima-san' (redaktorka wydawnictwa -> autorka mangi)"
+    },
+    "Nana Teramura -> Rei Teshima": {
+      "description": "Zwrot: 'Rei-chan' (starsza asystentka -> młodsza asystentka)"
+    },
+    "Harue Natsukusa -> Hebichika-sensei": {
+      "description": "Zwrot: 'Sensei' (główna asystentka -> autorka mangi)"
+    }
+  },
+  "glossary": {
+    "Storyboard / Storyboards": "scenopis / nemu",
+    "One-shot": "one-shot / komiks jednorazowy",
+    "Serialization": "serializacja / publikacja w odcinkach",
+    "Tones / Screentones": "rastry / tony",
+    "Mapping nib": "stalówka mapowa / maru-pen",
+    "Foreshortened / Foreshortening": "skrót perspektywiczny",
+    "Vanishing points": "punkty zbiegu",
+    "Chief Assistant": "główna asystentka",
+    "Sweet Snake Strawberries": "Sweet Snake Strawberries",
+    "Heartbeat Love Romance": "Heartbeat Love Romance"
+  },
+  "relationships": {},
+  "episodes_translated": [
+    "tmpifcrjna7"
+  ]
+}

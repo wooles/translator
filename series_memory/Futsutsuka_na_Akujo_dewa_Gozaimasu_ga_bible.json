@@ -8,36 +8,57 @@
       "description": "Zwrot: 'Wasza Cesarska Mość' (Główna dama dworu -> Cesarzowa)"
     },
     "Kou Kenshuu (Cesarzowa) -> Shu Keigetsu": {
-      "description": "Zwrot: 'Shu Keigetsu / ty' (Cesarzowa -> Kandydatka z niższego klanu)"
+      "description": "Zwrot: 'Shu Keigetsu / po imieniu' (Władczyni -> Dama dworu)"
     },
     "Shin-U -> Kou Kenshuu": {
       "description": "Zwrot: 'Wasza Cesarska Mość' (Kapitan gwardii -> Cesarzowa)"
     },
     "Shin-U -> Shu Keigetsu": {
-      "description": "Zwrot: 'Panienko Shu / Shu Keigetsu' (Oficer gwardii -> Dama dworu)"
+      "description": "Zwrot: 'Pani Shu Keigetsu' (dowódca straży -> szlachcianka)"
     },
     "Leelee -> Shu Keigetsu": {
-      "description": "Zwrot: 'Panienko Keigetsu / Panienko' (Dama dworu / Służąca -> Jej pani)"
+      "description": "Zwrot: 'Moja Pani / Panienko Keigetsu' (służąca -> pani)"
     },
     "Ei Gyoumei -> Służba / Gwardia": {
       "description": "Zwrot: 'per wy / tryb rozkazujący' (Następca Tronu -> Podwładni)"
     },
     "Bunkou -> Shu Keigetsu": {
       "description": "Zwrot: 'Panienko Shu' (Eunuch -> Kandydatka klanu Shu)"
+    },
+    "Shu Keigetsu -> Kou Kenshuu (Cesarzowa)": {
+      "description": "Zwrot: 'Wasza Cesarska Mość' (poddana / kandydatka na dwór -> władczyni)"
+    },
+    "Ei Gyoumei (Książę) -> Kou Kenshuu (Cesarzowa)": {
+      "description": "Zwrot: 'Matko / Wasza Cesarska Mość' (Syn i Następca Tronu -> Cesarzowa)"
+    },
+    "Shin-U (Kapitan Jastrzębich Oczu) -> Shu Keigetsu": {
+      "description": "Zwrot: 'Panienko Keigetsu / Panienko z rodu Shu' (Dowódca Straży -> Dama dworu)"
+    },
+    "Shu Keigetsu -> Ei Gyoumei (Następca Tronu)": {
+      "description": "Zwrot: 'Wasza Wysokość' (poddana -> książę)"
+    },
+    "Kou Kenshuu (Cesarzowa) -> Kou Tousetsu": {
+      "description": "Zwrot: 'Tousetsu' (cesarzowa -> Główna Dama Dworu)"
     }
   },
   "glossary": {
-    "Bow of Warding": "Łuk Odpędzania Zła",
-    "Eagle Eyes": "Sokole Oczy",
+    "Bow of Warding": "Łuk Ochronny",
+    "Eagle Eyes": "Orle Oczy",
     "Court Lady / Maiden": "Dama Dworu / Kandydatka (Dama z Klanu)",
     "Noble Consort": "Szlachetna Małżonka / Szlachetna Konkubina",
     "Water qi": "Qi wody / Energia wody",
     "Violet Dragon's Spring": "Źródło Fioletowego Smoka",
     "Apothecary": "Medyk / Aptekarz",
-    "Eunuch": "Eunuch"
+    "Eunuch": "Eunuch",
+    "water qi / fire qi / earth qi": "qi wody / qi ognia / qi ziemi",
+    "Sogdian Whirl": "Taniec Sogdyjski",
+    "Archery Vigil": "Łucznicze Czuwanie",
+    "Water qi / Fire qi / Earth qi": "Qi Wody / Qi Ognia / Qi Ziemi"
   },
   "relationships": {},
   "episodes_translated": [
-    "tmpc7zbcf40"
+    "tmpc7zbcf40",
+    "tmp1udq4xn_",
+    "tmp1ne63jmr"
   ]
 }

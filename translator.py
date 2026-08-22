@@ -51,7 +51,7 @@ logging.getLogger("google_genai.models").setLevel(logging.ERROR)
 from google import genai
 from google.genai import types
 
-from rules import get_translation_system_prompt
+from rules import get_translation_system_prompt, get_focused_rules_for_batch
 from verifier import DialogueVerifier, RefinedLine
 from extract import extract_frame_at_timestamp, extract_audio_slice
 from metadata import get_anime_context, format_anime_context_for_prompt
@@ -66,6 +66,8 @@ from avt_formatter import split_subtitle_syntactically, calculate_cps
 from prosody_engine import AudioProsodyEngine
 from speaker_diarizer import SpeakerVoiceClassifier
 from typesetting_matcher import TypesettingColorMatcher
+from user_feedback import UserFeedbackManager
+from glossary_manager import GlossaryManager
 
 def extract_typesetting_tags(raw_text: str) -> Tuple[str, str]:
     """
@@ -247,6 +249,10 @@ class MultimodalTranslator:
         # Rejestr Oficjalnego Kanonu Polskich Wydań Mangowych (Waneko, JPF, Studio JG itp.)
         self.manga_canon = MangaCanonRegistry()
 
+        # Baza Osobistych Korekt Użytkownika (Few-Shot Golden Examples) oraz Słownik Deterministyczny
+        self.user_feedback = UserFeedbackManager()
+        self.glossary_manager = GlossaryManager()
+
         # Licznik rzeczywistych tokenów dla bieżącego odcinka
         self.current_episode_tokens: Dict[str, Any] = {"prompt": 0, "cached": 0, "output": 0, "model": self.model}
 
@@ -261,10 +267,16 @@ class MultimodalTranslator:
         series_bible_str: str = "",
         prosody_tags: Optional[Dict[int, str]] = None,
         speaker_tags: Optional[Dict[int, str]] = None,
-        manga_canon_str: str = ""
+        manga_canon_str: str = "",
+        user_feedback_str: str = "",
+        glossary_str: str = "",
+        focused_rules_str: str = ""
     ) -> str:
         """
         Tworzy tekst promptu dla danej paczki kwestii wraz z:
+        - Złotymi Wzorcami i Korektami Użytkownika (Few-Shot Golden Examples)
+        - Bezwzględnym Słownikiem Deterministycznym (Glossary Overrides)
+        - Skoncentrowanymi Filarami AVT (Context-Aware Focused Rules)
         - Oficjalnym Kanonem Mangi (Wydawnictwa Waneko, JPF, Studio JG itp.)
         - Biblią Serialu (Pamięć Międzyodcinkowa)
         - Profilem odcinka (Słowniczek i Macierz Relacji)
@@ -278,6 +290,18 @@ class MultimodalTranslator:
         - Ostrzeżeniami tempa czytania CPS
         """
         lines = []
+
+        # 00a. Osobiste Złote Wzorce i Korekty Użytkownika (Maksymalny Priorytet)
+        if user_feedback_str:
+            lines.append(user_feedback_str)
+
+        # 00b. Bezwzględny Słownik Pojęć i Nazw Użytkownika
+        if glossary_str:
+            lines.append(glossary_str)
+
+        # 00c. Skoncentrowana Uwaga i Właściwości Bieżącej Sceny (Eliminacja Lost in the Middle)
+        if focused_rules_str:
+            lines.append(focused_rules_str)
 
         # 0a. Oficjalny Kanon Polskiego Wydania Mangi
         if manga_canon_str:
@@ -686,6 +710,16 @@ class MultimodalTranslator:
         if series_bible_str:
             print(f"  [Biblia Serialu]: Wczytano ciągłość sezonu dla serii '{series_title or self.series_bible.slug}'")
 
+        # 0d. Połączony Słownik Użytkownika i Biblii Serialu (Deterministyczny)
+        series_gloss_dict = self.series_bible.data.get("glossary", {}) if hasattr(self, "series_bible") and self.series_bible else {}
+        combined_glossary = self.glossary_manager.get_combined_glossary(series_gloss_dict)
+        if combined_glossary:
+            print(f"  [Słownik Deterministyczny]: Aktywnych {len(combined_glossary)} żelaznych terminów.")
+
+        user_rules_cnt = len(self.user_feedback.list_all())
+        if user_rules_cnt > 0:
+            print(f"  [Korekty Użytkownika]: Wczytano {user_rules_cnt} złotych reguł (Few-Shot Prompting).")
+
         if episode_profile:
             if not manga_canon_entry and episode_profile.manga_canon_source:
                 print(f"  [Kanon Mangi]: Rozpoznano oficjalny polski przekład ({episode_profile.manga_canon_source})")
@@ -798,7 +832,24 @@ class MultimodalTranslator:
                     except Exception:
                         pass
 
-                # 3. Prompt tekstowy z bazą wiedzy AniList, rejestrem postaci, lookaheadem i cechami fonicznymi
+                # 3. Dynamiczne reguły kontekstowe, złote wzorce użytkownika i deterministyczny słownik
+                batch_en_queries = [item[2] for item in untranslated_in_batch]
+                relevant_feedback = self.user_feedback.find_relevant_feedback(
+                    batch_en_queries,
+                    anime_title=anime_meta.get("title", "") if anime_meta else ""
+                )
+                user_feedback_str = self.user_feedback.format_for_prompt(relevant_feedback)
+                glossary_str = self.glossary_manager.format_for_prompt(combined_glossary)
+                focused_rules_str = get_focused_rules_for_batch([
+                    {
+                        "en": item[2],
+                        "is_sign": detect_event_visual_type(item[1], item[3])["is_sign"],
+                        "speaker_gender": self.character_registry.get(item[1].name)
+                    }
+                    for item in untranslated_in_batch
+                ])
+
+                # 3b. Prompt tekstowy z bazą wiedzy AniList, rejestrem postaci, lookaheadem i cechami fonicznymi
                 prompt_text = self._prepare_batch_prompt(
                     untranslated_in_batch,
                     history,
@@ -809,7 +860,10 @@ class MultimodalTranslator:
                     series_bible_str=series_bible_str,
                     prosody_tags=prosody_tags,
                     speaker_tags=speaker_tags,
-                    manga_canon_str=manga_canon_str
+                    manga_canon_str=manga_canon_str,
+                    user_feedback_str=user_feedback_str,
+                    glossary_str=glossary_str,
+                    focused_rules_str=focused_rules_str
                 )
 
                 # 4. Wywołanie Gemini (Obraz + Tekst ze słuchu Whisper) - Zero opłat za streaming audio do Google!
@@ -896,12 +950,17 @@ class MultimodalTranslator:
                     })
 
                 # 6. Opcjonalna II faza weryfikatora (Redakcja Literacka)
+                all_user_rules = self.user_feedback.list_all()
+
                 if self.enable_verifier and hasattr(self, 'verifier'):
                     pbar.set_postfix_str("Faza 2 (Redakcja Dialogów Pro)...")
                     refined_lines: List[RefinedLine] = self.verifier.verify_batch(
                         batch_items=pass1_items,
                         scene_summary=scene_desc or "",
-                        episode_profile_str=episode_profile_str
+                        episode_profile_str=episode_profile_str,
+                        user_feedback_str=user_feedback_str,
+                        glossary_str=glossary_str,
+                        focused_rules_str=focused_rules_str
                     )
                     refined_dict = {r.id: sanitize_sub_text(r.refined_pl) for r in refined_lines}
                     for r in refined_lines:
@@ -913,10 +972,14 @@ class MultimodalTranslator:
                             text=raw_final,
                             speaker_gender=item.get("speaker_gender"),
                             is_all_girls_scene=True,
-                            is_sign=item.get("is_sign", False)
+                            is_sign=item.get("is_sign", False),
+                            user_feedback_rules=all_user_rules,
+                            custom_glossary=combined_glossary
                         )
-                        for fix in fixes:
-                            pbar.write(f"  [AVT Linter] {fix}")
+                        # Deterministyczny filtr terminologiczny
+                        final_text, gloss_fixes = GlossaryManager.apply_deterministic_overrides(final_text, combined_glossary)
+                        for fix in fixes + gloss_fixes:
+                            pbar.write(f"  [AVT Linter/Słownik] {fix}")
                         formatted_final = split_subtitle_syntactically(final_text, max_line_len=42, is_ass=is_ass)
                         translated_results[item["orig_idx"]] = formatted_final
                         history.append({"en": item["en"], "pl": formatted_final})
@@ -927,10 +990,14 @@ class MultimodalTranslator:
                             text=raw_final,
                             speaker_gender=item.get("speaker_gender"),
                             is_all_girls_scene=True,
-                            is_sign=item.get("is_sign", False)
+                            is_sign=item.get("is_sign", False),
+                            user_feedback_rules=all_user_rules,
+                            custom_glossary=combined_glossary
                         )
-                        for fix in fixes:
-                            pbar.write(f"  [AVT Linter] {fix}")
+                        # Deterministyczny filtr terminologiczny
+                        final_text, gloss_fixes = GlossaryManager.apply_deterministic_overrides(final_text, combined_glossary)
+                        for fix in fixes + gloss_fixes:
+                            pbar.write(f"  [AVT Linter/Słownik] {fix}")
                         formatted_final = split_subtitle_syntactically(final_text, max_line_len=42, is_ass=is_ass)
                         translated_results[item["orig_idx"]] = formatted_final
                         history.append({"en": item["en"], "pl": formatted_final})

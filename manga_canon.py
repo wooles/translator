@@ -644,6 +644,48 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Takemichi -> Mikey": "Mikey-kun / Mikey",
             "Draken -> Mikey": "Mikey / na ty"
         }
+    },
+    "nieuchwytny_samuraj": {
+        "title": "Nieuchwytny Samuraj (Nige Jouzu no Wakagimi / The Elusive Samurai)",
+        "aliases": [
+            "nieuchwytny samuraj",
+            "nige jouzu no wakagimi",
+            "nige jouzu no wakagimi s2",
+            "nige jouzu no wakagimi 2nd season",
+            "the elusive samurai",
+            "elusive samurai",
+            "nigejouzu no wakagimi",
+            "nigejouzu"
+        ],
+        "publisher": "Wydawnictwo Dango",
+        "glossary": {
+            "Elusive Samurai": "Nieuchwytny Samuraj",
+            "Suwa Grand Shrine": "Wielka Świątynia Suwa",
+            "Suwa Shrine": "Chram Suwa / Świątynia Suwa",
+            "Suwa Sect": "Nurt Suwa",
+            "Three Great Generals of the Suwa Sect": "Trzej Wielcy Generałowie Nurtu Suwa",
+            "Three Great Generals of Suwa": "Trzej Wielcy Generałowie Suwa",
+            "Hojo clan": "Ród Hōjō",
+            "Ashikaga clan": "Ród Ashikaga",
+            "Suwa clan": "Ród Suwa",
+            "Kamakura Shogunate": "Szogunat Kamakura",
+            "Kenmu Restoration": "Restauracja Kenmu",
+            "Nanboku-cho period": "Okres Nanboku-chō (Dwóch Dworów)",
+            "Nakasendai Rebellion": "Powstanie Nakasendai",
+            "Inuoumono": "Inuoumono (łucznictwo konne z psami)",
+            "Yabusame": "Yabusame (rytualne łucznictwo konne)",
+            "Kasagake": "Kasagake (łucznictwo do kapeluszy)",
+            "Lord of Kamakura": "Władca Kamakury / Pan na Kamakurze",
+            "Fukashi Fortress": "Twierdza Fukashi",
+            "Shinano Province": "Prowincja Shinano"
+        },
+        "character_forms": {
+            "Tokiyuki -> Yorishige": "panie Yorishige / Wasza Świątobliwość",
+            "Yorishige -> Tokiyuki": "panie Tokiyuki / panie młody",
+            "Shizuku -> Tokiyuki": "panie Tokiyuki",
+            "Kojiro -> Tokiyuki": "Tokiyuki / Wasza Dostojność",
+            "Ayako -> Tokiyuki": "Tokiyuki / paniczu Tokiyuki"
+        }
     }
 }
 
@@ -697,7 +739,7 @@ class MangaCanonRegistry:
             return ""
 
         lines = [
-            f"=== 📖 OFICJALNY KANON POLSKIEGO WYDANIA MANGI ({canon_entry.get('publisher', 'Oficjalne Wydawnictwo')}) ===",
+            f"=== [KANON] OFICJALNY KANON POLSKIEGO WYDANIA MANGI ({canon_entry.get('publisher', 'Oficjalne Wydawnictwo')}) ===",
             f"Dla serii '{canon_entry.get('title', 'Anime')}' BEZWZGLĘDNIE zachowaj poniższą kanoniczną terminologię:"
         ]
 
@@ -713,7 +755,7 @@ class MangaCanonRegistry:
             for rel, form_desc in list(char_forms.items())[:8]:
                 lines.append(f"  - {rel}: {form_desc}")
 
-        lines.append("⚠️ ZASADA AVT: Zachowaj kanoniczne nazwy, ale przy długich wypowiedziach stosuj zwięzłą polską składnię (limit 17 CPS).")
+        lines.append("(!) ZASADA AVT: Zachowaj kanoniczne nazwy, ale przy długich wypowiedziach stosuj zwięzłą polską składnię (limit 17 CPS).")
         lines.append("=========================================================================\n")
 
         return "\n".join(lines)

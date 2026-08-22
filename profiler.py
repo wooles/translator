@@ -50,13 +50,13 @@ def format_episode_profile_for_prompt(profile: Optional[EpisodeProfile]) -> str:
 
     lines = ["=== SŁOWNICZEK, REALIA ŚWIATA, DZIEDZINA I MACIERZ RELACJI (PROFILER ODCINKA) ==="]
     if profile.manga_canon_source:
-        lines.append(f"📖 Oficjalny polski kanon mangowy: {profile.manga_canon_source}")
+        lines.append(f"[Kanon Mangi]: {profile.manga_canon_source}")
     if profile.setting_and_era:
-        lines.append(f"🏛️ Epoka i realia świata: {profile.setting_and_era}")
+        lines.append(f"[Realia świata / Epoka]: {profile.setting_and_era}")
     if profile.domain_expertise:
-        lines.append(f"🍷 Dziedzina specjalistyczna: {profile.domain_expertise}")
+        lines.append(f"[Dziedzina specjalistyczna]: {profile.domain_expertise}")
     if profile.dialogue_stylization:
-        lines.append(f"📜 Stylizacja językowa i rejestr: {profile.dialogue_stylization}")
+        lines.append(f"[Stylizacja językowa]: {profile.dialogue_stylization}")
     if profile.episode_summary:
         lines.append(f"Fabuła odcinka: {profile.episode_summary}")
     if profile.tone_and_genre:
@@ -171,10 +171,10 @@ Zwróć wynik w formacie JSON zgodnym ze schematem EpisodeProfile."""
                 is_billing_exhausted = "prepayment" in err_str or "depleted" in err_str or ("billing" in err_str and "credit" in err_str)
                 if is_billing_exhausted:
                     print("\n" + "!" * 75)
-                    print("  ❌ [BŁĄD KONTA GOOGLE AI STUDIO / PŁATNOŚCI]:")
+                    print("  [!] [BŁĄD KONTA GOOGLE AI STUDIO / PŁATNOŚCI]:")
                     print("  Wyczerpały się środki przedpłacone (Prepayment Credits / Limit wydatków)!")
                     print("  Komunikat Google: 'Your prepayment credits are depleted.'")
-                    print("  👉 Wejdź na https://aistudio.google.com/ i doładuj środki, aby kontynuować.")
+                    print("  -> Wejdź na https://aistudio.google.com/ i doładuj środki, aby kontynuować.")
                     print("!" * 75 + "\n")
                     raise RuntimeError("Wyczerpane środki na koncie Google AI Studio (Prepayment Credits Depleted).")
 
@@ -186,7 +186,7 @@ Zwróć wynik w formacie JSON zgodnym ze schematem EpisodeProfile."""
                     next_idx = (current_model_idx + 1) % len(candidate_models)
                     if next_idx != current_model_idx:
                         print(f"\n[Profiler Odcinka]: Model {current_model} jest przeciążony u Google (503).")
-                        print(f"  ⚡ Płynne przełączenie na bezpośredni model flagowy {candidate_models[next_idx]} (100% jakość bez czekania)...")
+                        print(f"  [>>] Płynne przełączenie na bezpośredni model flagowy {candidate_models[next_idx]} (100% jakość bez czekania)...")
                         current_model_idx = next_idx
                         time.sleep(1)
                         continue
@@ -194,7 +194,7 @@ Zwróć wynik w formacie JSON zgodnym ze schematem EpisodeProfile."""
                 if is_unavailable or is_rate_limit:
                     wait_sec = min(4 + attempt * 2, 20)
                     print(f"\n[Profiler Odcinka]: Chwilowe przeciążenie serwerów Google (503/429 na {current_model}).")
-                    print(f"  ⏳ Utrzymuję najwyższą jakość profilu. Czekam {wait_sec}s na zwolnienie zasobów (próba #{attempt})...")
+                    print(f"  [..] Utrzymuję najwyższą jakość profilu. Czekam {wait_sec}s na zwolnienie zasobów (próba #{attempt})...")
                     time.sleep(wait_sec)
                 else:
                     wait_sec = min(4 + attempt * 2, 20)

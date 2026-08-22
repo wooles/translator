@@ -224,11 +224,11 @@ def format_anime_context_for_prompt(meta: Dict[str, Any]) -> str:
         lines.append(f"Gatunki: {', '.join(meta['genres'])}")
 
     if meta.get("setting_tags"):
-        lines.append(f"🏛️ Epoka i realia świata: {', '.join(meta['setting_tags'])}")
+        lines.append(f"[Realia świata / Epoka]: {', '.join(meta['setting_tags'])}")
 
     if meta.get("detected_domains"):
-        lines.append(f"🍷 Dziedzina specjalistyczna / Tematyka: {', '.join(meta['detected_domains'])}")
-        lines.append("⚠️ WYTYCZNA BRANŻOWA (FILAR XVI): Bezwzględny nakaz stosowania oficjalnej, profesjonalnej polskiej terminologii branżowej (np. w winie: 'szczep', 'rocznik', 'apelacja', 'taniny', 'kupaż', 'ciało wina'). ZAKAZ amatorskich kalek!")
+        lines.append(f"[Dziedzina specjalistyczna / Tematyka]: {', '.join(meta['detected_domains'])}")
+        lines.append("(!) WYTYCZNA BRANŻOWA (FILAR XVI): Bezwzględny nakaz stosowania oficjalnej, profesjonalnej polskiej terminologii branżowej (np. w winie: 'szczep', 'rocznik', 'apelacja', 'taniny', 'kupaż', 'ciało wina'). ZAKAZ amatorskich kalek!")
 
     if meta.get("description"):
         desc = meta["description"]
@@ -242,7 +242,7 @@ def format_anime_context_for_prompt(meta: Dict[str, Any]) -> str:
         for t in (meta.get("genres", []) + meta.get("setting_tags", []))
     )
     if is_historical:
-        lines.append("⚠️ WYTYCZNA STYLIZACJI: Seria osadzona w realiach dawnych/historycznych!")
+        lines.append("(!) WYTYCZNA STYLIZACJI: Seria osadzona w realiach dawnych/historycznych!")
         lines.append("   - Kategoryczny ZAKAZ współczesnego slangu młodzieżowego ('spoko', 'masakra', 'wkręcasz mnie').")
         lines.append("   - Stosuj szlachetny, epokowy rejestr języka polskiego, dopasowany do hierarchii społecznej i kultury tamtych czasów.")
 

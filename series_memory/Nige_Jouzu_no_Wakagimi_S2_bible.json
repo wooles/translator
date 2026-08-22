@@ -1,0 +1,101 @@
+{
+  "anime_title": "Nige Jouzu no Wakagimi S2",
+  "characters": {
+    "Yorishige Suwa -> Tokiyuki Hōjō": {
+      "description": "Zwrot: 'Panie Tokiyuki / Młody Panie' (opiekun i boski kapłan -> młody dziedzic rodu Hōjō)"
+    },
+    "Tokiyuki Hōjō -> Yorishige Suwa": {
+      "description": "Zwrot: 'Panie Yorishige' (młody pan -> opiekun i doradca)"
+    },
+    "Yukiyasu Unno -> Tokiyuki Hōjō (Chōjūmaru)": {
+      "description": "Zwrot: 'Chōjūmaru' (generał Suwy -> młody posłaniec pod ukrytym imieniem)"
+    },
+    "Tomomitsu Inukai -> Tokiyuki Hōjō (Chōjūmaru)": {
+      "description": "Zwrot: 'Młody kurierze / Chōjūmaru' (zarządca fortu -> posłaniec)"
+    },
+    "Tokiyuki Hōjō (Chojumaru) -> Mochizuki / Shinomiya / Nezu": {
+      "description": "Zwrot: 'panie Mochizuki / panie Shinomiya / panie Nezu' (młody dziedzic rodu Hōjō (incognito jako łącznik) -> feudalni dowódcy)"
+    },
+    "Ayako -> Lord Mochizuki": {
+      "description": "Zwrot: 'Ojcze / panie ojcze' (córka -> ojciec (dowódca rodu Mochizuki))"
+    },
+    "Muneie Tokoiwa / Mochizuki -> Tokiyuki Hōjō (Chojumaru)": {
+      "description": "Zwrot: 'Młody Panie / dzieciaku / Chojumaru' (feudalny dowódca -> pan feudalny / łącznik)"
+    },
+    "Sadamune Ogasawara -> Tokiyuki i towarzysze": {
+      "description": "Zwrot: 'bachorze / wy / szczury' (wrogi gubernator / dowódca -> Tokiyuki i jego Drużyna Nieuchwytnych)"
+    },
+    "Yorishige Suwa (Maska Shinano) -> Sadamune Ogasawara / Tokiyuki": {
+      "description": "Zwrot: 'Sadamune / Młody Panie' (boski opiekun i kapłan -> wrogi dowódca / podopieczny)"
+    },
+    "Tokiyuki Hojo -> Mochizuki / Shinomiya": {
+      "description": "Zwrot: 'panie Mochizuki / panie Shinomiya' (młody pan / dziedzic -> dowódcy i wasale)"
+    },
+    "Cesarz Go-Daigo -> Kiyohara": {
+      "description": "Zwrot: 'Kiyoharo' (cesarz -> poddany / urzędnik dworski)"
+    },
+    "Kiyohara -> Cesarz Go-Daigo": {
+      "description": "Zwrot: 'Wasza Cesarska Mość / Panie' (urzędnik -> cesarz)"
+    },
+    "Mochizuki -> Tokiyuki Hojo": {
+      "description": "Zwrot: 'młody panie / panie Tokiyuki' (generał Suwa -> młody pan)"
+    },
+    "Shokan -> Chojumaru": {
+      "description": "Zwrot: 'na ty / Chojumaru' (dowódca / strateg -> podwładny)"
+    },
+    "Tokiyuki Suwa -> Sojusznicy / Mochizuki": {
+      "description": "Zwrot: 'młody panie / panie Mochizuki' (młody dziedzic -> dowódcy i wasale)"
+    },
+    "Gubernator Kiyohara -> Cesarz Go-Daigo": {
+      "description": "Zwrot: 'Wasza Cesarska Mość' (urzędnik cesarski -> cesarz)"
+    },
+    "Mochizuki -> Ród Shinomiya": {
+      "description": "Zwrot: 'panie Shinomiya' (jeden z Trzech Wielkich Generałów -> sojusznicze rody)"
+    },
+    "Shokan -> Sadamune Ogasawara": {
+      "description": "Zwrot: 'panie Sadamune' (strateg -> sojuszniczy dowódca)"
+    }
+  },
+  "glossary": {
+    "Three Great Generals of the Suwa Sect": "Trzej Wielcy Generałowie Nurtu Suwa",
+    "Suwa Grand Shrine": "Wielka Świątynia Suwa",
+    "Hojo clan": "Ród Hōjō",
+    "Fukashi Fort": "Fort Fukashi",
+    "Imperial command": "Rozkaz cesarski",
+    "Young Lord": "Młody Pan",
+    "Provincial Official": "Gubernator prowincji",
+    "Shinano Mask / Suwa Mask": "Maska Shinano / Maska Suwa",
+    "Pincer attack": "Atak kleszczowy",
+    "Elusive Samurai": "Nieuchwytny Samuraj",
+    "Suwa Shrine": "Chram Suwa / Świątynia Suwa",
+    "Suwa Sect": "Nurt Suwa",
+    "Three Great Generals of Suwa": "Trzej Wielcy Generałowie Suwa",
+    "Ashikaga clan": "Ród Ashikaga",
+    "Suwa clan": "Ród Suwa",
+    "Kamakura Shogunate": "Szogunat Kamakura",
+    "Kenmu Restoration": "Restauracja Kenmu",
+    "Nanboku-cho period": "Okres Nanboku-chō (Dwóch Dworów)",
+    "Nakasendai Rebellion": "Powstanie Nakasendai",
+    "Inuoumono": "Inuoumono (łucznictwo konne z psami)",
+    "Yabusame": "Yabusame (rytualne łucznictwo konne)",
+    "Kasagake": "Kasagake (łucznictwo do kapeluszy)",
+    "Lord of Kamakura": "Władca Kamakury / Pan na Kamakurze",
+    "Fukashi Fortress": "Twierdza Fukashi",
+    "Shinano Province": "Prowincja Shinano",
+    "Mikoshi / Battle Mikoshi": "Mikoshi / bojowa lektyka",
+    "Provincial Official / Kokushi": "Gubernator prowincji / urzędnik cesarski",
+    "Emperor Godaigo": "Cesarz Go-Daigo",
+    "Elusive Warriors": "Uciekający Wojownicy",
+    "Battle mikoshi": "bojowa mikoshi",
+    "Provincial Official (Kokushi)": "gubernator prowincji",
+    "Suwa Myojin": "Suwa Myōjin"
+  },
+  "relationships": {},
+  "episodes_translated": [
+    "tmpnbh3evgk",
+    "tmpn97a1c8n",
+    "Kanon Mangi",
+    "tmp53xv6q4n",
+    "tmpgvm6hevq"
+  ]
+}

@@ -30,7 +30,10 @@ class DialogueVerifier:
         self,
         batch_items: List[Dict[str, Any]],
         scene_summary: str = "",
-        episode_profile_str: str = ""
+        episode_profile_str: str = "",
+        user_feedback_str: str = "",
+        glossary_str: str = "",
+        focused_rules_str: str = ""
     ) -> List[RefinedLine]:
         """
         Przeprowadza redakcję i weryfikację paczki dialogów.
@@ -43,6 +46,13 @@ class DialogueVerifier:
         prompt_lines = []
         prompt_lines.append("Zredaguj poniższe kwestie dialogowe. BEZWZGLĘDNIE wyeliminuj dosłowne tłumaczenie 1 do 1, sztuczne konstrukcje i kalki.")
         prompt_lines.append("Zastąp drewniane sformułowania żywym, potoczystym językiem polskim mówionym (tak jak w profesjonalnym dubbingu / u polskich nastolatków):")
+        
+        if user_feedback_str:
+            prompt_lines.append(f"\n{user_feedback_str}\n")
+        if glossary_str:
+            prompt_lines.append(f"\n{glossary_str}\n")
+        if focused_rules_str:
+            prompt_lines.append(f"\n{focused_rules_str}\n")
         if episode_profile_str:
             prompt_lines.append(f"\n{episode_profile_str}\n")
         if scene_summary:
