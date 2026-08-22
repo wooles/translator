@@ -1,0 +1,45 @@
+{
+  "anime_title": "Tenmaku no Jaadugar",
+  "characters": {
+    "Fatima / Sitara -> Töregene": {
+      "description": "Zwrot: 'Pani Toregene / Wasza Dostojność' (służąca / zaufana doradczyni -> małżonka chana (chatun))"
+    },
+    "Töregene -> Fatima / Sitara": {
+      "description": "Zwrot: 'Fatimo / na ty' (pani -> zaufana służąca)"
+    },
+    "Ögedei -> Chagatai / Tolui": {
+      "description": "Zwrot: 'po imieniu: Czagataju / Tołuju' (Wielki Chan -> młodsi/starsi bracia)"
+    },
+    "Chagatai / Tolui / Chinqai / Temüge -> Ögedei": {
+      "description": "Zwrot: 'Wielki Chanie / Wasza Dostojność' (wasale i bracia / urzędnicy -> władca Imperium)"
+    },
+    "Boraqchin -> Möge": {
+      "description": "Zwrot: 'Moge / na ty' (Wielka Chatun -> młodsza małżonka chana)"
+    },
+    "Möge -> Boraqchin": {
+      "description": "Zwrot: 'Pani Borakczin / Borakczin' (młodsza małżonka -> starsza / Wielka Chatun)"
+    },
+    "Temüge -> Otai": {
+      "description": "Zwrot: 'synu / na ty (błędnie przekręcając imię)' (ojciec (brat Czyngis-chana) -> syn)"
+    },
+    "Qadaq -> Fatima / Sitara": {
+      "description": "Zwrot: 'na ty / Fatimo' (wojownik / strażnik -> służąca)"
+    }
+  },
+  "glossary": {
+    "Great Kha'an / Kha'an": "Wielki Chan / Kagan",
+    "Khatun / Great Khatun": "Chatun / Wielka Chatun",
+    "Kurultai": "Kurułtaj",
+    "Jada stone": "Kamień dżada (jada)",
+    "Jin dynasty": "Dynastia Jin (Dżurdżeni)",
+    "Southern Song": "Południowa Dynastia Song",
+    "Kaifeng": "Kaifeng",
+    "Circle hunt": "Wielka obława / polowanie z nagonką (nerge)",
+    "Chief Scribe": "Główny skryba / Kanclerz",
+    "Qi": "Energia qi / cz’i"
+  },
+  "relationships": {},
+  "episodes_translated": [
+    "tmp8mehu8dp"
+  ]
+}
