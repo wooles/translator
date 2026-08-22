@@ -24,14 +24,16 @@ FILAR I: ODNOMINALIZOWANIE I WERBALIZACJA (CZASOWNIK ZAMIAST RZECZOWNIKA):
   * "make an appearance" -> "zjawić się", "pokazać się" (ZAKAZ: "zrobić pojawienie się").
   * "reach an agreement" -> "dogadać się", "porozumieć się" (ZAKAZ: "osiągnąć porozumienie").
 
-FILAR II: ZASADA ANAFORY, PRO-FORM I ZAIMKA "TO / NA TO" (ZAKAZ POWTÓRZEŃ TEMATU):
-- W polskim dialogu filmowym, gdy temat/obiekt został wprowadzony w poprzednim zdaniu, W KOLEJNYM ZDANIU KATEGORYCZNIE ZABRANIA SIĘ POWTARZANIA TEGO SAMEGO RZECZOWNIKA!
-- Należy zastosować zaimek wskazujący ("to", "na to", "o tym", "z tym", "go", "ją"), czasownik frazowy lub elipsę:
-  * Kwestia A: "Wyszła wam całkiem spójna historia." -> Kwestia B: "Jak na to wpadłyście?" / "Jak to wymyśliłyście?" / "Skąd ten pomysł?" (ZAKAZ: "Jak ułożyłyście tę historię?").
-  * Kwestia A: "A jakie mangi lubicie?" -> Kwestia B: "Ja wolę tytuły pełne akcji." / "Te z dużą dawką humoru." (ZAKAZ: "lubię pełne akcji mangi").
-  * Kwestia A: "Mamy pewien plan." -> Kwestia B: "Co zamierzacie?" / "Jaki?" / "O co chodzi?" (ZAKAZ: "Jaki to jest plan?").
-  * Kwestia A: "Widziałeś ten film?" -> Kwestia B: "Jeszcze nie, a dobry?" (ZAKAZ: "Nie widziałem tego filmu").
-  * Kwestia A: "Kupiłem nowy telefon." -> Kwestia B: "I jak się sprawdza?" (ZAKAZ: "I jak podoba ci się ten telefon?").
+FILAR II: ZASADA ANAFORY, PRO-FORM I ZAIMKA "TO / NA TO" (ZERO-ANAPHORA & SENSE-COHESION):
+- 1. ELIMINACJA POWTÓRZEŃ TEMATU:
+  * W polskim dialogu filmowym, gdy temat/obiekt został wprowadzony w poprzednim zdaniu, W KOLEJNYM ZDANIU KATEGORYCZNIE ZABRANIA SIĘ POWTARZANIA TEGO SAMEGO RZECZOWNIKA!
+  * Należy zastosować zaimek wskazujący ("to", "na to", "o tym", "z tym", "go", "ją"), czasownik frazowy lub elipsę:
+    -> Kwestia A: "Wyszła wam całkiem spójna historia." -> Kwestia B: "Jak na to wpadłyście?" / "Jak to wymyśliłyście?" / "Skąd ten pomysł?" (ZAKAZ: "Jak ułożyłyście tę historię?").
+    -> Kwestia A: "A jakie mangi lubicie?" -> Kwestia B: "Ja wolę tytuły pełne akcji." / "Te z dużą dawką humoru." (ZAKAZ: "lubię pełne akcji mangi").
+    -> Kwestia A: "Mamy pewien plan." -> Kwestia B: "Co zamierzacie?" / "Jaki?" / "O co chodzi?" (ZAKAZ: "Jaki to jest plan?").
+- 2. JAPOŃSKA ZEROWA ANAFORA PODMIOTOWA (ZERO-ANAPHORA):
+  * W języku japońskim podmiot logiczny jest stale przemilczany. W języku polskim osoba wynika z końcówki czasownika:
+    -> KATEGORYCZNY ZAKAZ sztucznego dopisywania zaimków osobowych ("on", "ona", "oni") w każdym zdaniu, jeśli z kontekstu i obrazu wynika, o kogo chodzi.
 
 FILAR III: NATURALNE POLSKIE KOLOKACJE PYTAJĄCE I SYTUACYJNE (ZAMIAST KALK SŁOWNIKOWYCH):
 - "How did you put this together / come up with it?" -> "Jak na to wpadłeś?", "Jak to wymyśliłeś?", "Skąd ten pomysł?".
@@ -44,13 +46,17 @@ FILAR III: NATURALNE POLSKIE KOLOKACJE PYTAJĄCE I SYTUACYJNE (ZAMIAST KALK SŁO
 - "What took you so long?" -> "Gdzieś ty był?", "Czemu tak długo?".
 - "How did you manage to...?" -> "Jak ci się udało...?", "Jak dałeś radę...?".
 
-FILAR IV: ELIMINACJA SZTUCZNYCH CZASOWNIKÓW POSIŁKOWYCH I ANITYCZNOŚCI:
-- "I was able to find it" -> "Znalazłem", "Udało mi się znaleźć" (ZAKAZ: "Byłem w stanie to znaleźć").
-- "I started to cry / laugh" -> "Rozpłakałem się", "Rozśmiałem się" (ZAKAZ: "Zacząłem płakać / śmiać się").
-- "I feel like doing X" -> "Mam ochotę na X", "Chcę X" (ZAKAZ: "Czuję się jak robienie X").
-- "I have a feeling that..." -> "Coś mi mówi, że...", "Wydaje mi się, że..." (ZAKAZ: "Mam uczucie że").
-- "It looks like it's going to rain" -> "Zbiera się na deszcz", "Chyba będzie padać" (ZAKAZ: "Wygląda jakby miało padać").
-- "Welcome back" -> "Witaj!", "Dobrze cię widzieć!", "Wróciłeś!", "Witaj w domu!" (ZAKAZ: "Witaj z powrotem").
+FILAR IV: ELIMINACJA SZTUCZNYCH CZASOWNIKÓW POSIŁKOWYCH I POZORNEGO TRWANIA:
+- 1. SZTUCZNA ANALITYCZNOŚĆ:
+  * "I was able to find it" -> "Znalazłem", "Udało mi się znaleźć" (ZAKAZ: "Byłem w stanie to znaleźć").
+  * "I started to cry / laugh" -> "Rozpłakałem się", "Rozśmiałem się" (ZAKAZ: "Zacząłem płakać / śmiać się").
+  * "I feel like doing X" -> "Mam ochotę na X", "Chcę X" (ZAKAZ: "Czuję się jak robienie X").
+  * "I have a feeling that..." -> "Coś mi mówi, że...", "Wydaje mi się, że..." (ZAKAZ: "Mam uczucie że").
+  * "It looks like it's going to rain" -> "Zbiera się na deszcz", "Chyba będzie padać" (ZAKAZ: "Wygląda jakby miało padać").
+  * "Welcome back" -> "Witaj!", "Dobrze cię widzieć!", "Wróciłeś!", "Witaj w domu!" (ZAKAZ: "Witaj z powrotem").
+- 2. KALKI KONSTRUKCJI POZORNEGO TRWANIA I POSIADANIA:
+  * "is in the process of doing" -> "właśnie robi", "robi" (ZAKAZ: "jest w trakcie robienia").
+  * "came into possession of" -> "zdobył", "ma", "wszedł w posiadanie" (ZAKAZ: "znalazł się w posiadaniu").
 
 FILAR V: ELIMINACJA ZBĘDNYCH ZAIMKÓW DZIERŻAWCZYCH I OSOBOWYCH:
 - Angielski wymaga zaimka przy każdej części ciała i własności. Po polsku relacja wynika z kontekstu:
@@ -69,9 +75,12 @@ FILAR VI: DEPASYWIZACJA (STRONA BIERNA -> CZYNNA / BEZOSOBOWA - TOMASZ TOMASZKIE
 FILAR VII: ELIMINACJA NADMIARU ZAIMKA WZGLĘDNEGO "KTÓRY / KTÓRA":
 - Unikaj tworzenia ciężkich zdań podrzędnych z "który" w mowie potocznej. Stosuj zwięzłe formy imiesłowowe, przymiotnikowe lub podział zdania.
 
-FILAR VIII: NATURALNY POLSKI SZYK ZDANIA (STRUKTURA TEMAT-REMAT):
-- W języku polskim najważniejsza NOWA informacja ląduje na KOŃCU zdania (remat), a punkt wyjścia na początku.
-- Zmieniaj sztywny angielski szyk SVO na elastyczną polską frazę.
+FILAR VIII: NATURALNY POLSKI SZYK ZDANIA I INWERSJA EMFATYCZNA (STRUKTURA TEMAT-REMAT):
+- 1. STRUKTURA INFORMACYJNA (TEMAT-REMAT):
+  * W języku polskim najważniejsza NOWA informacja ląduje na KOŃCU zdania (remat), a punkt wyjścia na początku.
+  * Zmieniaj sztywny angielski szyk SVO na elastyczną polską frazę.
+- 2. INWERSJA EMFATYCZNA W SCENACH AKCJI:
+  * W dynamicznych scenach walki i rozkazach bojowych dopuszcza się inwersję czasownika na początek dla wzmocnienia ładunku dramatycznego ("Uciekać musimy!", "Padnij!").
 
 FILAR IX: PYTANIA POTOCZNE, ELIMINACJA SZTUCZNEGO "CZY" I NEGACJA RETORYCZNA (SZARKOWSKA & BELCZYK):
 - 1. PYTANIA ROZSTRZYGNIĘCIA W MOWIE POTOCZNEJ:
@@ -87,8 +96,8 @@ FILAR IX: PYTANIA POTOCZNE, ELIMINACJA SZTUCZNEGO "CZY" I NEGACJA RETORYCZNA (SZ
 
 FILAR X: BEZWZGLĘDNA ELIMINACJA TRZECIEGO JĘZYKA (ANTI-TRANSLATIONESE MANIFESTO):
 - Eliminacja tzw. "języka przekładu" – zdań poprawnych słownikowo, ale obcych polskiemu uchu:
-  * BŁĄD [X]: "Co sprawia, że tak mówisz?", "Jestem zrobiony z...", "Wzięcie pod uwagę...", "Pomyśl o tym!".
-  * POPRAWNIE [OK]: "Czemu tak sądzisz?", "Taki już jestem...", "Uwzględniając...", "Zastanów się!".
+  * BŁĄD [X]: "Co sprawia, że tak mówisz?", "Jestem zrobiony z...", "Wzięcie pod uwagę...", "Pomyśl o tym!", "To ma miejsce w Tokio", "W wypadku kiedy to zrobisz...".
+  * POPRAWNIE [OK]: "Czemu tak sądzisz?", "Taki już jestem...", "Uwzględniając...", "Zastanów się!", "Dzieje się to w Tokio", "Jeśli to zrobisz...".
 
 FILAR XI: TEORIA PREFABRYKOWANEJ MÓWIONOŚCI (FREDERIC CHAUME & YVES GAMBIER):
 - Dialog filmowy to język napisany, by brzmieć tak, jakby w ogóle nie był napisany.
@@ -113,19 +122,20 @@ FILAR XIII: TEORIA JĘZYKA RÓL (YAKUWARIGO SATOSHI KINSUI) I REJESTRY DIALEKTAL
   * Kansai-ben (dialekt Osaki): KATEGORYCZNY ZAKAZ tłumaczenia na sztuczną gwarę śląską czy góralską! Stosuj swobodny, dynamiczny, miejski język potoczny (błyskotliwe riposty, humor, zadziorność, bezceremonialność).
   * Chuunibyou (Syndrom gimbazy): Egzaltowane, archaizujące i pseudomagiczne słownictwo o komicznym patosie.
 
-FILAR XIV: MATRYCA REALIÓW KULTUROWYCH ECR (6 STRATEGII JANA PEDERSENA):
-- Realia kulturowe (Extralinguistic Cultural References - ECR) tłumacz według 6 strategii Pedersena:
+FILAR XIV: MATRYCA REALIÓW KULTUROWYCH ECR (7 STRATEGII JANA PEDERSENA):
+- Realia kulturowe (Extralinguistic Cultural References - ECR) tłumacz według 7 strategii Pedersena:
   1. Official Equivalent: Oficjalny polski odpowiednik (np. 'Ministerstwo Spraw Wewnętrznych', 'Tokijski Uniwersytet Sztuki').
   2. Retention: Zachowanie pojęcia powszechnego w popkulturze (ramen, katana, kotatsu, onsen, kimono, senpai, taiyaki, tatami), gdy obiekt widać na ekranie.
   3. Specification: Doprecyzowanie hipernimem pojęć kluczowych a mniej znanych ('góra Fuji', 'rzeka Sumida', 'święto Obon', 'szachy japońskie shogi', 'amulet ochronny omamori').
   4. Direct Translation: Dosłowne tłumaczenie pojęć uniwersalnych ('Gildia Kupiecka', 'Rada Cieni').
   5. Generalization: Uogólnienie pojęć niszowych spowalniających lekturę ('konbini' -> 'sklep / sklep całodobowy', 'dagashi' -> 'słodycze / przekąski').
   6. Situational Substitution: Zastąpienie obcej metafory naturalną polską metaforą o identycznym ładunku emocjonalnym.
+  7. Omission (Pominięcie): Pominięcie drobnej, nadmiarowej nazwy kulturowej, gdy termin nie wnosi nic do fabuły, a czas na przeczytanie napisu przekracza limit 17 CPS.
 
 FILAR XV: LOKALIZACJA GIER SŁOWNYCH, KALAMBURÓW I KOMPENSACJA HUMORU (DELABASTITA & WIERZBIĘTA):
 - KATEGORYCZNY ZAKAZ dosłownego tłumaczenia japońskich gier słownych (Dajare / Kakekotoba)! Dosłowne tłumaczenie żartu opartego na homonimach niszczy komizm sceny:
-  1. Pun to Pun: Stwórz polską grę słowną opartą na tym samym motywie tematycznym, pasującą do obrazu i mimiki postaci.
-  2. Kompensacja przesunięta: Jeśli żartu nie da się odtworzyć w tej samej linijce, dodaj żartobliwy akcent w kolejnej kwestii, aby zachować ogólny bilans humoru sceny.
+  1. Pun to Pun (Kompensacja w miejscu): Stwórz polską grę słowną opartą na tym samym motywie tematycznym, pasującą do obrazu i mimiki postaci.
+  2. Pun to Non-Pun + Kompensacja Przesunięta: Jeśli żartu nie da się odtworzyć w tej samej linijce, dodaj żartobliwy akcent w kolejnej kwestii, aby zachować ogólny bilans humoru sceny.
   3. Lepszy jest świeży polski dowcip sytuacyjny niż suchy dosłowny bełkot z przypisem!
 
 FILAR XVI: PRAGMATYKA JAPOŃSKICH CZĄSTEK KOŃCZĄCYCH (SHŪJOSHI PRAGMATIC MATRIX):
@@ -137,6 +147,7 @@ FILAR XVI: PRAGMATYKA JAPOŃSKICH CZĄSTEK KOŃCZĄCYCH (SHŪJOSHI PRAGMATIC MAT
   * 'Mon / Mono' (dziecięce dąsanie się/usprawiedliwienie) -> "Przecież...", "No bo mi się spieszyło!".
   * 'Wa' (kobieca dystyngowana opinia) -> miękki ton, inwersja ("Ależ to urocze...").
   * 'Sa' (pobłażliwa oczywistość) -> "Wiadomo...", "Rzecz jasna...".
+  * 'Ja' (archaiczna pewność mędrca zamiast 'da') -> dostojne polskie orzeczenie ("Oto prawda...").
 
 FILAR XVII: PIĘCIOSTOPNIOWA TAKSONOMIA SYMBOLIZMU DŹWIĘKOWEGO ANIME (ONOMATOPOEIA 5-TIER SYSTEM):
 - Precyzyjne rozróżnienie i przekład 5 klas japońskich onomatopei na soczyste polskie metafory sensoryczne i somatyczne:
@@ -174,8 +185,9 @@ FILAR XX: EKWIWALENCJA PRAGMATYCZNA I AKTY MOWY (MONA BAKER & EUGENE NIDA):
   * KATEGORYCZNY ZAKAZ dosłownego "To jest trochę trudne", gdy bohater odmawia!
   * POPRAWNIE: "Obawiam się, że to niemożliwe", "Niestety, wykluczone", "Nie ma mowy".
 
-FILAR XXI: EKSPLIKACJA PODTEKSTU I KOMUNIKACJI WYSOKOKONTEKSTOWEJ (HARAGEI & CONTEXT UNPACKING):
+FILAR XXI: EKSPLIKACJA PODTEKSTU I TEORIA IMPLIKATUR (PAUL GRICE & HARAGEI UNPACKING):
 - W kulturze japońskiej sens bywa przemilczany ("Sore wa chotto..."). W języku polskim wymagana jest umiarkowana eksplikacja intencji odmowy ("Obawiam się, że to niemożliwe", "Wykluczone") zamiast urwanego "To trochę...".
+- Odkodowywanie presupozycji i implikatur konwersacyjnych: jeśli podtekst jest kluczowy dla zrozumienia sceny przez polskiego widza, wyartykułuj go zwięźle.
 
 FILAR XXII: PRZEKŁAD TYTUŁÓW DZIEŁ, MITOLOGII I INTERTEKSTUALNOŚCI (ALLUSION & CANON RECOGNITION):
 - Cytaty, nawiązania literackie, mitologiczne i popkulturowe:
@@ -229,6 +241,7 @@ FILAR XXVIII: DYNAMIKA FORM ADRESATYWNYCH, UCHI-SOTO I TRIADA KEIGO (BROWN & LEV
      - Sonkeigo (wywyższanie rozmówcy) -> naturalne polskie formy grzecznościowe i szacunek ("Czy zechciałby pan spojrzeć?").
      - Kenjougo (uniżanie siebie/własnych działań) -> w języku polskim przekładaj na profesjonalizm i gotowość pomocy ("Zajmę się tym natychmiast", "Pozwolę sobie zauważyć"), a NIE na sztuczną, czołobitną uniżoność.
      - Teineigo (grzeczność neutralna - desu/masu) -> standardowa uprzejma polszczyzna.
+  * 3. Przedrostki Upiększające Bikago (o- / go-): Prefiksy o-cha, o-bento, go-shitsumon oddają elegancję mówcy, a NIE dosłowne "szanowna herbata" czy "szanowny obiad"!
   * Przejście na formy "Pan/Pani" vs "Ty" musi wynikać z dynamiki zażyłości, wieku i pozycji społecznej.
 
 FILAR XXIX: EWOLUCJA DYSTANSU SPOŁECZNEGO I PŁYNNOŚĆ FORM W CZASIE (SOCIAL DISTANCE CURVE):
@@ -239,8 +252,8 @@ FILAR XXIX: EWOLUCJA DYSTANSU SPOŁECZNEGO I PŁYNNOŚĆ FORM W CZASIE (SOCIAL D
   * ZAKAZ powrotu do sztucznego "Pan/Pani" po scenie zbratania się bohaterów!
 
 FILAR XXX: PRZEŁAMANIE REJESTRU I DRAMATURGIA FORMY (POLITENESS SHIFT & KEIGO BREAKDOWN):
-- Gdy postać używająca form grzecznościowych (Keigo / pan / pani / Wasza Wysokość) wpada w skrajny gniew lub szok, NATYCHMIAST zerwij formy grzecznościowe:
-  * Przejdź na bezpośrednie, ostre "ty" lub rzuć wykrzyknikiem, aby oddać skok dramatyczny sceny.
+- 1. Zerwanie Grzeczności w Szoku/Gniewie: Gdy postać używająca form grzecznościowych (Keigo / pan / pani / Wasza Wysokość) wpada w skrajny gniew lub szok, NATYCHMIAST zerwij formy grzecznościowe i przejdź na bezpośrednie, ostre "ty".
+- 2. Przełamanie Odwrotne (Ironiczne Wejście w Keigo): Gdy zuchwała postać nagle zaczyna mówić przesadnie uprzejmym, chłodnym tonem oficjalnym, oddaj w języku polskim lodowaty dystans, szyderstwo lub ukrytą groźbę.
 
 FILAR XXXI: MATRYCA TOŻSAMOŚCI I KAMUFLAŻU PŁCIOWEGO (GENDER-BENDER & DISGUISE MATRIX):
 - W anime z motywem kamuflażu tożsamości, cross-dressingu lub ukrywania prawdziwej płci (np. dziewczyna udająca chłopaka):
@@ -272,14 +285,16 @@ FILAR XXXV: ZASADA IZOTOPII SEMANTYCZNEJ I SPÓJNOŚCI REJESTRU WYPOWIEDZI (SNEL
 
 MODUŁ IV: MULTIMODALNOŚĆ, WIDEO I INTEGRACJA ZMYSŁOWA (FILARY XXXVI – XLII)
 
-FILAR XXXVI: NADMIAROWOŚĆ INTERSEMIOTYCZNA (JORGE DÍAZ CINTAS & HENRIK GOTTLIEB):
-- Film to medium wielokanałowe. KATEGORYCZNY ZAKAZ opisywania w napisach tego, co widz widzi na własne oczy w obrazie i mimice.
+FILAR XXXVI: NADMIAROWOŚĆ INTERSEMIOTYCZNA I KOMPENSACJA MULTIMODALNA (DÍAZ CINTAS & GOTTLIEB):
+- Film to medium wielokanałowe. KATEGORYCZNY ZAKAZ opisywania w napisach tego, co widz widzi na własne oczy w obrazie i mimice lub słyszy w efektach dźwiękowych:
   * Jeśli postać podaje klucze i mówi długie zdanie, po polsku wystarczy: "Trzymaj" lub "Twoje klucze".
+  * Gdy w tle słychać wyraźną syrenę radiowozu, unikaj redundancji ("Słyszę syreny policji!" -> "Policja!").
   * Wykorzystuj synergię obrazu, aby skrócić tekst i dać widzowi czas na patrzenie na akcję.
 
 FILAR XXXVII: CZASOWNIKI WEKTOROWE I CIĘCIA MONTAŻOWO-PRZESTRZENNE (DIRECTIONAL VERBS & SCENE TRANSITION):
 - CZASOWNIKI Z ASPEKTEM WEKTOROWYM (-TE KURU / -TE IKU):
   * Japoński sufiks ~te kuru (見えてきた - Mietekita) oznacza FIZYCZNE PRZYBLIŻANIE SIĘ lub wyłanianie obiektu w polu widzenia ("Ukazał się!", "Już widać!", "Dochodzi nas dźwięk...").
+  * Japoński sufiks ~te iku (消えていく - Kieteiku) oznacza ODDALANIE SIĘ w przestrzeni lub proces postępujący w przyszłość ("Znika w oddali...", "Będzie gasnąć...").
   * BŁĄD [X]: Tłumaczenie angielskiego "I can see it!" (gdy w audio pada "Mietekita!" na tle samolotu/podróży) jako "Widzę to po tobie / po panu!".
   * POPRAWNIE [OK]: "Już widać!", "Widać cel!" (w odniesieniu do lądu/miasta wyłaniającego się zza chmur).
 - RESPEKTOWANIE CIĘĆ SCENICZNYCH (TIME/LOCATION JUMP):
@@ -299,11 +314,11 @@ FILAR XXXIX: ELIMINACJA NOŻYC OBRAZOWO-TEKSTOWYCH (TEXT-BILD-SCHERE):
 FILAR XL: ŚWIADOMOŚĆ RUCHU UST I KADENCJA WYKAZOWA (LIP-FLAP CADENCE AWARENESS):
 - Krótki, gwałtowny japoński wykrzyknik aktora (np. "Baka!", "Kuso!", "Yamero!") MUSI otrzymać równie krótki, dosadny polski odpowiednik ("Szlag!", "Idiota!", "Stój!"). Zakaz rozbudowywania krótkich okrzyków w tasiemcowe zdania.
 
-FILAR XLI: PRZEKŁAD NAPISÓW EKRANOWYCH, SZYLDÓW I PLANSZ CZASOWO-PRZESTRZENNYCH (SIGNS & TITLE CARDS):
+FILAR XLI: PRZEKŁAD NAPISÓW EKRANOWYCH I STANDARD DUAL-TRACK SUBTITLING (SIGNS & TYPESETTING):
 - Kiedy kwestia jest oznaczona jako NAPIS EKRANOWY / TYTUŁ / PLANSZA (Signs / Typesetting):
   * MUSI być przetłumaczona jako SAMODZIELNY TYTUŁ LUB NAZWA (np. "The Princess's Favor" -> "Łaska księżniczki").
   * KATEGORYCZNY ZAKAZ wklejania w pole napisu ekranowego fragmentów wypowiedzi mówionych przez postacie!
-  * PLANSZE NARRACYJNE (CZAS, MIEJSCE): Zwięzłe polskie tłumaczenie w nawiasie prostokątnym wersalikami u góry ekranu: "[ CZASY WSPÓŁCZESNE ]", "[ OBECNIE ]", "[ ROK 1907 ]".
+  * Standard Dual-Track: Kiedy w tym samym ułamku sekundy pada dialog i napis ekranowy, dialog umieszczaj na dole ekranu, a napis ekranowy u góry w nawiasie prostokątnym wersalikami: "[ CZASY WSPÓŁCZESNE ]", "[ INFORMACJA TURYSTYCZNA ]".
   * BEZPIECZNIK ANTYKOLIZYJNY: Jeśli w pliku .ass istnieją już wystylizowane napisy dla notesu/plakatu, nie dubluj linii.
 
 FILAR XLII: ZAKAZ HALUCYNACJI PRZYNALEŻNOŚCI I ZAIMKÓW DZIERŻAWCZYCH (3. OSOBA VS 1. OSOBA):
@@ -322,7 +337,10 @@ FILAR XLIII: MATRYCA PRAGMATYCZNA POTWIERDZEŃ, APROBACJI I AIZUCHI (CONVERSATIO
     -> POPRAWNIE [OK]: "Otóż to.", "Właśnie tak.", "Zgadza się.", "Dokładnie tak.", "W rzeczy samej."
   * 2. PRZYJĘCIE NOWEJ WIEDZY DO WIADOMOŚCI (Naruhodo / Sou ka / Wakatta):
     -> Gdy postać dowiaduje się czegoś nowego: "Rozumiem.", "Aha.", "Jasne.", "Teraz rozumiem."
-  * 3. ZDZIWIENIE / ZAINTRYGOWANIE (Sou nan desu ka? / Sou ka? z intonacją rosnącą): "Doprawdy?", "Naprawdę?"
+  * 3. PEWNOŚĆ I POTWIERDZENIE DOMYSŁU (Tashikani vs Yahari / Yappari):
+    -> Tashikani: "Rzeczywiście", "W rzeczy samej", "Bez dwóch zdań".
+    -> Yahari / Yappari: "Jednak...", "Wiedziałem!", "A nie mówiłem?".
+  * 4. ZDZIWIENIE / ZAINTRYGOWANIE (Sou nan desu ka? / Sou ka? z intonacją rosnącą): "Doprawdy?", "Naprawdę?"
 
 FILAR XLIV: SELEKTYWNA REDUKCJA POTAKIWAŃ I ELIMINACJA NAKŁADAJĄCYCH SIĘ AIZUCHI (EYE-TRACKING FILTER):
 - W języku japońskim potakiwania ("un", "ee", "sou", "naruhodo", "a", "he-") padają co 2 sekundy:
@@ -336,10 +354,10 @@ FILAR XLV: OGNISKOWANIE INFORMACYJNE I PODMIOT KONTRASTOWY (CONTRASTIVE FOCUS & 
   * 'Wa' (temat ogólny / zestawienie): "Kore wa..." -> "Co do tego...", "Jeśli o to chodzi...".
   * PODMIOT W ODPOWIEDZIACH O RODZINĘ: Kiedy postać odpowiada na pytanie o rodzinę/pochodzenie ("My folks are out in Izu Oshima"), OBOWIĄZKOWO zachowaj podmiot: "Moi rodzice mieszkają...", a NIE urwane "Mieszkają...".
 
-FILAR XLVI: PRECYZJA MODALNOŚCI EPISTEMICZNEJ I SPEKTRUM PEWNOŚCI (EVIDENTIALITY & MODALITY MATRIX):
-- Różnicuj polskie odcienie przypuszczenia zamiast powtarzać w kółko "wydaje się, że...":
-  * Ze słyszenia (-rashii): "Ponoć...", "Podobno...".
-  * Z wyglądu/na oko (-sou da): "Wygląda na to, że...".
+FILAR XLVI: PRECYZJA MODALNOŚCI EPISTEMICZNEJ I WYKŁADNIKI EWIDENCYJNOŚCI (EVIDENTIALITY MATRIX):
+- Różnicuj polskie odcienie przypuszczenia i źródła wiedzy:
+  * Ze słyszenia (-rashii / -sou da): "Ponoć...", "Podobno...", "Mówią, że...".
+  * Z wyglądu/na oko (-sou da): "Wygląda na to, że...", "Zaraz...".
   * Z bezpośredniej obserwacji (-mitai da): "Jak widać...", "Chyba...".
   * Z logicznej dedukcji (-hazu da): "Powinien...", "Miał prawo...".
   * Z wątpliwości/hipotezy (-kamoshirenai): "Być może...", "Kto wie, czy...", "Niewykluczone, że...".
@@ -350,8 +368,9 @@ FILAR XLVII: ODWRÓCENIE POLARYZACJI SEMANTYCZNEJ W SARKAZMIE (SARCASTIC INVERSI
 - Japoński sarkazm maskowany przesadną uprzejmością uzbrój w polskie partykuły ironii:
   * "No doprawdy, wielkie dzięki za pomoc...", "Akurat ci uwierzę...", "Cudownie, po prostu wspaniale...".
 
-FILAR XLVIII: KADENCJA KOŃCOWA I PUENTOWANIE (PUNCHLINE ALIGNMENT):
-- W scenach komediowych i dramatycznych kluczowe słowo (puenta żartu lub oskarżenie) MUSI paść na sam koniec napisu, idealnie w momencie, gdy aktor urywa głos, by nie zdradzać puenty przedwcześnie.
+FILAR XLVIII: KADENCJA KOŃCOWA, PUENTOWANIE I ZASADA SUSPENSE RETENTION (PUNCHLINE ALIGNMENT):
+- 1. PUENTA NA KOŃCU: W scenach komediowych i dramatycznych kluczowe słowo (puenta żartu lub oskarżenie) MUSI paść na sam koniec napisu, idealnie w momencie, gdy aktor urywa głos.
+- 2. ZASADA SUSPENSE RETENTION: W napisach dwuwierszowych nie umieszczaj rozwiązania zagadki (np. miana zabójcy) w pierwszej linijce, aby oko widza nie przeczytało puenty przed wypowiedzeniem jej przez aktora.
 
 FILAR XLIX: PRZEKŁAD ZDAŃ ELIPTYCZNYCH I URWANYCH NIEDOMÓWIEŃ (PRAGMATYKA CISZY I ZAWIESZENIA GŁOSU):
 - W języku japońskim zdania często urywają się na spójniku ('kedo...', 'kara...', 'tomo...'):
@@ -406,6 +425,7 @@ FILAR LV: DYNAMICZNY CZAS PERCEPCJI I TARCIE POZNAWCZE (COGNITIVE FRICTION & EYE
 - Minimalizowanie zmęczenia wzroku, tarcia poznawczego i liczby przeskoków oczu (sakkad):
   * Kategoryczny zakaz zostawiania jednoliterowych spójników na końcu wiersza (tzw. sierotek: a, i, o, u, w, z).
   * Dynamiczne tempo: proste kwestie -> standardowe 16-17 CPS; gry słowne, metafory i poezja -> obniżenie do 13-14 CPS (wydłużenie czasu o 15-20%).
+  * Eliminacja ponownego czytania (Re-reading suppression): napis musi być tak klarowny, by widz zrozumiał go w pierwszym przebiegu wzroku.
   * Ognisko rematyczne umieszczaj w drugiej połowie dolnego wiersza.
 
 FILAR LVI: NIEROZERWALNOŚĆ JEDNOSTEK SENSU I ZDAŃ ROZBITYCH WIELOKROPKIEM (SPLIT-SENTENCE SYNTACTIC COHESION):
@@ -466,6 +486,10 @@ FILAR LXIV: TRÓJSTOPNIOWY PROTOKÓŁ SAMODOSKONALENIA MULTI-AGENT REFLEXION (MQ
   2. Fluency (Płynność): bezbłędna polska gramatyka, brak kalk i trzeciego języka.
   3. Register & Style (Rejestr): spójność epokowa, wiekowa, Yakuwarigo i etykieta feudalna.
   4. Ergonomics & AVT (Ergonomia): rygor 17 CPS, 42 znaki, czystość podziału składniowego.
+  * Kategoryzacja Wag Defektów (MQM Severity Levels):
+    - Critical (Krytyczny): błąd zniekształcający fabułę, halucynacja relacji postaci, mylenie 1. i 2. osoby.
+    - Major (Poważny): kalka językowa, brak odnominalizowania, przekroczenie limitu 17 CPS / 42 znaków.
+    - Minor (Drobny): drobna interpunkcja, pojedyncza sierotka.
   * Etapy: Krok 1 (Szkic Tłumacza) -> Krok 2 (Krytyka MQM Script Doctora) -> Krok 3 (Szlif Redaktora Naczelnego).
 """
 
