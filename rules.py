@@ -665,7 +665,7 @@ KLUCZOWE IDIOMY FILMOWE I ANIME (ZAKAZ TŁUMACZENIA SŁOWO W SŁOWO):
 """
 
 FALSE_FRIENDS_DICTIONARY = """
-FAŁSZYWI PRZYJACIELE TŁUMACZA (FALSE FRIENDS - KRYTYCZNE PUŁAPKI):
+FAŁSZYWI PRZYJACIELE TŁUMACZA (FALSE FRIENDS - KRYTYCZNE PUŁAPKI Z JĘZYKA ANGIELSKIEGO):
 - "actually" -> "tak naprawdę", "właściwie", "w rzeczywistości" (NIGDY: "aktualnie"!)
 - "eventually" -> "w końcu", "ostatecznie", "z czasem" (NIGDY: "ewentualnie"!)
 - "sympathy" -> "współczucie", "zrozumienie" (NIGDY: "sympatia"!)
@@ -674,11 +674,80 @@ FAŁSZYWI PRZYJACIELE TŁUMACZA (FALSE FRIENDS - KRYTYCZNE PUŁAPKI):
 - "preservative" -> "konserwant" (NIGDY: "prezerwatywa"!)
 - "confident" -> "pewny siebie" (NIGDY: "konfident"!)
 - "lunatic" -> "szaleniec", "wariat" (NIGDY: "lunatyk"!)
-- "hazard" -> "niebezpieczeństwo", "zagrożenie" (w kontekście ryzyka)
+- "hazard" -> "niebezpieczeństwo", "zagrożenie" (w kontekście ryzyka; NIGDY: "hazard" w grach losowych!)
+- "realize" -> "zdać sobie sprawę", "uświadomić sobie" (NIGDY: "zrealizować" w znaczeniu myśli!)
+- "fabric" -> "tkanina", "materiał" (NIGDY: "fabryka"!)
+- "physician" -> "lekarz", "internista" (NIGDY: "fizyk"!)
+- "cabinet" -> "szafka", "rząd" (NIGDY: bezrefleksyjny "gabinet"!)
+- "specific" -> "konkretny", "wybrany", "poszczególny" (NIGDY: "specyficzny" w znaczeniu konkretny!)
+- "evident" -> "oczywisty", "wyraźny", "bezsporny" (NIGDY: "ewidentny" w każdym zdaniu!)
+- "extraordinary" -> "niezwykły", "wyjątkowy" (NIGDY: "ekstraordynaryjny"!)
 - "novel" -> "powieść" (NIGDY: "nowela"!)
 - "ordinary" -> "zwykły", "przeciętny" (NIGDY: "ordynarny"!)
-- "chef" -> "szef kuchni" (NIGDY: "szef / boss"!)
+- "chef" -> "szef kuchni", "kucharz" (NIGDY: "szef / szefowa biura"!)
 - "closet" -> "szafa", "garderoba" (NIGDY: "klozet"!)
+"""
+
+JAPANESE_SOMATIC_AND_CULTURAL_IDIOMS = """
+JAPOŃSKIE IDIOMY SOMATYCZNE I KULTUROWE (SHINTAI GENGO - KRYTYCZNE PUŁAPKI):
+- "Kubi wo kashigeru" (首をかしげる - przechylić szyję):
+  -> "Dziwić się", "Zastanawiać się", "Zbić z tropu", "Nie rozumieć" (ZAKAZ: "przechylać szyję").
+- "Mune ga itai" (胸が痛い - klatka piersiowa boli):
+  -> "Serce mi pęka", "Boli mnie to", "Ciężko na to patrzeć", "Przykro mi" (ZAKAZ: "boli mnie klatka piersiowa" w kontekście emocjonalnym).
+- "Te wo nuku" (手を抜く - wyciągnąć ręce):
+  -> "Odwalać fuszerkę", "Iść na łatwiznę", "Oszczędzać siły", "Robić po łebkach" (ZAKAZ: "wyciągać ręce").
+- "Ashi wo hipparu" (足を引っ張る - ciągnąć za nogę):
+  -> "Rzucać kłody pod nogi", "Być ciężarem dla grupy", "Ciągnąć drużynę na dno", "Przeszkadzać" (ZAKAZ: "ciągnąć za nogę").
+- "Hara ga tatsu" (腹が立つ - brzuch wstaje):
+  -> "Szlag mnie trafia", "Wściekać się", "Gotować się ze złości", "Pienić się" (ZAKAZ: "brzuch wstaje").
+- "Ki ga chiru" (気が散る - rozproszyć ki):
+  -> "Rozpraszać się", "Tracić skupienie", "Nie móc się skoncentrować".
+- "Me ga takai" (目が高い - wysokie oczy):
+  -> "Mieć dobre oko", "Znać się na rzeczy", "Mieć wyrobiony gust", "Wiedzieć, co dobre".
+- "Hana ga takai" (鼻が高い - wysoki nos):
+  -> "Pękać z dumy", "Mieć powód do dumy", "Chlubić się czymś".
+- "Kao ga hiroi" (顔が広い - szeroka twarz):
+  -> "Mieć rozległe znajomości", "Być powszechnie znanym", "Mieć wtyki".
+- "Koshi ga hikui" (腰が低い - niskie biodro):
+  -> "Skromny", "Pokorny", "Pełen szacunku", "Uprzejmy".
+- "Shita wo maku" (舌を巻く - zawijać język):
+  -> "Zbierać szczękę z podłogi", "Być pod ogromnym wrażeniem", "Nie móc wyjść z podziwu".
+"""
+
+JAPANESE_GRAMMAR_AND_ASPECT_TRAPS = """
+JAPOŃSKIE PUŁAPKI GRAMATYCZNE, ASPEKTOWE I PRAGMATYCZNE:
+1. PASYWNO-SPRAWCZE MEIWAKU UKEMI (ADVERSATIVE PASSIVE):
+   - W japońskim strona bierna wyraża cierpienie/niedogodność mówiącego:
+     * "Ame ni furareta" -> "Złapał mnie deszcz!", "Zmokłem!" (BEZWZGLĘDNY ZAKAZ: "Zostałem opadany przez deszcz").
+     * "Hahaoya ni shinarareta" -> "Zmarła mu matka", "Stracił matkę" (ZAKAZ: "Został umarty przez matkę").
+     * "Kanojo ni naitareta" -> "Rozpłakała mi się", "Płakała przede mną" (ZAKAZ: "Zostałem opłakany przez nią").
+     * "Dorobou ni hairareta" -> "Włamali mi się", "Okradli mnie".
+
+2. ASPEKT STANU VS CZYNNOŚCI TRWAJĄCEJ (~TE IRU):
+   - Japoński ~te iru często oznacza STAN PO ZAKOŃCZENIU CZYNNOŚCI, a nie proces w trakcie:
+     * "Shinde iru" -> "Nie żyje", "Jest martwy" (ZAKAZ: "Umiera" w teraźniejszym procesie!).
+     * "Kekkon shite iru" -> "Jest żonaty / zamężna" (ZAKAZ: "Żeni się").
+     * "Futotte iru" -> "Jest tęgi / gruby / przy kości" (ZAKAZ: "Tyje").
+     * "Shitte iru" -> "Wiem", "Znam" (ZAKAZ: "Uczę się poznawać").
+     * "Motte iru" -> "Mam", "Posiadam".
+     * "Nite iru" -> "Jest podobny", "Przypomina".
+
+3. KONSTRUKCJE INTENCJI I WAHANIA (~TAI TO OMOU / ~YOU TO OMOU / ~TSUMORI):
+   - Zmiękczanie intencji w języku japońskim ("Myślę, że chcę"):
+     * "Watashi wa kore wo shitai to omoimasu" -> "Chcę to zrobić", "Zamierzam to zrobić", "Zrobię to" (BEZWZGLĘDNY ZAKAZ: "Myślę, że chcę to zrobić").
+     * "Iku tsumori da" -> "Planuję pójść", "Zamierzam iść".
+
+4. RELACJE PRZYSŁUGI (AGERU / KURERU / MORAU):
+   - "Tetsudatte kureta" -> "Pomógł mi" (ZAKAZ: "Dał mi pomoc").
+   - "Oshiete moratta" -> "Wytłumaczył mi", "Dowiedziałem się od niego" (ZAKAZ: "Otrzymałem nauczenie").
+   - "Yatte ageta" -> "Zrobiłem to dla niego".
+
+5. KWANTYFIKATORY OGRANICZAJĄCE (SHIKA ... NAI VS DAKE VS BAKARI):
+   - "Kore shika nai" -> "Zostało tylko to", "Mamy tylko to" (ZAKAZ kalki negatywnej: "Tego nie ma").
+   - "Asobi bakari shite iru" -> "Tylko zabawa mu w głowie", "W kółko się obija".
+
+6. PODWÓJNE ZAPRZECZENIA UPRZEJME (~NAKU WA NAI / ~NAI KOTO MO NAI):
+   - "Dekinaku wa nai" -> "W sumie dałbym radę", "Nie mówię, że nie potrafię", "Da się zrobić" (ZAKAZ: "Nie jest tak, że nie potrafię").
 """
 
 JAPANESE_AISATSU_GUIDE = """
@@ -796,6 +865,10 @@ Twoim nadrzędnym celem jest przekład dialogów na ŻYWĄ, NATURALNĄ POLSZCZYZ
 {COMMON_AVT_IDIOMS_AND_COLLOQUIALISMS}
 
 {FALSE_FRIENDS_DICTIONARY}
+
+{JAPANESE_SOMATIC_AND_CULTURAL_IDIOMS}
+
+{JAPANESE_GRAMMAR_AND_ASPECT_TRAPS}
 
 {JAPANESE_AISATSU_GUIDE}
 
