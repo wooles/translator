@@ -47,7 +47,9 @@ def test_rules_and_prompts():
     assert "FILAR XLVII: ZACHOWANIE PODMIOTU KONTRASTOWEGO" in ver_prompt
     assert "FILAR XLVIII: ZAKAZ HYBRYD HONORYFIKATYWNYCH" in sys_prompt
     assert "FILAR XLVIII: ZAKAZ HYBRYD HONORYFIKATYWNYCH" in ver_prompt
-    print(" -> PASSED: Kompletny Kanon 48 Filarów AVT jest aktywny w obu fazach tłumaczenia.")
+    assert "FILAR XLIX: PRZEKŁAD PLANSZ TYTUŁOWYCH" in sys_prompt
+    assert "FILAR XLIX: PRZEKŁAD PLANSZ TYTUŁOWYCH" in ver_prompt
+    print(" -> PASSED: Kompletny Kanon 49 Filarów AVT jest aktywny w obu fazach tłumaczenia.")
 
 def test_pydantic_schemas():
     print("[TEST 2/5] Weryfikacja schematów Pydantic...")
@@ -379,6 +381,40 @@ def test_pricing_guard():
     assert "Context Cache" in banner
     print(" -> PASSED: Strażnik cennika precyzyjnie kalkuluje i monitoruje koszty.")
 
+def test_sign_detector():
+    print("[TEST 17/17] Test Wizyjnego Detektora Plansz i Bezpieczników Antykolizyjnych (sign_detector)...")
+    from sign_detector import VisualSignDetector, DetectedSign
+    
+    # 1. Test wykrywania luk w pliku z pustą przerwą (10 sekund przerwy)
+    subs_with_gap = pysubs2.SSAFile()
+    subs_with_gap.events.append(pysubs2.SSAEvent(start=1000, end=3000, text="Kwestia 1"))
+    subs_with_gap.events.append(pysubs2.SSAEvent(start=15000, end=18000, text="Kwestia 2"))
+    
+    gaps = VisualSignDetector.find_subtitle_gaps(subs_with_gap, min_gap_ms=3500, margin_ms=1500)
+    assert len(gaps) >= 1
+    # Sprawdzamy, czy wyznaczona luka leży w pustym oknie
+    assert gaps[0][0] >= 4500  # 3000 + 1500 margin
+    assert gaps[0][1] <= 13500 # 15000 - 1500 margin
+    
+    # 2. Test Collision Guard na gęstym kadrze (notes/manga z wieloma linijkami)
+    dense_subs = pysubs2.SSAFile()
+    for i in range(10):
+        dense_subs.events.append(pysubs2.SSAEvent(start=i * 1000, end=(i + 1) * 1000, text=f"Notatka {i}"))
+    
+    dense_gaps = VisualSignDetector.find_subtitle_gaps(dense_subs, min_gap_ms=3500, margin_ms=1500)
+    assert len(dense_gaps) == 0  # Zero luk -> Collision Guard zablokował dublowanie napisów
+    
+    # 3. Test modelu Pydantic
+    sign = DetectedSign(
+        is_title_or_banner=True,
+        original_text="PRESENT DAY / げんざい",
+        translation_pl="CZASY WSPÓŁCZESNE",
+        banner_type="TIME_BANNER"
+    )
+    assert sign.is_title_or_banner is True
+    assert sign.translation_pl == "CZASY WSPÓŁCZESNE"
+    print(" -> PASSED: VisualSignDetector precyzyjnie wykrywa luki i chroni kadry przed dublowaniem.")
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -397,4 +433,5 @@ if __name__ == "__main__":
     test_batch_queue()
     test_context_cache()
     test_pricing_guard()
-    print("\n Wszystkie testy jednostkowe i integracyjne (16/16) zakończone pełnym sukcesem!\n")
+    test_sign_detector()
+    print("\n Wszystkie testy jednostkowe i integracyjne (17/17) zakończone pełnym sukcesem!\n")

@@ -327,6 +327,15 @@ FILAR XLVIII: ZAKAZ HYBRYD HONORYFIKATYWNYCH (ANTI-DOUBLE HONORIFIC HYBRID):
     -> KARDYNALNY BŁĄD [X]: "Pani Sensei, skończyłam!", "Panie Sensei!", "Pani Senpai!" (groteskowy potworek językowy łączący dwie sprzeczne tytulatury!).
     -> POPRAWNIE W TRYBIE ANIME [OK]: "Sensei, skończyłam!", "Teshima-sensei, skończyłam!", "Senpai!" (samo słowo Sensei niesie już pełny szacunek i nie wolno dodawać przed nim słowa 'Pani/Pan').
     -> POPRAWNIE W TRYBIE NATURALNYM [OK]: "Pani Teshimo, skończyłam!", "Mistrzyni, skończyłam!", "Szefowo, skończyłam!".
+
+FILAR XLIX: PRZEKŁAD PLANSZ TYTUŁOWYCH, LOKACJI I RAM CZASOWYCH (TITLE CARDS & TOP-CENTER AN8):
+- PLANSZE NARRACYJNE (CZAS, MIEJSCE, TYTUŁ ROZDZIAŁU):
+  * Kiedy na ekranie pojawia się plansza wprowadzająca czas lub miejsce akcji (np. 'PRESENT DAY / げんざい', 'TOKIO', 'ROK 1907', 'PROLOG'):
+    -> KARDYNALNY BŁĄD [X]: Pozostawienie planszy bez tłumaczenia lub nachodzenie polskim tekstem na dolne wtopione napisy wideo.
+    -> POPRAWNIE [OK]: Zwięzłe polskie tłumaczenie w nawiasie prostokątnym wersalikami, umieszczone u góry ekranu (Top-Center {\\an8}):
+       "[ CZASY WSPÓŁCZESNE ]", "[ OBECNIE ]", "[ ROK 1907 ]", "[ LONDYN, 1888 ]".
+- BEZPIECZNIK ANTYKOLIZYJNY WIZUALNEGO OCR:
+  * Jeśli w kadrze znajduje się tłumaczony wcześniej notes, manga lub plakat z istniejącymi już napisami w pliku .ass, kategoryczny zakaz dublowania linii!
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -767,12 +776,17 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
    - Kiedy postać zwraca się do mangaki/mistrza/nauczyciela per 'Sensei' / 'Senpai':
      -> KARDYNALNY BŁĄD [X]: "Pani Sensei, skończyłam!", "Panie Sensei!", "Pani Senpai!" (potworek łączący polską i japońską tytulaturę!).
      -> POPRAWNIE [OK]: "Sensei, skończyłam!" / "Teshima-sensei, skończyłam!" (lub naturalnie: "Pani Teshimo, skończyłam!").
+23. PRZEKŁAD PLANSZ TYTUŁOWYCH I POZYCJONOWANIE GÓRNE (FILAR XLIX):
+   - Kiedy na ekranie widnieje plansza czasu/miejsca ('PRESENT DAY', 'TOKIO'):
+     -> KARDYNALNY BŁĄD [X]: Brak tłumaczenia lub zasłanianie dołu ekranu.
+     -> POPRAWNIE [OK]: "[ CZASY WSPÓŁCZESNE ]" / "[ OBECNIE ]" (wersalikami w nawiasie prostokątnym).
      * "[Filar I - Odnominalizowanie] 'dokonał zabójstwa' -> 'zabił'"
      * "[Filar XLI - Notacja Liczebników] '3 dni' -> 'trzy dni'"
      * "[Filar XLV - Aprobata Aizuchi] 'Rozumiem' -> 'Otóż to' (potwierdzenie intuicji Shizuku)"
      * "[Filar XLVI - Yobisute] Usunięto sztuczne 'panie Issei' -> 'Issei'"
      * "[Filar XLVII - Podmiot Kontrastowy] 'Mieszkają...' -> 'Moi rodzice mieszkają...'"
      * "[Filar XLVIII - Anty-Hybryda] 'Pani Sensei' -> 'Sensei'"
+     * "[Filar XLIX - Plansze i Lokacje] 'PRESENT DAY' -> '[ CZASY WSPÓŁCZESNE ]'"
      * "[Filar XXXVI - Prefabrykowana Mówioność] Zastąpiono sztuczny imiesłów żywą polszczyzną"
      * "[Filar XXXI - Rejestr i Wulgaryzmy] Ujednolicono surowy język żołnierski"
 

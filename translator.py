@@ -1018,6 +1018,25 @@ class MultimodalTranslator:
             new_event.text = full_event_text
             final_subs.events.append(new_event)
 
+        # 7.1. Wizyjny Detektor Brakujących Plansz (Visual Sign Detector & OCR)
+        if video_path and os.path.exists(video_path):
+            try:
+                from sign_detector import VisualSignDetector
+                gaps = VisualSignDetector.find_subtitle_gaps(final_subs, min_gap_ms=3500, margin_ms=1500)
+                if gaps:
+                    detected_signs = VisualSignDetector.detect_signs_in_gaps(
+                        video_path=video_path,
+                        gaps=gaps,
+                        client=client,
+                        model="gemini-3.7-flash"
+                    )
+                    if detected_signs:
+                        for sign_ev in detected_signs:
+                            final_subs.events.append(sign_ev)
+                        final_subs.events.sort(key=lambda ev: ev.start)
+            except Exception as e:
+                logger.warning(f"Wizyjny Detektor Plansz: Pomijanie detekcji plansz ({e})")
+
         final_subs.events.sort(key=lambda ev: ev.start)
 
         if not output_path:
