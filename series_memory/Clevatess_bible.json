@@ -1,0 +1,30 @@
+{
+  "anime_title": "Clevatess",
+  "characters": {
+    "Clevatess": {
+      "description": "Król Demonicznych Bestii / Władca Mrocznych Bestii (monstrualny, prastary demon o wielkiej mądrości i sile, potężny, arogancki, dostojny głos)"
+    },
+    "Alicia": {
+      "description": "Dziewczyna Rycerz / Bohaterka z 13 Bohaterów, która przeciwstawiła się bezmyślnej rzezi i zawarła pakt z Clevatessem"
+    },
+    "Nel": {
+      "description": "Niemowlę powierzone Clevatessowi i Alicii"
+    },
+    "Clen": {
+      "description": "Ludzka forma / wcielenie Clevatessa"
+    }
+  },
+  "glossary": {
+    "Mage / Sorcerer / Warlock / Caster": "Wiedun / Wieduni (Kanon grupy Shisha - archaiczny męski odpowiednik wiedźmy)",
+    "Majuu / Demonic Beast / Shadow Beast": "Demoniczna Bestia / Bestia Mroku",
+    "Thirteen Heroes / 13 Heroes": "Trzynastu Bohaterów",
+    "Hero Armament / Hero Weapon": "Oręż Bohatera",
+    "Kingdom of Hiden": "Królestwo Hiden",
+    "Demon King / King of Beasts": "Król Bestii / Władca Bestii"
+  },
+  "relationships": {
+    "Clevatess -> Alicia": "Zwrot: Alicio / człowiecza dziewko / na ty (wyniosły władca bestii -> ludzka bohaterka)",
+    "Alicia -> Clevatess": "Zwrot: Clevatessie / potworze / na ty (wojowniczka -> prastara bestia)"
+  },
+  "episodes_translated": []
+}
