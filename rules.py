@@ -647,6 +647,41 @@ FILAR XC: SOMATYCZNY REZONANS EMOCJONALNY (DOUGLAS ROBINSON'S SOMATIC TRANSLATIO
 - Fizyczny rezonans afektywny:
   * Przekład musi przenosić fizjologiczne reakcje ciała (skurcz żołądka, ucisk w gardle, dreszcz grozy, wybuch śmiechu) bezpośrednio na fizyczne odczucia polskiego widza.
   * Tekst ma poruszać ciało i zmysły, a nie tylko intelekt.
+
+
+MODUŁ X: POLSKA FLEKSJA, DIALEKTYKA I ZAAWANSOWANA KOGNITYWISTYKA (FILARY XCI – XCV)
+
+FILAR XCI: ŻELAZNA FLEKSJA I POLSKA ODMIANA JAPOŃSKICH IMION I NAZWISK (POLISH DECLENSION MATRIX & PWN NORMS):
+- Język polski jest językiem wysoce fleksyjnym. Unikanie odmiany japońskich imion i nazwisk jest rażącym błędem stylistycznym i amatorszczyzną:
+  * 1. Imiona i nazwiska męskie zakończone na samogłoski -i, -e, -a oraz spółgłoski BEZWZGLĘDNIE ODMIENIAMY:
+    -> Issei: z Isseiem, o Isseiu, Isseiowi, Isseia (BŁĄD [X]: "rozmawiam z Issei").
+    -> Tomine: pana Tominego, z panem Tominem, o panu Tominem (BŁĄD [X]: "widzę Tomine").
+    -> Nakagawa: pana Nakagawy, z panem Nakagawą.
+    -> Shin: Shina, z Shinem, o Shinie.
+  * 2. Imiona żeńskie zakończone na -i, -u (Shizuku, Rei, Minami) pozostają nieodmienne, lecz zdanie musi zachować poprawną strukturę składniową (z Shizuku, o Shizuku).
+  * 3. Wołacze: imiona męskie w wołaczu zachowują formę mianownika z intonacją lub wołaczową ("Issei!", "Shin!").
+
+FILAR XCII: SYNCHRONIA PRZECZENIA I ODROCZENIA DRAMATYCZNEGO (DELAYED NEGATION & JVTA SUSPENSE):
+- W języku japońskim (SOV) negacja lub zwrot akcji pada na samym końcu zdania (...to omotta kedo, chigatta!):
+  * KATEGORYCZNY ZAKAZ wyprzedzania puenty na początku polskiego napisu, jeśli aktor buduje napięcie i przeczy dopiero po 2 sekundach ciszy.
+  * Zastosuj inwersję dramatyczną lub wielokropek, aby zsynchronizować moment zaskoczenia z audio ("Myślałem, że to koniec... a jednak nie!").
+
+FILAR XCIII: KOMPENSACJA DIALEKTÓW REGIONALNYCH (KANSAI-BEN / TOHOKU-BEN KOLOKWIALIZACJA):
+- Kategoryczny zakaz przekładania gwary Kansai (Kansai-ben) czy dialektu północnego (Tohoku-ben) na gwarę góralską, śląską lub wiejską (niszczy to realia świata przedstawionego!).
+- Właściwa kompensacja: stosuj polską stylizację kolokwialno-miejską, żywe partykuły nawiązania ("no weźże", "akurat", "gadaj zdrów"), skróty mowy i swobodniejszy szyk zdania.
+
+FILAR XCIV: MATRYCA ZAIMKÓW 1. OSOBY I PROFILU EGO (ORE / BOKU / WATASHI / ATASHI / SESSHA / WAGA):
+- Rozpoznawaj japońskie zaimki 1. osoby w ścieżce dźwiękowej i natychmiast kalibruj profil psychologiczny postaci:
+  * Ore (męski, pewny siebie, szorstki) -> dynamiczne, dosadne polskie zwroty.
+  * Boku (chłopięcy, skromny, kulturalny) -> łagodniejsza, uprzejma polszczyzna.
+  * Watashi / Watakushi (formalny, neutralny, elegancki) -> wyważony, dystyngowany styl.
+  * Sessha / Waga (archaiczny, samurajski, feudalny) -> stylizacja podniosła ("Jam jest", "Moja osoba").
+
+FILAR XCV: EKWIWALENCJA JAPOŃSKICH PRZYSŁÓW I FRAZEOLOGIZMÓW 4-ZNAKOWYCH (YOJIJUKUGO & CULTURAL IDIOMS):
+- Japońskie przysłowia 4-znakowe (Yojijukugo) i archaiczne metafory tłumacz na polskie ekwiwalenty frazeologiczne o tożsamym ciężarze filozoficznym i poetyckim:
+  * "Isseki nichou" -> "Upiec dwie pieczenie na jednym ogniu".
+  * "Jigou jitoku" -> "Naważyłeś sobie piwa, to teraz je wypij" / "Zbierasz to, co zasiałeś".
+  * "Ichi-go ichi-e" -> "Taka chwila zdarza się tylko raz w życiu".
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """

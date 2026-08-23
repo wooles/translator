@@ -116,7 +116,12 @@ def test_rules_and_prompts():
     assert "FILAR LXXXVIII:" in sys_prompt
     assert "FILAR LXXXIX:" in sys_prompt
     assert "FILAR XC:" in sys_prompt
-    print(" -> PASSED: Kompletny Zunifikowany Kanon 90 Filarów AVT (Zero Redundancji) jest aktywny w obu fazach tłumaczenia.")
+    assert "FILAR XCI:" in sys_prompt
+    assert "FILAR XCII:" in sys_prompt
+    assert "FILAR XCIII:" in sys_prompt
+    assert "FILAR XCIV:" in sys_prompt
+    assert "FILAR XCV:" in sys_prompt
+    print(" -> PASSED: Kompletny Zunifikowany Kanon 95 Filarów AVT (Filary I – XCV) jest aktywny w obu fazach tłumaczenia.")
 
 def test_pydantic_schemas():
     print("[TEST 2/5] Weryfikacja schematów Pydantic...")
@@ -220,14 +225,35 @@ def test_ffmpeg_frame_extraction():
         if os.path.exists(test_video):
             os.remove(test_video)
 
-from profiler import EpisodeProfile, CharacterRelationship, GlossaryTerm, format_episode_profile_for_prompt
+from profiler import (
+    EpisodeProfile,
+    CharacterRelationship,
+    GlossaryTerm,
+    NameDeclension,
+    FirstPersonPronoun,
+    format_episode_profile_for_prompt
+)
 from whisper_engine import JapaneseWhisperEngine
 
 def test_profiler_and_whisper():
-    print("[TEST 6/6] Test profilera odcinka i silnika Whisper...")
+    print("[TEST 6/6] Test profilera odcinka 2.0 (Fleksja, Zaimki, Idiomy) i silnika Whisper...")
     profile = EpisodeProfile(
         episode_summary="Odcinek o sprzątaniu klubu mangi",
         tone_and_genre="Komediodramat młodzieżowy",
+        name_declensions=[
+            NameDeclension(
+                character_name="Issei",
+                gender="MALE",
+                declension_summary="D. Isseia, C. Isseiowi, B. Isseia, N. z Isseiem, Msc. o Isseiu"
+            )
+        ],
+        first_person_pronouns=[
+            FirstPersonPronoun(
+                character_name="Issei",
+                japanese_pronoun="Ore",
+                psychological_profile="pewny siebie, szorstki, zdeterminowany"
+            )
+        ],
         characters=[
             CharacterRelationship(
                 speaker="Kokoro",
@@ -246,6 +272,13 @@ def test_profiler_and_whisper():
                 explanation="tradycyjne japońskie ciastka w kształcie ryby"
             )
         ],
+        yojijukugo_and_idioms=[
+            GlossaryTerm(
+                term_en="Isseki nichou",
+                translation_pl="Upiec dwie pieczenie na jednym ogniu",
+                explanation="przysłowie 4-znakowe"
+            )
+        ],
         key_conventions=["Unikać kalki 'Bless you' -> 'Na zdrowie'"]
     )
     formatted = format_episode_profile_for_prompt(profile)
@@ -253,9 +286,16 @@ def test_profiler_and_whisper():
     assert "taiyaki" in formatted
     assert "Imperium Mongolskie" in formatted
     assert "Enologia i Sommelierstwo" in formatted
+    assert "ŻELAZNA TABELA ODMIANY IMION" in formatted
+    assert "Isseiem" in formatted
+    assert "PROFIL PSYCHOLOGICZNY I ZAIMKI" in formatted
+    assert "Ore" in formatted
+    assert "EKWIWALENTY JAPOŃSKICH PRZYSŁÓW" in formatted
+    assert "Isseki nichou" in formatted
     
     # Test dostępności i stanu Whisper
     avail = JapaneseWhisperEngine.is_available()
+    print(" -> PASSED: Profiler 2.0 (Odmiana imion, zaimki ego, idiomy) działa w 100%.")
 from model_resolver import resolve_best_models, _extract_model_score
 
 def test_model_resolver():

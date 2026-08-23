@@ -18,6 +18,18 @@ from google.genai import types
 logger = logging.getLogger("profiler")
 
 
+class NameDeclension(BaseModel):
+    character_name: str = Field(description="Imię postaci w mianowniku (np. 'Issei', 'Tomine', 'Shizuku')")
+    gender: str = Field(description="'MALE' lub 'FEMALE'")
+    declension_summary: str = Field(description="Polska odmiana imienia/nazwiska przez przypadki (np. 'Issei -> D. Isseia, C. Isseiowi, B. Isseia, N. z Isseiem, Msc. o Isseiu' lub 'Shizuku -> nieodmienne (z Shizuku, o Shizuku)')")
+
+
+class FirstPersonPronoun(BaseModel):
+    character_name: str = Field(description="Imię postaci")
+    japanese_pronoun: str = Field(description="Zaimki 1. osoby używane w dialogach: 'Ore', 'Boku', 'Watashi', 'Atashi', 'Sessha', 'Waga'")
+    psychological_profile: str = Field(description="Profil psychologiczny i rejestr (np. 'Ore -> pewny siebie, szorstki, bezkompromisowy', 'Boku -> skromny, uprzejmy, chłopięcy', 'Watashi -> formalny/neutralny')")
+
+
 class CharacterRelationship(BaseModel):
     speaker: str = Field(description="Imię postaci mówiącej")
     listener: str = Field(description="Imię postaci słuchającej / adresata")
@@ -38,8 +50,11 @@ class EpisodeProfile(BaseModel):
     dialogue_stylization: str = Field(default="", description="Wytyczne stylizacji rejestru języka i zakazy/nakazy słownictwa dla tej epoki")
     manga_canon_source: Optional[str] = Field(default="", description="Oficjalne polskie wydawnictwo mangi (np. Waneko, J.P.Fantastica, Studio JG, Hanami), jeśli seria była wydana w Polsce")
     tone_and_genre: str = Field(description="Rejestr i ton dialogów (np. 'szlachetny epos historyczny', 'profesjonalny dramat sommeliera', 'lekkie młodzieżowe anime')")
+    name_declensions: List[NameDeclension] = Field(default_factory=list, description="Tabela odmiany imion i nazwisk bohaterów przez polskie przypadki (Filar XCI)")
+    first_person_pronouns: List[FirstPersonPronoun] = Field(default_factory=list, description="Matryca zaimków 1. osoby (Ore/Boku/Watashi) i profilu psychologicznego postaci (Filar XCIV)")
     characters: List[CharacterRelationship] = Field(default_factory=list, description="Macierz relacji i form grzecznościowych między bohaterami")
     glossary: List[GlossaryTerm] = Field(default_factory=list, description="Słowniczek kluczowych pojęć, tytułów, nazw własnych i terminów specjalistycznych")
+    yojijukugo_and_idioms: List[GlossaryTerm] = Field(default_factory=list, description="Japońskie przysłowia 4-znakowe, metafory i idiomy odcinka (Filar XCV)")
     key_conventions: List[str] = Field(default_factory=list, description="Kluczowe wytyczne stylistyczne dla tego konkretnego odcinka")
 
 
@@ -48,7 +63,7 @@ def format_episode_profile_for_prompt(profile: Optional[EpisodeProfile]) -> str:
     if not profile:
         return ""
 
-    lines = ["=== SŁOWNICZEK, REALIA ŚWIATA, DZIEDZINA I MACIERZ RELACJI (PROFILER ODCINKA) ==="]
+    lines = ["=== SŁOWNICZEK, REALIA ŚWIATA, DZIEDZINA I MACIERZ RELACJI (PROFILER ODCINKA 2.0) ==="]
     if profile.manga_canon_source:
         lines.append(f"[Kanon Mangi]: {profile.manga_canon_source}")
     if profile.setting_and_era:
@@ -62,6 +77,16 @@ def format_episode_profile_for_prompt(profile: Optional[EpisodeProfile]) -> str:
     if profile.tone_and_genre:
         lines.append(f"Ton dialogów: {profile.tone_and_genre}")
 
+    if profile.name_declensions:
+        lines.append("\nŻELAZNA TABELA ODMIANY IMION PRZEZ PRZYPADKI (FILAR XCI - BEZWZGLĘDNIE STOSUJ):")
+        for decl in profile.name_declensions:
+            lines.append(f"- {decl.character_name} ({decl.gender}): {decl.declension_summary}")
+
+    if profile.first_person_pronouns:
+        lines.append("\nPROFIL PSYCHOLOGICZNY I ZAIMKI 1. OSOBY (FILAR XCIV):")
+        for fpp in profile.first_person_pronouns:
+            lines.append(f"- {fpp.character_name}: [{fpp.japanese_pronoun}] -> {fpp.psychological_profile}")
+
     if profile.characters:
         lines.append("\nRELACJE SPOŁECZNE I FORMY ZWROTU (BEZWZGLĘDNIE PRZESTRZEGAJ):")
         for rel in profile.characters:
@@ -71,6 +96,11 @@ def format_episode_profile_for_prompt(profile: Optional[EpisodeProfile]) -> str:
         lines.append("\nUSTALONY SŁOWNICZEK POJĘĆ I TERMINOLOGII BRANŻOWEJ:")
         for g in profile.glossary:
             lines.append(f"- '{g.term_en}' = '{g.translation_pl}' ({g.explanation})")
+
+    if profile.yojijukugo_and_idioms:
+        lines.append("\nEKWIWALENTY JAPOŃSKICH PRZYSŁÓW I IDIOMÓW (FILAR XCV):")
+        for idi in profile.yojijukugo_and_idioms:
+            lines.append(f"- '{idi.term_en}' = '{idi.translation_pl}' ({idi.explanation})")
 
     if profile.key_conventions:
         lines.append("\nWYTYCZNE SPECYFICZNE DLA TEGO ODCINKA:")
@@ -104,8 +134,8 @@ class EpisodeProfiler:
             except Exception as e:
                 logger.warning(f"Błąd odczytu cache profilu ({e}), generowanie na nowo...")
 
-        prompt = f"""Jesteś Głównym Reżyserem i Konsultantem Merytorycznym Lokalizacji Anime.
-Twoim zadaniem jest wstępna analiza całego odcinka na podstawie poniższych dialogów i metadanych, aby stworzyć kompletny PROFIL ODCINKA, ustalić REALIA ŚWIATA, SPECJALISTYCZNĄ DZIEDZINĘ WIEDZY (np. winiarstwo/enologia, medycyna, muzyka klasyczna, shogi, kulinaria), OFICJALNY KANON POLSKIEGO WYDANIA MANGI (jeśli seria wyszła w Polsce) ORAZ REJESTR STYLIZACJI DIALOGÓW.
+        prompt = f"""Jesteś Głównym Reżyserem i Konsultantem Merytorycznym Lokalizacji Anime (Profiler 2.0).
+Twoim zadaniem jest wstępna analiza całego odcinka na podstawie poniższych dialogów i metadanych, aby stworzyć kompletny PROFIL ODCINKA 2.0, ustalić TABELĘ POLSKIEJ ODMIANY IMION (Filar XCI), MATRYCĘ ZAIMKÓW 1. OSOBY I PROFILU EGO (Filar XCIV), REALIA ŚWIATA, SPECJALISTYCZNĄ DZIEDZINĘ WIEDZY, OFICJALNY KANON POLSKIEGO WYDANIA MANGI ORAZ SŁOWNIK PRZYSŁÓW I IDIOMÓW (Filar XCV).
 
 METADANE Z BAZY ANILIST:
 {anime_metadata_str}
@@ -114,13 +144,16 @@ PRÓBKA KWESTII DIALOGOWYCH Z ODCINKA:
 {subs_text_sample[:12000]}
 
 ZADANIE:
-1. Zidentyfikuj EPOKĘ HISTORYCZNĄ ORAZ MIEJSCE AKCJI (np. "XIII wiek, Imperium Mongolskie / dwór chanów", "Okres Edo w feudalnej Japonii", "Współczesna szkoła w Tokio", "Średniowieczny świat fantasy").
-2. Zidentyfikuj NISZOWĄ DZIEDZINĘ WIEDZY / TEMATYKĘ SPECJALISTYCZNĄ (np. "Enologia i Sommelierstwo (Wino / Winiarstwo) - terminologia: szczepy, apelacje, roczniki, taniny, kupaż", "Medycyna", "Muzyka klasyczna", "Shogi").
-3. OFICJALNY POLSKI KANON MANGOWY: Jeśli to anime posiada oficjalny polski przekład mangowy (np. z wydawnictw Waneko, J.P.Fantastica, Studio JG, Hanami, Kotori, Dango, Egmont), zidentyfikuj wydawnictwo w 'manga_canon_source' oraz bezwzględnie włącz do słowniczka oficjalne polskie nazwy technik, magii, krain, formacji bojowych, organizacji i rang z polskich tomików papierowych.
-4. Ustal WYTYCZNE STYLIZACJI JĘZYKOWEJ dla tej epoki i dziedziny (np. dla wina: używanie fachowych polskich pojęć enologicznych, dla epoki dawnej: ZAKAZ współczesnego slangu).
-5. Zidentyfikuj kluczowe postacie, ich role oraz ustal, jak powinny się do siebie zwracać po polsku (kto per 'pan/pani', kto 'Wasza Dostojność / Chanie', kto po imieniu).
-6. Wyodrębnij specyficzne pojęcia epokowe, branżowe terminy specjalistyczne, tytuły dzieł, nazwy win/potraw/miejsc i ustal dla nich bezbłędne, polskie tłumaczenie.
-7. Określ ton i rejestr językowy dialogów.
+1. Zidentyfikuj EPOKĘ HISTORYCZNĄ ORAZ MIEJSCE AKCJI (np. "XIII wiek, Imperium Mongolskie", "Współczesne Tokio").
+2. Zidentyfikuj NISZOWĄ DZIEDZINĘ WIEDZY / TEMATYKĘ SPECJALISTYCZNĄ (np. "Enologia / Winiarstwo", "Medycyna", "Muzyka klasyczna", "Shogi").
+3. OFICJALNY POLSKI KANON MANGOWY: Zidentyfikuj wydawnictwo mangi (Waneko, JPF, Studio JG itp.) i włącz oficjalne nazwy z tomików papierowych.
+4. TABELA ODMIANY IMION I NAZWISK (Filar XCI): Dla każdej głównej postaci podaj poprawną polską odmianę przez przypadki (np. "Issei -> D. Isseia, C. Isseiowi, B. Isseia, N. z Isseiem, Msc. o Isseiu", "Tomine -> pana Tominego, z panem Tominem", "Shizuku -> nieodmienne").
+5. MATRYCA ZAIMKÓW 1. OSOBY (Filar XCIV): Rozpoznaj zaimki 'ja' używane przez postacie (Ore / Boku / Watashi / Atashi / Sessha) i zdefiniuj ich profil ego.
+6. Ustal WYTYCZNE STYLIZACJI JĘZYKOWEJ dla tej epoki i dziedziny.
+7. Zidentyfikuj kluczowe postacie, ich role oraz ustal formy zwrotu (kto per 'pan/pani', kto po imieniu na 'ty').
+8. Wyodrębnij specyficzne pojęcia, nazwy win/potraw/miejsc i ustal dla nich spójne polskie tłumaczenie.
+9. WYKRYJ JAPOŃSKIE PRZYSŁOWIA I IDIOMY (Yojijukugo - Filar XCV) i podaj dla nich polskie ekwiwalenty frazeologiczne.
+10. Określ ton i rejestr językowy dialogów.
 
 Zwróć wynik w formacie JSON zgodnym ze schematem EpisodeProfile."""
 
