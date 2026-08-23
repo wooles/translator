@@ -388,11 +388,13 @@ def main():
         model_p2 = best_models["flash_lite"]
     elif not model_p2 and not model_p1:
         from pricing_guard import PricingGuard
+        cost_flash_est = PricingGuard.estimate_episode_cost_pln("2")
+        cost_pro_est = PricingGuard.estimate_episode_cost_pln("3")
         print("\n" + "─" * 68)
         print("  WYBÓR PROFILU JAKOŚCI TŁUMACZENIA (Auto-wykrywanie najnowszych modeli):")
         print(f"  [1] STANDARDOWY      [{best_models['flash_lite']} - 100% Darmowy, szybki]")
-        print(f"  [2] STUDYJNY FLASH   [{best_models['flash']} + Redakcja Flash - Ekstremalnie tani (~0,08 zł/odc)]")
-        print(f"  [3] MASTER PRO ⭐   [{best_models['flash']} + {best_models['pro']} Redakcja Pro - Jakość Kinowa (~1,38 zł/odc z 30d Cache)]")
+        print(f"  [2] STUDYJNY FLASH   [{best_models['flash']} + Redakcja Flash - Ekstremalnie tani (~{cost_flash_est:.2f} zł/odc)]")
+        print(f"  [3] MASTER PRO ⭐   [{best_models['flash']} + {best_models['pro']} Redakcja Pro - Jakość Kinowa (~{cost_pro_est:.2f} zł/odc z 30d Cache)]")
         print("─" * 68)
         print(PricingGuard.get_pricing_status_banner())
         print("─" * 68)

@@ -52,9 +52,9 @@ class PricingGuard:
         Precyzyjnie szacuje koszt przetłumaczenia 24-minutowego odcinka anime w PLN.
         """
         batches = max(1, (lines_count + 23) // 24)
-        system_prompt_tokens = 13500
-        batch_input_tokens = 1200
-        batch_output_tokens = 1400
+        system_prompt_tokens = 32500  # Wielki Kanon 95 Filarów AVT w Context Cache
+        batch_input_tokens = 2500      # Klatka wideo + okno kontekstowe + audio Whisper
+        batch_output_tokens = 1200     # Tłumaczenie JSON
 
         profile = profile.lower()
 
@@ -95,7 +95,7 @@ class PricingGuard:
             # Faza 2 (Redakcja Pro 3.1 Preview)
             p2_cached_in = (batches * system_prompt_tokens) if has_cache else 0
             p2_uncached_in = (batches * batch_input_tokens) + (0 if has_cache else batches * system_prompt_tokens)
-            p2_out = batches * 1200
+            p2_out = batches * 1400
             cost_p2_usd = (
                 (p2_cached_in / 1_000_000) * rate_pro["input_cached"] +
                 (p2_uncached_in / 1_000_000) * rate_pro["input_uncached"] +
@@ -105,7 +105,7 @@ class PricingGuard:
             total_pln = (cost_p1_usd + cost_p2_usd) * usd_pln
             return round(total_pln, 2)
 
-        return 0.08
+        return 0.12
 
     @classmethod
     def calculate_actual_cost_pln(
@@ -169,10 +169,12 @@ class PricingGuard:
         """
         cost_flash = cls.estimate_episode_cost_pln("2")
         cost_pro = cls.estimate_episode_cost_pln("3")
+        ep_pro = int(40.0 / max(0.01, cost_pro))
+        ep_flash = int(40.0 / max(0.01, cost_flash))
 
         lines = [
             "  💰 STATUS CENNIKA GOOGLE: Zweryfikowany (Brak ukrytych opłat, rabat -75% Context Cache aktywny)",
-            f"  💡 Gwarantowany koszt: ~{cost_flash:.2f} zł (Flash) | ~{cost_pro:.2f} zł (Master Pro) | 40 zł = ok. 29–500 odcinków",
+            f"  💡 Szacowany koszt: ~{cost_flash:.2f} zł (Flash) | ~{cost_pro:.2f} zł (Master Pro) | 40 zł = ok. {ep_pro}–{ep_flash} odcinków",
             "  🛡️ Ochrona budżetu: Każda ewentualna zmiana stawek u Google zostanie natychmiast zasygnalizowana."
         ]
         return "\n".join(lines)
