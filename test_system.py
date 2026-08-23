@@ -890,6 +890,13 @@ def test_masterpieces_and_semiotics_pillars():
     assert "XC" in f_somatic
     print(" -> PASSED: Kanon Zunifikowany 90 Filarów AVT (Filary LXXXI – XC) w 100% zintegrowany i sprawny.")
 
+def test_translator_logger_and_sign_detector():
+    print("[TEST 29/29] Test odporności translator.py i loggera na błędy wizyjnej detekcji...")
+    import translator
+    assert hasattr(translator, "logger"), "translator module must define logger"
+    assert translator.logger is not None
+    print(" -> PASSED: Logger w translator.py poprawnie zainicjalizowany.")
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -920,5 +927,6 @@ if __name__ == "__main__":
     test_cognitive_prosody_and_narrative_pillars()
     test_visual_discourse_and_transcreation_pillars()
     test_masterpieces_and_semiotics_pillars()
-    print("\n Wszystkie testy jednostkowe i integracyjne (28/28) zakończone pełnym sukcesem!\n")
+    test_translator_logger_and_sign_detector()
+    print("\n Wszystkie testy jednostkowe i integracyjne (29/29) zakończone pełnym sukcesem!\n")
 

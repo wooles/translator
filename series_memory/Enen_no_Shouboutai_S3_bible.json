@@ -1,0 +1,55 @@
+{
+  "anime_title": "Enen no Shouboutai S3",
+  "characters": {
+    "Shinra -> Haumea": {
+      "description": "Zwrot: 'Haumea' (bohater -> antagonista)"
+    },
+    "Sho -> Shinra": {
+      "description": "Zwrot: 'bracie' (bracia (młodszy brat do starszego))"
+    },
+    "Shinra -> Sho": {
+      "description": "Zwrot: 'Sho' (bracia (starszy brat do młodszego))"
+    },
+    "Shinra -> Obi": {
+      "description": "Zwrot: 'Kapitanie Obi / Kapitan' (podwładny -> dowódca)"
+    },
+    "Maki -> Obi": {
+      "description": "Zwrot: 'kapitanie' (podwładna -> dowódca)"
+    },
+    "Licht -> Vulcan": {
+      "description": "Zwrot: 'Vulcan / po imieniu' (członkowie tego samego oddziału)"
+    },
+    "Licht -> Obi": {
+      "description": "Zwrot: 'kapitanie / panie kapitanie' (podwładny -> dowódca)"
+    },
+    "Haumea -> Shinra": {
+      "description": "Zwrot: 'Shinra / młody zbawco' (antagonista / wcielenie rozpaczy -> Filar / zbawca)"
+    },
+    "Obi -> Obywatele": {
+      "description": "Zwrot: 'proszę państwa / spokojnie' (kapitan Brygady -> cywile)"
+    }
+  },
+  "glossary": {
+    "Fire Force / Fire Soldiers": "Specjalne Siły Pożarnicze / Strażacy",
+    "The Great Cataclysm": "Wielki Kataklizm",
+    "Evangelist": "Ewangelista",
+    "Collective Unconscious": "zbiorowa podświadomość",
+    "Amaterasu": "Amaterasu",
+    "Infernals": "Męczennicy",
+    "Látom": "Látom",
+    "Great Cataclysm": "Wielki Kataklizm",
+    "Pillar": "Filar",
+    "Collective unconscious": "Zbiorowa nieświadomość",
+    "Pillars": "Filary",
+    "Fire Soldier": "strażak / strażak ogniowy",
+    "Despair Saintess / Saint": "Święta Rozpaczy / Święta"
+  },
+  "relationships": {},
+  "episodes_translated": [
+    "tmpowy5e9xz",
+    "tmpp115zk2e",
+    "tmpkmapjaze",
+    "tmp3q0tgomw",
+    "tmpkszqixci"
+  ]
+}

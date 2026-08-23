@@ -52,7 +52,7 @@ class VisualSignDetector:
         subs: pysubs2.SSAFile,
         min_gap_ms: int = 3500,
         margin_ms: int = 1500,
-        max_gaps_to_scan: int = 15
+        max_gaps_to_scan: int = 8
     ) -> List[Tuple[int, int]]:
         """
         BEZPIECZNIK 1 & 2 (Collision Guard & Zero-Gap Rule):
@@ -107,6 +107,7 @@ class VisualSignDetector:
     ) -> List[pysubs2.SSAEvent]:
         """
         Skanuje klatki z wyznaczonych bezpiecznych luk i tworzy zdarzenia ASS typu Sign dla wykrytych plansz.
+        Posiada mechanizm płynnego przełączania modeli (fallback) oraz circuit-breaker na wypadek 503.
         """
         if not gaps or not os.path.exists(video_path):
             return []
@@ -127,7 +128,19 @@ ZASADY BEZPIECZEŃSTWA (FILTR ANTYKOLIZYJNY):
 
 Zwróć wynik w formacie JSON zgodnym ze schematem DetectedSign."""
 
+        candidate_models = [model]
+        for fallback in ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-3.6-flash"]:
+            if fallback not in candidate_models:
+                candidate_models.append(fallback)
+
+        current_model_idx = 0
+        consecutive_errors = 0
+
         for gap_start, gap_end in gaps:
+            if consecutive_errors >= 2:
+                logger.info("VisualSignDetector: Pomijanie dalszych luk (przeciążenie serwerów Google 503) i zapisywanie napisów...")
+                break
+
             # Punkt czasowy w środku luki
             mid_ms = (gap_start + gap_end) // 2
             frame_path = None
@@ -138,41 +151,57 @@ Zwróć wynik w formacie JSON zgodnym ze schematem DetectedSign."""
 
                 pil_img = Image.open(frame_path)
                 
-                response = client.models.generate_content(
-                    model=model,
-                    contents=[prompt, pil_img],
-                    config=types.GenerateContentConfig(
-                        response_mime_type="application/json",
-                        response_schema=DetectedSign,
-                        temperature=0.1
-                    )
-                )
-
-                if response.text:
-                    data = json.loads(response.text)
-                    sign_info = DetectedSign.model_validate(data)
-                    
-                    if sign_info.is_title_or_banner and sign_info.translation_pl:
-                        clean_pl = sign_info.translation_pl.strip().strip("[]").upper()
-                        # Czas trwania planszy (maksymalnie 4.0s lub długość luki)
-                        event_duration = min(4000, gap_end - gap_start - 500)
-                        event_start = gap_start + 250
-                        event_end = event_start + max(2000, event_duration)
-
-                        # Generowanie estetycznego napisu górnego {\an8}
-                        styled_text = r"{\an8\fs26\bord1.5\shad1\c&HFFFFFF&\3c&H101020&}[ " + clean_pl + r" ]"
-                        
-                        new_ev = pysubs2.SSAEvent(
-                            start=event_start,
-                            end=event_end,
-                            text=styled_text,
-                            style="Sign"
+                success = False
+                for m_idx in range(current_model_idx, len(candidate_models)):
+                    cur_model = candidate_models[m_idx]
+                    try:
+                        response = client.models.generate_content(
+                            model=cur_model,
+                            contents=[prompt, pil_img],
+                            config=types.GenerateContentConfig(
+                                response_mime_type="application/json",
+                                response_schema=DetectedSign,
+                                temperature=0.1
+                            )
                         )
-                        detected_events.append(new_ev)
-                        logger.info(f"VisualSignDetector: Wykryto planszę na {event_start/1000:.1f}s: '{sign_info.original_text}' -> '[ {clean_pl} ]'")
+                        current_model_idx = m_idx
+                        consecutive_errors = 0
+                        success = True
+
+                        if response.text:
+                            data = json.loads(response.text)
+                            sign_info = DetectedSign.model_validate(data)
+                            
+                            if sign_info.is_title_or_banner and sign_info.translation_pl:
+                                clean_pl = sign_info.translation_pl.strip().strip("[]").upper()
+                                event_duration = min(4000, gap_end - gap_start - 500)
+                                event_start = gap_start + 250
+                                event_end = event_start + max(2000, event_duration)
+
+                                styled_text = r"{\an8\fs26\bord1.5\shad1\c&HFFFFFF&\3c&H101020&}[ " + clean_pl + r" ]"
+                                
+                                new_ev = pysubs2.SSAEvent(
+                                    start=event_start,
+                                    end=event_end,
+                                    text=styled_text,
+                                    style="Sign"
+                                )
+                                detected_events.append(new_ev)
+                                logger.info(f"VisualSignDetector: Wykryto planszę na {event_start/1000:.1f}s: '{sign_info.original_text}' -> '[ {clean_pl} ]'")
+                        break
+                    except Exception as e_model:
+                        err_str = str(e_model).lower()
+                        if "503" in err_str or "unavailable" in err_str or "429" in err_str:
+                            continue
+                        else:
+                            break
+                
+                if not success:
+                    consecutive_errors += 1
 
             except Exception as e:
-                logger.warning(f"VisualSignDetector: Błąd analizy luki {gap_start}-{gap_end}ms: {e}")
+                consecutive_errors += 1
+                logger.debug(f"VisualSignDetector: Błąd analizy luki {gap_start}-{gap_end}ms: {e}")
             finally:
                 if frame_path and os.path.exists(frame_path):
                     try:

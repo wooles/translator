@@ -47,6 +47,7 @@ from tqdm import tqdm
 # Wyciszenie ostrzeżeń deweloperskich z biblioteki google_genai
 logging.getLogger("google_genai").setLevel(logging.ERROR)
 logging.getLogger("google_genai.models").setLevel(logging.ERROR)
+logger = logging.getLogger("translator")
 
 from google import genai
 from google.genai import types
@@ -1094,8 +1095,8 @@ class MultimodalTranslator:
                     detected_signs = VisualSignDetector.detect_signs_in_gaps(
                         video_path=video_path,
                         gaps=gaps,
-                        client=client,
-                        model="gemini-3.7-flash"
+                        client=self.client,
+                        model=self.model_phase1
                     )
                     if detected_signs:
                         for sign_ev in detected_signs:
