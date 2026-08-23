@@ -694,6 +694,23 @@ FILAR XCVI: ASYMETRIA ZAIMKÓW 3. OSOBY I TRIANGULACJA PŁCI (KANOJO-TACHI [ONE 
   * 2. 彼ら (karera) / 男たち (otoko-tachi):
     -> Tłumacz na rodzaj męskoosobowy: ONI / ICH (Biernik) / IM / NIMI.
   * 3. ZAKAZ DOMYŚLNEGO MĘSKOOSOBOWEGO: Gdy podmiotem są kobiety, siostry zakonne, uczennice, kapłanki czy ofiary żeńskie (np. w Fire Force), KATEGORYCZNIE ZABRANIA SIĘ stosowania form 'oni / ich'.
+
+FILAR XCVII: PRAGMATYKA BIESIADNA I KUMPELSKIE ZAPROSZENIA DO ALKOHOLU (CONVIVIAL DRINKING CAMARADERIE):
+- Angielskie formuły biesiadne i pytania upewniające w kontekście alkoholu, toastów i jedzenia (np. "You're drinking, right?", "Have one, right?", "You want one? You're drinking, right?"):
+  * Są to AKTY BRATERSKIEJ/KUMPELSKIEJ INTEGRACJI, a NIE pytania o stan faktyczny czy diagnozę nałogu!
+  * KATEGORYCZNY ZAKAZ dosłowności: "Przecież pijesz" [BŁĄD KOSZMARNY - brzmi jak zarzut lub diagnoza lekarska!], "Pijesz, prawda?".
+  * OBOWIĄZKOWE polskie formuły biesiadne:
+    - "Konro, chlapniesz sobie? Chyba nie odmówisz?"
+    - "Napijesz się? Ze mną się nie napijesz?"
+    - "Pijesz ze mną, co?" / "Polejesz sobie? Nie odmówisz chyba?" / "Chlapniesz jednego?".
+
+FILAR XCVIII: TYPOGRAFIA PLANSZ TYTUŁOWYCH I ZWIĘZŁOŚĆ OPTYCZNA TYPESETTINGU (TITLE TYPOGRAPHY & SAFE AREA):
+- Polskie tytuły anime, rozdziałów i szyldów są o 40–60% dłuższe niż wersje angielskie/japońskie.
+- Ponieważ plansze tytułowe renderowane są ogromnym fontem (60–90 pt), długi tekst w jednej linii NIE MIEŚCI SIĘ W KADRZE (wychodzi poza bezpieczny obszar Canvasu Title-Safe 80%).
+- ŻELAZNA REGUŁA:
+  * Jeśli polski tytuł lub plansza przekracza 22–24 znaki, BEZWZGLĘDNIE sformatuj go w DWÓCH WYŚRODKOWANYCH WIERSZACH z tagiem \\N:
+    Przykład: "SPECJALNE SIŁY POŻARNICZE\\NCZĘŚĆ TRZECIA" (lub "ROZDZIAŁ 3").
+  * Kategoryczny zakaz generowania tasiemców tytułowych w jednej linii, które ucinają się na krawędziach ekranu!
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -1682,6 +1699,20 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR XCVI - Asymetria Zaimków 3. Osoby i Płeć (Kanojo-tachi vs Karera)]: "
             "Gdy japońskie audio zawiera 'kanojo-tachi' (lub podmiotem są kobiety/dziewczęta), BEZWZGLĘDNIE używaj 'one / je / ich', a NIE męskoosobowego 'oni / ich'!"
+        )
+
+    # 41. Pragmatyka biesiadna i toasty (Filar XCVII)
+    if any(w in combined_en for w in ["drinking", "drink", "have one", "cheers", "sake", "beer", "toast"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR XCVII - Pragmatyka Biesiadna i Kumpelskie Zaproszenia]: "
+            "Pytania o alkohol ('You're drinking, right?') tłumacz biesiadnie ('Chyba nie odmówisz?', 'Ze mną się nie napijesz?'), ZAKAZ dosłownego 'Przecież pijesz'!"
+        )
+
+    # 42. Typografia plansz tytułowych (Filar XCVIII)
+    if any(item.get("is_sign", False) for item in batch_items) or any(w in combined_en for w in ["season", "chapter", "episode", "part", "fire force"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR XCVIII - Typografia Plansz Tytułowych i Zwięzłość Typesettingu]: "
+            "Długie tytuły i plansze (>22 znaki) formatuj w DWÓCH WYŚRODKOWANYCH WIERSZACH z \\N (np. 'SPECJALNE SIŁY POŻARNICZE\\NCZĘŚĆ TRZECIA'), aby nie wychodziły poza kadr!"
         )
 
     if not focused_pillars:

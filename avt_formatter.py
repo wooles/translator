@@ -46,14 +46,18 @@ def calculate_cps(text: str, start_ms: int, end_ms: int) -> Tuple[float, bool]:
     is_fast = cps > SAFE_CPS_LIMIT
     return round(cps, 1), is_fast
 
-def split_subtitle_syntactically(text: str, max_line_len: int = MAX_LINE_LENGTH, is_ass: bool = True) -> str:
+def split_subtitle_syntactically(text: str, max_line_len: int = MAX_LINE_LENGTH, is_ass: bool = True, is_sign: bool = False) -> str:
     """
     Dzieli napis na MAKSYMALNIE 2 wiersze z zachowaniem spójności syntaktycznej (AVT)
     oraz struktury piramidy (dolny wiersz dłuższy lub równy górnemu).
+    Dla plansz ekranowych i tytułów (is_sign=True) stosuje bezpieczny limit optyczny (max 24 znaki/wiersz).
     Kategorycznie eliminuje 3-wierszowe schodki i wiszące sierotki.
     """
     if not text:
         return ""
+
+    if is_sign and max_line_len > 24:
+        max_line_len = 24
 
     sep = "\\N" if is_ass else "\n"
 

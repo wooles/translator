@@ -981,7 +981,7 @@ class MultimodalTranslator:
                         final_text, gloss_fixes = GlossaryManager.apply_deterministic_overrides(final_text, combined_glossary)
                         for fix in fixes + gloss_fixes:
                             pbar.write(f"  [AVT Linter/Słownik] {fix}")
-                        formatted_final = split_subtitle_syntactically(final_text, max_line_len=42, is_ass=is_ass)
+                        formatted_final = split_subtitle_syntactically(final_text, max_line_len=42, is_ass=is_ass, is_sign=item.get("is_sign", False))
                         translated_results[item["orig_idx"]] = formatted_final
                         history.append({"en": item["en"], "pl": formatted_final})
                 else:
@@ -999,7 +999,7 @@ class MultimodalTranslator:
                         final_text, gloss_fixes = GlossaryManager.apply_deterministic_overrides(final_text, combined_glossary)
                         for fix in fixes + gloss_fixes:
                             pbar.write(f"  [AVT Linter/Słownik] {fix}")
-                        formatted_final = split_subtitle_syntactically(final_text, max_line_len=42, is_ass=is_ass)
+                        formatted_final = split_subtitle_syntactically(final_text, max_line_len=42, is_ass=is_ass, is_sign=item.get("is_sign", False))
                         translated_results[item["orig_idx"]] = formatted_final
                         history.append({"en": item["en"], "pl": formatted_final})
 

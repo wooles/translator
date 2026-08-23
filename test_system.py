@@ -122,7 +122,9 @@ def test_rules_and_prompts():
     assert "FILAR XCIV:" in sys_prompt
     assert "FILAR XCV:" in sys_prompt
     assert "FILAR XCVI:" in sys_prompt
-    print(" -> PASSED: Kompletny Zunifikowany Kanon 96 Filarów AVT (Filary I – XCVI) jest aktywny w obu fazach tłumaczenia.")
+    assert "FILAR XCVII:" in sys_prompt
+    assert "FILAR XCVIII:" in sys_prompt
+    print(" -> PASSED: Kompletny Zunifikowany Kanon 98 Filarów AVT (Filary I – XCVIII) jest aktywny w obu fazach tłumaczenia.")
 
 def test_pydantic_schemas():
     print("[TEST 2/5] Weryfikacja schematów Pydantic...")
@@ -378,7 +380,13 @@ def test_avt_formatter_and_cps():
     parts = split_res.split("\\N")
     # Upewniamy się, że linijka 1 nie kończy się na 'do' ani 'z' ani 'w'
     assert not parts[0].strip().endswith((" w", " z", " do", " na"))
-    print(" -> PASSED: Podział linii AVT i kalkulator CPS działają bezbłędnie.")
+
+    # Test podziału planszy ekranowej/tytułu (is_sign=True) - ochrona przed wyjściem poza kadr
+    title_text = "SPECJALNE SIŁY POŻARNICZE CZĘŚĆ TRZECIA"
+    split_title = split_subtitle_syntactically(title_text, max_line_len=42, is_ass=True, is_sign=True)
+    assert "\\N" in split_title
+    assert len(split_title.split("\\N")) == 2
+    print(" -> PASSED: Podział linii AVT, ochrona plansz is_sign i kalkulator CPS działają bezbłędnie.")
 
 def test_prosody_and_diarizer():
     print("[TEST 11/12] Test lokalnej analizy prozodii i diarizacji fonicznej F0...")
