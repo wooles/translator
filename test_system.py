@@ -19,7 +19,7 @@ from verifier import RefinedLine, RefinedBatchResponse
 from translator import LineTranslation, BatchTranslationResponse, sanitize_sub_text
 
 def test_rules_and_prompts():
-    print("[TEST 1/25] Sprawdzanie kompletności 64 Zunifikowanych Filarów AVT i promptów...")
+    print("[TEST 1/28] Sprawdzanie kompletności 90 Zunifikowanych Filarów AVT i promptów...")
     sys_prompt = get_translation_system_prompt()
     ver_prompt = get_verifier_system_prompt()
     assert "I see" in sys_prompt
@@ -90,7 +90,33 @@ def test_rules_and_prompts():
     assert "FILAR LXII:" in sys_prompt
     assert "FILAR LXIII:" in sys_prompt
     assert "FILAR LXIV:" in sys_prompt
-    print(" -> PASSED: Kompletny Zunifikowany Kanon 64 Filarów AVT (Zero Redundancji) jest aktywny w obu fazach tłumaczenia.")
+    assert "FILAR LXV:" in sys_prompt
+    assert "FILAR LXVI:" in sys_prompt
+    assert "FILAR LXVII:" in sys_prompt
+    assert "FILAR LXVIII:" in sys_prompt
+    assert "FILAR LXIX:" in sys_prompt
+    assert "FILAR LXX:" in sys_prompt
+    assert "FILAR LXXI:" in sys_prompt
+    assert "FILAR LXXII:" in sys_prompt
+    assert "FILAR LXXIII:" in sys_prompt
+    assert "FILAR LXXIV:" in sys_prompt
+    assert "FILAR LXXV:" in sys_prompt
+    assert "FILAR LXXVI:" in sys_prompt
+    assert "FILAR LXXVII:" in sys_prompt
+    assert "FILAR LXXVIII:" in sys_prompt
+    assert "FILAR LXXIX:" in sys_prompt
+    assert "FILAR LXXX:" in sys_prompt
+    assert "FILAR LXXXI:" in sys_prompt
+    assert "FILAR LXXXII:" in sys_prompt
+    assert "FILAR LXXXIII:" in sys_prompt
+    assert "FILAR LXXXIV:" in sys_prompt
+    assert "FILAR LXXXV:" in sys_prompt
+    assert "FILAR LXXXVI:" in sys_prompt
+    assert "FILAR LXXXVII:" in sys_prompt
+    assert "FILAR LXXXVIII:" in sys_prompt
+    assert "FILAR LXXXIX:" in sys_prompt
+    assert "FILAR XC:" in sys_prompt
+    print(" -> PASSED: Kompletny Zunifikowany Kanon 90 Filarów AVT (Zero Redundancji) jest aktywny w obu fazach tłumaczenia.")
 
 def test_pydantic_schemas():
     print("[TEST 2/5] Weryfikacja schematów Pydantic...")
@@ -650,7 +676,7 @@ def test_master_avt_pillars():
     print(" -> PASSED: Zunifikowane filary realioznawcze, metryzacji i modalności w 100% zintegrowane.")
 
 def test_excellence_avt_pillars():
-    print("[TEST 25/25] Test Pragmatyki Anime i Żargonu RPG (Shūjoshi, Onomatopeje, RPG)...")
+    print("[TEST 25/26] Test Pragmatyki Anime i Żargonu RPG (Shūjoshi, Onomatopeje, RPG)...")
     from avt_linter import AVTLinter
     from rules import get_focused_rules_for_batch
 
@@ -674,7 +700,155 @@ def test_excellence_avt_pillars():
     batch_shujo = [{"en": "Doko ni iku no kashira?"}]
     f_shujo = get_focused_rules_for_batch(batch_shujo)
     assert "XVI" in f_shujo
-    print(" -> PASSED: Kanon Zunifikowany 64 Filarów AVT w 100% zintegrowany i sprawny.")
+    print(" -> PASSED: Pragmatyka anime i żargon RPG w 100% zintegrowane.")
+
+def test_cognitive_prosody_and_narrative_pillars():
+    print("[TEST 26/27] Test Kognitywistyki Prozodii, Narracji i Filarów AVT (LXV – LXX)...")
+    from rules import get_focused_rules_for_batch
+
+    # 1. Test dyspozytora dla Izomorfizmu Napięcia (Filar LXV)
+    batch_suspense = [{"en": "The truth is, he will never betray us."}]
+    f_suspense = get_focused_rules_for_batch(batch_suspense)
+    assert "LXV" in f_suspense
+
+    # 2. Test dyspozytora dla Prozodii Oddechu (Filar LXVI)
+    batch_breath = [{"en": "I can't... breath... run!"}]
+    f_breath = get_focused_rules_for_batch(batch_breath)
+    assert "LXVI" in f_breath
+
+    # 3. Test dyspozytora dla Kąta Kamery Empatycznej (Filar LXVII)
+    batch_empathy = [{"en": "He did this great favor for me."}]
+    f_empathy = get_focused_rules_for_batch(batch_empathy)
+    assert "LXVII" in f_empathy
+
+    # 4. Test dyspozytora dla Pamięci Leitmotywów (Filar LXVIII)
+    batch_leitmotif = [{"en": "This is my vow and destiny."}]
+    f_leitmotif = get_focused_rules_for_batch(batch_leitmotif)
+    assert "LXVIII" in f_leitmotif
+
+    # 5. Test dyspozytora dla Hierarchii Akustycznej (Filar LXIX)
+    batch_ambient = [{"en": "Emergency broadcast over the loudspeaker."}]
+    f_ambient = get_focused_rules_for_batch(batch_ambient)
+    assert "LXIX" in f_ambient
+
+    # 6. Test dyspozytora dla 4. Ściany i Metanarracji (Filar LXX)
+    batch_meta = [{"en": "The manga author missed the deadline for this episode."}]
+    f_meta = get_focused_rules_for_batch(batch_meta)
+    assert "LXX" in f_meta
+    print(" -> PASSED: Filary Kognitywistyki Prozodii i Narracji (LXV – LXX) w 100% zintegrowane.")
+
+def test_visual_discourse_and_transcreation_pillars():
+    print("[TEST 27/28] Test Kognitywistyki Wizualnej, Dyskursu i Transkreacji (LXXI – LXXX)...")
+    from rules import get_focused_rules_for_batch
+
+    # 1. Test dyspozytora dla Dostępności Leksykalnej (Filar LXXI)
+    batch_cps = [{"en": "Very fast spoken dialogue", "cps": 18.5}]
+    f_cps = get_focused_rules_for_batch(batch_cps)
+    assert "LXXI" in f_cps
+
+    # 2. Test dyspozytora dla Wektora Kinezycznego i Sakuga (Filar LXXII)
+    batch_sakuga = [{"en": "Dodge the slash attack and punch him!"}]
+    f_sakuga = get_focused_rules_for_batch(batch_sakuga)
+    assert "LXXII" in f_sakuga
+
+    # 3. Test dyspozytora dla Modalności Noda/Wake da (Filar LXXIII)
+    batch_noda = [{"en": "Because the reason is, wake dewa nai."}]
+    f_noda = get_focused_rules_for_batch(batch_noda)
+    assert "LXXIII" in f_noda
+
+    # 4. Test dyspozytora dla Rejestru Chibi / SD (Filar LXXIV)
+    batch_chibi = [{"en": "Look at that chibi funny face, you dummy!"}]
+    f_chibi = get_focused_rules_for_batch(batch_chibi)
+    assert "LXXIV" in f_chibi
+
+    # 5. Test dyspozytora dla Akcentu Logicznego i Szczytu F0 (Filar LXXV)
+    batch_f0 = [{"en": "You traitor! How could you!"}]
+    f_f0 = get_focused_rules_for_batch(batch_f0)
+    assert "LXXV" in f_f0
+
+    # 6. Test dyspozytora dla Biernej Agresji w Keigo (Filar LXXVI)
+    batch_passive = [{"en": "It is my honor to watch your pathetic insolence die in silence."}]
+    f_passive = get_focused_rules_for_batch(batch_passive)
+    assert "LXXVI" in f_passive
+
+    # 7. Test dyspozytora dla Triangulacji SFX (Filar LXXVII)
+    batch_sfx = [{"en": "A sudden silence and flash clash."}]
+    f_sfx = get_focused_rules_for_batch(batch_sfx)
+    assert "LXXVII" in f_sfx
+
+    # 8. Test dyspozytora dla Interfejsów Diegetycznych i Czatów (Filar LXXVIII)
+    batch_ui = [{"en": "Check your smartphone text message and chat."}]
+    f_ui = get_focused_rules_for_batch(batch_ui)
+    assert "LXXVIII" in f_ui
+
+    # 9. Test dyspozytora dla Transkreacji Emocjonalnej (Filar LXXIX)
+    batch_trans = [{"en": "Let's raise a toast and rhyme this poem."}]
+    f_trans = get_focused_rules_for_batch(batch_trans)
+    assert "LXXIX" in f_trans
+
+    # 10. Test dyspozytora dla Mikro-Interpunkcji Afektywnej (Filar LXXX)
+    batch_punct = [{"en": "W-What are you doing? Wha-"}]
+    f_punct = get_focused_rules_for_batch(batch_punct)
+    assert "LXXX" in f_punct
+    print(" -> PASSED: Kanon Zunifikowany 80 Filarów AVT (Filary LXXI – LXXX) w 100% zintegrowany.")
+
+def test_masterpieces_and_semiotics_pillars():
+    print("[TEST 28/28] Test Arcydzieł Światowej Translatoryki i Semiotyki (LXXXI – XC)...")
+    from rules import get_focused_rules_for_batch
+
+    # 1. Test dyspozytora dla Organicznej Ekspozycji Ghibli (Filar LXXXI)
+    batch_ghibli = [{"en": "Let me explain this world and give you full exposition."}]
+    f_ghibli = get_focused_rules_for_batch(batch_ghibli)
+    assert "LXXXI" in f_ghibli
+
+    # 2. Test dyspozytora dla Semiotycznej Negocjacji Eco (Filar LXXXII)
+    batch_eco = [{"en": "The deep intent and meaning of this metaphor."}]
+    f_eco = get_focused_rules_for_batch(batch_eco)
+    assert "LXXXII" in f_eco
+
+    # 3. Test dyspozytora dla Dekolonizacji Składni Ladmirala (Filar LXXXIII)
+    batch_cibliste = [{"en": "There is no doubt that the fact that in order to do so."}]
+    f_cibliste = get_focused_rules_for_batch(batch_cibliste)
+    assert "LXXXIII" in f_cibliste
+
+    # 4. Test dyspozytora dla Wykonawczego Kunsztu Smitha (Filar LXXXIV)
+    batch_mouth = [{"en": "A dramatic whisper and shouting speech with rage."}]
+    f_mouth = get_focused_rules_for_batch(batch_mouth)
+    assert "LXXXIV" in f_mouth
+
+    # 5. Test dyspozytora dla Integracji Kinematograficznej Romero-Fresco (Filar LXXXV)
+    batch_blindness = [{"en": "Look at the beauty of this cinematic landscape."}]
+    f_blindness = get_focused_rules_for_batch(batch_blindness)
+    assert "LXXXV" in f_blindness
+
+    # 6. Test dyspozytora dla Polifonii Bachtina (Filar LXXXVI)
+    batch_poly = [
+        {"en": "Hello sir.", "speaker_gender": "kobieta"},
+        {"en": "Get out of here!", "speaker_gender": "mężczyzna"}
+    ]
+    f_poly = get_focused_rules_for_batch(batch_poly)
+    assert "LXXXVI" in f_poly
+
+    # 7. Test dyspozytora dla Czystości Fokalizacji (Filar LXXXVII)
+    batch_focal = [{"en": "I asked myself in my own inner mind.", "is_thought": True}]
+    f_focal = get_focused_rules_for_batch(batch_focal)
+    assert "LXXXVII" in f_focal
+
+    # 8. Test dyspozytora dla Protokołu Bermana (Filar LXXXVIII)
+    batch_berman = [{"en": "A rough and bizarre poetic raw voice."}]
+    f_berman = get_focused_rules_for_batch(batch_berman)
+    assert "LXXXVIII" in f_berman
+
+    # 9. Test dyspozytora dla Restytucji Steinera (Filar LXXXIX)
+    batch_steiner = [{"en": "A cultural tradition and idiom lost in translation."}]
+    f_steiner = get_focused_rules_for_batch(batch_steiner)
+    assert "LXXXIX" in f_steiner
+
+    # 10. Test dyspozytora dla Somatycznego Rezonansu Robinsona (Filar XC)
+    batch_somatic = [{"en": "Terror and chills running through despair and heartbreak."}]
+    f_somatic = get_focused_rules_for_batch(batch_somatic)
+    assert "XC" in f_somatic
+    print(" -> PASSED: Kanon Zunifikowany 90 Filarów AVT (Filary LXXXI – XC) w 100% zintegrowany i sprawny.")
 
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
@@ -703,5 +877,8 @@ if __name__ == "__main__":
     test_extended_avt_pillars()
     test_master_avt_pillars()
     test_excellence_avt_pillars()
-    print("\n Wszystkie testy jednostkowe i integracyjne (25/25) zakończone pełnym sukcesem!\n")
+    test_cognitive_prosody_and_narrative_pillars()
+    test_visual_discourse_and_transcreation_pillars()
+    test_masterpieces_and_semiotics_pillars()
+    print("\n Wszystkie testy jednostkowe i integracyjne (28/28) zakończone pełnym sukcesem!\n")
 

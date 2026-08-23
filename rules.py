@@ -491,6 +491,162 @@ FILAR LXIV: TRÓJSTOPNIOWY PROTOKÓŁ SAMODOSKONALENIA MULTI-AGENT REFLEXION (MQ
     - Major (Poważny): kalka językowa, brak odnominalizowania, przekroczenie limitu 17 CPS / 42 znaków.
     - Minor (Drobny): drobna interpunkcja, pojedyncza sierotka.
   * Etapy: Krok 1 (Szkic Tłumacza) -> Krok 2 (Krytyka MQM Script Doctora) -> Krok 3 (Szlif Redaktora Naczelnego).
+
+
+MODUŁ VII: KOGNITYWISTYKA PROZODII, STRUKTURY NARRACYJNEJ I DIALOGU JAPOŃSKIEGO (FILARY LXV – LXX)
+
+FILAR LXV: IZOMORFIZM NAPIĘCIA SKŁADNIOWEGO I ANTYCYPACJI (SOV VS SVO SUSPENSE ISOMORPHISM & ANTI-SPOILER SYNTAX):
+- W języku japońskim orzeczenie, kluczowa negacja lub rozstrzygnięcie logiczne padają ZAWSZE na samym końcu kwestii (szyk SOV, np. "...to wa kangaerarenai", "...shika erabenai").
+- BEZWZGLĘDNY ZAKAZ niszczenia suspensu i wyprzedzania gry aktora (seiyū) w polskim szyku SVO:
+  * Jeśli w scenie dramatycznej ujawnienie zdrady, zgonu, odmowy lub tajemnicy następuje w ostatnim ułamku sekundy wypowiedzi japońskiej:
+    -> BŁĄD [X] (przedwczesny spoiler): "Nie do pomyślenia jest, żeby doszło do zdrady!" (widz czyta 'Nie do pomyślenia' zanim aktor otworzy usta).
+    -> POPRAWNIE [OK] (izomorfizm napięcia): "Żeby doszło do czegoś takiego... to nie do pomyślenia!" / "Mój miecz w twoich rękach?... Wykluczone!".
+  * Zsynchronizuj ładunek dramatyczny rematu z intonacyjnym punktem kulminacyjnym w audio japońskim.
+
+FILAR LXVI: FONICZNA SPÓJNOŚĆ KINEZJOLOGICZNA I PROZODIA ODDECHU (BREATH-GROUP & PHONATION CADENCE ALIGNMENT):
+- Aktorzy głosowi anime (seiyū) budują emocje na fizjologii krtani i oddechu (inhalation-pause, szloch, panika, skrajne wyczerpanie, zadyszka w biegu):
+  * Frazowanie napisu MUSI być zsynchronizowane z grupami oddechowymi postaci:
+    -> Gdy postać mówi na urywanych wydechach podczas walki/ucieczki, ZAKAZ stosowania długich, płynnych zdań wielokrotnie złożonych.
+    -> Stosuj krótkie, zwięzłe człony syntaktyczne, cięcia myślnikiem lub wielokropkiem oddające kinezjologię mowy ("Jeszcze... nie teraz... Muszę... dać radę!").
+  * Test kinetyczny: napis musi "oddychać" w tym samym rytmie co klatka piersiowa bohatera na ekranie.
+
+FILAR LXVII: KĄT KAMERY EMPATYCZNEJ I DEIKSA PSYCHOLOGICZNA (SUSUMU KUNO'S EMPATHY SYNTAX & PERSPECTIVE ALIGNMENT):
+- Japońska gramatyka relacji dawania/otrzymywania (ageru, kureru, morau, temorau, yaru) ściśle ustala kąt kamery psychologicznej (z czyjego punktu widzenia odbiorca ma współodczuwać scenę - prof. Susumu Kuno):
+  * 1. Kureru / Tekureta (ktoś wszedł w moją sferę, by mi pomóc) -> akcentuj wdzięczność, serdeczność i bliskość ("Przyszedł mi z pomocą", "Uratowałeś mi skórę", "Pomógł mi").
+  * 2. Morau / Temoratta (ja nakłoniłem kogoś / uzyskałem przysługę) -> akcentuj sprawczość lub prośbę ("Udało mi się go przekonać", "Wyprosiłam to u niego").
+  * 3. Ageru / Yaru (świadczenie przysługi na zewnątrz) -> akcentuj intencję wsparcia lub wyższości.
+  * ZAKAZ spłaszczania tych relacji do bezosobowego angielskiego szablonu ("He did it for me").
+
+FILAR LXVIII: PAMIĘĆ LEITMOTYWÓW I ECHA NARRACYJNEGO (LONG-TERM LEITMOTIF & CATCHPHRASE PERSISTENCE):
+- Wieloepizodowa spójność haseł, przysiąg, dewiz życiowych i fraz-kluczy (Catchphrases & Oaths):
+  * Jeśli postać powtarza specyficzną frazę (np. przysięgę z dzieciństwa, motto życiowe, rytualne zawołanie bitewne), która powraca w finale serii jako klamra kompozycyjna:
+    -> BEZWZGLĘDNY OBOWIĄZEK zachowania identycznej formy leksykalnej w każdym odcinku!
+    -> ZAKAZ zmieniania powracających motywów na losowe synonimy (np. odcinek 1: "Taki mam styl!", odcinek 24: "Nigdy się nie cofnę!" - niszczy katharsis widza).
+
+FILAR LXIX: HIERARCHIA PRZESTRZENNO-AKUSTYCZNA I DIALOGI DRUGOPLANOWE (SOUNDSTAGE & AMBIENT SPEECH TIERING):
+- W wielokanałowym miksie dźwiękowym (5.1/Atmos) oraz scenach z wieloma źródłami głosu stosuj trójstopniową gradację:
+  * 1. Poziom I (Fabuła pierwszoplanowa): Dialog postaci w centrum kadru – 100% priorytetu, dół ekranu.
+  * 2. Poziom II (Komunikaty diegetyczne / megafony / radio / interkom): Góra ekranu, wersaliki lub kursywa <i>[ KOMUNIKAT BAZY ]</i>.
+  * 3. Poziom III (Gwar tłumu / szum tła - Ambient Speech): Świadoma redukcja i eliminacja – tłumacz wyłącznie wtedy, gdy kwestia w tle niesie kluczowy żart sytuacyjny lub wskazówkę fabularną. Zakaz zaśmiecania ekranu beztreściowym szumem gapiów.
+
+FILAR LXX: PRAGMATYKA METANARRACYJNA I PRZEŁAMYWANIE CZWARTEJ ŚCIANY (META-HUMOR & 4TH-WALL EQUIVALENCE):
+- Komedie, parodie i serie łamiące czwartą ścianę (żarty z terminów mangaki, komitetu cenzury BPO, stacji Tokyo MX, budżetu animacji czy aktorów seiyū):
+  * Stosuj funkcjonalną ekwiwalencję metanarracyjną:
+    -> Zastępuj hermetyczne japońskie realia telewizyjno-redakcyjne błyskotliwym, powszechnie zrozumiałym dla polskiego widza żartem z konwencji anime/mangi i produkcji filmowej.
+    -> KATEGORYCZNY ZAKAZ niszczenia dynamiki komediowej encyklopedycznymi przypisami u góry ekranu!
+
+
+MODUŁ VIII: KOGNITYWISTYKA WIZUALNA, LINGWISTYKA DYSKURSU I TRANSKREACJA (FILARY LXXI – LXXX)
+
+FILAR LXXI: DOSTĘPNOŚĆ LEKSYKALNA, ROZKŁAD CZĘSTOTLIWOŚCI I ELIMINACJA TARCIA SŁOWNIKOWEGO (LEXICAL ACCESSIBILITY & SACCADIC REGRESSION SUPPRESSION):
+- Badania okulograficzne (Szarkowska, Kruger, Perego) dowodzą, że słowa rzadkie, archaizmy i skomplikowane zbitki wielosylabowe wydłużają czas fiksacji wzroku i wywołują regresje sakkadowe (cofanie wzroku).
+- W szybkim dialogu (CPS > 15) stosuj słownictwo o WYSOKIEJ DOSTĘPNOŚCI PERCEPCYJNEJ (leksyka natychmiast asymilowana przez mózg):
+  * Unikaj sztucznie napuszonych terminów, jeśli postać mówi prosto i dynamicznie.
+  * Trudne neologizmy i wyszukane metafory rezerwuj WYŁĄCZNIE dla scen wolnych (CPS < 12), gdzie widz ma czas na asymilację leksykalną.
+
+FILAR LXXII: ZGODNOŚĆ WEKTORA KINEZYCZNEGO I TRAJEKTORII SPOJRZENIA (GAZE-MOTION CONCORDANCE & SAKUGA PACING):
+- W dynamicznych scenach akcji i animacji kulminacyjnej (Sakuga):
+  * Wzrok widza podąża za wektorem ruchu postaci i kamery panoramicznej (od lewej do prawej, z góry na dół).
+  * Układaj tekst tak, by nie zmuszać oka do czytania pod prąd gwałtownego ruchu w kadrze.
+  * W scenach szaleńczego tempa preferuj jeden zwarty wiersz u dołu lub wyrównanie rematu do punktu skupienia akcji.
+
+FILAR LXXIII: PRAGMATYKA MODALNOŚCI EKSPLANACYJNEJ I DYSKURSU (NODA / WAKE DA / MONODA PRAGMATIC UNPACKING):
+- Precyzyjny przekład japońskich partykuł dyskursywnych i teleologicznych:
+  * 1. ~nda / ~noda (funkcja eksplanacyjna/przyczynowa) -> "Bo widzisz...", "Chodzi o to, że...", "Przecież..." (zakaz suchego spłaszczania do zdania oznajmującego).
+  * 2. ~wake da / ~wake dewa nai (logiczna konkluzja/negacja) -> "A zatem to dlatego...", "Więc to tak...", "To nie tak, że...".
+  * 3. ~monoda / ~koto da (prawda ogólna/powinność moralna) -> "Taka już kolej rzeczy", "W takich chwilach po prostu...".
+
+FILAR LXXIV: PLASTYCZNOŚĆ REJESTRU WIZUALNEGO CHIBI / SD (SUPER-DEFORMED VISUAL REGISTER SHIFTS):
+- W anime postaci w ułamku sekundy przechodzą ze stylu realistycznego w formę karykaturalną (Chibi / SD - Super Deformed):
+  * Przekład MUSI natychmiast podążać za plastyką kadru: przejdź na rejestr komediowy, pieszczotliwy, infantylny lub udawane dąsy ("Ojejciu, ale groźny!", "No weźcie, nie bądźcie tacy!").
+  * Zakaz utrzymywania sztywnego, poważnego tonu, gdy postać na ekranie zamienia się w małego ludzika z wielką głową.
+
+FILAR LXXV: ZESTROJENIE AKCENTU LOGICZNEGO I PROMINENCJI FONICZNEJ F0 (PITCH-ACCENT & F0 PEAK PROSODIC CONVERGENCE):
+- Słowo, na które w audio japońskim seiyū kładzie maksymalny nacisk intonacyjny (szczyt foniczny F0 / Pitch Accent):
+  * MUSI w polskim zdaniu znaleźć się na pozycji naturalnego akcentu logicznego (zazwyczaj przed pauzą lub na końcu frazy).
+  * Zakaz chowania kluczowego słowa oskarżenia lub zawołania w środku bezbarwnego polskiego zdania pobocznego.
+
+FILAR LXXVI: DYSTANSOWANIE HONORYFIKATYWNE I AGRESJA BIERNA W KEIGO (HONORIFIC DISTANCING & PASSIVE-AGGRESSIVE KEIGO):
+- Gdy wrodzy sobie bohaterowie, rywale lub antagoniści używają przesadnie formalnego języka szacunku (Keigo/Sonkeigo):
+  * Celem jest okazanie lodowatej pogardy, cynizmu, wyższości lub biernej agresji.
+  * ZAKAZ tłumaczenia takiego dialogu na wulgarną pyskówkę!
+  * POPRAWNIE: Utrzymuj chłodny, dystyngowany, hiperpoprawny styl urzędowo-dworski ("Będę niezmiernie zobowiązany, jeśli zechce pan wreszcie zamilknąć", "Doprawdy, zachwyca mnie pańska bezgraniczna naiwność").
+
+FILAR LXXVII: TRÓJWARSTWOWA TRIANGULACJA ONOMATOPEI MULTIMODALNYCH (VISUAL-ACOUSTIC SFX TRIANGULATION):
+- Rozstrzyganie koegzystencji dźwięku audio, napisu graficznego w kadrze i dialogu postaci:
+  * 1. Jeśli odgłos słychać wyraźnie w ścieżce dźwiękowej i bohater go komentuje -> ZAKAZ dublowania napisu onomatopei na ekranie.
+  * 2. Jeśli graficzny napis w kadrze wyraża stan bezdźwięczny (np. grobową ciszę 'Shiin', błysk 'Pika') -> przetłumacz w nawiasie lub oddaj poetycko w dialogu ("Cisza jak makiem zasiał...").
+  * 3. Unikaj redundancji semiotycznej zaśmiecającej pole widzenia.
+
+FILAR LXXVIII: POZYCJONOWANIE I TYPOGRAFIA INTERFEJSÓW DIEGETYCZNYCH (DIEGETIC UI, SMARTPHONE & CHAT FORMATTING):
+- Wiadomości na ekranach smartfonów, czaty sieciowe MMO, komunikatory i interfejsy HUD:
+  * SMS / komunikator: formatuj zwięźle w nawiasie z identyfikacją nadawcy: [ SMS od: Mama: Wracaj do domu! ].
+  * Czaty w grach/sieci: stosuj autentyczny styl komunikatorów (zwięzłość, brak wielkich liter, dynamika: "rzuć heala!").
+  * Pozycjonuj napisy blisko źródła ekranowego, chroniąc czytelność głównego dialogu.
+
+FILAR LXXIX: TRANSKREACJA EMOCJONALNA I INDEKS REZONANSU AFEKTYWNEGO (AFFECTIVE RESONANCE & TRANSCREATION EQUIVALENCE):
+- W scenach komediowych, piosenkach, rymowankach, toastach i grach słownych nadrzędnym celem jest WYWOŁANIE IDENTYCZNEJ REAKCJI EMOCJONALNEJ (śmiech, wzruszenie, dreszcz emocji):
+  * Dopuszcza się pełną transkreację (odejście od dosłownego słownictwa na rzecz stworzenia nowego polskiego żartu/rymu), o ile zachowuje charakter postaci i metrum sceny.
+  * Wywołanie u polskiego widza autentycznego śmiechu ma pierwszeństwo przed suchą poprawnością filologiczną.
+
+FILAR LXXX: KOGNITYWNA MIKRO-INTERPUNKCJA AFEKTYWNA (EMOTIONAL MICRO-PUNCTUATION & HESITATION FRAMING):
+- Perfekcyjna ortografia stanów emocjonalnych i załamań mowy:
+  * Jąkanie foniczne: łącz pojedynczym dywizem po pierwszej sylabie ("N-Nie patrz tak na mnie!" - ZAKAZ: "N... nie patrz").
+  * Nagłe urwanie wypowiedzi ze strachu / przerwanie przez inną postać: myślnik na końcu bez kropki ("Chciałam tylko powiedzieć, że–").
+  * Wahanie, niepewność, zawstydzenie (tsundere/dandere): wielokropek bez spacji ("Wiesz... tak sobie pomyślałam...").
+
+
+MODUŁ IX: KANON ARCYDZIEŁ ŚWIATOWEJ TRANSLATORYKI I SEMIOTYKI (FILARY LXXXI – XC)
+
+FILAR LXXXI: ZASADA ORGANICZNEJ EKSPOZYCJI I ANTY-OBJAŚNIANIA (THE GHIBLI & NEIL GAIMAN MINIMALIST EXPOSITION PRINCIPLE):
+- Ochrona filmowości i kinowego rytmu sceny:
+  * ZAKAZ dopisywania łopatologicznych wyjaśnień, dopowiedzeń i wpychania zbędnej ekspozycji w dialog, gdy obraz, reżyseria i atmosfera niosą już wystarczający ładunek narracyjny (zasada Hayao Miyazakiego & Neila Gaimana: "Zaufaj inteligencji i zmysłom widza").
+  * Dialog ma brzmieć autentycznie dla postaci, a nie jak instrukcja obsługi świata dla widza.
+
+FILAR LXXXII: SEMIOTYCZNA NEGOCJACJA ZNACZENIA I DEEP INTENT (UMBERTO ECO'S 'DIRE QUASI LA STESSA COSA'):
+- Gdy dosłowność i obca kultura są nieprzetłumaczalne 1:1, tłumacz prowadzi świadomą negocjację semiotyczną:
+  * Poświęć drugorzędną warstwę leksykalną, aby w 100% ocalić głęboką intencję dzieła (intentio operis), sens podtekstowy i ładunek emocjonalny.
+  * Tłumaczenie to sztuka kompromisu, w której zysk emocjonalny musi przewyższać stratę dosłowności.
+
+FILAR LXXXIII: DYNAMIZM DOCELOWY I CAŁKOWITA DEKOLONIZACJA SKŁADNI (JEAN-RENÉ LADMIRAL'S CIBLISTE MANIFESTO):
+- Całkowite zerwanie z grawitacją składni języka źródłowego:
+  * Zdanie po polsku musi brzmieć tak, jakby zostało od zera pomyślane i napisane przez wybitnego polskiego dramaturga/scenarzystę.
+  * Kategoryczny zakaz pozostawiania obcych śladów konstrukcyjnych i obcojęzycznego toku myślenia.
+
+FILAR LXXXIV: WYKONAWCZY KUNSZT AKTORSTWA GŁOSOWEGO (ALEXANDER O. SMITH'S PERFORMATIVE VOICING & MOUTH-FEEL):
+- Dialog filmowy musi być zoptymalizowany nie do cichego czytania z kartki, lecz do fizycznej emisji głosu i rezonansu krtani (tzw. "Mouth-Feel Test"):
+  * Rytm spółgłosek i samogłosek musi wspierać energię, pauzę i ładunek aktorski wypowiedzi.
+  * Każda linijka tekstu musi naturalnie "układać się w ustach" aktora/lektora.
+
+FILAR LXXXV: INTEGRACJA KINEMATOGRAFICZNA I ELIMINACJA ŚLEPOTY NAPISOWEJ (PABLO ROMERO-FRESCO'S ACCESSIBLE FILMMAKING):
+- Napis jako organiczny element kompozycji kadru:
+  * Eliminacja "Subtitling Blindness" (zjawiska, w którym widz gapi się wyłącznie na dolne litery, tracąc niuanse gry aktorskiej i kompozycji obrazu).
+  * Napis musi być tak skondensowany, czysty i ergonomiczny, by oko po ułamku sekundy wracało do centrum akcji na ekranie.
+
+FILAR LXXXVI: POLIFONIA GŁOSÓW I HETEROGLOSJA POSTACI (MIKHAIL BAKHTIN'S DIALOGIC POLYPHONY):
+- Bezwzględne zróżnicowanie idiolektów:
+  * Każda postać musi mieć własny unikalny słownik, zasób fraz, długość wypowiedzi i strukturę myśli.
+  * Kategoryczny zakaz zjawiska, w którym wszystkie postacie na ekranie mówią tym samym głosem tłumacza.
+
+FILAR LXXXVII: CZYSTOŚĆ FOKALIZACJI I WEWNĘTRZNEGO PUNKTU WIDZENIA (COGNITIVE NARRATOLOGY & FOCALIZATION PURITY):
+- W monologach wewnętrznych, myślach i retrospekcjach:
+  * Zachowaj subiektywny, intymny punkt widzenia danej postaci, bez domieszek obiektywizującego dystansu zewnętrznego narratora.
+  * Myśl postaci musi brzmieć jak jej autentyczny, surowy proces myślowy.
+
+FILAR LXXXVIII: PROTOKÓŁ ANTY-DEFORMACYJNY ANTOINE'A BERMANA (BERMAN'S 12 DEFORMING TENDENCIES SUPPRESSION):
+- Eliminacja klasycznych destrukcji przekładu:
+  * Zakaz racjonalizacji (wygładzania poetyckiej chropowatości i ostrości oryginału).
+  * Zakaz klaryfikacji (nadmiernego tłumaczenia tego, co autor celowo pozostawił niejasne).
+  * Zakaz ubożenia jakościowego i niszczenia wewnętrznych rytmów dzieła.
+
+FILAR LXXXIX: REKOMPENSATA HERMENEUTYCZNA I RESTYTUCJA EMOCJI (GEORGE STEINER'S HERMENEUTIC RESTITUTION):
+- Gdy w jednym miejscu dialogu tracimy specyficzny niuans kulturowy lub żart:
+  * Hermeneutycznym obowiązkiem tłumacza jest odzyskanie tego ładunku emocjonalnego i wzbogacenie sąsiedniej frazy, aby ocalić całkowity bilans artystyczny i dramaturgiczny sceny.
+
+FILAR XC: SOMATYCZNY REZONANS EMOCJONALNY (DOUGLAS ROBINSON'S SOMATIC TRANSLATION TRANSDUCTION):
+- Fizyczny rezonans afektywny:
+  * Przekład musi przenosić fizjologiczne reakcje ciała (skurcz żołądka, ucisk w gardle, dreszcz grozy, wybuch śmiechu) bezpośrednio na fizyczne odczucia polskiego widza.
+  * Tekst ma poruszać ciało i zmysły, a nie tylko intelekt.
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -1070,6 +1226,58 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
    - Urwane zdania z 'kedo/kara' uzupełniaj kontekstowo lub naturalnym zawieszeniem głosu '...'.
 54. PROTOKÓŁ MULTI-AGENT REFLEXION (FILAR LXIV):
    - Trzystopniowa synteza: Szkic Tłumacza -> Audyt Krytyka MQM -> Szlif Redaktora Naczelnego.
+55. IZOMORFIZM NAPIĘCIA SKŁADNIOWEGO I ANTY-SPOILER (FILAR LXV):
+   - Dopasuj polski szyk tak, by punkt kulminacyjny lub kluczowa negacja nie padły na początku zdania, jeśli seiyū wypowiada je na końcu kwestii (zakaz zdradzania suspensu przed aktorem!).
+56. PROZODIA ODDECHU I KINEZJOLOGIA MOWY (FILAR LXVI):
+   - W scenach paniki, walki, wyczerpania i szlochu frazuj napisy w urywanym rytmie wdechów i zadyszki postaci.
+57. KĄT KAMERY EMPATYCZNEJ I DEIKSA KUNO (FILAR LXVII):
+   - Zachowaj punkt widzenia empatii w relacjach kureru/morau/ageru (kto komu wyświadcza przysługę) z naturalnym celownikiem korzyści.
+58. SPÓJNOŚĆ LEITMOTYWÓW I HASEŁ (FILAR LXVIII):
+   - Gwarantuj bezwzględną, 100% powtarzalność leksykalną powracających przysiąg, dewiz i haseł postaci przez wszystkie odcinki serii.
+59. HIERARCHIA AKUSTYCZNA I SOUNDSTAGE (FILAR LXIX):
+   - Dialogi tła tłumacz selektywnie (brak zaśmiecania ekranu), a komunikaty z urządzeń pozycjonuj u góry w nawiasach.
+60. PRAGMATYKA METANARRACYJNA I 4. ŚCIANA (FILAR LXX):
+   - Przekładaj hermetyczne żarty z tworzenia anime/mangi i telewizji na naturalny, błyskotliwy polski dowcip bez encyklopedycznych przypisów.
+61. DOSTĘPNOŚĆ LEKSYKALNA I ROZKŁAD CZĘSTOTLIWOŚCI (FILAR LXXI):
+   - W szybkim dialogu stosuj słownictwo natychmiast rozpoznawalne, eliminując zacięcia lektury i cofnięcia wzroku.
+62. ZGODNOŚĆ WEKTORA KINEZYCZNEGO (FILAR LXXII):
+   - W dynamicznych scenach walki zgraj remat z ruchem kamery i akcji na ekranie.
+63. MODALNOŚĆ EKSPLANACYJNA NODA/WAKE DA (FILAR LXXIII):
+   - Oddawaj przyczynowo-wyjaśniającą funkcję japońskich partykuł dyskursywnych ("Bo widzisz...", "Chodzi o to, że...").
+64. REJESTR CHIBI / SD (FILAR LXXIV):
+   - Błyskawicznie przechodź w rejestr komediowo-infantylny przy zmianie stylu rysunku na karykaturę.
+65. AKCENT LOGICZNY I SZCZYT F0 (FILAR LXXV):
+   - Zestrajaj polski remat ze szczytem intonacyjnym aktora seiyū.
+66. DYSTANSOWANIE HONORYFIKATYWNE I AGRESJA BIERNA (FILAR LXXVI):
+   - Zachowaj lodowaty, hiperpoprawny styl urzędowy w relacjach wrogich stosujących Keigo (zakaz wulgaryzowania).
+67. TRIANGULACJA ONOMATOPEI MULTIMODALNYCH (FILAR LXXVII):
+   - Unikaj dublowania dźwięków obecnych w audio i dialogu; tłumacz stany niewydające dźwięku.
+68. INTERFEJSY DIEGETYCZNE I CZATY (FILAR LXXVIII):
+   - Wiadomości z telefonu formatuj w nawiasach [ SMS od: ... ], czaty gier stylizuj na żargon sieciowy.
+69. TRANSKREACJA EMOCJONALNA (FILAR LXXIX):
+   - W komedii i rymach priorytetem jest autentyczny śmiech polskiego widza nad dosłownością słownikową.
+70. KOGNITYWNA MIKRO-INTERPUNKCJA (FILAR LXXX):
+   - Jąkanie zapisuj z dywizem ("N-Nie!"), przerwanie myślnikiem ("że–"), wahanie wielokropkiem ("...").
+71. ORGANICZNA EKSPOZYCJA I ANTY-OBJAŚNIANIE (FILAR LXXXI):
+   - Zakaz dopisywania łopatologicznych wyjaśnień i wpychania zbędnej ekspozycji, gdy obraz i atmosfera niosą już sens sceny (zasada Ghibli/Miyazaki).
+72. SEMIOTYCZNA NEGOCJACJA ZNACZENIA (FILAR LXXXII):
+   - Poświęć drugorzędną warstwę leksykalną, aby w 100% ocalić głęboką intencję dzieła (intentio operis) i ładunek emocjonalny (Umberto Eco).
+73. DYNAMIZM DOCELOWY I DEKOLONIZACJA SKŁADNI (FILAR LXXXIII):
+   - Całkowicie zerwij z grawitacją obcej składni; zdanie musi brzmieć jak napisane od zera po polsku (Ladmiral Cibliste).
+74. WYKONAWCZY KUNSZT AKTORSTWA GŁOSOWEGO (FILAR LXXXIV):
+   - Optymalizuj dialog pod kątem fizycznej emisji głosu i rezonansu krtani (Mouth-Feel Test Alexandra O. Smitha).
+75. INTEGRACJA KINEMATOGRAFICZNA (FILAR LXXXV):
+   - Eliminuj 'Subtitling Blindness' – kondensuj napis tak, by oko widza po ułamku sekundy wracało do centrum kadru (Romero-Fresco).
+76. POLIFONIA GŁOSÓW I HETEROGLOSJA (FILAR LXXXVI):
+   - Zróżnicuj idiolekty postaci – każda musi operować własnym unikalnym słownikiem i konstrukcją zdań (Bachtin).
+77. CZYSTOŚĆ FOKALIZACJI WEWNĘTRZNEJ (FILAR LXXXVII):
+   - W monologach i myślach zachowaj surowy, subiektywny punkt widzenia postaci bez zewnętrznego dystansu narratora.
+78. PROTOKÓŁ ANTY-DEFORMACYJNY (FILAR LXXXVIII):
+   - Eliminuj racjonalizację (wygładzanie poetyckiej chropowatości) i klaryfikację celowych niedomówień autora (Berman).
+79. REKOMPENSATA HERMENEUTYCZNA (FILAR LXXXIX):
+   - Ocal całkowity bilans artystyczny sceny, wzbogacając sąsiednie frazy w zamian za utracony niuans kulturowy (Steiner).
+80. SOMATYCZNY REZONANS EMOCJONALNY (FILAR XC):
+   - Zapewnij bezpośredni fizjologiczny rezonans afektywny przekładu (dreszcz, ucisk w gardle, śmiech) u polskiego odbiorcy (Robinson).
       * "[Filar XVI - Shūjoshi] 'Iku zo!' -> 'No to ruszamy!'"
       * "[Filar XVII - Onomatopeja] 'Zokutto shita' -> 'Przeszły mnie ciarki'"
       * "[Filar XXIV - RPG Canon] 'Status Window' -> '[ OKNO STATUSU ]'"
@@ -1091,6 +1299,32 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
       * "[Filar XLI - Plansze i Lokacje] 'PRESENT DAY' -> '[ CZASY WSPÓŁCZESNE ]'"
       * "[Filar XI - Prefabrykowana Mówioność] Zastąpiono sztuczny imiesłów żywą polszczyzną"
       * "[Filar XXXIII - Rejestr i Wulgaryzmy] Ujednolicono surowy język żołnierski"
+      * "[Filar LXV - Suspense Isomorphism] Przestawiono orzeczenie na koniec, by nie zdradzać puenty przed aktorem"
+      * "[Filar LXVI - Prozodia Oddechu] Podzielono kwestię na urywane człony w scenie zadyszki"
+      * "[Filar LXVII - Empathy Syntax] 'Kureta' -> 'Przyszedł mi z pomocą' (zachowano wektor empatii)"
+      * "[Filar LXVIII - Leitmotif] Ujednolicono powracające zawołanie z kanonem serii"
+      * "[Filar LXIX - Soundstage] Przeniesiono komunikat megafonu na górę ekranu"
+      * "[Filar LXX - 4th Wall Meta-Humor] Zlokalizowano żart z terminów wydawniczych mangaki"
+      * "[Filar LXXI - Dostępność Leksykalna] Zastąpiono archaizm prostym czasownikiem w szybkim tempie"
+      * "[Filar LXXII - Gaze-Motion] Zestrojono układ wierszy z trajektorią ruchu w scenie walki"
+      * "[Filar LXXIII - Modalność Noda] 'Nda' -> 'Bo chodzi o to, że...'"
+      * "[Filar LXXIV - Chibi Register] Dostosowano ton do karykaturalnego stylu Chibi"
+      * "[Filar LXXV - Pitch Accent F0] Przesunięto emfatyczne oskarżenie na koniec frazy"
+      * "[Filar LXXVI - Passive-Aggressive Keigo] Oddano lodowaty sarkazm w formie dystyngowanej"
+      * "[Filar LXXVII - Triangulacja SFX] Usunięto nadmiarowy napis onomatopei obecnej w audio"
+      * "[Filar LXXVIII - Diegetic UI] Sformatowano wiadomość ze smartfona [ SMS od: Mama ]"
+      * "[Filar LXXIX - Transkreacja Afektywna] Przełożono grę słowną na błyskotliwy rym sytuacyjny"
+      * "[Filar LXXX - Mikro-Interpunkcja] Poprawiono formatowanie jąkania 'N-Nie patrz tak!'"
+      * "[Filar LXXXI - Minimalist Exposition] Usunięto zbędne dopowiedzenie ekspozycyjne (zasada Ghibli)"
+      * "[Filar LXXXII - Semiotic Negotiation] Zachowano głęboką intencję sceny kosztem dosłownego terminu (Eco)"
+      * "[Filar LXXXIII - Cibliste Dynamism] Całkowicie zrekonstruowano polski szyk (dekolonizacja składni)"
+      * "[Filar LXXXIV - Performative Voicing] Zoptymalizowano frazę pod kątem emisji głosu i rytmu aktorskiego"
+      * "[Filar LXXXV - Subtitling Blindness] Skondensowano tekst, by uwolnić wzrok widza ku kompozycji kadru"
+      * "[Filar LXXXVI - Dialogic Polyphony] Wyostrzono unikalny idiolekt postaci (eliminacja homogenizacji)"
+      * "[Filar LXXXVII - Focalization Purity] Oczyszczono monolog wewnętrzny z zewnętrznego dystansu narratora"
+      * "[Filar LXXXVIII - Anti-Deformation] Przywrócono surową poetycką chropowatość oryginału (Berman)"
+      * "[Filar LXXXIX - Hermeneutic Restitution] Skompensowano utracony żart w kolejnej frazie (Steiner)"
+      * "[Filar XC - Somatic Transduction] Wzmocniono fizjologiczny ładunek emocjonalny sceny grozy"
 
 {BELCZYK_AVT_MASTER_CANON}
 
@@ -1211,6 +1445,189 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR XLV - Podmiot Kontrastowy i Ogniskowanie Wa vs Ga]: "
             "W odpowiedzi na pytanie o rodzinę/pochodzenie zachowaj podmiot ('Moi rodzice mieszkają...', a nie urwane 'Mieszkają...')."
+        )
+
+    # 14. Napięcie składniowe, zwroty akcji i izomorfizm suspensu (Filar LXV)
+    if any(w in combined_en for w in ["never", "impossible", "betray", "traitor", "secret", "truth is", "actually", "no way"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR LXV - Izomorfizm Napięcia Składniowego i Anty-Spoiler]: "
+            "Dopasuj polski szyk tak, by kluczowe rozstrzygnięcie/negacja padły na końcu zdania, "
+            "idealnie w momencie wypowiedzenia przez aktora (zakaz zdradzania puenty na początku napisu!)."
+        )
+
+    # 15. Prozodia oddechu, wysiłek, szloch i zadyszka (Filar LXVI)
+    if any(w in combined_en for w in ["pant", "gasp", "breath", "huff", "sob", "run", "heavy"]) or any("..." in item.get("en", "") and ("!" in item.get("en", "") or "?" in item.get("en", "")) for item in batch_items):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR LXVI - Prozodia Oddechu i Kinezjologia Mowy]: "
+            "W scenach walki, zadyszki i szlochu stosuj krótkie, urywane takty rytmiczne dopasowane do oddechu seiyū."
+        )
+
+    # 16. Perspektywa empatyczna, relacje przysługi i kąt kamery Kuno (Filar LXVII)
+    if any(w in combined_en for w in ["for me", "for you", "favor", "kureta", "moratta", "did it for", "helped me", "save me"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR LXVII - Kąt Kamery Empatycznej i Kuno]: "
+            "Zachowaj wektor empatii w relacjach przysługi (kureru/morau) – precyzyjny celownik korzyści zamiast płaskich szablonów."
+        )
+
+    # 17. Pamięć leitmotywów, hasła i dewizy postaci (Filar LXVIII)
+    if any(w in combined_en for w in ["promise", "vow", "oath", "motto", "destiny", "way of", "style"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR LXVIII - Pamięć Leitmotywów i Echa Narracyjnego]: "
+            "Zachowaj żelazną, 100% powtarzalność leksykalną przysiąg, haseł i motywów przewodnich serii."
+        )
+
+    # 18. Przestrzeń akustyczna, tło i komunikaty diegetyczne (Filar LXIX)
+    if any(w in combined_en for w in ["announcement", "speaker", "radio", "intercom", "broadcast", "crowd", "police"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR LXIX - Hierarchia Akustyczna i Soundstage]: "
+            "Komunikaty z urządzeń umieszczaj u góry w nawiasie [ KOMUNIKAT ], a szum tła redukuj, chroniąc pierwszy plan."
+        )
+
+    # 19. Czwarta ściana, metanarracja i humor branżowy (Filar LXX)
+    if any(w in combined_en for w in ["author", "manga", "anime", "budget", "deadline", "episode", "season", "voice actor", "seiyuu", "censor", "broadcast"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR LXX - Pragmatyka Metanarracyjna i 4. Ściana]: "
+            "Żarty z tworzenia anime/mangi i telewizji adaptuj na błyskotliwy polski dowcip bez uciekania się do przypisów."
+        )
+
+    # 20. Dostępność leksykalna i szybkie tempo (Filar LXXI)
+    if any(item.get("cps", 0) > 16 for item in batch_items):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR LXXI - Dostępność Leksykalna i Eliminacja Tarcia]: "
+            "W szybkim tempie mowy używaj słów o wysokiej dostępności percepcyjnej, eliminując archaizmy i zacięcia lektury."
+        )
+
+    # 21. Dynamiczne sceny akcji, walka i ruch kamery (Filar LXXII)
+    if any(w in combined_en for w in ["fight", "attack", "strike", "slash", "dodge", "punch", "run", "fast", "blast"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR LXXII - Zgodność Wektora Kinezycznego i Spojrzenia]: "
+            "W dynamicznych scenach akcji układaj zwięzłe wiersze zgodnie z trajektorią ruchu kamery i ciosów."
+        )
+
+    # 22. Modalność eksplanacyjna i partykuły dyskursu (Filar LXXIII)
+    if any(w in combined_en for w in ["nda", "noda", "wake", "monoda", "because", "the reason is", "after all", "you see"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR LXXIII - Modalność Eksplanacyjna Noda/Wake da]: "
+            "Oddaj funkcję przyczynowo-wyjaśniającą za pomocą naturalnych partykuł ('Bo widzisz...', 'Chodzi o to, że...')."
+        )
+
+    # 23. Zmiana stylu na Chibi / SD i karykaturę (Filar LXXIV)
+    if any(w in combined_en for w in ["chibi", "cute", "funny face", "whine", "pout", "dummy", "geez"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR LXXIV - Plastyczność Rejestru Chibi / SD]: "
+            "Gdy postać przechodzi w styl karykaturalny/Chibi, natychmiast przełącz rejestr na komediowy, pieszczotliwy lub dąsający się."
+        )
+
+    # 24. Szczyt intonacyjny F0 i akcent logiczny (Filar LXXV)
+    if any(w in combined_en for w in ["you!", "traitor!", "liar!", "murderer!", "never!"]) or any(item.get("f0_peak", False) for item in batch_items):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR LXXV - Zestrojenie Akcentu Logicznego i Prominencji F0]: "
+            "Umieść wyraz o maksymalnym nacisku fonicznym aktora w pozycji naturalnego polskiego akcentu logicznego."
+        )
+
+    # 25. Dystansowanie honoryfikatywne i agresja bierna w Keigo (Filar LXXVI)
+    if any(w in combined_en for w in ["desu wa", "sama", "excellency", "honorable", "sir", "pleasure"]) and any(w in combined_en for w in ["fool", "die", "insolence", "dare", "pathetic", "silence"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR LXXVI - Dystansowanie Honoryfikatywne i Agresja Bierna]: "
+            "Zachowaj lodowaty, dystyngowany, hiperpoprawny styl urzędowo-dworski z ironicznym szacunkiem (zakaz wulgaryzowania!)."
+        )
+
+    # 26. Onomatopeje graficzne i triangulacja SFX (Filar LXXVII)
+    if any(w in combined_en for w in ["sfx", "boom", "thud", "rumble", "flash", "silence", "gasp", "clash"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR LXXVII - Trójwarstwowa Triangulacja Onomatopei]: "
+            "Unikaj dublowania dźwięków słyszalnych w audio; stany bezdźwięczne (cisza, błysk) oddawaj zwięźle w nawiasie lub dialogu."
+        )
+
+    # 27. Interfejsy diegetyczne, smartfony i czaty (Filar LXXVIII)
+    if any(w in combined_en for w in ["sms", "text message", "chat", "smartphone", "phone", "hud", "system log", "mail"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR LXXVIII - Interfejsy Diegetyczne i Smartfony]: "
+            "Wiadomości z telefonu formatuj [ SMS od: Nadawca: Treść ], czaty stylizuj na autentyczny żargon sieciowy."
+        )
+
+    # 28. Transkreacja emocjonalna, rymy i toasty (Filar LXXIX)
+    if any(w in combined_en for w in ["rhyme", "cheers", "toast", "poem", "song", "joke", "pun"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR LXXIX - Transkreacja Emocjonalna i Indeks Afektywny]: "
+            "W komedii, rymach i toastach priorytetem jest wywołanie autentycznej reakcji emocjonalnej (śmiech, wzruszenie) nad dosłownością."
+        )
+
+    # 29. Kognitywna mikro-interpunkcja afektywna (Filar LXXX)
+    if any(w in combined_en for w in ["w-what", "i-i", "b-but", "n-no", "wha-", "wait-", "tsundere"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR LXXX - Kognitywna Mikro-Interpunkcja Afektywna]: "
+            "Jąkanie formatuj dywizem ('N-Nie!'), nagłe przerwanie myślnikiem ('że–'), zawstydzenie wielokropkiem ('...')."
+        )
+
+    # 30. Organiczna ekspozycja i zasada minimalizmu Ghibli (Filar LXXXI)
+    if any(w in combined_en for w in ["explain", "exposition", "as you know", "in this world", "let me tell you"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR LXXXI - Organiczna Ekspozycja i Anty-Objaśnianie (Ghibli)]: "
+            "Zaufaj inteligencji widza – nie wpychaj łopatologicznych wyjaśnień w dialog, gdy obraz i nastrój niosą sens sceny."
+        )
+
+    # 31. Semiotyczna negocjacja znaczenia i Deep Intent (Filar LXXXII)
+    if any(w in combined_en for w in ["meaning", "intent", "spirit of", "metaphor", "symbol", "allegory"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR LXXXII - Semiotyczna Negocjacja Znaczenia (Umberto Eco)]: "
+            "Poświęć drugorzędną dosłowność, aby w 100% ocalić głęboką intencję dzieła (intentio operis) i ładunek podtekstu."
+        )
+
+    # 32. Dynamizm docelowy i dekolonizacja składni (Filar LXXXIII)
+    if any(w in combined_en for w in ["it is that", "there is no doubt that", "the fact that", "in order to"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR LXXXIII - Dynamizm Docelowy i Dekolonizacja Składni (Ladmiral)]: "
+            "Zerwij z obcą strukturą zdania – napisz kwestię tak, jakby została pomyślana od zera w żywej polszczyźnie."
+        )
+
+    # 33. Wykonawczy kunszt aktorstwa głosowego i Mouth-Feel (Filar LXXXIV)
+    if any(w in combined_en for w in ["shout", "whisper", "cry", "rage", "passion", "cadence", "speech"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR LXXXIV - Wykonawczy Kunszt i Mouth-Feel (Alexander O. Smith)]: "
+            "Zoptymalizuj układ głosek i rytm frazy tak, by dialog naturalnie i gładko 'układał się w ustach' aktora."
+        )
+
+    # 34. Integracja kinematograficzna i eliminacja ślepoty napisowej (Filar LXXXV)
+    if any(w in combined_en for w in ["cinematic", "visual", "landscape", "look at the", "silence", "beauty"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR LXXXV - Eliminacja Ślepoty Napisowej (Romero-Fresco)]: "
+            "Kondensuj napis do absolutnego minimum, aby widz chłonął kompozycję kadru i grę aktorską, a nie tylko czytał tekst."
+        )
+
+    # 35. Polifonia głosów i heteroglosja postaci (Filar LXXXVI)
+    if len(set(item.get("speaker_gender", "") for item in batch_items)) > 1 or any(item.get("speaker_role") for item in batch_items):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR LXXXVI - Polifonia Głosów i Heteroglosja (Bachtin)]: "
+            "Utrzymuj ostre zróżnicowanie idiolektów – każda postać musi mówić własnym, unikalnym językiem."
+        )
+
+    # 36. Czystość fokalizacji i monologu wewnętrznego (Filar LXXXVII)
+    if any(item.get("is_thought", False) for item in batch_items) or any(w in combined_en for w in ["thought", "inner", "myself", "mind"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR LXXXVII - Czystość Fokalizacji i Myśli Wewnętrznej]: "
+            "W monologu wewnętrznym zachowaj intymny, subiektywny punkt widzenia postaci bez chłodnego dystansu narratora."
+        )
+
+    # 37. Protokół anty-deformacyjny Antoine'a Bermana (Filar LXXXVIII)
+    if any(w in combined_en for w in ["rough", "poetic", "raw", "vulgar", "sharp", "bizarre"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR LXXXVIII - Protokół Anty-Deformacyjny (Antoine Berman)]: "
+            "Nie wygładzaj sztucznie poetyckich chropowatości i ostrości oryginału – zachowaj autentyczną siłę tekstu źródłowego."
+        )
+
+    # 38. Rekompensata hermeneutyczna i restytucja (Filar LXXXIX)
+    if any(w in combined_en for w in ["lost in translation", "culture", "tradition", "custom", "idiom"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR LXXXIX - Rekompensata Hermeneutyczna (George Steiner)]: "
+            "Odzyskaj ładunek emocjonalny utraconego niuansu kulturowego, wzbogacając sąsiednią kwestię."
+        )
+
+    # 39. Somatyczny rezonans emocjonalny (Filar XC)
+    if any(w in combined_en for w in ["horror", "terror", "chills", "heartbreak", "laughter", "shock", "despair"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR XC - Somatyczny Rezonans Emocjonalny (Douglas Robinson)]: "
+            "Przekład musi wywoływać bezpośrednią reakcję cielesno-zmysłową (gęsia skórka, ucisk w gardle, śmiech) u polskiego widza."
         )
 
     if not focused_pillars:
