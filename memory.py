@@ -17,17 +17,18 @@ MEMORY_JSON_PATH = Path(__file__).parent / "translation_memory.json"
 
 def clean_text_for_memory(text: str) -> str:
     """
-    Czyści tekst ze znaczników formatowania ASS i normalizuje białe znaki.
+    Czyści tekst ze znaczników formatowania ASS, rysunków wektorowych i normalizuje białe znaki.
     """
-    if not text:
+    if not text or text.startswith("m ") or "{\\p1}" in text:
         return ""
     # Usuwanie tagów {...}
     cleaned = re.sub(r"\{[^}]*\}?", "", text)
-    cleaned = re.sub(r"\{.*", "", cleaned)
-    # Usuwanie backslashy
     cleaned = re.sub(r"\\(?:[a-zA-Z0-9&]+|\([^)]*\)?)?", "", cleaned)
     cleaned = cleaned.replace("\\N", " ").replace("\\n", " ")
-    return re.sub(r"\s+", " ", cleaned).strip()
+    cleaned = re.sub(r"\s+", " ", cleaned).strip()
+    if cleaned.startswith("m ") or len(cleaned) < 2:
+        return ""
+    return cleaned
 
 def tokenize(text: str) -> List[str]:
     """
@@ -57,8 +58,11 @@ class TranslationMemory:
     def index_database_directory(self, base_dir: Path) -> int:
         """
         Skanuje podany katalog (np. 'baza napisów'), paruje pliki .en.ass/.en.srt z .ass/.srt
-        i zapisuje pary dialogowe do bazy danych.
+        z wykorzystaniem szybkiego wyszukiwania binarnego (O(N log M)) i zapisuje pary dialogowe do bazy danych.
         """
+        import bisect
+        from tqdm import tqdm
+
         if not base_dir.exists():
             return 0
 
@@ -74,9 +78,9 @@ class TranslationMemory:
         pairs_to_insert = []
         seen_pairs = set()
 
-        print(f"[Pamięć Tłumaczeniowa] Rozpoczynanie indeksowania bazy: {len(en_files)} plików angielskich...")
+        print(f"[Pamięć Tłumaczeniowa] Błyskawiczne indeksowanie bazy: {len(en_files)} plików...")
 
-        for en_path in en_files:
+        for en_path in tqdm(en_files, desc="Indeksowanie par dialogowych", unit="plik"):
             # Ustalenie nazwy pliku polskiego
             pl_name = en_path.name
             for suffix in [".en.ass", ".ang.ass", ".en.srt", ".ang.srt", ".ang"]:
@@ -86,8 +90,11 @@ class TranslationMemory:
 
             pl_path = en_path.parent / pl_name
             if not pl_path.exists():
-                # Próba znalezienia pliku z samym .ass
-                pl_path = en_path.parent / f"{en_path.stem.split('.')[0]}.ass"
+                # Próba znalezienia pliku z samym .ass / .srt
+                base_stem = en_path.stem.split(".")[0]
+                pl_path_ass = en_path.parent / f"{base_stem}.ass"
+                pl_path_srt = en_path.parent / f"{base_stem}.srt"
+                pl_path = pl_path_ass if pl_path_ass.exists() else pl_path_srt
 
             if not pl_path.exists():
                 continue
@@ -108,7 +115,20 @@ class TranslationMemory:
                 except Exception:
                     continue
 
-            # Parowanie kwestii według nakładania czasowego
+            # Przygotowanie posortowanej listy zdarzeń polskich do wyszukiwania binarnego
+            pl_events = []
+            for ev in subs_pl.events:
+                if ev.is_comment:
+                    continue
+                c_pl = clean_text_for_memory(ev.text)
+                if c_pl:
+                    pl_events.append((ev.start, c_pl))
+            pl_events.sort(key=lambda x: x[0])
+            pl_starts = [x[0] for x in pl_events]
+
+            if not pl_events:
+                continue
+
             anime_name = en_path.stem.split(" - ")[0].replace("[ASW]", "").replace("[Erai-raws]", "").strip()
 
             for ev_en in subs_en.events:
@@ -118,24 +138,24 @@ class TranslationMemory:
                 if not clean_en or len(clean_en) < 3 or len(clean_en) > 250:
                     continue
 
-                for ev_pl in subs_pl.events:
-                    if ev_pl.is_comment:
-                        continue
-                    # Nakładanie czasowe min. 150ms
-                    if abs(ev_en.start - ev_pl.start) < 300:
-                        clean_pl = clean_text_for_memory(ev_pl.text)
-                        if clean_pl and len(clean_pl) > 2 and clean_pl.lower() != clean_en.lower():
-                            pair_key = (clean_en.lower(), clean_pl.lower())
-                            if pair_key not in seen_pairs:
-                                seen_pairs.add(pair_key)
-                                pairs_to_insert.append((
-                                    clean_en,
-                                    clean_pl,
-                                    clean_en.lower(),
-                                    anime_name,
-                                    len(clean_en.split())
-                                ))
-                            break
+                # Wyszukiwanie binarne w oknie czasowym [-300ms, +300ms]
+                left = bisect.bisect_left(pl_starts, ev_en.start - 300)
+                right = bisect.bisect_right(pl_starts, ev_en.start + 300)
+
+                for k in range(left, right):
+                    clean_pl = pl_events[k][1]
+                    if len(clean_pl) > 2 and clean_pl.lower() != clean_en.lower():
+                        pair_key = (clean_en.lower(), clean_pl.lower())
+                        if pair_key not in seen_pairs:
+                            seen_pairs.add(pair_key)
+                            pairs_to_insert.append((
+                                clean_en,
+                                clean_pl,
+                                clean_en.lower(),
+                                anime_name,
+                                len(clean_en.split())
+                            ))
+                        break
 
         # Zapis do bazy SQLite
         with sqlite3.connect(self.db_path) as conn:
