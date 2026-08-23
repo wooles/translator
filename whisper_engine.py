@@ -158,7 +158,11 @@ class JapaneseWhisperEngine:
                 "language": "ja",
                 "beam_size": 3,
                 "vad_filter": True,
-                "vad_parameters": dict(min_silence_duration_ms=200)
+                "vad_parameters": dict(min_silence_duration_ms=200),
+                "condition_on_previous_text": False,
+                "repetition_penalty": 1.2,
+                "no_repeat_ngram_size": 3,
+                "compression_ratio_threshold": 2.4
             }
             if initial_prompt:
                 transcribe_kwargs["initial_prompt"] = initial_prompt

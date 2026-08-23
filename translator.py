@@ -814,20 +814,40 @@ class MultimodalTranslator:
                             # 1. Lokalna transkrypcja Whisper z kontekstem postaci i terminologii
                             if self.whisper:
                                 whisper_prime_keywords = []
-                                if self.character_registry:
-                                    whisper_prime_keywords.extend(list(self.character_registry.keys())[:8])
+                                if anime_meta:
+                                    t_nat = anime_meta.get("title_native")
+                                    t_rom = anime_meta.get("title_romaji")
+                                    if t_nat:
+                                        whisper_prime_keywords.append(t_nat)
+                                    elif t_rom:
+                                        whisper_prime_keywords.append(t_rom)
+
                                 if episode_profile:
                                     if getattr(episode_profile, "name_declensions", None):
-                                        whisper_prime_keywords.extend([nd.character_name for nd in episode_profile.name_declensions if nd.character_name][:8])
+                                        whisper_prime_keywords.extend([nd.character_name for nd in episode_profile.name_declensions if nd.character_name][:6])
                                     if getattr(episode_profile, "characters", None):
                                         for c in episode_profile.characters:
-                                            if getattr(c, "speaker", None): whisper_prime_keywords.append(c.speaker)
-                                            if getattr(c, "listener", None): whisper_prime_keywords.append(c.listener)
-                                if anime_meta and anime_meta.get("title"):
-                                    whisper_prime_keywords.append(anime_meta.get("title"))
-                                
-                                unique_kw = list(dict.fromkeys([k for k in whisper_prime_keywords if k]))[:12]
-                                initial_prompt_str = "、".join(unique_kw) if unique_kw else None
+                                            if getattr(c, "speaker", None):
+                                                whisper_prime_keywords.append(c.speaker)
+                                            if getattr(c, "listener", None):
+                                                whisper_prime_keywords.append(c.listener)
+
+                                # Bezpieczna filtracja słów kluczowych dla japońskiego Whispera (brak polskich znaków i opisów ról)
+                                sanitized_kw = []
+                                for kw in whisper_prime_keywords:
+                                    if not kw:
+                                        continue
+                                    clean_k = re.sub(r"\(.*?\)", "", kw).strip()
+                                    if not clean_k or len(clean_k) < 2:
+                                        continue
+                                    if re.search(r"[ąćęłńóśźżĄĆĘŁŃÓŚŹŻ]", clean_k):
+                                        continue
+                                    if clean_k.lower() in ("mężczyzna", "kobieta", "postać", "narrator", "man", "woman", "unknown", "głos", "dziewczyna", "chłopak"):
+                                        continue
+                                    if clean_k not in sanitized_kw:
+                                        sanitized_kw.append(clean_k)
+
+                                initial_prompt_str = "、".join(sanitized_kw[:8]) if sanitized_kw else None
 
                                 whisper_transcriptions = self.whisper.transcribe_batch_scene(
                                     scene_wav_path=temp_audio_file,
