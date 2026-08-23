@@ -803,7 +803,7 @@ class MultimodalTranslator:
                     try:
                         batch_start = untranslated_in_batch[0][1].start
                         batch_end = untranslated_in_batch[-1][1].end
-                        if 0 < (batch_end - batch_start) <= 120000:
+                        if 0 < (batch_end - batch_start) <= 360000:
                             temp_audio_file = extract_audio_slice(
                                 video_path=video_path,
                                 start_ms=batch_start,
@@ -816,11 +816,18 @@ class MultimodalTranslator:
                                 whisper_prime_keywords = []
                                 if self.character_registry:
                                     whisper_prime_keywords.extend(list(self.character_registry.keys())[:8])
-                                if episode_profile and episode_profile.characters:
-                                    whisper_prime_keywords.extend([c.name for c in episode_profile.characters][:8])
+                                if episode_profile:
+                                    if getattr(episode_profile, "name_declensions", None):
+                                        whisper_prime_keywords.extend([nd.character_name for nd in episode_profile.name_declensions if nd.character_name][:8])
+                                    if getattr(episode_profile, "characters", None):
+                                        for c in episode_profile.characters:
+                                            if getattr(c, "speaker", None): whisper_prime_keywords.append(c.speaker)
+                                            if getattr(c, "listener", None): whisper_prime_keywords.append(c.listener)
                                 if anime_meta and anime_meta.get("title"):
                                     whisper_prime_keywords.append(anime_meta.get("title"))
-                                initial_prompt_str = "、".join(whisper_prime_keywords) if whisper_prime_keywords else None
+                                
+                                unique_kw = list(dict.fromkeys([k for k in whisper_prime_keywords if k]))[:12]
+                                initial_prompt_str = "、".join(unique_kw) if unique_kw else None
 
                                 whisper_transcriptions = self.whisper.transcribe_batch_scene(
                                     scene_wav_path=temp_audio_file,
@@ -842,7 +849,8 @@ class MultimodalTranslator:
                                 batch_start_ms=batch_start,
                                 events=events_tuples
                             )
-                    except Exception:
+                    except Exception as e:
+                        pbar.write(f" ├─ [Ostrzeżenie Audio/Whisper]: {e}")
                         pass
 
                 # 3. Dynamiczne reguły kontekstowe, złote wzorce użytkownika i deterministyczny słownik
