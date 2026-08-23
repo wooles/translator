@@ -776,6 +776,28 @@ FILAR CIV: SOMATYKA EMOCJI I JAPOŃSKIE MIMETYKI (GITAIGO & SOMATIC IDIOMS):
     -> "Aż ciarki mnie przechodzą", "Przechodzi mnie dreszcz", "Aż mi skóra cierpnie".
   * ビックリ (Bikkuri - nagły szok/zaskoczenie):
     -> "Aż mnie zamurowało", "O mało zawału nie dostałem", "Zaniemówiłem".
+
+FILAR CV: HARAGEI I POETYKA NIEDOPOWIEDZENIA (ELLIPSIS & TRAILING PARTICLES -KEDO, -KARA, -TARA):
+- Gdy japońska kwestia urywa się na partykułę zawieszenia (-kedo, -kara, -tara, -mono de, -shi), a postać spuszcza wzrok lub wzdycha:
+  * KATEGORYCZNY ZAKAZ [X]: Sztucznego dopowiadania reszty zdania przez tłumacza ("I want to go, but I can't because of work" -> "Chciałabym pójść, ale nie mogę z powodu pracy.").
+  * POPRAWNIE [V]: Stosuj poetykę wielokropka i niedopowiedzenia ("Też bym chciała, ale...", "Przecież wiesz, że ja...", "Bardzo bym chciała, tylko że..."). Pozwól obrazowi i ciszy dopełnić sens!
+
+FILAR CVI: AIZUCHI I HIGIENA PHATYCZNA (ANTI-CLUTTER & PHATIC MINIMALISM):
+- Japońskie Aizuchi (Un, Sou, Ee, Naruhodo, Fumu) to rytmiczne sygnały podtrzymania kontaktu, a nie zawsze zgoda z treścią:
+  * KATEGORYCZNY ZAKAZ [X]: Zaśmiecania ekranu dosłownym "Tak", "Tak", "Rozumiem", "Racja" co 2 sekundy (przekroczenie limitów CPS).
+  * POPRAWNIE [V]: W 80% przypadków redukuj puste Aizuchi (kondensacja AVT). W pozostałych 20% stosuj naturalne polskie reaktywniki: "Mhm", "No", "Jasne", "Słucham", "Rozumiem".
+
+FILAR CVII: ASYMETRIA SPOŁECZNA KEIGO (SONKEIGO VS KENJŌGO - WYWYŻSZENIE VS UNIŻONOŚĆ):
+- W relacjach feudalnych, dworskich, biznesowych i hierarchii Senpai/Kōhai bezwzględnie różnicuj działania rozmówcy od działań własnych:
+  * Sonkeigo (wywyższanie słuchacza): "Raczy pan spocząć?", "Czy zechciałby pan spojrzeć?", "Pan raczy żartować".
+  * Kenjōgo (uniżanie siebie): "Pozwolę sobie zauważyć...", "Służę pomocą", "Udam się niezwłocznie".
+  * KATEGORYCZNY ZAKAZ [X]: Angielskiego spłaszczania obu form do neutralnego "Please sit" / "I go".
+
+FILAR CVIII: KINEZYKA SPOJRZENIA I TRIANGULACJA MIKROMIMIKI (VISUAL GAZE & SUBTEXT):
+- Gdy w kadrze widzisz mikro-rumieniec (tereru), ucieczkę wzrokiem (shisen wo sorasu) lub zaciśnięte dłonie:
+  * Przekładaj SUBTEKST psychologiczny sceny, a nie dosłowne słowa z angielskiego!
+  * Przykład Tsundere/Wstyd: EN: "I didn't do it because I like you or anything." -> BŁĘDNIE: "Nie zrobiłam tego, bo cię lubię czy coś." -> POPRAWNIE: "Żebyś sobie tylko czegoś nie pomyślał!".
+  * Gdy postać unika wzroku przy wyznaniu/przeprosinach -> stosuj formy bardziej intymne, zawstydzone i miękkie.
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -1820,6 +1842,34 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR CIV - Somatyka Emocji i Japońskie Mimetyki (Gitaigo)]: "
             "Mimetyki tłumacz bogatą polską frazeologią somatyczną: Doki doki -> 'Serce podchodzi mi do gardła', Waku waku -> 'Aż mnie nosi z ekscytacji!', Ira ira -> 'Krew mnie zalewa', Zoku zoku -> 'Aż ciarki mnie przechodzą'!"
+        )
+
+    # 49. Haragei i poetyka niedopowiedzenia (Filar CV)
+    if any(w.endswith("...") or w in ["but...", "though...", "kedo", "kara", "tara"] for w in combined_en.split()):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CV - Haragei i Poetyka Niedopowiedzenia (Kedo/Kara/Ellipsis)]: "
+            "Gdy japońska kwestia urywa się na partykułę zawieszenia lub wielokropek, NIE dopowiadaj reszty zdania! Stosuj nastrojowy wielokropek ('Też bym chciała, ale...', 'Przecież wiesz, że...')."
+        )
+
+    # 50. Aizuchi i higiena phatyczna (Filar CVI)
+    if any(w in combined_en.split() for w in ["yeah", "right", "i see", "un", "sou", "fumu", "mhm"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CVI - Aizuchi i Higiena Phatyczna (Anti-Clutter)]: "
+            "Puste japońskie potaknięcia podtrzymujące kontakt (Un, Sou) redukuj w napisach (kondensacja AVT) lub zamieniaj na oszczędne 'Mhm', 'No', 'Jasne'."
+        )
+
+    # 51. Asymetria Keigo (Filar CVII)
+    if any(w in combined_en for w in ["lord", "master", "sir", "lady", "senpai", "sama", "dono"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CVII - Asymetria Społeczna Keigo (Sonkeigo vs Kenjōgo)]: "
+            "Różnicuj uniżanie siebie ('pozwolę sobie zauważyć', 'służę pomocą') od wywyższania szefa/seniora ('raczy pan spocząć', 'czy zechciałby pan'). ZAKAZ spłaszczania obu do 'Please sit'."
+        )
+
+    # 52. Kinezyka spojrzenia i subtekst mikromimiki (Filar CVIII)
+    if any(w in combined_en for w in ["don't get the wrong idea", "idiot", "not like i", "blush", "baka"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CVIII - Kinezyka Spojrzenia i Subtekst Mikromimiki]: "
+            "Gdy w kadrze widać rumieniec, unikanie wzroku lub zawstydzenie, tłumacz psychologiczny SUBTEKST (np. 'Żebyś sobie tylko czegoś nie pomyślał!'), a nie szkolną kalkę z angielskiego!"
         )
 
     if not focused_pillars:

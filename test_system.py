@@ -130,7 +130,11 @@ def test_rules_and_prompts():
     assert "FILAR CII:" in sys_prompt
     assert "FILAR CIII:" in sys_prompt
     assert "FILAR CIV:" in sys_prompt
-    print(" -> PASSED: Kompletny Zunifikowany Kanon 104 Filarów AVT (Filary I – CIV) jest aktywny w obu fazach tłumaczenia.")
+    assert "FILAR CV:" in sys_prompt
+    assert "FILAR CVI:" in sys_prompt
+    assert "FILAR CVII:" in sys_prompt
+    assert "FILAR CVIII:" in sys_prompt
+    print(" -> PASSED: Kompletny Zunifikowany Kanon 108 Filarów AVT (Filary I – CVIII) jest aktywny w obu fazach tłumaczenia.")
 
 def test_pydantic_schemas():
     print("[TEST 2/5] Weryfikacja schematów Pydantic...")
@@ -931,13 +935,28 @@ def test_translator_logger_and_sign_detector():
     )
     assert alert_kanojo is not None and "Kanojo-tachi" in alert_kanojo
 
+    # Test Haragei & Aizuchi alerts
+    alert_haragei = translator.detect_audio_discrepancy(
+        jp_text="行きたいんですけど [Ikitai n desu kedo]",
+        pl_text="Chciałabym pójść, ale niestety nie mam dziś czasu.",
+        en_text="I want to go, but I don't have time."
+    )
+    assert alert_haragei is not None and "Haragei" in alert_haragei
+
+    alert_aizuchi = translator.detect_audio_discrepancy(
+        jp_text="うん [Un]",
+        pl_text="Tak, to jest całkowita prawda.",
+        en_text="Yeah, that's totally right."
+    )
+    assert alert_aizuchi is not None and "Aizuchi" in alert_aizuchi
+
     # Test Flashback 1:1 memory formatting
     from memory import format_translation_memory_for_prompt
     formatted_mem = format_translation_memory_for_prompt([
         {"en": "I will never give up!", "pl": "Nigdy się nie poddam!", "anime": "Kingdom", "score": 100}
     ])
     assert "[DOKŁADNY CYTAT 1:1]" in formatted_mem
-    print(" -> PASSED: Logger w translator.py, audio alerty i spójność retrospekcji 1:1 działają bezbłędnie.")
+    print(" -> PASSED: Logger w translator.py, audio alerty (Haragei, Aizuchi) i spójność retrospekcji 1:1 działają bezbłędnie.")
 
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")

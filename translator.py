@@ -146,6 +146,11 @@ def detect_audio_discrepancy(jp_text: str, pl_text: str, en_text: str) -> Option
     jp_lower = jp_text.lower()
     pl_lower = pl_text.lower()
 
+    # Wyciągamy czysty tekst Romaji (z nawiasów [Romaji]) oraz czysty japoński
+    clean_jp = re.sub(r"\[.*?\]", "", jp_text).strip()
+    romaji_match = re.findall(r"\[(.*?)\]", jp_text)
+    rom_lower = romaji_match[0].strip().lower() if romaji_match else jp_lower
+
     # 1. Kanojo-tachi vs męskie formy
     if "彼女たち" in jp_text or "kanojo-tachi" in jp_lower or "kanojotachi" in jp_lower:
         if any(w in pl_lower for w in ["oni ", "ich ", "mężczyźni", "chłopcy", "byli", "poszli", "zrobili"]):
@@ -165,6 +170,18 @@ def detect_audio_discrepancy(jp_text: str, pl_text: str, en_text: str) -> Option
     if ("panie " in pl_lower or "pani " in pl_lower) and not any(s in jp_text for s in ["様", "先生", "殿", "隊長"]):
         if not any(s in jp_lower for s in ["sama", "sensei", "dono", "taichou"]):
             return "W audio brak sufiksu szacunku (-sama/-sensei) -> Usuń sztuczne 'Pan/Pani' i zastosuj samo imię w wołaczu (Filar C)."
+
+    # 5. Haragei & Trailing Particles (-kedo, -kara, -tara) vs dopowiadanie zdania
+    trailing_keys = ["kedo", "kara", "tara", "monode", "shi"]
+    if any(clean_jp.endswith(p) for p in ["けど", "から", "たら", "し"]) or any(rom_lower.endswith(k) for k in trailing_keys):
+        if len(pl_text.split()) > 7 and not pl_text.endswith("..."):
+            return "Kwestia urywa się na partykułę zawieszenia (Haragei) -> Zastosuj wielokropek niedopowiedzenia zamiast sztucznego dopowiadania reszty zdania (Filar CV)."
+
+    # 6. Aizuchi (Un, Sou, Fumu) vs rozwlekły napis
+    aizuchi_keys = ["un", "sou", "fumu", "ee", "sou da", "sou da ne", "sou desu ne"]
+    if clean_jp in ["うん", "そう", "ふむ", "ええ", "そうだ", "そうですね"] or rom_lower in aizuchi_keys:
+        if len(pl_text.split()) > 2:
+            return "Krótkie Aizuchi podtrzymujące kontakt -> Zredukuj do oszczędnego 'Mhm' / 'No' / 'Jasne' (Filar CVI)."
 
     return None
 
