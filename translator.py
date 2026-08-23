@@ -135,6 +135,39 @@ def detect_event_visual_type(event: pysubs2.SSAEvent, ts_prefix: str) -> Dict[st
         "visual_details": desc
     }
 
+def detect_audio_discrepancy(jp_text: str, pl_text: str, en_text: str) -> Optional[str]:
+    """
+    Automatyczny detektor rozbieżności między japońskim głosem postaci (Whisper)
+    a wstępnym tłumaczeniem Fazy 1.
+    """
+    if not jp_text or not pl_text:
+        return None
+
+    jp_lower = jp_text.lower()
+    pl_lower = pl_text.lower()
+
+    # 1. Kanojo-tachi vs męskie formy
+    if "彼女たち" in jp_text or "kanojo-tachi" in jp_lower or "kanojotachi" in jp_lower:
+        if any(w in pl_lower for w in ["oni ", "ich ", "mężczyźni", "chłopcy", "byli", "poszli", "zrobili"]):
+            return "W audio pada 'Kanojo-tachi' (kobiety) -> Popraw 'Oni/Ich' na 'One/Je/Kobiety' (Filar XCVI)."
+
+    # 2. Kikanaide vs Wolę nie wiedzieć
+    if "聞かないで" in jp_text or "kikanaide" in jp_lower:
+        if any(w in pl_lower for w in ["wolę nie wiedzieć", "nie chcę wiedzieć", "nie chcę słyszeć"]):
+            return "W audio pada 'Kikanaide' (prośba mówcy: 'Nie pytaj') -> Popraw 'Wolę nie wiedzieć' na 'Nawet nie pytaj...' (Filar CI)."
+
+    # 3. Kure / Kase vs Proszę
+    if ("くれ" in jp_text or "kure" in jp_lower or "kase" in jp_lower) and "kudasai" not in jp_lower:
+        if pl_lower.startswith("proszę") or "czy możesz" in pl_lower or "czy mógłbyś" in pl_lower:
+            return "W audio pada szorstki tryb rozkazujący (-kure/-kase) -> Zamień sztuczne 'Proszę...' na bezpośredni rozkaz (Filar CIII)."
+
+    # 4. Yobisute vs Pan / Pani
+    if ("panie " in pl_lower or "pani " in pl_lower) and not any(s in jp_text for s in ["様", "先生", "殿", "隊長"]):
+        if not any(s in jp_lower for s in ["sama", "sensei", "dono", "taichou"]):
+            return "W audio brak sufiksu szacunku (-sama/-sensei) -> Usuń sztuczne 'Pan/Pani' i zastosuj samo imię w wołaczu (Filar C)."
+
+    return None
+
 def sanitize_sub_text(text: str, is_ass: bool = True) -> str:
     """
     Czyści tekst ze śmieci formatowania ASS, niedomkniętych nawiasów i zbędnych znaków,
@@ -982,6 +1015,8 @@ class MultimodalTranslator:
                     romaji_str = to_romaji(jp_text) if jp_text else ""
                     audio_jp_str = f"{jp_text} [{romaji_str}]" if romaji_str and romaji_str != jp_text else jp_text
 
+                    audio_discrepancy_msg = detect_audio_discrepancy(audio_jp_str, pl_candidate, clean_en)
+
                     pass1_items.append({
                         "id": batch_id,
                         "orig_idx": orig_idx,
@@ -991,6 +1026,7 @@ class MultimodalTranslator:
                         "speaker_voice": speaker_tags.get(batch_id, ""),
                         "prosody": prosody_tags.get(batch_id, ""),
                         "audio_jp": audio_jp_str,
+                        "audio_alert": audio_discrepancy_msg or "",
                         "cps_warning": cps_warn,
                         "notes": notes,
                         "is_sign": vtype["is_sign"],

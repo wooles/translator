@@ -213,9 +213,10 @@ class TranslationMemory:
         sorted_results = sorted(candidates.values(), key=lambda x: x["score"], reverse=True)
         return sorted_results[:max_examples]
 
-def format_translation_memory_for_prompt(examples: List[Dict[str, str]]) -> str:
+def format_translation_memory_for_prompt(examples: List[Dict[str, Any]]) -> str:
     """
     Formatuje wyciągnięte przykłady w czytelny blok do wstrzyknięcia do promptu LLM.
+    Wyróżnia cytaty 1:1 (Flashback Alignment) dla zachowania spójności serii.
     """
     if not examples:
         return ""
@@ -225,6 +226,9 @@ def format_translation_memory_for_prompt(examples: List[Dict[str, str]]) -> str:
     lines.append("Wzoruj się na poniższych autentycznych, naturalnych tłumaczeniach ludzkich:")
     for ex in examples:
         anime_tag = f"[{ex['anime']}] " if ex.get("anime") else ""
-        lines.append(f" • {anime_tag}EN: \"{ex['en']}\" -> PL: \"{ex['pl']}\"")
+        if ex.get("score") == 100:
+            lines.append(f" • {anime_tag}[DOKŁADNY CYTAT 1:1] EN: \"{ex['en']}\" -> PL: \"{ex['pl']}\" (Zachowaj to tłumaczenie dla spójności serii!)")
+        else:
+            lines.append(f" • {anime_tag}EN: \"{ex['en']}\" -> PL: \"{ex['pl']}\"")
     lines.append("-----------------------------------------------------------------\n")
     return "\n".join(lines)

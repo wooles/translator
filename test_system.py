@@ -128,7 +128,9 @@ def test_rules_and_prompts():
     assert "FILAR C:" in sys_prompt
     assert "FILAR CI:" in sys_prompt
     assert "FILAR CII:" in sys_prompt
-    print(" -> PASSED: Kompletny Zunifikowany Kanon 102 Filarów AVT (Filary I – CII) jest aktywny w obu fazach tłumaczenia.")
+    assert "FILAR CIII:" in sys_prompt
+    assert "FILAR CIV:" in sys_prompt
+    print(" -> PASSED: Kompletny Zunifikowany Kanon 104 Filarów AVT (Filary I – CIV) jest aktywny w obu fazach tłumaczenia.")
 
 def test_pydantic_schemas():
     print("[TEST 2/5] Weryfikacja schematów Pydantic...")
@@ -909,11 +911,33 @@ def test_masterpieces_and_semiotics_pillars():
     print(" -> PASSED: Kanon Zunifikowany 90 Filarów AVT (Filary LXXXI – XC) w 100% zintegrowany i sprawny.")
 
 def test_translator_logger_and_sign_detector():
-    print("[TEST 29/29] Test odporności translator.py i loggera na błędy wizyjnej detekcji...")
+    print("[TEST 29/29] Test odporności translator.py, audio alertów i spójności retrospekcji...")
     import translator
     assert hasattr(translator, "logger"), "translator module must define logger"
     assert translator.logger is not None
-    print(" -> PASSED: Logger w translator.py poprawnie zainicjalizowany.")
+
+    # Test Audio Discrepancy Detector
+    alert_kikanaide = translator.detect_audio_discrepancy(
+        jp_text="聞かないで [Kikanaide]",
+        pl_text="Wolę nie wiedzieć.",
+        en_text="Don't even ask."
+    )
+    assert alert_kikanaide is not None and "Kikanaide" in alert_kikanaide
+
+    alert_kanojo = translator.detect_audio_discrepancy(
+        jp_text="彼女たち [Kanojo-tachi]",
+        pl_text="Oni poszli na zakupy.",
+        en_text="They went shopping."
+    )
+    assert alert_kanojo is not None and "Kanojo-tachi" in alert_kanojo
+
+    # Test Flashback 1:1 memory formatting
+    from memory import format_translation_memory_for_prompt
+    formatted_mem = format_translation_memory_for_prompt([
+        {"en": "I will never give up!", "pl": "Nigdy się nie poddam!", "anime": "Kingdom", "score": 100}
+    ])
+    assert "[DOKŁADNY CYTAT 1:1]" in formatted_mem
+    print(" -> PASSED: Logger w translator.py, audio alerty i spójność retrospekcji 1:1 działają bezbłędnie.")
 
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")

@@ -752,6 +752,30 @@ FILAR CII: DYSTRYBUCJA LEKSYKALNA I ZAIMKOWA SUBSTYTUCJA DEIKTYCZNA (ANTI-NOUN R
     - W monologu/myślach: Stosuj zróżnicowanie leksykalne i kondensację ("Książka mojego ojca..." -> "Przecież uznano ją za zakazaną i spalono..." / "Spalono ją jako zakazane dzieło...").
     - Przy deiksie (wskazywaniu/kupowaniu/dotykaniu przedmiotu w kadrze): Zastąp rzeczownik naturalnym zaimkiem wskazującym lub dopełnieniowym ("Chciałabym ją kupić", "Chciałabym to kupić", "Mogę to kupić?").
 - Żelazna reguła: Gdy przedmiot jest oczywisty z kontekstu sceny lub został nazwany chwilę wcześniej, ZAWSZE zastępuj go zaimkiem ("ją", "jego", "to") zamiast mechanicznie powtarzać rzeczownik!
+
+FILAR CIII: PRAGMATYKA JAPOŃSKICH AKTÓW PROŚBY I ROZKAZU (KURE VS MORAERU VS KUDASAI):
+- Angielskie napisy spłaszczają prośby i żądania do 'Please do X' lub 'Can you do X?'. W języku polskim triangulujemy japoński czasownik:
+  * 1. Kumpelskie żądanie / bitewny rozkaz (-te kure / -kure / -ro / -e):
+    - "Tasukete kure!" -> "Pomóż mi!", "Ratuj!". KATEGORYCZNY ZAKAZ: "Proszę, pomóż mi".
+    - "Kase!" / "Kashite kure" -> "Dawaj to!", "Pożycz mi to!". KATEGORYCZNY ZAKAZ: "Czy możesz mi to pożyczyć?".
+  * 2. Nieśmiała prośba o przysługę (-te moraeru? / -te kureru?):
+    - "Mite moraeru?" -> "Zerkniesz na to?", "Mógłbyś rzucić okiem?".
+  * 3. Formalna uprzejmość (-te kudasai / -kudasaimase):
+    - "O-machi kudasai" -> "Proszę zaczekać", "Niech pan zaczeka".
+- Żelazna zasada: W scenach walki, pojedynków i pośpiechu forms z 'Proszę...' są sztucznym błędem tłumacza – stosuj czyste, stanowcze tryby rozkazujące!
+
+FILAR CIV: SOMATYKA EMOCJI I JAPOŃSKIE MIMETYKI (GITAIGO & SOMATIC IDIOMS):
+- Japońskie mimetyki stanów psychofizycznych tłumacz na bogatą, naturalną polską frazeologię somatyczną:
+  * ドキドキ (Doki doki - kołatanie serca ze strachu lub miłości):
+    -> "Serce podchodzi mi do gardła", "Aż serce mi wali", "Serce bije mi jak młotem" (ZAKAZ szkolnego: 'Moje serce bije szybko').
+  * ワクワク (Waku waku - radosne podekscytowanie/niecierpliwość):
+    -> "Aż mnie nosi z ekscytacji!", "Nie mogę się doczekać!", "Aż mi się oczy świecą!".
+  * イライラ (Ira ira - wzbierający gniew/frustracja):
+    -> "Krew mnie zalewa", "Szlag mnie trafia", "Doprowadza mnie do szału".
+  * ゾクゾク (Zoku zoku - dreszcz grozy, zachwytu lub gorączki):
+    -> "Aż ciarki mnie przechodzą", "Przechodzi mnie dreszcz", "Aż mi skóra cierpnie".
+  * ビックリ (Bikkuri - nagły szok/zaskoczenie):
+    -> "Aż mnie zamurowało", "O mało zawału nie dostałem", "Zaniemówiłem".
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -1782,6 +1806,20 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR CII - Zaimkowa Substytucja Deiktyczna i Zakaz Powtórzeń Rzeczowników]: "
             "Gdy postać wskazuje/kupuje/dotyka przedmiotu w kadrze ('buy this book'), zastąp rzeczownik zaimkiem ('Chciałabym ją/to kupić'). KATEGORYCZNY ZAKAZ powtarzania tego samego rzeczownika ('książka... księga... tę książkę')!"
+        )
+
+    # 47. Pragmatyka japońskich aktów prośby i rozkazu (Filar CIII)
+    if any(w in combined_en for w in ["please", "help me", "can you", "could you", "give me", "kure", "kase", "kudasai"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CIII - Pragmatyka Próśb i Rozkazów (Kure / Moraeru / Kudasai)]: "
+            "W scenach walki i pośpiechu ('Tasukete kure!') stosuj twarde rozkazy ('Pomóż mi!', 'Ratuj!'), ZAKAZ sztucznego 'Proszę, pomóż mi'. Prośby kumpelskie ('Kashite') tłumacz jako 'Dawaj to!', 'Pożycz mi to!'."
+        )
+
+    # 48. Somatyka emocji i mimetyki (Filar CIV)
+    if any(w in combined_en for w in ["excited", "nervous", "heart is", "irritat", "chills", "scared", "doki", "waku", "ira ira"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CIV - Somatyka Emocji i Japońskie Mimetyki (Gitaigo)]: "
+            "Mimetyki tłumacz bogatą polską frazeologią somatyczną: Doki doki -> 'Serce podchodzi mi do gardła', Waku waku -> 'Aż mnie nosi z ekscytacji!', Ira ira -> 'Krew mnie zalewa', Zoku zoku -> 'Aż ciarki mnie przechodzą'!"
         )
 
     if not focused_pillars:
