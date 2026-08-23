@@ -711,6 +711,15 @@ FILAR XCVIII: TYPOGRAFIA PLANSZ TYTUŁOWYCH I ZWIĘZŁOŚĆ OPTYCZNA TYPESETTING
   * Jeśli polski tytuł lub plansza przekracza 22–24 znaki, BEZWZGLĘDNIE sformatuj go w DWÓCH WYŚRODKOWANYCH WIERSZACH z tagiem \\N:
     Przykład: "SPECJALNE SIŁY POŻARNICZE\\NCZĘŚĆ TRZECIA" (lub "ROZDZIAŁ 3").
   * Kategoryczny zakaz generowania tasiemców tytułowych w jednej linii, które ucinają się na krawędziach ekranu!
+
+FILAR XCIX: ZAKAZ NADGORLIWEJ EKSPLIKACJI I SAMOWOLNEGO WTRĄCANIA IMION (ANTI-EXPLICITATION & VOCATIVE INTEGRITY):
+- Kategoryczny zakaz wtrącania imion postaci ("Panie X... / X-san...") w miejscach, gdzie w tekście angielskim i japońskim audio padają wyłącznie zawahania, pauzy i neutralne zaczepki (Hesitations & Interjections):
+  * "Erm, hey..." / "Um..." / "Ano..." / "Etto..." / "Chotto..." / "Wait..." / "Excuse me...".
+- Kategoryczny zakaz:
+  * BŁĄD [X]: Zamiana "Erm, hey" na "Panie Kamui..." (sztuczna formalizacja, niszczenie prawdy sceny i fałszowanie relacji między postaciami!).
+- Obowiązkowe polskie ekwiwalenty:
+  * POPRAWNIE: "Przepraszam...", "Zaraz, hej...", "Yyy, chwileczkę...", "Hej, zaraz...", "Słuchaj...".
+- Żelazna reguła: Imię w wołaczu wolno wstawić TYLKO I WYŁĄCZNIE WTEDY, gdy imię to zostało rzeczywiście wypowiedziane w dialogu EN lub japońskim audio JP!
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -1713,6 +1722,13 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR XCVIII - Typografia Plansz Tytułowych i Zwięzłość Typesettingu]: "
             "Długie tytuły i plansze (>22 znaki) formatuj w DWÓCH WYŚRODKOWANYCH WIERSZACH z \\N (np. 'SPECJALNE SIŁY POŻARNICZE\\NCZĘŚĆ TRZECIA'), aby nie wychodziły poza kadr!"
+        )
+
+    # 43. Zakaz nadgorliwej eksplikacji i wtrącania imion (Filar XCIX)
+    if any(w in combined_en for w in ["erm", "um", "hey,", "ano", "etto", "chotto", "wait,"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR XCIX - Zakaz Nadgorliwej Eksplikacji i Wtrącania Imion]: "
+            "Zwykłe zawahania ('Erm, hey') tłumacz jako 'Przepraszam...', 'Zaraz, hej...'. KATEGORYCZNY ZAKAZ samowolnego wklejania imion postaci ('Panie Kamui...')!"
         )
 
     if not focused_pillars:
