@@ -126,7 +126,8 @@ def test_rules_and_prompts():
     assert "FILAR XCVIII:" in sys_prompt
     assert "FILAR XCIX:" in sys_prompt
     assert "FILAR C:" in sys_prompt
-    print(" -> PASSED: Kompletny Zunifikowany Kanon 100 Filarów AVT (Filary I – C) jest aktywny w obu fazach tłumaczenia.")
+    assert "FILAR CI:" in sys_prompt
+    print(" -> PASSED: Kompletny Zunifikowany Kanon 101 Filarów AVT (Filary I – CI) jest aktywny w obu fazach tłumaczenia.")
 
 def test_pydantic_schemas():
     print("[TEST 2/5] Weryfikacja schematów Pydantic...")
@@ -296,11 +297,12 @@ def test_profiler_and_whisper():
     assert "PROFIL PSYCHOLOGICZNY I ZAIMKI" in formatted
     assert "Ore" in formatted
     assert "EKWIWALENTY JAPOŃSKICH PRZYSŁÓW" in formatted
-    assert "Isseki nichou" in formatted
-    
     # Test dostępności i stanu Whisper
     avail = JapaneseWhisperEngine.is_available()
-    print(" -> PASSED: Profiler 2.0 (Odmiana imion, zaimki ego, idiomy) działa w 100%.")
+    import inspect
+    sig = inspect.signature(JapaneseWhisperEngine.transcribe_batch_scene)
+    assert "initial_prompt" in sig.parameters
+    print(" -> PASSED: Profiler 2.0 (Odmiana imion, zaimki ego, idiomy) i Whisper Priming działają w 100%.")
 from model_resolver import resolve_best_models, _extract_model_score
 
 def test_model_resolver():

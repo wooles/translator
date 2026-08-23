@@ -379,7 +379,9 @@ class MultimodalTranslator:
             if whisper_transcriptions and idx + 1 in whisper_transcriptions:
                 jp_text = whisper_transcriptions[idx + 1]
                 if jp_text and not vtype["is_sign"]:
-                    lines.append(f"  JP (Japoński oryginał z mowy): {jp_text}")
+                    romaji_str = to_romaji(jp_text)
+                    jp_display = f"{jp_text} [{romaji_str}]" if romaji_str and romaji_str != jp_text else jp_text
+                    lines.append(f"  JP (Japoński oryginał z mowy): {jp_display}")
             lines.append(f"  EN (Napisy pomocnicze): {clean_text}")
 
         # 4. Podgląd przyszłych kwestii (Lookahead)
@@ -809,12 +811,22 @@ class MultimodalTranslator:
                             )
                             events_tuples = [(idx + 1, item[1]) for idx, item in enumerate(untranslated_in_batch)]
                             
-                            # 1. Lokalna transkrypcja Whisper
+                            # 1. Lokalna transkrypcja Whisper z kontekstem postaci i terminologii
                             if self.whisper:
+                                whisper_prime_keywords = []
+                                if self.character_registry:
+                                    whisper_prime_keywords.extend(list(self.character_registry.keys())[:8])
+                                if episode_profile and episode_profile.characters:
+                                    whisper_prime_keywords.extend([c.name for c in episode_profile.characters][:8])
+                                if anime_meta and anime_meta.get("title"):
+                                    whisper_prime_keywords.append(anime_meta.get("title"))
+                                initial_prompt_str = "、".join(whisper_prime_keywords) if whisper_prime_keywords else None
+
                                 whisper_transcriptions = self.whisper.transcribe_batch_scene(
                                     scene_wav_path=temp_audio_file,
                                     batch_start_ms=batch_start,
-                                    events=events_tuples
+                                    events=events_tuples,
+                                    initial_prompt=initial_prompt_str
                                 )
 
                             # 2. Lokalna analiza prozodii (RMS dBFS / szept / krzyk)
@@ -935,6 +947,10 @@ class MultimodalTranslator:
                     if not pl_candidate:
                         pl_candidate = clean_en
 
+                    jp_text = whisper_transcriptions.get(batch_id, "") if whisper_transcriptions else ""
+                    romaji_str = to_romaji(jp_text) if jp_text else ""
+                    audio_jp_str = f"{jp_text} [{romaji_str}]" if romaji_str and romaji_str != jp_text else jp_text
+
                     pass1_items.append({
                         "id": batch_id,
                         "orig_idx": orig_idx,
@@ -943,6 +959,7 @@ class MultimodalTranslator:
                         "speaker_gender": speaker_gender,
                         "speaker_voice": speaker_tags.get(batch_id, ""),
                         "prosody": prosody_tags.get(batch_id, ""),
+                        "audio_jp": audio_jp_str,
                         "cps_warning": cps_warn,
                         "notes": notes,
                         "is_sign": vtype["is_sign"],

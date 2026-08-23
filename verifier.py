@@ -66,9 +66,11 @@ class DialogueVerifier:
             cps_info = f" [CPS: {item.get('cps_warning')}]" if item.get('cps_warning') else ""
             notes_info = f" [Notatki: {item.get('notes')}]" if item.get('notes') else ""
             visual_info = f" [Położenie/Styl: {item.get('visual_details')}]" if item.get('visual_details') else ""
+            audio_info = f"  JP (Audio ze słuchu Whisper): {item['audio_jp']}\n" if item.get("audio_jp") else ""
             
             prompt_lines.append(
                 f"- [ID: {item['id']}]{type_tag}{gender_info}{voice_info}{prosody_info}{cps_info}{visual_info}\n"
+                f"{audio_info}"
                 f"  EN: {item['en']}\n"
                 f"  Wstępne PL: {item['pl']}{notes_info}"
             )

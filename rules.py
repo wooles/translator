@@ -735,6 +735,15 @@ FILAR C: JAPOŃSKIE YOBISUTE I ZAKAZ FAŁSZYWEJ TYTULATURY (BARE NAMES VS FALSE 
     - -dono (殿) -> Wielmożny panie
     - -taichou (隊長) -> Kapitanie / Dowódco.
   * Przy Yobisute w walce, akcji i zbliżeniach -> WYŁĄCZNIE SAMO IMIĘ!
+
+FILAR CI: NADRZĘDNOŚĆ JAPOŃSKIEGO AUDIO I TRIANGULACJA PERSPEKTYWY MÓWCY (KIKANAIDE VS KIKITAKUNAI):
+- Gdy tekst angielski jest wieloznaczny (np. "Don't even ask"), japońskie czasowniki i końcówki w audio bezwzględnie rozstrzygają perspektywę podmiotu:
+  * 1. 聞かないで (Kikanaide / Kiku + naide = prośba mówcy o zaniechanie pytań ze wstydu lub bezsilności):
+    -> BEZWZGLĘDNIE: "Nawet nie pytaj...", "Nie pytaj...", "Błagam, nie pytaj...".
+    -> KATEGORYCZNY ZAKAZ [X]: "Wolę nie wiedzieć" (błąd inwersji podmiotu – "wolę nie wiedzieć" mówi słuchacz, a nie zawstydzony sprawca!).
+  * 2. 聞きたくない (Kikitakunai / Kiku + takunai = odmowa słuchania przez słuchacza):
+    -> "Nie chcę o tym słyszeć", "Wolę nie wiedzieć", "Oszczędź mi szczegółów".
+- ŻELAZNA ZASADA: W razie rozbieżności między angielskim tekstem a japońskim audio ze słuchu (Whisper), BEZWZGLĘDNY PRIORYTET MA JAPOŃSKIE AUDIO!
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -1751,6 +1760,13 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR C - Japońskie Yobisute i Zakaz Fałszywego 'Panie X']: "
             "Gdy w audio pada samo imię (Yobisute), stosuj SAMO IMIĘ w wołaczu ('Kamui?'). KATEGORYCZNY ZAKAZ dodawania sztucznego 'Panie Kamui?' w walce i akcji!"
+        )
+
+    # 45. Nadrzędność japońskiego audio i triangulacja perspektywy (Filar CI)
+    if any(w in combined_en for w in ["ask", "tell", "hear", "listen", "know", "kikanaide", "kikitakunai"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CI - Nadrzędność Japońskiego Audio i Perspektywa (Kikanaide)]: "
+            "Gdy japońskie audio zawiera 'Kikanaide', tłumacz jako 'Nawet nie pytaj...', 'Nie pytaj...'. KATEGORYCZNY ZAKAZ 'Wolę nie wiedzieć'!"
         )
 
     if not focused_pillars:

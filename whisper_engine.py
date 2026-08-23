@@ -141,7 +141,8 @@ class JapaneseWhisperEngine:
         self,
         scene_wav_path: str,
         batch_start_ms: int,
-        events: List[Tuple[int, Any]]
+        events: List[Tuple[int, Any]],
+        initial_prompt: Optional[str] = None
     ) -> Dict[int, str]:
         """
         Transkrybuje całe audio paczki (np. 30-60 sek) W JEDNYM PRZEBIEGU (zamiast 14 osobnych wywołań).
@@ -153,12 +154,18 @@ class JapaneseWhisperEngine:
 
         try:
             self._initialize_model()
+            transcribe_kwargs = {
+                "language": "ja",
+                "beam_size": 3,
+                "vad_filter": True,
+                "vad_parameters": dict(min_silence_duration_ms=200)
+            }
+            if initial_prompt:
+                transcribe_kwargs["initial_prompt"] = initial_prompt
+
             segments, info = self.model.transcribe(
                 scene_wav_path,
-                language="ja",
-                beam_size=3,
-                vad_filter=True,
-                vad_parameters=dict(min_silence_duration_ms=200)
+                **transcribe_kwargs
             )
 
             result: Dict[int, List[str]] = {b_id: [] for b_id, _ in events}
