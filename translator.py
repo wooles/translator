@@ -152,6 +152,9 @@ def sanitize_sub_text(text: str, is_ass: bool = True) -> str:
         # Usunięcie uszkodzonych tagów ASS (z zachowaniem {\i1}, {\i0}, {\b1}, {\b0})
         text = re.sub(r"\{(?!(?:\\i[01]|\\b[01]))[^}]*\}?", "", text)
         text = re.sub(r"\{[^\\]*$", "", text)
+        # Deduplikacja powtórzonych sąsiadujących tagów (np. {\i1}{\i1} -> {\i1}, {\i0}{\i0} -> {\i0})
+        text = re.sub(r"(\{\\i[01]\})+", r"\1", text)
+        text = re.sub(r"(\{\\b[01]\})+", r"\1", text)
     else:
         # Dla SRT: konwersja tagów ASS na HTML
         text = re.sub(r"\{\\i1\}(.*?)\{\\i0\}", r"<i>\1</i>", text)

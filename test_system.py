@@ -127,7 +127,8 @@ def test_rules_and_prompts():
     assert "FILAR XCIX:" in sys_prompt
     assert "FILAR C:" in sys_prompt
     assert "FILAR CI:" in sys_prompt
-    print(" -> PASSED: Kompletny Zunifikowany Kanon 101 Filarów AVT (Filary I – CI) jest aktywny w obu fazach tłumaczenia.")
+    assert "FILAR CII:" in sys_prompt
+    print(" -> PASSED: Kompletny Zunifikowany Kanon 102 Filarów AVT (Filary I – CII) jest aktywny w obu fazach tłumaczenia.")
 
 def test_pydantic_schemas():
     print("[TEST 2/5] Weryfikacja schematów Pydantic...")
@@ -156,6 +157,10 @@ def test_sanitization_and_deduplication():
     # Test usuwania urwanych tagów ASS
     corrupted_tag = "{\\t(2840,3799,\\"
     assert sanitize_sub_text(corrupted_tag) == ""
+
+    # Test deduplikacji zdublowanych tagów ASS {\i1}{\i1} -> {\i1}
+    double_italic = "{\\i1}{\\i1}Książka mojego ojca...{\\i0}{\\i0}"
+    assert sanitize_sub_text(double_italic, is_ass=True) == "{\\i1}Książka mojego ojca...{\\i0}"
 
     # Test konwersji kursywy HTML na format ASS
     italic_html = "<i>Serio jej to pasuje?</i>"

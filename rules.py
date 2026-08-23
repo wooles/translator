@@ -744,6 +744,14 @@ FILAR CI: NADRZĘDNOŚĆ JAPOŃSKIEGO AUDIO I TRIANGULACJA PERSPEKTYWY MÓWCY (K
   * 2. 聞きたくない (Kikitakunai / Kiku + takunai = odmowa słuchania przez słuchacza):
     -> "Nie chcę o tym słyszeć", "Wolę nie wiedzieć", "Oszczędź mi szczegółów".
 - ŻELAZNA ZASADA: W razie rozbieżności między angielskim tekstem a japońskim audio ze słuchu (Whisper), BEZWZGLĘDNY PRIORYTET MA JAPOŃSKIE AUDIO!
+
+FILAR CII: DYSTRYBUCJA LEKSYKALNA I ZAIMKOWA SUBSTYTUCJA DEIKTYCZNA (ANTI-NOUN REPETITION & PRONOUN SUBSTITUTION):
+- Kategoryczny zakaz powtarzania tego samego rzeczownika (lub jego bliskiej formy rdzennej) w obrębie 2–4 sąsiednich kwestii:
+  * BŁĄD KOSZMARNY [X]: "Książka mojego ojca..." -> "Spalono ją jako zakazaną księgę..." -> "Chciałabym kupić tę książkę." (Potrójna tautologia i ciężka kalka z angielskiego 'I want to buy this book').
+  * POPRAWNIE [V]:
+    - W monologu/myślach: Stosuj zróżnicowanie leksykalne i kondensację ("Książka mojego ojca..." -> "Przecież uznano ją za zakazaną i spalono..." / "Spalono ją jako zakazane dzieło...").
+    - Przy deiksie (wskazywaniu/kupowaniu/dotykaniu przedmiotu w kadrze): Zastąp rzeczownik naturalnym zaimkiem wskazującym lub dopełnieniowym ("Chciałabym ją kupić", "Chciałabym to kupić", "Mogę to kupić?").
+- Żelazna reguła: Gdy przedmiot jest oczywisty z kontekstu sceny lub został nazwany chwilę wcześniej, ZAWSZE zastępuj go zaimkiem ("ją", "jego", "to") zamiast mechanicznie powtarzać rzeczownik!
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -1767,6 +1775,13 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR CI - Nadrzędność Japońskiego Audio i Perspektywa (Kikanaide)]: "
             "Gdy japońskie audio zawiera 'Kikanaide', tłumacz jako 'Nawet nie pytaj...', 'Nie pytaj...'. KATEGORYCZNY ZAKAZ 'Wolę nie wiedzieć'!"
+        )
+
+    # 46. Dystrybucja leksykalna i zaimkowa substytucja deiktyczna (Filar CII)
+    if any(w in combined_en for w in ["buy this", "take this", "this book", "this sword", "this letter", "this thing", "that book"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CII - Zaimkowa Substytucja Deiktyczna i Zakaz Powtórzeń Rzeczowników]: "
+            "Gdy postać wskazuje/kupuje/dotyka przedmiotu w kadrze ('buy this book'), zastąp rzeczownik zaimkiem ('Chciałabym ją/to kupić'). KATEGORYCZNY ZAKAZ powtarzania tego samego rzeczownika ('książka... księga... tę książkę')!"
         )
 
     if not focused_pillars:
