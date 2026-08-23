@@ -682,6 +682,18 @@ FILAR XCV: EKWIWALENCJA JAPOŃSKICH PRZYSŁÓW I FRAZEOLOGIZMÓW 4-ZNAKOWYCH (YO
   * "Isseki nichou" -> "Upiec dwie pieczenie na jednym ogniu".
   * "Jigou jitoku" -> "Naważyłeś sobie piwa, to teraz je wypij" / "Zbierasz to, co zasiałeś".
   * "Ichi-go ichi-e" -> "Taka chwila zdarza się tylko raz w życiu".
+
+FILAR XCVI: ASYMETRIA ZAIMKÓW 3. OSOBY I TRIANGULACJA PŁCI (KANOJO-TACHI [ONE / JE] VS KARERA [ONI / ICH]):
+- Język angielski w zaimku 3. osoby liczby mnogiej ('they / them / their') całkowicie zaciera rodzaj gramatyczny.
+- Tłumacz ma BEZWZGLĘDNY OBOWIĄZEK weryfikacji japońskiej ścieżki dźwiękowej i kontekstu obrazu:
+  * 1. 彼女たち (kanojo-tachi) / 彼女ら (kanojo-ra) / 女たち (onna-tachi):
+    -> BEZWZGLĘDNIE tłumacz na polski rodzaj NIEMĘSKOOSOBOWY (ŻEŃSKI):
+    -> Mianownik: ONE (ZAKAZ: 'oni').
+    -> Biernik: JE (ZAKAZ: 'ich'). Przykład: "Można je nazwać oparciem dla ludzkiego życia. One również..." (BŁĄD [X]: "Można ich nazwać... Oni również...").
+    -> Dopełniacz: ICH / Celownik: IM / Narzędnik: NIMI / Miejscownik: NICH.
+  * 2. 彼ら (karera) / 男たち (otoko-tachi):
+    -> Tłumacz na rodzaj męskoosobowy: ONI / ICH (Biernik) / IM / NIMI.
+  * 3. ZAKAZ DOMYŚLNEGO MĘSKOOSOBOWEGO: Gdy podmiotem są kobiety, siostry zakonne, uczennice, kapłanki czy ofiary żeńskie (np. w Fire Force), KATEGORYCZNIE ZABRANIA SIĘ stosowania form 'oni / ich'.
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -1663,6 +1675,13 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR XC - Somatyczny Rezonans Emocjonalny (Douglas Robinson)]: "
             "Przekład musi wywoływać bezpośrednią reakcję cielesno-zmysłową (gęsia skórka, ucisk w gardle, śmiech) u polskiego widza."
+        )
+
+    # 40. Asymetria zaimków 3. osoby i triangulacja płci (Filar XCVI)
+    if any(w in combined_en for w in ["they", "them", "their", "theirs", "kanojo"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR XCVI - Asymetria Zaimków 3. Osoby i Płeć (Kanojo-tachi vs Karera)]: "
+            "Gdy japońskie audio zawiera 'kanojo-tachi' (lub podmiotem są kobiety/dziewczęta), BEZWZGLĘDNIE używaj 'one / je / ich', a NIE męskoosobowego 'oni / ich'!"
         )
 
     if not focused_pillars:
