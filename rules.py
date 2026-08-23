@@ -720,6 +720,21 @@ FILAR XCIX: ZAKAZ NADGORLIWEJ EKSPLIKACJI I SAMOWOLNEGO WTRĄCANIA IMION (ANTI-E
 - Obowiązkowe polskie ekwiwalenty:
   * POPRAWNIE: "Przepraszam...", "Zaraz, hej...", "Yyy, chwileczkę...", "Hej, zaraz...", "Słuchaj...".
 - Żelazna reguła: Imię w wołaczu wolno wstawić TYLKO I WYŁĄCZNIE WTEDY, gdy imię to zostało rzeczywiście wypowiedziane w dialogu EN lub japońskim audio JP!
+
+FILAR C: JAPOŃSKIE YOBISUTE I ZAKAZ FAŁSZYWEJ TYTULATURY (BARE NAMES VS FALSE POLITENESS & DIEGETIC EQUALITY):
+- Japońskie Yobisute (呼び捨て - wymawianie samego imienia/nazwiska bez przyrostka):
+  * Gdy w audio JP postać mówi samo imię/nazwisko ("Kamui!", "Shinra!", "Arthur?"):
+  * W języku polskim BEZWZGLĘDNIE stosuj SAMO IMIĘ W WOŁACZU ("Kamui!", "Shinra!", "Arthurze?").
+- KATEGORYCZNY ZAKAZ samowolnego dodawania "Pan / Pani":
+  * BŁĄD KOSZMARNY [X]: "Panie Kamui?" w scenach walki, pojedynków, intymności, napięcia, furii czy kumpelskich relacji (brzmi jak urzędnik zza biurka!).
+  * POPRAWNIE: "Kamui?".
+- KIEDY WOLNO UŻYĆ "Panie / Pani / Mistrzu":
+  * TYLKO WTEDY, gdy w audio wyraźnie pada sufiks szacunku:
+    - -sama (様) -> Panie / Czcigodny
+    - -sensei (先生) -> Mistrzu / Profesorze
+    - -dono (殿) -> Wielmożny panie
+    - -taichou (隊長) -> Kapitanie / Dowódco.
+  * Przy Yobisute w walce, akcji i zbliżeniach -> WYŁĄCZNIE SAMO IMIĘ!
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -1729,6 +1744,13 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR XCIX - Zakaz Nadgorliwej Eksplikacji i Wtrącania Imion]: "
             "Zwykłe zawahania ('Erm, hey') tłumacz jako 'Przepraszam...', 'Zaraz, hej...'. KATEGORYCZNY ZAKAZ samowolnego wklejania imion postaci ('Panie Kamui...')!"
+        )
+
+    # 44. Japońskie Yobisute i zakaz fałszywej tytulatury (Filar C)
+    if any(len(item.get("en", "").split()) <= 2 and "?" in item.get("en", "") for item in batch_items) or any(w in combined_en for w in ["kamui", "shinra", "arthur", "lord", "mr."]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR C - Japońskie Yobisute i Zakaz Fałszywego 'Panie X']: "
+            "Gdy w audio pada samo imię (Yobisute), stosuj SAMO IMIĘ w wołaczu ('Kamui?'). KATEGORYCZNY ZAKAZ dodawania sztucznego 'Panie Kamui?' w walce i akcji!"
         )
 
     if not focused_pillars:
