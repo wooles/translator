@@ -798,6 +798,31 @@ FILAR CVIII: KINEZYKA SPOJRZENIA I TRIANGULACJA MIKROMIMIKI (VISUAL GAZE & SUBTE
   * Przekładaj SUBTEKST psychologiczny sceny, a nie dosłowne słowa z angielskiego!
   * Przykład Tsundere/Wstyd: EN: "I didn't do it because I like you or anything." -> BŁĘDNIE: "Nie zrobiłam tego, bo cię lubię czy coś." -> POPRAWNIE: "Żebyś sobie tylko czegoś nie pomyślał!".
   * Gdy postać unika wzroku przy wyznaniu/przeprosinach -> stosuj formy bardziej intymne, zawstydzone i miękkie.
+
+FILAR CIX: RELACYJNOŚĆ UCHI/SOTO I NATURALNOŚĆ POLSKICH STOPNI POKREWIEŃSTWA:
+- W relacjach rodzinnych triangulujemy wiek, rejestr i dynamikę Uchi (swoi) vs Soto (obcy):
+  * Oyaji ( 親父 / おやじ ) w ustach młodego buntownika/syna do rówieśników:
+    -> "Stary mi nagadał...", "Ojciec się wściekł...", "Mój stary..." (KATEGORYCZNY ZAKAZ urzędowego: 'Mój ojciec powiedział, że...').
+  * Haha ( 母 ) w ustach dziecka/dziewczyny do obcego:
+    -> "Mama mówiła...", "Mama mi kazała..." (ZAKAZ sztywnego: 'Moja matka').
+  * Aniki ( 兄貴 / 兄き ) wśród rodzeństwa: "Braciszku / Bracie"; wśród gangsterów/yakuzy: "Szefie / Starszy bracie".
+
+FILAR CX: TRIANGULACJA DŁUGU WDZIĘCZNOŚCI GIRI (SUMIMASEN JAKO CIĘŻAR ZOBOWIĄZANIA):
+- Sumimasen ( 済みません ) etymologicznie oznacza brak możliwości spłacenia długu moralnego.
+  * W scenach, gdy postać otrzymuje pomoc, ratunek, lekarstwo lub strawę od towarzysza, "Sumimasen" NIE JEST suchym "Przepraszam":
+    -> POPRAWNIE: "Wybacz kłopot...", "Nie trzeba było...", "Nie powinieneś był się narażać...", "Dziękuję i wybacz...".
+    -> KATEGORYCZNY ZAKAZ: Monotonnego "Przepraszam", gdy postać w rzeczywistości dziękuje z poczuciem winy!
+
+FILAR CXI: JAPOŃSKA ZJADLIWOŚĆ IYAMI I JADOWITA GRZECZNOŚĆ (INVERTED POLITENESS):
+- Japońska ironia i nienawiść rzadko posługują się wulgarnością; sączą się przez przesadną grzeczność (Keigo) i fałszywe komplementy:
+  * "Gokurōsama desu koto" / "O-jouzu desu wa ne" powiedziane z uśmieszkiem przez wroga:
+    -> Tłumacz na jadowitą polską ironię salonową: "Doprawdy, imponujący wysiłek...", "Cóż za niezwykły popis...", "Zaprawdę, przeszłaś samą siebie...".
+    -> KATEGORYCZNY ZAKAZ: Dosłownego brania fałszywych pochwał ('Dziękuję za ciężką pracę').
+
+FILAR CXII: SEMIOTYKA CISZY MA (間) I RYGOR WYGASZANIA NAPISÓW W PAUZIE DRAMATYCZNEJ:
+- W japońskiej kinematografii pusta przestrzeń i cisza (Ma) są nośnikiem dramatyzmu i emocji:
+  * Kategoryczny zakaz sztucznego rozciągania czasu trwania napisów na sekundy milczenia postaci!
+  * Napis musi wygasnąć dokładnie wtedy, gdy postać zamyka usta (z tolerancją +200 ms), aby widz mógł chłonąć ciszę kadru, muzykę i spojrzenie aktora bez wiszącego tekstu.
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -1870,6 +1895,34 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR CVIII - Kinezyka Spojrzenia i Subtekst Mikromimiki]: "
             "Gdy w kadrze widać rumieniec, unikanie wzroku lub zawstydzenie, tłumacz psychologiczny SUBTEKST (np. 'Żebyś sobie tylko czegoś nie pomyślał!'), a nie szkolną kalkę z angielskiego!"
+        )
+
+    # 53. Relacyjność Uchi/Soto i stopnie pokrewieństwa (Filar CIX)
+    if any(w in combined_en for w in ["my dad", "my father", "my mom", "my mother", "old man", "oyaji", "aniki", "bro"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CIX - Relacyjność Uchi/Soto i Pokrewieństwo (Oyaji/Aniki)]: "
+            "Młodzieżowe Oyaji do kolegów tłumacz jako 'Stary / Ojciec' (ZAKAZ: 'Mój ojciec'). Aniki u chuliganów/yakuzy to 'Szefie / Starszy bracie', a w rodzinie 'Braciszku'."
+        )
+
+    # 54. Triangulacja długu Giri i Sumimasen (Filar CX)
+    if any(w in combined_en for w in ["sorry", "excuse me", "sumimasen", "thank you for saving", "trouble"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CX - Dług Giri i Sumimasen jako Wina/Wdzięczność]: "
+            "Gdy ranna postać otrzymuje pomoc/strawę, Sumimasen to 'Wybacz kłopot...', 'Nie trzeba było...', 'Dziękuję i wybacz...'. KATEGORYCZNY ZAKAZ monotonnego 'Przepraszam'!"
+        )
+
+    # 55. Japońska zjadliwość Iyami (Filar CXI)
+    if any(w in combined_en for w in ["good job", "hard work", "impressive", "such an honor", "gokurou"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CXI - Japońska Zjadliwość Iyami (Inverted Politeness)]: "
+            "Fałszywe komplementy wrogów w Keigo tłumacz jako jadowitą polską ironię salonową ('Doprawdy, imponujący wyczyn...', 'Cóż za popis...'). ZAKAZ brania pochwał dosłownie!"
+        )
+
+    # 56. Semiotyka ciszy Ma (Filar CXII)
+    if any(len(item.get("en", "").split()) <= 3 for item in batch_items):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CXII - Semiotyka Ciszy Ma (間) i Zwięzłość AVT]: "
+            "Krótkie kwestie tłumacz zwięźle i dosadnie, pozwalając na wygaszenie napisu w momencie nadejścia ciszy i pauzy dramatycznej w scenie!"
         )
 
     if not focused_pillars:

@@ -134,7 +134,11 @@ def test_rules_and_prompts():
     assert "FILAR CVI:" in sys_prompt
     assert "FILAR CVII:" in sys_prompt
     assert "FILAR CVIII:" in sys_prompt
-    print(" -> PASSED: Kompletny Zunifikowany Kanon 108 Filarów AVT (Filary I – CVIII) jest aktywny w obu fazach tłumaczenia.")
+    assert "FILAR CIX:" in sys_prompt
+    assert "FILAR CX:" in sys_prompt
+    assert "FILAR CXI:" in sys_prompt
+    assert "FILAR CXII:" in sys_prompt
+    print(" -> PASSED: Kompletny Zunifikowany Kanon 112 Filarów AVT (Filary I – CXII) jest aktywny w obu fazach tłumaczenia.")
 
 def test_pydantic_schemas():
     print("[TEST 2/5] Weryfikacja schematów Pydantic...")
@@ -950,13 +954,28 @@ def test_translator_logger_and_sign_detector():
     )
     assert alert_aizuchi is not None and "Aizuchi" in alert_aizuchi
 
+    # Test Oyaji & Giri alerts
+    alert_oyaji = translator.detect_audio_discrepancy(
+        jp_text="親父 [Oyaji]",
+        pl_text="Mój ojciec powiedział, że mam wrócić.",
+        en_text="My dad said to come back."
+    )
+    assert alert_oyaji is not None and "Oyaji" in alert_oyaji
+
+    alert_giri = translator.detect_audio_discrepancy(
+        jp_text="すみません [Sumimasen]",
+        pl_text="Przepraszam za to.",
+        en_text="Thank you for saving my life, here is water."
+    )
+    assert alert_giri is not None and "Giri" in alert_giri
+
     # Test Flashback 1:1 memory formatting
     from memory import format_translation_memory_for_prompt
     formatted_mem = format_translation_memory_for_prompt([
         {"en": "I will never give up!", "pl": "Nigdy się nie poddam!", "anime": "Kingdom", "score": 100}
     ])
     assert "[DOKŁADNY CYTAT 1:1]" in formatted_mem
-    print(" -> PASSED: Logger w translator.py, audio alerty (Haragei, Aizuchi) i spójność retrospekcji 1:1 działają bezbłędnie.")
+    print(" -> PASSED: Logger w translator.py, audio alerty (Haragei, Aizuchi, Oyaji, Giri) i spójność retrospekcji 1:1 działają bezbłędnie.")
 
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")

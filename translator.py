@@ -183,6 +183,15 @@ def detect_audio_discrepancy(jp_text: str, pl_text: str, en_text: str) -> Option
         if len(pl_text.split()) > 2:
             return "Krótkie Aizuchi podtrzymujące kontakt -> Zredukuj do oszczędnego 'Mhm' / 'No' / 'Jasne' (Filar CVI)."
 
+    # 7. Oyaji vs sztywne 'mój ojciec'
+    if ("親父" in clean_jp or "おやじ" in clean_jp or "oyaji" in rom_lower) and "mój ojciec" in pl_lower:
+        return "W audio pada potoczne/buntownicze 'Oyaji' -> Zastąp sztywne 'mój ojciec' naturalnym 'stary' lub 'ojciec' (Filar CIX)."
+
+    # 8. Giri i Sumimasen w kontekście wdzięczności/ratunku
+    if ("済みません" in clean_jp or "すみません" in clean_jp or "sumimasen" in rom_lower) and any(w in en_text.lower() for w in ["saved", "water", "food", "help", "thank"]):
+        if pl_lower.startswith("przepraszam"):
+            return "W audio pada 'Sumimasen' jako dług wdzięczności (Giri) -> Zamień monotonne 'Przepraszam' na 'Wybacz kłopot...' / 'Nie trzeba było...' (Filar CX)."
+
     return None
 
 def sanitize_sub_text(text: str, is_ass: bool = True) -> str:
