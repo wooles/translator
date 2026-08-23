@@ -5,6 +5,7 @@ Arkadiusza Belczyka ("Tłumaczenie filmów", "Sztuka tłumaczenia filmów", "Por
 zasadach adaptacji japońskich tytułów grzecznościowych oraz Netflix Polish Timed Text Style Guide.
 """
 
+import re
 from typing import List, Dict, Any, Optional
 
 BELCZYK_AVT_MASTER_CANON = """
@@ -823,6 +824,28 @@ FILAR CXII: SEMIOTYKA CISZY MA (間) I RYGOR WYGASZANIA NAPISÓW W PAUZIE DRAMAT
 - W japońskiej kinematografii pusta przestrzeń i cisza (Ma) są nośnikiem dramatyzmu i emocji:
   * Kategoryczny zakaz sztucznego rozciągania czasu trwania napisów na sekundy milczenia postaci!
   * Napis musi wygasnąć dokładnie wtedy, gdy postać zamyka usta (z tolerancją +200 ms), aby widz mógł chłonąć ciszę kadru, muzykę i spojrzenie aktora bez wiszącego tekstu.
+
+FILAR CXIII: DYSKRETNA STYLIZACJA DIALEKTÓW REGIONALNYCH (KANSAI-BEN & HŌGEN):
+- Japońskie dialekty regionalne (Kansai-ben: Osaka/Kioto, Tohoku-ben, Hakata-ben) tłumaczymy z wyczuciem:
+  * KATEGORYCZNY ZAKAZ [X]: Tworzenia karykatury góralskiej ("hej bawocek") lub wiejskiej gwary w japońskim anime.
+  * POPRAWNIE [V]: Stosuj zadziorną, dynamiczną polszczyznę miejsko-kolokwialną:
+    - "Nande ya nen!" -> "Co ty bredzisz?!", "Chyba cię głowa boli!".
+    - "Honma ni akan..." -> "No to leżymy...", "Mogiła...", "Nie ma mowy...".
+    - "Seyana" -> "No ba!", "A jakże!", "Pewnie!".
+
+FILAR CXIV: AUTONOMICZNA TRANSKREACJA KALAMBURÓW I HOMOFONÓW (DAJARE / KAKEKOTOBA - ZASADA BARAŃCZAKA):
+- W przypadku japońskich gier słownych i kalamburów opartych na homofonach (Dajare, Kakekotoba):
+  * KATEGORYCZNY ZAKAZ [X]: Dodawania encyklopedycznych przypisów w klamrach [Przyp. tłum.: Słowo kami oznacza...].
+  * POPRAWNIE [V]: Stwórz autonomiczny polski kalambur fonetyczny lub dowcip sytuacyjny o identycznym ładunku humoru/zażenowania (Zasada Stanisława Barańczaka).
+
+FILAR CXV: ARCHITEKTURA HIPOKORYSTYKÓW I ZDROBNIENIA SŁOWOTWÓRCZE (AISHŌ & POLSKIE ZDROBNIENIA):
+- Japońskie sufiksy pieszczotliwości (-tan, -pyon, -cchi, -rin, -bōzu) przy braku honoryfikatorów przekładaj na bogactwo polskich zdrobnień słowotwórczych:
+  * "Rin-tan" / "Mio-cchi" -> "Rinusia", "Miodusia", "Mio".
+  * "Bokuchan" / "Bōzu" -> "szkrab", "chłystek", "braciszek", "maluch".
+
+FILAR CXVI: IZOMORFIZM CZASOWY DŁUGICH SAMOGŁOSEK I EMFASY EKSTATYCZNEJ (CHŌON & EKSTATIC ELONGATION):
+- Przeciągłe japońskie okrzyki bólu, rozpaczy lub determinacji (Itaaaai, Dameeee, Tasukeeee) formatuj ze zsynchronizowanym wydłużeniem ekspresyjnym:
+  * "Auaaa...!", "Nieee...!", "Ratunkuuu...!", "Stóóój...!" - idealnie zgrane z otwarciem krtani aktora w kadrze!
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -1936,6 +1959,34 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR CXII - Semiotyka Ciszy Ma (間) i Zwięzłość AVT]: "
             "Krótkie kwestie tłumacz zwięźle i dosadnie, pozwalając na wygaszenie napisu w momencie nadejścia ciszy i pauzy dramatycznej w scenie!"
+        )
+
+    # 57. Dialekty Kansai-ben i Hōgen (Filar CXIII)
+    if any(w in combined_en for w in ["y'all", "ain't", "nande ya", "akan", "honma", "seyana", "howdy"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CXIII - Dyskretna Stylizacja Dialektów (Kansai-ben)]: "
+            "Dialekty regionalne tłumacz zadziorną polszczyzną miejską ('Co ty bredzisz?!', 'No to leżymy...'). KATEGORYCZNY ZAKAZ tworzenia karykatury góralskiej!"
+        )
+
+    # 58. Kalambury i Homofony (Filar CXIV)
+    if any(w in combined_en for w in ["pun", "joke", "wordplay", "dajare", "kami", "kame"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CXIV - Kalambury i Homofony bez Przypisów (Barańczak)]: "
+            "Twórz autonomiczne polskie kalambury fonetyczne. KATEGORYCZNY ZAKAZ wstawiania przypisów w klamrach [Przyp. tłum.]!"
+        )
+
+    # 59. Zdrobnienia i Hipokorystyki (Filar CXV)
+    if any(w in combined_en for w in ["-tan", "-pyon", "-cchi", "-rin", "bozu"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CXV - Hipokorystyki i Polskie Zdrobnienia]: "
+            "Japońskie sufiksy pieszczotliwości przekładaj na bogatą polską paletę zdrobnień ('Rinusia', 'szkrab', 'maluch')."
+        )
+
+    # 60. Izomorfizm długich samogłosek (Filar CXVI)
+    if any(re.search(r"(?:a{3,}|e{3,}|o{3,}|u{3,}|i{3,})", item.get("en", "").lower()) for item in batch_items):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CXVI - Izomorfizm Długich Samogłosek (Chōon)]: "
+            "Przeciągłe okrzyki formatuj z ekspresyjnym wydłużeniem liter ('Auaaa...!', 'Nieee...!', 'Ratunkuuu...!'), zgrane z ruchem ust aktora."
         )
 
     if not focused_pillars:

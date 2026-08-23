@@ -138,7 +138,11 @@ def test_rules_and_prompts():
     assert "FILAR CX:" in sys_prompt
     assert "FILAR CXI:" in sys_prompt
     assert "FILAR CXII:" in sys_prompt
-    print(" -> PASSED: Kompletny Zunifikowany Kanon 112 Filarów AVT (Filary I – CXII) jest aktywny w obu fazach tłumaczenia.")
+    assert "FILAR CXIII:" in sys_prompt
+    assert "FILAR CXIV:" in sys_prompt
+    assert "FILAR CXV:" in sys_prompt
+    assert "FILAR CXVI:" in sys_prompt
+    print(" -> PASSED: Kompletny Zunifikowany Kanon 116 Filarów AVT (Filary I – CXVI) jest aktywny w obu fazach tłumaczenia.")
 
 def test_pydantic_schemas():
     print("[TEST 2/5] Weryfikacja schematów Pydantic...")
