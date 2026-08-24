@@ -142,7 +142,8 @@ def test_rules_and_prompts():
     assert "FILAR CXIV:" in sys_prompt
     assert "FILAR CXV:" in sys_prompt
     assert "FILAR CXVI:" in sys_prompt
-    print(" -> PASSED: Kompletny Zunifikowany Kanon 116 Filarów AVT (Filary I – CXVI) jest aktywny w obu fazach tłumaczenia.")
+    assert "FILAR CXVII:" in sys_prompt
+    print(" -> PASSED: Kompletny Zunifikowany Kanon 117 Filarów AVT (Filary I – CXVII) jest aktywny w obu fazach tłumaczenia.")
 
 def test_pydantic_schemas():
     print("[TEST 2/5] Weryfikacja schematów Pydantic...")
@@ -973,13 +974,21 @@ def test_translator_logger_and_sign_detector():
     )
     assert alert_giri is not None and "Giri" in alert_giri
 
+    # Test Ii desu refusal alert
+    alert_ii_desu = translator.detect_audio_discrepancy(
+        jp_text="僕は、いいです [Boku wa, ii desu]",
+        pl_text="Nic mi... nie jest.",
+        en_text="I'm… fine."
+    )
+    assert alert_ii_desu is not None and "CXVII" in alert_ii_desu
+
     # Test Flashback 1:1 memory formatting
     from memory import format_translation_memory_for_prompt
     formatted_mem = format_translation_memory_for_prompt([
         {"en": "I will never give up!", "pl": "Nigdy się nie poddam!", "anime": "Kingdom", "score": 100}
     ])
     assert "[DOKŁADNY CYTAT 1:1]" in formatted_mem
-    print(" -> PASSED: Logger w translator.py, audio alerty (Haragei, Aizuchi, Oyaji, Giri) i spójność retrospekcji 1:1 działają bezbłędnie.")
+    print(" -> PASSED: Logger w translator.py, audio alerty (Haragei, Aizuchi, Oyaji, Giri, Ii desu) i spójność retrospekcji 1:1 działają bezbłędnie.")
 
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")

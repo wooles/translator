@@ -846,6 +846,13 @@ FILAR CXV: ARCHITEKTURA HIPOKORYSTYKÓW I ZDROBNIENIA SŁOWOTWÓRCZE (AISHŌ & P
 FILAR CXVI: IZOMORFIZM CZASOWY DŁUGICH SAMOGŁOSEK I EMFASY EKSTATYCZNEJ (CHŌON & EKSTATIC ELONGATION):
 - Przeciągłe japońskie okrzyki bólu, rozpaczy lub determinacji (Itaaaai, Dameeee, Tasukeeee) formatuj ze zsynchronizowanym wydłużeniem ekspresyjnym:
   * "Auaaa...!", "Nieee...!", "Ratunkuuu...!", "Stóóój...!" - idealnie zgrane z otwarciem krtani aktora w kadrze!
+
+FILAR CXVII: PRAGMATYKA ODMOWY „...WA II DESU / KEKKOU DESU” (I'M FINE JAKO ODMOWA ZAPROSZENIA A NIE STAN ZDROWIA):
+- W języku japońskim zwrot „...wa ii desu” ( ...は、いいです ) lub „kekkou desu” w odpowiedzi na zaproszenie / propozycję („Chodźmy powitać gościa!”, „Chcesz herbaty?”) to grzeczna ODMOWA lub REZYGNACJA:
+  * KOSZMARNY BŁĄD KALKI [X]: Tłumaczenie angielskiego „I'm fine” / „I'm good” jako „Nic mi nie jest” / „Wszystko w porządku” w sytuacji, gdy nikt nie pyta o zdrowie czy rany!
+  * POPRAWNIE [V]:
+    - W odpowiedzi na zaproszenie/wyjście: „Ja... podziękuję.”, „Nie mam ochoty.”, „Ja... zostanę.”, „Spasuję.”.
+    - W odpowiedzi na poczęstunek/pomoc: „Dziękuję, obejdzie się.”, „Nie trzeba.”, „Dziękuję, nie trzeba.”.
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -1987,6 +1994,13 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR CXVI - Izomorfizm Długich Samogłosek (Chōon)]: "
             "Przeciągłe okrzyki formatuj z ekspresyjnym wydłużeniem liter ('Auaaa...!', 'Nieee...!', 'Ratunkuuu...!'), zgrane z ruchem ust aktora."
+        )
+
+    # 61. Pragmatyka odmowy 'ii desu / kekkou' (Filar CXVII)
+    if any(w in combined_en for w in ["i'm fine", "i'm good", "no thanks", "ii desu", "kekkou", "fine."]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CXVII - Pragmatyka Odmowy (Boku wa ii desu / I'm fine)]: "
+            "W odpowiedzi na zaproszenie, propozycję lub poczęstunek 'ii desu' / 'I'm fine' oznacza ODMOWĘ ('Ja... podziękuję.', 'Nie mam ochoty.', 'Ja zostanę.'). KATEGORYCZNY ZAKAZ tłumaczenia jako stan zdrowia ('Nic mi nie jest')!"
         )
 
     if not focused_pillars:

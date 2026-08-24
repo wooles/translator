@@ -192,6 +192,11 @@ def detect_audio_discrepancy(jp_text: str, pl_text: str, en_text: str) -> Option
         if pl_lower.startswith("przepraszam"):
             return "W audio pada 'Sumimasen' jako dług wdzięczności (Giri) -> Zamień monotonne 'Przepraszam' na 'Wybacz kłopot...' / 'Nie trzeba było...' (Filar CX)."
 
+    # 9. Ii desu / Kekkou desu w kontekście odmowy zaproszenia/propozycji vs stan zdrowia
+    if ("いいです" in clean_jp or "ii desu" in rom_lower or "kekkou" in rom_lower or "結構" in clean_jp):
+        if any(w in pl_lower for w in ["nic mi nie jest", "nic mi... nie jest", "wszystko w porządku", "dobrze się czuję"]):
+            return "W audio pada 'ii desu' (odmowa / rezygnacja) -> Zastąp błędny stan zdrowia ('Nic mi nie jest') poprawną odmową: 'Ja... podziękuję.' / 'Nie mam ochoty.' / 'Ja zostanę.' (Filar CXVII)."
+
     return None
 
 def sanitize_sub_text(text: str, is_ass: bool = True) -> str:
