@@ -3,7 +3,10 @@
 Moduł Inteligentnego Zarządzania Pamięcią Kontekstu (Google Gemini Context Caching).
 Zapewnia 75% oszczędności kosztów na serwerach Google bez najmniejszego wpływu na jakość.
 Wbudowane zabezpieczenie SHA-256: Zmiana choćby jednej litery w Filarach natychmiast unieważnia stary cache i tworzy nowy.
-TTL (Time-To-Live): 30 dni (2592000s) z automatycznym odnawianiem i czyszczeniem starych wersji danego modelu.
+Architektura Kroczącego Heartbeatu (Rolling Keep-Alive):
+- Cache tworzony jest na 20 minut (1200s) z ruchomym oknem przedłużanym po każdej paczce/błędzie 503.
+- Po zakończeniu odcinka lub kolejki cache jest natychmiast usuwany (0 zł kosztów postoju).
+- W razie awarii zasilania cache samoczynnie wygasa w 20 minut, zabezpieczając portfel.
 """
 
 import hashlib
@@ -14,8 +17,8 @@ from google.genai import types
 
 logger = logging.getLogger("context_cache")
 
-# Domyślny czas życia pamięci na serwerach Google: 30 dni
-DEFAULT_CACHE_TTL_SECONDS = 30 * 24 * 3600  # 2 592 000 sekund
+# Domyślny bezpieczny czas życia pamięci podręcznej: 20 minut (ruchome okno)
+DEFAULT_CACHE_TTL_SECONDS = 20 * 60  # 1200 sekund
 
 # Globalny rejestr w pamięci procesu
 _LOCAL_CACHE_REGISTRY: Dict[str, str] = {}
@@ -48,7 +51,7 @@ class ContextCacheManager:
         ttl_seconds: int = DEFAULT_CACHE_TTL_SECONDS
     ) -> Optional[str]:
         """
-        Pobiera istniejący lub tworzy nowy CachedContent na serwerach Google z czasem wygasania 30 dni.
+        Pobiera istniejący lub tworzy nowy CachedContent na serwerach Google z bezpiecznym czasem wygasania 20 minut.
         Precyzyjnie izoluje cache pomiędzy modelami (Flash vs Pro) i usuwa tylko przestarzałe wersje TEGO SAMEGO modelu.
         """
         if not client or not system_instruction:
@@ -58,7 +61,10 @@ class ContextCacheManager:
 
         # 1. Sprawdzenie w lokalnej pamięci procesu
         if content_hash in _LOCAL_CACHE_REGISTRY:
-            return _LOCAL_CACHE_REGISTRY[content_hash]
+            matched_name = _LOCAL_CACHE_REGISTRY[content_hash]
+            # Odświeżamy czas życia aktywnego cache (Rolling Keep-Alive)
+            cls.touch_cache(client, matched_name, ttl_seconds)
+            return matched_name
 
         model_clean = cls._clean_model_name(model)
         display_name = f"avt_{model_clean}_{content_hash}"
@@ -81,12 +87,13 @@ class ContextCacheManager:
 
                 if matched_name:
                     _LOCAL_CACHE_REGISTRY[content_hash] = matched_name
-                    logger.info(f"[Context Cache]: Wykorzystano aktywny 30-dniowy cache serwerowy: {matched_name}")
+                    cls.touch_cache(client, matched_name, ttl_seconds)
+                    logger.info(f"[Context Cache]: Wykorzystano aktywny cache serwerowy: {matched_name} (Odświeżono na +{ttl_seconds}s)")
                     return matched_name
         except Exception as e:
             logger.debug(f"[Context Cache]: Błąd podczas listowania/czyszczenia cache: {e}")
 
-        # 3. Próba utworzenia nowego 30-dniowego cache na serwerach Google
+        # 3. Próba utworzenia nowego cache na serwerach Google
         try:
             if hasattr(client, "caches") and hasattr(client.caches, "create"):
                 ttl_str = f"{ttl_seconds}s"
@@ -99,7 +106,7 @@ class ContextCacheManager:
                     )
                 )
                 _LOCAL_CACHE_REGISTRY[content_hash] = cache.name
-                logger.info(f"[Context Cache]: Utworzono 30-dniowy cache dla {model}: {cache.name} (TTL: {ttl_seconds}s)")
+                logger.info(f"[Context Cache]: Utworzono bezpieczny cache dla {model}: {cache.name} (Ruchome okno: {ttl_seconds}s)")
                 return cache.name
         except Exception as e:
             err_msg = str(e).lower()
@@ -109,3 +116,36 @@ class ContextCacheManager:
                 logger.debug(f"[Context Cache]: Cache niedostępny dla {model}, fallback do standardowego przekazywania: {e}")
 
         return None
+
+    @classmethod
+    def touch_cache(cls, client: genai.Client, cache_name: str, ttl_seconds: int = DEFAULT_CACHE_TTL_SECONDS):
+        """Przedłuża ruchome okno życia cache o 20 minut od tej sekundy (Kroczący Heartbeat)."""
+        if not client or not cache_name:
+            return
+        try:
+            if hasattr(client, "caches") and hasattr(client.caches, "update"):
+                client.caches.update(
+                    name=cache_name,
+                    config=types.UpdateCachedContentConfig(ttl=f"{ttl_seconds}s")
+                )
+                logger.debug(f"[Context Cache]: Heartbeat odświeżony dla {cache_name} (+{ttl_seconds}s)")
+        except Exception as e:
+            logger.debug(f"[Context Cache]: Nie udało się zaktualizować Heartbeatu dla {cache_name}: {e}")
+
+    @classmethod
+    def cleanup_all_active_caches(cls, client: genai.Client):
+        """Natychmiast usuwa wszystkie aktywne obiekty cache ze serwerów Google po zakończeniu pracy."""
+        if not client:
+            return
+        try:
+            if hasattr(client, "caches") and hasattr(client.caches, "delete"):
+                for hash_key, cache_name in list(_LOCAL_CACHE_REGISTRY.items()):
+                    try:
+                        client.caches.delete(name=cache_name)
+                        logger.info(f"[Context Cache]: Bezpiecznie usunięto cache {cache_name} (0 zł opłat po zakończeniu).")
+                    except Exception:
+                        pass
+                _LOCAL_CACHE_REGISTRY.clear()
+        except Exception as e:
+            logger.debug(f"[Context Cache]: Błąd podczas czyszczenia cache: {e}")
+

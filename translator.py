@@ -504,8 +504,7 @@ class MultimodalTranslator:
                 cached_name = ContextCacheManager.get_or_create_cache(
                     client=self.client,
                     model=current_model,
-                    system_instruction=self.system_prompt,
-                    ttl_seconds=86400
+                    system_instruction=self.system_prompt
                 )
                 gen_config_kwargs = {
                     "response_mime_type": "application/json",
@@ -527,7 +526,9 @@ class MultimodalTranslator:
                     um = response.usage_metadata
                     self.current_episode_tokens["prompt"] += getattr(um, "prompt_token_count", 0) or 0
                     self.current_episode_tokens["cached"] += getattr(um, "cached_content_token_count", 0) or 0
-                    self.current_episode_tokens["output"] += getattr(um, "candidates_token_count", 0) or 0
+                    cands = getattr(um, "candidates_token_count", 0) or 0
+                    thoughts = getattr(um, "thoughts_token_count", 0) or 0
+                    self.current_episode_tokens["output"] += (cands + thoughts)
                     self.current_episode_tokens["model"] = current_model
 
                 if hasattr(response, "parsed") and response.parsed is not None:
@@ -1264,6 +1265,15 @@ class MultimodalTranslator:
             print("─" * 60)
             print(f"  💰 Rzeczywisty łączny koszt całego odcinka (100%): {actual_cost_pln:.2f} PLN")
             print("─" * 60)
+        except Exception:
+            pass
+
+        # Bezpieczne usunięcie serwerowych obiektów Context Cache (0 zł opłat po zakończeniu pracy)
+        try:
+            from context_cache import ContextCacheManager
+            ContextCacheManager.cleanup_all_active_caches(self.client)
+            if self.verifier and hasattr(self.verifier, "client") and self.verifier.client != self.client:
+                ContextCacheManager.cleanup_all_active_caches(self.verifier.client)
         except Exception:
             pass
 

@@ -90,14 +90,19 @@ class DialogueVerifier:
                 cached_name = ContextCacheManager.get_or_create_cache(
                     client=self.client,
                     model=self.model,
-                    system_instruction=self.system_prompt,
-                    ttl_seconds=86400
+                    system_instruction=self.system_prompt
                 )
                 gen_config_kwargs = {
                     "response_mime_type": "application/json",
                     "response_schema": RefinedBatchResponse,
                     "temperature": 0.35,
                 }
+                if "pro" in self.model.lower():
+                    try:
+                        gen_config_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=1024)
+                    except Exception:
+                        pass
+
                 if cached_name:
                     gen_config_kwargs["cached_content"] = cached_name
                 else:
@@ -113,7 +118,9 @@ class DialogueVerifier:
                     um = response.usage_metadata
                     self.current_episode_tokens["prompt"] += getattr(um, "prompt_token_count", 0) or 0
                     self.current_episode_tokens["cached"] += getattr(um, "cached_content_token_count", 0) or 0
-                    self.current_episode_tokens["output"] += getattr(um, "candidates_token_count", 0) or 0
+                    cands = getattr(um, "candidates_token_count", 0) or 0
+                    thoughts = getattr(um, "thoughts_token_count", 0) or 0
+                    self.current_episode_tokens["output"] += (cands + thoughts)
                     self.current_episode_tokens["model"] = self.model
 
                 # Pobieramy sparsowany wynik

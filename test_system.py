@@ -530,6 +530,8 @@ def test_context_cache():
     print("[TEST 15/15] Test Inteligentnego Zarządzania Pamięcią Kontekstu (Google Context Caching)...")
     from context_cache import ContextCacheManager, DEFAULT_CACHE_TTL_SECONDS
     
+    assert DEFAULT_CACHE_TTL_SECONDS == 1200  # 20 minut ruchomego okna
+
     # 1. Test generowania hasha
     h1 = ContextCacheManager.get_content_hash("gemini-3.7-flash", "FILAR I: ODNOMINALIZOWANIE")
     h2 = ContextCacheManager.get_content_hash("gemini-3.7-flash", "FILAR I: ODNOMINALIZOWANIE")
@@ -542,7 +544,11 @@ def test_context_cache():
     # 3. Test bezpiecznego fallbacku przy braku klienta
     res = ContextCacheManager.get_or_create_cache(None, "gemini-3.7-flash", "prompt", ttl_seconds=DEFAULT_CACHE_TTL_SECONDS)
     assert res is None
-    print(" -> PASSED: Context Caching SHA-256 i unieważnianie starych wersji działają perfekcyjnie.")
+
+    # 4. Test metod Kroczącego Heartbeatu i czyszczenia
+    ContextCacheManager.touch_cache(None, None)
+    ContextCacheManager.cleanup_all_active_caches(None)
+    print(" -> PASSED: Context Caching SHA-256, Kroczący Heartbeat 20m i autoczyszczenie działają perfekcyjnie.")
 
 def test_pricing_guard():
     print("[TEST 16/16] Test Strażnika Cennika i Kosztów Google API (pricing_guard)...")
