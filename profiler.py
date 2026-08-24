@@ -65,6 +65,7 @@ class CharacterDossier(BaseModel):
     speech_style_pl: str = Field(description="Unikalny polski rejestr mowy (np. 'Chłodny, dumny, krótki, arystokratyczny bez poufałości')")
     first_person_pronoun: Optional[str] = Field(default=None, description="Japoński zaimek 'ja' (Ore, Boku, Watashi, Atashi) i profil ego")
     declension: Optional[str] = Field(default=None, description="Polska odmiana przez przypadki (np. 'Yoritsugu -> D. Yoritsugu, C. Yoritsugu, B. Yoritsugu')")
+    idiolect_matrix: Optional[str] = Field(default="", description="Matryca idiolektu: specyficzne nawyki leksykalne, zakazane/preferowane zwroty i rytm wypowiedzi dla tej postaci")
 
 
 class EpisodeProfile(BaseModel):
@@ -73,15 +74,14 @@ class EpisodeProfile(BaseModel):
     domain_expertise: str = Field(default="", description="Specjalistyczna dziedzina wiedzy i profesjonalna terminologia branżowa (np. 'Enologia / Sommelierstwo: terminologia winiarska, szczepy, apelacje', 'Szachy / Shogi')")
     dialogue_stylization: str = Field(default="", description="Wytyczne stylizacji rejestru języka i zakazy/nakazy słownictwa dla tej epoki")
     manga_canon_source: Optional[str] = Field(default="", description="Oficjalne polskie wydawnictwo mangi (np. Waneko, J.P.Fantastica, Studio JG, Hanami), jeśli seria była wydana w Polsce")
-    tone_and_genre: str = Field(description="Rejestr i ton dialogów (np. 'szlachetny epos historyczny', 'profesjonalny dramat sommeliera', 'lekkie młodzieżowe anime')")
-    dramatic_sequences: List[DramaticSequence] = Field(default_factory=list, description="Chronologiczna mapa sekwencji dramaturgicznych odcinka")
-    character_dossiers: List[CharacterDossier] = Field(default_factory=list, description="Kartoteka obsady, status społeczny i unikalny polski rejestr mowy")
-    danger_lines_prescan: List[DangerLinePreScan] = Field(default_factory=list, description="Prewencyjny skan wieloznacznych fraz i pułapek kontekstowych w całym odcinku")
-    name_declensions: List[NameDeclension] = Field(default_factory=list, description="Tabela odmiany imion i nazwisk bohaterów przez polskie przypadki (Filar XCI)")
-    first_person_pronouns: List[FirstPersonPronoun] = Field(default_factory=list, description="Matryca zaimków 1. osoby (Ore/Boku/Watashi) i profilu psychologicznego postaci (Filar XCIV)")
-    characters: List[CharacterRelationship] = Field(default_factory=list, description="Macierz relacji i form grzecznościowych między bohaterami")
-    glossary: List[GlossaryTerm] = Field(default_factory=list, description="Słowniczek kluczowych pojęć, tytułów, nazw własnych i terminów specjalistycznych")
-    yojijukugo_and_idioms: List[GlossaryTerm] = Field(default_factory=list, description="Japońskie przysłowia 4-znakowe, metafory i idiomy odcinka (Filar XCV)")
+    tone_and_genre: str = Field(description="Gatunek i dominujący ton emocjonalny (np. 'Komediodramat młodzieżowy, ciepły z elementami absurdu')")
+    danger_lines_prescan: List[DangerLinePreScan] = Field(default_factory=list, description="Lista wyłapanych przed tłumaczeniem niebezpiecznych pułapek kontekstowych i wieloznaczności w całym odcinku")
+    dramatic_sequences: List[DramaticSequence] = Field(default_factory=list, description="Podział odcinka na główne akty/sekwencje dramaturgiczne")
+    character_dossiers: List[CharacterDossier] = Field(default_factory=list, description="Dokładne dossier i stylizacja mowy głównych bohaterów")
+    name_declensions: List[NameDeclension] = Field(default_factory=list, description="Precyzyjna odmiana imion bohaterów przez wszystkie przypadki w języku polskim")
+    characters: List[CharacterRelationship] = Field(default_factory=list, description="Relacje między postaciami i ustalone polskie formy zwrotu")
+    glossary: List[GlossaryTerm] = Field(default_factory=list, description="Słowniczek kluczowych terminów, nazw własnych, ataków i realiów świata")
+    yojijukugo_and_idioms: List[GlossaryTerm] = Field(default_factory=list, description="Wykryte 4-znakowe idiomy (Yojijukugo), przysłowia i metafory z naturalnymi polskimi ekwiwalentami")
     key_conventions: List[str] = Field(default_factory=list, description="Kluczowe wytyczne stylistyczne dla tego konkretnego odcinka")
 
 
@@ -116,11 +116,12 @@ def format_episode_profile_for_prompt(profile: Optional[EpisodeProfile]) -> str:
             lines.append(f"• [{seq.time_range}] {seq.sequence_name}: {seq.dramatic_summary} (Ton: {seq.dominant_tone})")
 
     if profile.character_dossiers:
-        lines.append("\n🎭 KARTOTEKA OBSADY I UNIKALNY REJESTR MOWY (CHARACTER DOSSIERS):")
+        lines.append("\n🎭 KARTOTEKA OBSADY I MATRYCA IDIOLEKTÓW (CHARACTER DOSSIERS & IDIOLECT MATRIX):")
         for cd in profile.character_dossiers:
             pron = f" [Zaimek: {cd.first_person_pronoun}]" if cd.first_person_pronoun else ""
             decl = f" [Odmiana: {cd.declension}]" if cd.declension else ""
-            lines.append(f"• {cd.name} ({cd.gender}, {cd.age_and_role}){pron}{decl} -> Styl polski: {cd.speech_style_pl}")
+            idio = f" [Idiolekt: {cd.idiolect_matrix}]" if cd.idiolect_matrix else ""
+            lines.append(f"• {cd.name} ({cd.gender}, {cd.age_and_role}){pron}{decl} -> Styl: {cd.speech_style_pl}{idio}")
 
     if profile.name_declensions:
         lines.append("\nŻELAZNA TABELA ODMIANY IMION PRZEZ PRZYPADKI (FILAR XCI - BEZWZGLĘDNIE STOSUJ):")

@@ -1082,7 +1082,8 @@ class MultimodalTranslator:
                         "notes": notes,
                         "is_sign": vtype["is_sign"],
                         "visual_type": vtype["type_label"],
-                        "visual_details": vtype["visual_details"]
+                        "visual_details": vtype["visual_details"],
+                        "is_song": ("♪" in clean_en or "♫" in clean_en or "song" in event.style.lower() or "karaoke" in event.style.lower())
                     })
 
                 # 6. Opcjonalna II faza weryfikatora (Redakcja Literacka)
@@ -1239,6 +1240,18 @@ class MultimodalTranslator:
                         final_subs.events.sort(key=lambda ev: ev.start)
             except Exception as e:
                 logger.warning(f"Wizyjny Detektor Plansz: Pomijanie detekcji plansz ({e})")
+
+        # 7.2. Kinowe Dociąganie do Cięć Montażowych (SceneShotSnapper - Standard Netflix AVT)
+        if video_path and os.path.exists(video_path):
+            try:
+                from scene_snapper import SceneShotSnapper
+                cuts = SceneShotSnapper.detect_scene_cuts_ffmpeg(video_path)
+                if cuts:
+                    final_subs.events, snapped_cnt = SceneShotSnapper.snap_subtitles_to_cuts(final_subs.events, cuts)
+                    if snapped_cnt > 0:
+                        logger.info(f"[SceneShotSnapper]: Dociągnięto {snapped_cnt} krawędzi napisów do cięć montażowych.")
+            except Exception as e:
+                logger.warning(f"SceneShotSnapper: Pomijanie ({e})")
 
         final_subs.events.sort(key=lambda ev: ev.start)
 

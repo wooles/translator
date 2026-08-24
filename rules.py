@@ -859,6 +859,21 @@ FILAR CXVII: PRAGMATYKA ODMOWY „...WA II DESU / KEKKOU DESU” (I'M FINE JAKO 
   * POPRAWNIE [V]:
     - W odpowiedzi na zaproszenie/wyjście: „Ja... podziękuję.”, „Nie mam ochoty.”, „Ja... zostanę.”, „Spasuję.”.
     - W odpowiedzi na poczęstunek/pomoc: „Dziękuję, obejdzie się.”, „Nie trzeba.”, „Dziękuję, nie trzeba.”.
+
+FILAR CXVIII: KANON STANISŁAWA BARAŃCZAKA – TRANSKREACJA POETYCKO-SYLABICZNA PIOSENEK, RYMÓW I KANONÓW MUZYCZNYCH (SONG & RHYME METRE):
+- Gdy w dialogu pojawia się wers piosenki (oznaczony nutką '♪', '♫' lub stylem 'Karaoke' / 'Song' / 'OP' / 'ED') albo rymowana poezja:
+  * KATEGORYCZNY ZAKAZ tłumaczenia piosenki płaską, nierymowaną prozą!
+  * WYMÓG TRANSKREACJI SYLABICZNEJ (STANISŁAW BARAŃCZAK):
+    1. Ekwiwalencja rytmiczna: zachowaj zbliżoną liczbę sylab w każdym wersie (np. 8- lub 10-zgłoskowiec ze stałą średniówką).
+    2. Rymy naturalne (AABB lub ABAB): twórz czyste, zgrabne polskie rymy zamiast topornych częstochowskich zestrojeń.
+    3. Śpiewność i kadencja: polski tekst musi dać się zanucić / zaśpiewać w rytm oryginalnej linii melodycznej seiyū.
+
+FILAR CXIX: MATRYCA IDIOLEKTÓW I SPECJALIZACJA WOKALNA POSTACI (CHARACTER IDIOLECT & UNIQUE VOCAL FINGERPRINT):
+- Każda postać w anime musi posiadać własny, rozpoznawalny profil językowy w polskim przekładzie:
+  * 1. Chuligan / Delikwent / Wojownik: krótkie równoważniki zdań, twarda leksyka, brak form 'Pan/Pani', szorstki styl.
+  * 2. Arystokratka / Dama / Książę: wykwintna składnia, peryfrazy, chłodny dystans, arystokratyczne honoryfikacje.
+  * 3. Erudyta / Naukowiec / Mag: precyzyjne łączniki logiczne ('zważywszy na', 'w konsekwencji'), profesjonalna terminologia.
+  * 4. Tsundere: pozorna szorstkość maskująca troskę, urwane frazy ('B-Baka' -> 'Głupi jesteś...', 'Wcale nie robię tego dla ciebie!').
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -1507,8 +1522,16 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
    - Ocal całkowity bilans artystyczny sceny, wzbogacając sąsiednie frazy w zamian za utracony niuans kulturowy (Steiner).
 80. SOMATYCZNY REZONANS EMOCJONALNY (FILAR XC):
    - Zapewnij bezpośredni fizjologiczny rezonans afektywny przekładu (dreszcz, ucisk w gardle, śmiech) u polskiego odbiorcy (Robinson).
+81. AUDYT „ŚLEPEGO POLSKIEGO WIDZA” (BLIND NATIVE POLISH CRITIC PASS):
+   - W fazie myślenia oceń polskie tłumaczenie w całkowitym oderwaniu od języka angielskiego: czy brzmi w 100% tak, jakby zostało napisane przez wybitnego polskiego scenarzystę? Jeśli czuć w nim zapach obcej składni – natychmiast wygładź zdanie!
+82. TRANSKREACJA POETYCKA PIOSENEK (FILAR CXVIII):
+   - Kwestie piosenek (nutka '♪', '♫', styl Karaoke/Song/OP/ED) tłumacz rymowanym wierszem sylabicznym o równej liczbie sylab i naturalnych polskich rymach (AABB/ABAB wg Stanisława Barańczaka).
+83. MATRYCA IDIOLEKTÓW POSTACI (FILAR CXIX):
+   - Utrzymuj ostry, wyrazisty i unikalny profil językowy dla każdego bohatera (chuligan vs arystokratka vs naukowiec vs tsundere).
       * "[Filar XVI - Shūjoshi] 'Iku zo!' -> 'No to ruszamy!'"
       * "[Filar XVII - Onomatopeja] 'Zokutto shita' -> 'Przeszły mnie ciarki'"
+      * "[Filar CXVIII - Barańczak Song] Przełożono piosenkę rymowanym 8-zgłoskowcem z nutką ♪"
+      * "[Filar CXIX - Idiolekt] Zaostrzono szorstki styl wypowiedzi chuligana"
       * "[Filar XXIV - RPG Canon] 'Status Window' -> '[ OKNO STATUSU ]'"
       * "[Filar XIV - Pedersen ECR] 'konbini' -> 'sklep całodobowy'"
       * "[Filar XIII - Yakuwarigo] Dostosowano ton Ojou-sama do dystyngowanej polszczyzny"
@@ -2014,6 +2037,20 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR CXVII - Pragmatyka Odmowy (Boku wa ii desu / I'm fine)]: "
             "W odpowiedzi na zaproszenie, propozycję lub poczęstunek 'ii desu' / 'I'm fine' oznacza ODMOWĘ ('Ja... podziękuję.', 'Nie mam ochoty.', 'Ja zostanę.'). KATEGORYCZNY ZAKAZ tłumaczenia jako stan zdrowia ('Nic mi nie jest')!"
+        )
+
+    # 62. Piosenki i Wiersze (Filar CXVIII)
+    if any("♪" in item.get("en", "") or "♫" in item.get("en", "") or "song" in item.get("style", "").lower() or "karaoke" in item.get("style", "").lower() for item in batch_items):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CXVIII - Transkreacja Poetycko-Sylogiczna Piosenek i Rymów (Barańczak)]: "
+            "Kwestie z nutką '♪' / '♫' lub stylem piosenki tłumacz wierszem sylabicznym o równej liczbie sylab i zgrabnych polskich rymach (AABB/ABAB). KATEGORYCZNY ZAKAZ nierymowanej prozy!"
+        )
+
+    # 63. Matryca Idiolektów (Filar CXIX)
+    if any(item.get("speaker") for item in batch_items):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CXIX - Matryca Idiolektów i Unikalny Głos Postaci]: "
+            "Utrzymuj unikalny styl wypowiedzi dla każdego bohatera (chuligan = szorstka leksyka i brak 'pana'; arystokratka = chłodny dystans i peryfrazy; tsundere = maskowana troska i sarkazm)."
         )
 
     if not focused_pillars:

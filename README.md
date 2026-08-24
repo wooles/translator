@@ -4,11 +4,11 @@
 [![Google GenAI SDK](https://img.shields.io/badge/LLM%20Orchestration-Gemini%203.7%20Flash%20%7C%203.1%20Pro-orange.svg)](https://ai.google.dev/)
 [![Acoustic Ingestion](https://img.shields.io/badge/Acoustic%20ASR-Kotoba--Whisper%20v2.0%20CTranslate2-green.svg)](https://huggingface.co/kotoba-tech/kotoba-whisper-v2.0-faster)
 [![Architecture](https://img.shields.io/badge/Architecture-Dual--Phase%20Inference%20Pipeline-purple.svg)]()
-[![CI/Test Suite](https://img.shields.io/badge/Test%20Harness-29%2F29%20Passing-brightgreen.svg)]()
+[![CI/Test Suite](https://img.shields.io/badge/Test%20Harness-30%2F30%20Passing-brightgreen.svg)]()
 
 An asynchronous, multimodal audiovisual localization and translation engine written in Python. It executes high-fidelity semantic translation from Japanese audio tracks and intermediate English dialogue representations into target Polish dialogue scripts, strictly abiding by professional cinematographic subtitling standards (Belczyk AVT Matrix, Skopos Theory, Polysystem Theory).
 
-The system integrates **Large Multimodal Models (LMMs)** via structured JSON decoding, **fine-tuned Japanese ASR acoustic grounding (Kotoba-Whisper v2.0)** with prosodic feature extraction, **computer-vision spatial OCR**, and a **117-Pillar Constraint Solver** for grammatical, pragmalinguistic, and register alignment.
+The system integrates **Large Multimodal Models (LMMs)** via structured JSON decoding, **fine-tuned Japanese ASR acoustic grounding (Kotoba-Whisper v2.0)** with prosodic feature extraction, **computer-vision spatial OCR**, **Shot-Cut Snapping (Netflix AVT)**, and a **119-Pillar Constraint Solver** for grammatical, pragmalinguistic, idiolectal, and register alignment.
 
 ---
 
@@ -69,14 +69,14 @@ To eliminate attention drift across long video sequences, the pre-pass engine pe
 * **Gap-Filling Scene Detector (`VisualSignDetector`):** Detects non-speech intervals ($\Delta t \ge 3500\text{ms}$) and utilizes vision capabilities to extract in-frame text, signs, blackboard notations, and manga typography.
 * **Color Gamut Matching:** Analyzes frame luminance and chroma to generate compliant ASS styling directives, outline parameters, and color palettes.
 
-### 4. Deterministic 117-Pillar Audiovisual Translation (AVT) Canon
+### 4. Deterministic 119-Pillar Audiovisual Translation (AVT) Canon
 A formal rule engine integrating audiovisual translation theory, categorized into 6 operational domains:
 * **Domain I (Morphosyntax & Flexibility):** De-nominalization, verb-centric phrasing, pronoun stripping, topic-comment structuring.
 * **Domain II (Semiotics & Temporal Pacing):** Cinematographic shot-cut synchronization, semiotics of silence (*Ma*), strict Characters-Per-Second (CPS $\le 17$) enforcement.
 * **Domain III (Realia & Historical Registers):** Feudal titular hierarchies, archaic speech, publisher canon invariance.
 * **Domain IV (Anime Sociolinguistics & Pragmatics):** Social triangulation, relational indebtedness (*Giri*), conversational hedging, indirect refusal decoding (*„...wa ii desu”*).
 * **Domain V (Paralinguistics & Phonetics):** Isomorphic vowel elongation (*Chōon* mapping), prosodic continuity across sentence breaks.
-* **Domain VI (Foreign Morphology & Transcreation):** Polish grammatical case declension for non-standard Japanese proper nouns and dynamic Baranczak-style pun transcreation.
+* **Domain VI (Transcreation, Idiolects & Song Metre):** Polish case declension, Stanisław Barańczak syllabic song/rhyme transcreation (**Pillar CXVIII**), Character Idiolect Matrix (**Pillar CXIX**), and Blind Native Polish Critic fluency validation.
 
 ### 5. Enterprise KV Cache Management & Ephemeral Leases
 * **Server-Side Context Caching (KV-Cache):** Persists the ~39,000-token system instruction matrix directly in GPU VRAM, yielding a **-75%** operational discount on input token pricing.
@@ -87,6 +87,9 @@ A formal rule engine integrating audiovisual translation theory, categorized int
 ### 6. Cognitive Saturation Calibration & Tokenomics Controls
 * **Stochastic Looping Mitigation:** Unconstrained Chain-of-Thought (CoT) reasoning on Large Reasoning Models (e.g. Gemini 3.1 Pro) exhibits diminishing returns beyond 2000 tokens per batch, entering recursive self-doubt loops that inflate output token consumption without modifying the final selected Polish sentence.
 * **Calibrated 2048-Token Thinking Ceiling:** Enforces an optimal reasoning budget (`thinking_budget=2048`) that provides full headroom for complex poetic transcreation, rhyme generation, and *Mouth-Feel* validation while preventing runaway billing, stabilizing unit translation costs at **~$0.56 / 2.25 PLN** per episode.
+
+### 7. Cinematic Shot-Cut Snapping (SceneShotSnapper / Netflix Standard)
+* **Shot-Boundary Bleed Elimination:** Rapidly scans video stream keyframes and scene transition metrics via FFmpeg (`select=gt(scene,0.38)`), snapping subtitle entry/exit timestamps within $\pm 250\text{ms}$ of hard camera cuts. Prevents subtitle flashing across scene transitions and guarantees studio-grade Blu-ray/VOD readability.
 
 ---
 

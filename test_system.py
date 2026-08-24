@@ -1046,6 +1046,46 @@ def test_translator_logger_and_sign_detector():
     assert "[DOKŁADNY CYTAT 1:1]" in formatted_mem
     print(" -> PASSED: Logger w translator.py, audio alerty (Haragei, Aizuchi, Oyaji, Giri, Ii desu) i spójność retrospekcji 1:1 działają bezbłędnie.")
 
+def test_masterclass_next_gen():
+    print("[TEST 30/30] Test mechanizmów Masterclass (Pillar CXVIII Barańczak Song, Idiolect Matrix, SceneShotSnapper)...")
+    from rules import get_focused_rules_for_batch
+    from scene_snapper import SceneShotSnapper
+    from profiler import CharacterDossier, EpisodeProfile, format_episode_profile_for_prompt
+    import pysubs2
+
+    # 1. Test Song transcreation focus (Pillar CXVIII)
+    song_batch = [{"en": "♪ Shining stars in the sky tonight ♪", "style": "Song"}]
+    focused_song = get_focused_rules_for_batch(song_batch)
+    assert "FILAR CXVIII" in focused_song
+    assert "Barańczak" in focused_song
+
+    # 2. Test Idiolect Matrix formatting
+    dossier = CharacterDossier(
+        name="Ryuji",
+        gender="MALE",
+        age_and_role="16 lat, chuligan o złotym sercu",
+        speech_style_pl="szorstki, bezpośredni, brak pan/pani",
+        idiolect_matrix="Zakaz pełnych zdań podrzędnych, krótkie równoważniki, twarda męska leksyka"
+    )
+    prof = EpisodeProfile(
+        episode_summary="Odcinek szkolny",
+        tone_and_genre="Komediodramat młodzieżowy",
+        character_dossiers=[dossier]
+    )
+    formatted_prof = format_episode_profile_for_prompt(prof)
+    assert "Idiolekt: Zakaz pełnych zdań podrzędnych" in formatted_prof
+
+    # 3. Test SceneShotSnapper
+    ev1 = pysubs2.SSAEvent(start=1050, end=3000, text="Linijka przed cięciem")
+    ev2 = pysubs2.SSAEvent(start=4000, end=5950, text="Linijka po cięciu")
+    cuts = [1000, 6000]
+    snapped_events, snapped_cnt = SceneShotSnapper.snap_subtitles_to_cuts([ev1, ev2], cuts, snap_window_ms=250)
+    assert snapped_cnt == 2
+    assert snapped_events[0].start == 1000  # snapped from 1050 to 1000
+    assert snapped_events[1].end == 6000    # snapped from 5950 to 6000
+
+    print(" -> PASSED: Moduły Masterclass (Piosenki Barańczaka, Matryca Idiolektów, SceneShotSnapper) działają w 100%.")
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -1077,5 +1117,6 @@ if __name__ == "__main__":
     test_visual_discourse_and_transcreation_pillars()
     test_masterpieces_and_semiotics_pillars()
     test_translator_logger_and_sign_detector()
-    print("\n Wszystkie testy jednostkowe i integracyjne (29/29) zakończone pełnym sukcesem!\n")
+    test_masterclass_next_gen()
+    print("\n Wszystkie testy jednostkowe i integracyjne (30/30) zakończone pełnym sukcesem!\n")
 
