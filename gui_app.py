@@ -757,9 +757,9 @@ class MainWindow(QMainWindow):
         
         self.bg_profiles = QButtonGroup(self)
         self.rb_prof1 = QRadioButton("[1] Szybki (Free Tier) — 0,00 PLN (Model Flash-Lite)")
-        self.rb_prof2 = QRadioButton("[2] Studyjny Flash — ~0,14 PLN / odc. (Ekstremalnie tani, szybki)")
-        self.rb_prof3 = QRadioButton("[3] Master Pro ⭐ — ~1,35 PLN / odc. (Zalecany: Flash + Redakcja Pro)")
-        self.rb_prof4 = QRadioButton("[4] Kinowy Ultra 👑 — ~2,70 PLN / odc. (Pełny Pro 3.1: Faza 1 + Faza 2)")
+        self.rb_prof2 = QRadioButton("[2] Studyjny Flash — ~0,16 PLN / odc. (Ekstremalnie tani, szybki)")
+        self.rb_prof3 = QRadioButton("[3] Master Pro ⭐ — ~1,92 PLN / odc. (Zalecany: Flash + Redakcja Pro 3.1)")
+        self.rb_prof4 = QRadioButton("[4] Kinowy Ultra 👑 — ~3,70 PLN / odc. (Pełny Pro 3.1: Faza 1 + Faza 2)")
         self.rb_prof3.setChecked(True)
 
         self.bg_profiles.addButton(self.rb_prof1, 1)

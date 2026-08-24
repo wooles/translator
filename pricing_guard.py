@@ -44,17 +44,20 @@ class PricingGuard:
     @staticmethod
     def estimate_episode_cost_pln(
         profile: str,
-        lines_count: int = 340,
+        lines_count: int = 350,
         has_cache: bool = True,
         usd_pln: float = DEFAULT_USD_PLN
     ) -> float:
         """
-        Precyzyjnie szacuje koszt przetłumaczenia 24-minutowego odcinka anime w PLN.
+        Precyzyjnie szacuje rzeczywisty koszt przetłumaczenia 24-minutowego odcinka anime w PLN,
+        uwzględniając realne rozmiary Google Context Cache (39k tokenów), analizę wizyjną
+        oraz żetony myślenia (Extended Reasoning / CoT Thinking) modelu Pro.
         """
         batches = max(1, (lines_count + 23) // 24)
-        system_prompt_tokens = 32500  # Wielki Kanon 95 Filarów AVT w Context Cache
+        system_prompt_tokens = 39000  # Wielki Kanon 117 Filarów AVT w Context Cache (zweryfikowany na serwerach Google)
         batch_input_tokens = 2500      # Klatka wideo + okno kontekstowe + audio Whisper
-        batch_output_tokens = 1200     # Tłumaczenie JSON
+        batch_output_f1_tokens = 1300  # Tłumaczenie JSON + Diagnoza Sceny (SceneDiagnosis)
+        batch_output_pro_tokens = 3000 # Redakcja JSON + Diagnoza Sceny + Żetony Myślenia (Extended Reasoning)
 
         profile = profile.lower()
 
@@ -63,10 +66,10 @@ class PricingGuard:
 
         elif profile in ["2", "studio", "flash"]:
             rate = GOOGLE_API_RATES["flash"]
-            # Faza 1: Flash
+            # Faza 1: Flash 3.7
             p1_cached_in = (batches * system_prompt_tokens) if has_cache else 0
             p1_uncached_in = (batches * batch_input_tokens) + (0 if has_cache else batches * system_prompt_tokens)
-            p1_out = batches * batch_output_tokens
+            p1_out = batches * batch_output_f1_tokens
 
             cost_p1_usd = (
                 (p1_cached_in / 1_000_000) * rate["input_cached"] +
@@ -74,64 +77,75 @@ class PricingGuard:
                 (p1_out / 1_000_000) * rate["output"]
             )
             # Faza 2: Redakcja Flash
-            cost_p2_usd = cost_p1_usd * 0.8
-            total_pln = (cost_p1_usd + cost_p2_usd) * usd_pln
+            p2_cached_in = (batches * system_prompt_tokens) if has_cache else 0
+            p2_uncached_in = (batches * batch_input_tokens) + (0 if has_cache else batches * system_prompt_tokens)
+            p2_out = batches * 1200
+
+            cost_p2_usd = (
+                (p2_cached_in / 1_000_000) * rate["input_cached"] +
+                (p2_uncached_in / 1_000_000) * rate["input_uncached"] +
+                (p2_out / 1_000_000) * rate["output"]
+            )
+            profiler_usd = 0.002
+            total_pln = (cost_p1_usd + cost_p2_usd + profiler_usd) * usd_pln
             return round(total_pln, 2)
 
         elif profile in ["3", "pro", "master"]:
             rate_flash = GOOGLE_API_RATES["flash"]
             rate_pro = GOOGLE_API_RATES["pro"]
 
-            # Faza 1 (Wizja + Flash)
+            # Faza 1 (Wizja + Flash 3.7)
             p1_cached_in = (batches * system_prompt_tokens) if has_cache else 0
             p1_uncached_in = batches * (batch_input_tokens + 516) + (0 if has_cache else batches * system_prompt_tokens)
-            p1_out = batches * batch_output_tokens
+            p1_out = batches * batch_output_f1_tokens
             cost_p1_usd = (
                 (p1_cached_in / 1_000_000) * rate_flash["input_cached"] +
                 (p1_uncached_in / 1_000_000) * rate_flash["input_uncached"] +
                 (p1_out / 1_000_000) * rate_flash["output"]
             )
 
-            # Faza 2 (Redakcja Pro 3.1 Preview)
+            # Faza 2 (Redakcja Pro 3.1 Preview + Żetony Myślenia CoT)
             p2_cached_in = (batches * system_prompt_tokens) if has_cache else 0
             p2_uncached_in = (batches * batch_input_tokens) + (0 if has_cache else batches * system_prompt_tokens)
-            p2_out = batches * 1400
+            p2_out = batches * batch_output_pro_tokens
             cost_p2_usd = (
                 (p2_cached_in / 1_000_000) * rate_pro["input_cached"] +
                 (p2_uncached_in / 1_000_000) * rate_pro["input_uncached"] +
                 (p2_out / 1_000_000) * rate_pro["output"]
             )
 
-            total_pln = (cost_p1_usd + cost_p2_usd) * usd_pln
+            profiler_usd = 0.002
+            total_pln = (cost_p1_usd + cost_p2_usd + profiler_usd) * usd_pln
             return round(total_pln, 2)
 
         elif profile in ["4", "ultra", "ultra_pro", "cinema"]:
             rate_pro = GOOGLE_API_RATES["pro"]
 
-            # Faza 1 (Wizja + Pro 3.1)
+            # Faza 1 (Wizja + Pro 3.1 + Żetony Myślenia)
             p1_cached_in = (batches * system_prompt_tokens) if has_cache else 0
             p1_uncached_in = batches * (batch_input_tokens + 516) + (0 if has_cache else batches * system_prompt_tokens)
-            p1_out = batches * batch_output_tokens
+            p1_out = batches * batch_output_pro_tokens
             cost_p1_usd = (
                 (p1_cached_in / 1_000_000) * rate_pro["input_cached"] +
                 (p1_uncached_in / 1_000_000) * rate_pro["input_uncached"] +
                 (p1_out / 1_000_000) * rate_pro["output"]
             )
 
-            # Faza 2 (Redakcja Pro 3.1)
+            # Faza 2 (Redakcja Pro 3.1 + Żetony Myślenia)
             p2_cached_in = (batches * system_prompt_tokens) if has_cache else 0
             p2_uncached_in = (batches * batch_input_tokens) + (0 if has_cache else batches * system_prompt_tokens)
-            p2_out = batches * 1400
+            p2_out = batches * batch_output_pro_tokens
             cost_p2_usd = (
                 (p2_cached_in / 1_000_000) * rate_pro["input_cached"] +
                 (p2_uncached_in / 1_000_000) * rate_pro["input_uncached"] +
                 (p2_out / 1_000_000) * rate_pro["output"]
             )
 
-            total_pln = (cost_p1_usd + cost_p2_usd) * usd_pln
+            profiler_usd = 0.002
+            total_pln = (cost_p1_usd + cost_p2_usd + profiler_usd) * usd_pln
             return round(total_pln, 2)
 
-        return 0.12
+        return 0.16
 
     @classmethod
     def calculate_actual_cost_pln(
