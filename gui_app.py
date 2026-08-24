@@ -326,10 +326,11 @@ class SettingsDialog(QDialog):
 
         self.cb_whisper_model = QComboBox()
         self.cb_whisper_model.addItems([
-            "large-v3-turbo (Zalecany / Najwyższa jakość)",
+            "kotoba-tech/kotoba-whisper-v2.0-faster (Zalecany / Japoński SOTA ASR)",
+            "large-v3-turbo (Wielojęzyczny Fast)",
+            "large-v3",
             "medium",
-            "small",
-            "base"
+            "small"
         ])
         wh_layout.addWidget(self.cb_whisper_model)
         layout.addWidget(gb_whisper)
@@ -778,7 +779,7 @@ class MainWindow(QMainWindow):
         opts_layout = QHBoxLayout(gb_opts)
         self.chk_honorifics = QCheckBox("Zachowaj honoryfikatory (-kun, -chan, -san)")
         self.chk_honorifics.setChecked(True)
-        self.chk_whisper = QCheckBox("Lokalny Whisper STT (Japońskie audio large-v3-turbo)")
+        self.chk_whisper = QCheckBox("Lokalny Whisper STT (Japoński Kotoba-Whisper v2.0 SOTA)")
         self.chk_whisper.setChecked(True)
         opts_layout.addWidget(self.chk_honorifics)
         opts_layout.addWidget(self.chk_whisper)

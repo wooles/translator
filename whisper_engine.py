@@ -21,20 +21,36 @@ except ImportError:
     FASTER_WHISPER_AVAILABLE = False
 
 
+DEFAULT_JAPANESE_WHISPER_MODEL = "kotoba-tech/kotoba-whisper-v2.0-faster"
+
+MODEL_ALIASES = {
+    "kotoba": "kotoba-tech/kotoba-whisper-v2.0-faster",
+    "kotoba-v2": "kotoba-tech/kotoba-whisper-v2.0-faster",
+    "kotoba-whisper": "kotoba-tech/kotoba-whisper-v2.0-faster",
+    "turbo": "large-v3-turbo",
+    "large-turbo": "large-v3-turbo",
+    "large-v3-turbo": "large-v3-turbo",
+    "large-v3": "large-v3",
+    "anime": "quantumcookie/anime-whisper-ct2",
+}
+
+
 class JapaneseWhisperEngine:
     def __init__(
         self,
-        model_size: str = "large-v3-turbo",
+        model_size: str = DEFAULT_JAPANESE_WHISPER_MODEL,
         device: str = "auto",
         compute_type: str = "auto",
         download_root: Optional[str] = None
     ):
         """
         Inicjalizacja silnika japońskiego Whisper.
-        model_size: 'large-v3-turbo' (zalecany, ultraszybki), 'medium', 'small', 'base'
+        Domyślny model: 'kotoba-tech/kotoba-whisper-v2.0-faster' (SOTA dla mowy japońskiej, ReazonSpeech).
+        Aliasy: 'kotoba', 'turbo', 'large-v3', 'anime'
         device: 'cuda' (GPU), 'cpu' lub 'auto'
         """
-        self.model_size = model_size
+        clean_key = model_size.lower().strip()
+        self.model_size = MODEL_ALIASES.get(clean_key, model_size)
         self.device = device
         self.compute_type = compute_type
         self.download_root = download_root or str(Path(__file__).parent / ".models")
@@ -90,7 +106,7 @@ class JapaneseWhisperEngine:
             )
             self._is_initialized = True
         except Exception as e:
-            # Fallback na CPU INT8 w razie problemów ze sterownikami GPU
+            # Fallback 1: Próba na CPU INT8 w razie problemów ze sterownikami GPU
             if selected_device != "cpu":
                 try:
                     self.model = WhisperModel(
@@ -103,6 +119,23 @@ class JapaneseWhisperEngine:
                     return
                 except Exception:
                     pass
+
+            # Fallback 2: Jeśli model japoński Kotoba nie mógł być pobrany, fallback do large-v3-turbo
+            if self.model_size != "large-v3-turbo":
+                try:
+                    logger.info("[Whisper Engine]: Fallback na standardowy model large-v3-turbo...")
+                    self.model = WhisperModel(
+                        "large-v3-turbo",
+                        device=selected_device if selected_device == "cpu" else "cuda",
+                        compute_type=selected_compute,
+                        download_root=self.download_root
+                    )
+                    self.model_size = "large-v3-turbo"
+                    self._is_initialized = True
+                    return
+                except Exception:
+                    pass
+
             raise e
 
     def transcribe_audio_slice(self, wav_path: str) -> str:

@@ -278,6 +278,12 @@ def main():
         help="Wyłącz lokalną transkrypcję japońskiego Whisper"
     )
     parser.add_argument(
+        "--whisper-model",
+        type=str,
+        default="kotoba-tech/kotoba-whisper-v2.0-faster",
+        help="Lokalny model Whisper (domyślnie: 'kotoba-tech/kotoba-whisper-v2.0-faster', opcje: 'kotoba', 'turbo', 'large-v3', 'anime')"
+    )
+    parser.add_argument(
         "--batch-size", "-b",
         type=int,
         default=int(os.getenv("BATCH_SIZE", "24")),
@@ -433,7 +439,8 @@ def main():
             batch_size=args.batch_size,
             enable_verifier=enable_verifier,
             keep_honorifics=keep_honorifics,
-            use_whisper=use_whisper
+            use_whisper=use_whisper,
+            whisper_model_size=args.whisper_model
         )
     except ValueError as e:
         print(f"\n[Błąd Konfiguracji]: {e}")

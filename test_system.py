@@ -361,12 +361,13 @@ def test_profiler_and_whisper():
     assert "ŻELAZNA TABELA ODMIANY IMION" in formatted
     assert "Isseiem" in formatted
     assert "EKWIWALENTY JAPOŃSKICH PRZYSŁÓW" in formatted
-    # Test dostępności i stanu Whisper
     avail = JapaneseWhisperEngine.is_available()
     import inspect
     sig = inspect.signature(JapaneseWhisperEngine.transcribe_batch_scene)
     assert "initial_prompt" in sig.parameters
-    print(" -> PASSED: Profiler 3.0 (Kanon Mangi, Danger-Lines, Dossier, Sekwencje) i Whisper Priming działają w 100%.")
+    engine = JapaneseWhisperEngine()
+    assert "kotoba" in engine.model_size
+    print(" -> PASSED: Profiler 3.0 (Kanon Mangi, Danger-Lines, Dossier, Sekwencje) i Kotoba-Whisper v2.0 działają w 100%.")
 from model_resolver import resolve_best_models, _extract_model_score
 
 def test_model_resolver():

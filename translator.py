@@ -261,7 +261,7 @@ class MultimodalTranslator:
         max_image_width: int = 540,
         keep_honorifics: bool = True,
         use_whisper: bool = True,
-        whisper_model_size: str = "large-v3-turbo"
+        whisper_model_size: str = "kotoba-tech/kotoba-whisper-v2.0-faster"
     ):
         self.api_key = api_key or os.getenv("GEMINI_API_KEY")
         if not self.api_key:

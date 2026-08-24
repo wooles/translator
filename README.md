@@ -2,13 +2,13 @@
 
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
 [![Google GenAI SDK](https://img.shields.io/badge/LLM%20Orchestration-Gemini%203.7%20Flash%20%7C%203.1%20Pro-orange.svg)](https://ai.google.dev/)
-[![Acoustic Ingestion](https://img.shields.io/badge/Acoustic%20ASR-Faster--Whisper%20CTranslate2-green.svg)](https://github.com/SYSTRAN/faster-whisper)
+[![Acoustic Ingestion](https://img.shields.io/badge/Acoustic%20ASR-Kotoba--Whisper%20v2.0%20CTranslate2-green.svg)](https://huggingface.co/kotoba-tech/kotoba-whisper-v2.0-faster)
 [![Architecture](https://img.shields.io/badge/Architecture-Dual--Phase%20Inference%20Pipeline-purple.svg)]()
 [![CI/Test Suite](https://img.shields.io/badge/Test%20Harness-29%2F29%20Passing-brightgreen.svg)]()
 
 An asynchronous, multimodal audiovisual localization and translation engine written in Python. It executes high-fidelity semantic translation from Japanese audio tracks and intermediate English dialogue representations into target Polish dialogue scripts, strictly abiding by professional cinematographic subtitling standards (Belczyk AVT Matrix, Skopos Theory, Polysystem Theory).
 
-The system integrates **Large Multimodal Models (LMMs)** via structured JSON decoding, **offline ASR acoustic grounding** with prosodic feature extraction, **computer-vision spatial OCR**, and a **117-Pillar Constraint Solver** for grammatical, pragmalinguistic, and register alignment.
+The system integrates **Large Multimodal Models (LMMs)** via structured JSON decoding, **fine-tuned Japanese ASR acoustic grounding (Kotoba-Whisper v2.0)** with prosodic feature extraction, **computer-vision spatial OCR**, and a **117-Pillar Constraint Solver** for grammatical, pragmalinguistic, and register alignment.
 
 ---
 
@@ -19,7 +19,7 @@ The pipeline implements a decoupled, three-tier processing model: **Pre-Inferenc
 ```mermaid
 flowchart TD
     Video["Multiplexed Media Stream (MKV / MP4 / TS)"] --> Demux["Demuxing & Frame/Audio Extraction (FFmpeg)"]
-    Demux --> Whisper["Zero-Shot Acoustic Alignment (Faster-Whisper)"]
+    Demux --> Whisper["Zero-Shot Acoustic Alignment (Kotoba-Whisper v2.0 SOTA)"]
     Demux --> F0["Autocorrelation F0 Pitch & Prosody Contour Extraction"]
     Demux --> Vision["1080p Keyframe Sampling & Dynamic Downscaling"]
     Video --> SubtitleParser["Temporal Subtitle Event Ingestion (ASS / SRT)"]
@@ -58,7 +58,7 @@ To eliminate attention drift across long video sequences, the pre-pass engine pe
 * **Dynamic Tension Matrix (`DramaticSequence`):** Maps dialogue density and emotional peaks across narrative acts, modulating lexical register accordingly.
 
 ### 2. Acoustic Grounding & $F_0$ Fundamental Frequency Diarization
-* **Zero-Shot Japanese Phonetic Extraction (Faster-Whisper):** Transcribes raw *seiyū* speech directly from the audio demuxer, providing an immutable **Primary Semantic Anchor**.
+* **Fine-Tuned Japanese ASR Engine (Kotoba-Whisper v2.0 CTranslate2):** Integrates the state-of-the-art Japanese speech recognition model trained on over 35,000 hours of Japanese broadcast, drama, and conversational audio (*ReazonSpeech Corpus*). Distilled for 6.3x acceleration with sub-2GB VRAM footprint, drastically outperforming generic multilingual models in character error rate (CER) and noisy acoustic environments.
 * **Elimination of the English Pivot Loss:** Intermediate English subtitles are inherently lossy, frequently flattening Japanese honorifics, omitting sentence-ending epistemic particles (*Shūjoshi*), and misinterpreting cultural nuances. Grounding the translation directly in Japanese phonetic transcripts completely bypasses intermediate localization errors.
 * **Grammatical Gender & Register Disambiguation:** English pronouns (*„you”, „I”, „they”*) lack morphological gender and social stratification. Extracting spoken Japanese first-person (*Ore / Boku / Watashi / Atashi*) and second-person pronouns (*Anata / Anta / Omae / Kisama*) resolves target Polish grammatical gender, verbal inflection, and social hierarchy with 100% precision.
 * **Autocorrelation Prosody & $F_0$ Estimator:** Computes vocal fundamental frequency ($F_0$) variance, acoustic intensity, and speech duration metrics, injecting paralinguistic metadata (e.g., whisper, shout, emotional breakdown) directly into LMM context tokens.
