@@ -169,10 +169,10 @@ Token costs and architectural specifications per 24-minute media unit (~350 subt
 | :--- | :--- | :--- | :---: | :--- |
 | **`[1] STANDARD`** | `gemini-3.5-flash-lite` | *Disabled* | **$0.00 / 0.00 PLN** | Batch screening, Free-Tier CI/CD |
 | **`[2] STUDIO FLASH`** | `gemini-3.7-flash` | `gemini-3.7-flash` | **~$0.05 / 0.21 PLN** | High-throughput, cost-sensitive pipelines |
-| **`[3] MASTER PRO ⭐`** | `gemini-3.7-flash` | `gemini-3.1-pro-preview` | **~$0.52 / 2.10 PLN** | **Production Grade:** Cinema & dubbing (Optimal 1024 CoT Budget) |
+| **`[3] MASTER PRO ⭐`** | `gemini-3.7-flash` | `gemini-3.1-pro-preview` | **~$0.56 / 2.25 PLN** | **Production Grade:** Cinema & dubbing (100% Quality Plateau, 2048 CoT Ceiling) |
 | **`[4] CINEMA ULTRA 👑`** | `gemini-3.1-pro-preview` | `gemini-3.1-pro-preview` | **~$1.02 / 4.10 PLN** | Maximum depth, dual Pro inference |
 
-*Note: Estimates include active memory storage leases and optimized 1024-token Chain-of-Thought (CoT) reasoning budgets.*
+*Note: Estimates include active memory storage leases and 2048-token Chain-of-Thought (CoT) reasoning ceilings.*
 
 ---
 

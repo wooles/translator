@@ -95,7 +95,7 @@ class DialogueVerifier:
                 gen_config_kwargs = {
                     "response_mime_type": "application/json",
                     "response_schema": RefinedBatchResponse,
-                    "thinking_config": types.ThinkingConfig(thinking_budget=1024),
+                    "thinking_config": types.ThinkingConfig(thinking_budget=2048),
                 }
 
                 if cached_name:
