@@ -97,11 +97,7 @@ class DialogueVerifier:
                     "response_schema": RefinedBatchResponse,
                     "temperature": 0.35,
                 }
-                if "pro" in self.model.lower():
-                    try:
-                        gen_config_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=1024)
-                    except Exception:
-                        pass
+                # Pełna swoboda kognitywna modelu Pro (brak sztucznych limitów tokenów myślenia)
 
                 if cached_name:
                     gen_config_kwargs["cached_content"] = cached_name

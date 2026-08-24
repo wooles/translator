@@ -57,7 +57,7 @@ class PricingGuard:
         system_prompt_tokens = 39000  # Wielki Kanon 117 Filarów AVT w Context Cache (zweryfikowany na serwerach Google)
         batch_input_tokens = 2500      # Klatka wideo + okno kontekstowe + audio Whisper
         batch_output_f1_tokens = 1300  # Tłumaczenie JSON + Diagnoza Sceny (SceneDiagnosis)
-        batch_output_pro_tokens = 3000 # Redakcja JSON + Diagnoza Sceny + Żetony Myślenia (Extended Reasoning)
+        batch_output_pro_tokens = 3500 # Redakcja JSON + Diagnoza Sceny + Pełna Nieskrępowana Swoboda Myślenia CoT
 
         profile = profile.lower()
 
@@ -86,8 +86,9 @@ class PricingGuard:
                 (p2_uncached_in / 1_000_000) * rate["input_uncached"] +
                 (p2_out / 1_000_000) * rate["output"]
             )
+            storage_active_usd = 0.0128 # 20 min aktywnego storage podczas pracy
             profiler_usd = 0.002
-            total_pln = (cost_p1_usd + cost_p2_usd + profiler_usd) * usd_pln
+            total_pln = (cost_p1_usd + cost_p2_usd + storage_active_usd + profiler_usd) * usd_pln
             return round(total_pln, 2)
 
         elif profile in ["3", "pro", "master"]:
@@ -104,7 +105,7 @@ class PricingGuard:
                 (p1_out / 1_000_000) * rate_flash["output"]
             )
 
-            # Faza 2 (Redakcja Pro 3.1 Preview + Żetony Myślenia CoT)
+            # Faza 2 (Redakcja Pro 3.1 Preview + Nieskrępowane Żetony Myślenia CoT)
             p2_cached_in = (batches * system_prompt_tokens) if has_cache else 0
             p2_uncached_in = (batches * batch_input_tokens) + (0 if has_cache else batches * system_prompt_tokens)
             p2_out = batches * batch_output_pro_tokens
@@ -114,8 +115,9 @@ class PricingGuard:
                 (p2_out / 1_000_000) * rate_pro["output"]
             )
 
+            storage_active_usd = 0.0594 # 20 min aktywnego storage Pro podczas pracy
             profiler_usd = 0.002
-            total_pln = (cost_p1_usd + cost_p2_usd + profiler_usd) * usd_pln
+            total_pln = (cost_p1_usd + cost_p2_usd + storage_active_usd + profiler_usd) * usd_pln
             return round(total_pln, 2)
 
         elif profile in ["4", "ultra", "ultra_pro", "cinema"]:
@@ -141,8 +143,9 @@ class PricingGuard:
                 (p2_out / 1_000_000) * rate_pro["output"]
             )
 
+            storage_active_usd = 0.0594
             profiler_usd = 0.002
-            total_pln = (cost_p1_usd + cost_p2_usd + profiler_usd) * usd_pln
+            total_pln = (cost_p1_usd + cost_p2_usd + storage_active_usd + profiler_usd) * usd_pln
             return round(total_pln, 2)
 
         return 0.16

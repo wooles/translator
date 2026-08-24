@@ -561,13 +561,13 @@ def test_pricing_guard():
     cost_flash = PricingGuard.estimate_episode_cost_pln("2")
     assert 0.05 <= cost_flash <= 0.25
     
-    # 3. Test szacowania kosztu dla profilu Master Pro (~1.92 zł z Filarami i CoT)
+    # 3. Test szacowania kosztu dla profilu Master Pro (~2.25 zł z Filarami i pełnym CoT)
     cost_pro = PricingGuard.estimate_episode_cost_pln("3")
-    assert 1.40 <= cost_pro <= 2.30
+    assert 1.80 <= cost_pro <= 2.60
 
-    # 4. Test szacowania kosztu dla profilu Kinowy Ultra (~3.71 zł z Filarami i CoT)
+    # 4. Test szacowania kosztu dla profilu Kinowy Ultra (~4.10 zł z Filarami i pełnym CoT)
     cost_ultra = PricingGuard.estimate_episode_cost_pln("4")
-    assert 2.80 <= cost_ultra <= 4.40
+    assert 3.20 <= cost_ultra <= 4.80
     
     # 5. Test generowania banera
     banner = PricingGuard.get_pricing_status_banner()
