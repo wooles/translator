@@ -273,27 +273,51 @@ from profiler import (
     GlossaryTerm,
     NameDeclension,
     FirstPersonPronoun,
+    DangerLinePreScan,
+    DramaticSequence,
+    CharacterDossier,
     format_episode_profile_for_prompt
 )
 from whisper_engine import JapaneseWhisperEngine
 
 def test_profiler_and_whisper():
-    print("[TEST 6/6] Test profilera odcinka 2.0 (Fleksja, Zaimki, Idiomy) i silnika Whisper...")
+    print("[TEST 6/6] Test profilera odcinka 3.0 (Kanon Mangi, Danger-Lines, Dossier, Sekwencje)...")
     profile = EpisodeProfile(
         episode_summary="Odcinek o sprzątaniu klubu mangi",
         tone_and_genre="Komediodramat młodzieżowy",
+        manga_canon_source="Wydawnictwo Waneko",
+        danger_lines_prescan=[
+            DangerLinePreScan(
+                approx_time="00:06:12",
+                english_phrase="I'm… fine.",
+                speaker="Yoritsugu",
+                contextual_trap="Odmowa wyjścia [boku wa ii desu], a nie stan zdrowia!",
+                mandatory_direction="Tłumacz jako: Ja... podziękuję. ZAKAZ: Nic mi nie jest."
+            )
+        ],
+        dramatic_sequences=[
+            DramaticSequence(
+                sequence_name="Sekwencja 1: Świątynia Suwa",
+                time_range="00:00 - 08:00",
+                dramatic_summary="Przybycie Tokiyukiego i narastająca zazdrość Yoritsugu",
+                dominant_tone="dworska etykieta i tłumiona zazdrość"
+            )
+        ],
+        character_dossiers=[
+            CharacterDossier(
+                name="Yoritsugu",
+                gender="MALE",
+                age_and_role="7 lat, syn Yorishige, arystokrata",
+                speech_style_pl="chłodny, dumny, krótki",
+                first_person_pronoun="Boku",
+                declension="D. Yoritsugu, C. Yoritsugu, B. Yoritsugu"
+            )
+        ],
         name_declensions=[
             NameDeclension(
                 character_name="Issei",
                 gender="MALE",
                 declension_summary="D. Isseia, C. Isseiowi, B. Isseia, N. z Isseiem, Msc. o Isseiu"
-            )
-        ],
-        first_person_pronouns=[
-            FirstPersonPronoun(
-                character_name="Issei",
-                japanese_pronoun="Ore",
-                psychological_profile="pewny siebie, szorstki, zdeterminowany"
             )
         ],
         characters=[
@@ -324,21 +348,25 @@ def test_profiler_and_whisper():
         key_conventions=["Unikać kalki 'Bless you' -> 'Na zdrowie'"]
     )
     formatted = format_episode_profile_for_prompt(profile)
+    assert "Wydawnictwo Waneko" in formatted
+    assert "DANGER-LINES PRE-SCAN" in formatted
+    assert "Ja... podziękuję" in formatted
+    assert "Świątynia Suwa" in formatted
+    assert "CHARACTER DOSSIERS" in formatted
+    assert "Yoritsugu" in formatted
     assert "pani Teshima" in formatted
     assert "taiyaki" in formatted
     assert "Imperium Mongolskie" in formatted
     assert "Enologia i Sommelierstwo" in formatted
     assert "ŻELAZNA TABELA ODMIANY IMION" in formatted
     assert "Isseiem" in formatted
-    assert "PROFIL PSYCHOLOGICZNY I ZAIMKI" in formatted
-    assert "Ore" in formatted
     assert "EKWIWALENTY JAPOŃSKICH PRZYSŁÓW" in formatted
     # Test dostępności i stanu Whisper
     avail = JapaneseWhisperEngine.is_available()
     import inspect
     sig = inspect.signature(JapaneseWhisperEngine.transcribe_batch_scene)
     assert "initial_prompt" in sig.parameters
-    print(" -> PASSED: Profiler 2.0 (Odmiana imion, zaimki ego, idiomy) i Whisper Priming działają w 100%.")
+    print(" -> PASSED: Profiler 3.0 (Kanon Mangi, Danger-Lines, Dossier, Sekwencje) i Whisper Priming działają w 100%.")
 from model_resolver import resolve_best_models, _extract_model_score
 
 def test_model_resolver():
