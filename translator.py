@@ -803,6 +803,13 @@ class MultimodalTranslator:
         if user_rules_cnt > 0:
             print(f"  [Korekty Użytkownika]: Wczytano {user_rules_cnt} złotych reguł (Few-Shot Prompting).")
 
+        # 0e. Pre-warming i Weryfikacja Context Cache (Gwarancja rabatu -75% przed startem paczek)
+        from context_cache import ContextCacheManager
+        print(f"  [Infrastruktura Finansowa]: Weryfikacja i rozgrzewanie pamięci Context Cache...")
+        ContextCacheManager.ensure_cache_ready(self.client, self.model_phase1, self.system_prompt)
+        if self.verifier and hasattr(self.verifier, "client") and hasattr(self.verifier, "model") and hasattr(self.verifier, "system_prompt"):
+            ContextCacheManager.ensure_cache_ready(self.verifier.client, self.verifier.model, self.verifier.system_prompt)
+
         if episode_profile:
             if not manga_canon_entry and episode_profile.manga_canon_source:
                 print(f"  [Kanon Mangi]: Rozpoznano oficjalny polski przekład ({episode_profile.manga_canon_source})")

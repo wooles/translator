@@ -545,10 +545,11 @@ def test_context_cache():
     res = ContextCacheManager.get_or_create_cache(None, "gemini-3.7-flash", "prompt", ttl_seconds=DEFAULT_CACHE_TTL_SECONDS)
     assert res is None
 
-    # 4. Test metod Kroczącego Heartbeatu i czyszczenia
+    # 4. Test metod Kroczącego Heartbeatu, pre-warmingu i czyszczenia
+    ContextCacheManager.ensure_cache_ready(None, "gemini-3.7-flash", "prompt", verbose=False)
     ContextCacheManager.touch_cache(None, None)
     ContextCacheManager.cleanup_all_active_caches(None)
-    print(" -> PASSED: Context Caching SHA-256, Kroczący Heartbeat 20m i autoczyszczenie działają perfekcyjnie.")
+    print(" -> PASSED: Context Caching SHA-256, Pre-warming, Kroczący Heartbeat 20m i autoczyszczenie działają perfekcyjnie.")
 
 def test_pricing_guard():
     print("[TEST 16/16] Test Strażnika Cennika i Kosztów Google API (pricing_guard)...")

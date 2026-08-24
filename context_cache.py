@@ -93,29 +93,60 @@ class ContextCacheManager:
         except Exception as e:
             logger.debug(f"[Context Cache]: Błąd podczas listowania/czyszczenia cache: {e}")
 
-        # 3. Próba utworzenia nowego cache na serwerach Google
-        try:
-            if hasattr(client, "caches") and hasattr(client.caches, "create"):
-                ttl_str = f"{ttl_seconds}s"
-                cache = client.caches.create(
-                    model=model,
-                    config=types.CreateCachedContentConfig(
-                        system_instruction=system_instruction,
-                        ttl=ttl_str,
-                        display_name=display_name,
+        # 3. Próba utworzenia nowego cache na serwerach Google z automatycznym ponawianiem (Retry)
+        for create_attempt in range(1, 4):
+            try:
+                if hasattr(client, "caches") and hasattr(client.caches, "create"):
+                    ttl_str = f"{ttl_seconds}s"
+                    cache = client.caches.create(
+                        model=model,
+                        config=types.CreateCachedContentConfig(
+                            system_instruction=system_instruction,
+                            ttl=ttl_str,
+                            display_name=display_name,
+                        )
                     )
-                )
-                _LOCAL_CACHE_REGISTRY[content_hash] = cache.name
-                logger.info(f"[Context Cache]: Utworzono bezpieczny cache dla {model}: {cache.name} (Ruchome okno: {ttl_seconds}s)")
-                return cache.name
-        except Exception as e:
-            err_msg = str(e).lower()
-            if "minimum" in err_msg or "at least" in err_msg or "32768" in err_msg or "too small" in err_msg:
-                logger.debug(f"[Context Cache]: Prompt poniżej minimalnego progu serwerowego cache: {e}")
-            else:
-                logger.debug(f"[Context Cache]: Cache niedostępny dla {model}, fallback do standardowego przekazywania: {e}")
+                    _LOCAL_CACHE_REGISTRY[content_hash] = cache.name
+                    logger.info(f"[Context Cache]: Utworzono bezpieczny cache dla {model}: {cache.name} (Ruchome okno: {ttl_seconds}s)")
+                    return cache.name
+            except Exception as e:
+                err_msg = str(e).lower()
+                if "minimum" in err_msg or "at least" in err_msg or "32768" in err_msg or "too small" in err_msg:
+                    logger.debug(f"[Context Cache]: Prompt poniżej minimalnego progu serwerowego cache: {e}")
+                    break
+                elif create_attempt < 3 and ("503" in err_msg or "unavailable" in err_msg or "quota" in err_msg or "rate" in err_msg):
+                    import time
+                    time.sleep(1.5 * create_attempt)
+                    continue
+                else:
+                    logger.debug(f"[Context Cache]: Próba {create_attempt}/3 nieudana dla {model}: {e}")
 
         return None
+
+    @classmethod
+    def ensure_cache_ready(
+        cls,
+        client: genai.Client,
+        model: str,
+        system_instruction: str,
+        verbose: bool = True
+    ) -> Optional[str]:
+        """
+        Gwarantuje, że cache serwerowy jest w 100% zapięty i aktywny przed rozpoczęciem tłumaczenia,
+        zabezpieczając użytkownika przed nieautoryzowanym naliczeniem 100% pełnej stawki.
+        """
+        if not client or not system_instruction:
+            return None
+
+        cache_name = cls.get_or_create_cache(client, model, system_instruction)
+        if cache_name:
+            if verbose:
+                print(f"  [Context Cache]: Zapięto rabat -75% na serwerze Google dla {model}.")
+            return cache_name
+        else:
+            if verbose:
+                print(f"  [Context Cache / UWAGA]: Cache niedostępny dla {model} – zapytania mogą być rozliczane stawką standardową.")
+            return None
 
     @classmethod
     def touch_cache(cls, client: genai.Client, cache_name: str, ttl_seconds: int = DEFAULT_CACHE_TTL_SECONDS):
