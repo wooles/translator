@@ -1067,6 +1067,19 @@ class MainWindow(QMainWindow):
         else:
             os.startfile(os.getcwd())
 
+    def closeEvent(self, event):
+        """Zabezpieczenie: usuwa serwerowy cache przy zamykaniu okna GUI."""
+        try:
+            from context_cache import ContextCacheManager
+            from google import genai
+            api_key = os.getenv("GEMINI_API_KEY")
+            if api_key:
+                client = genai.Client(api_key=api_key)
+                ContextCacheManager.cleanup_all_active_caches(client)
+        except Exception:
+            pass
+        event.accept()
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # GŁÓWNY PUNKT WEJŚCIA

@@ -93,8 +93,10 @@ class ContextCacheManager:
         except Exception as e:
             logger.debug(f"[Context Cache]: Błąd podczas listowania/czyszczenia cache: {e}")
 
-        # 3. Próba utworzenia nowego cache na serwerach Google z automatycznym ponawianiem (Retry)
-        for create_attempt in range(1, 4):
+        # 3. Próba utworzenia nowego cache na serwerach Google – ponawianie DO SKUTKU (Infinite Retry dla 503/429)
+        create_attempt = 0
+        while True:
+            create_attempt += 1
             try:
                 if hasattr(client, "caches") and hasattr(client.caches, "create"):
                     ttl_str = f"{ttl_seconds}s"
@@ -111,17 +113,21 @@ class ContextCacheManager:
                     return cache.name
             except Exception as e:
                 err_msg = str(e).lower()
+                # 1. Trwały brak możliwości cache (np. prompt poniżej progu 32 768 tokenów)
                 if "minimum" in err_msg or "at least" in err_msg or "32768" in err_msg or "too small" in err_msg:
                     logger.debug(f"[Context Cache]: Prompt poniżej minimalnego progu serwerowego cache: {e}")
-                    break
-                elif create_attempt < 3 and ("503" in err_msg or "unavailable" in err_msg or "quota" in err_msg or "rate" in err_msg):
-                    import time
-                    time.sleep(1.5 * create_attempt)
-                    continue
-                else:
-                    logger.debug(f"[Context Cache]: Próba {create_attempt}/3 nieudana dla {model}: {e}")
+                    return None
 
-        return None
+                # 2. Błąd konta / klucza API (brak środków, zły klucz)
+                if "prepayment" in err_msg or "depleted" in err_msg or "api_key" in err_msg or "permission" in err_msg:
+                    logger.error(f"[Context Cache]: Błąd uprawnień/konta: {e}")
+                    return None
+
+                # 3. Błąd przejściowy serwerów Google (503 / 429 / socket / timeout) -> Ponawiamy DO SKUTKU
+                import time
+                wait_sec = min(3 + create_attempt * 2, 25)
+                print(f"  [Context Cache]: Serwery Google przeciążone (błąd 503/429 dla {model}). Czekam {wait_sec}s na wolny slot cache (próba #{create_attempt}, gwarancja rabatu -75%)...")
+                time.sleep(wait_sec)
 
     @classmethod
     def ensure_cache_ready(
@@ -165,10 +171,11 @@ class ContextCacheManager:
 
     @classmethod
     def cleanup_all_active_caches(cls, client: genai.Client):
-        """Natychmiast usuwa wszystkie aktywne obiekty cache ze serwerów Google po zakończeniu pracy."""
+        """Natychmiast usuwa wszystkie aktywne i osierocone obiekty cache ze serwerów Google po zakończeniu pracy."""
         if not client:
             return
         try:
+            # 1. Usunięcie zarejestrowanych obiektów w lokalnej sesji
             if hasattr(client, "caches") and hasattr(client.caches, "delete"):
                 for hash_key, cache_name in list(_LOCAL_CACHE_REGISTRY.items()):
                     try:
@@ -177,6 +184,16 @@ class ContextCacheManager:
                     except Exception:
                         pass
                 _LOCAL_CACHE_REGISTRY.clear()
+
+            # 2. Zamiatanie wszelkich osieroconych obiektów 'avt_' na koncie Google
+            if hasattr(client, "caches") and hasattr(client.caches, "list"):
+                for existing in client.caches.list():
+                    if existing.display_name and existing.display_name.startswith("avt_"):
+                        try:
+                            client.caches.delete(name=existing.name)
+                            logger.info(f"[Context Cache]: Usunięto osierocony obiekt cache: {existing.display_name}")
+                        except Exception:
+                            pass
         except Exception as e:
             logger.debug(f"[Context Cache]: Błąd podczas czyszczenia cache: {e}")
 
