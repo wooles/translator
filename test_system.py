@@ -555,15 +555,19 @@ def test_pricing_guard():
     cost_flash = PricingGuard.estimate_episode_cost_pln("2")
     assert 0.05 <= cost_flash <= 0.25
     
-    # 3. Test szacowania kosztu dla profilu Master Pro (~1.29 zł z 95 Filarami)
+    # 3. Test szacowania kosztu dla profilu Master Pro (~1.35 zł z Filarami)
     cost_pro = PricingGuard.estimate_episode_cost_pln("3")
     assert 0.80 <= cost_pro <= 1.90
+
+    # 4. Test szacowania kosztu dla profilu Kinowy Ultra (~2.70 zł z Filarami)
+    cost_ultra = PricingGuard.estimate_episode_cost_pln("4")
+    assert 1.90 <= cost_ultra <= 3.80
     
-    # 4. Test generowania banera
+    # 5. Test generowania banera
     banner = PricingGuard.get_pricing_status_banner()
     assert "STATUS CENNIKA GOOGLE" in banner
     assert "Context Cache" in banner
-    print(" -> PASSED: Strażnik cennika precyzyjnie kalkuluje i monitoruje koszty.")
+    print(" -> PASSED: Strażnik cennika precyzyjnie kalkuluje i monitoruje koszty dla 4 poziomów jakości.")
 
 def test_sign_detector():
     print("[TEST 17/17] Test Wizyjnego Detektora Plansz i Bezpieczników Antykolizyjnych (sign_detector)...")

@@ -105,6 +105,32 @@ class PricingGuard:
             total_pln = (cost_p1_usd + cost_p2_usd) * usd_pln
             return round(total_pln, 2)
 
+        elif profile in ["4", "ultra", "ultra_pro", "cinema"]:
+            rate_pro = GOOGLE_API_RATES["pro"]
+
+            # Faza 1 (Wizja + Pro 3.1)
+            p1_cached_in = (batches * system_prompt_tokens) if has_cache else 0
+            p1_uncached_in = batches * (batch_input_tokens + 516) + (0 if has_cache else batches * system_prompt_tokens)
+            p1_out = batches * batch_output_tokens
+            cost_p1_usd = (
+                (p1_cached_in / 1_000_000) * rate_pro["input_cached"] +
+                (p1_uncached_in / 1_000_000) * rate_pro["input_uncached"] +
+                (p1_out / 1_000_000) * rate_pro["output"]
+            )
+
+            # Faza 2 (Redakcja Pro 3.1)
+            p2_cached_in = (batches * system_prompt_tokens) if has_cache else 0
+            p2_uncached_in = (batches * batch_input_tokens) + (0 if has_cache else batches * system_prompt_tokens)
+            p2_out = batches * 1400
+            cost_p2_usd = (
+                (p2_cached_in / 1_000_000) * rate_pro["input_cached"] +
+                (p2_uncached_in / 1_000_000) * rate_pro["input_uncached"] +
+                (p2_out / 1_000_000) * rate_pro["output"]
+            )
+
+            total_pln = (cost_p1_usd + cost_p2_usd) * usd_pln
+            return round(total_pln, 2)
+
         return 0.12
 
     @classmethod
@@ -169,12 +195,13 @@ class PricingGuard:
         """
         cost_flash = cls.estimate_episode_cost_pln("2")
         cost_pro = cls.estimate_episode_cost_pln("3")
+        cost_ultra = cls.estimate_episode_cost_pln("4")
         ep_pro = int(40.0 / max(0.01, cost_pro))
         ep_flash = int(40.0 / max(0.01, cost_flash))
 
         lines = [
             "  💰 STATUS CENNIKA GOOGLE: Zweryfikowany (Brak ukrytych opłat, rabat -75% Context Cache aktywny)",
-            f"  💡 Szacowany koszt: ~{cost_flash:.2f} zł (Flash) | ~{cost_pro:.2f} zł (Master Pro) | 40 zł = ok. {ep_pro}–{ep_flash} odcinków",
+            f"  💡 Szacowany koszt: ~{cost_flash:.2f} zł (Flash) | ~{cost_pro:.2f} zł (Master Pro) | ~{cost_ultra:.2f} zł (Kinowy Ultra)",
             "  🛡️ Ochrona budżetu: Każda ewentualna zmiana stawek u Google zostanie natychmiast zasygnalizowana."
         ]
         return "\n".join(lines)

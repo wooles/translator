@@ -377,11 +377,14 @@ def main():
     model_p1 = args.model if args.model != "gemini-3.5-flash-lite" else None
     model_p2 = args.model_phase2
 
-    if args.profile == "pro" or args.profile == "master":
+    if args.profile in ["ultra", "ultra_pro", "cinema"]:
+        model_p1 = best_models["pro"]
+        model_p2 = best_models["pro"]
+    elif args.profile in ["pro", "master"]:
         model_p1 = best_models["flash"]
         model_p2 = best_models["pro"]
     elif args.profile == "studio":
-        model_p1 = best_models["flash_lite"]
+        model_p1 = best_models["flash"]
         model_p2 = best_models["flash"]
     elif args.profile == "standard":
         model_p1 = best_models["flash_lite"]
@@ -390,22 +393,27 @@ def main():
         from pricing_guard import PricingGuard
         cost_flash_est = PricingGuard.estimate_episode_cost_pln("2")
         cost_pro_est = PricingGuard.estimate_episode_cost_pln("3")
+        cost_ultra_est = PricingGuard.estimate_episode_cost_pln("4")
         print("\n" + "─" * 68)
         print("  WYBÓR PROFILU JAKOŚCI TŁUMACZENIA (Auto-wykrywanie najnowszych modeli):")
-        print(f"  [1] STANDARDOWY      [{best_models['flash_lite']} - 100% Darmowy, szybki]")
-        print(f"  [2] STUDYJNY FLASH   [{best_models['flash']} + Redakcja Flash - Ekstremalnie tani (~{cost_flash_est:.2f} zł/odc)]")
-        print(f"  [3] MASTER PRO ⭐   [{best_models['flash']} + {best_models['pro']} Redakcja Pro - Jakość Kinowa (~{cost_pro_est:.2f} zł/odc z 30d Cache)]")
+        print(f"  [1] STANDARDOWY       [{best_models['flash_lite']} - 100% Darmowy, szybki]")
+        print(f"  [2] STUDYJNY FLASH    [{best_models['flash']} + Redakcja Flash - Ekstremalnie tani (~{cost_flash_est:.2f} zł/odc)]")
+        print(f"  [3] MASTER PRO ⭐    [{best_models['flash']} + {best_models['pro']} Redakcja Pro - Jakość Kinowa (~{cost_pro_est:.2f} zł/odc z 30d Cache)]")
+        print(f"  [4] KINOWY ULTRA 👑   [{best_models['pro']} + {best_models['pro']} Pełny Pro - Maksymalna Głębokość (~{cost_ultra_est:.2f} zł/odc z 30d Cache)]")
         print("─" * 68)
         print(PricingGuard.get_pricing_status_banner())
         print("─" * 68)
         try:
-            prof_choice = input("  Twój wybór [1 / 2 / 3] (Wciśnij Enter dla 3): ").strip()
+            prof_choice = input("  Twój wybór [1 / 2 / 3 / 4] (Wciśnij Enter dla 3): ").strip()
             if prof_choice == "1":
                 model_p1 = best_models["flash_lite"]
                 model_p2 = best_models["flash_lite"]
             elif prof_choice == "2":
                 model_p1 = best_models["flash"]
                 model_p2 = best_models["flash"]
+            elif prof_choice == "4":
+                model_p1 = best_models["pro"]
+                model_p2 = best_models["pro"]
             else:
                 model_p1 = best_models["flash"]
                 model_p2 = best_models["pro"]

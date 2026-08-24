@@ -225,6 +225,10 @@ class TranslationWorker(QThread):
                 p1_model = models["flash"]
                 p2_model = None
                 enable_verifier = False
+            elif self.profile_idx == "4":
+                p1_model = models["pro"]
+                p2_model = models["pro"]
+                enable_verifier = True
             else:  # Profil 3 (Master Pro)
                 p1_model = models["flash"]
                 p2_model = models["pro"]
@@ -753,17 +757,20 @@ class MainWindow(QMainWindow):
         
         self.bg_profiles = QButtonGroup(self)
         self.rb_prof1 = QRadioButton("[1] Szybki (Free Tier) — 0,00 PLN (Model Flash-Lite)")
-        self.rb_prof2 = QRadioButton("[2] Studyjny Flash — ~0,08 PLN / odc. (3-5 min, 43 Filary, Rekomendowany)")
-        self.rb_prof3 = QRadioButton("[3] Master Pro — ~1,35 PLN / odc. (Flagowy Gemini 3.1 Pro Preview)")
-        self.rb_prof2.setChecked(True)
+        self.rb_prof2 = QRadioButton("[2] Studyjny Flash — ~0,14 PLN / odc. (Ekstremalnie tani, szybki)")
+        self.rb_prof3 = QRadioButton("[3] Master Pro ⭐ — ~1,35 PLN / odc. (Zalecany: Flash + Redakcja Pro)")
+        self.rb_prof4 = QRadioButton("[4] Kinowy Ultra 👑 — ~2,70 PLN / odc. (Pełny Pro 3.1: Faza 1 + Faza 2)")
+        self.rb_prof3.setChecked(True)
 
         self.bg_profiles.addButton(self.rb_prof1, 1)
         self.bg_profiles.addButton(self.rb_prof2, 2)
         self.bg_profiles.addButton(self.rb_prof3, 3)
+        self.bg_profiles.addButton(self.rb_prof4, 4)
 
         prof_layout.addWidget(self.rb_prof1)
         prof_layout.addWidget(self.rb_prof2)
         prof_layout.addWidget(self.rb_prof3)
+        prof_layout.addWidget(self.rb_prof4)
         left_layout.addWidget(gb_profiles)
 
         # Opcje dodatkowe
