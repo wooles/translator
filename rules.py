@@ -7,6 +7,12 @@ zasadach adaptacji japońskich tytułów grzecznościowych oraz Netflix Polish T
 
 import re
 from typing import List, Dict, Any, Optional
+from pydantic import BaseModel, Field
+
+class SceneDiagnosis(BaseModel):
+    dramatic_context: str = Field(description="Opis sytuacji w scenie: kto z kim rozmawia, jakie są relacje i ładunek emocjonalny")
+    dialogue_flow: str = Field(description="Powiązania przyczynowo-skutkowe między kwestiami: pytania, zaproszenia, reakcje, odmowy")
+    audio_intent_check: str = Field(description="Weryfikacja intencji mówców ze słuchu japońskiego (Whisper) vs skrypt angielski")
 
 BELCZYK_AVT_MASTER_CANON = """
 KOMPLEKSOWY KANON PRZEKŁADU AUDIOWIZUALNEGO (WG ARKADIUSZA BELCZYKA, JERZEGO PIEŃKOSA, STANISŁAWA BARAŃCZAKA I NORM POLSKIEGO DIALOGU FILMOWEGO):
@@ -1263,8 +1269,12 @@ Twoim nadrzędnym celem jest przekład dialogów na ŻYWĄ, NATURALNĄ POLSZCZYZ
 {anime_guide}
 
 ZASADY TECHNICZNE ODPOWIEDZI:
-- Zwracaj WYŁĄCZNIE czysty, naturalny tekst dialogowy dopasowany do języka młodzieży / nastolatków.
-- STOSUJ KONDENSACJĘ I ELIPSĘ: usuwaj zbędne "Ja", watę słowną i powtórzenia rzeczowników (np. "mangi... mangi" -> "tytuły", "serie" lub elipsa).
+- OBOWIĄZKOWA DIAGNOZA SCENY (scene_diagnosis): Przed wygenerowaniem tłumaczeń poszczególnych kwestii MUSISZ najpierw wypełnić obiekt "scene_diagnosis":
+  1. "dramatic_context": Kto z kim rozmawia, w jakiej relacji i jakie emocje/napięcia panują w scenie.
+  2. "dialogue_flow": Ciąg przyczynowo-skutkowy (np. linia A to zaproszenie, linia B to odmowa lub zbycie tematu).
+  3. "audio_intent_check": Co postacie NAPRAWDĘ mówią po japońsku w transkrypcji Whisper (zwłaszcza formy odmowy 'ii desu', rozkazy 'kure', dług 'giri/sumimasen') i gdzie angielski skrypt spłaszcza oryginał.
+- Zwracaj WYŁĄCZNIE czysty, naturalny tekst dialogowy dopasowany do żywej polszczyzny kinowej.
+- STOSUJ KONDENSACJĘ I ELIPSĘ: usuwaj zbędne "Ja", watę słowną i powtórzenia rzeczowników (Filar CII).
 - PAMIĘTAJ O RELACJACH: Uczeń mówiący o nauczycielce mówi "pani Teshima" / "pani Teshimy" (a nie bezimiennie "Teshima").
 - Analizuj CAŁE ZDANIA rozbite między linijkami i dbaj o ich idealną spójność gramatyczną i naturalny szyk po polsku.
 - ZAKAZ dosłownego tłumaczenia słowo w słowo.
@@ -1549,7 +1559,10 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
 
 {anime_guide}
 
-Zwróć ostateczną, perfekcyjnie skondensowaną, żywą wersję każdej kwestii w formacie JSON."""
+ZASADY TECHNICZNE ODPOWIEDZI PRO:
+- OBOWIĄZKOWA DIAGNOZA I AUDYT SCENY (scene_diagnosis): Przed redakcją kwestii wypełnij obiekt "scene_diagnosis", weryfikując intencje dramaturgiczne sceny, związki przyczynowo-skutkowe oraz zgodność ze słuchem japońskim (Whisper).
+- W polu 'changes_made' dla każdej poprawionej kwestii podawaj uzasadnienie i numer Filaru AVT.
+- Zwróć wynik jako obiekt JSON zgodny ze schematem."""
 
 
 def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:

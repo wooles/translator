@@ -52,7 +52,7 @@ logger = logging.getLogger("translator")
 from google import genai
 from google.genai import types
 
-from rules import get_translation_system_prompt, get_focused_rules_for_batch
+from rules import get_translation_system_prompt, get_focused_rules_for_batch, SceneDiagnosis
 from verifier import DialogueVerifier, RefinedLine
 from extract import extract_frame_at_timestamp, extract_audio_slice
 from metadata import get_anime_context, format_anime_context_for_prompt
@@ -245,6 +245,7 @@ class LineTranslation(BaseModel):
     notes: Optional[str] = Field(default=None, description="Uwagi redakcyjne")
 
 class BatchTranslationResponse(BaseModel):
+    scene_diagnosis: Optional[SceneDiagnosis] = Field(default=None, description="Obowiązkowa diagnoza sytuacji, intencji i podtekstu sceny PRZED tłumaczeniem")
     translations: List[LineTranslation] = Field(description="Lista przetłumaczonych kwestii")
     scene_description: Optional[str] = Field(default=None, description="Krótki opis sceny na kadrze")
     characters_identified: Optional[List[CharacterInfo]] = Field(default=None, description="Zidentyfikowane lub nowo odkryte postacie i ich płeć")
@@ -432,6 +433,17 @@ class MultimodalTranslator:
                 acoustic_cues.append(f"Ton: {prosody_tags[idx + 1]}")
             acoustic_str = f" [{', '.join(acoustic_cues)}]" if acoustic_cues else ""
 
+            # Dynamiczne wykrywanie relacji przyczynowo-skutkowej z poprzednią kwestią
+            relation_tag = ""
+            if idx > 0 and not vtype["is_sign"]:
+                prev_clean = batch_events[idx - 1][2].strip()
+                if prev_clean.endswith("?"):
+                    relation_tag = " [RELACJA: Prawdopodobna odpowiedź/reakcja na pytanie]"
+                elif any(prev_clean.lower().startswith(w) for w in ["come,", "let's", "shall we", "look,", "hey,"]):
+                    relation_tag = " [RELACJA: Prawdopodobna reakcja / zgoda / odmowa na zaproszenie/propozycję]"
+                elif prev_clean.endswith("...") or prev_clean.endswith("…"):
+                    relation_tag = " [RELACJA: Prawdopodobna kontynuacja myśli rozbitej wielokropkiem]"
+
             if vtype["is_sign"]:
                 lines.append(f"Kwestia [ID: {idx + 1}] [TYP: [NAPIS] {vtype['type_label']}] (Czas: {start_str} - {end_str}, Cechy: {vtype['visual_details']}):")
                 lines.append(f"  (!) UWAGA WIZUALNA: To jest NAPIS / TYTUŁ NA EKRANIE (np. tytuł mangi, rozdział, tablica, napis wklejony w kadr).")
@@ -439,7 +451,7 @@ class MultimodalTranslator:
                 lines.append(f"  BEZWZGLĘDNY ZAKAZ wklejania tu fragmentów dialogów mówionych przez postacie!")
             else:
                 speaker_name = event.name if event.name else "Postać"
-                lines.append(f"Kwestia [ID: {idx + 1}] [TYP: [DIALOG] {vtype['type_label']}] (Czas: {start_str} - {end_str}, Mówca: '{speaker_name}'){acoustic_str}:")
+                lines.append(f"Kwestia [ID: {idx + 1}] [TYP: [DIALOG] {vtype['type_label']}]{relation_tag} (Czas: {start_str} - {end_str}, Mówca: '{speaker_name}'){acoustic_str}:")
                 if is_fast:
                     lines.append(f"  (!) TEMPO CPS ({cps:.1f} z/s, czas {duration_s:.1f}s): Szybka kwestia! Zastosuj zwięzłą kondensację Belczyka.")
 
@@ -448,8 +460,8 @@ class MultimodalTranslator:
                 if jp_text and not vtype["is_sign"]:
                     romaji_str = to_romaji(jp_text)
                     jp_display = f"{jp_text} [{romaji_str}]" if romaji_str and romaji_str != jp_text else jp_text
-                    lines.append(f"  JP (Japoński oryginał z mowy): {jp_display}")
-            lines.append(f"  EN (Napisy pomocnicze): {clean_text}")
+                    lines.append(f"  JP (GŁÓWNA KOTWICA SEMANTYCZNA - Słuchaj intencji aktora): {jp_display}")
+            lines.append(f"  EN (Pomocniczy skrypt do czasu/ogólnego sensu): {clean_text}")
 
         # 4. Podgląd przyszłych kwestii (Lookahead)
         if lookahead_events:

@@ -7,7 +7,7 @@ from typing import List, Optional, Dict, Any
 from pydantic import BaseModel, Field
 from google import genai
 from google.genai import types
-from rules import get_verifier_system_prompt
+from rules import get_verifier_system_prompt, SceneDiagnosis
 
 class RefinedLine(BaseModel):
     id: int = Field(description="ID kwestii dialogowej zgodne z wejściem")
@@ -16,6 +16,7 @@ class RefinedLine(BaseModel):
     changes_made: Optional[str] = Field(default=None, description="Krótkie uzasadnienie redakcyjne (np. 'Zmieniono kalkę Widzę na Rozumiem')")
 
 class RefinedBatchResponse(BaseModel):
+    scene_diagnosis: Optional[SceneDiagnosis] = Field(default=None, description="Diagnoza i weryfikacja intencji dramaturgicznych sceny")
     lines: List[RefinedLine] = Field(description="Lista zredagowanych i zweryfikowanych kwestii dialogowych")
 
 class DialogueVerifier:

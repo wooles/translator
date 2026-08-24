@@ -12,7 +12,8 @@ from PIL import Image
 from rules import (
     get_translation_system_prompt,
     get_verifier_system_prompt,
-    ANTI_CALQUES_GUIDE
+    ANTI_CALQUES_GUIDE,
+    SceneDiagnosis
 )
 from extract import extract_frame_at_timestamp, list_subtitle_tracks
 from verifier import RefinedLine, RefinedBatchResponse
@@ -147,6 +148,11 @@ def test_rules_and_prompts():
 
 def test_pydantic_schemas():
     print("[TEST 2/5] Weryfikacja schematów Pydantic...")
+    diag = SceneDiagnosis(
+        dramatic_context="Yoritsugu siedzi w pokoju i zazdrośnie patrzy na powitanie Tokiyukiego.",
+        dialogue_flow="Służba zaprasza do wyjścia, a Yoritsugu chłodno odmawia.",
+        audio_intent_check="W audio pada 'boku wa ii desu' co oznacza odmowę 'Ja podziękuję', a nie stan zdrowia."
+    )
     tr = LineTranslation(
         id=1,
         polish_text="Rozumiem, co masz na myśli.",
@@ -154,8 +160,14 @@ def test_pydantic_schemas():
         visual_clues="mężczyzna w mundurze",
         notes="eliminacja kalki"
     )
-    batch = BatchTranslationResponse(translations=[tr], scene_description="Testowa scena")
+    batch = BatchTranslationResponse(
+        scene_diagnosis=diag,
+        translations=[tr],
+        scene_description="Testowa scena"
+    )
     assert batch.translations[0].id == 1
+    assert batch.scene_diagnosis is not None
+    assert "Yoritsugu" in batch.scene_diagnosis.dramatic_context
 
     ref = RefinedLine(
         id=1,
@@ -163,9 +175,13 @@ def test_pydantic_schemas():
         refined_pl="Rozumiem.",
         changes_made="Poprawiono kalkę"
     )
-    ref_batch = RefinedBatchResponse(lines=[ref])
+    ref_batch = RefinedBatchResponse(
+        scene_diagnosis=diag,
+        lines=[ref]
+    )
     assert ref_batch.lines[0].refined_pl == "Rozumiem."
-    print(" -> PASSED: Schematy Pydantic są poprawne.")
+    assert ref_batch.scene_diagnosis is not None
+    print(" -> PASSED: Schematy Pydantic i SceneDiagnosis są poprawne.")
 
 def test_sanitization_and_deduplication():
     print("[TEST 3/5] Test usuwania baboli ASS i deduplikacji znaków...")
