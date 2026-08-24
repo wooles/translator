@@ -57,7 +57,7 @@ class PricingGuard:
         system_prompt_tokens = 39000  # Wielki Kanon 117 Filarów AVT w Context Cache (zweryfikowany na serwerach Google)
         batch_input_tokens = 2500      # Klatka wideo + okno kontekstowe + audio Whisper
         batch_output_f1_tokens = 1300  # Tłumaczenie JSON + Diagnoza Sceny (SceneDiagnosis)
-        batch_output_pro_tokens = 3500 # Redakcja JSON + Diagnoza Sceny + Pełna Nieskrępowana Swoboda Myślenia CoT
+        batch_output_pro_tokens = 2224 # Redakcja JSON + Diagnoza Sceny + Optymalny Budżet Myślenia (1024 tokeny)
 
         profile = profile.lower()
 

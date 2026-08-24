@@ -95,9 +95,8 @@ class DialogueVerifier:
                 gen_config_kwargs = {
                     "response_mime_type": "application/json",
                     "response_schema": RefinedBatchResponse,
-                    "temperature": 0.35,
+                    "thinking_config": types.ThinkingConfig(thinking_budget=1024),
                 }
-                # Pełna swoboda kognitywna modelu Pro (brak sztucznych limitów tokenów myślenia)
 
                 if cached_name:
                     gen_config_kwargs["cached_content"] = cached_name
