@@ -58,9 +58,10 @@ To eliminate attention drift across long video sequences, the pre-pass engine pe
 * **Dynamic Tension Matrix (`DramaticSequence`):** Maps dialogue density and emotional peaks across narrative acts, modulating lexical register accordingly.
 
 ### 2. Acoustic Grounding & $F_0$ Fundamental Frequency Diarization
-* **Fine-Tuned Japanese ASR Engine (Kotoba-Whisper v2.0 CTranslate2):** Integrates the state-of-the-art Japanese speech recognition model trained on over 35,000 hours of Japanese broadcast, drama, and conversational audio (*ReazonSpeech Corpus*). Distilled for 6.3x acceleration with sub-2GB VRAM footprint, drastically outperforming generic multilingual models in character error rate (CER) and noisy acoustic environments.
+* **Fine-Tuned Japanese ASR Engine (Kotoba-Whisper v2.0 CTranslate2):** Integrates the state-of-the-art Japanese speech recognition model trained on over 35,000 hours of Japanese broadcast, drama, and conversational audio (*ReazonSpeech Corpus*). Distilled for 6.3x acceleration with sub-2GB VRAM footprint, drastically outperforming generic multilingual models in character error rate (CER), homophone disambiguation (Kanji context priors), and noisy acoustic environments.
 * **Elimination of the English Pivot Loss:** Intermediate English subtitles are inherently lossy, frequently flattening Japanese honorifics, omitting sentence-ending epistemic particles (*Shūjoshi*), and misinterpreting cultural nuances. Grounding the translation directly in Japanese phonetic transcripts completely bypasses intermediate localization errors.
-* **Grammatical Gender & Register Disambiguation:** English pronouns (*„you”, „I”, „they”*) lack morphological gender and social stratification. Extracting spoken Japanese first-person (*Ore / Boku / Watashi / Atashi*) and second-person pronouns (*Anata / Anta / Omae / Kisama*) resolves target Polish grammatical gender, verbal inflection, and social hierarchy with 100% precision.
+* **Grammatical Gender & Register Disambiguation:** English pronouns (*„you”, „I”, „they”*) lack morphological gender and social stratification. Extracting spoken Japanese first-person (*Ore / Boku / Watashi / Atashi / Sessha*) and second-person pronouns (*Anata / Anta / Omae / Kisama*) resolves target Polish grammatical gender, verbal inflection, and social hierarchy with 100% precision.
+* **BGM & Acoustic Noise Hallucination Suppression:** Generic multilingual Whisper models frequently hallucinate repetitive non-Japanese text when background music (BGM) or sound effects (SFX) dominate. Kotoba-Whisper's specialized acoustic filters maintain high signal-to-noise ratio isolation across dynamic battle scenes.
 * **Autocorrelation Prosody & $F_0$ Estimator:** Computes vocal fundamental frequency ($F_0$) variance, acoustic intensity, and speech duration metrics, injecting paralinguistic metadata (e.g., whisper, shout, emotional breakdown) directly into LMM context tokens.
 
 ### 3. Computer Vision OCR & Spatial Subtitle Typesetter
@@ -79,8 +80,13 @@ A formal rule engine integrating audiovisual translation theory, categorized int
 
 ### 5. Enterprise KV Cache Management & Ephemeral Leases
 * **Server-Side Context Caching (KV-Cache):** Persists the ~39,000-token system instruction matrix directly in GPU VRAM, yielding a **-75%** operational discount on input token pricing.
+* **Pre-Warming & Zero Cache-Miss Resilience:** Strictly enforces `ensure_cache_ready` prior to dispatching translation batches, guaranteeing that no full-price uncached prompt requests are ever transmitted to upstream inference servers.
 * **Sliding Keep-Alive Heartbeat (20m TTL):** Employs an ephemeral sliding expiration window refreshed per batch execution (`touch_cache`), preventing cache evictions during network throttling or Google API 503 retry storms.
 * **Deterministic Resource Teardown:** Executes an explicit `cleanup_all_active_caches` teardown in `finally` execution blocks, completely eliminating passive background storage fees (**0.00 PLN idle cost**).
+
+### 6. Cognitive Saturation Calibration & Tokenomics Controls
+* **Stochastic Looping Mitigation:** Unconstrained Chain-of-Thought (CoT) reasoning on Large Reasoning Models (e.g. Gemini 3.1 Pro) exhibits diminishing returns beyond 2000 tokens per batch, entering recursive self-doubt loops that inflate output token consumption without modifying the final selected Polish sentence.
+* **Calibrated 2048-Token Thinking Ceiling:** Enforces an optimal reasoning budget (`thinking_budget=2048`) that provides full headroom for complex poetic transcreation, rhyme generation, and *Mouth-Feel* validation while preventing runaway billing, stabilizing unit translation costs at **~$0.56 / 2.25 PLN** per episode.
 
 ---
 
