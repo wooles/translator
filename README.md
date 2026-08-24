@@ -58,9 +58,10 @@ To eliminate attention drift across long video sequences, the pre-pass engine pe
 * **Dynamic Tension Matrix (`DramaticSequence`):** Maps dialogue density and emotional peaks across narrative acts, modulating lexical register accordingly.
 
 ### 2. Acoustic Grounding & $F_0$ Fundamental Frequency Diarization
-* **Local CTranslate2 ASR:** Leverages `faster-whisper` for zero-shot Japanese phonetic extraction, mitigating inaccuracies, semantic omissions, and over-localizations present in intermediate English subtitle files.
-* **Autocorrelation Prosody Estimator:** Computes vocal fundamental frequency ($F_0$) variance, acoustic intensity, and speech duration metrics, injecting paralinguistic metadata (e.g., whisper, shout, emotional breakdown) directly into LMM context tokens.
-* **Acoustic-Visual Priming:** Japo-phonetic transcriptions serve as the primary semantic anchor for context synthesis.
+* **Zero-Shot Japanese Phonetic Extraction (Faster-Whisper):** Transcribes raw *seiyū* speech directly from the audio demuxer, providing an immutable **Primary Semantic Anchor**.
+* **Elimination of the English Pivot Loss:** Intermediate English subtitles are inherently lossy, frequently flattening Japanese honorifics, omitting sentence-ending epistemic particles (*Shūjoshi*), and misinterpreting cultural nuances. Grounding the translation directly in Japanese phonetic transcripts completely bypasses intermediate localization errors.
+* **Grammatical Gender & Register Disambiguation:** English pronouns (*„you”, „I”, „they”*) lack morphological gender and social stratification. Extracting spoken Japanese first-person (*Ore / Boku / Watashi / Atashi*) and second-person pronouns (*Anata / Anta / Omae / Kisama*) resolves target Polish grammatical gender, verbal inflection, and social hierarchy with 100% precision.
+* **Autocorrelation Prosody & $F_0$ Estimator:** Computes vocal fundamental frequency ($F_0$) variance, acoustic intensity, and speech duration metrics, injecting paralinguistic metadata (e.g., whisper, shout, emotional breakdown) directly into LMM context tokens.
 
 ### 3. Computer Vision OCR & Spatial Subtitle Typesetter
 * **Keyframe Ingestion:** Extracts temporal scene frames at dialogue intervals, downscaling to 768px for optimal visual token consumption.
@@ -145,6 +146,18 @@ The engine resolves common failure modes of traditional Machine Translation (MT)
 | :--- | :--- | :--- | :--- |
 | **Jujutsu Kaisen:** *Kan'i Ryōiki (簡易領域)* | *„Prosta sfera” / „Słaba domena”* | ✅ **„Prosta Domena”** | Waneko (tłum. D. Bruszewska) |
 | **Frieren:** *Kishōkyō no Ōra (断頭台のアウラ)* | *„Aura Gilotyny” / „Aura Ścięcia”* | ✅ **„Aura od Gilotyny”** | Studio JG (tłum. A. Zychma) |
+
+---
+
+### 7. Acoustic Grounding & Sentence-Ending Particle Decoding (*Shūjoshi Precision*)
+* **Problem:** English subtitles frequently collapse distinct emotional stances into identical flat text. For example, *„I know”* can mean feminine reassurance, masculine boastful warning, or tentative wondering depending on the unwritten Japanese particle.
+* **Engine Solution:** The Whisper acoustic stream captures sentence-ending particles (*~zo, ~ze, ~wa, ~kashira, ~yo, ~ne*), allowing the engine to generate accurate Polish tone, grammatical gender, and conversational color.
+
+| Context & Acoustic Input | Ambiguous EN Subtitle | Naive MT (Text Only) | Acoustic-Grounded Translation (Engine) | Decoded Paralinguistic Nuance |
+| :--- | :--- | :--- | :--- | :--- |
+| **Audio:** *„Wakatteru wa yo.”*<br>*(Feminine assertive particle `wa yo`)* | *„I know.”* | ❌ *„Wiem.”*<br>*(Flat, ambiguous gender)* | ✅ **„Przecież wiem!” / „Doskonale zdaję sobie sprawę.”** | Feminine assertive reassurance |
+| **Audio:** *„Wakatteru zo.”*<br>*(Masculine warning particle `zo`)* | *„I know.”* | ❌ *„Wiem.”*<br>*(Missing grave warning)* | ✅ **„Wiem o tym, ostrzegam cię.” / „Zdaję sobie z tego sprawę!”** | Masculine stern warning |
+| **Audio:** *„Wakatteru no kashira?”*<br>*(Introspective feminine wonder)* | *„Do they know?”* | ❌ *„Czy oni wiedzą?”* | ✅ **„Ciekawe, czy ona zdaje sobie z tego sprawę...”** | Feminine internal contemplation |
 
 ---
 
