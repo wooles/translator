@@ -101,6 +101,14 @@ class GlossaryManager:
         return "\n".join(lines)
 
     @classmethod
+    def clean_target_term(cls, trg: str) -> str:
+        """Usuwa zbędne objaśnienia w nawiasach (np. 'Płomień Adolli (Adolla Burst)' -> 'Płomień Adolli')."""
+        if not trg:
+            return ""
+        cleaned = re.sub(r"\s*\([^)]*\)$", "", trg).strip()
+        return cleaned if cleaned else trg.strip()
+
+    @classmethod
     def apply_deterministic_overrides(
         cls,
         text: str,
@@ -109,7 +117,7 @@ class GlossaryManager:
         """
         Bezwzględny filtr deterministyczny uruchamiany po tłumaczeniu.
         Jeśli w tekście pojawi się błędna/przestarzała wersja lub pominięty termin,
-        filtr podmienia go na ustaloną polską formę.
+        filtr podmienia go na ustaloną polską formę BEZ dublowania i bez wstawek w nawiasach.
         """
         if not text or not glossary_dict:
             return text, []
@@ -117,8 +125,19 @@ class GlossaryManager:
         modified = text
         applied_fixes = []
 
-        for src, trg in glossary_dict.items():
-            if not src or not trg or src.lower() == trg.lower():
+        # Sortujemy słownik od najdłuższych fraz do najkrótszych (aby "Shinra Bansho Man" miał pierwszeństwo przed "Shinra Bansho")
+        sorted_glossary = sorted(glossary_dict.items(), key=lambda kv: len(kv[0]), reverse=True)
+
+        for src, raw_trg in sorted_glossary:
+            if not src or not raw_trg:
+                continue
+
+            trg = cls.clean_target_term(raw_trg)
+            if not trg or src.lower() == trg.lower():
+                continue
+
+            # Zabezpieczenie: jeśli termin docelowy już znajduje się w tekście w tej samej frazie, nie dublujemy
+            if trg.lower() in modified.lower() and src.lower() in trg.lower():
                 continue
 
             # Jeśli w przetłumaczonym tekście ostał się angielski termin (nieprzetłumaczony)
@@ -126,5 +145,9 @@ class GlossaryManager:
             if pattern_src.search(modified):
                 modified = pattern_src.sub(trg, modified)
                 applied_fixes.append(f"Wymuszenie słownika: '{src}' -> '{trg}'")
+
+        # Czyszczenie ewentualnych zduplikowanych nawiasów (np. "(XYZ) (XYZ)" -> "")
+        modified = re.sub(r"\(([^)]+)\)\s*\(\1\)", r"(\1)", modified)
+        modified = re.sub(r"\s+", " ", modified).strip()
 
         return modified, applied_fixes

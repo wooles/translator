@@ -183,7 +183,7 @@ Twoim zadaniem jest dogłębna, wszechstronna analiza 100% skryptu całego odcin
 3. CHRONOLOGICZNA MAPA SEKWENCJI DRAMATURGICZNYCH (dramatic_sequences): Podziel odcinek na 3-4 akty/sekwencje czasowe z opisem napięcia i tonu.
 4. KARTOTEKA OBSADY I UNIKALNE IDIOLEKTY (character_dossiers): Określ wiek, status, japońskie zaimki 'ja' (Ore/Boku/Watashi) i unikalny polski rejestr mowy każdej postaci.
 5. TABELA ODMIANY IMION PRZEZ PRZYPADKI (name_declensions) & MATRYCA RELACJI I TYTULATURY (characters).
-6. SŁOWNICZEK POJĘĆ BRANŻOWYCH (glossary) ORAZ JAPOŃSKICH PRZYSŁÓW/IDIOMÓW (yojijukugo_and_idioms).
+6. SŁOWNICZEK POJĘĆ BRANŻOWYCH (glossary) ORAZ JAPOŃSKICH PRZYSŁÓW/IDIOMÓW (yojijukugo_and_idioms): Podawaj wyłącznie CZYSTE, DOCELOWE polskie nazwy własne i terminy bez żadnych dopisków w nawiasach (ZAKAZ: 'Shinra Bansho (Wszelkie Stworzenie)', 'Płomień Adolli (Adolla Burst)'; WYMÓG: 'Shinra Banshō', 'Płomień Adolli').
 7. EPOKA, REALIA ŚWIATA I DZIEDZINA SPECJALISTYCZNA.
 
 METADANE Z BAZY ANILIST:

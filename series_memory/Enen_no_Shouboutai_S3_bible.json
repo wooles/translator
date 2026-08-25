@@ -2,13 +2,13 @@
   "anime_title": "Enen no Shouboutai S3",
   "characters": {
     "Shinra -> Haumea": {
-      "description": "Zwrot: 'Haumea' (bohater -> antagonista)"
+      "description": "Zwrot: 'na ty / Haumea' (zbawca -> uratowana kapłanka)"
     },
     "Sho -> Shinra": {
-      "description": "Zwrot: 'bracie' (bracia (młodszy brat do starszego))"
+      "description": "Zwrot: 'bracie (Nii-san)' (młodszy brat -> starszy brat)"
     },
     "Shinra -> Sho": {
-      "description": "Zwrot: 'Sho' (bracia (starszy brat do młodszego))"
+      "description": "Zwrot: 'Sho / braciszku' (starszy brat -> młodszy brat)"
     },
     "Shinra -> Obi": {
       "description": "Zwrot: 'Kapitanie Obi / Kapitan' (podwładny -> dowódca)"
@@ -23,26 +23,50 @@
       "description": "Zwrot: 'kapitanie / panie kapitanie' (podwładny -> dowódca)"
     },
     "Haumea -> Shinra": {
-      "description": "Zwrot: 'Shinra / młody zbawco' (antagonista / wcielenie rozpaczy -> Filar / zbawca)"
+      "description": "Zwrot: 'Shinra Bansho Man / Boże' (antagonistka / wyznawczyni rozpaczy wobec zbawiciela)"
     },
     "Obi -> Obywatele": {
       "description": "Zwrot: 'proszę państwa / spokojnie' (kapitan Brygady -> cywile)"
+    },
+    "Arthur -> Shinra": {
+      "description": "Zwrot: 'głupcze / diable / bohaterze' (rywal / przyjaciel)"
+    },
+    "Charon -> Haumea": {
+      "description": "Zwrot: 'Haumea / mała' (oddany strażnik -> podopieczna)"
+    },
+    "Inca -> Shinra": {
+      "description": "Zwrot: 'Shinra / Shinra-kun / Bohaterze' (natrętna adoratorka / rywalka -> zbawca)"
+    },
+    "Iris -> Shinra": {
+      "description": "Zwrot: 'panie Shinra (Shinra-san)' (towarzysze broni / wzajemna sympatia)"
+    },
+    "Hibana -> Iris": {
+      "description": "Zwrot: 'Iris / siostrzyczko' (starsza przybrana siostra -> młodsza siostra)"
     }
   },
   "glossary": {
     "Fire Force / Fire Soldiers": "Specjalne Siły Pożarnicze / Strażacy",
     "The Great Cataclysm": "Wielki Kataklizm",
-    "Evangelist": "Ewangelista",
+    "Evangelist": "Ewangelistka",
     "Collective Unconscious": "zbiorowa podświadomość",
     "Amaterasu": "Amaterasu",
     "Infernals": "Męczennicy",
     "Látom": "Látom",
-    "Great Cataclysm": "Wielki Kataklizm",
+    "Great Cataclysm": "Wielki Kataklizmus / Wielka Katastrofa",
     "Pillar": "Filar",
     "Collective unconscious": "Zbiorowa nieświadomość",
     "Pillars": "Filary",
     "Fire Soldier": "strażak / strażak ogniowy",
-    "Despair Saintess / Saint": "Święta Rozpaczy / Święta"
+    "Despair Saintess / Saint": "Święta Rozpaczy / Święta",
+    "Adolla Burst": "Płomień Adolli",
+    "Shinra Bansho": "Shinra Banshō",
+    "Despair Saintess": "Święta Rozpaczy",
+    "Soul Resonance": "Rezonans Dusz",
+    "Shinra Bansho Man": "Shinra Banshō-man",
+    "Spontaneous Human Combustion": "Zjawisko samozapłonu ludzi",
+    "World Hero Force": "Korpus Bohaterów Świata",
+    "42-42-564": "42-42-564",
+    "Excalibur": "Ekskalibur"
   },
   "relationships": {},
   "episodes_translated": [
@@ -50,6 +74,8 @@
     "tmpp115zk2e",
     "tmpkmapjaze",
     "tmp3q0tgomw",
-    "tmpkszqixci"
+    "tmpkszqixci",
+    "tmp8jp2myh5",
+    "tmph43s0kjf"
   ]
 }
