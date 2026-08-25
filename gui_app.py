@@ -33,7 +33,8 @@ from PySide6.QtWidgets import (
     QLabel, QPushButton, QProgressBar, QTextEdit, QTableWidget,
     QTableWidgetItem, QHeaderView, QRadioButton, QButtonGroup,
     QCheckBox, QFileDialog, QMessageBox, QDialog, QLineEdit,
-    QComboBox, QGroupBox, QSplitter, QFrame, QScrollArea, QTabWidget
+    QComboBox, QGroupBox, QSplitter, QFrame, QScrollArea, QTabWidget,
+    QMenu
 )
 
 # Załadowanie zmiennych środowiskowych (.env)
@@ -814,12 +815,24 @@ class MainWindow(QMainWindow):
         self.table_live.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
         self.table_live.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)
         self.table_live.cellDoubleClicked.connect(self.on_live_cell_double_clicked)
+        self.table_live.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.table_live.customContextMenuRequested.connect(self.on_live_table_context_menu)
         live_layout.addWidget(self.table_live)
 
         h_live_btns = QHBoxLayout()
-        btn_edit_line = QPushButton("✍️ Popraw zaznaczoną kwestię (Ucz z korekty)")
+        btn_edit_line = QPushButton("✍️ Popraw kwestię...")
         btn_edit_line.clicked.connect(self.edit_selected_live_line)
+        
+        btn_quick_learn = QPushButton("⚡ 1-Click Learn (Zapamiętaj regułę)")
+        btn_quick_learn.setStyleSheet("background-color: #2b6cb0; color: white; font-weight: bold;")
+        btn_quick_learn.clicked.connect(self.quick_learn_selected_line)
+
+        btn_play_scene = QPushButton("🎬 Odtwórz scenę w wideo")
+        btn_play_scene.clicked.connect(self.play_selected_scene)
+
         h_live_btns.addWidget(btn_edit_line)
+        h_live_btns.addWidget(btn_quick_learn)
+        h_live_btns.addWidget(btn_play_scene)
         h_live_btns.addStretch()
         live_layout.addLayout(h_live_btns)
 
@@ -1044,6 +1057,84 @@ class MainWindow(QMainWindow):
 
     def on_live_cell_double_clicked(self, row: int, column: int):
         self._open_correction_for_row(row)
+
+    def on_live_table_context_menu(self, pos):
+        row = self.table_live.rowAt(pos.y())
+        if row < 0:
+            return
+        self.table_live.selectRow(row)
+
+        menu = QMenu(self)
+        act_edit = menu.addAction("✍️ Popraw i utwórz regułę...")
+        act_quick = menu.addAction("⚡ 1-Click Learn (Błyskawiczne uczenie)")
+        act_play = menu.addAction("🎬 Odtwórz tę scenę w wideo")
+
+        action = menu.exec(self.table_live.viewport().mapToGlobal(pos))
+        if action == act_edit:
+            self._open_correction_for_row(row)
+        elif action == act_quick:
+            self.quick_learn_selected_line()
+        elif action == act_play:
+            self.play_selected_scene()
+
+    def quick_learn_selected_line(self):
+        row = self.table_live.currentRow()
+        if row < 0 or row >= self.table_live.rowCount():
+            QMessageBox.warning(self, "Wybór", "Zaznacz w tabeli kwestię, z której chcesz utworzyć regułę uczenia!")
+            return
+
+        orig_en = self.table_live.item(row, 1).text() if self.table_live.item(row, 1) else ""
+        cur_pl = self.table_live.item(row, 2).text() if self.table_live.item(row, 2) else ""
+
+        if not orig_en or not cur_pl:
+            return
+
+        try:
+            from user_feedback import UserFeedbackManager
+            from glossary_manager import GlossaryManager
+
+            fb = UserFeedbackManager()
+            fb.add_feedback(
+                original_en=orig_en,
+                bad_pl=orig_en,
+                good_pl=cur_pl,
+                rule_reason=f"Żelazne tłumaczenie kwestii: '{orig_en}' -> '{cur_pl}'"
+            )
+
+            # Jeśli kwestia jest krótka (1-3 słowa), dodajemy także do słownika deterministycznego
+            if len(orig_en.split()) <= 3:
+                gm = GlossaryManager()
+                gm.add_term(src=orig_en, pl=cur_pl, desc="Reguła 1-Click z GUI")
+
+            self.log(f"⚡ [1-Click Learn] Zapisano złotą regułę: '{orig_en}' => '{cur_pl}'")
+            QMessageBox.information(
+                self,
+                "Zapisano Regułę",
+                f"Pomyślnie zapisano regułę uczenia AI:\n\n'{orig_en}' ➔ '{cur_pl}'\n\nBędzie ona automatycznie egzekwowana we wszystkich kolejnych odcinkach!"
+            )
+        except Exception as e:
+            QMessageBox.critical(self, "Błąd", f"Nie udało się zapisać reguły: {e}")
+
+    def play_selected_scene(self):
+        row = self.table_live.currentRow()
+        if row < 0:
+            QMessageBox.warning(self, "Wybór", "Zaznacz kwestię w tabeli, którą chcesz odtworzyć!")
+            return
+
+        video_path = None
+        if self.files_queue:
+            video_path = self.files_queue[0].get("video")
+
+        if not video_path or not os.path.exists(video_path):
+            QMessageBox.information(self, "Brak wideo", "Brak powiązanego pliku wideo dla tej sesji tłumaczenia.")
+            return
+
+        try:
+            # Uruchomienie domyślnego odtwarzacza wideo w systemie Windows
+            os.startfile(str(video_path))
+            self.log(f"🎬 Uruchomiono odtwarzacz wideo: {Path(video_path).name}")
+        except Exception as e:
+            QMessageBox.warning(self, "Błąd", f"Nie udało się otworzyć wideo: {e}")
 
     def edit_selected_live_line(self):
         row = self.table_live.currentRow()

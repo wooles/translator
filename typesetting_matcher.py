@@ -85,9 +85,31 @@ class TypesettingColorMatcher:
         return None
 
     @classmethod
+    def calculate_optimal_sign_position(cls, sign_type: str = "sign", region: Optional[str] = None) -> str:
+        """
+        Wylicza optymalne tagi pozycjonowania ASS (\\anX / \\pos), aby napis ekranowy (szyld, tablica, list, SMS)
+        nie kolidował z głównym dialogiem na dole ekranu.
+        """
+        st = (sign_type or "").lower()
+        reg = (region or "").lower()
+
+        if "header" in st or "title" in st or "tytuł" in st or reg == "top":
+            return r"{\an8\pos(960,100)}"
+        elif "left" in st or reg == "top_left":
+            return r"{\an7\pos(150,150)}"
+        elif "right" in st or reg == "top_right":
+            return r"{\an9\pos(1770,150)}"
+        elif "center" in st or "card" in st or "phone" in st or "sms" in st or "letter" in st or "list" in st:
+            return r"{\an5\pos(960,540)}"
+        elif "screen" in st or "sign" in st or "plansza" in st:
+            return r"{\an8\pos(960,120)}"
+        else:
+            return r"{\an8}"
+
+    @classmethod
     def enhance_typesetting_prefix(cls, original_prefix: str, image_path: Optional[str] = None) -> str:
         """
-        Wzbogaca prefiks tagów ASS o kolor {\1c&H...&} pobrany z obrazu,
+        Wzbogaca prefiks tagów ASS o kolor {\\1c&H...&} pobrany z obrazu,
         jeśli w tagach nie ma jeszcze zdefiniowanego koloru.
         """
         if not original_prefix:
@@ -106,3 +128,33 @@ class TypesettingColorMatcher:
                 return f"{color_tag}{original_prefix}"
 
         return original_prefix
+
+    @classmethod
+    def enhance_sign_typesetting(
+        cls,
+        original_prefix: str = "",
+        sign_type: str = "sign",
+        image_path: Optional[str] = None,
+        region: Optional[str] = None
+    ) -> str:
+        """
+        Kompleksowe formatowanie Typesetting 2.0:
+        1. Nadaje bezpieczną pozycję (np. góra ekranu \\an8 lub środek \\an5), jeśli brak pozycji.
+        2. Pobiera adaptacyjny kolor z wycinka klatki wideo.
+        3. Dodaje czytelny obrys i pogrubienie.
+        """
+        prefix = original_prefix or ""
+
+        # 1. Pozycjonowanie, jeśli brak tagu wyrównania / pozycji
+        if not (r"\an" in prefix or r"\pos" in prefix):
+            pos_tag = cls.calculate_optimal_sign_position(sign_type=sign_type, region=region)
+            prefix = f"{pos_tag}{prefix}"
+
+        # 2. Kolorowanie z obrazu
+        prefix = cls.enhance_typesetting_prefix(prefix, image_path=image_path)
+
+        # 3. Zapewnienie obrysu, jeśli brak
+        if r"\3c&H" not in prefix:
+            prefix = f"{{\\3c&H000000&\\bord2}}{prefix}"
+
+        return prefix

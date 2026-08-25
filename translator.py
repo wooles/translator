@@ -232,6 +232,60 @@ def sanitize_sub_text(text: str, is_ass: bool = True) -> str:
     text = re.sub(r"[ \t]+", " ", text).strip()
     return text
 
+def is_song_line(ev: Any, text: str) -> bool:
+    """Wykrywa, czy dana kwestia jest wersem piosenki (OP/ED/Theme/Song/Karaoke) lub tekstem z nutkami."""
+    if not text:
+        return False
+    style_name = (getattr(ev, "style", "") or "").lower()
+    song_style_keywords = ["op", "ed", "song", "theme", "insert", "karaoke", "romaji", "kanji", "piosenka", "śpiew", "music"]
+    if any(k in style_name for k in song_style_keywords):
+        return True
+    if any(sym in text for sym in ["♪", "♫", "🎶", "♬"]):
+        return True
+    return False
+
+def apply_simultaneous_dialogue_formatting(events: List[Any]) -> List[Any]:
+    """
+    Formatowanie Kwestii Symultanicznych (Standard AVT):
+    Gdy dwie różne postacie mówią jednocześnie w nakładającym się czasie,
+    dodaje dywizy dialogowe (- Kwestia), aby widz natychmiast odróżnił równoległe głosy.
+    """
+    if len(events) < 2:
+        return events
+
+    # Sortowanie chronologiczne
+    sorted_events = sorted(events, key=lambda e: e.start)
+    n = len(sorted_events)
+    simultaneous_indices = set()
+
+    for i in range(n):
+        ev_a = sorted_events[i]
+        # Pomijamy plansze ekranowe i piosenki
+        if (ev_a.style or "").lower() in ["sign", "signs", "title"] or "♪" in ev_a.text or r"\an8" in ev_a.text:
+            continue
+        for j in range(i + 1, n):
+            ev_b = sorted_events[j]
+            if (ev_b.style or "").lower() in ["sign", "signs", "title"] or "♪" in ev_b.text or r"\an8" in ev_b.text:
+                continue
+            if ev_b.start >= ev_a.end - 150:
+                break  # kolejne są już później
+
+            # Nakładanie się w czasie o co najmniej 300 ms
+            overlap = min(ev_a.end, ev_b.end) - max(ev_a.start, ev_b.start)
+            if overlap >= 300:
+                simultaneous_indices.add(i)
+                simultaneous_indices.add(j)
+
+    for idx in simultaneous_indices:
+        ev = sorted_events[idx]
+        ts_prefix, clean_body = extract_typesetting_tags(ev.text)
+        if not clean_body or clean_body.startswith(("-", "–", "—", "[", "(")):
+            continue
+        # Dodajemy dywiz dialogowy AVT
+        ev.text = f"{ts_prefix}- {clean_body}" if ts_prefix else f"- {clean_body}"
+
+    return sorted_events
+
 class CharacterInfo(BaseModel):
     name: str = Field(description="Imię lub określenie postaci (np. 'Arata', 'Minami', 'Nauczyciel')")
     gender: str = Field(description="Płeć postaci: 'mężczyzna', 'kobieta' lub 'inna'")
@@ -1100,7 +1154,7 @@ class MultimodalTranslator:
                         "is_sign": vtype["is_sign"],
                         "visual_type": vtype["type_label"],
                         "visual_details": vtype["visual_details"],
-                        "is_song": ("♪" in clean_en or "♫" in clean_en or "song" in event.style.lower() or "karaoke" in event.style.lower())
+                        "is_song": is_song_line(event, clean_en)
                     })
 
                 # 6. Opcjonalna II faza weryfikatora (Redakcja Literacka)
@@ -1132,6 +1186,10 @@ class MultimodalTranslator:
                         )
                         # Deterministyczny filtr terminologiczny
                         final_text, gloss_fixes = GlossaryManager.apply_deterministic_overrides(final_text, combined_glossary)
+                        if item.get("is_song"):
+                            clean_no_notes = re.sub(r"^[♪♫♬\s]+|[♪♫♬\s]+$", "", final_text).strip()
+                            if clean_no_notes:
+                                final_text = f"♪ {clean_no_notes} ♪"
                         for fix in fixes + gloss_fixes:
                             pbar.write(f"  [AVT Linter/Słownik] {fix}")
                         formatted_final = split_subtitle_syntactically(final_text, max_line_len=42, is_ass=is_ass, is_sign=item.get("is_sign", False))
@@ -1150,6 +1208,10 @@ class MultimodalTranslator:
                         )
                         # Deterministyczny filtr terminologiczny
                         final_text, gloss_fixes = GlossaryManager.apply_deterministic_overrides(final_text, combined_glossary)
+                        if item.get("is_song"):
+                            clean_no_notes = re.sub(r"^[♪♫♬\s]+|[♪♫♬\s]+$", "", final_text).strip()
+                            if clean_no_notes:
+                                final_text = f"♪ {clean_no_notes} ♪"
                         for fix in fixes + gloss_fixes:
                             pbar.write(f"  [AVT Linter/Słownik] {fix}")
                         formatted_final = split_subtitle_syntactically(final_text, max_line_len=42, is_ass=is_ass, is_sign=item.get("is_sign", False))
@@ -1238,6 +1300,9 @@ class MultimodalTranslator:
             new_event = orig_event.copy()
             new_event.text = full_event_text
             final_subs.events.append(new_event)
+
+        # 7.0. Diarizacja dialogów symultanicznych (Simultaneous Dialogue AVT)
+        final_subs.events = apply_simultaneous_dialogue_formatting(final_subs.events)
 
         # 7.1. Wizyjny Detektor Brakujących Plansz (Visual Sign Detector & OCR)
         if video_path and os.path.exists(video_path):

@@ -1099,6 +1099,54 @@ def test_masterclass_next_gen():
 
     print(" -> PASSED: Moduły Masterclass (Piosenki Barańczaka, Matryca Idiolektów, SceneShotSnapper, Hard Cache Lock) działają w 100%.")
 
+def test_masterclass_2_innovations():
+    print("[TEST 31/31] Test innowacji Masterclass 2.0 (Transkreacja OP/ED, Typesetting 2.0, Diarizacja Symultaniczna, 1-Click Learn)...")
+    import pysubs2
+    from translator import is_song_line, apply_simultaneous_dialogue_formatting
+    from typesetting_matcher import TypesettingColorMatcher
+    from user_feedback import UserFeedbackManager
+    from glossary_manager import GlossaryManager
+
+    # 1. Test detekcji piosenek
+    ev_song = pysubs2.SSAEvent(start=1000, end=3000, text="Fly high into the sky", style="OP_Roman")
+    ev_dialog = pysubs2.SSAEvent(start=4000, end=6000, text="Where are you going?", style="Default")
+    assert is_song_line(ev_song, ev_song.text) is True
+    assert is_song_line(ev_dialog, ev_dialog.text) is False
+    assert is_song_line(ev_dialog, "♪ Lalala ♪") is True
+
+    # 2. Test Typesetting Wizualny 2.0
+    pos_top = TypesettingColorMatcher.calculate_optimal_sign_position(sign_type="header")
+    assert r"\an8\pos(960,100)" in pos_top
+    pos_center = TypesettingColorMatcher.calculate_optimal_sign_position(sign_type="phone_sms")
+    assert r"\an5\pos(960,540)" in pos_center
+
+    enhanced = TypesettingColorMatcher.enhance_sign_typesetting(
+        original_prefix=r"{\fs24}[ ",
+        sign_type="header"
+    )
+    assert r"\an8" in enhanced or r"\pos" in enhanced
+    assert r"\3c&H" in enhanced
+
+    # 3. Test Diarizacji Dialogów Symultanicznych (Simultaneous Dialogue AVT)
+    ev_sim1 = pysubs2.SSAEvent(start=10000, end=13000, text="Uważaj z lewej strony!", style="Default")
+    ev_sim2 = pysubs2.SSAEvent(start=10200, end=13200, text="Już za późno!", style="Default")
+    formatted_sim = apply_simultaneous_dialogue_formatting([ev_sim1, ev_sim2])
+    assert formatted_sim[0].text.startswith("- ")
+    assert formatted_sim[1].text.startswith("- ")
+
+    # 4. Test 1-Click Learn
+    fb = UserFeedbackManager()
+    fb.add_feedback(
+        original_en="All creation",
+        bad_pl="Wszelkie Stworzenie (Wszelkie Stworzenie)",
+        good_pl="Wszelkie Stworzenie",
+        rule_reason="Eliminacja dublowania"
+    )
+    all_fb = fb.list_all()
+    assert any(f.get("original_en") == "All creation" for f in all_fb)
+
+    print(" -> PASSED: Innowacje Masterclass 2.0 (OP/ED Song, Typesetting 2.0, Diarizacja Symultaniczna, 1-Click Learn) działają w 100%.")
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -1131,5 +1179,6 @@ if __name__ == "__main__":
     test_masterpieces_and_semiotics_pillars()
     test_translator_logger_and_sign_detector()
     test_masterclass_next_gen()
-    print("\n Wszystkie testy jednostkowe i integracyjne (30/30) zakończone pełnym sukcesem!\n")
+    test_masterclass_2_innovations()
+    print("\n Wszystkie testy jednostkowe i integracyjne (31/31) zakończone pełnym sukcesem!\n")
 

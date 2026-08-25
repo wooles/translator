@@ -182,7 +182,18 @@ Zwróć wynik w formacie JSON zgodnym ze schematem DetectedSign."""
                                 event_start = gap_start + 250
                                 event_end = event_start + max(2000, event_duration)
 
-                                styled_text = r"{\an8\fs26\bord1.5\shad1\c&HFFFFFF&\3c&H101020&}[ " + clean_pl + r" ]"
+                                try:
+                                    from typesetting_matcher import TypesettingColorMatcher
+                                    base_prefix = r"{\fs26\bord2\shad1}[ "
+                                    enhanced_prefix = TypesettingColorMatcher.enhance_sign_typesetting(
+                                        original_prefix=base_prefix,
+                                        sign_type="header",
+                                        image_path=frame_path,
+                                        region="top"
+                                    )
+                                    styled_text = f"{enhanced_prefix}{clean_pl} ]"
+                                except Exception:
+                                    styled_text = r"{\an8\fs26\bord1.5\shad1\c&HFFFFFF&\3c&H101020&}[ " + clean_pl + r" ]"
                                 
                                 new_ev = pysubs2.SSAEvent(
                                     start=event_start,
