@@ -8,11 +8,16 @@ tłumaczyć bezpośrednio ze źródła z pominięciem błędów w napisach angie
 
 import os
 import sys
+import warnings
 import logging
 from pathlib import Path
 from typing import Optional, Dict, List, Tuple, Any
 
 os.environ["HF_HUB_DISABLE_SYMLINKS_WARNING"] = "1"
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
+warnings.filterwarnings("ignore", category=UserWarning, module="huggingface_hub")
+warnings.filterwarnings("ignore", category=FutureWarning)
+logging.getLogger("huggingface_hub").setLevel(logging.ERROR)
 
 logger = logging.getLogger("whisper_engine")
 

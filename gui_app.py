@@ -11,6 +11,16 @@ Zawiera:
 
 import os
 import sys
+import warnings
+import logging
+
+# Wyciszenie ostrzeżeń Hugging Face Hub, symlinków i nieszkodliwych powiadomień
+os.environ["HF_HUB_DISABLE_SYMLINKS_WARNING"] = "1"
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
+warnings.filterwarnings("ignore", category=UserWarning, module="huggingface_hub")
+warnings.filterwarnings("ignore", category=FutureWarning)
+logging.getLogger("huggingface_hub").setLevel(logging.ERROR)
+
 import json
 import time
 from pathlib import Path
