@@ -12,6 +12,8 @@ import logging
 from pathlib import Path
 from typing import Optional, Dict, List, Tuple, Any
 
+os.environ["HF_HUB_DISABLE_SYMLINKS_WARNING"] = "1"
+
 logger = logging.getLogger("whisper_engine")
 
 try:
