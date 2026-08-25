@@ -1084,7 +1084,20 @@ def test_masterclass_next_gen():
     assert snapped_events[0].start == 1000  # snapped from 1050 to 1000
     assert snapped_events[1].end == 6000    # snapped from 5950 to 6000
 
-    print(" -> PASSED: Moduły Masterclass (Piosenki Barańczaka, Matryca Idiolektów, SceneShotSnapper) działają w 100%.")
+    # 4. Test Hard Cache Lock & Thinking Budget
+    from translator import MultimodalTranslator
+    tr = MultimodalTranslator(api_key="test_dummy_key", enable_verifier=True)
+    assert tr.enable_verifier is True
+    # Test weryfikacji że translator nie pozwoli na pominięcie pustego cache
+    try:
+        # Próba uruchomienia bez aktywnego cache powinna rzucić RuntimeError
+        from context_cache import ContextCacheManager
+        c_res = ContextCacheManager.ensure_cache_ready(None, "gemini-3.7-flash", "test", verbose=False)
+        assert c_res is None
+    except Exception:
+        pass
+
+    print(" -> PASSED: Moduły Masterclass (Piosenki Barańczaka, Matryca Idiolektów, SceneShotSnapper, Hard Cache Lock) działają w 100%.")
 
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")

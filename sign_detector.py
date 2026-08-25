@@ -161,7 +161,8 @@ Zwróć wynik w formacie JSON zgodnym ze schematem DetectedSign."""
                             config=types.GenerateContentConfig(
                                 response_mime_type="application/json",
                                 response_schema=DetectedSign,
-                                temperature=0.1
+                                temperature=0.1,
+                                thinking_config=types.ThinkingConfig(thinking_budget=0)
                             )
                         )
                         current_model_idx = m_idx

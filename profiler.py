@@ -222,7 +222,8 @@ Zwróć wynik w formacie JSON zgodnym ze schematem EpisodeProfile."""
                     config=types.GenerateContentConfig(
                         response_mime_type="application/json",
                         response_schema=EpisodeProfile,
-                        temperature=0.2
+                        temperature=0.2,
+                        thinking_config=types.ThinkingConfig(thinking_budget=0)
                     )
                 )
                 profile_data = json.loads(response.text)

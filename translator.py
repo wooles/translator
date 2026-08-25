@@ -511,6 +511,13 @@ class MultimodalTranslator:
                     "response_schema": schema_class,
                     "temperature": 0.25,
                 }
+                if self.enable_verifier:
+                    # Faza 1 to szkic i ekstrakcja danych – wyłączamy zbędne myślenie (0 tokenów),
+                    # bo pełną reżyserię i analizę 119 Filarów wykonuje Faza 2 (Gemini 3.1 Pro z budżetem 2048 tokenów)
+                    gen_config_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=0)
+                else:
+                    gen_config_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=1024)
+
                 if cached_name:
                     gen_config_kwargs["cached_content"] = cached_name
                 else:
@@ -803,12 +810,23 @@ class MultimodalTranslator:
         if user_rules_cnt > 0:
             print(f"  [Korekty Użytkownika]: Wczytano {user_rules_cnt} złotych reguł (Few-Shot Prompting).")
 
-        # 0e. Pre-warming i Weryfikacja Context Cache (Gwarancja rabatu -75% przed startem paczek)
+        # 0e. Pre-warming i Twarda Blokada Portfela Context Cache (Gwarancja rabatu -75%)
         from context_cache import ContextCacheManager
         print(f"  [Infrastruktura Finansowa]: Weryfikacja i rozgrzewanie pamięci Context Cache...")
-        ContextCacheManager.ensure_cache_ready(self.client, self.model_phase1, self.system_prompt)
+        c1 = ContextCacheManager.ensure_cache_ready(self.client, self.model_phase1, self.system_prompt)
+        if not c1:
+            raise RuntimeError(
+                f"KATEGORYCZNA BLOKADA FINANSOWA: Nie udało się aktywować serwerowego Context Cache dla {self.model_phase1}. "
+                "Aby uchronić Twój portfel przed naliczeniem 4-krotnie wyższej stawki pełnej ($1.25/1M), proces został bezpiecznie wstrzymany. "
+                "Sprawdź połączenie z Google API lub stan konta i spróbuj ponownie."
+            )
         if self.verifier and hasattr(self.verifier, "client") and hasattr(self.verifier, "model") and hasattr(self.verifier, "system_prompt"):
-            ContextCacheManager.ensure_cache_ready(self.verifier.client, self.verifier.model, self.verifier.system_prompt)
+            c2 = ContextCacheManager.ensure_cache_ready(self.verifier.client, self.verifier.model, self.verifier.system_prompt)
+            if not c2:
+                raise RuntimeError(
+                    f"KATEGORYCZNA BLOKADA FINANSOWA: Nie udało się aktywować serwerowego Context Cache dla weryfikatora ({self.verifier.model}). "
+                    "Aby uchronić Twój portfel przed naliczeniem 4-krotnie wyższej stawki pełnej, proces został bezpiecznie wstrzymany."
+                )
 
         if episode_profile:
             if not manga_canon_entry and episode_profile.manga_canon_source:
