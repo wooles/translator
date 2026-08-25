@@ -1300,8 +1300,14 @@ class MultimodalTranslator:
             f1_stats = self.current_episode_tokens
             f2_stats = self.verifier.current_episode_tokens if self.verifier else None
             actual_cost_pln = PricingGuard.calculate_actual_cost_pln(f1_stats, f2_stats)
+            cost_f1_pln = PricingGuard.calculate_actual_cost_pln(f1_stats, None)
+            cost_f2_pln = max(0.0, actual_cost_pln - cost_f1_pln) if f2_stats else 0.0
+            
             print("─" * 60)
-            print(f"  💰 Rzeczywisty łączny koszt całego odcinka (100%): {actual_cost_pln:.2f} PLN")
+            print(f"  💰 RZECZYWISTY KOSZT ODCINKA: {actual_cost_pln:.2f} PLN")
+            print(f"  ├─ Faza 1 (Szkic/OCR): {cost_f1_pln:.2f} PLN [Prompt: {f1_stats.get('prompt',0)} (Cached: {f1_stats.get('cached',0)}), Wyjście: {f1_stats.get('output',0)}]")
+            if f2_stats:
+                print(f"  └─ Faza 2 (Reżyseria Pro): {cost_f2_pln:.2f} PLN [Prompt: {f2_stats.get('prompt',0)} (Cached: {f2_stats.get('cached',0)}), Wyjście+CoT 2048: {f2_stats.get('output',0)}]")
             print("─" * 60)
         except Exception:
             pass
