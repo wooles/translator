@@ -155,15 +155,18 @@ Zwróć wynik w formacie JSON zgodnym ze schematem DetectedSign."""
                 for m_idx in range(current_model_idx, len(candidate_models)):
                     cur_model = candidate_models[m_idx]
                     try:
+                        gen_cfg_kwargs = {
+                            "response_mime_type": "application/json",
+                            "response_schema": DetectedSign,
+                            "temperature": 0.1,
+                        }
+                        if "3.7" in cur_model.lower() or "3.1-pro" in cur_model.lower():
+                            gen_cfg_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=0)
+
                         response = client.models.generate_content(
                             model=cur_model,
                             contents=[prompt, pil_img],
-                            config=types.GenerateContentConfig(
-                                response_mime_type="application/json",
-                                response_schema=DetectedSign,
-                                temperature=0.1,
-                                thinking_config=types.ThinkingConfig(thinking_budget=0)
-                            )
+                            config=types.GenerateContentConfig(**gen_cfg_kwargs)
                         )
                         current_model_idx = m_idx
                         consecutive_errors = 0

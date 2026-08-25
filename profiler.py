@@ -216,15 +216,18 @@ Zwróć wynik w formacie JSON zgodnym ze schematem EpisodeProfile."""
             attempt += 1
             current_model = candidate_models[current_model_idx]
             try:
+                gen_config_kwargs = {
+                    "response_mime_type": "application/json",
+                    "response_schema": EpisodeProfile,
+                    "temperature": 0.2,
+                }
+                if "3.7" in current_model.lower() or "3.1-pro" in current_model.lower():
+                    gen_config_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=0)
+
                 response = self.client.models.generate_content(
                     model=current_model,
                     contents=prompt,
-                    config=types.GenerateContentConfig(
-                        response_mime_type="application/json",
-                        response_schema=EpisodeProfile,
-                        temperature=0.2,
-                        thinking_config=types.ThinkingConfig(thinking_budget=0)
-                    )
+                    config=types.GenerateContentConfig(**gen_config_kwargs)
                 )
                 profile_data = json.loads(response.text)
                 profile = EpisodeProfile.model_validate(profile_data)

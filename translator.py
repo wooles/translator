@@ -511,12 +511,11 @@ class MultimodalTranslator:
                     "response_schema": schema_class,
                     "temperature": 0.25,
                 }
-                if self.enable_verifier:
-                    # Faza 1 to szkic i ekstrakcja danych – wyłączamy zbędne myślenie (0 tokenów),
-                    # bo pełną reżyserię i analizę 119 Filarów wykonuje Faza 2 (Gemini 3.1 Pro z budżetem 2048 tokenów)
-                    gen_config_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=0)
-                else:
-                    gen_config_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=1024)
+                if "3.7" in current_model.lower() or "3.1-pro" in current_model.lower():
+                    if self.enable_verifier:
+                        gen_config_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=0)
+                    else:
+                        gen_config_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=1024)
 
                 if cached_name:
                     gen_config_kwargs["cached_content"] = cached_name
