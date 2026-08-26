@@ -8,32 +8,32 @@ and provides transparent cost summaries and budget safety checks.
 import os
 from typing import Dict, Any, Tuple, Optional
 
-# Base USD/PLN exchange rate
-DEFAULT_USD_PLN = 4.00
+# Base USD/PLN exchange rate (supports .env override)
+DEFAULT_USD_PLN = float(os.getenv("USD_PLN_RATE", os.getenv("USD_PLN", "4.00")))
 
-# Official Google API rates per 1M (1,000,000) tokens in USD
+# Official Google API rates per 1M (1,000,000) tokens in USD (supports .env override)
 GOOGLE_API_RATES: Dict[str, Dict[str, float]] = {
     "flash_lite": {
         "name": "Gemini 3.5 Flash-Lite",
-        "input_uncached": 0.0375,
-        "input_cached": 0.009375,
-        "output": 0.15,
+        "input_uncached": float(os.getenv("RATE_FLASH_LITE_IN", "0.0375")),
+        "input_cached": float(os.getenv("RATE_FLASH_LITE_CACHE", "0.009375")),
+        "output": float(os.getenv("RATE_FLASH_LITE_OUT", "0.15")),
         "storage_per_hour": 1.00,
         "is_free_tier": True
     },
     "flash": {
         "name": "Gemini 3.7 Flash",
-        "input_uncached": 0.75,
-        "input_cached": 0.075,  # -90% discount with Context Caching
-        "output": 3.75,         # Output token rate
+        "input_uncached": float(os.getenv("RATE_FLASH_IN", "0.75")),
+        "input_cached": float(os.getenv("RATE_FLASH_CACHE", "0.075")),  # -90% discount with Context Caching
+        "output": float(os.getenv("RATE_FLASH_OUT", "3.75")),         # Output token rate
         "storage_per_hour": 0.50,
         "is_free_tier": False
     },
     "pro": {
         "name": "Gemini 3.1 Pro Preview",
-        "input_uncached": 2.00,   # Official Google API rate (requests <= 200k tokens)
-        "input_cached": 0.20,     # -90% discount with Context Caching
-        "output": 12.00,          # Output token rate (including CoT Thinking)
+        "input_uncached": float(os.getenv("RATE_PRO_IN", "2.00")),   # Official Google API rate (requests <= 200k tokens)
+        "input_cached": float(os.getenv("RATE_PRO_CACHE", "0.20")),     # -90% discount with Context Caching
+        "output": float(os.getenv("RATE_PRO_OUT", "12.00")),          # Output token rate (including CoT Thinking)
         "storage_per_hour": 4.50,
         "is_free_tier": False
     }
