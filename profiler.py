@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Moduł Profilowania Odcinka (Pre-pass Episode Profiler & Glossary Engine).
-Przed rozpoczęciem tłumaczenia analizuje cały odcinek, mapuje relacje między postaciami
-(kto do kogo mówi na 'ty', kto per 'pan/pani') oraz tworzy słowniczek specyficznych pojęć,
-gwarantując idealną spójność dialogów w całym odcinku.
+Pre-pass Episode Profiler & Glossary Engine Module.
+Analyzes the entire episode script prior to translation, mapping character relationships
+(honorific vs. informal address forms) and compiling a specialized terminology glossary,
+ensuring consistent dialogue continuity across the whole episode.
 """
 
 import os
@@ -86,7 +86,7 @@ class EpisodeProfile(BaseModel):
 
 
 def format_episode_profile_for_prompt(profile: Optional[EpisodeProfile]) -> str:
-    """Formatuje profil odcinka do postaci zwięzłego bloku promptu systemowego (Profiler 3.0)."""
+    """Formats episode profile into a concise system prompt block (Profiler 3.0)."""
     if not profile:
         return ""
 
@@ -164,16 +164,16 @@ class EpisodeProfiler:
         cache_path: Optional[str] = None
     ) -> EpisodeProfile:
         """
-        Generuje lub wczytuje z cache profil odcinka (Profiler 3.0 Pre-pass).
+        Generates or loads episode profile from cache (Profiler 3.0 Pre-pass).
         """
         if cache_path and os.path.exists(cache_path):
             try:
                 with open(cache_path, "r", encoding="utf-8") as f:
                     data = json.load(f)
-                    logger.info(f"Wczytano profil odcinka z cache: {cache_path}")
+                    logger.info(f"Loaded episode profile from cache: {cache_path}")
                     return EpisodeProfile.model_validate(data)
             except Exception as e:
-                logger.warning(f"Błąd odczytu cache profilu ({e}), generowanie na nowo...")
+                logger.warning(f"Error reading profile cache ({e}), regenerating...")
 
         prompt = f"""Jesteś Głównym Reżyserem, Konsultantem Merytorycznym i Script Doctorem Lokalizacji Anime (Profiler 3.0).
 Twoim zadaniem jest dogłębna, wszechstronna analiza 100% skryptu całego odcinka, aby przygotować dla zespołu tłumaczy i redaktorów kompletny PROFIL ODCINKA 3.0:
@@ -197,7 +197,7 @@ Zwróć wynik w formacie JSON zgodnym ze schematem EpisodeProfile."""
         import time
         attempt = 0
 
-        # Pula wyłącznie dwóch absolutnie najnowszych modeli flagowych (Gemini 3.7 i 3.6 Flash)
+        # Candidate models pool restricted to the two latest flagship models
         candidate_models = [self.model]
         if "flash" in self.model.lower():
             for m in ["gemini-3.7-flash", "gemini-3.6-flash"]:
@@ -207,7 +207,6 @@ Zwróć wynik w formacie JSON zgodnym ze schematem EpisodeProfile."""
             for m in ["gemini-3.1-pro-preview"]:
                 if m not in candidate_models:
                     candidate_models.append(m)
-        # Ograniczenie do maksymalnie 2 najnowszych modeli
         candidate_models = candidate_models[:2]
 
         current_model_idx = 0
@@ -256,7 +255,7 @@ Zwróć wynik w formacie JSON zgodnym ze schematem EpisodeProfile."""
                 is_unavailable = "503" in err_str or "unavailable" in err_str or "high demand" in err_str
                 is_rate_limit = "429" in err_str or "quota" in err_str or "resource_exhausted" in err_str
                 
-                # Jeśli po 2 próbach dany model ma 503 na serwerach Google, przełączamy na bezpośredni model równoległy z tej samej generacji
+                # Switch to fallback model on persistent 503 errors
                 if is_unavailable and len(candidate_models) > 1 and attempt >= 2:
                     next_idx = (current_model_idx + 1) % len(candidate_models)
                     if next_idx != current_model_idx:

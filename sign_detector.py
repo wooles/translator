@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Moduł Wizyjnej Detekcji Plansz i Napisów Ekranowych (Visual Sign Detector & OCR Engine).
-Wykrywa brakujące w pliku napisów, wtopione w wideo plansze tytułowe, lokacje i ramy czasowe
-(np. 'PRESENT DAY / げんざい' -> '[ CZASY WSPÓŁCZESNE ]') i generuje dla nich eleganckie napisy górne.
+Visual Sign Detection & OCR Engine Module.
+Detects missing, hardcoded on-screen title cards, locations, and time banners
+(e.g., 'PRESENT DAY / げんざい' -> '[ CZASY WSPÓŁCZESNE ]') and generates top-aligned subtitles.
 
-Posiada 3 twarde bezpieczniki antykolizyjne zapobiegające dublowaniu napisów na tłumaczonych kadrach.
+Equipped with 3 strict anti-collision safety guards to prevent duplicate subtitles on translated frames.
 """
 
 import os
@@ -44,7 +44,7 @@ class DetectedSign(BaseModel):
 
 class VisualSignDetector:
     """
-    Inteligentny detektor brakujących plansz ekranowych z 3 bezpiecznikami antykolizyjnymi.
+    Intelligent detector for missing on-screen title cards with 3 anti-collision safety guards.
     """
 
     @staticmethod
@@ -55,20 +55,20 @@ class VisualSignDetector:
         max_gaps_to_scan: int = 8
     ) -> List[Tuple[int, int]]:
         """
-        BEZPIECZNIK 1 & 2 (Collision Guard & Zero-Gap Rule):
-        Wyszukuje przedziały czasowe (luki) w pliku napisów, w których przez co najmniej min_gap_ms
-        nie ma ŻADNYCH napisów (ani dialogów, ani znaków), zachowując bezpieczny margines margin_ms.
+        SAFETY GUARDS 1 & 2 (Collision Guard & Zero-Gap Rule):
+        Finds time intervals (gaps) in subtitle file where for at least min_gap_ms
+        there are NO subtitles (neither dialogue nor signs), maintaining safe margin_ms.
         """
         if not subs.events:
             return []
 
-        # Sortowanie zdarzeń chronologicznie
+        # Chronological event sorting
         sorted_events = sorted(subs.events, key=lambda ev: ev.start)
         
-        # Łączenie nakładających się zdarzeń w zajęte przedziały czasowe
+        # Merge overlapping events into occupied time spans
         occupied_intervals: List[Tuple[int, int]] = []
         for ev in sorted_events:
-            # Pomijamy zdarzenia całkowicie puste
+            # Skip empty events
             if not ev.text.strip():
                 continue
             
@@ -76,25 +76,25 @@ class VisualSignDetector:
             e = ev.end + margin_ms
             
             if occupied_intervals and occupied_intervals[-1][1] >= s:
-                # Rozszerzamy ostatni przedział
+                # Extend last interval
                 occupied_intervals[-1] = (occupied_intervals[-1][0], max(occupied_intervals[-1][1], e))
             else:
                 occupied_intervals.append((s, e))
 
         gaps: List[Tuple[int, int]] = []
         
-        # 1. Sprawdzenie luki przed pierwszym napisem
+        # 1. Check gap before first subtitle
         if occupied_intervals and occupied_intervals[0][0] > min_gap_ms:
             gaps.append((1000, occupied_intervals[0][0]))
 
-        # 2. Sprawdzenie luk między napisami
+        # 2. Check gaps between subtitles
         for i in range(len(occupied_intervals) - 1):
             gap_start = occupied_intervals[i][1]
             gap_end = occupied_intervals[i + 1][0]
             if (gap_end - gap_start) >= min_gap_ms:
                 gaps.append((gap_start, gap_end))
 
-        # Ograniczenie liczby skanowanych luk do najdłuższych / najważniejszych
+        # Limit scanned gaps to longest/most prominent ones
         gaps.sort(key=lambda g: g[1] - g[0], reverse=True)
         return gaps[:max_gaps_to_scan]
 
@@ -106,14 +106,14 @@ class VisualSignDetector:
         model: str = "gemini-3.7-flash"
     ) -> List[pysubs2.SSAEvent]:
         """
-        Skanuje klatki z wyznaczonych bezpiecznych luk i tworzy zdarzenia ASS typu Sign dla wykrytych plansz.
-        Posiada mechanizm płynnego przełączania modeli (fallback) oraz circuit-breaker na wypadek 503.
+        Scans frames from designated safe gaps and generates ASS Sign events for detected cards.
+        Includes seamless fallback switching and circuit-breaker for 503 server load.
         """
         if not gaps or not os.path.exists(video_path):
             return []
 
         detected_events: List[pysubs2.SSAEvent] = []
-        logger.info(f"VisualSignDetector: Skanowanie {len(gaps)} bezpiecznych luk czasowych w poszukiwaniu plansz...")
+        logger.info(f"VisualSignDetector: Scanning {len(gaps)} safe time gaps for title cards...")
 
         prompt = """Jesteś Ekspertem Wizyjnym Przekładu Audiowizualnego (AVT Sign Detector).
 Przeanalizuj przesłaną klatkę wideo z anime i oceń, czy widnieje na niej GŁÓWNA PLANSZA TYTUŁOWA, NAZWA MIEJSCA, DATA lub BELKA CZASOWA (np. 'PRESENT DAY / げんざい', 'TOKIO', 'ROK 1907', 'PROLOG', tytuł odcinka).
@@ -138,10 +138,10 @@ Zwróć wynik w formacie JSON zgodnym ze schematem DetectedSign."""
 
         for gap_start, gap_end in gaps:
             if consecutive_errors >= 2:
-                logger.info("VisualSignDetector: Pomijanie dalszych luk (przeciążenie serwerów Google 503) i zapisywanie napisów...")
+                logger.info("VisualSignDetector: Skipping remaining gaps due to Google 503 load and finalizing subtitles...")
                 break
 
-            # Punkt czasowy w środku luki
+            # Timestamp at middle of gap
             mid_ms = (gap_start + gap_end) // 2
             frame_path = None
             try:
@@ -184,14 +184,11 @@ Zwróć wynik w formacie JSON zgodnym ze schematem DetectedSign."""
 
                                 try:
                                     from typesetting_matcher import TypesettingColorMatcher
-                                    base_prefix = r"{\fs26\bord2\shad1}[ "
-                                    enhanced_prefix = TypesettingColorMatcher.enhance_sign_typesetting(
-                                        original_prefix=base_prefix,
-                                        sign_type="header",
-                                        image_path=frame_path,
-                                        region="top"
+                                    prefix = TypesettingColorMatcher.enhance_sign_typesetting(
+                                        sign_type=sign_info.banner_type or "sign",
+                                        image_path=frame_path
                                     )
-                                    styled_text = f"{enhanced_prefix}{clean_pl} ]"
+                                    styled_text = f"{prefix}[ {clean_pl} ]"
                                 except Exception:
                                     styled_text = r"{\an8\fs26\bord1.5\shad1\c&HFFFFFF&\3c&H101020&}[ " + clean_pl + r" ]"
                                 
@@ -202,7 +199,7 @@ Zwróć wynik w formacie JSON zgodnym ze schematem DetectedSign."""
                                     style="Sign"
                                 )
                                 detected_events.append(new_ev)
-                                logger.info(f"VisualSignDetector: Wykryto planszę na {event_start/1000:.1f}s: '{sign_info.original_text}' -> '[ {clean_pl} ]'")
+                                logger.info(f"VisualSignDetector: Detected sign at {event_start/1000:.1f}s: '{sign_info.original_text}' -> '[ {clean_pl} ]'")
                         break
                     except Exception as e_model:
                         err_str = str(e_model).lower()
@@ -216,7 +213,7 @@ Zwróć wynik w formacie JSON zgodnym ze schematem DetectedSign."""
 
             except Exception as e:
                 consecutive_errors += 1
-                logger.debug(f"VisualSignDetector: Błąd analizy luki {gap_start}-{gap_end}ms: {e}")
+                logger.debug(f"VisualSignDetector: Error analyzing gap {gap_start}-{gap_end}ms: {e}")
             finally:
                 if frame_path and os.path.exists(frame_path):
                     try:

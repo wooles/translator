@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Kompletny system reguł i wytycznych przekładu audiowizualnego (AVT) oparty na kanonie dzieł
-Arkadiusza Belczyka ("Tłumaczenie filmów", "Sztuka tłumaczenia filmów", "Poradnik tłumacza"),
-zasadach adaptacji japońskich tytułów grzecznościowych oraz Netflix Polish Timed Text Style Guide.
+Complete audiovisual translation (AVT) rule system based on the canon of Arkadiusz Belczyk
+("Tłumaczenie filmów", "Sztuka tłumaczenia filmów", "Poradnik tłumacza"),
+Japanese honorific title adaptation rules, and the Netflix Polish Timed Text Style Guide.
 """
 
 import re

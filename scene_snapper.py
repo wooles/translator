@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Moduł Kinowego Dociągania Napisów do Cięć Montażowych (Shot-Cut Snapper / Netflix AVT Standard).
-Wykrywa twarde cięcia kamerowe (Shot Transitions) za pomocą szybkiego filtra FFmpeg
-i precyzyjnie dociąga krawędzie czasowe napisów (start/end), eliminując zjawisko
-mrugania napisów na zmianach ujęć (tzw. Subtitle Shot-Bleed).
+Shot-Cut Subtitle Snapping Module (Shot-Cut Snapper / Netflix AVT Standard).
+Detects camera shot transitions using fast native FFmpeg scene filtering
+and aligns subtitle timing boundaries (start/end) to shot cuts, eliminating
+visual subtitle shot-bleed flicker across scene transitions.
 """
 
 import os
@@ -23,9 +23,9 @@ class SceneShotSnapper:
         max_duration_sec: Optional[float] = None
     ) -> List[int]:
         """
-        Szybko wykrywa znaczniki czasowe cięć montażowych w wideo (w milisekundach)
-        za pomocą natywnego filtra FFmpeg 'select=gt(scene,0.38)'.
-        Działa z prędkością kilkuset klatek na sekundę (bez renderingu wideo).
+        Detects timestamps of shot transitions in video (in milliseconds)
+        using native FFmpeg filter 'select=gt(scene,0.38)'.
+        Executes at several hundred fps without full video rendering.
         """
         if not video_path or not os.path.exists(video_path):
             return []
@@ -46,7 +46,7 @@ class SceneShotSnapper:
             cmd.insert(5, str(max_duration_sec))
 
         try:
-            # Uruchamiamy proces i przechwytujemy stderr ze znacznikami showinfo
+            # Execute process and capture stderr containing showinfo timestamps
             result = subprocess.run(
                 cmd,
                 capture_output=True,
@@ -56,7 +56,7 @@ class SceneShotSnapper:
                 timeout=120
             )
             
-            # Wzorzec FFmpeg showinfo: pts_time:12.345
+            # FFmpeg showinfo pattern: pts_time:12.345
             for line in result.stderr.splitlines():
                 if "pts_time:" in line:
                     match = re.search(r"pts_time:([0-9\.]+)", line)
@@ -65,7 +65,7 @@ class SceneShotSnapper:
                         cuts_ms.append(int(sec * 1000))
 
         except Exception as e:
-            logger.warning(f"Nie udało się pobrać cięć montażowych przez FFmpeg: {e}")
+            logger.warning(f"Could not extract scene cuts via FFmpeg: {e}")
 
         return sorted(list(set(cuts_ms)))
 
@@ -78,10 +78,10 @@ class SceneShotSnapper:
         min_duration_ms: int = 700
     ) -> Tuple[List[Any], int]:
         """
-        Dociąga czasy startu i końca każdego napisu do najbliższego cięcia montażowego,
-        jeśli odległość mieści się w oknie tolerancji snap_window_ms (domyślnie ~250ms / 6 klatek).
+        Snaps start and end times of each subtitle event to the nearest shot transition
+        if distance is within snap_window_ms (default ~250ms / 6 frames).
         
-        Zwraca: (zmodyfikowane_eventy, liczba_dokonanych_dociągnięć)
+        Returns: (modified_events, snapped_count)
         """
         if not events or not scene_cuts_ms:
             return events, 0
@@ -95,25 +95,25 @@ class SceneShotSnapper:
             orig_start = ev.start
             orig_end = ev.end
 
-            # 1. Dociąganie punktu wejścia (START)
+            # 1. Snap start timestamp
             for cut in scene_cuts_ms:
                 if abs(ev.start - cut) <= snap_window_ms:
-                    # Sprawdź czy nie skróci napisu poniżej minimum
+                    # Ensure subtitle duration does not drop below minimum
                     if (ev.end - cut) >= min_duration_ms:
                         ev.start = cut
                         snapped_count += 1
                         break
 
-            # 2. Dociąganie punktu wyjścia (END)
+            # 2. Snap end timestamp
             for cut in scene_cuts_ms:
                 if abs(ev.end - cut) <= snap_window_ms:
-                    # Sprawdź czy po dociągnięciu zachowano minimalny czas ekspozycji
+                    # Ensure minimum display duration is preserved
                     if (cut - ev.start) >= min_duration_ms:
                         ev.end = cut
                         snapped_count += 1
                         break
 
-            # Zabezpieczenie integralności
+            # Safeguard integrity
             if ev.end <= ev.start:
                 ev.start = orig_start
                 ev.end = max(ev.start + min_duration_ms, orig_end)

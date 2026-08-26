@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Moduł Lokalnej Klasyfikacji Barwy Głosu i Diarizacji Mówców (Voice Pitch & Speaker Diarization).
-W 100% lokalny, bazujący na autokorelacji fali dźwiękowej (F0 Fundamental Frequency)
-w celu bezbłędnego określenia płci mówcy (głos męski niski vs żeński wysoki) w scenach zza kadru.
+Local Voice Pitch Classification & Speaker Diarization Module.
+100% local, pitch-tracking module based on autocorrelation (F0 Fundamental Frequency)
+to identify speaker gender register (low male vs high female voice) in off-screen dialogue scenes.
 """
 
 import os
@@ -17,43 +17,43 @@ class SpeakerVoiceClassifier:
     @staticmethod
     def estimate_pitch_f0(samples: np.ndarray, sample_rate: int = 16000) -> Optional[float]:
         """
-        Szacuje średnią częstotliwość podstawową głosu (F0) metodą autokorelacji fonicznej.
-        Zakres ludzkiego głosu: 75 Hz (niski męski) do 450 Hz (wysoki żeński/dziecięcy).
+        Estimates fundamental voice frequency (F0) using autocorrelation method.
+        Human speech range: 75 Hz (deep male) to 450 Hz (high female/child).
         """
         if samples is None or len(samples) < sample_rate * 0.3:
             return None
 
-        # Normalizacja i usunięcie składowej stałej (DC offset)
+        # Normalize and remove DC offset
         samples = samples - np.mean(samples)
         if np.max(np.abs(samples)) < 50.0:
             return None
 
-        # Zakres poszukiwania okresu tonu podstawowego przy 16kHz
-        # Min F0 = 75 Hz -> Max Lag = 16000 / 75 = 213 próbek
-        # Max F0 = 400 Hz -> Min Lag = 16000 / 400 = 40 próbek
+        # Search range for pitch period at 16kHz
+        # Min F0 = 75 Hz -> Max Lag = 16000 / 75 = 213 samples
+        # Max F0 = 400 Hz -> Min Lag = 16000 / 400 = 40 samples
         min_lag = int(sample_rate / 400)  # ~40
         max_lag = int(sample_rate / 75)   # ~213
 
-        # Analiza w oknach 60ms z 50% nakładaniem
-        window_size = int(sample_rate * 0.06)  # 960 próbek
-        hop_size = int(sample_rate * 0.03)     # 480 próbek
+        # Window analysis of 60ms with 50% overlap
+        window_size = int(sample_rate * 0.06)  # 960 samples
+        hop_size = int(sample_rate * 0.03)     # 480 samples
 
         f0_estimates = []
 
         for start in range(0, len(samples) - window_size, hop_size):
             frame = samples[start:start + window_size]
             energy = np.sum(frame ** 2)
-            if energy < 1e5:  # Pomiń ciszę
+            if energy < 1e5:  # Skip silence
                 continue
 
-            # Autokorelacja okna
+            # Window autocorrelation
             corr = np.correlate(frame, frame, mode="full")
             corr = corr[len(frame) - 1:]
 
             if len(corr) <= max_lag:
                 continue
 
-            # Szukanie szczytu w zakresie lagów mowy
+            # Search peak in speech lag range
             search_region = corr[min_lag:max_lag]
             if len(search_region) == 0:
                 continue
@@ -61,7 +61,7 @@ class SpeakerVoiceClassifier:
             peak_idx = np.argmax(search_region) + min_lag
             peak_val = corr[peak_idx]
 
-            # Próg pewności periodyczności (unvoiced vs voiced)
+            # Voiced periodicity threshold
             if corr[0] > 0 and (peak_val / corr[0]) > 0.35:
                 f0 = sample_rate / peak_idx
                 if 75.0 <= f0 <= 450.0:
@@ -70,7 +70,7 @@ class SpeakerVoiceClassifier:
         if not f0_estimates or len(f0_estimates) < 3:
             return None
 
-        # Mediana z wykrytych tonów
+        # Median of detected pitch points
         return float(np.median(f0_estimates))
 
     @classmethod
@@ -81,8 +81,8 @@ class SpeakerVoiceClassifier:
         events: List[Tuple[int, Any]]
     ) -> Dict[int, str]:
         """
-        Klasyfikuje płeć i rejestr głosu dla wszystkich kwestii w paczce.
-        Zwraca słownik: {batch_id: 'Głos: żeński/wysoki' | 'Głos: męski/niski'}.
+        Classifies voice pitch and register for all dialogue events in a batch.
+        Returns a dictionary: {batch_id: 'Głos: żeński/wysoki' | 'Głos: męski/niski'}.
         """
         if not wav_path or not os.path.exists(wav_path):
             return {}

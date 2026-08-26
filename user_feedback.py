@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Moduł Pamięci Korekt Użytkownika (User Feedback & Few-Shot Memory).
-Gromadzi zgłoszone przez użytkownika poprawki i błędne konstrukcje,
-a następnie wstrzykuje je jako Złote Wzorce (Golden Examples) do promptu AI
-oraz zasila automatyczny linter reguł.
+User Feedback & Few-Shot Memory Module.
+Stores user-submitted corrections and flawed patterns,
+and injects them as Golden Examples into the AI prompt
+as well as supplying the dynamic AVT rule linter.
 """
 
 import os
@@ -17,7 +17,7 @@ FEEDBACK_FILE_PATH = Path(__file__).parent / "user_feedback.json"
 
 class UserFeedbackManager:
     """
-    Menedżer trwałych korekt i reguł użytkownika.
+    Manager for persistent user corrections and few-shot rules.
     """
     def __init__(self, storage_path: Optional[Path] = None):
         self.storage_path = storage_path or FEEDBACK_FILE_PATH
@@ -25,7 +25,7 @@ class UserFeedbackManager:
         self.load()
 
     def load(self):
-        """Wczytuje bazę korekt z pliku JSON."""
+        """Loads feedback database from JSON file."""
         if self.storage_path.exists():
             try:
                 with open(self.storage_path, "r", encoding="utf-8") as f:
@@ -35,7 +35,7 @@ class UserFeedbackManager:
             except Exception:
                 self.feedback_list = []
         else:
-            # Domyślne początkowe złote reguły na bazie dotychczasowych uwag
+            # Default initial golden rules based on common user guidelines
             self.feedback_list = [
                 {
                     "id": "init_1",
@@ -86,7 +86,7 @@ class UserFeedbackManager:
             self.save()
 
     def save(self):
-        """Zapisuje bazę korekt na dysku."""
+        """Saves feedback database to disk."""
         try:
             with open(self.storage_path, "w", encoding="utf-8") as f:
                 json.dump(self.feedback_list, f, ensure_ascii=False, indent=2)
@@ -101,7 +101,7 @@ class UserFeedbackManager:
         rule_reason: str = "",
         scope: str = "global"
     ) -> Dict[str, Any]:
-        """Dodaje nową korektę do bazy."""
+        """Adds a new correction entry to the database."""
         new_entry = {
             "id": f"fb_{int(time.time()*1000)}",
             "original_en": original_en.strip(),
@@ -111,7 +111,7 @@ class UserFeedbackManager:
             "scope": scope.strip() or "global",
             "created_at": time.strftime("%Y-%m-%d %H:%M:%S")
         }
-        # Unikanie duplikatów o tym samym bad_pl i good_pl
+        # Prevent duplicates with the same bad_pl and good_pl
         self.feedback_list = [
             f for f in self.feedback_list
             if not (f.get("bad_pl", "").lower() == new_entry["bad_pl"].lower() and
@@ -122,7 +122,7 @@ class UserFeedbackManager:
         return new_entry
 
     def remove_feedback(self, feedback_id: str) -> bool:
-        """Usuwa korektę o podanym ID."""
+        """Removes a correction by its ID."""
         initial_len = len(self.feedback_list)
         self.feedback_list = [f for f in self.feedback_list if f.get("id") != feedback_id]
         if len(self.feedback_list) < initial_len:
@@ -131,7 +131,7 @@ class UserFeedbackManager:
         return False
 
     def list_all(self, scope: Optional[str] = None) -> List[Dict[str, Any]]:
-        """Zwraca listę wszystkich reguł z ewentualnym filtrowaniem po scope."""
+        """Returns list of all rules, optionally filtered by scope."""
         if not scope or scope == "all":
             return list(self.feedback_list)
         return [f for f in self.feedback_list if f.get("scope") in ["global", scope]]
@@ -143,7 +143,7 @@ class UserFeedbackManager:
         max_examples: int = 5
     ) -> List[Dict[str, Any]]:
         """
-        Wyszukuje najbardziej trafne korekty dla podanych kwestii dialogowych.
+        Searches for the most relevant corrections for given dialogue lines.
         """
         if not self.feedback_list or not query_texts:
             return []
@@ -151,7 +151,7 @@ class UserFeedbackManager:
         relevant: List[Dict[str, Any]] = []
         seen_ids = set()
 
-        # 1. Sprawdzanie bezpośredniego dopasowania fraz
+        # 1. Check direct phrase matching
         for q in query_texts:
             q_clean = q.strip().lower()
             if len(q_clean) < 3:
@@ -169,7 +169,7 @@ class UserFeedbackManager:
                 orig_en = fb.get("original_en", "").lower()
                 bad_pl = fb.get("bad_pl", "").lower()
 
-                # Dopasowanie po angielskim oryginale lub polskiej kalki
+                # Match by English original or Polish calque
                 if orig_en and (orig_en in q_clean or q_clean in orig_en):
                     relevant.append(fb)
                     seen_ids.add(fb_id)
@@ -177,7 +177,7 @@ class UserFeedbackManager:
                     relevant.append(fb)
                     seen_ids.add(fb_id)
 
-        # 2. Jeśli brakuje specyficznych, dorzucamy najważniejsze reguły globalne (do max_examples)
+        # 2. Append general global rules up to max_examples if specific matches are few
         if len(relevant) < max_examples:
             for fb in self.feedback_list:
                 fb_id = fb.get("id")
@@ -191,7 +191,7 @@ class UserFeedbackManager:
 
     def format_for_prompt(self, relevant_entries: List[Dict[str, Any]]) -> str:
         """
-        Formatuje wybrane korekty jako sekcję Złotych Wzorców o najwyższym priorytecie dla LLM.
+        Formats selected corrections as a Golden Examples section for LLM prompt.
         """
         if not relevant_entries:
             return ""

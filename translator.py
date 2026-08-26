@@ -1,21 +1,22 @@
+# -*- coding: utf-8 -*-
 """
-Główny silnik tłumaczenia napisów z wykorzystaniem analizy multimodalnej Gemini Flash.
-Zawiera mechanizmy:
-1. Pełnego zachowania Typesettingu (TS) i pozycjonowania na ekranie (\\an8, \\pos, \\c, Style, Warstwy)
-2. Automatycznego pobierania wiedzy z AniList (fabuła, postacie, płeć) na podstawie nazwy pliku
-3. Słuchania oryginalnego japońskiego audio (Multimodal Speech Recognition & Japanese Vocabulary)
-4. Rejestru Postaci (Character Registry / Cast Tracker) - długoterminowe zapamiętywanie płci i relacji
-5. Kontekstu Przyszłego (Lookahead Window) - podgląd kolejnych kwestii do wykrywania płci i kontekstu
-6. Usuwania i sanityzacji uszkodzonych tagów ASS (brak śmieci typu {\\t(2840,3799,\\)
-7. Bezwzględnej deduplikacji napisów o identycznym czasie trwania
-8. 100% zachowania oryginalnych znaczników czasowych (timingu)
-9. Autozapisu (checkpointing) i automatycznego wznawiania
+Main Subtitle Translation Engine Module with Gemini Multimodal Processing.
+Features:
+1. Full Typesetting (TS) & on-screen positioning preservation (\\an8, \\pos, \\c, Styles, Layers).
+2. Automated AniList knowledge retrieval (synopsis, characters, genders) based on filename.
+3. Original Japanese audio listening (Multimodal Speech Recognition & Japanese Vocabulary).
+4. Character Registry / Cast Tracker - persistent character gender and relationship memory.
+5. Lookahead Window - preview of upcoming lines for context and gender resolution.
+6. ASS corrupted tag sanitization.
+7. Deduplication of identical subtitle events.
+8. 100% original timestamp timing preservation.
+9. Auto-checkpointing and automatic session resumption.
 """
 
 import os
 import sys
 
-# Wymuszenie pełnej obsługi znaków UTF-8 (w tym japońskich znaków Kanji/Kana)
+# Force full UTF-8 support (including Japanese Kanji/Kana characters)
 if sys.platform == "win32":
     try:
         import ctypes
@@ -44,7 +45,7 @@ from pydantic import BaseModel, Field
 import pysubs2
 from tqdm import tqdm
 
-# Wyciszenie ostrzeżeń deweloperskich z biblioteki google_genai
+# Silence developer warnings from google_genai library
 logging.getLogger("google_genai").setLevel(logging.ERROR)
 logging.getLogger("google_genai.models").setLevel(logging.ERROR)
 logger = logging.getLogger("translator")
@@ -72,18 +73,18 @@ from glossary_manager import GlossaryManager
 
 def extract_typesetting_tags(raw_text: str) -> Tuple[str, str]:
     """
-    Wyodrębnia poprawne tagi pozycjonowania i stylizacji ASS (np. {\\an8}, {\\pos(x,y)}, {\\fad(..)})
-    z początku kwestii, aby zachować Typesetting i pozycję na ekranie.
-    Zwraca: (prefix_tagów, czysty_tekst_dialogu)
+    Extracts valid ASS positioning and styling tags (e.g., {\\an8}, {\\pos(x,y)}, {\\fad(..)})
+    from the start of a subtitle line to preserve Typesetting and screen positioning.
+    Returns: (tag_prefix, clean_dialogue_text)
     """
     if not raw_text:
         return "", ""
     
-    # Wykrywanie początkowych bloków tagów ASS
+    # Detect leading ASS tag blocks
     match = re.match(r"^((?:\{[^}]+\})+)", raw_text)
     if match:
         tag_prefix = match.group(1)
-        # Upewniamy się, że to nie jest uszkodzony tag (musi zawierać znaki komend ASS)
+        # Ensure it is a valid tag block with ASS command characters
         if "\\" in tag_prefix and not tag_prefix.endswith("\\"):
             remaining = raw_text[len(tag_prefix):]
             clean_remaining = sanitize_sub_text(remaining)
@@ -93,9 +94,8 @@ def extract_typesetting_tags(raw_text: str) -> Tuple[str, str]:
 
 def detect_event_visual_type(event: pysubs2.SSAEvent, ts_prefix: str) -> Dict[str, Any]:
     """
-    Analizuje tagi ASS, pozycję, kąt obrotu, kolor oraz styl napisu,
-    aby precyzyjnie odróżnić napisy ekranowe (tytuły mang, znaki, plakaty, tablice)
-    od standardowych dialogów mówionych.
+    Analyzes ASS tags, position, rotation, color, and style to distinguish
+    on-screen text (manga titles, signs, posters, boards) from standard spoken dialogue.
     """
     is_sign = False
     details = []
@@ -137,8 +137,8 @@ def detect_event_visual_type(event: pysubs2.SSAEvent, ts_prefix: str) -> Dict[st
 
 def detect_audio_discrepancy(jp_text: str, pl_text: str, en_text: str) -> Optional[str]:
     """
-    Automatyczny detektor rozbieżności między japońskim głosem postaci (Whisper)
-    a wstępnym tłumaczeniem Fazy 1.
+    Automated discrepancy detector comparing Japanese voice recognition (Whisper)
+    against Phase 1 draft translation.
     """
     if not jp_text or not pl_text:
         return None
@@ -146,53 +146,53 @@ def detect_audio_discrepancy(jp_text: str, pl_text: str, en_text: str) -> Option
     jp_lower = jp_text.lower()
     pl_lower = pl_text.lower()
 
-    # Wyciągamy czysty tekst Romaji (z nawiasów [Romaji]) oraz czysty japoński
+    # Extract clean Romaji text (from [Romaji] brackets) and clean Japanese
     clean_jp = re.sub(r"\[.*?\]", "", jp_text).strip()
     romaji_match = re.findall(r"\[(.*?)\]", jp_text)
     rom_lower = romaji_match[0].strip().lower() if romaji_match else jp_lower
 
-    # 1. Kanojo-tachi vs męskie formy
+    # 1. Kanojo-tachi vs masculine forms
     if "彼女たち" in jp_text or "kanojo-tachi" in jp_lower or "kanojotachi" in jp_lower:
         if any(w in pl_lower for w in ["oni ", "ich ", "mężczyźni", "chłopcy", "byli", "poszli", "zrobili"]):
             return "W audio pada 'Kanojo-tachi' (kobiety) -> Popraw 'Oni/Ich' na 'One/Je/Kobiety' (Filar XCVI)."
 
-    # 2. Kikanaide vs Wolę nie wiedzieć
+    # 2. Kikanaide vs 'Wolę nie wiedzieć'
     if "聞かないで" in jp_text or "kikanaide" in jp_lower:
         if any(w in pl_lower for w in ["wolę nie wiedzieć", "nie chcę wiedzieć", "nie chcę słyszeć"]):
             return "W audio pada 'Kikanaide' (prośba mówcy: 'Nie pytaj') -> Popraw 'Wolę nie wiedzieć' na 'Nawet nie pytaj...' (Filar CI)."
 
-    # 3. Kure / Kase vs Proszę
+    # 3. Kure / Kase vs 'Proszę'
     if ("くれ" in jp_text or "kure" in jp_lower or "kase" in jp_lower) and "kudasai" not in jp_lower:
         if pl_lower.startswith("proszę") or "czy możesz" in pl_lower or "czy mógłbyś" in pl_lower:
             return "W audio pada szorstki tryb rozkazujący (-kure/-kase) -> Zamień sztuczne 'Proszę...' na bezpośredni rozkaz (Filar CIII)."
 
-    # 4. Yobisute vs Pan / Pani
+    # 4. Yobisute vs 'Pan / Pani'
     if ("panie " in pl_lower or "pani " in pl_lower) and not any(s in jp_text for s in ["様", "先生", "殿", "隊長"]):
         if not any(s in jp_lower for s in ["sama", "sensei", "dono", "taichou"]):
             return "W audio brak sufiksu szacunku (-sama/-sensei) -> Usuń sztuczne 'Pan/Pani' i zastosuj samo imię w wołaczu (Filar C)."
 
-    # 5. Haragei & Trailing Particles (-kedo, -kara, -tara) vs dopowiadanie zdania
+    # 5. Haragei & Trailing Particles (-kedo, -kara, -tara) vs completing the sentence
     trailing_keys = ["kedo", "kara", "tara", "monode", "shi"]
     if any(clean_jp.endswith(p) for p in ["けど", "から", "たら", "し"]) or any(rom_lower.endswith(k) for k in trailing_keys):
         if len(pl_text.split()) > 7 and not pl_text.endswith("..."):
             return "Kwestia urywa się na partykułę zawieszenia (Haragei) -> Zastosuj wielokropek niedopowiedzenia zamiast sztucznego dopowiadania reszty zdania (Filar CV)."
 
-    # 6. Aizuchi (Un, Sou, Fumu) vs rozwlekły napis
+    # 6. Aizuchi (Un, Sou, Fumu) vs wordy subtitles
     aizuchi_keys = ["un", "sou", "fumu", "ee", "sou da", "sou da ne", "sou desu ne"]
-    if clean_jp in ["うん", "そう", "ふむ", "ええ", "そうだ", "そうですね"] or rom_lower in aizuchi_keys:
+    if clean_jp in ["うん", "そう", "ふむ", "ええ", "そうだ", " glass", "そうですね"] or rom_lower in aizuchi_keys:
         if len(pl_text.split()) > 2:
             return "Krótkie Aizuchi podtrzymujące kontakt -> Zredukuj do oszczędnego 'Mhm' / 'No' / 'Jasne' (Filar CVI)."
 
-    # 7. Oyaji vs sztywne 'mój ojciec'
+    # 7. Oyaji vs stiff 'mój ojciec'
     if ("親父" in clean_jp or "おやじ" in clean_jp or "oyaji" in rom_lower) and "mój ojciec" in pl_lower:
         return "W audio pada potoczne/buntownicze 'Oyaji' -> Zastąp sztywne 'mój ojciec' naturalnym 'stary' lub 'ojciec' (Filar CIX)."
 
-    # 8. Giri i Sumimasen w kontekście wdzięczności/ratunku
+    # 8. Giri and Sumimasen in gratitude/saving context
     if ("済みません" in clean_jp or "すみません" in clean_jp or "sumimasen" in rom_lower) and any(w in en_text.lower() for w in ["saved", "water", "food", "help", "thank"]):
         if pl_lower.startswith("przepraszam"):
             return "W audio pada 'Sumimasen' jako dług wdzięczności (Giri) -> Zamień monotonne 'Przepraszam' na 'Wybacz kłopot...' / 'Nie trzeba było...' (Filar CX)."
 
-    # 9. Ii desu / Kekkou desu w kontekście odmowy zaproszenia/propozycji vs stan zdrowia
+    # 9. Ii desu / Kekkou desu in refusal vs health state
     if ("いいです" in clean_jp or "ii desu" in rom_lower or "kekkou" in rom_lower or "結構" in clean_jp):
         if any(w in pl_lower for w in ["nic mi nie jest", "nic mi... nie jest", "wszystko w porządku", "dobrze się czuję"]):
             return "W audio pada 'ii desu' (odmowa / rezygnacja) -> Zastąp błędny stan zdrowia ('Nic mi nie jest') poprawną odmową: 'Ja... podziękuję.' / 'Nie mam ochoty.' / 'Ja zostanę.' (Filar CXVII)."
@@ -201,39 +201,39 @@ def detect_audio_discrepancy(jp_text: str, pl_text: str, en_text: str) -> Option
 
 def sanitize_sub_text(text: str, is_ass: bool = True) -> str:
     """
-    Czyści tekst ze śmieci formatowania ASS, niedomkniętych nawiasów i zbędnych znaków,
-    jednocześnie poprawnie konwertując tagi HTML <i> / <b> na natywne formatowanie ASS {\\i1}...{\\i0}.
+    Cleans subtitle text from broken tags, unclosed brackets, and artifacts,
+    converting HTML tags <i> / <b> to native ASS formatting {\\i1}...{\\i0}.
     """
     if not text:
         return ""
     
     if is_ass:
-        # Konwersja <i> i <b> na format ASS {\i1} i {\b1}
+        # Convert <i> and <b> to ASS {\i1} and {\b1}
         text = re.sub(r"<i>(.*?)</i>", r"{\\i1}\1{\\i0}", text, flags=re.IGNORECASE)
         text = re.sub(r"<b>(.*?)</b>", r"{\\b1}\1{\\b0}", text, flags=re.IGNORECASE)
-        # Usunięcie wszelkich pozostałych surowych tagów HTML
+        # Strip any remaining raw HTML tags
         text = re.sub(r"</?[a-zA-Z][^>]*>", "", text)
-        # Usunięcie uszkodzonych tagów ASS (z zachowaniem {\i1}, {\i0}, {\b1}, {\b0})
+        # Strip corrupted ASS tags (preserving {\i1}, {\i0}, {\b1}, {\b0})
         text = re.sub(r"\{(?!(?:\\i[01]|\\b[01]))[^}]*\}?", "", text)
         text = re.sub(r"\{[^\\]*$", "", text)
-        # Deduplikacja powtórzonych sąsiadujących tagów (np. {\i1}{\i1} -> {\i1}, {\i0}{\i0} -> {\i0})
+        # Deduplicate repeated adjacent tags (e.g. {\i1}{\i1} -> {\i1})
         text = re.sub(r"(\{\\i[01]\})+", r"\1", text)
         text = re.sub(r"(\{\\b[01]\})+", r"\1", text)
     else:
-        # Dla SRT: konwersja tagów ASS na HTML
+        # For SRT: convert ASS tags to HTML
         text = re.sub(r"\{\\i1\}(.*?)\{\\i0\}", r"<i>\1</i>", text)
         text = re.sub(r"\{\\b1\}(.*?)\{\\b0\}", r"<b>\1</b>", text)
-        # Usunięcie wszelkich tagów klamrowych
+        # Strip all curly bracket tags
         text = re.sub(r"\{[^}]*\}?", "", text)
-        # Usunięcie niechcianych tagów HTML z wyjątkiem <i>, </i>, <b>, </b>
+        # Strip unwanted HTML tags except <i>, </i>, <b>, </b>
         text = re.sub(r"</?(?!(?:i|b)\b)[a-zA-Z][^>]*>", "", text)
 
-    # Normalizacja spacji i enterów
+    # Normalize whitespace and line breaks
     text = re.sub(r"[ \t]+", " ", text).strip()
     return text
 
 def is_song_line(ev: Any, text: str) -> bool:
-    """Wykrywa, czy dana kwestia jest wersem piosenki (OP/ED/Theme/Song/Karaoke) lub tekstem z nutkami."""
+    """Detects whether subtitle line is part of a song (OP/ED/Theme/Song/Karaoke) or musical note text."""
     if not text:
         return False
     style_name = (getattr(ev, "style", "") or "").lower()
@@ -246,21 +246,21 @@ def is_song_line(ev: Any, text: str) -> bool:
 
 def apply_simultaneous_dialogue_formatting(events: List[Any]) -> List[Any]:
     """
-    Formatowanie Kwestii Symultanicznych (Standard AVT):
-    Gdy dwie różne postacie mówią jednocześnie w nakładającym się czasie,
-    dodaje dywizy dialogowe (- Kwestia), aby widz natychmiast odróżnił równoległe głosy.
+    Simultaneous Dialogue Formatting (AVT Standard):
+    When two characters speak simultaneously during an overlapping time window,
+    adds dialogue dashes (- Line) to immediately distinguish parallel voices.
     """
     if len(events) < 2:
         return events
 
-    # Sortowanie chronologiczne
+    # Chronological sort
     sorted_events = sorted(events, key=lambda e: e.start)
     n = len(sorted_events)
     simultaneous_indices = set()
 
     for i in range(n):
         ev_a = sorted_events[i]
-        # Pomijamy plansze ekranowe i piosenki
+        # Skip on-screen signs and song lines
         if (ev_a.style or "").lower() in ["sign", "signs", "title"] or "♪" in ev_a.text or r"\an8" in ev_a.text:
             continue
         for j in range(i + 1, n):
@@ -268,9 +268,9 @@ def apply_simultaneous_dialogue_formatting(events: List[Any]) -> List[Any]:
             if (ev_b.style or "").lower() in ["sign", "signs", "title"] or "♪" in ev_b.text or r"\an8" in ev_b.text:
                 continue
             if ev_b.start >= ev_a.end - 150:
-                break  # kolejne są już później
+                break  # subsequent lines are outside overlap window
 
-            # Nakładanie się w czasie o co najmniej 300 ms
+            # Overlap in time by at least 300 ms
             overlap = min(ev_a.end, ev_b.end) - max(ev_a.start, ev_b.start)
             if overlap >= 300:
                 simultaneous_indices.add(i)
@@ -281,7 +281,7 @@ def apply_simultaneous_dialogue_formatting(events: List[Any]) -> List[Any]:
         ts_prefix, clean_body = extract_typesetting_tags(ev.text)
         if not clean_body or clean_body.startswith(("-", "–", "—", "[", "(")):
             continue
-        # Dodajemy dywiz dialogowy AVT
+        # Add AVT dialogue dash
         ev.text = f"{ts_prefix}- {clean_body}" if ts_prefix else f"- {clean_body}"
 
     return sorted_events
@@ -334,10 +334,10 @@ class MultimodalTranslator:
         self.keep_honorifics = keep_honorifics
         self.system_prompt = get_translation_system_prompt(keep_honorifics=keep_honorifics)
         
-        # Profiler Odcinka (Pre-pass Glossary & Character Matrix)
+        # Episode Profiler (Pre-pass Glossary & Character Matrix)
         self.profiler = EpisodeProfiler(client=self.client, model=self.model_phase1)
         
-        # Opcjonalny lokalny japoński Whisper (Speech-to-Text)
+        # Optional local Japanese Whisper engine (Speech-to-Text)
         self.whisper = None
         if use_whisper and JapaneseWhisperEngine.is_available():
             try:
@@ -345,7 +345,7 @@ class MultimodalTranslator:
             except Exception:
                 self.whisper = None
         
-        # Faza 2 - Script Doctor (może działać na modelu Pro)
+        # Phase 2 - Script Doctor / Editorial Verifier
         if self.enable_verifier:
             self.verifier = DialogueVerifier(
                 client=self.client,
@@ -353,13 +353,13 @@ class MultimodalTranslator:
                 keep_honorifics=keep_honorifics
             )
         
-        # Pamięć postaci w filmie (Character Registry)
+        # In-episode character memory (Character Registry)
         self.character_registry: Dict[str, str] = {}
         
-        # Pamięć Tłumaczeniowa z korpusu (Translation Memory)
+        # Translation Memory from subtitle corpus
         try:
             self.tm = TranslationMemory()
-            # Sprawdzenie czy baza wymaga zaindeksowania
+            # Check if index needs building
             baza_dir = Path(__file__).parent / "baza napisów"
             if baza_dir.exists():
                 with sqlite3.connect(self.tm.db_path) as conn:
@@ -369,14 +369,14 @@ class MultimodalTranslator:
         except Exception:
             self.tm = None
 
-        # Rejestr Oficjalnego Kanonu Polskich Wydań Mangowych (Waneko, JPF, Studio JG itp.)
+        # Official Polish Manga Canon Registry (Waneko, JPF, Studio JG etc.)
         self.manga_canon = MangaCanonRegistry()
 
-        # Baza Osobistych Korekt Użytkownika (Few-Shot Golden Examples) oraz Słownik Deterministyczny
+        # User Feedback Database (Few-Shot Golden Examples) & Deterministic Glossary
         self.user_feedback = UserFeedbackManager()
         self.glossary_manager = GlossaryManager()
 
-        # Licznik rzeczywistych tokenów dla bieżącego odcinka
+        # Real token counter for the current episode
         self.current_episode_tokens: Dict[str, Any] = {"prompt": 0, "cached": 0, "output": 0, "model": self.model}
 
     def _prepare_batch_prompt(
@@ -396,51 +396,51 @@ class MultimodalTranslator:
         focused_rules_str: str = ""
     ) -> str:
         """
-        Tworzy tekst promptu dla danej paczki kwestii wraz z:
-        - Złotymi Wzorcami i Korektami Użytkownika (Few-Shot Golden Examples)
-        - Bezwzględnym Słownikiem Deterministycznym (Glossary Overrides)
-        - Skoncentrowanymi Filarami AVT (Context-Aware Focused Rules)
-        - Oficjalnym Kanonem Mangi (Wydawnictwa Waneko, JPF, Studio JG itp.)
-        - Biblią Serialu (Pamięć Międzyodcinkowa)
-        - Profilem odcinka (Słowniczek i Macierz Relacji)
-        - Kontekstem fabuły z bazy AniList
-        - Wzorcami z Pamięci Tłumaczeniowej (Translation Memory)
-        - Rejestrem znanych postaci (Character Registry)
-        - Historią poprzednich dialogów
-        - Podglądem nadchodzących kwestii (Lookahead Window)
-        - Japońską transkrypcją mowy ze słuchu (Whisper STT)
-        - Cechami prozodii audio (szept/krzyk) i klasyfikacją głosu (diarizacja)
-        - Ostrzeżeniami tempa czytania CPS
+        Builds the prompt text for the current dialogue batch including:
+        - Few-Shot Golden Examples & User Feedback
+        - Deterministic Glossary Overrides
+        - Context-Aware Focused AVT Rules
+        - Official Polish Manga Canon
+        - Cross-Episode Series Bible Continuity
+        - Episode Profile (Glossary & Relationship Matrix)
+        - AniList metadata context
+        - Translation Memory examples
+        - Character Registry
+        - Previous dialogue history
+        - Lookahead Window preview
+        - Whisper Speech-to-Text transcription
+        - Audio prosody and speaker diarization tags
+        - CPS reading speed warnings
         """
         lines = []
 
-        # 00a. Osobiste Złote Wzorce i Korekty Użytkownika (Maksymalny Priorytet)
+        # 00a. User Golden Examples and Feedback (Top Priority)
         if user_feedback_str:
             lines.append(user_feedback_str)
 
-        # 00b. Bezwzględny Słownik Pojęć i Nazw Użytkownika
+        # 00b. Deterministic Glossary Overrides
         if glossary_str:
             lines.append(glossary_str)
 
-        # 00c. Skoncentrowana Uwaga i Właściwości Bieżącej Sceny (Eliminacja Lost in the Middle)
+        # 00c. Focused Scene Rules (Eliminate Lost-in-the-Middle)
         if focused_rules_str:
             lines.append(focused_rules_str)
 
-        # 0a. Oficjalny Kanon Polskiego Wydania Mangi
+        # 0a. Official Polish Manga Canon
         if manga_canon_str:
             lines.append(manga_canon_str)
 
-        # 0b. Ciągłość terminologiczna z Biblii Serialu
+        # 0b. Series Bible cross-episode continuity
         if series_bible_str:
             lines.append(series_bible_str)
 
-        # 0b. Słowniczek i Macierz Relacji z Profilera Odcinka (lub kontekst AniList w razie braku profilera)
+        # 0b. Episode profile glossary and relationships
         if episode_profile_str:
             lines.append(episode_profile_str)
         elif anime_context_str:
             lines.append(anime_context_str)
 
-        # 0c. Złote przykłady z Pamięci Tłumaczeniowej (Translation Memory)
+        # 0c. Translation Memory golden examples
         if self.tm:
             try:
                 batch_queries = [item[2] for item in batch_events]
@@ -450,21 +450,21 @@ class MultimodalTranslator:
             except Exception:
                 pass
 
-        # 1. Rejestr znanych postaci
+        # 1. Character Registry
         if self.character_registry:
             lines.append("--- ZNANE POSTACIE W TYM FILMIE (dla zachowania spójności płci i imion) ---")
             for name, details in self.character_registry.items():
                 lines.append(f"• {name}: {details}")
             lines.append("--------------------------------------------------------------------------\n")
 
-        # 2. Historia poprzednich kwestii
+        # 2. Previous dialogue history
         if history_context:
             lines.append("--- POPRZEDNIE KWESTIE W SCENIE (kontekst przeszły) ---")
             for h in history_context[-4:]:
                 lines.append(f"[Poprzednio] EN: {h['en']} -> PL: {h['pl']}")
             lines.append("-------------------------------------------------------\n")
 
-        # 3. Kwestie do przetłumaczenia
+        # 3. Lines to translate
         lines.append("Przetłumacz poniższe kwestie dialogowe na naturalny język polski. "
                      "PAMIĘTAJ: Kwestie często tworzą jedno długie zdanie rozbite na kilka linijek – ZAWSZE analizuj CAŁE ZDANIA od początku do końca, dbając o piękny, naturalny polski szyk wyrazów i płynność gramatyczną między linijkami! "
                      "ŻEŃSKOOSOBOWOŚĆ OBSADY: Dialogi między uczennicami/dziewczętami bezwzględnie tłumacz w RODZAJU ŻEŃSKIM (np. 'Głupia jesteś?' / 'Oszalałaś?', 'Jesteś pewna?', 'Widziałaś to?', 'poszłam', 'zrobiłam'). ZAKAZ form męskich ('Głupi jesteś?') w rozmowach dziewcząt! "
@@ -487,7 +487,7 @@ class MultimodalTranslator:
                 acoustic_cues.append(f"Ton: {prosody_tags[idx + 1]}")
             acoustic_str = f" [{', '.join(acoustic_cues)}]" if acoustic_cues else ""
 
-            # Dynamiczne wykrywanie relacji przyczynowo-skutkowej z poprzednią kwestią
+            # Dynamic cause-and-effect relationship detection with preceding line
             relation_tag = ""
             if idx > 0 and not vtype["is_sign"]:
                 prev_clean = batch_events[idx - 1][2].strip()
@@ -517,7 +517,7 @@ class MultimodalTranslator:
                     lines.append(f"  JP (GŁÓWNA KOTWICA SEMANTYCZNA - Słuchaj intencji aktora): {jp_display}")
             lines.append(f"  EN (Pomocniczy skrypt do czasu/ogólnego sensu): {clean_text}")
 
-        # 4. Podgląd przyszłych kwestii (Lookahead)
+        # 4. Lookahead window
         if lookahead_events:
             lines.append("\n--- PODGLĄD NASTĘPNYCH KWESTII (NIE TŁUMACZ ICH! Użyj tylko do zrozumienia kontekstu i płci) ---")
             for _, _, future_text, _ in lookahead_events[:4]:
@@ -528,11 +528,10 @@ class MultimodalTranslator:
 
     def _call_gemini_with_retry(self, contents: List[Any], schema_class) -> Any:
         """
-        Bezpieczne wywołanie API z automatyczną obsługą chwilowych limitów minutowych (429) i przeciążeń (503).
-        Wykorzystuje inteligentną pulę modeli flagowych (Tier-Preserving Model Pool), aby zapewnić
-        100% najwyższą jakość tłumaczenia bez wielominutowych przestojów.
+        Reliable API call with automated handling of rate limits (429) and server overloads (503).
+        Uses Tier-Preserving Model Pool to guarantee 100% flagship quality without delays.
         """
-        # Pula dwóch najwyższych wersji Flash lub najwyższej wersji Pro
+        # Flagship model candidate pool
         from model_resolver import resolve_best_models
         active_models = resolve_best_models(self.client)
 
@@ -619,7 +618,7 @@ class MultimodalTranslator:
                 is_unavailable = "503" in err_str or "unavailable" in err_str or "high demand" in err_str
                 is_rate_limit = "429" in err_str or "quota" in err_str or "resource_exhausted" in err_str or "rate" in err_str
                 
-                # Błyskawiczny fallback między dwoma najwyższymi wersjami Flash przy 503
+                # Instant fallback switch between the two top Flash versions on 503
                 if is_unavailable and len(candidate_models) > 1:
                     next_idx = (current_model_idx + 1) % len(candidate_models)
                     if next_idx != current_model_idx:
@@ -660,10 +659,10 @@ class MultimodalTranslator:
         cancel_check = None
     ) -> str:
         """
-        Główna metoda tłumacząca plik z napisami z pełnym zachowaniem Typesettingu, stylów i timingu.
+        Main method to translate a subtitle file preserving full Typesetting, styles, and timing.
         """
         subs_file = Path(subs_path)
-        # Reset rejestru postaci i liczników tokenów dla nowego odcinka
+        # Reset character registry and token counters for new episode
         self.character_registry = {}
         self.current_episode_tokens = {"prompt": 0, "cached": 0, "output": 0, "model": self.model}
         if self.verifier:
@@ -676,7 +675,7 @@ class MultimodalTranslator:
         except UnicodeDecodeError:
             subs = pysubs2.load(str(subs_file), encoding="latin2")
 
-        # 0. Pobranie metadanych anime z AniList
+        # 0. Retrieve anime metadata from AniList
         ref_filename = video_path if video_path else subs_path
         anime_meta = get_anime_context(ref_filename)
         anime_context_str = ""
@@ -694,11 +693,11 @@ class MultimodalTranslator:
                 print(f"[Baza AniList] [Dziedzina specjalistyczna]: {', '.join(anime_meta['detected_domains'])}")
             print(f"[Baza AniList] Wczytano opis fabuły oraz {char_count} postaci z ich płcią i rolami.")
             
-            # Wstępne wypełnienie rejestru postaci z bazy AniList
+            # Pre-populate character registry from AniList
             for c in anime_meta.get("characters", []):
                 self.character_registry[c["name"]] = f"{c['gender']} ({c['role']})"
 
-        # 1. Czyszczenie kwestii i kompresja animacji klatka-po-klatce (FBF Animation Deduplication)
+        # 1. Clean events and compress frame-by-frame animations (FBF Animation Deduplication)
         raw_all_entries = []
         for i, ev in enumerate(subs.events):
             if ev.is_comment:
@@ -710,7 +709,7 @@ class MultimodalTranslator:
                 continue
             raw_all_entries.append((i, ev, clean, ts_prefix))
 
-        # Kompresja animowanego typesettingu (np. 1100 sub-klatek 'CHIN' redukowane do 1 zapytania)
+        # Compress animated typesetting (e.g. 1100 sub-frames of 'CHIN' reduced to 1 API call)
         raw_entries = []
         sub_to_master = {}
         last_text = None
@@ -758,7 +757,7 @@ class MultimodalTranslator:
         history: List[Dict[str, str]] = []
         translated_results: Dict[int, str] = {}
 
-        # 1b. Szukanie plików checkpointu (wielokrotne ścieżki i formaty)
+        # 1b. Search for checkpoint files (multiple paths and candidate formats)
         checkpoint_path = None
         if video_path and os.path.exists(video_path):
             checkpoint_path = Path(video_path).with_suffix(".checkpoint.json")
@@ -823,7 +822,7 @@ class MultimodalTranslator:
         else:
             print("[Autozapis]: Brak wcześniejszego checkpointu. Rozpoczynanie tłumaczenia.")
 
-        # 0. Profiler Odcinka (Pre-pass Glossary & Relationship Matrix)
+        # 0. Episode Profiler (Pre-pass Glossary & Relationship Matrix)
         profile_cache_path = None
         if subs_path:
             profile_cache_path = str(Path(subs_path).with_suffix(".profile.json"))
@@ -840,7 +839,7 @@ class MultimodalTranslator:
         )
         episode_profile_str = format_episode_profile_for_prompt(episode_profile)
 
-        # 0b. Inicjalizacja i wczytanie Biblii Serialu (Pamięć Międzyodcinkowa Sezonu)
+        # 0b. Initialize and load Series Bible (Cross-Episode Continuity)
         series_title = ""
         if anime_meta:
             series_title = anime_meta.get("title_romaji") or anime_meta.get("title_english") or ""
@@ -862,7 +861,7 @@ class MultimodalTranslator:
                 glossary=gloss_dict
             )
 
-        # 0c. Sprawdzenie Oficjalnego Kanonu Polskiego Wydania Mangi (Waneko, JPF, Studio JG, Hanami itp.)
+        # 0c. Match Official Polish Manga Canon
         candidates_to_match = [series_title]
         if anime_meta:
             if anime_meta.get("title_romaji"): candidates_to_match.append(anime_meta["title_romaji"])
@@ -894,7 +893,7 @@ class MultimodalTranslator:
         if series_bible_str:
             print(f"  [Biblia Serialu]: Wczytano ciągłość sezonu dla serii '{series_title or self.series_bible.slug}'")
 
-        # 0d. Połączony Słownik Użytkownika i Biblii Serialu (Deterministyczny)
+        # 0d. Combined User and Series Bible Glossary (Deterministic)
         series_gloss_dict = self.series_bible.data.get("glossary", {}) if hasattr(self, "series_bible") and self.series_bible else {}
         combined_glossary = self.glossary_manager.get_combined_glossary(series_gloss_dict)
         if combined_glossary:
@@ -904,7 +903,7 @@ class MultimodalTranslator:
         if user_rules_cnt > 0:
             print(f"  [Korekty Użytkownika]: Wczytano {user_rules_cnt} złotych reguł (Few-Shot Prompting).")
 
-        # 0e. Pre-warming i Twarda Blokada Portfela Context Cache (Gwarancja rabatu -75%)
+        # 0e. Pre-warming and Context Cache Hard Protection (guarantees -75% discount)
         from context_cache import ContextCacheManager
         print(f"  [Infrastruktura Finansowa]: Weryfikacja i rozgrzewanie pamięci Context Cache...")
         c1 = ContextCacheManager.ensure_cache_ready(self.client, self.model_phase1, self.system_prompt)
@@ -961,12 +960,12 @@ class MultimodalTranslator:
                 if not untranslated_in_batch:
                     continue
 
-                # Pobieramy nadchodzące kwestie (Lookahead Window)
+                # Retrieve upcoming lines (Lookahead Window)
                 lookahead_events = []
                 if b_idx + 1 < len(batches):
                     lookahead_events = batches[b_idx + 1][:4]
 
-                # 2. Inteligentna ekstrakcja 1-2 kluczowych klatek dla paczki
+                # 2. Extract 1-2 key video frames for the batch
                 temp_frames: List[str] = []
                 image_contents = []
 
@@ -998,7 +997,7 @@ class MultimodalTranslator:
                         except Exception:
                             pass
 
-                # 2b. Ekstrakcja wycinka audio i Błyskawiczna LOKALNA transkrypcja Whisper + Prozodia + Diarizacja (100% Offline / 0 zł)
+                # 2b. Extract audio slice and run LOCAL Whisper transcription + Prosody + Diarization (100% offline)
                 temp_audio_file = None
                 whisper_transcriptions: Dict[int, str] = {}
                 prosody_tags: Dict[int, str] = {}
@@ -1015,7 +1014,7 @@ class MultimodalTranslator:
                             )
                             events_tuples = [(idx + 1, item[1]) for idx, item in enumerate(untranslated_in_batch)]
                             
-                            # 1. Lokalna transkrypcja Whisper z kontekstem postaci i terminologii
+                            # 1. Local Whisper transcription with character and terminology context
                             if self.whisper:
                                 whisper_prime_keywords = []
                                 if anime_meta:
@@ -1036,7 +1035,7 @@ class MultimodalTranslator:
                                             if getattr(c, "listener", None):
                                                 whisper_prime_keywords.append(c.listener)
 
-                                # Bezpieczna filtracja słów kluczowych dla japońskiego Whispera (brak polskich znaków i opisów ról)
+                                # Safe keyword filtering for Japanese Whisper (no Polish characters or role labels)
                                 sanitized_kw = []
                                 for kw in whisper_prime_keywords:
                                     if not kw:
@@ -1060,14 +1059,14 @@ class MultimodalTranslator:
                                     initial_prompt=initial_prompt_str
                                 )
 
-                            # 2. Lokalna analiza prozodii (RMS dBFS / szept / krzyk)
+                            # 2. Local prosody analysis (RMS dBFS / whisper / shout)
                             prosody_tags = AudioProsodyEngine.analyze_scene_prosody(
                                 wav_path=temp_audio_file,
                                 batch_start_ms=batch_start,
                                 events=events_tuples
                             )
 
-                            # 3. Lokalna diarizacja i szacowanie barwy głosu F0
+                            # 3. Local diarization and F0 pitch estimation
                             speaker_tags = SpeakerVoiceClassifier.classify_scene_speakers(
                                 wav_path=temp_audio_file,
                                 batch_start_ms=batch_start,
@@ -1077,7 +1076,7 @@ class MultimodalTranslator:
                         pbar.write(f" ├─ [Ostrzeżenie Audio/Whisper]: {e}")
                         pass
 
-                # 3. Dynamiczne reguły kontekstowe, złote wzorce użytkownika i deterministyczny słownik
+                # 3. Dynamic contextual rules, user golden feedback, and deterministic glossary
                 batch_en_queries = [item[2] for item in untranslated_in_batch]
                 relevant_feedback = self.user_feedback.find_relevant_feedback(
                     batch_en_queries,
@@ -1094,7 +1093,7 @@ class MultimodalTranslator:
                     for item in untranslated_in_batch
                 ])
 
-                # 3b. Prompt tekstowy z bazą wiedzy AniList, rejestrem postaci, lookaheadem i cechami fonicznymi
+                # 3b. Text prompt with AniList knowledge, character registry, lookahead, and phonetic cues
                 prompt_text = self._prepare_batch_prompt(
                     untranslated_in_batch,
                     history,
@@ -1111,9 +1110,9 @@ class MultimodalTranslator:
                     focused_rules_str=focused_rules_str
                 )
 
-                # 4. Wywołanie Gemini (Obraz + Tekst ze słuchu Whisper) - Zero opłat za streaming audio do Google!
+                # 4. Call Gemini (Vision + Whisper text context)
                 contents: List[Any] = []
-                # Podgląd statusu Whisper w konsoli (Romaji fonetyczne - czytelne na każdym terminalu)
+                # Console preview of Whisper status in phonetic Romaji
                 if whisper_transcriptions:
                     jp_raw_list = [v for v in whisper_transcriptions.values() if v]
                     if jp_raw_list:
@@ -1123,7 +1122,7 @@ class MultimodalTranslator:
                             romaji_line = romaji_line[:72] + "..."
                         pbar.write(f" ├─ [Odsłuch JP] \"{romaji_line}\"")
 
-                # 4. Wywołanie Gemini (Obraz + Tekst)
+                # 4. Call Gemini (Vision + Text)
                 contents: List[Any] = []
                 contents.extend(image_contents)
                 contents.append(prompt_text)
@@ -1134,7 +1133,7 @@ class MultimodalTranslator:
                     schema_class=BatchTranslationResponse
                 )
 
-                # Aktualizacja globalnego Rejestru Postaci (Character Registry)
+                # Update global Character Registry
                 if batch_response and batch_response.characters_identified:
                     for char in batch_response.characters_identified:
                         if char.name:
@@ -1143,7 +1142,7 @@ class MultimodalTranslator:
                 if batch_response and batch_response.scene_description:
                     pbar.write(f" ├─ [Kontekst] {batch_response.scene_description}")
 
-                # Czyszczenie klatek i audio tymczasowego
+                # Clean up temporary frames and audio files
                 for fpath in temp_frames:
                     try:
                         os.remove(fpath)
@@ -1155,7 +1154,7 @@ class MultimodalTranslator:
                     except OSError:
                         pass
 
-                # 5. Przetwarzanie odpowiedzi Fazy 1
+                # 5. Process Phase 1 response
                 pass1_items = []
                 scene_desc = batch_response.scene_description if batch_response else ""
 
@@ -1203,7 +1202,7 @@ class MultimodalTranslator:
                         "is_song": is_song_line(event, clean_en)
                     })
 
-                # 6. Opcjonalna II faza weryfikatora (Redakcja Literacka)
+                # 6. Optional Phase 2 Verifier (Script Doctor)
                 all_user_rules = self.user_feedback.list_all()
 
                 if self.enable_verifier and hasattr(self, 'verifier'):
@@ -1230,7 +1229,7 @@ class MultimodalTranslator:
                             user_feedback_rules=all_user_rules,
                             custom_glossary=combined_glossary
                         )
-                        # Deterministyczny filtr terminologiczny
+                        # Deterministic glossary overrides
                         final_text, gloss_fixes = GlossaryManager.apply_deterministic_overrides(final_text, combined_glossary)
                         if item.get("is_song"):
                             clean_no_notes = re.sub(r"^[♪♫♬\s]+|[♪♫♬\s]+$", "", final_text).strip()
@@ -1252,7 +1251,7 @@ class MultimodalTranslator:
                             user_feedback_rules=all_user_rules,
                             custom_glossary=combined_glossary
                         )
-                        # Deterministyczny filtr terminologiczny
+                        # Deterministic glossary overrides
                         final_text, gloss_fixes = GlossaryManager.apply_deterministic_overrides(final_text, combined_glossary)
                         if item.get("is_song"):
                             clean_no_notes = re.sub(r"^[♪♫♬\s]+|[♪♫♬\s]+$", "", final_text).strip()
@@ -1264,7 +1263,7 @@ class MultimodalTranslator:
                         translated_results[item["orig_idx"]] = formatted_final
                         history.append({"en": item["en"], "pl": formatted_final})
 
-                # Harmonizacja równoczesnych napisów ekranowych (chmurka + dialog o identycznej treści EN)
+                # Harmonize concurrent screen subtitles (e.g. speech balloon + dialogue with identical EN text)
                 en_to_best_pl: Dict[str, str] = {}
                 for item in pass1_items:
                     en_norm = item["en"].strip().lower()
@@ -1279,7 +1278,7 @@ class MultimodalTranslator:
                         if "to robi" in cur_pl.lower():
                             translated_results[item["orig_idx"]] = en_to_best_pl[en_norm]
 
-                # Autozapis checkpointu po każdej przetłumaczonej paczce (z zachowaniem liczników tokenów)
+                # Auto-save checkpoint after each batch (persisting token usage)
                 try:
                     checkpoint_payload = {
                         "translated_results": translated_results,
@@ -1301,7 +1300,7 @@ class MultimodalTranslator:
                         f1_stats = self.current_episode_tokens
                         f2_stats = self.verifier.current_episode_tokens if self.verifier else None
                         cur_cost_pln = PricingGuard.calculate_actual_cost_pln(f1_stats, f2_stats)
-                        # Przygotowanie próbek przetłumaczonych linijek dla podglądu na żywo
+                        # Prepare recent translation previews for UI live monitor
                         recent_previews = []
                         for it in pass1_items:
                             o_idx = it["orig_idx"]
@@ -1316,12 +1315,12 @@ class MultimodalTranslator:
 
                 time.sleep(2.0)
 
-        # 7. Budowa końcowego pliku z zachowaniem stylów, pozycjonowania i typesettingu
+        # 7. Construct final subtitle file preserving styles, positioning, and typesetting
         final_subs = pysubs2.SSAFile()
-        # Kopiowanie pełnego arkusza stylów (czcionki, kolory, położenie napisów)
+        # Copy full stylesheet (fonts, colors, positions)
         final_subs.styles = subs.styles.copy()
         final_subs.info = subs.info.copy()
-        # Wymuszenie WrapStyle: 2 (Brak samowolnego łamania przez odtwarzacz wideo)
+        # Force WrapStyle: 2 (no arbitrary line wrapping by video player)
         final_subs.info["WrapStyle"] = "2"
 
         for orig_idx, orig_event, _, ts_prefix in raw_all_entries:
@@ -1333,17 +1332,17 @@ class MultimodalTranslator:
             if not clean_translated_text:
                 continue
 
-            # Ponowne dołączenie tagów Typesettingu do przetłumaczonego tekstu
+            # Reattach Typesetting tags to translated text
             full_event_text = f"{ts_prefix}{clean_translated_text}" if ts_prefix else clean_translated_text
 
             new_event = orig_event.copy()
             new_event.text = full_event_text
             final_subs.events.append(new_event)
 
-        # 7.0. Diarizacja dialogów symultanicznych (Simultaneous Dialogue AVT)
+        # 7.0. Format simultaneous dialogues (Simultaneous Dialogue AVT)
         final_subs.events = apply_simultaneous_dialogue_formatting(final_subs.events)
 
-        # 7.1. Wizyjny Detektor Brakujących Plansz (Visual Sign Detector & OCR)
+        # 7.1. Visual Sign Detector & OCR for subtitle gaps
         if video_path and os.path.exists(video_path):
             try:
                 from sign_detector import VisualSignDetector
@@ -1362,7 +1361,7 @@ class MultimodalTranslator:
             except Exception as e:
                 logger.warning(f"Wizyjny Detektor Plansz: Pomijanie detekcji plansz ({e})")
 
-        # 7.2. Kinowe Dociąganie do Cięć Montażowych (SceneShotSnapper - Standard Netflix AVT)
+        # 7.2. Cinematic Shot Snapping (SceneShotSnapper - Netflix AVT Standard)
         if video_path and os.path.exists(video_path):
             try:
                 from scene_snapper import SceneShotSnapper
@@ -1388,7 +1387,7 @@ class MultimodalTranslator:
 
         final_subs.save(output_path, encoding="utf-8")
         
-        # Usunięcie pliku checkpointu po pomyślnym ukończeniu całości
+        # Remove checkpoint file upon successful completion
         if checkpoint_path.exists():
             try:
                 os.remove(str(checkpoint_path))
@@ -1397,7 +1396,7 @@ class MultimodalTranslator:
 
         print(f"\n[Sukces] Przetłumaczone, wyczyszczone napisy z zachowanym Typesettingiem zapisano w: {output_path}")
 
-        # Obliczenie i wyświetlenie łącznego rzeczywistego kosztu całego odcinka na podstawie tokenów
+        # Calculate and display total real episode cost based on token usage
         try:
             from pricing_guard import PricingGuard
             f1_stats = self.current_episode_tokens
@@ -1415,7 +1414,7 @@ class MultimodalTranslator:
         except Exception:
             pass
 
-        # Bezpieczne usunięcie serwerowych obiektów Context Cache (0 zł opłat po zakończeniu pracy)
+        # Clean up server-side Context Cache objects to avoid storage fees
         try:
             from context_cache import ContextCacheManager
             ContextCacheManager.cleanup_all_active_caches(self.client)

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Moduł Słownika Deterministycznego i Nadpisywania Terminologii (Deterministic Glossary Manager).
-Pozwala użytkownikowi na definiowanie żelaznych tłumaczeń pojęć, imion, ataków i tytułów,
-które są wstrzykiwane do promptu oraz bezwzględnie wymuszane w post-processingu (100% determinizmu).
+Deterministic Glossary Manager & Terminology Override Module.
+Allows defining rigid translations for concepts, character names, attacks, and titles,
+which are injected into prompts and strictly enforced in post-processing (100% determinism).
 """
 
 import os
@@ -15,7 +15,7 @@ GLOBAL_GLOSSARY_PATH = Path(__file__).parent / "global_glossary.json"
 
 class GlossaryManager:
     """
-    Zarządza globalnym oraz lokalnym słownikiem terminów z deterministycznym nadpisywaniem.
+    Manages global and per-series term glossaries with deterministic overrides.
     """
     def __init__(self, global_path: Optional[Path] = None):
         self.global_path = global_path or GLOBAL_GLOSSARY_PATH
@@ -23,7 +23,7 @@ class GlossaryManager:
         self.load()
 
     def load(self):
-        """Wczytuje globalny słownik z pliku JSON."""
+        """Loads global glossary from JSON file."""
         if self.global_path.exists():
             try:
                 with open(self.global_path, "r", encoding="utf-8") as f:
@@ -33,18 +33,18 @@ class GlossaryManager:
             except Exception:
                 self.global_terms = {}
         else:
-            # Domyślne żelazne terminy globalne
+            # Default verified global terms
             self.global_terms = {
-                "Sensei": {"pl": "Sensei", "desc": "Tytuł mistrza/nauczyciela (bez 'Pani/Pan')"},
-                "Senpai": {"pl": "Senpai", "desc": "Starszy kolega/koleżanka"},
-                "Your Honor": {"pl": "Wysoki Sądzie", "desc": "Zwrot do sędziego w sądzie"},
-                "Four Emperors": {"pl": "Czterej Cesarze", "desc": "Liczebnik męskoosobowy (nie: Czworo)"},
-                "Three Musketeers": {"pl": "Trzej Muszkieterowie", "desc": "Liczebnik męskoosobowy"}
+                "Sensei": {"pl": "Sensei", "desc": "Honorific for teacher/master without Pan/Pani"},
+                "Senpai": {"pl": "Senpai", "desc": "Senior peer honorific"},
+                "Your Honor": {"pl": "Wysoki Sądzie", "desc": "Courtroom judicial address"},
+                "Four Emperors": {"pl": "Czterej Cesarze", "desc": "Virile numeral (not: Czworo)"},
+                "Three Musketeers": {"pl": "Trzej Muszkieterowie", "desc": "Virile numeral"}
             }
             self.save()
 
     def save(self):
-        """Zapisuje globalny słownik na dysku."""
+        """Saves global glossary to disk."""
         try:
             with open(self.global_path, "w", encoding="utf-8") as f:
                 json.dump(self.global_terms, f, ensure_ascii=False, indent=2)
@@ -52,7 +52,7 @@ class GlossaryManager:
             pass
 
     def add_term(self, src: str, pl: str, desc: str = "") -> None:
-        """Dodaje lub aktualizuje termin w słowniku globalnym."""
+        """Adds or updates a term in the global glossary."""
         if src.strip() and pl.strip():
             self.global_terms[src.strip()] = {
                 "pl": pl.strip(),
@@ -61,7 +61,7 @@ class GlossaryManager:
             self.save()
 
     def remove_term(self, src: str) -> bool:
-        """Usuwa termin ze słownika globalnego."""
+        """Removes a term from the global glossary."""
         if src.strip() in self.global_terms:
             del self.global_terms[src.strip()]
             self.save()
@@ -70,14 +70,14 @@ class GlossaryManager:
 
     def get_combined_glossary(self, series_glossary: Optional[Dict[str, str]] = None) -> Dict[str, str]:
         """
-        Łączy słownik globalny ze słownikiem z Biblii Serialu (gdzie seria ma pierwszeństwo).
-        Zwraca prostą mapę {angielski/japoński_termin: polskie_tłumaczenie}.
+        Combines global glossary with Series Bible glossary (series takes precedence).
+        Returns simple mapping {source_term: target_pl_translation}.
         """
         combined: Dict[str, str] = {}
-        # 1. Globalne
+        # 1. Global terms
         for k, v in self.global_terms.items():
             combined[k] = v.get("pl", "") if isinstance(v, dict) else str(v)
-        # 2. Specyficzne dla serii (nadpisują globalne)
+        # 2. Series-specific terms (override global)
         if series_glossary:
             for k, v in series_glossary.items():
                 if k and v:
@@ -86,7 +86,7 @@ class GlossaryManager:
 
     def format_for_prompt(self, glossary_dict: Dict[str, str]) -> str:
         """
-        Formatuje słownik do wstrzyknięcia do promptu LLM z najwyższym priorytetem.
+        Formats glossary for high-priority LLM prompt injection.
         """
         if not glossary_dict:
             return ""
@@ -102,7 +102,7 @@ class GlossaryManager:
 
     @classmethod
     def clean_target_term(cls, trg: str) -> str:
-        """Usuwa zbędne objaśnienia w nawiasach (np. 'Płomień Adolli (Adolla Burst)' -> 'Płomień Adolli')."""
+        """Removes parenthetical clarifications (e.g., 'Płomień Adolli (Adolla Burst)' -> 'Płomień Adolli')."""
         if not trg:
             return ""
         cleaned = re.sub(r"\s*\([^)]*\)$", "", trg).strip()
@@ -115,9 +115,9 @@ class GlossaryManager:
         glossary_dict: Dict[str, str]
     ) -> Tuple[str, List[str]]:
         """
-        Bezwzględny filtr deterministyczny uruchamiany po tłumaczeniu.
-        Jeśli w tekście pojawi się błędna/przestarzała wersja lub pominięty termin,
-        filtr podmienia go na ustaloną polską formę BEZ dublowania i bez wstawek w nawiasach.
+        Post-processing deterministic filter.
+        Substitutes untranslated or erroneous terms with the enforced Polish form
+        without duplicates or brackets.
         """
         if not text or not glossary_dict:
             return text, []
@@ -125,7 +125,7 @@ class GlossaryManager:
         modified = text
         applied_fixes = []
 
-        # Sortujemy słownik od najdłuższych fraz do najkrótszych (aby "Shinra Bansho Man" miał pierwszeństwo przed "Shinra Bansho")
+        # Sort glossary by length descending so longer phrases match first
         sorted_glossary = sorted(glossary_dict.items(), key=lambda kv: len(kv[0]), reverse=True)
 
         for src, raw_trg in sorted_glossary:
@@ -136,17 +136,17 @@ class GlossaryManager:
             if not trg or src.lower() == trg.lower():
                 continue
 
-            # Zabezpieczenie: jeśli termin docelowy już znajduje się w tekście w tej samej frazie, nie dublujemy
+            # Prevent duplication if target already exists
             if trg.lower() in modified.lower() and src.lower() in trg.lower():
                 continue
 
-            # Jeśli w przetłumaczonym tekście ostał się angielski termin (nieprzetłumaczony)
+            # Check if source term remains untranslated
             pattern_src = re.compile(rf"\b{re.escape(src)}\b", re.IGNORECASE)
             if pattern_src.search(modified):
                 modified = pattern_src.sub(trg, modified)
                 applied_fixes.append(f"Wymuszenie słownika: '{src}' -> '{trg}'")
 
-        # Czyszczenie ewentualnych zduplikowanych nawiasów (np. "(XYZ) (XYZ)" -> "")
+        # Clean duplicate parentheses
         modified = re.sub(r"\(([^)]+)\)\s*\(\1\)", r"(\1)", modified)
         modified = re.sub(r"\s+", " ", modified).strip()
 

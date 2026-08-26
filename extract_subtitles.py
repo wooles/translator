@@ -1,10 +1,10 @@
 """
-Narzędzie do automatycznego, masowego wyciągania angielskich napisów (.ass / .srt) z plików wideo (.mkv, .mp4).
-Obsługuje:
-- Przeciąganie pojedynczych lub wielu plików wideo na raz
-- Przeciąganie całych folderów
-- Automatyczne wykrywanie angielskich ścieżek (eng / english / dialogi)
-- Zachowanie oryginalnego formatu napisów (.ass z pełnym typesettingiem lub .srt)
+Tool for automatic batch extraction of English subtitles (.ass / .srt) from video files (.mkv, .mp4).
+Supports:
+- Drag-and-drop of single or multiple video files
+- Processing entire folders recursively
+- Automatic detection of English tracks (eng / english / dialogues)
+- Preservation of original subtitle formats (.ass with full typesetting or .srt)
 """
 
 import os
@@ -18,7 +18,7 @@ VIDEO_EXTENSIONS = {".mkv", ".mp4", ".avi", ".mov", ".m4v", ".webm"}
 
 def get_subtitles_info(video_path: str) -> List[Dict[str, Any]]:
     """
-    Zwraca szczegółową listę ścieżek napisów w pliku wideo.
+    Returns a detailed list of subtitle tracks in the video file.
     """
     cmd = [
         "ffprobe",
@@ -51,43 +51,43 @@ def get_subtitles_info(video_path: str) -> List[Dict[str, Any]]:
 
 def extract_track_from_video(video_path: Path, output_dir: Optional[Path] = None, track_idx: Optional[int] = None) -> Optional[Path]:
     """
-    Wyciąga angielską ścieżkę napisów z pliku wideo i zapisuje ją obok pliku lub we wskazanym folderze.
+    Extracts English subtitle track from video file and saves it next to video or in target directory.
     """
     tracks = get_subtitles_info(str(video_path))
     if not tracks:
-        print(f"[Pominięto]: {video_path.name} (brak wbudowanych ścieżek napisów)")
+        print(f"[Skipped]: {video_path.name} (no embedded subtitle tracks)")
         return None
 
-    # Wybór właściwej ścieżki (szukamy 'eng', 'en', 'dialogue' lub bierzemy wskazaną / pierwszą)
+    # Select appropriate track (search for 'eng', 'en', 'dialogue' or take specified/first)
     chosen_track = None
     if track_idx is not None and 0 <= track_idx < len(tracks):
         chosen_track = tracks[track_idx]
     else:
-        # Priorytet 1: Język 'eng' / 'en' z dialogami
+        # Priority 1: Language 'eng' / 'en' with dialogue
         for t in tracks:
             if t["language"] in ("eng", "en", "english") and "sign" not in t["title"].lower():
                 chosen_track = t
                 break
         
-        # Priorytet 2: Jakikolwiek 'eng'
+        # Priority 2: Any 'eng'
         if not chosen_track:
             for t in tracks:
                 if t["language"] in ("eng", "en", "english"):
                     chosen_track = t
                     break
 
-        # Priorytet 3: Pierwsza dostępna ścieżka
+        # Priority 3: First available track
         if not chosen_track:
             chosen_track = tracks[0]
 
-    # Ustalenie formatu wyjściowego
+    # Determine output format
     codec = chosen_track["codec"]
     if "ass" in codec or "ssa" in codec:
         ext = ".ass"
     elif "subrip" in codec or "srt" in codec:
         ext = ".srt"
     elif "pgs" in codec or "hdmv" in codec or "vobsub" in codec or "dvd" in codec:
-        print(f"[Ostrzeżenie]: Ścieżka w {video_path.name} to napisy graficzne ({codec}). Ekstrakcja może wymagać OCR.")
+        print(f"[Warning]: Track in {video_path.name} is bitmap/PGS ({codec}). Extraction may require OCR.")
         ext = ".sup"
     else:
         ext = ".ass"
@@ -96,7 +96,7 @@ def extract_track_from_video(video_path: Path, output_dir: Optional[Path] = None
     target_dir.mkdir(parents=True, exist_ok=True)
     out_file = target_dir / f"{video_path.stem}.en{ext}"
 
-    # Komenda ffmpeg do ekstrakcji
+    # Ffmpeg command for extraction
     cmd = [
         "ffmpeg",
         "-y",
@@ -106,16 +106,16 @@ def extract_track_from_video(video_path: Path, output_dir: Optional[Path] = None
     ]
     try:
         subprocess.run(cmd, capture_output=True, text=True, check=True)
-        lang_info = f"język={chosen_track['language']}, tytuł='{chosen_track['title']}'"
-        print(f"[Sukces]: Wyciągnięto {out_file.name} (Ścieżka {chosen_track['sub_index']}: {lang_info})")
+        lang_info = f"language={chosen_track['language']}, title='{chosen_track['title']}'"
+        print(f"[Success]: Extracted {out_file.name} (Track {chosen_track['sub_index']}: {lang_info})")
         return out_file
     except Exception as e:
-        print(f"[Błąd ekstrakcji]: {video_path.name} -> {e}")
+        print(f"[Extraction error]: {video_path.name} -> {e}")
         return None
 
 def pick_files_or_dir_gui() -> List[Path]:
     """
-    Otwiera okienko wyboru plików dla Windows (GUI).
+    Opens file picker dialog for Windows (GUI).
     """
     try:
         import tkinter as tk
@@ -124,10 +124,10 @@ def pick_files_or_dir_gui() -> List[Path]:
         root.withdraw()
         root.attributes("-topmost", True)
         files = filedialog.askopenfilenames(
-            title="Wybierz pliki wideo do wyciągnięcia napisów",
+            title="Select video files for subtitle extraction",
             filetypes=[
-                ("Pliki wideo", "*.mkv *.mp4 *.avi *.mov *.webm"),
-                ("Wszystkie pliki", "*.*")
+                ("Video files", "*.mkv *.mp4 *.avi *.mov *.webm"),
+                ("All files", "*.*")
             ]
         )
         root.destroy()
@@ -137,22 +137,22 @@ def pick_files_or_dir_gui() -> List[Path]:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Ekstraktor angielskich napisów z plików wideo (.mkv, .mp4)"
+        description="English subtitle extractor for video files (.mkv, .mp4)"
     )
     parser.add_argument(
         "inputs",
         nargs="*",
-        help="Ścieżki do plików wideo lub folderów"
+        help="Paths to video files or directories"
     )
     parser.add_argument(
         "--output-dir", "-o",
-        help="Opcjonalny folder docelowy dla wyciągniętych napisów (domyślnie: obok wideo)"
+        help="Optional target directory for extracted subtitles (default: beside video)"
     )
     parser.add_argument(
         "--track", "-t",
         type=int,
         default=None,
-        help="Wymuś konkretny indeks ścieżki napisów (domyślnie: automatyczne wykrywanie angielskiej)"
+        help="Force specific subtitle track index (default: auto-detect English)"
     )
 
     args = parser.parse_args()
@@ -160,13 +160,13 @@ def main():
     input_paths = [Path(p) for p in args.inputs] if args.inputs else []
     
     if not input_paths:
-        print("[Info] Nie podano plików jako argumentu. Otwieram okno wyboru...")
+        print("[Info] No file arguments provided. Opening file picker dialog...")
         input_paths = pick_files_or_dir_gui()
         if not input_paths:
-            print("[Info] Nie wybrano żadnych plików. Zamykam program.")
+            print("[Info] No files selected. Exiting.")
             sys.exit(0)
 
-    # Zbieranie wszystkich plików wideo (także z wnętrza przekazanych folderów)
+    # Collect all video files (including inside nested folders)
     video_files: List[Path] = []
     for p in input_paths:
         if p.is_dir():
@@ -179,25 +179,25 @@ def main():
             video_files.append(p)
 
     if not video_files:
-        print("[Błąd]: Nie znaleziono żadnych obsługiwanych plików wideo (.mkv, .mp4, .avi).")
+        print("[Error]: No supported video files found (.mkv, .mp4, .avi).")
         sys.exit(1)
 
     print(f"\n=======================================================")
-    print(f"  Ekstraktor Angielskich Napisów z Plików Wideo")
-    print(f"  Znaleziono plików wideo do przetworzenia: {len(video_files)}")
+    print(f"  English Subtitle Video Extractor")
+    print(f"  Found video files to process: {len(video_files)}")
     print(f"=======================================================\n")
 
     out_dir = Path(args.output_dir) if args.output_dir else None
     extracted_count = 0
 
     for i, vfile in enumerate(video_files, 1):
-        print(f"[{i}/{len(video_files)}] Przetwarzanie: {vfile.name}")
+        print(f"[{i}/{len(video_files)}] Processing: {vfile.name}")
         res = extract_track_from_video(vfile, output_dir=out_dir, track_idx=args.track)
         if res:
             extracted_count += 1
 
     print(f"\n=======================================================")
-    print(f"  Zakończono! Pomyślnie wyciągnięto napisy dla {extracted_count}/{len(video_files)} plików.")
+    print(f"  Completed! Successfully extracted subtitles for {extracted_count}/{len(video_files)} files.")
     print(f"=======================================================\n")
 
 if __name__ == "__main__":

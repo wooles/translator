@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-Aplikacja Okienkowa GUI dla Tłumacza Anime (PySide6 / Qt 6).
-Zawiera:
-- Pełną integrację z silnikiem 43 Filarów AVT i Context Cache.
-- Obsługę przeciągania plików i folderów (Drag & Drop).
-- Asynchroniczne przetwarzanie w osobnym wątku (QThread) - zero zacięć okna.
-- Podgląd tłumaczenia na żywo linijka po linijce oraz licznik kosztów w PLN.
-- Panel Ustawień (Klucz API, Whisper large-v3-turbo, Biblia Serialu).
+Desktop GUI Application for Anime Subtitle Translator (PySide6 / Qt 6).
+Includes:
+- Full integration with 43 AVT Pillars engine and Context Cache.
+- Drag & Drop file and folder support.
+- Asynchronous processing in background QThread (responsive UI).
+- Live line-by-line translation monitor and real-time PLN cost tracker.
+- Settings Panel (API Key, Whisper Japanese STT, Series Bible).
 """
 
 import os
@@ -14,7 +14,7 @@ import sys
 import warnings
 import logging
 
-# Wyciszenie ostrzeżeń Hugging Face Hub, symlinków i nieszkodliwych powiadomień
+# Silence Hugging Face Hub warnings, symlink notices, and benign messages
 os.environ["HF_HUB_DISABLE_SYMLINKS_WARNING"] = "1"
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 warnings.filterwarnings("ignore", category=UserWarning, module="huggingface_hub")
@@ -37,7 +37,7 @@ from PySide6.QtWidgets import (
     QMenu
 )
 
-# Załadowanie zmiennych środowiskowych (.env)
+# Load environment variables (.env)
 from dotenv import load_dotenv, set_key
 load_dotenv()
 
@@ -51,7 +51,7 @@ from user_feedback import UserFeedbackManager
 from glossary_manager import GlossaryManager
 
 # ─────────────────────────────────────────────────────────────────────────────
-# STYLIZACJA DARK FLUENT DESIGN (QSS)
+# MODERN DARK FLUENT DESIGN STYLESHEET (QSS)
 # ─────────────────────────────────────────────────────────────────────────────
 MODERN_DARK_STYLE = """
 QMainWindow, QDialog {
@@ -194,7 +194,7 @@ QRadioButton::indicator, QCheckBox::indicator {
 """
 
 # ─────────────────────────────────────────────────────────────────────────────
-# WĄTEK ROBOCZY TŁUMACZENIA (QThread)
+# TRANSLATION WORKER THREAD (QThread)
 # ─────────────────────────────────────────────────────────────────────────────
 class TranslationWorker(QThread):
     progress_signal = Signal(int, int, list, float)  # current, total, previews, cost_pln
@@ -226,7 +226,7 @@ class TranslationWorker(QThread):
                 self.error_signal.emit("Brak klucza GEMINI_API_KEY! Ustaw go w oknie Ustawień.")
                 return
 
-            # Wykrycie najnowszych modeli
+            # Dynamic model resolution
             models = resolve_best_models()
             if self.profile_idx == "1":
                 p1_model = models["flash_lite"]
@@ -240,7 +240,7 @@ class TranslationWorker(QThread):
                 p1_model = models["pro"]
                 p2_model = models["pro"]
                 enable_verifier = True
-            else:  # Profil 3 (Master Pro)
+            else:  # Profile 3 (Master Pro)
                 p1_model = models["flash"]
                 p2_model = models["pro"]
                 enable_verifier = True
@@ -296,7 +296,7 @@ class TranslationWorker(QThread):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# OKNO USTAWIEŃ (SettingsDialog)
+# SETTINGS DIALOG (SettingsDialog)
 # ─────────────────────────────────────────────────────────────────────────────
 class SettingsDialog(QDialog):
     def __init__(self, parent=None):
@@ -308,7 +308,7 @@ class SettingsDialog(QDialog):
     def setup_ui(self):
         layout = QVBoxLayout(self)
 
-        # Klucz API Google
+        # Google API Key
         gb_api = QGroupBox("Klucz Google AI Studio (Gemini API)")
         api_layout = QVBoxLayout(gb_api)
         
@@ -330,7 +330,7 @@ class SettingsDialog(QDialog):
         api_layout.addLayout(h_api_btns)
         layout.addWidget(gb_api)
 
-        # Ustawienia Whisper
+        # Whisper settings
         gb_whisper = QGroupBox("Lokalny Japoński Whisper STT")
         wh_layout = QVBoxLayout(gb_whisper)
         lbl_wh = QLabel("Domyślny model transkrypcji audio ze słuchu:")
@@ -347,7 +347,7 @@ class SettingsDialog(QDialog):
         wh_layout.addWidget(self.cb_whisper_model)
         layout.addWidget(gb_whisper)
 
-        # Przyciski Zapisz / Anuluj
+        # Save / Cancel buttons
         h_bottom = QHBoxLayout()
         h_bottom.addStretch()
         btn_save = QPushButton("💾 Zapisz Ustawienia")
@@ -395,7 +395,7 @@ class SettingsDialog(QDialog):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# OKNO KOREKTY KWESTII I INTERAKTYWNEGO UCZENIA (UserCorrectionDialog)
+# USER CORRECTION & INTERACTIVE LEARNING DIALOG (UserCorrectionDialog)
 # ─────────────────────────────────────────────────────────────────────────────
 class UserCorrectionDialog(QDialog):
     def __init__(self, orig_en: str, cur_pl: str, parent=None):
@@ -410,7 +410,7 @@ class UserCorrectionDialog(QDialog):
     def setup_ui(self):
         layout = QVBoxLayout(self)
 
-        # Oryginał EN
+        # Original EN
         lbl_en = QLabel("Oryginał angielski / japoński:")
         lbl_en.setStyleSheet("color: #a0aec0; font-weight: bold;")
         layout.addWidget(lbl_en)
@@ -418,28 +418,28 @@ class UserCorrectionDialog(QDialog):
         self.txt_orig.setReadOnly(True)
         layout.addWidget(self.txt_orig)
 
-        # Błędna propozycja (jak przetłumaczyło AI)
+        # Initial draft translation
         lbl_bad = QLabel("Wersja pierwotna AI (do poprawy):")
         lbl_bad.setStyleSheet("color: #fc8181; font-weight: bold;")
         layout.addWidget(lbl_bad)
         self.txt_bad = QLineEdit(self.cur_pl)
         layout.addWidget(self.txt_bad)
 
-        # Twoja idealna wersja (jak ma być)
+        # Correct translation
         lbl_good = QLabel("Twoja poprawna wersja (jak powinno brzmieć po polsku):")
         lbl_good.setStyleSheet("color: #68d391; font-weight: bold;")
         layout.addWidget(lbl_good)
         self.txt_good = QLineEdit(self.cur_pl)
         layout.addWidget(self.txt_good)
 
-        # Uzasadnienie reguły
+        # Rule rationale
         lbl_reason = QLabel("Uzasadnienie / Zasada (dla promptu AI):")
         lbl_reason.setStyleSheet("color: #90cdf4; font-weight: bold;")
         layout.addWidget(lbl_reason)
         self.txt_reason = QLineEdit("Unikaj dosłowności, stosuj naturalną polszczyznę mówioną")
         layout.addWidget(self.txt_reason)
 
-        # Opcje zapisu
+        # Storage options
         gb_opts = QGroupBox("Opcje Zapamiętywania")
         opts_layout = QVBoxLayout(gb_opts)
         self.chk_save_rule = QCheckBox("🧠 Zapisz jako Złotą Regułę AI (Few-Shot Prompting w kolejnych tłumaczeniach)")
@@ -449,7 +449,7 @@ class UserCorrectionDialog(QDialog):
         opts_layout.addWidget(self.chk_save_glossary)
         layout.addWidget(gb_opts)
 
-        # Przyciski
+        # Action buttons
         h_btns = QHBoxLayout()
         h_btns.addStretch()
         btn_cancel = QPushButton("Anuluj")
@@ -473,7 +473,7 @@ class UserCorrectionDialog(QDialog):
 
         self.result_pl = good_text
 
-        # 1. Zapis do UserFeedbackManager
+        # 1. Save to UserFeedbackManager
         if self.chk_save_rule.isChecked():
             try:
                 fb_mgr = UserFeedbackManager()
@@ -487,7 +487,7 @@ class UserCorrectionDialog(QDialog):
             except Exception as e:
                 print(f"[Błąd zapisu reguły]: {e}")
 
-        # 2. Zapis do GlossaryManager
+        # 2. Save to GlossaryManager
         if self.chk_save_glossary.isChecked() and orig:
             try:
                 gloss_mgr = GlossaryManager()
@@ -504,7 +504,7 @@ class UserCorrectionDialog(QDialog):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# OKNO ZARZĄDZANIA REGUŁAMI I SŁOWNIKIEM (RulesAndGlossaryDialog)
+# RULES & DETERMINISTIC GLOSSARY MANAGER DIALOG (RulesAndGlossaryDialog)
 # ─────────────────────────────────────────────────────────────────────────────
 class RulesAndGlossaryDialog(QDialog):
     def __init__(self, parent=None):
@@ -520,7 +520,7 @@ class RulesAndGlossaryDialog(QDialog):
 
         self.tabs = QTabWidget()
 
-        # TAB 1: Złote Wzorce Użytkownika (Few-Shot)
+        # TAB 1: User Golden Examples (Few-Shot)
         tab_rules = QWidget()
         rules_layout = QVBoxLayout(tab_rules)
         
@@ -549,7 +549,7 @@ class RulesAndGlossaryDialog(QDialog):
         rules_layout.addLayout(h_rule_btns)
         self.tabs.addTab(tab_rules, "🧠 Złote Wzorce (Few-Shot)")
 
-        # TAB 2: Słownik Deterministyczny
+        # TAB 2: Deterministic Glossary
         tab_gloss = QWidget()
         gloss_layout = QVBoxLayout(tab_gloss)
 
@@ -579,7 +579,7 @@ class RulesAndGlossaryDialog(QDialog):
 
         layout.addWidget(self.tabs)
 
-        # Zamknij
+        # Close button
         h_bottom = QHBoxLayout()
         h_bottom.addStretch()
         btn_close = QPushButton("Zamknij")
@@ -648,7 +648,7 @@ class RulesAndGlossaryDialog(QDialog):
 
 
 def QInputDialog_getText(parent, title, label):
-    """Prosty dialog tekstowy zastępujący QInputDialog."""
+    """Simple text prompt dialog replacing QInputDialog."""
     dlg = QDialog(parent)
     dlg.setWindowTitle(title)
     dlg.resize(400, 150)
@@ -671,7 +671,7 @@ def QInputDialog_getText(parent, title, label):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# GŁÓWNE OKNO APLIKACJI (MainWindow)
+# MAIN APPLICATION WINDOW (MainWindow)
 # ─────────────────────────────────────────────────────────────────────────────
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -695,7 +695,7 @@ class MainWindow(QMainWindow):
         main_layout.setContentsMargins(16, 16, 16, 16)
         main_layout.setSpacing(12)
 
-        # 1. Górny nagłówek i status
+        # 1. Top header and navigation
         h_header = QHBoxLayout()
         lbl_title = QLabel("🎬 ANIME SUBTITLE TRANSLATOR PRO")
         lbl_title.setStyleSheet("font-size: 18px; font-weight: bold; color: #63b3ed;")
@@ -713,16 +713,16 @@ class MainWindow(QMainWindow):
         h_header.addWidget(btn_settings)
         main_layout.addLayout(h_header)
 
-        # 2. Główny splitter (Lewa: Pliki i Ustawienia | Prawa: Podgląd na żywo)
+        # 2. Main splitter (Left: Files & Settings | Right: Live Monitor & Logs)
         splitter = QSplitter(Qt.Horizontal)
 
-        # LEWY PANEL
+        # LEFT PANEL
         left_widget = QWidget()
         left_layout = QVBoxLayout(left_widget)
         left_layout.setContentsMargins(0, 0, 0, 0)
         left_layout.setSpacing(10)
 
-        # Strefa Drag & Drop
+        # Drag & Drop Zone
         self.drop_box = QFrame()
         self.drop_box.setStyleSheet("""
             QFrame {
@@ -755,7 +755,7 @@ class MainWindow(QMainWindow):
         drop_layout.addLayout(h_file_btns)
         left_layout.addWidget(self.drop_box)
 
-        # Tabela Kolejki Plików
+        # File Queue Table
         self.table_queue = QTableWidget()
         self.table_queue.setColumnCount(3)
         self.table_queue.setHorizontalHeaderLabels(["Plik Napisów", "Wideo", "Status"])
@@ -765,7 +765,7 @@ class MainWindow(QMainWindow):
         self.table_queue.setSelectionBehavior(QTableWidget.SelectRows)
         left_layout.addWidget(self.table_queue)
 
-        # Wybór Jakości Tłumaczenia
+        # Translation Quality Profile Selection
         gb_profiles = QGroupBox("Profil Jakości Tłumaczenia")
         prof_layout = QVBoxLayout(gb_profiles)
         
@@ -787,7 +787,7 @@ class MainWindow(QMainWindow):
         prof_layout.addWidget(self.rb_prof4)
         left_layout.addWidget(gb_profiles)
 
-        # Opcje dodatkowe
+        # Additional Options
         gb_opts = QGroupBox("Opcje Zaawansowane")
         opts_layout = QHBoxLayout(gb_opts)
         self.chk_honorifics = QCheckBox("Zachowaj honoryfikatory (-kun, -chan, -san)")
@@ -800,13 +800,13 @@ class MainWindow(QMainWindow):
 
         splitter.addWidget(left_widget)
 
-        # PRAWY PANEL (PODGLĄD NA ŻYWO I LOGI)
+        # RIGHT PANEL (LIVE STREAM MONITOR & LOGS)
         right_widget = QWidget()
         right_layout = QVBoxLayout(right_widget)
         right_layout.setContentsMargins(0, 0, 0, 0)
         right_layout.setSpacing(10)
 
-        # Karta Podglądu na żywo
+        # Live Bilingual Stream Card
         gb_live = QGroupBox("Podgląd Tłumaczenia na Żywo (Bilingual Live Stream)")
         live_layout = QVBoxLayout(gb_live)
 
@@ -840,7 +840,7 @@ class MainWindow(QMainWindow):
 
         right_layout.addWidget(gb_live)
 
-        # Konsola Logów
+        # Logs Console
         gb_logs = QGroupBox("Dziennik Zdarzeń (Logi)")
         logs_layout = QVBoxLayout(gb_logs)
         self.txt_logs = QTextEdit()
@@ -853,7 +853,7 @@ class MainWindow(QMainWindow):
         splitter.setStretchFactor(1, 6)
         main_layout.addWidget(splitter)
 
-        # 3. Dolny pasek postępu i przycisk START
+        # 3. Bottom progress bar and START actions
         bottom_box = QFrame()
         bottom_box.setStyleSheet("background-color: #141824; border-radius: 8px; padding: 10px;")
         b_layout = QVBoxLayout(bottom_box)
@@ -893,7 +893,7 @@ class MainWindow(QMainWindow):
         main_layout.addWidget(bottom_box)
 
     # ─────────────────────────────────────────────────────────────────────────
-    # OBSŁUGA DRAG & DROP
+    # DRAG & DROP HANDLERS
     # ─────────────────────────────────────────────────────────────────────────
     def dragEnterEvent(self, event: QDragEnterEvent):
         if event.mimeData().hasUrls():
@@ -955,7 +955,7 @@ class MainWindow(QMainWindow):
             self.table_queue.setItem(r, 2, QTableWidgetItem("Oczekuje"))
 
     # ─────────────────────────────────────────────────────────────────────────
-    # LOGI I AKTUALIZACJA WIDOKU
+    # LOGGING AND UI UPDATES
     # ─────────────────────────────────────────────────────────────────────────
     def log(self, text: str):
         self.txt_logs.append(text)
@@ -966,7 +966,7 @@ class MainWindow(QMainWindow):
         pass
 
     # ─────────────────────────────────────────────────────────────────────────
-    # START / STOP TŁUMACZENIA
+    # TRANSLATION LIFECYCLE (START / STOP)
     # ─────────────────────────────────────────────────────────────────────────
     def start_translation(self):
         if not self.files_queue:
@@ -1019,7 +1019,7 @@ class MainWindow(QMainWindow):
         self.lbl_progress.setText(f"Postęp: {current}/{total} kwestii ({pct}%) | Czas: {elapsed:.0f}s")
         self.lbl_cost.setText(f"💰 Rzeczywisty koszt: {cost_pln:.2f} PLN")
 
-        # Dodanie kwestii do tabeli na żywo
+        # Add lines to live table monitor
         for item in previews:
             row = self.table_live.rowCount()
             self.table_live.insertRow(row)
@@ -1047,7 +1047,7 @@ class MainWindow(QMainWindow):
         QMessageBox.critical(self, "Błąd Tłumaczenia", err_msg)
 
     # ─────────────────────────────────────────────────────────────────────────
-    # FUNKCJE POMOCNICZE
+    # HELPER AND INTERACTION METHODS
     # ─────────────────────────────────────────────────────────────────────────
     def open_settings(self):
         dlg = SettingsDialog(self)
@@ -1103,7 +1103,7 @@ class MainWindow(QMainWindow):
                 rule_reason=f"Żelazne tłumaczenie kwestii: '{orig_en}' -> '{cur_pl}'"
             )
 
-            # Jeśli kwestia jest krótka (1-3 słowa), dodajemy także do słownika deterministycznego
+            # If phrase is short (1-3 words), also add to deterministic glossary
             if len(orig_en.split()) <= 3:
                 gm = GlossaryManager()
                 gm.add_term(src=orig_en, pl=cur_pl, desc="Reguła 1-Click z GUI")
@@ -1132,7 +1132,7 @@ class MainWindow(QMainWindow):
             return
 
         try:
-            # Uruchomienie domyślnego odtwarzacza wideo w systemie Windows
+            # Launch system default video player
             os.startfile(str(video_path))
             self.log(f"🎬 Uruchomiono odtwarzacz wideo: {Path(video_path).name}")
         except Exception as e:
@@ -1172,7 +1172,7 @@ class MainWindow(QMainWindow):
             os.startfile(os.getcwd())
 
     def closeEvent(self, event):
-        """Zabezpieczenie: usuwa serwerowy cache przy zamykaniu okna GUI."""
+        """Clean up server-side Context Cache upon closing the GUI."""
         try:
             from context_cache import ContextCacheManager
             from google import genai
@@ -1186,7 +1186,7 @@ class MainWindow(QMainWindow):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# GŁÓWNY PUNKT WEJŚCIA
+# APPLICATION ENTRY POINT
 # ─────────────────────────────────────────────────────────────────────────────
 def main():
     app = QApplication(sys.argv)

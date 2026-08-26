@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Moduł Lokalnego Silnika Transkrypcji Mowy Japońskiej (Speech-to-Text).
-Wykorzystuje zoptymalizowaną bibliotekę faster-whisper (CTranslate2) do bezpośredniej
-transkrypcji kwestii audio na język japoński (Kanji / Kana), co pozwala modelowi
-tłumaczyć bezpośrednio ze źródła z pominięciem błędów w napisach angielskich.
+Local Japanese Speech Recognition Engine Module (Speech-to-Text).
+Uses optimized faster-whisper (CTranslate2) for direct
+transcription of audio dialogue into Japanese (Kanji / Kana), enabling
+translation directly from the original voice track without reliance on flawed English subs.
 """
 
 import os
@@ -51,10 +51,10 @@ class JapaneseWhisperEngine:
         download_root: Optional[str] = None
     ):
         """
-        Inicjalizacja silnika japońskiego Whisper.
-        Domyślny model: 'kotoba-tech/kotoba-whisper-v2.0-faster' (SOTA dla mowy japońskiej, ReazonSpeech).
-        Aliasy: 'kotoba', 'turbo', 'large-v3', 'anime'
-        device: 'cuda' (GPU), 'cpu' lub 'auto'
+        Initializes the Japanese Whisper engine.
+        Default model: 'kotoba-tech/kotoba-whisper-v2.0-faster' (SOTA for Japanese speech, ReazonSpeech).
+        Aliases: 'kotoba', 'turbo', 'large-v3', 'anime'
+        device: 'cuda' (GPU), 'cpu' or 'auto'
         """
         clean_key = model_size.lower().strip()
         self.model_size = MODEL_ALIASES.get(clean_key, model_size)
@@ -66,21 +66,21 @@ class JapaneseWhisperEngine:
 
     @staticmethod
     def is_available() -> bool:
-        """Sprawdza czy biblioteka faster-whisper jest zainstalowana w środowisku."""
+        """Checks if faster-whisper package is available in the environment."""
         return FASTER_WHISPER_AVAILABLE
 
     def _initialize_model(self):
-        """Leniwa inicjalizacja (Lazy Loading) modelu Whisper przy pierwszym użyciu."""
+        """Lazy loading of Whisper model on first invocation."""
         if self._is_initialized:
             return
         
         if not FASTER_WHISPER_AVAILABLE:
             raise RuntimeError(
-                "Biblioteka 'faster-whisper' nie jest zainstalowana! "
-                "Aby włączyć lokalną transkrypcję audio, uruchom: pip install faster-whisper"
+                "Package 'faster-whisper' is not installed! "
+                "To enable local audio transcription, run: pip install faster-whisper"
             )
 
-        # Dobór urządzenia (GPU CUDA lub CPU)
+        # Device selection (GPU CUDA or CPU)
         selected_device = self.device
         selected_compute = self.compute_type
 
@@ -115,7 +115,7 @@ class JapaneseWhisperEngine:
             dev_label = f"GPU (CUDA {selected_compute.upper()})" if selected_device == "cuda" else f"CPU ({selected_compute.upper()})"
             print(f"  [Lokalny Silnik Audio Kotoba-Whisper]: Załadowano model {self.model_size} na {dev_label}.")
         except Exception as e:
-            # Fallback 1: Próba na CPU INT8 w razie problemów ze sterownikami GPU
+            # Fallback 1: Try CPU INT8 on GPU driver failure
             if selected_device != "cpu":
                 try:
                     self.model = WhisperModel(
@@ -130,10 +130,10 @@ class JapaneseWhisperEngine:
                 except Exception:
                     pass
 
-            # Fallback 2: Jeśli model japoński Kotoba nie mógł być pobrany, fallback do large-v3-turbo
+            # Fallback 2: If Kotoba model cannot be loaded, fallback to large-v3-turbo
             if self.model_size != "large-v3-turbo":
                 try:
-                    logger.info("[Whisper Engine]: Fallback na standardowy model large-v3-turbo...")
+                    logger.info("[Whisper Engine]: Fallback to standard large-v3-turbo model...")
                     self.model = WhisperModel(
                         "large-v3-turbo",
                         device=selected_device if selected_device == "cpu" else "cuda",
@@ -150,8 +150,8 @@ class JapaneseWhisperEngine:
 
     def transcribe_audio_slice(self, wav_path: str) -> str:
         """
-        Transkrybuje krótki wycinek audio (16kHz WAV) na tekst japoński.
-        Zwraca czysty japoński string (Kanji/Kana).
+        Transcribes a short audio slice (16kHz WAV) to Japanese text.
+        Returns clean Japanese string (Kanji/Kana).
         """
         if not wav_path or not os.path.exists(wav_path):
             return ""
@@ -177,7 +177,7 @@ class JapaneseWhisperEngine:
             
             return "".join(transcribed_parts).strip()
         except Exception as e:
-            logger.warning(f"Błąd transkrypcji Whisper dla {wav_path}: {e}")
+            logger.warning(f"Whisper transcription error for {wav_path}: {e}")
             return ""
 
     def transcribe_batch_scene(
@@ -188,9 +188,9 @@ class JapaneseWhisperEngine:
         initial_prompt: Optional[str] = None
     ) -> Dict[int, str]:
         """
-        Transkrybuje całe audio paczki (np. 30-60 sek) W JEDNYM PRZEBIEGU (zamiast 14 osobnych wywołań).
-        Zwraca słownik {batch_id: transcribed_jp_text}.
-        Działa 20x-50x szybciej!
+        Transcribes entire batch scene audio (30-60s) in a SINGLE PASS.
+        Returns dictionary {batch_id: transcribed_jp_text}.
+        Runs 20x-50x faster!
         """
         if not scene_wav_path or not os.path.exists(scene_wav_path) or not FASTER_WHISPER_AVAILABLE:
             return {}
@@ -221,12 +221,12 @@ class JapaneseWhisperEngine:
                 seg_text = seg.text.strip()
                 if not seg_text:
                     continue
-                # Czas segmentu w milisekundach w skali całego filmu
+                # Segment timestamp in milliseconds in episode timeline
                 seg_start_abs = batch_start_ms + int(seg.start * 1000)
                 seg_end_abs = batch_start_ms + int(seg.end * 1000)
 
                 for b_id, ev in events:
-                    # Sprawdzamy czy segment nakłada się na czas kwestii
+                    # Check if segment overlaps with dialogue timing
                     overlap_start = max(ev.start, seg_start_abs)
                     overlap_end = min(ev.end, seg_end_abs)
                     if (overlap_end - overlap_start) > 100 or (ev.start <= seg_start_abs and ev.end >= seg_end_abs):
@@ -235,5 +235,5 @@ class JapaneseWhisperEngine:
 
             return {b_id: "".join(texts).strip() for b_id, texts in result.items() if texts}
         except Exception as e:
-            logger.warning(f"Błąd transkrypcji paczki Whisper: {e}")
+            logger.warning(f"Batch Whisper transcription error: {e}")
             return {}

@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 r"""
-Automatyczny Synchronizator i Budowniczy Bazy Napisów (Translation Memory).
+Automated Subtitle Synchronizer and Translation Memory Builder.
 
-Obsługuje:
-- Przeciąganie pojedynczych lub wielu plików wideo (.mkv, .mp4)
-- Przeciąganie całych folderów (np. 'E:\Kingdom 6th Season', 'E:\Mushoku Tensei S2')
-- Pełną obsługę wydań Blu-ray / BDMV (pliki 00001.mkv, BD_01.mkv, EP01.mkv)
-- Inteligentne rozwiązywanie nazwy anime z folderu nadrzędnego dla generycznych nazw plików
-- Automatyczną ekstrakcję angielskich napisów (.en.ass / .en.srt)
-- 3-poziomowe parowanie polskich napisów (.ass / .srt) w folderze
-- Kopiowanie pełnych par (EN + PL) z czytelnymi nazwami do 'baza napisów'
-- Automatyczne usuwanie tymczasowych angielskich napisów z folderu źródłowego
-- Błyskawiczne przeindeksowanie lokalnej bazy SQLite (translation_memory.db) w ~20 sekund
+Features:
+- Drag-and-drop support for single/multiple video files (.mkv, .mp4)
+- Drag-and-drop support for full season folders (e.g. 'E:\Kingdom 6th Season')
+- Full Blu-ray / BDMV release support (00001.mkv, BD_01.mkv, EP01.mkv)
+- Smart anime title resolution from parent folder for generic filenames
+- Automatic extraction of English subtitle tracks (.en.ass / .en.srt)
+- 3-tier matching for Polish subtitles (.ass / .srt) in the directory
+- Clean copying of full EN+PL pairs to 'baza napisów'
+- Automatic cleanup of temporary English subtitle files in source folders
+- High-speed reindexing of the local SQLite Translation Memory database
 """
 
 import os
@@ -31,13 +31,13 @@ BAZA_NAPISOW_DIR = Path(__file__).parent / "baza napisów"
 
 def extract_episode_num(name: str) -> str:
     """
-    Ekstraktuje numer odcinka z dowolnego formatu nazwy (00001, BD_01, EP01, E01, - 01).
+    Extracts episode number from various naming formats (00001, BD_01, EP01, E01, - 01).
     """
-    # 1. Standardowe wzorce: - 01, _01, EP01, E01, Episode 01, Odc 01
+    # 1. Standard patterns: - 01, _01, EP01, E01, Episode 01, Odc 01
     m = re.search(r"(?:ep|e|episode|odc|vol|[-_\s\[\.])0*(\d{1,4})(?:v\d+)?(?:[-_\s\.\]\)]|$)", name, re.IGNORECASE)
     if m:
         return m.group(1).lstrip("0") or "0"
-    # 2. Same cyfry (np. 00001, 01, 1)
+    # 2. Pure digits (e.g. 00001, 01, 1)
     m2 = re.match(r"^0*(\d{1,4})$", name)
     if m2:
         return m2.group(1).lstrip("0") or "0"
@@ -46,17 +46,17 @@ def extract_episode_num(name: str) -> str:
 
 def find_matching_polish_sub(video_path: Path) -> Tuple[Optional[Path], str]:
     """
-    Wyszukuje odpowiadający plik z polskimi napisami w folderze wideo za pomocą 3 strategii:
-    1. Dokładne dopasowanie nazwy pliku
-    2. Dopasowanie po wyekstrahowanym numerze odcinka
-    3. Dopasowanie po naturalnym porządku sortowania (dla wydań Blu-ray 00001.mkv)
-    Zwraca krotkę: (sciezka_do_pliku_pl, numer_odcinka).
+    Finds matching Polish subtitle file in the video folder using 3 strategies:
+    1. Exact filename match
+    2. Extracted episode number match
+    3. Natural sort order match (for Blu-ray releases like 00001.mkv)
+    Returns: (pl_sub_path, episode_num).
     """
     parent_dir = video_path.parent
     stem = video_path.stem
     ep_num = extract_episode_num(stem)
 
-    # 1. Dokładne dopasowanie nazwy
+    # 1. Exact filename match
     candidates = [
         parent_dir / f"{stem}.ass",
         parent_dir / f"{stem}.srt",
@@ -67,7 +67,7 @@ def find_matching_polish_sub(video_path: Path) -> Tuple[Optional[Path], str]:
         if c.exists() and c.is_file():
             return c, ep_num
 
-    # 2. Szukanie pliku po numerze odcinka
+    # 2. Episode number search
     if ep_num:
         for f in parent_dir.glob("*"):
             if f.is_file() and f.suffix.lower() in (".ass", ".srt"):
@@ -77,7 +77,7 @@ def find_matching_polish_sub(video_path: Path) -> Tuple[Optional[Path], str]:
                 if f_ep == ep_num:
                     return f, ep_num
 
-    # 3. Strategia Blu-ray: parowanie według naturalnego sortowania w folderze
+    # 3. Blu-ray strategy: match based on natural sorting order in folder
     all_videos = sorted([
         f for f in parent_dir.iterdir()
         if f.is_file() and f.suffix.lower() in VIDEO_EXTENSIONS
@@ -102,20 +102,20 @@ def find_matching_polish_sub(video_path: Path) -> Tuple[Optional[Path], str]:
 
 def resolve_baza_base_stem(vpath: Path, pl_sub_path: Path, ep_num: str) -> str:
     """
-    Ustala czytelną nazwę bazową dla plików w 'baza napisów',
-    aby baza wiedzy i Pamięć Tłumaczeniowa poprawnie powiązały tytuł anime.
+    Resolves a clean base name for files in 'baza napisów'
+    to ensure knowledge bases and Translation Memory associate the anime title properly.
     """
-    # 1. Sprawdzamy czy nazwa pliku polskiego jest bogata/opisowa (np. '[Grupa] Mushoku Tensei S2 - 01.ass')
+    # 1. Check if Polish subtitle filename is descriptive (e.g. '[Group] Mushoku Tensei S2 - 01.ass')
     pl_stem = pl_sub_path.stem
     if len(pl_stem) > 6 and not pl_stem.isdigit() and not re.match(r"^(?:bd_?\d+|ep_?\d+|0*\d+)$", pl_stem, re.IGNORECASE):
         return pl_stem
 
-    # 2. Sprawdzamy czy nazwa wideo jest bogata/opisowa
+    # 2. Check if video filename is descriptive
     v_stem = vpath.stem
     if len(v_stem) > 6 and not v_stem.isdigit() and not re.match(r"^(?:bd_?\d+|ep_?\d+|0*\d+)$", v_stem, re.IGNORECASE):
         return v_stem
 
-    # 3. Fallback dla wydań Blu-ray (np. folder 'Mushoku Tensei S2' + '00001.mkv'):
+    # 3. Fallback for Blu-ray releases (e.g. folder 'Mushoku Tensei S2' + '00001.mkv'):
     parent_clean = vpath.parent.name.replace("[BD]", "").replace("[BDMV]", "").strip()
     try:
         ep_formatted = f"{int(ep_num):02d}" if ep_num else "01"
@@ -126,7 +126,7 @@ def resolve_baza_base_stem(vpath: Path, pl_sub_path: Path, ep_num: str) -> str:
 
 def extract_english_track(video_path: Path, dest_dir: Path, target_stem: str) -> Optional[Path]:
     """
-    Wyciąga angielską ścieżkę dialogową bezpośrednio do wskazanego pliku w folderze bazy.
+    Extracts English dialogue track directly into the destination file in the database directory.
     """
     tracks = get_subtitles_info(str(video_path))
     if not tracks:
@@ -171,7 +171,7 @@ def extract_english_track(video_path: Path, dest_dir: Path, target_stem: str) ->
 
 def sync_videos_to_baza(video_files: List[Path], baza_dir: Path = BAZA_NAPISOW_DIR) -> int:
     """
-    Przetwarza listę plików wideo: wyciąga EN, paruje z PL, kopiuje parę do bazy i czyści śmieci.
+    Processes a list of video files: extracts EN, pairs with PL, copies to database, and cleans up.
     """
     baza_dir.mkdir(parents=True, exist_ok=True)
     synced_pairs = 0
@@ -185,23 +185,23 @@ def sync_videos_to_baza(video_files: List[Path], baza_dir: Path = BAZA_NAPISOW_D
     for idx, vpath in enumerate(video_files, 1):
         print(f"[{idx}/{len(video_files)}] Skanowanie: {vpath.name}")
 
-        # 1. Sprawdzamy czy w folderze wideo są polskie napisy
+        # 1. Check for matching Polish subtitles in source directory
         pl_sub_path, ep_num = find_matching_polish_sub(vpath)
         if not pl_sub_path:
             print(f"  ⚠️  [Pominięto]: Brak polskich napisów (.ass/.srt) w folderze: {vpath.parent.name}")
             print(f"      Aby dodać odcinek do bazy, umieść obok wideo plik z polskimi napisami.")
             continue
 
-        # 2. Ustalamy reprezentatywną nazwę pliku w bazie (dla wydań Blu-ray)
+        # 2. Resolve representative name in database
         baza_stem = resolve_baza_base_stem(vpath, pl_sub_path, ep_num)
 
-        # 3. Wyciągamy angielskie napisy bezpośrednio do folderu bazy
+        # 3. Extract English subtitles directly to database directory
         en_target_path = extract_english_track(vpath, dest_dir=baza_dir, target_stem=baza_stem)
         if not en_target_path or not en_target_path.exists() or en_target_path.stat().st_size == 0:
             print(f"  ❌ [Błąd]: Nie udało się wyciągnąć angielskich napisów tekstowych z {vpath.name}")
             continue
 
-        # 4. Kopiujemy polskie napisy do folderu bazy (z zachowaniem spójnej nazwy)
+        # 4. Copy Polish subtitles to database directory
         pl_target_ext = pl_sub_path.suffix
         pl_target_path = baza_dir / f"{baza_stem}{pl_target_ext}"
         try:
@@ -210,7 +210,7 @@ def sync_videos_to_baza(video_files: List[Path], baza_dir: Path = BAZA_NAPISOW_D
             print(f"  ❌ [Błąd kopiowania PL]: {e}")
             continue
 
-        # 5. Sprawdzamy i ewentualnie usuwamy tymczasowy angielski plik z folderu źródłowego
+        # 5. Remove temporary English subtitle files from source folder if present
         for temp_pattern in [f"{vpath.stem}.en.*", f"{baza_stem}.en.*"]:
             for temp_f in vpath.parent.glob(temp_pattern):
                 if temp_f.is_file():
@@ -226,7 +226,7 @@ def sync_videos_to_baza(video_files: List[Path], baza_dir: Path = BAZA_NAPISOW_D
         print(f"      └─ Zapis PL: {pl_target_path.name}")
         print(f"      (Folder źródłowy '{vpath.parent.name}' pozostawiony w 100% czysty)")
 
-    # 6. Automatyczne błyskawiczne przeindeksowanie bazy SQLite
+    # 6. Automatic instant reindexing of SQLite database
     if synced_pairs > 0:
         print("\n" + "─" * 70)
         print("  🔄 AKTUALIZACJA I RE-INDEKSACJA PAMIĘCI TŁUMACZENIOWEJ (SQLite)...")

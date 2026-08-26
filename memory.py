@@ -1,7 +1,7 @@
 """
-Moduł Pamięci Tłumaczeniowej (Translation Memory - TM) oraz analizy korpusu napisów anime.
-Automatycznie paruje angielskie i polskie wersje odcinków, indeksuje tysiące autentycznych
-linii dialogowych przetłumaczonych przez ludzi i podpowiada idealne zwroty w czasie rzeczywistym.
+Translation Memory (TM) & Subtitle Corpus Analysis Module.
+Automatically pairs English and Polish episode files, indexes authentic
+human-translated dialogue pairs, and provides real-time few-shot translation hints.
 """
 
 import os
@@ -17,11 +17,11 @@ MEMORY_JSON_PATH = Path(__file__).parent / "translation_memory.json"
 
 def clean_text_for_memory(text: str) -> str:
     """
-    Czyści tekst ze znaczników formatowania ASS, rysunków wektorowych i normalizuje białe znaki.
+    Cleans text from ASS tags, vector drawings, and normalizes whitespace.
     """
     if not text or text.startswith("m ") or "{\\p1}" in text:
         return ""
-    # Usuwanie tagów {...}
+    # Remove {...} tags
     cleaned = re.sub(r"\{[^}]*\}?", "", text)
     cleaned = re.sub(r"\\(?:[a-zA-Z0-9&]+|\([^)]*\)?)?", "", cleaned)
     cleaned = cleaned.replace("\\N", " ").replace("\\n", " ")
@@ -32,7 +32,7 @@ def clean_text_for_memory(text: str) -> str:
 
 def tokenize(text: str) -> List[str]:
     """
-    Dzieli tekst na znormalizowane tokeny słowne do szybkiego wyszukiwania.
+    Splits text into normalized word tokens for fast index lookups.
     """
     return [w.lower() for w in re.findall(r"\b\w{3,}\b", text.lower())]
 
@@ -57,8 +57,8 @@ class TranslationMemory:
 
     def index_database_directory(self, base_dir: Path) -> int:
         """
-        Skanuje podany katalog (np. 'baza napisów'), paruje pliki .en.ass/.en.srt z .ass/.srt
-        z wykorzystaniem szybkiego wyszukiwania binarnego (O(N log M)) i zapisuje pary dialogowe do bazy danych.
+        Scans given directory, pairs .en.ass/.en.srt with .ass/.srt files
+        using fast binary search (O(N log M)) and stores dialogue pairs in SQLite.
         """
         import bisect
         from tqdm import tqdm
@@ -66,7 +66,7 @@ class TranslationMemory:
         if not base_dir.exists():
             return 0
 
-        # Wyszukiwanie angielskich plików
+        # Scan for English subtitle files
         en_files = sorted(
             list(base_dir.glob("*.en.ass")) +
             list(base_dir.glob("*.en.srt")) +
@@ -78,10 +78,10 @@ class TranslationMemory:
         pairs_to_insert = []
         seen_pairs = set()
 
-        print(f"[Pamięć Tłumaczeniowa] Błyskawiczne indeksowanie bazy: {len(en_files)} plików...")
+        print(f"[Translation Memory] Indexing database: {len(en_files)} files...")
 
-        for en_path in tqdm(en_files, desc="Indeksowanie par dialogowych", unit="plik"):
-            # Ustalenie nazwy pliku polskiego
+        for en_path in tqdm(en_files, desc="Indexing dialogue pairs", unit="file"):
+            # Determine matching Polish subtitle filename
             pl_name = en_path.name
             for suffix in [".en.ass", ".ang.ass", ".en.srt", ".ang.srt", ".ang"]:
                 if pl_name.endswith(suffix):
@@ -90,7 +90,7 @@ class TranslationMemory:
 
             pl_path = en_path.parent / pl_name
             if not pl_path.exists():
-                # Próba znalezienia pliku z samym .ass / .srt
+                # Fallback to plain .ass / .srt
                 base_stem = en_path.stem.split(".")[0]
                 pl_path_ass = en_path.parent / f"{base_stem}.ass"
                 pl_path_srt = en_path.parent / f"{base_stem}.srt"
@@ -115,7 +115,7 @@ class TranslationMemory:
                 except Exception:
                     continue
 
-            # Przygotowanie posortowanej listy zdarzeń polskich do wyszukiwania binarnego
+            # Prepare sorted Polish events list for fast binary search
             pl_events = []
             for ev in subs_pl.events:
                 if ev.is_comment:
@@ -138,7 +138,7 @@ class TranslationMemory:
                 if not clean_en or len(clean_en) < 3 or len(clean_en) > 250:
                     continue
 
-                # Wyszukiwanie binarne w oknie czasowym [-300ms, +300ms]
+                # Binary search in [-300ms, +300ms] time window
                 left = bisect.bisect_left(pl_starts, ev_en.start - 300)
                 right = bisect.bisect_right(pl_starts, ev_en.start + 300)
 
@@ -157,7 +157,7 @@ class TranslationMemory:
                             ))
                         break
 
-        # Zapis do bazy SQLite
+        # Save to SQLite database
         with sqlite3.connect(self.db_path) as conn:
             conn.execute("DELETE FROM translation_pairs")
             conn.executemany(
@@ -165,12 +165,12 @@ class TranslationMemory:
                 pairs_to_insert
             )
 
-        print(f"[Pamięć Tłumaczeniowa] Zaindeksowano pomyślnie {len(pairs_to_insert)} autentycznych par dialogowych!")
+        print(f"[Translation Memory] Successfully indexed {len(pairs_to_insert)} authentic dialogue pairs!")
         return len(pairs_to_insert)
 
     def find_relevant_examples(self, query_texts: List[str], max_examples: int = 5) -> List[Dict[str, str]]:
         """
-        Wyszukuje w bazie najbardziej trafne, ludzkie przykłady tłumaczeń dla podanych kwestii dialogowych.
+        Searches database for the most relevant authentic translation examples.
         """
         if not os.path.exists(self.db_path):
             return []
@@ -185,7 +185,7 @@ class TranslationMemory:
                 if len(clean_q) < 3:
                     continue
 
-                # 1. Dokładne dopasowanie całej frazy (Exact Match)
+                # 1. Exact phrase match
                 cursor.execute(
                     "SELECT en_text, pl_text, anime_title FROM translation_pairs WHERE en_clean = ? LIMIT 2",
                     (clean_q,)
@@ -195,10 +195,9 @@ class TranslationMemory:
                     if key not in candidates:
                         candidates[key] = {"en": row[0], "pl": row[1], "anime": row[2], "score": 100}
 
-                # 2. Dopasowanie fragmentu frazowego (Sub-phrase match) dla idiomów i zwrotów
+                # 2. Sub-phrase matching for idioms and expressions
                 words = tokenize(clean_q)
                 if len(words) >= 2:
-                    # Szukamy par zawierających kluczowe zwroty
                     bigram_query = f"%{words[0]} {words[1]}%"
                     cursor.execute(
                         "SELECT en_text, pl_text, anime_title FROM translation_pairs WHERE en_clean LIKE ? AND word_count <= 14 LIMIT 2",
@@ -209,14 +208,14 @@ class TranslationMemory:
                         if key not in candidates:
                             candidates[key] = {"en": row[0], "pl": row[1], "anime": row[2], "score": 60}
 
-        # Sortowanie po trafności
+        # Sort by relevance score
         sorted_results = sorted(candidates.values(), key=lambda x: x["score"], reverse=True)
         return sorted_results[:max_examples]
 
 def format_translation_memory_for_prompt(examples: List[Dict[str, Any]]) -> str:
     """
-    Formatuje wyciągnięte przykłady w czytelny blok do wstrzyknięcia do promptu LLM.
-    Wyróżnia cytaty 1:1 (Flashback Alignment) dla zachowania spójności serii.
+    Formats extracted examples into a clean section for LLM prompt injection.
+    Highlights 1:1 quotes (Flashback Alignment) to maintain series consistency.
     """
     if not examples:
         return ""

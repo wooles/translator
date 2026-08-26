@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-Moduł Rejestru Kanonu Polskich Wydań Mangowych (Manga Canon Registry).
-Zapewnia 100% zgodności terminologicznej, nazw technik, magii, rang i relacji postaci
-z oficjalnymi polskimi tomikami mang wydawanymi przez renomowane wydawnictwa
+Polish Manga Canon Registry Module (Manga Canon Registry).
+Ensures 100% terminology consistency for techniques, magic, ranks, and character relationships
+matching official Polish manga publications from renowned publishers
 (Waneko, J.P.Fantastica, Studio JG, Hanami, Kotori, Dango).
 
-Działa w 100% lokalnie (Offline / 0 zł kosztów API).
+Runs 100% locally (Offline / 0 PLN API cost).
 """
 
 import os
@@ -16,7 +16,7 @@ from typing import Dict, Any, Optional, List
 
 MANGA_CANON_DIR = Path(__file__).parent / "manga_canon"
 
-# Wbudowana baza kanonicznej terminologii czołowych polskich wydań mangowych
+# Built-in canon terminology database from leading Polish manga editions
 BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     "kingdom": {
         "title": "Kingdom",
@@ -700,7 +700,7 @@ class MangaCanonRegistry:
         self._load_custom_files()
 
     def _load_custom_files(self):
-        """Wczytuje ewentualne pliki JSON dodane przez użytkownika do katalogu manga_canon/."""
+        """Loads custom JSON files added by user into manga_canon/ directory."""
         if not self.custom_dir.exists():
             return
         for json_file in self.custom_dir.glob("*.json"):
@@ -714,14 +714,14 @@ class MangaCanonRegistry:
                 pass
 
     def find_canon_for_series(self, anime_title: str) -> Optional[Dict[str, Any]]:
-        """Wyszukuje kanon polskiego wydania mangi na podstawie tytułu anime."""
+        """Finds Polish manga canon entry based on anime title."""
         if not anime_title:
             return None
 
         norm_title = re.sub(r"[^\w\s]", " ", anime_title.lower()).strip()
         norm_title_compact = re.sub(r"\s+", " ", norm_title)
 
-        # 1. Dokładne lub aliasowe dopasowanie
+        # 1. Exact or alias matching
         for key, entry in self.canon_db.items():
             aliases = entry.get("aliases", []) + [entry.get("title", "").lower(), key]
             for alias in aliases:
@@ -734,7 +734,7 @@ class MangaCanonRegistry:
         return None
 
     def format_canon_for_prompt(self, canon_entry: Optional[Dict[str, Any]]) -> str:
-        """Formatuje kanon mangowy do postaci zwięzłego bloku promptu systemowego."""
+        """Formats manga canon entry into a concise system prompt block."""
         if not canon_entry:
             return ""
 

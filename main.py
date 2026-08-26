@@ -1,5 +1,5 @@
 """
-Główny punkt wejścia CLI / GUI dla Multimodalnego Tłumacza Napisów (Gemini 3.7 Flash).
+Main CLI / GUI Entry Point for Multimodal Subtitle Translator (Gemini 3.7 Flash).
 """
 
 import os
@@ -7,14 +7,14 @@ import sys
 import warnings
 import logging
 
-# Wyciszenie ostrzeżeń Hugging Face Hub, symlinków i nieszkodliwych powiadomień
+# Silence Hugging Face Hub warnings, symlink notices, and benign messages
 os.environ["HF_HUB_DISABLE_SYMLINKS_WARNING"] = "1"
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 warnings.filterwarnings("ignore", category=UserWarning, module="huggingface_hub")
 warnings.filterwarnings("ignore", category=FutureWarning)
 logging.getLogger("huggingface_hub").setLevel(logging.ERROR)
 
-# Wymuszenie pełnej obsługi znaków UTF-8 (w tym japońskich Kanji/Hiragany/Katakany) w konsoli Windows
+# Force full UTF-8 support (including Japanese Kanji/Hiragana/Katakana) in Windows console
 if sys.platform == "win32":
     try:
         import ctypes
@@ -35,12 +35,12 @@ import argparse
 import subprocess
 from typing import Optional, Tuple, List, Dict, Any
 from pathlib import Path
-# Wczytanie zmiennych środowiskowych z .env
+# Load environment variables from .env
 try:
     from dotenv import load_dotenv
     load_dotenv()
 except ImportError:
-    # Wbudowany awaryjny parser pliku .env (gdyby python-dotenv nie był zainstalowany)
+    # Built-in fallback .env parser if python-dotenv is not installed
     env_file = Path(__file__).parent / ".env"
     if env_file.exists():
         try:
@@ -61,7 +61,7 @@ SUBTITLE_EXTENSIONS = {".srt", ".ass", ".ssa", ".vtt", ".sub"}
 
 def pick_file_gui() -> str:
     """
-    Otwiera natywne okno wyboru pliku w systemie Windows/Linux/macOS.
+    Opens a native file picker dialog in Windows/Linux/macOS.
     """
     try:
         import tkinter as tk
@@ -85,25 +85,25 @@ def pick_file_gui() -> str:
 
 def launch_player(video_path: str, subs_path: str):
     """
-    Próbuje uruchomić film z nowymi napisami w odtwarzaczu (mpv, vlc lub domyślnym systemowym).
+    Attempts to launch the video with the new subtitles in a player (mpv, vlc, or system default).
     """
     print(f"\n[Odtwarzacz] Uruchamianie wideo z przetłumaczonymi napisami...")
     
-    # 1. Próba MPV
+    # 1. Try MPV
     try:
         subprocess.Popen(["mpv", video_path, f"--sub-file={subs_path}"])
         return
     except Exception:
         pass
 
-    # 2. Próba VLC
+    # 2. Try VLC
     try:
         subprocess.Popen(["vlc", video_path, f"--sub-file={subs_path}"])
         return
     except Exception:
         pass
 
-    # 3. Domyślny program w Windows
+    # 3. Default program on Windows
     if os.name == "nt":
         try:
             os.startfile(video_path)
@@ -114,14 +114,14 @@ def launch_player(video_path: str, subs_path: str):
     print("[Info] Nie znaleziono mpv/vlc w PATH. Otwórz plik wideo ręcznie w swoim ulubionym odtwarzaczu.")
 
 def natural_sort_key(s: str) -> list:
-    """Umożliwia naturalne sortowanie nazw plików i odcinków (np. 1, 2, ..., 10, 11)."""
+    """Enables natural sorting of filenames and episode numbers (e.g., 1, 2, ..., 10, 11)."""
     import re
     return [int(text) if text.isdigit() else text.lower() for text in re.split(r'(\d+)', str(s))]
 
 
 def collect_input_files(raw_inputs: list) -> list:
     """
-    Zbiera i układa w kolejce pliki wideo, napisy lub całe foldery z odcinkami.
+    Collects and queues video files, subtitle files, or entire season directories.
     """
     collected = []
     seen = set()
@@ -133,7 +133,7 @@ def collect_input_files(raw_inputs: list) -> list:
         if not p.exists():
             continue
         if p.is_dir():
-            # Przeszukiwanie całego folderu
+            # Search entire directory
             for item in sorted(p.iterdir(), key=lambda x: natural_sort_key(x.name)):
                 if item.is_file():
                     ext = item.suffix.lower()
@@ -161,8 +161,8 @@ def resolve_episode_files(
     args_track: int = 0
 ) -> Tuple[Optional[Path], Optional[Path], bool]:
     """
-    Rozwiązuje powiązanie plik wideo <-> plik napisów dla pojedynczego odcinka.
-    Zwraca: (video_file, subs_file, temp_subs_extracted)
+    Resolves video file <-> subtitle file association for a single episode.
+    Returns: (video_file, subs_file, temp_subs_extracted)
     """
     video_file: Optional[Path] = None
     subs_file: Optional[Path] = None
@@ -336,7 +336,7 @@ def main():
             sys.exit(0)
         raw_inputs = [chosen_input]
 
-    # Zbieranie i sortowanie kolejki plików
+    # Collect and sort file queue
     queue = collect_input_files(raw_inputs)
     if not queue:
         print(f"[Błąd]: Nie znaleziono żadnych obsługiwanych plików wideo ani napisów.")
@@ -353,10 +353,10 @@ def main():
             print(f"  [{idx:02d}/{total_episodes:02d}] {item.name}")
         print("=" * 68)
 
-    # Inicjalizacja ustawień i modeli (zadawane TYLKO RAZ na początku dla całej kolejki)
+    # Initialize settings and models (prompted ONLY ONCE at startup for the entire queue)
     enable_verifier = not args.no_verify and os.getenv("ENABLE_VERIFIER", "true").lower() == "true"
 
-    # Wybór trybu honoryfikatorów: CLI -> Interaktywne menu w CMD -> .env
+    # Honorifics mode selection: CLI -> Interactive CMD menu -> .env
     if args.no_honorifics:
         keep_honorifics = False
     elif args.honorifics:
@@ -385,7 +385,7 @@ def main():
     from google import genai
     from google.genai import types
     
-    # Dynamiczne wykrywanie najnowszych modeli Gemini
+    # Dynamic detection of latest Gemini models
     api_key_check = os.getenv("GEMINI_API_KEY")
     temp_client = genai.Client(api_key=api_key_check, http_options=types.HttpOptions(timeout=15000)) if api_key_check else None
     best_models = resolve_best_models(temp_client)
@@ -459,7 +459,7 @@ def main():
 
     completed_files = []
 
-    # Główna pętla Kolejki Sezonowej
+    # Main Season Queue loop
     for ep_idx, target_path in enumerate(queue, 1):
         if is_season_queue:
             print("\n" + "═" * 70)
@@ -499,7 +499,7 @@ def main():
                 except OSError:
                     pass
 
-    # Podsumowanie końcowe
+    # Final summary
     print("\n" + "=" * 70)
     if is_season_queue:
         print(f"  🎉 ZAKOŃCZONO KOLEJKĘ SEZONOWĄ: Przetłumaczono {len(completed_files)}/{total_episodes} odcinków!")
@@ -511,7 +511,7 @@ def main():
             print(f"  🎉 Pomyślnie przetłumaczono: {completed_files[0][1]}")
     print("=" * 70 + "\n")
 
-    # Uruchomienie odtwarzacza (tylko w trybie pojedynczego pliku)
+    # Launch video player (only in single file mode)
     if not is_season_queue and args.play and queue and queue[0].suffix.lower() in VIDEO_EXTENSIONS and completed_files:
         launch_player(str(queue[0]), completed_files[0][1])
 

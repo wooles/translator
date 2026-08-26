@@ -1,44 +1,44 @@
 # -*- coding: utf-8 -*-
 """
-Moduł Formatowania i Podziału Linii AVT (Netflix Timed Text & Szarkowska Style Guide).
-Zawiera:
-1. Semantyczny podział linii (Syntactic Cohesion & Pyramiding) z bezpiecznym limitem znaków na wiersz.
-2. Bezwzględny zakaz potrójnych wierszy (maksymalnie 2 linie w dialogu).
-3. Zakaz rozrywania fraz gramatycznych i pozostawiania sierotek (wiszących wyrazów).
-4. Kontroler prędkości czytania (CPS - Characters Per Second).
+AVT Line Formatting & Segmentation Module (Netflix Timed Text & Szarkowska Style Guide).
+Contains:
+1. Syntactic line-breaking (Syntactic Cohesion & Pyramiding) with safe character limits per line.
+2. Strict prohibition of three-line subtitles (maximum 2 lines per subtitle event).
+3. Preservation of grammatical phrases and elimination of orphan words.
+4. Reading speed monitoring (CPS - Characters Per Second).
 """
 
 import re
 from typing import Tuple, Optional
 
-# Bezpieczna maksymalna liczba znaków na pojedynczy wiersz w napisach filmowych
+# Safe maximum number of characters per line in subtitle formatting
 MAX_LINE_LENGTH = 38
 
-# Maksymalny bezpieczny limit prędkości czytania (Netflix: 17 CPS dla dorosłych)
+# Safe reading speed ceiling (Netflix standard: 17 CPS for adult content)
 SAFE_CPS_LIMIT = 17.0
 
-# Słowa, po których KATEGORYCZNIE NIE WOLNO łamać linii (przyimki, spójniki, partykuły)
+# Prepositions and conjunctions after which a line break is strictly prohibited
 NO_BREAK_AFTER = {
     "w", "z", "do", "na", "o", "od", "po", "ze", "za", "we", "ku", "bez", "dla",
     "i", "a", "że", "bo", "czy", "by", "jak", "gdy", "co", "nie", "lecz", "ale"
 }
 
 def clean_text_for_len(text: str) -> str:
-    """Usuwa tagi formatowania ASS/HTML do rzetelnego pomiaru długości i CPS."""
+    """Strips ASS/HTML formatting tags for accurate length and CPS measurement."""
     if not text:
         return ""
-    # Usunięcie tagów ASS {...}
+    # Strip ASS tags {...}
     cleaned = re.sub(r"\{[^}]*\}", "", text)
-    # Usunięcie tagów HTML
+    # Strip HTML tags
     cleaned = re.sub(r"</?[^>]+>", "", cleaned)
-    # Usunięcie znaczników nowej linii
+    # Normalize line breaks
     cleaned = cleaned.replace("\\N", " ").replace("\\n", " ").replace("\n", " ")
     return re.sub(r"\s+", " ", cleaned).strip()
 
 def calculate_cps(text: str, start_ms: int, end_ms: int) -> Tuple[float, bool]:
     """
-    Oblicza prędkość czytania w Znakach Na Sekundę (CPS).
-    Zwraca: (wartość_cps, czy_przekracza_normę)
+    Calculates reading speed in Characters Per Second (CPS).
+    Returns: (cps_value, exceeds_limit_flag)
     """
     duration_s = max(0.3, (end_ms - start_ms) / 1000.0)
     clean = clean_text_for_len(text)
@@ -48,10 +48,10 @@ def calculate_cps(text: str, start_ms: int, end_ms: int) -> Tuple[float, bool]:
 
 def split_subtitle_syntactically(text: str, max_line_len: int = MAX_LINE_LENGTH, is_ass: bool = True, is_sign: bool = False) -> str:
     """
-    Dzieli napis na MAKSYMALNIE 2 wiersze z zachowaniem spójności syntaktycznej (AVT)
-    oraz struktury piramidy (dolny wiersz dłuższy lub równy górnemu).
-    Dla plansz ekranowych i tytułów (is_sign=True) stosuje bezpieczny limit optyczny (max 24 znaki/wiersz).
-    Kategorycznie eliminuje 3-wierszowe schodki i wiszące sierotki.
+    Splits subtitle into MAXIMUM 2 lines preserving syntactic cohesion (AVT)
+    and pyramiding structure (bottom line longer than or equal to top line).
+    For on-screen signs and title cards (is_sign=True) applies narrower limit (max 24 chars/line).
+    Eliminates 3-line stairs and hanging single words.
     """
     if not text:
         return ""
@@ -61,12 +61,12 @@ def split_subtitle_syntactically(text: str, max_line_len: int = MAX_LINE_LENGTH,
 
     sep = "\\N" if is_ass else "\n"
 
-    # Wyodrębnienie ewentualnego przedrostka tagów ASS (np. {\pos(..)})
+    # Extract ASS tag prefix (e.g. {\pos(..)})
     prefix_match = re.match(r"^((?:\{[^}]+\})+)", text)
     ts_prefix = prefix_match.group(1) if prefix_match else ""
     raw_content = text[len(ts_prefix):].strip()
 
-    # Zastępujemy wszystkie istniejące łamania pojedynczą spacją, aby zrekonstruować idealny 2-liniowy podział
+    # Normalize existing line breaks into single space to reconstruct clean 2-line break
     normalized_content = re.sub(r"\\N|\\n|\n", " ", raw_content)
     normalized_content = re.sub(r"\s+", " ", normalized_content).strip()
 
@@ -96,7 +96,7 @@ def split_subtitle_syntactically(text: str, max_line_len: int = MAX_LINE_LENGTH,
 
         score = 0.0
 
-        # Kary za przekroczenie docelowej długości linii
+        # Penalties for exceeding max line length
         if len_left > max_line_len:
             score -= (len_left - max_line_len) * 300.0
         if len_right > max_line_len:
@@ -105,17 +105,17 @@ def split_subtitle_syntactically(text: str, max_line_len: int = MAX_LINE_LENGTH,
         last_word_left = re.sub(r"[^\w]", "", left_words[-1].lower())
         first_word_right = re.sub(r"[^\w]", "", right_words[0].lower())
 
-        # 1. Bezwzględna kara za łamanie po przyimkach i spójnikach (sierotki)
+        # 1. Strict penalty for breaking after prepositions/conjunctions
         if last_word_left in NO_BREAK_AFTER:
             score -= 1000.0
 
-        # 2. Kara za pojedyncze wiszące słowo na początku lub końcu (mniej niż 2 słowa)
+        # 2. Penalty for single hanging word at start or end
         if len(left_words) == 1:
             score -= 300.0
         if len(right_words) == 1:
             score -= 300.0
 
-        # 3. Bonus za podział po znakach interpunkcyjnych kończących zdanie/frazę
+        # 3. Bonus for punctuation breaks at clause boundary
         if left_words[-1].endswith((".", "!", "?", "...", ":", ";")):
             score += 250.0
         elif left_words[-1].endswith(","):
@@ -123,18 +123,18 @@ def split_subtitle_syntactically(text: str, max_line_len: int = MAX_LINE_LENGTH,
         elif left_words[-1].endswith(("—", "-")):
             score += 120.0
 
-        # 4. Bonus za podział przed spójnikami podrzędnymi
+        # 4. Bonus for breaking before subordinate conjunctions
         if first_word_right in {"że", "bo", "ponieważ", "więc", "jeśli", "gdy", "kiedy", "chociaż", "dlatego", "który", "która", "które"}:
             score += 140.0
 
-        # 5. Zasada piramidy (Pyramiding - Netflix AVT): Dolny wiersz powinien być dłuższy od górnego (lub zbliżony)
+        # 5. Pyramiding rule (Netflix AVT): bottom line should be longer than or equal to top line
         diff = len_right - len_left
         if 0 <= diff <= 16:
-            score += 250.0  # Bardzo wysoki bonus za prawidłową piramidę (dół dłuższy lub równy)
+            score += 250.0  # High bonus for proper pyramiding
         elif diff < 0:
-            score -= abs(diff) * 25.0  # Surowa kara za odwróconą piramidę (góra dłuższa od dołu)
+            score -= abs(diff) * 25.0  # Penalty for inverted pyramid
 
-        # 6. Balans długości względem środka
+        # 6. Center balance penalty
         balance_penalty = abs(len_left - target_midpoint) * 2.0
         score -= balance_penalty
 
@@ -147,6 +147,6 @@ def split_subtitle_syntactically(text: str, max_line_len: int = MAX_LINE_LENGTH,
         line2 = " ".join(words[best_split_idx:]).strip()
         return f"{ts_prefix}{line1}{sep}{line2}"
 
-    # Bezpieczny podział w połowie słów
+    # Safe midpoint fallback
     mid = len(words) // 2
     return f"{ts_prefix}{' '.join(words[:mid])}{sep}{' '.join(words[mid:])}"

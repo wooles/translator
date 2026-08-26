@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
 """
-Moduł weryfikacji językowej, polskiej redakcji dialogów oraz eliminacji kalek językowych.
+Linguistic Verification & Polish Dialogue Polish/Refinement Module (Phase 2).
+Eliminates translationese, mechanical calques, and refines dialogues for natural spoken Polish flow.
 """
 
 import json
@@ -53,8 +55,8 @@ class DialogueVerifier:
         focused_rules_str: str = ""
     ) -> List[RefinedLine]:
         """
-        Przeprowadza redakcję i weryfikację paczki dialogów.
-        batch_items zawiera elementy:
+        Executes editorial refinement and verification for a dialogue batch.
+        batch_items contains elements:
         [{'id': int, 'en': str, 'pl': str, 'speaker_gender': str, 'notes': str}, ...]
         """
         if not batch_items:
@@ -136,12 +138,12 @@ class DialogueVerifier:
                     self.current_episode_tokens["output"] += (cands + thoughts)
                     self.current_episode_tokens["model"] = self.model
 
-                # Pobieramy sparsowany wynik
+                # Retrieve parsed structured output
                 if hasattr(response, "parsed") and response.parsed is not None:
                     parsed_obj: RefinedBatchResponse = response.parsed
                     return parsed_obj.lines
                 
-                # Fallback z response.text jeśli SDK zwróciło surowy json
+                # Fallback to response.text if SDK returned raw string
                 data = json.loads(response.text)
                 batch_resp = RefinedBatchResponse.model_validate(data)
                 return batch_resp.lines

@@ -1,6 +1,6 @@
 """
-Moduł automatycznego pobierania metadanych anime (fabuła, gatunki, postacie i ich płeć)
-z serwisów AniList i MyAnimeList na podstawie nazwy pliku.
+Module for automatically fetching anime metadata (plot, genres, characters and genders)
+from AniList and MyAnimeList based on filename.
 """
 
 import re
@@ -12,35 +12,35 @@ from typing import Optional, Dict, Any, List
 
 def clean_anime_filename(filename_or_path: str) -> str:
     """
-    Oczyszcza nazwę pliku z tagów grup fansuberskich, jakości, hashy i numeru odcinka,
-    aby uzyskać czysty tytuł serii (np. 'Otome Kaijuu Carameliser').
+    Cleans filename of fansub group tags, quality tags, hashes, and episode numbers
+    to extract a clean series title (e.g. 'Otome Kaijuu Carameliser').
     """
     name = Path(filename_or_path).stem
 
-    # 1. Usuwanie tagów w nawiasach kwadratowych na początku (np. [ASW], [SubsPlease], [Erai-raws])
+    # 1. Remove bracketed prefix tags (e.g. [ASW], [SubsPlease], [Erai-raws])
     name = re.sub(r"^\[[^\]]+\]\s*", "", name)
 
-    # 2. Usuwanie hashy CRC32 i jakości na końcu (np. [1080p HEVC][AE584971], (1080p))
+    # 2. Remove CRC32 hashes and quality tags at the end (e.g. [1080p HEVC][AE584971], (1080p))
     name = re.sub(r"\s*\[[^\]]+\]$", "", name)
     name = re.sub(r"\s*\([^\)]+\)$", "", name)
     name = re.sub(r"\[[0-9a-fA-F]{8}\]", "", name)
     name = re.sub(r"\[(?:1080p|720p|480p|2160p|4K|HEVC|x264|x265|AAC|FLAC)[^\]]*\]", "", name, flags=re.IGNORECASE)
 
-    # 3. Usuwanie numeru odcinka (np. - 07, _07, EP07, S01E07, Episode 7)
+    # 3. Remove episode number (e.g. - 07, _07, EP07, S01E07, Episode 7)
     name = re.sub(r"\s*-\s*(?:Episode\s*)?(?:S\d+)?(?:E|EP)?\d+(?:v\d+)?.*$", "", name, flags=re.IGNORECASE)
     name = re.sub(r"\s+(?:S\d+)?(?:E|EP)\d+.*$", "", name, flags=re.IGNORECASE)
     name = re.sub(r"\s*-\s*\d+.*$", "", name)
 
-    # 4. Zamiana podkreśleń i kropek na spacje
+    # 4. Replace underscores and dots with spaces
     name = name.replace("_", " ").replace(".", " ")
 
-    # 5. Usunięcie podwójnych spacji
+    # 5. Clean duplicate whitespace
     name = re.sub(r"\s+", " ", name).strip()
     return name
 
 def fetch_anilist_metadata(title: str) -> Optional[Dict[str, Any]]:
     """
-    Wysyła zapytanie do AniList GraphQL API w celu pobrania opisu fabuły i obsady postaci.
+    Queries the AniList GraphQL API to fetch plot synopsis, tags, and character cast.
     """
     query = """
     query ($search: String) {
@@ -95,15 +95,15 @@ def fetch_anilist_metadata(title: str) -> Optional[Dict[str, Any]]:
             if not media:
                 return None
 
-            # Czyścimy opis z ewentualnych znaczników HTML (np. <br>, <i>)
+            # Clean HTML tags from description (e.g. <br>, <i>)
             desc_raw = media.get("description") or ""
             desc_clean = re.sub(r"<[^>]+>", "", desc_raw).strip()
 
-            # Analiza tagów pod kątem kontekstu historycznego, epoki i realiów świata
+            # Analyze tags for historical context, setting, and world realities
             raw_tags = media.get("tags", [])
             tag_names = [t.get("name", "") for t in raw_tags if t.get("name")]
             
-            # Wykrywanie kluczowych znaczników epoki i świata
+            # Detect key historical and setting keywords
             historical_keywords = [
                 "historical", "mongol", "empire", "middle ages", "medieval", "edo period",
                 "feudal", "ancient", "war", "politics", "royalty", "samurai", "military",
@@ -114,7 +114,7 @@ def fetch_anilist_metadata(title: str) -> Optional[Dict[str, Any]]:
                 if any(k in t.lower() for k in historical_keywords)
             ]
 
-            # Wykrywanie specyficznych dziedzin wiedzy i niszowej tematyki specjalistycznej (z granicami słów \b)
+            # Detect specialized domains and terminology (with word boundaries \b)
             domain_keywords = {
                 "Enologia i Sommelierstwo (Wino)": [
                     r"\bwine\b", r"\bsommelier\b", r"\bwinery\b", r"\bvintages?\b",
@@ -165,7 +165,7 @@ def fetch_anilist_metadata(title: str) -> Optional[Dict[str, Any]]:
                 c_native = node.get("name", {}).get("native")
                 c_gender = node.get("gender") or "nieznana"
                 
-                # Ustalenie polskiego określenia płci
+                # Determine gender label for prompt
                 gender_pl = "postać"
                 if c_gender.lower() in ("female", "woman", "girl"):
                     gender_pl = "kobieta / dziewczyna"
@@ -197,7 +197,7 @@ def fetch_anilist_metadata(title: str) -> Optional[Dict[str, Any]]:
 
 def get_anime_context(filename_or_path: str) -> Optional[Dict[str, Any]]:
     """
-    Pobiera i formatuje pełne metadane anime na podstawie ścieżki lub nazwy pliku.
+    Fetches and formats anime metadata based on video/subtitle path or filename.
     """
     clean_title = clean_anime_filename(filename_or_path)
     if not clean_title or len(clean_title) < 2:
@@ -208,7 +208,7 @@ def get_anime_context(filename_or_path: str) -> Optional[Dict[str, Any]]:
 
 def format_anime_context_for_prompt(meta: Dict[str, Any]) -> str:
     """
-    Formatuje pobrane metadane w czytelny blok tekstu z uwzględnieniem realiów historycznych i stylizacji.
+    Formats fetched metadata into a clean context block with historical and genre guidelines.
     """
     if not meta:
         return ""
@@ -236,7 +236,7 @@ def format_anime_context_for_prompt(meta: Dict[str, Any]) -> str:
             desc = desc[:400].rsplit(".", 1)[0] + "."
         lines.append(f"Opis tła fabularnego: {desc}")
 
-    # Wytyczne stylizacji w zależności od tła historycznego
+    # Stylization guidelines depending on historical background
     is_historical = any(
         t.lower() in ("historical", "mongol empire", "middle ages", "medieval", "edo period", "feudal japan", "ancient china", "samurai")
         for t in (meta.get("genres", []) + meta.get("setting_tags", []))

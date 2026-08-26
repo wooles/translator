@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Skrypt automatycznej kompilacji projektu do samodzielnego pliku translator.exe (PyInstaller).
-Pakuje wszystkie zależności, zasoby, bazy pamięci i moduły w jeden plik wykonywalny.
+Automated build script for compiling the project into a standalone executable (translator.exe) via PyInstaller.
+Bundles all dependencies, assets, memory databases, and modules into an executable package.
 """
 
 import os
@@ -21,21 +21,21 @@ def build_executable():
         print(f"[BŁĄD] Nie znaleziono pliku {gui_script}")
         return
 
-    # Podstawowe argumenty PyInstaller
+    # Base PyInstaller arguments
     cmd = [
         sys.executable, "-m", "PyInstaller",
         "--name=translator",
-        "--windowed",            # Bez czarnego okna konsoli w tle
-        "--noconfirm",           # Nadpisywanie poprzedniego buildu
-        "--clean",               # Czyszczenie cache
+        "--windowed",            # No black console window in the background
+        "--noconfirm",           # Overwrite previous build
+        "--clean",               # Clean cache
     ]
 
-    # Dołączenie folderu z bazą napisów jeśli istnieje
+    # Include subtitle database directory if present
     baza_dir = base_dir / "baza napisów"
     if baza_dir.exists():
         cmd.extend(["--add-data", f"{baza_dir};baza napisów"])
 
-    # Dołączenie głównego skryptu
+    # Include main script
     cmd.append(str(gui_script))
 
     print("\n[PyInstaller] Uruchamianie kompilacji do dist/translator.exe...")

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Pomocnik konwersji tekstu japońskiego (Kanji / Kana) na zapis fonetyczny alfabetem łacińskim (Romaji).
-Gwarantuje czytelne wyświetlanie transkrypcji mowy w konsoli Windows bez pustych kwadratów (font boxes).
+Japanese text conversion helper (Kanji / Kana to Romaji phonetic transcription).
+Guarantees clean display of Japanese speech transcription in Windows console without missing font boxes.
 """
 
 from typing import Optional
@@ -17,7 +17,7 @@ except Exception:
 
 def to_romaji(text: str) -> str:
     """
-    Konwertuje japoński tekst (Kanji / Hiragana / Katakana) na czytelny zapis w alfabecie łacińskim (Romaji).
+    Converts Japanese text (Kanji / Hiragana / Katakana) into readable Latin alphabet transcription (Hepburn Romaji).
     """
     if not text:
         return ""
@@ -27,7 +27,7 @@ def to_romaji(text: str) -> str:
             result = _kks.convert(text)
             romaji_parts = [item.get("hepburn", "") or item.get("orig", "") for item in result]
             clean_romaji = " ".join(romaji_parts).strip()
-            # Łączenie zbędnych spacji wokół znaków interpunkcyjnych
+            # Collapse whitespace around punctuation marks
             clean_romaji = clean_romaji.replace(" .", ".").replace(" ,", ",").replace(" !", "!").replace(" ?", "?")
             return clean_romaji
         except Exception:

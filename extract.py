@@ -1,5 +1,5 @@
 """
-Moduł ekstrakcji napisów oraz klatek wideo z użyciem ffmpeg i Pillow.
+Subtitle and video frame extraction module using ffmpeg and Pillow.
 """
 
 import os
@@ -12,7 +12,7 @@ from PIL import Image
 
 def get_video_streams_info(video_path: str) -> Dict[str, Any]:
     """
-    Pobiera informacje o strumieniach audio i napisów z pliku wideo za pomocą ffprobe/ffmpeg.
+    Retrieves audio and subtitle stream information from a video file using ffprobe/ffmpeg.
     """
     cmd = [
         "ffprobe",
@@ -26,12 +26,12 @@ def get_video_streams_info(video_path: str) -> Dict[str, Any]:
         result = subprocess.run(cmd, capture_output=True, text=True, check=True)
         return json.loads(result.stdout)
     except Exception:
-        # Fallback jeśli ffprobe nie jest dostępny w PATH: spróbuj ffmpeg
+        # Fallback if ffprobe is unavailable in PATH: try ffmpeg
         return {}
 
 def list_subtitle_tracks(video_path: str) -> List[Dict[str, Any]]:
     """
-    Zwraca listę dostępnych ścieżek napisów w pliku wideo.
+    Returns a list of available subtitle tracks in a video file.
     """
     info = get_video_streams_info(video_path)
     sub_tracks = []
@@ -41,7 +41,7 @@ def list_subtitle_tracks(video_path: str) -> List[Dict[str, Any]]:
             if s.get("codec_type") == "subtitle":
                 tags = s.get("tags", {})
                 lang = tags.get("language", "und")
-                title = tags.get("title", f"Ścieżka {sub_idx + 1}")
+                title = tags.get("title", f"Track {sub_idx + 1}")
                 codec = s.get("codec_name", "unknown")
                 sub_tracks.append({
                     "sub_index": sub_idx,
@@ -55,8 +55,8 @@ def list_subtitle_tracks(video_path: str) -> List[Dict[str, Any]]:
 
 def extract_embedded_subtitles(video_path: str, sub_index: int = 0, output_path: Optional[str] = None) -> str:
     """
-    Wyciąga wbudowaną ścieżkę napisów z pliku wideo do deterministycznego pliku .extracted.ass lub wskazanego pliku.
-    Deterministyczna nazwa zapewnia 100% spójność wznawiania (checkpointing) i zapobiega wielokrotnym opłatom za Profiler.
+    Extracts embedded subtitle track from video file into a deterministic .extracted.ass file or specified target path.
+    Deterministic naming ensures 100% checkpoint consistency and prevents duplicate Profiler charges.
     """
     if not output_path:
         from pathlib import Path
@@ -88,8 +88,8 @@ def extract_frame_at_timestamp(
     max_width: int = 800
 ) -> str:
     """
-    Wyciąga klatkę wideo z podanego znacznika czasu (w milisekundach),
-    optymalizuje jej rozmiar i zapisuje jako JPEG.
+    Extracts a video frame at a given timestamp (in milliseconds),
+    optimizes its resolution and saves as JPEG.
     """
     if not output_path:
         tmp = tempfile.NamedTemporaryFile(suffix=".jpg", delete=False)
@@ -97,7 +97,7 @@ def extract_frame_at_timestamp(
         output_path = tmp.name
 
     sec = max(0.0, timestamp_ms / 1000.0)
-    # Wyciągamy klatkę za pomocą ffmpeg
+    # Extract frame using ffmpeg
     cmd = [
         "ffmpeg",
         "-y",
@@ -109,7 +109,7 @@ def extract_frame_at_timestamp(
     ]
     subprocess.run(cmd, capture_output=True, text=True, check=True)
 
-    # Optymalizacja klatki za pomocą Pillow (skalowanie dla oszczędności tokenów i szybkości)
+    # Frame optimization with Pillow (downscaling for token efficiency and speed)
     try:
         with Image.open(output_path) as img:
             img = img.convert("RGB")
@@ -130,18 +130,18 @@ def extract_audio_slice(
     output_path: Optional[str] = None
 ) -> str:
     """
-    Wyciąga krótki, lekki wycinek ścieżki dźwiękowej (16kHz mono WAV) dla danej sceny/paczki dialogowej.
-    Pozwala modelowi Gemini na bezpośrednie słuchanie oryginalnego japońskiego dubbingu.
+    Extracts a short audio slice (16kHz mono WAV) for a given scene/dialogue batch.
+    Allows the Gemini multimodal model to directly hear original Japanese voice acting.
     """
     if not output_path:
         tmp = tempfile.NamedTemporaryFile(suffix=".wav", delete=False)
         tmp.close()
         output_path = tmp.name
 
-    start_sec = max(0.0, (start_ms - 200) / 1000.0)  # 200ms bufor na początek głosu
-    duration_sec = max(0.8, (end_ms - start_ms + 400) / 1000.0)  # bufor na wybrzmienie
+    start_sec = max(0.0, (start_ms - 200) / 1000.0)  # 200ms voice onset buffer
+    duration_sec = max(0.8, (end_ms - start_ms + 400) / 1000.0)  # release decay buffer
 
-    # -ss przed -i dla błyskawicznego skoku, 16kHz mono WAV
+    # Fast seek with -ss before -i, 16kHz mono WAV
     cmd = [
         "ffmpeg",
         "-y",

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Moduł AVT Linter (Automatyczny Strażnik i Audytor Polszczyzny Filmowej).
-Oparty na wytycznych Arkadiusza Belczyka, Agnieszki Szarkowskiej, Netflix Polish Style Guide
-oraz dynamicznej bazie reguł i poprawek użytkownika (User Feedback & Glossary).
-Działa jako ostatnia, niezależna tarcza jakościowa sprawdzająca przetłumaczone kwestie pod kątem
-rażących kalek, sztucznych pytań, niewłaściwych form gramatycznych i pozostałości mechanicznego przekładu.
+AVT Linter Module (Automated Polish Film Subtitle Auditor & Quality Guard).
+Based on guidelines by Arkadiusz Belczyk, Agnieszka Szarkowska, Netflix Polish Style Guide,
+and the dynamic user feedback & glossary rules.
+Acts as a final, independent quality shield inspecting translated lines for
+calques, unnatural questions, incorrect gender forms, and machine-translation artifacts.
 """
 
 import re
@@ -13,20 +13,20 @@ from pathlib import Path
 
 class AVTLinter:
     """
-    Automatyczny walidator i korektor mechanicznych kalek językowych w napisach filmowych.
+    Automated validator and corrector for mechanical language calques in subtitle tracks.
     """
     
-    # Słownik automatycznych natychmiastowych podmian kalek z przypisaniem do Filarów AVT
-    # Zawiera elastyczne wzorce fleksyjne i wieloczasowe
+    # Dictionary of automated instant calque replacements mapped to AVT Pillars
+    # Supports flexible inflectional and tense patterns
     FIXED_REPLACEMENTS = [
-        # Amerykanizmy i kalki leksykalne (Filar IV / XXXVI)
+        # Americanisms and lexical calques (Pillar IV / XXXVI)
         (r"\b[Ww]itaj z powrotem\b", "Witaj!", "Filar IV/XXXVI - Eliminacja Kalek Amerykańskich"),
         
-        # Odmiany "mieć taką nadzieję" -> "mieć nadzieję"
+        # Inflections of "mieć taką nadzieję" -> "mieć nadzieję"
         (r"\b([Mm]am|[Mm]iałem|[Mm]iałam|[Mm]ieliśmy|[Mm]iałyśmy|[Bb]ędę mieć|[Bb]ędziemy mieć)\s+taką\s+nadzieję\b", r"\1 nadzieję", "Filar IV - Czystość Idiomatyczna"),
         (r"\b[Mm]am nadzieję na to\b", "Mam nadzieję", "Filar IV - Czystość Idiomatyczna"),
 
-        # Odmiany "robić sens" -> "mieć sens"
+        # Inflections of "robić sens" -> "mieć sens"
         (r"\bTo\s+robi\s+sens\b", "To ma sens", "Filar IV - Eliminacja Kalek"),
         (r"\bto\s+robi\s+sens\b", "to ma sens", "Filar IV - Eliminacja Kalek"),
         (r"\brobi\s+sens\b", "ma sens", "Filar IV - Eliminacja Kalek"),
@@ -54,7 +54,7 @@ class AVTLinter:
         (r"\b[Pp]oniosło klapę\b", "Nie wyszło", "Filar IV - Idiomatyka"),
         (r"\b[Ww]asz [Hh]onor\b", "Wysoki Sądzie", "Filar XVI - Realia Sądownicze"),
         
-        # Nominalizacje (Filar I)
+        # Nominalizations (Pillar I)
         (r"\b[Oo]dbyć rozmowę\b", "porozmawiać", "Filar I - Odnominalizowanie"),
         (r"\bodbyłem rozmowę\b", "porozmawiałem", "Filar I - Odnominalizowanie"),
         (r"\bodbyłam rozmowę\b", "porozmawiałam", "Filar I - Odnominalizowanie"),
@@ -64,12 +64,12 @@ class AVTLinter:
         (r"\b[Dd]ać odpowiedź\b", "odpowiedzieć", "Filar I - Odnominalizowanie"),
         (r"\b[Zz]robić pojawienie się\b", "zjawić się", "Filar I - Odnominalizowanie"),
 
-        # Pleonazmy i masło maślane (Belczyk)
+        # Pleonasms & tautologies (Belczyk)
         (r"\b[Cc]ofnąć się do tyłu\b", "cofnąć się", "Filar IV - Pleonazmy"),
         (r"\b[Oo]kres czasu\b", "okres", "Filar IV - Pleonazmy"),
         (r"\bw tym momencie czasu\b", "w tej chwili", "Filar IV - Pleonazmy"),
 
-        # Relacje rodzinne i tytulatura feudalna (Filar XXV / LX)
+        # Family relations & feudal honorifics (Pillars XXV / LX)
         (r"\bTo pan, [Mm]łody [Pp]anie\b", "To ty, młody panie", "Filar XXV - Eliminacja Tautologii Honoryfikatywnej"),
         (r"\bto pan, [Mm]łody [Pp]anie\b", "to ty, młody panie", "Filar XXV - Eliminacja Tautologii Honoryfikatywnej"),
         (r"\bTo pan, młody panie\b", "To ty, młody panie", "Filar XXV - Eliminacja Tautologii Honoryfikatywnej"),
@@ -82,7 +82,7 @@ class AVTLinter:
         (r"\b[Ss]tarszy bracie\b", "brachu", "Filar XXV - Relacje Rodzinne"),
         (r"\b[Ss]tarsza siostro\b", "siostra", "Filar XXV - Relacje Rodzinne"),
         
-        # Hybrydy honoryfikatywne (Filar XXVII)
+        # Honorific hybrids (Pillar XXVII)
         (r"\b[Pp]ani [Ss]ensei\b", "Sensei", "Filar XXVII - Zakaz Hybryd Honoryfikatywnych"),
         (r"\b[Pp]anie [Ss]ensei\b", "Sensei", "Filar XXVII - Zakaz Hybryd Honoryfikatywnych"),
         (r"\b[Pp]an [Ss]ensei\b", "Sensei", "Filar XXVII - Zakaz Hybryd Honoryfikatywnych"),
@@ -90,7 +90,7 @@ class AVTLinter:
         (r"\b[Pp]anie [Ss]enpai\b", "Senpai", "Filar XXVII - Zakaz Hybryd Honoryfikatywnych"),
         (r"\b[Pp]an [Ss]enpai\b", "Senpai", "Filar XXVII - Zakaz Hybryd Honoryfikatywnych"),
         
-        # Poprawność medyczna i rekcja przyczyn zgonu (Filar L)
+        # Medical terminology & cause of death syntax (Pillar L)
         (r"\b[Zz]marła na wylew\b", "zmarła z powodu wylewu", "Filar L - Poprawność Medyczna"),
         (r"\b[Zz]marł na wylew\b", "zmarł z powodu wylewu", "Filar L - Poprawność Medyczna"),
         (r"\b[Uu]marła na wylew\b", "zmarła z powodu wylewu", "Filar L - Poprawność Medyczna"),
@@ -100,14 +100,14 @@ class AVTLinter:
         (r"\b[Zz]marła na atak serca\b", "zmarła na zawał", "Filar L - Poprawność Medyczna"),
         (r"\b[Zz]marł na atak serca\b", "zmarł na zawał", "Filar L - Poprawność Medyczna"),
         
-        # Eliminacja zbędnego "Ja " na początku zdania (Filar I / Belczyk)
+        # Elimination of redundant sentence-initial "Ja " (Pillar I / Belczyk)
         (r"^Ja myślę, że\b", "Myślę, że", "Filar I - Eliminacja Zaimka Ja"),
         (r"^Ja wiem, że\b", "Wiem, że", "Filar I - Eliminacja Zaimka Ja"),
         (r"^Ja uważam, że\b", "Uważam, że", "Filar I - Eliminacja Zaimka Ja"),
         (r"^Ja sądzę, że\b", "Sądzę, że", "Filar I - Eliminacja Zaimka Ja"),
         (r"^Ja widzę, że\b", "Widzę, że", "Filar I - Eliminacja Zaimka Ja"),
         
-        # Eliminacja sztucznego "Czy" na początku krótkich pytań potocznych (Filar IX)
+        # Elimination of artificial "Czy" in short colloquial questions (Pillar IX)
         (r"^[Cc]zy jesteś pewna\?", "Jesteś pewna?", "Filar IX - Pytania bez 'Czy'"),
         (r"^[Cc]zy jesteś pewien\?", "Jesteś pewien?", "Filar IX - Pytania bez 'Czy'"),
         (r"^[Cc]zy wszystko w porządku\?", "Wszystko w porządku?", "Filar IX - Pytania bez 'Czy'"),
@@ -115,34 +115,34 @@ class AVTLinter:
         (r"^[Cc]zy oszalałaś\?", "Oszalałaś?", "Filar IX - Pytania bez 'Czy'"),
         (r"^[Cc]zy oszalałeś\?", "Oszalałeś?", "Filar IX - Pytania bez 'Czy'"),
 
-        # Paralingwistyka i odgłosy foniczne (Filar XVIII)
+        # Paralinguistics & vocal sound effects (Pillar XVIII)
         (r"\b[Aa]ra\s+ara\b", "O proszę...", "Filar XVIII - Paralingwistyka"),
         (r"\b[Tt]ch\b", "Tsk...", "Filar XVIII - Paralingwistyka"),
         (r"\b[Gg]uh\b", "Uch...", "Filar XVIII - Paralingwistyka"),
 
-        # Trzeci język i kalki translacyjne (Filar X)
+        # Third-language & translationese elimination (Pillar X)
         (r"\b[Cc]o sprawia, że tak mówisz\?", "Czemu tak sądzisz?", "Filar X - Anti-Translationese"),
         (r"\b[Jj]estem zrobiony z\b", "Taki już jestem", "Filar X - Anti-Translationese"),
         (r"\b[Ww]zięcie pod uwagę\b", "Biorąc pod uwagę", "Filar X - Anti-Translationese"),
 
-        # Interpunkcja audiowizualna (Filar LX)
+        # Audiovisual punctuation (Pillar LX)
         (r"!\?", "?!", "Filar LX - Zespolone Znaki Interpunkcyjne"),
         (r"!\?\?", "?!", "Filar LX - Zespolone Znaki Interpunkcyjne"),
         (r"\?\?\?", "?", "Filar LX - Zespolone Znaki Interpunkcyjne"),
 
-        # Realia kulturowe i Pedersen ECR (Filar XIV)
+        # Cultural realia and Pedersen ECR (Pillar XIV)
         (r"\b[Kk]onbini\b", "sklep", "Filar XIV - Pedersen Generalization"),
 
-        # Metryzacja miar i jednostek (Filar LIX)
+        # Unit metrication (Pillar LIX)
         (r"\b100\s+stóp\b", "30 metrów", "Filar LIX - Metryzacja Miar"),
         (r"\b10\s+stóp\b", "3 metry", "Filar LIX - Metryzacja Miar"),
         (r"\b6\s+stóp\b", "prawie dwa metry", "Filar LIX - Metryzacja Miar"),
 
-        # Modalność epistemiczna i naturalne wykładniki (Filar XLVI)
+        # Epistemic modality & natural exponents (Pillar XLVI)
         (r"\b[Nn]ie ma wątpliwości, że\b", "bez wątpienia", "Filar XLVI - Modalność Epistemiczna"),
         (r"\b[Jj]est możliwe, że\b", "być może", "Filar XLVI - Modalność Epistemiczna"),
 
-        # Japońskie idiomy somatyczne i pułapki gramatyczne (Filar XV / VI / IX)
+        # Japanese somatic idioms and grammatical traps (Pillars XV / VI / IX)
         (r"\b[Zz]ostałem opadany przez deszcz\b", "złapał mnie deszcz", "Filar VI - Adversative Passive Meiwaku Ukemi"),
         (r"\b[Zz]ostałam opadana przez deszcz\b", "złapał mnie deszcz", "Filar VI - Adversative Passive Meiwaku Ukemi"),
         (r"\b[Zz]ostał umarty przez matkę\b", "zmarła mu matka", "Filar VI - Adversative Passive Meiwaku Ukemi"),
@@ -155,16 +155,16 @@ class AVTLinter:
         (r"\b[Cc]iągnąć za nogę\b", "być ciężarem", "Filar XV - Idiomy Somatyczne"),
         (r"\b[Bb]rzuch mi wstaje\b", "szlag mnie trafia", "Filar XV - Idiomy Somatyczne"),
 
-        # Pragmatyka Shūjoshi (Filar XVI)
+        # Shūjoshi pragmatics (Pillar XVI)
         (r"\bIku zo!?\b", "No to ruszamy!", "Filar XVI - Shūjoshi Pragmatics"),
 
-        # Taksonomia Onomatopei (Filar XVII)
+        # Onomatopoeia taxonomy (Pillar XVII)
         (r"\b[Zz]okutto shita\b", "przeszły mnie ciarki", "Filar XVII - Onomatopoeia Gijougo"),
         (r"\b[Kk]yun to shita\b", "ścisnęło mnie za serce", "Filar XVII - Onomatopoeia Gijougo"),
         (r"\b[Ss]hiin to shita\b", "zapadła cisza jak makiem zasiał", "Filar XVII - Onomatopoeia Gitaigo"),
         (r"\b[Nn]oro-noro\b", "ślimaczym tempem", "Filar XVII - Onomatopoeia Giyougo"),
 
-        # Żargon RPG i Isekai (Filar XXIV)
+        # RPG & Isekai jargon (Pillar XXIV)
         (r"\b[Ss]tatus [Ww]indow\b", "[ OKNO STATUSU ]", "Filar XXIV - RPG / System Window"),
 
         (r"^[Cc]zy pójdziesz ze mną\?", "Pójdziesz ze mną?", "Filar IX - Pytania bez 'Czy'"),
@@ -184,9 +184,9 @@ class AVTLinter:
         custom_glossary: Optional[Dict[str, str]] = None
     ) -> Tuple[str, List[str]]:
         """
-        Analizuje i automatycznie poprawia kwestię dialogową.
-        Uwzględnia reguły kanoniczne, fleksję oraz dynamiczne reguły użytkownika.
-        Zwraca: (poprawiony_tekst, lista_zastosowanych_korekt)
+        Analyzes and automatically fixes dialogue lines.
+        Applies canonical AVT rules, inflection corrections, and user feedback overrides.
+        Returns: (fixed_text, list_of_applied_fixes)
         """
         if not text:
             return "", []
@@ -194,7 +194,7 @@ class AVTLinter:
         modified = text
         applied_fixes = []
 
-        # 1. Automatyczne podmiany leksykalne i frazeologiczne (Kanon AVT)
+        # 1. Automatic lexical and phraseological replacements (AVT Canon)
         for item in cls.FIXED_REPLACEMENTS:
             pattern = item[0]
             repl = item[1]
@@ -203,14 +203,14 @@ class AVTLinter:
                 modified = re.sub(pattern, repl, modified)
                 applied_fixes.append(f"[{pillar_tag}] {pattern} -> {repl}")
 
-        # 2. Dynamiczne reguły zgłoszone przez użytkownika (User Feedback)
+        # 2. Dynamic user feedback rules
         if user_feedback_rules:
             for fb in user_feedback_rules:
                 bad_pl = fb.get("bad_pl", "").strip()
                 good_pl = fb.get("good_pl", "").strip()
                 if not bad_pl or not good_pl or bad_pl == good_pl:
                     continue
-                # Sprawdzamy czy podano wielowariantowy zapis (z ukośnikiem)
+                # Handle slash-separated alternatives
                 bad_variants = [v.strip() for v in bad_pl.split("/") if v.strip()]
                 good_choice = good_pl.split("/")[0].strip()
 
@@ -220,7 +220,7 @@ class AVTLinter:
                         modified = re.sub(pat, good_choice, modified, flags=re.IGNORECASE)
                         applied_fixes.append(f"[Korekta Użytkownika] '{variant}' -> '{good_choice}'")
 
-        # 3. Twarde wymuszenia ze słownika (Glossary Overrides)
+        # 3. Strict glossary overrides
         if custom_glossary:
             for src, trg in custom_glossary.items():
                 if not src or not trg or src.lower() == trg.lower():
@@ -230,7 +230,7 @@ class AVTLinter:
                     modified = re.sub(pat_src, trg, modified, flags=re.IGNORECASE)
                     applied_fixes.append(f"[Słownik Deterministyczny] '{src}' -> '{trg}'")
 
-        # 4. Korekta płci gramatycznej dla scen dziewczęcych (Filar XIII)
+        # 4. Grammatical gender alignment for all-female scenes (Pillar XIII)
         if is_all_girls_scene and not is_sign:
             gender_fixes = [
                 (r"\b[Gg]łupi jesteś\?", "Głupia jesteś?"),
@@ -248,7 +248,7 @@ class AVTLinter:
                     modified = re.sub(pattern, repl, modified)
                     applied_fixes.append(f"[Filar XIII - Płeć Żeńska w Obsadzie] {pattern} -> {repl}")
 
-        # 5. Zabezpieczenie przed podwójnymi spacjami lub uciętymi znakami
+        # 5. Guard against duplicate spaces
         modified = re.sub(r"[ \t]+", " ", modified).strip()
 
         return modified, applied_fixes

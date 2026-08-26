@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Pancerny Silnik Pełnego Backupu Ekosystemu (Master Ecosystem Backup & Restore Engine).
-Obsługuje Zip64 (bez limitu 2GB), gwarantuje 100% spójności danych,
-pakuje historię AI (.gemini), pobrane modele (.models / .cache) oraz wszystkie projekty z Pulpitu.
+Master Ecosystem Backup & Restore Engine.
+Supports Zip64 (no 2GB limit), guarantees 100% data consistency,
+packages AI history (.gemini), downloaded models/caches (.cache), and all projects from the Desktop.
 """
 
 import os
@@ -21,20 +21,20 @@ def create_master_backup():
     print("  ROZPOCZYNAM TWORZENIE PELNEGO BACKUPU EKOSYSTEMU (Zip64 Engine)")
     print("=" * 70)
 
-    # 1. Lista zasobow do spakowania
+    # 1. List of resources to bundle
     items_to_backup = []
 
-    # A. Pamiec AI (.gemini)
+    # A. AI memory and conversation history (.gemini)
     gemini_dir = user_dir / ".gemini"
     if gemini_dir.exists():
         items_to_backup.append(("Pamiec AI i historia rozmow (.gemini)", gemini_dir, ".gemini"))
 
-    # B. Pobrane modele i cache (.cache)
+    # B. Downloaded models and cache (.cache)
     cache_dir = user_dir / ".cache"
     if cache_dir.exists():
         items_to_backup.append(("Zasoby zewnetrzne (.cache)", cache_dir, ".cache"))
 
-    # C. Projekty z Pulpitu
+    # C. Desktop Projects
     projects = ["translator", "sorter", "kalendarz"]
     for proj in projects:
         proj_path = desktop_dir / proj

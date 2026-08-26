@@ -1,5 +1,6 @@
+# -*- coding: utf-8 -*-
 """
-Zestaw testów weryfikacyjnych dla komponentów Multimodalnego Tłumacza Napisów.
+Verification test suite for Multimodal Subtitle Translator components.
 """
 
 import os
@@ -20,7 +21,7 @@ from verifier import RefinedLine, RefinedBatchResponse
 from translator import LineTranslation, BatchTranslationResponse, sanitize_sub_text
 
 def test_rules_and_prompts():
-    print("[TEST 1/28] Sprawdzanie kompletności 90 Zunifikowanych Filarów AVT i promptów...")
+    print("[TEST 1/31] Checking completeness of Unified AVT Pillars and prompts...")
     sys_prompt = get_translation_system_prompt()
     ver_prompt = get_verifier_system_prompt()
     assert "I see" in sys_prompt

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Moduł Biblii Serialu i Pamięci Międzyodcinkowej (Series Bible & Cross-Episode Continuity).
-Automatycznie akumuluje wiedzę, imiona postaci, ustalone formy zwrotów i słowniczek terminologii
-pomiędzy kolejnymi odcinkami tego samego anime, zapewniając 100% spójności przez cały sezon.
+Series Bible & Cross-Episode Continuity Module.
+Automatically accumulates knowledge, character profiles, honorific forms, and terminology
+across consecutive episodes of the same anime, ensuring 100% consistency across the entire season.
 """
 
 import os
@@ -14,7 +14,7 @@ from typing import Dict, List, Any, Optional
 SERIES_MEMORY_DIR = Path(__file__).parent / "series_memory"
 
 def clean_anime_slug(title: str) -> str:
-    """Tworzy bezpieczny identyfikator pliku z nazwy anime."""
+    """Creates a filesystem-safe identifier slug from anime title."""
     if not title:
         return "default_series"
     slug = re.sub(r"[^\w\s-]", "", title, flags=re.UNICODE).strip()
@@ -39,7 +39,7 @@ class SeriesBible:
         self.load()
 
     def load(self):
-        """Wczytuje istniejącą Biblię Serialu z dysku."""
+        """Loads existing Series Bible from disk."""
         if self.file_path.exists():
             try:
                 with open(self.file_path, "r", encoding="utf-8") as f:
@@ -56,7 +56,7 @@ class SeriesBible:
                 pass
 
     def save(self):
-        """Zapisuje aktualny stan Biblii Serialu na dysku."""
+        """Saves current Series Bible state to disk."""
         try:
             with open(self.file_path, "w", encoding="utf-8") as f:
                 json.dump(self.data, f, ensure_ascii=False, indent=2)
@@ -64,7 +64,7 @@ class SeriesBible:
             pass
 
     def update_from_episode_profile(self, episode_name: str, characters: Dict[str, str], glossary: Dict[str, str]):
-        """Aktualizuje słownik i bazę postaci na podstawie danych z Profilera nowego odcinka."""
+        """Updates glossary and character registry based on Profiler output of a new episode."""
         if episode_name and episode_name not in self.data["episodes_translated"]:
             self.data["episodes_translated"].append(episode_name)
 
@@ -77,14 +77,14 @@ class SeriesBible:
 
         if glossary:
             for k, v in glossary.items():
-                # Zapisujemy tylko nietrywialne terminy
+                # Store non-trivial terms only
                 if k and v and len(k) > 1 and len(v) > 1:
                     self.data["glossary"][k] = v
 
         self.save()
 
     def format_for_prompt(self) -> str:
-        """Formatuje Biblię Serialu w kompaktowy blok do wstrzyknięcia do promptu LLM (tylko kluczowe pozycje)."""
+        """Formats Series Bible into a compact section for LLM prompt injection."""
         lines = []
         has_content = False
 

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Moduł Automatycznego Kolorowania i Dopasowywania Stylów ASS (Typesetting Auto-Color Matcher).
-Analizuje wycinki klatek wideo (Pillow) dla napisów ekranowych (Signs / Typesetting)
-i automatycznie generuje estetyczne tagi kolorystyczne ASS {\\1c&HBBGGRR&}.
+ASS Subtitle Typesetting & Auto-Color Matcher Module.
+Analyzes video frame crops (Pillow) for on-screen signs/typesetting
+and automatically generates aesthetic ASS color tags {\\1c&HBBGGRR&}.
 """
 
 import os
@@ -10,7 +10,7 @@ from typing import Optional, Tuple
 from PIL import Image
 
 def rgb_to_ass_hex(r: int, g: int, b: int) -> str:
-    """Konwertuje kolor RGB na format ASS BGR (&HBBGGRR&)."""
+    """Converts RGB color tuple to ASS BGR format (&HBBGGRR&)."""
     return f"&H{b:02X}{g:02X}{r:02X}&"
 
 class TypesettingColorMatcher:
@@ -20,8 +20,8 @@ class TypesettingColorMatcher:
     @classmethod
     def extract_dominant_accent_color(cls, image_path: str, region: str = "top") -> Optional[str]:
         """
-        Pobiera wycinek klatki wideo i znajduje dominujący, nasycony kolor akcentu (np. kolor napisu/szyldu).
-        Zwraca string koloru w formacie ASS BGR: '&HBBGGRR&' lub None.
+        Extracts video frame crop and identifies dominant, saturated accent color (e.g. sign text color).
+        Returns ASS BGR color string: '&HBBGGRR&' or None.
         """
         if not image_path or not os.path.exists(image_path):
             return None
@@ -31,7 +31,7 @@ class TypesettingColorMatcher:
                 img = img.convert("RGB")
                 w, h = img.size
 
-                # Wybór regionu analizy
+                # Select region for color extraction
                 if region == "top":
                     box = (0, 0, w, int(h * 0.4))
                 elif region == "bottom":
@@ -40,10 +40,10 @@ class TypesettingColorMatcher:
                     box = (int(w * 0.15), int(h * 0.2), int(w * 0.85), int(h * 0.8))
 
                 crop = img.crop(box)
-                # Zmniejszenie próbki dla szybkości
+                # Downscale for performance
                 crop.thumbnail((120, 120), Image.Resampling.BOX)
 
-                # Kwantyzacja do 16 dominujących kolorów
+                # Quantize to 16 adaptive colors
                 quantized = crop.convert("P", palette=Image.ADAPTIVE, colors=16)
                 palette = quantized.getpalette()  # [R, G, B, R, G, B, ...]
                 color_counts = quantized.getcolors()
@@ -59,18 +59,18 @@ class TypesettingColorMatcher:
                     g = palette[idx * 3 + 1]
                     b = palette[idx * 3 + 2]
 
-                    # Obliczanie nasycenia (Saturation)
+                    # Calculate color saturation
                     max_c = max(r, g, b)
                     min_c = min(r, g, b)
                     delta = max_c - min_c
                     sat = delta / (max_c + 1e-5)
                     brightness = (r + g + b) / 3.0
 
-                    # Odrzucamy mdłe szarości, czyste czernie i czyste biele
+                    # Filter out dull grays, pure blacks, and pure whites
                     if brightness < 35 or brightness > 245 or sat < 0.25:
                         continue
 
-                    # Punktacja: kompromis między nasyceniem a popularnością koloru
+                    # Score: balance between saturation and color area
                     score = (sat * 1.5) * (count ** 0.5)
                     if score > best_score:
                         best_score = score
@@ -87,8 +87,8 @@ class TypesettingColorMatcher:
     @classmethod
     def calculate_optimal_sign_position(cls, sign_type: str = "sign", region: Optional[str] = None) -> str:
         """
-        Wylicza optymalne tagi pozycjonowania ASS (\\anX / \\pos), aby napis ekranowy (szyld, tablica, list, SMS)
-        nie kolidował z głównym dialogiem na dole ekranu.
+        Calculates optimal ASS positioning tags (\\anX / \\pos) to ensure on-screen signs
+        do not collide with dialogue at the bottom of the screen.
         """
         st = (sign_type or "").lower()
         reg = (region or "").lower()
@@ -109,13 +109,13 @@ class TypesettingColorMatcher:
     @classmethod
     def enhance_typesetting_prefix(cls, original_prefix: str, image_path: Optional[str] = None) -> str:
         """
-        Wzbogaca prefiks tagów ASS o kolor {\\1c&H...&} pobrany z obrazu,
-        jeśli w tagach nie ma jeszcze zdefiniowanego koloru.
+        Enriches ASS tag prefix with color tag {\\1c&H...&} sampled from the image
+        if color is not already defined in the tags.
         """
         if not original_prefix:
             original_prefix = ""
 
-        # Jeśli kolor jest już zdefiniowany ręcznie, zachowaj
+        # If color is already explicitly defined, preserve it
         if r"\c&H" in original_prefix or r"\1c&H" in original_prefix:
             return original_prefix
 
@@ -123,7 +123,7 @@ class TypesettingColorMatcher:
             region = "top" if (r"\an8" in original_prefix or r"\an7" in original_prefix) else "center"
             ass_color = cls.extract_dominant_accent_color(image_path, region=region)
             if ass_color:
-                # Wstawienie koloru z delikatnym czarnym obrysem
+                # Inject sampled accent color with crisp black outline
                 color_tag = f"{{\\1c{ass_color}\\3c&H000000&}}"
                 return f"{color_tag}{original_prefix}"
 
@@ -138,22 +138,22 @@ class TypesettingColorMatcher:
         region: Optional[str] = None
     ) -> str:
         """
-        Kompleksowe formatowanie Typesetting 2.0:
-        1. Nadaje bezpieczną pozycję (np. góra ekranu \\an8 lub środek \\an5), jeśli brak pozycji.
-        2. Pobiera adaptacyjny kolor z wycinka klatki wideo.
-        3. Dodaje czytelny obrys i pogrubienie.
+        Comprehensive Typesetting 2.0 styling:
+        1. Assigns collision-safe position (e.g. top \\an8 or center \\an5) if missing.
+        2. Samples adaptive accent color from video frame crop.
+        3. Adds clean outline and contrast border.
         """
         prefix = original_prefix or ""
 
-        # 1. Pozycjonowanie, jeśli brak tagu wyrównania / pozycji
+        # 1. Positioning tag if missing
         if not (r"\an" in prefix or r"\pos" in prefix):
             pos_tag = cls.calculate_optimal_sign_position(sign_type=sign_type, region=region)
             prefix = f"{pos_tag}{prefix}"
 
-        # 2. Kolorowanie z obrazu
+        # 2. Adaptive color matching from image
         prefix = cls.enhance_typesetting_prefix(prefix, image_path=image_path)
 
-        # 3. Zapewnienie obrysu, jeśli brak
+        # 3. Ensure outline tag if missing
         if r"\3c&H" not in prefix:
             prefix = f"{{\\3c&H000000&\\bord2}}{prefix}"
 
