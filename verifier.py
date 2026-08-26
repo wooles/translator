@@ -91,6 +91,7 @@ class DialogueVerifier:
             vis_sub_info = f"  [🎬 Wizja, Mimika & Usta]: {item['visual_subtext']}\n" if item.get('visual_subtext') else ""
             prag_reg_info = f"  [🎎 Rejestr Pragmatyczny JP]: {item['pragmatic_register']}\n" if item.get('pragmatic_register') else ""
             lit_info = f"  [📖 Dosłowny Sens JP]: {item['literal_meaning']}\n" if item.get('literal_meaning') else ""
+            cond_info = f"  {item['condensation_directive']}\n" if item.get('condensation_directive') else ""
             
             prompt_lines.append(
                 f"- [ID: {item['id']}]{type_tag}{gender_info}{voice_info}{prosody_info}{song_info}{cps_info}{visual_info}\n"
@@ -99,6 +100,7 @@ class DialogueVerifier:
                 f"{prag_reg_info}"
                 f"{vis_sub_info}"
                 f"{lit_info}"
+                f"{cond_info}"
                 f"  EN: {item['en']}\n"
                 f"  Wstępne PL: {item['pl']}{notes_info}"
             )

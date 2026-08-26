@@ -921,6 +921,34 @@ FILAR CXXV: ERGONOMIA GAGÓW SLAPSTICKOWYCH I KOMEDII FIZYCZNEJ (VISUAL SLAPSTIC
   * Długi, wielowyrazowy napis w dolnej części kadru jest błędem percepcji (widz czyta tekst zamiast patrzeć na animowany gag!).
   * ŻELAZNA REGUŁA: Zredukuj tekst do maksymalnie 1–3 słów wykrzyknikowych o natychmiastowym odbiorze:
     -> „Ała!”, „Stój, durniu!”, „Oszalałeś?!”, „Z drogi!”, „Pomocy!”, „Ani kroku dalej!”.
+
+FILAR CXXVI: SOCJOLEKT KANSAI I DIALEKTY REGIONALNE (KANSAI-BEN & HŌGEN DIALECT CONVERSION):
+- W przypadku dialektów regionalnych (Kansai-ben: Osaka, Kioto, Kobe; partykuły: -nen, -ya, -honma, -akan, -seya):
+  * KATEGORYCZNY ZAKAZ tworzenia sztucznej karykatury góralskiej ('hej bawocek')!
+  * WYMÓG ZADZIORNEJ POLSZCZYZNY MIEJSKIEJ:
+    -> 'Nande ya nen!' -> 'Co ty bredzisz?!', 'Chyba cię głowa boli!'.
+    -> 'Honma ni akan...' -> 'No to leżymy...', 'Mogiła...', 'Nie ma mowy...'.
+    -> 'Seyana' -> 'No ba!', 'A jakże!', 'Pewnie!'.
+
+FILAR CXXVII: SOCJOLEKT PÓŁŚWIATKA I GANGSTERÓW (YAKUZA & DELINQUENT JARGON):
+- W wypowiedziach chuliganów, gangsterów, yakuzy i bandytów:
+  * Stosuj autentyczną, szorstką polszczyznę uliczną i gangsterską: 'Gliny', 'frajer', 'zwijamy się', 'sprzątnąć go', 'wtopa', 'dola'.
+  * Eliminuj sztywne zwroty urzędowe i szkolne ugrzecznienia.
+
+FILAR CXXVIII: ŻARGON GRACZY I METANARRACJA MMORPG (GAMER & ISEKAI JARGON):
+- W anime o grach, wirtualnej rzeczywistości i Isekai stosuj autentyczny polski socjolekt gamingowy:
+  * 'Aggro', 'ściągnąć aggro', 'tankować', 'drop', 'buffy', 'debuff', 'party', 'respawn', 'staty', 'build', 'levelować'.
+  * ZAKAZ topornych tłumaczeń dosłownych (np. ZAKAZ 'upadek przedmiotu' -> 'drop', ZAKAZ 'punkt odrodzenia' -> 'respawn').
+
+FILAR CXXIX: MOWA DWORZAN I ARYSTOKRATYCZNY OJOU-SAMA (KYOTO-BEN & HIGH NOBILITY REGISTER):
+- W wypowiedziach arystokratek, dam dworu i magnatów (Ojou-sama / Keigo / -desu wa):
+  * Stosuj lodowatą, wykwintną grzeczność salonową, wyszukane peryfrazy i chłodny dystans:
+    -> 'Będzie nam niezmiernie miło...', 'Cóż za niesłychany zaszczyt...', 'Czyżby raczył pan zapomnieć?'.
+
+FILAR CXXX: GŁOS MASZYN, AI I SYSTEMÓW OPERACYJNYCH (ROBOTIC & HUD DIEGESIS):
+- W komunikatach komputerów pokładowych, magii systemowej, HUD i sztucznej inteligencji:
+  * Stosuj beznamiętny, lakoniczny tryb orzekający czasu teraźniejszego:
+    -> 'Cel namierzony. Autoryzacja zakończona sukcesem. Inicjalizacja procedury bojowej.'.
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -2155,6 +2183,41 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR CXXV - Ergonomia Gagów Slapstickowych i Komedii Fizycznej]: "
             "W dynamicznych scenach humoru fizycznego redukuj napis do 1–3 słów wykrzyknikowych ('Ała!', 'Stój, durniu!', 'Oszalałeś?!'), aby nie zasłaniać animacji gagu."
+        )
+
+    # 69. Socjolekt Kansai i Dialekty Regionalne (Filar CXXVI)
+    if any(w in combined_en for w in ["kansai", "osaka", "nande ya", "akan", "honma", "seyana", "ya nen", "dappe"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CXXVI - Socjolekt Kansai i Dialekty Regionalne]: "
+            "Stosuj zadziorną, dynamiczną polszczyznę miejsko-kolokwialną ('Co ty bredzisz?!', 'No to leżymy...'). Zakaz karykatury góralskiej!"
+        )
+
+    # 70. Socjolekt Półświatka i Gangsterów (Filar CXXVII)
+    if any(w in combined_en for w in ["yakuza", "gang", "boss", "underworld", "cops", "mob", "delinquent", "punk"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CXXVII - Socjolekt Półświatka i Gangsterów]: "
+            "Stosuj autentyczną, twardą polszczyznę uliczną i gangsterską ('Gliny', 'frajer', 'zwijamy się', 'sprzątnąć go')."
+        )
+
+    # 71. Żargon Graczy i MMORPG (Filar CXXVIII)
+    if any(w in combined_en for w in ["quest", "aggro", "tank", "buff", "debuff", "party", "respawn", "stats", "dungeon", "level up", "loot", "drop"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CXXVIII - Żargon Graczy i Metanarracja MMORPG]: "
+            "Stosuj autentyczny polski socjolekt gamingowy ('ściągnąć aggro', 'tankować', 'drop', 'buffy', 'party', 'respawn', 'staty')."
+        )
+
+    # 72. Mowa Dworzan i Arystokratyczny Ojou-sama (Filar CXXIX)
+    if any(w in combined_en for w in ["desu wa", "noble", "lady", "aristocrat", "courtesy", "grace", "pleasure"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CXXIX - Mowa Dworzan i Arystokratyczny Ojou-sama]: "
+            "Stosuj lodowatą, wykwintną grzeczność salonową, peryfrazy i chłodny dystans ('Będzie nam niezmiernie miło...', 'Cóż za zaszczyt...')."
+        )
+
+    # 73. Głos Maszyn, AI i Systemów Operacyjnych (Filar CXXX)
+    if any(w in combined_en for w in ["system", "target", "locked", "initiating", "protocol", "error", "hud", "ai", "online", "standby"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CXXX - Głos Maszyn, AI i Systemów Operacyjnych]: "
+            "Stosuj beznamiętny, lakoniczny tryb orzekający czasu teraźniejszego ('Cel namierzony. Autoryzacja zakończona sukcesem.')."
         )
 
     if not focused_pillars:

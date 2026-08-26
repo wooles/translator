@@ -153,9 +153,15 @@ def test_rules_and_prompts():
     assert "FILAR CXXIII:" in sys_prompt
     assert "FILAR CXXIV:" in sys_prompt
     assert "FILAR CXXV:" in sys_prompt
+    assert "FILAR CXXVI:" in sys_prompt
+    assert "FILAR CXXVII:" in sys_prompt
+    assert "FILAR CXXVIII:" in sys_prompt
+    assert "FILAR CXXIX:" in sys_prompt
+    assert "FILAR CXXX:" in sys_prompt
     assert "FILAR CXXI" in ver_prompt
     assert "FILAR CXXV" in ver_prompt
-    print(" -> PASSED: Kompletny Zunifikowany Kanon 125 Filarów AVT (Filary I – CXXV) jest aktywny w obu fazach tłumaczenia.")
+    assert "FILAR CXXX" in ver_prompt
+    print(" -> PASSED: Kompletny Zunifikowany Kanon 130 Filarów AVT (Filary I – CXXX) jest aktywny w obu fazach tłumaczenia.")
 
 def test_pydantic_schemas():
     print("[TEST 2/5] Weryfikacja schematów Pydantic i Detektora Rejestru Pragmatycznego...")
@@ -463,7 +469,14 @@ def test_model_resolver():
     print(" -> PASSED: Auto-discovery i rozdzielenie puli modeli Flash/Pro działa w 100%.")
 from avt_linter import AVTLinter
 from series_memory import SeriesBible
-from avt_formatter import split_subtitle_syntactically, calculate_cps, clean_text_for_len
+from avt_formatter import (
+    split_subtitle_syntactically,
+    calculate_cps,
+    clean_text_for_len,
+    calculate_condensation_directive,
+    snap_subtitles_to_shot_cuts,
+    format_diegetic_sound_wall
+)
 from prosody_engine import AudioProsodyEngine
 from speaker_diarizer import SpeakerVoiceClassifier
 from typesetting_matcher import TypesettingColorMatcher, rgb_to_ass_hex
@@ -516,7 +529,7 @@ def test_series_bible():
     print(" -> PASSED: Biblia Serialu prawidłowo zapisuje i synchronizuje wiedzę.")
 
 def test_avt_formatter_and_cps():
-    print("[TEST 10/12] Test semantycznego podziału linii (Netflix AVT) i CPS...")
+    print("[TEST 10/12] Test semantycznego podziału linii (Netflix AVT), CPS i Innowacji Masterclass...")
     # Test kalkulacji CPS
     cps, is_fast = calculate_cps("To jest krótka kwestia dialogowa.", start_ms=0, end_ms=1000)
     assert cps > 20.0
@@ -538,7 +551,25 @@ def test_avt_formatter_and_cps():
     split_title = split_subtitle_syntactically(title_text, max_line_len=42, is_ass=True, is_sign=True)
     assert "\\N" in split_title
     assert len(split_title.split("\\N")) == 2
-    print(" -> PASSED: Podział linii AVT, ochrona plansz is_sign i kalkulator CPS działają bezbłędnie.")
+
+    # Test dyrektywy kompresji tekstu (Smart Condensation Ratio)
+    cond_fast = calculate_condensation_directive("Musimy natychmiast uciekać stąd bo nadciągają potwory!", start_ms=0, end_ms=1200)
+    assert cond_fast is not None and "EKSTREMALNY" in cond_fast
+
+    # Test formatowania ściany dźwięku (Diegetic Sound-Wall)
+    sound_wall = format_diegetic_sound_wall("Uwaga mieszkańcy, zbliża się tajfun.", is_announcement=True)
+    assert sound_wall.startswith(r"{\an8}[ KOMUNIKAT:")
+
+    # Test snappingu napisów do cięć montażowych (Shot-Cut Snapping)
+    class DummyEvent:
+        def __init__(self, start, end):
+            self.start = start
+            self.end = end
+    evs = [DummyEvent(1050, 2900)]
+    snapped = snap_subtitles_to_shot_cuts(evs, shot_cuts_ms=[1000, 3000], max_snap_gap_ms=200)
+    assert snapped[0].start == 1000  # snapped to 1000ms cut
+    assert snapped[0].end == 2960    # snapped 40ms before 3000ms cut
+    print(" -> PASSED: Podział linii AVT, CPS, Shot-Cut Snapping, Condensation i Sound-Wall działają w 100%.")
 
 def test_prosody_and_diarizer():
     print("[TEST 11/12] Test lokalnej analizy prozodii i diarizacji fonicznej F0...")

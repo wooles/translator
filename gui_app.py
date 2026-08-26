@@ -581,6 +581,43 @@ class RulesAndGlossaryDialog(QDialog):
         gloss_layout.addLayout(h_gloss_btns)
         self.tabs.addTab(tab_gloss, "📖 Słownik Deterministyczny")
 
+        # TAB 3: Side-by-Side Reviewer & Quick Learn
+        tab_review = QWidget()
+        review_layout = QVBoxLayout(tab_review)
+
+        lbl_rev_info = QLabel("Wczytaj przetłumaczony plik (.ass/.srt), aby przejrzeć kwestie i jednym kliknięciem uczyć model (1-Click Learn):")
+        lbl_rev_info.setStyleSheet("color: #a0aec0;")
+        review_layout.addWidget(lbl_rev_info)
+
+        h_rev_top = QHBoxLayout()
+        btn_load_sub = QPushButton("📂 Wczytaj Napisy do Przeglądu")
+        btn_load_sub.clicked.connect(self.load_subtitles_for_review)
+        self.lbl_loaded_file = QLabel("Brak wczytanego pliku")
+        self.lbl_loaded_file.setStyleSheet("color: #63b3ed; font-style: italic;")
+        h_rev_top.addWidget(btn_load_sub)
+        h_rev_top.addWidget(self.lbl_loaded_file)
+        h_rev_top.addStretch()
+        review_layout.addLayout(h_rev_top)
+
+        self.table_review = QTableWidget()
+        self.table_review.setColumnCount(3)
+        self.table_review.setHorizontalHeaderLabels(["ID / Czas", "Tekst Oryginalny / Kwestia", "Polski Przekład"])
+        self.table_review.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
+        self.table_review.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
+        self.table_review.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)
+        self.table_review.setSelectionBehavior(QTableWidget.SelectRows)
+        review_layout.addWidget(self.table_review)
+
+        h_rev_actions = QHBoxLayout()
+        btn_learn_from_rev = QPushButton("⚡ 1-Click Learn (Zapamiętaj regułę z zaznaczonej kwestii)")
+        btn_learn_from_rev.setObjectName("PrimaryButton")
+        btn_learn_from_rev.clicked.connect(self.learn_from_selected_review_line)
+        h_rev_actions.addWidget(btn_learn_from_rev)
+        h_rev_actions.addStretch()
+        review_layout.addLayout(h_rev_actions)
+
+        self.tabs.addTab(tab_review, "🔍 Porównywarka i Szlif (Side-by-Side)")
+
         layout.addWidget(self.tabs)
 
         # Close button
@@ -593,6 +630,39 @@ class RulesAndGlossaryDialog(QDialog):
 
         self.refresh_rules_table()
         self.refresh_glossary_table()
+
+    def load_subtitles_for_review(self):
+        file_path, _ = QFileDialog.getOpenFileName(self, "Wybierz plik napisów", "", "Napisy (*.ass *.srt)")
+        if not file_path:
+            return
+        try:
+            import pysubs2
+            subs = pysubs2.load(file_path)
+            self.lbl_loaded_file.setText(os.path.basename(file_path))
+            self.table_review.setRowCount(len(subs))
+            for idx, ev in enumerate(subs):
+                start_m, start_s = divmod(ev.start // 1000, 60)
+                time_str = f"#{idx+1} ({start_m:02d}:{start_s:02d})"
+                clean_text = ev.text.replace(r"\N", " ").replace(r"\n", " ").strip()
+                self.table_review.setItem(idx, 0, QTableWidgetItem(time_str))
+                self.table_review.setItem(idx, 1, QTableWidgetItem(clean_text))
+                self.table_review.setItem(idx, 2, QTableWidgetItem(clean_text))
+        except Exception as e:
+            QMessageBox.critical(self, "Błąd", f"Nie udało się wczytać pliku: {e}")
+
+    def learn_from_selected_review_line(self):
+        row = self.table_review.currentRow()
+        if row < 0:
+            QMessageBox.warning(self, "Wybór", "Zaznacz kwestię z tabeli!")
+            return
+        orig_item = self.table_review.item(row, 1)
+        trans_item = self.table_review.item(row, 2)
+        orig_text = orig_item.text() if orig_item else ""
+        trans_text = trans_item.text() if trans_item else ""
+        dlg = UserCorrectionDialog(orig_text, trans_text, self)
+        if dlg.exec():
+            self.refresh_rules_table()
+            self.refresh_glossary_table()
 
     def refresh_rules_table(self):
         self.fb_mgr.load()

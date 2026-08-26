@@ -64,7 +64,13 @@ from avt_linter import AVTLinter
 from romaji_helper import to_romaji
 from series_memory import SeriesBible
 from manga_canon import MangaCanonRegistry
-from avt_formatter import split_subtitle_syntactically, calculate_cps
+from avt_formatter import (
+    split_subtitle_syntactically,
+    calculate_cps,
+    calculate_condensation_directive,
+    snap_subtitles_to_shot_cuts,
+    format_diegetic_sound_wall
+)
 from prosody_engine import AudioProsodyEngine
 from speaker_diarizer import SpeakerVoiceClassifier
 from typesetting_matcher import TypesettingColorMatcher
@@ -1212,6 +1218,7 @@ class MultimodalTranslator:
                     vtype = detect_event_visual_type(event, ts_prefix)
                     cps, is_fast = calculate_cps(clean_en, event.start, event.end)
                     cps_warn = f"Tempo CPS: {cps:.1f} (czas {(event.end - event.start)/1000.0:.1f}s)" if is_fast else ""
+                    condensation_dir = calculate_condensation_directive(clean_en, event.start, event.end)
 
                     visual_sub = ""
                     lit_mean = ""
@@ -1249,6 +1256,7 @@ class MultimodalTranslator:
                         "visual_subtext": visual_sub or "",
                         "literal_meaning": lit_mean or "",
                         "cps_warning": cps_warn,
+                        "condensation_directive": condensation_dir or "",
                         "notes": notes,
                         "is_sign": vtype["is_sign"],
                         "visual_type": vtype["type_label"],

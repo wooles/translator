@@ -150,3 +150,77 @@ def split_subtitle_syntactically(text: str, max_line_len: int = MAX_LINE_LENGTH,
     # Safe midpoint fallback
     mid = len(words) // 2
     return f"{ts_prefix}{' '.join(words[:mid])}{sep}{' '.join(words[mid:])}"
+
+
+def calculate_condensation_directive(text: str, start_ms: int, end_ms: int) -> Optional[str]:
+    """
+    Computes reading speed and exposure duration, generating an AVT condensation directive
+    for rapid dialogue or panic scenes.
+    """
+    duration_s = max(0.3, (end_ms - start_ms) / 1000.0)
+    clean = clean_text_for_len(text)
+    cps = len(clean) / duration_s
+    word_count = len(clean.split())
+
+    if duration_s < 1.4 and (cps > 18.0 or word_count > 6):
+        return f"[⏱️ RYGOR CZASOWY: EKSTREMALNY (czas {duration_s:.1f}s, tempo {cps:.1f} CPS)] -> Wymóg maksymalnej kondensacji: zredukuj wypowiedź do max 2-3 zwięzłych słów (usuń zbędne zaimki i ozdobniki, zachowaj samą puentę)!"
+    elif duration_s < 2.5 and cps > 16.0:
+        return f"[⏱️ RYGOR CZASOWY: WYSOKI (czas {duration_s:.1f}s, tempo {cps:.1f} CPS)] -> Skondensuj frazę, usuń watę słowną i skróć konstrukcje gramatyczne!"
+    elif cps > 20.0:
+        return f"[⏱️ RYGOR CZASOWY: WYSOKIE TEMPO ({cps:.1f} CPS)] -> Skróć kwestię, aby widz zdążył ją przeczytać bez pauzowania!"
+
+    return None
+
+
+def snap_subtitles_to_shot_cuts(events: list, shot_cuts_ms: list, max_snap_gap_ms: int = 350) -> list:
+    """
+    Snaps subtitle event boundaries (start_ms, end_ms) to video shot cuts (Netflix & Belczyk AVT standard).
+    Eliminates subtitle flashes when dialogue finishes slightly before or right after a camera cut.
+    """
+    if not shot_cuts_ms or not events:
+        return events
+
+    # Ensure sorted cuts
+    sorted_cuts = sorted(shot_cuts_ms)
+
+    for ev in events:
+        start = getattr(ev, 'start', 0)
+        end = getattr(ev, 'end', 0)
+
+        # Snap start to cut if cut is within [start - max_snap_gap_ms, start]
+        for cut in sorted_cuts:
+            if 0 <= start - cut <= max_snap_gap_ms:
+                ev.start = cut
+                break
+            elif 0 < cut - start <= 150:
+                ev.start = cut
+                break
+
+        # Snap end to cut if cut is right after dialogue end within [end, end + max_snap_gap_ms]
+        for cut in sorted_cuts:
+            if 0 <= cut - end <= max_snap_gap_ms:
+                # Snap 40ms before the cut so subtitle clears before camera switches
+                ev.end = max(ev.start + 300, cut - 40)
+                break
+            elif 0 < end - cut <= 150:
+                ev.end = max(ev.start + 300, cut - 40)
+                break
+
+    return events
+
+
+def format_diegetic_sound_wall(text: str, is_announcement: bool = False, is_radio_tv: bool = False) -> str:
+    """
+    Formats secondary background diegetic audio (PA announcements, loudspeakers, TV/radio news)
+    to the top of the screen {\\an8}[ KOMUNIKAT: ... ] preventing collision with foreground dialogue.
+    """
+    if not text:
+        return ""
+
+    clean = clean_text_for_len(text)
+    if is_announcement:
+        return f"{{\\an8}}[ KOMUNIKAT: {clean} ]"
+    elif is_radio_tv:
+        return f"{{\\an8}}[ WIADOMOŚCI: {clean} ]"
+
+    return text
