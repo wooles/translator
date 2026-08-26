@@ -19,13 +19,29 @@ class RefinedBatchResponse(BaseModel):
     scene_diagnosis: Optional[SceneDiagnosis] = Field(default=None, description="Diagnoza i weryfikacja intencji dramaturgicznych sceny")
     lines: List[RefinedLine] = Field(description="Lista zredagowanych i zweryfikowanych kwestii dialogowych")
 
+import os
+
 class DialogueVerifier:
-    def __init__(self, client: genai.Client, model: str = "gemini-3.5-flash-lite", keep_honorifics: bool = True):
+    def __init__(
+        self,
+        client: genai.Client,
+        model: str = "gemini-3.5-flash-lite",
+        keep_honorifics: bool = True,
+        thinking_budget: Optional[int] = None
+    ):
         self.client = client
         self.model = model
         self.keep_honorifics = keep_honorifics
         self.system_prompt = get_verifier_system_prompt(keep_honorifics=keep_honorifics)
         self.current_episode_tokens: Dict[str, Any] = {"prompt": 0, "cached": 0, "output": 0, "model": self.model}
+        
+        if thinking_budget is not None:
+            self.thinking_budget = thinking_budget
+        else:
+            try:
+                self.thinking_budget = int(os.getenv("PHASE2_THINKING_BUDGET", "1600"))
+            except (ValueError, TypeError):
+                self.thinking_budget = 1600
 
     def verify_batch(
         self,
@@ -96,8 +112,9 @@ class DialogueVerifier:
                 gen_config_kwargs = {
                     "response_mime_type": "application/json",
                     "response_schema": RefinedBatchResponse,
-                    "thinking_config": types.ThinkingConfig(thinking_budget=2048),
                 }
+                if "3.7" in self.model.lower() or "3.1-pro" in self.model.lower():
+                    gen_config_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=self.thinking_budget)
 
                 if cached_name:
                     gen_config_kwargs["cached_content"] = cached_name
