@@ -165,15 +165,22 @@ class DialogueVerifier:
                     print("!" * 75 + "\n")
                     raise RuntimeError("Wyczerpane środki na koncie Google AI Studio (Prepayment Credits Depleted).")
 
+                is_timeout = "504" in err_str or "deadline" in err_str or "timeout" in err_str or "timed out" in err_str
                 is_unavailable = "503" in err_str or "unavailable" in err_str or "high demand" in err_str
                 is_rate_limit = "429" in err_str or "quota" in err_str or "resource_exhausted" in err_str
                 
-                if is_unavailable or is_rate_limit:
+                if is_timeout:
+                    wait_sec = min(3 + attempt * 2, 15)
+                    print(f"\n[Redaktor Dialogów Pro / Faza 2]: Serwer Google potrzebował więcej czasu na analizę sceny (limit 45s).")
+                    print(f"  [..] Odczekuję {wait_sec}s i ponawiam próbę #{attempt} (100% ochrona danych)...")
+                    time.sleep(wait_sec)
+                elif is_unavailable or is_rate_limit:
                     wait_sec = min(5 + attempt * 3, 30)
-                    print(f"\n[Redaktor Dialogów / Redakcja]: Chwilowe przeciążenie serwerów Google (503/429 na {self.model}).")
+                    print(f"\n[Redaktor Dialogów Pro / Faza 2]: Chwilowe przeciążenie serwerów Google (503/429 na {self.model}).")
                     print(f"  [..] Utrzymuję najwyższą jakość PRO. Czekam {wait_sec}s na wolny slot serwera (próba #{attempt})...")
                     time.sleep(wait_sec)
                 else:
                     wait_sec = min(4 + attempt * 2, 20)
-                    print(f"\n[Redaktor Dialogów]: Ponawianie próby #{attempt} za {wait_sec}s ({e})...")
+                    clean_msg = str(e).split("{")[0].strip() if "{" in str(e) else str(e)
+                    print(f"\n[Redaktor Dialogów Pro / Faza 2]: Chwilowa przerwa w odpowiedzi API. Ponawianie próby #{attempt} za {wait_sec}s ({clean_msg})...")
                     time.sleep(wait_sec)

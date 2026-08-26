@@ -252,6 +252,7 @@ Zwróć wynik w formacie JSON zgodnym ze schematem EpisodeProfile."""
                     print("!" * 75 + "\n")
                     raise RuntimeError("Wyczerpane środki na koncie Google AI Studio (Prepayment Credits Depleted).")
 
+                is_timeout = "504" in err_str or "deadline" in err_str or "timeout" in err_str or "timed out" in err_str
                 is_unavailable = "503" in err_str or "unavailable" in err_str or "high demand" in err_str
                 is_rate_limit = "429" in err_str or "quota" in err_str or "resource_exhausted" in err_str
                 
@@ -265,12 +266,18 @@ Zwróć wynik w formacie JSON zgodnym ze schematem EpisodeProfile."""
                         time.sleep(1)
                         continue
 
-                if is_unavailable or is_rate_limit:
+                if is_timeout:
+                    wait_sec = min(3 + attempt * 2, 15)
+                    print(f"\n[Profiler Odcinka]: Serwer Google potrzebował więcej czasu na analizę profilu (limit 45s).")
+                    print(f"  [..] Odczekuję {wait_sec}s i ponawiam próbę #{attempt}...")
+                    time.sleep(wait_sec)
+                elif is_unavailable or is_rate_limit:
                     wait_sec = min(4 + attempt * 2, 20)
                     print(f"\n[Profiler Odcinka]: Chwilowe przeciążenie serwerów Google (503/429 na {current_model}).")
                     print(f"  [..] Utrzymuję najwyższą jakość profilu. Czekam {wait_sec}s na zwolnienie zasobów (próba #{attempt})...")
                     time.sleep(wait_sec)
                 else:
                     wait_sec = min(4 + attempt * 2, 20)
-                    print(f"\n[Profiler Odcinka]: Ponawianie próby #{attempt} za {wait_sec}s ({e})...")
+                    clean_msg = str(e).split("{")[0].strip() if "{" in str(e) else str(e)
+                    print(f"\n[Profiler Odcinka]: Ponawianie próby #{attempt} za {wait_sec}s ({clean_msg})...")
                     time.sleep(wait_sec)

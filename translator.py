@@ -615,6 +615,7 @@ class MultimodalTranslator:
                     print("!" * 75 + "\n")
                     raise RuntimeError("Wyczerpane środki na koncie Google AI Studio (Prepayment Credits Depleted).")
 
+                is_timeout = "504" in err_str or "deadline" in err_str or "timeout" in err_str or "timed out" in err_str
                 is_unavailable = "503" in err_str or "unavailable" in err_str or "high demand" in err_str
                 is_rate_limit = "429" in err_str or "quota" in err_str or "resource_exhausted" in err_str or "rate" in err_str
                 
@@ -628,7 +629,12 @@ class MultimodalTranslator:
                         time.sleep(1)
                         continue
 
-                if is_unavailable:
+                if is_timeout:
+                    wait_time = min(3 + attempt * 2, 15)
+                    print(f"\n[Tłumacz / Faza 1]: Serwer Google potrzebował więcej czasu na odpowiedź (limit 45s).")
+                    print(f"  [..] Odczekuję {wait_time}s i ponawiam próbę #{attempt}...")
+                    time.sleep(wait_time)
+                elif is_unavailable:
                     wait_time = min(4 + attempt * 2, 20)
                     print(f"\n[Tłumacz / Faza 1]: Chwilowe przeciążenie serwerów Google (503 UNAVAILABLE na {current_model}).")
                     print(f"  [..] Utrzymuję najwyższą jakość modelu bez redukcji.")
@@ -636,11 +642,13 @@ class MultimodalTranslator:
                     time.sleep(wait_time)
                 elif is_rate_limit:
                     wait_time = min(6 + attempt * 3, 30)
-                    print(f"\n[Limit minutowy Google / 429 na {current_model}]: Chwila przerwy na reset limitu ({wait_time}s)... Wznawiam automatycznie (próba #{attempt}).")
+                    print(f"\n[Tłumacz / Faza 1]: Chwilowy limit minutowy zapytań (429 Rate Limit na {current_model}).")
+                    print(f"  [..] Chwila przerwy na reset limitu ({wait_time}s)... Wznawiam automatycznie (próba #{attempt}).")
                     time.sleep(wait_time)
                 else:
                     wait_time = min(4 + attempt * 2, 20)
-                    print(f"\n[Tłumacz / Faza 1]: Ponawianie próby #{attempt} za {wait_time}s ({e})...")
+                    clean_msg = str(e).split("{")[0].strip() if "{" in str(e) else str(e)
+                    print(f"\n[Tłumacz / Faza 1]: Ponawianie próby #{attempt} za {wait_time}s ({clean_msg})...")
                     time.sleep(wait_time)
 
     def translate_file(
