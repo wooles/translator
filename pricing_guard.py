@@ -56,8 +56,8 @@ class PricingGuard:
         batches = max(1, (lines_count + 23) // 24)
         system_prompt_tokens = 39000  # AVT Pillars in Context Cache
         batch_input_tokens = 2500      # Video frame + context window + Whisper audio
-        batch_output_f1_tokens = 1100  # Translation JSON + Scene Diagnosis (F1 thinking=0)
-        batch_output_pro_tokens = 2100 # Pro Refinement JSON + Scene Diagnosis + CoT Thinking budget
+        batch_output_f1_tokens = 5100  # Translation JSON + Scene Diagnosis + 24 lines
+        batch_output_pro_tokens = 5800 # Pro Refinement JSON (24 lines + changes_made) + Scene Diagnosis + 1600 CoT Thinking budget
 
         profile = profile.lower()
 
