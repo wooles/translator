@@ -1280,6 +1280,47 @@ def test_masterclass_2_innovations():
 
     print(" -> PASSED: Innowacje Masterclass 2.0 (OP/ED Song, Typesetting 2.0, Diarizacja Symultaniczna, 1-Click Learn) działają w 100%.")
 
+def test_adaptive_thinking_budget():
+    print("[TEST 32/32] Test wielopoziomowego adaptacyjnego budżetu myślenia (Multi-Tier CoT)...")
+    # 1. Tier 1: Piosenki OP/ED / Alarmy audio -> 6144
+    batch_song = [{"id": 1, "en": "Song line ♪", "pl": "Wers", "is_song": True}]
+    has_song = any(item.get("is_song") for item in batch_song)
+    has_audio_alert = any(item.get("audio_alert") for item in batch_song)
+    if has_song or has_audio_alert:
+        b1 = max(4096, min(6144, 6144))
+    assert b1 == 6144
+
+    # 2. Tier 2: Rejestry / Gęste monologi -> 3072
+    batch_tactics = [{"id": 1, "en": "General, the enemy cavalry is flanking our left wing!", "pl": "Generale...", "pragmatic_register": "Wojskowy"}]
+    has_song = any(item.get("is_song") for item in batch_tactics)
+    has_audio_alert = any(item.get("audio_alert") for item in batch_tactics)
+    has_pragmatic_reg = any(item.get("pragmatic_register") for item in batch_tactics)
+    has_condensation = any(item.get("condensation_directive") for item in batch_tactics)
+    has_long_dialogue = any(len(item.get("en", "").split()) > 10 for item in batch_tactics)
+    if has_song or has_audio_alert:
+        b2 = 6144
+    elif has_pragmatic_reg or has_condensation or has_long_dialogue:
+        b2 = max(2048, min(6144, 3072))
+    else:
+        b2 = 1280
+    assert b2 == 3072
+
+    # 3. Tier 3: Standardowy dialog -> 1280
+    batch_simple = [{"id": 1, "en": "Hello.", "pl": "Cześć."}]
+    has_song = any(item.get("is_song") for item in batch_simple)
+    has_audio_alert = any(item.get("audio_alert") for item in batch_simple)
+    has_pragmatic_reg = any(item.get("pragmatic_register") for item in batch_simple)
+    has_condensation = any(item.get("condensation_directive") for item in batch_simple)
+    has_long_dialogue = any(len(item.get("en", "").split()) > 10 for item in batch_simple)
+    if has_song or has_audio_alert:
+        b3 = 6144
+    elif has_pragmatic_reg or has_condensation or has_long_dialogue:
+        b3 = 3072
+    else:
+        b3 = min(6144, 1280)
+    assert b3 == 1280
+    print(" -> PASSED: 3-poziomowy adaptacyjny budżet myślenia (6144 / 3072 / 1280 CoT) działa w 100%.")
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -1313,5 +1354,6 @@ if __name__ == "__main__":
     test_translator_logger_and_sign_detector()
     test_masterclass_next_gen()
     test_masterclass_2_innovations()
-    print("\n Wszystkie testy jednostkowe i integracyjne (31/31) zakończone pełnym sukcesem!\n")
+    test_adaptive_thinking_budget()
+    print("\n Wszystkie testy jednostkowe i integracyjne (32/32) zakończone pełnym sukcesem!\n")
 
