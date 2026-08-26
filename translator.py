@@ -689,8 +689,8 @@ class MultimodalTranslator:
             for c in anime_meta.get("characters", []):
                 self.character_registry[c["name"]] = f"{c['gender']} ({c['role']})"
 
-        # 1. Czyszczenie kwestii i ekstrakcja tagów Typesettingu
-        raw_entries = []
+        # 1. Czyszczenie kwestii i kompresja animacji klatka-po-klatce (FBF Animation Deduplication)
+        raw_all_entries = []
         for i, ev in enumerate(subs.events):
             if ev.is_comment:
                 continue
@@ -699,10 +699,41 @@ class MultimodalTranslator:
                 clean = sanitize_sub_text(ev.plaintext)
             if not clean:
                 continue
-            raw_entries.append((i, ev, clean, ts_prefix))
+            raw_all_entries.append((i, ev, clean, ts_prefix))
+
+        # Kompresja animowanego typesettingu (np. 1100 sub-klatek 'CHIN' redukowane do 1 zapytania)
+        raw_entries = []
+        sub_to_master = {}
+        last_text = None
+        last_style = None
+        last_end = -1
+        current_master_orig_idx = None
+
+        for orig_idx, ev, clean, ts_prefix in raw_all_entries:
+            is_fbf_animation = (
+                last_text is not None and
+                clean.strip().lower() == last_text.strip().lower() and
+                ev.style == last_style and
+                (ev.start <= last_end + 200) and
+                ((ev.end - ev.start) <= 300 or r"\pos" in ts_prefix or r"\move" in ts_prefix or r"\fsc" in ts_prefix or r"\clip" in ts_prefix)
+            )
+
+            if is_fbf_animation and current_master_orig_idx is not None:
+                sub_to_master[orig_idx] = current_master_orig_idx
+                last_end = max(last_end, ev.end)
+            else:
+                current_master_orig_idx = orig_idx
+                raw_entries.append((orig_idx, ev, clean, ts_prefix))
+                sub_to_master[orig_idx] = current_master_orig_idx
+                last_text = clean
+                last_style = ev.style
+                last_end = ev.end
 
         total_lines = len(raw_entries)
-        print(f"\n[Translator] Załadowano {total_lines} kwestii dialogowych do przetłumaczenia.")
+        fbf_saved = len(raw_all_entries) - total_lines
+        if fbf_saved > 0:
+            print(f"\n[Optymalizacja Typesettingu]: Wykryto i skompresowano {fbf_saved} animowanych mikronapisów FBF (Zaoszczędzono {fbf_saved} zapytań API!).")
+        print(f"\n[Translator] Załadowano {total_lines} unikalnych kwestii do przetłumaczenia (z {len(raw_all_entries)} wszystkich zdarzeń ASS).")
         print(f"[Translator] Model: {self.model} | Paczka: {self.batch_size} kwestii")
         print(f"[Translator] Honoryfikatory (-kun, -chan, -san): {'ZACHOWANE (Styl Anime/Fansub)' if self.keep_honorifics else 'USUWANE (Czysta polszczyzna/Netflix)'}")
         print(f"[Translator] Typesetting & Pozycjonowanie (ASS Styles): ZACHOWANE")
@@ -1279,21 +1310,14 @@ class MultimodalTranslator:
         # Wymuszenie WrapStyle: 2 (Brak samowolnego łamania przez odtwarzacz wideo)
         final_subs.info["WrapStyle"] = "2"
 
-        seen_events = set()
-
-        for orig_idx, orig_event, _, ts_prefix in raw_entries:
-            if orig_idx not in translated_results:
+        for orig_idx, orig_event, _, ts_prefix in raw_all_entries:
+            master_id = sub_to_master.get(orig_idx, orig_idx)
+            if master_id not in translated_results:
                 continue
             
-            clean_translated_text = sanitize_sub_text(translated_results[orig_idx])
+            clean_translated_text = sanitize_sub_text(translated_results[master_id])
             if not clean_translated_text:
                 continue
-
-            dedup_key = (orig_event.start // 150, orig_event.end // 150, clean_translated_text, orig_event.style)
-            if dedup_key in seen_events:
-                continue
-
-            seen_events.add(dedup_key)
 
             # Ponowne dołączenie tagów Typesettingu do przetłumaczonego tekstu
             full_event_text = f"{ts_prefix}{clean_translated_text}" if ts_prefix else clean_translated_text
