@@ -45,6 +45,7 @@ def resolve_best_models(client: Optional[genai.Client] = None) -> Dict[str, str]
     # Default verified base models (highest quality baseline)
     defaults = {
         "flash": "gemini-3.7-flash",
+        "flash_backup": "gemini-3.6-flash",
         "flash_lite": "gemini-3.5-flash-lite",
         "pro": "gemini-3.1-pro-preview"
     }

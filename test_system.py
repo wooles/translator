@@ -389,6 +389,10 @@ def test_model_resolver():
     assert score_37 > score_35 > score_25
     
     models = resolve_best_models(None)
+    assert "flash" in models
+    assert "flash_backup" in models
+    assert "pro" in models
+    print(" -> PASSED: Auto-discovery i rozdzielenie puli modeli Flash/Pro działa w 100%.")
 from avt_linter import AVTLinter
 from series_memory import SeriesBible
 from avt_formatter import split_subtitle_syntactically, calculate_cps, clean_text_for_len

@@ -533,9 +533,10 @@ class MultimodalTranslator:
     def _call_gemini_with_retry(self, contents: List[Any], schema_class) -> Any:
         """
         Reliable API call with automated handling of rate limits (429) and server overloads (503).
-        Uses Tier-Preserving Model Pool to guarantee 100% flagship quality without delays.
+        In Phase 1, seamlessly alternates and switches between the two highest Flash models
+        (e.g., Gemini 3.7 Flash and Gemini 3.6 Flash) for optimal throughput and quota distribution,
+        while maintaining the absolute highest model version for Phase 2 verification.
         """
-        # Flagship model candidate pool
         from model_resolver import resolve_best_models
         active_models = resolve_best_models(self.client)
 
@@ -544,14 +545,18 @@ class MultimodalTranslator:
             m1 = active_models.get("flash", "gemini-3.7-flash")
             m2 = active_models.get("flash_backup", "gemini-3.6-flash")
             candidate_models = [m1, m2] if m1 != m2 else [m1]
-            if self.model not in candidate_models:
-                candidate_models.insert(0, self.model)
+            if not hasattr(self, "phase1_rotation_idx"):
+                self.phase1_rotation_idx = 0
+            current_model_idx = self.phase1_rotation_idx % len(candidate_models)
+            self.phase1_rotation_idx += 1
         elif "pro" in self.model.lower():
             m_pro = active_models.get("pro", "gemini-3.1-pro-preview")
             candidate_models = [m_pro]
+            current_model_idx = 0
+        else:
+            current_model_idx = 0
 
         attempt = 0
-        current_model_idx = 0
 
         while True:
             attempt += 1
@@ -568,7 +573,7 @@ class MultimodalTranslator:
                     "response_schema": schema_class,
                     "temperature": 0.25,
                 }
-                if "3.7" in current_model.lower() or "3.1-pro" in current_model.lower():
+                if "3.7" in current_model.lower() or "3.1-pro" in current_model.lower() or "pro" in current_model.lower():
                     if self.enable_verifier:
                         gen_config_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=0)
                     else:
@@ -622,12 +627,11 @@ class MultimodalTranslator:
                 is_unavailable = "503" in err_str or "unavailable" in err_str or "high demand" in err_str
                 is_rate_limit = "429" in err_str or "quota" in err_str or "resource_exhausted" in err_str or "rate" in err_str
                 
-                # Instant fallback switch between the two top Flash versions on 503
-                if is_unavailable and len(candidate_models) > 1:
+                # Instant switch between the two top Flash versions on 503, 504, or 429
+                if (is_unavailable or is_timeout or is_rate_limit) and len(candidate_models) > 1:
                     next_idx = (current_model_idx + 1) % len(candidate_models)
                     if next_idx != current_model_idx:
-                        print(f"\n[Tłumacz / Faza 1]: Model {current_model} zgłasza przeciążenie u Google (503 High Demand).")
-                        print(f"  [>>] Błyskawiczne przełączenie na drugi najwyższy model Flash: {candidate_models[next_idx]} (100% płynność)...")
+                        print(f"\n[Tłumacz / Faza 1]: Przełączanie na alternatywny najwyższy model Flash: {candidate_models[next_idx]} (płynny load-balancing)...")
                         current_model_idx = next_idx
                         time.sleep(1)
                         continue

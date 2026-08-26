@@ -12,6 +12,18 @@
     },
     "Danto -> Heki": {
       "description": "Zwrot: 'nijaki generale z nizin' (wódz plemienia Feikong -> generał Qin)"
+    },
+    "Shin -> Mou Ten": {
+      "description": "Zwrot: 'Mou Ten' (braterska rywalizacja / sojusznicy z równorzędnych oddziałów)"
+    },
+    "Shin -> Ri Boku": {
+      "description": "Zwrot: 'Ri Boku' (zażarty wróg / śmiertelny przeciwnik)"
+    },
+    "Mou Ten -> Shin": {
+      "description": "Zwrot: 'Shin' (towarzysz broni / przyjaciel)"
+    },
+    "Ri Boku -> Shin": {
+      "description": "Zwrot: 'Dowódco Shin' (szacunek i chłodny dystans wobec obiecującego przeciwnika)"
     }
   },
   "glossary": {
@@ -39,11 +51,16 @@
     "Zhuhai Plains": "Równina Zhuhai",
     "Laoyang": "Zamek Laoyang",
     "Five Hundred-Man Commander": "Dowódca pięciuset ludzi",
-    "Thousand-Man Commander": "Dowódca tysiąca ludzi"
+    "Thousand-Man Commander": "Dowódca tysiąca ludzi",
+    "Hi Shin Force": "Oddział Hi Shin",
+    "Gaku Ka Force": "Jednostka Gaku Ka",
+    "Three Greats": "Trzej Wielcy Niebios",
+    "detached force": "oddział uderzeniowy"
   },
   "relationships": {},
   "episodes_translated": [
     "[Erai-raws] Kingdom 6th Season - 10 (JN) [1080p CR WEBRip HEVC AAC][MultiSub][E0CC5D52]",
-    "Kanon Mangi"
+    "Kanon Mangi",
+    "[Erai-raws] Kingdom 6th Season - 11 (JN) [1080p CR WEBRip HEVC AAC][MultiSub][31E77681]"
   ]
 }
