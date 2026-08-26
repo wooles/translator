@@ -265,19 +265,17 @@ Zwróć wynik w formacie JSON zgodnym ze schematem EpisodeProfile."""
                         time.sleep(1)
                         continue
 
+                wait_sec = 1.0
                 if is_timeout:
-                    wait_sec = min(1.0 + (attempt - 1) * 0.5, 3.0)
                     timeout_sec = int(os.getenv("GEMINI_HTTP_TIMEOUT_MS", "120000")) // 1000
                     print(f"\n[Profiler Odcinka]: Serwer Google potrzebował więcej czasu na analizę profilu (limit {timeout_sec}s).")
-                    print(f"  [..] Błyskawiczne ponowienie za {wait_sec:.1f}s (próba #{attempt})...")
+                    print(f"  [..] Błyskawiczne ponowienie za 1.0s (próba #{attempt})...")
                     time.sleep(wait_sec)
                 elif is_unavailable or is_rate_limit:
-                    wait_sec = min(1.0 + (attempt - 1) * 0.2, 2.0)
                     print(f"\n[Profiler Odcinka]: Chwilowe przeciążenie serwerów Google (503/429 na {current_model}).")
-                    print(f"  [..] Błyskawiczne ponowienie za {wait_sec:.1f}s (próba #{attempt})...")
+                    print(f"  [..] Błyskawiczne ponowienie za 1.0s (próba #{attempt})...")
                     time.sleep(wait_sec)
                 else:
-                    wait_sec = min(1.0 + (attempt - 1) * 0.5, 3.0)
                     clean_msg = str(e).split("{")[0].strip() if "{" in str(e) else str(e)
-                    print(f"\n[Profiler Odcinka]: Ponawianie próby #{attempt} za {wait_sec:.1f}s ({clean_msg})...")
+                    print(f"\n[Profiler Odcinka]: Ponawianie próby #{attempt} za 1.0s ({clean_msg})...")
                     time.sleep(wait_sec)
