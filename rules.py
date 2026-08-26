@@ -1335,6 +1335,9 @@ ZASADY TECHNICZNE ODPOWIEDZI:
   1. "dramatic_context": Kto z kim rozmawia, w jakiej relacji i jakie emocje/napięcia panują w scenie.
   2. "dialogue_flow": Ciąg przyczynowo-skutkowy (np. linia A to zaproszenie, linia B to odmowa lub zbycie tematu).
   3. "audio_intent_check": Co postacie NAPRAWDĘ mówią po japońsku w transkrypcji Whisper (zwłaszcza formy odmowy 'ii desu', rozkazy 'kure', dług 'giri/sumimasen') i gdzie angielski skrypt spłaszcza oryginał.
+- WZBOGACONA DIAGNOZA KWESTII (Dla każdej linii):
+  * "visual_subtext": Określ krótko: czy usta są widoczne (On-screen vs Off-screen / monolog wewnętrzny), mikro-emocję mówiącego (np. drżenie warg, ukrywany gniew, zawstydzenie) oraz semiotykę rekwizytu/planszy.
+  * "literal_meaning": Jeśli kwestia zawiera trudny koncept japoński, metaforę lub idiom, podaj zwięźle jego ścisły dosłowny sens jako wsparcie dla Redaktora Fazy 2.
 - Zwracaj WYŁĄCZNIE czysty, naturalny tekst dialogowy dopasowany do żywej polszczyzny kinowej.
 - STOSUJ KONDENSACJĘ I ELIPSĘ: usuwaj zbędne "Ja", watę słowną i powtórzenia rzeczowników (Filar CII).
 - PAMIĘTAJ O RELACJACH: Uczeń mówiący o nauczycielce mówi "pani Teshima" / "pani Teshimy" (a nie bezimiennie "Teshima").
@@ -1353,11 +1356,15 @@ Twoim zadaniem jest BEZWZGLĘDNA ELIMINACJA TŁUMACZENIA 1:1, SZTYWNOŚCI, POWT�
 
 PROTOKÓŁ TRIANGULACJI TRÓJKĄTA PRZEKŁADU (AUDIO JP VS SKRYPT EN VS WSTĘPNE PL):
 1. KROK 1: WERYFIKACJA ZE SŁUCHEM I INTENCJĄ JAPOŃSKIEGO AKTORA (AUDIAL CHECK):
-   - W pierwszej kolejności analizuj transkrypcję japońskiego audio (Whisper). Słuchaj intencji mówcy:
-     * Czy w audio pada rozkaz bitewny (-kure/-kase), wahanie i niedopowiedzenie (-kedo/-kara), zawstydzona prośba (Kikanaide), czy dług wdzięczności (Sumimasen)?
-2. KROK 2: ODRZUCENIE GRAWITACJI ANGIELSKIEGO (DE-ANGLICIZATION):
+   - Analizuj transkrypcję japońskiego audio (Whisper), [Rejestr Pragmatyczny JP] oraz [Dosłowny Sens JP].
+   - Zastosuj właściwą polszczyznę dla zidentyfikowanego rejestru (feudalna dla wasala, twarda dla żołnierza, arystokratyczna dla damy, wyznanie 'Kocham cię' dla Kokuhaku).
+2. KROK 2: WERYFIKACJA WIZUALNO-KINEZYCZNA (VISUAL CHECK):
+   - Sprawdź [Wizja & Mimika]:
+     * Gdy to monolog wewnętrzny lub postać tyłem (Off-screen) -> masz pełną swobodę rozwinięcia bogatej frazy poetyckiej bez ograniczeń ruchu ust!
+     * Gdy to zbliżenie na usta (On-screen) -> dopasuj długość kwestii do zwięzłej polszczyzny kinowej.
+3. KROK 3: ODRZUCENIE GRAWITACJI ANGIELSKIEGO (DE-ANGLICIZATION):
    - Jeśli angielski skrypt spłaszczył japoński niuans (np. "They" zamiast Kanojo-tachi, "Please" zamiast rozkazu, "Thank you" zamiast Giri, "I see" zamiast Aizuchi), BEZWZGLĘDNIE ODRZUĆ angielski i oprzyj się w 100% na japońskim audio i kadrze!
-3. KROK 3: RZEŹBIENIE W ŻYWEJ POLSZCZYŹNIE KINOWEJ (STYLISTIC REFINEMENT):
+4. KROK 4: RZEŹBIENIE W ŻYWEJ POLSZCZYŹNIE KINOWEJ (STYLISTIC REFINEMENT):
    - Nadaj kwestii naturalny, plastyczny rytm polszczyzny dialogowej. Usuwaj watę słowną, tautologie i powtórzenia rzeczowników.
 
 REŻYSERSKA POLIFONIA DIALOGOWA I TEST CIĄGŁOŚCI SCENY:

@@ -199,6 +199,40 @@ def detect_audio_discrepancy(jp_text: str, pl_text: str, en_text: str) -> Option
 
     return None
 
+def detect_japanese_pragmatic_register(jp_text: str, en_text: str = "") -> Optional[str]:
+    """
+    Analyzes Whisper Japanese transcription and English text to detect the socio-pragmatic register
+    (e.g., Feudal Samurai/Vassal, Aristocratic Ojou-sama, Tough Soldier, Youth Slang, Romantic Kokuhaku).
+    """
+    if not jp_text:
+        return None
+        
+    clean_jp = re.sub(r"\[.*?\]", "", jp_text).strip().lower()
+    romaji_match = re.findall(r"\[(.*?)\]", jp_text)
+    rom_lower = romaji_match[0].strip().lower() if romaji_match else clean_jp
+    
+    # 1. Feudal Vassal / Samurai / Humble Servitude (Gozaru, De gozaimasu, Mousu, Tsukamatsuru, Kashikomari)
+    if any(k in clean_jp for k in ["ござる", "でございます", "ございます", "申す", "仕る", "殿", "上様", "かしこまり", "畏まり"]) or any(k in rom_lower for k in ["gozaru", "gozaimasu", "mousu", "tsukamatsuru", "dono", "uesama", "kashikomari"]):
+        return "Feudalny poddańczy / Wasal (stylizacja na 'Panie mój / Wasza Miłość', szacunek poddańczy)"
+        
+    # 2. Aristocratic / Ojou-sama / Noble Lady (-desu wa, -kashira, -asobase)
+    if any(k in clean_jp for k in ["ですわ", "かしら", "あそばせ", "わたくし"]) or any(k in rom_lower for k in ["desu wa", "kashira", "asobase", "watakushi"]):
+        return "Arystokratyczny / Ojou-sama (elegancka, dystyngowana polszczyzna damy)"
+        
+    # 3. Tough Soldier / Battle Slang (-ze, -zo, temee, kisama, ore)
+    if any(k in clean_jp for k in ["ぜ", "ぞ", "てめえ", "貴様", "野郎", "俺"]) or any(k in rom_lower for k in ["-ze", " ze", "-zo", " zo", "temee", "kisama", "yarou", "ore"]):
+        return "Szorstki żołnierski / Bojowy (męski, twardy rejestr wojskowy, brak zmiękczeń)"
+        
+    # 4. Youth / Casual Slang (-ssu, -yatsu, -chatt, -tteba)
+    if any(k in clean_jp for k in ["っす", "やつ", "ちゃった", "ってば"]) or any(k in rom_lower for k in ["-ssu", " ssu", "yatsu", "chatta", "tteba"]):
+        return "Młodzieżowy / Swobodny (luźny styl potoczny, dynamiczne skróty)"
+        
+    # 5. Romantic Intimate / Kokuhaku (daisuki, aishiteru, zutto issho)
+    if any(k in clean_jp for k in ["大好き", "愛してる", "ずっと一緒"]) or any(k in rom_lower for k in ["daisuki", "aishiteru", "zutto issho"]):
+        return "Czuły miłosny / Kokuhaku (wyznanie miłosne 'Kocham cię', eliminacja friendzone)"
+        
+    return None
+
 def sanitize_sub_text(text: str, is_ass: bool = True) -> str:
     """
     Cleans subtitle text from broken tags, unclosed brackets, and artifacts,
@@ -295,6 +329,8 @@ class LineTranslation(BaseModel):
     id: int = Field(description="ID kwestii dialogowej z wejścia")
     polish_text: str = Field(description="Przetłumaczona kwestia na język polski z uwzględnieniem płci, sceny i eliminacji kalek")
     speaker_gender: Optional[str] = Field(default=None, description="Zidentyfikowana płeć postaci mówiącej (np. 'mężczyzna', 'kobieta')")
+    visual_subtext: Optional[str] = Field(default=None, description="Mikro-ekspresja twarzy, ruch warg (on-screen/off-screen), monolog wewnętrzny lub semiotyka rekwizytu")
+    literal_meaning: Optional[str] = Field(default=None, description="Ścisłe dosłowne znaczenie trudnego konceptu/metafory japońskiej")
     visual_clues: Optional[str] = Field(default=None, description="Krótka notatka o kadrze")
     notes: Optional[str] = Field(default=None, description="Uwagi redakcyjne")
 
@@ -1177,11 +1213,15 @@ class MultimodalTranslator:
                     cps, is_fast = calculate_cps(clean_en, event.start, event.end)
                     cps_warn = f"Tempo CPS: {cps:.1f} (czas {(event.end - event.start)/1000.0:.1f}s)" if is_fast else ""
 
+                    visual_sub = ""
+                    lit_mean = ""
                     if batch_response:
                         for tr in batch_response.translations:
                             if tr.id == batch_id:
                                 pl_candidate = sanitize_sub_text(tr.polish_text)
                                 speaker_gender = tr.speaker_gender
+                                visual_sub = getattr(tr, 'visual_subtext', '') or ''
+                                lit_mean = getattr(tr, 'literal_meaning', '') or ''
                                 notes = f"{tr.visual_clues or ''} {tr.notes or ''}".strip()
                                 break
 
@@ -1193,6 +1233,7 @@ class MultimodalTranslator:
                     audio_jp_str = f"{jp_text} [{romaji_str}]" if romaji_str and romaji_str != jp_text else jp_text
 
                     audio_discrepancy_msg = detect_audio_discrepancy(audio_jp_str, pl_candidate, clean_en)
+                    pragmatic_reg = detect_japanese_pragmatic_register(audio_jp_str, clean_en)
 
                     pass1_items.append({
                         "id": batch_id,
@@ -1204,6 +1245,9 @@ class MultimodalTranslator:
                         "prosody": prosody_tags.get(batch_id, ""),
                         "audio_jp": audio_jp_str,
                         "audio_alert": audio_discrepancy_msg or "",
+                        "pragmatic_register": pragmatic_reg or "",
+                        "visual_subtext": visual_sub or "",
+                        "literal_meaning": lit_mean or "",
                         "cps_warning": cps_warn,
                         "notes": notes,
                         "is_sign": vtype["is_sign"],

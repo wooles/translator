@@ -88,11 +88,17 @@ class DialogueVerifier:
             visual_info = f" [Położenie/Styl: {item.get('visual_details')}]" if item.get('visual_details') else ""
             audio_info = f"  JP (Audio ze słuchu Whisper): {item['audio_jp']}\n" if item.get("audio_jp") else ""
             alert_info = f"  [⚠️ ALARM ROZBIEŻNOŚCI AUDIO JP]: {item['audio_alert']}\n" if item.get("audio_alert") else ""
+            vis_sub_info = f"  [🎬 Wizja, Mimika & Usta]: {item['visual_subtext']}\n" if item.get('visual_subtext') else ""
+            prag_reg_info = f"  [🎎 Rejestr Pragmatyczny JP]: {item['pragmatic_register']}\n" if item.get('pragmatic_register') else ""
+            lit_info = f"  [📖 Dosłowny Sens JP]: {item['literal_meaning']}\n" if item.get('literal_meaning') else ""
             
             prompt_lines.append(
                 f"- [ID: {item['id']}]{type_tag}{gender_info}{voice_info}{prosody_info}{song_info}{cps_info}{visual_info}\n"
                 f"{audio_info}"
                 f"{alert_info}"
+                f"{prag_reg_info}"
+                f"{vis_sub_info}"
+                f"{lit_info}"
                 f"  EN: {item['en']}\n"
                 f"  Wstępne PL: {item['pl']}{notes_info}"
             )

@@ -158,7 +158,22 @@ def test_rules_and_prompts():
     print(" -> PASSED: Kompletny Zunifikowany Kanon 125 Filarów AVT (Filary I – CXXV) jest aktywny w obu fazach tłumaczenia.")
 
 def test_pydantic_schemas():
-    print("[TEST 2/5] Weryfikacja schematów Pydantic...")
+    print("[TEST 2/5] Weryfikacja schematów Pydantic i Detektora Rejestru Pragmatycznego...")
+    from translator import detect_japanese_pragmatic_register
+    
+    # Test detekcji rejestrów japońskich
+    reg_feudal = detect_japanese_pragmatic_register("ははっ、畏まりましてございます [haha, kashikomarimashite gozaimasu]")
+    assert reg_feudal is not None and "Feudalny" in reg_feudal
+    
+    reg_soldier = detect_japanese_pragmatic_register("行くぞ、野郎ども！ [iku zo, yaroudomo!]")
+    assert reg_soldier is not None and "Szorstki" in reg_soldier
+    
+    reg_ojou = detect_japanese_pragmatic_register("ごきげんよう、皆様 [gokigenyou, minasama desu wa]")
+    assert reg_ojou is not None and "Arystokratyczny" in reg_ojou
+    
+    reg_love = detect_japanese_pragmatic_register("ずっと一緒だよ、大好き [zutto issho da yo, daisuki]")
+    assert reg_love is not None and "Kokuhaku" in reg_love
+
     diag = SceneDiagnosis(
         dramatic_context="Yoritsugu siedzi w pokoju i zazdrośnie patrzy na powitanie Tokiyukiego.",
         dialogue_flow="Służba zaprasza do wyjścia, a Yoritsugu chłodno odmawia.",
@@ -168,6 +183,8 @@ def test_pydantic_schemas():
         id=1,
         polish_text="Rozumiem, co masz na myśli.",
         speaker_gender="mężczyzna",
+        visual_subtext="zbliżenie na usta, ukrywana wściekłość",
+        literal_meaning="ścisły sens dosłowny",
         visual_clues="mężczyzna w mundurze",
         notes="eliminacja kalki"
     )
@@ -177,6 +194,8 @@ def test_pydantic_schemas():
         scene_description="Testowa scena"
     )
     assert batch.translations[0].id == 1
+    assert batch.translations[0].visual_subtext == "zbliżenie na usta, ukrywana wściekłość"
+    assert batch.translations[0].literal_meaning == "ścisły sens dosłowny"
     assert batch.scene_diagnosis is not None
     assert "Yoritsugu" in batch.scene_diagnosis.dramatic_context
 
@@ -192,7 +211,7 @@ def test_pydantic_schemas():
     )
     assert ref_batch.lines[0].refined_pl == "Rozumiem."
     assert ref_batch.scene_diagnosis is not None
-    print(" -> PASSED: Schematy Pydantic i SceneDiagnosis są poprawne.")
+    print(" -> PASSED: Schematy Pydantic, Diagnoza Wizualna i Rejestr Pragmatyczny są w 100% poprawne.")
 
 def test_sanitization_and_deduplication():
     print("[TEST 3/5] Test usuwania baboli ASS i deduplikacji znaków...")
