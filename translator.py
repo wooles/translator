@@ -1449,10 +1449,16 @@ class MultimodalTranslator:
 
         final_subs.save(output_path, encoding="utf-8")
         
-        # Remove checkpoint file upon successful completion
+        # Remove checkpoint and temporary profile cache files upon successful completion
         if checkpoint_path.exists():
             try:
                 os.remove(str(checkpoint_path))
+            except OSError:
+                pass
+
+        if profile_cache_path and os.path.exists(profile_cache_path):
+            try:
+                os.remove(profile_cache_path)
             except OSError:
                 pass
 
