@@ -383,10 +383,11 @@ def main():
 
     from model_resolver import resolve_best_models
     from google import genai
+    from google.genai import types
     
     # Dynamiczne wykrywanie najnowszych modeli Gemini
     api_key_check = os.getenv("GEMINI_API_KEY")
-    temp_client = genai.Client(api_key=api_key_check) if api_key_check else None
+    temp_client = genai.Client(api_key=api_key_check, http_options=types.HttpOptions(timeout=15000)) if api_key_check else None
     best_models = resolve_best_models(temp_client)
 
     model_p1 = args.model if args.model != "gemini-3.5-flash-lite" else None

@@ -324,7 +324,7 @@ class MultimodalTranslator:
                 "lub utwórz plik .env z wpisem GEMINI_API_KEY=twój_klucz"
             )
         
-        self.client = genai.Client(api_key=self.api_key)
+        self.client = genai.Client(api_key=self.api_key, http_options=types.HttpOptions(timeout=45000))
         self.model = model
         self.model_phase1 = model
         self.model_phase2 = model_phase2 or model
@@ -648,7 +648,8 @@ class MultimodalTranslator:
         subs_path: str,
         video_path: Optional[str] = None,
         output_path: Optional[str] = None,
-        progress_callback = None
+        progress_callback = None,
+        cancel_check = None
     ) -> str:
         """
         Główna metoda tłumacząca plik z napisami z pełnym zachowaniem Typesettingu, stylów i timingu.
@@ -938,11 +939,16 @@ class MultimodalTranslator:
         ]
 
         with tqdm(total=total_lines, desc="Tłumaczenie dialogów", unit="linii") as pbar:
+            pbar.start_t = time.time()
             already_done = sum(1 for item in raw_entries if item[0] in translated_results)
             if already_done > 0:
                 pbar.update(already_done)
 
             for b_idx, batch in enumerate(batches):
+                if cancel_check and cancel_check():
+                    print("\n[Tłumacz]: Otrzymano sygnał przerwania (⏹ Stop). Bezpieczne zatrzymanie i zapis stanu...")
+                    break
+
                 untranslated_in_batch = [item for item in batch if item[0] not in translated_results]
                 if not untranslated_in_batch:
                     continue

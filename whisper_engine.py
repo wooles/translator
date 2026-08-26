@@ -112,6 +112,8 @@ class JapaneseWhisperEngine:
                 download_root=self.download_root
             )
             self._is_initialized = True
+            dev_label = f"GPU (CUDA {selected_compute.upper()})" if selected_device == "cuda" else f"CPU ({selected_compute.upper()})"
+            print(f"  [Lokalny Silnik Audio Kotoba-Whisper]: Załadowano model {self.model_size} na {dev_label}.")
         except Exception as e:
             # Fallback 1: Próba na CPU INT8 w razie problemów ze sterownikami GPU
             if selected_device != "cpu":
@@ -123,6 +125,7 @@ class JapaneseWhisperEngine:
                         download_root=self.download_root
                     )
                     self._is_initialized = True
+                    print(f"  [Lokalny Silnik Audio Kotoba-Whisper]: Załadowano model {self.model_size} na CPU (INT8 fallback).")
                     return
                 except Exception:
                     pass

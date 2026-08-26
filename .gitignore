@@ -17,6 +17,7 @@ models/
 *.sqlite3
 
 # Temporary Media & Subtitles
+baza napisów/
 temp/
 *.tmp
 *.log

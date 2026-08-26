@@ -1,0 +1,24 @@
+{
+  "anime_title": "Silent Witch",
+  "characters": {
+    "Ike -> Monica": {
+      "description": "Zwrot: 'Monico / w myślach: wiewióreczko' (książę pod przykrywką -> nieśmiała znajoma / sekretna ochroniarka)"
+    },
+    "Monica -> Ike": {
+      "description": "Zwrot: 'panie Ike' (nieśmiała dziewczyna -> szlachetny przyjaciel)"
+    },
+    "Monica -> Nero": {
+      "description": "Zwrot: 'Nero' (czarownica -> jej chowaniec)"
+    }
+  },
+  "glossary": {
+    "Silent Witch": "Milcząca Czarownica",
+    "Starweaving Mira": "Gwiazdotkacka Mira",
+    "The Fountain of Minerva": "Źródło Minerwy",
+    "Unchanted magecraft": "magia bezliturgiczna / magia bez inwokacji"
+  },
+  "relationships": {},
+  "episodes_translated": [
+    "tmpxfweggtg"
+  ]
+}

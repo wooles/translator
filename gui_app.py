@@ -276,7 +276,8 @@ class TranslationWorker(QThread):
                 output_path = engine.translate_file(
                     subs_path=subs_path,
                     video_path=video_path,
-                    progress_callback=progress_bridge
+                    progress_callback=progress_bridge,
+                    cancel_check=lambda: not self.is_running
                 )
 
                 f1_stats = engine.current_episode_tokens
@@ -374,7 +375,8 @@ class SettingsDialog(QDialog):
 
         try:
             from google import genai
-            client = genai.Client(api_key=key)
+            from google.genai import types
+            client = genai.Client(api_key=key, http_options=types.HttpOptions(timeout=15000))
             res = client.models.generate_content(
                 model="gemini-3.5-flash-lite",
                 contents="Test PING"

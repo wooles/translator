@@ -43,5 +43,14 @@
     "rule_reason": "Zakaz hybryd honoryfikatywnych 'Pani Sensei'. Albo sam japoński tytuł 'Sensei', albo polska forma 'Pani [Nazwisko]'.",
     "scope": "global",
     "created_at": "2026-08-22 23:34:42"
+  },
+  {
+    "id": "fb_1787766735269",
+    "original_en": "All creation",
+    "bad_pl": "Wszelkie Stworzenie (Wszelkie Stworzenie)",
+    "good_pl": "Wszelkie Stworzenie",
+    "rule_reason": "Eliminacja dublowania",
+    "scope": "global",
+    "created_at": "2026-08-26 19:52:15"
   }
 ]

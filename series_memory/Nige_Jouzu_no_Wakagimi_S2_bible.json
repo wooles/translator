@@ -54,6 +54,18 @@
     },
     "Shokan -> Sadamune Ogasawara": {
       "description": "Zwrot: 'panie Sadamune' (strateg -> sojuszniczy dowódca)"
+    },
+    "Yoritsugu -> Tokiyuki": {
+      "description": "Zwrot: 'Tokiyuki / Panicz Tokiyuki' (rywalizujący rówieśnicy, młodzi dziedzice)"
+    },
+    "Tokiyuki -> Yoritsugu": {
+      "description": "Zwrot: 'Yoritsugu / Panie Yoritsugu' (młodzi panowie, próba nawiązania przyjaźni)"
+    },
+    "Yorishige -> Tokiyuki": {
+      "description": "Zwrot: 'Panicz Tokiyuki' (opiekun i boski protektor -> młody dziedzic rodu Hojo)"
+    },
+    "Moritaka -> Tokiyuki": {
+      "description": "Zwrot: 'Panicz Tokiyuki' (poddany wojownik -> młody pan)"
     }
   },
   "glossary": {
@@ -88,7 +100,11 @@
     "Elusive Warriors": "Uciekający Wojownicy",
     "Battle mikoshi": "bojowa mikoshi",
     "Provincial Official (Kokushi)": "gubernator prowincji",
-    "Suwa Myojin": "Suwa Myōjin"
+    "Suwa Myojin": "Suwa Myōjin",
+    "Genpuku": "Genpuku",
+    "Eboshi-oya": "Eboshi-oya (ojciec chrzestny genpuku)",
+    "Arahitogami": "Arahitogami (Żywe Bóstwo)",
+    "Holy Pillar": "Święty Pal (Onbashira)"
   },
   "relationships": {},
   "episodes_translated": [
@@ -96,6 +112,7 @@
     "tmpn97a1c8n",
     "Kanon Mangi",
     "tmp53xv6q4n",
-    "tmpgvm6hevq"
+    "tmpgvm6hevq",
+    "tmp1ntds3_n"
   ]
 }
