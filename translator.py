@@ -638,21 +638,26 @@ class MultimodalTranslator:
 
                 wait_time = 0.5
                 if is_timeout:
-                    timeout_sec = int(os.getenv("GEMINI_HTTP_TIMEOUT_MS", "120000")) // 1000
-                    print(f"\n[Tłumacz / Faza 1]: Serwer Google potrzebował więcej czasu na odpowiedź (limit {timeout_sec}s).")
-                    print(f"  [..] Błyskawiczne ponowienie za 0.5s (próba #{attempt})...")
+                    if attempt == 1:
+                        timeout_sec = int(os.getenv("GEMINI_HTTP_TIMEOUT_MS", "120000")) // 1000
+                        print(f"\n[Tłumacz / Faza 1]: Serwer Google potrzebował więcej czasu na odpowiedź (limit {timeout_sec}s na {current_model}).")
+                        print("  [..] Ponawiam próbę co 0,5 s do uzyskania dostępu do TPU...")
                     time.sleep(wait_time)
                 elif is_unavailable:
-                    print(f"\n[Tłumacz / Faza 1]: Chwilowe przeciążenie serwerów Google (503 UNAVAILABLE na {current_model}).")
-                    print(f"  [..] Błyskawiczne ponowienie za 0.5s (próba #{attempt})...")
+                    if attempt == 1:
+                        print(f"\n[Tłumacz / Faza 1]: Chwilowe przeciążenie serwerów Google (503 UNAVAILABLE na {current_model}).")
+                        print("  [..] Ponawiam próbę co 0,5 s do uzyskania dostępu do TPU...")
                     time.sleep(wait_time)
                 elif is_rate_limit:
-                    print(f"\n[Tłumacz / Faza 1]: Chwilowy limit minutowy zapytań (429 Rate Limit na {current_model}).")
-                    print(f"  [..] Błyskawiczne ponowienie za 0.5s (próba #{attempt})...")
+                    if attempt == 1:
+                        print(f"\n[Tłumacz / Faza 1]: Chwilowy limit minutowy zapytań (429 Rate Limit na {current_model}).")
+                        print("  [..] Ponawiam próbę co 0,5 s do uzyskania dostępu do TPU...")
                     time.sleep(wait_time)
                 else:
-                    clean_msg = str(e).split("{")[0].strip() if "{" in str(e) else str(e)
-                    print(f"\n[Tłumacz / Faza 1]: Ponawianie próby #{attempt} za 0.5s ({clean_msg})...")
+                    if attempt == 1:
+                        clean_msg = str(e).split("{")[0].strip() if "{" in str(e) else str(e)
+                        print(f"\n[Tłumacz / Faza 1]: Chwilowa przerwa w odpowiedzi API na {current_model} ({clean_msg}).")
+                        print("  [..] Ponawiam próbę co 0,5 s do uzyskania dostępu do TPU...")
                     time.sleep(wait_time)
 
     def translate_file(

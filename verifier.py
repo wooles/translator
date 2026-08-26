@@ -173,15 +173,19 @@ class DialogueVerifier:
 
                 wait_sec = 0.5
                 if is_timeout:
-                    timeout_sec = int(os.getenv("GEMINI_HTTP_TIMEOUT_MS", "120000")) // 1000
-                    print(f"\n[Redaktor Dialogów / Faza 2]: Serwer Google potrzebował więcej czasu na analizę sceny (limit {timeout_sec}s).")
-                    print(f"  [..] Utrzymuję najwyższy model {self.model}. Błyskawiczne ponowienie za 0.5s (próba #{attempt})...")
+                    if attempt == 1:
+                        timeout_sec = int(os.getenv("GEMINI_HTTP_TIMEOUT_MS", "120000")) // 1000
+                        print(f"\n[Redaktor Dialogów / Faza 2]: Serwer Google potrzebował więcej czasu na analizę sceny (limit {timeout_sec}s na {self.model}).")
+                        print("  [..] Ponawiam próbę co 0,5 s do uzyskania dostępu do TPU...")
                     time.sleep(wait_sec)
                 elif is_unavailable or is_rate_limit:
-                    print(f"\n[Redaktor Dialogów / Faza 2]: Chwilowe przeciążenie serwerów Google (503/429 na {self.model}).")
-                    print(f"  [..] Błyskawiczne ponowienie za 0.5s (próba #{attempt} - walka o natychmiastowy slot TPU)...")
+                    if attempt == 1:
+                        print(f"\n[Redaktor Dialogów / Faza 2]: Chwilowe przeciążenie serwerów Google (503/429 na {self.model}).")
+                        print("  [..] Ponawiam próbę co 0,5 s do uzyskania dostępu do TPU...")
                     time.sleep(wait_sec)
                 else:
-                    clean_msg = str(e).split("{")[0].strip() if "{" in str(e) else str(e)
-                    print(f"\n[Redaktor Dialogów / Faza 2]: Chwilowa przerwa w odpowiedzi API na {self.model}. Ponawianie próby #{attempt} za 0.5s ({clean_msg})...")
+                    if attempt == 1:
+                        clean_msg = str(e).split("{")[0].strip() if "{" in str(e) else str(e)
+                        print(f"\n[Redaktor Dialogów / Faza 2]: Chwilowa przerwa w odpowiedzi API na {self.model} ({clean_msg}).")
+                        print("  [..] Ponawiam próbę co 0,5 s do uzyskania dostępu do TPU...")
                     time.sleep(wait_sec)
