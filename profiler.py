@@ -58,6 +58,39 @@ class DramaticSequence(BaseModel):
     dominant_tone: str = Field(description="Dominujący rejestr i ton (np. 'panika i tempo bojowe', 'dworska etykieta i tłumiona zazdrość', 'patos rycerski')")
 
 
+class RelationshipPivot(BaseModel):
+    approx_time: str = Field(description="Przybliżony czas zmiany w odcinku (np. '00:14:20')")
+    characters_involved: str = Field(description="Postacie, których dotyczy zmiana (np. 'Shin i Kyoukai', 'Nauczyciel i Arata')")
+    nature_of_shift: str = Field(description="Przyczyna i charakter zmiany relacji (np. 'Przejście ze sztywnego dystansu na poufałość po wyznaniu prawdy')")
+    strict_direction_pl: str = Field(description="Ścisła dyrektywa formy zwrotu (np. 'Od tej minuty ZAKAZ formy per pani, przejście na bezpośrednie ty / po imieniu: Kyoukai')")
+
+
+class CharacterCatchphrase(BaseModel):
+    character_name: str = Field(description="Imię postaci")
+    original_phrase: str = Field(description="Oryginalna fraza lub motyw w EN/JP (np. 'Yare yare daze', 'Dattebayo', 'Good grief')")
+    canonical_pl: str = Field(description="Ustalony, kultowy i jednolity polski odpowiednik (np. 'Dajcie mi święty spokój...', 'I to jak!')")
+    context_notes: str = Field(description="Zasada stosowania we wszystkich scenach odcinka")
+
+
+class SongTranscreationPlan(BaseModel):
+    song_type: str = Field(description="Typ utworu: 'Opening (OP)', 'Ending (ED)' lub 'Insert Song / Piosenka w tle'")
+    time_range: str = Field(description="Przedział czasowy piosenki (np. '00:01:30 - 00:03:00')")
+    metre_and_syllables: str = Field(description="Plan sylabiczny i metrum (np. '8 sylab w wersie (8/8/8/8), rymy parzyste AABB')")
+    poetic_theme: str = Field(description="Główny motyw poetycki i rejestr emocjonalny (np. 'Młodość, tęsknota i walka z przeznaczeniem')")
+
+
+class PunWordplayPlan(BaseModel):
+    approx_time: str = Field(description="Przybliżony czas kalamburu (np. '00:08:45')")
+    original_joke_or_pun: str = Field(description="Oryginalny żart słowny lub homofon (np. 'Dajare Kami [bóg] vs Kami [papier]')")
+    polish_transcreation: str = Field(description="Autonomiczny, zabawny polski ekwiwalent fonetyczny (ZAKAZ przypisów [Przyp. tłum.]!)")
+
+
+class ContinuityBridgeAlert(BaseModel):
+    term_or_event: str = Field(description="Kluczowy termin, nazwa rekwizytu lub wydarzenie z przeszłości")
+    canon_source_episode: str = Field(description="Źródło kanonu (np. 'Ustalenie z Odcinka 2 / Biblia Serialu')")
+    continuity_directive: str = Field(description="Ścisły wymóg spójności dla tłumacza w tym odcinku")
+
+
 class CharacterDossier(BaseModel):
     name: str = Field(description="Imię postaci")
     gender: str = Field(description="'MALE', 'FEMALE' lub 'UNKNOWN'")
@@ -76,6 +109,11 @@ class EpisodeProfile(BaseModel):
     manga_canon_source: Optional[str] = Field(default="", description="Oficjalne polskie wydawnictwo mangi (np. Waneko, J.P.Fantastica, Studio JG, Hanami), jeśli seria była wydana w Polsce")
     tone_and_genre: str = Field(description="Gatunek i dominujący ton emocjonalny (np. 'Komediodramat młodzieżowy, ciepły z elementami absurdu')")
     danger_lines_prescan: List[DangerLinePreScan] = Field(default_factory=list, description="Lista wyłapanych przed tłumaczeniem niebezpiecznych pułapek kontekstowych i wieloznaczności w całym odcinku")
+    relationship_pivots: List[RelationshipPivot] = Field(default_factory=list, description="Punkty zwrotne i dynamiczne zmiany w relacjach/formach zwrotu w trakcie odcinka")
+    character_catchphrases: List[CharacterCatchphrase] = Field(default_factory=list, description="Zamrożone kanoniczne polskie odpowiedniki dla powracających powiedzonek postaci")
+    song_transcreation_plans: List[SongTranscreationPlan] = Field(default_factory=list, description="Precyzyjny plan metryczny i rymotwórczy dla piosenek (Barańczak)")
+    puns_and_wordplays: List[PunWordplayPlan] = Field(default_factory=list, description="Strategie adaptacji japońskich gier słownych (Dajare) i homofonów na autonomiczne polskie dowcipy")
+    continuity_bridge_alerts: List[ContinuityBridgeAlert] = Field(default_factory=list, description="Ostrzeżenia i mosty ciągłości terminologicznej względem poprzednich odcinków")
     dramatic_sequences: List[DramaticSequence] = Field(default_factory=list, description="Podział odcinka na główne akty/sekwencje dramaturgiczne")
     character_dossiers: List[CharacterDossier] = Field(default_factory=list, description="Dokładne dossier i stylizacja mowy głównych bohaterów")
     name_declensions: List[NameDeclension] = Field(default_factory=list, description="Precyzyjna odmiana imion bohaterów przez wszystkie przypadki w języku polskim")
@@ -86,11 +124,11 @@ class EpisodeProfile(BaseModel):
 
 
 def format_episode_profile_for_prompt(profile: Optional[EpisodeProfile]) -> str:
-    """Formats episode profile into a concise system prompt block (Profiler 3.0)."""
+    """Formats episode profile into a concise system prompt block (Profiler 4.0)."""
     if not profile:
         return ""
 
-    lines = ["=== SŁOWNICZEK, KANON MANGI, REALIA ŚWIATA I PROFIL ODCINKA (PROFILER 3.0) ==="]
+    lines = ["=== SŁOWNICZEK, KANON MANGI, REALIA ŚWIATA I PROFIL ODCINKA (PROFILER 4.0) ==="]
     if profile.manga_canon_source:
         lines.append(f"[Oficjalny Kanon Mangi / Wydawnictwo]: {profile.manga_canon_source} (TERMINOLOGIA ZABLOKOWANA)")
     if profile.setting_and_era:
@@ -109,6 +147,31 @@ def format_episode_profile_for_prompt(profile: Optional[EpisodeProfile]) -> str:
         for dl in profile.danger_lines_prescan:
             spk = f" ({dl.speaker})" if dl.speaker else ""
             lines.append(f"• [{dl.approx_time}]{spk} '{dl.english_phrase}' -> PUŁAPKA: {dl.contextual_trap} => DYREKTYWA: {dl.mandatory_direction}")
+
+    if profile.relationship_pivots:
+        lines.append("\n🔄 PUNKTY ZWROTNE I ZMIANY RELACJI W TRAKCIE ODCINKA (RELATIONSHIP PIVOTS):")
+        for rp in profile.relationship_pivots:
+            lines.append(f"• [{rp.approx_time}] {rp.characters_involved}: {rp.nature_of_shift} => NAKAZ: {rp.strict_direction_pl}")
+
+    if profile.character_catchphrases:
+        lines.append("\n💬 ZAMROŻONE POWIEDZONKA I KWESTIE-WIZYTÓWKI (CATCHPHRASES):")
+        for cp in profile.character_catchphrases:
+            lines.append(f"• {cp.character_name}: '{cp.original_phrase}' = '{cp.canonical_pl}' ({cp.context_notes})")
+
+    if profile.song_transcreation_plans:
+        lines.append("\n🎵 MATRYCA RYMOTWÓRCZA DLA PIOSENEK OP/ED (FILAR CXVIII - BARAŃCZAK):")
+        for song in profile.song_transcreation_plans:
+            lines.append(f"• [{song.time_range}] {song.song_type}: Rytm: {song.metre_and_syllables} | Motyw: {song.poetic_theme}")
+
+    if profile.puns_and_wordplays:
+        lines.append("\n🃏 ADAPTACJA JAPOŃSKICH GIER SŁOWNYCH I KALAMBURÓW (PUNS & DAJARE):")
+        for pun in profile.puns_and_wordplays:
+            lines.append(f"• [{pun.approx_time}] {pun.original_joke_or_pun} => POLSKA ADAPTACJA: {pun.polish_transcreation}")
+
+    if profile.continuity_bridge_alerts:
+        lines.append("\n🌉 MOSTY CIĄGŁOŚCI MIĘDZYODCINKOWEJ (CONTINUITY ALERTS):")
+        for ca in profile.continuity_bridge_alerts:
+            lines.append(f"• [{ca.canon_source_episode}] {ca.term_or_event} => DYREKTYWA: {ca.continuity_directive}")
 
     if profile.dramatic_sequences:
         lines.append("\n🗺️ MAPA SEKWENCJI DRAMATURGICZNYCH ODCINKA:")
@@ -164,7 +227,7 @@ class EpisodeProfiler:
         cache_path: Optional[str] = None
     ) -> EpisodeProfile:
         """
-        Generates or loads episode profile from cache (Profiler 3.0 Pre-pass).
+        Generates or loads episode profile from cache (Profiler 4.0 Pre-pass).
         """
         if cache_path and os.path.exists(cache_path):
             try:
@@ -175,16 +238,21 @@ class EpisodeProfiler:
             except Exception as e:
                 logger.warning(f"Error reading profile cache ({e}), regenerating...")
 
-        prompt = f"""Jesteś Głównym Reżyserem, Konsultantem Merytorycznym i Script Doctorem Lokalizacji Anime (Profiler 3.0).
-Twoim zadaniem jest dogłębna, wszechstronna analiza 100% skryptu całego odcinka, aby przygotować dla zespołu tłumaczy i redaktorów kompletny PROFIL ODCINKA 3.0:
+        prompt = f"""Jesteś Głównym Reżyserem, Konsultantem Merytorycznym i Script Doctorem Lokalizacji Anime (Profiler 4.0).
+Twoim zadaniem jest dogłębna, wszechstronna analiza 100% skryptu całego odcinka, aby przygotować dla zespołu tłumaczy i redaktorów kompletny PROFIL ODCINKA 4.0:
 
 1. OFICJALNY KANON POLSKIEGO WYDANIA MANGI (Filar XXIII & XCIV): Zidentyfikuj wydawnictwo (Waneko, J.P.Fantastica, Studio JG, Kotori, Hanami, Dango, Egmont) i podaj oficjalne nazwy z tomików papierowych.
 2. SKANER MIN JĘZYKOWYCH I PUŁAPEK WIELOZNACZNOŚCI (danger_lines_prescan): Przeskanuj cały odcinek i wskaż zdradliwe kwestie angielskie (np. 'I\\'m fine' jako odmowa 'Ja podziękuję' zamiast 'Nic mi nie jest', 'Bless you', 'That bombed', 'Kikanaide', 'Sumimasen', 'Kanojo-tachi').
-3. CHRONOLOGICZNA MAPA SEKWENCJI DRAMATURGICZNYCH (dramatic_sequences): Podziel odcinek na 3-4 akty/sekwencje czasowe z opisem napięcia i tonu.
-4. KARTOTEKA OBSADY I UNIKALNE IDIOLEKTY (character_dossiers): Określ wiek, status, japońskie zaimki 'ja' (Ore/Boku/Watashi) i unikalny polski rejestr mowy każdej postaci.
-5. TABELA ODMIANY IMION PRZEZ PRZYPADKI (name_declensions) & MATRYCA RELACJI I TYTULATURY (characters).
-6. SŁOWNICZEK POJĘĆ BRANŻOWYCH (glossary) ORAZ JAPOŃSKICH PRZYSŁÓW/IDIOMÓW (yojijukugo_and_idioms): Podawaj wyłącznie CZYSTE, DOCELOWE polskie nazwy własne i terminy bez żadnych dopisków w nawiasach (ZAKAZ: 'Shinra Bansho (Wszelkie Stworzenie)', 'Płomień Adolli (Adolla Burst)'; WYMÓG: 'Shinra Banshō', 'Płomień Adolli').
-7. EPOKA, REALIA ŚWIATA I DZIEDZINA SPECJALISTYCZNA.
+3. PUNKTY ZWROTNE I ZMIANY RELACJI (relationship_pivots): Wskaż momenty w odcinku, w których następuje przełom i zmiana formy zwracania się do siebie (np. przejście z 'pani' na 'ty').
+4. POWIEDZONKA I KWESTIE-WIZYTÓWKI (character_catchphrases): Ustal jedno, kanoniczne polskie tłumaczenie dla powtarzających się motywów/zawołań postaci.
+5. MATRYCA METRYCZNA DLA PIOSENEK OP/ED (song_transcreation_plans): Rozpoznaj piosenki i ustal plan sylabiczny (np. 8 sylab) i rymy Barańczaka (AABB/ABAB).
+6. KALAMBURY I GRY SŁOWNE (puns_and_wordplays): Przekształć japońskie Dajare na autonomiczne polskie gry słowne bez przypisów [Przyp. tłum.].
+7. MOSTY CIĄGŁOŚCI (continuity_bridge_alerts): Wskaż terminy i wątki wymagające żelaznej spójności z całą serią.
+8. CHRONOLOGICZNA MAPA SEKWENCJI DRAMATURGICZNYCH (dramatic_sequences): Podziel odcinek na 3-4 akty/sekwencje czasowe z opisem napięcia i tonu.
+9. KARTOTEKA OBSADY I UNIKALNE IDIOLEKTY (character_dossiers): Określ wiek, status, japońskie zaimki 'ja' (Ore/Boku/Watashi) i unikalny polski rejestr mowy każdej postaci.
+10. TABELA ODMIANY IMION PRZEZ PRZYPADKI (name_declensions) & MATRYCA RELACJI I TYTULATURY (characters).
+11. SŁOWNICZEK POJĘĆ BRANŻOWYCH (glossary) ORAZ JAPOŃSKICH PRZYSŁÓW/IDIOMÓW (yojijukugo_and_idioms): Podawaj wyłącznie CZYSTE, DOCELOWE polskie nazwy własne i terminy bez żadnych dopisków w nawiasach.
+12. EPOKA, REALIA ŚWIATA I DZIEDZINA SPECJALISTYCZNA.
 
 METADANE Z BAZY ANILIST:
 {anime_metadata_str}

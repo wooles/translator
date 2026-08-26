@@ -306,12 +306,17 @@ from profiler import (
     DangerLinePreScan,
     DramaticSequence,
     CharacterDossier,
+    RelationshipPivot,
+    CharacterCatchphrase,
+    SongTranscreationPlan,
+    PunWordplayPlan,
+    ContinuityBridgeAlert,
     format_episode_profile_for_prompt
 )
 from whisper_engine import JapaneseWhisperEngine
 
 def test_profiler_and_whisper():
-    print("[TEST 6/6] Test profilera odcinka 3.0 (Kanon Mangi, Danger-Lines, Dossier, Sekwencje)...")
+    print("[TEST 6/6] Test profilera odcinka 4.0 (Pivots, Catchphrases, Song Matrix, Puns, Continuity)...")
     profile = EpisodeProfile(
         episode_summary="Odcinek o sprzątaniu klubu mangi",
         tone_and_genre="Komediodramat młodzieżowy",
@@ -323,6 +328,44 @@ def test_profiler_and_whisper():
                 speaker="Yoritsugu",
                 contextual_trap="Odmowa wyjścia [boku wa ii desu], a nie stan zdrowia!",
                 mandatory_direction="Tłumacz jako: Ja... podziękuję. ZAKAZ: Nic mi nie jest."
+            )
+        ],
+        relationship_pivots=[
+            RelationshipPivot(
+                approx_time="00:14:20",
+                characters_involved="Shin i Kyoukai",
+                nature_of_shift="Przejście ze sztywnego dystansu na poufałość",
+                strict_direction_pl="Od tej minuty ZAKAZ formy per pani, przejście na ty / po imieniu: Kyoukai"
+            )
+        ],
+        character_catchphrases=[
+            CharacterCatchphrase(
+                character_name="Jotaro",
+                original_phrase="Yare yare daze",
+                canonical_pl="Dajcie mi święty spokój...",
+                context_notes="Kultowe powiedzonko"
+            )
+        ],
+        song_transcreation_plans=[
+            SongTranscreationPlan(
+                song_type="Opening (OP)",
+                time_range="00:01:30 - 00:03:00",
+                metre_and_syllables="8 sylab w wersie (8/8/8/8), rymy parzyste AABB",
+                poetic_theme="Młodość, tęsknota i walka"
+            )
+        ],
+        puns_and_wordplays=[
+            PunWordplayPlan(
+                approx_time="00:08:45",
+                original_joke_or_pun="Dajare Kami [bóg] vs Kami [papier]",
+                polish_transcreation="Autonomiczny kalambur o zamku"
+            )
+        ],
+        continuity_bridge_alerts=[
+            ContinuityBridgeAlert(
+                term_or_event="Smoczy Kieł",
+                canon_source_episode="Odcinek 2",
+                continuity_directive="Utrzymuj 'Smoczy Kieł', zakaz 'Kieł Smoka'"
             )
         ],
         dramatic_sequences=[
@@ -378,8 +421,14 @@ def test_profiler_and_whisper():
         key_conventions=["Unikać kalki 'Bless you' -> 'Na zdrowie'"]
     )
     formatted = format_episode_profile_for_prompt(profile)
+    assert "PROFILER 4.0" in formatted
     assert "Wydawnictwo Waneko" in formatted
     assert "DANGER-LINES PRE-SCAN" in formatted
+    assert "PUNKTY ZWROTNE I ZMIANY RELACJI" in formatted
+    assert "ZAMROŻONE POWIEDZONKA" in formatted
+    assert "MATRYCA RYMOTWÓRCZA DLA PIOSENEK OP/ED" in formatted
+    assert "ADAPTACJA JAPOŃSKICH GIER SŁOWNYCH" in formatted
+    assert "MOSTY CIĄGŁOŚCI MIĘDZYODCINKOWEJ" in formatted
     assert "Ja... podziękuję" in formatted
     assert "Świątynia Suwa" in formatted
     assert "CHARACTER DOSSIERS" in formatted
@@ -397,7 +446,7 @@ def test_profiler_and_whisper():
     assert "initial_prompt" in sig.parameters
     engine = JapaneseWhisperEngine()
     assert "kotoba" in engine.model_size
-    print(" -> PASSED: Profiler 3.0 (Kanon Mangi, Danger-Lines, Dossier, Sekwencje) i Kotoba-Whisper v2.0 działają w 100%.")
+    print(" -> PASSED: Profiler 4.0 (Pivots, Catchphrases, Song Matrix, Puns, Continuity) i Kotoba-Whisper v2.0 działają w 100%.")
 from model_resolver import resolve_best_models, _extract_model_score
 
 def test_model_resolver():
