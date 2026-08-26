@@ -53,13 +53,12 @@ class PricingGuard:
         taking into account Google Context Cache size (39k tokens), vision processing,
         and Pro model CoT reasoning tokens.
         """
-        batches = max(1, (lines_count + 23) // 24)
+        batches = max(1, (lines_count + 27) // 28)
         system_prompt_tokens = 39000  # AVT Pillars in Context Cache
-        batch_input_tokens = 2500      # Video frame + context window + Whisper audio
-        batch_output_f1_tokens = 5100  # Translation JSON + Scene Diagnosis + 24 lines
-        batch_output_f1_tokens = 5100   # Translation JSON + Scene Diagnosis + 24 lines
-        batch_output_flash_cot = 6600   # Flash 3.7 Refinement JSON + Scene Diagnosis + 4096 Thinking Budget
-        batch_output_pro_tokens = 5800  # Pro 3.1 Refinement JSON + Scene Diagnosis + 1600 Thinking Budget
+        batch_input_tokens = 2200      # Video frame (scaled) + context window + Whisper audio
+        batch_output_f1_tokens = 2100  # Translation JSON with Sparse Diagnostics (null for simple lines)
+        batch_output_flash_cot = 2600  # Flash Refinement JSON + Elastic Adaptive CoT (1024-2048 avg)
+        batch_output_pro_tokens = 3200 # Pro Refinement JSON + CoT Thinking
 
         profile = profile.lower()
 
@@ -78,17 +77,17 @@ class PricingGuard:
                 (p1_uncached_in / 1_000_000) * rate["input_uncached"] +
                 (p1_out / 1_000_000) * rate["output"]
             )
-            storage_active_usd = 0.0128
-            profiler_usd = 0.002
+            storage_active_usd = 0.0064
+            profiler_usd = 0.001
             total_pln = (cost_p1_usd + storage_active_usd + profiler_usd) * usd_pln
             return round(total_pln, 2)
 
         elif profile in ["3", "master", "flash_reasoning", "pro_level3"]:
             rate_flash = GOOGLE_API_RATES["flash"]
 
-            # Phase 1: Vision + Flash 3.7
+            # Phase 1: Vision + Flash 3.7 (Sparse Diagnostics)
             p1_cached_in = (batches * system_prompt_tokens) if has_cache else 0
-            p1_uncached_in = batches * (batch_input_tokens + 516) + (0 if has_cache else batches * system_prompt_tokens)
+            p1_uncached_in = batches * (batch_input_tokens + 256) + (0 if has_cache else batches * system_prompt_tokens)
             p1_out = batches * batch_output_f1_tokens
             cost_p1_usd = (
                 (p1_cached_in / 1_000_000) * rate_flash["input_cached"] +
@@ -96,7 +95,7 @@ class PricingGuard:
                 (p1_out / 1_000_000) * rate_flash["output"]
             )
 
-            # Phase 2: Flash 3.7 Refinement with 4096 Deep Thinking Budget
+            # Phase 2: Flash 3.7 Refinement with Elastic Adaptive CoT Budget
             p2_cached_in = (batches * system_prompt_tokens) if has_cache else 0
             p2_uncached_in = (batches * batch_input_tokens) + (0 if has_cache else batches * system_prompt_tokens)
             p2_out = batches * batch_output_flash_cot
@@ -106,8 +105,8 @@ class PricingGuard:
                 (p2_out / 1_000_000) * rate_flash["output"]
             )
 
-            storage_active_usd = 0.0128 # 20 min active Flash storage
-            profiler_usd = 0.002
+            storage_active_usd = 0.0064 # 20 min active Flash storage
+            profiler_usd = 0.001
             total_pln = (cost_p1_usd + cost_p2_usd + storage_active_usd + profiler_usd) * usd_pln
             return round(total_pln, 2)
 
