@@ -5,10 +5,10 @@
       "description": "Zwrot: 'na ty / po imieniu: Luca' (syrena -> licealista / obiekt uczuć)"
     },
     "Luca -> Lara": {
-      "description": "Zwrot: 'na ty / po imieniu: Lara' (licealista / artysta -> romantyczna fascynacja)"
+      "description": "Zwrot: 'na ty / po imieniu (Lara)' (znajomi / rozwijające się uczucie)"
     },
     "Mari -> Lara": {
-      "description": "Zwrot: 'na ty / po imieniu: Lara' (przyjaciółka / ludzka opiekunka)"
+      "description": "Zwrot: 'na ty / po imieniu (Lara)' (przyjaciółki / współlokatorki)"
     },
     "Gon (Grace) -> Lara": {
       "description": "Zwrot: 'na ty / po imieniu: Lara' (opiekunka / mentorka ze świata syren)"
@@ -18,6 +18,15 @@
     },
     "Leo -> Lara": {
       "description": "Zwrot: 'Lara-chan / pani Lara' (młodszy brat Luca -> dziewczyna brata)"
+    },
+    "Lara -> Mari": {
+      "description": "Zwrot: 'na ty / po imieniu (Mari)' (przyjaciółki)"
+    },
+    "Lisa -> Mari": {
+      "description": "Zwrot: 'panieńskie / pełne (Mari Otsu)' (dystans / obca osoba z wrogiego świata)"
+    },
+    "Kusatsu -> Mari": {
+      "description": "Zwrot: 'po nazwisku (Otsu)' (trener -> zawodniczka)"
     }
   },
   "glossary": {
@@ -25,10 +34,15 @@
     "Biwako Terrace": "Biwako Terrace",
     "Dagger": "Sztylet",
     "Lake Biwa Fireworks Festival": "Festiwal Fajerwerków nad jeziorem Biwa",
-    "Cutting weight": "Zbijanie wagi / ścinanie wagi"
+    "Cutting weight": "Zbijanie wagi / ścinanie wagi",
+    "Girls Bantamweight Division": "Kategoria kogucia dziewcząt",
+    "Red corner / Blue corner": "Czerwony narożnik / Niebieski narożnik",
+    "Omi's Lightning": "Błyskawica z Omi",
+    "Merfolk": "Syreni ród / Syreny",
+    "Vanish into foam": "Rozwiać się w pianę morską / przemienić się w pianę"
   },
   "relationships": {},
   "episodes_translated": [
-    "tmptss49af2"
+    "Sayonara Lara - 08"
   ]
 }

@@ -815,8 +815,9 @@ class MultimodalTranslator:
                 char_key = f"{c.speaker} -> {c.listener}" if c.listener else c.speaker
                 char_dict[char_key] = f"Zwrot: '{c.address_form}' ({c.relationship_type})"
             gloss_dict = {g.term_en: g.translation_pl for g in episode_profile.glossary}
+            ref_name = Path(video_path).stem if video_path else (Path(subs_path).stem if subs_path else "Odcinek")
             self.series_bible.update_from_episode_profile(
-                episode_name=Path(subs_path).stem if subs_path else "Odcinek",
+                episode_name=ref_name,
                 characters=char_dict,
                 glossary=gloss_dict
             )

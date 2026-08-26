@@ -55,13 +55,21 @@ def list_subtitle_tracks(video_path: str) -> List[Dict[str, Any]]:
 
 def extract_embedded_subtitles(video_path: str, sub_index: int = 0, output_path: Optional[str] = None) -> str:
     """
-    Wyciąga wbudowaną ścieżkę napisów z pliku wideo do pliku tymczasowego lub wskazanego pliku .srt/.ass.
+    Wyciąga wbudowaną ścieżkę napisów z pliku wideo do deterministycznego pliku .extracted.ass lub wskazanego pliku.
+    Deterministyczna nazwa zapewnia 100% spójność wznawiania (checkpointing) i zapobiega wielokrotnym opłatom za Profiler.
     """
     if not output_path:
-        suffix = ".ass"
-        tmp = tempfile.NamedTemporaryFile(suffix=suffix, delete=False)
-        tmp.close()
-        output_path = tmp.name
+        from pathlib import Path
+        vp = Path(video_path)
+        deterministic_path = vp.parent / f"{vp.stem}.extracted.ass"
+        try:
+            deterministic_path.touch(exist_ok=True)
+            output_path = str(deterministic_path)
+        except Exception:
+            safe_stem = "".join(c for c in vp.stem if c.isalnum() or c in ("-", "_", " ", "."))
+            temp_dir = Path(tempfile.gettempdir()) / "anime_translator_subs"
+            temp_dir.mkdir(parents=True, exist_ok=True)
+            output_path = str(temp_dir / f"{safe_stem}_track{sub_index}.extracted.ass")
 
     cmd = [
         "ffmpeg",
