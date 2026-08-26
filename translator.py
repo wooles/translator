@@ -324,7 +324,8 @@ class MultimodalTranslator:
                 "lub utwórz plik .env z wpisem GEMINI_API_KEY=twój_klucz"
             )
         
-        self.client = genai.Client(api_key=self.api_key, http_options=types.HttpOptions(timeout=45000))
+        timeout_ms = int(os.getenv("GEMINI_HTTP_TIMEOUT_MS", "120000"))
+        self.client = genai.Client(api_key=self.api_key, http_options=types.HttpOptions(timeout=timeout_ms))
         self.model = model
         self.model_phase1 = model
         self.model_phase2 = model_phase2 or model
@@ -630,7 +631,8 @@ class MultimodalTranslator:
 
                 if is_timeout:
                     wait_time = min(3 + attempt * 2, 15)
-                    print(f"\n[Tłumacz / Faza 1]: Serwer Google potrzebował więcej czasu na odpowiedź (limit 45s).")
+                    timeout_sec = int(os.getenv("GEMINI_HTTP_TIMEOUT_MS", "120000")) // 1000
+                    print(f"\n[Tłumacz / Faza 1]: Serwer Google potrzebował więcej czasu na odpowiedź (limit {timeout_sec}s).")
                     print(f"  [..] Odczekuję {wait_time}s i ponawiam próbę #{attempt}...")
                     time.sleep(wait_time)
                 elif is_unavailable:

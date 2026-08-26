@@ -173,7 +173,8 @@ class DialogueVerifier:
                 
                 if is_timeout:
                     wait_sec = min(3 + attempt * 2, 15)
-                    print(f"\n[Redaktor Dialogów Pro / Faza 2]: Serwer Google potrzebował więcej czasu na analizę sceny (limit 45s).")
+                    timeout_sec = int(os.getenv("GEMINI_HTTP_TIMEOUT_MS", "120000")) // 1000
+                    print(f"\n[Redaktor Dialogów Pro / Faza 2]: Serwer Google potrzebował więcej czasu na analizę sceny (limit {timeout_sec}s).")
                     print(f"  [..] Odczekuję {wait_sec}s i ponawiam próbę #{attempt} (100% ochrona danych)...")
                     time.sleep(wait_sec)
                 elif is_unavailable or is_rate_limit:

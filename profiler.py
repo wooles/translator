@@ -267,7 +267,8 @@ Zwróć wynik w formacie JSON zgodnym ze schematem EpisodeProfile."""
 
                 if is_timeout:
                     wait_sec = min(3 + attempt * 2, 15)
-                    print(f"\n[Profiler Odcinka]: Serwer Google potrzebował więcej czasu na analizę profilu (limit 45s).")
+                    timeout_sec = int(os.getenv("GEMINI_HTTP_TIMEOUT_MS", "120000")) // 1000
+                    print(f"\n[Profiler Odcinka]: Serwer Google potrzebował więcej czasu na analizę profilu (limit {timeout_sec}s).")
                     print(f"  [..] Odczekuję {wait_sec}s i ponawiam próbę #{attempt}...")
                     time.sleep(wait_sec)
                 elif is_unavailable or is_rate_limit:
