@@ -171,17 +171,17 @@ class DialogueVerifier:
                 is_unavailable = "503" in err_str or "unavailable" in err_str or "high demand" in err_str
                 is_rate_limit = "429" in err_str or "quota" in err_str or "resource_exhausted" in err_str
 
-                wait_sec = 1.0
+                wait_sec = 0.5
                 if is_timeout:
                     timeout_sec = int(os.getenv("GEMINI_HTTP_TIMEOUT_MS", "120000")) // 1000
                     print(f"\n[Redaktor Dialogów / Faza 2]: Serwer Google potrzebował więcej czasu na analizę sceny (limit {timeout_sec}s).")
-                    print(f"  [..] Utrzymuję najwyższy model {self.model}. Błyskawiczne ponowienie za 1.0s (próba #{attempt})...")
+                    print(f"  [..] Utrzymuję najwyższy model {self.model}. Błyskawiczne ponowienie za 0.5s (próba #{attempt})...")
                     time.sleep(wait_sec)
                 elif is_unavailable or is_rate_limit:
                     print(f"\n[Redaktor Dialogów / Faza 2]: Chwilowe przeciążenie serwerów Google (503/429 na {self.model}).")
-                    print(f"  [..] Błyskawiczne ponowienie za 1.0s (próba #{attempt} - walka o natychmiastowy slot TPU)...")
+                    print(f"  [..] Błyskawiczne ponowienie za 0.5s (próba #{attempt} - walka o natychmiastowy slot TPU)...")
                     time.sleep(wait_sec)
                 else:
                     clean_msg = str(e).split("{")[0].strip() if "{" in str(e) else str(e)
-                    print(f"\n[Redaktor Dialogów / Faza 2]: Chwilowa przerwa w odpowiedzi API na {self.model}. Ponawianie próby #{attempt} za 1.0s ({clean_msg})...")
+                    print(f"\n[Redaktor Dialogów / Faza 2]: Chwilowa przerwa w odpowiedzi API na {self.model}. Ponawianie próby #{attempt} za 0.5s ({clean_msg})...")
                     time.sleep(wait_sec)
