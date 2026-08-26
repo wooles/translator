@@ -882,6 +882,45 @@ FILAR CXX: IDENTYFIKACJA POSTACI TYPU TOMBOY / SPORTOWIEC ORAZ MÓWCÓW NIEWIDOC
 - 2. Mówcy Niewidoczni / Głosy Nietypowe (Akwarium / Telefon / Zwierzątko / Duszek / Głos zza kadru):
   * Gdy w kadrze leży jedna postać, ale kwestię wypowiada ktoś inny (np. rybka-wiedźma Gon w akwarium, głos z telefonu), ZAWSZE weryfikuj tożsamość rzeczywistego mówcy z kartoteki i audio seiyū.
   * W razie niepewności stosuj naturalne polskie formy bezosobowe ("Mam poszukać?", "Mogę to sprawdzić?") zamiast ryzykownych form męskich.
+
+FILAR CXXI: PRZEKŁAD WYZNAŃ MIŁOSNYCH I WIELOZNACZNOŚCI KOKUHAKU (SUKI DA / DAISUKI VS LUBIĘ CIĘ / KOCHAM CIĘ):
+- W języku japońskim zwroty „Suki da” ( 好きだ ), „Daisuki” ( 大好き ) oraz „Aishiteru” ( 愛してる ) posiadają subtelny wektor emocjonalny zależny od intymności sceny:
+  * 1. W scenach wyznania miłosnego (Kokuhaku), uniesienia romantycznego, zachodu słońca, drżenia głosu i rumieńca w kadrze:
+    -> Angielskie tłumaczenie „I like you” / „I really like you” jest spłaszczeniem, które po polsku brzmi dziecinnie i sztucznie!
+    -> KARDYNALNY BŁĄD [X]: „Arata, ja cię po prostu bardzo lubię...” (brzmi jak strefa przyjaźni / friendzone!).
+    -> POPRAWNIE [OK]: „Arata, ja... po prostu cię kocham.” / „Zakochałam się w tobie.” / „Tak bardzo mi na tobie zależy...”.
+  * 2. W relacjach przyjacielskich / kumpelskich: „Uwielbiam cię”, „Super z ciebie kumpel”, „Jesteś niezastąpiony”.
+  * 3. W odniesieniu do przedmiotów, pasji, jedzenia, wina: „Uwielbiam to”, „Bardzo to lubię”, „Przepadam za tym”.
+
+FILAR CXXII: POETYKA POŻEGNANIA OSTATECZNEGO (SAYOUNARA VS ITTE KIMASU VS JA NE):
+- Angielskie napisy spłaszczają wszelkie formuły rozstania do „Goodbye”, „Bye” lub „See you”:
+  * 1. Sayōnara ( 左様なら ) w anime niesie potężny ciężar pożegnania ostatecznego (odejście na śmierć, zerwanie więzi, wyjazd na zawsze):
+    -> POPRAWNIE: „Żegnaj.” / „Żegnajcie.” (KATEGORYCZNY ZAKAZ urzędowego: „Do widzenia” na polu bitwy lub w chwili śmierci!).
+  * 2. Itte kimasu ( 行ってきます ) przy wyruszeniu na niebezpieczną misję / wyprawę:
+    -> POPRAWNIE: „Pora na mnie.” / „Ruszam w drogę.” / „Idę.”
+    -> Towarzysze odpowiadają (Itterasshai / 行ってらっしゃい): „Wracaj cały!” / „Uważaj na siebie!” / „Czekamy na ciebie!” (ZAKAZ szkolnego: „Wychodzę / Pa”).
+  * 3. Ja ne / Mata ne ( じゃあね / またね ) w codziennych relacjach: „Na razie!”, „Do jutra!”, „Trzymaj się!”.
+
+FILAR CXXIII: MAGIA PERFORMATYWNA, ZAKLĘCIA I PAKIETY MOCY (INCANTATION METRE & SPEECH ACTS):
+- W zaklęciach, pieczęciach, uwalnianiu mocy (Kaihō!) i formułach paktu (Speech Acts):
+  * KATEGORYCZNY ZAKAZ spłaszczania inkantacji do trybu opisowego („Składam przysięgę”, „Robię zaklęcie ognia”).
+  * WYMÓG CZASOWNIKÓW PERFORMATYWNYCH CZASU TERAŹNIEJSZEGO DOKONANEGO:
+    -> „Rozkazuję ci, płomieniu...”, „Mocą pradawnego paktu, obudź się!”, „Przysięgam na krew przodków...”, „Uwolnij swą potęgę!”.
+  * Zachowaj dostojne, równe metrum sylabiczne i podniosły patos magiczny.
+
+FILAR CXXIV: POLSKA TYTULATURA DWORSKO-FEUDALNA I HIERARCHIA ARYSTOKRATYCZNA (COURT ETIQUETTE HIERARCHY):
+- W anime historycznych, fantasy i dworskich bezwzględnie stosuj żelazną polską hierarchię tytulatury, eliminując potworki językowe:
+  * 1. Cesarz / Cesarzowa / Suzeren: „Wasza Cesarska Mość”, „Najjaśniejszy Panie”.
+  * 2. Król / Królowa: „Wasza Królewska Mość”, „Wasza Wysokość”, „Panie mój”.
+  * 3. Książę / Księżniczka / Następca tronu: „Wasza Książęca Mość”, „Młody panie”, „Książę”.
+  * 4. Feudał / Namiestnik / Lord: „Wasza Miłość”, „Mój panie”, „Panie namiestniku” (ZAKAZ: „Wasz Lordzie”, „Wasza Lady”).
+  * 5. Rycerz (Sir / Knight): „Panie rycerzu”, „Sir [Imię]”.
+
+FILAR CXXV: ERGONOMIA GAGÓW SLAPSTICKOWYCH I KOMEDII FIZYCZNEJ (VISUAL SLAPSTICK MINIMALISM):
+- Gdy w kadrze dochodzi do gwałtownego humoru fizycznego (uderzenie patelnią, upadek, ucieczka w popłochu, komiczny grymas, deformacja Chibi):
+  * Długi, wielowyrazowy napis w dolnej części kadru jest błędem percepcji (widz czyta tekst zamiast patrzeć na animowany gag!).
+  * ŻELAZNA REGUŁA: Zredukuj tekst do maksymalnie 1–3 słów wykrzyknikowych o natychmiastowym odbiorze:
+    -> „Ała!”, „Stój, durniu!”, „Oszalałeś?!”, „Z drogi!”, „Pomocy!”, „Ani kroku dalej!”.
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -1536,10 +1575,25 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
    - Kwestie piosenek (nutka '♪', '♫', styl Karaoke/Song/OP/ED) tłumacz rymowanym wierszem sylabicznym o równej liczbie sylab i naturalnych polskich rymach (AABB/ABAB wg Stanisława Barańczaka).
 83. MATRYCA IDIOLEKTÓW POSTACI (FILAR CXIX):
    - Utrzymuj ostry, wyrazisty i unikalny profil językowy dla każdego bohatera (chuligan vs arystokratka vs naukowiec vs tsundere).
+84. WYZNANIA MIŁOSNE I WIELOZNACZNOŚĆ KOKUHAKU (FILAR CXXI):
+   - W scenach wyznania miłosnego (rumieniec, intymność, wzruszenie) zwrot 'Suki' / 'Daisuki' tłumacz jako wyznanie miłości ('Kocham cię', 'Zakochałam się w tobie', 'Tak mi na tobie zależy'), a NIE szkolne 'Lubię cię' (friendzone).
+85. POETYKA POŻEGNANIA OSTATECZNEGO (FILAR CXXII):
+   - Rozróżniaj 'Sayōnara' (pożegnanie ostateczne/śmierć -> 'Żegnaj') od 'Itte kimasu' (wyruszenie na misję -> 'Pora na mnie / Ruszam w drogę' -> 'Wracaj cały!') i 'Ja ne' ('Na razie').
+86. MAGIA PERFORMATYWNA I INKANTACJE (FILAR CXXIII):
+   - W zaklęciach i przysięgach stosuj podniosłe czasowniki performatywne ('Rozkazuję ci...', 'Mocą paktu, obudź się!', 'Przysięgam...') o dostojnym metrum sylabicznym.
+87. POLSKA TYTULATURA DWORSKO-FEUDALNA (FILAR CXXIV):
+   - Stosuj ścisłą hierarchię tytulatury: Cesarz ('Wasza Cesarska Mość'), Król ('Wasza Królewska Mość / Wasza Wysokość'), Książę ('Wasza Książęca Mość / Młody panie'), Feudał ('Wasza Miłość / Mój panie'), Rycerz ('Panie rycerzu / Sir').
+88. ERGONOMIA GAGÓW SLAPSTICKOWYCH (FILAR CXXV):
+   - W dynamicznych scenach komedii fizycznej i slapsticku redukuj napis do 1–3 słów wykrzyknikowych ('Ała!', 'Stój, durniu!', 'Oszalałeś?!'), nie zasłaniając animacji gagu.
       * "[Filar XVI - Shūjoshi] 'Iku zo!' -> 'No to ruszamy!'"
       * "[Filar XVII - Onomatopeja] 'Zokutto shita' -> 'Przeszły mnie ciarki'"
       * "[Filar CXVIII - Barańczak Song] Przełożono piosenkę rymowanym 8-zgłoskowcem z nutką ♪"
       * "[Filar CXIX - Idiolekt] Zaostrzono szorstki styl wypowiedzi chuligana"
+      * "[Filar CXXI - Kokuhaku] 'I really like you' -> 'Po prostu cię kocham' (wyznanie miłosne w kadrze)"
+      * "[Filar CXXII - Sayonara] 'Goodbye' -> 'Żegnaj' (odejście na pole bitwy)"
+      * "[Filar CXXIII - Incantation] 'I cast fire' -> 'Płoń, płomieniu zagłady!' (performatywna formuła czaru)"
+      * "[Filar CXXIV - Feudal Etiquette] 'Your Lord' -> 'Wasza Miłość' (tytulatura namiestnika)"
+      * "[Filar CXXV - Slapstick] Skrócono kwestię paniki do 'Ała! Stój!'"
       * "[Filar XXIV - RPG Canon] 'Status Window' -> '[ OKNO STATUSU ]'"
       * "[Filar XIV - Pedersen ECR] 'konbini' -> 'sklep całodobowy'"
       * "[Filar XIII - Yakuwarigo] Dostosowano ton Ojou-sama do dystyngowanej polszczyzny"
@@ -2059,6 +2113,41 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR CXIX - Matryca Idiolektów i Unikalny Głos Postaci]: "
             "Utrzymuj unikalny styl wypowiedzi dla każdego bohatera (chuligan = szorstka leksyka i brak 'pana'; arystokratka = chłodny dystans i peryfrazy; tsundere = maskowana troska i sarkazm)."
+        )
+
+    # 64. Wyznania miłosne i Kokuhaku (Filar CXXI)
+    if any(w in combined_en for w in ["like you", "really like", "love", "suki", "daisuki", "aishiteru", "confess", "feelings for you", "crush"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CXXI - Wyznania Miłosne i Kokuhaku (Suki da vs Kocham cię)]: "
+            "W scenach romantycznych i wyznaniach miłosnych 'I like you' / 'suki' to wyznanie miłości ('Kocham cię', 'Zakochałam się w tobie', 'Tak mi na tobie zależy'). KATEGORYCZNY ZAKAZ szkolnego 'Lubię cię'!"
+        )
+
+    # 65. Pożegnania ostateczne i misje bojowe (Filar CXXII)
+    if any(w in combined_en for w in ["goodbye", "farewell", "sayonara", "itte kimasu", "itterasshai", "leaving", "parting"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CXXII - Poetyka Pożegnania Ostatecznego (Sayōnara vs Itte kimasu)]: "
+            "Rozróżniaj 'Sayōnara' (pożegnanie ostateczne/śmierć -> 'Żegnaj') od 'Itte kimasu' (wyruszenie na misję -> 'Pora na mnie / Ruszam w drogę' -> 'Wracaj cały!'). Zakaz szkolnego 'Do widzenia' na polu bitwy!"
+        )
+
+    # 66. Magia performatywna i zaklęcia (Filar CXXIII)
+    if any(w in combined_en for w in ["spell", "cast", "incantation", "awaken", "seal", "pact", "flame", "summon", "kaiho", "power"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CXXIII - Magia Performatywna i Inkantacje]: "
+            "W zaklęciach i formułach mocy stosuj czasowniki performatywne czasu teraźniejszego dokonanego ('Rozkazuję ci, płomieniu...', 'Mocą paktu, obudź się!'). Zakaz trybu opisowego!"
+        )
+
+    # 67. Tytulatura dworsko-feudalna (Filar CXXIV)
+    if any(w in combined_en for w in ["majesty", "highness", "your grace", "emperor", "empress", "king", "queen", "prince", "princess", "lord", "lady"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CXXIV - Polska Tytulatura Dworsko-Feudalna]: "
+            "Stosuj ścisłą hierarchię: Cesarz ('Wasza Cesarska Mość'), Król ('Wasza Królewska Mość / Wasza Wysokość'), Książę ('Wasza Książęca Mość / Młody panie'), Feudał ('Wasza Miłość / Mój panie'). Zakaz potworków 'Wasz Lordzie'!"
+        )
+
+    # 68. Ergonomia gagów slapstickowych (Filar CXXV)
+    if any(w in combined_en for w in ["ouch", "slap", "hit", "crash", "run!", "get out", "ow!", "wha?!", "moron!"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CXXV - Ergonomia Gagów Slapstickowych i Komedii Fizycznej]: "
+            "W dynamicznych scenach humoru fizycznego redukuj napis do 1–3 słów wykrzyknikowych ('Ała!', 'Stój, durniu!', 'Oszalałeś?!'), aby nie zasłaniać animacji gagu."
         )
 
     if not focused_pillars:

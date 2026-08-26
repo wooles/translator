@@ -145,7 +145,17 @@ def test_rules_and_prompts():
     assert "FILAR CXV:" in sys_prompt
     assert "FILAR CXVI:" in sys_prompt
     assert "FILAR CXVII:" in sys_prompt
-    print(" -> PASSED: Kompletny Zunifikowany Kanon 117 Filarów AVT (Filary I – CXVII) jest aktywny w obu fazach tłumaczenia.")
+    assert "FILAR CXVIII:" in sys_prompt
+    assert "FILAR CXIX:" in sys_prompt
+    assert "FILAR CXX:" in sys_prompt
+    assert "FILAR CXXI:" in sys_prompt
+    assert "FILAR CXXII:" in sys_prompt
+    assert "FILAR CXXIII:" in sys_prompt
+    assert "FILAR CXXIV:" in sys_prompt
+    assert "FILAR CXXV:" in sys_prompt
+    assert "FILAR CXXI" in ver_prompt
+    assert "FILAR CXXV" in ver_prompt
+    print(" -> PASSED: Kompletny Zunifikowany Kanon 125 Filarów AVT (Filary I – CXXV) jest aktywny w obu fazach tłumaczenia.")
 
 def test_pydantic_schemas():
     print("[TEST 2/5] Weryfikacja schematów Pydantic...")
@@ -703,6 +713,16 @@ def test_dynamic_rule_dispatcher():
     batch_v = [{"en": "Look, I can see it!"}]
     focused_v = get_focused_rules_for_batch(batch_v)
     assert "FILAR XXXVII" in focused_v
+
+    # 5. Test paczki z wyznaniem miłosnym (Filar CXXI)
+    batch_love = [{"en": "The truth is, I really like you!"}]
+    focused_love = get_focused_rules_for_batch(batch_love)
+    assert "FILAR CXXI" in focused_love
+
+    # 6. Test paczki z pożegnaniem na misję (Filar CXXII)
+    batch_bye = [{"en": "Sayonara, everyone! Itte kimasu!"}]
+    focused_bye = get_focused_rules_for_batch(batch_bye)
+    assert "FILAR CXXII" in focused_bye
     print(" -> PASSED: Dyspozytor reguł precyzyjnie aktywuje właściwe filary AVT.")
 
 def test_fuzzy_and_dynamic_avt_linter():
