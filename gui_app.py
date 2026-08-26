@@ -228,6 +228,7 @@ class TranslationWorker(QThread):
 
             # Dynamic model resolution
             models = resolve_best_models()
+            thinking_budget = 4096
             if self.profile_idx == "1":
                 p1_model = models["flash_lite"]
                 p2_model = None
@@ -237,15 +238,17 @@ class TranslationWorker(QThread):
                 p2_model = None
                 enable_verifier = False
             elif self.profile_idx == "4":
-                p1_model = models["pro"]
-                p2_model = models["pro"]
-                enable_verifier = True
-            else:  # Profile 3 (Master Pro)
                 p1_model = models["flash"]
                 p2_model = models["pro"]
                 enable_verifier = True
+                thinking_budget = 1600
+            else:  # Profile 3 (Mistrzowski Flash Reasoning 4096 - Domyślny)
+                p1_model = models["flash"]
+                p2_model = models["flash"]
+                enable_verifier = True
+                thinking_budget = 4096
 
-            self.log_signal.emit(f"🚀 Inicjalizacja silnika: Faza 1 ({p1_model})" + (f" -> Faza 2 ({p2_model})" if enable_verifier else ""))
+            self.log_signal.emit(f"🚀 Inicjalizacja silnika: Faza 1 ({p1_model})" + (f" -> Faza 2 ({p2_model} CoT {thinking_budget})" if enable_verifier else ""))
 
             engine = TranslatorEngine(
                 api_key=api_key,
@@ -254,7 +257,8 @@ class TranslationWorker(QThread):
                 enable_verifier=enable_verifier,
                 keep_honorifics=self.keep_honorifics,
                 use_whisper=self.use_whisper,
-                whisper_model_size=self.whisper_model
+                whisper_model_size=self.whisper_model,
+                thinking_budget_phase2=thinking_budget
             )
 
             total_files = len(self.files_to_process)
@@ -770,10 +774,10 @@ class MainWindow(QMainWindow):
         prof_layout = QVBoxLayout(gb_profiles)
         
         self.bg_profiles = QButtonGroup(self)
-        self.rb_prof1 = QRadioButton("[1] Szybki (Free Tier) — 0,00 PLN (Model Flash-Lite)")
-        self.rb_prof2 = QRadioButton("[2] Studyjny Flash — ~0,21 PLN / odc. (Ekstremalnie tani, szybki)")
-        self.rb_prof3 = QRadioButton("[3] Master Pro ⭐ — ~2,25 PLN / odc. (Zalecany: 100% Płaskowyż Jakości Kinowej)")
-        self.rb_prof4 = QRadioButton("[4] Kinowy Ultra 👑 — ~4,10 PLN / odc. (Podwójny Pro 3.1: Faza 1 + Faza 2)")
+        self.rb_prof1 = QRadioButton("[1] Szybki (Free Tier) — 0,00 PLN (Model Flash-Lite, bez Fazy 2)")
+        self.rb_prof2 = QRadioButton("[2] Studyjny Flash — ~0,80 PLN / odc. (Szkic Flash 3.7, bez Fazy 2)")
+        self.rb_prof3 = QRadioButton("[3] Mistrzowski Flash Reasoning ⭐ — ~2,85 PLN / odc. (ZALECANY: Faza 1 Flash + Faza 2 Flash z Thinking 4096)")
+        self.rb_prof4 = QRadioButton("[4] Kinowy Pro 👑 — ~7,80 PLN / odc. (Maksymalna Głębia: Faza 1 Flash + Faza 2 Gemini 3.1 Pro)")
         self.rb_prof3.setChecked(True)
 
         self.bg_profiles.addButton(self.rb_prof1, 1)

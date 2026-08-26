@@ -315,7 +315,8 @@ class MultimodalTranslator:
         max_image_width: int = 540,
         keep_honorifics: bool = True,
         use_whisper: bool = True,
-        whisper_model_size: str = "kotoba-tech/kotoba-whisper-v2.0-faster"
+        whisper_model_size: str = "kotoba-tech/kotoba-whisper-v2.0-faster",
+        thinking_budget_phase2: Optional[int] = None
     ):
         self.api_key = api_key or os.getenv("GEMINI_API_KEY")
         if not self.api_key:
@@ -333,6 +334,7 @@ class MultimodalTranslator:
         self.enable_verifier = enable_verifier
         self.max_image_width = max_image_width
         self.keep_honorifics = keep_honorifics
+        self.thinking_budget_phase2 = thinking_budget_phase2
         self.system_prompt = get_translation_system_prompt(keep_honorifics=keep_honorifics)
         
         # Episode Profiler (Pre-pass Glossary & Character Matrix)
@@ -351,7 +353,8 @@ class MultimodalTranslator:
             self.verifier = DialogueVerifier(
                 client=self.client,
                 model=self.model_phase2,
-                keep_honorifics=keep_honorifics
+                keep_honorifics=keep_honorifics,
+                thinking_budget=self.thinking_budget_phase2
             )
         
         # In-episode character memory (Character Registry)

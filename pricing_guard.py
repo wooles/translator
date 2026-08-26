@@ -57,7 +57,9 @@ class PricingGuard:
         system_prompt_tokens = 39000  # AVT Pillars in Context Cache
         batch_input_tokens = 2500      # Video frame + context window + Whisper audio
         batch_output_f1_tokens = 5100  # Translation JSON + Scene Diagnosis + 24 lines
-        batch_output_pro_tokens = 5800 # Pro Refinement JSON (24 lines + changes_made) + Scene Diagnosis + 1600 CoT Thinking budget
+        batch_output_f1_tokens = 5100   # Translation JSON + Scene Diagnosis + 24 lines
+        batch_output_flash_cot = 6600   # Flash 3.7 Refinement JSON + Scene Diagnosis + 4096 Thinking Budget
+        batch_output_pro_tokens = 5800  # Pro 3.1 Refinement JSON + Scene Diagnosis + 1600 Thinking Budget
 
         profile = profile.lower()
 
@@ -66,7 +68,7 @@ class PricingGuard:
 
         elif profile in ["2", "studio", "flash"]:
             rate = GOOGLE_API_RATES["flash"]
-            # Phase 1: Flash 3.7
+            # Phase 1: Flash 3.7 (Single phase, no Phase 2 verifier)
             p1_cached_in = (batches * system_prompt_tokens) if has_cache else 0
             p1_uncached_in = (batches * batch_input_tokens) + (0 if has_cache else batches * system_prompt_tokens)
             p1_out = batches * batch_output_f1_tokens
@@ -76,26 +78,15 @@ class PricingGuard:
                 (p1_uncached_in / 1_000_000) * rate["input_uncached"] +
                 (p1_out / 1_000_000) * rate["output"]
             )
-            # Phase 2: Flash Refinement
-            p2_cached_in = (batches * system_prompt_tokens) if has_cache else 0
-            p2_uncached_in = (batches * batch_input_tokens) + (0 if has_cache else batches * system_prompt_tokens)
-            p2_out = batches * 1200
-
-            cost_p2_usd = (
-                (p2_cached_in / 1_000_000) * rate["input_cached"] +
-                (p2_uncached_in / 1_000_000) * rate["input_uncached"] +
-                (p2_out / 1_000_000) * rate["output"]
-            )
-            storage_active_usd = 0.0128 # 20 min active storage during execution
+            storage_active_usd = 0.0128
             profiler_usd = 0.002
-            total_pln = (cost_p1_usd + cost_p2_usd + storage_active_usd + profiler_usd) * usd_pln
+            total_pln = (cost_p1_usd + storage_active_usd + profiler_usd) * usd_pln
             return round(total_pln, 2)
 
-        elif profile in ["3", "pro", "master"]:
+        elif profile in ["3", "master", "flash_reasoning", "pro_level3"]:
             rate_flash = GOOGLE_API_RATES["flash"]
-            rate_pro = GOOGLE_API_RATES["pro"]
 
-            # Phase 1 (Vision + Flash 3.7)
+            # Phase 1: Vision + Flash 3.7
             p1_cached_in = (batches * system_prompt_tokens) if has_cache else 0
             p1_uncached_in = batches * (batch_input_tokens + 516) + (0 if has_cache else batches * system_prompt_tokens)
             p1_out = batches * batch_output_f1_tokens
@@ -105,35 +96,36 @@ class PricingGuard:
                 (p1_out / 1_000_000) * rate_flash["output"]
             )
 
-            # Phase 2 (Pro Refinement + Extended CoT Thinking)
+            # Phase 2: Flash 3.7 Refinement with 4096 Deep Thinking Budget
             p2_cached_in = (batches * system_prompt_tokens) if has_cache else 0
             p2_uncached_in = (batches * batch_input_tokens) + (0 if has_cache else batches * system_prompt_tokens)
-            p2_out = batches * batch_output_pro_tokens
+            p2_out = batches * batch_output_flash_cot
             cost_p2_usd = (
-                (p2_cached_in / 1_000_000) * rate_pro["input_cached"] +
-                (p2_uncached_in / 1_000_000) * rate_pro["input_uncached"] +
-                (p2_out / 1_000_000) * rate_pro["output"]
+                (p2_cached_in / 1_000_000) * rate_flash["input_cached"] +
+                (p2_uncached_in / 1_000_000) * rate_flash["input_uncached"] +
+                (p2_out / 1_000_000) * rate_flash["output"]
             )
 
-            storage_active_usd = 0.0594 # 20 min active Pro storage during execution
+            storage_active_usd = 0.0128 # 20 min active Flash storage
             profiler_usd = 0.002
             total_pln = (cost_p1_usd + cost_p2_usd + storage_active_usd + profiler_usd) * usd_pln
             return round(total_pln, 2)
 
-        elif profile in ["4", "ultra", "ultra_pro", "cinema"]:
+        elif profile in ["4", "ultra", "ultra_pro", "cinema", "pro", "pro_level4"]:
+            rate_flash = GOOGLE_API_RATES["flash"]
             rate_pro = GOOGLE_API_RATES["pro"]
 
-            # Phase 1 (Vision + Pro 3.1 + CoT Thinking)
+            # Phase 1: Vision + Flash 3.7
             p1_cached_in = (batches * system_prompt_tokens) if has_cache else 0
             p1_uncached_in = batches * (batch_input_tokens + 516) + (0 if has_cache else batches * system_prompt_tokens)
-            p1_out = batches * batch_output_pro_tokens
+            p1_out = batches * batch_output_f1_tokens
             cost_p1_usd = (
-                (p1_cached_in / 1_000_000) * rate_pro["input_cached"] +
-                (p1_uncached_in / 1_000_000) * rate_pro["input_uncached"] +
-                (p1_out / 1_000_000) * rate_pro["output"]
+                (p1_cached_in / 1_000_000) * rate_flash["input_cached"] +
+                (p1_uncached_in / 1_000_000) * rate_flash["input_uncached"] +
+                (p1_out / 1_000_000) * rate_flash["output"]
             )
 
-            # Phase 2 (Pro Refinement + CoT Thinking)
+            # Phase 2: Gemini 3.1 Pro Refinement + 1600 CoT Thinking
             p2_cached_in = (batches * system_prompt_tokens) if has_cache else 0
             p2_uncached_in = (batches * batch_input_tokens) + (0 if has_cache else batches * system_prompt_tokens)
             p2_out = batches * batch_output_pro_tokens
