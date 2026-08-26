@@ -41,9 +41,9 @@ class DialogueVerifier:
             self.thinking_budget = thinking_budget
         else:
             try:
-                self.thinking_budget = int(os.getenv("PHASE2_THINKING_BUDGET", "1600"))
+                self.thinking_budget = int(os.getenv("PHASE2_THINKING_BUDGET", "6144"))
             except (ValueError, TypeError):
-                self.thinking_budget = 1600
+                self.thinking_budget = 6144
 
     def verify_batch(
         self,
@@ -110,20 +110,22 @@ class DialogueVerifier:
         import time
         attempt = 0
 
-        # Determine adaptive CoT thinking budget based on batch complexity (Elastic Budget)
-        effective_budget = self.thinking_budget
+        # Determine adaptive CoT thinking budget based on batch complexity (Elastic Multi-Tier Budget)
         has_song = any(item.get("is_song") for item in batch_items)
         has_audio_alert = any(item.get("audio_alert") for item in batch_items)
         has_pragmatic_reg = any(item.get("pragmatic_register") for item in batch_items)
         has_condensation = any(item.get("condensation_directive") for item in batch_items)
         has_long_dialogue = any(len(item.get("en", "").split()) > 10 for item in batch_items)
 
+        # Tier 1: Piosenki OP/ED (Barańczak), kalambury fonetyczne i alarmy rozbieżności audio
         if has_song or has_audio_alert:
-            effective_budget = min(self.thinking_budget, 4096)
+            effective_budget = max(4096, min(self.thinking_budget, 6144))
+        # Tier 2: Rejestry feudalne/dworskie, kompresja czasowa i długie narady militarne
         elif has_pragmatic_reg or has_condensation or has_long_dialogue:
-            effective_budget = min(self.thinking_budget, 2048)
+            effective_budget = max(2048, min(self.thinking_budget, 3072))
+        # Tier 3: Standardowy, żywy dialog codzienny
         else:
-            effective_budget = min(self.thinking_budget, 1024)
+            effective_budget = min(self.thinking_budget, 1280)
 
         while True:
             attempt += 1

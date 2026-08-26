@@ -447,17 +447,17 @@ def main():
                 model_p1 = best_models["flash"]
                 model_p2 = best_models["flash"]
                 enable_verifier = True
-                thinking_budget = 4096
+                thinking_budget = 6144
         except (EOFError, KeyboardInterrupt):
             model_p1 = best_models["flash"]
             model_p2 = best_models["flash"]
             enable_verifier = True
-            thinking_budget = 4096
+            thinking_budget = 6144
     else:
         model_p1 = model_p1 or best_models["flash"]
         model_p2 = model_p2 or best_models["flash"]
         enable_verifier = True
-        thinking_budget = 4096
+        thinking_budget = 6144
 
     use_whisper = not args.no_whisper
 
