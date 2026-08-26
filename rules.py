@@ -1363,9 +1363,9 @@ ZASADY TECHNICZNE ODPOWIEDZI:
   1. "dramatic_context": Kto z kim rozmawia, w jakiej relacji i jakie emocje/napięcia panują w scenie.
   2. "dialogue_flow": Ciąg przyczynowo-skutkowy (np. linia A to zaproszenie, linia B to odmowa lub zbycie tematu).
   3. "audio_intent_check": Co postacie NAPRAWDĘ mówią po japońsku w transkrypcji Whisper (zwłaszcza formy odmowy 'ii desu', rozkazy 'kure', dług 'giri/sumimasen') i gdzie angielski skrypt spłaszcza oryginał.
-- WZBOGACONA DIAGNOZA KWESTII (Dla każdej linii):
-  * "visual_subtext": Określ krótko: czy usta są widoczne (On-screen vs Off-screen / monolog wewnętrzny), mikro-emocję mówiącego (np. drżenie warg, ukrywany gniew, zawstydzenie) oraz semiotykę rekwizytu/planszy.
-  * "literal_meaning": Jeśli kwestia zawiera trudny koncept japoński, metaforę lub idiom, podaj zwięźle jego ścisły dosłowny sens jako wsparcie dla Redaktora Fazy 2.
+- ZASADA RZADKIEJ DIAGNOZY (SPARSE DIAGNOSTICS - ZERO MARNOTRAWSTWA TOKENÓW):
+  * W polach "visual_subtext", "literal_meaning", "visual_clues" i "notes" zwracaj null dla prostych, jednoznacznych kwestii.
+  * Wypełniaj te pola zwięźle (1 zwięzłe zdanie) TYLKO wtedy, gdy zachodzi rzeczywisty podtekst, sprzeczność mimiki z tekstem, monolog wewnętrzny (Off-screen) lub trudny idiom japoński.
 - Zwracaj WYŁĄCZNIE czysty, naturalny tekst dialogowy dopasowany do żywej polszczyzny kinowej.
 - STOSUJ KONDENSACJĘ I ELIPSĘ: usuwaj zbędne "Ja", watę słowną i powtórzenia rzeczowników (Filar CII).
 - PAMIĘTAJ O RELACJACH: Uczeń mówiący o nauczycielce mówi "pani Teshima" / "pani Teshimy" (a nie bezimiennie "Teshima").

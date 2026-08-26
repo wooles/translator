@@ -69,7 +69,8 @@ from avt_formatter import (
     calculate_cps,
     calculate_condensation_directive,
     snap_subtitles_to_shot_cuts,
-    format_diegetic_sound_wall
+    format_diegetic_sound_wall,
+    clean_text_for_len
 )
 from prosody_engine import AudioProsodyEngine
 from speaker_diarizer import SpeakerVoiceClassifier
@@ -326,6 +327,40 @@ def apply_simultaneous_dialogue_formatting(events: List[Any]) -> List[Any]:
 
     return sorted_events
 
+def create_adaptive_batches(raw_entries: list, base_batch_size: int = 24, max_batch_size: int = 32) -> list:
+    """
+    Groups subtitle events into coherent, scene-aligned batches of 24-32 lines,
+    adapting to dialogue density and scene pauses (> 4.0s gap starts a new batch).
+    """
+    if not raw_entries:
+        return []
+
+    batches = []
+    current_batch = []
+    current_words = 0
+
+    for item in raw_entries:
+        ev = item[1]
+        text_clean = clean_text_for_len(item[2])
+        words = len(text_clean.split())
+
+        is_full = len(current_batch) >= max_batch_size
+        is_dense = len(current_batch) >= base_batch_size and current_words >= 140
+        is_scene_break = current_batch and (ev.start - current_batch[-1][1].end) > 4000 and len(current_batch) >= 18
+
+        if is_full or is_dense or is_scene_break:
+            batches.append(current_batch)
+            current_batch = []
+            current_words = 0
+
+        current_batch.append(item)
+        current_words += max(1, words)
+
+    if current_batch:
+        batches.append(current_batch)
+
+    return batches
+
 class CharacterInfo(BaseModel):
     name: str = Field(description="Imię lub określenie postaci (np. 'Arata', 'Minami', 'Nauczyciel')")
     gender: str = Field(description="Płeć postaci: 'mężczyzna', 'kobieta' lub 'inna'")
@@ -335,10 +370,10 @@ class LineTranslation(BaseModel):
     id: int = Field(description="ID kwestii dialogowej z wejścia")
     polish_text: str = Field(description="Przetłumaczona kwestia na język polski z uwzględnieniem płci, sceny i eliminacji kalek")
     speaker_gender: Optional[str] = Field(default=None, description="Zidentyfikowana płeć postaci mówiącej (np. 'mężczyzna', 'kobieta')")
-    visual_subtext: Optional[str] = Field(default=None, description="Mikro-ekspresja twarzy, ruch warg (on-screen/off-screen), monolog wewnętrzny lub semiotyka rekwizytu")
-    literal_meaning: Optional[str] = Field(default=None, description="Ścisłe dosłowne znaczenie trudnego konceptu/metafory japońskiej")
-    visual_clues: Optional[str] = Field(default=None, description="Krótka notatka o kadrze")
-    notes: Optional[str] = Field(default=None, description="Uwagi redakcyjne")
+    visual_subtext: Optional[str] = Field(default=None, description="Zasada Sparse: podaj zwięźle TYLKO w razie konieczności (nietypowa mimika, ruch ust Off-screen, rumieniec, ironia). Dla zwykłych kwestii pozostaw null.")
+    literal_meaning: Optional[str] = Field(default=None, description="Zasada Sparse: podaj zwięźle TYLKO dla trudnych konceptów kulturowych, idiomów lub wieloznaczności japońskiej. Dla zwykłych kwestii pozostaw null.")
+    visual_clues: Optional[str] = Field(default=None, description="Krótka notatka o kadrze (tylko gdy istotna, inaczej null)")
+    notes: Optional[str] = Field(default=None, description="Uwagi redakcyjne (tylko w razie potrzeby, inaczej null)")
 
 class BatchTranslationResponse(BaseModel):
     scene_diagnosis: Optional[SceneDiagnosis] = Field(default=None, description="Obowiązkowa diagnoza sytuacji, intencji i podtekstu sceny PRZED tłumaczeniem")
@@ -992,10 +1027,11 @@ class MultimodalTranslator:
         if self.whisper:
             print(f"  [Lokalny Whisper STT]: AKTYWNY (model {self.whisper.model_size})")
 
-        batches = [
-            raw_entries[i:i + self.batch_size]
-            for i in range(0, total_lines, self.batch_size)
-        ]
+        batches = create_adaptive_batches(
+            raw_entries,
+            base_batch_size=self.batch_size,
+            max_batch_size=min(32, self.batch_size + 8)
+        )
 
         with tqdm(total=total_lines, desc="Tłumaczenie dialogów", unit="linii") as pbar:
             pbar.start_t = time.time()

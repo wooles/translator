@@ -569,7 +569,16 @@ def test_avt_formatter_and_cps():
     snapped = snap_subtitles_to_shot_cuts(evs, shot_cuts_ms=[1000, 3000], max_snap_gap_ms=200)
     assert snapped[0].start == 1000  # snapped to 1000ms cut
     assert snapped[0].end == 2960    # snapped 40ms before 3000ms cut
-    print(" -> PASSED: Podział linii AVT, CPS, Shot-Cut Snapping, Condensation i Sound-Wall działają w 100%.")
+
+    # Test adaptacyjnego grupowania paczek (Adaptive Batching)
+    from translator import create_adaptive_batches
+    raw_dummy = [
+        (i, DummyEvent(i * 1000, i * 1000 + 800), f"Krótki tekst {i}", "")
+        for i in range(60)
+    ]
+    adaptive_res = create_adaptive_batches(raw_dummy, base_batch_size=24, max_batch_size=32)
+    assert len(adaptive_res) == 2  # 60 lines packed into 2 batches (32 + 28) instead of 3 rigid batches (24 + 24 + 12)!
+    print(" -> PASSED: Podział linii AVT, CPS, Shot-Cut Snapping, Condensation, Sound-Wall i Adaptive Batching działają w 100%.")
 
 def test_prosody_and_diarizer():
     print("[TEST 11/12] Test lokalnej analizy prozodii i diarizacji fonicznej F0...")

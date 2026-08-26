@@ -110,6 +110,21 @@ class DialogueVerifier:
         import time
         attempt = 0
 
+        # Determine adaptive CoT thinking budget based on batch complexity (Elastic Budget)
+        effective_budget = self.thinking_budget
+        has_song = any(item.get("is_song") for item in batch_items)
+        has_audio_alert = any(item.get("audio_alert") for item in batch_items)
+        has_pragmatic_reg = any(item.get("pragmatic_register") for item in batch_items)
+        has_condensation = any(item.get("condensation_directive") for item in batch_items)
+        has_long_dialogue = any(len(item.get("en", "").split()) > 10 for item in batch_items)
+
+        if has_song or has_audio_alert:
+            effective_budget = min(self.thinking_budget, 4096)
+        elif has_pragmatic_reg or has_condensation or has_long_dialogue:
+            effective_budget = min(self.thinking_budget, 2048)
+        else:
+            effective_budget = min(self.thinking_budget, 1024)
+
         while True:
             attempt += 1
             try:
@@ -124,7 +139,7 @@ class DialogueVerifier:
                     "response_schema": RefinedBatchResponse,
                 }
                 if "3.7" in self.model.lower() or "pro" in self.model.lower() or "2.5" in self.model.lower() or "3.6" in self.model.lower():
-                    gen_config_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=self.thinking_budget)
+                    gen_config_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=effective_budget)
 
                 if cached_name:
                     gen_config_kwargs["cached_content"] = cached_name
