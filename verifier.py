@@ -99,23 +99,37 @@ class DialogueVerifier:
 
         prompt_text = "\n".join(prompt_lines)
 
-        import time
+        from model_resolver import resolve_best_models
+        active_models = resolve_best_models(self.client)
+        candidate_models = [self.model]
+        if "flash" in self.model.lower():
+            m1 = active_models.get("flash", "gemini-3.7-flash")
+            m2 = active_models.get("flash_backup", "gemini-3.6-flash")
+            candidate_models = [m1, m2] if m1 != m2 else [m1]
+            if self.model not in candidate_models:
+                candidate_models.insert(0, self.model)
+        elif "pro" in self.model.lower():
+            m_pro = active_models.get("pro", "gemini-3.1-pro-preview")
+            candidate_models = [m_pro]
+
+        current_model_idx = 0
         attempt = 0
 
         while True:
             attempt += 1
+            current_model = candidate_models[current_model_idx]
             try:
                 from context_cache import ContextCacheManager
                 cached_name = ContextCacheManager.get_or_create_cache(
                     client=self.client,
-                    model=self.model,
+                    model=current_model,
                     system_instruction=self.system_prompt
                 )
                 gen_config_kwargs = {
                     "response_mime_type": "application/json",
                     "response_schema": RefinedBatchResponse,
                 }
-                if "3.7" in self.model.lower() or "pro" in self.model.lower() or "2.5" in self.model.lower():
+                if "3.7" in current_model.lower() or "pro" in current_model.lower() or "2.5" in current_model.lower() or "3.6" in current_model.lower():
                     gen_config_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=self.thinking_budget)
 
                 if cached_name:
@@ -124,7 +138,7 @@ class DialogueVerifier:
                     gen_config_kwargs["system_instruction"] = self.system_prompt
 
                 response = self.client.models.generate_content(
-                    model=self.model,
+                    model=current_model,
                     contents=[prompt_text],
                     config=types.GenerateContentConfig(**gen_config_kwargs)
                 )
@@ -136,7 +150,7 @@ class DialogueVerifier:
                     cands = getattr(um, "candidates_token_count", 0) or 0
                     thoughts = getattr(um, "thoughts_token_count", 0) or 0
                     self.current_episode_tokens["output"] += (cands + thoughts)
-                    self.current_episode_tokens["model"] = self.model
+                    self.current_episode_tokens["model"] = current_model
 
                 # Retrieve parsed structured output
                 if hasattr(response, "parsed") and response.parsed is not None:
@@ -153,7 +167,7 @@ class DialogueVerifier:
                 is_cache_err = "403" in err_str or "cachedcontent" in err_str or "permission" in err_str
                 if is_cache_err and cached_name:
                     from context_cache import ContextCacheManager
-                    ContextCacheManager.invalidate_cache(self.model, self.system_prompt)
+                    ContextCacheManager.invalidate_cache(current_model, self.system_prompt)
                     cached_name = None
                     continue
 
@@ -171,16 +185,26 @@ class DialogueVerifier:
                 is_unavailable = "503" in err_str or "unavailable" in err_str or "high demand" in err_str
                 is_rate_limit = "429" in err_str or "quota" in err_str or "resource_exhausted" in err_str
                 
+                # Instant failover switch to backup Flash model on 503/429/504
+                if (is_unavailable or is_rate_limit or is_timeout) and len(candidate_models) > 1:
+                    next_idx = (current_model_idx + 1) % len(candidate_models)
+                    if next_idx != current_model_idx:
+                        print(f"\n[Redaktor Dialogów / Faza 2]: Model {current_model} zgłasza przeciążenie (503/429).")
+                        print(f"  [>>] Błyskawiczne przełączenie na drugi najwyższy model Flash: {candidate_models[next_idx]} (Thinking {self.thinking_budget})...")
+                        current_model_idx = next_idx
+                        time.sleep(1)
+                        continue
+
                 if is_timeout:
                     wait_sec = min(3 + attempt * 2, 15)
                     timeout_sec = int(os.getenv("GEMINI_HTTP_TIMEOUT_MS", "120000")) // 1000
-                    print(f"\n[Redaktor Dialogów Pro / Faza 2]: Serwer Google potrzebował więcej czasu na analizę sceny (limit {timeout_sec}s).")
+                    print(f"\n[Redaktor Dialogów / Faza 2]: Serwer Google potrzebował więcej czasu na analizę sceny (limit {timeout_sec}s).")
                     print(f"  [..] Odczekuję {wait_sec}s i ponawiam próbę #{attempt} (100% ochrona danych)...")
                     time.sleep(wait_sec)
                 elif is_unavailable or is_rate_limit:
-                    wait_sec = min(5 + attempt * 3, 30)
-                    print(f"\n[Redaktor Dialogów Pro / Faza 2]: Chwilowe przeciążenie serwerów Google (503/429 na {self.model}).")
-                    print(f"  [..] Utrzymuję najwyższą jakość PRO. Czekam {wait_sec}s na wolny slot serwera (próba #{attempt})...")
+                    wait_sec = min(4 + attempt * 2, 20)
+                    print(f"\n[Redaktor Dialogów / Faza 2]: Chwilowe przeciążenie serwerów Google (503/429 na {current_model}).")
+                    print(f"  [..] Odczekuję {wait_sec}s na wolny slot serwera (próba #{attempt})...")
                     time.sleep(wait_sec)
                 else:
                     wait_sec = min(4 + attempt * 2, 20)
