@@ -874,6 +874,14 @@ FILAR CXIX: MATRYCA IDIOLEKTÓW I SPECJALIZACJA WOKALNA POSTACI (CHARACTER IDIOL
   * 2. Arystokratka / Dama / Książę: wykwintna składnia, peryfrazy, chłodny dystans, arystokratyczne honoryfikacje.
   * 3. Erudyta / Naukowiec / Mag: precyzyjne łączniki logiczne ('zważywszy na', 'w konsekwencji'), profesjonalna terminologia.
   * 4. Tsundere: pozorna szorstkość maskująca troskę, urwane frazy ('B-Baka' -> 'Głupi jesteś...', 'Wcale nie robię tego dla ciebie!').
+
+FILAR CXX: IDENTYFIKACJA POSTACI TYPU TOMBOY / SPORTOWIEC ORAZ MÓWCÓW NIEWIDOCZNYCH (GENDER IDENTIFICATION & OFF-SCREEN SPEAKER COGNITION):
+- 1. Dziewczyny o Chłopięcym Wyglądzie (Tomboy / Bokserki / Krótkie Włosy):
+  * Postacie żeńskie z krótkimi czarnymi włosami, w luźnych koszulkach lub strojach sportowych (np. Mari Otsu) to w 100% KOBIETY / DZIEWCZYNY.
+  * BEZWZGLĘDNY ZAKAZ narzucania form męskich ('poszedł', 'zrobił', 'chciał') wyłącznie na podstawie krótkiej fryzury lub luźnego stroju w kadrze!
+- 2. Mówcy Niewidoczni / Głosy Nietypowe (Akwarium / Telefon / Zwierzątko / Duszek / Głos zza kadru):
+  * Gdy w kadrze leży jedna postać, ale kwestię wypowiada ktoś inny (np. rybka-wiedźma Gon w akwarium, głos z telefonu), ZAWSZE weryfikuj tożsamość rzeczywistego mówcy z kartoteki i audio seiyū.
+  * W razie niepewności stosuj naturalne polskie formy bezosobowe ("Mam poszukać?", "Mogę to sprawdzić?") zamiast ryzykownych form męskich.
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """

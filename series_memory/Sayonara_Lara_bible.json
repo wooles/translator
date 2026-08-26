@@ -11,7 +11,16 @@
       "description": "Zwrot: 'na ty / po imieniu (Lara)' (przyjaciółki / współlokatorki)"
     },
     "Gon (Grace) -> Lara": {
-      "description": "Zwrot: 'na ty / po imieniu: Lara' (opiekunka / mentorka ze świata syren)"
+      "description": "PŁEĆ: ŻEŃSKA (Wiedźma/mentorka w postaci rybki w akwarium). Zawsze formy ŻEŃSKIE (np. poszukałam, widziałam, mogłabym). Zwrot: 'na ty / po imieniu: Lara'"
+    },
+    "Gon (Grace) -> Mari": {
+      "description": "PŁEĆ: ŻEŃSKA (Wiedźma/mentorka w akwarium mówiąca do leżącej na łóżku Mari). Obie to KOBIETY! Zawsze formy ŻEŃSKIE (np. 'Chcesz, żebym poszukała?' / 'Mam poszukać?'). Zwrot: 'Mari / na ty'"
+    },
+    "Mari Otsu": {
+      "description": "PŁEĆ: ŻEŃSKA / KOBIETA (Bokserka, krótko ścięte czarne włosy, luźna czarna koszulka, styl tomboy). Mimo krótkich włosów to w 100% DZIEWCZYNA! Wszystkie formy dotyczące jej lub przez nią wypowiadane muszą być ŻEŃSKIE!"
+    },
+    "Gon (Grace) -> Luca": {
+      "description": "PŁEĆ: ŻEŃSKA (Wiedźma/mentorka w akwarium). Zawsze formy ŻEŃSKIE (np. 'Chcesz, żebym poszukała?' / 'Mam poszukać?'). Zwrot: 'Luca / na ty'"
     },
     "Leo -> Luca": {
       "description": "Zwrot: 'braciszku / bracie' (młodszy brat -> starszy brat)"
