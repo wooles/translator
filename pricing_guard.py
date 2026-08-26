@@ -23,17 +23,17 @@ GOOGLE_API_RATES: Dict[str, Dict[str, float]] = {
     },
     "flash": {
         "name": "Gemini 3.7 Flash",
-        "input_uncached": 0.075,
-        "input_cached": 0.01875,  # -75% zniżki
-        "output": 0.30,
-        "storage_per_hour": 1.00,
+        "input_uncached": 0.75,
+        "input_cached": 0.075,  # -90% zniżki z Context Caching
+        "output": 3.75,         # Stawka za tokeny wyjściowe
+        "storage_per_hour": 0.50,
         "is_free_tier": False
     },
     "pro": {
         "name": "Gemini 3.1 Pro Preview",
-        "input_uncached": 1.25,   # Oficjalna stawka Google API (dla zapytań <= 128k tokenów)
-        "input_cached": 0.3125,   # -75% zniżki z Context Caching
-        "output": 5.00,           # Oficjalna stawka Google API (dla wyjścia <= 128k tokenów)
+        "input_uncached": 2.00,   # Oficjalna stawka Google API (dla zapytań <= 200k tokenów)
+        "input_cached": 0.20,     # -90% zniżki z Context Caching
+        "output": 12.00,          # Stawka za tokeny wyjściowe (w tym CoT Thinking)
         "storage_per_hour": 4.50,
         "is_free_tier": False
     }
