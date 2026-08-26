@@ -637,24 +637,23 @@ class MultimodalTranslator:
                         continue
 
                 if is_timeout:
-                    wait_time = min(3 + attempt * 2, 15)
+                    wait_time = min(2 + attempt, 6)
                     timeout_sec = int(os.getenv("GEMINI_HTTP_TIMEOUT_MS", "120000")) // 1000
                     print(f"\n[Tłumacz / Faza 1]: Serwer Google potrzebował więcej czasu na odpowiedź (limit {timeout_sec}s).")
                     print(f"  [..] Odczekuję {wait_time}s i ponawiam próbę #{attempt}...")
                     time.sleep(wait_time)
                 elif is_unavailable:
-                    wait_time = min(4 + attempt * 2, 20)
+                    wait_time = min(2 + (attempt - 1) * 0.5, 5.0)
                     print(f"\n[Tłumacz / Faza 1]: Chwilowe przeciążenie serwerów Google (503 UNAVAILABLE na {current_model}).")
-                    print(f"  [..] Utrzymuję najwyższą jakość modelu bez redukcji.")
-                    print(f"  Odczekuję {wait_time}s i ponawiam próbę #{attempt}...")
+                    print(f"  [..] Szybkie ponowienie za {wait_time:.1f}s (próba #{attempt})...")
                     time.sleep(wait_time)
                 elif is_rate_limit:
-                    wait_time = min(6 + attempt * 3, 30)
+                    wait_time = min(2 + (attempt - 1) * 0.5, 5.0)
                     print(f"\n[Tłumacz / Faza 1]: Chwilowy limit minutowy zapytań (429 Rate Limit na {current_model}).")
-                    print(f"  [..] Chwila przerwy na reset limitu ({wait_time}s)... Wznawiam automatycznie (próba #{attempt}).")
+                    print(f"  [..] Szybkie ponowienie za {wait_time:.1f}s (próba #{attempt})...")
                     time.sleep(wait_time)
                 else:
-                    wait_time = min(4 + attempt * 2, 20)
+                    wait_time = min(2 + attempt, 6)
                     clean_msg = str(e).split("{")[0].strip() if "{" in str(e) else str(e)
                     print(f"\n[Tłumacz / Faza 1]: Ponawianie próby #{attempt} za {wait_time}s ({clean_msg})...")
                     time.sleep(wait_time)
