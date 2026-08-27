@@ -282,12 +282,27 @@ def is_song_line(ev: Any, text: str) -> bool:
     """Detects whether subtitle line is part of a song (OP/ED/Theme/Song/Karaoke) or musical note text."""
     if not text:
         return False
-    style_name = (getattr(ev, "style", "") or "").lower()
-    song_style_keywords = ["op", "ed", "song", "theme", "insert", "karaoke", "romaji", "kanji", "piosenka", "śpiew", "music"]
-    if any(k in style_name for k in song_style_keywords):
-        return True
+    
+    clean_strip = text.strip()
+    # 1. Signs, brackets, headers, top captions are NEVER songs
+    if clean_strip.startswith("[") and clean_strip.endswith("]"):
+        return False
+    if r"\an8" in text or r"\an7" in text or r"\an9" in text or r"\pos" in text:
+        return False
+        
+    style_name = (getattr(ev, "style", "") or "").lower().strip()
+    if style_name in ["sign", "signs", "title", "top", "caption", "typesetting", "location", "header", "on-screen"]:
+        return False
+
+    # 2. Check for explicit musical note symbols in the original text
     if any(sym in text for sym in ["♪", "♫", "🎶", "♬"]):
         return True
+
+    # 3. Match song-specific style names (OP_Roman, ED_Kanji, Theme, Song, Karaoke)
+    style_normalized = style_name.replace("_", " ").replace("-", " ")
+    if re.search(r"\b(op|ed|opening|ending|song|songs|theme|insert|insert song|karaoke|romaji|kanji|piosenka|śpiew|music)\b", style_normalized):
+        return True
+        
     return False
 
 def apply_simultaneous_dialogue_formatting(events: List[Any]) -> List[Any]:
@@ -1334,7 +1349,7 @@ class MultimodalTranslator:
                         )
                         # Deterministic glossary overrides
                         final_text, gloss_fixes = GlossaryManager.apply_deterministic_overrides(final_text, combined_glossary)
-                        if item.get("is_song"):
+                        if item.get("is_song") and not item.get("is_sign"):
                             clean_no_notes = re.sub(r"^[♪♫♬\s]+|[♪♫♬\s]+$", "", final_text).strip()
                             if clean_no_notes:
                                 final_text = f"♪ {clean_no_notes} ♪"
@@ -1356,7 +1371,7 @@ class MultimodalTranslator:
                         )
                         # Deterministic glossary overrides
                         final_text, gloss_fixes = GlossaryManager.apply_deterministic_overrides(final_text, combined_glossary)
-                        if item.get("is_song"):
+                        if item.get("is_song") and not item.get("is_sign"):
                             clean_no_notes = re.sub(r"^[♪♫♬\s]+|[♪♫♬\s]+$", "", final_text).strip()
                             if clean_no_notes:
                                 final_text = f"♪ {clean_no_notes} ♪"
