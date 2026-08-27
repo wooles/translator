@@ -67,11 +67,14 @@ FILAR IV: ELIMINACJA SZTUCZNYCH CZASOWNIKÓW POSIŁKOWYCH I POZORNEGO TRWANIA:
   * "came into possession of" -> "zdobył", "ma", "wszedł w posiadanie" (ZAKAZ: "znalazł się w posiadaniu").
 
 FILAR V: ELIMINACJA ZBĘDNYCH ZAIMKÓW DZIERŻAWCZYCH I OSOBOWYCH:
-- Angielski wymaga zaimka przy każdej części ciała i własności. Po polsku relacja wynika z kontekstu:
+- Angielski wymaga zaimka przy każdej części ciała i własności. Po polsku relacja wynika z kontekstu i formy zaimka osobowego (celownik/biernik):
   * "I put my hands in my pockets" -> "Włożyłem ręce do kieszeni" (ZAKAZ: "moje ręce do moich kieszeni").
   * "She talked with her sister" -> "Rozmawiała z siostrą" (ZAKAZ: "ze swoją siostrą").
   * "Close your eyes" -> "Zamknij oczy" (ZAKAZ: "twoje oczy").
   * "I broke my leg" -> "Złamałem nogę" (ZAKAZ: "moją nogę").
+  * "He grabbed my hand / arm" -> "Złapał mnie za rękę / ramię" (ZAKAZ: "złapał moją rękę").
+  * "He cut his head / throat" -> "Ściął mu głowę / Podciął mu gardło" (ZAKAZ: "ściął jego głowę").
+  * "She looked into my eyes" -> "Spojrzała mi w oczy" (ZAKAZ: "spojrzała w moje oczy").
   * "I think that..." -> "Myślę, że..." (ZAKAZ: "Ja myślę, że...").
 
 FILAR VI: DEPASYWIZACJA (STRONA BIERNA -> CZYNNA / BEZOSOBOWA - TOMASZ TOMASZKIEWICZ):
@@ -402,6 +405,10 @@ FILAR LI: EKSPERCKA TERMINOLOGIA SPECJALISTYCZNA I MERYTORYCZNA (KONSULTANT BRAN
 FILAR LII: STYLIZACJA EPOKOWA, REALIA ŚWIATA I ELIMINACJA ANACHRONIZMÓW:
 - Gdy seria rozgrywa się w realiach historycznych (Imperium Mongolskie, feudalna Japonia, wikingowie, starożytne Chiny):
   * KATEGORYCZNY ZAKAZ współczesnego slangu młodzieżowego ('spoko', 'masakra', 'wkręcasz mnie', 'luzik', 'siema').
+  * KATEGORYCZNY ZAKAZ anachronizmów technologicznych/lotniczych/korporacyjnych:
+    -> "point of no return" -> "nie ma już odwrotu", "mosty zostały spalone", "kości zostały rzucone" (ZAKAZ: "punkt bez powrotu").
+    -> "status report" -> "jaka jest sytuacja?!", "mów, co się dzieje!" (ZAKAZ: "raport o statusie").
+    -> "target eliminated" -> "wróg padł", "cel unieszkodliwiony" (ZAKAZ: "zlikwidowano cel").
   * Dopasuj słownictwo do realiów epoki: 'władca / Chan', 'dwór', 'namiot / jurta', 'niedola', 'niewiasta', 'kupcy', 'wyprawa wojenna', 'zarządca'.
   * Zachowaj hierarchię społeczną dawnych epok ('Wasza Dostojność', 'Chanie', 'panie mój').
 
@@ -952,6 +959,30 @@ FILAR CXXX: GŁOS MASZYN, AI I SYSTEMÓW OPERACYJNYCH (ROBOTIC & HUD DIEGESIS):
 - W komunikatach komputerów pokładowych, magii systemowej, HUD i sztucznej inteligencji:
   * Stosuj beznamiętny, lakoniczny tryb orzekający czasu teraźniejszego:
     -> 'Cel namierzony. Autoryzacja zakończona sukcesem. Inicjalizacja procedury bojowej.'.
+
+FILAR CXXXI: WEKTOR BATALISTYCZNY I ZAKAZ FAŁSZYWYCH DOPEŁNIEŃ (BATTLEFIELD VECTOR & ANTI-FALSE OBJECT):
+- W dynamicznych scenach bitewnych, szarżach i starciach formacji wojskowych:
+  * Angielskie czasowniki ruchu i natarcia bez dopełnienia ('attacking from above', 'pushing through', 'flanking left', 'charging down'):
+    -> TŁUMACZ BEZ SZTUCZNEGO DOPISYWANIA ZAIMKA 'nas / naszych'!
+    -> Gdy sojusznicy szarżują z góry na wroga: 'Uderzają z góry!' / 'Atakują ze wzgórza!' (KATEGORYCZNY ZAKAZ: 'Rażą nas z góry!').
+  * Stosuj dynamiczne, naturalne polskie czasowniki o silnym wektorze ruchu: 'Przełamują szyk!', 'Wdzierają się od flanki!', 'Szarżują ze wzgórza!'.
+
+FILAR CXXXII: PRAGMATYKA „SASUGA” I DUMY WSPÓLNOTOWEJ (SASUGA & COMMUNITY PRIDE TRANSLATIONESE ELIMINATION):
+- Japońskie 'Sasuga' (さすが) oraz angielskie 'That's [X] for you' w kontekście uznania dla kunsztu, waleczności lub niezawodności formacji / postaci:
+  * KATEGORYCZNY ZAKAZ kalki 'Całe plemię X...' lub 'Oto masz całe X' (co w polszczyźnie brzmi złośliwie/ironicznie)!
+  * BEZWZGLĘDNIE TŁUMACZ JAKO PEŁEN DUMY ZWROT UZNANIA:
+    -> 'Jak przystało na [plemię Mera / kapitana]!'
+    -> 'Oto [plemię Mera] w całej krasie!'
+    -> 'W swoim żywiole!'
+    -> 'Nie bez powodu słyną z...'
+    -> 'Cały [Shin], nic się nie zmienił!' (wyłącznie w odniesieniu do typowego nawyku pojedynczej osoby).
+
+FILAR CXXXIII: TWARDA RETORYKA ROZKAZÓW BOJOWYCH (MILITARY COMMAND CADENCE & LACONIC IMPERATIVES):
+- Polskie rozkazy dowódców na polu bitwy muszą być krótkie, bezlitosne, lakoniczne i twarde (brak rozwlekłych, szkolnych form gramatycznych):
+  * 'Rout them all!' -> 'Wytłuc ich do nogi!' / 'Rozbić w puch!' / 'Nie brać jeńców!' (ZAKAZ: 'Przepędźcie ich wszystkich!').
+  * 'Hold the line!' -> 'Trzymać szyk!' / 'Ani kroku w tył!' / 'Utrzymać pozycję!' (ZAKAZ: 'Utrzymujcie linię!').
+  * 'All units, charge!' -> 'Wszystkie oddziały, do ataku!' / 'Cała armia, naprzód!' / 'Szarża!' (ZAKAZ: 'Szarżujcie!').
+  * 'Take down their commander!' -> 'Dopaść dowódcę!' / 'Ściąć głowę wodza!' (ZAKAZ: 'Zdejmijcie ich dowódcę').
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -2221,6 +2252,27 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR CXXX - Głos Maszyn, AI i Systemów Operacyjnych]: "
             "Stosuj beznamiętny, lakoniczny tryb orzekający czasu teraźniejszego ('Cel namierzony. Autoryzacja zakończona sukcesem.')."
+        )
+
+    # 74. Wektor Batalistyczny i Zakaz Fałszywych Dopełnień (Filar CXXXI)
+    if any(w in combined_en for w in ["attacking from", "from above", "from behind", "pushing through", "flanking", "charging down", "striking from"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CXXXI - Wektor Batalistyczny i Zakaz Fałszywych Dopełnień]: "
+            "Gdy sojusznicy atakują wroga z góry/z flanki, KATEGORYCZNIE ZAKAZANE jest dopisywanie zaimka 'nas' ('Rażą nas z góry' -> BŁĄD!). Tłumacz jako: 'Uderzają z góry!', 'Szarżują ze wzgórza!', 'Przełamują szyk!'."
+        )
+
+    # 75. Pragmatyka „Sasuga” i Dumy Wspólnotowej (Filar CXXXII)
+    if any(w in combined_en for w in ["that's the", "for you", "that's a", "sasuga", "as expected of"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CXXXII - Pragmatyka „Sasuga” i Dumy Wspólnotowej]: "
+            "Zwroty typu 'That's the [X] for you' / 'Sasuga' tłumacz jako dumne: 'Jak przystało na [plemię/postać]!', 'Oto [X] w całej krasie!', 'W swoim żywiole!'. KATEGORYCZNY ZAKAZ złośliwej kalki 'Całe plemię X...'!"
+        )
+
+    # 76. Twarda Retoryka Rozkazów Bojowych (Filar CXXXIII)
+    if any(w in combined_en for w in ["rout them", "hold the line", "all units", "charge!", "advance!", "fall back!", "take down the", "cut down"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CXXXIII - Twarda Retoryka Rozkazów Bojowych]: "
+            "Rozkazy dowódców tłumacz lakonicznie i bezlitośnie: 'Wytłuc ich do nogi!', 'Trzymać szyk!', 'Ani kroku w tył!', 'Do ataku!', 'Dopaść dowódcę!'. Zakaz ugrzecznionych, szkolnych form!"
         )
 
     if not focused_pillars:
