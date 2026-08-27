@@ -8,7 +8,7 @@ guaranteeing the translator always utilizes the most capable models without manu
 
 import re
 import logging
-from typing import Dict, Optional, List, Tuple
+from typing import Dict, Optional, List, Tuple, Any
 from google import genai
 
 logger = logging.getLogger("model_resolver")
@@ -107,3 +107,92 @@ def resolve_best_models(client: Optional[genai.Client] = None) -> Dict[str, str]
             "flash_lite": defaults["flash_lite"],
             "pro": defaults["pro"]
         }
+
+
+def probe_model_health(client: Optional[genai.Client], model_name: str) -> Dict[str, Any]:
+    """
+    Sends a 1-token micro-probe to Google API to measure real-time latency and server cluster health.
+    """
+    if not client or not model_name:
+        return {"status": "unknown", "tag": "⚪ Gotowy", "latency_s": 0.0, "is_available": True, "error_msg": ""}
+
+    import time
+    from google.genai import types
+
+    t0 = time.time()
+    try:
+        cfg = types.GenerateContentConfig(
+            max_output_tokens=1,
+            http_options=types.HttpOptions(timeout=10000)
+        )
+        client.models.generate_content(
+            model=model_name,
+            contents="1",
+            config=cfg
+        )
+        lat = time.time() - t0
+        if lat < 1.5:
+            tag = f"🟢 PŁYNNY ({lat:.1f}s)"
+            status = "fast"
+        elif lat < 4.0:
+            tag = f"🟡 UMIARKOWANY ({lat:.1f}s)"
+            status = "normal"
+        else:
+            tag = f"🟠 WOLNY ({lat:.1f}s)"
+            status = "slow"
+
+        return {
+            "status": status,
+            "tag": tag,
+            "latency_s": round(lat, 2),
+            "is_available": True,
+            "error_msg": ""
+        }
+    except Exception as e:
+        lat = time.time() - t0
+        err_str = str(e)
+        if "503" in err_str or "UNAVAILABLE" in err_str or "high demand" in err_str.lower():
+            tag = "🔴 PRZECIĄŻONY (Błąd 503 / Wysoki popyt)"
+            status = "overloaded"
+        elif "429" in err_str or "ResourceExhausted" in err_str:
+            tag = "🔴 LIMIT ZAPYTAŃ (Błąd 429)"
+            status = "rate_limited"
+        elif "504" in err_str or "DEADLINE" in err_str:
+            tag = f"🔴 TIMEOUT ({lat:.1f}s / Błąd 504)"
+            status = "timeout"
+        else:
+            tag = f"⚠️ BŁĄD ({err_str[:25]})"
+            status = "error"
+
+        return {
+            "status": status,
+            "tag": tag,
+            "latency_s": round(lat, 2),
+            "is_available": False,
+            "error_msg": err_str
+        }
+
+
+def probe_all_models_health(client: Optional[genai.Client], models_dict: Dict[str, str]) -> Dict[str, Dict[str, Any]]:
+    """
+    Probes all candidate models concurrently in parallel (completes in ~1-2 seconds).
+    """
+    if not client:
+        return {k: {"status": "unknown", "tag": "⚪ Gotowy", "latency_s": 0.0, "is_available": True, "error_msg": ""} for k in models_dict}
+
+    import concurrent.futures
+
+    results = {}
+    with concurrent.futures.ThreadPoolExecutor(max_workers=min(4, len(models_dict))) as executor:
+        future_to_key = {
+            executor.submit(probe_model_health, client, model_name): key
+            for key, model_name in models_dict.items()
+        }
+        for future in concurrent.futures.as_completed(future_to_key):
+            key = future_to_key[future]
+            try:
+                results[key] = future.result()
+            except Exception as e:
+                results[key] = {"status": "error", "tag": "⚠️ Błąd", "latency_s": 0.0, "is_available": False, "error_msg": str(e)}
+
+    return results

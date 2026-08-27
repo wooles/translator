@@ -241,12 +241,12 @@ class TranslationWorker(QThread):
                 p1_model = models["flash"]
                 p2_model = models["pro"]
                 enable_verifier = True
-                thinking_budget = 1600
-            else:  # Profile 3 (Mistrzowski Flash Reasoning 4096 - Domyślny)
+                thinking_budget = 2048
+            else:  # Profile 3 (Mistrzowski Flash Reasoning Adaptive CoT do 6144 - Domyślny)
                 p1_model = models["flash"]
                 p2_model = models["flash"]
                 enable_verifier = True
-                thinking_budget = 4096
+                thinking_budget = 6144
 
             self.log_signal.emit(f"🚀 Inicjalizacja silnika: Faza 1 ({p1_model})" + (f" -> Faza 2 ({p2_model} CoT {thinking_budget})" if enable_verifier else ""))
 

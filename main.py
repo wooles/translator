@@ -416,18 +416,26 @@ def main():
         thinking_budget = 0
     elif not model_p2 and not model_p1:
         from pricing_guard import PricingGuard
+        from model_resolver import probe_all_models_health
         cost_flash_est = PricingGuard.estimate_episode_cost_pln("2")
         cost_pro_est = PricingGuard.estimate_episode_cost_pln("3")
         cost_ultra_est = PricingGuard.estimate_episode_cost_pln("4")
-        print("\n" + "─" * 68)
-        print("  WYBÓR PROFILU JAKOŚCI TŁUMACZENIA (Auto-wykrywanie najnowszych modeli):")
-        print(f"  [1] STANDARDOWY (Free)  [{best_models['flash_lite']} - 100% Darmowy, szybki]")
-        print(f"  [2] STUDYJNY FLASH      [{best_models['flash']} - Ekstremalnie tani, pojedyncza faza (~{cost_flash_est:.2f} zł/odc)]")
-        print(f"  [3] MISTRZOWSKI FLASH ⭐ [{best_models['flash']} + {best_models['flash']} (Adaptive CoT do 6144) - Zalecany (~{cost_pro_est:.2f} zł/odc)]")
-        print(f"  [4] KINOWY PRO 👑       [{best_models['flash']} + {best_models['pro']} (Redakcja Pro) - Maksymalna Głębia (~{cost_ultra_est:.2f} zł/odc)]")
-        print("─" * 68)
+
+        print("\n  [Sonda Serwerów Google]: Sprawdzanie obciążenia i latencji klastrów API na żywo...")
+        health_probe = probe_all_models_health(client, best_models)
+        tag_lite = health_probe.get("flash_lite", {}).get("tag", "🟢")
+        tag_flash = health_probe.get("flash", {}).get("tag", "🟢")
+        tag_pro = health_probe.get("pro", {}).get("tag", "🟢")
+
+        print("\n" + "═" * 74)
+        print("  WYBÓR PROFILU JAKOŚCI TŁUMACZENIA (Status Serwerów Google na Żywo):")
+        print(f"  [1] STANDARDOWY (Free)  [{best_models['flash_lite']}] {tag_lite}")
+        print(f"  [2] STUDYJNY FLASH      [{best_models['flash']}] {tag_flash} (~{cost_flash_est:.2f} zł/odc)")
+        print(f"  [3] MISTRZOWSKI FLASH ⭐ [{best_models['flash']} + {best_models['flash']}] {tag_flash} (~{cost_pro_est:.2f} zł/odc)")
+        print(f"  [4] KINOWY PRO 👑       [{best_models['flash']} + {best_models['pro']}] {tag_pro} (~{cost_ultra_est:.2f} zł/odc)")
+        print("─" * 74)
         print(PricingGuard.get_pricing_status_banner())
-        print("─" * 68)
+        print("═" * 74)
         try:
             prof_choice = input("  Twój wybór [1 / 2 / 3 / 4] (Wciśnij Enter dla 3): ").strip()
             if prof_choice == "1":
@@ -442,7 +450,7 @@ def main():
                 model_p1 = best_models["flash"]
                 model_p2 = best_models["pro"]
                 enable_verifier = True
-                thinking_budget = 1600
+                thinking_budget = 2048
             else:
                 model_p1 = best_models["flash"]
                 model_p2 = best_models["flash"]

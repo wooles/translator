@@ -459,10 +459,10 @@ def test_profiler_and_whisper():
     engine = JapaneseWhisperEngine()
     assert "kotoba" in engine.model_size
     print(" -> PASSED: Profiler 4.0 (Pivots, Catchphrases, Song Matrix, Puns, Continuity) i Kotoba-Whisper v2.0 działają w 100%.")
-from model_resolver import resolve_best_models, _extract_model_score
+from model_resolver import resolve_best_models, _extract_model_score, probe_model_health, probe_all_models_health
 
 def test_model_resolver():
-    print("[TEST 7/7] Test automatycznego wykrywania najnowszych modeli Gemini...")
+    print("[TEST 7/7] Test automatycznego wykrywania najnowszych modeli Gemini i Sondy Obciążenia...")
     score_37 = _extract_model_score("gemini-3.7-flash")
     score_35 = _extract_model_score("gemini-3.5-flash")
     score_25 = _extract_model_score("gemini-2.5-flash")
@@ -472,7 +472,12 @@ def test_model_resolver():
     assert "flash" in models
     assert "flash_backup" in models
     assert "pro" in models
-    print(" -> PASSED: Auto-discovery i rozdzielenie puli modeli Flash/Pro działa w 100%.")
+
+    # Test sondy stanu serwerów (offline mock)
+    health = probe_all_models_health(None, models)
+    assert "flash" in health
+    assert "tag" in health["flash"]
+    print(" -> PASSED: Auto-discovery, Sonda Obciążenia na Żywo i rozdzielenie puli modeli Flash/Pro działają w 100%.")
 from avt_linter import AVTLinter
 from series_memory import SeriesBible
 from avt_formatter import (
