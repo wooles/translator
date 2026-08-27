@@ -213,21 +213,22 @@ class DialogueVerifier:
                 is_unavailable = "503" in err_str or "unavailable" in err_str or "high demand" in err_str
                 is_rate_limit = "429" in err_str or "quota" in err_str or "resource_exhausted" in err_str
 
-                wait_sec = 0.5
+                import random
+                wait_sec = random.uniform(0.05, 0.08)
                 if is_timeout:
                     if attempt == 1:
                         timeout_sec = int(os.getenv("GEMINI_HTTP_TIMEOUT_MS", "120000")) // 1000
                         print(f"\n[Redaktor Dialogów / Faza 2]: Serwer Google potrzebował więcej czasu na analizę sceny (limit {timeout_sec}s na {self.model}).")
-                        print("  [..] Ponawiam próbę co 0,5 s do uzyskania dostępu do TPU...")
+                        print("  [..] Szybki mikro-retry (60ms) do natychmiastowego przechwycenia TPU...")
                     time.sleep(wait_sec)
                 elif is_unavailable or is_rate_limit:
                     if attempt == 1:
                         print(f"\n[Redaktor Dialogów / Faza 2]: Chwilowe przeciążenie serwerów Google (503/429 na {self.model}).")
-                        print("  [..] Ponawiam próbę co 0,5 s do uzyskania dostępu do TPU...")
+                        print("  [..] Szybki mikro-retry (60ms) do natychmiastowego przechwycenia TPU...")
                     time.sleep(wait_sec)
                 else:
                     if attempt == 1:
                         clean_msg = str(e).split("{")[0].strip() if "{" in str(e) else str(e)
                         print(f"\n[Redaktor Dialogów / Faza 2]: Chwilowa przerwa w odpowiedzi API na {self.model} ({clean_msg}).")
-                        print("  [..] Ponawiam próbę co 0,5 s do uzyskania dostępu do TPU...")
+                        print("  [..] Szybki mikro-retry (60ms) do natychmiastowego przechwycenia TPU...")
                     time.sleep(wait_sec)

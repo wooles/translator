@@ -738,28 +738,29 @@ class MultimodalTranslator:
                         time.sleep(1)
                         continue
 
-                wait_time = 0.5
+                import random
+                wait_time = random.uniform(0.05, 0.08)
                 if is_timeout:
                     if attempt == 1:
                         timeout_sec = int(os.getenv("GEMINI_HTTP_TIMEOUT_MS", "120000")) // 1000
                         print(f"\n[Tłumacz / Faza 1]: Serwer Google potrzebował więcej czasu na odpowiedź (limit {timeout_sec}s na {current_model}).")
-                        print("  [..] Ponawiam próbę co 0,5 s do uzyskania dostępu do TPU...")
+                        print("  [..] Szybki mikro-retry (60ms) do natychmiastowego przechwycenia TPU...")
                     time.sleep(wait_time)
                 elif is_unavailable:
                     if attempt == 1:
                         print(f"\n[Tłumacz / Faza 1]: Chwilowe przeciążenie serwerów Google (503 UNAVAILABLE na {current_model}).")
-                        print("  [..] Ponawiam próbę co 0,5 s do uzyskania dostępu do TPU...")
+                        print("  [..] Szybki mikro-retry (60ms) do natychmiastowego przechwycenia TPU...")
                     time.sleep(wait_time)
                 elif is_rate_limit:
                     if attempt == 1:
                         print(f"\n[Tłumacz / Faza 1]: Chwilowy limit minutowy zapytań (429 Rate Limit na {current_model}).")
-                        print("  [..] Ponawiam próbę co 0,5 s do uzyskania dostępu do TPU...")
+                        print("  [..] Szybki mikro-retry (60ms) do natychmiastowego przechwycenia TPU...")
                     time.sleep(wait_time)
                 else:
                     if attempt == 1:
                         clean_msg = str(e).split("{")[0].strip() if "{" in str(e) else str(e)
                         print(f"\n[Tłumacz / Faza 1]: Chwilowa przerwa w odpowiedzi API na {current_model} ({clean_msg}).")
-                        print("  [..] Ponawiam próbę co 0,5 s do uzyskania dostępu do TPU...")
+                        print("  [..] Szybki mikro-retry (60ms) do natychmiastowego przechwycenia TPU...")
                     time.sleep(wait_time)
 
     def _process_single_batch(
