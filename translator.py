@@ -1084,21 +1084,47 @@ class MultimodalTranslator:
                 if b_idx + 1 < len(batches):
                     lookahead_events = batches[b_idx + 1][:4]
 
-                # 2. Extract 1-2 key video frames for the batch
+                # 2. Extract 3-4 intelligent key video frames for the batch (Storyboard & Visual OCR)
                 temp_frames: List[str] = []
                 image_contents = []
 
                 if video_path and os.path.exists(video_path):
-                    timestamps_to_extract = [
-                        (untranslated_in_batch[0][1].start + untranslated_in_batch[0][1].end) // 2
-                    ]
-                    if len(untranslated_in_batch) > 6:
-                        mid_idx = len(untranslated_in_batch) // 2
-                        timestamps_to_extract.append(
-                            (untranslated_in_batch[mid_idx][1].start + untranslated_in_batch[mid_idx][1].end) // 2
-                        )
+                    raw_timestamps: List[int] = []
+                    
+                    # 1. Start line
+                    raw_timestamps.append((untranslated_in_batch[0][1].start + untranslated_in_batch[0][1].end) // 2)
 
-                    for ts in timestamps_to_extract:
+                    # 2. Priority: Signs and On-screen captions for OCR
+                    for _, ev, clean_txt, ts_pref in untranslated_in_batch:
+                        vtype = detect_event_visual_type(ev, ts_pref)
+                        if vtype.get("is_sign") or (clean_txt.startswith("[") and clean_txt.endswith("]")):
+                            sign_ts = (ev.start + ev.end) // 2
+                            raw_timestamps.append(sign_ts)
+                            if len(raw_timestamps) >= 4:
+                                break
+
+                    # 3. Middle / Scene transition frames
+                    N = len(untranslated_in_batch)
+                    if N >= 8 and len(raw_timestamps) < 4:
+                        raw_timestamps.append((untranslated_in_batch[N // 3][1].start + untranslated_in_batch[N // 3][1].end) // 2)
+                        raw_timestamps.append((untranslated_in_batch[(2 * N) // 3][1].start + untranslated_in_batch[(2 * N) // 3][1].end) // 2)
+                    elif N >= 3 and len(raw_timestamps) < 3:
+                        raw_timestamps.append((untranslated_in_batch[N // 2][1].start + untranslated_in_batch[N // 2][1].end) // 2)
+
+                    # 4. End of scene / Reaction frame
+                    if N >= 2 and len(raw_timestamps) < 4:
+                        raw_timestamps.append((untranslated_in_batch[-1][1].start + untranslated_in_batch[-1][1].end) // 2)
+
+                    # Sort and deduplicate timestamps (min 1500ms apart)
+                    raw_timestamps = sorted(raw_timestamps)
+                    deduped_ts: List[int] = []
+                    for ts in raw_timestamps:
+                        if not deduped_ts or all(abs(ts - existing) >= 1500 for existing in deduped_ts):
+                            deduped_ts.append(ts)
+                        if len(deduped_ts) >= 4:
+                            break
+
+                    for ts in deduped_ts:
                         try:
                             frame_path = extract_frame_at_timestamp(
                                 video_path=video_path,
