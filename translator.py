@@ -423,7 +423,8 @@ class MultimodalTranslator:
             )
         
         timeout_ms = int(os.getenv("GEMINI_HTTP_TIMEOUT_MS", "120000"))
-        self.client = genai.Client(api_key=self.api_key, http_options=types.HttpOptions(timeout=timeout_ms))
+        from client_factory import get_genai_client
+        self.client = get_genai_client(api_key=self.api_key, timeout_ms=timeout_ms)
         self.model = model
         self.model_phase1 = model
         self.model_phase2 = model_phase2 or model

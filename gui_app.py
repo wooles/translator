@@ -334,6 +334,45 @@ class SettingsDialog(QDialog):
         api_layout.addLayout(h_api_btns)
         layout.addWidget(gb_api)
 
+        # European Vertex AI Settings
+        gb_vertex = QGroupBox("🇪🇺 Europejskie Klastry Google (Vertex AI Enterprise — Ominięcie Kolejek)")
+        vx_layout = QVBoxLayout(gb_vertex)
+        
+        self.chk_use_vertex = QCheckBox("Włącz europejski region Vertex AI (europe-west1 / Belgia — bez przeciążeń 503)")
+        self.chk_use_vertex.setChecked(os.environ.get("GOOGLE_GENAI_USE_VERTEXAI", "").lower() in ["1", "true", "yes"])
+        self.chk_use_vertex.toggled.connect(self.on_vertex_toggled)
+        vx_layout.addWidget(self.chk_use_vertex)
+
+        lbl_proj_info = QLabel("ID Projektu Google Cloud (znajdziesz w Google AI Studio w kolumnie 'Project' lub console.cloud.google.com):")
+        lbl_proj_info.setStyleSheet("color: #a0aec0; font-size: 11px;")
+        vx_layout.addWidget(lbl_proj_info)
+
+        self.txt_project_id = QLineEdit()
+        self.txt_project_id.setPlaceholderText("np. my-gcp-project-12345 lub gen-lang-client-...")
+        self.txt_project_id.setText(os.environ.get("GOOGLE_CLOUD_PROJECT", ""))
+        self.txt_project_id.setEnabled(self.chk_use_vertex.isChecked())
+        vx_layout.addWidget(self.txt_project_id)
+
+        h_loc = QHBoxLayout()
+        lbl_loc = QLabel("Region Datacenter:")
+        self.cb_location = QComboBox()
+        self.cb_location.addItems([
+            "europe-west1 (Belgia / Najniższe opóźnienia PL)",
+            "europe-west4 (Holandia)",
+            "europe-west3 (Frankfurt)"
+        ])
+        cur_loc = os.environ.get("GOOGLE_CLOUD_LOCATION", "europe-west1")
+        for idx in range(self.cb_location.count()):
+            if cur_loc in self.cb_location.itemText(idx):
+                self.cb_location.setCurrentIndex(idx)
+                break
+        self.cb_location.setEnabled(self.chk_use_vertex.isChecked())
+        h_loc.addWidget(lbl_loc)
+        h_loc.addWidget(self.cb_location)
+        vx_layout.addLayout(h_loc)
+
+        layout.addWidget(gb_vertex)
+
         # Whisper settings
         gb_whisper = QGroupBox("Lokalny Japoński Whisper STT")
         wh_layout = QVBoxLayout(gb_whisper)
@@ -363,6 +402,10 @@ class SettingsDialog(QDialog):
         h_bottom.addWidget(btn_save)
         layout.addLayout(h_bottom)
 
+    def on_vertex_toggled(self, checked: bool):
+        self.txt_project_id.setEnabled(checked)
+        self.cb_location.setEnabled(checked)
+
     def toggle_echo(self):
         if self.txt_api_key.echoMode() == QLineEdit.Password:
             self.txt_api_key.setEchoMode(QLineEdit.Normal)
@@ -373,27 +416,52 @@ class SettingsDialog(QDialog):
 
     def test_api_connection(self):
         key = self.txt_api_key.text().strip()
+        use_vx = self.chk_use_vertex.isChecked()
+        proj = self.txt_project_id.text().strip()
+        loc_str = self.cb_location.currentText().split()[0]
+
         if not key:
             QMessageBox.warning(self, "Błąd", "Wprowadź klucz API przed testem!")
             return
+        if use_vx and not proj:
+            QMessageBox.warning(self, "Błąd Vertex AI", "Podaj ID Projektu Google Cloud przed testem Vertex AI!")
+            return
 
         try:
-            from google import genai
-            from google.genai import types
-            client = genai.Client(api_key=key, http_options=types.HttpOptions(timeout=15000))
+            from client_factory import get_genai_client
+            # Temporarily set env for testing
+            os.environ["GEMINI_API_KEY"] = key
+            os.environ["GOOGLE_GENAI_USE_VERTEXAI"] = "1" if use_vx else "0"
+            os.environ["GOOGLE_CLOUD_PROJECT"] = proj
+            os.environ["GOOGLE_CLOUD_LOCATION"] = loc_str
+
+            client = get_genai_client(api_key=key, timeout_ms=15000)
             res = client.models.generate_content(
-                model="gemini-3.5-flash-lite",
+                model="gemini-2.5-flash",
                 contents="Test PING"
             )
-            QMessageBox.information(self, "Sukces", f"Połączenie nawiązane pomyślnie!\nOdpowiedź Google: {res.text.strip()}")
+            mode_desc = f"Europejski Vertex AI ({loc_str})" if use_vx else "Google AI Studio"
+            QMessageBox.information(self, "Sukces", f"Połączenie nawiązane pomyślnie!\nTryb: {mode_desc}\nOdpowiedź: {res.text.strip()}")
         except Exception as e:
             QMessageBox.critical(self, "Błąd Połączenia", f"Nie udało się połączyć z API:\n{str(e)}")
 
     def save_settings(self):
         key = self.txt_api_key.text().strip()
+        use_vx = "1" if self.chk_use_vertex.isChecked() else "0"
+        proj = self.txt_project_id.text().strip()
+        loc_str = self.cb_location.currentText().split()[0]
+
         env_path = Path(__file__).parent / ".env"
         os.environ["GEMINI_API_KEY"] = key
+        os.environ["GOOGLE_GENAI_USE_VERTEXAI"] = use_vx
+        os.environ["GOOGLE_CLOUD_PROJECT"] = proj
+        os.environ["GOOGLE_CLOUD_LOCATION"] = loc_str
+
         set_key(str(env_path), "GEMINI_API_KEY", key)
+        set_key(str(env_path), "GOOGLE_GENAI_USE_VERTEXAI", use_vx)
+        set_key(str(env_path), "GOOGLE_CLOUD_PROJECT", proj)
+        set_key(str(env_path), "GOOGLE_CLOUD_LOCATION", loc_str)
+
         QMessageBox.information(self, "Zapisano", "Ustawienia zostały pomyślnie zapisane!")
         self.accept()
 
