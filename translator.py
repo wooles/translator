@@ -204,6 +204,11 @@ def detect_audio_discrepancy(jp_text: str, pl_text: str, en_text: str) -> Option
         if any(w in pl_lower for w in ["nic mi nie jest", "nic mi... nie jest", "wszystko w porządku", "dobrze się czuję"]):
             return "W audio pada 'ii desu' (odmowa / rezygnacja) -> Zastąp błędny stan zdrowia ('Nic mi nie jest') poprawną odmową: 'Ja... podziękuję.' / 'Nie mam ochoty.' / 'Ja zostanę.' (Filar CXVII)."
 
+    # 10. Sasuga (reputation / praise / typical excellence) vs literal whole/all calque
+    if "さすが" in clean_jp or "流石" in clean_jp or "sasuga" in rom_lower:
+        if pl_lower.startswith("całe ") or pl_lower.startswith("cały ") or pl_lower.startswith("to cały ") or "wszyscy" in pl_lower:
+            return "W audio pada 'Sasuga' (uznanie/podziw dla kunsztu i reputacji: 'jak przystało na...') -> Zamień mylącą kalkę ('Całe plemię...') na szlachetne 'Jak przystało na [postać/plemię]...' / 'Tego należało się spodziewać po...' (Filar CXI)."
+
     return None
 
 def detect_japanese_pragmatic_register(jp_text: str, en_text: str = "") -> Optional[str]:

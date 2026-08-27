@@ -1171,6 +1171,14 @@ def test_translator_logger_and_sign_detector():
     )
     assert alert_ii_desu is not None and "CXVII" in alert_ii_desu
 
+    # Test Sasuga alert (Praise / Reputation calque)
+    alert_sasuga = translator.detect_audio_discrepancy(
+        jp_text="さすがメラ族 [sasuga mera-zoku]",
+        pl_text="Całe plemię Mera.",
+        en_text="That's the Mera tribe for you."
+    )
+    assert alert_sasuga is not None and "Sasuga" in alert_sasuga
+
     # Test Flashback 1:1 memory formatting
     from memory import format_translation_memory_for_prompt
     formatted_mem = format_translation_memory_for_prompt([
