@@ -32,6 +32,8 @@ class DialogueVerifier:
         thinking_budget: Optional[int] = None
     ):
         self.client = client
+        from client_factory import MultiKeyClientPool
+        self.client_pool = MultiKeyClientPool(raw_keys=os.getenv("GEMINI_API_KEY"), timeout_ms=120000)
         self.model = model
         self.keep_honorifics = keep_honorifics
         self.system_prompt = get_verifier_system_prompt(keep_honorifics=keep_honorifics)
@@ -168,7 +170,8 @@ class DialogueVerifier:
 
                 def _single_generate():
                     cfg = types.GenerateContentConfig(**gen_config_kwargs)
-                    return self.client.models.generate_content(
+                    active_c = self.client_pool.get_client() if hasattr(self, "client_pool") else self.client
+                    return active_c.models.generate_content(
                         model=self.model,
                         contents=[prompt_text],
                         config=cfg

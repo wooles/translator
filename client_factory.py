@@ -56,6 +56,41 @@ def get_genai_client(
 
     key = api_key or os.environ.get("GEMINI_API_KEY", "").strip()
     if key:
-        return genai.Client(api_key=key, http_options=http_opts)
+        # If multiple keys are provided, use the first key as default single client
+        first_key = [k.strip() for k in key.replace(";", ",").split(",") if k.strip()][0]
+        return genai.Client(api_key=first_key, http_options=http_opts)
     else:
         return genai.Client(http_opts=http_opts)
+
+
+class MultiKeyClientPool:
+    """
+    Thread-safe Round-Robin Client Pool across multiple Google AI Studio API Keys.
+    Allows concurrent batches to distribute requests across independent gateway queues.
+    """
+    def __init__(self, raw_keys: Optional[str] = None, timeout_ms: int = 120000):
+        import threading
+        self._lock = threading.Lock()
+        self._idx = 0
+        raw = raw_keys or os.environ.get("GEMINI_API_KEY", "").strip()
+        keys_list = [k.strip() for k in raw.replace(";", ",").split(",") if k.strip()]
+        if not keys_list:
+            keys_list = [""]
+
+        http_opts = types.HttpOptions(timeout=timeout_ms)
+        self.clients = []
+        for k in keys_list:
+            if k:
+                self.clients.append(genai.Client(api_key=k, http_options=http_opts))
+            else:
+                self.clients.append(genai.Client(http_opts=http_opts))
+
+        logger.info(f"[MultiKey Pool]: Active gateway pool with {len(self.clients)} API channel(s).")
+
+    def get_client(self) -> genai.Client:
+        """Returns next client in round-robin sequence."""
+        with self._lock:
+            client = self.clients[self._idx % len(self.clients)]
+            self._idx += 1
+            return client
+

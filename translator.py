@@ -423,8 +423,9 @@ class MultimodalTranslator:
             )
         
         timeout_ms = int(os.getenv("GEMINI_HTTP_TIMEOUT_MS", "120000"))
-        from client_factory import get_genai_client
-        self.client = get_genai_client(api_key=self.api_key, timeout_ms=timeout_ms)
+        from client_factory import get_genai_client, MultiKeyClientPool
+        self.client_pool = MultiKeyClientPool(raw_keys=self.api_key, timeout_ms=timeout_ms)
+        self.client = self.client_pool.get_client()
         self.model = model
         self.model_phase1 = model
         self.model_phase2 = model_phase2 or model
@@ -689,7 +690,8 @@ class MultimodalTranslator:
 
                 def _single_generate():
                     cfg = types.GenerateContentConfig(**gen_config_kwargs)
-                    return self.client.models.generate_content(
+                    active_c = self.client_pool.get_client() if hasattr(self, "client_pool") else self.client
+                    return active_c.models.generate_content(
                         model=current_model,
                         contents=contents,
                         config=cfg
