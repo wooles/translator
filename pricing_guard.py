@@ -51,15 +51,15 @@ class PricingGuard:
         """
         Estimates the actual cost of translating a 24-minute anime episode in PLN,
         taking into account realistic adaptive batching (18 lines/batch), Google Context Cache (39k tokens),
-        vision frames, and extended CoT thinking tokens.
+        vision frames, ironclad OP/ED preservation (0 tokens), and dedicated Pro Adaptive CoT (2048/1024/512).
         """
         # Realistic adaptive batching (avg 18 lines per scene-aligned batch)
         batches = max(1, (lines_count + 17) // 18)
         system_prompt_tokens = 39000  # AVT Pillars in Context Cache
-        batch_input_tokens = 2800      # Video frame (scaled) + lookahead + Whisper audio + history
-        batch_output_f1_tokens = 3800  # Phase 1 Translation JSON + AVT scene metadata
-        batch_output_flash_cot = 4200  # Phase 2 Flash Refinement + Adaptive CoT thinking
-        batch_output_pro_tokens = 4500 # Phase 2 Pro Refinement + Pro Deep CoT thinking (at $12/1M rate)
+        batch_input_tokens = 2400      # Video frame (scaled) + lookahead + Whisper audio + history
+        batch_output_f1_tokens = 2200  # Phase 1 Translation JSON + AVT scene metadata
+        batch_output_flash_cot = 2800  # Phase 2 Flash Refinement + Adaptive CoT thinking
+        batch_output_pro_tokens = 1550 # Phase 2 Pro Refinement + Dedicated Pro CoT (2048/1024/512 avg)
 
         profile = profile.lower()
 
@@ -117,7 +117,7 @@ class PricingGuard:
 
             # Phase 1: Vision + Flash
             p1_cached_in = (batches * system_prompt_tokens) if has_cache else 0
-            p1_uncached_in = batches * (batch_input_tokens + 516) + (0 if has_cache else batches * system_prompt_tokens)
+            p1_uncached_in = batches * (batch_input_tokens + 256) + (0 if has_cache else batches * system_prompt_tokens)
             p1_out = batches * batch_output_f1_tokens
             cost_p1_usd = (
                 (p1_cached_in / 1_000_000) * rate_flash["input_cached"] +
@@ -125,7 +125,7 @@ class PricingGuard:
                 (p1_out / 1_000_000) * rate_flash["output"]
             )
 
-            # Phase 2: Gemini 3.1 Pro Refinement + CoT Thinking (billed at $12/1M output rate)
+            # Phase 2: Gemini 3.1 Pro Refinement + Dedicated Pro CoT (2048/1024/512)
             p2_cached_in = (batches * system_prompt_tokens) if has_cache else 0
             p2_uncached_in = (batches * batch_input_tokens) + (0 if has_cache else batches * system_prompt_tokens)
             p2_out = batches * batch_output_pro_tokens

@@ -693,17 +693,17 @@ def test_pricing_guard():
     # 1. Test szacowania kosztu dla profilu Standard (Free Tier)
     assert PricingGuard.estimate_episode_cost_pln("1") == 0.00
     
-    # 2. Test szacowania kosztu dla profilu Studyjny Flash (~1.58 zł)
+    # 2. Test szacowania kosztu dla profilu Studyjny Flash (~1.07 zł)
     cost_flash = PricingGuard.estimate_episode_cost_pln("2")
-    assert 0.80 <= cost_flash <= 2.50
+    assert 0.60 <= cost_flash <= 2.00
     
-    # 3. Test szacowania kosztu dla profilu Mistrzowski Flash Reasoning (~3.25 zł)
+    # 3. Test szacowania kosztu dla profilu Mistrzowski Flash Reasoning (~2.30 zł)
     cost_pro = PricingGuard.estimate_episode_cost_pln("3")
-    assert 2.00 <= cost_pro <= 5.00
+    assert 1.50 <= cost_pro <= 3.50
 
-    # 4. Test szacowania kosztu dla profilu Kinowy Pro (~7.22 zł)
+    # 4. Test szacowania kosztu dla profilu Kinowy Pro (~3.80 zł z adaptacyjnym CoT)
     cost_ultra = PricingGuard.estimate_episode_cost_pln("4")
-    assert 5.00 <= cost_ultra <= 10.00
+    assert 2.50 <= cost_ultra <= 5.50
     
     # 5. Test generowania banera
     banner = PricingGuard.get_pricing_status_banner()
