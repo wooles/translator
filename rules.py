@@ -61,6 +61,7 @@ FILAR IV: ELIMINACJA SZTUCZNYCH CZASOWNIKÓW POSIŁKOWYCH I POZORNEGO TRWANIA:
   * "I have a feeling that..." -> "Coś mi mówi, że...", "Wydaje mi się, że..." (ZAKAZ: "Mam uczucie że").
   * "It looks like it's going to rain" -> "Zbiera się na deszcz", "Chyba będzie padać" (ZAKAZ: "Wygląda jakby miało padać").
   * "Welcome back" -> "Witaj!", "Dobrze cię widzieć!", "Wróciłeś!", "Witaj w domu!" (ZAKAZ: "Witaj z powrotem").
+  * "passed the point of no return" -> "nie ma już odwrotu", "z tej drogi nie ma odwrotu", "dla tej armii nie ma już powrotu", "za daleko zaszli, by zawrócić" (KATEGORYCZNY ZAKAZ: "przekroczyła punkt bez powrotu" - to obca kalka niszcząca klimat eposu i dramatu).
 - 2. KALKI KONSTRUKCJI POZORNEGO TRWANIA I POSIADANIA:
   * "is in the process of doing" -> "właśnie robi", "robi" (ZAKAZ: "jest w trakcie robienia").
   * "came into possession of" -> "zdobył", "ma", "wszedł w posiadanie" (ZAKAZ: "znalazł się w posiadaniu").
