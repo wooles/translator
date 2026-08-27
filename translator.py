@@ -621,23 +621,14 @@ class MultimodalTranslator:
         if "flash" in self.model.lower():
             m1 = active_models.get("flash", "gemini-3.7-flash")
             m2 = active_models.get("flash_backup", "gemini-3.6-flash")
-            m3 = active_models.get("flash_lite", "gemini-3.5-flash-lite")
-            candidates_ordered = [self.model, m1, m2, "gemini-3.5-flash", m3]
-            candidate_models = []
-            for c in candidates_ordered:
-                if c and c not in candidate_models:
-                    candidate_models.append(c)
+            candidate_models = [m1, m2] if m1 != m2 else [m1]
             if not hasattr(self, "phase1_rotation_idx"):
                 self.phase1_rotation_idx = 0
             current_model_idx = self.phase1_rotation_idx % len(candidate_models)
             self.phase1_rotation_idx += 1
         elif "pro" in self.model.lower():
             m_pro = active_models.get("pro", "gemini-3.1-pro-preview")
-            candidates_ordered = [self.model, m_pro, "gemini-3.5-flash"]
-            candidate_models = []
-            for c in candidates_ordered:
-                if c and c not in candidate_models:
-                    candidate_models.append(c)
+            candidate_models = [m_pro]
             current_model_idx = 0
         else:
             current_model_idx = 0

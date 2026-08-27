@@ -127,48 +127,20 @@ class DialogueVerifier:
         else:
             effective_budget = min(self.thinking_budget, 1280)
 
-        # Build resilient candidate models list for Phase 2
-        from model_resolver import resolve_best_models
-        active_models = resolve_best_models(self.client)
-        candidate_models = [self.model]
-        if "flash" in self.model.lower():
-            m1 = active_models.get("flash", "gemini-3.7-flash")
-            m2 = active_models.get("flash_backup", "gemini-3.6-flash")
-            m3 = active_models.get("flash_lite", "gemini-3.5-flash-lite")
-            candidates_ordered = [self.model, m1, m2, "gemini-3.5-flash", m3]
-            candidate_models = []
-            for c in candidates_ordered:
-                if c and c not in candidate_models:
-                    candidate_models.append(c)
-            if not hasattr(self, "phase2_model_idx"):
-                self.phase2_model_idx = 0
-            current_model_idx = self.phase2_model_idx % len(candidate_models)
-        elif "pro" in self.model.lower():
-            m_pro = active_models.get("pro", "gemini-3.1-pro-preview")
-            candidates_ordered = [self.model, m_pro, "gemini-3.5-flash"]
-            candidate_models = []
-            for c in candidates_ordered:
-                if c and c not in candidate_models:
-                    candidate_models.append(c)
-            current_model_idx = 0
-        else:
-            current_model_idx = 0
-
         while True:
             attempt += 1
-            current_model = candidate_models[current_model_idx]
             try:
                 from context_cache import ContextCacheManager
                 cached_name = ContextCacheManager.get_or_create_cache(
                     client=self.client,
-                    model=current_model,
+                    model=self.model,
                     system_instruction=self.system_prompt
                 )
                 gen_config_kwargs = {
                     "response_mime_type": "application/json",
                     "response_schema": RefinedBatchResponse,
                 }
-                if "3.7" in current_model.lower() or "pro" in current_model.lower() or "3.1" in current_model.lower():
+                if "3.7" in self.model.lower() or "pro" in self.model.lower() or "2.5" in self.model.lower() or "3.6" in self.model.lower():
                     gen_config_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=effective_budget)
 
                 if cached_name:
@@ -177,7 +149,7 @@ class DialogueVerifier:
                     gen_config_kwargs["system_instruction"] = self.system_prompt
 
                 response = self.client.models.generate_content(
-                    model=current_model,
+                    model=self.model,
                     contents=[prompt_text],
                     config=types.GenerateContentConfig(**gen_config_kwargs)
                 )
@@ -189,7 +161,7 @@ class DialogueVerifier:
                     cands = getattr(um, "candidates_token_count", 0) or 0
                     thoughts = getattr(um, "thoughts_token_count", 0) or 0
                     self.current_episode_tokens["output"] += (cands + thoughts)
-                    self.current_episode_tokens["model"] = current_model
+                    self.current_episode_tokens["model"] = self.model
 
                 # Retrieve parsed structured output
                 if hasattr(response, "parsed") and response.parsed is not None:
@@ -206,7 +178,7 @@ class DialogueVerifier:
                 is_cache_err = "403" in err_str or "cachedcontent" in err_str or "permission" in err_str
                 if is_cache_err and cached_name:
                     from context_cache import ContextCacheManager
-                    ContextCacheManager.invalidate_cache(current_model, self.system_prompt)
+                    ContextCacheManager.invalidate_cache(self.model, self.system_prompt)
                     cached_name = None
                     continue
 
@@ -222,33 +194,23 @@ class DialogueVerifier:
 
                 is_timeout = "504" in err_str or "deadline" in err_str or "timeout" in err_str or "timed out" in err_str
                 is_unavailable = "503" in err_str or "unavailable" in err_str or "high demand" in err_str
-                is_rate_limit = "429" in err_str or "quota" in err_str or "resource_exhausted" in err_str or "rate" in err_str
-
-                # Failover to backup model in pool on 503/504/429
-                if (is_unavailable or is_timeout or is_rate_limit) and len(candidate_models) > 1:
-                    next_idx = (current_model_idx + 1) % len(candidate_models)
-                    if next_idx != current_model_idx:
-                        print(f"\n[Redaktor Dialogów / Faza 2]: Model {current_model} jest chwilowo przeciążony ({'504 Timeout' if is_timeout else '503 High Demand'}). Automatyczne przełączenie na {candidate_models[next_idx]}...")
-                        current_model_idx = next_idx
-                        self.phase2_model_idx = next_idx
-                        time.sleep(1)
-                        continue
+                is_rate_limit = "429" in err_str or "quota" in err_str or "resource_exhausted" in err_str
 
                 wait_sec = 0.5
                 if is_timeout:
                     if attempt == 1:
                         timeout_sec = int(os.getenv("GEMINI_HTTP_TIMEOUT_MS", "120000")) // 1000
-                        print(f"\n[Redaktor Dialogów / Faza 2]: Serwer Google potrzebował więcej czasu na analizę sceny (limit {timeout_sec}s na {current_model}).")
+                        print(f"\n[Redaktor Dialogów / Faza 2]: Serwer Google potrzebował więcej czasu na analizę sceny (limit {timeout_sec}s na {self.model}).")
                         print("  [..] Ponawiam próbę co 0,5 s do uzyskania dostępu do TPU...")
                     time.sleep(wait_sec)
                 elif is_unavailable or is_rate_limit:
                     if attempt == 1:
-                        print(f"\n[Redaktor Dialogów / Faza 2]: Chwilowe przeciążenie serwerów Google (503/429 na {current_model}).")
+                        print(f"\n[Redaktor Dialogów / Faza 2]: Chwilowe przeciążenie serwerów Google (503/429 na {self.model}).")
                         print("  [..] Ponawiam próbę co 0,5 s do uzyskania dostępu do TPU...")
                     time.sleep(wait_sec)
                 else:
                     if attempt == 1:
                         clean_msg = str(e).split("{")[0].strip() if "{" in str(e) else str(e)
-                        print(f"\n[Redaktor Dialogów / Faza 2]: Chwilowa przerwa w odpowiedzi API na {current_model} ({clean_msg}).")
+                        print(f"\n[Redaktor Dialogów / Faza 2]: Chwilowa przerwa w odpowiedzi API na {self.model} ({clean_msg}).")
                         print("  [..] Ponawiam próbę co 0,5 s do uzyskania dostępu do TPU...")
                     time.sleep(wait_sec)
