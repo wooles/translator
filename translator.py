@@ -685,11 +685,28 @@ class MultimodalTranslator:
                 else:
                     gen_config_kwargs["system_instruction"] = self.system_prompt
 
-                response = self.client.models.generate_content(
-                    model=current_model,
-                    contents=contents,
-                    config=types.GenerateContentConfig(**gen_config_kwargs)
-                )
+                import concurrent.futures
+
+                def _single_generate():
+                    cfg = types.GenerateContentConfig(**gen_config_kwargs)
+                    return self.client.models.generate_content(
+                        model=current_model,
+                        contents=contents,
+                        config=cfg
+                    )
+
+                # Speculative Hedging on Google AI Studio: if request hangs > 4.5s on congested TPU, launch parallel hedge
+                if "flash" in current_model.lower():
+                    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as hedge_executor:
+                        f1 = hedge_executor.submit(_single_generate)
+                        try:
+                            response = f1.result(timeout=4.5)
+                        except concurrent.futures.TimeoutError:
+                            f2 = hedge_executor.submit(_single_generate)
+                            done, _ = concurrent.futures.wait([f1, f2], return_when=concurrent.futures.FIRST_COMPLETED)
+                            response = list(done)[0].result()
+                else:
+                    response = _single_generate()
 
                 if hasattr(response, "usage_metadata") and response.usage_metadata:
                     um = response.usage_metadata

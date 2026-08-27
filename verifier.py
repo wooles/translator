@@ -164,11 +164,28 @@ class DialogueVerifier:
                 else:
                     gen_config_kwargs["system_instruction"] = self.system_prompt
 
-                response = self.client.models.generate_content(
-                    model=self.model,
-                    contents=[prompt_text],
-                    config=types.GenerateContentConfig(**gen_config_kwargs)
-                )
+                import concurrent.futures
+
+                def _single_generate():
+                    cfg = types.GenerateContentConfig(**gen_config_kwargs)
+                    return self.client.models.generate_content(
+                        model=self.model,
+                        contents=[prompt_text],
+                        config=cfg
+                    )
+
+                # Speculative Hedging on Google AI Studio: if Flash refinement takes > 6.0s on congested TPU, launch parallel hedge
+                if "flash" in self.model.lower():
+                    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as hedge_executor:
+                        f1 = hedge_executor.submit(_single_generate)
+                        try:
+                            response = f1.result(timeout=6.0)
+                        except concurrent.futures.TimeoutError:
+                            f2 = hedge_executor.submit(_single_generate)
+                            done, _ = concurrent.futures.wait([f1, f2], return_when=concurrent.futures.FIRST_COMPLETED)
+                            response = list(done)[0].result()
+                else:
+                    response = _single_generate()
 
                 if hasattr(response, "usage_metadata") and response.usage_metadata:
                     um = response.usage_metadata
