@@ -486,6 +486,18 @@ def main():
 
     completed_files = []
 
+    import concurrent.futures
+    preload_executor = concurrent.futures.ThreadPoolExecutor(max_workers=1)
+    next_preload_future = None
+
+    def _preload_worker(next_path):
+        return resolve_episode_files(
+            input_path=next_path,
+            args_subs=args.subs,
+            args_video=args.video,
+            args_track=args.track
+        )
+
     # Main Season Queue loop
     for ep_idx, target_path in enumerate(queue, 1):
         if is_season_queue:
@@ -493,16 +505,34 @@ def main():
             print(f"  📺 [KOLEJKA SEZONOWA: ODCINEK {ep_idx}/{total_episodes}] {target_path.name}")
             print("═" * 70)
 
-        video_file, subs_file, temp_subs_extracted = resolve_episode_files(
-            input_path=target_path,
-            args_subs=args.subs,
-            args_video=args.video,
-            args_track=args.track
-        )
+        # Retrieve preloaded episode data if available, else resolve directly
+        if next_preload_future is not None:
+            try:
+                video_file, subs_file, temp_subs_extracted = next_preload_future.result(timeout=120)
+            except Exception:
+                video_file, subs_file, temp_subs_extracted = resolve_episode_files(
+                    input_path=target_path,
+                    args_subs=args.subs,
+                    args_video=args.video,
+                    args_track=args.track
+                )
+            next_preload_future = None
+        else:
+            video_file, subs_file, temp_subs_extracted = resolve_episode_files(
+                input_path=target_path,
+                args_subs=args.subs,
+                args_video=args.video,
+                args_track=args.track
+            )
 
         if not subs_file or not subs_file.exists():
             print(f"  [Pominięto]: Nie udało się przygotować napisów dla {target_path.name}")
             continue
+
+        # Trigger background preloading for the next episode (N+1) while current is translating
+        if is_season_queue and ep_idx < total_episodes:
+            next_target = queue[ep_idx]
+            next_preload_future = preload_executor.submit(_preload_worker, next_target)
 
         final_output_path = args.output if (not is_season_queue and args.output) else None
         if not final_output_path and video_file:
@@ -525,6 +555,8 @@ def main():
                     os.remove(str(subs_file))
                 except OSError:
                     pass
+
+    preload_executor.shutdown(wait=False)
 
     # Final summary
     print("\n" + "=" * 70)

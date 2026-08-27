@@ -813,6 +813,428 @@ def QInputDialog_getText(parent, title, label):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# DIALOG: BIBLIA SERIALU (Series Bible Visualizer & Editor)
+# ─────────────────────────────────────────────────────────────────────────────
+class SeriesBibleDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("📖 Biblia Serialu — Rejestr Postaci, Relacji i Słownik Ciągłości")
+        self.resize(900, 650)
+        self.active_bible: Optional[SeriesBible] = None
+        self.setup_ui()
+        self.load_series_list()
+
+    def setup_ui(self):
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(16, 16, 16, 16)
+        layout.setSpacing(12)
+
+        # Header with series selector
+        h_top = QHBoxLayout()
+        h_top.addWidget(QLabel("Wybierz Serię:"))
+        self.cb_series = QComboBox()
+        self.cb_series.currentIndexChanged.connect(self.on_series_changed)
+        h_top.addWidget(self.cb_series, 1)
+
+        btn_new_series = QPushButton("➕ Nowa Seria")
+        btn_new_series.clicked.connect(self.create_new_series)
+        h_top.addWidget(btn_new_series)
+
+        btn_html = QPushButton("🌐 Eksportuj Raport HTML")
+        btn_html.setObjectName("PrimaryButton")
+        btn_html.clicked.connect(self.export_html_report)
+        h_top.addWidget(btn_html)
+        layout.addLayout(h_top)
+
+        # Tabs for Characters, Relationships, Glossary
+        self.tabs = QTabWidget()
+
+        # 1. Characters Tab
+        tab_chars = QWidget()
+        l_chars = QVBoxLayout(tab_chars)
+        self.table_chars = QTableWidget()
+        self.table_chars.setColumnCount(2)
+        self.table_chars.setHorizontalHeaderLabels(["Postać", "Rola / Idiolekt / Forma zwracania się"])
+        self.table_chars.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
+        self.table_chars.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
+        l_chars.addWidget(self.table_chars)
+
+        h_c_btns = QHBoxLayout()
+        btn_add_char = QPushButton("➕ Dodaj Postać")
+        btn_add_char.clicked.connect(self.add_character)
+        btn_del_char = QPushButton("🗑️ Usuń")
+        btn_del_char.clicked.connect(self.delete_character)
+        h_c_btns.addWidget(btn_add_char)
+        h_c_btns.addWidget(btn_del_char)
+        h_c_btns.addStretch()
+        l_chars.addLayout(h_c_btns)
+        self.tabs.addTab(tab_chars, "👥 Rejestr Postaci")
+
+        # 2. Relationships Tab
+        tab_rel = QWidget()
+        l_rel = QVBoxLayout(tab_rel)
+        self.table_rel = QTableWidget()
+        self.table_rel.setColumnCount(2)
+        self.table_rel.setHorizontalHeaderLabels(["Relacja (np. Postać A -> Postać B)", "Zasada (np. po imieniu / na Pan)"])
+        self.table_rel.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
+        self.table_rel.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
+        l_rel.addWidget(self.table_rel)
+
+        h_r_btns = QHBoxLayout()
+        btn_add_rel = QPushButton("➕ Dodaj Relację")
+        btn_add_rel.clicked.connect(self.add_relationship)
+        btn_del_rel = QPushButton("🗑️ Usuń")
+        btn_del_rel.clicked.connect(self.delete_relationship)
+        h_r_btns.addWidget(btn_add_rel)
+        h_r_btns.addWidget(btn_del_rel)
+        h_r_btns.addStretch()
+        l_rel.addLayout(h_r_btns)
+        self.tabs.addTab(tab_rel, "🤝 Matryca Relacji")
+
+        # 3. Glossary Tab
+        tab_gloss = QWidget()
+        l_gloss = QVBoxLayout(tab_gloss)
+        self.table_gloss = QTableWidget()
+        self.table_gloss.setColumnCount(2)
+        self.table_gloss.setHorizontalHeaderLabels(["Termin Źródłowy", "Ustalony Przekład PL"])
+        self.table_gloss.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
+        self.table_gloss.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
+        l_gloss.addWidget(self.table_gloss)
+
+        h_g_btns = QHBoxLayout()
+        btn_add_gloss = QPushButton("➕ Dodaj Termin")
+        btn_add_gloss.clicked.connect(self.add_glossary_term)
+        btn_del_gloss = QPushButton("🗑️ Usuń")
+        btn_del_gloss.clicked.connect(self.delete_glossary_term)
+        h_g_btns.addWidget(btn_add_gloss)
+        h_g_btns.addWidget(btn_del_gloss)
+        h_g_btns.addStretch()
+        l_gloss.addLayout(h_g_btns)
+        self.tabs.addTab(tab_gloss, "📚 Słownik Serii")
+
+        layout.addWidget(self.tabs)
+
+        # Bottom buttons
+        h_bottom = QHBoxLayout()
+        btn_save = QPushButton("💾 Zapisz Zmiany w Biblii")
+        btn_save.setObjectName("PrimaryButton")
+        btn_save.clicked.connect(self.save_current_bible)
+        h_bottom.addWidget(btn_save)
+        h_bottom.addStretch()
+        btn_close = QPushButton("Zamknij")
+        btn_close.clicked.connect(self.accept)
+        h_bottom.addWidget(btn_close)
+        layout.addLayout(h_bottom)
+
+    def load_series_list(self):
+        from series_memory import SERIES_MEMORY_DIR
+        self.cb_series.clear()
+        SERIES_MEMORY_DIR.mkdir(parents=True, exist_ok=True)
+        files = list(SERIES_MEMORY_DIR.glob("*_bible.json"))
+        if not files:
+            self.active_bible = SeriesBible("Domyślna Seria")
+            self.active_bible.save()
+            files = list(SERIES_MEMORY_DIR.glob("*_bible.json"))
+
+        for f in files:
+            title = f.stem.replace("_bible", "").replace("_", " ").title()
+            self.cb_series.addItem(title, str(f))
+
+    def on_series_changed(self):
+        file_path = self.cb_series.currentData()
+        if file_path and os.path.exists(file_path):
+            try:
+                with open(file_path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                title = data.get("anime_title", self.cb_series.currentText())
+                self.active_bible = SeriesBible(title)
+                self.refresh_tables()
+            except Exception:
+                pass
+
+    def refresh_tables(self):
+        if not self.active_bible:
+            return
+        # Characters
+        chars = self.active_bible.data.get("characters", {})
+        self.table_chars.setRowCount(len(chars))
+        for r_idx, (name, info) in enumerate(chars.items()):
+            desc = info.get("description", "") if isinstance(info, dict) else str(info)
+            self.table_chars.setItem(r_idx, 0, QTableWidgetItem(name))
+            self.table_chars.setItem(r_idx, 1, QTableWidgetItem(desc))
+
+        # Relationships
+        rels = self.active_bible.data.get("relationships", {})
+        self.table_rel.setRowCount(len(rels))
+        for r_idx, (pair, rule) in enumerate(rels.items()):
+            self.table_rel.setItem(r_idx, 0, QTableWidgetItem(pair))
+            self.table_rel.setItem(r_idx, 1, QTableWidgetItem(rule))
+
+        # Glossary
+        gloss = self.active_bible.data.get("glossary", {})
+        self.table_gloss.setRowCount(len(gloss))
+        for r_idx, (src, trg) in enumerate(gloss.items()):
+            self.table_gloss.setItem(r_idx, 0, QTableWidgetItem(src))
+            self.table_gloss.setItem(r_idx, 1, QTableWidgetItem(trg))
+
+    def create_new_series(self):
+        title, ok = QInputDialog_getText(self, "Nowa Seria", "Podaj tytuł anime:")
+        if ok and title.strip():
+            b = SeriesBible(title.strip())
+            b.save()
+            self.load_series_list()
+
+    def add_character(self):
+        name, ok1 = QInputDialog_getText(self, "Nowa Postać", "Imię postaci:")
+        if ok1 and name.strip():
+            desc, ok2 = QInputDialog_getText(self, "Opis Postaci", f"Rola / Idiolekt dla {name}:")
+            if ok2 and self.active_bible:
+                self.active_bible.data["characters"][name.strip()] = {"description": desc.strip()}
+                self.refresh_tables()
+
+    def delete_character(self):
+        row = self.table_chars.currentRow()
+        if row < 0:
+            return
+        item = self.table_chars.item(row, 0)
+        if item and self.active_bible:
+            self.active_bible.data["characters"].pop(item.text(), None)
+            self.refresh_tables()
+
+    def add_relationship(self):
+        pair, ok1 = QInputDialog_getText(self, "Nowa Relacja", "Para postaci (np. Arata -> Kokoro):")
+        if ok1 and pair.strip():
+            rule, ok2 = QInputDialog_getText(self, "Zasada Zwracania Się", f"Forma dla {pair} (np. po imieniu / na Pan):")
+            if ok2 and self.active_bible:
+                self.active_bible.data["relationships"][pair.strip()] = rule.strip()
+                self.refresh_tables()
+
+    def delete_relationship(self):
+        row = self.table_rel.currentRow()
+        if row < 0:
+            return
+        item = self.table_rel.item(row, 0)
+        if item and self.active_bible:
+            self.active_bible.data["relationships"].pop(item.text(), None)
+            self.refresh_tables()
+
+    def add_glossary_term(self):
+        src, ok1 = QInputDialog_getText(self, "Nowy Termin", "Pojęcie źródłowe:")
+        if ok1 and src.strip():
+            trg, ok2 = QInputDialog_getText(self, "Tłumaczenie PL", f"Polskie tłumaczenie dla '{src}':")
+            if ok2 and self.active_bible:
+                self.active_bible.data["glossary"][src.strip()] = trg.strip()
+                self.refresh_tables()
+
+    def delete_glossary_term(self):
+        row = self.table_gloss.currentRow()
+        if row < 0:
+            return
+        item = self.table_gloss.item(row, 0)
+        if item and self.active_bible:
+            self.active_bible.data["glossary"].pop(item.text(), None)
+            self.refresh_tables()
+
+    def save_current_bible(self):
+        if self.active_bible:
+            # Re-read tables into data
+            chars = {}
+            for r in range(self.table_chars.rowCount()):
+                n = self.table_chars.item(r, 0).text().strip() if self.table_chars.item(r, 0) else ""
+                d = self.table_chars.item(r, 1).text().strip() if self.table_chars.item(r, 1) else ""
+                if n:
+                    chars[n] = {"description": d}
+            self.active_bible.data["characters"] = chars
+
+            rels = {}
+            for r in range(self.table_rel.rowCount()):
+                p = self.table_rel.item(r, 0).text().strip() if self.table_rel.item(r, 0) else ""
+                ru = self.table_rel.item(r, 1).text().strip() if self.table_rel.item(r, 1) else ""
+                if p:
+                    rels[p] = ru
+            self.active_bible.data["relationships"] = rels
+
+            gloss = {}
+            for r in range(self.table_gloss.rowCount()):
+                s = self.table_gloss.item(r, 0).text().strip() if self.table_gloss.item(r, 0) else ""
+                t = self.table_gloss.item(r, 1).text().strip() if self.table_gloss.item(r, 1) else ""
+                if s:
+                    gloss[s] = t
+            self.active_bible.data["glossary"] = gloss
+
+            self.active_bible.save()
+            QMessageBox.information(self, "Sukces", "Pomyślnie zapisano Biblię Serialu!")
+
+    def export_html_report(self):
+        if not self.active_bible:
+            return
+        self.save_current_bible()
+        import tempfile, webbrowser
+        html_content = self.active_bible.generate_html_report()
+        tmp = tempfile.NamedTemporaryFile(suffix=".html", delete=False, encoding="utf-8", mode="w")
+        tmp.write(html_content)
+        tmp.close()
+        webbrowser.open(f"file://{tmp.name}")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# DIALOG: WIZUALNY AUDYT QA I ODTWARZACZ (Live Video & Subtitle QA)
+# ─────────────────────────────────────────────────────────────────────────────
+class VideoQAViewerDialog(QDialog):
+    def __init__(self, video_path: Optional[str] = None, subs_path: Optional[str] = None, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("🎬 Wizualny Audyt QA — Odtwarzacz, Analiza CPS i Edycja w Locie")
+        self.resize(1000, 700)
+        self.video_path = video_path
+        self.subs_path = subs_path
+        self.subs_events = []
+        self.setup_ui()
+        if subs_path:
+            self.load_subtitles(subs_path)
+
+    def setup_ui(self):
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(16, 16, 16, 16)
+        layout.setSpacing(10)
+
+        # Header with file selector
+        h_top = QHBoxLayout()
+        self.lbl_info = QLabel("Plik: (Brak wczytanych napisów)")
+        self.lbl_info.setStyleSheet("color: #90cdf4; font-weight: bold;")
+        h_top.addWidget(self.lbl_info, 1)
+
+        btn_open = QPushButton("📂 Wczytaj Napisy (.ass / .srt)")
+        btn_open.clicked.connect(self.browse_subs)
+        h_top.addWidget(btn_open)
+        layout.addLayout(h_top)
+
+        # Table of lines with CPS badge
+        self.table = QTableWidget()
+        self.table.setColumnCount(4)
+        self.table.setHorizontalHeaderLabels(["ID / Czas", "Polski Tekst Kwestii (Kliknij, aby edytować)", "CPS (Prędkość)", "Status AVT"])
+        self.table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
+        self.table.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
+        self.table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeToContents)
+        self.table.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeToContents)
+        self.table.setSelectionBehavior(QTableWidget.SelectRows)
+        self.table.doubleClicked.connect(self.on_double_click_line)
+        layout.addWidget(self.table)
+
+        # Bottom action bar
+        h_bottom = QHBoxLayout()
+        btn_play = QPushButton("▶️ Odtwórz zaznaczoną scenę w wideo")
+        btn_play.clicked.connect(self.play_selected_line)
+        btn_save = QPushButton("💾 Zapisz Poprawione Napisy")
+        btn_save.setObjectName("PrimaryButton")
+        btn_save.clicked.connect(self.save_subtitles)
+        h_bottom.addWidget(btn_play)
+        h_bottom.addWidget(btn_save)
+        h_bottom.addStretch()
+        btn_close = QPushButton("Zamknij")
+        btn_close.clicked.connect(self.accept)
+        h_bottom.addWidget(btn_close)
+        layout.addLayout(h_bottom)
+
+    def browse_subs(self):
+        file_path, _ = QFileDialog.getOpenFileName(self, "Wybierz plik napisów", "", "Napisy (*.ass *.srt)")
+        if file_path:
+            self.load_subtitles(file_path)
+
+    def load_subtitles(self, path: str):
+        try:
+            import pysubs2
+            self.subs_path = path
+            self.subs_events = pysubs2.load(path)
+            self.lbl_info.setText(f"📄 {os.path.basename(path)} ({len(self.subs_events)} kwestii)")
+            self.table.setRowCount(len(self.subs_events))
+
+            for idx, ev in enumerate(self.subs_events):
+                start_m, start_s = divmod(ev.start // 1000, 60)
+                end_m, end_s = divmod(ev.end // 1000, 60)
+                time_str = f"#{idx+1} ({start_m:02d}:{start_s:02d} - {end_m:02d}:{end_s:02d})"
+                clean_text = ev.text.replace(r"\N", " ").replace(r"\n", " ").strip()
+
+                # Calculate CPS (Characters Per Second)
+                dur_sec = max(0.5, (ev.end - ev.start) / 1000.0)
+                cps = len(clean_text) / dur_sec
+
+                if cps < 17.0:
+                    cps_str = f"🟢 {cps:.1f} CPS"
+                    status_str = "Idealny"
+                elif cps <= 20.0:
+                    cps_str = f"🟡 {cps:.1f} CPS"
+                    status_str = "Umiarkowany"
+                else:
+                    cps_str = f"🔴 {cps:.1f} CPS"
+                    status_str = "Za szybki (Wymaga skrótu)"
+
+                self.table.setItem(idx, 0, QTableWidgetItem(time_str))
+                self.table.setItem(idx, 1, QTableWidgetItem(clean_text))
+                self.table.setItem(idx, 2, QTableWidgetItem(cps_str))
+                self.table.setItem(idx, 3, QTableWidgetItem(status_str))
+        except Exception as e:
+            QMessageBox.critical(self, "Błąd", f"Nie udało się wczytać napisów: {e}")
+
+    def on_double_click_line(self):
+        row = self.table.currentRow()
+        if row < 0 or row >= len(self.subs_events):
+            return
+        cur_text = self.table.item(row, 1).text() if self.table.item(row, 1) else ""
+        new_text, ok = QInputDialog_getText(self, "Edycja Kwestii", "Popraw tekst dialogu:")
+        if ok and new_text.strip():
+            self.table.setItem(row, 1, QTableWidgetItem(new_text.strip()))
+            self.subs_events[row].text = new_text.strip()
+            # Recalculate CPS
+            dur_sec = max(0.5, (self.subs_events[row].end - self.subs_events[row].start) / 1000.0)
+            cps = len(new_text.strip()) / dur_sec
+            cps_badge = f"🟢 {cps:.1f} CPS" if cps < 17.0 else (f"🟡 {cps:.1f} CPS" if cps <= 20.0 else f"🔴 {cps:.1f} CPS")
+            self.table.setItem(row, 2, QTableWidgetItem(cps_badge))
+
+    def play_selected_line(self):
+        row = self.table.currentRow()
+        if row < 0 or row >= len(self.subs_events):
+            QMessageBox.warning(self, "Wybór", "Zaznacz kwestię, którą chcesz odtworzyć!")
+            return
+
+        ev = self.subs_events[row]
+        start_sec = max(0.0, (ev.start / 1000.0) - 1.0)
+
+        # Look for video file in same directory
+        v_path = self.video_path
+        if not v_path and self.subs_path:
+            p = Path(self.subs_path)
+            for ext in [".mkv", ".mp4", ".avi"]:
+                cand = p.with_suffix(ext)
+                if cand.exists():
+                    v_path = str(cand)
+                    break
+
+        if not v_path or not os.path.exists(v_path):
+            v_path, _ = QFileDialog.getOpenFileName(self, "Wskaż plik wideo do odtworzenia", "", "Wideo (*.mkv *.mp4 *.avi)")
+            if not v_path:
+                return
+            self.video_path = v_path
+
+        from main import launch_player
+        launch_player(video_path=v_path, subs_path=self.subs_path, start_sec=start_sec)
+
+    def save_subtitles(self):
+        if not self.subs_path or not self.subs_events:
+            return
+        try:
+            # Sync text changes back
+            for r in range(self.table.rowCount()):
+                t = self.table.item(r, 1).text() if self.table.item(r, 1) else ""
+                if r < len(self.subs_events):
+                    self.subs_events[r].text = t
+            self.subs_events.save(self.subs_path)
+            QMessageBox.information(self, "Zapisano", f"Pomyślnie zaktualizowano plik napisów:\n{self.subs_path}")
+        except Exception as e:
+            QMessageBox.critical(self, "Błąd", f"Nie udało się zapisać napisów: {e}")
+
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # MAIN APPLICATION WINDOW (MainWindow)
 # ─────────────────────────────────────────────────────────────────────────────
 class MainWindow(QMainWindow):
@@ -844,12 +1266,15 @@ class MainWindow(QMainWindow):
         h_header.addWidget(lbl_title)
 
         h_header.addStretch()
+        btn_qa = QPushButton("🎬 Audyt QA i Odtwarzacz")
+        btn_qa.clicked.connect(self.open_video_qa_viewer)
         btn_rules = QPushButton("🧠 Reguły i Słownik")
         btn_rules.clicked.connect(self.open_rules_manager)
-        btn_settings = QPushButton("⚙️ Ustawienia API")
-        btn_settings.clicked.connect(self.open_settings)
         btn_bible = QPushButton("📚 Biblia Serialu")
         btn_bible.clicked.connect(self.open_series_bible)
+        btn_settings = QPushButton("⚙️ Ustawienia API")
+        btn_settings.clicked.connect(self.open_settings)
+        h_header.addWidget(btn_qa)
         h_header.addWidget(btn_rules)
         h_header.addWidget(btn_bible)
         h_header.addWidget(btn_settings)
@@ -1299,12 +1724,14 @@ class MainWindow(QMainWindow):
             self.log(f"✍️ Zastosowano korektę w linijce #{row + 1}: '{new_pl}'")
 
     def open_series_bible(self):
-        QMessageBox.information(
-            self,
-            "Biblia Serialu",
-            "Pamięć międzyodcinkowa (Biblia Serialu) automatycznie synchronizuje postacie i słowniczek "
-            "w plikach *.profile.json oraz bazie pamięci tłumaczeniowej."
-        )
+        dlg = SeriesBibleDialog(self)
+        dlg.exec()
+
+    def open_video_qa_viewer(self):
+        v_path = self.files_queue[0]["video"] if self.files_queue and self.files_queue[0].get("video") else None
+        s_path = self.files_queue[0]["subs"] if self.files_queue and self.files_queue[0].get("subs") else None
+        dlg = VideoQAViewerDialog(video_path=v_path, subs_path=s_path, parent=self)
+        dlg.exec()
 
     def open_output_folder(self):
         if self.files_queue:

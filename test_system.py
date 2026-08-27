@@ -1234,7 +1234,7 @@ def test_masterclass_next_gen():
     snapped_events, snapped_cnt = SceneShotSnapper.snap_subtitles_to_cuts([ev1, ev2], cuts, snap_window_ms=250)
     assert snapped_cnt == 2
     assert snapped_events[0].start == 1000  # snapped from 1050 to 1000
-    assert snapped_events[1].end == 6000    # snapped from 5950 to 6000
+    assert snapped_events[1].end == 5920    # snapped from 5950 to 5920 (Netflix AVT 2-frame buffer: 6000 - 80ms)
 
     # 4. Test Hard Cache Lock & Thinking Budget
     from translator import MultimodalTranslator

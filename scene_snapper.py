@@ -104,12 +104,12 @@ class SceneShotSnapper:
                         snapped_count += 1
                         break
 
-            # 2. Snap end timestamp
+            # 2. Snap end timestamp (Netflix AVT Standard: 2 frames before cut to prevent ghost flashes)
             for cut in scene_cuts_ms:
                 if abs(ev.end - cut) <= snap_window_ms:
-                    # Ensure minimum display duration is preserved
-                    if (cut - ev.start) >= min_duration_ms:
-                        ev.end = cut
+                    target_end = max(ev.start + min_duration_ms, cut - 80)
+                    if target_end > ev.start:
+                        ev.end = target_end
                         snapped_count += 1
                         break
 

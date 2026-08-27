@@ -108,3 +108,69 @@ class SeriesBible:
             lines.append("-------------------------------------------------------\n")
 
         return "\n".join(lines) if has_content else ""
+
+    def generate_html_report(self) -> str:
+        """Generates a responsive modern dark-mode HTML continuity report of the Series Bible."""
+        chars_rows = ""
+        for name, info in self.data.get("characters", {}).items():
+            desc = info.get("description", "") if isinstance(info, dict) else str(info)
+            chars_rows += f"<tr><td><strong>{name}</strong></td><td>{desc}</td></tr>"
+
+        gloss_rows = ""
+        for src, trg in self.data.get("glossary", {}).items():
+            gloss_rows += f"<tr><td><code>{src}</code></td><td><strong>{trg}</strong></td></tr>"
+
+        rel_rows = ""
+        for pair, rel in self.data.get("relationships", {}).items():
+            rel_rows += f"<tr><td><strong>{pair}</strong></td><td>{rel}</td></tr>"
+
+        episodes_list = ", ".join(self.data.get("episodes_translated", [])) or "Brak przetłumaczonych odcinków"
+
+        html = f"""<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<title>Biblia Serialu: {self.anime_title}</title>
+<style>
+  body {{ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; color: #f8fafc; margin: 0; padding: 30px; }}
+  .container {{ max-width: 900px; margin: 0 auto; background: #1e293b; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }}
+  h1 {{ color: #38bdf8; border-bottom: 2px solid #334155; padding-bottom: 12px; }}
+  h2 {{ color: #a855f7; margin-top: 30px; }}
+  .badge {{ background: #0284c7; color: white; padding: 4px 10px; border-radius: 6px; font-size: 13px; font-weight: bold; }}
+  table {{ width: 100%; border-collapse: collapse; margin-top: 10px; background: #0f172a; border-radius: 8px; overflow: hidden; }}
+  th, td {{ padding: 12px 15px; text-align: left; border-bottom: 1px solid #334155; }}
+  th {{ background: #1e293b; color: #94a3b8; text-transform: uppercase; font-size: 12px; }}
+  tr:hover {{ background: #1e293b; }}
+  code {{ background: #334155; padding: 2px 6px; border-radius: 4px; color: #f472b6; }}
+  .meta {{ color: #94a3b8; font-size: 14px; margin-bottom: 20px; }}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>📖 Biblia Serialu: {self.anime_title}</h1>
+  <div class="meta">
+    <p>📺 <strong>Przetłumaczone odcinki:</strong> {episodes_list}</p>
+    <p>🛡️ <strong>Liczba wpisów w pamięci ciągłości:</strong> {len(self.data.get('characters', {}))} postaci | {len(self.data.get('glossary', {}))} terminów</p>
+  </div>
+
+  <h2>👥 Rejestr Postaci i Idiolekty</h2>
+  <table>
+    <thead><tr><th>Postać</th><th>Opis / Idiolekt / Forma zwracania się</th></tr></thead>
+    <tbody>{chars_rows or '<tr><td colspan="2">Brak zarejestrowanych postaci</td></tr>'}</tbody>
+  </table>
+
+  <h2>🤝 Matryca Relacji i Honoryfikatorów</h2>
+  <table>
+    <thead><tr><th>Relacja</th><th>Zasada zwracania się</th></tr></thead>
+    <tbody>{rel_rows or '<tr><td colspan="2">Brak zarejestrowanych relacji</td></tr>'}</tbody>
+  </table>
+
+  <h2>📚 Słownik Nazw Własnych i Pojęć</h2>
+  <table>
+    <thead><tr><th>Termin Źródłowy</th><th>Ustalony Przekład Polski</th></tr></thead>
+    <tbody>{gloss_rows or '<tr><td colspan="2">Brak ustalonych terminów</td></tr>'}</tbody>
+  </table>
+</div>
+</body>
+</html>"""
+        return html
