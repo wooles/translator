@@ -480,6 +480,9 @@ class MultimodalTranslator:
 
         # Real token counter for the current episode
         self.current_episode_tokens: Dict[str, Any] = {"prompt": 0, "cached": 0, "output": 0, "model": self.model}
+        import threading
+        self.lock = threading.Lock()
+        self.concurrent_batches = int(os.getenv("CONCURRENT_BATCHES", "3"))
 
     def _prepare_batch_prompt(
         self,
@@ -690,12 +693,13 @@ class MultimodalTranslator:
 
                 if hasattr(response, "usage_metadata") and response.usage_metadata:
                     um = response.usage_metadata
-                    self.current_episode_tokens["prompt"] += getattr(um, "prompt_token_count", 0) or 0
-                    self.current_episode_tokens["cached"] += getattr(um, "cached_content_token_count", 0) or 0
-                    cands = getattr(um, "candidates_token_count", 0) or 0
-                    thoughts = getattr(um, "thoughts_token_count", 0) or 0
-                    self.current_episode_tokens["output"] += (cands + thoughts)
-                    self.current_episode_tokens["model"] = current_model
+                    with self.lock:
+                        self.current_episode_tokens["prompt"] += getattr(um, "prompt_token_count", 0) or 0
+                        self.current_episode_tokens["cached"] += getattr(um, "cached_content_token_count", 0) or 0
+                        cands = getattr(um, "candidates_token_count", 0) or 0
+                        thoughts = getattr(um, "thoughts_token_count", 0) or 0
+                        self.current_episode_tokens["output"] += (cands + thoughts)
+                        self.current_episode_tokens["model"] = current_model
 
                 if hasattr(response, "parsed") and response.parsed is not None:
                     return response.parsed
@@ -757,6 +761,381 @@ class MultimodalTranslator:
                         print(f"\n[Tłumacz / Faza 1]: Chwilowa przerwa w odpowiedzi API na {current_model} ({clean_msg}).")
                         print("  [..] Ponawiam próbę co 0,5 s do uzyskania dostępu do TPU...")
                     time.sleep(wait_time)
+
+    def _process_single_batch(
+        self,
+        b_idx: int,
+        batch: List[Any],
+        untranslated_in_batch: List[Any],
+        batches: List[List[Any]],
+        video_path: Optional[str],
+        is_ass: bool,
+        anime_meta: Optional[Dict[str, Any]],
+        episode_profile: Optional[Any],
+        anime_context_str: str,
+        episode_profile_str: str,
+        series_bible_str: str,
+        manga_canon_str: str,
+        combined_glossary: Dict[str, str],
+        all_user_rules: List[Any],
+        history: List[Dict[str, str]],
+        pbar: Any
+    ) -> Tuple[int, Dict[int, str], List[Any], List[Dict[str, Any]], str]:
+        """
+        Translates and refines a single batch of dialogue lines (Thread-Safe).
+        """
+        # Retrieve upcoming lines (Lookahead Window)
+        lookahead_events = []
+        if b_idx + 1 < len(batches):
+            lookahead_events = batches[b_idx + 1][:4]
+
+        # 2. Extract 3-4 intelligent key video frames for the batch (Storyboard & Visual OCR)
+        temp_frames: List[str] = []
+        image_contents = []
+
+        if video_path and os.path.exists(video_path):
+            raw_timestamps: List[int] = []
+            
+            # 1. Start line
+            raw_timestamps.append((untranslated_in_batch[0][1].start + untranslated_in_batch[0][1].end) // 2)
+
+            # 2. Priority: Signs and On-screen captions for OCR
+            for _, ev, clean_txt, ts_pref in untranslated_in_batch:
+                vtype = detect_event_visual_type(ev, ts_pref)
+                if vtype.get("is_sign") or (clean_txt.startswith("[") and clean_txt.endswith("]")):
+                    sign_ts = (ev.start + ev.end) // 2
+                    raw_timestamps.append(sign_ts)
+                    if len(raw_timestamps) >= 4:
+                        break
+
+            # 3. Middle / Scene transition frames
+            N = len(untranslated_in_batch)
+            if N >= 8 and len(raw_timestamps) < 4:
+                raw_timestamps.append((untranslated_in_batch[N // 3][1].start + untranslated_in_batch[N // 3][1].end) // 2)
+                raw_timestamps.append((untranslated_in_batch[(2 * N) // 3][1].start + untranslated_in_batch[(2 * N) // 3][1].end) // 2)
+            elif N >= 3 and len(raw_timestamps) < 3:
+                raw_timestamps.append((untranslated_in_batch[N // 2][1].start + untranslated_in_batch[N // 2][1].end) // 2)
+
+            # 4. End of scene / Reaction frame
+            if N >= 2 and len(raw_timestamps) < 4:
+                raw_timestamps.append((untranslated_in_batch[-1][1].start + untranslated_in_batch[-1][1].end) // 2)
+
+            # Sort and deduplicate timestamps (min 1500ms apart)
+            raw_timestamps = sorted(raw_timestamps)
+            deduped_ts: List[int] = []
+            for ts in raw_timestamps:
+                if not deduped_ts or all(abs(ts - existing) >= 1500 for existing in deduped_ts):
+                    deduped_ts.append(ts)
+                if len(deduped_ts) >= 4:
+                    break
+
+            for ts in deduped_ts:
+                try:
+                    frame_path = extract_frame_at_timestamp(
+                        video_path=video_path,
+                        timestamp_ms=ts,
+                        max_width=self.max_image_width
+                    )
+                    temp_frames.append(frame_path)
+                except Exception:
+                    pass
+
+            for fpath in temp_frames:
+                try:
+                    img = Image.open(fpath)
+                    image_contents.append(img)
+                except Exception:
+                    pass
+
+        # 2b. Extract audio slice and run LOCAL Whisper transcription + Prosody + Diarization (100% offline)
+        temp_audio_file = None
+        whisper_transcriptions: Dict[int, str] = {}
+        prosody_tags: Dict[int, str] = {}
+        speaker_tags: Dict[int, str] = {}
+        if video_path and os.path.exists(video_path):
+            try:
+                batch_start = untranslated_in_batch[0][1].start
+                batch_end = untranslated_in_batch[-1][1].end
+                if 0 < (batch_end - batch_start) <= 360000:
+                    temp_audio_file = extract_audio_slice(
+                        video_path=video_path,
+                        start_ms=batch_start,
+                        end_ms=batch_end
+                    )
+                    events_tuples = [(idx + 1, item[1]) for idx, item in enumerate(untranslated_in_batch)]
+                    
+                    # 1. Local Whisper transcription with character and terminology context
+                    if self.whisper:
+                        whisper_prime_keywords = []
+                        if anime_meta:
+                            t_nat = anime_meta.get("title_native")
+                            t_rom = anime_meta.get("title_romaji")
+                            if t_nat:
+                                whisper_prime_keywords.append(t_nat)
+                            elif t_rom:
+                                whisper_prime_keywords.append(t_rom)
+
+                        if episode_profile:
+                            if getattr(episode_profile, "name_declensions", None):
+                                whisper_prime_keywords.extend([nd.character_name for nd in episode_profile.name_declensions if nd.character_name][:6])
+                            if getattr(episode_profile, "characters", None):
+                                for c in episode_profile.characters:
+                                    if getattr(c, "speaker", None):
+                                        whisper_prime_keywords.append(c.speaker)
+                                    if getattr(c, "listener", None):
+                                        whisper_prime_keywords.append(c.listener)
+
+                        # Safe keyword filtering for Japanese Whisper (no Polish characters or role labels)
+                        sanitized_kw = []
+                        for kw in whisper_prime_keywords:
+                            if not kw:
+                                continue
+                            clean_k = re.sub(r"\(.*?\)", "", kw).strip()
+                            if not clean_k or len(clean_k) < 2:
+                                continue
+                            if re.search(r"[ąćęłńóśźżĄĆĘŁŃÓŚŹŻ]", clean_k):
+                                continue
+                            if clean_k.lower() in ("mężczyzna", "kobieta", "postać", "narrator", "man", "woman", "unknown", "głos", "dziewczyna", "chłopak"):
+                                continue
+                            if clean_k not in sanitized_kw:
+                                sanitized_kw.append(clean_k)
+
+                        initial_prompt_str = "、".join(sanitized_kw[:8]) if sanitized_kw else None
+
+                        whisper_transcriptions = self.whisper.transcribe_batch_scene(
+                            scene_wav_path=temp_audio_file,
+                            batch_start_ms=batch_start,
+                            events=events_tuples,
+                            initial_prompt=initial_prompt_str
+                        )
+
+                    # 2. Local prosody analysis (RMS dBFS / whisper / shout)
+                    prosody_tags = AudioProsodyEngine.analyze_scene_prosody(
+                        wav_path=temp_audio_file,
+                        batch_start_ms=batch_start,
+                        events=events_tuples
+                    )
+
+                    # 3. Local diarization and F0 pitch estimation
+                    speaker_tags = SpeakerVoiceClassifier.classify_scene_speakers(
+                        wav_path=temp_audio_file,
+                        batch_start_ms=batch_start,
+                        events=events_tuples
+                    )
+            except Exception as e:
+                pbar.write(f" ├─ [Ostrzeżenie Audio/Whisper]: {e}")
+                pass
+
+        # 3. Dynamic contextual rules, user golden feedback, and deterministic glossary
+        batch_en_queries = [item[2] for item in untranslated_in_batch]
+        relevant_feedback = self.user_feedback.find_relevant_feedback(
+            batch_en_queries,
+            anime_title=anime_meta.get("title", "") if anime_meta else ""
+        )
+        user_feedback_str = self.user_feedback.format_for_prompt(relevant_feedback)
+        glossary_str = self.glossary_manager.format_for_prompt(combined_glossary)
+        focused_rules_str = get_focused_rules_for_batch([
+            {
+                "en": item[2],
+                "is_sign": detect_event_visual_type(item[1], item[3])["is_sign"],
+                "speaker_gender": self.character_registry.get(item[1].name)
+            }
+            for item in untranslated_in_batch
+        ])
+
+        # 3b. Text prompt with AniList knowledge, character registry, lookahead, and phonetic cues
+        prompt_text = self._prepare_batch_prompt(
+            untranslated_in_batch,
+            history,
+            lookahead_events=lookahead_events,
+            anime_context_str=anime_context_str,
+            episode_profile_str=episode_profile_str,
+            whisper_transcriptions=whisper_transcriptions,
+            series_bible_str=series_bible_str,
+            prosody_tags=prosody_tags,
+            speaker_tags=speaker_tags,
+            manga_canon_str=manga_canon_str,
+            user_feedback_str=user_feedback_str,
+            glossary_str=glossary_str,
+            focused_rules_str=focused_rules_str
+        )
+
+        # 4. Call Gemini (Vision + Whisper text context)
+        if whisper_transcriptions:
+            jp_raw_list = [v for v in whisper_transcriptions.values() if v]
+            if jp_raw_list:
+                romaji_samples = [to_romaji(text) for text in jp_raw_list[:2]]
+                romaji_line = " | ".join(romaji_samples)
+                if len(romaji_line) > 75:
+                    romaji_line = romaji_line[:72] + "..."
+                pbar.write(f" ├─ [Odsłuch JP] \"{romaji_line}\"")
+
+        # 4. Call Gemini (Vision + Text)
+        contents: List[Any] = []
+        contents.extend(image_contents)
+        contents.append(prompt_text)
+
+        pbar.set_postfix_str("Faza 1 (Wizja + Audio)...")
+        batch_response = self._call_gemini_with_retry(
+            contents=contents,
+            schema_class=BatchTranslationResponse
+        )
+
+        # Update global Character Registry with thread lock
+        with self.lock:
+            if batch_response and batch_response.characters_identified:
+                for char in batch_response.characters_identified:
+                    if char.name:
+                        desc = f"{char.gender} ({char.role or 'postać'})"
+                        self.character_registry[char.name] = desc
+        if batch_response and batch_response.scene_description:
+            pbar.write(f" ├─ [Kontekst] {batch_response.scene_description}")
+
+        # Clean up temporary frames and audio files
+        for fpath in temp_frames:
+            try:
+                os.remove(fpath)
+            except OSError:
+                pass
+        if temp_audio_file and os.path.exists(temp_audio_file):
+            try:
+                os.remove(temp_audio_file)
+            except OSError:
+                pass
+
+        # 5. Process Phase 1 response
+        pass1_items = []
+        scene_desc = batch_response.scene_description if batch_response else ""
+
+        for idx, (orig_idx, event, clean_en, ts_prefix) in enumerate(untranslated_in_batch):
+            batch_id = idx + 1
+            pl_candidate = ""
+            speaker_gender = None
+            notes = ""
+            vtype = detect_event_visual_type(event, ts_prefix)
+            cps, is_fast = calculate_cps(clean_en, event.start, event.end)
+            cps_warn = f"Tempo CPS: {cps:.1f} (czas {(event.end - event.start)/1000.0:.1f}s)" if is_fast else ""
+            condensation_dir = calculate_condensation_directive(clean_en, event.start, event.end)
+
+            visual_sub = ""
+            lit_mean = ""
+            if batch_response:
+                for tr in batch_response.translations:
+                    if tr.id == batch_id:
+                        pl_candidate = sanitize_sub_text(tr.polish_text)
+                        speaker_gender = tr.speaker_gender
+                        visual_sub = getattr(tr, 'visual_subtext', '') or ''
+                        lit_mean = getattr(tr, 'literal_meaning', '') or ''
+                        notes = f"{tr.visual_clues or ''} {tr.notes or ''}".strip()
+                        break
+
+            if not pl_candidate:
+                pl_candidate = clean_en
+
+            jp_text = whisper_transcriptions.get(batch_id, "") if whisper_transcriptions else ""
+            romaji_str = to_romaji(jp_text) if jp_text else ""
+            audio_jp_str = f"{jp_text} [{romaji_str}]" if romaji_str and romaji_str != jp_text else jp_text
+
+            audio_discrepancy_msg = detect_audio_discrepancy(audio_jp_str, pl_candidate, clean_en)
+            pragmatic_reg = detect_japanese_pragmatic_register(audio_jp_str, clean_en)
+
+            pass1_items.append({
+                "id": batch_id,
+                "orig_idx": orig_idx,
+                "en": clean_en,
+                "pl": pl_candidate,
+                "speaker_gender": speaker_gender,
+                "speaker_voice": speaker_tags.get(batch_id, ""),
+                "prosody": prosody_tags.get(batch_id, ""),
+                "audio_jp": audio_jp_str,
+                "audio_alert": audio_discrepancy_msg or "",
+                "pragmatic_register": pragmatic_reg or "",
+                "visual_subtext": visual_sub or "",
+                "literal_meaning": lit_mean or "",
+                "cps_warning": cps_warn,
+                "condensation_directive": condensation_dir or "",
+                "notes": notes,
+                "is_sign": vtype["is_sign"],
+                "visual_type": vtype["type_label"],
+                "visual_details": vtype["visual_details"],
+                "is_song": is_song_line(event, clean_en)
+            })
+
+        # 6. Optional Phase 2 Verifier (Script Doctor)
+        batch_results: Dict[int, str] = {}
+
+        if self.enable_verifier and hasattr(self, 'verifier'):
+            pbar.set_postfix_str("Faza 2 (Redakcja Dialogów Pro)...")
+            refined_lines: List[RefinedLine] = self.verifier.verify_batch(
+                batch_items=pass1_items,
+                scene_summary=scene_desc or "",
+                episode_profile_str=episode_profile_str,
+                user_feedback_str=user_feedback_str,
+                glossary_str=glossary_str,
+                focused_rules_str=focused_rules_str
+            )
+            refined_dict = {r.id: sanitize_sub_text(r.refined_pl) for r in refined_lines}
+            for r in refined_lines:
+                if r.changes_made:
+                    pbar.write(f" └─ [Redaktor Dialogów] {r.changes_made}")
+            for item in pass1_items:
+                raw_final = sanitize_sub_text(refined_dict.get(item["id"], item["pl"]))
+                final_text, fixes = AVTLinter.lint_and_fix_line(
+                    text=raw_final,
+                    speaker_gender=item.get("speaker_gender"),
+                    is_all_girls_scene=True,
+                    is_sign=item.get("is_sign", False),
+                    user_feedback_rules=all_user_rules,
+                    custom_glossary=combined_glossary
+                )
+                # Deterministic glossary overrides
+                final_text, gloss_fixes = GlossaryManager.apply_deterministic_overrides(final_text, combined_glossary)
+                if item.get("is_song") and not item.get("is_sign"):
+                    clean_no_notes = re.sub(r"^[♪♫♬\s]+|[♪♫♬\s]+$", "", final_text).strip()
+                    if clean_no_notes:
+                        final_text = f"♪ {clean_no_notes} ♪"
+                for fix in fixes + gloss_fixes:
+                    pbar.write(f"  [AVT Linter/Słownik] {fix}")
+                formatted_final = split_subtitle_syntactically(final_text, max_line_len=42, is_ass=is_ass, is_sign=item.get("is_sign", False))
+                batch_results[item["orig_idx"]] = formatted_final
+        else:
+            for item in pass1_items:
+                raw_final = sanitize_sub_text(item["pl"])
+                final_text, fixes = AVTLinter.lint_and_fix_line(
+                    text=raw_final,
+                    speaker_gender=item.get("speaker_gender"),
+                    is_all_girls_scene=True,
+                    is_sign=item.get("is_sign", False),
+                    user_feedback_rules=all_user_rules,
+                    custom_glossary=combined_glossary
+                )
+                # Deterministic glossary overrides
+                final_text, gloss_fixes = GlossaryManager.apply_deterministic_overrides(final_text, combined_glossary)
+                if item.get("is_song") and not item.get("is_sign"):
+                    clean_no_notes = re.sub(r"^[♪♫♬\s]+|[♪♫♬\s]+$", "", final_text).strip()
+                    if clean_no_notes:
+                        final_text = f"♪ {clean_no_notes} ♪"
+                for fix in fixes + gloss_fixes:
+                    pbar.write(f"  [AVT Linter/Słownik] {fix}")
+                formatted_final = split_subtitle_syntactically(final_text, max_line_len=42, is_ass=is_ass, is_sign=item.get("is_sign", False))
+                batch_results[item["orig_idx"]] = formatted_final
+
+        # Harmonize concurrent screen subtitles (e.g. speech balloon + dialogue with identical EN text)
+        en_to_best_pl: Dict[str, str] = {}
+        for item in pass1_items:
+            en_norm = item["en"].strip().lower()
+            pl_res = batch_results.get(item["orig_idx"], "")
+            if pl_res and "to robi" not in pl_res.lower():
+                en_to_best_pl[en_norm] = pl_res
+
+        for item in pass1_items:
+            en_norm = item["en"].strip().lower()
+            if en_norm in en_to_best_pl:
+                cur_pl = batch_results.get(item["orig_idx"], "")
+                if "to robi" in cur_pl.lower():
+                    batch_results[item["orig_idx"]] = en_to_best_pl[en_norm]
+
+        return b_idx, batch_results, untranslated_in_batch, pass1_items, scene_desc
 
     def translate_file(
         self,
@@ -1071,405 +1450,140 @@ class MultimodalTranslator:
             if already_done > 0:
                 pbar.update(already_done)
 
+            # Collect all batches that need translation
+            tasks_to_run = []
             for b_idx, batch in enumerate(batches):
-                if cancel_check and cancel_check():
-                    print("\n[Tłumacz]: Otrzymano sygnał przerwania (⏹ Stop). Bezpieczne zatrzymanie i zapis stanu...")
-                    break
+                untranslated = [item for item in batch if item[0] not in translated_results]
+                if untranslated:
+                    tasks_to_run.append((b_idx, batch, untranslated))
 
-                untranslated_in_batch = [item for item in batch if item[0] not in translated_results]
-                if not untranslated_in_batch:
-                    continue
+            all_user_rules = self.user_feedback.list_all()
 
-                # Retrieve upcoming lines (Lookahead Window)
-                lookahead_events = []
-                if b_idx + 1 < len(batches):
-                    lookahead_events = batches[b_idx + 1][:4]
-
-                # 2. Extract 3-4 intelligent key video frames for the batch (Storyboard & Visual OCR)
-                temp_frames: List[str] = []
-                image_contents = []
-
-                if video_path and os.path.exists(video_path):
-                    raw_timestamps: List[int] = []
-                    
-                    # 1. Start line
-                    raw_timestamps.append((untranslated_in_batch[0][1].start + untranslated_in_batch[0][1].end) // 2)
-
-                    # 2. Priority: Signs and On-screen captions for OCR
-                    for _, ev, clean_txt, ts_pref in untranslated_in_batch:
-                        vtype = detect_event_visual_type(ev, ts_pref)
-                        if vtype.get("is_sign") or (clean_txt.startswith("[") and clean_txt.endswith("]")):
-                            sign_ts = (ev.start + ev.end) // 2
-                            raw_timestamps.append(sign_ts)
-                            if len(raw_timestamps) >= 4:
-                                break
-
-                    # 3. Middle / Scene transition frames
-                    N = len(untranslated_in_batch)
-                    if N >= 8 and len(raw_timestamps) < 4:
-                        raw_timestamps.append((untranslated_in_batch[N // 3][1].start + untranslated_in_batch[N // 3][1].end) // 2)
-                        raw_timestamps.append((untranslated_in_batch[(2 * N) // 3][1].start + untranslated_in_batch[(2 * N) // 3][1].end) // 2)
-                    elif N >= 3 and len(raw_timestamps) < 3:
-                        raw_timestamps.append((untranslated_in_batch[N // 2][1].start + untranslated_in_batch[N // 2][1].end) // 2)
-
-                    # 4. End of scene / Reaction frame
-                    if N >= 2 and len(raw_timestamps) < 4:
-                        raw_timestamps.append((untranslated_in_batch[-1][1].start + untranslated_in_batch[-1][1].end) // 2)
-
-                    # Sort and deduplicate timestamps (min 1500ms apart)
-                    raw_timestamps = sorted(raw_timestamps)
-                    deduped_ts: List[int] = []
-                    for ts in raw_timestamps:
-                        if not deduped_ts or all(abs(ts - existing) >= 1500 for existing in deduped_ts):
-                            deduped_ts.append(ts)
-                        if len(deduped_ts) >= 4:
-                            break
-
-                    for ts in deduped_ts:
-                        try:
-                            frame_path = extract_frame_at_timestamp(
+            if tasks_to_run:
+                max_workers = min(self.concurrent_batches, len(tasks_to_run))
+                if max_workers > 1:
+                    print(f"\n  [Równoległość Tier 1]: Uruchamianie równoległego tłumaczenia ({max_workers} paczki jednocześnie)...")
+                    import concurrent.futures
+                    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+                        future_to_bidx = {
+                            executor.submit(
+                                self._process_single_batch,
+                                b_idx=b_idx,
+                                batch=batch,
+                                untranslated_in_batch=untranslated,
+                                batches=batches,
                                 video_path=video_path,
-                                timestamp_ms=ts,
-                                max_width=self.max_image_width
-                            )
-                            temp_frames.append(frame_path)
-                        except Exception:
-                            pass
-
-                    for fpath in temp_frames:
-                        try:
-                            img = Image.open(fpath)
-                            image_contents.append(img)
-                        except Exception:
-                            pass
-
-                # 2b. Extract audio slice and run LOCAL Whisper transcription + Prosody + Diarization (100% offline)
-                temp_audio_file = None
-                whisper_transcriptions: Dict[int, str] = {}
-                prosody_tags: Dict[int, str] = {}
-                speaker_tags: Dict[int, str] = {}
-                if video_path and os.path.exists(video_path):
-                    try:
-                        batch_start = untranslated_in_batch[0][1].start
-                        batch_end = untranslated_in_batch[-1][1].end
-                        if 0 < (batch_end - batch_start) <= 360000:
-                            temp_audio_file = extract_audio_slice(
-                                video_path=video_path,
-                                start_ms=batch_start,
-                                end_ms=batch_end
-                            )
-                            events_tuples = [(idx + 1, item[1]) for idx, item in enumerate(untranslated_in_batch)]
-                            
-                            # 1. Local Whisper transcription with character and terminology context
-                            if self.whisper:
-                                whisper_prime_keywords = []
-                                if anime_meta:
-                                    t_nat = anime_meta.get("title_native")
-                                    t_rom = anime_meta.get("title_romaji")
-                                    if t_nat:
-                                        whisper_prime_keywords.append(t_nat)
-                                    elif t_rom:
-                                        whisper_prime_keywords.append(t_rom)
-
-                                if episode_profile:
-                                    if getattr(episode_profile, "name_declensions", None):
-                                        whisper_prime_keywords.extend([nd.character_name for nd in episode_profile.name_declensions if nd.character_name][:6])
-                                    if getattr(episode_profile, "characters", None):
-                                        for c in episode_profile.characters:
-                                            if getattr(c, "speaker", None):
-                                                whisper_prime_keywords.append(c.speaker)
-                                            if getattr(c, "listener", None):
-                                                whisper_prime_keywords.append(c.listener)
-
-                                # Safe keyword filtering for Japanese Whisper (no Polish characters or role labels)
-                                sanitized_kw = []
-                                for kw in whisper_prime_keywords:
-                                    if not kw:
-                                        continue
-                                    clean_k = re.sub(r"\(.*?\)", "", kw).strip()
-                                    if not clean_k or len(clean_k) < 2:
-                                        continue
-                                    if re.search(r"[ąćęłńóśźżĄĆĘŁŃÓŚŹŻ]", clean_k):
-                                        continue
-                                    if clean_k.lower() in ("mężczyzna", "kobieta", "postać", "narrator", "man", "woman", "unknown", "głos", "dziewczyna", "chłopak"):
-                                        continue
-                                    if clean_k not in sanitized_kw:
-                                        sanitized_kw.append(clean_k)
-
-                                initial_prompt_str = "、".join(sanitized_kw[:8]) if sanitized_kw else None
-
-                                whisper_transcriptions = self.whisper.transcribe_batch_scene(
-                                    scene_wav_path=temp_audio_file,
-                                    batch_start_ms=batch_start,
-                                    events=events_tuples,
-                                    initial_prompt=initial_prompt_str
-                                )
-
-                            # 2. Local prosody analysis (RMS dBFS / whisper / shout)
-                            prosody_tags = AudioProsodyEngine.analyze_scene_prosody(
-                                wav_path=temp_audio_file,
-                                batch_start_ms=batch_start,
-                                events=events_tuples
-                            )
-
-                            # 3. Local diarization and F0 pitch estimation
-                            speaker_tags = SpeakerVoiceClassifier.classify_scene_speakers(
-                                wav_path=temp_audio_file,
-                                batch_start_ms=batch_start,
-                                events=events_tuples
-                            )
-                    except Exception as e:
-                        pbar.write(f" ├─ [Ostrzeżenie Audio/Whisper]: {e}")
-                        pass
-
-                # 3. Dynamic contextual rules, user golden feedback, and deterministic glossary
-                batch_en_queries = [item[2] for item in untranslated_in_batch]
-                relevant_feedback = self.user_feedback.find_relevant_feedback(
-                    batch_en_queries,
-                    anime_title=anime_meta.get("title", "") if anime_meta else ""
-                )
-                user_feedback_str = self.user_feedback.format_for_prompt(relevant_feedback)
-                glossary_str = self.glossary_manager.format_for_prompt(combined_glossary)
-                focused_rules_str = get_focused_rules_for_batch([
-                    {
-                        "en": item[2],
-                        "is_sign": detect_event_visual_type(item[1], item[3])["is_sign"],
-                        "speaker_gender": self.character_registry.get(item[1].name)
-                    }
-                    for item in untranslated_in_batch
-                ])
-
-                # 3b. Text prompt with AniList knowledge, character registry, lookahead, and phonetic cues
-                prompt_text = self._prepare_batch_prompt(
-                    untranslated_in_batch,
-                    history,
-                    lookahead_events=lookahead_events,
-                    anime_context_str=anime_context_str,
-                    episode_profile_str=episode_profile_str,
-                    whisper_transcriptions=whisper_transcriptions,
-                    series_bible_str=series_bible_str,
-                    prosody_tags=prosody_tags,
-                    speaker_tags=speaker_tags,
-                    manga_canon_str=manga_canon_str,
-                    user_feedback_str=user_feedback_str,
-                    glossary_str=glossary_str,
-                    focused_rules_str=focused_rules_str
-                )
-
-                # 4. Call Gemini (Vision + Whisper text context)
-                contents: List[Any] = []
-                # Console preview of Whisper status in phonetic Romaji
-                if whisper_transcriptions:
-                    jp_raw_list = [v for v in whisper_transcriptions.values() if v]
-                    if jp_raw_list:
-                        romaji_samples = [to_romaji(text) for text in jp_raw_list[:2]]
-                        romaji_line = " | ".join(romaji_samples)
-                        if len(romaji_line) > 75:
-                            romaji_line = romaji_line[:72] + "..."
-                        pbar.write(f" ├─ [Odsłuch JP] \"{romaji_line}\"")
-
-                # 4. Call Gemini (Vision + Text)
-                contents: List[Any] = []
-                contents.extend(image_contents)
-                contents.append(prompt_text)
-
-                pbar.set_postfix_str("Faza 1 (Wizja + Audio)...")
-                batch_response = self._call_gemini_with_retry(
-                    contents=contents,
-                    schema_class=BatchTranslationResponse
-                )
-
-                # Update global Character Registry
-                if batch_response and batch_response.characters_identified:
-                    for char in batch_response.characters_identified:
-                        if char.name:
-                            desc = f"{char.gender} ({char.role or 'postać'})"
-                            self.character_registry[char.name] = desc
-                if batch_response and batch_response.scene_description:
-                    pbar.write(f" ├─ [Kontekst] {batch_response.scene_description}")
-
-                # Clean up temporary frames and audio files
-                for fpath in temp_frames:
-                    try:
-                        os.remove(fpath)
-                    except OSError:
-                        pass
-                if temp_audio_file and os.path.exists(temp_audio_file):
-                    try:
-                        os.remove(temp_audio_file)
-                    except OSError:
-                        pass
-
-                # 5. Process Phase 1 response
-                pass1_items = []
-                scene_desc = batch_response.scene_description if batch_response else ""
-
-                for idx, (orig_idx, event, clean_en, ts_prefix) in enumerate(untranslated_in_batch):
-                    batch_id = idx + 1
-                    pl_candidate = ""
-                    speaker_gender = None
-                    notes = ""
-                    vtype = detect_event_visual_type(event, ts_prefix)
-                    cps, is_fast = calculate_cps(clean_en, event.start, event.end)
-                    cps_warn = f"Tempo CPS: {cps:.1f} (czas {(event.end - event.start)/1000.0:.1f}s)" if is_fast else ""
-                    condensation_dir = calculate_condensation_directive(clean_en, event.start, event.end)
-
-                    visual_sub = ""
-                    lit_mean = ""
-                    if batch_response:
-                        for tr in batch_response.translations:
-                            if tr.id == batch_id:
-                                pl_candidate = sanitize_sub_text(tr.polish_text)
-                                speaker_gender = tr.speaker_gender
-                                visual_sub = getattr(tr, 'visual_subtext', '') or ''
-                                lit_mean = getattr(tr, 'literal_meaning', '') or ''
-                                notes = f"{tr.visual_clues or ''} {tr.notes or ''}".strip()
-                                break
-
-                    if not pl_candidate:
-                        pl_candidate = clean_en
-
-                    jp_text = whisper_transcriptions.get(batch_id, "") if whisper_transcriptions else ""
-                    romaji_str = to_romaji(jp_text) if jp_text else ""
-                    audio_jp_str = f"{jp_text} [{romaji_str}]" if romaji_str and romaji_str != jp_text else jp_text
-
-                    audio_discrepancy_msg = detect_audio_discrepancy(audio_jp_str, pl_candidate, clean_en)
-                    pragmatic_reg = detect_japanese_pragmatic_register(audio_jp_str, clean_en)
-
-                    pass1_items.append({
-                        "id": batch_id,
-                        "orig_idx": orig_idx,
-                        "en": clean_en,
-                        "pl": pl_candidate,
-                        "speaker_gender": speaker_gender,
-                        "speaker_voice": speaker_tags.get(batch_id, ""),
-                        "prosody": prosody_tags.get(batch_id, ""),
-                        "audio_jp": audio_jp_str,
-                        "audio_alert": audio_discrepancy_msg or "",
-                        "pragmatic_register": pragmatic_reg or "",
-                        "visual_subtext": visual_sub or "",
-                        "literal_meaning": lit_mean or "",
-                        "cps_warning": cps_warn,
-                        "condensation_directive": condensation_dir or "",
-                        "notes": notes,
-                        "is_sign": vtype["is_sign"],
-                        "visual_type": vtype["type_label"],
-                        "visual_details": vtype["visual_details"],
-                        "is_song": is_song_line(event, clean_en)
-                    })
-
-                # 6. Optional Phase 2 Verifier (Script Doctor)
-                all_user_rules = self.user_feedback.list_all()
-
-                if self.enable_verifier and hasattr(self, 'verifier'):
-                    pbar.set_postfix_str("Faza 2 (Redakcja Dialogów Pro)...")
-                    refined_lines: List[RefinedLine] = self.verifier.verify_batch(
-                        batch_items=pass1_items,
-                        scene_summary=scene_desc or "",
-                        episode_profile_str=episode_profile_str,
-                        user_feedback_str=user_feedback_str,
-                        glossary_str=glossary_str,
-                        focused_rules_str=focused_rules_str
-                    )
-                    refined_dict = {r.id: sanitize_sub_text(r.refined_pl) for r in refined_lines}
-                    for r in refined_lines:
-                        if r.changes_made:
-                            pbar.write(f" └─ [Redaktor Dialogów] {r.changes_made}")
-                    for item in pass1_items:
-                        raw_final = sanitize_sub_text(refined_dict.get(item["id"], item["pl"]))
-                        final_text, fixes = AVTLinter.lint_and_fix_line(
-                            text=raw_final,
-                            speaker_gender=item.get("speaker_gender"),
-                            is_all_girls_scene=True,
-                            is_sign=item.get("is_sign", False),
-                            user_feedback_rules=all_user_rules,
-                            custom_glossary=combined_glossary
-                        )
-                        # Deterministic glossary overrides
-                        final_text, gloss_fixes = GlossaryManager.apply_deterministic_overrides(final_text, combined_glossary)
-                        if item.get("is_song") and not item.get("is_sign"):
-                            clean_no_notes = re.sub(r"^[♪♫♬\s]+|[♪♫♬\s]+$", "", final_text).strip()
-                            if clean_no_notes:
-                                final_text = f"♪ {clean_no_notes} ♪"
-                        for fix in fixes + gloss_fixes:
-                            pbar.write(f"  [AVT Linter/Słownik] {fix}")
-                        formatted_final = split_subtitle_syntactically(final_text, max_line_len=42, is_ass=is_ass, is_sign=item.get("is_sign", False))
-                        translated_results[item["orig_idx"]] = formatted_final
-                        history.append({"en": item["en"], "pl": formatted_final})
-                else:
-                    for item in pass1_items:
-                        raw_final = sanitize_sub_text(item["pl"])
-                        final_text, fixes = AVTLinter.lint_and_fix_line(
-                            text=raw_final,
-                            speaker_gender=item.get("speaker_gender"),
-                            is_all_girls_scene=True,
-                            is_sign=item.get("is_sign", False),
-                            user_feedback_rules=all_user_rules,
-                            custom_glossary=combined_glossary
-                        )
-                        # Deterministic glossary overrides
-                        final_text, gloss_fixes = GlossaryManager.apply_deterministic_overrides(final_text, combined_glossary)
-                        if item.get("is_song") and not item.get("is_sign"):
-                            clean_no_notes = re.sub(r"^[♪♫♬\s]+|[♪♫♬\s]+$", "", final_text).strip()
-                            if clean_no_notes:
-                                final_text = f"♪ {clean_no_notes} ♪"
-                        for fix in fixes + gloss_fixes:
-                            pbar.write(f"  [AVT Linter/Słownik] {fix}")
-                        formatted_final = split_subtitle_syntactically(final_text, max_line_len=42, is_ass=is_ass, is_sign=item.get("is_sign", False))
-                        translated_results[item["orig_idx"]] = formatted_final
-                        history.append({"en": item["en"], "pl": formatted_final})
-
-                # Harmonize concurrent screen subtitles (e.g. speech balloon + dialogue with identical EN text)
-                en_to_best_pl: Dict[str, str] = {}
-                for item in pass1_items:
-                    en_norm = item["en"].strip().lower()
-                    pl_res = translated_results.get(item["orig_idx"], "")
-                    if pl_res and "to robi" not in pl_res.lower():
-                        en_to_best_pl[en_norm] = pl_res
-
-                for item in pass1_items:
-                    en_norm = item["en"].strip().lower()
-                    if en_norm in en_to_best_pl:
-                        cur_pl = translated_results.get(item["orig_idx"], "")
-                        if "to robi" in cur_pl.lower():
-                            translated_results[item["orig_idx"]] = en_to_best_pl[en_norm]
-
-                # Auto-save checkpoint after each batch (persisting token usage)
-                try:
-                    checkpoint_payload = {
-                        "translated_results": translated_results,
-                        "token_usage": {
-                            "f1": self.current_episode_tokens,
-                            "f2": self.verifier.current_episode_tokens if self.verifier else None
+                                is_ass=is_ass,
+                                anime_meta=anime_meta,
+                                episode_profile=episode_profile,
+                                anime_context_str=anime_context_str,
+                                episode_profile_str=episode_profile_str,
+                                series_bible_str=series_bible_str,
+                                manga_canon_str=manga_canon_str,
+                                combined_glossary=combined_glossary,
+                                all_user_rules=all_user_rules,
+                                history=history,
+                                pbar=pbar
+                            ): b_idx
+                            for b_idx, batch, untranslated in tasks_to_run
                         }
-                    }
-                    with open(checkpoint_path, "w", encoding="utf-8") as cp_file:
-                        json.dump(checkpoint_payload, cp_file, ensure_ascii=False)
-                except Exception:
-                    pass
 
-                pbar.update(len(untranslated_in_batch))
-                
-                if progress_callback:
-                    try:
-                        from pricing_guard import PricingGuard
-                        f1_stats = self.current_episode_tokens
-                        f2_stats = self.verifier.current_episode_tokens if self.verifier else None
-                        cur_cost_pln = PricingGuard.calculate_actual_cost_pln(f1_stats, f2_stats)
-                        # Prepare recent translation previews for UI live monitor
-                        recent_previews = []
-                        for it in pass1_items:
-                            o_idx = it["orig_idx"]
-                            recent_previews.append({
-                                "id": o_idx + 1,
-                                "en": it["en"],
-                                "pl": translated_results.get(o_idx, "")
-                            })
-                        progress_callback(len(translated_results), total_lines, recent_previews, cur_cost_pln)
-                    except Exception:
-                        pass
+                        for future in concurrent.futures.as_completed(future_to_bidx):
+                            if cancel_check and cancel_check():
+                                print("\n[Tłumacz]: Otrzymano sygnał przerwania (⏹ Stop)...")
+                                break
+                            try:
+                                b_res_idx, batch_res, untrans_items, pass1_items, sc_desc = future.result()
+                                with self.lock:
+                                    for orig_idx, text_res in batch_res.items():
+                                        translated_results[orig_idx] = text_res
+                                    # Save checkpoint safely
+                                    try:
+                                        checkpoint_payload = {
+                                            "translated_results": translated_results,
+                                            "token_usage": {
+                                                "f1": self.current_episode_tokens,
+                                                "f2": self.verifier.current_episode_tokens if self.verifier else None
+                                            }
+                                        }
+                                        with open(checkpoint_path, "w", encoding="utf-8") as cp_file:
+                                            json.dump(checkpoint_payload, cp_file, ensure_ascii=False)
+                                    except Exception:
+                                        pass
 
-                time.sleep(2.0)
+                                pbar.update(len(untrans_items))
+
+                                if progress_callback:
+                                    try:
+                                        from pricing_guard import PricingGuard
+                                        f1_s = self.current_episode_tokens
+                                        f2_s = self.verifier.current_episode_tokens if self.verifier else None
+                                        cur_c = PricingGuard.calculate_actual_cost_pln(f1_s, f2_s)
+                                        recent_prev = [
+                                            {"id": it["orig_idx"] + 1, "en": it["en"], "pl": translated_results.get(it["orig_idx"], "")}
+                                            for it in pass1_items
+                                        ]
+                                        progress_callback(len(translated_results), total_lines, recent_prev, cur_c)
+                                    except Exception:
+                                        pass
+                            except Exception as e:
+                                pbar.write(f" 🔴 [Błąd Paczki]: {e}")
+                else:
+                    for b_idx, batch, untranslated in tasks_to_run:
+                        if cancel_check and cancel_check():
+                            print("\n[Tłumacz]: Otrzymano sygnał przerwania (⏹ Stop)...")
+                            break
+                        try:
+                            b_res_idx, batch_res, untrans_items, pass1_items, sc_desc = self._process_single_batch(
+                                b_idx=b_idx,
+                                batch=batch,
+                                untranslated_in_batch=untranslated,
+                                batches=batches,
+                                video_path=video_path,
+                                is_ass=is_ass,
+                                anime_meta=anime_meta,
+                                episode_profile=episode_profile,
+                                anime_context_str=anime_context_str,
+                                episode_profile_str=episode_profile_str,
+                                series_bible_str=series_bible_str,
+                                manga_canon_str=manga_canon_str,
+                                combined_glossary=combined_glossary,
+                                all_user_rules=all_user_rules,
+                                history=history,
+                                pbar=pbar
+                            )
+                            with self.lock:
+                                for orig_idx, text_res in batch_res.items():
+                                    translated_results[orig_idx] = text_res
+                                try:
+                                    checkpoint_payload = {
+                                        "translated_results": translated_results,
+                                        "token_usage": {
+                                            "f1": self.current_episode_tokens,
+                                            "f2": self.verifier.current_episode_tokens if self.verifier else None
+                                        }
+                                    }
+                                    with open(checkpoint_path, "w", encoding="utf-8") as cp_file:
+                                        json.dump(checkpoint_payload, cp_file, ensure_ascii=False)
+                                except Exception:
+                                    pass
+                            pbar.update(len(untrans_items))
+
+                            if progress_callback:
+                                try:
+                                    from pricing_guard import PricingGuard
+                                    f1_s = self.current_episode_tokens
+                                    f2_s = self.verifier.current_episode_tokens if self.verifier else None
+                                    cur_c = PricingGuard.calculate_actual_cost_pln(f1_s, f2_s)
+                                    recent_prev = [
+                                        {"id": it["orig_idx"] + 1, "en": it["en"], "pl": translated_results.get(it["orig_idx"], "")}
+                                        for it in pass1_items
+                                    ]
+                                    progress_callback(len(translated_results), total_lines, recent_prev, cur_c)
+                                except Exception:
+                                    pass
+                        except Exception as e:
+                            pbar.write(f" 🔴 [Błąd Paczki]: {e}")
 
         # 7. Construct final subtitle file preserving styles, positioning, and typesetting
         final_subs = pysubs2.SSAFile()

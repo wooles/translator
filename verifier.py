@@ -36,6 +36,8 @@ class DialogueVerifier:
         self.keep_honorifics = keep_honorifics
         self.system_prompt = get_verifier_system_prompt(keep_honorifics=keep_honorifics)
         self.current_episode_tokens: Dict[str, Any] = {"prompt": 0, "cached": 0, "output": 0, "model": self.model}
+        import threading
+        self.lock = threading.Lock()
         
         if thinking_budget is not None:
             self.thinking_budget = thinking_budget
@@ -170,12 +172,13 @@ class DialogueVerifier:
 
                 if hasattr(response, "usage_metadata") and response.usage_metadata:
                     um = response.usage_metadata
-                    self.current_episode_tokens["prompt"] += getattr(um, "prompt_token_count", 0) or 0
-                    self.current_episode_tokens["cached"] += getattr(um, "cached_content_token_count", 0) or 0
-                    cands = getattr(um, "candidates_token_count", 0) or 0
-                    thoughts = getattr(um, "thoughts_token_count", 0) or 0
-                    self.current_episode_tokens["output"] += (cands + thoughts)
-                    self.current_episode_tokens["model"] = self.model
+                    with self.lock:
+                        self.current_episode_tokens["prompt"] += getattr(um, "prompt_token_count", 0) or 0
+                        self.current_episode_tokens["cached"] += getattr(um, "cached_content_token_count", 0) or 0
+                        cands = getattr(um, "candidates_token_count", 0) or 0
+                        thoughts = getattr(um, "thoughts_token_count", 0) or 0
+                        self.current_episode_tokens["output"] += (cands + thoughts)
+                        self.current_episode_tokens["model"] = self.model
 
                 # Retrieve parsed structured output
                 if hasattr(response, "parsed") and response.parsed is not None:
