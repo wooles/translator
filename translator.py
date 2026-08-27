@@ -1450,8 +1450,15 @@ class MultimodalTranslator:
             if not clean_translated_text:
                 continue
 
+            # Auto-elevate bracketed signs/captions '[ ... ]' to top (\an8) if missing positioning to prevent collision with bottom subs/hardsubs
+            clean_check = clean_translated_text.strip()
+            ts_prefix_applied = ts_prefix or ""
+            if (clean_check.startswith("[") and clean_check.endswith("]")) or "sign" in (orig_event.style or "").lower():
+                if not (r"\an" in ts_prefix_applied or r"\pos" in ts_prefix_applied):
+                    ts_prefix_applied = r"{\an8}" + ts_prefix_applied
+
             # Reattach Typesetting tags to translated text
-            full_event_text = f"{ts_prefix}{clean_translated_text}" if ts_prefix else clean_translated_text
+            full_event_text = f"{ts_prefix_applied}{clean_translated_text}" if ts_prefix_applied else clean_translated_text
 
             new_event = orig_event.copy()
             new_event.text = full_event_text
