@@ -685,6 +685,8 @@ class MultimodalTranslator:
                 import concurrent.futures
 
                 def _single_generate():
+                    from client_factory import global_rate_limiter
+                    global_rate_limiter.acquire()
                     cfg = types.GenerateContentConfig(**gen_config_kwargs)
                     active_c = self.client_pool.get_client() if hasattr(self, "client_pool") else self.client
                     return active_c.models.generate_content(

@@ -94,3 +94,38 @@ class MultiKeyClientPool:
             self._idx += 1
             return client
 
+
+class TokenBucketLimiter:
+    """
+    High-frequency Token Bucket / Leaky Bucket Rate Limiter.
+    Enforces a smooth pacing interval and smooth burst distribution
+    to completely eliminate 429 rate limit spikes.
+    """
+    def __init__(self, rate_per_second: float = 18.0, burst_capacity: int = 4):
+        import threading, time
+        self.rate = rate_per_second
+        self.capacity = burst_capacity
+        self.tokens = float(burst_capacity)
+        self.last_time = time.monotonic()
+        self.lock = threading.Lock()
+
+    def acquire(self):
+        """Acquires a token, sleeping if rate limit burst window is reached."""
+        import time, random
+        with self.lock:
+            while True:
+                now = time.monotonic()
+                elapsed = now - self.last_time
+                self.last_time = now
+                self.tokens = min(self.capacity, self.tokens + elapsed * self.rate)
+                if self.tokens >= 1.0:
+                    self.tokens -= 1.0
+                    return
+                wait = (1.0 - self.tokens) / self.rate
+                time.sleep(max(0.005, wait + random.uniform(0.002, 0.008)))
+
+
+# Global singleton instance for the entire translator process
+global_rate_limiter = TokenBucketLimiter(rate_per_second=18.0, burst_capacity=4)
+
+
