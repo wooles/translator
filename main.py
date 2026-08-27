@@ -386,7 +386,7 @@ def main():
     
     # Dynamic detection of latest Gemini models
     api_key_check = os.getenv("GEMINI_API_KEY")
-    temp_client = get_genai_client(api_key=api_key_check, timeout_ms=15000) if api_key_check else None
+    temp_client = get_genai_client(api_key=api_key_check, timeout_ms=35000) if api_key_check else None
     best_models = resolve_best_models(temp_client)
 
     model_p1 = args.model if args.model != "gemini-3.5-flash-lite" else None
