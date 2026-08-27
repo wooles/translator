@@ -195,25 +195,19 @@ def test_pydantic_schemas():
         id=1,
         polish_text="Rozumiem, co masz na myśli.",
         speaker_gender="mężczyzna",
-        visual_subtext="zbliżenie na usta, ukrywana wściekłość",
-        literal_meaning="ścisły sens dosłowny",
-        visual_clues="mężczyzna w mundurze",
         notes="eliminacja kalki"
     )
     batch = BatchTranslationResponse(
         scene_diagnosis=diag,
-        translations=[tr],
-        scene_description="Testowa scena"
+        translations=[tr]
     )
     assert batch.translations[0].id == 1
-    assert batch.translations[0].visual_subtext == "zbliżenie na usta, ukrywana wściekłość"
-    assert batch.translations[0].literal_meaning == "ścisły sens dosłowny"
+    assert batch.translations[0].polish_text == "Rozumiem, co masz na myśli."
     assert batch.scene_diagnosis is not None
     assert "Yoritsugu" in batch.scene_diagnosis.dramatic_context
 
     ref = RefinedLine(
         id=1,
-        original_en="I see.",
         refined_pl="Rozumiem.",
         changes_made="Poprawiono kalkę"
     )

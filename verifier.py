@@ -13,9 +13,8 @@ from rules import get_verifier_system_prompt, SceneDiagnosis
 
 class RefinedLine(BaseModel):
     id: int = Field(description="ID kwestii dialogowej zgodne z wejściem")
-    original_en: str = Field(description="Oryginalny tekst angielski")
     refined_pl: str = Field(description="Ostateczna, perfekcyjnie zredagowana kwestia w języku polskim, wolna od kalek")
-    changes_made: Optional[str] = Field(default=None, description="Krótkie uzasadnienie redakcyjne (np. 'Zmieniono kalkę Widzę na Rozumiem')")
+    changes_made: Optional[str] = Field(default=None, description="Krótkie uzasadnienie redakcyjne (tylko w razie potrzeby, np. 'Zmieniono kalkę')")
 
 class RefinedBatchResponse(BaseModel):
     scene_diagnosis: Optional[SceneDiagnosis] = Field(default=None, description="Diagnoza i weryfikacja intencji dramaturgicznych sceny")
