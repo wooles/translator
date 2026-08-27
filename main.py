@@ -421,7 +421,7 @@ def main():
         cost_ultra_est = PricingGuard.estimate_episode_cost_pln("4")
 
         print("\n  [Sonda Serwerów Google]: Sprawdzanie obciążenia i latencji klastrów API na żywo...")
-        health_probe = probe_all_models_health(client, best_models)
+        health_probe = probe_all_models_health(temp_client, best_models)
         tag_lite = health_probe.get("flash_lite", {}).get("tag", "🟢")
         tag_flash = health_probe.get("flash", {}).get("tag", "🟢")
         tag_pro = health_probe.get("pro", {}).get("tag", "🟢")
