@@ -423,7 +423,7 @@ def main():
         print("  WYBÓR PROFILU JAKOŚCI TŁUMACZENIA (Auto-wykrywanie najnowszych modeli):")
         print(f"  [1] STANDARDOWY (Free)  [{best_models['flash_lite']} - 100% Darmowy, szybki]")
         print(f"  [2] STUDYJNY FLASH      [{best_models['flash']} - Ekstremalnie tani, pojedyncza faza (~{cost_flash_est:.2f} zł/odc)]")
-        print(f"  [3] MISTRZOWSKI FLASH ⭐ [{best_models['flash']} + {best_models['flash']} (Thinking 4096) - Zalecany (~{cost_pro_est:.2f} zł/odc)]")
+        print(f"  [3] MISTRZOWSKI FLASH ⭐ [{best_models['flash']} + {best_models['flash']} (Adaptive CoT do 6144) - Zalecany (~{cost_pro_est:.2f} zł/odc)]")
         print(f"  [4] KINOWY PRO 👑       [{best_models['flash']} + {best_models['pro']} (Redakcja Pro) - Maksymalna Głębia (~{cost_ultra_est:.2f} zł/odc)]")
         print("─" * 68)
         print(PricingGuard.get_pricing_status_banner())
