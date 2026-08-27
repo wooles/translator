@@ -929,6 +929,17 @@ class MultimodalTranslator:
         else:
             print("[Autozapis]: Brak wcześniejszego checkpointu. Rozpoczynanie tłumaczenia.")
 
+        # Stalowa reguła: Zachowanie oryginalnych piosenek z Openingów i Endingów (OP/ED) bez tłumaczenia AI
+        song_lines_preserved = 0
+        for orig_idx, ev, clean, ts_prefix in raw_entries:
+            if is_song_line(ev, clean):
+                if orig_idx not in translated_results:
+                    translated_results[orig_idx] = clean
+                    song_lines_preserved += 1
+
+        if song_lines_preserved > 0:
+            print(f"  [Żelazna Reguła OP/ED]: Zachowano {song_lines_preserved} wersów piosenek (Opening/Ending) w oryginalnej wersji bez wysyłania do AI (0 PLN).")
+
         # 0. Episode Profiler (Pre-pass Glossary & Relationship Matrix)
         profile_cache_path = None
         if subs_path:
@@ -1446,6 +1457,12 @@ class MultimodalTranslator:
             if master_id not in translated_results:
                 continue
             
+            # If line is an OP/ED song, preserve original event text, styling and karaoke tags exactly 1:1
+            if is_song_line(orig_event, orig_event.text):
+                new_event = orig_event.copy()
+                final_subs.events.append(new_event)
+                continue
+
             clean_translated_text = sanitize_sub_text(translated_results[master_id])
             if not clean_translated_text:
                 continue

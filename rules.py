@@ -861,13 +861,15 @@ FILAR CXVII: PRAGMATYKA ODMOWY „...WA II DESU / KEKKOU DESU” (I'M FINE JAKO 
     - W odpowiedzi na zaproszenie/wyjście: „Ja... podziękuję.”, „Nie mam ochoty.”, „Ja... zostanę.”, „Spasuję.”.
     - W odpowiedzi na poczęstunek/pomoc: „Dziękuję, obejdzie się.”, „Nie trzeba.”, „Dziękuję, nie trzeba.”.
 
-FILAR CXVIII: KANON STANISŁAWA BARAŃCZAKA – TRANSKREACJA POETYCKO-SYLABICZNA PIOSENEK, RYMÓW I KANONÓW MUZYCZNYCH (SONG & RHYME METRE):
-- Gdy w dialogu pojawia się wers piosenki (oznaczony nutką '♪', '♫' lub stylem 'Karaoke' / 'Song' / 'OP' / 'ED') albo rymowana poezja:
-  * KATEGORYCZNY ZAKAZ tłumaczenia piosenki płaską, nierymowaną prozą!
-  * WYMÓG TRANSKREACJI SYLABICZNEJ (STANISŁAW BARAŃCZAK):
-    1. Ekwiwalencja rytmiczna: zachowaj zbliżoną liczbę sylab w każdym wersie (np. 8- lub 10-zgłoskowiec ze stałą średniówką).
-    2. Rymy naturalne (AABB lub ABAB): twórz czyste, zgrabne polskie rymy zamiast topornych częstochowskich zestrojeń.
-    3. Śpiewność i kadencja: polski tekst musi dać się zanucić / zaśpiewać w rytm oryginalnej linii melodycznej seiyū.
+FILAR CXVIII: STALOWA REGUŁA OP/ED I KANON STANISŁAWA BARAŃCZAKA (SONG & RHYME METRE):
+- 1. ŻELAZNY ZAKAZ TŁUMACZENIA PIOSENEK Z OPENINGÓW I ENDINGÓW (OP/ED):
+  * Wersy piosenek z czołówek (Opening) i tyłówek (Ending) są BEZWZGLĘDNIE ZACHOWYWANE W ORYGINALNYM TEKŚCIE (Romaji / stylizacja japońska / oryginalny zapis).
+  * System NIE tłumaczy piosenek OP/ED, co gwarantuje autentyczność ścieżki i oszczędza 100% tokenów API.
+- 2. PIOSENKI DIEGETYCZNE I WIERSZE W FABULE (TRANSKREACJA SYLABICZNA WG BARAŃCZAKA):
+  * Wyłącznie gdy bohater wewnątrz sceny śpiewa kołysankę, pieśń biesiadną lub recytuje wiersz fabularny:
+    1. Ekwiwalencja rytmiczna: zachowaj zbliżoną liczbę sylab w każdym wersie (np. 8- lub 10-zgłoskowiec).
+    2. Rymy naturalne (AABB lub ABAB): twórz czyste, zgrabne polskie rymy.
+    3. Śpiewność i kadencja: polski tekst musi dać się zanucić w rytm melodii postaci.
 
 FILAR CXIX: MATRYCA IDIOLEKTÓW I SPECJALIZACJA WOKALNA POSTACI (CHARACTER IDIOLECT & UNIQUE VOCAL FINGERPRINT):
 - Każda postać w anime musi posiadać własny, rozpoznawalny profil językowy w polskim przekładzie:
