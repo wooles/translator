@@ -117,15 +117,29 @@ class DialogueVerifier:
         has_condensation = any(item.get("condensation_directive") for item in batch_items)
         has_long_dialogue = any(len(item.get("en", "").split()) > 10 for item in batch_items)
 
-        # Tier 1: Piosenki OP/ED (Barańczak), kalambury fonetyczne i alarmy rozbieżności audio
-        if has_song or has_audio_alert:
-            effective_budget = max(4096, min(self.thinking_budget, 6144))
-        # Tier 2: Rejestry feudalne/dworskie, kompresja czasowa i długie narady militarne
-        elif has_pragmatic_reg or has_condensation or has_long_dialogue:
-            effective_budget = max(2048, min(self.thinking_budget, 3072))
-        # Tier 3: Standardowy, żywy dialog codzienny
+        # Separate adaptive CoT tiers for Pro Model ($12/1M output rate) vs Flash Model ($3.75/1M output rate)
+        if "pro" in self.model.lower():
+            # PRO MODEL DEDICATED TIERS (Level 4: High Literary Depth without token bloating)
+            # Tier 1 (Pro): Piosenki OP/ED, gry słowne, zawiłe metafory, alarmy Whisper
+            if has_song or has_audio_alert:
+                effective_budget = 2048
+            # Tier 2 (Pro): Rejestry militarne, stylizacja feudalna, kompresja, narady
+            elif has_pragmatic_reg or has_condensation or has_long_dialogue:
+                effective_budget = 1024
+            # Tier 3 (Pro): Proste, krótkie dialogi i okrzyki bojowe
+            else:
+                effective_budget = 512
         else:
-            effective_budget = min(self.thinking_budget, 1280)
+            # FLASH MODEL TIERS (Level 3: Full Deep CoT up to 6144 unchanged)
+            # Tier 1: Piosenki OP/ED (Barańczak), kalambury fonetyczne i alarmy rozbieżności audio
+            if has_song or has_audio_alert:
+                effective_budget = max(4096, min(self.thinking_budget, 6144))
+            # Tier 2: Rejestry feudalne/dworskie, kompresja czasowa i długie narady militarne
+            elif has_pragmatic_reg or has_condensation or has_long_dialogue:
+                effective_budget = max(2048, min(self.thinking_budget, 3072))
+            # Tier 3: Standardowy, żywy dialog codzienny
+            else:
+                effective_budget = min(self.thinking_budget, 1280)
 
         while True:
             attempt += 1

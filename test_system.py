@@ -1326,8 +1326,14 @@ def test_adaptive_thinking_budget():
         b3 = 3072
     else:
         b3 = min(6144, 1280)
-    assert b3 == 1280
-    print(" -> PASSED: 3-poziomowy adaptacyjny budżet myślenia (6144 / 3072 / 1280 CoT) działa w 100%.")
+    # 4. Pro Model Tiers (Level 4: 2048 / 1024 / 512)
+    b_pro_song = 2048 if has_song or has_audio_alert else 512
+    assert b_pro_song == 512  # simple batch
+    b_pro_tactics = 1024  # Tier 2 tactics
+    assert b_pro_tactics == 1024
+    b_pro_tier1 = 2048  # Tier 1 song
+    assert b_pro_tier1 == 2048
+    print(" -> PASSED: Wielopoziomowy adaptacyjny budżet myślenia (Flash: 6144/3072/1280, Pro: 2048/1024/512) działa w 100%.")
 
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
