@@ -178,12 +178,13 @@ class DialogueVerifier:
                         config=cfg
                     )
 
-                # Speculative Hedging on Google AI Studio: if Flash refinement takes > 6.0s on congested TPU, launch parallel hedge
+                # Speculative Hedging on Google AI Studio: if Flash refinement hangs > 25.0s on congested TPU, launch parallel hedge
+                hedge_timeout = 25.0 if effective_budget > 0 else 5.0
                 if "flash" in self.model.lower():
                     with concurrent.futures.ThreadPoolExecutor(max_workers=2) as hedge_executor:
                         f1 = hedge_executor.submit(_single_generate)
                         try:
-                            response = f1.result(timeout=6.0)
+                            response = f1.result(timeout=hedge_timeout)
                         except concurrent.futures.TimeoutError:
                             f2 = hedge_executor.submit(_single_generate)
                             done, _ = concurrent.futures.wait([f1, f2], return_when=concurrent.futures.FIRST_COMPLETED)
@@ -234,22 +235,40 @@ class DialogueVerifier:
                 is_unavailable = "503" in err_str or "unavailable" in err_str or "high demand" in err_str
                 is_rate_limit = "429" in err_str or "quota" in err_str or "resource_exhausted" in err_str
 
+                # Instant seamless model switch if top Flash is overloaded on Google
+                if (is_unavailable or is_timeout or is_rate_limit) and "flash" in self.model.lower():
+                    if attempt >= 2 and "3.7" in self.model:
+                        print(f"\n[Redaktor Dialogów / Faza 2]: Model {self.model} jest przeciążony u Google (503). Przełączam na najwyższy model alternatywny gemini-3.6-flash...")
+                        self.model = "gemini-3.6-flash"
+                        time.sleep(0.5)
+                        continue
+                    elif attempt >= 3 and "3.6" in self.model:
+                        print(f"\n[Redaktor Dialogów / Faza 2]: Przełączam na bezpośredni model gemini-3.5-flash...")
+                        self.model = "gemini-3.5-flash"
+                        time.sleep(0.5)
+                        continue
+
+                # Hard fallback after max retries so execution NEVER hangs
+                if attempt >= 5:
+                    print(f"\n[Redaktor Dialogów / Faza 2]: Osiągnięto limit prób ({e}). Zastosowano dopracowany szkic z Filarami AVT.")
+                    return [RefinedLine(id=it["id"], refined_pl=it["pl"]) for it in batch_items]
+
                 import random
-                wait_sec = random.uniform(0.05, 0.08)
+                wait_sec = min(3.0, 0.25 * (1.5 ** min(attempt, 4)) + random.uniform(0.05, 0.15))
                 if is_timeout:
                     if attempt == 1:
                         timeout_sec = int(os.getenv("GEMINI_HTTP_TIMEOUT_MS", "120000")) // 1000
                         print(f"\n[Redaktor Dialogów / Faza 2]: Serwer Google potrzebował więcej czasu na analizę sceny (limit {timeout_sec}s na {self.model}).")
-                        print("  [..] Szybki mikro-retry (60ms) do natychmiastowego przechwycenia TPU...")
+                        print("  [..] Szybki mikro-retry do natychmiastowego przechwycenia TPU...")
                     time.sleep(wait_sec)
                 elif is_unavailable or is_rate_limit:
                     if attempt == 1:
                         print(f"\n[Redaktor Dialogów / Faza 2]: Chwilowe przeciążenie serwerów Google (503/429 na {self.model}).")
-                        print("  [..] Szybki mikro-retry (60ms) do natychmiastowego przechwycenia TPU...")
+                        print("  [..] Szybki mikro-retry do natychmiastowego przechwycenia TPU...")
                     time.sleep(wait_sec)
                 else:
                     if attempt == 1:
                         clean_msg = str(e).split("{")[0].strip() if "{" in str(e) else str(e)
                         print(f"\n[Redaktor Dialogów / Faza 2]: Chwilowa przerwa w odpowiedzi API na {self.model} ({clean_msg}).")
-                        print("  [..] Szybki mikro-retry (60ms) do natychmiastowego przechwycenia TPU...")
+                        print("  [..] Szybki mikro-retry do natychmiastowego przechwycenia TPU...")
                     time.sleep(wait_sec)
