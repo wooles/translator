@@ -236,32 +236,22 @@ class DialogueVerifier:
                 is_unavailable = "503" in err_str or "unavailable" in err_str or "high demand" in err_str
                 is_rate_limit = "429" in err_str or "quota" in err_str or "resource_exhausted" in err_str
 
-                MAX_RETRIES = 5
-                if attempt >= MAX_RETRIES:
-                    if is_unavailable:
-                        friendly_reason = "Chwilowe przeciążenie klastrów TPU u Google (503 High Demand)"
-                    elif is_rate_limit:
-                        friendly_reason = "Tymczasowy limit przepustowości zapytań (429 Rate Limit)"
-                    elif is_timeout:
-                        friendly_reason = "Przekroczenie limitu czasu odpowiedzi serwera (Timeout)"
-                    else:
-                        friendly_reason = str(e).split("{")[0].strip().rstrip(".") or "Brak odpowiedzi serwera"
-                    print(f"\n[Redaktor Dialogów / Faza 2]: Osiągnięto limit {MAX_RETRIES} prób dla serwera Google ({friendly_reason}). Zastosowano dopracowany szkic z Filarami AVT.")
-                    return [RefinedLine(id=it["id"], refined_pl=it["pl"]) for it in batch_items]
-
                 import random
-                wait_sec = min(3.0, 0.35 * attempt + random.uniform(0.1, 0.25))
+                # Progressive exponential backoff with jitter to give Google TPUs breathing room during spikes
+                wait_sec = min(12.0, 1.5 * (1.4 ** min(attempt, 6)) + random.uniform(0.2, 0.8))
+                
                 if is_timeout:
                     timeout_sec = int(os.getenv("GEMINI_HTTP_TIMEOUT_MS", "120000")) // 1000
-                    print(f"\n[Redaktor Dialogów / Faza 2]: Serwer Google potrzebował więcej czasu na analizę sceny (limit {timeout_sec}s na {self.model}) [Próba {attempt}/{MAX_RETRIES}].")
-                    print("  [..] Szybki mikro-retry do natychmiastowego przechwycenia TPU...")
+                    print(f"\n[Redaktor Dialogów / Faza 2]: Serwer Google potrzebował więcej czasu na analizę sceny (limit {timeout_sec}s na {self.model}) [Ponawianie: Próba {attempt}]...")
+                    print(f"  [..] Oczekiwanie {wait_sec:.1f}s i automatyczne ponowienie na najwyższym modelu...")
                     time.sleep(wait_sec)
                 elif is_unavailable or is_rate_limit:
-                    print(f"\n[Redaktor Dialogów / Faza 2]: Chwilowe przeciążenie serwerów Google (503/429 na {self.model}) [Próba {attempt}/{MAX_RETRIES}].")
-                    print("  [..] Szybki mikro-retry do natychmiastowego przechwycenia TPU...")
+                    friendly_err = "Przeciążenie klastrów TPU (503 High Demand)" if is_unavailable else "Chwilowy limit zapytań (429 Rate Limit)"
+                    print(f"\n[Redaktor Dialogów / Faza 2]: Chwilowa niedostępność serwerów Google ({friendly_err} na {self.model}) [Ponawianie: Próba {attempt}]...")
+                    print(f"  [..] Oczekiwanie {wait_sec:.1f}s i ponawianie z pełnym myśleniem CoT (bez pomijania Fazy 2)...")
                     time.sleep(wait_sec)
                 else:
                     clean_msg = str(e).split("{")[0].strip() if "{" in str(e) else str(e)
-                    print(f"\n[Redaktor Dialogów / Faza 2]: Chwilowa przerwa w odpowiedzi API na {self.model} ({clean_msg}) [Próba {attempt}/{MAX_RETRIES}].")
-                    print("  [..] Szybki mikro-retry do natychmiastowego przechwycenia TPU...")
+                    print(f"\n[Redaktor Dialogów / Faza 2]: Chwilowa przerwa w odpowiedzi API na {self.model} ({clean_msg}) [Ponawianie: Próba {attempt}]...")
+                    print(f"  [..] Oczekiwanie {wait_sec:.1f}s i ponawianie...")
                     time.sleep(wait_sec)
