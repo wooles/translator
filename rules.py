@@ -1456,6 +1456,9 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
 5. PŁYNNOŚĆ, SZYK ZDANIA I SPÓJNOŚĆ ZDAŃ ROZBITYCH WIELOKROPKIEM (`...`):
    - Połącz rozbite linijki w logiczną całość z poprawnym polskim szykiem wyrazów i odmianą.
    - SPÓJNOŚĆ ZDAŃ ROZBITYCH MIĘDZY DWOMA NAPISAMI: Gdy zdanie ciągnie się przez dwa napisy (z `...`), sprawdź bezwzględną zgodność liczby i formy orzeczenia!
+   - BEZWZGLĘDNY ZAKAZ KASOWANIA TREŚCI POJEDYNCZYCH KWESTII (ZAKAZ ZASTĘPOWANIA CZĄSTKOWYCH FRAGMENTÓW ZDANIA SKRÓTAMI MYŚLOWYMI LUB HASŁAMI Z SĄSIEDNICH LINII):
+     * KARDYNALNY BŁĄD [X]: Gdy linijka A to "...zamieszkanej wyłącznie przez kobiety...", a linijka B to "...gdzie brały sobie mężów ze wschodu?", ZAKAZ ZASTĘPOWANIA linijki A hasłem/pytaniem z innej kwestii (np. BŁĄD: "O tym, czym jest menas hoku kor?")!
+     * POPRAWNIE [OK]: Linijka A MUSI przetłumaczyć swoją treść ("...w której mieszkały same kobiety...", "...zamieszkanej przez same kobiety..."), a linijka B kończy myśl. Każdy fragment zdania musi zachować swój oryginalny sens!
    - ZAKAZ DUBLOWANIA CZASOWNIKA (np. KARDYNALNY BŁĄD [X]: linijka A: "Taktyka... potrafi być...", linijka B: "...bywają niezwykle groźne, o ile zadziałają.").
    - POPRAWNIE [OK]: linijka A: "Taktyka łamiąca reguły wojny...", linijka B: "...bywa niezwykle groźna, o ile zadziała.".
 6. FORMULARZE POWITAŃ (AISATSU):

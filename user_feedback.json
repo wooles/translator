@@ -45,12 +45,21 @@
     "created_at": "2026-08-22 23:34:42"
   },
   {
-    "id": "fb_1787861518766",
+    "id": "fb_split_lines_protection",
+    "original_en": "...inhabited only by women...",
+    "bad_pl": "O tym, czym jest menas hoku kor?",
+    "good_pl": "...w której mieszkały same kobiety... / ...zamieszkanej przez same kobiety...",
+    "rule_reason": "Bezwzględny zakaz kasowania treści pojedynczych kwestii i zastępowania ich hasłami lub pojęciami z sąsiednich linijek przy zdaniach rozbitych wielokropkiem (...). Każda linijka musi oddać swój oryginalny sens.",
+    "scope": "global",
+    "created_at": "2026-08-29 01:57:00"
+  },
+  {
+    "id": "fb_1787961418419",
     "original_en": "All creation",
     "bad_pl": "Wszelkie Stworzenie (Wszelkie Stworzenie)",
     "good_pl": "Wszelkie Stworzenie",
     "rule_reason": "Eliminacja dublowania",
     "scope": "global",
-    "created_at": "2026-08-27 22:11:58"
+    "created_at": "2026-08-29 01:56:58"
   }
 ]
