@@ -699,8 +699,8 @@ class MultimodalTranslator:
                         config=cfg
                     )
 
-                # Speculative Hedging on Google AI Studio: calibrate timeout for thinking mode
-                hedge_timeout = 25.0 if ("thinking_config" in gen_config_kwargs and gen_config_kwargs["thinking_config"].thinking_budget > 0) else 5.0
+                # Speculative Hedging on Google AI Studio: calibrate timeout for thinking mode (45s for deep CoT)
+                hedge_timeout = 45.0 if ("thinking_config" in gen_config_kwargs and gen_config_kwargs["thinking_config"].thinking_budget > 0) else 5.0
                 if "flash" in current_model.lower():
                     with concurrent.futures.ThreadPoolExecutor(max_workers=2) as hedge_executor:
                         f1 = hedge_executor.submit(_single_generate)

@@ -179,8 +179,8 @@ class DialogueVerifier:
                         config=cfg
                     )
 
-                # Speculative Hedging on Google AI Studio: if Flash refinement hangs > 25.0s on congested TPU, launch parallel hedge
-                hedge_timeout = 25.0 if effective_budget > 0 else 5.0
+                # Speculative Hedging on Google AI Studio: calibrate timeout for unrestricted thinking headroom (45s for deep CoT)
+                hedge_timeout = 45.0 if effective_budget > 0 else 5.0
                 if "flash" in self.model.lower():
                     with concurrent.futures.ThreadPoolExecutor(max_workers=2) as hedge_executor:
                         f1 = hedge_executor.submit(_single_generate)
