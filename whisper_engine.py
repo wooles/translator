@@ -22,6 +22,21 @@ logging.getLogger("huggingface_hub").setLevel(logging.ERROR)
 
 logger = logging.getLogger("whisper_engine")
 
+# Ensure NVIDIA CUDA/cuBLAS/cuDNN runtime DLLs from pip wheels are visible to Windows CTranslate2
+if sys.platform == "win32":
+    for p in sys.path:
+        if "site-packages" in p:
+            nvidia_base = os.path.join(p, "nvidia")
+            if os.path.exists(nvidia_base):
+                for root, dirs, files in os.walk(nvidia_base):
+                    if any(f.endswith(".dll") for f in files):
+                        try:
+                            os.add_dll_directory(root)
+                            if root not in os.environ.get("PATH", ""):
+                                os.environ["PATH"] = root + ";" + os.environ.get("PATH", "")
+                        except Exception:
+                            pass
+
 try:
     from faster_whisper import WhisperModel
     FASTER_WHISPER_AVAILABLE = True
