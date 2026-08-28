@@ -1,12 +1,4 @@
 {
-  "Sensei": {
-    "pl": "Sensei",
-    "desc": "Tytuł mistrza/nauczyciela (bez 'Pani/Pan')"
-  },
-  "Senpai": {
-    "pl": "Senpai",
-    "desc": "Starszy kolega/koleżanka"
-  },
   "Your Honor": {
     "pl": "Wysoki Sądzie",
     "desc": "Zwrot do sędziego w sądzie"

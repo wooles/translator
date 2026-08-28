@@ -35,8 +35,6 @@ class GlossaryManager:
         else:
             # Default verified global terms
             self.global_terms = {
-                "Sensei": {"pl": "Sensei", "desc": "Honorific for teacher/master without Pan/Pani"},
-                "Senpai": {"pl": "Senpai", "desc": "Senior peer honorific"},
                 "Your Honor": {"pl": "Wysoki Sądzie", "desc": "Courtroom judicial address"},
                 "Four Emperors": {"pl": "Czterej Cesarze", "desc": "Virile numeral (not: Czworo)"},
                 "Three Musketeers": {"pl": "Trzej Muszkieterowie", "desc": "Virile numeral"}
@@ -68,7 +66,7 @@ class GlossaryManager:
             return True
         return False
 
-    def get_combined_glossary(self, series_glossary: Optional[Dict[str, str]] = None) -> Dict[str, str]:
+    def get_combined_glossary(self, series_glossary: Optional[Dict[str, str]] = None, keep_honorifics: bool = True) -> Dict[str, str]:
         """
         Combines global glossary with Series Bible glossary (series takes precedence).
         Returns simple mapping {source_term: target_pl_translation}.
@@ -76,11 +74,15 @@ class GlossaryManager:
         combined: Dict[str, str] = {}
         # 1. Global terms
         for k, v in self.global_terms.items():
+            if not keep_honorifics and k.lower() in ("senpai", "sensei", "kun", "chan", "san", "sama"):
+                continue
             combined[k] = v.get("pl", "") if isinstance(v, dict) else str(v)
         # 2. Series-specific terms (override global)
         if series_glossary:
             for k, v in series_glossary.items():
                 if k and v:
+                    if not keep_honorifics and k.lower() in ("senpai", "sensei", "kun", "chan", "san", "sama"):
+                        continue
                     combined[k] = v
         return combined
 

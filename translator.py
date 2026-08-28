@@ -1675,6 +1675,15 @@ class MultimodalTranslator:
             if is_isolated_paralinguistic_clutter(orig_event.text, clean_translated_text, is_sign=is_sign_flag):
                 continue
 
+            if not self.keep_honorifics and not is_sign_flag:
+                # Strip Japanese honorific suffixes (-senpai, -kun, -chan, -san, -sama, -sensei)
+                clean_translated_text = re.sub(
+                    r"([A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+)-(?:senpai|kun|chan|san|sama|sensei|dono|tan|pyon)\b",
+                    r"\1",
+                    clean_translated_text,
+                    flags=re.IGNORECASE
+                )
+
             # Auto-elevate bracketed signs/captions '[ ... ]' to top (\an8) if missing positioning to prevent collision with bottom subs/hardsubs
             clean_check = clean_translated_text.strip()
             ts_prefix_applied = ts_prefix or ""
