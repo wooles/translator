@@ -128,12 +128,6 @@ ZASADY BEZPIECZEŃSTWA (FILTR ANTYKOLIZYJNY):
 
 Zwróć wynik w formacie JSON zgodnym ze schematem DetectedSign."""
 
-        candidate_models = [model]
-        for fallback in ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-3.6-flash"]:
-            if fallback not in candidate_models:
-                candidate_models.append(fallback)
-
-        current_model_idx = 0
         consecutive_errors = 0
 
         for gap_start, gap_end in gaps:
@@ -151,65 +145,53 @@ Zwróć wynik w formacie JSON zgodnym ze schematem DetectedSign."""
 
                 pil_img = Image.open(frame_path)
                 
-                success = False
-                for m_idx in range(current_model_idx, len(candidate_models)):
-                    cur_model = candidate_models[m_idx]
-                    try:
-                        gen_cfg_kwargs = {
-                            "response_mime_type": "application/json",
-                            "response_schema": DetectedSign,
-                            "temperature": 0.1,
-                        }
-                        if "3.7" in cur_model.lower() or "3.1-pro" in cur_model.lower():
-                            gen_cfg_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=0)
+                try:
+                    gen_cfg_kwargs = {
+                        "response_mime_type": "application/json",
+                        "response_schema": DetectedSign,
+                        "temperature": 0.1,
+                    }
+                    if "3.7" in model.lower() or "3.1-pro" in model.lower():
+                        gen_cfg_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=0)
 
-                        response = client.models.generate_content(
-                            model=cur_model,
-                            contents=[prompt, pil_img],
-                            config=types.GenerateContentConfig(**gen_cfg_kwargs)
-                        )
-                        current_model_idx = m_idx
-                        consecutive_errors = 0
-                        success = True
+                    response = client.models.generate_content(
+                        model=model,
+                        contents=[prompt, pil_img],
+                        config=types.GenerateContentConfig(**gen_cfg_kwargs)
+                    )
+                    consecutive_errors = 0
 
-                        if response.text:
-                            data = json.loads(response.text)
-                            sign_info = DetectedSign.model_validate(data)
-                            
-                            if sign_info.is_title_or_banner and sign_info.translation_pl:
-                                clean_pl = sign_info.translation_pl.strip().strip("[]").upper()
-                                event_duration = min(4000, gap_end - gap_start - 500)
-                                event_start = gap_start + 250
-                                event_end = event_start + max(2000, event_duration)
+                    if response.text:
+                        data = json.loads(response.text)
+                        sign_info = DetectedSign.model_validate(data)
+                        
+                        if sign_info.is_title_or_banner and sign_info.translation_pl:
+                            clean_pl = sign_info.translation_pl.strip().strip("[]").upper()
+                            event_duration = min(4000, gap_end - gap_start - 500)
+                            event_start = gap_start + 250
+                            event_end = event_start + max(2000, event_duration)
 
-                                try:
-                                    from typesetting_matcher import TypesettingColorMatcher
-                                    prefix = TypesettingColorMatcher.enhance_sign_typesetting(
-                                        sign_type=sign_info.banner_type or "sign",
-                                        image_path=frame_path
-                                    )
-                                    styled_text = f"{prefix}[ {clean_pl} ]"
-                                except Exception:
-                                    styled_text = r"{\an8\fs26\bord1.5\shad1\c&HFFFFFF&\3c&H101020&}[ " + clean_pl + r" ]"
-                                
-                                new_ev = pysubs2.SSAEvent(
-                                    start=event_start,
-                                    end=event_end,
-                                    text=styled_text,
-                                    style="Sign"
+                            try:
+                                from typesetting_matcher import TypesettingColorMatcher
+                                prefix = TypesettingColorMatcher.enhance_sign_typesetting(
+                                    sign_type=sign_info.banner_type or "sign",
+                                    image_path=frame_path
                                 )
-                                detected_events.append(new_ev)
-                                logger.info(f"VisualSignDetector: Detected sign at {event_start/1000:.1f}s: '{sign_info.original_text}' -> '[ {clean_pl} ]'")
-                        break
-                    except Exception as e_model:
-                        err_str = str(e_model).lower()
-                        if "503" in err_str or "unavailable" in err_str or "429" in err_str:
-                            continue
-                        else:
-                            break
-                
-                if not success:
+                                styled_text = f"{prefix}[ {clean_pl} ]"
+                            except Exception:
+                                styled_text = r"{\an8\fs26\bord1.5\shad1\c&HFFFFFF&\3c&H101020&}[ " + clean_pl + r" ]"
+                            
+                            new_ev = pysubs2.SSAEvent(
+                                start=event_start,
+                                end=event_end,
+                                text=styled_text,
+                                style="Sign"
+                            )
+                            detected_events.append(new_ev)
+                            logger.info(f"VisualSignDetector: Detected sign at {event_start/1000:.1f}s: '{sign_info.original_text}' -> '[ {clean_pl} ]'")
+                except Exception as e_model:
                     consecutive_errors += 1
+                    logger.debug(f"VisualSignDetector: Model error: {e_model}")
 
             except Exception as e:
                 consecutive_errors += 1

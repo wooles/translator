@@ -642,27 +642,11 @@ class MultimodalTranslator:
         from model_resolver import resolve_best_models
         active_models = resolve_best_models(self.client)
 
-        candidate_models = [self.model]
-        if "flash" in self.model.lower():
-            m1 = active_models.get("flash", "gemini-3.7-flash")
-            m2 = active_models.get("flash_backup", "gemini-3.6-flash")
-            candidate_models = [m1, m2] if m1 != m2 else [m1]
-            if not hasattr(self, "phase1_rotation_idx"):
-                self.phase1_rotation_idx = 0
-            current_model_idx = self.phase1_rotation_idx % len(candidate_models)
-            self.phase1_rotation_idx += 1
-        elif "pro" in self.model.lower():
-            m_pro = active_models.get("pro", "gemini-3.1-pro-preview")
-            candidate_models = [m_pro]
-            current_model_idx = 0
-        else:
-            current_model_idx = 0
-
+        current_model = self.model
         attempt = 0
 
         while True:
             attempt += 1
-            current_model = candidate_models[current_model_idx]
             try:
                 from context_cache import ContextCacheManager
                 cached_name = ContextCacheManager.get_or_create_cache(
@@ -751,14 +735,6 @@ class MultimodalTranslator:
                 is_unavailable = "503" in err_str or "unavailable" in err_str or "high demand" in err_str
                 is_rate_limit = "429" in err_str or "quota" in err_str or "resource_exhausted" in err_str or "rate" in err_str
                 
-                # Instant switch between the two top Flash versions on 503, 504, or 429
-                if (is_unavailable or is_timeout or is_rate_limit) and len(candidate_models) > 1:
-                    next_idx = (current_model_idx + 1) % len(candidate_models)
-                    if next_idx != current_model_idx:
-                        print(f"\n[Tłumacz / Faza 1]: Przełączanie na alternatywny najwyższy model Flash: {candidate_models[next_idx]} (płynny load-balancing)...")
-                        current_model_idx = next_idx
-                        time.sleep(1)
-                        continue
 
                 import random
                 wait_time = min(12.0, 1.5 * (1.4 ** min(attempt, 6)) + random.uniform(0.2, 0.8))

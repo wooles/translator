@@ -264,35 +264,22 @@ Zwróć wynik w formacie JSON zgodnym ze schematem EpisodeProfile."""
 
         import time
         attempt = 0
-
-        # Candidate models pool restricted to the two latest flagship models
-        candidate_models = [self.model]
-        if "flash" in self.model.lower():
-            for m in ["gemini-3.7-flash", "gemini-3.6-flash"]:
-                if m not in candidate_models:
-                    candidate_models.append(m)
-        elif "pro" in self.model.lower():
-            for m in ["gemini-3.1-pro-preview"]:
-                if m not in candidate_models:
-                    candidate_models.append(m)
-        candidate_models = candidate_models[:2]
-
-        current_model_idx = 0
+        MAX_PROFILER_RETRIES = 4
 
         while True:
             attempt += 1
-            current_model = candidate_models[current_model_idx]
             try:
                 gen_config_kwargs = {
                     "response_mime_type": "application/json",
                     "response_schema": EpisodeProfile,
                     "temperature": 0.2,
                 }
-                if "3.7" in current_model.lower() or "3.1-pro" in current_model.lower():
+                if "3.7" in self.model.lower() or "3.1-pro" in self.model.lower():
                     gen_config_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=0)
 
-                response = self.client.models.generate_content(
-                    model=current_model,
+                active_client = self.client_pool.get_client() if self.client_pool else self.client
+                response = active_client.models.generate_content(
+                    model=self.model,
                     contents=prompt,
                     config=types.GenerateContentConfig(**gen_config_kwargs)
                 )
@@ -319,35 +306,28 @@ Zwróć wynik w formacie JSON zgodnym ze schematem EpisodeProfile."""
                     print("!" * 75 + "\n")
                     raise RuntimeError("Wyczerpane środki na koncie Google AI Studio (Prepayment Credits Depleted).")
 
+                if attempt >= MAX_PROFILER_RETRIES:
+                    print(f"\n[Profiler Odcinka]: Serwery Google są chwilowo zajęte (503/429 na {self.model}). Zastosowano profil domyślny...")
+                    return EpisodeProfile(episode_summary="Analiza sceniczna w toku tłumaczenia")
+
+                import random
+                wait_sec = min(6.0, 1.5 * attempt + random.uniform(0.2, 0.5))
                 is_timeout = "504" in err_str or "deadline" in err_str or "timeout" in err_str or "timed out" in err_str
                 is_unavailable = "503" in err_str or "unavailable" in err_str or "high demand" in err_str
                 is_rate_limit = "429" in err_str or "quota" in err_str or "resource_exhausted" in err_str
                 
-                # Switch to fallback model on persistent 503 errors
-                if is_unavailable and len(candidate_models) > 1 and attempt >= 2:
-                    next_idx = (current_model_idx + 1) % len(candidate_models)
-                    if next_idx != current_model_idx:
-                        print(f"\n[Profiler Odcinka]: Model {current_model} jest przeciążony u Google (503).")
-                        print(f"  [>>] Płynne przełączenie na bezpośredni model flagowy {candidate_models[next_idx]} (100% jakość bez czekania)...")
-                        current_model_idx = next_idx
-                        time.sleep(1)
-                        continue
-
-                wait_sec = 0.5
                 if is_timeout:
-                    if attempt == 1:
-                        timeout_sec = int(os.getenv("GEMINI_HTTP_TIMEOUT_MS", "120000")) // 1000
-                        print(f"\n[Profiler Odcinka]: Serwer Google potrzebował więcej czasu na analizę profilu (limit {timeout_sec}s na {current_model}).")
-                        print("  [..] Ponawiam próbę co 0,5 s do uzyskania dostępu do TPU...")
+                    timeout_sec = int(os.getenv("GEMINI_HTTP_TIMEOUT_MS", "120000")) // 1000
+                    print(f"\n[Profiler Odcinka]: Serwer Google potrzebował więcej czasu na analizę profilu (limit {timeout_sec}s na {self.model}) [Próba {attempt}/{MAX_PROFILER_RETRIES}].")
+                    print(f"  [..] Oczekiwanie {wait_sec:.1f}s i automatyczne ponawianie z rotacją kluczy API...")
                     time.sleep(wait_sec)
                 elif is_unavailable or is_rate_limit:
-                    if attempt == 1:
-                        print(f"\n[Profiler Odcinka]: Chwilowe przeciążenie serwerów Google (503/429 na {current_model}).")
-                        print("  [..] Ponawiam próbę co 0,5 s do uzyskania dostępu do TPU...")
+                    friendly_reason = "Przeciążenie TPU (503 High Demand)" if is_unavailable else "Limit zapytań (429 Rate Limit)"
+                    print(f"\n[Profiler Odcinka]: Chwilowa niedostępność serwerów Google ({friendly_reason} na {self.model}) [Próba {attempt}/{MAX_PROFILER_RETRIES}].")
+                    print(f"  [..] Oczekiwanie {wait_sec:.1f}s i automatyczne ponawianie z rotacją kluczy API...")
                     time.sleep(wait_sec)
                 else:
-                    if attempt == 1:
-                        clean_msg = str(e).split("{")[0].strip() if "{" in str(e) else str(e)
-                        print(f"\n[Profiler Odcinka]: Chwilowa przerwa w odpowiedzi API na {current_model} ({clean_msg}).")
-                        print("  [..] Ponawiam próbę co 0,5 s do uzyskania dostępu do TPU...")
+                    clean_msg = str(e).split("{")[0].strip() if "{" in str(e) else str(e)
+                    print(f"\n[Profiler Odcinka]: Chwilowa przerwa w odpowiedzi API na {self.model} ({clean_msg}) [Próba {attempt}/{MAX_PROFILER_RETRIES}].")
+                    print(f"  [..] Oczekiwanie {wait_sec:.1f}s i automatyczne ponawianie...")
                     time.sleep(wait_sec)
