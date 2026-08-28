@@ -142,6 +142,30 @@ def detect_event_visual_type(event: pysubs2.SSAEvent, ts_prefix: str) -> Dict[st
         "visual_details": desc
     }
 
+def is_isolated_paralinguistic_clutter(orig_en: str, translated_pl: str, is_sign: bool = False) -> bool:
+    """
+    Identifies isolated mimic/vocal grunts, sighs, and paralinguistic clutter
+    (e.g., 'Uh', 'Och!', 'Uch', 'Hmph', 'Ah', 'Gah', 'Tch') that do not carry
+    lexical meaning and pollute the screen against professional AVT standards.
+    """
+    if is_sign:
+        return False
+        
+    pl_clean = re.sub(r"[\s\"'«»„”!?.…]+", "", (translated_pl or "")).lower()
+    en_clean = re.sub(r"[\s\"'«»„”!?.…]+", "", (orig_en or "")).lower()
+    
+    clutter_words = {
+        "och", "uch", "uh", "ah", "ugh", "gah", "hmph", "hmpf", 
+        "tsk", "fu", "pff", "uff", "uf", "ech", "guh", "ku", "eh", "oh"
+    }
+    
+    if pl_clean in clutter_words:
+        # If English was also just a short grunt or paralinguistic sound
+        if not en_clean or en_clean in clutter_words or len(en_clean) <= 4:
+            return True
+            
+    return False
+
 def detect_audio_discrepancy(jp_text: str, pl_text: str, en_text: str) -> Optional[str]:
     """
     Automated discrepancy detector comparing Japanese voice recognition (Whisper)
@@ -1657,6 +1681,11 @@ class MultimodalTranslator:
             clean_translated_text = sanitize_sub_text(raw_pl)
             if not clean_translated_text:
                 clean_translated_text = sanitize_sub_text(orig_event.text)
+
+            # Professional AVT Anti-Clutter: Drop isolated paralinguistic grunts ("Och!", "Uch!", "Uh!", "Hmph!")
+            is_sign_flag = detect_event_visual_type(orig_event, ts_prefix)["is_sign"]
+            if is_isolated_paralinguistic_clutter(orig_event.text, clean_translated_text, is_sign=is_sign_flag):
+                continue
 
             # Auto-elevate bracketed signs/captions '[ ... ]' to top (\an8) if missing positioning to prevent collision with bottom subs/hardsubs
             clean_check = clean_translated_text.strip()

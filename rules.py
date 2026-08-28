@@ -169,6 +169,8 @@ FILAR XVII: PIĘCIOSTOPNIOWA TAKSONOMIA SYMBOLIZMU DŹWIĘKOWEGO ANIME (ONOMATOP
   5. Gijougo (uczucia i stany somatyczne): 'doki-doki' -> 'serce podchodzi do gardła / wali', 'ira-ira' -> 'aż mnie nosi / szlag mnie trafia', 'waku-waku' -> 'aż mnie skręca z ciekawości', 'kyun' -> 'ścisnęło mnie za serce', 'zokutto' -> 'przeszły mnie ciarki / dreszcz'.
 
 FILAR XVIII: ADAPTACJA PARALINGWISTYKI, DŹWIĘKÓW POZAWERBALNYCH I INTERIEKCJI FONICZNYCH:
+- KATEGORYCZNA ELIMINACJA SZUMU WIZUALNEGO (SUBTITLE CLUTTER & ISOLATED GRUNTS):
+  * Gdy kwestia w dialogu to pojedynczy odgłos seiyuu (naburmuszone "Uh", westchnienie "Ah", fuknięcie "Hmph", sapnięcie "Guh", "Och!"), a mimika twarzy i aktor głosowy w 100% przekazują emocję -> ZWRÓĆ PUSTY NAPIS "" (eliminacja szumu wizualnego według standardu Netflix / Canal+ AVT).
 - Kategoryczny zakaz dosłownego przepisywania surowych japońskich odgłosów komiksowych:
   * "Tch" / "Che" -> "Tsk...", "Szlag...", "Ech..." lub elipsa, jeśli grymas twarzy wystarczy.
   * "Eh?!" (zdumienie) -> "Co?!", "Jak to?!", "Słucham?!".

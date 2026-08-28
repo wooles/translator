@@ -896,6 +896,11 @@ def test_extended_avt_pillars():
     t2, _ = AVTLinter.lint_and_fix_line("Tch, znowu on.")
     assert "Tsk..." in t2
 
+    from translator import is_isolated_paralinguistic_clutter
+    assert is_isolated_paralinguistic_clutter("Uh...", "Och!", is_sign=False) is True
+    assert is_isolated_paralinguistic_clutter("Hmph", "Uch!", is_sign=False) is True
+    assert is_isolated_paralinguistic_clutter("Wait!", "Czekaj!", is_sign=False) is False
+
     # 2. Test eliminacji trzeciego języka (Filar X)
     t3, _ = AVTLinter.lint_and_fix_line("Co sprawia, że tak mówisz?")
     assert "Czemu tak sądzisz?" in t3
