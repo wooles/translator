@@ -9513,16 +9513,14 @@ ZWRÓĆ WYŁĄCZNIE CZYSTY KOD JSON BEZ ZBĘDNYCH KOMENTARZY.
                 contents=prompt,
                 config=types.GenerateContentConfig(
                     temperature=0.1,
-                    response_mime_type="application/json"
+                    tools=[types.Tool(google_search=types.GoogleSearch())]
                 )
             )
             raw_text = resp.text.strip()
-            if raw_text.startswith("```json"):
-                raw_text = raw_text[7:]
-            if raw_text.startswith("```"):
-                raw_text = raw_text[3:]
-            if raw_text.endswith("```"):
-                raw_text = raw_text[:-3]
+            if "```json" in raw_text:
+                raw_text = raw_text.split("```json")[1].split("```")[0]
+            elif "```" in raw_text:
+                raw_text = raw_text.split("```")[1].split("```")[0]
             data = json.loads(raw_text.strip())
 
             if data.get("has_polish_edition") and data.get("title") and data.get("publisher"):
