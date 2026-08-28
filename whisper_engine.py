@@ -92,17 +92,26 @@ class JapaneseWhisperEngine:
             selected_compute = self.compute_type
 
             if selected_device == "auto":
+                has_cuda = False
                 try:
-                    import torch
-                    if torch.cuda.is_available():
-                        selected_device = "cuda"
-                        if selected_compute == "auto":
-                            selected_compute = "float16"
-                    else:
-                        selected_device = "cpu"
-                        if selected_compute == "auto":
-                            selected_compute = "int8"
-                except ImportError:
+                    import ctranslate2
+                    if ctranslate2.get_cuda_device_count() > 0:
+                        has_cuda = True
+                except Exception:
+                    pass
+                if not has_cuda:
+                    try:
+                        import torch
+                        if torch.cuda.is_available():
+                            has_cuda = True
+                    except Exception:
+                        pass
+
+                if has_cuda:
+                    selected_device = "cuda"
+                    if selected_compute == "auto":
+                        selected_compute = "float16"
+                else:
                     selected_device = "cpu"
                     if selected_compute == "auto":
                         selected_compute = "int8"
@@ -168,22 +177,21 @@ class JapaneseWhisperEngine:
 
         try:
             self._initialize_model()
-            with self._infer_lock:
-                segments, info = self.model.transcribe(
-                    wav_path,
-                    language="ja",
-                    beam_size=1,
-                    vad_filter=True,
-                    vad_parameters=dict(min_silence_duration_ms=200)
-                )
-                
-                transcribed_parts = []
-                for segment in segments:
-                    text = segment.text.strip()
-                    if text:
-                        transcribed_parts.append(text)
-                
-                return "".join(transcribed_parts).strip()
+            segments, info = self.model.transcribe(
+                wav_path,
+                language="ja",
+                beam_size=1,
+                vad_filter=True,
+                vad_parameters=dict(min_silence_duration_ms=200)
+            )
+            
+            transcribed_parts = []
+            for segment in segments:
+                text = segment.text.strip()
+                if text:
+                    transcribed_parts.append(text)
+            
+            return "".join(transcribed_parts).strip()
         except Exception as e:
             logger.warning(f"Whisper transcription error for {wav_path}: {e}")
             return ""
@@ -218,12 +226,11 @@ class JapaneseWhisperEngine:
             if initial_prompt:
                 transcribe_kwargs["initial_prompt"] = initial_prompt
 
-            with self._infer_lock:
-                segments, info = self.model.transcribe(
-                    scene_wav_path,
-                    **transcribe_kwargs
-                )
-                segments_list = list(segments)
+            segments, info = self.model.transcribe(
+                scene_wav_path,
+                **transcribe_kwargs
+            )
+            segments_list = list(segments)
 
             result: Dict[int, List[str]] = {b_id: [] for b_id, _ in events}
             
