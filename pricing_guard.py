@@ -53,13 +53,13 @@ class PricingGuard:
         taking into account realistic adaptive batching (18 lines/batch), Google Context Cache (39k tokens),
         vision frames, ironclad OP/ED preservation (0 tokens), and dedicated Pro Adaptive CoT (2048/1024/512).
         """
-        # Realistic adaptive batching (avg 18 lines per scene-aligned batch)
+        # Realistic empirical batching (avg 18 lines per scene-aligned batch)
         batches = max(1, (lines_count + 17) // 18)
-        system_prompt_tokens = 39000  # AVT Pillars in Context Cache
-        batch_input_tokens = 2400      # Video frame (scaled) + lookahead + Whisper audio + history
-        batch_output_f1_tokens = 950   # Streamlined Phase 1 Translation JSON (Concise token-saving schema)
-        batch_output_flash_cot = 2200  # Phase 2 Flash Refinement + Elastic CoT thinking
-        batch_output_pro_tokens = 1400 # Phase 2 Pro Refinement + Dedicated Pro CoT (2048/1024/512 avg)
+        system_prompt_tokens = 33000  # AVT Pillars in Context Cache
+        batch_input_tokens = 9500      # Video frames (scaled) + lookahead + Whisper audio + history
+        batch_output_f1_tokens = 3800  # Full Masterclass Phase 1 JSON Translation (empirical ~76k tokens / 20 batches)
+        batch_output_flash_cot = 1500  # Phase 2 Flash Script Doctor Refinement + Elastic CoT thinking (~30-38k tokens)
+        batch_output_pro_tokens = 2000 # Phase 2 Pro Refinement + Dedicated Pro CoT (2048/1024/512 avg)
 
         profile = profile.lower()
 
