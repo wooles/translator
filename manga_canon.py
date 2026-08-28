@@ -47,31 +47,11 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Tolui": "Tołuj (Czwarty syn Czyngis-chana, mąż Sorkaktani)",
             "Sorghaghtani": "Sorkaktani Beki (Żona Tołuja, matka Mongkego i Kubłaja)",
             "Guyuk": "Güyük (Najstarszy syn Ogedeja i Toregene)",
-            "Godan": "Köden / Godan (Drugi syn Ogedeja i Toregene)",
-            "Mogul": "Mogołowie / Mongołowie",
-            "Tus": "Tus (Miasto w Persji / Chorasanie, ojczyzna Fatimy)",
-            "Nishapur": "Niszapur (Perskie miasto zniszczone przez Mongołów)",
-            "Batu": "Batu-chan (Syn Dżucziego, założyciel Złotej Ordy)",
-            "Subutai": "Subedej (Genialny wódz Czyngis-chana i Ogedeja)",
-            "Jebe": "Dżebe (Jeden z 'czterech psów' Czyngis-chana)",
-            "Muqali": "Mukali (Generał Czyngis-chana)",
-            "Shaman": "Szaman (Mongolski kapłan i wróżbita Tengri)",
-            "Tengri": "Tengri (Bóstwo Nieba koczowników stepowych)",
-            "Kurultai": "Kurułtaj (Ogólne zgromadzenie wodzów i książąt mongolskich)",
-            "Orda": "Orda (Koczowisko / obóz wojskowy)",
-            "Yassa": "Jasa (Wielkie prawo ustanowione przez Czyngis-chana)",
-            "Airag": "Ajrag / Kumys (Sfermentowane mleko klaczy)",
-            "Paiza": "Pajza (Tabliczka uprawniająca do poselstwa i zaopatrzenia)",
-            "Yam": "Örtöö / Jam (Mongolski konny system pocztowy)",
-            "Deel": "Deel (Tradycyjny płaszcz mongolski)",
-            "Khagan": "Chagan / Kachan (Wielki Chan)",
-            "Noyan": "Nojon (Mongolski arystokrata / dowódca wojskowy)"
+            "Godan": "Köden / Godan (Drugi syn Ogedeja i Toregene)"
         },
         "character_forms": {
-            "Fatima -> Toregene": "Pani Toregene / Wasza Wysokość (głęboka lojalność, szacunek)",
-            "Toregene -> Fatima": "Fatimo (ciepło, zaufanie, bliska powierniczka)",
-            "Toregene -> Ogedei": "Mój Panie / Wielki Chanie (oficjalny szacunek małżeński)",
-            "Ogedei -> Toregene": "Toregene / Chatun (z uznaniem dla jej inteligencji)",
+            "Toregene -> Fatima": "Fatimo (bliskość, zaufanie)",
+            "Fatima -> Toregene": "Pani Toregene / Chatun (szacunek)",
             "Fatima -> Ogedei": "Wielki Chanie / Wasza Wysokość (pełna uległość poddanej)",
             "Dwór -> Toregene": "Dostojna Chatun / Pani Toregene (poddaństwo)"
         }
@@ -99,22 +79,39 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Changping Jun": "Lord Shouheikun",
             "Changwen Jun": "Lord Shoubunkun",
             "Lu Buwei": "Ryo Fui",
+            "He Liao Diao": "Karyo Ten (Ten)",
+            "Qiang Lei": "Kyoukai",
             "Fei Xin Dui": "Hi Shin Unit (Oddział Hi Shin)",
+            "Yui Feng Unit": "Oddział Gyoku Hou",
+            "Le Hua Unit": "Oddział Gaku Ka",
             "Yui Shan": "Gyou",
             "Zhao": "Zhao (Państwo Zhao)",
             "Qin": "Qin (Państwo Qin)",
             "Chu": "Chu (Państwo Chu)",
             "Yan": "Yan (Państwo Yan)",
             "Qi": "Qi (Państwo Qi)",
+            "Wei": "Wei (Państwo Wei)",
+            "Han": "Han (Państwo Han)",
             "Middle Kingdom": "Państwo Środka",
+            "5-Man Squad": "Piątka",
+            "10-Man Commander": "Dziesiętnik",
+            "100-Man Commander": "Setnik",
+            "300-Man Commander": "Trzysetnik / Dowódca 300-osobowy",
+            "1000-Man Commander": "Tysięcznik",
+            "3000-Man Commander": "Trzytysięcznik / Dowódca 3-tysięczny",
+            "5000-Man Commander": "Pięciotysięcznik / Dowódca 5-tysięczny",
             "Great General": "Wielki Generał",
-            "Six Great Generals": "Sześciu Wielkich Generałów"
+            "Six Great Generals": "Sześciu Wielkich Generałów",
+            "Great General Under the Heavens": "Wielki Generał pod Niebiosami",
+            "Three Great Heavens": "Trzy Wielkie Niebiosa Zhao",
+            "Fire Dragons of Wei": "Siedem Ognistych Smoków Wei"
         },
         "character_forms": {
             "Shin -> Ei Sei": "Sei (braterska relacja z królem) / Wasza Wysokość (przy świadkach)",
             "Ei Sei -> Shin": "Shin (przyjacielsko, jak do równego brata broni)",
             "Ten -> Shin": "Shin (kumpelsko, jak starszy brat)",
-            "Kyoukai -> Shin": "Shin (spokojnie, zaufanie, głęboka więź)"
+            "Kyoukai -> Shin": "Shin (spokojnie, zaufanie, głęboka więź)",
+            "Ban You -> Ouhon": "Młody panie Hon / Dziedzicu Hon (stary sługa)"
         }
     },
     "golden_kamuy": {
@@ -126,284 +123,319 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
         "publisher": "Wydawnictwo Waneko",
         "glossary": {
             "Immortal Sugimoto": "Nieśmiertelny Sugimoto",
-            "Hinna hinna": "Hinna hinna (Dziękuję za jedzenie w języku Ajnów)",
+            "Saichi Sugimoto": "Saichi Sugimoto",
+            "Asirpa": "Asirpa",
+            "Yoshitake Shiraishi": "Yoshitake Shiraishi (Król Ucieczek)",
+            "Tokushirou Tsurumi": "Tokushirou Tsurumi (Porucznik Tsurumi)",
+            "Hyakunosuke Ogata": "Hyakunosuke Ogata (Snajper Ogata)",
+            "Genjirou Tanigaki": "Genjirou Tanigaki",
+            "Hajime Tsukishima": "Hajime Tsukishima (Sierżant Tsukishima)",
+            "Otonoshin Koito": "Otonoshin Koito (Podporucznik Koito)",
+            "Toshizou Hijikata": "Toshizou Hijikata (Były wicekapitan Shinsengumi)",
+            "Shinpachi Nagakura": "Shinpachi Nagakura",
+            "Tetsuzou Nihei": "Tetsuzou Nihei (Myśliwy Matagi)",
+            "7th Division": "Siódma Dywizja (7. Dywizja Cesarskiej Armii)",
+            "Ainu": "Ainu (Ajnowie)",
+            "Kamuy": "Kamuj (Bóstwo/Duch w wierzeniach Ajnów)",
+            "Kotan": "Kotan (Wioska Ajnów)",
             "Citatap": "Citatap (Tradycyjna siekana potrawa Ajnów)",
-            "Ainu Gold": "Złoto Ajnów",
-            "Abashiri Prison": "Więzienie w Abashiri",
-            "7th Division": "7. Dywizja Cesarskiej Armii Japonii",
-            "First Lieutenant Tsurumi": "Porucznik Tsurumi",
-            "Asirpa": "Asirpa (Ajnuska dziewczynka)",
-            "Sugimoto Saichi": "Sugimoto Saichi",
-            "Shiraishi Yoshitake": "Shiraishi Yoshitake (Król Ucieczek)",
-            "Ogata Hyakunosuke": "Ogata Hyakunosuke",
-            "Tanigaki Genjirou": "Tanigaki Genjirou",
-            "Kamuy": "Kamuy (Bóstwo / Duch natury u Ajnów)",
-            "Kotan": "Kotan (Wioska Ajnów)"
+            "Hinna hinna": "Hinna hinna (Dziękuję za pyszne jedzenie w języku Ajnów)",
+            "Osoma": "Osoma (Kupa/Gówno w języku Ajnów / Miso wg Asirpy)",
+            "Retar": "Retar (Biały wilk ezo)",
+            "Abashiri Prison": "Więzienie Abashiri",
+            "Nopperabo": "Nopperabo (Bez twarzy / Ojciec Asirpy)"
         },
         "character_forms": {
-            "Sugimoto -> Asirpa": "Asirpa-san / Asirpa (głęboki szacunek i ochrona)",
-            "Asirpa -> Sugimoto": "Sugimoto (ciepło, uczenie go kultury Ajnów)"
+            "Sugimoto -> Asirpa": "Asirpa / Asirpo (partnerska relacja i szacunek dla kultury Ajnów)",
+            "Asirpa -> Sugimoto": "Sugimoto (zaufanie i przyjaźń)",
+            "Shiraishi -> Sugimoto": "Sugimoto (kumpelsko / tchórzliwie)",
+            "Żołnierze -> Tsurumi": "Poruczniku Tsurumi / Panie Poruczniku (ślepe oddanie)"
         }
     },
     "chainsaw_man": {
         "title": "Chainsaw Man",
         "aliases": [
             "chainsaw man",
-            "csm"
+            "csm",
+            "człowiek piła"
         ],
         "publisher": "Wydawnictwo Waneko",
         "glossary": {
-            "Chainsaw Devil": "Demon Piły Mechanicznej",
-            "Chainsaw Devil / Chainsaw Man": "Demon Piły Mechanicznej / Chainsaw Man",
-            "Public Safety Devil Hunters": "Łowcy Demonów z Biura Bezpieczeństwa Publicznego",
+            "Chainsaw Man": "Chainsaw Man (Człowiek-Piła)",
+            "Denji": "Denji",
+            "Pochita": "Pochita (Diabeł Piły Łańcuchowej)",
+            "Makima": "Pani Makima / Makima (Szefowa Wydziału Specjalnego 4)",
+            "Aki Hayakawa": "Aki Hayakawa",
+            "Power": "Power (Kobiecy Krwawy Demon)",
+            "Himeno": "Himeno",
+            "Kobeni Higashiyama": "Kobeni Higashiyama",
+            "Kishibe": "Kapitan Kishibe",
+            "Reze": "Reze (Kobieta-Bomba)",
+            "Quanxi": "Quanxi (Pierwsza Łowczyni Demonów)",
+            "Asa Mitaka": "Asa Mitaka",
+            "Yoru": "Yoru (Diabeł Wojny)",
+            "Public Safety": "Bezpieczeństwo Publiczne (Oddział Łowców Demonów)",
             "Devil Hunter": "Łowca Demonów",
-            "Devil Hunters": "Łowcy Demonów",
-            "Gun Devil": "Demon Pistolet",
-            "Control Devil": "Demon Kontroli",
-            "Blood Devil": "Demon Krwi",
-            "Fiend": "Opętany",
-            "Special Division 4": "4. Oddział Specjalny",
-            "Devil": "Demon",
-            "Devils": "Demony",
-            "Hybrid": "Hybryda",
-            "Contract": "Kontrakt",
-            "Private Devil Hunters": "Prywatni Łowcy Demonów",
-            "Darkness Devil": "Demon Ciemności",
-            "Hell Devil": "Demon Piekła",
-            "Future Devil": "Demon Przyszłości",
-            "Fox Devil": "Demon Lis",
-            "Curse Devil": "Demon Klątwy",
-            "Ghost Devil": "Demon Duch",
-            "Bomb Devil": "Demon Bomba",
-            "War Devil": "Demon Wojny",
-            "Famine Devil": "Demon Głodu",
-            "Angel Devil": "Demon Anioł",
-            "Spider Devil": "Demon Pająk",
-            "Zombie Devil": "Demon Zombie",
-            "Eternity Devil": "Demon Wieczności",
-            "Doll Devil": "Demon Lalek",
-            "Punishment Devil": "Demon Kary",
-            "Shark Fiend": "Opętany Rekin",
-            "Violence Fiend": "Opętany Przemocy",
-            "Primal Devils": "Demony Pierwotne",
-            "Hell": "Piekło",
-            "Chainsaw Church": "Kościół Chainsaw Mana",
-            "Public Safety Special Division 4": "Specjalna Sekcja 4 Biura Bezpieczeństwa Publicznego",
-            "Hybrid / Weapon Human": "Hybryda / Człowiek-Broń",
-            "Hero of Hell": "Bohater Piekła",
-            "Famine Devil / Fami": "Demon Głodu / Fami",
-            "Death Devil": "Demon Śmierci",
-            "Four Horsemen": "Czterej Jeźdźcy",
-            "Primal Fear Devils / Primordial Devils": "Demony Pierwotne / Demony Pierwotnego Strachu",
-            "Falling Devil": "Demon Upadku",
-            "Bat Devil": "Demon Nietoperz",
-            "Leech Devil": "Demon Pijawka",
-            "Cosmos Devil": "Demon Kosmosu",
-            "Katana Man / Samurai Sword": "Katana",
-            "Hell's Door / Hell Gate": "Drzwi do Piekła / Brama Piekieł",
-            "Bang!": "Bang!",
-            "Kon": "Kon",
-            "Halloween!": "Halloween!",
-            "Super Chainsaw Man Motorcycle": "Super Motocykl Chainsaw Mana"
+            "Special Division 4": "Czwarty Wydział Specjalny (Wydział Specjalny 4)",
+            "Gun Devil": "Diabeł Broni Palnej",
+            "Control Devil": "Diabeł Kontroli",
+            "Blood Devil": "Diabeł Krwi",
+            "Fox Devil": "Diabeł Lisa (Kon!)",
+            "Curse Devil": "Diabeł Przekleństwa",
+            "Ghost Devil": "Diabeł Ducha",
+            "Future Devil": "Diabeł Przyszłości (Przyszłość rządzi!)",
+            "Darkness Devil": "Diabeł Ciemności",
+            "Fiend": "Opętaniec / Pół-diabeł (Demon)",
+            "Hybrid": "Hybryda / Człekokształtny demon",
+            "Hell": "Piekło"
         },
         "character_forms": {
-            "Denji -> Makima": "Pani Makima (bezwzględne uwielbienie, uległość)",
-            "Power -> Denji": "Denji (szorstko, z poczuciem wyższości, kumpelsko)",
-            "Aki -> Denji": "Denji / gówniarzu",
-            "Makima -> Denji": "Denji (protekcjonalnie, jak do zwierzęcia domowego)",
-            "Denji -> Power": "Power (kumpelsko, ciągłe kłótnie jak z młodszą siostrą)",
-            "Denji -> Kishibe": "Mistrzu",
-            "Kishibe -> Denji": "Denji / głąbie (szorstko, chłodno)",
-            "Aki Hayakawa -> Makima": "Pani Makima (bezwzględny szacunek, posłuszeństwo)"
+            "Denji -> Makima": "Pani Makimo (ślepe uwielbienie, uległość)",
+            "Aki -> Makima": "Pani Makimo (pełen profesjonalizm i zauroczenie)",
+            "Power -> Denji": "Denji / głupcze (arogancja, kumpelstwo)",
+            "Denji -> Power": "Power (kłótliwe rodzeństwo)"
         }
     },
     "jujutsu_kaisen": {
         "title": "Jujutsu Kaisen",
         "aliases": [
             "jujutsu kaisen",
-            "jjk"
+            "jjk",
+            "starcie magów"
         ],
         "publisher": "Wydawnictwo Waneko",
         "glossary": {
-            "Cursed Energy": "Przeklęta Energia",
-            "Domain Expansion": "Rozszerzenie Domeny",
-            "Curse / Cursed Spirit": "Klątwa / Przeklęty Duch",
-            "Jujutsu Sorcerer": "Zaklinacz Jujutsu",
-            "Cursed Technique": "Przeklęta Technika",
-            "Reverse Cursed Technique": "Odwrócona Przeklęta Technika",
-            "Black Flash": "Czarna Błyskawica",
-            "Cursed Object": "Przeklęty Przedmiot",
-            "Sukuna's Finger": "Palec Sukuny",
-            "Ryomen Sukuna": "Ryomen Sukuna (Król Klątw)",
-            "Satoru Gojo": "Satoru Gojo",
             "Yuji Itadori": "Yuji Itadori",
             "Megumi Fushiguro": "Megumi Fushiguro",
             "Nobara Kugisaki": "Nobara Kugisaki",
-            "Unlimited Void / Infinite Void": "Nieograniczona Pustka",
-            "Malevolent Shrine": "Sanktuarium Zła",
+            "Satoru Gojo": "Satoru Gojo",
+            "Ryomen Sukuna": "Ryomen Sukuna (Król Klątw)",
+            "Kento Nanami": "Kento Nanami",
+            "Suguru Geto": "Suguru Geto",
+            "Kenjaku": "Kenjaku",
+            "Yuta Okkotsu": "Yuta Okkotsu",
+            "Maki Zen'in": "Maki Zen'in",
+            "Toge Inumaki": "Toge Inumaki (Mag Mowy Zaklętej)",
+            "Panda": "Panda",
+            "Aoi Todo": "Aoi Todo",
+            "Toji Fushiguro": "Toji Fushiguro (Zabójca Magów)",
+            "Mahito": "Mahito",
+            "Jogo": "Jogo",
+            "Hanami": "Hanami",
+            "Cursed Energy": "Zaklęta Energia",
+            "Cursed Technique": "Zaklęta Technika",
+            "Domain Expansion": "Rozszerzenie Domeny",
             "Simple Domain": "Prosta Domena",
-            "Ten Shadows Technique": "Technika Dziesięciu Cieni",
-            "Mahoraga": "Mahoraga (Boski Generał Mahoraga)",
-            "Hollow Purple": "Fiolet",
-            "Limitless": "Bezlimit",
-            "Infinity": "Nieskończoność"
+            "Black Flash": "Czarny Błysk (Kokusen)",
+            "Limitless": "Bezgraniczność (Mukagen)",
+            "Six Eyes": "Sześcioro Oczu (Rikugan)",
+            "Malevolent Shrine": "Świątynia Zła (Fukuma Mizushi)",
+            "Infinite Void": "Nieskończona Pustka (Muryokusho)",
+            "Jujutsu High": "Technikum Magii Jujutsu w Tokio",
+            "Special Grade": "Ranga Specjalna",
+            "Shibuya Incident": "Incydent w Shibuyi",
+            "Culling Game": "Gra w Ubój"
         },
         "character_forms": {
-            "Yuji -> Gojo": "Nauczycielu Gojo / Panie Gojo (Gojo-sensei)",
-            "Megumi -> Gojo": "Gojo-sensei / Nauczycielu",
-            "Nobara -> Gojo": "Gojo-sensei",
-            "Gojo -> Yuji": "Yuji (wesoło, po kumpelsku)",
-            "Sukuna -> Yuji": "Gówniarzu / Bachorze",
-            "Yuji -> Sukuna": "Sukuna (wściekłość, nienawiść)"
+            "Yuji -> Gojo": "Panie Gojo / Sensei (pełen luz i szacunek)",
+            "Megumi -> Gojo": "Panie Gojo / Gojo (dystans, irytacja)",
+            "Todo -> Yuji": "Mój bracie! / Besto Friendo (ekstatyczne braterstwo)",
+            "Sukuna -> Ludzie": "Robactwo / Śmiecie (absolutna wyższość)"
         }
     },
-    "attack_on_titan": {
+    "shingeki_no_kyojin": {
         "title": "Atak Tytanów (Shingeki no Kyojin)",
         "aliases": [
             "shingeki no kyojin",
-            "atak tytanow",
-            "atak tytanów",
             "attack on titan",
-            "aot"
+            "aot",
+            "atak tytanów",
+            "atak tytanow",
+            "snk"
         ],
         "publisher": "Wydawnictwo J.P.Fantastica",
         "glossary": {
-            "Survey Corps / Scout Regiment": "Korpus Zwiadowczy (Zwiadowcy)",
-            "Omni-Directional Mobility Gear / ODM Gear": "Sprzęt do Manewrów Przestrzennych",
+            "Eren Jaeger": "Eren Jaeger",
+            "Mikasa Ackermann": "Mikasa Ackermann",
+            "Armin Arlert": "Armin Arlert",
+            "Levi Ackermann": "Kapral Levi / Kapitan Levi",
+            "Erwin Smith": "Dowódca Erwin Smith",
+            "Hange Zoe": "Hange Zoe",
+            "Reiner Braun": "Reiner Braun",
+            "Bertholdt Hoover": "Bertholdt Hoover",
+            "Annie Leonhart": "Annie Leonhart",
+            "Zeke Jaeger": "Zeke Jaeger",
+            "Survey Corps": "Korpus Zwiadowczy (Zwiadowcy)",
+            "Military Police Brigade": "Żandarmeria",
+            "Garrison Regiment": "Stacjonarni (Korpus Stacjonarny)",
+            "Attack Titan": "Tytan Atakujący",
             "Colossal Titan": "Tytan Kolosalny",
             "Armored Titan": "Tytan Opancerzony",
-            "Attack Titan": "Tytan Atakujący",
+            "Female Titan": "Tytan Kobiecy",
             "Beast Titan": "Tytan Zwierzęcy",
-            "Female Titan": "Tytan Żeński",
-            "Founding Titan": "Tytan Pierwotny",
+            "Founding Titan": "Tytan Pierwotny (Tytan Założyciel)",
+            "War Hammer Titan": "Tytan Młot Bojowy",
             "Jaw Titan": "Tytan Szczękowy",
             "Cart Titan": "Tytan Transportowy",
-            "War Hammer Titan": "Tytan Młot Bojowy",
-            "Military Police": "Żandarmeria",
-            "Garrison": "Korpus Stacjonarny",
+            "Omni-Directional Mobility Gear": "Sprzęt do Manewrów Przestrzennych (ODM Gear / Trójwymiarowy Sprzęt Manewrowy)",
             "Wall Maria": "Mur Maria",
             "Wall Rose": "Mur Rose",
             "Wall Sina": "Mur Sina",
-            "Eldians": "Eldianie",
+            "Paradis Island": "Wyspa Paradis",
             "Marley": "Marley",
-            "Rumbling": "Dudnienie",
-            "Paradis": "Wyspa Paradis"
+            "Eldia": "Eldia (Eldianie / Lud Ymir)",
+            "Rumbling": "Dudnienie (Zrównanie z Ziemią)"
         },
         "character_forms": {
-            "Eren -> Levi": "Kapitanie Levi (respekt i posłuszeństwo)",
-            "Mikasa -> Levi": "Kapitanie (chłodny dystans) / Levi",
-            "Levi -> Eren": "Eren / gnojku (szorstko, bez ceregieli)",
-            "Armin -> Eren": "Eren (najlepszy przyjaciel, na ty)",
-            "Eren -> Armin": "Armin (braterska więź)",
-            "Eren -> Mikasa": "Mikasa (irytacja jej nadopiekuńczością, z czasem troska)"
+            "Mikasa -> Eren": "Eren (nadopiekuńczość, głęboka miłość)",
+            "Zwiadowcy -> Levi": "Kapralu Levi / Panie Kapralu (dyscyplina i podziw)",
+            "Zwiadowcy -> Erwin": "Dowódco Erwinie / Sasageyo (gotowość na śmierć)"
         }
     },
     "naruto": {
-        "title": "Naruto",
+        "title": "Naruto / Boruto",
         "aliases": [
             "naruto",
-            "naruto shippuden"
+            "naruto shippuden",
+            "boruto"
         ],
         "publisher": "Wydawnictwo J.P.Fantastica",
         "glossary": {
-            "Hidden Leaf Village": "Wioska Ukrytego Liścia (Konoha)",
+            "Naruto Uzumaki": "Naruto Uzumaki",
+            "Sasuke Uchiha": "Sasuke Uchiha",
+            "Sakura Haruno": "Sakura Haruno",
+            "Kakashi Hatake": "Kakashi Hatake (Kopiujący Ninja)",
+            "Jiraiya": "Jiraiya (Ero-sennin / Żabi Pustelnik)",
+            "Tsunade": "Tsunade (Piąta Hokage / Legendarny Śpioch)",
+            "Orochimaru": "Orochimaru",
+            "Itachi Uchiha": "Itachi Uchiha",
+            "Madara Uchiha": "Madara Uchiha",
+            "Obito Uchiha": "Obito Uchiha / Tobi",
+            "Pain / Nagato": "Pain / Nagato",
+            "Minato Namikaze": "Minato Namikaze (Czwarty Hokage / Żółty Błysk Konohy)",
+            "Shikamaru Nara": "Shikamaru Nara",
+            "Hinata Hyuga": "Hinata Hyuga",
+            "Gaara": "Gaara (Piaskowy Gaara / Kazekage)",
+            "Konohagakure": "Konohagakure (Wioska Ukryta w Liściach / Konoha)",
+            "Sunagakure": "Sunagakure (Wioska Ukryta w Piasku)",
             "Hokage": "Hokage (Cień Ognia)",
-            "Shadow Clone Technique": "Technika Klonowania Cienia (Kage Bunshin no Jutsu)",
-            "Rasengan": "Rasengan",
-            "Sharingan": "Sharingan",
-            "Mangekyo Sharingan": "Mangekyo Sharingan",
-            "Chidori": "Chidori (Tysiąc Ptaków)",
-            "Genin": "Genin (Początkujący Ninja)",
-            "Chunin": "Chunin (Średni Ninja)",
-            "Jonin": "Jonin (Wyższy Ninja)",
-            "Anbu": "Anbu (Oddziały Specjalne)",
-            "Tailed Beast": "Oganiasta Bestia (Bijuu)",
-            "Nine-Tails / Kurama": "Dziewięcioogoniasty Lis (Kurama)",
-            "Akatsuki": "Akatsuki (Brzask)",
+            "Kazekage": "Kazekage (Cień Piasku)",
+            "Mizukage": "Mizukage (Cień Wody)",
+            "Raikage": "Raikage (Cień Błyskawicy)",
+            "Tsuchikage": "Tsuchikage (Cień Ziemi)",
             "Chakra": "Czakra",
-            "Jutsu": "Technika / Dżutsu",
-            "Genjutsu": "Techniki Iluzoryczne (Genjutsu)",
-            "Taijutsu": "Walka Wręcz (Taijutsu)",
-            "Ninjutsu": "Techniki Ninja (Ninjutsu)"
+            "Jutsu": "Jutsu (Technika Ninja / Genjutsu, Taijutsu, Ninjutsu)",
+            "Rasengan": "Rasengan (Kula Wirująca)",
+            "Chidori": "Chidori (Tysiąc Ptaków / Błyskawica)",
+            "Sharingan": "Sharingan (Kopiujące Oko)",
+            "Mangekyo Sharingan": "Mangekyou Sharingan (Kalejdoskopowy Sharingan)",
+            "Rinnegan": "Rinnegan (Oko Samsary)",
+            "Byakugan": "Byakugan (Białe Oko)",
+            "Nine-Tails / Kurama": "Kyuubi (Dziewięcioogoniasty Lis Demon / Kurama)",
+            "Jinchuriki": "Jinchuuriki (Nosiciel Ogoniastej Bestii)",
+            "Akatsuki": "Akatsuki (Brzask)"
         },
         "character_forms": {
-            "Naruto -> Kakashi": "Kakashi-sensei / Panie Kakashi",
-            "Naruto -> Jiraiya": "Zboczony Pustelniku (Ero-sennin)",
-            "Naruto -> Sasuke": "Sasuke (rywal, braterska nienawiść/więź)",
-            "Sasuke -> Naruto": "Naruto / młotku / tchórzu",
-            "Sakura -> Sasuke": "Sasuke-kun (uwielbienie)",
-            "Sakura -> Naruto": "Naruto / kretynie (irytacja, później głęboka przyjaźń)"
+            "Naruto -> Jiraiya": "Zboczony Pustelniku! / Ero-sennin",
+            "Naruto -> Sasuke": "Sasuke! (wieczny rywal i brat)",
+            "Sakura -> Sasuke": "Sasuke-kun (miłość)",
+            "Naruto -> Tsunade": "Babciu Tsunade!"
         }
     },
     "dragon_ball": {
-        "title": "Dragon Ball",
+        "title": "Dragon Ball / Dragon Ball Z / Dragon Ball Super",
         "aliases": [
             "dragon ball",
-            "db",
             "dragon ball z",
-            "dbz"
+            "dragon ball super",
+            "dbz",
+            "dbs"
         ],
         "publisher": "Wydawnictwo J.P.Fantastica",
         "glossary": {
-            "Goku / Son Goku": "Songo / Son Goku",
-            "Master Roshi": "Genialny Żółw (Mistrz Roshi)",
-            "King Piccolo": "Szatan Serduszko (Piccolo Daimao)",
-            "Piccolo": "Szatan Serduszko Junior / Piccolo",
-            "Kamehameha": "Fala Uderzeniowa (Kamehameha)",
-            "Dragon Balls": "Smocze Kule",
+            "Son Goku": "Son Goku (Kakarotto)",
+            "Vegeta": "Vegeta (Książę Saiyan)",
+            "Son Gohan": "Son Gohan",
+            "Son Goten": "Son Goten",
+            "Trunks": "Trunks",
+            "Piccolo": "Piccolo / Szatan Serduszko",
+            "Krillin": "Krilin",
+            "Yamcha": "Yamcha",
+            "Tien Shinhan": "Tenshinhan",
+            "Chiaotzu": "Chaoz",
+            "Master Roshi": "Genialny Żółw (Kame Sennin)",
+            "Bulma": "Bulma",
+            "Chi-Chi": "Chi-Chi",
+            "Frieza": "Freezer / Frieza",
+            "Cell": "Komórczak / Cell",
+            "Majin Buu": "Majin Buu / Bubu",
+            "Beerus": "Lord Beerus (Bóg Zniszczenia)",
+            "Whis": "Whis (Anioł)",
             "Shenron": "Shenron (Boski Smok)",
-            "Saiyan": "Saiyanin (Kosmiczny Wojownik)",
-            "Super Saiyan": "Super Saiyanin",
-            "Kaio-ken": "Technika Kaio (Kaio-ken)",
-            "Spirit Bomb": "Kula Mocy (Genki Dama)",
-            "Capsule Corp": "Kapsułkowa Korporacja (Capsule Corp)",
-            "Ki": "Ki (Energia Życiowa)"
+            "Dragon Balls": "Smocze Kule",
+            "Saiyan": "Saiyanin / Saiyajin",
+            "Super Saiyan": "Super Saiyanin (SSJ)",
+            "Ultra Instinct": "Ultra Instynkt (Migatte no Gokui)",
+            "Ultra Ego": "Ultra Ego (Wagama no Gokui)",
+            "Kamehameha": "Kamehameha (Fala Uderzeniowa Żółwia)",
+            "Spirit Bomb": "Genki Dama (Kula Energii Ducha)",
+            "Final Flash": "Final Flash (Ostateczny Błysk)",
+            "Big Bang Attack": "Wielki Wybuch (Big Bang Attack)",
+            "Destructo Disc / Kienzan": "Kienzan (Dysk Zagłady)",
+            "Senzu Bean": "Magiczna Fasolka (Senzu)",
+            "Capsule Corp": "Capsule Corporation"
         },
         "character_forms": {
-            "Goku -> Master Roshi": "Mistrzu / Genialny Żółwiu",
-            "Krilin -> Goku": "Songo / Goku (najlepszy przyjaciel)",
-            "Vegeta -> Goku": "Kakarotto (z dumą, rywalizacja)",
-            "Goku -> Vegeta": "Vegeta"
+            "Vegeta -> Goku": "Kakarotto! (duma Saiyanina)",
+            "Goku -> Vegeta": "Vegeta (kumpelska rywalizacja)",
+            "Goku -> Roshi": "Mistrzu Żółwiu (Genialny Żółwiu)",
+            "Frieza -> Saiyans": "Te bezużyteczne małpy..."
         }
     },
-    "demon_slayer": {
-        "title": "Miecz Zabójcy Demonów (Kimetsu no Yaiba)",
+    "kimetsu_no_yaiba": {
+        "title": "Miecz Zabójcy Demonów (Kimetsu no Yaiba: Demon Slayer)",
         "aliases": [
             "kimetsu no yaiba",
             "demon slayer",
             "miecz zabójcy demonów",
-            "miecz zabojcy demonow"
+            "miecz zabojcy demonow",
+            "kny"
         ],
         "publisher": "Wydawnictwo Waneko",
         "glossary": {
-            "Demon Slayer Corps": "Korpus Zabójców Demonów",
-            "Hashira / Pillar": "Filar (Hashira)",
-            "Sun Breathing": "Oddech Słońca",
-            "Water Breathing": "Oddech Wody",
-            "Flame Breathing": "Oddech Płomieni",
-            "Thunder Breathing": "Oddech Pioruna",
-            "Beast Breathing": "Oddech Bestii",
-            "Insect Breathing": "Oddech Owada",
-            "Muzan Kibutsuji": "Muzan Kibutsuji (Władca Demonów)",
-            "Twelve Kizuki / Twelve Demon Moons": "Dwanaście Demonicznych Księżyców",
-            "Upper Rank": "Wyższa Ranga",
-            "Lower Rank": "Niższa Ranga",
-            "Blood Demon Art": "Krwawa Sztuka Demoniczna",
-            "Nichirin Sword": "Miecz Nichirin",
             "Tanjiro Kamado": "Tanjiro Kamado",
             "Nezuko Kamado": "Nezuko Kamado",
             "Zenitsu Agatsuma": "Zenitsu Agatsuma",
-            "Inosuke Hashibira": "Inosuke Hashibira"
+            "Inosuke Hashibira": "Inosuke Hashibira (Głowa dzika)",
+            "Kanao Tsuyuri": "Kanao Tsuyuri",
+            "Genya Shinazugawa": "Genya Shinazugawa",
+            "Muzan Kibutsuji": "Muzan Kibutsuji (Władca Demonów)",
+            "Demon Slayer Corps": "Korpus Zabójców Demonów",
+            "Hashira / Pillars": "Filary (Hashira): Giyu Tomioka (Filar Wody), Shinobu Kocho (Filar Owada), Kyojuro Rengoku (Filar Płomienia), Tengen Uzui (Filar Dźwięku), Muichiro Tokito (Filar Mgły), Mitsuri Kanroji (Filar Miłości), Obanai Iguro (Filar Węża), Sanemi Shinazugawa (Filar Wiatru), Gyomei Himejima (Filar Skały)",
+            "Kagaya Ubuyashiki": "Kagaya Ubuyashiki (Oyakata-sama / Mistrz)",
+            "Twelve Demon Moons / Kizuki": "Dwanaście Demonicznych Księżyców (Wyższe i Niższe Rangi)",
+            "Nichirin Blade": "Miecz Nichirin (Ostrze Słoneczne)",
+            "Total Concentration Breathing": "Oddech Całkowitego Skupienia",
+            "Sun Breathing / Hinokami Kagura": "Taniec Boga Ognia (Hinokami Kagura / Oddech Słońca)",
+            "Water Breathing": "Oddech Wody",
+            "Flame Breathing": "Oddech Płomienia (Płoń, serce moje!)",
+            "Thunder Breathing": "Oddech Błyskawicy (Forma Pierwsza: Błysk i Grzmot)",
+            "Beast Breathing": "Oddech Bestii",
+            "Demon Slayer Mark": "Znamię Zabójcy Demonów",
+            "Mugen Train": "Pociąg Nieskończoność (Mugen Train)",
+            "Entertainment District": "Dzielnica Czerwonych Latarni (Yoshiwara)",
+            "Swordsmith Village": "Wioska Kowali",
+            "Infinity Castle": "Zamek Nieskończoności"
         },
         "character_forms": {
-            "Tanjiro -> Nezuko": "Nezuko (troska, ochrona siostry)",
-            "Zenitsu -> Nezuko": "Nezuko-chan (zaślepienie miłością)",
-            "Inosuke -> Tanjiro": "Gompachiro / Kamaboko (błędne przekręcanie imienia)",
-            "Tanjiro -> Filary": "Panie Filarze / Filarze X (ogromny szacunek)"
+            "Tanjiro -> Nezuko": "Nezuko! (braterska czułość i determinacja ochrony)",
+            "Zabójcy -> Oyakata-sama": "Mistrzu / Oyakata-sama (święta cześć)",
+            "Inosuke -> Tanjiro": "Kamaboko Gonpachiro! (przekręcanie imion)",
+            "Zenitsu -> Nezuko": "Nezuko-chan! (zakochany lament)"
         }
     },
     "death_note": {
-        "title": "Death Note",
+        "title": "Death Note (Notatnik Śmierci)",
         "aliases": [
             "death note",
             "notatnik śmierci",
@@ -411,54 +443,83 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
         ],
         "publisher": "Wydawnictwo J.P.Fantastica",
         "glossary": {
-            "Death Note": "Notatnik Śmierci",
-            "Shinigami / God of Death": "Bóg Śmierci (Shinigami)",
-            "Shinigami Eyes": "Oczy Boga Śmierci",
-            "Ryuk": "Ryuk",
             "Light Yagami": "Light Yagami (Kira)",
-            "L": "L (Ryuzaki)",
-            "Misa Amane": "Misa Amane (Misa-Misa)",
-            "Near": "Near",
-            "Mello": "Mello"
+            "L Lawliet": "L / Ryuzaki / Hideki Ryuga",
+            "Ryuk": "Ryuk (Shinigami / Bóg Śmierci)",
+            "Misa Amane": "Misa Amane (Druga Kira)",
+            "Rem": "Rem (Bóg Śmierci)",
+            "Soichiro Yagami": "Soichiro Yagami (Szef Policji, ojciec Lighta)",
+            "Near / Nate River": "Near (N)",
+            "Mello / Mihael Keehl": "Mello",
+            "Teru Mikami": "Teru Mikami (Sakujo! / Usunąć!)",
+            "Kiyomi Takada": "Kiyomi Takada (Rzeczniczka Kiry)",
+            "Watari / Quillsh Wammy": "Watari",
+            "Death Note": "Notatnik Śmierci",
+            "Shinigami": "Shinigami (Bóg Śmierci / Bogowie Śmierci)",
+            "Shinigami Realm": "Świat Bogów Śmierci",
+            "Shinigami Eyes": "Oczy Boga Śmierci (Pakt za połowę życia)",
+            "Heart Attack": "Zawał serca (Domyślna przyczyna zgonu w Death Note)",
+            "Kira": "Kira (Bóg Nowego Świata)",
+            "SPK": "SPK (Special Provision for Kira)",
+            "Wammy's House": "Dom Wammy'ego (Sierociniec dla geniuszy)"
         },
         "character_forms": {
-            "Light -> Ryuk": "Ryuk (dystans, traktowanie jako narzędzia/widza)",
-            "Ryuk -> Light": "Light (rozbawienie ludzką naturą)",
-            "Light -> L": "Ryuzaki (udawana przyjaźń, skryta śmiertelna wrogość)",
-            "L -> Light": "Light-kun (uprzejmość podszyta podejrzliwością)",
-            "Misa -> Light": "Light-kun (ślepe oddanie, miłość)"
+            "Light -> L": "Ryuzaki (maska przyjaźni / zimna kalkulacja)",
+            "L -> Light": "Light-kun (intelektualna gra w szachy / podejrzenie)",
+            "Misa -> Light": "Light-kun! / Mój ukochany!",
+            "Ryuk -> Light": "Ludzie są naprawdę interesujący..."
         }
     },
     "fullmetal_alchemist": {
-        "title": "Fullmetal Alchemist",
+        "title": "Fullmetal Alchemist (Stalowy Alchemik)",
         "aliases": [
             "fullmetal alchemist",
             "fma",
-            "stalowy alchemik",
-            "fullmetal alchemist brotherhood",
-            "fmab"
+            "fma: brotherhood",
+            "stalowy alchemik"
         ],
         "publisher": "Wydawnictwo J.P.Fantastica",
         "glossary": {
-            "State Alchemist": "Państwowy Alchemik",
-            "Fullmetal Alchemist": "Stalowy Alchemik",
+            "Edward Elric": "Edward Elric (Stalowy Alchemik / Ed)",
+            "Alphonse Elric": "Alphonse Elric (Al / Żelazna zbroja)",
+            "Roy Mustang": "Pułkownik Roy Mustang (Płomienny Alchemik)",
+            "Riza Hawkeye": "Porucznik Riza Hawkeye (Sokole Oko)",
+            "Winry Rockbell": "Winry Rockbell (Mechaniczka protez automail)",
+            "Pinako Rockbell": "Babcia Pinako Rockbell",
+            "Van Hohenheim": "Van Hohenheim (Ojciec braci Elric)",
+            "Father": "Ojciec (Stwórca Homunkulusów / Karzełek z Butelki)",
+            "Lust": "Lust (Żądza)",
+            "Gluttony": "Gluttony (Obżarstwo)",
+            "Envy": "Envy (Zawiść)",
+            "Greed": "Greed (Chciwość / Tarcza Ostateczna)",
+            "Wrath / King Bradley": "Wrath / Fuhrer King Bradley (Gniew)",
+            "Sloth": "Sloth (Lenistwo)",
+            "Pride / Selim Bradley": "Pride / Selim Bradley (Pycha)",
+            "Scar": "Scar (Szramowaty mściciel z Ishvalu)",
+            "Ling Yao": "Książę Ling Yao (Klan Yao z Xing)",
+            "Lan Fan": "Lan Fan",
+            "Fu": "Fu",
+            "May Chang": "May Chang (Panda Shao May / Alkahestria)",
+            "Alex Louis Armstrong": "Major Alex Louis Armstrong (Alchemik Silnoręki)",
+            "Olivier Mira Armstrong": "Generał dywizji Olivier Mira Armstrong (Królowa Północy / Forteca Briggs)",
+            "Maes Hughes": "Podpułkownik Maes Hughes",
+            "Izumi Curtis": "Mistrzyni Izumi Curtis (Zwykła gospodyni domowa!)",
             "Philosopher's Stone": "Kamień Filozoficzny",
-            "Transmutation": "Transmutacja",
-            "Transmutation Circle": "Krąg Transmutacyjny",
-            "Equivalent Exchange": "Prawo Równoważnej Wymiany",
-            "Homunculus": "Homunkulus",
-            "Automail": "Automail (Protezy mechaniczne)",
-            "Amestris": "Amestris",
-            "Edward Elric": "Edward Elric",
-            "Alphonse Elric": "Alphonse Elric",
-            "Roy Mustang": "Roy Mustang (Alchemik Płomieni)",
-            "King Bradley": "King Bradley (Führer Bradley)"
+            "Human Transmutation": "Transmutacja Ludzka (Złamanie największego tabu)",
+            "Equivalent Exchange": "Zasada Równorzędnej Wymiany",
+            "Gate of Truth": "Wrota Prawdy (Prawda / Bóg)",
+            "Automail": "Automail (Mechaniczne protezy)",
+            "State Alchemist": "Państwowy Alchemik",
+            "Amestris": "Amestris (Państwo militarne)",
+            "Central City": "Centrala (Central City)",
+            "Fortress of Briggs": "Forteca Briggs (Góry Północne)",
+            "Ishval": "Ishval (Wojna domowa w Ishvalu)"
         },
         "character_forms": {
-            "Edward -> Alphonse": "Al (braterska opieka, poczucie winy)",
-            "Alphonse -> Edward": "Bracie (Nii-san) / Ed",
-            "Edward -> Roy Mustang": "Pułkowniku / draniu (irytacja, szacunek)",
-            "Roy Mustang -> Edward": "Stalowy / Fullmetal (chłodno, dowódczo)"
+            "Edward -> Każdy": "KTO JEST TAK MAŁY, ŻE TRZEBA GO SZUKAĆ PRZEZ LUPĘ?!",
+            "Alphonse -> Edward": "Braciszku! / Nii-san",
+            "Mustang -> Hawkeye": "Porucznik Hawkeye (absolutne zaufanie wojskowe i osobiste)",
+            "Winry -> Ed": "Ed, znowu zniszczyłeś moją protezę automail?!"
         }
     },
     "bleach": {
@@ -468,23 +529,48 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
         ],
         "publisher": "Wydawnictwo J.P.Fantastica",
         "glossary": {
-            "Soul Reaper / Shinigami": "Bóg Śmierci (Shinigami)",
-            "Zanpakuto": "Zanpakuto (Klinga Duszy)",
-            "Shikai": "Shikai (Wstępne Uwolnienie)",
-            "Bankai": "Bankai (Ostateczne Uwolnienie)",
-            "Soul Society": "Społeczność Dusz (Soul Society)",
-            "Hollow": "Pusty (Hollow)",
-            "Arrancar": "Arrancar",
-            "Espada": "Espada",
-            "Gotei 13": "Gotei 13 (13 Oddziałów Ochronnych)",
-            "Quincy": "Quincy",
-            "Hueco Mundo": "Hueco Mundo",
-            "Reiatsu": "Reiatsu (Nacisk Duchowy)"
+            "Ichigo Kurosaki": "Ichigo Kurosaki (Zastępczy Shinigami)",
+            "Rukia Kuchiki": "Rukia Kuchiki",
+            "Orihime Inoue": "Orihime Inoue (Santen Kesshun)",
+            "Yasutora Sado / Chad": "Yasutora Sado / Chad (Brazo Derecha de Gigante)",
+            "Uryu Ishida": "Uryu Ishida (Quincy)",
+            "Renji Abarai": "Renji Abarai (Zabimaru)",
+            "Byakuya Kuchiki": "Byakuya Kuchiki (Senbonzakura / Kapitan 6. Oddziału)",
+            "Sosuke Aizen": "Sosuke Aizen (Kyoka Suigetsu)",
+            "Kisuke Urahara": "Kisuke Urahara (Sklep Urahary)",
+            "Yoruichi Shihoin": "Yoruichi Shihoin (Bogini Błyskawic / Czarny Kot)",
+            "Kenpachi Zaraki": "Kenpachi Zaraki (Kapitan 11. Oddziału)",
+            "Toshiro Hitsugaya": "Toshiro Hitsugaya (Hyourinmaru / Kapitan 10. Oddziału)",
+            "Genryusai Shigekuni Yamamoto": "Genryusai Shigekuni Yamamoto (Głównodowodzący Gotei 13)",
+            "Shunsui Kyoraku": "Shunsui Kyoraku",
+            "Jushiro Ukitake": "Jushiro Ukitake",
+            "Gin Ichimaru": "Gin Ichimaru (Shinso)",
+            "Ulquiorra Cifer": "Ulquiorra Cifer (Murcielago / Cuarto Espada)",
+            "Grimmjow Jaegerjaquez": "Grimmjow Jaegerjaquez (Pantera / Sexta Espada)",
+            "Yhwach": "Yhwach (Król Quincy / Wandenreich)",
+            "Shinigami": "Shinigami (Bóg Śmierci / Kosiarz Dusz)",
+            "Zanpakuto": "Zanpakuto (Kosa Duszy / Miecz Duszy)",
+            "Shikai": "Shikai (Wstępne Uwolnienie Miecza)",
+            "Bankai": "Bankai (Ostateczne Uwolnienie Miecza)",
+            "Getsuga Tensho": "Getsuga Tenshou (Kieł Przebijający Niebiosa)",
+            "Soul Society": "Soul Society (Społeczność Dusz)",
+            "Seireitei": "Seireitei (Dwór Czystych Dusz)",
+            "Rukongai": "Rukongai (Dzielnica Wędrujących Dusz)",
+            "Hueco Mundo": "Hueco Mundo (Pusty Świat)",
+            "Las Noches": "Las Noches (Pałac Nocy)",
+            "Hollow": "Hollow (Pusty)",
+            "Arrancar": "Arrancar (Pusty z połamaną maską i Zanpakuto)",
+            "Espada": "Espada (Dziesięć Ostrzy Hueco Mundo)",
+            "Quincy": "Quincy (Zakon Niszczycieli Duszy)",
+            "Gotei 13": "Gotei 13 (Trzynaście Oddziałów Obronnych)",
+            "Reiatsu": "Reiatsu (Ciśnienie Duchowe / Energia Duchowa Reiryoku)",
+            "Flash Step / Shunpo": "Shunpo (Błyskawiczny Krok)"
         },
         "character_forms": {
-            "Ichigo -> Rukia": "Rukia (kumpelsko, ciągłe sprzeczki)",
-            "Rukia -> Ichigo": "Ichigo / durniu (pouczająco)",
-            "Ichigo -> Urahara": "Panie w kapeluszu / Urahara"
+            "Ichigo -> Rukia": "Rukio / Ty karlico! (braterska więź, przekomarzanie)",
+            "Rukia -> Ichigo": "Ichigo, głupcze! (karzace uderzenie rysunkiem królika)",
+            "Renji -> Byakuya": "Kapitanie Kuchiki (pełen szacunek podwładnego)",
+            "Hitsugaya -> Wszyscy": "Nie Hitsugaya, tylko Kapitan Hitsugaya!"
         }
     },
     "one_piece": {
@@ -495,82 +581,127 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
         ],
         "publisher": "Wydawnictwo J.P.Fantastica",
         "glossary": {
-            "Devil Fruit": "Diabelski Owoc",
-            "Straw Hat Pirates": "Piraci Słomkowego Kapelusza",
-            "Straw Hat": "Słomkowy Kapelusz (Słomiany)",
-            "King of the Pirates": "Król Piratów",
-            "Grand Line": "Wielka Linia (Grand Line)",
-            "New World": "Nowy Świat",
-            "Haki": "Haki (Wola)",
-            "Conqueror's Haki": "Haki Władcy (Królewskie Haki)",
-            "Armament Haki": "Haki Uzbrojenia",
-            "Observation Haki": "Haki Obserwacji",
-            "Marine / Navy": "Marynarka Wojenna",
-            "Warlord of the Sea / Shichibukai": "Królewski Wojownik Mórz (Shichibukai)",
-            "Yonko / Four Emperors": "Czterej Imperatorzy (Yonko)",
-            "Poneglyph": "Poneglif",
-            "Buster Call": "Buster Call (Ostateczny Ostrzał)"
+            "Monkey D. Luffy": "Monkey D. Luffy (Słomkowy Kapelusz / Kapitan)",
+            "Roronoa Zoro": "Roronoa Zoro (Łowca Piratów / Szermierz Stylu Trzech Mieczy)",
+            "Nami": "Nami (Nawigatorka / Złodziejka Kotka)",
+            "Usopp": "Usopp (Snajper Sogeking / Bóg Usopp)",
+            "Sanji": "Sanji (Czarne Stopa / Kucharz)",
+            "Tony Tony Chopper": "Tony Tony Chopper (Renifer Medyk / Miłośnik Waty Cukrowej)",
+            "Nico Robin": "Nico Robin (Archeolożka / Diabelskie Dziecko)",
+            "Franky": "Franky (Cyborg Cieśla / SUPER!)",
+            "Brook": "Brook (Kościotrup Muzyk / Szermierz Dżentelmen)",
+            "Jinbe": "Jinbe (Rybolud Sternik / Rycerz Mórz)",
+            "Straw Hat Pirates": "Piraci Słomkowego Kapelusza (Załoga Słomkowych)",
+            "Going Merry": "Going Merry (Pierwszy statek)",
+            "Thousand Sunny": "Thousand Sunny (Statek Słoneczny)",
+            "Gol D. Roger": "Gol D. Roger (Król Piratów)",
+            "Edward Newgate / Whitebeard": "Białobrody (Edward Newgate / Najsilniejszy Człowiek Świata)",
+            "Shanks": "Czerwonowłosy Shanks (Czterej Imperatorzy / Yonko)",
+            "Marshall D. Teach / Blackbeard": "Czarnobrody (Marshall D. Teach)",
+            "Kaido": "Kaido (Bestia / Król Zwierząt)",
+            "Big Mom / Charlotte Linlin": "Big Mom (Charlotte Linlin)",
+            "Marine / Navy": "Marynarka Wojenna (Admirałowie: Akainu, Aokiji, Kizaru, Fujitora, Ryokugyu)",
+            "World Government": "Rząd Światowy (Pięciu Starszych / Gorosei / Im-sama)",
+            "Seven Warlords of the Sea / Shichibukai": "Królewscy Wojownicy Mórz (Shichibukai): Dracule Mihawk, Boa Hancock, Crocodile, Doflamingo, Kuma, Moria, Jinbe",
+            "Devil Fruit": "Diabelski Owoc (Paramecia, Zoan, Logia)",
+            "Gum-Gum Fruit / Hito Hito no Mi Model Nika": "Owoc Gomu Gomu (Model Nika / Słoneczny Bóg)",
+            "Haki": "Haki: Kenbunshoku Haki (Haki Obserwacji), Busoshoku Haki (Haki Zbrojenia), Haoshoku Haki (Haki Władcy / Królewskie Haki)",
+            "Grand Line": "Grand Line (Wielka Linia)",
+            "New World": "Nowy Świat (New World)",
+            "Red Line": "Red Line (Czerwona Linia)",
+            "Poneglyph": "Poneglif (Czerwony Poneglif Drogowy)",
+            "Void Century": "Pusty Wiek (Sto Lat Pustki)",
+            "Gear 2 / 3 / 4 / 5": "Bieg Drugi / Trzeci / Czwarty / Piąty (Gear 5 Nika)",
+            "Gomu Gomu no Pistol": "Gomu Gomu no Pistol! (Pistolet Gum-Gum)",
+            "Santoryu": "Styl Trzech Mieczy (Santoryu)"
         },
         "character_forms": {
-            "Luffy -> Załoga": "Imię bez honoryfikatorów (bezpośrednio, po kumpelsku)",
-            "Zoro -> Sanji": "Kucharz / Brwiasty (złośliwa rywalizacja)",
-            "Sanji -> Zoro": "Kutas / Mechogłowy",
-            "Sanji -> Nami": "Panna Nami (Nami-san, miłosne uniesienie)",
-            "Sanji -> Robin": "Pani Robin (Robin-chan)"
+            "Luffy -> Załoga": "Będę Królem Piratów! / Chodźmy jeść mięso!",
+            "Zoro -> Sanji": "Przeklęty Kucharz / Ero-cook (wieczna rywalizacja)",
+            "Sanji -> Zoro": "Głupi Glonojad / Marimo (kłótnie)",
+            "Sanji -> Nami/Robin": "Nami-san~! / Robin-chan~! (miłosny obłęd)",
+            "Chopper -> Ludzie": "Wcale się nie cieszę, że mnie chwalisz, ty draniu! (taniec radości)"
         }
     },
     "spy_x_family": {
         "title": "Spy x Family",
         "aliases": [
             "spy x family",
-            "spy family",
+            "spyxfamily",
             "sxf"
         ],
         "publisher": "Wydawnictwo Waneko",
         "glossary": {
-            "Operation Strix": "Operacja Stryks",
-            "Eden Academy": "Akademia Eden",
-            "Stella Star": "Gwiazdka Stella",
-            "Tonitrus Bolt": "Błyskawica Tonitrus",
-            "Twilight": "Zmierzch (Agent Zmierzch)",
-            "Thorn Princess": "Cierniowa Księżniczka",
-            "Ostania": "Ostania",
-            "Westalis": "Westalis",
-            "WISE": "WISE (Wywiad Westalis)",
-            "State Security Service / SSS": "Państwowa Służba Bezpieczeństwa (Tajniacy / SSS)",
-            "Imperial Scholar": "Cesarski Uczeń (Uczeń Elity)"
+            "Twilight": "Zmierzch (Twilight / Agent WISE)",
+            "Loid Forger": "Loid Forger (Psychiatra / Przybrany ojciec)",
+            "Thorn Princess": "Cierniowa Księżniczka (Thorn Princess / Zabójczyni Ogrodu)",
+            "Yor Forger / Briar": "Yor Forger (Urzędniczka / Przybrana matka)",
+            "Anya Forger": "Anya Forger (Eksperyment 007 / Telepatka)",
+            "Bond Forger": "Bond (Pies widzący przyszłość / Borf!)",
+            "Yuri Briar": "Yuri Briar (Młodszy brat Yor / Porucznik Służby Bezpieczeństwa Państwowego SSS)",
+            "Franky Franklin": "Franky Franklin (Informator Zmierzchu)",
+            "Sylvia Sherwood / Handler": "Sylvia Sherwood (Handler / Stalowa Dama WISE)",
+            "Fiona Frost / Nightfall": "Fiona Frost (Nightfall / Agentka zakochana w Zmierzchu)",
+            "Damian Desmond": "Damian Desmond (Drugi syn Donovana Desmonda / Synek)",
+            "Becky Blackbell": "Becky Blackbell (Najlepsza przyjaciółka Anyi)",
+            "Henry Henderson": "Henry Henderson (Nauczyciel w Edenie / ELEGANCJA!)",
+            "Donovan Desmond": "Donovan Desmond (Przewodniczący Partii Jedności Narodowej Ostanii)",
+            "Operation Strix": "Operacja Strix",
+            "WISE": "WISE (Wywiad Zachodniowiejski)",
+            "Eden Academy": "Akademia Eden (Prestiżowa szkoła w Berlint)",
+            "Imperial Scholars": "Uczniowie Cesarscy (Zdobywcy 8 Gwiazdek Stella)",
+            "Stella Stars": "Gwiazdki Stella",
+            "Tonitrus Bolts": "Pioruny Tonitrus (Punkty karne)",
+            "Ostania": "Ostania (Wschód / Berlint)",
+            "Westalis": "Westalis (Zachód)",
+            "Garden": "Ogród (Tajemnicza organizacja zabójców Ostanii)"
         },
         "character_forms": {
-            "Anya -> Loid": "Tato / Tatuś",
-            "Anya -> Yor": "Mamo / Mamusia",
-            "Loid -> Yor": "Yor (uprzejmie, jako udawane małżeństwo)",
-            "Yor -> Loid": "Panie Loidzie (Loid-san, nieśmiały szacunek)",
-            "Yuri -> Loid": "Loid (skrajna nienawiść i zazdrość o siostrę)",
-            "Anya -> Damian": "Synek (gardłowo, lekceważąco)"
+            "Anya -> Loid": "Tatuś (Papai)",
+            "Anya -> Yor": "Mamusiu (Mamai)",
+            "Anya -> Damian": "Synek (Jinan / kpina telepatyczna)",
+            "Loid -> Anya": "Anya (cierpliwość agenta pod przykrywką)",
+            "Yor -> Loid": "Panie Loidzie (nieśmiałość i urok)"
         }
     },
     "tokyo_ghoul": {
-        "title": "Tokyo Ghoul",
+        "title": "Tokyo Ghoul / Tokyo Ghoul:re",
         "aliases": [
             "tokyo ghoul",
-            "tokyo ghoul:re"
+            "tokyo ghoul:re",
+            "tokyo ghoul re"
         ],
         "publisher": "Wydawnictwo Waneko",
         "glossary": {
-            "Commission of Counter Ghoul / CCG": "Biuro Przeciwdziałania Ghulom (CCG)",
-            "Ghoul Investigator": "Inspektor Ghuli / Śledczy",
-            "Kagune": "Kagune (Narząd łowny ghula)",
-            "Quinque": "Quinque (Broń inspektorów z kagune)",
-            "Kakuja": "Kakuja (Zmutowany ghul-kanibal)",
+            "Ken Kaneki": "Ken Kaneki (Jednooki Ghul / Przepaska na Oko / Czarny Kosiarz / Jednooki Król)",
+            "Haise Sasaki": "Haise Sasaki (Inspektor Rangi Pierwszej / Przywódca Quinx)",
+            "Touka Kirishima": "Touka Kirishima (Królik / Anteiku)",
+            "Rize Kamishiro": "Rize Kamishiro (Żarłok)",
+            "Shu Tsukiyama": "Shu Tsukiyama (Smakosz / Gourmet)",
+            "Yoshimura": "Kuzan Yoshimura (Menedżer Anteiku / Jednooka Sowa)",
+            "Eto Yoshimura": "Eto Yoshimura (Autorka Sen Takatsuki / Jednooka Sowa)",
+            "Koutarou Amon": "Koutarou Amon (Inspektor Śledczy Pierwszej Klasy)",
+            "Kureo Mado": "Kureo Mado (Starszy Inspektor / Zbieracz Quinque)",
+            "Akira Mado": "Akira Mado",
+            "Kisho Arima": "Kisho Arima (Bóg Śmierci CCG / Niezrównany Inspektor Klasy Specjalnej)",
+            "Juuzou Suzuya": "Juuzou Suzuya (Inspektor Klasy Specjalnej)",
+            "Hideyoshi Nagachika": "Hideyoshi Nagachika (Hide / Przyjaciel Kanekiego)",
             "Anteiku": "Anteiku (Kawiarnia w 20. Dzielnicy)",
+            "CCG": "CCG (Biuro Przeciwdziałania Ghulom / Commission of Counter Ghoul)",
             "Aogiri Tree": "Drzewo Aogiri",
-            "One-Eyed Ghoul": "Jednooki Ghul",
-            "RC Cells": "Komórki RC"
+            "Quinx Squad": "Oddział Quinx (Ludzie z wszczepionym Kagune: Urie, Shirazu, Saiko, Mutsuki)",
+            "Kagune": "Kagune (Narząd łowny Ghuli: Ukaku, Koukaku, Rinkaku, Bikaku)",
+            "Kakuja": "Kakuja (Zmutowane Kagune po kanibalizmie)",
+            "Quinque": "Quinque (Broń inspektorów wytworzona z narządów Ghula)",
+            "RC Cells": "Komórki RC",
+            "Kakuhou": "Kakuhou (Woreczek gromadzący komórki RC)",
+            "Ghoul": "Ghul (Istota żywiąca się wyłącznie ludzkim mięsem i kawą)"
         },
         "character_forms": {
-            "Kaneki -> Touka": "Touka-chan / Touka",
-            "Touka -> Kaneki": "Kaneki / idioto (początkowo szorstko, potem troska)",
-            "Kaneki -> Yoshimura": "Kierowniku (Managerze)"
+            "Kaneki -> Touka": "Touka-chan / Touko",
+            "Tsukiyama -> Kaneki": "Kaneki-ken~! (ekstatyczny obłęd smakosza)",
+            "Arima -> Kaneki/Haise": "Haise (chłodny, surowy ojciec)",
+            "Quinx -> Haise": "Maman / Panie Sasaki (ciepło rodzinne)"
         }
     },
     "vinland_saga": {
@@ -579,22 +710,29 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "vinland saga",
             "saga winlandzka"
         ],
-        "publisher": "Wydawnictwo Hanami",
+        "publisher": "Wydawnictwo Hanami / Wydawnictwo Waneko",
         "glossary": {
-            "Vinland": "Winlandia",
+            "Thorfinn": "Thorfinn Karlsefni (Syn Thorsa / Prawdziwy Wojownik)",
+            "Askeladd": "Askeladd (Lucjusz Artoriusz Kastus / Dowódca najemników)",
+            "Canute / Cnut": "Książę Knut / Król Knut (Władca Anglii i Danii)",
+            "Thorkell the Tall": "Thorkell Wysoki (Wódz Jomswikingów)",
+            "Thors Snorresson": "Thors Snorresson (Troll z Jomsborga / Prawdziwy Wojownik)",
+            "Leif Erikson": "Leif Eriksson (Odkrywca Winlandii)",
+            "Einar": "Einar (Brat i przyjaciel Thorfinna z farmy Ketila)",
+            "Gudrid": "Gudrid",
+            "Hild": "Hild (Łowczyni z kuszą)",
+            "Ketil": "Ketil (Właściciel farmy)",
+            "Snake": "Wąż (Dowódca strażników farmy Ketila)",
             "Jomsvikings": "Jomswikingowie",
-            "Valhalla": "Walhalla",
-            "Thorfinn": "Thorfinn (Karlsefni)",
-            "Askeladd": "Askeladd",
-            "Thorkell": "Thorkell Wysoki",
-            "Canute / Knut": "Książę Knut / Król Knut",
-            "Sweyn": "Król Swen Widłobrody",
-            "Thors": "Thors (Troll z Jom)"
+            "Vinland": "Winlandia (Kraina pokoju bez wojny i niewolnictwa)",
+            "Valhalla": "Walhalla (Święta kraina poległych wojowników)",
+            "True Warrior": "Prawdziwy Wojownik (Prawdziwy wojownik nie potrzebuje miecza)",
+            "No Enemies": "Nie masz żadnych wrogów. Nikt na świecie nie jest twoim wrogiem."
         },
         "character_forms": {
-            "Thorfinn -> Askeladd": "Askeladd (płonąca nienawiść, żądza pojedynku)",
-            "Askeladd -> Thorfinn": "Thorfinn / synu Thorsa (cynizm, podstępne wykorzystywanie)",
-            "Canute -> Askeladd": "Askeladd (doradca, wódz gwardii)"
+            "Thorfinn -> Askeladd": "Askeladd! Pojedynkuj się ze mną! (nienawiść z dzieciństwa)",
+            "Askeladd -> Thorfinn": "Thorfinn, dorośnij... (gorzka lekcja życia)",
+            "Thors -> Thorfinn": "Pamiętaj, synu: nie masz żadnych wrogów."
         }
     },
     "berserk": {
@@ -604,93 +742,124 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
         ],
         "publisher": "Wydawnictwo J.P.Fantastica",
         "glossary": {
-            "Band of the Falcon / Band of the Hawk": "Drużyna Jastrzębia (Sokoła)",
-            "Behelit / Beherit": "Behelit (Jajo Króla)",
-            "Brand of Sacrifice": "Piętno Ofiary",
-            "Apostle": "Apostoł",
-            "Eclipse": "Zaćmienie",
-            "God Hand": "Ręka Boga",
-            "Dragon Slayer": "Pogromca Smoków (Wielki miecz Gutsa)",
-            "Berserker Armor": "Zbroja Berserka",
-            "Midland": "Midland",
-            "Guts": "Guts (Czarny Szermierz)",
-            "Griffith": "Griffith (Biały Jastrząb / Femto)",
-            "Casca": "Casca",
-            "Skull Knight": "Rycerz Czaszka"
+            "Guts": "Guts (Czarny Szermierz / Wojownik z Pogranicza)",
+            "Griffith": "Griffith (Biały Jastrząb / Femto / Piąty z Ręki Boga)",
+            "Casca": "Casca (Dowódca jednostki Jastrzębi)",
+            "Judeau": "Judeau (Mistrz noży do rzucania)",
+            "Pippin": "Pippin",
+            "Corkus": "Corkus",
+            "Rickert": "Rickert (Kowal)",
+            "Puck": "Puck (Elf / Duszek)",
+            "Isidro": "Isidro",
+            "Farnese de Vandimion": "Farnese de Vandimion (Święty Żelazny Łańcuch)",
+            "Serpico": "Serpico (Szermierz wiatru)",
+            "Schierke": "Schierke (Młoda czarownica)",
+            "Ivalera": "Ivalera (Elfka)",
+            "Skull Knight": "Rycerz Czaszka (Dawny król Gaiseric)",
+            "Nosferatu Zodd": "Nosferatu Zodd (Nieśmiertelny Zodd)",
+            "God Hand": "Ręka Boga (Void, Slan, Ubik, Conrad, Femto)",
+            "Band of the Falcon / Hawk": "Drużyna Jastrzębia (Banda Jastrzębia)",
+            "Brand of Sacrifice": "Znamię Ofiary (Piętno)",
+            "Behelit": "Behelit (Jajko Władcy / Karmazynowy Behelit)",
+            "Eclipse": "Zaćmienie (Święto Ofiarowania)",
+            "Dragon Slayer": "Zabójca Smoków (Wielki żelazny miecz Gutsa)",
+            "Berserker Armor": "Pancerz Berserka",
+            "Midland": "Midland (Królestwo Midlandu)",
+            "Holy See": "Święty Kościół / Święta Stolica",
+            "Apostles": "Apostołowie (Potwory zrodzone z poświęcenia ludzkich więzi)",
+            "Idea of Evil": "Idea Zła (Bóg zrodzony z ludzkich cierpień)"
         },
         "character_forms": {
-            "Guts -> Griffith": "Griffith (początkowo braterstwo/podziw, po Zaćmieniu śmiertelna nienawiść)",
-            "Griffith -> Guts": "Guts (jedyny, który sprawił, że zapomniał o marzeniu)",
-            "Casca -> Griffith": "Griffith (ślepe uwielbienie dowódcy)",
-            "Guts -> Casca": "Casca (miłość, bezwzględna ochrona)"
+            "Guts -> Griffith": "GRIFFITH! (ryk rozpaczy, furii i zdrady)",
+            "Griffith -> Guts": "Guts... Spośród tysięcy towarzyszy tylko ty sprawiłeś, że zapomniałem o marzeniu.",
+            "Casca -> Guts": "Guts (miłość, która przetrwała piekło)",
+            "Schierke -> Guts": "Panie Guts (duchowa przewodniczka pancerza)"
         }
     },
-    "my_hero_academia": {
+    "boku_no_hero_academia": {
         "title": "My Hero Academia: Akademia Bohaterów (Boku no Hero Academia)",
         "aliases": [
             "boku no hero academia",
             "my hero academia",
             "mha",
             "bnha",
-            "akademia bohaterów"
+            "akademia bohaterów",
+            "akademia bohaterow"
         ],
         "publisher": "Wydawnictwo Waneko",
         "glossary": {
-            "Quirk": "Dar (Indywidualność)",
-            "One For All": "Jeden za Wszystkich (One For All)",
-            "All For One": "Wszystko za Jednego (All For One)",
-            "U.A. High School": "Szkoła U.A. (Liceum U.A.)",
-            "Hero": "Bohater",
-            "Villain": "Złoczyńca (Przestępca)",
+            "Izuku Midoriya": "Izuku Midoriya (Deku)",
+            "Katsuki Bakugo": "Katsuki Bakugo (Kacchan / Wielki Wybuchobójczy Dynamight)",
+            "Shoto Todoroki": "Shoto Todoroki (Pół-Ogień, Pół-Lód)",
+            "All Might / Toshinori Yagi": "All Might (Symbol Pokoju)",
+            "Endeavor / Enji Todoroki": "Endeavor (Bohater nr 1 Płomieni)",
+            "Hawks / Keigo Takami": "Hawks (Skrzydlaty Bohater nr 2)",
+            "Ochaco Uraraka": "Ochaco Uraraka (Uravity)",
+            "Tenya Iida": "Tenya Iida (Ingenium)",
+            "Eijiro Kirishima": "Eijiro Kirishima (Red Riot)",
+            "Tsuyu Asui": "Tsuyu Asui (Froppy)",
+            "Shota Aizawa": "Shota Aizawa (Eraser Head / Wychowawca klasy 1-A)",
+            "All For One": "All For One (Wszystko za Jednego / Władca Półświatka)",
+            "Tomura Shigaraki / Tenko Shimura": "Tomura Shigaraki (Lider Ligi Złoczyńców / Rozpad)",
+            "Dabi / Toya Todoroki": "Dabi (Błękitne Płomienie)",
+            "Himiko Toga": "Himiko Toga (Przemiana przez krew)",
+            "Twice / Jin Bubaigawara": "Twice (Podwójność)",
+            "One For All": "Jeden za Wszystkich (One For All - Dziedziczona potęga 9 następców)",
+            "Quirk": "Dar (Indywidualność / Kosei)",
+            "Quirkless": "Bezdarny (Człowiek bez Daru)",
+            "U.A. High School": "Liceum U.A. (Akademia U.A.)",
+            "Class 1-A": "Klasa 1-A",
             "League of Villains": "Liga Złoczyńców",
             "Paranormal Liberation Front": "Front Wyzwolenia Zjawisk Nadprzyrodzonych",
-            "Smash": "Smash (np. Detroit Smash, Delaware Smash)",
-            "Plus Ultra": "Plus Ultra!",
-            "Pro Hero": "Zawodowy Bohater",
-            "Hero License": "Licencja Bohatera"
+            "Smash": "Smash! (Detroit Smash, Delaware Smash, United States of Smash!)",
+            "Plus Ultra": "Plus Ultra! (Dalej, ponad wszystko!)"
         },
         "character_forms": {
-            "Deku -> All Might": "All Might / Mistrzu (ogromne uwielbienie i szacunek)",
-            "Bakugo -> Deku": "Deku / śmieciu (pogarda, potem wściekła rywalizacja)",
-            "Deku -> Bakugo": "Kacchan (dziecięce przywiązanie, respekt)",
-            "Uraraka -> Deku": "Deku-kun (ciepło, skrywane uczucie)"
+            "Izuku -> Bakugo": "Kacchan! (respekt, podziw z dzieciństwa)",
+            "Bakugo -> Izuku": "Deku! Ty bezużyteczny śmieciu! (zadziorność i ambicja)",
+            "Izuku -> All Might": "All Might! / Mistrzu!",
+            "All Might -> Izuku": "Młody Midoriyo!"
         }
     },
     "sousou_no_frieren": {
         "title": "Frieren: U kresu drogi (Sousou no Frieren)",
         "aliases": [
             "sousou no frieren",
+            "frieren: u kresu drogi",
             "frieren",
-            "frieren: u kresu drogi"
+            "frieren at journey's end"
         ],
         "publisher": "Wydawnictwo Studio JG",
         "glossary": {
-            "Hero Party": "Drużyna Bohatera",
-            "First-Class Mage Exam": "Egzamin Magiczny Pierwszej Rangi",
-            "Demon": "Demon (Potwór manipulujący słowami)",
+            "Frieren": "Frieren (Pogromczyni / Frieren Zabójczyni Magów)",
+            "Himmel": "Himmel (Bohater Himmel / Pomnikowy narcyz o złotym sercu)",
+            "Heiter": "Heiter (Święty kapłan / Pijany kapłan)",
+            "Eisen": "Eisen (Krasnoludzki wojownik)",
+            "Fern": "Fern (Uczennica Frieren / Mag pierwszej klasy)",
+            "Stark": "Stark (Uczeń Eisena / Wojownik)",
+            "Sein": "Sein (Mnich i podróżnik)",
+            "Flamme": "Flamme (Legendarna Wielka Mag / Nauczycielka Frieren)",
+            "Serie": "Serie (Żyjący grimuar / Założycielka Kontynentalnego Związku Magii)",
+            "Aura the Guillotine": "Aura Gilotyna (Waga Posłuszeństwa / Jedna z Siedmiu Mędrców Zniszczenia)",
             "Demon King": "Król Demonów",
-            "Aura the Guillotine": "Aura Gilotynka",
-            "Mana": "Mana (Energia Magiczna)",
-            "Zoltraak": "Zoltraak (Magia Zabijania Ludzi / Magia Zwykłego Ataku)",
-            "Ende": "Ende (Kraina na najdalszej północy, Zamek Króla Demonów)",
-            "Aureole": "Aureole (Miejsce Spoczynku Dusz)",
-            "Continental Magic Association": "Kontynentalne Stowarzyszenie Magii",
-            "Himmel": "Himmel (Bohater Himmel)",
-            "Heiter": "Heiter (Kapłan Heiter)",
-            "Eisen": "Eisen (Wojownik Eisen)",
-            "Flamme": "Flamme (Wielka Czarodziejka Flamme)",
-            "Serie": "Serie (Wielka Czarodziejka Serie)"
+            "Hero Party": "Drużyna Bohaterów (Pokonała Króla Demonów po 10-letniej podróży)",
+            "Zoltraak": "Zoltraak (Magia Zabijania Ludzi / Zwykła Magia Ofensywna)",
+            "Mana Suppression": "Tłumienie Many (Ukrywanie poziomu energii)",
+            "Ende": "Ende (Zamek Króla Demonów na północnym krańcu kontynentu)",
+            "Aureole": "Aureole (Kraina spoczynku dusz w Ende)",
+            "First-Class Mage Exam": "Egzamin na Maga Pierwszej Klasy",
+            "Continental Magic Association": "Kontynentalny Związek Magii",
+            "Grimoire": "Grimuar (Księga zaklęć, np. magia tworzenia pola kwiatów)"
         },
         "character_forms": {
-            "Fern -> Frieren": "Mistrzyni Frieren (Frieren-sama, szacunek, matkowanie jej)",
-            "Frieren -> Fern": "Fern (spokojnie, jak nauczycielka i przyjaciółka)",
-            "Stark -> Frieren": "Mistrzyni Frieren",
-            "Fern -> Stark": "Stark-sama / Stark (drobne złośliwości, troska)",
-            "Himmel -> Frieren": "Frieren (czułość, niespełniona miłość)"
+            "Frieren -> Himmel": "Himmel... (wspomnienia, zrozumienie ludzkich serc)",
+            "Fern -> Frieren": "Mistrzyni Frieren / Frieren-sama (karzące spojrzenie na lenistwo)",
+            "Fern -> Stark": "Panie Stark / Dziecinny zboczeniec",
+            "Stark -> Fern": "Fern (strach przed jej fochem / troska)"
         }
     },
     "dungeon_meshi": {
-        "title": "Pyszności w Lochach (Dungeon Meshi)",
+        "title": "Pyszności w Lochach (Dungeon Meshi: Delicious in Dungeon)",
         "aliases": [
             "dungeon meshi",
             "delicious in dungeon",
@@ -699,137 +868,170 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
         ],
         "publisher": "Wydawnictwo Studio JG",
         "glossary": {
-            "Dungeon": "Lochy",
-            "Red Dragon": "Czerwony Smok",
-            "Living Armor": "Żywe Zbroje",
-            "Walking Mushroom": "Kroczący Grzyb",
-            "Mandrake": "Mandragora",
-            "Kraken": "Kraken",
-            "Lunatic Magician / Sissel": "Szalony Mag (Thistle / Sissel)",
-            "Golden Kingdom": "Złote Królestwo",
-            "Winged Lion": "Skrzydlaty Lew",
-            "Laios Touden": "Laios Touden",
-            "Marcille Donato": "Marcille Donato",
-            "Chilchuck Tims": "Chilchuck Tims",
-            "Senshi": "Senshi (Krasnoludzki kucharz lochów)",
-            "Falin Touden": "Falin Touden"
+            "Laios Touden": "Laios Touden (Rycerz / Fanatyk jedzenia potworów)",
+            "Marcille Donato": "Marcille Donato (Półelfia czarodziejka / Magia starożytna)",
+            "Chilchuck Tims": "Chilchuck Tims (Niziołek / Złodziej / Specjalista od pułapek)",
+            "Senshi": "Senshi (Krasnoludzki kucharz lochowy / Żelazny wok)",
+            "Falin Touden": "Falin Touden (Kapłanka / Siostra Laiosa / Chimera Czerwonego Smoka)",
+            "Shuro / Toshiro Nakamoto": "Shuro / Toshiro Nakamoto (Szermierz ze Wschodu)",
+            "Kabru": "Kabru (Przywódca drużyny badaczy)",
+            "Thistle": "Thistle (Szalony Mag / Nadworny czarodziej Delgalu)",
+            "Red Dragon": "Czerwony Smok (Pożarł Falin na głębokich poziomach)",
+            "Winged Lion": "Skrzydlaty Lew (Demon pożerający ludzkie pragnienia)",
+            "Dungeon": "Loch (Labirynt pod wyspą)",
+            "Golden Kingdom": "Złote Królestwo (Zatopione miasto króla Delgala)",
+            "Monster Cuisine": "Potrawka z potworów (Roastbazyliszek, zupa z ruchomej zbroi, tarta z pasożytów Krakena)",
+            "Ancient Magic": "Starożytna Magia / Czarna Magia (Nekromancja)"
         },
         "character_forms": {
-            "Marcille -> Laios": "Laios (ciągła panika i obrzydzenie jego pomysłami kulinarnymi)",
-            "Senshi -> Załoga": "Młodziki (z pozycji doświadczonego kucharza i krasnoluda)",
-            "Chilchuck -> Laios": "Laios / Szefie (pragmatyczny dystans)"
+            "Laios -> Potwory": "Ciekawe jak smakuje ich mięso... (naukowa pasja)",
+            "Marcille -> Laios": "NIGDY TEGO NIE ZJEM! / Laios, ty obrzydliwcu!",
+            "Senshi -> Marcille": "Jedz, bo bez zbilansowanej diety nie przetrwasz w lochu!",
+            "Chilchuck -> Drużyna": "Pamiętajcie, to tylko praca za stawkę!"
         }
     },
     "oshi_no_ko": {
         "title": "Moja Gwiazda (Oshi no Ko)",
         "aliases": [
             "oshi no ko",
-            "moja gwiazda"
+            "moja gwiazda",
+            "oniko"
         ],
         "publisher": "Wydawnictwo Studio JG",
         "glossary": {
-            "Idol": "Idol / Idolka",
-            "B-Komachi": "B-Komachi (Legendarna grupa idolek)",
-            "Strawberry Productions": "Truskawkowa Wytwórnia (Strawberry Productions)",
-            "Lala Lai Theatrical Company": "Teatr Lala Lai",
-            "Ai Hoshino": "Ai Hoshino",
-            "Aqua Hoshino": "Aqua Hoshino (Aquamarine)",
-            "Ruby Hoshino": "Ruby Hoshino",
-            "Kana Arima": "Kana Arima (Genialna dziecięca aktorka, 'Ta, co potrafi płakać w 10 sekund')",
-            "Akane Kurokawa": "Akane Kurokawa",
-            "Mem-Cho": "Mem-Cho"
+            "Ai Hoshino": "Ai Hoshino (Legendarna Idolka grupy B-Komachi / Podwójne gwiazdy w oczach)",
+            "Aquamarine Hoshino": "Aquamarine Hoshino / Aqua (Reinkarnacja dr Goro Amamiyi / Aktor zemsty)",
+            "Ruby Hoshino": "Ruby Hoshino (Reinkarnacja Sariny Tendouji / Liderka nowej B-Komachi)",
+            "Kana Arima": "Kana Arima (Genialna dziecięca aktorka liżąca sodę oczyszczoną / Centrum B-Komachi)",
+            "Akane Kurokawa": "Akane Kurokawa (Geniusz aktorstwa metodycznego / Teatr Lala Lai)",
+            "Mem-Cho": "Mem-Cho (YouTuberka / Była idolka ukrywająca wiek)",
+            "Miyako Saito": "Miyako Saito (Prezeska Agencji Strawberry Productions / Przybrana matka)",
+            "Ichigo Saito": "Ichigo Saito (Były prezes Strawberry Productions)",
+            "Taishi Gotanda": "Reżyser Taishi Gotanda (Mentor aktorski Aquy)",
+            "Hikaru Kamiki": "Hikaru Kamiki (Biologiczny ojciec / Prawdziwy sprawca morderstwa)",
+            "B-Komachi": "B-Komachi (Grupa Idolek)",
+            "Strawberry Productions": "Strawberry Productions (Agencja talentów)",
+            "Entertainment Industry": "Japoński Przemysł Rozrywkowy (Idolki, reality show, teatr, skandale)",
+            "Lie is Love": "Kłamstwo to najdoskonalsza forma miłości (Motto Ai)",
+            "Black Star Eyes": "Czarne Gwiazdy w Oczach (Mroczna manipulacja i żądza zemsty)"
         },
         "character_forms": {
-            "Aqua -> Ruby": "Ruby (opiekuńczość brata)",
-            "Kana -> Aqua": "Aqua (zadziornie, ukryta miłość)",
-            "Akane -> Aqua": "Aqua-kun (lojalność, profesjonalizm, głębokie zrozumienie)",
-            "Ruby -> Aqua": "Aqua / braciszku"
+            "Aqua -> Wrogowie": "Zimna, bezwzględna dedukcja i planowanie zemsty za śmierć Ai",
+            "Ruby -> Aqua": "Onii-chan / Aqua (początkowo rodzeństwo, później rozpad i prawda o Goro)",
+            "Kana -> Aqua": "Aqua, ty durniu! (niezdolność wyznania uczuć)",
+            "Akane -> Aqua": "Rozszyfruję każdy twój ból i pomogę ci zabić..."
         }
     },
     "solo_leveling": {
-        "title": "Solo Leveling",
+        "title": "Solo Leveling (Tylko ja awansuję)",
         "aliases": [
             "solo leveling",
-            "only i level up"
+            "tylko ja awansuję",
+            "tylko ja awansuje"
         ],
         "publisher": "Wydawnictwo Studio JG",
         "glossary": {
-            "Hunter": "Łowca",
-            "S-Rank Hunter": "Łowca Rangi S",
-            "E-Rank Hunter": "Łowca Rangi E ('Najsłabszy łowca ludzkości')",
-            "Gate / Dungeon": "Brama / Loch",
-            "Dungeon Break": "Przełamanie Bramy (Dungeon Break)",
-            "Monarch": "Monarcha (Władca Cieni)",
-            "Shadow Army": "Armia Cieni",
-            "Arise": "Wstań (Arise!)",
-            "System": "System",
-            "Shadow Monarch": "Monarcha Cieni",
-            "Sung Jinwoo": "Sung Jinwoo",
-            "Cha Hae-in": "Cha Hae-in",
-            "Go Gunhee": "Go Gunhee (Prezes Stowarzyszenia Łowców)"
+            "Sung Jinwoo": "Sung Jinwoo (Najsłabszy Łowca Rangi E -> Monarcha Cieni)",
+            "Cha Hae-in": "Cha Hae-in (Wicegildmistrzyni Gildii Hunters / Szermierz Rangi S)",
+            "Baek Yoonho": "Baek Yoonho (Gildmistrz Białego Tygrysa / Transformacja)",
+            "Choi Jong-in": "Choi Jong-in (Gildmistrz Hunters / Najsilniejszy Mag Ognia)",
+            "Go Gunhee": "Go Gunhee (Prezes Koreańskiego Stowarzyszenia Łowców)",
+            "Woo Jinchul": "Woo Jinchul (Szef Wydziału Nadzoru)",
+            "Thomas Andre": "Thomas Andre (Goliath / Łowca Rangi Krajowej z USA)",
+            "Liu Zhigang": "Liu Zhigang (Łowca Rangi Krajowej z Chin)",
+            "Igris": "Igris Krwawy Czerwony (Rycerz Cieni)",
+            "Beru": "Beru (Król Mrówek / Generał Cieni / Mój Królu!)",
+            "Iron": "Iron (Cień rycerza)",
+            "Tank": "Tank (Cień lodowego niedźwiedzia)",
+            "The System": "System (Projektor poziomów i zadań Architekta)",
+            "Hunter": "Łowca (Rangi: S, A, B, C, D, E oraz Ranga Krajowa)",
+            "Gates / Dungeons": "Wrota / Bramy / Lochy (Podwójny Loch / Czerwona Brama)",
+            "Awakening / Re-Awakening": "Przebudzenie / Ponowne Przebudzenie",
+            "Shadow Monarch": "Monarcha Cieni (Ashborn)",
+            "Monarchs and Rulers": "Monarchowie i Władcy",
+            "Arise": "Powstań! (Słowo kluczowe ekstrakcji Cieni)",
+            "Shadow Extraction": "Ekstrakcja Cienia (Tworzenie nieśmiertelnej Armii Cieni)",
+            "Ruler's Authority": "Autorytet Władcy (Telekineza)",
+            "Jeju Island Raid": "Rajd na Wyspę Jeju (Wojna z Królewskimi Mrówkami)"
         },
         "character_forms": {
-            "Jinwoo -> Cienie": "Wstań (rozkaz władcy)",
-            "Cha Hae-in -> Jinwoo": "Łowco Sung Jinwoo (fascynacja jego zapachem i potęgą)"
+            "Jinwoo -> Cienie": "Powstań! (Epicki rozkaz budzący armię)",
+            "Beru -> Jinwoo": "Mój Królu! (fanatyczne uwielbienie)",
+            "Cha Hae-in -> Jinwoo": "Panie Sung Jinwoo (fascynacja zapachem many)"
         }
     },
     "made_in_abyss": {
         "title": "Made in Abyss",
         "aliases": [
-            "made in abyss"
+            "made in abyss",
+            "mia"
         ],
         "publisher": "Wydawnictwo Kotori",
         "glossary": {
-            "Abyss": "Otchłań (Abyss)",
-            "White Whistle": "Biały Gwizdek (Legendarni Odkrywcy)",
-            "Black Whistle": "Czarny Gwizdek (Mistrzowie)",
-            "Moon Whistle": "Księżycowy Gwizdek (Nauczyciele)",
-            "Red Whistle": "Czerwony Gwizdek (Nowicjusze)",
-            "Curse of the Abyss": "Przekleństwo Otchłani (Nacisk Otchłani)",
-            "Relic": "Relikt",
-            "Aubade": "Aubade (Reg - 'Najwyższy Relikt')",
-            "Orth": "Orth (Miasto na skraju Otchłani)",
-            "Narehate / Hollow": "Narehate (Istoty, które utraciły człowieczeństwo)",
-            "Riko": "Riko",
-            "Reg": "Reg",
-            "Nanachi": "Nanachi",
-            "Ozen": "Ozen (Ozen Nieruchoma)",
-            "Bondrewd": "Bondrewd (Władca Świtu)"
+            "Riko": "Riko (Dziecko Otchłani / Czerwony Gwizdek -> Odkrywczyni)",
+            "Reg": "Reg (Robot z dna Otchłani / Władca Płomieni / Incinerator)",
+            "Nanachi": "Nanachi (Błogosławiona / Narehate / Puchata)",
+            "Mitty": "Mitty (Przeklęta Narehate)",
+            "Lyza the Annihilator": "Lyza Niszczycielka (Biały Gwizdek / Matka Riko)",
+            "Ozen the Immovable": "Ozen Niewzruszona (Biały Gwizdek / Obóz Poszukiwaczy)",
+            "Bondrewd the Novel": "Bondrewd Nowator (Władca Świtu / Biały Gwizdek / Ido Front)",
+            "Prushka": "Prushka (Córka Bondrewda / Przekształcona w Biały Gwizdek Riko)",
+            "Faputa": "Faputa (Księżniczka Narehate / Ucieleśnienie Wartości)",
+            "The Abyss": "Otchłań (Wielka szczelina na wyspie Orth)",
+            "Whistles": "Gwizdki: Czerwony Gwizdek (Uczeń), Niebieski Gwizdek (Adept), Fioletowy Gwizdek (Nauczyciel), Czarny Gwizdek (Ekspert), Biały Gwizdek (Legenda / Wykuty z Żywej Duszy)",
+            "Curse of the Abyss": "Klątwa Otchłani (Brzemię Powrotu z kolejnych warstw)",
+            "Layers of the Abyss": "Warstwy Otchłani: 1. Krawędź Otchłani, 2. Las Pokus, 3. Wielka Uskok, 4. Kielichy Olbrzymów, 5. Morze Trupów, 6. Stolica Niepowrotnych, 7. Dno Otchłani",
+            "Relics": "Relikty (Pradawne artefakty)",
+            "Incinerator": "Spopielacz (Incinerator / Działo Rega)",
+            "Cartridges": "Kartridże (Bateria niwelująca klątwę Bondrewda ze szczątków dzieci)"
         },
         "character_forms": {
-            "Riko -> Reg": "Reg (najlepszy przyjaciel, bezgraniczne zaufanie)",
-            "Reg -> Riko": "Riko (troska, poświęcenie życia)",
-            "Nanachi -> Riko/Reg": "Riko / Reg (z dystansem, przyjacielsko, 'naa')"
+            "Nanachi -> Reg/Riko": "Nnaa~ (charakterystyczne westchnienie i czułość)",
+            "Bondrewd -> Dzieci": "Subarashii! (Przerażający zachwyt nad postępem nauki)",
+            "Riko -> Reg": "Reg! (nieustraszona ciekawość i wiara w przyjaciela)"
         }
     },
     "haikyuu": {
         "title": "Haikyu!! (Haikyuu!!)",
         "aliases": [
-            "haikyuu",
             "haikyu!!",
+            "haikyuu",
+            "haikyuu!!",
             "haikyu"
         ],
-        "publisher": "Wydawnictwo Studio JG",
+        "publisher": "Wydawnictwo Waneko",
         "glossary": {
-            "Karasuno High School": "Liceum Karasuno ('Wrony')",
-            "Nekoma High School": "Liceum Nekoma ('Koty')",
+            "Shoyo Hinata": "Shoyo Hinata (Krótki / Mały Gigant / Przynęta)",
+            "Tobio Kageyama": "Tobio Kageyama (Król Boiska / Genialny Rozgrywający)",
+            "Daichi Sawamura": "Daichi Sawamura (Kapitan Karasuno)",
+            "Koshi Sugawara": "Koshi Sugawara (Wicekapitan)",
+            "Asahi Azumane": "Asahi Azumane (As Karasuno)",
+            "Yu Nishinoya": "Yu Nishinoya (Boski Strażnik Karasuno / Libero)",
+            "Ryunosuke Tanaka": "Ryunosuke Tanaka",
+            "Kei Tsukishima": "Kei Tsukishima (Księżyc / Środkowy Blokujący)",
+            "Tadashi Yamaguchi": "Tadashi Yamaguchi (Zagrywający z wyskoku)",
+            "Toru Oikawa": "Toru Oikawa (Wielki Król / Rozgrywający Aoba Johsai)",
+            "Tetsuro Kuroo": "Tetsuro Kuroo (Kapitan Nekomy / Prowokujący bloker)",
+            "Kenma Kozume": "Kenma Kozume (Mózg i Serce Nekomy / Gracz)",
+            "Kotaro Bokuto": "Kotaro Bokuto (As Fukurodani / Tryb Sowy)",
+            "Keiji Akaashi": "Keiji Akaashi (Rozgrywający Fukurodani)",
+            "Wakatoshi Ushijima": "Wakatoshi Ushijima (Super-As Shiratorizawy / Leworęczny potwór)",
+            "Karasuno High": "Liceum Karasuno (Kruki bez skrzydeł -> Nielotne Kruki znowu wzbijają się w powietrze)",
+            "Nekoma High": "Liceum Nekoma (Koty z wysypiska)",
             "Aoba Johsai": "Liceum Aoba Johsai (Seijoh)",
-            "Setter": "Rozgrywający",
-            "Middle Blocker": "Środkowy Blokujący",
-            "Wing Spiker / Outside Hitter": "Przyjmujący / Skrzydłowy",
-            "Opposite Hitter": "Atakujący",
-            "Libero": "Libero (Obrońca)",
-            "Quick Attack": "Szybki Atak (Błyskawiczny atak)",
-            "Freak Quick": "Atak Dziwoląg (Szybki atak Hinaty i Kageyamy)",
-            "Spring Tournament": "Turniej Wiosenny (Harukou)",
-            "Interhigh": "Turniej Interhigh",
-            "Trash Heap Battle": "Bitwa na Śmietnisku (Karasuno vs Nekoma)"
+            "Fukurodani Academy": "Akademia Fukurodani (Sowy)",
+            "Shiratorizawa Academy": "Akademia Shiratorizawa (Orły)",
+            "Freak Quick": "Potworny Szybki Atak (Błyskawiczne tempo Kageyamy i Hinaty)",
+            "Dump Shot": "Kiwa / Zmyłka rozgrywającego",
+            "Rolling Thunder": "Rolling Thunder! (Efektowne padnięcie w obronie Nishinoyi)",
+            "Spring Tournament": "Turniej Wiosenny (Harukou / Droga do Mistrzostw Krajowych)",
+            "Trash Heap Showdown": "Bitwa na Wysypisku Śmieci (Mecz Karasuno vs Nekoma)"
         },
         "character_forms": {
-            "Hinata -> Kageyama": "Kageyama / Baka Kageyama (wściekła rywalizacja, zgrany duet)",
-            "Kageyama -> Hinata": "Hinata / boke (Królewski Rozgrywający)",
-            "Hinata -> Oikawa": "Wielki Królu (Daiou-sama)",
-            "Hinata -> Kenma": "Kenma (przyjaźń ponad podziałami drużyn)"
+            "Hinata -> Kageyama": "Kageyama! Wystaw mi jeszcze jedną piłkę!",
+            "Kageyama -> Hinata": "Boke, Hinata boke! (Ty durniu, Hinata!)",
+            "Oikawa -> Kageyama": "Tobio-chan (ironiczny uśmieszek mistrza)",
+            "Bokuto -> Akaashi": "Akaaaashi! (lament w dołku psychicznym)"
         }
     },
     "kaguya_sama": {
@@ -837,27 +1039,30 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
         "aliases": [
             "kaguya-sama",
             "kaguya sama",
-            "kaguya-sama: love is war",
-            "miłość to wojna"
+            "miłość to wojna",
+            "milosc to wojna"
         ],
         "publisher": "Wydawnictwo Studio JG",
         "glossary": {
+            "Kaguya Shinomiya": "Kaguya Shinomiya (Wiceprzewodnicząca / Dziedziczka Konglomeratu Shinomiya)",
+            "Miyuki Shirogane": "Miyuki Shirogane (Przewodniczący Samorządu / Geniusz ciężkiej pracy)",
+            "Chika Fujiwara": "Chika Fujiwara (Sekretarz Samorządu / Detektyw Miłości)",
+            "Yu Ishigami": "Yu Ishigami (Skarbnik / Introwertyk / Chcę umrzeć, więc idę do domu)",
+            "Miko Iino": "Miko Iino (Audytorka / Strażniczka moralności)",
+            "Ai Hayasaka": "Ai Hayasaka (Osobista służąca Kaguyi / Mistrzyni kamuflażu)",
+            "Nagisa Kashiwagi": "Nagisa Kashiwagi",
+            "Maki Shijo": "Maki Shijo (Kuzynka Kaguyi / Cierpiąca z miłości)",
+            "Shuchiin Academy": "Akademia Shuchiin (Elitarna szkoła arystokracji)",
             "Student Council": "Samorząd Uczniowski",
-            "Shuchiin Academy": "Akademia Shuchiin",
-            "President": "Przewodniczący (Miyuki Shirogane)",
-            "Vice President": "Wiceprzewodnicząca (Kaguya Shinomiya)",
-            "Secretary": "Sekretarz (Chika Fujiwara)",
-            "Treasurer": "Skarbnik (Yu Ishigami)",
-            "Auditor": "Audytor (Miko Iino)",
-            "Shinomiya Zaibatsu": "Konglomerat Shinomiya (Zaibatsu Shinomiya)",
-            "How cute...": "Och, jak uroczo... (O kawaii koto...)",
-            "Love is War": "Wojna miłosna"
+            "Love is War": "Miłość to wojna: Kto pierwszy wyzna uczucie, ten przegrywa!",
+            "How Cute": "Och, jakie to urocze... (O-kawaii koto...)",
+            "Shinomiya Conglomerate": "Konglomerat Finansowy Shinomiya (Cztery wielkie zaibatsu)"
         },
         "character_forms": {
-            "Kaguya -> Shirogane": "Przewodniczący / Panie Przewodniczący (Prezydencie)",
-            "Shirogane -> Kaguya": "Panno Shinomiya (Shinomiya-san)",
-            "Chika -> Shirogane/Kaguya": "Prezydencie / Kaguya-san (wesoło, beztrosko)",
-            "Ishigami -> Kaguya": "Pani Kaguya (śmiertelny strach przed jej wzrokiem)"
+            "Kaguya -> Shirogane": "Przewodniczący / Shirogane (duma i ukryte uwielbienie)",
+            "Shirogane -> Kaguya": "Shinomiya (duma i obsesja na punkcie wyznania)",
+            "Chika -> Ishigami": "Ishigami-kun! Nie bądź taki ponury!",
+            "Ishigami -> Kaguya": "Shinomiya-senpai mnie zabije..."
         }
     },
     "jojo": {
@@ -865,30 +1070,39 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
         "aliases": [
             "jojo",
             "jojo's bizarre adventure",
-            "jojos bizarre adventure"
+            "jjba"
         ],
         "publisher": "Wydawnictwo J.P.Fantastica",
         "glossary": {
-            "Stand": "Stojak (Stand)",
-            "Hamon / Ripple": "Fale (Hamon)",
+            "Jonathan Joestar": "Jonathan Joestar (Część 1: Phantom Blood)",
+            "Joseph Joestar": "Joseph Joestar (Część 2: Battle Tendency)",
+            "Jotaro Kujo": "Jotaro Kujo (Część 3: Stardust Crusaders / Yare Yare Daze)",
+            "Josuke Higashikata": "Josuke Higashikata (Część 4: Diamond is Unbreakable / Gureto daze)",
+            "Giorno Giovanna": "Giorno Giovanna (Część 5: Golden Wind / Mam marzenie)",
+            "Jolyne Cujoh": "Jolyne Cujoh (Część 6: Stone Ocean / Yare Yare Dawa)",
+            "Johnny Joestar": "Johnny Joestar (Część 7: Steel Ball Run)",
+            "Dio Brando / DIO": "Dio Brando / DIO (Wampir / Odrzucam człowieczeństwo, JoJo!)",
+            "Kars": "Kars (Władca Ludzi z Filaru / Forma Ostateczna)",
+            "Yoshikage Kira": "Yoshikage Kira (Chcę tylko wieść spokojne życie)",
+            "Diavolo": "Diavolo (Boss Passione / King Crimson)",
+            "Enrico Pucci": "Ojciec Enrico Pucci (Made in Heaven)",
+            "Funny Valentine": "Prezydent Funny Valentine (D4C)",
+            "Hamon / Ripple": "Hamon (Energia słonecznego oddechu)",
+            "Stand": "Stand (Duchowa manifestacja siły bojowej)",
+            "Star Platinum": "Star Platinum (Ora Ora Ora Ora!)",
+            "The World": "The World / Za Warudo! (Zatrzymaj się, czasie!)",
+            "Crazy Diamond": "Crazy Diamond (Dora Dora Dora!)",
+            "Gold Experience": "Gold Experience (Muda Muda Muda Muda!)",
+            "Stone Free": "Stone Free",
+            "Tusk": "Tusk (Spin / Złota Proporcja)",
             "Stone Mask": "Kamienna Maska",
-            "Stand Arrow": "Strzała Standów",
-            "Speedwagon Foundation": "Fundacja Speedwagona",
-            "Jonathan Joestar": "Jonathan Joestar",
-            "Joseph Joestar": "Joseph Joestar",
-            "Jotaro Kujo": "Jotaro Kujo",
-            "Dio Brando": "Dio Brando (DIO)",
-            "The World": "The World (Za Warudo)",
-            "Star Platinum": "Star Platinum",
-            "Ora Ora!": "Ora Ora Ora!",
-            "Muda Muda!": "Muda Muda Muda!",
-            "Yare Yare Daze": "Dajcie mi święty spokój... (Yare Yare Daze)"
+            "Speedwagon Foundation": "Fundacja Speedwagona (Robert E. O. Speedwagon)"
         },
         "character_forms": {
-            "Jotaro -> Joseph": "Staruszku (Jiji)",
-            "Joseph -> Jotaro": "Jotaro",
-            "DIO -> Jotaro": "Jotaro!",
-            "Jotaro -> DIO": "DIO!"
+            "Jotaro -> Wrogowie": "Yare Yare Daze... (Dajcie mi święty spokój...)",
+            "DIO -> Joestarowie": "WRYYYYY! / Za Warudo!",
+            "Joseph -> Przeciwnicy": "Twoje kolejne słowa to: ...!",
+            "Giorno -> Bruno": "Bruno Bucciarati (braterska lojalność mafijna)"
         }
     },
     "blue_lock": {
@@ -898,52 +1112,1707 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
         ],
         "publisher": "Wydawnictwo Waneko",
         "glossary": {
-            "Blue Lock Project": "Projekt Blue Lock",
-            "Egoist": "Egoista (Najlepszy egoistyczny napastnik)",
-            "Striker": "Napastnik",
-            "Metavision": "Metawizja (Przestrzenna percepcja boiska)",
-            "Flow State": "Stan Przepływu (Flow)",
-            "Chemical Reaction": "Reakcja Chemiczna",
-            "Yoichi Isagi": "Yoichi Isagi",
-            "Meguru Bachira": "Meguru Bachira",
-            "Rensuke Kunigami": "Rensuke Kunigami",
-            "Hyoma Chigiri": "Hyoma Chigiri",
-            "Seishiro Nagi": "Seishiro Nagi",
-            "Reo Mikage": "Reo Mikage",
-            "Rin Itoshi": "Rin Itoshi",
-            "Sae Itoshi": "Sae Itoshi",
-            "Ego Jinpachi": "Ego Jinpachi"
+            "Yoichi Isagi": "Yoichi Isagi (Egoista Przestrzenny / Bezpośredni Wolej / Metawizja)",
+            "Meguru Bachira": "Meguru Bachira (Drybler / Potwór)",
+            "Rensuke Kunigami": "Rensuke Kunigami (Bohater Futbolu -> Dzika Karta)",
+            "Hyoma Chigiri": "Hyoma Chigiri (Pantera / Zawrotna Prędkość)",
+            "Seishiro Nagi": "Seishiro Nagi (Geniusz pierwszego kontaktu / Czarna Dziura)",
+            "Reo Mikage": "Reo Mikage (Kameleon / Dziedzic Korporacji Mikage)",
+            "Rin Itoshi": "Rin Itoshi (Marionetkarz / Zniszczenie)",
+            "Sae Itoshi": "Sae Itoshi (Geniusz Realu Madryt / Pomocnik Światowej Klasy)",
+            "Shouei Barou": "Shouei Barou (Król Boiska)",
+            "Jinpachi Ego": "Jinpachi Ego (Twórca Projektu Blue Lock / Trener)",
+            "Anri Teieri": "Anri Teieri (Działaczka Japońskiego Związku Piłki Nożnej)",
+            "Michael Kaiser": "Michael Kaiser (Cesarz / Kaiser Impact / Bastard München)",
+            "Alexis Ness": "Alexis Ness (Czarodziej Ness)",
+            "Noel Noa": "Noel Noa (Najlepszy Napastnik Świata / Francja)",
+            "Blue Lock Project": "Projekt Blue Lock (Ośrodek szkoleniowy mający stworzyć najlepszego napastnika świata)",
+            "Egoist": "Egoista (Największy egoista poprowadzi Japonię po Puchar Świata)",
+            "Metavision": "Metawizja (Widzenie przestrzenne całego boiska)",
+            "Flow State": "Stan Flow (Absolutne skupienie na granicy możliwości)",
+            "Direct Volley": "Bezpośredni Wolej (Direct Shot)",
+            "Neo Egoist League": "Liga Neo Egoistów (Mecze z klubami z Niemiec, Anglii, Włoch, Francji, Hiszpanii)"
         },
         "character_forms": {
-            "Ego -> Zawodnicy": "Moje drogie diamenty / nieudacznicy",
-            "Isagi -> Bachira": "Bachira (kumpelska więź)",
-            "Bachira -> Isagi": "Isagi (jego 'potwór')",
-            "Nagi -> Reo": "Reo (początkowo zależność, potem samodzielność)"
+            "Isagi -> Przeciwnicy": "Pożrę cię na tym boisku! (bezwzględne ego)",
+            "Ego -> Uczestnicy": "Nieoszlifowane diamenty / Wy śmiecie bez ambicji!",
+            "Barou -> Isagi": "Ty sługusie! Król jest tylko jeden!"
         }
     },
     "wind_breaker": {
         "title": "Wind Breaker",
         "aliases": [
             "wind breaker",
-            "bofurin"
+            "windbreaker"
         ],
         "publisher": "Wydawnictwo Studio JG",
         "glossary": {
-            "Furin High School": "Liceum Furin",
-            "Bofurin": "Bofurin (Wiatrołamy - Obrońcy Miasta)",
-            "Haruka Sakura": "Haruka Sakura",
-            "Hajime Umemiya": "Hajime Umemiya (Przywódca Bofurin)",
-            "Kyotaro Sugishita": "Kyotaro Sugishita",
-            "Hayato Suo": "Hayato Suo",
-            "Akihiko Nirei": "Akihiko Nirei",
-            "Lion Head Tribe / Shishitoren": "Shishitoren (Lwia Straż)",
-            "Toma Hiragi": "Toma Hiragi"
+            "Haruka Sakura": "Haruka Sakura (Dwukolorowe włosy i heterochromia / Samotnik na szczyt)",
+            "Hajime Umemiya": "Hajime Umemiya (Przywódca Bofurin / Pasjonat ogrodnictwa)",
+            "Kyotaro Sugishita": "Kyotaro Sugishita (Najwierniejszy wojownik Umemiyi)",
+            "Hayato Suo": "Hayato Suo (Szermierz w opasce na oku / Chiński styl walki)",
+            "Akihiko Nirei": "Akihiko Nirei (Kronikarz Bofurin / Notatnik)",
+            "Toma Hiragi": "Toma Hiragi (Jeden z Czterech Królów Niebios Bofurin)",
+            "Kotoha Tachibana": "Kotoha Tachibana (Właścicielka kawiarni Potos)",
+            "Chouji Tomiyama": "Chouji Tomiyama (Lider Shishitoren)",
+            "Jo Togame": "Jo Togame (Wicelider Shishitoren)",
+            "Furin High School": "Liceum Furin (Szkoła najgorszych chuliganów -> Obrońcy miasta)",
+            "Bofurin": "Bofurin (Tarcza Wiatru / Strażnicy Miasta Makochi)",
+            "Shishitoren": "Shishitoren (Gang Lwów)",
+            "KEEL": "KEEL",
+            "Four Heavenly Kings": "Czterej Królowie Niebios Furin",
+            "Makochi Town": "Miasto Makochi"
         },
         "character_forms": {
-            "Sakura -> Umemiya": "Umemiya / Przywódco (początkowy bunt, późniejszy szacunek)",
-            "Umemiya -> Sakura": "Sakura (ciepło, ojcowska duma)",
-            "Suo -> Sakura": "Sakura-kun (uprzejmie, z uśmiechem)",
-            "Nirei -> Sakura": "Sakura-san (podziw, wierny towarzysz)"
+            "Sakura -> Każdy": "Nie potrzebuję przyjaciół, przyszedłem tu zdobyć sam szczyt! (wstydliwe zakłopotanie na dobre słowa)",
+            "Umemiya -> Sakura": "Witaj w rodzinie Bofurin, Sakura! (ciepło i spokój)",
+            "Suo -> Sakura": "Sakura-kun, uspokój się trochę... (dżentelmeńska elegancja)"
+        }
+    },
+    "noragami": {
+        "title": "Noragami",
+        "aliases": [
+            "noragami"
+        ],
+        "publisher": "Wydawnictwo Studio JG",
+        "glossary": {
+            "Yato": "Yato (Yaboku / Bóg Dostawy za 5 jenów / Bóg Wojny i Nieszczęścia)",
+            "Hiyori Iki": "Hiyori Iki (Pół-zjawa z ogonkiem / Dusza opuszczająca ciało)",
+            "Yukine": "Yukine (Święty Oręż / Sekki / Podwójne Katany)",
+            "Bishamon": "Bishamon (Veena / Najpotężniejsza Bogini Wojny)",
+            "Kazuma": "Kazuma (Chouki / Kolczyk i Przewodnik Bishamon)",
+            "Kofuku": "Kofuku (Bogini Ubóstwa / Bieda)",
+            "Daikoku": "Daikoku (Kokki / Święty Oręż Kofuku)",
+            "Tenjin": "Tenjin (Bóg Nauki / Michizane Sugawara)",
+            "Nora / Stray": "Nora (Przybłęda / Skalańskie imię z wieloma panami)",
+            "Father / Sorcerer": "Ojciec / Czarnoksiężnik (Koto no Ha)",
+            "Shinki / Sacred Vessel": "Shinki (Święty Oręż / Boskie Naczynie)",
+            "Hafuri Vessel": "Błogosławione Naczynie (Hafuri no Utsuwa)",
+            "Ayakashi / Phantom": "Ayakashi (Zjawy / Potwory z Zaświatów)",
+            "Borderline": "Granica (Linia obronna Shinki)",
+            "Near Shore / Far Shore": "Bliski Brzeg (Świat Żywych) / Daleki Brzeg (Zaświaty)"
+        },
+        "character_forms": {
+            "Yato -> Hiyori": "Hiyori! (troska i uroczy żebrak)",
+            "Hiyori -> Yato": "Yato! (opiekuńczość i cios zapaśniczy Jungle Savate)",
+            "Yukine -> Yato": "Yato (początkowy bunt -> absolutne oddanie jako Hafuri)"
+        }
+    },
+    "akatsuki_no_yona": {
+        "title": "Yona w blasku świtu (Akatsuki no Yona: Yona of the Dawn)",
+        "aliases": [
+            "akatsuki no yona",
+            "yona w blasku świtu",
+            "yona w blasku switu",
+            "yona of the dawn"
+        ],
+        "publisher": "Wydawnictwo Studio JG",
+        "glossary": {
+            "Yona": "Księżniczka Yona (Czerwonowłosa reinkarnacja Króla Hiryuu)",
+            "Son Hak": "Son Hak (Grzmiąca Bestia / Wódz Plemienia Wiatru)",
+            "Soo-won": "Król Soo-won (Zdradziecki kuzyn / Władca Królestwa Kouka)",
+            "Yoon": "Yoon (Genialny piękny młodzieniec i medyk)",
+            "Kija": "Kija (Biały Smok / Smocza Szponiasta Prawica)",
+            "Shin-ah": "Shin-ah (Błękitny Smok / Przeklęte Oczy Paraliżu / Wiewiórka Ao)",
+            "Jae-ha": "Jae-ha (Zielony Smok / Skacząca Smocza Noga / Pirat)",
+            "Zeno": "Zeno (Żółty Smok / Nieśmiertelne Boskie Ciało)",
+            "King Hiryuu": "Karmazynowy Król Hiryuu (Bóg Smoków)",
+            "Kingdom of Kouka": "Królestwo Kouka (Pięć Plemion: Niebo, Wiatr, Ogień, Ziemia, Woda)",
+            "Kuuto": "Kuuto (Zamek Hiryuu / Stolica Kouka)",
+            "Wind Tribe": "Plemię Wiatru (Fuuga)",
+            "Four Dragon Warriors": "Czterej Smoczy Wojownicy"
+        },
+        "character_forms": {
+            "Hak -> Yona": "Księżniczko (bezgraniczne oddanie i ukryta miłość)",
+            "Yona -> Hak": "Hak (zaufanie, lęk o jego życie, narastająca miłość)",
+            "Kija -> Yona": "Nasza Pani! (święta wierność Smoka)"
+        }
+    },
+    "jibaku_shounen_hanako_kun": {
+        "title": "Hanako, duch ze szkolnej toalety (Jibaku Shounen Hanako-kun)",
+        "aliases": [
+            "jibaku shounen hanako-kun",
+            "hanako-kun",
+            "hanako duch ze szkolnej toalety",
+            "toilet-bound hanako-kun"
+        ],
+        "publisher": "Wydawnictwo Studio JG",
+        "glossary": {
+            "Hanako-kun": "Hanako ze Szkolnej Toalety (Amane Yugi / Siódma Tajemnica)",
+            "Nene Yashiro": "Nene Yashiro (Asystentka Hanako / Rzodkiewkowe nogi)",
+            "Kou Minamoto": "Kou Minamoto (Młody Egzorcysta z klanu Minamoto / Grzmiący Kostur)",
+            "Teru Minamoto": "Teru Minamoto (Genialny Egzorcysta / Przewodniczący)",
+            "Tsukasa Yugi": "Tsukasa Yugi (Brat bliźniak Hanako / Mroczny duch)",
+            "Sakura Nanamine": "Sakura Nanamine (Pakt z Tsukasą)",
+            "Natsuhiko Hyuuga": "Natsuhiko Hyuuga",
+            "Sosuke Mitsuba": "Sosuke Mitsuba (Trzecia Tajemnica: Lustrzane Piekło)",
+            "Aoi Akane": "Aoi Akane (Najlepsza przyjaciółka Nene)",
+            "Akane Aoi": "Akane Aoi (Pierwsza Tajemnica: Trzej Strażnicy Czasu)",
+            "Kamome Academy": "Akademia Kamome",
+            "Seven Wonders": "Siedem Tajemnic Szkoły (Siedem Szkolnych Legend)",
+            "Yorishiro": "Yorishiro (Święty boski przedmiot kryjący źródło mocy Tajemnicy)",
+            "Mokke": "Mokke (Cukierkowe różowe stworki / Króliki)",
+            "Mermaid's Scale": "Łuska Syreny (Pakt łączący dusze Nene i Hanako)"
+        },
+        "character_forms": {
+            "Hanako -> Nene": "Yashiro~ (droczliwa czułość i obrona)",
+            "Nene -> Hanako": "Hanako-kun! (panika, troska i uczucie)",
+            "Kou -> Hanako": "Hanako! (przyjaciel i rywal egzorcysty)"
+        }
+    },
+    "tatsuki_fujimoto_oneshots": {
+        "title": "Look Back & Goodbye, Eri (Dzieła Tatsukiego Fujimoto)",
+        "aliases": [
+            "look back",
+            "goodbye, eri",
+            "goodbye eri",
+            "do widzenia, eri"
+        ],
+        "publisher": "Wydawnictwo Studio JG",
+        "glossary": {
+            "Ayumu Fujino": "Ayumu Fujino (Geniusz 4-panelowej mangi w podstawówce)",
+            "Kyomoto": "Kyomoto (Hikikomori / Mistrzyni teł i pejzaży)",
+            "Fujino Kyo": "Fujino Kyo (Wspólny pseudonim artystyczny duet)",
+            "Yuta": "Yuta (Reżyser amator w Goodbye, Eri)",
+            "Eri": "Eri (Dziewczyna wampir / Muza filmowa)",
+            "Explosion Scene": "Wybuch w finale filmu (Szczypta fantazji w dramacie)"
+        },
+        "character_forms": {
+            "Fujino -> Kyomoto": "Rysujmy razem mangę! (przełamanie samotności)",
+            "Yuta -> Eri": "Eri... Dlaczego oglądamy to jeszcze raz?"
+        }
+    },
+    "tongari_boushi_no_atelier": {
+        "title": "Atelier spiczastych kapeluszy (Tongari Boushi no Atelier: Witch Hat Atelier)",
+        "aliases": [
+            "tongari boushi no atelier",
+            "witch hat atelier",
+            "atelier spiczastych kapeluszy",
+            "atelier spiczastych kapeluszy"
+        ],
+        "publisher": "Wydawnictwo Studio JG",
+        "glossary": {
+            "Coco": "Coco (Dziewczynka z zewnątrz / Uczennica Qifreya)",
+            "Qifrey": "Qifrey (Mistrz Magii / Właściciel Atelier)",
+            "Agott": "Agott (Dumna uczennica z rodu Arkrow)",
+            "Tetia": "Tetia (Radosna uczennica / Magia wiatru)",
+            "Richeh": "Richeh (Uparta uczennica / Magia skupienia)",
+            "Olruggio": "Olruggio (Strażnik Atelier / Twórca Magicznych Przedmiotów)",
+            "Brimmed Hats / Brimhats": "Kapelusze z Rondem w Dół (Zabronieni Czarnoksiężnicy)",
+            "Inishi / Forbidden Magic": "Zakazana Magia (Magia modyfikująca ludzkie ciało i czas)",
+            "Magic Ink": "Magiczny Atrament (Srebrny tusz)",
+            "Magic Glyphs": "Magiczne Pieczęcie / Kręgi (Rysowane piórem)",
+            "Pointed Hats": "Spiczaste Kapelusze (Praworządni Magowie)",
+            "Great Hall": "Wielka Sala Magii pod Wodą (Trybunał Magów)"
+        },
+        "character_forms": {
+            "Qifrey -> Uczennice": "Magia to cud, który może rysować każdy z nas.",
+            "Agott -> Coco": "Nie zostawaj w tyle, niemagiczna dziewczyno!",
+            "Coco -> Qifrey": "Mistrzu Qifreyu!"
+        }
+    },
+    "beastars": {
+        "title": "Beastars",
+        "aliases": [
+            "beastars"
+        ],
+        "publisher": "Wydawnictwo Studio JG",
+        "glossary": {
+            "Legoshi": "Legoshi (Szary wilk / Skromny scenograf klubu teatralnego)",
+            "Haru": "Haru (Króliczka karłowata / Klub ogrodniczy)",
+            "Louis": "Louis (Czerwony jeleń / Gwiazda teatru / Lider Shishigumi)",
+            "Juno": "Juno (Samiczka szarego wilka)",
+            "Jack": "Jack (Labrador / Przyjaciel z pokoju 701)",
+            "Gouhin": "Gouhin (Panda wielka / Terapeuta i psychiatra czarnego rynku)",
+            "Tem": "Tem (Alpaka / Ofiara pożarcia w szkole)",
+            "Riz": "Riz (Niedźwiedź brunatny / Morderca Tema)",
+            "Cherryton Academy": "Akademia Cherryton",
+            "Beastar": "Beastar (Wzniosły przywódca zwierzęcego świata)",
+            "Carnivores": "Mięsożercy (Instynkt drapieżnika)",
+            "Herbivores": "Roślinożercy",
+            "Black Market": "Czarny Rynek Mięsa (Ura-shuku)",
+            "Shishigumi": "Shishigumi (Mafijny gang lwów)"
+        },
+        "character_forms": {
+            "Legoshi -> Haru": "Chcę cię chronić... Nie jako drapieżnik, lecz z miłości.",
+            "Louis -> Legoshi": "Wilku, przestań udawać słabego!",
+            "Haru -> Legoshi": "Legoshi-kun..."
+        }
+    },
+    "yofukashi_no_uta": {
+        "title": "Zew Nocy (Yofukashi no Uta: Call of the Night)",
+        "aliases": [
+            "yofukashi no uta",
+            "call of the night",
+            "zew nocy"
+        ],
+        "publisher": "Wydawnictwo Studio JG",
+        "glossary": {
+            "Ko Yamori": "Ko Yamori (Gimnazjalista cierpiący na bezsenność / Półwampir)",
+            "Nazuna Nanakusa": "Nazuna Nanakusa (Wampirzyca / Miłośniczka piwa i gier)",
+            "Akira Asai": "Akira Asai (Przyjaciółka z dzieciństwa Ko)",
+            "Seri Kikyou": "Seri Kikyou (Wampirzyca Gyaru)",
+            "Nico Hirata": "Nico Hirata (Wampirza mentorka relacji)",
+            "Midori Kohakuhakobe": "Midori Kohakuhakobe (Wampirzyca z maid cafe)",
+            "Hatsuka Suzushiro": "Hatsuka Suzushiro",
+            "Kabura Honda": "Kabura Honda (Pielęgniarka wampirzyca)",
+            "Anko Uguisu": "Anko Uguisu (Detektyw polująca na wampiry)",
+            "Vampire Rule": "Zasada Wampirów: Człowiek zmienia się w wampira tylko, gdy zostanie ukąszony przez wampira, w którym się szczerze zakochał w ciągu 1 roku!",
+            "Night Walking": "Nocne Włóczenie Się (Magia nocy i wolności)"
+        },
+        "character_forms": {
+            "Ko -> Nazuna": "Nazuna-chan (fascynacja nocą i pragnienie zakochania)",
+            "Nazuna -> Ko": "Pijemy krew i gramy w retro gry!"
+        }
+    },
+    "kakegurui": {
+        "title": "Kakegurui: Szał hazardu",
+        "aliases": [
+            "kakegurui",
+            "kakegurui: szał hazardu",
+            "szał hazardu"
+        ],
+        "publisher": "Wydawnictwo Studio JG",
+        "glossary": {
+            "Yumeko Jabami": "Yumeko Jabami (Hazardzistka w amoku / Szaleństwo ryzyka)",
+            "Ryota Suzui": "Ryota Suzui (Początkowo piesek Pochi / Przyjaciel Yumeko)",
+            "Mary Saotome": "Mary Saotome (Duma i taktyka / Kakegurui Twin)",
+            "Kirari Momobami": "Kirari Momobami (Przewodnicząca Samorządu / Klan Momobami)",
+            "Ririka Momobami": "Ririka Momobami (Wiceprzewodnicząca w masce)",
+            "Sayaka Igarashi": "Sayaka Igarashi (Sekretarz Samorządu zakochana w Kirari)",
+            "Midari Ikishima": "Midari Ikishima (Rosyjska ruletka / Przewodnicząca Komitetu Urody)",
+            "Yumemi Yumemite": "Yumemi Yumemite (Idolka Samorządu)",
+            "Kaede Manyuda": "Kaede Manyuda (Skarbnik)",
+            "Itsuki Sumeragi": "Itsuki Sumeragi (Kolekcjonerka paznokci)",
+            "Hyakkaou Private Academy": "Prywatna Akademia Hyakkaou (Szkoła milionerów i hazardu)",
+            "Housepet": "Zwierzątko Domowe (Piesek / Pochi dla chłopców, Kotka / Mike dla dziewcząt)",
+            "Life Schedule": "Plan Życiowy (Niewolniczy kontrakt Samorządu)",
+            "Gambling Craze": "Szał Hazardu (Dajmy się ponieść hazardowemu szaleństwu!)"
+        },
+        "character_forms": {
+            "Yumeko -> Przeciwnicy": "Pogrążmy się w szaleństwie hazardu! (ekstatyczny trans)",
+            "Mary -> Yumeko": "Yumeko, ty szalona wariatko!",
+            "Kirari -> Szkoła": "Akademia to moje osobiste akwarium."
+        }
+    },
+    "horimiya": {
+        "title": "Horimiya",
+        "aliases": [
+            "horimiya",
+            "hori-san to miyamura-kun"
+        ],
+        "publisher": "Wydawnictwo Studio JG",
+        "glossary": {
+            "Kyoko Hori": "Kyoko Hori (Idealna uczennica w szkole / Gospodyni domowa po lekcjach)",
+            "Izumi Miyamura": "Izumi Miyamura (Cichy ponurak w okularach -> Przystojniak z kolczykami i tatuażami)",
+            "Toru Ishikawa": "Toru Ishikawa",
+            "Yuki Yoshikawa": "Yuki Yoshikawa",
+            "Kakeru Sengoku": "Kakeru Sengoku (Przewodniczący Samorządu)",
+            "Remi Ayasaki": "Remi Ayasaki",
+            "Sakura Kono": "Sakura Kono",
+            "Shu Iura": "Shu Iura",
+            "Souta Hori": "Souta Hori (Młodszy braciszek Hori)",
+            "Kyosuke Hori": "Kyosuke Hori (Wyluzowany ojciec Hori)",
+            "Katagiri Senior High School": "Liceum Katagiri",
+            "Secret Persona": "Ukryte Drugie Oblicze"
+        },
+        "character_forms": {
+            "Hori -> Miyamura": "Miyamura! (zaborcza miłość i prośba o bicie/przemoc domową dla zabawy)",
+            "Miyamura -> Hori": "Hori-san (czułość, akceptacja i miłość)",
+            "Souta -> Miyamura": "Brat Miyamura!"
+        }
+    },
+    "toradora": {
+        "title": "Toradora!",
+        "aliases": [
+            "toradora",
+            "toradora!"
+        ],
+        "publisher": "Wydawnictwo Studio JG / Wydawnictwo Kotori",
+        "glossary": {
+            "Ryuji Takasu": "Ryuji Takasu (Twarz mordercy / Złote serce i geniusz sprzątania)",
+            "Taiga Aisaka": "Taiga Aisaka (Kieszonkowy Tygrys / Tenori Taiga)",
+            "Minori Kushieda": "Minori Kushieda (Minorin / Kapitan kobiecej drużyny softballa)",
+            "Yusaku Kitamura": "Yusaku Kitamura (Wiceprzewodniczący / Przyjaciel Ryujiego)",
+            "Ami Kawashima": "Ami Kawashima (Modelka / Fałszywie urocza bestia)",
+            "Yasuko Takasu": "Yasuko Takasu (Młoda mama Ryujiego / Ya-chan)",
+            "Inko-chan": "Inko-chan (Brzydka papużka)",
+            "Palmtop Tiger": "Kieszonkowy Tygrys",
+            "Dragon and Tiger": "Smok i Tygrys (Od wieków tylko Smok może stać u boku Tygrysa)"
+        },
+        "character_forms": {
+            "Taiga -> Ryuji": "Ryuji, ty głupi kundlu! (początkowo) / Zawsze bądź przy mnie...",
+            "Ryuji -> Taiga": "Taiga (opieka kulinarna i bezwarunkowe wsparcie)"
+        }
+    },
+    "overlord": {
+        "title": "Overlord",
+        "aliases": [
+            "overlord"
+        ],
+        "publisher": "Wydawnictwo Kotori / Wydawnictwo Waneko",
+        "glossary": {
+            "Ainz Ooal Gown / Momonga": "Ainz Ooal Gown (Władca Wielkiego Grobowca Nazarick / Najwyższy z 41 Istot)",
+            "Albedo": "Albedo (Nadzorczyni Strażników Pięter / Sukub zakochany w Ainzie)",
+            "Shalltear Bloodfallen": "Shalltear Bloodfallen (Strażniczka 1-3 Piętra / Prawdziwy Wampir)",
+            "Demiurge": "Demiurge (Strażnik 7 Piętra / Diabelski Strateg / Sasuga Ainz-sama!)",
+            "Cocytus": "Cocytus (Strażnik 5 Piętra / Wojownik Owad)",
+            "Aura Bella Fiora": "Aura Bella Fiora (Strażniczka 6 Piętra / Mroczna Elfka)",
+            "Mare Bello Fiore": "Mare Bello Fiore (Strażnik 6 Piętra / Nieśmiały Mroczny Elf)",
+            "Sebas Tian": "Sebas Tian (Lokaj Nazarick / Mistrz Walki Wręcz)",
+            "Pandora's Actor": "Pandora's Actor (Zarządca Skarbca / Kreacja Momongi)",
+            "Pleiades Six Stars": "Plejady (Bojowe Pokojówki): Yuri Alpha, Lupusregina Beta, Narberal Gamma, CZ2128 Delta, Solution Epsilon, Entoma Vasilissa Zeta",
+            "Gazef Stronoff": "Gazef Stronoff (Główny Wojownik Królestwa Re-Estize)",
+            "Brain Unglaus": "Brain Unglaus",
+            "Evileye / Keeno": "Evileye (Błękitna Róża / Wampirzyca Mag)",
+            "Great Tomb of Nazarick": "Wielki Grobowiec Nazarick",
+            "YGGDRASIL": "YGGDRASIL (Dawna gra DMMO-RPG)",
+            "New World": "Nowy Świat (Świat, do którego przeniesiono Nazarick)",
+            "World Items": "Przedmioty Świata (World Class Items / 20 Najpotężniejszych)",
+            "Tier Magic": "Magia Kręgów (Od 1. do 10. Kręgu oraz Magia Super-Kręgów)",
+            "Fallen Down": "Upadek (Zaklęcie Super-Kręgu: Fallen Down)",
+            "Grasp Heart": "Zmiażdżenie Serca (Grasp Heart - Magia Śmierci 9. Kręgu)",
+            "Sorcerer Kingdom": "Królestwo Magii (Sorcerer Kingdom)"
+        },
+        "character_forms": {
+            "Strażnicy -> Ainz": "Niech żyje Najwyższy Władca Ainz Ooal Gown! / Sasuga Ainz-sama!",
+            "Ainz -> Strażnicy": "Zezwalam (w myślach: Oby tylko nie odkryli, że nie mam pojęcia co robię!)",
+            "Albedo -> Ainz": "Mój ukochany panie Ainzie!"
+        }
+    },
+    "sword_art_online": {
+        "title": "Sword Art Online (SAO)",
+        "aliases": [
+            "sword art online",
+            "sao",
+            "sword art online: progressive"
+        ],
+        "publisher": "Wydawnictwo Kotori / Wydawnictwo Studio JG",
+        "glossary": {
+            "Kirito / Kazuto Kirigaya": "Kirito (Czarny Szermierz / Beater / Bohater Aincradu)",
+            "Asuna / Asuna Yuuki": "Asuna (Błyskawica / Wicekapitan Rycerzy Krwi / Kasztanowowłosa)",
+            "Yui": "Yui (Program AI Ratowania Zdrowia Psychicznego / Córka Kirito i Asuny)",
+            "Klein / Ryotaro Tsuboi": "Klein (Gildia Fuurinkazan / Wojownik Katany)",
+            "Agil / Andrew Gilbert Mills": "Agil (Kupiec z toporem)",
+            "Silica / Keiko Ayano": "Silica (Pogromczyni Smoków / Pina)",
+            "Lisbeth / Rika Shinozaki": "Lisbeth (Kowal / Twórczyni Mrocznego Odpychacza)",
+            "Sinon / Shino Asada": "Sinon (Snajperka Hecate II / Gun Gale Online)",
+            "Leafa / Suguha Kirigaya": "Leafa (Wojowniczka Sylph / Siostra cioteczna Kazuto)",
+            "Eugeo": "Eugeo (Szermierz Niebieskiej Róży / Przyjaciel z Alicization)",
+            "Alice Zuberg / Synthesis Thirty": "Alice Synthesis Thirty (Rycerz Integralny)",
+            "Akihiko Kayaba / Heathcliff": "Akihiko Kayaba (Twórca SAO / Lider Rycerzy Krwi / Święty Miecz)",
+            "Aincrad": "Aincrad (Pływający Zamek o 100 Piętrach)",
+            "NerveGear": "NerveGear (Hełm Pełnego Zanurzenia / FullDive)",
+            "Elucidator": "Elucidator (Czarny Miecz Kirito)",
+            "Dark Repulser": "Dark Repulser (Mroczny Odpychacz / Zielony Miecz Lisbeth)",
+            "Dual Blades": "Dwa Miecze (Unikalna umiejętność Kirito: Starburst Stream / Błysk Gwiezdnego Potoku)",
+            "Laughing Coffin": "Śmiejąca się Trumna (Mordercza Gildia PK)",
+            "Knights of the Blood Oath": "Rycerze Krwi (KoB)",
+            "Underworld": "Underworld (Projekt Alicization)",
+            "Fluctlight": "Fluctlight (Światło Kwantowe Ludzkiej Duszy)"
+        },
+        "character_forms": {
+            "Kirito -> Asuna": "Asuna (miłość, która przetrwała śmierć w grze)",
+            "Asuna -> Kirito": "Kirito-kun (bezgraniczne zaufanie)",
+            "Yui -> Kirito/Asuna": "Tatusiu! / Mamusiu!"
+        }
+    },
+    "goblin_slayer": {
+        "title": "Zabójca goblinów (Goblin Slayer)",
+        "aliases": [
+            "goblin slayer",
+            "zabójca goblinów",
+            "zabojca goblinow"
+        ],
+        "publisher": "Wydawnictwo Studio JG / Wydawnictwo Kotori",
+        "glossary": {
+            "Goblin Slayer": "Zabójca Goblinów (Królobójca / Srebrny Poszukiwacz Przygód)",
+            "Priestess": "Kapłanka (Uczennica Matki Ziemi / Porcelanowa Poszukiwaczka)",
+            "High Elf Archer": "Wysoka Elfka Łuczniczka (2000-letnia łowczyni)",
+            "Dwarf Shaman": "Krasnoludzki Szaman (Miłośnik alkoholu i magii ziemi)",
+            "Lizard Priest": "Jaszczuroludzki Kapłan (Wojownik Ojca Smoków / Ser)",
+            "Cow Girl": "Pasterka (Przyjaciółka z dzieciństwa z farmy)",
+            "Guild Girl": "Urzędniczka Gildii (Przydziela zlecenia na gobliny)",
+            "Sword Maiden": "Dziewica Miecza (Arcykapłanka Boga Sprawiedliwości / Dawna Bohaterka)",
+            "Goblins": "Gobliny (Szkodniki, gwałciciele i potwory jaskiń: Zwykłe, Hobgobliny, Szamani, Władcy Goblinów, Czempioni)",
+            "Adventurers Guild": "Gildia Poszukiwaczy Przygód (Rangi: Porcelanowa, Obsydianowa, Stalowa, Szafirowa, Brązowa, Srebrna, Złota, Platynowa)",
+            "Miracles": "Cuda (Święta Magia: Święte Światło, Tarcza Ochronna, Uleczenie)",
+            "Goblin Nest": "Gniazdo Goblinów"
+        },
+        "character_forms": {
+            "Goblin Slayer -> Wszyscy": "Jedyny dobry goblin to martwy goblin.",
+            "Kapłanka -> Goblin Slayer": "Panie Zabójco Goblinów (troska i duchowe wsparcie)",
+            "Elfka -> Goblin Slayer": "Orkobójco! Nie używaj znowu ognia i wody w jaskini!"
+        }
+    },
+    "hellsing": {
+        "title": "Hellsing",
+        "aliases": [
+            "hellsing",
+            "hellsing ultimate"
+        ],
+        "publisher": "Wydawnictwo J.P.Fantastica",
+        "glossary": {
+            "Alucard": "Alucard (Hrabia Dracula / Wampir Król / Ogar z Baskerville)",
+            "Sir Integra Fairbrook Wingates Hellsing": "Sir Integra Hellsing (Głowa Królewskiego Zakonu Rycerzy Protestanckich)",
+            "Seras Victoria": "Seras Victoria (Policyjka / Wampirzyca z działkiem Harkonnen)",
+            "Walter C. Dornez": "Walter C. Dornez (Anioł Śmierci / Lokaj z monomolekularnymi nićmi)",
+            "Alexander Anderson": "Ojciec Alexander Anderson (Paladyn Iscariot / Regenerator z ostrzami)",
+            "The Major": "Major (Dowódca Millennium / „Panowie, uwielbiam wojnę!”)",
+            "The Captain": "Kapitan (Wilkołak)",
+            "Rip van Winkle": "Rip van Winkle (Czarodziejski Strzelec)",
+            "Zorin Blitz": "Zorin Blitz (Iluzjonistka z kosą)",
+            "Tubalcain Alhambra": "Tubalcain Alhambra (Dandys z kartami)",
+            "Schrödinger": "Schrödinger (Kotołak kwantowy / Wszędzie i nigdzie)",
+            "Enrico Maxwell": "Biskup Enrico Maxwell (Lider Sekcji XIII Iscariot)",
+            "Hellsing Organization": "Organizacja Hellsing (Królewski Zakon)",
+            "Iscariot Section XIII": "Sekcja XIII Iscariot (Watykańscy Zabójcy)",
+            "Millennium / Letztes Bataillon": "Millennium (Ostatni Batalion Nazistowskich Wampirów)",
+            "Freak Chips": "Chipy Freak (Sztuczne wampiry)",
+            "Jackal / Casull": "Pistolety Alucarda: .454 Casull i 13mm Auto Anti-Freak Jackal",
+            "Cromwell Control Art Restriction": "Pieczęć Cromwella (Poziom Uwolnienia: 3, 2, 1 i Poziom Zerowy)"
+        },
+        "character_forms": {
+            "Alucard -> Integra": "Moja Pani (Królewski pakt wierności krwi)",
+            "Integra -> Alucard": "Alucardzie! Zniszcz i zabij ich wszystkich! Zostaw tylko popiół!",
+            "Anderson -> Alucard": "Amen! (Fanatyczna wściekłość krzyżowca)",
+            "Alucard -> Seras": "Moja mała policyjko..."
+        }
+    },
+    "neon_genesis_evangelion": {
+        "title": "Neon Genesis Evangelion (NGE)",
+        "aliases": [
+            "neon genesis evangelion",
+            "evangelion",
+            "eva",
+            "nge"
+        ],
+        "publisher": "Wydawnictwo J.P.Fantastica",
+        "glossary": {
+            "Shinji Ikari": "Shinji Ikari (Trzecie Dziecko / Pilot Evy-01 / „Nie mogę uciekać!”)",
+            "Rei Ayanami": "Rei Ayanami (Pierwsze Dziecko / Pilot Evy-00 / Klon Yui Ikari)",
+            "Asuka Langley Soryu": "Asuka Langley Soryu (Drugie Dziecko / Pilot Evy-02 / „Jesteś głupi czy co?”)",
+            "Kaworu Nagisa": "Kaworu Nagisa (Piąte Dziecko / Siedemnasty Anioł Tabris)",
+            "Misato Katsuragi": "Misato Katsuragi (Major NERV / Szefowa Operacyjna)",
+            "Gendo Ikari": "Gendo Ikari (Naczelny Dowódca NERV / Ojciec Shinjiego)",
+            "Ritsuko Akagi": "Doktor Ritsuko Akagi (Główna Naukowiec / System MAGI)",
+            "Ryoji Kaji": "Ryoji Kaji (Szpieg i ogrodnik arbuzów)",
+            "Evangelion / EVA": "Jednostka Evangelion: EVA-01 (Typ Testowy), EVA-02 (Typ Produkcyjny), EVA-00 (Prototyp)",
+            "Angels": "Aniołowie (Sachiel, Shamshel, Ramiel, Gaghiel, Israfel, Zeruel itp.)",
+            "AT Field": "Pole AT (Pole Bezwzględnego Terroru / Bariera Duszy)",
+            "NERV": "NERV (Bóg w Niebiosach, Ludzkość w Spokoju)",
+            "SEELE": "SEELE (Tajemna Rada Mask / Zwoje znad Morza Martwego)",
+            "Human Instrumentality Project": "Projekt Dopełnienia Ludzkości",
+            "Second Impact": "Drugi Kataklizm (Antarktyda 2000 r.)",
+            "Third Impact": "Trzeci Kataklizm",
+            "Tokyo-3": "Neo-Tokio-3 (Podziemne GeoFront)",
+            "MAGI System": "Superkomputer MAGI: Melchior, Balthasar, Casper",
+            "LCL": "Płyn LCL (Płyn Owodniowy / Krew Lilith)",
+            "Spear of Longinus": "Włócznia Longinusa"
+        },
+        "character_forms": {
+            "Shinji -> Gendo": "Ojcze... (strach przed odrzuceniem, rozpaczliwa potrzeba uznania)",
+            "Asuka -> Shinji": "Anta baka?! (Czyś ty zidiociał, Shinji?!)",
+            "Misato -> Shinji": "Shinji-kun (dorosła opieka i poczucie winy)"
+        }
+    },
+    "soul_eater": {
+        "title": "Soul Eater",
+        "aliases": [
+            "soul eater"
+        ],
+        "publisher": "Wydawnictwo J.P.Fantastica",
+        "glossary": {
+            "Maka Albarn": "Maka Albarn (Władczyni Kosy / Wyczuwanie Dusz)",
+            "Soul Eater Evans": "Soul Eater Evans (Żywa Kosa Śmierci / Muzyk Fortepianowy)",
+            "Black Star": "Black Star (Władca Asasyn / Człowiek, który przewyższy Boga)",
+            "Tsubaki Nakatsukasa": "Tsubaki Nakatsukasa (Broń Cienia / Wielofunkcyjna broń ninja)",
+            "Death the Kid": "Death the Kid (Syn Śmierci / Obsesja Absolutnej Symetrii)",
+            "Liz and Patty Thompson": "Liz i Patty Thompson (Bliźniacze Pistolety Demonów)",
+            "Shinigami / Lord Death": "Lord Shinigami (Bóg Śmierci / Założyciel DWMA)",
+            "Franken Stein": "Doktor Franken Stein (Najsilniejszy absolwent / Śruba w głowie)",
+            "Spirit Albarn": "Spirit Albarn (Kosa Śmierci Lorda / Ojciec Maki)",
+            "Medusa Gorgon": "Meduza (Wiedźma Węży / Wektorowa Strzała)",
+            "Crona": "Crona (Władca Miecza Ragnaroka / Czarna Krew / Nie wiem jak sobie z tym poradzić)",
+            "Asura": "Kishin Asura (Ucieleśnienie Szaleństwa)",
+            "DWMA / Shibusen": "DWMA (Akademia Mistrzów Broni Śmierci w Death City)",
+            "Death Scythe": "Kosa Śmierci (Broń, która pożarła 99 dusz z jajem Kishina i 1 duszę wiedźmy)",
+            "Soul Resonance": "Rezonans Dusz (Wzajemne zestrojenie fal duchowych)",
+            "Madness": "Szaleństwo (Czarna Krew Kishina)",
+            "Kishin": "Kishin (Bóg Demonów Szaleństwa)"
+        },
+        "character_forms": {
+            "Maka -> Soul": "Soul! Zróbmy Rezonans Dusz! (partnerska jedność)",
+            "Kid -> Liz/Patty": "Moja symetria została zniszczona! Umrę!",
+            "Black Star -> Wszyscy": "HAHAHA! YAHOOO! Spójrzcie na wielkiego Black Stara!"
+        }
+    },
+    "monster": {
+        "title": "Monster (Naoki Urasawa)",
+        "aliases": [
+            "monster",
+            "potwór"
+        ],
+        "publisher": "Wydawnictwo Hanami / Wydawnictwo J.P.Fantastica",
+        "glossary": {
+            "Kenzo Tenma": "Doktor Kenzo Tenma (Genialny japoński neurochirurg w Niemczech)",
+            "Johan Liebert": "Johan Liebert (Bezimienny Potwór / Prawdziwy Antychryst)",
+            "Nina Fortner / Anna Liebert": "Nina Fortner / Anna Liebert (Siostra bliźniaczka Johana)",
+            "Heinrich Lunge": "Inspektor Heinrich Lunge (Genialny śledczy BKA / Pamięć palcowa)",
+            "Dieter": "Dieter (Chłopiec uratowany przez Tenmę)",
+            "Wolfgang Grimmer": "Wolfgang Grimmer (Wesoły Olbrzym / Absolwent Kinderheim 511 / Steiner)",
+            "Roberto": "Roberto (Cyngiel i fanatyczny wykonawca woli Johana)",
+            "Eva Heinemann": "Eva Heinemann (Była narzeczona Tenmy)",
+            "Kinderheim 511": "Kinderheim 511 (Eksperymentalny sierociniec NRD piorący mózgi dzieci)",
+            "The Nameless Monster": "Bezimienny Potwór (Baśń Emila Scherbe / Franz Bonaparta)",
+            "Red Rose Mansion": "Dwór Czerwonych Róż (Miejsce eksperymentów eugenicznych w Pradze)",
+            "Ruhenheim": "Ruhenheim (Miasteczko ostatecznej rzezi i samobójstwa)"
+        },
+        "character_forms": {
+            "Tenma -> Johan": "To ja uratowałem ci życie... Moim obowiązkiem jest je zakończyć.",
+            "Johan -> Tenma": "Doktorze Tenma... Prawdziwy koniec to nie śmierć, lecz zapomnienie.",
+            "Lunge -> Tenma": "Moje palce nigdy się nie mylą, doktorze Tenma."
+        }
+    },
+    "twentieth_century_boys": {
+        "title": "20th Century Boys: Chłopcy z dwudziestego wieku",
+        "aliases": [
+            "20th century boys",
+            "chłopcy z dwudziestego wieku",
+            "chlopcy z dwudziestego wieku"
+        ],
+        "publisher": "Wydawnictwo Hanami / Wydawnictwo J.P.Fantastica",
+        "glossary": {
+            "Kenji Endo": "Kenji Endo (Lider paczki z bazy w krzakach / Piosenkarz rockowy)",
+            "Friend / Tomodachi": "Przyjaciel (Tajemniczy wódz sekty w masce ze znakiem oka)",
+            "Kanna Endo": "Kanna Endo (Ostatnia nadzieja ludzkości / Siostrzenica Kenjiego)",
+            "Otcho / Shogun": "Otcho / Shogun (Wojownik z Tajlandii)",
+            "Yoshitsune": "Yoshitsune (Przywódca podziemnego ruchu oporu)",
+            "Maruo": "Maruo",
+            "Mon-chan": "Mon-chan",
+            "Yukiji": "Yukiji",
+            "Fukube": "Fukube",
+            "Katsumata": "Katsumata (Prawdziwy drugi Przyjaciel)",
+            "Book of Prophecy": "Księga Proroctw (Notatnik dziecięcych zabaw z 1969 r.)",
+            "New Book of Prophecy": "Nowa Księga Proroctw",
+            "Bloody New Year's Eve": "Krwawy Sylwester 2000 (Atak gigantycznego robota roznoszącego wirus)",
+            "Friendship Democratic Party": "Partia Przyjaźni i Demokracji (FDP)",
+            "Expo 1970": "Wystawa Światowa Expo 1970 w Osace"
+        },
+        "character_forms": {
+            "Kenji -> Przyjaciel": "Kim naprawdę jesteś, Przyjacielu?!",
+            "Kanna -> Kenji": "Wujku Kenji... Wróć i zagraj jeszcze raz na gitarze!"
+        }
+    },
+    "pluto": {
+        "title": "Pluto (Naoki Urasawa x Osamu Tezuka)",
+        "aliases": [
+            "pluto"
+        ],
+        "publisher": "Wydawnictwo J.P.Fantastica",
+        "glossary": {
+            "Gesicht": "Gesicht (Robot detektyw Europolu / Stop Zero-Krupp)",
+            "Atom / Astro Boy": "Atom (Genialny japoński robot chłopiec z 1 milionem koni mechanicznych)",
+            "Uran": "Uran (Młodsza siostra Atoma / Empatia wyczuwania emocji)",
+            "Mont Blanc": "Mont Blanc (Szwajcarski robot leśnik)",
+            "North No. 2": "Północ nr 2 (Szkocki robot wojenny uczący się grać na fortepianie)",
+            "Brando": "Brando (Turecki robot zapaśnik)",
+            "Hercules": "Hercules (Grecki robot zapaśnik)",
+            "Epsilon": "Epsilon (Pacyfistyczny robot zasilany energią fotonową opiekujący się sierotami)",
+            "Pluto / Sahad": "Pluto / Sahad (Potężny rogaty robot zrodzony z nienawiści)",
+            "Brau 1589": "Brau 1589 (Jedyny robot, który zamordował człowieka)",
+            "Professor Ochanomizu": "Profesor Ochanomizu (Szef Ministerstwa Nauki Japonii)",
+            "Doctor Tenma": "Doktor Tenma (Stwórca Atoma)",
+            "Doctor Abullah": "Doktor Abullah (Twórca Pluto / Królestwo Persji)",
+            "39th Central Asian War": "39. Wojna Środkowoazjatycka",
+            "Article 13 of Robot Law": "Artykuł 13 Prawa Robotów (Zakaz krzywdzenia ludzi)"
+        },
+        "character_forms": {
+            "Gesicht -> Wrogowie": "Nienawiść niczego nie zrodzi... Tylko smutek.",
+            "Atom -> Uran": "Uran, uważaj na siebie!"
+        }
+    },
+    "shaman_king": {
+        "title": "Shaman King (Król Szamanów)",
+        "aliases": [
+            "shaman king",
+            "król szamanów",
+            "krol szamanow"
+        ],
+        "publisher": "Wydawnictwo J.P.Fantastica",
+        "glossary": {
+            "Yoh Asakura": "Yoh Asakura (Leniwy Szaman / „Jakoś to będzie”)",
+            "Amidamaru": "Amidamaru (Duch samuraja sprzed 600 lat / Miecz Harusame)",
+            "Anna Kyoyama": "Anna Kyoyama (Itako / Narzeczona Yoha / Przyszła Królowa Szamanów)",
+            "Manta Oyamada": "Manta Oyamada (Najlepszy przyjaciel z encyklopedią)",
+            "Ren Tao": "Ren Tao (Dziedzic klanu Tao / Bason / Guan Dao)",
+            "Horohoro / Usui Horokeu": "Horohoro (Szaman Ajnów / Kororo / Deska snowboardowa)",
+            "Ryunosuke Umemiya / Wooden Sword Ryu": "Drewniany Miecz Ryu (Tokageroh / Pompadour)",
+            "Faust VIII": "Faust VIII (Nekromanta / Eliza)",
+            "Lyserg Diethel": "Lyserg Diethel (Dowsing / Morphine / X-LAWS)",
+            "Chocolove McDonell": "Chocolove McDonell (Szaman komik / Mic the Jaguar)",
+            "Hao Asakura": "Hao Asakura (Król Szamanów / Duch Ognia / „Jesteś taki mały...”)",
+            "Iron Maiden Jeanne": "Żelazna Dziewica Jeanne (Przywódczyni X-LAWS / Shamash)",
+            "Marco Lasso": "Marco Lasso (Kapitan X-LAWS)",
+            "Great Spirit": "Wielki Duch (Źródło wszelkiego bytu)",
+            "Spirit of Fire": "Duch Ognia (Jeden z Pięciu Wielkich Żywiołów)",
+            "Over Soul": "Over Soul (Materializacja ducha w przedmiocie)",
+            "Furyoku": "Furyoku (Mana / Siła duchowa szamana)",
+            "Shaman Fight": "Turniej Szamanów (Odbywa się raz na 500 lat w Wiosce Dobie / Patch)",
+            "Patch Tribe": "Plemię Patch (Sędziowie Turnieju Szamanów)"
+        },
+        "character_forms": {
+            "Anna -> Yoh": "Yoh! Trenuj, bo inaczej nie zostaniesz Królem Szamanów!",
+            "Yoh -> Przeciwnicy": "Spokojnie, jakoś to będzie. (Nanto ka naru)",
+            "Hao -> Ludzie": "Jakie to małe i bezużyteczne..."
+        }
+    },
+    "slam_dunk": {
+        "title": "Slam Dunk",
+        "aliases": [
+            "slam dunk"
+        ],
+        "publisher": "Wydawnictwo J.P.Fantastica",
+        "glossary": {
+            "Hanamichi Sakuragi": "Hanamichi Sakuragi (Geniusz Koszykówki / Król Zbiórek / Czerwona Czupryna)",
+            "Kaede Rukawa": "Kaede Rukawa (As Shohoku / Wieczny rywal Sakuragiego)",
+            "Takenori Akagi": "Takenori Akagi (Goryl / Kapitan Shohoku / Środkowy)",
+            "Hisashi Mitsui": "Hisashi Mitsui (Mistrz rzutów za 3 punkty / MVP Gimnazjum)",
+            "Ryota Miyagi": "Ryota Miyagi (Błyskawiczny Rozgrywający)",
+            "Haruko Akagi": "Haruko Akagi (Młodsza siostra Akagiego / Miłość Sakuragiego)",
+            "Mitsuyoshi Anzai": "Trener Anzai (Biały Diabeł -> Biały Budda / „Kiedy się poddasz, mecz się kończy”)",
+            "Kiminobu Kogure": "Kiminobu Kogure (Okularnik / Wicekapitan)",
+            "Akira Sendoh": "Akira Sendoh (Geniusz Ryonan / As)",
+            "Shinichi Maki": "Shinichi Maki (Król Kainan / MVP Prefektury)",
+            "Eiji Sawakita": "Eiji Sawakita (Najlepszy Licealny Koszykarz Japonii / Sannoh Kogyo)",
+            "Shohoku High School": "Liceum Shohoku",
+            "Ryonan High": "Liceum Ryonan",
+            "Kainan University Affiliated High": "Liceum Kainan",
+            "Sannoh Kogyo": "Liceum Sannoh (Niepokonani Mistrzowie Japonii)",
+            "Rebound": "Zbiórka (Kto kontroluje zbiórki, ten kontroluje cały mecz!)",
+            "Slam Dunk": "Slam Dunk (Wsad do kosza)",
+            "Inter-High Tournament": "Mistrzostwa Narodowe Szkół Średnich (Inter-High)"
+        },
+        "character_forms": {
+            "Sakuragi -> Akagi": "Gorylu! (prowokacja i szacunek dla kapitana)",
+            "Sakuragi -> Rukawa": "Rukawa, ty lisie! (zazdrosna rywalizacja)",
+            "Rukawa -> Sakuragi": "Dobe (Głupol / Matoł)"
+        }
+    },
+    "hokuto_no_ken": {
+        "title": "Pięść Gwiazd Północy (Hokuto no Ken: Fist of the North Star)",
+        "aliases": [
+            "hokuto no ken",
+            "fist of the north star",
+            "pięść gwiazd północy",
+            "piesc gwiazd polnocy"
+        ],
+        "publisher": "Wydawnictwo J.P.Fantastica",
+        "glossary": {
+            "Kenshiro": "Kenshiro (64. Spadkobierca Hokuto Shinken / Człowiek z Siedmioma Bliznami)",
+            "Raoh / Ken-Oh": "Raoh (Władca Końca Wieku Ken-Oh / Najstarszy brat Hokuto / Kokuoh)",
+            "Toki": "Toki (Drugi brat Hokuto / Mistrz Łagodnej Pięści)",
+            "Jagi": "Jagi (Trzeci brat Hokuto / Maska i strzelba)",
+            "Shin": "Shin (Mistrz Nanto Gokuto Ken / Gwiazda Samotności)",
+            "Rei": "Rei (Mistrz Nanto Suicho Ken / Gwiazda Sprawiedliwości)",
+            "Juda": "Juda (Nanto Kokaku Ken / Gwiazda Zdrady)",
+            "Shew": "Shew (Nanto Hakuro Ken / Niewidomy Generał)",
+            "Souther": "Souther (Święty Cesarz Nanto Ho-oh Ken / Gwiazda Przywództwa)",
+            "Yuria": "Yuria (Ostatni Generał Nanto / Ukochana Kenshiro)",
+            "Bat": "Bat (Chłopiec towarzysz)",
+            "Lin": "Lin (Dziewczynka towarzyszka)",
+            "Hokuto Shinken": "Boska Pięść Gwiazdy Północy (Sztuka uderzania w punkty witalne Keiraku Hikou)",
+            "Nanto Seiken": "Święta Pięść Gwiazdy Południa (Sztuka cięcia i szatkowania od zewnątrz)",
+            "Omae wa Mou Shindeiru": "Już jesteś martwy! (Omae wa mou shindeiru)",
+            "Hidebu / Abeshi": "Hidebu! / Abeshi! (Krzyki eksplodujących bandytów)",
+            "Musou Tensei": "Musou Tensei (Nieświadome Przeniknięcie / Ostateczny Sekret Smutku)"
+        },
+        "character_forms": {
+            "Kenshiro -> Wrogowie": "Jesteś już martwy. (Omae wa mou shindeiru)",
+            "Raoh -> Niebiosa": "W całym moim życiu nie mam ani jednego żalu! (Waga shougai ni ippen no kui nashi!)"
+        }
+    },
+    "vagabond": {
+        "title": "Vagabond (Takehiko Inoue)",
+        "aliases": [
+            "vagabond"
+        ],
+        "publisher": "Wydawnictwo J.P.Fantastica",
+        "glossary": {
+            "Miyamoto Musashi / Shinmen Takezo": "Miyamoto Musashi (Shinmen Takezo / Niepokonany pod Słońcem)",
+            "Sasaki Kojiro": "Sasaki Kojiro (Niesłyszący szermierz geniusz / Długi miecz Monohoshizao / Styl Ganryu)",
+            "Matahachi Hon'iden": "Matahachi Hon'iden (Przyjaciel z dzieciństwa / Fałszywy Sasaki Kojiro)",
+            "Otsu": "Otsu (Ukochana Musashiego)",
+            "Takuan Soho": "Mnich Takuan Soho (Duchowy przewodnik)",
+            "Inshun": "Inshun (Mistrz Włóczni Świątyni Hozoin)",
+            "Yagyu Muneyoshi / Sekishusai": "Yagyu Sekishusai (Legenda Stylu Shinkage)",
+            "Yoshioka Seijuro": "Yoshioka Seijuro (Głowa Szkoły Yoshioka w Kioto)",
+            "Yoshioka Denshichiro": "Yoshioka Denshichiro",
+            "Ueda Ryohei": "Ueda Ryohei (Pierwszy miecz Yoshioki)",
+            "Ito Ittosai": "Ito Ittosai (Mistrz Miecza / Nauczyciel Kojiro)",
+            "Battle of Sekigahara": "Bitwa pod Sekigaharą (1600 r.)",
+            "Yoshioka Clan 70-Man Duel": "Pojedynek z 70 szermierzami rodu Yoshioka pod Sosną Ichijoji",
+            "Ganryujima Duel": "Pojedynek na Wyspie Ganryujima (Wiosło przeciwko Monohoshizao)",
+            "Way of the Sword": "Droga Miecza (Zrozumienie nieskończoności wszechświata)"
+        },
+        "character_forms": {
+            "Musashi -> Przeciwnicy": "Pokaż mi swój miecz. Chcę zobaczyć, co kryje się na szczycie.",
+            "Takuan -> Musashi": "Takezo... Życie i śmierć to ta sama chwila."
+        }
+    },
+    "uzumaki_junji_ito": {
+        "title": "Uzumaki (Spirala) i Dzieła Junjiego Ito",
+        "aliases": [
+            "uzumaki",
+            "spirala",
+            "junji ito",
+            "tomie",
+            "gyo"
+        ],
+        "publisher": "Wydawnictwo J.P.Fantastica",
+        "glossary": {
+            "Kirie Goshima": "Kirie Goshima (Licealistka z Kurouzu-cho)",
+            "Shuichi Saito": "Shuichi Saito (Chłopak Kirie / Pierwszy dostrzegł przekleństwo)",
+            "Toshio Saito": "Toshio Saito (Ojciec Shuichiego / Obsesja na punkcie spirali)",
+            "Tomie Kawakami": "Tomie (Nieśmiertelna piękność doprowadzająca mężczyzn do morderczego szału)",
+            "Kurouzu-cho": "Miasteczko Kurouzu (Przeklęte przez Spiralę)",
+            "Spiral Curse": "Klątwa Spirali (Ludzkie ciała zwijające się w muszle ślimaków, trąby powietrzne, włosy)",
+            "Snail People": "Ślimakoludzie (Mieszkańcy przemienieni w ślimaki)",
+            "Hanging Balloons": "Balony Wisielców (Głowy szukające swoich sobowtórów)",
+            "Gyo": "Gyo (Kroczący odór / Ryby na mechanicznych odnóżach)",
+            "Amigara Fault": "Uskok Amigara (Szczeliny w skale w kształcie ludzkich sylwetek)"
+        },
+        "character_forms": {
+            "Shuichi -> Kirie": "Kirie! Uciekajmy z tego przeklętego miasteczka!",
+            "Kirie -> Shuichi": "Shuichi, dlaczego to znowu się dzieje?!"
+        }
+    },
+    "bakuman": {
+        "title": "Bakuman",
+        "aliases": [
+            "bakuman"
+        ],
+        "publisher": "Wydawnictwo Waneko",
+        "glossary": {
+            "Moritaka Mashiro / Saiko": "Moritaka Mashiro (Saiko / Rysownik mangi)",
+            "Akito Takagi / Shujin": "Akito Takagi (Shujin / Scenarzysta mangi)",
+            "Miho Azuki": "Miho Azuki (Aktorka głosowa seiyuu / Ukochana Saiko)",
+            "Kaya Miyoshi": "Kaya Miyoshi (Żona Shujina)",
+            "Eiji Nizuma": "Eiji Nizuma (Genialny nastoletni rywal / Crow / Zombie Gun)",
+            "Shintaro Fukuda": "Shintaro Fukuda (Kiyoshi Knight)",
+            "Kazuya Hiramaru": "Kazuya Hiramaru (Otter No. 11 / Leniwy mangaka płaczący za wolnością)",
+            "Aiko Iwase": "Aiko Iwase",
+            "Nobuhiro Mashiro / Taro Kawaguchi": "Taro Kawaguchi (Wujek Saiko / Zmarły mangaka gagowy)",
+            "Akira Hattori": "Akira Hattori (Pierwszy i najważniejszy redaktor duetu)",
+            "Goro Miura": "Goro Miura (Drugi redaktor)",
+            "Koji Yoshida": "Koji Yoshida (Redaktor Hiramaru)",
+            "Heishi Sasaki": "Redaktor Naczelny Sasaki",
+            "Ashirogi Muto": "Ashirogi Muto (Wspólny pseudonim Mashiro i Takagiego)",
+            "Weekly Shonen Jump": "Tygodnik Shonen Jump (Wydawnictwo Shueisha)",
+            "Name / Storyboard": "Name (Scenopis obrazkowy / Szkic rozdziału)",
+            "Serialization": "Serializacja (Publikacja cotygodniowa w Jumpie)",
+            "Questionnaire Rankings": "Wyniki Ankiet Czytelników (Ranking top 1-20)",
+            "G-Pen": "Piórko G-Pen (Podstawowe narzędzie rysownika mangi)",
+            "Anime Adaptation": "Adaptacja Anime (Warunek ślubu Saiko i Azuki)"
+        },
+        "character_forms": {
+            "Saiko -> Shujin": "Shujin! Zróbmy najlepszą mangę w historii Jumpa!",
+            "Shujin -> Saiko": "Saiko, mam genialny pomysł na scenariusz!",
+            "Hattori -> Ashirogi": "Waszą siłą jest manga kalkulowana i mroczna."
+        }
+    },
+    "kuroko_no_basket": {
+        "title": "Kuroko's Basket (Kuroko no Basket)",
+        "aliases": [
+            "kuroko's basket",
+            "kuroko no basket",
+            "kuroko no basuke",
+            "knb"
+        ],
+        "publisher": "Wydawnictwo Waneko",
+        "glossary": {
+            "Tetsuya Kuroko": "Tetsuya Kuroko (Szósty Widmowy Gracz / Misdirection / Cień)",
+            "Taiga Kagami": "Taiga Kagami (Światło Seirin / Skok meteoru / Strefa)",
+            "Ryota Kise": "Ryota Kise (Idealna Kopia / As Kaijo)",
+            "Shintaro Midorima": "Shintaro Midorima (Rzuty za 3 punkty przez całe boisko / Talizmany Oha Asa / Shutoku)",
+            "Daiki Aomine": "Daiki Aomine (As Pokolenia Cudów / Streetball / „Jedynym, który może mnie pokonać, jestem ja sam!” / Touou)",
+            "Atsushi Murasakibara": "Atsushi Murasakibara (Olbrzym obrony podkoszowej / Młot Thora / Yosen)",
+            "Seijuro Akashi": "Seijuro Akashi (Kapitan Pokolenia Cudów / Oko Cesarza / Kostkowy Łamacz / Rakuzan)",
+            "Tetsuya N°2": "Tetsuya nr 2 (Piesek maskotka Seirin o oczach Kuroko)",
+            "Riko Aida": "Riko Aida (Trenerka Seirin / Wzrok analizujący mięśnie)",
+            "Junpei Hyuga": "Junpei Hyuga (Kapitan Seirin / Rzuty z odskoku Clutch)",
+            "Teiko Middle School": "Gimnazjum Teiko (Kolebka Pokolenia Cudów)",
+            "Generation of Miracles": "Pokolenie Cudów (Kiseki no Sedai)",
+            "Seirin High": "Liceum Seirin (Nowo powstały klub koszykówki)",
+            "Misdirection": "Misdirection (Przekierowanie uwagi / Niewidzialne podania)",
+            "Phantom Shot": "Widmowy Rzut Kuroko",
+            "Vanishing Drive": "Znikający Dribling",
+            "The Zone": "Strefa (Stan 100% wykorzystania potencjału ciała)",
+            "Direct Drive Zone": "Strefa Bezpośredniego Napędu (Prawdziwa Strefa Zespołowa Seirin)",
+            "Winter Cup": "Puchar Zimowy (Turniej o Mistrzostwo Japonii)"
+        },
+        "character_forms": {
+            "Kuroko -> Kagami": "Jestem cieniem. Im jaśniejsze jest twoje światło, tym głębszy staje się mój cień.",
+            "Aomine -> Kuroko": "Tetsu... Koszykówka znowu stała się ekscytująca.",
+            "Akashi -> Wszyscy": "Moje rozkazy są absolutne."
+        }
+    },
+    "fire_force": {
+        "title": "Fire Force (Enen no Shouboutai)",
+        "aliases": [
+            "fire force",
+            "enen no shouboutai"
+        ],
+        "publisher": "Wydawnictwo Waneko",
+        "glossary": {
+            "Shinra Kusakabe": "Shinra Kusakabe (Diabelskie Ślady / Płomienne Stopy / Trzecia Generacja)",
+            "Arthur Boyle": "Arthur Boyle (Król Rycerzy / Miecz Plazmowy Excalibur)",
+            "Akitaru Obi": "Akitaru Obi (Kapitan 8. Zastępu / Zwykły człowiek ze stali)",
+            "Takehisa Hinawa": "Takehisa Hinawa (Porucznik / Kontrola trajektorii pocisków)",
+            "Iris": "Siostra Iris (Zakonnica Świątyni Solarnych Płomieni / Látom)",
+            "Maki Oze": "Maki Oze (Druga Generacja / Czarownica Ognia Pusu Pusu)",
+            "Tamaki Kotatsu": "Tamaki Kotatsu (Kotopies / Wieczny pech zboczeńca)",
+            "Vulcan Joseph": "Vulcan Joseph (Genialny inżynier mechanik)",
+            "Benimaru Shinmon": "Benimaru Shinmon (Najsilniejszy Żołnierz Pożarnictwa / Asakusa / Hyakki Yagyou)",
+            "Leonard Burns": "Leonard Burns (Kapitan 1. Zastępu)",
+            "Sho Kusakabe": "Sho Kusakabe (Młodszy brat Shinry / Dowódca Rycerzy Popielatego Dymu)",
+            "The Evangelist": "Ewangelista (Prorokini Kataklizmu)",
+            "Special Fire Force": "Specjalne Siły Pożarnicze (Ósemka Zastępów)",
+            "Infernals": "Płomienni (Infernales / Ludzie strawieni zjawiskiem samozapłonu)",
+            "Spontaneous Human Combustion": "Zjawisko Samorzutnego Zapłonu Ludzkiego Ciała",
+            "Adolla Burst": "Adolla Burst (Czysty Święty Płomień Stworzenia)",
+            "Adolla Link": "Więź Adolla (Połączenie umysłów przez inny wymiar)",
+            "White-Clad": "Białe Płaszcze (Kult Ewangelisty)",
+            "Holy Sol Temple": "Święta Świątynia Sol (Religia Cesarstwa Tokio)",
+            "Amaterasu": "Amaterasu (Termo-generator zasilający Tokio ludzką duszą)",
+            "Latom": "Látom (Niech spoczywa w pokoju wiecznego płomienia)"
+        },
+        "character_forms": {
+            "Shinra -> Arthur": "Głupi rycerzyku! (kumpelska rywalizacja)",
+            "Arthur -> Shinra": "Jam jest Król Rycerzy, ty diable!",
+            "Siostra Iris -> Płomienni": "Płomieniu, uwolnij tę duszę... Látom."
+        }
+    },
+    "black_lagoon": {
+        "title": "Black Lagoon",
+        "aliases": [
+            "black lagoon"
+        ],
+        "publisher": "Wydawnictwo Waneko",
+        "glossary": {
+            "Rokuro Okajima / Rock": "Rokuro Okajima / Rock (Japoński korposzczur -> Mózg i negocjator Lagoon)",
+            "Revy / Two Hand": "Revy Dwie Dłonie (Rebecca Lee / Podwójne Beretty Cutlass)",
+            "Dutch": "Dutch (Szef Kompanii Lagoon / Weteran z Wietnamu)",
+            "Benny": "Benny (Haker i mechanik)",
+            "Balalaika / Vladilena": "Balalaika (Kapitan WDW / Szefowa Hotelu Moskwa)",
+            "Boris": "Sierżant Boris (Wierny towarzysz Balalaiki)",
+            "Mr. Chang": "Pan Chang (Boss Triady w Roanapur)",
+            "Eda": "Eda (Zakonnica Kościoła Przemocy / Agentka CIA)",
+            "Sister Yolanda": "Siostra Yolanda (Jednooka matrona Kościoła)",
+            "Roberta / Rosarita Cisneros": "Roberta (Pies Gończy z Florydy / Bezwzględna pokojówka)",
+            "Garcia Lovelace": "Młody pan Garcia Lovelace",
+            "Fabiola Iglesias": "Fabiola Iglesias",
+            "Hansel and Gretel": "Jaś i Małgosia (Wampirze dzieci z Rumunii z siekierą i BAR-em)",
+            "Shenhua": "Shenhua (Tajwańska zabójczyni z nożami)",
+            "Sawyer the Cleaner": "Sawyer Sprzątaczka (Piła łańcuchowa i sztuczna krtań)",
+            "Lagoon Company": "Kompania Lagoon (Kuter torpedowy Elco PT)",
+            "Roanapur": "Roanapur (Miasto bezprawia i zbrodni w Tajlandii)",
+            "Hotel Moscow": "Hotel Moskwa (Rosyjska mafia / Byli komandosi)",
+            "Rip-Off Church": "Kościół Przemocy (Przemyt broni pod habitem)"
+        },
+        "character_forms": {
+            "Revy -> Rock": "Rock! Zamknij się i nie pouczaj mnie z tym swoim białym kołnierzykiem!",
+            "Rock -> Revy": "Revy... Spójrzmy na to z innej perspektywy.",
+            "Balalaika -> Wrogowie": "Uklęknijcie przed Armią Radziecką."
+        }
+    },
+    "owari_no_seraph": {
+        "title": "Seraph of the End: Serafin Dni Ostatnich (Owari no Seraph)",
+        "aliases": [
+            "owari no seraph",
+            "seraph of the end",
+            "serafin dni ostatnich"
+        ],
+        "publisher": "Wydawnictwo Waneko",
+        "glossary": {
+            "Yuuichiro Hyakuya": "Yuuichiro Hyakuya (Yuu / Czarna Seria Asuramaru / Serafin)",
+            "Mikaela Hyakuya": "Mikaela Hyakuya (Mika / Wampir / Przekształcony w miecz Yuu)",
+            "Guren Ichinose": "Podpułkownik Guren Ichinose (Klan Ichinose / Mahiru no Yo)",
+            "Shinoa Hiiragi": "Sierżant Shinoa Hiiragi (Kosa Shikama Douji / Liderka Drużyny Shinoi)",
+            "Yoichi Saotome": "Yoichi Saotome (Łuk Gekkouin)",
+            "Shihou Kimizuki": "Shihou Kimizuki (Podwójne miecze Kiseki-ou)",
+            "Mitsuba Sangu": "Mitsuba Sangu (Topór Tenjiryuu)",
+            "Kureto Hiiragi": "Generał Kureto Hiiragi (Naczelny wódz Japońskiej Cesarskiej Armii Demonów)",
+            "Shinya Hiiragi": "Shinya Hiiragi (Snajper Byakkomaru)",
+            "Ferid Bathory": "Ferid Bathory (Siódmy Progenitor Wampirów)",
+            "Krul Tepes": "Królowa Krul Tepes (Trzeci Progenitor Wampirów)",
+            "Crowley Eusford": "Crowley Eusford (Trzynasty Progenitor)",
+            "Japanese Imperial Demon Army": "Japońska Cesarska Armia Demonów (JIDA)",
+            "Moon Demon Company": "Kompania Księżycowych Demonów (Elitarny oddział egzekucyjny Gurena)",
+            "Cursed Gear": "Przeklęty Oręż (Broń z zapieczętowanym demonem Czarnej Serii)",
+            "Seraph of the End": "Serafin Dni Ostatnich (Zakazany eksperyment na dzieciach z sierocińca Hyakuya)",
+            "Vampire Progenitors": "Wampirzy Progenitorzy (Rada Wyższych Rang)",
+            "Apocalypse Virus": "Wirus Apokalipsy (Wytłukł 90% dorosłej ludzkości)"
+        },
+        "character_forms": {
+            "Yuu -> Mika": "Mika! Zawsze będziemy rodziną! Przywrócę cię do człowieczeństwa!",
+            "Mika -> Yuu": "Yuu-chan! Nie pozwól, by ci ludzie cię wykorzystywali!",
+            "Shinoa -> Yuu": "Yuu-san~ (ironiczny, uroczy uśmieszek)"
+        }
+    },
+    "deadman_wonderland": {
+        "title": "Deadman Wonderland",
+        "aliases": [
+            "deadman wonderland"
+        ],
+        "publisher": "Wydawnictwo Waneko",
+        "glossary": {
+            "Ganta Igarashi / Woodpecker": "Ganta Igarashi (Dzięcioł / Działo Gantasa)",
+            "Shiro / Wretched Egg": "Shiro (Jajko Zepsucia / Czerwony Człowiek)",
+            "Senji Kiyomasa / Crow": "Senji Kiyomasa (Wroniec / Niewidzialne Ostrza Krwi / Zujji!)",
+            "Yo Takami": "Yo Takami",
+            "Minatsuki Takami / Hummingbird": "Minatsuki Takami (Koliber / Płaczące Skrzydła)",
+            "Toto Sakigami / Mockingbird": "Toto Sakigami (Prześmiewca / Kopiowanie Gałęzi Grzechu)",
+            "Tsunenaga Tamaki": "Tsunenaga Tamaki (Promotor / Sadystyczny zarządca więzienia)",
+            "Makina": "Naczelnik Makina (Szefowa Strażników z wielkim mieczem)",
+            "Deadman Wonderland": "Deadman Wonderland (Prywatne komercyjne więzienie i park rozrywki w Tokio)",
+            "Branch of Sin": "Gałąź Grzechu (Zdolność manipulacji własną krwią jako bronią)",
+            "Carnival Corpse": "Carnival Corpse (Nielegalne walki gladiatorów Deadmanów o części ciała)",
+            "Cast Points": "Punkty CP (Waluta więzienna kupująca cukierki neutralizujące truciznę z obroży)",
+            "Candy": "Cukierek (Neutralizator trucizny co 3 dni)",
+            "Red Man / Wretched Egg": "Czerwony Człowiek (Morderca całej klasy Ganty)",
+            "Forgeries": "Fałszywki (Sztuczni Deadmani Tamakiego)"
+        },
+        "character_forms": {
+            "Shiro -> Ganta": "Ganta~! Zjedzmy ciasteczka!",
+            "Ganta -> Shiro": "Shiro! Obiecuję, że cię stąd wyciągnę!",
+            "Senji -> Ganta": "Zujji! (Ścinaj ich prosto i szybko, dzieciaku!)"
+        }
+    },
+    "pandora_hearts": {
+        "title": "Pandora Hearts",
+        "aliases": [
+            "pandora hearts"
+        ],
+        "publisher": "Wydawnictwo Waneko",
+        "glossary": {
+            "Oz Vessalius": "Oz Vessalius (Dziedzic Vessaliusów / Prawdziwy B-Rabbit / Czarny Królik)",
+            "Alice / B-Rabbit": "Alice (Krwawy Czarny Królik / B-Rabbit / Kosa i łańcuchy)",
+            "Gilbert Nightray / Raven": "Gilbert Nightray (Kruk / Sługa i przyjaciel Oza / Raven)",
+            "Sharon Rainsworth": "Sharon Rainsworth (Eques / Dama z papierowym wachlarzem)",
+            "Xerxes Break / Mad Hatter": "Xerxes Break (Szalony Kapelusznik / Emily / Pożeracz słodyczy)",
+            "Vincent Nightray": "Vincent Nightray (Demagorgon / Nożyczki)",
+            "Jack Vessalius": "Jack Vessalius (Bohater sprzed 100 lat / Prawdziwy sprawca tragedii)",
+            "Laciez": "Laciez (Siostra Oswalda / Pieśń Laciez)",
+            "Glen Baskerville / Oswald": "Glen Baskerville (Głowa Klanu Baskerville)",
+            "The Abyss": "Otchłań (Mroczny wymiar rządzony przez Wolę Otchłani)",
+            "Will of the Abyss": "Wola Otchłani (Biała Alicja)",
+            "Chains": "Łańcuchy (Istoty zrodzone z Otchłani)",
+            "Four Great Dukedoms": "Cztery Rody Książęce: Vessalius, Nightray, Rainsworth, Barma",
+            "Pandora Organization": "Organizacja Pandora (Badanie tajemnic Otchłani)",
+            "Tragedy of Sablier": "Tragedia w Sablier (Zrzucenie stolicy w czeluść Otchłani)"
+        },
+        "character_forms": {
+            "Gilbert -> Oz": "Panie Ozie! (bezgraniczna wierność i obrona)",
+            "Alice -> Oz": "Oz! Jestem głodna, daj mi mięso!",
+            "Break -> Oz/Sharon": "Och, jakże to zabawne... (chytry, genialny uśmiech)"
+        }
+    },
+    "ajin": {
+        "title": "Ajin (Demi-Human)",
+        "aliases": [
+            "ajin",
+            "ajin: demi-human",
+            "półludzie"
+        ],
+        "publisher": "Wydawnictwo Waneko",
+        "glossary": {
+            "Kei Nagai": "Kei Nagai (Uczeń medycyny / Skrajny pragmatyk / Nieśmiertelny Ajin)",
+            "Kaito": "Kaito (Jedyny wierny przyjaciel Keia)",
+            "Sato / Samuel T. Owen": "Sato (Kapelusznik / Psychopatyczny terrorysta / Gracz)",
+            "Koji Tanaka": "Koji Tanaka (Drugi Ajin w Japonii / Wyzwolony z tortur laboratoryjnych)",
+            "Yuu Tosaki": "Yuu Tosaki (Naczelnik Wydziału Kontroli Ajin Ministerstwa Zdrowia)",
+            "Izumi Shimomura": "Izumi Shimomura (Ochroniarka Tosakiego / Ukryty Ajin)",
+            "Ko Nakano": "Ko Nakano (Głupkowaty, energiczny Ajin współpracujący z Keiem)",
+            "IBM / Invisible Black Matter": "IBM (Niewidzialna Czarna Materia / Czarny Duch)",
+            "Ajin / Demi-Human": "Ajin (Nieśmiertelna istota regenerująca się natychmiast po śmierci)",
+            "Paralyzing Scream": "Paraliżujący Krzyk (Głos Ajina tymczasowo obezwładniający ludzi)",
+            "Reset": "Zresetowanie (Śmierć Ajina w celu pełnego uleczenia ran)",
+            "Ministry of Health": "Ministerstwo Zdrowia, Pracy i Opieki Społecznej Japonii"
+        },
+        "character_forms": {
+            "Sato -> Ludzie": "Zagrajmy w grę! (ekstatyczny uśmiech rzeźnika)",
+            "Kei -> Ko": "Nie pomagam ci dlatego, że cię lubię, tylko dlatego, że to logiczne."
+        }
+    },
+    "summer_time_rendering": {
+        "title": "Summer Time Rendering (Renderowanie Letniego Czasu)",
+        "aliases": [
+            "summer time rendering",
+            "summer time render",
+            "str"
+        ],
+        "publisher": "Wydawnictwo Waneko",
+        "glossary": {
+            "Shinpei Ajiro": "Shinpei Ajiro (Pętle czasowe / Prawe oko Haine)",
+            "Ushio Kofune": "Ushio Kofune (Oryginał utonęła / Cień Ushio)",
+            "Mio Kofune": "Mio Kofune (Młodsza siostra)",
+            "Hizuru Minakata / Ryunosuke": "Hizuru Minakata (Pisarka Ryuunosuke Nagumo / Podwójna osobowość)",
+            "Sou Hishigata": "Sou Hishigata (Medyk z kliniki)",
+            "Tokiko Hishigata": "Tokiko Hishigata (Kontroluje Dziecięce Cienie)",
+            "Seido Hishigata": "Doktor Seido Hishigata",
+            "Alain Kofune": "Alain Kofune",
+            "Haine": "Matka Cieni Haine (Pierwotny Cień z kosmosu)",
+            "Shide / Masahito Karikiri": "Shide (Czteroręki Cień / Czterystuletni kapłan)",
+            "Shadows": "Cienie (Klonują wygląd, wspomnienia i zabijają oryginały błyskiem światła)",
+            "Hitogashima Island": "Wyspa Hitogashima (Prefektura Wakayama)",
+            "Time Loop": "Pętla Czasowa (Cofanie się w czasie po każdej śmierci Shinpeia ze skracającym się limitem)",
+            "Shadow Sickness": "Choroba Cieni (Legenda o sobowtórach)"
+        },
+        "character_forms": {
+            "Shinpei -> Ushio": "Ushio! Tym razem cię ocalę!",
+            "Hizuru/Ryunosuke -> Cienie": "Zmierzyłem czas reakcji na 2 milisekundy. Jesteś martwy."
+        }
+    },
+    "yuukoku_no_moriarty": {
+        "title": "Patriota Moriarty (Yuukoku no Moriarty: Moriarty the Patriot)",
+        "aliases": [
+            "yuukoku no moriarty",
+            "moriarty the patriot",
+            "patriota moriarty"
+        ],
+        "publisher": "Wydawnictwo Waneko",
+        "glossary": {
+            "William James Moriarty": "William James Moriarty (Profesor Matematyki / Konsultant Zbrodni)",
+            "Albert James Moriarty": "Albert James Moriarty (Podpułkownik MI6 / Lord)",
+            "Louis James Moriarty": "Louis James Moriarty (Zarządca posiadłości / Lojalny brat)",
+            "Sherlock Holmes": "Sherlock Holmes (Jedyny Doradca Detektywistyczny / Przyjaciel i nemezis)",
+            "John H. Watson": "Doktor John H. Watson (Kronikarz i przyjaciel Holmesa)",
+            "Fred Porlock": "Fred Porlock (Mistrz kamuflażu i zwiadu)",
+            "Sebastian Moran": "Pułkownik Sebastian Moran (Wyborowy strzelec i prawa ręka)",
+            "Mycroft Holmes": "Mycroft Holmes (Dyrektor Wywiadu Wojskowego / Brat Sherlocka)",
+            "Irene Adler / James Bond": "Irene Adler (Kobieta / Nowy agent James Bond)",
+            "Lord of Crime": "Władca Zbrodni (Konsultant planujący perfekcyjne zbrodnie przeciw arystokracji)",
+            "Class System": "System Klasowy Wiktoriańskiej Anglii",
+            "Catch Me If You Can": "Złap mnie, jeśli potrafisz, Sherlocku Holmesie."
+        },
+        "character_forms": {
+            "William -> Sherlock": "Mój drogi Sherlocku (intelektualne partnerstwo i wyznaczona rola bohatera)",
+            "Sherlock -> William": "Liam! Nie pozwolę ci umrzeć w samotności!"
+        }
+    },
+    "sasaki_to_miyano": {
+        "title": "Sasaki i Miyano (Sasaki to Miyano)",
+        "aliases": [
+            "sasaki to miyano",
+            "sasaki i miyano"
+        ],
+        "publisher": "Wydawnictwo Waneko",
+        "glossary": {
+            "Shumei Sasaki": "Shumei Sasaki (Starszy kolega z kolczykami / Ciepły chuligan)",
+            "Yoshikazu Miyano": "Yoshikazu Miyano (Fudanshi / Miłośnik mang Boys' Love)",
+            "Taiga Hirano": "Taiga Hirano (Opiekuńczy starszy kolega / Pofarbowany blondyn)",
+            "Akira Kagiura": "Akira Kagiura (Koszykarz / Współlokator Hirano)",
+            "Jiro Ogasawara": "Jiro Ogasawara",
+            "Tasuku Kuresawa": "Tasuku Kuresawa (Okularnik kochający swoją dziewczynę)",
+            "Gonsaburo Tashiro": "Gonsaburo Tashiro",
+            "Boys' Love / BL": "Boys' Love (Mangi BL czytane przez Miyano)",
+            "Fudanshi": "Fudanshi (Chłopak czytający historie o miłości męsko-męskiej)"
+        },
+        "character_forms": {
+            "Sasaki -> Miyano": "Mya-chan~ (rozmarzona, czuła troska)",
+            "Miyano -> Sasaki": "Sasaki-senpai! (wstydliwość, dzielenie się tomikami mang)"
+        }
+    },
+    "given": {
+        "title": "Given",
+        "aliases": [
+            "given"
+        ],
+        "publisher": "Wydawnictwo Dango / Wydawnictwo Waneko",
+        "glossary": {
+            "Mafuyu Sato": "Mafuyu Sato (Wokalista i gitarzysta z czerwoną gitarą Gibson ES-330 / Fuyunohanashi)",
+            "Ritsuka Uenoyama": "Ritsuka Uenoyama (Genialny gitarzysta prowadzący)",
+            "Haruki Nakayama": "Haruki Nakayama (Basista / Najstarszy członek zespołu / Długie włosy)",
+            "Akihiko Kaji": "Akihiko Kaji (Perkusista / Skrzypek / Współlokator Ugetsu)",
+            "Ugetsu Murata": "Ugetsu Murata (Geniusz skrzypiec światowej sławy / Dawna miłość Akihiko)",
+            "Yuki Yoshida": "Yuki Yoshida (Zmarły przyjaciel z dzieciństwa i pierwsza miłość Mafuyu)",
+            "Hiiragi Kashima": "Hiiragi Kashima (Zespół syh)",
+            "Shizusumi Yagi": "Shizusumi Yagi",
+            "Band Given": "Zespół Given (Dawniej The Seasons)",
+            "Fuyunohanashi": "Opowieść Zimowa (Fuyu no Hanashi - Pierwsza piosenka Mafuyu)"
+        },
+        "character_forms": {
+            "Uenoyama -> Mafuyu": "Kiedy zacząłeś śpiewać, moje serce stanęło w ogniu.",
+            "Mafuyu -> Uenoyama": "Uenoyama-kun... Naucz mnie grać na gitarze."
+        }
+    },
+    "mirai_nikki": {
+        "title": "Dziennik przyszłości (Mirai Nikki: Future Diary)",
+        "aliases": [
+            "mirai nikki",
+            "future diary",
+            "dziennik przyszłości",
+            "dziennik przyszlosci"
+        ],
+        "publisher": "Wydawnictwo Waneko",
+        "glossary": {
+            "Yukiteru Amano / First": "Yukiteru Amano (Pierwszy / Dziennik Przypadkowego Obserwatora)",
+            "Yuno Gasai / Second": "Yuno Gasai (Druga / Dziennik Yukiteru / Królowa Yandere / Topór i noże)",
+            "Takao Hiyama / Third": "Takao Hiyama (Trzeci / Dziennik Mordercy)",
+            "Keigo Kurusu / Fourth": "Keigo Kurusu (Czwarty / Szef Policji / Dziennik Śledczy)",
+            "Reisuke Houjou / Fifth": "Reisuke Houjou (Piąty / Genialny 4-latek z truciznami)",
+            "Tsubaki Kasugano / Sixth": "Tsubaki Kasugano (Szósta / Kapłanka Świętego Oka / Dziennik Jasnowidzenia)",
+            "Marco Ikusaba & Ai Mikami / Seventh": "Marco i Ai (Siódmi / Zakochana Para / Dziennik Wymiany)",
+            "Kamado Ueshita / Eighth": "Kamado Ueshita (Ósma / Matka Sierocińca / Dziennik Bloga Serwera)",
+            "Minene Uryu / Ninth": "Minene Uryu (Dziewiąta / Terrorystka Bombowa / Dziennik Ucieczki)",
+            "Karyuudo Tsukishima / Tenth": "Karyuudo Tsukishima (Dziesiąty / Dziennik Hodowli Psów)",
+            "John Bacchus / Eleventh": "Burmistrz John Bacchus (Jedenasty / Dziennik Obserwatora The Watcher)",
+            "Yomotsu Hirasaka / Twelfth": "Yomotsu Hirasaka (Dwunasty / Niewidomy Bohater Sprawiedliwości)",
+            "Deus Ex Machina": "Deus Ex Machina (Bóg Czasu i Przestrzeni)",
+            "Muru Muru": "Muru Muru (Służąca Deusa / Spiskowczyni)",
+            "Future Diary": "Pamiętnik Przyszłości (Telefon komórkowy przewidujący kolejne 90 dni)",
+            "Survival Game": "Gra o Tron Boga (12 posiadaczy pamiętników walczących na śmierć i życie)",
+            "DEAD END": "DEAD END (Zapowiedź nieuchronnej śmierci na ekranie telefonu)"
+        },
+        "character_forms": {
+            "Yuno -> Yuki": "Yukkii~! Yuno cię obroni! (słodki głos przed brutalną rzezią)",
+            "Yuki -> Yuno": "Yuno, stój! Przestań zabijać!"
+        }
+    },
+    "another": {
+        "title": "Another",
+        "aliases": [
+            "another"
+        ],
+        "publisher": "Wydawnictwo Studio JG",
+        "glossary": {
+            "Koichi Sakakibara": "Koichi Sakakibara (Nowy uczeń z Tokio)",
+            "Mei Misaki": "Mei Misaki (Dziewczyna z opaską na lewym oku / Szklane lalkowe oko widzące barwę śmierci)",
+            "Izumi Akazawa": "Izumi Akazawa (Szefowa Środków Zaradczych Klasy 3-3)",
+            "Naoya Teshigawara": "Naoya Teshigawara",
+            "Tomohiko Kazami": "Tomohiko Kazami",
+            "Yuuya Mochizuki": "Yuuya Mochizuki (Klub plastyczny)",
+            "Tatsuji Chibiki": "Tatsuji Chibiki (Bibliotekarz / Świadek klątwy od 1972 r.)",
+            "Reiko Mikami / Ms. Mikami": "Pani Mikami / Ciotka Reiko (Nauczycielka / Nieistniejący Zmarły)",
+            "Misaki Yomiyama": "Misaki z 1972 roku (Uczeń, po którego śmierci klasa udawała, że wciąż żyje)",
+            "Yomiyama North Middle School": "Gimnazjum Yomiyama Północne (Klasa 3-3)",
+            "Class 3-3 Curse": "Klątwa Klasy 3-3 (Obecność Zmarłego sprowadza serię makabrycznych wypadków na uczniów i ich rodziny)",
+            "The Non-Existent One": "Nieistniejący (Uczeń traktowany jak powietrze, by zrównoważyć liczbę osób w klasie)",
+            "Send the Dead Back to Death": "Odeślij Zmarłego do Śmierci (Jedyny sposób na zatrzymanie klątwy)"
+        },
+        "character_forms": {
+            "Mei -> Koichi": "W naszej klasie... wydarzyło się coś strasznego.",
+            "Koichi -> Mei": "Misaki... Dlaczego nikt oprócz mnie z tobą nie rozmawia?"
+        }
+    },
+    "log_horizon": {
+        "title": "Log Horizon",
+        "aliases": [
+            "log horizon"
+        ],
+        "publisher": "Wydawnictwo Studio JG",
+        "glossary": {
+            "Shiroe / Kei Shirogane": "Shiroe (Strateg w okularach / Arcymag / Zaklinacz / Gildia Log Horizon)",
+            "Naotsugu": "Naotsugu (Obrońca / Przyjaciel z herbatą i majtkami)",
+            "Akatsuki": "Akatsuki (Kobiecy Zabójca Ninja / Oddana podopieczna Shiroe)",
+            "Nyanta": "Szef Nyanta (Kot fechmistrz / Kucharz przywracający smak potrawom)",
+            "Tohya & Minori": "Tohya (Samuraj) i Minori (Uczennica zaklinaczka)",
+            "Isuzu & Rundelhaus Code": "Isuzu (Bard) i Rundelhaus Code (Mag Ludzi Ziemi)",
+            "Krusty": "Krusty (Gildmistrz D.D.D. / Przewodniczący Okrągłego Stołu)",
+            "Marielle & Henrietta": "Marielle (Przymierze Półksiężyca) i Henrietta (Księgowa)",
+            "Soujiro Seta": "Soujiro Seta (Mistrz Miecza Souken)",
+            "William Massachusetts": "William Massachusetts (Srebrny Miecz)",
+            "Kanami": "Kanami (Dawna liderka Debauchery Tea Party)",
+            "Debauchery Tea Party": "Debauchery Tea Party (Legendarna nieformalna grupa rajdowa)",
+            "Elder Tale": "Elder Tale (Gra MMORPG przeniesiona w rzeczywistość po dodatku Novasphere)",
+            "Round Table Conference": "Rada Okrągłego Stołu w Akibie",
+            "People of the Land": "Ludzie Ziemi (Dawni NPC z własną wolą i duszą)",
+            "Catastrophe / Apocalypse": "Wielka Katastrofa (Dzień uwięzienia w grze)",
+            "Flavor Text": "Tekst Poboczny (Opis przedmiotu stający się fizycznym prawem w świecie gry)"
+        },
+        "character_forms": {
+            "Akatsuki -> Shiroe": "Mój Panie (poprawa okularów i uderzenie kolanem w Naotsugu)",
+            "Shiroe -> Okrągły Stół": "Poprawienie okularów na nosie (początek genialnego planu)"
+        }
+    },
+    "oyasumi_punpun": {
+        "title": "Dobranoc, Punpunie (Oyasumi Punpun: Goodnight Punpun)",
+        "aliases": [
+            "oyasumi punpun",
+            "goodnight punpun",
+            "dobranoc, punpunie",
+            "dobranoc punpunie"
+        ],
+        "publisher": "Wydawnictwo Hanami",
+        "glossary": {
+            "Punpun Onodera / Punyama": "Punpun Onodera (Rysowany jako mały ptaszek -> Rogaty demon -> Czarna bryła)",
+            "Aiko Tanaka": "Aiko Tanaka (Pierwsza i jedyna tragiczna miłość Punpuna / Kagoshima)",
+            "Yuichi Onodera": "Wujek Yuichi (Brat matki Punpuna / Cierpiący dorosły)",
+            "Midori Okuma": "Midori (Żona wujka Yuichiego)",
+            "Sachi Nanjou": "Sachi Nanjou (Rysowniczka mangi i przyjaciółka dorosłego Punpuna)",
+            "Shuntaro Harumin": "Harumin (Przyjaciel z podstawówki)",
+            "Masumi Seki & Ko Shimizu": "Seki i Shimizu (Przyjaciele z dzieciństwa)",
+            "Pegasus": "Pegasus (Lider dziwacznej sekty zbawienia)",
+            "God / Kami-sama": "Bóg Punpuna (Uśmiechnięta głowa z afro pojawiająca się po słowach: „Drogi Boże, drogi Boże, tinkle tinkle hoy!”)",
+            "Tinkle Tinkle Hoy": "Drogi Boże, drogi Boże, tinkle tinkle hoy! (Zaklęcie przyzywające Boga)"
+        },
+        "character_forms": {
+            "Punpun -> Aiko": "Aiko... Jeśli skłamiesz, zabiję cię. Chodźmy razem na koniec świata.",
+            "Bóg -> Punpun": "Cześć, Punpun! Znowu masz beznadziejne myśli?"
+        }
+    },
+    "usagi_yojimbo": {
+        "title": "Usagi Yojimbo (Stan Sakai)",
+        "aliases": [
+            "usagi yojimbo",
+            "usagi",
+            "królik ochroniarz"
+        ],
+        "publisher": "Wydawnictwo Egmont Polska",
+        "glossary": {
+            "Miyamoto Usagi": "Miyamoto Usagi (Królik Ronin / Mistrz Szkoły Miecza Kensei Katsuichi)",
+            "Gennosuke / Gen": "Gennosuke (Nosorożec Łowca Nagród)",
+            "Tomoe Ame": "Tomoe Ame (Kotka Samurajka / Ochroniarka Lorda Noriyukiego)",
+            "Lord Noriyuki": "Lord Noriyuki (Młody władca klanu Geishu)",
+            "Lord Hikiji": "Mroczny Lord Hikiji (Zabójca ojca Usagiego i zdrajca z równiny Adachigahara)",
+            "Jei": "Jei (Czarny Wilk / Ostrze Bogów / Omen Śmierci)",
+            "Katsuichi": "Mistrz Katsuichi (Nauczyciel szermierki Usagiego)",
+            "Kitsune": "Kitsune (Lisica Złodziejka i Akrobatka)",
+            "Chizu": "Chizu (Była przywódczyni klanu Neko Ninja)",
+            "Neko Ninja": "Klan Neko Ninja (Kocie Ninja)",
+            "Mogura Ninja": "Klan Mogura Ninja (Krety Ninja)",
+            "Komou": "Komou (Wielki Wojownik Nietoperz)",
+            "Grasscutter / Kusanagi": "Święty Miecz Kusanagi (Ścinacz Traw)",
+            "Edo Period Japan": "Japonia okresu Edo (Antropomorficzny świat zwierząt samurajskich)"
+        },
+        "character_forms": {
+            "Usagi -> Przeciwnicy": "Podążam ścieżką wojownika Musha Shugyo.",
+            "Gen -> Usagi": "Usagi! Ile jest warta głowa tego bandyty?"
+        }
+    },
+    "inuyasha": {
+        "title": "InuYasha",
+        "aliases": [
+            "inuyasha",
+            "inuyasha: feudal fairy tale"
+        ],
+        "publisher": "Wydawnictwo J.P.Fantastica",
+        "glossary": {
+            "InuYasha": "InuYasha (Pół-demon / Syn Wielkiego Psiego Demona / Tessaiga)",
+            "Kagome Higurashi": "Kagome Higurashi (Reinkarnacja kapłanki Kikyo / Święte strzały oczyszczenia / „Siad!”)",
+            "Kikyo": "Kapłanka Kikyo (Strażniczka Klejnotu Czterech Dusz)",
+            "Sesshomaru": "Sesshomaru (Pełnokrwisty psi demon / Starszy brat / Tenseiga / Bakusaiga)",
+            "Jaken": "Jaken (Zielony sługa Sesshomaru z dwugłowym kosturem)",
+            "Rin": "Rin (Mała ludzka dziewczynka pod opieką Sesshomaru)",
+            "Miroku": "Mnich Miroku (Kazaana / Przeklęta Czarna Dziura w prawej dłoni)",
+            "Sango": "Sango (Łowczyni Demonów / Wielki bumerang Hiraikotsu)",
+            "Shippo": "Shippo (Mały lisi demon / Magia iluzji)",
+            "Kirara": "Kirara (Dwuoogoniasty ognisty demon-kot Nekomata)",
+            "Naraku": "Naraku (Pół-demon zrodzony z bandyty Onigumo / Pajęcze znamię)",
+            "Kagura": "Kagura (Władczyni Wiatru / Jestem wolna jak wiatr)",
+            "Kanna": "Kanna (Czysta pustka / Lustro dusz)",
+            "Shikon Jewel": "Klejnot Czterech Dusz (Shikon no Tama)",
+            "Tessaiga": "Tessaiga (Żelazny Miecz Kłów InuYashy: Cięcie Wiatru / Bakuryuha)",
+            "Tenseiga": "Tenseiga (Niebiański Miecz Uzdrawiający Sesshomaru)",
+            "Wind Scar": "Cięcie Wiatru (Kaze no Kizu)",
+            "Backlash Wave": "Fala Odwrotna (Bakuryuha)",
+            "Osuwari": "Siad! (Rozkaz Kagome powalający InuYashę na ziemię)"
+        },
+        "character_forms": {
+            "Kagome -> InuYasha": "InuYasha... SIAD! (Osuwari!)",
+            "InuYasha -> Kagome": "Kagome! Zostań za mną!",
+            "Sesshomaru -> InuYasha": "Mój nędzny pół-krwisty bracie..."
+        }
+    },
+    "fairy_tail": {
+        "title": "Fairy Tail",
+        "aliases": [
+            "fairy tail",
+            "ft"
+        ],
+        "publisher": "Wydawnictwo Studio JG",
+        "glossary": {
+            "Natsu Dragneel": "Natsu Dragneel (Salamander / Zabójca Smoków Ognia / E.N.D.)",
+            "Lucy Heartfilia": "Lucy Heartfilia (Gwiezdna Czarodziejka / Złote Klucze Zodiaku)",
+            "Happy": "Happy (Niebieski kot Exceed / Aye, sir!)",
+            "Gray Fullbuster": "Gray Fullbuster (Mag Lodowego Tworzenia / Lodowy Zabójca Demonów / Ekshibicjonista)",
+            "Erza Scarlet": "Erza Scarlet (Tytania / Królowa Wróżek / Magia Przezbrojenia Kansou)",
+            "Wendy Marvell": "Wendy Marvell (Kapłanka Błękitnego Nieba / Zabójczyni Smoków Powietrza)",
+            "Carla": "Carla (Biała kotka Exceed)",
+            "Makarov Dreyar": "Makarov Dreyar (Trzeci Mistrz Gildii / Tytan / Prawo Wróżek)",
+            "Laxus Dreyar": "Laxus Dreyar (Zabójca Smoków Piorunów / Błyskawica)",
+            "Gajeel Redfox": "Gajeel Redfox (Czarny Stalowy Zabójca Smoków Żelaza / Panther Lily)",
+            "Juvia Lockser": "Juvia Lockser (Kobieta Deszcz / Magia Wody / Zakochana w Grayu)",
+            "Mirajane Strauss": "Mirajane Strauss (Diablica Mirajane / Przejęcie Duszy Szatana)",
+            "Elfman & Lisanna": "Elfman (Prawdziwy Mężczyzna!) i Lisanna",
+            "Gildarts Clive": "Gildarts Clive (As Fairy Tail / Magia Miażdżenia)",
+            "Zeref Dragneel": "Czarny Mag Zeref (Cesarz Spriggan z Alvarez)",
+            "Acnologia": "Acnologia (Czarny Smok Apokalipsy / Król Smoków)",
+            "Mavis Vermillion": "Mavis Vermillion (Pierwsza Mistrzyni i Założycielka Fairy Tail / Serce Wróżki)",
+            "Fairy Tail Guild": "Gildia Fairy Tail (Miasto Magnolia w Królestwie Fiore)",
+            "Dragon Slayer Magic": "Magia Zabójców Smoków (Ogień, Żelazo, Powietrze, Błyskawica, Światło, Cień)",
+            "Celestial Spirit Keys": "Klucze Gwiezdnych Duchów (12 Złotych Bram Zodiaku)",
+            "Fairy Law": "Prawo Wróżek (Fairy Law - Jedna z Trzech Wielkich Magii Gildii)",
+            "Fairy Glitter": "Blask Wróżek (Fairy Glitter)",
+            "Fairy Sphere": "Sfera Wróżek (Fairy Sphere)"
+        },
+        "character_forms": {
+            "Natsu -> Wrogowie": "Zapłonąłem! (Moe te kita zo!)",
+            "Happy -> Natsu": "Aye, sir! (Rybka!)",
+            "Juvia -> Gray": "Gray-sama~! (zakochana powódź)"
+        }
+    },
+    "nanatsu_no_taizai": {
+        "title": "Seven Deadly Sins: Siedem Grzechów Głównych (Nanatsu no Taizai)",
+        "aliases": [
+            "nanatsu no taizai",
+            "seven deadly sins",
+            "siedem grzechów głównych",
+            "siedem grzechow glownych"
+        ],
+        "publisher": "Wydawnictwo Studio JG",
+        "glossary": {
+            "Meliodas": "Meliodas (Smoczy Grzech Gniewu / Kapitan Siedmiu Grzechów / Syn Króla Demonów)",
+            "Elizabeth Liones": "Księżniczka Elizabeth Liones (Trzecia Księżniczka / Reinkarnacja Bogini)",
+            "Hawk": "Hawk (Świnka Kapitan Utylizacji Resztek)",
+            "Ban": "Ban (Lisi Grzech Chciwości / Nieśmiertelny Ban / Snatch)",
+            "King / Harlequin": "King (Niedźwiedzi Grzech Ociężałości / Król Wróżek / Włócznia Chastiefol)",
+            "Diane": "Diane (Wężowy Grzech Zazdrości / Gigantka z klanu Olbrzymów / Młot Gideon)",
+            "Gowther": "Gowther (Kozi Grzech Rozpusty / Lalka / Magia Wspomnień Invasion)",
+            "Merlin": "Merlin (Świński Grzech Łakomstwa / Najwspanialsza Czarodziejka Britannii)",
+            "Escanor": "Escanor (Lwi Grzech Pychy / Mistrz Słońca / „Kto o tym zadecydował?” / Boski Topór Rhitta)",
+            "Zeldris & Estarossa": "Zeldris i Estarossa (Dziesięć Przykazań Króla Demonów)",
+            "Holy Knights": "Święci Rycerze Królestwa Liones (Gilthunder, Howzer, Griamore)",
+            "Boar Hat": "Karczma Kapelusz Dzika (Boar Hat)",
+            "Full Counter": "Pełne Odbicie (Full Counter - Odbija wrogą magię ze zdwojoną siłą)",
+            "The One": "Ten Jedyny (Forma Escanora w samo południe przez 1 minutę)",
+            "Sacred Treasures": "Święte Skarby Grzechów"
+        },
+        "character_forms": {
+            "Meliodas -> Elizabeth": "Sate, sate, sate... (Cóż, cóż, cóż...)",
+            "Escanor -> Wrogowie": "Poczułem przed tobą litość. Kto zadecydował, że moje słońce zgasło?",
+            "Ban -> Meliodas": "Dancho! (Szefie!)"
+        }
+    },
+    "ao_no_exorcist": {
+        "title": "Blue Exorcist (Ao no Exorcist)",
+        "aliases": [
+            "ao no exorcist",
+            "blue exorcist"
+        ],
+        "publisher": "Wydawnictwo Waneko",
+        "glossary": {
+            "Rin Okumura": "Rin Okumura (Syn Szatana / Niebieskie Płomienie / Miecz Kurikara)",
+            "Yukio Okumura": "Yukio Okumura (Młodszy brat bliźniak / Egzorcysta Nauczyciel Paladyn / Podwójne pistolety)",
+            "Shiro Fujimoto": "Ojciec Shiro Fujimoto (Były Paladyn / Przybrany ojciec bliźniaków)",
+            "Mephisto Pheles / Samael": "Mephisto Pheles (Dyrektor Akademii Prawdziwego Krzyża / Król Czasu)",
+            "Shiemi Moriyama": "Shiemi Moriyama (Chorowity duszek Greenman / Nia)",
+            "Ryuji Suguro / Bon": "Ryuji Suguro (Bon / Syn opata z Kioto)",
+            "Renzo Shima & Konekomaru": "Renzo Shima (Szpieg Iluminatów) i Konekomaru Miwa",
+            "Izumo Kamiki": "Izumo Kamiki (Kapłanka Lisów Inari / Brwi jak kropki)",
+            "Shura Kirigakure": "Shura Kirigakure (Wyższa Egzorcystka / Wężowy miecz z piersi)",
+            "Satan": "Szatan (Bóg Gehenny)",
+            "Assiah": "Assiah (Świat Ludzi)",
+            "Gehenna": "Gehenna (Świat Demonów)",
+            "True Cross Academy": "Akademia Prawdziwego Krzyża",
+            "True Cross Order": "Zakon Prawdziwego Krzyża",
+            "Exorcist Classes": "Klasy Egzorcystów: Rycerz (Knight), Dragon (Strzelec), Doktor (Uzdrowiciel), Aria (Odmawiający wersety), Przywoływacz (Tamer)",
+            "Paladin": "Paladyn (Najwyższy stopień egzorcysty w Zakonie)"
+        },
+        "character_forms": {
+            "Rin -> Yukio": "Yukio! Nie pozwolę ci dźwigać tego wszystkiego samemu!",
+            "Yukio -> Rin": "Nii-san! Przestań być taki nieodpowiedzialny!",
+            "Mephisto -> Wszyscy": "Eins, zwei, drei! Zróbmy z tego wspaniałe show!"
+        }
+    },
+    "akame_ga_kill": {
+        "title": "Akame ga Kill!",
+        "aliases": [
+            "akame ga kill",
+            "akame ga kill!"
+        ],
+        "publisher": "Wydawnictwo Waneko",
+        "glossary": {
+            "Akame": "Akame (Cięcie Jednego Ciosu Murasame / Trucizna)",
+            "Tatsumi": "Tatsumi (Chłopak ze wsi / Zbroja Incursio)",
+            "Najenda": "Najenda (Jednoręka szefowa Night Raid / Dawna Generał)",
+            "Mine": "Mine (Genialna Snajperka / Działo Pumpkin)",
+            "Leone": "Leone (Lwia wojowniczka / Pas Lionelle)",
+            "Lubbock": "Lubbock (Nici Cross Tail)",
+            "Sheele": "Sheele (Wielkie nożyce Extrase)",
+            "Bulat": "Bulat (Niezłomny brat w Incursio / Zadbane włosy)",
+            "Chelsea": "Chelsea (Lizak i makijaż Gaea Foundation)",
+            "Esdeath": "Generał Esdeath (Królowa Lodu / Demon Extract / Oddział Jaegers / Zakochanie w Tatsumim)",
+            "Kurome": "Kurome (Młodsza siostra Akame / Miecz Yatsufusa ożywiający trupy)",
+            "Night Raid": "Night Raid (Zabójcy Armii Rewolucyjnej)",
+            "The Empire": "Cesarstwo (Zepsute przez Premiera Honest)",
+            "Prime Minister Honest": "Premier Honest (Sadystyczny tyran sterujący dzieckiem cesarzem)",
+            "Teigu / Imperial Arms": "Teigu (Święty Oręż / 48 Pradawnych Broni stworzonych przez Pierwszego Cesarza)",
+            "Shingu": "Shingu (Podróbki Teigu)"
+        },
+        "character_forms": {
+            "Akame -> Cele": "Zostaniesz wyeliminowany. (Houmuru)",
+            "Esdeath -> Tatsumi": "Tatsumi... Będziesz mój na zawsze.",
+            "Tatsumi -> Akame": "Akame! Przetrwamy to i zobaczymy nowy świat!"
+        }
+    },
+    "cardcaptor_sakura": {
+        "title": "Cardcaptor Sakura (Łowczyni Kart Sakura)",
+        "aliases": [
+            "cardcaptor sakura",
+            "sakura łowczyni kart",
+            "ccs"
+        ],
+        "publisher": "Wydawnictwo J.P.Fantastica",
+        "glossary": {
+            "Sakura Kinomoto": "Sakura Kinomoto (Łowczyni Kart / Klucz Pieczęci / „Wszystko na pewno będzie dobrze!”)",
+            "Keroberos / Kero-chan": "Keroberos / Kero (Strażnik Pieczęci / Żarłoczny pluszowy lew / Prawdziwa bestia)",
+            "Tomoyo Daidouji": "Tomoyo Daidouji (Kamerzystka / Projektantka nieskończonych kostiumów Sakury)",
+            "Syaoran Li": "Syaoran Li (Młody mag z Hongkongu / Spadkobierca Clowa / Miecz i zaklęcia feng shui)",
+            "Meiling Li": "Meiling Li (Kuzynka Syaorana)",
+            "Yukito Tsukishiro / Yue": "Yukito Tsukishiro (Sędzia Yue / Skrzydlaty strażnik księżyca)",
+            "Touya Kinomoto": "Touya Kinomoto (Starszy brat Sakury widzący duchy / Potwór)",
+            "Clow Reed": "Clow Reed (Najpotężniejszy Mag Wschodu i Zachodu / Twórca Kart)",
+            "Eriol Hi柊zawa": "Eriol Hi柊zawa (Reinkarnacja Clow Reeda)",
+            "Clow Cards": "Karty Clowa (The Windy, The Fly, The Shadow, The Watery, The Firey, The Earthy itp.)",
+            "Sakura Cards": "Karty Sakury (Przekształcone przez moc gwiazd)",
+            "Sealing Wand": "Różdżka Pieczęci (Uwolnij swą moc! / Zwróć swą pierwotną postać!)"
+        },
+        "character_forms": {
+            "Sakura -> Różdżka": "Kluczu, który kryjesz w sobie moc ciemności, ukaż swą prawdziwą postać przed Sakurą! Uwolnij moc! (Release!)",
+            "Kero -> Sakura": "Sakura! Złap tę kartę!",
+            "Tomoyo -> Sakura": "Sakura-chan jest dzisiaj niewyobrażalnie urocza!"
+        }
+    },
+    "madoka_magica": {
+        "title": "Puella Magi Madoka Magica (Magiczna Madoka)",
+        "aliases": [
+            "madoka magica",
+            "puella magi madoka magica",
+            "magiczna madoka"
+        ],
+        "publisher": "Wydawnictwo Waneko",
+        "glossary": {
+            "Madoka Kaname": "Madoka Kaname (Bogini Madoka / Prawo Cyklu / Różowy łuk)",
+            "Homura Akemi": "Homura Akemi (Mag Czasu / Pętle czasowe / Demon Homura)",
+            "Sayaka Miki": "Sayaka Miki (Mag mieczy i regeneracji / Oktavia von Seckendorff)",
+            "Mami Tomoe": "Mami Tomoe (Tiro Finale / Wstęgi i muszkiety / Odcięta głowa przez Charlotte)",
+            "Kyoko Sakura": "Kyoko Sakura (Włócznia iluzji / Wiecznie coś je / Pakt z Sayaką)",
+            "Kyubey / Incubator": "Kyubey (Inkubator / Obcy zbierający energię z rozpaczy dziewcząt / „Zostań magiczną dziewczyną!”)",
+            "Nagisa Momoe": "Nagisa Momoe (Wiedźma Charlotte / Ser)",
+            "Soul Gem": "Klejnot Duszy (Soul Gem - Prawdziwe naczynie duszy dziewczyny)",
+            "Grief Seed": "Ziarno Rozpaczy (Grief Seed - Oczyszcza Soul Gem przed skażeniem)",
+            "Magical Girl": "Magiczna Dziewczyna (Puella Magi - Pakt spełniający 1 życzenie)",
+            "Witch": "Wiedźma (Ostateczne stadium skażonego Klejnotu Duszy)",
+            "Walpurgisnacht": "Noc Walpurgii (Najpotężniejsza niszczycielska wiedźma teatralna)",
+            "Law of Cycles": "Prawo Cyklu (Zbawienie Madoki ratujące dziewczęta przed staniem się wiedźmami)"
+        },
+        "character_forms": {
+            "Homura -> Madoka": "Nawet jeśli cały świat cię zapomni, ja będę o tobie pamiętać.",
+            "Kyubey -> Dziewczęta": "Zawrzyj ze mną kontrakt i zostań magiczną dziewczyną!"
+        }
+    },
+    "akira": {
+        "title": "Akira (Katsuhiro Otomo)",
+        "aliases": [
+            "akira"
+        ],
+        "publisher": "Wydawnictwo J.P.Fantastica",
+        "glossary": {
+            "Shotaro Kaneda": "Shotaro Kaneda (Lider gangu motocyklowego Kapsułek / Czerwony motocykl custom)",
+            "Tetsuo Shima": "Tetsuo Shima (Numer 41 / Przebudzenie potęgi telekinetycznej niszczącej kosmos)",
+            "Akira": "Akira (Numer 28 / Źródło III Wojny Światowej w 1988 r. / Boska niszczycielska siła)",
+            "Kei": "Kei (Ruch oporu / Medium telepatyczne)",
+            "Colonel Shikishima": "Pułkownik Shikishima (Dowódca Projektu Akira)",
+            "Doctor Onishi": "Doktor Onishi",
+            "Kiyoko, Takashi, Masaru": "Esperzy (Numery 25, 26, 27 / Dzieci z pomarszczonymi starczymi twarzami)",
+            "Lady Miyako": "Pani Miyako (Numer 19 / Kapłanka świątyni)",
+            "Neo-Tokyo": "Neo-Tokio (Odbudowana metropolia nad Zatoką Tokijską przed Igrzyskami Olimpijskimi)",
+            "The Capsules": "Kapsułki (Gang motocyklistów Kanedy)",
+            "The Clowns": "Klowni (Wrogi gang motocyklowy)",
+            "SOL Laser": "Satelitarny Laser Bojowy SOL",
+            "Psychic Powers": "Zdolności Parapsychiczne (Czysta ewolucja energii wszechświata)"
+        },
+        "character_forms": {
+            "Kaneda -> Tetsuo": "TETSUOOO!",
+            "Tetsuo -> Kaneda": "KANEDAAA! Przestań mną dyrygować!"
+        }
+    },
+    "ghost_in_the_shell": {
+        "title": "Ghost in the Shell (Koukaku Kidoutai: Duch w Pancerzu)",
+        "aliases": [
+            "ghost in the shell",
+            "koukaku kidoutai",
+            "gits"
+        ],
+        "publisher": "Wydawnictwo J.P.Fantastica",
+        "glossary": {
+            "Major Motoko Kusanagi": "Major Motoko Kusanagi (Pełny wojskowy cybernetyczny pancerz / Szefowa taktyczna Sekcji 9)",
+            "Batou": "Batou (Cyborg z oczami wizyjnymi / Karabin maszynowy / Miłośnik Tachikom)",
+            "Togusa": "Togusa (Prawie w 100% człowiek / Rewolwer Mateba / Dawny policjant)",
+            "Daisuke Aramaki": "Szef Daisuke Aramaki (Małpa / Dyrektor Sekcji 9)",
+            "Ishikawa": "Ishikawa (Mistrz wywiadu i wojny informacyjnej)",
+            "Saito": "Saito (Snajper z okiem Hawkeye)",
+            "Paz & Borma": "Paz (Infiltrator) i Borma (Ekspert ładunków wybuchowych)",
+            "Tachikoma": "Tachikoma (Inteligentne niebieskie czołgi myjące z dziecięcymi głosikami i olejem)",
+            "Puppet Master": "Władca Marionetek (Projekt 2501 / Byt AI narodzony w sieci informacyjnej)",
+            "Laughing Man / Aoi": "Śmiejący się Człowiek (Aoi / Stand Alone Complex)",
+            "Public Security Section 9": "Sekcja Bezpieczeństwa Publicznego nr 9 (Sekcja 9)",
+            "Cyberbrain": "Cybermózg (Elektroniczne złącza mózgowe / Złącze potyliczne)",
+            "Ghost": "Duch (Ghost - Świadomość, tożsamość i dusza wewnątrz maszyny)",
+            "Thermo-Optical Camouflage": "Kamuflaż Termooptyczny (Niewidzialność)",
+            "Stand Alone Complex": "Stand Alone Complex (Zjawisko naśladowania oryginału bez istnienia oryginału)",
+            "Cyberbrain Sclerosis": "Stwardnienie Cybermózgu"
+        },
+        "character_forms": {
+            "Motoko -> Batou": "Mój Duch mi to podpowiada, Batou.",
+            "Batou -> Motoko": "Majorze! Uważaj na siebie!",
+            "Tachikoma -> Batou": "Batou-san! Zobacz, odkryliśmy czym jest indywidualność!"
+        }
+    },
+    "gunnm_alita": {
+        "title": "Battle Angel Alita (Gunnm)",
+        "aliases": [
+            "battle angel alita",
+            "gunnm",
+            "alita"
+        ],
+        "publisher": "Wydawnictwo J.P.Fantastica",
+        "glossary": {
+            "Alita / Gally": "Alita (Gally / Ciało Berserkera / Wojowniczka Panzer Kunst)",
+            "Daisuke Ido": "Daisuke Ido (Cyberchirurg i Łowca Nagród)",
+            "Yugo": "Yugo (Chłopak marzący o ucieczce do Zalem / Złodziej rdzeni kręgowych)",
+            "Makaku": "Makaku (Potwór pożerający mózgi z endorfinami)",
+            "Jashugan": "Jashugan (Niekwestionowany Mistrz Motorballu)",
+            "Desty Nova": "Profesor Desty Nova (Szalony naukowiec z Zalem / Flan / Nanotechnologia)",
+            "Figure Four": "Figure Four (Mistrz sztuk walki anty-cyborgowych / Ukochany Ality)",
+            "Karasu / Kaos": "Kaos (Radiowy syn Novy / Psychometria)",
+            "Scrapyard": "Miasto Złomu (Kuzutetsu / Podniebne wysypisko pod Zalem)",
+            "Zalem / Tiphares": "Zalem (Podniebne miasto raju dla wybrańców)",
+            "Motorball": "Motorball (Brutalny sport wyścigowy cyborgów)",
+            "Panzer Kunst": "Panzer Kunst (Starożytna marsjańska sztuka walki cyborgów)",
+            "Damascus Steel": "Stal Damasceńska (Ostrza Ality)",
+            "Hunter-Warrior": "Łowca Nagród (Zarejestrowany w Fabryce)"
+        },
+        "character_forms": {
+            "Ido -> Alita": "Alito... Twoja dusza jest czysta i niewinna.",
+            "Alita -> Wrogowie": "Nie jestem niczyją zabawką. Jam jest wojowniczką Panzer Kunst!"
+        }
+    },
+    "gto_onizuka": {
+        "title": "Great Teacher Onizuka (GTO)",
+        "aliases": [
+            "great teacher onizuka",
+            "gto"
+        ],
+        "publisher": "Wydawnictwo Waneko",
+        "glossary": {
+            "Eikichi Onizuka": "Eikichi Onizuka (22 lata, kawaler / Były motocyklista bousouzoku / Najwspanialszy Nauczyciel Japonii)",
+            "Ryuji Danma": "Ryuji Danma (Najlepszy kumpel z duetu Oni-Baku / Mechanik)",
+            "Azusa Fuyutsuki": "Azusa Fuyutsuki (Nauczycielka / Ukochana Onizuki)",
+            "Hiroshi Uchiyamada": "Wicedyrektor Hiroshi Uchiyamada (Moja ukochana Toyota Cresta!)",
+            "Ryoko Sakurai": "Dyrektor Generalna Ryoko Sakurai (Opiekunka Onizuki)",
+            "Yoshito Kikuchi": "Yoshito Kikuchi (Geniusz komputerowy o IQ 180)",
+            "Urumi Kanzaki": "Urumi Kanzaki (Geniusz heterochromia / Terrorystka intelektualna)",
+            "Kunio Murai": "Kunio Murai (Lider buntowników klasy 3-4 / Młoda mama Julia)",
+            "Tomoko Nomura": "Tomoko Nomura (Toroko / Idolka z wielkim biustem)",
+            "Miyabi Aizawa": "Miyabi Aizawa (Główna manipulatorka nienawidząca nauczycieli)",
+            "Holy Forest Academy": "Akademia Świętego Lasu (Seirin Academy)",
+            "Class 3-4": "Klasa 3-4 (Klasa niszcząca psychicznie każdego wychowawcę)",
+            "German Suplex": "German Suplex (Rzut Onizuki na wicedyrektorze i chuliganach)"
+        },
+        "character_forms": {
+            "Onizuka -> Uczniowie": "Lekcje życia są ważniejsze niż jakiekolwiek podręczniki!",
+            "Uchiyamada -> Onizuka": "ONIZUKAAA! MOJA CRESTA!!!"
+        }
+    },
+    "claymore": {
+        "title": "Claymore",
+        "aliases": [
+            "claymore"
+        ],
+        "publisher": "Wydawnictwo J.P.Fantastica",
+        "glossary": {
+            "Clare": "Clare (Nr 47 / Najsłabsza wojowniczka / Posiada ciało i krew Teresy / Szybki Miecz)",
+            "Teresa of the Faint Smile": "Teresa o Nikłym Uśmiechu (Nr 1 / Niezrównana najsilniejsza wojowniczka w historii)",
+            "Raki": "Raki (Chłopiec uratowany przez Clare / Uczeń Isleya)",
+            "Priscilla": "Priscilla (Przebudzona Istota / Najpotężniejszy potwór bez pamięci)",
+            "Miria": "Miria Widmo (Nr 6 / Liderka buntu na Północy)",
+            "Helen & Deneve": "Helen (Rozciągliwe ramiona) i Deneve (Podwójne miecze regeneracji)",
+            "Teresa, Irene, Sophia, Noel": "Dawna elita Organizacji",
+            "Isley of the North": "Isley z Północy (Srebrny Król / Dawny Męski Nr 1)",
+            "Riful of the West": "Riful z Zachodu (Najmłodsza Przebudzona Istota)",
+            "Luciela of the South": "Luciela z Południa",
+            "Claymore / Silver-Eyed Witches": "Wojowniczki Claymore (Srebrnookie Wiedźmy / Pół-ludzie, pół-Yoma)",
+            "Yoma": "Yoma (Potwory pożerające ludzkie wnętrzności)",
+            "Awakened Beings": "Przebudzone Istoty (Wojowniczki, które przekroczyły 100% Yoki)",
+            "The Organization": "Organizacja (Czarni Płaszcze / Eksperyment laboratoryjny na odizolowanym kontynencie)",
+            "Yoki": "Yoki (Demoniczna energia Yoma)"
+        },
+        "character_forms": {
+            "Clare -> Priscilla": "Pomściłam Teresę... Nawet jeśli sama stanę się potworem!",
+            "Teresa -> Clare": "Clare... Dzięki tobie odnalazłam ciepło w sercu."
+        }
+    },
+    "d_gray_man": {
+        "title": "D.Gray-man",
+        "aliases": [
+            "d.gray-man",
+            "d gray man",
+            "d-gray-man",
+            "dgm"
+        ],
+        "publisher": "Wydawnictwo Waneko",
+        "glossary": {
+            "Allen Walker": "Allen Walker (Zniszczona lewa ręka / Koronne Błazeństwo / Czerwone Przeklęte Oko / Czternasty Nea)",
+            "Yu Kanda": "Yu Kanda (Szermierz Mugen / Sztuczny Apostoł / Lotos życia)",
+            "Lenalee Lee": "Lenalee Lee (Czarne Buty / Ekwipunek Krystaliczny / Siostra Komuiego)",
+            "Lavi": "Lavi (Młot Ognia i Piorunów / Spadkobierca Kronikarzy Bookmanów)",
+            "Cross Marian": "Generał Cross Marian (Pistolet Judgment / Matka Grobu / Kobiety i długi)",
+            "Komui Lee": "Komui Lee (Dyrektor Naukowy / Komurin robot)",
+            "Millennium Earl": "Tysiącletni Hrabia (Stwórca Akum / Patriarcha Rodziny Noego)",
+            "Tyki Mikk": "Tyki Mikk (Noe Przyjemności / Zdolność przenikania przez materię)",
+            "Road Kamelot": "Road Kamelot (Noe Snów / Dziewczynka z drzwiami)",
+            "The Black Order": "Czarny Zakon (Watykańska baza Egzorcystów)",
+            "Innocence": "Innocence (Czystość / Boska substancja zwalczająca Mroczną Materię)",
+            "Akuma": "Akuma (Mechaniczne demony zrodzone z dusz zmarłych i ludzkiej rozpaczy: Poziom 1, 2, 3, 4)",
+            "Noah Family": "Rodzina Noego (13 Apostołów zrodzonych ze wspomnień Noego)",
+            "Crown Clown": "Koronne Błazeństwo (Biały Płaszcz i Szpon Innocence Allena)",
+            "The 14th / Nea Walker": "Czternasty Noe (Nea D. Campbell / Muzyk Arki)"
+        },
+        "character_forms": {
+            "Allen -> Kanda": "Kanda! Przestań być taki chamski! (wieczna rywalizacja)",
+            "Kanda -> Allen": "Moyashi! (Kiełku!)",
+            "Hrabia -> Egzorcyści": "Witajcie, drodzy Egzorcyści~!"
+        }
+    },
+    "gantz": {
+        "title": "Gantz",
+        "aliases": [
+            "gantz"
+        ],
+        "publisher": "Wydawnictwo Waneko",
+        "glossary": {
+            "Kei Kurono": "Kei Kurono (Kurono-kun / Zwykły egoista -> Legendarny Lider i Wojownik Gantza)",
+            "Masaru Kato": "Masaru Kato (Przyjaciel z dzieciństwa / Sprawiedliwość i ochrona brata Ayumu)",
+            "Kei Kishimoto": "Kei Kishimoto (Dziewczyna z wielkim biustem / Klon)",
+            "Joichiro Nishi": "Joichiro Nishi (Cyniczny weteran w trybie niewidzialnym)",
+            "Tae Kojima": "Tae Kojima (Ukochana Kurono / Cel misji Gantza)",
+            "Yoshikazu Suzuki": "Suzuki-san (Starszy pan / Czyste serce)",
+            "Reika Shimohira": "Reika Shimohira (Słynna modelka i idolka zakochana w Kurono)",
+            "Daizemon Kaze": "Daizemon Kaze (Wojownik walki wręcz / Muscle Rider)",
+            "Hachiro Oka": "Hachiro Oka (Mistrz Osaki ze 100 punktami zdobytymi 7 razy / Mecha Zbroja)",
+            "Gantz Sphere": "Czarna Kula Gantz (Tajemniczy czarny globus z nagim człowiekiem w środku w pokoju w Tokio)",
+            "Gantz Suit": "Kombinezon Gantz (Wzmacnia siłę, skok i chroni przed pociskami dzięki płynowi)",
+            "X-Gun & X-Rifle": "Broń X-Gun i Karabin X-Rifle (Opóźniony wybuch molekularny)",
+            "Z-Gun / Gravity Gun": "Działo Grawitacyjne Z-Gun (Miażdży cele pionowym słupem ciśnienia)",
+            "100 Points Menu": "Menu 100 Punktów: 1. Wolność z wymazaniem pamięci, 2. Potężniejsza broń/mecha, 3. Wskrzeszenie zmarłego z pamięci kuli",
+            "Aliens": "Kosmici / Obcy: Kosmita Cebula, Kosmita Tanaka, Kosmici z Posągów Świątyni, Kosmici z Nurarihyon w Osace"
+        },
+        "character_forms": {
+            "Gantz -> Gracze": "Wasze stare życia dobiegły końca. To, co zrobicie z nowymi, zależy ode mnie.",
+            "Kurono -> Tae": "Tae-chan! Zawsze do ciebie wrócę!"
         }
     }
 }
