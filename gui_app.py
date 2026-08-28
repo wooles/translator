@@ -229,21 +229,22 @@ class TranslationWorker(QThread):
             # Dynamic model resolution
             models = resolve_best_models()
             thinking_budget = 4096
+            p1_fast = models.get("flash_backup", "gemini-3.6-flash")
             if self.profile_idx == "1":
                 p1_model = models["flash_lite"]
                 p2_model = None
                 enable_verifier = False
             elif self.profile_idx == "2":
-                p1_model = models["flash"]
+                p1_model = p1_fast
                 p2_model = None
                 enable_verifier = False
             elif self.profile_idx == "4":
-                p1_model = models["flash"]
+                p1_model = p1_fast
                 p2_model = models["pro"]
                 enable_verifier = True
                 thinking_budget = 2048
-            else:  # Profile 3 (Mistrzowski Flash Reasoning Adaptive CoT do 6144 - Domyślny)
-                p1_model = models["flash"]
+            else:  # Profile 3 (F1: 3.6-flash + F2: 3.7-flash CoT do 6144 - Domyślny)
+                p1_model = p1_fast
                 p2_model = models["flash"]
                 enable_verifier = True
                 thinking_budget = 6144
