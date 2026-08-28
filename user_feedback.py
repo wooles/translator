@@ -189,10 +189,14 @@ class UserFeedbackManager:
 
         return relevant[:max_examples]
 
-    def format_for_prompt(self, relevant_entries: List[Dict[str, Any]]) -> str:
+    def format_for_prompt(self, relevant_entries: Optional[List[Dict[str, Any]]] = None) -> str:
         """
         Formats selected corrections as a Golden Examples section for LLM prompt.
+        If relevant_entries is None, formats all registered feedback entries.
         """
+        if relevant_entries is None:
+            relevant_entries = self.list_all()
+
         if not relevant_entries:
             return ""
 
