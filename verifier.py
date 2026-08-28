@@ -73,16 +73,19 @@ class DialogueVerifier:
         prompt_lines.append("Zastąp drewniane sformułowania żywym, potoczystym językiem polskim mówionym (tak jak w profesjonalnym dubbingu / u polskich nastolatków):")
         prompt_lines.append("W polu 'changes_made' dla KAŻDEJ poprawionej kwestii podaj DOKŁADNE uzasadnienie i numer Filaru AVT (np. '[Filar IV - Szyk Zdania] Usunięto kalkę angielską'). Jeśli kwestia nie wymagała poprawek, wpisz null.")
         
-        if user_feedback_str:
-            prompt_lines.append(f"\n{user_feedback_str}\n")
-        if glossary_str:
-            prompt_lines.append(f"\n{glossary_str}\n")
         if focused_rules_str:
             prompt_lines.append(f"\n{focused_rules_str}\n")
-        if episode_profile_str:
-            prompt_lines.append(f"\n{episode_profile_str}\n")
         if scene_summary:
             prompt_lines.append(f"\n[Kontekst sceny]: {scene_summary}\n")
+
+        # Static Episode Knowledge (Only appended if not already baked into Cached System Instructions)
+        if not getattr(self, "_episode_knowledge_cached", False):
+            if user_feedback_str:
+                prompt_lines.append(f"\n{user_feedback_str}\n")
+            if glossary_str:
+                prompt_lines.append(f"\n{glossary_str}\n")
+            if episode_profile_str:
+                prompt_lines.append(f"\n{episode_profile_str}\n")
 
         for item in batch_items:
             type_tag = f" [[Napis] {item['visual_type']}]" if item.get("is_sign") else " [DIALOG]"

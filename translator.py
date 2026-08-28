@@ -538,31 +538,24 @@ class MultimodalTranslator:
         """
         lines = []
 
-        # 00a. User Golden Examples and Feedback (Top Priority)
-        if user_feedback_str:
-            lines.append(user_feedback_str)
-
-        # 00b. Deterministic Glossary Overrides
-        if glossary_str:
-            lines.append(glossary_str)
-
-        # 00c. Focused Scene Rules (Eliminate Lost-in-the-Middle)
+        # 00c. Focused Scene Rules (Dynamic per-batch - always included)
         if focused_rules_str:
             lines.append(focused_rules_str)
 
-        # 0a. Official Polish Manga Canon
-        if manga_canon_str:
-            lines.append(manga_canon_str)
-
-        # 0b. Series Bible cross-episode continuity
-        if series_bible_str:
-            lines.append(series_bible_str)
-
-        # 0b. Episode profile glossary and relationships
-        if episode_profile_str:
-            lines.append(episode_profile_str)
-        elif anime_context_str:
-            lines.append(anime_context_str)
+        # Static Episode Knowledge (Only appended if not already baked into Cached System Instructions)
+        if not getattr(self, "_episode_knowledge_cached", False):
+            if user_feedback_str:
+                lines.append(user_feedback_str)
+            if glossary_str:
+                lines.append(glossary_str)
+            if manga_canon_str:
+                lines.append(manga_canon_str)
+            if series_bible_str:
+                lines.append(series_bible_str)
+            if episode_profile_str:
+                lines.append(episode_profile_str)
+            elif anime_context_str:
+                lines.append(anime_context_str)
 
         # 0c. Translation Memory golden examples
         if self.tm:
@@ -1438,28 +1431,14 @@ class MultimodalTranslator:
             print(f"  [Słownik Deterministyczny]: Aktywnych {len(combined_glossary)} żelaznych terminów (w tym 100% Kanonu Mangowego).")
 
         user_rules_cnt = len(self.user_feedback.list_all())
+        user_feedback_str = self.user_feedback.format_for_prompt()
         if user_rules_cnt > 0:
             print(f"  [Korekty Użytkownika]: Wczytano {user_rules_cnt} złotych reguł (Few-Shot Prompting).")
 
-        # 0e. Pre-warming and Context Cache Hard Protection (guarantees -75% discount)
-        from context_cache import ContextCacheManager
-        print(f"  [Infrastruktura Finansowa]: Weryfikacja i rozgrzewanie pamięci Context Cache...")
-        pool_or_c1 = self.client_pool if hasattr(self, "client_pool") and self.client_pool else self.client
-        c1 = ContextCacheManager.ensure_cache_ready(pool_or_c1, self.model_phase1, self.system_prompt)
-        if not c1:
-            raise RuntimeError(
-                f"KATEGORYCZNA BLOKADA FINANSOWA: Nie udało się aktywować serwerowego Context Cache dla {self.model_phase1}. "
-                "Aby uchronić Twój portfel przed naliczeniem 4-krotnie wyższej stawki pełnej ($1.25/1M), proces został bezpiecznie wstrzymany. "
-                "Sprawdź połączenie z Google API lub stan konta i spróbuj ponownie."
-            )
-        if self.verifier and hasattr(self.verifier, "model") and hasattr(self.verifier, "system_prompt"):
-            pool_or_c2 = getattr(self.verifier, "client_pool", None) or getattr(self.verifier, "client", None)
-            c2 = ContextCacheManager.ensure_cache_ready(pool_or_c2, self.verifier.model, self.verifier.system_prompt)
-            if not c2:
-                raise RuntimeError(
-                    f"KATEGORYCZNA BLOKADA FINANSOWA: Nie udało się aktywować serwerowego Context Cache dla weryfikatora ({self.verifier.model}). "
-                    "Aby uchronić Twój portfel przed naliczeniem 4-krotnie wyższej stawki pełnej, proces został bezpiecznie wstrzymany."
-                )
+        # 0e. Format static episode strings
+        glossary_str = self.glossary_manager.format_for_prompt(combined_glossary)
+        manga_canon_str = f"\nOFICJALNY KANON MANGOWY ({manga_canon_entry['publisher']}):\n" + "\n".join([f"- '{k}' = '{v}'" for k, v in manga_canon_entry.get('glossary', {}).items()]) if manga_canon_entry else ""
+        episode_profile_str = format_episode_profile_for_prompt(episode_profile) if episode_profile else ""
 
         if episode_profile:
             if not manga_canon_entry and episode_profile.manga_canon_source:
@@ -1486,6 +1465,50 @@ class MultimodalTranslator:
                 terms_preview = ", ".join([f"'{g.term_en}' -> '{g.translation_pl}'" for g in episode_profile.glossary[:6]])
                 suffix = "..." if len(episode_profile.glossary) > 6 else ""
                 print(f"  [Słowniczek Odcinka]: {terms_preview}{suffix}")
+
+        # 0f. Bake static Episode Knowledge (Profile, Glossary, Series Bible, User Feedback) into Cached System Instructions
+        episode_knowledge_blocks = []
+        if user_feedback_str:
+            episode_knowledge_blocks.append(f"{user_feedback_str}")
+        if glossary_str:
+            episode_knowledge_blocks.append(f"{glossary_str}")
+        if manga_canon_str:
+            episode_knowledge_blocks.append(f"{manga_canon_str}")
+        if series_bible_str:
+            episode_knowledge_blocks.append(f"{series_bible_str}")
+        if episode_profile_str:
+            episode_knowledge_blocks.append(f"{episode_profile_str}")
+        elif anime_context_str:
+            episode_knowledge_blocks.append(f"{anime_context_str}")
+
+        if episode_knowledge_blocks:
+            full_ep_knowledge = "\n\n".join(episode_knowledge_blocks)
+            self.system_prompt = f"{self.system_prompt}\n\n=== WIEDZA I WYTYCZNE DLA TEGO ODCINKA (PROFIL, SŁOWNIK, CIĄGŁOŚĆ) ===\n{full_ep_knowledge}"
+            self._episode_knowledge_cached = True
+            if self.verifier and hasattr(self.verifier, "system_prompt"):
+                self.verifier.system_prompt = f"{self.verifier.system_prompt}\n\n=== WIEDZA I WYTYCZNE DLA TEGO ODCINKA (PROFIL, SŁOWNIK, CIĄGŁOŚĆ) ===\n{full_ep_knowledge}"
+                self.verifier._episode_knowledge_cached = True
+
+        # Pre-warming and Context Cache Hard Protection across all client pool keys (guarantees -90% discount)
+        from context_cache import ContextCacheManager
+        print(f"  [Infrastruktura Finansowa]: Weryfikacja i rozgrzewanie pamięci Context Cache z pełną wiedzą odcinka...")
+        pool_or_c1 = self.client_pool if hasattr(self, "client_pool") and self.client_pool else self.client
+        c1 = ContextCacheManager.ensure_cache_ready(pool_or_c1, self.model_phase1, self.system_prompt)
+        if not c1:
+            raise RuntimeError(
+                f"KATEGORYCZNA BLOKADA FINANSOWA: Nie udało się aktywować serwerowego Context Cache dla {self.model_phase1}. "
+                "Aby uchronić Twój portfel przed naliczeniem 10-krotnie wyższej stawki pełnej, proces został bezpiecznie wstrzymany. "
+                "Sprawdź połączenie z Google API lub stan konta i spróbuj ponownie."
+            )
+        if self.verifier and hasattr(self.verifier, "model") and hasattr(self.verifier, "system_prompt"):
+            pool_or_c2 = getattr(self.verifier, "client_pool", None) or getattr(self.verifier, "client", None)
+            c2 = ContextCacheManager.ensure_cache_ready(pool_or_c2, self.verifier.model, self.verifier.system_prompt)
+            if not c2:
+                raise RuntimeError(
+                    f"KATEGORYCZNA BLOKADA FINANSOWA: Nie udało się aktywować serwerowego Context Cache dla weryfikatora ({self.verifier.model}). "
+                    "Aby uchronić Twój portfel przed naliczeniem 10-krotnie wyższej stawki pełnej, proces został bezpiecznie wstrzymany."
+                )
+
         if self.whisper:
             try:
                 self.whisper._initialize_model()

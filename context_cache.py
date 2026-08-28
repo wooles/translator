@@ -150,22 +150,26 @@ class ContextCacheManager:
         verbose: bool = True
     ) -> Optional[str]:
         """
-        Guarantees that server cache is active and locked before translation begins,
+        Guarantees that server cache is active and locked across all client pool keys before translation begins,
         protecting against unauthorized full-rate billing.
         """
         if not client or not system_instruction:
             return None
 
-        primary_c = client.clients[0] if (hasattr(client, "clients") and client.clients) else client
-        cache_name = cls.get_or_create_cache(primary_c, model, system_instruction)
-        if cache_name:
-            if verbose:
-                print(f"  [Context Cache]: Locked -75% server discount for {model}.")
-            return cache_name
+        if hasattr(client, "clients") and client.clients:
+            first_name = None
+            for c in client.clients:
+                res = cls.get_or_create_cache(c, model, system_instruction)
+                if not first_name:
+                    first_name = res
+            if verbose and first_name:
+                print(f"  [Context Cache]: Locked -90% server discount for {model} across {len(client.clients)} API keys.")
+            return first_name or "cached_ready"
         else:
-            if verbose:
-                print(f"  [Context Cache]: Locked server baseline for {model}.")
-            return "cached_ready"
+            cache_name = cls.get_or_create_cache(client, model, system_instruction)
+            if cache_name and verbose:
+                print(f"  [Context Cache]: Locked -90% server discount for {model}.")
+            return cache_name or "cached_ready"
 
     @classmethod
     def touch_cache(cls, client: genai.Client, cache_name: str, ttl_seconds: int = DEFAULT_CACHE_TTL_SECONDS):
