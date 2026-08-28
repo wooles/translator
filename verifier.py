@@ -235,24 +235,6 @@ class DialogueVerifier:
                 is_unavailable = "503" in err_str or "unavailable" in err_str or "high demand" in err_str
                 is_rate_limit = "429" in err_str or "quota" in err_str or "resource_exhausted" in err_str
 
-                # Instant seamless model switch if top Flash is overloaded on Google
-                if (is_unavailable or is_timeout or is_rate_limit) and "flash" in self.model.lower():
-                    if attempt >= 2 and "3.7" in self.model:
-                        print(f"\n[Redaktor Dialogów / Faza 2]: Model {self.model} jest przeciążony u Google (503). Przełączam na najwyższy model alternatywny gemini-3.6-flash...")
-                        self.model = "gemini-3.6-flash"
-                        time.sleep(0.5)
-                        continue
-                    elif attempt >= 3 and "3.6" in self.model:
-                        print(f"\n[Redaktor Dialogów / Faza 2]: Przełączam na bezpośredni model gemini-3.5-flash...")
-                        self.model = "gemini-3.5-flash"
-                        time.sleep(0.5)
-                        continue
-
-                # Hard fallback after max retries so execution NEVER hangs
-                if attempt >= 5:
-                    print(f"\n[Redaktor Dialogów / Faza 2]: Osiągnięto limit prób ({e}). Zastosowano dopracowany szkic z Filarami AVT.")
-                    return [RefinedLine(id=it["id"], refined_pl=it["pl"]) for it in batch_items]
-
                 import random
                 wait_sec = min(3.0, 0.25 * (1.5 ** min(attempt, 4)) + random.uniform(0.05, 0.15))
                 if is_timeout:
