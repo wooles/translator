@@ -172,7 +172,7 @@ class JapaneseWhisperEngine:
                 segments, info = self.model.transcribe(
                     wav_path,
                     language="ja",
-                    beam_size=3,
+                    beam_size=1,
                     vad_filter=True,
                     vad_parameters=dict(min_silence_duration_ms=200)
                 )
@@ -207,7 +207,7 @@ class JapaneseWhisperEngine:
             self._initialize_model()
             transcribe_kwargs = {
                 "language": "ja",
-                "beam_size": 3,
+                "beam_size": 1,
                 "vad_filter": True,
                 "vad_parameters": dict(min_silence_duration_ms=200),
                 "condition_on_previous_text": False,

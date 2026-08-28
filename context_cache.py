@@ -71,10 +71,7 @@ class ContextCacheManager:
 
         # 1. Check in-process local memory
         if content_hash in _LOCAL_CACHE_REGISTRY:
-            matched_name = _LOCAL_CACHE_REGISTRY[content_hash]
-            # Refresh active cache lifetime (Rolling Keep-Alive)
-            cls.touch_cache(client, matched_name, ttl_seconds)
-            return matched_name
+            return _LOCAL_CACHE_REGISTRY[content_hash]
 
         model_clean = cls._clean_model_name(model)
         display_name = f"avt_{model_clean}_{content_hash}"
