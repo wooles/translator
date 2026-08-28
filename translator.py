@@ -389,16 +389,14 @@ class CharacterInfo(BaseModel):
 class LineTranslation(BaseModel):
     id: int = Field(description="ID kwestii dialogowej z wejścia")
     polish_text: str = Field(description="Przetłumaczona kwestia na język polski z uwzględnieniem płci, sceny i eliminacji kalek")
-    speaker_gender: Optional[str] = Field(default=None, description="Zidentyfikowana płeć postaci mówiącej (np. 'mężczyzna', 'kobieta')")
-    visual_subtext: Optional[str] = Field(default=None, description="Zwięzła notatka o mimice lub gestach (opcjonalna)")
-    literal_meaning: Optional[str] = Field(default=None, description="Dosłowny sens idiomu (opcjonalny)")
-    visual_clues: Optional[str] = Field(default=None, description="Notatka o kadrze (opcjonalna)")
-    notes: Optional[str] = Field(default=None, description="Zwięzła uwaga o kadrze lub grze słów (tylko w razie potrzeby, inaczej null)")
+    speaker_gender: Optional[str] = Field(default=None, description="Płeć mówcy: 'mężczyzna' lub 'kobieta'")
+    visual_subtext: Optional[str] = Field(default=None, description="Maks. 5 słów o mimice/gestach (np. 'uśmiech, zaciśnięta pięść') lub null")
+    literal_meaning: Optional[str] = Field(default=None, description="Dosłowny idiom JP (maks. 5 słów) tylko w razie potrzeby, inaczej null")
+    notes: Optional[str] = Field(default=None, description="Kluczowa notatka (maks. 5 słów) tylko w razie potrzeby, inaczej null")
 
 class BatchTranslationResponse(BaseModel):
-    scene_diagnosis: Optional[SceneDiagnosis] = Field(default=None, description="Zwięzła diagnoza sytuacji, intencji i podtekstu sceny PRZED tłumaczeniem")
+    scene_diagnosis: Optional[SceneDiagnosis] = Field(default=None, description="Syntetyczna diagnoza sytuacji i podtekstu sceny PRZED tłumaczeniem (1-2 zwięzłe zdania)")
     translations: List[LineTranslation] = Field(description="Lista przetłumaczonych kwestii")
-    scene_description: Optional[str] = Field(default=None, description="Krótki opis sceny na kadrze")
     characters_identified: Optional[List[CharacterInfo]] = Field(default=None, description="Zidentyfikowane lub nowo odkryte postacie i ich płeć")
 
 class MultimodalTranslator:

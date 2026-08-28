@@ -57,9 +57,9 @@ class PricingGuard:
         batches = max(1, (lines_count + 17) // 18)
         system_prompt_tokens = 39000  # AVT Pillars in Context Cache
         batch_input_tokens = 2400      # Video frame (scaled) + lookahead + Whisper audio + history
-        batch_output_f1_tokens = 2200  # Phase 1 Translation JSON + AVT scene metadata
-        batch_output_flash_cot = 2800  # Phase 2 Flash Refinement + Adaptive CoT thinking
-        batch_output_pro_tokens = 1550 # Phase 2 Pro Refinement + Dedicated Pro CoT (2048/1024/512 avg)
+        batch_output_f1_tokens = 950   # Streamlined Phase 1 Translation JSON (Concise token-saving schema)
+        batch_output_flash_cot = 2200  # Phase 2 Flash Refinement + Elastic CoT thinking
+        batch_output_pro_tokens = 1400 # Phase 2 Pro Refinement + Dedicated Pro CoT (2048/1024/512 avg)
 
         profile = profile.lower()
 
