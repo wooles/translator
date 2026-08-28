@@ -1954,12 +1954,16 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
         }
     },
     "re_zero": {
-        "title": "Re:Zero - Życie w innym świecie od zera",
+        "title": "Re:Zero - Życie w innym świecie od zera (Re:Zero kara Hajimeru Isekai Seikatsu)",
         "aliases": [
             "re:zero",
             "re zero",
             "rezero",
             "re:zero kara hajimeru isekai seikatsu",
+            "re:zero s3",
+            "re:zero season 3",
+            "re:zero s2",
+            "re:zero s1",
             "zycie w innym swiecie od zera",
             "życie w innym świecie od zera"
         ],
@@ -1967,17 +1971,46 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
         "glossary": {
             "Return by Death": "Powrót przez Śmierć",
             "Witch of Envy / Satella": "Wiedźma Zazdrości (Satella)",
+            "Witch Factor": "Czynnik Wiedźmy",
             "Witch Cult": "Kult Wiedźmy",
             "Sin Archbishop": "Arcybiskup Grzechu",
+            "Gospel": "Ewangelia Kultu Wiedźmy",
+            "Unseen Hand": "Niewidzialna Ręka",
+            "Authority / Authority of Sloth / Greed": "Autorytet (Autorytet Leniwca / Chciwości)",
             "Dragon Kingdom of Lugnica": "Smocze Królestwo Lugnicy",
             "Royal Selection": "Królewska Selekcja",
-            "White Whale": "Biały Wieloryb",
-            "Mabeast": "Magiczna Bestia"
+            "Three Great Mabeasts": "Trzy Wielkie Magiczne Bestie",
+            "White Whale / Hakugei": "Biały Wieloryb",
+            "Great Rabbit": "Wielki Królik",
+            "Black Serpent": "Czarny Wąż",
+            "Mabeast": "Magiczna Bestia",
+            "Divine Protection / Blessing": "Boskie Błogosławieństwo (Boska Opieka)",
+            "Mana Gate": "Brama Many",
+            "Sanctuary": "Sanktuarium (Święte Miejsce)",
+            "Trial of the Sanctuary": "Próba Sanktuarium",
+            "Witch's Miasma / Witch's Scent": "Miazmat Wiedźmy (Zapach Wiedźmy)",
+            "Shadow Magic / Yin Magic": "Magia Cienia (Magia Yin)",
+            "Shamak / El Shamak / Ul Shamak": "Shamak / El Shamak (Magia Cienia)",
+            "Spirit Knight": "Rycerz Ducha",
+            "Sword Saint": "Święty Miecza (Reinhard)",
+            "Dragon Sword Reid": "Smoczy Miecz Reid",
+            "Subaru's Tracksuit": "Dres Subaru",
+            "Appa": "Appa (jabłkopodobny owoc)"
         },
         "character_forms": {
             "Subaru -> Emilia": "Emilia-tan / Emilia",
+            "Emilia -> Subaru": "Subaru / na ty",
             "Rem -> Subaru": "panie Subaru / Subaru-kun",
-            "Ram -> Subaru": "Barusu / głąbie"
+            "Ram -> Subaru": "Barusu / głąbie",
+            "Beatrice -> Subaru": "Subaru / na ty (Betty)",
+            "Subaru -> Beatrice": "Beako / Beatrice",
+            "Puck -> Emilia": "Lia / córeczko",
+            "Roswaal -> Subaru": "Subaru-kun",
+            "Subaru -> Reinhard": "Reinhard / na ty",
+            "Crusch -> Subaru": "panie Natsuki / Subaru",
+            "Felix -> Subaru": "Subaru-kyun",
+            "Garfiel -> Subaru": "kapitanie / szefie",
+            "Otto -> Subaru": "panie Natsuki / Subaru"
         }
     },
     "sword_art_online": {
