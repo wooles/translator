@@ -1620,8 +1620,6 @@ class MultimodalTranslator:
 
         for orig_idx, orig_event, _, ts_prefix in raw_all_entries:
             master_id = sub_to_master.get(orig_idx, orig_idx)
-            if master_id not in translated_results:
-                continue
             
             # If line is an OP/ED song, preserve original event text, styling and karaoke tags exactly 1:1
             if is_song_line(orig_event, orig_event.text):
@@ -1629,9 +1627,13 @@ class MultimodalTranslator:
                 final_subs.events.append(new_event)
                 continue
 
-            clean_translated_text = sanitize_sub_text(translated_results[master_id])
+            raw_pl = translated_results.get(master_id)
+            if not raw_pl:
+                raw_pl = orig_event.text
+
+            clean_translated_text = sanitize_sub_text(raw_pl)
             if not clean_translated_text:
-                continue
+                clean_translated_text = sanitize_sub_text(orig_event.text)
 
             # Auto-elevate bracketed signs/captions '[ ... ]' to top (\an8) if missing positioning to prevent collision with bottom subs/hardsubs
             clean_check = clean_translated_text.strip()
