@@ -760,29 +760,30 @@ class MultimodalTranslator:
                         time.sleep(1)
                         continue
 
+                MAX_RETRIES = 5
+                if attempt >= MAX_RETRIES:
+                    print(f"\n[Tłumacz / Faza 1]: Osiągnięto limit {MAX_RETRIES} prób dla serwera Google ({e}). Zastosowano awaryjny szkic.")
+                    return schema_class.model_validate({"translations": []})
+
                 import random
-                wait_time = random.uniform(0.05, 0.08)
+                wait_time = min(3.0, 0.35 * attempt + random.uniform(0.1, 0.25))
                 if is_timeout:
-                    if attempt == 1:
-                        timeout_sec = int(os.getenv("GEMINI_HTTP_TIMEOUT_MS", "120000")) // 1000
-                        print(f"\n[Tłumacz / Faza 1]: Serwer Google potrzebował więcej czasu na odpowiedź (limit {timeout_sec}s na {current_model}).")
-                        print("  [..] Szybki mikro-retry (60ms) do natychmiastowego przechwycenia TPU...")
+                    timeout_sec = int(os.getenv("GEMINI_HTTP_TIMEOUT_MS", "120000")) // 1000
+                    print(f"\n[Tłumacz / Faza 1]: Serwer Google potrzebował więcej czasu na odpowiedź (limit {timeout_sec}s na {current_model}) [Próba {attempt}/{MAX_RETRIES}].")
+                    print("  [..] Szybki mikro-retry do natychmiastowego przechwycenia TPU...")
                     time.sleep(wait_time)
                 elif is_unavailable:
-                    if attempt == 1:
-                        print(f"\n[Tłumacz / Faza 1]: Chwilowe przeciążenie serwerów Google (503 UNAVAILABLE na {current_model}).")
-                        print("  [..] Szybki mikro-retry (60ms) do natychmiastowego przechwycenia TPU...")
+                    print(f"\n[Tłumacz / Faza 1]: Chwilowe przeciążenie serwerów Google (503 UNAVAILABLE na {current_model}) [Próba {attempt}/{MAX_RETRIES}].")
+                    print("  [..] Szybki mikro-retry do natychmiastowego przechwycenia TPU...")
                     time.sleep(wait_time)
                 elif is_rate_limit:
-                    if attempt == 1:
-                        print(f"\n[Tłumacz / Faza 1]: Chwilowy limit minutowy zapytań (429 Rate Limit na {current_model}).")
-                        print("  [..] Szybki mikro-retry (60ms) do natychmiastowego przechwycenia TPU...")
+                    print(f"\n[Tłumacz / Faza 1]: Chwilowy limit minutowy zapytań (429 Rate Limit na {current_model}) [Próba {attempt}/{MAX_RETRIES}].")
+                    print("  [..] Szybki mikro-retry do natychmiastowego przechwycenia TPU...")
                     time.sleep(wait_time)
                 else:
-                    if attempt == 1:
-                        clean_msg = str(e).split("{")[0].strip() if "{" in str(e) else str(e)
-                        print(f"\n[Tłumacz / Faza 1]: Chwilowa przerwa w odpowiedzi API na {current_model} ({clean_msg}).")
-                        print("  [..] Szybki mikro-retry (60ms) do natychmiastowego przechwycenia TPU...")
+                    clean_msg = str(e).split("{")[0].strip() if "{" in str(e) else str(e)
+                    print(f"\n[Tłumacz / Faza 1]: Chwilowa przerwa w odpowiedzi API na {current_model} ({clean_msg}) [Próba {attempt}/{MAX_RETRIES}].")
+                    print("  [..] Szybki mikro-retry do natychmiastowego przechwycenia TPU...")
                     time.sleep(wait_time)
 
     def _process_single_batch(

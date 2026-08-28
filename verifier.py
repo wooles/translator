@@ -235,22 +235,24 @@ class DialogueVerifier:
                 is_unavailable = "503" in err_str or "unavailable" in err_str or "high demand" in err_str
                 is_rate_limit = "429" in err_str or "quota" in err_str or "resource_exhausted" in err_str
 
+                MAX_RETRIES = 5
+                if attempt >= MAX_RETRIES:
+                    print(f"\n[Redaktor Dialogów / Faza 2]: Osiągnięto limit {MAX_RETRIES} prób dla serwera Google ({e}). Zastosowano dopracowany szkic z Filarami AVT.")
+                    return [RefinedLine(id=it["id"], refined_pl=it["pl"]) for it in batch_items]
+
                 import random
-                wait_sec = min(3.0, 0.25 * (1.5 ** min(attempt, 4)) + random.uniform(0.05, 0.15))
+                wait_sec = min(3.0, 0.35 * attempt + random.uniform(0.1, 0.25))
                 if is_timeout:
-                    if attempt == 1:
-                        timeout_sec = int(os.getenv("GEMINI_HTTP_TIMEOUT_MS", "120000")) // 1000
-                        print(f"\n[Redaktor Dialogów / Faza 2]: Serwer Google potrzebował więcej czasu na analizę sceny (limit {timeout_sec}s na {self.model}).")
-                        print("  [..] Szybki mikro-retry do natychmiastowego przechwycenia TPU...")
+                    timeout_sec = int(os.getenv("GEMINI_HTTP_TIMEOUT_MS", "120000")) // 1000
+                    print(f"\n[Redaktor Dialogów / Faza 2]: Serwer Google potrzebował więcej czasu na analizę sceny (limit {timeout_sec}s na {self.model}) [Próba {attempt}/{MAX_RETRIES}].")
+                    print("  [..] Szybki mikro-retry do natychmiastowego przechwycenia TPU...")
                     time.sleep(wait_sec)
                 elif is_unavailable or is_rate_limit:
-                    if attempt == 1:
-                        print(f"\n[Redaktor Dialogów / Faza 2]: Chwilowe przeciążenie serwerów Google (503/429 na {self.model}).")
-                        print("  [..] Szybki mikro-retry do natychmiastowego przechwycenia TPU...")
+                    print(f"\n[Redaktor Dialogów / Faza 2]: Chwilowe przeciążenie serwerów Google (503/429 na {self.model}) [Próba {attempt}/{MAX_RETRIES}].")
+                    print("  [..] Szybki mikro-retry do natychmiastowego przechwycenia TPU...")
                     time.sleep(wait_sec)
                 else:
-                    if attempt == 1:
-                        clean_msg = str(e).split("{")[0].strip() if "{" in str(e) else str(e)
-                        print(f"\n[Redaktor Dialogów / Faza 2]: Chwilowa przerwa w odpowiedzi API na {self.model} ({clean_msg}).")
-                        print("  [..] Szybki mikro-retry do natychmiastowego przechwycenia TPU...")
+                    clean_msg = str(e).split("{")[0].strip() if "{" in str(e) else str(e)
+                    print(f"\n[Redaktor Dialogów / Faza 2]: Chwilowa przerwa w odpowiedzi API na {self.model} ({clean_msg}) [Próba {attempt}/{MAX_RETRIES}].")
+                    print("  [..] Szybki mikro-retry do natychmiastowego przechwycenia TPU...")
                     time.sleep(wait_sec)
