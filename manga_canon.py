@@ -5810,17 +5810,23 @@ Znasz na wylot katalogi wszystkich oficjalnych polskich wydawnictw:
 ZADANIE:
 Sprawdź, czy seria anime/manga '{primary_title}' (lub powiązane tytuły: {', '.join(all_candidates[:4])}) POSIADA OFICJALNE POLSKIE WYDANIE MANGI LUB LIGHT NOVEL wydane przez jakiekolwiek licencjonowane polskie wydawnictwo.
 
-Jeżeli seria została oficjalnie wydana w Polsce, zwróć WYCZERPUJĄCY, KOMPLETNY JSON ze WSZYSTKIMI kluczowymi nazwami własnymi, rangami, atakami, magią, lokacjami i formami zwrotów:
+Jeżeli seria została oficjalnie wydana w Polsce, zwróć WYCZERPUJĄCY, ENCYKLOPEDYCZNY słownik (minimum 25-40 kluczowych terminów) ze WSZYSTKIMI oficjalnymi polskimi nazwami:
+1. Wszystkie techniki walki, ataki, zaklęcia, formacje i transformacje.
+2. Wszystkie rangi wojskowe, szlacheckie, tytuły honorowe, gildie, sekty, zakony i organizacje.
+3. Wszystkie kluczowe krainy, miasta, twierdze, rzeki, artefakty, przedmioty i unikalne pojęcia świata.
+4. Wszystkie kanoniczne formy zwrotów i relacje między głównymi i pobocznymi postaciami.
+
+Struktura JSON:
 {{
   "has_polish_edition": true,
   "title": "Oficjalny Polski Tytuł (Oryginalny Tytuł)",
-  "publisher": "Wydawnictwo XYZ",
+  "publisher": "Wydawnictwo XYZ (np. Waneko, Studio JG, JPF, Kotori, Hanami, Dango)",
   "aliases": ["{primary_title.lower()}", "{slug}"],
   "glossary": {{
-    "Angielska/Japońska nazwa ataku, rangi, magii, frakcji lub lokacji": "Oficjalne polskie tłumaczenie z polskiego wydania mangi"
+    "Angielska/Japońska nazwa terminu": "Oficjalne polskie tłumaczenie z polskiego wydania mangi"
   }},
   "character_forms": {{
-    "PostaćA -> PostaćB": "kanoniczna forma zwrotu (np. panie X / po imieniu / na ty / mistrzu)"
+    "PostaćA -> PostaćB": "forma zwrotu i styl relacji (np. panie X / mistrzu / na ty / z szacunkiem)"
   }}
 }}
 
@@ -5842,7 +5848,13 @@ ZWRÓĆ WYŁĄCZNIE CZYSTY KOD JSON BEZ ZBĘDNYCH KOMENTARZY.
                 )
             )
             raw_text = resp.text.strip()
-            data = json.loads(raw_text)
+            if raw_text.startswith("```json"):
+                raw_text = raw_text[7:]
+            if raw_text.startswith("```"):
+                raw_text = raw_text[3:]
+            if raw_text.endswith("```"):
+                raw_text = raw_text[:-3]
+            data = json.loads(raw_text.strip())
 
             if data.get("has_polish_edition") and data.get("title") and data.get("publisher"):
                 entry_data = {
