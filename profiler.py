@@ -102,12 +102,12 @@ class CharacterDossier(BaseModel):
 
 
 class EpisodeProfile(BaseModel):
-    episode_summary: str = Field(description="Krótkie 2-3 zdaniowe streszczenie fabuły i tonu odcinka")
+    episode_summary: str = Field(default="", description="Krótkie 2-3 zdaniowe streszczenie fabuły i tonu odcinka")
     setting_and_era: str = Field(default="", description="Epoka historyczna, czas i miejsce akcji (np. 'XIII wiek, Imperium Mongolskie', 'Współczesne Tokio')")
     domain_expertise: str = Field(default="", description="Specjalistyczna dziedzina wiedzy i profesjonalna terminologia branżowa (np. 'Enologia / Sommelierstwo: terminologia winiarska, szczepy, apelacje', 'Szachy / Shogi')")
     dialogue_stylization: str = Field(default="", description="Wytyczne stylizacji rejestru języka i zakazy/nakazy słownictwa dla tej epoki")
     manga_canon_source: Optional[str] = Field(default="", description="Oficjalne polskie wydawnictwo mangi (np. Waneko, J.P.Fantastica, Studio JG, Hanami), jeśli seria była wydana w Polsce")
-    tone_and_genre: str = Field(description="Gatunek i dominujący ton emocjonalny (np. 'Komediodramat młodzieżowy, ciepły z elementami absurdu')")
+    tone_and_genre: str = Field(default="", description="Gatunek i dominujący ton emocjonalny (np. 'Komediodramat młodzieżowy, ciepły z elementami absurdu')")
     danger_lines_prescan: List[DangerLinePreScan] = Field(default_factory=list, description="Lista wyłapanych przed tłumaczeniem niebezpiecznych pułapek kontekstowych i wieloznaczności w całym odcinku")
     relationship_pivots: List[RelationshipPivot] = Field(default_factory=list, description="Punkty zwrotne i dynamiczne zmiany w relacjach/formach zwrotu w trakcie odcinka")
     character_catchphrases: List[CharacterCatchphrase] = Field(default_factory=list, description="Zamrożone kanoniczne polskie odpowiedniki dla powracających powiedzonek postaci")
@@ -264,7 +264,8 @@ Zwróć wynik w formacie JSON zgodnym ze schematem EpisodeProfile."""
 
         import time
         attempt = 0
-        MAX_PROFILER_RETRIES = 4
+        num_keys = len(self.client_pool.clients) if hasattr(self, "client_pool") and self.client_pool and hasattr(self.client_pool, "clients") else 1
+        MAX_PROFILER_RETRIES = max(15, num_keys * 2)
 
         while True:
             attempt += 1
@@ -308,7 +309,10 @@ Zwróć wynik w formacie JSON zgodnym ze schematem EpisodeProfile."""
 
                 if attempt >= MAX_PROFILER_RETRIES:
                     print(f"\n[Profiler Odcinka]: Serwery Google są chwilowo zajęte (503/429 na {self.model}). Zastosowano profil domyślny...")
-                    return EpisodeProfile(episode_summary="Analiza sceniczna w toku tłumaczenia")
+                    return EpisodeProfile(
+                        episode_summary="Analiza sceniczna w toku tłumaczenia",
+                        tone_and_genre="Dramat historyczny / przygodowy"
+                    )
 
                 import random
                 # Zero-Wait Multi-Key Hopping (200ms between keys; micro-pause after full key round)
