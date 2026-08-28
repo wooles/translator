@@ -1073,15 +1073,13 @@ class MultimodalTranslator:
                 clean_ref = sanitize_sub_text(r.refined_pl)
                 ch_desc = (getattr(r, 'changes_made', '') or '').strip()
                 
-                # Check if there is an actual textual modification
+                # Check if there is an actual textual modification or meaningful redaction note
                 has_text_change = orig_pl and (orig_pl.strip() != clean_ref.strip())
+                has_meaningful_note = bool(ch_desc and "Zweryfikowano" not in ch_desc and ch_desc.lower() != "null")
                 
-                if has_text_change:
-                    if ch_desc and "Zweryfikowano" not in ch_desc and ch_desc.lower() != "null":
-                        clean_note = ch_desc if ch_desc.startswith("[") else f"[{ch_desc}]"
-                        pillar_note = f" {clean_note}"
-                    else:
-                        pillar_note = ""
+                if has_text_change or has_meaningful_note:
+                    clean_note = ch_desc if ch_desc.startswith("[") else (f"[{ch_desc}]" if ch_desc else "")
+                    pillar_note = f" {clean_note}" if clean_note else ""
                     
                     # Strip internal ASS tags (like {\i1}, {\i0}) for pure, clean console display
                     disp_orig = re.sub(r"\{[^\}]*\}", "", orig_pl).strip()
@@ -1090,9 +1088,6 @@ class MultimodalTranslator:
                     pbar.write(f" └─ [Redaktor Dialogów] #{r.id}{pillar_note}")
                     pbar.write(f"    ├─ Szkic:  \"{disp_orig}\"")
                     pbar.write(f"    └─ Szlif:  \"{disp_ref}\"")
-                elif ch_desc and "Zweryfikowano" not in ch_desc and ch_desc.lower() != "null":
-                    clean_note = ch_desc if ch_desc.startswith("[") else f"[{ch_desc}]"
-                    pbar.write(f" └─ [Redaktor Dialogów] #{r.id} {clean_note}")
             for item in pass1_items:
                 raw_final = sanitize_sub_text(refined_dict.get(item["id"], item["pl"]))
                 final_text, fixes = AVTLinter.lint_and_fix_line(
