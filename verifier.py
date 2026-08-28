@@ -14,7 +14,7 @@ from rules import get_verifier_system_prompt, SceneDiagnosis
 class RefinedLine(BaseModel):
     id: int = Field(description="ID kwestii dialogowej zgodne z wejściem")
     refined_pl: str = Field(description="Ostateczna, perfekcyjnie zredagowana kwestia w języku polskim, wolna od kalek")
-    changes_made: Optional[str] = Field(default=None, description="Zwięzłe uzasadnienie redakcyjne i numer Filaru AVT dla każdej poprawionej kwestii, np. '[Filar IV] Zmieniono szyk'")
+    changes_made: str = Field(default="[Filar I] Zweryfikowano naturalność", description="Obowiązkowe uzasadnienie redakcyjne i numer Filaru AVT dla każdej kwestii, np. '[Filar IV] Zmieniono szyk'")
 
 class RefinedBatchResponse(BaseModel):
     scene_diagnosis: Optional[SceneDiagnosis] = Field(default=None, description="Diagnoza i weryfikacja intencji dramaturgicznych sceny")
@@ -68,6 +68,7 @@ class DialogueVerifier:
         prompt_lines = []
         prompt_lines.append("Zredaguj poniższe kwestie dialogowe. BEZWZGLĘDNIE wyeliminuj dosłowne tłumaczenie 1 do 1, sztuczne konstrukcje i kalki.")
         prompt_lines.append("Zastąp drewniane sformułowania żywym, potoczystym językiem polskim mówionym (tak jak w profesjonalnym dubbingu / u polskich nastolatków):")
+        prompt_lines.append("DLA KAŻDEJ KWESTII w polu 'changes_made' BEZWZGLĘDNIE podaj opis i numer Filaru AVT (np. '[Filar IV] Zmieniono szyk i usunięto kalkę' lub '[Filar I] Potwierdzono naturalną polszczyznę').")
         
         if user_feedback_str:
             prompt_lines.append(f"\n{user_feedback_str}\n")

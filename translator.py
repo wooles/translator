@@ -1106,8 +1106,16 @@ class MultimodalTranslator:
             )
             refined_dict = {r.id: sanitize_sub_text(r.refined_pl) for r in refined_lines}
             for r in refined_lines:
-                if r.changes_made:
-                    pbar.write(f" └─ [Redaktor Dialogów] {r.changes_made}")
+                orig_item = next((it for it in pass1_items if it["id"] == r.id), None)
+                orig_pl = orig_item["pl"] if orig_item else ""
+                clean_ref = sanitize_sub_text(r.refined_pl)
+                ch_desc = getattr(r, 'changes_made', '') or ''
+                if ch_desc:
+                    pbar.write(f" └─ [Redaktor Dialogów] #{r.id} {ch_desc}")
+                elif orig_pl and orig_pl != clean_ref:
+                    pbar.write(f" └─ [Redaktor Dialogów] #{r.id} \"{orig_pl}\" ➔ \"{clean_ref}\"")
+                elif clean_ref:
+                    pbar.write(f" └─ [Redaktor Dialogów] #{r.id} ✓ \"{clean_ref}\"")
             for item in pass1_items:
                 raw_final = sanitize_sub_text(refined_dict.get(item["id"], item["pl"]))
                 final_text, fixes = AVTLinter.lint_and_fix_line(
