@@ -1347,6 +1347,7 @@ SPECYFIKA PRZEKŁADU ANIME, GŁOSU ORAZ JĘZYKA JAPOŃSKIEGO:
    - "daijoubu" (大丈夫) = "wszystko w porządku", "nic mi nie jest", "spokojnie".
    - "naruhodo" (なるほど) = "rozumiem", "aha", "no tak".
    - "kami / kami-sama" (神 / 神様) = w mowie potocznej z uwielbieniem o kimś, kto pomógł/przyniósł jedzenie: "Bogini!", "Jesteś bóstwem!", "Zbawczyni!", "Anioł, nie kobieta!" (BEZWZGLĘDNY ZAKAZ: "Na zdrowie"!).
+   - "warukatta na / warikatta na / warui" (悪かったな / 悪い) = "Moja wina..." / "Wybacz..." / "Przepraszam..." (KATEGORYCZNY ZAKAZ liczby mnogiej "Wybaczcie" w scenach 1:1, gdy postać mówi do jednego rozmówcy!).
 4. ELIPTYCZNOŚĆ (DOMYŚLNY PODMIOT) I ROZPOZNAWANIE MÓWCY:
    - Japoński niemal zawsze pomija podmioty ("watashi", "anata", "watashitachi").
    - KTO MÓWI NA KADRZE:

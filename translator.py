@@ -233,6 +233,12 @@ def detect_audio_discrepancy(jp_text: str, pl_text: str, en_text: str) -> Option
         if pl_lower.startswith("całe ") or pl_lower.startswith("cały ") or pl_lower.startswith("to cały ") or "wszyscy" in pl_lower:
             return "W audio pada 'Sasuga' (uznanie/podziw dla kunsztu i reputacji: 'jak przystało na...') -> Zamień mylącą kalkę ('Całe plemię...') na szlachetne 'Jak przystało na [postać/plemię]...' / 'Tego należało się spodziewać po...' (Filar CXI)."
 
+    # 11. Warukatta / Warikatta / Warui (singular informal apology) vs plural 'Wybaczcie'
+    warui_keys = ["warukatta", "warikatta", "warui", "warui na", "warukatta na", "warukattana", "warikattana"]
+    if any(k in rom_lower for k in warui_keys) or any(k in clean_jp for k in ["悪かった", "悪い"]):
+        if any(w in pl_lower for w in ["wybaczcie", "przeproście", "przepraszamy"]):
+            return "W audio pada pojedyncze 'Warukatta na / Warui' (Moja wina / Wybacz) -> Zamień błędną liczbę mnogą ('Wybaczcie') na naturalną liczbę pojedynczą: 'Wybacz...' lub 'Moja wina...' (Filar CXXVI)."
+
     return None
 
 def detect_japanese_pragmatic_register(jp_text: str, en_text: str = "") -> Optional[str]:

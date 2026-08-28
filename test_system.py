@@ -1189,6 +1189,14 @@ def test_translator_logger_and_sign_detector():
     )
     assert alert_sasuga is not None and "Sasuga" in alert_sasuga
 
+    # Test Warukatta na alert (Singular informal apology vs plural Wybaczcie)
+    alert_warukatta = translator.detect_audio_discrepancy(
+        jp_text="悪かったな [Warukatta na]",
+        pl_text="Wybaczcie.",
+        en_text="Sorry."
+    )
+    assert alert_warukatta is not None and "Warukatta" in alert_warukatta
+
     # Test Flashback 1:1 memory formatting
     from memory import format_translation_memory_for_prompt
     formatted_mem = format_translation_memory_for_prompt([
