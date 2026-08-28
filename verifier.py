@@ -147,6 +147,7 @@ class DialogueVerifier:
 
         while True:
             attempt += 1
+            cached_name = None
             try:
                 from context_cache import ContextCacheManager
                 gen_config_kwargs = {
@@ -159,6 +160,7 @@ class DialogueVerifier:
                 import concurrent.futures
 
                 def _single_generate():
+                    nonlocal cached_name
                     from client_factory import global_rate_limiter
                     global_rate_limiter.acquire()
                     active_c = self.client_pool.get_client() if hasattr(self, "client_pool") and self.client_pool else self.client
