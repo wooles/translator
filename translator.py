@@ -1791,10 +1791,14 @@ class MultimodalTranslator:
         except Exception:
             pass
 
-        # Clean up server-side Context Cache objects to avoid storage fees
+        # Clean up server-side Context Cache objects across all clients in the pool to avoid storage fees
         try:
             from context_cache import ContextCacheManager
-            ContextCacheManager.cleanup_all_active_caches(self.client)
+            if hasattr(self, "client_pool") and self.client_pool and hasattr(self.client_pool, "clients"):
+                for c in self.client_pool.clients:
+                    ContextCacheManager.cleanup_all_active_caches(c)
+            else:
+                ContextCacheManager.cleanup_all_active_caches(self.client)
             if self.verifier and hasattr(self.verifier, "client") and self.verifier.client != self.client:
                 ContextCacheManager.cleanup_all_active_caches(self.verifier.client)
         except Exception:
