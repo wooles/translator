@@ -1865,19 +1865,34 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
         "aliases": [
             "tongari boushi no atelier",
             "witch hat atelier",
-            "atelier spiczastych kapeluszy"
+            "atelier spiczastych kapeluszy",
+            "atelier szpiczastych kapelusznikow",
+            "atelier szpiczastych kapeluszy",
+            "tongari boushi"
         ],
         "publisher": "Wydawnictwo Kotori",
         "glossary": {
-            "Pointed Hat": "Spiczasty Kapelusz",
-            "Brimmed Hat": "Rondo / Kapelusze z Rondem",
+            "Pointed Hat / Pointed Caps": "Spiczasty Kapelusz (Magowie Prawi)",
+            "Brimmed Hat / Brimmed Caps": "Kapelusze z Rondem (Magowie Wyklęci / Wrogowie)",
             "Magic Ink": "Magiczny Atrament",
+            "Forbidden Magic": "Magia Zakazana (Magia Ciała i Ludzi)",
+            "Knights of Moralis": "Rycerze Moralis (Strażnicy Praw Magii)",
+            "Great Hall": "Wielka Sala Magów (Rada Siedmiu)",
+            "Atelier": "Atelier (Pracownia Magiczna)",
+            "Magic Crest / Glyph": "Pieczęć Magiczna / Glif",
             "Keystones": "Kamienie Kluczowe",
-            "Great Hall": "Wielka Sala Magów"
+            "Silverwood": "Srebrnodrzew",
+            "Magic Wand / Pen": "Rysik Magiczny / Pióro Magiczne",
+            "Silver Night Festival": "Festiwal Srebrnej Nocy"
         },
         "character_forms": {
             "Coco -> Qifrey": "mistrzu Qifrey",
-            "Agott -> Coco": "Coco / na ty"
+            "Agott -> Coco": "Coco / na ty",
+            "Tetia -> Coco": "Coco / na ty",
+            "Richeh -> Coco": "Coco / na ty",
+            "Olruggio -> Qifrey": "Qifrey / na ty",
+            "Qifrey -> Olruggio": "Olruggio / na ty",
+            "Coco -> Beldaruit": "Wielki Mędrcu Beldaruit / panie Beldaruit"
         }
     },
     "chihayafuru": {
