@@ -650,11 +650,6 @@ class MultimodalTranslator:
             attempt += 1
             try:
                 from context_cache import ContextCacheManager
-                cached_name = ContextCacheManager.get_or_create_cache(
-                    client=self.client,
-                    model=current_model,
-                    system_instruction=self.system_prompt
-                )
                 gen_config_kwargs = {
                     "response_mime_type": "application/json",
                     "response_schema": schema_class,
@@ -666,18 +661,23 @@ class MultimodalTranslator:
                     else:
                         gen_config_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=1024)
 
-                if cached_name:
-                    gen_config_kwargs["cached_content"] = cached_name
-                else:
-                    gen_config_kwargs["system_instruction"] = self.system_prompt
-
                 import concurrent.futures
 
                 def _single_generate():
                     from client_factory import global_rate_limiter
                     global_rate_limiter.acquire()
-                    cfg = types.GenerateContentConfig(**gen_config_kwargs)
-                    active_c = self.client_pool.get_client() if hasattr(self, "client_pool") else self.client
+                    active_c = self.client_pool.get_client() if hasattr(self, "client_pool") and self.client_pool else self.client
+                    cached_name = ContextCacheManager.get_or_create_cache(
+                        client=active_c,
+                        model=current_model,
+                        system_instruction=self.system_prompt
+                    )
+                    cfg_kwargs = dict(gen_config_kwargs)
+                    if cached_name:
+                        cfg_kwargs["cached_content"] = cached_name
+                    else:
+                        cfg_kwargs["system_instruction"] = self.system_prompt
+                    cfg = types.GenerateContentConfig(**cfg_kwargs)
                     return active_c.models.generate_content(
                         model=current_model,
                         contents=contents,
@@ -1418,15 +1418,17 @@ class MultimodalTranslator:
         # 0e. Pre-warming and Context Cache Hard Protection (guarantees -75% discount)
         from context_cache import ContextCacheManager
         print(f"  [Infrastruktura Finansowa]: Weryfikacja i rozgrzewanie pamięci Context Cache...")
-        c1 = ContextCacheManager.ensure_cache_ready(self.client, self.model_phase1, self.system_prompt)
+        pool_or_c1 = self.client_pool if hasattr(self, "client_pool") and self.client_pool else self.client
+        c1 = ContextCacheManager.ensure_cache_ready(pool_or_c1, self.model_phase1, self.system_prompt)
         if not c1:
             raise RuntimeError(
                 f"KATEGORYCZNA BLOKADA FINANSOWA: Nie udało się aktywować serwerowego Context Cache dla {self.model_phase1}. "
                 "Aby uchronić Twój portfel przed naliczeniem 4-krotnie wyższej stawki pełnej ($1.25/1M), proces został bezpiecznie wstrzymany. "
                 "Sprawdź połączenie z Google API lub stan konta i spróbuj ponownie."
             )
-        if self.verifier and hasattr(self.verifier, "client") and hasattr(self.verifier, "model") and hasattr(self.verifier, "system_prompt"):
-            c2 = ContextCacheManager.ensure_cache_ready(self.verifier.client, self.verifier.model, self.verifier.system_prompt)
+        if self.verifier and hasattr(self.verifier, "model") and hasattr(self.verifier, "system_prompt"):
+            pool_or_c2 = getattr(self.verifier, "client_pool", None) or getattr(self.verifier, "client", None)
+            c2 = ContextCacheManager.ensure_cache_ready(pool_or_c2, self.verifier.model, self.verifier.system_prompt)
             if not c2:
                 raise RuntimeError(
                     f"KATEGORYCZNA BLOKADA FINANSOWA: Nie udało się aktywować serwerowego Context Cache dla weryfikatora ({self.verifier.model}). "

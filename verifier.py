@@ -149,11 +149,6 @@ class DialogueVerifier:
             attempt += 1
             try:
                 from context_cache import ContextCacheManager
-                cached_name = ContextCacheManager.get_or_create_cache(
-                    client=self.client,
-                    model=self.model,
-                    system_instruction=self.system_prompt
-                )
                 gen_config_kwargs = {
                     "response_mime_type": "application/json",
                     "response_schema": RefinedBatchResponse,
@@ -161,18 +156,23 @@ class DialogueVerifier:
                 if "3.7" in self.model.lower() or "pro" in self.model.lower() or "2.5" in self.model.lower() or "3.6" in self.model.lower():
                     gen_config_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=effective_budget)
 
-                if cached_name:
-                    gen_config_kwargs["cached_content"] = cached_name
-                else:
-                    gen_config_kwargs["system_instruction"] = self.system_prompt
-
                 import concurrent.futures
 
                 def _single_generate():
                     from client_factory import global_rate_limiter
                     global_rate_limiter.acquire()
-                    cfg = types.GenerateContentConfig(**gen_config_kwargs)
-                    active_c = self.client_pool.get_client() if hasattr(self, "client_pool") else self.client
+                    active_c = self.client_pool.get_client() if hasattr(self, "client_pool") and self.client_pool else self.client
+                    cached_name = ContextCacheManager.get_or_create_cache(
+                        client=active_c,
+                        model=self.model,
+                        system_instruction=self.system_prompt
+                    )
+                    cfg_kwargs = dict(gen_config_kwargs)
+                    if cached_name:
+                        cfg_kwargs["cached_content"] = cached_name
+                    else:
+                        cfg_kwargs["system_instruction"] = self.system_prompt
+                    cfg = types.GenerateContentConfig(**cfg_kwargs)
                     return active_c.models.generate_content(
                         model=self.model,
                         contents=[prompt_text],

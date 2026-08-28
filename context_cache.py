@@ -11,7 +11,7 @@ Rolling Keep-Alive Heartbeat Architecture:
 
 import hashlib
 import logging
-from typing import Optional, Dict
+from typing import Optional, Dict, Any, Union
 from google import genai
 from google.genai import types
 
@@ -31,15 +31,25 @@ class ContextCacheManager:
         return model.replace("models/", "").replace("-preview", "").replace(".", "_").replace("-", "_")
 
     @staticmethod
-    def get_content_hash(model: str, system_instruction: str) -> str:
-        """Generates a unique SHA-256 hash from model name and full system instruction text."""
-        content = f"{model}::{system_instruction}"
+    def _get_client_id(client: Optional[Any]) -> str:
+        """Extracts unique client identifier (API key hash or object id)."""
+        if client:
+            if hasattr(client, "_api_client") and hasattr(client._api_client, "api_key") and client._api_client.api_key:
+                return hashlib.sha256(client._api_client.api_key.encode("utf-8")).hexdigest()[:8]
+            return str(id(client))
+        return "default"
+
+    @classmethod
+    def get_content_hash(cls, model: str, system_instruction: str, client: Optional[Any] = None) -> str:
+        """Generates a unique SHA-256 hash from client key, model name and full system instruction text."""
+        client_id = cls._get_client_id(client)
+        content = f"{client_id}::{model}::{system_instruction}"
         return hashlib.sha256(content.encode("utf-8")).hexdigest()[:16]
 
     @classmethod
-    def invalidate_cache(cls, model: str, system_instruction: str):
+    def invalidate_cache(cls, model: str, system_instruction: str, client: Optional[Any] = None):
         """Removes an entry from the local registry upon 403 or invalidation."""
-        content_hash = cls.get_content_hash(model, system_instruction)
+        content_hash = cls.get_content_hash(model, system_instruction, client=client)
         _LOCAL_CACHE_REGISTRY.pop(content_hash, None)
 
     @classmethod
@@ -52,12 +62,12 @@ class ContextCacheManager:
     ) -> Optional[str]:
         """
         Retrieves existing or creates new CachedContent on Google servers with safe 20-minute expiration.
-        Strictly isolates cache between models (Flash vs Pro) and only cleans outdated versions of the SAME model.
+        Strictly isolates cache per Google Cloud Project / API key and per model.
         """
         if not client or not system_instruction:
             return None
 
-        content_hash = cls.get_content_hash(model, system_instruction)
+        content_hash = cls.get_content_hash(model, system_instruction, client=client)
 
         # 1. Check in-process local memory
         if content_hash in _LOCAL_CACHE_REGISTRY:
@@ -132,7 +142,7 @@ class ContextCacheManager:
     @classmethod
     def ensure_cache_ready(
         cls,
-        client: genai.Client,
+        client: Any,
         model: str,
         system_instruction: str,
         verbose: bool = True
@@ -140,19 +150,30 @@ class ContextCacheManager:
         """
         Guarantees that server cache is active and locked before translation begins,
         protecting against unauthorized full-rate billing.
+        If a MultiKeyClientPool is provided, warms caches across all keys in the pool.
         """
         if not client or not system_instruction:
             return None
 
-        cache_name = cls.get_or_create_cache(client, model, system_instruction)
-        if cache_name:
-            if verbose:
-                print(f"  [Context Cache]: Locked -75% server discount for {model}.")
-            return cache_name
+        if hasattr(client, "clients") and client.clients:
+            primary_name = None
+            for c in client.clients:
+                res = cls.get_or_create_cache(c, model, system_instruction)
+                if not primary_name:
+                    primary_name = res
+            if primary_name and verbose:
+                print(f"  [Context Cache]: Locked -75% server discount for {model} (Active across {len(client.clients)} API channel(s)).")
+            return primary_name
         else:
-            if verbose:
-                print(f"  [Context Cache / WARNING]: Cache unavailable for {model} - requests may be billed at standard rate.")
-            return None
+            cache_name = cls.get_or_create_cache(client, model, system_instruction)
+            if cache_name:
+                if verbose:
+                    print(f"  [Context Cache]: Locked -75% server discount for {model}.")
+                return cache_name
+            else:
+                if verbose:
+                    print(f"  [Context Cache / WARNING]: Cache unavailable for {model} - requests may be billed at standard rate.")
+                return None
 
     @classmethod
     def touch_cache(cls, client: genai.Client, cache_name: str, ttl_seconds: int = DEFAULT_CACHE_TTL_SECONDS):
