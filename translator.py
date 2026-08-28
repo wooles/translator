@@ -683,19 +683,8 @@ class MultimodalTranslator:
                         config=cfg
                     )
 
-                # Speculative Hedging on Google AI Studio: calibrate timeout for thinking mode (45s for deep CoT)
-                hedge_timeout = 45.0 if ("thinking_config" in gen_config_kwargs and gen_config_kwargs["thinking_config"].thinking_budget > 0) else 5.0
-                if "flash" in current_model.lower():
-                    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as hedge_executor:
-                        f1 = hedge_executor.submit(_single_generate)
-                        try:
-                            response = f1.result(timeout=hedge_timeout)
-                        except concurrent.futures.TimeoutError:
-                            f2 = hedge_executor.submit(_single_generate)
-                            done, _ = concurrent.futures.wait([f1, f2], return_when=concurrent.futures.FIRST_COMPLETED)
-                            response = list(done)[0].result()
-                else:
-                    response = _single_generate()
+                # Direct generation using thread-safe client pool and token bucket limiter
+                response = _single_generate()
 
                 if hasattr(response, "usage_metadata") and response.usage_metadata:
                     um = response.usage_metadata
@@ -776,6 +765,10 @@ class MultimodalTranslator:
         """
         Translates and refines a single batch of dialogue lines (Thread-Safe).
         """
+        # Micro-stagger entry across worker threads to avoid burst gateway collisions on Google TPUs
+        if self.concurrent_batches > 1:
+            time.sleep((b_idx % self.concurrent_batches) * 0.2)
+
         # Retrieve upcoming lines (Lookahead Window)
         lookahead_events = []
         if b_idx + 1 < len(batches):
