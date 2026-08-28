@@ -1278,12 +1278,16 @@ def test_masterclass_2_innovations():
     assert r"\an8" in enhanced or r"\pos" in enhanced
     assert r"\3c&H" in enhanced
 
-    # 3. Test Diarizacji Dialogów Symultanicznych (Simultaneous Dialogue AVT)
-    ev_sim1 = pysubs2.SSAEvent(start=10000, end=13000, text="Uważaj z lewej strony!", style="Default")
-    ev_sim2 = pysubs2.SSAEvent(start=10200, end=13200, text="Już za późno!", style="Default")
-    formatted_sim = apply_simultaneous_dialogue_formatting([ev_sim1, ev_sim2])
-    assert formatted_sim[0].text.startswith("- ")
-    assert formatted_sim[1].text.startswith("- ")
+    # 3. Test Diarizacji Dialogów Symultanicznych i Czystości Myślników (Simultaneous Dialogue AVT)
+    from translator import clean_orphaned_dialogue_dashes
+    single_speaker = "- Sajotchi, słyszałam, że to kara boska?"
+    assert clean_orphaned_dialogue_dashes(single_speaker) == "Sajotchi, słyszałam, że to kara boska?"
+    dual_speaker = r"- Cześć!\N- Hejka!"
+    assert clean_orphaned_dialogue_dashes(dual_speaker) == r"- Cześć!\N- Hejka!"
+
+    ev_sim1 = pysubs2.SSAEvent(start=10000, end=13000, text="- Uważaj z lewej strony!", style="Default")
+    formatted_sim = apply_simultaneous_dialogue_formatting([ev_sim1])
+    assert formatted_sim[0].text == "Uważaj z lewej strony!"
 
     # 4. Test 1-Click Learn
     fb = UserFeedbackManager()

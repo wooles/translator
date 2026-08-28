@@ -329,47 +329,35 @@ def is_song_line(ev: Any, text: str) -> bool:
         
     return False
 
+def clean_orphaned_dialogue_dashes(text: str) -> str:
+    """
+    Strips accidental leading dialogue dashes on single-speaker lines.
+    In AVT standards, a dialogue dash ('- ') is ONLY valid when two different
+    characters speak in the same subtitle block (e.g., '- Line 1\\N- Line 2').
+    If a subtitle has only one speaker, leading dashes are visual noise.
+    """
+    if not text:
+        return text
+    
+    # If the text has a second line with a dash (e.g. "\N- " or "\n- "), it is a valid dual-speaker block!
+    if r"\N-" in text or r"\N -" in text or r"\N–" in text or r"\N –" in text or "\n-" in text or "\n -" in text:
+        return text
+        
+    ts_prefix, clean_body = extract_typesetting_tags(text)
+    # Strip leading dash on single-speaker line
+    clean_body = re.sub(r"^[-–—]\s*", "", clean_body)
+    return f"{ts_prefix}{clean_body}" if ts_prefix else clean_body
+
 def apply_simultaneous_dialogue_formatting(events: List[Any]) -> List[Any]:
     """
     Simultaneous Dialogue Formatting (AVT Standard):
-    When two characters speak simultaneously during an overlapping time window,
-    adds dialogue dashes (- Line) to immediately distinguish parallel voices.
+    Ensures that single-speaker lines do NOT have orphaned leading dashes,
+    while multi-speaker lines within a single subtitle block correctly use dialogue dashes.
     """
-    if len(events) < 2:
-        return events
-
-    # Chronological sort
-    sorted_events = sorted(events, key=lambda e: e.start)
-    n = len(sorted_events)
-    simultaneous_indices = set()
-
-    for i in range(n):
-        ev_a = sorted_events[i]
-        # Skip on-screen signs and song lines
-        if (ev_a.style or "").lower() in ["sign", "signs", "title"] or "♪" in ev_a.text or r"\an8" in ev_a.text:
-            continue
-        for j in range(i + 1, n):
-            ev_b = sorted_events[j]
-            if (ev_b.style or "").lower() in ["sign", "signs", "title"] or "♪" in ev_b.text or r"\an8" in ev_b.text:
-                continue
-            if ev_b.start >= ev_a.end - 150:
-                break  # subsequent lines are outside overlap window
-
-            # Overlap in time by at least 300 ms
-            overlap = min(ev_a.end, ev_b.end) - max(ev_a.start, ev_b.start)
-            if overlap >= 300:
-                simultaneous_indices.add(i)
-                simultaneous_indices.add(j)
-
-    for idx in simultaneous_indices:
-        ev = sorted_events[idx]
-        ts_prefix, clean_body = extract_typesetting_tags(ev.text)
-        if not clean_body or clean_body.startswith(("-", "–", "—", "[", "(")):
-            continue
-        # Add AVT dialogue dash
-        ev.text = f"{ts_prefix}- {clean_body}" if ts_prefix else f"- {clean_body}"
-
-    return sorted_events
+    for ev in events:
+        if ev.text and not is_song_line(ev, ev.text):
+            ev.text = clean_orphaned_dialogue_dashes(ev.text)
+    return events
 
 def create_adaptive_batches(raw_entries: list, base_batch_size: int = 24, max_batch_size: int = 32) -> list:
     """
