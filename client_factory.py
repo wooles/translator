@@ -125,7 +125,7 @@ class TokenBucketLimiter:
                 time.sleep(max(0.005, wait + random.uniform(0.002, 0.008)))
 
 
-# Global singleton instance for the entire translator process
-global_rate_limiter = TokenBucketLimiter(rate_per_second=18.0, burst_capacity=4)
+# Global singleton instance for the entire translator process (Tier 2 High Throughput)
+global_rate_limiter = TokenBucketLimiter(rate_per_second=float(os.getenv("RATE_LIMIT_PER_SEC", "35.0")), burst_capacity=8)
 
 

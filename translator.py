@@ -483,7 +483,7 @@ class MultimodalTranslator:
         self.current_episode_tokens: Dict[str, Any] = {"prompt": 0, "cached": 0, "output": 0, "model": self.model}
         import threading
         self.lock = threading.Lock()
-        self.concurrent_batches = int(os.getenv("CONCURRENT_BATCHES", "3"))
+        self.concurrent_batches = int(os.getenv("CONCURRENT_BATCHES", "6"))
 
     def _prepare_batch_prompt(
         self,
