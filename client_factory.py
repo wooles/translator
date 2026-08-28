@@ -83,7 +83,7 @@ class MultiKeyClientPool:
             if k:
                 self.clients.append(genai.Client(api_key=k, http_options=http_opts))
             else:
-                self.clients.append(genai.Client(http_opts=http_opts))
+                self.clients.append(genai.Client(http_options=http_opts))
 
         logger.info(f"[MultiKey Pool]: Active gateway pool with {len(self.clients)} API channel(s).")
 
