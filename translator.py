@@ -1118,12 +1118,17 @@ class MultimodalTranslator:
                 orig_pl = orig_item["pl"] if orig_item else ""
                 clean_ref = sanitize_sub_text(r.refined_pl)
                 ch_desc = getattr(r, 'changes_made', '') or ''
-                if ch_desc:
+                
+                # Check if there is an actual textual modification
+                has_text_change = orig_pl and (orig_pl.strip() != clean_ref.strip())
+                
+                if has_text_change:
+                    pillar_note = f" [{ch_desc}]" if ch_desc and "Zweryfikowano" not in ch_desc else ""
+                    pbar.write(f" └─ [Redaktor Dialogów] #{r.id}{pillar_note}")
+                    pbar.write(f"    ├─ Szkic:  \"{orig_pl}\"")
+                    pbar.write(f"    └─ Szlif:  \"{clean_ref}\"")
+                elif ch_desc and "Zweryfikowano" not in ch_desc and ch_desc.lower() != "null":
                     pbar.write(f" └─ [Redaktor Dialogów] #{r.id} {ch_desc}")
-                elif orig_pl and orig_pl != clean_ref:
-                    pbar.write(f" └─ [Redaktor Dialogów] #{r.id} \"{orig_pl}\" ➔ \"{clean_ref}\"")
-                elif clean_ref:
-                    pbar.write(f" └─ [Redaktor Dialogów] #{r.id} ✓ \"{clean_ref}\"")
             for item in pass1_items:
                 raw_final = sanitize_sub_text(refined_dict.get(item["id"], item["pl"]))
                 final_text, fixes = AVTLinter.lint_and_fix_line(
