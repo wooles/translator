@@ -766,7 +766,7 @@ class MultimodalTranslator:
         """
         # Micro-stagger entry across worker threads to avoid burst gateway collisions on Google TPUs
         if self.concurrent_batches > 1:
-            time.sleep((b_idx % self.concurrent_batches) * 0.2)
+            time.sleep((b_idx % self.concurrent_batches) * 0.4)
 
         # Retrieve upcoming lines (Lookahead Window)
         lookahead_events = []
@@ -1463,7 +1463,10 @@ class MultimodalTranslator:
                 suffix = "..." if len(episode_profile.glossary) > 6 else ""
                 print(f"  [Słowniczek Odcinka]: {terms_preview}{suffix}")
         if self.whisper:
-            print(f"  [Lokalny Whisper STT]: AKTYWNY (model {self.whisper.model_size})")
+            try:
+                self.whisper._initialize_model()
+            except Exception as e:
+                logger.warning(f"Whisper warm-up failed: {e}")
 
         batches = create_adaptive_batches(
             raw_entries,

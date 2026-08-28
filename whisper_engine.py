@@ -10,6 +10,7 @@ import os
 import sys
 import warnings
 import logging
+import threading
 from pathlib import Path
 from typing import Optional, Dict, List, Tuple, Any
 
@@ -63,6 +64,8 @@ class JapaneseWhisperEngine:
         self.download_root = download_root or str(Path(__file__).parent / ".models")
         self.model: Optional[Any] = None
         self._is_initialized = False
+        self._init_lock = threading.Lock()
+        self._infer_lock = threading.Lock()
 
     @staticmethod
     def is_available() -> bool:
@@ -70,83 +73,87 @@ class JapaneseWhisperEngine:
         return FASTER_WHISPER_AVAILABLE
 
     def _initialize_model(self):
-        """Lazy loading of Whisper model on first invocation."""
+        """Lazy loading of Whisper model on first invocation (Thread-Safe)."""
         if self._is_initialized:
             return
-        
-        if not FASTER_WHISPER_AVAILABLE:
-            raise RuntimeError(
-                "Package 'faster-whisper' is not installed! "
-                "To enable local audio transcription, run: pip install faster-whisper"
-            )
 
-        # Device selection (GPU CUDA or CPU)
-        selected_device = self.device
-        selected_compute = self.compute_type
+        with self._init_lock:
+            if self._is_initialized:
+                return
 
-        if selected_device == "auto":
-            try:
-                import torch
-                if torch.cuda.is_available():
-                    selected_device = "cuda"
-                    if selected_compute == "auto":
-                        selected_compute = "float16"
-                else:
+            if not FASTER_WHISPER_AVAILABLE:
+                raise RuntimeError(
+                    "Package 'faster-whisper' is not installed! "
+                    "To enable local audio transcription, run: pip install faster-whisper"
+                )
+
+            # Device selection (GPU CUDA or CPU)
+            selected_device = self.device
+            selected_compute = self.compute_type
+
+            if selected_device == "auto":
+                try:
+                    import torch
+                    if torch.cuda.is_available():
+                        selected_device = "cuda"
+                        if selected_compute == "auto":
+                            selected_compute = "float16"
+                    else:
+                        selected_device = "cpu"
+                        if selected_compute == "auto":
+                            selected_compute = "int8"
+                except ImportError:
                     selected_device = "cpu"
                     if selected_compute == "auto":
                         selected_compute = "int8"
-            except ImportError:
-                selected_device = "cpu"
-                if selected_compute == "auto":
-                    selected_compute = "int8"
 
-        if selected_compute == "auto":
-            selected_compute = "int8" if selected_device == "cpu" else "float16"
+            if selected_compute == "auto":
+                selected_compute = "int8" if selected_device == "cpu" else "float16"
 
-        try:
-            os.makedirs(self.download_root, exist_ok=True)
-            self.model = WhisperModel(
-                self.model_size,
-                device=selected_device,
-                compute_type=selected_compute,
-                download_root=self.download_root
-            )
-            self._is_initialized = True
-            dev_label = f"GPU (CUDA {selected_compute.upper()})" if selected_device == "cuda" else f"CPU ({selected_compute.upper()})"
-            print(f"  [Lokalny Silnik Audio Kotoba-Whisper]: Załadowano model {self.model_size} na {dev_label}.")
-        except Exception as e:
-            # Fallback 1: Try CPU INT8 on GPU driver failure
-            if selected_device != "cpu":
-                try:
-                    self.model = WhisperModel(
-                        self.model_size,
-                        device="cpu",
-                        compute_type="int8",
-                        download_root=self.download_root
-                    )
-                    self._is_initialized = True
-                    print(f"  [Lokalny Silnik Audio Kotoba-Whisper]: Załadowano model {self.model_size} na CPU (INT8 fallback).")
-                    return
-                except Exception:
-                    pass
+            try:
+                os.makedirs(self.download_root, exist_ok=True)
+                self.model = WhisperModel(
+                    self.model_size,
+                    device=selected_device,
+                    compute_type=selected_compute,
+                    download_root=self.download_root
+                )
+                self._is_initialized = True
+                dev_label = f"GPU (CUDA {selected_compute.upper()})" if selected_device == "cuda" else f"CPU ({selected_compute.upper()})"
+                print(f"  [Lokalny Silnik Audio Kotoba-Whisper]: Załadowano model {self.model_size} na {dev_label}.")
+            except Exception as e:
+                # Fallback 1: Try CPU INT8 on GPU driver failure
+                if selected_device != "cpu":
+                    try:
+                        self.model = WhisperModel(
+                            self.model_size,
+                            device="cpu",
+                            compute_type="int8",
+                            download_root=self.download_root
+                        )
+                        self._is_initialized = True
+                        print(f"  [Lokalny Silnik Audio Kotoba-Whisper]: Załadowano model {self.model_size} na CPU (INT8 fallback).")
+                        return
+                    except Exception:
+                        pass
 
-            # Fallback 2: If Kotoba model cannot be loaded, fallback to large-v3-turbo
-            if self.model_size != "large-v3-turbo":
-                try:
-                    logger.info("[Whisper Engine]: Fallback to standard large-v3-turbo model...")
-                    self.model = WhisperModel(
-                        "large-v3-turbo",
-                        device=selected_device if selected_device == "cpu" else "cuda",
-                        compute_type=selected_compute,
-                        download_root=self.download_root
-                    )
-                    self.model_size = "large-v3-turbo"
-                    self._is_initialized = True
-                    return
-                except Exception:
-                    pass
+                # Fallback 2: If Kotoba model cannot be loaded, fallback to large-v3-turbo
+                if self.model_size != "large-v3-turbo":
+                    try:
+                        logger.info("[Whisper Engine]: Fallback to standard large-v3-turbo model...")
+                        self.model = WhisperModel(
+                            "large-v3-turbo",
+                            device=selected_device if selected_device == "cpu" else "cuda",
+                            compute_type=selected_compute,
+                            download_root=self.download_root
+                        )
+                        self.model_size = "large-v3-turbo"
+                        self._is_initialized = True
+                        return
+                    except Exception:
+                        pass
 
-            raise e
+                raise e
 
     def transcribe_audio_slice(self, wav_path: str) -> str:
         """
@@ -161,21 +168,22 @@ class JapaneseWhisperEngine:
 
         try:
             self._initialize_model()
-            segments, info = self.model.transcribe(
-                wav_path,
-                language="ja",
-                beam_size=3,
-                vad_filter=True,
-                vad_parameters=dict(min_silence_duration_ms=200)
-            )
-            
-            transcribed_parts = []
-            for segment in segments:
-                text = segment.text.strip()
-                if text:
-                    transcribed_parts.append(text)
-            
-            return "".join(transcribed_parts).strip()
+            with self._infer_lock:
+                segments, info = self.model.transcribe(
+                    wav_path,
+                    language="ja",
+                    beam_size=3,
+                    vad_filter=True,
+                    vad_parameters=dict(min_silence_duration_ms=200)
+                )
+                
+                transcribed_parts = []
+                for segment in segments:
+                    text = segment.text.strip()
+                    if text:
+                        transcribed_parts.append(text)
+                
+                return "".join(transcribed_parts).strip()
         except Exception as e:
             logger.warning(f"Whisper transcription error for {wav_path}: {e}")
             return ""
@@ -210,14 +218,16 @@ class JapaneseWhisperEngine:
             if initial_prompt:
                 transcribe_kwargs["initial_prompt"] = initial_prompt
 
-            segments, info = self.model.transcribe(
-                scene_wav_path,
-                **transcribe_kwargs
-            )
+            with self._infer_lock:
+                segments, info = self.model.transcribe(
+                    scene_wav_path,
+                    **transcribe_kwargs
+                )
+                segments_list = list(segments)
 
             result: Dict[int, List[str]] = {b_id: [] for b_id, _ in events}
             
-            for seg in segments:
+            for seg in segments_list:
                 seg_text = seg.text.strip()
                 if not seg_text:
                     continue
