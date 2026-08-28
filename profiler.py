@@ -311,7 +311,14 @@ Zwróć wynik w formacie JSON zgodnym ze schematem EpisodeProfile."""
                     return EpisodeProfile(episode_summary="Analiza sceniczna w toku tłumaczenia")
 
                 import random
-                wait_sec = min(6.0, 1.5 * attempt + random.uniform(0.2, 0.5))
+                # Zero-Wait Multi-Key Hopping (200ms between keys; micro-pause after full key round)
+                num_keys = len(self.client_pool.clients) if hasattr(self, "client_pool") and self.client_pool else 1
+                if attempt % max(1, num_keys) != 0:
+                    wait_sec = 0.2 + random.uniform(0.05, 0.15)
+                else:
+                    cycle = attempt // max(1, num_keys)
+                    wait_sec = min(3.0, 0.6 + 0.4 * min(cycle, 4) + random.uniform(0.1, 0.3))
+
                 is_timeout = "504" in err_str or "deadline" in err_str or "timeout" in err_str or "timed out" in err_str
                 is_unavailable = "503" in err_str or "unavailable" in err_str or "high demand" in err_str
                 is_rate_limit = "429" in err_str or "quota" in err_str or "resource_exhausted" in err_str
@@ -319,12 +326,12 @@ Zwróć wynik w formacie JSON zgodnym ze schematem EpisodeProfile."""
                 if is_timeout:
                     timeout_sec = int(os.getenv("GEMINI_HTTP_TIMEOUT_MS", "120000")) // 1000
                     print(f"\n[Profiler Odcinka]: Serwer Google potrzebował więcej czasu na analizę profilu (limit {timeout_sec}s na {self.model}) [Próba {attempt}/{MAX_PROFILER_RETRIES}].")
-                    print(f"  [..] Oczekiwanie {wait_sec:.1f}s i automatyczne ponawianie z rotacją kluczy API...")
+                    print(f"  [..] Błyskawiczny przeskok na kolejny klucz API ({wait_sec:.2f}s)...")
                     time.sleep(wait_sec)
                 elif is_unavailable or is_rate_limit:
                     friendly_reason = "Przeciążenie TPU (503 High Demand)" if is_unavailable else "Limit zapytań (429 Rate Limit)"
                     print(f"\n[Profiler Odcinka]: Chwilowa niedostępność serwerów Google ({friendly_reason} na {self.model}) [Próba {attempt}/{MAX_PROFILER_RETRIES}].")
-                    print(f"  [..] Oczekiwanie {wait_sec:.1f}s i automatyczne ponawianie z rotacją kluczy API...")
+                    print(f"  [..] Błyskawiczny przeskok na kolejny klucz API ({wait_sec:.2f}s)...")
                     time.sleep(wait_sec)
                 else:
                     clean_msg = str(e).split("{")[0].strip() if "{" in str(e) else str(e)

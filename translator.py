@@ -726,22 +726,28 @@ class MultimodalTranslator:
                 
 
                 import random
-                # Fast agile TPU sniping (1.0s - 3.5s) combined with instant multi-key rotation
-                wait_time = min(3.5, 0.8 + 0.5 * min(attempt, 4) + random.uniform(0.1, 0.4))
+                # Zero-Wait Multi-Key Hopping (200ms between keys; micro-pause after full key round)
+                num_keys = len(self.client_pool.clients) if hasattr(self, "client_pool") and self.client_pool else 1
+                if attempt % max(1, num_keys) != 0:
+                    wait_time = 0.2 + random.uniform(0.05, 0.15)
+                else:
+                    cycle = attempt // max(1, num_keys)
+                    wait_time = min(3.0, 0.6 + 0.4 * min(cycle, 4) + random.uniform(0.1, 0.3))
+
                 if is_timeout:
                     timeout_sec = int(os.getenv("GEMINI_HTTP_TIMEOUT_MS", "120000")) // 1000
                     print(f"\n[Tłumacz / Faza 1]: Serwer Google potrzebował więcej czasu na odpowiedź (limit {timeout_sec}s na {current_model}) [Ponawianie: Próba {attempt}]...")
-                    print(f"  [..] Oczekiwanie {wait_time:.1f}s i ponawianie...")
+                    print(f"  [..] Błyskawiczny przeskok na kolejny klucz API ({wait_time:.2f}s)...")
                     time.sleep(wait_time)
                 elif is_unavailable or is_rate_limit:
                     friendly_err = "Przeciążenie serwerów TPU (503 High Demand)" if is_unavailable else "Chwilowy limit zapytań (429 Rate Limit)"
                     print(f"\n[Tłumacz / Faza 1]: Chwilowa niedostępność serwerów Google ({friendly_err} na {current_model}) [Ponawianie: Próba {attempt}]...")
-                    print(f"  [..] Oczekiwanie {wait_time:.1f}s i ponawianie...")
+                    print(f"  [..] Błyskawiczny przeskok na kolejny klucz API ({wait_time:.2f}s)...")
                     time.sleep(wait_time)
                 else:
                     clean_msg = str(e).split("{")[0].strip() if "{" in str(e) else str(e)
                     print(f"\n[Tłumacz / Faza 1]: Chwilowa przerwa w odpowiedzi API na {current_model} ({clean_msg}) [Ponawianie: Próba {attempt}]...")
-                    print(f"  [..] Oczekiwanie {wait_time:.1f}s i ponawianie...")
+                    print(f"  [..] Oczekiwanie {wait_time:.2f}s i ponawianie...")
                     time.sleep(wait_time)
 
     def _process_single_batch(
