@@ -437,7 +437,7 @@ class MultimodalTranslator:
         self.system_prompt = get_translation_system_prompt(keep_honorifics=keep_honorifics)
         
         # Episode Profiler (Pre-pass Glossary & Character Matrix)
-        self.profiler = EpisodeProfiler(client=self.client, model=self.model_phase1)
+        self.profiler = EpisodeProfiler(client=self.client_pool or self.client, model=self.model_phase1)
         
         # Optional local Japanese Whisper engine (Speech-to-Text)
         self.whisper = None
@@ -450,7 +450,7 @@ class MultimodalTranslator:
         # Phase 2 - Script Doctor / Editorial Verifier
         if self.enable_verifier:
             self.verifier = DialogueVerifier(
-                client=self.client,
+                client=self.client_pool or self.client,
                 model=self.model_phase2,
                 keep_honorifics=keep_honorifics,
                 thinking_budget=self.thinking_budget_phase2

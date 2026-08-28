@@ -216,8 +216,13 @@ def format_episode_profile_for_prompt(profile: Optional[EpisodeProfile]) -> str:
 
 
 class EpisodeProfiler:
-    def __init__(self, client: genai.Client, model: str = "gemini-3.5-flash-lite"):
+    def __init__(self, client: Any, model: str = "gemini-3.5-flash-lite"):
         self.client = client
+        if hasattr(client, "clients") and hasattr(client, "get_client"):
+            self.client_pool = client
+        else:
+            from client_factory import MultiKeyClientPool
+            self.client_pool = MultiKeyClientPool(raw_keys=os.getenv("GEMINI_API_KEY"), timeout_ms=120000)
         self.model = model
 
     def profile_episode(
