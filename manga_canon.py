@@ -20,7 +20,16 @@ MANGA_CANON_DIR = Path(__file__).parent / "manga_canon"
 BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     "kingdom": {
         "title": "Kingdom",
-        "aliases": ["kingdom", "kingdom s6", "kingdom season 6", "kingdom s5", "kingdom s4", "kingdom s3", "kingdom s2", "kingdom s1"],
+        "aliases": [
+            "kingdom",
+            "kingdom s6",
+            "kingdom season 6",
+            "kingdom s5",
+            "kingdom s4",
+            "kingdom s3",
+            "kingdom s2",
+            "kingdom s1"
+        ],
         "publisher": "Oficjalny kanon mangowy / Państwo Środka",
         "glossary": {
             "Middle Kingdom": "Państwo Środka",
@@ -58,7 +67,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Five-Thousand-Man Commander": "Pięciotysięcznik / Dowódca pięciu tysięcy ludzi",
             "5000-Man Commander": "Pięciotysięcznik / Dowódca pięciu tysięcy ludzi",
             "Great General Under the Heavens": "Wielki Generał pod Niebiosami",
-            "Great General": "Wielki Generał",
             "General": "Generał"
         },
         "character_forms": {
@@ -69,7 +77,12 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     },
     "jujutsu_kaisen": {
         "title": "Jujutsu Kaisen",
-        "aliases": ["jujutsu kaisen", "jujutsu kaisen s2", "jujutsu", "jjk"],
+        "aliases": [
+            "jujutsu kaisen",
+            "jujutsu kaisen s2",
+            "jujutsu",
+            "jjk"
+        ],
         "publisher": "Wydawnictwo Waneko",
         "glossary": {
             "Domain Expansion": "Rozszerzenie Domeny",
@@ -94,7 +107,12 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     },
     "frieren": {
         "title": "Sousou no Frieren (Frieren. U kresu drogi)",
-        "aliases": ["sousou no frieren", "frieren", "frieren beyond journeys end"],
+        "aliases": [
+            "sousou no frieren",
+            "frieren",
+            "frieren beyond journeys end",
+            "frieren u kresu drogi"
+        ],
         "publisher": "Wydawnictwo Studio JG",
         "glossary": {
             "Frieren the Slayer": "Frieren Pogromczyni",
@@ -116,7 +134,10 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     },
     "chainsaw_man": {
         "title": "Chainsaw Man",
-        "aliases": ["chainsaw man", "csm"],
+        "aliases": [
+            "chainsaw man",
+            "csm"
+        ],
         "publisher": "Wydawnictwo Waneko",
         "glossary": {
             "Chainsaw Devil": "Diabeł Piły Łańcuchowej",
@@ -135,7 +156,13 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     },
     "attack_on_titan": {
         "title": "Atak Tytanów (Shingeki no Kyojin)",
-        "aliases": ["shingeki no kyojin", "attack on titan", "aot"],
+        "aliases": [
+            "shingeki no kyojin",
+            "attack on titan",
+            "aot",
+            "atak tytanow",
+            "atak tytanów"
+        ],
         "publisher": "Wydawnictwo J.P.Fantastica",
         "glossary": {
             "Survey Corps / Scout Regiment": "Korpus Zwiadowczy",
@@ -159,7 +186,11 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     },
     "vinland_saga": {
         "title": "Saga Winlandzka (Vinland Saga)",
-        "aliases": ["vinland saga", "vinland"],
+        "aliases": [
+            "vinland saga",
+            "vinland",
+            "saga winlandzka"
+        ],
         "publisher": "Wydawnictwo Hanami",
         "glossary": {
             "Jomsvikings": "Wojownicy z Jomsborga",
@@ -175,7 +206,12 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     },
     "demon_slayer": {
         "title": "Miecz Zabójcy Demonów (Kimetsu no Yaiba)",
-        "aliases": ["kimetsu no yaiba", "demon slayer"],
+        "aliases": [
+            "kimetsu no yaiba",
+            "demon slayer",
+            "miecz zabojcy demonow",
+            "miecz zabójcy demonów"
+        ],
         "publisher": "Wydawnictwo Waneko",
         "glossary": {
             "Demon Slayer Corps": "Korpus Zabójców Demonów",
@@ -198,7 +234,12 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     },
     "dungeon_meshi": {
         "title": "Pyszności w Lochu (Dungeon Meshi)",
-        "aliases": ["dungeon meshi", "delicious in dungeon"],
+        "aliases": [
+            "dungeon meshi",
+            "delicious in dungeon",
+            "pysznosci w lochu",
+            "pyszności w lochu"
+        ],
         "publisher": "Wydawnictwo Studio JG",
         "glossary": {
             "Red Dragon": "Czerwony Smok",
@@ -215,7 +256,10 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     },
     "spy_x_family": {
         "title": "Spy x Family",
-        "aliases": ["spy x family", "spyxfamily"],
+        "aliases": [
+            "spy x family",
+            "spyxfamily"
+        ],
         "publisher": "Wydawnictwo Waneko",
         "glossary": {
             "Twilight": "Zmierzch",
@@ -234,9 +278,957 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Loid -> Yor": "Yor / pani Yor (oficjalnie)"
         }
     },
+    "my_hero_academia": {
+        "title": "Moja Akademia Bohaterów (My Hero Academia / Boku no Hero Academia)",
+        "aliases": [
+            "my hero academia",
+            "boku no hero academia",
+            "mha",
+            "bnha",
+            "moja akademia bohaterow",
+            "moja akademia bohaterów"
+        ],
+        "publisher": "Wydawnictwo Waneko",
+        "glossary": {
+            "Quirk": "Dar",
+            "One For All": "Jeden za Wszystkich (One For All)",
+            "All For One": "Wszystko dla Jednego (All For One)",
+            "Hero Association": "Stowarzyszenie Bohaterów",
+            "League of Villains": "Liga Złoczyńców",
+            "Plus Ultra": "Plus Ultra!",
+            "Pro Hero": "Zawodowy Bohater",
+            "U.A. High School": "Liceum U.A."
+        },
+        "character_forms": {
+            "Deku -> All Might": "panie All Might",
+            "Bakugo -> Deku": "Deku / śmieciu",
+            "Deku -> Bakugo": "Kacchan"
+        }
+    },
+    "one_punch_man": {
+        "title": "One-Punch Man",
+        "aliases": [
+            "one punch man",
+            "one-punch man",
+            "opm"
+        ],
+        "publisher": "Wydawnictwo J.P.Fantastica",
+        "glossary": {
+            "Hero Association": "Stowarzyszenie Bohaterów",
+            "S-Class Hero": "Bohater Klasy S",
+            "Threat Level: God / Dragon / Demon / Tiger / Wolf": "Poziom Zagrożenia: Bóg / Smok / Demon / Tygrys / Wilk",
+            "Serious Punch": "Poważne Uderzenie",
+            "Consecutive Normal Punches": "Seria Zwykłych Ciosów",
+            "Monster Association": "Stowarzyszenie Potworów"
+        },
+        "character_forms": {
+            "Genos -> Saitama": "mistrzu Saitama",
+            "Saitama -> Genos": "Genos / na ty"
+        }
+    },
+    "black_clover": {
+        "title": "Black Clover",
+        "aliases": [
+            "black clover"
+        ],
+        "publisher": "Wydawnictwo Waneko",
+        "glossary": {
+            "Magic Knights": "Rycerze Magii",
+            "Black Bulls": "Czarne Byki",
+            "Golden Dawn": "Złoty Świt",
+            "Wizard King": "Król Magów",
+            "Anti-Magic": "Antymagia",
+            "Grimoire": "Grimuar (Pięciolistna Koniczyna)",
+            "Clover Kingdom": "Królestwo Koniczyny",
+            "Devil Union": "Zjednoczenie z Diabłem"
+        },
+        "character_forms": {
+            "Asta -> Yami": "kapitanie Yami",
+            "Asta -> Yuno": "Yuno / rywalu",
+            "Noelle -> Asta": "głupi Asta / Asta"
+        }
+    },
+    "kaguya_sama": {
+        "title": "Kaguya-sama: Miłość to wojna (Kaguya-sama wa Kokurasetai)",
+        "aliases": [
+            "kaguya-sama wa kokurasetai",
+            "kaguya sama",
+            "kaguya-sama love is war",
+            "milosc to wojna",
+            "miłość to wojna"
+        ],
+        "publisher": "Wydawnictwo Studio JG",
+        "glossary": {
+            "Student Council": "Samorząd Uczniowski",
+            "Shuchiin Academy": "Akademia Shuchiin",
+            "Love Confession": "Wyznanie Miłości",
+            "President": "Przewodniczący",
+            "Vice President": "Wiceprzewodnicząca"
+        },
+        "character_forms": {
+            "Kaguya -> Shirogane": "panie przewodniczący / Shirogane",
+            "Shirogane -> Kaguya": "pani Shinomiya / Kaguya",
+            "Chika -> Kaguya": "Kaguya-san / Kaguya"
+        }
+    },
+    "horimiya": {
+        "title": "Horimiya",
+        "aliases": [
+            "horimiya",
+            "hori-san to miyamura-kun"
+        ],
+        "publisher": "Wydawnictwo Studio JG",
+        "glossary": {
+            "Katagiri High School": "Liceum Katagiri",
+            "Piercing": "Kolczyki",
+            "Secret Identity": "Ukryta Tożsamość"
+        },
+        "character_forms": {
+            "Hori -> Miyamura": "Miyamura / Izumi",
+            "Miyamura -> Hori": "Hori-san / Kyouko"
+        }
+    },
+    "the_promised_neverland": {
+        "title": "The Promised Neverland (Yakusoku no Neverland)",
+        "aliases": [
+            "yakusoku no neverland",
+            "the promised neverland",
+            "promised neverland"
+        ],
+        "publisher": "Wydawnictwo Waneko",
+        "glossary": {
+            "Grace Field House": "Sierociniec Grace Field House",
+            "Premium Quality Meat": "Mięso Najwyższej Jakości",
+            "Demons": "Demony",
+            "The Promise": "Obietnica",
+            "Mama": "Mama (Opiekunka)",
+            "Sister Krone": "Siostra Krone"
+        },
+        "character_forms": {
+            "Emma -> Norman": "Norman / na ty",
+            "Ray -> Emma": "Emma / na ty",
+            "Children -> Isabella": "Mamo"
+        }
+    },
+    "kuroshitsuji": {
+        "title": "Mroczny Kamerdyner (Kuroshitsuji / Black Butler)",
+        "aliases": [
+            "kuroshitsuji",
+            "black butler",
+            "mroczny kamerdyner"
+        ],
+        "publisher": "Wydawnictwo Waneko",
+        "glossary": {
+            "Phantomhive Household": "Ród Phantomhive",
+            "Queen's Watchdog": "Pies Łańcuchowy Królowej",
+            "Demon Butler": "Demoniczny Kamerdyner",
+            "Faustian Contract": "Cyrograf / Pakt",
+            "Grim Reaper / Shinigami": "Żniwiarz Śmierci",
+            "Cinematic Record": "Zapis Życia (Taśma Kinematograficzna)"
+        },
+        "character_forms": {
+            "Sebastian -> Ciel": "mój panie / paniczu Cielu",
+            "Ciel -> Sebastian": "Sebastianie / to rozkaz"
+        }
+    },
+    "blue_exorcist": {
+        "title": "Ao no Exorcist (Blue Exorcist)",
+        "aliases": [
+            "ao no exorcist",
+            "blue exorcist",
+            "niebieski egzorcysta"
+        ],
+        "publisher": "Wydawnictwo Waneko",
+        "glossary": {
+            "True Cross Academy": "Akademia Prawdziwego Krzyża",
+            "Exorcist": "Egzorcysta",
+            "Paladin": "Paladyn",
+            "Blue Flames": "Błękitne Płomienie Szatana",
+            "Gehenna": "Gehenna (Świat Demonów)",
+            "Assiah": "Assiah (Świat Ludzi)",
+            "Kurikara": "Miecz Kurikara"
+        },
+        "character_forms": {
+            "Rin -> Yukio": "Yukio / braciszku",
+            "Yukio -> Rin": "bracie / Rinie",
+            "Rin -> Mephisto": "Mephisto / durniu"
+        }
+    },
+    "claymore": {
+        "title": "Claymore",
+        "aliases": [
+            "claymore"
+        ],
+        "publisher": "Wydawnictwo Waneko",
+        "glossary": {
+            "Claymore / Silver-eyed Witches": "Srebrnookie Wiedźmy (Claymore)",
+            "Yoma": "Yoma (Potwory)",
+            "Awakened Being": "Przebudzona Istota",
+            "Abyssal One": "Istota z Otchłani",
+            "Yoki": "Energia Yoki",
+            "Organization": "Organizacja"
+        },
+        "character_forms": {
+            "Clare -> Teresa": "pani Tereso / Teresa",
+            "Raki -> Clare": "Clare / na ty"
+        }
+    },
+    "dorohedoro": {
+        "title": "Dorohedoro",
+        "aliases": [
+            "dorohedoro"
+        ],
+        "publisher": "Wydawnictwo Waneko",
+        "glossary": {
+            "The Hole": "Dziura",
+            "Sorcerers / Magic Users": "Magowie",
+            "Black Smoke": "Czarny Dym",
+            "En Family": "Rodzina Ena",
+            "Cross-Eyes": "Krzyżoocy",
+            "Gyoza": "Gyoza"
+        },
+        "character_forms": {
+            "Caiman -> Nikaido": "Nikaido / na ty",
+            "Shin -> Noi": "Noi / na ty"
+        }
+    },
+    "mob_psycho_100": {
+        "title": "Mob Psycho 100",
+        "aliases": [
+            "mob psycho 100",
+            "mob psycho"
+        ],
+        "publisher": "Wydawnictwo Waneko",
+        "glossary": {
+            "Esper": "Esper / Psychik",
+            "Spirits and Such Consultation Office": "Biuro Konsultacji Duchowych",
+            "Claw": "Szpon (Organizacja Claw)",
+            "100% Explosion": "Eksplozja 100%",
+            "???%": "Stan ???%"
+        },
+        "character_forms": {
+            "Mob -> Reigen": "mistrzu Reigen",
+            "Reigen -> Mob": "Mob / Shigeo",
+            "Dimple -> Mob": "Shigeo / na ty"
+        }
+    },
+    "slime_isekai": {
+        "title": "Odrodzony jako galareta (Tensei shitara Slime Datta Ken)",
+        "aliases": [
+            "tensei shitara slime datta ken",
+            "that time i got reincarnated as a slime",
+            "tensura",
+            "odrodzony jako galareta"
+        ],
+        "publisher": "Wydawnictwo Studio JG",
+        "glossary": {
+            "Jura Tempest Federation": "Federacja Jura Tempest",
+            "Demon Lord": "Władca Demonów (Demon Lord)",
+            "True Dragon": "Prawdziwy Smok",
+            "Great Sage": "Wielki Mędrzec (Great Sage)",
+            "Raphael": "Mądrościowy Król Rafael",
+            "Predator / Gluttony": "Drapieżca / Żarłoczność",
+            "Ogre / Kijin": "Ogr / Kijin"
+        },
+        "character_forms": {
+            "Subordinates -> Rimuru": "Lordzie Rimuru / Władco Rimuru",
+            "Rimuru -> Veldora": "Veldora / brachu"
+        }
+    },
+    "goblin_slayer": {
+        "title": "Goblin Slayer (Pogromca Goblinów)",
+        "aliases": [
+            "goblin slayer",
+            "pogromca goblinow",
+            "pogromca goblinów"
+        ],
+        "publisher": "Wydawnictwo Studio JG",
+        "glossary": {
+            "Goblin Slayer": "Pogromca Goblinów",
+            "Silver Rank": "Ranga Srebrna",
+            "Porcelain Rank": "Ranga Porcelanowa",
+            "Goblin Champion / Lord / Shaman": "Czempion / Władca / Szaman Goblinów",
+            "Adventurers Guild": "Gildia Poszukiwaczy Przygód"
+        },
+        "character_forms": {
+            "Priestess -> Goblin Slayer": "panie Pogromco Goblinów",
+            "High Elf Archer -> Goblin Slayer": "Orcbolg / brodaczu"
+        }
+    },
+    "spice_and_wolf": {
+        "title": "Wilk i Korzenne Ciasteczka (Spice and Wolf / Ookami to Koushinryou)",
+        "aliases": [
+            "spice and wolf",
+            "ookami to koushinryou",
+            "wilk i korzenne ciasteczka"
+        ],
+        "publisher": "Wydawnictwo Studio JG",
+        "glossary": {
+            "Holo the Wise Wolf": "Holo Mądra Wilczyca",
+            "Yoitsu": "Kraina Yoitsu",
+            "Trenni Silver Coins": "Srebrniki Trenni",
+            "Rowen Trade Guild": "Gildia Kupiecka Rowen",
+            "Traveling Merchant": "Wędrowny Kupiec"
+        },
+        "character_forms": {
+            "Holo -> Lawrence": "Lawrence / mój miły",
+            "Lawrence -> Holo": "Holo / pani Holo"
+        }
+    },
+    "yona_of_the_dawn": {
+        "title": "Yona w blasku świtu (Akatsuki no Yona)",
+        "aliases": [
+            "akatsuki no yona",
+            "yona of the dawn",
+            "yona w blasku switu",
+            "yona w blasku świtu"
+        ],
+        "publisher": "Wydawnictwo Studio JG",
+        "glossary": {
+            "Kingdom of Kouka": "Królestwo Kouka",
+            "Four Dragon Warriors (White, Blue, Green, Yellow)": "Cztery Smoki (Biały, Błękitny, Zielony, Żółty)",
+            "Sky Clan / Wind Clan / Fire Clan": "Plemię Niebios / Wiatru / Ognia",
+            "Hiryuu Castle": "Zamek Hiryuu"
+        },
+        "character_forms": {
+            "Hak -> Yona": "księżniczko Yono",
+            "Yona -> Hak": "Hak / na ty",
+            "Soo-won -> Yona": "Yona / na ty"
+        }
+    },
+    "kuroko_no_basket": {
+        "title": "Kuroko's Basketball (Kuroko no Basket)",
+        "aliases": [
+            "kuroko no basket",
+            "kuroko no basuke",
+            "kuroko's basketball"
+        ],
+        "publisher": "Wydawnictwo Studio JG",
+        "glossary": {
+            "Generation of Miracles": "Pokolenie Cudów",
+            "Phantom Sixth Man": "Widmowy Szósty Gracz",
+            "Seirin High": "Liceum Seirin",
+            "Misdirection": "Mylenie Wzroku (Misdirection)",
+            "Ignite Pass": "Płomienne Podanie",
+            "The Zone": "Strefa Skupienia (The Zone)"
+        },
+        "character_forms": {
+            "Kuroko -> Kagami": "Kagami-kun / Kagami",
+            "Kagami -> Kuroko": "Kuroko / na ty",
+            "Aomine -> Kuroko": "Tetsu"
+        }
+    },
+    "gokushufudou": {
+        "title": "Droga do Yakuzy (Gokushufudou: The Way of the Househusband)",
+        "aliases": [
+            "gokushufudou",
+            "the way of the househusband",
+            "droga do yakuzy"
+        ],
+        "publisher": "Wydawnictwo Kotori",
+        "glossary": {
+            "Immortal Tatsu": "Nieśmiertelny Tatsu",
+            "Househusband": "Mąż Domowy / Perfekcyjny Pan Domu",
+            "Yakuza": "Yakuza",
+            "Neighborhood Association": "Komitet Sąsiedzki"
+        },
+        "character_forms": {
+            "Miku -> Tatsu": "Tatsu / kochanie",
+            "Masa -> Tatsu": "szefie Tatsu / aniki"
+        }
+    },
+    "ancient_magus_bride": {
+        "title": "Oblubienica Czarnoksiężnika (Mahoutsukai no Yome / The Ancient Magus' Bride)",
+        "aliases": [
+            "mahoutsukai no yome",
+            "the ancient magus bride",
+            "ancient magus bride",
+            "oblubienica czarnoksieznika",
+            "oblubienica czarnoksiężnika"
+        ],
+        "publisher": "Wydawnictwo Kotori",
+        "glossary": {
+            "Sleigh Beggy": "Sleigh Beggy (Dziecko Umiłowane przez Magię)",
+            "Thorn Mage": "Mag Cierni",
+            "Neighbors / Fae": "Sąsiedzi / Elfy i Duszki",
+            "Familiar": "Chowaniec",
+            "Alchemist": "Alchemik"
+        },
+        "character_forms": {
+            "Chise -> Elias": "Elias / panie Eliasie",
+            "Elias -> Chise": "Chise / moja panno"
+        }
+    },
+    "sakamoto_days": {
+        "title": "Sakamoto Days",
+        "aliases": [
+            "sakamoto days"
+        ],
+        "publisher": "Wydawnictwo Studio JG",
+        "glossary": {
+            "Order": "Zakon / Order (Elita Zabójców)",
+            "JCC (Japanese Assassin Training Center)": "JCC (Japońska Akademia Zabójców)",
+            "Legendary Hitman": "Legendarny Płatny Zabójca",
+            "Sakamoto Convenience Store": "Sklep Spożywczy Sakamoto"
+        },
+        "character_forms": {
+            "Shin -> Sakamoto": "szefie Sakamoto / panie Sakamoto",
+            "Lu -> Sakamoto": "Sakamoto / panie Sakamoto"
+        }
+    },
+    "gachiakuta": {
+        "title": "Gachiakuta",
+        "aliases": [
+            "gachiakuta"
+        ],
+        "publisher": "Wydawnictwo Studio JG",
+        "glossary": {
+            "The Pit / The Abyss": "Otchłań (Wysypisko Śmieci)",
+            "Cleaners / Janitors": "Czyściciele (Klan Sprzątaczy)",
+            "Jinki (Vital Instrument)": "Jinki (Ożywione Narzędzie)",
+            "Giver": "Obdarowany (Użytkownik Jinki)",
+            "Trash Beast": "Śmieciowa Bestia"
+        },
+        "character_forms": {
+            "Rudo -> Enjin": "Enjin / na ty",
+            "Zanka -> Rudo": "Rudo / śmieciu"
+        }
+    },
+    "akira": {
+        "title": "Akira",
+        "aliases": [
+            "akira"
+        ],
+        "publisher": "Wydawnictwo J.P.Fantastica",
+        "glossary": {
+            "Neo-Tokyo": "Neo-Tokio",
+            "Capsules": "Gang Kapsułek",
+            "Clowns": "Gang Błaznów",
+            "Akira": "Projekt Akira",
+            "Olympic Stadium": "Stadion Olimpijski"
+        },
+        "character_forms": {
+            "Kaneda -> Tetsuo": "Tetsuo / na ty",
+            "Tetsuo -> Kaneda": "Kaneda / durniu"
+        }
+    },
+    "ghost_in_the_shell": {
+        "title": "Ghost in the Shell",
+        "aliases": [
+            "ghost in the shell",
+            "gits",
+            "stand alone complex"
+        ],
+        "publisher": "Wydawnictwo J.P.Fantastica",
+        "glossary": {
+            "Public Security Section 9": "Sekcja 9 Bezpieczeństwa Publicznego",
+            "Major": "Pani Major",
+            "Cyberbrain": "Cybermózg",
+            "Ghost": "Duch (Ghost)",
+            "Tachikoma": "Tachikoma",
+            "Laughing Man": "Śmiejący Się Człowiek"
+        },
+        "character_forms": {
+            "Batou -> Motoko": "Major / Motoko",
+            "Section 9 -> Aramaki": "szefie Aramaki"
+        }
+    },
+    "blame": {
+        "title": "Blame!",
+        "aliases": [
+            "blame",
+            "blame!"
+        ],
+        "publisher": "Wydawnictwo J.P.Fantastica",
+        "glossary": {
+            "The City / Megastructure": "Megastruktura / Miasto",
+            "Net Terminal Gene": "Gen Terminala Sieciowego",
+            "Gravitational Beam Emitter": "Emiter Promieni Grawitacyjnych (GBE)",
+            "Safeguard": "System Zabezpieczeń (Safeguard)",
+            "Silicon Life": "Krzemowe Formy Życia"
+        },
+        "character_forms": {
+            "Killy -> Cibo": "Cibo / na ty",
+            "Cibo -> Killy": "Killy / na ty"
+        }
+    },
+    "gantz": {
+        "title": "Gantz",
+        "aliases": [
+            "gantz"
+        ],
+        "publisher": "Wydawnictwo J.P.Fantastica",
+        "glossary": {
+            "Gantz": "Czarna Kula Gantz",
+            "100 Points Menu": "Menu 100 Punktów",
+            "Gantz Suit": "Kombinezon Bojowy Gantz",
+            "X-Gun": "Pistolet Rentgenowski (X-Gun)",
+            "Oni Alien": "Obcy Rasy Oni",
+            "Nurarihyon": "Obcy Nurarihyon"
+        },
+        "character_forms": {
+            "Kurono -> Kato": "Kato / na ty",
+            "Kato -> Kurono": "Kurono / na ty"
+        }
+    },
+    "inuyasha": {
+        "title": "InuYasha",
+        "aliases": [
+            "inuyasha",
+            "inu yasha"
+        ],
+        "publisher": "Wydawnictwo J.P.Fantastica",
+        "glossary": {
+            "Shikon Jewel": "Klejnot Czterech Dusz (Shikon no Tama)",
+            "Tessaiga": "Miecz Tessaiga",
+            "Tenseiga": "Miecz Tenseiga",
+            "Wind Scar": "Blizna Wiatru",
+            "Backlash Wave": "Fala Odwetowa (Bakuryuha)",
+            "Naraku": "Naraku (Półdemon)",
+            "Sengoku Period": "Epoka Sengoku"
+        },
+        "character_forms": {
+            "Kagome -> Inuyasha": "Inuyasha / do nogi! (osuwari)",
+            "Inuyasha -> Kagome": "Kagome / na ty",
+            "Sesshomaru -> Inuyasha": "półdemonie / Inuyasho"
+        }
+    },
+    "ranma": {
+        "title": "Ranma 1/2",
+        "aliases": [
+            "ranma",
+            "ranma 1/2",
+            "ranma 1 2"
+        ],
+        "publisher": "Wydawnictwo J.P.Fantastica",
+        "glossary": {
+            "Jusenkyo Cursed Springs": "Przeklęte Źródła Jusenkyo",
+            "Anything-Goes Martial Arts": "Sztuki Walki Wszystkich Chwytów Dozwolonych",
+            "Tendo Dojo": "Dojo Rodziny Tendo",
+            "Moko Takabisha": "Moko Takabisha",
+            "Hiryu Shotenha": "Hiryu Shotenha"
+        },
+        "character_forms": {
+            "Ranma -> Akane": "niekobieca Akane / Akane",
+            "Akane -> Ranma": "zboczeniec Ranma / Ranma"
+        }
+    },
+    "sailor_moon": {
+        "title": "Czarodziejka z Księżyca (Sailor Moon)",
+        "aliases": [
+            "sailor moon",
+            "czarodziejka z ksiezyca",
+            "czarodziejka z księżyca",
+            "bishoujo senshi sailor moon"
+        ],
+        "publisher": "Wydawnictwo J.P.Fantastica",
+        "glossary": {
+            "Sailor Guardians": "Czarodziejki / Wojowniczki w Marynarkach",
+            "Moon Tiara Action": "Księżycowy Diademie, Działaj!",
+            "Moon Healing Escalation": "Księżycowa Eskalacja Uzdrowienia",
+            "Tuxedo Mask": "Tuxedo Mask / Zamaskowany Dżentelmen",
+            "Silver Crystal": "Srebrny Kryształ",
+            "Dark Kingdom": "Mroczne Królestwo",
+            "Moon Kingdom": "Księżycowe Królestwo (Srebrne Milenium)"
+        },
+        "character_forms": {
+            "Usagi -> Mamoru": "Mamoru / panie Mamoru",
+            "Mamoru -> Usagi": "Usako / Usagi",
+            "Sailors -> Usagi": "Usagi / Księżniczko Serenity"
+        }
+    },
+    "captain_tsubasa": {
+        "title": "Kapitan Jastrząb (Captain Tsubasa)",
+        "aliases": [
+            "captain tsubasa",
+            "kapitan jastrzab",
+            "kapitan jastrząb",
+            "tsubasa"
+        ],
+        "publisher": "Wydawnictwo J.P.Fantastica",
+        "glossary": {
+            "Drive Shoot": "Strzał Opadający (Drive Shoot)",
+            "Tiger Shoot": "Strzał Tygrysa (Tiger Shoot)",
+            "Twin Shoot": "Podwójny Strzał",
+            "Nankatsu SC": "Klub Nankatsu",
+            "Toho Academy": "Akademia Toho",
+            "All Japan Youth": "Młodzieżowa Reprezentacja Japonii"
+        },
+        "character_forms": {
+            "Tsubasa -> Hyuga": "Hyuga / na ty",
+            "Hyuga -> Tsubasa": "Tsubasa / na ty",
+            "Ishizaki -> Tsubasa": "kapitanie Tsubasa / Tsubasa"
+        }
+    },
+    "slam_dunk": {
+        "title": "Slam Dunk",
+        "aliases": [
+            "slam dunk"
+        ],
+        "publisher": "Wydawnictwo J.P.Fantastica",
+        "glossary": {
+            "Shohoku High": "Liceum Shohoku",
+            "Rebound King": "Król Zbiórek",
+            "Slam Dunk": "Wsad do Kosza (Slam Dunk)",
+            "National Championship / Inter-High": "Turniej Narodowy (Inter-High)",
+            "Kainan High": "Liceum Kainan"
+        },
+        "character_forms": {
+            "Sakuragi -> Rukawa": "lisie Rukawa / Rukawa",
+            "Rukawa -> Sakuragi": "głąbie / kretynie",
+            "Sakuragi -> Akagi": "Gorylu / kapitanie"
+        }
+    },
+    "parasyte": {
+        "title": "Pasożyt (Parasyte / Kiseijuu)",
+        "aliases": [
+            "kiseijuu",
+            "parasyte",
+            "pasozyt",
+            "pasożyt"
+        ],
+        "publisher": "Wydawnictwo J.P.Fantastica",
+        "glossary": {
+            "Migi": "Migi (Prawica)",
+            "Parasite": "Pasożyt",
+            "Gotou": "Gotou (Kolektyw Pasożytów)"
+        },
+        "character_forms": {
+            "Shinichi -> Migi": "Migi / na ty",
+            "Migi -> Shinichi": "Shinichi"
+        }
+    },
+    "gunnm": {
+        "title": "Battle Angel Alita (Gunnm)",
+        "aliases": [
+            "gunnm",
+            "battle angel alita",
+            "alita"
+        ],
+        "publisher": "Wydawnictwo J.P.Fantastica",
+        "glossary": {
+            "Scrapyard": "Miasto Złomu",
+            "Tiphares / Zalem": "Podniebne Miasto Zalem",
+            "Panzer Kunst": "Pancerna Sztuka Walki (Panzer Kunst)",
+            "Motorball": "Motorball",
+            "Hunter-Warrior": "Łowca Nagród (Hunter-Warrior)",
+            "Damascus Blade": "Ostrze Damasceńskie"
+        },
+        "character_forms": {
+            "Alita / Gally -> Ido": "doktorze Ido / ojcze",
+            "Ido -> Alita": "Alita / Gally"
+        }
+    },
+    "shaman_king": {
+        "title": "Król Szamanów (Shaman King)",
+        "aliases": [
+            "shaman king",
+            "krol szamanow",
+            "król szamanów"
+        ],
+        "publisher": "Wydawnictwo Hanami",
+        "glossary": {
+            "Shaman Fight": "Turniej Szamanów",
+            "Over Soul": "Jedność Duszy (Over Soul)",
+            "Guardian Ghost": "Duch Stróż",
+            "Amidamaru": "Amidamaru (Duch Samuraja)",
+            "Great Spirit": "Wielki Duch",
+            "Patch Tribe": "Plemię Patch",
+            "Furyoku": "Energia Furyoku"
+        },
+        "character_forms": {
+            "Yoh -> Amidamaru": "Amidamaru / przyjacielu",
+            "Anna -> Yoh": "Yoh / durniu (z władczością)"
+        }
+    },
+    "twenty_century_boys": {
+        "title": "Chłopcy z XX wieku (20th Century Boys)",
+        "aliases": [
+            "20th century boys",
+            "chlopcy z xx wieku",
+            "chłopcy z xx wieku",
+            "21st century boys"
+        ],
+        "publisher": "Wydawnictwo Hanami",
+        "glossary": {
+            "Friend / Tomodachi": "Przyjaciel (Tomodachi)",
+            "Book of Prophecy": "Księga Proroctw",
+            "Bloody New Year's Eve": "Krwawy Sylwester 2000",
+            "Friendland": "Park Rozrywki Przyjaciela"
+        },
+        "character_forms": {
+            "Kenji -> Kanna": "Kanna / na ty",
+            "Kanna -> Kenji": "wujku Kenji"
+        }
+    },
+    "mushishi": {
+        "title": "Mushishi",
+        "aliases": [
+            "mushishi"
+        ],
+        "publisher": "Wydawnictwo Hanami",
+        "glossary": {
+            "Mushi": "Mushi (Pierwotne Formy Życia)",
+            "Mushi Master": "Mistrz Mushi (Mushishi)",
+            "Ginko": "Ginko (Wędrowny Znawca Mushi)",
+            "Kouki": "Kouki (Płynne Źródło Życia)"
+        },
+        "character_forms": {
+            "Villagers -> Ginko": "panie Ginko / mistrzu Ginko"
+        }
+    },
+    "mieruko_chan": {
+        "title": "Mieruko-chan (Ta dziewczyna widzi potwory)",
+        "aliases": [
+            "mieruko-chan",
+            "mieruko chan",
+            "mieruko"
+        ],
+        "publisher": "Wydawnictwo Dango",
+        "glossary": {
+            "Grotesque Spirits": "Widmowe Potwory",
+            "Ignore": "Ignoruj za wszelką cenę (Nie patrz na nich)",
+            "Shrine Spirits": "Bóstwa Chramu (Trzy Modlitwy)"
+        },
+        "character_forms": {
+            "Miko -> Hana": "Hana / na ty",
+            "Hana -> Miko": "Miko / na ty"
+        }
+    },
+    "rent_a_girlfriend": {
+        "title": "Dziewczyna do wynajęcia (Kanojo, Okarishimasu)",
+        "aliases": [
+            "kanojo okarishimasu",
+            "kanojo, okarishimasu",
+            "rent a girlfriend",
+            "dziewczyna do wynajecia",
+            "dziewczyna do wynajęcia"
+        ],
+        "publisher": "Wydawnictwo Dango",
+        "glossary": {
+            "Rental Girlfriend": "Dziewczyna do Wynajęcia",
+            "Diamond App": "Aplikacja Diamond",
+            "Diamond Rental": "Wypożyczenie Diamentowe"
+        },
+        "character_forms": {
+            "Kazuya -> Chizuru": "Mizuhara / Chizuru-san",
+            "Chizuru -> Kazuya": "panie Kinoshita / Kazuya"
+        }
+    },
+    "hamefura": {
+        "title": "Moje odrodzenie w grze otome jako czarny charakter (Hamefura)",
+        "aliases": [
+            "hamefura",
+            "otome game no hametsu flag",
+            "my next life as a villainess"
+        ],
+        "publisher": "Wydawnictwo Dango",
+        "glossary": {
+            "Fortune Lover": "Gra Otome Fortune Lover",
+            "Doom Flag / Destruction Flag": "Flaga Zgłuby",
+            "Bakarina": "Katarina Claes (Bakarina)",
+            "Exile / Death": "Wygnanie / Śmierć"
+        },
+        "character_forms": {
+            "Katarina -> Geordo": "książę Geordo",
+            "Geordo -> Katarina": "Katarino / moja droga"
+        }
+    },
+    "natsume_yuujinchou": {
+        "title": "Księga Przyjaciół Natsume (Natsume Yuujinchou)",
+        "aliases": [
+            "natsume yuujinchou",
+            "natsume's book of friends",
+            "ksiega przyjaciol natsume",
+            "księga przyjaciół natsume"
+        ],
+        "publisher": "Wydawnictwo Dango",
+        "glossary": {
+            "Book of Friends": "Księga Przyjaciół (Yuujinchou)",
+            "Nyanko-sensei / Madara": "Nyanko-sensei (Madara)",
+            "Ayakashi / Youkai": "Ayakashi / Youkai (Duchy)",
+            "Name Returning": "Zwracanie Imienia"
+        },
+        "character_forms": {
+            "Natsume -> Nyanko-sensei": "mistrzu Nyanko / kocie",
+            "Nyanko-sensei -> Natsume": "Natsume / dzieciaku"
+        }
+    },
+    "twoje_kwietniowe_klamstwo": {
+        "title": "Twoje kwietniowe kłamstwo (Shigatsu wa Kimi no Uso)",
+        "aliases": [
+            "shigatsu wa kimi no uso",
+            "your lie in april",
+            "twoje kwietniowe klamstwo",
+            "twoje kwietniowe kłamstwo"
+        ],
+        "publisher": "Wydawnictwo Waneko",
+        "glossary": {
+            "Human Metronome": "Ludzki Metronom",
+            "Violinist": "Skrzypaczka",
+            "Pianist": "Pianista",
+            "Monotone World": "Czarno-biały Świat bez Dźwięków"
+        },
+        "character_forms": {
+            "Kaori -> Kousei": "Przyjacielu A / Kousei",
+            "Kousei -> Kaori": "Miyazono-san / Kaori"
+        }
+    },
+    "toradora": {
+        "title": "Toradora!",
+        "aliases": [
+            "toradora",
+            "toradora!"
+        ],
+        "publisher": "Wydawnictwo Waneko",
+        "glossary": {
+            "Palmtop Tiger": "Kieszonkowy Tygrys",
+            "Dragon and Tiger": "Smok i Tygrys",
+            "Ohashi High School": "Liceum Ohashi"
+        },
+        "character_forms": {
+            "Taiga -> Ryuuji": "Ryuuji / kundlu",
+            "Ryuuji -> Taiga": "Taiga / na ty",
+            "Minori -> Ryuuji": "Takasu-kun"
+        }
+    },
+    "shape_of_voice": {
+        "title": "Kształt twojego głosu (Koe no Katachi / A Silent Voice)",
+        "aliases": [
+            "koe no katachi",
+            "a silent voice",
+            "ksztalt twojego glosu",
+            "kształt twojego głosu"
+        ],
+        "publisher": "Wydawnictwo Waneko",
+        "glossary": {
+            "Sign Language": "Język Migowy",
+            "Notebook": "Zeszyt do Rozmów",
+            "Redemption": "Odkupienie Win"
+        },
+        "character_forms": {
+            "Shoya -> Shoko": "Nishimiya / Shoko",
+            "Shoko -> Shoya": "Shoya (w języku migowym)"
+        }
+    },
+    "d_gray_man": {
+        "title": "D.Gray-man",
+        "aliases": [
+            "d.gray-man",
+            "d gray man",
+            "dgrayman"
+        ],
+        "publisher": "Wydawnictwo Waneko",
+        "glossary": {
+            "Black Order": "Czarny Zakon",
+            "Exorcist": "Egzorcysta",
+            "Innocence": "Niewinność (Innocence)",
+            "Akuma": "Akuma (Machina Cierpienia)",
+            "Millennium Earl": "Tysiącletni Hrabia",
+            "Noah Clan": "Klan Noego",
+            "Crown Clown": "Błazen Koronny"
+        },
+        "character_forms": {
+            "Allen -> Kanda": "Kanda / durniu",
+            "Kanda -> Allen": "kiełku / fasolo",
+            "Lenalee -> Allen": "Allen / na ty"
+        }
+    },
+    "yu_yu_hakusho": {
+        "title": "Yu Yu Hakusho (Wysłannik Zaświatów)",
+        "aliases": [
+            "yu yu hakusho",
+            "yuyu hakusho",
+            "wyslannik zaswiatow",
+            "wysłannik zaświatów"
+        ],
+        "publisher": "Wydawnictwo J.P.Fantastica",
+        "glossary": {
+            "Spirit Detective": "Detektyw Zaświatów",
+            "Spirit Gun / Reigan": "Pocisk Ducha (Reigan)",
+            "Dark Tournament": "Mroczny Turniej",
+            "Spirit World": "Świat Dusz (Reikai)",
+            "Demon World": "Świat Demonów (Makai)",
+            "Dragon of the Darkness Flame": "Czarny Płomienny Smok"
+        },
+        "character_forms": {
+            "Yusuke -> Kuwabara": "Kuwabara / głąbie",
+            "Hiei -> Yusuke": "Yusuke / durniu",
+            "Kurama -> Yusuke": "Yusuke / na ty"
+        }
+    },
+    "kenshin": {
+        "title": "Rurouni Kenshin (Kenshin: Wędrowny Samuraj)",
+        "aliases": [
+            "rurouni kenshin",
+            "kenshin",
+            "rurouni kenshin meiji kenkaku romantan"
+        ],
+        "publisher": "Wydawnictwo J.P.Fantastica",
+        "glossary": {
+            "Battosai the Manslayer": "Battousai Zabójca",
+            "Reverse-Blade Sword / Sakabato": "Miecz o Odwróconym Ostrzu (Sakabato)",
+            "Hiten Mitsurugi-ryu": "Styl Miecza Hiten Mitsurugi",
+            "Amakakeru Ryu no Hirameki": "Błysk Pikującego Smoka",
+            "Kamiya Kasshin-ryu": "Styl Kamiya Kasshin (Miecz Chroniący Życie)",
+            "Meiji Era": "Era Meiji"
+        },
+        "character_forms": {
+            "Kenshin -> Kaoru": "panno Kaoru (Kaoru-dono)",
+            "Kaoru -> Kenshin": "Kenshin / na ty",
+            "Sanosuke -> Kenshin": "Kenshin / durniu"
+        }
+    },
+    "hellsing": {
+        "title": "Hellsing",
+        "aliases": [
+            "hellsing",
+            "hellsing ultimate"
+        ],
+        "publisher": "Wydawnictwo J.P.Fantastica",
+        "glossary": {
+            "Hellsing Organization / Royal Order of Protestant Knights": "Organizacja Hellsing (Królewski Zakon Rycerzy Protestanckich)",
+            "Alucard": "Alucard (Prawdziwy Wampir)",
+            "Iscariot (Section XIII)": "Iscariot (Watykańska Sekcja XIII)",
+            "Millennium": "Organizacja Millennium (Ostatni Batalion)",
+            "Major": "Major (Dowódca Millennium)",
+            "Alexander Anderson": "Ojciec Alexander Anderson (Bagnetowy Egzorcysta)"
+        },
+        "character_forms": {
+            "Alucard -> Integra": "pani Hellsing / moja pani",
+            "Integra -> Alucard": "Alucardzie / Szukaj i niszcz!",
+            "Seras -> Alucard": "mistrzu"
+        }
+    },
+    "black_lagoon": {
+        "title": "Black Lagoon",
+        "aliases": [
+            "black lagoon"
+        ],
+        "publisher": "Wydawnictwo Waneko",
+        "glossary": {
+            "Lagoon Company": "Kompania Lagoon",
+            "Roanapur": "Miasto Zbrodni Roanapur",
+            "Hotel Moscow": "Hotel Moskwa",
+            "Balalaika": "Balalaika (Kapitan)",
+            "Rip-Off Church": "Fałszywy Kościół (Siostra Eda)",
+            "Cutlass": "Pistolety Beretta Cutlass"
+        },
+        "character_forms": {
+            "Revy -> Rock": "Rock / gogusiu",
+            "Rock -> Revy": "Revy / na ty",
+            "Dutch -> Rock": "Rock / synu"
+        }
+    },
     "golden_kamuy": {
         "title": "Golden Kamuy",
-        "aliases": ["golden kamuy", "golden kamuy s4", "golden kamuy s3", "golden kamuy s2", "golden kamuy s1"],
+        "aliases": [
+            "golden kamuy",
+            "golden kamuy s4",
+            "golden kamuy s3",
+            "golden kamuy s2",
+            "golden kamuy s1"
+        ],
         "publisher": "Wydawnictwo Waneko",
         "glossary": {
             "Immortal Sugimoto": "Nieśmiertelny Sugimoto",
@@ -265,7 +1257,13 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     },
     "fullmetal_alchemist": {
         "title": "Fullmetal Alchemist (Stalowy Alchemik)",
-        "aliases": ["fullmetal alchemist", "fullmetal alchemist brotherhood", "fma", "fmab"],
+        "aliases": [
+            "fullmetal alchemist",
+            "fullmetal alchemist brotherhood",
+            "fma",
+            "fmab",
+            "stalowy alchemik"
+        ],
         "publisher": "Wydawnictwo J.P.Fantastica",
         "glossary": {
             "State Alchemist": "Państwowy Alchemik",
@@ -286,7 +1284,9 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     },
     "berserk": {
         "title": "Berserk",
-        "aliases": ["berserk"],
+        "aliases": [
+            "berserk"
+        ],
         "publisher": "Wydawnictwo J.P.Fantastica",
         "glossary": {
             "Band of the Hawk": "Drużyna Sokoła",
@@ -305,7 +1305,10 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     },
     "monster": {
         "title": "Monster",
-        "aliases": ["monster", "naoki urasawa monster"],
+        "aliases": [
+            "monster",
+            "naoki urasawa monster"
+        ],
         "publisher": "Wydawnictwo Hanami",
         "glossary": {
             "Kinderheim 511": "Sierociniec Kinderheim 511",
@@ -320,7 +1323,10 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     },
     "one_piece": {
         "title": "One Piece",
-        "aliases": ["one piece", "op"],
+        "aliases": [
+            "one piece",
+            "op"
+        ],
         "publisher": "Wydawnictwo J.P.Fantastica",
         "glossary": {
             "Straw Hat Pirates": "Piraci Słomkowego Kapelusza",
@@ -340,7 +1346,10 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     },
     "tokyo_ghoul": {
         "title": "Tokyo Ghoul",
-        "aliases": ["tokyo ghoul", "tokyo ghoul re"],
+        "aliases": [
+            "tokyo ghoul",
+            "tokyo ghoul re"
+        ],
         "publisher": "Wydawnictwo Waneko",
         "glossary": {
             "CCG / Commission of Counter Ghoul": "Biuro Przeciwdziałania Ghouli (CCG)",
@@ -359,7 +1368,13 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     },
     "bungou_stray_dogs": {
         "title": "Bungou Stray Dogs (Bezpańscy Literaci)",
-        "aliases": ["bungou stray dogs", "bungo stray dogs", "bsd"],
+        "aliases": [
+            "bungou stray dogs",
+            "bungo stray dogs",
+            "bsd",
+            "bezpanscy literaci",
+            "bezpańscy literaci"
+        ],
         "publisher": "Wydawnictwo Waneko",
         "glossary": {
             "Armed Detective Agency": "Zbrojna Agencja Detektywistyczna",
@@ -378,7 +1393,9 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     },
     "blue_lock": {
         "title": "Blue Lock",
-        "aliases": ["blue lock"],
+        "aliases": [
+            "blue lock"
+        ],
         "publisher": "Wydawnictwo Waneko",
         "glossary": {
             "Blue Lock": "Projekt Blue Lock",
@@ -394,7 +1411,12 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     },
     "haikyuu": {
         "title": "Haikyu!! (Haikyuu!!)",
-        "aliases": ["haikyuu", "haikyu", "haikyuu!!", "haikyu!!"],
+        "aliases": [
+            "haikyuu",
+            "haikyu",
+            "haikyuu!!",
+            "haikyu!!"
+        ],
         "publisher": "Wydawnictwo Studio JG",
         "glossary": {
             "Karasuno High": "Liceum Karasuno",
@@ -414,7 +1436,11 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     },
     "oshi_no_ko": {
         "title": "Moja Gwiazda (Oshi no Ko)",
-        "aliases": ["oshi no ko", "my star"],
+        "aliases": [
+            "oshi no ko",
+            "my star",
+            "moja gwiazda"
+        ],
         "publisher": "Wydawnictwo Studio JG",
         "glossary": {
             "B-Komachi": "Grupa Idol B-Komachi",
@@ -432,7 +1458,10 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     },
     "bocchi_the_rock": {
         "title": "Bocchi the Rock!",
-        "aliases": ["bocchi the rock", "bocchi the rock!"],
+        "aliases": [
+            "bocchi the rock",
+            "bocchi the rock!"
+        ],
         "publisher": "Wydawnictwo Studio JG",
         "glossary": {
             "Kessoku Band": "Kessoku Band",
@@ -447,7 +1476,13 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     },
     "dragon_ball": {
         "title": "Dragon Ball",
-        "aliases": ["dragon ball", "dragon ball z", "dragon ball super", "dbz", "dbs"],
+        "aliases": [
+            "dragon ball",
+            "dragon ball z",
+            "dragon ball super",
+            "dbz",
+            "dbs"
+        ],
         "publisher": "Wydawnictwo J.P.Fantastica",
         "glossary": {
             "Kamehameha": "Kamehameha",
@@ -464,7 +1499,12 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     },
     "naruto": {
         "title": "Naruto / Naruto Shippuuden",
-        "aliases": ["naruto", "naruto shippuden", "naruto shippuuden", "boruto"],
+        "aliases": [
+            "naruto",
+            "naruto shippuden",
+            "naruto shippuuden",
+            "boruto"
+        ],
         "publisher": "Wydawnictwo J.P.Fantastica",
         "glossary": {
             "Hidden Leaf Village / Konoha": "Wioska Ukrytego Liścia (Konoha)",
@@ -484,7 +1524,11 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     },
     "bleach": {
         "title": "Bleach",
-        "aliases": ["bleach", "bleach thousand year blood war", "bleach tybw"],
+        "aliases": [
+            "bleach",
+            "bleach thousand year blood war",
+            "bleach tybw"
+        ],
         "publisher": "Wydawnictwo J.P.Fantastica",
         "glossary": {
             "Soul Reaper / Shinigami": "Żniwiarz Dusz (Shinigami)",
@@ -504,7 +1548,11 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     },
     "death_note": {
         "title": "Death Note (Notatnik Śmierci)",
-        "aliases": ["death note"],
+        "aliases": [
+            "death note",
+            "notatnik smierci",
+            "notatnik śmierci"
+        ],
         "publisher": "Wydawnictwo J.P.Fantastica",
         "glossary": {
             "Death Note": "Notatnik Śmierci",
@@ -520,7 +1568,14 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     },
     "jojo": {
         "title": "JoJo's Bizarre Adventure",
-        "aliases": ["jojo", "jojos bizarre adventure", "jojo no kimyou na bouken", "stardust crusaders", "golden wind", "stone ocean"],
+        "aliases": [
+            "jojo",
+            "jojos bizarre adventure",
+            "jojo no kimyou na bouken",
+            "stardust crusaders",
+            "golden wind",
+            "stone ocean"
+        ],
         "publisher": "Wydawnictwo J.P.Fantastica",
         "glossary": {
             "Stand": "Stand",
@@ -536,7 +1591,10 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     },
     "dandadan": {
         "title": "DanDaDan",
-        "aliases": ["dandadan", "dan da dan"],
+        "aliases": [
+            "dandadan",
+            "dan da dan"
+        ],
         "publisher": "Wydawnictwo Studio JG",
         "glossary": {
             "Turbo Granny": "Turbo Babcia",
@@ -551,7 +1609,11 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     },
     "kaiju_no_8": {
         "title": "Kaiju No. 8",
-        "aliases": ["kaiju no 8", "kaiju no. 8", "kaiju no.8"],
+        "aliases": [
+            "kaiju no 8",
+            "kaiju no. 8",
+            "kaiju no.8"
+        ],
         "publisher": "Wydawnictwo Studio JG",
         "glossary": {
             "Kaiju": "Kaiju (Potwór)",
@@ -566,7 +1628,12 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     },
     "solo_leveling": {
         "title": "Solo Leveling (Tylko ja awansuję)",
-        "aliases": ["solo leveling", "ore dake level up na ken"],
+        "aliases": [
+            "solo leveling",
+            "ore dake level up na ken",
+            "tylko ja awansuje",
+            "tylko ja awansuję"
+        ],
         "publisher": "Wydawnictwo Studio JG",
         "glossary": {
             "Hunter": "Łowca",
@@ -582,7 +1649,10 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     },
     "mushoku_tensei": {
         "title": "Mushoku Tensei: Przegrany bezrobotny",
-        "aliases": ["mushoku tensei", "jobless reincarnation"],
+        "aliases": [
+            "mushoku tensei",
+            "jobless reincarnation"
+        ],
         "publisher": "Wydawnictwo Studio JG",
         "glossary": {
             "Mana Disaster / Teleportation Incident": "Incydent Teleportacyjny (Katastrofa Many)",
@@ -598,7 +1668,9 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     },
     "made_in_abyss": {
         "title": "Made in Abyss",
-        "aliases": ["made in abyss"],
+        "aliases": [
+            "made in abyss"
+        ],
         "publisher": "Wydawnictwo Kotori",
         "glossary": {
             "Abyss": "Otchłań",
@@ -615,7 +1687,12 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     },
     "overlord": {
         "title": "Overlord",
-        "aliases": ["overlord", "overlord iv", "overlord iii", "overlord ii"],
+        "aliases": [
+            "overlord",
+            "overlord iv",
+            "overlord iii",
+            "overlord ii"
+        ],
         "publisher": "Wydawnictwo Kotori",
         "glossary": {
             "Great Tomb of Nazarick": "Wielki Grobowiec Nazarick",
@@ -632,7 +1709,12 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     },
     "hells_paradise": {
         "title": "Piekielny Raj (Jigokuraku / Hell's Paradise)",
-        "aliases": ["jigokuraku", "hells paradise", "hell's paradise"],
+        "aliases": [
+            "jigokuraku",
+            "hells paradise",
+            "hell's paradise",
+            "piekielny raj"
+        ],
         "publisher": "Wydawnictwo Waneko",
         "glossary": {
             "Elixir of Immortality": "Eliksir Nieśmiertelności",
@@ -648,7 +1730,9 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     },
     "tokyo_revengers": {
         "title": "Tokyo Revengers",
-        "aliases": ["tokyo revengers"],
+        "aliases": [
+            "tokyo revengers"
+        ],
         "publisher": "Wydawnictwo Waneko",
         "glossary": {
             "Tokyo Manji Gang / Toman": "Gang Tokyo Manji (Toman)",
@@ -706,7 +1790,12 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     },
     "kusuriya_no_hitorigoto": {
         "title": "Zapiski Zielarki (Kusuriya no Hitorigoto / The Apothecary Diaries)",
-        "aliases": ["kusuriya no hitorigoto", "apothecary diaries", "the apothecary diaries", "zapiski zielarki"],
+        "aliases": [
+            "kusuriya no hitorigoto",
+            "apothecary diaries",
+            "the apothecary diaries",
+            "zapiski zielarki"
+        ],
         "publisher": "Wydawnictwo Studio JG",
         "glossary": {
             "Rear Palace": "Tylny Pałac",
@@ -730,7 +1819,11 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     },
     "dr_stone": {
         "title": "Dr. Stone",
-        "aliases": ["dr stone", "dr. stone", "dr.stone"],
+        "aliases": [
+            "dr stone",
+            "dr. stone",
+            "dr.stone"
+        ],
         "publisher": "Wydawnictwo Waneko",
         "glossary": {
             "Kingdom of Science": "Królestwo Nauki",
@@ -749,7 +1842,10 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     },
     "wind_breaker": {
         "title": "Wind Breaker",
-        "aliases": ["wind breaker", "windbreaker"],
+        "aliases": [
+            "wind breaker",
+            "windbreaker"
+        ],
         "publisher": "Wydawnictwo Waneko",
         "glossary": {
             "Bofurin": "Bofurin (Strażnicy Wiatru Furin)",
@@ -766,7 +1862,11 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     },
     "witch_hat_atelier": {
         "title": "Atelier Spiczastych Kapeluszy (Tongari Boushi no Atelier)",
-        "aliases": ["tongari boushi no atelier", "witch hat atelier", "atelier spiczastych kapeluszy"],
+        "aliases": [
+            "tongari boushi no atelier",
+            "witch hat atelier",
+            "atelier spiczastych kapeluszy"
+        ],
         "publisher": "Wydawnictwo Kotori",
         "glossary": {
             "Pointed Hat": "Spiczasty Kapelusz",
@@ -782,7 +1882,9 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     },
     "chihayafuru": {
         "title": "Chihayafuru",
-        "aliases": ["chihayafuru"],
+        "aliases": [
+            "chihayafuru"
+        ],
         "publisher": "Wydawnictwo Hanami",
         "glossary": {
             "Karuta": "Karuta (Ogura Hyakunin Isshu)",
@@ -798,7 +1900,10 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     },
     "pluto": {
         "title": "Pluto",
-        "aliases": ["pluto", "naoki urasawa pluto"],
+        "aliases": [
+            "pluto",
+            "naoki urasawa pluto"
+        ],
         "publisher": "Wydawnictwo Hanami",
         "glossary": {
             "Gesicht": "Inspektor Gesicht",
@@ -814,7 +1919,14 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     },
     "komi_cant_communicate": {
         "title": "Komi nie potrafi się porozumieć (Komi-san wa, Komyushou desu)",
-        "aliases": ["komi-san wa komyushou desu", "komi cant communicate", "komi can't communicate", "komi san"],
+        "aliases": [
+            "komi-san wa komyushou desu",
+            "komi cant communicate",
+            "komi can't communicate",
+            "komi san",
+            "komi nie potrafi sie porozumiec",
+            "komi nie potrafi się porozumieć"
+        ],
         "publisher": "Wydawnictwo Studio JG",
         "glossary": {
             "Communication Disorder": "Zaburzenie Komunikacji",
@@ -828,7 +1940,14 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     },
     "re_zero": {
         "title": "Re:Zero - Życie w innym świecie od zera",
-        "aliases": ["re:zero", "re zero", "rezero", "re:zero kara hajimeru isekai seikatsu"],
+        "aliases": [
+            "re:zero",
+            "re zero",
+            "rezero",
+            "re:zero kara hajimeru isekai seikatsu",
+            "zycie w innym swiecie od zera",
+            "życie w innym świecie od zera"
+        ],
         "publisher": "Wydawnictwo Waneko",
         "glossary": {
             "Return by Death": "Powrót przez Śmierć",
@@ -848,7 +1967,11 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     },
     "sword_art_online": {
         "title": "Sword Art Online",
-        "aliases": ["sword art online", "sao", "sword art online alicization"],
+        "aliases": [
+            "sword art online",
+            "sao",
+            "sword art online alicization"
+        ],
         "publisher": "Wydawnictwo Kotori",
         "glossary": {
             "Aincrad": "Aincrad (Pływający Zamek)",
@@ -868,7 +1991,10 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     },
     "fire_force": {
         "title": "Fire Force (Enen no Shouboutai)",
-        "aliases": ["fire force", "enen no shouboutai"],
+        "aliases": [
+            "fire force",
+            "enen no shouboutai"
+        ],
         "publisher": "Wydawnictwo Waneko",
         "glossary": {
             "Special Fire Force": "Specjalne Siły Przeciwpożarowe",
@@ -887,7 +2013,9 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     },
     "soul_eater": {
         "title": "Soul Eater",
-        "aliases": ["soul eater"],
+        "aliases": [
+            "soul eater"
+        ],
         "publisher": "Wydawnictwo J.P.Fantastica",
         "glossary": {
             "DWMA / Shibusen": "Akademia Śmierci (Shibusen)",
@@ -906,7 +2034,10 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     },
     "noragami": {
         "title": "Noragami",
-        "aliases": ["noragami", "noragami aragoto"],
+        "aliases": [
+            "noragami",
+            "noragami aragoto"
+        ],
         "publisher": "Wydawnictwo Studio JG",
         "glossary": {
             "Delivery God Yato": "Bóg na Telefon Yato",
@@ -924,7 +2055,12 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     },
     "eminence_in_shadow": {
         "title": "Eminencja w cieniu (Kage no Jitsuryokusha ni Naritakute!)",
-        "aliases": ["kage no jitsuryokusha ni naritakute", "the eminence in shadow", "eminence in shadow", "eminencja w cieniu"],
+        "aliases": [
+            "kage no jitsuryokusha ni naritakute",
+            "the eminence in shadow",
+            "eminence in shadow",
+            "eminencja w cieniu"
+        ],
         "publisher": "Wydawnictwo Studio JG",
         "glossary": {
             "Shadow Garden": "Ogród Cieni (Shadow Garden)",
@@ -940,7 +2076,12 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
     },
     "yofukashi_no_uta": {
         "title": "Pieśń Nocy (Yofukashi no Uta / Call of the Night)",
-        "aliases": ["yofukashi no uta", "call of the night", "pieśń nocy"],
+        "aliases": [
+            "yofukashi no uta",
+            "call of the night",
+            "pieśń nocy",
+            "piesn nocy"
+        ],
         "publisher": "Wydawnictwo Dango",
         "glossary": {
             "Vampire": "Wampir",
