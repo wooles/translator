@@ -1405,11 +1405,15 @@ class MultimodalTranslator:
         if series_bible_str:
             print(f"  [Biblia Serialu]: Wczytano ciągłość sezonu dla serii '{series_title or self.series_bible.slug}'")
 
-        # 0d. Combined User and Series Bible Glossary (Deterministic)
+        # 0d. Combined User, Manga Canon and Series Bible Glossary (Deterministic)
         series_gloss_dict = self.series_bible.data.get("glossary", {}) if hasattr(self, "series_bible") and self.series_bible else {}
+        if manga_canon_entry and manga_canon_entry.get("glossary"):
+            series_gloss_dict.update(manga_canon_entry["glossary"])
         combined_glossary = self.glossary_manager.get_combined_glossary(series_gloss_dict)
+        if manga_canon_entry and manga_canon_entry.get("glossary"):
+            combined_glossary.update(manga_canon_entry["glossary"])
         if combined_glossary:
-            print(f"  [Słownik Deterministyczny]: Aktywnych {len(combined_glossary)} żelaznych terminów.")
+            print(f"  [Słownik Deterministyczny]: Aktywnych {len(combined_glossary)} żelaznych terminów (w tym 100% Kanonu Mangowego).")
 
         user_rules_cnt = len(self.user_feedback.list_all())
         if user_rules_cnt > 0:

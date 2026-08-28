@@ -2232,14 +2232,14 @@ Znasz na wylot katalogi wszystkich oficjalnych polskich wydawnictw:
 ZADANIE:
 Sprawdź, czy seria anime/manga '{primary_title}' (lub powiązane tytuły: {', '.join(all_candidates[:4])}) POSIADA OFICJALNE POLSKIE WYDANIE MANGI LUB LIGHT NOVEL wydane przez jakiekolwiek licencjonowane polskie wydawnictwo.
 
-Jeżeli seria została oficjalnie wydana w Polsce, zwróć JSON:
+Jeżeli seria została oficjalnie wydana w Polsce, zwróć WYCZERPUJĄCY, KOMPLETNY JSON ze WSZYSTKIMI kluczowymi nazwami własnymi, rangami, atakami, magią, lokacjami i formami zwrotów:
 {{
   "has_polish_edition": true,
   "title": "Oficjalny Polski Tytuł (Oryginalny Tytuł)",
   "publisher": "Wydawnictwo XYZ",
   "aliases": ["{primary_title.lower()}", "{slug}"],
   "glossary": {{
-    "Angielska/Japońska nazwa ataku, rangi, magii lub lokacji": "Oficjalne polskie tłumaczenie z mangi"
+    "Angielska/Japońska nazwa ataku, rangi, magii, frakcji lub lokacji": "Oficjalne polskie tłumaczenie z polskiego wydania mangi"
   }},
   "character_forms": {{
     "PostaćA -> PostaćB": "kanoniczna forma zwrotu (np. panie X / po imieniu / na ty / mistrzu)"
@@ -2289,7 +2289,7 @@ ZWRÓĆ WYŁĄCZNIE CZYSTY KOD JSON BEZ ZBĘDNYCH KOMENTARZY.
             return None
 
     def format_canon_for_prompt(self, canon_entry: Optional[Dict[str, Any]]) -> str:
-        """Formats manga canon entry into a concise system prompt block."""
+        """Formats complete manga canon entry into a system prompt block with ZERO truncation."""
         if not canon_entry:
             return ""
 
@@ -2300,14 +2300,14 @@ ZWRÓĆ WYŁĄCZNIE CZYSTY KOD JSON BEZ ZBĘDNYCH KOMENTARZY.
 
         glossary = canon_entry.get("glossary", {})
         if glossary:
-            lines.append("• Słowniczek kanoniczny (ataki, magia, krainy, formacje):")
-            for term_src, term_pl in list(glossary.items())[:25]:
+            lines.append("• Kompletny słowniczek kanoniczny (ataki, magia, krainy, formacje, rangi):")
+            for term_src, term_pl in glossary.items():
                 lines.append(f"  - '{term_src}' -> '{term_pl}'")
 
         char_forms = canon_entry.get("character_forms", {})
         if char_forms:
-            lines.append("• Kanoniczne formy zwrotów i relacje:")
-            for rel, form_desc in list(char_forms.items())[:12]:
+            lines.append("• Kompletne kanoniczne formy zwrotów i relacje:")
+            for rel, form_desc in char_forms.items():
                 lines.append(f"  - {rel}: {form_desc}")
 
         lines.append("(!) ZASADA AVT: Zachowaj kanoniczne nazwy, ale przy długich wypowiedziach stosuj zwięzłą polską składnię (limit 17 CPS).")
