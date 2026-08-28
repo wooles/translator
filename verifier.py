@@ -226,8 +226,8 @@ class DialogueVerifier:
                 is_rate_limit = "429" in err_str or "quota" in err_str or "resource_exhausted" in err_str
 
                 import random
-                # Progressive exponential backoff with jitter to give Google TPUs breathing room during spikes
-                wait_sec = min(12.0, 1.5 * (1.4 ** min(attempt, 6)) + random.uniform(0.2, 0.8))
+                # Fast agile TPU sniping (1.0s - 3.5s) combined with instant multi-key rotation
+                wait_sec = min(3.5, 0.8 + 0.5 * min(attempt, 4) + random.uniform(0.1, 0.4))
                 
                 if is_timeout:
                     timeout_sec = int(os.getenv("GEMINI_HTTP_TIMEOUT_MS", "120000")) // 1000
