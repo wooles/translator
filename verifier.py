@@ -179,19 +179,8 @@ class DialogueVerifier:
                         config=cfg
                     )
 
-                # Speculative Hedging on Google AI Studio: calibrate timeout for unrestricted thinking headroom (45s for deep CoT)
-                hedge_timeout = 45.0 if effective_budget > 0 else 5.0
-                if "flash" in self.model.lower():
-                    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as hedge_executor:
-                        f1 = hedge_executor.submit(_single_generate)
-                        try:
-                            response = f1.result(timeout=hedge_timeout)
-                        except concurrent.futures.TimeoutError:
-                            f2 = hedge_executor.submit(_single_generate)
-                            done, _ = concurrent.futures.wait([f1, f2], return_when=concurrent.futures.FIRST_COMPLETED)
-                            response = list(done)[0].result()
-                else:
-                    response = _single_generate()
+                # Direct generation using thread-safe multi-key rotation and token bucket pacing
+                response = _single_generate()
 
                 if hasattr(response, "usage_metadata") and response.usage_metadata:
                     um = response.usage_metadata

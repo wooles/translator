@@ -1088,6 +1088,10 @@ class MultimodalTranslator:
 
         if self.enable_verifier and hasattr(self, 'verifier'):
             pbar.set_postfix_str("Faza 2 (Redakcja Dialogów Pro)...")
+            # Staggered entry (350ms per thread) to prevent simultaneous TPU burst collisions on 503
+            stagger_sec = (b_idx % max(1, self.concurrent_batches)) * 0.35
+            if stagger_sec > 0:
+                time.sleep(stagger_sec)
             refined_lines: List[RefinedLine] = self.verifier.verify_batch(
                 batch_items=pass1_items,
                 scene_summary=scene_desc or "",
