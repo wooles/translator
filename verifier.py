@@ -31,8 +31,11 @@ class DialogueVerifier:
         thinking_budget: Optional[int] = None
     ):
         self.client = client
-        from client_factory import MultiKeyClientPool
-        self.client_pool = MultiKeyClientPool(raw_keys=os.getenv("GEMINI_API_KEY"), timeout_ms=120000)
+        if hasattr(client, "get_client") and hasattr(client, "clients"):
+            self.client_pool = client
+        else:
+            from client_factory import MultiKeyClientPool
+            self.client_pool = MultiKeyClientPool(raw_keys=os.getenv("GEMINI_API_KEY"), timeout_ms=120000)
         self.model = model
         self.keep_honorifics = keep_honorifics
         self.system_prompt = get_verifier_system_prompt(keep_honorifics=keep_honorifics)

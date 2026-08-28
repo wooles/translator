@@ -7,7 +7,7 @@ and European Enterprise Vertex AI endpoints (europe-west1 / Belgia).
 
 import os
 import logging
-from typing import Optional
+from typing import Optional, Dict, Any
 from google import genai
 from google.genai import types
 
@@ -68,8 +68,11 @@ class MultiKeyClientPool:
     Thread-safe Round-Robin Client Pool across multiple Google AI Studio API Keys.
     Allows concurrent batches to distribute requests across independent gateway queues.
     """
+    _SHARED_POOLS: Dict[str, Any] = {}
+
     def __init__(self, raw_keys: Optional[str] = None, timeout_ms: int = 120000):
         import threading
+        import concurrent.futures
         self._lock = threading.Lock()
         self._idx = 0
         raw = raw_keys or os.environ.get("GEMINI_API_KEY", "").strip()
@@ -78,12 +81,16 @@ class MultiKeyClientPool:
             keys_list = [""]
 
         http_opts = types.HttpOptions(timeout=timeout_ms)
-        self.clients = []
-        for k in keys_list:
+        
+        def _make_client(k: str) -> genai.Client:
             if k:
-                self.clients.append(genai.Client(api_key=k, http_options=http_opts))
+                return genai.Client(api_key=k, http_options=http_opts)
             else:
-                self.clients.append(genai.Client(http_options=http_opts))
+                return genai.Client(http_options=http_opts)
+
+        # Initialize all clients in parallel for sub-second startup
+        with concurrent.futures.ThreadPoolExecutor(max_workers=min(32, max(4, len(keys_list)))) as executor:
+            self.clients = list(executor.map(_make_client, keys_list))
 
         logger.info(f"[MultiKey Pool]: Active gateway pool with {len(self.clients)} API channel(s).")
 

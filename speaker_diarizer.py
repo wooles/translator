@@ -66,6 +66,8 @@ class SpeakerVoiceClassifier:
                 f0 = sample_rate / peak_idx
                 if 75.0 <= f0 <= 450.0:
                     f0_estimates.append(f0)
+                    if len(f0_estimates) >= 12:
+                        break
 
         if not f0_estimates or len(f0_estimates) < 3:
             return None
