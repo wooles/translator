@@ -238,7 +238,15 @@ class DialogueVerifier:
 
                 MAX_RETRIES = 5
                 if attempt >= MAX_RETRIES:
-                    print(f"\n[Redaktor Dialogów / Faza 2]: Osiągnięto limit {MAX_RETRIES} prób dla serwera Google ({e}). Zastosowano dopracowany szkic z Filarami AVT.")
+                    if is_unavailable:
+                        friendly_reason = "Chwilowe przeciążenie klastrów TPU u Google (503 High Demand)"
+                    elif is_rate_limit:
+                        friendly_reason = "Tymczasowy limit przepustowości zapytań (429 Rate Limit)"
+                    elif is_timeout:
+                        friendly_reason = "Przekroczenie limitu czasu odpowiedzi serwera (Timeout)"
+                    else:
+                        friendly_reason = str(e).split("{")[0].strip().rstrip(".") or "Brak odpowiedzi serwera"
+                    print(f"\n[Redaktor Dialogów / Faza 2]: Osiągnięto limit {MAX_RETRIES} prób dla serwera Google ({friendly_reason}). Zastosowano dopracowany szkic z Filarami AVT.")
                     return [RefinedLine(id=it["id"], refined_pl=it["pl"]) for it in batch_items]
 
                 import random

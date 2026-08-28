@@ -762,7 +762,15 @@ class MultimodalTranslator:
 
                 MAX_RETRIES = 5
                 if attempt >= MAX_RETRIES:
-                    print(f"\n[Tłumacz / Faza 1]: Osiągnięto limit {MAX_RETRIES} prób dla serwera Google ({e}). Zastosowano awaryjny szkic.")
+                    if is_unavailable:
+                        friendly_reason = "Chwilowe przeciążenie klastrów TPU u Google (503 High Demand)"
+                    elif is_rate_limit:
+                        friendly_reason = "Tymczasowy limit przepustowości zapytań (429 Rate Limit)"
+                    elif is_timeout:
+                        friendly_reason = "Przekroczenie limitu czasu odpowiedzi serwera (Timeout)"
+                    else:
+                        friendly_reason = str(e).split("{")[0].strip().rstrip(".") or "Brak odpowiedzi serwera"
+                    print(f"\n[Tłumacz / Faza 1]: Osiągnięto limit {MAX_RETRIES} prób dla serwera Google ({friendly_reason}). Zastosowano awaryjny szkic.")
                     return schema_class.model_validate({"translations": []})
 
                 import random
