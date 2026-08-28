@@ -395,6 +395,7 @@ class LineTranslation(BaseModel):
 class BatchTranslationResponse(BaseModel):
     scene_diagnosis: Optional[SceneDiagnosis] = Field(default=None, description="Zwięzła diagnoza sytuacji, intencji i podtekstu sceny PRZED tłumaczeniem")
     translations: List[LineTranslation] = Field(description="Lista przetłumaczonych kwestii")
+    scene_description: Optional[str] = Field(default=None, description="Krótki opis sceny na kadrze")
     characters_identified: Optional[List[CharacterInfo]] = Field(default=None, description="Zidentyfikowane lub nowo odkryte postacie i ich płeć")
 
 class MultimodalTranslator:
@@ -1006,8 +1007,15 @@ class MultimodalTranslator:
                     if char.name:
                         desc = f"{char.gender} ({char.role or 'postać'})"
                         self.character_registry[char.name] = desc
-        if batch_response and batch_response.scene_description:
-            pbar.write(f" ├─ [Kontekst] {batch_response.scene_description}")
+        scene_desc = ""
+        if batch_response:
+            if getattr(batch_response, "scene_diagnosis", None) and batch_response.scene_diagnosis:
+                scene_desc = getattr(batch_response.scene_diagnosis, "dramatic_context", "") or ""
+            elif getattr(batch_response, "scene_description", None):
+                scene_desc = batch_response.scene_description or ""
+
+        if scene_desc:
+            pbar.write(f" ├─ [Kontekst] {scene_desc}")
 
         # Clean up temporary frames and audio files
         for fpath in temp_frames:
@@ -1023,7 +1031,6 @@ class MultimodalTranslator:
 
         # 5. Process Phase 1 response
         pass1_items = []
-        scene_desc = batch_response.scene_description if batch_response else ""
 
         for idx, (orig_idx, event, clean_en, ts_prefix) in enumerate(untranslated_in_batch):
             batch_id = idx + 1
