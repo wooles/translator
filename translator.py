@@ -1070,18 +1070,28 @@ class MultimodalTranslator:
                 orig_item = next((it for it in pass1_items if it["id"] == r.id), None)
                 orig_pl = orig_item["pl"] if orig_item else ""
                 clean_ref = sanitize_sub_text(r.refined_pl)
-                ch_desc = getattr(r, 'changes_made', '') or ''
+                ch_desc = (getattr(r, 'changes_made', '') or '').strip()
                 
                 # Check if there is an actual textual modification
                 has_text_change = orig_pl and (orig_pl.strip() != clean_ref.strip())
                 
                 if has_text_change:
-                    pillar_note = f" [{ch_desc}]" if ch_desc and "Zweryfikowano" not in ch_desc else ""
+                    if ch_desc and "Zweryfikowano" not in ch_desc and ch_desc.lower() != "null":
+                        clean_note = ch_desc if ch_desc.startswith("[") else f"[{ch_desc}]"
+                        pillar_note = f" {clean_note}"
+                    else:
+                        pillar_note = ""
+                    
+                    # Strip internal ASS tags (like {\i1}, {\i0}) for pure, clean console display
+                    disp_orig = re.sub(r"\{[^\}]*\}", "", orig_pl).strip()
+                    disp_ref = re.sub(r"\{[^\}]*\}", "", clean_ref).strip()
+                    
                     pbar.write(f" └─ [Redaktor Dialogów] #{r.id}{pillar_note}")
-                    pbar.write(f"    ├─ Szkic:  \"{orig_pl}\"")
-                    pbar.write(f"    └─ Szlif:  \"{clean_ref}\"")
+                    pbar.write(f"    ├─ Szkic:  \"{disp_orig}\"")
+                    pbar.write(f"    └─ Szlif:  \"{disp_ref}\"")
                 elif ch_desc and "Zweryfikowano" not in ch_desc and ch_desc.lower() != "null":
-                    pbar.write(f" └─ [Redaktor Dialogów] #{r.id} {ch_desc}")
+                    clean_note = ch_desc if ch_desc.startswith("[") else f"[{ch_desc}]"
+                    pbar.write(f" └─ [Redaktor Dialogów] #{r.id} {clean_note}")
             for item in pass1_items:
                 raw_final = sanitize_sub_text(refined_dict.get(item["id"], item["pl"]))
                 final_text, fixes = AVTLinter.lint_and_fix_line(
