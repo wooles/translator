@@ -4859,7 +4859,22 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "White Lead Powder": "Biała maść ołowiowa",
             "Aphrodisiac": "Afrodyzjak",
             "Bureau of Medicine": "Wydział Medyczny",
-            "Madame of Rokushōkan": "Babka z Rokushōkan"
+            "Madame of Rokushōkan": "Babka z Rokushōkan",
+            "La Clan": "Klan La",
+            "Shi Clan": "Klan Shi",
+            "Fengxian": "Fengxian (była kurtyzana)",
+            "Cordyceps / Dongchongxiacao": "Maczużnik chiński (Grzyb gąsienicowy / Dongchongxiacao)",
+            "Fugu Poison / Tetrodotoxin": "Tetrodotoksyna (Trucizna z rozdymki)",
+            "Datura": "Bieluń dziędzierzawa (Datura)",
+            "Liquid Mercury": "Płynna rtęć",
+            "Cinnabar": "Cynober (siarczek rtęci)",
+            "Rhododendron Poison": "Trucizna z różanecznika",
+            "Suiren": "Suiren (główna służąca Jinshiego)",
+            "Hongniang": "Hongniang (główna dama dworu Gyokuyou)",
+            "Basen": "Basen (młodszy pomocnik)",
+            "Rikuson": "Rikuson (adiutant Lakana)",
+            "Shisui": "Shisui (służąca z zamiłowaniem do owadów)",
+            "Shenmei": "Shenmei (pani rodu Shi)"
         },
         "character_forms": {
             "Maomao -> Jinshi": "Panie Jinshi – oficjalnie, ze sztucznym szacunkiem, ukrywanym w duchu wstrętem i chłodnym dystansem",
@@ -4874,7 +4889,9 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Maomao -> Lakan": "Ten człowiek / Strateg Lakan – z jawną niechęcią, wrogością i zupełnym brakiem szacunku",
             "Lakan -> Maomao": "Moja ukochana córeczka / Maomao – z obsesyjną miłością ojcowską i zachwytem",
             "Pairin / Joka / Meimei -> Maomao": "Maomao – siostrzanie, z troską i pobłażaniem dla jej dziwactw",
-            "Maomao -> Pairin / Joka / Meimei": "Siostro – z szacunkiem młodszej wychowanki z tego samego domu uciech"
+            "Maomao -> Pairin / Joka / Meimei": "Siostro – z szacunkiem młodszej wychowanki z tego samego domu uciech",
+            "Maomao -> Suiren": "Pani Suiren – z uprzejmym szacunkiem",
+            "Maomao -> Hongniang": "Pani Hongniang – ze zrozumieniem dla jej trudów"
         }
     },
     "dr_stone": {
