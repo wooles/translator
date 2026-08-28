@@ -234,18 +234,7 @@ class DialogueVerifier:
                     cycle = attempt // max(1, num_keys)
                     wait_sec = min(3.0, 0.6 + 0.4 * min(cycle, 4) + random.uniform(0.1, 0.3))
                 
-                if is_timeout:
-                    timeout_sec = int(os.getenv("GEMINI_HTTP_TIMEOUT_MS", "120000")) // 1000
-                    print(f"\n[Redaktor Dialogów / Faza 2]: Serwer Google potrzebował więcej czasu na analizę sceny (limit {timeout_sec}s na {self.model}) [Ponawianie: Próba {attempt}]...")
-                    print(f"  [..] Błyskawiczny przeskok na kolejny klucz API ({wait_sec:.2f}s) z pełnym CoT...")
-                    time.sleep(wait_sec)
-                elif is_unavailable or is_rate_limit:
-                    friendly_err = "Przeciążenie klastrów TPU (503 High Demand)" if is_unavailable else "Chwilowy limit zapytań (429 Rate Limit)"
-                    print(f"\n[Redaktor Dialogów / Faza 2]: Chwilowa niedostępność serwerów Google ({friendly_err} na {self.model}) [Ponawianie: Próba {attempt}]...")
-                    print(f"  [..] Błyskawiczny przeskok na kolejny klucz API ({wait_sec:.2f}s) z pełnym budżetem myślenia CoT...")
-                    time.sleep(wait_sec)
-                else:
-                    clean_msg = str(e).split("{")[0].strip() if "{" in str(e) else str(e)
-                    print(f"\n[Redaktor Dialogów / Faza 2]: Chwilowa przerwa w odpowiedzi API na {self.model} ({clean_msg}) [Ponawianie: Próba {attempt}]...")
-                    print(f"  [..] Oczekiwanie {wait_sec:.2f}s i ponawianie...")
-                    time.sleep(wait_sec)
+                if attempt == 1:
+                    friendly_err = "Przeciążenie klastrów TPU (503 High Demand)" if is_unavailable else ("Chwilowy limit zapytań (429 Rate Limit)" if is_rate_limit else "Oczekiwanie na odpowiedź serwera")
+                    print(f"\n[Redaktor Dialogów / Faza 2]: Kolejkowanie do TPU na {self.model} ({friendly_err}). Błyskawiczna rotacja kluczy API...")
+                time.sleep(wait_sec)

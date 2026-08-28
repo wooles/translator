@@ -734,21 +734,10 @@ class MultimodalTranslator:
                     cycle = attempt // max(1, num_keys)
                     wait_time = min(3.0, 0.6 + 0.4 * min(cycle, 4) + random.uniform(0.1, 0.3))
 
-                if is_timeout:
-                    timeout_sec = int(os.getenv("GEMINI_HTTP_TIMEOUT_MS", "120000")) // 1000
-                    print(f"\n[Tłumacz / Faza 1]: Serwer Google potrzebował więcej czasu na odpowiedź (limit {timeout_sec}s na {current_model}) [Ponawianie: Próba {attempt}]...")
-                    print(f"  [..] Błyskawiczny przeskok na kolejny klucz API ({wait_time:.2f}s)...")
-                    time.sleep(wait_time)
-                elif is_unavailable or is_rate_limit:
-                    friendly_err = "Przeciążenie serwerów TPU (503 High Demand)" if is_unavailable else "Chwilowy limit zapytań (429 Rate Limit)"
-                    print(f"\n[Tłumacz / Faza 1]: Chwilowa niedostępność serwerów Google ({friendly_err} na {current_model}) [Ponawianie: Próba {attempt}]...")
-                    print(f"  [..] Błyskawiczny przeskok na kolejny klucz API ({wait_time:.2f}s)...")
-                    time.sleep(wait_time)
-                else:
-                    clean_msg = str(e).split("{")[0].strip() if "{" in str(e) else str(e)
-                    print(f"\n[Tłumacz / Faza 1]: Chwilowa przerwa w odpowiedzi API na {current_model} ({clean_msg}) [Ponawianie: Próba {attempt}]...")
-                    print(f"  [..] Oczekiwanie {wait_time:.2f}s i ponawianie...")
-                    time.sleep(wait_time)
+                if attempt == 1:
+                    friendly_err = "Przeciążenie serwerów TPU (503 High Demand)" if is_unavailable else ("Chwilowy limit zapytań (429 Rate Limit)" if is_rate_limit else "Oczekiwanie na odpowiedź serwera")
+                    print(f"\n[Tłumacz / Faza 1]: Kolejkowanie do TPU na {current_model} ({friendly_err}). Błyskawiczna rotacja kluczy API...")
+                time.sleep(wait_time)
 
     def _process_single_batch(
         self,

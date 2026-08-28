@@ -323,18 +323,7 @@ Zwróć wynik w formacie JSON zgodnym ze schematem EpisodeProfile."""
                 is_unavailable = "503" in err_str or "unavailable" in err_str or "high demand" in err_str
                 is_rate_limit = "429" in err_str or "quota" in err_str or "resource_exhausted" in err_str
                 
-                if is_timeout:
-                    timeout_sec = int(os.getenv("GEMINI_HTTP_TIMEOUT_MS", "120000")) // 1000
-                    print(f"\n[Profiler Odcinka]: Serwer Google potrzebował więcej czasu na analizę profilu (limit {timeout_sec}s na {self.model}) [Próba {attempt}/{MAX_PROFILER_RETRIES}].")
-                    print(f"  [..] Błyskawiczny przeskok na kolejny klucz API ({wait_sec:.2f}s)...")
-                    time.sleep(wait_sec)
-                elif is_unavailable or is_rate_limit:
-                    friendly_reason = "Przeciążenie TPU (503 High Demand)" if is_unavailable else "Limit zapytań (429 Rate Limit)"
-                    print(f"\n[Profiler Odcinka]: Chwilowa niedostępność serwerów Google ({friendly_reason} na {self.model}) [Próba {attempt}/{MAX_PROFILER_RETRIES}].")
-                    print(f"  [..] Błyskawiczny przeskok na kolejny klucz API ({wait_sec:.2f}s)...")
-                    time.sleep(wait_sec)
-                else:
-                    clean_msg = str(e).split("{")[0].strip() if "{" in str(e) else str(e)
-                    print(f"\n[Profiler Odcinka]: Chwilowa przerwa w odpowiedzi API na {self.model} ({clean_msg}) [Próba {attempt}/{MAX_PROFILER_RETRIES}].")
-                    print(f"  [..] Oczekiwanie {wait_sec:.1f}s i automatyczne ponawianie...")
-                    time.sleep(wait_sec)
+                if attempt == 1:
+                    friendly_reason = "Przeciążenie TPU (503 High Demand)" if is_unavailable else ("Limit zapytań (429 Rate Limit)" if is_rate_limit else "Oczekiwanie na odpowiedź serwera")
+                    print(f"\n[Profiler Odcinka]: Kolejkowanie do TPU na {self.model} ({friendly_reason}). Błyskawiczna rotacja kluczy API...")
+                time.sleep(wait_sec)
