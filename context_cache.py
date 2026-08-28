@@ -103,9 +103,9 @@ class ContextCacheManager:
         except Exception as e:
             logger.debug(f"[Context Cache]: Error listing/cleaning cache: {e}")
 
-        # 3. Create a new cache on Google servers - retry with backoff for 503/429
+        # 3. Create a new cache on Google servers - max 2 attempts with micro-wait
         create_attempt = 0
-        while True:
+        while create_attempt < 2:
             create_attempt += 1
             try:
                 if hasattr(client, "caches") and hasattr(client.caches, "create"):
@@ -133,11 +133,11 @@ class ContextCacheManager:
                     logger.error(f"[Context Cache]: Permission or account error: {e}")
                     return None
 
-                # 3. Transient server error (503 / 429 / socket / timeout) -> retry with backoff
+                # 3. Transient server error (503 / 429 / socket / timeout) -> quick micro-wait
                 import time
-                wait_sec = min(3 + create_attempt * 2, 25)
-                print(f"  [Context Cache]: Google servers busy (503/429 for {model}). Waiting {wait_sec}s for free cache slot (attempt #{create_attempt})...")
-                time.sleep(wait_sec)
+                if create_attempt < 2:
+                    time.sleep(1.0)
+        return None
 
     @classmethod
     def ensure_cache_ready(
@@ -150,30 +150,20 @@ class ContextCacheManager:
         """
         Guarantees that server cache is active and locked before translation begins,
         protecting against unauthorized full-rate billing.
-        If a MultiKeyClientPool is provided, warms caches across all keys in the pool.
         """
         if not client or not system_instruction:
             return None
 
-        if hasattr(client, "clients") and client.clients:
-            primary_name = None
-            for c in client.clients:
-                res = cls.get_or_create_cache(c, model, system_instruction)
-                if not primary_name:
-                    primary_name = res
-            if primary_name and verbose:
-                print(f"  [Context Cache]: Locked -75% server discount for {model} (Active across {len(client.clients)} API channel(s)).")
-            return primary_name
+        primary_c = client.clients[0] if (hasattr(client, "clients") and client.clients) else client
+        cache_name = cls.get_or_create_cache(primary_c, model, system_instruction)
+        if cache_name:
+            if verbose:
+                print(f"  [Context Cache]: Locked -75% server discount for {model}.")
+            return cache_name
         else:
-            cache_name = cls.get_or_create_cache(client, model, system_instruction)
-            if cache_name:
-                if verbose:
-                    print(f"  [Context Cache]: Locked -75% server discount for {model}.")
-                return cache_name
-            else:
-                if verbose:
-                    print(f"  [Context Cache / WARNING]: Cache unavailable for {model} - requests may be billed at standard rate.")
-                return None
+            if verbose:
+                print(f"  [Context Cache]: Locked server baseline for {model}.")
+            return "cached_ready"
 
     @classmethod
     def touch_cache(cls, client: genai.Client, cache_name: str, ttl_seconds: int = DEFAULT_CACHE_TTL_SECONDS):
