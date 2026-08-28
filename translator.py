@@ -1383,17 +1383,17 @@ class MultimodalTranslator:
         if video_path:
             candidates_to_match.append(Path(video_path).stem)
 
-        manga_canon_entry = None
-        for cand in candidates_to_match:
-            if cand:
-                manga_canon_entry = self.manga_canon.find_canon_for_series(cand)
-                if manga_canon_entry:
-                    break
+        manga_canon_entry = self.manga_canon.get_or_discover_canon(
+            series_title=series_title,
+            candidates=candidates_to_match,
+            anime_meta=anime_meta,
+            client=self.client_pool or self.client
+        )
 
         manga_canon_str = ""
         if manga_canon_entry:
             manga_canon_str = self.manga_canon.format_canon_for_prompt(manga_canon_entry)
-            print(f"  [Kanon Mangi]: Wczytano oficjalną polską terminologię ({manga_canon_entry.get('publisher', 'Wydawnictwo')})")
+            print(f"  [Kanon Mangi]: Wczytano oficjalny polski kanon: '{manga_canon_entry.get('title')}' ({manga_canon_entry.get('publisher', 'Wydawnictwo')})")
             if manga_canon_entry.get("glossary"):
                 self.series_bible.update_from_episode_profile(
                     episode_name="Kanon Mangi",

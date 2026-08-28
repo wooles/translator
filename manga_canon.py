@@ -703,12 +703,264 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Kojiro -> Tokiyuki": "Tokiyuki / Wasza Dostojność",
             "Ayako -> Tokiyuki": "Tokiyuki / paniczu Tokiyuki"
         }
+    },
+    "kusuriya_no_hitorigoto": {
+        "title": "Zapiski Zielarki (Kusuriya no Hitorigoto / The Apothecary Diaries)",
+        "aliases": ["kusuriya no hitorigoto", "apothecary diaries", "the apothecary diaries", "zapiski zielarki"],
+        "publisher": "Wydawnictwo Studio JG",
+        "glossary": {
+            "Rear Palace": "Tylny Pałac",
+            "Inner Palace": "Pałac Wewnętrzny",
+            "Pure Consort": "Czysta Małżonka",
+            "Precious Consort": "Drogocenna Małżonka",
+            "Virtuous Consort": "Cnotliwa Małżonka",
+            "Capable Consort": "Zdolna Małżonka",
+            "Verdigris House": "Dom pod Zielonym Gryfem",
+            "Courtesan": "Kurtyzana",
+            "Eunuch": "Eunuch",
+            "Apothecary": "Zielarka / Aptekarka",
+            "Quack Doctor": "Pocieszny Doktorek / Konował"
+        },
+        "character_forms": {
+            "Maomao -> Jinshi": "pan Jinshi",
+            "Jinshi -> Maomao": "Maomao / ty",
+            "Gaoshun -> Jinshi": "panicz Jinshi",
+            "Maomao -> Gyokuyou": "pani Gyokuyou / Wasza Wysokość"
+        }
+    },
+    "dr_stone": {
+        "title": "Dr. Stone",
+        "aliases": ["dr stone", "dr. stone", "dr.stone"],
+        "publisher": "Wydawnictwo Waneko",
+        "glossary": {
+            "Kingdom of Science": "Królestwo Nauki",
+            "Petrification": "Petryfikacja (Zamiana w kamień)",
+            "Revival Fluid / Miracle Fluid": "Płyn Ożywienia (Cudowny Płyn)",
+            "Empire of Might": "Imperium Siły Tsukasy",
+            "Ishigami Village": "Wioska Ishigami",
+            "Nital": "Nital (Kwas azotowy + alkohol)",
+            "Sulfa Drug": "Sulfamid"
+        },
+        "character_forms": {
+            "Senku -> Chrome": "Chrome / na ty",
+            "Chrome -> Senku": "Senku / na ty",
+            "Kohaku -> Senku": "Senku / czarodzieju"
+        }
+    },
+    "wind_breaker": {
+        "title": "Wind Breaker",
+        "aliases": ["wind breaker", "windbreaker"],
+        "publisher": "Wydawnictwo Waneko",
+        "glossary": {
+            "Bofurin": "Bofurin (Strażnicy Wiatru Furin)",
+            "Furin High School": "Liceum Furin",
+            "Shishitoren": "Gang Shishitoren",
+            "Keel": "Gang Keel",
+            "Captain": "Kapitan / Dowódca"
+        },
+        "character_forms": {
+            "Sakura -> Umemiya": "Umemiya / na ty (szorstko)",
+            "Nirei -> Sakura": "panie Sakura / Sakura-san",
+            "Suo -> Sakura": "Sakura-kun / Sakura"
+        }
+    },
+    "witch_hat_atelier": {
+        "title": "Atelier Spiczastych Kapeluszy (Tongari Boushi no Atelier)",
+        "aliases": ["tongari boushi no atelier", "witch hat atelier", "atelier spiczastych kapeluszy"],
+        "publisher": "Wydawnictwo Kotori",
+        "glossary": {
+            "Pointed Hat": "Spiczasty Kapelusz",
+            "Brimmed Hat": "Rondo / Kapelusze z Rondem",
+            "Magic Ink": "Magiczny Atrament",
+            "Keystones": "Kamienie Kluczowe",
+            "Great Hall": "Wielka Sala Magów"
+        },
+        "character_forms": {
+            "Coco -> Qifrey": "mistrzu Qifrey",
+            "Agott -> Coco": "Coco / na ty"
+        }
+    },
+    "chihayafuru": {
+        "title": "Chihayafuru",
+        "aliases": ["chihayafuru"],
+        "publisher": "Wydawnictwo Hanami",
+        "glossary": {
+            "Karuta": "Karuta (Ogura Hyakunin Isshu)",
+            "Meijin": "Meijin (Mistrz)",
+            "Queen": "Królowa Karuty",
+            "Mizuusawa High": "Liceum Mizusawa",
+            "Class A / Class B": "Klasa A / Klasa B"
+        },
+        "character_forms": {
+            "Chihaya -> Taichi": "Taichi / na ty",
+            "Chihaya -> Arata": "Arata / na ty"
+        }
+    },
+    "pluto": {
+        "title": "Pluto",
+        "aliases": ["pluto", "naoki urasawa pluto"],
+        "publisher": "Wydawnictwo Hanami",
+        "glossary": {
+            "Gesicht": "Inspektor Gesicht",
+            "Atom": "Atom / Astro Boy",
+            "Seven Great Robots": "Siedem Najwspanialszych Robotów Świata",
+            "39th Central Asian War": "39. Wojna Środkowoazjatycka",
+            "Bora Corporation": "Korporacja Bora"
+        },
+        "character_forms": {
+            "Gesicht -> Atom": "Atom / na ty",
+            "Atom -> Gesicht": "panie Gesicht"
+        }
+    },
+    "komi_cant_communicate": {
+        "title": "Komi nie potrafi się porozumieć (Komi-san wa, Komyushou desu)",
+        "aliases": ["komi-san wa komyushou desu", "komi cant communicate", "komi can't communicate", "komi san"],
+        "publisher": "Wydawnictwo Studio JG",
+        "glossary": {
+            "Communication Disorder": "Zaburzenie Komunikacji",
+            "Itan Private High School": "Prywatne Liceum Itan",
+            "100 Friends": "100 Przyjaciół"
+        },
+        "character_forms": {
+            "Tadano -> Komi": "Komi-san / Komi",
+            "Najimi -> Tadano": "Tadano / na ty"
+        }
+    },
+    "re_zero": {
+        "title": "Re:Zero - Życie w innym świecie od zera",
+        "aliases": ["re:zero", "re zero", "rezero", "re:zero kara hajimeru isekai seikatsu"],
+        "publisher": "Wydawnictwo Waneko",
+        "glossary": {
+            "Return by Death": "Powrót przez Śmierć",
+            "Witch of Envy / Satella": "Wiedźma Zazdrości (Satella)",
+            "Witch Cult": "Kult Wiedźmy",
+            "Sin Archbishop": "Arcybiskup Grzechu",
+            "Dragon Kingdom of Lugnica": "Smocze Królestwo Lugnicy",
+            "Royal Selection": "Królewska Selekcja",
+            "White Whale": "Biały Wieloryb",
+            "Mabeast": "Magiczna Bestia"
+        },
+        "character_forms": {
+            "Subaru -> Emilia": "Emilia-tan / Emilia",
+            "Rem -> Subaru": "panie Subaru / Subaru-kun",
+            "Ram -> Subaru": "Barusu / głąbie"
+        }
+    },
+    "sword_art_online": {
+        "title": "Sword Art Online",
+        "aliases": ["sword art online", "sao", "sword art online alicization"],
+        "publisher": "Wydawnictwo Kotori",
+        "glossary": {
+            "Aincrad": "Aincrad (Pływający Zamek)",
+            "NerveGear": "NerveGear",
+            "Beater": "Beater (Beta Tester + Oszust)",
+            "Knights of the Blood Oath": "Rycerze Krwi",
+            "Black Swordsman": "Czarny Szermierz",
+            "Dual Blades": "Podwójne Ostrza",
+            "Underworld": "Underworld",
+            "Fluctlight": "Fluctlight"
+        },
+        "character_forms": {
+            "Kirito -> Asuna": "Asuna / na ty",
+            "Asuna -> Kirito": "Kirito-kun / Kirito",
+            "Klein -> Kirito": "Kirito / na ty"
+        }
+    },
+    "fire_force": {
+        "title": "Fire Force (Enen no Shouboutai)",
+        "aliases": ["fire force", "enen no shouboutai"],
+        "publisher": "Wydawnictwo Waneko",
+        "glossary": {
+            "Special Fire Force": "Specjalne Siły Przeciwpożarowe",
+            "Company 8": "Ósma Kompania",
+            "Infernals": "Piekielni",
+            "Adolla Burst": "Płomień Adolli (Adolla Burst)",
+            "White-Clad": "Białe Szaty",
+            "Evangelist": "Ewangelista",
+            "Latom": "Látom (Niech spłonie w pokoju)"
+        },
+        "character_forms": {
+            "Shinra -> Captain Obi": "kapitanie Obi",
+            "Arthur -> Shinra": "Shinra / diable",
+            "Iris -> Shinra": "panie Shinra"
+        }
+    },
+    "soul_eater": {
+        "title": "Soul Eater",
+        "aliases": ["soul eater"],
+        "publisher": "Wydawnictwo J.P.Fantastica",
+        "glossary": {
+            "DWMA / Shibusen": "Akademia Śmierci (Shibusen)",
+            "Meister": "Mistrz Broni (Meister)",
+            "Demon Weapon": "Demoniczna Broń",
+            "Death Scythe": "Kosa Śmierci",
+            "Lord Death / Shinigami": "Lord Śmierć",
+            "Kishin": "Kishin (Bóstwo Szaleństwa)",
+            "Soul Resonance": "Rezonans Dusz"
+        },
+        "character_forms": {
+            "Maka -> Soul": "Soul / na ty",
+            "Black Star -> Tsubaki": "Tsubaki / na ty",
+            "Death the Kid -> Liz": "Liz / na ty"
+        }
+    },
+    "noragami": {
+        "title": "Noragami",
+        "aliases": ["noragami", "noragami aragoto"],
+        "publisher": "Wydawnictwo Studio JG",
+        "glossary": {
+            "Delivery God Yato": "Bóg na Telefon Yato",
+            "Regalia / Shinki": "Święty Oręż (Shinki)",
+            "Phantoms / Ayakashi": "Zjawy (Ayakashi)",
+            "Ablution": "Rytuał Oczyszczenia",
+            "Bishamonten": "Bishamonten (Bogini Wojny)",
+            "Kofuku": "Bogini Biedy Kofuku"
+        },
+        "character_forms": {
+            "Hiyori -> Yato": "Yato / na ty",
+            "Yukine -> Yato": "Yato / durniu",
+            "Yato -> Hiyori": "Hiyori / na ty"
+        }
+    },
+    "eminence_in_shadow": {
+        "title": "Eminencja w cieniu (Kage no Jitsuryokusha ni Naritakute!)",
+        "aliases": ["kage no jitsuryokusha ni naritakute", "the eminence in shadow", "eminence in shadow", "eminencja w cieniu"],
+        "publisher": "Wydawnictwo Studio JG",
+        "glossary": {
+            "Shadow Garden": "Ogród Cieni (Shadow Garden)",
+            "Cult of Diablos": "Kult Diablosa",
+            "Seven Shadows": "Siedem Cieni",
+            "Lord Shadow": "Władca Shadow / Lord Shadow",
+            "I Am Atomic": "Jestem Atomem (I Am Atomic)"
+        },
+        "character_forms": {
+            "Shadows -> Cid": "Władco Shadow / panie Shadow",
+            "Cid -> Alpha": "Alpha / na ty"
+        }
+    },
+    "yofukashi_no_uta": {
+        "title": "Pieśń Nocy (Yofukashi no Uta / Call of the Night)",
+        "aliases": ["yofukashi no uta", "call of the night", "pieśń nocy"],
+        "publisher": "Wydawnictwo Dango",
+        "glossary": {
+            "Vampire": "Wampir",
+            "Night Walking": "Nocne Włóczęgi",
+            "Blood Sucking": "Wysysanie Krwi",
+            "Offspring": "Potomek / Dziecko Wampira"
+        },
+        "character_forms": {
+            "Kou -> Nazuna": "Nazuna / na ty",
+            "Nazuna -> Kou": "Kou-kun / Kou"
+        }
     }
 }
 
 
 class MangaCanonRegistry:
-    """Zarządca i wyszukiwarka kanonu polskich wydań mangowych."""
+    """
+    Zarządca i inteligentna wyszukiwarka oficjalnego kanonu polskich wydań mangowych
+    (Waneko, J.P.Fantastica, Studio JG, Kotori, Hanami, Dango, Akuma, Egmont itp.).
+    """
 
     def __init__(self, custom_dir: Optional[Path] = None):
         self.custom_dir = custom_dir or MANGA_CANON_DIR
@@ -717,10 +969,12 @@ class MangaCanonRegistry:
         self._load_custom_files()
 
     def _load_custom_files(self):
-        """Loads custom JSON files added by user into manga_canon/ directory."""
+        """Loads custom and dynamically discovered JSON files from manga_canon/ directory."""
         if not self.custom_dir.exists():
             return
         for json_file in self.custom_dir.glob("*.json"):
+            if json_file.name.startswith("."):
+                continue
             try:
                 with open(json_file, "r", encoding="utf-8") as f:
                     data = json.load(f)
@@ -750,6 +1004,134 @@ class MangaCanonRegistry:
 
         return None
 
+    def get_or_discover_canon(
+        self,
+        series_title: str,
+        candidates: Optional[List[str]] = None,
+        anime_meta: Optional[Dict[str, Any]] = None,
+        client: Optional[Any] = None,
+        model: str = "gemini-3.6-flash"
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Universal Polish Manga Canon Resolver:
+        1. Checks built-in database and local cache.
+        2. If not found, dynamically queries AI knowledge base to discover
+           if the anime has an official Polish manga/light novel edition (Waneko, JPF, Studio JG, Kotori, Hanami, Dango etc.).
+        3. Saves discovered canon to manga_canon/{slug}.json for instant offline access.
+        """
+        all_candidates = []
+        if series_title:
+            all_candidates.append(series_title)
+        if candidates:
+            all_candidates.extend(candidates)
+        if anime_meta:
+            for k in ["title_romaji", "title_english", "title_japanese", "title_native"]:
+                if anime_meta.get(k):
+                    all_candidates.append(anime_meta[k])
+
+        # 1. Check local DB
+        for cand in all_candidates:
+            if cand:
+                entry = self.find_canon_for_series(cand)
+                if entry:
+                    return entry
+
+        # 2. Check negative cache
+        neg_cache_path = self.custom_dir / ".no_canon_cache.json"
+        neg_cache = set()
+        if neg_cache_path.exists():
+            try:
+                with open(neg_cache_path, "r", encoding="utf-8") as f:
+                    neg_cache = set(json.load(f))
+            except Exception:
+                pass
+
+        primary_title = series_title or (all_candidates[0] if all_candidates else "")
+        if not primary_title:
+            return None
+
+        slug = re.sub(r"[^\w]+", "_", primary_title.lower()).strip("_")
+        if slug in neg_cache:
+            return None
+
+        # 3. Dynamic Discovery via AI (if client available)
+        if not client:
+            return None
+
+        try:
+            from google.genai import types
+            prompt = f"""
+Jesteś czołowym ekspertem i archiwistą rynku mangi oraz light novel w Polsce.
+Znasz na wylot katalogi wszystkich oficjalnych polskich wydawnictw:
+- Wydawnictwo Waneko
+- Wydawnictwo J.P.Fantastica (JPF)
+- Wydawnictwo Studio JG
+- Wydawnictwo Kotori
+- Wydawnictwo Hanami
+- Wydawnictwo Dango
+- Wydawnictwo Akuma
+- Wydawnictwo Egmont Polska
+- Wydawnictwo Amber / Kasen / Taiga
+
+ZADANIE:
+Sprawdź, czy seria anime/manga '{primary_title}' (lub powiązane tytuły: {', '.join(all_candidates[:4])}) POSIADA OFICJALNE POLSKIE WYDANIE MANGI LUB LIGHT NOVEL wydane przez jakiekolwiek licencjonowane polskie wydawnictwo.
+
+Jeżeli seria została oficjalnie wydana w Polsce, zwróć JSON:
+{{
+  "has_polish_edition": true,
+  "title": "Oficjalny Polski Tytuł (Oryginalny Tytuł)",
+  "publisher": "Wydawnictwo XYZ",
+  "aliases": ["{primary_title.lower()}", "{slug}"],
+  "glossary": {{
+    "Angielska/Japońska nazwa ataku, rangi, magii lub lokacji": "Oficjalne polskie tłumaczenie z mangi"
+  }},
+  "character_forms": {{
+    "PostaćA -> PostaćB": "kanoniczna forma zwrotu (np. panie X / po imieniu / na ty / mistrzu)"
+  }}
+}}
+
+Jeżeli seria NIE POSIADA oficjalnego polskiego wydania mangi/LN w Polsce:
+Zwróć:
+{{
+  "has_polish_edition": false
+}}
+
+ZWRÓĆ WYŁĄCZNIE CZYSTY KOD JSON BEZ ZBĘDNYCH KOMENTARZY.
+"""
+            target_client = getattr(client, "get_client", lambda: client)()
+            resp = target_client.models.generate_content(
+                model=model,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    temperature=0.1,
+                    response_mime_type="application/json"
+                )
+            )
+            raw_text = resp.text.strip()
+            data = json.loads(raw_text)
+
+            if data.get("has_polish_edition") and data.get("title") and data.get("publisher"):
+                entry_data = {
+                    "title": data["title"],
+                    "aliases": list(set(data.get("aliases", []) + [slug, primary_title.lower()])),
+                    "publisher": data["publisher"],
+                    "glossary": data.get("glossary", {}),
+                    "character_forms": data.get("character_forms", {})
+                }
+                out_path = self.custom_dir / f"{slug}.json"
+                with open(out_path, "w", encoding="utf-8") as f:
+                    json.dump(entry_data, f, ensure_ascii=False, indent=2)
+
+                self.canon_db[slug] = entry_data
+                return entry_data
+            else:
+                neg_cache.add(slug)
+                with open(neg_cache_path, "w", encoding="utf-8") as f:
+                    json.dump(list(neg_cache), f, ensure_ascii=False, indent=2)
+                return None
+        except Exception:
+            return None
+
     def format_canon_for_prompt(self, canon_entry: Optional[Dict[str, Any]]) -> str:
         """Formats manga canon entry into a concise system prompt block."""
         if not canon_entry:
@@ -763,13 +1145,13 @@ class MangaCanonRegistry:
         glossary = canon_entry.get("glossary", {})
         if glossary:
             lines.append("• Słowniczek kanoniczny (ataki, magia, krainy, formacje):")
-            for term_src, term_pl in list(glossary.items())[:15]:
+            for term_src, term_pl in list(glossary.items())[:25]:
                 lines.append(f"  - '{term_src}' -> '{term_pl}'")
 
         char_forms = canon_entry.get("character_forms", {})
         if char_forms:
             lines.append("• Kanoniczne formy zwrotów i relacje:")
-            for rel, form_desc in list(char_forms.items())[:8]:
+            for rel, form_desc in list(char_forms.items())[:12]:
                 lines.append(f"  - {rel}: {form_desc}")
 
         lines.append("(!) ZASADA AVT: Zachowaj kanoniczne nazwy, ale przy długich wypowiedziach stosuj zwięzłą polską składnię (limit 17 CPS).")
