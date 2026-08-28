@@ -162,11 +162,13 @@ class DialogueVerifier:
 
                 import concurrent.futures
 
+                last_used_client = None
                 def _single_generate():
-                    nonlocal cached_name
+                    nonlocal cached_name, last_used_client
                     from client_factory import global_rate_limiter
                     global_rate_limiter.acquire()
                     active_c = self.client_pool.get_client() if hasattr(self, "client_pool") and self.client_pool else self.client
+                    last_used_client = active_c
                     cached_name = ContextCacheManager.get_or_create_cache(
                         client=active_c,
                         model=self.model,
@@ -209,6 +211,9 @@ class DialogueVerifier:
 
             except Exception as e:
                 err_str = str(e).lower()
+                if hasattr(self, "client_pool") and self.client_pool and last_used_client:
+                    self.client_pool.report_error(last_used_client, err_str)
+
                 is_cache_err = "403" in err_str or "cachedcontent" in err_str or "permission" in err_str
                 if is_cache_err and cached_name:
                     from context_cache import ContextCacheManager

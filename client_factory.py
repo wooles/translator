@@ -7,7 +7,7 @@ and European Enterprise Vertex AI endpoints (europe-west1 / Belgia).
 
 import os
 import logging
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, Tuple, List
 from google import genai
 from google.genai import types
 
@@ -65,16 +65,16 @@ def get_genai_client(
 
 class MultiKeyClientPool:
     """
-    Thread-safe Round-Robin Client Pool across multiple Google AI Studio API Keys.
-    Allows concurrent batches to distribute requests across independent gateway queues.
+    Thread-safe Smart Round-Robin Client Pool with Circuit Breaker and Auto-Banning of Exhausted Keys.
+    Distributes requests only across active, healthy API keys, immediately cooling down keys that hit 429 quota.
     """
-    _SHARED_POOLS: Dict[str, Any] = {}
-
     def __init__(self, raw_keys: Optional[str] = None, timeout_ms: int = 120000):
         import threading
+        import time
         import concurrent.futures
         self._lock = threading.Lock()
         self._idx = 0
+        self._cooldowns: Dict[int, float] = {}  # client index -> expiry monotonic time
         raw = raw_keys or os.environ.get("GEMINI_API_KEY", "").strip()
         keys_list = [k.strip() for k in raw.replace(";", ",").split(",") if k.strip()]
         if not keys_list:
@@ -92,14 +92,77 @@ class MultiKeyClientPool:
         with concurrent.futures.ThreadPoolExecutor(max_workers=min(32, max(4, len(keys_list)))) as executor:
             self.clients = list(executor.map(_make_client, keys_list))
 
-        logger.info(f"[MultiKey Pool]: Active gateway pool with {len(self.clients)} API channel(s).")
+        # Fast parallel health probe on startup (only if multiple keys exist)
+        if len(self.clients) > 1:
+            def _probe_client(idx_c: Tuple[int, genai.Client]) -> Tuple[int, bool]:
+                idx, c = idx_c
+                try:
+                    c.models.generate_content(
+                        model="gemini-3.6-flash",
+                        contents="ping",
+                        config=types.GenerateContentConfig(max_output_tokens=1)
+                    )
+                    return idx, True
+                except Exception as e:
+                    err = str(e).lower()
+                    if "429" in err or "quota" in err or "resource_exhausted" in err or "prepayment" in err:
+                        return idx, False
+                    return idx, True
+
+            with concurrent.futures.ThreadPoolExecutor(max_workers=min(32, len(self.clients))) as executor:
+                probe_results = list(executor.map(_probe_client, enumerate(self.clients)))
+
+            now = time.monotonic()
+            healthy_count = 0
+            for idx, is_healthy in probe_results:
+                if not is_healthy:
+                    self._cooldowns[idx] = now + 300.0  # 5 min cooldown for exhausted keys
+                else:
+                    healthy_count += 1
+
+            if healthy_count > 0:
+                print(f"  [MultiKey Pool]: Gotowe {healthy_count}/{len(self.clients)} aktywnych kluczy API ({len(self.clients) - healthy_count} w trybie cooldown).")
+            else:
+                self._cooldowns.clear()  # Fallback: keep all if none passed
+
+    def report_error(self, client: genai.Client, error_str: str):
+        """Immediately puts client into cooldown upon 429 quota or account error."""
+        import time
+        err = error_str.lower()
+        if "429" in err or "quota" in err or "resource_exhausted" in err or "prepayment" in err or "depleted" in err:
+            with self._lock:
+                for idx, c in enumerate(self.clients):
+                    if c is client:
+                        self._cooldowns[idx] = time.monotonic() + 180.0
+                        break
 
     def get_client(self) -> genai.Client:
-        """Returns next client in round-robin sequence."""
+        """Returns next healthy client in round-robin sequence."""
+        import time
         with self._lock:
-            client = self.clients[self._idx % len(self.clients)]
-            self._idx += 1
-            return client
+            now = time.monotonic()
+            # Clean expired cooldowns
+            expired = [idx for idx, exp in self._cooldowns.items() if exp <= now]
+            for idx in expired:
+                del self._cooldowns[idx]
+
+            available_indices = [i for i in range(len(self.clients)) if i not in self._cooldowns]
+            if available_indices:
+                chosen_idx = available_indices[self._idx % len(available_indices)]
+                self._idx += 1
+                return self.clients[chosen_idx]
+
+            # If all are cooling down, pick the one expiring soonest
+            soonest_idx = min(self._cooldowns.keys(), key=lambda k: self._cooldowns[k])
+            return self.clients[soonest_idx]
+
+    def get_active_clients(self) -> List[genai.Client]:
+        """Returns list of currently active (non-cooling down) clients."""
+        import time
+        with self._lock:
+            now = time.monotonic()
+            active = [c for idx, c in enumerate(self.clients) if self._cooldowns.get(idx, 0) <= now]
+            return active if active else self.clients
 
 
 class TokenBucketLimiter:

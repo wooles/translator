@@ -664,11 +664,13 @@ class MultimodalTranslator:
 
                 import concurrent.futures
 
+                last_used_client = None
                 def _single_generate():
-                    nonlocal cached_name
+                    nonlocal cached_name, last_used_client
                     from client_factory import global_rate_limiter
                     global_rate_limiter.acquire()
                     active_c = self.client_pool.get_client() if hasattr(self, "client_pool") and self.client_pool else self.client
+                    last_used_client = active_c
                     cached_name = ContextCacheManager.get_or_create_cache(
                         client=active_c,
                         model=current_model,
@@ -706,6 +708,9 @@ class MultimodalTranslator:
 
             except Exception as e:
                 err_str = str(e).lower()
+                if hasattr(self, "client_pool") and self.client_pool and last_used_client:
+                    self.client_pool.report_error(last_used_client, err_str)
+
                 is_cache_err = "403" in err_str or "cachedcontent" in err_str or "permission" in err_str
                 if is_cache_err and cached_name:
                     from context_cache import ContextCacheManager
@@ -1490,9 +1495,10 @@ class MultimodalTranslator:
             all_user_rules = self.user_feedback.list_all()
 
             if tasks_to_run:
-                max_workers = min(self.concurrent_batches, len(tasks_to_run))
+                active_keys_count = len(self.client_pool.get_active_clients()) if hasattr(self, "client_pool") and self.client_pool else 1
+                max_workers = min(self.concurrent_batches, len(tasks_to_run), max(2, active_keys_count * 2))
                 if max_workers > 1:
-                    print(f"\n  [Równoległość Tier 1]: Uruchamianie równoległego tłumaczenia ({max_workers} paczki jednocześnie)...")
+                    print(f"\n  [Równoległość Tier 1]: Uruchamianie równoległego tłumaczenia ({max_workers} paczek jednocześnie / {active_keys_count} aktywnych kluczy API)...")
                     import concurrent.futures
                     with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
                         future_to_bidx = {
