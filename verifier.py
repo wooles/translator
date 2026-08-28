@@ -157,7 +157,7 @@ class DialogueVerifier:
                     "response_mime_type": "application/json",
                     "response_schema": RefinedBatchResponse,
                 }
-                if "3.7" in self.model.lower() or "pro" in self.model.lower() or "2.5" in self.model.lower() or "3.6" in self.model.lower():
+                if "3.7" in self.model.lower() or "pro" in self.model.lower() or "2.5-pro" in self.model.lower():
                     gen_config_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=effective_budget)
 
                 import concurrent.futures

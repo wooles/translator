@@ -482,6 +482,7 @@ class MultimodalTranslator:
         # Real token counter for the current episode
         self.current_episode_tokens: Dict[str, Any] = {"prompt": 0, "cached": 0, "output": 0, "model": self.model}
         import threading
+        self.lock = threading.Lock()
         num_keys = len(self.client_pool.clients) if hasattr(self, "client_pool") and self.client_pool and hasattr(self.client_pool, "clients") else 1
         default_concurrency = min(10, max(4, num_keys // 2)) if num_keys > 2 else 4
         self.concurrent_batches = int(os.getenv("CONCURRENT_BATCHES", str(default_concurrency)))
@@ -744,7 +745,9 @@ class MultimodalTranslator:
 
                 if attempt == 1:
                     friendly_err = "Przeciążenie serwerów TPU (503 High Demand)" if is_unavailable else ("Chwilowy limit zapytań (429 Rate Limit)" if is_rate_limit else "Oczekiwanie na odpowiedź serwera")
-                    print(f"\n[Tłumacz / Faza 1]: Kolejkowanie do TPU na {current_model} ({friendly_err}). Błyskawiczna rotacja kluczy API...")
+                    print(f"\n[Tłumacz / Faza 1]: Kolejkowanie do TPU na {current_model} ({friendly_err}). Błyskawiczna rotacja kluczy API... [BŁĄD: {e}]")
+                else:
+                    print(f"  ├─ [Próba {attempt}]: Błąd: {e}")
                 time.sleep(wait_time)
 
     def _process_single_batch(
