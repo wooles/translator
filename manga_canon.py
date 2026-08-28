@@ -5810,11 +5810,12 @@ Znasz na wylot katalogi wszystkich oficjalnych polskich wydawnictw:
 ZADANIE:
 Sprawdź, czy seria anime/manga '{primary_title}' (lub powiązane tytuły: {', '.join(all_candidates[:4])}) POSIADA OFICJALNE POLSKIE WYDANIE MANGI LUB LIGHT NOVEL wydane przez jakiekolwiek licencjonowane polskie wydawnictwo.
 
-Jeżeli seria została oficjalnie wydana w Polsce, zwróć WYCZERPUJĄCY, ENCYKLOPEDYCZNY słownik (minimum 25-40 kluczowych terminów) ze WSZYSTKIMI oficjalnymi polskimi nazwami:
-1. Wszystkie techniki walki, ataki, zaklęcia, formacje i transformacje.
-2. Wszystkie rangi wojskowe, szlacheckie, tytuły honorowe, gildie, sekty, zakony i organizacje.
-3. Wszystkie kluczowe krainy, miasta, twierdze, rzeki, artefakty, przedmioty i unikalne pojęcia świata.
-4. Wszystkie kanoniczne formy zwrotów i relacje między głównymi i pobocznymi postaciami.
+Jeżeli seria została oficjalnie wydana w Polsce, zwróć WYCZERPUJĄCY, BEZWZGLĘDNIE KOMPLETNY ENCYKLOPEDYCZNY SŁOWNIK ZE WSZYSTKIMI (BEZ ŻADNYCH LIMITÓW ILOŚCIOWYCH) OFICJALNYMI POLSKIMI TERMINAMI Z POLSKIEGO WYDANIA MANGI/LN:
+1. ABSOLUTNIE WSZYSTKIE techniki walki, ataki, zaklęcia, style szermiercze, formacje, aury i transformacje.
+2. ABSOLUTNIE WSZYSTKIE rangi wojskowe, tytuły szlacheckie, tytuły honorowe, stanowiska dworskie, gildie, sekty, klany, zakony, oddziały i organizacje.
+3. ABSOLUTNIE WSZYSTKIE krainy, prowincje, miasta, zamki, twierdze, rzeki, artefakty, oręż, przedmioty, leki/zioła/trucizny i unikalne pojęcia świata.
+4. ABSOLUTNIE WSZYSTKIE kanoniczne formy zwrotów i relacje między wszystkimi postaciami występującymi w serii (głównymi, drugoplanowymi i pobocznymi).
+Podaj pełen, maksymalny zasób wiedzy bez pomijania jakiegokolwiek pojęcia.
 
 Struktura JSON:
 {{
