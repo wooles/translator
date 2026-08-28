@@ -390,6 +390,9 @@ class LineTranslation(BaseModel):
     id: int = Field(description="ID kwestii dialogowej z wejścia")
     polish_text: str = Field(description="Przetłumaczona kwestia na język polski z uwzględnieniem płci, sceny i eliminacji kalek")
     speaker_gender: Optional[str] = Field(default=None, description="Zidentyfikowana płeć postaci mówiącej (np. 'mężczyzna', 'kobieta')")
+    visual_subtext: Optional[str] = Field(default=None, description="Zwięzła notatka o mimice lub gestach (opcjonalna)")
+    literal_meaning: Optional[str] = Field(default=None, description="Dosłowny sens idiomu (opcjonalny)")
+    visual_clues: Optional[str] = Field(default=None, description="Notatka o kadrze (opcjonalna)")
     notes: Optional[str] = Field(default=None, description="Zwięzła uwaga o kadrze lub grze słów (tylko w razie potrzeby, inaczej null)")
 
 class BatchTranslationResponse(BaseModel):
@@ -1051,7 +1054,7 @@ class MultimodalTranslator:
                         speaker_gender = tr.speaker_gender
                         visual_sub = getattr(tr, 'visual_subtext', '') or ''
                         lit_mean = getattr(tr, 'literal_meaning', '') or ''
-                        notes = f"{tr.visual_clues or ''} {tr.notes or ''}".strip()
+                        notes = f"{getattr(tr, 'visual_clues', '') or ''} {getattr(tr, 'notes', '') or ''}".strip()
                         break
 
             if not pl_candidate:
