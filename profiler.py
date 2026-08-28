@@ -264,8 +264,6 @@ Zwróć wynik w formacie JSON zgodnym ze schematem EpisodeProfile."""
 
         import time
         attempt = 0
-        num_keys = len(self.client_pool.clients) if hasattr(self, "client_pool") and self.client_pool and hasattr(self.client_pool, "clients") else 1
-        MAX_PROFILER_RETRIES = max(15, num_keys * 2)
 
         while True:
             attempt += 1
@@ -307,16 +305,9 @@ Zwróć wynik w formacie JSON zgodnym ze schematem EpisodeProfile."""
                     print("!" * 75 + "\n")
                     raise RuntimeError("Wyczerpane środki na koncie Google AI Studio (Prepayment Credits Depleted).")
 
-                if attempt >= MAX_PROFILER_RETRIES:
-                    print(f"\n[Profiler Odcinka]: Serwery Google są chwilowo zajęte (503/429 na {self.model}). Zastosowano profil domyślny...")
-                    return EpisodeProfile(
-                        episode_summary="Analiza sceniczna w toku tłumaczenia",
-                        tone_and_genre="Dramat historyczny / przygodowy"
-                    )
-
                 import random
                 # Zero-Wait Multi-Key Hopping (200ms between keys; micro-pause after full key round)
-                num_keys = len(self.client_pool.clients) if hasattr(self, "client_pool") and self.client_pool else 1
+                num_keys = len(self.client_pool.clients) if hasattr(self, "client_pool") and self.client_pool and hasattr(self.client_pool, "clients") else 1
                 if attempt % max(1, num_keys) != 0:
                     wait_sec = 0.2 + random.uniform(0.05, 0.15)
                 else:
@@ -327,7 +318,7 @@ Zwróć wynik w formacie JSON zgodnym ze schematem EpisodeProfile."""
                 is_unavailable = "503" in err_str or "unavailable" in err_str or "high demand" in err_str
                 is_rate_limit = "429" in err_str or "quota" in err_str or "resource_exhausted" in err_str
                 
-                if attempt == 1:
+                if attempt == 1 or attempt % max(1, num_keys) == 0:
                     friendly_reason = "Przeciążenie TPU (503 High Demand)" if is_unavailable else ("Limit zapytań (429 Rate Limit)" if is_rate_limit else "Oczekiwanie na odpowiedź serwera")
-                    print(f"\n[Profiler Odcinka]: Kolejkowanie do TPU na {self.model} ({friendly_reason}). Błyskawiczna rotacja kluczy API...")
+                    print(f"\n[Profiler Odcinka]: Kolejkowanie do TPU na {self.model} ({friendly_reason}, próba #{attempt}). Błyskawiczna rotacja kluczy API...")
                 time.sleep(wait_sec)
