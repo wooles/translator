@@ -482,8 +482,9 @@ class MultimodalTranslator:
         # Real token counter for the current episode
         self.current_episode_tokens: Dict[str, Any] = {"prompt": 0, "cached": 0, "output": 0, "model": self.model}
         import threading
-        self.lock = threading.Lock()
-        self.concurrent_batches = int(os.getenv("CONCURRENT_BATCHES", "6"))
+        num_keys = len(self.client_pool.clients) if hasattr(self, "client_pool") and self.client_pool and hasattr(self.client_pool, "clients") else 1
+        default_concurrency = min(10, max(4, num_keys // 2)) if num_keys > 2 else 4
+        self.concurrent_batches = int(os.getenv("CONCURRENT_BATCHES", str(default_concurrency)))
 
     def _prepare_batch_prompt(
         self,
