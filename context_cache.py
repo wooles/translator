@@ -11,6 +11,7 @@ Rolling Keep-Alive Heartbeat Architecture:
 
 import hashlib
 import logging
+import threading
 from typing import Optional, Dict, Any, Union
 from google import genai
 from google.genai import types
@@ -25,6 +26,8 @@ _LOCAL_CACHE_REGISTRY: Dict[str, str] = {}
 
 
 class ContextCacheManager:
+    _LOCK = threading.Lock()
+
     @staticmethod
     def _clean_model_name(model: str) -> str:
         """Cleans and normalizes the model name."""
@@ -49,8 +52,9 @@ class ContextCacheManager:
     @classmethod
     def invalidate_cache(cls, model: str, system_instruction: str, client: Optional[Any] = None):
         """Removes an entry from the local registry upon 403 or invalidation."""
-        content_hash = cls.get_content_hash(model, system_instruction, client=client)
-        _LOCAL_CACHE_REGISTRY.pop(content_hash, None)
+        with cls._LOCK:
+            content_hash = cls.get_content_hash(model, system_instruction, client=client)
+            _LOCAL_CACHE_REGISTRY.pop(content_hash, None)
 
     @classmethod
     def get_or_create_cache(
@@ -67,74 +71,75 @@ class ContextCacheManager:
         if not client or not system_instruction:
             return None
 
-        content_hash = cls.get_content_hash(model, system_instruction, client=client)
+        with cls._LOCK:
+            content_hash = cls.get_content_hash(model, system_instruction, client=client)
 
-        # 1. Check in-process local memory
-        if content_hash in _LOCAL_CACHE_REGISTRY:
-            return _LOCAL_CACHE_REGISTRY[content_hash]
+            # 1. Check in-process local memory
+            if content_hash in _LOCAL_CACHE_REGISTRY:
+                return _LOCAL_CACHE_REGISTRY[content_hash]
 
-        model_clean = cls._clean_model_name(model)
-        display_name = f"avt_{model_clean}_{content_hash}"
-        model_prefix = f"avt_{model_clean}_"
+            model_clean = cls._clean_model_name(model)
+            display_name = f"avt_{model_clean}_{content_hash}"
+            model_prefix = f"avt_{model_clean}_"
 
-        # 2. Try to find existing cache and clean outdated versions of the SAME model
-        try:
-            if hasattr(client, "caches") and hasattr(client.caches, "list"):
-                matched_name = None
-                for existing in client.caches.list():
-                    if existing.display_name == display_name:
-                        matched_name = existing.name
-                    elif existing.display_name and existing.display_name.startswith(model_prefix):
-                        # Only delete outdated version of the SAME model (without touching other models)
-                        try:
-                            client.caches.delete(name=existing.name)
-                            logger.info(f"[Context Cache]: Removed outdated version {existing.display_name}")
-                        except Exception:
-                            pass
-
-                if matched_name:
-                    _LOCAL_CACHE_REGISTRY[content_hash] = matched_name
-                    cls.touch_cache(client, matched_name, ttl_seconds)
-                    logger.info(f"[Context Cache]: Reused active server cache: {matched_name} (Refreshed for +{ttl_seconds}s)")
-                    return matched_name
-        except Exception as e:
-            logger.debug(f"[Context Cache]: Error listing/cleaning cache: {e}")
-
-        # 3. Create a new cache on Google servers - max 2 attempts with micro-wait
-        create_attempt = 0
-        while create_attempt < 2:
-            create_attempt += 1
+            # 2. Try to find existing cache and clean outdated versions of the SAME model
             try:
-                if hasattr(client, "caches") and hasattr(client.caches, "create"):
-                    ttl_str = f"{ttl_seconds}s"
-                    cache = client.caches.create(
-                        model=model,
-                        config=types.CreateCachedContentConfig(
-                            system_instruction=system_instruction,
-                            ttl=ttl_str,
-                            display_name=display_name,
-                        )
-                    )
-                    _LOCAL_CACHE_REGISTRY[content_hash] = cache.name
-                    logger.info(f"[Context Cache]: Created safe cache for {model}: {cache.name} (Rolling window: {ttl_seconds}s)")
-                    return cache.name
+                if hasattr(client, "caches") and hasattr(client.caches, "list"):
+                    matched_name = None
+                    for existing in client.caches.list():
+                        if existing.display_name == display_name:
+                            matched_name = existing.name
+                        elif existing.display_name and existing.display_name.startswith(model_prefix):
+                            # Only delete outdated version of the SAME model (without touching other models)
+                            try:
+                                client.caches.delete(name=existing.name)
+                                logger.info(f"[Context Cache]: Removed outdated version {existing.display_name}")
+                            except Exception:
+                                pass
+
+                    if matched_name:
+                        _LOCAL_CACHE_REGISTRY[content_hash] = matched_name
+                        cls.touch_cache(client, matched_name, ttl_seconds)
+                        logger.info(f"[Context Cache]: Reused active server cache: {matched_name} (Refreshed for +{ttl_seconds}s)")
+                        return matched_name
             except Exception as e:
-                err_msg = str(e).lower()
-                # 1. Permanent inability to cache (e.g. prompt below 32,768 token threshold)
-                if "minimum" in err_msg or "at least" in err_msg or "32768" in err_msg or "too small" in err_msg:
-                    logger.debug(f"[Context Cache]: Prompt below minimum server cache threshold: {e}")
-                    return None
+                logger.debug(f"[Context Cache]: Error listing/cleaning cache: {e}")
 
-                # 2. Account / API key error (insufficient funds, bad key)
-                if "prepayment" in err_msg or "depleted" in err_msg or "api_key" in err_msg or "permission" in err_msg:
-                    logger.error(f"[Context Cache]: Permission or account error: {e}")
-                    return None
+            # 3. Create a new cache on Google servers - max 2 attempts with micro-wait
+            create_attempt = 0
+            while create_attempt < 2:
+                create_attempt += 1
+                try:
+                    if hasattr(client, "caches") and hasattr(client.caches, "create"):
+                        ttl_str = f"{ttl_seconds}s"
+                        cache = client.caches.create(
+                            model=model,
+                            config=types.CreateCachedContentConfig(
+                                system_instruction=system_instruction,
+                                ttl=ttl_str,
+                                display_name=display_name,
+                            )
+                        )
+                        _LOCAL_CACHE_REGISTRY[content_hash] = cache.name
+                        logger.info(f"[Context Cache]: Created safe cache for {model}: {cache.name} (Rolling window: {ttl_seconds}s)")
+                        return cache.name
+                except Exception as e:
+                    err_msg = str(e).lower()
+                    # 1. Permanent inability to cache (e.g. prompt below 32,768 token threshold)
+                    if "minimum" in err_msg or "at least" in err_msg or "32768" in err_msg or "too small" in err_msg:
+                        logger.debug(f"[Context Cache]: Prompt below minimum server cache threshold: {e}")
+                        return None
 
-                # 3. Transient server error (503 / 429 / socket / timeout) -> quick micro-wait
-                import time
-                if create_attempt < 2:
-                    time.sleep(1.0)
-        return None
+                    # 2. Account / API key error (insufficient funds, bad key)
+                    if "prepayment" in err_msg or "depleted" in err_msg or "api_key" in err_msg or "permission" in err_msg:
+                        logger.error(f"[Context Cache]: Permission or account error: {e}")
+                        return None
+
+                    # 3. Transient server error (503 / 429 / socket / timeout) -> quick micro-wait
+                    import time
+                    if create_attempt < 2:
+                        time.sleep(1.0)
+            return None
 
     @classmethod
     def ensure_cache_ready(

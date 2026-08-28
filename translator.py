@@ -1473,6 +1473,17 @@ class MultimodalTranslator:
             except Exception as e:
                 logger.warning(f"Whisper warm-up failed: {e}")
 
+        # Pre-warm Context Cache sequentially for all clients before parallel threads start (Zero-Race Lock)
+        try:
+            from context_cache import ContextCacheManager
+            clients_to_warm = self.client_pool.clients if hasattr(self, "client_pool") and self.client_pool else [self.client]
+            for c in clients_to_warm:
+                ContextCacheManager.get_or_create_cache(client=c, model=self.model_phase1, system_instruction=self.system_prompt)
+                if self.enable_verifier and self.verifier:
+                    ContextCacheManager.get_or_create_cache(client=c, model=self.verifier.model, system_instruction=self.verifier.system_prompt)
+        except Exception:
+            pass
+
         batches = create_adaptive_batches(
             raw_entries,
             base_batch_size=self.batch_size,
