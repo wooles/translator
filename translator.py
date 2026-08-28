@@ -1450,9 +1450,18 @@ class MultimodalTranslator:
                 print(f"  [Ton i Rejestr Dialogów]: {episode_profile.tone_and_genre}")
             if episode_profile.characters:
                 print(f"  [Relacje i Etykieta]: Rozpoznano relacje dla {len(episode_profile.characters)} postaci.")
+            if episode_profile.danger_lines_prescan:
+                print(f"  [Skaner Min Językowych]: Wykryto {len(episode_profile.danger_lines_prescan)} niebezpiecznych pułapek kontekstowych (uzbrojone dyrektywy).")
+            if episode_profile.relationship_pivots:
+                print(f"  [Punkty Zwrotne Relacji]: Zabezpieczono {len(episode_profile.relationship_pivots)} dynamicznych zmian relacji w trakcie odcinka.")
+            if episode_profile.character_catchphrases:
+                print(f"  [Powiedzonka Postaci]: Zamrożono {len(episode_profile.character_catchphrases)} unikalnych kwestii-wizytówek.")
+            if episode_profile.character_dossiers:
+                print(f"  [Matryca Idiolektów]: Skonfigurowano unikalną stylizację mowy dla {len(episode_profile.character_dossiers)} bohaterów.")
             if episode_profile.glossary:
-                terms_preview = ", ".join([f"'{g.term_en}' -> '{g.translation_pl}'" for g in episode_profile.glossary])
-                print(f"  [Słowniczek Odcinka]: {terms_preview}")
+                terms_preview = ", ".join([f"'{g.term_en}' -> '{g.translation_pl}'" for g in episode_profile.glossary[:6]])
+                suffix = "..." if len(episode_profile.glossary) > 6 else ""
+                print(f"  [Słowniczek Odcinka]: {terms_preview}{suffix}")
         if self.whisper:
             print(f"  [Lokalny Whisper STT]: AKTYWNY (model {self.whisper.model_size})")
 
