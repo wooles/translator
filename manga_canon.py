@@ -18,6 +18,57 @@ MANGA_CANON_DIR = Path(__file__).parent / "manga_canon"
 
 # Built-in canon terminology database from leading Polish manga editions
 BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
+    "tenmaku_no_jaadugar": {
+        "title": "Wiedźma z Jurty (Tenmaku no Jaadugar: A Witch's Life in Mongol)",
+        "aliases": [
+            "tenmaku no jaadugar",
+            "wiedźma z jurty",
+            "wiedzma z jurty",
+            "jaadugar",
+            "a witch's life in mongol",
+            "tenmaku no jaadugar: a witch's life in mongol",
+            "tenmaku"
+        ],
+        "publisher": "Wydawnictwo Waneko",
+        "glossary": {
+            "Jaadugar / Witch": "Jaadugar (Wiedźma / Czarownica)",
+            "Yurt / Ger": "Jurta (Ger - filcowy namiot koczowników)",
+            "Khatun / Chatun": "Chatun (Wielka Małżonka Chana)",
+            "Khan / Khagan": "Chan / Wielki Chan (Kagan)",
+            "Horde / Ordo": "Orda (Obóz koczowniczy / Ordo)",
+            "Mongol Empire": "Imperium Mongolskie",
+            "Persia / Khwarazm": "Persja / Imperium Chorezmijskie",
+            "City of Tus": "Miasto Tus (Perski ośrodek nauki)",
+            "Karakorum": "Karakorum (Stolica Imperium Mongolskiego)",
+            "Nomads": "Koczownicy / Ludy Wielkiego Stepu",
+            "Forest Hunters": "Leśni łowcy",
+            "Pastoralists / Shepherds": "Pasterze owiec / Pasterze stepowi",
+            "Astrolabe": "Astrolabium",
+            "Alchemy / Islamic Medicine": "Alchemia i Medycyna Arabska",
+            "Secret History of the Mongols": "Tajna historia Mongołów",
+            "Great Khan Ögedei": "Wielki Chan Ogedej",
+            "Genghis Khan": "Czyngis-chan",
+            "Empress Töregene (Töregene Khatun)": "Chatun Töregene (Toregine)",
+            "Fatima (Siti)": "Fatima (Siti / Jaadugar)",
+            "Curse / Retribution": "Klątwa i Zemsta na Najeźdźcach",
+            "Steppe": "Wielki Step",
+            "Silk Road": "Jedwabny Szlak",
+            "Tumen": "Tumen (Dywizja dziesięciu tysięcy wojowników)",
+            "Noyan": "Nojan (Mongolski dowódca / arystokrata)",
+            "Shaman / Tengriism": "Szaman / Wiara w Wieczne Błękitne Niebo (Tengri)",
+            "Eternal Blue Sky": "Wieczne Błękitne Niebo (Tengri)",
+            "Dayir Usun": "Dayir Usun (Wódz Merkity)",
+            "Merkit": "Plemię Merkitów",
+            "Jurchen / Jin Dynasty": "Dżurdżeni / Dynastia Jin"
+        },
+        "character_forms": {
+            "Fatima -> Töregene": "Pani Töregene / Wasza Wysokość (z oddaniem, lojalnością i ukrytym wspólnym celem)",
+            "Töregene -> Fatima": "Fatimo / Siti (z głębokim zaufaniem, jako jedynej powiernicy i doradczyni)",
+            "Töregene -> Ögedei": "Chan / Mój mężu (z dworską uległością maskującą polityczne ambicje)",
+            "Fatima -> Koczownicy": "Koczownicy / Barbarzyńcy (w myślach) / Panowie (na głos)",
+            "Dayir -> Töregene": "Moja córko / Töregene (z ojcowską troską)"
+        }
+    },
     "kingdom": {
         "title": "Kingdom",
         "aliases": [
