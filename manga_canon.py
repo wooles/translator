@@ -4779,7 +4779,12 @@ ZWRÓĆ WYŁĄCZNIE CZYSTY KOD JSON BEZ ZBĘDNYCH KOMENTARZY.
         if glossary:
             lines.append("• Kompletny słowniczek kanoniczny (ataki, magia, krainy, formacje, rangi):")
             for term_src, term_pl in glossary.items():
-                lines.append(f"  - '{term_src}' -> '{term_pl}'")
+                if "(" in term_pl and ")" in term_pl:
+                    clean_term = term_pl.split("(")[0].strip()
+                    explanation = term_pl.split("(", 1)[1].rsplit(")", 1)[0].strip()
+                    lines.append(f"  - '{term_src}' -> '{clean_term}' [Kontekst: {explanation} - UWAGA: w dialogu używaj wyłącznie czystego '{clean_term}', NIGDY nie wklejaj tekstu w nawiasie do napisów!]")
+                else:
+                    lines.append(f"  - '{term_src}' -> '{term_pl}'")
 
         char_forms = canon_entry.get("character_forms", {})
         if char_forms:
@@ -4791,7 +4796,8 @@ ZWRÓĆ WYŁĄCZNIE CZYSTY KOD JSON BEZ ZBĘDNYCH KOMENTARZY.
         lines.append("1. OBOWIĄZKOWA ODMIANA PRZEZ PRZYPADKI: Wszystkie imiona, stopnie i tytuły MUSZĄ być odmieniane gramatycznie w zdaniu (np. 'z generałem Riboku', 'dla Oukiego', 'z Shinem', a NIGDY sztywny mianownik 'z Wielki Generał Riboku'!).")
         lines.append("2. ZAKAZ DUBEL-HONORYFIKATORÓW I HYBRYD: Kategoryczny zakaz łączenia 'pan' z rangami wojskowymi (NIGDY 'z panem Wielki Generał', 'pan Generał' -> wyłącznie 'z Wielkim Generałem Riboku / z Riboku').")
         lines.append("3. Tytuły wojskowe (np. 'Wielki Generał') stosuj tylko wtedy, gdy padają one w danej kwestii w oryginale; gdy pada samo imię, używaj samego odmienionego imienia.")
-        lines.append("4. ZASADA AVT: Zachowaj kanoniczne nazwy, ale przy długich wypowiedziach stosuj zwięzłą polską składnię (limit 17 CPS).")
+        lines.append("4. KATEGORYCZNY ZAKAZ WKLEJANIA NAWIASÓW ZE SŁOWNIKA DO DIALOGÓW: Napisy filmowe to mowa postaci. Nigdy, pod żadnym pozorem nie wklejaj do napisów nawiasów wyjaśniających z glosariusza (np. '(Demon Północy z Ganmon)', '(Półelfka)', '(Potworny Ptak z Qin)'). W dialogu ma paść wyłącznie naturalna wypowiedź bohatera!")
+        lines.append("5. ZASADA AVT: Zachowaj kanoniczne nazwy, ale przy długich wypowiedziach stosuj zwięzłą polską składnię (limit 17 CPS).")
         lines.append("=========================================================================\n")
         return "\n".join(lines)
 

@@ -200,12 +200,12 @@ def format_episode_profile_for_prompt(profile: Optional[EpisodeProfile]) -> str:
     if profile.glossary:
         lines.append("\nUSTALONY SŁOWNICZEK POJĘĆ I TERMINOLOGII BRANŻOWEJ:")
         for g in profile.glossary:
-            lines.append(f"- '{g.term_en}' = '{g.translation_pl}' ({g.explanation})")
+            lines.append(f"- '{g.term_en}' = '{g.translation_pl}' [Kontekst: {g.explanation} - wklejaj wyłącznie czystą nazwę '{g.translation_pl}', bez nawiasów!]")
 
     if profile.yojijukugo_and_idioms:
         lines.append("\nEKWIWALENTY JAPOŃSKICH PRZYSŁÓW I IDIOMÓW (FILAR XCV):")
         for idi in profile.yojijukugo_and_idioms:
-            lines.append(f"- '{idi.term_en}' = '{idi.translation_pl}' ({idi.explanation})")
+            lines.append(f"- '{idi.term_en}' = '{idi.translation_pl}' [Kontekst: {idi.explanation} - wklejaj wyłącznie polski ekwiwalent '{idi.translation_pl}', bez nawiasów!]")
 
     if profile.key_conventions:
         lines.append("\nWYTYCZNE SPECYFICZNE DLA TEGO ODCINKA:")
