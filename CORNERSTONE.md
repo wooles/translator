@@ -61,6 +61,11 @@ Rozstrzyganie wszelkich konfliktów translacyjnych i priorytetów w silniku odby
 * **Poziom 4: ERGONOMIA I LIMITY AVT** (17 CPS, semantyczny podział linii, eliminacja sierotek, brak naruszeń montażowych).
 * **Poziom 5: WSKAZÓWKI I KOREKTY UŻYTKOWNIKA** (Uwagi użytkownika traktowane są jako cenne wskazówki jakościowe i impuls do systemowego doskonalenia kodu silnika, a nie jako sztywna dogmatyka ponad regułami profesjonalnego AVT).
 
+### 9. PRAWO ZERO-AI I CZYSTEGO KANONU PAPIEROWEGO (ZERO-AI KNOWLEDGE POLICY)
+* Kategoryczny, dożywotni ZAKAZ wprowadzania do słowników, rejestrów kanonu (`manga_canon.py`) i pamięci tłumaczeniowej jakichkolwiek terminów wygenerowanych syntetycznie przez AI lub automatyczne translatory.
+* 100% terminów w rejestrze musi pochodzić bezpośrednio z licencjonowanych fizycznych wydań papierowych polskich wydawnictw (Waneko, JPF, Studio JG, Kotori, Hanami, Dango, Egmont) lub recenzowanej bazy Tanuki Manga.
+* Wszelkie wartości słownika muszą być czystymi, docelowymi terminami polskimi (bez zanieczyszczeń nawiasami wyjaśniającymi w wartościach docelowych).
+
 ---
 
 ## 🔒 ZASADA WERYFIKACJI PRZYSZŁYCH ZMIAN

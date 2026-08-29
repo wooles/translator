@@ -628,6 +628,17 @@ def test_manga_canon():
     assert jjk_canon is not None
     assert "Domen" in jjk_canon["glossary"]["Domain Expansion"]
     assert jjk_canon["publisher"] == "Wydawnictwo Waneko"
+    assert jjk_canon["glossary"]["Domain Expansion"] == "Rozszerzenie Domeny"
+
+    # Test dopasowania Chainsaw Man (Waneko Zero-AI Grounding check)
+    csm_canon = registry.find_canon_for_series("Chainsaw Man - Episode 01")
+    assert csm_canon is not None
+    assert csm_canon["glossary"]["Gun Devil"] == "Demon Broni Palnej"
+    assert csm_canon["glossary"]["Fiend"] == "Opętaniec"
+    assert csm_canon["glossary"]["Devil Hunter"] == "Łowca Demonów"
+    assert csm_canon["glossary"]["Devil Contract"] == "Pakt z Demonem"
+    for term_key, term_val in csm_canon["glossary"].items():
+        assert "Diabeł" not in term_val, f"Kalka AI 'Diabeł' znaleziona w CSM: {term_key} -> {term_val}"
 
     # Test dopasowania Golden Kamuy
     gk_canon = registry.find_canon_for_series("[Erai-raws] Golden Kamuy - 01 [1080p]")
@@ -639,7 +650,7 @@ def test_manga_canon():
     prompt_chunk = registry.format_canon_for_prompt(jjk_canon)
     assert "Domen" in prompt_chunk
     assert "Waneko" in prompt_chunk
-    print(" -> PASSED: Kanon polskich wydań mangowych działa w 100% (baza Waneko, JPF, Studio JG itp.).")
+    print(" -> PASSED: Kanon polskich wydań mangowych działa w 100% (baza Waneko, JPF, Studio JG itp. bez kalek AI).")
 
 def test_batch_queue():
     print("[TEST 14/14] Test Kolejki Sezonowej (Batch Queue) i naturalnego sortowania...")
