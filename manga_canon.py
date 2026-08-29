@@ -4729,20 +4729,17 @@ ZWRÓĆ WYŁĄCZNIE CZYSTY KOD JSON BEZ ZBĘDNYCH KOMENTARZY.
             return ""
 
         lines = [
-            f"=== [KANON] OFICJALNY KANON POLSKIEGO WYDANIA MANGI ({canon_entry.get('publisher', 'Oficjalne Wydawnictwo')}) ===",
-            f"Dla serii '{canon_entry.get('title', 'Anime')}' BEZWZGLĘDNIE zachowaj poniższą kanoniczną terminologię:"
+            f"=== [POZIOM 1 HIERARCHII PRZEKŁADU: OFICJALNY KANON POLSKIEGO WYDANIA MANGI ({canon_entry.get('publisher', 'Oficjalne Wydawnictwo')})] ===",
+            f"Dla serii '{canon_entry.get('title', 'Anime')}' poniższe pojęcia stanowią NIENARUSZALNY FUNDAMENT PRZEKŁADU:",
+            "1. BEZWZGLĘDNY PRIORYTET: Jeśli postać, atak, termin lub lokacja znajduje się w poniższym rejestrze, MASZ OBOWIĄZEK użyć dokładnie tego kanonicznego terminu (odmienionego poprawnie przez przypadki).",
+            "2. ZASADA FALLBACKU: Tylko i wyłącznie wtedy, gdy danego słowa/ataku NIE MA w poniższym kanonie, tłumacz przekłada je we własnym zakresie, stosując kolejne szczeble hierarchii (Poziom 2: Triangulacja audio JP/kadr > skrypt EN, Poziom 3: Trzy Złote Soczewki, Poziom 4: Limity AVT, Poziom 5: Wskazówki)."
         ]
 
         glossary = canon_entry.get("glossary", {})
         if glossary:
             lines.append("• Kompletny słowniczek kanoniczny (ataki, magia, krainy, formacje, rangi):")
             for term_src, term_pl in glossary.items():
-                if "(" in term_pl and ")" in term_pl:
-                    clean_term = term_pl.split("(")[0].strip()
-                    explanation = term_pl.split("(", 1)[1].rsplit(")", 1)[0].strip()
-                    lines.append(f"  - '{term_src}' -> '{clean_term}' [Kontekst: {explanation} - UWAGA: w dialogu używaj wyłącznie czystego '{clean_term}', NIGDY nie wklejaj tekstu w nawiasie do napisów!]")
-                else:
-                    lines.append(f"  - '{term_src}' -> '{term_pl}'")
+                lines.append(f"  - '{term_src}' -> '{term_pl}'")
 
         char_forms = canon_entry.get("character_forms", {})
         if char_forms:
@@ -4754,7 +4751,7 @@ ZWRÓĆ WYŁĄCZNIE CZYSTY KOD JSON BEZ ZBĘDNYCH KOMENTARZY.
         lines.append("1. OBOWIĄZKOWA ODMIANA PRZEZ PRZYPADKI: Wszystkie imiona, stopnie i tytuły MUSZĄ być odmieniane gramatycznie w zdaniu (np. 'z generałem Riboku', 'dla Oukiego', 'z Shinem', a NIGDY sztywny mianownik 'z Wielki Generał Riboku'!).")
         lines.append("2. ZAKAZ DUBEL-HONORYFIKATORÓW I HYBRYD: Kategoryczny zakaz łączenia 'pan' z rangami wojskowymi (NIGDY 'z panem Wielki Generał', 'pan Generał' -> wyłącznie 'z Wielkim Generałem Riboku / z Riboku').")
         lines.append("3. Tytuły wojskowe (np. 'Wielki Generał') stosuj tylko wtedy, gdy padają one w danej kwestii w oryginale; gdy pada samo imię, używaj samego odmienionego imienia.")
-        lines.append("4. KATEGORYCZNY ZAKAZ WKLEJANIA NAWIASÓW ZE SŁOWNIKA DO DIALOGÓW: Napisy filmowe to mowa postaci. Nigdy, pod żadnym pozorem nie wklejaj do napisów nawiasów wyjaśniających z glosariusza (np. '(Demon Północy z Ganmon)', '(Półelfka)', '(Potworny Ptak z Qin)'). W dialogu ma paść wyłącznie naturalna wypowiedź bohatera!")
+        lines.append("4. KATEGORYCZNY ZAKAZ WKLEJANIA NAWIASÓW ZE SŁOWNIKA DO DIALOGÓW: W dialogu ma paść wyłącznie naturalna, czysta wypowiedź bohatera!")
         lines.append("5. ZASADA AVT: Zachowaj kanoniczne nazwy, ale przy długich wypowiedziach stosuj zwięzłą polską składnię (limit 17 CPS).")
         lines.append("=========================================================================\n")
         return "\n".join(lines)

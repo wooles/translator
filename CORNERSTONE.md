@@ -55,11 +55,12 @@ Każda przyszła zmiana w kodzie musi zachować lub polepszyć poniższe paramet
 
 ### 8. PRAWO OFICJALNEJ HIERARCHII PRZEKŁADU (THE 5-TIER TRANSLATION HIERARCHY)
 Rozstrzyganie wszelkich konfliktów translacyjnych i priorytetów w silniku odbywa się ściśle według następującej hierarchii:
-* **Poziom 1: OFICJALNY KANON POLSKICH WYDAŃ MANGOWYCH** (Najwyższy autorytet terminologiczny licencjonowanych tomików papierowych).
-* **Poziom 2: TRIANGULACJA: JAPOŃSKIE AUDIO I KADR > ANGIELSKI SKRYPT** (Japoński dźwięk i obraz stoją bezwzględnie wyżej niż angielski skrypt pośredni).
-* **Poziom 3: TRZY ZŁOTE SOCZEWKI** (Ucho, Świat, Obraz – żywa, naturalnie odmieniona polszczyzna kinowa wg szkoły Barańczaka i Belczyka).
-* **Poziom 4: ERGONOMIA I LIMITY AVT** (17 CPS, semantyczny podział linii, eliminacja sierotek, brak naruszeń montażowych).
-* **Poziom 5: WSKAZÓWKI I KOREKTY UŻYTKOWNIKA** (Uwagi użytkownika traktowane są jako cenne wskazówki jakościowe i impuls do systemowego doskonalenia kodu silnika, a nie jako sztywna dogmatyka ponad regułami profesjonalnego AVT).
+* **Poziom 1: OFICJALNY KANON POLSKICH WYDAŃ MANGOWYCH** (Najwyższy, nienaruszalny autorytet terminologiczny licencjonowanych tomików papierowych. Jeśli dane pojęcie, imię, atak lub lokacja znajduje się w rejestrze kanonu, tłumacz ma bezwzględny obowiązek jego użycia z poprawną polską odmianą).
+* **ZASADA FALLBACKU (WŁASNY PRZEKŁAD):** Tylko i wyłącznie wtedy, gdy danego terminu **nie ma w rejestrze kanonu (Poziom 1)**, tłumacz przekłada go we własnym zakresie, stosując kolejne szczeble hierarchii:
+  * **Poziom 2: TRIANGULACJA: JAPOŃSKIE AUDIO I KADR > ANGIELSKI SKRYPT** (Japoński dźwięk i obraz stoją bezwzględnie wyżej niż angielski skrypt pośredni).
+  * **Poziom 3: TRZY ZŁOTE SOCZEWKI** (Ucho, Świat, Obraz – żywa, naturalnie odmieniona polszczyzna kinowa wg szkoły Barańczaka i Belczyka).
+  * **Poziom 4: ERGONOMIA I LIMITY AVT** (17 CPS, semantyczny podział linii, eliminacja sierotek, brak naruszeń montażowych).
+  * **Poziom 5: WSKAZÓWKI I KOREKTY UŻYTKOWNIKA** (Uwagi użytkownika traktowane są jako cenne wskazówki jakościowe i impuls do systemowego doskonalenia kodu silnika, a nie jako sztywna dogmatyka ponad regułami profesjonalnego AVT).
 
 ### 9. PRAWO ZERO-AI I CZYSTEGO KANONU PAPIEROWEGO (ZERO-AI KNOWLEDGE POLICY)
 * Kategoryczny, dożywotni ZAKAZ wprowadzania do słowników, rejestrów kanonu (`manga_canon.py`) i pamięci tłumaczeniowej jakichkolwiek terminów wygenerowanych syntetycznie przez AI lub automatyczne translatory.
