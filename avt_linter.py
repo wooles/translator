@@ -154,6 +154,10 @@ class AVTLinter:
         (r"\b[Aa]ra\s+ara\b", "O proszę...", "Filar XVIII - Paralingwistyka"),
         (r"\b[Tt]ch\b", "Tsk...", "Filar XVIII - Paralingwistyka"),
         (r"\b[Gg]uh\b", "Uch...", "Filar XVIII - Paralingwistyka"),
+        (r"^[Mm]ów[—–-]$", "Ach...", "Filar XVIII/IV - Eliminacja fałszywego czasownika 'Mów—' przy paralingwistycznym wdechu/wysiłku"),
+        (r"^[Mm]ów\.\.\.$", "Ach...", "Filar XVIII/IV - Eliminacja fałszywego czasownika"),
+        (r"^[Gg]adaj[—–-]$", "Uch...", "Filar XVIII/IV - Eliminacja fałszywego czasownika"),
+        (r"^[Pp]owiedz[—–-]$", "Ach...", "Filar XVIII/IV - Eliminacja fałszywego czasownika"),
 
         # Third-language & translationese elimination (Pillar X)
         (r"\b[Cc]o sprawia, że tak mówisz\?", "Czemu tak sądzisz?", "Filar X - Anti-Translationese"),

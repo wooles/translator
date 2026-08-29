@@ -1796,10 +1796,11 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
         )
 
     # 8. Paralingwistyka, odgłosy, onomatopeje i wulgaryzmy
-    if any(w in combined_en for w in ["tch", "ara ara", "oi oi", "guh", "kuso", "damn", "shit", "fuck", "kashira", "mon"]):
+    if any(w in combined_en for w in ["tch", "ara ara", "oi oi", "guh", "kuso", "damn", "shit", "fuck", "kashira", "mon", "aa", "speak", "say"]):
         focused_pillars.append(
-            "• [SKUP SIĘ NA: FILAR XXXIII, XVIII, XVI & XVII - Shūjoshi i Onomatopeje]: "
+            "• [SKUP SIĘ NA: FILAR XXXIII, XVIII, XVI & XVII - Shūjoshi, Onomatopeje i Paralingwistyka]: "
             "Adaptuj odgłosy i cząstki ('Ara ara' -> 'O proszę...', 'Tch' -> 'Tsk/Szlag', 'Guh' -> 'Uch...', 'kashira' -> 'Ciekawe, czy...'). "
+            "Gdy w audio słychać jedynie paralingwistyczny wdech/krzyk/wysiłek (np. 'Aa...', 'Ugh...'), KATEGORYCZNIE ZABRANIA SIĘ wstawiania fałszywych czasowników ('Mów—', 'Gadaj—'). "
             "Wulgaryzmy kalibruj do ładunku emocjonalnego i rejestru sceny."
         )
 
