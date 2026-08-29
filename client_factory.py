@@ -14,6 +14,30 @@ from google.genai import types
 logger = logging.getLogger("client_factory")
 
 
+def format_friendly_api_error(e: Exception) -> str:
+    """
+    Formats raw Google API / network error dumps into clean, human-friendly Polish messages.
+    Eliminates cryptic JSON dictionaries and technical codes.
+    """
+    err_str = str(e).lower()
+    if "503" in err_str or "unavailable" in err_str or "high demand" in err_str:
+        return "Chwilowe przeciążenie serwerów Google (503 High Demand)"
+    elif "429" in err_str or "quota" in err_str or "resource_exhausted" in err_str or "rate" in err_str:
+        return "Chwilowy limit zapytań na kluczu (429 Rate Limit)"
+    elif "504" in err_str or "deadline" in err_str or "timeout" in err_str or "timed out" in err_str:
+        return "Przekroczono limit czasu odpowiedzi serwera (504 Timeout)"
+    elif "500" in err_str or "internal" in err_str:
+        return "Chwilowy błąd wewnętrzny serwera Google (500 Internal Error)"
+    elif "connection" in err_str or "network" in err_str or "failed to connect" in err_str:
+        return "Chwilowe zakłócenie połączenia internetowego"
+    else:
+        # Strip ugly JSON braces / raw dict dumps
+        raw = str(e)
+        if "{" in raw:
+            raw = raw.split("{")[0].strip().rstrip(".:")
+        return raw if raw else "Oczekiwanie na odpowiedź serwera"
+
+
 def get_genai_client(
     api_key: Optional[str] = None,
     timeout_ms: int = 120000,

@@ -10,6 +10,7 @@ from pydantic import BaseModel, Field
 from google import genai
 from google.genai import types
 from rules import get_verifier_system_prompt, SceneDiagnosis
+from client_factory import format_friendly_api_error
 
 class RefinedLine(BaseModel):
     id: int = Field(description="ID kwestii dialogowej zgodne z wejściem")
@@ -247,7 +248,9 @@ class DialogueVerifier:
                     cycle = attempt // max(1, num_keys)
                     wait_sec = min(3.0, 0.6 + 0.4 * min(cycle, 4) + random.uniform(0.1, 0.3))
                 
+                friendly_msg = format_friendly_api_error(e)
                 if attempt == 1:
-                    friendly_err = "Przeciążenie klastrów TPU (503 High Demand)" if is_unavailable else ("Chwilowy limit zapytań (429 Rate Limit)" if is_rate_limit else "Oczekiwanie na odpowiedź serwera")
-                    print(f"\n[Redaktor Dialogów / Faza 2]: Kolejkowanie do TPU na {self.model} ({friendly_err}). Błyskawiczna rotacja kluczy API...")
+                    print(f"\n[Redaktor Dialogów / Faza 2]: {friendly_msg}. Błyskawiczna rotacja kluczy API...")
+                else:
+                    print(f"  ├─ [Próba #{attempt}]: {friendly_msg} -> przełączam na kolejny klucz API...")
                 time.sleep(wait_sec)

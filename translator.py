@@ -77,6 +77,7 @@ from speaker_diarizer import SpeakerVoiceClassifier
 from typesetting_matcher import TypesettingColorMatcher
 from user_feedback import UserFeedbackManager
 from glossary_manager import GlossaryManager
+from client_factory import format_friendly_api_error
 
 def extract_typesetting_tags(raw_text: str) -> Tuple[str, str]:
     """
@@ -752,11 +753,11 @@ class MultimodalTranslator:
                     cycle = attempt // max(1, num_keys)
                     wait_time = min(3.0, 0.6 + 0.4 * min(cycle, 4) + random.uniform(0.1, 0.3))
 
+                friendly_msg = format_friendly_api_error(e)
                 if attempt == 1:
-                    friendly_err = "Przeciążenie serwerów TPU (503 High Demand)" if is_unavailable else ("Chwilowy limit zapytań (429 Rate Limit)" if is_rate_limit else "Oczekiwanie na odpowiedź serwera")
-                    print(f"\n[Tłumacz / Faza 1]: Kolejkowanie do TPU na {current_model} ({friendly_err}). Błyskawiczna rotacja kluczy API... [BŁĄD: {e}]")
+                    print(f"\n[Tłumacz / Faza 1]: {friendly_msg}. Błyskawiczna rotacja kluczy API...")
                 else:
-                    print(f"  ├─ [Próba {attempt}]: Błąd: {e}")
+                    print(f"  ├─ [Próba #{attempt}]: {friendly_msg} -> przełączam na kolejny klucz API...")
                 time.sleep(wait_time)
 
     def _process_single_batch(
@@ -1616,7 +1617,7 @@ class MultimodalTranslator:
                                     except Exception:
                                         pass
                             except Exception as e:
-                                pbar.write(f" 🔴 [Błąd Paczki]: {e}")
+                                pbar.write(f" 🔴 [Błąd Paczki]: {format_friendly_api_error(e)}")
                 else:
                     for b_idx, batch, untranslated in tasks_to_run:
                         if cancel_check and cancel_check():
@@ -1672,7 +1673,7 @@ class MultimodalTranslator:
                                 except Exception:
                                     pass
                         except Exception as e:
-                            pbar.write(f" 🔴 [Błąd Paczki]: {e}")
+                            pbar.write(f" 🔴 [Błąd Paczki]: {format_friendly_api_error(e)}")
 
         # 7. Construct final subtitle file preserving styles, positioning, and typesetting
         final_subs = pysubs2.SSAFile()

@@ -14,6 +14,7 @@ from typing import List, Optional, Dict, Any
 from pydantic import BaseModel, Field
 from google import genai
 from google.genai import types
+from client_factory import format_friendly_api_error
 
 logger = logging.getLogger("profiler")
 
@@ -323,7 +324,7 @@ Zwróć wynik w formacie JSON zgodnym ze schematem EpisodeProfile."""
                 is_unavailable = "503" in err_str or "unavailable" in err_str or "high demand" in err_str
                 is_rate_limit = "429" in err_str or "quota" in err_str or "resource_exhausted" in err_str
                 
+                friendly_msg = format_friendly_api_error(e)
                 if attempt == 1 or attempt % max(1, num_keys) == 0:
-                    friendly_reason = "Przeciążenie TPU (503 High Demand)" if is_unavailable else ("Limit zapytań (429 Rate Limit)" if is_rate_limit else "Oczekiwanie na odpowiedź serwera")
-                    print(f"\n[Profiler Odcinka]: Kolejkowanie do TPU na {self.model} ({friendly_reason}, próba #{attempt}). Błyskawiczna rotacja kluczy API...")
+                    print(f"\n[Profiler Odcinka]: {friendly_msg} (próba #{attempt}) -> automatyczna rotacja kluczy API...")
                 time.sleep(wait_sec)
