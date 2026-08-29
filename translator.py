@@ -223,10 +223,13 @@ def detect_audio_discrepancy(jp_text: str, pl_text: str, en_text: str) -> Option
         if pl_lower.startswith("proszę") or "czy możesz" in pl_lower or "czy mógłbyś" in pl_lower:
             return "W audio pada szorstki tryb rozkazujący (-kure/-kase) -> Zamień sztuczne 'Proszę...' na bezpośredni rozkaz (Filar CIII)."
 
-    # 4. Yobisute vs 'Pan / Pani'
-    if ("panie " in pl_lower or "pani " in pl_lower) and not any(s in jp_text for s in ["様", "先生", "殿", "隊長"]):
-        if not any(s in jp_lower for s in ["sama", "sensei", "dono", "taichou"]):
-            return "W audio brak sufiksu szacunku (-sama/-sensei) -> Usuń sztuczne 'Pan/Pani' i zastosuj samo imię w wołaczu (Filar C)."
+    # 4. Yobisute, -kun, -chan, and peer -san vs artificial 'Pan / Pani'
+    honorific_noble_keys = ["様", "先生", "殿", "隊長", "部長", "課長", "社長", "師匠", "sama", "sensei", "dono", "taichou", "buchou", "kachou", "shachou", "shishou"]
+    if any(p in pl_lower for p in ["panie ", "pani ", "pan ", "pana ", "panu ", "panią "]) and not any(s in jp_text for s in honorific_noble_keys):
+        if not any(s in jp_lower for s in honorific_noble_keys):
+            if any(s in jp_text for s in ["君", "くん", "ちゃん"]) or any(s in rom_lower for s in ["kun", "chan", "-kun", "-chan"]):
+                return "W audio pada rówieśniczy sufiks '-kun' / '-chan' -> Kategoryczny zakaz dodawania 'Pan/Pani' do imienia; stosuj samo imię na 'ty' w wołaczu (Filar XLVI / C)."
+            return "W audio brak sufiksu wyższego szacunku (-sama/-sensei/-dono) -> Usuń sztuczny dystans 'Pan/Pani' i zastosuj samo imię w wołaczu (Filar C)."
 
     # 5. Haragei & Trailing Particles (-kedo, -kara, -tara) vs completing the sentence
     trailing_keys = ["kedo", "kara", "tara", "monode", "shi"]
@@ -324,6 +327,11 @@ def detect_audio_discrepancy(jp_text: str, pl_text: str, en_text: str) -> Option
     if any(k in clean_jp for k in ["何これ", "なにこれ", "なんだこれ", "何だこれ"]) or any(k in rom_lower for k in nanikore_keys):
         if "co to za rzecz" in pl_lower or "czym jest ta rzecz" in pl_lower:
             return "W audio pada 'Nani kore?' (zdumienie sytuacją/obiektem) -> Zastąp sztywne 'Co to za rzecz?' naturalnym: 'Co to ma być?' / 'A to co znowu?' (Filar XLIII)."
+
+    # 22. Hybrydy honoryfikatywne (Pani Sensei / Panie Senpai / Panie Taichou)
+    hybrid_patterns = ["pani sensei", "panie sensei", "pan sensei", "pani senpai", "panie senpai", "pan senpai", "panie taichou", "panie shishou", "panie buchou"]
+    if any(h in pl_lower for h in hybrid_patterns):
+        return "Wykryto hybrydę honoryfikatywną ('Pani Sensei' / 'Panie Senpai') -> Zastąp czystym 'Sensei' / 'Senpai' lub naturalnym polskim tytułem 'Mistrzu' / 'Pani [Nazwisko]' (Filar XLVIII)."
 
     return None
 

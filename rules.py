@@ -748,20 +748,28 @@ FILAR XCIX: ZAKAZ NADGORLIWEJ EKSPLIKACJI I SAMOWOLNEGO WTRĄCANIA IMION (ANTI-E
   * POPRAWNIE: "Przepraszam...", "Zaraz, hej...", "Yyy, chwileczkę...", "Hej, zaraz...", "Słuchaj...".
 - Żelazna reguła: Imię w wołaczu wolno wstawić TYLKO I WYŁĄCZNIE WTEDY, gdy imię to zostało rzeczywiście wypowiedziane w dialogu EN lub japońskim audio JP!
 
-FILAR C: JAPOŃSKIE YOBISUTE I ZAKAZ FAŁSZYWEJ TYTULATURY (BARE NAMES VS FALSE POLITENESS & DIEGETIC EQUALITY):
-- Japońskie Yobisute (呼び捨て - wymawianie samego imienia/nazwiska bez przyrostka):
-  * Gdy w audio JP postać mówi samo imię/nazwisko ("Kamui!", "Shinra!", "Arthur?"):
-  * W języku polskim BEZWZGLĘDNIE stosuj SAMO IMIĘ W WOŁACZU ("Kamui!", "Shinra!", "Arthurze?").
-- KATEGORYCZNY ZAKAZ samowolnego dodawania "Pan / Pani":
-  * BŁĄD KOSZMARNY [X]: "Panie Kamui?" w scenach walki, pojedynków, intymności, napięcia, furii czy kumpelskich relacji (brzmi jak urzędnik zza biurka!).
-  * POPRAWNIE: "Kamui?".
-- KIEDY WOLNO UŻYĆ "Panie / Pani / Mistrzu":
-  * TYLKO WTEDY, gdy w audio wyraźnie pada sufiks szacunku:
-    - -sama (様) -> Panie / Czcigodny
-    - -sensei (先生) -> Mistrzu / Profesorze
-    - -dono (殿) -> Wielmożny panie
-    - -taichou (隊長) -> Kapitanie / Dowódco.
-  * Przy Yobisute w walce, akcji i zbliżeniach -> WYŁĄCZNIE SAMO IMIĘ!
+FILAR C: JAPOŃSKIE YOBISUTE, SUFIKSY RÓWIEŚNICZE (-KUN, -CHAN, -SAN) I PEŁNA MATRYCA TYTULATURY:
+- 1. Japońskie Yobisute (呼び捨て - brak jakiegokolwiek przyrostka w audio):
+  * Gdy w audio JP postać mówi samo imię/nazwisko ("Kamui!", "Shinra!", "Arthur?", "Issei"):
+  * W języku polskim BEZWZGLĘDNIE stosuj SAMO IMIĘ W WOŁACZU ("Kamui!", "Shinra!", "Arthurze?", "Issei!").
+  * KATEGORYCZNY ZAKAZ dodawania "Pan / Pani" (BŁĄD [X]: "Co pan czuje, panie Issei?" -> POPRAWNIE [OK]: "Co czujesz, Issei?").
+- 2. Sufiksy rówieśnicze i przyjacielskie (-kun, -chan):
+  * -kun (君 / くん) w ustach rówieśników/dziewcząt/kolegów (np. Shizuku-kun, Issei-kun):
+    -> BEZWZGLĘDNY ZAKAZ "Pan Shizuku / Panie Issei" -> ZAWSZE SAMO IMIĘ NA "TY" ("Shizuku", "Issei").
+  * -chan (ちゃん) w ustach przyjaciółek/rodziny (np. Hana-chan, Kokoro-chan, Akafuku-chan):
+    -> BEZWZGLĘDNY ZAKAZ "Pani Hana / Pani Kokoro" -> ZAWSZE SAMO IMIĘ LUB ZDROBNIENIE NA "TY" ("Hana", "Kokoro", "Haneczko").
+- 3. Sufiks -san (さん - dystans szkolny vs dorośli obcy):
+  * Wśród uczniów/rówieśników w szkole (np. Komi-san, Miyabi-san):
+    -> Tłumacz po samym imieniu na "ty" ("Komi, pożyczysz gumkę?", "Miyabi, idziesz z nami?").
+  * Wobec dorosłych obcych/klientów/sąsiadów z nazwiskiem (np. Teshima-san, Yamada-san):
+    -> Stosuj formy grzecznościowe: "Pani Teshimo", "Panie Yamado".
+- 4. Sufiksy wyższego szacunku i hierarchii (-sama, -sensei, -senpai, -dono, -shishou, -taichou):
+  * -sama (様) -> "Wasza Wysokość", "Panienko", "Pani Loulan", "Panie mój", "Bóg / Bogini".
+  * -sensei (先生) -> "Sensei", "Mistrzu", "Pani Teshimo", "Panie profesorze", "Pani doktor" (ZAKAZ HYBRYD: 'Pani Sensei').
+  * -senpai (先輩) -> "Senpai", "Starszy kolego", "[Imię]-senpai" (ZAKAZ HYBRYD: 'Pani Senpai').
+  * -dono (殿) -> "Wielmożny Panie", "Mości [Imię]".
+  * -shishou (師匠) -> "Mistrzu!".
+  * -taichou / -buchou (隊長 / 部長) -> "Kapitanie!", "Dowódco!", "Kierowniku!", "Prezesie!".
 
 FILAR CI: NADRZĘDNOŚĆ JAPOŃSKIEGO AUDIO I TRIANGULACJA PERSPEKTYWY MÓWCY (KIKANAIDE VS KIKITAKUNAI):
 - Gdy tekst angielski jest wieloznaczny (np. "Don't even ask"), japońskie czasowniki i końcówki w audio bezwzględnie rozstrzygają perspektywę podmiotu:

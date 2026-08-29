@@ -538,7 +538,13 @@ def test_avt_linter():
     assert t12 == "To wspaniałe, prawda?"
     t13, f13 = AVTLinter.lint_and_fix_line("Co to za rzecz?", is_sign=False)
     assert t13 == "Co to ma być?"
-    print(" -> PASSED: AVT Linter bezbłędnie wyłapuje i koryguje kalki, formy, nawiasy, cudzysłowy, formy 1-na-1, Aizuchi i ALL-CAPS.")
+
+    # Test eliminacji hybryd honoryfikatywnych (Pani Sensei -> Sensei)
+    t14, f14 = AVTLinter.lint_and_fix_line("Dzień dobry, Pani Sensei!", is_sign=False)
+    assert t14 == "Dzień dobry, Sensei!"
+    t15, f15 = AVTLinter.lint_and_fix_line("Panie Senpai, zaczekaj!", is_sign=False)
+    assert t15 == "Senpai, zaczekaj!"
+    print(" -> PASSED: AVT Linter bezbłędnie wyłapuje i koryguje kalki, formy, nawiasy, cudzysłowy, formy 1-na-1, Aizuchi, hybrydy i ALL-CAPS.")
 
 def test_series_bible():
     print("[TEST 9/12] Test Biblii Serialu i Pamięci Międzyodcinkowej (series_memory)...")
@@ -1324,13 +1330,29 @@ def test_translator_logger_and_sign_detector():
     )
     assert alert_nanikore is not None and "Nani kore" in alert_nanikore
 
+    # Test Hybrid Honorific alert (Pani Sensei / Panie Senpai)
+    alert_hybrid = translator.detect_audio_discrepancy(
+        jp_text="先生 [Sensei]",
+        pl_text="Pani Sensei, skończyłam!",
+        en_text="Sensei, I'm done!"
+    )
+    assert alert_hybrid is not None and "hybrydę" in alert_hybrid
+
+    # Test -kun / -chan de-formalization alert
+    alert_kun = translator.detect_audio_discrepancy(
+        jp_text="雫くん [Shizuku-kun]",
+        pl_text="Pan Shizuku to powiedział.",
+        en_text="Shizuku-kun said that."
+    )
+    assert alert_kun is not None and "sufiks" in alert_kun
+
     # Test Flashback 1:1 memory formatting
     from memory import format_translation_memory_for_prompt
     formatted_mem = format_translation_memory_for_prompt([
         {"en": "I will never give up!", "pl": "Nigdy się nie poddam!", "anime": "Kingdom", "score": 100}
     ])
     assert "[DOKŁADNY CYTAT 1:1]" in formatted_mem
-    print(" -> PASSED: Logger w translator.py, audio alerty (Haragei, Aizuchi Matrix, Oyaji, Giri, Ii desu, Wakaru, Sorena, Uso) i spójność retrospekcji 1:1 działają bezbłędnie.")
+    print(" -> PASSED: Logger w translator.py, audio alerty (Haragei, Aizuchi, Oyaji, Giri, Ii desu, Wakaru, Hybrydy, Kun) i spójność retrospekcji 1:1 działają bezbłędnie.")
 
 def test_masterclass_next_gen():
     print("[TEST 30/30] Test mechanizmów Masterclass (Pillar CXVIII Barańczak Song, Idiolect Matrix, SceneShotSnapper)...")

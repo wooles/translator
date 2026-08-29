@@ -181,6 +181,16 @@ class AVTLinter:
         (r"\b[Pp]an(?:a|u|em|ie)?\s+(Shizuku|Issei|Arata|Shin|Luffy|Naruto|Ichigo|Tanjiro|Deku|Yuji|Yoritsugu|Aoi|Ren|Haru|Kaito|Sora|Yuto|Riku|Takumi|Daiki)\b", r"\1", "Filar XLVI - Eliminacja sztucznego 'pan' przy imieniu męskim (-kun)"),
         (r"\b[Pp]ani\s+(Kokoro|Miyabi|Akafuku|Hana|Yui|Rin|Sakura|Akari|Nanami|Mei|Hina|Mio|Yuna|Koharu|Saki|Kanna)\b", r"\1", "Filar XLVI - Eliminacja sztucznego 'pani' przy imieniu rówieśniczki (-chan)"),
 
+        # Honorific Hybrids De-formalization (Pillar XLVIII / C)
+        (r"\b[Pp]ani\s+[Ss]ensei\b", "Sensei", "Filar XLVIII - Zakaz Hybryd Honoryfikatywnych (Pani Sensei -> Sensei)"),
+        (r"\b[Pp]anie\s+[Ss]ensei\b", "Sensei", "Filar XLVIII - Zakaz Hybryd Honoryfikatywnych (Panie Sensei -> Sensei)"),
+        (r"\b[Pp]an\s+[Ss]ensei\b", "Sensei", "Filar XLVIII - Zakaz Hybryd Honoryfikatywnych (Pan Sensei -> Sensei)"),
+        (r"\b[Pp]ani\s+[Ss]enpai\b", "Senpai", "Filar XLVIII - Zakaz Hybryd Honoryfikatywnych (Pani Senpai -> Senpai)"),
+        (r"\b[Pp]anie\s+[Ss]enpai\b", "Senpai", "Filar XLVIII - Zakaz Hybryd Honoryfikatywnych (Panie Senpai -> Senpai)"),
+        (r"\b[Pp]an\s+[Ss]enpai\b", "Senpai", "Filar XLVIII - Zakaz Hybryd Honoryfikatywnych (Pan Senpai -> Senpai)"),
+        (r"\b[Pp]anie\s+[Ss]hishou\b", "Mistrzu", "Filar XLVIII - Zakaz Hybryd Honoryfikatywnych (Panie Shishou -> Mistrzu)"),
+        (r"\b[Pp]anie\s+[Tt]aichou\b", "Kapitanie", "Filar XLVIII - Zakaz Hybryd Honoryfikatywnych (Panie Taichou -> Kapitanie)"),
+
         # 1-on-1 Dialogue Singular Number Normalization (Pillar LI / X)
         (r"\b[Ss]łyszeliście przed chwilą\b", "Słyszałeś przed chwilą", "Filar LI - Liczba Pojedyncza w Dialogu 1-na-1"),
         (r"\b[Ww]idzieliście przed chwilą\b", "Widziałeś przed chwilą", "Filar LI - Liczba Pojedyncza w Dialogu 1-na-1"),
