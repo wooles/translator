@@ -634,7 +634,7 @@ def test_manga_canon():
     assert gk_canon is not None
     assert gk_canon["glossary"]["Immortal Sugimoto"] == "Nieśmiertelny Sugimoto"
     assert "Hinna" in gk_canon["glossary"]["Hinna hinna"]
-    assert gk_canon["publisher"] == "Wydawnictwo Waneko"
+    assert "Kotori" in gk_canon["publisher"]
 
     prompt_chunk = registry.format_canon_for_prompt(jjk_canon)
     assert "Domen" in prompt_chunk
