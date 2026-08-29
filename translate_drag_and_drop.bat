@@ -2,10 +2,10 @@
 chcp 65001 > nul
 set "PYTHONIOENCODING=utf-8"
 set "PYTHONUTF8=1"
-title Multimodal Subtitle Translator (Gemini 3.7 Flash)
+title Multimodal Subtitle Translator
 
 echo ========================================================
-echo   Multimodal Video Subtitle Translator (Gemini 3.7 Flash)
+echo   Multimodal Video Subtitle Translator
 echo ========================================================
 echo.
 

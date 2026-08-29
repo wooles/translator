@@ -367,8 +367,8 @@ def main():
         
         print("\n" + "─" * 58)
         print("  WYBÓR STYLU DLA JAPOŃSKICH HONORYFIKATORÓW:")
-        print("  [1] ZACHOWAJ (-kun, -chan, -san, -sama) [Styl Fansub / Anime]")
-        print("  [2] USUŃ i zastąp czystą polszczyzną    [Styl Netflix / Dubbing]")
+        print("  [1] ZACHOWAJ (-kun, -chan, -san, -sama)")
+        print("  [2] USUŃ i zastąp czystą polszczyzną")
         print("─" * 58)
         try:
             choice = input(f"  Twój wybór [1 / 2] (Wciśnij Enter dla {default_label}): ").strip()
@@ -416,9 +416,6 @@ def main():
     elif not model_p2 and not model_p1:
         from pricing_guard import PricingGuard
         from model_resolver import probe_all_models_health
-        cost_flash_est = PricingGuard.estimate_episode_cost_pln("2")
-        cost_pro_est = PricingGuard.estimate_episode_cost_pln("3")
-        cost_ultra_est = PricingGuard.estimate_episode_cost_pln("4")
 
         print("\n  [Sonda Serwerów Google]: Sprawdzanie obciążenia i latencji klastrów API na żywo...")
         health_probe = probe_all_models_health(temp_client, best_models)
@@ -428,11 +425,10 @@ def main():
 
         print("\n" + "═" * 74)
         print("  WYBÓR PROFILU JAKOŚCI TŁUMACZENIA (Status Serwerów Google na Żywo):")
-        p1_fast = best_models.get("flash_backup", "gemini-3.6-flash")
-        print(f"  [1] STANDARDOWY (Free)  [{best_models['flash_lite']}] {tag_lite}")
-        print(f"  [2] STUDYJNY FLASH      [{p1_fast}] {tag_flash} (~{cost_flash_est:.2f} zł/odc)")
-        print(f"  [3] MISTRZOWSKI FLASH ⭐ [{best_models['flash']} (CoT 0) + {best_models['flash']} CoT 6144] {tag_flash} (~{cost_pro_est:.2f} zł/odc)")
-        print(f"  [4] KINOWY PRO 👑       [{p1_fast} + {best_models['pro']} CoT] {tag_pro} (~{cost_ultra_est:.2f} zł/odc)")
+        print(f"  [1] STANDARDOWY   [{best_models['flash_lite']}] {tag_lite}")
+        print(f"  [2] STUDYJNY      [{best_models['flash']}] {tag_flash}")
+        print(f"  [3] MISTRZOWSKI ⭐ [{best_models['flash']} (CoT 0) + {best_models['flash']} CoT 6144] {tag_flash}")
+        print(f"  [4] KINOWY 👑     [{best_models['flash']} + {best_models['pro']} CoT] {tag_pro}")
         print("─" * 74)
         print(PricingGuard.get_pricing_status_banner())
         print("═" * 74)
@@ -443,11 +439,11 @@ def main():
                 model_p2 = None
                 enable_verifier = False
             elif prof_choice == "2":
-                model_p1 = best_models.get("flash_backup", "gemini-3.6-flash")
+                model_p1 = best_models["flash"]
                 model_p2 = None
                 enable_verifier = False
             elif prof_choice == "4":
-                model_p1 = best_models.get("flash_backup", "gemini-3.6-flash")
+                model_p1 = best_models["flash"]
                 model_p2 = best_models["pro"]
                 enable_verifier = True
                 thinking_budget = 2048
