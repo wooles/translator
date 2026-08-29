@@ -27,7 +27,9 @@ def test_rules_and_prompts():
     assert "I see" in sys_prompt
     assert "Rozumiem" in sys_prompt
     assert "KANON PRZEKŁADU AUDIOWIZUALNEGO" in sys_prompt
+    assert "MACIERZ INTENCJI PRAGMATYCZNYCH" in sys_prompt
     assert "Arkadiusza Belczyka" in ver_prompt
+    assert "ZASADA ZWIĘZŁOŚCI I EKONOMII SYLAB" in ver_prompt
     assert "FILAR I:" in sys_prompt
     assert "FILAR II:" in sys_prompt
     assert "FILAR III:" in sys_prompt

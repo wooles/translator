@@ -1362,7 +1362,12 @@ SPECYFIKA PRZEKŁADU ANIME, GŁOSU ORAZ JĘZYKA JAPOŃSKIEGO:
    - "yappari" / "yahari" (やっぱり) = "jednak", "tak jak myślałam/myślałem", "w końcu".
    - "hontou" (本当) = "naprawdę", "serio", "naprawdę tak jest".
    - "betsu ni" (別に) = "wcale nie", "nic takiego", "wcale mi nie zależy".
-   - "daijoubu" (大丈夫) = "wszystko w porządku", "nic mi nie jest", "spokojnie".
+   - "daijoubu" (大丈夫) -> MACIERZ INTENCJI PRAGMATYCZNYCH (dopasuj do intonacji seiyuu i sytuacji, z priorytetem zwięzłości kinowej):
+     * Uspokojenie lęku/troski: "Spokojnie", "Wszystko w porządku", "Nie martw się" (ZAKAZ rozwlekłych angielskich kalk: "Nie musisz się martwić").
+     * Grzeczna odmowa ("Daijoubu desu"): "Dziękuję, nie trzeba", "Obejdzie się", "Nie ma potrzeby".
+     * Stan zdrowia po ciosie/upadku ("Daijoubu?!"): "Nic ci nie jest?!", "Żyjesz?!", "W porządku?!"; Odpowiedź: "Nic mi nie jest", "Cały jestem".
+     * Gotowość/zdolność do zadania ("Daijoubu?"): "Dasz radę?", "Poradzisz sobie?"; Odpowiedź: "Dam radę", "Spokojna głowa".
+     * Stan obiektywny: "Wszystko w porządku", "Sytuacja opanowana".
    - "naruhodo" (なるほど) = "rozumiem", "aha", "no tak".
    - "kami / kami-sama" (神 / 神様) = w mowie potocznej z uwielbieniem o kimś, kto pomógł/przyniósł jedzenie: "Bogini!", "Jesteś bóstwem!", "Zbawczyni!", "Anioł, nie kobieta!" (BEZWZGLĘDNY ZAKAZ: "Na zdrowie"!).
    - "warukatta na / warikatta na / warui" (悪かったな / 悪い) = "Moja wina..." / "Wybacz..." / "Przepraszam..." (KATEGORYCZNY ZAKAZ liczby mnogiej "Wybaczcie" w scenach 1:1, gdy postać mówi do jednego rozmówcy!).
@@ -1453,6 +1458,9 @@ PROTOKÓŁ TRIANGULACJI TRÓJKĄTA PRZEKŁADU (AUDIO JP VS SKRYPT EN VS WSTĘPNE
      * Gdy to zbliżenie na usta (On-screen) -> dopasuj długość kwestii do zwięzłej polszczyzny kinowej.
 3. KROK 3: ODRZUCENIE GRAWITACJI ANGIELSKIEGO (DE-ANGLICIZATION):
    - Jeśli angielski skrypt spłaszczył japoński niuans (np. "They" zamiast Kanojo-tachi, "Please" zamiast rozkazu, "Thank you" zamiast Giri, "I see" zamiast Aizuchi), BEZWZGLĘDNIE ODRZUĆ angielski i oprzyj się w 100% na japońskim audio i kadrze!
+   - ZASADA ZWIĘZŁOŚCI I EKONOMII SYLAB DLA KRÓTKICH FRAZ JAPOŃSKICH (Barańczak / Belczyk AVT):
+     * Gdy seiyuu wypowiada krótką, 2-3 sylabową frazę (np. "Daijoubu", "Wakatta", "Sou da na", "Shikata ga nai"), BEZWZGLĘDNIE ZABRANIA SIĘ przejmowania rozwlekłych konstrukcji angielskich (np. "You don't need to worry", "As I thought", "It is what it is").
+     * Wybieraj najkrótszy, najbardziej soczysty polski odpowiednik ("Spokojnie" / "W porządku" / "Nie martw się" / "Jasne" / "Trudno" / "Wiedziałem"), idealnie dopasowany do intencji seiyuu i rytmu sceny.
 4. KROK 4: RZEŹBIENIE W ŻYWEJ POLSZCZYŹNIE KINOWEJ (STYLISTIC REFINEMENT):
    - Nadaj kwestii naturalny, plastyczny rytm polszczyzny dialogowej. Usuwaj watę słowną, tautologie i powtórzenia rzeczowników.
 

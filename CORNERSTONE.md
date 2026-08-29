@@ -84,6 +84,10 @@ Rozstrzyganie wszelkich konfliktów translacyjnych i priorytetów w silniku odby
 * 100% terminów w rejestrze musi pochodzić bezpośrednio z licencjonowanych fizycznych wydań papierowych polskich wydawnictw (Waneko, JPF, Studio JG, Kotori, Hanami, Dango, Egmont) lub recenzowanej bazy Tanuki Manga.
 * Wszelkie wartości słownika muszą być czystymi, docelowymi terminami polskimi (bez zanieczyszczeń nawiasami wyjaśniającymi w wartościach docelowych).
 
+### 10. PRAWO MACIERZY INTENCJI PRAGMATYCZNYCH I ZWIĘZŁOŚCI KINOWEJ (PRAGMATIC INTENT & ANTI-BLOAT POLICY)
+* Krótkie, wieloznaczne zwroty japońskie (np. *Daijoubu*, *Wakatta*, *Sou da na*, *Shikata ga nai*) muszą być przekładane na podstawie **Macierzy Intencji Pragmatycznych** seiyuu (uspokojenie lęku $\rightarrow$ *„Spokojnie” / „Wszystko w porządku” / „Nie martw się”*, grzeczna odmowa $\rightarrow$ *„Dziękuję, nie trzeba”*, stan fizyczny $\rightarrow$ *„Nic mi nie jest”*, gotowość $\rightarrow$ *„Dam radę”*).
+* Bezwzględny zakaz mechanicznego przejmowania rozwlekłych angielskich konstrukcji (np. angielskie *„You don't have to worry”* $\rightarrow$ zakaz rozdmuchiwania do *„Nie musisz się martwić”*, gdy japońskie audio zawiera zwięzłe *Daijoubu*). Tłumacz ma obowiązek zachowania zwięzłości kinowej i naturalnej ekonomii sylab.
+
 ---
 
 ## 🔒 ZASADA WERYFIKACJI PRZYSZŁYCH ZMIAN
