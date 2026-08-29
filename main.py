@@ -402,7 +402,7 @@ def main():
         model_p1 = best_models["flash"]
         model_p2 = best_models["flash"]
         enable_verifier = True
-        thinking_budget = 4096
+        thinking_budget = 6144
     elif args.profile in ["studio", "2"]:
         model_p1 = best_models["flash"]
         model_p2 = None
@@ -431,7 +431,7 @@ def main():
         p1_fast = best_models.get("flash_backup", "gemini-3.6-flash")
         print(f"  [1] STANDARDOWY (Free)  [{best_models['flash_lite']}] {tag_lite}")
         print(f"  [2] STUDYJNY FLASH      [{p1_fast}] {tag_flash} (~{cost_flash_est:.2f} zł/odc)")
-        print(f"  [3] MISTRZOWSKI FLASH ⭐ [{p1_fast} + {best_models['flash']} CoT] {tag_flash} (~{cost_pro_est:.2f} zł/odc)")
+        print(f"  [3] MISTRZOWSKI FLASH ⭐ [{best_models['flash']} (CoT 0) + {best_models['flash']} CoT 6144] {tag_flash} (~{cost_pro_est:.2f} zł/odc)")
         print(f"  [4] KINOWY PRO 👑       [{p1_fast} + {best_models['pro']} CoT] {tag_pro} (~{cost_ultra_est:.2f} zł/odc)")
         print("─" * 74)
         print(PricingGuard.get_pricing_status_banner())
@@ -451,18 +451,18 @@ def main():
                 model_p2 = best_models["pro"]
                 enable_verifier = True
                 thinking_budget = 2048
-            else:  # Profile 3: Mistrzowski Flash (F1: 3.6-flash szybki szkic + F2: 3.7-flash pełny CoT 6144)
-                model_p1 = best_models.get("flash_backup", "gemini-3.6-flash")
+            else:  # Profile 3: Dual Highest Flash (F1: Najwyższy Flash CoT 0 + F2: Najwyższy Flash CoT 6144)
+                model_p1 = best_models["flash"]
                 model_p2 = best_models["flash"]
                 enable_verifier = True
                 thinking_budget = 6144
         except (EOFError, KeyboardInterrupt):
-            model_p1 = best_models.get("flash_backup", "gemini-3.6-flash")
+            model_p1 = best_models["flash"]
             model_p2 = best_models["flash"]
             enable_verifier = True
             thinking_budget = 6144
     else:
-        model_p1 = model_p1 or best_models.get("flash_backup", "gemini-3.6-flash")
+        model_p1 = model_p1 or best_models["flash"]
         model_p2 = model_p2 or best_models["flash"]
         enable_verifier = True
         thinking_budget = 6144

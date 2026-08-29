@@ -543,6 +543,7 @@ class MultimodalTranslator:
         self.enable_verifier = enable_verifier
         self.max_image_width = max_image_width
         self.keep_honorifics = keep_honorifics
+        self.phase1_thinking_budget = 0  # Phase 1 is guaranteed to run with CoT=0 for rapid triangulation
         self.thinking_budget_phase2 = thinking_budget_phase2
         self.system_prompt = get_translation_system_prompt(keep_honorifics=keep_honorifics)
         
@@ -763,11 +764,12 @@ class MultimodalTranslator:
                     "response_schema": schema_class,
                     "temperature": 0.25,
                 }
-                if "3.7" in current_model.lower() or "3.1-pro" in current_model.lower() or "pro" in current_model.lower():
-                    if self.enable_verifier:
-                        gen_config_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=0)
-                    else:
-                        gen_config_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=1024)
+                # Phase 1: Always enforce thinking_budget=0 (CoT=0) for reasoning-capable models (Flash 3.7+, 3.8+, 4.0+, Pro)
+                # ensuring rapid triangulation with zero thinking token cost.
+                is_reasoning_capable = any(k in current_model.lower() for k in ["flash", "pro", "thinking", "reasoning"]) and "lite" not in current_model.lower()
+                if is_reasoning_capable:
+                    budget_p1 = getattr(self, "phase1_thinking_budget", 0)
+                    gen_config_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=budget_p1)
 
                 import concurrent.futures
 
@@ -1925,3 +1927,6 @@ class MultimodalTranslator:
             pass
 
         return output_path
+
+# Alias for backwards compatibility
+TranslatorEngine = MultimodalTranslator

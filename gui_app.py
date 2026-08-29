@@ -243,8 +243,8 @@ class TranslationWorker(QThread):
                 p2_model = models["pro"]
                 enable_verifier = True
                 thinking_budget = 2048
-            else:  # Profile 3 (F1: 3.6-flash + F2: 3.7-flash CoT do 6144 - Domyślny)
-                p1_model = p1_fast
+            else:  # Profile 3: Dual Highest Flash (F1: Najwyższy Flash CoT 0 + F2: Najwyższy Flash CoT do 6144 - Domyślny)
+                p1_model = models["flash"]
                 p2_model = models["flash"]
                 enable_verifier = True
                 thinking_budget = 6144
@@ -1340,7 +1340,7 @@ class MainWindow(QMainWindow):
         self.bg_profiles = QButtonGroup(self)
         self.rb_prof1 = QRadioButton("[1] Szybki (Free Tier) — 0,00 PLN (Model Flash-Lite, bez Fazy 2)")
         self.rb_prof2 = QRadioButton("[2] Studyjny Flash — ~1,07 PLN / odc. (Szkic Flash, bez Fazy 2)")
-        self.rb_prof3 = QRadioButton("[3] Mistrzowski Flash Reasoning ⭐ — ~2,30 PLN / odc. (ZALECANY: Faza 1 Flash + Faza 2 Flash z Adaptive CoT do 6144)")
+        self.rb_prof3 = QRadioButton("[3] Mistrzowski Flash Reasoning ⭐ — ~2,30 PLN / odc. (ZALECANY: F1 Najwyższy Flash [CoT 0] + F2 Najwyższy Flash [CoT do 6144])")
         self.rb_prof4 = QRadioButton("[4] Kinowy Pro 👑 — ~3,80 PLN / odc. (Maksymalna Głębia: Faza 1 Flash + Faza 2 Gemini 3.1 Pro z Adaptacyjnym CoT)")
         self.rb_prof3.setChecked(True)
 

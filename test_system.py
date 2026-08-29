@@ -471,7 +471,23 @@ def test_model_resolver():
     health = probe_all_models_health(None, models)
     assert "flash" in health
     assert "tag" in health["flash"]
-    print(" -> PASSED: Auto-discovery, Sonda Obciążenia na Żywo i rozdzielenie puli modeli Flash/Pro działają w 100%.")
+
+    # Test gwarancji Phase 1 thinking_budget == 0 oraz Profile 3 dual-highest-flash
+    from translator import TranslatorEngine
+    dummy_engine = TranslatorEngine(
+        api_key="AIzaSyDummyTestKeyForVerificationOnly12345",
+        model=models["flash"],
+        model_phase2=models["flash"],
+        enable_verifier=True,
+        thinking_budget_phase2=6144,
+        use_whisper=False
+    )
+    assert dummy_engine.phase1_thinking_budget == 0
+    assert dummy_engine.model_phase1 == models["flash"]
+    assert dummy_engine.model_phase2 == models["flash"]
+    assert dummy_engine.verifier.thinking_budget == 6144
+
+    print(" -> PASSED: Auto-discovery, Sonda Obciążenia na Żywo, Profile 3 Dual-Flash i gwarancja F1 CoT=0 działają w 100%.")
 from avt_linter import AVTLinter
 from series_memory import SeriesBible
 from avt_formatter import (
