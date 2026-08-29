@@ -84,6 +84,16 @@ class AVTLinter:
         (r"\b[Ww]asza [Ww]ysokość\b", "wasza wysokość", "Filar LX - Ortografia Wołacza i Małe Litery"),
         (r"\b[Ss]tarszy bracie\b", "brachu", "Filar XXV - Relacje Rodzinne"),
         (r"\b[Ss]tarsza siostro\b", "siostra", "Filar XXV - Relacje Rodzinne"),
+
+        # Kingdom audio-matching & feudal address fixes (Pillars IV / XXV)
+        (r"\b[Cc]hronić pana Bena\b", "Chronić panicza Hona", "Filar IV/XXV - Eliminacja Chińskiego Pinyin 'Ben' na rzecz Japońskiego Audio 'Hon' (Kingdom)"),
+        (r"\bchronić pana Bena\b", "chronić panicza Hona", "Filar IV/XXV - Eliminacja Chińskiego Pinyin 'Ben' na rzecz Japońskiego Audio 'Hon' (Kingdom)"),
+        (r"\b[Pp]ana Bena\b", "panicza Hona", "Filar IV/XXV - Pinyin 'Ben' -> Audio 'Hon'"),
+        (r"\bpana Bena\b", "panicza Hona", "Filar IV/XXV - Pinyin 'Ben' -> Audio 'Hon'"),
+        (r"\b[Pp]an Ben\b", "panicz Hon", "Filar IV/XXV - Pinyin 'Ben' -> Audio 'Hon'"),
+        (r"\bpan Ben\b", "panicz Hon", "Filar IV/XXV - Pinyin 'Ben' -> Audio 'Hon'"),
+        (r"\b[Pp]anie Benie\b", "paniczu Honie", "Filar IV/XXV - Pinyin 'Ben' -> Audio 'Hon'"),
+        (r"\bpanie Benie\b", "paniczu Honie", "Filar IV/XXV - Pinyin 'Ben' -> Audio 'Hon'"),
         
         # Honorific hybrids (Pillar XXVII)
         (r"\b[Pp]ani [Ss]ensei\b", "Sensei", "Filar XXVII - Zakaz Hybryd Honoryfikatywnych"),
