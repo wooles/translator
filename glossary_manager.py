@@ -97,7 +97,8 @@ class GlossaryManager:
             "--- BEZWZGLĘDNY SŁOWNICZEK POJĘĆ I TERMINOLOGII (WYMÓG DETERMINISTYCZNY) ---",
             "Poniższe pojęcia MUSZĄ być przetłumaczone DOKŁADNIE tak, jak podano poniżej:"
         ]
-        for src, trg in glossary_dict.items():
+        for src, raw_trg in glossary_dict.items():
+            trg = self.clean_target_term(raw_trg)
             lines.append(f" • '{src}' => '{trg}'")
         lines.append("----------------------------------------------------------------------------\n")
         return "\n".join(lines)
