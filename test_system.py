@@ -513,7 +513,14 @@ def test_avt_linter():
     # Test eliminacji hybryd honoryfikatywnych (Pani Sensei -> Sensei)
     t6, f6 = AVTLinter.lint_and_fix_line("Pani Sensei, skończyłam!")
     assert t6 == "Sensei, skończyłam!"
-    print(" -> PASSED: AVT Linter bezbłędnie wyłapuje i koryguje kalki i formy.")
+
+    # Test rozpakowywania nawiasów kwadratowych i normalizacji ALL-CAPS w dialogu w tle
+    t7, f7 = AVTLinter.lint_and_fix_line("[ Przepraszam za zwłokę! Ruszajmy! ]", is_sign=False)
+    assert t7 == "Przepraszam za zwłokę! Ruszajmy!"
+
+    t8, f8 = AVTLinter.lint_and_fix_line("[ PRZEPRASZAM ZA ZWŁOKĘ! RUSZAJMY! ]", is_sign=False)
+    assert t8 == "Przepraszam za zwłokę! Ruszajmy!"
+    print(" -> PASSED: AVT Linter bezbłędnie wyłapuje i koryguje kalki, formy, nawiasy i ALL-CAPS.")
 
 def test_series_bible():
     print("[TEST 9/12] Test Biblii Serialu i Pamięci Międzyodcinkowej (series_memory)...")

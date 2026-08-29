@@ -1508,19 +1508,23 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
    - W seriach historycznych (np. XIII w. Imperium Mongolskie, starożytność, średniowiecze) BEZWZGLĘDNIE wyeliminuj nowoczesny slang młodzieżowy ('spoko', 'masakra', 'wkręcasz'). Dopasuj słownictwo do klimatu epoki.
 16. TERMINOLOGIA SPECJALISTYCZNA I KONSULTACJA BRANŻOWA:
    - W seriach o tematyce niszowej (winiarstwo, muzyka, medycyna, shogi, kulinaria) bezwzględnie stosuj oficjalną polską terminologię branżową (np. w winie: 'szczep', 'rocznik', 'apelacja', 'taniny', 'kupaż', 'ciało wina').
-17. OBOWIĄZEK ATRYBUCJI FILARU W POLU 'changes_made':
+17. DIALOGI POSTACI W TLE, W ODDALI I NA GÓRZE EKRANU (\\an8):
+   - Kwestie wypowiadane przez postacie w tle, w korytarzu lub na drugim planie to ŻYWY DIALOG MÓWIONY.
+   - BEZWZGLĘDNY ZAKAZ umieszczania dialogów w nawiasach kwadratowych [...] (BŁĄD: '[ PRZEPRASZAM ZA ZWŁOKĘ! ]' -> POPRAWNIE: 'Przepraszam za zwłokę!').
+   - BEZWZGLĘDNY ZAKAZ pisania dialogów wielkimi literami (ALL-CAPS). Stosuj naturalny zapis dialogowy (Sentence case).
+18. OBOWIĄZEK ATRYBUCJI FILARU W POLU 'changes_made':
    - W polu 'changes_made' dla każdej poprawionej kwestii BEZWZGLĘDNIE podawaj numer i nazwę Filaru AVT, na podstawie którego dokonałeś korekty, np.:
      * "[Filar XXXIV - Relacje Rodzinne] Usunięto 'starszy bracie' -> 'brachu'"
      * "[Filar XLIV - Czasowniki Wektorowe] 'Widzę to po panu' -> 'Już widać!' (po cięciu na samolot)"
-18. CIĘCIA MONTAŻOWE, CZASOWNIKI WEKTOROWE (-TE KURU / MIETEKITA) I DESYGNATY ZAIMKÓW:
+19. CIĘCIA MONTAŻOWE, CZASOWNIKI WEKTOROWE (-TE KURU / MIETEKITA) I DESYGNATY ZAIMKÓW:
    - Kiedy po cięciu sceny (np. podróż, lecący samolot, plener) postać mówi "I can see it!" (audio: 'Mietekita!'):
      -> KARDYNALNY BŁĄD [X]: "Widzę to po tobie / po panu" (zignorowanie obrazu i cięcia sceny!).
      -> POPRAWNIE [OK]: "Już widać!", "Widać cel!", "Już je widać!" (zgodnie z obrazem i kolejnymi linijkami o krajobrazie/lądzie).
-19. MATRYCA APROBACJI (SOU NE / SOU VS ROZUMIEM) I AIZUCHI:
+20. MATRYCA APROBACJI (SOU NE / SOU VS ROZUMIEM) I AIZUCHI:
    - Kiedy postać potwierdza trafną uwagę rozmówcy (audio: 'Sou' / 'Sou ne' / 'Sou desu') i rozwija jego myśl (np. o winie/charakterze):
      -> KARDYNALNY BŁĄD [X]: "Rozumiem." (bierna kalka "I see", brzmiąca obco i urzędowo!).
      -> POPRAWNIE [OK]: "Otóż to.", "Właśnie tak.", "Zgadza się.", "Dokładnie tak."
-20. ZASADA YOBISUTE I ZAKAZ „PANA/PANI” PRZY SAMYM IMIENIU (FILAR XLVI):
+21. ZASADA YOBISUTE I ZAKAZ „PANA/PANI” PRZY SAMYM IMIENIU (FILAR XLVI):
    - Kiedy postać zwraca się do rozmówcy po samym imieniu (np. Loulan do Isseia, Shizuku do Isseia, przyjaciele, rywale):
      -> KARDYNALNY BŁĄD [X]: "Co pan czuje, panie Issei?" (sztuczny dystans niszczący dynamikę postaci!).
      -> POPRAWNIE [OK]: "Co czujesz, Issei?" (bezpośrednio po imieniu na "ty").

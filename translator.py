@@ -103,43 +103,54 @@ def extract_typesetting_tags(raw_text: str) -> Tuple[str, str]:
 def detect_event_visual_type(event: pysubs2.SSAEvent, ts_prefix: str) -> Dict[str, Any]:
     """
     Analyzes ASS tags, position, rotation, color, and style to distinguish
-    on-screen text (manga titles, signs, posters, boards) from standard spoken dialogue.
+    on-screen text (manga titles, signs, posters, boards) from standard spoken dialogue (including top dialogue).
     """
     is_sign = False
+    is_top = False
     details = []
 
     style_lower = (event.style or "").lower()
     name_lower = (event.name or "").lower()
     ts_lower = (ts_prefix or "").lower()
 
-    if any(s in style_lower for s in ["sign", "title", "note", "top", "manga", "screen", "ts", "typesetting", "card"]):
+    if any(s in style_lower for s in ["sign", "title", "poster", "board", "screen", "typesetting", "card", "ts", "napis", "tytuł", "szyld"]):
         is_sign = True
         details.append(f"styl='{event.style}'")
 
-    if any(n in name_lower for n in ["sign", "title", "note", "typesetting", "screen"]):
+    if any(n in name_lower for n in ["sign", "title", "poster", "board", "typesetting", "screen", "napis"]):
         is_sign = True
         details.append(f"aktor='{event.name}'")
 
-    if r"\pos" in ts_lower:
+    if r"\frz" in ts_lower or r"\org" in ts_lower or r"\clip" in ts_lower or r"\p1" in ts_lower:
         is_sign = True
-        details.append("pozycjonowany na ekranie (\\pos)")
+        details.append("obrócony/wklejony graficznie w perspektywę kadrów")
 
-    if r"\frz" in ts_lower or r"\org" in ts_lower:
-        is_sign = True
-        details.append("obrócony/wklejony w perspektywę mangi (\\frz)")
+    if r"\pos" in ts_lower and not is_sign:
+        # Check if it has custom graphic colors or rotation
+        if r"\c&h" in ts_lower or r"\1c&h" in ts_lower or r"\3c&h" in ts_lower:
+            is_sign = True
+            details.append("pozycjonowany napis graficzny (\\pos)")
+        else:
+            is_top = True
+            details.append("dialog pozycjonowany (\\pos)")
 
-    if any(an in ts_lower for an in [r"\an7", r"\an8", r"\an9", r"\an4", r"\an5", r"\an6"]):
-        is_sign = True
-        details.append("położenie poza dolnym marginesem (\\an)")
+    if any(an in ts_lower for an in [r"\an7", r"\an8", r"\an9", r"\an4", r"\an5", r"\an6"]) or "top" in style_lower:
+        if not is_sign:
+            is_top = True
+            details.append("dialog górny / postać w tle (\\an8/Top)")
 
-    if r"\c&h" in ts_lower or r"\1c&h" in ts_lower:
-        is_sign = True
-        details.append("indywidualny kolor graficzny")
+    if is_sign:
+        type_label = "NAPIS EKRANOWY / TYTUŁ (Sign/Typesetting)"
+    elif is_top:
+        type_label = "MÓWIONY DIALOG W TLE / NA GÓRZE EKRANU (Top Dialogue)"
+    else:
+        type_label = "MÓWIONY DIALOG POSTACI"
 
     desc = ", ".join(details) if details else "standardowy dolny dialog"
     return {
         "is_sign": is_sign,
-        "type_label": "NAPIS EKRANOWY / TYTUŁ (Sign/Typesetting)" if is_sign else "MÓWIONY DIALOG POSTACI",
+        "is_top": is_top,
+        "type_label": type_label,
         "visual_details": desc
     }
 
@@ -624,6 +635,8 @@ class MultimodalTranslator:
             else:
                 speaker_name = event.name if event.name else "Postać"
                 lines.append(f"Kwestia [ID: {idx + 1}] [TYP: [DIALOG] {vtype['type_label']}]{relation_tag} (Czas: {start_str} - {end_str}, Mówca: '{speaker_name}'){acoustic_str}:")
+                if vtype.get("is_top"):
+                    lines.append(f"  (!) DIALOG GÓRNY / W TLE: To jest dialog postaci w tle/oddali. Formatuj jako naturalny dialog mówiony (Sentence case). BEZWZGLĘDNY ZAKAZ nawiasów kwadratowych [...] i ZAKAZ wielkich liter ALL-CAPS!")
                 if is_fast:
                     lines.append(f"  (!) TEMPO CPS ({cps:.1f} z/s, czas {duration_s:.1f}s): Szybka kwestia! Zastosuj zwięzłą kondensację Belczyka.")
 

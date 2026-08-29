@@ -293,7 +293,32 @@ class AVTLinter:
                     modified = re.sub(pattern, repl, modified)
                     applied_fixes.append(f"[Filar XIII - Płeć Żeńska w Obsadzie] {pattern} -> {repl}")
 
-        # 5. Guard against duplicate spaces
+        # 5. Anti-Bracket & ALL-CAPS normalization for spoken dialogue (Pillars IV & LX)
+        if not is_sign:
+            # 5a. Strip outer square brackets e.g. "[ Przepraszam za zwłokę! ]" -> "Przepraszam za zwłokę!"
+            if modified.startswith("[") and modified.endswith("]"):
+                inner = modified[1:-1].strip()
+                if inner:
+                    modified = inner
+                    applied_fixes.append("[Filar IV/LX - Eliminacja nawiasów kwadratowych z dialogu mówionego]")
+
+            # 5b. Convert screaming ALL-CAPS dialogue to natural sentence case
+            letters = re.findall(r'[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]', modified)
+            if len(letters) >= 6 and all(c.isupper() for c in letters):
+                # Capitalize first letter of each sentence
+                sentences = re.split(r'([.!?…]+(?:\s+|$))', modified.lower())
+                capitalized_parts = []
+                for part in sentences:
+                    if part and any(c.isalpha() for c in part):
+                        # Find first alphabetic char and capitalize
+                        first_alpha_idx = next((i for i, c in enumerate(part) if c.isalpha()), -1)
+                        if first_alpha_idx != -1:
+                            part = part[:first_alpha_idx] + part[first_alpha_idx].upper() + part[first_alpha_idx + 1:]
+                    capitalized_parts.append(part)
+                modified = "".join(capitalized_parts)
+                applied_fixes.append("[Filar IV/LX - Konwersja ALL-CAPS w dialogu na naturalną wielkość liter]")
+
+        # 6. Guard against duplicate spaces
         modified = re.sub(r"[ \t]+", " ", modified).strip()
 
         return modified, applied_fixes
