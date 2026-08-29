@@ -23,17 +23,17 @@ GOOGLE_API_RATES: Dict[str, Dict[str, float]] = {
     },
     "flash": {
         "name": "Gemini 3.7 Flash",
-        "input_uncached": float(os.getenv("RATE_FLASH_IN", "0.10")),
-        "input_cached": float(os.getenv("RATE_FLASH_CACHE", "0.025")),  # -75% discount with Context Caching
-        "output": float(os.getenv("RATE_FLASH_OUT", "0.40")),         # Output token rate
-        "storage_per_hour": 1.00,
+        "input_uncached": float(os.getenv("RATE_FLASH_IN", "0.75")),
+        "input_cached": float(os.getenv("RATE_FLASH_CACHE", "0.075")),  # -90% discount with Context Caching
+        "output": float(os.getenv("RATE_FLASH_OUT", "3.75")),         # Output token rate including CoT Thinking traces
+        "storage_per_hour": 0.50,
         "is_free_tier": False
     },
     "pro": {
         "name": "Gemini 3.1 Pro Preview",
-        "input_uncached": float(os.getenv("RATE_PRO_IN", "1.25")),   # Official Google API rate (requests <= 200k tokens)
-        "input_cached": float(os.getenv("RATE_PRO_CACHE", "0.3125")),    # -75% discount with Context Caching
-        "output": float(os.getenv("RATE_PRO_OUT", "5.00")),          # Output token rate (including CoT Thinking)
+        "input_uncached": float(os.getenv("RATE_PRO_IN", "2.00")),   # Official Google API rate (requests <= 200k tokens)
+        "input_cached": float(os.getenv("RATE_PRO_CACHE", "0.20")),     # -90% discount with Context Caching
+        "output": float(os.getenv("RATE_PRO_OUT", "12.00")),          # Output token rate (including CoT Thinking)
         "storage_per_hour": 4.50,
         "is_free_tier": False
     }
