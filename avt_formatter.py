@@ -78,6 +78,38 @@ def split_subtitle_syntactically(text: str, max_line_len: int = MAX_LINE_LENGTH,
     if len(words) <= 1:
         return f"{ts_prefix}{normalized_content}"
 
+    # For long texts (written letters, notes, manifestos, documents > 80 chars)
+    # wrap into balanced lines of max_line_len (<= 40-42 chars) to prevent horizontal screen overflow
+    if len(clean_full) > max_line_len * 2:
+        wrapped_lines = []
+        current_words = []
+        current_len = 0
+        for w in words:
+            w_len = len(clean_text_for_len(w))
+            # Split if line exceeds max_line_len or at clause punctuation with sufficient length
+            should_break = False
+            if current_words:
+                if current_len + 1 + w_len > max_line_len:
+                    should_break = True
+                elif current_words[-1].endswith(("!", "?", ".")) and current_len >= 28:
+                    should_break = True
+
+            if should_break:
+                last_w = re.sub(r"[^\w]", "", current_words[-1].lower())
+                # Avoid breaking right after prepositions if possible
+                if last_w not in NO_BREAK_AFTER or len(current_words) > 1:
+                    wrapped_lines.append(" ".join(current_words))
+                    current_words = [w]
+                    current_len = w_len
+                    continue
+
+            current_words.append(w)
+            current_len += (1 + w_len) if current_len > 0 else w_len
+
+        if current_words:
+            wrapped_lines.append(" ".join(current_words))
+        return f"{ts_prefix}{sep.join(wrapped_lines)}"
+
     best_split_idx = -1
     best_score = -999999.0
 

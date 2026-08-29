@@ -598,6 +598,19 @@ def test_avt_formatter_and_cps():
     assert snapped[0].start == 1000  # snapped to 1000ms cut
     assert snapped[0].end == 2960    # snapped 40ms before 3000ms cut
 
+    # Test wieloliniowego łamania długich notatek i list (> 80 znaków) bez ucinania boków
+    long_note = "Nie wzbudzaj litości! Wyciągaj pomocną, ciepłą dłoń! Żadnego użalania się nad sobą, idiotko! Bądź uczciwa! Rysuj na sto procent, a nie na odwal, durna! Rysuj własną krwią! Narysuj to i giń!"
+    split_note = split_subtitle_syntactically(long_note, max_line_len=40, is_ass=True, is_sign=True)
+    note_lines = split_note.split("\\N")
+    assert len(note_lines) >= 3
+    for nl in note_lines:
+        assert len(clean_text_for_len(nl)) <= 48
+
+    # Test formatowania i estymacji budżetu
+    dur_ms = 4000
+    cond = calculate_condensation_directive("Krótka kwestia.", 0, dur_ms)
+    assert cond is None
+
     # Test adaptacyjnego grupowania paczek (Adaptive Batching)
     from translator import create_adaptive_batches
     raw_dummy = [
@@ -630,9 +643,11 @@ def test_typesetting_matcher():
     hex_color = rgb_to_ass_hex(255, 128, 64)
     assert hex_color == "&H4080FF&"  # ASS to BGR
 
-    # Test wzbogacania prefiksu tagów
+    # Test gwarancji wysokiego kontrastu (biały fill fallback i gruby obrys bord3)
     res = TypesettingColorMatcher.enhance_typesetting_prefix("{\\an8}")
     assert "\\an8" in res
+    assert "&HFFFFFF&" in res or "\\1c" in res
+    assert "\\bord3" in res
     print(" -> PASSED: Moduł auto-stylizacji i kolorów ASS działa w 100%.")
 
 from manga_canon import MangaCanonRegistry

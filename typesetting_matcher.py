@@ -66,8 +66,9 @@ class TypesettingColorMatcher:
                     sat = delta / (max_c + 1e-5)
                     brightness = (r + g + b) / 3.0
 
-                    # Filter out dull grays, pure blacks, and pure whites
-                    if brightness < 35 or brightness > 245 or sat < 0.25:
+                    # Filter out dark/murky colors, dull grays, and pure blacks (AVT Contrast Guard)
+                    # Subtitle text MUST have high luminance (brightness >= 160) to ensure readability
+                    if brightness < 160 or brightness > 252 or sat < 0.20:
                         continue
 
                     # Score: balance between saturation and color area
@@ -99,7 +100,7 @@ class TypesettingColorMatcher:
             return r"{\an7\pos(150,150)}"
         elif "right" in st or reg == "top_right":
             return r"{\an9\pos(1770,150)}"
-        elif "center" in st or "card" in st or "phone" in st or "sms" in st or "letter" in st or "list" in st:
+        elif "center" in st or "card" in st or "phone" in st or "sms" in st or "letter" in st or "list" in st or "kartka" in st or "notatka" in st:
             return r"{\an5\pos(960,540)}"
         elif "screen" in st or "sign" in st or "plansza" in st:
             return r"{\an8\pos(960,120)}"
@@ -109,8 +110,9 @@ class TypesettingColorMatcher:
     @classmethod
     def enhance_typesetting_prefix(cls, original_prefix: str, image_path: Optional[str] = None) -> str:
         """
-        Enriches ASS tag prefix with color tag {\\1c&H...&} sampled from the image
-        if color is not already defined in the tags.
+        Enriches ASS tag prefix with high-contrast color tag {\\1c&H...&\\3c&H000000&\\bord3}
+        sampled from the image if color is not already defined in the tags.
+        Guarantees white fill fallback {\\1c&HFFFFFF&} if scene is dark.
         """
         if not original_prefix:
             original_prefix = ""
@@ -119,15 +121,15 @@ class TypesettingColorMatcher:
         if r"\c&H" in original_prefix or r"\1c&H" in original_prefix:
             return original_prefix
 
+        ass_color = None
         if image_path:
             region = "top" if (r"\an8" in original_prefix or r"\an7" in original_prefix) else "center"
             ass_color = cls.extract_dominant_accent_color(image_path, region=region)
-            if ass_color:
-                # Inject sampled accent color with crisp black outline
-                color_tag = f"{{\\1c{ass_color}\\3c&H000000&}}"
-                return f"{color_tag}{original_prefix}"
 
-        return original_prefix
+        # High-contrast fill (sampled bright color or crisp white) with thick black outline (AVT standard)
+        fill_color = ass_color if ass_color else "&HFFFFFF&"
+        color_tag = f"{{\\1c{fill_color}\\3c&H000000&\\bord3}}"
+        return f"{color_tag}{original_prefix}"
 
     @classmethod
     def enhance_sign_typesetting(
@@ -140,8 +142,8 @@ class TypesettingColorMatcher:
         """
         Comprehensive Typesetting 2.0 styling:
         1. Assigns collision-safe position (e.g. top \\an8 or center \\an5) if missing.
-        2. Samples adaptive accent color from video frame crop.
-        3. Adds clean outline and contrast border.
+        2. Samples adaptive high-contrast accent color from video frame crop (or white fallback).
+        3. Adds clean thick black outline (\\bord3) for guaranteed readability.
         """
         prefix = original_prefix or ""
 
@@ -150,11 +152,11 @@ class TypesettingColorMatcher:
             pos_tag = cls.calculate_optimal_sign_position(sign_type=sign_type, region=region)
             prefix = f"{pos_tag}{prefix}"
 
-        # 2. Adaptive color matching from image
+        # 2. Adaptive high-contrast color matching from image (or white fallback)
         prefix = cls.enhance_typesetting_prefix(prefix, image_path=image_path)
 
         # 3. Ensure outline tag if missing
         if r"\3c&H" not in prefix:
-            prefix = f"{{\\3c&H000000&\\bord2}}{prefix}"
+            prefix = f"{{\\3c&H000000&\\bord3}}{prefix}"
 
         return prefix
