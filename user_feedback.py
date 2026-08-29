@@ -201,8 +201,8 @@ class UserFeedbackManager:
             return ""
 
         lines = [
-            "--- ZŁOTE WZORCE I OSOBISTE WYTYCZNE UŻYTKOWNIKA (FEW-SHOT EXAMPLES) ---",
-            "BEZWZGLĘDNIE zastosuj poniższe wzorce i unikaj wskazanych błędów z poprzednich wydań:"
+            "--- WSKAZÓWKI I ZŁOTE WZORCE Z POPRZEDNICH WYDAŃ (FEW-SHOT GUIDANCE) ---",
+            "Poniższe przykłady traktuj jako cenne wskazówki jakościowe. Zastosuj wyciągnięte z nich lekcje naturalnej polszczyzny:"
         ]
         for fb in relevant_entries:
             en_str = f" [Oryginał EN: \"{fb['original_en']}\"]" if fb.get("original_en") else ""

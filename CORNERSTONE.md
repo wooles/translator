@@ -53,6 +53,14 @@ Każda przyszła zmiana w kodzie musi zachować lub polepszyć poniższe paramet
   2. 🌍 **ŚWIAT:** Czy język i dobór słów idealnie oddają duszę świata przedstawionego i tożsamość postaci?
   3. 🎬 **OBRAZ I AUDIO:** Czy tekst idealnie harmonizuje z mimiką, ruchem postaci na kadrze i odgłosami z japońskiego audio?
 
+### 8. PRAWO OFICJALNEJ HIERARCHII PRZEKŁADU (THE 5-TIER TRANSLATION HIERARCHY)
+Rozstrzyganie wszelkich konfliktów translacyjnych i priorytetów w silniku odbywa się ściśle według następującej hierarchii:
+* **Poziom 1: OFICJALNY KANON POLSKICH WYDAŃ MANGOWYCH** (Najwyższy autorytet terminologiczny licencjonowanych tomików papierowych).
+* **Poziom 2: TRIANGULACJA: JAPOŃSKIE AUDIO I KADR > ANGIELSKI SKRYPT** (Japoński dźwięk i obraz stoją bezwzględnie wyżej niż angielski skrypt pośredni).
+* **Poziom 3: TRZY ZŁOTE SOCZEWKI** (Ucho, Świat, Obraz – żywa, naturalnie odmieniona polszczyzna kinowa wg szkoły Barańczaka i Belczyka).
+* **Poziom 4: ERGONOMIA I LIMITY AVT** (17 CPS, semantyczny podział linii, eliminacja sierotek, brak naruszeń montażowych).
+* **Poziom 5: WSKAZÓWKI I KOREKTY UŻYTKOWNIKA** (Uwagi użytkownika traktowane są jako cenne wskazówki jakościowe i impuls do systemowego doskonalenia kodu silnika, a nie jako sztywna dogmatyka ponad regułami profesjonalnego AVT).
+
 ---
 
 ## 🔒 ZASADA WERYFIKACJI PRZYSZŁYCH ZMIAN
