@@ -21,7 +21,24 @@ Każda przyszła zmiana w kodzie musi zachować lub polepszyć poniższe paramet
 
 ---
 
-## ⚖️ 5 NIENARUSZALNYCH PRAW TŁUMACZA (THE 5 IMMUTABLE LAWS)
+## 👑 TRZY ŻELAZNE ZASADY PROJEKTU (W KOLEJNOŚCI OD NAJWAŻNIEJSZEJ DO NAJMNIEJ WAŻNEJ)
+
+1. **CZYSTOŚĆ I REŻIM REJESTRU KANONU MANGI (OFICJALNE ŹRÓDŁA ONLY, ZERO AI):**
+   * W rejestrze (`manga_canon.py`) znajdują się **wyłącznie terminy z oficjalnych i sprawdzonych źródeł** (licencjonowane polskie wydania papierowe: Waneko, J.P.Fantastica, Studio JG, Kotori, Hanami, Dango, Egmont oraz baza Tanuki Manga).
+   * Rejestr ogranicza się **wyłącznie do oryginalnego słowa (klucza) i jego oficjalnego polskiego odpowiednika** (czyste pary klucz $\rightarrow$ wartość, bez zbędnych komentarzy, nawiasów i opisów).
+   * **KATEGORYCZNY ZAKAZ** stosowania jakichkolwiek treści wygenerowanych syntetycznie przez AI lub pochodzących z niesprawdzonych źródeł. Asystent ma bezwzględny obowiązek dbania o utrzymanie rejestru w tym surowym reżimie.
+
+2. **NADRZĘDNOŚĆ KANONU MANGI JAKO POZIOMU 1:**
+   * Kanon mangi stanowi **nadrzędny Poziom 1 w hierarchii przekładu**.
+   * Wszystkie zawarte w nim terminy **muszą być bezwzględnie i obligatoryjnie uwzględniane oraz deterministycznie wymuszane przy tłumaczeniu**.
+
+3. **UWAGI UŻYTKOWNIKA JAKO POZIOM 5 (WSKAZÓWKI SYSTEMOWE):**
+   * Uwagi i korekty użytkownika mają **najniższy, Poziom 5 w hierarchii przekładu**.
+   * Należy traktować je jako **wskazówki do poprawy przyszłych tłumaczeń** (systemowe reguły, ulepszenia lintera, wzorce Few-Shot i optymalizacja triangulacji), a nie jako doraźne burzenie hierarchii Poziomów 1–4.
+
+---
+
+## ⚖️ NIENARUSZALNE PRAWA TŁUMACZA (THE IMMUTABLE LAWS)
 
 ### 1. PRAWO JAKOŚCI KINOWEJ (ZERO DEGRADATION)
 * **Zakaz obniżania modeli:** Faza 1 musi zawsze działać na flagowym modelu Flash (np. Gemini 3.6/3.7 Flash), a Faza 2 na modelu z pełnym budżetem myślenia CoT (6144).
