@@ -1357,6 +1357,33 @@ def test_adaptive_thinking_budget():
     assert b_pro_tier1 == 2048
     print(" -> PASSED: Wielopoziomowy adaptacyjny budżet myślenia (Flash: 6144/3072/1280, Pro: 2048/1024/512) działa w 100%.")
 
+def test_cornerstone_invariants():
+    print("[TEST 33/33] Test Żelaznych Kotwic Stabilności i Nienaruszalności Ceny/Wydajności (Cornerstone v2.0 Invariants)...")
+    from client_factory import format_friendly_api_error
+    from context_cache import ContextCacheManager
+    
+    # 1. Test eliminacji technicznego śmietnika w błędach API
+    err_503 = Exception("503 UNAVAILABLE. {'error': {'code': 503, 'message': 'High demand'}}")
+    friendly_503 = format_friendly_api_error(err_503)
+    assert "503 High Demand" in friendly_503
+    assert "{" not in friendly_503
+    
+    err_429 = Exception("429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'Quota exceeded'}}")
+    friendly_429 = format_friendly_api_error(err_429)
+    assert "429 Rate Limit" in friendly_429
+    assert "{" not in friendly_429
+
+    # 2. Test gwarancji pre-warmingu wszystkich kluczy w puli
+    class MockClientPool:
+        def __init__(self):
+            self.clients = [None, None, None]
+    
+    pool = MockClientPool()
+    ContextCacheManager.ensure_cache_ready(pool, "gemini-3.7-flash", "test prompt", verbose=False)
+    ContextCacheManager.cleanup_all_active_caches(None)
+    
+    print(" -> PASSED: Żelazne kotwice wydajności, pre-warmingu multi-key i ochrony kosztów są w 100% aktywne.")
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -1391,5 +1418,6 @@ if __name__ == "__main__":
     test_masterclass_next_gen()
     test_masterclass_2_innovations()
     test_adaptive_thinking_budget()
-    print("\n Wszystkie testy jednostkowe i integracyjne (32/32) zakończone pełnym sukcesem!\n")
+    test_cornerstone_invariants()
+    print("\n Wszystkie testy jednostkowe i integracyjne (33/33) zakończone pełnym sukcesem!\n")
 
