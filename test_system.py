@@ -1231,13 +1231,21 @@ def test_translator_logger_and_sign_detector():
     )
     assert alert_warukatta is not None and "Warukatta" in alert_warukatta
 
+    # Test Wakaru / Wakaruu Aizuchi alert (Empathetic agreement vs adjective exclamation)
+    alert_wakaru = translator.detect_audio_discrepancy(
+        jp_text="分かる～ [Wakaruu]",
+        pl_text="Genialne!",
+        en_text="Brilliant!"
+    )
+    assert alert_wakaru is not None and "Wakaru" in alert_wakaru
+
     # Test Flashback 1:1 memory formatting
     from memory import format_translation_memory_for_prompt
     formatted_mem = format_translation_memory_for_prompt([
         {"en": "I will never give up!", "pl": "Nigdy się nie poddam!", "anime": "Kingdom", "score": 100}
     ])
     assert "[DOKŁADNY CYTAT 1:1]" in formatted_mem
-    print(" -> PASSED: Logger w translator.py, audio alerty (Haragei, Aizuchi, Oyaji, Giri, Ii desu) i spójność retrospekcji 1:1 działają bezbłędnie.")
+    print(" -> PASSED: Logger w translator.py, audio alerty (Haragei, Aizuchi, Oyaji, Giri, Ii desu, Wakaru) i spójność retrospekcji 1:1 działają bezbłędnie.")
 
 def test_masterclass_next_gen():
     print("[TEST 30/30] Test mechanizmów Masterclass (Pillar CXVIII Barańczak Song, Idiolect Matrix, SceneShotSnapper)...")

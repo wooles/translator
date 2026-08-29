@@ -265,6 +265,12 @@ def detect_audio_discrepancy(jp_text: str, pl_text: str, en_text: str) -> Option
         if any(w in pl_lower for w in ["wybaczcie", "przeproście", "przepraszamy"]):
             return "W audio pada pojedyncze 'Warukatta na / Warui' (Moja wina / Wybacz) -> Zamień błędną liczbę mnogą ('Wybaczcie') na naturalną liczbę pojedynczą: 'Wybacz...' lub 'Moja wina...' (Filar CXXVI)."
 
+    # 12. Wakaru / Wakaruu (empathic agreement / shared feeling) vs adjective exclamations (Genialne/Wspaniale)
+    wakaru_keys = ["wakaru", "wakaruu", "wakaru-", "wakaru yo", "wakaru wa", "wakaru na", "wakaruze", "wakaruzo"]
+    if any(clean_jp.startswith(k) or clean_jp == k for k in ["分かる", "わかる", "分かるー", "わかるー", "分かる～", "わかる～", "分かるよ", "わかるよ"]) or any(k in rom_lower for k in wakaru_keys):
+        if any(w in pl_lower for w in ["genialne", "wspaniale", "doskonale", "świetnie", "bystry", "mądry"]):
+            return "W audio pada 'Wakaru / Wakaruu' (empatyczna zgoda/współodczuwanie: 'No nie?' / 'Totalnie!' / 'Też tak myślę!' / 'Prawda?' / 'Wiem!') -> Odrzuć błędną przymiotnikową ocenę ('Genialne!') na rzecz naturalnej polskiej zgody i potwierdzenia (Filar XLIII / CVI)."
+
     return None
 
 def detect_japanese_pragmatic_register(jp_text: str, en_text: str = "") -> Optional[str]:

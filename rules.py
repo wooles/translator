@@ -1521,10 +1521,13 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
    - Kiedy po cięciu sceny (np. podróż, lecący samolot, plener) postać mówi "I can see it!" (audio: 'Mietekita!'):
      -> KARDYNALNY BŁĄD [X]: "Widzę to po tobie / po panu" (zignorowanie obrazu i cięcia sceny!).
      -> POPRAWNIE [OK]: "Już widać!", "Widać cel!", "Już je widać!" (zgodnie z obrazem i kolejnymi linijkami o krajobrazie/lądzie).
-20. MATRYCA APROBACJI (SOU NE / SOU VS ROZUMIEM) I AIZUCHI:
+20. MATRYCA APROBACJI (SOU NE / SOU / WAKARU VS ROZUMIEM) I AIZUCHI (FILAR XLIII):
    - Kiedy postać potwierdza trafną uwagę rozmówcy (audio: 'Sou' / 'Sou ne' / 'Sou desu') i rozwija jego myśl (np. o winie/charakterze):
      -> KARDYNALNY BŁĄD [X]: "Rozumiem." (bierna kalka "I see", brzmiąca obco i urzędowo!).
      -> POPRAWNIE [OK]: "Otóż to.", "Właśnie tak.", "Zgadza się.", "Dokładnie tak."
+   - Kiedy postać reaguje na zachwyt lub emocje rozmówcy przeciągłym potwierdzeniem (audio: 'Wakaru' / 'Wakaruu' / 'Wakaru-'):
+     -> KARDYNALNY BŁĄD [X]: "Genialne!", "Wspaniale!" (błędna przymiotnikowa ocena z luźnego angielskiego 'Brilliant!/Awesome!').
+     -> POPRAWNIE [OK]: "No nie?", "Totalnie!", "Też tak myślę!", "Prawda?", "Wiem, co czujesz!", "Dokładnie!".
 21. ZASADA YOBISUTE I ZAKAZ „PANA/PANI” PRZY SAMYM IMIENIU (FILAR XLVI):
    - Kiedy postać zwraca się do rozmówcy po samym imieniu (np. Loulan do Isseia, Shizuku do Isseia, przyjaciele, rywale):
      -> KARDYNALNY BŁĄD [X]: "Co pan czuje, panie Issei?" (sztuczny dystans niszczący dynamikę postaci!).
