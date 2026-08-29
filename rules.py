@@ -343,17 +343,27 @@ FILAR XLII: ZAKAZ HALUCYNACJI PRZYNALEŻNOŚCI I ZAIMKÓW DZIERŻAWCZYCH (3. OSO
 MODUŁ V: PRAGMATYKA DIALOGU I KONTEKST ROZMOWY (FILARY XLIII – LII)
 
 FILAR XLIII: MATRYCA PRAGMATYCZNA POTWIERDZEŃ, APROBACJI I AIZUCHI (CONVERSATIONAL VALIDATION MATRIX):
-- ROZRÓŻNIENIE APROBACJI OD PRZYJĘCIA INFORMACJI:
+- ROZRÓŻNIENIE APROBACJI OD PRZYJĘCIA INFORMACJI I REAKCJI EMOCJONALNYCH:
   * 1. APROBATA / POTWIERDZENIE HIPOTEZY ROZMÓWCY (Sou / Sou ne / Sou desu):
     -> Gdy rozmówca wysuwa trafną uwagę (np. "Wyczułem w winie trud osadników..."), a postać potwierdza jego rację:
     -> BŁĄD [X]: Bierne, urzędowe "Rozumiem." (kalka angielskiego "I see").
     -> POPRAWNIE [OK]: "Otóż to.", "Właśnie tak.", "Zgadza się.", "Dokładnie tak.", "W rzeczy samej."
-  * 2. PRZYJĘCIE NOWEJ WIEDZY DO WIADOMOŚCI (Naruhodo / Sou ka / Wakatta):
-    -> Gdy postać dowiaduje się czegoś nowego: "Rozumiem.", "Aha.", "Jasne.", "Teraz rozumiem."
-  * 3. PEWNOŚĆ I POTWIERDZENIE DOMYSŁU (Tashikani vs Yahari / Yappari):
-    -> Tashikani: "Rzeczywiście", "W rzeczy samej", "Bez dwóch zdań".
-    -> Yahari / Yappari: "Jednak...", "Wiedziałem!", "A nie mówiłem?".
-  * 4. ZDZIWIENIE / ZAINTRYGOWANIE (Sou nan desu ka? / Sou ka? z intonacją rosnącą): "Doprawdy?", "Naprawdę?"
+  * 2. EMPATIA I WSPÓŁODCZUWANIE (Wakaru / Wakaruu / Sore na!):
+    -> Wakaru / Wakaruu (分かる〜): "No nie?", "Totalnie!", "Też tak myślę!", "Prawda?", "Wiem, co czujesz!" (ZAKAZ: 'Genialne!', 'Rozumiem').
+    -> Sore na! / Sore! (それな！): "Otóż to!", "Rel!", "W punkt!", "Święta prawda!", "O to to!" (ZAKAZ: 'Ta rzecz!', 'To to!').
+    -> Tashika ni (確かに): "W sumie racja.", "To prawda.", "Faktycznie.", "Masz rację." (ZAKAZ: 'Z pewnością').
+  * 3. PRZYJĘCIE NOWEJ WIEDZY I OLŚNIENIE (Naruhodo / Sou ka / Sou iu koto ka):
+    -> Naruhodo / Naruhodo ne: "A, w ten sposób!", "Wszystko jasne.", "A, o to chodzi.", "No tak." (ZAKAZ: 'Rzeczywiście', 'Rozumiem').
+    -> Sou iu koto ka: "A więc o to chodzi!", "Czyli tak to wygląda!", "Teraz to ma sens!" (ZAKAZ: 'Więc tak to jest').
+  * 4. ZASKOCZENIE I NIEDOWIERZANIE (Uso / Maji de / Nani kore):
+    -> Uso / Uso desho: "Żartujesz?", "Serio?", "Bez jaj!", "Nie wierzę!" (ZAKAZ: 'Kłamstwo!').
+    -> Maji de? / Maji ka?: "Serio?", "Poważnie?", "Nie gadaj!" (ZAKAZ: 'Czy to prawda?').
+    -> Nani kore?: "Co to ma być?", "A to co znowu?", "Co to takiego?" (ZAKAZ: 'Co to za rzecz?').
+  * 5. POTWIERDZENIE DOMYSŁÓW I SATYSFAKCJA (Yappari / Desho / Daro):
+    -> Yappari / Yahari: "Wiedziałem!", "Jednak miałem rację!", "Tak jak myślałem.", "A jednak!" (ZAKAZ: 'Po wszystkim', 'Zgodnie z oczekiwaniami').
+    -> Desho? / Daro?: "A nie mówiłem?", "No widzisz?", "No nie?", "Prawda?" (ZAKAZ: 'Czyż nie?').
+  * 6. PÓŁ-ZGODA I POWŚCIĄGLIWOŚĆ (Maa ne / Maa na):
+    -> Maa ne: "No niby tak...", "W sumie...", "Mniej więcej...", "Coś w tym jest..." (ZAKAZ: 'Cóż, tak.').
 
 FILAR XLIV: SELEKTYWNA REDUKCJA POTAKIWAŃ I ELIMINACJA NAKŁADAJĄCYCH SIĘ AIZUCHI (EYE-TRACKING FILTER):
 - W języku japońskim potakiwania ("un", "ee", "sou", "naruhodo", "a", "he-") padają co 2 sekundy:
@@ -1521,13 +1531,28 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
    - Kiedy po cięciu sceny (np. podróż, lecący samolot, plener) postać mówi "I can see it!" (audio: 'Mietekita!'):
      -> KARDYNALNY BŁĄD [X]: "Widzę to po tobie / po panu" (zignorowanie obrazu i cięcia sceny!).
      -> POPRAWNIE [OK]: "Już widać!", "Widać cel!", "Już je widać!" (zgodnie z obrazem i kolejnymi linijkami o krajobrazie/lądzie).
-20. MATRYCA APROBACJI (SOU NE / SOU / WAKARU VS ROZUMIEM) I AIZUCHI (FILAR XLIII):
-   - Kiedy postać potwierdza trafną uwagę rozmówcy (audio: 'Sou' / 'Sou ne' / 'Sou desu') i rozwija jego myśl (np. o winie/charakterze):
+20. MATRYCA APROBACJI I ZWROTÓW REAKTYWNYCH AIZUCHI (FILAR XLIII):
+   - Kiedy postać potwierdza trafną uwagę rozmówcy (audio: 'Sou' / 'Sou ne' / 'Sou desu') i rozwija jego myśl:
      -> KARDYNALNY BŁĄD [X]: "Rozumiem." (bierna kalka "I see", brzmiąca obco i urzędowo!).
      -> POPRAWNIE [OK]: "Otóż to.", "Właśnie tak.", "Zgadza się.", "Dokładnie tak."
-   - Kiedy postać reaguje na zachwyt lub emocje rozmówcy przeciągłym potwierdzeniem (audio: 'Wakaru' / 'Wakaruu' / 'Wakaru-'):
+   - Kiedy postać reaguje na zachwyt/emocje przeciągłym potwierdzeniem (audio: 'Wakaru / Wakaruu / Wakaru-'):
      -> KARDYNALNY BŁĄD [X]: "Genialne!", "Wspaniale!" (błędna przymiotnikowa ocena z luźnego angielskiego 'Brilliant!/Awesome!').
      -> POPRAWNIE [OK]: "No nie?", "Totalnie!", "Też tak myślę!", "Prawda?", "Wiem, co czujesz!", "Dokładnie!".
+   - Kiedy postać wyraża absolutną młodzieżową zgodę (audio: 'Sore na! / Sore!'):
+     -> KARDYNALNY BŁĄD [X]: "Ta rzecz!", "To to!" (dosłowna kalka angielskiego 'That!').
+     -> POPRAWNIE [OK]: "Otóż to!", "Rel!", "W punkt!", "Święta prawda!", "O to to!".
+   - Kiedy postać przyznaje rację (audio: 'Tashika ni / Tashika ni ne'):
+     -> KARDYNALNY BŁĄD [X]: "Z pewnością." (sztywna kalka angielskiego 'Certainly.').
+     -> POPRAWNIE [OK]: "W sumie racja.", "To prawda.", "Faktycznie.", "Masz rację.".
+   - Kiedy postać doznaje olśnienia / rozumie mechanizm (audio: 'Naruhodo / Sou iu koto ka'):
+     -> KARDYNALNY BŁĄD [X]: "Rzeczywiście.", "Więc tak to jest."
+     -> POPRAWNIE [OK]: "A, w ten sposób!", "Wszystko jasne.", "A więc o to chodzi!", "Czyli tak to wygląda!".
+   - Kiedy postać reaguje na szok/zdziwienie (audio: 'Uso! / Maji de? / Nani kore?'):
+     -> KARDYNALNY BŁĄD [X]: "Kłamstwo!", "Czy to prawda?", "Co to za rzecz?"
+     -> POPRAWNIE [OK]: "Żartujesz?", "Serio?", "Bez jaj!", "Nie wierzę!", "Nie gadaj!", "Co to ma być?".
+   - Kiedy postać potwierdza wcześniejsze domysły (audio: 'Yappari / Desho?'):
+     -> KARDYNALNY BŁĄD [X]: "Po wszystkim.", "Zgodnie z oczekiwaniami.", "Czyż nie?"
+     -> POPRAWNIE [OK]: "Wiedziałem!", "Jednak miałem rację!", "Tak jak myślałem.", "A nie mówiłem?", "No widzisz?".
 21. ZASADA YOBISUTE I ZAKAZ „PANA/PANI” PRZY SAMYM IMIENIU (FILAR XLVI):
    - Kiedy postać zwraca się do rozmówcy po samym imieniu (np. Loulan do Isseia, Shizuku do Isseia, przyjaciele, rywale):
      -> KARDYNALNY BŁĄD [X]: "Co pan czuje, panie Issei?" (sztuczny dystans niszczący dynamikę postaci!).

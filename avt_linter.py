@@ -185,6 +185,10 @@ class AVTLinter:
         (r"\b[Ss]łyszeliście przed chwilą\b", "Słyszałeś przed chwilą", "Filar LI - Liczba Pojedyncza w Dialogu 1-na-1"),
         (r"\b[Ww]idzieliście przed chwilą\b", "Widziałeś przed chwilą", "Filar LI - Liczba Pojedyncza w Dialogu 1-na-1"),
 
+        # Aizuchi & Conversational Reactive Expressions (Pillar XLIII)
+        (r"\b[Cc]zyż nie\?", "prawda?", "Filar XLIII - Eliminacja archaizmu 'Czyż nie?' (Desho)"),
+        (r"\b[Cc]o to za rzecz\?", "Co to ma być?", "Filar XLIII - Naturalne zdziwienie (Nani kore)"),
+
         # Cultural realia and Pedersen ECR (Pillar XIV)
         (r"\b[Kk]onbini\b", "sklep", "Filar XIV - Pedersen Generalization"),
 

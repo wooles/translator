@@ -271,6 +271,60 @@ def detect_audio_discrepancy(jp_text: str, pl_text: str, en_text: str) -> Option
         if any(w in pl_lower for w in ["genialne", "wspaniale", "doskonale", "świetnie", "bystry", "mądry"]):
             return "W audio pada 'Wakaru / Wakaruu' (empatyczna zgoda/współodczuwanie: 'No nie?' / 'Totalnie!' / 'Też tak myślę!' / 'Prawda?' / 'Wiem!') -> Odrzuć błędną przymiotnikową ocenę ('Genialne!') na rzecz naturalnej polskiej zgody i potwierdzenia (Filar XLIII / CVI)."
 
+    # 13. Sore na / Sore! / Sore da (youth agreement / absolute validation) vs literal 'To to!' / 'Ta rzecz!'
+    sorena_keys = ["sore na", "sore!", "sore da", "sore da yo", "sore da na"]
+    if any(clean_jp.startswith(k) or clean_jp == k for k in ["それな", "それ！", "それだ", "それだよ"]) or any(k in rom_lower for k in sorena_keys):
+        if any(w in pl_lower for w in ["ta rzecz", "to to", "właśnie to coś", "tamtą rzecz"]):
+            return "W audio pada potoczne 'Sore na!' (absolutna zgoda z rozmówcą) -> Zamień dosłowną kalkę na żywe: 'Otóż to!' / 'Rel!' / 'W punkt!' / 'Święta prawda!' (Filar XLIII)."
+
+    # 14. Tashika ni / Tashika ni ne (conceding a point / admitting truth) vs stiff 'Z pewnością'
+    tashika_keys = ["tashika ni", "tashikani", "tashika ni ne", "tashikani ne"]
+    if any(clean_jp.startswith(k) or clean_jp == k for k in ["確かに", "たしかに", "確かにね", "たしかにね"]) or any(k in rom_lower for k in tashika_keys):
+        if pl_lower.startswith("z pewnością") or pl_lower.startswith("pewnie tak"):
+            return "W audio pada 'Tashika ni' (przyznanie racji: 'W sumie racja' / 'To prawda' / 'Faktycznie') -> Zastąp sztywne 'Z pewnością...' naturalnym przyznaniem racji (Filar XLIII)."
+
+    # 15. Naruhodo / Naruhodo ne (realization / understanding mechanics) vs stiff 'Rzeczywiście' / 'Rozumiem'
+    naruhodo_keys = ["naruhodo", "naruhodone", "naruhodo na", "naruhodo ne"]
+    if any(clean_jp.startswith(k) or clean_jp == k for k in ["なるほど", "なるほどね", "なるほどな"]) or any(k in rom_lower for k in naruhodo_keys):
+        if pl_lower == "rzeczywiście." or pl_lower == "rozumiem.":
+            return "W audio pada 'Naruhodo' (olśnienie/zrozumienie toku myśli) -> Zastąp urzędowe 'Rozumiem/Rzeczywiście' żywym: 'A, w ten sposób!' / 'Wszystko jasne.' / 'A, o to chodzi.' (Filar XLIII)."
+
+    # 16. Sou iu koto ka / Sou iu koto ne (deducing the truth) vs literal 'Więc tak to jest'
+    souiukoto_keys = ["sou iu koto ka", "sou iu koto ne", "souiu koto ka", "souiukoto ka"]
+    if any(k in clean_jp for k in ["そういうことか", "そういう事か", "そういうことね"]) or any(k in rom_lower for k in souiukoto_keys):
+        if "więc tak to jest" in pl_lower or "taka to rzecz" in pl_lower:
+            return "W audio pada 'Sou iu koto ka' (domyślenie się sedna sprawy) -> Zastąp kalkę naturalnym: 'A więc o to chodzi!' / 'Czyli tak to wygląda!' (Filar XLIII)."
+
+    # 17. Uso / Uso desho / Masaka (disbelief / shock) vs literal 'Kłamstwo!'
+    uso_keys = ["uso", "uso-", "uso!", "uso desho", "uso daro", "usodesho", "masaka"]
+    if clean_jp in ["嘘", "うそ", "うそー", "嘘でしょ", "うそでしょ", "まさか"] or rom_lower in uso_keys:
+        if any(w in pl_lower for w in ["kłamstwo", "kłamiesz", "to kłamstwo", "kłamco"]):
+            return "W audio pada wykrzyknik zdziwienia 'Uso! / Uso desho?' -> Zamień nienaturalne 'Kłamstwo!' na naturalne: 'Żartujesz?' / 'Serio?' / 'Bez jaj!' / 'Nie wierzę!' (Filar XLIII)."
+
+    # 18. Maji de? / Maji ka? (youth disbelief) vs stiff 'Czy to prawda?'
+    maji_keys = ["maji de", "majide", "maji ka", "majika", "maji kayo", "majikayo"]
+    if any(k in clean_jp for k in ["マジで", "まじで", "マジか", "まじか", "マジかよ"]) or any(k in rom_lower for k in maji_keys):
+        if any(w in pl_lower for w in ["czy to prawda", "prawdziwie", "prawdziwe to"]):
+            return "W audio pada młodzieżowe 'Maji de? / Maji ka?' -> Zamień sztywne 'Czy to prawda?' na żywe: 'Serio?' / 'Poważnie?' / 'Nie gadaj!' (Filar XLIII)."
+
+    # 19. Yappari / Yahari / Yappa (confirmation of suspicion) vs literal 'Po wszystkim' / 'Zgodnie z oczekiwaniami'
+    yappari_keys = ["yappari", "yahari", "yappa", "yappari na", "yapparina"]
+    if any(k in clean_jp for k in ["やっぱり", "やはり", "やっぱ", "やっぱな"]) or any(k in rom_lower for k in yappari_keys):
+        if any(w in pl_lower for w in ["po wszystkim", "zgodnie z oczekiwaniami", "jak oczekiwano"]):
+            return "W audio pada 'Yappari / Yahari' (potwierdzenie domysłów) -> Zamień kalkę na naturalne: 'Wiedziałem!' / 'Jednak miałem rację!' / 'A jednak!' / 'Tak jak myślałem.' (Filar XLIII)."
+
+    # 20. Desho? / Daro? (seeking validation / 'Told you so!') vs archaic 'Czyż nie?'
+    desho_keys = ["desho", "deshou", "desho?", "daro", "darou", "daro?"]
+    if clean_jp in ["でしょ", "でしょう", "でしょ？", "だろ", "だろう", "だろ？"] or rom_lower in desho_keys:
+        if "czyż nie" in pl_lower:
+            return "W audio pada potoczne 'Desho? / Daro?' -> Zamień archaiczne 'Czyż nie?' na naturalne: 'A nie mówiłem?' / 'No widzisz?' / 'No nie?' / 'Prawda?' (Filar XLIII)."
+
+    # 21. Nani kore? (shock at bizarre situation/object) vs literal 'Co to za rzecz?'
+    nanikore_keys = ["nani kore", "nanikore", "nanda kore", "nandakore"]
+    if any(k in clean_jp for k in ["何これ", "なにこれ", "なんだこれ", "何だこれ"]) or any(k in rom_lower for k in nanikore_keys):
+        if "co to za rzecz" in pl_lower or "czym jest ta rzecz" in pl_lower:
+            return "W audio pada 'Nani kore?' (zdumienie sytuacją/obiektem) -> Zastąp sztywne 'Co to za rzecz?' naturalnym: 'Co to ma być?' / 'A to co znowu?' (Filar XLIII)."
+
     return None
 
 def detect_japanese_pragmatic_register(jp_text: str, en_text: str = "") -> Optional[str]:

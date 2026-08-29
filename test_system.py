@@ -532,7 +532,13 @@ def test_avt_linter():
     # Test eliminacji liczby mnogiej w dialogach 1-na-1 (Słyszeliście -> Słyszałeś)
     t11, f11 = AVTLinter.lint_and_fix_line("Słyszeliście przed chwilą głos dyrektorki?", is_sign=False)
     assert t11 == "Słyszałeś przed chwilą głos dyrektorki?"
-    print(" -> PASSED: AVT Linter bezbłędnie wyłapuje i koryguje kalki, formy, nawiasy, cudzysłowy, formy 1-na-1 i ALL-CAPS.")
+
+    # Test eliminacji kalek Aizuchi (Czyż nie? -> Prawda?, Co to za rzecz? -> Co to ma być?)
+    t12, f12 = AVTLinter.lint_and_fix_line("To wspaniałe, czyż nie?", is_sign=False)
+    assert t12 == "To wspaniałe, prawda?"
+    t13, f13 = AVTLinter.lint_and_fix_line("Co to za rzecz?", is_sign=False)
+    assert t13 == "Co to ma być?"
+    print(" -> PASSED: AVT Linter bezbłędnie wyłapuje i koryguje kalki, formy, nawiasy, cudzysłowy, formy 1-na-1, Aizuchi i ALL-CAPS.")
 
 def test_series_bible():
     print("[TEST 9/12] Test Biblii Serialu i Pamięci Międzyodcinkowej (series_memory)...")
@@ -1254,13 +1260,77 @@ def test_translator_logger_and_sign_detector():
     )
     assert alert_wakaru is not None and "Wakaru" in alert_wakaru
 
+    # Test Sore na! alert (Absolute agreement vs literal That!)
+    alert_sorena = translator.detect_audio_discrepancy(
+        jp_text="それな！ [Sore na!]",
+        pl_text="To to!",
+        en_text="That!"
+    )
+    assert alert_sorena is not None and "Sore na" in alert_sorena
+
+    # Test Tashika ni alert (Admitting truth vs stiff Certainly)
+    alert_tashika = translator.detect_audio_discrepancy(
+        jp_text="確かにね [Tashika ni ne]",
+        pl_text="Z pewnością tak.",
+        en_text="Certainly."
+    )
+    assert alert_tashika is not None and "Tashika ni" in alert_tashika
+
+    # Test Naruhodo alert (Realization vs stiff Indeed)
+    alert_naruhodo = translator.detect_audio_discrepancy(
+        jp_text="なるほど [Naruhodo]",
+        pl_text="Rzeczywiście.",
+        en_text="Indeed."
+    )
+    assert alert_naruhodo is not None and "Naruhodo" in alert_naruhodo
+
+    # Test Uso / Uso desho alert (Disbelief vs literal Lie)
+    alert_uso = translator.detect_audio_discrepancy(
+        jp_text="嘘でしょ [Uso desho]",
+        pl_text="Kłamstwo!",
+        en_text="No way, that's a lie!"
+    )
+    assert alert_uso is not None and "Uso" in alert_uso
+
+    # Test Maji de alert (Youth disbelief vs stiff Is that true?)
+    alert_maji = translator.detect_audio_discrepancy(
+        jp_text="マジかよ [Maji kayo]",
+        pl_text="Czy to prawda?",
+        en_text="For real?"
+    )
+    assert alert_maji is not None and "Maji" in alert_maji
+
+    # Test Yappari alert (Confirmation vs After all)
+    alert_yappari = translator.detect_audio_discrepancy(
+        jp_text="やっぱりな [Yappari na]",
+        pl_text="Po wszystkim tak jest.",
+        en_text="After all."
+    )
+    assert alert_yappari is not None and "Yappari" in alert_yappari
+
+    # Test Desho alert (Validation vs Czyż nie?)
+    alert_desho = translator.detect_audio_discrepancy(
+        jp_text="でしょ？ [Desho?]",
+        pl_text="Czyż nie?",
+        en_text="Right?"
+    )
+    assert alert_desho is not None and "Desho" in alert_desho
+
+    # Test Nani kore alert (Shock vs Co to za rzecz?)
+    alert_nanikore = translator.detect_audio_discrepancy(
+        jp_text="何これ [Nani kore]",
+        pl_text="Co to za rzecz?",
+        en_text="What is this?"
+    )
+    assert alert_nanikore is not None and "Nani kore" in alert_nanikore
+
     # Test Flashback 1:1 memory formatting
     from memory import format_translation_memory_for_prompt
     formatted_mem = format_translation_memory_for_prompt([
         {"en": "I will never give up!", "pl": "Nigdy się nie poddam!", "anime": "Kingdom", "score": 100}
     ])
     assert "[DOKŁADNY CYTAT 1:1]" in formatted_mem
-    print(" -> PASSED: Logger w translator.py, audio alerty (Haragei, Aizuchi, Oyaji, Giri, Ii desu, Wakaru) i spójność retrospekcji 1:1 działają bezbłędnie.")
+    print(" -> PASSED: Logger w translator.py, audio alerty (Haragei, Aizuchi Matrix, Oyaji, Giri, Ii desu, Wakaru, Sorena, Uso) i spójność retrospekcji 1:1 działają bezbłędnie.")
 
 def test_masterclass_next_gen():
     print("[TEST 30/30] Test mechanizmów Masterclass (Pillar CXVIII Barańczak Song, Idiolect Matrix, SceneShotSnapper)...")
