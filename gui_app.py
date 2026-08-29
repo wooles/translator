@@ -436,7 +436,7 @@ class SettingsDialog(QDialog):
             os.environ["GOOGLE_CLOUD_PROJECT"] = proj
             os.environ["GOOGLE_CLOUD_LOCATION"] = loc_str
 
-            client = get_genai_client(api_key=key, timeout_ms=15000)
+            client = get_genai_client(api_key=key, timeout_sec=15.0)
             res = client.models.generate_content(
                 model="gemini-2.5-flash",
                 contents="Test PING"

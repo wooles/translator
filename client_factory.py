@@ -41,14 +41,19 @@ def format_friendly_api_error(e: Exception) -> str:
 def get_genai_client(
     api_key: Optional[str] = None,
     timeout_sec: float = 45.0,
+    timeout_ms: Optional[int] = None,
     force_ai_studio: bool = False
 ) -> genai.Client:
     """
-    Creates and returns a genai.Client instance with safe 45s timeout.
+    Creates and returns a genai.Client instance with safe timeout.
+    Accepts both timeout_sec and legacy timeout_ms (auto-converted to seconds).
     If gcp_key.json exists (or GOOGLE_GENAI_USE_VERTEXAI is True),
     authenticates using European Vertex AI Enterprise credentials (europe-west1 / Belgia).
     Otherwise, connects via standard Google AI Studio API Key.
     """
+    if timeout_ms is not None:
+        timeout_sec = timeout_ms / 1000.0
+
     use_vertex = os.environ.get("GOOGLE_GENAI_USE_VERTEXAI", "1").lower() in ["1", "true", "yes"]
     key_path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "").strip()
     if not key_path:
@@ -93,7 +98,12 @@ class MultiKeyClientPool:
     Thread-safe Smart Round-Robin Client Pool with Circuit Breaker and Auto-Banning of Exhausted Keys.
     Distributes requests only across active, healthy API keys, immediately cooling down keys that hit 429 quota.
     """
-    def __init__(self, raw_keys: Optional[str] = None, timeout_sec: float = 45.0):
+    def __init__(
+        self,
+        raw_keys: Optional[str] = None,
+        timeout_sec: float = 45.0,
+        timeout_ms: Optional[int] = None
+    ):
         import threading
         import time
         import concurrent.futures
@@ -104,6 +114,9 @@ class MultiKeyClientPool:
         keys_list = [k.strip() for k in raw.replace(";", ",").split(",") if k.strip()]
         if not keys_list:
             keys_list = [""]
+
+        if timeout_ms is not None:
+            timeout_sec = timeout_ms / 1000.0
 
         safe_timeout = float(os.environ.get("GEMINI_HTTP_TIMEOUT_SEC", str(timeout_sec)))
         http_opts = types.HttpOptions(timeout=safe_timeout)
