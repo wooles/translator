@@ -181,6 +181,10 @@ class AVTLinter:
         (r"\b[Pp]an(?:a|u|em|ie)?\s+(Shizuku|Issei|Arata|Shin|Luffy|Naruto|Ichigo|Tanjiro|Deku|Yuji|Yoritsugu|Aoi|Ren|Haru|Kaito|Sora|Yuto|Riku|Takumi|Daiki)\b", r"\1", "Filar XLVI - Eliminacja sztucznego 'pan' przy imieniu męskim (-kun)"),
         (r"\b[Pp]ani\s+(Kokoro|Miyabi|Akafuku|Hana|Yui|Rin|Sakura|Akari|Nanami|Mei|Hina|Mio|Yuna|Koharu|Saki|Kanna)\b", r"\1", "Filar XLVI - Eliminacja sztucznego 'pani' przy imieniu rówieśniczki (-chan)"),
 
+        # 1-on-1 Dialogue Singular Number Normalization (Pillar LI / X)
+        (r"\b[Ss]łyszeliście przed chwilą\b", "Słyszałeś przed chwilą", "Filar LI - Liczba Pojedyncza w Dialogu 1-na-1"),
+        (r"\b[Ww]idzieliście przed chwilą\b", "Widziałeś przed chwilą", "Filar LI - Liczba Pojedyncza w Dialogu 1-na-1"),
+
         # Cultural realia and Pedersen ECR (Pillar XIV)
         (r"\b[Kk]onbini\b", "sklep", "Filar XIV - Pedersen Generalization"),
 

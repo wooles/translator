@@ -1529,19 +1529,23 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
    - Kiedy postać zwraca się do rozmówcy po samym imieniu (np. Loulan do Isseia, Shizuku do Isseia, przyjaciele, rywale):
      -> KARDYNALNY BŁĄD [X]: "Co pan czuje, panie Issei?" (sztuczny dystans niszczący dynamikę postaci!).
      -> POPRAWNIE [OK]: "Co czujesz, Issei?" (bezpośrednio po imieniu na "ty").
-21. PODMIOT KONTRASTOWY W ODPOWIEDZIACH (MY FOLKS / WATASHI NO) (FILAR XLVII):
+22. PODMIOT KONTRASTOWY W ODPOWIEDZIACH (MY FOLKS / WATASHI NO) (FILAR XLVII):
    - Kiedy postać odpowiada na pytanie o swoją rodzinę/pochodzenie ("My folks are out in..." / audio: "Watashi no..."):
      -> KARDYNALNY BŁĄD [X]: "Mieszkają na Izu Oshimie" (urwana forma bezosobowa gubiąca mówcę!).
      -> POPRAWNIE [OK]: "Moi rodzice mieszkają na Izu Oshimie." / "Moi mieszkają na Izu Oshimie."
-22. ZAKAZ HYBRYD HONORYFIKATYWNYCH (PANI SENSEI -> SENSEI) (FILAR XLVIII):
+23. ZAKAZ HYBRYD HONORYFIKATYWNYCH (PANI SENSEI -> SENSEI) (FILAR XLVIII):
    - Kiedy postać zwraca się do mangaki/mistrza/nauczyciela per 'Sensei' / 'Senpai':
      -> KARDYNALNY BŁĄD [X]: "Pani Sensei, skończyłam!", "Panie Sensei!", "Pani Senpai!" (potworek łączący polską i japońską tytulaturę!).
      -> POPRAWNIE [OK]: "Sensei, skończyłam!" / "Teshima-sensei, skończyłam!" (lub naturalnie: "Pani Teshimo, skończyłam!").
-23. PRZEKŁAD PLANSZ TYTUŁOWYCH I POZYCJONOWANIE GÓRNE (FILAR XLIX):
+24. LICZBA GRAMATYCZNA ZAIMKA 'YOU' W DIALOGACH 1-NA-1 (FILAR LI / X):
+   - Kiedy w scenie/kadrze rozmawiają ze sobą dwie postacie (dialog 1-na-1, np. dwóch uczniów w korytarzu):
+     -> KARDYNALNY BŁĄD [X]: "Słyszeliście przed chwilą głos dyrektorki?", "Widzieliście to?", "Wiecie co zrobić?" (halucynacja liczby mnogiej z dwuznacznego angielskiego 'you'!).
+     -> POPRAWNIE [OK]: "Słyszałeś przed chwilą głos dyrektorki?", "Widziałeś to?", "Wiesz, co zrobić?" (2. osoba liczby pojedynczej: 'ty' / 'słyszałeś').
+25. PRZEKŁAD PLANSZ TYTUŁOWYCH I POZYCJONOWANIE GÓRNE (FILAR XLIX):
    - Kiedy na ekranie widnieje plansza czasu/miejsca ('PRESENT DAY', 'TOKIO'):
      -> KARDYNALNY BŁĄD [X]: Brak tłumaczenia lub zasłanianie dołu ekranu.
      -> POPRAWNIE [OK]: "[ CZASY WSPÓŁCZESNE ]" / "[ OBECNIE ]" (wersalikami w nawiasie prostokątnym).
-24. IZOTOPIA SEMANTYCZNA I JEDNOLITOŚĆ REJESTRU (FILAR L):
+26. IZOTOPIA SEMANTYCZNA I JEDNOLITOŚĆ REJESTRU (FILAR L):
    - Kategoryczny zakaz mieszania skrajnych rejestrów (np. archaiczny styl dworski z młodzieżowym slangiem 'masakra').
 25. KONDENSACJA I RYTM DIALOGU (FILAR LIV):
    - Przy szybkim tempie (CPS > 17) stosuj zwięzłą kompresję leksykalną, elipsę i usuwanie waty słownej.

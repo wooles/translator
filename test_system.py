@@ -528,7 +528,11 @@ def test_avt_linter():
     # Test eliminacji spacji przed interpunkcją po cudzysłowie oraz sztucznego 'pan Shizuku' (-kun)
     t10, f10 = AVTLinter.lint_and_fix_line("Słowo „odkrycie” , którego użył pan Shizuku, jest tu niezwykle trafne.", is_sign=False)
     assert t10 == "Słowo „odkrycie”, którego użył Shizuku, jest tu niezwykle trafne."
-    print(" -> PASSED: AVT Linter bezbłędnie wyłapuje i koryguje kalki, formy, nawiasy, cudzysłowy i ALL-CAPS.")
+
+    # Test eliminacji liczby mnogiej w dialogach 1-na-1 (Słyszeliście -> Słyszałeś)
+    t11, f11 = AVTLinter.lint_and_fix_line("Słyszeliście przed chwilą głos dyrektorki?", is_sign=False)
+    assert t11 == "Słyszałeś przed chwilą głos dyrektorki?"
+    print(" -> PASSED: AVT Linter bezbłędnie wyłapuje i koryguje kalki, formy, nawiasy, cudzysłowy, formy 1-na-1 i ALL-CAPS.")
 
 def test_series_bible():
     print("[TEST 9/12] Test Biblii Serialu i Pamięci Międzyodcinkowej (series_memory)...")

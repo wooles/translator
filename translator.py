@@ -610,6 +610,7 @@ class MultimodalTranslator:
         # 3. Lines to translate
         lines.append("Przetłumacz poniższe kwestie dialogowe na naturalny język polski. "
                      "PAMIĘTAJ: Kwestie często tworzą jedno długie zdanie rozbite na kilka linijek – ZAWSZE analizuj CAŁE ZDANIA od początku do końca, dbając o piękny, naturalny polski szyk wyrazów i płynność gramatyczną między linijkami! "
+                     "DIALOGI 1-NA-1 I LICZBA GRAMATYCZNA: Gdy w scenie/kadrze rozmawiają ze sobą dwie postacie (1-na-1), angielskie dwuznaczne 'you' (np. 'Did you hear...?', 'Did you see...?', 'Do you know...?') BEZWZGLĘDNIE tłumacz w 2. osobie liczby POJEDYNCZEJ ('Słyszałeś?' / 'Słyszałaś?', 'Widziałeś?', 'Wiesz?'). KATEGORYCZNY ZAKAZ form liczby mnogiej ('Słyszeliście?') w rozmowach dwuosobowych! "
                      "ŻEŃSKOOSOBOWOŚĆ OBSADY: Dialogi między uczennicami/dziewczętami bezwzględnie tłumacz w RODZAJU ŻEŃSKIM (np. 'Głupia jesteś?' / 'Oszalałaś?', 'Jesteś pewna?', 'Widziałaś to?', 'poszłam', 'zrobiłam'). ZAKAZ form męskich ('Głupi jesteś?') w rozmowach dziewcząt! "
                      "PRZYNALEŻNOŚĆ I 3. OSOBA: Frazy typu '[Imię]'s dad / mom / manga' (np. 'Akafuku's dad!') tłumacz w 3. osobie ('Tata Akafuku!'). BEZWZGLĘDNY ZAKAZ zamiany imienia innej postaci na 1. osobę ('to mój tata' -> BŁĄD!). "
                      "Użyj załączonych klatek wideo do WIZUALNEGO ODCZYTANIA (OCR) JAPOŃSKICH NAPISÓW (chmurki jak いいよね, tablice, telefony, szyldy) oraz japońskiego audio do ustalenia emocji i kontekstu sytuacji. "
