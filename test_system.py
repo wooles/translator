@@ -618,6 +618,12 @@ def test_avt_formatter_and_cps():
     assert "\\N" in split_s1 and "OTAI" in split_s1
     assert "\\N" in split_s2 and "TEMÜGE" in split_s2
 
+    # Test eliminacji 3. linii w długich dialogach mówionych (<= 115 znaków - Tenmaku 91-char case)
+    spoken_long = "Musimy przejść przez ziemie Południowej dynastii Song, by uderzyć na Kaifeng od południa."
+    split_spoken = split_subtitle_syntactically(spoken_long, max_line_len=42, is_ass=True, is_sign=False)
+    spoken_parts = split_spoken.split("\\N")
+    assert len(spoken_parts) == 2, f"Spoken dialogue must be strictly 2 lines, got: {len(spoken_parts)}"
+
     # Test dyrektywy kompresji tekstu (Smart Condensation Ratio)
     cond_fast = calculate_condensation_directive("Musimy natychmiast uciekać stąd bo nadciągają potwory!", start_ms=0, end_ms=1200)
     assert cond_fast is not None and "EKSTREMALNY" in cond_fast

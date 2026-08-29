@@ -80,9 +80,11 @@ def split_subtitle_syntactically(text: str, max_line_len: int = MAX_LINE_LENGTH,
     if len(words) <= 1:
         return f"{ts_prefix}{normalized_content}"
 
-    # For long texts (written letters, notes, manifestos, documents > 80 chars, or long signs > 36 chars)
-    # wrap into balanced lines of max_line_len to prevent horizontal screen overflow
-    if len(clean_full) > max_line_len * 2:
+    # For long texts (written letters, notes, manifestos, documents > 120 chars, or long signs > 36 chars)
+    # wrap into balanced lines of max_line_len to prevent horizontal screen overflow.
+    # Spoken dialogue (<= 115 chars) is strictly limited to MAXIMUM 2 LINES.
+    should_wrap_multi = (is_positioned_sign and len(clean_full) > max_line_len * 2) or (len(clean_full) > 120)
+    if should_wrap_multi:
         wrapped_lines = []
         current_words = []
         current_len = 0
@@ -134,9 +136,9 @@ def split_subtitle_syntactically(text: str, max_line_len: int = MAX_LINE_LENGTH,
 
         # Penalties for exceeding max line length
         if len_left > max_line_len:
-            score -= (len_left - max_line_len) * 300.0
+            score -= (len_left - max_line_len) * (200.0 if is_positioned_sign else 35.0)
         if len_right > max_line_len:
-            score -= (len_right - max_line_len) * 300.0
+            score -= (len_right - max_line_len) * (200.0 if is_positioned_sign else 35.0)
 
         last_word_left = re.sub(r"[^\w]", "", left_words[-1].lower())
         first_word_right = re.sub(r"[^\w]", "", right_words[0].lower())
@@ -158,19 +160,19 @@ def split_subtitle_syntactically(text: str, max_line_len: int = MAX_LINE_LENGTH,
         elif left_words[-1].endswith((".", "!", "?", "...", ";")):
             score += 250.0
         elif left_words[-1].endswith(","):
-            score += 150.0
+            score += 180.0
 
         # 4. Bonus for breaking before subordinate conjunctions
-        if first_word_right in {"że", "bo", "ponieważ", "więc", "jeśli", "gdy", "kiedy", "chociaż", "dlatego", "który", "która", "które"}:
-            score += 140.0
+        if first_word_right in {"że", "bo", "ponieważ", "więc", "jeśli", "gdy", "kiedy", "chociaż", "dlatego", "który", "która", "które", "by", "aby", "żeby", "jak"}:
+            score += 160.0
 
         # 5. Pyramiding rule (Netflix AVT): bottom line should be longer than or equal to top line (dialogue only)
         if not is_positioned_sign:
             diff = len_right - len_left
             if 0 <= diff <= 16:
-                score += 250.0  # High bonus for proper pyramiding
+                score += 200.0  # High bonus for proper pyramiding
             elif diff < 0:
-                score -= abs(diff) * 25.0  # Penalty for inverted pyramid
+                score -= abs(diff) * 15.0  # Penalty for inverted pyramid
 
         # 6. Center balance penalty
         balance_penalty = abs(len_left - target_midpoint) * 2.0
