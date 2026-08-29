@@ -5,9 +5,9 @@ Maintains 100% authentic, verified official Polish terminology published in phys
 by licensed Polish publishers (Wydawnictwo Waneko, J.P.Fantastica, Studio JG, Kotori, Hanami, Dango, Egmont).
 
 Strict Grounding Rule (Law 9 - Zero-AI Policy):
-Zero tolerance for synthetic English calques or hallucinated AI terms.
-Deterministic Glossary only includes pure, clean key-value pairs (Source EN/JP -> Target PL)
-without any bracketed annotations, descriptions, or slash alternatives.
+Zero tolerance for synthetic English calques, AI hallucinations, or extra commentary.
+Deterministic Glossary contains ONLY pure key-value pairs (Original Term -> Polish Print Equivalent)
+without any bracketed annotations, descriptions, or additional data.
 """
 
 import os
@@ -48,12 +48,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Sorghaghtani": "Sorkaktani Beki",
             "Guyuk": "Güyük",
             "Godan": "Köden"
-        },
-        "character_forms": {
-            "Toregene -> Fatima": "Fatimo (bliskość, zaufanie)",
-            "Fatima -> Toregene": "Pani Toregene / Chatun (szacunek)",
-            "Fatima -> Ogedei": "Wielki Chanie / Wasza Wysokość (pełna uległość poddanej)",
-            "Dwór -> Toregene": "Dostojna Chatun / Pani Toregene (poddaństwo)"
         }
     },
     "kingdom": {
@@ -109,7 +103,7 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Tou": "Tou",
             "Teng": "Tou",
             "Ousen": "Ousen",
-            "Wang Jian": "Ousen",
+            "Wang Jian": "Król Ouken",
             "Kanki": "Kanki",
             "Huan Yi": "Kanki",
             "Yotanwa": "Yotanwa",
@@ -241,7 +235,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Seikai": "Generał Seikai",
             "Cheng Hui": "Generał Seikai",
             "Ouken": "Król Ouken",
-            "Wang Jian (Qi)": "Król Ouken",
             "Hi Shin Unit": "Oddział Hi Shin",
             "Fei Xin Dui": "Oddział Hi Shin",
             "Gyoku Hou Unit": "Oddział Gyoku Hou",
@@ -295,20 +288,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Legalism": "Praworządność",
             "Weight of a General": "Ciężar Generała",
             "Bushin": "Bushin"
-        },
-        "character_forms": {
-            "Shin -> Ei Sei": "Sei (braterska relacja i bezpośredniość) / Wasza Wysokość (oficjalnie przy dworzanach)",
-            "Ei Sei -> Shin": "Shin (serdeczny przyjaciel, równy partner w marzeniu o zjednoczeniu)",
-            "Ten -> Shin": "Shin (kumpelska troska jak o starszego brata)",
-            "Kyoukai -> Shin": "Shin (spokój, głębokie zaufanie i cicha miłość)",
-            "Ouki -> Shin": "Młody chłopcze / Dzieciaku (ojcowski mentoring z humorem 'nfufufu')",
-            "Shin -> Ouki": "Wielki Generale Ouki! (najwyższy szacunek i autorytet)",
-            "Banyou -> Ouhon": "Panicz Hon / Młody pan Hon / Hon-sama (stary, oddany sługa; BEZWZGLĘDNY ZAKAZ 'pan Ben')",
-            "Ban You -> Ouhon": "Panicz Hon / Młody pan Hon / Hon-sama (stary, oddany sługa; BEZWZGLĘDNY ZAKAZ 'pan Ben')",
-            "Gyoku Hou -> Ouhon": "Młody pan Hon / Dowódca Hon (oddanie żołnierzy; zakaz 'Ben')",
-            "Kozen -> Mouten": "Panicz Ten / Młody pan Mouten / Mouten-sama (stary sługa; BEZWZGLĘDNY ZAKAZ 'pan Tian')",
-            "Ouhon -> Shin": "Bękarcie / Chłystku (szlachecka duma skrywająca uznanie rywala)",
-            "Mouten -> Shin": "Shin / Przyjacielu (lekki, ciepły ton kumpelski)"
         }
     },
     "golden_kamuy": {
@@ -346,12 +325,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Tattooed Convicts": "Wytatuowani więźniowie",
             "Ainu Gold": "Złoto Ajnów",
             "Karafuto": "Karafuto"
-        },
-        "character_forms": {
-            "Sugimoto -> Asirpa": "Asirpa / Asirpo (partnerska relacja i szacunek dla kultury Ajnów)",
-            "Asirpa -> Sugimoto": "Sugimoto (zaufanie i przyjaźń)",
-            "Shiraishi -> Sugimoto": "Sugimoto (kumpelsko / tchórzliwie)",
-            "Żołnierze -> Tsurumi": "Poruczniku Tsurumi / Panie Poruczniku (ślepe oddanie)"
         }
     },
     "chainsaw_man": {
@@ -414,14 +387,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Chainsaw Cord": "Uchwyt rozrusznika na piersi Denjiego",
             "Kon": "Kon!",
             "Easy Revenge": "Łatwa Zemsta"
-        },
-        "character_forms": {
-            "Denji -> Makima": "Pani Makimo / Makima-san (ślepe, psie posłuszeństwo i zauroczenie)",
-            "Aki -> Makima": "Pani Makimo (pełen profesjonalizm i zauroczenie)",
-            "Power -> Denji": "Denji! (zarozumiała, komiczna wyższość 'Jestem geniuszem!')",
-            "Denji -> Power": "Power (kłótliwe rodzeństwo)",
-            "Aki -> Denji/Power": "Głupki / Bachory (szorstka odpowiedzialność starszego brata)",
-            "Makima -> Denji": "Dobry piesek (chłodna, bezlitosna manipulacja)"
         }
     },
     "jujutsu_kaisen": {
@@ -521,13 +486,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Split Soul Katana": "Katana Rozcinająca Dusze",
             "Playful Cloud": "Swawolna Chmura",
             "Cursed Spirit": "Przeklęty Duch"
-        },
-        "character_forms": {
-            "Yuji -> Gojo": "Gojo-sensei (uwielbienie i szacunek dla mentora)",
-            "Megumi -> Gojo": "Gojo-san (lekki dystans i powaga)",
-            "Todo -> Yuji": "Mój najlepszy przyjacielu! / Bracie! (My Best Friend / Brother)",
-            "Sukuna -> Ludzie": "Robaki / Nędznicy (absolutna boska pycha)",
-            "Nobara -> Yuji/Megumi": "Głupki / Chłopcy (pewność siebie i dominacja)"
         }
     },
     "shingeki_no_kyojin": {
@@ -572,11 +530,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Marley": "Marley",
             "Eldia": "Eldia",
             "Rumbling": "Dudnienie"
-        },
-        "character_forms": {
-            "Mikasa -> Eren": "Eren (nadopiekuńczość, głęboka miłość)",
-            "Zwiadowcy -> Levi": "Kapralu Levi / Panie Kapralu (dyscyplina i podziw)",
-            "Zwiadowcy -> Erwin": "Dowódco Erwinie / Sasageyo (gotowość na śmierć)"
         }
     },
     "naruto": {
@@ -651,15 +604,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Hidden Mist Village": "Wioska Ukrytej Mgły",
             "Hidden Cloud Village": "Wioska Ukrytej Chmury",
             "Hidden Stone Village": "Wioska Ukrytej Skały"
-        },
-        "character_forms": {
-            "Naruto -> Jiraiya": "Zboczony Pustelniku! / Ero-sennin",
-            "Naruto -> Sasuke": "Sasuke! (wieczny rywal i brat)",
-            "Sakura -> Sasuke": "Sasuke-kun! (miłość)",
-            "Naruto -> Tsunade": "Babciu Tsunade!",
-            "Naruto -> Wszyscy": "Dattebayo! / Taka jest moja droga ninja!",
-            "Sasuke -> Naruto": "Usuratonkachi / Durniu (skrywane braterstwo)",
-            "Jiraiya -> Naruto": "Naruto / Dzieciaku (ojcowska mądrość Mędrca)"
         }
     },
     "dragon_ball": {
@@ -726,13 +670,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Fusion": "Fuzja: Taniec Fuzyjny, Kolczyki Potara",
             "Super Dragon Balls": "Super Smocze Kule",
             "Hyperbolic Time Chamber": "Komnata Ducha i Czasu"
-        },
-        "character_forms": {
-            "Vegeta -> Goku": "Kakarotto! (wieczna duma rywala)",
-            "Goku -> Vegeta": "Vegeta (beztroska, kumpelska chęć walki)",
-            "Goku -> Roshi": "Mistrzu Żółwiu (Genialny Żółwiu)",
-            "Frieza -> Saiyans": "Te bezużyteczne małpy...",
-            "Gohan -> Piccolo": "Panie Piccolo / Piccolo-san (najwyższy szacunek i ojcowska więź)"
         }
     },
     "kimetsu_no_yaiba": {
@@ -772,12 +709,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Entertainment District": "Dzielnica Czerwonych Latarni",
             "Swordsmith Village": "Wioska Kowali",
             "Infinity Castle": "Zamek Nieskończoności"
-        },
-        "character_forms": {
-            "Tanjiro -> Nezuko": "Nezuko! (braterska czułość i determinacja ochrony)",
-            "Zabójcy -> Oyakata-sama": "Mistrzu / Oyakata-sama (święta cześć)",
-            "Inosuke -> Tanjiro": "Kamaboko Gonpachiro! (przekręcanie imion)",
-            "Zenitsu -> Nezuko": "Nezuko-chan! (zakochany lament)"
         }
     },
     "death_note": {
@@ -811,12 +742,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Kira": "Kira",
             "SPK": "SPK",
             "Wammy's House": "Dom Wammy'ego"
-        },
-        "character_forms": {
-            "Light -> L": "Ryuzaki (maska przyjaźni / zimna kalkulacja)",
-            "L -> Light": "Light-kun (intelektualna gra w szachy / podejrzenie)",
-            "Misa -> Light": "Light-kun! / Mój ukochany!",
-            "Ryuk -> Light": "Ludzie są naprawdę interesujący..."
         }
     },
     "fullmetal_alchemist": {
@@ -873,14 +798,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Alkahestry": "Alkahestria",
             "Briggs": "Twierdza Briggs",
             "Xing": "Cesarstwo Xing"
-        },
-        "character_forms": {
-            "Edward -> Każdy": "KTO JEST TAK MAŁY, ŻE TRZEBA GO SZUKAĆ PRZEZ LUPĘ?!",
-            "Alphonse -> Edward": "Nii-san! / Bracie! (rozsądek i troska)",
-            "Mustang -> Hawkeye": "Porucznik Hawkeye (absolutne zaufanie wojskowe i osobiste)",
-            "Winry -> Ed": "Ed, znowu zniszczyłeś moją protezę automail?!",
-            "Edward -> Wszyscy": "Kto jest taki mały, że ledwo go widać spod fasoli?! (szał na punkcie wzrostu)",
-            "Mustang -> Edward": "Stalowy / Fullmetal (szorstka opieka dowódcy)"
         }
     },
     "bleach": {
@@ -952,13 +869,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Resurreccion": "Resurrección",
             "Vollstandig": "Quincy: Vollständig",
             "Soul King": "Król Dusz"
-        },
-        "character_forms": {
-            "Ichigo -> Rukia": "Rukia (głębokie zaufanie i partnerska więź)",
-            "Rukia -> Ichigo": "Ichigo / Durniu (surowa opieka i wsparcie)",
-            "Renji -> Byakuya": "Kapitanie Kuchiki (pełen szacunek podwładnego)",
-            "Hitsugaya -> Wszyscy": "Nie Hitsugaya, tylko Kapitan Hitsugaya!",
-            "Aizen -> Wszyscy": "Zimna, boska pycha ('Wszystko szło zgodnie z moim planem')"
         }
     },
     "one_piece": {
@@ -1048,16 +958,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Laugh Tale": "Laugh Tale",
             "Ancient Weapons": "Starożytne Bronie",
             "Mary Geoise": "Święta Ziemia Mary Geoise"
-        },
-        "character_forms": {
-            "Luffy -> Załoga": "Będę Królem Piratów! / Chodźmy jeść mięso!",
-            "Zoro -> Sanji": "Przeklęty kucharz / Ero-cook (wieczna rywalizacja)",
-            "Sanji -> Zoro": "Głupi mchem / Marimo",
-            "Sanji -> Nami/Robin": "Nami-san~! / Robin-chan~! (miłosny obłęd)",
-            "Chopper -> Ludzie": "Wcale się nie cieszę, że mnie chwalisz, ty draniu! (taniec radości)",
-            "Luffy -> Wszyscy": "Zostanę Królem Piratów! / Kaizoku ou ni ore wa naru!",
-            "Zoro -> Luffy": "Kapitanie / Luffy (absolutna lojalność prawego skrzydła)",
-            "Sanji -> Kobiety": "Nami-san~! / Robin-chan~! (miłosne uwielbienie)"
         }
     },
     "spy_x_family": {
@@ -1095,13 +995,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Ostania": "Ostania",
             "Westalis": "Westalis",
             "Garden": "Ogród"
-        },
-        "character_forms": {
-            "Anya -> Loid": "Tatuś (Papai)",
-            "Anya -> Yor": "Mamusiu (Mamai)",
-            "Anya -> Damian": "Synek (Jinan / kpina telepatyczna)",
-            "Loid -> Anya": "Anya (cierpliwość agenta pod przykrywką)",
-            "Yor -> Loid": "Panie Loidzie (nieśmiałość i urok)"
         }
     },
     "tokyo_ghoul": {
@@ -1136,12 +1029,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "RC Cells": "Komórki RC",
             "Kakuhou": "Kakuhou",
             "Ghoul": "Ghul"
-        },
-        "character_forms": {
-            "Kaneki -> Touka": "Touka-chan / Touko",
-            "Tsukiyama -> Kaneki": "Kaneki-ken~! (ekstatyczny obłęd smakosza)",
-            "Arima -> Kaneki/Haise": "Haise (chłodny, surowy ojciec)",
-            "Quinx -> Haise": "Maman / Panie Sasaki (ciepło rodzinne)"
         }
     },
     "vinland_saga": {
@@ -1217,14 +1104,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Althing": "Thing",
             "Wergild": "Główszczyzna",
             "Skraeling": "Skrælingowie"
-        },
-        "character_forms": {
-            "Thorfinn -> Askeladd": "Askeladd! Pojedynkuj się ze mną! (nienawiść z dzieciństwa)",
-            "Askeladd -> Thorfinn": "Thorfinn, dorośnij... / Chłopcze (gorzka lekcja życia)",
-            "Thors -> Thorfinn": "Pamiętaj, synu: nie masz żadnych wrogów.",
-            "Einar -> Thorfinn": "Thorfinn, bracie / Jesteśmy wolnymi ludźmi",
-            "Canute -> Thorfinn": "Thorfinn, dawny druhu...",
-            "Thorkell -> Thorfinn": "Młody Thorfinn! Pokaż, czego nauczył cię Thors!"
         }
     },
     "berserk": {
@@ -1275,12 +1154,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Astral World": "Świat Astralny",
             "World Tree": "Drzewo Świata",
             "Falconia": "Falconia"
-        },
-        "character_forms": {
-            "Guts -> Griffith": "GRIFFITH! (czysta, wstrząsająca żądza zemsty i ból zdrady)",
-            "Griffith -> Guts": "Guts (jedyny człowiek, który sprawił, że zapomniał o swoim marzeniu)",
-            "Casca -> Guts": "Guts (miłość, która przetrwała piekło)",
-            "Schierke -> Guts": "Panie Guts / Guts-san (troska o jego duszę w Zbroi Berserkera)"
         }
     },
     "boku_no_hero_academia": {
@@ -1326,12 +1199,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Paranormal Liberation Front": "Front Wyzwolenia Zjawisk Nadprzyrodzonych",
             "Smash": "Smash!",
             "Plus Ultra": "Plus Ultra!"
-        },
-        "character_forms": {
-            "Izuku -> Bakugo": "Kacchan! (respekt, podziw z dzieciństwa)",
-            "Bakugo -> Izuku": "Deku! Ty bezużyteczny śmieciu! (zadziorność i ambicja)",
-            "Izuku -> All Might": "All Might! / Mistrzu!",
-            "All Might -> Izuku": "Młody Midoriyo!"
         }
     },
     "sousou_no_frieren": {
@@ -1363,12 +1230,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "First-Class Mage Exam": "Egzamin na Maga Pierwszej Klasy",
             "Continental Magic Association": "Kontynentalny Związek Magii",
             "Grimoire": "Grimuar"
-        },
-        "character_forms": {
-            "Frieren -> Himmel": "Himmel... (wspomnienia, zrozumienie ludzkich serc)",
-            "Fern -> Frieren": "Mistrzyni Frieren / Frieren-sama (karzące spojrzenie na lenistwo)",
-            "Fern -> Stark": "Panie Stark / Dziecinny zboczeniec",
-            "Stark -> Fern": "Fern (strach przed jej fochem / troska)"
         }
     },
     "dungeon_meshi": {
@@ -1396,12 +1257,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Golden Kingdom": "Złote Królestwo",
             "Monster Cuisine": "Potrawka z potworów",
             "Ancient Magic": "Starożytna Magia"
-        },
-        "character_forms": {
-            "Laios -> Potwory": "Ciekawe jak smakuje ich mięso... (naukowa pasja)",
-            "Marcille -> Laios": "NIGDY TEGO NIE ZJEM! / Laios, ty obrzydliwcu!",
-            "Senshi -> Marcille": "Jedz, bo bez zbilansowanej diety nie przetrwasz w lochu!",
-            "Chilchuck -> Drużyna": "Pamiętajcie, to tylko praca za stawkę!"
         }
     },
     "oshi_no_ko": {
@@ -1428,12 +1283,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Entertainment Industry": "Japoński Przemysł Rozrywkowy",
             "Lie is Love": "Kłamstwo to najdoskonalsza forma miłości",
             "Black Star Eyes": "Czarne Gwiazdy w Oczach"
-        },
-        "character_forms": {
-            "Aqua -> Wrogowie": "Zimna, bezwzględna dedukcja i planowanie zemsty za śmierć Ai",
-            "Ruby -> Aqua": "Onii-chan / Aqua (początkowo rodzeństwo, później rozpad i prawda o Goro)",
-            "Kana -> Aqua": "Aqua, ty durniu! (niezdolność wyznania uczuć)",
-            "Akane -> Aqua": "Rozszyfruję każdy twój ból i pomogę ci zabić..."
         }
     },
     "solo_leveling": {
@@ -1469,11 +1318,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Shadow Extraction": "Ekstrakcja Cienia",
             "Ruler's Authority": "Autorytet Władcy",
             "Jeju Island Raid": "Rajd na Wyspę Jeju"
-        },
-        "character_forms": {
-            "Jinwoo -> Cienie": "Powstań! (Epicki rozkaz budzący armię)",
-            "Beru -> Jinwoo": "Mój Królu! (fanatyczne uwielbienie)",
-            "Cha Hae-in -> Jinwoo": "Panie Sung Jinwoo (fascynacja zapachem many)"
         }
     },
     "made_in_abyss": {
@@ -1500,11 +1344,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Relics": "Relikty",
             "Incinerator": "Spopielacz",
             "Cartridges": "Kartridże"
-        },
-        "character_forms": {
-            "Nanachi -> Reg/Riko": "Nnaa~ (charakterystyczne westchnienie i czułość)",
-            "Bondrewd -> Dzieci": "Subarashii! (Przerażający zachwyt nad postępem nauki)",
-            "Riko -> Reg": "Reg! (nieustraszona ciekawość i wiara w przyjaciela)"
         }
     },
     "haikyuu": {
@@ -1542,12 +1381,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Rolling Thunder": "Rolling Thunder!",
             "Spring Tournament": "Turniej Wiosenny",
             "Trash Heap Showdown": "Bitwa na Wysypisku Śmieci"
-        },
-        "character_forms": {
-            "Hinata -> Kageyama": "Kageyama! Wystaw mi jeszcze jedną piłkę!",
-            "Kageyama -> Hinata": "Boke, Hinata boke! (Ty durniu, Hinata!)",
-            "Oikawa -> Kageyama": "Tobio-chan (ironiczny uśmieszek mistrza)",
-            "Bokuto -> Akaashi": "Akaaaashi! (lament w dołku psychicznym)"
         }
     },
     "kaguya_sama": {
@@ -1573,12 +1406,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Love is War": "Miłość to wojna: Kto pierwszy wyzna uczucie, ten przegrywa!",
             "How Cute": "Och, jakie to urocze...",
             "Shinomiya Conglomerate": "Konglomerat Finansowy Shinomiya"
-        },
-        "character_forms": {
-            "Kaguya -> Shirogane": "Przewodniczący / Shirogane (duma i ukryte uwielbienie)",
-            "Shirogane -> Kaguya": "Shinomiya (duma i obsesja na punkcie wyznania)",
-            "Chika -> Ishigami": "Ishigami-kun! Nie bądź taki ponury!",
-            "Ishigami -> Kaguya": "Shinomiya-senpai mnie zabije..."
         }
     },
     "jojo": {
@@ -1615,12 +1442,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Tusk": "Tusk",
             "Stone Mask": "Kamienna Maska",
             "Speedwagon Foundation": "Fundacja Speedwagona"
-        },
-        "character_forms": {
-            "Jotaro -> Wrogowie": "Yare Yare Daze... (Dajcie mi święty spokój...)",
-            "DIO -> Joestarowie": "WRYYYYY! / Za Warudo!",
-            "Joseph -> Przeciwnicy": "Twoje kolejne słowa to: ...!",
-            "Giorno -> Bruno": "Bruno Bucciarati (braterska lojalność mafijna)"
         }
     },
     "blue_lock": {
@@ -1650,11 +1471,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Flow State": "Stan Flow",
             "Direct Volley": "Bezpośredni Wolej",
             "Neo Egoist League": "Liga Neo Egoistów"
-        },
-        "character_forms": {
-            "Isagi -> Przeciwnicy": "Pożrę cię na tym boisku! (bezwzględne ego)",
-            "Ego -> Uczestnicy": "Nieoszlifowane diamenty / Wy śmiecie bez ambicji!",
-            "Barou -> Isagi": "Ty sługusie! Król jest tylko jeden!"
         }
     },
     "wind_breaker": {
@@ -1680,11 +1496,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "KEEL": "KEEL",
             "Four Heavenly Kings": "Czterej Królowie Niebios Furin",
             "Makochi Town": "Miasto Makochi"
-        },
-        "character_forms": {
-            "Sakura -> Każdy": "Nie potrzebuję przyjaciół, przyszedłem tu zdobyć sam szczyt! (wstydliwe zakłopotanie na dobre słowa)",
-            "Umemiya -> Sakura": "Witaj w rodzinie Bofurin, Sakura! (ciepło i spokój)",
-            "Suo -> Sakura": "Sakura-kun, uspokój się trochę... (dżentelmeńska elegancja)"
         }
     },
     "noragami": {
@@ -1714,11 +1525,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Borderline": "Granica",
             "Near Shore": "Bliski Brzeg",
             "Far Shore": "Bliski Brzeg"
-        },
-        "character_forms": {
-            "Yato -> Hiyori": "Hiyori! (troska i uroczy żebrak)",
-            "Hiyori -> Yato": "Yato! (opiekuńczość i cios zapaśniczy Jungle Savate)",
-            "Yukine -> Yato": "Yato (początkowy bunt -> absolutne oddanie jako Hafuri)"
         }
     },
     "akatsuki_no_yona": {
@@ -1744,11 +1550,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Kuuto": "Kuuto",
             "Wind Tribe": "Plemię Wiatru",
             "Four Dragon Warriors": "Czterej Smoczy Wojownicy"
-        },
-        "character_forms": {
-            "Hak -> Yona": "Księżniczko (bezgraniczne oddanie i ukryta miłość)",
-            "Yona -> Hak": "Hak (zaufanie, lęk o jego życie, narastająca miłość)",
-            "Kija -> Yona": "Nasza Pani! (święta wierność Smoka)"
         }
     },
     "jibaku_shounen_hanako_kun": {
@@ -1776,11 +1577,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Yorishiro": "Yorishiro",
             "Mokke": "Mokke",
             "Mermaid's Scale": "Łuska Syreny"
-        },
-        "character_forms": {
-            "Hanako -> Nene": "Yashiro~ (droczliwa czułość i obrona)",
-            "Nene -> Hanako": "Hanako-kun! (panika, troska i uczucie)",
-            "Kou -> Hanako": "Hanako! (przyjaciel i rywal egzorcysty)"
         }
     },
     "tatsuki_fujimoto_oneshots": {
@@ -1799,10 +1595,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Yuta": "Yuta",
             "Eri": "Eri",
             "Explosion Scene": "Wybuch w finale filmu"
-        },
-        "character_forms": {
-            "Fujino -> Kyomoto": "Rysujmy razem mangę! (przełamanie samotności)",
-            "Yuta -> Eri": "Eri... Dlaczego oglądamy to jeszcze raz?"
         }
     },
     "tongari_boushi_no_atelier": {
@@ -1828,11 +1620,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Magic Glyphs": "Magiczne Pieczęcie",
             "Pointed Hats": "Spiczaste Kapelusze",
             "Great Hall": "Wielka Sala Magii pod Wodą"
-        },
-        "character_forms": {
-            "Qifrey -> Uczennice": "Magia to cud, który może rysować każdy z nas.",
-            "Agott -> Coco": "Nie zostawaj w tyle, niemagiczna dziewczyno!",
-            "Coco -> Qifrey": "Mistrzu Qifreyu!"
         }
     },
     "beastars": {
@@ -1856,11 +1643,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Herbivores": "Roślinożercy",
             "Black Market": "Czarny Rynek Mięsa",
             "Shishigumi": "Shishigumi"
-        },
-        "character_forms": {
-            "Legoshi -> Haru": "Chcę cię chronić... Nie jako drapieżnik, lecz z miłości.",
-            "Louis -> Legoshi": "Wilku, przestań udawać słabego!",
-            "Haru -> Legoshi": "Legoshi-kun..."
         }
     },
     "yofukashi_no_uta": {
@@ -1883,10 +1665,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Anko Uguisu": "Anko Uguisu",
             "Vampire Rule": "Zasada Wampirów: Człowiek zmienia się w wampira tylko, gdy zostanie ukąszony przez wampira, w którym się szczerze zakochał w ciągu 1 roku!",
             "Night Walking": "Nocne Włóczenie Się"
-        },
-        "character_forms": {
-            "Ko -> Nazuna": "Nazuna-chan (fascynacja nocą i pragnienie zakochania)",
-            "Nazuna -> Ko": "Pijemy krew i gramy w retro gry!"
         }
     },
     "kakegurui": {
@@ -1912,11 +1690,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Housepet": "Zwierzątko Domowe",
             "Life Schedule": "Plan Życiowy",
             "Gambling Craze": "Szał Hazardu"
-        },
-        "character_forms": {
-            "Yumeko -> Przeciwnicy": "Pogrążmy się w szaleństwie hazardu! (ekstatyczny trans)",
-            "Mary -> Yumeko": "Yumeko, ty szalona wariatko!",
-            "Kirari -> Szkoła": "Akademia to moje osobiste akwarium."
         }
     },
     "horimiya": {
@@ -1939,11 +1712,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Kyosuke Hori": "Kyosuke Hori",
             "Katagiri Senior High School": "Liceum Katagiri",
             "Secret Persona": "Ukryte Drugie Oblicze"
-        },
-        "character_forms": {
-            "Hori -> Miyamura": "Miyamura! (zaborcza miłość i prośba o bicie/przemoc domową dla zabawy)",
-            "Miyamura -> Hori": "Hori-san (czułość, akceptacja i miłość)",
-            "Souta -> Miyamura": "Brat Miyamura!"
         }
     },
     "toradora": {
@@ -1963,10 +1731,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Inko-chan": "Inko-chan",
             "Palmtop Tiger": "Kieszonkowy Tygrys",
             "Dragon and Tiger": "Smok i Tygrys"
-        },
-        "character_forms": {
-            "Taiga -> Ryuji": "Ryuji, ty głupi kundlu! (początkowo) / Zawsze bądź przy mnie...",
-            "Ryuji -> Taiga": "Taiga (opieka kulinarna i bezwarunkowe wsparcie)"
         }
     },
     "overlord": {
@@ -1999,11 +1763,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Fallen Down": "Upadek",
             "Grasp Heart": "Zmiażdżenie Serca",
             "Sorcerer Kingdom": "Królestwo Magii"
-        },
-        "character_forms": {
-            "Strażnicy -> Ainz": "Niech żyje Najwyższy Władca Ainz Ooal Gown! / Sasuga Ainz-sama!",
-            "Ainz -> Strażnicy": "Zezwalam (w myślach: Oby tylko nie odkryli, że nie mam pojęcia co robię!)",
-            "Albedo -> Ainz": "Mój ukochany panie Ainzie!"
         }
     },
     "sword_art_online": {
@@ -2046,11 +1805,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Knights of the Blood Oath": "Rycerze Krwi",
             "Underworld": "Underworld",
             "Fluctlight": "Fluctlight"
-        },
-        "character_forms": {
-            "Kirito -> Asuna": "Asuna (miłość, która przetrwała śmierć w grze)",
-            "Asuna -> Kirito": "Kirito-kun (bezgraniczne zaufanie)",
-            "Yui -> Kirito/Asuna": "Tatusiu! / Mamusiu!"
         }
     },
     "goblin_slayer": {
@@ -2074,11 +1828,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Adventurers Guild": "Gildia Poszukiwaczy Przygód",
             "Miracles": "Cuda",
             "Goblin Nest": "Gniazdo Goblinów"
-        },
-        "character_forms": {
-            "Goblin Slayer -> Wszyscy": "Jedyny dobry goblin to martwy goblin.",
-            "Kapłanka -> Goblin Slayer": "Panie Zabójco Goblinów (troska i duchowe wsparcie)",
-            "Elfka -> Goblin Slayer": "Orkobójco! Nie używaj znowu ognia i wody w jaskini!"
         }
     },
     "hellsing": {
@@ -2109,12 +1858,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Jackal": "Pistolety Alucarda: .454 Casull i 13mm Auto Anti-Freak Jackal",
             "Casull": "Pistolety Alucarda: .454 Casull i 13mm Auto Anti-Freak Jackal",
             "Cromwell Control Art Restriction": "Pieczęć Cromwella"
-        },
-        "character_forms": {
-            "Alucard -> Integra": "Moja Pani (Królewski pakt wierności krwi)",
-            "Integra -> Alucard": "Alucardzie! Zniszcz i zabij ich wszystkich! Zostaw tylko popiół!",
-            "Anderson -> Alucard": "Amen! (Fanatyczna wściekłość krzyżowca)",
-            "Alucard -> Seras": "Moja mała policyjko..."
         }
     },
     "neon_genesis_evangelion": {
@@ -2148,11 +1891,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "MAGI System": "Superkomputer MAGI: Melchior, Balthasar, Casper",
             "LCL": "Płyn LCL",
             "Spear of Longinus": "Włócznia Longinusa"
-        },
-        "character_forms": {
-            "Shinji -> Gendo": "Ojcze... (strach przed odrzuceniem, rozpaczliwa potrzeba uznania)",
-            "Asuka -> Shinji": "Anta baka?! (Czyś ty zidiociał, Shinji?!)",
-            "Misato -> Shinji": "Shinji-kun (dorosła opieka i poczucie winy)"
         }
     },
     "soul_eater": {
@@ -2181,11 +1919,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Soul Resonance": "Rezonans Dusz",
             "Madness": "Szaleństwo",
             "Kishin": "Kishin"
-        },
-        "character_forms": {
-            "Maka -> Soul": "Soul! Zróbmy Rezonans Dusz! (partnerska jedność)",
-            "Kid -> Liz/Patty": "Moja symetria została zniszczona! Umrę!",
-            "Black Star -> Wszyscy": "HAHAHA! YAHOOO! Spójrzcie na wielkiego Black Stara!"
         }
     },
     "monster": {
@@ -2209,11 +1942,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "The Nameless Monster": "Bezimienny Potwór",
             "Red Rose Mansion": "Dwór Czerwonych Róż",
             "Ruhenheim": "Ruhenheim"
-        },
-        "character_forms": {
-            "Tenma -> Johan": "To ja uratowałem ci życie... Moim obowiązkiem jest je zakończyć.",
-            "Johan -> Tenma": "Doktorze Tenma... Prawdziwy koniec to nie śmierć, lecz zapomnienie.",
-            "Lunge -> Tenma": "Moje palce nigdy się nie mylą, doktorze Tenma."
         }
     },
     "twentieth_century_boys": {
@@ -2242,10 +1970,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Bloody New Year's Eve": "Krwawy Sylwester 2000",
             "Friendship Democratic Party": "Partia Przyjaźni i Demokracji",
             "Expo 1970": "Wystawa Światowa Expo 1970 w Osace"
-        },
-        "character_forms": {
-            "Kenji -> Przyjaciel": "Kim naprawdę jesteś, Przyjacielu?!",
-            "Kanna -> Kenji": "Wujku Kenji... Wróć i zagraj jeszcze raz na gitarze!"
         }
     },
     "pluto": {
@@ -2272,10 +1996,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Doctor Abullah": "Doktor Abullah",
             "39th Central Asian War": "39. Wojna Środkowoazjatycka",
             "Article 13 of Robot Law": "Artykuł 13 Prawa Robotów"
-        },
-        "character_forms": {
-            "Gesicht -> Wrogowie": "Nienawiść niczego nie zrodzi... Tylko smutek.",
-            "Atom -> Uran": "Uran, uważaj na siebie!"
         }
     },
     "shaman_king": {
@@ -2308,11 +2028,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Furyoku": "Furyoku",
             "Shaman Fight": "Turniej Szamanów",
             "Patch Tribe": "Plemię Patch"
-        },
-        "character_forms": {
-            "Anna -> Yoh": "Yoh! Trenuj, bo inaczej nie zostaniesz Królem Szamanów!",
-            "Yoh -> Przeciwnicy": "Spokojnie, jakoś to będzie. (Nanto ka naru)",
-            "Hao -> Ludzie": "Jakie to małe i bezużyteczne..."
         }
     },
     "slam_dunk": {
@@ -2340,11 +2055,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Rebound": "Zbiórka",
             "Slam Dunk": "Slam Dunk",
             "Inter-High Tournament": "Mistrzostwa Narodowe Szkół Średnich"
-        },
-        "character_forms": {
-            "Sakuragi -> Akagi": "Gorylu! (prowokacja i szacunek dla kapitana)",
-            "Sakuragi -> Rukawa": "Rukawa, ty lisie! (zazdrosna rywalizacja)",
-            "Rukawa -> Sakuragi": "Dobe (Głupol / Matoł)"
         }
     },
     "hokuto_no_ken": {
@@ -2376,10 +2086,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Hidebu": "Hidebu!",
             "Abeshi": "Hidebu!",
             "Musou Tensei": "Musou Tensei"
-        },
-        "character_forms": {
-            "Kenshiro -> Wrogowie": "Jesteś już martwy. (Omae wa mou shindeiru)",
-            "Raoh -> Niebiosa": "W całym moim życiu nie mam ani jednego żalu! (Waga shougai ni ippen no kui nashi!)"
         }
     },
     "vagabond": {
@@ -2406,10 +2112,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Yoshioka Clan 70-Man Duel": "Pojedynek z 70 szermierzami rodu Yoshioka pod Sosną Ichijoji",
             "Ganryujima Duel": "Pojedynek na Wyspie Ganryujima",
             "Way of the Sword": "Droga Miecza"
-        },
-        "character_forms": {
-            "Musashi -> Przeciwnicy": "Pokaż mi swój miecz. Chcę zobaczyć, co kryje się na szczycie.",
-            "Takuan -> Musashi": "Takezo... Życie i śmierć to ta sama chwila."
         }
     },
     "uzumaki_junji_ito": {
@@ -2433,10 +2135,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Hanging Balloons": "Balony Wisielców",
             "Gyo": "Gyo",
             "Amigara Fault": "Uskok Amigara"
-        },
-        "character_forms": {
-            "Shuichi -> Kirie": "Kirie! Uciekajmy z tego przeklętego miasteczka!",
-            "Kirie -> Shuichi": "Shuichi, dlaczego to znowu się dzieje?!"
         }
     },
     "bakuman": {
@@ -2470,11 +2168,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Questionnaire Rankings": "Wyniki Ankiet Czytelników",
             "G-Pen": "Piórko G-Pen",
             "Anime Adaptation": "Adaptacja Anime"
-        },
-        "character_forms": {
-            "Saiko -> Shujin": "Shujin! Zróbmy najlepszą mangę w historii Jumpa!",
-            "Shujin -> Saiko": "Saiko, mam genialny pomysł na scenariusz!",
-            "Hattori -> Ashirogi": "Waszą siłą jest manga kalkulowana i mroczna."
         }
     },
     "kuroko_no_basket": {
@@ -2506,11 +2199,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "The Zone": "Strefa",
             "Direct Drive Zone": "Strefa Bezpośredniego Napędu",
             "Winter Cup": "Puchar Zimowy"
-        },
-        "character_forms": {
-            "Kuroko -> Kagami": "Jestem cieniem. Im jaśniejsze jest twoje światło, tym głębszy staje się mój cień.",
-            "Aomine -> Kuroko": "Tetsu... Koszykówka znowu stała się ekscytująca.",
-            "Akashi -> Wszyscy": "Moje rozkazy są absolutne."
         }
     },
     "fire_force": {
@@ -2542,11 +2230,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Holy Sol Temple": "Święta Świątynia Sol",
             "Amaterasu": "Amaterasu",
             "Latom": "Látom"
-        },
-        "character_forms": {
-            "Shinra -> Arthur": "Głupi rycerzyku! (kumpelska rywalizacja)",
-            "Arthur -> Shinra": "Jam jest Król Rycerzy, ty diable!",
-            "Siostra Iris -> Płomienni": "Płomieniu, uwolnij tę duszę... Látom."
         }
     },
     "black_lagoon": {
@@ -2579,11 +2262,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Roanapur": "Roanapur",
             "Hotel Moscow": "Hotel Moskwa",
             "Rip-Off Church": "Kościół Przemocy"
-        },
-        "character_forms": {
-            "Revy -> Rock": "Rock! Zamknij się i nie pouczaj mnie z tym swoim białym kołnierzykiem!",
-            "Rock -> Revy": "Revy... Spójrzmy na to z innej perspektywy.",
-            "Balalaika -> Wrogowie": "Uklęknijcie przed Armią Radziecką."
         }
     },
     "owari_no_seraph": {
@@ -2613,11 +2291,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Seraph of the End": "Serafin Dni Ostatnich",
             "Vampire Progenitors": "Wampirzy Progenitorzy",
             "Apocalypse Virus": "Wirus Apokalipsy"
-        },
-        "character_forms": {
-            "Yuu -> Mika": "Mika! Zawsze będziemy rodziną! Przywrócę cię do człowieczeństwa!",
-            "Mika -> Yuu": "Yuu-chan! Nie pozwól, by ci ludzie cię wykorzystywali!",
-            "Shinoa -> Yuu": "Yuu-san~ (ironiczny, uroczy uśmieszek)"
         }
     },
     "deadman_wonderland": {
@@ -2647,11 +2320,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Candy": "Cukierek",
             "Red Man": "Czerwony Człowiek",
             "Forgeries": "Fałszywki"
-        },
-        "character_forms": {
-            "Shiro -> Ganta": "Ganta~! Zjedzmy ciasteczka!",
-            "Ganta -> Shiro": "Shiro! Obiecuję, że cię stąd wyciągnę!",
-            "Senji -> Ganta": "Zujji! (Ścinaj ich prosto i szybko, dzieciaku!)"
         }
     },
     "pandora_hearts": {
@@ -2680,11 +2348,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Four Great Dukedoms": "Cztery Rody Książęce: Vessalius, Nightray, Rainsworth, Barma",
             "Pandora Organization": "Organizacja Pandora",
             "Tragedy of Sablier": "Tragedia w Sablier"
-        },
-        "character_forms": {
-            "Gilbert -> Oz": "Panie Ozie! (bezgraniczna wierność i obrona)",
-            "Alice -> Oz": "Oz! Jestem głodna, daj mi mięso!",
-            "Break -> Oz/Sharon": "Och, jakże to zabawne... (chytry, genialny uśmiech)"
         }
     },
     "ajin": {
@@ -2711,10 +2374,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Paralyzing Scream": "Paraliżujący Krzyk",
             "Reset": "Zresetowanie",
             "Ministry of Health": "Ministerstwo Zdrowia, Pracy i Opieki Społecznej Japonii"
-        },
-        "character_forms": {
-            "Sato -> Ludzie": "Zagrajmy w grę! (ekstatyczny uśmiech rzeźnika)",
-            "Kei -> Ko": "Nie pomagam ci dlatego, że cię lubię, tylko dlatego, że to logiczne."
         }
     },
     "summer_time_rendering": {
@@ -2742,10 +2401,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Hitogashima Island": "Wyspa Hitogashima",
             "Time Loop": "Pętla Czasowa",
             "Shadow Sickness": "Choroba Cieni"
-        },
-        "character_forms": {
-            "Shinpei -> Ushio": "Ushio! Tym razem cię ocalę!",
-            "Hizuru/Ryunosuke -> Cienie": "Zmierzyłem czas reakcji na 2 milisekundy. Jesteś martwy."
         }
     },
     "yuukoku_no_moriarty": {
@@ -2770,10 +2425,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Lord of Crime": "Władca Zbrodni",
             "Class System": "System Klasowy Wiktoriańskiej Anglii",
             "Catch Me If You Can": "Złap mnie, jeśli potrafisz, Sherlocku Holmesie."
-        },
-        "character_forms": {
-            "William -> Sherlock": "Mój drogi Sherlocku (intelektualne partnerstwo i wyznaczona rola bohatera)",
-            "Sherlock -> William": "Liam! Nie pozwolę ci umrzeć w samotności!"
         }
     },
     "sasaki_to_miyano": {
@@ -2794,10 +2445,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Boys' Love": "Boys' Love",
             "BL": "Boys' Love",
             "Fudanshi": "Fudanshi"
-        },
-        "character_forms": {
-            "Sasaki -> Miyano": "Mya-chan~ (rozmarzona, czuła troska)",
-            "Miyano -> Sasaki": "Sasaki-senpai! (wstydliwość, dzielenie się tomikami mang)"
         }
     },
     "given": {
@@ -2817,10 +2464,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Shizusumi Yagi": "Shizusumi Yagi",
             "Band Given": "Zespół Given",
             "Fuyunohanashi": "Opowieść Zimowa"
-        },
-        "character_forms": {
-            "Uenoyama -> Mafuyu": "Kiedy zacząłeś śpiewać, moje serce stanęło w ogniu.",
-            "Mafuyu -> Uenoyama": "Uenoyama-kun... Naucz mnie grać na gitarze."
         }
     },
     "mirai_nikki": {
@@ -2862,10 +2505,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Future Diary": "Pamiętnik Przyszłości",
             "Survival Game": "Gra o Tron Boga",
             "DEAD END": "DEAD END"
-        },
-        "character_forms": {
-            "Yuno -> Yuki": "Yukkii~! Yuno cię obroni! (słodki głos przed brutalną rzezią)",
-            "Yuki -> Yuno": "Yuno, stój! Przestań zabijać!"
         }
     },
     "another": {
@@ -2889,10 +2528,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Class 3-3 Curse": "Klątwa Klasy 3-3",
             "The Non-Existent One": "Nieistniejący",
             "Send the Dead Back to Death": "Odeślij Zmarłego do Śmierci"
-        },
-        "character_forms": {
-            "Mei -> Koichi": "W naszej klasie... wydarzyło się coś strasznego.",
-            "Koichi -> Mei": "Misaki... Dlaczego nikt oprócz mnie z tobą nie rozmawia?"
         }
     },
     "log_horizon": {
@@ -2921,10 +2556,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Catastrophe": "Wielka Katastrofa",
             "Apocalypse": "Wielka Katastrofa",
             "Flavor Text": "Tekst Poboczny"
-        },
-        "character_forms": {
-            "Akatsuki -> Shiroe": "Mój Panie (poprawa okularów i uderzenie kolanem w Naotsugu)",
-            "Shiroe -> Okrągły Stół": "Poprawienie okularów na nosie (początek genialnego planu)"
         }
     },
     "oyasumi_punpun": {
@@ -2949,10 +2580,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "God": "Bóg Punpuna",
             "Kami-sama": "Bóg Punpuna",
             "Tinkle Tinkle Hoy": "Drogi Boże, drogi Boże, tinkle tinkle hoy!"
-        },
-        "character_forms": {
-            "Punpun -> Aiko": "Aiko... Jeśli skłamiesz, zabiję cię. Chodźmy razem na koniec świata.",
-            "Bóg -> Punpun": "Cześć, Punpun! Znowu masz beznadziejne myśli?"
         }
     },
     "usagi_yojimbo": {
@@ -2980,10 +2607,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Grasscutter": "Święty Miecz Kusanagi",
             "Kusanagi": "Święty Miecz Kusanagi",
             "Edo Period Japan": "Japonia okresu Edo"
-        },
-        "character_forms": {
-            "Usagi -> Przeciwnicy": "Podążam ścieżką wojownika Musha Shugyo.",
-            "Gen -> Usagi": "Usagi! Ile jest warta głowa tego bandyty?"
         }
     },
     "inuyasha": {
@@ -3013,11 +2636,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Wind Scar": "Cięcie Wiatru",
             "Backlash Wave": "Fala Odwrotna",
             "Osuwari": "Siad!"
-        },
-        "character_forms": {
-            "Kagome -> InuYasha": "InuYasha... SIAD! (Osuwari!)",
-            "InuYasha -> Kagome": "Kagome! Zostań za mną!",
-            "Sesshomaru -> InuYasha": "Mój nędzny pół-krwisty bracie..."
         }
     },
     "fairy_tail": {
@@ -3051,11 +2669,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Fairy Law": "Prawo Wróżek",
             "Fairy Glitter": "Blask Wróżek",
             "Fairy Sphere": "Sfera Wróżek"
-        },
-        "character_forms": {
-            "Natsu -> Wrogowie": "Zapłonąłem! (Moe te kita zo!)",
-            "Happy -> Natsu": "Aye, sir! (Rybka!)",
-            "Juvia -> Gray": "Gray-sama~! (zakochana powódź)"
         }
     },
     "nanatsu_no_taizai": {
@@ -3084,11 +2697,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Full Counter": "Pełne Odbicie",
             "The One": "Ten Jedyny",
             "Sacred Treasures": "Święte Skarby Grzechów"
-        },
-        "character_forms": {
-            "Meliodas -> Elizabeth": "Sate, sate, sate... (Cóż, cóż, cóż...)",
-            "Escanor -> Wrogowie": "Poczułem przed tobą litość. Kto zadecydował, że moje słońce zgasło?",
-            "Ban -> Meliodas": "Dancho! (Szefie!)"
         }
     },
     "ao_no_exorcist": {
@@ -3117,11 +2725,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "True Cross Order": "Zakon Prawdziwego Krzyża",
             "Exorcist Classes": "Klasy Egzorcystów: Rycerz, Dragon, Doktor, Aria, Przywoływacz",
             "Paladin": "Paladyn"
-        },
-        "character_forms": {
-            "Rin -> Yukio": "Yukio! Nie pozwolę ci dźwigać tego wszystkiego samemu!",
-            "Yukio -> Rin": "Nii-san! Przestań być taki nieodpowiedzialny!",
-            "Mephisto -> Wszyscy": "Eins, zwei, drei! Zróbmy z tego wspaniałe show!"
         }
     },
     "akame_ga_kill": {
@@ -3149,11 +2752,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Teigu": "Teigu",
             "Imperial Arms": "Teigu",
             "Shingu": "Shingu"
-        },
-        "character_forms": {
-            "Akame -> Cele": "Zostaniesz wyeliminowany. (Houmuru)",
-            "Esdeath -> Tatsumi": "Tatsumi... Będziesz mój na zawsze.",
-            "Tatsumi -> Akame": "Akame! Przetrwamy to i zobaczymy nowy świat!"
         }
     },
     "cardcaptor_sakura": {
@@ -3179,11 +2777,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Clow Cards": "Karty Clowa",
             "Sakura Cards": "Karty Sakury",
             "Sealing Wand": "Różdżka Pieczęci"
-        },
-        "character_forms": {
-            "Sakura -> Różdżka": "Kluczu, który kryjesz w sobie moc ciemności, ukaż swą prawdziwą postać przed Sakurą! Uwolnij moc! (Release!)",
-            "Kero -> Sakura": "Sakura! Złap tę kartę!",
-            "Tomoyo -> Sakura": "Sakura-chan jest dzisiaj niewyobrażalnie urocza!"
         }
     },
     "madoka_magica": {
@@ -3209,10 +2802,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Witch": "Wiedźma",
             "Walpurgisnacht": "Noc Walpurgii",
             "Law of Cycles": "Prawo Cyklu"
-        },
-        "character_forms": {
-            "Homura -> Madoka": "Nawet jeśli cały świat cię zapomni, ja będę o tobie pamiętać.",
-            "Kyubey -> Dziewczęta": "Zawrzyj ze mną kontrakt i zostań magiczną dziewczyną!"
         }
     },
     "akira": {
@@ -3235,10 +2824,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "The Clowns": "Klowni",
             "SOL Laser": "Satelitarny Laser Bojowy SOL",
             "Psychic Powers": "Zdolności Parapsychiczne"
-        },
-        "character_forms": {
-            "Kaneda -> Tetsuo": "TETSUOOO!",
-            "Tetsuo -> Kaneda": "KANEDAAA! Przestań mną dyrygować!"
         }
     },
     "ghost_in_the_shell": {
@@ -3267,11 +2852,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Thermo-Optical Camouflage": "Kamuflaż Termooptyczny",
             "Stand Alone Complex": "Stand Alone Complex",
             "Cyberbrain Sclerosis": "Stwardnienie Cybermózgu"
-        },
-        "character_forms": {
-            "Motoko -> Batou": "Mój Duch mi to podpowiada, Batou.",
-            "Batou -> Motoko": "Majorze! Uważaj na siebie!",
-            "Tachikoma -> Batou": "Batou-san! Zobacz, odkryliśmy czym jest indywidualność!"
         }
     },
     "gunnm_alita": {
@@ -3300,10 +2880,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Panzer Kunst": "Panzer Kunst",
             "Damascus Steel": "Stal Damasceńska",
             "Hunter-Warrior": "Łowca Nagród"
-        },
-        "character_forms": {
-            "Ido -> Alita": "Alito... Twoja dusza jest czysta i niewinna.",
-            "Alita -> Wrogowie": "Nie jestem niczyją zabawką. Jam jest wojowniczką Panzer Kunst!"
         }
     },
     "gto_onizuka": {
@@ -3327,10 +2903,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Holy Forest Academy": "Akademia Świętego Lasu",
             "Class 3-4": "Klasa 3-4",
             "German Suplex": "German Suplex"
-        },
-        "character_forms": {
-            "Onizuka -> Uczniowie": "Lekcje życia są ważniejsze niż jakiekolwiek podręczniki!",
-            "Uchiyamada -> Onizuka": "ONIZUKAAA! MOJA CRESTA!!!"
         }
     },
     "claymore": {
@@ -3356,10 +2928,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Awakened Beings": "Przebudzone Istoty",
             "The Organization": "Organizacja",
             "Yoki": "Yoki"
-        },
-        "character_forms": {
-            "Clare -> Priscilla": "Pomściłam Teresę... Nawet jeśli sama stanę się potworem!",
-            "Teresa -> Clare": "Clare... Dzięki tobie odnalazłam ciepło w sercu."
         }
     },
     "d_gray_man": {
@@ -3388,11 +2956,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Crown Clown": "Koronne Błazeństwo",
             "The 14th": "Czternasty Noe",
             "Nea Walker": "Czternasty Noe"
-        },
-        "character_forms": {
-            "Allen -> Kanda": "Kanda! Przestań być taki chamski! (wieczna rywalizacja)",
-            "Kanda -> Allen": "Moyashi! (Kiełku!)",
-            "Hrabia -> Egzorcyści": "Witajcie, drodzy Egzorcyści~!"
         }
     },
     "gantz": {
@@ -3418,10 +2981,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Gravity Gun": "Działo Grawitacyjne Z-Gun",
             "100 Points Menu": "Menu 100 Punktów: 1. Wolność z wymazaniem pamięci, 2. Potężniejsza broń/mecha, 3. Wskrzeszenie zmarłego z pamięci kuli",
             "Aliens": "Kosmici"
-        },
-        "character_forms": {
-            "Gantz -> Gracze": "Wasze stare życia dobiegły końca. To, co zrobicie z nowymi, zależy ode mnie.",
-            "Kurono -> Tae": "Tae-chan! Zawsze do ciebie wrócę!"
         }
     },
     "tokyo_revengers": {
@@ -3469,12 +3028,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Bloody Halloween": "Krwawe Halloween",
             "Christmas Showdown": "Starcie Bożonarodzeniowe",
             "Kanto Incident": "Incydent w Kanto"
-        },
-        "character_forms": {
-            "Takemichi -> Mikey": "Mikey-kun (szacunek i lojalność)",
-            "Mikey -> Takemichi": "Takemichy (przyjaźń i zaufanie)",
-            "Draken -> Mikey": "Mikey (partnerska równość)",
-            "Chifuyu -> Takemichi": "Partnerze / Takemichi (braterska więź)"
         }
     },
     "dr_stone": {
@@ -3520,11 +3073,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Nital": "Nital",
             "Sulfa Drug": "Sulfonamidy",
             "Cell Phone": "Telefon polowy"
-        },
-        "character_forms": {
-            "Senku -> Wszyscy": "Na dziesięć miliardów procent / To ekscytujące!",
-            "Chrome -> Senku": "Senku (fascynacja nauką)",
-            "Kohaku -> Senku": "Senku (przyjaźń i lojalność wojowniczki)"
         }
     },
     "dorohedoro": {
@@ -3566,11 +3114,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Gyoza": "Gyoza",
             "Hungry Bug": "Hungry Bug",
             "Living Dead Night": "Noc Żywych Trupów"
-        },
-        "character_forms": {
-            "Kaiman -> Nikaido": "Nikaido (kumpelska więź i miłość do gyozy)",
-            "Shin -> Noi": "Noi (zgrany duet zabójców)",
-            "Noi -> Shin": "Shin-senpai (szacunek i bliskość)"
         }
     },
     "re_zero": {
@@ -3662,14 +3205,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Sacred Empire of Vollachia": "Święte Cesarstwo Vollachii",
             "Holy Kingdom of Gusteko": "Święte Królestwo Gusteko",
             "Kararagi": "Wolne Miasta Kararagi"
-        },
-        "character_forms": {
-            "Subaru -> Emilia": "Emilia-tan (uwielbienie, czułość i miłość)",
-            "Rem -> Subaru": "Subaru-kun (bezgraniczne oddanie, wiara w jego bohaterstwo)",
-            "Beatrice -> Subaru": "Betty / kashira (wyniosłość tsundere skrywająca głęboką samotność)",
-            "Ram -> Subaru": "Barusu (złośliwe przezwisko i cięty humor)",
-            "Petelgeuse -> Subaru": "Ty... czyżbyś był zwiastunem Miłości?! / Niewierny leniwcze!",
-            "Echidna -> Subaru": "Subaru (ciekawość jego nieskończonych pętli śmierci)"
         }
     },
     "bungou_stray_dogs": {
@@ -3716,12 +3251,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "The Book": "Księga",
             "Rashomon": "Rashomon",
             "No Longer Human": "Niepełnosprawny Człowiek"
-        },
-        "character_forms": {
-            "Atsushi -> Dazai": "Dazai-san (podziw i zagubienie)",
-            "Dazai -> Kunikida": "Kunikida-kun (wieczne droczenie się)",
-            "Akutagawa -> Dazai": "Dazai-san (desperacka potrzeba uznania)",
-            "Chuya -> Dazai": "Dazai / Ty gnoju! (odwieczna nienawiść Soukoku)"
         }
     },
     "mashle": {
@@ -3762,11 +3291,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Magic Wand": "Różdżka magiczna",
             "Cream Puff": "Ptyś z kremem",
             "Magic Lines": "Znaki magii na twarzy"
-        },
-        "character_forms": {
-            "Mash -> Wszyscy": "Spokojnie, to tylko mięśnie / Chcecie ptysia?",
-            "Finn -> Mash": "Mash-kun! (panika i rozsądek)",
-            "Dot -> Lance": "Przystojniaczku (wieczna zazdrość)"
         }
     },
     "record_of_ragnarok": {
@@ -3814,11 +3338,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Volundr": "Volundr",
             "Mjolnir": "Mjölnir",
             "Eyes of the Lord": "Oczy Pana"
-        },
-        "character_forms": {
-            "Brunhilda -> Bogowie": "Wyniosła pogarda i zimna kalkulacja",
-            "Goll -> Brunhilda": "Hilde-neesama! (panika i podziw)",
-            "Zeus -> Zawodnicy": "Ekscytacja walką i obłędna siła"
         }
     },
     "gintama": {
@@ -3858,12 +3377,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Yoshiwara": "Yoshiwara",
             "Jouishishi": "Joui",
             "Bokuto Lake Toya": "Drewniany miecz z Jeziora Toya"
-        },
-        "character_forms": {
-            "Kagura -> Gintoki": "Gin-chan (dziecięca poufałość)",
-            "Shinpachi -> Gintoki": "Gin-san (krzyk rozsądku i tsukkomi)",
-            "Hijikata -> Gintoki": "Yorozuya / Srebrnowłosy (wieczna rywalizacja)",
-            "Katsura -> Wszyscy": "Zura ja nai, Katsura da! (Nie Zura, tylko Katsura!)"
         }
     },
     "kuroshitsuji": {
@@ -3901,11 +3414,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Cinematic Record": "Zapis filmowy życia",
             "Death Scythe": "Kosa Śmierci",
             "Faustian Contract": "Cyrograf"
-        },
-        "character_forms": {
-            "Sebastian -> Ciel": "Yes, My Lord / Oczywiście, mój panie (perfekcyjny lokaj)",
-            "Ciel -> Sebastian": "Sebastian, to rozkaz! (bezwzględny władca)",
-            "Elizabeth -> Ciel": "Ciel! (dziecięca, radosna miłość)"
         }
     },
     "kore_kaite_shine": {
@@ -3929,10 +3437,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Maru-Pen": "Stalówka Maru-Pen",
             "Screen Tone": "Rastry",
             "Manuscript Paper": "Papier do mangi"
-        },
-        "character_forms": {
-            "Uczennice -> Teshima": "Pani Teshimo / Pani Profesor (szacunek dla nauczycielki)",
-            "Uczennice między sobą": "Po imieniu bez 'Pan/Pani' (koleżeńska relacja licealna)"
         }
     },
     "dandadan": {
@@ -3959,11 +3463,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Golden Balls": "Kinto",
             "Spiritual Power": "Moc duchowa",
             "Alien Technology": "Technologia kosmitów"
-        },
-        "character_forms": {
-            "Momo -> Okarun": "Okarun (początkowo przezwisko, później czuła więź)",
-            "Okarun -> Momo": "Ayase-san (nieśmiałość i głęboki szacunek)",
-            "Turbo Babcia -> Momo": "Gówniaro / Pyskata dziewucho (szorstka złośliwość)"
         }
     },
     "kaiju_no_8": {
@@ -3993,11 +3492,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Fortitude": "Fortitudo",
             "Numbered Weapon": "Broń Liczbowa",
             "Unleashed Combat Power": "Uwolniona Moc Bojowa"
-        },
-        "character_forms": {
-            "Kafka -> Mina": "Mina (obietnica z dzieciństwa) / Pani Kapitan (na służbie)",
-            "Mina -> Kafka": "Kafka (skrywane zaufanie i pamięć o przysiędze)",
-            "Reno -> Kafka": "Senpai / Kafka-san (lojalny druh chroniący jego tajemnicę)"
         }
     },
     "sakamoto_days": {
@@ -4030,10 +3524,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "JCC": "JCC",
             "Sakamoto Store": "Sklep spożywczy Sakamoto",
             "Family Rule": "Zasada domowa Sakamoto: Absolutny zakaz zabijania!"
-        },
-        "character_forms": {
-            "Shin -> Sakamoto": "Szefie / Sakamoto-san (bezgraniczny podziw i czytanie w myślach)",
-            "Sakamoto -> Aoi": "Ciepłe oddanie i bezwzględne posłuszeństwo żonie"
         }
     },
     "kagurabachi": {
@@ -4062,10 +3552,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Hishaku": "Hishaku",
             "Rakuzaichi": "Rakuzaichi",
             "Datenseki": "Datenseki"
-        },
-        "character_forms": {
-            "Chihiro -> Char": "Opiekuńcza, starszobraterska troska",
-            "Hakuri -> Chihiro": "Chihiro (wiara i oparcie w nowym przyjacielu)"
         }
     },
     "sailor_moon": {
@@ -4103,11 +3589,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Moon Healing Escalation": "Księżycowa Eskalacja Uleczenia",
             "Silver Millennium": "Srebrne Milenium",
             "Crystal Tokyo": "Kryształowe Tokio"
-        },
-        "character_forms": {
-            "Usagi -> Mamoru": "Mamo-chan (czułość i miłość)",
-            "Mamoru -> Usagi": "Usako (czułe przezwisko)",
-            "Wojowniczki -> Usagi": "Usagi-chan / Księżniczko (szacunek i przyjaźń)"
         }
     },
     "saint_seiya": {
@@ -4151,10 +3632,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Aurora Execution": "Egzekucja Zorzy",
             "Nebula Chain": "Łańcuch Nebuli",
             "Phoenix Illusion Fist": "Demoniczna Pięść Feniksa"
-        },
-        "character_forms": {
-            "Rycerze -> Saori": "Pani Saori / Bogini Ateno (absolutna lojalność)",
-            "Ikki -> Shun": "Shun! (braterska opieka)"
         }
     },
     "captain_tsubasa": {
@@ -4199,11 +3676,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Eagle Shot": "Strzał Orła",
             "Fire Shot": "Ognisty Strzał",
             "Miracle Drive Shoot": "Cudowny Strzał z Rotacją"
-        },
-        "character_forms": {
-            "Tsubasa -> Roberto": "Trenerze Roberto! (podziw i wdzięczność)",
-            "Hyuga -> Tsubasa": "Tsubasa! (zaciekła, rycerska rywalizacja)",
-            "Nankatsu -> Tsubasa": "Kapitanie Tsubaso!"
         }
     },
     "ranma_half": {
@@ -4240,12 +3712,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Anything-Goes Martial Arts": "Sztuki Walki Wszystko Ujdzie",
             "Hiryu Shotenha": "Latający Smok Przebijający Niebiosa",
             "Bakusai Tenketsu": "Technika Rozbijania Skał w Pył"
-        },
-        "character_forms": {
-            "Ranma -> Akane": "Niekobiecy babsztyl / Akane (droczenie się skrywające uczucie)",
-            "Akane -> Ranma": "Głupi Ranma! / Zboczeniec! (wybuchowy temperament)",
-            "Ryoga -> Ranma": "Saotome! (żądza zemsty za zabłądzenie)",
-            "Shampoo -> Ranma": "Airen! / Mój ukochany!"
         }
     },
     "yu_yu_hakusho": {
@@ -4279,11 +3745,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Dragon of the Darkness Flame": "Smok Płomienia Ciemności",
             "Rose Whip": "Różany Bicz",
             "Dark Tournament": "Ciemny Turniej"
-        },
-        "character_forms": {
-            "Kuwabara -> Yusuke": "Urameshi! (szorstka rywalizacja i braterstwo)",
-            "Yusuke -> Keiko": "Keiko (troska ukryta pod maską chuligana)",
-            "Hiei -> Kuwabara": "Głupi człowiek / Baka (chłodny dystans)"
         }
     },
     "dr_slump": {
@@ -4309,10 +3770,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Penguin Village": "Wioska Pingwinów",
             "N'cha Cannon": "Działo N'cha",
             "Earth Split": "Rozbicie Ziemi na Pół"
-        },
-        "character_forms": {
-            "Arale -> Wszyscy": "N'cha! / Hoyoyo! / Kiiin! (dziecięca radość robota)",
-            "Senbei -> Arale": "Arale, przestań bawić się kupą na patyku!"
         }
     },
     "chobits": {
@@ -4336,10 +3793,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Chobits": "Chobits",
             "A City with No People": "Miasto bez ludzi",
             "The Person Just for Me": "Ta jedyna osoba przeznaczona tylko dla mnie"
-        },
-        "character_forms": {
-            "Chii -> Hideki": "Hideki! / Chii! (dziecięca niewinność i miłość)",
-            "Hideki -> Chii": "Chii (opiekuńczość i odkrywanie człowieczeństwa maszyny)"
         }
     },
     "danmachi": {
@@ -4383,12 +3836,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Liaris Freese": "Liaris Freese",
             "Firebolt": "Firebolt",
             "Argonaut": "Argonauta"
-        },
-        "character_forms": {
-            "Bell -> Hestia": "Kami-sama / Pani Bogini (głęboka cześć i lojalność)",
-            "Hestia -> Bell": "Bell-kun! (zaborcza miłość i opiekuńczość)",
-            "Lili -> Bell": "Bell-sama (szacunek dla wybawcy)",
-            "Bell -> Ais": "Panna Wallenstein (podziw dla niedoścignionego ideału)"
         }
     },
     "shield_hero": {
@@ -4423,11 +3870,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Curse Series": "Seria Przekleństwa",
             "Iron Maiden": "Żelazna Dziewica",
             "Blood Sacrifice": "Krwawa Ofiara"
-        },
-        "character_forms": {
-            "Raphtalia -> Naofumi": "Naofumi-sama (miłość i wierność miecza)",
-            "Naofumi -> Raphtalia": "Raphtalia (zaufanie i ojcowska opieka)",
-            "Filo -> Naofumi": "Panie! / Goshujin-sama!"
         }
     },
     "slime_isekai": {
@@ -4470,11 +3912,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Gluttony": "Żarłoczność",
             "Megiddo": "Megiddo",
             "Naming": "Nadawanie Imion"
-        },
-        "character_forms": {
-            "Potwory -> Rimuru": "Pan Rimuru / Rimuru-sama (uwielbienie i boska cześć)",
-            "Veldora -> Rimuru": "Rimuru! (kumpelska duma)",
-            "Milim -> Rimuru": "Mój najlepszy przyjaciel!"
         }
     },
     "kusuriya_no_hitorigoto": {
@@ -4520,12 +3957,6 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Datura": "Bieluń dziędzierzawa",
             "Blowfish Poison": "Tetrodotoksyna",
             "Resurrection Medicine": "Lekarstwo wskrzeszające"
-        },
-        "character_forms": {
-            "Maomao -> Jinshi": "Panie Jinshi / Jinshi-sama (chłodny profesjonalizm skrywający zażenowanie jego urodą)",
-            "Jinshi -> Maomao": "Maomao (fascynacja, zazdrość i skrywane uczucie)",
-            "Gaoshun -> Maomao": "Xiaomao / Mała Mao (ojcowska, łagodna troska)",
-            "Gyokuyou -> Maomao": "Maomao (ciepłe zaufanie i ochrona na dworze)"
         }
     }
 }
