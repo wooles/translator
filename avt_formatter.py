@@ -56,8 +56,8 @@ def split_subtitle_syntactically(text: str, max_line_len: int = MAX_LINE_LENGTH,
     if not text:
         return ""
 
-    if is_sign and max_line_len > 24:
-        max_line_len = 24
+    if is_sign and max_line_len > 40:
+        max_line_len = 40
 
     sep = "\\N" if is_ass else "\n"
 

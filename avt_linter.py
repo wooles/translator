@@ -293,16 +293,16 @@ class AVTLinter:
                     modified = re.sub(pattern, repl, modified)
                     applied_fixes.append(f"[Filar XIII - Płeć Żeńska w Obsadzie] {pattern} -> {repl}")
 
-        # 5. Anti-Bracket & ALL-CAPS normalization for spoken dialogue (Pillars IV & LX)
-        if not is_sign:
-            # 5a. Strip outer square brackets e.g. "[ Przepraszam za zwłokę! ]" -> "Przepraszam za zwłokę!"
-            if modified.startswith("[") and modified.endswith("]"):
-                inner = modified[1:-1].strip()
-                if inner:
-                    modified = inner
-                    applied_fixes.append("[Filar IV/LX - Eliminacja nawiasów kwadratowych z dialogu mówionego]")
+        # 5. Anti-Bracket normalization for all subtitles (Pillars IV & LX)
+        # 5a. Strip outer square brackets e.g. "[ Przepraszam za zwłokę! ]" -> "Przepraszam za zwłokę!"
+        if modified.startswith("[") and modified.endswith("]"):
+            inner = modified[1:-1].strip()
+            if inner:
+                modified = inner
+                applied_fixes.append("[Filar IV/LX - Eliminacja nawiasów kwadratowych z tekstu]")
 
-            # 5b. Convert screaming ALL-CAPS dialogue to natural sentence case
+        # 5b. Convert screaming ALL-CAPS dialogue to natural sentence case
+        if not is_sign:
             letters = re.findall(r'[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]', modified)
             if len(letters) >= 6 and all(c.isupper() for c in letters):
                 # Capitalize first letter of each sentence

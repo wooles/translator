@@ -100,6 +100,20 @@ def extract_typesetting_tags(raw_text: str) -> Tuple[str, str]:
 
     return "", sanitize_sub_text(raw_text)
 
+def sanitize_ts_prefix_for_translation(ts_prefix: str) -> str:
+    """
+    Sanitizes ASS typesetting tag prefixes before reattaching to translated Polish text:
+    - Strips restrictive \\clip(...) / \\iclip(...) bounding boxes that crop/hide longer Polish translations.
+    - Cleans empty or malformed tag blocks e.g. "{}".
+    """
+    if not ts_prefix:
+        return ""
+    # Strip restrictive clip/iclip rectangles designed for shorter English text
+    cleaned = re.sub(r"\\i?clip\([^)]*\)", "", ts_prefix)
+    # Clean empty tag braces {}
+    cleaned = re.sub(r"\{\s*\}", "", cleaned)
+    return cleaned
+
 def detect_event_visual_type(event: pysubs2.SSAEvent, ts_prefix: str) -> Dict[str, Any]:
     """
     Analyzes ASS tags, position, rotation, color, and style to distinguish
@@ -1729,7 +1743,7 @@ class MultimodalTranslator:
 
             # Auto-elevate bracketed signs/captions '[ ... ]' to top (\an8) if missing positioning to prevent collision with bottom subs/hardsubs
             clean_check = clean_translated_text.strip()
-            ts_prefix_applied = ts_prefix or ""
+            ts_prefix_applied = sanitize_ts_prefix_for_translation(ts_prefix or "")
             if (clean_check.startswith("[") and clean_check.endswith("]")) or "sign" in (orig_event.style or "").lower():
                 if not (r"\an" in ts_prefix_applied or r"\pos" in ts_prefix_applied):
                     ts_prefix_applied = r"{\an8}" + ts_prefix_applied
