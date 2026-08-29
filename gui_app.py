@@ -243,8 +243,8 @@ class TranslationWorker(QThread):
                 p2_model = models["pro"]
                 enable_verifier = True
                 thinking_budget = 2048
-            else:  # Profile 3: Dual Highest Flash (F1: Najwyższy Flash CoT 0 + F2: Najwyższy Flash CoT do 6144 - Domyślny)
-                p1_model = models["flash"]
+            else:  # Profile 3: Second Highest Flash (F1 CoT 0) + Highest Flash (F2 CoT do 6144 - Domyślny)
+                p1_model = p1_fast
                 p2_model = models["flash"]
                 enable_verifier = True
                 thinking_budget = 6144

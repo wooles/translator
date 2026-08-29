@@ -399,7 +399,7 @@ def main():
         enable_verifier = True
         thinking_budget = 1600
     elif args.profile in ["pro", "master", "3", "flash_reasoning"]:
-        model_p1 = best_models["flash"]
+        model_p1 = best_models.get("flash_backup", "gemini-3.6-flash")
         model_p2 = best_models["flash"]
         enable_verifier = True
         thinking_budget = 6144
@@ -421,13 +421,17 @@ def main():
         health_probe = probe_all_models_health(temp_client, best_models)
         tag_lite = health_probe.get("flash_lite", {}).get("tag", "🟢")
         tag_flash = health_probe.get("flash", {}).get("tag", "🟢")
+        tag_flash_p1 = health_probe.get("flash_backup", {}).get("tag", "🟢")
         tag_pro = health_probe.get("pro", {}).get("tag", "🟢")
+
+        p1_model_name = best_models.get("flash_backup", "gemini-3.6-flash")
+        p2_model_name = best_models["flash"]
 
         print("\n" + "═" * 74)
         print("  WYBÓR PROFILU JAKOŚCI TŁUMACZENIA (Status Serwerów Google na Żywo):")
         print(f"  [1] STANDARDOWY   [{best_models['flash_lite']}] {tag_lite}")
         print(f"  [2] STUDYJNY      [{best_models['flash']}] {tag_flash}")
-        print(f"  [3] MISTRZOWSKI ⭐ [{best_models['flash']} (CoT 0) + {best_models['flash']} CoT 6144] {tag_flash}")
+        print(f"  [3] MISTRZOWSKI ⭐ [{p1_model_name} (CoT 0) + {p2_model_name} CoT 6144] {tag_flash_p1}")
         print(f"  [4] KINOWY 👑     [{best_models['flash']} + {best_models['pro']} CoT] {tag_pro}")
         print("─" * 74)
         print(PricingGuard.get_pricing_status_banner())
@@ -447,13 +451,13 @@ def main():
                 model_p2 = best_models["pro"]
                 enable_verifier = True
                 thinking_budget = 2048
-            else:  # Profile 3: Dual Highest Flash (F1: Najwyższy Flash CoT 0 + F2: Najwyższy Flash CoT 6144)
-                model_p1 = best_models["flash"]
+            else:  # Profile 3: Second Highest Flash (F1 CoT 0) + Highest Flash (F2 CoT 6144)
+                model_p1 = best_models.get("flash_backup", "gemini-3.6-flash")
                 model_p2 = best_models["flash"]
                 enable_verifier = True
                 thinking_budget = 6144
         except (EOFError, KeyboardInterrupt):
-            model_p1 = best_models["flash"]
+            model_p1 = best_models.get("flash_backup", "gemini-3.6-flash")
             model_p2 = best_models["flash"]
             enable_verifier = True
             thinking_budget = 6144
