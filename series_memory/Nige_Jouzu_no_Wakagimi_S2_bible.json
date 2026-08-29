@@ -66,6 +66,18 @@
     },
     "Moritaka -> Tokiyuki": {
       "description": "Zwrot: 'Panicz Tokiyuki' (poddany wojownik -> młody pan)"
+    },
+    "Tokiyuki Hōjō -> Yasuie Hōjō": {
+      "description": "Zwrot: 'Wuju / Wuju Yasuie' (bratanek -> wuj)"
+    },
+    "Yasuie Hōjō -> Tokiyuki Hōjō": {
+      "description": "Zwrot: 'panie Tokiyuki' (wuj -> młody pan / głowa rodu)"
+    },
+    "Genba Kazama -> Fubuki": {
+      "description": "Zwrot: 'na ty / Fubuki' (towarzysze broni)"
+    },
+    "Suwa Yorishige -> Tokiyuki Hōjō": {
+      "description": "Zwrot: 'panie Tokiyuki' (opiekuńczy kapłan -> młody dziedzic)"
     }
   },
   "glossary": {
@@ -104,7 +116,11 @@
     "Genpuku": "Genpuku",
     "Eboshi-oya": "Eboshi-oya (ojciec chrzestny genpuku)",
     "Arahitogami": "Arahitogami (Żywe Bóstwo)",
-    "Holy Pillar": "Święty Pal (Onbashira)"
+    "Holy Pillar": "Święty Pal (Onbashira)",
+    "Ashikaga School": "Szkoła Ashikaga",
+    "Tengu": "Tengu",
+    "Taiheiki": "Kronika Taiheiki",
+    "Post town": "Miasteczko stacyjne"
   },
   "relationships": {},
   "episodes_translated": [
@@ -113,6 +129,7 @@
     "Kanon Mangi",
     "tmp53xv6q4n",
     "tmpgvm6hevq",
-    "tmp1ntds3_n"
+    "tmp1ntds3_n",
+    "[ASW] Nige Jouzu no Wakagimi S2 - 07 [1080p HEVC][4F700E16]"
   ]
 }

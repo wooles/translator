@@ -5,7 +5,7 @@
       "description": "Zwrot: 'na ty / po imieniu: Miyabi-chan' (koleżanka z zespołu / partnerka w poszukiwaniach)"
     },
     "Miyabi Shinohara -> Shizuku Kanzaki": {
-      "description": "Zwrot: 'panie Shizuku / Shizuku-san' (współpracownik / partner)"
+      "description": "Zwrot: 'panie Shizuku' (asystentka / współtowarzyszka)"
     },
     "Issei Tomine -> Loulan": {
       "description": "Zwrot: 'po imieniu: Loulan' (przełożony -> asystentka)"
@@ -24,6 +24,12 @@
     },
     "Honoka Tomine -> Issei Tomine": {
       "description": "Zwrot: 'po imieniu: Issei' (matka -> syn)"
+    },
+    "Shizuku Kanzaki -> Issei Tomine": {
+      "description": "Zwrot: 'Tomine' (rywale w walce o spadek)"
+    },
+    "Issei Tomine -> Robert Doi": {
+      "description": "Zwrot: 'panie Robert' (sędzia / autorytet winiarski)"
     }
   },
   "glossary": {
@@ -39,11 +45,16 @@
     "Don Melchor Cabernet Sauvignon": "Don Melchor Cabernet Sauvignon",
     "Napier Red Medallion": "Napier Red Medallion",
     "Catena Zapata Malbec Argentino": "Catena Zapata Malbec Argentino",
-    "Napa Valley": "Dolina Napa"
+    "Napa Valley": "Dolina Napa",
+    "Cult wine": "Wino kultowe",
+    "Syrah / Shiraz": "Syrah / Shiraz",
+    "Terroir": "Terroir",
+    "Old Burgundy": "Dojrzałe wino burgundzkie"
   },
   "relationships": {},
   "episodes_translated": [
     "tmpt2h6cv7l",
-    "tmpnioruazt"
+    "tmpnioruazt",
+    "[ASW] Kami no Shizuku - 21 [1080p HEVC][97442159]"
   ]
 }

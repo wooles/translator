@@ -24,6 +24,15 @@
     },
     "Lozo -> Shun Shuishu": {
       "description": "Zwrot: 'na ty / człowieku z nizin' (bezwzględny król plemienny -> obcy poseł)"
+    },
+    "Wang Ben -> Oddział Yu Feng": {
+      "description": "Zwrot: 'Żołnierze Yu Feng / moi ludzie' (dowódca -> podwładni)"
+    },
+    "Han Chang -> Wang Ben": {
+      "description": "Zwrot: 'Młody panie / dowódco Ben' (przyboczny -> dowódca)"
+    },
+    "Xin -> Wei Ping / Song Zuo / Tian Yong": {
+      "description": "Zwrot: 'po imieniu / wy, durnie' (dowódca -> towarzysze broni)"
     }
   },
   "glossary": {
@@ -51,7 +60,10 @@
     "State of Qi": "Państwo Qi",
     "Zhuhai Plains": "Równina Zhuhai",
     "Five Hundred-Man Commander": "Dowódca pięciuset ludzi",
-    "Thousand-Man Commander": "Dowódca tysiąca ludzi"
+    "Thousand-Man Commander": "Dowódca tysiąca ludzi",
+    "Fei Xin Force": "Jednostka Fei Xin",
+    "Three Greats": "Trzej Wielcy Niebios",
+    "Dragon's Den": "Smocze Legowisko"
   },
   "relationships": {},
   "episodes_translated": [
@@ -59,6 +71,7 @@
     "tmp2s6g9x3n",
     "tmppw33m3fl",
     "tmpymtsp2tj",
-    "Kanon Mangi"
+    "Kanon Mangi",
+    "[ASW] Kingdom S6 - 13 [1080p HEVC][122056AC]"
   ]
 }

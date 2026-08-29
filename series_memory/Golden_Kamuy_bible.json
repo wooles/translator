@@ -8,7 +8,7 @@
       "description": "Zwrot: 'Sugimoto (po nazwisku, bez tytulatury)' (równorzędni partnerzy w wyprawie)"
     },
     "Usami -> Kadokura": {
-      "description": "Zwrot: 'naczelniku Kadokura / panie naczelniku' (żołnierz 7. Dywizji -> były strażnik/naczelnik więzienia Abashiri)"
+      "description": "Zwrot: 'ty prosiaczku / staruchu' (oprawca -> więzień/ofiara)"
     },
     "Tsukishima -> Koito": {
       "description": "Zwrot: 'podporuczniku Koito / panie podporuczniku' (sierżant sztabowy -> bezpośredni przełożony oficer)"
@@ -18,10 +18,16 @@
     },
     "Kirawus -> Saichi Sugimoto": {
       "description": "Zwrot: 'panie Sugimoto / Sugimoto-nispa' (sprzymierzeniec Ajnu -> Sugimoto (zwrot z szacunkiem))"
+    },
+    "Tsurumi -> Usami": {
+      "description": "Zwrot: 'szeregowy Usami / Tokishige-kun' (dowódca -> bezgranicznie oddany podwładny)"
+    },
+    "Sugimoto -> Asirpa": {
+      "description": "Zwrot: 'Asirpa / partnerko' (towarzysze broni / opiekun i podopieczna)"
     }
   },
   "glossary": {
-    "7th Division": "7. Dywizja (Siódma Dywizja)",
+    "7th Division": "Siódma Dywizja (7. Dywizja Cesarskiej Armii)",
     "Jack the Ripper": "Kuba Rozpruwacz",
     "Type 30 rifle": "Karabin Typ 30 (Arisaka Typ 30)",
     "Type 38 rifle": "Karabin Typ 38 (Arisaka Typ 38)",
@@ -29,10 +35,34 @@
     "Surku / Wolfsbane": "Surku / Tojad",
     "Aca": "Aca (Ojciec)",
     "Nispa": "Nispa (Pan / Szanowny)",
-    "Menko": "Karty menko"
+    "Menko": "Karty menko",
+    "Ainu": "Ainu (Ajnowie)",
+    "Nopperabo": "Nopperabo (Bez twarzy / Ojciec Asirpy)",
+    "Sapporo Brewery": "Browar w Sapporo",
+    "Immortal Sugimoto": "Nieśmiertelny Sugimoto",
+    "Saichi Sugimoto": "Saichi Sugimoto",
+    "Asirpa": "Asirpa",
+    "Yoshitake Shiraishi": "Yoshitake Shiraishi (Król Ucieczek)",
+    "Tokushirou Tsurumi": "Tokushirou Tsurumi (Porucznik Tsurumi)",
+    "Hyakunosuke Ogata": "Hyakunosuke Ogata (Snajper Ogata)",
+    "Genjirou Tanigaki": "Genjirou Tanigaki",
+    "Hajime Tsukishima": "Hajime Tsukishima (Sierżant Tsukishima)",
+    "Otonoshin Koito": "Otonoshin Koito (Podporucznik Koito)",
+    "Toshizou Hijikata": "Toshizou Hijikata (Były wicekapitan Shinsengumi)",
+    "Shinpachi Nagakura": "Shinpachi Nagakura",
+    "Tetsuzou Nihei": "Tetsuzou Nihei (Myśliwy Matagi)",
+    "Kamuy": "Kamuj (Bóstwo/Duch w wierzeniach Ajnów)",
+    "Kotan": "Kotan (Wioska Ajnów)",
+    "Citatap": "Citatap (Tradycyjna siekana potrawa Ajnów)",
+    "Hinna hinna": "Hinna hinna (Dziękuję za pyszne jedzenie w języku Ajnów)",
+    "Osoma": "Osoma (Kupa/Gówno w języku Ajnów / Miso wg Asirpy)",
+    "Retar": "Retar (Biały wilk ezo)",
+    "Abashiri Prison": "Więzienie Abashiri"
   },
   "relationships": {},
   "episodes_translated": [
-    "tmp996h2his"
+    "tmp996h2his",
+    "[ASW] Golden Kamuy - 52 [1080p HEVC][B92A80B5]",
+    "Kanon Mangi"
   ]
 }

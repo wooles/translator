@@ -14,32 +14,163 @@
       "description": "Zwrot: 'Wielki Chanie / Wasza Dostojność' (wasale i bracia / urzędnicy -> władca Imperium)"
     },
     "Boraqchin -> Möge": {
-      "description": "Zwrot: 'Moge / na ty' (Wielka Chatun -> młodsza małżonka chana)"
+      "description": "Zwrot: 'Möge' (pierwsza żona -> czwarta żona)"
     },
     "Möge -> Boraqchin": {
-      "description": "Zwrot: 'Pani Borakczin / Borakczin' (młodsza małżonka -> starsza / Wielka Chatun)"
+      "description": "Zwrot: 'po imieniu: Boraqchin' (współżony (dawne żony Czingis-chana))"
     },
     "Temüge -> Otai": {
       "description": "Zwrot: 'synu / na ty (błędnie przekręcając imię)' (ojciec (brat Czyngis-chana) -> syn)"
     },
     "Qadaq -> Fatima / Sitara": {
       "description": "Zwrot: 'na ty / Fatimo' (wojownik / strażnik -> służąca)"
+    },
+    "Töregene -> Sitara": {
+      "description": "Zwrot: 'po imieniu: Sitara' (pani -> podwładna)"
+    },
+    "Sitara -> Töregene": {
+      "description": "Zwrot: 'pani Töregene' (służąca -> władczyni)"
+    },
+    "Dayir -> Töregene": {
+      "description": "Zwrot: 'po imieniu: Töregene' (mąż -> żona)"
+    },
+    "Khulan -> Dayir": {
+      "description": "Zwrot: 'ojcze' (córka -> ojciec)"
+    },
+    "Ögedei -> Töregene": {
+      "description": "Zwrot: 'po imieniu: Töregene' (mąż / książę -> żona)"
+    },
+    "Chagatai -> Ögedei": {
+      "description": "Zwrot: 'Wielki Chan Ögedei' (brat/poddany -> Wielki Chan)"
+    },
+    "Tolui -> Ögedei": {
+      "description": "Zwrot: 'bracie / Wielki Chanie' (młodszy brat -> monarcha)"
+    },
+    "Sitara -> Boraqchin": {
+      "description": "Zwrot: 'Wielka Chatan / Wasza Wysokość' (medyk -> władczyni)"
+    },
+    "Hulegu -> Sorghaghtani": {
+      "description": "Zwrot: 'Matko' (syn -> matka)"
+    },
+    "Tolui -> Subutai": {
+      "description": "Zwrot: 'po imieniu / Subutai' (wodzowie / książę -> generał)"
+    },
+    "Boraqchin -> Sitara": {
+      "description": "Zwrot: 'Fatima' (pierwsza Chatuń -> perska lekarka)"
+    },
+    "Möge -> Sitara": {
+      "description": "Zwrot: 'niewolnico' (pani -> służąca)"
+    },
+    "Dayir Usun -> Töregene": {
+      "description": "Zwrot: 'po imieniu: Töregene' (mąż / wódz -> żona)"
+    },
+    "Khulan -> Töregene": {
+      "description": "Zwrot: 'matko / Töregene' (pasierbica -> macocha / przyjaciółki)"
+    },
+    "Töregene -> Dayir": {
+      "description": "Zwrot: 'wodzu Dayirze / mężu' (żona -> wódz i mąż)"
     }
   },
   "glossary": {
     "Great Kha'an / Kha'an": "Wielki Chan / Kagan",
     "Khatun / Great Khatun": "Chatun / Wielka Chatun",
-    "Kurultai": "Kurułtaj",
-    "Jada stone": "Kamień dżada (jada)",
-    "Jin dynasty": "Dynastia Jin (Dżurdżeni)",
+    "Kurultai": "Kurułtaj (Ogólne zgromadzenie wodzów i książąt mongolskich)",
+    "Jada stone": "Kamień jada",
+    "Jin dynasty": "Dynastia Jin",
     "Southern Song": "Południowa Dynastia Song",
     "Kaifeng": "Kaifeng",
-    "Circle hunt": "Wielka obława / polowanie z nagonką (nerge)",
+    "Circle hunt": "nagonka",
     "Chief Scribe": "Główny skryba / Kanclerz",
-    "Qi": "Energia qi / cz’i"
+    "Qi": "energia qi",
+    "Mergen": "Mergen",
+    "kam": "kam",
+    "jada stone": "kamień jada",
+    "Great Kha'an": "Wielki Chan",
+    "Great Khatun": "Wielka Chatan",
+    "al-iksir": "Al-iksir",
+    "danyao": "Danyao",
+    "waidan": "Waidan",
+    "rahj al-gar": "rahj al-gar",
+    "sandarac": "Sandarak",
+    "jada stone / bezoar stone": "Kamień jada / Kamień bezoarowy",
+    "urum": "Urum",
+    "Otchigin": "Otchigin",
+    "jadamishi": "jadamishi",
+    "Tengri": "Tengri",
+    "Kam": "Kam",
+    "Usun": "Usun",
+    "Yeke Mongol Ulus": "Wielkie Państwo Mongolskie",
+    "Khorasan": "Chorasan",
+    "Selenge River": "rzeka Selenga",
+    "Jaadugar / Witch": "Jaadugar (Wiedźma / Czarownica)",
+    "Yurt / Ger": "Jurta (Ger - filcowy namiot koczowników)",
+    "Khatun / Chatun": "Chatun (Wielka Małżonka Chana)",
+    "Khan / Khagan": "Chan / Wielki Chan (Kagan)",
+    "Horde / Ordo": "Orda (Obóz koczowniczy / Ordo)",
+    "Mongol Empire": "Imperium Mongolskie",
+    "Persia / Khwarazm": "Persja / Imperium Chorezmijskie",
+    "City of Tus": "Miasto Tus (Perski ośrodek nauki)",
+    "Karakorum": "Karakorum (Stolica Imperium Mongolskiego)",
+    "Nomads": "Koczownicy / Ludy Wielkiego Stepu",
+    "Forest Hunters": "Leśni łowcy",
+    "Pastoralists / Shepherds": "Pasterze owiec / Pasterze stepowi",
+    "Astrolabe": "Astrolabium",
+    "Alchemy / Islamic Medicine": "Alchemia i Medycyna Arabska",
+    "Secret History of the Mongols": "Tajna historia Mongołów",
+    "Great Khan Ögedei": "Wielki Chan Ogedej",
+    "Genghis Khan": "Czyngis-chan (Wielki Chan, założyciel Imperium Mongolskiego)",
+    "Empress Töregene (Töregene Khatun)": "Chatun Töregene (Toregine)",
+    "Fatima (Siti)": "Fatima (Siti / Jaadugar)",
+    "Curse / Retribution": "Klątwa i Zemsta na Najeźdźcach",
+    "Steppe": "Wielki Step",
+    "Silk Road": "Jedwabny Szlak",
+    "Tumen": "Tumen (Dywizja dziesięciu tysięcy wojowników)",
+    "Noyan": "Nojon (Mongolski arystokrata / dowódca wojskowy)",
+    "Shaman / Tengriism": "Szaman / Wiara w Wieczne Błękitne Niebo (Tengri)",
+    "Eternal Blue Sky": "Wieczne Błękitne Niebo (Tengri)",
+    "Dayir Usun": "Dayir Usun (Wódz Merkity)",
+    "Merkit": "Plemię Merkitów",
+    "Jurchen / Jin Dynasty": "Dżurdżeni / Dynastia Jin",
+    "Al-iksir": "Eliksir",
+    "Danyao": "Danyao",
+    "Rahj al-gar": "Rahj al-gar",
+    "Sandarac": "Sandarak",
+    "Urum": "Urum",
+    "Toregene": "Toregene (Druga żona Ogedeja Chana, Chatun)",
+    "Fatima": "Fatima (Medyczka i uczona z Tus, niewolnica i doradczyni Toregene)",
+    "Ogedei": "Ogedej Chan (Trzeci syn Czyngis-chana, Wielki Chan)",
+    "Khatun": "Chatun (Tytuł cesarzowej / szanownej małżonki chana)",
+    "Yurt": "Jurta (Tradycyjny namiot koczowników)",
+    "Great Khan": "Wielki Chan (Najwyższy władca Mongołów)",
+    "Jochi": "Dżuczi (Najstarszy syn Czyngis-chana)",
+    "Chagatai": "Czagataj (Drugi syn Czyngis-chana)",
+    "Tolui": "Tołuj (Czwarty syn Czyngis-chana, mąż Sorkaktani)",
+    "Sorghaghtani": "Sorkaktani Beki (Żona Tołuja, matka Mongkego i Kubłaja)",
+    "Guyuk": "Güyük (Najstarszy syn Ogedeja i Toregene)",
+    "Godan": "Köden / Godan (Drugi syn Ogedeja i Toregene)",
+    "Mogul": "Mogołowie / Mongołowie",
+    "Tus": "Tus (Miasto w Persji / Chorasanie, ojczyzna Fatimy)",
+    "Nishapur": "Niszapur (Perskie miasto zniszczone przez Mongołów)",
+    "Batu": "Batu-chan (Syn Dżucziego, założyciel Złotej Ordy)",
+    "Subutai": "Subedej (Genialny wódz Czyngis-chana i Ogedeja)",
+    "Jebe": "Dżebe (Jeden z 'czterech psów' Czyngis-chana)",
+    "Muqali": "Mukali (Generał Czyngis-chana)",
+    "Shaman": "Szaman (Mongolski kapłan i wróżbita Tengri)",
+    "Orda": "Orda (Koczowisko / obóz wojskowy)",
+    "Yassa": "Jasa (Wielkie prawo ustanowione przez Czyngis-chana)",
+    "Airag": "Ajrag / Kumys (Sfermentowane mleko klaczy)",
+    "Paiza": "Pajza (Tabliczka uprawniająca do poselstwa i zaopatrzenia)",
+    "Yam": "Örtöö / Jam (Mongolski konny system pocztowy)",
+    "Deel": "Deel (Tradycyjny płaszcz mongolski)",
+    "Khagan": "Chagan / Kachan (Wielki Chan)"
   },
   "relationships": {},
   "episodes_translated": [
-    "tmp8mehu8dp"
+    "tmp8mehu8dp",
+    "[ASW] Tenmaku no Jaadugar - 06 [1080p HEVC][3304C541]",
+    "[ASW] Tenmaku no Jaadugar - 07 [1080p HEVC][C9D77E6F]",
+    "[ASW] Tenmaku no Jaadugar - 08 [1080p HEVC][93C64921]",
+    "[ASW] Tenmaku no Jaadugar - 09 [1080p HEVC][D3FB6335]",
+    "Kanon Mangi"
   ]
 }
