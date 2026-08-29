@@ -47,6 +47,12 @@ Każda przyszła zmiana w kodzie musi zachować lub polepszyć poniższe paramet
 * Baza terminologiczna i dynamiczne pobieranie danych opierają się WYŁĄCZNIE na fizycznych polskich wydaniach papierowych (Waneko, JPF, Studio JG, Kotori, Hanami, Dango, Egmont) oraz recenzowanej encyklopedii Tanuki Manga.
 * Kategorycznie ZAKAZANE jest pobieranie lub sugerowanie się tłumaczeniami z Crunchyroll PL (ze względu na niską jakość literacką, kalki z języka angielskiego i błędy gramatyczne).
 
+### 7. PRAWO TRZECH ZŁOTYCH SOCZEWEK POZNAWCZYCH (THE 3 GOLDEN COGNITIVE LENSES)
+* Faza 2 (Script Doctor) ocenia każdą kwestię dialogową przez 3 proste, nadrzędne soczewki bez rozpraszania uwagi długimi checklistami:
+  1. 👂 **Soczewka Ucha:** Wymóg naturalnego brzmienia przy głośnym odczytaniu i bezwzględna odmiana przez przypadki.
+  2. 🌍 **Soczewka Świata:** Bezwzględny zakaz współczesnego żargonu urzędowego w epice oraz zakaz wycieku nawiasów ze słownika.
+  3. 🎬 **Soczewka Obrazu i Dźwięku:** Pełna spójność tekstu z mimiką i zakaz fałszywych czasowników na sapnięciach i westchnieniach.
+
 ---
 
 ## 🔒 ZASADA WERYFIKACJI PRZYSZŁYCH ZMIAN
