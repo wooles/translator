@@ -95,7 +95,17 @@ class AVTLinter:
         (r"\b[Pp]anie Benie\b", "paniczu Honie", "Filar IV/XXV - Pinyin 'Ben' -> Audio 'Hon'"),
         (r"\bpanie Benie\b", "paniczu Honie", "Filar IV/XXV - Pinyin 'Ben' -> Audio 'Hon'"),
         
-        # Honorific hybrids (Pillar XXVII)
+        # Honorific hybrids & Military rank clobbering (Pillars IV / XXVII / LX)
+        (r"\b[Zz]\s+panem\s+(?:[Ww]ielki(?:m)?\s+)?[Gg]enerał(?:em)?\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+)\b", r"z generałem \1", "Filar XXVII/IV - Eliminacja potworka 'z panem Wielki Generał X'"),
+        (r"\bz\s+panem\s+(?:[Ww]ielki(?:m)?\s+)?[Gg]enerał(?:em)?\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+)\b", r"z generałem \1", "Filar XXVII/IV - Eliminacja potworka 'z panem Wielki Generał X'"),
+        (r"\b[Zz]\s+panem\s+Wielki\s+Generał\b", "z Wielkim Generałem", "Filar IV/XXVII - Poprawność Narzędnika"),
+        (r"\bz\s+panem\s+Wielki\s+Generał\b", "z Wielkim Generałem", "Filar IV/XXVII - Poprawność Narzędnika"),
+        (r"\b[Pp]anem\s+Wielki\s+Generał\b", "Wielkim Generałem", "Filar IV/XXVII - Poprawność Narzędnika"),
+        (r"\bpanem\s+Wielki\s+Generał\b", "Wielkim Generałem", "Filar IV/XXVII - Poprawność Narzędnika"),
+        (r"\b[Pp]ana\s+Wielki\s+Generał\b", "Wielkiego Generała", "Filar IV/XXVII - Poprawność Dopełniacza"),
+        (r"\bpana\s+Wielki\s+Generał\b", "Wielkiego Generała", "Filar IV/XXVII - Poprawność Dopełniacza"),
+        (r"\b[Pp]an\s+Wielki\s+Generał\b", "Wielki Generał", "Filar XXVII - Eliminacja hybrydy 'Pan Wielki Generał'"),
+        (r"\bpan\s+Wielki\s+Generał\b", "Wielki Generał", "Filar XXVII - Eliminacja hybrydy 'Pan Wielki Generał'"),
         (r"\b[Pp]ani [Ss]ensei\b", "Sensei", "Filar XXVII - Zakaz Hybryd Honoryfikatywnych"),
         (r"\b[Pp]anie [Ss]ensei\b", "Sensei", "Filar XXVII - Zakaz Hybryd Honoryfikatywnych"),
         (r"\b[Pp]an [Ss]ensei\b", "Sensei", "Filar XXVII - Zakaz Hybryd Honoryfikatywnych"),
