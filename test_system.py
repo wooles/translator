@@ -683,11 +683,12 @@ from manga_canon import MangaCanonRegistry
 def test_manga_canon():
     print("[TEST 13/13] Test Rejestru Kanonu Polskich Wydań Mangowych (manga_canon)...")
     registry = MangaCanonRegistry()
-    # Test dopasowania Kingdom
-    kingdom_canon = registry.find_canon_for_series("[ASW] Kingdom S6 - 10 [1080p]")
-    assert kingdom_canon is not None
-    assert kingdom_canon["glossary"]["Middle Kingdom"] == "Państwo Środka"
-    assert kingdom_canon["glossary"]["Great General"] == "Wielki Generał"
+    # Test dopasowania Berserk (Wydawnictwo J.P.Fantastica)
+    berserk_canon = registry.find_canon_for_series("[ASW] Berserk - 10 [1080p]")
+    assert berserk_canon is not None
+    assert berserk_canon["glossary"]["Band of the Hawk"] == "Drużyna Jastrzębia"
+    assert berserk_canon["glossary"]["Dragonslayer"] == "Zabójca Smoków"
+    assert "J.P.Fantastica" in berserk_canon["publisher"]
 
     # Test dopasowania Jujutsu Kaisen
     jjk_canon = registry.find_canon_for_series("Jujutsu Kaisen Season 2")
