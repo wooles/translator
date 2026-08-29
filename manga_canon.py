@@ -4687,6 +4687,7 @@ KRYTYCZNE ZASADY WERYFIKACJI ŹRÓDEŁ:
    - Polskie bazy Fandom prowadzone przez czytelników polskich tomików (*.fandom.com/pl)
    - Polskie bazy komiksowe (alejakomiksu.com, komikspec.pl, gildia.pl)
 2. KATEGORYCZNY ZAKAZ:
+   - Kategorycznie ZAKAZANE jest korzystanie z Crunchyroll PL (ich napisy zawierają kalki z języka angielskiego, błędy gramatyczne i niską jakość literacką).
    - Kategorycznie ignoruj anglojęzyczne fora (Reddit, 4chan, MAL), automatyczne translatory i mechaniczne tłumaczenia dosłowne z języka angielskiego.
    - Jeśli nie masz 100% potwierdzenia danego terminu z polskiego wydania papierowego, NIE WYMYŚLAJ GO! Lepiej podać autentyczne terminy z polskiego druku.
 3. Jeśli seria NIE POSIADA oficjalnego polskiego wydania mangi/LN w Polsce, natychmiast zwróć:

@@ -43,9 +43,13 @@ Każda przyszła zmiana w kodzie musi zachować lub polepszyć poniższe paramet
 ### 5. PRAWO CZYSTYCH KOMUNIKATÓW (HUMAN-FRIENDLY LOGS)
 * Wszelkie błędy sieciowe (503, 429, 504) muszą być prezentowane użytkownikowi w czystym, zrozumiałym języku polskim, bez surowych zrzutów słowników JSON czy kodów technicznych.
 
+### 6. PRAWO CZYSTYCH ŹRÓDEŁ I ZAKAZ CRUNCHYROLL PL (TRUSTED SOURCES ONLY)
+* Baza terminologiczna i dynamiczne pobieranie danych opierają się WYŁĄCZNIE na fizycznych polskich wydaniach papierowych (Waneko, JPF, Studio JG, Kotori, Hanami, Dango, Egmont) oraz recenzowanej encyklopedii Tanuki Manga.
+* Kategorycznie ZAKAZANE jest pobieranie lub sugerowanie się tłumaczeniami z Crunchyroll PL (ze względu na niską jakość literacką, kalki z języka angielskiego i błędy gramatyczne).
+
 ---
 
 ## 🔒 ZASADA WERYFIKACJI PRZYSZŁYCH ZMIAN
 Przed zaakceptowaniem i scommitowaniem jakiejkolwiek przyszłej zmiany w kodzie, programista/agent AI jest **bezwzględnie zobowiązany** do:
-1. Uruchomienia .venv\Scripts\python test_system.py i uzyskania wyniku **33/33 PASSED**.
+1. Uruchomienia `.venv\Scripts\python test_system.py` i uzyskania wyniku **33/33 PASSED**.
 2. Weryfikacji, że żadna zmiana nie spowalnia asynchronicznego dispatchera paczek ani nie zwiększa zużycia tokenów wejściowych.
