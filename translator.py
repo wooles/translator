@@ -766,7 +766,7 @@ class MultimodalTranslator:
                 }
                 # Phase 1: Always enforce thinking_budget=0 (CoT=0) for reasoning-capable models (Flash 3.7+, 3.8+, 4.0+, Pro)
                 # ensuring rapid triangulation with zero thinking token cost.
-                is_reasoning_capable = any(k in current_model.lower() for k in ["flash", "pro", "thinking", "reasoning"]) and "lite" not in current_model.lower()
+                is_reasoning_capable = any(k in current_model.lower() for k in ["3.7", "3.8", "4.", "pro", "thinking", "reasoning"]) and "lite" not in current_model.lower()
                 if is_reasoning_capable:
                     budget_p1 = getattr(self, "phase1_thinking_budget", 0)
                     gen_config_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=budget_p1)
