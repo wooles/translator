@@ -593,6 +593,7 @@ class MultimodalTranslator:
         # Real token counter for the current episode
         self.current_episode_tokens: Dict[str, Any] = {"prompt": 0, "cached": 0, "output": 0, "model": self.model}
         import threading
+        self.lock = threading.Lock()
         # Smart Batch Queueing & Pacing:
         # Default to 1-by-1 streaming pacing mode (eliminates TPU congestion and provides live instant updates)
         default_concurrency = 1
