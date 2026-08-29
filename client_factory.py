@@ -45,14 +45,19 @@ def get_genai_client(
     force_ai_studio: bool = False
 ) -> genai.Client:
     """
-    Creates and returns a genai.Client instance with safe timeout.
-    Accepts both timeout_sec and legacy timeout_ms (auto-converted to seconds).
+    Creates and returns a genai.Client instance with safe timeout in milliseconds.
+    Accepts both timeout_sec (e.g. 45.0) and timeout_ms (e.g. 45000), smartly normalizing to milliseconds.
     If gcp_key.json exists (or GOOGLE_GENAI_USE_VERTEXAI is True),
     authenticates using European Vertex AI Enterprise credentials (europe-west1 / Belgia).
     Otherwise, connects via standard Google AI Studio API Key.
     """
     if timeout_ms is not None:
-        timeout_sec = timeout_ms / 1000.0
+        final_timeout_ms = int(timeout_ms)
+    else:
+        final_timeout_ms = int(timeout_sec * 1000) if timeout_sec < 1000 else int(timeout_sec)
+    
+    # Enforce Google API minimum deadline requirement (min 10000ms = 10s)
+    final_timeout_ms = max(10000, final_timeout_ms)
 
     use_vertex = os.environ.get("GOOGLE_GENAI_USE_VERTEXAI", "1").lower() in ["1", "true", "yes"]
     key_path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "").strip()
@@ -62,8 +67,7 @@ def get_genai_client(
             key_path = default_key
 
     location = os.environ.get("GOOGLE_CLOUD_LOCATION", "europe-west1").strip()
-    safe_timeout = float(os.environ.get("GEMINI_HTTP_TIMEOUT_SEC", str(timeout_sec)))
-    http_opts = types.HttpOptions(timeout=safe_timeout)
+    http_opts = types.HttpOptions(timeout=final_timeout_ms)
 
     if use_vertex and key_path and os.path.exists(key_path) and not force_ai_studio:
         try:
@@ -116,10 +120,12 @@ class MultiKeyClientPool:
             keys_list = [""]
 
         if timeout_ms is not None:
-            timeout_sec = timeout_ms / 1000.0
+            final_timeout_ms = int(timeout_ms)
+        else:
+            final_timeout_ms = int(timeout_sec * 1000) if timeout_sec < 1000 else int(timeout_sec)
 
-        safe_timeout = float(os.environ.get("GEMINI_HTTP_TIMEOUT_SEC", str(timeout_sec)))
-        http_opts = types.HttpOptions(timeout=safe_timeout)
+        final_timeout_ms = max(10000, final_timeout_ms)
+        http_opts = types.HttpOptions(timeout=final_timeout_ms)
         
         def _make_client(k: str) -> genai.Client:
             if k:

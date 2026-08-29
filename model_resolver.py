@@ -126,8 +126,10 @@ def probe_model_health(client: Optional[genai.Client], model_name: str) -> Dict[
             "http_options": types.HttpOptions(timeout=25000)
         }
         if "pro" in model_name.lower() or "3.1" in model_name.lower():
+            cfg_kwargs["max_output_tokens"] = 600
             cfg_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=512)
         elif "3.7" in model_name.lower():
+            cfg_kwargs["max_output_tokens"] = 10
             cfg_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=0)
 
         cfg = types.GenerateContentConfig(**cfg_kwargs)
