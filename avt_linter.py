@@ -171,9 +171,15 @@ class AVTLinter:
         (r"\b[Ww]zięcie pod uwagę\b", "Biorąc pod uwagę", "Filar X - Anti-Translationese"),
 
         # Audiovisual punctuation (Pillar LX)
+        (r'([”"»])\s+([,.:;!?…])', r'\1\2', "Filar LX - Eliminacja spacji przed interpunkcją po cudzysłowie"),
+        (r'([„"«])\s+', r'\1', "Filar LX - Eliminacja spacji po cudzysłowie otwierającym"),
         (r"!\?", "?!", "Filar LX - Zespolone Znaki Interpunkcyjne"),
         (r"!\?\?", "?!", "Filar LX - Zespolone Znaki Interpunkcyjne"),
         (r"\?\?\?", "?", "Filar LX - Zespolone Znaki Interpunkcyjne"),
+
+        # Japanese -kun honorific & Yobisute first-name de-formalization (Pillar XLVI / IX)
+        (r"\b[Pp]an(?:a|u|em|ie)?\s+(Shizuku|Issei|Arata|Shin|Luffy|Naruto|Ichigo|Tanjiro|Deku|Yuji|Yoritsugu|Aoi|Ren|Haru|Kaito|Sora|Yuto|Riku|Takumi|Daiki)\b", r"\1", "Filar XLVI - Eliminacja sztucznego 'pan' przy imieniu męskim (-kun)"),
+        (r"\b[Pp]ani\s+(Kokoro|Miyabi|Akafuku|Hana|Yui|Rin|Sakura|Akari|Nanami|Mei|Hina|Mio|Yuna|Koharu|Saki|Kanna)\b", r"\1", "Filar XLVI - Eliminacja sztucznego 'pani' przy imieniu rówieśniczki (-chan)"),
 
         # Cultural realia and Pedersen ECR (Pillar XIV)
         (r"\b[Kk]onbini\b", "sklep", "Filar XIV - Pedersen Generalization"),

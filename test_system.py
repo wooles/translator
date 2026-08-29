@@ -524,7 +524,11 @@ def test_avt_linter():
     # Test rozpakowywania nawiasów kwadratowych ze znaków/tytułów
     t9, f9 = AVTLinter.lint_and_fix_line("[ ODCINEK 9: DZIEWCZYNO-KAIJU! ]", is_sign=True)
     assert t9 == "ODCINEK 9: DZIEWCZYNO-KAIJU!"
-    print(" -> PASSED: AVT Linter bezbłędnie wyłapuje i koryguje kalki, formy, nawiasy i ALL-CAPS.")
+
+    # Test eliminacji spacji przed interpunkcją po cudzysłowie oraz sztucznego 'pan Shizuku' (-kun)
+    t10, f10 = AVTLinter.lint_and_fix_line("Słowo „odkrycie” , którego użył pan Shizuku, jest tu niezwykle trafne.", is_sign=False)
+    assert t10 == "Słowo „odkrycie”, którego użył Shizuku, jest tu niezwykle trafne."
+    print(" -> PASSED: AVT Linter bezbłędnie wyłapuje i koryguje kalki, formy, nawiasy, cudzysłowy i ALL-CAPS.")
 
 def test_series_bible():
     print("[TEST 9/12] Test Biblii Serialu i Pamięci Międzyodcinkowej (series_memory)...")
