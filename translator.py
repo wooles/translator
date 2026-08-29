@@ -532,9 +532,9 @@ class MultimodalTranslator:
                 "lub utwórz plik .env z wpisem GEMINI_API_KEY=twój_klucz"
             )
         
-        timeout_ms = int(os.getenv("GEMINI_HTTP_TIMEOUT_MS", "120000"))
+        timeout_sec = float(os.getenv("GEMINI_HTTP_TIMEOUT_SEC", "45.0"))
         from client_factory import get_genai_client, MultiKeyClientPool
-        self.client_pool = MultiKeyClientPool(raw_keys=self.api_key, timeout_ms=timeout_ms)
+        self.client_pool = MultiKeyClientPool(raw_keys=self.api_key, timeout_sec=timeout_sec)
         self.client = self.client_pool.get_client()
         self.model = model
         self.model_phase1 = model
@@ -593,9 +593,9 @@ class MultimodalTranslator:
         # Real token counter for the current episode
         self.current_episode_tokens: Dict[str, Any] = {"prompt": 0, "cached": 0, "output": 0, "model": self.model}
         import threading
-        self.lock = threading.Lock()
-        num_keys = len(self.client_pool.clients) if hasattr(self, "client_pool") and self.client_pool and hasattr(self.client_pool, "clients") else 1
-        default_concurrency = min(10, max(4, num_keys // 2)) if num_keys > 2 else 4
+        # Smart Batch Queueing & Pacing:
+        # Default to 1-by-1 streaming pacing mode (eliminates TPU congestion and provides live instant updates)
+        default_concurrency = 1
         self.concurrent_batches = int(os.getenv("CONCURRENT_BATCHES", str(default_concurrency)))
 
     def _prepare_batch_prompt(
@@ -1648,9 +1648,9 @@ class MultimodalTranslator:
 
             if tasks_to_run:
                 active_keys_count = len(self.client_pool.get_active_clients()) if hasattr(self, "client_pool") and self.client_pool else 1
-                max_workers = min(self.concurrent_batches, len(tasks_to_run), max(2, active_keys_count * 2))
+                max_workers = min(self.concurrent_batches, len(tasks_to_run))
                 if max_workers > 1:
-                    print(f"\n  [Równoległość Tier 1]: Uruchamianie równoległego tłumaczenia ({max_workers} paczek jednocześnie / {active_keys_count} aktywnych kluczy API)...")
+                    print(f"\n  [Kolejka Paczek]: Uruchamianie równoległego tłumaczenia ({max_workers} paczek w locie / {active_keys_count} aktywnych kluczy API)...")
                     import concurrent.futures
                     with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
                         future_to_bidx = {
@@ -1717,10 +1717,13 @@ class MultimodalTranslator:
                             except Exception as e:
                                 pbar.write(f" 🔴 [Błąd Paczki]: {format_friendly_api_error(e)}")
                 else:
-                    for b_idx, batch, untranslated in tasks_to_run:
+                    print(f"\n  [Kolejka Paczek]: Płynne tłumaczenie sekwencyjne (1 paczka na raz / rotacja {active_keys_count} aktywnych kluczy API)...")
+                    for loop_i, (b_idx, batch, untranslated) in enumerate(tasks_to_run):
                         if cancel_check and cancel_check():
                             print("\n[Tłumacz]: Otrzymano sygnał przerwania (⏹ Stop)...")
                             break
+                        if loop_i > 0:
+                            time.sleep(0.25)
                         try:
                             b_res_idx, batch_res, untrans_items, pass1_items, sc_desc = self._process_single_batch(
                                 b_idx=b_idx,

@@ -40,11 +40,11 @@ def format_friendly_api_error(e: Exception) -> str:
 
 def get_genai_client(
     api_key: Optional[str] = None,
-    timeout_ms: int = 120000,
+    timeout_sec: float = 45.0,
     force_ai_studio: bool = False
 ) -> genai.Client:
     """
-    Creates and returns a genai.Client instance.
+    Creates and returns a genai.Client instance with safe 45s timeout.
     If gcp_key.json exists (or GOOGLE_GENAI_USE_VERTEXAI is True),
     authenticates using European Vertex AI Enterprise credentials (europe-west1 / Belgia).
     Otherwise, connects via standard Google AI Studio API Key.
@@ -57,7 +57,8 @@ def get_genai_client(
             key_path = default_key
 
     location = os.environ.get("GOOGLE_CLOUD_LOCATION", "europe-west1").strip()
-    http_opts = types.HttpOptions(timeout=timeout_ms)
+    safe_timeout = float(os.environ.get("GEMINI_HTTP_TIMEOUT_SEC", str(timeout_sec)))
+    http_opts = types.HttpOptions(timeout=safe_timeout)
 
     if use_vertex and key_path and os.path.exists(key_path) and not force_ai_studio:
         try:
@@ -73,7 +74,7 @@ def get_genai_client(
                 project=project_id,
                 location=location,
                 credentials=creds,
-                http_opts=http_opts if hasattr(types, "HttpOptions") else None
+                http_options=http_opts
             )
         except Exception as e:
             logger.warning(f"Vertex AI initialization failed ({e}). Falling back to Google AI Studio.")
@@ -84,7 +85,7 @@ def get_genai_client(
         first_key = [k.strip() for k in key.replace(";", ",").split(",") if k.strip()][0]
         return genai.Client(api_key=first_key, http_options=http_opts)
     else:
-        return genai.Client(http_opts=http_opts)
+        return genai.Client(http_options=http_opts)
 
 
 class MultiKeyClientPool:
@@ -92,7 +93,7 @@ class MultiKeyClientPool:
     Thread-safe Smart Round-Robin Client Pool with Circuit Breaker and Auto-Banning of Exhausted Keys.
     Distributes requests only across active, healthy API keys, immediately cooling down keys that hit 429 quota.
     """
-    def __init__(self, raw_keys: Optional[str] = None, timeout_ms: int = 120000):
+    def __init__(self, raw_keys: Optional[str] = None, timeout_sec: float = 45.0):
         import threading
         import time
         import concurrent.futures
@@ -104,7 +105,8 @@ class MultiKeyClientPool:
         if not keys_list:
             keys_list = [""]
 
-        http_opts = types.HttpOptions(timeout=timeout_ms)
+        safe_timeout = float(os.environ.get("GEMINI_HTTP_TIMEOUT_SEC", str(timeout_sec)))
+        http_opts = types.HttpOptions(timeout=safe_timeout)
         
         def _make_client(k: str) -> genai.Client:
             if k:

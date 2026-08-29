@@ -36,7 +36,7 @@ class DialogueVerifier:
             self.client_pool = client
         else:
             from client_factory import MultiKeyClientPool
-            self.client_pool = MultiKeyClientPool(raw_keys=os.getenv("GEMINI_API_KEY"), timeout_ms=120000)
+            self.client_pool = MultiKeyClientPool(raw_keys=os.getenv("GEMINI_API_KEY"), timeout_sec=45.0)
         self.model = model
         self.keep_honorifics = keep_honorifics
         self.system_prompt = get_verifier_system_prompt(keep_honorifics=keep_honorifics)
