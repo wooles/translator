@@ -1644,8 +1644,14 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
    - Ocal całkowity bilans artystyczny sceny, wzbogacając sąsiednie frazy w zamian za utracony niuans kulturowy (Steiner).
 80. SOMATYCZNY REZONANS EMOCJONALNY (FILAR XC):
    - Zapewnij bezpośredni fizjologiczny rezonans afektywny przekładu (dreszcz, ucisk w gardle, śmiech) u polskiego odbiorcy (Robinson).
-81. AUDYT „ŚLEPEGO POLSKIEGO WIDZA” (BLIND NATIVE POLISH CRITIC PASS):
-   - W fazie myślenia oceń polskie tłumaczenie w całkowitym oderwaniu od języka angielskiego: czy brzmi w 100% tak, jakby zostało napisane przez wybitnego polskiego scenarzystę? Jeśli czuć w nim zapach obcej składni – natychmiast wygładź zdanie!
+81. AUDYT „ŚLEPEGO POLSKIEGO WIDZA” I KRYTYCZNA AUTOREFLEKSJA (BLIND NATIVE POLISH CRITIC PASS):
+   - W fazie myślenia CoT wykonaj test 'Ślepego Polskiego Widza': oceń każde zdanie w całkowitym oderwaniu od języka angielskiego.
+   - ZADAJ SOBIE PYTANIA KRYTYCZNE:
+     * Czy to zdanie brzmi w 100% naturalnie po polsku, jak w profesjonalnym dubbingu kinowym?
+     * Czy nie ma tu wycieku notatek w nawiasach ze słownika (np. '(Demon Północy)')?
+     * Czy wszystkie tytuły i imiona są poprawnie odmienione przez przypadki (np. 'z Wielkim Generałem Riboku / z Riboku', a NIGDY 'z panem Wielki Generał')?
+     * Czy w epickim dramacie nie pojawił się suchy język urzędowy (np. 'powołał armię' -> zmień na 'zebrał armię')?
+     * Jeśli czujesz choć cień obcej składni lub sztuczności – NATYCHMIAST przeredaguj zdanie przed wygenerowaniem wyniku!
 82. TRANSKREACJA POETYCKA PIOSENEK (FILAR CXVIII):
    - Kwestie piosenek (nutka '♪', '♫', styl Karaoke/Song/OP/ED) tłumacz rymowanym wierszem sylabicznym o równej liczbie sylab i naturalnych polskich rymach (AABB/ABAB wg Stanisława Barańczaka).
 83. MATRYCA IDIOLEKTÓW POSTACI (FILAR CXIX):
