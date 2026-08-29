@@ -608,7 +608,15 @@ def test_avt_formatter_and_cps():
     title_text = "SPECJALNE SIŁY POŻARNICZE: HISTORIA WALKI CZĘŚĆ TRZECIA"
     split_title = split_subtitle_syntactically(title_text, max_line_len=42, is_ass=True, is_sign=True)
     assert "\\N" in split_title
-    assert len(split_title.split("\\N")) == 2
+    assert len(split_title.split("\\N")) >= 2
+
+    # Test plansz postaci i banerów z pozycjonowaniem (Tenmaku no Jaadugar cases)
+    s1 = "{\\pos(150,600)}SYN TEMÜGIEGO – OTAI"
+    s2 = "{\\pos(1650,300)}MŁODSZY BRAT CZYNGIS-CHANA – TEMÜGE"
+    split_s1 = split_subtitle_syntactically(s1, is_sign=True)
+    split_s2 = split_subtitle_syntactically(s2, is_sign=True)
+    assert "\\N" in split_s1 and "OTAI" in split_s1
+    assert "\\N" in split_s2 and "TEMÜGE" in split_s2
 
     # Test dyrektywy kompresji tekstu (Smart Condensation Ratio)
     cond_fast = calculate_condensation_directive("Musimy natychmiast uciekać stąd bo nadciągają potwory!", start_ms=0, end_ms=1200)

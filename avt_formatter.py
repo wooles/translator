@@ -56,15 +56,17 @@ def split_subtitle_syntactically(text: str, max_line_len: int = MAX_LINE_LENGTH,
     if not text:
         return ""
 
-    if is_sign and max_line_len > 40:
-        max_line_len = 40
-
     sep = "\\N" if is_ass else "\n"
 
     # Extract ASS tag prefix (e.g. {\pos(..)})
     prefix_match = re.match(r"^((?:\{[^}]+\})+)", text)
     ts_prefix = prefix_match.group(1) if prefix_match else ""
     raw_content = text[len(ts_prefix):].strip()
+
+    # If event is a sign or positioned typesetting with \pos, enforce narrow line limit (max 18-20 chars)
+    is_positioned_sign = is_sign or (r"\pos" in ts_prefix) or (r"\an" in ts_prefix and "an8" not in ts_prefix and "an2" not in ts_prefix)
+    if is_positioned_sign:
+        max_line_len = min(max_line_len, 18)
 
     # Normalize existing line breaks into single space to reconstruct clean 2-line break
     normalized_content = re.sub(r"\\N|\\n|\n", " ", raw_content)
@@ -78,8 +80,8 @@ def split_subtitle_syntactically(text: str, max_line_len: int = MAX_LINE_LENGTH,
     if len(words) <= 1:
         return f"{ts_prefix}{normalized_content}"
 
-    # For long texts (written letters, notes, manifestos, documents > 80 chars)
-    # wrap into balanced lines of max_line_len (<= 40-42 chars) to prevent horizontal screen overflow
+    # For long texts (written letters, notes, manifestos, documents > 80 chars, or long signs > 36 chars)
+    # wrap into balanced lines of max_line_len to prevent horizontal screen overflow
     if len(clean_full) > max_line_len * 2:
         wrapped_lines = []
         current_words = []
@@ -90,6 +92,8 @@ def split_subtitle_syntactically(text: str, max_line_len: int = MAX_LINE_LENGTH,
             should_break = False
             if current_words:
                 if current_len + 1 + w_len > max_line_len:
+                    should_break = True
+                elif is_positioned_sign and current_words[-1] in ["–", "-", "—", ":"]:
                     should_break = True
                 elif current_words[-1].endswith(("!", "?", ".")) and current_len >= 28:
                     should_break = True
@@ -141,30 +145,32 @@ def split_subtitle_syntactically(text: str, max_line_len: int = MAX_LINE_LENGTH,
         if last_word_left in NO_BREAK_AFTER:
             score -= 1000.0
 
-        # 2. Penalty for single hanging word at start or end
-        if len(left_words) == 1:
-            score -= 300.0
-        if len(right_words) == 1:
-            score -= 300.0
+        # 2. Penalty for single hanging word at start or end (disabled for signs where single name at end is normal)
+        if not is_positioned_sign:
+            if len(left_words) == 1:
+                score -= 300.0
+            if len(right_words) == 1:
+                score -= 300.0
 
-        # 3. Bonus for punctuation breaks at clause boundary
-        if left_words[-1].endswith((".", "!", "?", "...", ":", ";")):
+        # 3. Bonus for punctuation breaks at clause boundary & title separators
+        if left_words[-1] in ["–", "-", "—", ":"] or left_words[-1].endswith(("–", "-", "—", ":")):
+            score += 400.0
+        elif left_words[-1].endswith((".", "!", "?", "...", ";")):
             score += 250.0
         elif left_words[-1].endswith(","):
             score += 150.0
-        elif left_words[-1].endswith(("—", "-")):
-            score += 120.0
 
         # 4. Bonus for breaking before subordinate conjunctions
         if first_word_right in {"że", "bo", "ponieważ", "więc", "jeśli", "gdy", "kiedy", "chociaż", "dlatego", "który", "która", "które"}:
             score += 140.0
 
-        # 5. Pyramiding rule (Netflix AVT): bottom line should be longer than or equal to top line
-        diff = len_right - len_left
-        if 0 <= diff <= 16:
-            score += 250.0  # High bonus for proper pyramiding
-        elif diff < 0:
-            score -= abs(diff) * 25.0  # Penalty for inverted pyramid
+        # 5. Pyramiding rule (Netflix AVT): bottom line should be longer than or equal to top line (dialogue only)
+        if not is_positioned_sign:
+            diff = len_right - len_left
+            if 0 <= diff <= 16:
+                score += 250.0  # High bonus for proper pyramiding
+            elif diff < 0:
+                score -= abs(diff) * 25.0  # Penalty for inverted pyramid
 
         # 6. Center balance penalty
         balance_penalty = abs(len_left - target_midpoint) * 2.0
