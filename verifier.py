@@ -196,8 +196,10 @@ class DialogueVerifier:
                         config=cfg
                     )
 
-                # Direct generation using thread-safe multi-key rotation and token bucket pacing
-                response = _single_generate()
+                # Direct generation using thread-safe multi-key rotation and token bucket pacing with hard 95s watchdog
+                with concurrent.futures.ThreadPoolExecutor(max_workers=1) as ex:
+                    fut = ex.submit(_single_generate)
+                    response = fut.result(timeout=95.0)
 
                 if hasattr(response, "usage_metadata") and response.usage_metadata:
                     um = response.usage_metadata
