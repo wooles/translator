@@ -206,11 +206,15 @@ class DialogueVerifier:
                 # Retrieve parsed structured output
                 if hasattr(response, "parsed") and response.parsed is not None:
                     parsed_obj: RefinedBatchResponse = response.parsed
+                    if attempt > 1:
+                        print(f"  └─ [OK / Faza 2]: Połączenie z Google API przywrócone (próba #{attempt}).")
                     return parsed_obj.lines
                 
                 # Fallback to response.text if SDK returned raw string
                 data = json.loads(response.text)
                 batch_resp = RefinedBatchResponse.model_validate(data)
+                if attempt > 1:
+                    print(f"  └─ [OK / Faza 2]: Połączenie z Google API przywrócone (próba #{attempt}).")
                 return batch_resp.lines
 
             except Exception as e:
@@ -240,17 +244,20 @@ class DialogueVerifier:
                 is_rate_limit = "429" in err_str or "quota" in err_str or "resource_exhausted" in err_str
 
                 import random
-                # Zero-Wait Multi-Key Hopping (200ms between keys; micro-pause after full key round)
                 num_keys = len(self.client_pool.clients) if hasattr(self, "client_pool") and self.client_pool else 1
-                if attempt % max(1, num_keys) != 0:
-                    wait_sec = 0.2 + random.uniform(0.05, 0.15)
-                else:
+                if is_unavailable or is_timeout:
                     cycle = attempt // max(1, num_keys)
-                    wait_sec = min(3.0, 0.6 + 0.4 * min(cycle, 4) + random.uniform(0.1, 0.3))
+                    wait_sec = min(4.0, 1.5 + 0.5 * min(cycle, 5) + random.uniform(0.1, 0.4))
+                else:
+                    if attempt % max(1, num_keys) != 0:
+                        wait_sec = 0.2 + random.uniform(0.05, 0.15)
+                    else:
+                        cycle = attempt // max(1, num_keys)
+                        wait_sec = min(3.0, 0.6 + 0.4 * min(cycle, 4) + random.uniform(0.1, 0.3))
                 
                 friendly_msg = format_friendly_api_error(e)
                 if attempt == 1:
-                    print(f"\n[Redaktor Dialogów / Faza 2]: {friendly_msg}. Błyskawiczna rotacja kluczy API...")
-                else:
-                    print(f"  ├─ [Próba #{attempt}]: {friendly_msg} -> przełączam na kolejny klucz API...")
+                    print(f"\n[Redaktor Dialogów / Faza 2]: {friendly_msg} -> oczekiwanie i automatyczna rotacja kluczy API...")
+                elif attempt % max(1, num_keys * 3) == 0:
+                    print(f"  ├─ [Status / Faza 2]: {friendly_msg} (próba #{attempt}, ponawianie w tle)...")
                 time.sleep(wait_sec)
