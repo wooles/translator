@@ -2,7 +2,7 @@
   "anime_title": "Golden Kamuy",
   "characters": {
     "Saichi Sugimoto -> Asirpa": {
-      "description": "Zwrot: 'panno Asirpo / Asirpa-san' (towarzysze broni, lojalni partnerzy o silnej więzi opiekuńczej)"
+      "description": "Zwrot: 'na ty / po imieniu: Asirpa' (partnerzy i obrońca)"
     },
     "Asirpa -> Saichi Sugimoto": {
       "description": "Zwrot: 'Sugimoto (po nazwisku, bez tytulatury)' (równorzędni partnerzy w wyprawie)"
@@ -11,7 +11,7 @@
       "description": "Zwrot: 'ty prosiaczku / staruchu' (oprawca -> więzień/ofiara)"
     },
     "Tsukishima -> Koito": {
-      "description": "Zwrot: 'podporuczniku Koito / panie podporuczniku' (sierżant sztabowy -> bezpośredni przełożony oficer)"
+      "description": "Zwrot: 'podporuczniku Koito' (podwładny -> przełożony)"
     },
     "Kikuta -> Koito": {
       "description": "Zwrot: 'podporuczniku Koito' (starszy chorąży -> młodszy stopniem oficer)"
@@ -23,46 +23,160 @@
       "description": "Zwrot: 'szeregowy Usami / Tokishige-kun' (dowódca -> bezgranicznie oddany podwładny)"
     },
     "Sugimoto -> Asirpa": {
-      "description": "Zwrot: 'Asirpa / partnerko' (towarzysze broni / opiekun i podopieczna)"
+      "description": "Zwrot: 'Asirpa / po imieniu' (towarzysze broni i bliscy przyjaciele)"
+    },
+    "Shiraishi -> Botaro": {
+      "description": "Zwrot: 'Botaro / Pirat' (Współwięźniowie i kompani)"
+    },
+    "Tsurumi -> Podwładni": {
+      "description": "Zwrot: 'Po stopniach wojskowych (np. poruczniku Koito)' (Dowódca wojskowy -> podwładni)"
+    },
+    "Tsurumi -> Asirpa": {
+      "description": "Zwrot: 'Asirpa / dziewczynka' (Przesłuchujący / manipulator i więzień)"
+    },
+    "Tsurumi -> Sofia": {
+      "description": "Zwrot: 'Sofio / pani Zojo' (dawny znajomy/mściciel -> rewolucjonistka)"
+    },
+    "Sugimoto -> Shiraishi": {
+      "description": "Zwrot: 'Shiraishi' (towarzysze broni)"
+    },
+    "Ariko -> Sugimoto": {
+      "description": "Zwrot: 'Sugimoto' (Chwilowi sprzymierzeńcy)"
+    },
+    "Ariko -> Kikuta": {
+      "description": "Zwrot: 'panie starszy sierżancie Kikuta' (podwładny -> przełożony / towarzysze broni)"
+    },
+    "Koito -> Tsurumi": {
+      "description": "Zwrot: 'panie poruczniku Tsurumi' (podwładny bezgranicznie oddany dowódcy)"
+    },
+    "Kikuta Mokutarou -> Saichi Sugimoto": {
+      "description": "Zwrot: 'na ty / Norabo / chłopie' (sierżant -> rekrut / podopieczny)"
+    },
+    "Saichi Sugimoto -> Kikuta Mokutarou": {
+      "description": "Zwrot: 'panie sierżancie / sierżancie Kikuta' (rekrut -> przełożony)"
+    },
+    "Kaneko Kaeko -> Saichi Sugimoto": {
+      "description": "Zwrot: 'panie Yuusaku / panie Hanazawa' (kandydatka na żonę -> domniemany narzeczony)"
+    },
+    "Tokushirou Tsurumi -> Hidenobu Okuda": {
+      "description": "Zwrot: 'generale Okuda / panie generale' (podwładny -> dowódca dywizji)"
+    },
+    "Sugimoto -> Kikuta": {
+      "description": "Zwrot: 'sierżancie Kikuta / panie Kikuta' (młodszy towarzysz -> przełożony / mentor)"
+    },
+    "Kikuta -> Sugimoto": {
+      "description": "Zwrot: 'Norabo / Sugimoto' (starszy sierżant -> protegowany)"
+    },
+    "Tsurumi -> Kikuta": {
+      "description": "Zwrot: 'podporuczniku Kikuta' (dowódca -> podwładny (podwójny agent))"
+    },
+    "Tokushirou Tsurumi -> Shinpachi Nagakura": {
+      "description": "Zwrot: 'panie Nagakura (Nagakura-san)' (wrogowie / gracz polityczny i weteran)"
+    },
+    "Tatsuma Ushiyama -> Asirpa": {
+      "description": "Zwrot: 'Panienko' (obrońca -> podopieczna)"
+    },
+    "Tsurumi -> Tsukishima": {
+      "description": "Zwrot: 'sierżancie Tsukishima' (dowódca -> podwładny)"
+    },
+    "Hijikata -> Nagakura": {
+      "description": "Zwrot: 'Shinpachi / po imieniu' (dawni bracia broni z Shinsengumi)"
+    },
+    "Otonoshin Koito -> Tokushirou Tsurumi": {
+      "description": "Zwrot: 'panie poruczniku / poruczniku Tsurumi' (podwładny -> dowódca)"
+    },
+    "Shinpachi Nagakura -> Toshizou Hijikata": {
+      "description": "Zwrot: 'Hijikata / na ty' (bracia broni ze Shinsengumi)"
+    },
+    "Asirpa -> Tanigaki Genjiro": {
+      "description": "Zwrot: 'Tanigaki-Nispa' (szacunek łowczyni Ainu wobec honorowego towarzysza)"
+    },
+    "Hijikata -> Sugimoto": {
+      "description": "Zwrot: 'Sugimoto Saichi' (dawny dowódca samurajski szanujący determinację młodego żołnierza)"
     }
   },
   "glossary": {
-    "7th Division": "Siódma Dywizja (7. Dywizja Cesarskiej Armii)",
+    "7th Division": "Siódma Dywizja",
     "Jack the Ripper": "Kuba Rozpruwacz",
-    "Type 30 rifle": "Karabin Typ 30 (Arisaka Typ 30)",
-    "Type 38 rifle": "Karabin Typ 38 (Arisaka Typ 38)",
+    "Type 30 rifle": "Karabin Typ 30",
+    "Type 38 rifle": "Karabin Typ 38",
     "Firing pin": "Iglica",
-    "Surku / Wolfsbane": "Surku / Tojad",
-    "Aca": "Aca (Ojciec)",
-    "Nispa": "Nispa (Pan / Szanowny)",
+    "Surku / Wolfsbane": "Surku",
+    "Aca": "Aca",
+    "Nispa": "Nispa",
     "Menko": "Karty menko",
-    "Ainu": "Ainu (Ajnowie)",
-    "Nopperabo": "Nopperabo (Bez twarzy / Ojciec Asirpy)",
+    "Ainu": "Ainu",
+    "Nopperabo": "Nopperabo",
     "Sapporo Brewery": "Browar w Sapporo",
     "Immortal Sugimoto": "Nieśmiertelny Sugimoto",
     "Saichi Sugimoto": "Saichi Sugimoto",
     "Asirpa": "Asirpa",
-    "Yoshitake Shiraishi": "Yoshitake Shiraishi (Król Ucieczek)",
-    "Tokushirou Tsurumi": "Tokushirou Tsurumi (Porucznik Tsurumi)",
-    "Hyakunosuke Ogata": "Hyakunosuke Ogata (Snajper Ogata)",
+    "Yoshitake Shiraishi": "Yoshitake Shiraishi",
+    "Tokushirou Tsurumi": "Tokushirou Tsurumi",
+    "Hyakunosuke Ogata": "Hyakunosuke Ogata",
     "Genjirou Tanigaki": "Genjirou Tanigaki",
-    "Hajime Tsukishima": "Hajime Tsukishima (Sierżant Tsukishima)",
-    "Otonoshin Koito": "Otonoshin Koito (Podporucznik Koito)",
-    "Toshizou Hijikata": "Toshizou Hijikata (Były wicekapitan Shinsengumi)",
+    "Hajime Tsukishima": "Hajime Tsukishima",
+    "Otonoshin Koito": "Otonoshin Koito",
+    "Toshizou Hijikata": "Toshizou Hijikata",
     "Shinpachi Nagakura": "Shinpachi Nagakura",
-    "Tetsuzou Nihei": "Tetsuzou Nihei (Myśliwy Matagi)",
-    "Kamuy": "Kamuj (Bóstwo/Duch w wierzeniach Ajnów)",
-    "Kotan": "Kotan (Wioska Ajnów)",
-    "Citatap": "Citatap (Tradycyjna siekana potrawa Ajnów)",
-    "Hinna hinna": "Hinna hinna (Dziękuję za pyszne jedzenie w języku Ajnów)",
-    "Osoma": "Osoma (Kupa/Gówno w języku Ajnów / Miso wg Asirpy)",
-    "Retar": "Retar (Biały wilk ezo)",
-    "Abashiri Prison": "Więzienie Abashiri"
+    "Tetsuzou Nihei": "Tetsuzou Nihei",
+    "Kamuy": "Kamuj",
+    "Kotan": "Kotan",
+    "Citatap": "Citatap",
+    "Hinna hinna": "Hinna hinna",
+    "Osoma": "Osoma",
+    "Retar": "Retar",
+    "Abashiri Prison": "Więzienie Abashiri",
+    "Smallpox": "ospa prawdziwa",
+    "Steam pump": "pompa parowa",
+    "Ezo Republic": "Republika Ezo",
+    "Nagant": "Nagant",
+    "Wilk": "Wilk",
+    "Tattooed Convicts": "Wytatuowani więźniowie",
+    "Ainu Gold": "Złoto Ajnów",
+    "Karafuto": "Karafuto",
+    "Ako Prison": "Więzienie Akō",
+    "Vladivostok": "Władywostok",
+    "Pinky Bone": "Kość małego palca",
+    "Hachimaki": "Opaska na głowę",
+    "kamuy": "kamuj",
+    "cietoy": "cietoy",
+    "Makiri": "nóż makiri",
+    "Attus": "szata attus",
+    "Kene": "sok z olszy",
+    "Cepker": "buty ze skóry łososia",
+    "Ainu gold": "Złoto Ajnów",
+    "Regimental flag bearer": "Sztandarowy pułku",
+    "Mitsubishi zaibatsu": "Zaibatsu Mitsubishi",
+    "Imperial Hotel": "Hotel Imperialny",
+    "Rokumeikan": "Rokumeikan",
+    "Goryoukaku": "Twierdza Goryōkaku",
+    "Hakodate Magistrate": "Namiestnictwo Hakodate",
+    "Dead drop": "Martwa skrzynka",
+    "Bastion fort": "Fort bastionowy",
+    "Cietoi": "Ziemia okrzemkowa",
+    "deed book": "akt własności ziemi",
+    "Kaitenmaru": "okręt Kaitenmaru",
+    "opium poppy": "mak lekarski",
+    "Shinsengumi": "Shinsengumi",
+    "Satsuma": "Satsuma",
+    "Deed book": "Akt własności ziemi",
+    "Quiver": "Kołczan"
   },
   "relationships": {},
   "episodes_translated": [
     "tmp996h2his",
     "[ASW] Golden Kamuy - 52 [1080p HEVC][B92A80B5]",
-    "Kanon Mangi"
+    "Kanon Mangi",
+    "[ASW] Golden Kamuy - 53 [1080p HEVC][39C4B9EA]",
+    "[ASW] Golden Kamuy - 54 [1080p HEVC][029DCA46]",
+    "[ASW] Golden Kamuy - 55 [1080p HEVC][F4BE9E19]",
+    "[ASW] Golden Kamuy - 56 [1080p HEVC][A4842B6E]",
+    "[ASW] Golden Kamuy - 57 [1080p HEVC][BC7A67CC]",
+    "[ASW] Golden Kamuy - 58 [1080p HEVC][AE367B6A]",
+    "[ASW] Golden Kamuy - 59 [1080p HEVC][867DEE0B]",
+    "[ASW] Golden Kamuy - 60 [1080p HEVC][CAF7567C]",
+    "[ASW] Golden Kamuy - 61 [1080p HEVC][FFD813D3]",
+    "[ASW] Golden Kamuy - 62 [1080p HEVC][E14D8958]"
   ]
 }

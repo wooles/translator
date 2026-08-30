@@ -76,10 +76,12 @@ class SeriesBible:
                     self.data["characters"][name]["description"] = details
 
         if glossary:
+            import re
             for k, v in glossary.items():
-                # Store non-trivial terms only
+                # Store non-trivial terms only and sanitize parenthetical descriptions
                 if k and v and len(k) > 1 and len(v) > 1:
-                    self.data["glossary"][k] = v
+                    clean_v = re.sub(r"\s*[\(\[].*?[\)\]]", "", v).strip()
+                    self.data["glossary"][k] = clean_v if clean_v else v.strip()
 
         self.save()
 

@@ -105,10 +105,10 @@ class GlossaryManager:
 
     @classmethod
     def clean_target_term(cls, trg: str) -> str:
-        """Removes parenthetical clarifications (e.g., 'Płomień Adolli (Adolla Burst)' -> 'Płomień Adolli')."""
+        """Removes parenthetical clarifications (e.g., 'Tus (Miasto w Persji)' -> 'Tus', 'Płomień Adolli (Adolla Burst)' -> 'Płomień Adolli')."""
         if not trg:
             return ""
-        cleaned = re.sub(r"\s*\([^)]*\)$", "", trg).strip()
+        cleaned = re.sub(r"\s*[\(\[].*?[\)\]]", "", trg).strip()
         return cleaned if cleaned else trg.strip()
 
     @classmethod

@@ -15,12 +15,12 @@
     }
   },
   "glossary": {
-    "Mage / Sorcerer / Warlock / Caster": "Wiedun / Wieduni",
-    "Majuu / Demonic Beast / Shadow Beast": "Demoniczna Bestia / Bestia Mroku",
+    "Mage / Sorcerer / Warlock / Caster": "Wiedun",
+    "Majuu / Demonic Beast / Shadow Beast": "Demoniczna Bestia",
     "Thirteen Heroes / 13 Heroes": "Trzynastu Bohaterów",
     "Hero Armament / Hero Weapon": "Oręż Bohatera",
     "Kingdom of Hiden": "Królestwo Hiden",
-    "Demon King / King of Beasts": "Król Bestii / Władca Bestii"
+    "Demon King / King of Beasts": "Król Bestii"
   },
   "relationships": {
     "Clevatess -> Alicia": "Zwrot: Alicio / człowiecza dziewko / na ty (wyniosły władca bestii -> ludzka bohaterka)",

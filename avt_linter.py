@@ -289,15 +289,19 @@ class AVTLinter:
                         modified = re.sub(pat, good_choice, modified, flags=re.IGNORECASE)
                         applied_fixes.append(f"[Korekta Użytkownika] '{variant}' -> '{good_choice}'")
 
-        # 3. Strict glossary overrides
+        # 3. Strict glossary overrides (Sanitized from parenthetical notes/brackets)
         if custom_glossary:
-            for src, trg in custom_glossary.items():
-                if not src or not trg or src.lower() == trg.lower():
+            for src, raw_trg in custom_glossary.items():
+                if not src or not raw_trg:
+                    continue
+                # Strip parenthetical clarifications e.g. "Tus (Miasto w Persji)" -> "Tus"
+                clean_trg = re.sub(r"\s*[\(\[].*?[\)\]]", "", raw_trg).strip()
+                if not clean_trg or src.lower() == clean_trg.lower():
                     continue
                 pat_src = rf"\b{re.escape(src)}\b"
                 if re.search(pat_src, modified, re.IGNORECASE):
-                    modified = re.sub(pat_src, trg, modified, flags=re.IGNORECASE)
-                    applied_fixes.append(f"[Słownik Deterministyczny] '{src}' -> '{trg}'")
+                    modified = re.sub(pat_src, clean_trg, modified, flags=re.IGNORECASE)
+                    applied_fixes.append(f"[Słownik Deterministyczny] '{src}' -> '{clean_trg}'")
 
         # 4. Grammatical gender alignment for all-female scenes (Pillar XIII)
         if is_all_girls_scene and not is_sign:

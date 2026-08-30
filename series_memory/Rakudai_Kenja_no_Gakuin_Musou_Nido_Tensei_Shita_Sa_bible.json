@@ -1,0 +1,30 @@
+{
+  "anime_title": "Rakudai Kenja no Gakuin Musou: Nido Tensei Shita Saikyou Kenja, 400-nengo no Sekai wo Maken de Musou",
+  "characters": {
+    "Anastasia -> Eftal": {
+      "description": "Zwrot: 'Mistrzu / panie Eftalu' (uczen -> nauczyciel)"
+    },
+    "Merlin -> Eftal": {
+      "description": "Zwrot: 'Eftal / Mistrzu Eftalu' (pierwsza uczennica -> nauczyciel)"
+    },
+    "Merlin -> Maria": {
+      "description": "Zwrot: 'Siostrzyczko Mario' (udawane dziecko -> nauczycielka)"
+    },
+    "Anastasia -> Merlin": {
+      "description": "Zwrot: 'Merlin' (koleżanki / uczennice tego samego mistrza)"
+    }
+  },
+  "glossary": {
+    "Noble Inquisition Organization": "Szlachecka Organizacja Inkwizycyjna",
+    "Special Slave Crest": "Specjalna Pieczęć Niewolnicza",
+    "Contract Beast": "Bóstwo Kontraktu",
+    "Seraph Dispel": "Rozproszenie Serafina",
+    "Yunotron": "Yunotron",
+    "Magia Monolith": "Monolit Magii",
+    "Magia Burst": "Eksplozja Magii"
+  },
+  "relationships": {},
+  "episodes_translated": [
+    "[ASW] Rakudai Kenja no Gakuin Musou - 10 [1080p HEVC][EB8519C9]"
+  ]
+}
