@@ -872,15 +872,10 @@ class MultimodalTranslator:
                         wait_time = min(3.0, 0.6 + 0.4 * min(cycle, 4) + random.uniform(0.1, 0.3))
 
                 friendly_msg = format_friendly_api_error(e)
-                now = _time.monotonic()
                 with MultimodalTranslator._STATUS_LOCK:
                     if not MultimodalTranslator._STATUS_ACTIVE:
                         print(f"\n[Status / Faza 1]: {friendly_msg} -> oczekiwanie na serwery Google i automatyczna rotacja kluczy...")
                         MultimodalTranslator._STATUS_ACTIVE = True
-                        MultimodalTranslator._LAST_STATUS_TIME = now
-                    elif now - MultimodalTranslator._LAST_STATUS_TIME > 25.0:
-                        print(f"⏳ [Status / Faza 1]: {friendly_msg} (próba #{attempt}, oczekiwanie na odpowiedź Google)...")
-                        MultimodalTranslator._LAST_STATUS_TIME = now
 
                 time.sleep(wait_time)
 

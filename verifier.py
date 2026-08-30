@@ -269,14 +269,9 @@ class DialogueVerifier:
                         wait_sec = min(3.0, 0.6 + 0.4 * min(cycle, 4) + random.uniform(0.1, 0.3))
                 
                 friendly_msg = format_friendly_api_error(e)
-                now = _time.monotonic()
                 with DialogueVerifier._STATUS_LOCK:
                     if not DialogueVerifier._STATUS_ACTIVE:
                         print(f"\n[Status / Faza 2]: {friendly_msg} -> oczekiwanie na serwery Google i automatyczna rotacja kluczy...")
                         DialogueVerifier._STATUS_ACTIVE = True
-                        DialogueVerifier._LAST_STATUS_TIME = now
-                    elif now - DialogueVerifier._LAST_STATUS_TIME > 25.0:
-                        print(f"⏳ [Status / Faza 2]: {friendly_msg} (próba #{attempt}, oczekiwanie na odpowiedź Google)...")
-                        DialogueVerifier._LAST_STATUS_TIME = now
 
                 time.sleep(wait_sec)
