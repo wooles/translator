@@ -56,6 +56,57 @@ class AudioProsodyEngine:
             return None
 
     @classmethod
+    def detect_intra_line_pause(cls, samples: np.ndarray, min_pause_ms: int = 600) -> Optional[int]:
+        """
+        Detects significant suspense/breath pauses (silence gap >= min_pause_ms)
+        within an ongoing spoken dialogue line. Returns pause duration in ms or None.
+        """
+        if samples is None or len(samples) < 16000 * 1.5:  # Requires at least 1.5s duration
+            return None
+
+        window_size = 800  # 50ms at 16kHz
+        if len(samples) < window_size * 4:
+            return None
+
+        chunks = [samples[i:i+window_size] for i in range(0, len(samples), window_size)]
+        chunk_energies = [np.sqrt(np.mean(c**2)) for c in chunks if len(c) == window_size]
+        if not chunk_energies:
+            return None
+
+        max_energy = max(chunk_energies)
+        if max_energy < 5.0:
+            return None
+
+        # Silence threshold: 12% of peak energy or background floor
+        silence_threshold = max(2.0, max_energy * 0.12)
+        is_silence = [e < silence_threshold for e in chunk_energies]
+
+        # Ignore initial 200ms and final 200ms
+        trim_start = 4
+        trim_end = len(is_silence) - 4
+        if trim_end <= trim_start:
+            return None
+
+        middle_silence = is_silence[trim_start:trim_end]
+        
+        # Count longest consecutive silence block in the middle
+        max_consecutive = 0
+        current_consecutive = 0
+        for s in middle_silence:
+            if s:
+                current_consecutive += 1
+                if current_consecutive > max_consecutive:
+                    max_consecutive = current_consecutive
+            else:
+                current_consecutive = 0
+
+        pause_ms = max_consecutive * 50
+        if pause_ms >= min_pause_ms:
+            return pause_ms
+
+        return None
+
+    @classmethod
     def analyze_scene_prosody(
         cls,
         wav_path: str,
@@ -63,8 +114,9 @@ class AudioProsodyEngine:
         events: List[Tuple[int, Any]]
     ) -> Dict[int, str]:
         """
-        Analyzes phonic characteristics (RMS dBFS, dynamics, tempo) for all dialogue events in a batch.
-        Returns a dictionary: {batch_id: 'tone_description'} (e.g. {1: 'cichy szept', 2: 'krzyk / wzburzenie'}).
+        Analyzes phonic characteristics (RMS dBFS, dynamics, tempo, emotion, breath pauses)
+        for all dialogue events in a batch.
+        Returns a dictionary: {batch_id: 'tone_description'}
         """
         if not wav_path or not os.path.exists(wav_path):
             return {}
@@ -92,25 +144,31 @@ class AudioProsodyEngine:
             peak = np.max(np.abs(samples))
             peak_dbfs = 20 * math.log10(max(1.0, peak) / 32767.0)
 
-            # Detect tone characteristics
+            # Detect tone characteristics and emotional expression
             tags = []
-            if dbfs < -33.0:
-                tags.append("cichy szept / niepewność")
-            elif dbfs > -13.0 or peak_dbfs > -1.5:
-                tags.append("krzyk / wysokie emocje / wzburzenie")
+            if dbfs < -34.0:
+                tags.append("cichy szept / monolog wewnętrzny")
+            elif dbfs > -12.0 or peak_dbfs > -1.0:
+                tags.append("krzyk bojowy / silne wzburzenie emocjonalne")
 
-            # Analyze speech duration and energy variance (trembling / rapid)
+            # Analyze speech duration and energy variance (trembling / rapid / calm sarcasm)
             duration_s = (ev.end - ev.start) / 1000.0
             if duration_s > 0:
-                # Energy variance in 50ms windows
                 window_size = 800  # 50ms at 16kHz
                 if len(samples) > window_size * 2:
                     chunks = [samples[i:i+window_size] for i in range(0, len(samples), window_size)]
                     chunk_energies = [np.sqrt(np.mean(c**2)) for c in chunks if len(c) == window_size]
                     if chunk_energies:
                         energy_std = np.std(chunk_energies) / (rms + 1e-5)
-                        if energy_std > 0.85 and "krzyk" not in str(tags):
-                            tags.append("emocjonalne drżenie głosu")
+                        if energy_std > 0.90 and "krzyk" not in str(tags):
+                            tags.append("emocjonalne drżenie głosu / płacz")
+                        elif energy_std < 0.28 and -28.0 <= dbfs <= -18.0:
+                            tags.append("chłodny sarkazm / opanowany dystans")
+
+            # Detect intra-line dramatic breath pause (suspense)
+            pause_ms = cls.detect_intra_line_pause(samples, min_pause_ms=650)
+            if pause_ms:
+                tags.append(f"dramatyczna pauza oddechowa seiyuu (~{pause_ms}ms)")
 
             if tags:
                 results[b_id] = " | ".join(tags)

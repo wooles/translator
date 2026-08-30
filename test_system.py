@@ -680,7 +680,18 @@ def test_prosody_and_diarizer():
     f0_est_male = SpeakerVoiceClassifier.estimate_pitch_f0(sine_120hz, sample_rate=sr)
     assert f0_est_male is not None
     assert 110.0 <= f0_est_male <= 130.0
-    print(" -> PASSED: Autokorelacja foniczna i estymacja pasma F0 działają perfekcyjnie.")
+
+    # Test detektora dramatycznych przerw oddechowych seiyuu (Breath-Pause AVT)
+    # 2.0s sygnał: 0.5s mowa + 0.8s cisza + 0.7s mowa
+    speech_part1 = (np.sin(2 * np.pi * 200 * np.linspace(0, 0.5, int(sr * 0.5))) * 10000).astype(np.float32)
+    silence_part = np.zeros(int(sr * 0.8), dtype=np.float32)
+    speech_part2 = (np.sin(2 * np.pi * 200 * np.linspace(0, 0.7, int(sr * 0.7))) * 10000).astype(np.float32)
+    synthetic_pause_audio = np.concatenate([speech_part1, silence_part, speech_part2])
+    
+    detected_pause = AudioProsodyEngine.detect_intra_line_pause(synthetic_pause_audio, min_pause_ms=600)
+    assert detected_pause is not None
+    assert 700 <= detected_pause <= 850
+    print(" -> PASSED: Autokorelacja foniczna, estymacja F0 i detektor przerw oddechowych seiyuu (Breath-Pause) działają perfekcyjnie.")
 
 def test_typesetting_matcher():
     print("[TEST 12/12] Test auto-kolorowania napisów ekranowych (typesetting_matcher)...")

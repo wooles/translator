@@ -1452,11 +1452,17 @@ PROTOKÓŁ TRIANGULACJI TRÓJKĄTA PRZEKŁADU (AUDIO JP VS SKRYPT EN VS WSTĘPNE
 1. KROK 1: WERYFIKACJA ZE SŁUCHEM I INTENCJĄ JAPOŃSKIEGO AKTORA (AUDIAL CHECK):
    - Analizuj transkrypcję japońskiego audio (Whisper), [Rejestr Pragmatyczny JP] oraz [Dosłowny Sens JP].
    - Zastosuj właściwą polszczyznę dla zidentyfikowanego rejestru (feudalna dla wasala, twarda dla żołnierza, arystokratyczna dla damy, wyznanie 'Kocham cię' dla Kokuhaku).
-2. KROK 2: WERYFIKACJA WIZUALNO-KINEZYCZNA (VISUAL CHECK):
-   - Sprawdź [Wizja & Mimika]:
+2. KROK 2: WERYFIKACJA WIZUALNO-KINEZYCZNA I PRZESTRZENNA (VISUAL & PROXEMIC CHECK):
+   - Sprawdź [Wizja & Mimika] oraz [Układ Przestrzenny / Hierarchię Władzy]:
+     * Gdy rozmówca klęczy/składa pokłon przed władcą (np. Ögedej, generał, król) -> BEZWZGLĘDNIE wymuś szacunek poddańczy ("Wasza Wysokość", "Chanie", "Mój panie") bez nieuzasadnionej poufałości!
      * Gdy to monolog wewnętrzny lub postać tyłem (Off-screen) -> masz pełną swobodę rozwinięcia bogatej frazy poetyckiej bez ograniczeń ruchu ust!
      * Gdy to zbliżenie na usta (On-screen) -> dopasuj długość kwestii do zwięzłej polszczyzny kinowej.
-3. KROK 3: ODRZUCENIE GRAWITACJI ANGIELSKIEGO (DE-ANGLICIZATION):
+3. KROK 3: WERYFIKACJA PROZODII I PRZERW ODDECHOWYCH SEIYUU (ACOUSTIC & BREATH-PAUSE CHECK):
+   - Sprawdź [Ton / Ekspresję Głosu]:
+     * "Cichy szept / Monolog wewnętrzny" -> eliminuj zbędne wykrzykniki, stosuj miękkie, intymne i stonowane słownictwo.
+     * "Krzyk bojowy / Wzburzenie" -> stosuj ostre, energiczne czasowniki i dynamiczny szyk zdania.
+     * "Dramatyczna pauza oddechowa seiyuu" -> wstaw w miejscu pauzy naturalny wielokropek (...) lub myślnik (—), zachowując kinowy suspens oddechu aktora.
+4. KROK 4: ODRZUCENIE GRAWITACJI ANGIELSKIEGO (DE-ANGLICIZATION):
    - Jeśli angielski skrypt spłaszczył japoński niuans (np. "They" zamiast Kanojo-tachi, "Please" zamiast rozkazu, "Thank you" zamiast Giri, "I see" zamiast Aizuchi), BEZWZGLĘDNIE ODRZUĆ angielski i oprzyj się w 100% na japońskim audio i kadrze!
    - ZASADA ZWIĘZŁOŚCI I EKONOMII SYLAB DLA KRÓTKICH FRAZ JAPOŃSKICH (Barańczak / Belczyk AVT):
      * Gdy seiyuu wypowiada krótką, 2-3 sylabową frazę (np. "Daijoubu", "Wakatta", "Sou da na", "Shikata ga nai"), BEZWZGLĘDNIE ZABRANIA SIĘ przejmowania rozwlekłych konstrukcji angielskich (np. "You don't need to worry", "As I thought", "It is what it is").
