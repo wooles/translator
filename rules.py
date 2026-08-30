@@ -198,9 +198,15 @@ FILAR XX: EKWIWALENCJA PRAGMATYCZNA I AKTY MOWY (MONA BAKER & EUGENE NIDA):
   * KATEGORYCZNY ZAKAZ dosłownego "To jest trochę trudne", gdy bohater odmawia!
   * POPRAWNIE: "Obawiam się, że to niemożliwe", "Niestety, wykluczone", "Nie ma mowy".
 
-FILAR XXI: EKSPLIKACJA PODTEKSTU I TEORIA IMPLIKATUR (PAUL GRICE & HARAGEI UNPACKING):
-- W kulturze japońskiej sens bywa przemilczany ("Sore wa chotto..."). W języku polskim wymagana jest umiarkowana eksplikacja intencji odmowy ("Obawiam się, że to niemożliwe", "Wykluczone") zamiast urwanego "To trochę...".
-- Odkodowywanie presupozycji i implikatur konwersacyjnych: jeśli podtekst jest kluczowy dla zrozumienia sceny przez polskiego widza, wyartykułuj go zwięźle.
+FILAR XXI: EKSPLIKACJA PODTEKSTU, IMPLIKATURY I MATRYCA FORMUŁ PHATYCZNYCH (PAUL GRICE & ANIMESUB.INFO STANDARD):
+- 1. EKSPLIKACJA PODTEKSTU (HARAGEI UNPACKING):
+  * W kulturze japońskiej sens bywa przemilczany ("Sore wa chotto..."). W języku polskim wymagana jest umiarkowana eksplikacja intencji odmowy ("Obawiam się, że to niemożliwe", "Wykluczone") zamiast urwanego "To trochę...".
+- 2. ZŁOTA MATRYCA FORMUŁ PHATYCZNYCH (ANIMESUB.INFO KANON):
+  * "Itadakimasu" -> Zależnie od sytuacji scenicznej: "Dzięki za jedzenie!", "No to jemy!", "Wygląda pysznie!", "Dziękuję za posiłek!" (KATEGORYCZNY ZAKAZ mówienia "Smacznego" samemu do siebie w pustym pokoju!).
+  * "Gochisousama (deshita)" -> "Dziękuję, było pyszne!", "Dzięki za poczęstunek!", "Najadłem się!".
+  * "Otsukaresama (deshita)" -> Po pracy/walce: "Dobra robota", "Dzięki za dziś", "Należał wam się odpoczynek"; w korytarzu biura: "Dzień dobry".
+  * "Shouganai / Shikata ga nai" -> "Trudno", "Przepadło", "Nie mamy wyboru", "I tak byśmy tego nie zmienili" (ZAKAZ sztywnego: "Nic nie da się zrobić").
+  * "Tadaima / Okaeri" -> "Już jestem! / Wróciłem!" oraz "Witaj w domu! / Już jesteś!".
 
 FILAR XXII: PRZEKŁAD TYTUŁÓW DZIEŁ, MITOLOGII I INTERTEKSTUALNOŚCI (ALLUSION & CANON RECOGNITION):
 - Cytaty, nawiązania literackie, mitologiczne i popkulturowe:
@@ -888,22 +894,28 @@ FILAR CXVII: PRAGMATYKA ODMOWY „...WA II DESU / KEKKOU DESU” (I'M FINE JAKO 
     - W odpowiedzi na zaproszenie/wyjście: „Ja... podziękuję.”, „Nie mam ochoty.”, „Ja... zostanę.”, „Spasuję.”.
     - W odpowiedzi na poczęstunek/pomoc: „Dziękuję, obejdzie się.”, „Nie trzeba.”, „Dziękuję, nie trzeba.”.
 
-FILAR CXVIII: STALOWA REGUŁA OP/ED I KANON STANISŁAWA BARAŃCZAKA (SONG & RHYME METRE):
+FILAR CXVIII: STALOWA REGUŁA OP/ED ORAZ TRANSKREACJA BARAŃCZAKOWSKA (DAJARE, GOROAWASE & SONG METRE):
 - 1. ŻELAZNY ZAKAZ TŁUMACZENIA PIOSENEK Z OPENINGÓW I ENDINGÓW (OP/ED):
   * Wersy piosenek z czołówek (Opening) i tyłówek (Ending) są BEZWZGLĘDNIE ZACHOWYWANE W ORYGINALNYM TEKŚCIE (Romaji / stylizacja japońska / oryginalny zapis).
   * System NIE tłumaczy piosenek OP/ED, co gwarantuje autentyczność ścieżki i oszczędza 100% tokenów API.
-- 2. PIOSENKI DIEGETYCZNE I WIERSZE W FABULE (TRANSKREACJA SYLABICZNA WG BARAŃCZAKA):
+- 2. TRANSKREACJA GIER SŁOWNYCH, KALAMBURÓW I SUCHARÓW (DAJARE & GOROAWASE ANSI STANDARD):
+  * Japońskie gry słowne oparte na homonimii (Dajare / Oyaji Gag) oraz skojarzeniach liczbowych (Goroawase, np. 4649 = yoroshiku) podlegają zasadzie KOMPENSACJI SEMANTYCZNEJ STANISŁAWA BARAŃCZAKA:
+    -> Bezwzględny zakaz dosłownego tłumaczenia, które niszczy humor i sens sceny!
+    -> Tłumacz ma obowiązek stworzyć polski kalambur fonetyczny lub żart sytuacyjny o identycznej funkcji komicznej (np. suchar wywołujący zażenowanie otoczenia lub błyskotliwy rym).
+- 3. PIOSENKI DIEGETYCZNE I WIERSZE W FABULE (TRANSKREACJA SYLABICZNA WG BARAŃCZAKA):
   * Wyłącznie gdy bohater wewnątrz sceny śpiewa kołysankę, pieśń biesiadną lub recytuje wiersz fabularny:
     1. Ekwiwalencja rytmiczna: zachowaj zbliżoną liczbę sylab w każdym wersie (np. 8- lub 10-zgłoskowiec).
     2. Rymy naturalne (AABB lub ABAB): twórz czyste, zgrabne polskie rymy.
     3. Śpiewność i kadencja: polski tekst musi dać się zanucić w rytm melodii postaci.
 
-FILAR CXIX: MATRYCA IDIOLEKTÓW I SPECJALIZACJA WOKALNA POSTACI (CHARACTER IDIOLECT & UNIQUE VOCAL FINGERPRINT):
+FILAR CXIX: MATRYCA IDIOLEKTÓW I JĘZYK RÓL YAKUWARIGO (ANIMESUB.INFO CHARACTER ARCHETYPES):
 - Każda postać w anime musi posiadać własny, rozpoznawalny profil językowy w polskim przekładzie:
-  * 1. Chuligan / Delikwent / Wojownik: krótkie równoważniki zdań, twarda leksyka, brak form 'Pan/Pani', szorstki styl.
-  * 2. Arystokratka / Dama / Książę: wykwintna składnia, peryfrazy, chłodny dystans, arystokratyczne honoryfikacje.
-  * 3. Erudyta / Naukowiec / Mag: precyzyjne łączniki logiczne ('zważywszy na', 'w konsekwencji'), profesjonalna terminologia.
-  * 4. Tsundere: pozorna szorstkość maskująca troskę, urwane frazy ('B-Baka' -> 'Głupi jesteś...', 'Wcale nie robię tego dla ciebie!').
+  * 1. Arystokratka / Ojou-sama / Dama ('watakushi', 'desu wa'): wykwintna salonowa składnia, peryfrazy, chłodny dystans ("Doprawdy, to zbyteczne", "Czy zechciałby pan...").
+  * 2. Mędrzec / Starzec ('washi', 'ja', 'noja'): łagodna, lekko staroświecka polszczyzna ("Młodziku", "Powiadam ci", "Wżdy").
+  * 3. Samuraj / Rycerz ('sessha', 'de gozaru'): dostojny etos rycerski, zwięzłość, powaga, zero współczesnego slangu ("Jam jest...", "Czynię swą powinność").
+  * 4. Yankii / Delikwent / Wojownik ('ore-sama', 'temee', 'koraa'): krótkie równoważniki zdań, twarda leksyka, brak form 'Pan/Pani', szorstki styl potoczny.
+  * 5. Tsundere: pozorna szorstkość maskująca troskę, urwane frazy ('B-Baka' -> 'Głupi jesteś...', 'Wcale nie robię tego dla ciebie!').
+  * 6. Erudyta / Naukowiec / Mag: precyzyjne łączniki logiczne ('zważywszy na', 'w konsekwencji'), profesjonalna terminologia.
 
 FILAR CXX: IDENTYFIKACJA POSTACI TYPU TOMBOY / SPORTOWIEC ORAZ MÓWCÓW NIEWIDOCZNYCH (GENDER IDENTIFICATION & OFF-SCREEN SPEAKER COGNITION):
 - 1. Dziewczyny o Chłopięcym Wyglądzie (Tomboy / Bokserki / Krótkie Włosy):
@@ -952,13 +964,15 @@ FILAR CXXV: ERGONOMIA GAGÓW SLAPSTICKOWYCH I KOMEDII FIZYCZNEJ (VISUAL SLAPSTIC
   * ŻELAZNA REGUŁA: Zredukuj tekst do maksymalnie 1–3 słów wykrzyknikowych o natychmiastowym odbiorze:
     -> „Ała!”, „Stój, durniu!”, „Oszalałeś?!”, „Z drogi!”, „Pomocy!”, „Ani kroku dalej!”.
 
-FILAR CXXVI: SOCJOLEKT KANSAI I DIALEKTY REGIONALNE (KANSAI-BEN & HŌGEN DIALECT CONVERSION):
-- W przypadku dialektów regionalnych (Kansai-ben: Osaka, Kioto, Kobe; partykuły: -nen, -ya, -honma, -akan, -seya):
-  * KATEGORYCZNY ZAKAZ tworzenia sztucznej karykatury góralskiej ('hej bawocek')!
-  * WYMÓG ZADZIORNEJ POLSZCZYZNY MIEJSKIEJ:
-    -> 'Nande ya nen!' -> 'Co ty bredzisz?!', 'Chyba cię głowa boli!'.
+FILAR CXXVI: SOCJOLEKT KANSAI I DIALEKTY REGIONALNE (ANIMESUB.INFO KANSAI-BEN & HŌGEN STANDARD):
+- W przypadku dialektów regionalnych (Kansai-ben: Osaka, Kioto, Kobe; partykuły: -nen, -ya, -honma, -akan, -seya, -dappe):
+  * KATEGORYCZNY ZAKAZ tworzenia sztucznej karykatury góralskiej czy śląskiej ('hej bawocek')!
+  * WYMÓG ŻYWEJ POLSZCZYZNY GAWĘDZIARSKO-MIEJSKIEJ I KUPICIEJ (ZADZIORNOŚĆ, HUMOR, SERDECZNOŚĆ):
+    -> 'Nande ya nen!' -> 'Co ty bredzisz?!', 'Chyba cię głowa boli!', 'A to ci heca!'.
     -> 'Honma ni akan...' -> 'No to leżymy...', 'Mogiła...', 'Nie ma mowy...'.
     -> 'Seyana' -> 'No ba!', 'A jakże!', 'Pewnie!'.
+    -> 'Ookini!' -> 'Wielkie dzięki!', 'Dzięki stokrotne!'.
+    -> Stosuj żywe polskie partykuły i konstrukcje retoryczne: "widzisz go!", "no przecie", "ani chybi", "człowieku!".
 
 FILAR CXXVII: SOCJOLEKT PÓŁŚWIATKA I GANGSTERÓW (YAKUZA & DELINQUENT JARGON):
 - W wypowiedziach chuliganów, gangsterów, yakuzy i bandytów:

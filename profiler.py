@@ -223,7 +223,8 @@ class EpisodeProfiler:
             self.client_pool = client
         else:
             from client_factory import MultiKeyClientPool
-            self.client_pool = MultiKeyClientPool(raw_keys=os.getenv("GEMINI_API_KEY"), timeout_sec=45.0)
+            timeout_sec = float(os.getenv("GEMINI_HTTP_TIMEOUT_SEC", "90.0"))
+            self.client_pool = MultiKeyClientPool(raw_keys=os.getenv("GEMINI_API_KEY"), timeout_sec=timeout_sec)
         self.model = model
 
     def profile_episode(
@@ -252,10 +253,10 @@ Twoim zadaniem jest dogłębna, wszechstronna analiza 100% skryptu całego odcin
 3. PUNKTY ZWROTNE I ZMIANY RELACJI (relationship_pivots): Wskaż momenty w odcinku, w których następuje przełom i zmiana formy zwracania się do siebie (np. przejście z 'pani' na 'ty').
 4. POWIEDZONKA I KWESTIE-WIZYTÓWKI (character_catchphrases): Ustal jedno, kanoniczne polskie tłumaczenie dla powtarzających się motywów/zawołań postaci.
 5. MATRYCA METRYCZNA DLA PIOSENEK OP/ED (song_transcreation_plans): Rozpoznaj piosenki i ustal plan sylabiczny (np. 8 sylab) i rymy Barańczaka (AABB/ABAB).
-6. KALAMBURY I GRY SŁOWNE (puns_and_wordplays): Przekształć japońskie Dajare na autonomiczne polskie gry słowne bez przypisów [Przyp. tłum.].
+6. KALAMBURY I GRY SŁOWNE (puns_and_wordplays): Przekształć japońskie Dajare i Goroawase na autonomiczne polskie gry słowne wg zasad Stanisława Barańczaka (bez przypisów [Przyp. tłum.]!).
 7. MOSTY CIĄGŁOŚCI (continuity_bridge_alerts): Wskaż terminy i wątki wymagające żelaznej spójności z całą serią.
 8. CHRONOLOGICZNA MAPA SEKWENCJI DRAMATURGICZNYCH (dramatic_sequences): Podziel odcinek na 3-4 akty/sekwencje czasowe z opisem napięcia i tonu.
-9. KARTOTEKA OBSADY I UNIKALNE IDIOLEKTY (character_dossiers): Określ wiek, status, japońskie zaimki 'ja' (Ore/Boku/Watashi) i unikalny polski rejestr mowy każdej postaci.
+9. KARTOTEKA OBSADY I IDIOLEKTY YAKUWARIGO (character_dossiers): Określ wiek, status, japońskie zaimki (Ore/Boku/Watashi/Washi/Sessha), dialekt (Kansai-ben) i unikalny polski rejestr mowy (Ojou-sama salonowy, Starzec staroświecki, Samuraj rycerski, Yankii szorstki, Kansai gawędziarski).
 10. TABELA ODMIANY IMION PRZEZ PRZYPADKI (name_declensions) & MATRYCA RELACJI I TYTULATURY (characters).
 11. SŁOWNICZEK POJĘĆ BRANŻOWYCH (glossary) ORAZ JAPOŃSKICH PRZYSŁÓW/IDIOMÓW (yojijukugo_and_idioms): Podawaj wyłącznie CZYSTE, DOCELOWE polskie nazwy własne i terminy bez żadnych dopisków w nawiasach.
 12. EPOKA, REALIA ŚWIATA I DZIEDZINA SPECJALISTYCZNA.
