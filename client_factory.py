@@ -38,9 +38,11 @@ def format_friendly_api_error(e: Exception) -> str:
         return raw if raw else "Oczekiwanie na odpowiedź serwera"
 
 
+DEFAULT_HTTP_TIMEOUT_SEC = float(os.getenv("GEMINI_HTTP_TIMEOUT_SEC", "90.0"))
+
 def get_genai_client(
     api_key: Optional[str] = None,
-    timeout_sec: float = 45.0,
+    timeout_sec: float = DEFAULT_HTTP_TIMEOUT_SEC,
     timeout_ms: Optional[int] = None,
     force_ai_studio: bool = False
 ) -> genai.Client:
@@ -105,7 +107,7 @@ class MultiKeyClientPool:
     def __init__(
         self,
         raw_keys: Optional[str] = None,
-        timeout_sec: float = 45.0,
+        timeout_sec: float = DEFAULT_HTTP_TIMEOUT_SEC,
         timeout_ms: Optional[int] = None
     ):
         import threading

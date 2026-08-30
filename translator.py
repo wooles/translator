@@ -515,6 +515,7 @@ class BatchTranslationResponse(BaseModel):
 class MultimodalTranslator:
     _STATUS_LOCK = threading.Lock()
     _STATUS_ACTIVE: bool = False
+    _LAST_STATUS_TIME: float = 0.0
 
     def __init__(
         self,
@@ -536,7 +537,7 @@ class MultimodalTranslator:
                 "lub utwórz plik .env z wpisem GEMINI_API_KEY=twój_klucz"
             )
         
-        timeout_sec = float(os.getenv("GEMINI_HTTP_TIMEOUT_SEC", "45.0"))
+        timeout_sec = float(os.getenv("GEMINI_HTTP_TIMEOUT_SEC", "90.0"))
         from client_factory import get_genai_client, MultiKeyClientPool
         self.client_pool = MultiKeyClientPool(raw_keys=self.api_key, timeout_sec=timeout_sec)
         self.client = self.client_pool.get_client()
@@ -820,6 +821,7 @@ class MultimodalTranslator:
                         if MultimodalTranslator._STATUS_ACTIVE:
                             print(f"  └─ [OK / Faza 1]: Połączenie z Google API przywrócone.")
                             MultimodalTranslator._STATUS_ACTIVE = False
+                            MultimodalTranslator._LAST_STATUS_TIME = 0.0
                     return response.parsed
                 else:
                     res = schema_class.model_validate(json.loads(response.text))
@@ -827,6 +829,7 @@ class MultimodalTranslator:
                         if MultimodalTranslator._STATUS_ACTIVE:
                             print(f"  └─ [OK / Faza 1]: Połączenie z Google API przywrócone.")
                             MultimodalTranslator._STATUS_ACTIVE = False
+                            MultimodalTranslator._LAST_STATUS_TIME = 0.0
                     return res
 
             except Exception as e:
@@ -856,6 +859,7 @@ class MultimodalTranslator:
                 is_rate_limit = "429" in err_str or "quota" in err_str or "resource_exhausted" in err_str or "rate" in err_str
 
                 import random
+                import time as _time
                 num_keys = len(self.client_pool.clients) if hasattr(self, "client_pool") and self.client_pool else 1
                 if is_unavailable or is_timeout:
                     cycle = attempt // max(1, num_keys)
@@ -868,10 +872,15 @@ class MultimodalTranslator:
                         wait_time = min(3.0, 0.6 + 0.4 * min(cycle, 4) + random.uniform(0.1, 0.3))
 
                 friendly_msg = format_friendly_api_error(e)
+                now = _time.monotonic()
                 with MultimodalTranslator._STATUS_LOCK:
                     if not MultimodalTranslator._STATUS_ACTIVE:
                         print(f"\n[Status / Faza 1]: {friendly_msg} -> oczekiwanie na serwery Google i automatyczna rotacja kluczy...")
                         MultimodalTranslator._STATUS_ACTIVE = True
+                        MultimodalTranslator._LAST_STATUS_TIME = now
+                    elif now - MultimodalTranslator._LAST_STATUS_TIME > 25.0:
+                        print(f"⏳ [Status / Faza 1]: {friendly_msg} (próba #{attempt}, oczekiwanie na odpowiedź Google)...")
+                        MultimodalTranslator._LAST_STATUS_TIME = now
 
                 time.sleep(wait_time)
 

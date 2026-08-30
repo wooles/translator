@@ -27,6 +27,7 @@ import threading
 class DialogueVerifier:
     _STATUS_LOCK = threading.Lock()
     _STATUS_ACTIVE: bool = False
+    _LAST_STATUS_TIME: float = 0.0
 
     def __init__(
         self,
@@ -40,7 +41,8 @@ class DialogueVerifier:
             self.client_pool = client
         else:
             from client_factory import MultiKeyClientPool
-            self.client_pool = MultiKeyClientPool(raw_keys=os.getenv("GEMINI_API_KEY"), timeout_sec=45.0)
+            timeout_sec = float(os.getenv("GEMINI_HTTP_TIMEOUT_SEC", "90.0"))
+            self.client_pool = MultiKeyClientPool(raw_keys=os.getenv("GEMINI_API_KEY"), timeout_sec=timeout_sec)
         self.model = model
         self.keep_honorifics = keep_honorifics
         self.system_prompt = get_verifier_system_prompt(keep_honorifics=keep_honorifics)
@@ -214,6 +216,7 @@ class DialogueVerifier:
                         if DialogueVerifier._STATUS_ACTIVE:
                             print(f"  └─ [OK / Faza 2]: Połączenie z Google API przywrócone.")
                             DialogueVerifier._STATUS_ACTIVE = False
+                            DialogueVerifier._LAST_STATUS_TIME = 0.0
                     return parsed_obj.lines
                 
                 # Fallback to response.text if SDK returned raw string
@@ -223,6 +226,7 @@ class DialogueVerifier:
                     if DialogueVerifier._STATUS_ACTIVE:
                         print(f"  └─ [OK / Faza 2]: Połączenie z Google API przywrócone.")
                         DialogueVerifier._STATUS_ACTIVE = False
+                        DialogueVerifier._LAST_STATUS_TIME = 0.0
                 return batch_resp.lines
 
             except Exception as e:
@@ -252,6 +256,7 @@ class DialogueVerifier:
                 is_rate_limit = "429" in err_str or "quota" in err_str or "resource_exhausted" in err_str
 
                 import random
+                import time as _time
                 num_keys = len(self.client_pool.clients) if hasattr(self, "client_pool") and self.client_pool else 1
                 if is_unavailable or is_timeout:
                     cycle = attempt // max(1, num_keys)
@@ -264,9 +269,14 @@ class DialogueVerifier:
                         wait_sec = min(3.0, 0.6 + 0.4 * min(cycle, 4) + random.uniform(0.1, 0.3))
                 
                 friendly_msg = format_friendly_api_error(e)
+                now = _time.monotonic()
                 with DialogueVerifier._STATUS_LOCK:
                     if not DialogueVerifier._STATUS_ACTIVE:
                         print(f"\n[Status / Faza 2]: {friendly_msg} -> oczekiwanie na serwery Google i automatyczna rotacja kluczy...")
                         DialogueVerifier._STATUS_ACTIVE = True
+                        DialogueVerifier._LAST_STATUS_TIME = now
+                    elif now - DialogueVerifier._LAST_STATUS_TIME > 25.0:
+                        print(f"⏳ [Status / Faza 2]: {friendly_msg} (próba #{attempt}, oczekiwanie na odpowiedź Google)...")
+                        DialogueVerifier._LAST_STATUS_TIME = now
 
                 time.sleep(wait_sec)
