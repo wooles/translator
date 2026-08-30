@@ -22,8 +22,12 @@ class RefinedBatchResponse(BaseModel):
     lines: List[RefinedLine] = Field(description="Lista zredagowanych i zweryfikowanych kwestii dialogowych")
 
 import os
+import threading
 
 class DialogueVerifier:
+    _STATUS_LOCK = threading.Lock()
+    _STATUS_ACTIVE: bool = False
+
     def __init__(
         self,
         client: genai.Client,
@@ -206,15 +210,19 @@ class DialogueVerifier:
                 # Retrieve parsed structured output
                 if hasattr(response, "parsed") and response.parsed is not None:
                     parsed_obj: RefinedBatchResponse = response.parsed
-                    if attempt > 1:
-                        print(f"  └─ [OK / Faza 2]: Połączenie z Google API przywrócone (próba #{attempt}).")
+                    with DialogueVerifier._STATUS_LOCK:
+                        if DialogueVerifier._STATUS_ACTIVE:
+                            print(f"  └─ [OK / Faza 2]: Połączenie z Google API przywrócone.")
+                            DialogueVerifier._STATUS_ACTIVE = False
                     return parsed_obj.lines
                 
                 # Fallback to response.text if SDK returned raw string
                 data = json.loads(response.text)
                 batch_resp = RefinedBatchResponse.model_validate(data)
-                if attempt > 1:
-                    print(f"  └─ [OK / Faza 2]: Połączenie z Google API przywrócone (próba #{attempt}).")
+                with DialogueVerifier._STATUS_LOCK:
+                    if DialogueVerifier._STATUS_ACTIVE:
+                        print(f"  └─ [OK / Faza 2]: Połączenie z Google API przywrócone.")
+                        DialogueVerifier._STATUS_ACTIVE = False
                 return batch_resp.lines
 
             except Exception as e:
@@ -256,8 +264,9 @@ class DialogueVerifier:
                         wait_sec = min(3.0, 0.6 + 0.4 * min(cycle, 4) + random.uniform(0.1, 0.3))
                 
                 friendly_msg = format_friendly_api_error(e)
-                if attempt == 1:
-                    print(f"\n[Redaktor Dialogów / Faza 2]: {friendly_msg} -> oczekiwanie i automatyczna rotacja kluczy API...")
-                elif attempt % max(1, num_keys * 3) == 0:
-                    print(f"  ├─ [Status / Faza 2]: {friendly_msg} (próba #{attempt}, ponawianie w tle)...")
+                with DialogueVerifier._STATUS_LOCK:
+                    if not DialogueVerifier._STATUS_ACTIVE:
+                        print(f"\n[Status / Faza 2]: {friendly_msg} -> oczekiwanie na serwery Google i automatyczna rotacja kluczy...")
+                        DialogueVerifier._STATUS_ACTIVE = True
+
                 time.sleep(wait_sec)

@@ -298,6 +298,8 @@ Zwróć wynik w formacie JSON zgodnym ze schematem EpisodeProfile."""
                     except Exception:
                         pass
 
+                if attempt > 1:
+                    print(f"  └─ [OK / Profiler]: Połączenie z Google API przywrócone.")
                 return profile
             except Exception as e:
                 err_str = str(e).lower()
@@ -325,6 +327,6 @@ Zwróć wynik w formacie JSON zgodnym ze schematem EpisodeProfile."""
                 is_rate_limit = "429" in err_str or "quota" in err_str or "resource_exhausted" in err_str
                 
                 friendly_msg = format_friendly_api_error(e)
-                if attempt == 1 or attempt % max(1, num_keys) == 0:
-                    print(f"\n[Profiler Odcinka]: {friendly_msg} (próba #{attempt}) -> automatyczna rotacja kluczy API...")
+                if attempt == 1:
+                    print(f"\n[Profiler Odcinka]: {friendly_msg} -> oczekiwanie na serwery Google i automatyczna rotacja kluczy...")
                 time.sleep(wait_sec)

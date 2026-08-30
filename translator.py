@@ -36,6 +36,7 @@ import re
 import time
 import json
 import logging
+import threading
 import tempfile
 import sqlite3
 from typing import List, Optional, Dict, Any, Tuple
@@ -512,6 +513,9 @@ class BatchTranslationResponse(BaseModel):
     characters_identified: Optional[List[CharacterInfo]] = Field(default=None, description="Zidentyfikowane lub nowo odkryte postacie i ich płeć")
 
 class MultimodalTranslator:
+    _STATUS_LOCK = threading.Lock()
+    _STATUS_ACTIVE: bool = False
+
     def __init__(
         self,
         api_key: Optional[str] = None,
@@ -812,13 +816,17 @@ class MultimodalTranslator:
                         self.current_episode_tokens["model"] = current_model
 
                 if hasattr(response, "parsed") and response.parsed is not None:
-                    if attempt > 1:
-                        print(f"  └─ [OK / Faza 1]: Połączenie z Google API przywrócone (próba #{attempt}).")
+                    with MultimodalTranslator._STATUS_LOCK:
+                        if MultimodalTranslator._STATUS_ACTIVE:
+                            print(f"  └─ [OK / Faza 1]: Połączenie z Google API przywrócone.")
+                            MultimodalTranslator._STATUS_ACTIVE = False
                     return response.parsed
                 else:
                     res = schema_class.model_validate(json.loads(response.text))
-                    if attempt > 1:
-                        print(f"  └─ [OK / Faza 1]: Połączenie z Google API przywrócone (próba #{attempt}).")
+                    with MultimodalTranslator._STATUS_LOCK:
+                        if MultimodalTranslator._STATUS_ACTIVE:
+                            print(f"  └─ [OK / Faza 1]: Połączenie z Google API przywrócone.")
+                            MultimodalTranslator._STATUS_ACTIVE = False
                     return res
 
             except Exception as e:
@@ -860,10 +868,11 @@ class MultimodalTranslator:
                         wait_time = min(3.0, 0.6 + 0.4 * min(cycle, 4) + random.uniform(0.1, 0.3))
 
                 friendly_msg = format_friendly_api_error(e)
-                if attempt == 1:
-                    print(f"\n[Tłumacz / Faza 1]: {friendly_msg} -> oczekiwanie i automatyczna rotacja kluczy API...")
-                elif attempt % max(1, num_keys * 3) == 0:
-                    print(f"  ├─ [Status / Faza 1]: {friendly_msg} (próba #{attempt}, ponawianie w tle)...")
+                with MultimodalTranslator._STATUS_LOCK:
+                    if not MultimodalTranslator._STATUS_ACTIVE:
+                        print(f"\n[Status / Faza 1]: {friendly_msg} -> oczekiwanie na serwery Google i automatyczna rotacja kluczy...")
+                        MultimodalTranslator._STATUS_ACTIVE = True
+
                 time.sleep(wait_time)
 
     def _process_single_batch(
