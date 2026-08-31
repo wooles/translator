@@ -69,6 +69,7 @@ from avt_formatter import (
     split_subtitle_syntactically,
     calculate_cps,
     calculate_condensation_directive,
+    clamp_sub_second_cps,
     snap_subtitles_to_shot_cuts,
     format_diegetic_sound_wall,
     clean_text_for_len
@@ -727,7 +728,9 @@ class MultimodalTranslator:
                 lines.append(f"Kwestia [ID: {idx + 1}] [TYP: [DIALOG] {vtype['type_label']}]{relation_tag} (Czas: {start_str} - {end_str}, Mówca: '{speaker_name}'){acoustic_str}:")
                 if vtype.get("is_top"):
                     lines.append(f"  (!) DIALOG GÓRNY / W TLE: To jest dialog postaci w tle/oddali. Formatuj jako naturalny dialog mówiony (Sentence case). BEZWZGLĘDNY ZAKAZ nawiasów kwadratowych [...] i ZAKAZ wielkich liter ALL-CAPS!")
-                if is_fast:
+                if duration_s <= 0.6:
+                    lines.append(f"  (!) MIKRO-KWESTIA / DŹWIĘK WAHANIA (czas {duration_s:.1f}s, tempo {cps:.1f} z/s): Kwestia trwa ułamek sekundy! Zastosuj Filar CXXXIV: zredukuj do MAX 1-2 słów (np. 'Znaczy...', 'Ech...', 'Cóż...'). KATEGORYCZNY ZAKAZ wielowyrazowych zdań!")
+                elif is_fast:
                     lines.append(f"  (!) TEMPO CPS ({cps:.1f} z/s, czas {duration_s:.1f}s): Szybka kwestia! Zastosuj zwięzłą kondensację Belczyka.")
 
             if whisper_transcriptions and idx + 1 in whisper_transcriptions:
@@ -736,6 +739,8 @@ class MultimodalTranslator:
                     romaji_str = to_romaji(jp_text)
                     jp_display = f"{jp_text} [{romaji_str}]" if romaji_str and romaji_str != jp_text else jp_text
                     lines.append(f"  JP (GŁÓWNA KOTWICA SEMANTYCZNA - Słuchaj intencji aktora): {jp_display}")
+                    if duration_s <= 0.8 and any(h in jp_text for h in ["え", "う", "あの", "えっと", "ん", "ま…", "あ…", "え…"]) and len(clean_text.split()) > 2:
+                        lines.append(f"  [🎙️ ALARM ROZBIEŻNOŚCI AUDIO JP]: W audio seiyū padło wyłącznie krótkie wahanie/dźwięk ('{jp_display}'). ZAKAZ tłumaczenia całego zdania w tym ułamkowym bloku! Ogranicz do samego wahania: 'Znaczy...', 'Cóż...', 'Ech...'.")
             lines.append(f"  EN (Pomocniczy skrypt do czasu/ogólnego sensu): {clean_text}")
 
         # 4. Lookahead window
@@ -1247,6 +1252,7 @@ class MultimodalTranslator:
                         final_text = f"♪ {clean_no_notes} ♪"
                 for fix in fixes + gloss_fixes:
                     pbar.write(f"  [AVT Linter/Słownik] {fix}")
+                final_text = clamp_sub_second_cps(final_text, item["event"].start, item["event"].end)
                 formatted_final = split_subtitle_syntactically(final_text, max_line_len=42, is_ass=is_ass, is_sign=item.get("is_sign", False))
                 batch_results[item["orig_idx"]] = formatted_final
         else:
@@ -1268,6 +1274,7 @@ class MultimodalTranslator:
                         final_text = f"♪ {clean_no_notes} ♪"
                 for fix in fixes + gloss_fixes:
                     pbar.write(f"  [AVT Linter/Słownik] {fix}")
+                final_text = clamp_sub_second_cps(final_text, item["event"].start, item["event"].end)
                 formatted_final = split_subtitle_syntactically(final_text, max_line_len=42, is_ass=is_ass, is_sign=item.get("is_sign", False))
                 batch_results[item["orig_idx"]] = formatted_final
 

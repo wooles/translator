@@ -163,13 +163,15 @@ def test_rules_and_prompts():
     assert "FILAR CXXXI:" in sys_prompt
     assert "FILAR CXXXII:" in sys_prompt
     assert "FILAR CXXXIII:" in sys_prompt
+    assert "FILAR CXXXIV:" in sys_prompt
     assert "FILAR CXXI" in ver_prompt
     assert "FILAR CXXV" in ver_prompt
     assert "FILAR CXXX" in ver_prompt
     assert "FILAR CXXXI" in ver_prompt
     assert "FILAR CXXXII" in ver_prompt
     assert "FILAR CXXXIII" in ver_prompt
-    print(" -> PASSED: Kompletny Zunifikowany Kanon 133 Filarów AVT (Filary I – CXXXIII) jest aktywny w obu fazach tłumaczenia.")
+    assert "FILAR CXXXIV" in ver_prompt
+    print(" -> PASSED: Kompletny Zunifikowany Kanon 134 Filarów AVT (Filary I – CXXXIV) jest aktywny w obu fazach tłumaczenia.")
 
 def test_pydantic_schemas():
     print("[TEST 2/5] Weryfikacja schematów Pydantic i Detektora Rejestru Pragmatycznego...")
@@ -497,6 +499,7 @@ from avt_formatter import (
     calculate_cps,
     clean_text_for_len,
     calculate_condensation_directive,
+    clamp_sub_second_cps,
     snap_subtitles_to_shot_cuts,
     format_diegetic_sound_wall
 )
@@ -627,6 +630,12 @@ def test_avt_formatter_and_cps():
     # Test dyrektywy kompresji tekstu (Smart Condensation Ratio)
     cond_fast = calculate_condensation_directive("Musimy natychmiast uciekać stąd bo nadciągają potwory!", start_ms=0, end_ms=1200)
     assert cond_fast is not None and "EKSTREMALNY" in cond_fast
+
+    # Test Filaru CXXXIV: Mikro-kwestie i dźwięki wahania (<0.6s)
+    cond_micro = calculate_condensation_directive("I mean... we should slowly...", start_ms=0, end_ms=400)
+    assert cond_micro is not None and "MIKRO-KWESTIA" in cond_micro
+    clamped_micro = clamp_sub_second_cps("Znaczy... musimy powoli...", start_ms=0, end_ms=400)
+    assert clamped_micro == "Znaczy...", f"Expected 'Znaczy...', got: '{clamped_micro}'"
 
     # Test formatowania ściany dźwięku (Diegetic Sound-Wall)
     sound_wall = format_diegetic_sound_wall("Uwaga mieszkańcy, zbliża się tajfun.", is_announcement=True)

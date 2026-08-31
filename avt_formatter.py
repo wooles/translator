@@ -195,14 +195,16 @@ def split_subtitle_syntactically(text: str, max_line_len: int = MAX_LINE_LENGTH,
 def calculate_condensation_directive(text: str, start_ms: int, end_ms: int) -> Optional[str]:
     """
     Computes reading speed and exposure duration, generating an AVT condensation directive
-    for rapid dialogue or panic scenes.
+    for rapid dialogue, panic scenes, and sub-second micro-hesitations.
     """
-    duration_s = max(0.3, (end_ms - start_ms) / 1000.0)
+    duration_s = max(0.2, (end_ms - start_ms) / 1000.0)
     clean = clean_text_for_len(text)
     cps = len(clean) / duration_s
     word_count = len(clean.split())
 
-    if duration_s < 1.4 and (cps > 18.0 or word_count > 6):
+    if duration_s <= 0.6:
+        return f"[⏱️ RYGOR CZASOWY: MIKRO-KWESTIA (<0.6s, czas {duration_s:.1f}s, tempo {cps:.1f} CPS)] -> Kwestia trwa ułamek sekundy! Zredukuj do MAX 1-2 słów (max 6-8 znaków, np. 'Znaczy...', 'Ech...', 'Cóż...'). KATEGORYCZNY ZAKAZ wielowyrazowych zdań!"
+    elif duration_s < 1.4 and (cps > 18.0 or word_count > 6):
         return f"[⏱️ RYGOR CZASOWY: EKSTREMALNY (czas {duration_s:.1f}s, tempo {cps:.1f} CPS)] -> Wymóg maksymalnej kondensacji: zredukuj wypowiedź do max 2-3 zwięzłych słów (usuń zbędne zaimki i ozdobniki, zachowaj samą puentę)!"
     elif duration_s < 2.5 and cps > 16.0:
         return f"[⏱️ RYGOR CZASOWY: WYSOKI (czas {duration_s:.1f}s, tempo {cps:.1f} CPS)] -> Skondensuj frazę, usuń watę słowną i skróć konstrukcje gramatyczne!"
@@ -210,6 +212,42 @@ def calculate_condensation_directive(text: str, start_ms: int, end_ms: int) -> O
         return f"[⏱️ RYGOR CZASOWY: WYSOKIE TEMPO ({cps:.1f} CPS)] -> Skróć kwestię, aby widz zdążył ją przeczytać bez pauzowania!"
 
     return None
+
+
+def clamp_sub_second_cps(text: str, start_ms: int, end_ms: int) -> str:
+    """
+    Safely clamps sub-second dialogue lines (duration <= 0.6s) to prevent unreadable text walls (Filar CXXXIV).
+    If a 0.4s line contains a multi-phrase split with ellipsis (e.g. 'Znaczy... musimy powoli...'),
+    retains only the initial hesitation fragment ('Znaczy...').
+    """
+    if not text or not text.strip():
+        return text
+    duration_s = (end_ms - start_ms) / 1000.0
+    if duration_s > 0.6:
+        return text
+
+    clean = clean_text_for_len(text)
+    if len(clean) <= 10:
+        return text
+
+    # If text contains ellipsis separating thoughts (e.g. 'Znaczy... musimy powoli...')
+    if "..." in text:
+        parts = text.split("...")
+        first_part = parts[0].strip()
+        if first_part:
+            return f"{first_part}..."
+    elif "…" in text:
+        parts = text.split("…")
+        first_part = parts[0].strip()
+        if first_part:
+            return f"{first_part}…"
+
+    # If no ellipsis, but length > 10 chars in <= 0.6s, keep max 1-2 words with ellipsis
+    words = text.strip().split()
+    if len(words) > 1:
+        return f"{words[0]}..."
+
+    return text
 
 
 def snap_subtitles_to_shot_cuts(events: list, shot_cuts_ms: list, max_snap_gap_ms: int = 350) -> list:

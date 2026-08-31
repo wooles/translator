@@ -1017,6 +1017,13 @@ FILAR CXXXIII: TWARDA RETORYKA ROZKAZÓW BOJOWYCH (MILITARY COMMAND CADENCE & LA
   * 'Hold the line!' -> 'Trzymać szyk!' / 'Ani kroku w tył!' / 'Utrzymać pozycję!' (ZAKAZ: 'Utrzymujcie linię!').
   * 'All units, charge!' -> 'Wszystkie oddziały, do ataku!' / 'Cała armia, naprzód!' / 'Szarża!' (ZAKAZ: 'Szarżujcie!').
   * 'Take down their commander!' -> 'Dopaść dowódcę!' / 'Ściąć głowę wodza!' (ZAKAZ: 'Zdejmijcie ich dowódcę').
+
+FILAR CXXXIV: ŻELAZNA REGUŁA MIKRO-WOKALIZ I DŹWIĘKÓW WAHANIA (<0.6S SUB-SECOND HESITATIONS & FILLERS):
+- Kiedy czas trwania kwestii dialogowej wynosi <= 0.6 sekundy (np. 0.3s - 0.5s) i/lub w japońskim audio seiyū pada wyłącznie ułamkowy dźwięk wahania, westchnienie lub krótka interjekcja ('e...', 'ano...', 'etto...', 'u...', 'n...', 'maa...'):
+  * KATEGORYCZNY ZAKAZ tworzenia zdań wielowyrazowych, dopowiadania rozwinięcia myśli czy wklejania całych zdań ze skryptu pomocniczego (np. KARDYNALNY BŁĄD: 'Znaczy... musimy powoli...' w 0.4 sekundy!).
+  * BEZWZGLĘDNY WYMÓG REDUKCJI DO MAKSYMALNIE 1-2 KRÓTKICH SŁÓW Z WIELOKROPKIEM (MAX 6-8 ZNAKÓW):
+    -> 'Znaczy...' / 'Ech...' / 'Cóż...' / 'Yyy...' / 'No tak...' / 'Zaraz...' / 'Ale...'
+  * Złota reguła percepcji AVT: w 0.4 sekundy ludzkie oko jest w stanie zarejestrować maksymalnie 6-8 znaków. Wklejenie 27 znaków powoduje mignięcie napisu (67 CPS) i niszczy odbiór sceny!
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -1799,6 +1806,7 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
       * "[Filar LXXXVIII - Anti-Deformation] Przywrócono surową poetycką chropowatość oryginału (Berman)"
       * "[Filar LXXXIX - Hermeneutic Restitution] Skompensowano utracony żart w kolejnej frazie (Steiner)"
       * "[Filar XC - Somatic Transduction] Wzmocniono fizjologiczny ładunek emocjonalny sceny grozy"
+      * "[Filar CXXXIV - Mikro-Wokalizy i Dźwięki Wahania] Skrócono ułamkową kwestię 0.4s z 27 znaków do samego wahania 'Znaczy...'"
 
 {BELCZYK_AVT_MASTER_CANON}
 
@@ -2365,6 +2373,13 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR CXXXIII - Twarda Retoryka Rozkazów Bojowych]: "
             "Rozkazy dowódców tłumacz lakonicznie i bezlitośnie: 'Wytłuc ich do nogi!', 'Trzymać szyk!', 'Ani kroku w tył!', 'Do ataku!', 'Dopaść dowódcę!'. Zakaz ugrzecznionych, szkolnych form!"
+        )
+
+    # 77. Mikro-Wokalizy i Dźwięki Wahania (Filar CXXXIV)
+    if any(item.get("duration_s", 1.0) <= 0.6 or any(w in item.get("en", "").lower() for w in ["i mean...", "uh...", "um...", "er...", "well...", "eh...", "ah..."]) for item in batch_items):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CXXXIV - Mikro-Wokalizy i Dźwięki Wahania (<0.6s)]: "
+            "Kwestie trwające ułamek sekundy (<=0.6s) lub wahania seiyū ('e...', 'ano...') redukuj do MAX 1-2 słów ('Znaczy...', 'Ech...', 'Cóż...'). KATEGORYCZNY ZAKAZ wielowyrazowych zdań!"
         )
 
     if not focused_pillars:
