@@ -354,7 +354,90 @@ class AVTLinter:
                 modified = "".join(capitalized_parts)
                 applied_fixes.append("[Filar IV/LX - Konwersja ALL-CAPS w dialogu na naturalną wielkość liter]")
 
-        # 6. Guard against duplicate spaces
+        # 6. Automatic conversion of spelled-out ordinal numbers in episode/chapter headings (Filar LIX & XCVIII)
+        modified, num_fixes = cls.convert_verbal_ordinal_numbers(modified)
+        applied_fixes.extend(num_fixes)
+
+        # 7. Guard against duplicate spaces
         modified = re.sub(r"[ \t]+", " ", modified).strip()
 
         return modified, applied_fixes
+
+    @classmethod
+    def convert_verbal_ordinal_numbers(cls, text: str) -> Tuple[str, List[str]]:
+        """
+        Converts spelled-out Polish ordinal numbers in episode/chapter titles to Arabic numerals (Filar LIX / XCVIII).
+        E.g. 'ODCINEK PIĘĆDZIESIĄTY DRUGI' -> 'ODCINEK 52'
+             'ODCINEK PIERWSZY' -> 'ODCINEK 1'
+             'ROZDZIAŁ DWUDZIESTY CZWARTY' -> 'ROZDZIAŁ 24'
+        """
+        ORDINAL_TENS = {
+            "dwudziesty": 20, "dwudziestej": 20, "dwudziestego": 20, "dwudzieste": 20, "dwudziesta": 20,
+            "trzydziesty": 30, "trzydziestej": 30, "trzydziestego": 30, "trzydzieste": 30, "trzydziesta": 30,
+            "czterdziesty": 40, "czterdziestej": 40, "czterdziestego": 40, "czterdzieste": 40, "czterdziesta": 40,
+            "pięćdziesiąty": 50, "pięćdziesiątej": 50, "pięćdziesiątego": 50, "pięćdziesiąte": 50, "pięćdziesiąta": 50,
+            "sześćdziesiąty": 60, "sześćdziesiątej": 60, "sześćdziesiątego": 60, "sześćdziesiąte": 60, "sześćdziesiąta": 60,
+            "siedemdziesiąty": 70, "siedemdziesiątej": 70, "siedemdziesiątego": 70, "siedemdziesiąte": 70, "siedemdziesiąta": 70,
+            "osiemdziesiąty": 80, "osiemdziesiątej": 80, "osiemdziesiątego": 80, "osiemdziesiąte": 80, "osiemdziesiąta": 80,
+            "dziewięćdziesiąty": 90, "dziewięćdziesiątej": 90, "dziewięćdziesiątego": 90, "dziewięćdziesiąte": 90, "dziewięćdziesiąta": 90,
+            "setny": 100, "setnej": 100, "setnego": 100, "setne": 100, "setna": 100,
+        }
+        ORDINAL_UNITS_AND_TEENS = {
+            "pierwszy": 1, "pierwsza": 1, "pierwsze": 1, "pierwszego": 1, "pierwszej": 1,
+            "drugi": 2, "druga": 2, "drugie": 2, "drugiego": 2, "drugiej": 2,
+            "trzeci": 3, "trzecia": 3, "trzecie": 3, "trzeciego": 3, "trzeciej": 3,
+            "czwarty": 4, "czwarta": 4, "czwarte": 4, "czwartego": 4, "czwartej": 4,
+            "piąty": 5, "piąta": 5, "piąte": 5, "piątego": 5, "piątej": 5,
+            "szósty": 6, "szósta": 6, "szóste": 6, "szóstego": 6, "szóstej": 6,
+            "siódmy": 7, "siódma": 7, "siódme": 7, "siódmego": 7, "siódmej": 7,
+            "ósmy": 8, "ósma": 8, "ósme": 8, "ósmego": 8, "ósmej": 8,
+            "dziewiąty": 9, "dziewiąta": 9, "dziewiąte": 9, "dziewiątego": 9, "dziewiątej": 9,
+            "dziesiąty": 10, "dziesiąta": 10, "dziesiąte": 10, "dziesiątego": 10, "dziesiątej": 10,
+            "jedenasty": 11, "jedenasta": 11, "jedenaste": 11, "jedenastego": 11, "jedenastej": 11,
+            "dwunasty": 12, "dwunasta": 12, "dwunaste": 12, "dwunastego": 12, "dwunastej": 12,
+            "trzynasty": 13, "trzynasta": 13, "trzynaste": 13, "trzynastego": 13, "trzynastej": 13,
+            "czternasty": 14, "czternasta": 14, "czternaste": 14, "czternastego": 14, "czternastej": 14,
+            "piętnasty": 15, "piętnasta": 15, "piętnaste": 15, "piętnastego": 15, "piętnastej": 15,
+            "szesnasty": 16, "szesnasta": 16, "szesnaste": 16, "szesnastego": 16, "szesnastej": 16,
+            "siedemnasty": 17, "siedemnasta": 17, "siedemnaste": 17, "siedemnastego": 17, "siedemnastej": 17,
+            "osiemnasty": 18, "osiemnasta": 18, "osiemnaste": 18, "osiemnastego": 18, "osiemnastej": 18,
+            "dziewiętnasty": 19, "dziewiętnasta": 19, "dziewiętnaste": 19, "dziewiętnastego": 19, "dziewiętnastej": 19,
+        }
+
+        fixes = []
+        modified = text
+
+        pattern = re.compile(
+            r"\b(odcinek|rozdział|akt|część|epizod)\s+([a-ząćęłńóśźż]+)(?:\s+([a-ząćęłńóśźż]+))?\b",
+            re.IGNORECASE
+        )
+
+        def repl(match):
+            prefix = match.group(1)
+            w1 = match.group(2).lower()
+            w2 = match.group(3).lower() if match.group(3) else None
+
+            val = 0
+            consumed_two = False
+
+            if w1 in ORDINAL_TENS:
+                val += ORDINAL_TENS[w1]
+                if w2 and w2 in ORDINAL_UNITS_AND_TEENS:
+                    val += ORDINAL_UNITS_AND_TEENS[w2]
+                    consumed_two = True
+            elif w1 in ORDINAL_UNITS_AND_TEENS:
+                val += ORDINAL_UNITS_AND_TEENS[w1]
+            else:
+                return match.group(0)
+
+            if val > 0:
+                fixes.append(f"[Filar LIX/XCVIII - Notacja Cyfrowa Odcinka] '{match.group(0)}' -> '{prefix} {val}'")
+                if consumed_two:
+                    return f"{prefix} {val}"
+                else:
+                    return f"{prefix} {val}" + (f" {match.group(3)}" if w2 and not consumed_two else "")
+
+            return match.group(0)
+
+        modified = pattern.sub(repl, modified)
+        return modified, fixes

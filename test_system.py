@@ -539,6 +539,11 @@ def test_avt_linter():
     t7, f7 = AVTLinter.lint_and_fix_line("[ Przepraszam za zwłokę! Ruszajmy! ]", is_sign=False)
     assert t7 == "Przepraszam za zwłokę! Ruszajmy!"
 
+    # Test konwersji słownych numerów odcinków na cyfry (Filar LIX / XCVIII)
+    t8, f8 = AVTLinter.lint_and_fix_line("ODCINEK PIĘĆDZIESIĄTY DRUGI\\NNUMER JEDEN PANA TOKUSHIRO", is_sign=True)
+    assert "ODCINEK 52" in t8
+    assert "NUMER JEDEN PANA TOKUSHIRO" in t8
+
     t8, f8 = AVTLinter.lint_and_fix_line("[ PRZEPRASZAM ZA ZWŁOKĘ! RUSZAJMY! ]", is_sign=False)
     assert t8 == "Przepraszam za zwłokę! Ruszajmy!"
 
@@ -612,6 +617,11 @@ def test_avt_formatter_and_cps():
     split_title = split_subtitle_syntactically(title_text, max_line_len=42, is_ass=True, is_sign=True)
     assert "\\N" in split_title
     assert len(split_title.split("\\N")) >= 2
+
+    # Test Filaru XCVIII: Zachowanie eleganckiego 2-wierszowego tytułu odcinka (bez cięcia na 4 linie)
+    title_ep = split_subtitle_syntactically("ODCINEK 52\\NNUMER JEDEN PANA TOKUSHIRO", is_sign=True)
+    assert len(title_ep.split("\\N")) == 2, f"Title card must be strictly 2 lines, got: {len(title_ep.split(chr(92)+'N'))}"
+    assert "ODCINEK 52" in title_ep.split("\\N")[0]
 
     # Test plansz postaci i banerów z pozycjonowaniem (Tenmaku no Jaadugar cases)
     s1 = "{\\pos(150,600)}SYN TEMÜGIEGO – OTAI"

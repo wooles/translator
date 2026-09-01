@@ -63,10 +63,24 @@ def split_subtitle_syntactically(text: str, max_line_len: int = MAX_LINE_LENGTH,
     ts_prefix = prefix_match.group(1) if prefix_match else ""
     raw_content = text[len(ts_prefix):].strip()
 
-    # If event is a sign or positioned typesetting with \pos, enforce narrow line limit (max 18-20 chars)
-    is_positioned_sign = is_sign or (r"\pos" in ts_prefix) or (r"\an" in ts_prefix and "an8" not in ts_prefix and "an2" not in ts_prefix)
-    if is_positioned_sign:
+    # If event has explicit \pos(x,y) coordinates or side alignment, enforce narrow line limit (max 18 chars)
+    is_tight_pos = (r"\pos" in ts_prefix) or (r"\an" in ts_prefix and "an8" not in ts_prefix and "an2" not in ts_prefix)
+    is_positioned_sign = is_tight_pos or is_sign
+
+    if is_tight_pos:
         max_line_len = min(max_line_len, 18)
+    elif is_sign:
+        max_line_len = min(max_line_len, 34)
+
+    # 1. PRESERVE EXPLICIT 2-LINE DIVISION (e.g. Title Cards from LLM / Script Doctor)
+    if ("\\N" in raw_content or "\\n" in raw_content or "\n" in raw_content):
+        existing_parts = [p.strip() for p in re.split(r"\\N|\\n|\n", raw_content) if p.strip()]
+        if len(existing_parts) == 2:
+            len_p0 = len(clean_text_for_len(existing_parts[0]))
+            len_p1 = len(clean_text_for_len(existing_parts[1]))
+            target_limit = 22 if is_tight_pos else (36 if is_sign else 42)
+            if len_p0 <= target_limit and len_p1 <= target_limit:
+                return f"{ts_prefix}{existing_parts[0]}{sep}{existing_parts[1]}"
 
     # Normalize existing line breaks into single space to reconstruct clean 2-line break
     normalized_content = re.sub(r"\\N|\\n|\n", " ", raw_content)
@@ -80,7 +94,7 @@ def split_subtitle_syntactically(text: str, max_line_len: int = MAX_LINE_LENGTH,
     if len(words) <= 1:
         return f"{ts_prefix}{normalized_content}"
 
-    # For long texts (written letters, notes, manifestos, documents > 120 chars, or long signs > 36 chars)
+    # For long texts (written letters, notes, manifestos, documents > 120 chars, or long signs > 68 chars)
     # wrap into balanced lines of max_line_len to prevent horizontal screen overflow.
     # Spoken dialogue (<= 115 chars) is strictly limited to MAXIMUM 2 LINES.
     should_wrap_multi = (is_positioned_sign and len(clean_full) > max_line_len * 2) or (len(clean_full) > 120)

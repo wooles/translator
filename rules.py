@@ -740,10 +740,13 @@ FILAR XCVII: PRAGMATYKA BIESIADNA I KUMPELSKIE ZAPROSZENIA DO ALKOHOLU (CONVIVIA
 FILAR XCVIII: TYPOGRAFIA PLANSZ TYTUŁOWYCH I ZWIĘZŁOŚĆ OPTYCZNA TYPESETTINGU (TITLE TYPOGRAPHY & SAFE AREA):
 - Polskie tytuły anime, rozdziałów i szyldów są o 40–60% dłuższe niż wersje angielskie/japońskie.
 - Ponieważ plansze tytułowe renderowane są ogromnym fontem (60–90 pt), długi tekst w jednej linii NIE MIEŚCI SIĘ W KADRZE (wychodzi poza bezpieczny obszar Canvasu Title-Safe 80%).
-- ŻELAZNA REGUŁA:
-  * Jeśli polski tytuł lub plansza przekracza 22–24 znaki, BEZWZGLĘDNIE sformatuj go w DWÓCH WYŚRODKOWANYCH WIERSZACH z tagiem \\N:
-    Przykład: "SPECJALNE SIŁY POŻARNICZE\\NCZĘŚĆ TRZECIA" (lub "ROZDZIAŁ 3").
-  * Kategoryczny zakaz generowania tasiemców tytułowych w jednej linii, które ucinają się na krawędziach ekranu!
+- ŻELAZNA REGUŁA DLA PLANSZ I TYTUŁÓW ODCINKÓW:
+  * Numery odcinków i rozdziałów zapisuj ZAWSZE CYFRAMI ARABSKIMI (np. 'ODCINEK 52', 'ROZDZIAŁ 12'). KATEGORYCZNY ZAKAZ form słownych ('ODCINEK PIĘĆDZIESIĄTY DRUGI' -> BŁĄD!).
+  * Formatuj planszę tytułową w MAKSYMALNIE DWÓCH WYŚRODKOWANYCH WIERSZACH z tagiem \\N:
+    Wiersz 1: ODCINEK [Numer cyframi]
+    Wiersz 2: [Polski Tytuł w poprawnym przypadku gramatycznym]
+    Przykład: "ODCINEK 52\\NNUMER JEDEN PANA TOKUSHIRO" (lub "SPECJALNE SIŁY POŻARNICZE\\NCZĘŚĆ TRZECIA").
+  * Kategoryczny zakaz generowania wielowierszowych piramid (3-4 linie) oraz tasiemców ucinających się na bokach ekranu!
 
 FILAR XCIX: ZAKAZ NADGORLIWEJ EKSPLIKACJI I SAMOWOLNEGO WTRĄCANIA IMION (ANTI-EXPLICITATION & VOCATIVE INTEGRITY):
 - Kategoryczny zakaz wtrącania imion postaci ("Panie X... / X-san...") w miejscach, gdzie w tekście angielskim i japońskim audio padają wyłącznie zawahania, pauzy i neutralne zaczepki (Hesitations & Interjections):
