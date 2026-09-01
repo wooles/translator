@@ -1014,11 +1014,15 @@ def test_extended_avt_pillars():
     from avt_linter import AVTLinter
     from rules import get_focused_rules_for_batch
 
-    # 1. Test paralingwistyki (Filar XVIII)
+    # 1. Test paralingwistyki i kinezjatyki Kakegoe (Filar XVIII)
     t1, _ = AVTLinter.lint_and_fix_line("Ara ara, co my tu mamy?")
     assert "O proszę..." in t1
     t2, _ = AVTLinter.lint_and_fix_line("Tch, znowu on.")
     assert "Tsk..." in t2
+    t_k1, _ = AVTLinter.lint_and_fix_line("Yoisho, ale ciężkie!")
+    assert "Hop..." in t_k1
+    t_k2, _ = AVTLinter.lint_and_fix_line("Yotto... udało się!")
+    assert "Hop..." in t_k2
 
     from translator import is_isolated_paralinguistic_clutter
     assert is_isolated_paralinguistic_clutter("Uh...", "Och!", is_sign=False) is True
@@ -1408,6 +1412,14 @@ def test_translator_logger_and_sign_detector():
         en_text="Shizuku-kun said that."
     )
     assert alert_kun is not None and "sufiks" in alert_kun
+
+    # Test Kakegoe physical exertion alert (Yotto / Yoisho vs polite Proszę)
+    alert_kakegoe = translator.detect_audio_discrepancy(
+        jp_text="よっと [Yotto]",
+        pl_text="Proszę...",
+        en_text="There..."
+    )
+    assert alert_kakegoe is not None and "Kakegoe" in alert_kakegoe
 
     # Test Flashback 1:1 memory formatting
     from memory import format_translation_memory_for_prompt

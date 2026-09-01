@@ -335,6 +335,12 @@ def detect_audio_discrepancy(jp_text: str, pl_text: str, en_text: str) -> Option
     if any(h in pl_lower for h in hybrid_patterns):
         return "Wykryto hybrydę honoryfikatywną ('Pani Sensei' / 'Panie Senpai') -> Zastąp czystym 'Sensei' / 'Senpai' lub naturalnym polskim tytułem 'Mistrzu' / 'Pani [Nazwisko]' (Filar XLVIII)."
 
+    # 23. Kakegoe (Yotto, Yoisho, Dokkoisho, Yoi kora) vs polite 'Proszę'
+    kakegoe_keys = ["yotto", "yoisho", "dokkoisho", "yoi kora", "yoikora", "eisa"]
+    if any(k in rom_lower for k in kakegoe_keys) or any(k in clean_jp for k in ["よっと", "よいしょ", "どっこいしょ", "よいこら", "えいさ"]):
+        if any(w in pl_lower for w in ["proszę", "oto jest", "oto masz", "oto proszę"]):
+            return "W audio pada 'Yotto/Yoisho' (Kakegoe - odgłos wysiłku fizycznego/kinezjatyki) -> Kategoryczny zakaz zwrotu grzecznościowego 'Proszę'! Zastąp naturalnym odgłosem: 'Hop...', 'I siup...', 'Raz, dwa...' lub elipsą (Filar XVIII)."
+
     return None
 
 def detect_japanese_pragmatic_register(jp_text: str, en_text: str = "") -> Optional[str]:

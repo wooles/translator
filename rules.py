@@ -171,6 +171,12 @@ FILAR XVII: PIĘCIOSTOPNIOWA TAKSONOMIA SYMBOLIZMU DŹWIĘKOWEGO ANIME (ONOMATOP
 FILAR XVIII: ADAPTACJA PARALINGWISTYKI, DŹWIĘKÓW POZAWERBALNYCH I INTERIEKCJI FONICZNYCH:
 - KATEGORYCZNA ELIMINACJA SZUMU WIZUALNEGO (SUBTITLE CLUTTER & ISOLATED GRUNTS):
   * Gdy kwestia w dialogu to pojedynczy odgłos seiyuu (naburmuszone "Uh", westchnienie "Ah", fuknięcie "Hmph", sapnięcie "Guh", "Och!"), a mimika twarzy i aktor głosowy w 100% przekazują emocję -> ZWRÓĆ PUSTY NAPIS "" (eliminacja szumu wizualnego według standardu Netflix / Canal+ AVT).
+- JAPOŃSKIE ODGŁOSY WYSIŁKU FIZYCZNEGO I KINEZJATYKI (KAKEGOE):
+  * "Yotto..." (よっと…) / "Yoisho..." (よいしょ…) / "Dokkoisho..." (どっこいしょ…) / "Yoi kora..." (odgłos wysiłku przy podnoszeniu ciężaru, stawianiu wiadra, siadaniu, kucaniu przy dojeniu zwierzęcia):
+    -> POPRAWNIE: "Hop...", "Hopla...", "I siup...", "No i już...", "Raz, dwa..." (lub puste "" jeśli odgłos w audio wystarcza).
+    -> KARDYNALNY BŁĄD [X]: "Proszę...", "Oto..." (kalka z angielskiego "There / Here you go" - postać nie częstuje nikogo grzecznościowo, lecz wykonuje wysiłek fizyczny!).
+  * "Hora!" (ほら) / "Sora!" (そら) (przy rzucie, dynamicznym podaniu przedmiotu):
+    -> POPRAWNIE: "Łap!", "Masz!", "Trzymaj!", "Hop!" (KATEGORYCZNY ZAKAZ: "Proszę!").
 - Kategoryczny zakaz dosłownego przepisywania surowych japońskich odgłosów komiksowych:
   * "Tch" / "Che" -> "Tsk...", "Szlag...", "Ech..." lub elipsa, jeśli grymas twarzy wystarczy.
   * "Eh?!" (zdumienie) -> "Co?!", "Jak to?!", "Słucham?!".
@@ -1772,6 +1778,7 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
       * "[Filar XXXV - Izotopia Rejestru] Usunięto anachroniczny slang ze sceny historycznej"
       * "[Filar LIV - Kondensacja Díaz Cintas] Skrócono kwestię z 22 na 14 CPS"
       * "[Filar XVIII - Paralingwistyka] Przetłumaczono 'Ara ara' -> 'O proszę...'"
+      * "[Filar XVIII - Kakegoe] Przetłumaczono odgłos wysiłku 'Yotto...' -> 'Hop...' (ZAKAZ 'Proszę...')"
       * "[Filar X - Anti-Translationese] 'Co sprawia, że...' -> 'Czemu tak uważasz?'"
       * "[Filar LX - Interpunkcja AVT] Poprawiono '!?' -> '?!'"
       * "[Filar I - Odnominalizowanie] 'dokonał zabójstwa' -> 'zabił'"
