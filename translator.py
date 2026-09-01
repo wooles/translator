@@ -1176,6 +1176,9 @@ class MultimodalTranslator:
             pass1_items.append({
                 "id": batch_id,
                 "orig_idx": orig_idx,
+                "event": event,
+                "start_ms": event.start,
+                "end_ms": event.end,
                 "en": clean_en,
                 "pl": pl_candidate,
                 "speaker_gender": speaker_gender,
@@ -1252,7 +1255,9 @@ class MultimodalTranslator:
                         final_text = f"♪ {clean_no_notes} ♪"
                 for fix in fixes + gloss_fixes:
                     pbar.write(f"  [AVT Linter/Słownik] {fix}")
-                final_text = clamp_sub_second_cps(final_text, item["event"].start, item["event"].end)
+                start_m = item.get("start_ms", item["event"].start if "event" in item else 0)
+                end_m = item.get("end_ms", item["event"].end if "event" in item else 1000)
+                final_text = clamp_sub_second_cps(final_text, start_m, end_m)
                 formatted_final = split_subtitle_syntactically(final_text, max_line_len=42, is_ass=is_ass, is_sign=item.get("is_sign", False))
                 batch_results[item["orig_idx"]] = formatted_final
         else:
@@ -1274,7 +1279,9 @@ class MultimodalTranslator:
                         final_text = f"♪ {clean_no_notes} ♪"
                 for fix in fixes + gloss_fixes:
                     pbar.write(f"  [AVT Linter/Słownik] {fix}")
-                final_text = clamp_sub_second_cps(final_text, item["event"].start, item["event"].end)
+                start_m = item.get("start_ms", item["event"].start if "event" in item else 0)
+                end_m = item.get("end_ms", item["event"].end if "event" in item else 1000)
+                final_text = clamp_sub_second_cps(final_text, start_m, end_m)
                 formatted_final = split_subtitle_syntactically(final_text, max_line_len=42, is_ass=is_ass, is_sign=item.get("is_sign", False))
                 batch_results[item["orig_idx"]] = formatted_final
 
