@@ -23,7 +23,7 @@
       "description": "Zwrot: 'z imienia: Tokishige-kun / Szeregowy Usami' (dowódca -> podwładny / mistrz -> wyznawca)"
     },
     "Sugimoto -> Asirpa": {
-      "description": "Zwrot: 'na ty / Asirpo' (towarzysze broni, wzajemna ochrona i zaufanie)"
+      "description": "Zwrot: 'Asirpa-san / na ty' (Towarzysze broni, opiekuńczo-partnerska więź)"
     },
     "Shiraishi -> Botaro": {
       "description": "Zwrot: 'Botaro / Pirat' (Współwięźniowie i kompani)"
@@ -126,6 +126,12 @@
     },
     "Shiraishi -> Hijikata": {
       "description": "Zwrot: 'staruszku / panie Hijikata' (sojusznicy z przymusu, nuta komediowego lęku przed autorytetem)"
+    },
+    "Asirpa -> Hijikata": {
+      "description": "Zwrot: 'panie Hijikata / Hijikata-nispa' (Młoda Ajnuka wobec szanowanego starszego przywódcy)"
+    },
+    "Tsurumi -> Nagakura": {
+      "description": "Zwrot: 'panie Nagakura' (Oficer wywiadu wobec weterana Shinsengumi / przeciwnicy polityczni)"
     }
   },
   "glossary": {
@@ -136,7 +142,7 @@
     "Firing pin": "Iglica",
     "Surku / Wolfsbane": "Surku",
     "Aca": "Aca",
-    "Nispa": "nispa",
+    "Nispa": "Nispa",
     "Menko": "Karty menko",
     "Ainu": "Ainu",
     "Nopperabo": "Nopperabo",
@@ -183,10 +189,10 @@
     "Mitsubishi zaibatsu": "Zaibatsu Mitsubishi",
     "Imperial Hotel": "Hotel Imperialny",
     "Rokumeikan": "Rokumeikan",
-    "Goryoukaku": "Twierdza Goryōkaku",
+    "Goryoukaku": "Goryoukaku",
     "Hakodate Magistrate": "Namiestnictwo Hakodate",
     "Dead drop": "martwa skrzynka",
-    "Bastion fort": "Fort bastionowy",
+    "Bastion fort": "Twierdza bastionowa",
     "Cietoi": "Ziemia okrzemkowa",
     "deed book": "akt własności ziemi",
     "Kaitenmaru": "okręt Kaitenmaru",

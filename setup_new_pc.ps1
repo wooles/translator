@@ -93,7 +93,7 @@ if (-not $ApiKey -or $ApiKey -eq "twój_klucz_api_tutaj") {
     Write-Host "  Podaj swój klucz GEMINI_API_KEY (uzyskany z https://aistudio.google.com/):" -ForegroundColor Cyan
     $ApiKey = Read-Host "  Klucz API"
     if ($ApiKey) {
-        $EnvContent = "GEMINI_API_KEY=$ApiKey`nGEMINI_MODEL=gemini-3.7-flash`nBATCH_SIZE=24`nENABLE_VERIFIER=true`nKEEP_HONORIFICS=true"
+        $EnvContent = "GEMINI_API_KEY=$ApiKey`nGEMINI_MODEL=gemini-3.8-flash`nBATCH_SIZE=24`nENABLE_VERIFIER=true`nKEEP_HONORIFICS=true"
         Set-Content -Path $EnvFile -Value $EnvContent -Encoding UTF8
         Write-Host "  -> Zapisano klucz w pliku .env" -ForegroundColor Green
     }
@@ -104,7 +104,7 @@ if (-not $ApiKey -or $ApiKey -eq "twój_klucz_api_tutaj") {
 # ------------------------------------------------------------------------------
 # 6. Indeksowanie bazy Translation Memory i testy systemu
 # ------------------------------------------------------------------------------
-Write-Host "[6/6] Weryfikacja i autotest systemu..." -ForegroundColor Yellow
+Write-Host "[6/6] Weryfikacja i autotest systemu (Cornerstone v2.0 - 33/33 testy AVT)..." -ForegroundColor Yellow
 if (Test-Path (Join-Path $ProjectDir "baza napisów")) {
     & $VenvPython (Join-Path $ProjectDir "index_baza.py")
 }

@@ -41,9 +41,11 @@ def create_master_backup():
         if proj_path.exists():
             items_to_backup.append((f"Projekt: {proj}", proj_path, f"DesktopProjects/{proj}"))
 
-    single_file = desktop_dir / "produkcja.html"
-    if single_file.exists():
-        items_to_backup.append(("Plik produkcja.html", single_file, "DesktopProjects/produkcja.html"))
+    desktop_files = ["produkcja.html", "Nowy dokument tekstowy.txt"]
+    for df in desktop_files:
+        single_file = desktop_dir / df
+        if single_file.exists():
+            items_to_backup.append((f"Plik Pulpitu: {df}", single_file, f"DesktopProjects/{df}"))
 
     EXCLUDE_DIRS = {".venv", "__pycache__", ".pytest_cache", "bin", "obj", ".vs"}
 
@@ -146,6 +148,11 @@ def restore_master_backup():
             pip_exe = trans_dir / ".venv" / "Scripts" / "pip.exe"
             if pip_exe.exists():
                 subprocess.run([str(pip_exe), "install", "-r", "requirements.txt"], check=False)
+            py_exe = trans_dir / ".venv" / "Scripts" / "python.exe"
+            test_py = trans_dir / "test_system.py"
+            if py_exe.exists() and test_py.exists():
+                print("\n[INFO] Weryfikacja CornerStone v2.0 (33/33 testy AVT)...")
+                subprocess.run([str(py_exe), str(test_py)], check=False)
 
     print("\n" + "=" * 70)
     print("  PRZYWRACANIE ZAKONCZONE W 100%! WSZYSTKO JEST NA SWOIM MIEJSCU!")

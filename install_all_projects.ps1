@@ -129,7 +129,7 @@ if (Test-Path $TranslatorDir) {
         Write-Host "     (Link jest klikalny w konsoli lub możesz go skopiować do przeglądarki)" -ForegroundColor DarkGray
         $ApiKey = Read-Host "  Wklej swój GEMINI_API_KEY (i wciśnij Enter)"
         if ($ApiKey) {
-            "GEMINI_API_KEY=$ApiKey`nGEMINI_MODEL=gemini-3.7-flash`nBATCH_SIZE=24`nENABLE_VERIFIER=true`nKEEP_HONORIFICS=true" | Out-File -FilePath $TrEnv -Encoding UTF8
+            "GEMINI_API_KEY=$ApiKey`nGEMINI_MODEL=gemini-3.8-flash`nBATCH_SIZE=24`nENABLE_VERIFIER=true`nKEEP_HONORIFICS=true" | Out-File -FilePath $TrEnv -Encoding UTF8
             Write-Host "  -> Klucz API został pomyślnie zapisany w pliku .env!" -ForegroundColor Green
         }
     }
@@ -137,7 +137,7 @@ if (Test-Path $TranslatorDir) {
     if (Test-Path (Join-Path $TranslatorDir "index_baza.py")) {
         & $TrPython (Join-Path $TranslatorDir "index_baza.py")
     }
-    # Autotesty systemu (13/13 testów AVT)
+    # Autotesty systemu (33/33 testów AVT Cornerstone v2.0)
     if (Test-Path (Join-Path $TranslatorDir "test_system.py")) {
         & $TrPython (Join-Path $TranslatorDir "test_system.py")
     }
