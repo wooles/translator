@@ -623,6 +623,14 @@ def test_avt_formatter_and_cps():
     assert len(title_ep.split("\\N")) == 2, f"Title card must be strictly 2 lines, got: {len(title_ep.split(chr(92)+'N'))}"
     assert "ODCINEK 52" in title_ep.split("\\N")[0]
 
+    # Test Filaru XCVIII: Automatyczne rozdzielenie ODCINEK X TYTUŁ na 2 wiersze
+    title_ep_raw = split_subtitle_syntactically("ODCINEK 53 STWORZYĆ OJCZYZNĘ", is_sign=True)
+    assert title_ep_raw == "ODCINEK 53\\NSTWORZYĆ OJCZYZNĘ"
+    title_ep_colon = split_subtitle_syntactically("ODCINEK 53: STWORZYĆ OJCZYZNĘ", is_sign=True)
+    assert title_ep_colon == "ODCINEK 53\\NSTWORZYĆ OJCZYZNĘ"
+    title_ch_raw = split_subtitle_syntactically("ROZDZIAŁ 12 NOWY POCZĄTEK", is_sign=True)
+    assert title_ch_raw == "ROZDZIAŁ 12\\NNOWY POCZĄTEK"
+
     # Test plansz postaci i banerów z pozycjonowaniem (Tenmaku no Jaadugar cases)
     s1 = "{\\pos(150,600)}SYN TEMÜGIEGO – OTAI"
     s2 = "{\\pos(1650,300)}MŁODSZY BRAT CZYNGIS-CHANA – TEMÜGE"
@@ -722,6 +730,16 @@ def test_typesetting_matcher():
     assert "\\an8" in res
     assert "&HFFFFFF&" in res or "\\1c" in res
     assert "\\bord3" in res
+
+    # Test Quadrant Detection (Typesetting Proximity)
+    pos_br = TypesettingColorMatcher.calculate_optimal_sign_position(region="bottom_right")
+    assert "\\an3" in pos_br and "1750" in pos_br
+    pos_bl = TypesettingColorMatcher.calculate_optimal_sign_position(region="bottom_left")
+    assert "\\an1" in pos_bl and "170" in pos_bl
+    pos_tr = TypesettingColorMatcher.calculate_optimal_sign_position(region="top_right")
+    assert "\\an9" in pos_tr and "1750" in pos_tr
+    pos_tl = TypesettingColorMatcher.calculate_optimal_sign_position(region="top_left")
+    assert "\\an7" in pos_tl and "170" in pos_tl
     print(" -> PASSED: Moduł auto-stylizacji i kolorów ASS działa w 100%.")
 
 from manga_canon import MangaCanonRegistry

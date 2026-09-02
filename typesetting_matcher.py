@@ -89,21 +89,40 @@ class TypesettingColorMatcher:
     def calculate_optimal_sign_position(cls, sign_type: str = "sign", region: Optional[str] = None) -> str:
         """
         Calculates optimal ASS positioning tags (\\anX / \\pos) to ensure on-screen signs
-        do not collide with dialogue at the bottom of the screen.
+        are positioned in the vicinity of the original visual text (Typesetting Proximity).
         """
         st = (sign_type or "").lower()
-        reg = (region or "").lower()
+        reg = (region or "").lower().strip()
 
-        if "header" in st or "title" in st or "tytuł" in st or reg == "top":
-            return r"{\an8\pos(960,100)}"
-        elif "left" in st or reg == "top_left":
-            return r"{\an7\pos(150,150)}"
-        elif "right" in st or reg == "top_right":
-            return r"{\an9\pos(1770,150)}"
-        elif "center" in st or "card" in st or "phone" in st or "sms" in st or "letter" in st or "list" in st or "kartka" in st or "notatka" in st:
+        # 1. Exact Quadrant Mapping (Typesetting Proximity)
+        if reg in ["bottom_right", "right_bottom", "br", "dolny_prawy", "prawy_dolny"]:
+            return r"{\an3\pos(1750,920)}"
+        elif reg in ["bottom_left", "left_bottom", "bl", "dolny_lewy", "lewy_dolny"]:
+            return r"{\an1\pos(170,920)}"
+        elif reg in ["top_right", "right_top", "tr", "gorny_prawy", "prawy_gorny"]:
+            return r"{\an9\pos(1750,150)}"
+        elif reg in ["top_left", "left_top", "tl", "gorny_lewy", "lewy_gorny"]:
+            return r"{\an7\pos(170,150)}"
+        elif reg in ["center", "srodek", "middle"]:
             return r"{\an5\pos(960,540)}"
-        elif "screen" in st or "sign" in st or "plansza" in st:
-            return r"{\an8\pos(960,120)}"
+        elif reg in ["bottom_center", "bottom", "dol", "dolny"]:
+            return r"{\an2\pos(960,920)}"
+        elif reg in ["top_center", "top", "gora", "gorny"]:
+            return r"{\an8\pos(960,100)}"
+
+        # 2. Fallback based on semantic sign type
+        if "bottom_right" in st:
+            return r"{\an3\pos(1750,920)}"
+        elif "bottom_left" in st:
+            return r"{\an1\pos(170,920)}"
+        elif "left" in st:
+            return r"{\an7\pos(150,150)}"
+        elif "right" in st:
+            return r"{\an9\pos(1770,150)}"
+        elif any(k in st for k in ["card", "phone", "sms", "letter", "list", "kartka", "notatka"]):
+            return r"{\an5\pos(960,540)}"
+        elif any(k in st for k in ["header", "title", "tytuł", "screen", "sign", "plansza"]):
+            return r"{\an8\pos(960,100)}"
         else:
             return r"{\an8}"
 

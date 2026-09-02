@@ -40,6 +40,10 @@ class DetectedSign(BaseModel):
         default="TIME_OR_LOCATION",
         description="Typ planszy: 'TIME_BANNER', 'LOCATION_BANNER', 'EPISODE_TITLE', 'CHAPTER_SIGN'"
     )
+    screen_region: Optional[str] = Field(
+        default="top",
+        description="Rzeczywiste położenie tekstu/planszy na kadrze: 'bottom_right', 'bottom_left', 'top_right', 'top_left', 'top_center', 'center', 'bottom_center'"
+    )
 
 
 class VisualSignDetector:
@@ -124,7 +128,9 @@ ZASADY BEZPIECZEŃSTWA (FILTR ANTYKOLIZYJNY):
    - To zwykła scena z postaciami lub krajobraz bez dużych napisów.
    - Tekst na ekranie to gęsty tekst z tła (strona w notesie, gazeta, list, ekran komputera, manga, plakat w tle).
    - Tekst jest nieczytelny lub nie stanowi planszy narracyjnej.
-3. Jeśli is_title_or_banner = True, podaj zwięzłe, naturalne polskie tłumaczenie w translation_pl (np. 'CZASY WSPÓŁCZESNE', 'OBECNIE', 'LONDYN, 1888').
+3. Jeśli is_title_or_banner = True:
+   - podaj zwięzłe, naturalne polskie tłumaczenie w translation_pl (np. 'CZASY WSPÓŁCZESNE', 'OBECNIE', 'LONDYN, 1888').
+   - wskaż w screen_region precyzyjne położenie tekstu na kadrze: 'bottom_right' (prawy dolny róg), 'bottom_left' (lewy dolny róg), 'top_right' (prawy górny róg), 'top_left' (lewy górny róg), 'top_center' (górna belka), 'center' (środek kadru).
 
 Zwróć wynik w formacie JSON zgodnym ze schematem DetectedSign."""
 
@@ -175,7 +181,8 @@ Zwróć wynik w formacie JSON zgodnym ze schematem DetectedSign."""
                                 from typesetting_matcher import TypesettingColorMatcher
                                 prefix = TypesettingColorMatcher.enhance_sign_typesetting(
                                     sign_type=sign_info.banner_type or "sign",
-                                    image_path=frame_path
+                                    image_path=frame_path,
+                                    region=sign_info.screen_region or "top"
                                 )
                                 styled_text = f"{prefix}[ {clean_pl} ]"
                             except Exception:

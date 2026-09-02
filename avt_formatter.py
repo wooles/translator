@@ -86,6 +86,17 @@ def split_subtitle_syntactically(text: str, max_line_len: int = MAX_LINE_LENGTH,
     normalized_content = re.sub(r"\\N|\\n|\n", " ", raw_content)
     normalized_content = re.sub(r"\s+", " ", normalized_content).strip()
 
+    # 2. AUTOMATIC 2-LINE FORMATTING FOR EPISODE/CHAPTER TITLE CARDS (Filar XCVIII)
+    # E.g. "ODCINEK 53 STWORZYĆ OJCZYZNĘ" -> "ODCINEK 53\NSTWORZYĆ OJCZYZNĘ"
+    # E.g. "ODCINEK 53: STWORZYĆ OJCZYZNĘ" -> "ODCINEK 53\NSTWORZYĆ OJCZYZNĘ"
+    # E.g. "ROZDZIAŁ 12 NOWY POCZĄTEK" -> "ROZDZIAŁ 12\NNOWY POCZĄTEK"
+    ep_match = re.match(r"^(ODCINEK|Odcinek|ROZDZIAŁ|Rozdział|AKT|Akt|CZĘŚĆ|Część|EPIZOD|Epizod)\s+(\d+|[IVXLCDM]+)(?:\s*[:–-]\s*|\s+)(.+)$", normalized_content)
+    if ep_match:
+        ep_prefix = f"{ep_match.group(1)} {ep_match.group(2)}"
+        ep_title = ep_match.group(3).strip()
+        if ep_title:
+            return f"{ts_prefix}{ep_prefix}{sep}{ep_title}"
+
     clean_full = clean_text_for_len(normalized_content)
     if len(clean_full) <= max_line_len:
         return f"{ts_prefix}{normalized_content}"
