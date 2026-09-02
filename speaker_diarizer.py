@@ -126,12 +126,12 @@ class SpeakerVoiceClassifier:
                 f0 = cls.estimate_pitch_f0(chunk, sample_rate=framerate)
 
                 if f0 is not None:
-                    if f0 >= 175.0:
-                        results[b_id] = f"żeński / wysoki (~{int(f0)}Hz)"
-                    elif f0 <= 155.0:
+                    if f0 <= 155.0:
                         results[b_id] = f"męski / niski (~{int(f0)}Hz)"
+                    elif f0 <= 190.0:
+                        results[b_id] = f"męski tenor / alt żeński (~{int(f0)}Hz)"
                     else:
-                        results[b_id] = f"mieszany/pośredni (~{int(f0)}Hz)"
+                        results[b_id] = f"wysoki / dziecięcy / żeński (~{int(f0)}Hz)"
 
         except Exception:
             pass

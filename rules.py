@@ -1060,6 +1060,21 @@ FILAR CXXXV: JAPOŃSKA MATRYCA 8 DIALEKTÓW REGIONALNYCH I IDIOLEKTÓW (HŌGEN &
   8. Hokkaido-ben & Dialogi Pogranicza Ajnów (北海道弁 - Północ, Sapporo, Otaru - 'Golden Kamuy'):
      * Cechy: Surowy klimat północy, mowa traperska, autentyczna terminologia Ajnów ('Hinna', 'Citatap', 'namara', 'shibareru').
      * Polska stylizacja: Lakoniczny, chłodny język pionierów i myśliwych.
+
+FILAR CXXXVI: TRIANGULACJA KOGNYTYWNA I FONICZNA WIEKU/PŁCI (MAŁY CHŁOPIEC VS DZIEWCZYNKA VS DOROSŁY):
+- Rozstrzyganie rodzaju gramatycznego w języku polskim (-łem/-łam, -eś/-aś) przy braku twarzy w kadrze (voiceover, infografika, monolog wewnętrzny, narracja zza kadru) na podstawie 4-poziomowej triangulacji:
+  1. MAŁY CHŁOPIEC (Shounen / Dziecko płci męskiej - dubbingowany przez seiyū kobietę o wysokim F0 > 200 Hz, np. Luffy, Conan, Killua, Naruto):
+     * Markery audio: Zaimki 'Boku', 'Ore', 'Oira', 'Boku-chan', zwroty 'Niichan', 'Neechan', cząstki '-da yo', '-mon', '-yai'.
+     * Kartoteka: Płeć MALE, wiek < 14 lat.
+     * Żelazny wymóg AVT: BEZWZGLĘDNIE stosuj rodzaj MĘSKI ('Zgubiłem się!', 'Chciałem pomóc!', 'Domyślałem się!', 'Byłem sam!'). KATEGORYCZNY ZAKAZ form żeńskich z powodu wysokiego głosu aktorki!
+  2. MAŁA DZIEWCZYNKA (Shojo / Dziecko płci żeńskiej - wysoki głos F0 > 200 Hz):
+     * Markery audio: Zaimki 'Atashi', 'Watashi', 'Uchi', mówienie o sobie w 3. osobie ('Anya lubi...'), zwroty 'Onii-chan', 'Onee-chan', cząstki '-na no', '-wa'.
+     * Kartoteka: Płeć FEMALE, wiek < 14 lat.
+     * Żelazny wymóg AVT: BEZWZGLĘDNIE stosuj rodzaj ŻEŃSKI ('Zgubiłam się!', 'Chciałam pomóc!', 'Domyślałam się!', 'Byłam sama!').
+  3. DOROSŁY MĘŻCZYZNA (Niski baryton/bas F0 <= 155 Hz):
+     * Żelazny wymóg AVT: W monologach zza kadru i dedukcjach BEZWZGLĘDNIE stosuj rodzaj MĘSKI ('Domyślałem się, ale...', 'Wiedziałem to', 'Zrobiłem'). KATEGORYCZNY ZAKAZ form żeńskich!
+  4. DOROSŁA KOBIETA (Alt/Sopran F0 >= 180 Hz bez markerów chłopięcych):
+     * Żelazny wymóg AVT: Stosuj rodzaj ŻEŃSKI ('Domyślałam się, ale...', 'Wiedziałam to', 'Zrobiłam').
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -2424,6 +2439,13 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR CXXXV - Japońska Matryca 8 Dialektów Regionalnych (Hōgen & Yakuwarigo)]: "
             "Stosuj zróżnicowaną stylizację dla 8 grup dialektalnych (Satsuma-ben: fonetyczne ściągnięcia 'Sierżan' Cukszma góni za Asirpoł!', Kansai: zadziorna miejska polszczyzna, Tohoku: ciepła mowa gawędziarska 'dyć prawda', Hiroshima: twardy slang Yakuzy 'bo ci łeb urwę', Okinawa: słoneczna życzliwość). Zakaz karykatury góralskiej!"
+        )
+
+    # 79. Triangulacja Kognitywna i Foniczna Wieku/Płci (Filar CXXXVI)
+    if any(item.get("speaker_gender") in ["chłopiec", "dziewczynka", "mężczyzna", "kobieta"] or any(w in item.get("en", "").lower() for w in ["i guessed", "i figured", "i thought", "i knew", "i was", "i did", "i felt", "i saw", "i heard", "i wanted"]) for item in batch_items):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CXXXVI - Triangulacja Kognitywna i Foniczna Wieku/Płci (Chłopiec vs Dziewczynka vs Dorosły)]: "
+            "Dopasuj rodzaj gramatyczny czasowników 1. osoby (-łem vs -łam): Dorosły mężczyzna oraz Mały chłopiec (mimo wysokiego głosu seiyū!) BEZWZGLĘDNIE otrzymują formy męskie ('Domyślałem się', 'Zgubiłem się!', 'Wiedziałem'). Kobieta i Mała dziewczynka otrzymują formy żeńskie ('Domyślałam się', 'Zgubiłam się!')."
         )
 
     if not focused_pillars:

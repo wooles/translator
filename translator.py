@@ -366,40 +366,48 @@ def detect_japanese_pragmatic_register(jp_text: str, en_text: str = "") -> Optio
     # 3. Tough Soldier / Battle Slang (-ze, -zo, temee, kisama, ore)
     if any(k in clean_jp for k in ["ぜ", "ぞ", "てめえ", "貴様", "野郎", "俺"]) or any(k in rom_lower for k in ["-ze", " ze", "-zo", " zo", "temee", "kisama", "yarou", "ore"]):
         return "Szorstki żołnierski / Bojowy (męski, twardy rejestr wojskowy, brak zmiękczeń)"
-        
-    # 4. Youth / Casual Slang (-ssu, -yatsu, -chatt, -tteba)
+
+    # 4. Mały Chłopiec / Shounen (Boku, Ore, Oira, Boku-chan, Niichan, Neechan)
+    if any(k in clean_jp for k in ["ぼく", "ボク", "おいら", "ボクちゃん", "ぼくちゃん", "にいちゃん", "ねえちゃん"]) or any(k in rom_lower for k in ["boku ", "boku,", "boku-", "oira", "niichan", "neechan", "boku wa", "boku ga"]):
+        return "Mały chłopiec / Shounen (mimo wysokiego głosu seiyū BEZWZGLĘDNIE rodzaj MĘSKI: -łem, -łem się, 'Zgubiłem się', 'Chciałem pomóc' - Filar CXXXVI)"
+
+    # 5. Mała Dziewczynka / Shojo (Atashi, Uchi, Onii-chan, Onee-chan, -na no)
+    if any(k in clean_jp for k in ["あたち", "あたし", "ウチ", "お兄ちゃん", "お姉ちゃん", "おにいちゃん", "おねえちゃん"]) or any(k in rom_lower for k in ["atashi", "atachi", "onii-chan", "onee-chan", "oniichan", "oneechan"]):
+        return "Mała dziewczynka / Shojo (wysoki głos dziecięcy, rodzaj ŻEŃSKI: -łam, -łam się, 'Zgubiłam się', 'Chciałam pomóc' - Filar CXXXVI)"
+
+    # 6. Youth / Casual Slang (-ssu, -yatsu, -chatt, -tteba)
     if any(k in clean_jp for k in ["っす", "やつ", "ちゃった", "ってば"]) or any(k in rom_lower for k in ["-ssu", " ssu", "yatsu", "chatta", "tteba"]):
         return "Młodzieżowy / Swobodny (luźny styl potoczny, dynamiczne skróty)"
         
-    # 5. Romantic Intimate / Kokuhaku (daisuki, aishiteru, zutto issho)
+    # 7. Romantic Intimate / Kokuhaku (daisuki, aishiteru, zutto issho)
     if any(k in clean_jp for k in ["大好き", "愛してる", "ずっと一緒"]) or any(k in rom_lower for k in ["daisuki", "aishiteru", "zutto issho"]):
         return "Czuły miłosny / Kokuhaku (wyznanie miłosne 'Kocham cię', eliminacja friendzone)"
 
-    # 6. Satsuma-ben (Chesto, Gowasu, Oddon, Jaddo, Mosu)
+    # 8. Satsuma-ben (Chesto, Gowasu, Oddon, Jaddo, Mosu)
     if any(k in clean_jp for k in ["チェスト", "ごわす", "でごわす", "おっどん", "じゃっど", "もす"]) or any(k in rom_lower for k in ["chesto", "gowasu", "oddon", "jaddo", "mosu"]):
         return "Dialekt Satsuma / Satsuma-ben (fonetyczne ściągnięcia, twarda artykulacja 'Cukszma', elizje apostrofowe 'Sierżan'', hermetyczny szyfr wojenny - Filar CXXXV)"
 
-    # 7. Kansai-ben / Osaka & Kyoto (-nen, -yaro, honma, akan, seyana, -dosu, oideyasu)
+    # 9. Kansai-ben / Osaka & Kyoto (-nen, -yaro, honma, akan, seyana, -dosu, oideyasu)
     if any(k in clean_jp for k in ["ねん", "やろ", "ほんま", "あかん", "せやな", "どす", "おいでやす"]) or any(k in rom_lower for k in ["-nen", "honma", "akan", "seyana", "nande ya", "dosu", "oideyasu"]):
         return "Dialekt Kansai / Kansai-ben (zadziorna, błyskotliwa miejska polszczyzna z humorem / aksamitny styl salonowy Kioto - Filar CXXXV)"
 
-    # 8. Tohoku-ben & Tsugaru-ben (-dabe, -daccha, ora, nda, -zura, nashite)
+    # 10. Tohoku-ben & Tsugaru-ben (-dabe, -daccha, ora, nda, -zura, nashite)
     if any(k in clean_jp for k in ["だべ", "だっちゃ", "おら", "ずら", "なして"]) or any(k in rom_lower for k in ["-dabe", "-daccha", "dappe", "zura", "nashite"]):
         return "Dialekt Tohoku / Tsugaru-ben (ciepła, gawędziarska mowa prowincjonalna 'dyć prawda', 'no przeca' - Filar CXXXV)"
 
-    # 9. Hiroshima-ben & Yakuza (-jaken, -jakee, -noo, buchi, taigii)
+    # 11. Hiroshima-ben & Yakuza (-jaken, -jakee, -noo, buchi, taigii)
     if any(k in clean_jp for k in ["じゃけん", "じゃけえ", "たいぎい", "ぶち"]) or any(k in rom_lower for k in ["jaken", "jakee", "taigii", "buchi"]):
         return "Dialekt Hiroshima / Półświatek Yakuzy (szorstki, bezkompromisowy slang gangsterski 'bo ci łeb urwę' - Filar CXXXV)"
 
-    # 10. Hakata-ben & Kyūshū (-to?, -bai, -tai, suitoo, batten)
+    # 12. Hakata-ben & Kyūshū (-to?, -bai, -tai, suitoo, batten)
     if any(k in clean_jp for k in ["ばい", "たい", "好いとー", "ばってん"]) or any(k in rom_lower for k in ["-bai", "-tai", "suitoo", "batten"]):
         return "Dialekt Hakata / Kiusiu (śpiewna, bezpośrednia, urocza mowa południowa - Filar CXXXV)"
 
-    # 11. Okinawa-ben & Uchinaaguchi (Haisai, Mensoore, Nankurunaisa, -saa)
+    # 13. Okinawa-ben & Uchinaaguchi (Haisai, Mensoore, Nankurunaisa, -saa)
     if any(k in clean_jp for k in ["はいさい", "はいたい", "めんそーれ", "なんくるないさ"]) or any(k in rom_lower for k in ["haisai", "haitai", "mensoore", "nankurunaisa"]):
         return "Dialekt Okinawa / Uchinaaguchi (słoneczny, zrelaksowany ton wyspiarski 'Spokojna głowa' - Filar CXXXV)"
 
-    # 12. Hokkaido-ben (Namara, Shibareru, Shitakke)
+    # 14. Hokkaido-ben (Namara, Shibareru, Shitakke)
     if any(k in clean_jp for k in ["なまら", "しばれる", "したっけ"]) or any(k in rom_lower for k in ["namara", "shibareru", "shitakke"]):
         return "Dialekt Hokkaido (surowa, lakoniczna mowa pionierów północy i traperów - Filar CXXXV)"
         
@@ -1273,10 +1281,19 @@ class MultimodalTranslator:
                     pbar.write(f"    └─ Szlif:  \"{disp_ref}\"")
             for item in pass1_items:
                 raw_final = sanitize_sub_text(refined_dict.get(item["id"], item["pl"]))
+                # Triangulate effective gender from character registry, audio F0 voice, and pragmatic clues (Filar CXXXVI)
+                spk_gen = item.get("speaker_gender")
+                spk_voice = item.get("speaker_voice", "")
+                if not spk_gen:
+                    if "męski" in spk_voice.lower():
+                        spk_gen = "mężczyzna"
+                    elif "żeński" in spk_voice.lower():
+                        spk_gen = "kobieta"
+
                 final_text, fixes = AVTLinter.lint_and_fix_line(
                     text=raw_final,
-                    speaker_gender=item.get("speaker_gender"),
-                    is_all_girls_scene=True,
+                    speaker_gender=spk_gen,
+                    is_all_girls_scene=(spk_gen in ["kobieta", "dziewczynka"]),
                     is_sign=item.get("is_sign", False),
                     user_feedback_rules=all_user_rules,
                     custom_glossary=combined_glossary
@@ -1297,10 +1314,18 @@ class MultimodalTranslator:
         else:
             for item in pass1_items:
                 raw_final = sanitize_sub_text(item["pl"])
+                spk_gen = item.get("speaker_gender")
+                spk_voice = item.get("speaker_voice", "")
+                if not spk_gen:
+                    if "męski" in spk_voice.lower():
+                        spk_gen = "mężczyzna"
+                    elif "żeński" in spk_voice.lower():
+                        spk_gen = "kobieta"
+
                 final_text, fixes = AVTLinter.lint_and_fix_line(
                     text=raw_final,
-                    speaker_gender=item.get("speaker_gender"),
-                    is_all_girls_scene=True,
+                    speaker_gender=spk_gen,
+                    is_all_girls_scene=(spk_gen in ["kobieta", "dziewczynka"]),
                     is_sign=item.get("is_sign", False),
                     user_feedback_rules=all_user_rules,
                     custom_glossary=combined_glossary

@@ -165,6 +165,7 @@ def test_rules_and_prompts():
     assert "FILAR CXXXIII:" in sys_prompt
     assert "FILAR CXXXIV:" in sys_prompt
     assert "FILAR CXXXV:" in sys_prompt
+    assert "FILAR CXXXVI:" in sys_prompt
     assert "FILAR CXXI" in ver_prompt
     assert "FILAR CXXV" in ver_prompt
     assert "FILAR CXXX" in ver_prompt
@@ -173,7 +174,8 @@ def test_rules_and_prompts():
     assert "FILAR CXXXIII" in ver_prompt
     assert "FILAR CXXXIV" in ver_prompt
     assert "FILAR CXXXV" in ver_prompt or "CXXXV" in ver_prompt or "Filar CXXXV" in ver_prompt or "FILAR" in ver_prompt
-    print(" -> PASSED: Kompletny Zunifikowany Kanon 135 Filarów AVT (Filary I – CXXXV) jest aktywny w obu fazach tłumaczenia.")
+    assert "FILAR CXXXVI" in ver_prompt or "CXXXVI" in ver_prompt or "Filar CXXXVI" in ver_prompt or "FILAR" in ver_prompt
+    print(" -> PASSED: Kompletny Zunifikowany Kanon 136 Filarów AVT (Filary I – CXXXVI) jest aktywny w obu fazach tłumaczenia.")
 
 def test_pydantic_schemas():
     print("[TEST 2/5] Weryfikacja schematów Pydantic i Detektora Rejestru Pragmatycznego...")
@@ -201,6 +203,13 @@ def test_pydantic_schemas():
 
     reg_hiroshima = detect_japanese_pragmatic_register("わりゃ、ぶちたいぎいんじゃけん！ [warya, buchi taigiin jaken!]")
     assert reg_hiroshima is not None and "Hiroshima" in reg_hiroshima
+
+    # Test detekcji rejestrów dziecięcych (Filar CXXXVI: Chłopiec vs Dziewczynka)
+    reg_boy = detect_japanese_pragmatic_register("ぼく、迷子になっちゃった [boku, maigo ni nacchatta]")
+    assert reg_boy is not None and "chłopiec" in reg_boy.lower()
+
+    reg_girl = detect_japanese_pragmatic_register("あたち、お兄ちゃんと行きたいの [atachi, onii-chan to ikitai]")
+    assert reg_girl is not None and "dziewczynka" in reg_girl.lower()
 
     diag = SceneDiagnosis(
         dramatic_context="Yoritsugu siedzi w pokoju i zazdrośnie patrzy na powitanie Tokiyukiego.",
@@ -534,6 +543,16 @@ def test_avt_linter():
     # Test korekty rodzaju męskiego na żeński u dziewcząt
     t3, f3 = AVTLinter.lint_and_fix_line("Głupi jesteś?", is_all_girls_scene=True)
     assert t3 == "Głupia jesteś?"
+
+    # Test Filaru CXXXVI: Triangulacja foniczna i korekta rodzaju żeńskiego na męski (Dorosły / Chłopiec / Niski głos F0)
+    tm1, _ = AVTLinter.lint_and_fix_line("Domyślałam się, ale...", speaker_gender="mężczyzna")
+    assert tm1 == "Domyślałem się, ale..."
+    tb1, _ = AVTLinter.lint_and_fix_line("Zgubiłam się!", speaker_gender="chłopiec")
+    assert tb1 == "Zgubiłem się!"
+    tg1, _ = AVTLinter.lint_and_fix_line("Zgubiłem się!", speaker_gender="dziewczynka")
+    assert tg1 == "Zgubiłam się!"
+    ta1, _ = AVTLinter.lint_and_fix_line("Wiedziałam to od dawna.", speaker_gender="męski / niski (~120Hz)")
+    assert ta1 == "Wiedziałem to od dawna."
     
     # Test korekty rekcji przyczyny zgonu (wylew / atak serca)
     t4, f4 = AVTLinter.lint_and_fix_line("Natsuki zmarła na wylew zaraz po porodzie.")

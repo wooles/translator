@@ -315,23 +315,58 @@ class AVTLinter:
                     modified = re.sub(pat_src, clean_trg, modified, flags=re.IGNORECASE)
                     applied_fixes.append(f"[Słownik Deterministyczny] '{src}' -> '{clean_trg}'")
 
-        # 4. Grammatical gender alignment for all-female scenes (Pillar XIII)
-        if is_all_girls_scene and not is_sign:
-            gender_fixes = [
-                (r"\b[Gg]łupi jesteś\?", "Głupia jesteś?"),
-                (r"\b[Jj]esteś pewien\?", "Jesteś pewna?"),
-                (r"\b[Oo]szalałeś\?", "Oszalałaś?"),
-                (r"\b[Zz]głupiałeś\?", "Zgłupiałaś?"),
-                (r"\b[Ww]idziałeś to\?", "Widziałaś to?"),
-                (r"\b[Ss]łyszałeś to\?", "Słyszałaś to?"),
-                (r"\b[Zz]robiłeś to\?", "Zrobiłaś to?"),
-                (r"\b[Pp]oszedłeś tam\?", "Poszłaś tam?"),
-                (r"\b[Mm]yślałeś, że\b", "Myślałaś, że"),
-            ]
-            for pattern, repl in gender_fixes:
-                if re.search(pattern, modified):
-                    modified = re.sub(pattern, repl, modified)
-                    applied_fixes.append(f"[Filar XIII - Płeć Żeńska w Obsadzie] {pattern} -> {repl}")
+        # 4. Grammatical gender alignment (Filar XIII & Filar CXXXVI: Acoustic & Cognitive Gender Triangulation)
+        if not is_sign:
+            spk_norm = (speaker_gender or "").lower()
+            is_male_speaker = any(w in spk_norm for w in ["mężczyzna", "chłopiec", "male", "boy", "męski"])
+            is_female_speaker = any(w in spk_norm for w in ["kobieta", "dziewczynka", "female", "girl", "żeński"]) or (is_all_girls_scene and not is_male_speaker)
+
+            if is_male_speaker:
+                male_fixes = [
+                    (r"\b[Dd]omyślałam się\b", lambda m: "Domyślałem się" if m.group(0)[0].isupper() else "domyślałem się"),
+                    (r"\b[Mm]yślałam\b", lambda m: "Myślałem" if m.group(0)[0].isupper() else "myślałem"),
+                    (r"\b[Ww]iedziałam\b", lambda m: "Wiedziałem" if m.group(0)[0].isupper() else "wiedziałem"),
+                    (r"\b[Ww]idziałam\b", lambda m: "Widziałem" if m.group(0)[0].isupper() else "widziałem"),
+                    (r"\b[Zz]robiłam\b", lambda m: "Zrobiłem" if m.group(0)[0].isupper() else "zrobiłem"),
+                    (r"\b[Pp]oszłam\b", lambda m: "Poszedłem" if m.group(0)[0].isupper() else "poszedłem"),
+                    (r"\b[Zz]nalazłam\b", lambda m: "Znalazłem" if m.group(0)[0].isupper() else "znalazłem"),
+                    (r"\b[Cc]zułam\b", lambda m: "Czułem" if m.group(0)[0].isupper() else "czułem"),
+                    (r"\b[Ss]łyszałam\b", lambda m: "Słyszałem" if m.group(0)[0].isupper() else "słyszałem"),
+                    (r"\b[Chch]ciałam\b", lambda m: "Chciałem" if m.group(0)[0].isupper() else "chciałem"),
+                    (r"\b[Mm]ogłam\b", lambda m: "Mogłem" if m.group(0)[0].isupper() else "mogłem"),
+                    (r"\b[Zz]rozumiałam\b", lambda m: "Zrozumiałem" if m.group(0)[0].isupper() else "zrozumiałem"),
+                    (r"\b[Pp]owiedziałam\b", lambda m: "Powiedziałem" if m.group(0)[0].isupper() else "powiedziałem"),
+                    (r"\b[Bb]ałam się\b", lambda m: "Bałem się" if m.group(0)[0].isupper() else "bałem się"),
+                    (r"\b[Uu]dałam się\b", lambda m: "Udałem się" if m.group(0)[0].isupper() else "udałem się"),
+                    (r"\b[Bb]yłam\b", lambda m: "Byłem" if m.group(0)[0].isupper() else "byłem"),
+                    (r"\b[Zz]gubiłam się\b", lambda m: "Zgubiłem się" if m.group(0)[0].isupper() else "zgubiłem się"),
+                    (r"\b[Jj]esteś pewna\?", "Jesteś pewien?"),
+                    (r"\b[Gg]łupia jesteś\?", "Głupi jesteś?"),
+                    (r"\b[Oo]szalałaś\?", "Oszalałeś?"),
+                    (r"\b[Zz]głupiałaś\?", "Zgłupiałeś?"),
+                ]
+                for pattern, repl in male_fixes:
+                    if re.search(pattern, modified):
+                        modified = re.sub(pattern, repl, modified)
+                        applied_fixes.append(f"[Filar CXXXVI - Mówca Męski/Chłopiec] Korekta rodzaju żeńskiego na męski: {pattern}")
+
+            elif is_female_speaker:
+                female_fixes = [
+                    (r"\b[Gg]łupi jesteś\?", "Głupia jesteś?"),
+                    (r"\b[Jj]esteś pewien\?", "Jesteś pewna?"),
+                    (r"\b[Oo]szalałeś\?", "Oszalałaś?"),
+                    (r"\b[Zz]głupiałeś\?", "Zgłupiałaś?"),
+                    (r"\b[Ww]idziałeś to\?", "Widziałaś to?"),
+                    (r"\b[Ss]łyszałeś to\?", "Słyszałaś to?"),
+                    (r"\b[Zz]robiłeś to\?", "Zrobiłaś to?"),
+                    (r"\b[Pp]oszedłeś tam\?", "Poszłaś tam?"),
+                    (r"\b[Mm]yślałeś, że\b", "Myślałaś, że"),
+                    (r"\b[Zz]gubiłem się\b", lambda m: "Zgubiłam się" if m.group(0)[0].isupper() else "zgubiłam się"),
+                ]
+                for pattern, repl in female_fixes:
+                    if re.search(pattern, modified):
+                        modified = re.sub(pattern, repl, modified)
+                        applied_fixes.append(f"[Filar XIII/CXXXVI - Mówca Żeński/Dziewczynka] Korekta rodzaju męskiego na żeński: {pattern}")
 
         # 5. Anti-Bracket normalization for all subtitles (Pillars IV & LX)
         # 5a. Strip outer square brackets e.g. "[ Przepraszam za zwłokę! ]" -> "Przepraszam za zwłokę!"
