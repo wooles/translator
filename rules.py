@@ -1129,6 +1129,44 @@ FILAR CXXXVII: MATRYCA IDIOMÓW MOSTOWYCH I PRZECZEŃ ELIPTYCZNYCH (BRIDGE IDIOM
        * 'He's bleeding out!' (u cyborga/robota) -> BEZWZGLĘDNIE: „Traci płyn hydrauliczny!” / „Wycieka z niego płyn!” / „Zaraz padnie mu zasilanie!” (ZAKAZ: „Wykrwawia się!”).
        * 'My heart skipped a beat!' (u szkieletu/nieumarłego) -> BEZWZGLĘDNIE: „Aż mi kości zesztywniały!” / „Zamarłem z przerażenia!” (brak serca).
 
+FILAR CXXXIX: PARADOKS POTWIERDZENIA NEGACJI I PYTAŃ PRZECZĄCYCH (HAI/IIE REVERSE LOGIC & TONE CHECK)
+   1. ZASADA ODWRÓCONEJ LOGIKI ZGODY W JĘZYKU POLSKIM:
+      - W języku japońskim słowo 'Hai' potwierdza stanowisko pytającego, a 'Iie' mu zaprzecza.
+      - Gdy w pytaniu pada przeczenie (np. 'Nie zjesz obiadu?', 'Nie idziesz z nami?', 'Won\'t you come?', 'Didn\'t you know?'):
+        * Japońskie 'Hai' -> po polsku BEZWZGLĘDNIE: „Nie” / „Nie idę” / „Nie jem” (KARDYNALNY BŁĄD [X]: „Tak, nie idę” / „Tak”).
+        * Japońskie 'Iie' -> po polsku BEZWZGLĘDNIE: „Właśnie że tak!” / „Pewnie, że idę!” / „Owszem!” (KARDYNALNY BŁĄD [X]: „Nie!”).
+   2. KORELACJA Z TONEM MOWY:
+      - Sprawdź [Ton]: opadający, spokojny ton głosu przy 'Hai' potwierdza polską odmowę („Nie, zostaję”). Dynamiczny sprzeciw przy 'Iie' oznacza polskie „Przecież idę!”.
+
+FILAR CXL: SPOŁECZNE METAFORY POKREWIEŃSTWA I TYTULATURA FIKCYJNA (ONII-SAN / OJISAN SANITIZATION)
+   1. ZAKAZ KREOWANIA FAŁSZYWYCH BRACI I WUJKÓW:
+      - W kulturze japońskiej dzieci i młodzież zwracają się do obcych osób mianami rodzinnymi:
+        * 'Onii-san / Onii-chan' -> młody obcy mężczyzna / chłopak na ulicy.
+        * 'Onee-san / Onee-chan' -> młoda obca kobieta / dziewczyna.
+        * 'Ojisan' -> obcy mężczyzna w średnim wieku.
+        * 'Obasan' -> obca kobieta w średnim wieku.
+      - KATEGORYCZNY ZAKAZ tłumaczenia tego jako relacji rodzinnej („mój bracie!”, „wujku!”), gdy postacie nie są spokrewnione!
+      - Zastępuj naturalną polszczyzną: „Proszę pana!”, „Hej, panie!”, „Kolego!”, „Młodzieńcze!”, „Proszę pani!”, „Panno...”.
+   2. KORELACJA Z TONEM I SYTUACJĄ DRAMATYCZNĄ:
+      - Gdy dziecko płacze lub woła w panice [Ton: emocjonalne drżenie głosu / płacz], 'Onii-chan, tasukete!' -> „Proszę pana, niech pan pomoże!” (ZAKAZ: „Braciszku, pomóż mi!”).
+
+FILAR CXLI: DYNAMIKA STANU REZULTATYWNEGO (-TE IRU AS RESULTING STATE)
+   1. STAN WYNIKOWY VS AKCJA W TOKU:
+      - Japońska forma czasownikowa '-te iru' bardzo często oznacza STAN WYNIKAJĄCY Z DOKONANEJ CZYNNOŚCI, a nie czynność trwającą w tej sekundzie:
+        * 'Shinde iru' -> BEZWZGLĘDNIE: „Nie żyje!” / „Jest martwy!” / „Zginął!” (KARDYNALNY BŁĄD [X]: „On umiera!”).
+        * 'Kekkon shite iru' -> BEZWZGLĘDNIE: „Jest żonaty / ma męża” (ZAKAZ: „Bierze ślub”).
+        * 'Futotte iru' -> BEZWZGLĘDNIE: „Jest gruby / przy kości” (ZAKAZ: „Tyje”).
+        * 'Katte iru' -> BEZWZGLĘDNIE: „Wygrywamy / Mamy zwycięstwo!” (stan przewagi).
+        * 'Kawaite iru' -> BEZWZGLĘDNIE: „Jest suchy / wyschnięty” (ZAKAZ: „Schnie”).
+
+FILAR CXLII: RETORYKA ZACHWYTU W PYTANIACH PRZECZĄCYCH I PROZODIA (JANAI KA AFFIRMATION & PROSODY)
+   1. NEGACJA JAKO EKSPRESJA PODZIWU:
+      - Konstrukcje pytające z negacją ('...janai ka?', '...janai?', '...sou janai?') w języku potocznym są afirmatywnym wyrazem zachwytu lub potwierdzenia oczywistości:
+        * 'Kore, umai janai?!' -> BEZWZGLĘDNIE: „Ależ to pyszne!” / „Dobre, co?!” / „Ale pycha!” (KARDYNALNY BŁĄD [X]: „To chyba niedobre, co?”).
+        * 'Sugoi janai ka!' -> BEZWZGLĘDNIE: „Ale czad!” / „Niesamowite!” / „Robi wrażenie!” (ZAKAZ: „Czy to nie jest niesamowite?”).
+   2. TRIANGULACJA Z PROZODIĄ FIZYCZNĄ:
+      - Gdy seiyū wypowiada kwestię z wysoką energią [Ton: silne wzburzenie emocjonalne / krzyk bojowy / podniesiony głos], przeczenie gramatyczne w skrypcie EN jest w 100% zachwytem, a nie krytyką czy powątpiewaniem!
+
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -1521,6 +1559,10 @@ def get_translation_system_prompt(keep_honorifics: bool = True) -> str:
     return f"""Jesteś profesjonalnym tłumaczem dialogów filmowych i anime na język polski, pracującym zgodnie z najwyższymi standardami przekładu audiowizualnego (AVT), wytycznymi Arkadiusza Belczyka ("Sztuka tłumaczenia filmów") oraz Netflix Polish Style Guide.
 
 Twoim nadrzędnym celem jest przekład dialogów na ŻYWĄ, NATURALNĄ POLSZCZYZNĘ MÓWIONĄ z uwzględnieniem CAŁYCH ZDAŃ, obrazu, japońskiego audio oraz kontekstu.
+       * "[Filar CXXXIX - Hai/Iie Reverse] 'Didn't you go?' -> 'Hai' -> 'Nie, nie poszedłem' (odwrócona logika zaprzeczenia)"
+       * "[Filar CXL - Społeczne Pokrewieństwo] 'Onii-san, tasukete!' -> 'Proszę pana, niech pan pomoże!' (obcy człowiek na ulicy)"
+       * "[Filar CXLI - Stan Rezultatywny -te iru] 'Shinde iru' -> 'On nie żyje!' (stan dokonany, zakaz: 'on umiera')"
+       * "[Filar CXLII - Janai ka & Prosodia] 'Umai janai?!' -> 'Ale pycha!' (zachwyt przy podniesionym tonie)"
 
 {BELCZYK_AVT_MASTER_CANON}
 
@@ -2527,6 +2569,48 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR CXXXVI - Triangulacja Kognitywna i Foniczna Wieku/Płci (Chłopiec vs Dziewczynka vs Dorosły)]: "
             "Dopasuj rodzaj gramatyczny czasowników 1. osoby (-łem vs -łam): Dorosły mężczyzna oraz Mały chłopiec (mimo wysokiego głosu seiyū!) BEZWZGLĘDNIE otrzymują formy męskie ('Domyślałem się', 'Zgubiłem się!', 'Wiedziałem'). Kobieta i Mała dziewczynka otrzymują formy żeńskie ('Domyślałam się', 'Zgubiłam się!')."
+        )
+
+    # 80. Paradoks Potwierdzenia Negacji i Pytań Przeczących (Filar CXXXIX)
+    neg_q_patterns = ["didn't", "don't", "aren't", "won't", "can't", "isn't", "haven't", "nie idziesz", "nie wiesz", "nie chcesz"]
+    ans_patterns = ["yes", "no", "yeah", "nah", "hai", "iie", "tak", "nie"]
+    if any(q in combined_en for q in neg_q_patterns) and any(w in combined_en for w in ans_patterns):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CXXXIX - Paradoks Potwierdzenia Negacji i Pytań Przeczących (Hai/Iie & Reverse Logic)]: "
+            "ODWRÓCONA LOGIKA JAPOŃSKIEJ ZGODY! Przy pytaniu przeczącym ('Nie idziesz?', 'Didn't you know?') japońskie 'Hai' / ang. 'Yes' oznacza: "
+            "'Zgadza się, masz rację – NIE IDĘ!' -> po polsku BEZWZGLĘDNIE: „Nie!” / „Nie idę!” (KARDYNALNY BŁĄD [X]: „Tak, nie idę” / „Tak”). "
+            "Japońskie 'Iie' / ang. 'No' oznacza: „Właśnie że tak!” / „Pewnie, że idę!” (KARDYNALNY BŁĄD [X]: „Nie”). Skoreluj z opadającym tonem seiyū!"
+        )
+
+    # 81. Społeczne Metafory Pokrewieństwa (Filar CXL)
+    kin_patterns = ["onii", "onee", "ojisan", "obasan", "big brother", "big sister", "brother", "sister", "uncle", "auntie", "mister"]
+    if any(w in combined_en for w in kin_patterns):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CXL - Społeczne Metafory Pokrewieństwa (Onii-san / Ojisan Sanitization)]: "
+            "ZAKAZ TWORZENIA FAŁSZYWYCH BRACI I WUJKÓW! Gdy dziecko lub nastolatek mówi do obcego człowieka na ulicy/w walce 'Onii-san' / 'Onee-san' / 'Ojisan': "
+            "BEZWZGLĘDNY ZAKAZ: „mój bracie!”, „braciszku!”, „wujku!”. Tłumacz jako: „Proszę pana!”, „Hej, panie!”, „Kolego!”, „Młodzieńcze!”, „Proszę pani!”. "
+            "Gdy w tagach audio występuje [Ton: emocjonalne drżenie głosu / płacz], 'Onii-chan, tasukete!' -> „Proszę pana, pomocy!”!"
+        )
+
+    # 82. Dynamika Stanu Rezultatywnego (Filar CXLI)
+    state_patterns = ["shinde", "kekkon", "futotte", "kawaite", "is dead", "he's dead", "she's dead", "dying", "married", "marrying", "is dry", "has won"]
+    if any(w in combined_en for w in state_patterns):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CXLI - Dynamika Stanu Rezultatywnego (-te iru as Resulting State)]: "
+            "STAN WYNIKOWY TO NIE AKCJA W TOKU! Japońskie '-te iru' to często skutek dokonany: "
+            "'Shinde iru' -> BEZWZGLĘDNIE: „Nie żyje!” / „Jest martwy!” / „Zginął!” (KARDYNALNY BŁĄD [X]: „On umiera w tej chwili!”). "
+            "'Kekkon shite iru' -> BEZWZGLĘDNIE: „Jest żonaty / ma męża” (ZAKAZ: „Bierze ślub”). "
+            "'Futotte iru' -> BEZWZGLĘDNIE: „Jest gruby / przy kości” (ZAKAZ: „Tyje”)."
+        )
+
+    # 83. Retoryka Zachwytu w Pytaniach Przeczących i Prozodia (Filar CXLII)
+    praise_patterns = ["janai", "isn't it", "doesn't it", "aren't you", "don't you think", "umai", "oishii", "sugoi", "delicious", "tasty", "great", "amazing"]
+    if any(w in combined_en for w in praise_patterns):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CXLII - Retoryka Zachwytu w Pytaniach Przeczących i Prozodia (Janai ka Affirmation)]: "
+            "NEGACJA JAKO EKSPRESJA PODZIWU! 'Kore, umai janai?!' / 'Sugoi janai ka!' przy podniesionym głosie seiyū [Ton: silne wzburzenie emocjonalne / krzyk] "
+            "to 100% zachwyt i entuzjazm: BEZWZGLĘDNIE: „Ależ to pyszne!” / „Dobre, co?!” / „Ale czad!” / „Niesamowite!”. "
+            "KARDYNALNY BŁĄD [X]: „To chyba niedobre, co?” / „Czy to nie jest niesamowite?”."
         )
 
     if not focused_pillars:

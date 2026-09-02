@@ -251,7 +251,13 @@ class EpisodeProfiler:
 Twoim zadaniem jest dogłębna, wszechstronna analiza 100% skryptu całego odcinka, aby przygotować dla zespołu tłumaczy i redaktorów kompletny PROFIL ODCINKA 4.0:
 
 1. OFICJALNY KANON POLSKIEGO WYDANIA MANGI (Filar XXIII & XCIV): Zidentyfikuj wydawnictwo (Waneko, J.P.Fantastica, Studio JG, Kotori, Hanami, Dango, Egmont) i podaj oficjalne nazwy z tomików papierowych.
-2. SKANER MIN JĘZYKOWYCH, PUŁAPEK ŚRODOWISKOWYCH I WIELOZNACZNOŚCI (danger_lines_prescan): Przeskanuj cały odcinek i wskaż zdradliwe kwestie angielskie (np. 'I\'m fine' jako odmowa 'Ja podziękuję' zamiast 'Nic mi nie jest', 'Bless you', 'That bombed', 'Kikanaide', 'Sumimasen', 'Kanojo-tachi') ORAZ pułapki fizyczności sceny (Filar CXXXVIII: np. 'underwater' w browarze z piwem/kadzi wina/bagnie -> ostrzeż przed słowem 'woda'; 'get down' w kosmosie -> ostrzeż przed 'padnij na ziemię').
+2. SKANER MIN JĘZYKOWYCH, PUŁAPEK ŚRODOWISKOWYCH I PRAGMATYCZNYCH (danger_lines_prescan): Przeskanuj cały odcinek i wskaż zdradliwe kwestie angielskie:
+   - Idiomy i odmowy: 'I\'m fine' jako odmowa 'Ja podziękuję' zamiast 'Nic mi nie jest', 'Bless you', 'That bombed', 'Kikanaide', 'Sumimasen', 'Kanojo-tachi'.
+   - Paradoks pytań przeczących (Filar CXXXIX): 'Hai/Yes' po pytaniu przeczącym ('Didn't you go?') -> ostrzeż przed dosłownym 'Tak!', nakaż 'Nie, nie poszedłem!'.
+   - Fałszywe pokrewieństwo (Filar CXL): 'Big brother / Uncle / Onii-san' do obcych osób na ulicy -> ostrzeż przed bratem/wujkiem, nakaż 'Proszę pana / Młodzieńcze'.
+   - Stan rezultatywny (Filar CXLI): 'Shinde iru / is dead' -> ostrzeż przed 'on umiera', nakaż 'nie żyje / jest martwy'.
+   - Pytania z zachwytem (Filar CXLII): 'Janai ka? / Isn't it delicious / Umai janai' z podniesionym tonem -> ostrzeż przed krytyką, nakaż zachwyt 'Ale pycha!'.
+   - Fizyczność sceny (Filar CXXXVIII): 'underwater' w browarze/bagnie -> ostrzeż przed słowem 'woda'; 'get down' w kosmosie -> ostrzeż przed 'padnij na ziemię'.
 3. PUNKTY ZWROTNE I ZMIANY RELACJI (relationship_pivots): Wskaż momenty w odcinku, w których następuje przełom i zmiana formy zwracania się do siebie (np. przejście z 'pani' na 'ty').
 4. POWIEDZONKA I KWESTIE-WIZYTÓWKI (character_catchphrases): Ustal jedno, kanoniczne polskie tłumaczenie dla powtarzających się motywów/zawołań postaci.
 5. MATRYCA METRYCZNA DLA PIOSENEK OP/ED (song_transcreation_plans): Rozpoznaj piosenki i ustal plan sylabiczny (np. 8 sylab) i rymy Barańczaka (AABB/ABAB).

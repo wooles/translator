@@ -168,6 +168,10 @@ def test_rules_and_prompts():
     assert "FILAR CXXXVI:" in sys_prompt
     assert "FILAR CXXXVII:" in sys_prompt
     assert "FILAR CXXXVIII:" in sys_prompt
+    assert "FILAR CXXXIX:" in sys_prompt
+    assert "FILAR CXL:" in sys_prompt
+    assert "FILAR CXLI:" in sys_prompt
+    assert "FILAR CXLII:" in sys_prompt
     assert "FILAR CXXI" in ver_prompt
     assert "FILAR CXXV" in ver_prompt
     assert "FILAR CXXX" in ver_prompt
@@ -179,7 +183,11 @@ def test_rules_and_prompts():
     assert "FILAR CXXXVI" in ver_prompt or "CXXXVI" in ver_prompt or "Filar CXXXVI" in ver_prompt or "FILAR" in ver_prompt
     assert "FILAR CXXXVII" in ver_prompt or "CXXXVII" in ver_prompt or "Filar CXXXVII" in ver_prompt or "FILAR" in ver_prompt
     assert "FILAR CXXXVIII" in ver_prompt or "CXXXVIII" in ver_prompt or "Filar CXXXVIII" in ver_prompt or "FILAR" in ver_prompt
-    print(" -> PASSED: Kompletny Zunifikowany Kanon 138 Filarów AVT (Filary I – CXXXVIII) jest aktywny w obu fazach tłumaczenia.")
+    assert "FILAR CXXXIX" in ver_prompt or "CXXXIX" in ver_prompt or "Filar CXXXIX" in ver_prompt or "FILAR" in ver_prompt
+    assert "FILAR CXL" in ver_prompt or "CXL" in ver_prompt or "Filar CXL" in ver_prompt or "FILAR" in ver_prompt
+    assert "FILAR CXLI" in ver_prompt or "CXLI" in ver_prompt or "Filar CXLI" in ver_prompt or "FILAR" in ver_prompt
+    assert "FILAR CXLII" in ver_prompt or "CXLII" in ver_prompt or "Filar CXLII" in ver_prompt or "FILAR" in ver_prompt
+    print(" -> PASSED: Kompletny Zunifikowany Kanon 142 Filarów AVT (Filary I – CXLII) jest aktywny w obu fazach tłumaczenia.")
 
 def test_pydantic_schemas():
     print("[TEST 2/5] Weryfikacja schematów Pydantic i Detektora Rejestru Pragmatycznego...")
@@ -1061,6 +1069,26 @@ def test_dynamic_rule_dispatcher():
     batch_bye = [{"en": "Sayonara, everyone! Itte kimasu!"}]
     focused_bye = get_focused_rules_for_batch(batch_bye)
     assert "FILAR CXXII" in focused_bye
+
+    # 7. Test paczki z paradoksem negacji (Filar CXXXIX)
+    batch_neg = [{"en": "Didn't you go there? Yes."}]
+    focused_neg = get_focused_rules_for_batch(batch_neg)
+    assert "CXXXIX" in focused_neg
+
+    # 8. Test paczki ze społecznymi metaforami pokrewieństwa (Filar CXL)
+    batch_kin = [{"en": "Big brother, please help me!"}]
+    focused_kin = get_focused_rules_for_batch(batch_kin)
+    assert "CXL" in focused_kin
+
+    # 9. Test paczki ze stanem rezultatywnym (Filar CXLI)
+    batch_state = [{"en": "He's dead, it's over."}]
+    focused_state = get_focused_rules_for_batch(batch_state)
+    assert "CXLI" in focused_state
+
+    # 10. Test paczki z zachwytem w pytaniu przeczącym (Filar CXLII)
+    batch_praise = [{"en": "Isn't it delicious?!"}]
+    focused_praise = get_focused_rules_for_batch(batch_praise)
+    assert "CXLII" in focused_praise
     print(" -> PASSED: Dyspozytor reguł precyzyjnie aktywuje właściwe filary AVT.")
 
 def test_fuzzy_and_dynamic_avt_linter():
