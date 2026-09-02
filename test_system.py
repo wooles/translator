@@ -562,6 +562,16 @@ def test_avt_linter():
     tb_onit, _ = AVTLinter.lint_and_fix_line("Na tym!")
     assert tb_onit == "Już się robi!"
 
+    # Test automatycznej fleksji nazw własnych i pojęć słownikowych (Filar IV / XCI)
+    t_goryokaku, _ = AVTLinter.lint_and_fix_line("...i w Twierdza Goryōkaku zacznie się na nowo.")
+    assert t_goryokaku == "...i w twierdzy Goryōkaku zacznie się na nowo."
+    t_ako, _ = AVTLinter.lint_and_fix_line("Uciekł z Więzienie Akō.")
+    assert t_ako == "Uciekł z więzienia Akō."
+    t_hotel, _ = AVTLinter.lint_and_fix_line("Spotkajmy się w Hotel Imperialny.")
+    assert t_hotel == "Spotkajmy się w hotelu Imperialny."
+    t_zamek, _ = AVTLinter.lint_and_fix_line("Maszerujemy do Zamek Kamakura.")
+    assert t_zamek == "Maszerujemy do zamku Kamakura."
+
     # Test Filaru CXXXVI: Triangulacja foniczna i korekta rodzaju żeńskiego na męski (Dorosły / Chłopiec / Niski głos F0)
     tm1, _ = AVTLinter.lint_and_fix_line("Domyślałam się, ale...", speaker_gender="mężczyzna")
     assert tm1 == "Domyślałem się, ale..."

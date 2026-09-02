@@ -1642,8 +1642,10 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
    - "Heart attack" -> "zawał serca", "zawał" (ZAKAZ: "atak serca").
 15. REALIA HISTORYCZNE I STYLIZACJA ŚWIATA:
    - W seriach historycznych (np. XIII w. Imperium Mongolskie, starożytność, średniowiecze) BEZWZGLĘDNIE wyeliminuj nowoczesny slang młodzieżowy ('spoko', 'masakra', 'wkręcasz'). Dopasuj słownictwo do klimatu epoki.
-16. TERMINOLOGIA SPECJALISTYCZNA I KONSULTACJA BRANŻOWA:
+16. TERMINOLOGIA SPECJALISTYCZNA, KONSULTACJA BRANŻOWA I FLEKSJA NAZW WŁASNYCH:
    - W seriach o tematyce niszowej (winiarstwo, muzyka, medycyna, shogi, kulinaria) bezwzględnie stosuj oficjalną polską terminologię branżową (np. w winie: 'szczep', 'rocznik', 'apelacja', 'taniny', 'kupaż', 'ciało wina').
+   - ODMIANA POJĘĆ ZE SŁOWNIKA I NAZW WŁASNYCH PRZEZ PRZYPADKI: Pojęcia ze słowniczka i bazy pamięci podane są w mianowniku jako baza leksykalna. W tekście BEZWZGLĘDNIE odmieniaj je przez przypadki zgodnie z polską składnią (np. 'Twierdza Goryōkaku' -> 'w twierdzy Goryōkaku', 'do twierdzy Goryōkaku', 'Więzienie Akō' -> 'w więzieniu Akō', 'z więzienia Akō').
+   - KATEGORYCZNY ZAKAZ zostawiania nieodmienionego mianownika po przyimkach (BŁĄD: 'w Twierdza Goryōkaku', 'z Więzienie Akō')!
 17. DIALOGI POSTACI W TLE, W ODDALI I NA GÓRZE EKRANU (\\an8):
    - Kwestie wypowiadane przez postacie w tle, w korytarzu lub na drugim planie to ŻYWY DIALOG MÓWIONY.
    - BEZWZGLĘDNY ZAKAZ umieszczania dialogów w nawiasach kwadratowych [...] (BŁĄD: '[ PRZEPRASZAM ZA ZWŁOKĘ! ]' -> POPRAWNIE: 'Przepraszam za zwłokę!').

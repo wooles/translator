@@ -94,8 +94,9 @@ class GlossaryManager:
             return ""
 
         lines = [
-            "--- BEZWZGLĘDNY SŁOWNICZEK POJĘĆ I TERMINOLOGII (WYMÓG DETERMINISTYCZNY) ---",
-            "Poniższe pojęcia MUSZĄ być przetłumaczone DOKŁADNIE tak, jak podano poniżej:"
+            "--- BEZWZGLĘDNY SŁOWNICZEK POJĘĆ I TERMINOLOGII (BAZA KANONICZNA W MIANOWNIKU) ---",
+            "Poniższe pojęcia to kanoniczne polskie odpowiedniki (podane w mianowniku jako forma bazowa).",
+            "W zdaniach BEZWZGLĘDNIE ODMIENIAJ JE PRZEZ PRZYPADKI zgodnie z polską gramatyką i przyimkami (np. 'Twierdza Goryōkaku' -> 'w twierdzy Goryōkaku', 'do twierdzy Goryōkaku', 'Więzienie Akō' -> 'w więzieniu Akō', 'z więzienia Akō'; ZAKAZ sztywnego mianownika po przyimkach typu 'w Twierdza'!):"
         ]
         for src, raw_trg in glossary_dict.items():
             trg = self.clean_target_term(raw_trg)
