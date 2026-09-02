@@ -48,15 +48,19 @@ def create_master_backup():
             items_to_backup.append((f"Plik Pulpitu: {df}", single_file, f"DesktopProjects/{df}"))
 
     EXCLUDE_DIRS = {".venv", "__pycache__", ".pytest_cache", "bin", "obj", ".vs"}
+    EXCLUDE_EXTENSIONS = {".db-shm", ".db-wal", ".lock", ".tmp", ".crdownload", ".part"}
 
     files_to_pack = []
     for label, src_path, arc_prefix in items_to_backup:
         if src_path.is_file():
-            files_to_pack.append((src_path, arc_prefix))
+            if not any(src_path.name.endswith(ext) for ext in EXCLUDE_EXTENSIONS):
+                files_to_pack.append((src_path, arc_prefix))
         elif src_path.is_dir():
             for root, dirs, files in os.walk(src_path):
                 dirs[:] = [d for d in dirs if d not in EXCLUDE_DIRS]
                 for file in files:
+                    if any(file.endswith(ext) for ext in EXCLUDE_EXTENSIONS):
+                        continue
                     full_p = Path(root) / file
                     rel_p = full_p.relative_to(src_path).as_posix()
                     arc_name = f"{arc_prefix}/{rel_p}"
@@ -75,6 +79,8 @@ def create_master_backup():
     with zipfile.ZipFile(temp_zip, "w", compression=zipfile.ZIP_DEFLATED, allowZip64=True, compresslevel=6) as zf:
         for full_p, arc_name in files_to_pack:
             try:
+                if not full_p.exists():
+                    continue
                 zf.write(full_p, arc_name)
                 packed_count += 1
                 if packed_count % 300 == 0 or packed_count == total_files:
