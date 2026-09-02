@@ -374,6 +374,34 @@ def detect_japanese_pragmatic_register(jp_text: str, en_text: str = "") -> Optio
     # 5. Romantic Intimate / Kokuhaku (daisuki, aishiteru, zutto issho)
     if any(k in clean_jp for k in ["大好き", "愛してる", "ずっと一緒"]) or any(k in rom_lower for k in ["daisuki", "aishiteru", "zutto issho"]):
         return "Czuły miłosny / Kokuhaku (wyznanie miłosne 'Kocham cię', eliminacja friendzone)"
+
+    # 6. Satsuma-ben (Chesto, Gowasu, Oddon, Jaddo, Mosu)
+    if any(k in clean_jp for k in ["チェスト", "ごわす", "でごわす", "おっどん", "じゃっど", "もす"]) or any(k in rom_lower for k in ["chesto", "gowasu", "oddon", "jaddo", "mosu"]):
+        return "Dialekt Satsuma / Satsuma-ben (fonetyczne ściągnięcia, twarda artykulacja 'Cukszma', elizje apostrofowe 'Sierżan'', hermetyczny szyfr wojenny - Filar CXXXV)"
+
+    # 7. Kansai-ben / Osaka & Kyoto (-nen, -yaro, honma, akan, seyana, -dosu, oideyasu)
+    if any(k in clean_jp for k in ["ねん", "やろ", "ほんま", "あかん", "せやな", "どす", "おいでやす"]) or any(k in rom_lower for k in ["-nen", "honma", "akan", "seyana", "nande ya", "dosu", "oideyasu"]):
+        return "Dialekt Kansai / Kansai-ben (zadziorna, błyskotliwa miejska polszczyzna z humorem / aksamitny styl salonowy Kioto - Filar CXXXV)"
+
+    # 8. Tohoku-ben & Tsugaru-ben (-dabe, -daccha, ora, nda, -zura, nashite)
+    if any(k in clean_jp for k in ["だべ", "だっちゃ", "おら", "ずら", "なして"]) or any(k in rom_lower for k in ["-dabe", "-daccha", "dappe", "zura", "nashite"]):
+        return "Dialekt Tohoku / Tsugaru-ben (ciepła, gawędziarska mowa prowincjonalna 'dyć prawda', 'no przeca' - Filar CXXXV)"
+
+    # 9. Hiroshima-ben & Yakuza (-jaken, -jakee, -noo, buchi, taigii)
+    if any(k in clean_jp for k in ["じゃけん", "じゃけえ", "たいぎい", "ぶち"]) or any(k in rom_lower for k in ["jaken", "jakee", "taigii", "buchi"]):
+        return "Dialekt Hiroshima / Półświatek Yakuzy (szorstki, bezkompromisowy slang gangsterski 'bo ci łeb urwę' - Filar CXXXV)"
+
+    # 10. Hakata-ben & Kyūshū (-to?, -bai, -tai, suitoo, batten)
+    if any(k in clean_jp for k in ["ばい", "たい", "好いとー", "ばってん"]) or any(k in rom_lower for k in ["-bai", "-tai", "suitoo", "batten"]):
+        return "Dialekt Hakata / Kiusiu (śpiewna, bezpośrednia, urocza mowa południowa - Filar CXXXV)"
+
+    # 11. Okinawa-ben & Uchinaaguchi (Haisai, Mensoore, Nankurunaisa, -saa)
+    if any(k in clean_jp for k in ["はいさい", "はいたい", "めんそーれ", "なんくるないさ"]) or any(k in rom_lower for k in ["haisai", "haitai", "mensoore", "nankurunaisa"]):
+        return "Dialekt Okinawa / Uchinaaguchi (słoneczny, zrelaksowany ton wyspiarski 'Spokojna głowa' - Filar CXXXV)"
+
+    # 12. Hokkaido-ben (Namara, Shibareru, Shitakke)
+    if any(k in clean_jp for k in ["なまら", "しばれる", "したっけ"]) or any(k in rom_lower for k in ["namara", "shibareru", "shitakke"]):
+        return "Dialekt Hokkaido (surowa, lakoniczna mowa pionierów północy i traperów - Filar CXXXV)"
         
     return None
 

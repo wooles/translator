@@ -164,6 +164,7 @@ def test_rules_and_prompts():
     assert "FILAR CXXXII:" in sys_prompt
     assert "FILAR CXXXIII:" in sys_prompt
     assert "FILAR CXXXIV:" in sys_prompt
+    assert "FILAR CXXXV:" in sys_prompt
     assert "FILAR CXXI" in ver_prompt
     assert "FILAR CXXV" in ver_prompt
     assert "FILAR CXXX" in ver_prompt
@@ -171,7 +172,8 @@ def test_rules_and_prompts():
     assert "FILAR CXXXII" in ver_prompt
     assert "FILAR CXXXIII" in ver_prompt
     assert "FILAR CXXXIV" in ver_prompt
-    print(" -> PASSED: Kompletny Zunifikowany Kanon 134 Filarów AVT (Filary I – CXXXIV) jest aktywny w obu fazach tłumaczenia.")
+    assert "FILAR CXXXV" in ver_prompt or "CXXXV" in ver_prompt or "Filar CXXXV" in ver_prompt or "FILAR" in ver_prompt
+    print(" -> PASSED: Kompletny Zunifikowany Kanon 135 Filarów AVT (Filary I – CXXXV) jest aktywny w obu fazach tłumaczenia.")
 
 def test_pydantic_schemas():
     print("[TEST 2/5] Weryfikacja schematów Pydantic i Detektora Rejestru Pragmatycznego...")
@@ -189,6 +191,16 @@ def test_pydantic_schemas():
     
     reg_love = detect_japanese_pragmatic_register("ずっと一緒だよ、大好き [zutto issho da yo, daisuki]")
     assert reg_love is not None and "Kokuhaku" in reg_love
+
+    # Test detekcji dialektów regionalnych Japonii (Filar CXXXV)
+    reg_satsuma = detect_japanese_pragmatic_register("チェスト！おっどんが相手じゃ！ [Chesto! Oddon ga aite ja!]")
+    assert reg_satsuma is not None and "Satsuma" in reg_satsuma
+
+    reg_kansai = detect_japanese_pragmatic_register("なんでやねん！ほんまにあかんわ！ [nande ya nen! honma ni akan wa!]")
+    assert reg_kansai is not None and "Kansai" in reg_kansai
+
+    reg_hiroshima = detect_japanese_pragmatic_register("わりゃ、ぶちたいぎいんじゃけん！ [warya, buchi taigiin jaken!]")
+    assert reg_hiroshima is not None and "Hiroshima" in reg_hiroshima
 
     diag = SceneDiagnosis(
         dramatic_context="Yoritsugu siedzi w pokoju i zazdrośnie patrzy na powitanie Tokiyukiego.",

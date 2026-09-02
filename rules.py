@@ -1033,6 +1033,33 @@ FILAR CXXXIV: ŻELAZNA REGUŁA MIKRO-WOKALIZ I DŹWIĘKÓW WAHANIA (<0.6S SUB-SE
   * BEZWZGLĘDNY WYMÓG REDUKCJI DO MAKSYMALNIE 1-2 KRÓTKICH SŁÓW Z WIELOKROPKIEM (MAX 6-8 ZNAKÓW):
     -> 'Znaczy...' / 'Ech...' / 'Cóż...' / 'Yyy...' / 'No tak...' / 'Zaraz...' / 'Ale...'
   * Złota reguła percepcji AVT: w 0.4 sekundy ludzkie oko jest w stanie zarejestrować maksymalnie 6-8 znaków. Wklejenie 27 znaków powoduje mignięcie napisu (67 CPS) i niszczy odbiór sceny!
+
+FILAR CXXXV: JAPOŃSKA MATRYCA 8 DIALEKTÓW REGIONALNYCH I IDIOLEKTÓW (HŌGEN & YAKUWARIGO COMPREHENSIVE MATRIX):
+- Precyzyjne rozróżnienie i zróżnicowana stylizacja 8 głównych grup dialektalnych Japonii (zakaz prymitywnej karykatury podhalańskiej/śląskiej!):
+  1. Satsuma-ben (薩摩弁 - Kiusiu / Kagoshima - np. Koito w 'Golden Kamuy'):
+     * Cechy: Skrajnie hermetyczny szyfr wojenny, twardość, zlane tempo mowy w panice/stresie.
+     * Markery: 'Chesto!', 'Gowasu', 'Oddon', 'Jaddo', 'Mosu', gardłowe ucięcia.
+     * Polska stylizacja: Fonetyczne ściągnięcia, twarda wymowa ('Cukszma'), elizje apostrofowe ('Sierżan''), archaiczna końcówka narzędnika ('-oł'), zlane tempo ('Sierżan' Cukszma góni za Asirpoł!').
+  2. Kansai-ben (関西弁 - Osaka, Kioto, Kobe - np. Shiraishi, Gin Ichimaru, Heiji Hattori):
+     * Osaka-ben (miejski/cwaniacki): Zadziorna miejska polszczyzna, błyskotliwe riposty, humor ('-nen', '-ya', 'honma', 'akan', 'seyana' -> 'Co ty bredzisz?!', 'No to leżymy...', 'No ba!').
+     * Kyoto-ben (Kyo-kotoba / salonowy): Aksamitna, wyrafinowana mowa z ukrytą ironią i chłodno-uprzejmym dystansem ('-dosu', 'oideyasu').
+  3. Tohoku-ben & Tsugaru-ben (東北弁 / 津軽弁 - Północne Honsiu, Aomori, Akita - np. Mitsuha w 'Kimi no Na wa', myśliwi Matagi):
+     * Cechy: Nosowe przeciąganie ('Zūzū-ben'), wiejski/górski spokój i poczciwość ('-dabe', '-daccha', 'ora', 'nda', 'nashite').
+     * Polska stylizacja: Ciepła polszczyzna gawędziarska z archaicznymi partykułami ('no przeca', 'dyć prawda', 'widzi mi się, że...').
+  4. Hiroshima-ben & Chūgoku-ben (広島弁 - Yakuza i Półświatek kryminalny):
+     * Cechy: Chropowaty, agresywny, groźny żargon przestępczy ('-jaken', '-jakee', '-noo', 'buchi', 'taigii').
+     * Polska stylizacja: Szorstki, bezkompromisowy slang twardzieli i ludzi ulicy ('bo ci łeb urwę', 'kumasz sprawę?', 'ani mi się waż').
+  5. Hakata-ben & Kyūshū-ben (博多弁 - Fukuoka, Kiusiu):
+     * Cechy: Melodyjność, ekspresja, dziewczęcy urok i bezpośredniość ('-to?', '-bai', '-tai', 'suitoo', 'batten').
+     * Polska stylizacja: Śpiewna, bezpośrednia, żywa mowa ('no pewnie, że tak!', 'przecież ci mówię!').
+  6. Nagoya-ben & Owari-ben (名古屋弁 - Aichi, Nagoya):
+     * Cechy: Twarde akcentowanie, dosadne potoczne wzmocnienia ('-myaa', '-dagane', 'doeryaa' -> 'potężnie', 'jak nic', 'ani chybi').
+  7. Okinawa-ben & Uchinaaguchi (沖縄方言 - Wyspy Ryukyu):
+     * Cechy: Słoneczny relaks, gościnność, śpiewna życzliwość ('Haisai', 'Mensoore', 'Nankurunaisa', '-saa').
+     * Polska stylizacja: Zrelaksowany, serdeczny ton wyspiarski ('Spokojna głowa, wszystko się ułoży!', 'Czołem, witajcie w naszych progach!').
+  8. Hokkaido-ben & Dialogi Pogranicza Ajnów (北海道弁 - Północ, Sapporo, Otaru - 'Golden Kamuy'):
+     * Cechy: Surowy klimat północy, mowa traperska, autentyczna terminologia Ajnów ('Hinna', 'Citatap', 'namara', 'shibareru').
+     * Polska stylizacja: Lakoniczny, chłodny język pionierów i myśliwych.
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -2390,6 +2417,13 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR CXXXIV - Mikro-Wokalizy i Dźwięki Wahania (<0.6s)]: "
             "Kwestie trwające ułamek sekundy (<=0.6s) lub wahania seiyū ('e...', 'ano...') redukuj do MAX 1-2 słów ('Znaczy...', 'Ech...', 'Cóż...'). KATEGORYCZNY ZAKAZ wielowyrazowych zdań!"
+        )
+
+    # 78. Japońska Matryca 8 Dialektów Regionalnych (Filar CXXXV)
+    if any(w in combined_en for w in ["chesto", "gowasu", "satsuma", "tsugaru", "tohoku", "hiroshima", "jaken", "hakata", "nagoya", "okinawa", "haisai", "nankurunaisa", "namara", "shibareru", "hokkaido", "dialect", "accent", "koito"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CXXXV - Japońska Matryca 8 Dialektów Regionalnych (Hōgen & Yakuwarigo)]: "
+            "Stosuj zróżnicowaną stylizację dla 8 grup dialektalnych (Satsuma-ben: fonetyczne ściągnięcia 'Sierżan' Cukszma góni za Asirpoł!', Kansai: zadziorna miejska polszczyzna, Tohoku: ciepła mowa gawędziarska 'dyć prawda', Hiroshima: twardy slang Yakuzy 'bo ci łeb urwę', Okinawa: słoneczna życzliwość). Zakaz karykatury góralskiej!"
         )
 
     if not focused_pillars:

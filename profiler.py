@@ -99,6 +99,7 @@ class CharacterDossier(BaseModel):
     speech_style_pl: str = Field(description="Unikalny polski rejestr mowy (np. 'Chłodny, dumny, krótki, arystokratyczny bez poufałości')")
     first_person_pronoun: Optional[str] = Field(default=None, description="Japoński zaimek 'ja' (Ore, Boku, Watashi, Atashi) i profil ego")
     declension: Optional[str] = Field(default=None, description="Polska odmiana przez przypadki (np. 'Yoritsugu -> D. Yoritsugu, C. Yoritsugu, B. Yoritsugu')")
+    dialect_category: Optional[str] = Field(default="", description="Dialekt regionalny postaci jeśli występuje: 'Satsuma-ben', 'Kansai-ben', 'Kyoto-ben', 'Tohoku-ben', 'Hiroshima-ben', 'Hakata-ben', 'Nagoya-ben', 'Okinawa-ben', 'Hokkaido-ben' lub brak (Filar CXXXV)")
     idiolect_matrix: Optional[str] = Field(default="", description="Matryca idiolektu: specyficzne nawyki leksykalne, zakazane/preferowane zwroty i rytm wypowiedzi dla tej postaci")
 
 
@@ -184,8 +185,9 @@ def format_episode_profile_for_prompt(profile: Optional[EpisodeProfile]) -> str:
         for cd in profile.character_dossiers:
             pron = f" [Zaimek: {cd.first_person_pronoun}]" if cd.first_person_pronoun else ""
             decl = f" [Odmiana: {cd.declension}]" if cd.declension else ""
+            dial = f" [Dialekt: {cd.dialect_category}]" if cd.dialect_category else ""
             idio = f" [Idiolekt: {cd.idiolect_matrix}]" if cd.idiolect_matrix else ""
-            lines.append(f"• {cd.name} ({cd.gender}, {cd.age_and_role}){pron}{decl} -> Styl: {cd.speech_style_pl}{idio}")
+            lines.append(f"• {cd.name} ({cd.gender}, {cd.age_and_role}){pron}{decl}{dial} -> Styl: {cd.speech_style_pl}{idio}")
 
     if profile.name_declensions:
         lines.append("\nŻELAZNA TABELA ODMIANY IMION PRZEZ PRZYPADKI (FILAR XCI - BEZWZGLĘDNIE STOSUJ):")
