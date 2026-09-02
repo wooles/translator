@@ -97,7 +97,16 @@ class DialogueVerifier:
 
         for item in batch_items:
             type_tag = f" [[Napis] {item['visual_type']}]" if item.get("is_sign") else " [DIALOG]"
-            gender_info = f" (Mówca: {item.get('speaker_gender')})" if item.get('speaker_gender') else ""
+            speaker_name = (item.get('speaker_name') or '').strip()
+            speaker_gender = (item.get('speaker_gender') or '').strip()
+            if speaker_name and speaker_gender:
+                char_info = f" (Postać: {speaker_name} | {speaker_gender})"
+            elif speaker_name:
+                char_info = f" (Postać: {speaker_name})"
+            elif speaker_gender:
+                char_info = f" (Mówca: {speaker_gender})"
+            else:
+                char_info = ""
             voice_info = f" [Głos: {item.get('speaker_voice')}]" if item.get('speaker_voice') else ""
             prosody_info = f" [Ton: {item.get('prosody')}]" if item.get('prosody') else ""
             song_info = " [🎵 PIOSENKA / WYMÓG RYMU I METRUM SYLABICZNEGO (FILAR CXVIII)]" if item.get("is_song") else ""
@@ -115,7 +124,7 @@ class DialogueVerifier:
             relation_info = f"  {item['relation_tag']}\n" if item.get('relation_tag') else ""
             
             prompt_lines.append(
-                f"- [ID: {item['id']}]{type_tag}{gender_info}{voice_info}{prosody_info}{song_info}{cps_info}{visual_info}{region_info}\n"
+                f"- [ID: {item['id']}]{type_tag}{char_info}{voice_info}{prosody_info}{song_info}{cps_info}{visual_info}{region_info}\n"
                 f"{audio_info}"
                 f"{alert_info}"
                 f"{prag_reg_info}"

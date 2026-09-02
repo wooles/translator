@@ -1247,7 +1247,15 @@ class MultimodalTranslator:
         scene_desc = ""
         if batch_response:
             if getattr(batch_response, "scene_diagnosis", None) and batch_response.scene_diagnosis:
-                scene_desc = getattr(batch_response.scene_diagnosis, "dramatic_context", "") or ""
+                diag = batch_response.scene_diagnosis
+                parts = []
+                if getattr(diag, "dramatic_context", None) and diag.dramatic_context.strip():
+                    parts.append(f"Kontekst: {diag.dramatic_context.strip()}")
+                if getattr(diag, "dialogue_flow", None) and diag.dialogue_flow.strip():
+                    parts.append(f"Dynamika: {diag.dialogue_flow.strip()}")
+                if getattr(diag, "audio_intent_check", None) and diag.audio_intent_check.strip():
+                    parts.append(f"Intencja Audio: {diag.audio_intent_check.strip()}")
+                scene_desc = " | ".join(parts)
             elif getattr(batch_response, "scene_description", None):
                 scene_desc = batch_response.scene_description or ""
 
@@ -1322,6 +1330,7 @@ class MultimodalTranslator:
                 "end_ms": event.end,
                 "en": clean_en,
                 "pl": pl_candidate,
+                "speaker_name": event.name.strip() if getattr(event, "name", None) else "",
                 "speaker_gender": speaker_gender,
                 "screen_region": screen_reg,
                 "speaker_voice": speaker_tags.get(batch_id, ""),
