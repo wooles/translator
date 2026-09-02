@@ -346,6 +346,64 @@ def detect_audio_discrepancy(jp_text: str, pl_text: str, en_text: str) -> Option
         if any(w in pl_lower for w in ["proszę", "oto jest", "oto masz", "oto proszę"]):
             return "W audio pada 'Yotto/Yoisho' (Kakegoe - odgłos wysiłku fizycznego/kinezjatyki) -> Kategoryczny zakaz zwrotu grzecznościowego 'Proszę'! Zastąp naturalnym odgłosem: 'Hop...', 'I siup...', 'Raz, dwa...' lub elipsą (Filar XVIII)."
 
+    # 24. Chigaimasu / Chigau (Deictic negation vs 'Nie o niego' / 'Różni się')
+    chigau_keys = ["chigaimasu", "chigau", "chigau yo", "chigau wa", "chigee", "chigee yo", "chiga-"]
+    if any(k in clean_jp for k in ["違います", "ちがいます", "違う", "ちがう", "ちげえ", "ちげえよ"]) or any(k in rom_lower for k in chigau_keys):
+        if any(w in pl_lower for w in ["nie o niego", "nie o nią", "nie o to", "różni się", "to inne"]):
+            if "him" in en_text.lower() or "he" in en_text.lower():
+                return "W audio pada 'Chigaimasu / Chigau' (zaprzeczenie tożsamości osoby: 'Not him') -> Kategoryczny zakaz potworka 'Nie o niego'! Zastąp naturalnym: 'To nie on!' lub 'To pomyłka!' (Filar CXXXVII)."
+            elif "her" in en_text.lower() or "she" in en_text.lower():
+                return "W audio pada 'Chigaimasu / Chigau' (zaprzeczenie tożsamości: 'Not her') -> Kategoryczny zakaz 'Nie o nią'! Zastąp: 'To nie ona!' lub 'To pomyłka!' (Filar CXXXVII)."
+            return "W audio pada 'Chigaimasu / Chigau' (sprostowanie sytuacji/nieporozumienia) -> Kategoryczny zakaz kalki 'Nie o to'! Zastąp: 'To nie tak!' / 'To pomyłka!' / 'Wcale nie!' (Filar CXXXVII)."
+
+    # 25. Douzo / Osaki ni douzo ('After you' / 'Be my guest' vs 'Po tobie' / 'Bądź moim gościem')
+    douzo_keys = ["douzo", "osaki ni", "osakini", "dozo"]
+    if any(k in clean_jp for k in ["どうぞ", "お先に", "お先にどうぞ"]) or any(k in rom_lower for k in douzo_keys):
+        if "po tobie" in pl_lower:
+            return "W audio pada 'Douzo / Osaki ni' (ustąpienie pierwszeństwa: 'After you') -> Kategoryczny zakaz potworka 'Po tobie'! Zastąp: 'Proszę przodem!' lub 'Pani/Pan ma pierwszeństwo' (Filar CXXXVII)."
+        if "bądź moim gościem" in pl_lower:
+            return "W audio pada 'Douzo' (zachęta: 'Be my guest') -> Kategoryczny zakaz 'Bądź moim gościem'! Zastąp: 'Bardzo proszę!' / 'Śmiało!' / 'Częstuj się!' (Filar CXXXVII)."
+
+    # 26. Hontou da yo na / Wakaru ('Tell me about it' vs 'Powiedz mi o tym')
+    if any(k in rom_lower for k in ["tell me", "hontou da", "wakaru", "hontou ni"]) or any(k in clean_jp for k in ["本当だな", "ほんとうだな", "わかる"]):
+        if "powiedz mi o tym" in pl_lower:
+            return "Wykryto kalkę angielskiego idiomu 'Tell me about it!' -> Zamień błędne 'Powiedz mi o tym' na naturalną polską zgodę: 'Nawet mi nie mów!' / 'Wiem coś o tym!' / 'Święta prawda!' (Filar CXXXVII)."
+
+    # 27. Omae ga iu na ('Look who's talking' vs 'Spójrz, kto mówi')
+    if any(k in clean_jp for k in ["お前が言うな", "あんたが言うな", "お前もな", "omae ga iu na"]) or "omae ga iu" in rom_lower:
+        if "spójrz kto mówi" in pl_lower or "spójrz, kto mówi" in pl_lower or "patrz kto mówi" in pl_lower:
+            return "W audio pada 'Omae ga iu na!' (wytknięcie hipokryzji: 'Look who's talking') -> Zastąp kalkę żywym: 'Kto to mówi!' / 'Odezwał się!' / 'Sam nie jesteś lepszy!' (Filar CXXXVII)."
+
+    # 28. Makasete / Ryoukai ('On it!' vs 'Na tym!')
+    if any(k in clean_jp for k in ["任せて", "まかせて", "了解", "りょうかい"]) or any(k in rom_lower for k in ["makasete", "ryoukai", "ryokai"]):
+        if pl_lower.strip() in ["na tym!", "na tym.", "na tym"]:
+            return "W audio pada 'Makasete / Ryoukai' ('On it!') -> Kategoryczny zakaz potworka 'Na tym'! Zastąp: 'Już się robi!' / 'Zajmę się tym!' / 'Zrozumiałem!' (Filar CXXXVII)."
+
+    # 29. Mochiron / Atarimae ('You bet!' vs 'Zakładasz się!')
+    if any(k in clean_jp for k in ["もちろん", "当たり前", "あたりまえ", "勿論"]) or any(k in rom_lower for k in ["mochiron", "atarimae"]):
+        if any(w in pl_lower for w in ["zakładasz się", "zakład!", "zakładaj się"]):
+            return "W audio pada 'Mochiron / Atarimae' ('You bet!') -> Zastąp kalkę: 'Pewnie!' / 'I to jak!' / 'Jasna sprawa!' (Filar CXXXVII)."
+
+    # 30. Yokatta na ('Good for you!' vs 'Dobre dla ciebie!')
+    if any(k in clean_jp for k in ["よかったな", "よかったね", "良かったな", "良かったね"]) or any(k in rom_lower for k in ["yokatta na", "yokatta ne", "yokattana"]):
+        if "dobre dla ciebie" in pl_lower:
+            return "W audio pada 'Yokatta na' (radość/gratulacje: 'Good for you!') -> Zastąp kalkę: 'To świetnie!' / 'Cieszę się!' / 'Brawo ty!' (Filar CXXXVII)."
+
+    # 31. Daijoubu / Ii desu ('I'm good / I'm fine' vs 'Jestem dobry!')
+    if any(k in clean_jp for k in ["大丈夫", "だいじょうぶ", "いいです", "結構です"]) or any(k in rom_lower for k in ["daijoubu", "ii desu", "kekkou desu"]):
+        if "jestem dobry" in pl_lower:
+            return "W audio pada 'Daijoubu / Ii desu' ('I'm good') -> Zastąp kalkę: 'Dziękuję, postoję' / 'Nie trzeba' / 'Wszystko gra' (Filar CXXXVII)."
+
+    # 32. Betsu ni ('Not really' vs 'Nieszczególnie' / 'Oddzielnie')
+    if any(k in clean_jp for k in ["別に", "べつに"]) or "betsu ni" in rom_lower or "betsuni" in rom_lower:
+        if any(w in pl_lower for w in ["nieszczególnie", "oddzielnie", "specjalnie nie"]):
+            return "W audio pada 'Betsu ni...' (zawoalowana obojętność/zbycie) -> Zastąp sztuczne 'Nieszczególnie' żywym: 'Nic takiego...' / 'Nieważne...' / 'Nie, nic...' (Filar CXXXVII)."
+
+    # 33. Ii kara / Mou ii (impatience / brush-off vs literal 'Bo dobrze' / 'To już jest dobre')
+    if any(k in clean_jp for k in ["いいから", "もういい"]) or any(k in rom_lower for k in ["ii kara", "iikara", "mou ii", "mouii"]):
+        if "bo dobrze" in pl_lower or "to już jest dobre" in pl_lower or "ponieważ dobrze" in pl_lower:
+            return "W audio pada 'Ii kara! / Mou ii!' (zniecierpliwienie/zbycie tematu) -> Zastąp kalkę: 'Mniejsza o to!' / 'Po prostu to zrób!' / 'Daj spokój!' / 'Mam dość!' (Filar CXXXVII)."
+
     return None
 
 def detect_japanese_pragmatic_register(jp_text: str, en_text: str = "") -> Optional[str]:

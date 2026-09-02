@@ -23,7 +23,7 @@
       "description": "Zwrot: 'z imienia: Tokishige-kun / Szeregowy Usami' (dowódca -> podwładny / mistrz -> wyznawca)"
     },
     "Sugimoto -> Asirpa": {
-      "description": "Zwrot: 'Asirpo / na ty' (towarzysze broni / opiekun i partnerka)"
+      "description": "Zwrot: 'na ty / Asirpo' (towarzysze broni, wzajemna ochrona i zaufanie)"
     },
     "Shiraishi -> Botaro": {
       "description": "Zwrot: 'Botaro / Pirat' (Współwięźniowie i kompani)"
@@ -68,7 +68,7 @@
       "description": "Zwrot: 'na ty / per Norabo' (sierżant / mentor -> młody włóczęga)"
     },
     "Tsurumi -> Kikuta": {
-      "description": "Zwrot: 'podporuczniku Kikuta' (dowódca -> podwładny (podwójny agent))"
+      "description": "Zwrot: 'chorąży Kikuta / panie Kikuta' (przełożony -> szpieg/podwładny)"
     },
     "Tokushirou Tsurumi -> Shinpachi Nagakura": {
       "description": "Zwrot: 'panie Nagakura (Nagakura-san)' (wrogowie / gracz polityczny i weteran)"
@@ -80,7 +80,7 @@
       "description": "Zwrot: 'sierżancie Tsukishima' (dowódca -> podwładny)"
     },
     "Hijikata -> Nagakura": {
-      "description": "Zwrot: 'Shinpachi / po imieniu' (dawni bracia broni z Shinsengumi)"
+      "description": "Zwrot: 'Gamushin / Shinpachi / na ty' (wieloletni bracia broni z Shinsengumi)"
     },
     "Otonoshin Koito -> Tokushirou Tsurumi": {
       "description": "Zwrot: 'panie poruczniku / poruczniku Tsurumi' (podwładny -> dowódca)"
@@ -123,6 +123,9 @@
     },
     "Tsurumi -> Okuda": {
       "description": "Zwrot: 'panie generale' (porucznik -> dowódca dywizji)"
+    },
+    "Shiraishi -> Hijikata": {
+      "description": "Zwrot: 'staruszku / panie Hijikata' (sojusznicy z przymusu, nuta komediowego lęku przed autorytetem)"
     }
   },
   "glossary": {
@@ -182,7 +185,7 @@
     "Rokumeikan": "Rokumeikan",
     "Goryoukaku": "Twierdza Goryōkaku",
     "Hakodate Magistrate": "Namiestnictwo Hakodate",
-    "Dead drop": "Martwa skrzynka",
+    "Dead drop": "martwa skrzynka",
     "Bastion fort": "Fort bastionowy",
     "Cietoi": "Ziemia okrzemkowa",
     "deed book": "akt własności ziemi",
@@ -202,7 +205,9 @@
     "Warrant Officer": "starszy chorąży",
     "1st Division": "1. Dywizja",
     "regimental flag bearer": "chorąży pułku",
-    "zaibatsu": "zaibatsu"
+    "zaibatsu": "zaibatsu",
+    "Fort Goryoukaku": "Goryoukaku",
+    "Wenkamuy": "Wenkamuj"
   },
   "relationships": {},
   "episodes_translated": [

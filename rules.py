@@ -1075,6 +1075,37 @@ FILAR CXXXVI: TRIANGULACJA KOGNYTYWNA I FONICZNA WIEKU/PŁCI (MAŁY CHŁOPIEC VS
      * Żelazny wymóg AVT: W monologach zza kadru i dedukcjach BEZWZGLĘDNIE stosuj rodzaj MĘSKI ('Domyślałem się, ale...', 'Wiedziałem to', 'Zrobiłem'). KATEGORYCZNY ZAKAZ form żeńskich!
   4. DOROSŁA KOBIETA (Alt/Sopran F0 >= 180 Hz bez markerów chłopięcych):
      * Żelazny wymóg AVT: Stosuj rodzaj ŻEŃSKI ('Domyślałam się, ale...', 'Wiedziałam to', 'Zrobiłam').
+
+FILAR CXXXVII: MATRYCA IDIOMÓW MOSTOWYCH I PRZECZEŃ ELIPTYCZNYCH (BRIDGE IDIOMS & DEICTIC NEGATION STANDARD):
+- KATEGORYCZNY ZAKAZ mechanicznego, dosłownego tłumaczenia krótkich fraz angielskich powstałych z mostu idiomatycznego (1-3 słowa) w miejsce japońskiej pragmatyki konwersacyjnej:
+  1. KONSTRUKCJE ZAIMKOWE I TOŻSAMOŚCIOWE (Deictic & Demonstrative Negations):
+     * 'Not him!' (JP: Chigaimasu! / Chigau!) -> BEZWZGLĘDNIE: „To nie on!” / „To pomyłka!” (KATEGORYCZNY ZAKAZ: „Nie o niego!”).
+     * 'Not her!' (JP: Chigau! / Aitsu ja nai!) -> BEZWZGLĘDNIE: „To nie ona!” / „Tylko nie ona!” (ZAKAZ: „Nie o nią!”).
+     * 'Not this!' (JP: Kore ja nai! / Yamete!) -> BEZWZGLĘDNIE: „Tylko nie to!” / „To nie to!” (ZAKAZ: „Nie to!” / „Nie o to!”).
+     * 'Not here!' (JP: Koko ja nai!) -> BEZWZGLĘDNIE: „Tylko nie tutaj!” / „Nie w tym miejscu!” (ZAKAZ: „Nie tu!” / „Nie w to miejsce!”).
+     * 'Not now!' (JP: Ima ja nai!) -> BEZWZGLĘDNIE: „Tylko nie teraz!” / „Byle nie teraz!” (ZAKAZ: „Nie w tym momencie!”).
+  2. ANGIELSKIE IDIOMY MOSTOWE (Bridge Conversational Idioms):
+     * 'After you!' (JP: Douzo / Osaki ni douzo) -> BEZWZGLĘDNIE: „Proszę przodem!” / „Pani/Pan ma pierwszeństwo.” (KATEGORYCZNY ZAKAZ potworka: „Po tobie!”).
+     * 'Be my guest!' (JP: Douzo) -> BEZWZGLĘDNIE: „Bardzo proszę!” / „Śmiało!” / „Częstuj się!” (ZAKAZ: „Bądź moim gościem!”).
+     * 'Tell me about it!' (JP: Wakaru / Hontou da yo na) -> BEZWZGLĘDNIE: „Nawet mi nie mów!” / „Wiem coś o tym!” / „Święta prawda!” (ZAKAZ: „Powiedz mi o tym!”).
+     * 'Look who's talking!' (JP: Omae ga iu na!) -> BEZWZGLĘDNIE: „Kto to mówi!” / „Odezwał się!” / „Sam nie jesteś lepszy!” (ZAKAZ: „Spójrz, kto mówi!”).
+     * 'On it!' (JP: Makasete / Ryoukai) -> BEZWZGLĘDNIE: „Już się robi!” / „Zajmę się tym!” / „Zrozumiałem!” (ZAKAZ potworka: „Na tym!”).
+     * 'You bet!' (JP: Mochiron / Atarimae da) -> BEZWZGLĘDNIE: „Pewnie!” / „I to jak!” / „Jasna sprawa!” (ZAKAZ: „Zakładasz się!”).
+     * 'There you go!' / 'Here you go!' (JP: Hai, douzo / Hora) -> BEZWZGLĘDNIE: „Proszę bardzo!” / „Oto i to!” / „Widzisz?” (ZAKAZ: „Tam idziesz!”).
+     * 'You don't say!' (JP: Masaka! / Hontou ni?) -> BEZWZGLĘDNIE: „Nie gadaj!” / „Co ty powiesz?!” / „Serio?!” (ZAKAZ: „Nie mówisz tego!”).
+     * 'Fair enough!' (JP: Maa ii ka / Naruhodo) -> BEZWZGLĘDNIE: „W porządku” / „Niech będzie” / „Uczciwie” (ZAKAZ: „Dość sprawiedliwie!”).
+     * 'Good for you!' (JP: Yokatta na!) -> BEZWZGLĘDNIE: „To świetnie!” / „Cieszę się!” / „Brawo ty!” (ZAKAZ: „Dobre dla ciebie!”).
+     * 'I'm good!' / 'I'm fine!' (JP: Daijoubu / Ii desu) -> BEZWZGLĘDNIE: „Dziękuję, postoję” / „Nie trzeba” / „Wszystko gra” (ZAKAZ: „Jestem dobry!”).
+     * 'Way to go!' (JP: Yatta na / Sasuga) -> BEZWZGLĘDNIE: „Brawo!” / „Dobra robota!” / „Klasa!” (ZAKAZ: „Droga do pójścia!”).
+     * 'Don't mention it!' (JP: Douitashimashite) -> BEZWZGLĘDNIE: „Nie ma za co!” / „Drobiazg!” / „Polecam się!” (ZAKAZ: „Nie wspominaj o tym!”).
+     * 'Out of the question!' (JP: Arienai / Dame da) -> BEZWZGLĘDNIE: „Wykluczone!” / „Nie wchodzi w grę!” (ZAKAZ: „Poza pytaniem!”).
+     * 'Take your time!' (JP: Go-yukkuri / Aserazu ni) -> BEZWZGLĘDNIE: „Spokojnie, bez pośpiechu!” / „Nie spiesz się!” (ZAKAZ: „Weź swój czas!”).
+  3. JAPOŃSKIE ZWROTY ZAWOALOWANE (Haragei & Soft Refusals):
+     * 'Betsu ni...' (別に...) -> BEZWZGLĘDNIE: „Nic takiego...” / „Nieważne...” / „Nie, nic...” (ZAKAZ: „Nieszczególnie...” / „Oddzielnie...”).
+     * 'Ii kara!' (いいから！) -> BEZWZGLĘDNIE: „Mniejsza o to!” / „Po prostu to zrób!” / „Nie gadaj, tylko chodź!” (ZAKAZ: „Bo tak jest dobrze!”).
+     * 'Mou ii!' (もういい！) -> BEZWZGLĘDNIE: „Daj spokój!” / „Już wystarczy!” / „Mam dość!” (ZAKAZ: „To już jest dobre!”).
+     * 'Sore wa chotto...' (それはちょっと...) -> BEZWZGLĘDNIE: „To może być problem...” / „Raczej nie dam rady...” / „Z tym będzie ciężko...” (ZAKAZ: „To jest trochę...”).
+     * 'Oseji wa ii' (お世辞はいい) -> BEZWZGLĘDNIE: „Daruj sobie te uprzejmości!” / „Nie słodź mi!” / „Nie kadź mi!” (ZAKAZ: „Pochlebstwo jest dobre”).
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -2026,6 +2057,21 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR LXX - Pragmatyka Metanarracyjna i 4. Ściana]: "
             "Żarty z tworzenia anime/mangi i telewizji adaptuj na błyskotliwy polski dowcip bez uciekania się do przypisów."
+        )
+
+    # 20. Matryca Idiomów Mostowych i Przeczeń Eliptycznych (Filar CXXXVII)
+    bridge_keys = ["not him", "not her", "not this", "not now", "after you", "be my guest", "tell me about it", "look who's talking", "on it", "you bet", "there you go", "you don't say", "fair enough", "good for you", "i'm good", "way to go", "don't mention it", "out of the question", "take your time", "chigaimasu", "chigau", "betsu ni", "ii kara", "mou ii"]
+    if any(k in combined_en for k in bridge_keys):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CXXXVII - Matryca Idiomów Mostowych i Przeczeń Eliptycznych]: "
+            "Kategoryczny zakaz kalkowania skrótów angielskich! "
+            "'Not him!' -> 'To nie on!' / 'To pomyłka!' (ZAKAZ: 'Nie o niego!'), "
+            "'After you!' -> 'Proszę przodem!' (ZAKAZ: 'Po tobie!'), "
+            "'Be my guest!' -> 'Bardzo proszę!' / 'Śmiało!' (ZAKAZ: 'Bądź moim gościem!'), "
+            "'Tell me about it!' -> 'Nawet mi nie mów!' / 'Święta prawda!' (ZAKAZ: 'Powiedz mi o tym!'), "
+            "'Look who's talking!' -> 'Kto to mówi!' / 'Odezwał się!' (ZAKAZ: 'Spójrz, kto mówi!'), "
+            "'On it!' -> 'Już się robi!' (ZAKAZ: 'Na tym!'), "
+            "'Betsu ni...' -> 'Nic takiego...' / 'Nieważne...' (ZAKAZ: 'Nieszczególnie...')."
         )
 
     # 20. Dostępność leksykalna i szybkie tempo (Filar LXXI)

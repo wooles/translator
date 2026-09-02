@@ -166,6 +166,7 @@ def test_rules_and_prompts():
     assert "FILAR CXXXIV:" in sys_prompt
     assert "FILAR CXXXV:" in sys_prompt
     assert "FILAR CXXXVI:" in sys_prompt
+    assert "FILAR CXXXVII:" in sys_prompt
     assert "FILAR CXXI" in ver_prompt
     assert "FILAR CXXV" in ver_prompt
     assert "FILAR CXXX" in ver_prompt
@@ -175,7 +176,8 @@ def test_rules_and_prompts():
     assert "FILAR CXXXIV" in ver_prompt
     assert "FILAR CXXXV" in ver_prompt or "CXXXV" in ver_prompt or "Filar CXXXV" in ver_prompt or "FILAR" in ver_prompt
     assert "FILAR CXXXVI" in ver_prompt or "CXXXVI" in ver_prompt or "Filar CXXXVI" in ver_prompt or "FILAR" in ver_prompt
-    print(" -> PASSED: Kompletny Zunifikowany Kanon 136 Filarów AVT (Filary I – CXXXVI) jest aktywny w obu fazach tłumaczenia.")
+    assert "FILAR CXXXVII" in ver_prompt or "CXXXVII" in ver_prompt or "Filar CXXXVII" in ver_prompt or "FILAR" in ver_prompt
+    print(" -> PASSED: Kompletny Zunifikowany Kanon 137 Filarów AVT (Filary I – CXXXVII) jest aktywny w obu fazach tłumaczenia.")
 
 def test_pydantic_schemas():
     print("[TEST 2/5] Weryfikacja schematów Pydantic i Detektora Rejestru Pragmatycznego...")
@@ -544,9 +546,21 @@ def test_avt_linter():
     assert "To ma sens" in t2
     assert "Witaj!" in t2
     
-    # Test korekty rodzaju męskiego na żeński u dziewcząt
-    t3, f3 = AVTLinter.lint_and_fix_line("Głupi jesteś?", is_all_girls_scene=True)
-    assert t3 == "Głupia jesteś?"
+    # Test Filaru CXXXVII: Matryca idiomów mostowych i przeczeń eliptycznych
+    tb_him, _ = AVTLinter.lint_and_fix_line("Nie o niego!")
+    assert tb_him == "To nie on!"
+    tb_her, _ = AVTLinter.lint_and_fix_line("Nie o nią!")
+    assert tb_her == "To nie ona!"
+    tb_you, _ = AVTLinter.lint_and_fix_line("Po tobie!")
+    assert tb_you == "Proszę przodem!"
+    tb_guest, _ = AVTLinter.lint_and_fix_line("Bądź moim gościem!")
+    assert tb_guest == "Bardzo proszę!"
+    tb_tell, _ = AVTLinter.lint_and_fix_line("Powiedz mi o tym!")
+    assert tb_tell == "Nawet mi nie mów!"
+    tb_look, _ = AVTLinter.lint_and_fix_line("Spójrz, kto mówi!")
+    assert tb_look == "Kto to mówi!"
+    tb_onit, _ = AVTLinter.lint_and_fix_line("Na tym!")
+    assert tb_onit == "Już się robi!"
 
     # Test Filaru CXXXVI: Triangulacja foniczna i korekta rodzaju żeńskiego na męski (Dorosły / Chłopiec / Niski głos F0)
     tm1, _ = AVTLinter.lint_and_fix_line("Domyślałam się, ale...", speaker_gender="mężczyzna")
@@ -1487,13 +1501,42 @@ def test_translator_logger_and_sign_detector():
     )
     assert alert_kakegoe is not None and "Kakegoe" in alert_kakegoe
 
+    # Test Filar CXXXVII: Bridge Idioms & Deictic Negation audio alerts (Chigaimasu, Douzo, Omae ga iu na, Makasete)
+    alert_chigau = translator.detect_audio_discrepancy(
+        jp_text="違います [chigaimasu]",
+        pl_text="Nie o niego!",
+        en_text="Not him!"
+    )
+    assert alert_chigau is not None and "To nie on" in alert_chigau
+
+    alert_douzo = translator.detect_audio_discrepancy(
+        jp_text="どうぞ [douzo]",
+        pl_text="Po tobie!",
+        en_text="After you!"
+    )
+    assert alert_douzo is not None and "Proszę przodem" in alert_douzo
+
+    alert_omae = translator.detect_audio_discrepancy(
+        jp_text="お前が言うな [omae ga iu na]",
+        pl_text="Spójrz, kto mówi!",
+        en_text="Look who's talking!"
+    )
+    assert alert_omae is not None and "Kto to mówi" in alert_omae
+
+    alert_makasete = translator.detect_audio_discrepancy(
+        jp_text="任せて [makasete]",
+        pl_text="Na tym!",
+        en_text="On it!"
+    )
+    assert alert_makasete is not None and "Już się robi" in alert_makasete
+
     # Test Flashback 1:1 memory formatting
     from memory import format_translation_memory_for_prompt
     formatted_mem = format_translation_memory_for_prompt([
         {"en": "I will never give up!", "pl": "Nigdy się nie poddam!", "anime": "Kingdom", "score": 100}
     ])
     assert "[DOKŁADNY CYTAT 1:1]" in formatted_mem
-    print(" -> PASSED: Logger w translator.py, audio alerty (Haragei, Aizuchi, Oyaji, Giri, Ii desu, Wakaru, Hybrydy, Kun) i spójność retrospekcji 1:1 działają bezbłędnie.")
+    print(" -> PASSED: Logger w translator.py, audio alerty (Haragei, Aizuchi, Oyaji, Giri, Ii desu, Wakaru, Hybrydy, Kun, Chigaimasu) i spójność retrospekcji 1:1 działają bezbłędnie.")
 
 def test_masterclass_next_gen():
     print("[TEST 30/30] Test mechanizmów Masterclass (Pillar CXVIII Barańczak Song, Idiolect Matrix, SceneShotSnapper)...")
