@@ -111,6 +111,8 @@ class DialogueVerifier:
             prag_reg_info = f"  [🎎 Rejestr Pragmatyczny JP]: {item['pragmatic_register']}\n" if item.get('pragmatic_register') else ""
             lit_info = f"  [📖 Dosłowny Sens JP]: {item['literal_meaning']}\n" if item.get('literal_meaning') else ""
             cond_info = f"  {item['condensation_directive']}\n" if item.get('condensation_directive') else ""
+            ambiguity_info = f"  [❓ Wątpliwość Fazy 1 (Rozwikłaj z obrazu/audio - Filar CXLV)]: {item['ambiguity_note']}\n" if item.get('ambiguity_note') else ""
+            relation_info = f"  {item['relation_tag']}\n" if item.get('relation_tag') else ""
             
             prompt_lines.append(
                 f"- [ID: {item['id']}]{type_tag}{gender_info}{voice_info}{prosody_info}{song_info}{cps_info}{visual_info}{region_info}\n"
@@ -120,6 +122,8 @@ class DialogueVerifier:
                 f"{vis_sub_info}"
                 f"{lit_info}"
                 f"{cond_info}"
+                f"{relation_info}"
+                f"{ambiguity_info}"
                 f"  EN: {item['en']}\n"
                 f"  Wstępne PL: {item['pl']}{notes_info}"
             )

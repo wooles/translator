@@ -404,6 +404,26 @@ def detect_audio_discrepancy(jp_text: str, pl_text: str, en_text: str) -> Option
         if "bo dobrze" in pl_lower or "to już jest dobre" in pl_lower or "ponieważ dobrze" in pl_lower:
             return "W audio pada 'Ii kara! / Mou ii!' (zniecierpliwienie/zbycie tematu) -> Zastąp kalkę: 'Mniejsza o to!' / 'Po prostu to zrób!' / 'Daj spokój!' / 'Mam dość!' (Filar CXXXVII)."
 
+    # 34. Chikushou / Kuso / Yabai / Shimatta (Radar Audio: silny wykrzyknik kryzysowy)
+    if any(k in clean_jp for k in ["ちくしょう", "畜生", "くそ", "糞", "やばい", "ヤバい", "しまった"]) or any(k in rom_lower for k in ["chikushou", "chikusho", "kuso", "yabai", "shimatta"]):
+        if any(w in pl_lower for w in ["ojej", "o nie", "ups", "rany", "kurczę"]):
+            return "W audio pada silny wykrzyknik kryzysowy (Chikushō/Kuso/Yabai) -> Wzmocnij polski ładunek emocjonalny (Filar CXLIV: 'Szlag by to!', 'Niech to szlag!', 'Do diabła!')."
+
+    # 35. Matte / Chotto matte (rozkaz zatrzymania)
+    if any(k in clean_jp for k in ["待って", "まって", "ちょっと待って"]) or any(k in rom_lower for k in ["matte", "chotto matte"]):
+        if "poczekaj minutę" in pl_lower or "chwilę czasu" in pl_lower:
+            return "W audio pada 'Matte / Chotto matte' -> 'Czekaj!' / 'Stój!' / 'Chwila!' (ZAKAZ: 'Poczekaj minutę')."
+
+    # 36. Yamero / Yamenai ka (żądanie zaprzestania przemocy/działania)
+    if any(k in clean_jp for k in ["やめろ", "辞めろ", "やめないか", "止めて", "やめて"]) or any(k in rom_lower for k in ["yamero", "yamete", "yamenaika"]):
+        if any(w in pl_lower for w in ["nie rób tego", "przestań to robić"]):
+            return "W audio pada 'Yamero / Yamete' -> 'Przestań!' / 'Zostaw to!' / 'Stój!' / 'Dosyć!' (Filar CXLIV)."
+
+    # 37. Shinde iru (stan rezultatywny vs trwające umieranie)
+    if any(k in clean_jp for k in ["死んでいる", "死んでる"]) or any(k in rom_lower for k in ["shinde iru", "shinderu"]):
+        if "umiera" in pl_lower:
+            return "W audio pada 'Shinde iru' (stan dokonany) -> 'Nie żyje!' / 'Jest martwy!' / 'Zginął!' (KARDYNALNY ZAKAZ: 'On umiera' - Filar CXLI)."
+
     return None
 
 def detect_japanese_pragmatic_register(jp_text: str, en_text: str = "") -> Optional[str]:
@@ -613,6 +633,7 @@ class LineTranslation(BaseModel):
     visual_subtext: Optional[str] = Field(default=None, description="Maks. 6 słów o mimice, gestach lub hierarchii przestrzennej (np. 'klęczy przed chanem', 'uśmiech, zaciśnięta pięść') lub null")
     literal_meaning: Optional[str] = Field(default=None, description="Dosłowny idiom JP (maks. 5 słów) tylko w razie potrzeby, inaczej null")
     notes: Optional[str] = Field(default=None, description="Kluczowa notatka (maks. 5 słów) tylko w razie potrzeby, inaczej null")
+    ambiguity_note: Optional[str] = Field(default=None, description="W razie wątpliwości (np. niejasny zaimek it/he, dwuznaczność słowa, brak pewności): krótka flaga dla Fazy 2 (maks. 6 słów), inaczej null")
 
 class BatchTranslationResponse(BaseModel):
     scene_diagnosis: Optional[SceneDiagnosis] = Field(default=None, description="Syntetyczna diagnoza sytuacji i podtekstu sceny PRZED tłumaczeniem (1-2 zwięzłe zdania)")
@@ -1261,6 +1282,7 @@ class MultimodalTranslator:
             visual_sub = ""
             lit_mean = ""
             screen_reg = None
+            ambiguity_note = ""
             if batch_response:
                 for tr in batch_response.translations:
                     if tr.id == batch_id:
@@ -1270,6 +1292,7 @@ class MultimodalTranslator:
                         visual_sub = getattr(tr, 'visual_subtext', '') or ''
                         lit_mean = getattr(tr, 'literal_meaning', '') or ''
                         notes = f"{getattr(tr, 'visual_clues', '') or ''} {getattr(tr, 'notes', '') or ''}".strip()
+                        ambiguity_note = getattr(tr, 'ambiguity_note', '') or ''
                         break
 
             if not pl_candidate:
@@ -1281,6 +1304,15 @@ class MultimodalTranslator:
 
             audio_discrepancy_msg = detect_audio_discrepancy(audio_jp_str, pl_candidate, clean_en)
             pragmatic_reg = detect_japanese_pragmatic_register(audio_jp_str, clean_en)
+
+            # Ping-pong dialogowy (Filar CXLVI)
+            relation_tag = ""
+            if idx > 0 and not vtype["is_sign"]:
+                prev_clean = untranslated_in_batch[idx - 1][2].strip()
+                if prev_clean.endswith("?"):
+                    relation_tag = "[PING-PONG DIALOGOWY: Odpowiedź/riposta na pytanie - zgraj leksykę i emocję (Filar CXLVI)]"
+                elif any(prev_clean.lower().startswith(w) for w in ["come,", "let's", "shall we", "look,", "hey,"]):
+                    relation_tag = "[PING-PONG DIALOGOWY: Reakcja na propozycję/zaczepkę (Filar CXLVI)]"
 
             pass1_items.append({
                 "id": batch_id,
@@ -1296,6 +1328,8 @@ class MultimodalTranslator:
                 "prosody": prosody_tags.get(batch_id, ""),
                 "audio_jp": audio_jp_str,
                 "audio_alert": audio_discrepancy_msg or "",
+                "ambiguity_note": ambiguity_note or "",
+                "relation_tag": relation_tag,
                 "pragmatic_register": pragmatic_reg or "",
                 "visual_subtext": visual_sub or "",
                 "literal_meaning": lit_mean or "",

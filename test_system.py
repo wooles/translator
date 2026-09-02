@@ -172,6 +172,10 @@ def test_rules_and_prompts():
     assert "FILAR CXL:" in sys_prompt
     assert "FILAR CXLI:" in sys_prompt
     assert "FILAR CXLII:" in sys_prompt
+    assert "FILAR CXLIII:" in sys_prompt
+    assert "FILAR CXLIV:" in sys_prompt
+    assert "FILAR CXLV:" in sys_prompt
+    assert "FILAR CXLVI:" in sys_prompt
     assert "FILAR CXXI" in ver_prompt
     assert "FILAR CXXV" in ver_prompt
     assert "FILAR CXXX" in ver_prompt
@@ -187,7 +191,11 @@ def test_rules_and_prompts():
     assert "FILAR CXL" in ver_prompt or "CXL" in ver_prompt or "Filar CXL" in ver_prompt or "FILAR" in ver_prompt
     assert "FILAR CXLI" in ver_prompt or "CXLI" in ver_prompt or "Filar CXLI" in ver_prompt or "FILAR" in ver_prompt
     assert "FILAR CXLII" in ver_prompt or "CXLII" in ver_prompt or "Filar CXLII" in ver_prompt or "FILAR" in ver_prompt
-    print(" -> PASSED: Kompletny Zunifikowany Kanon 142 Filarów AVT (Filary I – CXLII) jest aktywny w obu fazach tłumaczenia.")
+    assert "FILAR CXLIII" in ver_prompt or "CXLIII" in ver_prompt
+    assert "FILAR CXLIV" in ver_prompt or "CXLIV" in ver_prompt
+    assert "FILAR CXLV" in ver_prompt or "CXLV" in ver_prompt
+    assert "FILAR CXLVI" in ver_prompt or "CXLVI" in ver_prompt
+    print(" -> PASSED: Kompletny Zunifikowany Kanon 146 Filarów AVT (Filary I – CXLVI) jest aktywny w obu fazach tłumaczenia.")
 
 def test_pydantic_schemas():
     print("[TEST 2/5] Weryfikacja schematów Pydantic i Detektora Rejestru Pragmatycznego...")
@@ -793,6 +801,11 @@ def test_prosody_and_diarizer():
     detected_pause = AudioProsodyEngine.detect_intra_line_pause(synthetic_pause_audio, min_pause_ms=600)
     assert detected_pause is not None
     assert 700 <= detected_pause <= 850
+
+    # Test budżetu sylabicznego Mouth-Pacing (Filar CXLIII)
+    assert AudioProsodyEngine.calculate_syllable_budget(0.3) == 2
+    assert AudioProsodyEngine.calculate_syllable_budget(0.6) == 3
+    assert AudioProsodyEngine.calculate_syllable_budget(1.5) == 8
     print(" -> PASSED: Autokorelacja foniczna, estymacja F0 i detektor przerw oddechowych seiyuu (Breath-Pause) działają perfekcyjnie.")
 
 def test_typesetting_matcher():
@@ -1089,6 +1102,21 @@ def test_dynamic_rule_dispatcher():
     batch_praise = [{"en": "Isn't it delicious?!"}]
     focused_praise = get_focused_rules_for_batch(batch_praise)
     assert "CXLII" in focused_praise
+
+    # 11. Test paczki z limitem sylabicznym Mouth-Pacing (Filar CXLIII)
+    batch_pacing = [{"duration_s": 0.5, "en": "Wait!"}]
+    focused_pacing = get_focused_rules_for_batch(batch_pacing)
+    assert "CXLIII" in focused_pacing
+
+    # 12. Test paczki z radarem audio seiyuu (Filar CXLIV)
+    batch_radar = [{"en": "Damn it!", "audio_alert": "W audio pada Chikushou"}]
+    focused_radar = get_focused_rules_for_batch(batch_radar)
+    assert "CXLIV" in focused_radar
+
+    # 13. Test paczki z ping-pongiem dialogowym (Filar CXLVI)
+    batch_volley = [{"en": "Are you insane?", "relation_tag": "[PING-PONG DIALOGOWY]"}]
+    focused_volley = get_focused_rules_for_batch(batch_volley)
+    assert "CXLVI" in focused_volley
     print(" -> PASSED: Dyspozytor reguł precyzyjnie aktywuje właściwe filary AVT.")
 
 def test_fuzzy_and_dynamic_avt_linter():
@@ -1579,6 +1607,28 @@ def test_translator_logger_and_sign_detector():
         en_text="On it!"
     )
     assert alert_makasete is not None and "Już się robi" in alert_makasete
+
+    # Test Filar CXLIV (Chikushou) & Matte & Shinde iru (Filar CXLI)
+    alert_chiku = translator.detect_audio_discrepancy(
+        jp_text="ちくしょう [Chikushou]",
+        pl_text="Ojej...",
+        en_text="Damn it."
+    )
+    assert alert_chiku is not None and "CXLIV" in alert_chiku
+
+    alert_matte = translator.detect_audio_discrepancy(
+        jp_text="待って [Matte]",
+        pl_text="Poczekaj minutę!",
+        en_text="Wait a minute!"
+    )
+    assert alert_matte is not None and "Matte" in alert_matte
+
+    alert_shinde = translator.detect_audio_discrepancy(
+        jp_text="死んでいる [Shinde iru]",
+        pl_text="On umiera!",
+        en_text="He's dead!"
+    )
+    assert alert_shinde is not None and "CXLI" in alert_shinde
 
     # Test Flashback 1:1 memory formatting
     from memory import format_translation_memory_for_prompt

@@ -258,7 +258,7 @@ Twoim zadaniem jest dogłębna, wszechstronna analiza 100% skryptu całego odcin
    - Stan rezultatywny (Filar CXLI): 'Shinde iru / is dead' -> ostrzeż przed 'on umiera', nakaż 'nie żyje / jest martwy'.
    - Pytania z zachwytem (Filar CXLII): 'Janai ka? / Isn't it delicious / Umai janai' z podniesionym tonem -> ostrzeż przed krytyką, nakaż zachwyt 'Ale pycha!'.
    - Fizyczność sceny (Filar CXXXVIII): 'underwater' w browarze/bagnie -> ostrzeż przed słowem 'woda'; 'get down' w kosmosie -> ostrzeż przed 'padnij na ziemię'.
-3. PUNKTY ZWROTNE I ZMIANY RELACJI (relationship_pivots): Wskaż momenty w odcinku, w których następuje przełom i zmiana formy zwracania się do siebie (np. przejście z 'pani' na 'ty').
+3. PUNKTY ZWROTNE I EWOLUCJA RELACJI (relationship_pivots & dynamiczne wektory więzi): Wskaż momenty w odcinku, w których następuje przełom i zmiana formy zwracania się do siebie (np. przejście z 'pani' na 'ty') oraz ogólną trajektorię rozwoju więzi w odcinku (np. nieufność -> narastające zaufanie po wspólnej walce), zabezpieczając przed regresją form grzecznościowych w kolejnych odcinkach.
 4. POWIEDZONKA I KWESTIE-WIZYTÓWKI (character_catchphrases): Ustal jedno, kanoniczne polskie tłumaczenie dla powtarzających się motywów/zawołań postaci.
 5. MATRYCA METRYCZNA DLA PIOSENEK OP/ED (song_transcreation_plans): Rozpoznaj piosenki i ustal plan sylabiczny (np. 8 sylab) i rymy Barańczaka (AABB/ABAB).
 6. KALAMBURY I GRY SŁOWNE (puns_and_wordplays): Przekształć japońskie Dajare i Goroawase na autonomiczne polskie gry słowne wg zasad Stanisława Barańczaka (bez przypisów [Przyp. tłum.]!).

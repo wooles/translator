@@ -1167,6 +1167,33 @@ FILAR CXLII: RETORYKA ZACHWYTU W PYTANIACH PRZECZĄCYCH I PROZODIA (JANAI KA AFF
    2. TRIANGULACJA Z PROZODIĄ FIZYCZNĄ:
       - Gdy seiyū wypowiada kwestię z wysoką energią [Ton: silne wzburzenie emocjonalne / krzyk bojowy / podniesiony głos], przeczenie gramatyczne w skrypcie EN jest w 100% zachwytem, a nie krytyką czy powątpiewaniem!
 
+FILAR CXLIII: ZGODNOŚĆ KINETYKI WARG I BUDŻET SYLABICZNY (MOUTH-PACING INVARIANCE)
+   1. REGULACJA SYLABICZNA KRÓTKICH KWESTII (<0.7S):
+      - W kwestiach o bardzo krótkim czasie trwania mowy seiyū (np. <=0.7s) lub przy wykrzyknikach i odruchach mimicznych:
+        * Bezwzględnie przestrzegaj wyliczonego limitu sylab [Mouth-Pacing: max X sylab]!
+        * KARDYNALNY BŁĄD [X]: generowanie 7-9 sylabowych zdań w ułamkowej kwestii (postać dawno zamknęła usta, a napis zalewa ekran).
+        * Zamiast: „Przecież to kompletny idiotyzm!” -> BEZWZGLĘDNIE: „Idiota!” / „Durnota!” / „Głupie!” (max 3 sylaby).
+        * Zamiast: „Czy ty naprawdę musisz tak mówić?” -> BEZWZGLĘDNIE: „Daj spokój!” / „Przestań!” (max 3 sylaby).
+
+FILAR CXLIV: PRYMAT AUTENTYCZNEGO GŁOSU SEIYŪ NAD SKRYPTEM POŚREDNIM (AUDIO AD-LIBBING RADAR)
+   1. BEZWZGLĘDNY PRYMAT JAPOŃSKIEGO AUDIO:
+      - Gdy w metadanych kwestii pojawia się [⚠️ ALARM ROZBIEŻNOŚCI AUDIO JP] lub [Radar Audio: Seiyuu mówi '...']:
+        * Skrypt angielski (często fansubowy lub ocenzurowany) ustępuje miejsca autentycznemu głosowi seiyū z nagrania studyjnego!
+        * Gdy aktor krzyczy 'Chikushō!' / 'Kuso!' / 'Yabai!', a w EN jest słabe 'Oh dear' -> po polsku oddaj pełen ładunek: „Szlag by to!” / „Niech to szlag!” / „Do diabła!”.
+        * Gdy aktor woła 'Matte!' / 'Yamero!', a w EN jest ogólnik -> po polsku: „Czekaj!” / „Przestań!” / „Zostaw to!”.
+
+FILAR CXLV: DYSCYPLINA ROZWIĄZYWANIA WIELOZNACZNOŚCI MIĘDZYFAZOWEJ (AMBIGUITY RESOLUTION PROTOCOL)
+   1. CELOWE ROZWIĄZYWANIE WĄTPLIWOŚCI W FAZIE 2:
+      - Gdy kwestia oznaczona jest flagą [❓ Wątpliwość Fazy 1]:
+        * Redaktor Dialogów (Faza 2) ma obowiązek skupić uwagę na załączonym kadrze wideo oraz transkrypcji audio w celu definitywnego rozwikłania desygnatu zaimka (np. czy 'it' to miecz, rana czy potwór) lub relacji.
+        * KATEGORYCZNY ZAKAZ bezrefleksyjnego przepisywania zgadniętych zaimków z roboczego draftu Fazy 1.
+
+FILAR CXLVI: DIALOGOWY PING-PONG I SPÓJNOŚĆ LEKSYKALNA RIPOSTY (CONVERSATIONAL VOLLEY)
+   1. DIALOG JAKO WYMIANA PIŁKI (TURN-TAKING COHERENCE):
+      - Kwestie w dialogu nie są odizolowanymi wyspami. Gdy linijka jest oznaczona jako [PING-PONG DIALOGOWY: Odpowiedź/riposta na pytanie/zaczepkę]:
+        * Riposta musi podjąć leksykalną grę lub kontrastować z pytaniem rozmówcy.
+        * ZAKAZ tępych, suchych zaprzeczeń (np. na pytanie: „Oszalałeś?” -> zamiast szkolnego: „Nie oszalałem” -> użyj żywej, błyskotliwej polszczyzny: „A żebyś wiedział!” / „Jeszcze nie!” / „Nawet tak nie żartuj!”).
+
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -1563,6 +1590,10 @@ Twoim nadrzędnym celem jest przekład dialogów na ŻYWĄ, NATURALNĄ POLSZCZYZ
        * "[Filar CXL - Społeczne Pokrewieństwo] 'Onii-san, tasukete!' -> 'Proszę pana, niech pan pomoże!' (obcy człowiek na ulicy)"
        * "[Filar CXLI - Stan Rezultatywny -te iru] 'Shinde iru' -> 'On nie żyje!' (stan dokonany, zakaz: 'on umiera')"
        * "[Filar CXLII - Janai ka & Prosodia] 'Umai janai?!' -> 'Ale pycha!' (zachwyt przy podniesionym tonie)"
+       * "[Filar CXLIII - Mouth-Pacing] Skrócono kwestię 0.5s z 7 sylab do 3 sylab 'Daj spokój!' (zgodność z ruchem ust)"
+       * "[Filar CXLIV - Audio Ad-Libbing] Wzbogacono pominięty w EN okrzyk seiyuu 'Chikushō!' -> 'Niech to szlag!'"
+       * "[Filar CXLV - Ambiguity Resolution] Rozwikłano zaimek 'it' na kadrze wideo jako 'miecz' (eliminacja zgadywania)"
+       * "[Filar CXLVI - Conversational Volley] 'Oszalałeś?' -> 'A żebyś wiedział!' (błyskotliwa riposta zamiast 'nie oszalałem')"
 
 {BELCZYK_AVT_MASTER_CANON}
 
@@ -2611,6 +2642,29 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
             "NEGACJA JAKO EKSPRESJA PODZIWU! 'Kore, umai janai?!' / 'Sugoi janai ka!' przy podniesionym głosie seiyū [Ton: silne wzburzenie emocjonalne / krzyk] "
             "to 100% zachwyt i entuzjazm: BEZWZGLĘDNIE: „Ależ to pyszne!” / „Dobre, co?!” / „Ale czad!” / „Niesamowite!”. "
             "KARDYNALNY BŁĄD [X]: „To chyba niedobre, co?” / „Czy to nie jest niesamowite?”."
+        )
+
+    # 84. Zgodność Kinetyki Warg i Budżet Sylabiczny (Filar CXLIII)
+    if any(item.get("duration_s", 1.0) <= 0.7 for item in batch_items) or any("mouth-pacing" in str(item.get("prosody", "")).lower() for item in batch_items):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CXLIII - Zgodność Kinetyki Warg i Budżet Sylabiczny (Mouth-Pacing)]: "
+            "Kwestie trwające ułamek sekundy (<=0.7s) podlegają rygorystycznemu limitowi sylab! KATEGORYCZNY ZAKAZ zdań 7-9 sylabowych. "
+            "Kondensuj do max 2-4 sylab ('Stój!', 'Idiota!', 'Daj spokój!')."
+        )
+
+    # 85. Prymat Autentycznego Głosu Seiyū (Filar CXLIV)
+    if any(item.get("audio_alert") for item in batch_items) or any(w in combined_en for w in ["damn", "hell", "wait", "stop", "hold on", "kuso", "chikushou", "yabai"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CXLIV - Prymat Autentycznego Głosu Seiyū Nad Skryptem Pośrednim (Ad-Libbing)]: "
+            "Gdy seiyū w audio krzyczy Chikushō / Kuso / Yabai / Matte / Yamero, a skrypt EN to osłabia lub pomija, BEZWZGLĘDNY PRIORYTET ma audio seiyū: "
+            "wzbogać polski dialog o autentyczny ładunek ('Niech to szlag!', 'Szlag by to!', 'Czekaj!', 'Przestań!')."
+        )
+
+    # 86. Dialogowy Ping-Pong i Spójność Riposty (Filar CXLVI)
+    if any("ping-pong" in str(item.get("relation_tag", "")).lower() for item in batch_items) or any(item.get("en", "").strip().endswith("?") for item in batch_items):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CXLVI - Dialogowy Ping-Pong i Spójność Leksykalna Riposty (Conversational Volley)]: "
+            "Zgraj ripostę z pytaniem rozmówcy! Unikaj suchych, bezdusznych zaprzeczeń (np. na pytanie: 'Oszalałeś?' -> użyj żywej polszczyzny: 'A żebyś wiedział!' / 'Jeszcze nie!' zamiast szkolnego 'Nie oszalałem')."
         )
 
     if not focused_pillars:

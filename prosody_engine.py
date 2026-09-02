@@ -170,7 +170,34 @@ class AudioProsodyEngine:
             if pause_ms:
                 tags.append(f"dramatyczna pauza oddechowa seiyuu (~{pause_ms}ms)")
 
+            # Calculate Mouth-Pacing syllable budget for concise lip synchrony
+            syllable_limit = cls.calculate_syllable_budget(duration_s, dbfs)
+            if duration_s <= 0.7:
+                tags.append(f"Mouth-Pacing: max {syllable_limit} sylaby (mowa seiyuu trwa tylko {duration_s:.1f}s - KONDENSUJ!)")
+            elif duration_s <= 1.2:
+                tags.append(f"Mouth-Pacing: max {syllable_limit} sylab ({duration_s:.1f}s)")
+
             if tags:
                 results[b_id] = " | ".join(tags)
 
         return results
+
+    @classmethod
+    def calculate_syllable_budget(cls, duration_s: float, dbfs: float = -20.0) -> int:
+        """
+        Calculates recommended maximum Polish syllable budget based on seiyuu speech duration (Mouth-Pacing).
+        Enforces concise dubbing/subtitling synchrony, preventing cognitive overload when character lips close early.
+        """
+        if duration_s <= 0.4:
+            return 2
+        elif duration_s <= 0.7:
+            return 3
+        elif duration_s <= 1.0:
+            return 5
+        elif duration_s <= 1.5:
+            return 8
+        elif duration_s <= 2.0:
+            return 11
+        else:
+            return int(duration_s * 5.5)
+
