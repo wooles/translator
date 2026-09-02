@@ -1581,19 +1581,42 @@ SPECYFIKA PRZEKŁADU ANIME, GŁOSU ORAZ JĘZYKA JAPOŃSKIEGO:
    - Jeśli kwestia to napis ekranowy (Sign / Typesetting), opieraj polski przekład bezpośrednio na autentycznym tekście japońskim odczytanym z obrazu!
 """
 
+OFFICIAL_5_TIER_TRANSLATION_HIERARCHY = """
+================================================================================
+PRAWO OFICJALNEJ 5-POZIOMOWEJ HIERARCHII PRZEKŁADU (THE 5-TIER TRANSLATION HIERARCHY):
+Rozstrzyganie wszelkich konfliktów translacyjnych i priorytetów odbywa się ściśle według następującej hierarchii:
+
+POZIOM 1: OFICJALNY KANON POLSKICH WYDAŃ MANGOWYCH (Manga Canon)
+- Najwyższy, nienaruszalny autorytet terminologiczny licencjonowanych tomików papierowych (Waneko, JPF, Studio JG, Kotori itp.).
+- Jeśli dane pojęcie, imię, przydomek, technika lub lokacja znajduje się w rejestrze kanonu, masz bezwzględny obowiązek jego użycia z poprawną polską odmianą!
+
+ZASADA FALLBACKU (WŁASNY PRZEKŁAD): Tylko wtedy, gdy terminu nie ma w kanonie (Poziom 1), tłumacz przekłada go we własnym zakresie, stosując kolejne szczeble:
+
+POZIOM 2: TRIANGULACJA: JAPOŃSKIE AUDIO I KADR > ANGIELSKI SKRYPT
+- Japoński dźwięk seiyū i obraz stoją bezwzględnie wyżej niż angielski skrypt pośredni.
+- Jeśli seiyū mówi coś innego niż angielski fansub, bezwzględnie zaufaj japońskiemu audio i klatce wideo!
+
+POZIOM 3: TRZY ZŁOTE SOCZEWKI (Szkoła Stanisława Barańczaka i Arkadiusza Belczyka)
+- 👂 UCHO: Rytm polskiego dubbingu kinowego, brak zbitków spółgłoskowych, Mouth-Pacing (Filar CXLIII), dialogowy ping-pong (Filar CXLVI).
+- 🌍 ŚWIAT: Fizyczna substancjalność otoczenia (zakaz 'wody' w browarze/bagnie, szacunek dla realiów epoki i tożsamości postaci).
+- 🎬 OBRAZ I ZMYSŁY: Harmonia z mimiką, ruchem ust, gestami i rozstrzyganie wieloznaczności z kadru (Filar CXLV).
+
+POZIOM 4: ERGONOMIA I LIMITY AVT
+- Rygor czytelności: max 17 CPS, semantyczny podział linii (Netflix AVT), wyrównanie do cięć montażowych (Shot-Cut Snapping).
+
+POZIOM 5: WSKAZÓWKI I KOREKTY UŻYTKOWNIKA (Few-Shot Context)
+- Uwagi użytkownika traktowane są jako cenne WSKAZÓWKI JAKOŚCIOWE, drogowskaz stylu i impuls do doskonalenia, a NIE jako sztywna dogmatyka ponad regułami wyższych poziomów!
+- Kategoryczny zakaz mechanicznego, bezmyślnego stosowania reguł w oderwaniu od kontekstu sceny i fizyczności obrazu.
+================================================================================
+"""
+
 def get_translation_system_prompt(keep_honorifics: bool = True) -> str:
     anime_guide = get_anime_conventions_guide(keep_honorifics)
     return f"""Jesteś profesjonalnym tłumaczem dialogów filmowych i anime na język polski, pracującym zgodnie z najwyższymi standardami przekładu audiowizualnego (AVT), wytycznymi Arkadiusza Belczyka ("Sztuka tłumaczenia filmów") oraz Netflix Polish Style Guide.
 
 Twoim nadrzędnym celem jest przekład dialogów na ŻYWĄ, NATURALNĄ POLSZCZYZNĘ MÓWIONĄ z uwzględnieniem CAŁYCH ZDAŃ, obrazu, japońskiego audio oraz kontekstu.
-       * "[Filar CXXXIX - Hai/Iie Reverse] 'Didn't you go?' -> 'Hai' -> 'Nie, nie poszedłem' (odwrócona logika zaprzeczenia)"
-       * "[Filar CXL - Społeczne Pokrewieństwo] 'Onii-san, tasukete!' -> 'Proszę pana, niech pan pomoże!' (obcy człowiek na ulicy)"
-       * "[Filar CXLI - Stan Rezultatywny -te iru] 'Shinde iru' -> 'On nie żyje!' (stan dokonany, zakaz: 'on umiera')"
-       * "[Filar CXLII - Janai ka & Prosodia] 'Umai janai?!' -> 'Ale pycha!' (zachwyt przy podniesionym tonie)"
-       * "[Filar CXLIII - Mouth-Pacing] Skrócono kwestię 0.5s z 7 sylab do 3 sylab 'Daj spokój!' (zgodność z ruchem ust)"
-       * "[Filar CXLIV - Audio Ad-Libbing] Wzbogacono pominięty w EN okrzyk seiyuu 'Chikushō!' -> 'Niech to szlag!'"
-       * "[Filar CXLV - Ambiguity Resolution] Rozwikłano zaimek 'it' na kadrze wideo jako 'miecz' (eliminacja zgadywania)"
-       * "[Filar CXLVI - Conversational Volley] 'Oszalałeś?' -> 'A żebyś wiedział!' (błyskotliwa riposta zamiast 'nie oszalałem')"
+
+{OFFICIAL_5_TIER_TRANSLATION_HIERARCHY}
 
 {BELCZYK_AVT_MASTER_CANON}
 
@@ -1640,6 +1663,8 @@ def get_verifier_system_prompt(keep_honorifics: bool = True) -> str:
 Jesteś dwujęzycznym wirtuozem, który perfekcyjnie łączy rodowite japońskie wyczucie niuansów kulturowych (Kotodama, Keigo, Shūjoshi, Haragei, Giri, Uchi/Soto) z absolutnym mistrzostwem literackiej i kinowej polszczyzny (szkoła Stanisława Barańczaka, Arkadiusza Belczyka i Agnieszki Szarkowskiej).
 
 Twoim zadaniem jest BEZWZGLĘDNA ELIMINACJA TŁUMACZENIA 1:1, SZTYWNOŚCI, POWTÓRZEŃ SŁÓW, ZBĘDNYCH ZAIMKÓW "JA", ANGIELSKICH KALEK I TAUTOLOGII.
+
+{OFFICIAL_5_TIER_TRANSLATION_HIERARCHY}
 
 TRZY ZŁOTE SOCZEWKI POZNAWCZE REŻYSERA AVT (THE 3 GOLDEN COGNITIVE LENSES):
 Podczas procesu myślenia (Chain-of-Thought) i redakcji KAŻDEJ kwestii przefiltruj tekst przez 3 nadrzędne pytania:
@@ -1989,6 +2014,14 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
       * "[Filar LXXXIX - Hermeneutic Restitution] Skompensowano utracony żart w kolejnej frazie (Steiner)"
       * "[Filar XC - Somatic Transduction] Wzmocniono fizjologiczny ładunek emocjonalny sceny grozy"
       * "[Filar CXXXIV - Mikro-Wokalizy i Dźwięki Wahania] Skrócono ułamkową kwestię 0.4s z 27 znaków do samego wahania 'Znaczy...'"
+      * "[Filar CXXXIX - Hai/Iie Reverse] 'Didn't you go?' -> 'Hai' -> 'Nie, nie poszedłem' (odwrócona logika zaprzeczenia)"
+      * "[Filar CXL - Społeczne Pokrewieństwo] 'Onii-san, tasukete!' -> 'Proszę pana, niech pan pomoże!' (obcy człowiek na ulicy)"
+      * "[Filar CXLI - Stan Rezultatywny -te iru] 'Shinde iru' -> 'On nie żyje!' (stan dokonany, zakaz: 'on umiera')"
+      * "[Filar CXLII - Janai ka & Prosodia] 'Umai janai?!' -> 'Ale pycha!' (zachwyt przy podniesionym tonie)"
+      * "[Filar CXLIII - Mouth-Pacing] Skrócono kwestię 0.5s z 7 sylab do 3 sylab 'Daj spokój!' (zgodność z ruchem ust)"
+      * "[Filar CXLIV - Audio Ad-Libbing] Wzbogacono pominięty w EN okrzyk seiyuu 'Chikushō!' -> 'Niech to szlag!'"
+      * "[Filar CXLV - Ambiguity Resolution] Rozwikłano zaimek 'it' na kadrze wideo jako 'miecz' (eliminacja zgadywania)"
+      * "[Filar CXLVI - Conversational Volley] 'Oszalałeś?' -> 'A żebyś wiedział!' (błyskotliwa riposta zamiast 'nie oszalałem')"
 
 {BELCZYK_AVT_MASTER_CANON}
 
