@@ -6,6 +6,7 @@ and automatically generates aesthetic ASS color tags {\\1c&HBBGGRR&}.
 """
 
 import os
+import re
 from typing import Optional, Tuple
 from PIL import Image
 
@@ -166,8 +167,13 @@ class TypesettingColorMatcher:
         """
         prefix = original_prefix or ""
 
-        # 1. Positioning tag if missing
-        if not (r"\an" in prefix or r"\pos" in prefix):
+        # 1. Positioning tag: apply quadrant positioning if specific region given or missing
+        if region and region.strip():
+            pos_tag = cls.calculate_optimal_sign_position(sign_type=sign_type, region=region)
+            if r"\pos" not in prefix:
+                prefix = re.sub(r"\{\\an\d\}|\\an\d", "", prefix).strip()
+            prefix = f"{pos_tag}{prefix}"
+        elif not (r"\an" in prefix or r"\pos" in prefix):
             pos_tag = cls.calculate_optimal_sign_position(sign_type=sign_type, region=region)
             prefix = f"{pos_tag}{prefix}"
 

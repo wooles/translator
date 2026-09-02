@@ -2,7 +2,7 @@
   "anime_title": "Sayonara Lara",
   "characters": {
     "Lara -> Luca": {
-      "description": "Zwrot: 'na ty / po imieniu: Luca' (syrena -> licealista / obiekt uczuć)"
+      "description": "Zwrot: 'Luca' (nieśmiałe zakochani / przyjaciele)"
     },
     "Luca -> Lara": {
       "description": "Zwrot: 'na ty / po imieniu (Lara)' (znajomi / rozwijające się uczucie)"
@@ -26,7 +26,7 @@
       "description": "Zwrot: 'braciszku / bracie' (młodszy brat -> starszy brat)"
     },
     "Leo -> Lara": {
-      "description": "Zwrot: 'Lara-chan / pani Lara' (młodszy brat Luca -> dziewczyna brata)"
+      "description": "Zwrot: 'Lara' (młodszy brat przyjaciela)"
     },
     "Lara -> Mari": {
       "description": "Zwrot: 'na ty / po imieniu (Mari)' (przyjaciółki)"
@@ -36,6 +36,12 @@
     },
     "Kusatsu -> Mari": {
       "description": "Zwrot: 'po nazwisku (Otsu)' (trener -> zawodniczka)"
+    },
+    "Mari -> Luca": {
+      "description": "Zwrot: 'po imieniu / na ty' (znajomi / opiekunowie Lary)"
+    },
+    "Grace -> Mari": {
+      "description": "Zwrot: 'Mari' (wiedźma w akwarium -> opiekunka)"
     }
   },
   "glossary": {
@@ -48,10 +54,15 @@
     "Red corner / Blue corner": "Czerwony narożnik",
     "Omi's Lightning": "Błyskawica z Omi",
     "Merfolk": "Syreni ród",
-    "Vanish into foam": "Rozwiać się w pianę morską"
+    "Vanish into foam": "Rozwiać się w pianę morską",
+    "True Love": "Prawdziwa miłość",
+    "Witch's potion": "Eliksir czarownicy",
+    "Chlorine Removal": "Uzdatniacz wody",
+    "Zeze Castle": "Zamek Zeze"
   },
   "relationships": {},
   "episodes_translated": [
-    "Sayonara Lara - 08"
+    "Sayonara Lara - 08",
+    "[ASW] Sayonara Lara - 09 [1080p HEVC][D0F6BE61]"
   ]
 }

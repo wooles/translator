@@ -220,6 +220,7 @@ def test_pydantic_schemas():
         id=1,
         polish_text="Rozumiem, co masz na myśli.",
         speaker_gender="mężczyzna",
+        screen_region="bottom_right",
         notes="eliminacja kalki"
     )
     batch = BatchTranslationResponse(
@@ -228,12 +229,14 @@ def test_pydantic_schemas():
     )
     assert batch.translations[0].id == 1
     assert batch.translations[0].polish_text == "Rozumiem, co masz na myśli."
+    assert batch.translations[0].screen_region == "bottom_right"
     assert batch.scene_diagnosis is not None
     assert "Yoritsugu" in batch.scene_diagnosis.dramatic_context
 
     ref = RefinedLine(
         id=1,
         refined_pl="Rozumiem.",
+        screen_region="bottom_right",
         changes_made="Poprawiono kalkę"
     )
     ref_batch = RefinedBatchResponse(
@@ -241,6 +244,7 @@ def test_pydantic_schemas():
         lines=[ref]
     )
     assert ref_batch.lines[0].refined_pl == "Rozumiem."
+    assert ref_batch.lines[0].screen_region == "bottom_right"
     assert ref_batch.scene_diagnosis is not None
     print(" -> PASSED: Schematy Pydantic, Diagnoza Wizualna i Rejestr Pragmatyczny są w 100% poprawne.")
 
@@ -771,6 +775,19 @@ def test_typesetting_matcher():
     assert "\\an9" in pos_tr and "1750" in pos_tr
     pos_tl = TypesettingColorMatcher.calculate_optimal_sign_position(region="top_left")
     assert "\\an7" in pos_tl and "170" in pos_tl
+
+    # Test Typesetting Proximity 2.0 Override: generic \an8 overridden with bottom_right \an3\pos(1750,920)
+    enhanced_br = TypesettingColorMatcher.enhance_sign_typesetting(original_prefix=r"{\an8}", region="bottom_right")
+    assert "\\pos(1750,920)" in enhanced_br
+    assert "\\an3" in enhanced_br
+    assert "\\an8" not in enhanced_br
+
+    # Test Title Card auto-detection in detect_event_visual_type
+    from translator import detect_event_visual_type
+    ev_title = pysubs2.SSAEvent(text="Episode 57\\nTokyo Love Story", style="Default")
+    vtype_title = detect_event_visual_type(ev_title)
+    assert vtype_title["is_sign"] is True
+    assert "plansza tytułowa" in vtype_title["visual_details"]
     print(" -> PASSED: Moduł auto-stylizacji i kolorów ASS działa w 100%.")
 
 from manga_canon import MangaCanonRegistry

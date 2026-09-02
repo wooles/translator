@@ -116,10 +116,10 @@ def sanitize_ts_prefix_for_translation(ts_prefix: str) -> str:
     cleaned = re.sub(r"\{\s*\}", "", cleaned)
     return cleaned
 
-def detect_event_visual_type(event: pysubs2.SSAEvent, ts_prefix: str) -> Dict[str, Any]:
+def detect_event_visual_type(event: pysubs2.SSAEvent, ts_prefix: str = "") -> Dict[str, Any]:
     """
-    Analyzes ASS tags, position, rotation, color, and style to distinguish
-    on-screen text (manga titles, signs, posters, boards) from standard spoken dialogue (including top dialogue).
+    Analyzes ASS tags, position, rotation, color, text content, and style to distinguish
+    on-screen text (manga titles, signs, posters, boards, episode titles) from standard spoken dialogue (including top dialogue).
     """
     is_sign = False
     is_top = False
@@ -128,6 +128,7 @@ def detect_event_visual_type(event: pysubs2.SSAEvent, ts_prefix: str) -> Dict[st
     style_lower = (event.style or "").lower()
     name_lower = (event.name or "").lower()
     ts_lower = (ts_prefix or "").lower()
+    text_raw = (event.plaintext or event.text or "").strip()
 
     if any(s in style_lower for s in ["sign", "title", "poster", "board", "screen", "typesetting", "card", "ts", "napis", "tytuł", "szyld"]):
         is_sign = True
@@ -136,6 +137,10 @@ def detect_event_visual_type(event: pysubs2.SSAEvent, ts_prefix: str) -> Dict[st
     if any(n in name_lower for n in ["sign", "title", "poster", "board", "typesetting", "screen", "napis"]):
         is_sign = True
         details.append(f"aktor='{event.name}'")
+
+    if re.match(r"^(episode|odcinek|chapter|rozdział|act|akt|part|część)\s+(\d+|[ivxlcdm]+)", text_raw, re.IGNORECASE):
+        is_sign = True
+        details.append("plansza tytułowa odcinka/rozdziału")
 
     if r"\frz" in ts_lower or r"\org" in ts_lower or r"\clip" in ts_lower or r"\p1" in ts_lower:
         is_sign = True
@@ -546,6 +551,7 @@ class LineTranslation(BaseModel):
     id: int = Field(description="ID kwestii dialogowej z wejścia")
     polish_text: str = Field(description="Przetłumaczona kwestia na język polski z uwzględnieniem płci, sceny i eliminacji kalek")
     speaker_gender: Optional[str] = Field(default=None, description="Płeć mówcy: 'mężczyzna' lub 'kobieta'")
+    screen_region: Optional[str] = Field(default=None, description="Dla planszy/tytułu/napisu ekranowego: wskaż wykryte na kadrze położenie japońskiego napisu: 'bottom_right' (prawy dolny róg), 'bottom_left' (lewy dolny róg), 'top_right' (prawy górny róg), 'top_left' (lewy górny róg), 'bottom_center' (dół), 'top_center' (góra), 'center' (środek) lub null dla zwykłych dialogów.")
     visual_subtext: Optional[str] = Field(default=None, description="Maks. 6 słów o mimice, gestach lub hierarchii przestrzennej (np. 'klęczy przed chanem', 'uśmiech, zaciśnięta pięść') lub null")
     literal_meaning: Optional[str] = Field(default=None, description="Dosłowny idiom JP (maks. 5 słów) tylko w razie potrzeby, inaczej null")
     notes: Optional[str] = Field(default=None, description="Kluczowa notatka (maks. 5 słów) tylko w razie potrzeby, inaczej null")
@@ -762,8 +768,9 @@ class MultimodalTranslator:
 
             if vtype["is_sign"]:
                 lines.append(f"Kwestia [ID: {idx + 1}] [TYP: [NAPIS] {vtype['type_label']}] (Czas: {start_str} - {end_str}, Cechy: {vtype['visual_details']}):")
-                lines.append(f"  (!) UWAGA WIZUALNA: To jest NAPIS / TYTUŁ NA EKRANIE (np. tytuł mangi, rozdział, tablica, napis wklejony w kadr).")
-                lines.append(f"  Przetłumacz ten tekst jako SAMODZIELNY TYTUŁ/NAPIS (np. 'The Princess's Favor' / '姫様のご寵愛' -> 'Łaska księżniczki' / 'Faworyta księżniczki').")
+                lines.append(f"  (!) UWAGA WIZUALNA: To jest NAPIS / TYTUŁ NA EKRANIE (np. tytuł odcinka/rozdziału, tytuł mangi, tablica, szyld, plansza).")
+                lines.append(f"  Przetłumacz ten tekst jako SAMODZIELNY TYTUŁ/NAPIS (np. 'The Princess's Favor' / '姫様のご寵愛' -> 'Łaska księżniczki').")
+                lines.append(f"  (!) POŁOŻENIE W KADRZE (Typesetting Proximity): Spójrz na dołączoną klatkę wideo i w polu 'screen_region' wskaż dokładny kwadrant, w którym widnieje ten japoński napis: 'bottom_right' (prawy dolny róg), 'bottom_left' (lewy dolny róg), 'top_right' (prawy górny róg), 'top_left' (lewy górny róg), 'top_center' (górna belka), 'center' (środek) lub 'bottom_center' (dół).")
                 lines.append(f"  BEZWZGLĘDNY ZAKAZ wklejania tu fragmentów dialogów mówionych przez postacie!")
             else:
                 speaker_name = event.name if event.name else "Postać"
@@ -1195,11 +1202,13 @@ class MultimodalTranslator:
 
             visual_sub = ""
             lit_mean = ""
+            screen_reg = None
             if batch_response:
                 for tr in batch_response.translations:
                     if tr.id == batch_id:
                         pl_candidate = sanitize_sub_text(tr.polish_text)
                         speaker_gender = tr.speaker_gender
+                        screen_reg = getattr(tr, 'screen_region', None)
                         visual_sub = getattr(tr, 'visual_subtext', '') or ''
                         lit_mean = getattr(tr, 'literal_meaning', '') or ''
                         notes = f"{getattr(tr, 'visual_clues', '') or ''} {getattr(tr, 'notes', '') or ''}".strip()
@@ -1224,6 +1233,7 @@ class MultimodalTranslator:
                 "en": clean_en,
                 "pl": pl_candidate,
                 "speaker_gender": speaker_gender,
+                "screen_region": screen_reg,
                 "speaker_voice": speaker_tags.get(batch_id, ""),
                 "prosody": prosody_tags.get(batch_id, ""),
                 "audio_jp": audio_jp_str,
@@ -1242,6 +1252,7 @@ class MultimodalTranslator:
 
         # 6. Optional Phase 2 Verifier (Script Doctor)
         batch_results: Dict[int, str] = {}
+        batch_regions: Dict[int, str] = {}
 
         if self.enable_verifier and hasattr(self, 'verifier'):
             pbar.set_postfix_str("Faza 2 (Redakcja Dialogów Pro)...")
@@ -1258,6 +1269,7 @@ class MultimodalTranslator:
                 focused_rules_str=focused_rules_str
             )
             refined_dict = {r.id: sanitize_sub_text(r.refined_pl) for r in refined_lines}
+            refined_region_dict = {r.id: r.screen_region for r in refined_lines if getattr(r, 'screen_region', None)}
             for r in refined_lines:
                 orig_item = next((it for it in pass1_items if it["id"] == r.id), None)
                 orig_pl = orig_item["pl"] if orig_item else ""
@@ -1311,6 +1323,9 @@ class MultimodalTranslator:
                 final_text = clamp_sub_second_cps(final_text, start_m, end_m)
                 formatted_final = split_subtitle_syntactically(final_text, max_line_len=42, is_ass=is_ass, is_sign=item.get("is_sign", False))
                 batch_results[item["orig_idx"]] = formatted_final
+                eff_reg = refined_region_dict.get(item["id"]) or item.get("screen_region")
+                if eff_reg:
+                    batch_regions[item["orig_idx"]] = eff_reg
         else:
             for item in pass1_items:
                 raw_final = sanitize_sub_text(item["pl"])
@@ -1343,6 +1358,8 @@ class MultimodalTranslator:
                 final_text = clamp_sub_second_cps(final_text, start_m, end_m)
                 formatted_final = split_subtitle_syntactically(final_text, max_line_len=42, is_ass=is_ass, is_sign=item.get("is_sign", False))
                 batch_results[item["orig_idx"]] = formatted_final
+                if item.get("screen_region"):
+                    batch_regions[item["orig_idx"]] = item["screen_region"]
 
         # Harmonize concurrent screen subtitles (e.g. speech balloon + dialogue with identical EN text)
         en_to_best_pl: Dict[str, str] = {}
@@ -1359,7 +1376,7 @@ class MultimodalTranslator:
                 if "to robi" in cur_pl.lower():
                     batch_results[item["orig_idx"]] = en_to_best_pl[en_norm]
 
-        return b_idx, batch_results, untranslated_in_batch, pass1_items, scene_desc
+        return b_idx, batch_results, batch_regions, untranslated_in_batch, pass1_items, scene_desc
 
     def translate_file(
         self,
@@ -1467,6 +1484,7 @@ class MultimodalTranslator:
 
         history: List[Dict[str, str]] = []
         translated_results: Dict[int, str] = {}
+        translated_regions: Dict[int, str] = {}
 
         # 1b. Search for checkpoint files (multiple paths and candidate formats)
         checkpoint_path = None
@@ -1504,6 +1522,7 @@ class MultimodalTranslator:
                         if isinstance(saved_data, dict) and len(saved_data) > 0:
                             if "translated_results" in saved_data:
                                 translated_results = {int(k): str(v) for k, v in saved_data["translated_results"].items() if str(k).isdigit()}
+                                translated_regions = {int(k): str(v) for k, v in saved_data.get("translated_regions", {}).items() if str(k).isdigit()}
                                 token_usage = saved_data.get("token_usage", {})
                                 restored_f1_tokens = token_usage.get("f1")
                                 restored_f2_tokens = token_usage.get("f2")
@@ -1777,14 +1796,18 @@ class MultimodalTranslator:
                                 print("\n[Tłumacz]: Otrzymano sygnał przerwania (⏹ Stop)...")
                                 break
                             try:
-                                b_res_idx, batch_res, untrans_items, pass1_items, sc_desc = future.result()
+                                b_res_idx, batch_res, batch_regs, untrans_items, pass1_items, sc_desc = future.result()
                                 with self.lock:
                                     for orig_idx, text_res in batch_res.items():
                                         translated_results[orig_idx] = text_res
+                                    for orig_idx, reg_res in batch_regs.items():
+                                        if reg_res:
+                                            translated_regions[orig_idx] = reg_res
                                     # Save checkpoint safely
                                     try:
                                         checkpoint_payload = {
                                             "translated_results": translated_results,
+                                            "translated_regions": translated_regions,
                                             "token_usage": {
                                                 "f1": self.current_episode_tokens,
                                                 "f2": self.verifier.current_episode_tokens if self.verifier else None
@@ -1821,7 +1844,7 @@ class MultimodalTranslator:
                         if loop_i > 0:
                             time.sleep(0.25)
                         try:
-                            b_res_idx, batch_res, untrans_items, pass1_items, sc_desc = self._process_single_batch(
+                            b_res_idx, batch_res, batch_regs, untrans_items, pass1_items, sc_desc = self._process_single_batch(
                                 b_idx=b_idx,
                                 batch=batch,
                                 untranslated_in_batch=untranslated,
@@ -1842,9 +1865,13 @@ class MultimodalTranslator:
                             with self.lock:
                                 for orig_idx, text_res in batch_res.items():
                                     translated_results[orig_idx] = text_res
+                                for orig_idx, reg_res in batch_regs.items():
+                                    if reg_res:
+                                        translated_regions[orig_idx] = reg_res
                                 try:
                                     checkpoint_payload = {
                                         "translated_results": translated_results,
+                                        "translated_regions": translated_regions,
                                         "token_usage": {
                                             "f1": self.current_episode_tokens,
                                             "f2": self.verifier.current_episode_tokens if self.verifier else None
@@ -1911,11 +1938,19 @@ class MultimodalTranslator:
                     flags=re.IGNORECASE
                 )
 
-            # Auto-elevate bracketed signs/captions '[ ... ]' to top (\an8) if missing positioning to prevent collision with bottom subs/hardsubs
+            # Typesetting Proximity 2.0: Anchor signs/titles to the detected visual quadrant or fallback to top
             clean_check = clean_translated_text.strip()
             ts_prefix_applied = sanitize_ts_prefix_for_translation(ts_prefix or "")
-            if (clean_check.startswith("[") and clean_check.endswith("]")) or "sign" in (orig_event.style or "").lower():
-                if not (r"\an" in ts_prefix_applied or r"\pos" in ts_prefix_applied):
+            item_region = translated_regions.get(master_id)
+            is_title_card = bool(re.match(r"^(ODCINEK|ROZDZIAŁ|EPIZOD|CZĘŚĆ|AKT)\s+\d+", clean_check, re.IGNORECASE))
+
+            if is_sign_flag or is_title_card or (clean_check.startswith("[") and clean_check.endswith("]")) or "sign" in (orig_event.style or "").lower() or "title" in (orig_event.style or "").lower():
+                if item_region:
+                    pos_tag = TypesettingColorMatcher.calculate_optimal_sign_position(region=item_region)
+                    if r"\pos" not in ts_prefix_applied:
+                        ts_prefix_applied = re.sub(r"\{\\an\d\}|\\an\d", "", ts_prefix_applied).strip()
+                    ts_prefix_applied = f"{pos_tag}{ts_prefix_applied}"
+                elif not (r"\an" in ts_prefix_applied or r"\pos" in ts_prefix_applied):
                     ts_prefix_applied = r"{\an8}" + ts_prefix_applied
 
             # Reattach Typesetting tags to translated text

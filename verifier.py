@@ -15,6 +15,7 @@ from client_factory import format_friendly_api_error
 class RefinedLine(BaseModel):
     id: int = Field(description="ID kwestii dialogowej zgodne z wejściem")
     refined_pl: str = Field(description="Ostateczna, perfekcyjnie zredagowana kwestia w języku polskim, wolna od kalek")
+    screen_region: Optional[str] = Field(default=None, description="Dla planszy/tytułu/napisu ekranowego: wskaż lub zachowaj wykryte na kadrze położenie japońskiego napisu: 'bottom_right' (prawy dolny róg), 'bottom_left' (lewy dolny róg), 'top_right' (prawy górny róg), 'top_left' (lewy górny róg), 'bottom_center' (dół), 'top_center' (góra), 'center' (środek) lub null dla zwykłych dialogów.")
     changes_made: Optional[str] = Field(default=None, description="Dokładne uzasadnienie i numer Filaru AVT dla poprawionej kwestii (np. '[Filar IV - Szyk Zdania] Usunięto kalkę'). Jeśli kwestia nie wymagała zmian, wpisz null.")
 
 class RefinedBatchResponse(BaseModel):
@@ -103,6 +104,7 @@ class DialogueVerifier:
             cps_info = f" [CPS: {item.get('cps_warning')}]" if item.get('cps_warning') else ""
             notes_info = f" [Notatki: {item.get('notes')}]" if item.get('notes') else ""
             visual_info = f" [Położenie/Styl: {item.get('visual_details')}]" if item.get('visual_details') else ""
+            region_info = f" [Kwadrant kadru: {item.get('screen_region')}]" if item.get('screen_region') else ""
             audio_info = f"  JP (Audio ze słuchu Whisper): {item['audio_jp']}\n" if item.get("audio_jp") else ""
             alert_info = f"  [⚠️ ALARM ROZBIEŻNOŚCI AUDIO JP]: {item['audio_alert']}\n" if item.get("audio_alert") else ""
             vis_sub_info = f"  [🎬 Wizja, Mimika & Usta]: {item['visual_subtext']}\n" if item.get('visual_subtext') else ""
@@ -111,7 +113,7 @@ class DialogueVerifier:
             cond_info = f"  {item['condensation_directive']}\n" if item.get('condensation_directive') else ""
             
             prompt_lines.append(
-                f"- [ID: {item['id']}]{type_tag}{gender_info}{voice_info}{prosody_info}{song_info}{cps_info}{visual_info}\n"
+                f"- [ID: {item['id']}]{type_tag}{gender_info}{voice_info}{prosody_info}{song_info}{cps_info}{visual_info}{region_info}\n"
                 f"{audio_info}"
                 f"{alert_info}"
                 f"{prag_reg_info}"

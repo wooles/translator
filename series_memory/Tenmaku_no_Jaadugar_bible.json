@@ -44,10 +44,10 @@
       "description": "Zwrot: 'Wielki Chan Ögedei' (brat/poddany -> Wielki Chan)"
     },
     "Tolui -> Ögedei": {
-      "description": "Zwrot: 'Wielki Chaganie / bracie' (młodszy brat / wódz -> cesarz)"
+      "description": "Zwrot: 'bracie / Wielki Chanie' (młodszy brat -> monarcha)"
     },
     "Sitara -> Boraqchin": {
-      "description": "Zwrot: 'Wielka Chatan / Wasza Wysokość' (medyk -> władczyni)"
+      "description": "Zwrot: 'Wielka Chatun / Pani' (niewolnica/medyczka -> monarchini)"
     },
     "Hulegu -> Sorghaghtani": {
       "description": "Zwrot: 'Matko' (syn -> matka)"
@@ -59,7 +59,7 @@
       "description": "Zwrot: 'Fatima' (pierwsza Chatuń -> perska lekarka)"
     },
     "Möge -> Sitara": {
-      "description": "Zwrot: 'niewolnico' (pani -> służąca)"
+      "description": "Zwrot: 'dziewczyno / Fatimo' (księżna -> poddana)"
     },
     "Dayir Usun -> Töregene": {
       "description": "Zwrot: 'po imieniu: Töregene' (mąż / wódz -> żona)"
@@ -94,19 +94,19 @@
     "Mergen": "Mergen",
     "kam": "kam",
     "jada stone": "kamień jada",
-    "Great Kha'an": "Wielki Chagan",
+    "Great Kha'an": "Wielki Chan",
     "Great Khatun": "Wielka Chatun",
     "al-iksir": "al-iksir",
     "danyao": "danyao",
     "waidan": "Waidan",
-    "rahj al-gar": "rahj al-gar",
+    "rahj al-gar": "rahdż al-gar",
     "sandarac": "sandarak",
     "jada stone / bezoar stone": "Kamień jada",
     "urum": "Urum",
     "Otchigin": "Otchigin",
-    "jadamishi": "jadamishi",
+    "jadamishi": "rytuał jada",
     "Tengri": "Tengri",
-    "Kam": "Kam",
+    "Kam": "kam",
     "Usun": "Usun",
     "Yeke Mongol Ulus": "Wielkie Państwo Mongolskie",
     "Khorasan": "Chorasan",

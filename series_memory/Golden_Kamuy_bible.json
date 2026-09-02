@@ -2,10 +2,10 @@
   "anime_title": "Golden Kamuy",
   "characters": {
     "Saichi Sugimoto -> Asirpa": {
-      "description": "Zwrot: 'na ty / po imieniu: Asirpa' (partnerzy i obrońca)"
+      "description": "Zwrot: 'panna Asirpa / Asirpa-san' (obrońca i partner)"
     },
     "Asirpa -> Saichi Sugimoto": {
-      "description": "Zwrot: 'Sugimoto (po nazwisku, bez tytulatury)' (równorzędni partnerzy w wyprawie)"
+      "description": "Zwrot: 'na ty / po imieniu: Sugimoto' (partnerzy / towarzysze broni)"
     },
     "Usami -> Kadokura": {
       "description": "Zwrot: 'ty prosiaczku / staruchu' (oprawca -> więzień/ofiara)"
@@ -20,10 +20,10 @@
       "description": "Zwrot: 'panie Sugimoto / Sugimoto-nispa' (sprzymierzeniec Ajnu -> Sugimoto (zwrot z szacunkiem))"
     },
     "Tsurumi -> Usami": {
-      "description": "Zwrot: 'szeregowy Usami / Tokishige-kun' (dowódca -> bezgranicznie oddany podwładny)"
+      "description": "Zwrot: 'z imienia: Tokishige-kun / Szeregowy Usami' (dowódca -> podwładny / mistrz -> wyznawca)"
     },
     "Sugimoto -> Asirpa": {
-      "description": "Zwrot: 'Asirpa / po imieniu' (towarzysze broni i bliscy przyjaciele)"
+      "description": "Zwrot: 'Asirpo / na ty' (towarzysze broni / opiekun i partnerka)"
     },
     "Shiraishi -> Botaro": {
       "description": "Zwrot: 'Botaro / Pirat' (Współwięźniowie i kompani)"
@@ -32,22 +32,22 @@
       "description": "Zwrot: 'Po stopniach wojskowych (np. poruczniku Koito)' (Dowódca wojskowy -> podwładni)"
     },
     "Tsurumi -> Asirpa": {
-      "description": "Zwrot: 'Asirpa / dziewczynka' (Przesłuchujący / manipulator i więzień)"
+      "description": "Zwrot: 'Asirpa / Asirpo' (porywacz / manipulator -> zakładniczka)"
     },
     "Tsurumi -> Sofia": {
-      "description": "Zwrot: 'Sofio / pani Zojo' (dawny znajomy/mściciel -> rewolucjonistka)"
+      "description": "Zwrot: 'pani Zoyo / Sofio Złotoręka' (przesłuchujący -> więźniarka / dawni znajomi)"
     },
     "Sugimoto -> Shiraishi": {
-      "description": "Zwrot: 'Shiraishi' (towarzysze broni)"
+      "description": "Zwrot: 'na ty / Shiraishi' (towarzysze broni)"
     },
     "Ariko -> Sugimoto": {
-      "description": "Zwrot: 'Sugimoto' (Chwilowi sprzymierzeńcy)"
+      "description": "Zwrot: 'Sugimoto / na ty' (tymczasowy sojusznik wojenny)"
     },
     "Ariko -> Kikuta": {
-      "description": "Zwrot: 'panie starszy sierżancie Kikuta' (podwładny -> przełożony / towarzysze broni)"
+      "description": "Zwrot: 'panie chorąży / chorąży Kikuta' (podwładny -> starszy stopniem / weterani z jednego okopu)"
     },
     "Koito -> Tsurumi": {
-      "description": "Zwrot: 'panie poruczniku Tsurumi' (podwładny bezgranicznie oddany dowódcy)"
+      "description": "Zwrot: 'poruczniku Tsurumi / panie poruczniku' (zaślepiony podwładny -> dowódca)"
     },
     "Kikuta Mokutarou -> Saichi Sugimoto": {
       "description": "Zwrot: 'na ty / Norabo / chłopie' (sierżant -> rekrut / podopieczny)"
@@ -62,10 +62,10 @@
       "description": "Zwrot: 'generale Okuda / panie generale' (podwładny -> dowódca dywizji)"
     },
     "Sugimoto -> Kikuta": {
-      "description": "Zwrot: 'sierżancie Kikuta / panie Kikuta' (młodszy towarzysz -> przełożony / mentor)"
+      "description": "Zwrot: 'panie sierżancie / panie Kikuta' (młodzieniec -> oficer/instruktor)"
     },
     "Kikuta -> Sugimoto": {
-      "description": "Zwrot: 'Norabo / Sugimoto' (starszy sierżant -> protegowany)"
+      "description": "Zwrot: 'na ty / per Norabo' (sierżant / mentor -> młody włóczęga)"
     },
     "Tsurumi -> Kikuta": {
       "description": "Zwrot: 'podporuczniku Kikuta' (dowódca -> podwładny (podwójny agent))"
@@ -93,6 +93,36 @@
     },
     "Hijikata -> Sugimoto": {
       "description": "Zwrot: 'Sugimoto Saichi' (dawny dowódca samurajski szanujący determinację młodego żołnierza)"
+    },
+    "Usami -> Tsurumi": {
+      "description": "Zwrot: 'panie poruczniku / Tokushirou-san' (podwładny -> dowódca)"
+    },
+    "Tokishige Usami -> Tokushirou Tsurumi": {
+      "description": "Zwrot: 'poruczniku Tsurumi / panie poruczniku' (podwładny -> ubóstwiany dowódca)"
+    },
+    "Hajime Tsukishima -> Otonoshin Koito": {
+      "description": "Zwrot: 'panie poruczniku Koito' (podwładny -> przełożony)"
+    },
+    "Otonoshin Koito -> Hajime Tsukishima": {
+      "description": "Zwrot: 'Tsukishima' (dowódca -> podwładny)"
+    },
+    "Yoshitake Shiraishi -> Fusataro Oosawa": {
+      "description": "Zwrot: 'Botaro / Fusataro' (towarzysze niedoli)"
+    },
+    "Tsukishima -> Tsurumi": {
+      "description": "Zwrot: 'panie poruczniku / poruczniku Tsurumi' (podwładny -> przełożony (wojskowa))"
+    },
+    "Koito -> Tsukishima": {
+      "description": "Zwrot: 'sierżancie Tsukishima / Tsukishima' (oficer -> podoficer)"
+    },
+    "Nikaido -> Ariko": {
+      "description": "Zwrot: 'Szeregowy Ariko' (żołnierze z tej samej dywizji)"
+    },
+    "Kaeko -> Sugimoto": {
+      "description": "Zwrot: 'panie Yuusaku (Yuusaku-san)' (arystokratka -> rzekomy kandydat na męża)"
+    },
+    "Tsurumi -> Okuda": {
+      "description": "Zwrot: 'panie generale' (porucznik -> dowódca dywizji)"
     }
   },
   "glossary": {
@@ -103,7 +133,7 @@
     "Firing pin": "Iglica",
     "Surku / Wolfsbane": "Surku",
     "Aca": "Aca",
-    "Nispa": "Nispa",
+    "Nispa": "nispa",
     "Menko": "Karty menko",
     "Ainu": "Ainu",
     "Nopperabo": "Nopperabo",
@@ -128,7 +158,7 @@
     "Retar": "Retar",
     "Abashiri Prison": "Więzienie Abashiri",
     "Smallpox": "ospa prawdziwa",
-    "Steam pump": "pompa parowa",
+    "Steam pump": "Parowa motopompa strażacka",
     "Ezo Republic": "Republika Ezo",
     "Nagant": "Nagant",
     "Wilk": "Wilk",
@@ -138,12 +168,12 @@
     "Ako Prison": "Więzienie Akō",
     "Vladivostok": "Władywostok",
     "Pinky Bone": "Kość małego palca",
-    "Hachimaki": "Opaska na głowę",
+    "Hachimaki": "hachimaki",
     "kamuy": "kamuj",
-    "cietoy": "cietoy",
-    "Makiri": "nóż makiri",
-    "Attus": "szata attus",
-    "Kene": "sok z olszy",
+    "cietoy": "cietoj",
+    "Makiri": "makiri",
+    "Attus": "attus",
+    "Kene": "kene",
     "Cepker": "buty ze skóry łososia",
     "Ainu gold": "Złoto Ajnów",
     "Regimental flag bearer": "Sztandarowy pułku",
@@ -161,7 +191,18 @@
     "Shinsengumi": "Shinsengumi",
     "Satsuma": "Satsuma",
     "Deed book": "Akt własności ziemi",
-    "Quiver": "Kołczan"
+    "Quiver": "Kołczan",
+    "menaspa": "menaspa",
+    "Uworamkote": "uworamkote",
+    "Irezumi": "tatuaż skazańca",
+    "Tattooed skins": "tatuowane skóry",
+    "Escape King": "Król Ucieczek",
+    "Golden Hand": "Złotoręka",
+    "Horkew Oskoni": "Horkew Oskoni",
+    "Warrant Officer": "starszy chorąży",
+    "1st Division": "1. Dywizja",
+    "regimental flag bearer": "chorąży pułku",
+    "zaibatsu": "zaibatsu"
   },
   "relationships": {},
   "episodes_translated": [
