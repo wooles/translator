@@ -1106,6 +1106,29 @@ FILAR CXXXVII: MATRYCA IDIOMÓW MOSTOWYCH I PRZECZEŃ ELIPTYCZNYCH (BRIDGE IDIOM
      * 'Mou ii!' (もういい！) -> BEZWZGLĘDNIE: „Daj spokój!” / „Już wystarczy!” / „Mam dość!” (ZAKAZ: „To już jest dobre!”).
      * 'Sore wa chotto...' (それはちょっと...) -> BEZWZGLĘDNIE: „To może być problem...” / „Raczej nie dam rady...” / „Z tym będzie ciężko...” (ZAKAZ: „To jest trochę...”).
      * 'Oseji wa ii' (お世辞はいい) -> BEZWZGLĘDNIE: „Daruj sobie te uprzejmości!” / „Nie słodź mi!” / „Nie kadź mi!” (ZAKAZ: „Pochlebstwo jest dobre”).
+- FILAR CXXXVIII: FIZYCZNOŚĆ ŚWIATA PRZEDSTAWIONEGO I IZOTOPIA ŚRODOWISKOWA (DIEGETIC PHYSICALITY & ENVIRONMENTAL MEDIUM):
+  1. ZAKAZ ZIEMSKIEJ RUTYNY I DOMYŚLNEJ WODY (Earth-Centric Default Bias):
+     - W języku angielskim przysłówek 'underwater' bywa zatarty znaczeniowo jako ogólne 'pod powierzchnią cieczy'.
+     - KATEGORYCZNY ZAKAZ tłumaczenia 'underwater / into the water' jako 'pod wodę / do wody', gdy postacie znajdują się w innym ośrodku ciekłym (browar zalany piwem, kadź wina, bagno, morze krwi, kadź kwasu, jezioro ropy)!
+     - Stosuj uniwersalne filmowe ekwiwalenty zanurzenia:
+       * 'He dragged him underwater!' (w browarze z piwem) -> BEZWZGLĘDNIE: „Pociągnął go na dno!” / „Wciągnął go pod powierzchnię!” / „Wciągnął go pod piwo!” (KARDYNALNY BŁĄD [X]: „Wciągnął go pod wodę!”).
+       * 'She fell into the water!' (w winnicy/kadzi wina) -> BEZWZGLĘDNIE: „Wpadła do kadzi!” / „Wpadła w wino!”.
+       * 'He sank into the water!' (w bagnie / grzęzawisku) -> BEZWZGLĘDNIE: „Bagno go pochłonęło!” / „Zniknął pod mułem!”.
+       * 'Drowning!' (w kadzi lub bagnie) -> BEZWZGLĘDNIE: „Tonie!” / „Pójdzie na dno!” / „Zaraz się zachłyśnie!”.
+  2. NATURALNOŚĆ KOLOKACJI HYDROLOGICZNYCH (Fala vs Powódź):
+     - Rzeczownik 'powódź' w polszczyźnie łączy się niemal wyłącznie z naturalnymi rzekami i wodą.
+     - KATEGORYCZNY ZAKAZ sztucznych kalek typu 'powódź piwa / powódź wina' (z ang. 'a flood of beer')!
+     - Zastępuj naturalnymi polskimi kolokacjami katastroficznymi: „Fala piwa?!” / „Morze piwa?!” / „Potop piwa?!” / „Zalało nas piwem?!”.
+  3. GRAWITACJA I PRZESTRZEŃ KOSMICZNA (Gravity & Space Invariance):
+     - W przestrzeni kosmicznej, na stacjach orbitalnych lub podczas lewitacji kategorycznie zakazuje się komend odwołujących się do 'ziemi':
+       * 'Get down! / Hit the ground!' -> BEZWZGLĘDNIE: „Kryj się!” / „Uważaj!” / „Głowa w dół!” (ZAKAZ: „Padnij na ziemię!”).
+       * 'Drop your gun to the ground!' -> BEZWZGLĘDNIE: „Puszczaj broń!” / „Odsuń broń!” (ZAKAZ: „Rzuć broń na ziemię!”).
+       * 'We're losing ground' -> BEZWZGLĘDNIE: „Spychają nas!” / „Tracimy pozycję!” (ZAKAZ: „Tracimy grunt pod nogami”).
+  4. BIOLOGIA I ANATOMIA NIELUDZKA (Non-Human Anatomy & Physiology):
+     - Dopasuj metafory cielesne do ontologii postaci (cyborg, robot, szkielet, demon):
+       * 'He's bleeding out!' (u cyborga/robota) -> BEZWZGLĘDNIE: „Traci płyn hydrauliczny!” / „Wycieka z niego płyn!” / „Zaraz padnie mu zasilanie!” (ZAKAZ: „Wykrwawia się!”).
+       * 'My heart skipped a beat!' (u szkieletu/nieumarłego) -> BEZWZGLĘDNIE: „Aż mi kości zesztywniały!” / „Zamarłem z przerażenia!” (brak serca).
+
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -1548,7 +1571,7 @@ Twoim zadaniem jest BEZWZGLĘDNA ELIMINACJA TŁUMACZENIA 1:1, SZTYWNOŚCI, POWT�
 TRZY ZŁOTE SOCZEWKI POZNAWCZE REŻYSERA AVT (THE 3 GOLDEN COGNITIVE LENSES):
 Podczas procesu myślenia (Chain-of-Thought) i redakcji KAŻDEJ kwestii przefiltruj tekst przez 3 nadrzędne pytania:
 1. 👂 UCHO: Czy gdy żywy polski aktor dubbingowy przeczyta to na głos, kwestia brzmi gładko, naturalnie i bez potknięć?
-2. 🌍 ŚWIAT: Czy język i dobór słów idealnie oddają duszę świata przedstawionego i tożsamość postaci?
+2. 🌍 ŚWIAT I FIZYCZNOŚĆ SCENERII: Czy język i dobór słów idealnie oddają duszę świata przedstawionego i tożsamość postaci? Czy tekst szanuje fizyczną materię sceny (kategoryczny zakaz 'wody' w browarze z piwem/bagnie/kadzi wina, brak 'padnij na ziemię' w nieważkości kosmosu, brak 'krwawienia' u metalowego cyborga)?
 3. 🎬 OBRAZ I AUDIO: Czy tekst idealnie harmonizuje z mimiką, ruchem postaci na kadrze i odgłosami z japońskiego audio?
 
 PROTOKÓŁ TRIANGULACJI TRÓJKĄTA PRZEKŁADU (AUDIO JP VS SKRYPT EN VS WSTĘPNE PL):
@@ -1643,6 +1666,7 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
 15. REALIA HISTORYCZNE I STYLIZACJA ŚWIATA:
    - W seriach historycznych (np. XIII w. Imperium Mongolskie, starożytność, średniowiecze) BEZWZGLĘDNIE wyeliminuj nowoczesny slang młodzieżowy ('spoko', 'masakra', 'wkręcasz'). Dopasuj słownictwo do klimatu epoki.
 16. TERMINOLOGIA SPECJALISTYCZNA, KONSULTACJA BRANŻOWA I FLEKSJA NAZW WŁASNYCH:
+   - FIZYCZNOŚĆ SCENERII I OŚRODEK CIEKŁY (FILAR CXXXVIII): Kategoryczny zakaz wstawiania 'wody' w scenach dziejących się w innej cieczy (browar zalany piwem -> 'pod powierzchnię / na dno / pod piwo', a NIGDY 'pod wodę'!). Zakaz 'powodzi piwa' -> 'fala piwa'. Zakaz 'padnij na ziemię' w nieważkości.
    - W seriach o tematyce niszowej (winiarstwo, muzyka, medycyna, shogi, kulinaria) bezwzględnie stosuj oficjalną polską terminologię branżową (np. w winie: 'szczep', 'rocznik', 'apelacja', 'taniny', 'kupaż', 'ciało wina').
    - ODMIANA POJĘĆ ZE SŁOWNIKA I NAZW WŁASNYCH PRZEZ PRZYPADKI: Pojęcia ze słowniczka i bazy pamięci podane są w mianowniku jako baza leksykalna. W tekście BEZWZGLĘDNIE odmieniaj je przez przypadki zgodnie z polską składnią (np. 'Twierdza Goryōkaku' -> 'w twierdzy Goryōkaku', 'do twierdzy Goryōkaku', 'Więzienie Akō' -> 'w więzieniu Akō', 'z więzienia Akō').
    - KATEGORYCZNY ZAKAZ zostawiania nieodmienionego mianownika po przyimkach (BŁĄD: 'w Twierdza Goryōkaku', 'z Więzienie Akō')!
@@ -2059,6 +2083,15 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR LXX - Pragmatyka Metanarracyjna i 4. Ściana]: "
             "Żarty z tworzenia anime/mangi i telewizji adaptuj na błyskotliwy polski dowcip bez uciekania się do przypisów."
+        )
+
+    # 21. Fizyczność Świata i Izotopia Środowiskowa (Filar CXXXVIII)
+    env_keys = ["beer", "piwo", "wine", "wino", "blood", "krew", "swamp", "bagno", "mud", "błoto", "acid", "kwas", "brewery", "browar", "underwater", "space", "kosmos"]
+    if any(k in combined_en for k in env_keys):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CXXXVIII & SOCZEWKA 2 (ŚWIAT) - Fizyczność Scenerii i Izotopia Środowiskowa]: "
+            "Szanuj materię sceny! Jeśli postacie są w browarze z piwem/bagnie/kadzi wina -> ZAKAZ słowa 'woda' (He dragged him underwater -> 'Pociągnął go na dno' / 'Wciągnął go pod powierzchnię'). "
+            "Kategoryczny zakaz 'powódź piwa' -> 'fala piwa' / 'morze piwa'!"
         )
 
     # 20. Matryca Idiomów Mostowych i Przeczeń Eliptycznych (Filar CXXXVII)

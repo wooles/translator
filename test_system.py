@@ -167,6 +167,7 @@ def test_rules_and_prompts():
     assert "FILAR CXXXV:" in sys_prompt
     assert "FILAR CXXXVI:" in sys_prompt
     assert "FILAR CXXXVII:" in sys_prompt
+    assert "FILAR CXXXVIII:" in sys_prompt
     assert "FILAR CXXI" in ver_prompt
     assert "FILAR CXXV" in ver_prompt
     assert "FILAR CXXX" in ver_prompt
@@ -177,7 +178,8 @@ def test_rules_and_prompts():
     assert "FILAR CXXXV" in ver_prompt or "CXXXV" in ver_prompt or "Filar CXXXV" in ver_prompt or "FILAR" in ver_prompt
     assert "FILAR CXXXVI" in ver_prompt or "CXXXVI" in ver_prompt or "Filar CXXXVI" in ver_prompt or "FILAR" in ver_prompt
     assert "FILAR CXXXVII" in ver_prompt or "CXXXVII" in ver_prompt or "Filar CXXXVII" in ver_prompt or "FILAR" in ver_prompt
-    print(" -> PASSED: Kompletny Zunifikowany Kanon 137 Filarów AVT (Filary I – CXXXVII) jest aktywny w obu fazach tłumaczenia.")
+    assert "FILAR CXXXVIII" in ver_prompt or "CXXXVIII" in ver_prompt or "Filar CXXXVIII" in ver_prompt or "FILAR" in ver_prompt
+    print(" -> PASSED: Kompletny Zunifikowany Kanon 138 Filarów AVT (Filary I – CXXXVIII) jest aktywny w obu fazach tłumaczenia.")
 
 def test_pydantic_schemas():
     print("[TEST 2/5] Weryfikacja schematów Pydantic i Detektora Rejestru Pragmatycznego...")
@@ -571,6 +573,12 @@ def test_avt_linter():
     assert t_hotel == "Spotkajmy się w hotelu Imperialny."
     t_zamek, _ = AVTLinter.lint_and_fix_line("Maszerujemy do Zamek Kamakura.")
     assert t_zamek == "Maszerujemy do zamku Kamakura."
+
+    # Test Filaru CXXXVIII: Kolokacje ciekłe (Fala piwa / Fala wina)
+    t_piwo, _ = AVTLinter.lint_and_fix_line("Co to ma być?! Powódź piwa?!")
+    assert t_piwo == "Co to ma być?! Fala piwa?!"
+    t_wino, _ = AVTLinter.lint_and_fix_line("Z pękniętej beczki polała się powódź wina.")
+    assert t_wino == "Z pękniętej beczki polała się fala wina."
 
     # Test Filaru CXXXVI: Triangulacja foniczna i korekta rodzaju żeńskiego na męski (Dorosły / Chłopiec / Niski głos F0)
     tm1, _ = AVTLinter.lint_and_fix_line("Domyślałam się, ale...", speaker_gender="mężczyzna")
@@ -1189,6 +1197,11 @@ def test_excellence_avt_pillars():
     batch_shujo = [{"en": "Doko ni iku no kashira?"}]
     f_shujo = get_focused_rules_for_batch(batch_shujo)
     assert "XVI" in f_shujo
+
+    # 5. Test dyspozytora dla Izotopii Środowiskowej (Filar CXXXVIII)
+    batch_env = [{"en": "He fell into the vat of beer and was dragged underwater!"}]
+    f_env = get_focused_rules_for_batch(batch_env)
+    assert "CXXXVIII" in f_env
     print(" -> PASSED: Pragmatyka anime i żargon RPG w 100% zintegrowane.")
 
 def test_cognitive_prosody_and_narrative_pillars():
