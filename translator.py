@@ -2003,10 +2003,12 @@ class MultimodalTranslator:
             is_title_card = bool(re.match(r"^(ODCINEK|ROZDZIAŁ|EPIZOD|CZĘŚĆ|AKT)\s+\d+", clean_check, re.IGNORECASE))
 
             if is_sign_flag or is_title_card or (clean_check.startswith("[") and clean_check.endswith("]")) or "sign" in (orig_event.style or "").lower() or "title" in (orig_event.style or "").lower():
-                if item_region:
+                if r"\pos" in ts_prefix_applied:
+                    # Preserve original subtitle's custom coordinates without corrupting
+                    pass
+                elif item_region:
                     pos_tag = TypesettingColorMatcher.calculate_optimal_sign_position(region=item_region)
-                    if r"\pos" not in ts_prefix_applied:
-                        ts_prefix_applied = re.sub(r"\{\\an\d\}|\\an\d", "", ts_prefix_applied).strip()
+                    ts_prefix_applied = re.sub(r"\{\\an\d\}|\\an\d", "", ts_prefix_applied).strip()
                     ts_prefix_applied = f"{pos_tag}{ts_prefix_applied}"
                 elif not (r"\an" in ts_prefix_applied or r"\pos" in ts_prefix_applied):
                     ts_prefix_applied = r"{\an8}" + ts_prefix_applied

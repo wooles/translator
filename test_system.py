@@ -790,21 +790,20 @@ def test_typesetting_matcher():
     assert "&HFFFFFF&" in res or "\\1c" in res
     assert "\\bord3" in res
 
-    # Test Quadrant Detection (Typesetting Proximity)
+    # Test Quadrant Detection (Typesetting Proximity - Resolution Independent \an tags)
     pos_br = TypesettingColorMatcher.calculate_optimal_sign_position(region="bottom_right")
-    assert "\\an3" in pos_br and "1750" in pos_br
+    assert pos_br == r"{\an3}"
     pos_bl = TypesettingColorMatcher.calculate_optimal_sign_position(region="bottom_left")
-    assert "\\an1" in pos_bl and "170" in pos_bl
+    assert pos_bl == r"{\an1}"
     pos_tr = TypesettingColorMatcher.calculate_optimal_sign_position(region="top_right")
-    assert "\\an9" in pos_tr and "1750" in pos_tr
+    assert pos_tr == r"{\an9}"
     pos_tl = TypesettingColorMatcher.calculate_optimal_sign_position(region="top_left")
-    assert "\\an7" in pos_tl and "170" in pos_tl
+    assert pos_tl == r"{\an7}"
 
-    # Test Typesetting Proximity 2.0 Override: generic \an8 overridden with bottom_right \an3\pos(1750,920)
+    # Test Typesetting Proximity 2.0 Override: generic \an8 overridden with bottom_right \an3
     enhanced_br = TypesettingColorMatcher.enhance_sign_typesetting(original_prefix=r"{\an8}", region="bottom_right")
-    assert "\\pos(1750,920)" in enhanced_br
-    assert "\\an3" in enhanced_br
-    assert "\\an8" not in enhanced_br
+    assert r"\an3" in enhanced_br
+    assert r"\an8" not in enhanced_br
 
     # Test Title Card auto-detection in detect_event_visual_type
     from translator import detect_event_visual_type
@@ -1616,11 +1615,11 @@ def test_masterclass_2_innovations():
     assert is_song_line(ev_dialog, ev_dialog.text) is False
     assert is_song_line(ev_dialog, "♪ Lalala ♪") is True
 
-    # 2. Test Typesetting Wizualny 2.0
+    # 2. Test Typesetting Wizualny 2.0 (Resolution-Independent \an)
     pos_top = TypesettingColorMatcher.calculate_optimal_sign_position(sign_type="header")
-    assert r"\an8\pos(960,100)" in pos_top
+    assert r"\an8" in pos_top
     pos_center = TypesettingColorMatcher.calculate_optimal_sign_position(sign_type="phone_sms")
-    assert r"\an5\pos(960,540)" in pos_center
+    assert r"\an5" in pos_center
 
     enhanced = TypesettingColorMatcher.enhance_sign_typesetting(
         original_prefix=r"{\fs24}[ ",
