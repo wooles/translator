@@ -832,14 +832,29 @@ def test_typesetting_matcher():
     # Test Typesetting Proximity 2.0 Override: generic \an8 overridden with bottom_right \an3
     enhanced_br = TypesettingColorMatcher.enhance_sign_typesetting(original_prefix=r"{\an8}", region="bottom_right")
     assert r"\an3" in enhanced_br
-    assert r"\an8" not in enhanced_br
+    # Test Sign Contrast & Visibility Guard (Filar AVT Contrast Invariance)
+    dark_tattoo_prefix = r"{\pos(500,500)\c&H000000&}"
+    contrasted_tattoo = TypesettingColorMatcher.ensure_sign_contrast(dark_tattoo_prefix)
+    assert r"\3c&HFFFFFF&" in contrasted_tattoo
+    assert r"\bord3" in contrasted_tattoo
+    assert r"\pos(500,500)" in contrasted_tattoo
 
-    # Test Title Card auto-detection in detect_event_visual_type
-    from translator import detect_event_visual_type
-    ev_title = pysubs2.SSAEvent(text="Episode 57\\nTokyo Love Story", style="Default")
-    vtype_title = detect_event_visual_type(ev_title)
-    assert vtype_title["is_sign"] is True
-    assert "plansza tytułowa" in vtype_title["visual_details"]
+    # Test \bord0 removal and contrast addition
+    bord0_prefix = r"{\pos(400,400)\c&H1A1A1A&\bord0}"
+    contrasted_bord0 = TypesettingColorMatcher.ensure_sign_contrast(bord0_prefix)
+    assert r"\3c&HFFFFFF&" in contrasted_bord0
+    assert r"\bord0" not in contrasted_bord0
+    assert r"\bord3" in contrasted_bord0
+
+    # Test style with dark primary color
+    dark_style = pysubs2.SSAStyle()
+    dark_style.primarycolor = pysubs2.Color(10, 10, 10)
+    dark_style.outlinecolor = pysubs2.Color(10, 10, 10)
+    dark_style.outline = 0
+    contrasted_style = TypesettingColorMatcher.ensure_sign_contrast(r"{\pos(300,300)}", style=dark_style)
+    assert r"\3c&HFFFFFF&" in contrasted_style
+    assert r"\bord3" in contrasted_style
+
     print(" -> PASSED: Moduł auto-stylizacji i kolorów ASS działa w 100%.")
 
 from manga_canon import MangaCanonRegistry

@@ -2056,6 +2056,10 @@ class MultimodalTranslator:
                 elif not (r"\an" in ts_prefix_applied or r"\pos" in ts_prefix_applied):
                     ts_prefix_applied = r"{\an8}" + ts_prefix_applied
 
+                # Sign Contrast & Visibility Guard (Filar AVT Contrast Invariance)
+                target_style = getattr(subs, "styles", {}).get(orig_event.style) if hasattr(subs, "styles") else None
+                ts_prefix_applied = TypesettingColorMatcher.ensure_sign_contrast(ts_prefix_applied, style=target_style)
+
             # Reattach Typesetting tags to translated text
             full_event_text = f"{ts_prefix_applied}{clean_translated_text}" if ts_prefix_applied else clean_translated_text
 

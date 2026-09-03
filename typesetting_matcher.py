@@ -7,7 +7,7 @@ and automatically generates aesthetic ASS color tags {\\1c&HBBGGRR&}.
 
 import os
 import re
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Any
 from PIL import Image
 
 def rgb_to_ass_hex(r: int, g: int, b: int) -> str:
@@ -184,5 +184,98 @@ class TypesettingColorMatcher:
         # 3. Ensure outline tag if missing
         if r"\3c&H" not in prefix:
             prefix = f"{{\\3c&H000000&\\bord3}}{prefix}"
+
+        return prefix
+
+    @classmethod
+    def parse_ass_color(cls, color_str: str) -> Optional[Tuple[int, int, int]]:
+        """Parses ASS hex color (&HBBGGRR& or &HAABBGGRR&) into (R, G, B) tuple."""
+        if not color_str:
+            return None
+        m = re.search(r"&H([0-9a-fA-F]{6,8})&?", color_str)
+        if m:
+            clean = m.group(1)
+            if len(clean) == 8:
+                clean = clean[2:]  # strip alpha
+            if len(clean) == 6:
+                b = int(clean[0:2], 16)
+                g = int(clean[2:4], 16)
+                r = int(clean[4:6], 16)
+                return (r, g, b)
+        return None
+
+    @classmethod
+    def calculate_luminance(cls, r: int, g: int, b: int) -> float:
+        """Calculates perceived luminance (0.0 to 255.0)."""
+        return 0.299 * r + 0.587 * g + 0.114 * b
+
+    @classmethod
+    def ensure_sign_contrast(cls, prefix: str, style: Optional[Any] = None) -> str:
+        """
+        Sign Contrast & Visibility Guard (Filar AVT Contrast Invariance):
+        Prevents on-screen signs/tattoos from blending into dark artwork or bright backgrounds.
+        1. Checks fill color (\\c or \\1c) and outline color (\\3c) and border width (\\bord).
+        2. If fill is dark (luminance < 130) and outline is missing or also dark:
+           Enforces high-contrast white outline {\\3c&HFFFFFF&\\bord3}.
+        3. If outline is absent (\\bord0 or missing \\3c/\\bord):
+           Enforces crisp contrast border (\\bord3 with contrasting outline).
+        """
+        if not prefix:
+            prefix = ""
+
+        # Extract primary fill color (\1c or \c)
+        m_fill = re.search(r"\\(?:1c|c)(&H[0-9a-fA-F]+&?)", prefix)
+        fill_rgb = cls.parse_ass_color(m_fill.group(1)) if m_fill else None
+
+        # If not in prefix, fallback to style.primarycolor
+        if fill_rgb is None and style is not None:
+            p_color = getattr(style, "primarycolor", None) or getattr(style, "primary_color", None)
+            if p_color is not None and hasattr(p_color, "r"):
+                fill_rgb = (p_color.r, p_color.g, p_color.b)
+
+        # Extract outline color (\3c)
+        m_out = re.search(r"\\3c(&H[0-9a-fA-F]+&?)", prefix)
+        out_rgb = cls.parse_ass_color(m_out.group(1)) if m_out else None
+
+        # If not in prefix, fallback to style.outlinecolor
+        if out_rgb is None and style is not None:
+            o_color = getattr(style, "outlinecolor", None) or getattr(style, "outline_color", None)
+            if o_color is not None and hasattr(o_color, "r"):
+                out_rgb = (o_color.r, o_color.g, o_color.b)
+
+        # Extract border width
+        m_bord = re.search(r"\\bord(\d+(?:\.\d+)?)", prefix)
+        if m_bord:
+            border_width = float(m_bord.group(1))
+        elif style is not None and hasattr(style, "outline"):
+            border_width = float(style.outline)
+        else:
+            border_width = None
+
+        # Case 1: Fill color is DARK (e.g. black tattoo, dark ink, luminance < 130)
+        if fill_rgb is not None:
+            fill_lum = cls.calculate_luminance(*fill_rgb)
+            if fill_lum < 130:
+                out_lum = cls.calculate_luminance(*out_rgb) if out_rgb else 0.0
+                # If outline is missing, thin (<= 1.0) or also dark (low contrast)
+                if out_rgb is None or border_width is None or border_width <= 1.0 or out_lum < 130:
+                    clean_pref = re.sub(r"\\3c&H[0-9a-fA-F]+&?", "", prefix)
+                    clean_pref = re.sub(r"\\bord\d+(?:\.\d+)?", "", clean_pref)
+                    clean_pref = re.sub(r"\{\s*\}", "", clean_pref).strip()
+                    return f"{{\\3c&HFFFFFF&\\bord3}}{clean_pref}"
+
+        # Case 2: Sign has border 0 (\bord0)
+        if border_width is not None and border_width == 0:
+            clean_pref = re.sub(r"\\bord0(?:\.0+)?", "", prefix)
+            clean_pref = re.sub(r"\{\s*\}", "", clean_pref).strip()
+            if fill_rgb and cls.calculate_luminance(*fill_rgb) < 130:
+                return f"{{\\3c&HFFFFFF&\\bord3}}{clean_pref}"
+            else:
+                return f"{{\\3c&H000000&\\bord3}}{clean_pref}"
+
+        # Case 3: If no fill color AND no outline was specified at all, ensure safe contrast
+        if not m_fill and not m_out and (border_width is None or border_width <= 0):
+            if not (r"\3c" in prefix or r"\bord" in prefix):
+                return f"{{\\3c&H000000&\\bord3}}{prefix}"
 
         return prefix
