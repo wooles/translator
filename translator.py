@@ -459,6 +459,17 @@ def detect_audio_discrepancy(jp_text: str, pl_text: str, en_text: str) -> Option
         if any(w in pl_lower for w in ["może ", "chyba ", "prawdopodobnie "]):
             return "W audio seiyuu mówi 'Zettai ni / Kanarazu' (100% kategoryczna pewność/przysięga) -> Nie osłabiaj kwestii do 'może/chyba'! Użyj: 'Na pewno!' / 'Bezwzględnie!' / 'Za nic w świecie!' (Filar CXLVII)."
 
+    # 45. Ottotto / Acchichi / Itta / Sammu (Somatyczne Odruchy Ciała i Kakegoe vs angielskie kalki)
+    if any(k in clean_jp for k in ["おっとっと", "おっと", "オットット", "あっちっち", "熱っ", "さっむ", "痛っ"]) or any(k in rom_lower for k in ["ottotto", "ototo", "acchichi", "sammu", "itta"]):
+        if any(w in pl_lower for w in ["oho, spokojnie", "oho, ostrożnie", "oho spokojnie", "spokojnie..."]):
+            return "W audio seiyuu mówi 'Ottotto' (wykrzyknik utraty równowagi / potknięcia) -> KATEGORYCZNY ZAKAZ angielskiej kalki 'Oho, spokojnie...'. Zastąp odruchem: 'Ło, ło, ło...!', 'Uuu, powoli...!' lub usuń napis (Filar XVIII)."
+        if "to jest gorące" in pl_lower or "to gorące" in pl_lower:
+            return "W audio pada 'Acchichi / Atsu' (oparzenie termiczne) -> Zastąp szkolny opis odruchem bólu: 'Ała!' / 'Parzy!' / 'Cholera, gorące!' (Filar XVIII)."
+        if "to jest zimne" in pl_lower or "to zimne" in pl_lower:
+            return "W audio pada 'Sammu / Samui' (szok termiczny) -> Zastąp szkolny opis: 'Brrr!' / 'Ale mróz!' / 'Lodowata!' (Filar XVIII)."
+        if "to boli" in pl_lower:
+            return "W audio seiyuu mówi 'Itta / Ita' (nagły ból mechaniczny) -> Zastąp opis stanu odruchem: 'Ała!' / 'Auć!' / 'Niech to...!' (Filar XVIII)."
+
     return None
 
 def detect_japanese_pragmatic_register(jp_text: str, en_text: str = "") -> Optional[str]:

@@ -171,12 +171,27 @@ FILAR XVII: PIĘCIOSTOPNIOWA TAKSONOMIA SYMBOLIZMU DŹWIĘKOWEGO ANIME (ONOMATOP
 FILAR XVIII: ADAPTACJA PARALINGWISTYKI, DŹWIĘKÓW POZAWERBALNYCH I INTERIEKCJI FONICZNYCH:
 - KATEGORYCZNA ELIMINACJA SZUMU WIZUALNEGO (SUBTITLE CLUTTER & ISOLATED GRUNTS):
   * Gdy kwestia w dialogu to pojedynczy odgłos seiyuu (naburmuszone "Uh", westchnienie "Ah", fuknięcie "Hmph", sapnięcie "Guh", "Och!"), a mimika twarzy i aktor głosowy w 100% przekazują emocję -> ZWRÓĆ PUSTY NAPIS "" (eliminacja szumu wizualnego według standardu Netflix / Canal+ AVT).
-- JAPOŃSKIE ODGŁOSY WYSIŁKU FIZYCZNEGO I KINEZJATYKI (KAKEGOE):
+- JAPOŃSKIE ODGŁOSY WYSIŁKU FIZYCZNEGO, KINEZJATYKI I SOMATYKI CIAŁA (KAKEGOE & SOMATIC REFLEXES):
+  * "Ottotto..." (おっとっと…) / "Ototo..." (odruch utraty równowagi, potknięcia, chwiania się, niemal upadku na plecy/twarz):
+    -> POPRAWNIE: „Ło, ło, ło...!”, „Uuu, powoli...!”, „O-o-o, chwila...!”, „Hop, hop, hop...!” lub PUSTY NAPIS "" (elipsa szumu wizualnego Netflix AVT).
+    -> KARDYNALNY BŁĄD [X]: „Oho, spokojnie...”, „Łatwo tam...” (bezduszna kalka z angielskiego 'Whoa, easy there' - 'oho' to wykrzyknik spostrzeżenia, nikt lecąc na plecy nie mówi 'oho', a 'spokojnie' to komenda do kogoś obcego, nie odruch własnego ciała!).
+  * "Acchichi!" (あっちっち!) / "Atsu'!" (oparzenie termiczne, dotknięcie gorącej lufy/garnka/wrzątku):
+    -> POPRAWNIE: „Ała!”, „Parzy!”, „Cholera, gorące!”.
+    -> KARDYNALNY BŁĄD [X]: „To jest gorące!” (szkolny opis stanu zamiast odruchu bólu).
+  * "Sammu!" (さっむ!) / "Samui!" (nagły szok termiczny z zimna, wpadnięcie do lodowatej wody, mróz):
+    -> POPRAWNIE: „Brrr!”, „Ale piździ!”, „Ale mróz!”, „Lodowata!”.
+    -> KARDYNALNY BŁĄD [X]: „To jest zimne!”.
+  * "Itta!" (痛っ!) / "Ita'!" (nagły ból mechaniczny: walnięcie głową w belkę, postrzał, uderzenie piszczelem):
+    -> POPRAWNIE: „Ała!”, „Auć!”, „Niech to...!”, „Szlag!”.
+    -> KARDYNALNY BŁĄD [X]: „To boli!”.
   * "Yotto..." (よっと…) / "Yoisho..." (よいしょ…) / "Dokkoisho..." (どっこいしょ…) / "Yoi kora..." (odgłos wysiłku przy podnoszeniu ciężaru, stawianiu wiadra, siadaniu, kucaniu przy dojeniu zwierzęcia):
     -> POPRAWNIE: "Hop...", "Hopla...", "I siup...", "No i już...", "Raz, dwa..." (lub puste "" jeśli odgłos w audio wystarcza).
     -> KARDYNALNY BŁĄD [X]: "Proszę...", "Oto..." (kalka z angielskiego "There / Here you go" - postać nie częstuje nikogo grzecznościowo, lecz wykonuje wysiłek fizyczny!).
-  * "Hora!" (ほら) / "Sora!" (そら) (przy rzucie, dynamicznym podaniu przedmiotu):
+  * "Hora!" (ほら) / "Sora!" (そら) (przy rzucie, dynamicznym podaniu przedmiotu w locie):
     -> POPRAWNIE: "Łap!", "Masz!", "Trzymaj!", "Hop!" (KATEGORYCZNY ZAKAZ: "Proszę!").
+  * "Puhā!" (ぷはーっ!) (sapnięcie ulgi/orzeźwienia po kuflu zimnego piwa lub wynurzeniu z wody):
+    -> POPRAWNIE: „Aaaach!”, „Ale dobre!”, „Wreszcie powietrze!” lub puste "" (elipsa szumu).
+    -> KARDYNALNY BŁĄD [X]: „Pha!”.
 - Kategoryczny zakaz dosłownego przepisywania surowych japońskich odgłosów komiksowych:
   * "Tch" / "Che" -> "Tsk...", "Szlag...", "Ech..." lub elipsa, jeśli grymas twarzy wystarczy.
   * "Eh?!" (zdumienie) -> "Co?!", "Jak to?!", "Słucham?!".
@@ -1987,6 +2002,7 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
       * "[Filar LIV - Kondensacja Díaz Cintas] Skrócono kwestię z 22 na 14 CPS"
       * "[Filar XVIII - Paralingwistyka] Przetłumaczono 'Ara ara' -> 'O proszę...'"
       * "[Filar XVIII - Kakegoe] Przetłumaczono odgłos wysiłku 'Yotto...' -> 'Hop...' (ZAKAZ 'Proszę...')"
+      * "[Filar XVIII - Somatyka/Kakegoe] 'Ottotto...' -> 'Ło, ło, ło...!' lub elipsa (ZAKAZ 'Oho, spokojnie...')"
       * "[Filar X - Anti-Translationese] 'Co sprawia, że...' -> 'Czemu tak uważasz?'"
       * "[Filar LX - Interpunkcja AVT] Poprawiono '!?' -> '?!'"
       * "[Filar I - Odnominalizowanie] 'dokonał zabójstwa' -> 'zabił'"
@@ -2056,6 +2072,7 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
 
     focused_pillars = []
     combined_en = " ".join(item.get("en", "") for item in batch_items).lower()
+    combined_jp = " ".join(str(item.get("audio_jp", "")) for item in batch_items).lower()
     has_signs = any(item.get("is_sign", False) for item in batch_items)
     has_questions = any("?" in item.get("en", "") for item in batch_items)
     has_ellipsis = any("..." in item.get("en", "") or "…" in item.get("en", "") for item in batch_items)
@@ -2115,13 +2132,14 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
             "tylko jedno orzeczenie (zakaz dublowania czasownika) i ścisła zgodność liczby podmiotu."
         )
 
-    # 8. Paralingwistyka, odgłosy, onomatopeje i wulgaryzmy
-    if any(w in combined_en for w in ["tch", "ara ara", "oi oi", "guh", "kuso", "damn", "shit", "fuck", "kashira", "mon", "aa", "speak", "say"]):
+    # 8. Paralingwistyka, odgłosy, kinezjatyka, somatyka i wulgaryzmy
+    somatic_triggers = ["ottotto", "ototo", "whoa", "steady", "easy", "yoisho", "yotto", "acchichi", "sammu", "itta", "puha", "tch", "ara ara", "oi oi", "guh", "kuso", "damn", "shit", "fuck", "kashira", "mon", "aa", "speak", "say"]
+    if any(w in combined_en for w in somatic_triggers) or any(w in combined_jp for w in ["おっと", "よいしょ", "よっと", "あっち", "痛っ", "さっむ", "ぷは"]):
         focused_pillars.append(
-            "• [SKUP SIĘ NA: FILAR XXXIII, XVIII, XVI & XVII - Shūjoshi, Onomatopeje i Paralingwistyka]: "
-            "Adaptuj odgłosy i cząstki ('Ara ara' -> 'O proszę...', 'Tch' -> 'Tsk/Szlag', 'Guh' -> 'Uch...', 'kashira' -> 'Ciekawe, czy...'). "
-            "Gdy w audio słychać jedynie paralingwistyczny wdech/krzyk/wysiłek (np. 'Aa...', 'Ugh...'), KATEGORYCZNIE ZABRANIA SIĘ wstawiania fałszywych czasowników ('Mów—', 'Gadaj—'). "
-            "Wulgaryzmy kalibruj do ładunku emocjonalnego i rejestru sceny."
+            "• [SKUP SIĘ NA: FILAR XVIII, XXXIII, XVI & XVII - Kakegoe, Somatyka Ciała i Paralingwistyka]: "
+            "Odruchy motoryczne i utratę równowagi (Ottotto) tłumacz somatycznie ('Ło, ło, ło...!', 'Uuu, powoli...!') lub usuń napis do '' (elipsa szumu wizualnego Netflix AVT). "
+            "KATEGORYCZNY ZAKAZ angielskich kalek: 'Oho, spokojnie...', 'To jest gorące' (zastąp: 'Parzy!'), 'To boli' (zastąp: 'Ała!'). "
+            "Gdy w audio słychać jedynie wdech/krzyk/wysiłek, KATEGORYCZNIE ZABRANIA SIĘ wstawiania fałszywych czasowników ('Mów—', 'Gadaj—')."
         )
 
     # 9. Piosenki i utwory muzyczne

@@ -1140,6 +1140,11 @@ def test_dynamic_rule_dispatcher():
     focused_modal = get_focused_rules_for_batch(batch_modal)
     assert "CXLVII" in focused_modal
 
+    # 15. Test paczki z wykrzyknikami somatycznymi (Filar XVIII)
+    batch_som = [{"en": "Whoa, easy there...", "audio_jp": "おっとっと [Ottotto]"}]
+    focused_som = get_focused_rules_for_batch(batch_som)
+    assert "XVIII" in focused_som
+
     print(" -> PASSED: Dyspozytor reguł precyzyjnie aktywuje właściwe filary AVT.")
 
 def test_fuzzy_and_dynamic_avt_linter():
@@ -1163,6 +1168,14 @@ def test_fuzzy_and_dynamic_avt_linter():
     assert "tak jak myślałem" in t_m1
     t_m2, _ = AVTLinter.lint_and_fix_line("Nie da się pomóc.")
     assert "nic na to nie poradzimy" in t_m2
+
+    # 2c. Test eliminacji kalek somatycznych (Filar XVIII)
+    t_s1, _ = AVTLinter.lint_and_fix_line("Oho, spokojnie...")
+    assert "Ło, ło, ło..." in t_s1
+    t_s2, _ = AVTLinter.lint_and_fix_line("To jest gorące!")
+    assert "Parzy!" in t_s2
+    t_s3, _ = AVTLinter.lint_and_fix_line("To boli!")
+    assert "Ała!" in t_s3
 
     # 3. Test dynamicznych reguł użytkownika w linterze
     user_rules = [
@@ -1701,6 +1714,28 @@ def test_translator_logger_and_sign_detector():
         en_text="It can't be helped."
     )
     assert alert_shouganai is not None and "Shouganai" in alert_shouganai
+
+    # Test Filar XVIII: Trigger 45 Somatic Reflexes & Kakegoe (Ottotto, Acchichi, Itta)
+    alert_ottotto = translator.detect_audio_discrepancy(
+        jp_text="おっとっと [Ottotto]",
+        pl_text="Oho, spokojnie...",
+        en_text="Whoa, easy there..."
+    )
+    assert alert_ottotto is not None and "Ottotto" in alert_ottotto and "XVIII" in alert_ottotto
+
+    alert_acchichi = translator.detect_audio_discrepancy(
+        jp_text="あっちっち [Acchichi]",
+        pl_text="To jest gorące!",
+        en_text="Ouch, that's hot!"
+    )
+    assert alert_acchichi is not None and "Acchichi" in alert_acchichi
+
+    alert_itta = translator.detect_audio_discrepancy(
+        jp_text="痛っ [Itta]",
+        pl_text="To boli!",
+        en_text="It hurts!"
+    )
+    assert alert_itta is not None and "Itta" in alert_itta
 
     # Test Flashback 1:1 memory formatting
     from memory import format_translation_memory_for_prompt
