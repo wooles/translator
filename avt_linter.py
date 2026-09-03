@@ -103,6 +103,12 @@ class AVTLinter:
         (r"^\s*[Nn]ie da się temu pomóc([!\.\?]*)\s*$", r"Nic na to nie poradzimy\1", "Filar CLIII - Eliminacja Kalki 'Can't be helped'"),
         (r"^\s*[Zz]rób to z umiarem([!\.\?]*)\s*$", r"Przestań wreszcie\1", "Filar CLIII - Eliminacja Kalki 'Iikagen ni shiro'"),
         
+        # Dialects & 3rd Person Family Relations (Filar CLIV)
+        (r"\b[Ss]tarszy brat powiedział\b", "Mój brat powiedział", "Filar CLIV - Relacja Rodzinna w 3. Osobie"),
+        (r"\bstarszy brat powiedział\b", "mój brat powiedział", "Filar CLIV - Relacja Rodzinna w 3. Osobie"),
+        (r"\b[Ss]tarsza siostra powiedziała\b", "Moja siostra powiedziała", "Filar CLIV - Relacja Rodzinna w 3. Osobie"),
+        (r"\bstarsza siostra powiedziała\b", "moja siostra powiedziała", "Filar CLIV - Relacja Rodzinna w 3. Osobie"),
+        
         # Environmental Media & Non-Aqueous Liquids (Filar CXXXVIII)
         (r"\bPowódź\s+piwa\b", "Fala piwa", "Filar CXXXVIII - Kolokacja Cieczy (Fala piwa)"),
         (r"\bpowódź\s+piwa\b", "fala piwa", "Filar CXXXVIII - Kolokacja Cieczy (Fala piwa)"),

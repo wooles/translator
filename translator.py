@@ -550,6 +550,23 @@ def detect_audio_discrepancy(jp_text: str, pl_text: str, en_text: str, prosody: 
         if pl_lower.strip() in ["zrobiłem to.", "zrobiłem to!", "zrobiłam to.", "zrobiłam to!"] and not any(w in en_text.lower() for w in ["i made it happen", "i manufactured"]):
             return "W audio seiyuu krzyczy z radości 'Yatta!' (sukces/zwycięstwo) -> Zastąp sztywne 'Zrobiłem to!' naturalnym: 'Udało się!' / 'Mamy to!' / 'Wyszło!' / 'Jest!' (Filar CLIII)."
 
+    # 54. Logika Odpowiedzi na Przeczenia (Echo Agreement: Hai/Un vs Iie/Uun - Filar CLIV)
+    is_neg_q = any(w in en_text.lower() for w in ["don't you", "aren't you", "didn't you", "can't you", "won't you", "haven't you", "isn't it"]) or any(k in clean_jp for k in ["ないの", "ないか", "ない？", "ないのか", "ないですか"]) or any(k in rom_lower for k in ["nai no", "nai ka", "nai desu ka"])
+    if is_neg_q:
+        if any(clean_jp.startswith(k) or clean_jp == k for k in ["はい", "うん", "ええ"]) or any(rom_lower.startswith(k) or rom_lower == k for k in ["hai", "un", "ee"]):
+            if pl_lower.startswith("tak") or pl_lower.startswith("jasne") or pl_lower == "tak." or pl_lower == "tak!":
+                return "W audio pada 'Hai/Un' jako potwierdzenie przeczenia (Echo Agreement) -> ZAKAZ 'Tak'! W polskim odpowiadamy na fakt: 'Nie' / 'Nie idę' / 'Zgadza się, nie wiem' (Filar CLIV)."
+
+    # 55. Kansai-ben Jibun ('Ty') & Relacje Trzecioosobowe (Onii-chan / Onee-chan - Filar CLIV)
+    is_kansai = any(k in clean_jp for k in ["ねん", "やろ", "へん", "せや", "あかん"]) or any(k in rom_lower for k in ["nen", "yaro", "hen", "seya", "akan", "honma"])
+    if is_kansai and ("自分" in clean_jp or "jibun" in rom_lower):
+        if any(w in pl_lower for w in ["ja ", "mnie ", "siebie ", "samemu", "sobie "]) and not any(w in pl_lower for w in ["ty ", "ciebie ", "tobie ", "cię "]):
+            return "W audio w dialekcie Kansai pada 'Jibun' w odniesieniu do rozmówcy -> 'Jibun' w Kansai to 'TY'! Zamień 'ja/siebie' na 'ty/ciebie' ('Co ty wyprawiasz?!', Filar CLIV)."
+
+    if any(k in clean_jp for k in ["お兄ちゃん", "お姉ちゃん"]) or any(k in rom_lower for k in ["onii-chan", "onee-chan", "oniichan", "oneechan"]):
+        if any(w in pl_lower for w in ["starszy brat", "starsza siostra", "onii-chan", "onee-chan"]):
+            return "W audio postać mówi o bracie/siostrze w 3. osobie -> Zastąp sztuczne 'Starszy brat / Onii-chan' naturalnym 'Mój brat' / 'Brat mi powiedział' (Filar CLIV)."
+
     return None
 
 def detect_japanese_pragmatic_register(jp_text: str, en_text: str = "") -> Optional[str]:

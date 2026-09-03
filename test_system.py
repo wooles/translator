@@ -209,7 +209,9 @@ def test_rules_and_prompts():
     assert "FILAR CLII" in ver_prompt or "CLII" in ver_prompt
     assert "FILAR CLIII" in ver_prompt or "CLIII" in ver_prompt
     assert "FILAR CLIII" in sys_prompt or "CLIII" in sys_prompt
-    print(" -> PASSED: Kompletny Zunifikowany Kanon 153 Filarów AVT (Filary I – CLIII) jest aktywny w obu fazach tłumaczenia.")
+    assert "FILAR CLIV" in ver_prompt or "CLIV" in ver_prompt
+    assert "FILAR CLIV" in sys_prompt or "CLIV" in sys_prompt
+    print(" -> PASSED: Kompletny Zunifikowany Kanon 154 Filarów AVT (Filary I – CLIV) jest aktywny w obu fazach tłumaczenia.")
 
 def test_pydantic_schemas():
     print("[TEST 2/5] Weryfikacja schematów Pydantic i Detektora Rejestru Pragmatycznego...")
@@ -1891,6 +1893,28 @@ def test_translator_logger_and_sign_detector():
         en_text="We won!"
     )
     assert alert_yatta is not None and "Yatta" in alert_yatta and "CLIII" in alert_yatta
+
+    # Test Filar CLIV: Trigger 54-55 Negative Question Echo Agreement & Kansai Jibun
+    alert_echo_neg = translator.detect_audio_discrepancy(
+        jp_text="はい [Hai]",
+        pl_text="Tak, oczywiście.",
+        en_text="Don't you want to come?"
+    )
+    assert alert_echo_neg is not None and "Echo Agreement" in alert_echo_neg and "CLIV" in alert_echo_neg
+
+    alert_kansai_jibun = translator.detect_audio_discrepancy(
+        jp_text="自分、何してんねん [Jibun, nani shiten nen]",
+        pl_text="Co ja takiego zrobiłem?",
+        en_text="What are you doing?"
+    )
+    assert alert_kansai_jibun is not None and "Jibun" in alert_kansai_jibun and "CLIV" in alert_kansai_jibun
+
+    alert_family_3rd = translator.detect_audio_discrepancy(
+        jp_text="お兄ちゃんが言ってた [Onii-chan ga itteta]",
+        pl_text="Starszy brat powiedział, że nie wolno.",
+        en_text="My brother said not to."
+    )
+    assert alert_family_3rd is not None and "Starszy brat" in alert_family_3rd and "CLIV" in alert_family_3rd
 
     # Test Flashback 1:1 memory formatting
     from memory import format_translation_memory_for_prompt

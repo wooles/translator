@@ -1341,6 +1341,39 @@ FILAR CLIII: WIELKA MATRYCA AFEKTYWNA JAPOŃSKICH KANDŌSHI (WESTCHNIENIA, REZYG
         - KARDYNALNY BŁĄD [X]: „Jak myślałem”, „Po wszystkim”.
       * SASUGA NI (さすがに) -> „Nawet jak na niego, to lekka przesada...”, „Tym razem to już przesadził...”, „Wszystko ma swoje granice...”.
 
+FILAR CLIV: LOGIKA ODPOWIEDZI NA PRZECZENIA, ZAIMKI DIALEKTALNE I RELACJE TRZECIOOSOBOWE (HAI/IIE, KANSAI JIBUN I ZASADA GIKUN)
+   1. LOGIKA ODPOWIEDZI NA PYTANIA Z NEGACJĄ (ECHO AGREEMENT: HAI VS IIE):
+      - W języku japońskim „Hai” potwierdza formę pytania (zgodę z tezą rozmówcy), a „Iie” zaprzecza tezie. W języku polskim odpowiadamy na stan faktyczny!
+      - Pytanie: „Ikanai no?” / „Aren't you going?” (Nie idziesz?):
+        * Odpowiedź JP: HAI / UN (はい / うん) -> Zgoda z negacją („Zgadza się, nie idę”).
+          -> POPRAWNY POLSKI: „Nie.” / „Nie idę.” / „Zostaję.” / „Zgadza się.” / „Ani mi się śni.”
+          -> KARDYNALNY BŁĄD [X]: „Tak.” / „Tak, idę.” (ODWRÓCENIE SENSU FABUŁY O 180 STOPNI! Widz pomyśli, że bohater idzie!).
+        * Odpowiedź JP: IIE / UUN (いいえ / ううん) -> Odrzucenie negacji („Mylisz się, idę!”).
+          -> POPRAWNY POLSKI: „Właśnie że tak!” / „Właśnie że idę!” / „Idę!” / „Ależ skąd, wybieram się tam.”
+          -> KARDYNALNY BŁĄD [X]: „Nie.” (Błędne potwierdzenie odmowy).
+      - Pytanie: „Shiranai no?” / „Don't you know?” (Nie wiesz?):
+        * HAI -> „Nie, nie wiem.” / „Ani trochę.” / „Pojęcia nie mam.” (ZAKAZ: „Tak”).
+        * IIE -> „Wiem!” / „Właśnie że wiem!” (ZAKAZ: „Nie”).
+
+   2. DIALEKT KANSAI I ZAIMKI-FAŁSZYWI PRZYJACIELE (JIBUN JAKO 'TY'):
+      - W dialekcie Kansai (Osaka, Kioto, Kobe – markery: -ya, -nen, -hen, -de, akan, honma, seya):
+        * JIBUN (自分) bardzo często pełni funkcję zaimka DRUGIEJ OSOBY: „TY”!
+          -> „Jibun, nani shiten nen?” -> „Co ty wyprawiasz?!” (KARDYNALNY BŁĄD [X]: „Co ja robię?!”).
+          -> „Jibun mo iku ya ro?” -> „Ty też idziesz, prawda?” (ZAKAZ: „Ja też pójdę”).
+        * UCHI (うち) w ustach dziewcząt lub w Kansai oznacza „JA / MNIE”, a nie dosłowne „nasz dom”:
+          -> „Uchi wa shiran de!” -> „Ja tam nic nie wiem!” (ZAKAZ: „Nasz dom nie wie”).
+
+   3. RELACJE RODZINNE W TRZECIEJ OSOBIE (UCHI VS SOTO):
+      - Gdy japońskie dziecko lub nastolatek mówi o członku własnej rodziny do kogoś z zewnątrz:
+        * „Onii-chan ga itta” -> POPRAWNIE: „Mój brat powiedział” / „Brat mi mówił” / „[Imię] mi mówił”.
+          -> KARDYNALNY BŁĄD [X]: „Onii-chan powiedział”, „Starszy brat powiedział” (infantylna kalka!).
+        * „Onee-chan ga...” -> POPRAWNIE: „Moja siostra...” / „Siostra...” (ZAKAZ: „Starsza siostra...”).
+        * „Okaa-san ga...” -> POPRAWNIE: „Mama...” / „Moja mama...” (ZAKAZ: „Pani matka”).
+
+   4. ZASADA GIKUN (KANJI VS FURIGANA W AUDIO):
+      - Gdy w skrypcie/napisach pojawia się kanji, lecz seiyū wymawia fonetycznie inne słowo (np. kanji 地球 [Chikyū = Ziemia], a seiyū śpiewa/mówi ほし [Hoshi = Gwiazda/Planeta] lub ふるさと [Furusato = Ojczyzna]):
+        -> Bezwzględny prymat ma wymawiane słowo seiyū (Filar CXLIV & CLIV). Przekład musi odzwierciedlać to, co słyszy ucho widza.
+
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -2177,6 +2210,7 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
       * "[Filar CLI - Sumimasen & Aisatsu] 'Sumimasen' za przysługę -> 'Dziękuję!'; 'Ittekimasu' -> 'Wychodzę!'"
       * "[Filar CLII - Okrzyki Bojowe] 'Abunai!' (krzyk) -> 'Padnij!' / 'Kryj się!' (ZAKAZ opisu 'Niebezpiecznie!')"
       * "[Filar CLIII - Wielka Matryca Kandōshi] 'Yare yare daze' -> 'Litości...' (ZAKAZ 'Dobre nieszczęście!'); 'Mendokusai' -> 'Ale mi się nie chce...'; 'Oi oi' -> 'Ej, zaraz, zaraz!'; 'Maa maa' -> 'Spokojnie, no już...'; 'Yokatta' -> 'Całe szczęście...'"
+      * "[Filar CLIV - Logika Przeczeń i Kansai Jibun] Pytanie 'Nie idziesz?' + 'Hai' -> 'Nie idę' (ZAKAZ 'Tak, idę'); Kansai 'Jibun nani shiten nen?' -> 'Co ty wyprawiasz?!'"
 
 {BELCZYK_AVT_MASTER_CANON}
 
@@ -2933,6 +2967,23 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
             "Mendokusai -> 'Ale mi się nie chce...' / 'Co za męczarnia...'; Shou ga nai -> 'Trudno...' / 'Nic na to nie poradzimy'; "
             "Oi oi -> 'Ej, zaraz, zaraz...' / 'Ej, bez przesady!'; Maa maa -> 'Spokojnie, no już...' / 'Bez nerwów...'; "
             "Iikagen ni shiro -> 'Przestań wreszcie!' / 'Dość tego!'; Yokatta -> 'Całe szczęście...' (ZAKAZ 'To było dobre!'); Yatta -> 'Udało się!' / 'Mamy to!'."
+        )
+
+    # 94. Logika Przeczeń, Zaimki Dialektalne i Relacje Trzecioosobowe (Filar CLIV - Hai/Iie, Kansai Jibun, Uchi/Soto)
+    has_negative_q = any(
+        any(w in str(item.get("en", "")).lower() for w in ["don't you", "aren't you", "didn't you", "can't you", "won't you", "haven't you", "isn't it", "aren't they"]) or
+        any(tok in str(item.get("audio_jp", "")).lower() for tok in ["nai no", "nai ka", "shiranai", "ikanai", "chigau", "ないの", "ないか"])
+        for item in batch_items
+    )
+    kansai_markers = ["jibun", " 自分", "やろ", "ねん", "へん", "あかん", "せや", "yaro", "nen", "hen", "akan", "seya", "honma", "onii-chan", "onee-chan", "お兄ちゃん", "お姉ちゃん"]
+    has_kansai_or_family = any(any(tok in str(item.get("audio_jp", "")).lower() for tok in kansai_markers) for item in batch_items)
+
+    if has_negative_q or has_kansai_or_family:
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CLIV - Logika Przeczeń (Hai/Iie) i Kansai Jibun]: "
+            "Pytanie z negacją ('Nie idziesz?') + 'Hai' -> 'Nie idę' / 'Zgadza się, nie idę' (KARDYNALNY BŁĄD: 'Tak, idę' - odwrócenie sensu o 180°!). "
+            "Kansai 'Jibun' w kontekście rozmówcy -> 'TY' ('Co ty wyprawiasz?!', ZAKAZ: 'Co ja robię?!'). "
+            "Rodzina w 3. osobie -> 'Mój brat powiedział' (ZAKAZ: 'Starszy brat powiedział', 'Onii-chan powiedział')."
         )
 
     if not focused_pillars:
