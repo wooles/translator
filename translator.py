@@ -1393,6 +1393,35 @@ class MultimodalTranslator:
             if not pl_candidate:
                 pl_candidate = clean_en
 
+            # Triangulate missing speaker gender from character registry
+            if not speaker_gender and event.name and event.name.strip() in self.character_registry:
+                reg_desc = self.character_registry[event.name.strip()].lower()
+                if "kobieta" in reg_desc or "żeńsk" in reg_desc or "dziewczyn" in reg_desc:
+                    speaker_gender = "kobieta"
+                elif "mężczyzna" in reg_desc or "męsk" in reg_desc or "chłopak" in reg_desc:
+                    speaker_gender = "mężczyzna"
+
+            # Line-Level Pinning: Direct Profiler alerts for this specific line
+            if episode_profile:
+                if getattr(episode_profile, "danger_lines_prescan", None):
+                    for dl in episode_profile.danger_lines_prescan:
+                        if dl.english_phrase and dl.english_phrase.lower() in clean_en.lower():
+                            trap_tag = f"[🚨 PUŁAPKA PROFILERA: {dl.contextual_trap} => DYREKTYWA: {dl.mandatory_direction}]"
+                            notes = f"{notes} {trap_tag}".strip()
+                            break
+                if getattr(episode_profile, "character_catchphrases", None):
+                    for cp in episode_profile.character_catchphrases:
+                        if cp.original_phrase and cp.original_phrase.lower() in clean_en.lower():
+                            cp_tag = f"[💬 KWESTIA-WIZYTÓWKA: '{cp.canonical_pl}']"
+                            notes = f"{notes} {cp_tag}".strip()
+                            break
+                if getattr(episode_profile, "puns_and_wordplays", None):
+                    for pun in episode_profile.puns_and_wordplays:
+                        if pun.original_joke_or_pun and pun.original_joke_or_pun.lower() in clean_en.lower():
+                            pun_tag = f"[🃏 GRA SŁOWNA: {pun.polish_transcreation}]"
+                            notes = f"{notes} {pun_tag}".strip()
+                            break
+
             jp_text = whisper_transcriptions.get(batch_id, "") if whisper_transcriptions else ""
             romaji_str = to_romaji(jp_text) if jp_text else ""
             audio_jp_str = f"{jp_text} [{romaji_str}]" if romaji_str and romaji_str != jp_text else jp_text
@@ -1455,7 +1484,9 @@ class MultimodalTranslator:
                 episode_profile_str=episode_profile_str,
                 user_feedback_str=user_feedback_str,
                 glossary_str=glossary_str,
-                focused_rules_str=phase2_focused_rules
+                focused_rules_str=phase2_focused_rules,
+                series_bible_str=series_bible_str,
+                manga_canon_str=manga_canon_str
             )
             refined_dict = {r.id: sanitize_sub_text(r.refined_pl) for r in refined_lines}
             refined_region_dict = {r.id: r.screen_region for r in refined_lines if getattr(r, 'screen_region', None)}

@@ -66,7 +66,9 @@ class DialogueVerifier:
         episode_profile_str: str = "",
         user_feedback_str: str = "",
         glossary_str: str = "",
-        focused_rules_str: str = ""
+        focused_rules_str: str = "",
+        series_bible_str: str = "",
+        manga_canon_str: str = ""
     ) -> List[RefinedLine]:
         """
         Executes editorial refinement and verification for a dialogue batch.
@@ -93,6 +95,10 @@ class DialogueVerifier:
                 prompt_lines.append(f"\n{user_feedback_str}\n")
             if glossary_str:
                 prompt_lines.append(f"\n{glossary_str}\n")
+            if manga_canon_str:
+                prompt_lines.append(f"\n{manga_canon_str}\n")
+            if series_bible_str:
+                prompt_lines.append(f"\n{series_bible_str}\n")
             if episode_profile_str:
                 prompt_lines.append(f"\n{episode_profile_str}\n")
 
