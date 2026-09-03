@@ -424,6 +424,41 @@ def detect_audio_discrepancy(jp_text: str, pl_text: str, en_text: str) -> Option
         if "umiera" in pl_lower:
             return "W audio pada 'Shinde iru' (stan dokonany) -> 'Nie żyje!' / 'Jest martwy!' / 'Zginął!' (KARDYNALNY ZAKAZ: 'On umiera' - Filar CXLI)."
 
+    # 38. Tabun / Osoraku (domysł vs kategoryczne 'na pewno' / 'na pewno nie')
+    if any(k in clean_jp for k in ["たぶん", "多分", "恐らく", "おそら"]) or any(k in rom_lower for k in ["tabun", "osoraku"]):
+        if any(w in pl_lower for w in ["na pewno", "z całą pewnością", "bezwzględnie", "wykluczone"]):
+            return "W audio seiyuu mówi 'Tabun / Osoraku' (niepewność/domysł: 'Chyba / Może / Raczej') -> KATEGORYCZNY ZAKAZ kategorycznego 'Na pewno / Na pewno nie'! Zastąp: 'Chyba...' / 'Pewnie...' / 'Raczej...' (Filar CXLVII)."
+
+    # 39. Yappari / Yahari ('After all' vs 'Wiedziałem! / A jednak!')
+    if any(k in clean_jp for k in ["やっぱり", "やはり", "矢張り"]) or any(k in rom_lower for k in ["yappari", "yahari"]):
+        if any(w in pl_lower for w in ["po wszystkim", "mimo wszystko"]):
+            return "W audio seiyuu mówi 'Yappari / Yahari' (potwierdzenie przypuszczenia) -> Kategoryczny zakaz kalki 'Po wszystkim / Mimo wszystko'! Zastąp: 'Wiedziałem!' / 'A jednak!' / 'Tak jak myślałem...' (Filar CXLVII)."
+
+    # 40. Sasuga / Sasuga ni ('As expected' vs 'Jak przystało / Bez przesady')
+    if any(k in clean_jp for k in ["さすが", "流石"]) or any(k in rom_lower for k in ["sasuga", "sasugani", "sasuga ni"]):
+        if any(w in pl_lower for w in ["zgodnie z oczekiwaniami", "jak oczekiwano"]):
+            return "W audio seiyuu mówi 'Sasuga / Sasuga ni' -> Kategoryczny zakaz urzędniczego 'Zgodnie z oczekiwaniami'! Zastąp: 'Jak przystało na mistrza!' / 'Nawet jak na niego to przesada!' / 'Bez przesady...' (Filar CXLVII)."
+
+    # 41. Douse ('Anyway' vs fatalistyczne 'I tak...')
+    if any(k in clean_jp for k in ["どうせ", "何れ"]) or "douse" in rom_lower or "dōse" in rom_lower:
+        if "w każdym razie" in pl_lower or "tak czy inaczej" in pl_lower:
+            return "W audio seiyuu mówi 'Douse' (fatalizm i rezygnacja) -> Zastąp płytkie 'W każdym razie' autentycznym ładunkiem: 'I tak nic z tego...' / 'Przecież i tak...' / 'Bez różnicy...' (Filar CXLVII)."
+
+    # 42. Masaka (szok / niedowierzanie vs kategoryczne wykluczenie)
+    if any(k in clean_jp for k in ["まさか"]) or "masaka" in rom_lower:
+        if any(w in pl_lower for w in ["żadna droga", "w żaden sposób", "żadnym sposobem"]):
+            return "W audio seiyuu mówi 'Masaka' (szok i niedowierzanie) -> Zastąp kalkę: 'Niemożliwe!' / 'Nie mów, że...!' / 'Chyba kpisz!' / 'To nie może być prawda!' (Filar CXLVII)."
+
+    # 43. Shikata ga nai / Shouganai ('It can't be helped' vs 'Trudno / Nic nie poradzimy')
+    if any(k in clean_jp for k in ["仕方がない", "しょうがない", "仕様がない", "仕方がねえ"]) or any(k in rom_lower for k in ["shikata ga nai", "shouganai", "shikatanai", "shou ga nai"]):
+        if any(w in pl_lower for w in ["nie da się pomóc", "nie można pomóc", "nie da się temu zaradzić"]):
+            return "W audio seiyuu mówi 'Shikata ga nai / Shouganai' (pogodzenie z losem) -> Zastąp kalkę z angielskiego: 'Trudno...' / 'Nic na to nie poradzimy...' / 'Nie ma rady...' / 'Siła wyższa...' (Filar CXLVII)."
+
+    # 44. Zettai ni / Kanarazu (kategoryczna obietnica/pewność)
+    if any(k in clean_jp for k in ["絶対に", "絶対", "必ず"]) or any(k in rom_lower for k in ["zettai", "kanarazu"]):
+        if any(w in pl_lower for w in ["może ", "chyba ", "prawdopodobnie "]):
+            return "W audio seiyuu mówi 'Zettai ni / Kanarazu' (100% kategoryczna pewność/przysięga) -> Nie osłabiaj kwestii do 'może/chyba'! Użyj: 'Na pewno!' / 'Bezwzględnie!' / 'Za nic w świecie!' (Filar CXLVII)."
+
     return None
 
 def detect_japanese_pragmatic_register(jp_text: str, en_text: str = "") -> Optional[str]:

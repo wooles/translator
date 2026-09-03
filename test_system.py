@@ -176,6 +176,7 @@ def test_rules_and_prompts():
     assert "FILAR CXLIV:" in sys_prompt
     assert "FILAR CXLV:" in sys_prompt
     assert "FILAR CXLVI:" in sys_prompt
+    assert "FILAR CXLVII:" in sys_prompt
     assert "FILAR CXXI" in ver_prompt
     assert "FILAR CXXV" in ver_prompt
     assert "FILAR CXXX" in ver_prompt
@@ -195,7 +196,8 @@ def test_rules_and_prompts():
     assert "FILAR CXLIV" in ver_prompt or "CXLIV" in ver_prompt
     assert "FILAR CXLV" in ver_prompt or "CXLV" in ver_prompt
     assert "FILAR CXLVI" in ver_prompt or "CXLVI" in ver_prompt
-    print(" -> PASSED: Kompletny Zunifikowany Kanon 146 Filarów AVT (Filary I – CXLVI) jest aktywny w obu fazach tłumaczenia.")
+    assert "FILAR CXLVII" in ver_prompt or "CXLVII" in ver_prompt
+    print(" -> PASSED: Kompletny Zunifikowany Kanon 147 Filarów AVT (Filary I – CXLVII) jest aktywny w obu fazach tłumaczenia.")
 
 def test_pydantic_schemas():
     print("[TEST 2/5] Weryfikacja schematów Pydantic i Detektora Rejestru Pragmatycznego...")
@@ -1132,6 +1134,12 @@ def test_dynamic_rule_dispatcher():
     batch_volley = [{"en": "Are you insane?", "relation_tag": "[PING-PONG DIALOGOWY]"}]
     focused_volley = get_focused_rules_for_batch(batch_volley)
     assert "CXLVI" in focused_volley
+
+    # 14. Test paczki z matrycą przysłówków modalnych (Filar CXLVII)
+    batch_modal = [{"en": "Probably.", "audio_jp": "たぶん [Tabun]"}]
+    focused_modal = get_focused_rules_for_batch(batch_modal)
+    assert "CXLVII" in focused_modal
+
     print(" -> PASSED: Dyspozytor reguł precyzyjnie aktywuje właściwe filary AVT.")
 
 def test_fuzzy_and_dynamic_avt_linter():
@@ -1149,6 +1157,12 @@ def test_fuzzy_and_dynamic_avt_linter():
     assert "to miało sens" in t3.lower()
     t4, _ = AVTLinter.lint_and_fix_line("To nie będzie robić sensu.")
     assert "to nie będzie mieć sensu" in t4.lower()
+
+    # 2b. Test eliminacji kalek modalnych (Filar CXLVII)
+    t_m1, _ = AVTLinter.lint_and_fix_line("Wszystko poszło zgodnie z oczekiwaniami.")
+    assert "tak jak myślałem" in t_m1
+    t_m2, _ = AVTLinter.lint_and_fix_line("Nie da się pomóc.")
+    assert "nic na to nie poradzimy" in t_m2
 
     # 3. Test dynamicznych reguł użytkownika w linterze
     user_rules = [
@@ -1644,6 +1658,49 @@ def test_translator_logger_and_sign_detector():
         en_text="He's dead!"
     )
     assert alert_shinde is not None and "CXLI" in alert_shinde
+
+    # Test Filar CXLVII: Modal Adverbs & Discrepancy Triggers 38-44 (Tabun, Yappari, Sasuga, Douse, Masaka, Shouganai)
+    alert_tabun = translator.detect_audio_discrepancy(
+        jp_text="たぶん [Tabun]",
+        pl_text="Na pewno nie.",
+        en_text="Probably not."
+    )
+    assert alert_tabun is not None and "Tabun" in alert_tabun and "CXLVII" in alert_tabun
+
+    alert_yappari = translator.detect_audio_discrepancy(
+        jp_text="やっぱり [Yappari]",
+        pl_text="Po wszystkim poszedł tam.",
+        en_text="After all, he went there."
+    )
+    assert alert_yappari is not None and "Yappari" in alert_yappari
+
+    alert_sasugani = translator.detect_audio_discrepancy(
+        jp_text="流石に [Sasuga ni]",
+        pl_text="Zgodnie z oczekiwaniami, to było za dużo.",
+        en_text="As expected, it was too much."
+    )
+    assert alert_sasugani is not None and "Sasuga" in alert_sasugani
+
+    alert_douse = translator.detect_audio_discrepancy(
+        jp_text="どうせ [Douse]",
+        pl_text="W każdym razie to nie ma znaczenia.",
+        en_text="Anyway, it doesn't matter."
+    )
+    assert alert_douse is not None and "Douse" in alert_douse
+
+    alert_masaka = translator.detect_audio_discrepancy(
+        jp_text="まさか [Masaka]",
+        pl_text="W żaden sposób tego nie zrobię.",
+        en_text="No way I'll do that."
+    )
+    assert alert_masaka is not None and "Masaka" in alert_masaka
+
+    alert_shouganai = translator.detect_audio_discrepancy(
+        jp_text="しょうがない [Shouganai]",
+        pl_text="Nie da się pomóc w tej sytuacji.",
+        en_text="It can't be helped."
+    )
+    assert alert_shouganai is not None and "Shouganai" in alert_shouganai
 
     # Test Flashback 1:1 memory formatting
     from memory import format_translation_memory_for_prompt

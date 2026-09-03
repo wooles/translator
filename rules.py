@@ -1194,6 +1194,17 @@ FILAR CXLVI: DIALOGOWY PING-PONG I SPÓJNOŚĆ LEKSYKALNA RIPOSTY (CONVERSATIONA
         * Riposta musi podjąć leksykalną grę lub kontrastować z pytaniem rozmówcy.
         * ZAKAZ tępych, suchych zaprzeczeń (np. na pytanie: „Oszalałeś?” -> zamiast szkolnego: „Nie oszalałem” -> użyj żywej, błyskotliwej polszczyzny: „A żebyś wiedział!” / „Jeszcze nie!” / „Nawet tak nie żartuj!”).
 
+FILAR CXLVII: MATRYCA PRZYSŁÓWKÓW MODALNYCH I PRAGMATYCZNYCH (EPISTEMIC & PRAGMATIC ADVERB MATRIX)
+   1. STOPNIE PEWNOŚCI I NIEPEWNOŚCI (EPISTEMIC PROBABILITY VS ABSOLUTE CERTAINTY):
+      - Gdy w japońskim audio padają kluczowe przysłówki modalne, bezwzględnie zsynchronizuj polski stopień pewności ze słuchem seiyū:
+        * TABUN (多分) / OSORAKU (恐らく) -> Domysł, niepewność (50-70%): „Chyba...”, „Raczej...”, „Pewnie tak...”, „Może...”. KATEGORYCZNY ZAKAZ kategorycznego „Na pewno!” lub „Na pewno nie!”!
+        * YAPPARI / YAHARI (やっぱり / やはり) -> Potwierdzenie wcześniejszego przeczucia: „Wiedziałem!”, „A jednak!”, „Tak jak myślałem...”. KARDYNALNY ZAKAZ angielskiej kalki: „Po wszystkim” / „Mimo wszystko”!
+        * SASUGA / SASUGA NI (さすが / さすがに) -> Kunszt mistrzowski LUB przekroczenie granicy: „Jak przystało na mistrza!” LUB „Nawet jak na niego to przesada!”, „Bez przesady...”. KARDYNALNY ZAKAZ urzędniczego: „Zgodnie z oczekiwaniami”!
+        * DOUSE (どうせ) -> Fatalizm i rezygnacja: „I tak nic z tego...”, „Przecież i tak...”, „Bez różnicy...”. KARDYNALNY ZAKAZ spłycania do bezdusznego: „W każdym razie”!
+        * MASAKA (まさか) -> Szok i niedowierzanie: „Niemożliwe!”, „Nie mów, że...!”, „Chyba kpisz!”, „To nie może być prawda!”. KARDYNALNY ZAKAZ dosłownego: „Żadnym sposobem” / „Nigdy w życiu”.
+        * SHIKATA GA NAI / SHOUGANAI (仕方がない / しょうがない) -> Bezsilność i pogodzenie z losem: „Trudno...”, „Nic na to nie poradzimy...”, „Nie ma rady...”, „Siła wyższa...”. KARDYNALNY ZAKAZ kalki z EN: „Nie da się pomóc”!
+        * ZETTAI NI (絶対に) / KANARAZU (必ず) -> 100% kategoryczna pewność, obietnica lub zakaz: „Na pewno!”, „Bezwzględnie!”, „Za nic w świecie!”, „W życiu!”, „Ani mi się waż!”.
+
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -2022,6 +2033,7 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
       * "[Filar CXLIV - Audio Ad-Libbing] Wzbogacono pominięty w EN okrzyk seiyuu 'Chikushō!' -> 'Niech to szlag!'"
       * "[Filar CXLV - Ambiguity Resolution] Rozwikłano zaimek 'it' na kadrze wideo jako 'miecz' (eliminacja zgadywania)"
       * "[Filar CXLVI - Conversational Volley] 'Oszalałeś?' -> 'A żebyś wiedział!' (błyskotliwa riposta zamiast 'nie oszalałem')"
+      * "[Filar CXLVII - Matryca Modalna] 'Tabun' -> 'Chyba...' (domysł, kategoryczny zakaz 'na pewno nie')"
 
 {BELCZYK_AVT_MASTER_CANON}
 
@@ -2698,6 +2710,16 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR CXLVI - Dialogowy Ping-Pong i Spójność Leksykalna Riposty (Conversational Volley)]: "
             "Zgraj ripostę z pytaniem rozmówcy! Unikaj suchych, bezdusznych zaprzeczeń (np. na pytanie: 'Oszalałeś?' -> użyj żywej polszczyzny: 'A żebyś wiedział!' / 'Jeszcze nie!' zamiast szkolnego 'Nie oszalałem')."
+        )
+
+    # 87. Matryca Przysłówków Modalnych i Pragmatycznych (Filar CXLVII)
+    modal_jp_tokens = ["tabun", "osoraku", "yappari", "yahari", "sasuga", "douse", "masaka", "shouganai", "shikata", "zettai", "kanarazu", "たぶん", "恐らく", "やっぱり", "さすが", "どうせ", "まさか", "仕方", "絶対", "必ず"]
+    if any(any(tok in str(item.get("audio_jp", "")).lower() for tok in modal_jp_tokens) for item in batch_items) or any(any(w in str(item.get("en", "")).lower() for w in ["probably", "after all", "as expected", "anyway", "no way", "can't be helped", "definitely"]) for item in batch_items):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CXLVII - Matryca Przysłówków Modalnych i Pragmatycznych (Epistemic Matrix)]: "
+            "Precyzyjnie dopasuj stopień pewności ze słuchem seiyū! Tabun/Osoraku -> 'Chyba' / 'Pewnie' / 'Raczej' (KATEGORYCZNY ZAKAZ: 'Na pewno / Na pewno nie'!). "
+            "Yappari -> 'Wiedziałem!' / 'A jednak!' (ZAKAZ: 'Po wszystkim'). Sasuga -> 'Jak przystało na mistrza!' / 'Bez przesady!'. "
+            "Douse -> 'I tak nic z tego...'. Masaka -> 'Niemożliwe!' / 'Chyba kpisz!'. Shouganai -> 'Trudno...' / 'Nic nie poradzimy...' (ZAKAZ: 'Nie da się pomóc')."
         )
 
     if not focused_pillars:
