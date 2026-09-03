@@ -199,16 +199,17 @@ def is_isolated_paralinguistic_clutter(orig_en: str, translated_pl: str, is_sign
             
     return False
 
-def detect_audio_discrepancy(jp_text: str, pl_text: str, en_text: str) -> Optional[str]:
+def detect_audio_discrepancy(jp_text: str, pl_text: str, en_text: str, prosody: str = "") -> Optional[str]:
     """
     Automated discrepancy detector comparing Japanese voice recognition (Whisper)
-    against Phase 1 draft translation.
+    and audio acoustic prosody (tone, dBFS, shouting vs sarcasm) against Phase 1 draft translation.
     """
     if not jp_text or not pl_text:
         return None
 
     jp_lower = jp_text.lower()
     pl_lower = pl_text.lower()
+    prosody_lower = prosody.lower() if prosody else ""
 
     # Extract clean Romaji text (from [Romaji] brackets) and clean Japanese
     clean_jp = re.sub(r"\[.*?\]", "", jp_text).strip()
@@ -257,7 +258,7 @@ def detect_audio_discrepancy(jp_text: str, pl_text: str, en_text: str) -> Option
     # 8. Giri and Sumimasen in gratitude/saving context
     if ("済みません" in clean_jp or "すみません" in clean_jp or "sumimasen" in rom_lower) and any(w in en_text.lower() for w in ["saved", "water", "food", "help", "thank"]):
         if pl_lower.startswith("przepraszam"):
-            return "W audio pada 'Sumimasen' jako dług wdzięczności (Giri) -> Zamień monotonne 'Przepraszam' na 'Wybacz kłopot...' / 'Nie trzeba było...' (Filar CX)."
+            return "W audio pada 'Sumimasen' jako dług wdzięczności (Giri) -> Zamień monotonne 'Przepraszam' na 'Dziękuję!' / 'Nie trzeba było...' / 'Wybacz kłopot...' (Filar CX & CLI)."
 
     # 9. Ii desu / Kekkou desu in refusal vs health state
     if ("いいです" in clean_jp or "ii desu" in rom_lower or "kekkou" in rom_lower or "結構" in clean_jp):
@@ -474,6 +475,40 @@ def detect_audio_discrepancy(jp_text: str, pl_text: str, en_text: str) -> Option
     if any(k in clean_jp for k in ["本当なのか", "本当か", "本当ね", "確かなのか", "誠か", "実か"]) or any(k in rom_lower for k in ["honto nano ka", "hontou na no ka", "honto ka", "tashika na no ka", "makoto ka"]):
         if any(w in pl_lower for w in ["to prawda?", "czy to prawda?"]):
             return "W audio seiyuu mówi 'Hontō na no ka / Tashika na no ka' (żołnierski wstrząs / weryfikacja wieści) -> KATEGORYCZNY ZAKAZ urzędowego 'To prawda?'. Zastąp żywym odruchem: 'To pewne?!' / 'Jesteś pewna?!' / 'Więc to prawda...?!' / 'Na pewno?!' / 'Prawdę mówisz?!' (Filar CXLVIII)."
+
+    # 47. Haragei: Daijōbu & Chotto (Zawoalowane Odmowy vs pozorne zgody)
+    if "大丈夫" in clean_jp or "daijoubu" in rom_lower or "daijobu" in rom_lower:
+        if any(w in pl_lower for w in ["w porządku.", "w porządku!", "w porządku?"]):
+            if any(w in en_text.lower() for w in ["help", "need", "want", "tea", "water", "okay", "fine", "alright", "careful"]):
+                return "W audio seiyuu mówi 'Daijōbu' w odpowiedzi na ofertę/troskę (Haragei - zawoalowana odmowa) -> KATEGORYCZNY ZAKAZ mylącego 'W porządku' (sugeruje zgodę!). Użyj: 'Nie trzeba, dziękuję' / 'Obejdzie się' / 'Dam radę' / 'Poradzę sobie' (Filar CXLIX)."
+    if "ちょっと" in clean_jp or "chotto" in rom_lower:
+        if any(w in pl_lower for w in ["trochę...", "to trochę...", "trochę."]) and not any(w in pl_lower for w in ["poczekaj", "chwil", "zaraz"]):
+            return "W audio seiyuu mówi 'Chotto...' w tonie wahania/odmowy (Haragei) -> KATEGORYCZNY ZAKAZ kalki 'Trochę...'. Zastąp autentyczną japońską odmową: 'Raczej nie da rady...' / 'Obawiam się, że to niemożliwe...' / 'Z tym będzie kłopot...' (Filar CXLIX)."
+
+    # 48. Hora! & Fuzja ze Słuchem i Prozodią (Popędzanie vs Złośliwy Triumf vs Rzut)
+    if "ほら" in clean_jp or "hora" in rom_lower:
+        is_shouting = any(w in prosody_lower for w in ["krzyk", "wzburzenie", "wzrost energii", "dbfs > -12"]) or en_text.endswith("!")
+        is_sarcastic = any(w in prosody_lower for w in ["sarkazm", "dystans"]) or "miro" in rom_lower or "ne" in rom_lower or "見ろ" in clean_jp
+        if any(w in pl_lower for w in ["spójrz", "patrz ", "popatrz", "zobacz"]):
+            if is_sarcastic or "hora miro" in rom_lower or "見ろ" in clean_jp:
+                return "W audio seiyuu mówi 'Hora miro / Hora ne' (złośliwy triumf) -> KATEGORYCZNY ZAKAZ dosłownego 'Spójrz/Patrz'. Zastąp triumfem: 'A nie mówiłem?!' / 'Widzisz?!' / 'Masz za swoje!' (Filar CL)."
+            elif is_shouting or any(w in en_text.lower() for w in ["come on", "hurry", "quick", "faster", "get moving"]):
+                return "W audio seiyuu krzyczy 'Hora!' (popędzanie / wysoka energia foniczna) -> KATEGORYCZNY ZAKAZ kalki 'Spójrz/Patrz!'. Użyj: 'No dalej!' / 'Rusz się!' / 'Śmiało!' / 'Szybciej!' (Filar CL)."
+            elif any(w in en_text.lower() for w in ["take this", "here", "catch"]):
+                return "W audio pada 'Hora!' przy podaniu/rzucie przedmiotu -> KATEGORYCZNY ZAKAZ 'Spójrz!'. Użyj: 'Masz!' / 'Łap!' / 'Trzymaj!' (Filar CL)."
+
+    # 49. Rytualne Formuły Sytuacyjne Aisatsu (Ittekimasu, Tadaima, Ojama shimasu)
+    if any(k in clean_jp for k in ["行ってきます", "行ってらっしゃい", "お邪魔します", "ただいま", "おかえり"]) or any(k in rom_lower for k in ["ittekimasu", "itterasshai", "ojama shimasu", "tadaima", "okaeri"]):
+        if any(w in pl_lower for w in ["pójdę i wrócę", "idź i wróć", "będę przeszkadzał", "przeszkadzam", "wróciłem do domu", "witaj w domu"]):
+            return "W audio seiyuu używa rytualnej formuły powitania/wyjścia (Aisatsu) -> Zastąp szkolną kalkę naturalną polszczyzną: 'Wychodzę!' / 'Trzymaj się!' / 'Dzień dobry!' / 'Przepraszam za najście' / 'Wróciłem!' (Filar CLI)."
+
+    # 50. Abunai! & Tasukete! (Okrzyki Bojowe i Bezpośrednie Zagrożenie Życia)
+    if any(k in clean_jp for k in ["危ない", "危ねえ", "危ねっ"]) or any(k in rom_lower for k in ["abunai", "abune", "abunee"]):
+        if any(w in pl_lower for w in ["niebezpiecznie", "to jest niebezpieczne", "niebezpieczeństwo"]):
+            return "W audio seiyuu krzyczy 'Abunai!' (śmiertelne zagrożenie / okrzyk bojowy) -> KATEGORYCZNY ZAKAZ opisowego 'Niebezpiecznie!'. Zastąp natychmiastowym rozkazem taktycznym: 'Padnij!' / 'Kryj się!' / 'Uważaj!' / 'Z drogi!' (Filar CLII)."
+    if "助けて" in clean_jp or "tasukete" in rom_lower:
+        if any(w in pl_lower for w in ["ocal mnie", "uratuj mnie"]):
+            return "W audio seiyuu woła 'Tasukete!' w zagrożeniu życia -> KATEGORYCZNY ZAKAZ teatralnego 'Ocal mnie!'. Użyj dynamicznego: 'Ratunku!' / 'Pomocy!' / 'Niech ktoś pomoże!' (Filar CLII)."
 
     return None
 
@@ -1361,7 +1396,7 @@ class MultimodalTranslator:
             romaji_str = to_romaji(jp_text) if jp_text else ""
             audio_jp_str = f"{jp_text} [{romaji_str}]" if romaji_str and romaji_str != jp_text else jp_text
 
-            audio_discrepancy_msg = detect_audio_discrepancy(audio_jp_str, pl_candidate, clean_en)
+            audio_discrepancy_msg = detect_audio_discrepancy(audio_jp_str, pl_candidate, clean_en, prosody=prosody_tags.get(batch_id, ""))
             pragmatic_reg = detect_japanese_pragmatic_register(audio_jp_str, clean_en)
 
             # Ping-pong dialogowy (Filar CXLVI)

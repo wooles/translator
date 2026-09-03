@@ -178,6 +178,10 @@ def test_rules_and_prompts():
     assert "FILAR CXLVI:" in sys_prompt
     assert "FILAR CXLVII:" in sys_prompt
     assert "FILAR CXLVIII:" in sys_prompt
+    assert "FILAR CXLIX:" in sys_prompt
+    assert "FILAR CL:" in sys_prompt
+    assert "FILAR CLI:" in sys_prompt
+    assert "FILAR CLII:" in sys_prompt
     assert "FILAR CXXI" in ver_prompt
     assert "FILAR CXXV" in ver_prompt
     assert "FILAR CXXX" in ver_prompt
@@ -199,7 +203,11 @@ def test_rules_and_prompts():
     assert "FILAR CXLVI" in ver_prompt or "CXLVI" in ver_prompt
     assert "FILAR CXLVII" in ver_prompt or "CXLVII" in ver_prompt
     assert "FILAR CXLVIII" in ver_prompt or "CXLVIII" in ver_prompt
-    print(" -> PASSED: Kompletny Zunifikowany Kanon 148 Filarów AVT (Filary I – CXLVIII) jest aktywny w obu fazach tłumaczenia.")
+    assert "FILAR CXLIX" in ver_prompt or "CXLIX" in ver_prompt
+    assert "FILAR CL" in ver_prompt or "CL" in ver_prompt
+    assert "FILAR CLI" in ver_prompt or "CLI" in ver_prompt
+    assert "FILAR CLII" in ver_prompt or "CLII" in ver_prompt
+    print(" -> PASSED: Kompletny Zunifikowany Kanon 152 Filarów AVT (Filary I – CLII) jest aktywny w obu fazach tłumaczenia.")
 
 def test_pydantic_schemas():
     print("[TEST 2/5] Weryfikacja schematów Pydantic i Detektora Rejestru Pragmatycznego...")
@@ -1152,6 +1160,26 @@ def test_dynamic_rule_dispatcher():
     focused_ver = get_focused_rules_for_batch(batch_ver)
     assert "CXLVIII" in focused_ver
 
+    # 17. Test paczki z Haragei (Filar CXLIX)
+    batch_haragei = [{"en": "I'm fine.", "audio_jp": "大丈夫 [Daijoubu]"}]
+    focused_haragei = get_focused_rules_for_batch(batch_haragei)
+    assert "CXLIX" in focused_haragei
+
+    # 18. Test paczki z Hora! (Filar CL)
+    batch_hora = [{"en": "Look!", "audio_jp": "ほら [Hora]"}]
+    focused_hora = get_focused_rules_for_batch(batch_hora)
+    assert "CL" in focused_hora
+
+    # 19. Test paczki z Aisatsu i Sumimasen (Filar CLI)
+    batch_aisatsu = [{"en": "I'm home!", "audio_jp": "ただいま [Tadaima]"}]
+    focused_aisatsu = get_focused_rules_for_batch(batch_aisatsu)
+    assert "CLI" in focused_aisatsu
+
+    # 20. Test paczki z Abunai i Tasukete (Filar CLII)
+    batch_danger = [{"en": "Look out!", "audio_jp": "危ない [Abunai]"}]
+    focused_danger = get_focused_rules_for_batch(batch_danger)
+    assert "CLII" in focused_danger
+
     print(" -> PASSED: Dyspozytor reguł precyzyjnie aktywuje właściwe filary AVT.")
 
 def test_fuzzy_and_dynamic_avt_linter():
@@ -1189,6 +1217,14 @@ def test_fuzzy_and_dynamic_avt_linter():
     assert "To pewne?" in t_v1
     t_v2, _ = AVTLinter.lint_and_fix_line("To prawda.")
     assert t_v2 == "To prawda."
+
+    # 2e. Test eliminacji kalek Abunai, Tasukete i Aisatsu (Filary CLI - CLII)
+    t_d1, _ = AVTLinter.lint_and_fix_line("Niebezpiecznie!")
+    assert "Uważaj!" in t_d1
+    t_d2, _ = AVTLinter.lint_and_fix_line("Ocal mnie!")
+    assert "Ratunku!" in t_d2
+    t_d3, _ = AVTLinter.lint_and_fix_line("Będę przeszkadzał.")
+    assert "Przepraszam za najście" in t_d3
 
     # 3. Test dynamicznych reguł użytkownika w linterze
     user_rules = [
@@ -1757,6 +1793,66 @@ def test_translator_logger_and_sign_detector():
         en_text="Is that true?"
     )
     assert alert_honto is not None and "Hontō na no ka" in alert_honto and "CXLVIII" in alert_honto
+
+    # Test Filar CXLIX: Trigger 47 Haragei (Daijoubu & Chotto)
+    alert_daijoubu = translator.detect_audio_discrepancy(
+        jp_text="大丈夫です [Daijoubu desu]",
+        pl_text="W porządku.",
+        en_text="Do you need any help?",
+        prosody="spokojny ton"
+    )
+    assert alert_daijoubu is not None and "Daijōbu" in alert_daijoubu and "CXLIX" in alert_daijoubu
+
+    alert_chotto = translator.detect_audio_discrepancy(
+        jp_text="それはちょっと… [Sore wa chotto...]",
+        pl_text="To trochę...",
+        en_text="Will you come with us?",
+        prosody="wahanie / pauza oddechowa"
+    )
+    assert alert_chotto is not None and "Chotto" in alert_chotto and "CXLIX" in alert_chotto
+
+    # Test Filar CL: Trigger 48 Hora & Prosody Fusion (Krzyk vs Sarkazm)
+    alert_hora_shout = translator.detect_audio_discrepancy(
+        jp_text="ほら早く！ [Hora hayaku!]",
+        pl_text="Spójrz szybko!",
+        en_text="Come on, hurry up!",
+        prosody="krzyk bojowy / silne wzburzenie"
+    )
+    assert alert_hora_shout is not None and "Hora" in alert_hora_shout and "CL" in alert_hora_shout
+
+    alert_hora_sarcasm = translator.detect_audio_discrepancy(
+        jp_text="ほら見ろ [Hora miro]",
+        pl_text="Spójrz na to.",
+        en_text="See? I told you so.",
+        prosody="chłodny sarkazm / opanowany dystans"
+    )
+    assert alert_hora_sarcasm is not None and "Hora miro" in alert_hora_sarcasm and "CL" in alert_hora_sarcasm
+
+    # Test Filar CLI: Trigger 49 Formuły Sytuacyjne Aisatsu
+    alert_aisatsu = translator.detect_audio_discrepancy(
+        jp_text="お邪魔します [Ojama shimasu]",
+        pl_text="Będę przeszkadzał.",
+        en_text="I will intrude.",
+        prosody="uprzejmy ton"
+    )
+    assert alert_aisatsu is not None and "Aisatsu" in alert_aisatsu and "CLI" in alert_aisatsu
+
+    # Test Filar CLII: Trigger 50 Abunai & Tasukete with Shouting Prosody
+    alert_abunai = translator.detect_audio_discrepancy(
+        jp_text="危ない！ [Abunai!]",
+        pl_text="To jest niebezpieczne!",
+        en_text="Watch out!",
+        prosody="krzyk bojowy / silne wzburzenie"
+    )
+    assert alert_abunai is not None and "Abunai" in alert_abunai and "CLII" in alert_abunai
+
+    alert_tasukete = translator.detect_audio_discrepancy(
+        jp_text="助けて！ [Tasukete!]",
+        pl_text="Ocal mnie!",
+        en_text="Help me!",
+        prosody="krzyk bojowy / płacz"
+    )
+    assert alert_tasukete is not None and "Tasukete" in alert_tasukete and "CLII" in alert_tasukete
 
     # Test Flashback 1:1 memory formatting
     from memory import format_translation_memory_for_prompt

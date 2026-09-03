@@ -1241,6 +1241,50 @@ FILAR CXLVIII: PRAGMATYKA PYTAŃ O WIARYGODNOŚĆ, PRAWDZIWOŚĆ I SZOK POZNAWCZ
         * KI NO SEI KA...? (気のせいか) -> Kwestionowanie własnych zmysłów:
           -> POPRAWNIE: „Przywidziało mi się...?”, „Tylko mi się zdawało...”, „Zwid...”. KARDYNALNY ZAKAZ: „Wina mojego umysłu”.
 
+FILAR CXLIX: MATRYCA ODPOWIEDZI ZAWOALOWANYCH I UKRYTYCH ODMÓW (HARAGEI: DAIJŌBU & CHOTTO)
+   1. HARAGEI I KULTUROWA ODMOWA W JĘZYKU JAPOŃSKIM:
+      - Japończycy niemal nigdy nie odmawiają wprost słowem „Nie” (Iie). Używają figur zawoalowanych:
+        * DAIJŌBU (大丈夫 / 大丈夫です) w odpowiedzi na propozycję/ofertę pomocy, poczęstunku lub wyręczenia:
+          -> POPRAWNIE: „Nie trzeba, dziękuję”, „Obejdzie się”, „Dam radę”, „Dzięki, poradzę sobie”, „Wszystko gra”.
+          -> KARDYNALNY BŁĄD [X]: „W porządku!” (polski widz odbiera to jako zgodę: „W porządku, nalej mi herbaty!”, podczas gdy postać odmówiła!).
+        * CHOTTO... (ちょっと… / それはちょっと…) w odpowiedzi na prośbę, rozkaz lub zaproszenie:
+          -> POPRAWNIE: „Raczej nie da rady...”, „Obawiam się, że to niemożliwe...”, „Z tym będzie kłopot...”, „Nie za bardzo...”.
+          -> KARDYNALNY BŁĄD [X]: „Trochę...”, „To trochę...” (bezduszna kalka z angielskiego 'A little / That's a bit' - brzmi jak urwany pomiar ilościowy!).
+
+FILAR CL: PRAGMATYKA WIELOFUNKCYJNEGO HORA! (HORA MATRIX & PROSODY FUSION)
+   1. ROZRÓŻNIENIE PRZEZ FUZJĘ SŁUCHU (WHISPER) I PROZODII (AUDIO PROSODY ENGINE):
+      - Słowo HORA (ほら) nie oznacza wyłącznie patrzenia oczami. Zbadaj ton i dynamikę seiyū:
+        * HORA! / HORA HAYAKU! (ほら / ほら早く) przy wysokiej energii / krzyku bojowym / popędzaniu:
+          -> POPRAWNIE: „No dalej!”, „Rusz się!”, „Śmiało!”, „Szybciej!”, „Ruszże się!”.
+          -> KARDYNALNY BŁĄD [X]: „Spójrz!”, „Patrz!” (kalka z angielskiego 'Look! / See?').
+        * HORA MIRO / HORA NE (ほら見ろ / ほらね) przy chłodnym sarkazmie / triumfie:
+          -> POPRAWNIE: „A nie mówiłem?!”, „Widzisz?!”, „Masz za swoje!”.
+          -> KARDYNALNY BŁĄD [X]: „Spójrz na to!” (postać nie każe oglądać obiektu, lecz triumfuje, że miała rację).
+        * HORA! (ほら) przy wręczeniu, rzucie lub podaniu broni/przedmiotu:
+          -> POPRAWNIE: „Masz!”, „Łap!”, „Trzymaj!”, „Hop!”.
+
+FILAR CLI: ODWRÓCONA WDZIĘCZNOŚĆ I FORMUŁY SYTUACYJNE (SUMIMASEN & AISATSU MATRIX)
+   1. PARADOKS SUMIMASEN I RYTUAŁY POWITAŃ:
+      - SUMIMASEN (すみません) jako podziękowanie za fatygę / przysługę / podniesienie przedmiotu:
+        -> POPRAWNIE: „Dziękuję!”, „Bardzo dziękuję!”, „Nie trzeba było!”, „Dziękuję, nie kłopocz się!”.
+        -> KARDYNALNY BŁĄD [X]: „Przepraszam!” (gdy postać dziękuje za przysługę, polskie „przepraszam” wywołuje konfuzję u widza).
+      - RYTUAŁY POWITAŃ I WYJŚCIA (AISATSU) W REALIACH CODZIENNYCH I WOJSKOWYCH:
+        * ITTEKIMASU (行ってきます) -> „Wychodzę!”, „Już idę!”, „Do zobaczenia!” (ZAKAZ: „Pójdę i wrócę”).
+        * ITTERASSHAI (行ってらっしゃい) -> „Trzymaj się!”, „Uważaj na siebie!”, „Do zobaczenia!” (ZAKAZ: „Idź i wróć”).
+        * TADAIMA (ただいま) -> „Wróciłem!”, „Już jestem!”, „To ja!” (ZAKAZ w bazie wojskowej: „Jestem w domu”).
+        * OKAERI (おかえり) -> „O, już jesteś!”, „Witaj z powrotem!” (ZAKAZ: „Witaj w domu”).
+        * OJAMA SHIMASU (お邪魔します) -> „Dzień dobry!”, „Pozwoliłem sobie wejść”, „Przepraszam za najście”, „Nie przeszkadzam?” (ZAKAZ: „Będę przeszkadzał”).
+
+FILAR CLII: DYSCYPLINA OKRZYKÓW BOJOWYCH I OSTRZEŻEŃ ODDZIAŁOWYCH (ABUNAI & TASUKETE)
+   1. DYNAMIKA POLA WALKI I ŚMIERTELNEGO ZAGROŻENIA:
+      - Gdy seiyū krzyczy z wysokim natężeniem (krzyk bojowy / wzburzenie emocjonalne):
+        * ABUNAI! / ABUNE'E! (危ない / 危ねえ) w obliczu lecącej kuli, eksplozji, ostrza lub walącego się drzewa:
+          -> POPRAWNIE: „Padnij!”, „Kryj się!”, „Uważaj!”, „Z drogi!”, „Głowa w dół!”.
+          -> KARDYNALNY BŁĄD [X]: „Niebezpiecznie!”, „To jest niebezpieczne!” (chłodny, analityczny opis cechy otoczenia zamiast rozkazu taktycznego ratującego życie!).
+        * TASUKETE! (助けて) w sytuacji bezpośredniego zagrożenia życia (duszenie, postrzał, tonięcie):
+          -> POPRAWNIE: „Ratunku!”, „Pomocy!”, „Niech ktoś pomoże!”.
+          -> KARDYNALNY BŁĄD [X]: „Ocal mnie!” (teatralny archaizm zabijający realizm pola walki).
+
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -2072,6 +2116,10 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
       * "[Filar CXLVI - Conversational Volley] 'Oszalałeś?' -> 'A żebyś wiedział!' (błyskotliwa riposta zamiast 'nie oszalałem')"
       * "[Filar CXLVII - Matryca Modalna] 'Tabun' -> 'Chyba...' (domysł, kategoryczny zakaz 'na pewno nie')"
       * "[Filar CXLVIII - Szok i Wiarygodność] 'Hontō na no ka?' -> 'To pewne?!' (weryfikacja plotki wojennej, ZAKAZ urzędowego 'To prawda?')"
+      * "[Filar CXLIX - Haragei] 'Daijoubu' na ofertę pomocy -> 'Nie trzeba, dziękuję' (ZAKAZ 'W porządku'); 'Chotto...' -> 'Raczej nie da rady...'"
+      * "[Filar CL - Hora & Prosody] 'Hora hayaku!' (krzyk) -> 'Rusz się!' / 'No dalej!' (ZAKAZ 'Spójrz'); 'Hora miro' -> 'A nie mówiłem?!'"
+      * "[Filar CLI - Sumimasen & Aisatsu] 'Sumimasen' za przysługę -> 'Dziękuję!'; 'Ittekimasu' -> 'Wychodzę!'"
+      * "[Filar CLII - Okrzyki Bojowe] 'Abunai!' (krzyk) -> 'Padnij!' / 'Kryj się!' (ZAKAZ opisu 'Niebezpiecznie!')"
 
 {BELCZYK_AVT_MASTER_CANON}
 
@@ -2769,6 +2817,42 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
             "• [SKUP SIĘ NA: FILAR CXLVIII - Pragmatyka Pytań o Wiarygodność i Szok Poznawczy (Veracity Matrix)]: "
             "KATEGORYCZNY ZAKAZ urzędowego 'To prawda?' w scenach grozy, wojny i szoku! "
             "Dopasuj żywą ludzką reakcję: 'To pewne?!' / 'Jesteś pewna?!' / 'Więc to prawda...?!' / 'Prawdę mówisz?!' / 'Serio?!'."
+        )
+
+    # 89. Matryca Odpowiedzi Zawoalowanych i Ukrytych Odmów (Filar CXLIX - Haragei)
+    haragei_tokens = ["daijoubu", "daijobu", "chotto", "大丈夫", "ちょっと"]
+    if any(any(tok in str(item.get("audio_jp", "")).lower() for tok in haragei_tokens) for item in batch_items) or any(any(w in str(item.get("en", "")).lower() for w in ["i'm okay", "i'm fine", "that's a bit", "a little..."]) for item in batch_items):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CXLIX - Haragei: Odpowiedzi Zawoalowane i Odmowy (Daijoubu & Chotto)]: "
+            "Gdy postać odpowiada 'Daijoubu' na propozycję/ofertę pomocy -> to ODMOWA: 'Nie trzeba, dziękuję' / 'Obejdzie się' / 'Dam radę' (KATEGORYCZNY ZAKAZ mylącego 'W porządku'). "
+            "Gdy seiyuu mówi 'Chotto...' w odpowiedzi na prośbę -> 'Raczej nie da rady...' / 'Obawiam się, że to niemożliwe...' (ZAKAZ 'Trochę...')."
+        )
+
+    # 90. Pragmatyka Wielofunkcyjnego Hora! i Fuzja z Prozodią (Filar CL)
+    if any(any(tok in str(item.get("audio_jp", "")).lower() for tok in ["hora", "ほら"]) for item in batch_items) or any(any(w in str(item.get("en", "")).lower() for w in ["look!", "see?", "come on", "here you go"]) for item in batch_items):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CL - Pragmatyka Hora! i Fuzja ze Słuchem/Prozodią]: "
+            "Nie tłumacz bezmyślnie 'Hora' jako 'Spójrz / Patrz'! Zbadaj ton seiyū: "
+            "krzyk bojowy / pośpiech -> popędzanie: 'No dalej!' / 'Rusz się!' / 'Śmiało!'; "
+            "sarkazm / Hora miro -> 'A nie mówiłem?!' / 'Widzisz?!'; wręczenie -> 'Masz!' / 'Łap!'."
+        )
+
+    # 91. Odwrócona Wdzięczność i Formuły Sytuacyjne (Filar CLI - Sumimasen & Aisatsu)
+    aisatsu_tokens = ["sumimasen", "ittekimasu", "itterasshai", "tadaima", "okaeri", "ojama", "すみません", "行ってきます", "ただいま", "おかえり", "お邪魔"]
+    if any(any(tok in str(item.get("audio_jp", "")).lower() for tok in aisatsu_tokens) for item in batch_items) or any(any(w in str(item.get("en", "")).lower() for w in ["i'm home", "welcome home", "i will intrude", "excuse me"]) for item in batch_items):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CLI - Sumimasen i Formuły Sytuacyjne (Aisatsu)]: "
+            "Sumimasen za przysługę to PODZIĘKOWANIE: 'Dziękuję!' / 'Nie trzeba było!' (ZAKAZ 'Przepraszam!'). "
+            "Aisatsu dostosuj do realiów sceny (Ittekimasu -> 'Wychodzę!', Tadaima -> 'Wróciłem!', Ojama shimasu -> 'Dzień dobry!' / 'Przepraszam za najście')."
+        )
+
+    # 92. Dyscyplina Okrzyków Bojowych i Ostrzeżeń Oddziałowych (Filar CLII - Abunai & Tasukete)
+    danger_tokens = ["abunai", "abune", "tasukete", "危ない", "危ねえ", "助けて"]
+    if any(any(tok in str(item.get("audio_jp", "")).lower() for tok in danger_tokens) for item in batch_items) or any(any(w in str(item.get("en", "")).lower() for w in ["watch out", "look out", "danger", "save me", "help me"]) for item in batch_items):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CLII - Okrzyki Bojowe i Ostrzeżenia (Abunai & Tasukete)]: "
+            "Gdy seiyū krzyczy w zagrożeniu życia: Abunai! -> natychmiastowy rozkaz taktyczny: 'Padnij!' / 'Kryj się!' / 'Uważaj!' / 'Z drogi!' (KATEGORYCZNY ZAKAZ opisu 'Niebezpiecznie!'). "
+            "Tasukete! -> 'Ratunku!' / 'Pomocy!' (ZAKAZ 'Ocal mnie!')."
         )
 
     if not focused_pillars:
