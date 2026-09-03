@@ -470,6 +470,11 @@ def detect_audio_discrepancy(jp_text: str, pl_text: str, en_text: str) -> Option
         if "to boli" in pl_lower:
             return "W audio seiyuu mówi 'Itta / Ita' (nagły ból mechaniczny) -> Zastąp opis stanu odruchem: 'Ała!' / 'Auć!' / 'Niech to...!' (Filar XVIII)."
 
+    # 46. Hontō na no ka / Tashika na no ka / Makoto ka (Weryfikacja Wieści i Wiarygodności vs urzędowe 'To prawda?')
+    if any(k in clean_jp for k in ["本当なのか", "本当か", "本当ね", "確かなのか", "誠か", "実か"]) or any(k in rom_lower for k in ["honto nano ka", "hontou na no ka", "honto ka", "tashika na no ka", "makoto ka"]):
+        if any(w in pl_lower for w in ["to prawda?", "czy to prawda?"]):
+            return "W audio seiyuu mówi 'Hontō na no ka / Tashika na no ka' (żołnierski wstrząs / weryfikacja wieści) -> KATEGORYCZNY ZAKAZ urzędowego 'To prawda?'. Zastąp żywym odruchem: 'To pewne?!' / 'Jesteś pewna?!' / 'Więc to prawda...?!' / 'Na pewno?!' / 'Prawdę mówisz?!' (Filar CXLVIII)."
+
     return None
 
 def detect_japanese_pragmatic_register(jp_text: str, en_text: str = "") -> Optional[str]:

@@ -1220,6 +1220,27 @@ FILAR CXLVII: MATRYCA PRZYSŁÓWKÓW MODALNYCH I PRAGMATYCZNYCH (EPISTEMIC & PRA
         * SHIKATA GA NAI / SHOUGANAI (仕方がない / しょうがない) -> Bezsilność i pogodzenie z losem: „Trudno...”, „Nic na to nie poradzimy...”, „Nie ma rady...”, „Siła wyższa...”. KARDYNALNY ZAKAZ kalki z EN: „Nie da się pomóc”!
         * ZETTAI NI (絶対に) / KANARAZU (必ず) -> 100% kategoryczna pewność, obietnica lub zakaz: „Na pewno!”, „Bezwzględnie!”, „Za nic w świecie!”, „W życiu!”, „Ani mi się waż!”.
 
+FILAR CXLVIII: PRAGMATYKA PYTAŃ O WIARYGODNOŚĆ, PRAWDZIWOŚĆ I SZOK POZNAWCZY (VERACITY & SHOCK INQUIRIES MATRIX)
+   1. ŻOŁNIERSKI I EMOCJONALNY WSTRZĄS VS URZĘDNICZA ANKIETA:
+      - Gdy bohaterowie stają w obliczu nagłych, szokujących, wojennych lub dramatycznych wieści, a seiyū pyta o autentyczność faktów:
+        * HONTŌ NA NO KA? (本当なのか) / HONTŌ NI? (本当に) -> Wstrząs, powątpiewanie, weryfikacja plotki przez żołnierza/dorosłego:
+          -> POPRAWNIE: „To pewne?!”, „Jesteś pewna?!”, „Więc to prawda...?!” / „Na pewno?!”, „Prawdę mówisz?!”.
+          -> KARDYNALNY BŁĄD [X]: „To prawda?”, „Czy to prawda?” (bezduszna, urzędowa kalka z angielskiego 'Is that true?' - brzmi jak ankieter weryfikujący zeznanie, zabijając cały dramatyzm sceny!).
+        * TASHIKA NA NO KA? (確かなのか) / TASHIKA NAN DA NA? (確かなんだな) -> Weryfikacja meldunku/wywiadu wojskowego:
+          -> POPRAWNIE: „To potwierdzona informacja?!”, „Masz pewność?!”, „To pewne wieści?!”. KATEGORYCZNY ZAKAZ: „Czy to pewne?”.
+        * MAKOTO KA? (真か / 誠か) / MAKOTO NI? -> Rejestr historyczny, samurajski, feudalny (jidaigeki):
+          -> POPRAWNIE: „Prawda li to?!”, „Prawdę powiadasz?!”, „Prawdę rzeczesz?!”, „Czyżby to prawda?!”.
+        * MAJI KA YO? (マジかよ) / MAJI NANO KA? -> Slang młodzieżowy i potoczny:
+          -> POPRAWNIE: „Bez jaj?!”, „Serio?!”, „Chyba żartujesz?!”, „Nie pierdol?!”. KATEGORYCZNY ZAKAZ: „Poważnie?”.
+        * USO DAROU? (嘘だろう) / USO DA! -> Odruchowe wyparcie psychologiczne wobec tragedii/straty:
+          -> POPRAWNIE: „Chyba żartujesz?!”, „To nie może być prawda!”, „Niemożliwe!”, „Nie gadaj!”. KARDYNALNY ZAKAZ dosłownego: „To kłamstwo!” na wieść o czyjejś śmierci.
+        * MASAKA HONTŌ NI...? (まさか本当に…) -> Lęk przed potwierdzeniem najgorszego koszmaru:
+          -> POPRAWNIE: „Nie mów, że to prawda...!”, „A więc to nie były tylko plotki...?!”.
+        * DOU IU KOTO DA?! (どういうことだ) / ITTAI DOU IU KOTO DA?! -> Szok i żądanie wyjaśnień:
+          -> POPRAWNIE: „Co to ma znaczyć?!”, „O czym ty w ogóle mówisz?!”, „Co tam się dzieje?!”. KARDYNALNY ZAKAZ: „Co to za sprawa?”.
+        * KI NO SEI KA...? (気のせいか) -> Kwestionowanie własnych zmysłów:
+          -> POPRAWNIE: „Przywidziało mi się...?”, „Tylko mi się zdawało...”, „Zwid...”. KARDYNALNY ZAKAZ: „Wina mojego umysłu”.
+
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -2050,6 +2071,7 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
       * "[Filar CXLV - Ambiguity Resolution] Rozwikłano zaimek 'it' na kadrze wideo jako 'miecz' (eliminacja zgadywania)"
       * "[Filar CXLVI - Conversational Volley] 'Oszalałeś?' -> 'A żebyś wiedział!' (błyskotliwa riposta zamiast 'nie oszalałem')"
       * "[Filar CXLVII - Matryca Modalna] 'Tabun' -> 'Chyba...' (domysł, kategoryczny zakaz 'na pewno nie')"
+      * "[Filar CXLVIII - Szok i Wiarygodność] 'Hontō na no ka?' -> 'To pewne?!' (weryfikacja plotki wojennej, ZAKAZ urzędowego 'To prawda?')"
 
 {BELCZYK_AVT_MASTER_CANON}
 
@@ -2738,6 +2760,15 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
             "Precyzyjnie dopasuj stopień pewności ze słuchem seiyū! Tabun/Osoraku -> 'Chyba' / 'Pewnie' / 'Raczej' (KATEGORYCZNY ZAKAZ: 'Na pewno / Na pewno nie'!). "
             "Yappari -> 'Wiedziałem!' / 'A jednak!' (ZAKAZ: 'Po wszystkim'). Sasuga -> 'Jak przystało na mistrza!' / 'Bez przesady!'. "
             "Douse -> 'I tak nic z tego...'. Masaka -> 'Niemożliwe!' / 'Chyba kpisz!'. Shouganai -> 'Trudno...' / 'Nic nie poradzimy...' (ZAKAZ: 'Nie da się pomóc')."
+        )
+
+    # 88. Pragmatyka Pytań o Wiarygodność i Szok Poznawczy (Filar CXLVIII)
+    veracity_tokens = ["honto", "tashika", "makoto", "is that true", "really", "for real", "true?", "本当", "確か", "誠"]
+    if any(any(tok in str(item.get("audio_jp", "")).lower() for tok in veracity_tokens) for item in batch_items) or any(any(w in str(item.get("en", "")).lower() for w in ["is that true", "really?", "for real?", "is it true"]) for item in batch_items):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CXLVIII - Pragmatyka Pytań o Wiarygodność i Szok Poznawczy (Veracity Matrix)]: "
+            "KATEGORYCZNY ZAKAZ urzędowego 'To prawda?' w scenach grozy, wojny i szoku! "
+            "Dopasuj żywą ludzką reakcję: 'To pewne?!' / 'Jesteś pewna?!' / 'Więc to prawda...?!' / 'Prawdę mówisz?!' / 'Serio?!'."
         )
 
     if not focused_pillars:

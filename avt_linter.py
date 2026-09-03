@@ -64,6 +64,7 @@ class AVTLinter:
         (r"\b[Oo]ho,?\s+spokojnie(?:\.{1,3}|\b)", "Ło, ło, ło...", "Filar XVIII - Eliminacja Kalki Somatycznej 'Whoa, easy' (Ottotto)"),
         (r"\b[Tt]o\s+jest\s+gorące(?:\!|\b)", "Parzy!", "Filar XVIII - Eliminacja Opisu Bólu (Acchichi)"),
         (r"\b[Tt]o\s+boli(?:\!|\b)", "Ała!", "Filar XVIII - Eliminacja Opisu Bólu (Itta)"),
+        (r"^\s*[Tt]o\s+prawda\?\s*$", "To pewne?", "Filar CXLVIII - Eliminacja Urzędowego Pytania 'To prawda?'"),
         (r"\b[Nn]ic nie da się zrobić\b", "Trudno", "Filar XXI - Eliminacja Kalki 'Shouganai' (ANSI Standard)"),
         (r"\b[Dd]zięki za zmęczenie\b", "Dobra robota", "Filar XXI - Eliminacja Kalki 'Otsukaresama' (ANSI Standard)"),
         (r"\b[Dd]zięki za dobrą pracę\b", "Dobra robota", "Filar XXI - Eliminacja Kalki 'Otsukaresama' (ANSI Standard)"),

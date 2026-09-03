@@ -177,6 +177,7 @@ def test_rules_and_prompts():
     assert "FILAR CXLV:" in sys_prompt
     assert "FILAR CXLVI:" in sys_prompt
     assert "FILAR CXLVII:" in sys_prompt
+    assert "FILAR CXLVIII:" in sys_prompt
     assert "FILAR CXXI" in ver_prompt
     assert "FILAR CXXV" in ver_prompt
     assert "FILAR CXXX" in ver_prompt
@@ -197,7 +198,8 @@ def test_rules_and_prompts():
     assert "FILAR CXLV" in ver_prompt or "CXLV" in ver_prompt
     assert "FILAR CXLVI" in ver_prompt or "CXLVI" in ver_prompt
     assert "FILAR CXLVII" in ver_prompt or "CXLVII" in ver_prompt
-    print(" -> PASSED: Kompletny Zunifikowany Kanon 147 Filarów AVT (Filary I – CXLVII) jest aktywny w obu fazach tłumaczenia.")
+    assert "FILAR CXLVIII" in ver_prompt or "CXLVIII" in ver_prompt
+    print(" -> PASSED: Kompletny Zunifikowany Kanon 148 Filarów AVT (Filary I – CXLVIII) jest aktywny w obu fazach tłumaczenia.")
 
 def test_pydantic_schemas():
     print("[TEST 2/5] Weryfikacja schematów Pydantic i Detektora Rejestru Pragmatycznego...")
@@ -1145,6 +1147,11 @@ def test_dynamic_rule_dispatcher():
     focused_som = get_focused_rules_for_batch(batch_som)
     assert "XVIII" in focused_som
 
+    # 16. Test paczki z pytaniami o wiarygodność (Filar CXLVIII)
+    batch_ver = [{"en": "Is that true?", "audio_jp": "本当なのか [Honto nano ka]"}]
+    focused_ver = get_focused_rules_for_batch(batch_ver)
+    assert "CXLVIII" in focused_ver
+
     print(" -> PASSED: Dyspozytor reguł precyzyjnie aktywuje właściwe filary AVT.")
 
 def test_fuzzy_and_dynamic_avt_linter():
@@ -1176,6 +1183,12 @@ def test_fuzzy_and_dynamic_avt_linter():
     assert "Parzy!" in t_s2
     t_s3, _ = AVTLinter.lint_and_fix_line("To boli!")
     assert "Ała!" in t_s3
+
+    # 2d. Test eliminacji urzędowego pytania o wiarygodność (Filar CXLVIII)
+    t_v1, _ = AVTLinter.lint_and_fix_line("To prawda?")
+    assert "To pewne?" in t_v1
+    t_v2, _ = AVTLinter.lint_and_fix_line("To prawda.")
+    assert t_v2 == "To prawda."
 
     # 3. Test dynamicznych reguł użytkownika w linterze
     user_rules = [
@@ -1736,6 +1749,14 @@ def test_translator_logger_and_sign_detector():
         en_text="It hurts!"
     )
     assert alert_itta is not None and "Itta" in alert_itta
+
+    # Test Filar CXLVIII: Trigger 46 Veracity Inquiries (Honto nano ka vs To prawda?)
+    alert_honto = translator.detect_audio_discrepancy(
+        jp_text="本当なのか [Honto nano ka]",
+        pl_text="To prawda?",
+        en_text="Is that true?"
+    )
+    assert alert_honto is not None and "Hontō na no ka" in alert_honto and "CXLVIII" in alert_honto
 
     # Test Flashback 1:1 memory formatting
     from memory import format_translation_memory_for_prompt
