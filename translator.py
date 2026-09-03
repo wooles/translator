@@ -1279,6 +1279,7 @@ class MultimodalTranslator:
         focused_rules_str = get_focused_rules_for_batch([
             {
                 "en": item[2],
+                "audio_jp": whisper_transcriptions.get(item[0], "") if whisper_transcriptions else "",
                 "is_sign": detect_event_visual_type(item[1], item[3])["is_sign"],
                 "speaker_gender": self.character_registry.get(item[1].name)
             }
@@ -1447,13 +1448,14 @@ class MultimodalTranslator:
             stagger_sec = (b_idx % max(1, self.concurrent_batches)) * 0.35
             if stagger_sec > 0:
                 time.sleep(stagger_sec)
+            phase2_focused_rules = get_focused_rules_for_batch(pass1_items)
             refined_lines: List[RefinedLine] = self.verifier.verify_batch(
                 batch_items=pass1_items,
                 scene_summary=scene_desc or "",
                 episode_profile_str=episode_profile_str,
                 user_feedback_str=user_feedback_str,
                 glossary_str=glossary_str,
-                focused_rules_str=focused_rules_str
+                focused_rules_str=phase2_focused_rules
             )
             refined_dict = {r.id: sanitize_sub_text(r.refined_pl) for r in refined_lines}
             refined_region_dict = {r.id: r.screen_region for r in refined_lines if getattr(r, 'screen_region', None)}

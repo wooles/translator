@@ -42,7 +42,7 @@ class DialogueVerifier:
             self.client_pool = client
         else:
             from client_factory import MultiKeyClientPool
-            timeout_sec = float(os.getenv("GEMINI_HTTP_TIMEOUT_SEC", "90.0"))
+            timeout_sec = max(150.0, float(os.getenv("GEMINI_HTTP_TIMEOUT_SEC", "90.0")))
             self.client_pool = MultiKeyClientPool(raw_keys=os.getenv("GEMINI_API_KEY"), timeout_sec=timeout_sec)
         self.model = model
         self.keep_honorifics = keep_honorifics
@@ -79,6 +79,7 @@ class DialogueVerifier:
         prompt_lines = []
         prompt_lines.append("Zredaguj poniższe kwestie dialogowe. BEZWZGLĘDNIE wyeliminuj dosłowne tłumaczenie 1 do 1, sztuczne konstrukcje i kalki.")
         prompt_lines.append("Zastąp drewniane sformułowania żywym, potoczystym językiem polskim mówionym (tak jak w profesjonalnym dubbingu / u polskich nastolatków):")
+        prompt_lines.append("WYKORZYSTAJ CZAS NA ZASTANOWIENIE (Thinking / CoT): Przed zwróceniem każdego wersu przeprowadź w myślach rygorystyczny audyt każdego zdania pod kątem Kanonu 152 Filarów AVT (w tym: Filar IV - Szyk i Kalki, Filar XVIII - Paralingwistyka i Kakegoe, Filar CXLIV - Prymat Audio Seiyū, Filar CXLVI - Ping-Pong Dialogowy, Filar CXLVII - Modalność, Filar CXLVIII - Wiarygodność, Filary CXLIX-CLII - Haragei, Hora, Aisatsu i Okrzyki Bojowe). Zsynchronizuj rejestr z odsłuchem japońskim Whisper i fizycznym tonem głosu seiyū [Ton: ...]!")
         prompt_lines.append("W polu 'changes_made' dla KAŻDEJ poprawionej kwestii podaj DOKŁADNE uzasadnienie i numer Filaru AVT (np. '[Filar IV - Szyk Zdania] Usunięto kalkę angielską'). Jeśli kwestia nie wymagała poprawek, wpisz null.")
         
         if focused_rules_str:
@@ -145,33 +146,35 @@ class DialogueVerifier:
         # Determine adaptive CoT thinking budget based on batch complexity (Elastic Multi-Tier Budget)
         has_song = any(item.get("is_song") for item in batch_items)
         has_audio_alert = any(item.get("audio_alert") for item in batch_items)
+        has_ambiguity = any(item.get("ambiguity_note") for item in batch_items)
         has_pragmatic_reg = any(item.get("pragmatic_register") for item in batch_items)
         has_condensation = any(item.get("condensation_directive") for item in batch_items)
         has_long_dialogue = any(len(item.get("en", "").split()) > 10 for item in batch_items)
+        has_relation = any(item.get("relation_tag") for item in batch_items)
 
         # Separate adaptive CoT tiers for Pro Model ($12/1M output rate) vs Flash Model ($3.75/1M output rate)
         if "pro" in self.model.lower():
             # PRO MODEL DEDICATED TIERS (Level 4: High Literary Depth without token bloating)
-            # Tier 1 (Pro): Piosenki OP/ED, gry słowne, zawiłe metafory, alarmy Whisper
-            if has_song or has_audio_alert:
+            # Tier 1 (Pro): Piosenki OP/ED, gry słowne, zawiłe metafory, alarmy Whisper, wątpliwości Fazy 1
+            if has_song or has_audio_alert or has_ambiguity:
                 effective_budget = 2048
-            # Tier 2 (Pro): Rejestry militarne, stylizacja feudalna, kompresja, narady
-            elif has_pragmatic_reg or has_condensation or has_long_dialogue:
+            # Tier 2 (Pro): Rejestry militarne, stylizacja feudalna, kompresja, narady, ping-pong
+            elif has_pragmatic_reg or has_condensation or has_long_dialogue or has_relation:
+                effective_budget = 1536
+            # Tier 3 (Pro): Proste, krótkie dialogi i okrzyki bojowe (1024 tokeny CoT)
+            else:
                 effective_budget = 1024
-            # Tier 3 (Pro): Proste, krótkie dialogi i okrzyki bojowe
-            else:
-                effective_budget = 512
         else:
-            # FLASH MODEL TIERS (Level 3: Full Deep CoT up to 6144 unchanged)
-            # Tier 1: Piosenki OP/ED (Barańczak), kalambury fonetyczne i alarmy rozbieżności audio
-            if has_song or has_audio_alert:
+            # FLASH MODEL TIERS (Level 3: Full Deep CoT up to 6144)
+            # Tier 1: Piosenki OP/ED (Barańczak), kalambury fonetyczne, alarmy rozbieżności audio, wątpliwości F1
+            if has_song or has_audio_alert or has_ambiguity:
                 effective_budget = max(4096, min(self.thinking_budget, 6144))
-            # Tier 2: Rejestry feudalne/dworskie, kompresja czasowa i długie narady militarne
-            elif has_pragmatic_reg or has_condensation or has_long_dialogue:
+            # Tier 2: Rejestry feudalne/dworskie, kompresja czasowa, długie narady militarne, ping-pong
+            elif has_pragmatic_reg or has_condensation or has_long_dialogue or has_relation:
                 effective_budget = max(2048, min(self.thinking_budget, 3072))
-            # Tier 3: Standardowy, żywy dialog codzienny
+            # Tier 3: Standardowy, żywy dialog codzienny (2048 tokenów CoT dla pełnego audytu 152 Filarów)
             else:
-                effective_budget = min(self.thinking_budget, 1280)
+                effective_budget = min(self.thinking_budget, 2048)
 
         while True:
             attempt += 1
@@ -182,7 +185,8 @@ class DialogueVerifier:
                     "response_mime_type": "application/json",
                     "response_schema": RefinedBatchResponse,
                 }
-                if "3.7" in self.model.lower() or "pro" in self.model.lower() or "2.5-pro" in self.model.lower():
+                is_reasoning_capable = any(k in self.model.lower() for k in ["2.5", "3.5", "3.7", "3.8", "4.", "pro", "thinking", "reasoning"]) and "lite" not in self.model.lower()
+                if is_reasoning_capable:
                     gen_config_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=effective_budget)
 
                 import concurrent.futures
@@ -211,10 +215,10 @@ class DialogueVerifier:
                         config=cfg
                     )
 
-                # Direct generation using thread-safe multi-key rotation and token bucket pacing with hard 95s watchdog
+                # Direct generation using thread-safe multi-key rotation and token bucket pacing with hard 150s watchdog
                 with concurrent.futures.ThreadPoolExecutor(max_workers=1) as ex:
                     fut = ex.submit(_single_generate)
-                    response = fut.result(timeout=95.0)
+                    response = fut.result(timeout=150.0)
 
                 if hasattr(response, "usage_metadata") and response.usage_metadata:
                     um = response.usage_metadata

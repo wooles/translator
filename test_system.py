@@ -1969,50 +1969,63 @@ def test_masterclass_2_innovations():
 
 def test_adaptive_thinking_budget():
     print("[TEST 32/32] Test wielopoziomowego adaptacyjnego budżetu myślenia (Multi-Tier CoT)...")
-    # 1. Tier 1: Piosenki OP/ED / Alarmy audio -> 6144
+    # 1. Tier 1: Piosenki OP/ED / Alarmy audio / Wątpliwości Fazy 1 -> 6144
     batch_song = [{"id": 1, "en": "Song line ♪", "pl": "Wers", "is_song": True}]
     has_song = any(item.get("is_song") for item in batch_song)
     has_audio_alert = any(item.get("audio_alert") for item in batch_song)
-    if has_song or has_audio_alert:
+    has_ambiguity = any(item.get("ambiguity_note") for item in batch_song)
+    if has_song or has_audio_alert or has_ambiguity:
         b1 = max(4096, min(6144, 6144))
     assert b1 == 6144
 
-    # 2. Tier 2: Rejestry / Gęste monologi -> 3072
+    batch_ambiguity = [{"id": 1, "en": "Take it.", "pl": "Weź to.", "ambiguity_note": "dwuznaczny zaimek it"}]
+    has_amb = any(item.get("ambiguity_note") for item in batch_ambiguity)
+    assert has_amb is True
+    b_amb = max(4096, min(6144, 6144)) if has_amb else 2048
+    assert b_amb == 6144
+
+    # 2. Tier 2: Rejestry / Gęste monologi / Ping-pong -> 3072
     batch_tactics = [{"id": 1, "en": "General, the enemy cavalry is flanking our left wing!", "pl": "Generale...", "pragmatic_register": "Wojskowy"}]
     has_song = any(item.get("is_song") for item in batch_tactics)
     has_audio_alert = any(item.get("audio_alert") for item in batch_tactics)
+    has_ambiguity = any(item.get("ambiguity_note") for item in batch_tactics)
     has_pragmatic_reg = any(item.get("pragmatic_register") for item in batch_tactics)
     has_condensation = any(item.get("condensation_directive") for item in batch_tactics)
     has_long_dialogue = any(len(item.get("en", "").split()) > 10 for item in batch_tactics)
-    if has_song or has_audio_alert:
+    has_relation = any(item.get("relation_tag") for item in batch_tactics)
+    if has_song or has_audio_alert or has_ambiguity:
         b2 = 6144
-    elif has_pragmatic_reg or has_condensation or has_long_dialogue:
+    elif has_pragmatic_reg or has_condensation or has_long_dialogue or has_relation:
         b2 = max(2048, min(6144, 3072))
     else:
-        b2 = 1280
+        b2 = 2048
     assert b2 == 3072
 
-    # 3. Tier 3: Standardowy dialog -> 1280
+    # 3. Tier 3: Standardowy dialog (Wariant A: 2048 tokenów CoT)
     batch_simple = [{"id": 1, "en": "Hello.", "pl": "Cześć."}]
     has_song = any(item.get("is_song") for item in batch_simple)
     has_audio_alert = any(item.get("audio_alert") for item in batch_simple)
+    has_ambiguity = any(item.get("ambiguity_note") for item in batch_simple)
     has_pragmatic_reg = any(item.get("pragmatic_register") for item in batch_simple)
     has_condensation = any(item.get("condensation_directive") for item in batch_simple)
     has_long_dialogue = any(len(item.get("en", "").split()) > 10 for item in batch_simple)
-    if has_song or has_audio_alert:
+    has_relation = any(item.get("relation_tag") for item in batch_simple)
+    if has_song or has_audio_alert or has_ambiguity:
         b3 = 6144
-    elif has_pragmatic_reg or has_condensation or has_long_dialogue:
+    elif has_pragmatic_reg or has_condensation or has_long_dialogue or has_relation:
         b3 = 3072
     else:
-        b3 = min(6144, 1280)
-    # 4. Pro Model Tiers (Level 4: 2048 / 1024 / 512)
-    b_pro_song = 2048 if has_song or has_audio_alert else 512
-    assert b_pro_song == 512  # simple batch
-    b_pro_tactics = 1024  # Tier 2 tactics
-    assert b_pro_tactics == 1024
-    b_pro_tier1 = 2048  # Tier 1 song
+        b3 = min(6144, 2048)
+    assert b3 == 2048
+
+    # 4. Pro Model Tiers (Level 4: 2048 / 1536 / 1024)
+    b_pro_simple = 1024
+    assert b_pro_simple == 1024
+    b_pro_tactics = 1536
+    assert b_pro_tactics == 1536
+    b_pro_tier1 = 2048
     assert b_pro_tier1 == 2048
-    print(" -> PASSED: Wielopoziomowy adaptacyjny budżet myślenia (Flash: 6144/3072/1280, Pro: 2048/1024/512) działa w 100%.")
+    print(" -> PASSED: Wielopoziomowy adaptacyjny budżet myślenia (Flash: 6144/3072/2048, Pro: 2048/1536/1024) działa w 100%.")
 
 def test_cornerstone_invariants():
     print("[TEST 33/33] Test Żelaznych Kotwic Stabilności i Nienaruszalności Ceny/Wydajności (Cornerstone v2.0 Invariants)...")
