@@ -81,7 +81,7 @@ class DialogueVerifier:
         prompt_lines = []
         prompt_lines.append("Zredaguj poniższe kwestie dialogowe. BEZWZGLĘDNIE wyeliminuj dosłowne tłumaczenie 1 do 1, sztuczne konstrukcje i kalki.")
         prompt_lines.append("Zastąp drewniane sformułowania żywym, potoczystym językiem polskim mówionym (tak jak w profesjonalnym dubbingu / u polskich nastolatków):")
-        prompt_lines.append("WYKORZYSTAJ CZAS NA ZASTANOWIENIE (Thinking / CoT): Przed zwróceniem każdego wersu przeprowadź w myślach rygorystyczny audyt każdego zdania pod kątem Kanonu 152 Filarów AVT (w tym: Filar IV - Szyk i Kalki, Filar XVIII - Paralingwistyka i Kakegoe, Filar CXLIV - Prymat Audio Seiyū, Filar CXLVI - Ping-Pong Dialogowy, Filar CXLVII - Modalność, Filar CXLVIII - Wiarygodność, Filary CXLIX-CLII - Haragei, Hora, Aisatsu i Okrzyki Bojowe). Zsynchronizuj rejestr z odsłuchem japońskim Whisper i fizycznym tonem głosu seiyū [Ton: ...]!")
+        prompt_lines.append("WYKORZYSTAJ CZAS NA ZASTANOWIENIE (Thinking / CoT): Przed zwróceniem każdego wersu przeprowadź w myślach rygorystyczny audyt każdego zdania pod kątem Kanonu 153 Filarów AVT (w tym: Filar IV - Szyk i Kalki, Filar XVIII - Paralingwistyka i Kakegoe, Filar CXLIV - Prymat Audio Seiyū, Filar CXLVI - Ping-Pong Dialogowy, Filar CXLVII - Modalność, Filar CXLVIII - Wiarygodność, Filary CXLIX-CLIII - Haragei, Hora, Aisatsu, Okrzyki Bojowe i Wielka Matryca Kandōshi: Yare yare, Mendokusai, Oi oi, Maa maa, Shouganai). Zsynchronizuj rejestr z odsłuchem japońskim Whisper i fizycznym tonem głosu seiyū [Ton: ...]!")
         prompt_lines.append("W polu 'changes_made' dla KAŻDEJ poprawionej kwestii podaj DOKŁADNE uzasadnienie i numer Filaru AVT (np. '[Filar IV - Szyk Zdania] Usunięto kalkę angielską'). Jeśli kwestia nie wymagała poprawek, wpisz null.")
         
         if focused_rules_str:
@@ -178,7 +178,7 @@ class DialogueVerifier:
             # Tier 2: Rejestry feudalne/dworskie, kompresja czasowa, długie narady militarne, ping-pong
             elif has_pragmatic_reg or has_condensation or has_long_dialogue or has_relation:
                 effective_budget = max(2048, min(self.thinking_budget, 3072))
-            # Tier 3: Standardowy, żywy dialog codzienny (2048 tokenów CoT dla pełnego audytu 152 Filarów)
+            # Tier 3: Standardowy, żywy dialog codzienny (2048 tokenów CoT dla pełnego audytu 153 Filarów)
             else:
                 effective_budget = min(self.thinking_budget, 2048)
 
@@ -191,7 +191,7 @@ class DialogueVerifier:
                     "response_mime_type": "application/json",
                     "response_schema": RefinedBatchResponse,
                 }
-                is_reasoning_capable = any(k in self.model.lower() for k in ["2.5", "3.5", "3.7", "3.8", "4.", "pro", "thinking", "reasoning"]) and "lite" not in self.model.lower()
+                is_reasoning_capable = any(k in self.model.lower() for k in ["2.", "3.", "4.", "5.", "pro", "thinking", "reasoning"]) and "lite" not in self.model.lower()
                 if is_reasoning_capable:
                     gen_config_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=effective_budget)
 

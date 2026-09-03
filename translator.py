@@ -510,6 +510,46 @@ def detect_audio_discrepancy(jp_text: str, pl_text: str, en_text: str, prosody: 
         if any(w in pl_lower for w in ["ocal mnie", "uratuj mnie"]):
             return "W audio seiyuu woła 'Tasukete!' w zagrożeniu życia -> KATEGORYCZNY ZAKAZ teatralnego 'Ocal mnie!'. Użyj dynamicznego: 'Ratunku!' / 'Pomocy!' / 'Niech ktoś pomoże!' (Filar CLII)."
 
+    # 51. Yare yare & Mendokusai & Shouganai (Westchnienia Znużenia i Ciężaru - Filar CLIII)
+    yare_keys = ["yare yare", "yareyare", "yare-yare", "yare yare daze", "yareyaredaze"]
+    if any(k in clean_jp for k in ["やれやれ", "やれやれだぜ"]) or any(k in rom_lower for k in yare_keys):
+        if any(w in pl_lower for w in ["dobre nieszczęście", "dobra żałość", "daj mi przerwę", "no cóż, no cóż", "o drogi", "dobre niebiosa"]):
+            return "W audio seiyuu wzdycha 'Yare yare' -> Zastąp kalkę angielską naturalną polszczyzną: 'Ja nie mogę...' / 'Litości...' / 'Ręce opadają...' / 'Uff...' (Filar CLIII)."
+
+    if any(k in clean_jp for k in ["めんどくさい", "面倒"]) or any(k in rom_lower for k in ["mendokusai", "mendou", "mendou da"]):
+        if any(w in pl_lower for w in ["co za ból", "jaki ból", "to jest ból", "jest uciążliwe"]):
+            return "W audio seiyuu mówi 'Mendokusai' -> Kategoryczny zakaz kalki 'Co za ból!'. Użyj: 'Ale mi się nie chce...' / 'Co za męczarnia...' / 'Dajcie mi spokój...' (Filar CLIII)."
+
+    if any(k in clean_jp for k in ["しょうがない", "仕方がない", "しょうがねえ"]) or any(k in rom_lower for k in ["shou ga nai", "shouganai", "shikata ga nai", "shouganee"]):
+        if any(w in pl_lower for w in ["nie można temu pomóc", "nie da się temu pomóc", "tak po prostu jest"]):
+            return "W audio seiyuu mówi 'Shou ga nai' -> Zastąp kalkę 'Nie można temu pomóc' naturalnym: 'Trudno...' / 'Nic na to nie poradzimy' / 'Nie mamy wyboru' (Filar CLIII)."
+
+    # 52. Oi oi & Maa maa & Nante kotta & Iikagen ni shiro (Szok, Pacyfikowanie i Furia - Filar CLIII)
+    if any(k in clean_jp for k in ["おいおい", "おいおいおい"]) or any(k in rom_lower for k in ["oi oi", "oioi"]):
+        if any(w in pl_lower for w in ["hej hej", "hej, hej"]):
+            return "W audio seiyuu reaguje 'Oi, oi...' na absurd rozmówcy -> Zamień wołające 'Hej, hej!' na mitygujące: 'Ej, zaraz, zaraz...' / 'Ej, chwila...' / 'Ej, bez przesady!' (Filar CLIII)."
+
+    if any(k in clean_jp for k in ["まあまあ"]) or any(k in rom_lower for k in ["maa maa", "maamaa"]):
+        if any(w in pl_lower for w in ["cóż, cóż", "cóż cóż", "tak sobie"]):
+            return "W audio seiyuu ucisza spór 'Maa, maa...' -> Zamień kalkę na pacyfikujące: 'Spokojnie, no już...' / 'Bez nerwów...' / 'Dajcie spokój...' (Filar CLIII)."
+
+    if any(k in clean_jp for k in ["なんてこった", "なんて事だ"]) or any(k in rom_lower for k in ["nante kotta", "nante koto da"]):
+        if any(w in pl_lower for w in ["co za rzecz", "co to za sprawa", "jaka to rzecz"]):
+            return "W audio seiyuu mówi 'Nante kotta!' -> Zastąp kalkę naturalnym wykrzyknikiem pecha: 'Niech to szlag!' / 'Co za pech!' / 'Jasny gwint!' (Filar CLIII)."
+
+    if any(k in clean_jp for k in ["いい加減にしろ", "いい加減にしなさい"]) or any(k in rom_lower for k in ["iikagen ni shiro", "iikagen"]):
+        if any(w in pl_lower for w in ["zrób to z umiarem", "bądź umiarkowany", "umiarkowanie"]):
+            return "W audio seiyuu krzyczy 'Iikagen ni shiro!' -> Zastąp absurdalną kalkę gniewnym: 'Przestań wreszcie!' / 'Miarka się przebrała!' / 'Dość tego!' (Filar CLIII)."
+
+    # 53. Yokatta & Yatta! (Ulga i Triumf - Filar CLIII)
+    if any(k in clean_jp for k in ["よかった", "良かった"]) or any(k in rom_lower for k in ["yokatta", "yokattane", "yokatta na"]):
+        if pl_lower.strip() in ["to było dobre.", "to było dobre!", "było dobrze.", "było dobrze!"] or pl_lower.startswith("to było dobre"):
+            return "W audio seiyuu wzdycha z ulgą 'Yokatta...' -> Kategoryczny zakaz kalki 'To było dobre!'. Użyj: 'Całe szczęście...' / 'Kamień z serca...' / 'Uff, jak dobrze...' (Filar CLIII)."
+
+    if any(k in clean_jp for k in ["やった", "やったー", "やったぜ", "やったぞ"]) or any(k in rom_lower for k in ["yatta", "yattaa", "yattaze", "yattazo"]):
+        if pl_lower.strip() in ["zrobiłem to.", "zrobiłem to!", "zrobiłam to.", "zrobiłam to!"] and not any(w in en_text.lower() for w in ["i made it happen", "i manufactured"]):
+            return "W audio seiyuu krzyczy z radości 'Yatta!' (sukces/zwycięstwo) -> Zastąp sztywne 'Zrobiłem to!' naturalnym: 'Udało się!' / 'Mamy to!' / 'Wyszło!' / 'Jest!' (Filar CLIII)."
+
     return None
 
 def detect_japanese_pragmatic_register(jp_text: str, en_text: str = "") -> Optional[str]:

@@ -1285,6 +1285,62 @@ FILAR CLII: DYSCYPLINA OKRZYKÓW BOJOWYCH I OSTRZEŻEŃ ODDZIAŁOWYCH (ABUNAI & 
           -> POPRAWNIE: „Ratunku!”, „Pomocy!”, „Niech ktoś pomoże!”.
           -> KARDYNALNY BŁĄD [X]: „Ocal mnie!” (teatralny archaizm zabijający realizm pola walki).
 
+FILAR CLIII: WIELKA MATRYCA AFEKTYWNA JAPOŃSKICH KANDŌSHI (WESTCHNIENIA, REZYGNACJA, WYKRZYKNIKI I REAKCJE SYTUACYJNE)
+   Japońskie wykrzykniki modalne i afektywne (Kandōshi) niosą potężny ładunek emocjonalno-sytuacyjny, którego BEZWZGLĘDNIE NIE WOLNO tłumaczyć dosłownie ani kalkować z angielskich fansubów!
+   
+   1. GRUPA I: ZNUŻENIE, BEZRADNOŚĆ I CIĘŻAR PSYCHICZNY (SIGHS OF RESIGNATION):
+      * YARE YARE / YARE YARE DAZE (やれやれ / やれやれだぜ) -> W zależności od intonacji i mimiki:
+        - Cynizm / zmęczenie głupotą (niski tembr, wydech): „Ja nie mogę...”, „Litości...”, „Ręce opadają...”, „Oszaleć można...”, „Dajcie mi święty spokój...”.
+        - Ulga po zażegnanym kryzysie (rozluźnienie): „Uff...”, „No, całe szczęście...”, „Nareszcie z głowy...”, „Mało brakowało...”.
+        - Pobłażliwość mentora/starszego (uśmiech): „I co ja z wami mam...”, „O rany, rany...”, „Nigdy się nie zmienicie...”.
+        - Lekceważenie przeciwnika (drwina): „I to ma być wszystko?...”, „Doprawdy żałosne...”, „Błagam cię...”.
+        - KARDYNALNY BŁĄD [X]: „Dobre nieszczęście!”, „Daj mi przerwę”, „No cóż, no cóż”, „O drogi”.
+      * MENDOKUSAI / MENDOU DA NA (めんどくさい / 面倒だな) -> „Ale mi się nie chce...”, „Co za męczarnia...”, „Co za zawracanie głowy...”, „Rany, ale kłopot...”, „Dajcie mi spokój...”.
+        - KARDYNALNY BŁĄD [X]: „Co za ból!”, „To uciążliwe!”, „Jestem w kłopocie!”.
+      * SHOU GA NAI / SHIKATA GA NAI (しょうがない / 仕方がない) -> „Trudno...”, „Nic na to nie poradzimy”, „Nie mamy wyboru”, „Siła wyższa”, „Trudna rada”.
+        - KARDYNALNY BŁĄD [X]: „Nie można temu pomóc”, „Tak po prostu jest”.
+      * MATTAKU... / KORE DA KARA... (全く... / これだから...) -> „I jak tu z nimi wytrzymać...”, „Z wami to zawsze...”, „No szlag by to...”, „Doprawdy...”.
+        - KARDYNALNY BŁĄD [X]: „Całkowicie...”, „Z tego powodu...”.
+      * IYA NI NARU NA (嫌になっちゃう / 嫌になるな) -> „Rzygać się chce...”, „Odechciewa się żyć...”, „Mam serdecznie dość...”.
+
+   2. GRUPA II: SZOK, NIEDOWIERZANIE I ABSURD (SHOCK & REALITY CHECK):
+      * OI, OI... / OI OI OI! (おいおい) -> Reakcja na czyjś absurd lub głupotę: „Ej, zaraz, zaraz...”, „Ej, chwila...”, „Ej, no bez przesady!”, „Czekaj no!”.
+        - KARDYNALNY BŁĄD [X]: „Hej, hej!”, „Hej ty!” (gdy postać nie woła, lecz studzi rozmówcę).
+      * MASAKA / MASAKA NA... (まさか) -> „Niemożliwe...”, „To nie może być prawda...”, „Chyba żartujesz...”, „To jakiś żart...”.
+        - KARDYNALNY BŁĄD [X]: „Nie ma mowy” (gdy postać nie odmawia, tylko nie wierzy własnym oczom).
+      * USO! / USO DESHO? / USO DARO (嘘 / 嘘でしょ) -> „Nie wierzę!”, „Żartujesz?!”, „Serio?!”, „Bez jaj!”.
+        - KARDYNALNY BŁĄD [X]: „Kłamstwo!”, „Kłamiesz!” (w obliczu szoku/potwora/wygranej).
+      * MAJI DE? / MAJI KA YO! (マジで？ / マジかよ！) -> „Serio?!”, „Poważnie?!”, „Nie gadaj!”, „Co ty nie powiesz?!”.
+      * NANTE KOTTA! (なんてこった！) -> „Niech to szlag!”, „Co za pech!”, „Jasny gwint!”, „Nie do wiary!”.
+        - KARDYNALNY BŁĄD [X]: „Co za rzecz!”, „Co to za sprawa!”.
+
+   3. GRUPA III: UCISZANIE, PACYFIKOWANIE I POPĘDZANIE (DE-ESCALATION & PACING):
+      * MAA, MAA... (まあまあ) -> Uciszanie kłótni / rozdzielanie rozmówców: „Spokojnie, no już...”, „Bez nerwów...”, „Dajcie spokój...”, „Zostawcie to...”.
+        - KARDYNALNY BŁĄD [X]: „Cóż, cóż”, „Tak sobie”.
+      * II KARA! / II KARA SAA (いいから！) -> Popędzanie / ucinanie dyskusji: „Nieważne, po prostu to zrób!”, „Nie gadaj, tylko chodź!”, „Rób, co mówię!”, „Mniejsza z tym!”.
+        - KARDYNALNY BŁĄD [X]: „Bo jest dobrze!”, „Jest w porządku!” (fatalna kalka słownikowa!).
+      * BETSU NI... (別に...) -> „Nic takiego...”, „Nieważne...”, „Wcale nie...”, „A bo co?...”.
+        - KARDYNALNY BŁĄD [X]: „Nieszczególnie...”, „Osobno...”.
+      * OCHI-TSUKE! / OCHI-TSUITE (落ち着け) -> „Spokojnie!”, „Oddychaj!”, „Opanuj się!”, „Tylko bez paniki!”.
+
+   4. GRUPA IV: ZNIECIERPLIWIENIE, ZBESZTANIE I FURIA (ANNOYANCE & REPRIMAND):
+      * MOU! / MOU II! (もう！ / もういい！) -> „No weź!”, „Daj spokój!”, „Mam dość!”, „Koniec tematu!”.
+        - KARDYNALNY BŁĄD [X]: „Już!”, „Już dobrze!”.
+      * KORA! / KORA KORA! (こら！) -> „Hejże!”, „Co wy wyprawiacie?!”, „Uspokójcie się!”, „Hola, hola!”.
+      * IIKAGEN NI SHIRO! (いい加減にしろ！) -> „Przestań wreszcie!”, „Miarka się przebrała!”, „Dość tego!”, „Koniec tej farsy!”.
+        - KARDYNALNY BŁĄD [X]: „Zrób to z umiarem!”.
+      * NANI YATTEN NO! / NANI SHITE N DA YO! (何やってんの！) -> „Odbiło ci?!”, „Co ty wyprawiasz?!”, „Zgłupiałeś?!”.
+        - KARDYNALNY BŁĄD [X]: „Co robisz?”.
+
+   5. GRUPA V: UZNANIE, ULGA I TRIUMF (RELIEF, CONFIRMATION & TRIUMPH):
+      * YOKATTA... (よかった...) -> „Całe szczęście...”, „Kamień z serca...”, „Uff, jak dobrze...”, „Dzięki Bogu...”.
+        - KARDYNALNY BŁĄD [X]: „To było dobre”, „Było dobrze”.
+      * YATTA! / YATTA ZE! (やった！ / やったぜ！) -> „Udało się!”, „Mamy to!”, „Wyszło!”, „Jest!”.
+        - KARDYNALNY BŁĄD [X]: „Zrobiłem to!” (sztywna kalka po wygranej).
+      * YAPPARI / YAHARI (やっぱり / やはり) -> „Wiedziałem...”, „A nie mówiłem?”, „Jednak...”, „Tak jak sądziłem...”.
+        - KARDYNALNY BŁĄD [X]: „Jak myślałem”, „Po wszystkim”.
+      * SASUGA NI (さすがに) -> „Nawet jak na niego, to lekka przesada...”, „Tym razem to już przesadził...”, „Wszystko ma swoje granice...”.
+
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -2120,6 +2176,7 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
       * "[Filar CL - Hora & Prosody] 'Hora hayaku!' (krzyk) -> 'Rusz się!' / 'No dalej!' (ZAKAZ 'Spójrz'); 'Hora miro' -> 'A nie mówiłem?!'"
       * "[Filar CLI - Sumimasen & Aisatsu] 'Sumimasen' za przysługę -> 'Dziękuję!'; 'Ittekimasu' -> 'Wychodzę!'"
       * "[Filar CLII - Okrzyki Bojowe] 'Abunai!' (krzyk) -> 'Padnij!' / 'Kryj się!' (ZAKAZ opisu 'Niebezpiecznie!')"
+      * "[Filar CLIII - Wielka Matryca Kandōshi] 'Yare yare daze' -> 'Litości...' (ZAKAZ 'Dobre nieszczęście!'); 'Mendokusai' -> 'Ale mi się nie chce...'; 'Oi oi' -> 'Ej, zaraz, zaraz!'; 'Maa maa' -> 'Spokojnie, no już...'; 'Yokatta' -> 'Całe szczęście...'"
 
 {BELCZYK_AVT_MASTER_CANON}
 
@@ -2853,6 +2910,29 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
             "• [SKUP SIĘ NA: FILAR CLII - Okrzyki Bojowe i Ostrzeżenia (Abunai & Tasukete)]: "
             "Gdy seiyū krzyczy w zagrożeniu życia: Abunai! -> natychmiastowy rozkaz taktyczny: 'Padnij!' / 'Kryj się!' / 'Uważaj!' / 'Z drogi!' (KATEGORYCZNY ZAKAZ opisu 'Niebezpiecznie!'). "
             "Tasukete! -> 'Ratunku!' / 'Pomocy!' (ZAKAZ 'Ocal mnie!')."
+        )
+
+    # 93. Wielka Matryca Afektywna Japońskich Kandōshi (Filar CLIII - Yare yare, Mendokusai, Oi oi, Maa maa, Shouganai, Yokatta)
+    kandoushi_tokens = [
+        "yare yare", "yareyare", "yare-yare", "mendokusai", "mendou", "shou ga nai", "shouganai", "shikata ga nai", "shikataganai",
+        "mattaku", "kore da kara", "iya ni naru", "oi oi", "oioi", "masaka", "uso", "maji", "nante kotta",
+        "maa maa", "maamaa", "ii kara", "betsu ni", "ochitsu", "mou ii", "kora", "iikagen", "nani yatten",
+        "yokatta", "yatta", "yappari", "yahari", "sasuga ni",
+        "やれやれ", "めんどくさい", "しょうがない", "仕方がない", "全く", "これだから", "おいおい", "まさか", "嘘", "マジ", "なんてこった",
+        "まあまあ", "いいから", "別に", "落ち着", "もういい", "こら", "いい加減", "よかった", "やった", "やっぱり", "さすがに"
+    ]
+    en_kandoushi_keys = [
+        "good grief", "give me a break", "what a pain", "what a drag", "can't be helped", "honestly", "seriously", "give it a rest",
+        "hold on", "whoa whoa", "no way", "you're lying", "for real", "holy cow", "now now", "calm down", "just do it",
+        "nothing really", "that's enough", "cut it out", "enough is enough", "what are you doing", "i'm glad", "we did it", "as i thought"
+    ]
+    if any(any(tok in str(item.get("audio_jp", "")).lower() for tok in kandoushi_tokens) for item in batch_items) or any(any(w in str(item.get("en", "")).lower() for w in en_kandoushi_keys) for item in batch_items):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CLIII - Wielka Matryca Kandōshi (Westchnienia i Emocje)]: "
+            "Kategoryczny zakaz dosłownych kalek! Yare yare -> 'Ja nie mogę...' / 'Litości...' / 'Ręce opadają...' / 'Uff...'; "
+            "Mendokusai -> 'Ale mi się nie chce...' / 'Co za męczarnia...'; Shou ga nai -> 'Trudno...' / 'Nic na to nie poradzimy'; "
+            "Oi oi -> 'Ej, zaraz, zaraz...' / 'Ej, bez przesady!'; Maa maa -> 'Spokojnie, no już...' / 'Bez nerwów...'; "
+            "Iikagen ni shiro -> 'Przestań wreszcie!' / 'Dość tego!'; Yokatta -> 'Całe szczęście...' (ZAKAZ 'To było dobre!'); Yatta -> 'Udało się!' / 'Mamy to!'."
         )
 
     if not focused_pillars:

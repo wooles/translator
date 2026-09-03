@@ -96,6 +96,13 @@ class AVTLinter:
         (r"^\s*[Pp]oza pytaniem([!\.\?]*)\s*$", r"Wykluczone\1", "Filar CXXXVII - Eliminacja Kalki 'Out of the question'"),
         (r"^\s*[Ww]eź swój czas([!\.\?]*)\s*$", r"Bez pośpiechu\1", "Filar CXXXVII - Eliminacja Kalki 'Take your time'"),
         
+        # Kandōshi & Affective Interjections (Filar CLIII)
+        (r"^\s*[Dd]obre nieszczęście([!\.\?]*)\s*$", r"Litości\1", "Filar CLIII - Eliminacja Kalki 'Good grief'"),
+        (r"^\s*[Dd]aj mi przerwę([!\.\?]*)\s*$", r"Daj mi spokój\1", "Filar CLIII - Eliminacja Kalki 'Give me a break'"),
+        (r"^\s*[Nn]ie można temu pomóc([!\.\?]*)\s*$", r"Nic na to nie poradzimy\1", "Filar CLIII - Eliminacja Kalki 'Can't be helped'"),
+        (r"^\s*[Nn]ie da się temu pomóc([!\.\?]*)\s*$", r"Nic na to nie poradzimy\1", "Filar CLIII - Eliminacja Kalki 'Can't be helped'"),
+        (r"^\s*[Zz]rób to z umiarem([!\.\?]*)\s*$", r"Przestań wreszcie\1", "Filar CLIII - Eliminacja Kalki 'Iikagen ni shiro'"),
+        
         # Environmental Media & Non-Aqueous Liquids (Filar CXXXVIII)
         (r"\bPowódź\s+piwa\b", "Fala piwa", "Filar CXXXVIII - Kolokacja Cieczy (Fala piwa)"),
         (r"\bpowódź\s+piwa\b", "fala piwa", "Filar CXXXVIII - Kolokacja Cieczy (Fala piwa)"),

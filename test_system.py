@@ -207,7 +207,9 @@ def test_rules_and_prompts():
     assert "FILAR CL" in ver_prompt or "CL" in ver_prompt
     assert "FILAR CLI" in ver_prompt or "CLI" in ver_prompt
     assert "FILAR CLII" in ver_prompt or "CLII" in ver_prompt
-    print(" -> PASSED: Kompletny Zunifikowany Kanon 152 Filarów AVT (Filary I – CLII) jest aktywny w obu fazach tłumaczenia.")
+    assert "FILAR CLIII" in ver_prompt or "CLIII" in ver_prompt
+    assert "FILAR CLIII" in sys_prompt or "CLIII" in sys_prompt
+    print(" -> PASSED: Kompletny Zunifikowany Kanon 153 Filarów AVT (Filary I – CLIII) jest aktywny w obu fazach tłumaczenia.")
 
 def test_pydantic_schemas():
     print("[TEST 2/5] Weryfikacja schematów Pydantic i Detektora Rejestru Pragmatycznego...")
@@ -1853,6 +1855,42 @@ def test_translator_logger_and_sign_detector():
         prosody="krzyk bojowy / płacz"
     )
     assert alert_tasukete is not None and "Tasukete" in alert_tasukete and "CLII" in alert_tasukete
+
+    # Test Filar CLIII: Trigger 51-53 Kandōshi Affective Matrix (Yare yare, Mendokusai, Oi oi, Maa maa, Yokatta, Yatta)
+    alert_yare = translator.detect_audio_discrepancy(
+        jp_text="やれやれだぜ [Yare yare daze]",
+        pl_text="Dobre nieszczęście, znowu to samo.",
+        en_text="Good grief, not this again."
+    )
+    assert alert_yare is not None and "Yare yare" in alert_yare and "CLIII" in alert_yare
+
+    alert_mendo = translator.detect_audio_discrepancy(
+        jp_text="めんどくさい [Mendokusai]",
+        pl_text="Co za ból, muszę tam iść.",
+        en_text="What a drag, I have to go."
+    )
+    assert alert_mendo is not None and "Mendokusai" in alert_mendo and "CLIII" in alert_mendo
+
+    alert_oioi = translator.detect_audio_discrepancy(
+        jp_text="おいおい [Oi oi]",
+        pl_text="Hej, hej, uspokój się.",
+        en_text="Hey, hey, slow down."
+    )
+    assert alert_oioi is not None and "Oi, oi" in alert_oioi and "CLIII" in alert_oioi
+
+    alert_yokatta = translator.detect_audio_discrepancy(
+        jp_text="よかった [Yokatta]",
+        pl_text="To było dobre!",
+        en_text="I'm glad!"
+    )
+    assert alert_yokatta is not None and "Yokatta" in alert_yokatta and "CLIII" in alert_yokatta
+
+    alert_yatta = translator.detect_audio_discrepancy(
+        jp_text="やった！ [Yatta!]",
+        pl_text="Zrobiłem to!",
+        en_text="We won!"
+    )
+    assert alert_yatta is not None and "Yatta" in alert_yatta and "CLIII" in alert_yatta
 
     # Test Flashback 1:1 memory formatting
     from memory import format_translation_memory_for_prompt
