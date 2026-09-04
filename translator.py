@@ -881,7 +881,8 @@ def create_adaptive_batches(raw_entries: list, base_batch_size: int = 24, max_ba
 
         is_full = len(current_batch) >= max_batch_size
         is_dense = len(current_batch) >= base_batch_size and current_words >= 140
-        is_scene_break = current_batch and (ev.start - current_batch[-1][1].end) > 4000 and len(current_batch) >= 18
+        # Dramatic Beat Batching: natural scene break (> 2800ms silence) when batch has at least 18 items
+        is_scene_break = current_batch and (ev.start - current_batch[-1][1].end) > 2800 and len(current_batch) >= 18
 
         if is_full or is_dense or is_scene_break:
             batches.append(current_batch)
@@ -905,6 +906,7 @@ class LineTranslation(BaseModel):
     id: int = Field(description="ID kwestii dialogowej z wejścia")
     polish_text: str = Field(description="Przetłumaczona kwestia na język polski z uwzględnieniem płci, sceny i eliminacji kalek")
     speaker_gender: Optional[str] = Field(default=None, description="Płeć mówcy: 'mężczyzna' lub 'kobieta'")
+    semiotic_layer: Optional[str] = Field(default="spoken_on_screen", description="Warstwa semiotyczna: 'spoken_on_screen' (mowa w kadrze), 'spoken_off_screen' (komentarz zza kadru), 'manga_balloon' (dymek/halucynacja), 'inner_thought' (myśli), 'diegetic_sign' (plansza/napis)")
     screen_region: Optional[str] = Field(default=None, description="Dla planszy/tytułu/napisu ekranowego: wskaż wykryte na kadrze położenie japońskiego napisu: 'bottom_right' (prawy dolny róg), 'bottom_left' (lewy dolny róg), 'top_right' (prawy górny róg), 'top_left' (lewy górny róg), 'bottom_center' (dół), 'top_center' (góra), 'center' (środek) lub null dla zwykłych dialogów.")
     visual_subtext: Optional[str] = Field(default=None, description="Maks. 6 słów o mimice, gestach lub hierarchii przestrzennej (np. 'klęczy przed chanem', 'uśmiech, zaciśnięta pięść') lub null")
     literal_meaning: Optional[str] = Field(default=None, description="Dosłowny idiom JP (maks. 5 słów) tylko w razie potrzeby, inaczej null")
@@ -1101,6 +1103,7 @@ class MultimodalTranslator:
                      "Użyj załączonych klatek wideo do WIZUALNEGO ODCZYTANIA (OCR) JAPOŃSKICH NAPISÓW (chmurki jak いいよね, tablice, telefony, szyldy) oraz japońskiego audio do ustalenia emocji i kontekstu sytuacji. "
                      "TRIANGULACJA KOMPLEMENTARNA ŹRÓDEŁ: Skrypt angielski (EN) zapewnia precyzję faktów, nazwy własne i logikę zdania, a japoński głos seiyū (JP) decyduje o formie grzecznościowej, płci i zgodności ze słuchem widza! "
                      "WIELOGŁOS I NAPISY W DYMKACH (FILAR LVII): Jeśli kwestia zawiera wypowiedzi dwóch postaci (np. z myślnikami '- ') lub jednoczesny dymek z mangi i komentarz postaci: BEZWZGLĘDNIE rozdziel je na DWIE OSOBNE LINIE, każdą zaczynając od myślnika ze spacją ('- Kwestia 1\\N- Kwestia 2'). KATEGORYCZNY ZAKAZ łączenia ich w jedną linijkę lub wklejania myślnika w środku zdania! "
+                     "DEKOMPOZYCJA SEMIOTYCZNA (FILAR CLX): W polu 'semiotic_layer' sklasyfikuj warstwę każdej kwestii: 'spoken_on_screen' (żywy dialog postaci w kadrze), 'spoken_off_screen' (komentarz zza kadru), 'manga_balloon' (dymek komiksowy/halucynacja), 'inner_thought' (myśli wewnętrzne) lub 'diegetic_sign' (plansza/napis). KATEGORYCZNY ZAKAZ mieszania w jednym zdaniu słów z dymka mangowego ze słowami dialogu mówionego! "
                      "BEZWZGLĘDNIE unikaj tłumaczenia 1:1, kalek i sztywnych definicji (np. 'That bombed' -> 'To mi nie wyszło', 'I'm home' -> 'Wróciłam!', 'I see' -> 'Rozumiem'):")
 
         for idx, (original_idx, event, clean_text, ts_prefix) in enumerate(batch_events):
@@ -1613,6 +1616,10 @@ class MultimodalTranslator:
                     parts.append(f"Dynamika: {diag.dialogue_flow.strip()}")
                 if getattr(diag, "audio_intent_check", None) and diag.audio_intent_check.strip():
                     parts.append(f"Intencja Audio: {diag.audio_intent_check.strip()}")
+                if getattr(diag, "dominant_tone", None) and diag.dominant_tone.strip():
+                    parts.append(f"Rejestr: {diag.dominant_tone.strip()}")
+                if getattr(diag, "power_dynamic", None) and diag.power_dynamic.strip():
+                    parts.append(f"Władza/Status: {diag.power_dynamic.strip()}")
                 scene_desc = " | ".join(parts)
             elif getattr(batch_response, "scene_description", None):
                 scene_desc = batch_response.scene_description or ""
@@ -1649,11 +1656,13 @@ class MultimodalTranslator:
             lit_mean = ""
             screen_reg = None
             ambiguity_note = ""
+            semiotic_layer = "spoken_on_screen"
             if batch_response:
                 for tr in batch_response.translations:
                     if tr.id == batch_id:
                         pl_candidate = sanitize_sub_text(tr.polish_text)
                         speaker_gender = tr.speaker_gender
+                        semiotic_layer = getattr(tr, 'semiotic_layer', 'spoken_on_screen') or 'spoken_on_screen'
                         screen_reg = getattr(tr, 'screen_region', None)
                         visual_sub = getattr(tr, 'visual_subtext', '') or ''
                         lit_mean = getattr(tr, 'literal_meaning', '') or ''
@@ -1730,6 +1739,7 @@ class MultimodalTranslator:
                 "pl": pl_candidate,
                 "speaker_name": event.name.strip() if getattr(event, "name", None) else "",
                 "speaker_gender": speaker_gender,
+                "semiotic_layer": semiotic_layer,
                 "screen_region": screen_reg,
                 "speaker_voice": speaker_tags.get(batch_id, ""),
                 "prosody": prosody_tags.get(batch_id, ""),

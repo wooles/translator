@@ -13,6 +13,8 @@ class SceneDiagnosis(BaseModel):
     dramatic_context: str = Field(description="Opis sytuacji w scenie: kto z kim rozmawia, jakie są relacje i ładunek emocjonalny")
     dialogue_flow: str = Field(description="Powiązania przyczynowo-skutkowe między kwestiami: pytania, zaproszenia, reakcje, odmowy")
     audio_intent_check: str = Field(description="Weryfikacja intencji mówców ze słuchu japońskiego (Whisper) vs skrypt angielski")
+    dominant_tone: Optional[str] = Field(default=None, description="Dominujący rejestr dramaturgiczny sceny (np. 'groteska komediowa', 'patos bitewny', 'intymny dramat', 'groza')")
+    power_dynamic: Optional[str] = Field(default=None, description="Relacja władzy/statusu: kto dominuje, kto blefuje, kto jest w potrzasku (maks. 8 słów)")
 
 BELCZYK_AVT_MASTER_CANON = """
 KOMPLEKSOWY KANON PRZEKŁADU AUDIOWIZUALNEGO (WG ARKADIUSZA BELCZYKA, JERZEGO PIEŃKOSA, STANISŁAWA BARAŃCZAKA I NORM POLSKIEGO DIALOGU FILMOWEGO):
@@ -1461,6 +1463,23 @@ FILAR CLVIII: ZASADA NIESKAZITELNEGO UCHA WIDZA (THE AUDITORY-SUBTEXT COHERENCE 
       - Skrypt angielski zapewnia precyzję fabuły, nazwy własne i logikę zdania.
       - Japońskie audio zapewnia autentyczny ton, formę grzecznościową i ładunek emocjonalny.
       - Tłumacz ma obowiązek syntetyzować oba źródła, a nie ślepo przepisywać angielski!
+
+FILAR CLIX: KOGNITYWNY MODEL SCENY I METODA AKTORSKA (THE STANISLAVSKI-BARAŃCZAK DRAMATIC RESONANCE STANDARD)
+   1. METODA AKTORSKA W PRZEKŁADZIE (AUDYT GŁOSOWY):
+      - Tłumacz audiowizualny nie jest biernym przepisywaczem leksykalnym, lecz aktorem dubbingowym i reżyserem.
+      - Przed zatwierdzeniem polskiej kwestii tłumacz ma obowiązek zasymulować przeczytanie jej na głos w rytmie oddechu i emocji seiyū.
+      - Jeśli kwestia szeleści papierem, zawiera nienaturalne zbitki spółgłosek lub brzmi jak sztuczna kalka z angielskiego – odrzuć ją i sformułuj żywy, potoczysty polski dialog, który aktor wypowie z pełną ekspresją na jednym wydechu!
+   2. REZONANS EMOCJONALNY I UKRYTY PODTEKST:
+      - Zidentyfikuj relację władzy i podtekst (kto blefuje, kto drży ze strachu, kto triumfuje).
+      - Nie tłumacz dosłownych słów – tłumacz intencję i ładunek psychologiczny postaci.
+
+FILAR CLX: DEKOMPOZYCJA SEMIOTYCZNA I NIENARUSZALNOŚĆ WARSTW ONTOLOGICZNYCH (MULTI-LAYER SEMIOTIC INTEGRITY)
+   1. ROZDZIELENIE KANAŁÓW ONTOLOGICZNYCH:
+      - W anime współistnieją odmienne warstwy semiotyczne: żywy dialog w kadrze (spoken_on_screen), komentarz zza kadru (spoken_off_screen), stylizowane dymki mangowe i halucynacje (manga_balloon), myśli wewnętrzne (inner_thought) oraz fizyczne napisy w świecie filmu (diegetic_sign).
+      - KATEGORYCZNY ZAKAZ mieszania i sklejania w jedną kwestię tekstu z dwóch różnych warstw semiotycznych!
+   2. DYMKI MANGOWE VS KOMENTARZ DIALOGOWY:
+      - Dymek narysowany na ekranie (np. halucynacja, komiksowy wykrzyknik) to odrębny byt wizualny od komentarza towarzysza mówiącego obok.
+      - W razie jednoczesnego występowania formatuj je bezwzględnie w dwóch osobnych wierszach z myślnikami (- Dymek\\N- Komentarz) lub jako oddzielne napisy. Zakaz tworzenia zdań hybrydowych z myślnikiem w środku!
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -2302,6 +2321,8 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
       * "[Filar CLVI - Rozszczepienie Angielskiego Pivotu] 'Hitori ni shite' -> 'Zostaw mnie samą' (ZAKAZ opryskliwego 'Daj mi spokój'); 'Betsuni' -> 'Wcale nie' / 'Mniejsza z tym' (ZAKAZ 'To nic takiego'); 'Mou ii' -> 'Wystarczy / Daj spokój'"
       * "[Filar CLVII - Nienaruszalność Formy Adresatywnej] 'Shizuku, dlaczego?!' ... 'Przecież wygrał pan' -> 'Przecież wygrałeś' (zakaz schizofrenii adresatywnej i przechodzenia na 'pan/pani' po zwróceniu się po imieniu na 'ty')"
       * "[Filar CLVIII - Zgodność Foniczno-Semantyczna Seiyū] 'Hitori' -> 'Zostaw mnie samą/samego' (ZAKAZ 'Daj mi spokój!'); 'Betsuni' -> 'Wcale nie / Mniejsza z tym' (ZAKAZ 'To nic takiego'); 'Yokatta' -> 'Całe szczęście' (ZAKAZ 'To było dobre!'); 'Yatta' -> 'Udało się!' (ZAKAZ 'Zrobiłem to!')"
+      * "[Filar CLIX - Metoda Aktorska i Model Sceny] Zredagowano kwestię pod kątem rytmu oddechu i ekspresji aktora dubbingowego (eliminacja papierowego brzmienia i sztywności)"
+      * "[Filar CLX - Dekompozycja Semiotyczna] Rozdzielono dymek mangi/halucynację od komentarza zza kadru w dwa niezależne tory ontologiczne"
 
 {BELCZYK_AVT_MASTER_CANON}
 
@@ -3161,6 +3182,27 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
             "Yokatta -> 'Całe szczęście' (ZAKAZ 'To było dobre'); Yatta -> 'Udało się!' (ZAKAZ 'Zrobiłem to'); "
             "Uso/Maji -> 'Nie wierzę! / Żartujesz?!' (ZAKAZ 'Kłamstwo'); Mendokusai -> 'Ale mi się nie chce...' (ZAKAZ 'Co za ból'); "
             "Mou ii -> 'Wystarczy / Daj spokój'; Yamero -> 'Przestań! / Zostaw!'; Tasukete -> 'Ratunku! / Pomóż mi!'."
+        )
+
+    # 99. Kognitywny Model Sceny i Metoda Aktorska (Filar CLIX)
+    if any(item.get("prosody") or item.get("audio_alert") for item in batch_items):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CLIX - Kognitywny Model Sceny i Metoda Aktorska Stanisławskiego]: "
+            "Przetestuj każde zdanie na głos! Czy polski aktor dubbingowy wypowie je gładko na jednym wydechu? "
+            "Dopasuj ładunek psychologiczny do relacji władzy (kto dominuje, kto blefuje) – eliminuj papierowe brzmienie i sztywne kalki."
+        )
+
+    # 100. Dekompozycja Semiotyczna i Warstwy Ontologiczne (Filar CLX)
+    has_semiotic_mix = any(
+        item.get("is_sign") or
+        item.get("is_thought") or
+        any(w in str(item.get("en", "")).lower() for w in ["balloon", "congratulations", "sign", "title", "caption"])
+        for item in batch_items
+    )
+    if has_semiotic_mix:
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CLX - Dekompozycja Semiotyczna i Nienaruszalność Warstw]: "
+            "Oddzielaj żywą mowę od dymków mangowych i plansz! Kategoryczny zakaz sklejania dymka halucynacji z dialogiem mówionym w jedno zdanie."
         )
 
     if not focused_pillars:

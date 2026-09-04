@@ -219,11 +219,15 @@ def test_rules_and_prompts():
     assert "FILAR CLVII" in sys_prompt or "CLVII" in sys_prompt
     assert "FILAR CLVIII" in ver_prompt or "CLVIII" in ver_prompt
     assert "FILAR CLVIII" in sys_prompt or "CLVIII" in sys_prompt
-    print(" -> PASSED: Kompletny Zunifikowany Kanon 158 Filarów AVT (Filary I – CLVIII) jest aktywny w obu fazach tłumaczenia.")
+    assert "FILAR CLIX" in ver_prompt or "CLIX" in ver_prompt
+    assert "FILAR CLIX" in sys_prompt or "CLIX" in sys_prompt
+    assert "FILAR CLX" in ver_prompt or "CLX" in ver_prompt
+    assert "FILAR CLX" in sys_prompt or "CLX" in sys_prompt
+    print(" -> PASSED: Kompletny Zunifikowany Kanon 160 Filarów AVT (Filary I – CLX) jest aktywny w obu fazach tłumaczenia.")
 
 def test_pydantic_schemas():
     print("[TEST 2/5] Weryfikacja schematów Pydantic i Detektora Rejestru Pragmatycznego...")
-    from translator import detect_japanese_pragmatic_register
+    from translator import detect_japanese_pragmatic_register, create_adaptive_batches
     
     # Test detekcji rejestrów japońskich
     reg_feudal = detect_japanese_pragmatic_register("ははっ、畏まりましてございます [haha, kashikomarimashite gozaimasu]")
@@ -258,24 +262,34 @@ def test_pydantic_schemas():
     diag = SceneDiagnosis(
         dramatic_context="Yoritsugu siedzi w pokoju i zazdrośnie patrzy na powitanie Tokiyukiego.",
         dialogue_flow="Służba zaprasza do wyjścia, a Yoritsugu chłodno odmawia.",
-        audio_intent_check="W audio pada 'boku wa ii desu' co oznacza odmowę 'Ja podziękuję', a nie stan zdrowia."
+        audio_intent_check="W audio pada 'boku wa ii desu' co oznacza odmowę 'Ja podziękuję', a nie stan zdrowia.",
+        dominant_tone="chłodna zawiść / dworski dystans",
+        power_dynamic="pan-służący (wyższość Yoritsugu)"
     )
+    assert diag.dominant_tone == "chłodna zawiść / dworski dystans"
+    assert diag.power_dynamic == "pan-służący (wyższość Yoritsugu)"
+
     tr = LineTranslation(
         id=1,
         polish_text="Rozumiem, co masz na myśli.",
         speaker_gender="mężczyzna",
+        semiotic_layer="manga_balloon",
         screen_region="bottom_right",
         notes="eliminacja kalki"
     )
+    assert tr.semiotic_layer == "manga_balloon"
+
     batch = BatchTranslationResponse(
         scene_diagnosis=diag,
         translations=[tr]
     )
     assert batch.translations[0].id == 1
     assert batch.translations[0].polish_text == "Rozumiem, co masz na myśli."
+    assert batch.translations[0].semiotic_layer == "manga_balloon"
     assert batch.translations[0].screen_region == "bottom_right"
     assert batch.scene_diagnosis is not None
     assert "Yoritsugu" in batch.scene_diagnosis.dramatic_context
+    assert batch.scene_diagnosis.dominant_tone == "chłodna zawiść / dworski dystans"
 
     ref = RefinedLine(
         id=1,
@@ -290,7 +304,26 @@ def test_pydantic_schemas():
     assert ref_batch.lines[0].refined_pl == "Rozumiem."
     assert ref_batch.lines[0].screen_region == "bottom_right"
     assert ref_batch.scene_diagnosis is not None
-    print(" -> PASSED: Schematy Pydantic, Diagnoza Wizualna i Rejestr Pragmatyczny są w 100% poprawne.")
+
+    # Test Dramatic Beat Batching (Zero-Cost Guarantee & no micro-batches)
+    raw_events = []
+    for i in range(17):
+        ev = pysubs2.SSAEvent(start=i * 1000, end=i * 1000 + 500, text=f"Line {i}")
+        raw_events.append((i, ev, f"Line {i}", ""))
+    # 18th event after 3500ms pause (current_batch has 17 items, so it should NOT break)
+    ev18 = pysubs2.SSAEvent(start=20000, end=20500, text="Line 17")
+    raw_events.append((17, ev18, "Line 17", ""))
+    batches1 = create_adaptive_batches(raw_events, base_batch_size=24, max_batch_size=30)
+    assert len(batches1) == 1, "Nie powinno dzielić partii przy mniej niż 18 kwestiach"
+
+    # 19th event after another 3500ms pause (current_batch has 18 items, so it SHOULD break on dramatic beat)
+    ev19 = pysubs2.SSAEvent(start=24000, end=24500, text="Line 18")
+    raw_events.append((18, ev19, "Line 18", ""))
+    batches2 = create_adaptive_batches(raw_events, base_batch_size=24, max_batch_size=30)
+    assert len(batches2) == 2, "Powinno podzielić partię po 18 kwestiach przy pauzie > 2800ms"
+    assert len(batches2[0]) == 18
+
+    print(" -> PASSED: Schematy Pydantic, Diagnoza Wizualna, Semiotic Layers i Dramatic Beat Batching są w 100% poprawne.")
 
 def test_sanitization_and_deduplication():
     print("[TEST 3/5] Test usuwania baboli ASS i deduplikacji znaków...")

@@ -81,7 +81,7 @@ class DialogueVerifier:
         prompt_lines = []
         prompt_lines.append("Zredaguj poniższe kwestie dialogowe. BEZWZGLĘDNIE wyeliminuj dosłowne tłumaczenie 1 do 1, sztuczne konstrukcje i kalki.")
         prompt_lines.append("Zastąp drewniane sformułowania żywym, potoczystym językiem polskim mówionym (tak jak w profesjonalnym dubbingu / u polskich nastolatków):")
-        prompt_lines.append("WYKORZYSTAJ CZAS NA ZASTANOWIENIE (Thinking / CoT): Przed zwróceniem każdego wersu przeprowadź w myślach rygorystyczny audyt każdego zdania pod kątem Kanonu 158 Filarów AVT (w tym: Filar IV - Szyk i Kalki, Filar XVIII - Paralingwistyka i Kakegoe, Filar LVII - Standard Wielogłosu i Dymków Mangi w Osobnych Liniach z Myślnikiem, Filar CXLIV - Prymat Audio Seiyū, Filar CXLVI - Ping-Pong Dialogowy, Filar CXLVII - Modalność, Filar CXLVIII - Wiarygodność, Filary CXLIX-CLVI - Haragei, Hora, Aisatsu, Okrzyki Bojowe, Kandōshi, Logika Przeczeń, Kansai Jibun, Separacja Mowy i Myśli, Rozszczepienie Angielskiego Pivotu Hitori vs Hottoite, Filar CLVII - Nienaruszalność Formy Adresatywnej i Zakaz Schizofrenii Pan/Ty oraz Filar CLVIII - Zgodność Foniczno-Semantyczna Seiyū). Zsynchronizuj rejestr z odsłuchem japońskim Whisper i fizycznym tonem głosu seiyū [Ton: ...]!")
+        prompt_lines.append("WYKORZYSTAJ CZAS NA ZASTANOWIENIE (Thinking / CoT): Przed zwróceniem każdego wersu przeprowadź w myślach rygorystyczny audyt każdego zdania pod kątem Kanonu 160 Filarów AVT (w tym: Filar IV - Szyk i Kalki, Filar XVIII - Paralingwistyka i Kakegoe, Filar LVII - Standard Wielogłosu i Dymków Mangi w Osobnych Liniach z Myślnikiem, Filar CXLIV - Prymat Audio Seiyū, Filar CXLVI - Ping-Pong Dialogowy, Filar CXLVII - Modalność, Filar CXLVIII - Wiarygodność, Filary CXLIX-CLVI - Haragei, Hora, Aisatsu, Okrzyki Bojowe, Kandōshi, Logika Przeczeń, Kansai Jibun, Separacja Mowy i Myśli, Rozszczepienie Angielskiego Pivotu Hitori vs Hottoite, Filar CLVII - Nienaruszalność Formy Adresatywnej i Zakaz Schizofrenii Pan/Ty, Filar CLVIII - Zgodność Foniczno-Semantyczna Seiyū, Filar CLIX - Standard Rezonansu Dramatycznego Stanisławskiego-Barańczaka / Metoda Aktorska: symulacja głośnego wypowiedzenia kwestii na jednym wydechu z kontrolą fonetyki i mięśni narządów mowy oraz Filar CLX - Wielowarstwowa Spójność Semiotyczna). Zsynchronizuj rejestr z odsłuchem japońskim Whisper i fizycznym tonem głosu seiyū [Ton: ...]!")
         prompt_lines.append("W polu 'changes_made' dla KAŻDEJ poprawionej kwestii podaj DOKŁADNE uzasadnienie i numer Filaru AVT (np. '[Filar IV - Szyk Zdania] Usunięto kalkę angielską' lub '[Filar CLVII - Forma Adresatywna] Usunięto 'wygrał pan' -> 'wygrałeś''). Jeśli kwestia nie wymagała poprawek, wpisz null.")
         
         if focused_rules_str:
@@ -104,6 +104,7 @@ class DialogueVerifier:
 
         for item in batch_items:
             type_tag = f" [[Napis] {item['visual_type']}]" if item.get("is_sign") else " [DIALOG]"
+            semiotic_tag = f" [{item['semiotic_layer']}]" if item.get("semiotic_layer") else ""
             speaker_name = (item.get('speaker_name') or '').strip()
             speaker_gender = (item.get('speaker_gender') or '').strip()
             if speaker_name and speaker_gender:
@@ -131,7 +132,7 @@ class DialogueVerifier:
             relation_info = f"  {item['relation_tag']}\n" if item.get('relation_tag') else ""
             
             prompt_lines.append(
-                f"- [ID: {item['id']}]{type_tag}{char_info}{voice_info}{prosody_info}{song_info}{cps_info}{visual_info}{region_info}\n"
+                f"- [ID: {item['id']}]{type_tag}{semiotic_tag}{char_info}{voice_info}{prosody_info}{song_info}{cps_info}{visual_info}{region_info}\n"
                 f"{audio_info}"
                 f"{alert_info}"
                 f"{prag_reg_info}"
