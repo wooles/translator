@@ -328,7 +328,8 @@ class AVTLinter:
         is_all_girls_scene: bool = True,
         is_sign: bool = False,
         user_feedback_rules: Optional[List[Dict[str, Any]]] = None,
-        custom_glossary: Optional[Dict[str, str]] = None
+        custom_glossary: Optional[Dict[str, str]] = None,
+        is_informal_ty: bool = False
     ) -> Tuple[str, List[str]]:
         """
         Analyzes and automatically fixes dialogue lines.
@@ -433,6 +434,85 @@ class AVTLinter:
                     if re.search(pattern, modified):
                         modified = re.sub(pattern, repl, modified)
                         applied_fixes.append(f"[Filar XIII/CXXXVI - Mówca Żeński/Dziewczynka] Korekta rodzaju męskiego na żeński: {pattern}")
+
+        # 4b. Anti-Drift: Elimination of spurious 'pan/pani' in informal 1-on-1 dialogue (Filar CLVII)
+        if not is_sign:
+            line_has_yobisute = bool(re.search(r"\b([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+)[,?!](?:\s+|\\N)+.*\b(pan|pani|pana|panu)\b", modified, re.IGNORECASE))
+            if is_informal_ty or line_has_yobisute:
+                raw_pan_pairs = [
+                    ("wygrał", "pan", "wygrałeś"),
+                    ("wygrała", "pani", "wygrałaś"),
+                    ("zrobił", "pan", "zrobiłeś"),
+                    ("zrobiła", "pani", "zrobiłaś"),
+                    ("widział", "pan", "widziałeś"),
+                    ("widziała", "pani", "widziałaś"),
+                    ("słyszał", "pan", "słyszałeś"),
+                    ("słyszała", "pani", "słyszałaś"),
+                    ("powiedział", "pan", "powiedziałeś"),
+                    ("powiedziała", "pani", "powiedziałaś"),
+                    ("poszedł", "pan", "poszedłeś"),
+                    ("poszła", "pani", "poszłaś"),
+                    ("miał", "pan", "miałeś"),
+                    ("miała", "pani", "miałaś"),
+                    ("był", "pan", "byłeś"),
+                    ("była", "pani", "byłaś"),
+                    ("chciał", "pan", "chciałeś"),
+                    ("chciała", "pani", "chciałaś"),
+                    ("mógł", "pan", "mogłeś"),
+                    ("mogła", "pani", "mogłaś"),
+                    ("wiedział", "pan", "wiedziałeś"),
+                    ("wiedziała", "pani", "wiedziałaś"),
+                    ("myślał", "pan", "myślałeś"),
+                    ("myślała", "pani", "myślałaś"),
+                    ("pan", "wygrał", "wygrałeś"),
+                    ("pani", "wygrała", "wygrałaś"),
+                    ("pan", "zrobił", "zrobiłeś"),
+                    ("pani", "zrobiła", "zrobiłaś"),
+                    ("pan", "widział", "widziałeś"),
+                    ("pani", "widziała", "widziałaś"),
+                    ("pan", "słyszał", "słyszałeś"),
+                    ("pani", "słyszała", "słyszałaś"),
+                    ("pan", "powiedział", "powiedziałeś"),
+                    ("pani", "powiedziała", "powiedziałaś"),
+                    ("pan", "wie", "wiesz"),
+                    ("pani", "wie", "wiesz"),
+                    ("wie", "pan", "wiesz"),
+                    ("wie", "pani", "wiesz"),
+                    ("pan", "widzi", "widzisz"),
+                    ("pani", "widzi", "widzisz"),
+                    ("widzi", "pan", "widzisz"),
+                    ("widzi", "pani", "widzisz"),
+                    ("pan", "myśli", "myślisz"),
+                    ("pani", "myśli", "myślisz"),
+                    ("myśli", "pan", "myślisz"),
+                    ("myśli", "pani", "myślisz"),
+                    ("pan", "mówi", "mówisz"),
+                    ("pani", "mówi", "mówisz"),
+                    ("mówi", "pan", "mówisz"),
+                    ("mówi", "pani", "mówisz"),
+                ]
+                spurious_pan_fixes = [
+                    (rf"\b{re.escape(w1)}(?:\s+|\\N)+{re.escape(w2)}\b", repl)
+                    for w1, w2, repl in raw_pan_pairs
+                ]
+                spurious_pan_fixes.extend([
+                    (r"\bniech(?:\s+|\\N)+pan(?:\s+|\\N)+powie\b", "powiedz"),
+                    (r"\bniech(?:\s+|\\N)+pani(?:\s+|\\N)+powie\b", "powiedz"),
+                    (r"\bniech(?:\s+|\\N)+pan(?:\s+|\\N)+spojrzy\b", "spójrz"),
+                    (r"\bniech(?:\s+|\\N)+pani(?:\s+|\\N)+spojrzy\b", "spójrz"),
+                    (r"\bniech(?:\s+|\\N)+pan(?:\s+|\\N)+posłucha\b", "posłuchaj"),
+                    (r"\bniech(?:\s+|\\N)+pani(?:\s+|\\N)+posłucha\b", "posłuchaj"),
+                    (r"\bniech(?:\s+|\\N)+pan(?:\s+|\\N)+uważa\b", "uważaj"),
+                    (r"\bniech(?:\s+|\\N)+pani(?:\s+|\\N)+uważa\b", "uważaj"),
+                    (r"\bniech(?:\s+|\\N)+pan(?:\s+|\\N)+poczeka\b", "poczekaj"),
+                    (r"\bniech(?:\s+|\\N)+pani(?:\s+|\\N)+poczeka\b", "poczekaj"),
+                ])
+                for pattern, repl in spurious_pan_fixes:
+                    if re.search(pattern, modified, re.IGNORECASE):
+                        def _repl_match(m, r=repl):
+                            return r.capitalize() if m.group(0)[0].isupper() else r
+                        modified = re.sub(pattern, _repl_match, modified, flags=re.IGNORECASE)
+                        applied_fixes.append(f"[Filar CLVII - Spójność Form Adresatywnych] Korekta sztucznego 'pana/pani' na formę 'ty': {pattern} -> {repl}")
 
         # 5. Anti-Bracket normalization for all subtitles (Pillars IV & LX)
         # 5a. Strip outer square brackets e.g. "[ Przepraszam za zwłokę! ]" -> "Przepraszam za zwłokę!"

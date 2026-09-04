@@ -5,13 +5,13 @@
       "description": "Zwrot: 'na ty / po imieniu: Miyabi-chan' (koleżanka z zespołu / partnerka w poszukiwaniach)"
     },
     "Miyabi Shinohara -> Shizuku Kanzaki": {
-      "description": "Zwrot: 'panie Shizuku' (asystentka / współtowarzyszka)"
+      "description": "Zwrot: 'na ty / Shizuku' (bliscy współpracownicy i partnerzy winiarscy; w dialogach wyłącznie na ty: 'wygrałeś', 'wiesz', kategoryczny zakaz mieszania 'Shizuku' z 'pan')"
     },
     "Issei Tomine -> Loulan": {
       "description": "Zwrot: 'po imieniu: Loulan' (przełożony -> asystentka)"
     },
     "Loulan -> Issei Tomine": {
-      "description": "Zwrot: 'panie Issei / po imieniu z szacunkiem: Issei-san' (asystentka -> mistrz winiarski)"
+      "description": "Zwrot: 'Issei' (oddana towarzyszka i powierniczka)"
     },
     "Kawarage -> Shizuku Kanzaki": {
       "description": "Zwrot: 'panie Kanzaki / Kanzaki-kun' (szef działu -> podwładny)"
@@ -26,10 +26,16 @@
       "description": "Zwrot: 'po imieniu: Issei' (matka -> syn)"
     },
     "Shizuku Kanzaki -> Issei Tomine": {
-      "description": "Zwrot: 'Tomine' (rywale w walce o spadek)"
+      "description": "Zwrot: 'Tomine / Issei Tomine' (rywal w walce o spadek)"
     },
     "Issei Tomine -> Robert Doi": {
       "description": "Zwrot: 'panie Robert' (sędzia / autorytet winiarski)"
+    },
+    "Issei Tomine -> Shizuku Kanzaki": {
+      "description": "Zwrot: 'Kanzaki Shizuku / bracie' (rywale / adoptowani bracia)"
+    },
+    "Chousuke Honma -> Shizuku Kanzaki": {
+      "description": "Zwrot: 'Kanzaki' (starszy kolega z działu w Taiyo Beer)"
     }
   },
   "glossary": {
@@ -49,12 +55,18 @@
     "Cult wine": "Wino kultowe",
     "Syrah / Shiraz": "Syrah",
     "Terroir": "Terroir",
-    "Old Burgundy": "Dojrzałe wino burgundzkie"
+    "Old Burgundy": "Dojrzałe wino burgundzkie",
+    "Eighth Apostle": "Ósmy Apostoł",
+    "Marathon du Médoc": "Marathon du Médoc",
+    "Château Lafite Rothschild": "Château Lafite",
+    "Château Latour": "Château Latour",
+    "Afterglow / Aftertaste": "Finisz"
   },
   "relationships": {},
   "episodes_translated": [
     "tmpt2h6cv7l",
     "tmpnioruazt",
-    "[ASW] Kami no Shizuku - 21 [1080p HEVC][97442159]"
+    "[ASW] Kami no Shizuku - 21 [1080p HEVC][97442159]",
+    "[ASW] Kami no Shizuku - 22 [1080p HEVC][3F4CB067]"
   ]
 }

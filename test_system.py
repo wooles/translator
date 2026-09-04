@@ -215,7 +215,9 @@ def test_rules_and_prompts():
     assert "FILAR CLV" in sys_prompt or "CLV" in sys_prompt
     assert "FILAR CLVI" in ver_prompt or "CLVI" in ver_prompt
     assert "FILAR CLVI" in sys_prompt or "CLVI" in sys_prompt
-    print(" -> PASSED: Kompletny Zunifikowany Kanon 156 Filarów AVT (Filary I – CLVI) jest aktywny w obu fazach tłumaczenia.")
+    assert "FILAR CLVII" in ver_prompt or "CLVII" in ver_prompt
+    assert "FILAR CLVII" in sys_prompt or "CLVII" in sys_prompt
+    print(" -> PASSED: Kompletny Zunifikowany Kanon 157 Filarów AVT (Filary I – CLVII) jest aktywny w obu fazach tłumaczenia.")
 
 def test_pydantic_schemas():
     print("[TEST 2/5] Weryfikacja schematów Pydantic i Detektora Rejestru Pragmatycznego...")
@@ -673,7 +675,24 @@ def test_avt_linter():
     assert t14 == "Dzień dobry, Sensei!"
     t15, f15 = AVTLinter.lint_and_fix_line("Panie Senpai, zaczekaj!", is_sign=False)
     assert t15 == "Senpai, zaczekaj!"
-    print(" -> PASSED: AVT Linter bezbłędnie wyłapuje i koryguje kalki, formy, nawiasy, cudzysłowy, formy 1-na-1, Aizuchi, hybrydy i ALL-CAPS.")
+
+    # Test Filaru CLVII: Nienaruszalność formy adresatywnej (eliminacja sztucznego pan/pani na rzecz 'ty')
+    t_clvii1, _ = AVTLinter.lint_and_fix_line("Przecież wygrał pan trzy z siedmiu starć!", is_informal_ty=True)
+    assert t_clvii1 == "Przecież wygrałeś trzy z siedmiu starć!"
+
+    t_clvii2, _ = AVTLinter.lint_and_fix_line(r"Przecież wygrał\Npan trzy z siedmiu starć!", is_informal_ty=True)
+    assert t_clvii2 == "Przecież wygrałeś trzy z siedmiu starć!"
+
+    t_clvii3, _ = AVTLinter.lint_and_fix_line("Shizuku, dlaczego wygrał pan te zawody?")
+    assert t_clvii3 == "Shizuku, dlaczego wygrałeś te zawody?"
+
+    t_clvii4, _ = AVTLinter.lint_and_fix_line("Przecież pan wie, co to oznacza!", is_informal_ty=True)
+    assert t_clvii4 == "Przecież wiesz, co to oznacza!"
+
+    t_clvii5, _ = AVTLinter.lint_and_fix_line("Czy pan wie, co to oznacza?", is_informal_ty=True)
+    assert t_clvii5 == "Czy wiesz, co to oznacza?"
+
+    print(" -> PASSED: AVT Linter bezbłędnie wyłapuje i koryguje kalki, formy, nawiasy, cudzysłowy, formy 1-na-1, Aizuchi, hybrydy, ALL-CAPS i Filar CLVII (T-V Invariance).")
 
 def test_series_bible():
     print("[TEST 9/12] Test Biblii Serialu i Pamięci Międzyodcinkowej (series_memory)...")

@@ -582,6 +582,11 @@ def detect_audio_discrepancy(jp_text: str, pl_text: str, en_text: str, prosody: 
         if any(w in pl_lower for w in ["to nic takiego", "nie ma sprawy", "nic się nie stało"]):
             return "W audio pada 'Betsuni' (別に = chłód emocjonalny, foch, dystans). Zastąp uspokajające 'To nic takiego' trafnym: 'Wcale nie', 'Nieważne' lub 'Mniejsza z tym' (Filar CLVI)."
 
+    # 59. Kolaps Formy Adresatywnej / Spurious 'Pan/Pani' przy 'You' na 'Ty' (Filar CLVII)
+    if any(w in en_text.lower() for w in ["you won", "you did", "you saw", "you told", "you said", "you have", "you had", "you were", "you know", "did you", "have you", "why did you"]):
+        if any(w in pl_lower for w in ["wygrał pan", "wygrała pani", "zrobił pan", "zrobiła pani", "widział pan", "widziała pani", "powiedział pan", "powiedziała pani", "pan wie", "pani wie", "wie pan", "wie pani", "pan widzi", "pani widzi", "pan myśli", "pani myśli", "pan mówi", "pani mówi"]):
+            return "Wykryto kolaps formy adresatywnej (Pronominal Address Drift - Filar CLVII)! Angielskie 'you' w relacji nieformalnej/koleżeńskiej lub po imieniu przetłumaczono sztucznie per 'pan/pani'. Zamień 'wygrał pan' na 'wygrałeś', 'pan wie' na 'wiesz' itp.!"
+
     return None
 
 def detect_japanese_pragmatic_register(jp_text: str, en_text: str = "") -> Optional[str]:
@@ -1008,6 +1013,7 @@ class MultimodalTranslator:
         lines.append("Przetłumacz poniższe kwestie dialogowe na naturalny język polski. "
                      "PAMIĘTAJ: Kwestie często tworzą jedno długie zdanie rozbite na kilka linijek – ZAWSZE analizuj CAŁE ZDANIA od początku do końca, dbając o piękny, naturalny polski szyk wyrazów i płynność gramatyczną między linijkami! "
                      "DIALOGI 1-NA-1 I LICZBA GRAMATYCZNA: Gdy w scenie/kadrze rozmawiają ze sobą dwie postacie (1-na-1), angielskie dwuznaczne 'you' (np. 'Did you hear...?', 'Did you see...?', 'Do you know...?') BEZWZGLĘDNIE tłumacz w 2. osobie liczby POJEDYNCZEJ ('Słyszałeś?' / 'Słyszałaś?', 'Widziałeś?', 'Wiesz?'). KATEGORYCZNY ZAKAZ form liczby mnogiej ('Słyszeliście?') w rozmowach dwuosobowych! "
+                     "KONSEKWENCJA FORM ADRESATYWNYCH (FILAR CLVII): Jeśli w scenie/dialogu postać zwraca się do rozmówcy po imieniu (np. 'Shizuku, dlaczego?!') lub na 'ty', KATEGORYCZNIE ZABRANIA SIĘ przechodzenia na formy per 'pan/pani' ('wygrał pan' -> BŁĄD KARDYNALNY!). Wszystkie kolejne kwestie skierowane do tej osoby ('you won', 'did you', 'you') BEZWZGLĘDNIE tłumacz w 2. osobie na 'ty' ('wygrałeś trzy z siedmiu starć!'). Kategoryczny zakaz schizofrenii adresatywnej i mieszania 'ty' z 'pan' w jednej rozmowie! "
                      "ŻEŃSKOOSOBOWOŚĆ OBSADY: Dialogi między uczennicami/dziewczętami bezwzględnie tłumacz w RODZAJU ŻEŃSKIM (np. 'Głupia jesteś?' / 'Oszalałaś?', 'Jesteś pewna?', 'Widziałaś to?', 'poszłam', 'zrobiłam'). ZAKAZ form męskich ('Głupi jesteś?') w rozmowach dziewcząt! "
                      "PRZYNALEŻNOŚĆ I 3. OSOBA: Frazy typu '[Imię]'s dad / mom / manga' (np. 'Akafuku's dad!') tłumacz w 3. osobie ('Tata Akafuku!'). BEZWZGLĘDNY ZAKAZ zamiany imienia innej postaci na 1. osobę ('to mój tata' -> BŁĄD!). "
                      "Użyj załączonych klatek wideo do WIZUALNEGO ODCZYTANIA (OCR) JAPOŃSKICH NAPISÓW (chmurki jak いいよね, tablice, telefony, szyldy) oraz japońskiego audio do ustalenia emocji i kontekstu sytuacji. "
@@ -1633,6 +1639,37 @@ class MultimodalTranslator:
                 "is_song": is_song_line(event, clean_en)
             })
 
+        # Determine speakers and scene-level informal status (Filar CLVII - T-V Invariance)
+        speakers_on_ty = set()
+        scene_has_first_name_vocative = False
+        for it in pass1_items:
+            pl_cand = it.get("pl", "")
+            en_txt = it.get("en", "")
+            spk = (it.get("speaker_name") or "").strip()
+            
+            # Detect first-name vocative in PL or EN (e.g. "Shizuku, dlaczego?!", "Shizuku, why?!")
+            first_name_match = re.search(r"\b([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]{2,})[,?!]", pl_cand) or re.search(r"\b([A-Z][a-z]{2,})[,?!]", en_txt)
+            if first_name_match:
+                voc_word = first_name_match.group(1).lower()
+                if voc_word not in ["proszę", "przepraszam", "panie", "pani", "sensei", "senpai", "mistrzu", "ojcze", "matko", "mamo", "tato", "bądź", "daj", "stój", "wait", "look", "what", "why", "stop"]:
+                    scene_has_first_name_vocative = True
+                    if spk:
+                        speakers_on_ty.add(spk)
+            
+            # Detect informal Polish phrasing: "wiesz", "zobacz", "nie mów", "poczekaj", "daj spokój"
+            if re.search(r"\b(zobacz|spójrz|czekaj|poczekaj|powiedz|nie\s+mów|wiesz|słuchaj|daj\s+spokój|nie\s+bądź|twój|twoja|twoje|cię|ciebie|tobą|tobie)\b", pl_cand, re.IGNORECASE):
+                if spk:
+                    speakers_on_ty.add(spk)
+
+        # Line-level address drift pinning before Phase 2 Verifier
+        for it in pass1_items:
+            spk = (it.get("speaker_name") or "").strip()
+            is_item_informal = (spk in speakers_on_ty) or scene_has_first_name_vocative
+            if is_item_informal:
+                if re.search(r"\b(wygrał|wygrała|zrobił|zrobiła|widział|widziała|powiedział|powiedziała|słyszał|słyszała|był|była|miał|miała|chciał|chciała|mógł|mogła|wiedział|wiedziała|wie|widzi|myśli|mówi|ma)\s+(pan|pani)\b|\b(pan|pani)\s+(wygrał|wygrała|zrobił|zrobiła|widział|widziała|słyszał|słyszała|powiedział|powiedziała|wie|widzi|myśli|mówi)\b", it["pl"], re.IGNORECASE):
+                    drift_alert = "[🚨 ALARM FILAR CLVII: Zwrot per 'pan/pani' w scenie/dialogu po imieniu na 'ty'! Kategoryczny zakaz 'wygrał pan' / 'pan wie' -> Zmień na 2. os. 'wygrałeś' / 'wiesz'!]"
+                    it["notes"] = f"{it.get('notes', '')} {drift_alert}".strip()
+
         # 6. Optional Phase 2 Verifier (Script Doctor)
         batch_results: Dict[int, str] = {}
         batch_regions: Dict[int, str] = {}
@@ -1688,13 +1725,16 @@ class MultimodalTranslator:
                     elif "żeński" in spk_voice.lower():
                         spk_gen = "kobieta"
 
+                spk_name = (item.get("speaker_name") or "").strip()
+                is_item_informal = (spk_name in speakers_on_ty) or scene_has_first_name_vocative
                 final_text, fixes = AVTLinter.lint_and_fix_line(
                     text=raw_final,
                     speaker_gender=spk_gen,
                     is_all_girls_scene=(spk_gen in ["kobieta", "dziewczynka"]),
                     is_sign=item.get("is_sign", False),
                     user_feedback_rules=all_user_rules,
-                    custom_glossary=combined_glossary
+                    custom_glossary=combined_glossary,
+                    is_informal_ty=is_item_informal
                 )
                 # Deterministic glossary overrides
                 final_text, gloss_fixes = GlossaryManager.apply_deterministic_overrides(final_text, combined_glossary)
@@ -1723,13 +1763,16 @@ class MultimodalTranslator:
                     elif "żeński" in spk_voice.lower():
                         spk_gen = "kobieta"
 
+                spk_name = (item.get("speaker_name") or "").strip()
+                is_item_informal = (spk_name in speakers_on_ty) or scene_has_first_name_vocative
                 final_text, fixes = AVTLinter.lint_and_fix_line(
                     text=raw_final,
                     speaker_gender=spk_gen,
                     is_all_girls_scene=(spk_gen in ["kobieta", "dziewczynka"]),
                     is_sign=item.get("is_sign", False),
                     user_feedback_rules=all_user_rules,
-                    custom_glossary=combined_glossary
+                    custom_glossary=combined_glossary,
+                    is_informal_ty=is_item_informal
                 )
                 # Deterministic glossary overrides
                 final_text, gloss_fixes = GlossaryManager.apply_deterministic_overrides(final_text, combined_glossary)

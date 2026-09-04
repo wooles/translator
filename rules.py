@@ -1420,6 +1420,22 @@ FILAR CLVI: ROZSZCZEPIENIE DWUZNACZNOŚCI ANGIELSKIEGO PIVOTU I PRYMAT KOTWIC LE
       - WARUI / WARUI NA (悪い / 悪いな): męskie, kumpelskie przyznanie się do winy lub podziękowanie.
         -> POPRAWNIE: „Mój błąd.” / „Sorki.” / „Wybacz kłopot.”.
       - SUMIMASEN (すみません): formuła dystansowa, potrójna funkcja (przeprosiny / podziękowanie / nawiązanie kontaktu).
+
+FILAR CLVII: ZASADA NIENARUSZALNOŚCI FORMY ADRESATYWNEJ (T-V INVARIANCE) I ZAKAZ SCHIZOFRENII FORM GRZECZNOŚCIOWYCH (PRONOMINAL ADDRESS DRIFT: YOBISUTE NA 'TY' VS PAN/PANI)
+   1. KONSEKWENCJA REJESTRU ROZMÓWCY (ZASADA BRATERSTWA JĘZYKOWEGO):
+      - Jeśli postać A zwraca się do postaci B po imieniu (Yobisute: „Shizuku”, „Issei”, „Arata”, „Kuroe”, „Miyabi”) lub na „ty”, w całej scenie OBOWIĄZUJE ŻELAZNA KONSEKWENCJA:
+        -> KATEGORYCZNY ZAKAZ przechodzenia w kolejnych zdaniach na formy per „pan/pani” („wygrał pan”, „pan wie”, „niech pan spojrzy”)!
+        -> KARDYNALNY BŁĄD SCHIZOFRENII ADRESATYWNEJ [X]:
+           Linijka 1: „Shizuku, dlaczego?!” (po imieniu na „ty”)
+           Linijka 5: „Słucham? Przecież wygrał pan trzy z siedmiu starć!” (nagle per „pan”!)
+        -> POPRAWNIE AVT [OK]:
+           Linijka 1: „Shizuku, dlaczego?!”
+           Linijka 5: „Słucham? Przecież wygrałeś trzy z siedmiu starć!” (konsekwentnie na „ty”).
+   2. DYSTRYBUCJA ANGIELSKIEGO PIVOTU „YOU”:
+      - Angielskie „you” („you won”, „did you see”, „you are”, „what do you think”) w dialogach między osobami mówiącymi sobie po imieniu, rówieśnikami, przyjaciółmi, rywalami czy współpracownikami BEZWZGLĘDNIE tłumacz w 2. osobie liczby pojedynczej na „ty” („wygrałeś”, „widziałeś”, „jesteś”, „co sądzisz”).
+      - Formę per „pan/pani” stosuj WYŁĄCZNIE wtedy, gdy postacie zwracają się do siebie oficjalnie po nazwisku z tytulaturą („panie Kanzaki”, „panie Tomine”, „panie inspektorze”) i w całej scenie utrzymują ten sam dystans.
+   3. JEDYNY WYJĄTEK DLA ZMIANY FORMY:
+      - Zmiana formy z „pan/pani” na „ty” może nastąpić WYŁĄCZNIE w punkcie zwrotnym zdefiniowanym przez Profiler (Relationship Pivot), gdy bohaterowie wyraźnie ustalają przejście na „ty” (np. „Mów mi Shizuku / Przejdźmy na ty”). W żadnym wypadku nie może to być losowy skok w ramach jednej wymiany zdań!
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -2259,6 +2275,7 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
       * "[Filar CLIV - Logika Przeczeń i Kansai Jibun] Pytanie 'Nie idziesz?' + 'Hai' -> 'Nie idę' (ZAKAZ 'Tak, idę'); Kansai 'Jibun nani shiten nen?' -> 'Co ty wyprawiasz?!'"
       * "[Filar CLV - Repetycje Myśli i Separacja Mowy] Repetycja myśli 'I can't stop it' (3x) -> 'Nie powstrzymam tego' (ZAKAZ podmiany na treść dialogu o fankach z sąsiedniej linijki)"
       * "[Filar CLVI - Rozszczepienie Angielskiego Pivotu] 'Hitori ni shite' -> 'Zostaw mnie samą' (ZAKAZ opryskliwego 'Daj mi spokój'); 'Betsuni' -> 'Wcale nie' / 'Mniejsza z tym' (ZAKAZ 'To nic takiego'); 'Mou ii' -> 'Wystarczy / Daj spokój'"
+      * "[Filar CLVII - Nienaruszalność Formy Adresatywnej] 'Shizuku, dlaczego?!' ... 'Przecież wygrał pan' -> 'Przecież wygrałeś' (zakaz schizofrenii adresatywnej i przechodzenia na 'pan/pani' po zwróceniu się po imieniu na 'ty')"
 
 {BELCZYK_AVT_MASTER_CANON}
 
@@ -3064,6 +3081,20 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
             "• [SKUP SIĘ NA: FILAR CLVI - Rozszczepienie Angielskiego Pivotu i Kotwice Audio]: "
             "Nie ulegaj fałszywym synonimom angielskim! 'Hitori ni shite' (一人にして) w łzach/smutku to 'Zostaw mnie samą/samego' (ZAKAZ opryskliwego 'Daj mi spokój'!). "
             "'Betsuni' to chłodne 'Wcale nie' / 'Mniejsza z tym' (ZAKAZ 'To nic takiego'). 'Mou ii' to rezygnacja 'Wystarczy / Daj spokój'."
+        )
+
+    # 97. Nienaruszalność Formy Adresatywnej i Zakaz Schizofrenii Pan/Ty (Filar CLVII)
+    has_address_drift_risk = any(
+        any(w in str(item.get("en", "")).lower() for w in ["you won", "did you", "you did", "have you", "you're", "you are", "why?!", "why?", "look,", "what? but you", "you've"]) or
+        bool(re.search(r"\b(pan|pani|pana|panu|panie)\b", str(item.get("pl", "")).lower()))
+        for item in batch_items
+    )
+    if has_address_drift_risk:
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CLVII - Nienaruszalność Formy Adresatywnej i Zakaz Schizofrenii Pan/Ty]: "
+            "Jeśli postać zwraca się do rozmówcy po imieniu (np. 'Shizuku, dlaczego?!'), w całej scenie KONSEKWENTNIE stosuj formę na 'ty'! "
+            "KATEGORYCZNY ZAKAZ wtrącania formy 'pan/pani' ('wygrał pan' -> BŁĄD KARDYNALNY! Należy: 'wygrałeś'). "
+            "Wszelkie zwroty 'you / you won / did you' do osoby, z którą jesteś po imieniu, tłumacz w 2. osobie na 'ty'!"
         )
 
     if not focused_pillars:
