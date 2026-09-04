@@ -845,6 +845,14 @@ def test_avt_linter():
     t_ndir, f_ndir = AVTLinter.lint_and_fix_line("Tak.", prev_line_text="Czy to twój płaszcz?")
     assert t_ndir == "Tak."
 
+    # Test Filar XLIII/CXLVI - Reakcja na Pytanie Otwarte (Wh-question)
+    t_wh1, f_wh1 = AVTLinter.lint_and_fix_line("Tak.", prev_line_text="Dokąd idziesz?")
+    assert t_wh1 == "Eee..."
+    assert any("Reakcja na Pytanie Otwarte" in f for f in f_wh1)
+
+    t_wh2, f_wh2 = AVTLinter.lint_and_fix_line("T-Tak.", prev_line_text="Co tam robisz?")
+    assert t_wh2 == "E-Eee..."
+
     # Test Filar CLXI - Nienaruszalność Perspektywy Narracyjnej i Zakaz Zdrady Tożsamości Incognito (0.00 PLN)
     t_witch, fixes_witch = AVTLinter.lint_and_fix_line(
         "{\\i1}Przecież jest tam też mój esej!{\\i0}",

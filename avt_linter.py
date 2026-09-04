@@ -609,13 +609,18 @@ class AVTLinter:
                     modified = re.sub(r"\b[Bb]rachu\b", _waka_brachu_repl, modified)
                     applied_fixes.append("[Filar CLVIII - Zgodność Foniczna Seiyū] Wykryto 'Waka' w audio: zastąpiono błędne 'brachu' przez 'panie'")
 
-        # 4d. Directive/Warning Confirmation Guard (Filar XLIII & CXLVI)
+        # 4d. Directive/Warning & Wh-Question Confirmation Guard (Filar XLIII & CXLVI)
         # When preceding line is an explicit warning or imperative directive, lone affirmative "Tak / T-Tak" is an unnatural calque.
         if not is_sign and prev_line_text:
             prev_clean = re.sub(r"\{[^\}]*\}", "", prev_line_text).strip().lower()
             # Directive/warning triggers in previous line
             is_prev_warning = bool(re.search(
                 r"\b(uważaj|uważajcie|ostrożnie|czekaj|poczekaj|zaczekaj|stój|stójcie|pospiesz|pospieszcie|chodź|chodźcie|nie ruszaj|trzymaj się|uważaj pod nogi)\b",
+                prev_clean,
+                re.IGNORECASE
+            ))
+            is_prev_wh_question = bool(prev_clean.endswith("?") and re.search(
+                r"\b(dokąd|gdzie|skąd|kiedy|dlaczego|czemu|po\s+co|kto|kogo|komu|kim|co|czego|czym|jak|jaki|jaka|jakie|jakim|jakich|o\s+co|o\s+czym|z\s+kim|w\s+jaki\s+sposób)\b",
                 prev_clean,
                 re.IGNORECASE
             ))
@@ -633,6 +638,17 @@ class AVTLinter:
                     
                     modified = re.sub(rf"\b{re.escape(word)}", repl_word, modified)
                     applied_fixes.append(f"[Filar XLIII/CXLVI - Dyrektywne Potwierdzenie] Wykryto odpowiedź na ostrzeżenie/polecenie ('{prev_clean[:30]}...'): zastąpiono '{word}{punct}' przez '{repl_word}{punct}'")
+            elif is_prev_wh_question:
+                clean_current = re.sub(r"\{[^\}]*\}", "", modified).strip()
+                m_aff = re.match(r"^([Tt]-[Tt]ak|[Tt]ak)([\.!\?…]*)$", clean_current)
+                if m_aff:
+                    word = m_aff.group(1)
+                    punct = m_aff.group(2) or "..."
+                    if not punct.endswith("..."):
+                        punct = "..."
+                    repl_word = "E-Eee" if word.lower().startswith("t-") else "Eee"
+                    modified = re.sub(rf"\b{re.escape(word)}[\.!\?…]*", f"{repl_word}{punct}", modified)
+                    applied_fixes.append(f"[Filar XLIII/CXLVI - Reakcja na Pytanie Otwarte] Wykryto odpowiedź na pytanie otwarte ('{prev_clean[:30]}...'): zastąpiono nielogiczne '{word}' przez '{repl_word}{punct}'")
 
         # 4e. Focalization & Dramatic Irony Guard (Filar CLXI - Nienaruszalność Perspektywy Narracyjnej)
         if not is_sign and audio_jp:
