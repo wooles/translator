@@ -157,7 +157,7 @@ Zwróć wynik w formacie JSON zgodnym ze schematem DetectedSign."""
                         "response_schema": DetectedSign,
                         "temperature": 0.1,
                     }
-                    if "3.7" in model.lower() or "3.1-pro" in model.lower():
+                    if any(k in model.lower() for k in ["3.7", "3.8", "flash", "pro"]) and "lite" not in model.lower():
                         gen_cfg_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=0)
 
                     response = client.models.generate_content(

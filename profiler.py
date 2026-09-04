@@ -288,7 +288,7 @@ Zwróć wynik w formacie JSON zgodnym ze schematem EpisodeProfile."""
                     "response_schema": EpisodeProfile,
                     "temperature": 0.2,
                 }
-                if "3.7" in self.model.lower() or "3.1-pro" in self.model.lower():
+                if any(k in self.model.lower() for k in ["3.7", "3.8", "flash", "pro"]) and "lite" not in self.model.lower():
                     gen_config_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=0)
 
                 active_client = self.client_pool.get_client() if self.client_pool else self.client
