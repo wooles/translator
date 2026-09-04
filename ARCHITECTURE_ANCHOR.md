@@ -58,9 +58,21 @@ Dokument ten definiuje żelazne zasady, niezmienniki architektoniczne i standard
 
 ---
 
-## 5. 🧪 PAKIET TESTÓW INTEGRACYJNYCH (32/32 PASSED)
+## 5. 🧠 KOGNITYWISTYKA AVT I ARCHITEKTURA ZEROWEJ LUKI (ZERO-GAP BASELINE)
+1. **100% Bezstratny Przepływ Kontekstu**:
+   * Faza 2 (Script Doctor) otrzymuje pełen zestaw: `history_context` (poprzednie kwestie z polskim przekładem, mówcami i stanem myśli), `lookahead_events` (przyszłe kwestie z mówcami), `character_registry` (płeć, role) oraz ustrukturyzowaną `scene_diagnosis` (z Teorią Umysłu).
+2. **Ping-Pong Dialogowy i Logika Odpowiedzi**:
+   * Kategoryczny zakaz samotnego „Tak/T-Tak” w odpowiedzi na ostrzeżenia/dyrektywy, pytania otwarte (Wh-questions) oraz pytania z przeczeniem (Echo Agreement / Filar CLIV).
+3. **Gwarancja Zerowej Luki (Zero-Gap Healing Pass)**:
+   * Automatyczny pasaż uzupełniający w `translate_file` eliminuje jakiekolwiek pominięte kwestie wynikające z błędów sieciowych.
+4. **Całościowy Audyt Odcinka (`EpisodeQualityGate`)**:
+   * Analiza pełnej osi czasu: spójność T-V, higiena interpunkcji, bariera myśli wewnętrznej i skaner pozostałości angielskich.
+
+---
+
+## 6. 🧪 PAKIET TESTÓW INTEGRACYJNYCH (34/34 PASSED)
 Przed zatwierdzeniem jakichkolwiek przyszłych zmian należy bezwzględnie wykonać:
 ```powershell
 .venv\Scripts\python test_system.py
 ```
-Wszystkie 32 testy jednostkowe i integracyjne **muszą zakończyć się statusem PASSED**. Naruszenie któregokolwiek z powyższych punktów traktowane jest jako regresja krytyczna.
+Wszystkie 34 testy jednostkowe i integracyjne **muszą zakończyć się statusem PASSED**. Naruszenie któregokolwiek z powyższych punktów traktowane jest jako regresja krytyczna i natychmiastowo blokuje wdrożenie.

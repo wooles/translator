@@ -1,23 +1,24 @@
 # 🏛️ CORNERSTONE v2.0 — ŻELAZNY FUNDAMENT I STANDARD ZŁOTEGO ŚRODKA
 
-> **DATA USTANOWIENIA:** 2026-08-29  
-> **GIT COMMIT:** 432d979  
+> **DATA USTANOWIENIA / AKTUALIZACJI:** 2026-09-05  
+> **GIT COMMIT:** 1208154  
 > **GIT TAG:** cornerstone-v2.0  
-> **STATUS:** ZABLOKOWANY / NIENARUSZALNY (IMMUTABLE BASELINE)
+> **STATUS:** ZABLOKOWANY / NIENARUSZALNY (IMMUTABLE PEAK QUALITY BASELINE)
 
 ---
 
 ## 🎯 METRYKI BAZOWE ZŁOTEGO STANDARDU (BASELINE BENCHMARK)
 
-Każda przyszła zmiana w kodzie musi zachować lub polepszyć poniższe parametry referencyjne:
+Każda przyszła zmiana w kodzie musi traktować obecny stan jako nienaruszalną bazę referencyjną i bezwzględnie zachować lub polepszyć poniższe parametry:
 
 * ⏱️ **PRĘDKOŚĆ TŁUMACZENIA:** **~1.90 – 2.05 linii/s** (Odcinek ~360 linii w **3:00 – 3:15 min**).
 * 💰 **KOSZT ODCINKA (POZIOM 3):** **~2.30 – 2.66 PLN** (przy rabacie Context Cache **-90%** i oszczędności **~4.00 PLN / odcinek**).
-* 🧠 **GŁĘBIA SCRIPT DOCTORA (FAZA 2):** Budżet myślenia Gemini 3.7 Flash zablokowany na **6144 CoT tokenów**.
+* 🧠 **GŁĘBIA SCRIPT DOCTORA (FAZA 2):** Budżet myślenia Gemini 3.7 Flash zablokowany na **6144 CoT tokenów** (Multi-Tier Elastic 6144 / 3072 / 2048).
 * 🛡️ **PAMIĘĆ PODRĘCZNA CONTEXT CACHE:** Pełny pre-warming wielokluczowy (*Multi-Key Pre-warming*) na wszystkich projektach przed startem tłumaczenia.
 * 📚 **OFICJALNY KANON MANGOWY:** 83 zweryfikowane serie z oficjalnymi polskimi wydaniami papierowymi (Kotori, Waneko, JPF, Studio JG, Hanami, Dango, Egmont).
-* 💾 **PAMIĘĆ TŁUMACZENIOWA (TM):** 173 906 autentycznych par dialogowych w 	ranslation_memory.db.
-* 🧪 **REGRESYJNY ZESTAW TESTÓW:** **33/33 TESTY W 	est_system.py** muszą kończyć się statusem **PASSED**.
+* 💾 **PAMIĘĆ TŁUMACZENIOWA (TM):** 173 906 autentycznych par dialogowych w `translation_memory.db`.
+* 🧪 **REGRESYJNY ZESTAW TESTÓW:** **34/34 TESTY W `test_system.py`** muszą kończyć się statusem **PASSED** (100% bez regresji).
+* 🎯 **ARCHITEKTURA ZEROWEJ LUKI (ZERO-GAP ARCHITECTURE):** 100% bezstratny przepływ kontekstu między fazami, automatyczny Healing Pass, obsługa pytań otwartych i przeczeń (Echo Agreement) oraz globalny EpisodeQualityGate.
 
 ---
 
@@ -88,9 +89,20 @@ Rozstrzyganie wszelkich konfliktów translacyjnych i priorytetów w silniku odby
 * Krótkie, wieloznaczne zwroty japońskie (np. *Daijoubu*, *Wakatta*, *Sou da na*, *Shikata ga nai*) muszą być przekładane na podstawie **Macierzy Intencji Pragmatycznych** seiyuu (uspokojenie lęku $\rightarrow$ *„Spokojnie” / „Wszystko w porządku” / „Nie martw się”*, grzeczna odmowa $\rightarrow$ *„Dziękuję, nie trzeba”*, stan fizyczny $\rightarrow$ *„Nic mi nie jest”*, gotowość $\rightarrow$ *„Dam radę”*).
 * Bezwzględny zakaz mechanicznego przejmowania rozwlekłych angielskich konstrukcji (np. angielskie *„You don't have to worry”* $\rightarrow$ zakaz rozdmuchiwania do *„Nie musisz się martwić”*, gdy japońskie audio zawiera zwięzłe *Daijoubu*). Tłumacz ma obowiązek zachowania zwięzłości kinowej i naturalnej ekonomii sylab.
 
+### 11. PRAWO NIENARUSZALNOŚCI JAKOŚCI PRZEKŁADU I ZEROWEJ LUKI (ZERO-GAP & PEAK TRANSLATION BASELINE)
+* Obecny stan kodu silnika (`cornerstone-v2.0` / commit `1208154`) stanowi **absolutną bazę referencyjną i złoty standard jakości tłumaczenia**.
+* Wszystkie przyszłe modyfikacje kodu **MUSZĄ** traktować ten poziom jako nienaruszalne minimum — jakakolwiek regresja językowa, utrata kontekstu lub spłaszczenie dialogu jest traktowana jako błąd krytyczny.
+* **Nienaruszalne elementy architektury jakości:**
+  1. **100% Bezstratny Przepływ Kontekstu**: Pomiędzy Fazą 1 a Fazą 2 przekazywane są zawsze: `history_context` (z atrybucją mówcy i stanem myśli), `lookahead_events` (z atrybucją mówcy), `character_registry` (z płcią i statusem) oraz ustrukturyzowana `scene_diagnosis` (z Teorią Umysłu).
+  2. **Gwarancja Zerowej Luki (Zero-Gap Guarantee)**: Automatyczny Healing Pass w `translate_file` gwarantuje 100% przetłumaczonych linii bez pominięć przez błędy sieciowe lub usterki API.
+  3. **Naturalny Ping-Pong Dialogowy (Kognitywistyka AVT)**: Bezwzględny zakaz samotnego „Tak/T-Tak” w odpowiedzi na ostrzeżenia/dyrektywy, pytania otwarte (Wh-questions) oraz pytania z przeczeniem (Echo Agreement / Filar CLIV).
+  4. **Całościowy Audytor Jakości Odcinka (`EpisodeQualityGate`)**: Nienaruszalność form adresatywnych (T-V Invariance), higiena interpunkcji, bariera myśli wewnętrznej oraz skaner pozostałości języka angielskiego (English Remainder Sweep).
+
 ---
 
-## 🔒 ZASADA WERYFIKACJI PRZYSZŁYCH ZMIAN
+## 🔒 ZASADA WERYFIKACJI PRZYSZŁYCH ZMIAN (REGRESSION GUARD)
 Przed zaakceptowaniem i scommitowaniem jakiejkolwiek przyszłej zmiany w kodzie, programista/agent AI jest **bezwzględnie zobowiązany** do:
-1. Uruchomienia `.venv\Scripts\python test_system.py` i uzyskania wyniku **33/33 PASSED**.
-2. Weryfikacji, że żadna zmiana nie spowalnia asynchronicznego dispatchera paczek ani nie zwiększa zużycia tokenów wejściowych.
+1. Uruchomienia `.venv\Scripts\python test_system.py` i uzyskania wyniku **34/34 PASSED** (100% skuteczności bez regresji).
+2. Weryfikacji, że żadna zmiana nie obniża jakości tłumaczenia, nie narusza reguł lingwistycznych Filarów I – CLXI ani nie usuwa żadnego z mechanizmów Zero-Gap.
+3. Potwierdzenia niezmiennika zerowego kosztu (**0.00 PLN**) dla mechanizmów audytu i optymalizacji.
+4. Upewnienia się, że żadna zmiana nie spowalnia asynchronicznego dispatchera paczek ani nie zwiększa zużycia tokenów wejściowych.
