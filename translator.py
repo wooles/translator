@@ -2893,6 +2893,13 @@ class MultimodalTranslator:
                 user_feedback_rules=all_user_rules
             )
             if qg_fixes:
+                en_warnings = [f for f in qg_fixes if "nieprzetłumaczony angielski" in f]
+                if en_warnings:
+                    print(f"\n  ⚠️ [ALARM EPISODE QUALITY GATE]: Wykryto {len(en_warnings)} nieprzetłumaczonych kwestii angielskich:")
+                    for ew in en_warnings[:5]:
+                        print(f"     └─ {ew}")
+                    if len(en_warnings) > 5:
+                        print(f"     └─ ... i {len(en_warnings) - 5} kolejnych.")
                 logger.info(f"[EpisodeQualityGate]: Przeprowadzono całościowy audyt zdroworozsądkowy ({len(qg_fixes)} poprawek integralności).")
                 for f in qg_fixes[:5]:
                     logger.info(f"  ├─ {f}")
