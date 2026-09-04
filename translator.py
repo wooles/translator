@@ -1146,6 +1146,20 @@ class MultimodalTranslator:
             if prev_clean:
                 prev_clean_lower = prev_clean.lower()
                 clean_en_lower = clean_text.lower().strip()
+                jp_audio_line = (whisper_transcriptions.get(idx + 1, "") if whisper_transcriptions else "").lower()
+
+                # Czy bieżąca kwestia to potwierdzenie afirmatywne (tak/hai/yes)?
+                curr_is_affirmation = any(
+                    clean_en_lower.startswith(w) for w in ["yes", "y-yes", "yeah", "yep", "right", "okay", "ok"]
+                ) or any(
+                    w in jp_audio_line for w in ["hai", "はい", "ee", "ええ", "un", "うん"]
+                )
+
+                prev_jp = ""
+                if idx > 0 and whisper_transcriptions:
+                    prev_jp = whisper_transcriptions.get(idx, "").lower()
+                elif idx == 0 and history_context:
+                    prev_jp = history_context[-1].get("audio_jp", "").lower()
 
                 is_prev_directive = any(
                     w in prev_clean_lower for w in [
@@ -1158,6 +1172,11 @@ class MultimodalTranslator:
                         "uważaj", "uważajcie", "ostrożnie", "czekaj", "zaczekaj", "poczekaj",
                         "stój", "stójcie", "nie ruszaj", "pospiesz", "chodź", "chodźcie", "ruszaj",
                         "trzymaj się"
+                    ]
+                ) or any(
+                    w in prev_jp for w in [
+                        "ki o tsukete", "kiwotsukete", "abunai", "chotto matte", "mate",
+                        "tomare", "ugoku na", "hayaku", "気をつけ", "危ない", "待って", "止まれ"
                     ]
                 )
 

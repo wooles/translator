@@ -2257,7 +2257,41 @@ def test_translator_logger_and_sign_detector():
         {"en": "I will never give up!", "pl": "Nigdy się nie poddam!", "anime": "Kingdom", "score": 100}
     ])
     assert "[DOKŁADNY CYTAT 1:1]" in formatted_mem
-    print(" -> PASSED: Logger w translator.py, audio alerty (Haragei, Aizuchi, Oyaji, Giri, Ii desu, Wakaru, Hybrydy, Kun, Chigaimasu) i spójność retrospekcji 1:1 działają bezbłędnie.")
+
+    # Test _prepare_batch_prompt prompt construction and curr_is_affirmation calculation
+    from translator import MultimodalTranslator
+    import pysubs2
+    class MockTranslator(MultimodalTranslator):
+        def __init__(self):
+            self.tm = None
+            self.character_registry = {"Eftal": "mężczyzna, potężny mędrzec"}
+            self._episode_knowledge_cached = False
+
+    mock_trans = MockTranslator()
+    ev1 = pysubs2.SSAEvent(start=1000, end=2500, text="Watch out, master!", style="Default")
+    ev2 = pysubs2.SSAEvent(start=2600, end=3800, text="Yeah, I know.", style="Default")
+    ev3 = pysubs2.SSAEvent(start=3900, end=5000, text="Where are you going?", style="Default")
+    ev4 = pysubs2.SSAEvent(start=5100, end=6200, text="Yes...", style="Default")
+    ev5 = pysubs2.SSAEvent(start=6300, end=7500, text="Don't you want to come?", style="Default")
+    ev6 = pysubs2.SSAEvent(start=7600, end=8800, text="Yes.", style="Default")
+
+    batch_evs = [
+        (0, ev1, "Watch out, master!", ""),
+        (1, ev2, "Yeah, I know.", ""),
+        (2, ev3, "Where are you going?", ""),
+        (3, ev4, "Yes...", ""),
+        (4, ev5, "Don't you want to come?", ""),
+        (5, ev6, "Yes.", ""),
+    ]
+    prompt_res = mock_trans._prepare_batch_prompt(
+        batch_events=batch_evs,
+        history_context=[{"en": "Be careful.", "pl": "Uważaj.", "audio_jp": "abunai"}],
+        whisper_transcriptions={2: "hai", 4: "un", 6: "hai"}
+    )
+    assert "Filar CXLVI & XLIII" in prompt_res
+    assert "Filar CLIV" in prompt_res
+    assert "Watch out, master!" in prompt_res
+    print(" -> PASSED: Logger w translator.py, audio alerty (Haragei, Aizuchi, Oyaji, Giri, Ii desu, Wakaru, Hybrydy, Kun, Chigaimasu), spójność retrospekcji 1:1 i _prepare_batch_prompt działają bezbłędnie.")
 
 def test_masterclass_next_gen():
     print("[TEST 30/30] Test mechanizmów Masterclass (Pillar CXVIII Barańczak Song, Idiolect Matrix, SceneShotSnapper)...")
