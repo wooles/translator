@@ -311,6 +311,18 @@ def test_pydantic_schemas():
     assert ref_batch.lines[0].screen_region == "bottom_right"
     assert ref_batch.scene_diagnosis is not None
 
+    # Test verify_batch signature with history_context, lookahead_events, character_registry, scene_diagnosis
+    from verifier import DialogueVerifier
+    dummy_verifier = DialogueVerifier.__new__(DialogueVerifier)
+    dummy_res = dummy_verifier.verify_batch(
+        batch_items=[],
+        history_context=[{"speaker": "Felix", "en": "Watch out", "pl": "Uważaj"}],
+        lookahead_events=[(1, None, "Next line", "")],
+        character_registry={"Felix": "mężczyzna"},
+        scene_diagnosis=diag
+    )
+    assert dummy_res == []
+
     # Test Dramatic Beat Batching (Zero-Cost Guarantee & no micro-batches)
     raw_events = []
     for i in range(17):
@@ -2453,13 +2465,23 @@ def test_episode_quality_gate():
     ev5 = pysubs2.SSAEvent(start=8000, end=9200, text="To prawda.. czy to na pewno ty ?", style="Default")
     # Linia 6: Amerykanizm (Filar IV / XXXVI)
     ev6 = pysubs2.SSAEvent(start=9500, end=11000, text="Witaj z powrotem w akademii.", style="Default")
+    # Linia 7: Pytanie otwarte (Wh-question)
+    ev7 = pysubs2.SSAEvent(start=11500, end=12500, text="Dokąd idziesz o tej porze?", style="Default")
+    # Linia 8: Odpowiedź w postaci wahania (błędne Tak -> winno być Eee...)
+    ev8 = pysubs2.SSAEvent(start=12700, end=13500, text="Tak.", style="Default")
+    # Linia 9: Wołacz po imieniu (T-V Invariance)
+    ev9 = pysubs2.SSAEvent(start=14000, end=15000, text="Felixie, zaczekaj!", style="Default")
+    # Linia 10: Schizofrenia adresatywna (pan po zwrocie po imieniu)
+    ev10 = pysubs2.SSAEvent(start=15200, end=16500, text="Przecież wygrał pan starcie.", style="Default")
+    # Linia 11: Przypadkowy pytajnik w potwierdzeniu twierdzącym
+    ev11 = pysubs2.SSAEvent(start=17000, end=18000, text="Rozumiem?", style="Default")
 
-    subs.events = [ev1, ev2, ev3, ev4, ev5, ev6]
+    subs.events = [ev1, ev2, ev3, ev4, ev5, ev6, ev7, ev8, ev9, ev10, ev11]
 
     audited_subs, fixes = EpisodeQualityGate.audit_and_fix_entire_episode(subs)
 
     # Weryfikacja korekt
-    assert len(fixes) >= 4, f"Oczekiwano co najmniej 4 poprawek, otrzymano {len(fixes)}"
+    assert len(fixes) >= 7, f"Oczekiwano co najmniej 7 poprawek, otrzymano {len(fixes)}"
 
     # 1. Dyrektywne potwierdzenie: T-Tak. -> D-Dobrze.
     assert audited_subs.events[1].text == "D-Dobrze."
@@ -2477,7 +2499,19 @@ def test_episode_quality_gate():
     # 4. Usunięcie kalki amerykańskiej
     assert audited_subs.events[5].text.startswith("Witaj!")
 
-    print(" -> PASSED: Episode Quality Gate bezbłędnie eliminuje banalne błędy na pełnej osi czasu (Adjacency Pairs, Thought Boundary, Incognito, Typography, Calques) przy koszcie 0.00 PLN.")
+    # 5. Pytanie otwarte Wh-question: Tak. -> Eee...
+    assert audited_subs.events[7].text == "Eee..."
+    assert any("Pytanie Otwarte" in f for f in fixes)
+
+    # 6. Spójność adresatywna T-V: wygrał pan -> wygrałeś
+    assert "wygrałeś" in audited_subs.events[9].text
+    assert any("T-V Invariance" in f for f in fixes)
+
+    # 7. Usunięcie pytajnika z potwierdzenia: Rozumiem? -> Rozumiem.
+    assert audited_subs.events[10].text == "Rozumiem."
+    assert any("Higiena Pytajnika" in f for f in fixes)
+
+    print(" -> PASSED: Episode Quality Gate bezbłędnie eliminuje banalne błędy na pełnej osi czasu (Adjacency Pairs, Wh-Questions, T-V Invariance, Thought Boundary, Incognito, Typography, Calques) przy koszcie 0.00 PLN.")
 
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")

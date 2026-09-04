@@ -5,7 +5,7 @@ Eliminates translationese, mechanical calques, and refines dialogues for natural
 """
 
 import json
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Tuple
 from pydantic import BaseModel, Field
 from google import genai
 from google.genai import types
@@ -68,7 +68,11 @@ class DialogueVerifier:
         glossary_str: str = "",
         focused_rules_str: str = "",
         series_bible_str: str = "",
-        manga_canon_str: str = ""
+        manga_canon_str: str = "",
+        history_context: Optional[List[Dict[str, Any]]] = None,
+        lookahead_events: Optional[List[Tuple[int, Any, str, str]]] = None,
+        character_registry: Optional[Dict[str, str]] = None,
+        scene_diagnosis: Optional[Any] = None
     ) -> List[RefinedLine]:
         """
         Executes editorial refinement and verification for a dialogue batch.
@@ -91,8 +95,66 @@ class DialogueVerifier:
         
         if focused_rules_str:
             prompt_lines.append(f"\n{focused_rules_str}\n")
-        if scene_summary:
+
+        # Known Characters in episode for role and status continuity
+        if character_registry:
+            prompt_lines.append("--- ZNANE POSTACIE W TYM FILMIE (spójność ról, płci i relacji władzy) ---")
+            for name, details in character_registry.items():
+                prompt_lines.append(f"• {name}: {details}")
+            prompt_lines.append("--------------------------------------------------------------------------\n")
+
+        # Structured Scene Diagnosis from Phase 1
+        if scene_diagnosis and hasattr(scene_diagnosis, "dramatic_context"):
+            diag_lines = ["\n🎬 DIAGNOZA DRAMATURGICZNA I KOGNITYWNA SCENY:"]
+            if getattr(scene_diagnosis, "dramatic_context", None) and scene_diagnosis.dramatic_context.strip():
+                diag_lines.append(f"• Sytuacja i emocje: {scene_diagnosis.dramatic_context.strip()}")
+            if getattr(scene_diagnosis, "dialogue_flow", None) and scene_diagnosis.dialogue_flow.strip():
+                diag_lines.append(f"• Dynamika dialogu (przyczyna-skutek): {scene_diagnosis.dialogue_flow.strip()}")
+            if getattr(scene_diagnosis, "audio_intent_check", None) and scene_diagnosis.audio_intent_check.strip():
+                diag_lines.append(f"• Intencja ze słuchu (Whisper): {scene_diagnosis.audio_intent_check.strip()}")
+            if getattr(scene_diagnosis, "dominant_tone", None) and scene_diagnosis.dominant_tone.strip():
+                diag_lines.append(f"• Rejestr i ton: {scene_diagnosis.dominant_tone.strip()}")
+            if getattr(scene_diagnosis, "power_dynamic", None) and scene_diagnosis.power_dynamic.strip():
+                diag_lines.append(f"• Relacja władzy: {scene_diagnosis.power_dynamic.strip()}")
+            if getattr(scene_diagnosis, "epistemic_asymmetry", None) and scene_diagnosis.epistemic_asymmetry.strip():
+                diag_lines.append(f"• Teoria Umysłu (asymetria wiedzy / zakaz dekonspiracji): {scene_diagnosis.epistemic_asymmetry.strip()}")
+            if getattr(scene_diagnosis, "table_read_mouth_feel", None) and scene_diagnosis.table_read_mouth_feel.strip():
+                diag_lines.append(f"• Próba Stolikowa (płynność w ustach aktora): {scene_diagnosis.table_read_mouth_feel.strip()}")
+            prompt_lines.append("\n".join(diag_lines) + "\n")
+        elif scene_summary:
             prompt_lines.append(f"\n[Kontekst sceny]: {scene_summary}\n")
+
+        # Dialogue History Context (Cross-Batch & Intra-Scene)
+        if history_context:
+            prompt_lines.append("--- POPRZEDNIE KWESTIE W SCENIE (kontekst przeszły / ciągłość dialogu) ---")
+            for h in history_context[-4:]:
+                spk_label = ""
+                spk_name = (h.get("speaker") or h.get("speaker_name") or "").strip()
+                spk_gen = (h.get("speaker_gender") or "").strip()
+                if spk_name and spk_gen:
+                    spk_label = f" (Mówca: {spk_name} | {spk_gen})"
+                elif spk_name:
+                    spk_label = f" (Mówca: {spk_name})"
+                elif spk_gen:
+                    spk_label = f" (Mówca: {spk_gen})"
+                
+                mode_label = " [💭 Myśl wewnętrzna]" if h.get("is_thought") else ""
+
+                if h.get("pl"):
+                    prompt_lines.append(f"[Poprzednio]{spk_label}{mode_label} EN: {h['en']} -> PL: {h['pl']}")
+                else:
+                    prompt_lines.append(f"[Poprzednio]{spk_label}{mode_label} EN: {h['en']}")
+            prompt_lines.append("---------------------------------------------------------------------------\n")
+
+        # Lookahead preview of upcoming dialogue
+        if lookahead_events:
+            prompt_lines.append("--- NADCHODZĄCE KWESTIE (kontekst przyszły / dokąd zmierza rozmowa) ---")
+            for item in lookahead_events[:4]:
+                fut_text = item[2] if len(item) > 2 else ""
+                fut_ev = item[1] if len(item) > 1 else None
+                fut_spk = f" (Mówca: {fut_ev.name})" if fut_ev and getattr(fut_ev, "name", None) else ""
+                prompt_lines.append(f"[Wkrótce]{fut_spk} EN: {fut_text}")
+            prompt_lines.append("--------------------------------------------------------------------------\n")
 
         # Static Episode Knowledge (Only appended if not already baked into Cached System Instructions)
         if not getattr(self, "_episode_knowledge_cached", False):
@@ -110,6 +172,9 @@ class DialogueVerifier:
         for item in batch_items:
             type_tag = f" [[Napis] {item['visual_type']}]" if item.get("is_sign") else " [DIALOG]"
             semiotic_tag = f" [{item['semiotic_layer']}]" if item.get("semiotic_layer") else ""
+            mode_tag = " [💭 Myśl wewnętrzna]" if item.get("is_thought") else (" [🗣️ Mowa diegetyczna]" if not item.get("is_sign") else "")
+            dur_s = item.get("duration_s")
+            dur_info = f" (Czas: {dur_s:.1f}s)" if dur_s else ""
             speaker_name = (item.get('speaker_name') or '').strip()
             speaker_gender = (item.get('speaker_gender') or '').strip()
             if speaker_name and speaker_gender:
@@ -137,7 +202,7 @@ class DialogueVerifier:
             relation_info = f"  {item['relation_tag']}\n" if item.get('relation_tag') else ""
             
             prompt_lines.append(
-                f"- [ID: {item['id']}]{type_tag}{semiotic_tag}{char_info}{voice_info}{prosody_info}{song_info}{cps_info}{visual_info}{region_info}\n"
+                f"- [ID: {item['id']}]{type_tag}{semiotic_tag}{mode_tag}{char_info}{voice_info}{prosody_info}{dur_info}{song_info}{cps_info}{visual_info}{region_info}\n"
                 f"{audio_info}"
                 f"{alert_info}"
                 f"{prag_reg_info}"

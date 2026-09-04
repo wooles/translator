@@ -820,12 +820,17 @@ class EpisodeQualityGate:
                     prev_clean = cand_text
                     break
 
-            # 1. ADJACENCY PAIR AUDIT: Directive / Warning -> Affirmation Guard (Filar XLIII / CXLVI)
+            # 1. ADJACENCY PAIR AUDIT: Directive / Warning / Wh-Question -> Affirmation Guard (Filar XLIII / CXLVI)
             if not is_sign and prev_clean and prev_ev:
                 time_gap_ms = ev.start - prev_ev.end
                 if time_gap_ms < 9000:
                     is_prev_directive = bool(re.search(
                         r"\b(uważaj|uważajcie|ostrożnie|czekaj|poczekaj|zaczekaj|stój|stójcie|pospiesz|pospieszcie|chodź|chodźcie|nie ruszaj|trzymaj się|uważaj pod nogi|ruszaj|kryj się|padnij)\b",
+                        prev_clean,
+                        re.IGNORECASE
+                    ))
+                    is_prev_wh_question = bool(prev_clean.endswith("?") and re.search(
+                        r"\b(dokąd|gdzie|kiedy|dlaczego|czemu|kto|kogo|komu|kim|co|czego|czym|jak|jaki|jaka|jakie|jakim|jakich|o\s+co|o\s+czym|z\s+kim|w\s+jaki\s+sposób)\b",
                         prev_clean,
                         re.IGNORECASE
                     ))
@@ -838,6 +843,17 @@ class EpisodeQualityGate:
                             repl_word = "D-Dobrze" if word.lower().startswith("t-") else ("Dobrze" if word[0].isupper() else "dobrze")
                             ev.text = re.sub(rf"\b{re.escape(word)}", repl_word, ev.text, count=1)
                             fixes.append(f"[Episode Quality Gate - Dyrektywne Potwierdzenie] Linia #{i+1}: zastąpiono '{word}{punct}' przez '{repl_word}{punct}' w reakcji na '{prev_clean[:25]}...'")
+                    elif is_prev_wh_question:
+                        # Open questions cannot be answered with lone "Yes/Tak" (hesitation mistranslation)
+                        m_aff = re.match(r"^(\s*\{[^\}]*\})*([Tt]-[Tt]ak|[Tt]ak)([\.!\?…]*)(\{[^\}]*\}\s*)*$", ev.text.strip())
+                        if m_aff:
+                            word = m_aff.group(2)
+                            punct = m_aff.group(3) or "..."
+                            if not punct.endswith("..."):
+                                punct = "..."
+                            repl_word = "E-Eee" if word.lower().startswith("t-") else "Eee"
+                            ev.text = re.sub(rf"\b{re.escape(word)}[\.!\?…]*", f"{repl_word}{punct}", ev.text, count=1)
+                            fixes.append(f"[Episode Quality Gate - Reakcja na Pytanie Otwarte] Linia #{i+1}: zastąpiono nielogiczne '{word}' przez '{repl_word}{punct}' w reakcji na pytanie otwarte '{prev_clean[:25]}...'")
 
             # 2. THOUGHT-TO-SPEECH BOUNDARY: Strip unsolicited thought italics on plain dialogue lines
             if not is_sign and prev_ev:
@@ -862,6 +878,34 @@ class EpisodeQualityGate:
                     ev.text = re.sub(r"\bmoj(?:a|ej|ą)\s+prac(?:a|y|ę)\b", "praca Wiedźmy Milczenia", ev.text, flags=re.IGNORECASE)
                     fixes.append(f"[Episode Quality Gate - Filar CLXI] Linia #{i+1}: skorygowano zdradę tożsamości 'moja praca' -> 'praca Wiedźmy Milczenia'")
 
+            # 3b. INTER-LINE T-V INVARIANCE (Filar CLVII): First name in dialogue vs unexpected 'pan/pani'
+            if not is_sign and prev_clean and prev_ev:
+                time_gap_ms = ev.start - prev_ev.end
+                if time_gap_ms < 6000:
+                    first_name_in_prev = bool(re.search(
+                        r"(?<!\bpanie\s)(?<!\bpani\s)(?<!\bpanno\s)\b([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]{2,})[,?!]",
+                        prev_clean
+                    ))
+                    if first_name_in_prev:
+                        drift_matches = [
+                            (r"\bwygrał\s+pan\b", "wygrałeś"),
+                            (r"\bwygrała\s+pani\b", "wygrałaś"),
+                            (r"\bwidział\s+pan\b", "widziałeś"),
+                            (r"\bwidziała\s+pani\b", "widziałaś"),
+                            (r"\bzrobił\s+pan\b", "zrobiłeś"),
+                            (r"\bzrobiła\s+pani\b", "zrobiłaś"),
+                            (r"\bpan\s+wie\b", "wiesz"),
+                            (r"\bpani\s+wie\b", "wiesz"),
+                            (r"\bpan\s+myśli\b", "myślisz"),
+                            (r"\bpani\s+myśli\b", "myślisz"),
+                            (r"\bniech\s+pan\s+spojrzy\b", "spójrz"),
+                            (r"\bniech\s+pani\s+spojrzy\b", "spójrz")
+                        ]
+                        for dr_pat, dr_rep in drift_matches:
+                            if re.search(dr_pat, ev.text, re.IGNORECASE):
+                                ev.text = re.sub(dr_pat, dr_rep, ev.text, flags=re.IGNORECASE)
+                                fixes.append(f"[Episode Quality Gate - Filar CLVII T-V Invariance] Linia #{i+1}: skorygowano nieuzasadniony zwrot formalny na 2. os. '{dr_rep}' po zwróceniu się po imieniu")
+
             # 4. RESIDUAL ENGLISH CALQUE SWEEP (Belczyk AVT Canon)
             for item in AVTLinter.FIXED_REPLACEMENTS:
                 pattern = item[0]
@@ -878,6 +922,10 @@ class EpisodeQualityGate:
             ev.text = re.sub(r"\s+([,\.!\?…])", r"\1", ev.text)
             # Normalize whitespace around ASS line breaks
             ev.text = re.sub(r"\s*\\N\s*", r"\\N", ev.text)
+            # Remove misplaced question mark on pure affirmative statements like "Rozumiem?" -> "Rozumiem."
+            if not is_sign and re.match(r"^(\s*\{[^\}]*\})*(?:Rozumiem|Jasne|D-Dobrze|Dobrze|W porządku|Oczywiście)\?+(\{[^\}]*\}\s*)*$", ev.text.strip()):
+                ev.text = re.sub(r"\?+", ".", ev.text)
+                fixes.append(f"[Episode Quality Gate - Higiena Pytajnika] Linia #{i+1}: usunięto pytajnik z potwierdzenia twierdzącego")
 
             # Record if text changed due to hygiene
             if ev.text != text_before and not any(f"Linia #{i+1}:" in f for f in fixes):

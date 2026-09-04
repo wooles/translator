@@ -1086,10 +1086,22 @@ class MultimodalTranslator:
         if history_context:
             lines.append("--- POPRZEDNIE KWESTIE W SCENIE (kontekst przeszły) ---")
             for h in history_context[-4:]:
+                spk_label = ""
+                spk_name = (h.get("speaker") or h.get("speaker_name") or "").strip()
+                spk_gen = (h.get("speaker_gender") or "").strip()
+                if spk_name and spk_gen:
+                    spk_label = f" (Mówca: {spk_name} | {spk_gen})"
+                elif spk_name:
+                    spk_label = f" (Mówca: {spk_name})"
+                elif spk_gen:
+                    spk_label = f" (Mówca: {spk_gen})"
+                
+                mode_label = " [💭 Myśl wewnętrzna]" if h.get("is_thought") else ""
+
                 if h.get("pl"):
-                    lines.append(f"[Poprzednio] EN: {h['en']} -> PL: {h['pl']}")
+                    lines.append(f"[Poprzednio]{spk_label}{mode_label} EN: {h['en']} -> PL: {h['pl']}")
                 else:
-                    lines.append(f"[Poprzednio] EN: {h['en']}")
+                    lines.append(f"[Poprzednio]{spk_label}{mode_label} EN: {h['en']}")
             lines.append("-------------------------------------------------------\n")
 
         # 3. Lines to translate
@@ -1120,13 +1132,44 @@ class MultimodalTranslator:
                 acoustic_cues.append(f"Ton: {prosody_tags[idx + 1]}")
             acoustic_str = f" [{', '.join(acoustic_cues)}]" if acoustic_cues else ""
 
-            # Dynamic cause-and-effect relationship detection with preceding line
+            # Dynamic cause-and-effect relationship detection with preceding line (intra-batch and cross-batch)
             relation_tag = ""
+            prev_clean = ""
+            prev_pl_ref = ""
             if idx > 0 and not vtype["is_sign"]:
                 prev_clean = batch_events[idx - 1][2].strip()
-                if prev_clean.endswith("?"):
+            elif idx == 0 and not vtype["is_sign"] and history_context:
+                prev_h = history_context[-1]
+                prev_clean = prev_h.get("en", "").strip()
+                prev_pl_ref = prev_h.get("pl", "").strip().lower()
+
+            if prev_clean:
+                prev_clean_lower = prev_clean.lower()
+                clean_en_lower = clean_text.lower().strip()
+
+                is_prev_directive = any(
+                    w in prev_clean_lower for w in [
+                        "watch your step", "be careful", "watch out", "look out", "mind the",
+                        "careful", "hold on", "wait", "listen", "don't move", "hurry", "stay back",
+                        "follow me", "step back", "take care"
+                    ]
+                ) or any(
+                    w in prev_pl_ref for w in [
+                        "uważaj", "uważajcie", "ostrożnie", "czekaj", "zaczekaj", "poczekaj",
+                        "stój", "stójcie", "nie ruszaj", "pospiesz", "chodź", "chodźcie", "ruszaj",
+                        "trzymaj się"
+                    ]
+                )
+
+                curr_is_affirmation = any(
+                    clean_en_lower.startswith(w) for w in ["yes", "y-yes", "yeah", "yep", "right", "okay", "ok"]
+                )
+
+                if is_prev_directive and curr_is_affirmation:
+                    relation_tag = " [RELACJA: Odpowiedź na ostrzeżenie/dyrektywę – KATEGORYCZNY ZAKAZ 'Tak/T-Tak'! Użyj 'Dobrze / D-Dobrze / Jasne / Będę uważać / W porządku' (Filar CXLVI & XLIII)]"
+                elif prev_clean.endswith("?"):
                     relation_tag = " [RELACJA: Prawdopodobna odpowiedź/reakcja na pytanie]"
-                elif any(prev_clean.lower().startswith(w) for w in ["come,", "let's", "shall we", "look,", "hey,"]):
+                elif any(prev_clean_lower.startswith(w) for w in ["come,", "let's", "shall we", "look,", "hey,"]):
                     relation_tag = " [RELACJA: Prawdopodobna reakcja / zgoda / odmowa na zaproszenie/propozycję]"
                 elif prev_clean.endswith("...") or prev_clean.endswith("…"):
                     relation_tag = " [RELACJA: Prawdopodobna kontynuacja myśli rozbitej wielokropkiem]"
@@ -1382,9 +1425,16 @@ class MultimodalTranslator:
         lookback_history = []
         if b_idx > 0 and b_idx - 1 < len(batches):
             prev_batch = batches[b_idx - 1]
-            for prev_orig_idx, _, prev_clean_en, _ in prev_batch[-4:]:
+            for prev_orig_idx, prev_event, prev_clean_en, _ in prev_batch[-4:]:
                 prev_pl = translated_results.get(prev_orig_idx, "") if translated_results else ""
-                lookback_history.append({"en": prev_clean_en, "pl": prev_pl})
+                spk = prev_event.name.strip() if getattr(prev_event, "name", None) else ""
+                is_th = "italic" in (prev_event.style or "").lower() or r"\i1" in (prev_event.text or "")
+                lookback_history.append({
+                    "en": prev_clean_en,
+                    "pl": prev_pl,
+                    "speaker": spk,
+                    "is_thought": is_th
+                })
         elif history:
             lookback_history = list(history[-4:])
 
@@ -1911,7 +1961,11 @@ class MultimodalTranslator:
                 glossary_str=glossary_str,
                 focused_rules_str=phase2_focused_rules,
                 series_bible_str=series_bible_str,
-                manga_canon_str=manga_canon_str
+                manga_canon_str=manga_canon_str,
+                history_context=lookback_history,
+                lookahead_events=lookahead_events,
+                character_registry=self.character_registry,
+                scene_diagnosis=getattr(batch_response, "scene_diagnosis", None) if batch_response else None
             )
             refined_dict = {r.id: sanitize_sub_text(r.refined_pl) for r in refined_lines}
             refined_region_dict = {r.id: r.screen_region for r in refined_lines if getattr(r, 'screen_region', None)}
@@ -2487,7 +2541,14 @@ class MultimodalTranslator:
                                     for it in pass1_items:
                                         pl_final = batch_res.get(it["orig_idx"], it.get("pl", ""))
                                         if pl_final:
-                                            history.append({"orig_idx": it["orig_idx"], "en": it["en"], "pl": pl_final})
+                                            history.append({
+                                                "orig_idx": it["orig_idx"],
+                                                "en": it["en"],
+                                                "pl": pl_final,
+                                                "speaker": it.get("speaker_name", ""),
+                                                "speaker_gender": it.get("speaker_gender", ""),
+                                                "is_thought": it.get("is_thought", False)
+                                            })
                                     history.sort(key=lambda x: x.get("orig_idx", 0))
                                     if len(history) > 30:
                                         history[:] = history[-30:]
@@ -2560,7 +2621,14 @@ class MultimodalTranslator:
                                 for it in pass1_items:
                                     pl_final = batch_res.get(it["orig_idx"], it.get("pl", ""))
                                     if pl_final:
-                                        history.append({"orig_idx": it["orig_idx"], "en": it["en"], "pl": pl_final})
+                                        history.append({
+                                            "orig_idx": it["orig_idx"],
+                                            "en": it["en"],
+                                            "pl": pl_final,
+                                            "speaker": it.get("speaker_name", ""),
+                                            "speaker_gender": it.get("speaker_gender", ""),
+                                            "is_thought": it.get("is_thought", False)
+                                        })
                                 history.sort(key=lambda x: x.get("orig_idx", 0))
                                 if len(history) > 30:
                                     history[:] = history[-30:]
