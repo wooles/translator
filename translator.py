@@ -828,10 +828,26 @@ def clean_orphaned_dialogue_dashes(text: str) -> str:
     
     # If the text has a second line with a dash (e.g. "\N- " or "\n- "), it is a valid dual-speaker block!
     if r"\N-" in text or r"\N -" in text or r"\N–" in text or r"\N –" in text or "\n-" in text or "\n -" in text:
+        ts_prefix, clean_body = extract_typesetting_tags(text)
+        parts = re.split(r"\\N|\\n|\n", clean_body)
+        if len(parts) == 2:
+            p0 = re.sub(r"^[-–—]\s*", "", parts[0]).strip()
+            p1 = re.sub(r"^[-–—]\s*", "", parts[1]).strip()
+            sep = r"\N" if r"\N" in text else "\n"
+            return f"{ts_prefix}- {p0}{sep}- {p1}"
         return text
         
     ts_prefix, clean_body = extract_typesetting_tags(text)
-    # Strip leading dash on single-speaker line
+
+    # In-line dual speaker turn (e.g. "Gratulacje... - Rozpacz po przegranej...")
+    dual_turn_match = re.match(r"^[-–—]?\s*(.+?(?:[.!?…]+|\]|\))\s*)[-–—]\s*([A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż…\[].+)$", clean_body)
+    if dual_turn_match:
+        p1 = re.sub(r"^[-–—]\s*", "", dual_turn_match.group(1)).strip()
+        p2 = re.sub(r"^[-–—]\s*", "", dual_turn_match.group(2)).strip()
+        sep = r"\N"
+        return f"{ts_prefix}- {p1}{sep}- {p2}"
+
+    # Strip leading dash on genuine single-speaker line
     clean_body = re.sub(r"^[-–—]\s*", "", clean_body)
     return f"{ts_prefix}{clean_body}" if ts_prefix else clean_body
 
@@ -1084,6 +1100,7 @@ class MultimodalTranslator:
                      "PRZYNALEŻNOŚĆ I 3. OSOBA: Frazy typu '[Imię]'s dad / mom / manga' (np. 'Akafuku's dad!') tłumacz w 3. osobie ('Tata Akafuku!'). BEZWZGLĘDNY ZAKAZ zamiany imienia innej postaci na 1. osobę ('to mój tata' -> BŁĄD!). "
                      "Użyj załączonych klatek wideo do WIZUALNEGO ODCZYTANIA (OCR) JAPOŃSKICH NAPISÓW (chmurki jak いいよね, tablice, telefony, szyldy) oraz japońskiego audio do ustalenia emocji i kontekstu sytuacji. "
                      "TRIANGULACJA KOMPLEMENTARNA ŹRÓDEŁ: Skrypt angielski (EN) zapewnia precyzję faktów, nazwy własne i logikę zdania, a japoński głos seiyū (JP) decyduje o formie grzecznościowej, płci i zgodności ze słuchem widza! "
+                     "WIELOGŁOS I NAPISY W DYMKACH (FILAR LVII): Jeśli kwestia zawiera wypowiedzi dwóch postaci (np. z myślnikami '- ') lub jednoczesny dymek z mangi i komentarz postaci: BEZWZGLĘDNIE rozdziel je na DWIE OSOBNE LINIE, każdą zaczynając od myślnika ze spacją ('- Kwestia 1\\N- Kwestia 2'). KATEGORYCZNY ZAKAZ łączenia ich w jedną linijkę lub wklejania myślnika w środku zdania! "
                      "BEZWZGLĘDNIE unikaj tłumaczenia 1:1, kalek i sztywnych definicji (np. 'That bombed' -> 'To mi nie wyszło', 'I'm home' -> 'Wróciłam!', 'I see' -> 'Rozumiem'):")
 
         for idx, (original_idx, event, clean_text, ts_prefix) in enumerate(batch_events):

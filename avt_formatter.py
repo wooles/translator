@@ -72,15 +72,33 @@ def split_subtitle_syntactically(text: str, max_line_len: int = MAX_LINE_LENGTH,
     elif is_sign:
         max_line_len = min(max_line_len, 34)
 
-    # 1. PRESERVE EXPLICIT 2-LINE DIVISION (e.g. Title Cards from LLM / Script Doctor)
+    # 1. PRESERVE EXPLICIT 2-LINE DIVISION & DUAL-SPEAKER DIALOGUES (Filar LVII / Netflix AVT)
     if ("\\N" in raw_content or "\\n" in raw_content or "\n" in raw_content):
         existing_parts = [p.strip() for p in re.split(r"\\N|\\n|\n", raw_content) if p.strip()]
         if len(existing_parts) == 2:
+            is_dual_speaker = (
+                existing_parts[0].startswith(("-", "–", "—")) or
+                existing_parts[1].startswith(("-", "–", "—"))
+            )
+            if is_dual_speaker:
+                clean_p0 = re.sub(r"^[-–—]\s*", "", existing_parts[0]).strip()
+                clean_p1 = re.sub(r"^[-–—]\s*", "", existing_parts[1]).strip()
+                return f"{ts_prefix}- {clean_p0}{sep}- {clean_p1}"
+
             len_p0 = len(clean_text_for_len(existing_parts[0]))
             len_p1 = len(clean_text_for_len(existing_parts[1]))
             target_limit = 22 if is_tight_pos else (36 if is_sign else 42)
             if len_p0 <= target_limit and len_p1 <= target_limit:
                 return f"{ts_prefix}{existing_parts[0]}{sep}{existing_parts[1]}"
+
+    # 1b. DETECT IN-LINE DUAL-SPEAKER DIALOGUE TURNS (Filar LVII)
+    # E.g. "Gratulacje... - Rozpacz po przegranej..." -> "- Gratulacje...\N- Rozpacz po przegranej..."
+    # E.g. "...i utracie wszystkiego... - Dziękuję..." -> "- ...i utracie wszystkiego...\N- Dziękuję..."
+    dual_turn_match = re.match(r"^[-–—]?\s*(.+?(?:[.!?…]+|\]|\))\s*)[-–—]\s*([A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż…\[].+)$", raw_content)
+    if dual_turn_match and not is_positioned_sign:
+        p1 = re.sub(r"^[-–—]\s*", "", dual_turn_match.group(1)).strip()
+        p2 = re.sub(r"^[-–—]\s*", "", dual_turn_match.group(2)).strip()
+        return f"{ts_prefix}- {p1}{sep}- {p2}"
 
     # Normalize existing line breaks into single space to reconstruct clean 2-line break
     normalized_content = re.sub(r"\\N|\\n|\n", " ", raw_content)

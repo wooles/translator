@@ -853,6 +853,14 @@ def test_avt_formatter_and_cps():
     spoken_parts = split_spoken.split("\\N")
     assert len(spoken_parts) == 2, f"Spoken dialogue must be strictly 2 lines, got: {len(spoken_parts)}"
 
+    # Test Filaru LVII: Wykrywanie i separacja wielogłosu oraz dymków mangi na 2 osobne linie z myślnikiem
+    split_dual_inline1 = split_subtitle_syntactically("Gratulacje... - Rozpacz po przegranej...")
+    assert split_dual_inline1 == r"- Gratulacje...\N- Rozpacz po przegranej...", f"Expected dual-line format, got: {split_dual_inline1}"
+    split_dual_inline2 = split_subtitle_syntactically("...i utracie wszystkiego... - Dziękuję...")
+    assert split_dual_inline2 == r"- ...i utracie wszystkiego...\N- Dziękuję...", f"Expected dual-line format, got: {split_dual_inline2}"
+    split_dual_explicit = split_subtitle_syntactically(r"Gratulacje...\N- Rozpacz po przegranej...")
+    assert split_dual_explicit == r"- Gratulacje...\N- Rozpacz po przegranej...", f"Expected dual-line format, got: {split_dual_explicit}"
+
     # Test dyrektywy kompresji tekstu (Smart Condensation Ratio)
     cond_fast = calculate_condensation_directive("Musimy natychmiast uciekać stąd bo nadciągają potwory!", start_ms=0, end_ms=1200)
     assert cond_fast is not None and "EKSTREMALNY" in cond_fast
@@ -2235,10 +2243,22 @@ def test_masterclass_2_innovations():
     assert clean_orphaned_dialogue_dashes(single_speaker) == "Sajotchi, słyszałam, że to kara boska?"
     dual_speaker = r"- Cześć!\N- Hejka!"
     assert clean_orphaned_dialogue_dashes(dual_speaker) == r"- Cześć!\N- Hejka!"
+    dual_missing_dash = r"Cześć!\N- Hejka!"
+    assert clean_orphaned_dialogue_dashes(dual_missing_dash) == r"- Cześć!\N- Hejka!"
+    inline_dual1 = "Gratulacje... - Rozpacz po przegranej..."
+    assert clean_orphaned_dialogue_dashes(inline_dual1) == r"- Gratulacje...\N- Rozpacz po przegranej..."
+    inline_dual2 = "...i utracie wszystkiego... - Dziękuję..."
+    assert clean_orphaned_dialogue_dashes(inline_dual2) == r"- ...i utracie wszystkiego...\N- Dziękuję..."
 
     ev_sim1 = pysubs2.SSAEvent(start=10000, end=13000, text="- Uważaj z lewej strony!", style="Default")
     formatted_sim = apply_simultaneous_dialogue_formatting([ev_sim1])
     assert formatted_sim[0].text == "Uważaj z lewej strony!"
+
+    # Test triggera Filaru LVII w get_focused_rules_for_batch
+    from rules import get_focused_rules_for_batch
+    batch_dual_test = [{"id": 1, "en": r"-Congratulations…\N-The despair of losing at gambling", "is_sign": False}]
+    rules_out = get_focused_rules_for_batch(batch_dual_test)
+    assert "FILAR LVII" in rules_out, f"Expected FILAR LVII in rules, got: {rules_out}"
 
     # 4. Test 1-Click Learn
     fb = UserFeedbackManager()

@@ -2345,6 +2345,23 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
             "Kategoryczny zakaz wklejania w pole napisu ekranowego fragmentów dialogu mówionego!"
         )
 
+    # 2b. Wielogłos, dialogi nakładające się i dymki mangi na ekranie (Filar LVII)
+    has_dual_speaker = any(
+        r"\N-" in it.get("en", "") or
+        r"\N -" in it.get("en", "") or
+        it.get("en", "").strip().startswith("-") or
+        it.get("en", "").strip().startswith("–") or
+        bool(re.search(r"[.!?…]+[\s\"']*(?:\\N|\n)?[-–—]\s*", it.get("en", "")))
+        for it in batch_items
+    )
+    if has_dual_speaker:
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR LVII - Standard Wielogłosu, Dialogów Nakładających się i Dymków Mangi]: "
+            "Gdy w jednej kwestii odzywają się dwie postacie (z myślnikami '- ') LUB kwestia łączy dymek mangi/planszę z dialogiem mówionym: "
+            "BEZWZGLĘDNIE zachowaj format DWÓCH OSOBNYCH LINII z myślnikiem ze spacją na początku KAŻDEJ ('- Kwestia 1\\N- Kwestia 2'). "
+            "KATEGORYCZNY ZAKAZ łączenia wypowiedzi w jedną linijkę i zakaz wstawiania myślnika w środku zdania ('Kwestia 1 - Kwestia 2' -> BŁĄD KARDYNALNY)!"
+        )
+
     # 3. Formy grzecznościowe, tytulatura feudalna i honoryfikatory
     if any(w in combined_en for w in ["sensei", "senpai", "sama", "lord", "young lord", "general", "sir", "master"]):
         focused_pillars.append(
