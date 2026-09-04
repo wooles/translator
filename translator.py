@@ -2530,11 +2530,20 @@ class MultimodalTranslator:
             max_batch_size=min(32, self.batch_size + 8)
         )
 
-        with tqdm(total=total_lines, desc="Tłumaczenie dialogów", unit="linii") as pbar:
+        with tqdm(
+            total=total_lines,
+            desc="Tłumaczenie dialogów",
+            unit="linii",
+            file=sys.stdout,
+            dynamic_ncols=True,
+            leave=True,
+            mininterval=0.1
+        ) as pbar:
             pbar.start_t = time.time()
             already_done = sum(1 for item in raw_entries if item[0] in translated_results)
             if already_done > 0:
                 pbar.update(already_done)
+                pbar.refresh()
 
             # Collect all batches that need translation
             tasks_to_run = []
@@ -2618,6 +2627,7 @@ class MultimodalTranslator:
                                         pass
 
                                 pbar.update(len(untrans_items))
+                                pbar.refresh()
 
                                 if progress_callback:
                                     try:
@@ -2634,6 +2644,7 @@ class MultimodalTranslator:
                                         pass
                             except Exception as e:
                                 pbar.write(f" 🔴 [Błąd Paczki]: {format_friendly_api_error(e)}")
+                                pbar.refresh()
                 else:
                     print(f"\n  [Kolejka Paczek]: Płynne tłumaczenie sekwencyjne (1 paczka na raz / rotacja {active_keys_count} aktywnych kluczy API)...")
                     for loop_i, (b_idx, batch, untranslated) in enumerate(tasks_to_run):
@@ -2696,6 +2707,7 @@ class MultimodalTranslator:
                                 except Exception:
                                     pass
                             pbar.update(len(untrans_items))
+                            pbar.refresh()
 
                             if progress_callback:
                                 try:
@@ -2712,41 +2724,62 @@ class MultimodalTranslator:
                                     pass
                         except Exception as e:
                             pbar.write(f" 🔴 [Błąd Paczki]: {format_friendly_api_error(e)}")
+                            pbar.refresh()
 
-        # 6.9. Zero-Gap Healing Pass: uzupełnienie ewentualnych brakujących kwestii po awariach paczek
-        missing_entries = [item for item in raw_entries if item[0] not in translated_results]
-        if missing_entries:
-            print(f"\n  [Zero-Gap Guard]: Wykryto {len(missing_entries)} nieprzetłumaczonych kwestii po pętli głównej. Uruchamianie pasażu uzupełniającego (Healing Pass)...")
-            healing_batches = create_adaptive_batches(missing_entries, base_batch_size=min(12, len(missing_entries)), max_batch_size=16)
-            for h_bidx, h_batch in enumerate(healing_batches):
-                try:
-                    _, h_res, h_regs, _, h_pass1, _ = self._process_single_batch(
-                        b_idx=len(batches) + h_bidx,
-                        batch=h_batch,
-                        untranslated_in_batch=h_batch,
-                        batches=batches,
-                        video_path=video_path,
-                        is_ass=is_ass,
-                        anime_meta=anime_meta,
-                        episode_profile=episode_profile,
-                        anime_context_str=anime_context_str,
-                        episode_profile_str=episode_profile_str,
-                        series_bible_str=series_bible_str,
-                        manga_canon_str=manga_canon_str,
-                        combined_glossary=combined_glossary,
-                        all_user_rules=all_user_rules,
-                        history=history,
-                        pbar=pbar,
-                        translated_results=translated_results
-                    )
-                    with self.lock:
-                        for orig_idx, text_res in h_res.items():
-                            translated_results[orig_idx] = text_res
-                        for orig_idx, reg_res in h_regs.items():
-                            if reg_res:
-                                translated_regions[orig_idx] = reg_res
-                except Exception as h_err:
-                    logger.warning(f"[Zero-Gap Guard]: Błąd pasażu uzupełniającego: {h_err}")
+            # 6.9. Zero-Gap Healing Pass: uzupełnienie ewentualnych brakujących kwestii po awariach paczek
+            missing_entries = [item for item in raw_entries if item[0] not in translated_results]
+            if missing_entries:
+                pbar.write(f"\n  [Zero-Gap Guard]: Wykryto {len(missing_entries)} nieprzetłumaczonych kwestii po pętli głównej. Uruchamianie pasażu uzupełniającego (Healing Pass)...")
+                healing_batches = create_adaptive_batches(missing_entries, base_batch_size=min(12, len(missing_entries)), max_batch_size=16)
+                for h_bidx, h_batch in enumerate(healing_batches):
+                    try:
+                        _, h_res, h_regs, _, h_pass1, _ = self._process_single_batch(
+                            b_idx=len(batches) + h_bidx,
+                            batch=h_batch,
+                            untranslated_in_batch=h_batch,
+                            batches=batches,
+                            video_path=video_path,
+                            is_ass=is_ass,
+                            anime_meta=anime_meta,
+                            episode_profile=episode_profile,
+                            anime_context_str=anime_context_str,
+                            episode_profile_str=episode_profile_str,
+                            series_bible_str=series_bible_str,
+                            manga_canon_str=manga_canon_str,
+                            combined_glossary=combined_glossary,
+                            all_user_rules=all_user_rules,
+                            history=history,
+                            pbar=pbar,
+                            translated_results=translated_results
+                        )
+                        with self.lock:
+                            for orig_idx, text_res in h_res.items():
+                                translated_results[orig_idx] = text_res
+                            for orig_idx, reg_res in h_regs.items():
+                                if reg_res:
+                                    translated_regions[orig_idx] = reg_res
+                        pbar.update(len(h_res))
+                        pbar.refresh()
+
+                        if progress_callback:
+                            try:
+                                from pricing_guard import PricingGuard
+                                f1_s = self.current_episode_tokens
+                                f2_s = self.verifier.current_episode_tokens if self.verifier else None
+                                cur_c = PricingGuard.calculate_actual_cost_pln(f1_s, f2_s)
+                                recent_prev = [
+                                    {"id": it["orig_idx"] + 1, "en": it["en"], "pl": translated_results.get(it["orig_idx"], "")}
+                                    for it in h_pass1
+                                ]
+                                progress_callback(len(translated_results), total_lines, recent_prev, cur_c)
+                            except Exception:
+                                pass
+                    except Exception as h_err:
+                        pbar.write(f"  [Zero-Gap Guard]: Błąd pasażu uzupełniającego: {h_err}")
+                        pbar.refresh()
+
+            # Końcowe odświeżenie paska, aby upewnić się, że pokazuje 100%
+            pbar.refresh()
 
         # 7. Construct final subtitle file preserving styles, positioning, and typesetting
         final_subs = pysubs2.SSAFile()
