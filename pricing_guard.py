@@ -143,17 +143,16 @@ class PricingGuard:
         return 0.16
 
     @classmethod
-    def calculate_actual_cost_pln(
+    def calculate_actual_cost_breakdown(
         cls,
         f1_stats: Dict[str, Any],
         f2_stats: Optional[Dict[str, Any]] = None,
-        usd_pln: float = DEFAULT_USD_PLN
-    ) -> float:
+        usd_pln: float = DEFAULT_USD_PLN,
+        vat_rate: float = 0.23
+    ) -> Dict[str, float]:
         """
-        Calculates exact actual session cost based on usage_metadata captured from Google API.
+        Calculates exact actual session cost breakdown (net, gross with VAT, standard rate without cache, and savings).
         """
-        total_usd = 0.0
-        
         # Phase 1
         m1 = f1_stats.get("model", "flash")
         rate1 = GOOGLE_API_RATES["flash"]
@@ -167,12 +166,18 @@ class PricingGuard:
         uncached1 = max(0, prompt1 - cached1)
         out1 = f1_stats.get("output", 0)
 
-        cost1 = (
+        cost1_usd = (
             (cached1 / 1_000_000) * rate1["input_cached"] +
             (uncached1 / 1_000_000) * rate1["input_uncached"] +
             (out1 / 1_000_000) * rate1["output"]
         )
-        total_usd += cost1
+        cost1_without_cache_usd = (
+            (prompt1 / 1_000_000) * rate1["input_uncached"] +
+            (out1 / 1_000_000) * rate1["output"]
+        )
+
+        cost2_usd = 0.0
+        cost2_without_cache_usd = 0.0
 
         # Phase 2 (if active)
         if f2_stats:
@@ -188,14 +193,51 @@ class PricingGuard:
             uncached2 = max(0, prompt2 - cached2)
             out2 = f2_stats.get("output", 0)
 
-            cost2 = (
+            cost2_usd = (
                 (cached2 / 1_000_000) * rate2["input_cached"] +
                 (uncached2 / 1_000_000) * rate2["input_uncached"] +
                 (out2 / 1_000_000) * rate2["output"]
             )
-            total_usd += cost2
+            cost2_without_cache_usd = (
+                (prompt2 / 1_000_000) * rate2["input_uncached"] +
+                (out2 / 1_000_000) * rate2["output"]
+            )
 
-        return round(total_usd * usd_pln, 2)
+        total_net_usd = cost1_usd + cost2_usd
+        total_without_cache_usd = cost1_without_cache_usd + cost2_without_cache_usd
+
+        f1_net_pln = round(cost1_usd * usd_pln, 2)
+        f2_net_pln = round(cost2_usd * usd_pln, 2)
+        total_net_pln = round(total_net_usd * usd_pln, 2)
+        total_gross_pln = round(total_net_pln * (1.0 + vat_rate), 2)
+        
+        standard_net_pln = round(total_without_cache_usd * usd_pln, 2)
+        standard_gross_pln = round(standard_net_pln * (1.0 + vat_rate), 2)
+        savings_pln = round(max(0.0, standard_net_pln - total_net_pln), 2)
+
+        return {
+            "net_pln": total_net_pln,
+            "gross_pln": total_gross_pln,
+            "f1_net_pln": f1_net_pln,
+            "f2_net_pln": f2_net_pln,
+            "standard_net_pln": standard_net_pln,
+            "standard_gross_pln": standard_gross_pln,
+            "savings_pln": savings_pln,
+            "vat_rate": vat_rate
+        }
+
+    @classmethod
+    def calculate_actual_cost_pln(
+        cls,
+        f1_stats: Dict[str, Any],
+        f2_stats: Optional[Dict[str, Any]] = None,
+        usd_pln: float = DEFAULT_USD_PLN
+    ) -> float:
+        """
+        Calculates exact actual session cost based on usage_metadata captured from Google API.
+        """
+        breakdown = cls.calculate_actual_cost_breakdown(f1_stats, f2_stats, usd_pln=usd_pln)
+        return breakdown["net_pln"]
 
     @classmethod
     def get_pricing_status_banner(cls) -> str:

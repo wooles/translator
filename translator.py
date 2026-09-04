@@ -2940,22 +2940,24 @@ class MultimodalTranslator:
             from pricing_guard import PricingGuard
             f1_stats = self.current_episode_tokens
             f2_stats = self.verifier.current_episode_tokens if self.verifier else None
-            actual_cost_pln = PricingGuard.calculate_actual_cost_pln(f1_stats, f2_stats)
-            cost_f1_pln = PricingGuard.calculate_actual_cost_pln(f1_stats, None)
-            cost_f2_pln = max(0.0, actual_cost_pln - cost_f1_pln) if f2_stats else 0.0
-            
-            cached_tok_total = f1_stats.get('cached', 0) + (f2_stats.get('cached', 0) if f2_stats else 0)
-            cache_savings_pln = (cached_tok_total / 1_000_000) * (0.75 - 0.075) * 4.0
+            breakdown = PricingGuard.calculate_actual_cost_breakdown(f1_stats, f2_stats)
+            actual_cost_pln = breakdown["net_pln"]
+            cost_gross_pln = breakdown["gross_pln"]
+            cost_f1_pln = breakdown["f1_net_pln"]
+            cost_f2_pln = breakdown["f2_net_pln"]
+            std_gross_pln = breakdown["standard_gross_pln"]
+            cache_savings_pln = breakdown["savings_pln"]
 
-            print("\n" + "═" * 68)
-            print(f"  💰 RZECZYWISTY KOSZT ODCINKA: {actual_cost_pln:.2f} PLN")
-            print(f"  ├─ Faza 1 (Szkic & OCR Sparse): {cost_f1_pln:.2f} PLN")
+            print("\n" + "═" * 72)
+            print(f"  💰 RZECZYWISTY KOSZT ODCINKA: {actual_cost_pln:.2f} PLN netto (~{cost_gross_pln:.2f} PLN brutto z VAT 23%)")
+            print(f"  ├─ Faza 1 (Szkic & OCR Sparse): {cost_f1_pln:.2f} PLN netto")
             print(f"  │   └─ Wejście: {f1_stats.get('prompt',0):,} tok (Cached: {f1_stats.get('cached',0):,}) | Wyjście: {f1_stats.get('output',0):,} tok")
             if f2_stats:
-                print(f"  └─ Faza 2 (Reżyseria & Elastic CoT): {cost_f2_pln:.2f} PLN")
-                print(f"      └─ Wejście: {f2_stats.get('prompt',0):,} tok (Cached: {f2_stats.get('cached',0):,}) | Wyjście+CoT: {f2_stats.get('output',0):,} tok")
-            print(f"  🛡️ Oszczędność Context Cache (-90% rabat): ~{cache_savings_pln:.2f} PLN")
-            print("═" * 68 + "\n")
+                print(f"  ├─ Faza 2 (Reżyseria & Elastic CoT): {cost_f2_pln:.2f} PLN netto")
+                print(f"  │   └─ Wejście: {f2_stats.get('prompt',0):,} tok (Cached: {f2_stats.get('cached',0):,}) | Wyjście+CoT: {f2_stats.get('output',0):,} tok")
+            print(f"  ├─ 🛡️ Rabat Context Cache (-90%): Zaoszczędzono ~{cache_savings_pln:.2f} PLN (Standardowo bez rabatu: ~{std_gross_pln:.2f} PLN brutto)")
+            print(f"  └─ ℹ️ Rozliczenia Google Cloud: Wyciągi bankowe zawierają 23% VAT i sumują wszystkie próby oraz testy z danego dnia.")
+            print("═" * 72 + "\n")
         except Exception:
             pass
 
