@@ -266,10 +266,14 @@ def test_pydantic_schemas():
         dialogue_flow="Służba zaprasza do wyjścia, a Yoritsugu chłodno odmawia.",
         audio_intent_check="W audio pada 'boku wa ii desu' co oznacza odmowę 'Ja podziękuję', a nie stan zdrowia.",
         dominant_tone="chłodna zawiść / dworski dystans",
-        power_dynamic="pan-służący (wyższość Yoritsugu)"
+        power_dynamic="pan-służący (wyższość Yoritsugu)",
+        epistemic_asymmetry="Służba nie wie o urazie Yoritsugu; Yoritsugu ukrywa zazdrość.",
+        table_read_mouth_feel="Kwestie brzmią potoczyście i zwięźle, bez kalek."
     )
     assert diag.dominant_tone == "chłodna zawiść / dworski dystans"
     assert diag.power_dynamic == "pan-służący (wyższość Yoritsugu)"
+    assert diag.epistemic_asymmetry == "Służba nie wie o urazie Yoritsugu; Yoritsugu ukrywa zazdrość."
+    assert diag.table_read_mouth_feel == "Kwestie brzmią potoczyście i zwięźle, bez kalek."
 
     tr = LineTranslation(
         id=1,

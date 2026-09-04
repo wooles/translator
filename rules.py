@@ -15,6 +15,8 @@ class SceneDiagnosis(BaseModel):
     audio_intent_check: str = Field(description="Weryfikacja intencji mówców ze słuchu japońskiego (Whisper) vs skrypt angielski")
     dominant_tone: Optional[str] = Field(default=None, description="Dominujący rejestr dramaturgiczny sceny (np. 'groteska komediowa', 'patos bitewny', 'intymny dramat', 'groza')")
     power_dynamic: Optional[str] = Field(default=None, description="Relacja władzy/statusu: kto dominuje, kto blefuje, kto jest w potrzasku (maks. 8 słów)")
+    epistemic_asymmetry: Optional[str] = Field(default=None, description="Teoria Umysłu (Theory of Mind): Kto co wie, a czego NIE WIE w tej scenie? Kto ukrywa tożsamość/motywy? Czego postaciom w kadrze nie wolno zdradzić rozmówcy (np. 'Felix nie wie, że rozmawia z Cichą Wiedźmą; Monika milczy i ukrywa tożsamość')?")
+    table_read_mouth_feel: Optional[str] = Field(default=None, description="Próba Stolikowa (Barańczak-Stanisławski): Weryfikacja potoczystości mówionej: czy kwestie układają się naturalnie w ustach polskich aktorów dubbingowych i eliminują papierowe kalki?")
 
 BELCZYK_AVT_MASTER_CANON = """
 KOMPLEKSOWY KANON PRZEKŁADU AUDIOWIZUALNEGO (WG ARKADIUSZA BELCZYKA, JERZEGO PIEŃKOSA, STANISŁAWA BARAŃCZAKA I NORM POLSKIEGO DIALOGU FILMOWEGO):
@@ -1947,6 +1949,8 @@ ZASADY TECHNICZNE ODPOWIEDZI:
   1. "dramatic_context": Kto z kim rozmawia, w jakiej relacji i jakie emocje/napięcia panują w scenie.
   2. "dialogue_flow": Ciąg przyczynowo-skutkowy (np. linia A to zaproszenie, linia B to odmowa lub zbycie tematu).
   3. "audio_intent_check": Co postacie NAPRAWDĘ mówią po japońsku w transkrypcji Whisper (zwłaszcza formy odmowy 'ii desu', rozkazy 'kure', dług 'giri/sumimasen') i gdzie angielski skrypt spłaszcza oryginał.
+  4. "epistemic_asymmetry": Teoria Umysłu (Theory of Mind): Kto co wie, a czego NIE WIE rozmówca? Czego postaciom w kadrze nie wolno zdradzić w dialogu (np. ukryta tożsamość)?
+  5. "table_read_mouth_feel": Próba Stolikowa (Barańczak-Stanisławski): Czy kwestie układają się naturalnie w ustach polskich aktorów dubbingowych, eliminując sztuczne kalki?
 - ZASADA RZADKIEJ DIAGNOZY (SPARSE DIAGNOSTICS - ZERO MARNOTRAWSTWA TOKENÓW):
   * W polach "visual_subtext", "literal_meaning", "visual_clues" i "notes" zwracaj null dla prostych, jednoznacznych kwestii.
   * Wypełniaj te pola zwięźle (1 zwięzłe zdanie) TYLKO wtedy, gdy zachodzi rzeczywisty podtekst, sprzeczność mimiki z tekstem, monolog wewnętrzny (Off-screen) lub trudny idiom japoński.
@@ -2347,7 +2351,7 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
 {anime_guide}
 
 ZASADY TECHNICZNE ODPOWIEDZI PRO:
-- OBOWIĄZKOWA DIAGNOZA I AUDYT SCENY (scene_diagnosis): Przed redakcją kwestii wypełnij obiekt "scene_diagnosis", weryfikując intencje dramaturgiczne sceny, związki przyczynowo-skutkowe oraz zgodność ze słuchem japońskim (Whisper).
+- OBOWIĄZKOWA DIAGNOZA I AUDYT SCENY (scene_diagnosis): Przed redakcją kwestii wypełnij obiekt "scene_diagnosis", weryfikując intencje dramaturgiczne sceny, związki przyczynowo-skutkowe, asymetrię wiedzy (Teoria Umysłu: kto co wie, a czego nie wie rozmówca) oraz zgodność ze słuchem japońskim (Whisper) i potoczystością próby stolikowej.
 - W polu 'changes_made' dla każdej poprawionej kwestii podawaj uzasadnienie i numer Filaru AVT.
 - Zwróć wynik jako obiekt JSON zgodny ze schematem."""
 

@@ -1620,6 +1620,10 @@ class MultimodalTranslator:
                     parts.append(f"Rejestr: {diag.dominant_tone.strip()}")
                 if getattr(diag, "power_dynamic", None) and diag.power_dynamic.strip():
                     parts.append(f"Władza/Status: {diag.power_dynamic.strip()}")
+                if getattr(diag, "epistemic_asymmetry", None) and diag.epistemic_asymmetry.strip():
+                    parts.append(f"Teoria Umysłu: {diag.epistemic_asymmetry.strip()}")
+                if getattr(diag, "table_read_mouth_feel", None) and diag.table_read_mouth_feel.strip():
+                    parts.append(f"Próba Stolikowa: {diag.table_read_mouth_feel.strip()}")
                 scene_desc = " | ".join(parts)
             elif getattr(batch_response, "scene_description", None):
                 scene_desc = batch_response.scene_description or ""
