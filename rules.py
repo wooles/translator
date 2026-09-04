@@ -1488,6 +1488,14 @@ FILAR CLX: DEKOMPOZYCJA SEMIOTYCZNA I NIENARUSZALNOŚĆ WARSTW ONTOLOGICZNYCH (M
    2. DYMKI MANGOWE VS KOMENTARZ DIALOGOWY:
       - Dymek narysowany na ekranie (np. halucynacja, komiksowy wykrzyknik) to odrębny byt wizualny od komentarza towarzysza mówiącego obok.
       - W razie jednoczesnego występowania formatuj je bezwzględnie w dwóch osobnych wierszach z myślnikami (- Dymek\\N- Komentarz) lub jako oddzielne napisy. Zakaz tworzenia zdań hybrydowych z myślnikiem w środku!
+
+FILAR CLXI: NIENARUSZALNOŚĆ PERSPEKTYWY NARRACYJNEJ I ZAKAZ ZDRADY TOŻSAMOŚCI INCOGNITO (THE DRAMATIC IRONY & FOCALIZATION INTEGRITY STANDARD)
+   1. ZASADA IRONII DRAMATYCZNEJ I SPÓJNOŚCI PERSPEKTYWY MÓWCY (FOCALIZATION INTEGRITY):
+      - Gdy postać rozmawia z bohaterem ukrywającym swoją tożsamość (np. Felix mówi o Wiedźmie Milczenia w obecności Moniki), tłumaczowi KATEGORYCZNIE ZABRANIA SIĘ zamiany wypowiedzi w 3. osobie na 1. osobę ('by the Silent Witch' / 'Chinmoku no majo no ronbun' -> NAKAZ: 'Wiedźmy Milczenia', BEZWZGLĘDNY ZAKAZ: 'mój', 'mój esej', 'moja praca')!
+      - Tłumacz ma wiernie oddawać punkt widzenia i wiedzę mówiącej na ekranie postaci (wiedza diegetyczna mówcy), a nie omniscientną wiedzę widza/modelu o ukrytej tożsamości rozmówcy!
+   2. ZAKAZ SAMOWOLNEJ KONWERSJI DIALOGU NA MYŚL (ANTI-PERSPECTIVE DRIFT):
+      - Jeśli w skrypcie wejściowym kwestia nie ma kursywy, a postać na ekranie mówi na głos (dialog diegetyczny), KATEGORYCZNIE ZABRANIA SIĘ dodawania tagów {\\i1} i zamieniania wypowiedzi na monolog wewnętrzny innej postaci tylko dlatego, że w sąsiednich linijkach pojawiały się myśli.
+      - Nie przypisuj słów wypowiedzianych na głos innej postaci pod postacią rzekomej myśli!
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -2331,6 +2339,7 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
       * "[Filar CLVIII - Zgodność Foniczno-Semantyczna Seiyū] 'Hitori' -> 'Zostaw mnie samą/samego' (ZAKAZ 'Daj mi spokój!'); 'Betsuni' -> 'Wcale nie / Mniejsza z tym' (ZAKAZ 'To nic takiego'); 'Yokatta' -> 'Całe szczęście' (ZAKAZ 'To było dobre!'); 'Yatta' -> 'Udało się!' (ZAKAZ 'Zrobiłem to!')"
       * "[Filar CLIX - Metoda Aktorska i Model Sceny] Zredagowano kwestię pod kątem rytmu oddechu i ekspresji aktora dubbingowego (eliminacja papierowego brzmienia i sztywności)"
       * "[Filar CLX - Dekompozycja Semiotyczna] Rozdzielono dymek mangi/halucynację od komentarza zza kadru w dwa niezależne tory ontologiczne"
+      * "[Filar CLXI - Nienaruszalność Perspektywy] 'by the Silent Witch' wypowiedziane przez rozmówcę -> 'Wiedźmy Milczenia' (ZAKAZ podmiany 3. osoby na 1. osobę 'mój esej' z powodu ukrytej tożsamości Moniki; zakaz dodawania {{\\i1}} do słów mówionych na głos)"
       * "[Filar XLIII/CXLVI - Dyrektywne Potwierdzenie] 'Uważaj pod nogi!' -> 'T-Tak' -> 'D-Dobrze' / 'Będę uważać' (ZAKAZ 'Tak' po ostrzeżeniu/poleceniu)"
 
 {BELCZYK_AVT_MASTER_CANON}
@@ -3215,6 +3224,25 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR CLX - Dekompozycja Semiotyczna i Nienaruszalność Warstw]: "
             "Oddzielaj żywą mowę od dymków mangowych i plansz! Kategoryczny zakaz sklejania dymka halucynacji z dialogiem mówionym w jedno zdanie."
+        )
+
+    # 101. Nienaruszalność Perspektywy Narracyjnej i Zakaz Zdrady Tożsamości Incognito (Filar CLXI)
+    has_focalization_trigger = any(
+        any(tok in str(item.get("en", "")).lower() for tok in [
+            "silent witch", "by the", "written by", "essay by", "paper by", "report by", "work by"
+        ]) or
+        any(tok in str(item.get("audio_jp", "")).lower() for tok in [
+            "chinmoku no majo", "沈黙の魔女", "no ronbun", "論文", "no sakuhin", "作品"
+        ]) or
+        any("filar clxi" in str(item.get("notes", "")).lower() for item in [item])
+        for item in batch_items
+    )
+    if has_focalization_trigger:
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CLXI - Nienaruszalność Perspektywy Narracyjnej i Zakaz Zdrady Tożsamości Incognito]: "
+            "Gdy postać mówi na głos w 3. osobie (np. 'by the Silent Witch' / 'Chinmoku no majo no ronbun'), "
+            "KATEGORYCZNIE ZABRANIA SIĘ zamiany wypowiedzi na 1. osobę ('mój esej') ze względu na ukrytą tożsamość rozmówcy! "
+            "Zakaz samowolnego dodawania kursywy {\\i1} do dialogów mówionych na głos – tłumacz świat przedstawiony z perspektywy mówcy!"
         )
 
     if not focused_pillars:

@@ -1843,6 +1843,26 @@ class MultimodalTranslator:
                 elif any(k in audio_jp_str for k in ["yatta", "やった"]) and ("zrobiłem to" in pl_check or "zrobiłam to" in pl_check):
                     it["notes"] = f"{it.get('notes', '')} [🚨 ALARM FILAR CLVIII: W audio pada 'Yatta'! ZAKAZ 'Zrobiłem to'! NAKAZ: 'Udało się!']".strip()
 
+            # Focalization & Dramatic Irony Guard (Filar CLXI)
+            clean_en_lower = str(it.get("en", "")).lower()
+            pl_check = str(it.get("pl", "")).lower()
+            audio_jp_str = str(it.get("audio_jp", "")).lower()
+
+            # Check 1: 3rd person in source (EN/JP) turned into 1st person in PL candidate
+            has_3rd_person_source = any(tok in clean_en_lower for tok in ["silent witch", "by the", "written by", "paper by", "essay by"]) or any(tok in audio_jp_str for tok in ["chinmoku no majo", "沈黙の魔女", "no ronbun", "論文"])
+            has_1st_person_pl = bool(re.search(r"\b(mój|moja|moje|moim|moich|moją|mego)\s+(esej|praca|artykuł|traktat|tekst)\b", pl_check))
+            if has_3rd_person_source and has_1st_person_pl and not any(tok in clean_en_lower for tok in ["my ", "i ", "me ", "mine"]):
+                focal_alert = "[🚨 ALARM FILAR CLXI: Zdrada tożsamości incognito / dryf fokalizacji! W oryginale mowa w 3. osobie o Wiedźmie/dziele, a w szkicu PL pojawiła się 1. osoba ('mój esej')! KATEGORYCZNIE ZACHOWAJ 3. OSOBĘ MÓWCY (np. 'Wiedźmy Milczenia')!]"
+                it["notes"] = f"{it.get('notes', '')} {focal_alert}".strip()
+
+            # Check 2: Unsolicited thought italicization
+            orig_ev = it.get("event")
+            orig_ev_text = orig_ev.text if orig_ev and getattr(orig_ev, "text", None) else it.get("en", "")
+            if r"\i1" not in orig_ev_text and not it.get("is_thought", False):
+                if r"\i1" in str(it.get("pl", "")) and audio_jp_str:
+                    unsolicited_italics_alert = "[🚨 ALARM FILAR CLXI: Nieuprawniona konwersja dialogu na myśl! Dialog mówiony na głos został oznaczony kursywą {\\i1}. Usuń kursywę i traktuj kwestię jako mowę diegetyczną!]"
+                    it["notes"] = f"{it.get('notes', '')} {unsolicited_italics_alert}".strip()
+
         # 6. Optional Phase 2 Verifier (Script Doctor)
         batch_results: Dict[int, str] = {}
         batch_regions: Dict[int, str] = {}

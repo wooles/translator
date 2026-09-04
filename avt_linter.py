@@ -634,6 +634,30 @@ class AVTLinter:
                     modified = re.sub(rf"\b{re.escape(word)}", repl_word, modified)
                     applied_fixes.append(f"[Filar XLIII/CXLVI - Dyrektywne Potwierdzenie] Wykryto odpowiedź na ostrzeżenie/polecenie ('{prev_clean[:30]}...'): zastąpiono '{word}{punct}' przez '{repl_word}{punct}'")
 
+        # 4e. Focalization & Dramatic Irony Guard (Filar CLXI - Nienaruszalność Perspektywy Narracyjnej)
+        if not is_sign and audio_jp:
+            clean_audio_jp = audio_jp.lower()
+            if any(k in clean_audio_jp for k in ["chinmoku no majo", "沈黙の魔女"]):
+                # 1. Strip unsolicited thought italics from spoken dialogue
+                if "{\\i1}" in modified:
+                    modified = re.sub(r"\{\\i[01]\}", "", modified).strip()
+                    applied_fixes.append("[Filar CLXI - Zakaz Konwersji Dialogu na Myśl] Usunięto sztuczną kursywę {\\i1} z dialogu mówionego na głos")
+
+                # 2. Guard against 1st person possessive drift ('mój esej', 'moja praca', etc.)
+                if re.search(r"\bmój\s+(esej|artykuł|traktat)\b", modified, re.IGNORECASE):
+                    def _witch_essay_repl(m):
+                        noun = m.group(1)
+                        res = f"{noun} Wiedźmy Milczenia"
+                        return res.capitalize() if m.group(0)[0].isupper() else res
+                    modified = re.sub(r"\bmój\s+(esej|artykuł|traktat)\b", _witch_essay_repl, modified, flags=re.IGNORECASE)
+                    applied_fixes.append("[Filar CLXI - Nienaruszalność Perspektywy] Skorygowano zdradę tożsamości incognito: 'mój esej' -> 'esej Wiedźmy Milczenia'")
+                elif re.search(r"\bmoj(?:a|ej|ą)\s+prac(?:a|y|ę)\b", modified, re.IGNORECASE):
+                    def _witch_work_repl(m):
+                        res = "praca Wiedźmy Milczenia"
+                        return res.capitalize() if m.group(0)[0].isupper() else res
+                    modified = re.sub(r"\bmoj(?:a|ej|ą)\s+prac(?:a|y|ę)\b", _witch_work_repl, modified, flags=re.IGNORECASE)
+                    applied_fixes.append("[Filar CLXI - Nienaruszalność Perspektywy] Skorygowano zdradę tożsamości incognito: 'moja praca' -> 'praca Wiedźmy Milczenia'")
+
         # 5. Anti-Bracket normalization for all subtitles (Pillars IV & LX)
         # 5a. Strip outer square brackets e.g. "[ Przepraszam za zwłokę! ]" -> "Przepraszam za zwłokę!"
         if modified.startswith("[") and modified.endswith("]"):

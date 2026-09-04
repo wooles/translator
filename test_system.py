@@ -223,7 +223,9 @@ def test_rules_and_prompts():
     assert "FILAR CLIX" in sys_prompt or "CLIX" in sys_prompt
     assert "FILAR CLX" in ver_prompt or "CLX" in ver_prompt
     assert "FILAR CLX" in sys_prompt or "CLX" in sys_prompt
-    print(" -> PASSED: Kompletny Zunifikowany Kanon 160 Filarów AVT (Filary I – CLX) jest aktywny w obu fazach tłumaczenia.")
+    assert "FILAR CLXI" in ver_prompt or "CLXI" in ver_prompt
+    assert "FILAR CLXI" in sys_prompt or "CLXI" in sys_prompt
+    print(" -> PASSED: Kompletny Zunifikowany Kanon 161 Filarów AVT (Filary I – CLXI) jest aktywny w obu fazach tłumaczenia.")
 
 def test_pydantic_schemas():
     print("[TEST 2/5] Weryfikacja schematów Pydantic i Detektora Rejestru Pragmatycznego...")
@@ -827,7 +829,16 @@ def test_avt_linter():
     t_ndir, f_ndir = AVTLinter.lint_and_fix_line("Tak.", prev_line_text="Czy to twój płaszcz?")
     assert t_ndir == "Tak."
 
-    print(" -> PASSED: AVT Linter bezbłędnie wyłapuje i koryguje kalki, formy, nawiasy, cudzysłowy, formy 1-na-1, Aizuchi, hybrydy, ALL-CAPS, Filar CLVII (T-V Invariance), Filar CLVIII (Zgodność Seiyū) oraz Filar XLIII/CXLVI (Dyrektywne Potwierdzenie).")
+    # Test Filar CLXI - Nienaruszalność Perspektywy Narracyjnej i Zakaz Zdrady Tożsamości Incognito (0.00 PLN)
+    t_witch, fixes_witch = AVTLinter.lint_and_fix_line(
+        "{\\i1}Przecież jest tam też mój esej!{\\i0}",
+        audio_jp="沈黙の魔女の論文が載ってる [Chinmoku no majo no ronbun ga notteru]"
+    )
+    assert t_witch == "Przecież jest tam też esej Wiedźmy Milczenia!"
+    assert any("CLXI" in f for f in fixes_witch)
+    assert any("Zakaz Konwersji Dialogu na Myśl" in f for f in fixes_witch)
+
+    print(" -> PASSED: AVT Linter bezbłędnie wyłapuje i koryguje kalki, formy, nawiasy, cudzysłowy, formy 1-na-1, Aizuchi, hybrydy, ALL-CAPS, Filar CLVII (T-V Invariance), Filar CLVIII (Zgodność Seiyū), Filar XLIII/CXLVI (Dyrektywne Potwierdzenie) oraz Filar CLXI (Nienaruszalność Perspektywy i Zakaz Zdrady Tożsamości Incognito).")
 
 def test_series_bible():
     print("[TEST 9/12] Test Biblii Serialu i Pamięci Międzyodcinkowej (series_memory)...")
@@ -1408,6 +1419,11 @@ def test_dynamic_rule_dispatcher():
     focused_dir_ping = get_focused_rules_for_batch(batch_dir_ping)
     assert "CXLVI" in focused_dir_ping
     assert "OSTRZEŻENIA" in focused_dir_ping
+
+    # 25. Test paczki z Filar CLXI (Nienaruszalność Perspektywy Narracyjnej i Zakaz Zdrady Tożsamości Incognito)
+    batch_clxi = [{"en": "There's an essay in here by the Silent Witch!", "audio_jp": "沈黙の魔女の論文が載ってる [Chinmoku no majo no ronbun ga notteru]"}]
+    focused_clxi = get_focused_rules_for_batch(batch_clxi)
+    assert "CLXI" in focused_clxi
 
     print(" -> PASSED: Dyspozytor reguł precyzyjnie aktywuje właściwe filary AVT.")
 
