@@ -393,6 +393,10 @@ FILAR XLIII: MATRYCA PRAGMATYCZNA POTWIERDZEŃ, APROBACJI I AIZUCHI (CONVERSATIO
     -> Desho? / Daro?: "A nie mówiłem?", "No widzisz?", "No nie?", "Prawda?" (ZAKAZ: 'Czyż nie?').
   * 6. PÓŁ-ZGODA I POWŚCIĄGLIWOŚĆ (Maa ne / Maa na):
     -> Maa ne: "No niby tak...", "W sumie...", "Mniej więcej...", "Coś w tym jest..." (ZAKAZ: 'Cóż, tak.').
+  * 7. DYREKTYWNE POTWIERDZENIA I REAKCJA NA OSTRZEŻENIA/POLECENIA (Hai / Ee / Un po dyrektywach):
+    -> Gdy poprzednia kwestia to ostrzeżenie (np. "Uważaj pod nogi!", "Ostrożnie!"), zakaz ("Nie ruszaj się!"), polecenie ("Poczekaj!", "Chodź tu!") lub prośba:
+    -> BŁĄD [X]: Mechaniczne, bezmyślne "Tak." / "T-Tak." (kalka z angielskiego 'Yes/Y-Yes' oraz słownikowego 'Hai=Tak'). Polak na ostrzeżenie NIGDY nie odpowiada "Tak"!
+    -> POPRAWNIE [OK]: "Dobrze." / "D-Dobrze.", "Jasne.", "W porządku.", "Będę uważać.", "Już.", "Zrozumiałam/em." lub podziękowanie za troskę: "Dzięki." / "D-Dziękuję.".
 
 FILAR XLIV: SELEKTYWNA REDUKCJA POTAKIWAŃ I ELIMINACJA NAKŁADAJĄCYCH SIĘ AIZUCHI (EYE-TRACKING FILTER):
 - W języku japońskim potakiwania ("un", "ee", "sou", "naruhodo", "a", "he-") padają co 2 sekundy:
@@ -1210,6 +1214,10 @@ FILAR CXLVI: DIALOGOWY PING-PONG I SPÓJNOŚĆ LEKSYKALNA RIPOSTY (CONVERSATIONA
       - Kwestie w dialogu nie są odizolowanymi wyspami. Gdy linijka jest oznaczona jako [PING-PONG DIALOGOWY: Odpowiedź/riposta na pytanie/zaczepkę]:
         * Riposta musi podjąć leksykalną grę lub kontrastować z pytaniem rozmówcy.
         * ZAKAZ tępych, suchych zaprzeczeń (np. na pytanie: „Oszalałeś?” -> zamiast szkolnego: „Nie oszalałem” -> użyj żywej, błyskotliwej polszczyzny: „A żebyś wiedział!” / „Jeszcze nie!” / „Nawet tak nie żartuj!”).
+   2. DYREKTYWY, OSTRZEŻENIA I PROŚBY (REAKCJA NA POLECENIE/OSTRZEŻENIE):
+      - Gdy poprzednia kwestia zawierała ostrzeżenie (np. „Uważaj pod nogi”, „Ostrożnie”), zakaz lub polecenie:
+        * KATEGORYCZNY ZAKAZ mechanicznego potakiwania „Tak” / „T-Tak” (kalka z EN „Yes” i powierzchownego japońskiego „Hai”).
+        * Odpowiedź musi wyrażać przyjęcie polecenia lub ostrożność: „Dobrze / D-Dobrze”, „Jasne”, „W porządku”, „Będę uważać”, „Już” lub podziękowanie: „Dzięki / D-Dziękuję”.
 
 FILAR CXLVII: MATRYCA PRZYSŁÓWKÓW MODALNYCH I PRAGMATYCZNYCH (EPISTEMIC & PRAGMATIC ADVERB MATRIX)
    1. STOPNIE PEWNOŚCI I NIEPEWNOŚCI (EPISTEMIC PROBABILITY VS ABSOLUTE CERTAINTY):
@@ -2323,6 +2331,7 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
       * "[Filar CLVIII - Zgodność Foniczno-Semantyczna Seiyū] 'Hitori' -> 'Zostaw mnie samą/samego' (ZAKAZ 'Daj mi spokój!'); 'Betsuni' -> 'Wcale nie / Mniejsza z tym' (ZAKAZ 'To nic takiego'); 'Yokatta' -> 'Całe szczęście' (ZAKAZ 'To było dobre!'); 'Yatta' -> 'Udało się!' (ZAKAZ 'Zrobiłem to!')"
       * "[Filar CLIX - Metoda Aktorska i Model Sceny] Zredagowano kwestię pod kątem rytmu oddechu i ekspresji aktora dubbingowego (eliminacja papierowego brzmienia i sztywności)"
       * "[Filar CLX - Dekompozycja Semiotyczna] Rozdzielono dymek mangi/halucynację od komentarza zza kadru w dwa niezależne tory ontologiczne"
+      * "[Filar XLIII/CXLVI - Dyrektywne Potwierdzenie] 'Uważaj pod nogi!' -> 'T-Tak' -> 'D-Dobrze' / 'Będę uważać' (ZAKAZ 'Tak' po ostrzeżeniu/poleceniu)"
 
 {BELCZYK_AVT_MASTER_CANON}
 
@@ -2408,10 +2417,11 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
         )
 
     # 6. Matryca Aizuchi i potwierdzeń
-    if any(w in combined_en for w in ["i see", "right", "makes sense", "naruhodo", "sou ne", "sou desu"]):
+    if any(w in combined_en for w in ["i see", "right", "makes sense", "naruhodo", "sou ne", "sou desu"]) or any(w in combined_jp for w in ["なるほど", "そうですね", "はい"]):
         focused_pillars.append(
-            "• [SKUP SIĘ NA: FILAR XLIII - Aprobata vs Przyjęcie Wiedzy]: "
-            "Potwierdzenie trafnej uwagi rozmówcy (Sou / Sou ne) to 'Otóż to.' / 'Właśnie tak.' / 'Zgadza się.' (a NIE bierne 'Rozumiem.')."
+            "• [SKUP SIĘ NA: FILAR XLIII - Aprobata vs Przyjęcie Wiedzy i Dyrektywy]: "
+            "Potwierdzenie trafnej uwagi rozmówcy (Sou / Sou ne) to 'Otóż to.' / 'Właśnie tak.' / 'Zgadza się.' (a NIE bierne 'Rozumiem.'). "
+            "W odpowiedzi na ostrzeżenie/dyrektywę/polecenie (Hai/Ee) KATEGORYCZNIE ZAKAŻ 'Tak / T-Tak'! Użyj: 'Dobrze / D-Dobrze', 'Jasne', 'Będę uważać' lub 'W porządku'."
         )
 
     # 7. Spójność zdań rozbitych wielokropkiem i podział wierszy
@@ -3017,7 +3027,9 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
     if any("ping-pong" in str(item.get("relation_tag", "")).lower() for item in batch_items) or any(item.get("en", "").strip().endswith("?") for item in batch_items):
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR CXLVI - Dialogowy Ping-Pong i Spójność Leksykalna Riposty (Conversational Volley)]: "
-            "Zgraj ripostę z pytaniem rozmówcy! Unikaj suchych, bezdusznych zaprzeczeń (np. na pytanie: 'Oszalałeś?' -> użyj żywej polszczyzny: 'A żebyś wiedział!' / 'Jeszcze nie!' zamiast szkolnego 'Nie oszalałem')."
+            "Zgraj ripostę z pytaniem rozmówcy! Unikaj suchych zaprzeczeń (np. 'Oszalałeś?' -> 'A żebyś wiedział!'). "
+            "Na OSTRZEŻENIA i POLECENIA ('Uważaj pod nogi', 'Poczekaj', 'Chodź') KATEGORYCZNIE ZAKAŻ 'Tak / T-Tak'! "
+            "Użyj naturalnego potwierdzenia przyjęcia: 'Dobrze / D-Dobrze', 'Jasne', 'Będę uważać', 'W porządku' lub 'Dzięki'."
         )
 
     # 87. Matryca Przysłówków Modalnych i Pragmatycznych (Filar CXLVII)

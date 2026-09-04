@@ -1713,13 +1713,46 @@ class MultimodalTranslator:
             audio_discrepancy_msg = detect_audio_discrepancy(audio_jp_str, pl_candidate, clean_en, prosody=prosody_tags.get(batch_id, ""))
             pragmatic_reg = detect_japanese_pragmatic_register(audio_jp_str, clean_en)
 
-            # Ping-pong dialogowy (Filar CXLVI)
+            # Ping-pong dialogowy (Filar CXLVI & XLIII)
             relation_tag = ""
             if idx > 0 and not vtype["is_sign"]:
                 prev_clean = untranslated_in_batch[idx - 1][2].strip()
-                if prev_clean.endswith("?"):
+                prev_clean_lower = prev_clean.lower()
+                prev_pl = pass1_items[idx - 1].get("pl", "").lower() if idx - 1 < len(pass1_items) else ""
+                prev_jp = pass1_items[idx - 1].get("audio_jp", "").lower() if idx - 1 < len(pass1_items) else ""
+
+                # Sprawdź, czy poprzednia linijka to dyrektywa/ostrzeżenie/polecenie
+                is_prev_directive = any(
+                    w in prev_clean_lower for w in [
+                        "watch your step", "be careful", "watch out", "look out", "mind the",
+                        "careful", "hold on", "wait", "listen", "don't move", "hurry", "stay back",
+                        "follow me", "step back", "take care"
+                    ]
+                ) or any(
+                    w in prev_pl for w in [
+                        "uważaj", "uważajcie", "ostrożnie", "czekaj", "zaczekaj", "poczekaj",
+                        "stój", "stójcie", "nie ruszaj", "pospiesz", "chodź", "chodźcie", "ruszaj",
+                        "trzymaj się"
+                    ]
+                ) or any(
+                    w in prev_jp for w in [
+                        "ki o tsukete", "kiwotsukete", "abunai", "chotto matte", "mate",
+                        "tomare", "ugoku na", "hayaku", "気をつけ", "危ない", "待って", "止まれ"
+                    ]
+                )
+
+                # Czy bieżąca kwestia to potwierdzenie afirmatywne (tak/hai/yes)?
+                curr_is_affirmation = any(
+                    clean_en.lower().strip().startswith(w) for w in ["yes", "y-yes", "yeah", "yep", "right", "okay", "ok"]
+                ) or any(
+                    w in audio_jp_str.lower() for w in ["hai", "はい", "ee", "ええ", "un", "うん"]
+                )
+
+                if is_prev_directive and curr_is_affirmation:
+                    relation_tag = "[PING-PONG DIALOGOWY: Odpowiedź na ostrzeżenie/dyrektywę – KATEGORYCZNY ZAKAZ 'Tak/T-Tak'! Użyj 'Dobrze / D-Dobrze / Jasne / Będę uważać / W porządku' (Filar CXLVI & XLIII)]"
+                elif prev_clean.endswith("?"):
                     relation_tag = "[PING-PONG DIALOGOWY: Odpowiedź/riposta na pytanie - zgraj leksykę i emocję (Filar CXLVI)]"
-                elif any(prev_clean.lower().startswith(w) for w in ["come,", "let's", "shall we", "look,", "hey,"]):
+                elif any(prev_clean_lower.startswith(w) for w in ["come,", "let's", "shall we", "look,", "hey,"]):
                     relation_tag = "[PING-PONG DIALOGOWY: Reakcja na propozycję/zaczepkę (Filar CXLVI)]"
 
             dur_s = max(0.05, (event.end - event.start) / 1000.0)
@@ -1854,6 +1887,7 @@ class MultimodalTranslator:
                     pbar.write(f" └─ [Redaktor Dialogów] #{r.id}{pillar_note}")
                     pbar.write(f"    ├─ Szkic:  \"{disp_orig}\"")
                     pbar.write(f"    └─ Szlif:  \"{disp_ref}\"")
+            prev_linted_line = ""
             for item in pass1_items:
                 raw_final = sanitize_sub_text(refined_dict.get(item["id"], item["pl"]))
                 # Triangulate effective gender from character registry, audio F0 voice, and pragmatic clues (Filar CXXXVI)
@@ -1880,8 +1914,10 @@ class MultimodalTranslator:
                     user_feedback_rules=all_user_rules,
                     custom_glossary=combined_glossary,
                     is_informal_ty=is_item_informal,
-                    audio_jp=item.get("audio_jp", "")
+                    audio_jp=item.get("audio_jp", ""),
+                    prev_line_text=prev_linted_line
                 )
+                prev_linted_line = final_text
                 # Deterministic glossary overrides
                 final_text, gloss_fixes = GlossaryManager.apply_deterministic_overrides(final_text, combined_glossary)
                 if item.get("is_song") and not item.get("is_sign"):
@@ -1899,6 +1935,7 @@ class MultimodalTranslator:
                 if eff_reg:
                     batch_regions[item["orig_idx"]] = eff_reg
         else:
+            prev_linted_line = ""
             for item in pass1_items:
                 raw_final = sanitize_sub_text(item["pl"])
                 spk_gen = item.get("speaker_gender")
@@ -1924,8 +1961,10 @@ class MultimodalTranslator:
                     user_feedback_rules=all_user_rules,
                     custom_glossary=combined_glossary,
                     is_informal_ty=is_item_informal,
-                    audio_jp=item.get("audio_jp", "")
+                    audio_jp=item.get("audio_jp", ""),
+                    prev_line_text=prev_linted_line
                 )
+                prev_linted_line = final_text
                 # Deterministic glossary overrides
                 final_text, gloss_fixes = GlossaryManager.apply_deterministic_overrides(final_text, combined_glossary)
                 if item.get("is_song") and not item.get("is_sign"):

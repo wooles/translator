@@ -811,7 +811,23 @@ def test_avt_linter():
     assert t_omae == "Przecież wygrałeś te zawody!"
     assert any("CLVII" in f for f in fixes_om)
 
-    print(" -> PASSED: AVT Linter bezbłędnie wyłapuje i koryguje kalki, formy, nawiasy, cudzysłowy, formy 1-na-1, Aizuchi, hybrydy, ALL-CAPS, Filar CLVII (T-V Invariance) oraz Filar CLVIII (Zgodność Foniczno-Semantyczna Seiyū).")
+    # Test Filar XLIII/CXLVI - Dyrektywne Potwierdzenie po ostrzeżeniu/poleceniu (0.00 PLN)
+    t_dir1, f_dir1 = AVTLinter.lint_and_fix_line("T-Tak.", prev_line_text="Ciemno tu, uważaj pod nogi.")
+    assert t_dir1 == "D-Dobrze."
+    assert any("Dyrektywne Potwierdzenie" in f for f in f_dir1)
+
+    t_dir2, f_dir2 = AVTLinter.lint_and_fix_line("Tak.", prev_line_text="Poczekaj na mnie!")
+    assert t_dir2 == "Dobrze."
+    assert any("Dyrektywne Potwierdzenie" in f for f in f_dir2)
+
+    t_dir3, f_dir3 = AVTLinter.lint_and_fix_line("Tak...", prev_line_text="Stój, nie ruszaj się.")
+    assert t_dir3 == "Dobrze..."
+
+    # Sprawdzenie, że zwykłe pytanie nadal pozwala na "Tak."
+    t_ndir, f_ndir = AVTLinter.lint_and_fix_line("Tak.", prev_line_text="Czy to twój płaszcz?")
+    assert t_ndir == "Tak."
+
+    print(" -> PASSED: AVT Linter bezbłędnie wyłapuje i koryguje kalki, formy, nawiasy, cudzysłowy, formy 1-na-1, Aizuchi, hybrydy, ALL-CAPS, Filar CLVII (T-V Invariance), Filar CLVIII (Zgodność Seiyū) oraz Filar XLIII/CXLVI (Dyrektywne Potwierdzenie).")
 
 def test_series_bible():
     print("[TEST 9/12] Test Biblii Serialu i Pamięci Międzyodcinkowej (series_memory)...")
@@ -1386,6 +1402,12 @@ def test_dynamic_rule_dispatcher():
     batch_clviii = [{"en": "That was good.", "audio_jp": "よかった [Yokatta]"}]
     focused_clviii = get_focused_rules_for_batch(batch_clviii)
     assert "CLVIII" in focused_clviii
+
+    # 24. Test paczki z Ping-Pongiem Dyrektywnym (Filar CXLVI & XLIII)
+    batch_dir_ping = [{"relation_tag": "[PING-PONG DIALOGOWY: Odpowiedź na ostrzeżenie/dyrektywę – KATEGORYCZNY ZAKAZ 'Tak/T-Tak']"}]
+    focused_dir_ping = get_focused_rules_for_batch(batch_dir_ping)
+    assert "CXLVI" in focused_dir_ping
+    assert "OSTRZEŻENIA" in focused_dir_ping
 
     print(" -> PASSED: Dyspozytor reguł precyzyjnie aktywuje właściwe filary AVT.")
 

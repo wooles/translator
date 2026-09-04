@@ -330,7 +330,8 @@ class AVTLinter:
         user_feedback_rules: Optional[List[Dict[str, Any]]] = None,
         custom_glossary: Optional[Dict[str, str]] = None,
         is_informal_ty: bool = False,
-        audio_jp: str = ""
+        audio_jp: str = "",
+        prev_line_text: str = ""
     ) -> Tuple[str, List[str]]:
         """
         Analyzes and automatically fixes dialogue lines.
@@ -607,6 +608,31 @@ class AVTLinter:
                         return "Panie" if m.group(0)[0].isupper() else "panie"
                     modified = re.sub(r"\b[Bb]rachu\b", _waka_brachu_repl, modified)
                     applied_fixes.append("[Filar CLVIII - Zgodność Foniczna Seiyū] Wykryto 'Waka' w audio: zastąpiono błędne 'brachu' przez 'panie'")
+
+        # 4d. Directive/Warning Confirmation Guard (Filar XLIII & CXLVI)
+        # When preceding line is an explicit warning or imperative directive, lone affirmative "Tak / T-Tak" is an unnatural calque.
+        if not is_sign and prev_line_text:
+            prev_clean = re.sub(r"\{[^\}]*\}", "", prev_line_text).strip().lower()
+            # Directive/warning triggers in previous line
+            is_prev_warning = bool(re.search(
+                r"\b(uważaj|uważajcie|ostrożnie|czekaj|poczekaj|zaczekaj|stój|stójcie|pospiesz|pospieszcie|chodź|chodźcie|nie ruszaj|trzymaj się|uważaj pod nogi)\b",
+                prev_clean,
+                re.IGNORECASE
+            ))
+            if is_prev_warning:
+                # Check if current line is solely an affirmative "Tak / T-Tak" (with optional ellipsis or exclamation mark)
+                clean_current = re.sub(r"\{[^\}]*\}", "", modified).strip()
+                m_aff = re.match(r"^([Tt]-[Tt]ak|[Tt]ak)([\.!\?…]*)$", clean_current)
+                if m_aff:
+                    word = m_aff.group(1)
+                    punct = m_aff.group(2) or "."
+                    if word.lower().startswith("t-"):
+                        repl_word = "D-Dobrze"
+                    else:
+                        repl_word = "Dobrze" if word[0].isupper() else "dobrze"
+                    
+                    modified = re.sub(rf"\b{re.escape(word)}", repl_word, modified)
+                    applied_fixes.append(f"[Filar XLIII/CXLVI - Dyrektywne Potwierdzenie] Wykryto odpowiedź na ostrzeżenie/polecenie ('{prev_clean[:30]}...'): zastąpiono '{word}{punct}' przez '{repl_word}{punct}'")
 
         # 5. Anti-Bracket normalization for all subtitles (Pillars IV & LX)
         # 5a. Strip outer square brackets e.g. "[ Przepraszam za zwłokę! ]" -> "Przepraszam za zwłokę!"
