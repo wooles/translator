@@ -1238,6 +1238,14 @@ class MultimodalTranslator:
         if b_idx + 1 < len(batches):
             lookahead_events = batches[b_idx + 1][:4]
 
+        # Retrieve previous lines (Lookback Window / History)
+        lookback_history = []
+        if history:
+            lookback_history = list(history[-4:])
+        elif b_idx > 0 and b_idx - 1 < len(batches):
+            for prev_item in batches[b_idx - 1][-4:]:
+                lookback_history.append({"en": prev_item[2], "pl": ""})
+
         # 2. Extract 3-4 intelligent key video frames for the batch (Storyboard & Visual OCR)
         temp_frames: List[str] = []
         image_contents = []
@@ -1383,20 +1391,36 @@ class MultimodalTranslator:
         )
         user_feedback_str = self.user_feedback.format_for_prompt(relevant_feedback)
         glossary_str = self.glossary_manager.format_for_prompt(combined_glossary)
-        focused_rules_str = get_focused_rules_for_batch([
-            {
-                "en": item[2],
-                "audio_jp": whisper_transcriptions.get(item[0], "") if whisper_transcriptions else "",
-                "is_sign": detect_event_visual_type(item[1], item[3])["is_sign"],
-                "speaker_gender": self.character_registry.get(item[1].name)
-            }
-            for item in untranslated_in_batch
-        ])
+        batch_items_for_rules = []
+        for idx, (orig_idx, ev, clean_txt, ts_pref) in enumerate(untranslated_in_batch):
+            b_id = idx + 1
+            dur_s = max(0.05, (ev.end - ev.start) / 1000.0)
+            cps_val, _ = calculate_cps(clean_txt, ev.start, ev.end)
+            style_str = ev.style or ""
+            is_th = "italic" in style_str.lower() or r"\i1" in (ev.text or "")
+            vtype_info = detect_event_visual_type(ev, ts_pref)
+            batch_items_for_rules.append({
+                "id": b_id,
+                "orig_idx": orig_idx,
+                "en": clean_txt,
+                "audio_jp": whisper_transcriptions.get(b_id, "") if whisper_transcriptions else "",
+                "style": style_str,
+                "is_thought": is_th,
+                "duration_s": dur_s,
+                "cps": cps_val,
+                "is_sign": vtype_info["is_sign"],
+                "speaker_gender": self.character_registry.get(ev.name),
+                "speaker": ev.name,
+                "prosody": prosody_tags.get(b_id, ""),
+                "speaker_voice": speaker_tags.get(b_id, ""),
+                "is_song": is_song_line(ev, clean_txt)
+            })
+        focused_rules_str = get_focused_rules_for_batch(batch_items_for_rules)
 
         # 3b. Text prompt with AniList knowledge, character registry, lookahead, and phonetic cues
         prompt_text = self._prepare_batch_prompt(
             untranslated_in_batch,
-            history,
+            lookback_history,
             lookahead_events=lookahead_events,
             anime_context_str=anime_context_str,
             episode_profile_str=episode_profile_str,
@@ -1549,10 +1573,17 @@ class MultimodalTranslator:
                 elif any(prev_clean.lower().startswith(w) for w in ["come,", "let's", "shall we", "look,", "hey,"]):
                     relation_tag = "[PING-PONG DIALOGOWY: Reakcja na propozycję/zaczepkę (Filar CXLVI)]"
 
+            dur_s = max(0.05, (event.end - event.start) / 1000.0)
+            style_str = event.style or ""
+            is_th = "italic" in style_str.lower() or r"\i1" in (event.text or "")
             pass1_items.append({
                 "id": batch_id,
                 "orig_idx": orig_idx,
                 "event": event,
+                "style": style_str,
+                "is_thought": is_th,
+                "duration_s": dur_s,
+                "cps": cps,
                 "start_ms": event.start,
                 "end_ms": event.end,
                 "en": clean_en,
@@ -2134,6 +2165,12 @@ class MultimodalTranslator:
                                     for orig_idx, reg_res in batch_regs.items():
                                         if reg_res:
                                             translated_regions[orig_idx] = reg_res
+                                    for it in pass1_items:
+                                        pl_final = batch_res.get(it["orig_idx"], it.get("pl", ""))
+                                        if pl_final:
+                                            history.append({"en": it["en"], "pl": pl_final})
+                                    if len(history) > 30:
+                                        history[:] = history[-30:]
                                     # Save checkpoint safely
                                     try:
                                         checkpoint_payload = {
@@ -2199,6 +2236,12 @@ class MultimodalTranslator:
                                 for orig_idx, reg_res in batch_regs.items():
                                     if reg_res:
                                         translated_regions[orig_idx] = reg_res
+                                for it in pass1_items:
+                                    pl_final = batch_res.get(it["orig_idx"], it.get("pl", ""))
+                                    if pl_final:
+                                        history.append({"en": it["en"], "pl": pl_final})
+                                if len(history) > 30:
+                                    history[:] = history[-30:]
                                 try:
                                     checkpoint_payload = {
                                         "translated_results": translated_results,
