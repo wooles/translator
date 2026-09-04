@@ -217,7 +217,9 @@ def test_rules_and_prompts():
     assert "FILAR CLVI" in sys_prompt or "CLVI" in sys_prompt
     assert "FILAR CLVII" in ver_prompt or "CLVII" in ver_prompt
     assert "FILAR CLVII" in sys_prompt or "CLVII" in sys_prompt
-    print(" -> PASSED: Kompletny Zunifikowany Kanon 157 Filarów AVT (Filary I – CLVII) jest aktywny w obu fazach tłumaczenia.")
+    assert "FILAR CLVIII" in ver_prompt or "CLVIII" in ver_prompt
+    assert "FILAR CLVIII" in sys_prompt or "CLVIII" in sys_prompt
+    print(" -> PASSED: Kompletny Zunifikowany Kanon 158 Filarów AVT (Filary I – CLVIII) jest aktywny w obu fazach tłumaczenia.")
 
 def test_pydantic_schemas():
     print("[TEST 2/5] Weryfikacja schematów Pydantic i Detektora Rejestru Pragmatycznego...")
@@ -705,7 +707,40 @@ def test_avt_linter():
     assert t_formal3 == "Panie doktorze, czy pacjent miał zawał?"
     assert len(fixes3) == 0
 
-    print(" -> PASSED: AVT Linter bezbłędnie wyłapuje i koryguje kalki, formy, nawiasy, cudzysłowy, formy 1-na-1, Aizuchi, hybrydy, ALL-CAPS i Filar CLVII (T-V Invariance wraz z immunitetem form oficjalnych).")
+    # Test Filaru CLVIII: Zgodność Foniczna Seiyū (Cross-Audio Auditory Fixes)
+    t_hitori_f, fixes_hf = AVTLinter.lint_and_fix_line("Daj mi spokój.", speaker_gender="kobieta", audio_jp="一人にしてくれ [Hitori ni shite kure]")
+    assert t_hitori_f == "Zostaw mnie samą."
+    assert any("CLVIII" in f for f in fixes_hf)
+
+    t_hitori_m, fixes_hm = AVTLinter.lint_and_fix_line("Daj mi spokój.", speaker_gender="mężczyzna", audio_jp="一人にして [Hitori ni shite]")
+    assert t_hitori_m == "Zostaw mnie samego."
+    assert any("CLVIII" in f for f in fixes_hm)
+
+    t_betsuni, fixes_b = AVTLinter.lint_and_fix_line("To nic takiego.", audio_jp="別に [Betsuni]")
+    assert t_betsuni == "Wcale nie."
+    assert any("CLVIII" in f for f in fixes_b)
+
+    t_betsuni2, fixes_b2 = AVTLinter.lint_and_fix_line("Nie ma sprawy.", audio_jp="別に [Betsuni]")
+    assert t_betsuni2 == "Wcale nie."
+
+    t_yokatta, fixes_y = AVTLinter.lint_and_fix_line("To było dobre!", audio_jp="よかった [Yokatta]")
+    assert t_yokatta == "Całe szczęście!"
+    assert any("CLVIII" in f for f in fixes_y)
+
+    t_yatta, fixes_ya = AVTLinter.lint_and_fix_line("Zrobiłem to!", audio_jp="やった [Yatta]")
+    assert t_yatta == "Udało się!"
+    assert any("CLVIII" in f for f in fixes_ya)
+
+    t_mendo, fixes_m = AVTLinter.lint_and_fix_line("Co za ból...", audio_jp="面倒くさい [Mendokusai]")
+    assert t_mendo == "Co za męczarnia..."
+    assert any("CLVIII" in f for f in fixes_m)
+
+    # Test wymuszenia formy 'ty' z głosu seiyuu (zaimek 'omae' / 'kimi' w audio_jp)
+    t_omae, fixes_om = AVTLinter.lint_and_fix_line("Przecież wygrał pan te zawody!", audio_jp="お前が勝った [Omae ga katta]")
+    assert t_omae == "Przecież wygrałeś te zawody!"
+    assert any("CLVII" in f for f in fixes_om)
+
+    print(" -> PASSED: AVT Linter bezbłędnie wyłapuje i koryguje kalki, formy, nawiasy, cudzysłowy, formy 1-na-1, Aizuchi, hybrydy, ALL-CAPS, Filar CLVII (T-V Invariance) oraz Filar CLVIII (Zgodność Foniczno-Semantyczna Seiyū).")
 
 def test_series_bible():
     print("[TEST 9/12] Test Biblii Serialu i Pamięci Międzyodcinkowej (series_memory)...")
@@ -1229,6 +1264,11 @@ def test_dynamic_rule_dispatcher():
     batch_clvi = [{"en": "Please leave me alone.", "audio_jp": "一人にしてくれ [Hitori ni shite kure]"}]
     focused_clvi = get_focused_rules_for_batch(batch_clvi)
     assert "CLVI" in focused_clvi
+
+    # 23. Test paczki z Filar CLVIII (Zgodność Foniczno-Semantyczna Seiyū / Auditory Anchor)
+    batch_clviii = [{"en": "That was good.", "audio_jp": "よかった [Yokatta]"}]
+    focused_clviii = get_focused_rules_for_batch(batch_clviii)
+    assert "CLVIII" in focused_clviii
 
     print(" -> PASSED: Dyspozytor reguł precyzyjnie aktywuje właściwe filary AVT.")
 
@@ -1987,6 +2027,42 @@ def test_translator_logger_and_sign_detector():
         en_text="It's nothing."
     )
     assert alert_betsuni is not None and "Betsuni" in alert_betsuni and "CLVI" in alert_betsuni
+
+    # Test Filar CLVIII: SAGE Kotwice Audio i Trigger 60
+    anchor_yokatta = translator.get_audio_semantic_anchor("よかった [Yokatta]", "That was good.")
+    assert anchor_yokatta is not None and "Yokatta" in anchor_yokatta and "CLVIII" in anchor_yokatta
+
+    anchor_yatta = translator.get_audio_semantic_anchor("やった [Yatta]", "We did it!")
+    assert anchor_yatta is not None and "Yatta" in anchor_yatta and "CLVIII" in anchor_yatta
+
+    anchor_mendo = translator.get_audio_semantic_anchor("面倒くさい [Mendokusai]", "What a drag.")
+    assert anchor_mendo is not None and "Mendokusai" in anchor_mendo and "CLVIII" in anchor_mendo
+
+    anchor_tasukete = translator.get_audio_semantic_anchor("助けて [Tasukete]", "Please save me!")
+    assert anchor_tasukete is not None and "Tasukete" in anchor_tasukete and "CLVIII" in anchor_tasukete
+
+    anchor_omae = translator.get_audio_semantic_anchor("お前 [Omae]", "You won.")
+    assert anchor_omae is not None and "omae" in anchor_omae.lower() and "CLVIII" in anchor_omae
+
+    anchor_boku = translator.get_audio_semantic_anchor("僕 [Boku]", "I went there.")
+    assert anchor_boku is not None and "boku" in anchor_boku.lower() and "CLVIII" in anchor_boku
+
+    anchor_atashi = translator.get_audio_semantic_anchor("あたし [Atashi]", "I made it.")
+    assert anchor_atashi is not None and "atashi" in anchor_atashi.lower() and "CLVIII" in anchor_atashi
+
+    alert_yokatta = translator.detect_audio_discrepancy(
+        jp_text="よかった [Yokatta]",
+        pl_text="To było dobre!",
+        en_text="That was good."
+    )
+    assert alert_yokatta is not None and "Yokatta" in alert_yokatta and "CLVIII" in alert_yokatta
+
+    alert_yatta = translator.detect_audio_discrepancy(
+        jp_text="やった [Yatta]",
+        pl_text="Zrobiłem to!",
+        en_text="We did it!"
+    )
+    assert alert_yatta is not None and "Yatta" in alert_yatta and "CLVIII" in alert_yatta
 
     # Test Flashback 1:1 memory formatting
     from memory import format_translation_memory_for_prompt

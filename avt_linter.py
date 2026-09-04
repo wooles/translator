@@ -329,7 +329,8 @@ class AVTLinter:
         is_sign: bool = False,
         user_feedback_rules: Optional[List[Dict[str, Any]]] = None,
         custom_glossary: Optional[Dict[str, str]] = None,
-        is_informal_ty: bool = False
+        is_informal_ty: bool = False,
+        audio_jp: str = ""
     ) -> Tuple[str, List[str]]:
         """
         Analyzes and automatically fixes dialogue lines.
@@ -437,6 +438,11 @@ class AVTLinter:
 
         # 4b. Anti-Drift: Elimination of spurious 'pan/pani' in informal 1-on-1 dialogue (Filar CLVII)
         if not is_sign:
+            audio_jp_lower = audio_jp.lower() if audio_jp else ""
+            if not is_informal_ty and audio_jp_lower:
+                if any(tok in audio_jp_lower for tok in ["omae", "kimi", "kisama", "temee", "お前", "君", "貴様", "てめえ"]):
+                    is_informal_ty = True
+
             # Guard: If the line contains an explicit formal title or honorific address (e.g. "Panie Tanaka", "Pani Sato", "Panie doktorze"),
             # it is strictly formal and must NEVER be forced to "ty"!
             has_explicit_formal_vocative = bool(re.search(
@@ -529,6 +535,65 @@ class AVTLinter:
                             return r.capitalize() if m.group(0)[0].isupper() else r
                         modified = re.sub(pattern, _repl_match, modified, flags=re.IGNORECASE)
                         applied_fixes.append(f"[Filar CLVII - Spójność Form Adresatywnych] Korekta sztucznego 'pana/pani' na formę 'ty': {pattern} -> {repl}")
+
+        # 4c. Cross-Audio Auditory Fixes (Filar CLVIII - Zgodność Foniczno-Semantyczna Seiyū)
+        if not is_sign and audio_jp:
+            clean_audio_jp = audio_jp.lower()
+            spk_norm = (speaker_gender or "").lower()
+            is_male_spk = any(w in spk_norm for w in ["mężczyzna", "chłopiec", "male", "boy", "męski"])
+            is_female_spk = any(w in spk_norm for w in ["kobieta", "dziewczynka", "female", "girl", "żeński"]) or (is_all_girls_scene and not is_male_spk)
+
+            # 1. HITORI (一人 / 独り / ひとり): w audio prośba o samotność -> ZAKAZ 'daj mi spokój'
+            if any(k in clean_audio_jp for k in ["hitori", "一人", "独り", "ひとり"]):
+                if re.search(r"\b[Dd]aj(?:\s+|\\N)+mi(?:\s+|\\N)+spokój\b", modified):
+                    repl_hitori = "Zostaw mnie samą" if is_female_spk else "Zostaw mnie samego"
+                    def _hitori_repl(m, r=repl_hitori):
+                        return r if m.group(0)[0].isupper() else r.lower()
+                    modified = re.sub(r"\b[Dd]aj(?:\s+|\\N)+mi(?:\s+|\\N)+spokój\b", _hitori_repl, modified)
+                    applied_fixes.append(f"[Filar CLVIII - Zgodność Foniczna Seiyū] Wykryto 'Hitori' w audio: zastąpiono 'daj mi spokój' przez '{repl_hitori.lower()}'")
+                elif re.search(r"\b[Dd]ajcie(?:\s+|\\N)+mi(?:\s+|\\N)+spokój\b", modified):
+                    repl_hitori = "Zostawcie mnie samą" if is_female_spk else "Zostawcie mnie samego"
+                    def _hitori_pl_repl(m, r=repl_hitori):
+                        return r if m.group(0)[0].isupper() else r.lower()
+                    modified = re.sub(r"\b[Dd]ajcie(?:\s+|\\N)+mi(?:\s+|\\N)+spokój\b", _hitori_pl_repl, modified)
+                    applied_fixes.append(f"[Filar CLVIII - Zgodność Foniczna Seiyū] Wykryto 'Hitori' w audio: zastąpiono 'dajcie mi spokój' przez '{repl_hitori.lower()}'")
+
+            # 2. BETSUNI (別に / べつに): chłód, foch, dystans -> ZAKAZ 'to nic takiego', 'nie ma sprawy'
+            if any(k in clean_audio_jp for k in ["betsuni", "別に", "べつに"]):
+                if re.search(r"\b[Tt]o(?:\s+|\\N)+nic(?:\s+|\\N)+takiego\b", modified):
+                    def _betsuni_repl(m):
+                        return "Wcale nie" if m.group(0)[0].isupper() else "wcale nie"
+                    modified = re.sub(r"\b[Tt]o(?:\s+|\\N)+nic(?:\s+|\\N)+takiego\b", _betsuni_repl, modified)
+                    applied_fixes.append("[Filar CLVIII - Zgodność Foniczna Seiyū] Wykryto 'Betsuni' w audio: zastąpiono 'to nic takiego' przez 'wcale nie'")
+                elif re.search(r"\b[Nn]ie(?:\s+|\\N)+ma(?:\s+|\\N)+sprawy\b", modified):
+                    def _betsuni_sprawy(m):
+                        return "Wcale nie" if m.group(0)[0].isupper() else "wcale nie"
+                    modified = re.sub(r"\b[Nn]ie(?:\s+|\\N)+ma(?:\s+|\\N)+sprawy\b", _betsuni_sprawy, modified)
+                    applied_fixes.append("[Filar CLVIII - Zgodność Foniczna Seiyū] Wykryto 'Betsuni' w audio: zastąpiono 'nie ma sprawy' przez 'wcale nie'")
+
+            # 3. YOKATTA (よかった / 良かった): ulga, kamień z serca -> ZAKAZ 'to było dobre'
+            if any(k in clean_audio_jp for k in ["yokatta", "よかった", "良かった"]):
+                if re.search(r"\b[Tt]o(?:\s+|\\N)+było(?:\s+|\\N)+dobre\b", modified):
+                    def _yokatta_repl(m):
+                        return "Całe szczęście" if m.group(0)[0].isupper() else "całe szczęście"
+                    modified = re.sub(r"\b[Tt]o(?:\s+|\\N)+było(?:\s+|\\N)+dobre\b", _yokatta_repl, modified)
+                    applied_fixes.append("[Filar CLVIII - Zgodność Foniczna Seiyū] Wykryto 'Yokatta' w audio: zastąpiono 'to było dobre' przez 'całe szczęście'")
+
+            # 4. YATTA (やった): radość z triumfu -> ZAKAZ 'zrobiłem to'
+            if any(k in clean_audio_jp for k in ["yatta", "やった"]):
+                if re.search(r"\b[Zz]robił(?:em|am)(?:\s+|\\N)+to\b", modified):
+                    def _yatta_repl(m):
+                        return "Udało się" if m.group(0)[0].isupper() else "udało się"
+                    modified = re.sub(r"\b[Zz]robił(?:em|am)(?:\s+|\\N)+to\b", _yatta_repl, modified)
+                    applied_fixes.append("[Filar CLVIII - Zgodność Foniczna Seiyū] Wykryto 'Yatta' w audio: zastąpiono 'zrobiłem/am to' przez 'udało się'")
+
+            # 5. MENDOKUSAI (面倒くさい / めんどくさい): zniechęcenie -> ZAKAZ 'co za ból'
+            if any(k in clean_audio_jp for k in ["mendokusai", "面倒くさい", "めんどくさい", "面倒"]):
+                if re.search(r"\b[Cc]o(?:\s+|\\N)+za(?:\s+|\\N)+ból\b", modified):
+                    def _mendo_repl(m):
+                        return "Co za męczarnia" if m.group(0)[0].isupper() else "co za męczarnia"
+                    modified = re.sub(r"\b[Cc]o(?:\s+|\\N)+za(?:\s+|\\N)+ból\b", _mendo_repl, modified)
+                    applied_fixes.append("[Filar CLVIII - Zgodność Foniczna Seiyū] Wykryto 'Mendokusai' w audio: zastąpiono 'co za ból' przez 'co za męczarnia'")
 
         # 5. Anti-Bracket normalization for all subtitles (Pillars IV & LX)
         # 5a. Strip outer square brackets e.g. "[ Przepraszam za zwłokę! ]" -> "Przepraszam za zwłokę!"

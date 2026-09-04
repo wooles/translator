@@ -258,10 +258,12 @@ class JapaneseWhisperEngine:
                 seg_end_abs = batch_start_ms + int(seg.end * 1000)
 
                 for b_id, ev in events:
-                    # Check if segment overlaps with dialogue timing
-                    overlap_start = max(ev.start, seg_start_abs)
-                    overlap_end = min(ev.end, seg_end_abs)
-                    if (overlap_end - overlap_start) > 100 or (ev.start <= seg_start_abs and ev.end >= seg_end_abs):
+                    # Check if segment overlaps with dialogue timing (with 150ms acoustic padding for speech onset/offset)
+                    pad_start = max(0, ev.start - 150)
+                    pad_end = ev.end + 150
+                    overlap_start = max(pad_start, seg_start_abs)
+                    overlap_end = min(pad_end, seg_end_abs)
+                    if (overlap_end - overlap_start) > 80 or (pad_start <= seg_start_abs and pad_end >= seg_end_abs):
                         if seg_text not in result[b_id]:
                             result[b_id].append(seg_text)
 

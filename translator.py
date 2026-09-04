@@ -541,14 +541,14 @@ def detect_audio_discrepancy(jp_text: str, pl_text: str, en_text: str, prosody: 
         if any(w in pl_lower for w in ["zrób to z umiarem", "bądź umiarkowany", "umiarkowanie"]):
             return "W audio seiyuu krzyczy 'Iikagen ni shiro!' -> Zastąp absurdalną kalkę gniewnym: 'Przestań wreszcie!' / 'Miarka się przebrała!' / 'Dość tego!' (Filar CLIII)."
 
-    # 53. Yokatta & Yatta! (Ulga i Triumf - Filar CLIII)
+    # 53. Yokatta & Yatta! (Ulga i Triumf - Filar CLIII / CLVIII)
     if any(k in clean_jp for k in ["よかった", "良かった"]) or any(k in rom_lower for k in ["yokatta", "yokattane", "yokatta na"]):
         if pl_lower.strip() in ["to było dobre.", "to było dobre!", "było dobrze.", "było dobrze!"] or pl_lower.startswith("to było dobre"):
-            return "W audio seiyuu wzdycha z ulgą 'Yokatta...' -> Kategoryczny zakaz kalki 'To było dobre!'. Użyj: 'Całe szczęście...' / 'Kamień z serca...' / 'Uff, jak dobrze...' (Filar CLIII)."
+            return "W audio seiyuu wzdycha z ulgą 'Yokatta...' -> Kategoryczny zakaz kalki 'To było dobre!'. Użyj: 'Całe szczęście...' / 'Kamień z serca...' / 'Uff, jak dobrze...' (Filar CLIII/CLVIII)."
 
     if any(k in clean_jp for k in ["やった", "やったー", "やったぜ", "やったぞ"]) or any(k in rom_lower for k in ["yatta", "yattaa", "yattaze", "yattazo"]):
         if pl_lower.strip() in ["zrobiłem to.", "zrobiłem to!", "zrobiłam to.", "zrobiłam to!"] and not any(w in en_text.lower() for w in ["i made it happen", "i manufactured"]):
-            return "W audio seiyuu krzyczy z radości 'Yatta!' (sukces/zwycięstwo) -> Zastąp sztywne 'Zrobiłem to!' naturalnym: 'Udało się!' / 'Mamy to!' / 'Wyszło!' / 'Jest!' (Filar CLIII)."
+            return "W audio seiyuu krzyczy z radości 'Yatta!' (sukces/zwycięstwo) -> Zastąp sztywne 'Zrobiłem to!' naturalnym: 'Udało się!' / 'Mamy to!' / 'Wyszło!' / 'Jest!' (Filar CLIII/CLVIII)."
 
     # 54. Logika Odpowiedzi na Przeczenia (Echo Agreement: Hai/Un vs Iie/Uun - Filar CLIV)
     is_neg_q = any(w in en_text.lower() for w in ["don't you", "aren't you", "didn't you", "can't you", "won't you", "haven't you", "isn't it"]) or any(k in clean_jp for k in ["ないの", "ないか", "ない？", "ないのか", "ないですか"]) or any(k in rom_lower for k in ["nai no", "nai ka", "nai desu ka"])
@@ -586,6 +586,19 @@ def detect_audio_discrepancy(jp_text: str, pl_text: str, en_text: str, prosody: 
     if any(w in en_text.lower() for w in ["you won", "you did", "you saw", "you told", "you said", "you have", "you had", "you were", "you know", "did you", "have you", "why did you"]):
         if any(w in pl_lower for w in ["wygrał pan", "wygrała pani", "zrobił pan", "zrobiła pani", "widział pan", "widziała pani", "powiedział pan", "powiedziała pani", "pan wie", "pani wie", "wie pan", "wie pani", "pan widzi", "pani widzi", "pan myśli", "pani myśli", "pan mówi", "pani mówi"]):
             return "Wykryto kolaps formy adresatywnej (Pronominal Address Drift - Filar CLVII)! Angielskie 'you' w relacji nieformalnej/koleżeńskiej lub po imieniu przetłumaczono sztucznie per 'pan/pani'. Zamień 'wygrał pan' na 'wygrałeś', 'pan wie' na 'wiesz' itp.!"
+
+    # 60. Zgodność Foniczno-Semantyczna Seiyū i Test Ucha Widza (Filar CLVIII)
+    if any(k in clean_jp for k in ["一人にして", "独りにして", "ひとりにして"]) or "hitori ni shite" in rom_lower or "hitori" in rom_lower:
+        if any(w in pl_lower for w in ["daj mi spokój", "daj spokój"]):
+            return "W audio pada 'Hitori' (sam/sama). Zastąp opryskliwe 'Daj mi spokój' intymnym: 'Zostaw mnie samą/samego' (Filar CLVIII)."
+
+    if any(k in clean_jp for k in ["助けて", "たすけて"]) or "tasukete" in rom_lower:
+        if any(w in pl_lower for w in ["ocal mnie", "uratuj mnie"]):
+            return "W audio pada 'Tasukete' (krzyk o pomoc). Zastąp teatralne 'Ocal mnie' naturalnym: 'Ratunku!' / 'Pomóż mi!' (Filar CLVIII)."
+
+    if any(k in clean_jp for k in ["やめろ", "やめて"]) or "yamero" in rom_lower or "yamete" in rom_lower:
+        if any(w in pl_lower for w in ["nie rób tego", "nie czyń"]):
+            return "W audio pada 'Yamero/Yamete' (sprzeciw). Zastąp 'Nie rób tego' naturalnym: 'Przestań!' / 'Stój!' (Filar CLVIII)."
 
     return None
 
@@ -661,9 +674,11 @@ def detect_japanese_pragmatic_register(jp_text: str, en_text: str = "") -> Optio
 
 def get_audio_semantic_anchor(jp_text: str, en_text: str = "") -> Optional[str]:
     """
+    SAGE (Seiyū Acoustic Grounding Engine).
     Analyzes Whisper Japanese transcription and English text to detect dangerous pivot ambiguities
-    (e.g., 'leave me alone' -> Hitori ni shite vs Hottoite, 'it's nothing' -> Betsuni vs Nandemonai).
-    Returns an explicit disambiguation anchor directive for the translation prompt.
+    and auditory anchor discrepancies (e.g., 'leave me alone' -> Hitori ni shite vs Hottoite,
+    'it's nothing' -> Betsuni vs Nandemonai, 'that was good' -> Yokatta, 'I did it' -> Yatta).
+    Returns an explicit disambiguation anchor directive for the translation prompt (Filar CLVI / CLVIII).
     """
     if not jp_text:
         return None
@@ -672,22 +687,72 @@ def get_audio_semantic_anchor(jp_text: str, en_text: str = "") -> Optional[str]:
     rom_lower = romaji_match[0].strip().lower() if romaji_match else to_romaji(clean_jp).lower()
     en_lower = (en_text or "").lower()
 
-    # 1. Hitori ni shite vs Hottoite / Leave me alone (Filar CLVI)
+    # 1. Hitori ni shite vs Hottoite / Leave me alone (Filar CLVI / CLVIII)
     if any(k in clean_jp for k in ["一人にして", "独りにして", "ひとりにして", "一人で", "独りで"]) or any(k in rom_lower for k in ["hitori ni shite", "hitori de", "hitorinisite", "hitori"]):
         if any(w in en_lower for w in ["leave me alone", "alone", "by myself", "give me a break", "peace"]):
-            return "W audio pada '一人にして (Hitori ni shite)' = samotność, bycie samemu w rozpaczy/bólu -> ZAKAZ opryskliwego 'Daj mi spokój'! NAKAZ: 'Zostaw mnie samą/samego' / 'Chcę być sam(a)' (Filar CLVI)."
+            return "W audio pada '一人にして (Hitori ni shite)' = samotność, bycie samemu w rozpaczy/bólu -> ZAKAZ opryskliwego 'Daj mi spokój'! NAKAZ: 'Zostaw mnie samą/samego' / 'Chcę być sam(a)' (Filar CLVI/CLVIII)."
 
-    # 2. Betsuni vs Nandemonai / It's nothing (Filar CLVI)
+    # 2. Betsuni vs Nandemonai / It's nothing (Filar CLVI / CLVIII)
     if ("別に" in clean_jp or "betsuni" in rom_lower) and any(w in en_lower for w in ["nothing", "not really", "it's fine", "never mind"]):
-        return "W audio pada '別に (Betsuni)' = chłód emocjonalny, foch, dystans -> ZAKAZ 'To nic takiego, nie ma sprawy'! NAKAZ: 'Wcale nie' / 'Nieważne' / 'Mniejsza z tym' (Filar CLVI)."
+        return "W audio pada '別に (Betsuni)' = chłód emocjonalny, foch, dystans -> ZAKAZ 'To nic takiego, nie ma sprawy'! NAKAZ: 'Wcale nie' / 'Nieważne' / 'Mniejsza z tym' (Filar CLVI/CLVIII)."
 
-    # 3. Mou ii vs Kekkou desu / That's enough / It's fine (Filar CLVI)
+    # 3. Mou ii vs Kekkou desu / That's enough / It's fine (Filar CLVI / CLVIII)
     if ("もういい" in clean_jp or "mou ii" in rom_lower or "mouii" in rom_lower) and any(w in en_lower for w in ["enough", "it's fine", "forget it"]):
-        return "W audio pada 'もういい (Mou ii)' = rezygnacja, urażona duma -> NAKAZ: 'Wystarczy' / 'Daj spokój' / 'Koniec tematu' (Filar CLVI)."
+        return "W audio pada 'もういい (Mou ii)' = rezygnacja, urażona duma -> NAKAZ: 'Wystarczy' / 'Daj spokój' / 'Koniec tematu' (Filar CLVI/CLVIII)."
 
-    # 4. Gaman dekinai vs Yurusenai / I can't take it (Filar CLVI)
+    # 4. Gaman dekinai vs Yurusenai / I can't take it (Filar CLVI / CLVIII)
     if any(k in clean_jp for k in ["我慢できない", "耐えられない"]) or any(k in rom_lower for k in ["gaman dekinai", "taerarenai"]):
-        return "W audio pada 'Gaman dekinai' (ból fizyczny/psychiczny) -> NAKAZ: 'Dłużej tego nie zniosę / Nie wytrzymam' (ZAKAZ: 'Nie wybaczę tego') (Filar CLVI)."
+        return "W audio pada 'Gaman dekinai' (ból fizyczny/psychiczny) -> NAKAZ: 'Dłużej tego nie zniosę / Nie wytrzymam' (ZAKAZ: 'Nie wybaczę tego') (Filar CLVI/CLVIII)."
+
+    # 5. Yokatta (Filar CLVIII)
+    if any(k in clean_jp for k in ["よかった", "良かった"]) or any(k in rom_lower for k in ["yokatta", "yokattane"]):
+        if any(w in en_lower for w in ["good", "great", "glad", "relief", "thank goodness", "thank god"]):
+            return "W audio pada 'よかった (Yokatta)' = ulga, kamień z serca -> KATEGORYCZNY ZAKAZ dosłownego 'To było dobre!'! NAKAZ: 'Całe szczęście...' / 'Jak dobrze...' (Filar CLVIII)."
+
+    # 6. Yatta (Filar CLVIII)
+    if any(k in clean_jp for k in ["やった", "やったー"]) or any(k in rom_lower for k in ["yatta", "yattaa"]):
+        if any(w in en_lower for w in ["did it", "done it", "i did", "we did", "yes", "hooray"]):
+            return "W audio pada 'やった (Yatta)' = triumf, radość z sukcesu -> ZAKAZ 'Zrobiłem to!'! NAKAZ: 'Udało się!' / 'Mamy to!' / 'Jest!' (Filar CLVIII)."
+
+    # 7. Uso / Maji (Filar CLVIII)
+    if any(k in clean_jp for k in ["嘘", "うそ", "マジ", "まじ"]) or any(k in rom_lower for k in ["uso", "maji"]):
+        if any(w in en_lower for w in ["lie", "lying", "no way", "really", "kidding", "serious"]):
+            return "W audio pada '嘘/マジ (Uso/Maji)' = szok i niedowierzanie -> ZAKAZ 'Kłamstwo!'! NAKAZ: 'Nie wierzę!' / 'Żartujesz?!' / 'Bez jaj!' (Filar CLVIII)."
+
+    # 8. Mendokusai (Filar CLVIII)
+    if any(k in clean_jp for k in ["めんどくさい", "面倒くさい", "面倒"]) or any(k in rom_lower for k in ["mendokusai", "mendou"]):
+        if any(w in en_lower for w in ["pain", "bother", "hassle", "trouble", "annoying", "drag"]):
+            return "W audio pada '面倒くさい (Mendokusai)' = zniechęcenie, udręka -> ZAKAZ 'Co za ból!'! NAKAZ: 'Ale mi się nie chce...' / 'Co za męczarnia...' (Filar CLVIII)."
+
+    # 9. Tasukete (Filar CLVIII)
+    if any(k in clean_jp for k in ["助けて", "たすけて"]) or any(k in rom_lower for k in ["tasukete", "tasukete kure"]):
+        if any(w in en_lower for w in ["help", "save"]):
+            return "W audio pada '助けて (Tasukete)' = krzyk o pomoc -> ZAKAZ teatralnego 'Ocal mnie!'! NAKAZ: 'Ratunku!' / 'Pomóż mi!' (Filar CLVIII)."
+
+    # 10. Yamero / Yamete (Filar CLVIII)
+    if any(k in clean_jp for k in ["やめろ", "やめて", "止めろ", "止めて"]) or any(k in rom_lower for k in ["yamero", "yamete"]):
+        if any(w in en_lower for w in ["stop", "don't"]):
+            return "W audio pada 'やめろ/やめて (Yamero/Yamete)' = sprzeciw/protest -> NAKAZ: 'Przestań!' / 'Stój!' / 'Zostaw!' (Filar CLVIII)."
+
+    # 11. Shikata ga nai / Shou ga nai (Filar CLVIII)
+    if any(k in clean_jp for k in ["しょうがない", "仕方がない", "仕方ない"]) or any(k in rom_lower for k in ["shou ga nai", "shikata ga nai", "shouganai", "shikatanai"]):
+        if any(w in en_lower for w in ["help", "choice", "way"]):
+            return "W audio pada 'しょうがない (Shou ga nai)' = pogodzenie się z losem -> ZAKAZ 'Nie da się temu pomóc'! NAKAZ: 'Trudno...' / 'Nic na to nie poradzimy' / 'Nie mamy wyboru' (Filar CLVIII)."
+
+    # 12. Pronoun: omae / kimi / kisama / temee (Filar CLVII / CLVIII)
+    if any(k in clean_jp for k in ["お前", "君", "貴様", "てめえ"]) or any(k in rom_lower.split() for k in ["omae", "kimi", "kisama", "temee"]):
+        if any(w in en_lower for w in ["you", "your"]):
+            return "W audio seiyū zaimek 2. osoby na 'ty' ('omae/kimi/kisama') -> KATEGORYCZNY ZAKAZ formy 'pan/pani'! Bezwzględnie tłumacz w 2. osobie na 'ty' (Filar CLVII/CLVIII)."
+
+    # 13. Pronoun: ore / boku (Filar CXXXVI / CLVIII)
+    if any(k in clean_jp for k in ["俺", "僕"]) or any(k in rom_lower.split() for k in ["ore", "boku"]):
+        if any(w in en_lower for w in ["i ", "i'm", "i've", "my ", "me"]):
+            return "W audio seiyū męski zaimek 1. osoby ('ore/boku') -> Mówca to mężczyzna/chłopak! Stosuj męskie formy przeszłe (-łem, -łem się) (Filar CXXXVI/CLVIII)."
+
+    # 14. Pronoun: atashi / atai (Filar XIII / CLVIII)
+    if any(k in clean_jp for k in ["あたし", "あたい"]) or any(k in rom_lower.split() for k in ["atashi", "atai"]):
+        if any(w in en_lower for w in ["i ", "i'm", "i've", "my ", "me"]):
+            return "W audio seiyū damski zaimek 1. osoby ('atashi') -> Mówca to kobieta/dziewczyna! Stosuj żeńskie formy przeszłe (-łam, -łam się) (Filar XIII/CLVIII)."
 
     return None
 
@@ -1014,10 +1079,11 @@ class MultimodalTranslator:
                      "PAMIĘTAJ: Kwestie często tworzą jedno długie zdanie rozbite na kilka linijek – ZAWSZE analizuj CAŁE ZDANIA od początku do końca, dbając o piękny, naturalny polski szyk wyrazów i płynność gramatyczną między linijkami! "
                      "DIALOGI 1-NA-1 I LICZBA GRAMATYCZNA: Gdy w scenie/kadrze rozmawiają ze sobą dwie postacie (1-na-1), angielskie dwuznaczne 'you' (np. 'Did you hear...?', 'Did you see...?', 'Do you know...?') BEZWZGLĘDNIE tłumacz w 2. osobie liczby POJEDYNCZEJ ('Słyszałeś?' / 'Słyszałaś?', 'Widziałeś?', 'Wiesz?'). KATEGORYCZNY ZAKAZ form liczby mnogiej ('Słyszeliście?') w rozmowach dwuosobowych! "
                      "KONSEKWENCJA FORM ADRESATYWNYCH (FILAR CLVII): Jeśli w scenie/dialogu postać zwraca się do rozmówcy po imieniu (np. 'Shizuku, dlaczego?!') lub na 'ty', KATEGORYCZNIE ZABRANIA SIĘ przechodzenia na formy per 'pan/pani' ('wygrał pan' -> BŁĄD KARDYNALNY!). Wszystkie kolejne kwestie skierowane do tej osoby ('you won', 'did you', 'you') BEZWZGLĘDNIE tłumacz w 2. osobie na 'ty' ('wygrałeś trzy z siedmiu starć!'). Kategoryczny zakaz schizofrenii adresatywnej i mieszania 'ty' z 'pan' w jednej rozmowie! "
+                     "ZGODNOŚĆ FONICZNO-SEMANTYCZNA ZE SŁUCHEM (FILAR CLVIII): Polski widz ogląda anime z oryginalnym japońskim głosem seiyū! Gdy w audio rozbrzmiewa wyraziste słowo ('Hitori' -> 'sam/sama', 'Betsuni' -> 'wcale nie', 'Yokatta' -> 'całe szczęście', 'Yatta' -> 'udało się!', 'Uso/Maji' -> 'nie wierzę! / żartujesz?!', 'Mendokusai' -> 'nie chce mi się / męczarnia'), KATEGORYCZNIE ZABRANIA SIĘ bezmyślnego przepisywania amerykańskich parafraz ('Daj mi spokój', 'To nic takiego', 'To było dobre', 'Zrobiłem to', 'Co za ból')! "
                      "ŻEŃSKOOSOBOWOŚĆ OBSADY: Dialogi między uczennicami/dziewczętami bezwzględnie tłumacz w RODZAJU ŻEŃSKIM (np. 'Głupia jesteś?' / 'Oszalałaś?', 'Jesteś pewna?', 'Widziałaś to?', 'poszłam', 'zrobiłam'). ZAKAZ form męskich ('Głupi jesteś?') w rozmowach dziewcząt! "
                      "PRZYNALEŻNOŚĆ I 3. OSOBA: Frazy typu '[Imię]'s dad / mom / manga' (np. 'Akafuku's dad!') tłumacz w 3. osobie ('Tata Akafuku!'). BEZWZGLĘDNY ZAKAZ zamiany imienia innej postaci na 1. osobę ('to mój tata' -> BŁĄD!). "
                      "Użyj załączonych klatek wideo do WIZUALNEGO ODCZYTANIA (OCR) JAPOŃSKICH NAPISÓW (chmurki jak いいよね, tablice, telefony, szyldy) oraz japońskiego audio do ustalenia emocji i kontekstu sytuacji. "
-                     "Jeśli podano japońską transkrypcję (JP), opieraj sens bezpośrednio na japońskim oryginale! "
+                     "TRIANGULACJA KOMPLEMENTARNA ŹRÓDEŁ: Skrypt angielski (EN) zapewnia precyzję faktów, nazwy własne i logikę zdania, a japoński głos seiyū (JP) decyduje o formie grzecznościowej, płci i zgodności ze słuchem widza! "
                      "BEZWZGLĘDNIE unikaj tłumaczenia 1:1, kalek i sztywnych definicji (np. 'That bombed' -> 'To mi nie wyszło', 'I'm home' -> 'Wróciłam!', 'I see' -> 'Rozumiem'):")
 
         for idx, (original_idx, event, clean_text, ts_prefix) in enumerate(batch_events):
@@ -1066,10 +1132,10 @@ class MultimodalTranslator:
                 if jp_text and not vtype["is_sign"]:
                     romaji_str = to_romaji(jp_text)
                     jp_display = f"{jp_text} [{romaji_str}]" if romaji_str and romaji_str != jp_text else jp_text
-                    lines.append(f"  JP (GŁÓWNA KOTWICA SEMANTYCZNA - Słuchaj intencji aktora): {jp_display}")
+                    lines.append(f"  🎙️ GŁOS SEIYŪ (KOTWICA FONICZNA, REJESTR I PŁEĆ): {jp_display}")
                     semantic_anchor = get_audio_semantic_anchor(jp_text, clean_text)
                     if semantic_anchor:
-                        lines.append(f"  [🎙️ KOTWICA SEMANTYCZNA AUDIO]: {semantic_anchor}")
+                        lines.append(f"  🎯 ZGODNOŚĆ FONICZNO-SEMANTYCZNA (FILAR CLVIII): {semantic_anchor}")
                     if duration_s <= 0.8 and any(h in jp_text for h in ["え", "う", "あの", "えっと", "ん", "ま…", "あ…", "え…"]) and len(clean_text.split()) > 2:
                         lines.append(f"  [🎙️ ALARM ROZBIEŻNOŚCI AUDIO JP]: W audio seiyū padło wyłącznie krótkie wahanie/dźwięk ('{jp_display}'). ZAKAZ tłumaczenia całego zdania w tym ułamkowym bloku! Ogranicz do samego wahania: 'Znaczy...', 'Cóż...', 'Ech...'.")
             if episode_profile:
@@ -1088,7 +1154,7 @@ class MultimodalTranslator:
                         if pun.original_joke_or_pun and pun.original_joke_or_pun.lower() in clean_text.lower():
                             lines.append(f"  [🃏 GRA SŁOWNA: {pun.polish_transcreation}]")
                             break
-            lines.append(f"  EN (Pomocniczy skrypt do czasu/ogólnego sensu): {clean_text}")
+            lines.append(f"  📄 SKRYPT PODSTAWOWY EN (TREŚĆ, FAKTY I SKŁADNIA): {clean_text}")
 
         # 4. Lookahead window
         if lookahead_events:
@@ -1677,6 +1743,19 @@ class MultimodalTranslator:
                         drift_alert = "[🚨 ALARM FILAR CLVII: Zwrot per 'pan/pani' w scenie/dialogu po imieniu na 'ty'! Kategoryczny zakaz 'wygrał pan' / 'pan wie' -> Zmień na 2. os. 'wygrałeś' / 'wiesz'!]"
                         it["notes"] = f"{it.get('notes', '')} {drift_alert}".strip()
 
+            # Auditory Anchor Pinning (Filar CLVIII)
+            audio_jp_str = str(it.get("audio_jp", "")).lower()
+            if audio_jp_str and not it.get("is_sign"):
+                pl_check = str(it.get("pl", "")).lower()
+                if any(k in audio_jp_str for k in ["hitori", "一人", "独り", "ひとり"]) and ("daj mi spokój" in pl_check or "dajcie mi spokój" in pl_check):
+                    it["notes"] = f"{it.get('notes', '')} [🚨 ALARM FILAR CLVIII: W audio pada 'Hitori'! ZAKAZ 'Daj mi spokój'! NAKAZ: 'Zostaw mnie samą/samego']".strip()
+                elif any(k in audio_jp_str for k in ["betsuni", "別に"]) and ("to nic takiego" in pl_check or "nie ma sprawy" in pl_check):
+                    it["notes"] = f"{it.get('notes', '')} [🚨 ALARM FILAR CLVIII: W audio pada 'Betsuni'! ZAKAZ 'To nic takiego'! NAKAZ: 'Wcale nie' / 'Mniejsza z tym']".strip()
+                elif any(k in audio_jp_str for k in ["yokatta", "よかった", "良かった"]) and "to było dobre" in pl_check:
+                    it["notes"] = f"{it.get('notes', '')} [🚨 ALARM FILAR CLVIII: W audio pada 'Yokatta'! ZAKAZ 'To było dobre'! NAKAZ: 'Całe szczęście']".strip()
+                elif any(k in audio_jp_str for k in ["yatta", "やった"]) and ("zrobiłem to" in pl_check or "zrobiłam to" in pl_check):
+                    it["notes"] = f"{it.get('notes', '')} [🚨 ALARM FILAR CLVIII: W audio pada 'Yatta'! ZAKAZ 'Zrobiłem to'! NAKAZ: 'Udało się!']".strip()
+
         # 6. Optional Phase 2 Verifier (Script Doctor)
         batch_results: Dict[int, str] = {}
         batch_regions: Dict[int, str] = {}
@@ -1746,7 +1825,8 @@ class MultimodalTranslator:
                     is_sign=item.get("is_sign", False),
                     user_feedback_rules=all_user_rules,
                     custom_glossary=combined_glossary,
-                    is_informal_ty=is_item_informal
+                    is_informal_ty=is_item_informal,
+                    audio_jp=item.get("audio_jp", "")
                 )
                 # Deterministic glossary overrides
                 final_text, gloss_fixes = GlossaryManager.apply_deterministic_overrides(final_text, combined_glossary)
@@ -1789,7 +1869,8 @@ class MultimodalTranslator:
                     is_sign=item.get("is_sign", False),
                     user_feedback_rules=all_user_rules,
                     custom_glossary=combined_glossary,
-                    is_informal_ty=is_item_informal
+                    is_informal_ty=is_item_informal,
+                    audio_jp=item.get("audio_jp", "")
                 )
                 # Deterministic glossary overrides
                 final_text, gloss_fixes = GlossaryManager.apply_deterministic_overrides(final_text, combined_glossary)

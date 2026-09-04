@@ -1436,6 +1436,31 @@ FILAR CLVII: ZASADA NIENARUSZALNOŚCI FORMY ADRESATYWNEJ (T-V INVARIANCE) I ZAKA
       - Formę per „pan/pani” stosuj WYŁĄCZNIE wtedy, gdy postacie zwracają się do siebie oficjalnie po nazwisku z tytulaturą („panie Kanzaki”, „panie Tomine”, „panie inspektorze”) i w całej scenie utrzymują ten sam dystans.
    3. JEDYNY WYJĄTEK DLA ZMIANY FORMY:
       - Zmiana formy z „pan/pani” na „ty” może nastąpić WYŁĄCZNIE w punkcie zwrotnym zdefiniowanym przez Profiler (Relationship Pivot), gdy bohaterowie wyraźnie ustalają przejście na „ty” (np. „Mów mi Shizuku / Przejdźmy na ty”). W żadnym wypadku nie może to być losowy skok w ramach jednej wymiany zdań!
+
+FILAR CLVIII: ZASADA NIESKAZITELNEGO UCHA WIDZA (THE AUDITORY-SUBTEXT COHERENCE STANDARD)
+   1. HARMONIA MIĘDZY SŁUCHEM A NAPISAMI:
+      - Polski widz ogląda anime z japońską ścieżką dźwiękową seiyū.
+      - Gdy w głośniku rozbrzmiewa wyraziste słowo japońskie (np. liczebnik, powszechnie znany zwrot, wykrzyknik, imię), a na ekranie pojawia się amerykańska parafraza zniekształcająca sens – powstaje u widza bolesny dysonans poznawczy.
+      - KATEGORYCZNY ZAKAZ ulegania angielskim uproszczeniom i amerykańskiemu slangowi tam, gdzie seiyū wypowiada precyzyjny termin japoński!
+   2. MATRYCA KOTWIC FONICZNYCH (KLUCZOWE SŁOWA SEIYŪ):
+      - HITORI (一人 / 独り / ひとり): w kontekście emocjonalnym to „sam / sama / w pojedynkę / zostaw mnie samą”. KARDYNALNY BŁĄD: „Daj mi spokój!”.
+      - BETSUNI (別に): chłód, dystans, foch -> „Wcale nie / Mniejsza z tym / Nieważne”. KARDYNALNY BŁĄD: „To nic takiego / Nie ma sprawy”.
+      - YOKATTA (よかった): ulga, kamień z serca -> „Całe szczęście / Jak dobrze”. KARDYNALNY BŁĄD: „To było dobre!”.
+      - YATTA (やった): triumf, sukces -> „Udało się! / Mamy to!”. KARDYNALNY BŁĄD: „Zrobiłem to!”.
+      - USO / MAJI (嘘 / マジ): niedowierzanie -> „Nie wierzę! / Żartujesz?! / Bez jaj!”. KARDYNALNY BŁĄD: „Kłamstwo!”.
+      - MENDOKUSAI (面倒くさい): zniechęcenie -> „Ale mi się nie chce... / Co za męczarnia...”. KARDYNALNY BŁĄD: „Co za ból!”.
+      - MOU II (もういい): rezygnacja, machnięcie ręką -> „Wystarczy / Daj spokój / Koniec tematu”. KARDYNALNY BŁĄD: „W porządku”.
+      - GAMAN DEKINAI (我慢できない): granica bólu/cierpienia -> „Dłużej tego nie zniosę / Nie wytrzymam”. KARDYNALNY BŁĄD: „Nie wybaczę tego”.
+      - TASUKETE (助けて): krzyk o pomoc -> „Ratunku! / Pomóż mi!”. KARDYNALNY BŁĄD: „Ocal mnie!”.
+      - YAMERO / YAMETE (やめろ / やめて): sprzeciw -> „Przestań! / Stój! / Zostaw!”.
+      - SHIKATA GA NAI / SHOU GA NAI (しょうがない): pogodzenie się z losem -> „Trudno / Nic nie poradzimy / Nie mamy wyboru”. KARDYNALNY BŁĄD: „Nie da się temu pomóc”.
+      - NARUHODO (なるほど): olśnienie, zrozumienie mechanizmu -> „W ten sposób... / A więc o to chodzi / Wszystko jasne”.
+      - WAKATTA (分かった): przyjęcie polecenia -> „Jasne / Zrozumiałem / Robi się”.
+      - BAKA / AHO (馬鹿 / アホ): afektywna obelga -> „Idiota / Głupek / Durniu” (dopasuj ciężar do wieku postaci).
+   3. INTEGRALNOŚĆ OBU ŹRÓDEŁ (TRIANGULACJA KOMPLEMENTARNA):
+      - Skrypt angielski zapewnia precyzję fabuły, nazwy własne i logikę zdania.
+      - Japońskie audio zapewnia autentyczny ton, formę grzecznościową i ładunek emocjonalny.
+      - Tłumacz ma obowiązek syntetyzować oba źródła, a nie ślepo przepisywać angielski!
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -2276,6 +2301,7 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
       * "[Filar CLV - Repetycje Myśli i Separacja Mowy] Repetycja myśli 'I can't stop it' (3x) -> 'Nie powstrzymam tego' (ZAKAZ podmiany na treść dialogu o fankach z sąsiedniej linijki)"
       * "[Filar CLVI - Rozszczepienie Angielskiego Pivotu] 'Hitori ni shite' -> 'Zostaw mnie samą' (ZAKAZ opryskliwego 'Daj mi spokój'); 'Betsuni' -> 'Wcale nie' / 'Mniejsza z tym' (ZAKAZ 'To nic takiego'); 'Mou ii' -> 'Wystarczy / Daj spokój'"
       * "[Filar CLVII - Nienaruszalność Formy Adresatywnej] 'Shizuku, dlaczego?!' ... 'Przecież wygrał pan' -> 'Przecież wygrałeś' (zakaz schizofrenii adresatywnej i przechodzenia na 'pan/pani' po zwróceniu się po imieniu na 'ty')"
+      * "[Filar CLVIII - Zgodność Foniczno-Semantyczna Seiyū] 'Hitori' -> 'Zostaw mnie samą/samego' (ZAKAZ 'Daj mi spokój!'); 'Betsuni' -> 'Wcale nie / Mniejsza z tym' (ZAKAZ 'To nic takiego'); 'Yokatta' -> 'Całe szczęście' (ZAKAZ 'To było dobre!'); 'Yatta' -> 'Udało się!' (ZAKAZ 'Zrobiłem to!')"
 
 {BELCZYK_AVT_MASTER_CANON}
 
@@ -3095,6 +3121,26 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
             "Jeśli postać zwraca się do rozmówcy po imieniu (np. 'Shizuku, dlaczego?!'), w całej scenie KONSEKWENTNIE stosuj formę na 'ty'! "
             "KATEGORYCZNY ZAKAZ wtrącania formy 'pan/pani' ('wygrał pan' -> BŁĄD KARDYNALNY! Należy: 'wygrałeś'). "
             "Wszelkie zwroty 'you / you won / did you' do osoby, z którą jesteś po imieniu, tłumacz w 2. osobie na 'ty'!"
+        )
+
+    # 98. Zgodność Foniczno-Semantyczna Seiyū i Test Ucha Widza (Filar CLVIII)
+    has_auditory_anchor_trigger = any(
+        any(tok in str(item.get("audio_jp", "")).lower() for tok in [
+            "hitori", "一人", "独り", "betsuni", "別に", "yokatta", "よかった", "yatta", "やった",
+            "uso", "嘘", "maji", "マジ", "mendokusai", "面倒くさい", "mou ii", "もういい",
+            "gaman", "我慢", "tasukete", "助けて", "yamero", "yamete", "やめろ", "やめて",
+            "shikata ga nai", "shou ga nai", "しょうがない", "naruhodo", "なるほど", "wakatta", "分かった"
+        ])
+        for item in batch_items
+    )
+    if has_auditory_anchor_trigger:
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CLVIII - Zgodność Foniczno-Semantyczna Seiyū (Harmonia Ucha)]: "
+            "Polski widz słyszy głos seiyū! Bezwzględnie zestroić napisy ze słyszanym japońskim słowem kluczowym: "
+            "Hitori -> 'sam/sama' (ZAKAZ 'Daj mi spokój'); Betsuni -> 'Wcale nie / Mniejsza z tym' (ZAKAZ 'To nic takiego'); "
+            "Yokatta -> 'Całe szczęście' (ZAKAZ 'To było dobre'); Yatta -> 'Udało się!' (ZAKAZ 'Zrobiłem to'); "
+            "Uso/Maji -> 'Nie wierzę! / Żartujesz?!' (ZAKAZ 'Kłamstwo'); Mendokusai -> 'Ale mi się nie chce...' (ZAKAZ 'Co za ból'); "
+            "Mou ii -> 'Wystarczy / Daj spokój'; Yamero -> 'Przestań! / Zostaw!'; Tasukete -> 'Ratunku! / Pomóż mi!'."
         )
 
     if not focused_pillars:
