@@ -2431,6 +2431,50 @@ def test_cornerstone_invariants():
     
     print(" -> PASSED: Żelazne kotwice wydajności, pre-warmingu multi-key i ochrony kosztów są w 100% aktywne.")
 
+def test_episode_quality_gate():
+    print("[TEST 34/34] Test Całościowego Strażnika Jakości Odcinka (Episode Quality Gate 0.00 PLN)...")
+    from avt_linter import EpisodeQualityGate
+    import pysubs2
+
+    subs = pysubs2.SSAFile()
+    # Linia 1: Ostrzeżenie (Directive)
+    ev1 = pysubs2.SSAEvent(start=1000, end=2500, text="Ciemno tu, uważaj pod nogi.", style="Default")
+    # Linia 2: Odpowiedź w postaci samotnego "T-Tak." (Adjacency Pair test)
+    ev2 = pysubs2.SSAEvent(start=2700, end=3800, text="T-Tak.", style="Default")
+    # Linia 3: Myśl w kursywie
+    ev3 = pysubs2.SSAEvent(start=4000, end=5500, text="{\\i1}Muszę uważać, by nikt nie odkrył mojej tożsamości...{\\i0}", style="Italics")
+    # Linia 4: Dialog na głos ze sztuczną kursywą i błędem fokalizacji (Silent Witch test)
+    ev4 = pysubs2.SSAEvent(start=5800, end=7500, text="{\\i1}Przecież jest tam też mój esej!{\\i0}", style="Default")
+    # Linia 5: Linijka z podwójną kropką i spacją przed znakiem zapytania (Higiena interpunkcji)
+    ev5 = pysubs2.SSAEvent(start=8000, end=9200, text="To prawda.. czy to na pewno ty ?", style="Default")
+    # Linia 6: Amerykanizm (Filar IV / XXXVI)
+    ev6 = pysubs2.SSAEvent(start=9500, end=11000, text="Witaj z powrotem w akademii.", style="Default")
+
+    subs.events = [ev1, ev2, ev3, ev4, ev5, ev6]
+
+    audited_subs, fixes = EpisodeQualityGate.audit_and_fix_entire_episode(subs)
+
+    # Weryfikacja korekt
+    assert len(fixes) >= 4, f"Oczekiwano co najmniej 4 poprawek, otrzymano {len(fixes)}"
+
+    # 1. Dyrektywne potwierdzenie: T-Tak. -> D-Dobrze.
+    assert audited_subs.events[1].text == "D-Dobrze."
+    assert any("Dyrektywne Potwierdzenie" in f for f in fixes)
+
+    # 2. Zdjęcie sztucznej kursywy i przywrócenie 3. osoby w tytule
+    assert audited_subs.events[3].text == "Przecież jest tam też esej Wiedźmy Milczenia!"
+    assert any("Bariera Myśli" in f for f in fixes)
+    assert any("Filar CLXI" in f for f in fixes)
+
+    # 3. Higiena interpunkcji: .. -> ... oraz brak spacji przed ?
+    assert "..." in audited_subs.events[4].text
+    assert "ty?" in audited_subs.events[4].text
+
+    # 4. Usunięcie kalki amerykańskiej
+    assert audited_subs.events[5].text.startswith("Witaj!")
+
+    print(" -> PASSED: Episode Quality Gate bezbłędnie eliminuje banalne błędy na pełnej osi czasu (Adjacency Pairs, Thought Boundary, Incognito, Typography, Calques) przy koszcie 0.00 PLN.")
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -2466,5 +2510,6 @@ if __name__ == "__main__":
     test_masterclass_2_innovations()
     test_adaptive_thinking_budget()
     test_cornerstone_invariants()
-    print("\n Wszystkie testy jednostkowe i integracyjne (33/33) zakończone pełnym sukcesem!\n")
+    test_episode_quality_gate()
+    print("\n Wszystkie testy jednostkowe i integracyjne (34/34) zakończone pełnym sukcesem!\n")
 

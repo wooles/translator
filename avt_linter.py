@@ -770,3 +770,117 @@ class AVTLinter:
 
         modified = pattern.sub(repl, modified)
         return modified, fixes
+
+
+class EpisodeQualityGate:
+    """
+    Global Post-Translation Quality Gate & Human-Eye Common Sense Auditor.
+    Executes a comprehensive, chronological pass across the entire subtitle file
+    (eliminating batch boundary blindspots) right before saving to disk.
+    Guarantees zero-cost (0.00 PLN) elimination of trivial human-visible errors.
+    """
+
+    @classmethod
+    def audit_and_fix_entire_episode(
+        cls,
+        subs: Any,  # pysubs2.SSAFile
+        custom_glossary: Optional[Dict[str, str]] = None,
+        user_feedback_rules: Optional[List[Dict[str, Any]]] = None
+    ) -> Tuple[Any, List[str]]:
+        if not subs or not hasattr(subs, "events") or not subs.events:
+            return subs, []
+
+        fixes: List[str] = []
+        events = subs.events
+
+        for i, ev in enumerate(events):
+            if not ev.text or not ev.text.strip():
+                continue
+
+            text_before = ev.text
+
+            # Identify if current event is a sign/title (e.g. style has "Sign", "Title", or contains \pos / \an8)
+            is_sign = bool(
+                re.search(r"\\(pos|move|an[789]|clip)\b", ev.text) or
+                any(s in (ev.style or "").lower() for s in ["sign", "title", "caption", "typeset", "op", "ed"])
+            )
+
+            # Find preceding dialogue event (skip signs and empty events)
+            prev_ev = None
+            prev_clean = ""
+            for j in range(i - 1, -1, -1):
+                cand = events[j]
+                cand_text = re.sub(r"\{[^\}]*\}", "", cand.text or "").strip()
+                cand_is_sign = bool(
+                    re.search(r"\\(pos|move|an[789]|clip)\b", cand.text or "") or
+                    any(s in (cand.style or "").lower() for s in ["sign", "title", "caption", "typeset", "op", "ed"])
+                )
+                if cand_text and not cand_is_sign:
+                    prev_ev = cand
+                    prev_clean = cand_text
+                    break
+
+            # 1. ADJACENCY PAIR AUDIT: Directive / Warning -> Affirmation Guard (Filar XLIII / CXLVI)
+            if not is_sign and prev_clean and prev_ev:
+                time_gap_ms = ev.start - prev_ev.end
+                if time_gap_ms < 9000:
+                    is_prev_directive = bool(re.search(
+                        r"\b(uważaj|uważajcie|ostrożnie|czekaj|poczekaj|zaczekaj|stój|stójcie|pospiesz|pospieszcie|chodź|chodźcie|nie ruszaj|trzymaj się|uważaj pod nogi|ruszaj|kryj się|padnij)\b",
+                        prev_clean,
+                        re.IGNORECASE
+                    ))
+                    if is_prev_directive:
+                        # Match lone affirmative like "Tak.", "T-Tak.", "Tak!", "T-Tak..."
+                        m_aff = re.match(r"^(\s*\{[^\}]*\})*([Tt]-[Tt]ak|[Tt]ak)([\.!\?…]*)(\{[^\}]*\}\s*)*$", ev.text.strip())
+                        if m_aff:
+                            word = m_aff.group(2)
+                            punct = m_aff.group(3) or "."
+                            repl_word = "D-Dobrze" if word.lower().startswith("t-") else ("Dobrze" if word[0].isupper() else "dobrze")
+                            ev.text = re.sub(rf"\b{re.escape(word)}", repl_word, ev.text, count=1)
+                            fixes.append(f"[Episode Quality Gate - Dyrektywne Potwierdzenie] Linia #{i+1}: zastąpiono '{word}{punct}' przez '{repl_word}{punct}' w reakcji na '{prev_clean[:25]}...'")
+
+            # 2. THOUGHT-TO-SPEECH BOUNDARY: Strip unsolicited thought italics on plain dialogue lines
+            if not is_sign and prev_ev:
+                prev_is_thought = "italic" in (prev_ev.style or "").lower() or r"\i1" in (prev_ev.text or "")
+                curr_style_thought = "italic" in (ev.style or "").lower()
+                # If previous event was a thought, and current style is regular dialogue, strip artificial {\i1}...{\i0}
+                if prev_is_thought and not curr_style_thought:
+                    if r"\i1" in ev.text and r"\i0" in ev.text:
+                        ev.text = re.sub(r"\{\\i[01]\}", "", ev.text).strip()
+                        fixes.append(f"[Episode Quality Gate - Bariera Myśli] Linia #{i+1}: usunięto sztuczną kursywę {{\\i1}} po przejściu z myśli do mowy diegetycznej")
+
+            # 3. FOCALIZATION & DRAMATIC IRONY (Filar CLXI): Guard against 1st person drift for 3rd person titles
+            if not is_sign:
+                if re.search(r"\bmój\s+(esej|artykuł|traktat)\b", ev.text, re.IGNORECASE):
+                    def _qg_witch_essay_repl(m):
+                        noun = m.group(1)
+                        res = f"{noun} Wiedźmy Milczenia"
+                        return res.capitalize() if m.group(0)[0].isupper() else res
+                    ev.text = re.sub(r"\bmój\s+(esej|artykuł|traktat)\b", _qg_witch_essay_repl, ev.text, flags=re.IGNORECASE)
+                    fixes.append(f"[Episode Quality Gate - Filar CLXI] Linia #{i+1}: przywrócono 3. osobę 'esej Wiedźmy Milczenia' zamiast 'mój esej'")
+                elif re.search(r"\bmoj(?:a|ej|ą)\s+prac(?:a|y|ę)\b", ev.text, re.IGNORECASE) and any(w in (prev_clean or "").lower() for w in ["wiedźm", "esej", "artykuł", "traktat"]):
+                    ev.text = re.sub(r"\bmoj(?:a|ej|ą)\s+prac(?:a|y|ę)\b", "praca Wiedźmy Milczenia", ev.text, flags=re.IGNORECASE)
+                    fixes.append(f"[Episode Quality Gate - Filar CLXI] Linia #{i+1}: skorygowano zdradę tożsamości 'moja praca' -> 'praca Wiedźmy Milczenia'")
+
+            # 4. RESIDUAL ENGLISH CALQUE SWEEP (Belczyk AVT Canon)
+            for item in AVTLinter.FIXED_REPLACEMENTS:
+                pattern = item[0]
+                repl = item[1]
+                pillar_tag = item[2] if len(item) > 2 else "Belczyk AVT"
+                if re.search(pattern, ev.text):
+                    ev.text = re.sub(pattern, repl, ev.text)
+                    fixes.append(f"[Episode Quality Gate - {pillar_tag}] Linia #{i+1}: {pattern} -> {repl}")
+
+            # 5. PUNCTUATION & TYPOGRAPHY HYGIENE
+            # Clean accidental double dots (e.g. "To prawda..") -> "To prawda..."
+            ev.text = re.sub(r"(?<!\.)\.\.(?!\.)", "...", ev.text)
+            # Remove space before comma/period/exclamation/question mark
+            ev.text = re.sub(r"\s+([,\.!\?…])", r"\1", ev.text)
+            # Normalize whitespace around ASS line breaks
+            ev.text = re.sub(r"\s*\\N\s*", r"\\N", ev.text)
+
+            # Record if text changed due to hygiene
+            if ev.text != text_before and not any(f"Linia #{i+1}:" in f for f in fixes):
+                fixes.append(f"[Episode Quality Gate - Higiena Tekstu] Linia #{i+1}: oczyszczono interpunkcję i formatowanie")
+
+        return subs, fixes

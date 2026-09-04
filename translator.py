@@ -1713,14 +1713,33 @@ class MultimodalTranslator:
             audio_discrepancy_msg = detect_audio_discrepancy(audio_jp_str, pl_candidate, clean_en, prosody=prosody_tags.get(batch_id, ""))
             pragmatic_reg = detect_japanese_pragmatic_register(audio_jp_str, clean_en)
 
-            # Ping-pong dialogowy (Filar CXLVI & XLIII)
+            # Ping-pong dialogowy (Filar CXLVI & XLIII) oraz Ciągłość Międzybatchowa
             relation_tag = ""
+            prev_clean = ""
+            prev_clean_lower = ""
+            prev_pl = ""
+            prev_jp = ""
+            prev_is_thought = False
+
             if idx > 0 and not vtype["is_sign"]:
                 prev_clean = untranslated_in_batch[idx - 1][2].strip()
                 prev_clean_lower = prev_clean.lower()
                 prev_pl = pass1_items[idx - 1].get("pl", "").lower() if idx - 1 < len(pass1_items) else ""
                 prev_jp = pass1_items[idx - 1].get("audio_jp", "").lower() if idx - 1 < len(pass1_items) else ""
+                prev_is_thought = pass1_items[idx - 1].get("is_thought", False) if idx - 1 < len(pass1_items) else False
+            elif idx == 0 and b_idx > 0 and b_idx - 1 < len(batches) and not vtype["is_sign"]:
+                # Cross-batch continuity: pobierz ostatnią kwestię z poprzedniego batcha
+                prev_batch = batches[b_idx - 1]
+                if prev_batch:
+                    last_item = prev_batch[-1]
+                    prev_clean = last_item[2].strip() if len(last_item) > 2 else ""
+                    prev_clean_lower = prev_clean.lower()
+                    prev_orig_idx = last_item[0]
+                    prev_pl = (translated_results.get(prev_orig_idx, "") if translated_results else "").lower()
+                    prev_event = last_item[1]
+                    prev_is_thought = "italic" in (prev_event.style or "").lower() or r"\i1" in (prev_event.text or "")
 
+            if prev_clean:
                 # Sprawdź, czy poprzednia linijka to dyrektywa/ostrzeżenie/polecenie
                 is_prev_directive = any(
                     w in prev_clean_lower for w in [
@@ -1758,6 +1777,12 @@ class MultimodalTranslator:
             dur_s = max(0.05, (event.end - event.start) / 1000.0)
             style_str = event.style or ""
             is_th = "italic" in style_str.lower() or r"\i1" in (event.text or "")
+
+            # Bariera Zmiany Mówcy i Stylu (Thought-to-Speech Firewall)
+            if prev_is_thought and not is_th and audio_jp_str and not vtype["is_sign"]:
+                boundary_alert = "[⚠️ ZMIANA TRYBU: Koniec myśli wewnętrznej! Ta kwestia to dialog na głos w kadrze - ZAKAZ kursywy {\\i1} i ZAKAZ monologu wewnętrznego!]"
+                relation_tag = f"{relation_tag} {boundary_alert}".strip()
+
             pass1_items.append({
                 "id": batch_id,
                 "orig_idx": orig_idx,
@@ -1907,7 +1932,7 @@ class MultimodalTranslator:
                     pbar.write(f" └─ [Redaktor Dialogów] #{r.id}{pillar_note}")
                     pbar.write(f"    ├─ Szkic:  \"{disp_orig}\"")
                     pbar.write(f"    └─ Szlif:  \"{disp_ref}\"")
-            prev_linted_line = ""
+            prev_linted_line = (lookback_history[-1]["pl"] if lookback_history else "")
             for item in pass1_items:
                 raw_final = sanitize_sub_text(refined_dict.get(item["id"], item["pl"]))
                 # Triangulate effective gender from character registry, audio F0 voice, and pragmatic clues (Filar CXXXVI)
@@ -1955,7 +1980,7 @@ class MultimodalTranslator:
                 if eff_reg:
                     batch_regions[item["orig_idx"]] = eff_reg
         else:
-            prev_linted_line = ""
+            prev_linted_line = (lookback_history[-1]["pl"] if lookback_history else "")
             for item in pass1_items:
                 raw_final = sanitize_sub_text(item["pl"])
                 spk_gen = item.get("speaker_gender")
@@ -2668,6 +2693,23 @@ class MultimodalTranslator:
                 logger.warning(f"SceneShotSnapper: Pomijanie ({e})")
 
         final_subs.events.sort(key=lambda ev: ev.start)
+
+        # 7.3. Global Episode Quality Gate & Human-Eye Common Sense Audit (0.00 PLN)
+        try:
+            from avt_linter import EpisodeQualityGate
+            final_subs, qg_fixes = EpisodeQualityGate.audit_and_fix_entire_episode(
+                final_subs,
+                custom_glossary=combined_glossary,
+                user_feedback_rules=all_user_rules
+            )
+            if qg_fixes:
+                logger.info(f"[EpisodeQualityGate]: Przeprowadzono całościowy audyt zdroworozsądkowy ({len(qg_fixes)} poprawek integralności).")
+                for f in qg_fixes[:5]:
+                    logger.info(f"  ├─ {f}")
+                if len(qg_fixes) > 5:
+                    logger.info(f"  └─ ... i {len(qg_fixes) - 5} kolejnych poprawek.")
+        except Exception as e:
+            logger.warning(f"EpisodeQualityGate: Pomijanie ({e})")
 
         if not output_path:
             stem = subs_file.stem
