@@ -38,14 +38,14 @@ def resolve_best_models(client: Optional[genai.Client] = None) -> Dict[str, str]
     """
     Automatically inspects available models in Google AI Studio for the provided API client
     and returns a dictionary with the newest versions for each tier:
-    - 'flash': Latest flagship Flash model (e.g. gemini-3.7-flash or gemini-3.6-flash)
+    - 'flash': Latest flagship Flash model (e.g. gemini-3.8-flash or gemini-3.7-flash)
     - 'flash_lite': Fastest lightweight Flash-Lite model (e.g. gemini-3.5-flash-lite)
     - 'pro': Flagship Pro class model (e.g. gemini-3.1-pro-preview)
     """
     # Default verified base models (highest quality baseline)
     defaults = {
-        "flash": "gemini-3.7-flash",
-        "flash_backup": "gemini-3.6-flash",
+        "flash": "gemini-3.8-flash",
+        "flash_backup": "gemini-3.7-flash",
         "flash_lite": "gemini-3.5-flash-lite",
         "pro": "gemini-3.1-pro-preview"
     }
@@ -128,7 +128,7 @@ def probe_model_health(client: Optional[genai.Client], model_name: str) -> Dict[
         if "pro" in model_name.lower() or "3.1" in model_name.lower():
             cfg_kwargs["max_output_tokens"] = 600
             cfg_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=512)
-        elif "3.7" in model_name.lower():
+        elif any(k in model_name.lower() for k in ["3.7", "3.8", "flash"]):
             cfg_kwargs["max_output_tokens"] = 10
             cfg_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=0)
 

@@ -530,13 +530,15 @@ from model_resolver import resolve_best_models, _extract_model_score, probe_mode
 
 def test_model_resolver():
     print("[TEST 7/7] Test automatycznego wykrywania najnowszych modeli Gemini i Sondy Obciążenia...")
+    score_38 = _extract_model_score("gemini-3.8-flash")
     score_37 = _extract_model_score("gemini-3.7-flash")
     score_35 = _extract_model_score("gemini-3.5-flash")
     score_25 = _extract_model_score("gemini-2.5-flash")
-    assert score_37 > score_35 > score_25
+    assert score_38 > score_37 > score_35 > score_25
     
     models = resolve_best_models(None)
     assert "flash" in models
+    assert models["flash"] == "gemini-3.8-flash"
     assert "flash_backup" in models
     assert "pro" in models
 
@@ -545,22 +547,22 @@ def test_model_resolver():
     assert "flash" in health
     assert "tag" in health["flash"]
 
-    # Test gwarancji Phase 1 thinking_budget == 0 oraz Profile 3 (F1: Second Highest Flash CoT 0 + F2: Highest Flash CoT 6144)
+    # Test gwarancji Phase 1 thinking_budget == 0 oraz Profile 3 (F1: Highest Flash gemini-3.8-flash CoT 0 + F2: Highest Flash CoT 6144)
     from translator import TranslatorEngine
     dummy_engine = TranslatorEngine(
         api_key="AIzaSyDummyTestKeyForVerificationOnly12345",
-        model=models.get("flash_backup", "gemini-3.6-flash"),
+        model=models["flash"],
         model_phase2=models["flash"],
         enable_verifier=True,
         thinking_budget_phase2=6144,
         use_whisper=False
     )
     assert dummy_engine.phase1_thinking_budget == 0
-    assert dummy_engine.model_phase1 == models.get("flash_backup", "gemini-3.6-flash")
+    assert dummy_engine.model_phase1 == models["flash"]
     assert dummy_engine.model_phase2 == models["flash"]
     assert dummy_engine.verifier.thinking_budget == 6144
 
-    print(" -> PASSED: Auto-discovery, Sonda Obciążenia na Żywo, Profile 3 (F1 Flash Backup + F2 Highest Flash CoT 6144) i gwarancja F1 CoT=0 działają w 100%.")
+    print(" -> PASSED: Auto-discovery, Sonda Obciążenia na Żywo, Profile 3 (F1 Highest Flash CoT 0 + F2 Highest Flash CoT 6144) i gwarancja F1 CoT=0 działają w 100%.")
 from avt_linter import AVTLinter
 from series_memory import SeriesBible
 from avt_formatter import (
