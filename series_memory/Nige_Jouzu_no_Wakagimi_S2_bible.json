@@ -78,6 +78,21 @@
     },
     "Suwa Yorishige -> Tokiyuki Hōjō": {
       "description": "Zwrot: 'panie Tokiyuki' (opiekuńczy kapłan -> młody dziedzic)"
+    },
+    "Shizuku -> Tokiyuki Houjou (Chojumaru)": {
+      "description": "Zwrot: 'Bracie / Starszy bracie (w kamuflażu) / Panie Tokiyuki (na osobności)' (służka/kapłanka i jej pan (publicznie udawane rodzeństwo))"
+    },
+    "Mima Sasaki -> Tokiyuki Houjou (Chojumaru)": {
+      "description": "Zwrot: 'chłopcze / mały / ty' (wyniosła córka feudała -> zafascynowana protektorka)"
+    },
+    "Mima Sasaki -> Shizuku": {
+      "description": "Zwrot: 'wiejska kapłanko / panienko ze wsi' (hazardowa rywalka z pogardzanego prowincjonalnego chramu)"
+    },
+    "Kojiro -> Tokiyuki Houjou (Chojumaru)": {
+      "description": "Zwrot: 'Młody panie (po cichu) / Bracie Chojumaru (publicznie)' (lojalny wojownik i rówieśnik chroniący pana)"
+    },
+    "Yasuie -> Kinmune Saionji": {
+      "description": "Zwrot: 'Wielki Radco / Panie Kinmune' (spiskowiec z Kamakury i dworski dostojnik cesarski)"
     }
   },
   "glossary": {
@@ -120,7 +135,15 @@
     "Ashikaga School": "Szkoła Ashikaga",
     "Tengu": "Tengu",
     "Taiheiki": "Kronika Taiheiki",
-    "Post town": "Miasteczko stacyjne"
+    "Post town": "Miasteczko stacyjne",
+    "Kyo": "Kyo",
+    "Basara": "Basara",
+    "Okuchi bakama": "Okuchi-bakama",
+    "Kanmon": "Kanmon",
+    "Willow (game)": "Wierzbina",
+    "Holy power": "Moc sakralna",
+    "Major Counselor": "Wielki Radca",
+    "Mount Hiei": "Góra Hiei"
   },
   "relationships": {},
   "episodes_translated": [
@@ -130,6 +153,7 @@
     "tmp53xv6q4n",
     "tmpgvm6hevq",
     "tmp1ntds3_n",
-    "[ASW] Nige Jouzu no Wakagimi S2 - 07 [1080p HEVC][4F700E16]"
+    "[ASW] Nige Jouzu no Wakagimi S2 - 07 [1080p HEVC][4F700E16]",
+    "[ASW] Nige Jouzu no Wakagimi S2 - 08 [1080p HEVC][84230547]"
   ]
 }

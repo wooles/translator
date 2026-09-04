@@ -264,8 +264,11 @@ class DialogueVerifier:
                 is_cache_err = "403" in err_str or "cachedcontent" in err_str or "permission" in err_str
                 if is_cache_err and cached_name:
                     from context_cache import ContextCacheManager
-                    ContextCacheManager.invalidate_cache(self.model, self.system_prompt)
+                    ContextCacheManager.invalidate_cache(self.model, self.system_prompt, client=last_used_client)
+                    with DialogueVerifier._STATUS_LOCK:
+                        print(f"\n[Context Cache]: Wykryto unieważniony cache serwerowy weryfikatora -> automatyczna regeneracja...")
                     cached_name = None
+                    time.sleep(0.5)
                     continue
 
                 is_billing_exhausted = "prepayment" in err_str or "depleted" in err_str or ("billing" in err_str and "credit" in err_str)

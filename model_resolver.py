@@ -128,7 +128,7 @@ def probe_model_health(client: Optional[genai.Client], model_name: str) -> Dict[
         if "pro" in model_name.lower() or "3.1" in model_name.lower():
             cfg_kwargs["max_output_tokens"] = 600
             cfg_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=512)
-        elif any(k in model_name.lower() for k in ["3.7", "3.8", "flash"]):
+        elif "lite" not in model_name.lower() and any(k in model_name.lower() for k in ["3.7", "3.8", "flash"]):
             cfg_kwargs["max_output_tokens"] = 10
             cfg_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=0)
 

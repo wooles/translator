@@ -53,8 +53,14 @@ class ContextCacheManager:
     def invalidate_cache(cls, model: str, system_instruction: str, client: Optional[Any] = None):
         """Removes an entry from the local registry upon 403 or invalidation."""
         with cls._LOCK:
-            content_hash = cls.get_content_hash(model, system_instruction, client=client)
-            _LOCAL_CACHE_REGISTRY.pop(content_hash, None)
+            if client:
+                content_hash = cls.get_content_hash(model, system_instruction, client=client)
+                _LOCAL_CACHE_REGISTRY.pop(content_hash, None)
+            else:
+                # Purge all matching model caches across any clients
+                to_remove = [k for k in list(_LOCAL_CACHE_REGISTRY.keys()) if f"::{model}::" in k]
+                for k in to_remove:
+                    _LOCAL_CACHE_REGISTRY.pop(k, None)
 
     @classmethod
     def get_or_create_cache(
@@ -79,10 +85,11 @@ class ContextCacheManager:
                 return _LOCAL_CACHE_REGISTRY[content_hash]
 
             model_clean = cls._clean_model_name(model)
-            display_name = f"avt_{model_clean}_{content_hash}"
-            model_prefix = f"avt_{model_clean}_"
+            client_id = cls._get_client_id(client)
+            display_name = f"avt_{model_clean}_{client_id}_{content_hash}"
+            model_prefix = f"avt_{model_clean}_{client_id}_"
 
-            # 2. Try to find existing cache and clean outdated versions of the SAME model
+            # 2. Try to find existing cache and clean outdated versions of the SAME client and model
             try:
                 if hasattr(client, "caches") and hasattr(client.caches, "list"):
                     matched_name = None
@@ -90,7 +97,7 @@ class ContextCacheManager:
                         if existing.display_name == display_name:
                             matched_name = existing.name
                         elif existing.display_name and existing.display_name.startswith(model_prefix):
-                            # Only delete outdated version of the SAME model (without touching other models)
+                            # Only delete outdated version of the SAME client and model
                             try:
                                 client.caches.delete(name=existing.name)
                                 logger.info(f"[Context Cache]: Removed outdated version {existing.display_name}")
