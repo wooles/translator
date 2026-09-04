@@ -1166,10 +1166,17 @@ class MultimodalTranslator:
                     bool(re.search(r"\b(dokąd|gdzie|skąd|kiedy|dlaczego|czemu|po\s+co|kto|kogo|komu|kim|co|czego|czym|jak|jaki|jaka|jakie|jakim|jakich|o\s+co|o\s+czym|z\s+kim)\b", prev_pl_ref, re.IGNORECASE))
                 )
 
+                is_prev_neg_q = prev_clean.endswith("?") and (
+                    any(w in prev_clean_lower for w in ["don't", "aren't", "didn't", "can't", "won't", "haven't", "isn't"]) or
+                    bool(re.search(r"\bnie\s+(jest|jesteś|jesteście|są|był|była|było|byli|byłeś|byłaś|będzie|będziesz|będą|ma|masz|macie|chcesz|chce|chcecie|wiesz|wie|wiecie|możesz|może|możecie|idziesz|idzie|idziecie|zrobisz|mówisz|widzisz|słyszysz)\b", prev_pl_ref, re.IGNORECASE))
+                )
+
                 if is_prev_directive and curr_is_affirmation:
                     relation_tag = " [RELACJA: Odpowiedź na ostrzeżenie/dyrektywę – KATEGORYCZNY ZAKAZ 'Tak/T-Tak'! Użyj 'Dobrze / D-Dobrze / Jasne / Będę uważać / W porządku' (Filar CXLVI & XLIII)]"
                 elif is_prev_wh and curr_is_affirmation:
                     relation_tag = " [RELACJA: Odpowiedź na pytanie otwarte – KATEGORYCZNY ZAKAZ samotnego 'Tak/T-Tak'! W japońskim audio seiyū wypowiada wahanie – użyj 'Eee...' / 'E-Eee...' / 'Cóż...' (Filar CXLVI)]"
+                elif is_prev_neg_q and curr_is_affirmation:
+                    relation_tag = " [RELACJA: Odpowiedź na pytanie z przeczeniem (Echo Agreement) – KATEGORYCZNY ZAKAZ 'Tak'! W japońskim audio seiyū potwierdza przeczenie ('Hai/Un' = racja, nie jest tak). W języku polskim odpowiadamy na fakt: 'Nie / Nie idę / Wcale nie / Skądże' (Filar CLIV)]"
                 elif prev_clean.endswith("?"):
                     relation_tag = " [RELACJA: Prawdopodobna odpowiedź/reakcja na pytanie]"
                 elif any(prev_clean_lower.startswith(w) for w in ["come,", "let's", "shall we", "look,", "hey,"]):
@@ -1225,8 +1232,9 @@ class MultimodalTranslator:
         # 4. Lookahead window
         if lookahead_events:
             lines.append("\n--- PODGLĄD NASTĘPNYCH KWESTII (NIE TŁUMACZ ICH! Użyj tylko do zrozumienia kontekstu i płci) ---")
-            for _, _, future_text, _ in lookahead_events[:4]:
-                lines.append(f"[Wkrótce] EN: {future_text}")
+            for _, fut_ev, future_text, _ in lookahead_events[:4]:
+                fut_spk = f" (Mówca: {fut_ev.name})" if fut_ev and getattr(fut_ev, "name", None) else ""
+                lines.append(f"[Wkrótce]{fut_spk} EN: {future_text}")
             lines.append("------------------------------------------------------------------------------------------------")
 
         return "\n".join(lines)
@@ -1727,8 +1735,11 @@ class MultimodalTranslator:
                         ambiguity_note = getattr(tr, 'ambiguity_note', '') or ''
                         break
 
+            is_missing_tr = False
             if not pl_candidate:
                 pl_candidate = clean_en
+                is_missing_tr = True
+                notes = f"{notes} [🚨 LUKA W FAZIE 1: Kwestia pominięta w szkicu! PRZETŁUMACZ OD ZERA Z EN I AUDIO JP!]".strip()
 
             # Triangulate missing speaker gender from character registry
             if not speaker_gender and event.name and event.name.strip() in self.character_registry:
@@ -1829,14 +1840,23 @@ class MultimodalTranslator:
                     bool(re.search(r"\b(dokąd|gdzie|skąd|kiedy|dlaczego|czemu|po\s+co|kto|kogo|komu|kim|co|czego|czym|jak|jaki|jaka|jakie|jakim|jakich|o\s+co|o\s+czym|z\s+kim)\b", prev_pl, re.IGNORECASE))
                 )
 
+                is_prev_neg_q = prev_clean.endswith("?") and (
+                    any(w in prev_clean_lower for w in ["don't", "aren't", "didn't", "can't", "won't", "haven't", "isn't"]) or
+                    bool(re.search(r"\bnie\s+(jest|jesteś|jesteście|są|był|była|było|byli|byłeś|byłaś|będzie|będziesz|będą|ma|masz|macie|chcesz|chce|chcecie|wiesz|wie|wiecie|możesz|może|możecie|idziesz|idzie|idziecie|zrobisz|mówisz|widzisz|słyszysz)\b", prev_pl, re.IGNORECASE))
+                )
+
                 if is_prev_directive and curr_is_affirmation:
                     relation_tag = "[PING-PONG DIALOGOWY: Odpowiedź na ostrzeżenie/dyrektywę – KATEGORYCZNY ZAKAZ 'Tak/T-Tak'! Użyj 'Dobrze / D-Dobrze / Jasne / Będę uważać / W porządku' (Filar CXLVI & XLIII)]"
                 elif is_prev_wh and curr_is_affirmation:
                     relation_tag = "[PING-PONG DIALOGOWY: Odpowiedź na pytanie otwarte – KATEGORYCZNY ZAKAZ samotnego 'Tak/T-Tak'! W japońskim audio padło wahanie – użyj 'Eee...' / 'E-Eee...' / 'Cóż...' (Filar CXLVI)]"
+                elif is_prev_neg_q and curr_is_affirmation:
+                    relation_tag = "[PING-PONG DIALOGOWY: Odpowiedź na pytanie z przeczeniem (Echo Agreement) – KATEGORYCZNY ZAKAZ 'Tak'! W japońskim audio seiyū potwierdza przeczenie ('Hai/Un' = racja, nie jest tak). W języku polskim odpowiadamy na fakt: 'Nie / Nie idę / Wcale nie / Skądże' (Filar CLIV)]"
                 elif prev_clean.endswith("?"):
                     relation_tag = "[PING-PONG DIALOGOWY: Odpowiedź/riposta na pytanie - zgraj leksykę i emocję (Filar CXLVI)]"
                 elif any(prev_clean_lower.startswith(w) for w in ["come,", "let's", "shall we", "look,", "hey,"]):
                     relation_tag = "[PING-PONG DIALOGOWY: Reakcja na propozycję/zaczepkę (Filar CXLVI)]"
+                elif prev_clean.endswith("...") or prev_clean.endswith("…"):
+                    relation_tag = "[PING-PONG DIALOGOWY: Prawdopodobna kontynuacja myśli urwanej wielokropkiem (...)]"
 
             dur_s = max(0.05, (event.end - event.start) / 1000.0)
             style_str = event.style or ""
@@ -1853,6 +1873,7 @@ class MultimodalTranslator:
                 "event": event,
                 "style": style_str,
                 "is_thought": is_th,
+                "is_missing_translation": is_missing_tr,
                 "duration_s": dur_s,
                 "cps": cps,
                 "start_ms": event.start,
@@ -2672,6 +2693,41 @@ class MultimodalTranslator:
                                     pass
                         except Exception as e:
                             pbar.write(f" 🔴 [Błąd Paczki]: {format_friendly_api_error(e)}")
+
+        # 6.9. Zero-Gap Healing Pass: uzupełnienie ewentualnych brakujących kwestii po awariach paczek
+        missing_entries = [item for item in raw_entries if item[0] not in translated_results]
+        if missing_entries:
+            print(f"\n  [Zero-Gap Guard]: Wykryto {len(missing_entries)} nieprzetłumaczonych kwestii po pętli głównej. Uruchamianie pasażu uzupełniającego (Healing Pass)...")
+            healing_batches = create_adaptive_batches(missing_entries, base_batch_size=min(12, len(missing_entries)), max_batch_size=16)
+            for h_bidx, h_batch in enumerate(healing_batches):
+                try:
+                    _, h_res, h_regs, _, h_pass1, _ = self._process_single_batch(
+                        b_idx=len(batches) + h_bidx,
+                        batch=h_batch,
+                        untranslated_in_batch=h_batch,
+                        batches=batches,
+                        video_path=video_path,
+                        is_ass=is_ass,
+                        anime_meta=anime_meta,
+                        episode_profile=episode_profile,
+                        anime_context_str=anime_context_str,
+                        episode_profile_str=episode_profile_str,
+                        series_bible_str=series_bible_str,
+                        manga_canon_str=manga_canon_str,
+                        combined_glossary=combined_glossary,
+                        all_user_rules=all_user_rules,
+                        history=history,
+                        pbar=pbar,
+                        translated_results=translated_results
+                    )
+                    with self.lock:
+                        for orig_idx, text_res in h_res.items():
+                            translated_results[orig_idx] = text_res
+                        for orig_idx, reg_res in h_regs.items():
+                            if reg_res:
+                                translated_regions[orig_idx] = reg_res
+                except Exception as h_err:
+                    logger.warning(f"[Zero-Gap Guard]: Błąd pasażu uzupełniającego: {h_err}")
 
         # 7. Construct final subtitle file preserving styles, positioning, and typesetting
         final_subs = pysubs2.SSAFile()

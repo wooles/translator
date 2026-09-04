@@ -201,6 +201,16 @@ class DialogueVerifier:
             ambiguity_info = f"  [❓ Wątpliwość Fazy 1 (Rozwikłaj z obrazu/audio - Filar CXLV)]: {item['ambiguity_note']}\n" if item.get('ambiguity_note') else ""
             relation_info = f"  {item['relation_tag']}\n" if item.get('relation_tag') else ""
             
+            is_untranslated = item.get("is_missing_translation", False) or (
+                item.get("pl", "").strip().lower() == item.get("en", "").strip().lower()
+                and len(item.get("en", "").split()) >= 2
+                and not item.get("is_sign")
+            )
+            if is_untranslated:
+                pl_display = f"  Wstępne PL: [🚨 BRAK PRZEKŁADU W FAZIE 1 - PRZETŁUMACZ OD ZERA Z EN I AUDIO JP!]{notes_info}"
+            else:
+                pl_display = f"  Wstępne PL: {item['pl']}{notes_info}"
+
             prompt_lines.append(
                 f"- [ID: {item['id']}]{type_tag}{semiotic_tag}{mode_tag}{char_info}{voice_info}{prosody_info}{dur_info}{song_info}{cps_info}{visual_info}{region_info}\n"
                 f"{audio_info}"
@@ -212,7 +222,7 @@ class DialogueVerifier:
                 f"{relation_info}"
                 f"{ambiguity_info}"
                 f"  EN: {item['en']}\n"
-                f"  Wstępne PL: {item['pl']}{notes_info}"
+                f"{pl_display}"
             )
 
         prompt_text = "\n".join(prompt_lines)

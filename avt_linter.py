@@ -624,6 +624,10 @@ class AVTLinter:
                 prev_clean,
                 re.IGNORECASE
             ))
+            is_prev_neg_q = bool(prev_clean.endswith("?") and (
+                re.search(r"\bnie\s+(jest|jesteś|jesteście|są|był|była|było|byli|byłeś|byłaś|będzie|będziesz|będą|ma|masz|macie|chcesz|chce|chcecie|wiesz|wie|wiecie|możesz|może|możecie|idziesz|idzie|idziecie|zrobisz|mówisz|widzisz|słyszysz)\b", prev_clean, re.IGNORECASE) or
+                any(prev_clean.startswith(w) for w in ["don't", "aren't", "didn't", "can't", "won't", "haven't", "isn't"])
+            ))
             if is_prev_warning:
                 # Check if current line is solely an affirmative "Tak / T-Tak" (with optional ellipsis or exclamation mark)
                 clean_current = re.sub(r"\{[^\}]*\}", "", modified).strip()
@@ -649,6 +653,15 @@ class AVTLinter:
                     repl_word = "E-Eee" if word.lower().startswith("t-") else "Eee"
                     modified = re.sub(rf"\b{re.escape(word)}[\.!\?…]*", f"{repl_word}{punct}", modified)
                     applied_fixes.append(f"[Filar XLIII/CXLVI - Reakcja na Pytanie Otwarte] Wykryto odpowiedź na pytanie otwarte ('{prev_clean[:30]}...'): zastąpiono nielogiczne '{word}' przez '{repl_word}{punct}'")
+            elif is_prev_neg_q:
+                clean_current = re.sub(r"\{[^\}]*\}", "", modified).strip()
+                m_aff = re.match(r"^([Tt]-[Tt]ak|[Tt]ak)([\.!\?…]*)$", clean_current)
+                if m_aff:
+                    word = m_aff.group(1)
+                    punct = m_aff.group(2) or "."
+                    repl_word = "N-Nie" if word.lower().startswith("t-") else ("Nie" if word[0].isupper() else "nie")
+                    modified = re.sub(rf"\b{re.escape(word)}", repl_word, modified)
+                    applied_fixes.append(f"[Filar CLIV - Echo Agreement] Wykryto odpowiedź na pytanie z przeczeniem ('{prev_clean[:30]}...'): zastąpiono nielogiczne '{word}{punct}' przez '{repl_word}{punct}'")
 
         # 4e. Focalization & Dramatic Irony Guard (Filar CLXI - Nienaruszalność Perspektywy Narracyjnej)
         if not is_sign and audio_jp:
@@ -850,6 +863,10 @@ class EpisodeQualityGate:
                         prev_clean,
                         re.IGNORECASE
                     ))
+                    is_prev_neg_q = bool(prev_clean.endswith("?") and (
+                        re.search(r"\bnie\s+(jest|jesteś|jesteście|są|był|była|było|byli|byłeś|byłaś|będzie|będziesz|będą|ma|masz|macie|chcesz|chce|chcecie|wiesz|wie|wiecie|możesz|może|możecie|idziesz|idzie|idziecie|zrobisz|mówisz|widzisz|słyszysz)\b", prev_clean, re.IGNORECASE) or
+                        any(prev_clean.startswith(w) for w in ["don't", "aren't", "didn't", "can't", "won't", "haven't", "isn't"])
+                    ))
                     if is_prev_directive:
                         # Match lone affirmative like "Tak.", "T-Tak.", "Tak!", "T-Tak..."
                         m_aff = re.match(r"^(\s*\{[^\}]*\})*([Tt]-[Tt]ak|[Tt]ak)([\.!\?…]*)(\{[^\}]*\}\s*)*$", ev.text.strip())
@@ -870,6 +887,15 @@ class EpisodeQualityGate:
                             repl_word = "E-Eee" if word.lower().startswith("t-") else "Eee"
                             ev.text = re.sub(rf"\b{re.escape(word)}[\.!\?…]*", f"{repl_word}{punct}", ev.text, count=1)
                             fixes.append(f"[Episode Quality Gate - Reakcja na Pytanie Otwarte] Linia #{i+1}: zastąpiono nielogiczne '{word}' przez '{repl_word}{punct}' w reakcji na pytanie otwarte '{prev_clean[:25]}...'")
+                    elif is_prev_neg_q:
+                        # Negative questions answered affirmatively in JP (Hai/Un) must be negative in PL (Nie / N-Nie)
+                        m_aff = re.match(r"^(\s*\{[^\}]*\})*([Tt]-[Tt]ak|[Tt]ak)([\.!\?…]*)(\{[^\}]*\}\s*)*$", ev.text.strip())
+                        if m_aff:
+                            word = m_aff.group(2)
+                            punct = m_aff.group(3) or "."
+                            repl_word = "N-Nie" if word.lower().startswith("t-") else ("Nie" if word[0].isupper() else "nie")
+                            ev.text = re.sub(rf"\b{re.escape(word)}", repl_word, ev.text, count=1)
+                            fixes.append(f"[Episode Quality Gate - Echo Agreement] Linia #{i+1}: zastąpiono '{word}{punct}' przez '{repl_word}{punct}' w reakcji na pytanie z przeczeniem '{prev_clean[:25]}...'")
 
             # 2. THOUGHT-TO-SPEECH BOUNDARY: Strip unsolicited thought italics on plain dialogue lines
             if not is_sign and prev_ev:
@@ -942,6 +968,14 @@ class EpisodeQualityGate:
             if not is_sign and re.match(r"^(\s*\{[^\}]*\})*(?:Rozumiem|Jasne|D-Dobrze|Dobrze|W porządku|Oczywiście)\?+(\{[^\}]*\}\s*)*$", ev.text.strip()):
                 ev.text = re.sub(r"\?+", ".", ev.text)
                 fixes.append(f"[Episode Quality Gate - Higiena Pytajnika] Linia #{i+1}: usunięto pytajnik z potwierdzenia twierdzącego")
+            # 6. ENGLISH REMAINDER SWEEP (Zero Untranslated English Lines Guarantee)
+            if not is_sign:
+                clean_no_tags = re.sub(r"\{[^\}]*\}", "", ev.text).strip()
+                words = [w.lower() for w in re.findall(r"\b[a-zA-Z]+\b", clean_no_tags)]
+                common_en_stop = {"the", "and", "you", "that", "this", "with", "have", "from", "what", "there", "they", "would", "about", "could", "should", "their", "will", "were", "been"}
+                en_hits = [w for w in words if w in common_en_stop]
+                if len(words) >= 4 and len(en_hits) >= 2 and not any(c in clean_no_tags for c in "ąćęłńóśźżĄĆĘŁŃÓŚŹŻ"):
+                    fixes.append(f"[Episode Quality Gate - Wykryto nieprzetłumaczony angielski] Linia #{i+1}: '{clean_no_tags[:35]}...'")
 
             # Record if text changed due to hygiene
             if ev.text != text_before and not any(f"Linia #{i+1}:" in f for f in fixes):

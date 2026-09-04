@@ -853,6 +853,14 @@ def test_avt_linter():
     t_wh2, f_wh2 = AVTLinter.lint_and_fix_line("T-Tak.", prev_line_text="Co tam robisz?")
     assert t_wh2 == "E-Eee..."
 
+    # Test Filar CLIV - Echo Agreement w pytaniach z przeczeniem (Nie jest ci zimno? -> Tak. -> Nie.)
+    t_echo1, f_echo1 = AVTLinter.lint_and_fix_line("Tak.", prev_line_text="Nie jest ci zimno?")
+    assert t_echo1 == "Nie."
+    assert any("Echo Agreement" in f for f in f_echo1)
+
+    t_echo2, f_echo2 = AVTLinter.lint_and_fix_line("T-Tak.", prev_line_text="Nie chcesz iść?")
+    assert t_echo2 == "N-Nie."
+
     # Test Filar CLXI - Nienaruszalność Perspektywy Narracyjnej i Zakaz Zdrady Tożsamości Incognito (0.00 PLN)
     t_witch, fixes_witch = AVTLinter.lint_and_fix_line(
         "{\\i1}Przecież jest tam też mój esej!{\\i0}",
@@ -2483,13 +2491,19 @@ def test_episode_quality_gate():
     ev10 = pysubs2.SSAEvent(start=15200, end=16500, text="Przecież wygrał pan starcie.", style="Default")
     # Linia 11: Przypadkowy pytajnik w potwierdzeniu twierdzącym
     ev11 = pysubs2.SSAEvent(start=17000, end=18000, text="Rozumiem?", style="Default")
+    # Linia 12: Pytanie z przeczeniem (Echo Agreement Filar CLIV)
+    ev12 = pysubs2.SSAEvent(start=18500, end=19500, text="Nie jest ci zimno?", style="Default")
+    # Linia 13: Odpowiedź w postaci samotnego T-Tak. w reakcji na przeczenie (winno być N-Nie.)
+    ev13 = pysubs2.SSAEvent(start=19700, end=20500, text="T-Tak.", style="Default")
+    # Linia 14: Całkowicie nieprzetłumaczona angielska linijka dialogu (English Remainder Sweep)
+    ev14 = pysubs2.SSAEvent(start=21000, end=22500, text="What are you talking about tonight?", style="Default")
 
-    subs.events = [ev1, ev2, ev3, ev4, ev5, ev6, ev7, ev8, ev9, ev10, ev11]
+    subs.events = [ev1, ev2, ev3, ev4, ev5, ev6, ev7, ev8, ev9, ev10, ev11, ev12, ev13, ev14]
 
     audited_subs, fixes = EpisodeQualityGate.audit_and_fix_entire_episode(subs)
 
     # Weryfikacja korekt
-    assert len(fixes) >= 7, f"Oczekiwano co najmniej 7 poprawek, otrzymano {len(fixes)}"
+    assert len(fixes) >= 9, f"Oczekiwano co najmniej 9 poprawek, otrzymano {len(fixes)}"
 
     # 1. Dyrektywne potwierdzenie: T-Tak. -> D-Dobrze.
     assert audited_subs.events[1].text == "D-Dobrze."
@@ -2519,7 +2533,14 @@ def test_episode_quality_gate():
     assert audited_subs.events[10].text == "Rozumiem."
     assert any("Higiena Pytajnika" in f for f in fixes)
 
-    print(" -> PASSED: Episode Quality Gate bezbłędnie eliminuje banalne błędy na pełnej osi czasu (Adjacency Pairs, Wh-Questions, T-V Invariance, Thought Boundary, Incognito, Typography, Calques) przy koszcie 0.00 PLN.")
+    # 8. Pytanie z przeczeniem (Echo Agreement): T-Tak. -> N-Nie.
+    assert audited_subs.events[12].text == "N-Nie."
+    assert any("Echo Agreement" in f for f in fixes)
+
+    # 9. Wykrycie pozostałości języka angielskiego (English Remainder Sweep)
+    assert any("Angielski Pozostałość" in f or "nieprzetłumaczony angielski" in f for f in fixes)
+
+    print(" -> PASSED: Episode Quality Gate bezbłędnie eliminuje banalne błędy na pełnej osi czasu (Adjacency Pairs, Wh-Questions, Echo Agreement, T-V Invariance, Thought Boundary, Incognito, Typography, English Sweep) przy koszcie 0.00 PLN.")
 
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
