@@ -207,7 +207,8 @@ class DialogueVerifier:
                     cached_name = ContextCacheManager.get_or_create_cache(
                         client=active_c,
                         model=self.model,
-                        system_instruction=self.system_prompt
+                        system_instruction=self.system_prompt,
+                        tag="verifier"
                     )
                     cfg_kwargs = dict(gen_config_kwargs)
                     if cached_name:
@@ -264,7 +265,7 @@ class DialogueVerifier:
                 is_cache_err = "403" in err_str or "cachedcontent" in err_str or "permission" in err_str
                 if is_cache_err and cached_name:
                     from context_cache import ContextCacheManager
-                    ContextCacheManager.invalidate_cache(self.model, self.system_prompt, client=last_used_client)
+                    ContextCacheManager.invalidate_cache(self.model, self.system_prompt, client=last_used_client, tag="verifier")
                     with DialogueVerifier._STATUS_LOCK:
                         print(f"\n[Context Cache]: Wykryto unieważniony cache serwerowy weryfikatora -> automatyczna regeneracja...")
                     cached_name = None

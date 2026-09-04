@@ -28,6 +28,8 @@ _LOCAL_CACHE_REGISTRY: Dict[str, str] = {}
 class ContextCacheManager:
     _LOCK = threading.Lock()
 
+    _LAST_TOUCH: Dict[str, float] = {}
+
     @staticmethod
     def _clean_model_name(model: str) -> str:
         """Cleans and normalizes the model name."""
@@ -43,22 +45,34 @@ class ContextCacheManager:
         return "default"
 
     @classmethod
-    def get_content_hash(cls, model: str, system_instruction: str, client: Optional[Any] = None) -> str:
-        """Generates a unique SHA-256 hash from client key, model name and full system instruction text."""
+    def _get_prompt_tag(cls, system_instruction: str, tag: Optional[str] = None) -> str:
+        """Extracts semantic phase tag (e.g. translator vs verifier) to prevent cross-phase cache deletion."""
+        if tag:
+            return tag.lower().strip()
+        si = (system_instruction or "").lower()
+        if any(w in si for w in ["verifier", "redaktor", "redakcj", "script doctor", "szlif", "faza 2"]):
+            return "verifier"
+        return "translator"
+
+    @classmethod
+    def get_content_hash(cls, model: str, system_instruction: str, client: Optional[Any] = None, tag: Optional[str] = None) -> str:
+        """Generates a unique SHA-256 hash from client key, model name, phase tag and full system instruction text."""
         client_id = cls._get_client_id(client)
-        content = f"{client_id}::{model}::{system_instruction}"
+        prompt_tag = cls._get_prompt_tag(system_instruction, tag)
+        content = f"{client_id}::{model}::{prompt_tag}::{system_instruction}"
         return hashlib.sha256(content.encode("utf-8")).hexdigest()[:16]
 
     @classmethod
-    def invalidate_cache(cls, model: str, system_instruction: str, client: Optional[Any] = None):
+    def invalidate_cache(cls, model: str, system_instruction: str, client: Optional[Any] = None, tag: Optional[str] = None):
         """Removes an entry from the local registry upon 403 or invalidation."""
         with cls._LOCK:
             if client:
-                content_hash = cls.get_content_hash(model, system_instruction, client=client)
+                content_hash = cls.get_content_hash(model, system_instruction, client=client, tag=tag)
                 _LOCAL_CACHE_REGISTRY.pop(content_hash, None)
             else:
-                # Purge all matching model caches across any clients
-                to_remove = [k for k in list(_LOCAL_CACHE_REGISTRY.keys()) if f"::{model}::" in k]
+                prompt_tag = cls._get_prompt_tag(system_instruction, tag)
+                # Purge all matching model caches across any clients for this phase
+                to_remove = [k for k in list(_LOCAL_CACHE_REGISTRY.keys()) if f"::{model}::{prompt_tag}::" in k]
                 for k in to_remove:
                     _LOCAL_CACHE_REGISTRY.pop(k, None)
 
@@ -68,28 +82,36 @@ class ContextCacheManager:
         client: genai.Client,
         model: str,
         system_instruction: str,
-        ttl_seconds: int = DEFAULT_CACHE_TTL_SECONDS
+        ttl_seconds: int = DEFAULT_CACHE_TTL_SECONDS,
+        tag: Optional[str] = None
     ) -> Optional[str]:
         """
         Retrieves existing or creates new CachedContent on Google servers with safe 20-minute expiration.
-        Strictly isolates cache per Google Cloud Project / API key and per model.
+        Strictly isolates cache per Google Cloud Project / API key, per model, and per pipeline phase.
         """
         if not client or not system_instruction:
             return None
 
         with cls._LOCK:
-            content_hash = cls.get_content_hash(model, system_instruction, client=client)
+            content_hash = cls.get_content_hash(model, system_instruction, client=client, tag=tag)
 
             # 1. Check in-process local memory
             if content_hash in _LOCAL_CACHE_REGISTRY:
-                return _LOCAL_CACHE_REGISTRY[content_hash]
+                cached_name = _LOCAL_CACHE_REGISTRY[content_hash]
+                import time
+                now = time.monotonic()
+                if now - cls._LAST_TOUCH.get(cached_name, 0) > 120.0:
+                    cls.touch_cache(client, cached_name, ttl_seconds)
+                    cls._LAST_TOUCH[cached_name] = now
+                return cached_name
 
             model_clean = cls._clean_model_name(model)
             client_id = cls._get_client_id(client)
-            display_name = f"avt_{model_clean}_{client_id}_{content_hash}"
-            model_prefix = f"avt_{model_clean}_{client_id}_"
+            prompt_tag = cls._get_prompt_tag(system_instruction, tag)
+            display_name = f"avt_{model_clean}_{client_id}_{prompt_tag}_{content_hash}"
+            model_prefix = f"avt_{model_clean}_{client_id}_{prompt_tag}_"
 
-            # 2. Try to find existing cache and clean outdated versions of the SAME client and model
+            # 2. Try to find existing cache and clean outdated versions of the SAME client, model and phase
             try:
                 if hasattr(client, "caches") and hasattr(client.caches, "list"):
                     matched_name = None
@@ -97,7 +119,7 @@ class ContextCacheManager:
                         if existing.display_name == display_name:
                             matched_name = existing.name
                         elif existing.display_name and existing.display_name.startswith(model_prefix):
-                            # Only delete outdated version of the SAME client and model
+                            # Only delete outdated version of the SAME client, model and phase
                             try:
                                 client.caches.delete(name=existing.name)
                                 logger.info(f"[Context Cache]: Removed outdated version {existing.display_name}")
@@ -107,6 +129,8 @@ class ContextCacheManager:
                     if matched_name:
                         _LOCAL_CACHE_REGISTRY[content_hash] = matched_name
                         cls.touch_cache(client, matched_name, ttl_seconds)
+                        import time
+                        cls._LAST_TOUCH[matched_name] = time.monotonic()
                         logger.info(f"[Context Cache]: Reused active server cache: {matched_name} (Refreshed for +{ttl_seconds}s)")
                         return matched_name
             except Exception as e:
@@ -154,7 +178,8 @@ class ContextCacheManager:
         client: Any,
         model: str,
         system_instruction: str,
-        verbose: bool = True
+        verbose: bool = True,
+        tag: Optional[str] = None
     ) -> Optional[str]:
         """
         Guarantees that server cache is active and locked across all client pool keys before translation begins,
@@ -163,19 +188,20 @@ class ContextCacheManager:
         if not client or not system_instruction:
             return None
 
+        prompt_tag = cls._get_prompt_tag(system_instruction, tag)
         if hasattr(client, "clients") and client.clients:
             first_name = None
             for c in client.clients:
-                res = cls.get_or_create_cache(c, model, system_instruction)
+                res = cls.get_or_create_cache(c, model, system_instruction, tag=tag)
                 if not first_name:
                     first_name = res
             if verbose and first_name:
-                print(f"  [Context Cache]: Locked -90% server discount for {model} across {len(client.clients)} API keys.")
+                print(f"  [Context Cache]: Locked -90% server discount for {model} ({prompt_tag}) across {len(client.clients)} API keys.")
             return first_name or "cached_ready"
         else:
-            cache_name = cls.get_or_create_cache(client, model, system_instruction)
+            cache_name = cls.get_or_create_cache(client, model, system_instruction, tag=tag)
             if cache_name and verbose:
-                print(f"  [Context Cache]: Locked -90% server discount for {model}.")
+                print(f"  [Context Cache]: Locked -90% server discount for {model} ({prompt_tag}).")
             return cache_name or "cached_ready"
 
     @classmethod

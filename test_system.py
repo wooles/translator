@@ -1035,6 +1035,7 @@ def test_batch_queue():
 
 def test_context_cache():
     print("[TEST 15/15] Test Inteligentnego Zarządzania Pamięcią Kontekstu (Google Context Caching)...")
+    import hashlib
     from context_cache import ContextCacheManager, DEFAULT_CACHE_TTL_SECONDS
     
     assert DEFAULT_CACHE_TTL_SECONDS == 1200  # 20 minut ruchomego okna
@@ -1052,7 +1053,44 @@ def test_context_cache():
     res = ContextCacheManager.get_or_create_cache(None, "gemini-3.7-flash", "prompt", ttl_seconds=DEFAULT_CACHE_TTL_SECONDS)
     assert res is None
 
-    # 4. Test metod Kroczącego Heartbeatu, pre-warmingu i czyszczenia
+    # 4. Test izolacji fazowej Faza 1 (Wizja) vs Faza 2 (Weryfikator) dla tego samego modelu
+    h_f1 = ContextCacheManager.get_content_hash("gemini-3.8-flash", "Wizja Prompt", tag="translator")
+    h_f2 = ContextCacheManager.get_content_hash("gemini-3.8-flash", "Redakcja Prompt", tag="verifier")
+    assert h_f1 != h_f2
+
+    class DummyCacheObj:
+        def __init__(self, name, display_name):
+            self.name = name
+            self.display_name = display_name
+
+    class DummyCacheClient:
+        def __init__(self):
+            class DummyAPIClient:
+                api_key = "dummy_key"
+            self._api_client = DummyAPIClient()
+            self.deleted = []
+            cid = hashlib.sha256(b"dummy_key").hexdigest()[:8]
+            self.caches_list = [
+                DummyCacheObj("caches/f1_old", f"avt_gemini_3_8_flash_{cid}_translator_old"),
+                DummyCacheObj("caches/f2_active", f"avt_gemini_3_8_flash_{cid}_verifier_12345"),
+            ]
+            class CachesAPI:
+                def __init__(self, parent):
+                    self.parent = parent
+                def list(self):
+                    return self.parent.caches_list
+                def delete(self, name):
+                    self.parent.deleted.append(name)
+                def create(self, model, config):
+                    return DummyCacheObj("caches/f1_new", config.display_name)
+            self.caches = CachesAPI(self)
+
+    c_dummy = DummyCacheClient()
+    ContextCacheManager.get_or_create_cache(c_dummy, "gemini-3.8-flash", "New Wizja Prompt", tag="translator")
+    assert "caches/f1_old" in c_dummy.deleted
+    assert "caches/f2_active" not in c_dummy.deleted, "Faza 1 nie może usuwać cache Fazy 2!"
+
+    # 5. Test metod Kroczącego Heartbeatu, pre-warmingu i czyszczenia
     ContextCacheManager.ensure_cache_ready(None, "gemini-3.7-flash", "prompt", verbose=False)
     ContextCacheManager.touch_cache(None, None)
     ContextCacheManager.cleanup_all_active_caches(None)

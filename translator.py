@@ -1207,7 +1207,8 @@ class MultimodalTranslator:
                     cached_name = ContextCacheManager.get_or_create_cache(
                         client=active_c,
                         model=current_model,
-                        system_instruction=self.system_prompt
+                        system_instruction=self.system_prompt,
+                        tag="translator"
                     )
                     cfg_kwargs = dict(gen_config_kwargs)
                     if cached_name:
@@ -1260,7 +1261,7 @@ class MultimodalTranslator:
                 is_cache_err = "403" in err_str or "cachedcontent" in err_str or "permission" in err_str
                 if is_cache_err and cached_name:
                     from context_cache import ContextCacheManager
-                    ContextCacheManager.invalidate_cache(current_model, self.system_prompt, client=last_used_client)
+                    ContextCacheManager.invalidate_cache(current_model, self.system_prompt, client=last_used_client, tag="translator")
                     with MultimodalTranslator._STATUS_LOCK:
                         print(f"\n[Context Cache]: Wykryto unieważniony cache serwerowy na kluczu -> automatyczna regeneracja...")
                     cached_name = None
@@ -2248,7 +2249,7 @@ class MultimodalTranslator:
         from context_cache import ContextCacheManager
         print(f"  [Infrastruktura Finansowa]: Weryfikacja i rozgrzewanie pamięci Context Cache z pełną wiedzą odcinka...")
         pool_or_c1 = self.client_pool if hasattr(self, "client_pool") and self.client_pool else self.client
-        c1 = ContextCacheManager.ensure_cache_ready(pool_or_c1, self.model_phase1, self.system_prompt)
+        c1 = ContextCacheManager.ensure_cache_ready(pool_or_c1, self.model_phase1, self.system_prompt, tag="translator")
         if not c1:
             raise RuntimeError(
                 f"KATEGORYCZNA BLOKADA FINANSOWA: Nie udało się aktywować serwerowego Context Cache dla {self.model_phase1}. "
@@ -2257,7 +2258,7 @@ class MultimodalTranslator:
             )
         if self.verifier and hasattr(self.verifier, "model") and hasattr(self.verifier, "system_prompt"):
             pool_or_c2 = getattr(self.verifier, "client_pool", None) or getattr(self.verifier, "client", None)
-            c2 = ContextCacheManager.ensure_cache_ready(pool_or_c2, self.verifier.model, self.verifier.system_prompt)
+            c2 = ContextCacheManager.ensure_cache_ready(pool_or_c2, self.verifier.model, self.verifier.system_prompt, tag="verifier")
             if not c2:
                 raise RuntimeError(
                     f"KATEGORYCZNA BLOKADA FINANSOWA: Nie udało się aktywować serwerowego Context Cache dla weryfikatora ({self.verifier.model}). "
@@ -2275,9 +2276,9 @@ class MultimodalTranslator:
             from context_cache import ContextCacheManager
             clients_to_warm = self.client_pool.clients if hasattr(self, "client_pool") and self.client_pool else [self.client]
             for c in clients_to_warm:
-                ContextCacheManager.get_or_create_cache(client=c, model=self.model_phase1, system_instruction=self.system_prompt)
+                ContextCacheManager.get_or_create_cache(client=c, model=self.model_phase1, system_instruction=self.system_prompt, tag="translator")
                 if self.enable_verifier and self.verifier:
-                    ContextCacheManager.get_or_create_cache(client=c, model=self.verifier.model, system_instruction=self.verifier.system_prompt)
+                    ContextCacheManager.get_or_create_cache(client=c, model=self.verifier.model, system_instruction=self.verifier.system_prompt, tag="verifier")
         except Exception:
             pass
 
