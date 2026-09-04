@@ -437,8 +437,24 @@ class AVTLinter:
 
         # 4b. Anti-Drift: Elimination of spurious 'pan/pani' in informal 1-on-1 dialogue (Filar CLVII)
         if not is_sign:
-            line_has_yobisute = bool(re.search(r"\b([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+)[,?!](?:\s+|\\N)+.*\b(pan|pani|pana|panu)\b", modified, re.IGNORECASE))
-            if is_informal_ty or line_has_yobisute:
+            # Guard: If the line contains an explicit formal title or honorific address (e.g. "Panie Tanaka", "Pani Sato", "Panie doktorze"),
+            # it is strictly formal and must NEVER be forced to "ty"!
+            has_explicit_formal_vocative = bool(re.search(
+                r"\b(panie|pani|panno|panu|pana)\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+|doktorze|profesorze|inspektorze|prezesie|dyrektorze|kierowniku|komisarzu|mecenasie|oficerze|kapitanie|majorze|generale)\b",
+                modified,
+                re.IGNORECASE
+            ))
+
+            # True Yobisute: bare name vocative NOT preceded by formal honorific 'panie/pani'
+            line_has_yobisute = False
+            if not has_explicit_formal_vocative:
+                yobi_m = re.search(r"(?<!\bpanie\s)(?<!\bpani\s)(?<!\bpanno\s)(?<!\bpanu\s)\b([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]{2,})[,?!](?:\s+|\\N)+.*\b(pan|pani|pana|panu)\b", modified, re.IGNORECASE)
+                if yobi_m:
+                    first_w = yobi_m.group(1).lower()
+                    if first_w not in ["panie", "pani", "panno", "panu", "pana", "proszę", "przepraszam", "doktorze", "profesorze", "inspektorze", "zaraz", "chwila", "czekaj", "słuchaj", "patrz", "widzisz"]:
+                        line_has_yobisute = True
+
+            if (is_informal_ty or line_has_yobisute) and not has_explicit_formal_vocative:
                 raw_pan_pairs = [
                     ("wygrał", "pan", "wygrałeś"),
                     ("wygrała", "pani", "wygrałaś"),

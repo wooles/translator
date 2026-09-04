@@ -1647,11 +1647,12 @@ class MultimodalTranslator:
             en_txt = it.get("en", "")
             spk = (it.get("speaker_name") or "").strip()
             
-            # Detect first-name vocative in PL or EN (e.g. "Shizuku, dlaczego?!", "Shizuku, why?!")
-            first_name_match = re.search(r"\b([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]{2,})[,?!]", pl_cand) or re.search(r"\b([A-Z][a-z]{2,})[,?!]", en_txt)
+            # Detect true first-name vocative in PL or EN (bare name, e.g. "Shizuku, dlaczego?!", "Shizuku, why?!")
+            # Must NOT be preceded by "Panie / Pani / Mr. / Ms."
+            first_name_match = re.search(r"(?<!\bpanie\s)(?<!\bpani\s)(?<!\bpanno\s)(?<!\bpanu\s)\b([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]{2,})[,?!]", pl_cand, re.IGNORECASE) or re.search(r"(?<!\bmr\.\s)(?<!\bms\.\s)(?<!\bmrs\.\s)\b([A-Z][a-z]{2,})[,?!]", en_txt, re.IGNORECASE)
             if first_name_match:
                 voc_word = first_name_match.group(1).lower()
-                if voc_word not in ["proszę", "przepraszam", "panie", "pani", "sensei", "senpai", "mistrzu", "ojcze", "matko", "mamo", "tato", "bądź", "daj", "stój", "wait", "look", "what", "why", "stop"]:
+                if voc_word not in ["proszę", "przepraszam", "panie", "pani", "panno", "panu", "sensei", "senpai", "mistrzu", "ojcze", "matko", "mamo", "tato", "bądź", "daj", "stój", "wait", "look", "what", "why", "stop", "sorry", "excuse"]:
                     scene_has_first_name_vocative = True
                     if spk:
                         speakers_on_ty.add(spk)
@@ -1664,11 +1665,17 @@ class MultimodalTranslator:
         # Line-level address drift pinning before Phase 2 Verifier
         for it in pass1_items:
             spk = (it.get("speaker_name") or "").strip()
-            is_item_informal = (spk in speakers_on_ty) or scene_has_first_name_vocative
-            if is_item_informal:
-                if re.search(r"\b(wygrał|wygrała|zrobił|zrobiła|widział|widziała|powiedział|powiedziała|słyszał|słyszała|był|była|miał|miała|chciał|chciała|mógł|mogła|wiedział|wiedziała|wie|widzi|myśli|mówi|ma)\s+(pan|pani)\b|\b(pan|pani)\s+(wygrał|wygrała|zrobił|zrobiła|widział|widziała|słyszał|słyszała|powiedział|powiedziała|wie|widzi|myśli|mówi)\b", it["pl"], re.IGNORECASE):
-                    drift_alert = "[🚨 ALARM FILAR CLVII: Zwrot per 'pan/pani' w scenie/dialogu po imieniu na 'ty'! Kategoryczny zakaz 'wygrał pan' / 'pan wie' -> Zmień na 2. os. 'wygrałeś' / 'wiesz'!]"
-                    it["notes"] = f"{it.get('notes', '')} {drift_alert}".strip()
+            has_formal_voc = bool(re.search(
+                r"\b(panie|pani|panno|panu|pana)\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+|doktorze|profesorze|inspektorze|prezesie|dyrektorze|kierowniku|komisarzu)\b",
+                it["pl"],
+                re.IGNORECASE
+            ))
+            if not has_formal_voc:
+                is_item_informal = (spk in speakers_on_ty) if spk else scene_has_first_name_vocative
+                if is_item_informal:
+                    if re.search(r"\b(wygrał|wygrała|zrobił|zrobiła|widział|widziała|powiedział|powiedziała|słyszał|słyszała|był|była|miał|miała|chciał|chciała|mógł|mogła|wiedział|wiedziała|wie|widzi|myśli|mówi|ma)\s+(pan|pani)\b|\b(pan|pani)\s+(wygrał|wygrała|zrobił|zrobiła|widział|widziała|słyszał|słyszała|powiedział|powiedziała|wie|widzi|myśli|mówi)\b", it["pl"], re.IGNORECASE):
+                        drift_alert = "[🚨 ALARM FILAR CLVII: Zwrot per 'pan/pani' w scenie/dialogu po imieniu na 'ty'! Kategoryczny zakaz 'wygrał pan' / 'pan wie' -> Zmień na 2. os. 'wygrałeś' / 'wiesz'!]"
+                        it["notes"] = f"{it.get('notes', '')} {drift_alert}".strip()
 
         # 6. Optional Phase 2 Verifier (Script Doctor)
         batch_results: Dict[int, str] = {}
@@ -1726,7 +1733,12 @@ class MultimodalTranslator:
                         spk_gen = "kobieta"
 
                 spk_name = (item.get("speaker_name") or "").strip()
-                is_item_informal = (spk_name in speakers_on_ty) or scene_has_first_name_vocative
+                has_formal_voc = bool(re.search(
+                    r"\b(panie|pani|panno|panu|pana)\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+|doktorze|profesorze|inspektorze|prezesie|dyrektorze|kierowniku|komisarzu)\b",
+                    raw_final,
+                    re.IGNORECASE
+                ))
+                is_item_informal = ((spk_name in speakers_on_ty) if spk_name else scene_has_first_name_vocative) and not has_formal_voc
                 final_text, fixes = AVTLinter.lint_and_fix_line(
                     text=raw_final,
                     speaker_gender=spk_gen,
@@ -1764,7 +1776,12 @@ class MultimodalTranslator:
                         spk_gen = "kobieta"
 
                 spk_name = (item.get("speaker_name") or "").strip()
-                is_item_informal = (spk_name in speakers_on_ty) or scene_has_first_name_vocative
+                has_formal_voc = bool(re.search(
+                    r"\b(panie|pani|panno|panu|pana)\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+|doktorze|profesorze|inspektorze|prezesie|dyrektorze|kierowniku|komisarzu)\b",
+                    raw_final,
+                    re.IGNORECASE
+                ))
+                is_item_informal = ((spk_name in speakers_on_ty) if spk_name else scene_has_first_name_vocative) and not has_formal_voc
                 final_text, fixes = AVTLinter.lint_and_fix_line(
                     text=raw_final,
                     speaker_gender=spk_gen,

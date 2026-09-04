@@ -692,7 +692,20 @@ def test_avt_linter():
     t_clvii5, _ = AVTLinter.lint_and_fix_line("Czy pan wie, co to oznacza?", is_informal_ty=True)
     assert t_clvii5 == "Czy wiesz, co to oznacza?"
 
-    print(" -> PASSED: AVT Linter bezbłędnie wyłapuje i koryguje kalki, formy, nawiasy, cudzysłowy, formy 1-na-1, Aizuchi, hybrydy, ALL-CAPS i Filar CLVII (T-V Invariance).")
+    # Test ochrony autentycznych form oficjalnych (panie Tanaka / pani Sato / panie doktorze) przed fałszywą konwersją
+    t_formal1, fixes1 = AVTLinter.lint_and_fix_line("Dzień dobry, panie Tanaka, czy widział pan raport?", is_informal_ty=True)
+    assert t_formal1 == "Dzień dobry, panie Tanaka, czy widział pan raport?"
+    assert len(fixes1) == 0
+
+    t_formal2, fixes2 = AVTLinter.lint_and_fix_line("Pani Sato, co pani myśli o tej decyzji?", is_informal_ty=True)
+    assert t_formal2 == "Pani Sato, co pani myśli o tej decyzji?"
+    assert len(fixes2) == 0
+
+    t_formal3, fixes3 = AVTLinter.lint_and_fix_line("Panie doktorze, czy pacjent miał zawał?", is_informal_ty=True)
+    assert t_formal3 == "Panie doktorze, czy pacjent miał zawał?"
+    assert len(fixes3) == 0
+
+    print(" -> PASSED: AVT Linter bezbłędnie wyłapuje i koryguje kalki, formy, nawiasy, cudzysłowy, formy 1-na-1, Aizuchi, hybrydy, ALL-CAPS i Filar CLVII (T-V Invariance wraz z immunitetem form oficjalnych).")
 
 def test_series_bible():
     print("[TEST 9/12] Test Biblii Serialu i Pamięci Międzyodcinkowej (series_memory)...")
