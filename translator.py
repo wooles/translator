@@ -929,6 +929,7 @@ class MultimodalTranslator:
         lookahead_events: List[Tuple[int, pysubs2.SSAEvent, str, str]] = None,
         anime_context_str: str = "",
         episode_profile_str: str = "",
+        episode_profile: Optional[EpisodeProfile] = None,
         whisper_transcriptions: Optional[Dict[int, str]] = None,
         series_bible_str: str = "",
         prosody_tags: Optional[Dict[int, str]] = None,
@@ -1062,6 +1063,22 @@ class MultimodalTranslator:
                         lines.append(f"  [🎙️ KOTWICA SEMANTYCZNA AUDIO]: {semantic_anchor}")
                     if duration_s <= 0.8 and any(h in jp_text for h in ["え", "う", "あの", "えっと", "ん", "ま…", "あ…", "え…"]) and len(clean_text.split()) > 2:
                         lines.append(f"  [🎙️ ALARM ROZBIEŻNOŚCI AUDIO JP]: W audio seiyū padło wyłącznie krótkie wahanie/dźwięk ('{jp_display}'). ZAKAZ tłumaczenia całego zdania w tym ułamkowym bloku! Ogranicz do samego wahania: 'Znaczy...', 'Cóż...', 'Ech...'.")
+            if episode_profile:
+                if getattr(episode_profile, "danger_lines_prescan", None):
+                    for dl in episode_profile.danger_lines_prescan:
+                        if dl.english_phrase and dl.english_phrase.lower() in clean_text.lower():
+                            lines.append(f"  [🚨 PUŁAPKA PROFILERA: {dl.contextual_trap} => DYREKTYWA: {dl.mandatory_direction}]")
+                            break
+                if getattr(episode_profile, "character_catchphrases", None):
+                    for cp in episode_profile.character_catchphrases:
+                        if cp.original_phrase and cp.original_phrase.lower() in clean_text.lower():
+                            lines.append(f"  [💬 KWESTIA-WIZYTÓWKA: '{cp.canonical_pl}' ({cp.context_notes})]")
+                            break
+                if getattr(episode_profile, "puns_and_wordplays", None):
+                    for pun in episode_profile.puns_and_wordplays:
+                        if pun.original_joke_or_pun and pun.original_joke_or_pun.lower() in clean_text.lower():
+                            lines.append(f"  [🃏 GRA SŁOWNA: {pun.polish_transcreation}]")
+                            break
             lines.append(f"  EN (Pomocniczy skrypt do czasu/ogólnego sensu): {clean_text}")
 
         # 4. Lookahead window
@@ -1424,6 +1441,7 @@ class MultimodalTranslator:
             lookahead_events=lookahead_events,
             anime_context_str=anime_context_str,
             episode_profile_str=episode_profile_str,
+            episode_profile=episode_profile,
             whisper_transcriptions=whisper_transcriptions,
             series_bible_str=series_bible_str,
             prosody_tags=prosody_tags,
@@ -1963,6 +1981,17 @@ class MultimodalTranslator:
                 characters=char_dict,
                 glossary=gloss_dict
             )
+            # Pre-populate global Character Registry from Episode Profile dossiers and declensions
+            if getattr(episode_profile, "character_dossiers", None):
+                for cd in episode_profile.character_dossiers:
+                    if cd.name and cd.name not in self.character_registry:
+                        gender_pl = "kobieta" if cd.gender.upper() == "FEMALE" else ("mężczyzna" if cd.gender.upper() == "MALE" else cd.gender)
+                        self.character_registry[cd.name] = f"{gender_pl} ({cd.age_and_role or 'postać'})"
+            if getattr(episode_profile, "name_declensions", None):
+                for nd in episode_profile.name_declensions:
+                    if nd.character_name and nd.character_name not in self.character_registry:
+                        gender_pl = "kobieta" if nd.gender.upper() == "FEMALE" else ("mężczyzna" if nd.gender.upper() == "MALE" else nd.gender)
+                        self.character_registry[nd.character_name] = f"{gender_pl} (postać)"
 
         # 0c. Match Official Polish Manga Canon
         candidates_to_match = [series_title]
