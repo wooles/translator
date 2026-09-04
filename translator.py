@@ -998,7 +998,10 @@ class MultimodalTranslator:
         if history_context:
             lines.append("--- POPRZEDNIE KWESTIE W SCENIE (kontekst przeszły) ---")
             for h in history_context[-4:]:
-                lines.append(f"[Poprzednio] EN: {h['en']} -> PL: {h['pl']}")
+                if h.get("pl"):
+                    lines.append(f"[Poprzednio] EN: {h['en']} -> PL: {h['pl']}")
+                else:
+                    lines.append(f"[Poprzednio] EN: {h['en']}")
             lines.append("-------------------------------------------------------\n")
 
         # 3. Lines to translate
@@ -1241,8 +1244,9 @@ class MultimodalTranslator:
         combined_glossary: Dict[str, str],
         all_user_rules: List[Any],
         history: List[Dict[str, str]],
-        pbar: Any
-    ) -> Tuple[int, Dict[int, str], List[Any], List[Dict[str, Any]], str]:
+        pbar: Any,
+        translated_results: Optional[Dict[int, str]] = None
+    ) -> Tuple[int, Dict[int, str], Dict[int, str], List[Any], List[Dict[str, Any]], str]:
         """
         Translates and refines a single batch of dialogue lines (Thread-Safe).
         """
@@ -1255,13 +1259,15 @@ class MultimodalTranslator:
         if b_idx + 1 < len(batches):
             lookahead_events = batches[b_idx + 1][:4]
 
-        # Retrieve previous lines (Lookback Window / History)
+        # Retrieve previous lines (Lookback Window / Local Scene Continuity)
         lookback_history = []
-        if history:
+        if b_idx > 0 and b_idx - 1 < len(batches):
+            prev_batch = batches[b_idx - 1]
+            for prev_orig_idx, _, prev_clean_en, _ in prev_batch[-4:]:
+                prev_pl = translated_results.get(prev_orig_idx, "") if translated_results else ""
+                lookback_history.append({"en": prev_clean_en, "pl": prev_pl})
+        elif history:
             lookback_history = list(history[-4:])
-        elif b_idx > 0 and b_idx - 1 < len(batches):
-            for prev_item in batches[b_idx - 1][-4:]:
-                lookback_history.append({"en": prev_item[2], "pl": ""})
 
         # 2. Extract 3-4 intelligent key video frames for the batch (Storyboard & Visual OCR)
         temp_frames: List[str] = []
@@ -2177,7 +2183,8 @@ class MultimodalTranslator:
                                 combined_glossary=combined_glossary,
                                 all_user_rules=all_user_rules,
                                 history=history,
-                                pbar=pbar
+                                pbar=pbar,
+                                translated_results=translated_results
                             ): b_idx
                             for b_idx, batch, untranslated in tasks_to_run
                         }
@@ -2197,7 +2204,8 @@ class MultimodalTranslator:
                                     for it in pass1_items:
                                         pl_final = batch_res.get(it["orig_idx"], it.get("pl", ""))
                                         if pl_final:
-                                            history.append({"en": it["en"], "pl": pl_final})
+                                            history.append({"orig_idx": it["orig_idx"], "en": it["en"], "pl": pl_final})
+                                    history.sort(key=lambda x: x.get("orig_idx", 0))
                                     if len(history) > 30:
                                         history[:] = history[-30:]
                                     # Save checkpoint safely
@@ -2257,7 +2265,8 @@ class MultimodalTranslator:
                                 combined_glossary=combined_glossary,
                                 all_user_rules=all_user_rules,
                                 history=history,
-                                pbar=pbar
+                                pbar=pbar,
+                                translated_results=translated_results
                             )
                             with self.lock:
                                 for orig_idx, text_res in batch_res.items():
@@ -2268,7 +2277,8 @@ class MultimodalTranslator:
                                 for it in pass1_items:
                                     pl_final = batch_res.get(it["orig_idx"], it.get("pl", ""))
                                     if pl_final:
-                                        history.append({"en": it["en"], "pl": pl_final})
+                                        history.append({"orig_idx": it["orig_idx"], "en": it["en"], "pl": pl_final})
+                                history.sort(key=lambda x: x.get("orig_idx", 0))
                                 if len(history) > 30:
                                     history[:] = history[-30:]
                                 try:
