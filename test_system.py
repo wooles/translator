@@ -562,7 +562,39 @@ def test_model_resolver():
     assert dummy_engine.model_phase2 == models["flash"]
     assert dummy_engine.verifier.thinking_budget == 6144
 
-    print(" -> PASSED: Auto-discovery, Sonda Obciążenia na Żywo, Profile 3 (F1 Highest Flash CoT 0 + F2 Highest Flash CoT 6144) i gwarancja F1 CoT=0 działają w 100%.")
+    # Test dynamicznego wykrywania przyszłych wersji bez sztywnych przypisań (np. 4.0 / 3.9 / 3.8)
+    class MockModel:
+        def __init__(self, name):
+            self.name = name
+    class MockClient:
+        class models:
+            @staticmethod
+            def list():
+                return [
+                    MockModel("models/gemini-4.0-flash"),
+                    MockModel("models/gemini-3.8-flash"),
+                    MockModel("models/gemini-3.7-flash"),
+                    MockModel("models/gemini-3.5-flash-lite"),
+                    MockModel("models/gemini-3.1-pro-preview")
+                ]
+
+    dynamic_models = resolve_best_models(MockClient())
+    assert dynamic_models["flash"] == "gemini-4.0-flash"
+    assert dynamic_models["flash_backup"] == "gemini-3.8-flash"
+
+    dynamic_engine = TranslatorEngine(
+        api_key="AIzaSyDummyTestKeyForVerificationOnly12345",
+        model=dynamic_models["flash"],
+        model_phase2=dynamic_models["flash"],
+        enable_verifier=True,
+        thinking_budget_phase2=6144,
+        use_whisper=False
+    )
+    assert dynamic_engine.phase1_thinking_budget == 0
+    assert dynamic_engine.model_phase1 == "gemini-4.0-flash"
+    assert dynamic_engine.model_phase2 == "gemini-4.0-flash"
+
+    print(" -> PASSED: Auto-discovery, Sonda Obciążenia na Żywo, Profile 3 (F1 Highest Flash CoT 0 + F2 Highest Flash CoT 6144) i dynamiczne przypisywanie najwyższego Flash bez sztywnych ograniczeń działają w 100%.")
 from avt_linter import AVTLinter
 from series_memory import SeriesBible
 from avt_formatter import (

@@ -226,8 +226,13 @@ class TranslationWorker(QThread):
                 self.error_signal.emit("Brak klucza GEMINI_API_KEY! Ustaw go w oknie Ustawień.")
                 return
 
-            # Dynamic model resolution
-            models = resolve_best_models()
+            # Dynamic model resolution (automatically queries API for highest available Flash/Pro models)
+            from google import genai
+            try:
+                temp_client = genai.Client(api_key=api_key)
+                models = resolve_best_models(temp_client)
+            except Exception:
+                models = resolve_best_models(None)
             thinking_budget = 4096
             if self.profile_idx == "1":
                 p1_model = models["flash_lite"]
