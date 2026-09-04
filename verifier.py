@@ -214,7 +214,22 @@ class DialogueVerifier:
                     if cached_name:
                         cfg_kwargs["cached_content"] = cached_name
                     else:
-                        cfg_kwargs["system_instruction"] = self.system_prompt
+                        is_paid = ("flash" in self.model.lower() or "pro" in self.model.lower()) and "lite" not in self.model.lower()
+                        if is_paid:
+                            cached_name = ContextCacheManager.get_or_create_cache(
+                                client=active_c,
+                                model=self.model,
+                                system_instruction=self.system_prompt,
+                                tag="verifier"
+                            )
+                            if cached_name:
+                                cfg_kwargs["cached_content"] = cached_name
+                            else:
+                                raise RuntimeError(
+                                    f"KATEGORYCZNA BLOKADA FINANSOWA: Zablokowano próbę wysłania 33k tokenów bez aktywnego rabatu -90% dla {self.model}."
+                                )
+                        if "cached_content" not in cfg_kwargs:
+                            cfg_kwargs["system_instruction"] = self.system_prompt
                     cfg = types.GenerateContentConfig(**cfg_kwargs)
                     return active_c.models.generate_content(
                         model=self.model,
@@ -255,7 +270,7 @@ class DialogueVerifier:
                         print(f"  └─ [OK / Faza 2]: Połączenie z Google API przywrócone.")
                         DialogueVerifier._STATUS_ACTIVE = False
                         DialogueVerifier._LAST_STATUS_TIME = 0.0
-                return batch_resp.lines
+                    return batch_resp.lines
 
             except Exception as e:
                 err_str = str(e).lower()
@@ -282,13 +297,21 @@ class DialogueVerifier:
                     print("!" * 75 + "\n")
                     raise RuntimeError("Wyczerpane środki na koncie Google AI Studio (Prepayment Credits Depleted).")
 
+                # Anti-Spin-Lock Circuit Breaker: Hard stop to protect quota and funds
+                num_keys = len(self.client_pool.clients) if hasattr(self, "client_pool") and self.client_pool else 1
+                max_allowed_attempts = max(25, num_keys * 8)
+                if attempt >= max_allowed_attempts:
+                    raise RuntimeError(
+                        f"KATEGORYCZNA BLOKADA BEZPIECZEŃSTWA: Osiągnięto limit {attempt} prób dla partii w Fazie 2. "
+                        f"Ostatni błąd: {e}. Proces wstrzymano w celu ochrony budżetu przed niekontrolowanymi zapytaniami."
+                    )
+
                 is_timeout = "504" in err_str or "deadline" in err_str or "timeout" in err_str or "timed out" in err_str
                 is_unavailable = "503" in err_str or "unavailable" in err_str or "high demand" in err_str
                 is_rate_limit = "429" in err_str or "quota" in err_str or "resource_exhausted" in err_str
 
                 import random
                 import time as _time
-                num_keys = len(self.client_pool.clients) if hasattr(self, "client_pool") and self.client_pool else 1
                 if is_unavailable or is_timeout:
                     cycle = attempt // max(1, num_keys)
                     wait_sec = min(4.0, 1.5 + 0.5 * min(cycle, 5) + random.uniform(0.1, 0.4))
