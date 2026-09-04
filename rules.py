@@ -1390,6 +1390,36 @@ FILAR CLV: DYSCYPLINA REPETYCJI MYŚLI WEWNĘTRZNYCH I OCHRONA PRZED ZLEWANIEM Z
       - ZAKAZ ECHOLALII: Myśl nie może być dosłownym powtórzeniem słów mówionych na głos w tym samym ułamku sekundy.
       - ZAKAZ SZTUCZNEGO ROZBIJANIA ZDANIA: Nie wolno rozrywać myśli na oderwane od kontekstu ułamki z wielokropkami wokół wypowiedzi na głos, tworząc na ekranie chaotyczną zbitkę składniową.
 
+FILAR CLVI: ROZSZCZEPIENIE DWUZNACZNOŚCI ANGIELSKIEGO PIVOTU I PRYMAT KOTWIC LEKSYKALNYCH AUDIO (ENGLISH PIVOT AMBIGUITY COLLAPSE: HITORI VS HOTTOITE, BETSUNI, MOU II)
+   1. ASYMETRIA ANGIELSKIEGO PIVOTU „LEAVE ME ALONE” (HITORI NI SHITE VS HOTTOITE):
+      - Angielski zwrot „Leave me alone” to groźna pułapka translacyjna zamazująca dwa krańcowo odmienne rejestry emocjonalne:
+        * HITORI NI SHITE (一人にして / 独りにして / 一人にさせて) – od kanji 一人 (hitori = sam / w pojedynkę):
+          -> Wyraża ból, rozpacz, wstyd, załamanie, płacz lub chęć ukrycia cierpienia przed drugą osobą.
+          -> JEDYNY POPRAWNY PRZEKŁAD AVT: „Zostaw mnie samą / samego...” / „Chcę być sama / sam...” / „Pozwól mi pobyć samej...”.
+          -> KARDYNALNY BŁĄD [X]: Tłumaczenie jako opryskliwe „Daj mi spokój!” / „Odczep się!” – to fałszuje intencje postaci i niszczy dramaturgię!
+        * HOTTOITE / HOUROKUSHITE / KAMAWA NAIDE (放っておいて / 構わないで):
+          -> Wyraża gniew, zniecierpliwienie, opryskliwość lub odepchnięcie natręta.
+          -> POPRAWNY PRZEKŁAD AVT: „Daj mi spokój!” / „Zostaw mnie w spokoju!” / „Nie wtrącaj się!” / „Odejdź!”.
+
+   2. ASYMETRIA „IT'S NOTHING” (BETSUNI VS NANDEMONAI):
+      - Angielski zwrot „It's nothing / Nothing / Not really” ma dwa japońskie bieguny:
+        * BETSUNI (別に): chłód emocjonalny, foch, dystans, duma (tzw. tsundere).
+          -> POPRAWNIE: „Wcale nie.” / „Nieważne.” / „Mniejsza z tym.” / „Nic takiego.” (ZAKAZ ciepłego: „To nic takiego, nie ma sprawy”).
+        * NANDEMONAI (何でもない): łagodne uspokajanie rozmówcy, by się nie martwił.
+          -> POPRAWNIE: „To nic.” / „Nic się nie stało.” / „Wszystko w porządku.”.
+
+   3. ASYMETRIA „IT'S FINE / THAT'S ENOUGH” (MOU II VS KEKKOU DESU / II DESU):
+      - MOU II (もういい): rezygnacja, urażona duma, machnięcie ręką.
+        -> POPRAWNIE: „Wystarczy.” / „Daj już spokój.” / „Koniec tematu.” / „Nieważne.”.
+      - KEKKOU DESU / II DESU (結構です / いいです): uprzejma, asertywna odmowa.
+        -> POPRAWNIE: „Dziękuję, nie trzeba.” / „Obejdzie się.” / „Nie ma potrzeby.”.
+
+   4. ASYMETRIA „I'M SORRY” (GOMENNASAI VS SUMIMASEN VS WARUI NA):
+      - GOMEN / GOMENNASAI (ごめん / ごめんなさい): osobista skrucha, prośba o wybaczenie.
+        -> POPRAWNIE: „Przepraszam cię.” / „Wybacz mi.”.
+      - WARUI / WARUI NA (悪い / 悪いな): męskie, kumpelskie przyznanie się do winy lub podziękowanie.
+        -> POPRAWNIE: „Mój błąd.” / „Sorki.” / „Wybacz kłopot.”.
+      - SUMIMASEN (すみません): formuła dystansowa, potrójna funkcja (przeprosiny / podziękowanie / nawiązanie kontaktu).
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -2228,6 +2258,7 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
       * "[Filar CLIII - Wielka Matryca Kandōshi] 'Yare yare daze' -> 'Litości...' (ZAKAZ 'Dobre nieszczęście!'); 'Mendokusai' -> 'Ale mi się nie chce...'; 'Oi oi' -> 'Ej, zaraz, zaraz!'; 'Maa maa' -> 'Spokojnie, no już...'; 'Yokatta' -> 'Całe szczęście...'"
       * "[Filar CLIV - Logika Przeczeń i Kansai Jibun] Pytanie 'Nie idziesz?' + 'Hai' -> 'Nie idę' (ZAKAZ 'Tak, idę'); Kansai 'Jibun nani shiten nen?' -> 'Co ty wyprawiasz?!'"
       * "[Filar CLV - Repetycje Myśli i Separacja Mowy] Repetycja myśli 'I can't stop it' (3x) -> 'Nie powstrzymam tego' (ZAKAZ podmiany na treść dialogu o fankach z sąsiedniej linijki)"
+      * "[Filar CLVI - Rozszczepienie Angielskiego Pivotu] 'Hitori ni shite' -> 'Zostaw mnie samą' (ZAKAZ opryskliwego 'Daj mi spokój'); 'Betsuni' -> 'Wcale nie' / 'Mniejsza z tym' (ZAKAZ 'To nic takiego'); 'Mou ii' -> 'Wystarczy / Daj spokój'"
 
 {BELCZYK_AVT_MASTER_CANON}
 
@@ -3020,6 +3051,19 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
             "Kategoryczny zakaz halucynacyjnego zlewania myśli z dialogiem na głos! "
             "Repetycje paniki/stresu w myślach (np. 'I can't stop it' powtórzone 3 razy -> 'Nie powstrzymam tego...') zachowaj wiernie jako mantrę. "
             "ZAKAZ samowolnego wygładzania i wklejania do myśli słów z sąsiedniej linijki mówionej na głos!"
+        )
+
+    # 96. Rozszczepienie Dwuznaczności Angielskiego Pivotu (Filar CLVI - Hitori vs Hottoite, Betsuni, Mou ii)
+    has_pivot_ambiguity = any(
+        any(w in str(item.get("en", "")).lower() for w in ["leave me alone", "alone", "it's nothing", "not really", "that's enough", "i'm fine"]) or
+        any(tok in str(item.get("audio_jp", "")).lower() for tok in ["hitori", "一人", "独り", "betsuni", "別に", "mou ii", "もういい", "hottoite", "放っておいて"])
+        for item in batch_items
+    )
+    if has_pivot_ambiguity:
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CLVI - Rozszczepienie Angielskiego Pivotu i Kotwice Audio]: "
+            "Nie ulegaj fałszywym synonimom angielskim! 'Hitori ni shite' (一人にして) w łzach/smutku to 'Zostaw mnie samą/samego' (ZAKAZ opryskliwego 'Daj mi spokój'!). "
+            "'Betsuni' to chłodne 'Wcale nie' / 'Mniejsza z tym' (ZAKAZ 'To nic takiego'). 'Mou ii' to rezygnacja 'Wystarczy / Daj spokój'."
         )
 
     if not focused_pillars:

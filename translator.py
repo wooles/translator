@@ -572,6 +572,16 @@ def detect_audio_discrepancy(jp_text: str, pl_text: str, en_text: str, prosody: 
         if any(w in pl_lower for w in ["nie chcę, żebyś", "stracił fanki", "przeze mnie", "twoje fanki"]):
             return "W audio w myślach pada repetycja paniki 'Tomerarenai...' (Nie powstrzymam tego...) -> KARDYNALNY BŁĄD halucynacyjnego zlewania myśli z mową na głos! Zastąp wiernym przekładem myśli: 'Nie powstrzymam tego...' (Filar CLV)."
 
+    # 57. Hitori ni shite vs Hottoite (Prośba o Samotność vs Odepchnięcie Natręta - Filar CLVI)
+    if any(k in clean_jp for k in ["一人にして", "独りにして", "ひとりにして", "一人で", "独りで"]) or any(k in rom_lower for k in ["hitori ni shite", "hitori de", "hitorinisite", "hitori"]):
+        if any(w in pl_lower for w in ["daj mi spokój", "daj spokój", "odczep się", "spadaj", "odwal się"]):
+            return "W audio pada 'Hitori ni shite' (一人にして = prośba o samotność w cierpieniu/płaczu, od kanji 一人 = sam). KARDYNALNY BŁĄD angielskiego pivotu! Zastąp opryskliwe 'Daj mi spokój' intymnym: 'Zostaw mnie samą/samego' lub 'Chcę być sam(a)' (Filar CLVI)."
+
+    # 58. Betsuni vs Nandemonai (Chłodny Dystans / Foch vs Uspokajanie - Filar CLVI)
+    if ("別に" in clean_jp or "betsuni" in rom_lower) and any(w in en_text.lower() for w in ["nothing", "it's nothing", "not really"]):
+        if any(w in pl_lower for w in ["to nic takiego", "nie ma sprawy", "nic się nie stało"]):
+            return "W audio pada 'Betsuni' (別に = chłód emocjonalny, foch, dystans). Zastąp uspokajające 'To nic takiego' trafnym: 'Wcale nie', 'Nieważne' lub 'Mniejsza z tym' (Filar CLVI)."
+
     return None
 
 def detect_japanese_pragmatic_register(jp_text: str, en_text: str = "") -> Optional[str]:
@@ -642,6 +652,38 @@ def detect_japanese_pragmatic_register(jp_text: str, en_text: str = "") -> Optio
     if any(k in clean_jp for k in ["なまら", "しばれる", "したっけ"]) or any(k in rom_lower for k in ["namara", "shibareru", "shitakke"]):
         return "Dialekt Hokkaido (surowa, lakoniczna mowa pionierów północy i traperów - Filar CXXXV)"
         
+    return None
+
+def get_audio_semantic_anchor(jp_text: str, en_text: str = "") -> Optional[str]:
+    """
+    Analyzes Whisper Japanese transcription and English text to detect dangerous pivot ambiguities
+    (e.g., 'leave me alone' -> Hitori ni shite vs Hottoite, 'it's nothing' -> Betsuni vs Nandemonai).
+    Returns an explicit disambiguation anchor directive for the translation prompt.
+    """
+    if not jp_text:
+        return None
+    clean_jp = re.sub(r"\[.*?\]", "", jp_text).strip().lower()
+    romaji_match = re.findall(r"\[(.*?)\]", jp_text)
+    rom_lower = romaji_match[0].strip().lower() if romaji_match else to_romaji(clean_jp).lower()
+    en_lower = (en_text or "").lower()
+
+    # 1. Hitori ni shite vs Hottoite / Leave me alone (Filar CLVI)
+    if any(k in clean_jp for k in ["一人にして", "独りにして", "ひとりにして", "一人で", "独りで"]) or any(k in rom_lower for k in ["hitori ni shite", "hitori de", "hitorinisite", "hitori"]):
+        if any(w in en_lower for w in ["leave me alone", "alone", "by myself", "give me a break", "peace"]):
+            return "W audio pada '一人にして (Hitori ni shite)' = samotność, bycie samemu w rozpaczy/bólu -> ZAKAZ opryskliwego 'Daj mi spokój'! NAKAZ: 'Zostaw mnie samą/samego' / 'Chcę być sam(a)' (Filar CLVI)."
+
+    # 2. Betsuni vs Nandemonai / It's nothing (Filar CLVI)
+    if ("別に" in clean_jp or "betsuni" in rom_lower) and any(w in en_lower for w in ["nothing", "not really", "it's fine", "never mind"]):
+        return "W audio pada '別に (Betsuni)' = chłód emocjonalny, foch, dystans -> ZAKAZ 'To nic takiego, nie ma sprawy'! NAKAZ: 'Wcale nie' / 'Nieważne' / 'Mniejsza z tym' (Filar CLVI)."
+
+    # 3. Mou ii vs Kekkou desu / That's enough / It's fine (Filar CLVI)
+    if ("もういい" in clean_jp or "mou ii" in rom_lower or "mouii" in rom_lower) and any(w in en_lower for w in ["enough", "it's fine", "forget it"]):
+        return "W audio pada 'もういい (Mou ii)' = rezygnacja, urażona duma -> NAKAZ: 'Wystarczy' / 'Daj spokój' / 'Koniec tematu' (Filar CLVI)."
+
+    # 4. Gaman dekinai vs Yurusenai / I can't take it (Filar CLVI)
+    if any(k in clean_jp for k in ["我慢できない", "耐えられない"]) or any(k in rom_lower for k in ["gaman dekinai", "taerarenai"]):
+        return "W audio pada 'Gaman dekinai' (ból fizyczny/psychiczny) -> NAKAZ: 'Dłużej tego nie zniosę / Nie wytrzymam' (ZAKAZ: 'Nie wybaczę tego') (Filar CLVI)."
+
     return None
 
 def sanitize_sub_text(text: str, is_ass: bool = True) -> str:
@@ -1015,6 +1057,9 @@ class MultimodalTranslator:
                     romaji_str = to_romaji(jp_text)
                     jp_display = f"{jp_text} [{romaji_str}]" if romaji_str and romaji_str != jp_text else jp_text
                     lines.append(f"  JP (GŁÓWNA KOTWICA SEMANTYCZNA - Słuchaj intencji aktora): {jp_display}")
+                    semantic_anchor = get_audio_semantic_anchor(jp_text, clean_text)
+                    if semantic_anchor:
+                        lines.append(f"  [🎙️ KOTWICA SEMANTYCZNA AUDIO]: {semantic_anchor}")
                     if duration_s <= 0.8 and any(h in jp_text for h in ["え", "う", "あの", "えっと", "ん", "ま…", "あ…", "え…"]) and len(clean_text.split()) > 2:
                         lines.append(f"  [🎙️ ALARM ROZBIEŻNOŚCI AUDIO JP]: W audio seiyū padło wyłącznie krótkie wahanie/dźwięk ('{jp_display}'). ZAKAZ tłumaczenia całego zdania w tym ułamkowym bloku! Ogranicz do samego wahania: 'Znaczy...', 'Cóż...', 'Ech...'.")
             lines.append(f"  EN (Pomocniczy skrypt do czasu/ogólnego sensu): {clean_text}")
@@ -1487,6 +1532,10 @@ class MultimodalTranslator:
             jp_text = whisper_transcriptions.get(batch_id, "") if whisper_transcriptions else ""
             romaji_str = to_romaji(jp_text) if jp_text else ""
             audio_jp_str = f"{jp_text} [{romaji_str}]" if romaji_str and romaji_str != jp_text else jp_text
+
+            semantic_anchor = get_audio_semantic_anchor(jp_text, clean_en)
+            if semantic_anchor and not lit_mean:
+                lit_mean = f"[KOTWICA AUDIO]: {semantic_anchor}"
 
             audio_discrepancy_msg = detect_audio_discrepancy(audio_jp_str, pl_candidate, clean_en, prosody=prosody_tags.get(batch_id, ""))
             pragmatic_reg = detect_japanese_pragmatic_register(audio_jp_str, clean_en)

@@ -213,7 +213,9 @@ def test_rules_and_prompts():
     assert "FILAR CLIV" in sys_prompt or "CLIV" in sys_prompt
     assert "FILAR CLV" in ver_prompt or "CLV" in ver_prompt
     assert "FILAR CLV" in sys_prompt or "CLV" in sys_prompt
-    print(" -> PASSED: Kompletny Zunifikowany Kanon 155 Filarów AVT (Filary I – CLV) jest aktywny w obu fazach tłumaczenia.")
+    assert "FILAR CLVI" in ver_prompt or "CLVI" in ver_prompt
+    assert "FILAR CLVI" in sys_prompt or "CLVI" in sys_prompt
+    print(" -> PASSED: Kompletny Zunifikowany Kanon 156 Filarów AVT (Filary I – CLVI) jest aktywny w obu fazach tłumaczenia.")
 
 def test_pydantic_schemas():
     print("[TEST 2/5] Weryfikacja schematów Pydantic i Detektora Rejestru Pragmatycznego...")
@@ -1191,6 +1193,11 @@ def test_dynamic_rule_dispatcher():
     focused_clv = get_focused_rules_for_batch(batch_clv)
     assert "CLV" in focused_clv
 
+    # 22. Test paczki z Filar CLVI (Rozszczepienie Angielskiego Pivotu: Hitori vs Hottoite, Betsuni)
+    batch_clvi = [{"en": "Please leave me alone.", "audio_jp": "一人にしてくれ [Hitori ni shite kure]"}]
+    focused_clvi = get_focused_rules_for_batch(batch_clvi)
+    assert "CLVI" in focused_clvi
+
     print(" -> PASSED: Dyspozytor reguł precyzyjnie aktywuje właściwe filary AVT.")
 
 def test_fuzzy_and_dynamic_avt_linter():
@@ -1930,6 +1937,24 @@ def test_translator_logger_and_sign_detector():
         en_text="I can't stop it."
     )
     assert alert_thought_merge is not None and "Tomerarenai" in alert_thought_merge and "CLV" in alert_thought_merge
+
+    # Test Filar CLVI: Kotwice Semantyczne Audio i Triggery 57-58
+    anchor_hitori = translator.get_audio_semantic_anchor("一人にしてくれ [Hitori ni shite kure]", "Please leave me alone.")
+    assert anchor_hitori is not None and "Hitori ni shite" in anchor_hitori and "CLVI" in anchor_hitori
+
+    alert_hitori = translator.detect_audio_discrepancy(
+        jp_text="一人にしてくれ [Hitori ni shite kure]",
+        pl_text="Daj mi spokój.",
+        en_text="Please leave me alone."
+    )
+    assert alert_hitori is not None and "Hitori ni shite" in alert_hitori and "CLVI" in alert_hitori
+
+    alert_betsuni = translator.detect_audio_discrepancy(
+        jp_text="別に [Betsuni]",
+        pl_text="To nic takiego, nie przejmuj się.",
+        en_text="It's nothing."
+    )
+    assert alert_betsuni is not None and "Betsuni" in alert_betsuni and "CLVI" in alert_betsuni
 
     # Test Flashback 1:1 memory formatting
     from memory import format_translation_memory_for_prompt
