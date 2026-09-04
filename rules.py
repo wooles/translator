@@ -3129,14 +3129,17 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
             "hitori", "一人", "独り", "betsuni", "別に", "yokatta", "よかった", "yatta", "やった",
             "uso", "嘘", "maji", "マジ", "mendokusai", "面倒くさい", "mou ii", "もういい",
             "gaman", "我慢", "tasukete", "助けて", "yamero", "yamete", "やめろ", "やめて",
-            "shikata ga nai", "shou ga nai", "しょうがない", "naruhodo", "なるほど", "wakatta", "分かった"
-        ])
+            "shikata ga nai", "shou ga nai", "しょうがない", "naruhodo", "なるほど", "wakatta", "分かった",
+            "waka", "若", "若様", "wakagimi", "若君"
+        ]) or
+        any(tok in str(item.get("en", "")).lower() for tok in ["my lord", "milord", "young master", "young lord"])
         for item in batch_items
     )
     if has_auditory_anchor_trigger:
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR CLVIII - Zgodność Foniczno-Semantyczna Seiyū (Harmonia Ucha)]: "
             "Polski widz słyszy głos seiyū! Bezwzględnie zestroić napisy ze słyszanym japońskim słowem kluczowym: "
+            "Waka / Waka-sama / Wakagimi (若 / 若様 / 'My Lord') -> 'Młody panie / Panie / Paniczu' (KATEGORYCZNY ZAKAZ: 'bracie', 'brachu'!). Jeśli postać mówi Waka w tłumie, to odruchowa wpadka, której NIE WOLNO cenzurować ani podmieniać na fałszywy kamuflaż; "
             "Hitori -> 'sam/sama' (ZAKAZ 'Daj mi spokój'); Betsuni -> 'Wcale nie / Mniejsza z tym' (ZAKAZ 'To nic takiego'); "
             "Yokatta -> 'Całe szczęście' (ZAKAZ 'To było dobre'); Yatta -> 'Udało się!' (ZAKAZ 'Zrobiłem to'); "
             "Uso/Maji -> 'Nie wierzę! / Żartujesz?!' (ZAKAZ 'Kłamstwo'); Mendokusai -> 'Ale mi się nie chce...' (ZAKAZ 'Co za ból'); "

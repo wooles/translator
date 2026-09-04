@@ -595,6 +595,19 @@ class AVTLinter:
                     modified = re.sub(r"\b[Cc]o(?:\s+|\\N)+za(?:\s+|\\N)+ból\b", _mendo_repl, modified)
                     applied_fixes.append("[Filar CLVIII - Zgodność Foniczna Seiyū] Wykryto 'Mendokusai' w audio: zastąpiono 'co za ból' przez 'co za męczarnia'")
 
+            # 6. WAKA / WAKA-SAMA (若 / 若様): panicz, młody pan -> KATEGORYCZNY ZAKAZ 'bracie' / 'brachu'
+            if any(k in clean_audio_jp for k in ["waka", "若", "若様", "wakagimi", "若君"]):
+                if re.search(r"\b[Bb]racie\b", modified):
+                    def _waka_repl(m):
+                        return "Panie" if m.group(0)[0].isupper() else "panie"
+                    modified = re.sub(r"\b[Bb]racie\b", _waka_repl, modified)
+                    applied_fixes.append("[Filar CLVIII - Zgodność Foniczna Seiyū] Wykryto 'Waka' w audio: zastąpiono błędne 'bracie' przez 'panie'")
+                elif re.search(r"\b[Bb]rachu\b", modified):
+                    def _waka_brachu_repl(m):
+                        return "Panie" if m.group(0)[0].isupper() else "panie"
+                    modified = re.sub(r"\b[Bb]rachu\b", _waka_brachu_repl, modified)
+                    applied_fixes.append("[Filar CLVIII - Zgodność Foniczna Seiyū] Wykryto 'Waka' w audio: zastąpiono błędne 'brachu' przez 'panie'")
+
         # 5. Anti-Bracket normalization for all subtitles (Pillars IV & LX)
         # 5a. Strip outer square brackets e.g. "[ Przepraszam za zwłokę! ]" -> "Przepraszam za zwłokę!"
         if modified.startswith("[") and modified.endswith("]"):

@@ -769,6 +769,10 @@ def test_avt_linter():
     assert t_mendo == "Co za męczarnia..."
     assert any("CLVIII" in f for f in fixes_m)
 
+    t_waka, fixes_w = AVTLinter.lint_and_fix_line("W porządku, bracie?", audio_jp="大丈夫ですか、若? [Daijoubu desu ka, Waka?]")
+    assert t_waka == "W porządku, panie?"
+    assert any("CLVIII" in f for f in fixes_w)
+
     # Test wymuszenia formy 'ty' z głosu seiyuu (zaimek 'omae' / 'kimi' w audio_jp)
     t_omae, fixes_om = AVTLinter.lint_and_fix_line("Przecież wygrał pan te zawody!", audio_jp="お前が勝った [Omae ga katta]")
     assert t_omae == "Przecież wygrałeś te zawody!"

@@ -80,7 +80,7 @@
       "description": "Zwrot: 'panie Tokiyuki' (opiekuńczy kapłan -> młody dziedzic)"
     },
     "Shizuku -> Tokiyuki Houjou (Chojumaru)": {
-      "description": "Zwrot: 'Bracie / Starszy bracie (w kamuflażu) / Panie Tokiyuki (na osobności)' (służka/kapłanka i jej pan (publicznie udawane rodzeństwo))"
+      "description": "Zwrot: 'Młody panie / Panie Tokiyuki (gdy w audio Waka/Waka-sama)' lub 'Bracie' (WYŁĄCZNIE gdy w audio seiyuu mówi Aniki/Aniue). ZAKAZ tłumaczenia 'Waka' jako 'bracie'!"
     },
     "Mima Sasaki -> Tokiyuki Houjou (Chojumaru)": {
       "description": "Zwrot: 'chłopcze / mały / ty' (wyniosła córka feudała -> zafascynowana protektorka)"
@@ -89,7 +89,7 @@
       "description": "Zwrot: 'wiejska kapłanko / panienko ze wsi' (hazardowa rywalka z pogardzanego prowincjonalnego chramu)"
     },
     "Kojiro -> Tokiyuki Houjou (Chojumaru)": {
-      "description": "Zwrot: 'Młody panie (po cichu) / Bracie Chojumaru (publicznie)' (lojalny wojownik i rówieśnik chroniący pana)"
+      "description": "Zwrot: 'Młody panie / Panie' (gdy w audio Waka/Waka-sama) lub 'Chojumaru'. KATEGORYCZNY ZAKAZ tłumaczenia 'Waka' jako 'bracie', nawet w miejscach publicznych (jeśli Kojiro mówi Waka, to odruchowa wpadka, którą należy zachować)!"
     },
     "Yasuie -> Kinmune Saionji": {
       "description": "Zwrot: 'Wielki Radco / Panie Kinmune' (spiskowiec z Kamakury i dworski dostojnik cesarski)"
