@@ -211,7 +211,9 @@ def test_rules_and_prompts():
     assert "FILAR CLIII" in sys_prompt or "CLIII" in sys_prompt
     assert "FILAR CLIV" in ver_prompt or "CLIV" in ver_prompt
     assert "FILAR CLIV" in sys_prompt or "CLIV" in sys_prompt
-    print(" -> PASSED: Kompletny Zunifikowany Kanon 154 Filarów AVT (Filary I – CLIV) jest aktywny w obu fazach tłumaczenia.")
+    assert "FILAR CLV" in ver_prompt or "CLV" in ver_prompt
+    assert "FILAR CLV" in sys_prompt or "CLV" in sys_prompt
+    print(" -> PASSED: Kompletny Zunifikowany Kanon 155 Filarów AVT (Filary I – CLV) jest aktywny w obu fazach tłumaczenia.")
 
 def test_pydantic_schemas():
     print("[TEST 2/5] Weryfikacja schematów Pydantic i Detektora Rejestru Pragmatycznego...")
@@ -1184,6 +1186,11 @@ def test_dynamic_rule_dispatcher():
     focused_danger = get_focused_rules_for_batch(batch_danger)
     assert "CLII" in focused_danger
 
+    # 21. Test paczki z Filar CLV (Dyscyplina Repetycji Myśli i Separacji Mowy)
+    batch_clv = [{"en": "I can't stop it.", "style": "Italics", "audio_jp": "止められない [Tomerarenai]"}]
+    focused_clv = get_focused_rules_for_batch(batch_clv)
+    assert "CLV" in focused_clv
+
     print(" -> PASSED: Dyspozytor reguł precyzyjnie aktywuje właściwe filary AVT.")
 
 def test_fuzzy_and_dynamic_avt_linter():
@@ -1915,6 +1922,14 @@ def test_translator_logger_and_sign_detector():
         en_text="My brother said not to."
     )
     assert alert_family_3rd is not None and "Starszy brat" in alert_family_3rd and "CLIV" in alert_family_3rd
+
+    # Test Filar CLV: Trigger 56 Repetition of Internal Monologue and Separation from Speech
+    alert_thought_merge = translator.detect_audio_discrepancy(
+        jp_text="止められない [Tomerarenai]",
+        pl_text="Nie chcę, żebyś stracił fanki.",
+        en_text="I can't stop it."
+    )
+    assert alert_thought_merge is not None and "Tomerarenai" in alert_thought_merge and "CLV" in alert_thought_merge
 
     # Test Flashback 1:1 memory formatting
     from memory import format_translation_memory_for_prompt

@@ -567,6 +567,11 @@ def detect_audio_discrepancy(jp_text: str, pl_text: str, en_text: str, prosody: 
         if any(w in pl_lower for w in ["starszy brat", "starsza siostra", "onii-chan", "onee-chan"]):
             return "W audio postać mówi o bracie/siostrze w 3. osobie -> Zastąp sztuczne 'Starszy brat / Onii-chan' naturalnym 'Mój brat' / 'Brat mi powiedział' (Filar CLIV)."
 
+    # 56. Repetycje Myśli i Separacja od Dialogu Mówionego (Tomerarenai / I can't stop it - Filar CLV)
+    if any(k in clean_jp for k in ["止められない", "無理だ", "駄目だ"]) or any(k in rom_lower for k in ["tomerarenai", "muri da", "dame da"]) or any(w in en_text.lower() for w in ["can't stop it", "cannot stop it", "can't hold it"]):
+        if any(w in pl_lower for w in ["nie chcę, żebyś", "stracił fanki", "przeze mnie", "twoje fanki"]):
+            return "W audio w myślach pada repetycja paniki 'Tomerarenai...' (Nie powstrzymam tego...) -> KARDYNALNY BŁĄD halucynacyjnego zlewania myśli z mową na głos! Zastąp wiernym przekładem myśli: 'Nie powstrzymam tego...' (Filar CLV)."
+
     return None
 
 def detect_japanese_pragmatic_register(jp_text: str, en_text: str = "") -> Optional[str]:

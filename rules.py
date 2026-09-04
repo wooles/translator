@@ -1374,6 +1374,22 @@ FILAR CLIV: LOGIKA ODPOWIEDZI NA PRZECZENIA, ZAIMKI DIALEKTALNE I RELACJE TRZECI
       - Gdy w skrypcie/napisach pojawia się kanji, lecz seiyū wymawia fonetycznie inne słowo (np. kanji 地球 [Chikyū = Ziemia], a seiyū śpiewa/mówi ほし [Hoshi = Gwiazda/Planeta] lub ふるさと [Furusato = Ojczyzna]):
         -> Bezwzględny prymat ma wymawiane słowo seiyū (Filar CXLIV & CLIV). Przekład musi odzwierciedlać to, co słyszy ucho widza.
 
+FILAR CLV: DYSCYPLINA REPETYCJI MYŚLI WEWNĘTRZNYCH I OCHRONA PRZED ZLEWANIEM Z MOWĄ (SIMULTANEOUS OVERLAP & THOUGHT SEPARATION)
+   1. OCHRONA AFEKTYWNYCH REPETYCJI WEWNĘTRZNYCH (MANTRY PANIKI I KRYZYSU):
+      - W momentach skrajnego napięcia, paniki, walki z samym sobą lub fizycznej przemiany bohaterowie anime często powtarzają w myślach (Italics) tę samą krótką frazę:
+        * „Tomerarenai... Tomerarenai... Tomerarenai...!” (I can't stop it... -> „Nie powstrzymam tego... Nie powstrzymam tego... Nie dam rady tego zatrzymać...!”)
+        * „Muri da... Muri da...” (It's impossible... -> „Nie dam rady... Nie ma mowy...”)
+        * „Dame da... Dame da...” (It's no use... -> „Koniec ze mną... To na nic...”)
+      - KARDYNALNY BŁĄD HALUCYNACJI [X]: Uznanie repetycji w myślach za „zbyteczną powtórkę” i samowolne podmienianie jej na treść rozmowy mówionej z sąsiedniej linijki (np. podmiana myśli „Nie powstrzymam tego” na wymyślone „Nie chcę, żebyś przeze mnie stracił fanki”)!
+      - Powtórzenie myśli to kluczowy środek wyrazu reżysera – oddaje walące serce, panikę i załamanie psychiczne. Należy zachować repetycję wiernie wobec audio seiyū!
+
+   2. SEPARACJA SEMANTYCZNA MOWY I MYŚLI W SCENACH NAKŁADAJĄCYCH SIĘ (OVERLAP VS ITALICS):
+      - W scenach jednoczesnego dialogu na głos i monologu wewnętrznego:
+        * Warstwa mówiona na głos (Default/Overlap) to zewnętrzna MASKA bohatera (kłamstwa, chłód, wymówki, by kogoś zranić lub odepchnąć).
+        * Warstwa myśli (Italics) to wewnętrzna PRAWDA bohatera (rozpacz, miłość, strach, ból).
+      - ZAKAZ ECHOLALII: Myśl nie może być dosłownym powtórzeniem słów mówionych na głos w tym samym ułamku sekundy.
+      - ZAKAZ SZTUCZNEGO ROZBIJANIA ZDANIA: Nie wolno rozrywać myśli na oderwane od kontekstu ułamki z wielokropkami wokół wypowiedzi na głos, tworząc na ekranie chaotyczną zbitkę składniową.
+
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -2211,6 +2227,7 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
       * "[Filar CLII - Okrzyki Bojowe] 'Abunai!' (krzyk) -> 'Padnij!' / 'Kryj się!' (ZAKAZ opisu 'Niebezpiecznie!')"
       * "[Filar CLIII - Wielka Matryca Kandōshi] 'Yare yare daze' -> 'Litości...' (ZAKAZ 'Dobre nieszczęście!'); 'Mendokusai' -> 'Ale mi się nie chce...'; 'Oi oi' -> 'Ej, zaraz, zaraz!'; 'Maa maa' -> 'Spokojnie, no już...'; 'Yokatta' -> 'Całe szczęście...'"
       * "[Filar CLIV - Logika Przeczeń i Kansai Jibun] Pytanie 'Nie idziesz?' + 'Hai' -> 'Nie idę' (ZAKAZ 'Tak, idę'); Kansai 'Jibun nani shiten nen?' -> 'Co ty wyprawiasz?!'"
+      * "[Filar CLV - Repetycje Myśli i Separacja Mowy] Repetycja myśli 'I can't stop it' (3x) -> 'Nie powstrzymam tego' (ZAKAZ podmiany na treść dialogu o fankach z sąsiedniej linijki)"
 
 {BELCZYK_AVT_MASTER_CANON}
 
@@ -2984,6 +3001,25 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
             "Pytanie z negacją ('Nie idziesz?') + 'Hai' -> 'Nie idę' / 'Zgadza się, nie idę' (KARDYNALNY BŁĄD: 'Tak, idę' - odwrócenie sensu o 180°!). "
             "Kansai 'Jibun' w kontekście rozmówcy -> 'TY' ('Co ty wyprawiasz?!', ZAKAZ: 'Co ja robię?!'). "
             "Rodzina w 3. osobie -> 'Mój brat powiedział' (ZAKAZ: 'Starszy brat powiedział', 'Onii-chan powiedział')."
+        )
+
+    # 95. Dyscyplina Repetycji Myśli Wewnętrznych i Ochrona Przed Zlewaniem z Mową (Filar CLV - Overlap vs Italics)
+    has_overlap_and_italics = (
+        any("overlap" in str(item.get("style", "")).lower() for item in batch_items) and
+        any("italic" in str(item.get("style", "")).lower() or item.get("is_thought", False) for item in batch_items)
+    )
+    has_panic_mantra = any(
+        any(w in str(item.get("en", "")).lower() for w in ["can't stop", "cannot stop", "can't hold", "no use", "impossible"]) or
+        any(tok in str(item.get("audio_jp", "")).lower() for tok in ["tomerarenai", "muri da", "dame da", "止められない", "無理だ", "駄目だ"])
+        for item in batch_items
+    )
+
+    if has_overlap_and_italics or has_panic_mantra:
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CLV - Repetycje Myśli i Separacja Mowy]: "
+            "Kategoryczny zakaz halucynacyjnego zlewania myśli z dialogiem na głos! "
+            "Repetycje paniki/stresu w myślach (np. 'I can't stop it' powtórzone 3 razy -> 'Nie powstrzymam tego...') zachowaj wiernie jako mantrę. "
+            "ZAKAZ samowolnego wygładzania i wklejania do myśli słów z sąsiedniej linijki mówionej na głos!"
         )
 
     if not focused_pillars:
