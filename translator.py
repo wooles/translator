@@ -2790,10 +2790,48 @@ class MultimodalTranslator:
                             except Exception:
                                 pass
                     except Exception as h_err:
-                        pbar.write(f"  [Zero-Gap Guard]: Błąd pasażu uzupełniającego: {h_err}")
+                        pbar.write(f"  [Zero-Gap Guard]: Błąd paczki uzupełniającej ({h_err}). Próba ratunkowa linijka po linijce...")
                         pbar.refresh()
+                        for s_item in h_batch:
+                            if s_item[0] in translated_results:
+                                continue
+                            try:
+                                _, s_res, s_regs, _, _, _ = self._process_single_batch(
+                                    b_idx=len(batches) + 500,
+                                    batch=[s_item],
+                                    untranslated_in_batch=[s_item],
+                                    batches=batches,
+                                    video_path=video_path,
+                                    is_ass=is_ass,
+                                    anime_meta=anime_meta,
+                                    episode_profile=episode_profile,
+                                    anime_context_str=anime_context_str,
+                                    episode_profile_str=episode_profile_str,
+                                    series_bible_str=series_bible_str,
+                                    manga_canon_str=manga_canon_str,
+                                    combined_glossary=combined_glossary,
+                                    all_user_rules=all_user_rules,
+                                    history=history,
+                                    pbar=pbar,
+                                    translated_results=translated_results
+                                )
+                                with self.lock:
+                                    for orig_idx, text_res in s_res.items():
+                                        translated_results[orig_idx] = text_res
+                                    for orig_idx, reg_res in s_regs.items():
+                                        if reg_res:
+                                            translated_regions[orig_idx] = reg_res
+                                pbar.update(len(s_res))
+                                pbar.refresh()
+                            except Exception as s_err:
+                                pbar.write(f"  [Zero-Gap Guard]: Awaryjna linia #{s_item[0] + 1} nie powiodła się: {s_err}")
+                                pbar.refresh()
 
-            # Końcowe odświeżenie paska, aby upewnić się, że pokazuje 100%
+            # Końcowa weryfikacja integralności Zero-Gap przed zapisem
+            missing_final = [item for item in raw_entries if item[0] not in translated_results and not is_song_line(item[1], item[2])]
+            if missing_final:
+                pbar.write(f"\n  🚨 [ALARM ZERO-GAP]: Nie udało się przetłumaczyć {len(missing_final)} kwestii dialogowych!")
+                pbar.write(f"     Plik checkpointu zostanie zachowany w celu bezstratnego dokończenia.")
             pbar.refresh()
 
         # 7. Construct final subtitle file preserving styles, positioning, and typesetting
@@ -2935,18 +2973,22 @@ class MultimodalTranslator:
 
         final_subs.save(output_path, encoding="utf-8")
         
-        # Remove checkpoint and temporary profile cache files upon successful completion
-        if checkpoint_path.exists():
-            try:
-                os.remove(str(checkpoint_path))
-            except OSError:
-                pass
+        # Remove checkpoint and temporary profile cache files only upon truly 100% complete dialogue translation
+        missing_dialogue_at_end = [item for item in raw_entries if item[0] not in translated_results and not is_song_line(item[1], item[2])]
+        if not missing_dialogue_at_end:
+            if checkpoint_path.exists():
+                try:
+                    os.remove(str(checkpoint_path))
+                except OSError:
+                    pass
 
-        if profile_cache_path and os.path.exists(profile_cache_path):
-            try:
-                os.remove(profile_cache_path)
-            except OSError:
-                pass
+            if profile_cache_path and os.path.exists(profile_cache_path):
+                try:
+                    os.remove(profile_cache_path)
+                except OSError:
+                    pass
+        else:
+            print(f"  ⚠️ [AUTOZAPIS]: Plik checkpointu {checkpoint_path.name} został ZACHOWANY, ponieważ brakuje {len(missing_dialogue_at_end)} kwestii dialogowych. Uruchom ponowne tłumaczenie, aby bezstratnie dokończyć brakujące linie!")
 
         print(f"\n[Sukces] Przetłumaczone, wyczyszczone napisy z zachowanym Typesettingiem zapisano w: {output_path}")
 
