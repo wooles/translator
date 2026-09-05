@@ -2003,6 +2003,14 @@ class MultimodalTranslator:
                 elif "mężczyzna" in reg_desc or "męsk" in reg_desc or "chłopak" in reg_desc:
                     speaker_gender = "mężczyzna"
 
+            # Fallback z estymacji fonicznej F0 (SpeakerVoiceClassifier), jeśli płeć wciąż nieznana
+            if not speaker_gender and speaker_tags and batch_id in speaker_tags:
+                v_tag = speaker_tags[batch_id].lower()
+                if "żeńsk" in v_tag or "sopran" in v_tag:
+                    speaker_gender = "kobieta"
+                elif "męsk" in v_tag or "baryton" in v_tag or "bas" in v_tag:
+                    speaker_gender = "mężczyzna"
+
             # Line-Level Pinning: Direct Profiler alerts for this specific line
             if episode_profile:
                 if getattr(episode_profile, "danger_lines_prescan", None):
@@ -2032,8 +2040,6 @@ class MultimodalTranslator:
                 series_bible=getattr(self, "series_bible", None)
             )
             subj_3p_str = " ".join(subj_3p) if subj_3p else ""
-            if subj_3p_str:
-                notes = f"{notes} {subj_3p_str}".strip()
 
             jp_text = whisper_transcriptions.get(batch_id, "") if whisper_transcriptions else ""
             romaji_str = to_romaji(jp_text) if jp_text else ""

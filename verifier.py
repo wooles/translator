@@ -86,11 +86,12 @@ class DialogueVerifier:
         prompt_lines.append("Zredaguj poniższe kwestie dialogowe. BEZWZGLĘDNIE wyeliminuj dosłowne tłumaczenie 1 do 1, sztuczne konstrukcje i kalki.")
         prompt_lines.append("Zastąp drewniane sformułowania żywym, potoczystym językiem polskim mówionym (tak jak w profesjonalnym dubbingu / u polskich nastolatków):")
         prompt_lines.append(
-            "WYKORZYSTAJ CZAS NA ZASTANOWIENIE (Thinking / CoT): Przed zatwierdzeniem każdej kwestii przeprowadź w myślach 4-etapowy test zdrowego rozsądku, ucha widza i ślepej lektury:\n"
-            "1. TEST INTERAKCJI DIALOGOWEJ (PING-PONG): Czy ta kwestia logicznie i naturalnie odpowiada na poprzednią? KATEGORYCZNY ZAKAZ samotnego 'Tak/T-Tak' w odpowiedzi na polecenie lub ostrzeżenie 'Uważaj!' (użyj 'Dobrze / D-Dobrze / Jasne / Będę uważać / W porządku' - Filar XLIII/CXLVI)!\n"
-            "2. TEST FOKALIZACJI I FIZYCZNOŚCI SCENY: Kto mówi w kadrze na głos? Czy to nie zmiana z myśli wewnętrznej na głośny dialog diegetyczny? KATEGORYCZNY ZAKAZ przypisywania cudzych słów w 1. osobie bohaterom ukrywającym tożsamość ('by the Silent Witch' -> 'Wiedźmy Milczenia', BEZWZGLĘDNY ZAKAZ 'mój esej' - Filar CLXI)!\n"
-            "3. TEST AKTORSKI I AUDYT UCHA (STANISŁAWSKI-BARAŃCZAK): Czy to zdanie brzmi potoczyście, gdy polski aktor dubbingowy wypowie je na jednym wydechu? Bezwzględnie eliminuj sztywne angielskie kalki słownikowe i papierowe brzmienie (Filar CLIX)!\n"
-            "4. TEST ŚLEPEJ LEKTURY POLSZCZYNY (AUTONOMOUS BLIND-READING FLOW): Przeczytaj wygenerowany polski dialog tak, jakbyś nigdy nie widział angielskiego skryptu. Czy brzmi w 100% naturalnie dla polskiego ucha, jak kwestia z profesjonalnego dubbingu? Jeśli czujesz w nim choćby cień angielskiej składni lub sztucznej kalki – przeredaguj je na czystą, płynną polszczyznę!"
+            "WYKORZYSTAJ CZAS NA ZASTANOWIENIE (Thinking / CoT): Jako Główny Reżyser Dubbingu i Script Doctor, przed zatwierdzeniem każdej kwestii przeprowadź w myślach 5-etapowy proces reżyserski:\n"
+            "1. ANALIZA PODTEKSTU I RELACJI (DRAMATURGY & SUBTEXT): Kto mówi do kogo? Jaki jest status i układ sceny (Kadr 1-na-1 vs Uchi-Soto/zbiorowy)? Czy ton seiyū lub alarm afektywny nie demaskuje ukrytej ironii/sarkazmu pod pozorem uprzejmości (Filar CLVIII)?\n"
+            "2. DYNAMIKA DIALOGU I PING-PONG (INTERACTION FLOW): Czy kwestia naturalnie odpowiada na poprzednią wypowiedź partnera? KATEGORYCZNY ZAKAZ samotnego 'Tak/T-Tak' na polecenie lub ostrzeżenie 'Uważaj!' (użyj 'Dobrze / D-Dobrze / Jasne / Będę uważać' - Filar XLIII/CXLVI) oraz fałszywych potwierdzeń na pytania z przeczeniem (Echo Agreement - Filar CLIV)!\n"
+            "3. PRÓBA STOLIKOWA I AUDYT UCHA (TABLE-READ & MOUTH-FEEL): Przeczytaj kwestię w myślach na jednym wydechu polskiego aktora dubbingowego. Czy fraza układa się w ustach bez sztywności i zgrzytów? Czy tempo CPS i długość odpowiadają czasowi trwania kwestii (mikro-kwestie <0.5s zredukowane do zwięzłych okrzyków - Filar CXXXIV)?\n"
+            "4. TEST FOKALIZACJI I TOŻSAMOŚCI (PERSPECTIVE & FIREWALL): Kto mówi w kadrze na głos? Czy to nie zmiana z myśli na głośny dialog? KATEGORYCZNY ZAKAZ przypisywania cudzych słów w 1. osobie bohaterom ukrywającym tożsamość ('by the Silent Witch' -> 'Wiedźmy Milczenia', ZAKAZ 'mój esej' - Filar CLXI) oraz ZAKAZ 'wygrał pan' w dialogu na 'ty' (Filar CLVII)!\n"
+            "5. TEST ŚLEPEJ LEKTURY POLSZCZYNY (AUTONOMOUS BLIND-READING FLOW): Przeczytaj wygenerowany polski dialog tak, jakbyś nigdy nie widział angielskiego skryptu. Czy brzmi w 100% naturalnie dla polskiego ucha, jak czysta, potoczysta polszczyzna literacka i filmowa? Jeśli czujesz w nim choćby cień angielskiej składni lub sztucznej kalki – przeredaguj je na czystą, płynną polszczyznę!"
         )
         prompt_lines.append("W polu 'changes_made' dla KAŻDEJ poprawionej kwestii podaj DOKŁADNE uzasadnienie i numer Filaru AVT (np. '[Filar IV - Szyk Zdania] Usunięto kalkę angielską' lub '[Filar CLVII - Forma Adresatywna] Usunięto 'wygrał pan' -> 'wygrałeś''). Jeśli kwestia nie wymagała poprawek, wpisz null.")
         
@@ -104,24 +105,34 @@ class DialogueVerifier:
                 prompt_lines.append(f"• {name}: {details}")
             prompt_lines.append("--------------------------------------------------------------------------\n")
 
-        # Structured Scene Diagnosis from Phase 1
-        if scene_diagnosis and hasattr(scene_diagnosis, "dramatic_context"):
+        # Structured Scene Diagnosis from Phase 1 (Support both Pydantic model and dict)
+        if scene_diagnosis:
+            diag_dict = scene_diagnosis.dict() if hasattr(scene_diagnosis, "dict") else (scene_diagnosis if isinstance(scene_diagnosis, dict) else {})
+            dram_ctx = diag_dict.get("dramatic_context") or getattr(scene_diagnosis, "dramatic_context", None)
+            dial_flow = diag_dict.get("dialogue_flow") or getattr(scene_diagnosis, "dialogue_flow", None)
+            aud_check = diag_dict.get("audio_intent_check") or getattr(scene_diagnosis, "audio_intent_check", None)
+            dom_tone = diag_dict.get("dominant_tone") or getattr(scene_diagnosis, "dominant_tone", None)
+            pow_dyn = diag_dict.get("power_dynamic") or getattr(scene_diagnosis, "power_dynamic", None)
+            epis_asym = diag_dict.get("epistemic_asymmetry") or getattr(scene_diagnosis, "epistemic_asymmetry", None)
+            tbl_read = diag_dict.get("table_read_mouth_feel") or getattr(scene_diagnosis, "table_read_mouth_feel", None)
+
             diag_lines = ["\n🎬 DIAGNOZA DRAMATURGICZNA I KOGNITYWNA SCENY:"]
-            if getattr(scene_diagnosis, "dramatic_context", None) and scene_diagnosis.dramatic_context.strip():
-                diag_lines.append(f"• Sytuacja i emocje: {scene_diagnosis.dramatic_context.strip()}")
-            if getattr(scene_diagnosis, "dialogue_flow", None) and scene_diagnosis.dialogue_flow.strip():
-                diag_lines.append(f"• Dynamika dialogu (przyczyna-skutek): {scene_diagnosis.dialogue_flow.strip()}")
-            if getattr(scene_diagnosis, "audio_intent_check", None) and scene_diagnosis.audio_intent_check.strip():
-                diag_lines.append(f"• Intencja ze słuchu (Whisper): {scene_diagnosis.audio_intent_check.strip()}")
-            if getattr(scene_diagnosis, "dominant_tone", None) and scene_diagnosis.dominant_tone.strip():
-                diag_lines.append(f"• Rejestr i ton: {scene_diagnosis.dominant_tone.strip()}")
-            if getattr(scene_diagnosis, "power_dynamic", None) and scene_diagnosis.power_dynamic.strip():
-                diag_lines.append(f"• Relacja władzy: {scene_diagnosis.power_dynamic.strip()}")
-            if getattr(scene_diagnosis, "epistemic_asymmetry", None) and scene_diagnosis.epistemic_asymmetry.strip():
-                diag_lines.append(f"• Teoria Umysłu (asymetria wiedzy / zakaz dekonspiracji): {scene_diagnosis.epistemic_asymmetry.strip()}")
-            if getattr(scene_diagnosis, "table_read_mouth_feel", None) and scene_diagnosis.table_read_mouth_feel.strip():
-                diag_lines.append(f"• Próba Stolikowa (płynność w ustach aktora): {scene_diagnosis.table_read_mouth_feel.strip()}")
-            prompt_lines.append("\n".join(diag_lines) + "\n")
+            if dram_ctx and str(dram_ctx).strip():
+                diag_lines.append(f"• Sytuacja i emocje: {str(dram_ctx).strip()}")
+            if dial_flow and str(dial_flow).strip():
+                diag_lines.append(f"• Dynamika dialogu (przyczyna-skutek): {str(dial_flow).strip()}")
+            if aud_check and str(aud_check).strip():
+                diag_lines.append(f"• Intencja ze słuchu (Whisper): {str(aud_check).strip()}")
+            if dom_tone and str(dom_tone).strip():
+                diag_lines.append(f"• Rejestr i ton: {str(dom_tone).strip()}")
+            if pow_dyn and str(pow_dyn).strip():
+                diag_lines.append(f"• Relacja władzy: {str(pow_dyn).strip()}")
+            if epis_asym and str(epis_asym).strip():
+                diag_lines.append(f"• Teoria Umysłu (asymetria wiedzy / zakaz dekonspiracji): {str(epis_asym).strip()}")
+            if tbl_read and str(tbl_read).strip():
+                diag_lines.append(f"• Próba Stolikowa (płynność w ustach aktora): {str(tbl_read).strip()}")
+            if len(diag_lines) > 1:
+                prompt_lines.append("\n".join(diag_lines) + "\n")
         elif scene_summary:
             prompt_lines.append(f"\n[Kontekst sceny]: {scene_summary}\n")
 
@@ -173,7 +184,7 @@ class DialogueVerifier:
         for item in batch_items:
             type_tag = f" [[Napis] {item['visual_type']}]" if item.get("is_sign") else " [DIALOG]"
             semiotic_tag = f" [{item['semiotic_layer']}]" if item.get("semiotic_layer") else ""
-            mode_tag = " [💭 Myśl wewnętrzna]" if item.get("is_thought") else (" [🗣️ Mowa diegetyczna]" if not item.get("is_sign") else "")
+            mode_tag = " [💭 Myśl]" if item.get("is_thought") else (" [🗣️ Mowa]" if not item.get("is_sign") else "")
             dur_s = item.get("duration_s")
             dur_info = f" (Czas: {dur_s:.1f}s)" if dur_s else ""
             speaker_name = (item.get('speaker_name') or '').strip()
@@ -186,44 +197,74 @@ class DialogueVerifier:
                 char_info = f" (Mówca: {speaker_gender})"
             else:
                 char_info = ""
-            voice_info = f" [Głos: {item.get('speaker_voice')}]" if item.get('speaker_voice') else ""
-            prosody_info = f" [Ton: {item.get('prosody')}]" if item.get('prosody') else ""
-            song_info = " [🎵 PIOSENKA / WYMÓG RYMU I METRUM SYLABICZNEGO (FILAR CXVIII)]" if item.get("is_song") else ""
-            cps_info = f" [CPS: {item.get('cps_warning')}]" if item.get('cps_warning') else ""
-            notes_info = f" [Notatki: {item.get('notes')}]" if item.get('notes') else ""
-            visual_info = f" [Położenie/Styl: {item.get('visual_details')}]" if item.get('visual_details') else ""
-            region_info = f" [Kwadrant kadru: {item.get('screen_region')}]" if item.get('screen_region') else ""
-            subject_3p_info = f"  {item['third_person_subject']}\n" if item.get('third_person_subject') else ""
-            audio_info = f"  JP (Audio ze słuchu Whisper): {item['audio_jp']}\n" if item.get("audio_jp") else ""
-            alert_info = f"  [⚠️ ALARM ROZBIEŻNOŚCI AUDIO JP]: {item['audio_alert']}\n" if item.get("audio_alert") else ""
-            vis_sub_info = f"  [🎬 Wizja, Mimika & Usta]: {item['visual_subtext']}\n" if item.get('visual_subtext') else ""
-            prag_reg_info = f"  [🎎 Rejestr Pragmatyczny JP]: {item['pragmatic_register']}\n" if item.get('pragmatic_register') else ""
-            lit_info = f"  [📖 Dosłowny Sens JP]: {item['literal_meaning']}\n" if item.get('literal_meaning') else ""
-            cond_info = f"  {item['condensation_directive']}\n" if item.get('condensation_directive') else ""
-            ambiguity_info = f"  [❓ Wątpliwość Fazy 1 (Rozwikłaj z obrazu/audio - Filar CXLV)]: {item['ambiguity_note']}\n" if item.get('ambiguity_note') else ""
-            relation_info = f"  {item['relation_tag']}\n" if item.get('relation_tag') else ""
-            
+
+            # Actor & Voice profile
+            actor_cues = []
+            if item.get('speaker_voice'):
+                actor_cues.append(f"Głos: {item['speaker_voice']}")
+            if item.get('prosody'):
+                actor_cues.append(f"Ton: {item['prosody']}")
+            if item.get('pragmatic_register'):
+                actor_cues.append(f"Rejestr: {item['pragmatic_register']}")
+            actor_line = f"  [Aktorstwo i Rejestr]: {', '.join(actor_cues)}\n" if actor_cues else ""
+
+            # Multimodal audio/visual cues
+            multimodal_lines = []
+            if item.get("audio_jp"):
+                multimodal_lines.append(f"    • JP (Audio seiyū): {item['audio_jp']}")
+            if item.get('visual_subtext'):
+                multimodal_lines.append(f"    • Obraz i mimika: {item['visual_subtext']}")
+            if item.get('literal_meaning'):
+                multimodal_lines.append(f"    • Dosłowny sens JP: {item['literal_meaning']}")
+            if item.get('visual_details'):
+                multimodal_lines.append(f"    • Typografia/Styl: {item['visual_details']}")
+            if item.get('screen_region'):
+                multimodal_lines.append(f"    • Kwadrant kadru: {item['screen_region']}")
+            multimodal_block = "  [Kontekst Multimodalny]:\n" + "\n".join(multimodal_lines) + "\n" if multimodal_lines else ""
+
+            # Directives, alarms, relational dynamics & traps
+            directive_lines = []
+            if item.get('relation_tag'):
+                directive_lines.append(f"    • Dynamika: {item['relation_tag'].strip()}")
+            if item.get('audio_alert'):
+                directive_lines.append(f"    • Alarm audio: {item['audio_alert'].strip()}")
+            if item.get('third_person_subject'):
+                directive_lines.append(f"    • Płeć 3. osoby: {item['third_person_subject'].strip()}")
+            if item.get('condensation_directive'):
+                directive_lines.append(f"    • Kondensacja: {item['condensation_directive'].strip()}")
+            elif item.get('cps_warning'):
+                directive_lines.append(f"    • Tempo CPS: {item['cps_warning'].strip()}")
+            if item.get('is_song'):
+                directive_lines.append("    • PIOSENKA: Wymóg rymu i metrum sylabicznego (Filar CXVIII - Barańczak)!")
+            if item.get('ambiguity_note'):
+                directive_lines.append(f"    • Wątpliwość Fazy 1: {item['ambiguity_note'].strip()}")
+
+            # Clean notes from duplicates (remove third_person_subject from notes if already present)
+            raw_notes = (item.get('notes') or '').strip()
+            if raw_notes:
+                clean_notes = raw_notes
+                if item.get('third_person_subject') and item['third_person_subject'] in clean_notes:
+                    clean_notes = clean_notes.replace(item['third_person_subject'], '').strip()
+                if clean_notes:
+                    directive_lines.append(f"    • Wytyczne redakcyjne: {clean_notes}")
+
+            directives_block = "  [🎯 KRYTYCZNE WYTYCZNE DO SZLIFU]:\n" + "\n".join(directive_lines) + "\n" if directive_lines else ""
+
             is_untranslated = item.get("is_missing_translation", False) or (
                 item.get("pl", "").strip().lower() == item.get("en", "").strip().lower()
                 and len(item.get("en", "").split()) >= 2
                 and not item.get("is_sign")
             )
             if is_untranslated:
-                pl_display = f"  Wstępne PL: [🚨 BRAK PRZEKŁADU W FAZIE 1 - PRZETŁUMACZ OD ZERA Z EN I AUDIO JP!]{notes_info}"
+                pl_display = "  Szkic PL: [🚨 BRAK PRZEKŁADU W FAZIE 1 - PRZETŁUMACZ OD ZERA Z EN I AUDIO JP!]"
             else:
-                pl_display = f"  Wstępne PL: {item['pl']}{notes_info}"
+                pl_display = f"  Szkic PL: {item['pl']}"
 
             prompt_lines.append(
-                f"- [ID: {item['id']}]{type_tag}{semiotic_tag}{mode_tag}{char_info}{voice_info}{prosody_info}{dur_info}{song_info}{cps_info}{visual_info}{region_info}\n"
-                f"{subject_3p_info}"
-                f"{audio_info}"
-                f"{alert_info}"
-                f"{prag_reg_info}"
-                f"{vis_sub_info}"
-                f"{lit_info}"
-                f"{cond_info}"
-                f"{relation_info}"
-                f"{ambiguity_info}"
+                f"- [KWESTIA #{item['id']}]{type_tag}{semiotic_tag}{mode_tag}{char_info}{dur_info}\n"
+                f"{actor_line}"
+                f"{multimodal_block}"
+                f"{directives_block}"
                 f"  EN: {item['en']}\n"
                 f"{pl_display}"
             )
