@@ -96,11 +96,10 @@ class PricingGuard:
                 (p1_out / 1_000_000) * rate_flash["output"]
             )
 
-            # Phase 2: Flash Refinement with Elastic Adaptive CoT Budget & Smart Bypass (~35% of batches)
-            p2_batches = max(1, int(batches * 0.35))
-            p2_cached_in = (p2_batches * system_prompt_tokens) if has_cache else 0
-            p2_uncached_in = (p2_batches * batch_input_tokens) + (0 if has_cache else p2_batches * system_prompt_tokens)
-            p2_out = p2_batches * batch_output_flash_cot
+            # Phase 2: Flash Refinement with Elastic Adaptive CoT Budget (100% batches)
+            p2_cached_in = (batches * system_prompt_tokens) if has_cache else 0
+            p2_uncached_in = (batches * batch_input_tokens) + (0 if has_cache else batches * system_prompt_tokens)
+            p2_out = batches * batch_output_flash_cot
             cost_p2_usd = (
                 (p2_cached_in / 1_000_000) * rate_flash["input_cached"] +
                 (p2_uncached_in / 1_000_000) * rate_flash["input_uncached"] +
@@ -126,11 +125,10 @@ class PricingGuard:
                 (p1_out / 1_000_000) * rate_flash["output"]
             )
 
-            # Phase 2: Gemini 3.1 Pro Refinement + Dedicated Pro CoT with Smart Bypass (~35% of batches)
-            p2_batches = max(1, int(batches * 0.35))
-            p2_cached_in = (p2_batches * system_prompt_tokens) if has_cache else 0
-            p2_uncached_in = (p2_batches * batch_input_tokens) + (0 if has_cache else p2_batches * system_prompt_tokens)
-            p2_out = p2_batches * batch_output_pro_tokens
+            # Phase 2: Gemini 3.1 Pro Refinement + Dedicated Pro CoT (100% batches)
+            p2_cached_in = (batches * system_prompt_tokens) if has_cache else 0
+            p2_uncached_in = (batches * batch_input_tokens) + (0 if has_cache else batches * system_prompt_tokens)
+            p2_out = batches * batch_output_pro_tokens
             cost_p2_usd = (
                 (p2_cached_in / 1_000_000) * rate_pro["input_cached"] +
                 (p2_uncached_in / 1_000_000) * rate_pro["input_uncached"] +

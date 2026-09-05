@@ -1250,13 +1250,13 @@ def test_pricing_guard():
     cost_flash = PricingGuard.estimate_episode_cost_pln("2")
     assert 1.50 <= cost_flash <= 2.50
     
-    # 3. Test szacowania kosztu dla profilu Mistrzowski Dual Flash (~2.30 - 2.60 zł z Adaptive Smart Bypass)
+    # 3. Test szacowania kosztu dla profilu Mistrzowski Dual Flash (~3.00 - 3.40 zł)
     cost_pro = PricingGuard.estimate_episode_cost_pln("3")
-    assert 2.00 <= cost_pro <= 3.80
+    assert 2.80 <= cost_pro <= 3.80
 
-    # 4. Test szacowania kosztu dla profilu Kinowy Pro (~3.50 - 4.00 zł z Adaptive Smart Bypass)
+    # 4. Test szacowania kosztu dla profilu Kinowy Pro (~5.50 - 6.50 zł z adaptacyjnym CoT)
     cost_ultra = PricingGuard.estimate_episode_cost_pln("4")
-    assert 3.20 <= cost_ultra <= 6.50
+    assert 4.50 <= cost_ultra <= 7.50
     
     # 5. Test generowania banera
     banner = PricingGuard.get_pricing_status_banner()
@@ -2929,8 +2929,8 @@ def test_comprehensive_architecture_extensions():
     print(" -> PASSED: StyleMatrixEngine, SQLite FTS5 BM25, Auto-Diff Ingestion i Matryca 7 Przypadków Deklinacji działają w 100% harmonii przy koszcie 0.00 PLN.")
 
 
-def test_adaptive_phase2_bypass_and_anti_attention_dilution():
-    print("[TEST 43/43] Test Adaptive Smart Bypass Fazy 2, Ograniczenia Rozproszenia Uwagi (Lost in the Middle) i Kotwic Semantycznych...")
+def test_anti_attention_dilution_semantic_anchors_and_full_phase2():
+    print("[TEST 43/43] Test Pełnej Fazy 2 CoT 6000, Ograniczenia Rozproszenia Uwagi (Lost in the Middle) i Kotwic Semantycznych...")
     from translator import get_audio_semantic_anchor
     from rules import get_focused_rules_for_batch
     from pricing_guard import PricingGuard
@@ -2956,63 +2956,13 @@ def test_adaptive_phase2_bypass_and_anti_attention_dilution():
     rule_count = focused_str.count("• [SKUP SIĘ NA:")
     assert 1 <= rule_count <= 3, f"Oczekiwano maks 3 reguł (anty-Lost in the Middle), otrzymano {rule_count}"
 
-    # 3. Logika Adaptive Smart Bypass Fazy 2
-    def eval_needs_phase2(items):
-        unique_spk = set()
-        for it in items:
-            spk = (it.get("speaker_name") or it.get("speaker") or "").strip()
-            if spk:
-                unique_spk.add(spk)
-            notes_str = str(it.get("notes", ""))
-            if "🚨" in notes_str or "⚠️" in notes_str or "ALARM" in notes_str:
-                return True
-            cps_val = it.get("cps", 0.0)
-            dur_s = it.get("duration_s", 1.0)
-            if cps_val > 17.0 or dur_s <= 0.6:
-                return True
-            if it.get("is_song") or it.get("is_sign"):
-                return True
-            prosody_str = str(it.get("speaker_voice", "") + " " + it.get("prosody", "")).lower()
-            if any(k in prosody_str for k in ["krzyk", "ironia", "chłód", "sarkazm", "szept", "płacz", "gniew", "wahanie"]):
-                return True
-        if len(unique_spk) >= 3:
-            return True
-        return False
-
-    # Scenariusz A: standardowy dialog 1-na-1 (powinien ominąć Fazę 2)
-    standard_batch = [
-        {"speaker_name": "Anna", "cps": 12.0, "duration_s": 2.5, "notes": "", "is_song": False, "is_sign": False, "prosody": ""},
-        {"speaker_name": "Piotr", "cps": 14.0, "duration_s": 1.8, "notes": "", "is_song": False, "is_sign": False, "prosody": ""}
-    ]
-    assert eval_needs_phase2(standard_batch) is False, "Standardowy dialog 1-na-1 powinien ominąć Fazę 2"
-
-    # Scenariusz B: alarm jakościowy (musi iść do Fazy 2)
-    alarm_batch = [
-        {"speaker_name": "Anna", "cps": 12.0, "duration_s": 2.5, "notes": "[🚨 ALARM: Anchor]", "is_song": False, "is_sign": False, "prosody": ""}
-    ]
-    assert eval_needs_phase2(alarm_batch) is True, "Paczka z alarmem musi trafić do Fazy 2"
-
-    # Scenariusz C: szybkie tempo CPS > 17.0 (musi iść do Fazy 2)
-    fast_batch = [
-        {"speaker_name": "Anna", "cps": 18.5, "duration_s": 1.2, "notes": "", "is_song": False, "is_sign": False, "prosody": ""}
-    ]
-    assert eval_needs_phase2(fast_batch) is True, "Paczka o wysokim CPS musi trafić do Fazy 2"
-
-    # Scenariusz D: tłum >= 3 mówców (musi iść do Fazy 2)
-    crowd_batch = [
-        {"speaker_name": "Anna", "cps": 12.0, "duration_s": 2.0, "notes": "", "is_song": False, "is_sign": False, "prosody": ""},
-        {"speaker_name": "Piotr", "cps": 12.0, "duration_s": 2.0, "notes": "", "is_song": False, "is_sign": False, "prosody": ""},
-        {"speaker_name": "Jan", "cps": 12.0, "duration_s": 2.0, "notes": "", "is_song": False, "is_sign": False, "prosody": ""}
-    ]
-    assert eval_needs_phase2(crowd_batch) is True, "Paczka zbiorowa (3 mówców) musi trafić do Fazy 2"
-
-    # 4. Sprawdzenie oszczędności finansowych PricingGuard
+    # 3. Sprawdzenie stabilnych stawek PricingGuard dla pełnej Fazy 2 (100% paczek)
     p3_cost = PricingGuard.estimate_episode_cost_pln("3")
+    assert 2.80 <= p3_cost <= 3.80, f"Profil 3 powinien kosztować ~3.00 - 3.40 zł, kosztuje {p3_cost} zł"
     p4_cost = PricingGuard.estimate_episode_cost_pln("4")
-    assert p3_cost < 2.80, f"Profil 3 powinien kosztować poniżej 2.80 zł, kosztuje {p3_cost} zł"
-    assert p4_cost < 4.20, f"Profil 4 powinien kosztować poniżej 4.20 zł, kosztuje {p4_cost} zł"
+    assert 5.00 <= p4_cost <= 7.50, f"Profil 4 powinien kosztować ~6.00 - 6.50 zł, kosztuje {p4_cost} zł"
 
-    print(" -> PASSED: Adaptive Smart Bypass, Anti-Attention Dilution i Kotwice Semantyczne działają perfekcyjnie.")
+    print(" -> PASSED: Pełna Faza 2 CoT 6000 (100% kwestii), Anti-Attention Dilution i Kotwice Semantyczne działają w 100% harmonii.")
 
 
 if __name__ == "__main__":
@@ -3056,7 +3006,7 @@ if __name__ == "__main__":
     test_affective_incongruity_and_sarcasm_detector()
     test_quality_gate_name_declension_vocative_and_micro_lines()
     test_comprehensive_architecture_extensions()
-    test_adaptive_phase2_bypass_and_anti_attention_dilution()
+    test_anti_attention_dilution_semantic_anchors_and_full_phase2()
     print("\n Wszystkie testy jednostkowe i integracyjne (43/43) zakończone pełnym sukcesem!\n")
 
 
