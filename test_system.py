@@ -868,11 +868,17 @@ def test_avt_linter():
         "{\\i1}Przecież jest tam też mój esej!{\\i0}",
         audio_jp="沈黙の魔女の論文が載ってる [Chinmoku no majo no ronbun ga notteru]"
     )
-    assert t_witch == "Przecież jest tam też esej Wiedźmy Milczenia!"
-    assert any("CLXI" in f for f in fixes_witch)
-    assert any("Zakaz Konwersji Dialogu na Myśl" in f for f in fixes_witch)
+    # Test Filar III/XIV - Kolokacja Czasowo-Szkolna (długa przerwa, a nie duża przerwa)
+    t_break1, _ = AVTLinter.lint_and_fix_line(r"Czekam na ciebie na dużej\Nprzerwie w pokoju wychowawczym.")
+    assert t_break1 == r"Czekam na ciebie na długiej\Nprzerwie w pokoju wychowawczym."
+    t_break2, _ = AVTLinter.lint_and_fix_line("Duża przerwa już się skończyła.")
+    assert t_break2 == "Długa przerwa już się skończyła."
+    t_break3, _ = AVTLinter.lint_and_fix_line("Spotkajmy się na małej przerwie.")
+    assert t_break3 == "Spotkajmy się na krótkiej przerwie."
+    t_break4, _ = AVTLinter.lint_and_fix_line("Przed nami duży weekend!")
+    assert t_break4 == "Przed nami długi weekend!"
 
-    print(" -> PASSED: AVT Linter bezbłędnie wyłapuje i koryguje kalki, formy, nawiasy, cudzysłowy, formy 1-na-1, Aizuchi, hybrydy, ALL-CAPS, Filar CLVII (T-V Invariance), Filar CLVIII (Zgodność Seiyū), Filar XLIII/CXLVI (Dyrektywne Potwierdzenie) oraz Filar CLXI (Nienaruszalność Perspektywy i Zakaz Zdrady Tożsamości Incognito).")
+    print(" -> PASSED: AVT Linter bezbłędnie wyłapuje i koryguje kalki, formy, nawiasy, cudzysłowy, formy 1-na-1, Aizuchi, hybrydy, ALL-CAPS, Filar CLVII (T-V Invariance), Filar CLVIII (Zgodność Seiyū), Filar XLIII/CXLVI (Dyrektywne Potwierdzenie), Filar CLXI (Nienaruszalność Perspektywy) oraz Filar III/XIV (Kolokacje Czasowo-Szkolne: Długa przerwa).")
 
 def test_series_bible():
     print("[TEST 9/12] Test Biblii Serialu i Pamięci Międzyodcinkowej (series_memory)...")

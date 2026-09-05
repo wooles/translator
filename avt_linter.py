@@ -11,6 +11,44 @@ import re
 from typing import Dict, List, Tuple, Optional, Any
 from pathlib import Path
 
+def _fix_duza_przerwa_match(m: Any) -> str:
+    first_letter = m.group(1)
+    ending = m.group(2).lower()
+    sep = m.group(3)
+    przerw_end = m.group(4) or ""
+    mapping = {
+        "a": "długa",
+        "ą": "długą",
+        "ej": "długiej",
+        "e": "długie",
+        "ych": "długich",
+        "ym": "długim",
+        "ymi": "długimi",
+    }
+    form = mapping.get(ending, "długiej")
+    if first_letter.isupper():
+        form = form.capitalize()
+    return f"{form}{sep}przerw{przerw_end}"
+
+def _fix_mala_przerwa_match(m: Any) -> str:
+    first_letter = m.group(1)
+    ending = m.group(2).lower()
+    sep = m.group(3)
+    przerw_end = m.group(4) or ""
+    mapping = {
+        "a": "krótka",
+        "ą": "krótką",
+        "ej": "krótkiej",
+        "e": "krótkie",
+        "ych": "krótkich",
+        "ym": "krótkim",
+        "ymi": "krótkimi",
+    }
+    form = mapping.get(ending, "krótkiej")
+    if first_letter.isupper():
+        form = form.capitalize()
+    return f"{form}{sep}przerw{przerw_end}"
+
 class AVTLinter:
     """
     Automated validator and corrector for mechanical language calques in subtitle tracks.
@@ -118,6 +156,33 @@ class AVTLinter:
         (r"\bpowódź\s+wina\b", "fala wina", "Filar CXXXVIII - Kolokacja Cieczy (Fala wina)"),
         (r"\bPowodzi\s+wina\b", "Fali wina", "Filar CXXXVIII - Kolokacja Cieczy (Fali wina)"),
         (r"\bpowodzi\s+wina\b", "fali wina", "Filar CXXXVIII - Kolokacja Cieczy (Fali wina)"),
+
+        # School & Temporal Collocations (Filar III/XIV/ECR: "długa przerwa", nie "duża przerwa")
+        (
+            r"\b([Dd])uż(ej|ymi|ych|ym|a|ą|e)((?:\\N|\s)+)przerw(ie|ami|ach|om|a|y|ę|ą|o)?\b",
+            _fix_duza_przerwa_match,
+            "Filar III/XIV - Kolokacja Czasowo-Szkolna ('długa przerwa', nie 'duża')",
+        ),
+        (
+            r"\b([Mm])ał(ej|ymi|ych|ym|a|ą|e)((?:\\N|\s)+)przerw(ie|ami|ach|om|a|y|ę|ą|o)?\b",
+            _fix_mala_przerwa_match,
+            "Filar III/XIV - Kolokacja Czasowo-Szkolna ('krótka przerwa', nie 'mała')",
+        ),
+        (
+            r"\b[Dd]uży(?:\s+|\\N)+weekend\b",
+            lambda m: ("Długi" if m.group(0)[0].isupper() else "długi") + ("\\N" if "\\N" in m.group(0) else " ") + "weekend",
+            "Filar III/IV - Kolokacje Czasowe (Długi weekend)",
+        ),
+        (
+            r"\b[Dd]użego(?:\s+|\\N)+weekendu\b",
+            lambda m: ("Długiego" if m.group(0)[0].isupper() else "długiego") + ("\\N" if "\\N" in m.group(0) else " ") + "weekendu",
+            "Filar III/IV - Kolokacje Czasowe (Długiego weekendu)",
+        ),
+        (
+            r"\b[Dd]użym(?:\s+|\\N)+weekendzie\b",
+            lambda m: ("Długim" if m.group(0)[0].isupper() else "długim") + ("\\N" if "\\N" in m.group(0) else " ") + "weekendzie",
+            "Filar III/IV - Kolokacje Czasowe (Długim weekendzie)",
+        ),
         
         # Proper Noun Prepositional Case Agreement (Filar IV / Filar XCI / Belczyk)
         (r"\b([Ww]|we|[Pp]rzy|[Nn]a|[Oo])\s+Twierdza\s+([A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźżōū]+)\b", r"\1 twierdzy \2", "Filar IV/XCI - Odmiana Rzeczownika w Nazwie Własnej (Miejscownik: w twierdzy)"),
@@ -351,7 +416,8 @@ class AVTLinter:
             pillar_tag = item[2] if len(item) > 2 else "Filar IV - Reguły Belczyka"
             if re.search(pattern, modified):
                 modified = re.sub(pattern, repl, modified)
-                applied_fixes.append(f"[{pillar_tag}] {pattern} -> {repl}")
+                repl_disp = repl if isinstance(repl, str) else "[korekta fleksyjna]"
+                applied_fixes.append(f"[{pillar_tag}] {pattern} -> {repl_disp}")
 
         # 2. Dynamic user feedback rules
         if user_feedback_rules:
@@ -1370,7 +1436,8 @@ class EpisodeQualityGate:
                 pillar_tag = item[2] if len(item) > 2 else "Belczyk AVT"
                 if re.search(pattern, ev.text):
                     ev.text = re.sub(pattern, repl, ev.text)
-                    fixes.append(f"[Episode Quality Gate - {pillar_tag}] Linia #{i+1}: {pattern} -> {repl}")
+                    repl_disp = repl if isinstance(repl, str) else "[korekta fleksyjna]"
+                    fixes.append(f"[Episode Quality Gate - {pillar_tag}] Linia #{i+1}: {pattern} -> {repl_disp}")
 
             # 4b. USER FEEDBACK GOLDEN RULES (Deterministic Overrides)
             if user_feedback_rules:

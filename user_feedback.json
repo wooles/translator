@@ -63,12 +63,21 @@
     "created_at": "2026-09-05 21:45:00"
   },
   {
-    "id": "fb_1788644338489",
+    "id": "fb_dluga_przerwa",
+    "original_en": "at lunch break / lunch break",
+    "bad_pl": "na dużej przerwie / duża przerwa",
+    "good_pl": "na długiej przerwie / długa przerwa",
+    "rule_reason": "W języku polskim w realiach szkolnych mówi się 'długa przerwa' (lub 'przerwa obiadowa'), a NIE 'duża przerwa'. Czas ma wymiar długości, a nie rozmiaru fizycznego.",
+    "scope": "global",
+    "created_at": "2026-09-05 23:55:00"
+  },
+  {
+    "id": "fb_1788645707667",
     "original_en": "All creation",
     "bad_pl": "Wszelkie Stworzenie (Wszelkie Stworzenie)",
     "good_pl": "Wszelkie Stworzenie",
     "rule_reason": "Eliminacja dublowania",
     "scope": "global",
-    "created_at": "2026-09-05 23:38:58"
+    "created_at": "2026-09-06 00:01:47"
   }
 ]

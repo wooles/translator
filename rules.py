@@ -56,6 +56,10 @@ FILAR III: NATURALNE POLSKIE KOLOKACJE PYTAJĄCE I SYTUACYJNE (ZAMIAST KALK SŁO
 - "What difference does it make?" -> "A co za różnica?", "Co to zmienia?".
 - "What took you so long?" -> "Gdzieś ty był?", "Czemu tak długo?".
 - "How did you manage to...?" -> "Jak ci się udało...?", "Jak dałeś radę...?".
+- 2. KOLOKACJE CZASOWE I REALIA SZKOLNE:
+  * "lunch break / noon recess" (昼休み) -> "długa przerwa" (lub "przerwa obiadowa") (KATEGORYCZNY ZAKAZ: "duża przerwa" - czas w polszczyźnie ma wymiar DŁUGOŚCI, a nie rozmiaru fizycznego; w polskich szkołach mówi się wyłącznie "długa przerwa"!).
+  * "short break / recess" -> "krótka przerwa" (ZAKAZ: "mała przerwa").
+  * "long weekend" -> "długi weekend" (ZAKAZ: "duży weekend").
 
 FILAR IV: ELIMINACJA SZTUCZNYCH CZASOWNIKÓW POSIŁKOWYCH I POZORNEGO TRWANIA:
 - 1. SZTUCZNA ANALITYCZNOŚĆ:
@@ -2482,6 +2486,15 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
             "• [SKUP SIĘ NA: FILAR LIX - Metryzacja i Liczby]: "
             "Anglosaskie jednostki zamieniaj na metryczne ('feet' -> 'metry', 'miles' -> 'kilometry'). "
             "Małe liczby (0-10) zapisuj słownie ('trzy dni', 'pięć minut')."
+        )
+
+    # 10b. Kolokacje czasowo-szkolne i realia przerw (Filar III & XIV)
+    if any(w in combined_en for w in ["lunch break", "noon recess", "break", "recess", "weekend", "holiday"]) or any(w in combined_jp for w in ["昼休み", "休み"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR III & XIV - Realia Szkolne i Kolokacje Czasowe]: "
+            "Czas w polszczyźnie ma wymiar DŁUGOŚCI, a nie rozmiaru fizycznego: "
+            "'lunch break / noon recess (昼休み)' to bezwzględnie 'długa przerwa' (lub 'przerwa obiadowa') — KATEGORYCZNY ZAKAZ: 'duża przerwa'! "
+            "'short break / recess' to 'krótka przerwa' (ZAKAZ: 'mała przerwa'), 'long weekend' to 'długi weekend' (ZAKAZ: 'duży weekend')."
         )
 
     # 11. Modalność i pewność wypowiedzi
