@@ -130,11 +130,16 @@ def detect_event_visual_type(event: pysubs2.SSAEvent, ts_prefix: str = "") -> Di
     ts_lower = (ts_prefix or "").lower()
     text_raw = (event.plaintext or event.text or "").strip()
 
-    if any(s in style_lower for s in ["sign", "title", "poster", "board", "screen", "typesetting", "card", "ts", "napis", "tytuł", "szyld"]):
+    style_is_sub = bool(re.search(r"\bsubtitles?\b", style_lower))
+    if not style_is_sub and (
+        re.search(r"\b(sign|signs|title|titles|poster|board|typesetting|card|napis|napisy|tytuł|tytuły|szyld|szyldy)\b", style_lower)
+        or "on-screen" in style_lower
+        or style_lower == "ts"
+    ):
         is_sign = True
         details.append(f"styl='{event.style}'")
 
-    if any(n in name_lower for n in ["sign", "title", "poster", "board", "typesetting", "screen", "napis"]):
+    if not style_is_sub and re.search(r"\b(sign|signs|title|titles|poster|board|typesetting|napis)\b", name_lower):
         is_sign = True
         details.append(f"aktor='{event.name}'")
 
@@ -3148,9 +3153,13 @@ class MultimodalTranslator:
             clean_check = clean_translated_text.strip()
             ts_prefix_applied = sanitize_ts_prefix_for_translation(ts_prefix or "")
             item_region = translated_regions.get(master_id)
-            is_title_card = bool(re.match(r"^(ODCINEK|ROZDZIAŁ|EPIZOD|CZĘŚĆ|AKT)\s+\d+", clean_check, re.IGNORECASE))
+            style_clean = (orig_event.style or "").lower()
+            style_is_sub = bool(re.search(r"\bsubtitles?\b", style_clean))
+            has_sign_style = not style_is_sub and bool(
+                re.search(r"\b(sign|signs|title|titles|typeset|typesetting|caption)\b", style_clean)
+            )
 
-            if is_sign_flag or is_title_card or (clean_check.startswith("[") and clean_check.endswith("]")) or "sign" in (orig_event.style or "").lower() or "title" in (orig_event.style or "").lower():
+            if is_sign_flag or is_title_card or (clean_check.startswith("[") and clean_check.endswith("]")) or has_sign_style:
                 if r"\pos" in ts_prefix_applied:
                     # Preserve original subtitle's custom coordinates without corrupting
                     pass
