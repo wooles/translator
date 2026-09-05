@@ -59,6 +59,45 @@ class DialogueVerifier:
             except (ValueError, TypeError):
                 self.thinking_budget = 6144
 
+    def calculate_effective_budget(self, batch_items: List[Dict[str, Any]]) -> int:
+        """
+        Elastic Multi-Tier CoT Budget calculation:
+        Scales thinking tokens dynamically based on the semiotic and linguistic complexity of the batch.
+        - Pro: 2048 (complex) / 1536 (medium) / 1024 (simple)
+        - Flash: 6144 (complex) / 3072 (medium) / 2048 (simple)
+        """
+        has_song = any(item.get("is_song") for item in batch_items)
+        has_audio_alert = any(item.get("audio_alert") for item in batch_items)
+        has_ambiguity = any(item.get("ambiguity_note") for item in batch_items)
+        has_pragmatic_reg = any(item.get("pragmatic_register") for item in batch_items)
+        has_condensation = any(item.get("condensation_directive") for item in batch_items)
+        has_long_dialogue = any(len(item.get("en", "").split()) > 10 for item in batch_items)
+        has_relation = any(item.get("relation_tag") for item in batch_items)
+
+        # Separate adaptive CoT tiers for Pro Model ($12/1M output rate) vs Flash Model ($3.75/1M output rate)
+        if "pro" in self.model.lower():
+            # PRO MODEL DEDICATED TIERS (Level 4: High Literary Depth without token bloating)
+            # Tier 1 (Pro): Piosenki OP/ED, gry słowne, zawiłe metafory, alarmy Whisper, wątpliwości Fazy 1
+            if has_song or has_audio_alert or has_ambiguity:
+                return 2048
+            # Tier 2 (Pro): Rejestry militarne, stylizacja feudalna, kompresja, narady, ping-pong
+            elif has_pragmatic_reg or has_condensation or has_long_dialogue or has_relation:
+                return 1536
+            # Tier 3 (Pro): Proste, krótkie dialogi i okrzyki bojowe (1024 tokeny CoT)
+            else:
+                return 1024
+        else:
+            # FLASH MODEL TIERS (Level 3: Full Deep CoT up to 6144)
+            # Tier 1: Piosenki OP/ED (Barańczak), kalambury fonetyczne, alarmy rozbieżności audio, wątpliwości F1
+            if has_song or has_audio_alert or has_ambiguity:
+                return max(4096, min(self.thinking_budget, 6144))
+            # Tier 2: Rejestry feudalne/dworskie, kompresja czasowa, długie narady militarne, ping-pong
+            elif has_pragmatic_reg or has_condensation or has_long_dialogue or has_relation:
+                return max(2048, min(self.thinking_budget, 3072))
+            # Tier 3: Standardowy, żywy dialog codzienny (2048 tokenów CoT dla pełnego audytu 156 Filarów)
+            else:
+                return min(self.thinking_budget, 2048)
+
     def verify_batch(
         self,
         batch_items: List[Dict[str, Any]],
@@ -280,37 +319,7 @@ class DialogueVerifier:
         attempt = 0
 
         # Determine adaptive CoT thinking budget based on batch complexity (Elastic Multi-Tier Budget)
-        has_song = any(item.get("is_song") for item in batch_items)
-        has_audio_alert = any(item.get("audio_alert") for item in batch_items)
-        has_ambiguity = any(item.get("ambiguity_note") for item in batch_items)
-        has_pragmatic_reg = any(item.get("pragmatic_register") for item in batch_items)
-        has_condensation = any(item.get("condensation_directive") for item in batch_items)
-        has_long_dialogue = any(len(item.get("en", "").split()) > 10 for item in batch_items)
-        has_relation = any(item.get("relation_tag") for item in batch_items)
-
-        # Separate adaptive CoT tiers for Pro Model ($12/1M output rate) vs Flash Model ($3.75/1M output rate)
-        if "pro" in self.model.lower():
-            # PRO MODEL DEDICATED TIERS (Level 4: High Literary Depth without token bloating)
-            # Tier 1 (Pro): Piosenki OP/ED, gry słowne, zawiłe metafory, alarmy Whisper, wątpliwości Fazy 1
-            if has_song or has_audio_alert or has_ambiguity:
-                effective_budget = 2048
-            # Tier 2 (Pro): Rejestry militarne, stylizacja feudalna, kompresja, narady, ping-pong
-            elif has_pragmatic_reg or has_condensation or has_long_dialogue or has_relation:
-                effective_budget = 1536
-            # Tier 3 (Pro): Proste, krótkie dialogi i okrzyki bojowe (1024 tokeny CoT)
-            else:
-                effective_budget = 1024
-        else:
-            # FLASH MODEL TIERS (Level 3: Full Deep CoT up to 6144)
-            # Tier 1: Piosenki OP/ED (Barańczak), kalambury fonetyczne, alarmy rozbieżności audio, wątpliwości F1
-            if has_song or has_audio_alert or has_ambiguity:
-                effective_budget = max(4096, min(self.thinking_budget, 6144))
-            # Tier 2: Rejestry feudalne/dworskie, kompresja czasowa, długie narady militarne, ping-pong
-            elif has_pragmatic_reg or has_condensation or has_long_dialogue or has_relation:
-                effective_budget = max(2048, min(self.thinking_budget, 3072))
-            # Tier 3: Standardowy, żywy dialog codzienny (2048 tokenów CoT dla pełnego audytu 156 Filarów)
-            else:
-                effective_budget = min(self.thinking_budget, 2048)
+        effective_budget = self.calculate_effective_budget(batch_items)
 
         while True:
             attempt += 1

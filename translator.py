@@ -2312,7 +2312,9 @@ class MultimodalTranslator:
         refined_region_dict: Dict[int, str] = {it["id"]: it.get("screen_region") for it in pass1_items if it.get("screen_region")}
 
         if self.enable_verifier and hasattr(self, 'verifier'):
-            pbar.set_postfix_str("Faza 2 (Redakcja Dialogów Pro CoT)...")
+            budget_val = getattr(self.verifier, "calculate_effective_budget", lambda items: getattr(self.verifier, "thinking_budget", 2048))(pass1_items)
+            model_tag = "Flash" if "flash" in getattr(self.verifier, "model", "").lower() else "Pro"
+            pbar.set_postfix_str(f"Faza 2 (Redakcja {model_tag} CoT: {budget_val})...")
             # Staggered entry (350ms per thread) to prevent simultaneous TPU burst collisions on 503
             stagger_sec = (b_idx % max(1, self.concurrent_batches)) * 0.35
             if stagger_sec > 0:

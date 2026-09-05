@@ -2507,6 +2507,27 @@ def test_adaptive_thinking_budget():
     assert b_pro_tactics == 1536
     b_pro_tier1 = 2048
     assert b_pro_tier1 == 2048
+
+    # 5. Bezpośredni test metody DialogueVerifier.calculate_effective_budget
+    from unittest.mock import MagicMock
+    from verifier import DialogueVerifier
+    mock_vf = MagicMock(spec=DialogueVerifier)
+    mock_vf.model = "gemini-3.8-flash"
+    mock_vf.thinking_budget = 6144
+    mock_vf.calculate_effective_budget = DialogueVerifier.calculate_effective_budget.__get__(mock_vf)
+    assert mock_vf.calculate_effective_budget(batch_song) == 6144
+    assert mock_vf.calculate_effective_budget(batch_ambiguity) == 6144
+    assert mock_vf.calculate_effective_budget(batch_tactics) == 3072
+    assert mock_vf.calculate_effective_budget(batch_simple) == 2048
+
+    mock_vp = MagicMock(spec=DialogueVerifier)
+    mock_vp.model = "gemini-3.1-pro"
+    mock_vp.thinking_budget = 2048
+    mock_vp.calculate_effective_budget = DialogueVerifier.calculate_effective_budget.__get__(mock_vp)
+    assert mock_vp.calculate_effective_budget(batch_song) == 2048
+    assert mock_vp.calculate_effective_budget(batch_tactics) == 1536
+    assert mock_vp.calculate_effective_budget(batch_simple) == 1024
+
     print(" -> PASSED: Wielopoziomowy adaptacyjny budżet myślenia (Flash: 6144/3072/2048, Pro: 2048/1536/1024) działa w 100%.")
 
 def test_cornerstone_invariants():
