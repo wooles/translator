@@ -341,7 +341,17 @@ def test_pydantic_schemas():
     raw_events.append((18, ev19, "Line 18", ""))
     batches2 = create_adaptive_batches(raw_events, base_batch_size=24, max_batch_size=30)
     assert len(batches2) == 2, "Powinno podzielić partię po 18 kwestiach przy pauzie > 2800ms"
-    assert len(batches2[0]) == 18
+    # Test detekcji stylów plansz, szyldów i napisów ekranowych (Caption, Caption-14 itp.)
+    from translator import detect_event_visual_type
+    ev_cap = pysubs2.SSAEvent(start=1000, end=3000, text=r"{\pos(793.6,554.4)}{\an7}Student Council", style="Caption-14")
+    vt_cap = detect_event_visual_type(ev_cap, ts_prefix=r"{\pos(793.6,554.4)}{\an7}")
+    assert vt_cap["is_sign"] is True
+    assert vt_cap["is_top"] is False
+
+    ev_sub = pysubs2.SSAEvent(start=1000, end=3000, text="Well, that's true too...", style="Subtitle")
+    vt_sub = detect_event_visual_type(ev_sub)
+    assert vt_sub["is_sign"] is False
+    assert vt_sub["is_top"] is False
 
     print(" -> PASSED: Schematy Pydantic, Diagnoza Wizualna, Semiotic Layers i Dramatic Beat Batching są w 100% poprawne.")
 

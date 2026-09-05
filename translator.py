@@ -132,7 +132,8 @@ def detect_event_visual_type(event: pysubs2.SSAEvent, ts_prefix: str = "") -> Di
 
     style_is_sub = bool(re.search(r"\bsubtitles?\b", style_lower))
     if not style_is_sub and (
-        re.search(r"\b(sign|signs|title|titles|poster|board|typesetting|card|napis|napisy|tytuł|tytuły|szyld|szyldy)\b", style_lower)
+        re.search(r"\b(sign|signs|caption|captions|title|titles|poster|board|typesetting|card|napis|napisy|tytuł|tytuły|szyld|szyldy)\b", style_lower)
+        or style_lower.startswith("caption")
         or "on-screen" in style_lower
         or style_lower == "ts"
     ):
@@ -3155,8 +3156,9 @@ class MultimodalTranslator:
             item_region = translated_regions.get(master_id)
             style_clean = (orig_event.style or "").lower()
             style_is_sub = bool(re.search(r"\bsubtitles?\b", style_clean))
-            has_sign_style = not style_is_sub and bool(
-                re.search(r"\b(sign|signs|title|titles|typeset|typesetting|caption)\b", style_clean)
+            has_sign_style = not style_is_sub and (
+                bool(re.search(r"\b(sign|signs|title|titles|typeset|typesetting|caption|captions)\b", style_clean))
+                or style_clean.startswith("caption")
             )
 
             if is_sign_flag or is_title_card or (clean_check.startswith("[") and clean_check.endswith("]")) or has_sign_style:

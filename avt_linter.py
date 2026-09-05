@@ -1177,7 +1177,10 @@ class EpisodeQualityGate:
             ev_is_sub = bool(re.search(r"\bsubtitles?\b", ev_style_lower))
             is_sign = bool(
                 re.search(r"\\(pos|move|an[789]|clip)\b", ev.text) or
-                (not ev_is_sub and bool(re.search(r"\b(sign|signs|title|titles|caption|typeset|typesetting|op|ed)\b", ev_style_lower)))
+                (not ev_is_sub and (
+                    bool(re.search(r"\b(sign|signs|title|titles|caption|captions|typeset|typesetting|op|ed)\b", ev_style_lower))
+                    or ev_style_lower.startswith("caption")
+                ))
             )
 
             # Find preceding dialogue event (skip signs and empty events)
@@ -1190,7 +1193,10 @@ class EpisodeQualityGate:
                 cand_is_sub = bool(re.search(r"\bsubtitles?\b", cand_style_lower))
                 cand_is_sign = bool(
                     re.search(r"\\(pos|move|an[789]|clip)\b", cand.text or "") or
-                    (not cand_is_sub and bool(re.search(r"\b(sign|signs|title|titles|caption|typeset|typesetting|op|ed)\b", cand_style_lower)))
+                    (not cand_is_sub and (
+                        bool(re.search(r"\b(sign|signs|title|titles|caption|captions|typeset|typesetting|op|ed)\b", cand_style_lower))
+                        or cand_style_lower.startswith("caption")
+                    ))
                 )
                 if cand_text and not cand_is_sign:
                     prev_ev = cand
