@@ -918,6 +918,102 @@ class BatchTranslationResponse(BaseModel):
     translations: List[LineTranslation] = Field(description="Lista przetłumaczonych kwestii")
     characters_identified: Optional[List[CharacterInfo]] = Field(default=None, description="Zidentyfikowane lub nowo odkryte postacie i ich płeć")
 
+CANONICAL_MALE_NAMES_ON_A = {
+    "shira", "akira", "gaara", "ashitaka", "kiba", "soma", "kenta",
+    "ryoma", "hanza", "koba", "soya", "toma", "genga", "sinbad", "judar", "alibaba"
+}
+
+def detect_third_person_mentions(
+    clean_text: str,
+    speaker: Optional[str],
+    character_registry: Optional[Dict[str, str]] = None,
+    series_bible: Optional[Any] = None
+) -> List[str]:
+    """
+    Scans clean dialogue text for 3rd-person character mentions.
+    Injects strict gender and past-tense agreement directives (Filar CLXII)
+    when a character (especially male with a name ending in '-a') is discussed
+    by another speaker, preventing gender drift across points of view.
+    """
+    if not clean_text:
+        return []
+
+    speaker_clean = (speaker or "").strip()
+    speaker_lower = speaker_clean.lower()
+    directives = []
+    seen_names = set()
+
+    # Aggregate candidate characters and their confirmed genders
+    candidates: Dict[str, str] = {}  # name -> "MALE" or "FEMALE"
+
+    # 1. From Character Registry
+    if character_registry:
+        for full_name, details in character_registry.items():
+            if not full_name:
+                continue
+            desc_lower = str(details).lower()
+            gen = None
+            if any(k in desc_lower for k in ["male", "mężczyzna", "chłopak", "męsk"]):
+                gen = "MALE"
+            elif any(k in desc_lower for k in ["female", "kobieta", "dziewczyn", "żeńsk"]):
+                gen = "FEMALE"
+            
+            # Split multi-name slashes like "Fatima / Sitara"
+            parts = [p.strip() for p in re.split(r"[/,]", full_name) if p.strip()]
+            for p in parts:
+                if len(p) >= 3 and gen:
+                    candidates[p] = gen
+
+    # 2. From Series Bible characters
+    if series_bible and hasattr(series_bible, "data"):
+        bible_chars = series_bible.data.get("characters", {})
+        for c_key, c_val in bible_chars.items():
+            desc_str = c_val.get("description", "") if isinstance(c_val, dict) else str(c_val)
+            desc_lower = desc_str.lower()
+            gen = None
+            if any(k in desc_lower for k in ["male", "mężczyzna", "chłopak", "męsk"]):
+                gen = "MALE"
+            elif any(k in desc_lower for k in ["female", "kobieta", "dziewczyn", "żeńsk"]):
+                gen = "FEMALE"
+            
+            # c_key might be "Sitara -> Shira" or "Shira"
+            names = re.findall(r"\b[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]{2,}\b", c_key)
+            for n in names:
+                if n not in candidates:
+                    if gen:
+                        candidates[n] = gen
+                    elif n.lower() in CANONICAL_MALE_NAMES_ON_A:
+                        candidates[n] = "MALE"
+
+    # 3. Canonical Male Names on '-a' (Filar CLXII)
+    for c_name in CANONICAL_MALE_NAMES_ON_A:
+        cap_name = c_name.capitalize()
+        if cap_name not in candidates:
+            candidates[cap_name] = "MALE"
+
+    # Scan clean_text for candidates
+    for name, gender in candidates.items():
+        name_lower = name.lower()
+        # Skip if character is the speaker
+        if speaker_lower and (name_lower == speaker_lower or name_lower in speaker_lower or speaker_lower in name_lower):
+            continue
+        if name_lower in seen_names:
+            continue
+
+        # Match name as a whole word in English text (or possessive e.g. Shira's)
+        if re.search(rf"\b{re.escape(name)}(?:'s)?\b", clean_text, re.IGNORECASE):
+            seen_names.add(name_lower)
+            if gender == "MALE":
+                directives.append(
+                    f"[PODMIOT 3. OSOBY: '{name}' to MĘŻCZYZNA -> KATEGORYCZNY ZAKAZ orzeczeń żeńskich ('{name} ostrzegała/mówiła/była')! WYMAGANE orzeczenia męskie w czasie przeszłym: '{name} ostrzegał/mówił/był' (Filar CLXII)]"
+                )
+            elif gender == "FEMALE":
+                directives.append(
+                    f"[PODMIOT 3. OSOBY: '{name}' to KOBIETA -> KATEGORYCZNY ZAKAZ orzeczeń męskich ('{name} ostrzegał/mówił/był')! WYMAGANE orzeczenia żeńskie w czasie przeszłym: '{name} ostrzegała/mówiła/była']"
+                )
+
+    return directives
+
 class MultimodalTranslator:
     _STATUS_LOCK = threading.Lock()
     _STATUS_ACTIVE: bool = False
@@ -1220,6 +1316,14 @@ class MultimodalTranslator:
             else:
                 speaker_name = event.name if event.name else "Postać"
                 lines.append(f"Kwestia [ID: {idx + 1}] [TYP: [DIALOG] {vtype['type_label']}]{relation_tag} (Czas: {start_str} - {end_str}, Mówca: '{speaker_name}'){acoustic_str}:")
+                subj_3p = detect_third_person_mentions(
+                    clean_text=clean_text,
+                    speaker=event.name,
+                    character_registry=self.character_registry,
+                    series_bible=getattr(self, "series_bible", None)
+                )
+                for s3 in subj_3p:
+                    lines.append(f"  {s3}")
                 if vtype.get("is_top"):
                     lines.append(f"  (!) DIALOG GÓRNY / W TLE: To jest dialog postaci w tle/oddali. Formatuj jako naturalny dialog mówiony (Sentence case). BEZWZGLĘDNY ZAKAZ nawiasów kwadratowych [...] i ZAKAZ wielkich liter ALL-CAPS!")
                 if duration_s <= 0.6:
@@ -1797,6 +1901,17 @@ class MultimodalTranslator:
                             notes = f"{notes} {pun_tag}".strip()
                             break
 
+            # 3rd-person character mention detection (Filar CLXII)
+            subj_3p = detect_third_person_mentions(
+                clean_text=clean_en,
+                speaker=event.name,
+                character_registry=self.character_registry,
+                series_bible=getattr(self, "series_bible", None)
+            )
+            subj_3p_str = " ".join(subj_3p) if subj_3p else ""
+            if subj_3p_str:
+                notes = f"{notes} {subj_3p_str}".strip()
+
             jp_text = whisper_transcriptions.get(batch_id, "") if whisper_transcriptions else ""
             romaji_str = to_romaji(jp_text) if jp_text else ""
             audio_jp_str = f"{jp_text} [{romaji_str}]" if romaji_str and romaji_str != jp_text else jp_text
@@ -1930,6 +2045,7 @@ class MultimodalTranslator:
                 "cps_warning": cps_warn,
                 "condensation_directive": condensation_dir or "",
                 "notes": notes,
+                "third_person_subject": subj_3p_str,
                 "is_sign": vtype["is_sign"],
                 "visual_type": vtype["type_label"],
                 "visual_details": vtype["visual_details"],
@@ -2191,16 +2307,17 @@ class MultimodalTranslator:
         except UnicodeDecodeError:
             subs = pysubs2.load(str(subs_file), encoding="latin2")
 
-        # 0. Retrieve anime metadata from AniList
+        # 0. Retrieve anime metadata from AniList (with Gemini Parametric Knowledge Fallback)
         ref_filename = video_path if video_path else subs_path
-        anime_meta = get_anime_context(ref_filename)
+        client_for_meta = getattr(self, "client_pool", None) or self.client
+        anime_meta = get_anime_context(ref_filename, client=client_for_meta)
         anime_context_str = ""
         
         if anime_meta:
             anime_context_str = format_anime_context_for_prompt(anime_meta)
             title_name = anime_meta.get("title_romaji") or anime_meta.get("title_english") or "Seria"
             char_count = len(anime_meta.get("characters", []))
-            print(f"\n[Baza AniList] Rozpoznano serię: '{title_name}'")
+            print(f"\n[Baza Wiedzy Anime]: Rozpoznano serię: '{title_name}'")
             if anime_meta.get("genres"):
                 print(f"[Baza AniList] Gatunki: {', '.join(anime_meta['genres'])}")
             if anime_meta.get("setting_tags"):
@@ -2378,18 +2495,7 @@ class MultimodalTranslator:
                 series_title = Path(ref_path).stem.split(" - ")[0].replace("[ASW]", "").replace("[Erai-raws]", "").strip()
         self.series_bible = SeriesBible(anime_title=series_title)
         if episode_profile:
-            char_dict = {}
-            for c in episode_profile.characters:
-                char_key = f"{c.speaker} -> {c.listener}" if c.listener else c.speaker
-                char_dict[char_key] = f"Zwrot: '{c.address_form}' ({c.relationship_type})"
-            gloss_dict = {g.term_en: g.translation_pl for g in episode_profile.glossary}
-            ref_name = Path(video_path).stem if video_path else (Path(subs_path).stem if subs_path else "Odcinek")
-            self.series_bible.update_from_episode_profile(
-                episode_name=ref_name,
-                characters=char_dict,
-                glossary=gloss_dict
-            )
-            # Pre-populate global Character Registry from Episode Profile dossiers and declensions
+            # Pre-populate global Character Registry from Episode Profile dossiers and declensions first
             if getattr(episode_profile, "character_dossiers", None):
                 for cd in episode_profile.character_dossiers:
                     if cd.name and cd.name not in self.character_registry:
@@ -2400,6 +2506,24 @@ class MultimodalTranslator:
                     if nd.character_name and nd.character_name not in self.character_registry:
                         gender_pl = "kobieta" if nd.gender.upper() == "FEMALE" else ("mężczyzna" if nd.gender.upper() == "MALE" else nd.gender)
                         self.character_registry[nd.character_name] = f"{gender_pl} (postać)"
+
+            char_dict = {}
+            for c in episode_profile.characters:
+                char_key = f"{c.speaker} -> {c.listener}" if c.listener else c.speaker
+                char_dict[char_key] = f"Zwrot: '{c.address_form}' ({c.relationship_type})"
+
+            # Also persist standalone confirmed characters from Character Registry into Series Bible
+            for cname, creg in self.character_registry.items():
+                if cname and cname not in char_dict:
+                    char_dict[cname] = creg
+
+            gloss_dict = {g.term_en: g.translation_pl for g in episode_profile.glossary}
+            ref_name = Path(video_path).stem if video_path else (Path(subs_path).stem if subs_path else "Odcinek")
+            self.series_bible.update_from_episode_profile(
+                episode_name=ref_name,
+                characters=char_dict,
+                glossary=gloss_dict
+            )
 
         # 0c. Match Official Polish Manga Canon
         candidates_to_match = [series_title]
@@ -2943,7 +3067,9 @@ class MultimodalTranslator:
             final_subs, qg_fixes = EpisodeQualityGate.audit_and_fix_entire_episode(
                 final_subs,
                 custom_glossary=combined_glossary,
-                user_feedback_rules=all_user_rules
+                user_feedback_rules=all_user_rules,
+                character_registry=self.character_registry,
+                series_bible=getattr(self, "series_bible", None)
             )
             if qg_fixes:
                 en_warnings = [f for f in qg_fixes if "nieprzetłumaczony angielski" in f]

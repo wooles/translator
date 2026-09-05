@@ -63,6 +63,51 @@ class SeriesBible:
         except Exception:
             pass
 
+    def _sanitize_character_entry(self, name: str, details: str) -> str:
+        """
+        Guards Series Bible against gender poisoning and ambiguous descriptions (Layer 5).
+        - Filters out collective feminine nouns (e.g. 'służące w obozie', 'koleżanki')
+          when applied to male or mixed characters.
+        - Ensures explicit gender clarity for canonical oriental names on '-a'.
+        """
+        if not details:
+            return ""
+
+        CANONICAL_MALE_NAMES = {
+            "shira", "akira", "gaara", "ashitaka", "kiba", "soma", "kenta",
+            "ryoma", "hanza", "koba", "soya", "toma", "genga", "sinbad", "judar", "alibaba"
+        }
+
+        clean_desc = details.strip()
+        name_lower = name.lower()
+
+        # Check if the relationship or character involves a confirmed male character
+        involves_male = any(m in name_lower for m in CANONICAL_MALE_NAMES)
+        if not involves_male and hasattr(self, "data") and "characters" in self.data:
+            for k, v in self.data["characters"].items():
+                if k.lower() in name_lower:
+                    desc_v = str(v.get("description", "") if isinstance(v, dict) else v).lower()
+                    if any(w in desc_v for w in ["male", "mężczyzna", "chłopak", "męsk"]):
+                        involves_male = True
+                        break
+
+        # If a relationship or entry involves a male character, forbid collective feminine nouns
+        if involves_male:
+            # Replace ambiguous "służące" with "służba / podwładni"
+            clean_desc = re.sub(r"\bsłużące\b", "służba", clean_desc, flags=re.IGNORECASE)
+            clean_desc = re.sub(r"\bkoleżanki\b", "znajomi", clean_desc, flags=re.IGNORECASE)
+            clean_desc = re.sub(r"\bprzyjaciółki\b", "przyjaciele", clean_desc, flags=re.IGNORECASE)
+
+        # For standalone male names ending in '-a', enforce explicit gender and directive
+        is_standalone_male_a = any(name_lower == m for m in CANONICAL_MALE_NAMES)
+        if is_standalone_male_a:
+            if "mężczyzna" not in clean_desc.lower() and "male" not in clean_desc.lower():
+                clean_desc = f"MĘŻCZYZNA (postać) - {clean_desc}".strip()
+            if "kategoryczny nakaz form męskich" not in clean_desc.lower() and "ostrzegał" not in clean_desc.lower():
+                clean_desc = f"{clean_desc} [KATEGORYCZNY NAKAZ form męskich w czasie przeszłym: mówił / ostrzegał / pomógł]".strip()
+
+        return clean_desc
+
     def update_from_episode_profile(self, episode_name: str, characters: Dict[str, str], glossary: Dict[str, str]):
         """Updates glossary and character registry based on Profiler output of a new episode."""
         if episode_name and episode_name not in self.data["episodes_translated"]:
@@ -70,10 +115,28 @@ class SeriesBible:
 
         if characters:
             for name, details in characters.items():
+                if not name or not details:
+                    continue
+                clean_details = self._sanitize_character_entry(name, details)
                 if name not in self.data["characters"]:
-                    self.data["characters"][name] = {"description": details}
+                    self.data["characters"][name] = {"description": clean_details}
                 else:
-                    self.data["characters"][name]["description"] = details
+                    existing_entry = self.data["characters"][name]
+                    existing_desc = existing_entry.get("description", "") if isinstance(existing_entry, dict) else str(existing_entry)
+                    existing_lower = existing_desc.lower()
+
+                    # Protect confirmed gender against downgrading or overwriting
+                    has_confirmed_male = any(w in existing_lower for w in ["mężczyzna", "męsk", "male", "kategoryczny nakaz form męskich"])
+                    is_incoming_female = any(w in clean_details.lower() for w in ["kobieta", "żeńsk", "female", "służąca"])
+                    if has_confirmed_male and is_incoming_female:
+                        continue
+
+                    # If existing entry has rich directives/seiyū, do not overwrite with bare string
+                    has_rich_directives = any(w in existing_lower for w in ["kategoryczny", "nakaz", "seiyū", "bezwzględnie formy męskie"])
+                    if has_rich_directives and not any(w in clean_details.lower() for w in ["kategoryczny", "nakaz"]):
+                        continue
+
+                    self.data["characters"][name] = {"description": clean_details}
 
         if glossary:
             import re

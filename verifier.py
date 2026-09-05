@@ -192,6 +192,7 @@ class DialogueVerifier:
             notes_info = f" [Notatki: {item.get('notes')}]" if item.get('notes') else ""
             visual_info = f" [Położenie/Styl: {item.get('visual_details')}]" if item.get('visual_details') else ""
             region_info = f" [Kwadrant kadru: {item.get('screen_region')}]" if item.get('screen_region') else ""
+            subject_3p_info = f"  {item['third_person_subject']}\n" if item.get('third_person_subject') else ""
             audio_info = f"  JP (Audio ze słuchu Whisper): {item['audio_jp']}\n" if item.get("audio_jp") else ""
             alert_info = f"  [⚠️ ALARM ROZBIEŻNOŚCI AUDIO JP]: {item['audio_alert']}\n" if item.get("audio_alert") else ""
             vis_sub_info = f"  [🎬 Wizja, Mimika & Usta]: {item['visual_subtext']}\n" if item.get('visual_subtext') else ""
@@ -213,6 +214,7 @@ class DialogueVerifier:
 
             prompt_lines.append(
                 f"- [ID: {item['id']}]{type_tag}{semiotic_tag}{mode_tag}{char_info}{voice_info}{prosody_info}{dur_info}{song_info}{cps_info}{visual_info}{region_info}\n"
+                f"{subject_3p_info}"
                 f"{audio_info}"
                 f"{alert_info}"
                 f"{prag_reg_info}"

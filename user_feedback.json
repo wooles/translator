@@ -63,12 +63,12 @@
     "created_at": "2026-09-05 21:45:00"
   },
   {
-    "id": "fb_1788637550642",
+    "id": "fb_1788638585871",
     "original_en": "All creation",
     "bad_pl": "Wszelkie Stworzenie (Wszelkie Stworzenie)",
     "good_pl": "Wszelkie Stworzenie",
     "rule_reason": "Eliminacja dublowania",
     "scope": "global",
-    "created_at": "2026-09-05 21:45:50"
+    "created_at": "2026-09-05 22:03:05"
   }
 ]

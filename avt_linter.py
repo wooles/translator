@@ -800,6 +800,153 @@ class AVTLinter:
         modified = pattern.sub(repl, modified)
         return modified, fixes
 
+FEMININE_IRREGULAR_TO_MASCULINE = {
+    "była": "był",
+    "poszła": "poszedł",
+    "przyszła": "przyszedł",
+    "odeszła": "odszedł",
+    "weszła": "wszedł",
+    "wyszła": "wyszedł",
+    "doszła": "doszedł",
+    "przeszła": "przeszedł",
+    "znalazła": "znalazł",
+    "mogła": "mógł",
+    "pomogła": "pomógł",
+    "uciekła": "uciekł",
+    "upadła": "upadł",
+    "zmarła": "zmarł",
+    "dotarła": "dotarł",
+    "zjadła": "zjadł",
+    "upiekła": "upiekł",
+    "wiodła": "wiódł",
+    "niosła": "niósł",
+    "chciała": "chciał",
+    "miała": "miał",
+    "wiedziała": "wiedział",
+    "widziała": "widział",
+    "musiała": "musiał",
+}
+
+MASCULINE_IRREGULAR_TO_FEMININE = {
+    "był": "była",
+    "poszedł": "poszła",
+    "przyszedł": "przyszła",
+    "odszedł": "odeszła",
+    "wszedł": "weszła",
+    "wyszedł": "wyszła",
+    "doszedł": "doszła",
+    "przeszedł": "przeszła",
+    "znalazł": "znalazła",
+    "mógł": "mogła",
+    "pomógł": "pomogła",
+    "uciekł": "uciekła",
+    "upadł": "upadła",
+    "zmarł": "zmarła",
+    "dotarł": "dotarła",
+    "chciał": "chciała",
+    "miał": "miała",
+    "wiedział": "wiedziała",
+    "widział": "widziała",
+    "musiał": "musiała",
+}
+
+FIRST_PERSON_FEMININE_TO_MASCULINE = [
+    (r"\bpowinnam\s+była\b", "powinienem był"),
+    (r"\bpowinnam\b", "powinienem"),
+    (r"\bchciałabym\b", "chciałbym"),
+    (r"\bmogłabym\b", "mógłbym"),
+    (r"\bwolałabym\b", "wolałbym"),
+    (r"\bbyłam\b", "byłem"),
+    (r"\bzrobiłam\b", "zrobiłem"),
+    (r"\bposzłam\b", "poszedłem"),
+    (r"\bprzyszłam\b", "przyszedłem"),
+    (r"\bwiedziałam\b", "wiedziałem"),
+    (r"\bwidziałam\b", "widziałem"),
+    (r"\bmówiłam\b", "mówiłem"),
+    (r"\bczekałam\b", "czekałem"),
+    (r"\bmyślałam\b", "myślałem"),
+    (r"\bzrozumiałam\b", "zrozumiałem"),
+    (r"\bbałam\s+się\b", "bałem się"),
+    (r"\bsłyszałam\b", "słyszałem"),
+    (r"\bczułam\b", "czułem"),
+    (r"\bobiecałam\b", "obiecałem"),
+    (r"\bpostanowiłam\b", "postanowiłem"),
+    (r"\bwróciłam\b", "wróciłem"),
+    (r"\bznalazłam\b", "znalazłem"),
+    (r"\bodeszłam\b", "odszedłem"),
+    (r"\bwyszłam\b", "wyszedłem"),
+    (r"\bweszłam\b", "wszedłem")
+]
+
+FIRST_PERSON_MASCULINE_TO_FEMININE = [
+    (r"\bpowinienem\s+był\b", "powinnam była"),
+    (r"\bpowinienem\b", "powinnam"),
+    (r"\bchciałbym\b", "chciałabym"),
+    (r"\bmógłbym\b", "mogłabym"),
+    (r"\bwolałbym\b", "wolałabym"),
+    (r"\bbyłem\b", "byłam"),
+    (r"\bzrobiłem\b", "zrobiłam"),
+    (r"\bposzedłem\b", "poszłam"),
+    (r"\bprzyszedłem\b", "przyszłam"),
+    (r"\bwiedziałem\b", "wiedziałam"),
+    (r"\bwidziałem\b", "widziałam"),
+    (r"\bmówiłem\b", "mówiłam"),
+    (r"\bczekałem\b", "czekałam"),
+    (r"\bmyślałem\b", "myślałam"),
+    (r"\bzrozumiałem\b", "zrozumiałam"),
+    (r"\bbałem\s+się\b", "bałam się"),
+    (r"\bsłyszałem\b", "słyszałam"),
+    (r"\bczułem\b", "czułam"),
+    (r"\bobiecałem\b", "obiecałam"),
+    (r"\bpostanowiłem\b", "postanowiłam"),
+    (r"\bwróciłem\b", "wróciłam"),
+    (r"\bznalazłem\b", "znalazłam"),
+    (r"\bodszedłem\b", "odeszłam"),
+    (r"\bwyszedłem\b", "wyszłam"),
+    (r"\bwszedłem\b", "weszłam")
+]
+
+def convert_feminine_past_to_masculine(verb: str) -> Optional[str]:
+    v_lower = verb.lower()
+    if v_lower in FEMININE_IRREGULAR_TO_MASCULINE:
+        res = FEMININE_IRREGULAR_TO_MASCULINE[v_lower]
+        return res.capitalize() if verb[0].isupper() else res
+
+    if v_lower.endswith("ęła"):
+        res = v_lower[:-3] + "ął"
+    elif v_lower.endswith("iała"):
+        res = v_lower[:-4] + "iał"
+    elif v_lower.endswith("ała"):
+        res = v_lower[:-3] + "ał"
+    elif v_lower.endswith("iła"):
+        res = v_lower[:-3] + "ił"
+    elif v_lower.endswith("yła"):
+        res = v_lower[:-3] + "ył"
+    else:
+        return None
+
+    return res.capitalize() if verb[0].isupper() else res
+
+def convert_masculine_past_to_feminine(verb: str) -> Optional[str]:
+    v_lower = verb.lower()
+    if v_lower in MASCULINE_IRREGULAR_TO_FEMININE:
+        res = MASCULINE_IRREGULAR_TO_FEMININE[v_lower]
+        return res.capitalize() if verb[0].isupper() else res
+
+    if v_lower.endswith("ął"):
+        res = v_lower[:-2] + "ęła"
+    elif v_lower.endswith("iał"):
+        res = v_lower[:-3] + "iała"
+    elif v_lower.endswith("ał"):
+        res = v_lower[:-2] + "ała"
+    elif v_lower.endswith("ił"):
+        res = v_lower[:-2] + "iła"
+    elif v_lower.endswith("ył"):
+        res = v_lower[:-2] + "yła"
+    else:
+        return None
+
+    return res.capitalize() if verb[0].isupper() else res
 
 class EpisodeQualityGate:
     """
@@ -814,13 +961,85 @@ class EpisodeQualityGate:
         cls,
         subs: Any,  # pysubs2.SSAFile
         custom_glossary: Optional[Dict[str, str]] = None,
-        user_feedback_rules: Optional[List[Dict[str, Any]]] = None
+        user_feedback_rules: Optional[List[Dict[str, Any]]] = None,
+        character_registry: Optional[Dict[str, str]] = None,
+        series_bible: Optional[Any] = None
     ) -> Tuple[Any, List[str]]:
         if not subs or not hasattr(subs, "events") or not subs.events:
             return subs, []
 
         fixes: List[str] = []
         events = subs.events
+
+        # Step 0: Episode-Wide Character Gender Knowledge Base (Filar CLXII)
+        CANONICAL_MALE_NAMES_ON_A = {
+            "shira", "akira", "gaara", "ashitaka", "kiba", "soma", "kenta",
+            "ryoma", "hanza", "koba", "soya", "toma", "genga", "sinbad", "judar", "alibaba"
+        }
+        char_gender_map: Dict[str, str] = {}  # char_name_lower -> "MALE" or "FEMALE"
+
+        # 0a. From Character Registry
+        if character_registry:
+            for cname, cdesc in character_registry.items():
+                cd_lower = str(cdesc).lower()
+                gen = None
+                if any(k in cd_lower for k in ["male", "mężczyzna", "chłopak", "męsk"]):
+                    gen = "MALE"
+                elif any(k in cd_lower for k in ["female", "kobieta", "dziewczyn", "żeńsk"]):
+                    gen = "FEMALE"
+                if gen:
+                    for p in re.split(r"[/,]", cname):
+                        clean_p = p.strip()
+                        if len(clean_p) >= 3:
+                            char_gender_map[clean_p.lower()] = gen
+
+        # 0b. From Series Bible
+        if series_bible and hasattr(series_bible, "data"):
+            bible_chars = series_bible.data.get("characters", {})
+            for c_key, c_val in bible_chars.items():
+                desc_str = c_val.get("description", "") if isinstance(c_val, dict) else str(c_val)
+                desc_lower = desc_str.lower()
+                gen = None
+                if any(k in desc_lower for k in ["male", "mężczyzna", "chłopak", "męsk"]):
+                    gen = "MALE"
+                elif any(k in desc_lower for k in ["female", "kobieta", "dziewczyn", "żeńsk"]):
+                    gen = "FEMALE"
+                if gen:
+                    for n in re.findall(r"\b[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]{2,}\b", c_key):
+                        if n.lower() not in char_gender_map:
+                            char_gender_map[n.lower()] = gen
+
+        # 0c. Canonical Male Names on '-a'
+        for m_name in CANONICAL_MALE_NAMES_ON_A:
+            if m_name not in char_gender_map:
+                char_gender_map[m_name] = "MALE"
+
+        # 0d. Empirical self-reference extraction across entire episode script
+        speaker_male_votes: Dict[str, int] = {}
+        speaker_female_votes: Dict[str, int] = {}
+
+        for ev in events:
+            if not ev.text or not getattr(ev, "name", None):
+                continue
+            spk_norm = ev.name.strip().lower()
+            if not spk_norm or len(spk_norm) < 3:
+                continue
+            clean_t = re.sub(r"\{[^\}]*\}", "", ev.text).lower()
+
+            if re.search(r"\b(powinienem|mógłbym|chciałbym|wolałbym|poszedłem|zrobiłem|byłem|widziałem|wiedziałem|pomyślałem|mówiłem|czekałem|wróciłem|znalazłem|przyszedłem|odszedłem|wyszedłem|wszedłem|zrozumiałem|myślałem|słyszałem|czułem|obiecałem|postanowiłem)\b", clean_t):
+                speaker_male_votes[spk_norm] = speaker_male_votes.get(spk_norm, 0) + 1
+
+            if re.search(r"\b(powinnam|mogłabym|chciałabym|wolałabym|poszłam|zrobiłam|byłam|widziałam|wiedziałam|pomyślałam|mówiłam|czekałam|wróciłam|znalazłam|przyszłam|odeszłam|wyszłam|weszłam|zrozumiałam|myślałam|słyszałam|czułam|obiecałam|postanowiłam)\b", clean_t):
+                speaker_female_votes[spk_norm] = speaker_female_votes.get(spk_norm, 0) + 1
+
+        for spk, m_count in speaker_male_votes.items():
+            f_count = speaker_female_votes.get(spk, 0)
+            if m_count > f_count and spk not in char_gender_map:
+                char_gender_map[spk] = "MALE"
+        for spk, f_count in speaker_female_votes.items():
+            m_count = speaker_male_votes.get(spk, 0)
+            if f_count > m_count and spk not in char_gender_map:
+                char_gender_map[spk] = "FEMALE"
 
         for i, ev in enumerate(events):
             if not ev.text or not ev.text.strip():
@@ -947,6 +1166,77 @@ class EpisodeQualityGate:
                             if re.search(dr_pat, ev.text, re.IGNORECASE):
                                 ev.text = re.sub(dr_pat, dr_rep, ev.text, flags=re.IGNORECASE)
                                 fixes.append(f"[Episode Quality Gate - Filar CLVII T-V Invariance] Linia #{i+1}: skorygowano nieuzasadniony zwrot formalny na 2. os. '{dr_rep}' po zwróceniu się po imieniu")
+
+            # 3c. CHARACTER GENDER CONSISTENCY GUARD (Filar CLXII)
+            if not is_sign:
+                # 3c-1: 1st-person self-reference consistency for the speaker
+                if getattr(ev, "name", None):
+                    spk_name_lower = ev.name.strip().lower()
+                    spk_gen = char_gender_map.get(spk_name_lower)
+                    if spk_gen == "MALE":
+                        for f_pat, m_repl in FIRST_PERSON_FEMININE_TO_MASCULINE:
+                            if re.search(f_pat, ev.text, re.IGNORECASE):
+                                def _m_case_repl(m, repl=m_repl):
+                                    return repl.capitalize() if m.group(0)[0].isupper() else repl
+                                ev.text = re.sub(f_pat, _m_case_repl, ev.text, flags=re.IGNORECASE)
+                                fixes.append(f"[Episode Quality Gate - Spójność Płci Postaci] Linia #{i+1}: skorygowano 1. os. na rodzaj męski dla mówcy '{ev.name}'")
+                    elif spk_gen == "FEMALE":
+                        for m_pat, f_repl in FIRST_PERSON_MASCULINE_TO_FEMININE:
+                            if re.search(m_pat, ev.text, re.IGNORECASE):
+                                def _f_case_repl(m, repl=f_repl):
+                                    return repl.capitalize() if m.group(0)[0].isupper() else repl
+                                ev.text = re.sub(m_pat, _f_case_repl, ev.text, flags=re.IGNORECASE)
+                                fixes.append(f"[Episode Quality Gate - Spójność Płci Postaci] Linia #{i+1}: skorygowano 1. os. na rodzaj żeński dla mówczyni '{ev.name}'")
+
+                # 3c-2: 3rd-person subject-verb past-tense agreement
+                for char_lower, gender in char_gender_map.items():
+                    if len(char_lower) < 3:
+                        continue
+                    # Match name (normal order): [Name] [optional adverb] [verb]
+                    # Matches across \N (hard line break) as well as regular whitespace
+                    sp_regex = r"(?:\s+|\\N)+"
+                    pat_forward = rf"\b([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+)" + sp_regex + rf"(?:(już|też|wtedy|wczoraj|zawsze|nigdy|właśnie|przecież|tylko|jedynie|naprawdę)" + sp_regex + rf")?([A-Za-ząćęłńóśźż]+)\b"
+                    for m in list(re.finditer(pat_forward, ev.text)):
+                        matched_name = m.group(1)
+                        if matched_name.lower() != char_lower:
+                            continue
+                        verb = m.group(3)
+                        if gender == "MALE":
+                            new_v = convert_feminine_past_to_masculine(verb)
+                            if new_v and new_v.lower() != verb.lower():
+                                old_chunk = m.group(0)
+                                new_chunk = old_chunk.replace(verb, new_v, 1)
+                                ev.text = ev.text.replace(old_chunk, new_chunk, 1)
+                                fixes.append(f"[Episode Quality Gate - Spójność Płci Postaci] Linia #{i+1}: skorygowano orzeczenie 3. osoby '{matched_name} {verb}' -> '{matched_name} {new_v}' (potwierdzona płeć męska)")
+                        elif gender == "FEMALE":
+                            new_v = convert_masculine_past_to_feminine(verb)
+                            if new_v and new_v.lower() != verb.lower():
+                                old_chunk = m.group(0)
+                                new_chunk = old_chunk.replace(verb, new_v, 1)
+                                ev.text = ev.text.replace(old_chunk, new_chunk, 1)
+                                fixes.append(f"[Episode Quality Gate - Spójność Płci Postaci] Linia #{i+1}: skorygowano orzeczenie 3. osoby '{matched_name} {verb}' -> '{matched_name} {new_v}' (potwierdzona płeć żeńska)")
+
+                    # Match name (inverted order): [verb] [optional pronoun] [Name]
+                    pat_inverted = rf"\b([A-Za-ząćęłńóśźż]+)" + sp_regex + rf"(?:(mnie|nas|go|ją|ich|mu|jej|im|cię|wam)" + sp_regex + rf")?([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+)\b"
+                    for m in list(re.finditer(pat_inverted, ev.text)):
+                        matched_name = m.group(3)
+                        if matched_name.lower() != char_lower:
+                            continue
+                        verb = m.group(1)
+                        if gender == "MALE":
+                            new_v = convert_feminine_past_to_masculine(verb)
+                            if new_v and new_v.lower() != verb.lower():
+                                old_chunk = m.group(0)
+                                new_chunk = old_chunk.replace(verb, new_v, 1)
+                                ev.text = ev.text.replace(old_chunk, new_chunk, 1)
+                                fixes.append(f"[Episode Quality Gate - Spójność Płci Postaci] Linia #{i+1}: skorygowano orzeczenie szyku przestawnego '{verb} {matched_name}' -> '{new_v} {matched_name}' (potwierdzona płeć męska)")
+                        elif gender == "FEMALE":
+                            new_v = convert_masculine_past_to_feminine(verb)
+                            if new_v and new_v.lower() != verb.lower():
+                                old_chunk = m.group(0)
+                                new_chunk = old_chunk.replace(verb, new_v, 1)
+                                ev.text = ev.text.replace(old_chunk, new_chunk, 1)
+                                fixes.append(f"[Episode Quality Gate - Spójność Płci Postaci] Linia #{i+1}: skorygowano orzeczenie szyku przestawnego '{verb} {matched_name}' -> '{new_v} {matched_name}' (potwierdzona płeć żeńska)")
 
             # 4. RESIDUAL ENGLISH CALQUE SWEEP (Belczyk AVT Canon)
             for item in AVTLinter.FIXED_REPLACEMENTS:

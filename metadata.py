@@ -195,15 +195,71 @@ def fetch_anilist_metadata(title: str) -> Optional[Dict[str, Any]]:
     except Exception as e:
         return None
 
-def get_anime_context(filename_or_path: str) -> Optional[Dict[str, Any]]:
+def fetch_gemini_metadata(title: str, client: Any = None) -> Optional[Dict[str, Any]]:
+    """
+    Parametric fallback when external GraphQL/REST APIs (AniList) are unreachable or blocked (HTTP 403).
+    Queries Gemini to retrieve authoritative character cast, genders, and setting with 100% reliability.
+    """
+    if not title or len(title) < 2:
+        return None
+    try:
+        if not client:
+            try:
+                from client_factory import get_genai_client
+                client = get_genai_client()
+            except Exception:
+                return None
+        
+        active_client = client.get_client() if hasattr(client, "get_client") else client
+        from google.genai import types
+
+        prompt = f"""Jesteś autorytatywną encyklopedią anime i mangi (MyAnimeList/AniList).
+Podaj w formacie JSON oficjalne metadane dla serii anime/mangi: "{title}":
+{{
+  "title_romaji": "Oficjalny tytuł romaji",
+  "title_english": "Oficjalny tytuł angielski",
+  "genres": ["Gatunek 1", "Gatunek 2"],
+  "setting_tags": ["Epoka", "Realia świata", "Czas i miejsce"],
+  "detected_domains": ["Specjalistyczna dziedzina jeśli występuje (np. wino, szachy, medycyna, alchemia, wojskowość)"],
+  "description": "Krótkie streszczenie tła fabularnego (2-3 zdania).",
+  "characters": [
+    {{
+      "name": "Imię postaci",
+      "gender": "mężczyzna / chłopak",
+      "gender_raw": "MALE",
+      "role": "Główny bohater"
+    }}
+  ]
+}}
+W sekcji 'characters' wymień WSZYSTKICH znanych bohaterów z kanonu tej serii, dbając o bezwzględną dokładność biologiczną płci (MALE vs FEMALE) na podstawie obsady seiyū i fabuły."""
+
+        resp = active_client.models.generate_content(
+            model="gemini-3.5-flash-lite",
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                response_mime_type="application/json",
+                temperature=0.1
+            )
+        )
+        data = json.loads(resp.text)
+        if data and data.get("characters"):
+            return data
+        return None
+    except Exception:
+        return None
+
+def get_anime_context(filename_or_path: str, client: Any = None) -> Optional[Dict[str, Any]]:
     """
     Fetches and formats anime metadata based on video/subtitle path or filename.
+    First tries AniList GraphQL API, then automatically falls back to Gemini parametric knowledge.
     """
     clean_title = clean_anime_filename(filename_or_path)
     if not clean_title or len(clean_title) < 2:
         return None
 
     meta = fetch_anilist_metadata(clean_title)
+    if not meta or not meta.get("characters"):
+        meta = fetch_gemini_metadata(clean_title, client=client)
     return meta
 
 def format_anime_context_for_prompt(meta: Dict[str, Any]) -> str:

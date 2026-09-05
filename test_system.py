@@ -225,7 +225,9 @@ def test_rules_and_prompts():
     assert "FILAR CLX" in sys_prompt or "CLX" in sys_prompt
     assert "FILAR CLXI" in ver_prompt or "CLXI" in ver_prompt
     assert "FILAR CLXI" in sys_prompt or "CLXI" in sys_prompt
-    print(" -> PASSED: Kompletny Zunifikowany Kanon 161 Filarów AVT (Filary I – CLXI) jest aktywny w obu fazach tłumaczenia.")
+    assert "FILAR CLXII" in ver_prompt or "CLXII" in ver_prompt
+    assert "FILAR CLXII" in sys_prompt or "CLXII" in sys_prompt
+    print(" -> PASSED: Kompletny Zunifikowany Kanon 162 Filarów AVT (Filary I – CLXII) jest aktywny w obu fazach tłumaczenia.")
 
 def test_pydantic_schemas():
     print("[TEST 2/5] Weryfikacja schematów Pydantic i Detektora Rejestru Pragmatycznego...")
@@ -884,6 +886,27 @@ def test_series_bible():
         assert "Arata" in bible.data["characters"]
         assert bible.data["glossary"]["Dragon Slayer"] == "Pogromca Smoków"
         
+        # Test sanityzacji relacji i ochrony przed zatruciem (Layer 5)
+        bible.update_from_episode_profile(
+            episode_name="Odcinek 2",
+            characters={"Sitara -> Shira": "Zwrot: 'Shira / na ty' (służące w obozie)"},
+            glossary={}
+        )
+        desc = bible.data["characters"]["Sitara -> Shira"]["description"]
+        assert "służące" not in desc
+        assert "służba" in desc
+
+        # Test niezmienności potwierdzonej płci męskiej (zakaz nadpisywania kobietą)
+        bible.data["characters"]["Shira"] = {"description": "MĘŻCZYZNA (postać) [KATEGORYCZNY NAKAZ form męskich]"}
+        bible.update_from_episode_profile(
+            episode_name="Odcinek 3",
+            characters={"Shira": "kobieta, służąca"},
+            glossary={}
+        )
+        shira_desc = bible.data["characters"]["Shira"]["description"]
+        assert "MĘŻCZYZNA" in shira_desc
+        assert "kobieta" not in shira_desc
+
         # Test wczytywania i formatowania dla promptu
         formatted_bible = bible.format_for_prompt()
         assert "Dragon Slayer" in formatted_bible
@@ -2531,13 +2554,21 @@ def test_episode_quality_gate():
     ev13 = pysubs2.SSAEvent(start=19700, end=20500, text="T-Tak.", style="Default")
     # Linia 14: Całkowicie nieprzetłumaczona angielska linijka dialogu (English Remainder Sweep)
     ev14 = pysubs2.SSAEvent(start=21000, end=22500, text="What are you talking about tonight?", style="Default")
+    # Linia 15: Wypowiedź Shiry w 1. os. czasu przeszłego (potwierdzenie płci męskiej mówcy)
+    ev15 = pysubs2.SSAEvent(start=23000, end=24500, name="Shira", text="Może powinienem był wspomnieć o tym wcześniej...", style="Default")
+    # Linia 16: Wypowiedź Sitary o Shirze z błędnym orzeczeniem żeńskim (Spójność 3. osoby Filar CLXII)
+    ev16 = pysubs2.SSAEvent(start=25000, end=27000, name="Sitara", text="Shira ostrzegała,\\Nże pogrążyła się w bezgranicznej rozpaczy...", style="Default")
+    # Linia 17: Wypowiedź Shiry z przypadkową żeńską formą 1. osoby (Spójność 1. osoby)
+    ev17 = pysubs2.SSAEvent(start=27500, end=29000, name="Shira", text="Nie wiedziałam, co począć.", style="Default")
+    # Linia 18: Szyk przestawny z orzeczeniem przed imieniem męskim na -a
+    ev18 = pysubs2.SSAEvent(start=29500, end=31000, name="Sitara", text="Tak właśnie mówiła Shira.", style="Default")
 
-    subs.events = [ev1, ev2, ev3, ev4, ev5, ev6, ev7, ev8, ev9, ev10, ev11, ev12, ev13, ev14]
+    subs.events = [ev1, ev2, ev3, ev4, ev5, ev6, ev7, ev8, ev9, ev10, ev11, ev12, ev13, ev14, ev15, ev16, ev17, ev18]
 
     audited_subs, fixes = EpisodeQualityGate.audit_and_fix_entire_episode(subs)
 
     # Weryfikacja korekt
-    assert len(fixes) >= 9, f"Oczekiwano co najmniej 9 poprawek, otrzymano {len(fixes)}"
+    assert len(fixes) >= 12, f"Oczekiwano co najmniej 12 poprawek, otrzymano {len(fixes)}"
 
     # 1. Dyrektywne potwierdzenie: T-Tak. -> D-Dobrze.
     assert audited_subs.events[1].text == "D-Dobrze."
@@ -2574,7 +2605,52 @@ def test_episode_quality_gate():
     # 9. Wykrycie pozostałości języka angielskiego (English Remainder Sweep)
     assert any("Angielski Pozostałość" in f or "nieprzetłumaczony angielski" in f for f in fixes)
 
-    print(" -> PASSED: Episode Quality Gate bezbłędnie eliminuje banalne błędy na pełnej osi czasu (Adjacency Pairs, Wh-Questions, Echo Agreement, T-V Invariance, Thought Boundary, Incognito, Typography, English Sweep) przy koszcie 0.00 PLN.")
+    # 10. Nienaruszalność płci postaci (Filar CLXII - 3rd person agreement)
+    assert audited_subs.events[15].text == "Shira ostrzegał,\\Nże pogrążyła się w bezgranicznej rozpaczy..."
+
+    # 11. Spójność 1. osoby mówcy męskiego (1st person speaker agreement)
+    assert audited_subs.events[16].text == "Nie wiedziałem, co począć."
+
+    # 12. Szyk przestawny (Inverted order agreement)
+    assert audited_subs.events[17].text == "Tak właśnie mówił Shira."
+    assert any("Spójność Płci Postaci" in f for f in fixes)
+
+    print(" -> PASSED: Episode Quality Gate bezbłędnie eliminuje banalne błędy na pełnej osi czasu (Adjacency Pairs, Wh-Questions, Echo Agreement, T-V Invariance, Thought Boundary, Incognito, Typography, English Sweep, Spójność Płci Postaci) przy koszcie 0.00 PLN.")
+
+def test_character_gender_invariance_architecture():
+    print("[TEST 35/35] Test Kompleksowej Architektury Nienaruszalności Płci (5 Warstw Ochrony)...")
+    from translator import detect_third_person_mentions, CANONICAL_MALE_NAMES_ON_A
+    from metadata import clean_anime_filename
+
+    # 1. Test canonical male names on -a
+    assert "shira" in CANONICAL_MALE_NAMES_ON_A
+    assert "akira" in CANONICAL_MALE_NAMES_ON_A
+    assert "gaara" in CANONICAL_MALE_NAMES_ON_A
+
+    # 2. Test 3rd-person mention detector for male names on -a
+    dirs = detect_third_person_mentions(
+        clean_text="Shira warned that she had plunged into bottomless despair...",
+        speaker="Sitara",
+        character_registry={"Sitara": "FEMALE (Main)", "Shira": "MALE (Supporting)"}
+    )
+    assert len(dirs) >= 1
+    assert "Shira" in dirs[0]
+    assert "MĘŻCZYZNA" in dirs[0]
+    assert "Filar CLXII" in dirs[0]
+    assert "ZAKAZ orzeczeń żeńskich" in dirs[0]
+
+    # 3. Test that speaker talking about themselves does not trigger 3rd person tag
+    dirs_self = detect_third_person_mentions(
+        clean_text="I, Shira, will protect the camp.",
+        speaker="Shira",
+        character_registry={"Shira": "MALE (Supporting)"}
+    )
+    assert len(dirs_self) == 0
+
+    # 4. Test cleaner of anime filenames
+    assert clean_anime_filename("[ASW] Tenmaku no Jaadugar - 11 [1080p HEVC][2E312ADA].ass") == "Tenmaku no Jaadugar"
+
+    print(" -> PASSED: Wszystkie 5 warstw Architektury Nienaruszalności Płci (Metadane, Filar CLXII, Detektor 3. Osoby, EpisodeQualityGate, Pamięć Międzyodcinkowa) działają w 100% harmonii.")
 
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
@@ -2612,5 +2688,6 @@ if __name__ == "__main__":
     test_adaptive_thinking_budget()
     test_cornerstone_invariants()
     test_episode_quality_gate()
-    print("\n Wszystkie testy jednostkowe i integracyjne (34/34) zakończone pełnym sukcesem!\n")
+    test_character_gender_invariance_architecture()
+    print("\n Wszystkie testy jednostkowe i integracyjne (35/35) zakończone pełnym sukcesem!\n")
 

@@ -1496,8 +1496,19 @@ FILAR CLXI: NIENARUSZALNOŚĆ PERSPEKTYWY NARRACYJNEJ I ZAKAZ ZDRADY TOŻSAMOŚC
       - Gdy postać rozmawia z bohaterem ukrywającym swoją tożsamość (np. Felix mówi o Wiedźmie Milczenia w obecności Moniki), tłumaczowi KATEGORYCZNIE ZABRANIA SIĘ zamiany wypowiedzi w 3. osobie na 1. osobę ('by the Silent Witch' / 'Chinmoku no majo no ronbun' -> NAKAZ: 'Wiedźmy Milczenia', BEZWZGLĘDNY ZAKAZ: 'mój', 'mój esej', 'moja praca')!
       - Tłumacz ma wiernie oddawać punkt widzenia i wiedzę mówiącej na ekranie postaci (wiedza diegetyczna mówcy), a nie omniscientną wiedzę widza/modelu o ukrytej tożsamości rozmówcy!
    2. ZAKAZ SAMOWOLNEJ KONWERSJI DIALOGU NA MYŚL (ANTI-PERSPECTIVE DRIFT):
-      - Jeśli w skrypcie wejściowym kwestia nie ma kursywy, a postać na ekranie mówi na głos (dialog diegetyczny), KATEGORYCZNIE ZABRANIA SIĘ dodawania tagów {\\i1} i zamieniania wypowiedzi na monolog wewnętrzny innej postaci tylko dlatego, że w sąsiednich linijkach pojawiały się myśli.
+      - Jeśli w skrypcie wejściowym kwestia nie ma kursywy, a postać na ekranie mówi na głos (dialog diegetyczny), KATEGORYCZNIE ZABRANIA SIĘ dodawania tagów {\i1} i zamieniania wypowiedzi na monolog wewnętrzny innej postaci tylko dlatego, że w sąsiednich linijkach pojawiały się myśli.
       - Nie przypisuj słów wypowiedzianych na głos innej postaci pod postacią rzekomej myśli!
+
+FILAR CLXII: NIENARUSZALNOŚĆ PŁCI GRAMATYCZNEJ IMION ORIENTALNYCH NA '-A' (GRAMMATICAL GENDER INVARIANCE FOR NAMES ENDING IN '-A')
+   1. ZAKAZ ZŁUDZENIA MORFOLOGICZNEGO (KOŃCÓWKA '-A' TO NIE ZAWSZE KOBIETA!):
+      - W języku polskim i językach indoeuropejskich samogłoska '-a' na końcu imienia silnie sugeruje płeć żeńską. W anime niezliczone imiona japońskie, mongolskie, perskie, arabskie i fantasy kończą się na '-a' i są to BEZWZGLĘDNIE POSTACIE MĘSKIE (np. Shira, Akira, Gaara, Ashitaka, Kiba, Soma, Kenta, Ryoma, Hanza, Koba, Soya, Toma, Genga, Sinbad, Judar, Alibaba)!
+      - KATEGORYCZNIE ZABRANIA SIĘ automatycznego wnioskowania, że postać jest kobietą, wyłącznie dlatego, że jej imię kończy się na samogłoskę '-a'! Zawsze weryfikuj płeć ze skryptu, relacji i głosu seiyū.
+   2. ŻELAZNA ZGODA CZASOWNIKA W CZASIE PRZESZŁYM (ORZECZENIE MĘSKIE DLA POSTACI MĘSKIEJ):
+      - Chociaż w języku polskim imiona męskie na '-a' odmieniają się przez przypadki według deklinacji żeńskiej (M. Shira, D. Shiry, C. Shirze, B. Shirę, N. z Shirą, Msc. o Shirze), to WSZYSTKIE czasowniki w czasie przeszłym, przymiotniki i imiesłowy orzekające o nich BEZWZGLĘDNIE MUSZĄ MIEĆ RODZAJ MĘSKI:
+        * PRAWIDŁOWO: "Shira ostrzegał", "Shira mówił", "Shira wiedział", "Shira przyszedł", "Shira pomógł", "Shira był zmęczony".
+        * KARDYNALNY BŁĄD: "Shira ostrzegała", "Shira mówiła", "Shira przyszła", "Shira była".
+   3. SPÓJNOŚĆ WZMIANEK W 3. OSOBIE (THIRD-PERSON ENTITY AGREEMENT):
+      - Gdy inna postać (np. kobieta) wspomina w dialogu lub myśli o męskim bohaterze ("Shira did tell me that...", "Akira said..."), orzeczenie dotyczące tej osoby bezwzględnie zachowuje rodzaj męski ("Shira ostrzegał mnie / Shira mówił mi"), całkowicie niezależnie od płci osoby mówiącej w kadrze!
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -2344,6 +2355,7 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
       * "[Filar CLIX - Metoda Aktorska i Model Sceny] Zredagowano kwestię pod kątem rytmu oddechu i ekspresji aktora dubbingowego (eliminacja papierowego brzmienia i sztywności)"
       * "[Filar CLX - Dekompozycja Semiotyczna] Rozdzielono dymek mangi/halucynację od komentarza zza kadru w dwa niezależne tory ontologiczne"
       * "[Filar CLXI - Nienaruszalność Perspektywy] 'by the Silent Witch' wypowiedziane przez rozmówcę -> 'Wiedźmy Milczenia' (ZAKAZ podmiany 3. osoby na 1. osobę 'mój esej' z powodu ukrytej tożsamości Moniki; zakaz dodawania {{\\i1}} do słów mówionych na głos)"
+      * "[Filar CLXII - Nienaruszalność Płci Imion na '-a'] 'Shira did tell me' -> 'Shira ostrzegał mnie / Shira mówił mi' (ZAKAZ 'Shira ostrzegała'; postać męska o imieniu na '-a' bezwzględnie wymaga orzeczenia męskiego w czasie przeszłym)"
       * "[Filar XLIII/CXLVI - Dyrektywne Potwierdzenie] 'Uważaj pod nogi!' -> 'T-Tak' -> 'D-Dobrze' / 'Będę uważać' (ZAKAZ 'Tak' po ostrzeżeniu/poleceniu)"
 
 {BELCZYK_AVT_MASTER_CANON}
@@ -3247,6 +3259,18 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
             "Gdy postać mówi na głos w 3. osobie (np. 'by the Silent Witch' / 'Chinmoku no majo no ronbun'), "
             "KATEGORYCZNIE ZABRANIA SIĘ zamiany wypowiedzi na 1. osobę ('mój esej') ze względu na ukrytą tożsamość rozmówcy! "
             "Zakaz samowolnego dodawania kursywy {\\i1} do dialogów mówionych na głos – tłumacz świat przedstawiony z perspektywy mówcy!"
+        )
+
+    # 102. Nienaruszalność Płci Imion Orientalnych na '-a' (Filar CLXII)
+    has_name_on_a_trigger = any(
+        re.search(r"\b(shira|akira|gaara|ashitaka|kiba|soma|kenta|ryoma|hanza|koba|soya|toma|genga|sinbad|judar|alibaba)\b", str(item.get("en", "")), re.IGNORECASE) or
+        any("filar clxii" in str(item.get("notes", "")).lower() for item in [item])
+        for item in batch_items
+    )
+    if has_name_on_a_trigger:
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CLXII - Nienaruszalność Płci Imion Orientalnych na '-a']: "
+            "Imiona męskie kończące się na samogłoskę '-a' (np. Shira, Akira, Gaara, Ashitaka) wymagają BEZWZGLĘDNIE orzeczeń i czasowników w rodzaju męskim w czasie przeszłym ('Shira ostrzegał / mówił / pomógł / przyszedł'). KATEGORYCZNY ZAKAZ form żeńskich ('Shira ostrzegała / mówiła')!"
         )
 
     if not focused_pillars:

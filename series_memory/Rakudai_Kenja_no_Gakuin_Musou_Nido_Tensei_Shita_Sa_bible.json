@@ -2,10 +2,10 @@
   "anime_title": "Rakudai Kenja no Gakuin Musou: Nido Tensei Shita Saikyou Kenja, 400-nengo no Sekai wo Maken de Musou",
   "characters": {
     "Anastasia -> Eftal": {
-      "description": "Zwrot: 'panie / Panie Eftalu' (ocalona służąca -> wybawca i mistrz)"
+      "description": "Zwrot: 'Mistrzu' (ocalona niewolnica -> wybawca i mentor)"
     },
     "Merlin -> Eftal": {
-      "description": "Zwrot: 'na ty / Eftalu' (dawna uczennica i powierniczka -> mistrz z poprzedniego życia)"
+      "description": "Zwrot: 'na ty / Eftalu' (dawna uczennica i towarzyszka broni -> mentor)"
     },
     "Merlin -> Maria": {
       "description": "Zwrot: 'Siostrzyczko Mario' (udawane dziecko -> nauczycielka)"
@@ -14,10 +14,10 @@
       "description": "Zwrot: 'Merlin' (koleżanki / uczennice tego samego mistrza)"
     },
     "Eftal -> Anastasia": {
-      "description": "Zwrot: 'na ty / Anastasio' (mistrz / opiekun -> podopieczna)"
+      "description": "Zwrot: 'na ty / Anastasio' (opiekun i mistrz -> podopieczna)"
     },
     "Eftal -> Merlin": {
-      "description": "Zwrot: 'na ty / Merlin' (mistrz -> zaufana towarzyszka)"
+      "description": "Zwrot: 'na ty / Merlin' (mistrz -> oddana powierniczka)"
     },
     "Seiryu -> Eftal": {
       "description": "Zwrot: 'człowieku / nędzny śmiertelniku' (bóstwo paktu -> bezczelny buntownik)"
@@ -40,8 +40,11 @@
     "Physical Enhancement": "Wzmocnienie Fizyczne",
     "Enhance Divine Domain": "Wzmocnienie Boskiej Domeny",
     "Thor's Lance": "Włócznia Thora",
-    "Lightning Emperor": "Cesarz Błyskawic",
-    "Contract-Breaker": "Pogromca Przymierzy"
+    "Lightning Emperor": "Władca Błyskawic",
+    "Contract-Breaker": "Pogromca Przymierzy",
+    "Contract beast": "Bestia paktu",
+    "Slave crest": "Piętno niewolnika",
+    "Four Holy Beasts": "Cztery Święte Bestie"
   },
   "relationships": {},
   "episodes_translated": [
