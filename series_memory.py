@@ -34,6 +34,7 @@ class SeriesBible:
             "characters": {},          # { "Arata": {"gender": "męska", "role": "uczeń", "forms": "Arata"} }
             "glossary": {},            # { "Choushi": "czara na sake", "Dragon Slayer": "Pogromca Smoków" }
             "relationships": {},      # { "Kokoro->Arata": "po imieniu / na ty", "Uczniowie->Teshima": "pani Teshima" }
+            "plot_anchors": {},        # { "kamień jada": "rytualny artefakt wywołujący deszcz", "zbieg z Samarkandy": "Shira" }
             "episodes_translated": []  # ["odcinek 1", "odcinek 2"]
         }
         self.load()
@@ -108,8 +109,14 @@ class SeriesBible:
 
         return clean_desc
 
-    def update_from_episode_profile(self, episode_name: str, characters: Dict[str, str], glossary: Dict[str, str]):
-        """Updates glossary and character registry based on Profiler output of a new episode."""
+    def update_from_episode_profile(
+        self,
+        episode_name: str,
+        characters: Dict[str, str],
+        glossary: Dict[str, str],
+        plot_anchors: Optional[Dict[str, str]] = None
+    ):
+        """Updates glossary, character registry, and plot anchors based on Profiler output of a new episode."""
         if episode_name and episode_name not in self.data["episodes_translated"]:
             self.data["episodes_translated"].append(episode_name)
 
@@ -146,6 +153,16 @@ class SeriesBible:
                     clean_v = re.sub(r"\s*[\(\[].*?[\)\]]", "", v).strip()
                     self.data["glossary"][k] = clean_v if clean_v else v.strip()
 
+        if plot_anchors:
+            if "plot_anchors" not in self.data:
+                self.data["plot_anchors"] = {}
+            for k, v in plot_anchors.items():
+                if k and v:
+                    clean_k = str(k).strip()
+                    clean_v = str(v).strip()
+                    if clean_k and clean_v:
+                        self.data["plot_anchors"][clean_k] = clean_v
+
         self.save()
 
     def format_for_prompt(self) -> str:
@@ -153,7 +170,7 @@ class SeriesBible:
         lines = []
         has_content = False
 
-        if self.data["characters"] or self.data["glossary"]:
+        if self.data["characters"] or self.data["glossary"] or self.data.get("plot_anchors"):
             lines.append("--- BIBLIA SERIALU (PAMIĘĆ MIĘDZYODCINKOWA SEZONU) ---")
             lines.append(f"Seria: '{self.anime_title}' (Przetłumaczono odcinków: {len(self.data['episodes_translated'])})")
             
@@ -168,6 +185,12 @@ class SeriesBible:
                 lines.append("• Ustalone nazwy i terminologia z poprzednich odcinków (ZACHOWAJ SPÓJNOŚĆ!):")
                 for src, trg in list(self.data["glossary"].items())[:12]:
                     lines.append(f"  - '{src}' -> '{trg}'")
+                has_content = True
+
+            if self.data.get("plot_anchors"):
+                lines.append("• Kluczowe rekwizyty i kotwice fabularne (PLOT ANCHORS - ZACHOWAJ CIĄGŁOŚĆ!):")
+                for item_key, directive in list(self.data["plot_anchors"].items())[:8]:
+                    lines.append(f"  - [{item_key}]: {directive}")
                 has_content = True
 
             lines.append("-------------------------------------------------------\n")
@@ -188,6 +211,10 @@ class SeriesBible:
         rel_rows = ""
         for pair, rel in self.data.get("relationships", {}).items():
             rel_rows += f"<tr><td><strong>{pair}</strong></td><td>{rel}</td></tr>"
+
+        anchor_rows = ""
+        for p_item, p_dir in self.data.get("plot_anchors", {}).items():
+            anchor_rows += f"<tr><td><strong>{p_item}</strong></td><td>{p_dir}</td></tr>"
 
         episodes_list = ", ".join(self.data.get("episodes_translated", [])) or "Brak przetłumaczonych odcinków"
 
@@ -215,7 +242,7 @@ class SeriesBible:
   <h1>📖 Biblia Serialu: {self.anime_title}</h1>
   <div class="meta">
     <p>📺 <strong>Przetłumaczone odcinki:</strong> {episodes_list}</p>
-    <p>🛡️ <strong>Liczba wpisów w pamięci ciągłości:</strong> {len(self.data.get('characters', {}))} postaci | {len(self.data.get('glossary', {}))} terminów</p>
+    <p>🛡️ <strong>Liczba wpisów w pamięci ciągłości:</strong> {len(self.data.get('characters', {}))} postaci | {len(self.data.get('glossary', {}))} terminów | {len(self.data.get('plot_anchors', {}))} kotwic fabularnych</p>
   </div>
 
   <h2>👥 Rejestr Postaci i Idiolekty</h2>
@@ -235,7 +262,14 @@ class SeriesBible:
     <thead><tr><th>Termin Źródłowy</th><th>Ustalony Przekład Polski</th></tr></thead>
     <tbody>{gloss_rows or '<tr><td colspan="2">Brak ustalonych terminów</td></tr>'}</tbody>
   </table>
+
+  <h2>⚓ Rekwizyty i Kotwice Fabularne (Plot Anchors)</h2>
+  <table>
+    <thead><tr><th>Rekwizyt / Zdarzenie</th><th>Wymóg Ciągłości i Kontekst</th></tr></thead>
+    <tbody>{anchor_rows or '<tr><td colspan="2">Brak zarejestrowanych kotwic fabularnych</td></tr>'}</tbody>
+  </table>
 </div>
 </body>
 </html>"""
+        return html
         return html

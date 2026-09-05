@@ -204,9 +204,11 @@ def detect_audio_discrepancy(jp_text: str, pl_text: str, en_text: str, prosody: 
     Automated discrepancy detector comparing Japanese voice recognition (Whisper)
     and audio acoustic prosody (tone, dBFS, shouting vs sarcasm) against Phase 1 draft translation.
     """
-    if not jp_text or not pl_text:
+    if not pl_text:
         return None
 
+    jp_text = jp_text or ""
+    en_text = en_text or ""
     jp_lower = jp_text.lower()
     pl_lower = pl_text.lower()
     prosody_lower = prosody.lower() if prosody else ""
@@ -599,6 +601,30 @@ def detect_audio_discrepancy(jp_text: str, pl_text: str, en_text: str, prosody: 
     if any(k in clean_jp for k in ["やめろ", "やめて"]) or "yamero" in rom_lower or "yamete" in rom_lower:
         if any(w in pl_lower for w in ["nie rób tego", "nie czyń"]):
             return "W audio pada 'Yamero/Yamete' (sprzeciw). Zastąp 'Nie rób tego' naturalnym: 'Przestań!' / 'Stój!' (Filar CLVIII)."
+
+    # 61. Dysonans Afektywny i Sarkazm (Acoustic Incongruity Engine)
+    is_sarcastic_prosody = any(w in prosody_lower for w in [
+        "sarkazm", "dystans", "chłód", "cynizm", "ironia", "drwiąc", "flat", "falling", "chłodny sarkazm"
+    ])
+    if is_sarcastic_prosody:
+        polite_en_patterns = [
+            "thank you", "thanks", "good job", "well done", "nice work", "great job",
+            "i'm sorry", "sorry", "excuse me", "my bad", "what a help", "so helpful",
+            "glad to hear", "happy to help", "you're the best"
+        ]
+        polite_jp_patterns = [
+            "arigatou", "arigato", "tasukatta", "gomen", "gomenne", "sumimasen",
+            "sasuga", "yokatta", "ureshii", "wakarimashita"
+        ]
+        has_polite_en = any(p in en_text.lower() for p in polite_en_patterns)
+        has_polite_jp = any(p in rom_lower for p in polite_jp_patterns) or any(k in clean_jp for k in ["ありがとう", "助かった", "ごめん", "すみません", "流石", "さすが", "よかった"])
+        if has_polite_en or has_polite_jp:
+            if any(w in pl_lower for w in ["dziękuję", "dzięki", "dobra robota", "świetna robota", "przepraszam", "cieszę się", "wspaniale"]):
+                return (
+                    "[⚠️ ALARM DYSONANSU AFEKTYWNEGO / SARKAZMU]: W audio seiyū słychać jadowity chłód/ironię/dystans! "
+                    "ZAKAZ dosłownego przekładu ('Dziękuję / Dobra robota / Przepraszam')! "
+                    "Wymagana polska zjadliwość, ironia lub sarkazm: 'Też mi pomoc...', 'Akurat...', 'Wielkie mi dzięki...', 'Taa, jasne...', 'Jeszcze czego...']"
+                )
 
     return None
 
@@ -1014,6 +1040,90 @@ def detect_third_person_mentions(
 
     return directives
 
+def detect_scene_social_context(
+    batch_events: List[Tuple[int, pysubs2.SSAEvent, str, str]],
+    history_context: Optional[List[Dict[str, Any]]] = None,
+    lookahead_events: Optional[List[Tuple[int, pysubs2.SSAEvent, str, str]]] = None,
+    character_registry: Optional[Dict[str, str]] = None,
+    series_bible: Optional[Any] = None
+) -> Optional[str]:
+    """
+    Dynamic Crowd vs 1-on-1 (Uchi-Soto & Crowd Density Tracker).
+    Analyzes active speakers and characters across sliding dialogue window (+-6 lines / 15s).
+    - If exactly 2 distinct characters in private conversation: tags 1-on-1 mode (direct 'ty' required).
+    - If 3+ characters or higher status figure (chan, ruler, sensei, general) present:
+      tags group / Uchi-Soto distancing and etiquette protocol.
+    """
+    if not batch_events:
+        return None
+
+    active_speakers: List[str] = []
+
+    # 1. From history context
+    if history_context:
+        for h in history_context[-4:]:
+            spk = (h.get("speaker") or h.get("speaker_name") or "").strip()
+            if spk and spk not in active_speakers:
+                active_speakers.append(spk)
+
+    # 2. From current batch
+    for item in batch_events:
+        ev = item[1] if len(item) > 1 else None
+        if ev and getattr(ev, "name", None):
+            spk = ev.name.strip()
+            if spk and spk not in active_speakers:
+                active_speakers.append(spk)
+
+    # 3. From lookahead preview
+    if lookahead_events:
+        for item in lookahead_events[:4]:
+            fut_ev = item[1] if len(item) > 1 else None
+            if fut_ev and getattr(fut_ev, "name", None):
+                spk = fut_ev.name.strip()
+                if spk and spk not in active_speakers:
+                    active_speakers.append(spk)
+
+    NON_CHAR_LABELS = {"sign", "title", "caption", "typeset", "op", "ed", "all", "wszyscy", "tłum", "crowd", "napis", "szyld", "narrator", "voice"}
+    clean_speakers = [s for s in active_speakers if s.lower() not in NON_CHAR_LABELS and not any(k in s.lower() for k in ["sign", "title", "napis", "ts"])]
+
+    HIGH_STATUS_KEYWORDS = [
+        "władca", "chan", "arystokrat", "król", "książę", "księżniczk", "generał",
+        "dowódca", "nauczyciel", "sensei", "mistrz", "szef", "lord", "lady", "tsar",
+        "tsarina", "cesarz", "cesarzowa", "chana", "chanem", "kapłan", "kanclerz", "dyrektor"
+    ]
+
+    high_status_found: Optional[str] = None
+    all_known_chars: Dict[str, str] = {}
+    if character_registry:
+        all_known_chars.update(character_registry)
+    if series_bible and hasattr(series_bible, "data") and "characters" in series_bible.data:
+        for k, v in series_bible.data["characters"].items():
+            desc = v.get("description", "") if isinstance(v, dict) else str(v)
+            if k not in all_known_chars:
+                all_known_chars[k] = desc
+
+    for spk in clean_speakers:
+        for cname, cdesc in all_known_chars.items():
+            if cname.lower() in spk.lower() or spk.lower() in cname.lower():
+                cd_lower = str(cdesc).lower()
+                if any(k in cd_lower for k in HIGH_STATUS_KEYWORDS):
+                    high_status_found = f"{spk} ({cdesc})"
+                    break
+        if high_status_found:
+            break
+
+    if high_status_found:
+        return f"[KADR ZBIOROWY / UCHI-SOTO: W scenie obecna jest postać wyższa rangą ({high_status_found}) -> Wymóg oficjalnego dystansu i protokołu dworskiego/szkolnego]"
+
+    if len(clean_speakers) == 2:
+        return f"[KADR 1-NA-1: Rozmowa w cztery oczy ({clean_speakers[0]} i {clean_speakers[1]}) -> Kategoryczny wymóg bezpośredniego 'ty' i 2. os. lp.]"
+
+    if len(clean_speakers) >= 3:
+        speakers_str = ", ".join(clean_speakers[:4])
+        return f"[KADR ZBIOROWY / UCHI-SOTO: Scena wieloosobowa ({speakers_str}) -> Wymóg zachowania odpowiedniego dystansu społecznego i protokołu relacji (Uchi-Soto)]"
+
+    return None
+
 class MultimodalTranslator:
     _STATUS_LOCK = threading.Lock()
     _STATUS_ACTIVE: bool = False
@@ -1199,6 +1309,19 @@ class MultimodalTranslator:
                 else:
                     lines.append(f"[Poprzednio]{spk_label}{mode_label} EN: {h['en']}")
             lines.append("-------------------------------------------------------\n")
+
+        # 2b. Dynamic Crowd vs 1-on-1 (Uchi-Soto & Crowd Density Tracker)
+        social_context = detect_scene_social_context(
+            batch_events=batch_events,
+            history_context=history_context,
+            lookahead_events=lookahead_events,
+            character_registry=self.character_registry,
+            series_bible=getattr(self, "series_bible", None)
+        )
+        if social_context:
+            lines.append("--- STATUS SPOŁECZNY SCENY (UCHI-SOTO / KADR 1-NA-1 VS ZBIOROWY) ---")
+            lines.append(social_context)
+            lines.append("-------------------------------------------------------------------\n")
 
         # 3. Lines to translate
         lines.append("Przetłumacz poniższe kwestie dialogowe na naturalny język polski. "
@@ -2016,6 +2139,17 @@ class MultimodalTranslator:
                 boundary_alert = "[⚠️ ZMIANA TRYBU: Koniec myśli wewnętrznej! Ta kwestia to dialog na głos w kadrze - ZAKAZ kursywy {\\i1} i ZAKAZ monologu wewnętrznego!]"
                 relation_tag = f"{relation_tag} {boundary_alert}".strip()
 
+            # Dynamic Crowd vs 1-on-1 (Uchi-Soto & Crowd Density Tracker)
+            social_context = detect_scene_social_context(
+                batch_events=untranslated_in_batch,
+                history_context=lookback_history,
+                lookahead_events=lookahead_events,
+                character_registry=self.character_registry,
+                series_bible=getattr(self, "series_bible", None)
+            )
+            if social_context and not vtype["is_sign"]:
+                relation_tag = f"{relation_tag} {social_context}".strip()
+
             pass1_items.append({
                 "id": batch_id,
                 "orig_idx": orig_idx,
@@ -2518,11 +2652,18 @@ class MultimodalTranslator:
                     char_dict[cname] = creg
 
             gloss_dict = {g.term_en: g.translation_pl for g in episode_profile.glossary}
+            plot_anchors_dict = {}
+            if getattr(episode_profile, "continuity_bridge_alerts", None):
+                for cba in episode_profile.continuity_bridge_alerts:
+                    if cba.term_or_event and cba.continuity_directive:
+                        plot_anchors_dict[cba.term_or_event] = cba.continuity_directive
+
             ref_name = Path(video_path).stem if video_path else (Path(subs_path).stem if subs_path else "Odcinek")
             self.series_bible.update_from_episode_profile(
                 episode_name=ref_name,
                 characters=char_dict,
-                glossary=gloss_dict
+                glossary=gloss_dict,
+                plot_anchors=plot_anchors_dict
             )
 
         # 0c. Match Official Polish Manga Canon

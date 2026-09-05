@@ -76,6 +76,83 @@ class SpeakerVoiceClassifier:
         return float(np.median(f0_estimates))
 
     @classmethod
+    def estimate_pitch_dynamics(cls, samples: np.ndarray, sample_rate: int = 16000) -> Optional[Dict[str, Any]]:
+        """
+        Estimates pitch dynamics across spoken dialogue:
+        calculates F0 contour slope (falling/rising/flat) and end-of-phrase energy drop
+        to distinguish cold cynicism/sarcasm from sincere engagement.
+        """
+        if samples is None or len(samples) < sample_rate * 0.35:
+            return None
+
+        samples = samples - np.mean(samples)
+        if np.max(np.abs(samples)) < 50.0:
+            return None
+
+        min_lag = int(sample_rate / 400)
+        max_lag = int(sample_rate / 75)
+        window_size = int(sample_rate * 0.06)
+        hop_size = int(sample_rate * 0.03)
+
+        f0_points = []
+        frame_energies = []
+
+        for start in range(0, len(samples) - window_size, hop_size):
+            frame = samples[start:start + window_size]
+            energy = np.sum(frame ** 2)
+            frame_energies.append(energy)
+            if energy < 1e5:
+                continue
+
+            corr = np.correlate(frame, frame, mode="full")
+            corr = corr[len(frame) - 1:]
+            if len(corr) <= max_lag:
+                continue
+
+            search_region = corr[min_lag:max_lag]
+            if len(search_region) == 0:
+                continue
+
+            peak_idx = np.argmax(search_region) + min_lag
+            peak_val = corr[peak_idx]
+
+            if corr[0] > 0 and (peak_val / corr[0]) > 0.35:
+                f0 = sample_rate / peak_idx
+                if 75.0 <= f0 <= 450.0:
+                    f0_points.append(f0)
+
+        if len(f0_points) < 4:
+            return None
+
+        mid = len(f0_points) // 2
+        f0_start = float(np.median(f0_points[:mid]))
+        f0_end = float(np.median(f0_points[mid:]))
+        median_f0 = float(np.median(f0_points))
+
+        if f0_end < f0_start * 0.88:
+            slope = "falling"
+        elif f0_end > f0_start * 1.12:
+            slope = "rising"
+        else:
+            slope = "flat"
+
+        # Energy drop towards end of phrase
+        energy_drop = False
+        if len(frame_energies) >= 6:
+            e_start = np.mean(frame_energies[:len(frame_energies)//2])
+            e_end = np.mean(frame_energies[len(frame_energies)//2:])
+            if e_start > 0 and (e_end / e_start) < 0.45:
+                energy_drop = True
+
+        return {
+            "median_f0": median_f0,
+            "f0_start": f0_start,
+            "f0_end": f0_end,
+            "slope": slope,
+            "energy_drop": energy_drop
+        }
+
+    @classmethod
     def classify_scene_speakers(
         cls,
         wav_path: str,

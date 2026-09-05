@@ -2652,6 +2652,165 @@ def test_character_gender_invariance_architecture():
 
     print(" -> PASSED: Wszystkie 5 warstw Architektury Nienaruszalności Płci (Metadane, Filar CLXII, Detektor 3. Osoby, EpisodeQualityGate, Pamięć Międzyodcinkowa) działają w 100% harmonii.")
 
+def test_blind_read_and_scene_social_context():
+    print("[TEST 36/38] Test Wstecznej Weryfikacji Percepcyjnej i Trackera Scen Zbiorowych (Blind-Read & Uchi-Soto)...")
+    from rules import get_verifier_system_prompt
+    from translator import detect_scene_social_context
+    import pysubs2
+
+    # 1. Blind-Reading Flow instruction exists in verifier prompt
+    prompt = get_verifier_system_prompt()
+    assert "WSTECZNA WERYFIKACJA PERCEPCYJNA" in prompt
+    assert "AUTONOMOUS BLIND-READING" in prompt
+
+    # 2. 1-on-1 private scene detection
+    ev1 = pysubs2.SSAEvent(start=1000, end=3000, text="Hello")
+    ev1.name = "Fatima"
+    ev2 = pysubs2.SSAEvent(start=3500, end=5000, text="Hi")
+    ev2.name = "Sitara"
+    batch_2p = [(1, ev1, "Hello", ""), (2, ev2, "Hi", "")]
+    res_2p = detect_scene_social_context(batch_2p)
+    assert res_2p is not None
+    assert "KADR 1-NA-1" in res_2p
+    assert "Fatima i Sitara" in res_2p
+    assert "2. os. lp." in res_2p
+
+    # 3. Crowd / Group scene detection (3+ speakers)
+    ev3 = pysubs2.SSAEvent(start=5500, end=7000, text="Listen")
+    ev3.name = "Shira"
+    batch_3p = [(1, ev1, "Hello", ""), (2, ev2, "Hi", ""), (3, ev3, "Listen", "")]
+    res_3p = detect_scene_social_context(batch_3p)
+    assert res_3p is not None
+    assert "KADR ZBIOROWY / UCHI-SOTO" in res_3p
+    assert "Scena wieloosobowa" in res_3p
+
+    # 4. High-status character presence overrides into Uchi-Soto protocol
+    ev_khan = pysubs2.SSAEvent(start=1000, end=3000, text="My orders")
+    ev_khan.name = "Ögedej"
+    batch_khan = [(1, ev_khan, "My orders", ""), (2, ev1, "Understood", "")]
+    res_khan = detect_scene_social_context(
+        batch_khan,
+        character_registry={"Ögedej": "Władca / Wielki Chan (mężczyzna)"}
+    )
+    assert res_khan is not None
+    assert "KADR ZBIOROWY / UCHI-SOTO" in res_khan
+    assert "postać wyższa rangą" in res_khan
+
+    print(" -> PASSED: Wsteczna Weryfikacja Percepcyjna (Blind-Read) i Dynamiczny Tracker Scen Zbiorowych (Uchi-Soto) działają w 100%.")
+
+def test_affective_incongruity_and_sarcasm_detector():
+    print("[TEST 37/38] Test Afektywnego Detektora Dysonansu i Sarkazmu (Acoustic Incongruity Engine)...")
+    import numpy as np
+    from speaker_diarizer import SpeakerVoiceClassifier
+    from translator import detect_audio_discrepancy
+
+    # 1. Pitch contour dynamics (falling vs rising F0)
+    sr = 16000
+    t = np.linspace(0, 1.0, sr)
+    f_start, f_end = 220.0, 130.0
+    phase = 2 * np.pi * (f_start * t + (f_end - f_start) * 0.5 * t**2)
+    falling_samples = 15000.0 * np.sin(phase)
+
+    dyn = SpeakerVoiceClassifier.estimate_pitch_dynamics(falling_samples, sample_rate=sr)
+    assert dyn is not None
+    assert dyn["slope"] == "falling"
+
+    # 2. Sarcastic dissonance detection with polite phrase
+    msg_sarcasm = detect_audio_discrepancy(
+        jp_text="ありがとう [arigatou]",
+        pl_text="Dziękuję ci za pomoc.",
+        en_text="Thank you for your help.",
+        prosody="chłodny sarkazm / opanowany dystans"
+    )
+    assert msg_sarcasm is not None
+    assert "ALARM DYSONANSU AFEKTYWNEGO / SARKAZMU" in msg_sarcasm
+    assert "Wielkie mi dzięki" in msg_sarcasm
+
+    # 3. Good job / Sasuga with sarcastic falling tone
+    msg_sasuga = detect_audio_discrepancy(
+        jp_text="さすが [sasuga]",
+        pl_text="Dobra robota.",
+        en_text="Good job, genius.",
+        prosody="dystans / opadająca intonacja"
+    )
+    assert msg_sasuga is not None
+    assert "ALARM DYSONANSU AFEKTYWNEGO / SARKAZMU" in msg_sasuga
+
+    # 4. Sincere phrase without sarcastic tone should not trigger sarcasm alarm
+    msg_sincere = detect_audio_discrepancy(
+        jp_text="ありがとう [arigatou]",
+        pl_text="Dziękuję ci.",
+        en_text="Thank you.",
+        prosody="ciepły, spokojny głos"
+    )
+    assert msg_sincere is None
+
+    print(" -> PASSED: Detektor Dysonansu Afektywnego i Sarkazmu (Acoustic Incongruity Engine) bezbłędnie chroni przed dosłownym przekładem ironii seiyū.")
+
+def test_quality_gate_name_declension_vocative_and_micro_lines():
+    print("[TEST 38/38] Test Strażnika Deklinacji Imion, Wołacza i Mikro-Kwestii (< 0.5s) oraz Plot Anchors...")
+    import tempfile
+    from pathlib import Path
+    import pysubs2
+    from avt_linter import EpisodeQualityGate
+    from series_memory import SeriesBible
+
+    # 1. EpisodeQualityGate: Foreign Name Declension, Vocative Uniformity, and Micro-Line Clamping
+    subs = pysubs2.SSAFile()
+    ev1 = pysubs2.SSAEvent(start=1000, end=3000, text="Rozmawiałem z Töregene o traktacie.")
+    ev2 = pysubs2.SSAEvent(start=4000, end=6000, text="Poszedłem z Töregene do namiotu.")
+    ev3 = pysubs2.SSAEvent(start=7000, end=9000, text="Stałem przed namiotem z Töregene.")
+    ev4 = pysubs2.SSAEvent(start=10000, end=12000, text="Muszę uciekać z Töregeną!")
+
+    ev5 = pysubs2.SSAEvent(start=13000, end=15000, text="Felix! Chodź tutaj natychmiast.")
+    ev6 = pysubs2.SSAEvent(start=16000, end=18000, text="Felix! Uważaj na siebie.")
+    ev7 = pysubs2.SSAEvent(start=19000, end=21000, text="Felixie! Co ty wyprawiasz?")
+    ev8 = pysubs2.SSAEvent(start=22000, end=24000, text="Felix! Słyszysz mnie?")
+
+    ev9 = pysubs2.SSAEvent(start=25000, end=25400, text="Nie mogę w to uwierzyć...")
+
+    subs.events = [ev1, ev2, ev3, ev4, ev5, ev6, ev7, ev8, ev9]
+
+    audited_subs, fixes = EpisodeQualityGate.audit_and_fix_entire_episode(
+        subs,
+        character_registry={"Töregene": "Kobieta (żona chana)", "Felix": "Mężczyzna (uczeń)"}
+    )
+
+    # Name declension unified to dominant undeclined convention
+    assert audited_subs.events[3].text == "Muszę uciekać z Töregene!"
+    assert any("Jednolita Deklinacja Imion" in f for f in fixes)
+
+    # Vocative unified to dominant 'Felix'
+    assert audited_subs.events[6].text == "Felix! Co ty wyprawiasz?"
+    assert any("Jednolitość Wołacza" in f for f in fixes)
+
+    # Micro-line clamped to punchy Polish exclamation
+    assert audited_subs.events[8].text == "Niemożliwe!"
+    assert any("Kompresja Mikro-Kwestii" in f for f in fixes)
+
+    # 2. SeriesBible Plot Anchors Continuity
+    with tempfile.TemporaryDirectory() as tmpdir:
+        bible = SeriesBible("JaadugarContinuity", storage_dir=Path(tmpdir))
+        bible.update_from_episode_profile(
+            episode_name="Odcinek 11",
+            characters={"Shira": "Mężczyzna"},
+            glossary={"Jada": "kamień deszczu"},
+            plot_anchors={
+                "kamień jada": "rytualny artefakt wywołujący ulewę",
+                "zbieg z Samarkandy": "Shira ukrywający się pod przebraniem"
+            }
+        )
+        prompt_txt = bible.format_for_prompt()
+        assert "PLOT ANCHORS" in prompt_txt
+        assert "kamień jada" in prompt_txt
+        assert "rytualny artefakt" in prompt_txt
+
+        html_rep = bible.generate_html_report()
+        assert "kamień jada" in html_rep
+        assert "zbieg z Samarkandy" in html_rep
+
+    print(" -> PASSED: EpisodeQualityGate (deklinacja imion obcych, wołacz, mikro-kwestie <0.5s) i Biblia Serialu (Plot Anchors) działają w 100% przy koszcie 0.00 PLN.")
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -2689,5 +2848,9 @@ if __name__ == "__main__":
     test_cornerstone_invariants()
     test_episode_quality_gate()
     test_character_gender_invariance_architecture()
-    print("\n Wszystkie testy jednostkowe i integracyjne (35/35) zakończone pełnym sukcesem!\n")
+    test_blind_read_and_scene_social_context()
+    test_affective_incongruity_and_sarcasm_detector()
+    test_quality_gate_name_declension_vocative_and_micro_lines()
+    print("\n Wszystkie testy jednostkowe i integracyjne (38/38) zakończone pełnym sukcesem!\n")
+
 

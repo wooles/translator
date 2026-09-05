@@ -1041,6 +1041,65 @@ class EpisodeQualityGate:
             if f_count > m_count and spk not in char_gender_map:
                 char_gender_map[spk] = "FEMALE"
 
+        # 0e. Pre-pass for Foreign Name Declension & Vocative Uniformity
+        prep_name_counts: Dict[str, Dict[str, int]] = {}
+        voc_name_counts: Dict[str, Dict[str, int]] = {}
+
+        candidate_names = set(char_gender_map.keys())
+        if character_registry:
+            for k in character_registry.keys():
+                for p in re.split(r"[/,]", k):
+                    clean_p = p.strip().lower()
+                    if len(clean_p) >= 3:
+                        candidate_names.add(clean_p)
+
+        for ev in events:
+            if not ev.text:
+                continue
+            clean_t = re.sub(r"\{[^\}]*\}", "", ev.text)
+
+            # Preposition + Capitalized Word
+            for m in re.finditer(r"\b(z|ze|do|dla|o|u|od|przed|nad|pod|przy|przez|za)\s+([^\s,\.!\?…]+)", clean_t):
+                n_form = m.group(2)
+                for c_name in candidate_names:
+                    stem_len = max(3, len(c_name) - 2)
+                    stem = c_name[:stem_len]
+                    if n_form.lower().startswith(stem):
+                        if c_name not in prep_name_counts:
+                            prep_name_counts[c_name] = {}
+                        prep_name_counts[c_name][n_form] = prep_name_counts[c_name].get(n_form, 0) + 1
+                        break
+
+            # Vocative address: Name followed by ! or ,
+            for m in re.finditer(r"(?:^|[,\.!\?…]\s*|\bHej,\s*|\bEj,\s*)([^\s,\.!\?…]{2,})([!,\?])", clean_t):
+                voc_word = m.group(1)
+                if voc_word.lower() in ["dobrze", "jasne", "proszę", "przepraszam", "uważaj", "czekaj", "stój", "witaj", "chwila", "powiedz", "widzisz", "chodź"]:
+                    continue
+                for c_name in candidate_names:
+                    stem_len = max(3, len(c_name) - 2)
+                    stem = c_name[:stem_len]
+                    if voc_word.lower().startswith(stem):
+                        if c_name not in voc_name_counts:
+                            voc_name_counts[c_name] = {}
+                        voc_name_counts[c_name][voc_word] = voc_name_counts[c_name].get(voc_word, 0) + 1
+                        break
+
+        dominant_prep_names: Dict[str, str] = {}
+        for c_name, forms in prep_name_counts.items():
+            total = sum(forms.values())
+            if total >= 2:
+                dom_form, dom_count = max(forms.items(), key=lambda x: x[1])
+                if dom_count / total >= 0.75:
+                    dominant_prep_names[c_name] = dom_form
+
+        dominant_voc_names: Dict[str, str] = {}
+        for c_name, forms in voc_name_counts.items():
+            total = sum(forms.values())
+            if total >= 2:
+                dom_voc, dom_count = max(forms.items(), key=lambda x: x[1])
+                if dom_count / total >= 0.75:
+                    dominant_voc_names[c_name] = dom_voc
+
         for i, ev in enumerate(events):
             if not ev.text or not ev.text.strip():
                 continue
@@ -1237,6 +1296,68 @@ class EpisodeQualityGate:
                                 new_chunk = old_chunk.replace(verb, new_v, 1)
                                 ev.text = ev.text.replace(old_chunk, new_chunk, 1)
                                 fixes.append(f"[Episode Quality Gate - Spójność Płci Postaci] Linia #{i+1}: skorygowano orzeczenie szyku przestawnego '{verb} {matched_name}' -> '{new_v} {matched_name}' (potwierdzona płeć żeńska)")
+
+            # 3d. FOREIGN NAME DECLENSION UNIFORMITY (Prepositional Cases)
+            if not is_sign and dominant_prep_names:
+                for c_name, dom_form in dominant_prep_names.items():
+                    stem_len = max(3, len(c_name) - 2)
+                    stem = c_name[:stem_len]
+                    def _prep_decl_repl(m, target=dom_form):
+                        prep = m.group(1)
+                        matched_form = m.group(2)
+                        if matched_form != target:
+                            return f"{prep} {target}"
+                        return m.group(0)
+                    pat = rf"\b(z|ze|do|dla|o|u|od|przed|nad|pod|przy|przez|za)\s+({re.escape(stem)}[^\s,\.!\?…]*)\b"
+                    old_text = ev.text
+                    ev.text = re.sub(pat, _prep_decl_repl, ev.text, flags=re.IGNORECASE)
+                    if ev.text != old_text:
+                        fixes.append(f"[Episode Quality Gate - Jednolita Deklinacja Imion] Linia #{i+1}: ujednolicono formę imienia po przyimku na '{dom_form}' (dominująca konwencja w odcinku)")
+
+            # 3e. VOCATIVE UNIFORMITY
+            if not is_sign and dominant_voc_names:
+                for c_name, dom_voc in dominant_voc_names.items():
+                    stem_len = max(3, len(c_name) - 2)
+                    stem = c_name[:stem_len]
+                    def _voc_repl(m, target=dom_voc):
+                        prefix = m.group(1) or ""
+                        matched_voc = m.group(2)
+                        punct = m.group(3) or "!"
+                        if matched_voc != target and matched_voc.lower() not in ["dobrze", "jasne", "proszę", "przepraszam"]:
+                            return f"{prefix}{target}{punct}"
+                        return m.group(0)
+                    pat = rf"(^|[,\.!\?…]\s*|\bHej,\s*|\bEj,\s*)({re.escape(stem)}[^\s,\.!\?…]*)([!,\?])"
+                    old_text = ev.text
+                    ev.text = re.sub(pat, _voc_repl, ev.text, flags=re.IGNORECASE)
+                    if ev.text != old_text:
+                        fixes.append(f"[Episode Quality Gate - Jednolitość Wołacza] Linia #{i+1}: ujednolicono formę wołacza na '{dom_voc}' (dominująca konwencja w odcinku)")
+
+            # 3f. MICRO-LINE LENGTH CLAMPING (< 0.5s / 500ms)
+            line_dur_ms = ev.end - ev.start
+            if not is_sign and 0 < line_dur_ms <= 500:
+                clean_t = re.sub(r"\{[^\}]*\}", "", ev.text).strip()
+                if len(clean_t) > 14 or len(clean_t.split()) > 3:
+                    cl_lower = clean_t.lower()
+                    if any(w in cl_lower for w in ["nie wierzę", "niemożliwe", "nie mogę", "jak to", "co ty", "naprawdę", "serio", "co takiego"]):
+                        repl = "Niemożliwe!" if any(w in cl_lower for w in ["nie wierzę", "niemożliwe", "nie mogę"]) else "Co?!"
+                    elif any(w in cl_lower for w in ["uważaj", "stój", "ratunku", "pomocy", "uciekaj", "z drogi", "padnij"]):
+                        repl = "Uważaj!" if "uważaj" in cl_lower else ("Stój!" if "stój" in cl_lower else "Ratunku!")
+                    elif any(w in cl_lower for w in ["ech", "uch", "och", "ach", "litości", "niech to", "daj spokój", "rany", "zaraz"]):
+                        repl = "Ech..." if any(w in cl_lower for w in ["ech", "uch", "och", "ach"]) else "Niech to..."
+                    elif clean_t.endswith("?"):
+                        repl = "Co?!"
+                    elif clean_t.endswith("!"):
+                        words = clean_t.split()
+                        repl = f"{words[0]}!" if len(words[0]) <= 12 else words[0][:10] + "!"
+                    else:
+                        words = clean_t.split()
+                        repl = f"{words[0]}..." if len(words[0]) <= 12 else words[0][:10] + "..."
+
+                    # Preserve leading typesetting tags
+                    m_prefix = re.match(r"^(\{[^\}]*\})+", ev.text)
+                    prefix = m_prefix.group(0) if m_prefix else ""
+                    ev.text = f"{prefix}{repl}"
+                    fixes.append(f"[Episode Quality Gate - Kompresja Mikro-Kwestii <0.5s] Linia #{i+1}: skondensowano zbyt długą kwestię ({line_dur_ms}ms, {len(clean_t)} zn.) '{clean_t}' -> '{repl}'")
 
             # 4. RESIDUAL ENGLISH CALQUE SWEEP (Belczyk AVT Canon)
             for item in AVTLinter.FIXED_REPLACEMENTS:

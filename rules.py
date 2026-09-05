@@ -2008,7 +2008,9 @@ PROTOKÓŁ TRIANGULACJI TRÓJKĄTA PRZEKŁADU (AUDIO JP VS SKRYPT EN VS WSTĘPNE
    - ZASADA ZWIĘZŁOŚCI I EKONOMII SYLAB DLA KRÓTKICH FRAZ JAPOŃSKICH (Barańczak / Belczyk AVT):
      * Gdy seiyuu wypowiada krótką, 2-3 sylabową frazę (np. "Daijoubu", "Wakatta", "Sou da na", "Shikata ga nai"), BEZWZGLĘDNIE ZABRANIA SIĘ przejmowania rozwlekłych konstrukcji angielskich (np. "You don't need to worry", "As I thought", "It is what it is").
      * Wybieraj najkrótszy, najbardziej soczysty polski odpowiednik ("Spokojnie" / "W porządku" / "Nie martw się" / "Jasne" / "Trudno" / "Wiedziałem"), idealnie dopasowany do intencji seiyuu i rytmu sceny.
-4. KROK 4: RZEŹBIENIE W ŻYWEJ POLSZCZYŹNIE KINOWEJ (STYLISTIC REFINEMENT):
+5. KROK 5: WSTECZNA WERYFIKACJA PERCEPCYJNA (AUTONOMOUS BLIND-READING TEST):
+   - Odsuń na bok angielski skrypt i przeczytaj polską kwestię na zimno, z perspektywy polskiego widza w kinie. Czy kwestia brzmi tak, jakby została pierwotnie napisana po polsku przez wybitnego dramaturga? Jeśli w zdaniu wyczuwalny jest choćby cień kalki składniowej lub obcego szyku – natychmiast przeredaguj je na czystą, organiczną polszczyznę!
+6. KROK 6: RZEŹBIENIE W ŻYWEJ POLSZCZYŹNIE KINOWEJ (STYLISTIC REFINEMENT):
    - Nadaj kwestii naturalny, plastyczny rytm polszczyzny dialogowej. Usuwaj watę słowną, tautologie i powtórzenia rzeczowników.
 
 REŻYSERSKA POLIFONIA DIALOGOWA I TEST CIĄGŁOŚCI SCENY:

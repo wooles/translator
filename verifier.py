@@ -86,10 +86,11 @@ class DialogueVerifier:
         prompt_lines.append("Zredaguj poniższe kwestie dialogowe. BEZWZGLĘDNIE wyeliminuj dosłowne tłumaczenie 1 do 1, sztuczne konstrukcje i kalki.")
         prompt_lines.append("Zastąp drewniane sformułowania żywym, potoczystym językiem polskim mówionym (tak jak w profesjonalnym dubbingu / u polskich nastolatków):")
         prompt_lines.append(
-            "WYKORZYSTAJ CZAS NA ZASTANOWIENIE (Thinking / CoT): Przed zatwierdzeniem każdej kwestii przeprowadź w myślach 3-etapowy test zdrowego rozsądku i ucha widza:\n"
+            "WYKORZYSTAJ CZAS NA ZASTANOWIENIE (Thinking / CoT): Przed zatwierdzeniem każdej kwestii przeprowadź w myślach 4-etapowy test zdrowego rozsądku, ucha widza i ślepej lektury:\n"
             "1. TEST INTERAKCJI DIALOGOWEJ (PING-PONG): Czy ta kwestia logicznie i naturalnie odpowiada na poprzednią? KATEGORYCZNY ZAKAZ samotnego 'Tak/T-Tak' w odpowiedzi na polecenie lub ostrzeżenie 'Uważaj!' (użyj 'Dobrze / D-Dobrze / Jasne / Będę uważać / W porządku' - Filar XLIII/CXLVI)!\n"
             "2. TEST FOKALIZACJI I FIZYCZNOŚCI SCENY: Kto mówi w kadrze na głos? Czy to nie zmiana z myśli wewnętrznej na głośny dialog diegetyczny? KATEGORYCZNY ZAKAZ przypisywania cudzych słów w 1. osobie bohaterom ukrywającym tożsamość ('by the Silent Witch' -> 'Wiedźmy Milczenia', BEZWZGLĘDNY ZAKAZ 'mój esej' - Filar CLXI)!\n"
-            "3. TEST AKTORSKI I AUDYT UCHA (STANISŁAWSKI-BARAŃCZAK): Czy to zdanie brzmi potoczyście, gdy polski aktor dubbingowy wypowie je na jednym wydechu? Bezwzględnie eliminuj sztywne angielskie kalki słownikowe i papierowe brzmienie (Filar CLIX)!"
+            "3. TEST AKTORSKI I AUDYT UCHA (STANISŁAWSKI-BARAŃCZAK): Czy to zdanie brzmi potoczyście, gdy polski aktor dubbingowy wypowie je na jednym wydechu? Bezwzględnie eliminuj sztywne angielskie kalki słownikowe i papierowe brzmienie (Filar CLIX)!\n"
+            "4. TEST ŚLEPEJ LEKTURY POLSZCZYNY (AUTONOMOUS BLIND-READING FLOW): Przeczytaj wygenerowany polski dialog tak, jakbyś nigdy nie widział angielskiego skryptu. Czy brzmi w 100% naturalnie dla polskiego ucha, jak kwestia z profesjonalnego dubbingu? Jeśli czujesz w nim choćby cień angielskiej składni lub sztucznej kalki – przeredaguj je na czystą, płynną polszczyznę!"
         )
         prompt_lines.append("W polu 'changes_made' dla KAŻDEJ poprawionej kwestii podaj DOKŁADNE uzasadnienie i numer Filaru AVT (np. '[Filar IV - Szyk Zdania] Usunięto kalkę angielską' lub '[Filar CLVII - Forma Adresatywna] Usunięto 'wygrał pan' -> 'wygrałeś''). Jeśli kwestia nie wymagała poprawek, wpisz null.")
         
