@@ -265,7 +265,8 @@ Twoim zadaniem jest dogłębna, wszechstronna analiza 100% skryptu całego odcin
 7. MOSTY CIĄGŁOŚCI (continuity_bridge_alerts): Wskaż terminy i wątki wymagające żelaznej spójności z całą serią.
 8. CHRONOLOGICZNA MAPA SEKWENCJI DRAMATURGICZNYCH (dramatic_sequences): Podziel odcinek na 3-4 akty/sekwencje czasowe z opisem napięcia i tonu.
 9. KARTOTEKA OBSADY I IDIOLEKTY YAKUWARIGO (character_dossiers): Określ wiek, status, japońskie zaimki (Ore/Boku/Watashi/Washi/Sessha), dialekt (Kansai-ben) i unikalny polski rejestr mowy (Ojou-sama salonowy, Starzec staroświecki, Samuraj rycerski, Yankii szorstki, Kansai gawędziarski).
-10. TABELA ODMIANY IMION PRZEZ PRZYPADKI (name_declensions) & MATRYCA RELACJI I TYTULATURY (characters).
+10. TABELA ODMIANY IMION PRZEZ PRZYPADKI (name_declensions) & MATRYCA RELACJI I TYTULATURY (characters):
+   - PUŁAPKA KOŃCÓWKI '-A' W IMIONACH MĘSKICH (FILAR CLVII & CLXII): Wiele imion japońskich i orientalnych kończy się na samogłoskę '-a' (np. Shira, Akira, Gaara, Ashitaka, Kiba, Soma, Kenta, Ryoma, Hanza) i są to POSTACIE MĘSKIE! KATEGORYCZNY ZAKAZ klasyfikowania postaci jako kobiety wyłącznie na podstawie litery '-a' na końcu imienia. Sprawdź rolę społeczną, zaimki (Ore/Boku) i kontekst wypowiedzi. W języku polskim dla postaci męskich orzeczenia w czasie przeszłym BEZWZGLĘDNIE wymagają formy męskiej: 'Shira mówił / ostrzegał / pomógł / zrobił', a NIE żeńskiej ('ostrzegała')!
 11. SŁOWNICZEK POJĘĆ BRANŻOWYCH (glossary) ORAZ JAPOŃSKICH PRZYSŁÓW/IDIOMÓW (yojijukugo_and_idioms): Podawaj wyłącznie CZYSTE, DOCELOWE polskie nazwy własne i terminy bez żadnych dopisków w nawiasach.
 12. EPOKA, REALIA ŚWIATA I DZIEDZINA SPECJALISTYCZNA.
 

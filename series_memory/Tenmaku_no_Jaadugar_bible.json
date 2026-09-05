@@ -44,10 +44,10 @@
       "description": "Zwrot: 'Wielki Chan Ögedei' (brat/poddany -> Wielki Chan)"
     },
     "Tolui -> Ögedei": {
-      "description": "Zwrot: 'bracie / Wielki Chanie' (młodszy brat -> monarcha)"
+      "description": "Zwrot: 'bracie' (młodszy brat -> starszy brat / Wielki Chagan)"
     },
     "Sitara -> Boraqchin": {
-      "description": "Zwrot: 'Wielka Chatun / Pani' (niewolnica/medyczka -> monarchini)"
+      "description": "Zwrot: 'Wielka Chatun / Wasza Wysokość' (niewolnica/służąca -> pierwsza małżonka Chagana)"
     },
     "Hulegu -> Sorghaghtani": {
       "description": "Zwrot: 'Matko' (syn -> matka)"
@@ -56,7 +56,7 @@
       "description": "Zwrot: 'po imieniu / Subutai' (wodzowie / książę -> generał)"
     },
     "Boraqchin -> Sitara": {
-      "description": "Zwrot: 'Fatima' (pierwsza Chatuń -> perska lekarka)"
+      "description": "Zwrot: 'Fatimo / na ty' (cesarzowa -> poddana/służąca)"
     },
     "Möge -> Sitara": {
       "description": "Zwrot: 'dziewczyno / Fatimo' (księżna -> poddana)"
@@ -78,6 +78,24 @@
     },
     "Fatima -> Töregene": {
       "description": "Zwrot: 'pani Töregene' (służąca/sojuszniczka -> pani)"
+    },
+    "Ögedei -> Tolui": {
+      "description": "Zwrot: 'Tołuju / bracie' (starszy brat -> młodszy brat)"
+    },
+    "Sitara -> Shira": {
+      "description": "Zwrot: 'Shira / na ty' (Shira to MĘŻCZYZNA / młodzieniec z Samarkandy, tłumacz w obozie Mongołów; bezwzględnie formy męskie: 'Shira mówił / ostrzegał / pomógł')"
+    },
+    "Shira": {
+      "description": "MĘŻCZYZNA (młodzieniec z Samarkandy, tłumacz i strateg, seiyū: Miyu Irino). KATEGORYCZNY NAKAZ form męskich w czasie przeszłym: 'Shira mówił / ostrzegał / wiedział / pomógł / zrobił'. ZAKAZ form żeńskich ('ostrzegała')!"
+    },
+    "Qadaq -> Güyük": {
+      "description": "Zwrot: 'książę Gujuk / panie' (wierny zarządca/sługa -> młody książę)"
+    },
+    "Sitara -> Sorghaghtani": {
+      "description": "Zwrot: 'Księżniczko Sorkaktani / pani' (posłanniczka / dawna podwładna -> arystokratka)"
+    },
+    "Boraqchin -> Ögedei": {
+      "description": "Zwrot: 'Wielki Chaganie / mój panie' (żona/cesarzowa -> mąż/władca)"
     }
   },
   "glossary": {
@@ -94,7 +112,7 @@
     "Mergen": "Mergen",
     "kam": "kam",
     "jada stone": "kamień jada",
-    "Great Kha'an": "Wielki Chan",
+    "Great Kha'an": "Wielki Chagan",
     "Great Khatun": "Wielka Chatun",
     "al-iksir": "al-iksir",
     "danyao": "danyao",
@@ -174,7 +192,12 @@
     "Khagan": "Chagan",
     "circle hunt": "polowanie z nagonką",
     "Quanzhen Daoists": "taoistyczna sekta Quanzhen",
-    "bezoar stone": "kamień bezoarowy"
+    "bezoar stone": "kamień bezoarowy",
+    "Jarghuchi": "dżarguczi",
+    "Elements": "Elementy",
+    "House of Tolui": "Ród Tołuja",
+    "House of Ögedei": "Ród Ugedeja",
+    "Waidan": "Zewnętrzna alchemia"
   },
   "relationships": {},
   "episodes_translated": [
@@ -183,6 +206,8 @@
     "[ASW] Tenmaku no Jaadugar - 07 [1080p HEVC][C9D77E6F]",
     "[ASW] Tenmaku no Jaadugar - 08 [1080p HEVC][93C64921]",
     "[ASW] Tenmaku no Jaadugar - 09 [1080p HEVC][D3FB6335]",
-    "Kanon Mangi"
+    "Kanon Mangi",
+    "[ASW] Tenmaku no Jaadugar - 10 [1080p HEVC][8479EA10]",
+    "[ASW] Tenmaku no Jaadugar - 11 [1080p HEVC][2E312ADA]"
   ]
 }

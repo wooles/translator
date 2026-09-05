@@ -957,6 +957,15 @@ class EpisodeQualityGate:
                     ev.text = re.sub(pattern, repl, ev.text)
                     fixes.append(f"[Episode Quality Gate - {pillar_tag}] Linia #{i+1}: {pattern} -> {repl}")
 
+            # 4b. USER FEEDBACK GOLDEN RULES (Deterministic Overrides)
+            if user_feedback_rules:
+                for fb in user_feedback_rules:
+                    bad = fb.get("bad_pl")
+                    good = fb.get("good_pl")
+                    if bad and good and bad.strip() and bad in ev.text:
+                        ev.text = ev.text.replace(bad, good)
+                        fixes.append(f"[Episode Quality Gate - Złota Reguła Użytkownika] Linia #{i+1}: '{bad}' -> '{good}'")
+
             # 5. PUNCTUATION & TYPOGRAPHY HYGIENE
             # Clean accidental double dots (e.g. "To prawda..") -> "To prawda..."
             ev.text = re.sub(r"(?<!\.)\.\.(?!\.)", "...", ev.text)

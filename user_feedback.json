@@ -54,12 +54,21 @@
     "created_at": "2026-08-29 01:57:00"
   },
   {
-    "id": "fb_1788557031664",
+    "id": "fb_shira_male_gender",
+    "original_en": "Shira did tell me that she was terribly despondent.",
+    "bad_pl": "Shira ostrzegała, że pogrążyła się w bezgranicznej rozpaczy...",
+    "good_pl": "Shira ostrzegał, że pogrążyła się w bezgranicznej rozpaczy...",
+    "rule_reason": "Shira to postać męska (młodzieniec z Samarkandy). Mimo że imię kończy się na '-a', orzeczenia w czasie przeszłym wymagają rodzaju męskiego: 'Shira ostrzegał / mówił / zrobił / wiedział', a NIE żeńskiego ('ostrzegała').",
+    "scope": "Tenmaku no Jaadugar",
+    "created_at": "2026-09-05 21:45:00"
+  },
+  {
+    "id": "fb_1788637550642",
     "original_en": "All creation",
     "bad_pl": "Wszelkie Stworzenie (Wszelkie Stworzenie)",
     "good_pl": "Wszelkie Stworzenie",
     "rule_reason": "Eliminacja dublowania",
     "scope": "global",
-    "created_at": "2026-09-04 23:23:51"
+    "created_at": "2026-09-05 21:45:50"
   }
 ]
