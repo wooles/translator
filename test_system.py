@@ -2562,13 +2562,15 @@ def test_episode_quality_gate():
     ev17 = pysubs2.SSAEvent(start=27500, end=29000, name="Shira", text="Nie wiedziałam, co począć.", style="Default")
     # Linia 18: Szyk przestawny z orzeczeniem przed imieniem męskim na -a
     ev18 = pysubs2.SSAEvent(start=29500, end=31000, name="Sitara", text="Tak właśnie mówiła Shira.", style="Default")
+    # Linia 19: Przypadkowa ściana tekstu (4 wiersze w dialogu - Filar LVII)
+    ev19 = pysubs2.SSAEvent(start=31500, end=34000, text="Zaraz, za co przepraszasz?\\NPrzecież nie miałeś złych\\Nintencji, kiedy do niej\\Npodszedłeś, co?", style="Default")
 
-    subs.events = [ev1, ev2, ev3, ev4, ev5, ev6, ev7, ev8, ev9, ev10, ev11, ev12, ev13, ev14, ev15, ev16, ev17, ev18]
+    subs.events = [ev1, ev2, ev3, ev4, ev5, ev6, ev7, ev8, ev9, ev10, ev11, ev12, ev13, ev14, ev15, ev16, ev17, ev18, ev19]
 
     audited_subs, fixes = EpisodeQualityGate.audit_and_fix_entire_episode(subs)
 
     # Weryfikacja korekt
-    assert len(fixes) >= 12, f"Oczekiwano co najmniej 12 poprawek, otrzymano {len(fixes)}"
+    assert len(fixes) >= 13, f"Oczekiwano co najmniej 13 poprawek, otrzymano {len(fixes)}"
 
     # 1. Dyrektywne potwierdzenie: T-Tak. -> D-Dobrze.
     assert audited_subs.events[1].text == "D-Dobrze."
@@ -2615,7 +2617,11 @@ def test_episode_quality_gate():
     assert audited_subs.events[17].text == "Tak właśnie mówił Shira."
     assert any("Spójność Płci Postaci" in f for f in fixes)
 
-    print(" -> PASSED: Episode Quality Gate bezbłędnie eliminuje banalne błędy na pełnej osi czasu (Adjacency Pairs, Wh-Questions, Echo Agreement, T-V Invariance, Thought Boundary, Incognito, Typography, English Sweep, Spójność Płci Postaci) przy koszcie 0.00 PLN.")
+    # 13. Limit maksymalnie 2 wierszy dla kwestii dialogowych (Filar LVII / Netflix AVT)
+    assert len(audited_subs.events[18].text.split(r"\N")) == 2
+    assert any("Filar LVII" in f for f in fixes)
+
+    print(" -> PASSED: Episode Quality Gate bezbłędnie eliminuje banalne błędy na pełnej osi czasu (Adjacency Pairs, Wh-Questions, Echo Agreement, T-V Invariance, Thought Boundary, Incognito, Typography, English Sweep, Spójność Płci Postaci, Maks. 2 Wiersze AVT) przy koszcie 0.00 PLN.")
 
 def test_character_gender_invariance_architecture():
     print("[TEST 35/35] Test Kompleksowej Architektury Nienaruszalności Płci (5 Warstw Ochrony)...")

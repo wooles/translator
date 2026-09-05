@@ -1401,6 +1401,15 @@ class EpisodeQualityGate:
                 if len(words) >= 4 and len(en_hits) >= 2 and not any(c in clean_no_tags for c in "ąćęłńóśźżĄĆĘŁŃÓŚŹŻ"):
                     fixes.append(f"[Episode Quality Gate - Wykryto nieprzetłumaczony angielski] Linia #{i+1}: '{clean_no_tags[:35]}...'")
 
+            # 7. STRICT AVT 2-LINE CEILING FOR DIALOGUE (Filar LVII / Netflix AVT: Maks. 2 wiersze)
+            if not is_sign and r"\N" in ev.text:
+                parts = [p for p in ev.text.split(r"\N") if p.strip()]
+                if len(parts) > 2:
+                    from avt_formatter import split_subtitle_syntactically
+                    old_lines_cnt = len(parts)
+                    ev.text = split_subtitle_syntactically(ev.text, max_line_len=42, is_ass=True, is_sign=False)
+                    fixes.append(f"[Episode Quality Gate - Filar LVII (Maks. 2 Wiersze)] Linia #{i+1}: zredukowano {old_lines_cnt} wiersze do standardowych 2 wierszy AVT")
+
             # Record if text changed due to hygiene
             if ev.text != text_before and not any(f"Linia #{i+1}:" in f for f in fixes):
                 fixes.append(f"[Episode Quality Gate - Higiena Tekstu] Linia #{i+1}: oczyszczono interpunkcję i formatowanie")
