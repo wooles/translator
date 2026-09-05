@@ -801,9 +801,32 @@ def get_audio_semantic_anchor(jp_text: str, en_text: str = "") -> Optional[str]:
             return "W audio seiyū męski zaimek 1. osoby ('ore/boku') -> Mówca to mężczyzna/chłopak! Stosuj męskie formy przeszłe (-łem, -łem się) (Filar CXXXVI/CLVIII)."
 
     # 14. Pronoun: atashi / atai (Filar XIII / CLVIII)
-    if any(k in clean_jp for k in ["あたし", "あたい"]) or any(k in rom_lower.split() for k in ["atashi", "atai"]):
+    if any(k in clean_jp for k in ["あたし", "あtai", "あたい"]) or any(k in rom_lower.split() for k in ["atashi", "atai"]):
         if any(w in en_lower for w in ["i ", "i'm", "i've", "my ", "me"]):
             return "W audio seiyū damski zaimek 1. osoby ('atashi') -> Mówca to kobieta/dziewczyna! Stosuj żeńskie formy przeszłe (-łam, -łam się) (Filar XIII/CLVIII)."
+
+    # 15. Pivot: Iku vs Coming (Filar CLXI / CLVIII)
+    if any(k in clean_jp for k in ["行く", "いく", "行きます", "行こう", "いこう"]) or any(k in rom_lower.split() for k in ["iku", "ikimasu", "ikou"]):
+        if any(w in en_lower for w in ["coming", "i'm coming", "on my way"]):
+            return "W audio pada '行く (Iku)' = ruch OD mówcy -> KATEGORYCZNY ZAKAZ angielskiej kalki 'Przychodzę!' / 'Już przychodzę!'. NAKAZ: 'Idę!' / 'Już idę!' / 'Zaraz będę!' (Filar CLXI/CLVIII)."
+
+    # 16. Pivot: Naruhodo vs Sou ka vs Wakatta / I see (Filar CLVIII)
+    if any(k in clean_jp for k in ["なるほど", "成程"]) or "naruhodo" in rom_lower:
+        if any(w in en_lower for w in ["i see", "makes sense", "understand"]):
+            return "W audio pada 'なるほど (Naruhodo)' = zrozumienie toku myślenia -> NAKAZ: 'A więc tak...' / 'Rozumiem twój tok myślenia' / 'No proszę...' (ZAKAZ sztampowego 'Rozumiem') (Filar CLVIII)."
+    elif any(k in clean_jp for k in ["そうか", "そっか"]) or any(k in rom_lower.split() for k in ["souka", "sokka", "sou ka"]):
+        if any(w in en_lower for w in ["i see", "is that so"]):
+            return "W audio pada 'そうか/そっか (Sou ka/Sokka)' = powściągliwe przyjęcie do wiadomości -> NAKAZ: 'Doprawdy?' / 'A więc tak...' / 'Tak sądzisz?' / 'Jasne...' (Filar CLVIII)."
+
+    # 17. Pivot: Chigau / Chigaimasu (Filar CLVIII)
+    if any(k in clean_jp for k in ["違う", "ちがう", "違います", "ちがいます"]) or any(k in rom_lower.split() for k in ["chigau", "chigaimasu", "chiga"]):
+        if any(w in en_lower for w in ["no", "wrong", "not true", "not like that", "mistake"]):
+            return "W audio pada '違う/違います (Chigau/Chigaimasu)' = gwałtowne zaprzeczenie pomyłce -> NAKAZ: 'Wcale nie!' / 'To pomyłka!' / 'Źle to rozumiesz!' / 'Wcale tak nie jest!' (Filar CLVIII)."
+
+    # 18. Pivot: Ii desu / Kekkou desu (Filar CLVIII)
+    if any(k in clean_jp for k in ["いいです", "結構です", "けっこうです"]) or any(k in rom_lower.split() for k in ["ii desu", "kekkou", "kekkou desu"]):
+        if any(w in en_lower for w in ["fine", "good", "okay", "no thanks"]):
+            return "W audio seiyū odrzuca ofertę ('結構です/いいです') -> NAKAZ formy grzecznej odmowy: 'Nie trzeba' / 'Obejdzie się' / 'Dziękuję, nie trzeba' (ZAKAZ 'Jest dobrze/w porządku') (Filar CLVIII)."
 
     return None
 
@@ -1349,18 +1372,12 @@ class MultimodalTranslator:
             lines.append("-------------------------------------------------------------------\n")
 
         # 3. Lines to translate
-        lines.append("Przetłumacz poniższe kwestie dialogowe na naturalny język polski. "
-                     "PAMIĘTAJ: Kwestie często tworzą jedno długie zdanie rozbite na kilka linijek – ZAWSZE analizuj CAŁE ZDANIA od początku do końca, dbając o piękny, naturalny polski szyk wyrazów i płynność gramatyczną między linijkami! "
-                     "DIALOGI 1-NA-1 I LICZBA GRAMATYCZNA: Gdy w scenie/kadrze rozmawiają ze sobą dwie postacie (1-na-1), angielskie dwuznaczne 'you' (np. 'Did you hear...?', 'Did you see...?', 'Do you know...?') BEZWZGLĘDNIE tłumacz w 2. osobie liczby POJEDYNCZEJ ('Słyszałeś?' / 'Słyszałaś?', 'Widziałeś?', 'Wiesz?'). KATEGORYCZNY ZAKAZ form liczby mnogiej ('Słyszeliście?') w rozmowach dwuosobowych! "
-                     "KONSEKWENCJA FORM ADRESATYWNYCH (FILAR CLVII): Jeśli w scenie/dialogu postać zwraca się do rozmówcy po imieniu (np. 'Shizuku, dlaczego?!') lub na 'ty', KATEGORYCZNIE ZABRANIA SIĘ przechodzenia na formy per 'pan/pani' ('wygrał pan' -> BŁĄD KARDYNALNY!). Wszystkie kolejne kwestie skierowane do tej osoby ('you won', 'did you', 'you') BEZWZGLĘDNIE tłumacz w 2. osobie na 'ty' ('wygrałeś trzy z siedmiu starć!'). Kategoryczny zakaz schizofrenii adresatywnej i mieszania 'ty' z 'pan' w jednej rozmowie! "
-                     "ZGODNOŚĆ FONICZNO-SEMANTYCZNA ZE SŁUCHEM (FILAR CLVIII): Polski widz ogląda anime z oryginalnym japońskim głosem seiyū! Gdy w audio rozbrzmiewa wyraziste słowo ('Hitori' -> 'sam/sama', 'Betsuni' -> 'wcale nie', 'Yokatta' -> 'całe szczęście', 'Yatta' -> 'udało się!', 'Uso/Maji' -> 'nie wierzę! / żartujesz?!', 'Mendokusai' -> 'nie chce mi się / męczarnia'), KATEGORYCZNIE ZABRANIA SIĘ bezmyślnego przepisywania amerykańskich parafraz ('Daj mi spokój', 'To nic takiego', 'To było dobre', 'Zrobiłem to', 'Co za ból')! "
-                     "ŻEŃSKOOSOBOWOŚĆ OBSADY: Dialogi między uczennicami/dziewczętami bezwzględnie tłumacz w RODZAJU ŻEŃSKIM (np. 'Głupia jesteś?' / 'Oszalałaś?', 'Jesteś pewna?', 'Widziałaś to?', 'poszłam', 'zrobiłam'). ZAKAZ form męskich ('Głupi jesteś?') w rozmowach dziewcząt! "
-                     "PRZYNALEŻNOŚĆ I 3. OSOBA: Frazy typu '[Imię]'s dad / mom / manga' (np. 'Akafuku's dad!') tłumacz w 3. osobie ('Tata Akafuku!'). BEZWZGLĘDNY ZAKAZ zamiany imienia innej postaci na 1. osobę ('to mój tata' -> BŁĄD!). "
-                     "Użyj załączonych klatek wideo do WIZUALNEGO ODCZYTANIA (OCR) JAPOŃSKICH NAPISÓW (chmurki jak いいよね, tablice, telefony, szyldy) oraz japońskiego audio do ustalenia emocji i kontekstu sytuacji. "
-                     "TRIANGULACJA KOMPLEMENTARNA ŹRÓDEŁ: Skrypt angielski (EN) zapewnia precyzję faktów, nazwy własne i logikę zdania, a japoński głos seiyū (JP) decyduje o formie grzecznościowej, płci i zgodności ze słuchem widza! "
-                     "WIELOGŁOS I NAPISY W DYMKACH (FILAR LVII): Jeśli kwestia zawiera wypowiedzi dwóch postaci (np. z myślnikami '- ') lub jednoczesny dymek z mangi i komentarz postaci: BEZWZGLĘDNIE rozdziel je na DWIE OSOBNE LINIE, każdą zaczynając od myślnika ze spacją ('- Kwestia 1\\N- Kwestia 2'). KATEGORYCZNY ZAKAZ łączenia ich w jedną linijkę lub wklejania myślnika w środku zdania! "
-                     "DEKOMPOZYCJA SEMIOTYCZNA (FILAR CLX): W polu 'semiotic_layer' sklasyfikuj warstwę każdej kwestii: 'spoken_on_screen' (żywy dialog postaci w kadrze), 'spoken_off_screen' (komentarz zza kadru), 'manga_balloon' (dymek komiksowy/halucynacja), 'inner_thought' (myśli wewnętrzne) lub 'diegetic_sign' (plansza/napis). KATEGORYCZNY ZAKAZ mieszania w jednym zdaniu słów z dymka mangowego ze słowami dialogu mówionego! "
-                     "BEZWZGLĘDNIE unikaj tłumaczenia 1:1, kalek i sztywnych definicji (np. 'That bombed' -> 'To mi nie wyszło', 'I'm home' -> 'Wróciłam!', 'I see' -> 'Rozumiem'):")
+        lines.append("Przetłumacz poniższe kwestie na naturalny, żywy język polski, dbając o filmowy rytm dialogu:\n"
+                     "1. SYNTAKTYKA I CIĄGŁOŚĆ: Analizuj całe zdania rozbite na linijki. Dbaj o naturalny polski szyk wyrazów i płynność gramatyczną.\n"
+                     "2. LICZBA I PŁEĆ: W rozmowach 1-na-1 'you' tłumacz w 2. osobie l. pojedynczej ('ty'). Płeć form przeszłych dopasuj ściśle do metadanych i audio seiyū.\n"
+                     "3. TRIANGULACJA EN+JP+OBRAZ: Skrypt EN daje logikę i nazwy, japońskie audio daje rejestr/tonację i zgodność z uchem widza, a klatki wideo służą do odczytu napisów ekranowych.\n"
+                     "4. WIELOGŁOS: Wypowiedzi dwóch osób w jednej kwestii rozdziel na dwie linie ('- Kwestia 1\\N- Kwestia 2').\n"
+                     "5. NATURALNOŚĆ: Bezwzględnie unikaj sztucznych kalek i sztywnych definicji (np. 'That bombed' -> 'Nie wyszło mi', 'I'm home' -> 'Wróciłam!', 'I see' -> 'Rozumiem'):")
 
         for idx, (original_idx, event, clean_text, ts_prefix) in enumerate(batch_events):
             start_str = pysubs2.time.ms_to_str(event.start)
@@ -1897,7 +1914,7 @@ class MultimodalTranslator:
                 "speaker_voice": speaker_tags.get(b_id, ""),
                 "is_song": is_song_line(ev, clean_txt)
             })
-        focused_rules_str = get_focused_rules_for_batch(batch_items_for_rules)
+        focused_rules_str = get_focused_rules_for_batch(batch_items_for_rules, max_rules=3)
 
         # 3b. Text prompt with AniList knowledge, character registry, lookahead, and phonetic cues
         prompt_text = self._prepare_batch_prompt(
@@ -2288,147 +2305,138 @@ class MultimodalTranslator:
                     unsolicited_italics_alert = "[🚨 ALARM FILAR CLXI: Nieuprawniona konwersja dialogu na myśl! Dialog mówiony na głos został oznaczony kursywą {\\i1}. Usuń kursywę i traktuj kwestię jako mowę diegetyczną!]"
                     it["notes"] = f"{it.get('notes', '')} {unsolicited_italics_alert}".strip()
 
-        # 6. Optional Phase 2 Verifier (Script Doctor)
+        # 6. Optional Phase 2 Verifier (Script Doctor) with Adaptive Smart Bypass
         batch_results: Dict[int, str] = {}
         batch_regions: Dict[int, str] = {}
+        refined_dict: Dict[int, str] = {it["id"]: sanitize_sub_text(it["pl"]) for it in pass1_items}
+        refined_region_dict: Dict[int, str] = {it["id"]: it.get("screen_region") for it in pass1_items if it.get("screen_region")}
 
+        needs_phase2 = False
         if self.enable_verifier and hasattr(self, 'verifier'):
-            pbar.set_postfix_str("Faza 2 (Redakcja Dialogów Pro)...")
-            # Staggered entry (350ms per thread) to prevent simultaneous TPU burst collisions on 503
-            stagger_sec = (b_idx % max(1, self.concurrent_batches)) * 0.35
-            if stagger_sec > 0:
-                time.sleep(stagger_sec)
-            phase2_focused_rules = get_focused_rules_for_batch(pass1_items)
-            refined_lines: List[RefinedLine] = self.verifier.verify_batch(
-                batch_items=pass1_items,
-                scene_summary=scene_desc or "",
-                episode_profile_str=episode_profile_str,
-                user_feedback_str=user_feedback_str,
-                glossary_str=glossary_str,
-                focused_rules_str=phase2_focused_rules,
-                series_bible_str=series_bible_str,
-                manga_canon_str=manga_canon_str,
-                history_context=lookback_history,
-                lookahead_events=lookahead_events,
-                character_registry=self.character_registry,
-                scene_diagnosis=getattr(batch_response, "scene_diagnosis", None) if batch_response else None
+            # Adaptive Smart Bypass: check if batch requires deep CoT & editorial doctoring
+            unique_speakers = set()
+            for it in pass1_items:
+                spk = (it.get("speaker_name") or it.get("speaker") or "").strip()
+                if spk:
+                    unique_speakers.add(spk)
+
+                notes_str = str(it.get("notes", ""))
+                if "🚨" in notes_str or "⚠️" in notes_str or "ALARM" in notes_str:
+                    needs_phase2 = True
+                    break
+
+                cps_val = it.get("cps", 0.0)
+                dur_s = it.get("duration_s", 1.0)
+                if cps_val > 17.0 or dur_s <= 0.6:
+                    needs_phase2 = True
+                    break
+
+                if it.get("is_song") or it.get("is_sign"):
+                    needs_phase2 = True
+                    break
+
+                prosody_str = str(it.get("speaker_voice", "") + " " + it.get("prosody", "")).lower()
+                if any(k in prosody_str for k in ["krzyk", "ironia", "chłód", "sarkazm", "szept", "płacz", "gniew", "wahanie"]):
+                    needs_phase2 = True
+                    break
+
+            if len(unique_speakers) >= 3:
+                needs_phase2 = True
+
+            if needs_phase2:
+                pbar.set_postfix_str("Faza 2 (Redakcja Dialogów Pro)...")
+                # Staggered entry (350ms per thread) to prevent simultaneous TPU burst collisions on 503
+                stagger_sec = (b_idx % max(1, self.concurrent_batches)) * 0.35
+                if stagger_sec > 0:
+                    time.sleep(stagger_sec)
+                phase2_focused_rules = get_focused_rules_for_batch(pass1_items, max_rules=3)
+                refined_lines: List[RefinedLine] = self.verifier.verify_batch(
+                    batch_items=pass1_items,
+                    scene_summary=scene_desc or "",
+                    episode_profile_str=episode_profile_str,
+                    user_feedback_str=user_feedback_str,
+                    glossary_str=glossary_str,
+                    focused_rules_str=phase2_focused_rules,
+                    series_bible_str=series_bible_str,
+                    manga_canon_str=manga_canon_str,
+                    history_context=lookback_history,
+                    lookahead_events=lookahead_events,
+                    character_registry=self.character_registry,
+                    scene_diagnosis=getattr(batch_response, "scene_diagnosis", None) if batch_response else None
+                )
+                refined_dict.update({r.id: sanitize_sub_text(r.refined_pl) for r in refined_lines})
+                refined_region_dict.update({r.id: r.screen_region for r in refined_lines if getattr(r, 'screen_region', None)})
+                for r in refined_lines:
+                    orig_item = next((it for it in pass1_items if it["id"] == r.id), None)
+                    orig_pl = orig_item["pl"] if orig_item else ""
+                    clean_ref = sanitize_sub_text(r.refined_pl)
+                    ch_desc = (getattr(r, 'changes_made', '') or '').strip()
+
+                    # Check if there is an actual textual modification or meaningful redaction note
+                    has_text_change = orig_pl and (orig_pl.strip() != clean_ref.strip())
+                    has_meaningful_note = bool(ch_desc and "Zweryfikowano" not in ch_desc and ch_desc.lower() != "null")
+
+                    if has_text_change or has_meaningful_note:
+                        clean_note = ch_desc if ch_desc.startswith("[") else (f"[{ch_desc}]" if ch_desc else "")
+                        pillar_note = f" {clean_note}" if clean_note else ""
+
+                        # Strip internal ASS tags (like {\i1}, {\i0}) for pure, clean console display
+                        disp_orig = re.sub(r"\{[^\}]*\}", "", orig_pl).strip()
+                        disp_ref = re.sub(r"\{[^\}]*\}", "", clean_ref).strip()
+
+                        pbar.write(f" └─ [Redaktor Dialogów] #{r.id}{pillar_note}")
+                        pbar.write(f"    ├─ Szkic:  \"{disp_orig}\"")
+                        pbar.write(f"    └─ Szlif:  \"{disp_ref}\"")
+            else:
+                pbar.set_postfix_str("Faza 2: Pominięto (kwestie standardowe - oszczędność tokenów)")
+
+        prev_linted_line = (lookback_history[-1]["pl"] if lookback_history else "")
+        for item in pass1_items:
+            raw_final = sanitize_sub_text(refined_dict.get(item["id"], item["pl"]))
+            # Triangulate effective gender from character registry, audio F0 voice, and pragmatic clues (Filar CXXXVI)
+            spk_gen = item.get("speaker_gender")
+            spk_voice = item.get("speaker_voice", "")
+            if not spk_gen:
+                if "męski" in spk_voice.lower():
+                    spk_gen = "mężczyzna"
+                elif "żeński" in spk_voice.lower():
+                    spk_gen = "kobieta"
+
+            spk_name = (item.get("speaker_name") or "").strip()
+            has_formal_voc = bool(re.search(
+                r"\b(panie|pani|panno|panu|pana)\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+|doktorze|profesorze|inspektorze|prezesie|dyrektorze|kierowniku|komisarzu)\b",
+                raw_final,
+                re.IGNORECASE
+            ))
+            is_item_informal = ((spk_name in speakers_on_ty) if spk_name else scene_has_first_name_vocative) and not has_formal_voc
+            final_text, fixes = AVTLinter.lint_and_fix_line(
+                text=raw_final,
+                speaker_gender=spk_gen,
+                is_all_girls_scene=(spk_gen in ["kobieta", "dziewczynka"]),
+                is_sign=item.get("is_sign", False),
+                user_feedback_rules=all_user_rules,
+                custom_glossary=combined_glossary,
+                is_informal_ty=is_item_informal,
+                audio_jp=item.get("audio_jp", ""),
+                prev_line_text=prev_linted_line
             )
-            refined_dict = {r.id: sanitize_sub_text(r.refined_pl) for r in refined_lines}
-            refined_region_dict = {r.id: r.screen_region for r in refined_lines if getattr(r, 'screen_region', None)}
-            for r in refined_lines:
-                orig_item = next((it for it in pass1_items if it["id"] == r.id), None)
-                orig_pl = orig_item["pl"] if orig_item else ""
-                clean_ref = sanitize_sub_text(r.refined_pl)
-                ch_desc = (getattr(r, 'changes_made', '') or '').strip()
-                
-                # Check if there is an actual textual modification or meaningful redaction note
-                has_text_change = orig_pl and (orig_pl.strip() != clean_ref.strip())
-                has_meaningful_note = bool(ch_desc and "Zweryfikowano" not in ch_desc and ch_desc.lower() != "null")
-                
-                if has_text_change or has_meaningful_note:
-                    clean_note = ch_desc if ch_desc.startswith("[") else (f"[{ch_desc}]" if ch_desc else "")
-                    pillar_note = f" {clean_note}" if clean_note else ""
-                    
-                    # Strip internal ASS tags (like {\i1}, {\i0}) for pure, clean console display
-                    disp_orig = re.sub(r"\{[^\}]*\}", "", orig_pl).strip()
-                    disp_ref = re.sub(r"\{[^\}]*\}", "", clean_ref).strip()
-                    
-                    pbar.write(f" └─ [Redaktor Dialogów] #{r.id}{pillar_note}")
-                    pbar.write(f"    ├─ Szkic:  \"{disp_orig}\"")
-                    pbar.write(f"    └─ Szlif:  \"{disp_ref}\"")
-            prev_linted_line = (lookback_history[-1]["pl"] if lookback_history else "")
-            for item in pass1_items:
-                raw_final = sanitize_sub_text(refined_dict.get(item["id"], item["pl"]))
-                # Triangulate effective gender from character registry, audio F0 voice, and pragmatic clues (Filar CXXXVI)
-                spk_gen = item.get("speaker_gender")
-                spk_voice = item.get("speaker_voice", "")
-                if not spk_gen:
-                    if "męski" in spk_voice.lower():
-                        spk_gen = "mężczyzna"
-                    elif "żeński" in spk_voice.lower():
-                        spk_gen = "kobieta"
-
-                spk_name = (item.get("speaker_name") or "").strip()
-                has_formal_voc = bool(re.search(
-                    r"\b(panie|pani|panno|panu|pana)\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+|doktorze|profesorze|inspektorze|prezesie|dyrektorze|kierowniku|komisarzu)\b",
-                    raw_final,
-                    re.IGNORECASE
-                ))
-                is_item_informal = ((spk_name in speakers_on_ty) if spk_name else scene_has_first_name_vocative) and not has_formal_voc
-                final_text, fixes = AVTLinter.lint_and_fix_line(
-                    text=raw_final,
-                    speaker_gender=spk_gen,
-                    is_all_girls_scene=(spk_gen in ["kobieta", "dziewczynka"]),
-                    is_sign=item.get("is_sign", False),
-                    user_feedback_rules=all_user_rules,
-                    custom_glossary=combined_glossary,
-                    is_informal_ty=is_item_informal,
-                    audio_jp=item.get("audio_jp", ""),
-                    prev_line_text=prev_linted_line
-                )
-                prev_linted_line = final_text
-                # Deterministic glossary overrides
-                final_text, gloss_fixes = GlossaryManager.apply_deterministic_overrides(final_text, combined_glossary)
-                if item.get("is_song") and not item.get("is_sign"):
-                    clean_no_notes = re.sub(r"^[♪♫♬\s]+|[♪♫♬\s]+$", "", final_text).strip()
-                    if clean_no_notes:
-                        final_text = f"♪ {clean_no_notes} ♪"
-                for fix in fixes + gloss_fixes:
-                    pbar.write(f"  [AVT Linter/Słownik] {fix}")
-                start_m = item.get("start_ms", item["event"].start if "event" in item else 0)
-                end_m = item.get("end_ms", item["event"].end if "event" in item else 1000)
-                final_text = clamp_sub_second_cps(final_text, start_m, end_m)
-                formatted_final = split_subtitle_syntactically(final_text, max_line_len=42, is_ass=is_ass, is_sign=item.get("is_sign", False))
-                batch_results[item["orig_idx"]] = formatted_final
-                eff_reg = refined_region_dict.get(item["id"]) or item.get("screen_region")
-                if eff_reg:
-                    batch_regions[item["orig_idx"]] = eff_reg
-        else:
-            prev_linted_line = (lookback_history[-1]["pl"] if lookback_history else "")
-            for item in pass1_items:
-                raw_final = sanitize_sub_text(item["pl"])
-                spk_gen = item.get("speaker_gender")
-                spk_voice = item.get("speaker_voice", "")
-                if not spk_gen:
-                    if "męski" in spk_voice.lower():
-                        spk_gen = "mężczyzna"
-                    elif "żeński" in spk_voice.lower():
-                        spk_gen = "kobieta"
-
-                spk_name = (item.get("speaker_name") or "").strip()
-                has_formal_voc = bool(re.search(
-                    r"\b(panie|pani|panno|panu|pana)\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+|doktorze|profesorze|inspektorze|prezesie|dyrektorze|kierowniku|komisarzu)\b",
-                    raw_final,
-                    re.IGNORECASE
-                ))
-                is_item_informal = ((spk_name in speakers_on_ty) if spk_name else scene_has_first_name_vocative) and not has_formal_voc
-                final_text, fixes = AVTLinter.lint_and_fix_line(
-                    text=raw_final,
-                    speaker_gender=spk_gen,
-                    is_all_girls_scene=(spk_gen in ["kobieta", "dziewczynka"]),
-                    is_sign=item.get("is_sign", False),
-                    user_feedback_rules=all_user_rules,
-                    custom_glossary=combined_glossary,
-                    is_informal_ty=is_item_informal,
-                    audio_jp=item.get("audio_jp", ""),
-                    prev_line_text=prev_linted_line
-                )
-                prev_linted_line = final_text
-                # Deterministic glossary overrides
-                final_text, gloss_fixes = GlossaryManager.apply_deterministic_overrides(final_text, combined_glossary)
-                if item.get("is_song") and not item.get("is_sign"):
-                    clean_no_notes = re.sub(r"^[♪♫♬\s]+|[♪♫♬\s]+$", "", final_text).strip()
-                    if clean_no_notes:
-                        final_text = f"♪ {clean_no_notes} ♪"
-                for fix in fixes + gloss_fixes:
-                    pbar.write(f"  [AVT Linter/Słownik] {fix}")
-                start_m = item.get("start_ms", item["event"].start if "event" in item else 0)
-                end_m = item.get("end_ms", item["event"].end if "event" in item else 1000)
-                final_text = clamp_sub_second_cps(final_text, start_m, end_m)
-                formatted_final = split_subtitle_syntactically(final_text, max_line_len=42, is_ass=is_ass, is_sign=item.get("is_sign", False))
-                batch_results[item["orig_idx"]] = formatted_final
-                if item.get("screen_region"):
-                    batch_regions[item["orig_idx"]] = item["screen_region"]
+            prev_linted_line = final_text
+            # Deterministic glossary overrides
+            final_text, gloss_fixes = GlossaryManager.apply_deterministic_overrides(final_text, combined_glossary)
+            if item.get("is_song") and not item.get("is_sign"):
+                clean_no_notes = re.sub(r"^[♪♫♬\s]+|[♪♫♬\s]+$", "", final_text).strip()
+                if clean_no_notes:
+                    final_text = f"♪ {clean_no_notes} ♪"
+            for fix in fixes + gloss_fixes:
+                pbar.write(f"  [AVT Linter/Słownik] {fix}")
+            start_m = item.get("start_ms", item["event"].start if "event" in item else 0)
+            end_m = item.get("end_ms", item["event"].end if "event" in item else 1000)
+            final_text = clamp_sub_second_cps(final_text, start_m, end_m)
+            formatted_final = split_subtitle_syntactically(final_text, max_line_len=42, is_ass=is_ass, is_sign=item.get("is_sign", False))
+            batch_results[item["orig_idx"]] = formatted_final
+            eff_reg = refined_region_dict.get(item["id"]) or item.get("screen_region")
+            if eff_reg:
+                batch_regions[item["orig_idx"]] = eff_reg
 
         # Harmonize concurrent screen subtitles (e.g. speech balloon + dialogue with identical EN text)
         en_to_best_pl: Dict[str, str] = {}

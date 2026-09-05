@@ -2374,7 +2374,7 @@ ZASADY TECHNICZNE ODPOWIEDZI PRO:
 - Zwróć wynik jako obiekt JSON zgodny ze schematem."""
 
 
-def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
+def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Optional[int] = None) -> str:
     """
     Dynamiczny dyspozytor reguł AVT (Context-Aware Rule Dispatcher).
     Analizuje specyfikę bieżącej paczki kwestii i generuje wysoce skoncentrowaną
@@ -2957,7 +2957,7 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
         )
 
     # 73. Głos Maszyn, AI i Systemów Operacyjnych (Filar CXXX)
-    if any(w in combined_en for w in ["system", "target", "locked", "initiating", "protocol", "error", "hud", "ai", "online", "standby"]):
+    if any(re.search(rf"\b{w}\b", combined_en) for w in ["system", "target", "locked", "initiating", "protocol", "error", "hud", "ai", "online", "standby"]):
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR CXXX - Głos Maszyn, AI i Systemów Operacyjnych]: "
             "Stosuj beznamiętny, lakoniczny tryb orzekający czasu teraźniejszego ('Cel namierzony. Autoryzacja zakończona sukcesem.')."
@@ -3290,6 +3290,10 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]]) -> str:
 
     if not focused_pillars:
         return ""
+
+    # Anti-Attention Dilution: cap at max_rules if specified to prevent LLM cognitive overload ('Lost in the Middle')
+    if max_rules is not None and max_rules > 0 and len(focused_pillars) > max_rules:
+        focused_pillars = focused_pillars[:max_rules]
 
     lines = [
         "--- [!] SKONCENTROWANA UWAGA DLA TEJ SCENY (PRIORYTETOWE FILARY AVT) ---",
