@@ -21,6 +21,94 @@ def clean_anime_slug(title: str) -> str:
     slug = re.sub(r"[-\s]+", "_", slug)
     return slug[:50] or "default_series"
 
+
+def generate_polish_name_declension(name: str, gender: str = "UNKNOWN") -> Dict[str, str]:
+    """
+    Generates 7 grammatical cases for Japanese / foreign anime character names
+    following standard Polish literary AVT phonological rules.
+    """
+    n = name.strip()
+    g = gender.upper()
+    if not n:
+        return {}
+
+    # Female names ending in consonant or vowel other than -a: strictly undeclined in Polish
+    if g == "FEMALE" or "KOBIETA" in g or "ŻEŃSK" in g:
+        if n.endswith("a"):
+            stem = n[:-1]
+            c_ms = stem + "e"
+            if stem.endswith("k"):
+                c_ms = stem[:-1] + "ce"
+            elif stem.endswith("g"):
+                c_ms = stem[:-1] + "dze"
+            elif stem.endswith("r"):
+                c_ms = stem[:-1] + "rze"
+            elif stem.endswith("t"):
+                c_ms = stem[:-1] + "cie"
+            elif stem.endswith("d"):
+                c_ms = stem[:-1] + "dzie"
+            elif stem.endswith("s"):
+                c_ms = stem[:-1] + "sie"
+            elif stem.endswith("n"):
+                c_ms = stem[:-1] + "nie"
+            elif stem.endswith("m"):
+                c_ms = stem[:-1] + "mie"
+            return {
+                "M": n,
+                "D": stem + ("i" if stem[-1] in "kg" else "y"),
+                "C": c_ms,
+                "B": stem + "ę",
+                "N": stem + "ą",
+                "Ms": c_ms,
+                "W": stem + "o"
+            }
+        else:
+            return {"M": n, "D": n, "C": n, "B": n, "N": n, "Ms": n, "W": n}
+    else:
+        # Male / neutral
+        if n.endswith("a"):
+            stem = n[:-1]
+            c_ms = stem + "e"
+            if stem.endswith("k"):
+                c_ms = stem[:-1] + "ce"
+            elif stem.endswith("g"):
+                c_ms = stem[:-1] + "dze"
+            elif stem.endswith("r"):
+                c_ms = stem[:-1] + "rze"
+            elif stem.endswith("t"):
+                c_ms = stem[:-1] + "cie"
+            elif stem.endswith("d"):
+                c_ms = stem[:-1] + "dzie"
+            elif stem.endswith("s"):
+                c_ms = stem[:-1] + "sie"
+            elif stem.endswith("n"):
+                c_ms = stem[:-1] + "nie"
+            elif stem.endswith("m"):
+                c_ms = stem[:-1] + "mie"
+            return {
+                "M": n,
+                "D": stem + ("i" if stem[-1] in "kg" else "y"),
+                "C": c_ms,
+                "B": stem + "ę",
+                "N": stem + "ą",
+                "Ms": c_ms,
+                "W": stem + "o"
+            }
+        elif n[-1].lower() not in "aeiouy":
+            stem = n
+            return {
+                "M": n,
+                "D": stem + "a",
+                "C": stem + "owi",
+                "B": stem + "a",
+                "N": stem + "em",
+                "Ms": stem + "ie",
+                "W": stem + "ie"
+            }
+        else:
+            return {"M": n, "D": n, "C": n, "B": n, "N": n, "Ms": n, "W": n}
+
+
 class SeriesBible:
     def __init__(self, anime_title: str, storage_dir: Optional[Path] = None):
         self.anime_title = anime_title.strip() if anime_title else "Nieznana Seria"
@@ -34,6 +122,7 @@ class SeriesBible:
             "characters": {},          # { "Arata": {"gender": "męska", "role": "uczeń", "forms": "Arata"} }
             "glossary": {},            # { "Choushi": "czara na sake", "Dragon Slayer": "Pogromca Smoków" }
             "relationships": {},      # { "Kokoro->Arata": "po imieniu / na ty", "Uczniowie->Teshima": "pani Teshima" }
+            "declensions": {},        # { "Shira": {"M": "Shira", "D": "Shiry", "C": "Shirze", ...} }
             "plot_anchors": {},        # { "kamień jada": "rytualny artefakt wywołujący deszcz", "zbieg z Samarkandy": "Shira" }
             "episodes_translated": []  # ["odcinek 1", "odcinek 2"]
         }
@@ -145,6 +234,12 @@ class SeriesBible:
 
                     self.data["characters"][name] = {"description": clean_details}
 
+                # Generate and store 7-case Polish declension matrix
+                c_gender = "MALE" if any(w in clean_details.lower() for w in ["mężczyzna", "męsk", "male", "chłopak"]) else ("FEMALE" if any(w in clean_details.lower() for w in ["kobieta", "żeńsk", "female", "dziewczyna"]) else "UNKNOWN")
+                if "declensions" not in self.data:
+                    self.data["declensions"] = {}
+                self.data["declensions"][name] = generate_polish_name_declension(name, c_gender)
+
         if glossary:
             import re
             for k, v in glossary.items():
@@ -170,7 +265,7 @@ class SeriesBible:
         lines = []
         has_content = False
 
-        if self.data["characters"] or self.data["glossary"] or self.data.get("plot_anchors"):
+        if self.data["characters"] or self.data["glossary"] or self.data.get("plot_anchors") or self.data.get("declensions"):
             lines.append("--- BIBLIA SERIALU (PAMIĘĆ MIĘDZYODCINKOWA SEZONU) ---")
             lines.append(f"Seria: '{self.anime_title}' (Przetłumaczono odcinków: {len(self.data['episodes_translated'])})")
             
@@ -180,6 +275,16 @@ class SeriesBible:
                     desc = info.get("description", "") if isinstance(info, dict) else str(info)
                     lines.append(f"  - {name}: {desc}")
                 has_content = True
+
+            if self.data.get("declensions"):
+                decl_items = []
+                for c_name, c_decl in list(self.data["declensions"].items())[:6]:
+                    if c_decl.get("M") != c_decl.get("D"):
+                        decl_items.append(f"    * {c_name}: D. {c_decl.get('D')}, C/Ms. {c_decl.get('C')}, B/N. {c_decl.get('B')}/z {c_decl.get('N')}, W. {c_decl.get('W')}!")
+                if decl_items:
+                    lines.append("• Wzorzec odmiany imion (Matryca 7 Przypadków - KATEGORYCZNY NAKAZ FLEKSJI):")
+                    lines.extend(decl_items)
+                    has_content = True
 
             if self.data["glossary"]:
                 lines.append("• Ustalone nazwy i terminologia z poprzednich odcinków (ZACHOWAJ SPÓJNOŚĆ!):")

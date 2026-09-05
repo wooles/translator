@@ -72,12 +72,570 @@
     "created_at": "2026-09-05 23:55:00"
   },
   {
-    "id": "fb_1788646233491",
+    "id": "fb_1788648047914",
+    "original_en": "",
+    "bad_pl": "odmiany przez przypadki",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'odmiany przez przypadki'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047915",
+    "original_en": "",
+    "bad_pl": "zastępowania poprawnie odmienionej nazwy sztywnym",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'zastępowania poprawnie odmienionej nazwy sztywnym'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047915",
+    "original_en": "",
+    "bad_pl": "automatycznego przekładu słów",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'automatycznego przekładu słów'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047916",
+    "original_en": "",
+    "bad_pl": "słowa",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'słowa'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047916",
+    "original_en": "",
+    "bad_pl": "metafor maszynowych w światach przedprzemysłowych",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'metafor maszynowych w światach przedprzemysłowych'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047917",
+    "original_en": "",
+    "bad_pl": "używania desygnatu",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'używania desygnatu'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047917",
+    "original_en": "",
+    "bad_pl": "padnij na ziemię",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'padnij na ziemię'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047918",
+    "original_en": "",
+    "bad_pl": "używania domyślnych ziemskich pojęć",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'używania domyślnych ziemskich pojęć'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047918",
+    "original_en": "",
+    "bad_pl": "wody",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'wody'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047919",
+    "original_en": "",
+    "bad_pl": "tłumaczenia",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'tłumaczenia'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047919",
+    "original_en": "",
+    "bad_pl": "komend ziemskich w stanie nieważkości i kosmosie",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'komend ziemskich w stanie nieważkości i kosmosie'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047920",
+    "original_en": "",
+    "bad_pl": "Padnij na ziemię!",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'Padnij na ziemię!'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047920",
+    "original_en": "",
+    "bad_pl": "Rzuć broń na ziemię!",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'Rzuć broń na ziemię!'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047921",
+    "original_en": "",
+    "bad_pl": "Tracimy grunt pod nogami",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'Tracimy grunt pod nogami'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047922",
+    "original_en": "",
+    "bad_pl": "Wykrwawia się!",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'Wykrwawia się!'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047922",
+    "original_en": "",
+    "bad_pl": "powódź piwa",
+    "good_pl": ">",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'powódź piwa'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047923",
+    "original_en": "",
+    "bad_pl": "nazywania obcych ludzi",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'nazywania obcych ludzi'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047923",
+    "original_en": "",
+    "bad_pl": "dosłownego tłumaczenia japońskiej tytulatury ulicz",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'dosłownego tłumaczenia japońskiej tytulatury ulicz'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047924",
+    "original_en": "",
+    "bad_pl": "kategorycznego",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'kategorycznego'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047924",
+    "original_en": "",
+    "bad_pl": "Na pewno",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'Na pewno'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047925",
+    "original_en": "",
+    "bad_pl": "kategoryczny",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'kategoryczny'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047926",
+    "original_en": "",
+    "bad_pl": "angielskiej kalki",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'angielskiej kalki'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047926",
+    "original_en": "",
+    "bad_pl": "opisowego",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'opisowego'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047927",
+    "original_en": "",
+    "bad_pl": "bezdusznego kalkowania angielskiego",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'bezdusznego kalkowania angielskiego'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047928",
+    "original_en": "",
+    "bad_pl": "urzędniczego i ankietowego",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'urzędniczego i ankietowego'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047928",
+    "original_en": "",
+    "bad_pl": "ankietowo-urzędniczego",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'ankietowo-urzędniczego'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047929",
+    "original_en": "",
+    "bad_pl": "dosłownego",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'dosłownego'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047930",
+    "original_en": "",
+    "bad_pl": "opisu",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'opisu'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047930",
+    "original_en": "",
+    "bad_pl": "analitycznego opisu",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'analitycznego opisu'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047931",
+    "original_en": "",
+    "bad_pl": "mylącego",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'mylącego'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047932",
+    "original_en": "",
+    "bad_pl": "rozwlekłych zdań",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'rozwlekłych zdań'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047933",
+    "original_en": "",
+    "bad_pl": "dosłownych kalek z angielskich fansubów",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'dosłownych kalek z angielskich fansubów'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047933",
+    "original_en": "",
+    "bad_pl": "dublowania tego samego motywu słowo w słowo w mowi",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'dublowania tego samego motywu słowo w słowo w mowi'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047934",
+    "original_en": "",
+    "bad_pl": "sztucznego rozbijania zdania z myśli na poszarpane",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'sztucznego rozbijania zdania z myśli na poszarpane'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047935",
+    "original_en": "",
+    "bad_pl": "wygładzania",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'wygładzania'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047936",
+    "original_en": "",
+    "bad_pl": "zlewania myśli z mową na głos",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'zlewania myśli z mową na głos'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047937",
+    "original_en": "",
+    "bad_pl": "ciepłego",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'ciepłego'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047938",
+    "original_en": "",
+    "bad_pl": "oburzenia moralnego",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'oburzenia moralnego'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047938",
+    "original_en": "",
+    "bad_pl": "przejścia na",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'przejścia na'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047939",
+    "original_en": "",
+    "bad_pl": "wygrał pan",
+    "good_pl": "> Zmień na 2",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'wygrał pan'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047940",
+    "original_en": "",
+    "bad_pl": "mieszania",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'mieszania'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047941",
+    "original_en": "",
+    "bad_pl": "dotykania takiej kwestii",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'dotykania takiej kwestii'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047942",
+    "original_en": "",
+    "bad_pl": "Daj mi spokój",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'Daj mi spokój'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047943",
+    "original_en": "",
+    "bad_pl": "To nic takiego",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'To nic takiego'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047943",
+    "original_en": "",
+    "bad_pl": "wysyłania zapytania w pełnej cenie",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'wysyłania zapytania w pełnej cenie'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047944",
+    "original_en": "",
+    "bad_pl": "poświęcania spójności relacji na rzecz sztucznego",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'poświęcania spójności relacji na rzecz sztucznego'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047945",
+    "original_en": "",
+    "bad_pl": "usuwania odruchowych wpadek postaci",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'usuwania odruchowych wpadek postaci'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047946",
+    "original_en": "",
+    "bad_pl": "bracie",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'bracie'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047947",
+    "original_en": "",
+    "bad_pl": "scalania ich w jedną linię",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'scalania ich w jedną linię'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047948",
+    "original_en": "",
+    "bad_pl": "zlewania dymków mangowych",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'zlewania dymków mangowych'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047949",
+    "original_en": "",
+    "bad_pl": "sklejania dymka halucynacji z dialogiem mówionym w",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'sklejania dymka halucynacji z dialogiem mówionym w'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047950",
+    "original_en": "",
+    "bad_pl": "mechanicznego",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'mechanicznego'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047951",
+    "original_en": "",
+    "bad_pl": "mechanicznego potakiwania",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'mechanicznego potakiwania'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047952",
+    "original_en": "",
+    "bad_pl": "Tak/T-Tak",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'Tak/T-Tak'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047953",
+    "original_en": "",
+    "bad_pl": "Zdrady Tożsamości Incognito",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'Zdrady Tożsamości Incognito'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047954",
+    "original_en": "",
+    "bad_pl": "konwersji dialogu na myśl",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'konwersji dialogu na myśl'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047955",
+    "original_en": "",
+    "bad_pl": "samowolnego dodawania tagów",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'samowolnego dodawania tagów'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047956",
+    "original_en": "",
+    "bad_pl": "zamiany na",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'zamiany na'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047957",
+    "original_en": "",
+    "bad_pl": "kursywy i zakaz przypisywania jej poprzedniemu myś",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'kursywy i zakaz przypisywania jej poprzedniemu myś'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047958",
+    "original_en": "",
+    "bad_pl": "w promptach oraz automatyczną korektę na",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'w promptach oraz automatyczną korektę na'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047959",
+    "original_en": "",
+    "bad_pl": "Regresji Jakościowej",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'Regresji Jakościowej'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648047960",
+    "original_en": "",
+    "bad_pl": "samotnego",
+    "good_pl": "Zgodnie z polskim kanonem AVT",
+    "rule_reason": "Kanon AVT ustalony w projekcie: bezwzględny zakaz formy 'samotnego'.",
+    "scope": "global",
+    "created_at": "2026-09-06 00:40:47"
+  },
+  {
+    "id": "fb_1788648218184",
     "original_en": "All creation",
     "bad_pl": "Wszelkie Stworzenie (Wszelkie Stworzenie)",
     "good_pl": "Wszelkie Stworzenie",
     "rule_reason": "Eliminacja dublowania",
     "scope": "global",
-    "created_at": "2026-09-06 00:10:33"
+    "created_at": "2026-09-06 00:43:38"
   }
 ]

@@ -54,6 +54,23 @@ class TranslationMemory:
                 )
             """)
             conn.execute("CREATE INDEX IF NOT EXISTS idx_en_clean ON translation_pairs(en_clean)")
+            try:
+                conn.execute("""
+                    CREATE VIRTUAL TABLE IF NOT EXISTS translation_pairs_fts USING fts5(
+                        en_clean, pl_text, anime_title, tokenize='unicode61'
+                    )
+                """)
+                cur = conn.cursor()
+                cur.execute("SELECT count(*) FROM translation_pairs_fts")
+                cnt_fts = cur.fetchone()[0]
+                cur.execute("SELECT count(*) FROM translation_pairs")
+                cnt_main = cur.fetchone()[0]
+                if cnt_fts < cnt_main:
+                    cur.execute("DELETE FROM translation_pairs_fts")
+                    cur.execute("INSERT INTO translation_pairs_fts(en_clean, pl_text, anime_title) SELECT en_clean, pl_text, anime_title FROM translation_pairs")
+                    conn.commit()
+            except Exception:
+                pass
 
     def index_database_directory(self, base_dir: Path) -> int:
         """
@@ -164,13 +181,22 @@ class TranslationMemory:
                 "INSERT INTO translation_pairs (en_text, pl_text, en_clean, anime_title, word_count) VALUES (?, ?, ?, ?, ?)",
                 pairs_to_insert
             )
+            try:
+                conn.execute("DELETE FROM translation_pairs_fts")
+                conn.executemany(
+                    "INSERT INTO translation_pairs_fts (en_clean, pl_text, anime_title) VALUES (?, ?, ?)",
+                    [(p[2], p[1], p[3]) for p in pairs_to_insert]
+                )
+            except Exception:
+                pass
 
         print(f"[Translation Memory] Successfully indexed {len(pairs_to_insert)} authentic dialogue pairs!")
         return len(pairs_to_insert)
 
     def find_relevant_examples(self, query_texts: List[str], max_examples: int = 5) -> List[Dict[str, str]]:
         """
-        Searches database for the most relevant authentic translation examples.
+        Searches database for the most relevant authentic translation examples
+        using SQLite FTS5 (BM25 ranking) and exact phrase matching.
         """
         if not os.path.exists(self.db_path):
             return []
@@ -185,7 +211,7 @@ class TranslationMemory:
                 if len(clean_q) < 3:
                     continue
 
-                # 1. Exact phrase match
+                # 1. Exact phrase match (Priority 100)
                 cursor.execute(
                     "SELECT en_text, pl_text, anime_title FROM translation_pairs WHERE en_clean = ? LIMIT 2",
                     (clean_q,)
@@ -195,18 +221,46 @@ class TranslationMemory:
                     if key not in candidates:
                         candidates[key] = {"en": row[0], "pl": row[1], "anime": row[2], "score": 100}
 
-                # 2. Sub-phrase matching for idioms and expressions
-                words = tokenize(clean_q)
-                if len(words) >= 2:
-                    bigram_query = f"%{words[0]} {words[1]}%"
-                    cursor.execute(
-                        "SELECT en_text, pl_text, anime_title FROM translation_pairs WHERE en_clean LIKE ? AND word_count <= 14 LIMIT 2",
-                        (bigram_query,)
-                    )
-                    for row in cursor.fetchall():
-                        key = row[0]
-                        if key not in candidates:
-                            candidates[key] = {"en": row[0], "pl": row[1], "anime": row[2], "score": 60}
+                # 2. SQLite FTS5 BM25 Match (High-Speed Full-Text Search)
+                try:
+                    sanitized_tokens = re.findall(r"\w+", clean_q)
+                    if sanitized_tokens:
+                        # 2a. Phrase match via FTS5
+                        phrase_q = '"' + " ".join(sanitized_tokens[:8]) + '"'
+                        cursor.execute(
+                            "SELECT en_clean, pl_text, anime_title, bm25(translation_pairs_fts) FROM translation_pairs_fts WHERE translation_pairs_fts MATCH ? ORDER BY bm25(translation_pairs_fts) LIMIT 2",
+                            (phrase_q,)
+                        )
+                        for row in cursor.fetchall():
+                            key = row[0]
+                            if key not in candidates:
+                                candidates[key] = {"en": row[0], "pl": row[1], "anime": row[2], "score": 85}
+
+                        # 2b. Multi-term AND match on key words (len >= 4)
+                        key_tokens = [t for t in sanitized_tokens if len(t) >= 4]
+                        if len(key_tokens) >= 2:
+                            and_q = " AND ".join(key_tokens[:4])
+                            cursor.execute(
+                                "SELECT en_clean, pl_text, anime_title, bm25(translation_pairs_fts) FROM translation_pairs_fts WHERE translation_pairs_fts MATCH ? ORDER BY bm25(translation_pairs_fts) LIMIT 2",
+                                (and_q,)
+                            )
+                            for row in cursor.fetchall():
+                                key = row[0]
+                                if key not in candidates:
+                                    candidates[key] = {"en": row[0], "pl": row[1], "anime": row[2], "score": 70}
+                except Exception:
+                    # Fallback to sub-phrase LIKE matching if FTS fails
+                    words = tokenize(clean_q)
+                    if len(words) >= 2:
+                        bigram_query = f"%{words[0]} {words[1]}%"
+                        cursor.execute(
+                            "SELECT en_text, pl_text, anime_title FROM translation_pairs WHERE en_clean LIKE ? AND word_count <= 14 LIMIT 2",
+                            (bigram_query,)
+                        )
+                        for row in cursor.fetchall():
+                            key = row[0]
+                            if key not in candidates:
+                                candidates[key] = {"en": row[0], "pl": row[1], "anime": row[2], "score": 60}
 
         # Sort by relevance score
         sorted_results = sorted(candidates.values(), key=lambda x: x["score"], reverse=True)

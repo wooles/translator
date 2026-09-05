@@ -1119,6 +1119,19 @@ class EpisodeQualityGate:
                     if len(clean_p) >= 3:
                         candidate_names.add(clean_p)
 
+        # 0f. 7-Case Character Declension Matrix from Series Bible / Registry
+        character_declensions: Dict[str, Dict[str, str]] = {}
+        if series_bible and hasattr(series_bible, "data") and "declensions" in series_bible.data:
+            character_declensions = dict(series_bible.data["declensions"])
+        elif character_registry:
+            from series_memory import generate_polish_name_declension
+            for k in character_registry.keys():
+                for p in re.split(r"[/,]", k):
+                    clean_p = p.strip()
+                    if len(clean_p) >= 3:
+                        g = char_gender_map.get(clean_p.lower(), "UNKNOWN")
+                        character_declensions[clean_p] = generate_polish_name_declension(clean_p, g)
+
         for ev in events:
             if not ev.text:
                 continue
@@ -1389,6 +1402,46 @@ class EpisodeQualityGate:
                     ev.text = re.sub(pat, _prep_decl_repl, ev.text, flags=re.IGNORECASE)
                     if ev.text != old_text:
                         fixes.append(f"[Episode Quality Gate - Jednolita Deklinacja Imion] Linia #{i+1}: ujednolicono formę imienia po przyimku na '{dom_form}' (dominująca konwencja w odcinku)")
+
+            # 3d2. DETERMINISTIC 7-CASE DECLENSION MATRIX ENFORCEMENT (from Series Bible / Registry)
+            if not is_sign and character_declensions:
+                for c_name, c_decl in character_declensions.items():
+                    if not c_name or len(c_name) < 3:
+                        continue
+                    m_form = c_decl.get("M", c_name)
+
+                    # Narzędnik (z, ze, przed, nad, pod, za) -> c_decl["N"]
+                    n_form = c_decl.get("N")
+                    if n_form and n_form != m_form:
+                        pat_n = rf"\b(z|ze|przed|nad|pod|za)\s+({re.escape(m_form)})\b"
+                        def _repl_n(m, target=n_form):
+                            return f"{m.group(1)} {target}"
+                        old_t = ev.text
+                        ev.text = re.sub(pat_n, _repl_n, ev.text, flags=re.IGNORECASE)
+                        if ev.text != old_t:
+                            fixes.append(f"[Episode Quality Gate - Matryca Narzędnika] Linia #{i+1}: ujednolicono formę na '{n_form}' po przyimku narzędnika")
+
+                    # Dopełniacz (do, dla, od, u, bez) -> c_decl["D"]
+                    d_form = c_decl.get("D")
+                    if d_form and d_form != m_form:
+                        pat_d = rf"\b(do|dla|od|u|bez)\s+({re.escape(m_form)})\b"
+                        def _repl_d(m, target=d_form):
+                            return f"{m.group(1)} {target}"
+                        old_t = ev.text
+                        ev.text = re.sub(pat_d, _repl_d, ev.text, flags=re.IGNORECASE)
+                        if ev.text != old_t:
+                            fixes.append(f"[Episode Quality Gate - Matryca Dopełniacza] Linia #{i+1}: ujednolicono formę na '{d_form}' po przyimku dopełniacza")
+
+                    # Miejscownik (o, przy) -> c_decl["Ms"]
+                    ms_form = c_decl.get("Ms")
+                    if ms_form and ms_form != m_form:
+                        pat_ms = rf"\b(o|przy)\s+({re.escape(m_form)})\b"
+                        def _repl_ms(m, target=ms_form):
+                            return f"{m.group(1)} {target}"
+                        old_t = ev.text
+                        ev.text = re.sub(pat_ms, _repl_ms, ev.text, flags=re.IGNORECASE)
+                        if ev.text != old_t:
+                            fixes.append(f"[Episode Quality Gate - Matryca Miejscownika] Linia #{i+1}: ujednolicono formę na '{ms_form}' po przyimku miejscownika")
 
             # 3e. VOCATIVE UNIFORMITY
             if not is_sign and dominant_voc_names:

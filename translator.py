@@ -116,11 +116,30 @@ def sanitize_ts_prefix_for_translation(ts_prefix: str) -> str:
     cleaned = re.sub(r"\{\s*\}", "", cleaned)
     return cleaned
 
-def detect_event_visual_type(event: pysubs2.SSAEvent, ts_prefix: str = "") -> Dict[str, Any]:
+def detect_event_visual_type(event: pysubs2.SSAEvent, ts_prefix: str = "", style_report: Optional[Any] = None) -> Dict[str, Any]:
     """
     Analyzes ASS tags, position, rotation, color, text content, and style to distinguish
     on-screen text (manga titles, signs, posters, boards, episode titles) from standard spoken dialogue (including top dialogue).
+    Uses StyleMatrixEngine when available for geometric certainty.
     """
+    if style_report is not None:
+        from style_matrix import EventRole
+        role, detail = style_report.classify_single_event(event)
+        is_sign = role in (EventRole.SIGN_LOCATIONAL, EventRole.SIGN_OVERLAY)
+        is_top = role == EventRole.DIALOGUE_TOP
+        if is_sign:
+            type_label = "NAPIS EKRANOWY / TYTUŁ (Sign/Typesetting)"
+        elif is_top:
+            type_label = "MÓWIONY DIALOG W TLE / NA GÓRZE EKRANU (Top Dialogue)"
+        else:
+            type_label = "MÓWIONY DIALOG POSTACI"
+        return {
+            "is_sign": is_sign,
+            "is_top": is_top,
+            "type_label": type_label,
+            "visual_details": detail
+        }
+
     is_sign = False
     is_top = False
     details = []
@@ -1346,7 +1365,7 @@ class MultimodalTranslator:
         for idx, (original_idx, event, clean_text, ts_prefix) in enumerate(batch_events):
             start_str = pysubs2.time.ms_to_str(event.start)
             end_str = pysubs2.time.ms_to_str(event.end)
-            vtype = detect_event_visual_type(event, ts_prefix)
+            vtype = detect_event_visual_type(event, ts_prefix, style_report=getattr(self, "style_report", None))
             duration_s = max(0.2, (event.end - event.start) / 1000.0)
             cps, is_fast = calculate_cps(clean_text, event.start, event.end)
 
@@ -1721,7 +1740,7 @@ class MultimodalTranslator:
 
             # 2. Priority: Signs and On-screen captions for OCR
             for _, ev, clean_txt, ts_pref in untranslated_in_batch:
-                vtype = detect_event_visual_type(ev, ts_pref)
+                vtype = detect_event_visual_type(ev, ts_pref, style_report=getattr(self, "style_report", None))
                 if vtype.get("is_sign") or (clean_txt.startswith("[") and clean_txt.endswith("]")):
                     sign_ts = (ev.start + ev.end) // 2
                     raw_timestamps.append(sign_ts)
@@ -1861,7 +1880,7 @@ class MultimodalTranslator:
             cps_val, _ = calculate_cps(clean_txt, ev.start, ev.end)
             style_str = ev.style or ""
             is_th = "italic" in style_str.lower() or r"\i1" in (ev.text or "")
-            vtype_info = detect_event_visual_type(ev, ts_pref)
+            vtype_info = detect_event_visual_type(ev, ts_pref, style_report=getattr(self, "style_report", None))
             batch_items_for_rules.append({
                 "id": b_id,
                 "orig_idx": orig_idx,
@@ -1972,7 +1991,7 @@ class MultimodalTranslator:
             pl_candidate = ""
             speaker_gender = None
             notes = ""
-            vtype = detect_event_visual_type(event, ts_prefix)
+            vtype = detect_event_visual_type(event, ts_prefix, style_report=getattr(self, "style_report", None))
             cps, is_fast = calculate_cps(clean_en, event.start, event.end)
             cps_warn = f"Tempo CPS: {cps:.1f} (czas {(event.end - event.start)/1000.0:.1f}s)" if is_fast else ""
             condensation_dir = calculate_condensation_directive(clean_en, event.start, event.end)
@@ -2452,6 +2471,12 @@ class MultimodalTranslator:
             subs = pysubs2.load(str(subs_file), encoding="utf-8")
         except UnicodeDecodeError:
             subs = pysubs2.load(str(subs_file), encoding="latin2")
+
+        # Initialize StyleMatrixEngine for geometric and semantic ASS classification
+        from style_matrix import analyze_subtitles
+        self.style_report = analyze_subtitles(subs)
+        matrix_summary = self.style_report.get_summary()
+        print(f"\n[StyleMatrixEngine] Pre-audyt stylów: {matrix_summary}")
 
         # 0. Retrieve anime metadata from AniList (with Gemini Parametric Knowledge Fallback)
         ref_filename = video_path if video_path else subs_path
@@ -3137,7 +3162,7 @@ class MultimodalTranslator:
                 clean_translated_text = sanitize_sub_text(orig_event.text)
 
             # Professional AVT Anti-Clutter: Drop isolated paralinguistic grunts ("Och!", "Uch!", "Uh!", "Hmph!")
-            is_sign_flag = detect_event_visual_type(orig_event, ts_prefix)["is_sign"]
+            is_sign_flag = detect_event_visual_type(orig_event, ts_prefix, style_report=getattr(self, "style_report", None))["is_sign"]
             if is_isolated_paralinguistic_clutter(orig_event.text, clean_translated_text, is_sign=is_sign_flag):
                 continue
 

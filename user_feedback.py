@@ -212,3 +212,70 @@ class UserFeedbackManager:
             )
         lines.append("-------------------------------------------------------------------------\n")
         return "\n".join(lines)
+
+    def ingest_diff_from_subtitles(
+        self,
+        raw_pl_subs_path: Path,
+        corrected_pl_subs_path: Path,
+        scope: str = "global"
+    ) -> List[Dict[str, Any]]:
+        """
+        Auto-Diff Subtitle Ingestion Engine.
+        Compares an AI-generated subtitle file with the user-corrected final subtitle file.
+        Extracts all human corrections, classifies them, and saves them to user_feedback.json.
+        """
+        import pysubs2
+        raw_path = Path(raw_pl_subs_path)
+        corr_path = Path(corrected_pl_subs_path)
+        if not raw_path.exists() or not corr_path.exists():
+            return []
+
+        try:
+            subs_raw = pysubs2.load(str(raw_path), encoding="utf-8")
+        except Exception:
+            subs_raw = pysubs2.load(str(raw_path), encoding="latin2")
+
+        try:
+            subs_corr = pysubs2.load(str(corr_path), encoding="utf-8")
+        except Exception:
+            subs_corr = pysubs2.load(str(corr_path), encoding="latin2")
+
+        ingested = []
+
+        # Match by start time within +-350ms window
+        for ev_corr in subs_corr.events:
+            if ev_corr.is_comment:
+                continue
+            text_corr = re.sub(r"\{[^\}]*\}", "", ev_corr.text or "").strip()
+            if not text_corr:
+                continue
+
+            # Find matching raw event
+            best_match = None
+            min_diff = 400  # ms threshold
+            for ev_raw in subs_raw.events:
+                if ev_raw.is_comment:
+                    continue
+                diff = abs(ev_raw.start - ev_corr.start)
+                if diff < min_diff:
+                    min_diff = diff
+                    best_match = ev_raw
+
+            if best_match:
+                text_raw = re.sub(r"\{[^\}]*\}", "", best_match.text or "").strip()
+                if text_raw and text_corr and text_raw != text_corr:
+                    c_raw = text_raw.replace("\\N", " ").replace("\\n", " ").strip()
+                    c_corr = text_corr.replace("\\N", " ").replace("\\n", " ").strip()
+                    if c_raw != c_corr and len(c_raw) >= 3 and len(c_corr) >= 3:
+                        rule_reason = f"Autentyczna korekta użytkownika (z odcinka: {raw_path.stem})"
+                        entry = self.add_feedback(
+                            original_en="",
+                            bad_pl=c_raw,
+                            good_pl=c_corr,
+                            rule_reason=rule_reason,
+                            scope=scope
+                        )
+                        ingested.append(entry)
+
+        return ingested
+

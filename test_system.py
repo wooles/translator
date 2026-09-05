@@ -2833,6 +2833,102 @@ def test_quality_gate_name_declension_vocative_and_micro_lines():
 
     print(" -> PASSED: EpisodeQualityGate (deklinacja imion obcych, wołacz, mikro-kwestie <0.5s) i Biblia Serialu (Plot Anchors) działają w 100% przy koszcie 0.00 PLN.")
 
+
+def test_comprehensive_architecture_extensions():
+    print("[TEST 39-42/42] Test Nowej Kompleksowej Architektury: StyleMatrixEngine, SQLite FTS5 BM25, Auto-Diff Ingestion i Matryca 7 Przypadków Deklinacji...")
+
+    # 1. StyleMatrixEngine Test
+    from style_matrix import analyze_subtitles, EventRole
+    subs = pysubs2.SSAFile()
+    subs.styles["Subtitle"] = pysubs2.SSAStyle(alignment=2, marginv=40, fontsize=50)
+    subs.styles["Caption-14"] = pysubs2.SSAStyle(alignment=7, marginv=20, fontsize=35)
+    subs.styles["OP-Romanji"] = pysubs2.SSAStyle(alignment=8, marginv=30, fontsize=40)
+    subs.styles["Staff"] = pysubs2.SSAStyle(alignment=1, marginv=10, fontsize=20)
+
+    # Event 0: Subtitle (regular dialogue)
+    subs.events.append(pysubs2.SSAEvent(start=1000, end=3000, text="Cześć, jak się masz?", style="Subtitle"))
+    # Event 1: Caption-14 with \pos (sign)
+    subs.events.append(pysubs2.SSAEvent(start=1500, end=4000, text=r"{\pos(793.6,554.4)}{\an7}Komitet Dyscypliny", style="Caption-14"))
+    # Event 2: Song
+    subs.events.append(pysubs2.SSAEvent(start=5000, end=7000, text="Yume o miru...", style="OP-Romanji"))
+    # Event 3: Staff
+    subs.events.append(pysubs2.SSAEvent(start=8000, end=9000, text="Tłumaczenie: Wooles", style="Staff"))
+
+    report = analyze_subtitles(subs)
+    assert report.is_dialogue(0) is True
+    assert report.is_screen_sign(0) is False
+    assert report.is_screen_sign(1) is True
+    assert report.is_dialogue(1) is False
+    assert report.is_song(2) is True
+    assert report.event_roles[3] == EventRole.STAFF_METADATA
+
+    # 2. SQLite FTS5 BM25 Translation Memory Test
+    from memory import TranslationMemory
+    tm = TranslationMemory()
+    results = tm.find_relevant_examples(["lunch break"], max_examples=3)
+    assert len(results) > 0
+    assert any("lunch break" in r["en"].lower() for r in results)
+
+    # 3. Auto-Diff Subtitle Ingestion Test
+    import tempfile
+    from user_feedback import UserFeedbackManager
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmp_path = Path(tmpdir)
+        fb_mgr = UserFeedbackManager(storage_path=tmp_path / "test_feedback.json")
+        
+        subs_raw = pysubs2.SSAFile()
+        subs_raw.events.append(pysubs2.SSAEvent(start=1000, end=3000, text="To robi sens."))
+        raw_p = tmp_path / "raw.ass"
+        subs_raw.save(str(raw_p))
+
+        subs_corr = pysubs2.SSAFile()
+        subs_corr.events.append(pysubs2.SSAEvent(start=1000, end=3000, text="To ma sens."))
+        corr_p = tmp_path / "corr.ass"
+        subs_corr.save(str(corr_p))
+
+        ingested = fb_mgr.ingest_diff_from_subtitles(raw_p, corr_p)
+        assert len(ingested) == 1
+        assert ingested[0]["bad_pl"] == "To robi sens."
+        assert ingested[0]["good_pl"] == "To ma sens."
+
+    # 4. Morphological 7-Case Declension Matrix & EpisodeQualityGate Test
+    from series_memory import generate_polish_name_declension
+    shira_decl = generate_polish_name_declension("Shira", "MALE")
+    assert shira_decl["M"] == "Shira"
+    assert shira_decl["D"] == "Shiry"
+    assert shira_decl["C"] == "Shirze"
+    assert shira_decl["B"] == "Shirę"
+    assert shira_decl["N"] == "Shirą"
+    assert shira_decl["Ms"] == "Shirze"
+    assert shira_decl["W"] == "Shiro"
+
+    aika_decl = generate_polish_name_declension("Aika", "FEMALE")
+    assert aika_decl["D"] == "Aiki"
+    assert aika_decl["C"] == "Aice"
+    assert aika_decl["W"] == "Aiko"
+
+    rin_decl = generate_polish_name_declension("Rin", "FEMALE")
+    assert rin_decl["D"] == "Rin"
+    assert rin_decl["N"] == "Rin"
+
+    # Test EpisodeQualityGate enforcing 7-case matrix
+    from avt_linter import EpisodeQualityGate
+    subs_test = pysubs2.SSAFile()
+    subs_test.events.append(pysubs2.SSAEvent(start=1000, end=3000, text="Rozmawiałem wczoraj z Shira w pokoju."))
+    subs_test.events.append(pysubs2.SSAEvent(start=3500, end=5500, text="Idę prosto do Shira."))
+    subs_test.events.append(pysubs2.SSAEvent(start=6000, end=8000, text="Dużo myślałem o Shira."))
+
+    fixed_subs, fixes = EpisodeQualityGate.audit_and_fix_entire_episode(
+        subs_test,
+        character_registry={"Shira": "mężczyzna (zbieg)"}
+    )
+    assert "z Shirą" in fixed_subs.events[0].text
+    assert "do Shiry" in fixed_subs.events[1].text
+    assert "o Shirze" in fixed_subs.events[2].text
+
+    print(" -> PASSED: StyleMatrixEngine, SQLite FTS5 BM25, Auto-Diff Ingestion i Matryca 7 Przypadków Deklinacji działają w 100% harmonii przy koszcie 0.00 PLN.")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -2873,6 +2969,8 @@ if __name__ == "__main__":
     test_blind_read_and_scene_social_context()
     test_affective_incongruity_and_sarcasm_detector()
     test_quality_gate_name_declension_vocative_and_micro_lines()
-    print("\n Wszystkie testy jednostkowe i integracyjne (38/38) zakończone pełnym sukcesem!\n")
+    test_comprehensive_architecture_extensions()
+    print("\n Wszystkie testy jednostkowe i integracyjne (42/42) zakończone pełnym sukcesem!\n")
+
 
 
