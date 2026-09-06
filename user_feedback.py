@@ -15,6 +15,24 @@ from typing import List, Dict, Any, Optional
 
 FEEDBACK_FILE_PATH = Path(__file__).parent / "user_feedback.json"
 
+META_LEAK_KEYWORDS = {"kanon", "avt", "filar", "prompt", "few-shot", "system instruction", "zakaz"}
+
+def is_valid_feedback_entry(entry: Dict[str, Any]) -> bool:
+    """Strictly validates whether a feedback rule is a genuine translation correction, rejecting meta-leaks."""
+    if not isinstance(entry, dict):
+        return False
+    bad_pl = str(entry.get("bad_pl", "")).strip()
+    good_pl = str(entry.get("good_pl", "")).strip()
+    if not bad_pl or not good_pl or bad_pl.lower() == good_pl.lower():
+        return False
+    if good_pl.startswith(">"):
+        return False
+    good_lower = good_pl.lower()
+    if any(kw in good_lower for kw in META_LEAK_KEYWORDS):
+        return False
+    return True
+
+
 class UserFeedbackManager:
     """
     Manager for persistent user corrections and few-shot rules.
@@ -31,7 +49,7 @@ class UserFeedbackManager:
                 with open(self.storage_path, "r", encoding="utf-8") as f:
                     data = json.load(f)
                     if isinstance(data, list):
-                        self.feedback_list = data
+                        self.feedback_list = [d for d in data if is_valid_feedback_entry(d)]
             except Exception:
                 self.feedback_list = []
         else:
@@ -111,6 +129,8 @@ class UserFeedbackManager:
             "scope": scope.strip() or "global",
             "created_at": time.strftime("%Y-%m-%d %H:%M:%S")
         }
+        if not is_valid_feedback_entry(new_entry):
+            return {}
         # Prevent duplicates with the same bad_pl and good_pl
         self.feedback_list = [
             f for f in self.feedback_list

@@ -69,11 +69,14 @@ def extract_rules_from_history(history_file: Path = HISTORY_PATH) -> List[Dict[s
         if bad.lower() in seen_bad or bad.lower() in ["tego", "kalki", "używania", "zamiany na 1"]:
             continue
         seen_bad.add(bad.lower())
+        # Disallow empty or meta placeholder substitutes (never substitute with 'Zgodnie z polskim kanonem AVT')
+        if not good or any(m in good.lower() for m in ["kanon", "avt", "filar", "prompt", "zakaz", ">"]):
+            continue
         extracted_rules.append({
             "original_en": "",
             "bad_pl": bad,
-            "good_pl": good or "Zgodnie z polskim kanonem AVT",
-            "rule_reason": f"Kanon AVT ustalony w projekcie: bezwzględny zakaz formy '{bad}'.",
+            "good_pl": good,
+            "rule_reason": f"Kanon AVT ustalony w projekcie: zakaz '{bad}' na rzecz '{good}'.",
             "scope": "global"
         })
 

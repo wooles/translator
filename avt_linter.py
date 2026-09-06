@@ -426,6 +426,9 @@ class AVTLinter:
                 good_pl = fb.get("good_pl", "").strip()
                 if not bad_pl or not good_pl or bad_pl == good_pl:
                     continue
+                # Never allow meta-vocabulary or prompt instructions to be injected as replacements
+                if any(kw in good_pl.lower() for kw in ["kanon", "avt", "filar", "prompt", "few-shot", "zakaz", ">"]):
+                    continue
                 # Handle slash-separated alternatives
                 bad_variants = [v.strip() for v in bad_pl.split("/") if v.strip()]
                 good_choice = good_pl.split("/")[0].strip()
@@ -1503,7 +1506,11 @@ class EpisodeQualityGate:
                 for fb in user_feedback_rules:
                     bad = fb.get("bad_pl")
                     good = fb.get("good_pl")
-                    if bad and good and bad.strip() and bad in ev.text:
+                    if not bad or not good or bad.strip() == good.strip():
+                        continue
+                    if any(kw in good.lower() for kw in ["kanon", "avt", "filar", "prompt", "few-shot", "zakaz", ">"]):
+                        continue
+                    if bad.strip() and bad in ev.text:
                         ev.text = ev.text.replace(bad, good)
                         fixes.append(f"[Episode Quality Gate - Złota Reguła Użytkownika] Linia #{i+1}: '{bad}' -> '{good}'")
 
@@ -1535,6 +1542,15 @@ class EpisodeQualityGate:
                     old_lines_cnt = len(parts)
                     ev.text = split_subtitle_syntactically(ev.text, max_line_len=42, is_ass=True, is_sign=False)
                     fixes.append(f"[Episode Quality Gate - Filar LVII (Maks. 2 Wiersze)] Linia #{i+1}: zredukowano {old_lines_cnt} wiersze do standardowych 2 wierszy AVT")
+
+            # 8. META-LEAK FIREWALL & PURGE (Absolute zero tolerance for meta-language in subtitles)
+            meta_leak_pat = r"(?i)\b(zgodnie\s+z\s+polskim\s+kanonem\s+avt|kanon(?:em)?\s*avt|kanon\s+avt|filar\s+[ivxlcdm0-9]+|few-shot|system\s*prompt|prompt\s*leak)\b"
+            if re.search(meta_leak_pat, ev.text):
+                ev.text = re.sub(meta_leak_pat, "", ev.text)
+                ev.text = re.sub(r"[ \t]+", " ", ev.text)
+                ev.text = re.sub(r"\\N\s+", r"\\N", ev.text)
+                ev.text = re.sub(r"\s+\\N", r"\\N", ev.text).strip()
+                fixes.append(f"[Episode Quality Gate - ALARM: Wykryto i usunięto wyciek meta-języka AVT] Linia #{i+1}: wyczyszczono frazę meta-kanoniczną")
 
             # Record if text changed due to hygiene
             if ev.text != text_before and not any(f"Linia #{i+1}:" in f for f in fixes):
