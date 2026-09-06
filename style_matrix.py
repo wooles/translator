@@ -26,14 +26,33 @@ class StyleProfile:
     """Stores computed geometric and semantic profile of a single ASS style."""
     def __init__(self, name: str, style: pysubs2.SSAStyle, play_res_y: int = 1080):
         self.name = name
-        self.alignment = style.alignment  # 1-3: Bottom, 4-6: Middle, 7-9: Top
-        self.margin_v = style.marginv
-        self.fontsize = style.fontsize
-        self.is_italic = bool(style.italic)
-        self.play_res_y = play_res_y
+        try:
+            self.alignment = int(getattr(style, "alignment", 2))
+        except (ValueError, TypeError):
+            self.alignment = 2
+
+        try:
+            self.margin_v = float(getattr(style, "marginv", 10.0))
+        except (ValueError, TypeError):
+            self.margin_v = 10.0
+
+        try:
+            self.fontsize = float(getattr(style, "fontsize", 20.0))
+        except (ValueError, TypeError):
+            self.fontsize = 20.0
+
+        self.is_italic = bool(getattr(style, "italic", False))
+
+        try:
+            res_y = float(play_res_y) if play_res_y else 1080.0
+        except (ValueError, TypeError):
+            res_y = 1080.0
+        if res_y <= 0:
+            res_y = 1080.0
+        self.play_res_y = int(round(res_y))
 
         # Compute relative vertical margin
-        self.rel_margin_v = (self.margin_v / play_res_y) if play_res_y > 0 else 0.0
+        self.rel_margin_v = (self.margin_v / res_y) if res_y > 0 else 0.0
 
         # Initial classification based purely on style properties and naming
         self.default_role = self._classify_style_default(style)
@@ -80,8 +99,21 @@ class StyleProfile:
 class StyleMatrixReport:
     """Contains analyzed style roles and event-level classifications for an episode."""
     def __init__(self, subs: pysubs2.SSAFile):
-        self.play_res_x = subs.info.get("PlayResX", 1920)
-        self.play_res_y = subs.info.get("PlayResY", 1080)
+        try:
+            self.play_res_x = int(subs.info.get("PlayResX", 1920) or 1920)
+        except (ValueError, TypeError):
+            self.play_res_x = 1920
+
+        try:
+            self.play_res_y = int(subs.info.get("PlayResY", 1080) or 1080)
+        except (ValueError, TypeError):
+            self.play_res_y = 1080
+
+        if self.play_res_x <= 0:
+            self.play_res_x = 1920
+        if self.play_res_y <= 0:
+            self.play_res_y = 1080
+
         self.style_profiles: Dict[str, StyleProfile] = {}
         self.event_roles: List[EventRole] = []
         self.event_details: List[str] = []

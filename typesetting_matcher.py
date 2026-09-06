@@ -322,6 +322,21 @@ class TypesettingColorMatcher:
         """
         eff_prefix = existing_prefix if existing_prefix is not None else (prefix or "")
 
+        try:
+            rx = float(playres_x) if playres_x else 1920.0
+        except (ValueError, TypeError):
+            rx = 1920.0
+        try:
+            ry = float(playres_y) if playres_y else 1080.0
+        except (ValueError, TypeError):
+            ry = 1080.0
+        if rx <= 0:
+            rx = 1920.0
+        if ry <= 0:
+            ry = 1080.0
+        playres_x = int(round(rx))
+        playres_y = int(round(ry))
+
         if not typesetting_data:
             return cls.enhance_sign_typesetting(original_prefix=eff_prefix, style=style)
 

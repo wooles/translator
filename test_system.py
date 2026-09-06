@@ -2861,6 +2861,9 @@ def test_comprehensive_architecture_extensions():
     # 1. StyleMatrixEngine Test
     from style_matrix import analyze_subtitles, EventRole
     subs = pysubs2.SSAFile()
+    # Explicitly test string PlayRes attributes (as parsed by pysubs2.load from real ASS files)
+    subs.info["PlayResX"] = "1920"
+    subs.info["PlayResY"] = "1080"
     subs.styles["Subtitle"] = pysubs2.SSAStyle(alignment=2, marginv=40, fontsize=50)
     subs.styles["Caption-14"] = pysubs2.SSAStyle(alignment=7, marginv=20, fontsize=35)
     subs.styles["OP-Romanji"] = pysubs2.SSAStyle(alignment=8, marginv=30, fontsize=40)
