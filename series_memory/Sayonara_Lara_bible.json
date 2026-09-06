@@ -8,7 +8,7 @@
       "description": "Zwrot: 'na ty / po imieniu (Lara)' (znajomi / rozwijające się uczucie)"
     },
     "Mari -> Lara": {
-      "description": "Zwrot: 'na ty / po imieniu (Lara)' (przyjaciółki / współlokatorki)"
+      "description": "Zwrot: 'na ty / Lara' (bliskie przyjaciółki)"
     },
     "Gon (Grace) -> Lara": {
       "description": "PŁEĆ: ŻEŃSKA (Wiedźma/mentorka w postaci rybki w akwarium). Zawsze formy ŻEŃSKIE (np. poszukałam, widziałam, mogłabym). Zwrot: 'na ty / po imieniu: Lara'"
@@ -17,7 +17,7 @@
       "description": "PŁEĆ: ŻEŃSKA (Wiedźma/mentorka w akwarium mówiąca do leżącej na łóżku Mari). Obie to KOBIETY! Zawsze formy ŻEŃSKIE (np. 'Chcesz, żebym poszukała?' / 'Mam poszukać?'). Zwrot: 'Mari / na ty'"
     },
     "Mari Otsu": {
-      "description": "PŁEĆ: ŻEŃSKA / KOBIETA (Bokserka, krótko ścięte czarne włosy, luźna czarna koszulka, styl tomboy). Mimo krótkich włosów to w 100% DZIEWCZYNA! Wszystkie formy dotyczące jej lub przez nią wypowiadane muszą być ŻEŃSKIE!"
+      "description": "kobieta (Uczennica szkoły średniej, zawodniczka boksu juniorskiego, oddana przyjaciółka Lary)"
     },
     "Gon (Grace) -> Luca": {
       "description": "PŁEĆ: ŻEŃSKA (Wiedźma/mentorka w akwarium). Zawsze formy ŻEŃSKIE (np. 'Chcesz, żebym poszukała?' / 'Mam poszukać?'). Zwrot: 'Luca / na ty'"
@@ -42,10 +42,46 @@
     },
     "Grace -> Mari": {
       "description": "Zwrot: 'Mari' (wiedźma w akwarium -> opiekunka)"
+    },
+    "Lara -> Rowan": {
+      "description": "Zwrot: 'ojcze' (córka -> ojciec / król)"
+    },
+    "Rowan -> Lara": {
+      "description": "Zwrot: 'Lara / córko' (ojciec / monarcha -> córka)"
+    },
+    "Luca -> Mari": {
+      "description": "Zwrot: 'Otsu / na ty' (znajomi ze szkoły)"
+    },
+    "Yoshiya -> Mari": {
+      "description": "Zwrot: 'Mari / na ty' (rodzeństwo (starszy brat -> młodsza siostra))"
+    },
+    "Yoshiya -> Luca": {
+      "description": "Zwrot: 'młody / na ty' (starszy chłopak -> intruz / młodszy kolega siostry)"
+    },
+    "Lara": {
+      "description": "kobieta / dziewczyna (Główna bohaterka)"
+    },
+    "Rowan": {
+      "description": "mężczyzna (Król syren, ojciec Lary, wyniosły i pałający bezwzględną nienawiścią do rodzaju ludzkiego)"
+    },
+    "Luca": {
+      "description": "mężczyzna (Nastolatek, przyjaciel Mari i Lary, momentami tchórzliwy, lecz w decydującej chwili przezwyciężający strach)"
+    },
+    "Yoshiya": {
+      "description": "mężczyzna (Starszy brat Mari, nonszalancki buntownik wagarowicz z praktycznymi znajomościami)"
+    },
+    "Mari": {
+      "description": "kobieta (postać)"
+    },
+    "Lisa": {
+      "description": "kobieta (postać)"
+    },
+    "Rigmor": {
+      "description": "kobieta (postać)"
     }
   },
   "glossary": {
-    "Lake Biwa": "Jezioro Biwa",
+    "Lake Biwa": "jezioro Biwa",
     "Biwako Terrace": "Biwako Terrace",
     "Dagger": "Sztylet",
     "Lake Biwa Fireworks Festival": "Festiwal Fajerwerków nad jeziorem Biwa",
@@ -58,11 +94,148 @@
     "True Love": "Prawdziwa miłość",
     "Witch's potion": "Eliksir czarownicy",
     "Chlorine Removal": "Uzdatniacz wody",
-    "Zeze Castle": "Zamek Zeze"
+    "Zeze Castle": "Zamek Zeze",
+    "Okishima": "Okishima",
+    "Mother Lake": "Matka Jezioro",
+    "merfolk": "syreni lud",
+    "light": "światłość"
   },
   "relationships": {},
+  "declensions": {
+    "Mari -> Lara": {
+      "M": "Mari -> Lara",
+      "D": "Mari -> Lary",
+      "C": "Mari -> Larze",
+      "B": "Mari -> Larę",
+      "N": "Mari -> Larą",
+      "Ms": "Mari -> Larze",
+      "W": "Mari -> Laro"
+    },
+    "Lara -> Rowan": {
+      "M": "Lara -> Rowan",
+      "D": "Lara -> Rowana",
+      "C": "Lara -> Rowanowi",
+      "B": "Lara -> Rowana",
+      "N": "Lara -> Rowanem",
+      "Ms": "Lara -> Rowanie",
+      "W": "Lara -> Rowanie"
+    },
+    "Rowan -> Lara": {
+      "M": "Rowan -> Lara",
+      "D": "Rowan -> Lary",
+      "C": "Rowan -> Larze",
+      "B": "Rowan -> Larę",
+      "N": "Rowan -> Larą",
+      "Ms": "Rowan -> Larze",
+      "W": "Rowan -> Laro"
+    },
+    "Luca -> Mari": {
+      "M": "Luca -> Mari",
+      "D": "Luca -> Mari",
+      "C": "Luca -> Mari",
+      "B": "Luca -> Mari",
+      "N": "Luca -> Mari",
+      "Ms": "Luca -> Mari",
+      "W": "Luca -> Mari"
+    },
+    "Yoshiya -> Mari": {
+      "M": "Yoshiya -> Mari",
+      "D": "Yoshiya -> Mari",
+      "C": "Yoshiya -> Mari",
+      "B": "Yoshiya -> Mari",
+      "N": "Yoshiya -> Mari",
+      "Ms": "Yoshiya -> Mari",
+      "W": "Yoshiya -> Mari"
+    },
+    "Yoshiya -> Luca": {
+      "M": "Yoshiya -> Luca",
+      "D": "Yoshiya -> Lucy",
+      "C": "Yoshiya -> Luce",
+      "B": "Yoshiya -> Lucę",
+      "N": "Yoshiya -> Lucą",
+      "Ms": "Yoshiya -> Luce",
+      "W": "Yoshiya -> Luco"
+    },
+    "Lara": {
+      "M": "Lara",
+      "D": "Lary",
+      "C": "Larze",
+      "B": "Larę",
+      "N": "Larą",
+      "Ms": "Larze",
+      "W": "Laro"
+    },
+    "Rowan": {
+      "M": "Rowan",
+      "D": "Rowana",
+      "C": "Rowanowi",
+      "B": "Rowana",
+      "N": "Rowanem",
+      "Ms": "Rowanie",
+      "W": "Rowanie"
+    },
+    "Mari Otsu": {
+      "M": "Mari Otsu",
+      "D": "Mari Otsu",
+      "C": "Mari Otsu",
+      "B": "Mari Otsu",
+      "N": "Mari Otsu",
+      "Ms": "Mari Otsu",
+      "W": "Mari Otsu"
+    },
+    "Luca": {
+      "M": "Luca",
+      "D": "Lucy",
+      "C": "Luce",
+      "B": "Lucę",
+      "N": "Lucą",
+      "Ms": "Luce",
+      "W": "Luco"
+    },
+    "Yoshiya": {
+      "M": "Yoshiya",
+      "D": "Yoshiyy",
+      "C": "Yoshiye",
+      "B": "Yoshiyę",
+      "N": "Yoshiyą",
+      "Ms": "Yoshiye",
+      "W": "Yoshiyo"
+    },
+    "Mari": {
+      "M": "Mari",
+      "D": "Mari",
+      "C": "Mari",
+      "B": "Mari",
+      "N": "Mari",
+      "Ms": "Mari",
+      "W": "Mari"
+    },
+    "Lisa": {
+      "M": "Lisa",
+      "D": "Lisy",
+      "C": "Lisie",
+      "B": "Lisę",
+      "N": "Lisą",
+      "Ms": "Lisie",
+      "W": "Liso"
+    },
+    "Rigmor": {
+      "M": "Rigmor",
+      "D": "Rigmor",
+      "C": "Rigmor",
+      "B": "Rigmor",
+      "N": "Rigmor",
+      "Ms": "Rigmor",
+      "W": "Rigmor"
+    }
+  },
+  "plot_anchors": {
+    "Białe kwiaty na tafli jeziora": "Zachować spójność opisu zjawiska jako identycznego ze śladem, który pojawił się przy wcześniejszym użyciu mocy przez Larę.",
+    "Utrata światła i śmierć matki (Rigmor)": "Imię matki Rigmor musi pozostać niezmienne, a jej zabójstwo przez ludzi stanowi niezmienny dogmat nienawiści króla Rowana."
+  },
   "episodes_translated": [
     "Sayonara Lara - 08",
-    "[ASW] Sayonara Lara - 09 [1080p HEVC][D0F6BE61]"
+    "[ASW] Sayonara Lara - 09 [1080p HEVC][D0F6BE61]",
+    "[ASW] Sayonara Lara - 10 [1080p HEVC][7AE6081B]"
   ]
 }

@@ -3203,6 +3203,7 @@ class MultimodalTranslator:
                 bool(re.search(r"\b(sign|signs|title|titles|typeset|typesetting|caption|captions)\b", style_clean))
                 or style_clean.startswith("caption")
             )
+            is_title_card = bool(re.match(r"^(episode|odcinek|chapter|rozdział|act|akt|part|część)\s+(\d+|[ivxlcdm]+)", clean_check, re.IGNORECASE))
 
             if is_sign_flag or is_title_card or (clean_check.startswith("[") and clean_check.endswith("]")) or has_sign_style:
                 target_style = getattr(subs, "styles", {}).get(orig_event.style) if hasattr(subs, "styles") else None

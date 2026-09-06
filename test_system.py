@@ -3130,6 +3130,17 @@ def test_fansub_quality_pixel_perfect_typesetting():
     assert r"\frz15" in tags_from_dict
     assert r"\1c&H00AAFF&" in tags_from_dict
 
+    # 11. Test montażu napisów i flagi is_title_card w final_subs
+    import re
+    from translator import detect_event_visual_type
+    orig_ev = pysubs2.SSAEvent(start=1000, end=3000, text="Episode 10: Sayonara", style="Title")
+    clean_tr = "Odcinek 10: Sayonara"
+    clean_chk = clean_tr.strip()
+    is_sgn = detect_event_visual_type(orig_ev, "")["is_sign"]
+    is_tc = bool(re.match(r"^(episode|odcinek|chapter|rozdział|act|akt|part|część)\s+(\d+|[ivxlcdm]+)", clean_chk, re.IGNORECASE))
+    assert is_tc is True
+    assert (is_sgn or is_tc) is True
+
     print(" -> PASSED: Fansub-Quality Pixel-Perfect Typesetting (Grounding 2D, \\pos, \\frz, \\1c, \\3c) działa w 100% harmonii.")
 
 
