@@ -7,12 +7,36 @@ and automatically generates aesthetic ASS color tags {\\1c&HBBGGRR&}.
 
 import os
 import re
-from typing import Optional, Tuple, Any
+from typing import Optional, Tuple, Any, List
 from PIL import Image
+from pydantic import BaseModel, Field
 
 def rgb_to_ass_hex(r: int, g: int, b: int) -> str:
     """Converts RGB color tuple to ASS BGR format (&HBBGGRR&)."""
     return f"&H{b:02X}{g:02X}{r:02X}&"
+
+def hex_to_ass_hex(hex_str: str) -> Optional[str]:
+    """Converts #RRGGBB or RRGGBB to ASS BGR format (&HBBGGRR&)."""
+    if not hex_str:
+        return None
+    clean = str(hex_str).strip().lstrip("#")
+    if len(clean) == 6:
+        try:
+            r = int(clean[0:2], 16)
+            g = int(clean[2:4], 16)
+            b = int(clean[4:6], 16)
+            return rgb_to_ass_hex(r, g, b)
+        except ValueError:
+            return None
+    return None
+
+class VisualTypesettingData(BaseModel):
+    detected_box_1000: Optional[List[int]] = Field(default=None, description="[ymin, xmin, ymax, xmax] w skali 0-1000 dla japońskiego tekstu/planszy na kadrze")
+    placement: Optional[str] = Field(default="above", description="'above' (nad japońskim tekstem), 'below' (pod), 'overlay' (na tekście), 'beside_right' (obok po prawej), 'beside_left' (obok po lewej)")
+    rotation_deg: Optional[int] = Field(default=0, description="Kąt obrotu w stopniach (-45 do 45) jeśli tekst na kadrze jest skośny/pod kątem, inaczej 0")
+    primary_color_hex: Optional[str] = Field(default=None, description="Kolor wiodący napisu w formacie HEX '#RRGGBB' lub null")
+    outline_color_hex: Optional[str] = Field(default=None, description="Kolor obrysu/cienia w formacie HEX '#RRGGBB' lub null")
+    font_style_hint: Optional[str] = Field(default=None, description="'comic', 'handwritten', 'clean', 'serif', 'neon' lub null")
 
 class TypesettingColorMatcher:
     def __init__(self):
@@ -279,3 +303,175 @@ class TypesettingColorMatcher:
                 return f"{{\\3c&H000000&\\bord3}}{prefix}"
 
         return prefix
+
+    @classmethod
+    def generate_pixel_perfect_ass_tags(
+        cls,
+        typesetting_data: Any,
+        playres_x: int = 1920,
+        playres_y: int = 1080,
+        prefix: str = "",
+        existing_prefix: Optional[str] = None,
+        image_path: Optional[str] = None,
+        style: Optional[Any] = None
+    ) -> str:
+        """
+        Generates Fansub-Quality Pixel-Perfect ASS tags (\\pos, \\frz, \\1c, \\3c, \\blur, \\bord)
+        from Gemini 2D Spatial Grounding metadata (bounding box, placement, rotation, color).
+        Preserves custom \\pos(X, Y) if already present in existing_prefix.
+        """
+        eff_prefix = existing_prefix if existing_prefix is not None else (prefix or "")
+
+        if not typesetting_data:
+            return cls.enhance_sign_typesetting(original_prefix=eff_prefix, style=style)
+
+        # Extract typesetting metadata from Pydantic model or dict
+        def _get(field: str, default=None):
+            if hasattr(typesetting_data, field):
+                val = getattr(typesetting_data, field)
+                return val if val is not None else default
+            elif isinstance(typesetting_data, dict):
+                val = typesetting_data.get(field)
+                return val if val is not None else default
+            return default
+
+        bbox = _get("detected_box_1000")
+        placement = str(_get("placement", "above") or "above").lower().strip()
+        rotation_deg = _get("rotation_deg", 0)
+        primary_hex = _get("primary_color_hex")
+        outline_hex = _get("outline_color_hex")
+        font_hint = str(_get("font_style_hint", "") or "").lower().strip()
+        screen_reg = _get("screen_region")
+
+        tags = []
+
+        # 2. Position Calculation (\pos) from Bounding Box [ymin, xmin, ymax, xmax] in 0..1000
+        # If custom position is already defined in existing prefix, preserve it and do NOT calculate new \pos
+        has_custom_pos = r"\pos" in eff_prefix
+        has_valid_bbox = False
+
+        if not has_custom_pos:
+            if bbox and isinstance(bbox, (list, tuple)) and len(bbox) == 4:
+                try:
+                    ymin, xmin, ymax, xmax = [float(v) for v in bbox]
+                    # Sanity check ranges
+                    if 0 <= ymin <= 1000 and 0 <= xmin <= 1000 and ymin < ymax <= 1000 and xmin < xmax <= 1000:
+                        has_valid_bbox = True
+                        b_ymin = (ymin / 1000.0) * playres_y
+                        b_xmin = (xmin / 1000.0) * playres_x
+                        b_ymax = (ymax / 1000.0) * playres_y
+                        b_xmax = (xmax / 1000.0) * playres_x
+                        center_x = (b_xmin + b_xmax) / 2.0
+                        center_y = (b_ymin + b_ymax) / 2.0
+
+                        if placement == "above":
+                            anchor = "an2"  # Bottom-center: sits directly above the Japanese text
+                            pos_x = center_x
+                            pos_y = max(25.0, b_ymin - 8.0)
+                        elif placement == "below":
+                            anchor = "an8"  # Top-center: sits directly below the Japanese text
+                            pos_x = center_x
+                            pos_y = min(float(playres_y) - 25.0, b_ymax + 8.0)
+                        elif placement in ["beside_right", "right"]:
+                            anchor = "an4"  # Middle-left: sits right of the Japanese text
+                            pos_x = min(float(playres_x) - 30.0, b_xmax + 10.0)
+                            pos_y = center_y
+                        elif placement in ["beside_left", "left"]:
+                            anchor = "an6"  # Middle-right: sits left of the Japanese text
+                            pos_x = max(30.0, b_xmin - 10.0)
+                            pos_y = center_y
+                        else:  # overlay / center
+                            anchor = "an5"  # Center
+                            pos_x = center_x
+                            pos_y = center_y
+
+                        # Margin clamping
+                        pos_x = max(20.0, min(float(playres_x) - 20.0, pos_x))
+                        pos_y = max(20.0, min(float(playres_y) - 20.0, pos_y))
+
+                        tags.append(f"\\{anchor}\\pos({int(round(pos_x))},{int(round(pos_y))})")
+                except (ValueError, TypeError):
+                    has_valid_bbox = False
+
+            if not has_valid_bbox:
+                # Fallback to quadrant alignment
+                if screen_reg:
+                    pos_tag = cls.calculate_optimal_sign_position(region=screen_reg)
+                    tags.append(pos_tag.strip("{}"))
+                elif not (r"\an" in eff_prefix or r"\pos" in eff_prefix):
+                    tags.append(r"\an8")
+
+        # 3. Rotation Angle (\frz)
+        if rotation_deg and r"\frz" not in eff_prefix:
+            try:
+                rot_float = float(rotation_deg)
+                if rot_float != 0:
+                    clamped_rot = max(-60.0, min(60.0, rot_float))
+                    tags.append(f"\\frz{int(round(clamped_rot))}")
+            except (ValueError, TypeError):
+                pass
+
+        # 4. Color Matching (\1c and \3c)
+        primary_ass = hex_to_ass_hex(primary_hex) if primary_hex else None
+        outline_ass = hex_to_ass_hex(outline_hex) if outline_hex else None
+
+        # Sample from image crop if primary color not specified by model
+        if not primary_ass and image_path and has_valid_bbox:
+            try:
+                with Image.open(image_path) as img:
+                    w, h = img.size
+                    crop_box = (
+                        int((xmin / 1000.0) * w),
+                        int((ymin / 1000.0) * h),
+                        int((xmax / 1000.0) * w),
+                        int((ymax / 1000.0) * h)
+                    )
+                    crop_box = (
+                        max(0, crop_box[0] - 5),
+                        max(0, crop_box[1] - 5),
+                        min(w, crop_box[2] + 5),
+                        min(h, crop_box[3] + 5)
+                    )
+                    if crop_box[2] > crop_box[0] and crop_box[3] > crop_box[1]:
+                        crop = img.crop(crop_box)
+                        crop.thumbnail((64, 64), Image.Resampling.BOX)
+                        q = crop.convert("P", palette=Image.ADAPTIVE, colors=8)
+                        pal = q.getpalette()
+                        cols = q.getcolors()
+                        if cols and pal:
+                            cols.sort(key=lambda x: x[0], reverse=True)
+                            for cnt, idx in cols:
+                                r, g, b = pal[idx*3], pal[idx*3+1], pal[idx*3+2]
+                                if 40 < (r + g + b) / 3.0 < 245:
+                                    primary_ass = rgb_to_ass_hex(r, g, b)
+                                    break
+            except Exception:
+                pass
+
+        if primary_ass and r"\1c" not in eff_prefix and r"\c&H" not in eff_prefix:
+            tags.append(f"\\1c{primary_ass}")
+
+        if outline_ass and r"\3c" not in eff_prefix:
+            tags.append(f"\\3c{outline_ass}")
+
+        # 5. Styling Effects (Border, Blur for neon/comic)
+        if "comic" in font_hint or "neon" in font_hint or (rotation_deg and abs(float(rotation_deg)) >= 15):
+            if r"\blur" not in eff_prefix:
+                tags.append(r"\blur1.5")
+            if r"\bord" not in eff_prefix and not outline_ass:
+                tags.append(r"\bord3")
+        elif "paper" in font_hint or "clean" in font_hint:
+            if r"\bord" not in eff_prefix:
+                tags.append(r"\bord0\shad1")
+
+        new_tags_str = "".join(tags)
+        if new_tags_str:
+            clean_existing = eff_prefix
+            if has_valid_bbox and not has_custom_pos:
+                clean_existing = re.sub(r"\{\\an\d\}|\\an\d", "", clean_existing).strip()
+            res_prefix = f"{{{new_tags_str}}}{clean_existing}"
+        else:
+            res_prefix = eff_prefix
+
+        return cls.ensure_sign_contrast(res_prefix, style=style)
+

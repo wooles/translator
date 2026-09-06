@@ -2986,6 +2986,150 @@ def test_anti_attention_dilution_semantic_anchors_and_full_phase2():
     print(" -> PASSED: Pełna Faza 2 CoT 6000 (100% kwestii), Anti-Attention Dilution i Kotwice Semantyczne działają w 100% harmonii.")
 
 
+def test_fansub_quality_pixel_perfect_typesetting():
+    print("[TEST 44/44] Test Fansub-Quality Pixel-Perfect Typesetting (Grounding 2D, \\pos, \\frz, \\1c, \\3c)...")
+    from typesetting_matcher import hex_to_ass_hex, VisualTypesettingData, TypesettingColorMatcher
+    from translator import LineTranslation
+    from verifier import RefinedLine
+
+    # 1. Test konwersji kolorów HEX (#RRGGBB -> ASS &HBBGGRR&)
+    assert hex_to_ass_hex("#FFFFFF") == "&HFFFFFF&"
+    assert hex_to_ass_hex("#FF8040") == "&H4080FF&"
+    assert hex_to_ass_hex("#70FF70") == "&H70FF70&"
+    assert hex_to_ass_hex("005500") == "&H005500&"
+    assert hex_to_ass_hex(None) is None
+    assert hex_to_ass_hex("invalid") is None
+
+    # 2. Test modelu VisualTypesettingData
+    vdata = VisualTypesettingData(
+        detected_box_1000=[100, 200, 300, 400],
+        placement="above",
+        rotation_deg=-25,
+        primary_color_hex="#70FF70",
+        outline_color_hex="#005500",
+        font_style_hint="comic_bold"
+    )
+    assert vdata.detected_box_1000 == [100, 200, 300, 400]
+    assert vdata.placement == "above"
+    assert vdata.rotation_deg == -25
+    assert vdata.primary_color_hex == "#70FF70"
+
+    # 3. Test integracji z Pydantic w Faza 1 i Faza 2
+    tr_line = LineTranslation(
+        id=1,
+        polish_text="MANGA MÓJ BOHATER",
+        visual_typesetting=vdata
+    )
+    assert tr_line.visual_typesetting is not None
+    assert tr_line.visual_typesetting.rotation_deg == -25
+
+    ref_line = RefinedLine(
+        id=1,
+        refined_pl="MANGA MÓJ BOHATER",
+        visual_typesetting=vdata
+    )
+    assert ref_line.visual_typesetting is not None
+    assert ref_line.visual_typesetting.primary_color_hex == "#70FF70"
+
+    # 4. Test generowania tagów piksel-w-piksel (\pos, \frz, \1c, \3c, \blur)
+    # Rozdzielczość 1920x1080, box [ymin=100, xmin=200, ymax=300, xmax=400]
+    # xmin = 200/1000 * 1920 = 384, xmax = 400/1000 * 1920 = 768 -> center_x = 576
+    # ymin = 100/1000 * 1080 = 108, ymax = 300/1000 * 1080 = 324
+    # 'above' -> anchor \an2, pos_x=576, pos_y=max(25, 108-8)=100
+    tags_above = TypesettingColorMatcher.generate_pixel_perfect_ass_tags(
+        typesetting_data=vdata,
+        playres_x=1920,
+        playres_y=1080,
+        prefix=""
+    )
+    assert r"\an2\pos(576,100)" in tags_above, f"Brak poprawnej pozycji \\an2\\pos(576,100): {tags_above}"
+    assert r"\frz-25" in tags_above, f"Brak poprawnego obrotu \\frz-25: {tags_above}"
+    assert r"\1c&H70FF70&" in tags_above, f"Brak koloru tekstu \\1c&H70FF70&: {tags_above}"
+    assert r"\3c&H005500&" in tags_above, f"Brak obrysu \\3c&H005500&: {tags_above}"
+    assert r"\blur1.5" in tags_above, f"Brak efektu blur dla komiksu: {tags_above}"
+
+    # 5. Test wariantu umiejscowienia: 'below'
+    vdata_below = VisualTypesettingData(
+        detected_box_1000=[100, 200, 300, 400],
+        placement="below"
+    )
+    # 'below' -> anchor \an8, pos_x=576, pos_y=min(1080-25, 324+8)=332
+    tags_below = TypesettingColorMatcher.generate_pixel_perfect_ass_tags(
+        typesetting_data=vdata_below,
+        playres_x=1920,
+        playres_y=1080,
+        prefix=""
+    )
+    assert r"\an8\pos(576,332)" in tags_below, f"Brak poprawnej pozycji \\an8\\pos(576,332): {tags_below}"
+
+    # 6. Test wariantu umiejscowienia: 'beside_right'
+    vdata_right = VisualTypesettingData(
+        detected_box_1000=[100, 200, 300, 400],
+        placement="beside_right"
+    )
+    # 'beside_right' -> anchor \an4, pos_x=min(1920-30, 768+10)=778, pos_y=(108+324)/2=216
+    tags_right = TypesettingColorMatcher.generate_pixel_perfect_ass_tags(
+        typesetting_data=vdata_right,
+        playres_x=1920,
+        playres_y=1080,
+        prefix=""
+    )
+    assert r"\an4\pos(778,216)" in tags_right, f"Brak poprawnej pozycji \\an4\\pos(778,216): {tags_right}"
+
+    # 7. Test wariantu umiejscowienia: 'overlay'
+    vdata_overlay = VisualTypesettingData(
+        detected_box_1000=[100, 200, 300, 400],
+        placement="overlay"
+    )
+    # 'overlay' -> anchor \an5, pos_x=576, pos_y=216
+    tags_overlay = TypesettingColorMatcher.generate_pixel_perfect_ass_tags(
+        typesetting_data=vdata_overlay,
+        playres_x=1920,
+        playres_y=1080,
+        prefix=""
+    )
+    assert r"\an5\pos(576,216)" in tags_overlay, f"Brak pozycji \\an5\\pos(576,216): {tags_overlay}"
+
+    # 8. Test zachowania istniejących współrzędnych \pos z oryginalnego pliku (Zero-Destruction Rule)
+    existing_prefix = r"{\pos(150,250)\c&HFFFFFF&}"
+    tags_preserved = TypesettingColorMatcher.generate_pixel_perfect_ass_tags(
+        typesetting_data=vdata,
+        playres_x=1920,
+        playres_y=1080,
+        prefix=existing_prefix
+    )
+    assert r"\pos(150,250)" in tags_preserved, f"Oryginalne \\pos(150,250) powinno być nienaruszone: {tags_preserved}"
+    assert r"\frz-25" in tags_preserved, f"Powinno dołączyć \\frz-25: {tags_preserved}"
+
+    # 9. Test fallbacku do kwadrantu gdy brak Bounding Boxa (Pure Text Mode)
+    vdata_no_bbox = {"screen_region": "bottom_right"}
+    tags_fallback = TypesettingColorMatcher.generate_pixel_perfect_ass_tags(
+        typesetting_data=vdata_no_bbox,
+        playres_x=1920,
+        playres_y=1080,
+        prefix=""
+    )
+    assert r"\an3" in tags_fallback, f"Oczekiwano fallbacku \\an3 dla bottom_right: {tags_fallback}"
+
+    # 10. Test słownika (dict) zamiast obiektu Pydantic (wznowienie z checkpointu JSON)
+    dict_data = {
+        "detected_box_1000": [100, 200, 300, 400],
+        "placement": "above",
+        "rotation_deg": 15,
+        "primary_color_hex": "#FFAA00"
+    }
+    tags_from_dict = TypesettingColorMatcher.generate_pixel_perfect_ass_tags(
+        typesetting_data=dict_data,
+        playres_x=1920,
+        playres_y=1080
+    )
+    assert r"\an2\pos(576,100)" in tags_from_dict
+    assert r"\frz15" in tags_from_dict
+    assert r"\1c&H00AAFF&" in tags_from_dict
+
+    print(" -> PASSED: Fansub-Quality Pixel-Perfect Typesetting (Grounding 2D, \\pos, \\frz, \\1c, \\3c) działa w 100% harmonii.")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -3028,7 +3172,8 @@ if __name__ == "__main__":
     test_quality_gate_name_declension_vocative_and_micro_lines()
     test_comprehensive_architecture_extensions()
     test_anti_attention_dilution_semantic_anchors_and_full_phase2()
-    print("\n Wszystkie testy jednostkowe i integracyjne (43/43) zakończone pełnym sukcesem!\n")
+    test_fansub_quality_pixel_perfect_typesetting()
+    print("\n Wszystkie testy jednostkowe i integracyjne (44/44) zakończone pełnym sukcesem!\n")
 
 
 

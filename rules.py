@@ -367,6 +367,7 @@ FILAR XLI: PRZEKŁAD NAPISÓW EKRANOWYCH I STANDARD DUAL-TRACK SUBTITLING (SIGNS
   * MUSI być przetłumaczona jako SAMODZIELNY TYTUŁ LUB NAZWA (np. "The Princess's Favor" -> "Łaska księżniczki").
   * KATEGORYCZNY ZAKAZ wklejania w pole napisu ekranowego fragmentów wypowiedzi mówionych przez postacie!
   * Standard Dual-Track: Kiedy w tym samym ułamku sekundy pada dialog i napis ekranowy, dialog umieszczaj na dole ekranu, a napis ekranowy u góry w nawiasie prostokątnym wersalikami: "[ CZASY WSPÓŁCZESNE ]", "[ INFORMACJA TURYSTYCZNA ]".
+  * FANSUB-QUALITY VISUAL TYPESETTING (Pixel-Perfect Spatial Grounding): Dla plansz, szyldów, okładek mangi i onomatopei (SFX) rozpoznaj na dołączonym kadrze wideo pozycję oryginalnego tekstu (detected_box_1000: [ymin, xmin, ymax, xmax]), kąt obrotu (rotation_deg: np. -25 dla skosu), sugerowane umiejscowienie ('above' / 'below' / 'overlay') oraz dominujące kolory (primary_color_hex, outline_color_hex), aby tłumacz mógł wygenerować perfekcyjne współrzędne ASS (\pos, \frz, \1c, \3c) dorównujące ręcznemu typesettingowi grup fansubberskich.
   * BEZPIECZNIK ANTYKOLIZYJNY: Jeśli w pliku .ass istnieją już wystylizowane napisy dla notesu/plakatu, nie dubluj linii.
 
 FILAR XLII: ZAKAZ HALUCYNACJI PRZYNALEŻNOŚCI I ZAIMKÓW DZIERŻAWCZYCH (3. OSOBA VS 1. OSOBA):

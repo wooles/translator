@@ -11,11 +11,13 @@ from google import genai
 from google.genai import types
 from rules import get_verifier_system_prompt, SceneDiagnosis
 from client_factory import format_friendly_api_error
+from typesetting_matcher import VisualTypesettingData
 
 class RefinedLine(BaseModel):
     id: int = Field(description="ID kwestii dialogowej zgodne z wejściem")
     refined_pl: str = Field(description="Ostateczna, perfekcyjnie zredagowana kwestia w języku polskim, wolna od kalek")
     screen_region: Optional[str] = Field(default=None, description="Dla planszy/tytułu/napisu ekranowego: wskaż lub zachowaj wykryte na kadrze położenie japońskiego napisu: 'bottom_right' (prawy dolny róg), 'bottom_left' (lewy dolny róg), 'top_right' (prawy górny róg), 'top_left' (lewy górny róg), 'bottom_center' (dół), 'top_center' (góra), 'center' (środek) lub null dla zwykłych dialogów.")
+    visual_typesetting: Optional[VisualTypesettingData] = Field(default=None, description="Zachowaj lub skoryguj obiekt pozycjonowania przestrzennego (VisualTypesettingData) dla napisów ekranowych")
     changes_made: Optional[str] = Field(default=None, description="Dokładne uzasadnienie i numer Filaru AVT dla poprawionej kwestii (np. '[Filar IV - Szyk Zdania] Usunięto kalkę'). Jeśli kwestia nie wymagała zmian, wpisz null.")
 
 class RefinedBatchResponse(BaseModel):

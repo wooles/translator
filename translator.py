@@ -76,7 +76,7 @@ from avt_formatter import (
 )
 from prosody_engine import AudioProsodyEngine
 from speaker_diarizer import SpeakerVoiceClassifier
-from typesetting_matcher import TypesettingColorMatcher
+from typesetting_matcher import TypesettingColorMatcher, VisualTypesettingData
 from user_feedback import UserFeedbackManager
 from glossary_manager import GlossaryManager
 from client_factory import format_friendly_api_error
@@ -982,6 +982,7 @@ class LineTranslation(BaseModel):
     speaker_gender: Optional[str] = Field(default=None, description="Płeć mówcy: 'mężczyzna' lub 'kobieta'")
     semiotic_layer: Optional[str] = Field(default="spoken_on_screen", description="Warstwa semiotyczna: 'spoken_on_screen' (mowa w kadrze), 'spoken_off_screen' (komentarz zza kadru), 'manga_balloon' (dymek/halucynacja), 'inner_thought' (myśli), 'diegetic_sign' (plansza/napis)")
     screen_region: Optional[str] = Field(default=None, description="Dla planszy/tytułu/napisu ekranowego: wskaż wykryte na kadrze położenie japońskiego napisu: 'bottom_right' (prawy dolny róg), 'bottom_left' (lewy dolny róg), 'top_right' (prawy górny róg), 'top_left' (lewy górny róg), 'bottom_center' (dół), 'top_center' (góra), 'center' (środek) lub null dla zwykłych dialogów.")
+    visual_typesetting: Optional[VisualTypesettingData] = Field(default=None, description="Dla planszy/tytułu/napisu ekranowego/onomatopei: precyzyjne współrzędne 2D [ymin, xmin, ymax, xmax] w skali 0-1000, umiejscowienie 'above'/'below', kąt obrotu rotation_deg (-45 do 45) oraz kolory HEX lub null dla zwykłej mowy.")
     visual_subtext: Optional[str] = Field(default=None, description="Maks. 6 słów o mimice, gestach lub hierarchii przestrzennej (np. 'klęczy przed chanem', 'uśmiech, zaciśnięta pięść') lub null")
     literal_meaning: Optional[str] = Field(default=None, description="Dosłowny idiom JP (maks. 5 słów) tylko w razie potrzeby, inaczej null")
     notes: Optional[str] = Field(default=None, description="Kluczowa notatka (maks. 5 słów) tylko w razie potrzeby, inaczej null")
@@ -1476,7 +1477,7 @@ class MultimodalTranslator:
                 lines.append(f"Kwestia [ID: {idx + 1}] [TYP: [NAPIS] {vtype['type_label']}] (Czas: {start_str} - {end_str}, Cechy: {vtype['visual_details']}):")
                 lines.append(f"  (!) UWAGA WIZUALNA: To jest NAPIS / TYTUŁ NA EKRANIE (np. tytuł odcinka/rozdziału, tytuł mangi, tablica, szyld, plansza).")
                 lines.append(f"  Przetłumacz ten tekst jako SAMODZIELNY TYTUŁ/NAPIS (np. 'The Princess's Favor' / '姫様のご寵愛' -> 'Łaska księżniczki').")
-                lines.append(f"  (!) POŁOŻENIE W KADRZE (Typesetting Proximity): Spójrz na dołączoną klatkę wideo i w polu 'screen_region' wskaż dokładny kwadrant, w którym widnieje ten japoński napis: 'bottom_right' (prawy dolny róg), 'bottom_left' (lewy dolny róg), 'top_right' (prawy górny róg), 'top_left' (lewy górny róg), 'top_center' (górna belka), 'center' (środek) lub 'bottom_center' (dół).")
+                lines.append(f"  (!) POŁOŻENIE I TYPESETTING (Pixel-Perfect Grounding): Spójrz na klatkę wideo i w obiekcie 'visual_typesetting' podaj Bounding Box japońskiego napisu 'detected_box_1000' [ymin, xmin, ymax, xmax] (0-1000), pozycję 'placement' ('above'/'below'/'overlay'/'beside_right'/'beside_left'), kąt obrotu 'rotation_deg' (-45 do 45) oraz kolory HEX ('primary_color_hex', 'outline_color_hex'). W 'screen_region' wskaż kwadrant.")
                 lines.append(f"  BEZWZGLĘDNY ZAKAZ wklejania tu fragmentów dialogów mówionych przez postacie!")
             else:
                 speaker_name = event.name if event.name else "Postać"
@@ -2016,6 +2017,7 @@ class MultimodalTranslator:
             visual_sub = ""
             lit_mean = ""
             screen_reg = None
+            v_typesetting = None
             ambiguity_note = ""
             semiotic_layer = "spoken_on_screen"
             if batch_response:
@@ -2025,6 +2027,7 @@ class MultimodalTranslator:
                         speaker_gender = tr.speaker_gender
                         semiotic_layer = getattr(tr, 'semiotic_layer', 'spoken_on_screen') or 'spoken_on_screen'
                         screen_reg = getattr(tr, 'screen_region', None)
+                        v_typesetting = getattr(tr, 'visual_typesetting', None)
                         visual_sub = getattr(tr, 'visual_subtext', '') or ''
                         lit_mean = getattr(tr, 'literal_meaning', '') or ''
                         notes = f"{getattr(tr, 'visual_clues', '') or ''} {getattr(tr, 'notes', '') or ''}".strip()
@@ -2215,6 +2218,7 @@ class MultimodalTranslator:
                 "speaker_gender": speaker_gender,
                 "semiotic_layer": semiotic_layer,
                 "screen_region": screen_reg,
+                "visual_typesetting": v_typesetting,
                 "speaker_voice": speaker_tags.get(batch_id, ""),
                 "prosody": prosody_tags.get(batch_id, ""),
                 "audio_jp": audio_jp_str,
@@ -2310,6 +2314,7 @@ class MultimodalTranslator:
         batch_regions: Dict[int, str] = {}
         refined_dict: Dict[int, str] = {it["id"]: sanitize_sub_text(it["pl"]) for it in pass1_items}
         refined_region_dict: Dict[int, str] = {it["id"]: it.get("screen_region") for it in pass1_items if it.get("screen_region")}
+        refined_typesetting_dict: Dict[int, Any] = {it["id"]: it.get("visual_typesetting") for it in pass1_items if it.get("visual_typesetting")}
 
         if self.enable_verifier and hasattr(self, 'verifier'):
             budget_val = getattr(self.verifier, "calculate_effective_budget", lambda items: getattr(self.verifier, "thinking_budget", 2048))(pass1_items)
@@ -2336,6 +2341,7 @@ class MultimodalTranslator:
             )
             refined_dict.update({r.id: sanitize_sub_text(r.refined_pl) for r in refined_lines})
             refined_region_dict.update({r.id: r.screen_region for r in refined_lines if getattr(r, 'screen_region', None)})
+            refined_typesetting_dict.update({r.id: r.visual_typesetting for r in refined_lines if getattr(r, 'visual_typesetting', None)})
             for r in refined_lines:
                 orig_item = next((it for it in pass1_items if it["id"] == r.id), None)
                 orig_pl = orig_item["pl"] if orig_item else ""
@@ -2405,6 +2411,9 @@ class MultimodalTranslator:
             eff_reg = refined_region_dict.get(item["id"]) or item.get("screen_region")
             if eff_reg:
                 batch_regions[item["orig_idx"]] = eff_reg
+            eff_ts = refined_typesetting_dict.get(item["id"]) or item.get("visual_typesetting")
+            if eff_ts:
+                item["visual_typesetting"] = eff_ts
 
         # Harmonize concurrent screen subtitles (e.g. speech balloon + dialogue with identical EN text)
         en_to_best_pl: Dict[str, str] = {}
@@ -2537,6 +2546,7 @@ class MultimodalTranslator:
         history: List[Dict[str, str]] = []
         translated_results: Dict[int, str] = {}
         translated_regions: Dict[int, str] = {}
+        translated_typesetting: Dict[int, Any] = {}
 
         # 1b. Search for checkpoint files (multiple paths and candidate formats)
         checkpoint_path = None
@@ -2575,6 +2585,7 @@ class MultimodalTranslator:
                             if "translated_results" in saved_data:
                                 translated_results = {int(k): str(v) for k, v in saved_data["translated_results"].items() if str(k).isdigit()}
                                 translated_regions = {int(k): str(v) for k, v in saved_data.get("translated_regions", {}).items() if str(k).isdigit()}
+                                translated_typesetting = {int(k): v for k, v in saved_data.get("translated_typesetting", {}).items() if str(k).isdigit()}
                                 token_usage = saved_data.get("token_usage", {})
                                 restored_f1_tokens = token_usage.get("f1")
                                 restored_f2_tokens = token_usage.get("f2")
@@ -2891,6 +2902,8 @@ class MultimodalTranslator:
                                         if reg_res:
                                             translated_regions[orig_idx] = reg_res
                                     for it in pass1_items:
+                                        if it.get("visual_typesetting"):
+                                            translated_typesetting[it["orig_idx"]] = it["visual_typesetting"]
                                         pl_final = batch_res.get(it["orig_idx"], it.get("pl", ""))
                                         if pl_final:
                                             history.append({
@@ -2909,6 +2922,10 @@ class MultimodalTranslator:
                                         checkpoint_payload = {
                                             "translated_results": translated_results,
                                             "translated_regions": translated_regions,
+                                            "translated_typesetting": {
+                                                str(k): (v.model_dump() if hasattr(v, "model_dump") else (v.dict() if hasattr(v, "dict") else v))
+                                                for k, v in translated_typesetting.items()
+                                            },
                                             "token_usage": {
                                                 "f1": self.current_episode_tokens,
                                                 "f2": self.verifier.current_episode_tokens if self.verifier else None
@@ -2973,6 +2990,8 @@ class MultimodalTranslator:
                                     if reg_res:
                                         translated_regions[orig_idx] = reg_res
                                 for it in pass1_items:
+                                    if it.get("visual_typesetting"):
+                                        translated_typesetting[it["orig_idx"]] = it["visual_typesetting"]
                                     pl_final = batch_res.get(it["orig_idx"], it.get("pl", ""))
                                     if pl_final:
                                         history.append({
@@ -2990,6 +3009,10 @@ class MultimodalTranslator:
                                     checkpoint_payload = {
                                         "translated_results": translated_results,
                                         "translated_regions": translated_regions,
+                                        "translated_typesetting": {
+                                            str(k): (v.model_dump() if hasattr(v, "model_dump") else (v.dict() if hasattr(v, "dict") else v))
+                                            for k, v in translated_typesetting.items()
+                                        },
                                         "token_usage": {
                                             "f1": self.current_episode_tokens,
                                             "f2": self.verifier.current_episode_tokens if self.verifier else None
@@ -3051,6 +3074,9 @@ class MultimodalTranslator:
                             for orig_idx, reg_res in h_regs.items():
                                 if reg_res:
                                     translated_regions[orig_idx] = reg_res
+                            for it in h_pass1:
+                                if it.get("visual_typesetting"):
+                                    translated_typesetting[it["orig_idx"]] = it["visual_typesetting"]
                         pbar.update(len(h_res))
                         pbar.refresh()
 
@@ -3074,7 +3100,7 @@ class MultimodalTranslator:
                             if s_item[0] in translated_results:
                                 continue
                             try:
-                                _, s_res, s_regs, _, _, _ = self._process_single_batch(
+                                _, s_res, s_regs, _, s_pass1, _ = self._process_single_batch(
                                     b_idx=len(batches) + 500,
                                     batch=[s_item],
                                     untranslated_in_batch=[s_item],
@@ -3099,6 +3125,9 @@ class MultimodalTranslator:
                                     for orig_idx, reg_res in s_regs.items():
                                         if reg_res:
                                             translated_regions[orig_idx] = reg_res
+                                    for it in s_pass1:
+                                        if it.get("visual_typesetting"):
+                                            translated_typesetting[it["orig_idx"]] = it["visual_typesetting"]
                                 pbar.update(len(s_res))
                                 pbar.refresh()
                             except Exception as s_err:
@@ -3119,6 +3148,19 @@ class MultimodalTranslator:
         final_subs.info = subs.info.copy()
         # Force WrapStyle: 2 (no arbitrary line wrapping by video player)
         final_subs.info["WrapStyle"] = "2"
+
+        try:
+            playres_x = int(subs.info.get("PlayResX", 1920) or 1920)
+        except Exception:
+            playres_x = 1920
+        try:
+            playres_y = int(subs.info.get("PlayResY", 1080) or 1080)
+        except Exception:
+            playres_y = 1080
+        if playres_x <= 0:
+            playres_x = 1920
+        if playres_y <= 0:
+            playres_y = 1080
 
         for orig_idx, orig_event, _, ts_prefix in raw_all_entries:
             master_id = sub_to_master.get(orig_idx, orig_idx)
@@ -3163,19 +3205,34 @@ class MultimodalTranslator:
             )
 
             if is_sign_flag or is_title_card or (clean_check.startswith("[") and clean_check.endswith("]")) or has_sign_style:
-                if r"\pos" in ts_prefix_applied:
-                    # Preserve original subtitle's custom coordinates without corrupting
-                    pass
-                elif item_region:
-                    pos_tag = TypesettingColorMatcher.calculate_optimal_sign_position(region=item_region)
-                    ts_prefix_applied = re.sub(r"\{\\an\d\}|\\an\d", "", ts_prefix_applied).strip()
-                    ts_prefix_applied = f"{pos_tag}{ts_prefix_applied}"
-                elif not (r"\an" in ts_prefix_applied or r"\pos" in ts_prefix_applied):
-                    ts_prefix_applied = r"{\an8}" + ts_prefix_applied
-
-                # Sign Contrast & Visibility Guard (Filar AVT Contrast Invariance)
                 target_style = getattr(subs, "styles", {}).get(orig_event.style) if hasattr(subs, "styles") else None
-                ts_prefix_applied = TypesettingColorMatcher.ensure_sign_contrast(ts_prefix_applied, style=target_style)
+                item_ts_data = translated_typesetting.get(master_id)
+                if item_ts_data:
+                    if isinstance(item_ts_data, dict) and "screen_region" not in item_ts_data and item_region:
+                        item_ts_data["screen_region"] = item_region
+                    elif hasattr(item_ts_data, "__dict__") and not getattr(item_ts_data, "screen_region", None) and item_region:
+                        setattr(item_ts_data, "screen_region", item_region)
+
+                    ts_prefix_applied = TypesettingColorMatcher.generate_pixel_perfect_ass_tags(
+                        typesetting_data=item_ts_data,
+                        playres_x=playres_x,
+                        playres_y=playres_y,
+                        prefix=ts_prefix_applied,
+                        style=target_style
+                    )
+                else:
+                    if r"\pos" in ts_prefix_applied:
+                        # Preserve original subtitle's custom coordinates without corrupting
+                        pass
+                    elif item_region:
+                        pos_tag = TypesettingColorMatcher.calculate_optimal_sign_position(region=item_region)
+                        ts_prefix_applied = re.sub(r"\{\\an\d\}|\\an\d", "", ts_prefix_applied).strip()
+                        ts_prefix_applied = f"{pos_tag}{ts_prefix_applied}"
+                    elif not (r"\an" in ts_prefix_applied or r"\pos" in ts_prefix_applied):
+                        ts_prefix_applied = r"{\an8}" + ts_prefix_applied
+
+                    # Sign Contrast & Visibility Guard (Filar AVT Contrast Invariance)
+                    ts_prefix_applied = TypesettingColorMatcher.ensure_sign_contrast(ts_prefix_applied, style=target_style)
 
             # Reattach Typesetting tags to translated text
             full_event_text = f"{ts_prefix_applied}{clean_translated_text}" if ts_prefix_applied else clean_translated_text
