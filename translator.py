@@ -2460,8 +2460,7 @@ class MultimodalTranslator:
         # Initialize StyleMatrixEngine for geometric and semantic ASS classification
         from style_matrix import analyze_subtitles
         self.style_report = analyze_subtitles(subs)
-        matrix_summary = self.style_report.get_summary()
-        print(f"\n[StyleMatrixEngine] Pre-audyt stylów: {matrix_summary}")
+        print(self.style_report.format_user_friendly_summary())
 
         # 0. Retrieve anime metadata from AniList (with Gemini Parametric Knowledge Fallback)
         ref_filename = video_path if video_path else subs_path
