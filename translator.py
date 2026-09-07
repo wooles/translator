@@ -3208,10 +3208,15 @@ class MultimodalTranslator:
                 target_style = getattr(subs, "styles", {}).get(orig_event.style) if hasattr(subs, "styles") else None
                 item_ts_data = translated_typesetting.get(master_id)
                 if item_ts_data:
-                    if isinstance(item_ts_data, dict) and "screen_region" not in item_ts_data and item_region:
-                        item_ts_data["screen_region"] = item_region
-                    elif hasattr(item_ts_data, "__dict__") and not getattr(item_ts_data, "screen_region", None) and item_region:
-                        setattr(item_ts_data, "screen_region", item_region)
+                    if isinstance(item_ts_data, dict):
+                        if "screen_region" not in item_ts_data and item_region:
+                            item_ts_data["screen_region"] = item_region
+                    else:
+                        try:
+                            if not getattr(item_ts_data, "screen_region", None) and item_region:
+                                setattr(item_ts_data, "screen_region", item_region)
+                        except Exception:
+                            pass
 
                     ts_prefix_applied = TypesettingColorMatcher.generate_pixel_perfect_ass_tags(
                         typesetting_data=item_ts_data,

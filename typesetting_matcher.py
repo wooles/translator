@@ -31,12 +31,14 @@ def hex_to_ass_hex(hex_str: str) -> Optional[str]:
     return None
 
 class VisualTypesettingData(BaseModel):
+    model_config = {"extra": "allow"}
     detected_box_1000: Optional[List[int]] = Field(default=None, description="[ymin, xmin, ymax, xmax] w skali 0-1000 dla japońskiego tekstu/planszy na kadrze")
     placement: Optional[str] = Field(default="above", description="'above' (nad japońskim tekstem), 'below' (pod), 'overlay' (na tekście), 'beside_right' (obok po prawej), 'beside_left' (obok po lewej)")
     rotation_deg: Optional[int] = Field(default=0, description="Kąt obrotu w stopniach (-45 do 45) jeśli tekst na kadrze jest skośny/pod kątem, inaczej 0")
     primary_color_hex: Optional[str] = Field(default=None, description="Kolor wiodący napisu w formacie HEX '#RRGGBB' lub null")
     outline_color_hex: Optional[str] = Field(default=None, description="Kolor obrysu/cienia w formacie HEX '#RRGGBB' lub null")
     font_style_hint: Optional[str] = Field(default=None, description="'comic', 'handwritten', 'clean', 'serif', 'neon' lub null")
+    screen_region: Optional[str] = Field(default=None, description="Wykryte położenie na kadrze (np. 'bottom_right', 'top_center', 'center')")
 
 class TypesettingColorMatcher:
     def __init__(self):
