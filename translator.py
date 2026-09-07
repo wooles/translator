@@ -2790,42 +2790,47 @@ class MultimodalTranslator:
                 self.verifier.system_prompt = f"{self.verifier.system_prompt}\n\n=== WIEDZA I WYTYCZNE DLA TEGO ODCINKA (PROFIL, SŁOWNIK, CIĄGŁOŚĆ) ===\n{full_ep_knowledge}"
                 self.verifier._episode_knowledge_cached = True
 
-        # Pre-warming and Context Cache Hard Protection across all client pool keys (guarantees -90% discount)
-        from context_cache import ContextCacheManager
-        print(f"  [Infrastruktura Finansowa]: Weryfikacja i rozgrzewanie pamięci Context Cache z pełną wiedzą odcinka...")
-        pool_or_c1 = self.client_pool if hasattr(self, "client_pool") and self.client_pool else self.client
-        c1 = ContextCacheManager.ensure_cache_ready(pool_or_c1, self.model_phase1, self.system_prompt, tag="translator")
-        if not c1:
-            raise RuntimeError(
-                f"KATEGORYCZNA BLOKADA FINANSOWA: Nie udało się aktywować serwerowego Context Cache dla {self.model_phase1}. "
-                "Aby uchronić Twój portfel przed naliczeniem 10-krotnie wyższej stawki pełnej, proces został bezpiecznie wstrzymany. "
-                "Sprawdź połączenie z Google API lub stan konta i spróbuj ponownie."
-            )
-        if self.verifier and hasattr(self.verifier, "model") and hasattr(self.verifier, "system_prompt"):
-            pool_or_c2 = getattr(self.verifier, "client_pool", None) or getattr(self.verifier, "client", None)
-            c2 = ContextCacheManager.ensure_cache_ready(pool_or_c2, self.verifier.model, self.verifier.system_prompt, tag="verifier")
-            if not c2:
-                raise RuntimeError(
-                    f"KATEGORYCZNA BLOKADA FINANSOWA: Nie udało się aktywować serwerowego Context Cache dla weryfikatora ({self.verifier.model}). "
-                    "Aby uchronić Twój portfel przed naliczeniem 10-krotnie wyższej stawki pełnej, proces został bezpiecznie wstrzymany."
-                )
-
-        if self.whisper:
-            try:
-                self.whisper._initialize_model()
-            except Exception as e:
-                logger.warning(f"Whisper warm-up failed: {e}")
-
-        # Pre-warm Context Cache sequentially for all clients before parallel threads start (Zero-Race Lock)
-        try:
+        # Check if translation is already 100% complete from checkpoint
+        untranslated_count = sum(1 for item in raw_entries if item[0] not in translated_results and not is_song_line(item[1], item[2]))
+        if untranslated_count > 0:
+            # Pre-warming and Context Cache Hard Protection across all client pool keys (guarantees -90% discount)
             from context_cache import ContextCacheManager
-            clients_to_warm = self.client_pool.clients if hasattr(self, "client_pool") and self.client_pool else [self.client]
-            for c in clients_to_warm:
-                ContextCacheManager.get_or_create_cache(client=c, model=self.model_phase1, system_instruction=self.system_prompt, tag="translator")
-                if self.enable_verifier and self.verifier:
-                    ContextCacheManager.get_or_create_cache(client=c, model=self.verifier.model, system_instruction=self.verifier.system_prompt, tag="verifier")
-        except Exception:
-            pass
+            print(f"  [Infrastruktura Finansowa]: Weryfikacja i rozgrzewanie pamięci Context Cache z pełną wiedzą odcinka...")
+            pool_or_c1 = self.client_pool if hasattr(self, "client_pool") and self.client_pool else self.client
+            c1 = ContextCacheManager.ensure_cache_ready(pool_or_c1, self.model_phase1, self.system_prompt, tag="translator")
+            if not c1:
+                raise RuntimeError(
+                    f"KATEGORYCZNA BLOKADA FINANSOWA: Nie udało się aktywować serwerowego Context Cache dla {self.model_phase1}. "
+                    "Aby uchronić Twój portfel przed naliczeniem 10-krotnie wyższej stawki pełnej, proces został bezpiecznie wstrzymany. "
+                    "Sprawdź połączenie z Google API lub stan konta i spróbuj ponownie."
+                )
+            if self.verifier and hasattr(self.verifier, "model") and hasattr(self.verifier, "system_prompt"):
+                pool_or_c2 = getattr(self.verifier, "client_pool", None) or getattr(self.verifier, "client", None)
+                c2 = ContextCacheManager.ensure_cache_ready(pool_or_c2, self.verifier.model, self.verifier.system_prompt, tag="verifier")
+                if not c2:
+                    raise RuntimeError(
+                        f"KATEGORYCZNA BLOKADA FINANSOWA: Nie udało się aktywować serwerowego Context Cache dla weryfikatora ({self.verifier.model}). "
+                        "Aby uchronić Twój portfel przed naliczeniem 10-krotnie wyższej stawki pełnej, proces został bezpiecznie wstrzymany."
+                    )
+
+            if self.whisper:
+                try:
+                    self.whisper._initialize_model()
+                except Exception as e:
+                    logger.warning(f"Whisper warm-up failed: {e}")
+
+            # Pre-warm Context Cache sequentially for all clients before parallel threads start (Zero-Race Lock)
+            try:
+                from context_cache import ContextCacheManager
+                clients_to_warm = self.client_pool.clients if hasattr(self, "client_pool") and self.client_pool else [self.client]
+                for c in clients_to_warm:
+                    ContextCacheManager.get_or_create_cache(client=c, model=self.model_phase1, system_instruction=self.system_prompt, tag="translator")
+                    if self.enable_verifier and self.verifier:
+                        ContextCacheManager.get_or_create_cache(client=c, model=self.verifier.model, system_instruction=self.verifier.system_prompt, tag="verifier")
+            except Exception:
+                pass
+        else:
+            print(f"  [Autozapis]: Wszystkie kwestie dialogowe ({len(translated_results)}) wczytane z checkpointu. Pomijanie rozgrzewania API.")
 
         batches = create_adaptive_batches(
             raw_entries,
