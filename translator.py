@@ -2599,9 +2599,13 @@ class MultimodalTranslator:
         if restored_f1_tokens and isinstance(restored_f1_tokens, dict):
             for k in ["prompt", "cached", "output"]:
                 self.current_episode_tokens[k] = self.current_episode_tokens.get(k, 0) + restored_f1_tokens.get(k, 0)
+            if "model" in restored_f1_tokens and restored_f1_tokens["model"]:
+                self.current_episode_tokens["model"] = restored_f1_tokens["model"]
         if restored_f2_tokens and isinstance(restored_f2_tokens, dict) and self.verifier:
             for k in ["prompt", "cached", "output"]:
                 self.verifier.current_episode_tokens[k] = self.verifier.current_episode_tokens.get(k, 0) + restored_f2_tokens.get(k, 0)
+            if "model" in restored_f2_tokens and restored_f2_tokens["model"]:
+                self.verifier.current_episode_tokens["model"] = restored_f2_tokens["model"]
 
         if found_checkpoint_path and translated_results:
             print("\n" + "═" * 60)

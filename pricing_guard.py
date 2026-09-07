@@ -181,11 +181,11 @@ class PricingGuard:
 
         # Phase 2 (if active)
         if f2_stats:
-            m2 = f2_stats.get("model", "pro")
-            rate2 = GOOGLE_API_RATES["pro"]
-            if "flash" in m2.lower() and "lite" not in m2.lower():
-                rate2 = GOOGLE_API_RATES["flash"]
-            elif "lite" in m2.lower():
+            m2 = f2_stats.get("model") or f1_stats.get("model", "flash")
+            rate2 = GOOGLE_API_RATES["flash"]
+            if "pro" in str(m2).lower():
+                rate2 = GOOGLE_API_RATES["pro"]
+            elif "lite" in str(m2).lower():
                 rate2 = GOOGLE_API_RATES["flash_lite"]
 
             cached2 = f2_stats.get("cached", 0)
