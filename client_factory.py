@@ -61,9 +61,11 @@ def get_genai_client(
     # Enforce Google API minimum deadline requirement (min 10000ms = 10s)
     final_timeout_ms = max(10000, final_timeout_ms)
 
-    use_vertex = os.environ.get("GOOGLE_GENAI_USE_VERTEXAI", "1").lower() in ["1", "true", "yes"]
+    # Vertex AI is strictly disabled by default to prevent unexpected Google Cloud enterprise billing.
+    # The translator uses Google AI Studio API Keys (GEMINI_API_KEY) exclusively.
+    use_vertex = os.environ.get("GOOGLE_GENAI_USE_VERTEXAI", "0").lower() in ["1", "true", "yes"]
     key_path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "").strip()
-    if not key_path:
+    if not key_path and use_vertex:
         default_key = os.path.join(os.path.dirname(__file__), "gcp_key.json")
         if os.path.exists(default_key):
             key_path = default_key
