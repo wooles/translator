@@ -3231,6 +3231,161 @@ def test_phase1_gender_hallucination_arbitration():
     print(" -> PASSED: Wielopoziomowy Silnik Arbitrażu Płci (Ochrona przed Halucynacją Fazy 1, Weto Kanonu, Weto F0 i Linter 0.00 PLN) działa w 100% harmonii.")
 
 
+def test_multimodal_addressee_and_plural_group_resolution():
+    print("[TEST 46/46] Test Multimodalnego Rozpoznawania Adresata i Morfologii Grup Liczby Mnogiej (Filar CLXIII)...")
+    from translator import MultimodalTranslator, LineTranslation
+    from avt_linter import EpisodeQualityGate, convert_virile_plural_to_nonvirile, convert_nonvirile_plural_to_virile
+    import pysubs2
+
+    tr = MultimodalTranslator.__new__(MultimodalTranslator)
+    tr.character_registry = {
+        "Naie": "kobieta, nauczycielka",
+        "Erena": "kobieta, uczennica",
+        "Shin": "mężczyzna, żołnierz"
+    }
+
+    # 1. Test Pydantic Schema: addressee field in LineTranslation
+    lt = LineTranslation(
+        id=1,
+        polish_text="Dziewczęta, czy byłyście gotowe?",
+        speaker_gender="mężczyzna",
+        addressee="grupa_kobiet"
+    )
+    assert lt.addressee == "grupa_kobiet"
+
+    # 2. Test _resolve_line_addressee: Grupa Kobiet vs Grupa Mężczyzn vs Grupa Mieszana
+    ev1 = pysubs2.SSAEvent(start=1000, end=3000, name="Shin", text="Dziewczęta, uważajcie!")
+    batch_evs = [(0, ev1, "Girls, watch out!", "")]
+
+    # 2a. Direct phase 1 visual detection: grupa_kobiet
+    cat, lbl = tr._resolve_line_addressee(
+        event=ev1,
+        raw_phase1_addressee="grupa_kobiet",
+        batch_events=batch_evs,
+        event_idx=0,
+        whisper_text="みんな、気をつけて [Minna, ki o tsukete]",
+        clean_text="Girls, watch out!"
+    )
+    assert cat == "grupa_kobiet"
+    assert "niemęskoosobowa" in lbl.lower()
+
+    # 2b. Phase 1 + Whisper JP plural marker triangulation: 'kobiety' + 'tachi' -> grupa_kobiet
+    cat, lbl = tr._resolve_line_addressee(
+        event=ev1,
+        raw_phase1_addressee="kobiety w klasie",
+        batch_events=batch_evs,
+        event_idx=0,
+        whisper_text="お前達、何をしている？ [Omaetachi, nani o shiteiru?]",
+        clean_text="What are you doing?"
+    )
+    assert cat == "grupa_kobiet"
+
+    # 2c. Grupa mężczyzn: 'żołnierze' + 'tachi'
+    cat_m, lbl_m = tr._resolve_line_addressee(
+        event=ev1,
+        raw_phase1_addressee="żołnierze na placu",
+        batch_events=batch_evs,
+        event_idx=0,
+        whisper_text="野郎共、準備しろ [Yaroudomo, junbi shiro]",
+        clean_text="Men, get ready!"
+    )
+    assert cat_m == "grupa_mężczyzn"
+    assert "męskoosobowa" in lbl_m.lower()
+
+    # 2d. Grupa mieszana: tłum / ogół
+    cat_mix, lbl_mix = tr._resolve_line_addressee(
+        event=ev1,
+        raw_phase1_addressee="grupa_mieszana",
+        batch_events=batch_evs,
+        event_idx=0,
+        whisper_text="皆さん、こんにちは [Mina-sama, konnichiwa]",
+        clean_text="Hello everyone!"
+    )
+    assert cat_mix == "grupa_mieszana"
+    assert "męskoosobowa" in lbl_mix.lower()
+
+    # 2e. 1-on-1 turn alternation: Shin speaks after Naie -> addressee is Naie (kobieta)
+    ev_naie = pysubs2.SSAEvent(start=500, end=900, name="Naie", text="Shin, co się stało?")
+    ev_shin = pysubs2.SSAEvent(start=1000, end=2000, name="Shin", text="Już nic.")
+    batch_dialogue = [(0, ev_naie, "", ""), (1, ev_shin, "", "")]
+    cat_single, lbl_single = tr._resolve_line_addressee(
+        event=ev_shin,
+        raw_phase1_addressee=None,
+        batch_events=batch_dialogue,
+        event_idx=1,
+        whisper_text="",
+        clean_text="Nothing."
+    )
+    assert cat_single == "kobieta"
+    assert "Naie" in lbl_single
+
+    # 3. Test Fleksyjnych Konwerterów Liczby Mnogiej (0.00 PLN)
+    assert convert_virile_plural_to_nonvirile("zrobiliście") == "zrobiłyście"
+    assert convert_virile_plural_to_nonvirile("widzieliście") == "widziałyście"
+    assert convert_virile_plural_to_nonvirile("byliście") == "byłyście"
+    assert convert_virile_plural_to_nonvirile("poszliście") == "poszłyście"
+    assert convert_virile_plural_to_nonvirile("mogliście") == "mogłyście"
+    assert convert_virile_plural_to_nonvirile("znaleźliście") == "znalazłyście"
+
+    assert convert_nonvirile_plural_to_virile("zrobiłyście") == "zrobiliście"
+    assert convert_nonvirile_plural_to_virile("widziałyście") == "widzieliście"
+    assert convert_nonvirile_plural_to_virile("byłyście") == "byliście"
+    assert convert_nonvirile_plural_to_virile("poszłyście") == "poszliście"
+
+    # 4. Test EpisodeQualityGate (Deterministyczny Bezpiecznik 0.00 PLN na Grupy)
+    # 4a. Grupa kobiet z błędem męskoosobowym (zrobiliście -> zrobiłyście, byliście gotowi -> byłyście gotowe)
+    subs = pysubs2.SSAFile()
+    ev_g1 = pysubs2.SSAEvent(start=1000, end=3000, name="Shin", text="Dziewczęta, czy zrobiliście to na czas?")
+    ev_g1.addressee = "grupa_kobiet"
+    ev_g2 = pysubs2.SSAEvent(start=4000, end=6000, name="Shin", text="Czy byłyście gotowi do drogi?")
+    ev_g2.addressee = "grupa_kobiet"
+    subs.events = [ev_g1, ev_g2]
+
+    audited_subs, fixes = EpisodeQualityGate.audit_and_fix_entire_episode(
+        subs,
+        character_registry=tr.character_registry
+    )
+    assert audited_subs.events[0].text == "Dziewczęta, czy zrobiłyście to na czas?", f"Otrzymano: {audited_subs.events[0].text}"
+    assert audited_subs.events[1].text == "Czy byłyście gotowe do drogi?", f"Otrzymano: {audited_subs.events[1].text}"
+    assert any("Filar CLXIII Morfologia Niemęskoosobowa" in f for f in fixes)
+    assert any("Filar CLXIII Przymiotnik Niemęskoosobowy" in f for f in fixes)
+
+    # 4b. Grupa mężczyzn z błędem niemęskoosobowym (poszłyście -> poszliście)
+    subs_m = pysubs2.SSAFile()
+    ev_m1 = pysubs2.SSAEvent(start=1000, end=3000, name="Naie", text="Żołnierze, dokąd poszłyście?")
+    ev_m1.addressee = "grupa_mężczyzn"
+    subs_m.events = [ev_m1]
+
+    audited_m, fixes_m = EpisodeQualityGate.audit_and_fix_entire_episode(
+        subs_m,
+        character_registry=tr.character_registry
+    )
+    assert audited_m.events[0].text == "Żołnierze, dokąd poszliście?", f"Otrzymano: {audited_m.events[0].text}"
+    assert any("Filar CLXIII Morfologia Męskoosobowa" in f for f in fixes_m)
+
+    # 5. Test Biblii Serialu (Series Bible) i zachowania definicji grup (Layer 2)
+    from series_memory import SeriesBible
+    bible = SeriesBible("Test_Series_CLXIII")
+    try:
+        bible.update_from_episode_profile(
+            episode_name="Odcinek 1",
+            characters={
+                "Uczennice": "grupa dziewcząt w klasie",
+                "Rycerze": "grupa mężczyzn na zamku"
+            },
+            glossary={}
+        )
+        u_desc = bible.data["characters"]["Uczennice"]["description"]
+        r_desc = bible.data["characters"]["Rycerze"]["description"]
+        assert "niemęskoosobow" in u_desc.lower() or "-łyście" in u_desc.lower()
+        assert "męskoosobow" in r_desc.lower() or "-liście" in r_desc.lower()
+    finally:
+        if bible.file_path.exists():
+            bible.file_path.unlink()
+
+    print(" -> PASSED: Multimodalne Rozpoznawanie Adresata, Triangulacja Whisper JP i Morfologia Grup (Filar CLXIII) działają w 100% harmonii (0.00 PLN).")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -3275,7 +3430,8 @@ if __name__ == "__main__":
     test_anti_attention_dilution_semantic_anchors_and_full_phase2()
     test_fansub_quality_pixel_perfect_typesetting()
     test_phase1_gender_hallucination_arbitration()
-    print("\n Wszystkie testy jednostkowe i integracyjne (45/45) zakończone pełnym sukcesem!\n")
+    test_multimodal_addressee_and_plural_group_resolution()
+    print("\n Wszystkie testy jednostkowe i integracyjne (46/46) zakończone pełnym sukcesem!\n")
 
 
 

@@ -196,6 +196,17 @@ class SeriesBible:
             if "kategoryczny nakaz form męskich" not in clean_desc.lower() and "ostrzegał" not in clean_desc.lower():
                 clean_desc = f"{clean_desc} [KATEGORYCZNY NAKAZ form męskich w czasie przeszłym: mówił / ostrzegał / pomógł]".strip()
 
+        # Safeguard plural groups morphology in Series Bible (Filar CLXIII)
+        is_female_group = any(w in name_lower or w in clean_desc.lower() for w in ["grupa kobiet", "grupa dziewcząt", "uczennice", "kapłanki", "dziewczęta", "wojowniczki"])
+        if is_female_group and not involves_male:
+            if "niemęskoosobow" not in clean_desc.lower() and "-łyście" not in clean_desc.lower():
+                clean_desc = f"{clean_desc} [GRUPA KOBIET - Wymóg form niemęskoosobowych: -łyście / byłyście gotowe]".strip()
+
+        is_male_group = any(w in name_lower or w in clean_desc.lower() for w in ["grupa mężczyzn", "grupa chłopaków", "żołnierze", "panowie", "wojownicy"])
+        if is_male_group:
+            if "męskoosobow" not in clean_desc.lower() and "-liście" not in clean_desc.lower():
+                clean_desc = f"{clean_desc} [GRUPA MĘŻCZYZN - Wymóg rodzaju męskoosobowego: -liście / byliście gotowi]".strip()
+
         return clean_desc
 
     def update_from_episode_profile(

@@ -1023,6 +1023,148 @@ def convert_masculine_past_to_feminine(verb: str) -> Optional[str]:
 
     return res.capitalize() if verb[0].isupper() else res
 
+VIRILE_PLURAL_IRREGULAR_TO_NONVIRILE: Dict[str, str] = {
+    "znaleźliście": "znalazłyście",
+    "poszliście": "poszłyście",
+    "przyszliście": "przyszłyście",
+    "wyszliście": "wyszłyście",
+    "odeszliście": "odeszłyście",
+    "weszliście": "weszłyście",
+    "przeszliście": "przeszłyście",
+    "doszliście": "doszłyście",
+    "zeszliście": "zeszłyście",
+    "mogliście": "mogłyście",
+    "pomogliście": "pomogłyście",
+    "byliście": "byłyście",
+    "widzieliście": "widziałyście",
+    "słyszeliście": "słyszałyście",
+    "chcieliście": "chciałyście",
+    "wiedzieliście": "wiedziałyście",
+    "myśleliście": "myślałyście",
+    "powiedzieliście": "powiedziałyście",
+    "zrozumieliście": "zrozumiałyście",
+    "zapomnieliście": "zapomniałyście",
+    "musieliście": "musiałyście",
+    "mieliście": "miałyście",
+    "wzięliście": "wzięłyście",
+    "zaczęliście": "zaczęłyście",
+}
+
+NONVIRILE_PLURAL_IRREGULAR_TO_VIRILE: Dict[str, str] = {
+    "znalazłyście": "znaleźliście",
+    "poszłyście": "poszliście",
+    "przyszłyście": "przyszliście",
+    "wyszłyście": "wyszliście",
+    "odeszłyście": "odeszliście",
+    "weszłyście": "weszliście",
+    "przeszłyście": "przeszliście",
+    "doszłyście": "doszliście",
+    "zeszłyście": "zeszliście",
+    "mogłyście": "mogliście",
+    "pomogłyście": "pomogliście",
+    "byłyście": "byliście",
+    "widziałyście": "widzieliście",
+    "słyszałyście": "słyszeliście",
+    "chciałyście": "chcieliście",
+    "wiedziałyście": "wiedzieliście",
+    "myślałyście": "myśleliście",
+    "powiedziałyście": "powiedzieliście",
+    "zrozumiałyście": "zrozumieliście",
+    "zapomniałyście": "zapomnieliście",
+    "musiałyście": "musieliście",
+    "miałyście": "mieliście",
+    "wzięłyście": "wzięliście",
+    "zaczęłyście": "zaczęliście",
+}
+
+VIRILE_ADJECTIVES_TO_NONVIRILE: Dict[str, str] = {
+    "gotowi": "gotowe",
+    "pewni": "pewne",
+    "sami": "same",
+    "bezpieczni": "bezpieczne",
+    "zmęczeni": "zmęczone",
+    "ciekawi": "ciekawe",
+    "zadowoleni": "zadowolone",
+    "zaskoczeni": "zaskoczone",
+    "zdziwieni": "zdziwione",
+    "gotowiście": "gotoweście",
+}
+
+NONVIRILE_ADJECTIVES_TO_VIRILE: Dict[str, str] = {
+    "gotowe": "gotowi",
+    "pewne": "pewni",
+    "same": "sami",
+    "bezpieczne": "bezpieczni",
+    "zmęczone": "zmęczeni",
+    "ciekawe": "ciekawi",
+    "zadowolone": "zadowoleni",
+    "zaskoczone": "zaskoczeni",
+    "zdziwione": "zdziwieni",
+    "gotoweście": "gotowiście",
+}
+
+def convert_virile_plural_to_nonvirile(verb: str) -> Optional[str]:
+    v_lower = verb.lower()
+    if v_lower in VIRILE_PLURAL_IRREGULAR_TO_NONVIRILE:
+        res = VIRILE_PLURAL_IRREGULAR_TO_NONVIRILE[v_lower]
+        return res.capitalize() if verb[0].isupper() else res
+
+    if v_lower.endswith("agliście"):
+        res = v_lower[:-8] + "agłyście"
+    elif v_lower.endswith("egliście"):
+        res = v_lower[:-8] + "egłyście"
+    elif v_lower.endswith("ogliście"):
+        res = v_lower[:-8] + "ogłyście"
+    elif v_lower.endswith("szliście"):
+        res = v_lower[:-8] + "szłyście"
+    elif v_lower.endswith("ieliście"):
+        res = v_lower[:-8] + "iałyście"
+    elif v_lower.endswith("aliście"):
+        res = v_lower[:-7] + "ałyście"
+    elif v_lower.endswith("iliście"):
+        res = v_lower[:-7] + "iłyście"
+    elif v_lower.endswith("yliście"):
+        res = v_lower[:-7] + "yłyście"
+    elif v_lower.endswith("ęliście"):
+        res = v_lower[:-7] + "ęłyście"
+    elif v_lower.endswith("liście"):
+        res = v_lower[:-6] + "łyście"
+    else:
+        return None
+
+    return res.capitalize() if verb[0].isupper() else res
+
+def convert_nonvirile_plural_to_virile(verb: str) -> Optional[str]:
+    v_lower = verb.lower()
+    if v_lower in NONVIRILE_PLURAL_IRREGULAR_TO_VIRILE:
+        res = NONVIRILE_PLURAL_IRREGULAR_TO_VIRILE[v_lower]
+        return res.capitalize() if verb[0].isupper() else res
+
+    if v_lower.endswith("agłyście"):
+        res = v_lower[:-8] + "agliście"
+    elif v_lower.endswith("egłyście"):
+        res = v_lower[:-8] + "egliście"
+    elif v_lower.endswith("ogłyście"):
+        res = v_lower[:-8] + "ogliście"
+    elif v_lower.endswith("szłyście"):
+        res = v_lower[:-8] + "szliście"
+    elif v_lower.endswith("iałyście"):
+        res = v_lower[:-8] + "ieliście"
+    elif v_lower.endswith("ałyście"):
+        res = v_lower[:-7] + "aliście"
+    elif v_lower.endswith("iłyście"):
+        res = v_lower[:-7] + "iliście"
+    elif v_lower.endswith("yłyście"):
+        res = v_lower[:-7] + "yliście"
+    elif v_lower.endswith("ęłyście"):
+        res = v_lower[:-7] + "ęliście"
+    elif v_lower.endswith("łyście"):
+        res = v_lower[:-6] + "liście"
+    else:
+        return None
+
+    return res.capitalize() if verb[0].isupper() else res
+
 class EpisodeQualityGate:
     """
     Global Post-Translation Quality Gate & Human-Eye Common Sense Auditor.
@@ -1038,7 +1180,8 @@ class EpisodeQualityGate:
         custom_glossary: Optional[Dict[str, str]] = None,
         user_feedback_rules: Optional[List[Dict[str, Any]]] = None,
         character_registry: Optional[Dict[str, str]] = None,
-        series_bible: Optional[Any] = None
+        series_bible: Optional[Any] = None,
+        line_addressees: Optional[Dict[int, str]] = None
     ) -> Tuple[Any, List[str]]:
         if not subs or not hasattr(subs, "events") or not subs.events:
             return subs, []
@@ -1439,6 +1582,57 @@ class EpisodeQualityGate:
                                 new_chunk = old_chunk.replace(verb, new_v, 1)
                                 ev.text = ev.text.replace(old_chunk, new_chunk, 1)
                                 fixes.append(f"[Episode Quality Gate - Spójność Płci Postaci] Linia #{i+1}: skorygowano orzeczenie szyku przestawnego '{verb} {matched_name}' -> '{new_v} {matched_name}' (potwierdzona płeć żeńska)")
+
+            # 3c-3. 2ND-PERSON PLURAL ADDRESSEE GROUP AGREEMENT (Filar CLXIII - 0.00 PLN)
+            if not is_sign:
+                raw_ev_addressee = getattr(ev, "addressee", None) or (line_addressees.get(i) if line_addressees else None)
+                addr_norm = (raw_ev_addressee or "").strip().lower()
+
+                clean_ev_text = re.sub(r"\{[^\}]*\}", "", ev.text)
+                has_female_vocative = bool(re.search(r"\b(dziewczęta|dziewczyny|panie|kobiety|siostry|uczennice|kapłanki)[!,\?]", clean_ev_text, re.IGNORECASE))
+                has_male_vocative = bool(re.search(r"\b(chłopaki|panowie|mężczyźni|żołnierze|bracia|chłopcy)[!,\?]", clean_ev_text, re.IGNORECASE))
+
+                is_female_group = ("grupa_kobiet" in addr_norm) or has_female_vocative
+                is_male_group = ("grupa_mężczyzn" in addr_norm) or has_male_vocative
+                is_mixed_group = ("grupa_mieszana" in addr_norm)
+
+                if is_female_group:
+                    # 1. Convert virile 2nd-person plural verbs (-liście) -> non-virile (-łyście)
+                    for m in list(re.finditer(r"\b([A-Za-ząćęłńóśźż]+liście)\b", ev.text)):
+                        v_virile = m.group(1)
+                        v_nonvirile = convert_virile_plural_to_nonvirile(v_virile)
+                        if v_nonvirile and v_nonvirile.lower() != v_virile.lower():
+                            ev.text = re.sub(rf"\b{re.escape(v_virile)}\b", v_nonvirile, ev.text, count=1)
+                            fixes.append(f"[Episode Quality Gate - Filar CLXIII Morfologia Niemęskoosobowa] Linia #{i+1}: skorygowano formę męskoosobową '{v_virile}' -> '{v_nonvirile}' (adresat: grupa kobiet)")
+
+                    # 2. Convert virile adjectives / participles (gotowi, pewni, sami, etc.) -> non-virile (gotowe, pewne, same)
+                    for v_adj, nv_adj in VIRILE_ADJECTIVES_TO_NONVIRILE.items():
+                        pat_adj = rf"\b((?:byłyście|byliście|jesteście|bądźcie|zostałyście|zostaliście|zostańcie|będziecie|czujecie\s+się)\s+)({re.escape(v_adj)})\b"
+                        for m in list(re.finditer(pat_adj, ev.text, re.IGNORECASE)):
+                            prefix = m.group(1)
+                            old_adj = m.group(2)
+                            repl_adj = nv_adj.capitalize() if old_adj[0].isupper() else nv_adj
+                            ev.text = re.sub(rf"\b{re.escape(prefix)}{re.escape(old_adj)}\b", f"{prefix}{repl_adj}", ev.text, count=1)
+                            fixes.append(f"[Episode Quality Gate - Filar CLXIII Przymiotnik Niemęskoosobowy] Linia #{i+1}: skorygowano '{prefix}{old_adj}' -> '{prefix}{repl_adj}' (adresat: grupa kobiet)")
+
+                elif is_male_group or is_mixed_group:
+                    # Convert non-virile 2nd-person plural verbs (-łyście) -> virile (-liście)
+                    for m in list(re.finditer(r"\b([A-Za-ząćęłńóśźż]+łyście)\b", ev.text)):
+                        v_nonvirile = m.group(1)
+                        v_virile = convert_nonvirile_plural_to_virile(v_nonvirile)
+                        if v_virile and v_virile.lower() != v_nonvirile.lower():
+                            ev.text = re.sub(rf"\b{re.escape(v_nonvirile)}\b", v_virile, ev.text, count=1)
+                            fixes.append(f"[Episode Quality Gate - Filar CLXIII Morfologia Męskoosobowa] Linia #{i+1}: skorygowano formę niemęskoosobową '{v_nonvirile}' -> '{v_virile}' (adresat: {'grupa mężczyzn' if is_male_group else 'grupa mieszana'})")
+
+                    # Convert non-virile adjectives -> virile
+                    for nv_adj, v_adj in NONVIRILE_ADJECTIVES_TO_VIRILE.items():
+                        pat_adj = rf"\b((?:byliście|byłyście|jesteście|bądźcie|zostaliście|zostałyście|zostańcie|będziecie|czujecie\s+się)\s+)({re.escape(nv_adj)})\b"
+                        for m in list(re.finditer(pat_adj, ev.text, re.IGNORECASE)):
+                            prefix = m.group(1)
+                            old_adj = m.group(2)
+                            repl_adj = v_adj.capitalize() if old_adj[0].isupper() else v_adj
+                            ev.text = re.sub(rf"\b{re.escape(prefix)}{re.escape(old_adj)}\b", f"{prefix}{repl_adj}", ev.text, count=1)
+                            fixes.append(f"[Episode Quality Gate - Filar CLXIII Przymiotnik Męskoosobowy] Linia #{i+1}: skorygowano '{prefix}{old_adj}' -> '{prefix}{repl_adj}' (adresat: {'grupa mężczyzn' if is_male_group else 'grupa mieszana'})")
 
             # 3d. FOREIGN NAME DECLENSION UNIFORMITY (Prepositional Cases)
             if not is_sign and dominant_prep_names:

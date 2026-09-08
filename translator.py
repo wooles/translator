@@ -980,6 +980,17 @@ class LineTranslation(BaseModel):
     id: int = Field(description="ID kwestii dialogowej z wejścia")
     polish_text: str = Field(description="Przetłumaczona kwestia na język polski z uwzględnieniem płci, sceny i eliminacji kalek")
     speaker_gender: Optional[str] = Field(default=None, description="Płeć mówcy: 'mężczyzna' lub 'kobieta'")
+    addressee: Optional[str] = Field(
+        default=None,
+        description=(
+            "Odbiorca kwestii na kadrze/w scenie: "
+            "'kobieta' (pojedyncza), 'mężczyzna' (pojedynczy), "
+            "'grupa_kobiet' (grupa samych kobiet/dziewcząt - wymóg form: zrobiłyście/byłyście), "
+            "'grupa_mężczyzn' (grupa samych mężczyzn - wymóg form: zrobiliście/byliście), "
+            "'grupa_mieszana' (mężczyźni i kobiety / tłum - wymóg form: zrobiliście/byliście) "
+            "lub 'brak' (myśl/monolog)"
+        )
+    )
     semiotic_layer: Optional[str] = Field(default="spoken_on_screen", description="Warstwa semiotyczna: 'spoken_on_screen' (mowa w kadrze), 'spoken_off_screen' (komentarz zza kadru), 'manga_balloon' (dymek/halucynacja), 'inner_thought' (myśli), 'diegetic_sign' (plansza/napis)")
     screen_region: Optional[str] = Field(default=None, description="Dla planszy/tytułu/napisu ekranowego: wskaż wykryte na kadrze położenie japońskiego napisu: 'bottom_right' (prawy dolny róg), 'bottom_left' (lewy dolny róg), 'top_right' (prawy górny róg), 'top_left' (lewy górny róg), 'bottom_center' (dół), 'top_center' (góra), 'center' (środek) lub null dla zwykłych dialogów.")
     visual_typesetting: Optional[VisualTypesettingData] = Field(default=None, description="Dla planszy/tytułu/napisu ekranowego/onomatopei: precyzyjne współrzędne 2D [ymin, xmin, ymax, xmax] w skali 0-1000, umiejscowienie 'above'/'below', kąt obrotu rotation_deg (-45 do 45) oraz kolory HEX lub null dla zwykłej mowy.")
@@ -1416,6 +1427,77 @@ class MultimodalTranslator:
             return "mężczyzna", alerts
 
         return None, alerts
+
+    def _resolve_line_addressee(
+        self,
+        event: pysubs2.SSAEvent,
+        raw_phase1_addressee: Optional[str],
+        batch_events: List[Tuple[int, pysubs2.SSAEvent, str, str]],
+        event_idx: int,
+        whisper_text: str = "",
+        clean_text: str = ""
+    ) -> Tuple[Optional[str], Optional[str]]:
+        """
+        Multimodal Addressee & Number Resolution Engine (0.00 PLN).
+        Resolves addressee category and label based on:
+        1. Phase 1 frame analysis (raw_phase1_addressee: 'grupa_kobiet', 'grupa_mężczyzn', 'grupa_mieszana', 'kobieta', 'mężczyzna')
+        2. Whisper JP pluralis markers (-tachi, -ra, minna, shokun, zen'in, mina-sama)
+        3. Intra-scene dialogue alternation (1-on-1 turn between known speakers)
+        4. Textual vocative analysis (first-name callout in line text)
+
+        Returns: (addressee_category, addressee_label)
+        - addressee_category: "grupa_kobiet" | "grupa_mężczyzn" | "grupa_mieszana" | "kobieta" | "mężczyzna" | "brak" | None
+        - addressee_label: np. "Grupa Kobiet (L. mnoga niemęskoosobowa: -łyście)", "Naie (Kobieta)"
+        """
+        raw_norm = (raw_phase1_addressee or "").strip().lower()
+        jp_lower = whisper_text.lower()
+        has_jp_plural = any(m in jp_lower for m in [
+            "tachi", "たち", "達", "omae-ra", "お前ら", "kisama-ra", "貴様ら", "minna", "みんな", "皆",
+            "shokun", "諸君", "zen'in", "全員", "mina-sama", "皆様", "domo", "ども", "共"
+        ])
+
+        # 1. Direct Plural Group Check
+        if "grupa_kobiet" in raw_norm or (has_jp_plural and any(w in raw_norm for w in ["kobiet", "dziewcz", "female", "żeńsk"])) or (any(w in raw_norm for w in ["kobiet", "dziewcz"]) and any(p in raw_norm for p in ["grupa", "wiele", "wszystk", "klas"])):
+            return "grupa_kobiet", "Grupa Kobiet (L. mnoga niemęskoosobowa: -łyście)"
+
+        if "grupa_mężczyzn" in raw_norm or (has_jp_plural and any(w in raw_norm for w in ["mężczyzn", "chłopak", "male", "żołnierz", "męsk"])) or (any(w in raw_norm for w in ["mężczyzn", "chłopak", "żołnierz"]) and any(p in raw_norm for p in ["grupa", "wiele", "wszystk"])):
+            return "grupa_mężczyzn", "Grupa Mężczyzn (L. mnoga męskoosobowa: -liście)"
+
+        if "grupa_mieszana" in raw_norm or "grupa" in raw_norm or has_jp_plural:
+            return "grupa_mieszana", "Grupa Mieszana (L. mnoga męskoosobowa: -liście)"
+
+        # 2. Textual Vocative Check (Calling someone by name in line text)
+        for cname in self.character_registry.keys():
+            if len(cname) >= 3 and re.search(rf"\b{re.escape(cname)}[,!?]", clean_text, re.IGNORECASE):
+                cdesc = self.character_registry[cname].lower()
+                if any(k in cdesc for k in self.FEMALE_ROLE_KEYWORDS):
+                    return "kobieta", f"{cname} (Kobieta)"
+                elif any(k in cdesc for k in ["male", "mężczyzna", "chłopak", "męsk"]):
+                    return "mężczyzna", f"{cname} (Mężczyzna)"
+
+        # 3. 1-on-1 Dialogue Alternation (Ping-Pong Turn)
+        curr_spk = (getattr(event, "name", None) or "").strip()
+        if event_idx > 0 and curr_spk:
+            prev_ev = batch_events[event_idx - 1][1] if len(batch_events[event_idx - 1]) > 1 else None
+            prev_spk = (getattr(prev_ev, "name", None) or "").strip() if prev_ev else ""
+            if prev_spk and prev_spk != curr_spk:
+                # Interlocutor found
+                if prev_spk in self.character_registry:
+                    cdesc = self.character_registry[prev_spk].lower()
+                    if any(k in cdesc for k in self.FEMALE_ROLE_KEYWORDS):
+                        return "kobieta", f"{prev_spk} (Kobieta)"
+                    elif any(k in cdesc for k in ["male", "mężczyzna", "chłopak", "męsk"]):
+                        return "mężczyzna", f"{prev_spk} (Mężczyzna)"
+
+        # 4. Fallback to Phase 1 Single Person Detection
+        if any(w in raw_norm for w in ["kobieta", "kobiet", "żeńsk", "female", "dziewczyn"]):
+            return "kobieta", "Kobieta"
+        elif any(w in raw_norm for w in ["mężczyzna", "mężczyzn", "męsk", "male", "chłopak"]):
+            return "mężczyzna", "Mężczyzna"
+        elif "brak" in raw_norm or "self" in raw_norm or "monolog" in raw_norm:
+            return "brak", "Brak (Monolog / Myśl)"
+
+        return None, None
 
     def _prepare_batch_prompt(
         self,
@@ -2171,11 +2253,13 @@ class MultimodalTranslator:
             v_typesetting = None
             ambiguity_note = ""
             semiotic_layer = "spoken_on_screen"
+            raw_addressee = None
             if batch_response:
                 for tr in batch_response.translations:
                     if tr.id == batch_id:
                         pl_candidate = sanitize_sub_text(tr.polish_text)
                         speaker_gender = tr.speaker_gender
+                        raw_addressee = getattr(tr, 'addressee', None)
                         semiotic_layer = getattr(tr, 'semiotic_layer', 'spoken_on_screen') or 'spoken_on_screen'
                         screen_reg = getattr(tr, 'screen_region', None)
                         v_typesetting = getattr(tr, 'visual_typesetting', None)
@@ -2203,6 +2287,17 @@ class MultimodalTranslator:
             speaker_gender = resolved_gender
             if arb_alerts:
                 notes = f"{notes} {' '.join(arb_alerts)}".strip()
+
+            # Multimodal Addressee & Plural Group Resolution Engine (0.00 PLN)
+            jp_curr_text = whisper_transcriptions.get(batch_id, "") if whisper_transcriptions else ""
+            addressee_cat, addressee_label = self._resolve_line_addressee(
+                event=event,
+                raw_phase1_addressee=raw_addressee,
+                batch_events=untranslated_in_batch,
+                event_idx=idx,
+                whisper_text=jp_curr_text,
+                clean_text=clean_en
+            )
 
             # Line-Level Pinning: Direct Profiler alerts for this specific line
             if episode_profile:
@@ -2364,6 +2459,8 @@ class MultimodalTranslator:
                 "pl": pl_candidate,
                 "speaker_name": event.name.strip() if getattr(event, "name", None) else "",
                 "speaker_gender": speaker_gender,
+                "addressee": addressee_cat,
+                "addressee_label": addressee_label,
                 "semiotic_layer": semiotic_layer,
                 "screen_region": screen_reg,
                 "visual_typesetting": v_typesetting,
@@ -2423,6 +2520,12 @@ class MultimodalTranslator:
                     if re.search(r"\b(wygrał|wygrała|zrobił|zrobiła|widział|widziała|powiedział|powiedziała|słyszał|słyszała|był|była|miał|miała|chciał|chciała|mógł|mogła|wiedział|wiedziała|wie|widzi|myśli|mówi|ma)\s+(pan|pani)\b|\b(pan|pani)\s+(wygrał|wygrała|zrobił|zrobiła|widział|widziała|słyszał|słyszała|powiedział|powiedziała|wie|widzi|myśli|mówi)\b", it["pl"], re.IGNORECASE):
                         drift_alert = "[🚨 ALARM FILAR CLVII: Zwrot per 'pan/pani' w scenie/dialogu po imieniu na 'ty'! Kategoryczny zakaz 'wygrał pan' / 'pan wie' -> Zmień na 2. os. 'wygrałeś' / 'wiesz'!]"
                         it["notes"] = f"{it.get('notes', '')} {drift_alert}".strip()
+
+            # Multimodal Addressee Plural Warning Pinning (Filar CLXIII)
+            if it.get("addressee") == "grupa_kobiet":
+                it["notes"] = f"{it.get('notes', '')} [🚨 ALARM FILAR CLXIII: Adresat to GRUPA KOBIET! Kategoryczny nakaz form niemęskoosobowych: 'zrobiłyście / byłyście gotowe / widziałyście' (ZAKAZ: -liście / gotowi)!]".strip()
+            elif it.get("addressee") in ["grupa_mężczyzn", "grupa_mieszana"]:
+                it["notes"] = f"{it.get('notes', '')} [🚨 ALARM FILAR CLXIII: Adresat to {('GRUPA MĘŻCZYZN' if it.get('addressee') == 'grupa_mężczyzn' else 'GRUPA MIESZANA')}! Kategoryczny nakaz rodzaju męskoosobowego: 'zrobiliście / byliście gotowi / widzieliście'!]".strip()
 
             # Auditory Anchor Pinning (Filar CLVIII)
             audio_jp_str = str(it.get("audio_jp", "")).lower()
@@ -2694,6 +2797,7 @@ class MultimodalTranslator:
         translated_results: Dict[int, str] = {}
         translated_regions: Dict[int, str] = {}
         translated_typesetting: Dict[int, Any] = {}
+        translated_addressees: Dict[int, str] = {}
 
         # 1b. Search for checkpoint files (multiple paths and candidate formats)
         checkpoint_path = None
@@ -2733,6 +2837,7 @@ class MultimodalTranslator:
                                 translated_results = {int(k): str(v) for k, v in saved_data["translated_results"].items() if str(k).isdigit()}
                                 translated_regions = {int(k): str(v) for k, v in saved_data.get("translated_regions", {}).items() if str(k).isdigit()}
                                 translated_typesetting = {int(k): v for k, v in saved_data.get("translated_typesetting", {}).items() if str(k).isdigit()}
+                                translated_addressees = {int(k): str(v) for k, v in saved_data.get("translated_addressees", {}).items() if str(k).isdigit()}
                                 token_usage = saved_data.get("token_usage", {})
                                 restored_f1_tokens = token_usage.get("f1")
                                 restored_f2_tokens = token_usage.get("f2")
@@ -3071,6 +3176,8 @@ class MultimodalTranslator:
                                     for it in pass1_items:
                                         if it.get("visual_typesetting"):
                                             translated_typesetting[it["orig_idx"]] = it["visual_typesetting"]
+                                        if it.get("addressee"):
+                                            translated_addressees[it["orig_idx"]] = it["addressee"]
                                         pl_final = batch_res.get(it["orig_idx"], it.get("pl", ""))
                                         if pl_final:
                                             history.append({
@@ -3093,6 +3200,7 @@ class MultimodalTranslator:
                                                 str(k): (v.model_dump() if hasattr(v, "model_dump") else (v.dict() if hasattr(v, "dict") else v))
                                                 for k, v in translated_typesetting.items()
                                             },
+                                            "translated_addressees": translated_addressees,
                                             "token_usage": {
                                                 "f1": self.current_episode_tokens,
                                                 "f2": self.verifier.current_episode_tokens if self.verifier else None
@@ -3159,6 +3267,8 @@ class MultimodalTranslator:
                                 for it in pass1_items:
                                     if it.get("visual_typesetting"):
                                         translated_typesetting[it["orig_idx"]] = it["visual_typesetting"]
+                                    if it.get("addressee"):
+                                        translated_addressees[it["orig_idx"]] = it["addressee"]
                                     pl_final = batch_res.get(it["orig_idx"], it.get("pl", ""))
                                     if pl_final:
                                         history.append({
@@ -3180,6 +3290,7 @@ class MultimodalTranslator:
                                             str(k): (v.model_dump() if hasattr(v, "model_dump") else (v.dict() if hasattr(v, "dict") else v))
                                             for k, v in translated_typesetting.items()
                                         },
+                                        "translated_addressees": translated_addressees,
                                         "token_usage": {
                                             "f1": self.current_episode_tokens,
                                             "f2": self.verifier.current_episode_tokens if self.verifier else None
@@ -3244,6 +3355,8 @@ class MultimodalTranslator:
                             for it in h_pass1:
                                 if it.get("visual_typesetting"):
                                     translated_typesetting[it["orig_idx"]] = it["visual_typesetting"]
+                                if it.get("addressee"):
+                                    translated_addressees[it["orig_idx"]] = it["addressee"]
                         pbar.update(len(h_res))
                         pbar.refresh()
 
@@ -3295,6 +3408,8 @@ class MultimodalTranslator:
                                     for it in s_pass1:
                                         if it.get("visual_typesetting"):
                                             translated_typesetting[it["orig_idx"]] = it["visual_typesetting"]
+                                        if it.get("addressee"):
+                                            translated_addressees[it["orig_idx"]] = it["addressee"]
                                 pbar.update(len(s_res))
                                 pbar.refresh()
                             except Exception as s_err:
@@ -3412,6 +3527,7 @@ class MultimodalTranslator:
 
             new_event = orig_event.copy()
             new_event.text = full_event_text
+            new_event.addressee = translated_addressees.get(master_id)
             final_subs.events.append(new_event)
 
         # 7.0. Format simultaneous dialogues (Simultaneous Dialogue AVT)
@@ -3458,7 +3574,8 @@ class MultimodalTranslator:
                 custom_glossary=combined_glossary,
                 user_feedback_rules=all_user_rules,
                 character_registry=self.character_registry,
-                series_bible=getattr(self, "series_bible", None)
+                series_bible=getattr(self, "series_bible", None),
+                line_addressees=translated_addressees
             )
             if qg_fixes:
                 en_warnings = [f for f in qg_fixes if "nieprzetłumaczony angielski" in f]

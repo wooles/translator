@@ -1518,6 +1518,22 @@ FILAR CLXII: NIENARUSZALNOŚĆ PŁCI GRAMATYCZNEJ IMION ORIENTALNYCH NA '-A' (GR
         * KARDYNALNY BŁĄD: "Shira ostrzegała", "Shira mówiła", "Shira przyszła", "Shira była".
    3. SPÓJNOŚĆ WZMIANEK W 3. OSOBIE (THIRD-PERSON ENTITY AGREEMENT):
       - Gdy inna postać (np. kobieta) wspomina w dialogu lub myśli o męskim bohaterze ("Shira did tell me that...", "Akira said..."), orzeczenie dotyczące tej osoby bezwzględnie zachowuje rodzaj męski ("Shira ostrzegał mnie / Shira mówił mi"), całkowicie niezależnie od płci osoby mówiącej w kadrze!
+
+FILAR CLXIII: MORFOLOGIA ADRESATYWNA LICZBY MNOGIEJ (RODZAJ MĘSKOOSOBOWY VS NIEMĘSKOOSOBOWY W LICZBIE MNOGIEJ):
+   1. ZASADA PODZIAŁU GRUPY NA KADRZE:
+      - W języku polskim zwroty w 2. osobie liczby mnogiej ('wy') bezwzględnie wymagają rozróżnienia składu płciowego odbiorców na kadrze:
+      - GRUPA SAMYCH KOBIET / DZIEWCZĄT ('grupa_kobiet'):
+        * BEZWZGLĘDNY NAKAZ form niemęskoosobowych:
+          -> Czasowniki w czasie przeszłym: 'widziałyście', 'byłyście', 'zrobiłyście', 'poszłyście', 'słyszałyście', 'zrozumiałyście' (KATEGORYCZNY ZAKAZ form męskoosobowych: 'widzieliście', 'byliście', 'zrobiliście').
+          -> Przymiotniki i imiesłowy: 'jesteście gotowe', 'byłyście pewne', 'zostałyście same' (ZAKAZ: 'gotowi', 'pewni', 'sami').
+          -> Wołacz / zwrot: 'Dziewczęta', 'Drogie panie', 'Dziewczyny'.
+      - GRUPA SAMYCH MĘŻCZYZN ('grupa_mężczyzn') LUB GRUPA MIESZANA ('grupa_mieszana' - kobiety i mężczyźni / tłum):
+        * W języku polskim obecność choćby jednego mężczyzny w grupie wymusza rodzaj męskoosobowy:
+          -> Czasowniki w czasie przeszłym: 'widzieliście', 'byliście', 'zrobiliście', 'poszliście', 'słyszeliście'.
+          -> Przymiotniki i imiesłowy: 'jesteście gotowi', 'byliście pewni', 'zostaliście sami'.
+          -> Wołacz / zwrot: 'Panowie', 'Chłopaki', 'Żołnierze' (dla mężczyzn) lub 'Wszyscy', 'Kochani', 'Ludzie' (dla grupy mieszanej).
+   2. TRIANGULACJA Z JAPOŃSKIEGO AUDIO (WHISPER JP):
+      - Gdy seiyū używa cząstek liczby mnogiej ('-tachi', '-ra', 'minna', 'shokun', 'zen'in', 'mina-sama'), KATEGORYCZNIE ZABRANIA SIĘ tłumaczenia w liczbie pojedynczej ('Uważaj!' -> NAKAZ: 'Uważajcie! / Bądźcie ostrożni / ostrożne!').
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -3292,6 +3308,22 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Op
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR CLXII - Nienaruszalność Płci Imion Orientalnych na '-a']: "
             "Imiona męskie kończące się na samogłoskę '-a' (np. Shira, Akira, Gaara, Ashitaka) wymagają BEZWZGLĘDNIE orzeczeń i czasowników w rodzaju męskim w czasie przeszłym ('Shira ostrzegał / mówił / pomógł / przyszedł'). KATEGORYCZNY ZAKAZ form żeńskich ('Shira ostrzegała / mówiła')!"
+        )
+
+    # 103. Morfologia Adresatywna Liczby Mnogiej (Filar CLXIII)
+    has_plural_addressee_trigger = any(
+        any(w in str(item.get("audio_jp", "")).lower() for w in ["tachi", "omae-ra", "kisama-ra", "minna", "shokun", "zen'in", "mina-sama"]) or
+        any(w in str(item.get("en", "")).lower() for w in ["you all", "you guys", "all of you", "girls", "everyone", "ladies"]) or
+        any(w in str(item.get("addressee", "")).lower() for w in ["grupa", "group"]) or
+        any("filar clxiii" in str(item.get("notes", "")).lower() for item in [item])
+        for item in batch_items
+    )
+    if has_plural_addressee_trigger:
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CLXIII - Morfologia Adresatywna Liczby Mnogiej (Męskoosobowy vs Niemęskoosobowy)]: "
+            "Dla grupy samych kobiet/dziewcząt ('grupa_kobiet') BEZWZGLĘDNIE stosuj formy niemęskoosobowe ('zrobiłyście', 'widziałyście', 'byłyście gotowe'). "
+            "Dla grupy mężczyzn lub grupy mieszanej stosuj rodzaj męskoosobowy ('zrobiliście', 'widzieliście', 'byliście gotowi'). "
+            "Przy japońskich cząstkach liczby mnogiej (-tachi, -ra, minna) KATEGORYCZNY ZAKAZ liczby pojedynczej!"
         )
 
     if not focused_pillars:

@@ -244,6 +244,10 @@ class DialogueVerifier:
             else:
                 char_info = ""
 
+            addressee_label = (item.get('addressee_label') or '').strip()
+            if addressee_label:
+                char_info = f"{char_info} -> [Adresat: {addressee_label}]"
+
             # Actor & Voice profile
             actor_cues = []
             if item.get('speaker_voice'):
@@ -284,6 +288,10 @@ class DialogueVerifier:
                 directive_lines.append("    • PIOSENKA: Wymóg rymu i metrum sylabicznego (Filar CXVIII - Barańczak)!")
             if item.get('ambiguity_note'):
                 directive_lines.append(f"    • Wątpliwość Fazy 1: {item['ambiguity_note'].strip()}")
+            if item.get('addressee') == 'grupa_kobiet':
+                directive_lines.append("    • ADRESAT (GRUPA KOBIET): Wymóg form niemęskoosobowych: 'zrobiłyście / byłyście gotowe / widziałyście' (ZAKAZ: -liście / gotowi) (Filar CLXIII)!")
+            elif item.get('addressee') in ['grupa_mężczyzn', 'grupa_mieszana']:
+                directive_lines.append(f"    • ADRESAT ({'GRUPA MĘŻCZYZN' if item.get('addressee') == 'grupa_mężczyzn' else 'GRUPA MIESZANA'}): Wymóg form męskoosobowych: 'zrobiliście / byliście gotowi / widzieliście' (Filar CLXIII)!")
 
             # Clean notes from duplicates (remove third_person_subject from notes if already present)
             raw_notes = (item.get('notes') or '').strip()
