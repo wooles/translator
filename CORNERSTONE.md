@@ -98,6 +98,16 @@ Rozstrzyganie wszelkich konfliktów translacyjnych i priorytetów w silniku odby
   3. **Naturalny Ping-Pong Dialogowy (Kognitywistyka AVT)**: Bezwzględny zakaz samotnego „Tak/T-Tak” w odpowiedzi na ostrzeżenia/dyrektywy, pytania otwarte (Wh-questions) oraz pytania z przeczeniem (Echo Agreement / Filar CLIV).
   4. **Całościowy Audytor Jakości Odcinka (`EpisodeQualityGate`)**: Nienaruszalność form adresatywnych (T-V Invariance), higiena interpunkcji, bariera myśli wewnętrznej oraz skaner pozostałości języka angielskiego (English Remainder Sweep).
 
+### 12. PRAWO ANTY-ŁATANIA I OBOWIĄZKOWEGO AUDYTU 5 WARSTW (THE ANTI-PATCHING & 5-LAYER ROOT-CAUSE MANDATE)
+* Kategoryczny zakaz gaszenia pożarów przez edycję samego pliku napisów `.ass` lub dodawanie pojedynczych regexów w linterze.
+* Każde zgłoszenie błędu nakłada na inżyniera bezwzględny obowiązek przeprowadzenia pełnego audytu 5 warstw:
+  1. `profiler.py` (wyeliminowanie źródła błędu w analizie wstępnej),
+  2. `series_memory.py` (symetryczna ochrona bazy wiedzy przed skażeniem),
+  3. `rules.py` (zakazanie błędu w kanonie i dyspozytorze Fazy 1/2),
+  4. `avt_linter.py` (deterministyczny bezpiecznik 0.00 PLN w `EpisodeQualityGate`),
+  5. `test_system.py` (trwały test regresyjny uniemożliwiający nawrót błędu).
+* Odpowiedź inżyniera bez przedstawienia dowodów we wszystkich 5 warstwach stanowi złamanie standardu CORNERSTONE.
+
 ---
 
 ## 🔒 ZASADA WERYFIKACJI PRZYSZŁYCH ZMIAN (REGRESSION GUARD)
