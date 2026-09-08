@@ -3171,6 +3171,66 @@ def test_fansub_quality_pixel_perfect_typesetting():
     print(" -> PASSED: Fansub-Quality Pixel-Perfect Typesetting (Grounding 2D, \\pos, \\frz, \\1c, \\3c) działa w 100% harmonii.")
 
 
+def test_phase1_gender_hallucination_arbitration():
+    print("[TEST 45/45] Test Wielopoziomowego Silnika Arbitrażu Płci (Ochrona przed Halucynacją Fazy 1)...")
+    from translator import MultimodalTranslator
+    from avt_linter import EpisodeQualityGate
+    import pysubs2
+
+    # 1. Test Symetrycznej Nienaruszalności Pamięci (Symmetrical Immutable Registry Lock)
+    tr = MultimodalTranslator.__new__(MultimodalTranslator)
+    tr.character_registry = {}
+    tr._register_character_safe("Naie", "kobieta", "nauczycielka")
+    assert "kobieta" in tr.character_registry["Naie"]
+
+    # Próba skażenia rejestru przez halucynację Fazy 1 ("mężczyzna")
+    tr._register_character_safe("Naie", "mężczyzna", "postać")
+    assert "kobieta" in tr.character_registry["Naie"], "BŁĄD: Dozwolono na nadpisanie potwierdzonej kobiety formą męską!"
+
+    # Symetria dla postaci męskiej
+    tr._register_character_safe("Benimaru", "mężczyzna", "generał")
+    tr._register_character_safe("Benimaru", "kobieta", "postać")
+    assert "mężczyzna" in tr.character_registry["Benimaru"], "BŁĄD: Dozwolono na nadpisanie potwierdzonego mężczyzny formą żeńską!"
+
+    # 2. Test Weta Kanonicznego (Kanon > Halucynacja Fazy 1)
+    ev_naie = pysubs2.SSAEvent(start=1000, end=4000, name="Naie", text="Gdybym wiedział, już dawno doniósłbym cesarzowi.")
+    resolved_g, alerts = tr._arbitrate_speaker_gender(
+        event=ev_naie,
+        raw_phase1_gender="mężczyzna",  # Faza 1 zhalucynowała!
+        batch_id=1,
+        pl_candidate="Gdybym wiedział, już dawno doniósłbym cesarzowi."
+    )
+    assert resolved_g == "kobieta", f"Oczekiwano 'kobieta' po wecie kanonicznym, otrzymano {resolved_g}"
+    assert any("Weto Kanonu" in a for a in alerts), "Oczekiwano alarmu Weta Kanonu w alertach arbitrażu"
+    assert any("ALARM KOREKTY FLEKSYJNEJ" in a for a in alerts), "Oczekiwano alarmu korekty fleksyjnej (-łem) dla Fazy 2"
+
+    # 3. Test Weta Akustycznego (F0 Sopran / Whisper JP 'atashi' dla nienazwanej postaci)
+    ev_unnamed = pysubs2.SSAEvent(start=5000, end=7000, name="Ktoś", text="Myślałem o tym...")
+    resolved_unnamed, alerts_unnamed = tr._arbitrate_speaker_gender(
+        event=ev_unnamed,
+        raw_phase1_gender="mężczyzna",  # Faza 1 mówi mężczyzna
+        batch_id=2,
+        speaker_tags={2: "wysoki / dziecięcy / żeński (~240Hz)"},
+        whisper_transcriptions={2: "あたしもそう思っていた [Atashi mo sou omotteita]"},
+        pl_candidate="Myślałem o tym..."
+    )
+    assert resolved_unnamed == "kobieta", f"Oczekiwano 'kobieta' po wecie akustycznym F0/Whisper, otrzymano {resolved_unnamed}"
+    assert any("ARBITRAŻU AKUSTYCZNEGO" in a for a in alerts_unnamed), "Oczekiwano alarmu arbitrażu akustycznego"
+
+    # 4. Test Integracji z EpisodeQualityGate (Deterministyczny bezpiecznik końcowy)
+    subs = pysubs2.SSAFile()
+    ev_corrupted = pysubs2.SSAEvent(start=1000, end=4000, name="Naie", text="Gdybym wiedział, już dawno doniósłbym cesarzowi.")
+    subs.events = [ev_corrupted]
+    audited_subs, fixes = EpisodeQualityGate.audit_and_fix_entire_episode(
+        subs,
+        character_registry=tr.character_registry
+    )
+    assert audited_subs.events[0].text == "Gdybym wiedziała, już dawno doniosłabym cesarzowi."
+    assert any("Spójność Płci Postaci" in f for f in fixes)
+
+    print(" -> PASSED: Wielopoziomowy Silnik Arbitrażu Płci (Ochrona przed Halucynacją Fazy 1, Weto Kanonu, Weto F0 i Linter 0.00 PLN) działa w 100% harmonii.")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -3214,7 +3274,8 @@ if __name__ == "__main__":
     test_comprehensive_architecture_extensions()
     test_anti_attention_dilution_semantic_anchors_and_full_phase2()
     test_fansub_quality_pixel_perfect_typesetting()
-    print("\n Wszystkie testy jednostkowe i integracyjne (44/44) zakończone pełnym sukcesem!\n")
+    test_phase1_gender_hallucination_arbitration()
+    print("\n Wszystkie testy jednostkowe i integracyjne (45/45) zakończone pełnym sukcesem!\n")
 
 
 

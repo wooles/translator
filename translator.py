@@ -1271,6 +1271,152 @@ class MultimodalTranslator:
         default_concurrency = 1
         self.concurrent_batches = int(os.getenv("CONCURRENT_BATCHES", str(default_concurrency)))
 
+    FEMALE_ROLE_KEYWORDS = [
+        "female", "kobieta", "dziewczyn", "żeńsk", "nauczycielk", "czarodziejk",
+        "szpieżk", "wojowniczk", "kapłank", "służąc", "pani", "bohaterk",
+        "arystokratk", "władczyn", "królow", "księżniczk", "matk", "córk", "siostr"
+    ]
+    MALE_ROLE_KEYWORDS = [
+        "male", "mężczyzna", "chłopak", "męsk", "chłopiec", "król", "książę", "wojownik"
+    ]
+
+    def _register_character_safe(self, name: str, gender: str, role: str = "") -> None:
+        """
+        Safely registers or updates a character in self.character_registry with
+        symmetrical immutable protection (cannot downgrade/overwrite confirmed FEMALE with MALE
+        or confirmed MALE with FEMALE).
+        """
+        if not name:
+            return
+        clean_name = name.strip()
+        new_desc = f"{gender} ({role or 'postać'})".strip()
+        new_lower = new_desc.lower()
+
+        if clean_name in self.character_registry:
+            existing_desc = self.character_registry[clean_name]
+            existing_lower = existing_desc.lower()
+
+            has_confirmed_female = any(w in existing_lower for w in self.FEMALE_ROLE_KEYWORDS)
+            is_incoming_male = any(w in new_lower for w in ["male", "mężczyzna", "chłopak", "męsk"])
+            if has_confirmed_female and is_incoming_male:
+                # Symmetrical lock: reject male overwrite for confirmed female
+                return
+
+            has_confirmed_male = any(w in existing_lower for w in ["male", "mężczyzna", "chłopak", "męsk"])
+            is_incoming_female = any(w in new_lower for w in self.FEMALE_ROLE_KEYWORDS)
+            if has_confirmed_male and is_incoming_female:
+                # Symmetrical lock: reject female overwrite for confirmed male
+                return
+
+        self.character_registry[clean_name] = new_desc
+
+    def _arbitrate_speaker_gender(
+        self,
+        event: pysubs2.SSAEvent,
+        raw_phase1_gender: Optional[str],
+        batch_id: int,
+        speaker_tags: Optional[Dict[int, str]] = None,
+        whisper_transcriptions: Optional[Dict[int, str]] = None,
+        pl_candidate: str = ""
+    ) -> Tuple[Optional[str], List[str]]:
+        """
+        Multi-Signal Gender Arbitration Engine (0.00 PLN).
+        Arbitrates speaker gender across independent sources using Hierarchy of Authority:
+        1. Canonical Authority: self.series_bible & self.character_registry (VETO POWER)
+        2. Acoustic & Linguistic Ground Truth: F0 Pitch (speaker_tags) & Japanese seiyū markers (whisper)
+        3. Phase 1 Draft: raw_phase1_gender
+
+        Returns: (resolved_gender, arbitration_alerts)
+        """
+        alerts = []
+        canonical_gender = None
+        spk_clean = (getattr(event, "name", None) or "").strip()
+
+        # 1. Canonical Authority Check
+        if spk_clean:
+            if spk_clean in self.character_registry:
+                desc = self.character_registry[spk_clean].lower()
+                if any(k in desc for k in self.FEMALE_ROLE_KEYWORDS):
+                    canonical_gender = "kobieta"
+                elif any(k in desc for k in ["male", "mężczyzna", "chłopak", "męsk"]):
+                    canonical_gender = "mężczyzna"
+
+            if not canonical_gender and hasattr(self, "series_bible") and self.series_bible and hasattr(self.series_bible, "data"):
+                b_chars = self.series_bible.data.get("characters", {})
+                for b_name, b_val in b_chars.items():
+                    if spk_clean.lower() in b_name.lower() or b_name.lower() in spk_clean.lower():
+                        b_desc = b_val.get("description", "") if isinstance(b_val, dict) else str(b_val)
+                        b_lower = b_desc.lower()
+                        if any(k in b_lower for k in self.FEMALE_ROLE_KEYWORDS):
+                            canonical_gender = "kobieta"
+                            break
+                        elif any(k in b_lower for k in ["male", "mężczyzna", "chłopak", "męsk"]):
+                            canonical_gender = "mężczyzna"
+                            break
+
+        # 2. Acoustic & Linguistic Ground Truth
+        acoustic_gender = None
+        if speaker_tags and batch_id in speaker_tags:
+            v_tag = speaker_tags[batch_id].lower()
+            if "żeńsk" in v_tag or "sopran" in v_tag or "dziecięcy" in v_tag:
+                hz_match = re.search(r"~(\d+)\s*hz", v_tag)
+                if hz_match:
+                    hz_val = int(hz_match.group(1))
+                    if hz_val >= 195:
+                        acoustic_gender = "kobieta"
+                    elif hz_val <= 150:
+                        acoustic_gender = "mężczyzna"
+                else:
+                    acoustic_gender = "kobieta"
+            elif "męsk" in v_tag or "baryton" in v_tag or "bas" in v_tag:
+                acoustic_gender = "mężczyzna"
+
+        jp_text = (whisper_transcriptions.get(batch_id, "") if whisper_transcriptions else "").lower()
+        jp_female_marker = any(m in jp_text for m in ["atashi", "あたし", "atai", "あtai", "kashira", "かしら", "わよ", "wayo"])
+        jp_male_marker = any(m in jp_text for m in ["ore", "俺", "boku", "僕"])
+
+        raw_norm = (raw_phase1_gender or "").lower()
+        phase1_is_female = any(w in raw_norm for w in ["kobieta", "żeńsk", "female", "dziewczyn"])
+        phase1_is_male = any(w in raw_norm for w in ["mężczyzna", "męsk", "male", "chłopak"])
+
+        # 3. Hierarchy Arbitration & Veto Evaluation
+        # Case A: Canonical Authority prevails
+        if canonical_gender == "kobieta":
+            if phase1_is_male:
+                alerts.append(f"[🚨 ALARM ARBITRAŻU: Faza 1 błędnie przypisała rodzaj męski dla potwierdzonej kobiety '{spk_clean}'! Zastosowano Weto Kanonu -> wymuszono 'kobieta']")
+            has_masc_verb = bool(re.search(r"\b(byłem|miałem|widziałem|wiedziałem|zrobiłem|pomyślałem|chciałem|mogłem|poszedłem|powiedziałem|czułem|słyszałem|wróciłem|dostałem|znalazłem|oddałem|zgubiłem|uratowałem|przyszedłem|doniósłbym|wiedziałbym|mógłbym|chciałbym)\b", pl_candidate, re.IGNORECASE))
+            if has_masc_verb:
+                alerts.append(f"[🚨 ALARM KOREKTY FLEKSYJNEJ: Faza 1 wygenerowała formę męską (-łem) dla mówczyni '{spk_clean}'! Faza 2 BEZWZGLĘDNIE musi zastosować formę żeńską (-łam / -łaś)!]")
+            return "kobieta", alerts
+
+        if canonical_gender == "mężczyzna":
+            if phase1_is_female:
+                alerts.append(f"[🚨 ALARM ARBITRAŻU: Faza 1 błędnie przypisała rodzaj żeński dla potwierdzonego mężczyzny '{spk_clean}'! Zastosowano Weto Kanonu -> wymuszono 'mężczyzna']")
+            return "mężczyzna", alerts
+
+        # Case B: Acoustic / Japanese linguistic Ground Truth overrides unknown Phase 1
+        if (acoustic_gender == "kobieta" or jp_female_marker) and phase1_is_male:
+            alerts.append(f"[🚨 ALARM ARBITRAŻU AKUSTYCZNEGO: Faza 1 wskazała rodzaj męski, lecz obiektywny odsłuch F0/Whisper wykazuje głos żeński! Wymuszono 'kobieta']")
+            return "kobieta", alerts
+
+        if (acoustic_gender == "mężczyzna" or jp_male_marker) and phase1_is_female:
+            alerts.append(f"[🚨 ALARM ARBITRAŻU AKUSTYCZNEGO: Faza 1 wskazała rodzaj żeński, lecz obiektywny odsłuch F0/Whisper wykazuje głos męski! Wymuszono 'mężczyzna']")
+            return "mężczyzna", alerts
+
+        # Case C: Direct Phase 1 or Fallback
+        if phase1_is_female:
+            return "kobieta", alerts
+        elif phase1_is_male:
+            return "mężczyzna", alerts
+        elif acoustic_gender:
+            return acoustic_gender, alerts
+        elif jp_female_marker:
+            return "kobieta", alerts
+        elif jp_male_marker:
+            return "mężczyzna", alerts
+
+        return None, alerts
+
     def _prepare_batch_prompt(
         self,
         batch_events: List[Tuple[int, pysubs2.SSAEvent, str, str]],
@@ -1962,13 +2108,12 @@ class MultimodalTranslator:
             schema_class=BatchTranslationResponse
         )
 
-        # Update global Character Registry with thread lock
+        # Update global Character Registry with thread lock and safe registration
         with self.lock:
             if batch_response and batch_response.characters_identified:
                 for char in batch_response.characters_identified:
                     if char.name:
-                        desc = f"{char.gender} ({char.role or 'postać'})"
-                        self.character_registry[char.name] = desc
+                        self._register_character_safe(char.name, char.gender, char.role or "postać")
         scene_desc = ""
         if batch_response:
             if getattr(batch_response, "scene_diagnosis", None) and batch_response.scene_diagnosis:
@@ -2046,21 +2191,18 @@ class MultimodalTranslator:
                 is_missing_tr = True
                 notes = f"{notes} [🚨 LUKA W FAZIE 1: Kwestia pominięta w szkicu! PRZETŁUMACZ OD ZERA Z EN I AUDIO JP!]".strip()
 
-            # Triangulate missing speaker gender from character registry
-            if not speaker_gender and event.name and event.name.strip() in self.character_registry:
-                reg_desc = self.character_registry[event.name.strip()].lower()
-                if "kobieta" in reg_desc or "żeńsk" in reg_desc or "dziewczyn" in reg_desc:
-                    speaker_gender = "kobieta"
-                elif "mężczyzna" in reg_desc or "męsk" in reg_desc or "chłopak" in reg_desc:
-                    speaker_gender = "mężczyzna"
-
-            # Fallback z estymacji fonicznej F0 (SpeakerVoiceClassifier), jeśli płeć wciąż nieznana
-            if not speaker_gender and speaker_tags and batch_id in speaker_tags:
-                v_tag = speaker_tags[batch_id].lower()
-                if "żeńsk" in v_tag or "sopran" in v_tag:
-                    speaker_gender = "kobieta"
-                elif "męsk" in v_tag or "baryton" in v_tag or "bas" in v_tag:
-                    speaker_gender = "mężczyzna"
+            # Multi-Signal Gender Arbitration Engine (0.00 PLN)
+            resolved_gender, arb_alerts = self._arbitrate_speaker_gender(
+                event=event,
+                raw_phase1_gender=speaker_gender,
+                batch_id=batch_id,
+                speaker_tags=speaker_tags,
+                whisper_transcriptions=whisper_transcriptions,
+                pl_candidate=pl_candidate
+            )
+            speaker_gender = resolved_gender
+            if arb_alerts:
+                notes = f"{notes} {' '.join(arb_alerts)}".strip()
 
             # Line-Level Pinning: Direct Profiler alerts for this specific line
             if episode_profile:
@@ -2489,7 +2631,7 @@ class MultimodalTranslator:
             
             # Pre-populate character registry from AniList
             for c in anime_meta.get("characters", []):
-                self.character_registry[c["name"]] = f"{c['gender']} ({c['role']})"
+                self._register_character_safe(c["name"], c["gender"], c.get("role", "postać"))
 
         # 1. Clean events and compress frame-by-frame animations (FBF Animation Deduplication)
         raw_all_entries = []
@@ -2661,18 +2803,29 @@ class MultimodalTranslator:
             if ref_path:
                 series_title = Path(ref_path).stem.split(" - ")[0].replace("[ASW]", "").replace("[Erai-raws]", "").strip()
         self.series_bible = SeriesBible(anime_title=series_title)
+        # Pre-populate global Character Registry from persistent Series Bible
+        if self.series_bible and hasattr(self.series_bible, "data"):
+            bible_chars = self.series_bible.data.get("characters", {})
+            for b_name, b_val in bible_chars.items():
+                b_desc = b_val.get("description", "") if isinstance(b_val, dict) else str(b_val)
+                if b_name and b_desc:
+                    for p in re.split(r"[/,]", b_name):
+                        clean_p = p.strip()
+                        if len(clean_p) >= 3 and clean_p not in self.character_registry:
+                            self.character_registry[clean_p] = b_desc
+
         if episode_profile:
             # Pre-populate global Character Registry from Episode Profile dossiers and declensions first
             if getattr(episode_profile, "character_dossiers", None):
                 for cd in episode_profile.character_dossiers:
-                    if cd.name and cd.name not in self.character_registry:
+                    if cd.name:
                         gender_pl = "kobieta" if cd.gender.upper() == "FEMALE" else ("mężczyzna" if cd.gender.upper() == "MALE" else cd.gender)
-                        self.character_registry[cd.name] = f"{gender_pl} ({cd.age_and_role or 'postać'})"
+                        self._register_character_safe(cd.name, gender_pl, cd.age_and_role or 'postać')
             if getattr(episode_profile, "name_declensions", None):
                 for nd in episode_profile.name_declensions:
-                    if nd.character_name and nd.character_name not in self.character_registry:
+                    if nd.character_name:
                         gender_pl = "kobieta" if nd.gender.upper() == "FEMALE" else ("mężczyzna" if nd.gender.upper() == "MALE" else nd.gender)
-                        self.character_registry[nd.character_name] = f"{gender_pl} (postać)"
+                        self._register_character_safe(nd.character_name, gender_pl, 'postać')
 
             char_dict = {}
             for c in episode_profile.characters:
