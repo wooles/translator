@@ -1053,15 +1053,21 @@ class EpisodeQualityGate:
         }
         char_gender_map: Dict[str, str] = {}  # char_name_lower -> "MALE" or "FEMALE"
 
+        FEMALE_ROLE_KEYWORDS = [
+            "female", "kobieta", "dziewczyn", "żeńsk", "nauczycielk", "czarodziejk",
+            "szpieżk", "wojowniczk", "kapłank", "służąc", "pani", "bohaterk",
+            "arystokratk", "władczyn", "królow", "księżniczk", "matk", "córk", "siostr"
+        ]
+
         # 0a. From Character Registry
         if character_registry:
             for cname, cdesc in character_registry.items():
                 cd_lower = str(cdesc).lower()
                 gen = None
-                if any(k in cd_lower for k in ["male", "mężczyzna", "chłopak", "męsk"]):
-                    gen = "MALE"
-                elif any(k in cd_lower for k in ["female", "kobieta", "dziewczyn", "żeńsk"]):
+                if any(k in cd_lower for k in FEMALE_ROLE_KEYWORDS):
                     gen = "FEMALE"
+                elif any(k in cd_lower for k in ["male", "mężczyzna", "chłopak", "męsk"]):
+                    gen = "MALE"
                 if gen:
                     for p in re.split(r"[/,]", cname):
                         clean_p = p.strip()
@@ -1075,10 +1081,10 @@ class EpisodeQualityGate:
                 desc_str = c_val.get("description", "") if isinstance(c_val, dict) else str(c_val)
                 desc_lower = desc_str.lower()
                 gen = None
-                if any(k in desc_lower for k in ["male", "mężczyzna", "chłopak", "męsk"]):
-                    gen = "MALE"
-                elif any(k in desc_lower for k in ["female", "kobieta", "dziewczyn", "żeńsk"]):
+                if any(k in desc_lower for k in FEMALE_ROLE_KEYWORDS):
                     gen = "FEMALE"
+                elif any(k in desc_lower for k in ["male", "mężczyzna", "chłopak", "męsk"]):
+                    gen = "MALE"
                 if gen:
                     for n in re.findall(r"\b[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]{2,}\b", c_key):
                         if n.lower() not in char_gender_map:

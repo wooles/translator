@@ -923,6 +923,17 @@ def test_series_bible():
         assert "MĘŻCZYZNA" in shira_desc
         assert "kobieta" not in shira_desc
 
+        # Test niezmienności potwierdzonej płci żeńskiej (zakaz nadpisywania mężczyzną)
+        bible.data["characters"]["Naie"] = {"description": "kobieta, nauczycielka [KATEGORYCZNY NAKAZ form żeńskich]"}
+        bible.update_from_episode_profile(
+            episode_name="Odcinek 4",
+            characters={"Naie": "mężczyzna, szpieg"},
+            glossary={}
+        )
+        naie_desc = bible.data["characters"]["Naie"]["description"]
+        assert "kobieta" in naie_desc
+        assert "mężczyzna" not in naie_desc
+
         # Test wczytywania i formatowania dla promptu
         formatted_bible = bible.format_for_prompt()
         assert "Dragon Slayer" in formatted_bible
@@ -2601,13 +2612,22 @@ def test_episode_quality_gate():
     ev18 = pysubs2.SSAEvent(start=29500, end=31000, name="Sitara", text="Tak właśnie mówiła Shira.", style="Default")
     # Linia 19: Przypadkowa ściana tekstu (4 wiersze w dialogu - Filar LVII)
     ev19 = pysubs2.SSAEvent(start=31500, end=34000, text="Zaraz, za co przepraszasz?\\NPrzecież nie miałeś złych\\Nintencji, kiedy do niej\\Npodszedłeś, co?", style="Default")
+    # Linia 20: Poprzedzająca kwestia rozmówczyni (Naie)
+    ev20 = pysubs2.SSAEvent(start=35000, end=37000, name="Naie", text="Raczej nie powinnaś mi o tym mówić.", style="Default")
+    # Linia 21: Wewnątrzzdaniowa hybryda 'ty' + 'pan' w rozmowie dwóch kobiet (Alicia -> Naie)
+    ev21 = pysubs2.SSAEvent(start=37500, end=40000, name="Alicia", text="Przecież wiesz, kim jestem,\\Na jakoś mnie pan nie wydał.", style="Default")
+    # Linia 22: Czasowniki przypuszczające 1. os. kobiety (Naie: nauczycielka)
+    ev22 = pysubs2.SSAEvent(start=40500, end=42000, name="Naie", text="Gdybym wiedział,\\Njuż dawno doniósłbym cesarzowi.", style="Default")
 
-    subs.events = [ev1, ev2, ev3, ev4, ev5, ev6, ev7, ev8, ev9, ev10, ev11, ev12, ev13, ev14, ev15, ev16, ev17, ev18, ev19]
+    subs.events = [ev1, ev2, ev3, ev4, ev5, ev6, ev7, ev8, ev9, ev10, ev11, ev12, ev13, ev14, ev15, ev16, ev17, ev18, ev19, ev20, ev21, ev22]
 
-    audited_subs, fixes = EpisodeQualityGate.audit_and_fix_entire_episode(subs)
+    audited_subs, fixes = EpisodeQualityGate.audit_and_fix_entire_episode(
+        subs,
+        character_registry={"Naie": "nauczycielka w Akademii, szpieg", "Alicia": "kobieta, bohaterka"}
+    )
 
     # Weryfikacja korekt
-    assert len(fixes) >= 13, f"Oczekiwano co najmniej 13 poprawek, otrzymano {len(fixes)}"
+    assert len(fixes) >= 15, f"Oczekiwano co najmniej 15 poprawek, otrzymano {len(fixes)}"
 
     # 1. Dyrektywne potwierdzenie: T-Tak. -> D-Dobrze.
     assert audited_subs.events[1].text == "D-Dobrze."
@@ -2657,6 +2677,13 @@ def test_episode_quality_gate():
     # 13. Limit maksymalnie 2 wierszy dla kwestii dialogowych (Filar LVII / Netflix AVT)
     assert len(audited_subs.events[18].text.split(r"\N")) == 2
     assert any("Filar LVII" in f for f in fixes)
+
+    # 14. Eliminacja wewnątrzzdaniowej hybrydy T-V w rozmowie kobiet (Filar CLVII)
+    assert audited_subs.events[20].text == "Przecież wiesz, kim jestem,\\Na jakoś mnie nie wydałaś."
+    assert any("Intra-Line T-V Invariance" in f for f in fixes)
+
+    # 15. Spójność 1. osoby mówczyni żeńskiej (nauczycielka -> formy żeńskie)
+    assert audited_subs.events[21].text == "Gdybym wiedziała,\\Njuż dawno doniosłabym cesarzowi."
 
     print(" -> PASSED: Episode Quality Gate bezbłędnie eliminuje banalne błędy na pełnej osi czasu (Adjacency Pairs, Wh-Questions, Echo Agreement, T-V Invariance, Thought Boundary, Incognito, Typography, English Sweep, Spójność Płci Postaci, Maks. 2 Wiersze AVT) przy koszcie 0.00 PLN.")
 

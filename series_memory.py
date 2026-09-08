@@ -221,21 +221,31 @@ class SeriesBible:
                     existing_desc = existing_entry.get("description", "") if isinstance(existing_entry, dict) else str(existing_entry)
                     existing_lower = existing_desc.lower()
 
-                    # Protect confirmed gender against downgrading or overwriting
+                    # Protect confirmed gender against downgrading or overwriting (both male and female)
                     has_confirmed_male = any(w in existing_lower for w in ["mężczyzna", "męsk", "male", "kategoryczny nakaz form męskich"])
-                    is_incoming_female = any(w in clean_details.lower() for w in ["kobieta", "żeńsk", "female", "służąca"])
+                    is_incoming_female = any(w in clean_details.lower() for w in ["kobieta", "żeńsk", "female", "służąca", "nauczycielka", "dziewczyna"])
                     if has_confirmed_male and is_incoming_female:
                         continue
 
+                    has_confirmed_female = any(w in existing_lower for w in ["kobieta", "żeńsk", "female", "dziewczyna", "kategoryczny nakaz form żeńskich", "nauczycielka"])
+                    is_incoming_male = any(w in clean_details.lower() for w in ["mężczyzna", "męsk", "male", "chłopak"])
+                    if has_confirmed_female and is_incoming_male:
+                        continue
+
                     # If existing entry has rich directives/seiyū, do not overwrite with bare string
-                    has_rich_directives = any(w in existing_lower for w in ["kategoryczny", "nakaz", "seiyū", "bezwzględnie formy męskie"])
+                    has_rich_directives = any(w in existing_lower for w in ["kategoryczny", "nakaz", "seiyū", "bezwzględnie formy"])
                     if has_rich_directives and not any(w in clean_details.lower() for w in ["kategoryczny", "nakaz"]):
                         continue
 
                     self.data["characters"][name] = {"description": clean_details}
 
                 # Generate and store 7-case Polish declension matrix
-                c_gender = "MALE" if any(w in clean_details.lower() for w in ["mężczyzna", "męsk", "male", "chłopak"]) else ("FEMALE" if any(w in clean_details.lower() for w in ["kobieta", "żeńsk", "female", "dziewczyna"]) else "UNKNOWN")
+                FEMALE_KEYWORDS = [
+                    "kobieta", "żeńsk", "female", "dziewczyn", "nauczycielk", "czarodziejk",
+                    "szpieżk", "wojowniczk", "kapłank", "służąc", "pani", "bohaterk",
+                    "arystokratk", "władczyn", "królow", "księżniczk", "matk", "córk", "siostr"
+                ]
+                c_gender = "MALE" if (any(w in clean_details.lower() for w in ["mężczyzna", "męsk", "male", "chłopak"]) and not any(w in clean_details.lower() for w in FEMALE_KEYWORDS)) else ("FEMALE" if any(w in clean_details.lower() for w in FEMALE_KEYWORDS) else "UNKNOWN")
                 if "declensions" not in self.data:
                     self.data["declensions"] = {}
                 self.data["declensions"][name] = generate_polish_name_declension(name, c_gender)

@@ -1453,6 +1453,10 @@ FILAR CLVII: ZASADA NIENARUSZALNOŚCI FORMY ADRESATYWNEJ (T-V INVARIANCE) I ZAKA
       - Formę per „pan/pani” stosuj WYŁĄCZNIE wtedy, gdy postacie zwracają się do siebie oficjalnie po nazwisku z tytulaturą („panie Kanzaki”, „panie Tomine”, „panie inspektorze”) i w całej scenie utrzymują ten sam dystans.
    3. JEDYNY WYJĄTEK DLA ZMIANY FORMY:
       - Zmiana formy z „pan/pani” na „ty” może nastąpić WYŁĄCZNIE w punkcie zwrotnym zdefiniowanym przez Profiler (Relationship Pivot), gdy bohaterowie wyraźnie ustalają przejście na „ty” (np. „Mów mi Shizuku / Przejdźmy na ty”). W żadnym wypadku nie może to być losowy skok w ramach jednej wymiany zdań!
+   4. ZAKAZ WEWNĄTRZZDANIOWYCH HYBRYD ADRESATYWNYCH (INTRA-LINE T-V HYBRID BAN):
+      - KATEGORYCZNY ZAKAZ łączenia w obrębie tej samej kwestii dialogowej lub zdania form poufałych na „ty” (np. „Przecież wiesz”, „Widzisz”, „Myślisz”, „Mówiłeś”) z formami grzecznościowymi per „pan/pani” („a jakoś mnie pan nie wydał”, „stoi pan”, „oferuję panu”)!
+      - BŁĄD KARDYNALNY [X]: „Przecież wiesz, kim jestem, a jakoś mnie pan nie wydał.” (niedopuszczalny anacoluthon rejestru).
+      - POPRAWNIE AVT [OK]: „Przecież wiesz, kim jestem, a jakoś mnie nie wydałeś / nie wydałaś.” (jednolity rejestr w całej wypowiedzi).
 
 FILAR CLVIII: ZASADA NIESKAZITELNEGO UCHA WIDZA (THE AUDITORY-SUBTEXT COHERENCE STANDARD)
    1. HARMONIA MIĘDZY SŁUCHEM A NAPISAMI:
@@ -3202,15 +3206,16 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Op
 
     # 97. Nienaruszalność Formy Adresatywnej i Zakaz Schizofrenii Pan/Ty (Filar CLVII)
     has_address_drift_risk = any(
-        any(w in str(item.get("en", "")).lower() for w in ["you won", "did you", "you did", "have you", "you're", "you are", "why?!", "why?", "look,", "what? but you", "you've"]) or
+        any(w in str(item.get("en", "")).lower() for w in ["you won", "did you", "you did", "have you", "you're", "you are", "why?!", "why?", "look,", "what? but you", "you've", "you didn't", "you know"]) or
         bool(re.search(r"\b(pan|pani|pana|panu|panie)\b", str(item.get("pl", "")).lower()))
         for item in batch_items
     )
     if has_address_drift_risk:
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR CLVII - Nienaruszalność Formy Adresatywnej i Zakaz Schizofrenii Pan/Ty]: "
-            "Jeśli postać zwraca się do rozmówcy po imieniu (np. 'Shizuku, dlaczego?!'), w całej scenie KONSEKWENTNIE stosuj formę na 'ty'! "
+            "Jeśli postać zwraca się do rozmówcy po imieniu (np. 'Shizuku, dlaczego?!') lub na 'ty' ('Przecież wiesz...'), w całej scenie KONSEKWENTNIE stosuj formę na 'ty'! "
             "KATEGORYCZNY ZAKAZ wtrącania formy 'pan/pani' ('wygrał pan' -> BŁĄD KARDYNALNY! Należy: 'wygrałeś'). "
+            "ZAKAZ WEWNĄTRZZDANIOWYCH HYBRYD: Niedopuszczalne jest łączenie formy 'ty' ('wiesz') z 'pan nie wydał' w jednym zdaniu (musi być: 'nie wydałeś / nie wydałaś'). "
             "Wszelkie zwroty 'you / you won / did you' do osoby, z którą jesteś po imieniu, tłumacz w 2. osobie na 'ty'!"
         )
 

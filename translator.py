@@ -1021,6 +1021,12 @@ def detect_third_person_mentions(
     # Aggregate candidate characters and their confirmed genders
     candidates: Dict[str, str] = {}  # name -> "MALE" or "FEMALE"
 
+    FEMALE_ROLE_KEYWORDS = [
+        "female", "kobieta", "dziewczyn", "żeńsk", "nauczycielk", "czarodziejk",
+        "szpieżk", "wojowniczk", "kapłank", "służąc", "pani", "bohaterk",
+        "arystokratk", "władczyn", "królow", "księżniczk", "matk", "córk", "siostr"
+    ]
+
     # 1. From Character Registry
     if character_registry:
         for full_name, details in character_registry.items():
@@ -1028,10 +1034,10 @@ def detect_third_person_mentions(
                 continue
             desc_lower = str(details).lower()
             gen = None
-            if any(k in desc_lower for k in ["male", "mężczyzna", "chłopak", "męsk"]):
-                gen = "MALE"
-            elif any(k in desc_lower for k in ["female", "kobieta", "dziewczyn", "żeńsk"]):
+            if any(k in desc_lower for k in FEMALE_ROLE_KEYWORDS):
                 gen = "FEMALE"
+            elif any(k in desc_lower for k in ["male", "mężczyzna", "chłopak", "męsk"]):
+                gen = "MALE"
             
             # Split multi-name slashes like "Fatima / Sitara"
             parts = [p.strip() for p in re.split(r"[/,]", full_name) if p.strip()]
@@ -1046,10 +1052,10 @@ def detect_third_person_mentions(
             desc_str = c_val.get("description", "") if isinstance(c_val, dict) else str(c_val)
             desc_lower = desc_str.lower()
             gen = None
-            if any(k in desc_lower for k in ["male", "mężczyzna", "chłopak", "męsk"]):
-                gen = "MALE"
-            elif any(k in desc_lower for k in ["female", "kobieta", "dziewczyn", "żeńsk"]):
+            if any(k in desc_lower for k in FEMALE_ROLE_KEYWORDS):
                 gen = "FEMALE"
+            elif any(k in desc_lower for k in ["male", "mężczyzna", "chłopak", "męsk"]):
+                gen = "MALE"
             
             # c_key might be "Sitara -> Shira" or "Shira"
             names = re.findall(r"\b[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]{2,}\b", c_key)
