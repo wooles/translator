@@ -9,7 +9,7 @@ import os
 import re
 from typing import Optional, Tuple, Any, List
 from PIL import Image
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 def rgb_to_ass_hex(r: int, g: int, b: int) -> str:
     """Converts RGB color tuple to ASS BGR format (&HBBGGRR&)."""
@@ -25,13 +25,13 @@ def hex_to_ass_hex(hex_str: str) -> Optional[str]:
             r = int(clean[0:2], 16)
             g = int(clean[2:4], 16)
             b = int(clean[4:6], 16)
-            return rgb_to_ass_hex(r, g, b)
+            return f"&H{b:02X}{g:02X}{r:02X}&"
         except ValueError:
             return None
     return None
 
 class VisualTypesettingData(BaseModel):
-    model_config = {"extra": "allow"}
+    model_config = ConfigDict(extra="ignore")
     detected_box_1000: Optional[List[int]] = Field(default=None, description="[ymin, xmin, ymax, xmax] w skali 0-1000 dla japońskiego tekstu/planszy na kadrze")
     placement: Optional[str] = Field(default="above", description="'above' (nad japońskim tekstem), 'below' (pod), 'overlay' (na tekście), 'beside_right' (obok po prawej), 'beside_left' (obok po lewej)")
     rotation_deg: Optional[int] = Field(default=0, description="Kąt obrotu w stopniach (-45 do 45) jeśli tekst na kadrze jest skośny/pod kątem, inaczej 0")

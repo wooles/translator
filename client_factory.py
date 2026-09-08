@@ -20,7 +20,9 @@ def format_friendly_api_error(e: Exception) -> str:
     Eliminates cryptic JSON dictionaries and technical codes.
     """
     err_str = str(e).lower()
-    if "503" in err_str or "unavailable" in err_str or "high demand" in err_str:
+    if "additionalproperties" in err_str:
+        return "Niezgodność schematu Google Developer API (additionalProperties)"
+    elif "503" in err_str or "unavailable" in err_str or "high demand" in err_str:
         return "Chwilowe przeciążenie serwerów Google (503 High Demand)"
     elif "429" in err_str or "quota" in err_str or "resource_exhausted" in err_str or "rate" in err_str:
         return "Chwilowy limit zapytań na kluczu (429 Rate Limit)"
@@ -36,6 +38,47 @@ def format_friendly_api_error(e: Exception) -> str:
         if "{" in raw:
             raw = raw.split("{")[0].strip().rstrip(".:")
         return raw if raw else "Oczekiwanie na odpowiedź serwera"
+
+
+def patch_google_genai_schema_sanitizer() -> None:
+    """
+    Patches google.genai._transformers.process_schema to ensure that
+    'additionalProperties' is strictly eliminated from all generated JSON schemas
+    when operating in Gemini Developer API mode (Google AI Studio).
+    This prevents 400 INVALID_ARGUMENT errors on any nested Pydantic models.
+    """
+    try:
+        from google.genai import _transformers
+        if getattr(_transformers, "_additional_props_sanitizer_active", False):
+            return
+
+        orig_process = _transformers.process_schema
+
+        def safe_process_schema(schema, client, *args, **kwargs):
+            orig_process(schema, client, *args, **kwargs)
+
+            def _strip_recursive(s):
+                if isinstance(s, dict):
+                    s.pop("additionalProperties", None)
+                    s.pop("additional_properties", None)
+                    for v in s.values():
+                        if isinstance(v, dict):
+                            _strip_recursive(v)
+                        elif isinstance(v, list):
+                            for item in v:
+                                if isinstance(item, dict):
+                                    _strip_recursive(item)
+
+            _strip_recursive(schema)
+
+        _transformers.process_schema = safe_process_schema
+        _transformers._additional_props_sanitizer_active = True
+        logger.debug("Google GenAI schema sanitizer patched successfully.")
+    except Exception as e:
+        logger.warning(f"Could not patch google.genai schema sanitizer: {e}")
+
+# Automatically activate schema sanitizer upon module import
+patch_google_genai_schema_sanitizer()
 
 
 DEFAULT_HTTP_TIMEOUT_SEC = float(os.getenv("GEMINI_HTTP_TIMEOUT_SEC", "90.0"))

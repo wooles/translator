@@ -42,7 +42,7 @@ import sqlite3
 from typing import List, Optional, Dict, Any, Tuple
 from pathlib import Path
 from PIL import Image
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 import pysubs2
 from tqdm import tqdm
 
@@ -79,7 +79,9 @@ from speaker_diarizer import SpeakerVoiceClassifier
 from typesetting_matcher import TypesettingColorMatcher, VisualTypesettingData
 from user_feedback import UserFeedbackManager
 from glossary_manager import GlossaryManager
-from client_factory import format_friendly_api_error
+from client_factory import format_friendly_api_error, patch_google_genai_schema_sanitizer
+
+patch_google_genai_schema_sanitizer()
 
 def extract_typesetting_tags(raw_text: str) -> Tuple[str, str]:
     """
@@ -972,11 +974,13 @@ def create_adaptive_batches(raw_entries: list, base_batch_size: int = 24, max_ba
     return batches
 
 class CharacterInfo(BaseModel):
+    model_config = ConfigDict(extra="ignore")
     name: str = Field(description="Imię lub określenie postaci (np. 'Arata', 'Minami', 'Nauczyciel')")
     gender: str = Field(description="Płeć postaci: 'mężczyzna', 'kobieta' lub 'inna'")
     role: Optional[str] = Field(default=None, description="Krótka rola lub relacja, np. 'główny bohater', 'koleżanka z klasy'")
 
 class LineTranslation(BaseModel):
+    model_config = ConfigDict(extra="ignore")
     id: int = Field(description="ID kwestii dialogowej z wejścia")
     polish_text: str = Field(description="Przetłumaczona kwestia na język polski z uwzględnieniem płci, sceny i eliminacji kalek")
     speaker_gender: Optional[str] = Field(default=None, description="Płeć mówcy: 'mężczyzna' lub 'kobieta'")
@@ -1000,6 +1004,7 @@ class LineTranslation(BaseModel):
     ambiguity_note: Optional[str] = Field(default=None, description="W razie wątpliwości (np. niejasny zaimek it/he, dwuznaczność słowa, brak pewności): krótka flaga dla Fazy 2 (maks. 6 słów), inaczej null")
 
 class BatchTranslationResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
     scene_diagnosis: Optional[SceneDiagnosis] = Field(default=None, description="Syntetyczna diagnoza sytuacji i podtekstu sceny PRZED tłumaczeniem (1-2 zwięzłe zdania)")
     translations: List[LineTranslation] = Field(description="Lista przetłumaczonych kwestii")
     characters_identified: Optional[List[CharacterInfo]] = Field(default=None, description="Zidentyfikowane lub nowo odkryte postacie i ich płeć")

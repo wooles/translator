@@ -13,7 +13,7 @@ import logging
 import tempfile
 from typing import List, Tuple, Optional, Dict, Any
 from pathlib import Path
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 import pysubs2
 from PIL import Image
 
@@ -25,6 +25,7 @@ logger = logging.getLogger("sign_detector")
 
 
 class DetectedSign(BaseModel):
+    model_config = ConfigDict(extra="ignore")
     is_title_or_banner: bool = Field(
         description="True TYLKO jeśli na kadrze widnieje duża, centralna plansza tytułowa, data, nazwa miejsca lub rama czasowa (np. 'PRESENT DAY', 'ROK 1907', 'TOKIO', tytuł odcinka). False jeśli to zwykła scena, tło lub gęsty tekst z notesu/książki."
     )

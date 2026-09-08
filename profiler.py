@@ -11,10 +11,12 @@ import json
 import logging
 from pathlib import Path
 from typing import List, Optional, Dict, Any
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from google import genai
 from google.genai import types
-from client_factory import format_friendly_api_error
+from client_factory import format_friendly_api_error, patch_google_genai_schema_sanitizer
+
+patch_google_genai_schema_sanitizer()
 
 logger = logging.getLogger("profiler")
 
@@ -104,6 +106,7 @@ class CharacterDossier(BaseModel):
 
 
 class EpisodeProfile(BaseModel):
+    model_config = ConfigDict(extra="ignore")
     episode_summary: str = Field(default="", description="Krótkie 2-3 zdaniowe streszczenie fabuły i tonu odcinka")
     setting_and_era: str = Field(default="", description="Epoka historyczna, czas i miejsce akcji (np. 'XIII wiek, Imperium Mongolskie', 'Współczesne Tokio')")
     domain_expertise: str = Field(default="", description="Specjalistyczna dziedzina wiedzy i profesjonalna terminologia branżowa (np. 'Enologia / Sommelierstwo: terminologia winiarska, szczepy, apelacje', 'Szachy / Shogi')")

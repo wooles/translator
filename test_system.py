@@ -3502,6 +3502,74 @@ def test_exception_driven_architecture_and_conflict_shields():
     print(" -> PASSED: Architektura Sterowana Wyjątkami, Tarcza Wołacza, Nadrzędność Tłumu, Blind-Drafting i Smart CPS działają w 100% harmonii (0.00 PLN).")
 
 
+def test_gemini_developer_api_schema_compliance_no_additional_properties():
+    """
+    Test 48: Weryfikacja całkowitej zgodności schematów Pydantic z Google Gemini Developer API (Google AI Studio).
+    Zapewnia, że żaden schemat przekazywany do API (Faza 1, Faza 2, Profiler, Sign Detector)
+    nie zawiera pola 'additionalProperties', które powoduje natychmiastowe odrzucenie zapytania (400 INVALID_ARGUMENT)
+    w trybie Gemini Developer API mode.
+    Weryfikuje także deterministyczny sanetyzator schematów w client_factory.py.
+    """
+    print("\n[TEST 48/48] Test Zgodności Schematów z Google Gemini Developer API (Zero additionalProperties)...")
+    import json
+    from google.genai import _transformers
+    from pydantic import BaseModel, ConfigDict
+    from client_factory import patch_google_genai_schema_sanitizer, format_friendly_api_error
+    from typesetting_matcher import VisualTypesettingData
+    from translator import BatchTranslationResponse, LineTranslation
+    from verifier import RefinedBatchResponse, RefinedLine
+    from profiler import EpisodeProfile
+    from sign_detector import DetectedSign
+
+    # 1. Aktywuj sanetyzator schematów
+    patch_google_genai_schema_sanitizer()
+
+    # 2. Test bezpośredni model_json_schema() dla wszystkich kluczowych struktur
+    assert "additionalProperties" not in json.dumps(VisualTypesettingData.model_json_schema()), "VisualTypesettingData zawiera additionalProperties!"
+    assert "additionalProperties" not in json.dumps(BatchTranslationResponse.model_json_schema()), "BatchTranslationResponse zawiera additionalProperties!"
+    assert "additionalProperties" not in json.dumps(LineTranslation.model_json_schema()), "LineTranslation zawiera additionalProperties!"
+    assert "additionalProperties" not in json.dumps(RefinedBatchResponse.model_json_schema()), "RefinedBatchResponse zawiera additionalProperties!"
+    assert "additionalProperties" not in json.dumps(RefinedLine.model_json_schema()), "RefinedLine zawiera additionalProperties!"
+    assert "additionalProperties" not in json.dumps(EpisodeProfile.model_json_schema()), "EpisodeProfile zawiera additionalProperties!"
+    assert "additionalProperties" not in json.dumps(DetectedSign.model_json_schema()), "DetectedSign zawiera additionalProperties!"
+
+    # 3. Test transformacji do types.Schema przez google.genai SDK
+    schema_faza1 = _transformers.t_schema(None, BatchTranslationResponse)
+    dump_f1 = json.dumps(schema_faza1.model_dump(by_alias=True, exclude_none=True))
+    assert getattr(schema_faza1, "additional_properties", None) is None, "types.Schema Fazy 1 ma additional_properties!"
+    assert "additionalProperties" not in dump_f1, "Serializacja types.Schema Fazy 1 zawiera additionalProperties!"
+
+    schema_faza2 = _transformers.t_schema(None, RefinedBatchResponse)
+    dump_f2 = json.dumps(schema_faza2.model_dump(by_alias=True, exclude_none=True))
+    assert getattr(schema_faza2, "additional_properties", None) is None, "types.Schema Fazy 2 ma additional_properties!"
+    assert "additionalProperties" not in dump_f2, "Serializacja types.Schema Fazy 2 zawiera additionalProperties!"
+
+    schema_prof = _transformers.t_schema(None, EpisodeProfile)
+    dump_prof = json.dumps(schema_prof.model_dump(by_alias=True, exclude_none=True))
+    assert getattr(schema_prof, "additional_properties", None) is None, "types.Schema Profilera ma additional_properties!"
+    assert "additionalProperties" not in dump_prof, "Serializacja types.Schema Profilera zawiera additionalProperties!"
+
+    # 4. Test odporności sanetyzatora na ewentualne przyszłe modele z extra='allow'
+    class VulnerableChild(BaseModel):
+        model_config = {"extra": "allow"}
+        dummy_field: str = "test"
+
+    class VulnerableParent(BaseModel):
+        child: VulnerableChild
+
+    sanitized_schema = _transformers.t_schema(None, VulnerableParent)
+    sanitized_dump = json.dumps(sanitized_schema.model_dump(by_alias=True, exclude_none=True))
+    assert getattr(sanitized_schema, "additional_properties", None) is None, "Sanetyzator nie zneutralizował additional_properties na poziomie obiektu!"
+    assert "additionalProperties" not in sanitized_dump, "Sanetyzator nie usunął additionalProperties ze zrzuconego słownika!"
+
+    # 5. Test czytelnego formatowania błędów schematu w client_factory.py
+    err = Exception("400 additionalProperties is only supported in Gemini Enterprise Agent Platform mode, , not in Gemini Developer API mode.")
+    formatted_msg = format_friendly_api_error(err)
+    assert "additionalProperties" in formatted_msg or "schematu" in formatted_msg.lower(), f"Niepoprawne formatowanie błędu: {formatted_msg}"
+
+    print(" -> PASSED: Pełna zgodność schematów z Gemini Developer API mode (0.00 additionalProperties) w 100% aktywna.")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -3548,7 +3616,8 @@ if __name__ == "__main__":
     test_phase1_gender_hallucination_arbitration()
     test_multimodal_addressee_and_plural_group_resolution()
     test_exception_driven_architecture_and_conflict_shields()
-    print("\n Wszystkie testy jednostkowe i integracyjne (47/47) zakończone pełnym sukcesem!\n")
+    test_gemini_developer_api_schema_compliance_no_additional_properties()
+    print("\n Wszystkie testy jednostkowe i integracyjne (48/48) zakończone pełnym sukcesem!\n")
 
 
 
