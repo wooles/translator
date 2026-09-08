@@ -969,10 +969,16 @@ FIRST_PERSON_MASCULINE_TO_FEMININE = [
     (r"\bobiecałem\b", "obiecałam"),
     (r"\bpostanowiłem\b", "postanowiłam"),
     (r"\bwróciłem\b", "wróciłam"),
-    (r"\bznalazłem\b", "znalazłam"),
     (r"\bodszedłem\b", "odeszłam"),
     (r"\bwyszedłem\b", "wyszłam"),
-    (r"\bwszedłem\b", "weszłam")
+    (r"\bwszedłem\b", "weszłam"),
+    (r"\bgdybym\s+wiedział\b", "gdybym wiedziała"),
+    (r"\bjuż\s+dawno\s+doniósłbym\b", "już dawno doniosłabym"),
+    (r"\bdoniósłbym\b", "doniosłabym"),
+    (r"\botrzymałem\b", "otrzymałam"),
+    (r"\bstraciłem\b", "straciłam"),
+    (r"\bchciałem\b", "chciałam"),
+    (r"\bmogłem\b", "mogłam")
 ]
 
 def convert_feminine_past_to_masculine(verb: str) -> Optional[str]:
@@ -1317,6 +1323,45 @@ class EpisodeQualityGate:
                             if re.search(dr_pat, ev.text, re.IGNORECASE):
                                 ev.text = re.sub(dr_pat, dr_rep, ev.text, flags=re.IGNORECASE)
                                 fixes.append(f"[Episode Quality Gate - Filar CLVII T-V Invariance] Linia #{i+1}: skorygowano nieuzasadniony zwrot formalny na 2. os. '{dr_rep}' po zwróceniu się po imieniu")
+
+            # 3b-2. INTRA-LINE T-V INVARIANCE (Filar CLVII): Eliminate hybrid "ty" + "pan/pani" in the same line
+            if not is_sign:
+                has_informal_ty = bool(re.search(
+                    r"\b(?:przecież\s+)?(?:wiesz|widzisz|myślisz|pamiętasz|rozumiesz|mówisz|robisz|chcesz|możesz|masz|musisz|znasz|słyszysz|jesteś)\b|"
+                    r"\b[a-ząćęłńóśźż]+(?:łeś|łaś)\b",
+                    ev.text,
+                    re.IGNORECASE
+                ))
+                has_formal_title = bool(re.search(r"\b(?:panie|pani)\s+(?:profesor|doktor|prezes|kapitan|major)\b", ev.text, re.IGNORECASE))
+                if has_informal_ty and not has_formal_title:
+                    # Check if addressee is known female
+                    addressee_is_female = False
+                    if prev_ev and getattr(prev_ev, "name", None):
+                        prev_spk_gen = char_gender_map.get(prev_ev.name.strip().lower())
+                        if prev_spk_gen == "FEMALE":
+                            addressee_is_female = True
+
+                    intra_tv_fixes = [
+                        (r"\ba\s+jakoś\s+mnie\s+pan\s+nie\s+wydał\b", "a jakoś mnie nie wydałaś" if addressee_is_female else "a jakoś mnie nie wydałeś"),
+                        (r"\ba\s+jakoś\s+mnie\s+pani\s+nie\s+wydała\b", "a jakoś mnie nie wydałaś"),
+                        (r"\bmnie\s+pan\s+nie\s+wydał\b", "mnie nie wydałaś" if addressee_is_female else "mnie nie wydałeś"),
+                        (r"\bmnie\s+pani\s+nie\s+wydała\b", "mnie nie wydałaś"),
+                        (r"\bstoi\s+pan\b", "stoisz"),
+                        (r"\bstoi\s+pani\b", "stoisz"),
+                        (r"\bpan\s+stoi\b", "stoisz"),
+                        (r"\bpani\s+stoi\b", "stoisz"),
+                        (r"\bprzysłał\s+tu\s+pana\b", "przysłał cię tu"),
+                        (r"\bprzysłał\s+tu\s+panią\b", "przysłał cię tu"),
+                        (r"\boferuję\s+panu\s+pomoc\b", "oferuję ci pomoc"),
+                        (r"\boferuję\s+pani\s+pomoc\b", "oferuję ci pomoc"),
+                        (r"\balbo\s+pan\b", "albo ty"),
+                        (r"\balbo\s+pani\b", "albo ty"),
+                        (r"\bdowiesz\s+się\s+pierwszy\b", "dowiesz się pierwsza" if addressee_is_female else "dowiesz się pierwszy")
+                    ]
+                    for tv_pat, tv_rep in intra_tv_fixes:
+                        if re.search(tv_pat, ev.text, re.IGNORECASE):
+                            ev.text = re.sub(tv_pat, tv_rep, ev.text, flags=re.IGNORECASE)
+                            fixes.append(f"[Episode Quality Gate - Intra-Line T-V Invariance] Linia #{i+1}: zlikwidowano hybrydę 'ty' + zwrot formalny: '{tv_pat}' -> '{tv_rep}'")
 
             # 3c. CHARACTER GENDER CONSISTENCY GUARD (Filar CLXII)
             if not is_sign:

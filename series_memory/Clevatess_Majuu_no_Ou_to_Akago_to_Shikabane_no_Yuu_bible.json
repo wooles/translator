@@ -1,0 +1,242 @@
+{
+  "anime_title": "Clevatess: Majuu no Ou to Akago to Shikabane no Yuusha 2nd Season",
+  "characters": {
+    "Alicia -> Naie": {
+      "description": "Relacja: szantażystka -> zdemaskowana szpieg (zwrot formalny 'pani profesor' w masce uczennicy, przejście na 'ty' w bezpośrednim szantażu: 'nie wydałaś mnie / stoisz / dowiesz się pierwsza') [KATEGORYCZNY ZAKAZ 'panie profesorze/pan']"
+    },
+    "Alicia -> Klen": {
+      "description": "Zwrot: 'Klen / na ty' (nawiązana więź telepatyczna i pakt przetrwania)"
+    },
+    "Leon i Tygel -> Alicia": {
+      "description": "Zwrot: 'dziewczyno z Hiden / ty' (wzajemny sojusz taktyczny rywali)"
+    },
+    "Zavthier -> Clevatess": {
+      "description": "Zwrot: 'Władco Mrocznych Bestii Południa / Clevatessie Księżycowego Blasku / na ty' (odwieczni równorzędni władcy potworów)"
+    },
+    "Rathwell -> Edison": {
+      "description": "Zwrot: 'Eddy / ty' (pasożytnicze bóstwo -> sterroryzowany nosiciel)"
+    },
+    "Yuriel -> Owen Koath": {
+      "description": "Zwrot: 'Święty Miecza Owenie Koath / ty' (król Eslinn -> podległy czempion militarny)"
+    },
+    "Clevatess": {
+      "description": "mężczyzna / chłopak (Główny bohater)"
+    },
+    "Alicia": {
+      "description": "kobieta / dziewczyna (Główna bohaterka)"
+    },
+    "Klen / Clevatess": {
+      "description": "mężczyzna (Starożytny Władca Mrocznych Bestii Południa uwięziony w ludzkiej powłoce chłopca)"
+    },
+    "Naie": {
+      "description": "kobieta (Nauczycielka w Akademii Solsein, w rzeczywistości skryta szpieg Cesarstwa Boelate) [KATEGORYCZNY NAKAZ form żeńskich: wiedziała / doniosłaby / otrzymała / straciła]"
+    },
+    "Zavthier": {
+      "description": "kobieta (Władczyni Mrocznych Bestii Zachodu (Zavthier od Złudzeń), bóstwo czczone przez lud Orggitów)"
+    },
+    "Rathwell": {
+      "description": "mężczyzna (Władca Mrocznych Bestii Wschodu (Błękitny Rathwell), pasożyt zasiedlający ciało Edisona)"
+    },
+    "Klen": {
+      "description": "mężczyzna (postać)"
+    },
+    "Sarasa": {
+      "description": "kobieta (postać)"
+    },
+    "Edison": {
+      "description": "mężczyzna (postać)"
+    },
+    "Tygel": {
+      "description": "mężczyzna (postać)"
+    },
+    "Leon": {
+      "description": "mężczyzna (postać)"
+    },
+    "Luna": {
+      "description": "mężczyzna (postać)"
+    }
+  },
+  "glossary": {
+    "Lord of Dark Beasts": "Władca Mrocznych Bestii",
+    "Dark Ichor": "czarny posok",
+    "Crest": "Kresa",
+    "Regalia": "Święty Oręż",
+    "Village of Origin": "Wioska Początku",
+    "Sword Saint": "Święty Miecza",
+    "Church of Elds": "Kościół Elds",
+    "Shamaness Godspeaker": "Szamanka Głosu Boga"
+  },
+  "relationships": {},
+  "declensions": {
+    "Alicia -> Naie": {
+      "M": "Alicia -> Naie",
+      "D": "Alicia -> Naie",
+      "C": "Alicia -> Naie",
+      "B": "Alicia -> Naie",
+      "N": "Alicia -> Naie",
+      "Ms": "Alicia -> Naie",
+      "W": "Alicia -> Naie"
+    },
+    "Alicia -> Klen": {
+      "M": "Alicia -> Klen",
+      "D": "Alicia -> Klena",
+      "C": "Alicia -> Klenowi",
+      "B": "Alicia -> Klena",
+      "N": "Alicia -> Klenem",
+      "Ms": "Alicia -> Klenie",
+      "W": "Alicia -> Klenie"
+    },
+    "Leon i Tygel -> Alicia": {
+      "M": "Leon i Tygel -> Alicia",
+      "D": "Leon i Tygel -> Aliciy",
+      "C": "Leon i Tygel -> Alicie",
+      "B": "Leon i Tygel -> Alicię",
+      "N": "Leon i Tygel -> Alicią",
+      "Ms": "Leon i Tygel -> Alicie",
+      "W": "Leon i Tygel -> Alicio"
+    },
+    "Zavthier -> Clevatess": {
+      "M": "Zavthier -> Clevatess",
+      "D": "Zavthier -> Clevatessa",
+      "C": "Zavthier -> Clevatessowi",
+      "B": "Zavthier -> Clevatessa",
+      "N": "Zavthier -> Clevatessem",
+      "Ms": "Zavthier -> Clevatessie",
+      "W": "Zavthier -> Clevatessie"
+    },
+    "Rathwell -> Edison": {
+      "M": "Rathwell -> Edison",
+      "D": "Rathwell -> Edisona",
+      "C": "Rathwell -> Edisonowi",
+      "B": "Rathwell -> Edisona",
+      "N": "Rathwell -> Edisonem",
+      "Ms": "Rathwell -> Edisonie",
+      "W": "Rathwell -> Edisonie"
+    },
+    "Yuriel -> Owen Koath": {
+      "M": "Yuriel -> Owen Koath",
+      "D": "Yuriel -> Owen Koatha",
+      "C": "Yuriel -> Owen Koathowi",
+      "B": "Yuriel -> Owen Koatha",
+      "N": "Yuriel -> Owen Koathem",
+      "Ms": "Yuriel -> Owen Koathie",
+      "W": "Yuriel -> Owen Koathie"
+    },
+    "Clevatess": {
+      "M": "Clevatess",
+      "D": "Clevatessa",
+      "C": "Clevatessowi",
+      "B": "Clevatessa",
+      "N": "Clevatessem",
+      "Ms": "Clevatessie",
+      "W": "Clevatessie"
+    },
+    "Alicia": {
+      "M": "Alicia",
+      "D": "Aliciy",
+      "C": "Alicie",
+      "B": "Alicię",
+      "N": "Alicią",
+      "Ms": "Alicie",
+      "W": "Alicio"
+    },
+    "Klen / Clevatess": {
+      "M": "Klen / Clevatess",
+      "D": "Klen / Clevatessa",
+      "C": "Klen / Clevatessowi",
+      "B": "Klen / Clevatessa",
+      "N": "Klen / Clevatessem",
+      "Ms": "Klen / Clevatessie",
+      "W": "Klen / Clevatessie"
+    },
+    "Naie": {
+      "M": "Naie",
+      "D": "Naie",
+      "C": "Naie",
+      "B": "Naie",
+      "N": "Naie",
+      "Ms": "Naie",
+      "W": "Naie"
+    },
+    "Zavthier": {
+      "M": "Zavthier",
+      "D": "Zavthier",
+      "C": "Zavthier",
+      "B": "Zavthier",
+      "N": "Zavthier",
+      "Ms": "Zavthier",
+      "W": "Zavthier"
+    },
+    "Rathwell": {
+      "M": "Rathwell",
+      "D": "Rathwella",
+      "C": "Rathwellowi",
+      "B": "Rathwella",
+      "N": "Rathwellem",
+      "Ms": "Rathwellie",
+      "W": "Rathwellie"
+    },
+    "Klen": {
+      "M": "Klen",
+      "D": "Klena",
+      "C": "Klenowi",
+      "B": "Klena",
+      "N": "Klenem",
+      "Ms": "Klenie",
+      "W": "Klenie"
+    },
+    "Sarasa": {
+      "M": "Sarasa",
+      "D": "Sarasy",
+      "C": "Sarasie",
+      "B": "Sarasę",
+      "N": "Sarasą",
+      "Ms": "Sarasie",
+      "W": "Saraso"
+    },
+    "Edison": {
+      "M": "Edison",
+      "D": "Edisona",
+      "C": "Edisonowi",
+      "B": "Edisona",
+      "N": "Edisonem",
+      "Ms": "Edisonie",
+      "W": "Edisonie"
+    },
+    "Tygel": {
+      "M": "Tygel",
+      "D": "Tygela",
+      "C": "Tygelowi",
+      "B": "Tygela",
+      "N": "Tygelem",
+      "Ms": "Tygelie",
+      "W": "Tygelie"
+    },
+    "Leon": {
+      "M": "Leon",
+      "D": "Leona",
+      "C": "Leonowi",
+      "B": "Leona",
+      "N": "Leonem",
+      "Ms": "Leonie",
+      "W": "Leonie"
+    },
+    "Luna": {
+      "M": "Luna",
+      "D": "Luny",
+      "C": "Lunie",
+      "B": "Lunę",
+      "N": "Luną",
+      "Ms": "Lunie",
+      "W": "Luno"
+    }
+  },
+  "plot_anchors": {
+    "Dark Ichor (czarny posok / mroczny ichtor)": "Ciecz i nośnik esencji bestii, przez który porozumiewają się Klen i Alicia. Konsekwentnie stosować 'czarny posok' lub 'posok ciemności'.",
+    "Book of Toah (Księga Toah)": "Święty relikt znaleziony przez Klena w Hiden, powiązany z prastarą mową bogów i rozdziałami Legendy o Bohaterze.",
+    "Sword Saint Owen Koath (Święty Miecza Owen Koath)": "Elitarny tytuł wojskowy z Eslinn. Bezwzględnie 'Święty Miecza', nie 'Mistrz Miecza' ani 'Szermierz Święty'."
+  },
+  "episodes_translated": [
+    "[ASW] Clevatess S2 - 03 [1080p HEVC][AB6D13B4]"
+  ]
+}
