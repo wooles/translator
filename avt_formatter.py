@@ -248,11 +248,11 @@ def calculate_condensation_directive(text: str, start_ms: int, end_ms: int) -> O
     if duration_s <= 0.6:
         return f"[⏱️ RYGOR CZASOWY: MIKRO-KWESTIA (<0.6s, czas {duration_s:.1f}s, tempo {cps:.1f} CPS)] -> Kwestia trwa ułamek sekundy! Zredukuj do MAX 1-2 słów (max 6-8 znaków, np. 'Znaczy...', 'Ech...', 'Cóż...'). KATEGORYCZNY ZAKAZ wielowyrazowych zdań!"
     elif duration_s < 1.4 and (cps > 18.0 or word_count > 6):
-        return f"[⏱️ RYGOR CZASOWY: EKSTREMALNY (czas {duration_s:.1f}s, tempo {cps:.1f} CPS)] -> Wymóg maksymalnej kondensacji: zredukuj wypowiedź do max 2-3 zwięzłych słów (usuń zbędne zaimki i ozdobniki, zachowaj samą puentę)!"
+        return f"[⏱️ RYGOR CZASOWY: EKSTREMALNY (czas {duration_s:.1f}s, tempo {cps:.1f} CPS)] -> Wymóg maksymalnej kondensacji: zredukuj wypowiedź do max 2-3 zwięzłych słów (zetnij zaimki i łączniki, bezwzględnie zachowaj emocję i podtekst)!"
     elif duration_s < 2.5 and cps > 16.0:
-        return f"[⏱️ RYGOR CZASOWY: WYSOKI (czas {duration_s:.1f}s, tempo {cps:.1f} CPS)] -> Skondensuj frazę, usuń watę słowną i skróć konstrukcje gramatyczne!"
+        return f"[⏱️ RYGOR CZASOWY: WYSOKI (czas {duration_s:.1f}s, tempo {cps:.1f} CPS)] -> Skondensuj frazę: zetnij zaimki (ja/ty) i watę słowną; bezwzględnie zachowaj emocję i podtekst!"
     elif cps > 20.0:
-        return f"[⏱️ RYGOR CZASOWY: WYSOKIE TEMPO ({cps:.1f} CPS)] -> Skróć kwestię, aby widz zdążył ją przeczytać bez pauzowania!"
+        return f"[⏱️ RYGOR CZASOWY: WYSOKIE TEMPO ({cps:.1f} CPS)] -> Skróć kwestię: usuń zaimki i łączniki; zachowaj emocję, aby widz zdążył przeczytać bez pauzowania!"
 
     return None
 

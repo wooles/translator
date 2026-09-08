@@ -311,6 +311,8 @@ class DialogueVerifier:
             )
             if is_untranslated:
                 pl_display = "  Szkic PL: [🚨 BRAK PRZEKŁADU W FAZIE 1 - PRZETŁUMACZ OD ZERA Z EN I AUDIO JP!]"
+            elif item.get("is_blind_draft"):
+                pl_display = "  Szkic PL: [⚠️ TŁUMACZ AUTONOMICZNIE ZE SŁUCHU JP I EN - Wykryto dysonans/kalkę w Fazie 1]"
             else:
                 pl_display = f"  Szkic PL: {item['pl']}"
 

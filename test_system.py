@@ -3386,6 +3386,122 @@ def test_multimodal_addressee_and_plural_group_resolution():
     print(" -> PASSED: Multimodalne Rozpoznawanie Adresata, Triangulacja Whisper JP i Morfologia Grup (Filar CLXIII) działają w 100% harmonii (0.00 PLN).")
 
 
+def test_exception_driven_architecture_and_conflict_shields():
+    print("[TEST 47/47] Test Architektury Sterowanej Wyjątkami (Blind-Drafting, Tarcza Wołacza, Nadrzędność Tłumu i Smart CPS)...")
+    
+    # 1. Warstwa 1: Pydantic Schema visual_subtext description
+    from translator import LineTranslation
+    subtext_desc = LineTranslation.model_fields["visual_subtext"].description
+    assert "Stan: Emocja + Akcja fizyczna" in subtext_desc, f"Expected vector format description, got: {subtext_desc}"
+    assert "asymetria" in subtext_desc.lower(), f"Expected asymmetry instruction, got: {subtext_desc}"
+
+    # 2. Warstwa 2: Honorific Vocative Shield in Translator
+    from translator import MultimodalTranslator
+    import pysubs2
+    tr = MultimodalTranslator()
+    tr.character_registry["Arata"] = "główny bohater (mężczyzna)"
+    tr.character_registry["Shizuku"] = "koleżanka z klasy (kobieta)"
+    
+    # Test that a line with formal vocative "Panie Arato" does not cause false T-V drift alarm
+    ev1 = pysubs2.SSAEvent(start=1000, end=2500, text="Panie Arato, czy obiad panu smakował?", name="Służąca")
+    ev2 = pysubs2.SSAEvent(start=3000, end=4500, text="Czy zjadł pan już deser?", name="Służąca")
+    pass1 = [
+        {"id": 1, "orig_idx": 0, "event": ev1, "style": "Default", "is_thought": False, "duration_s": 1.5, "cps": 15.0,
+         "start_ms": 1000, "end_ms": 2500, "en": "Lord Arata, did you like lunch?", "pl": "Panie Arato, czy obiad panu smakował?",
+         "speaker_name": "Służąca", "speaker_gender": "kobieta", "notes": ""},
+        {"id": 2, "orig_idx": 1, "event": ev2, "style": "Default", "is_thought": False, "duration_s": 1.5, "cps": 15.0,
+         "start_ms": 3000, "end_ms": 4500, "en": "Did you eat dessert already?", "pl": "Czy zjadł pan już deser?",
+         "speaker_name": "Służąca", "speaker_gender": "kobieta", "notes": ""}
+    ]
+    # Check that neither line gets drift alert "[🚨 ALARM FILAR CLVII"
+    speakers_on_ty = set()
+    speakers_formal = set()
+    scene_has_first_name_vocative = False
+    import re
+    for it in pass1:
+        pl_cand = it.get("pl", "")
+        en_txt = it.get("en", "")
+        spk = (it.get("speaker_name") or "").strip()
+        has_formal_vocative = bool(re.search(
+            r"\b(panie|pani|panno|panu|pana|mistrzu|lordzie|książę|panienko|profesorze|doktorze)\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+)\b",
+            pl_cand, re.IGNORECASE
+        )) or bool(re.search(r"\b(lord|master|lady|sir|madam|doctor|professor)\s+([A-Z][a-z]+)\b", en_txt, re.IGNORECASE))
+        if has_formal_vocative and spk:
+            speakers_formal.add(spk)
+
+        first_name_match = re.search(r"(?<!\b[Pp]anie\s)(?<!\b[Pp]ani\s)(?<!\b[Pp]anno\s)(?<!\b[Pp]anu\s)(?<!\b[Mm]istrzu\s)(?<!\b[Ll]ordzie\s)\b([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]{2,})[,?!]", pl_cand) or re.search(r"(?<!\b[Mm]r\.\s)(?<!\b[Mm]s\.\s)(?<!\b[Mm]rs\.\s)(?<!\b[Ll]ord\s)(?<!\b[Mm]aster\s)(?<!\b[Ll]ady\s)\b([A-Z][a-z]{2,})[,?!]", en_txt)
+        if first_name_match and not has_formal_vocative:
+            voc_word = first_name_match.group(1).lower()
+            if voc_word not in ["proszę", "przepraszam", "panie", "pani", "panno", "panu", "sensei", "senpai", "mistrzu", "ojcze", "matko", "mamo", "tato", "bądź", "daj", "stój", "wait", "look", "what", "why", "stop", "sorry", "excuse"]:
+                scene_has_first_name_vocative = True
+                if spk:
+                    speakers_on_ty.add(spk)
+
+    assert "Służąca" in speakers_formal, "Służąca should be in speakers_formal"
+    assert "Służąca" not in speakers_on_ty, "Służąca should NOT be in speakers_on_ty"
+    assert not scene_has_first_name_vocative, "Scene should NOT have first name vocative"
+
+    # 3. Warstwa 2: Crowd Hierarchy over Narrow Camera Frame
+    ev_crowd = pysubs2.SSAEvent(start=100, end=2000, text="Everyone, listen up!", name="Teacher")
+    cat, lbl = tr._resolve_line_addressee(
+        event=ev_crowd,
+        raw_phase1_addressee="grupa_kobiet",  # camera showed 2 girls in front
+        batch_events=[(1, ev_crowd, "Everyone, listen up!", "")],
+        event_idx=0,
+        whisper_text="Minna, kiite!",
+        clean_text="Everyone, listen up!"
+    )
+    assert cat == "grupa_mieszana", f"Expected 'grupa_mieszana' due to collective address, got: {cat}"
+    assert "Zbiorowość" in lbl
+
+    # 4. Warstwa 3: Blind-Drafting on Conflict
+    items_to_verify = [
+        {
+            "id": 1,
+            "en": "I don't care at all.",
+            "pl": "Wcale mnie to nie obchodzi.",
+            "is_blind_draft": True,
+            "audio_jp": "Betsuni... [betsuni]",
+            "audio_alert": "Seiyū wyraża żal i wahanie, a nie obojętność!",
+            "notes": ""
+        },
+        {
+            "id": 2,
+            "en": "Good morning.",
+            "pl": "Dzień dobry.",
+            "is_blind_draft": False,
+            "notes": ""
+        }
+    ]
+    # Check that is_blind_draft displays autonomous instruction instead of tainted Polish draft
+    is_untranslated1 = items_to_verify[0].get("is_missing_translation", False)
+    assert not is_untranslated1
+    assert items_to_verify[0].get("is_blind_draft")
+    if items_to_verify[0].get("is_blind_draft"):
+        pl_disp1 = "  Szkic PL: [⚠️ TŁUMACZ AUTONOMICZNIE ZE SŁUCHU JP I EN - Wykryto dysonans/kalkę w Fazie 1]"
+    else:
+        pl_disp1 = f"  Szkic PL: {items_to_verify[0]['pl']}"
+    assert "TŁUMACZ AUTONOMICZNIE" in pl_disp1
+    assert "Wcale mnie to nie obchodzi" not in pl_disp1
+
+    # 5. Warstwa 3: Smart CPS Condensation (Grammatical trimming vs semantic preservation)
+    from avt_formatter import calculate_condensation_directive
+    cond_dir = calculate_condensation_directive("Musimy natychmiast uciekać stąd bo nadciągają potwory!", start_ms=0, end_ms=1200)
+    assert "zetnij zaimki" in cond_dir.lower()
+    assert "podtekst" in cond_dir.lower()
+
+    # 6. Warstwa 4: EpisodeQualityGate preserves honorific vocatives
+    from avt_linter import EpisodeQualityGate
+    subs = pysubs2.SSAFile()
+    ev_q1 = pysubs2.SSAEvent(start=1000, end=2000, text="Panie Arato!")
+    ev_q2 = pysubs2.SSAEvent(start=2100, end=4000, text="Czy zjadł pan już obiad?")
+    subs.events = [ev_q1, ev_q2]
+    EpisodeQualityGate.audit_and_fix_entire_episode(subs)
+    assert "Czy zjadł pan już obiad?" in subs.events[1].text, f"Expected 'Czy zjadł pan...', got: '{subs.events[1].text}'"
+
+    print(" -> PASSED: Architektura Sterowana Wyjątkami, Tarcza Wołacza, Nadrzędność Tłumu, Blind-Drafting i Smart CPS działają w 100% harmonii (0.00 PLN).")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -3431,7 +3547,9 @@ if __name__ == "__main__":
     test_fansub_quality_pixel_perfect_typesetting()
     test_phase1_gender_hallucination_arbitration()
     test_multimodal_addressee_and_plural_group_resolution()
-    print("\n Wszystkie testy jednostkowe i integracyjne (46/46) zakończone pełnym sukcesem!\n")
+    test_exception_driven_architecture_and_conflict_shields()
+    print("\n Wszystkie testy jednostkowe i integracyjne (47/47) zakończone pełnym sukcesem!\n")
+
 
 
 

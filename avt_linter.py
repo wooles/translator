@@ -1449,11 +1449,21 @@ class EpisodeQualityGate:
             if not is_sign and prev_clean and prev_ev:
                 time_gap_ms = ev.start - prev_ev.end
                 if time_gap_ms < 6000:
-                    first_name_in_prev = bool(re.search(
-                        r"(?<!\bpanie\s)(?<!\bpani\s)(?<!\bpanno\s)\b([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]{2,})[,?!]",
-                        prev_clean
+                    has_formal_voc_prev = bool(re.search(
+                        r"\b(panie|pani|panno|panu|pana|mistrzu|lordzie|książę|panienko)\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+)\b",
+                        prev_clean,
+                        re.IGNORECASE
                     ))
-                    if first_name_in_prev:
+                    has_formal_voc_curr = bool(re.search(
+                        r"\b(panie|pani|panno|panu|pana|mistrzu|lordzie|książę|panienko)\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+|doktorze|profesorze|inspektorze|prezesie|dyrektorze|kierowniku|komisarzu)\b",
+                        ev.text,
+                        re.IGNORECASE
+                    ))
+                    first_name_in_prev = bool(re.search(
+                        r"(?<!\bpanie\s)(?<!\bpani\s)(?<!\bpanno\s)(?<!\bmistrzu\s)(?<!\blordzie\s)\b([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]{2,})[,?!]",
+                        prev_clean
+                    )) and not has_formal_voc_prev
+                    if first_name_in_prev and not has_formal_voc_curr:
                         drift_matches = [
                             (r"\bwygrał\s+pan\b", "wygrałeś"),
                             (r"\bwygrała\s+pani\b", "wygrałaś"),

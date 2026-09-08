@@ -994,7 +994,7 @@ class LineTranslation(BaseModel):
     semiotic_layer: Optional[str] = Field(default="spoken_on_screen", description="Warstwa semiotyczna: 'spoken_on_screen' (mowa w kadrze), 'spoken_off_screen' (komentarz zza kadru), 'manga_balloon' (dymek/halucynacja), 'inner_thought' (myśli), 'diegetic_sign' (plansza/napis)")
     screen_region: Optional[str] = Field(default=None, description="Dla planszy/tytułu/napisu ekranowego: wskaż wykryte na kadrze położenie japońskiego napisu: 'bottom_right' (prawy dolny róg), 'bottom_left' (lewy dolny róg), 'top_right' (prawy górny róg), 'top_left' (lewy górny róg), 'bottom_center' (dół), 'top_center' (góra), 'center' (środek) lub null dla zwykłych dialogów.")
     visual_typesetting: Optional[VisualTypesettingData] = Field(default=None, description="Dla planszy/tytułu/napisu ekranowego/onomatopei: precyzyjne współrzędne 2D [ymin, xmin, ymax, xmax] w skali 0-1000, umiejscowienie 'above'/'below', kąt obrotu rotation_deg (-45 do 45) oraz kolory HEX lub null dla zwykłej mowy.")
-    visual_subtext: Optional[str] = Field(default=None, description="Maks. 6 słów o mimice, gestach lub hierarchii przestrzennej (np. 'klęczy przed chanem', 'uśmiech, zaciśnięta pięść') lub null")
+    visual_subtext: Optional[str] = Field(default=None, description="Maks. 10-12 słów w formacie 'Stan: Emocja + Akcja fizyczna'. Podawaj TYLKO gdy mimika/gest przeczy słowom lub wnosi ukryty podtekst niewidoczny w tekście (asymetria obrazu i tekstu), w przeciwnym razie null.")
     literal_meaning: Optional[str] = Field(default=None, description="Dosłowny idiom JP (maks. 5 słów) tylko w razie potrzeby, inaczej null")
     notes: Optional[str] = Field(default=None, description="Kluczowa notatka (maks. 5 słów) tylko w razie potrzeby, inaczej null")
     ambiguity_note: Optional[str] = Field(default=None, description="W razie wątpliwości (np. niejasny zaimek it/he, dwuznaczność słowa, brak pewności): krótka flaga dla Fazy 2 (maks. 6 słów), inaczej null")
@@ -1455,6 +1455,23 @@ class MultimodalTranslator:
             "tachi", "たち", "達", "omae-ra", "お前ら", "kisama-ra", "貴様ら", "minna", "みんな", "皆",
             "shokun", "諸君", "zen'in", "全員", "mina-sama", "皆様", "domo", "ども", "共"
         ])
+
+        # 0. Broad Collective Crowd / Audience Check (Filar CLXIII & Scene Crowd Hierarchy)
+        # Addressing a broad collective ("everyone", "minna", "all of you") overrides narrow camera frame
+        # UNLESS the line specifically restricts to women ("girls/ladies/dziewczęta") or men ("boys/men/chłopcy")
+        clean_lower = clean_text.lower()
+        has_gendered_target = any(w in clean_lower for w in ["girl", "lady", "ladies", "women", "woman", "dziewcz", "kobiet", "boy", "boys", "men", "man", "chłopak", "panowie", "panie"])
+        has_broad_collective = not has_gendered_target and (any(w in clean_lower for w in [
+            "everyone", "everybody", "all of you", "class", "team", "guys", "listen up", "attention everyone"
+        ]) or any(w in jp_lower for w in [
+            "minna", "みんな", "皆", "shokun", "諸君", "zen'in", "全員", "mina-sama", "皆様"
+        ]))
+        if has_broad_collective:
+            genders_in_reg = set(self.character_registry.values()) if getattr(self, "character_registry", None) else set()
+            has_male = any("mężczyzna" in str(g).lower() or "male" in str(g).lower() or "chłopak" in str(g).lower() for g in genders_in_reg)
+            has_female = any("kobieta" in str(g).lower() or "female" in str(g).lower() or "dziewczyn" in str(g).lower() for g in genders_in_reg)
+            if has_male and has_female:
+                return "grupa_mieszana", "Grupa Mieszana (Zbiorowość/L. mnoga męskoosobowa: -liście)"
 
         # 1. Direct Plural Group Check
         if "grupa_kobiet" in raw_norm or (has_jp_plural and any(w in raw_norm for w in ["kobiet", "dziewcz", "female", "żeńsk"])) or (any(w in raw_norm for w in ["kobiet", "dziewcz"]) and any(p in raw_norm for p in ["grupa", "wiele", "wszystk", "klas"])):
@@ -2444,6 +2461,15 @@ class MultimodalTranslator:
             if social_context and not vtype["is_sign"]:
                 relation_tag = f"{relation_tag} {social_context}".strip()
 
+            # Blind-Drafting on Conflict Engine (0.00 PLN)
+            # Detect whether Phase 1 draft is at severe risk of anchoring bias
+            has_audio_conflict = bool(audio_discrepancy_msg) or any(
+                k in audio_jp_str.lower() for k in ["hitori", "一人", "独り", "betsuni", "別に", "yokatta", "よかった", "yatta", "やった"]
+            )
+            has_ambiguity_conflict = bool(ambiguity_note)
+            has_severe_trap = bool(notes and "[🚨 PUŁAPKA PROFILERA" in notes)
+            is_blind_draft = has_audio_conflict or has_ambiguity_conflict or has_severe_trap
+
             pass1_items.append({
                 "id": batch_id,
                 "orig_idx": orig_idx,
@@ -2451,6 +2477,7 @@ class MultimodalTranslator:
                 "style": style_str,
                 "is_thought": is_th,
                 "is_missing_translation": is_missing_tr,
+                "is_blind_draft": is_blind_draft,
                 "duration_s": dur_s,
                 "cps": cps,
                 "start_ms": event.start,
@@ -2483,18 +2510,32 @@ class MultimodalTranslator:
                 "is_song": is_song_line(event, clean_en)
             })
 
-        # Determine speakers and scene-level informal status (Filar CLVII - T-V Invariance)
+        # Determine speakers and scene-level informal status (Filar CLVII - T-V Invariance & Honorific Vocative Shield)
         speakers_on_ty = set()
+        speakers_formal = set()
         scene_has_first_name_vocative = False
         for it in pass1_items:
             pl_cand = it.get("pl", "")
             en_txt = it.get("en", "")
             spk = (it.get("speaker_name") or "").strip()
             
+            # Detect formal honorific address in line: "Panie Arato", "Pani Shizuku", "Mistrzu Ken"
+            has_formal_vocative = bool(re.search(
+                r"\b(panie|pani|panno|panu|pana|mistrzu|lordzie|książę|panienko|profesorze|doktorze)\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+)\b",
+                pl_cand,
+                re.IGNORECASE
+            )) or bool(re.search(
+                r"\b(lord|master|lady|sir|madam|doctor|professor)\s+([A-Z][a-z]+)\b",
+                en_txt,
+                re.IGNORECASE
+            ))
+            if has_formal_vocative and spk:
+                speakers_formal.add(spk)
+
             # Detect true first-name vocative in PL or EN (bare name, e.g. "Shizuku, dlaczego?!", "Shizuku, why?!")
-            # Must NOT be preceded by "Panie / Pani / Mr. / Ms."
-            first_name_match = re.search(r"(?<!\bpanie\s)(?<!\bpani\s)(?<!\bpanno\s)(?<!\bpanu\s)\b([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]{2,})[,?!]", pl_cand, re.IGNORECASE) or re.search(r"(?<!\bmr\.\s)(?<!\bms\.\s)(?<!\bmrs\.\s)\b([A-Z][a-z]{2,})[,?!]", en_txt, re.IGNORECASE)
-            if first_name_match:
+            # Must NOT be preceded by "Panie / Pani / Mr. / Ms." or formal titles
+            first_name_match = re.search(r"(?<!\b[Pp]anie\s)(?<!\b[Pp]ani\s)(?<!\b[Pp]anno\s)(?<!\b[Pp]anu\s)(?<!\b[Mm]istrzu\s)(?<!\b[Ll]ordzie\s)\b([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]{2,})[,?!]", pl_cand) or re.search(r"(?<!\b[Mm]r\.\s)(?<!\b[Mm]s\.\s)(?<!\b[Mm]rs\.\s)(?<!\b[Ll]ord\s)(?<!\b[Mm]aster\s)(?<!\b[Ll]ady\s)\b([A-Z][a-z]{2,})[,?!]", en_txt)
+            if first_name_match and not has_formal_vocative:
                 voc_word = first_name_match.group(1).lower()
                 if voc_word not in ["proszę", "przepraszam", "panie", "pani", "panno", "panu", "sensei", "senpai", "mistrzu", "ojcze", "matko", "mamo", "tato", "bądź", "daj", "stój", "wait", "look", "what", "why", "stop", "sorry", "excuse"]:
                     scene_has_first_name_vocative = True
@@ -2502,7 +2543,7 @@ class MultimodalTranslator:
                         speakers_on_ty.add(spk)
             
             # Detect informal Polish phrasing: "wiesz", "zobacz", "nie mów", "poczekaj", "daj spokój"
-            if re.search(r"\b(zobacz|spójrz|czekaj|poczekaj|powiedz|nie\s+mów|wiesz|słuchaj|daj\s+spokój|nie\s+bądź|twój|twoja|twoje|cię|ciebie|tobą|tobie)\b", pl_cand, re.IGNORECASE):
+            if not has_formal_vocative and re.search(r"\b(zobacz|spójrz|czekaj|poczekaj|powiedz|nie\s+mów|wiesz|słuchaj|daj\s+spokój|nie\s+bądź|twój|twoja|twoje|cię|ciebie|tobą|tobie)\b", pl_cand, re.IGNORECASE):
                 if spk:
                     speakers_on_ty.add(spk)
 
@@ -2510,12 +2551,13 @@ class MultimodalTranslator:
         for it in pass1_items:
             spk = (it.get("speaker_name") or "").strip()
             has_formal_voc = bool(re.search(
-                r"\b(panie|pani|panno|panu|pana)\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+|doktorze|profesorze|inspektorze|prezesie|dyrektorze|kierowniku|komisarzu)\b",
+                r"\b(panie|pani|panno|panu|pana|mistrzu|lordzie|książę|panienko)\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+|doktorze|profesorze|inspektorze|prezesie|dyrektorze|kierowniku|komisarzu)\b",
                 it["pl"],
                 re.IGNORECASE
             ))
-            if not has_formal_voc:
-                is_item_informal = (spk in speakers_on_ty) if spk else scene_has_first_name_vocative
+            has_formal_address_in_line = has_formal_voc or bool(re.search(r"\b(niech\s+(pan|pani)|dziękuję\s+(panu|pani)|proszę\s+(pana|pani)|(pana|pani)\s+zdaniem)\b", it["pl"], re.IGNORECASE))
+            if not has_formal_address_in_line and spk not in speakers_formal:
+                is_item_informal = (spk in speakers_on_ty) if spk else (scene_has_first_name_vocative and not bool(re.search(r"\b(pan|pani|panu|pana)\b", it["pl"], re.IGNORECASE)))
                 if is_item_informal:
                     if re.search(r"\b(wygrał|wygrała|zrobił|zrobiła|widział|widziała|powiedział|powiedziała|słyszał|słyszała|był|była|miał|miała|chciał|chciała|mógł|mogła|wiedział|wiedziała|wie|widzi|myśli|mówi|ma)\s+(pan|pani)\b|\b(pan|pani)\s+(wygrał|wygrała|zrobił|zrobiła|widział|widziała|słyszał|słyszała|powiedział|powiedziała|wie|widzi|myśli|mówi)\b", it["pl"], re.IGNORECASE):
                         drift_alert = "[🚨 ALARM FILAR CLVII: Zwrot per 'pan/pani' w scenie/dialogu po imieniu na 'ty'! Kategoryczny zakaz 'wygrał pan' / 'pan wie' -> Zmień na 2. os. 'wygrałeś' / 'wiesz'!]"
