@@ -975,7 +975,7 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "frieren: u kresu drogi",
             "frieren at journey's end"
         ],
-        "publisher": "Wydawnictwo Studio JG",
+        "publisher": "Wydawnictwo Studio JG (tłum. Martyna Zdonek)",
         "glossary": {
             "Frieren": "Frieren",
             "Himmel": "Himmel",
@@ -987,6 +987,10 @@ BUILTIN_MANGA_CANON: Dict[str, Dict[str, Any]] = {
             "Flamme": "Flamme",
             "Serie": "Serie",
             "Aura the Guillotine": "Aura Gilotyna",
+            "Dantōdai no Aura": "Aura Gilotyna",
+            "Dantodai no Aura": "Aura Gilotyna",
+            "断頭台のアウラ": "Aura Gilotyna",
+            "Auserlese": "Szale Posłuszeństwa",
             "Demon King": "Król Demonów",
             "Hero Party": "Drużyna Bohaterów",
             "Zoltraak": "Zoltraak",

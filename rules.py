@@ -735,6 +735,9 @@ FILAR XCI: ŻELAZNA FLEKSJA I POLSKA ODMIANA JAPOŃSKICH ORAZ OBCYCH/FANTASY IMI
     -> "Klen's order" -> "rozkaz Klena" (BŁĄD [X]: "rozkaz Klen").
   * 3. Imiona żeńskie zakończone na -i, -u (Shizuku, Rei, Minami) oraz zakończone na spółgłoskę pozostają nieodmienne, lecz zdanie musi zachować poprawną strukturę składniową (z Shizuku, o Shizuku). Imiona żeńskie na -a odmieniają się normalnie (Alicia -> Alicii, z Alicią).
   * 4. Wołacze: imiona męskie w wołaczu zachowują formę mianownika z intonacją lub wołaczową ("Issei!", "Shin!", "Drelu!" / "Drel!").
+  * 5. ZAKAZ KALKOWANIA PRZYDOMKÓW TYTULARNYCH Z PRZYIMKIEM 'OD' (OF THE...):
+    -> Przydomki postaci w języku angielskim i japońskim tworzone z partykułą 'no' lub konstrukcją przydawkową (np. 'Aura the Guillotine' / 断頭台のアウラ) w polszczyźnie oddaje się poprzez apozycję mianownikową (np. 'Aura Gilotyna', dopełniacz: 'Aury Gilotyny', narzędnik: 'z Aurą Gilotyną') lub tradycyjny epitet.
+    -> KATEGORYCZNY ZAKAZ tworzenia sztucznych konstrukcji peryfrastycznych z przyimkiem 'od' (KOSZMARNY BŁĄD [X]: 'Aura od Gilotyny'; POPRAWNY KANON Studio JG: 'Aura Gilotyna'). Wszelkie nazwy własne i tytuły postaci weryfikuj z oficjalnym kanonem wydawniczym.
 
 FILAR XCII: SYNCHRONIA PRZECZENIA I ODROCZENIA DRAMATYCZNEGO (DELAYED NEGATION & JVTA SUSPENSE):
 - W języku japońskim (SOV) negacja lub zwrot akcji pada na samym końcu zdania (...to omotta kedo, chigatta!):

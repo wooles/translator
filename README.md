@@ -4,7 +4,7 @@
 [![Google GenAI SDK](https://img.shields.io/badge/LLM%20Orchestration-Gemini%203.5%20%7C%203.7%20Flash%20%7C%203.1%20Pro-orange.svg)](https://ai.google.dev/)
 [![Acoustic Ingestion](https://img.shields.io/badge/Acoustic%20ASR-Kotoba--Whisper%20v2.0%20CTranslate2-green.svg)](https://huggingface.co/kotoba-tech/kotoba-whisper-v2.0-faster)
 [![Architecture](https://img.shields.io/badge/Architecture-5--Layer%20Root%20Cause%20Pipeline-purple.svg)]()
-[![CI/Test Suite](https://img.shields.io/badge/Test%20Harness-51%2F51%20Passing-brightgreen.svg)]()
+[![CI/Test Suite](https://img.shields.io/badge/Test%20Harness-52%2F52%20Passing-brightgreen.svg)]()
 
 An asynchronous, multimodal audiovisual localization and translation engine written in Python. It executes high-fidelity semantic translation from Japanese audio tracks, video keyframes, and intermediate English dialogue representations into target Polish dialogue scripts, strictly abiding by professional cinematographic subtitling standards (Belczyk AVT Matrix, Skopos Theory, Polysystem Theory).
 
@@ -178,7 +178,7 @@ The engine resolves common failure modes of traditional Machine Translation (MT)
 | Source Named Entity | Naive Fan Translation / LLM | Official Print Canon (Engine) | Official Publisher Source |
 | :--- | :--- | :--- | :--- |
 | **Jujutsu Kaisen:** *Kan'i Ryōiki (簡易領域)* | *„Prosta sfera” / „Słaba domena”* | ✅ **„Prosta Domena”** | Waneko (tłum. D. Bruszewska) |
-| **Frieren:** *Kishōkyō no Ōra (断頭台のアウラ)* | *„Aura Gilotyny” / „Aura Ścięcia”* | ✅ **„Aura od Gilotyny”** | Studio JG (tłum. A. Zychma) |
+| **Frieren:** *Dantōdai no Aura (断頭台のアウラ)* | *„Aura od Gilotyny” / „Aura Ścięcia”* | ✅ **„Aura Gilotyna”** | Studio JG (tłum. Martyna Zdonek) |
 
 ---
 
@@ -312,7 +312,7 @@ python main.py "media.mkv" --play
 
 ## 🧪 Verification Test Harness
 
-The engine is guarded by an automated regression and integration test suite executing **51 modular verification routines**:
+The engine is guarded by an automated regression and integration test suite executing **52 modular verification routines**:
 ```powershell
 python test_system.py
 ```
@@ -323,6 +323,7 @@ python test_system.py
 * 7-Case Foreign Name Declension Matrix (Filar XCI) & EpisodeQualityGate integration (Test 50).
 * Typo Shield & Lexical Integrity (Filar CLXIV) integration (Test 51).
 * Multimodal Addressee Resolution (Filar CLXIII) for singular female/male and plural groups (Test 46).
+* Official Manga Canon & Titular Calque Shield for Frieren (*Aura Gilotyna*, Studio JG / Martyna Zdonek) (Test 52).
 * Tokenomics financial calculations across all quality tiers.
 * Translation Memory SQLite FTS5 BM25 temporal matching ($\Delta t \le 300\text{ms}$).
 

@@ -253,7 +253,8 @@ class EpisodeProfiler:
         prompt = f"""Jesteś Głównym Reżyserem, Konsultantem Merytorycznym i Script Doctorem Lokalizacji Anime (Profiler 4.0).
 Twoim zadaniem jest dogłębna, wszechstronna analiza 100% skryptu całego odcinka, aby przygotować dla zespołu tłumaczy i redaktorów kompletny PROFIL ODCINKA 4.0:
 
-1. OFICJALNY KANON POLSKIEGO WYDANIA MANGI (Filar XXIII & XCIV): Zidentyfikuj wydawnictwo (Waneko, J.P.Fantastica, Studio JG, Kotori, Hanami, Dango, Egmont) i podaj oficjalne nazwy z tomików papierowych.
+1. OFICJALNY KANON POLSKIEGO WYDANIA MANGI (Filar XXIII, XCIV & XCVIII): Zidentyfikuj wydawnictwo (Waneko, J.P.Fantastica, Studio JG, Kotori, Hanami, Dango, Egmont) i podaj oficjalne nazwy z tomików papierowych.
+   - KATEGORYCZNY ZAKAZ tworzenia sztucznych konstrukcji peryfrastycznych z przyimkiem 'od' dla przydomków i tytulatury (np. 'Aura the Guillotine' / 'Dantōdai no Aura' -> KATEGORYCZNY ZAKAZ 'Aura od Gilotyny'; POPRAWNY KANON Studio JG: 'Aura Gilotyna'; 'Jack the Ripper' -> 'Kuba Rozpruwacz'). Przydomki postaci w polszczyźnie tworzy się przez apozycję mianownikową (np. 'Aura Gilotyna', dop. 'Aury Gilotyny') lub tradycyjny epitet, a NIGDY przez mechaniczne kalkowanie 'X of the Y' jako 'X od Y'!
 2. SKANER MIN JĘZYKOWYCH, PUŁAPEK ŚRODOWISKOWYCH I PRAGMATYCZNYCH (danger_lines_prescan): Przeskanuj cały odcinek i wskaż zdradliwe kwestie angielskie:
    - Idiomy i odmowy: 'I\'m fine' jako odmowa 'Ja podziękuję' zamiast 'Nic mi nie jest', 'Bless you', 'That bombed', 'Kikanaide', 'Sumimasen', 'Kanojo-tachi'.
    - Paradoks pytań przeczących (Filar CXXXIX): 'Hai/Yes' po pytaniu przeczącym ('Didn't you go?') -> ostrzeż przed dosłownym 'Tak!', nakaż 'Nie, nie poszedłem!'.

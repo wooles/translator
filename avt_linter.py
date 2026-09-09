@@ -49,6 +49,22 @@ def _fix_mala_przerwa_match(m: Any) -> str:
         form = form.capitalize()
     return f"{form}{sep}przerw{przerw_end}"
 
+def _fix_aura_gilotyna_match(m: Any) -> str:
+    lead = m.group(1) or ""
+    first_letter = m.group(2)
+    ending = m.group(3).lower()
+    mapping = {
+        "a": "ura Gilotyna",
+        "y": "ury Gilotyny",
+        "ze": "urze Gilotynie",
+        "ę": "urę Gilotynę",
+        "ą": "urą Gilotyną",
+        "o": "uro Gilotyno",
+    }
+    tail = mapping.get(ending, "ura Gilotyna")
+    capitalized = f"A{tail}" if first_letter.isupper() else f"a{tail}"
+    return f"{lead}{capitalized}"
+
 class AVTLinter:
     """
     Automated validator and corrector for mechanical language calques in subtitle tracks.
@@ -57,6 +73,10 @@ class AVTLinter:
     # Dictionary of automated instant calque replacements mapped to AVT Pillars
     # Supports flexible inflectional and tense patterns
     FIXED_REPLACEMENTS = [
+        # Anime publishing canon & titular calques: 'Aura od Gilotyny' / 'Aura Ścięcia' -> 'Aura Gilotyna' (Filar XCVIII / Studio JG)
+        (r"(^|[^\w]|\\[Nnh])([Aa])ur(a|y|ze|ę|ą|o)\s+od\s+[Gg]ilotyn(?:y|ą)?\b", _fix_aura_gilotyna_match, "Filar XCVIII - Oficjalny Kanon Mangowy (Studio JG: Aura Gilotyna)"),
+        (r"(^|[^\w]|\\[Nnh])([Aa])ur(a|y|ze|ę|ą|o)\s+[Śś]cięcia\b", _fix_aura_gilotyna_match, "Filar XCVIII - Oficjalny Kanon Mangowy (Studio JG: Aura Gilotyna)"),
+
         # Americanisms and lexical calques (Pillar IV / XXXVI)
         (r"\b[Ww]itaj z powrotem\b", "Witaj!", "Filar IV/XXXVI - Eliminacja Kalek Amerykańskich"),
         

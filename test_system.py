@@ -3812,6 +3812,59 @@ def test_lexical_typo_correction_and_orthographic_integrity_guard():
     print(" -> PASSED: Eliminacja literówek, tarcza ortograficzna (Filar CLXIV) i EpisodeQualityGate działają w 100% harmonii (0.00 PLN).")
 
 
+def test_frieren_manga_canon_aura_gilotyna_and_calque_shield():
+    print("[TEST 52/52] Test Kanonu Mangowego Frieren (Studio JG / Martyna Zdonek), Tarczy 'Aura Gilotyna' i Eliminacji Kalki 'od Gilotyny'...")
+    import pysubs2
+    from manga_canon import manga_canon_registry
+    from avt_linter import AVTLinter, EpisodeQualityGate
+    from series_memory import generate_polish_name_declension, sanitize_lexical_text
+
+    # Asercja 1: Weryfikacja rejestru kanonu dla Frieren - oficjalne wydawnictwo Studio JG i tłum. Martyna Zdonek
+    canon = manga_canon_registry.find_canon_for_series("Sousou no Frieren")
+    assert canon is not None, "Błąd: nie odnaleziono wpisu dla Sousou no Frieren w manga_canon!"
+    assert "Studio JG" in canon["publisher"], f"Błąd wydawcy: {canon['publisher']}"
+    assert "Martyna Zdonek" in canon["publisher"], f"Błąd: brak atrybucji rzeczywistej tłumaczki Martyny Zdonek w {canon['publisher']}"
+
+    # Asercja 2: Oficjalny kanon to bezwzględnie 'Aura Gilotyna' (zarówno z EN jak i z JP kanji/transkrypcji)
+    assert canon["glossary"]["Aura the Guillotine"] == "Aura Gilotyna"
+    assert canon["glossary"]["Dantōdai no Aura"] == "Aura Gilotyna"
+    assert canon["glossary"]["断頭台のアウラ"] == "Aura Gilotyna"
+
+    # Asercja 3: Matryca fleksyjna 7 przypadków dla żeńskiego imienia złożonego 'Aura Gilotyna'
+    decl = generate_polish_name_declension("Aura Gilotyna", gender="FEMALE")
+    assert decl["M"] == "Aura Gilotyna"
+    assert decl["D"] == "Aury Gilotyny"
+    assert decl["C"] == "Aurze Gilotynie"
+    assert decl["B"] == "Aurę Gilotynę"
+    assert decl["N"] == "Aurą Gilotyną"
+    assert decl["Ms"] == "Aurze Gilotynie"
+    assert decl["W"] == "Auro Gilotyno"
+
+    # Asercja 4: AVTLinter eliminuje kalkę 'Aura od Gilotyny' we wszystkich przypadkach gramatycznych
+    t_m, fixes_m = AVTLinter.lint_and_fix_line("Oto bezlitosna Aura od Gilotyny.")
+    assert t_m == "Oto bezlitosna Aura Gilotyna.", f"Błąd mianownika: {t_m}"
+    assert any("Aura Gilotyna" in f for f in fixes_m)
+
+    t_d, _ = AVTLinter.lint_and_fix_line(r"Boimy się armii\NAury od Gilotyny.")
+    assert t_d == r"Boimy się armii\NAury Gilotyny.", f"Błąd dopełniacza: {t_d}"
+
+    t_c, _ = AVTLinter.lint_and_fix_line("Rzucili wyzwanie Aurze od Gilotyny.")
+    assert t_c == "Rzucili wyzwanie Aurze Gilotynie.", f"Błąd celownika: {t_c}"
+
+    # Asercja 5: Series memory sanitize_lexical_text oczyszcza wpisy z 'od Gilotyny'
+    assert sanitize_lexical_text("Aura od Gilotyny") == "Aura Gilotyna"
+    assert sanitize_lexical_text("potęga Aury od Gilotyny") == "potęga Aury Gilotyny"
+
+    # Asercja 6: EpisodeQualityGate post-pass (0.00 PLN) naprawia 'Aura od Gilotyny' na osi czasu .ass
+    subs = pysubs2.SSAFile()
+    subs.events.append(pysubs2.SSAEvent(start=1000, end=4000, text=r"To ona,\Npotężna Aura od Gilotyny!"))
+    audited, eqg_fixes = EpisodeQualityGate.audit_and_fix_entire_episode(subs)
+    assert audited.events[0].text == r"To ona,\Npotężna Aura Gilotyna!", f"Błąd EQG: {audited.events[0].text}"
+    assert any("Aura Gilotyna" in f for f in eqg_fixes)
+
+    print(" -> PASSED: Kanon mangowy Frieren (Studio JG / Martyna Zdonek), tarcza 'Aura Gilotyna' i eliminacja 'od Gilotyny' działają w 100% harmonii (0.00 PLN).")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -3862,7 +3915,8 @@ if __name__ == "__main__":
     test_user_glossary_lowest_priority_guard()
     test_foreign_fantasy_name_declension_and_genitive_possession_guard()
     test_lexical_typo_correction_and_orthographic_integrity_guard()
-    print("\n Wszystkie testy jednostkowe i integracyjne (51/51) zakończone pełnym sukcesem!\n")
+    test_frieren_manga_canon_aura_gilotyna_and_calque_shield()
+    print("\n Wszystkie testy jednostkowe i integracyjne (52/52) zakończone pełnym sukcesem!\n")
 
 
 

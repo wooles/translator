@@ -32,6 +32,15 @@ def generate_polish_name_declension(name: str, gender: str = "UNKNOWN") -> Dict[
     if not n:
         return {}
 
+    words = n.split()
+    if len(words) > 1:
+        sub_decls = [generate_polish_name_declension(w, gender) for w in words]
+        if all(sub_decls):
+            return {
+                case: " ".join(d.get(case, w) for d, w in zip(sub_decls, words))
+                for case in ["M", "D", "C", "B", "N", "Ms", "W"]
+            }
+
     # Female names ending in consonant or vowel other than -a: strictly undeclined in Polish
     if g == "FEMALE" or "KOBIETA" in g or "ŻEŃSK" in g:
         if n.endswith("a"):
@@ -142,6 +151,12 @@ def sanitize_lexical_text(text: str) -> str:
         (r"(^|[^\w]|\\[Nnh])([Nn])arazie\b", r"\g<1>\g<2>a razie"),
         (r"(^|[^\w]|\\[Nnh])([Zz])\s+przed\b", r"\g<1>sprzed"),
         (r"(^|[^\w]|\\[Nnh])([Zz])\s+poza\b", r"\g<1>spoza"),
+        # Anti-calque titular normalizations: 'Aura od Gilotyny' -> 'Aura Gilotyna' (Filar XCVIII/CLXV)
+        (r"(^|[^\w]|\\[Nnh])([Aa])ura\s+od\s+[Gg]ilotyny\b", r"\g<1>\g<2>ura Gilotyna"),
+        (r"(^|[^\w]|\\[Nnh])([Aa])ury\s+od\s+[Gg]ilotyny\b", r"\g<1>\g<2>ury Gilotyny"),
+        (r"(^|[^\w]|\\[Nnh])([Aa])urze\s+od\s+[Gg]ilotyny\b", r"\g<1>\g<2>urze Gilotynie"),
+        (r"(^|[^\w]|\\[Nnh])([Aa])urę\s+od\s+[Gg]ilotyny\b", r"\g<1>\g<2>urę Gilotynę"),
+        (r"(^|[^\w]|\\[Nnh])([Aa])urą\s+od\s+[Gg]ilotyn(?:ą|y)\b", r"\g<1>\g<2>urą Gilotyną"),
     ]
     res = text
     for pat, repl in TYPO_NORMALIZATIONS:
