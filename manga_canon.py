@@ -3759,6 +3759,13 @@ class MangaCanonRegistry:
                 with open(json_file, "r", encoding="utf-8") as f:
                     data = json.load(f)
                     slug = json_file.stem
+                    if isinstance(data, dict) and "glossary" in data and isinstance(data["glossary"], dict):
+                        # Law 9: Strict Grounding - strip any brackets or descriptions
+                        data["glossary"] = {
+                            str(k).strip(): re.sub(r"\s*[\(\[].*?[\)\]]", "", str(v)).strip()
+                            for k, v in data["glossary"].items()
+                            if str(k).strip() and re.sub(r"\s*[\(\[].*?[\)\]]", "", str(v)).strip()
+                        }
                     self.canon_db[slug] = data
             except Exception as e:
                 logger.warning(f"Failed to load custom canon from {json_file.name}: {e}")
@@ -3883,7 +3890,7 @@ Jeżeli seria została oficjalnie wydana w Polsce, zwróć kompletny słownik w 
   "publisher": "Wydawnictwo XYZ (np. Waneko, Studio JG, JPF, Kotori, Hanami, Dango)",
   "aliases": ["{primary_title.lower()}", "{slug}"],
   "glossary": {{
-    "Oryginalna nazwa japońska lub angielska": "Oficjalne polskie tłumaczenie z polskiego wydania mangi (z krótkim wyjaśnieniem w nawiasie jeśli to postać/atak)"
+    "Oryginalna nazwa japońska lub angielska": "CZYSTE polskie tłumaczenie z oficjalnego tomu (KATEGORYCZNIE BEZ NAWIASÓW, bez objaśnień kim jest postać, bez dopisków 'postać/atak' - wyłącznie czysta nazwa własna do bezpośredniego użycia w dialogu)"
   }},
   "character_forms": {{
     "PostaćA -> PostaćB": "forma zwrotu i styl relacji z polskiego przekładu"
@@ -3909,11 +3916,20 @@ ZWRÓĆ WYŁĄCZNIE CZYSTY KOD JSON BEZ ZBĘDNYCH KOMENTARZY.
             data = json.loads(raw_text.strip())
 
             if data.get("has_polish_edition") and data.get("title") and data.get("publisher"):
+                raw_glossary = data.get("glossary", {})
+                clean_glossary = {}
+                for k, v in raw_glossary.items():
+                    k_clean = str(k).strip()
+                    # Law 9: Strict Grounding - strip any brackets or descriptions
+                    v_clean = re.sub(r"\s*[\(\[].*?[\)\]]", "", str(v)).strip()
+                    if k_clean and v_clean:
+                        clean_glossary[k_clean] = v_clean
+
                 entry_data = {
                     "title": data["title"],
                     "aliases": list(set(data.get("aliases", []) + [slug, primary_title.lower()])),
                     "publisher": data["publisher"],
-                    "glossary": data.get("glossary", {}),
+                    "glossary": clean_glossary,
                     "character_forms": data.get("character_forms", {})
                 }
                 out_path = self.custom_dir / f"{slug}.json"

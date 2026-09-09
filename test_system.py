@@ -1171,7 +1171,19 @@ def test_manga_canon():
     prompt_chunk = registry.format_canon_for_prompt(jjk_canon)
     assert "Domen" in prompt_chunk
     assert "Waneko" in prompt_chunk
-    print(" -> PASSED: Kanon polskich wydań mangowych działa w 100% (baza Waneko, JPF, Studio JG itp. bez kalek AI).")
+
+    # Żelazna asercja czystości: w CAŁEJ bazie BUILTIN_MANGA_CANON nie ma ani jednego nawiasu ani dopisku
+    from manga_canon import BUILTIN_MANGA_CANON
+    total_checked = 0
+    for s_key, s_data in BUILTIN_MANGA_CANON.items():
+        for src_t, pl_t in s_data.get("glossary", {}).items():
+            total_checked += 1
+            assert "(" not in pl_t and ")" not in pl_t, f"Skażenie kanonu nawiasem w {s_key}: '{src_t}' -> '{pl_t}'"
+            assert "[" not in pl_t and "]" not in pl_t, f"Skażenie kanonu nawiasem kwadratowym w {s_key}: '{src_t}' -> '{pl_t}'"
+            assert not any(ch in pl_t for ch in [':', ';', '=', '->', '{', '}', '<', '>']), f"Skażenie kanonu znakami specjalnymi w {s_key}: '{src_t}' -> '{pl_t}'"
+    assert total_checked > 2500, f"Zbyt mała liczba terminów w kanonie: {total_checked}"
+
+    print(f" -> PASSED: Kanon polskich wydań mangowych działa w 100% ({total_checked} terminów w 100% czystej postaci, zero nawiasów/komentarzy).")
 
 def test_batch_queue():
     print("[TEST 14/14] Test Kolejki Sezonowej (Batch Queue) i naturalnego sortowania...")
