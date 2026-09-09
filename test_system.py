@@ -3862,7 +3862,22 @@ def test_frieren_manga_canon_aura_gilotyna_and_calque_shield():
     assert audited.events[0].text == r"To ona,\Npotężna Aura Gilotyna!", f"Błąd EQG: {audited.events[0].text}"
     assert any("Aura Gilotyna" in f for f in eqg_fixes)
 
-    print(" -> PASSED: Kanon mangowy Frieren (Studio JG / Martyna Zdonek), tarcza 'Aura Gilotyna' i eliminacja 'od Gilotyny' działają w 100% harmonii (0.00 PLN).")
+    # Asercja 7: Automatyczny audyt dokumentacji README.md pod kątem zgodności z bazą kanonu
+    readme_path = Path(__file__).parent / "README.md"
+    assert readme_path.exists(), "Błąd: brak pliku README.md w repozytorium!"
+    with open(readme_path, "r", encoding="utf-8") as f:
+        readme_content = f.read()
+
+    assert "Aura od Gilotyny" not in readme_content, "Błąd audytu README: wykryto zmyśloną kalkę 'Aura od Gilotyny'!"
+    assert "Kishōkyō" not in readme_content, "Błąd audytu README: wykryto błędną transkrypcję 'Kishōkyō'!"
+    assert "A. Zychma" not in readme_content, "Błąd audytu README: wykryto fikcyjnego tłumacza 'A. Zychma'!"
+    assert "Aura Gilotyna" in readme_content, "Błąd audytu README: brak oficjalnego kanonu 'Aura Gilotyna'!"
+    assert "Martyna Zdonek" in readme_content, "Błąd audytu README: brak rzeczywistej tłumaczki 'Martyna Zdonek'!"
+    assert "Dantōdai no Aura" in readme_content, "Błąd audytu README: brak poprawnej transkrypcji 'Dantōdai no Aura'!"
+    assert "Prosta Domena" in readme_content, "Błąd audytu README: brak kanonu 'Prosta Domena'!"
+    assert "D. Bruszewska" in readme_content, "Błąd audytu README: brak rzeczywistej tłumaczki Waneko 'D. Bruszewska'!"
+
+    print(" -> PASSED: Kanon mangowy Frieren (Studio JG / Martyna Zdonek), tarcza 'Aura Gilotyna', eliminacja 'od Gilotyny' oraz audyt dokumentacji README działają w 100% harmonii (0.00 PLN).")
 
 
 if __name__ == "__main__":

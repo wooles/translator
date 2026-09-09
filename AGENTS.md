@@ -56,3 +56,14 @@ Odpowiedź pozbawiona tej ścieżki stanowi bezpośrednie naruszenie reguł work
 1. **Bezwzględny zakaz Vertex AI:** use_vertex = 0, brak zależności od GCP billing. Wyłącznie bezpośrednie klucze Google AI Studio API Keys.
 2. **Context Caching:** Wszystkie zapytania muszą wykorzystywać pre-warming i rabat -90%.
 3. **Koszty zerowe:** Mechanizmy lintera, audytu i pamięci serialu muszą mieć koszt dokładnie 0.00 PLN.
+
+---
+
+## 📖 6. ZASADA ZERO-CONFABULATION W DOKUMENTACJI I KANONIE (GROUND-TRUTH SOURCING)
+
+1. **Zakaz generowania terminów „z pamięci” modelu:**
+   Asystent ma bezwzględny zakaz wprowadzania do dokumentacji (README.md, opisy, tabele porównawcze, prompty) jakichkolwiek „przykładowych” lub „kanonicznych” terminów, nazwisk tłumaczy, tytułów czy przydomków na podstawie wewnętrznych wag LLM.
+2. **Obowiązek weryfikacji w bazie kodu (`manga_canon.py`):**
+   Wszelkie przykłady oficjalnego kanonu podawane w dokumentacji MUSZĄ być zmapowane 1:1 z istniejącymi, zweryfikowanymi wpisami w `manga_canon.py` lub potwierdzone w stopce redakcyjnej licencjonowanego polskiego wydawnictwa papierowego.
+3. **Automatyczny audyt dokumentacji (CI Gate):**
+   Każda zmiana w pliku README.md podlega automatycznemu testowi weryfikacyjnemu w `test_system.py` (Asercja 7), który weryfikuje spójność terminologiczną i uniemożliwia zatwierdzenie niesprawdzonych treści.
