@@ -383,6 +383,18 @@ class AVTLinter:
         (r"^[Cc]zy możemy już iść\?", "Możemy już iść?", "Filar IX - Pytania bez 'Czy'"),
         (r"^[Cc]zy widziałaś to\?", "Widziałaś to?", "Filar IX - Pytania bez 'Czy'"),
         (r"^[Cc]zy słyszałaś to\?", "Słyszałaś to?", "Filar IX - Pytania bez 'Czy'"),
+
+        # Lexical Typos & Orthographic Deformations (Pillar CLXIV)
+        (r"(^|[^\w]|\\[Nnh])([Ss])pyh(am|asz|a|amy|acie|ają|ać|ał|ała|ało|ali|ały|ano)\b", r"\g<1>\g<2>pyt\g<3>", "Filar CLXIV - Eliminacja Literówki 'spyham' -> 'spytam'"),
+        (r"(^|[^\w]|\\[Nnh])([Ww])ziąść\b", r"\g<1>\g<2>ziąć", "Filar CLXIV - Eliminacja Błędu Ortograficznego 'wziąść' -> 'wziąć'"),
+        (r"(^|[^\w]|\\[Nnh])([Pp])oszłem\b", r"\g<1>\g<2>oszedłem", "Filar CLXIV - Eliminacja Błędu Fleksyjnego 'poszłem' -> 'poszedłem'"),
+        (r"(^|[^\w]|\\[Nnh])([Ww])łancza(ć|m|sz|my|cie|ją|ł|ła|ło|li|ły|no|nie|nia|niem)?\b", r"\g<1>\g<2>łącza\g<3>", "Filar CLXIV - Eliminacja Błędu Fonetycznego 'włanczać' -> 'włączać'"),
+        (r"(^|[^\w]|\\[Nnh])([Ww])yłancza(ć|m|sz|my|cie|ją|ł|ła|ło|li|ły|no|nie|nia|niem)?\b", r"\g<1>\g<2>yłącza\g<3>", "Filar CLXIV - Eliminacja Błędu Fonetycznego 'wyłanczać' -> 'wyłączać'"),
+        (r"(^|[^\w]|\\[Nnh])([Nn])a\s+codzień\b", r"\g<1>\g<2>a co dzień", "Filar CLXIV - Eliminacja Błędu Pisowni 'na codzień' -> 'na co dzień'"),
+        (r"(^|[^\w]|\\[Nnh])([Cc])onajmniej\b", r"\g<1>\g<2>o najmniej", "Filar CLXIV - Eliminacja Błędu Pisowni 'conajmniej' -> 'co najmniej'"),
+        (r"(^|[^\w]|\\[Nnh])([Nn])arazie\b", r"\g<1>\g<2>a razie", "Filar CLXIV - Eliminacja Błędu Pisowni 'narazie' -> 'na razie'"),
+        (r"(^|[^\w]|\\[Nnh])([Zz])\s+przed\b", r"\g<1>sprzed", "Filar CLXIV - Eliminacja Błędu Pisowni 'z przed' -> 'sprzed'"),
+        (r"(^|[^\w]|\\[Nnh])([Zz])\s+poza\b", r"\g<1>spoza", "Filar CLXIV - Eliminacja Błędu Pisowni 'z poza' -> 'spoza'"),
     ]
 
     @classmethod
@@ -439,10 +451,17 @@ class AVTLinter:
                         modified = re.sub(pat, good_choice, modified, flags=re.IGNORECASE)
                         applied_fixes.append(f"[Korekta Użytkownika] '{variant}' -> '{good_choice}'")
 
-        # 3. Strict glossary overrides (Sanitized from parenthetical notes/brackets)
+        # 3. Strict glossary overrides (Sanitized from parenthetical notes/brackets & homograph protection)
         if custom_glossary:
             for src, raw_trg in custom_glossary.items():
                 if not src or not raw_trg:
+                    continue
+                src_clean = src.strip()
+                # Stopword & safety protection: do not substitute single short words that collide with Polish homographs
+                if " " not in src_clean and (len(src_clean) < 3 or src_clean.lower() in {
+                    "to", "no", "do", "on", "i", "a", "ja", "ze", "ma", "te", "ta", "co",
+                    "ten", "pan", "tam", "dla", "bez", "jak", "sie", "się", "ale", "lub", "czy"
+                }):
                     continue
                 # Strip parenthetical clarifications e.g. "Tus (Miasto w Persji)" -> "Tus"
                 clean_trg = re.sub(r"\s*[\(\[].*?[\)\]]", "", raw_trg).strip()
@@ -1165,6 +1184,146 @@ def convert_nonvirile_plural_to_virile(verb: str) -> Optional[str]:
 
     return res.capitalize() if verb[0].isupper() else res
 
+MASCULINE_2ND_SG_IRREGULAR_TO_FEMININE: Dict[str, str] = {
+    "poszedłeś": "poszłaś",
+    "przyszedłeś": "przyszłaś",
+    "wyszedłeś": "wyszłaś",
+    "odszedłeś": "odeszłaś",
+    "wszedłeś": "weszłaś",
+    "przeszedłeś": "przeszłaś",
+    "doszedłeś": "doszłaś",
+    "zszedłeś": "zeszłaś",
+    "znalazłeś": "znalazłaś",
+    "odnalazłeś": "odnalazłaś",
+    "mogłeś": "mogłaś",
+    "pomogłeś": "pomogłaś",
+    "wziąłeś": "wzięłaś",
+    "zacząłeś": "zaczęłaś",
+    "wpadłeś": "wpadłaś",
+    "upadłeś": "upadłaś",
+}
+
+FEMININE_2ND_SG_IRREGULAR_TO_MASCULINE: Dict[str, str] = {
+    "poszłaś": "poszedłeś",
+    "przyszłaś": "przyszedłeś",
+    "wyszłaś": "wyszedłeś",
+    "odeszłaś": "odszedłeś",
+    "weszłaś": "wszedłeś",
+    "przeszłaś": "przeszedłeś",
+    "doszłaś": "doszedłeś",
+    "zeszłaś": "zszedłeś",
+    "znalazłaś": "znalazłeś",
+    "odnalazłaś": "odnalazłeś",
+    "mogłaś": "mogłeś",
+    "pomogłaś": "pomogłeś",
+    "wzięłaś": "wziąłeś",
+    "zaczęłaś": "zacząłeś",
+    "wpadłaś": "wpadłeś",
+    "upadłaś": "upadłeś",
+}
+
+MASCULINE_SG_ADJECTIVES_TO_FEMININE: Dict[str, str] = {
+    "pewien": "pewna",
+    "pewny": "pewna",
+    "gotów": "gotowa",
+    "gotowy": "gotowa",
+    "sam": "sama",
+    "bezpieczny": "bezpieczna",
+    "zmęczony": "zmęczona",
+    "ciekawy": "ciekawa",
+    "zadowolony": "zadowolona",
+    "zaskoczony": "zaskoczona",
+    "zdziwiony": "zdziwiona",
+    "spokojny": "spokojna",
+    "szczęśliwy": "szczęśliwa",
+}
+
+FEMININE_SG_ADJECTIVES_TO_MASCULINE: Dict[str, str] = {
+    "pewna": "pewien",
+    "gotowa": "gotowy",
+    "sama": "sam",
+    "bezpieczna": "bezpieczny",
+    "zmęczona": "zmęczony",
+    "ciekawa": "ciekawy",
+    "zadowolona": "zadowolony",
+    "zaskoczona": "zaskoczony",
+    "zdziwiona": "zdziwiony",
+    "spokojna": "spokojny",
+    "szczęśliwa": "szczęśliwy",
+}
+
+def convert_2nd_person_masculine_to_feminine(verb: str) -> Optional[str]:
+    v_lower = verb.lower()
+    if v_lower in MASCULINE_2ND_SG_IRREGULAR_TO_FEMININE:
+        res = MASCULINE_2ND_SG_IRREGULAR_TO_FEMININE[v_lower]
+        return res.capitalize() if verb[0].isupper() else res
+
+    if v_lower.endswith("ąłeś"):
+        res = v_lower[:-4] + "ęłaś"
+    elif v_lower.endswith("łeś"):
+        res = v_lower[:-3] + "łaś"
+    else:
+        return None
+
+    return res.capitalize() if verb[0].isupper() else res
+
+def convert_2nd_person_feminine_to_masculine(verb: str) -> Optional[str]:
+    v_lower = verb.lower()
+    if v_lower in FEMININE_2ND_SG_IRREGULAR_TO_MASCULINE:
+        res = FEMININE_2ND_SG_IRREGULAR_TO_MASCULINE[v_lower]
+        return res.capitalize() if verb[0].isupper() else res
+
+    if v_lower.endswith("ęłaś"):
+        res = v_lower[:-4] + "ąłeś"
+    elif v_lower.endswith("łaś"):
+        res = v_lower[:-3] + "łeś"
+    else:
+        return None
+
+    return res.capitalize() if verb[0].isupper() else res
+
+POSSESSIVE_GOVERNING_NOUNS_PATTERN = (
+    r"(?:sekret|sekretu|sekretom|sekrety|sekretów|"
+    r"tajemnic|tajemnica|tajemnice|tajemnicy|tajemnicom|tajemnicą|tajemnicę|"
+    r"miecz|miecza|mieczem|mieczu|miecze|mieczom|mieczami|"
+    r"oręż|oręża|orężem|"
+    r"zbroj|zbroja|zbroi|zbroję|zbroją|"
+    r"rozkaz|rozkazu|rozkazem|rozkazy|rozkazów|rozkazom|"
+    r"wol[aieyęą]|moc|mocy|mocą|potęg[aieyęą]|magi[aieyęą]|"
+    r"śmierć|śmierci|śmiercią|życi[aeeęu]|dusz[aieyęą]|ciał[aoeuy]|kr[ew|wi]|"
+    r"obecnoś[ćci]|powrót|powrotu|powrotem|zdrad[aieyęą]|zemst[aieyęą]|gniew|gniewu|gniewem|"
+    r"pomoc|pomocy|pomocą|łask[aieyęą]|cień|cienia|cieniem|"
+    r"herb|herbu|herbem|herby|herbów|twierdz[aieyęą]|zamek|zamku|zamkiem|zamki|zamków|"
+    r"grób|grobu|grobem|groby|grobów|świątyni[aieyęą]|"
+    r"armi[aieyęą]|armii|armiom|wojsk[aoeuy]|"
+    r"słudzy|sług|sług[aieyęą]|ludzi|ludźmi|ludziom|zwolennik|zwolennika|zwolennicy|zwolenników|"
+    r"syn|syna|synowi|synem|synowie|synów|córk[aieyęą]|córek|córkom|"
+    r"brat|brata|bratu|bratem|bracia|braci|braciom|siostr[aieyęą]|sióstr|siostrom|"
+    r"ojciec|ojca|ojcu|ojcem|matk[aieyęą]|matek|matkom|"
+    r"żon[aieyęą]|żon|żonom|mąż|męża|mężowi|mężem|"
+    r"pan|pana|panu|panem|panowie|panów|władc[aeyęą]|władców|"
+    r"mistrz|mistrza|mistrzowi|mistrzem|mistrzowie|mistrzów|"
+    r"uczeń|ucznia|uczniowi|uczniem|uczniowie|uczniów|"
+    r"przyjaciel|przyjaciela|przyjacielowi|przyjacielem|przyjaciele|przyjaciół|"
+    r"wróg|wroga|wrogowi|wrogiem|wrogowie|wrogów|"
+    r"los|losu|losem|losy|losów|imię|imienia|imieniem|imiona|imion|"
+    r"głos|głosu|głosem|głosy|głosów|wzrok|wzroku|wzrokiem|"
+    r"oczy|oczach|oczami|oczu|dłonie|dłoni|dłoniach|dłońmi|ręce|rąk|rękach|rękami)"
+)
+
+GENITIVE_GOVERNING_VERBS_PATTERN = (
+    r"(?:szukam|szukasz|szuka|szukamy|szukacie|szukają|szukałem|szukałam|szukał|szukała|szukali|szukały|"
+    r"potrzebuj[ęesz]|potrzebujemy|potrzebujecie|potrzebują|potrzebowałem|potrzebowałam|potrzebował|potrzebowała|potrzebowali|"
+    r"pilnuj|pilnujesz|pilnuje|pilnujemy|pilnujecie|pilnują|pilnowałem|pilnowałam|pilnował|pilnowała|pilnowali|"
+    r"broń|bronisz|broni|bronimy|bronicie|bronią|broniłem|broniłam|bronił|broniła|bronili|"
+    r"unikaj|unikasz|unika|unikamy|unikacie|unikają|unikałem|unikałam|unikał|unikała|unikali|"
+    r"boję\s+się|boisz\s+się|boi\s+się|boimy\s+się|boicie\s+się|boją\s+się|bałem\s+się|bałam\s+się|bał\s+się|bała\s+się|bali\s+się|"
+    r"nie\s+ma|nie\s+widzę|nie\s+widzisz|nie\s+widzi|nie\s+widziałem|nie\s+widziałam|nie\s+widział|nie\s+widziała|nie\s+widzieli|"
+    r"nie\s+znam|nie\s+znasz|nie\s+zna|nie\s+znałem|nie\s+znałam|nie\s+znał|nie\s+znała|nie\s+znali|"
+    r"nie\s+pamiętam|nie\s+pamiętasz|nie\s+pamięta|nie\s+pamiętałem|nie\s+pamiętałam|nie\s+pamiętał|nie\s+pamiętała|nie\s+pamiętali|"
+    r"nie\s+słyszę|nie\s+słyszysz|nie\s+słyszy|nie\s+słyszałem|nie\s+słyszałam|nie\s+słyszał|nie\s+słyszała|nie\s+słyszeli)"
+)
+
 class EpisodeQualityGate:
     """
     Global Post-Translation Quality Gate & Human-Eye Common Sense Auditor.
@@ -1277,18 +1436,44 @@ class EpisodeQualityGate:
                     if len(clean_p) >= 3:
                         candidate_names.add(clean_p)
 
-        # 0f. 7-Case Character Declension Matrix from Series Bible / Registry
+        # 0f. 7-Case Character Declension Matrix from Series Bible / Registry / Actors
+        from series_memory import generate_polish_name_declension
         character_declensions: Dict[str, Dict[str, str]] = {}
         if series_bible and hasattr(series_bible, "data") and "declensions" in series_bible.data:
-            character_declensions = dict(series_bible.data["declensions"])
-        elif character_registry:
-            from series_memory import generate_polish_name_declension
+            character_declensions.update(dict(series_bible.data["declensions"]))
+
+        if character_registry:
             for k in character_registry.keys():
                 for p in re.split(r"[/,]", k):
                     clean_p = p.strip()
-                    if len(clean_p) >= 3:
+                    if len(clean_p) >= 3 and not any(clean_p.lower() == existing_k.lower() for existing_k in character_declensions.keys()):
                         g = char_gender_map.get(clean_p.lower(), "UNKNOWN")
                         character_declensions[clean_p] = generate_polish_name_declension(clean_p, g)
+
+        # Also populate from candidate names / event actors if not present
+        NON_NAME_ACTORS = {
+            "wszyscy", "ktos", "ktoś", "glos", "głos", "narrator", "napis", "napisy",
+            "tytul", "tytuł", "tlumaczenie", "tłumaczenie", "kobieta", "mezczyzna",
+            "mężczyzna", "chlopak", "chłopak", "dziewczyna", "tlum", "tłum", "strażnik",
+            "straznik", "zolnierz", "żołnierz", "main", "default", "alt", "sign", "signs"
+        }
+        all_candidate_chars = set()
+        for k in candidate_names:
+            all_candidate_chars.add(k.strip())
+        for ev in events:
+            ev_act = getattr(ev, "name", None) or getattr(ev, "actor", None)
+            if ev_act and str(ev_act).strip():
+                act_clean = str(ev_act).strip()
+                if len(act_clean) >= 3 and not any(ch in act_clean for ch in "{}[]():;"):
+                    all_candidate_chars.add(act_clean)
+
+        for cand in all_candidate_chars:
+            if not cand or len(cand) < 3 or cand.lower() in NON_NAME_ACTORS:
+                continue
+            cand_proper = cand.capitalize()
+            if not any(cand.lower() == existing_k.lower() for existing_k in character_declensions.keys()):
+                cand_g = char_gender_map.get(cand.lower(), "UNKNOWN")
+                character_declensions[cand_proper] = generate_polish_name_declension(cand_proper, cand_g)
 
         for ev in events:
             if not ev.text:
@@ -1644,6 +1829,71 @@ class EpisodeQualityGate:
                             ev.text = re.sub(rf"\b{re.escape(prefix)}{re.escape(old_adj)}\b", f"{prefix}{repl_adj}", ev.text, count=1)
                             fixes.append(f"[Episode Quality Gate - Filar CLXIII Przymiotnik Męskoosobowy] Linia #{i+1}: skorygowano '{prefix}{old_adj}' -> '{prefix}{repl_adj}' (adresat: {'grupa mężczyzn' if is_male_group else 'grupa mieszana'})")
 
+                else:
+                    # 2ND-PERSON SINGULAR ADDRESSEE AGREEMENT (kobieta vs mężczyzna)
+                    is_single_female = False
+                    is_single_male = False
+
+                    if addr_norm in ["kobieta", "female", "dziewczyna"] or any(k in addr_norm for k in ["(kobieta)", "(female)"]):
+                        is_single_female = True
+                    elif addr_norm in ["mężczyzna", "male", "chłopak"] or any(k in addr_norm for k in ["(mężczyzna)", "(male)"]):
+                        is_single_male = True
+                    else:
+                        # Check character vocative in line
+                        if character_registry:
+                            for cname, cdesc in character_registry.items():
+                                if len(cname) >= 3 and re.search(rf"\b{re.escape(cname)}[!,\?]", clean_ev_text, re.IGNORECASE):
+                                    cdesc_l = cdesc.lower()
+                                    if any(k in cdesc_l for k in ["kobieta", "female", "dziewczyn", "nauczycielka", "uczennica", "kapłanka"]):
+                                        is_single_female = True
+                                        break
+                                    elif any(k in cdesc_l for k in ["mężczyzna", "male", "chłopak", "żołnierz", "rycerz"]):
+                                        is_single_male = True
+                                        break
+                        if not is_single_female and not is_single_male:
+                            if re.search(r"\b(dziewczyno|kobieto|panienko|siostro|mamo)[!,\?]", clean_ev_text, re.IGNORECASE):
+                                is_single_female = True
+                            elif re.search(r"\b(chłopcze|młodzieńcze|bracie|ojcze|tato)[!,\?]", clean_ev_text, re.IGNORECASE):
+                                is_single_male = True
+
+                    if is_single_female:
+                        # 1. Convert masculine 2nd-person singular past verbs (-łeś, poszedłeś, etc.) -> feminine (-łaś, poszłaś)
+                        for m in list(re.finditer(r"\b([A-Za-ząćęłńóśźż]+łeś)\b", ev.text)):
+                            v_masc = m.group(1)
+                            v_fem = convert_2nd_person_masculine_to_feminine(v_masc)
+                            if v_fem and v_fem.lower() != v_masc.lower():
+                                ev.text = re.sub(rf"\b{re.escape(v_masc)}\b", v_fem, ev.text, count=1)
+                                fixes.append(f"[Episode Quality Gate - Filar CLXIII Morfologia Żeńska 2. os. lp.] Linia #{i+1}: skorygowano formę męską '{v_masc}' -> '{v_fem}' (adresat: kobieta)")
+
+                        # 2. Convert masculine adjectives / participles -> feminine
+                        for m_adj, f_adj in MASCULINE_SG_ADJECTIVES_TO_FEMININE.items():
+                            pat_adj = rf"\b((?:byłaś|byłeś|jesteś|bądź|zostałaś|zostałeś|zostań|będziesz|czujesz\s+się|[A-Za-ząćęłńóśźż]+(?:łeś|łaś)(?:\s+\w+)?)\s+)({re.escape(m_adj)})\b"
+                            for m in list(re.finditer(pat_adj, ev.text, re.IGNORECASE)):
+                                prefix = m.group(1)
+                                old_adj = m.group(2)
+                                repl_adj = f_adj.capitalize() if old_adj[0].isupper() else f_adj
+                                ev.text = re.sub(rf"\b{re.escape(prefix)}{re.escape(old_adj)}\b", f"{prefix}{repl_adj}", ev.text, count=1)
+                                fixes.append(f"[Episode Quality Gate - Filar CLXIII Przymiotnik Żeński 2. os. lp.] Linia #{i+1}: skorygowano '{prefix}{old_adj}' -> '{prefix}{repl_adj}' (adresat: kobieta)")
+
+                    elif is_single_male:
+                        # 1. Convert feminine 2nd-person singular past verbs (-łaś, poszłaś, etc.) -> masculine (-łeś, poszedłeś)
+                        for m in list(re.finditer(r"\b([A-Za-ząćęłńóśźż]+łaś)\b", ev.text)):
+                            v_fem = m.group(1)
+                            v_masc = convert_2nd_person_feminine_to_masculine(v_fem)
+                            if v_masc and v_masc.lower() != v_fem.lower():
+                                ev.text = re.sub(rf"\b{re.escape(v_fem)}\b", v_masc, ev.text, count=1)
+                                fixes.append(f"[Episode Quality Gate - Filar CLXIII Morfologia Męska 2. os. lp.] Linia #{i+1}: skorygowano formę żeńską '{v_fem}' -> '{v_masc}' (adresat: mężczyzna)")
+
+                        # 2. Convert feminine adjectives / participles -> masculine
+                        for f_adj, m_adj in FEMININE_SG_ADJECTIVES_TO_MASCULINE.items():
+                            pat_adj = rf"\b((?:byłeś|byłaś|jesteś|bądź|zostałeś|zostałaś|zostań|będziesz|czujesz\s+się|[A-Za-ząćęłńóśźż]+(?:łeś|łaś)(?:\s+\w+)?)\s+)({re.escape(f_adj)})\b"
+                            for m in list(re.finditer(pat_adj, ev.text, re.IGNORECASE)):
+                                prefix = m.group(1)
+                                old_adj = m.group(2)
+                                repl_adj = m_adj.capitalize() if old_adj[0].isupper() else m_adj
+                                ev.text = re.sub(rf"\b{re.escape(prefix)}{re.escape(old_adj)}\b", f"{prefix}{repl_adj}", ev.text, count=1)
+                                fixes.append(f"[Episode Quality Gate - Filar CLXIII Przymiotnik Męski 2. os. lp.] Linia #{i+1}: skorygowano '{prefix}{old_adj}' -> '{prefix}{repl_adj}' (adresat: mężczyzna)")
+
             # 3d. FOREIGN NAME DECLENSION UNIFORMITY (Prepositional Cases)
             if not is_sign and dominant_prep_names:
                 for c_name, dom_form in dominant_prep_names.items():
@@ -1668,34 +1918,65 @@ class EpisodeQualityGate:
                         continue
                     m_form = c_decl.get("M", c_name)
 
-                    # Narzędnik (z, ze, przed, nad, pod, za) -> c_decl["N"]
+                    # Narzędnik (z, ze, przed, nad, pod, za, między) -> c_decl["N"]
                     n_form = c_decl.get("N")
                     if n_form and n_form != m_form:
-                        pat_n = rf"\b(z|ze|przed|nad|pod|za)\s+({re.escape(m_form)})\b"
+                        pat_n = rf"\b(z|ze|przed|nad|pod|za|między)(\s+|\\(?:[Nnh])+)+({re.escape(m_form)})\b"
                         def _repl_n(m, target=n_form):
-                            return f"{m.group(1)} {target}"
+                            matched = m.group(3)
+                            tgt = target.upper() if matched.isupper() else (target.capitalize() if matched.istitle() else target)
+                            return f"{m.group(1)}{m.group(2)}{tgt}"
                         old_t = ev.text
                         ev.text = re.sub(pat_n, _repl_n, ev.text, flags=re.IGNORECASE)
                         if ev.text != old_t:
                             fixes.append(f"[Episode Quality Gate - Matryca Narzędnika] Linia #{i+1}: ujednolicono formę na '{n_form}' po przyimku narzędnika")
 
-                    # Dopełniacz (do, dla, od, u, bez) -> c_decl["D"]
+                    # Dopełniacz (do, dla, od, u, bez, koło, obok itp.) -> c_decl["D"]
                     d_form = c_decl.get("D")
                     if d_form and d_form != m_form:
-                        pat_d = rf"\b(do|dla|od|u|bez)\s+({re.escape(m_form)})\b"
-                        def _repl_d(m, target=d_form):
-                            return f"{m.group(1)} {target}"
+                        # Prepozycje dopełniacza
+                        pat_prep_d = rf"\b(do|dla|od|u|bez|koło|obok|wzdłuż|podczas|zamiast|oprócz|wokół|wobec)(\s+|\\(?:[Nnh])+)+({re.escape(m_form)})\b"
+                        def _repl_prep_d(m, target=d_form):
+                            matched = m.group(3)
+                            tgt = target.upper() if matched.isupper() else (target.capitalize() if matched.istitle() else target)
+                            return f"{m.group(1)}{m.group(2)}{tgt}"
                         old_t = ev.text
-                        ev.text = re.sub(pat_d, _repl_d, ev.text, flags=re.IGNORECASE)
+                        ev.text = re.sub(pat_prep_d, _repl_prep_d, ev.text, flags=re.IGNORECASE)
                         if ev.text != old_t:
                             fixes.append(f"[Episode Quality Gate - Matryca Dopełniacza] Linia #{i+1}: ujednolicono formę na '{d_form}' po przyimku dopełniacza")
+
+                        # Rzeczowniki dzierżawcze oraz czasowniki rządzące dopełniaczem (np. "sekretów Drel" -> "sekretów Drela", "miecz Drel" -> "miecz Drela", "szukasz Drel" -> "szukasz Drela")
+                        pat_pos_d = rf"\b({POSSESSIVE_GOVERNING_NOUNS_PATTERN}|{GENITIVE_GOVERNING_VERBS_PATTERN})((?:(?:\s+|\\(?:[Nnh])+)+(?:samego|tamtego|tego))?(?:\s+|\\(?:[Nnh])+)+)({re.escape(m_form)})\b"
+                        def _repl_pos_d(m, target=d_form):
+                            matched = m.group(3)
+                            tgt = target.upper() if matched.isupper() else (target.capitalize() if matched.istitle() else target)
+                            return f"{m.group(1)}{m.group(2)}{tgt}"
+                        old_t = ev.text
+                        ev.text = re.sub(pat_pos_d, _repl_pos_d, ev.text, flags=re.IGNORECASE)
+                        if ev.text != old_t:
+                            fixes.append(f"[Episode Quality Gate - Dopełniacz Dzierżawczy] Linia #{i+1}: ujednolicono formę na '{d_form}' po określeniu dzierżawczym/rządzącym")
+
+                    # Celownik (ku, przeciw, dzięki, wbrew) -> c_decl["C"]
+                    c_form = c_decl.get("C")
+                    if c_form and c_form != m_form:
+                        pat_c = rf"\b(ku|przeciw|przeciwko|dzięki|wbrew)(\s+|\\(?:[Nnh])+)+({re.escape(m_form)})\b"
+                        def _repl_c(m, target=c_form):
+                            matched = m.group(3)
+                            tgt = target.upper() if matched.isupper() else (target.capitalize() if matched.istitle() else target)
+                            return f"{m.group(1)}{m.group(2)}{tgt}"
+                        old_t = ev.text
+                        ev.text = re.sub(pat_c, _repl_c, ev.text, flags=re.IGNORECASE)
+                        if ev.text != old_t:
+                            fixes.append(f"[Episode Quality Gate - Matryca Celownika] Linia #{i+1}: ujednolicono formę na '{c_form}' po przyimku celownika")
 
                     # Miejscownik (o, przy) -> c_decl["Ms"]
                     ms_form = c_decl.get("Ms")
                     if ms_form and ms_form != m_form:
-                        pat_ms = rf"\b(o|przy)\s+({re.escape(m_form)})\b"
+                        pat_ms = rf"\b(o|przy)(\s+|\\(?:[Nnh])+)+({re.escape(m_form)})\b"
                         def _repl_ms(m, target=ms_form):
-                            return f"{m.group(1)} {target}"
+                            matched = m.group(3)
+                            tgt = target.upper() if matched.isupper() else (target.capitalize() if matched.istitle() else target)
+                            return f"{m.group(1)}{m.group(2)}{tgt}"
                         old_t = ev.text
                         ev.text = re.sub(pat_ms, _repl_ms, ev.text, flags=re.IGNORECASE)
                         if ev.text != old_t:

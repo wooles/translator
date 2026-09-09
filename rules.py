@@ -19,7 +19,7 @@ class SceneDiagnosis(BaseModel):
     epistemic_asymmetry: Optional[str] = Field(default=None, description="Teoria Umysłu (Theory of Mind): Kto co wie, a czego NIE WIE w tej scenie? Kto ukrywa tożsamość/motywy? Czego postaciom w kadrze nie wolno zdradzić rozmówcy (np. 'Felix nie wie, że rozmawia z Cichą Wiedźmą; Monika milczy i ukrywa tożsamość')?")
     table_read_mouth_feel: Optional[str] = Field(default=None, description="Próba Stolikowa (Barańczak-Stanisławski): Weryfikacja potoczystości mówionej: czy kwestie układają się naturalnie w ustach polskich aktorów dubbingowych i eliminują papierowe kalki?")
 
-BELCZYK_AVT_MASTER_CANON = """
+BELCZYK_AVT_MASTER_CANON = r"""
 KOMPLEKSOWY KANON PRZEKŁADU AUDIOWIZUALNEGO (WG ARKADIUSZA BELCZYKA, JERZEGO PIEŃKOSA, STANISŁAWA BARAŃCZAKA I NORM POLSKIEGO DIALOGU FILMOWEGO):
 
 MODUŁ I: SKŁADNIA, GIĘTKOŚĆ JĘZYKOWA I POLSZCZYZNA FILMOWA (FILARY I – XII)
@@ -719,15 +719,22 @@ FILAR XC: SOMATYCZNY REZONANS EMOCJONALNY (DOUGLAS ROBINSON'S SOMATIC TRANSLATIO
 
 MODUŁ X: POLSKA FLEKSJA, DIALEKTYKA I ZAAWANSOWANA KOGNITYWISTYKA (FILARY XCI – XCV)
 
-FILAR XCI: ŻELAZNA FLEKSJA I POLSKA ODMIANA JAPOŃSKICH IMION I NAZWISK (POLISH DECLENSION MATRIX & PWN NORMS):
-- Język polski jest językiem wysoce fleksyjnym. Unikanie odmiany japońskich imion i nazwisk jest rażącym błędem stylistycznym i amatorszczyzną:
-  * 1. Imiona i nazwiska męskie zakończone na samogłoski -i, -e, -a oraz spółgłoski BEZWZGLĘDNIE ODMIENIAMY:
+FILAR XCI: ŻELAZNA FLEKSJA I POLSKA ODMIANA JAPOŃSKICH ORAZ OBCYCH/FANTASY IMION I NAZWISK (POLISH DECLENSION MATRIX & PWN NORMS):
+- Język polski jest językiem wysoce fleksyjnym. Unikanie odmiany imion japońskich, obcych i fantasy jest rażącym błędem stylistycznym i amatorszczyzną:
+  * 1. Imiona męskie zakończone na spółgłoskę (zarówno japońskie: Shin, Ken, jak i obcojęzyczne/fantasy: Drel, Gart, Klen, Arthur, Roland, Thorfinn, Eren, Armin) oraz samogłoski -i, -e, -a BEZWZGLĘDNIE ODMIENIAMY:
+    -> Drel: szukasz sekretów Drela, o Drelu, Drelowi, z Drelem, widzę Drela (KATEGORYCZNY ZAKAZ zostawiania w mianowniku: 'sekretów Drel', 'szukasz Drel'!).
+    -> Gart: z Gartem, o Garcie, Gartowi, widzę Garta, miecz Garta (BŁĄD [X]: "miecz Gart").
+    -> Klen: wieża Klena, o Klenie, Klenowi, z Klenem.
     -> Issei: z Isseiem, o Isseiu, Isseiowi, Isseia (BŁĄD [X]: "rozmawiam z Issei").
     -> Tomine: pana Tominego, z panem Tominem, o panu Tominem (BŁĄD [X]: "widzę Tomine").
     -> Nakagawa: pana Nakagawy, z panem Nakagawą.
     -> Shin: Shina, z Shinem, o Shinie.
-  * 2. Imiona żeńskie zakończone na -i, -u (Shizuku, Rei, Minami) pozostają nieodmienne, lecz zdanie musi zachować poprawną strukturę składniową (z Shizuku, o Shizuku).
-  * 3. Wołacze: imiona męskie w wołaczu zachowują formę mianownika z intonacją lub wołaczową ("Issei!", "Shin!").
+  * 2. ZAKAZ KALKOWANIA ANGIELSKIEGO SAKSOŃSKIEGO DOPEŁNIACZA ('S / OF) BEZ FLEKSJI:
+    -> "Drel's secrets / secrets of Drel" -> "sekrety Drela / tajemnice Drela" (KARDYNALNY BŁĄD [X]: "sekretów Drel").
+    -> "Gart's sword" -> "miecz Garta" (BŁĄD [X]: "miecz Gart").
+    -> "Klen's order" -> "rozkaz Klena" (BŁĄD [X]: "rozkaz Klen").
+  * 3. Imiona żeńskie zakończone na -i, -u (Shizuku, Rei, Minami) oraz zakończone na spółgłoskę pozostają nieodmienne, lecz zdanie musi zachować poprawną strukturę składniową (z Shizuku, o Shizuku). Imiona żeńskie na -a odmieniają się normalnie (Alicia -> Alicii, z Alicią).
+  * 4. Wołacze: imiona męskie w wołaczu zachowują formę mianownika z intonacją lub wołaczową ("Issei!", "Shin!", "Drelu!" / "Drel!").
 
 FILAR XCII: SYNCHRONIA PRZECZENIA I ODROCZENIA DRAMATYCZNEGO (DELAYED NEGATION & JVTA SUSPENSE):
 - W języku japońskim (SOV) negacja lub zwrot akcji pada na samym końcu zdania (...to omotta kedo, chigatta!):
@@ -1520,8 +1527,18 @@ FILAR CLXII: NIENARUSZALNOŚĆ PŁCI GRAMATYCZNEJ IMION ORIENTALNYCH NA '-A' (GR
    3. SPÓJNOŚĆ WZMIANEK W 3. OSOBIE (THIRD-PERSON ENTITY AGREEMENT):
       - Gdy inna postać (np. kobieta) wspomina w dialogu lub myśli o męskim bohaterze ("Shira did tell me that...", "Akira said..."), orzeczenie dotyczące tej osoby bezwzględnie zachowuje rodzaj męski ("Shira ostrzegał mnie / Shira mówił mi"), całkowicie niezależnie od płci osoby mówiącej w kadrze!
 
-FILAR CLXIII: MORFOLOGIA ADRESATYWNA LICZBY MNOGIEJ (RODZAJ MĘSKOOSOBOWY VS NIEMĘSKOOSOBOWY W LICZBIE MNOGIEJ):
-   1. ZASADA PODZIAŁU GRUPY NA KADRZE:
+FILAR CLXIII: MORFOLOGIA ADRESATYWNA 2. OSOBY (POJEDYNCZA KOBIETA / POJEDYNCZY MĘŻCZYZNA ORAZ GRUPY W LICZBIE MNOGIEJ):
+   1. ROZPOZNANIE ADRESATA W 2. OSOBIE LICZBY POJEDYNCZEJ ('ty'):
+      - W języku angielskim zaimek 'you' jest całkowicie bezpłciowy i nie ujawnia gramatycznego rodzaju rozmówcy. W języku polskim forma czasownika w czasie przeszłym oraz przymiotniki orzecznikowe bezwzględnie wymagają uzgodnienia z płcią adresata wypowiedzi:
+      - POJEDYNCZA KOBIETA / DZIEWCZYNA ('kobieta'):
+        * BEZWZGLĘDNY NAKAZ form żeńskich:
+          -> Czasowniki w czasie przeszłym: 'byłaś', 'zrobiłaś', 'poszłaś', 'przyszłaś', 'widziałaś', 'słyszałaś', 'chciałaś', 'wiedziałaś', 'mogłaś', 'miałaś', 'powiedziałaś', 'znalazłaś' (KATEGORYCZNY ZAKAZ form męskich: 'byłeś', 'zrobiłeś', 'poszedłeś', 'chciałeś', 'widziałeś'!).
+          -> Przymiotniki i imiesłowy orzecznikowe: 'jesteś pewna', 'byłaś gotowa', 'zostałaś sama', 'byłaś zmęczona', 'jesteś zadowolona', 'byłaś zaskoczona' (KATEGORYCZNY ZAKAZ: 'pewien', 'gotów', 'gotowy', 'sam', 'zmęczony').
+      - POJEDYNCZY MĘŻCZYZNA / CHŁOPAK ('mężczyzna'):
+        * BEZWZGLĘDNY NAKAZ form męskich:
+          -> Czasowniki w czasie przeszłym: 'byłeś', 'zrobiłeś', 'poszedłeś', 'przyszedłeś', 'widziałeś', 'słyszałeś', 'chciałeś', 'wiedziałeś', 'mogłeś', 'miałeś', 'powiedziałeś'.
+          -> Przymiotniki i imiesłowy orzecznikowe: 'jesteś pewien', 'byłeś gotowy/gotów', 'zostałeś sam', 'byłeś zmęczony' (ZAKAZ: 'pewna', 'gotowa', 'sama').
+   2. MORFOLOGIA ADRESATYWNA LICZBY MNOGIEJ ('wy'):
       - W języku polskim zwroty w 2. osobie liczby mnogiej ('wy') bezwzględnie wymagają rozróżnienia składu płciowego odbiorców na kadrze:
       - GRUPA SAMYCH KOBIET / DZIEWCZĄT ('grupa_kobiet'):
         * BEZWZGLĘDNY NAKAZ form niemęskoosobowych:
@@ -1533,8 +1550,27 @@ FILAR CLXIII: MORFOLOGIA ADRESATYWNA LICZBY MNOGIEJ (RODZAJ MĘSKOOSOBOWY VS NIE
           -> Czasowniki w czasie przeszłym: 'widzieliście', 'byliście', 'zrobiliście', 'poszliście', 'słyszeliście'.
           -> Przymiotniki i imiesłowy: 'jesteście gotowi', 'byliście pewni', 'zostaliście sami'.
           -> Wołacz / zwrot: 'Panowie', 'Chłopaki', 'Żołnierze' (dla mężczyzn) lub 'Wszyscy', 'Kochani', 'Ludzie' (dla grupy mieszanej).
-   2. TRIANGULACJA Z JAPOŃSKIEGO AUDIO (WHISPER JP):
+   3. TRIANGULACJA Z JAPOŃSKIEGO AUDIO (WHISPER JP):
       - Gdy seiyū używa cząstek liczby mnogiej ('-tachi', '-ra', 'minna', 'shokun', 'zen'in', 'mina-sama'), KATEGORYCZNIE ZABRANIA SIĘ tłumaczenia w liczbie pojedynczej ('Uważaj!' -> NAKAZ: 'Uważajcie! / Bądźcie ostrożni / ostrożne!').
+
+FILAR CLXIV: BEZWZGLĘDNA KONTROLA ORTOGRAFII, LITERÓWEK I CZASOWNIKÓW PYTAJĄCYCH (ANTI-TYPO & LEXICAL INTEGRITY):
+   1. CZASOWNIKI PYTANIA I DOCIEKANIA (SPYTAĆ / ZAPYTAĆ / PYTAĆ):
+      - Czasownik 'spytać / zapytać' w 1. osobie liczby pojedynczej czasu przyszłego/teraźniejszego ma wyłącznie formę: 'spytam', 'zapytam' lub 'pytam'.
+      - KARDYNALNY BŁĄD [X]: 'spyham' (nieistniejący potworek leksykalny, zniekształcenie fonetyczno-klawiaturowe!).
+      - POPRAWNIE [OK]: 'spytam' / 'zapytam' ("O to, co tam odkryła, spytam moją sługę osobiście").
+   2. ELIMINACJA HALUCYNACJI I ZNIEKSZTAŁCEŃ FONETYCZNO-KLAWIATUROWYCH:
+      - Bezwzględny zakaz literówek i nieistniejących form wyrazowych w dialogu filmowym:
+        * 'spyham / spyhasz / spyha' -> 'spytam / spytasz / spyta'
+        * 'wziąść' -> 'wziąć'
+        * 'poszłem' -> 'poszedłem'
+        * 'włanczać' -> 'włączać'
+        * 'wyłanczać' -> 'wyłączać'
+        * 'na prawdę' -> 'naprawdę'
+        * 'na codzień' -> 'na co dzień'
+        * 'conajmniej' -> 'co najmniej'
+        * 'narazie' -> 'na razie'
+        * 'z przed' -> 'sprzed'
+        * 'z poza' -> 'spoza'
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -2108,7 +2144,13 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
    - "Heart attack" -> "zawał serca", "zawał" (ZAKAZ: "atak serca").
 15. REALIA HISTORYCZNE I STYLIZACJA ŚWIATA:
    - W seriach historycznych (np. XIII w. Imperium Mongolskie, starożytność, średniowiecze) BEZWZGLĘDNIE wyeliminuj nowoczesny slang młodzieżowy ('spoko', 'masakra', 'wkręcasz'). Dopasuj słownictwo do klimatu epoki.
-16. TERMINOLOGIA SPECJALISTYCZNA, KONSULTACJA BRANŻOWA I FLEKSJA NAZW WŁASNYCH:
+16. TERMINOLOGIA SPECJALISTYCZNA, KONSULTACJA BRANŻOWA I 4-POZIOMOWA HIERARCHIA SŁOWNIKA:
+   - 4-POZIOMOWA HIERARCHIA AUTORYTETU TERMINOLOGICZNEGO:
+     * Poziom 1 (Najwyższy — Nienaruszalny): Oficjalny Kanon Mangowy (100% polskie wydania licencjonowane Waneko, Kotori, JPF itp.).
+     * Poziom 2 (Bardzo wysoki — Ciągłość Sezonu): Biblia Serialu z poprzednich odcinków.
+     * Poziom 3 (Wysoki — Kontekst Fabularny): Profiler Odcinka & Baza AniList.
+     * Poziom 4 (NAJNIŻSZY — Pomocnicza Sugestia): Słownik Użytkownika.
+     -> ŻELAZNA ZASADA: Wpisy użytkownika mają NAJNIŻSZY priorytet. Wszelkie kolizje z Kanonem Mangi, Biblią Serialu lub kontekstem sceny bezwzględnie unieważniają wpis użytkownika. Zabrania się wymuszania błędnych, nieodmienionych lub nienaturalnych form ze słownika użytkownika.
    - FIZYCZNOŚĆ SCENERII I OŚRODEK CIEKŁY (FILAR CXXXVIII): Kategoryczny zakaz wstawiania 'wody' w scenach dziejących się w innej cieczy (browar zalany piwem -> 'pod powierzchnię / na dno / pod piwo', a NIGDY 'pod wodę'!). Zakaz 'powodzi piwa' -> 'fala piwa'. Zakaz 'padnij na ziemię' w nieważkości.
    - W seriach o tematyce niszowej (winiarstwo, muzyka, medycyna, shogi, kulinaria) bezwzględnie stosuj oficjalną polską terminologię branżową (np. w winie: 'szczep', 'rocznik', 'apelacja', 'taniny', 'kupaż', 'ciało wina').
    - ODMIANA POJĘĆ ZE SŁOWNIKA I NAZW WŁASNYCH PRZEZ PRZYPADKI: Pojęcia ze słowniczka i bazy pamięci podane są w mianowniku jako baza leksykalna. W tekście BEZWZGLĘDNIE odmieniaj je przez przypadki zgodnie z polską składnią (np. 'Twierdza Goryōkaku' -> 'w twierdzy Goryōkaku', 'do twierdzy Goryōkaku', 'Więzienie Akō' -> 'w więzieniu Akō', 'z więzienia Akō').
@@ -2385,6 +2427,7 @@ KRYTYCZNA LISTA KONTROLNA BELCZYKA:
       * "[Filar CLXI - Nienaruszalność Perspektywy] 'by the Silent Witch' wypowiedziane przez rozmówcę -> 'Wiedźmy Milczenia' (ZAKAZ podmiany 3. osoby na 1. osobę 'mój esej' z powodu ukrytej tożsamości Moniki; zakaz dodawania {{\\i1}} do słów mówionych na głos)"
       * "[Filar CLXII - Nienaruszalność Płci Imion na '-a'] 'Shira did tell me' -> 'Shira ostrzegał mnie / Shira mówił mi' (ZAKAZ 'Shira ostrzegała'; postać męska o imieniu na '-a' bezwzględnie wymaga orzeczenia męskiego w czasie przeszłym)"
       * "[Filar XLIII/CXLVI - Dyrektywne Potwierdzenie] 'Uważaj pod nogi!' -> 'T-Tak' -> 'D-Dobrze' / 'Będę uważać' (ZAKAZ 'Tak' po ostrzeżeniu/poleceniu)"
+      * "[Filar CLXIV - Czystość Ortograficzna i Anti-Typo] 'spyham' -> 'spytam / zapytam' (eliminacja deformacji leksykalnych i literówek w czasownikach pytających; wziąść -> wziąć, poszłem -> poszedłem)"
 
 {BELCZYK_AVT_MASTER_CANON}
 
@@ -2745,6 +2788,15 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Op
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR XC - Somatyczny Rezonans Emocjonalny (Douglas Robinson)]: "
             "Przekład musi wywoływać bezpośrednią reakcję cielesno-zmysłową (gęsia skórka, ucisk w gardle, śmiech) u polskiego widza."
+        )
+
+    # 39b. Fleksja imion obcych i dopełniacz dzierżawczy (Filar XCI)
+    has_possessive = any(bool(re.search(r"\b[A-Z][a-z]+'s\b", it.get("en", ""))) or bool(re.search(r"\b(?:secrets?|sword|power|orders?|death|body|blood|will|life|shadow|tomb|castle|tower|realm|son|daughter|brother|father|mother)\s+of\s+[A-Z]", it.get("en", ""))) for it in batch_items)
+    if has_possessive or any(w in combined_en for w in ["'s secrets", "'s sword", "'s power", "'s death", "'s life"]):
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR XCI - Żelazna Fleksja Imion Obcych/Fantasy i Dopełniacz Dzierżawczy]: "
+            "KATEGORYCZNY ZAKAZ pozostawiania obcych/fantasy imion w mianowniku (np. 'Drel\'s secrets' -> 'sekretów Drela' [BŁĄD KOSZMARNY: 'sekretów Drel']). "
+            "Imiona męskie na spółgłoskę bezwzględnie odmieniaj: Drel -> Drela, Gart -> Garta, Klen -> Klena."
         )
 
     # 40. Asymetria zaimków 3. osoby i triangulacja płci (Filar XCVI)
@@ -3311,20 +3363,36 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Op
             "Imiona męskie kończące się na samogłoskę '-a' (np. Shira, Akira, Gaara, Ashitaka) wymagają BEZWZGLĘDNIE orzeczeń i czasowników w rodzaju męskim w czasie przeszłym ('Shira ostrzegał / mówił / pomógł / przyszedł'). KATEGORYCZNY ZAKAZ form żeńskich ('Shira ostrzegała / mówiła')!"
         )
 
-    # 103. Morfologia Adresatywna Liczby Mnogiej (Filar CLXIII)
-    has_plural_addressee_trigger = any(
-        any(w in str(item.get("audio_jp", "")).lower() for w in ["tachi", "omae-ra", "kisama-ra", "minna", "shokun", "zen'in", "mina-sama"]) or
-        any(w in str(item.get("en", "")).lower() for w in ["you all", "you guys", "all of you", "girls", "everyone", "ladies"]) or
-        any(w in str(item.get("addressee", "")).lower() for w in ["grupa", "group"]) or
+    # 103. Morfologia Adresatywna 2. Osoby: Pojedyncza Kobieta/Mężczyzna oraz Grupy (Filar CLXIII)
+    has_addressee_trigger = any(
+        any(w in str(item.get("audio_jp", "")).lower() for w in ["tachi", "omae-ra", "kisama-ra", "minna", "shokun", "zen'in", "mina-sama", "anata", "omae", "temee", "anta"]) or
+        any(w in str(item.get("en", "")).lower() for w in ["you all", "you guys", "all of you", "girls", "everyone", "ladies", "you are", "are you", "were you", "did you"]) or
+        any(w in str(item.get("addressee", "")).lower() for w in ["grupa", "group", "kobieta", "mężczyzna", "female", "male"]) or
         any("filar clxiii" in str(item.get("notes", "")).lower() for item in [item])
         for item in batch_items
     )
-    if has_plural_addressee_trigger:
+    if has_addressee_trigger:
         focused_pillars.append(
-            "• [SKUP SIĘ NA: FILAR CLXIII - Morfologia Adresatywna Liczby Mnogiej (Męskoosobowy vs Niemęskoosobowy)]: "
-            "Dla grupy samych kobiet/dziewcząt ('grupa_kobiet') BEZWZGLĘDNIE stosuj formy niemęskoosobowe ('zrobiłyście', 'widziałyście', 'byłyście gotowe'). "
-            "Dla grupy mężczyzn lub grupy mieszanej stosuj rodzaj męskoosobowy ('zrobiliście', 'widzieliście', 'byliście gotowi'). "
-            "Przy japońskich cząstkach liczby mnogiej (-tachi, -ra, minna) KATEGORYCZNY ZAKAZ liczby pojedynczej!"
+            "• [SKUP SIĘ NA: FILAR CLXIII - Morfologia Adresatywna 2. Osoby ('ty' kobieta/mężczyzna oraz 'wy' grupy)]: "
+            "Dla pojedynczej kobiety ('kobieta') w 2. os. lp. 'ty' BEZWZGLĘDNIE stosuj formy żeńskie ('byłaś', 'zrobiłaś', 'poszłaś', 'jesteś pewna', 'gotowa'). "
+            "Dla pojedynczego mężczyzny ('mężczyzna') stosuj formy męskie ('byłeś', 'zrobiłeś', 'poszedłeś', 'jesteś pewien', 'gotowy'). "
+            "Dla grupy samych kobiet ('grupa_kobiet') stosuj formy niemęskoosobowe ('zrobiłyście', 'byłyście gotowe'). "
+            "Dla grupy mężczyzn/mieszanej stosuj męskoosobowe ('zrobiliście', 'byliście gotowi')."
+        )
+
+    # 104. Bezwzględna Kontrola Ortografii, Literówek i Czasowników Pytających (Filar CLXIV)
+    has_typo_or_inquiry_trigger = any(
+        any(w in str(item.get("en", "")).lower() for w in ["ask", "inquire", "question", "personally", "servant", "discovered", "find out"]) or
+        any(w in str(item.get("audio_jp", "")).lower() for w in ["kiku", "kikou", "tazuneru", "tou"]) or
+        any("filar clxiv" in str(item.get("notes", "")).lower() for item in [item])
+        for item in batch_items
+    )
+    if has_typo_or_inquiry_trigger:
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CLXIV - Bezwzględna Kontrola Ortografii, Literówek i Czasowników Pytających]: "
+            "Czasownik 'spytać / zapytać' w 1. os. lp. czasu przyszłego ma wyłącznie postać 'spytam' lub 'zapytam' "
+            "(KARDYNALNY BŁĄD [X]: 'spyham' [potworek leksykalny!]; POPRAWNIE: 'spytam / zapytam'). "
+            "Bezwzględny zakaz wszelkich literówek i deformacji wyrazowych (wziąść -> wziąć, poszłem -> poszedłem, włanczać -> włączać)."
         )
 
     if not focused_pillars:

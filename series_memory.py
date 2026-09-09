@@ -96,17 +96,57 @@ def generate_polish_name_declension(name: str, gender: str = "UNKNOWN") -> Dict[
             }
         elif n[-1].lower() not in "aeiouy":
             stem = n
+            last_c = n[-1].lower()
+            last_2c = n[-2:].lower() if len(n) >= 2 else ""
+            if last_c in ("l", "k", "g", "j", "c") or last_2c in ("ch", "cz", "sz", "rz"):
+                c_ms = stem + "u"
+                c_w = stem + "u"
+            elif last_c == "r":
+                c_ms = stem[:-1] + "rze"
+                c_w = stem[:-1] + "rze"
+            elif last_c == "t":
+                c_ms = stem[:-1] + "cie"
+                c_w = stem[:-1] + "cie"
+            elif last_c == "d":
+                c_ms = stem[:-1] + "dzie"
+                c_w = stem[:-1] + "dzie"
+            else:
+                c_ms = stem + "ie"
+                c_w = stem + "ie"
+
             return {
                 "M": n,
                 "D": stem + "a",
                 "C": stem + "owi",
                 "B": stem + "a",
                 "N": stem + "em",
-                "Ms": stem + "ie",
-                "W": stem + "ie"
+                "Ms": c_ms,
+                "W": c_w
             }
         else:
             return {"M": n, "D": n, "C": n, "B": n, "N": n, "Ms": n, "W": n}
+
+
+def sanitize_lexical_text(text: str) -> str:
+    """Sanitizes text against known LLM/OCR typos and deformed Polish words (Filar CLXIV)."""
+    if not text:
+        return ""
+    TYPO_NORMALIZATIONS = [
+        (r"(^|[^\w]|\\[Nnh])([Ss])pyh(am|asz|a|amy|acie|ają|ać|ał|ała|ało|ali|ały|ano)\b", r"\g<1>\g<2>pyt\g<3>"),
+        (r"(^|[^\w]|\\[Nnh])([Ww])ziąść\b", r"\g<1>\g<2>ziąć"),
+        (r"(^|[^\w]|\\[Nnh])([Pp])oszłem\b", r"\g<1>\g<2>oszedłem"),
+        (r"(^|[^\w]|\\[Nnh])([Ww])łancza(ć|m|sz|my|cie|ją|ł|ła|ło|li|ły|no|nie|nia|niem)?\b", r"\g<1>\g<2>łącza\g<3>"),
+        (r"(^|[^\w]|\\[Nnh])([Ww])yłancza(ć|m|sz|my|cie|ją|ł|ła|ło|li|ły|no|nie|nia|niem)?\b", r"\g<1>\g<2>yłącza\g<3>"),
+        (r"(^|[^\w]|\\[Nnh])([Nn])a\s+codzień\b", r"\g<1>\g<2>a co dzień"),
+        (r"(^|[^\w]|\\[Nnh])([Cc])onajmniej\b", r"\g<1>\g<2>o najmniej"),
+        (r"(^|[^\w]|\\[Nnh])([Nn])arazie\b", r"\g<1>\g<2>a razie"),
+        (r"(^|[^\w]|\\[Nnh])([Zz])\s+przed\b", r"\g<1>sprzed"),
+        (r"(^|[^\w]|\\[Nnh])([Zz])\s+poza\b", r"\g<1>spoza"),
+    ]
+    res = text
+    for pat, repl in TYPO_NORMALIZATIONS:
+        res = re.sub(pat, repl, res)
+    return res
 
 
 class SeriesBible:
@@ -168,7 +208,7 @@ class SeriesBible:
             "ryoma", "hanza", "koba", "soya", "toma", "genga", "sinbad", "judar", "alibaba"
         }
 
-        clean_desc = details.strip()
+        clean_desc = sanitize_lexical_text(details.strip())
         name_lower = name.lower()
 
         # Check if the relationship or character involves a confirmed male character
@@ -207,16 +247,28 @@ class SeriesBible:
             if "męskoosobow" not in clean_desc.lower() and "-liście" not in clean_desc.lower():
                 clean_desc = f"{clean_desc} [GRUPA MĘŻCZYZN - Wymóg rodzaju męskoosobowego: -liście / byliście gotowi]".strip()
 
+        # Safeguard singular addressee morphology in Series Bible (Filar CLXIII)
+        is_single_female = any(w in clean_desc.lower() for w in ["kobieta", "female", "dziewczyna", "nauczycielka", "uczennica", "kapłanka", "pani"]) and not is_female_group and not involves_male
+        if is_single_female:
+            if "2. os. lp." not in clean_desc.lower() and "-łaś" not in clean_desc.lower():
+                clean_desc = f"{clean_desc} [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]".strip()
+
+        is_single_male = any(w in clean_desc.lower() for w in ["mężczyzna", "male", "chłopak", "żołnierz", "pan", "uczeń"]) and not is_male_group
+        if is_single_male:
+            if "2. os. lp." not in clean_desc.lower() and "-łeś" not in clean_desc.lower():
+                clean_desc = f"{clean_desc} [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]".strip()
+
         return clean_desc
 
     def update_from_episode_profile(
         self,
-        episode_name: str,
-        characters: Dict[str, str],
-        glossary: Dict[str, str],
-        plot_anchors: Optional[Dict[str, str]] = None
+        episode_name: str = "",
+        characters: Optional[Dict[str, str]] = None,
+        glossary: Optional[Dict[str, str]] = None,
+        plot_anchors: Optional[Dict[str, str]] = None,
+        relationships: Optional[Dict[str, str]] = None,
     ):
-        """Updates glossary, character registry, and plot anchors based on Profiler output of a new episode."""
+        """Updates glossary, character registry, relationships, and plot anchors based on Profiler output of a new episode."""
         if episode_name and episode_name not in self.data["episodes_translated"]:
             self.data["episodes_translated"].append(episode_name)
 
@@ -259,15 +311,31 @@ class SeriesBible:
                 c_gender = "MALE" if (any(w in clean_details.lower() for w in ["mężczyzna", "męsk", "male", "chłopak"]) and not any(w in clean_details.lower() for w in FEMALE_KEYWORDS)) else ("FEMALE" if any(w in clean_details.lower() for w in FEMALE_KEYWORDS) else "UNKNOWN")
                 if "declensions" not in self.data:
                     self.data["declensions"] = {}
-                self.data["declensions"][name] = generate_polish_name_declension(name, c_gender)
+
+                names_to_decline = [name]
+                if "->" in name:
+                    names_to_decline.extend([p.strip() for p in name.split("->")])
+                elif "/" in name:
+                    names_to_decline.extend([p.strip() for p in name.split("/")])
+
+                for single_n in names_to_decline:
+                    if single_n and len(single_n) >= 3 and not any(ch in single_n for ch in "->/"):
+                        self.data["declensions"][single_n] = generate_polish_name_declension(single_n, c_gender)
 
         if glossary:
             import re
             for k, v in glossary.items():
                 # Store non-trivial terms only and sanitize parenthetical descriptions
                 if k and v and len(k) > 1 and len(v) > 1:
-                    clean_v = re.sub(r"\s*[\(\[].*?[\)\]]", "", v).strip()
-                    self.data["glossary"][k] = clean_v if clean_v else v.strip()
+                    clean_k = str(k).strip()
+                    clean_v = sanitize_lexical_text(re.sub(r"\s*[\(\[].*?[\)\]]", "", v).strip())
+                    if clean_k and clean_v:
+                        # Case-insensitive update to prevent duplicate collisions
+                        norm_k = clean_k.lower()
+                        for old_k in list(self.data["glossary"].keys()):
+                            if old_k.lower() == norm_k and old_k != clean_k:
+                                del self.data["glossary"][old_k]
+                        self.data["glossary"][clean_k] = clean_v
 
         if plot_anchors:
             if "plot_anchors" not in self.data:
@@ -275,9 +343,23 @@ class SeriesBible:
             for k, v in plot_anchors.items():
                 if k and v:
                     clean_k = str(k).strip()
-                    clean_v = str(v).strip()
+                    clean_v = sanitize_lexical_text(str(v).strip())
                     if clean_k and clean_v:
                         self.data["plot_anchors"][clean_k] = clean_v
+
+        if relationships:
+            if "relationships" not in self.data:
+                self.data["relationships"] = {}
+            for rel_k, rel_v in relationships.items():
+                if rel_k and rel_v:
+                    self.data["relationships"][rel_k] = sanitize_lexical_text(str(rel_v).strip())
+                    # Also extract names from relationships to decline them
+                    import re
+                    for part in re.split(r"->|/|,", rel_k):
+                        part_clean = part.strip()
+                        if len(part_clean) >= 3 and not any(ch in part_clean for ch in "{}[]():;"):
+                            if part_clean not in self.data["declensions"]:
+                                self.data["declensions"][part_clean] = generate_polish_name_declension(part_clean, "UNKNOWN")
 
         self.save()
 

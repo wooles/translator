@@ -13,9 +13,15 @@ from typing import Dict, List, Tuple, Any, Optional
 
 GLOBAL_GLOSSARY_PATH = Path(__file__).parent / "global_glossary.json"
 
+DANGEROUS_POLISH_HOMOGRAPHS = {
+    "to", "no", "do", "on", "i", "a", "ja", "ze", "ma", "te", "ta", "co",
+    "ten", "pan", "tam", "dla", "bez", "jak", "sie", "się", "ale", "lub", "czy"
+}
+
 class GlossaryManager:
     """
-    Manages global and per-series term glossaries with deterministic overrides.
+    Manages global and per-series term glossaries with deterministic overrides
+    and strict 4-tier authority hierarchy (Manga Canon > Series Bible > Profiler > User Glossary).
     """
     def __init__(self, global_path: Optional[Path] = None):
         self.global_path = global_path or GLOBAL_GLOSSARY_PATH
@@ -66,31 +72,85 @@ class GlossaryManager:
             return True
         return False
 
-    def get_combined_glossary(self, series_glossary: Optional[Dict[str, str]] = None, keep_honorifics: bool = True) -> Dict[str, str]:
+    def get_combined_glossary(
+        self,
+        series_glossary: Optional[Dict[str, str]] = None,
+        keep_honorifics: bool = True,
+        manga_canon_glossary: Optional[Dict[str, str]] = None,
+        profiler_glossary: Optional[Dict[str, str]] = None,
+        user_glossary: Optional[Dict[str, str]] = None
+    ) -> Dict[str, str]:
         """
-        Combines global glossary with Series Bible glossary (series takes precedence).
-        Returns simple mapping {source_term: target_pl_translation}.
+        Combines glossaries strictly according to the 4-tier authority hierarchy:
+        Tier 1 (Highest): Manga Canon (100% official Polish licensed publications)
+        Tier 2 (Very High): Series Bible (cross-episode continuity of the season)
+        Tier 3 (High): Episode Profile (pre-pass context from current episode & AniList)
+        Tier 4 (Lowest - Fallback only): User / Global Glossary (user_glossary or self.global_terms)
+
+        Any collision is resolved in favor of higher tiers, completely preventing
+        unintended or low-quality user entries from overriding canon, series continuity, or episode context.
         """
         combined: Dict[str, str] = {}
-        # 1. Global terms
-        for k, v in self.global_terms.items():
-            if not keep_honorifics and k.lower() in ("senpai", "sensei", "kun", "chan", "san", "sama"):
-                continue
-            combined[k] = v.get("pl", "") if isinstance(v, dict) else str(v)
-        # 2. Series-specific terms (override global)
-        if series_glossary:
-            for k, v in series_glossary.items():
-                if k and v:
-                    if not keep_honorifics and k.lower() in ("senpai", "sensei", "kun", "chan", "san", "sama"):
+
+        def _normalize_key(k: str) -> str:
+            return k.strip().lower()
+
+        # Helper to safely put entries into combined dictionary with case-insensitive collision purge
+        def _merge_layer(source_dict: Optional[Dict[str, str]], is_user_fallback: bool = False):
+            if not source_dict:
+                return
+            for k, raw_v in source_dict.items():
+                if not k or not raw_v:
+                    continue
+                k_clean = k.strip()
+                v_clean = raw_v.get("pl", "") if isinstance(raw_v, dict) else str(raw_v).strip()
+                if not k_clean or not v_clean:
+                    continue
+
+                if not keep_honorifics and k_clean.lower() in ("senpai", "sensei", "kun", "chan", "san", "sama"):
+                    continue
+
+                # Layer 4 (User Glossary) Safety Gates:
+                if is_user_fallback:
+                    # Guard 1: Filter out dangerous short words / Polish homographs (e.g. 'to', 'no', 'do', 'on')
+                    if " " not in k_clean and (len(k_clean) < 3 or k_clean.lower() in DANGEROUS_POLISH_HOMOGRAPHS):
                         continue
-                    combined[k] = v
+                    # Guard 2: Reject identical src == trg
+                    if k_clean.lower() == v_clean.lower():
+                        continue
+
+                # Remove any existing collision (case-insensitive)
+                norm_k = _normalize_key(k_clean)
+                keys_to_remove = [existing_k for existing_k in combined.keys() if _normalize_key(existing_k) == norm_k]
+                for old_k in keys_to_remove:
+                    del combined[old_k]
+
+                combined[k_clean] = v_clean
+
+        # 1. Tier 4 (Lowest): User / Global Glossary
+        user_terms = user_glossary if user_glossary is not None else self.global_terms
+        _merge_layer(user_terms, is_user_fallback=True)
+
+        # 2. Tier 3 (High): Episode Profile
+        _merge_layer(profiler_glossary, is_user_fallback=False)
+
+        # 3. Tier 2 (Very High): Series Bible
+        _merge_layer(series_glossary, is_user_fallback=False)
+
+        # 4. Tier 1 (Highest - Absolute): Manga Canon
+        _merge_layer(manga_canon_glossary, is_user_fallback=False)
+
         return combined
 
-    def format_for_prompt(self, glossary_dict: Dict[str, str]) -> str:
+    def format_for_prompt(
+        self,
+        glossary_dict: Dict[str, str],
+        user_fallback_dict: Optional[Dict[str, str]] = None
+    ) -> str:
         """
-        Formats glossary for high-priority LLM prompt injection.
+        Formats glossary for high-priority LLM prompt injection with strict hierarchy transparency.
         """
-        if not glossary_dict:
+        if not glossary_dict and not user_fallback_dict:
             return ""
 
         lines = [
@@ -98,9 +158,17 @@ class GlossaryManager:
             "Poniższe pojęcia to kanoniczne polskie odpowiedniki (podane w mianowniku jako forma bazowa).",
             "W zdaniach BEZWZGLĘDNIE ODMIENIAJ JE PRZEZ PRZYPADKI zgodnie z polską gramatyką i przyimkami (np. 'Twierdza Goryōkaku' -> 'w twierdzy Goryōkaku', 'do twierdzy Goryōkaku', 'Więzienie Akō' -> 'w więzieniu Akō', 'z więzienia Akō'; ZAKAZ sztywnego mianownika po przyimkach typu 'w Twierdza'!):"
         ]
-        for src, raw_trg in glossary_dict.items():
+        for src, raw_trg in (glossary_dict or {}).items():
             trg = self.clean_target_term(raw_trg)
             lines.append(f" • '{src}' => '{trg}'")
+
+        if user_fallback_dict:
+            lines.append("\n--- POMOCNICZE SUGESTIE SŁOWNIKOWE (NISKI PRIORYTET) ---")
+            lines.append("Poniższe propozycje użytkownika stosuj WYŁĄCZNIE wtedy, gdy nie naruszają powyższego kanonu, kontekstu sceny ani naturalnej polszczyzny:")
+            for src, raw_trg in user_fallback_dict.items():
+                trg = self.clean_target_term(raw_trg)
+                lines.append(f" • [Sugestia pomocnicza] '{src}' => '{trg}'")
+
         lines.append("----------------------------------------------------------------------------\n")
         return "\n".join(lines)
 
@@ -134,6 +202,10 @@ class GlossaryManager:
 
         for src, raw_trg in sorted_glossary:
             if not src or not raw_trg:
+                continue
+
+            # Stopword & safety protection: do not substitute single short words that collide with Polish
+            if " " not in src and (len(src) < 3 or src.lower() in DANGEROUS_POLISH_HOMOGRAPHS):
                 continue
 
             trg = cls.clean_target_term(raw_trg)

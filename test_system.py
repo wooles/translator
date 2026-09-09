@@ -3363,6 +3363,55 @@ def test_multimodal_addressee_and_plural_group_resolution():
     assert audited_m.events[0].text == "Żołnierze, dokąd poszliście?", f"Otrzymano: {audited_m.events[0].text}"
     assert any("Filar CLXIII Morfologia Męskoosobowa" in f for f in fixes_m)
 
+    # 4c. Pojedyncza kobieta z błędem męskim w 2. os. lp. (zrobiłeś -> zrobiłaś, byłeś pewien -> byłaś pewna)
+    from avt_linter import convert_2nd_person_masculine_to_feminine, convert_2nd_person_feminine_to_masculine
+    assert convert_2nd_person_masculine_to_feminine("zrobiłeś") == "zrobiłaś"
+    assert convert_2nd_person_masculine_to_feminine("byłeś") == "byłaś"
+    assert convert_2nd_person_masculine_to_feminine("poszedłeś") == "poszłaś"
+    assert convert_2nd_person_masculine_to_feminine("przyszedłeś") == "przyszłaś"
+    assert convert_2nd_person_masculine_to_feminine("mogłeś") == "mogłaś"
+    assert convert_2nd_person_masculine_to_feminine("wziąłeś") == "wzięłaś"
+
+    assert convert_2nd_person_feminine_to_masculine("zrobiłaś") == "zrobiłeś"
+    assert convert_2nd_person_feminine_to_masculine("byłaś") == "byłeś"
+    assert convert_2nd_person_feminine_to_masculine("poszłaś") == "poszedłeś"
+    assert convert_2nd_person_feminine_to_masculine("przyszłaś") == "przyszedłeś"
+    assert convert_2nd_person_feminine_to_masculine("mogłaś") == "mogłeś"
+    assert convert_2nd_person_feminine_to_masculine("wzięłaś") == "wziąłeś"
+
+    subs_fem = pysubs2.SSAFile()
+    ev_f1 = pysubs2.SSAEvent(start=1000, end=3000, name="Shin", text="Naie, czy zrobiłeś to na czas?")
+    ev_f1.addressee = "kobieta"
+    ev_f2 = pysubs2.SSAEvent(start=4000, end=6000, name="Shin", text="Czy byłeś pewien, Naie?")
+    ev_f2.addressee = "kobieta"
+    subs_fem.events = [ev_f1, ev_f2]
+
+    audited_fem, fixes_fem = EpisodeQualityGate.audit_and_fix_entire_episode(
+        subs_fem,
+        character_registry=tr.character_registry
+    )
+    assert audited_fem.events[0].text == "Naie, czy zrobiłaś to na czas?", f"Otrzymano: {audited_fem.events[0].text}"
+    assert audited_fem.events[1].text == "Czy byłaś pewna, Naie?", f"Otrzymano: {audited_fem.events[1].text}"
+    assert any("Filar CLXIII Morfologia Żeńska 2. os. lp." in f for f in fixes_fem)
+    assert any("Filar CLXIII Przymiotnik Żeński 2. os. lp." in f for f in fixes_fem)
+
+    # 4d. Pojedynczy mężczyzna z błędem żeńskim w 2. os. lp. (poszłaś -> poszedłeś, byłaś gotowa -> byłeś gotowy)
+    subs_male = pysubs2.SSAFile()
+    ev_mal1 = pysubs2.SSAEvent(start=1000, end=3000, name="Naie", text="Shin, dlaczego poszłaś tam sama?")
+    ev_mal1.addressee = "mężczyzna"
+    ev_mal2 = pysubs2.SSAEvent(start=4000, end=6000, name="Naie", text="Czy byłaś gotowa, Shin?")
+    ev_mal2.addressee = "mężczyzna"
+    subs_male.events = [ev_mal1, ev_mal2]
+
+    audited_male, fixes_male = EpisodeQualityGate.audit_and_fix_entire_episode(
+        subs_male,
+        character_registry=tr.character_registry
+    )
+    assert audited_male.events[0].text == "Shin, dlaczego poszedłeś tam sam?", f"Otrzymano: {audited_male.events[0].text}"
+    assert audited_male.events[1].text == "Czy byłeś gotowy, Shin?", f"Otrzymano: {audited_male.events[1].text}"
+    assert any("Filar CLXIII Morfologia Męska 2. os. lp." in f for f in fixes_male)
+    assert any("Filar CLXIII Przymiotnik Męski 2. os. lp." in f for f in fixes_male)
+
     # 5. Test Biblii Serialu (Series Bible) i zachowania definicji grup (Layer 2)
     from series_memory import SeriesBible
     bible = SeriesBible("Test_Series_CLXIII")
@@ -3570,6 +3619,199 @@ def test_gemini_developer_api_schema_compliance_no_additional_properties():
     print(" -> PASSED: Pełna zgodność schematów z Gemini Developer API mode (0.00 additionalProperties) w 100% aktywna.")
 
 
+def test_user_glossary_lowest_priority_guard():
+    print("[TEST 49/49] Test Nadrzędności Kanonu i Najniższego Priorytetu Słownika Użytkownika (4-Tier Hierarchy)...")
+    from glossary_manager import GlossaryManager
+
+    with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as f:
+        tmp_json = Path(f.name)
+
+    try:
+        mgr = GlossaryManager(global_path=tmp_json)
+
+        # 1. Symulacja ryzykownych / kolidujących wpisów użytkownika
+        user_test_entries = {
+            "great khan": "Wielki Szef",         # Kolizja z Kanonem Mangi (Tier 1)
+            "Black Tower": "Czarna Budka",       # Kolizja z Biblią Serialu (Tier 2)
+            "Soul Orb": "Kulka Dusz",            # Kolizja z Profilerem Odcinka (Tier 3)
+            "to": "dla",                         # Niebezpieczny homonim polski (Stopword guard)
+            "do": "robić",                       # Niebezpieczny homonim polski
+            "Custom Shield": "Tarcza Mocy"       # Bezpieczny, niekolidujący termin pomocniczy (Tier 4)
+        }
+
+        canon_dict = {"Great Khan": "Wielki Chan"}
+        series_dict = {"Black Tower": "Czarna Wieża"}
+        profiler_dict = {"Soul Orb": "Sfera Dusz"}
+
+        combined = mgr.get_combined_glossary(
+            series_glossary=series_dict,
+            manga_canon_glossary=canon_dict,
+            profiler_glossary=profiler_dict,
+            user_glossary=user_test_entries
+        )
+
+        # Asercja 1: Kanon Mangi (Tier 1) bezwzględnie eliminuje wpis użytkownika
+        assert combined.get("Great Khan") == "Wielki Chan", f"Błąd: oczekiwano 'Wielki Chan', otrzymano: {combined.get('Great Khan')}"
+        assert "great khan" not in combined, "Błąd: wielkość liter użytkownika nie została scalona z kanonem!"
+
+        # Asercja 2: Biblia Serialu (Tier 2) bezwzględnie eliminuje wpis użytkownika
+        assert combined.get("Black Tower") == "Czarna Wieża", f"Błąd: oczekiwano 'Czarna Wieża', otrzymano: {combined.get('Black Tower')}"
+
+        # Asercja 3: Profiler Odcinka (Tier 3) bezwzględnie eliminuje wpis użytkownika
+        assert combined.get("Soul Orb") == "Sfera Dusz", f"Błąd: oczekiwano 'Sfera Dusz', otrzymano: {combined.get('Soul Orb')}"
+
+        # Asercja 4: Twardy bezpiecznik homonimów polszczyzny usuwa niebezpieczne krótkie słowa stopowe
+        assert "to" not in combined, "Błąd: niebezpieczne słowo 'to' nie zostało odfiltrowane ze słownika użytkownika!"
+        assert "do" not in combined, "Błąd: niebezpieczne słowo 'do' nie zostało odfiltrowane ze słownika użytkownika!"
+
+        # Asercja 5: Prawidłowy wpis użytkownika bez kolizji zostaje zachowany jako bezpieczny fallback
+        assert combined.get("Custom Shield") == "Tarcza Mocy", "Błąd: bezpieczny termin użytkownika nie został zachowany jako fallback!"
+
+        # Asercja 6: Deterministyczny post-processing nie niszczy polskich słów 'to', 'do'
+        test_line = "To jest Black Tower, a nie zwykły dom."
+        fixed_text, fixes = GlossaryManager.apply_deterministic_overrides(test_line, combined)
+        assert "Czarna Wieża" in fixed_text, "Błąd: termin kanoniczny nie został wdrożony!"
+        assert fixed_text.startswith("To jest"), f"Błąd: polskie słowo 'To' zostało uszkodzone przez podmianę! Wynik: {fixed_text}"
+
+        # Asercja 7: Formatowanie promptu z jawną separacją priorytetów
+        prompt_sec = mgr.format_for_prompt(combined, user_fallback_dict={"Custom Shield": "Tarcza Mocy"})
+        assert "BEZWZGLĘDNY SŁOWNICZEK" in prompt_sec
+        assert "POMOCNICZE SUGESTIE SŁOWNIKOWE (NISKI PRIORYTET)" in prompt_sec
+
+    finally:
+        if tmp_json.exists():
+            tmp_json.unlink()
+
+    print(" -> PASSED: 4-poziomowa hierarchia terminologii, ochrona kanonu i tarcza słownika użytkownika działają w 100% harmonii (0.00 PLN).")
+
+
+def test_foreign_fantasy_name_declension_and_genitive_possession_guard():
+    print("[TEST 50/50] Test Żelaznej Fleksji Imion Obcych/Fantasy, Dopełniacza Dzierżawczego i Episode Quality Gate...")
+    from pathlib import Path
+    import pysubs2
+    from series_memory import generate_polish_name_declension, SeriesBible
+    from rules import get_focused_rules_for_batch
+    from avt_linter import EpisodeQualityGate
+
+    # Asercja 1: Generowanie 7-przypadkowej matrycy deklinacji dla imion obcych/fantasy zakończonych na spółgłoskę (-l, -t, -n, -k itp.)
+    drel_decl = generate_polish_name_declension("Drel", "MALE")
+    assert drel_decl["M"] == "Drel", f"Błąd: oczekiwano 'Drel', otrzymano: {drel_decl['M']}"
+    assert drel_decl["D"] == "Drela", f"Błąd: oczekiwano 'Drela', otrzymano: {drel_decl['D']}"
+    assert drel_decl["C"] == "Drelowi", f"Błąd: oczekiwano 'Drelowi', otrzymano: {drel_decl['C']}"
+    assert drel_decl["B"] == "Drela", f"Błąd: oczekiwano 'Drela', otrzymano: {drel_decl['B']}"
+    assert drel_decl["N"] == "Drelem", f"Błąd: oczekiwano 'Drelem', otrzymano: {drel_decl['N']}"
+    assert drel_decl["Ms"] == "Drelu", f"Błąd: oczekiwano 'Drelu', otrzymano: {drel_decl['Ms']}"
+    assert drel_decl["W"] == "Drelu", f"Błąd: oczekiwano 'Drelu', otrzymano: {drel_decl['W']}"
+
+    gart_decl = generate_polish_name_declension("Gart", "MALE")
+    assert gart_decl["D"] == "Garta"
+    assert gart_decl["Ms"] == "Garcie"
+
+    klen_decl = generate_polish_name_declension("Klen", "MALE")
+    assert klen_decl["D"] == "Klena"
+    assert klen_decl["Ms"] == "Klenie"
+
+    # Asercja 2: Aktualizacja Biblii Serialu automatycznie ekstrahuje imiona z relacji (A -> B) i generuje deklinacje
+    import tempfile
+    with tempfile.TemporaryDirectory() as tmpdir:
+        bible = SeriesBible("TestDrelContinuity", storage_dir=Path(tmpdir))
+        bible.update_from_episode_profile(
+            characters={"Gart": "Mężczyzna, dowódca", "Drel": "Mężczyzna, wróg"},
+            relationships={"Gart -> Drel": "Konflikt o władzę"}
+        )
+        assert "Drel" in bible.data["declensions"], "Błąd: 'Drel' nie został zarejestrowany w declensions Biblii Serialu!"
+        assert bible.data["declensions"]["Drel"]["D"] == "Drela"
+        assert bible.data["declensions"]["Drel"]["Ms"] == "Drelu"
+
+    # Asercja 3: Dynamiczny dyspozytor uwagi (focused_pillars) aktywuje Filar XCI dla dopełniacza dzierżawczego ('s / of)
+    batch_pos = [{"en": "Are you looking for Drel's secrets?"}]
+    rules_out = get_focused_rules_for_batch(batch_pos)
+    assert "FILAR XCI" in rules_out, "Błąd: Filar XCI nie został aktywowany dla angielskiego possessive 's!"
+    assert "Drela" in rules_out, "Błąd: Reguła fleksji Drela nie pojawiła się w promptcie skupienia!"
+
+    # Asercja 4: EpisodeQualityGate deterministycznie naprawia linię zgłoszoną przez użytkownika
+    subs = pysubs2.SSAFile()
+    ev1 = pysubs2.SSAEvent(start=1000, end=4000, text=r"Wiem, po co tu jesteś.\NSzukasz sekretów Drel.", name="Gart", style="Main")
+    ev2 = pysubs2.SSAEvent(start=5000, end=7000, text="Miecz Drel został zniszczony.", name="Gart", style="Main")
+    ev3 = pysubs2.SSAEvent(start=8000, end=10000, text="Nie widziałem Gart od wczoraj.", name="Drel", style="Main")
+    ev4 = pysubs2.SSAEvent(start=11000, end=13000, text="Dzięki Drel wszystko ocalało.", name="Alicia", style="Main")
+    ev5 = pysubs2.SSAEvent(start=14000, end=16000, text="Rozmawiają o Drel.", name="Gart", style="Main")
+    ev6 = pysubs2.SSAEvent(start=17000, end=19000, text=r"Wiem, po co tu jesteś.\NSzukasz sekretów Drela.", name="Gart", style="Main")
+
+    subs.events = [ev1, ev2, ev3, ev4, ev5, ev6]
+    fixed_subs, fixes = EpisodeQualityGate.audit_and_fix_entire_episode(
+        subs,
+        character_registry={"Drel": "MALE", "Gart": "MALE"}
+    )
+
+    # Weryfikacja naprawy zgłoszonego błędu
+    assert fixed_subs.events[0].text == r"Wiem, po co tu jesteś.\NSzukasz sekretów Drela.", f"Błąd w linii zgłoszonej: {fixed_subs.events[0].text}"
+    assert fixed_subs.events[1].text == "Miecz Drela został zniszczony.", f"Błąd w dopełniaczu posiadacza: {fixed_subs.events[1].text}"
+    assert fixed_subs.events[2].text == "Nie widziałem Garta od wczoraj.", f"Błąd w zaprzeczonym orzeczeniu: {fixed_subs.events[2].text}"
+    assert fixed_subs.events[3].text == "Dzięki Drelowi wszystko ocalało.", f"Błąd w celowniku: {fixed_subs.events[3].text}"
+    assert fixed_subs.events[4].text == "Rozmawiają o Drelu.", f"Błąd w miejscowniku: {fixed_subs.events[4].text}"
+    # Weryfikacja braku podwójnej deklinacji dla formy już poprawnej
+    assert fixed_subs.events[5].text == r"Wiem, po co tu jesteś.\NSzukasz sekretów Drela.", f"Błąd: podwójna zmiana poprawnej formy: {fixed_subs.events[5].text}"
+
+    # Asercja 5: Deterministyczna deklinacja działa również bez rejestru postaci, na podstawie samych aktorów odcinka (ev.name)
+    subs_auto = pysubs2.SSAFile()
+    ev_auto1 = pysubs2.SSAEvent(start=1000, end=3000, text="Szukasz sekretów Drel.", name="Gart", style="Main")
+    ev_auto2 = pysubs2.SSAEvent(start=4000, end=6000, text="Jestem Drel.", name="Drel", style="Main")
+    subs_auto.events = [ev_auto1, ev_auto2]
+    auto_fixed, _ = EpisodeQualityGate.audit_and_fix_entire_episode(subs_auto)
+    assert auto_fixed.events[0].text == "Szukasz sekretów Drela.", f"Błąd: aktor 'Drel' nie został automatycznie odmieniony: {auto_fixed.events[0].text}"
+
+    print(" -> PASSED: Fleksja imion obcych/fantasy, dopełniacz dzierżawczy i twardy bezpiecznik EpisodeQualityGate działają w 100% harmonii (0.00 PLN).")
+
+
+def test_lexical_typo_correction_and_orthographic_integrity_guard():
+    print("[TEST 51/51] Test Eliminacji Literówek, Integralności Ortograficznej (Filar CLXIV) i EpisodeQualityGate...")
+    import pysubs2
+    from avt_linter import AVTLinter, EpisodeQualityGate
+    from rules import get_focused_rules_for_batch
+    from series_memory import SeriesBible, sanitize_lexical_text
+
+    # Asercja 1: AVTLinter bezbłędnie eliminuje literówkę 'spyham' -> 'spytam' w linii użytkownika z \N
+    raw_line = r"O to, co tam odkryła,\Nspyham moją sługę osobiście."
+    fixed_line, fixes = AVTLinter.lint_and_fix_line(raw_line)
+    assert fixed_line == r"O to, co tam odkryła,\Nspytam moją sługę osobiście.", f"Błąd lintera: {fixed_line}"
+    assert any("CLXIV" in f or "spyham" in f for f in fixes), "Błąd: brak atrybucji Filaru CLXIV w linterze!"
+
+    # Asercja 2: Obsługa odmiany czasownika (Spyham, spyhasz, spyha, spyhała)
+    t_cap, _ = AVTLinter.lint_and_fix_line("Spyham go o radę.")
+    assert t_cap == "Spytam go o radę."
+    t_past, _ = AVTLinter.lint_and_fix_line("Ona spyhała o drogę.")
+    assert t_past == "Ona spytała o drogę."
+
+    # Asercja 3: Eliminacja pozostałych deformacji fonetyczno-ortograficznych
+    t_wziac, _ = AVTLinter.lint_and_fix_line("Muszę to wziąść.")
+    assert t_wziac == "Muszę to wziąć."
+    t_poszlem, _ = AVTLinter.lint_and_fix_line("Wczoraj tam poszłem.")
+    assert t_poszlem == "Wczoraj tam poszedłem."
+    t_wlaczac, _ = AVTLinter.lint_and_fix_line("Nie wolno tego włanczać.")
+    assert t_wlaczac == "Nie wolno tego włączać."
+
+    # Asercja 4: SeriesBible i sanitize_lexical_text czyszczą wpisy glosariusza i relacji z literówek
+    assert sanitize_lexical_text("spyham o rozkazy") == "spytam o rozkazy"
+    assert sanitize_lexical_text("chciał to wziąść") == "chciał to wziąć"
+
+    # Asercja 5: Dynamiczny dyspozytor uwagi (focused_pillars) aktywuje Filar CLXIV dla słów pytania/dociekania
+    batch_inquiry = [{"en": "I will ask my servant personally about what she discovered."}]
+    rules_out = get_focused_rules_for_batch(batch_inquiry)
+    assert "FILAR CLXIV" in rules_out, "Błąd: Filar CLXIV nie został aktywowany dla zapytania!"
+    assert "spytam" in rules_out, "Błąd: wskazówka 'spytam' nie pojawiła się w promptcie skupienia!"
+
+    # Asercja 6: EpisodeQualityGate naprawia kwestię użytkownika na pełnej osi czasu z formatowaniem \N (0.00 PLN)
+    subs = pysubs2.SSAFile()
+    ev = pysubs2.SSAEvent(start=1000, end=4000, text=r"O to, co tam odkryła,\Nspyham moją sługę osobiście.", name="Klen", style="Main")
+    subs.events = [ev]
+    audited_subs, eqg_fixes = EpisodeQualityGate.audit_and_fix_entire_episode(subs)
+    assert audited_subs.events[0].text == r"O to, co tam odkryła,\Nspytam moją sługę osobiście.", f"Błąd EQG: {audited_subs.events[0].text}"
+    assert any("spyham" in f for f in eqg_fixes), "Błąd: brak odnotowania naprawy w fixes EQG!"
+
+    print(" -> PASSED: Eliminacja literówek, tarcza ortograficzna (Filar CLXIV) i EpisodeQualityGate działają w 100% harmonii (0.00 PLN).")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -3617,7 +3859,10 @@ if __name__ == "__main__":
     test_multimodal_addressee_and_plural_group_resolution()
     test_exception_driven_architecture_and_conflict_shields()
     test_gemini_developer_api_schema_compliance_no_additional_properties()
-    print("\n Wszystkie testy jednostkowe i integracyjne (48/48) zakończone pełnym sukcesem!\n")
+    test_user_glossary_lowest_priority_guard()
+    test_foreign_fantasy_name_declension_and_genitive_possession_guard()
+    test_lexical_typo_correction_and_orthographic_integrity_guard()
+    print("\n Wszystkie testy jednostkowe i integracyjne (51/51) zakończone pełnym sukcesem!\n")
 
 
 

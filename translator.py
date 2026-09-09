@@ -1972,7 +1972,7 @@ class MultimodalTranslator:
         history: List[Dict[str, str]],
         pbar: Any,
         translated_results: Optional[Dict[int, str]] = None
-    ) -> Tuple[int, Dict[int, str], Dict[int, str], List[Any], List[Dict[str, Any]], str]:
+    ) -> Tuple[int, Dict[int, str], Dict[int, str], List[Any], List[Dict[str, Any]], str, str]:
         """
         Translates and refines a single batch of dialogue lines (Thread-Safe).
         """
@@ -2568,8 +2568,12 @@ class MultimodalTranslator:
                         drift_alert = "[🚨 ALARM FILAR CLVII: Zwrot per 'pan/pani' w scenie/dialogu po imieniu na 'ty'! Kategoryczny zakaz 'wygrał pan' / 'pan wie' -> Zmień na 2. os. 'wygrałeś' / 'wiesz'!]"
                         it["notes"] = f"{it.get('notes', '')} {drift_alert}".strip()
 
-            # Multimodal Addressee Plural Warning Pinning (Filar CLXIII)
-            if it.get("addressee") == "grupa_kobiet":
+            # Multimodal Addressee Warning Pinning (Filar CLXIII)
+            if it.get("addressee") == "kobieta":
+                it["notes"] = f"{it.get('notes', '')} [🎯 ALARM FILAR CLXIII: Adresat to KOBIETA ({it.get('addressee_label', 'Kobieta')})! W 2. os. lp. ('ty') BEZWZGLĘDNY nakaz form żeńskich: 'zrobiłaś / byłaś / poszłaś / wiedziałaś / jesteś pewna / byłaś gotowa' (KATEGORYCZNY ZAKAZ form męskich: -łeś / pewien / gotowy)!]".strip()
+            elif it.get("addressee") == "mężczyzna":
+                it["notes"] = f"{it.get('notes', '')} [🎯 ALARM FILAR CLXIII: Adresat to MĘŻCZYZNA ({it.get('addressee_label', 'Mężczyzna')})! W 2. os. lp. ('ty') BEZWZGLĘDNY nakaz form męskich: 'zrobiłeś / byłeś / poszedłeś / wiedziałeś / jesteś pewien / byłeś gotowy' (KATEGORYCZNY ZAKAZ form żeńskich: -łaś / pewna / gotowa)!]".strip()
+            elif it.get("addressee") == "grupa_kobiet":
                 it["notes"] = f"{it.get('notes', '')} [🚨 ALARM FILAR CLXIII: Adresat to GRUPA KOBIET! Kategoryczny nakaz form niemęskoosobowych: 'zrobiłyście / byłyście gotowe / widziałyście' (ZAKAZ: -liście / gotowi)!]".strip()
             elif it.get("addressee") in ["grupa_mężczyzn", "grupa_mieszana"]:
                 it["notes"] = f"{it.get('notes', '')} [🚨 ALARM FILAR CLXIII: Adresat to {('GRUPA MĘŻCZYZN' if it.get('addressee') == 'grupa_mężczyzn' else 'GRUPA MIESZANA')}! Kategoryczny nakaz rodzaju męskoosobowego: 'zrobiliście / byliście gotowi / widzieliście'!]".strip()
@@ -2614,10 +2618,15 @@ class MultimodalTranslator:
         refined_region_dict: Dict[int, str] = {it["id"]: it.get("screen_region") for it in pass1_items if it.get("screen_region")}
         refined_typesetting_dict: Dict[int, Any] = {it["id"]: it.get("visual_typesetting") for it in pass1_items if it.get("visual_typesetting")}
 
+        cot_info_str = ""
         if self.enable_verifier and hasattr(self, 'verifier'):
             budget_val = getattr(self.verifier, "calculate_effective_budget", lambda items: getattr(self.verifier, "thinking_budget", 2048))(pass1_items)
             model_tag = "Flash" if "flash" in getattr(self.verifier, "model", "").lower() else "Pro"
-            pbar.set_postfix_str(f"Faza 2 (Redakcja {model_tag} CoT: {budget_val})...")
+            cot_info_str = f"Faza 2 (Redakcja {model_tag} CoT: {budget_val})"
+            with self.lock:
+                pbar.set_postfix_str(f"{cot_info_str}...")
+                pbar.refresh()
+            pbar.write(f" ├─ [{cot_info_str}]")
             # Staggered entry (350ms per thread) to prevent simultaneous TPU burst collisions on 503
             stagger_sec = (b_idx % max(1, self.concurrent_batches)) * 0.35
             if stagger_sec > 0:
@@ -2640,6 +2649,7 @@ class MultimodalTranslator:
             refined_dict.update({r.id: sanitize_sub_text(r.refined_pl) for r in refined_lines})
             refined_region_dict.update({r.id: r.screen_region for r in refined_lines if getattr(r, 'screen_region', None)})
             refined_typesetting_dict.update({r.id: r.visual_typesetting for r in refined_lines if getattr(r, 'visual_typesetting', None)})
+            any_redaction_printed = False
             for r in refined_lines:
                 orig_item = next((it for it in pass1_items if it["id"] == r.id), None)
                 orig_pl = orig_item["pl"] if orig_item else ""
@@ -2651,6 +2661,7 @@ class MultimodalTranslator:
                 has_meaningful_note = bool(ch_desc and "Zweryfikowano" not in ch_desc and ch_desc.lower() != "null")
 
                 if has_text_change or has_meaningful_note:
+                    any_redaction_printed = True
                     clean_note = ch_desc if ch_desc.startswith("[") else (f"[{ch_desc}]" if ch_desc else "")
                     pillar_note = f" {clean_note}" if clean_note else ""
 
@@ -2661,6 +2672,9 @@ class MultimodalTranslator:
                     pbar.write(f" └─ [Redaktor Dialogów] #{r.id}{pillar_note}")
                     pbar.write(f"    ├─ Szkic:  \"{disp_orig}\"")
                     pbar.write(f"    └─ Szlif:  \"{disp_ref}\"")
+
+            if not any_redaction_printed:
+                pbar.write(f" └─ [Redaktor Dialogów] Zweryfikowano bez uwag (100% zgodności z Kanonem AVT)")
 
         prev_linted_line = (lookback_history[-1]["pl"] if lookback_history else "")
         for item in pass1_items:
@@ -2728,7 +2742,7 @@ class MultimodalTranslator:
                 if "to robi" in cur_pl.lower():
                     batch_results[item["orig_idx"]] = en_to_best_pl[en_norm]
 
-        return b_idx, batch_results, batch_regions, untranslated_in_batch, pass1_items, scene_desc
+        return b_idx, batch_results, batch_regions, untranslated_in_batch, pass1_items, scene_desc, cot_info_str
 
     def translate_file(
         self,
@@ -3036,15 +3050,19 @@ class MultimodalTranslator:
         if series_bible_str:
             print(f"  [Biblia Serialu]: Wczytano ciągłość sezonu dla serii '{series_title or self.series_bible.slug}'")
 
-        # 0d. Combined User, Manga Canon and Series Bible Glossary (Deterministic)
+        # 0d. Combined User, Manga Canon and Series Bible Glossary (4-Tier Authority Hierarchy)
         series_gloss_dict = self.series_bible.data.get("glossary", {}) if hasattr(self, "series_bible") and self.series_bible else {}
-        if manga_canon_entry and manga_canon_entry.get("glossary"):
-            series_gloss_dict.update(manga_canon_entry["glossary"])
-        combined_glossary = self.glossary_manager.get_combined_glossary(series_gloss_dict)
-        if manga_canon_entry and manga_canon_entry.get("glossary"):
-            combined_glossary.update(manga_canon_entry["glossary"])
+        manga_canon_dict = manga_canon_entry.get("glossary", {}) if manga_canon_entry else {}
+        profiler_gloss_dict = {g.term_en: g.translation_pl for g in episode_profile.glossary} if (episode_profile and episode_profile.glossary) else {}
+
+        combined_glossary = self.glossary_manager.get_combined_glossary(
+            series_glossary=series_gloss_dict,
+            manga_canon_glossary=manga_canon_dict,
+            profiler_glossary=profiler_gloss_dict,
+            keep_honorifics=self.keep_honorifics
+        )
         if combined_glossary:
-            print(f"  [Słownik Deterministyczny]: Aktywnych {len(combined_glossary)} żelaznych terminów (w tym 100% Kanonu Mangowego).")
+            print(f"  [Słownik Deterministyczny]: Aktywnych {len(combined_glossary)} terminów (Hierarchia: Kanon Mangi > Biblia Serialu > Profiler > Słownik Użytkownika).")
 
         user_rules_cnt = len(self.user_feedback.list_all())
         user_feedback_str = self.user_feedback.format_for_prompt()
@@ -3213,7 +3231,7 @@ class MultimodalTranslator:
                                 print("\n[Tłumacz]: Otrzymano sygnał przerwania (⏹ Stop)...")
                                 break
                             try:
-                                b_res_idx, batch_res, batch_regs, untrans_items, pass1_items, sc_desc = future.result()
+                                b_res_idx, batch_res, batch_regs, untrans_items, pass1_items, sc_desc, b_cot = future.result()
                                 with self.lock:
                                     for orig_idx, text_res in batch_res.items():
                                         translated_results[orig_idx] = text_res
@@ -3258,8 +3276,10 @@ class MultimodalTranslator:
                                     except Exception:
                                         pass
 
-                                pbar.update(len(untrans_items))
-                                pbar.refresh()
+                                    if b_cot:
+                                        pbar.set_postfix_str(f"{b_cot}...")
+                                    pbar.update(len(untrans_items))
+                                    pbar.refresh()
 
                                 if progress_callback:
                                     try:
@@ -3286,7 +3306,7 @@ class MultimodalTranslator:
                         if loop_i > 0:
                             time.sleep(0.25)
                         try:
-                            b_res_idx, batch_res, batch_regs, untrans_items, pass1_items, sc_desc = self._process_single_batch(
+                            b_res_idx, batch_res, batch_regs, untrans_items, pass1_items, sc_desc, b_cot = self._process_single_batch(
                                 b_idx=b_idx,
                                 batch=batch,
                                 untranslated_in_batch=untranslated,
@@ -3347,8 +3367,10 @@ class MultimodalTranslator:
                                         json.dump(checkpoint_payload, cp_file, ensure_ascii=False)
                                 except Exception:
                                     pass
-                            pbar.update(len(untrans_items))
-                            pbar.refresh()
+                                if b_cot:
+                                    pbar.set_postfix_str(f"{b_cot}...")
+                                pbar.update(len(untrans_items))
+                                pbar.refresh()
 
                             if progress_callback:
                                 try:
@@ -3374,7 +3396,7 @@ class MultimodalTranslator:
                 healing_batches = create_adaptive_batches(missing_entries, base_batch_size=min(12, len(missing_entries)), max_batch_size=16)
                 for h_bidx, h_batch in enumerate(healing_batches):
                     try:
-                        _, h_res, h_regs, _, h_pass1, _ = self._process_single_batch(
+                        _, h_res, h_regs, _, h_pass1, _, h_cot = self._process_single_batch(
                             b_idx=len(batches) + h_bidx,
                             batch=h_batch,
                             untranslated_in_batch=h_batch,
@@ -3404,8 +3426,10 @@ class MultimodalTranslator:
                                     translated_typesetting[it["orig_idx"]] = it["visual_typesetting"]
                                 if it.get("addressee"):
                                     translated_addressees[it["orig_idx"]] = it["addressee"]
-                        pbar.update(len(h_res))
-                        pbar.refresh()
+                            if h_cot:
+                                pbar.set_postfix_str(f"{h_cot}...")
+                            pbar.update(len(h_res))
+                            pbar.refresh()
 
                         if progress_callback:
                             try:
@@ -3427,7 +3451,7 @@ class MultimodalTranslator:
                             if s_item[0] in translated_results:
                                 continue
                             try:
-                                _, s_res, s_regs, _, s_pass1, _ = self._process_single_batch(
+                                _, s_res, s_regs, _, s_pass1, _, s_cot = self._process_single_batch(
                                     b_idx=len(batches) + 500,
                                     batch=[s_item],
                                     untranslated_in_batch=[s_item],
@@ -3457,8 +3481,10 @@ class MultimodalTranslator:
                                             translated_typesetting[it["orig_idx"]] = it["visual_typesetting"]
                                         if it.get("addressee"):
                                             translated_addressees[it["orig_idx"]] = it["addressee"]
-                                pbar.update(len(s_res))
-                                pbar.refresh()
+                                    if s_cot:
+                                        pbar.set_postfix_str(f"{s_cot}...")
+                                    pbar.update(len(s_res))
+                                    pbar.refresh()
                             except Exception as s_err:
                                 pbar.write(f"  [Zero-Gap Guard]: Awaryjna linia #{s_item[0] + 1} nie powiodła się: {s_err}")
                                 pbar.refresh()

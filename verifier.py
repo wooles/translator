@@ -292,7 +292,11 @@ class DialogueVerifier:
                 directive_lines.append("    • PIOSENKA: Wymóg rymu i metrum sylabicznego (Filar CXVIII - Barańczak)!")
             if item.get('ambiguity_note'):
                 directive_lines.append(f"    • Wątpliwość Fazy 1: {item['ambiguity_note'].strip()}")
-            if item.get('addressee') == 'grupa_kobiet':
+            if item.get('addressee') == 'kobieta':
+                directive_lines.append(f"    • ADRESAT ({item.get('addressee_label', 'KOBIETA')}): Wymóg form żeńskich w 2. os. lp. ('ty'): 'zrobiłaś / byłaś / poszłaś / wiedziałaś / jesteś pewna / byłaś gotowa' (ZAKAZ: -łeś / pewien / gotowy) (Filar CLXIII)!")
+            elif item.get('addressee') == 'mężczyzna':
+                directive_lines.append(f"    • ADRESAT ({item.get('addressee_label', 'MĘŻCZYZNA')}): Wymóg form męskich w 2. os. lp. ('ty'): 'zrobiłeś / byłeś / poszedłeś / wiedziałeś / jesteś pewien / byłeś gotowy' (ZAKAZ: -łaś / pewna / gotowa) (Filar CLXIII)!")
+            elif item.get('addressee') == 'grupa_kobiet':
                 directive_lines.append("    • ADRESAT (GRUPA KOBIET): Wymóg form niemęskoosobowych: 'zrobiłyście / byłyście gotowe / widziałyście' (ZAKAZ: -liście / gotowi) (Filar CLXIII)!")
             elif item.get('addressee') in ['grupa_mężczyzn', 'grupa_mieszana']:
                 directive_lines.append(f"    • ADRESAT ({'GRUPA MĘŻCZYZN' if item.get('addressee') == 'grupa_mężczyzn' else 'GRUPA MIESZANA'}): Wymóg form męskoosobowych: 'zrobiliście / byliście gotowi / widzieliście' (Filar CLXIII)!")
