@@ -181,9 +181,10 @@ def sanitize_lexical_text(text: str) -> str:
         (r"\b[Zz]róbcie\s+swoje\s+najlepsze\b", lambda m: "Dajcie z siebie wszystko" if m.group(0)[0].isupper() else "dajcie z siebie wszystko"),
         (r"\b[Dd]obrej\s+nocy\b", lambda m: "Dobranoc" if m.group(0)[0].isupper() else "dobranoc"),
         # Anti-pivot fansub cliché eradication (Filar CLXVI)
-        (r"\b[Ww]itaj\s+z\s+powrotem\b", "Witaj!"),
-        (r"\b([Nn])ie\s+ma\s+mowy,?\s+żeby(śmy|ście|m|ś)?\b", lambda m: ("Wykluczone, by" if m.group(1).isupper() else "wykluczone, by") + (m.group(2) or "")),
-        (r"\b[Mm]am\s+taką\s+nadzieję\b", "Mam nadzieję"),
+        (r"\b([Ww])ita(j|jcie|m|my)\s+z\s+powrotem(!|\.|\.\.\.|,)?(?=\s|$|[,\.!\?])", lambda m: ("Witajcie!" if m.group(2) == "jcie" else ("Witamy!" if m.group(2) == "my" else ("Witam!" if m.group(2) == "m" else "Witaj!")))),
+        (r"\b([Nn])ie\s+ma\s+mowy,?\s+(?:że|a)?by(śmy|ście|m|ś)?\b", lambda m: ("Wykluczone, by" if m.group(1).isupper() else "wykluczone, by") + (m.group(2) or "")),
+        (r"\b([Mm](?:am|asz|a|amy|acie|ają|iałem|iałam|iał|iała|iało|ieliśmy|iałyśmy|ieli|iały|iałby|iałaby|iałoby|ieliby|iałyby)|[Bb]ęd(?:ę|ziesz|zie|ziemy|ziecie|dą)\s+mieć)\s+taką\s+nadzieję\b", r"\1 nadzieję"),
+        (r"\b([Mm](?:am|asz|a|amy|acie|ają|iałem|iałam|iał|iała|iało|ieliśmy|iałyśmy|ieli|iały|iałby|iałaby|iałoby|ieliby|iałyby)|[Bb]ęd(?:ę|ziesz|zie|ziemy|ziecie|dą)\s+mieć)\s+nadzieję\s+na\s+to\b", r"\1 nadzieję"),
     ]
     res = text
     for pat, repl in TYPO_NORMALIZATIONS:

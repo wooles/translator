@@ -65,6 +65,54 @@ def _fix_aura_gilotyna_match(m: Any) -> str:
     capitalized = f"A{tail}" if first_letter.isupper() else f"a{tail}"
     return f"{lead}{capitalized}"
 
+def _fix_robic_sens_match(m: Any) -> str:
+    neg = m.group(1) or ""
+    verb = m.group(2)
+    middle = m.group(3) or ""
+    sens = m.group(4)
+    v_lower = verb.lower()
+    mapping = {
+        "robić": "mieć",
+        "robi": "ma",
+        "robią": "mają",
+        "robisz": "masz",
+        "robię": "mam",
+        "robimy": "mamy",
+        "robicie": "macie",
+        "robił": "miał",
+        "robiła": "miała",
+        "robiło": "miało",
+        "robili": "mieli",
+        "robiły": "miały",
+        "robiłby": "miałby",
+        "robiłaby": "miałaby",
+        "robiłoby": "miałoby",
+        "robiliby": "mieliby",
+        "robiłyby": "miałyby",
+    }
+    miec_verb = mapping.get(v_lower, "ma")
+    if verb[0].isupper():
+        miec_verb = miec_verb.capitalize()
+    if neg:
+        sens = "sensu"
+    return f"{neg}{miec_verb} {middle}{sens}"
+
+def _fix_witaj_z_powrotem_match(m: Any) -> str:
+    ending = m.group(2)
+    punct = m.group(3) or ""
+    forms = {
+        "j": "Witaj",
+        "jcie": "Witajcie",
+        "m": "Witam",
+        "my": "Witamy"
+    }
+    word = forms.get(ending, "Witaj")
+    if punct == "!":
+        return f"{word}!"
+    elif punct in [".", ",", "..."]:
+        return f"{word}{punct}"
+    return f"{word}!"
+
 class AVTLinter:
     """
     Automated validator and corrector for mechanical language calques in subtitle tracks.
@@ -83,30 +131,15 @@ class AVTLinter:
         (r"(^|[^\w]|\\[Nnh])Dobrejsz(y|ego|emu|ym|a|ej|ą|e|ych|ymi)?\b", r"\g<1>Lepsz\g<2>", "Filar CLXIV - Eliminacja Zniekształcenia Leksykalnego 'dobrejszy' -> 'lepszy'"),
 
         # Americanisms and lexical calques (Pillar IV / XXXVI / CLXVI)
-        (r"\b[Ww]itaj z powrotem\b", "Witaj!", "Filar IV/XXXVI/CLXVI - Eliminacja Kalek Amerykańskich"),
-        (r"\b([Nn])ie\s+ma\s+mowy,?\s+żeby(śmy|ście|m|ś)?\b", lambda m: ("Wykluczone, by" if m.group(1).isupper() else "wykluczone, by") + (m.group(2) or ""), "Filar CLXVI - Likwidacja Kalki 'There is no way that' -> 'Wykluczone, by'"),
+        (r"\b([Ww])ita(j|jcie|m|my)\s+z\s+powrotem(!|\.|\.\.\.|,)?(?=\s|$|[,\.!\?])", _fix_witaj_z_powrotem_match, "Filar IV/XXXVI/CLXVI - Eliminacja Kalek Amerykańskich ('Witaj z powrotem')"),
+        (r"\b([Nn])ie\s+ma\s+mowy,?\s+(?:że|a)?by(śmy|ście|m|ś)?\b", lambda m: ("Wykluczone, by" if m.group(1).isupper() else "wykluczone, by") + (m.group(2) or ""), "Filar CLXVI - Likwidacja Kalki 'There is no way that' -> 'Wykluczone, by'"),
         
         # Inflections of "mieć taką nadzieję" -> "mieć nadzieję"
-        (r"\b([Mm]am|[Mm]iałem|[Mm]iałam|[Mm]ieliśmy|[Mm]iałyśmy|[Bb]ędę mieć|[Bb]ędziemy mieć)\s+taką\s+nadzieję\b", r"\1 nadzieję", "Filar IV - Czystość Idiomatyczna"),
-        (r"\b[Mm]am nadzieję na to\b", "Mam nadzieję", "Filar IV - Czystość Idiomatyczna"),
+        (r"\b([Mm](?:am|asz|a|amy|acie|ają|iałem|iałam|iał|iała|iało|ieliśmy|iałyśmy|ieli|iały|iałby|iałaby|iałoby|ieliby|iałyby)|[Bb]ęd(?:ę|ziesz|zie|ziemy|ziecie|dą)\s+mieć)\s+taką\s+nadzieję\b", r"\1 nadzieję", "Filar IV/CLXVI - Czystość Idiomatyczna (Eliminacja 'mieć taką nadzieję')"),
+        (r"\b([Mm](?:am|asz|a|amy|acie|ają|iałem|iałam|iał|iała|iało|ieliśmy|iałyśmy|ieli|iały|iałby|iałaby|iałoby|ieliby|iałyby)|[Bb]ęd(?:ę|ziesz|zie|ziemy|ziecie|dą)\s+mieć)\s+nadzieję\s+na\s+to\b", r"\1 nadzieję", "Filar IV/CLXVI - Czystość Idiomatyczna (Eliminacja 'mieć nadzieję na to')"),
 
         # Inflections of "robić sens" -> "mieć sens"
-        (r"\bTo\s+robi\s+sens\b", "To ma sens", "Filar IV - Eliminacja Kalek"),
-        (r"\bto\s+robi\s+sens\b", "to ma sens", "Filar IV - Eliminacja Kalek"),
-        (r"\brobi\s+sens\b", "ma sens", "Filar IV - Eliminacja Kalek"),
-        (r"\bTo\s+robiło\s+sens\b", "To miało sens", "Filar IV - Eliminacja Kalek"),
-        (r"\bto\s+robiło\s+sens\b", "to miało sens", "Filar IV - Eliminacja Kalek"),
-        (r"\brobiło\s+sens\b", "miało sens", "Filar IV - Eliminacja Kalek"),
-        (r"\bTo\s+będzie\s+robić\s+sens\b", "To będzie mieć sens", "Filar IV - Eliminacja Kalek"),
-        (r"\bto\s+będzie\s+robić\s+sens\b", "to będzie mieć sens", "Filar IV - Eliminacja Kalek"),
-        (r"\bTo\s+nie\s+robi\s+sensu\b", "To nie ma sensu", "Filar IV - Eliminacja Kalek"),
-        (r"\bto\s+nie\s+robi\s+sensu\b", "to nie ma sensu", "Filar IV - Eliminacja Kalek"),
-        (r"\bnie\s+robi\s+sensu\b", "nie ma sensu", "Filar IV - Eliminacja Kalek"),
-        (r"\bTo\s+nie\s+robiło\s+sensu\b", "To nie miało sensu", "Filar IV - Eliminacja Kalek"),
-        (r"\bto\s+nie\s+robiło\s+sensu\b", "to nie miało sensu", "Filar IV - Eliminacja Kalek"),
-        (r"\bnie\s+robiło\s+sensu\b", "nie miało sensu", "Filar IV - Eliminacja Kalek"),
-        (r"\bTo\s+nie\s+będzie\s+robić\s+sensu\b", "To nie będzie mieć sensu", "Filar IV - Eliminacja Kalek"),
-        (r"\bto\s+nie\s+będzie\s+robić\s+sensu\b", "to nie będzie mieć sensu", "Filar IV - Eliminacja Kalek"),
+        (r"\b([Nn]ie\s+)?([Rr]obi(?:ć|ę|sz|my|cie|ą|ł|ła|ło|li|ły|łby|łaby|łoby|liby|łyby)?)\s+((?:(?:to|jakikolwiek|żaden)\s+)*)(sens(?:u)?)\b", _fix_robic_sens_match, "Filar IV - Eliminacja Kalki 'robić sens' -> 'mieć sens'"),
 
         (r"\b[Jj]esteś w porządku\?", "Wszystko w porządku?", "Filar IV - Szablony Angielskie"),
         (r"\b[Bb]yłem w stanie to znaleźć\b", "Udało mi się to znaleźć", "Filar IV - Konstrukcje Obce"),
@@ -271,12 +304,10 @@ class AVTLinter:
         (r"\bpana\s+Wielki\s+Generał\b", "Wielkiego Generała", "Filar IV/XXVII - Poprawność Dopełniacza"),
         (r"\b[Pp]an\s+Wielki\s+Generał\b", "Wielki Generał", "Filar XXVII - Eliminacja hybrydy 'Pan Wielki Generał'"),
         (r"\bpan\s+Wielki\s+Generał\b", "Wielki Generał", "Filar XXVII - Eliminacja hybrydy 'Pan Wielki Generał'"),
-        (r"\b[Pp]ani [Ss]ensei\b", "Sensei", "Filar XXVII - Zakaz Hybryd Honoryfikatywnych"),
-        (r"\b[Pp]anie [Ss]ensei\b", "Sensei", "Filar XXVII - Zakaz Hybryd Honoryfikatywnych"),
-        (r"\b[Pp]an [Ss]ensei\b", "Sensei", "Filar XXVII - Zakaz Hybryd Honoryfikatywnych"),
-        (r"\b[Pp]ani [Ss]enpai\b", "Senpai", "Filar XXVII - Zakaz Hybryd Honoryfikatywnych"),
-        (r"\b[Pp]anie [Ss]enpai\b", "Senpai", "Filar XXVII - Zakaz Hybryd Honoryfikatywnych"),
-        (r"\b[Pp]an [Ss]enpai\b", "Senpai", "Filar XXVII - Zakaz Hybryd Honoryfikatywnych"),
+        (r"\b[Pp]anie\s+[Ss]hishou\b", "Mistrzu", "Filar XLVIII - Zakaz Hybryd Honoryfikatywnych (Panie Shishou -> Mistrzu)"),
+        (r"\b[Pp]anie\s+[Tt]aichou\b", "Kapitanie", "Filar XLVIII - Zakaz Hybryd Honoryfikatywnych (Panie Taichou -> Kapitanie)"),
+        (r"\b([Zz]e?|[Dd]o|[Oo]d|[Dd]la|[Oo]|[Uu])\s+[Pp]an(?:i|a|u|em|ie|ią)?\s+([Ss]ensei|[Ss]enpai|[Kk]ohai|[Ss]hishou|[Tt]aichou|[Ss]ama|[Dd]ono)\b", r"\1 \2", "Filar XXVII/XLVIII - Zakaz Hybryd Honoryfikatywnych po przyimku"),
+        (r"\b[Pp]an(?:i|a|u|em|ie|ią)?\s+([Ss]ensei|[Ss]enpai|[Kk]ohai|[Ss]hishou|[Tt]aichou|[Ss]ama|[Dd]ono)\b", r"\1", "Filar XXVII/XLVIII - Zakaz Hybryd Honoryfikatywnych"),
         
         # Epic & Military Collocations (Pillars IV / XLVII)
         (r"\b[Pp]owołał\s+armię\b", "zebrał armię", "Filar IV/XLVII - Epickość i naturalność ('zebrał armię' zamiast 'powołał armię')"),
@@ -350,15 +381,6 @@ class AVTLinter:
         (r"\b[Pp]an(?:a|u|em|ie)?\s+(Shizuku|Issei|Arata|Shin|Luffy|Naruto|Ichigo|Tanjiro|Deku|Yuji|Yoritsugu|Aoi|Ren|Haru|Kaito|Sora|Yuto|Riku|Takumi|Daiki)\b", r"\1", "Filar XLVI - Eliminacja sztucznego 'pan' przy imieniu męskim (-kun)"),
         (r"\b[Pp]ani\s+(Kokoro|Miyabi|Akafuku|Hana|Yui|Rin|Sakura|Akari|Nanami|Mei|Hina|Mio|Yuna|Koharu|Saki|Kanna)\b", r"\1", "Filar XLVI - Eliminacja sztucznego 'pani' przy imieniu rówieśniczki (-chan)"),
 
-        # Honorific Hybrids De-formalization (Pillar XLVIII / C)
-        (r"\b[Pp]ani\s+[Ss]ensei\b", "Sensei", "Filar XLVIII - Zakaz Hybryd Honoryfikatywnych (Pani Sensei -> Sensei)"),
-        (r"\b[Pp]anie\s+[Ss]ensei\b", "Sensei", "Filar XLVIII - Zakaz Hybryd Honoryfikatywnych (Panie Sensei -> Sensei)"),
-        (r"\b[Pp]an\s+[Ss]ensei\b", "Sensei", "Filar XLVIII - Zakaz Hybryd Honoryfikatywnych (Pan Sensei -> Sensei)"),
-        (r"\b[Pp]ani\s+[Ss]enpai\b", "Senpai", "Filar XLVIII - Zakaz Hybryd Honoryfikatywnych (Pani Senpai -> Senpai)"),
-        (r"\b[Pp]anie\s+[Ss]enpai\b", "Senpai", "Filar XLVIII - Zakaz Hybryd Honoryfikatywnych (Panie Senpai -> Senpai)"),
-        (r"\b[Pp]an\s+[Ss]enpai\b", "Senpai", "Filar XLVIII - Zakaz Hybryd Honoryfikatywnych (Pan Senpai -> Senpai)"),
-        (r"\b[Pp]anie\s+[Ss]hishou\b", "Mistrzu", "Filar XLVIII - Zakaz Hybryd Honoryfikatywnych (Panie Shishou -> Mistrzu)"),
-        (r"\b[Pp]anie\s+[Tt]aichou\b", "Kapitanie", "Filar XLVIII - Zakaz Hybryd Honoryfikatywnych (Panie Taichou -> Kapitanie)"),
 
         # 1-on-1 Dialogue Singular Number Normalization (Pillar LI / X)
         (r"\b[Ss]łyszeliście przed chwilą\b", "Słyszałeś przed chwilą", "Filar LI - Liczba Pojedyncza w Dialogu 1-na-1"),
@@ -1051,8 +1073,18 @@ FIRST_PERSON_MASCULINE_TO_FEMININE = [
     (r"\bmogłem\b", "mogłam")
 ]
 
+NON_VERBS_ON_ALA = {
+    "mała", "biała", "skała", "chwała", "ciała", "pała", "żała", "strzała", "pochwała"
+}
+
+NON_VERBS_ON_AL = {
+    "kanał", "kryształ", "szał", "wał", "ciał", "dział", "przydział", "rozdział"
+}
+
 def convert_feminine_past_to_masculine(verb: str) -> Optional[str]:
     v_lower = verb.lower()
+    if v_lower in NON_VERBS_ON_ALA:
+        return None
     if v_lower in FEMININE_IRREGULAR_TO_MASCULINE:
         res = FEMININE_IRREGULAR_TO_MASCULINE[v_lower]
         return res.capitalize() if verb[0].isupper() else res
@@ -1074,6 +1106,8 @@ def convert_feminine_past_to_masculine(verb: str) -> Optional[str]:
 
 def convert_masculine_past_to_feminine(verb: str) -> Optional[str]:
     v_lower = verb.lower()
+    if v_lower in NON_VERBS_ON_AL:
+        return None
     if v_lower in MASCULINE_IRREGULAR_TO_FEMININE:
         res = MASCULINE_IRREGULAR_TO_FEMININE[v_lower]
         return res.capitalize() if verb[0].isupper() else res
@@ -1695,7 +1729,7 @@ class EpisodeQualityGate:
                 # Check for delayed agreement fallacy ("Jasne, o co chodzi?" / "Pewnie, o co chodzi?" 4-25s after relocation request or 6s+ gap)
                 if (time_gap_ms >= 4000 and is_prev_private_request) or time_gap_ms >= 6000:
                     m_delayed_agree = re.search(
-                        r"^(\s*\{[^\}]*\})*([Jj]asne|[Pp]ewnie|[Ww]\s+porządku|[Dd]obrze|[Tt]ak|[Aa]\s+zatem|[Aa]\s+więc|[Nn]o\s+dobrze|[Nn]o\s+dobra),\s+(o\s+co\s+chodzi|co\s+się\s+stało|w\s+czym\s+rzecz|słucham|słucham\s+cię|co\s+jest|czego\s+chcesz|o\s+czym\s+chcesz|o\s+czym\s+chciałaś|o\s+czym\s+chciałeś)\b",
+                        r"^(\s*\{[^\}]*\})*([Jj]asne|[Pp]ewnie|[Ww]\s+porządku|[Dd]obrze|[Tt]ak|[Aa]\s+zatem|[Aa]\s+więc|[Nn]o\s+dobrze|[Nn]o\s+dobra)(?:[,.!?…—–-]+|\\[Nnh]+)*(?:\s+|\\N)+(o\s+co\s+chodzi|co\s+się\s+stało|w\s+czym\s+rzecz|słucham|słucham\s+cię|co\s+jest|czego\s+chcesz|o\s+czym\s+chcesz|o\s+czym\s+chciałaś|o\s+czym\s+chciałeś|w\s+czym\s+mogę\s+pomóc|zamieniam\s+się\s+w\s+słuch|o\s+co\s+biega|mów)\b",
                         ev.text,
                         re.IGNORECASE
                     )
@@ -1705,7 +1739,11 @@ class EpisodeQualityGate:
                         repl_starter = "Więc" if is_cap else "więc"
                         q_part = m_delayed_agree.group(3)
                         tag_prefix = m_delayed_agree.group(1) or ""
-                        repl_full = f"{tag_prefix}{repl_starter} {q_part}"
+                        sep_chunk = orig_lead[len(tag_prefix) + len(m_delayed_agree.group(2)):-len(q_part)]
+                        sep_repl = r"\N" if r"\N" in sep_chunk else " "
+                        if sep_repl == " " and q_part:
+                            q_part = q_part[0].lower() + q_part[1:]
+                        repl_full = f"{tag_prefix}{repl_starter}{sep_repl}{q_part}"
                         ev.text = ev.text[:m_delayed_agree.start()] + repl_full + ev.text[m_delayed_agree.end():]
                         fixes.append(
                             f"[Episode Quality Gate - Filar CLXV Dyskontinuitet Czasowy] Linia #{i+1}: "
@@ -1716,11 +1754,12 @@ class EpisodeQualityGate:
             # 1b. GESTURAL / PHYSICAL "HERE" -> "TUTAJ" CALQUE & ISOLATED KAKEGOE GUARD (Filar IV & XVIII)
             if not is_sign:
                 clean_no_tags = re.sub(r"\{[^\}]*\}", "", ev.text).strip()
-                # 1b-1: Lone "Tutaj / Tu / Oto" when NOT answering a spatial wh-question ("Gdzie? / Dokąd?")
+                # 1b-1: Lone or compound "Tutaj / Tu / Oto" when NOT answering a spatial wh-question ("Gdzie? / Dokąd?")
                 m_tutaj = re.match(r"^([Tt]utaj|[Tt]u|[Oo]to)([\.!\?…]*)$", clean_no_tags)
-                if m_tutaj:
-                    word = m_tutaj.group(1)
-                    punct = m_tutaj.group(2) or "."
+                m_tutaj_compound = re.match(r"^([Tt]utaj|[Tt]u|[Oo]to)[,\s]+(weź|bierz|masz|trzymaj|proszę)\b", clean_no_tags, re.IGNORECASE)
+                if m_tutaj or m_tutaj_compound:
+                    word = m_tutaj.group(1) if m_tutaj else m_tutaj_compound.group(1)
+                    punct = m_tutaj.group(2) if m_tutaj else ""
                     is_answering_loc = False
                     if prev_clean and prev_ev and (ev.start - prev_ev.end < 6000):
                         if any(w in prev_clean.lower() for w in ["gdzie", "dokąd", "skąd", "w którym miejscu", "gdzie to"]):
@@ -1941,55 +1980,68 @@ class EpisodeQualityGate:
                                 ev.text = re.sub(m_pat, _f_case_repl, ev.text, flags=re.IGNORECASE)
                                 fixes.append(f"[Episode Quality Gate - Spójność Płci Postaci] Linia #{i+1}: skorygowano 1. os. na rodzaj żeński dla mówczyni '{ev.name}'")
 
-                # 3c-2: 3rd-person subject-verb past-tense agreement
+                # 3c-2: 3rd-person subject-verb past-tense agreement (Filar CLXII)
                 for char_lower, gender in char_gender_map.items():
                     if len(char_lower) < 3:
                         continue
-                    # Match name (normal order): [Name] [optional adverb] [verb]
-                    # Matches across \N (hard line break) as well as regular whitespace
-                    sp_regex = r"(?:\s+|\\N)+"
-                    pat_forward = rf"\b([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+)" + sp_regex + rf"(?:(już|też|wtedy|wczoraj|zawsze|nigdy|właśnie|przecież|tylko|jedynie|naprawdę)" + sp_regex + rf")?([A-Za-ząćęłńóśźż]+)\b"
-                    for m in list(re.finditer(pat_forward, ev.text)):
-                        matched_name = m.group(1)
-                        if matched_name.lower() != char_lower:
-                            continue
-                        verb = m.group(3)
-                        if gender == "MALE":
-                            new_v = convert_feminine_past_to_masculine(verb)
-                            if new_v and new_v.lower() != verb.lower():
-                                old_chunk = m.group(0)
-                                new_chunk = old_chunk.replace(verb, new_v, 1)
-                                ev.text = ev.text.replace(old_chunk, new_chunk, 1)
-                                fixes.append(f"[Episode Quality Gate - Spójność Płci Postaci] Linia #{i+1}: skorygowano orzeczenie 3. osoby '{matched_name} {verb}' -> '{matched_name} {new_v}' (potwierdzona płeć męska)")
-                        elif gender == "FEMALE":
-                            new_v = convert_masculine_past_to_feminine(verb)
-                            if new_v and new_v.lower() != verb.lower():
-                                old_chunk = m.group(0)
-                                new_chunk = old_chunk.replace(verb, new_v, 1)
-                                ev.text = ev.text.replace(old_chunk, new_chunk, 1)
-                                fixes.append(f"[Episode Quality Gate - Spójność Płci Postaci] Linia #{i+1}: skorygowano orzeczenie 3. osoby '{matched_name} {verb}' -> '{matched_name} {new_v}' (potwierdzona płeć żeńska)")
+                    
+                    # 1. Forward search: [Name] ... [verb]
+                    for m in list(re.finditer(rf"\b{re.escape(char_lower)}\b", ev.text, re.IGNORECASE)):
+                        after_pos = m.end()
+                        remainder = ev.text[after_pos:]
+                        clause_match = re.match(r"^[^\.,!\?;—–-]+", remainder)
+                        if clause_match:
+                            clause_text = clause_match.group(0)
+                            tokens = list(re.finditer(r"\b[A-Za-ząćęłńóśźż]+\b", clause_text))
+                            for tok in tokens[:4]:  # check within next 4 words in clause
+                                w = tok.group(0)
+                                if gender == "MALE":
+                                    new_v = convert_feminine_past_to_masculine(w)
+                                elif gender == "FEMALE":
+                                    new_v = convert_masculine_past_to_feminine(w)
+                                else:
+                                    new_v = None
 
-                    # Match name (inverted order): [verb] [optional pronoun] [Name]
-                    pat_inverted = rf"\b([A-Za-ząćęłńóśźż]+)" + sp_regex + rf"(?:(mnie|nas|go|ją|ich|mu|jej|im|cię|wam)" + sp_regex + rf")?([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+)\b"
-                    for m in list(re.finditer(pat_inverted, ev.text)):
-                        matched_name = m.group(3)
-                        if matched_name.lower() != char_lower:
-                            continue
-                        verb = m.group(1)
-                        if gender == "MALE":
-                            new_v = convert_feminine_past_to_masculine(verb)
-                            if new_v and new_v.lower() != verb.lower():
-                                old_chunk = m.group(0)
-                                new_chunk = old_chunk.replace(verb, new_v, 1)
-                                ev.text = ev.text.replace(old_chunk, new_chunk, 1)
-                                fixes.append(f"[Episode Quality Gate - Spójność Płci Postaci] Linia #{i+1}: skorygowano orzeczenie szyku przestawnego '{verb} {matched_name}' -> '{new_v} {matched_name}' (potwierdzona płeć męska)")
-                        elif gender == "FEMALE":
-                            new_v = convert_masculine_past_to_feminine(verb)
-                            if new_v and new_v.lower() != verb.lower():
-                                old_chunk = m.group(0)
-                                new_chunk = old_chunk.replace(verb, new_v, 1)
-                                ev.text = ev.text.replace(old_chunk, new_chunk, 1)
-                                fixes.append(f"[Episode Quality Gate - Spójność Płci Postaci] Linia #{i+1}: skorygowano orzeczenie szyku przestawnego '{verb} {matched_name}' -> '{new_v} {matched_name}' (potwierdzona płeć żeńska)")
+                                if new_v and new_v.lower() != w.lower():
+                                    abs_start = after_pos + tok.start()
+                                    abs_end = after_pos + tok.end()
+                                    matched_name = m.group(0)
+                                    ev.text = ev.text[:abs_start] + new_v + ev.text[abs_end:]
+                                    fixes.append(
+                                        f"[Episode Quality Gate - Spójność Płci Postaci] Linia #{i+1}: "
+                                        f"skorygowano orzeczenie 3. osoby '{matched_name}... {w}' -> '{matched_name}... {new_v}' "
+                                        f"(potwierdzona płeć {'męska' if gender == 'MALE' else 'żeńska'})"
+                                    )
+                                    break
+
+                    # 2. Inverted search: [verb] ... [Name]
+                    for m in list(re.finditer(rf"\b{re.escape(char_lower)}\b", ev.text, re.IGNORECASE)):
+                        before_pos = m.start()
+                        prefix = ev.text[:before_pos]
+                        clause_match = re.search(r"[^\.,!\?;—–-]+$", prefix)
+                        if clause_match:
+                            clause_text = clause_match.group(0)
+                            tokens = list(re.finditer(r"\b[A-Za-ząćęłńóśźż]+\b", clause_text))
+                            for tok in reversed(tokens[-4:]):  # check backwards within last 4 words in clause
+                                w = tok.group(0)
+                                if gender == "MALE":
+                                    new_v = convert_feminine_past_to_masculine(w)
+                                elif gender == "FEMALE":
+                                    new_v = convert_masculine_past_to_feminine(w)
+                                else:
+                                    new_v = None
+
+                                if new_v and new_v.lower() != w.lower():
+                                    abs_start = clause_match.start() + tok.start()
+                                    abs_end = clause_match.start() + tok.end()
+                                    matched_name = m.group(0)
+                                    ev.text = ev.text[:abs_start] + new_v + ev.text[abs_end:]
+                                    fixes.append(
+                                        f"[Episode Quality Gate - Spójność Płci Postaci] Linia #{i+1}: "
+                                        f"skorygowano orzeczenie szyku przestawnego '{w}... {matched_name}' -> '{new_v}... {matched_name}' "
+                                        f"(potwierdzona płeć {'męska' if gender == 'MALE' else 'żeńska'})"
+                                    )
+                                    break
 
             # 3c-3. 2ND-PERSON PLURAL ADDRESSEE GROUP AGREEMENT (Filar CLXIII - 0.00 PLN)
             if not is_sign:

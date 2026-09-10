@@ -4192,6 +4192,88 @@ def test_anti_pivot_and_spatiotemporal_engine():
     print(" -> PASSED: Całościowy silnik czasoprzestrzenny, protokół Anti-Pivot (Filar CLXVI), 2-etapowa ślepa lektura CoT i EpisodeQualityGate działają w 100% harmonii (0.00 PLN).")
 
 
+def test_holistic_domain_generalization_and_systemic_invariants():
+    """
+    Test 57: Weryfikacja Całościowego Uogólnienia Dziedziny (Holistic Domain Generalization).
+    Sprawdza, czy wszystkie zgłoszone od początku projektu problemy są trwale i bezwzględnie
+    wyeliminowane w pełnej fleksji, z uwzględnieniem przeczeń, przysłówków, formatowania ASS
+    oraz pełnego paradygmatu gramatycznego (0.00 PLN).
+    """
+    print("[TEST 57] Test całościowego uogólnienia dziedziny, pełnej fleksji kalek i niezmienników podmiotowo-orzeczeniowych...")
+    import pysubs2
+    from avt_linter import AVTLinter, EpisodeQualityGate
+    from series_memory import sanitize_lexical_text
+
+    # Asercja 1: Pełna odmiana kalek fansuberskich (Filar IV / CLXVI)
+    t_hope_pl, _ = AVTLinter.lint_and_fix_line("Mamy taką nadzieję.")
+    assert t_hope_pl == "Mamy nadzieję.", f"Błąd lintera na 'Mamy taką nadzieję': {t_hope_pl}"
+
+    t_hope_3rd, _ = AVTLinter.lint_and_fix_line("On ma taką nadzieję.")
+    assert t_hope_3rd == "On ma nadzieję.", f"Błąd lintera na 'On ma taką nadzieję': {t_hope_3rd}"
+
+    t_sense_inv, _ = AVTLinter.lint_and_fix_line("Robi to jakikolwiek sens?")
+    assert t_sense_inv == "Ma to jakikolwiek sens?", f"Błąd lintera na 'Robi to jakikolwiek sens?': {t_sense_inv}"
+
+    t_sense_past_neg, _ = AVTLinter.lint_and_fix_line("To nie robiło sensu.")
+    assert t_sense_past_neg == "To nie miało sensu.", f"Błąd lintera na 'To nie robiło sensu': {t_sense_past_neg}"
+
+    t_welcome_pl, _ = AVTLinter.lint_and_fix_line("Witajcie z powrotem!")
+    assert t_welcome_pl == "Witajcie!", f"Błąd lintera na 'Witajcie z powrotem!': {t_welcome_pl}"
+
+    t_nomway_bym, _ = AVTLinter.lint_and_fix_line("Nie ma mowy, bym tam poszedł!")
+    assert t_nomway_bym == "Wykluczone, bym tam poszedł!", f"Błąd lintera na 'Nie ma mowy, bym': {t_nomway_bym}"
+
+    # Asercja 2: Pełna odmiana hybryd honoryfikatywnych we wszystkich przypadkach (Filar XXVII / XLVIII)
+    t_hybr_inst, _ = AVTLinter.lint_and_fix_line("Rozmawiałem z panią Sensei.")
+    assert t_hybr_inst == "Rozmawiałem z Sensei.", f"Błąd hybrydy w narzędniku: {t_hybr_inst}"
+
+    t_hybr_dat, _ = AVTLinter.lint_and_fix_line("Podziękuj panu Sensei.")
+    assert t_hybr_dat == "Podziękuj Sensei.", f"Błąd hybrydy w celowniku: {t_hybr_dat}"
+
+    t_hybr_senpai, _ = AVTLinter.lint_and_fix_line("Pani Senpai przyszła.")
+    assert t_hybr_senpai == "Senpai przyszła.", f"Błąd hybrydy Senpai: {t_hybr_senpai}"
+
+    # Asercja 3: Pamięć serialu chroniona w pełnej fleksji
+    san_hope = sanitize_lexical_text("Mamy taką nadzieję")
+    assert san_hope == "Mamy nadzieję", f"Błąd sanityzacji pamięci: {san_hope}"
+    san_noway = sanitize_lexical_text("Nie ma mowy, bym tam poszedł!")
+    assert san_noway == "Wykluczone, bym tam poszedł!", f"Błąd sanityzacji pamięci: {san_noway}"
+
+    # Asercja 4: EpisodeQualityGate: Gender Invariance z partykułą 'nie', przysłówkami i szykiem przestawnym
+    subs = pysubs2.SSAFile()
+    ev1 = pysubs2.SSAEvent(start=1000, end=3000, text="Moglibyśmy porozmawiać na osobności?", style="Default")
+    # Dyskontinuitet z kropką i łamaniem wiersza ASS \N
+    ev2 = pysubs2.SSAEvent(start=23000, end=25000, text="Jasne.\\No co chodzi?", style="Default")
+    # Dyskontinuitet z wykrzyknikiem i reakcją "W czym mogę pomóc?"
+    ev3 = pysubs2.SSAEvent(start=32000, end=34000, text="Pewnie! W czym mogę pomóc?", style="Default")
+    # Kalka gestu Tutaj ze złożeniem
+    ev4 = pysubs2.SSAEvent(start=35000, end=37000, text="Tutaj, weź to.", style="Default")
+    # Płeć z partykułą przeczącą 'nie'
+    ev5 = pysubs2.SSAEvent(start=38000, end=40000, text="Shira nie wiedziała o tym.", style="Default")
+    # Płeć z wyrażeniem przysłówkowym 'na pewno'
+    ev6 = pysubs2.SSAEvent(start=41000, end=43000, text="Shira na pewno wiedziała, co robić.", style="Default")
+    # Szyk przestawny z zaimkiem zwrotnym 'się'
+    ev7 = pysubs2.SSAEvent(start=44000, end=46000, text="Tak cieszyła się Shira.", style="Default")
+    # Szyk przestawny z zaimkiem celownika 'mi'
+    ev8 = pysubs2.SSAEvent(start=47000, end=49000, text="Wszystko powiedziała mi Shira.", style="Default")
+    subs.events = [ev1, ev2, ev3, ev4, ev5, ev6, ev7, ev8]
+
+    audited, fixes = EpisodeQualityGate.audit_and_fix_entire_episode(
+        subs,
+        character_registry={"Shira": "mężczyzna, uczony"}
+    )
+
+    assert audited.events[1].text == "Więc\\No co chodzi?", f"Błąd dyskontinuitetu z \\N: {audited.events[1].text}"
+    assert audited.events[2].text == "Więc w czym mogę pomóc?", f"Błąd dyskontinuitetu z wykrzyknikiem: {audited.events[2].text}"
+    assert audited.events[3].text in ["Proszę, weź to.", "Trzymaj, weź to."], f"Błąd kalki gestu Tutaj: {audited.events[3].text}"
+    assert audited.events[4].text == "Shira nie wiedział o tym.", f"Błąd płci z przeczeniem: {audited.events[4].text}"
+    assert audited.events[5].text == "Shira na pewno wiedział, co robić.", f"Błąd płci z przysłówkiem: {audited.events[5].text}"
+    assert audited.events[6].text == "Tak cieszył się Shira.", f"Błąd szyku przestawnego z 'się': {audited.events[6].text}"
+    assert audited.events[7].text == "Wszystko powiedział mi Shira.", f"Błąd szyku przestawnego z 'mi': {audited.events[7].text}"
+
+    print(" -> PASSED: Całościowe uogólnienie dziedziny, pełna fleksja kalek i niezmienniki podmiotowo-orzeczeniowe działają w 100% harmonii (0.00 PLN).")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -4247,7 +4329,8 @@ if __name__ == "__main__":
     test_linguistic_invariants_and_kakegoe_noise_elision()
     test_temporal_discontinuity_and_scene_boundary_guard()
     test_anti_pivot_and_spatiotemporal_engine()
-    print("\n Wszystkie testy jednostkowe i integracyjne (56/56) zakończone pełnym sukcesem!\n")
+    test_holistic_domain_generalization_and_systemic_invariants()
+    print("\n Wszystkie testy jednostkowe i integracyjne (57/57) zakończone pełnym sukcesem!\n")
 
 
 

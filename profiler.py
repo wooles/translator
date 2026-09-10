@@ -307,11 +307,13 @@ Twoim zadaniem jest dogłębna, wszechstronna analiza 100% skryptu całego odcin
       * W sekcji danger_lines_prescan bezwzględnie wskaż tego typu luki czasowe i nakaż właściwe otwarcie dialogu!
 
 16. PROTOKÓŁ ANTY-PIVOT I ELIMINACJA KLISZ FANSUBERSKICH (FILAR CLXVI):
-   - Zidentyfikuj i wpisz do danger_lines_prescan kwestie, w których angielskie fansuby stosują amatorskie wypełniacze lub kalki:
+   - Zidentyfikuj i wpisz do danger_lines_prescan kwestie, w których angielskie fansuby stosują amatorskie wypełniacze lub kalki we wszystkich formach fleksyjnych:
       * 'Sure, what is it?' / 'All right, what's up?' po pauzie -> 'Więc o co chodzi?' / 'Słucham cię' (ZAKAZ: 'Jasne...').
-      * 'Welcome back' -> 'Witaj!' / 'Wróciłeś!' (KATEGORYCZNY ZAKAZ: 'Witaj z powrotem').
-      * 'I hope so' / 'I hope not' -> 'Oby!' / 'Mam nadzieję!' / 'Oby nie!' (ZAKAZ: 'Mam taką nadzieję').
-      * 'There is no way that...' -> 'Wykluczone, by...' / 'To niemożliwe, żeby...'.
+      * 'Welcome back' (l. poj. i mn.: 'Witaj!', 'Witajcie!', 'Wróciłeś!', 'Wróciła!', 'Wróciliście!') -> KATEGORYCZNY ZAKAZ: 'Witaj z powrotem' / 'Witajcie z powrotem' / 'Witam z powrotem'.
+      * 'Makes sense / That makes sense' -> 'To ma sens / Rozumiem / To logiczne' (KATEGORYCZNY ZAKAZ: 'Robić sens' we wszystkich odmianach i szykach: 'robi sens', 'robi to sens', 'robiło sens', 'robiłoby sens').
+      * 'I hope so / We hope so / He hopes so' -> 'Oby!' / 'Mam nadzieję!' / 'Mamy nadzieję!' (KATEGORYCZNY ZAKAZ: 'mieć taką nadzieję' we wszystkich osobach: 'mam taką nadzieję', 'mamy taką nadzieję', 'ma taką nadzieję').
+      * 'There is no way (that)...' -> 'Wykluczone, by...', 'To niemożliwe, żeby...', 'Nie ma mowy, bym/byśmy/żeby/aby...'.
+      * Hybrydy honoryfikatywne z tytułami obcymi: KATEGORYCZNY ZAKAZ łączenia polskich form per 'pan/pani' z japońskimi tytułami obcymi we wszystkich 7 przypadkach deklinacji: 'pani Sensei', 'z panią Sensei', 'pan Sensei', 'panu Sensei', 'pani Senpai', 'pan Kohai', 'pani Shishou', 'pan Taichou'. Stosuj wyłącznie sam polski odpowiednik (np. 'Pani profesor', 'Mistrzu') lub sam japoński tytuł (np. 'Sensei').
       * Gest podania rekwizytu z angielskim 'Here' -> 'Proszę' / 'Trzymaj' (KARDYNALNY BŁĄD: 'Tutaj!').
    - W mandatory_direction wymuś nadrzędność dramaturgii i japońskiego audio seiyū nad dosłownym skryptem angielskim.
 

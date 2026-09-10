@@ -1612,11 +1612,12 @@ FILAR CLXVI: PROTOKÓŁ ELIMINACJI GRAWITACJI JĘZYKA ANGIELSKIEGO I KLISZ FANSU
       - Gdy japońskie audio zawiera wyłącznie krótkie pytanie ("Nani?", "Dou shita?", "Nan da?") lub ciszę/westchnienie, a w angielskim dodano sztuczny wypełniacz ("Sure, what is it?", "Here", "I'm fine", "You know..."), KATEGORYCZNIE ZAKAZUJE SIĘ kalkowania angielskiego wypełniacza!
       - Zawsze tłumacz rzeczywistą intencję dramaturgiczną wynikającą ze słuchu i obrazu.
    2. ELIMINACJA KLISZ SŁOWNIKOWYCH FANSUBÓW (BELCZYK & NETFLIX AVT CANON):
-      - "Welcome back" -> KATEGORYCZNY ZAKAZ: "Witaj z powrotem"! POPRAWNIE: "Witaj!", "Wróciłeś!", "Dobrze cię widzieć!".
-      - "I hope so" / "I hope not" -> KATEGORYCZNY ZAKAZ: "Mam taką nadzieję"! POPRAWNIE: "Oby!", "Mam nadzieję!", "Oby nie!".
-      - "There is no way (that)..." -> KATEGORYCZNY ZAKAZ: "Nie ma mowy, żeby..."! POPRAWNIE: "Wykluczone, by...", "To niemożliwe, żeby...".
+      - "Welcome back" -> KATEGORYCZNY ZAKAZ: "Witaj z powrotem" / "Witajcie z powrotem"! POPRAWNIE: "Witaj!", "Witajcie!", "Wróciłeś!", "Wróciliście!", "Dobrze cię widzieć!".
+      - "I hope so" / "We hope so" -> KATEGORYCZNY ZAKAZ: "Mam / Mamy / Ma taką nadzieję"! POPRAWNIE: "Oby!", "Mam nadzieję!", "Mamy nadzieję!", "Oby nie!".
+      - "There is no way (that)..." -> KATEGORYCZNY ZAKAZ: "Nie ma mowy, żeby / by / aby..."! POPRAWNIE: "Wykluczone, by...", "Wykluczone, bym...", "Wykluczone, byśmy...", "To niemożliwe, żeby...".
+      - "It makes sense" / "Does it make sense?" -> KATEGORYCZNY ZAKAZ: "To robi sens", "Robi to sens?", "Robiłoby sens"! POPRAWNIE: "To ma sens", "Ma to sens?", "Miałoby sens".
       - "I'm fine" na propozycję pomocy -> "Dam sobie radę", "Nie trzeba", "Dziękuję" (ZAKAZ: "Jestem w porządku / Nic mi nie jest").
-      - "Here" przy geście podania -> "Proszę", "Trzymaj", "Masz" lub elipsa "" (KARDYNALNY BŁĄD: "Tutaj!").
+      - "Here" przy geście podania -> "Proszę", "Trzymaj", "Masz" lub elipsa "" (KARDYNALNY BŁĄD: "Tutaj! / Tutaj, weź to").
    3. DWUETAPOWA ŚLEPA LEKTURA POLSZCZYZNY W MYŚLENIU (AUTONOMOUS BLIND-READING FLOW):
       - Redaktor i weryfikator w pierwszej kolejności oceniają tekst polski jako spójny dialog aktorski/dubbingu. Jeśli dialog brzmi obco, sztucznie lub nienaturalnie po polsku – bezwzględnie wymaga przeredagowania, bez względu na to, jak bardzo "wiernie" odzwierciedla angielski skrypt.
 """
