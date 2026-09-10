@@ -150,10 +150,30 @@ class DialogueVerifier:
         if focused_rules_str:
             prompt_lines.append(f"\n{focused_rules_str}\n")
 
-        # Known Characters in episode for role and status continuity
+        # Known Characters in episode for role and status continuity (Just-In-Time Scoped)
         if character_registry:
-            prompt_lines.append("--- ZNANE POSTACIE W TYM FILMIE (spójność ról, płci i relacji władzy) ---")
+            batch_corpus = " ".join([
+                (it.get("en", "") or "") + " " + (it.get("pl", "") or "") + " " + (it.get("speaker_name") or "")
+                for it in batch_items
+            ]).lower()
+            if history_context:
+                batch_corpus += " " + " ".join([(h.get("en", "") or "") + " " + (h.get("speaker") or "") for h in history_context[-3:]]).lower()
+            if lookahead_events:
+                batch_corpus += " " + " ".join([str(item[2] if len(item) > 2 else "") for item in lookahead_events[:2]]).lower()
+
+            active_chars = {}
             for name, details in character_registry.items():
+                name_clean = name.strip()
+                name_stem = name_clean[:max(3, len(name_clean) - 2)].lower()
+                if len(character_registry) <= 4 or name_stem in batch_corpus:
+                    active_chars[name] = details
+
+            if not active_chars:
+                for name, details in list(character_registry.items())[:4]:
+                    active_chars[name] = details
+
+            prompt_lines.append("--- ZNANE POSTACIE W SCENIE (spójność ról, płci i relacji władzy) ---")
+            for name, details in active_chars.items():
                 prompt_lines.append(f"• {name}: {details}")
             prompt_lines.append("--------------------------------------------------------------------------\n")
 
@@ -324,7 +344,12 @@ class DialogueVerifier:
             if is_untranslated:
                 pl_display = "  Szkic PL: [🚨 BRAK PRZEKŁADU W FAZIE 1 - PRZETŁUMACZ OD ZERA Z EN I AUDIO JP!]"
             elif item.get("is_blind_draft"):
-                pl_display = "  Szkic PL: [⚠️ TŁUMACZ AUTONOMICZNIE ZE SŁUCHU JP I EN - Wykryto dysonans/kalkę w Fazie 1]"
+                orig_pl = (item.get('pl') or '').strip()
+                ref_hint = f" (Szkic referencyjny: '{orig_pl}')" if orig_pl else ""
+                pl_display = (
+                    f"  Szkic PL (KWESTIA KRYTYCZNA - ANTY-KOTWICZENIE): "
+                    f"[⚠️ WYMÓG NIEZALEŻNEGO PRZEKŁADU! Przetłumacz autonomicznie z audio JP i dynamiki sceny, eliminując kalki i potaknięcia!{ref_hint}]"
+                )
             else:
                 pl_display = f"  Szkic PL: {item['pl']}"
 

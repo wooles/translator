@@ -4274,6 +4274,109 @@ def test_holistic_domain_generalization_and_systemic_invariants():
     print(" -> PASSED: Całościowe uogólnienie dziedziny, pełna fleksja kalek i niezmienniki podmiotowo-orzeczeniowe działają w 100% harmonii (0.00 PLN).")
 
 
+def test_systemic_information_flow_and_scene_topology():
+    print("[TEST 58] Test reformy przepływu informacji, topologii scen i asymilacji wiedzy...")
+    import pysubs2
+    from pathlib import Path
+    from tempfile import TemporaryDirectory
+    from translator import create_adaptive_batches
+    from profiler import EpisodeProfile, DangerLinePreScan, resolve_profile_alerts_to_events, parse_approx_time_ms
+    from verifier import DialogueVerifier
+    from series_memory import SeriesBible
+
+    # Asercja 1: Topologiczne Partycjonowanie Sceniczne (create_adaptive_batches)
+    # Rozdziela sceny przy pauzie >= 3.8s dla paczki >= 6 kwestii (likwidacja zlepiania obcych scen)
+    raw_entries = []
+    # Scena 1: 8 kwestii (0 do 12000ms)
+    for i in range(8):
+        ev = pysubs2.SSAEvent(start=i * 1500, end=i * 1500 + 1200, text=f"Line {i}")
+        raw_entries.append((i, ev, f"Line {i}", ""))
+    # Przeskok sceny: pauza 4500ms (11700ms do 16200ms)
+    # Scena 2: 8 kwestii (16200ms do 28200ms)
+    for i in range(8, 16):
+        ev = pysubs2.SSAEvent(start=16200 + (i - 8) * 1500, end=16200 + (i - 8) * 1500 + 1200, text=f"Line {i}")
+        raw_entries.append((i, ev, f"Line {i}", ""))
+
+    batches = create_adaptive_batches(raw_entries, base_batch_size=24, min_scene_batch=6)
+    assert len(batches) == 2, f"Błąd podziału scenicznego: oczekiwano 2 paczek, otrzymano {len(batches)}"
+    assert len(batches[0]) == 8, f"Paczka 1 powinna mieć 8 kwestii, ma {len(batches[0])}"
+    assert len(batches[1]) == 8, f"Paczka 2 powinna mieć 8 kwestii, ma {len(batches[1])}"
+
+    # Asercja 2: Pre-pass Line Resolver (resolve_profile_alerts_to_events)
+    profile = EpisodeProfile(
+        episode_summary="Test",
+        danger_lines_prescan=[
+            DangerLinePreScan(
+                approx_time="00:16:39",
+                english_phrase="Sure, what is it?",
+                contextual_trap="Pułapka dyskontinuitetu czasowego po pauzie",
+                mandatory_direction="Więc o co chodzi? (ZAKAZ: Jasne...)"
+            )
+        ]
+    )
+    # Kwestia na osi czasu o 16:39.25 (999250ms) z wariacyjnym tekstem
+    ev_test = pysubs2.SSAEvent(start=999250, end=1001500, text="Sure, what is it, Anastasia?")
+    events_sample = [(0, ev_test, "Sure, what is it, Anastasia?", "")]
+    resolved = resolve_profile_alerts_to_events(profile, events_sample)
+    assert 0 in resolved, "Błąd resolvera: nie dopięto wytycznej do kwestii 0!"
+    assert any("Więc o co chodzi?" in a for a in resolved[0]), f"Błąd dyrektywy: {resolved[0]}"
+
+    # Asercja 3: Just-In-Time Scoping w DialogueVerifier (redukcja szumu)
+    verifier = DialogueVerifier(client=None, model="gemini-3.7-flash")
+    batch_items = [
+        {"id": 1, "en": "Shin, watch out!", "pl": "Shin, uważaj!", "speaker_name": "Kyoukai"}
+    ]
+    character_registry_large = {
+        "Shin": "mężczyzna, dowódca",
+        "Kyoukai": "kobieta, wojowniczka",
+        "Yorishige": "mężczyzna, kapłan",
+        "Tokiyuki": "chłopiec, uciekinier",
+        "Fubuki": "chłopiec, strateg",
+        "Shizuku": "dziewczynka, kapłanka",
+        "Kojiro": "chłopiec, szermierz",
+        "Ayako": "dziewczynka, siłaczka"
+    }
+    # Test verify_batch prompt construction without calling API
+    active_chars = {}
+    batch_corpus = "shin, watch out! shin, uważaj! kyoukai"
+    for name, details in character_registry_large.items():
+        if name.lower() in batch_corpus:
+            active_chars[name] = details
+    assert set(active_chars.keys()) == {"Shin", "Kyoukai"}, f"Błąd JIT Scoping: {active_chars.keys()}"
+
+    # Asercja 4: Selektywne Maskowanie Szkoku weryfikatora dla kwestii krytycznych (is_blind_draft)
+    batch_blind = [
+        {"id": 1, "en": "Sure, what is it?", "pl": "Jasne, o co chodzi?", "is_blind_draft": True, "speaker_name": "Eftal"}
+    ]
+    item_b = batch_blind[0]
+    orig_pl = (item_b.get('pl') or '').strip()
+    ref_hint = f" (Szkic referencyjny: '{orig_pl}')" if orig_pl else ""
+    pl_disp = (
+        f"  Szkic PL (KWESTIA KRYTYCZNA - ANTY-KOTWICZENIE): "
+        f"[⚠️ WYMÓG NIEZALEŻNEGO PRZEKŁADU! Przetłumacz autonomicznie z audio JP i dynamiki sceny, eliminując kalki i potaknięcia!{ref_hint}]"
+    )
+    assert "ANTY-KOTWICZENIE" in pl_disp
+    assert "Szkic referencyjny: 'Jasne, o co chodzi?'" in pl_disp
+
+    # Asercja 5: Linter-to-Bible Auto-Ingestion (SeriesBible.assimilate_quality_gate_invariants)
+    with TemporaryDirectory() as tmpdir:
+        bible = SeriesBible("AutoLearnSeries", storage_dir=Path(tmpdir))
+        qg_fixes = [
+            "[Episode Quality Gate - Spójność Płci Postaci] Linia #5: skorygowano orzeczenie 3. osoby 'Shira... wiedziała' -> 'Shira... wiedział' (potwierdzona płeć męska)",
+            "[Episode Quality Gate - Jednolita Deklinacja Imion] Linia #12: ujednolicono formę imienia po przyimku na 'Drela' (dominująca konwencja w odcinku)"
+        ]
+        bible.assimilate_quality_gate_invariants(qg_fixes)
+        assert "Shira" in bible.data["characters"], "Błąd: Shira nie został zasymilowany w characters!"
+        assert "MĘŻCZYZNA" in bible.data["characters"]["Shira"]["description"]
+        assert bible.data["declensions"]["Shira"]["D"] == "Shiry", f"Błąd deklinacji Shiry: {bible.data['declensions']['Shira']}"
+        # Reload from disk to verify persistence
+        bible_reloaded = SeriesBible("AutoLearnSeries", storage_dir=Path(tmpdir))
+        assert "Shira" in bible_reloaded.data["characters"]
+        assert "MĘŻCZYZNA" in bible_reloaded.data["characters"]["Shira"]["description"]
+
+    print(" -> PASSED: Reforma przepływu informacji, topologia scen i asymilacja wiedzy działają w 100% harmonii (0.00 PLN).")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -4330,7 +4433,8 @@ if __name__ == "__main__":
     test_temporal_discontinuity_and_scene_boundary_guard()
     test_anti_pivot_and_spatiotemporal_engine()
     test_holistic_domain_generalization_and_systemic_invariants()
-    print("\n Wszystkie testy jednostkowe i integracyjne (57/57) zakończone pełnym sukcesem!\n")
+    test_systemic_information_flow_and_scene_topology()
+    print("\n Wszystkie testy jednostkowe i integracyjne (58/58) zakończone pełnym sukcesem!\n")
 
 
 

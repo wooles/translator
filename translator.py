@@ -938,10 +938,14 @@ def apply_simultaneous_dialogue_formatting(events: List[Any]) -> List[Any]:
             ev.text = clean_orphaned_dialogue_dashes(ev.text)
     return events
 
-def create_adaptive_batches(raw_entries: list, base_batch_size: int = 24, max_batch_size: int = 32) -> list:
+def create_adaptive_batches(raw_entries: list, base_batch_size: int = 24, max_batch_size: int = 34, min_scene_batch: int = 6) -> list:
     """
-    Groups subtitle events into coherent, scene-aligned batches of 24-32 lines,
-    adapting to dialogue density and scene pauses (> 4.0s gap starts a new batch).
+    Groups subtitle events into coherent, scene-aligned batches,
+    adapting to dialogue density and scene pauses:
+    - Major scene break (>= 3800ms gap) starts a new batch if current batch has at least min_scene_batch (6) lines.
+    - Massive temporal leap (>= 7000ms gap) starts a new batch if current batch has at least 4 lines.
+    - Continuous dialogue without scene cuts stays together up to max_batch_size (34 lines) or 150 words.
+    Guarantees no Adjacency Pairs or dialogues are split across arbitrary 18-line boundaries.
     """
     if not raw_entries:
         return []
@@ -956,9 +960,14 @@ def create_adaptive_batches(raw_entries: list, base_batch_size: int = 24, max_ba
         words = len(text_clean.split())
 
         is_full = len(current_batch) >= max_batch_size
-        is_dense = len(current_batch) >= base_batch_size and current_words >= 140
-        # Dramatic Beat Batching: natural scene break (> 2800ms silence) when batch has at least 18 items
-        is_scene_break = current_batch and (ev.start - current_batch[-1][1].end) > 2800 and len(current_batch) >= 18
+        is_dense = len(current_batch) >= base_batch_size and current_words >= 150
+
+        gap_ms = (ev.start - current_batch[-1][1].end) if current_batch else 0
+        is_scene_break = current_batch and (
+            (gap_ms >= 7000 and len(current_batch) >= 4) or
+            (gap_ms >= 3800 and len(current_batch) >= min_scene_batch) or
+            (gap_ms >= 2800 and len(current_batch) >= 18)
+        )
 
         if is_full or is_dense or is_scene_break:
             batches.append(current_batch)
@@ -1788,21 +1797,26 @@ class MultimodalTranslator:
                     if duration_s <= 0.8 and any(h in jp_text for h in ["え", "う", "あの", "えっと", "ん", "ま…", "あ…", "え…"]) and len(clean_text.split()) > 2:
                         lines.append(f"  [🎙️ ALARM ROZBIEŻNOŚCI AUDIO JP]: W audio seiyū padło wyłącznie krótkie wahanie/dźwięk ('{jp_display}'). ZAKAZ tłumaczenia całego zdania w tym ułamkowym bloku! Ogranicz do samego wahania: 'Znaczy...', 'Cóż...', 'Ech...'.")
             if episode_profile:
-                if getattr(episode_profile, "danger_lines_prescan", None):
-                    for dl in episode_profile.danger_lines_prescan:
-                        if dl.english_phrase and dl.english_phrase.lower() in clean_text.lower():
-                            lines.append(f"  [🚨 PUŁAPKA PROFILERA: {dl.contextual_trap} => DYREKTYWA: {dl.mandatory_direction}]")
-                            break
-                if getattr(episode_profile, "character_catchphrases", None):
-                    for cp in episode_profile.character_catchphrases:
-                        if cp.original_phrase and cp.original_phrase.lower() in clean_text.lower():
-                            lines.append(f"  [💬 KWESTIA-WIZYTÓWKA: '{cp.canonical_pl}' ({cp.context_notes})]")
-                            break
-                if getattr(episode_profile, "puns_and_wordplays", None):
-                    for pun in episode_profile.puns_and_wordplays:
-                        if pun.original_joke_or_pun and pun.original_joke_or_pun.lower() in clean_text.lower():
-                            lines.append(f"  [🃏 GRA SŁOWNA: {pun.polish_transcreation}]")
-                            break
+                pinned_alerts = getattr(self, "profile_line_alerts", {}).get(original_idx) or getattr(self, "profile_line_alerts", {}).get(idx)
+                if pinned_alerts:
+                    for pa in pinned_alerts:
+                        lines.append(f"  {pa}")
+                else:
+                    if getattr(episode_profile, "danger_lines_prescan", None):
+                        for dl in episode_profile.danger_lines_prescan:
+                            if dl.english_phrase and dl.english_phrase.lower() in clean_text.lower():
+                                lines.append(f"  [🚨 PUŁAPKA PROFILERA: {dl.contextual_trap} => DYREKTYWA: {dl.mandatory_direction}]")
+                                break
+                    if getattr(episode_profile, "character_catchphrases", None):
+                        for cp in episode_profile.character_catchphrases:
+                            if cp.original_phrase and cp.original_phrase.lower() in clean_text.lower():
+                                lines.append(f"  [💬 KWESTIA-WIZYTÓWKA: '{cp.canonical_pl}' ({cp.context_notes})]")
+                                break
+                    if getattr(episode_profile, "puns_and_wordplays", None):
+                        for pun in episode_profile.puns_and_wordplays:
+                            if pun.original_joke_or_pun and pun.original_joke_or_pun.lower() in clean_text.lower():
+                                lines.append(f"  [🃏 GRA SŁOWNA: {pun.polish_transcreation}]")
+                                break
             lines.append(f"  📄 SKRYPT PODSTAWOWY EN (TREŚĆ, FAKTY I SKŁADNIA): {clean_text}")
 
         # 4. Lookahead window
@@ -2345,7 +2359,11 @@ class MultimodalTranslator:
             )
 
             # Line-Level Pinning: Direct Profiler alerts for this specific line
-            if episode_profile:
+            pinned_alerts = getattr(self, "profile_line_alerts", {}).get(orig_idx) or getattr(self, "profile_line_alerts", {}).get(idx)
+            if pinned_alerts:
+                for pa in pinned_alerts:
+                    notes = f"{notes} {pa}".strip()
+            elif episode_profile:
                 if getattr(episode_profile, "danger_lines_prescan", None):
                     for dl in episode_profile.danger_lines_prescan:
                         if dl.english_phrase and dl.english_phrase.lower() in clean_en.lower():
@@ -2532,9 +2550,9 @@ class MultimodalTranslator:
             has_audio_conflict = bool(audio_discrepancy_msg) or any(
                 k in audio_jp_str.lower() for k in ["hitori", "一人", "独り", "betsuni", "別に", "yokatta", "よかった", "yatta", "やった"]
             )
-            has_ambiguity_conflict = bool(ambiguity_note)
-            has_severe_trap = bool(notes and "[🚨 PUŁAPKA PROFILERA" in notes)
-            is_blind_draft = has_audio_conflict or has_ambiguity_conflict or has_severe_trap
+            has_severe_trap = bool(notes and any(k in notes for k in ["[🚨 PUŁAPKA PROFILERA", "[🚨 ALARM FILAR", "[🎙️ ALARM KLISZY"]))
+            has_temporal_conflict = bool(relation_tag and ("DYSKONTINUITET CZASOWY" in relation_tag or "ALARM KLISZY FANSUBERSKIEJ" in relation_tag))
+            is_blind_draft = has_audio_conflict or has_ambiguity_conflict or has_severe_trap or has_temporal_conflict
 
             pass1_items.append({
                 "id": batch_id,
@@ -3163,6 +3181,17 @@ class MultimodalTranslator:
                 suffix = "..." if len(episode_profile.glossary) > 6 else ""
                 print(f"  [Słowniczek Odcinka]: {terms_preview}{suffix}")
 
+        # Pre-pass Line Resolver: bind danger lines & catchphrases to concrete line indices
+        self.profile_line_alerts = {}
+        if episode_profile and raw_entries:
+            try:
+                from profiler import resolve_profile_alerts_to_events
+                self.profile_line_alerts = resolve_profile_alerts_to_events(episode_profile, raw_entries)
+                if self.profile_line_alerts:
+                    print(f"  [Pre-pass Line Resolver]: Dopięto wytyczne Profilera do {len(self.profile_line_alerts)} kwestii na osi czasu.")
+            except Exception as e_res:
+                logger.warning(f"Błąd Pre-pass Line Resolvera ({e_res})")
+
         # 0f. Bake static Episode Knowledge (Profile, Glossary, Series Bible, User Feedback) into Cached System Instructions
         episode_knowledge_blocks = []
         if user_feedback_str:
@@ -3728,6 +3757,12 @@ class MultimodalTranslator:
                     logger.info(f"  ├─ {f}")
                 if len(qg_fixes) > 5:
                     logger.info(f"  └─ ... i {len(qg_fixes) - 5} kolejnych poprawek.")
+                if getattr(self, "series_bible", None):
+                    try:
+                        self.series_bible.assimilate_quality_gate_invariants(qg_fixes)
+                        logger.info("[SeriesBible]: Pomyślnie zasymilowano trwałe niezmienniki z EpisodeQualityGate do Biblii Serialu.")
+                    except Exception as e_sb:
+                        logger.warning(f"[SeriesBible]: Błąd asymilacji niezmienników ({e_sb})")
         except Exception as e:
             logger.warning(f"EpisodeQualityGate: Pomijanie ({e})")
 

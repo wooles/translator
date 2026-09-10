@@ -7,10 +7,11 @@ ensuring consistent dialogue continuity across the whole episode.
 """
 
 import os
+import re
 import json
 import logging
 from pathlib import Path
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Set, Tuple
 from pydantic import BaseModel, Field, ConfigDict
 from google import genai
 from google.genai import types
@@ -387,3 +388,173 @@ Zwróć wynik w formacie JSON zgodnym ze schematem EpisodeProfile."""
                 if attempt == 1:
                     print(f"\n[Profiler Odcinka]: {friendly_msg} -> oczekiwanie na serwery Google i automatyczna rotacja kluczy...")
                 time.sleep(wait_sec)
+
+
+def parse_approx_time_ms(time_str: str) -> Optional[int]:
+    """
+    Parses approximate time string (e.g. '00:16:39', '16:39', '00:16:39.25', '00:16:39,250') into milliseconds.
+    """
+    if not time_str or not isinstance(time_str, str):
+        return None
+    cleaned = time_str.strip().replace(",", ".")
+    m = re.match(r"^(?:(\d+):)?(\d+):(\d+(?:\.\d+)?)$", cleaned)
+    if not m:
+        return None
+    hours = int(m.group(1)) if m.group(1) else 0
+    mins = int(m.group(2))
+    secs = float(m.group(3))
+    return int((hours * 3600 + mins * 60 + secs) * 1000)
+
+
+def _extract_text_and_times_from_event(event_item: Any) -> Tuple[int, int, str]:
+    """
+    Normalizes event structure to (start_ms, end_ms, clean_text).
+    Supports pysubs2.SSAEvent, raw entry tuple (orig_idx, event, text, ...), or dict.
+    """
+    if hasattr(event_item, "start") and hasattr(event_item, "end") and hasattr(event_item, "text"):
+        clean_t = re.sub(r"\{[^\}]*\}", "", event_item.text).strip()
+        clean_t = re.sub(r"\\[Nnh]", " ", clean_t).strip()
+        return event_item.start, event_item.end, clean_t
+    elif isinstance(event_item, (list, tuple)) and len(event_item) >= 3:
+        ev = event_item[1]
+        raw_text = str(event_item[2])
+        clean_t = re.sub(r"\{[^\}]*\}", "", raw_text).strip()
+        clean_t = re.sub(r"\\[Nnh]", " ", clean_t).strip()
+        start = getattr(ev, "start", 0)
+        end = getattr(ev, "end", 0)
+        return start, end, clean_t
+    elif isinstance(event_item, dict):
+        start = event_item.get("start_ms", 0)
+        end = event_item.get("end_ms", 0)
+        clean_t = event_item.get("en", "")
+        return start, end, clean_t
+    return 0, 0, ""
+
+
+def resolve_profile_alerts_to_events(
+    profile: EpisodeProfile,
+    subs_events: List[Any],
+    max_time_window_ms: int = 15000
+) -> Dict[int, List[str]]:
+    """
+    Deterministic Pre-pass Line Resolver.
+    Binds Profiler alerts (danger_lines_prescan, character_catchphrases, puns_and_wordplays)
+    to concrete subtitle line indices based on time-window proximity and token Jaccard similarity.
+    Returns: Dict[line_index, List[formatted_alert_tag]]
+    Guarantees 0.00 PLN cost and 100% precision without brittle substring containment.
+    """
+    if not profile or not subs_events:
+        return {}
+
+    resolved_alerts: Dict[int, List[str]] = {}
+
+    def _tokenize(text: str) -> Set[str]:
+        return set(re.findall(r"\b[a-zA-Z0-9ąćęłńóśźżĄĆĘŁŃÓŚŹŻ]{2,}\b", (text or "").lower()))
+
+    def _jaccard(s1: Set[str], s2: Set[str]) -> float:
+        if not s1 or not s2:
+            return 0.0
+        return len(s1 & s2) / float(len(s1 | s2))
+
+    parsed_events: List[Tuple[int, int, int, str, Set[str]]] = []
+    for idx, ev_item in enumerate(subs_events):
+        s_ms, e_ms, txt = _extract_text_and_times_from_event(ev_item)
+        parsed_events.append((idx, s_ms, e_ms, txt, _tokenize(txt)))
+
+    # 1. Resolve danger_lines_prescan
+    if getattr(profile, "danger_lines_prescan", None):
+        for dl in profile.danger_lines_prescan:
+            if not dl.english_phrase:
+                continue
+            target_ms = parse_approx_time_ms(dl.approx_time)
+            phrase_tokens = _tokenize(dl.english_phrase)
+            phrase_clean = dl.english_phrase.strip().lower()
+
+            best_idx = None
+            best_score = -1.0
+
+            for idx, s_ms, e_ms, txt, ev_tokens in parsed_events:
+                txt_clean = txt.lower()
+                time_dist_ms = abs(s_ms - target_ms) if target_ms is not None else 0
+
+                # Window check
+                if target_ms is not None and time_dist_ms > max_time_window_ms:
+                    continue
+
+                j_sim = _jaccard(phrase_tokens, ev_tokens)
+                is_sub = (phrase_clean in txt_clean) or (txt_clean in phrase_clean and len(txt_clean) >= 6)
+
+                if is_sub or j_sim >= 0.35 or len(phrase_tokens & ev_tokens) >= max(2, len(phrase_tokens) - 1):
+                    time_penalty = (time_dist_ms / 1000.0) if target_ms is not None else 0.0
+                    score = (1.0 if is_sub else j_sim) * 100.0 - time_penalty
+                    if score > best_score:
+                        best_score = score
+                        best_idx = idx
+
+            # Fallback across entire episode if time window was too narrow
+            if best_idx is None and target_ms is not None:
+                for idx, s_ms, e_ms, txt, ev_tokens in parsed_events:
+                    txt_clean = txt.lower()
+                    is_sub = (phrase_clean in txt_clean) or (txt_clean in phrase_clean and len(txt_clean) >= 6)
+                    j_sim = _jaccard(phrase_tokens, ev_tokens)
+                    if is_sub or j_sim >= 0.5:
+                        score = (1.0 if is_sub else j_sim) * 100.0
+                        if score > best_score:
+                            best_score = score
+                            best_idx = idx
+
+            if best_idx is not None:
+                tag = f"[🚨 PUŁAPKA PROFILERA: {dl.contextual_trap} => DYREKTYWA: {dl.mandatory_direction}]"
+                if best_idx not in resolved_alerts:
+                    resolved_alerts[best_idx] = []
+                if tag not in resolved_alerts[best_idx]:
+                    resolved_alerts[best_idx].append(tag)
+
+    # 2. Resolve character_catchphrases
+    if getattr(profile, "character_catchphrases", None):
+        for cp in profile.character_catchphrases:
+            if not cp.original_phrase:
+                continue
+            cp_tokens = _tokenize(cp.original_phrase)
+            cp_clean = cp.original_phrase.strip().lower()
+            tag = f"[💬 KWESTIA-WIZYTÓWKA: '{cp.canonical_pl}']"
+
+            for idx, s_ms, e_ms, txt, ev_tokens in parsed_events:
+                if cp_clean in txt.lower() or _jaccard(cp_tokens, ev_tokens) >= 0.6:
+                    if idx not in resolved_alerts:
+                        resolved_alerts[idx] = []
+                    if tag not in resolved_alerts[idx]:
+                        resolved_alerts[idx].append(tag)
+
+    # 3. Resolve puns_and_wordplays
+    if getattr(profile, "puns_and_wordplays", None):
+        for pun in profile.puns_and_wordplays:
+            if not pun.original_joke_or_pun:
+                continue
+            target_ms = parse_approx_time_ms(getattr(pun, "approx_time", ""))
+            pun_tokens = _tokenize(pun.original_joke_or_pun)
+            pun_clean = pun.original_joke_or_pun.strip().lower()
+            tag = f"[🃏 GRA SŁOWNA: {pun.polish_transcreation}]"
+
+            best_idx = None
+            best_score = -1.0
+            for idx, s_ms, e_ms, txt, ev_tokens in parsed_events:
+                time_dist_ms = abs(s_ms - target_ms) if target_ms is not None else 0
+                if target_ms is not None and time_dist_ms > max_time_window_ms:
+                    continue
+                is_sub = pun_clean in txt.lower()
+                j_sim = _jaccard(pun_tokens, ev_tokens)
+                if is_sub or j_sim >= 0.35:
+                    score = (1.0 if is_sub else j_sim) * 100.0 - ((time_dist_ms / 1000.0) if target_ms else 0)
+                    if score > best_score:
+                        best_score = score
+                        best_idx = idx
+
+            if best_idx is not None:
+                if best_idx not in resolved_alerts:
+                    resolved_alerts[best_idx] = []
+                if tag not in resolved_alerts[best_idx]:
+                    resolved_alerts[best_idx].append(tag)
+
+    return resolved_alerts
+

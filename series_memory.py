@@ -440,6 +440,77 @@ class SeriesBible:
 
         self.save()
 
+    def assimilate_quality_gate_invariants(self, quality_gate_fixes: List[Any]):
+        """
+        Closed-loop learning engine (Layer 2).
+        Ingests 100% confirmed invariants from EpisodeQualityGate post-pass
+        (character gender, 7-case foreign name declensions, T-V address forms)
+        and commits them permanently to the Series Bible.
+        """
+        if not quality_gate_fixes:
+            return
+
+        has_updates = False
+        if "characters" not in self.data:
+            self.data["characters"] = {}
+        if "declensions" not in self.data:
+            self.data["declensions"] = {}
+
+        for fix_item in quality_gate_fixes:
+            # 1. Structured fix dictionary
+            if isinstance(fix_item, dict):
+                f_type = fix_item.get("type", "")
+                c_name = fix_item.get("character") or fix_item.get("name")
+                if c_name and f_type == "gender":
+                    gen = fix_item.get("gender", "").upper()
+                    if gen in ["MALE", "FEMALE"]:
+                        desc = f"{'MĘŻCZYZNA' if gen == 'MALE' else 'KOBIETA'} (zweryfikowano przez EpisodeQualityGate)"
+                        self.data["characters"][c_name] = {"description": desc, "source": "quality_gate"}
+                        self.data["declensions"][c_name] = generate_polish_name_declension(c_name, gen)
+                        has_updates = True
+                elif c_name and f_type == "declension":
+                    decl_map = fix_item.get("declension")
+                    if isinstance(decl_map, dict):
+                        self.data["declensions"][c_name] = decl_map
+                        has_updates = True
+
+            # 2. String parsing from EpisodeQualityGate log lines
+            elif isinstance(fix_item, str):
+                # Gender confirmation: e.g. "potwierdzona płeć męska" or "potwierdzona płeć żeńska"
+                m_gen = re.search(r"'(?:([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+)\.\.\.[^']*|[^']*\.\.\.\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+))'.*?potwierdzona płeć (męska|żeńska)", fix_item)
+                if m_gen:
+                    char_name = m_gen.group(1) or m_gen.group(2)
+                    gender_str = "MALE" if m_gen.group(3) == "męska" else "FEMALE"
+                    if char_name and len(char_name) >= 3:
+                        desc = f"{'MĘŻCZYZNA' if gender_str == 'MALE' else 'KOBIETA'} (zweryfikowano przez EpisodeQualityGate)"
+                        self.data["characters"][char_name] = {"description": desc, "source": "quality_gate"}
+                        self.data["declensions"][char_name] = generate_polish_name_declension(char_name, gender_str)
+                        has_updates = True
+
+                # 1st-person speaker gender confirmation:
+                m_spk = re.search(r"skorygowano 1\. os\. na rodzaj (męski|żeński) dla mówc(?:y|zyni) '([^']+)'", fix_item)
+                if m_spk:
+                    gender_str = "MALE" if m_spk.group(1) == "męski" else "FEMALE"
+                    char_name = m_spk.group(2).strip()
+                    if char_name and len(char_name) >= 3:
+                        desc = f"{'MĘŻCZYZNA' if gender_str == 'MALE' else 'KOBIETA'} (zweryfikowano przez EpisodeQualityGate)"
+                        self.data["characters"][char_name] = {"description": desc, "source": "quality_gate"}
+                        self.data["declensions"][char_name] = generate_polish_name_declension(char_name, gender_str)
+                        has_updates = True
+
+                # Prepositional Foreign Name Declension: e.g. "ujednolicono formę imienia po przyimku na 'Drela'"
+                m_prep = re.search(r"ujednolicono formę (?:imienia po przyimku|na) '([^']+)'", fix_item)
+                if m_prep:
+                    decl_form = m_prep.group(1)
+                    for existing_name in list(self.data["characters"].keys()) + list(self.data["declensions"].keys()):
+                        if len(existing_name) >= 3 and decl_form.lower().startswith(existing_name[:max(3, len(existing_name)-2)].lower()):
+                            if existing_name in self.data["declensions"]:
+                                self.data["declensions"][existing_name]["D"] = decl_form
+                                has_updates = True
+
+        if has_updates:
+            self.save()
+
     def format_for_prompt(self) -> str:
         """Formats Series Bible into a compact section for LLM prompt injection."""
         lines = []
