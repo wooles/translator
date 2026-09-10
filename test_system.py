@@ -4116,6 +4116,82 @@ def test_temporal_discontinuity_and_scene_boundary_guard():
     print(" -> PASSED: Protokół dyskontinuitetu czasowego, przeskoki scen i eliminacja 'Jasne, o co chodzi?' (Filar CLXV) działają w 100% harmonii (0.00 PLN).")
 
 
+def test_anti_pivot_and_spatiotemporal_engine():
+    print("[TEST 56] Test całościowego silnika czasoprzestrzennego, protokołu Anti-Pivot (Filar CLXVI) i 2-etapowej ślepej lektury CoT...")
+    from avt_linter import EpisodeQualityGate, AVTLinter
+    from rules import BELCZYK_AVT_MASTER_CANON, get_focused_rules_for_batch, get_verifier_system_prompt
+    from series_memory import SeriesBible, sanitize_lexical_text
+    import pysubs2
+    import tempfile
+    from pathlib import Path
+
+    # 1. Warstwa 1: Profiler 4.0 Pre-pass - Weryfikacja dyrektyw Anti-Pivot w promptcie
+    from profiler import EpisodeProfiler
+    # Prompt Profilera musi zawierać Filar CLXVI
+    from inspect import getsource
+    profiler_src = getsource(EpisodeProfiler.profile_episode)
+    assert "FILAR CLXVI" in profiler_src, "Brak dyrektyw Filaru CLXVI w profiler.py"
+    assert "danger_lines_prescan" in profiler_src, "Brak danger_lines_prescan w profiler.py"
+
+    # 2. Warstwa 2: Series Bible & Pamięć Serialu - Zero kontaminacji kliszami fansubów
+    assert sanitize_lexical_text("Nie ma mowy, żeby to zrobili") == "Wykluczone, by to zrobili"
+    assert sanitize_lexical_text("Witaj z powrotem w domu") == "Witaj! w domu"
+    assert sanitize_lexical_text("Mam taką nadzieję na jutro") == "Mam nadzieję na jutro"
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        bible = SeriesBible("AntiPivotTestSeries", storage_dir=Path(tmpdir))
+        bible.update_from_episode_profile(
+            episode_name="Odcinek 1",
+            glossary={
+                "cliche_test": "Nie ma mowy, żeby to przeszło",
+                "welcome_test": "Witaj z powrotem"
+            },
+            relationships={
+                "Arata->Shizuku": "Witaj z powrotem po podróży"
+            }
+        )
+        assert "Wykluczone, by" in bible.data["glossary"]["cliche_test"]
+        assert "Witaj z powrotem" not in bible.data["glossary"]["welcome_test"]
+        assert "Witaj z powrotem" not in bible.data["relationships"]["Arata->Shizuku"]
+
+    # 3. Warstwa 3: rules.py & verifier.py - Kanon Filaru CLXVI, Dynamiczny Dyspozytor i 2-Etapowy CoT
+    assert "FILAR CLXVI: PROTOKÓŁ ELIMINACJI GRAWITACJI JĘZYKA ANGIELSKIEGO" in BELCZYK_AVT_MASTER_CANON, "Brak Filaru CLXVI w BELCZYK_AVT_MASTER_CANON"
+    
+    batch_cliches = [
+        {"en": "Welcome back, master.", "duration_s": 2.0},
+        {"en": "I hope so, we did our best.", "duration_s": 2.5}
+    ]
+    f_rules = get_focused_rules_for_batch(batch_cliches)
+    assert "CLXVI" in f_rules, f"Dyspozytor reguł nie aktywował Filaru CLXVI: {f_rules}"
+
+    from verifier import DialogueVerifier
+    verifier_src = getsource(DialogueVerifier.verify_batch)
+    assert "DWUETAPOWY AUDYT POZNAWCZY" in verifier_src, "Brak 2-etapowego audytu w verifier.py"
+    assert "AUTONOMICZNA ŚLEPA LEKTURA" in verifier_src, "Brak ślepej lektury w verifier.py"
+    assert "Oś czasu" in verifier_src, "Brak parametru Oś czasu w verifier.py"
+
+    # 4. Warstwa 4: EpisodeQualityGate (0.00 PLN) - Deterministyczna eliminacja kalek i zatorów
+    subs = pysubs2.SSAFile()
+    # Kwestia 1: Welcome back calque
+    subs.events.append(pysubs2.SSAEvent(start=1000, end=3000, name="Alice", text="Witaj z powrotem w naszym zamku!"))
+    # Kwestia 2: There's no way calque
+    subs.events.append(pysubs2.SSAEvent(start=4000, end=6000, name="Bob", text="Nie ma mowy, żebyśmy się poddali."))
+    # Kwestia 3: Hope so calque
+    subs.events.append(pysubs2.SSAEvent(start=7000, end=9000, name="Alice", text="Mam taką nadzieję."))
+    # Kwestia 4 & 5: Temporal Discontinuity gap 12s after private request
+    subs.events.append(pysubs2.SSAEvent(start=10000, end=13000, name="Bob", text="Porozmawiajmy na osobności."))
+    subs.events.append(pysubs2.SSAEvent(start=25000, end=28000, name="Alice", text="Pewnie, o co chodzi?"))
+
+    audited_subs, fixes = EpisodeQualityGate.audit_and_fix_entire_episode(subs)
+    
+    assert audited_subs.events[0].text == "Witaj! w naszym zamku!", f"Błąd korekty 'Witaj z powrotem': {audited_subs.events[0].text}"
+    assert audited_subs.events[1].text == "Wykluczone, byśmy się poddali.", f"Błąd korekty 'Nie ma mowy, żeby': {audited_subs.events[1].text}"
+    assert audited_subs.events[2].text == "Mam nadzieję.", f"Błąd korekty 'Mam taką nadzieję': {audited_subs.events[2].text}"
+    assert audited_subs.events[4].text == "Więc o co chodzi?", f"Błąd korekty opóźnionego potwierdzenia: {audited_subs.events[4].text}"
+
+    print(" -> PASSED: Całościowy silnik czasoprzestrzenny, protokół Anti-Pivot (Filar CLXVI), 2-etapowa ślepa lektura CoT i EpisodeQualityGate działają w 100% harmonii (0.00 PLN).")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -4170,7 +4246,8 @@ if __name__ == "__main__":
     test_relational_tv_invariance_and_hybrid_vocative_guard()
     test_linguistic_invariants_and_kakegoe_noise_elision()
     test_temporal_discontinuity_and_scene_boundary_guard()
-    print("\n Wszystkie testy jednostkowe i integracyjne (55/55) zakończone pełnym sukcesem!\n")
+    test_anti_pivot_and_spatiotemporal_engine()
+    print("\n Wszystkie testy jednostkowe i integracyjne (56/56) zakończone pełnym sukcesem!\n")
 
 
 

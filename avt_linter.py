@@ -82,8 +82,9 @@ class AVTLinter:
         (r"(^|[^\w]|\\[Nnh])dobrejsz(y|ego|emu|ym|a|ej|ą|e|ych|ymi)?\b", r"\g<1>lepsz\g<2>", "Filar CLXIV - Eliminacja Zniekształcenia Leksykalnego 'dobrejszy' -> 'lepszy'"),
         (r"(^|[^\w]|\\[Nnh])Dobrejsz(y|ego|emu|ym|a|ej|ą|e|ych|ymi)?\b", r"\g<1>Lepsz\g<2>", "Filar CLXIV - Eliminacja Zniekształcenia Leksykalnego 'dobrejszy' -> 'lepszy'"),
 
-        # Americanisms and lexical calques (Pillar IV / XXXVI)
-        (r"\b[Ww]itaj z powrotem\b", "Witaj!", "Filar IV/XXXVI - Eliminacja Kalek Amerykańskich"),
+        # Americanisms and lexical calques (Pillar IV / XXXVI / CLXVI)
+        (r"\b[Ww]itaj z powrotem\b", "Witaj!", "Filar IV/XXXVI/CLXVI - Eliminacja Kalek Amerykańskich"),
+        (r"\b([Nn])ie\s+ma\s+mowy,?\s+żeby(śmy|ście|m|ś)?\b", lambda m: ("Wykluczone, by" if m.group(1).isupper() else "wykluczone, by") + (m.group(2) or ""), "Filar CLXVI - Likwidacja Kalki 'There is no way that' -> 'Wykluczone, by'"),
         
         # Inflections of "mieć taką nadzieję" -> "mieć nadzieję"
         (r"\b([Mm]am|[Mm]iałem|[Mm]iałam|[Mm]ieliśmy|[Mm]iałyśmy|[Bb]ędę mieć|[Bb]ędziemy mieć)\s+taką\s+nadzieję\b", r"\1 nadzieję", "Filar IV - Czystość Idiomatyczna"),
@@ -1691,8 +1692,8 @@ class EpisodeQualityGate:
                     prev_clean,
                     re.IGNORECASE
                 ))
-                # Check for delayed agreement fallacy ("Jasne, o co chodzi?" / "Pewnie, o co chodzi?" 5-25s after relocation request)
-                if (time_gap_ms >= 5000 and is_prev_private_request) or time_gap_ms >= 8000:
+                # Check for delayed agreement fallacy ("Jasne, o co chodzi?" / "Pewnie, o co chodzi?" 4-25s after relocation request or 6s+ gap)
+                if (time_gap_ms >= 4000 and is_prev_private_request) or time_gap_ms >= 6000:
                     m_delayed_agree = re.search(
                         r"^(\s*\{[^\}]*\})*([Jj]asne|[Pp]ewnie|[Ww]\s+porządku|[Dd]obrze|[Tt]ak|[Aa]\s+zatem|[Aa]\s+więc|[Nn]o\s+dobrze|[Nn]o\s+dobra),\s+(o\s+co\s+chodzi|co\s+się\s+stało|w\s+czym\s+rzecz|słucham|słucham\s+cię|co\s+jest|czego\s+chcesz|o\s+czym\s+chcesz|o\s+czym\s+chciałaś|o\s+czym\s+chciałeś)\b",
                         ev.text,

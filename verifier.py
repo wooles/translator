@@ -131,17 +131,19 @@ class DialogueVerifier:
         prompt_lines.append("Zredaguj poniższe kwestie dialogowe. BEZWZGLĘDNIE wyeliminuj dosłowne tłumaczenie 1 do 1, sztuczne konstrukcje i kalki.")
         prompt_lines.append("Zastąp drewniane sformułowania żywym, potoczystym językiem polskim mówionym (tak jak w profesjonalnym dubbingu / u polskich nastolatków):")
         prompt_lines.append(
-            "WYKORZYSTAJ CZAS NA ZASTANOWIENIE (Thinking / CoT): Jako Główny Reżyser Dubbingu i Script Doctor, przed zatwierdzeniem każdej kwestii przefiltruj tekst przez TRZY ZŁOTE SOCZEWKI POZNAWCZE (THE 3 GOLDEN COGNITIVE LENSES):\n"
-            "1. 👂 SOCZEWKA 1: UCHO (AUDYT DUBBINGU, PRÓBA STOLIKOWA, PING-PONG I ŚLEPA LEKTURA):\n"
-            "   - Próba stolikowa i oddech (Table-Read & Mouth-Feel): Przeczytaj kwestię w myślach na jednym wydechu polskiego aktora dubbingowego. Czy fraza układa się w ustach bez sztywności i zgrzytów? Czy tempo CPS i długość odpowiadają czasowi trwania kwestii (mikro-kwestie <0.5s zredukowane do zwięzłych okrzyków - Filar CXXXIV)?\n"
-            "   - Dynamika dialogu i ping-pong: Czy kwestia naturalnie odpowiada na poprzednią wypowiedź partnera? KATEGORYCZNY ZAKAZ samotnego 'Tak/T-Tak' na polecenie lub ostrzeżenie 'Uważaj!' (użyj 'Dobrze / D-Dobrze / Jasne / Będę uważać' - Filar XLIII/CXLVI) oraz fałszywych potwierdzeń na pytania z przeczeniem (Echo Agreement - Filar CLIV)!\n"
-            "   - Test ślepej lektury polszczyzny (Autonomous Blind-Reading Flow): Przeczytaj wygenerowany polski dialog tak, jakbyś nigdy nie widział angielskiego skryptu. Czy brzmi w 100% naturalnie dla polskiego ucha, jak czysta, potoczysta polszczyzna literacka i filmowa? Jeśli czujesz w nim choćby cień angielskiej składni lub sztucznej kalki – przeredaguj je na czystą, płynną polszczyznę!\n"
-            "2. 🌍 SOCZEWKA 2: ŚWIAT I FIZYCZNOŚĆ SCENERII (ŚRODOWISKO, TOŻSAMOŚĆ I RELACJE):\n"
-            "   - Fizyczność scenerii (Filar CXXXVIII): Czy tekst szanuje fizyczną materię sceny i izotopię środowiskową (kategoryczny zakaz 'wody' w browarze z piwem/bagnie/kadzi wina, brak 'padnij na ziemię' w nieważkości kosmosu, brak współczesnego slangu 'masakra/spoko' w średniowieczu)?\n"
-            "   - Tożsamość postaci i relacje: Kto mówi i do kogo? Jaki jest status i układ sceny (Kadr 1-na-1 vs Uchi-Soto/zbiorowy)? KATEGORYCZNY ZAKAZ 'wygrał pan' w dialogu na 'ty' (Filar CLVII) oraz ZAKAZ przypisywania cudzych słów w 1. osobie bohaterom ukrywającym tożsamość ('by the Silent Witch' -> 'Wiedźmy Milczenia', ZAKAZ 'mój esej' - Filar CLXI)!\n"
-            "3. 🎬 SOCZEWKA 3: OBRAZ I AUDIO (TRIANGULACJA MULTIMODALNA I AFEKT SEIYŪ):\n"
-            "   - Triangulacja foniczna (Filar CLVIII): Czy ton głosu seiyū (intonacja F0, opadający kontur) lub alarm dysonansu afektywnego nie demaskuje ukrytej ironii/sarkazmu pod pozorem uprzejmości? Jeśli seiyū mówi coś innego niż angielski fansub, bezwzględnie zaufaj japońskiemu audio!\n"
-            "   - Harmonia z kadrem i warstwą semiotyczną (Filar CXLV & CLX): Czy kwestia idealnie harmonizuje z mimiką, ruchem ust postaci na kadrze i gestami? Zgodność z warstwą (mowa w kadrze vs myśl vs dymek mangowy vs napis ekranowy)."
+            "WYKORZYSTAJ CZAS NA ZASTANOWIENIE (Thinking / CoT): Jako Główny Reżyser Dubbingu i Script Doctor, przed zatwierdzeniem każdej kwestii przeprowadź DWUETAPOWY AUDYT POZNAWCZY (THE 2-STAGE COGNITIVE AUDIT):\n"
+            "   KROK 1: AUTONOMICZNA ŚLEPA LEKTURA POLSKIEGO DIALOGU (BLIND-READING FLOW AUDIT - FILAR CLXVI):\n"
+            "     - Przeczytaj proponowane kwestie polskie (Szkic PL) JEDNA PO DRUGIEJ, jak gotowy skrypt aktorski/dubbingu, CAŁKOWICIE IGNORUJĄC na tym etapie tekst angielski!\n"
+            "     - Zbadaj: Czy kwestie płyną naturalnie w ustach polskich aktorów? Czy nie ma sztucznych kalek fansubów ('witaj z powrotem', 'mam taką nadzieję', 'nie ma mowy, żeby', 'tutaj' przy podawaniu)?\n"
+            "     - Czy po pauzie czasowej (Δt ≥ 5s / zmiana sceny) postać nie odpowiada absurdalnym opóźnionym potaknięciem ('Jasne, o co chodzi?' -> BŁĄD KARDYNALNY! Zamień na: 'Więc o co chodzi?' / 'O co chodzi?' / 'Słucham cię' - Filar CLXV)?\n"
+            "     - Przeredaguj tekst na bezbłędną, potoczystą polszczyznę literacką i filmową.\n"
+            "   KROK 2: TRIANGULACJA MULTIMODALNA I KONTROLA WIERNOŚCI (MULTIMODAL TRIANGULATION):\n"
+            "     - Dopiero teraz skonfrontuj wyszlifowaną polszczyznę z japońskim audio seiyū i faktami z EN.\n"
+            "     - Zbadaj ton, intonację F0 i ewentualną ironię seiyū (Filar CLVIII). Upewnij się, że nie pominięto kluczowych faktów, imion ani liczb.\n"
+            "     - Zastosuj trzy soczewki weryfikacyjne:\n"
+            "       * 👂 Ucho: oddech, CPS, dynamika ping-ponga (zakaz 'Tak' na ostrzeżenie, zakaz potakiwania na przeczenie - Filar CLIV).\n"
+            "       * 🌍 Świat: relacje władzy, nienaruszalność T-V (zakaz 'wygrał pan' na 'ty' - Filar CLVII), perspektywa incognito (Filar CLXI).\n"
+            "       * 🎬 Obraz i Audio: afekt seiyū, gesty, napisy ekranowe vs dialog."
         )
         prompt_lines.append("W polu 'changes_made' dla KAŻDEJ poprawionej kwestii podaj DOKŁADNE uzasadnienie i numer Filaru AVT (np. '[Filar IV - Szyk Zdania] Usunięto kalkę angielską' lub '[Filar CLVII - Forma Adresatywna] Usunięto 'wygrał pan' -> 'wygrałeś''). Jeśli kwestia nie wymagała poprawek, wpisz null.")
         
@@ -278,6 +280,8 @@ class DialogueVerifier:
 
             # Directives, alarms, relational dynamics & traps
             directive_lines = []
+            if item.get('time_gap_s') and item['time_gap_s'] >= 4.0:
+                directive_lines.append(f"    • Oś czasu: Pauza {item['time_gap_s']:.1f}s od poprzedniej kwestii (DYSKONTINUITET CZASOWY / ZMIANA SCENY)")
             if item.get('relation_tag'):
                 directive_lines.append(f"    • Dynamika: {item['relation_tag'].strip()}")
             if item.get('audio_alert'):

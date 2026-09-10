@@ -2397,6 +2397,9 @@ class MultimodalTranslator:
             is_prev_wh = False
             is_prev_neg_q = False
 
+            prev_ev_end = None
+            time_gap_ms = 0
+            time_gap_s = 0.0
             try:
                 if idx > 0 and not vtype["is_sign"]:
                     prev_clean = untranslated_in_batch[idx - 1][2].strip()
@@ -2404,6 +2407,7 @@ class MultimodalTranslator:
                     prev_pl = pass1_items[idx - 1].get("pl", "").lower() if idx - 1 < len(pass1_items) else ""
                     prev_jp = pass1_items[idx - 1].get("audio_jp", "").lower() if idx - 1 < len(pass1_items) else ""
                     prev_is_thought = pass1_items[idx - 1].get("is_thought", False) if idx - 1 < len(pass1_items) else False
+                    prev_ev_end = untranslated_in_batch[idx - 1][1].end
                 elif idx == 0 and b_idx > 0 and b_idx - 1 < len(batches) and not vtype["is_sign"]:
                     # Cross-batch continuity: pobierz ostatnią kwestię z poprzedniego batcha
                     prev_batch = batches[b_idx - 1]
@@ -2415,57 +2419,91 @@ class MultimodalTranslator:
                         prev_pl = (translated_results.get(prev_orig_idx, "") if translated_results else "").lower()
                         prev_event = last_item[1]
                         prev_is_thought = "italic" in (prev_event.style or "").lower() or r"\i1" in (prev_event.text or "")
+                        prev_ev_end = prev_event.end
+                elif idx == 0 and lookback_history and not vtype["is_sign"]:
+                    prev_h = lookback_history[-1]
+                    prev_clean = prev_h.get("en", "").strip()
+                    prev_clean_lower = prev_clean.lower()
+                    prev_pl = prev_h.get("pl", "").lower()
+                    prev_is_thought = prev_h.get("is_thought", False)
+                    prev_ev_end = prev_h.get("end_ms")
+
+                if prev_ev_end is not None:
+                    time_gap_ms = max(0, event.start - prev_ev_end)
+                    time_gap_s = time_gap_ms / 1000.0
 
                 if prev_clean:
-                    # Sprawdź, czy poprzednia linijka to dyrektywa/ostrzeżenie/polecenie
-                    is_prev_directive = any(
-                        w in prev_clean_lower for w in [
-                            "watch your step", "be careful", "watch out", "look out", "mind the",
-                            "careful", "hold on", "wait", "listen", "don't move", "hurry", "stay back",
-                            "follow me", "step back", "take care"
-                        ]
+                    # Sprawdź dyskontinuitet czasowy i przeskoki scen (Filar CLXV)
+                    is_prev_private_request = any(
+                        w in prev_clean_lower for w in ["in private", "talk alone", "on our own", "somewhere quiet", "alone"]
                     ) or any(
-                        w in prev_pl for w in [
-                            "uważaj", "uważajcie", "ostrożnie", "czekaj", "zaczekaj", "poczekaj",
-                            "stój", "stójcie", "nie ruszaj", "pospiesz", "chodź", "chodźcie", "ruszaj",
-                            "trzymaj się"
-                        ]
-                    ) or any(
-                        w in prev_jp for w in [
-                            "ki o tsukete", "kiwotsukete", "abunai", "chotto matte", "mate",
-                            "tomare", "ugoku na", "hayaku", "気をつけ", "危ない", "待って", "止まれ"
-                        ]
+                        w in prev_pl for w in ["na osobności", "w cztery oczy", "porozmawiać", "pogadać", "w ustronne"]
+                    )
+                    is_curr_delayed_agreement = any(
+                        clean_en.lower().strip().startswith(w) for w in ["sure,", "sure.", "sure!", "all right,", "all right.", "yeah, what", "ok, what", "okay, what"]
                     )
 
-                    # Czy bieżąca kwestia to potwierdzenie afirmatywne (tak/hai/yes)?
-                    curr_is_affirmation = any(
-                        clean_en.lower().strip().startswith(w) for w in ["yes", "y-yes", "yeah", "yep", "right", "okay", "ok"]
-                    ) or any(
-                        w in audio_jp_str.lower() for w in ["hai", "はい", "ee", "ええ", "un", "うん"]
-                    )
+                    if (time_gap_ms >= 5000 and (is_prev_private_request or is_curr_delayed_agreement)) or (time_gap_ms >= 8000 and not prev_clean.endswith("...")):
+                        relation_tag = f"[DYSKONTINUITET CZASOWY: Pauza {time_gap_s:.1f}s / Zmiana sceny – KATEGORYCZNY ZAKAZ opóźnionego 'Jasne/Pewnie' (Delayed Agreement Filar CLXV); postacie przeszły już na miejsce – tłumacz jako otwarcie rozmowy: 'Więc o co chodzi?' / 'No to o co chodzi?' / 'Słucham cię']"
+                    else:
+                        # Sprawdź, czy poprzednia linijka to dyrektywa/ostrzeżenie/polecenie
+                        is_prev_directive = any(
+                            w in prev_clean_lower for w in [
+                                "watch your step", "be careful", "watch out", "look out", "mind the",
+                                "careful", "hold on", "wait", "listen", "don't move", "hurry", "stay back",
+                                "follow me", "step back", "take care"
+                            ]
+                        ) or any(
+                            w in prev_pl for w in [
+                                "uważaj", "uważajcie", "ostrożnie", "czekaj", "zaczekaj", "poczekaj",
+                                "stój", "stójcie", "nie ruszaj", "pospiesz", "chodź", "chodźcie", "ruszaj",
+                                "trzymaj się"
+                            ]
+                        ) or any(
+                            w in prev_jp for w in [
+                                "ki o tsukete", "kiwotsukete", "abunai", "chotto matte", "mate",
+                                "tomare", "ugoku na", "hayaku", "気をつけ", "危ない", "待って", "止まれ"
+                            ]
+                        )
 
-                    is_prev_wh = prev_clean.endswith("?") and (
-                        any(w in prev_clean_lower for w in ["what", "where", "why", "how", "who", "when", "which", "whose", "whom"]) or
-                        bool(re.search(r"\b(dokąd|gdzie|skąd|kiedy|dlaczego|czemu|po\s+co|kto|kogo|komu|kim|co|czego|czym|jak|jaki|jaka|jakie|jakim|jakich|o\s+co|o\s+czym|z\s+kim)\b", prev_pl, re.IGNORECASE))
-                    )
+                        # Czy bieżąca kwestia to potwierdzenie afirmatywne (tak/hai/yes)?
+                        curr_is_affirmation = any(
+                            clean_en.lower().strip().startswith(w) for w in ["yes", "y-yes", "yeah", "yep", "right", "okay", "ok"]
+                        ) or any(
+                            w in audio_jp_str.lower() for w in ["hai", "はい", "ee", "ええ", "un", "うん"]
+                        )
 
-                    is_prev_neg_q = prev_clean.endswith("?") and (
-                        any(w in prev_clean_lower for w in ["don't", "aren't", "didn't", "can't", "won't", "haven't", "isn't"]) or
-                        bool(re.search(r"\bnie\s+(jest|jesteś|jesteście|są|był|była|było|byli|byłeś|byłaś|będzie|będziesz|będą|ma|masz|macie|chcesz|chce|chcecie|wiesz|wie|wiecie|możesz|może|możecie|idziesz|idzie|idziecie|zrobisz|mówisz|widzisz|słyszysz)\b", prev_pl, re.IGNORECASE))
-                    )
+                        is_prev_wh = prev_clean.endswith("?") and (
+                            any(w in prev_clean_lower for w in ["what", "where", "why", "how", "who", "when", "which", "whose", "whom"]) or
+                            bool(re.search(r"\b(dokąd|gdzie|skąd|kiedy|dlaczego|czemu|po\s+co|kto|kogo|komu|kim|co|czego|czym|jak|jaki|jaka|jakie|jakim|jakich|o\s+co|o\s+czym|z\s+kim)\b", prev_pl, re.IGNORECASE))
+                        )
 
-                    if is_prev_directive and curr_is_affirmation:
-                        relation_tag = "[PING-PONG DIALOGOWY: Odpowiedź na ostrzeżenie/dyrektywę – KATEGORYCZNY ZAKAZ 'Tak/T-Tak'! Użyj 'Dobrze / D-Dobrze / Jasne / Będę uważać / W porządku' (Filar CXLVI & XLIII)]"
-                    elif is_prev_wh and curr_is_affirmation:
-                        relation_tag = "[PING-PONG DIALOGOWY: Odpowiedź na pytanie otwarte – KATEGORYCZNY ZAKAZ samotnego 'Tak/T-Tak'! W japońskim audio padło wahanie – użyj 'Eee...' / 'E-Eee...' / 'Cóż...' (Filar CXLVI)]"
-                    elif is_prev_neg_q and curr_is_affirmation:
-                        relation_tag = "[PING-PONG DIALOGOWY: Odpowiedź na pytanie z przeczeniem (Echo Agreement) – KATEGORYCZNY ZAKAZ 'Tak'! W japońskim audio seiyū potwierdza przeczenie ('Hai/Un' = racja, nie jest tak). W języku polskim odpowiadamy na fakt: 'Nie / Nie idę / Wcale nie / Skądże' (Filar CLIV)]"
-                    elif prev_clean.endswith("?"):
-                        relation_tag = "[PING-PONG DIALOGOWY: Odpowiedź/riposta na pytanie - zgraj leksykę i emocję (Filar CXLVI)]"
-                    elif any(prev_clean_lower.startswith(w) for w in ["come,", "let's", "shall we", "look,", "hey,"]):
-                        relation_tag = "[PING-PONG DIALOGOWY: Reakcja na propozycję/zaczepkę (Filar CXLVI)]"
-                    elif prev_clean.endswith("...") or prev_clean.endswith("…"):
-                        relation_tag = "[PING-PONG DIALOGOWY: Prawdopodobna kontynuacja myśli urwanej wielokropkiem (...)]"
+                        is_prev_neg_q = prev_clean.endswith("?") and (
+                            any(w in prev_clean_lower for w in ["don't", "aren't", "didn't", "can't", "won't", "haven't", "isn't"]) or
+                            bool(re.search(r"\bnie\s+(jest|jesteś|jesteście|są|był|była|było|byli|byłeś|byłaś|będzie|będziesz|będą|ma|masz|macie|chcesz|chce|chcecie|wiesz|wie|wiecie|możesz|może|możecie|idziesz|idzie|idziecie|zrobisz|mówisz|widzisz|słyszysz)\b", prev_pl, re.IGNORECASE))
+                        )
+
+                        if is_prev_directive and curr_is_affirmation:
+                            relation_tag = "[PING-PONG DIALOGOWY: Odpowiedź na ostrzeżenie/dyrektywę – KATEGORYCZNY ZAKAZ 'Tak/T-Tak'! Użyj 'Dobrze / D-Dobrze / Jasne / Będę uważać / W porządku' (Filar CXLVI & XLIII)]"
+                        elif is_prev_wh and curr_is_affirmation:
+                            relation_tag = "[PING-PONG DIALOGOWY: Odpowiedź na pytanie otwarte – KATEGORYCZNY ZAKAZ samotnego 'Tak/T-Tak'! W japońskim audio padło wahanie – użyj 'Eee...' / 'E-Eee...' / 'Cóż...' (Filar CXLVI)]"
+                        elif is_prev_neg_q and curr_is_affirmation:
+                            relation_tag = "[PING-PONG DIALOGOWY: Odpowiedź na pytanie z przeczeniem (Echo Agreement) – KATEGORYCZNY ZAKAZ 'Tak'! W japońskim audio seiyū potwierdza przeczenie ('Hai/Un' = racja, nie jest tak). W języku polskim odpowiadamy na fakt: 'Nie / Nie idę / Wcale nie / Skądże' (Filar CLIV)]"
+                        elif prev_clean.endswith("?"):
+                            relation_tag = "[PING-PONG DIALOGOWY: Odpowiedź/riposta na pytanie - zgraj leksykę i emocję (Filar CXLVI)]"
+                        elif any(prev_clean_lower.startswith(w) for w in ["come,", "let's", "shall we", "look,", "hey,"]):
+                            relation_tag = "[PING-PONG DIALOGOWY: Reakcja na propozycję/zaczepkę (Filar CXLVI)]"
+                        elif prev_clean.endswith("...") or prev_clean.endswith("…"):
+                            relation_tag = "[PING-PONG DIALOGOWY: Prawdopodobna kontynuacja myśli urwanej wielokropkiem (...)]"
+
+                    # Whisper JP-First Semantic Override & Anti-Pivot Cliché Detection (Filar CLXVI)
+                    is_en_cliche = any(clean_en.lower().strip().startswith(w) for w in ["sure", "all right", "yeah", "here", "i'm fine", "i am fine", "wait"])
+                    has_jp_affirmation = any(tok in jp_text.lower() for tok in ["hai", "ee", "un", "wakatta", "はい", "ええ", "うん", "分かった"])
+                    if is_en_cliche and not has_jp_affirmation and jp_text:
+                        if any(tok in jp_text.lower() for tok in ["nani", "dou shita", "doushita", "nan da", "何", "どうした", "なんだ"]):
+                            relation_tag = f"{relation_tag} [🎙️ ALARM KLISZY FANSUBERSKIEJ (Filar CLXVI): W audio padło pytanie '{jp_text}' bez potaknięcia – zignoruj angielskie 'Sure/Yeah', tłumacz: 'O co chodzi?' / 'Co się stało?']".strip()
+                        elif "here" in clean_en.lower().strip() and any(tok in jp_text.lower() for tok in ["yoisho", "dokkoisho", "hora", "douzo"]):
+                            relation_tag = f"{relation_tag} [🎙️ ALARM SZUMU KINEZJATYCZNEGO (Filar IV/XVIII/CLXVI): W audio seiyū jest gest/kakegoe – ZAKAZ 'Tutaj!', użyj 'Proszę / Trzymaj' lub elipsy]".strip()
             except Exception:
                 relation_tag = ""
 
@@ -2507,6 +2545,8 @@ class MultimodalTranslator:
                 "is_missing_translation": is_missing_tr,
                 "is_blind_draft": is_blind_draft,
                 "duration_s": dur_s,
+                "time_gap_s": time_gap_s,
+                "time_gap_ms": time_gap_ms,
                 "cps": cps,
                 "start_ms": event.start,
                 "end_ms": event.end,
@@ -3274,7 +3314,9 @@ class MultimodalTranslator:
                                                 "pl": pl_final,
                                                 "speaker": it.get("speaker_name", ""),
                                                 "speaker_gender": it.get("speaker_gender", ""),
-                                                "is_thought": it.get("is_thought", False)
+                                                "is_thought": it.get("is_thought", False),
+                                                "end_ms": it.get("end_ms", 0),
+                                                "start_ms": it.get("start_ms", 0)
                                             })
                                     history.sort(key=lambda x: x.get("orig_idx", 0))
                                     if len(history) > 30:

@@ -306,6 +306,15 @@ Twoim zadaniem jest dogłębna, wszechstronna analiza 100% skryptu całego odcin
       * DRYF ZAIMKOWY I RESET EMOCJONALNY: Zaimki 'to/on' po zmianie kadru muszą być sprecyzowane; krzyk z walki nie może przenikać do cichej sceny po cięciu.
       * W sekcji danger_lines_prescan bezwzględnie wskaż tego typu luki czasowe i nakaż właściwe otwarcie dialogu!
 
+16. PROTOKÓŁ ANTY-PIVOT I ELIMINACJA KLISZ FANSUBERSKICH (FILAR CLXVI):
+   - Zidentyfikuj i wpisz do danger_lines_prescan kwestie, w których angielskie fansuby stosują amatorskie wypełniacze lub kalki:
+      * 'Sure, what is it?' / 'All right, what's up?' po pauzie -> 'Więc o co chodzi?' / 'Słucham cię' (ZAKAZ: 'Jasne...').
+      * 'Welcome back' -> 'Witaj!' / 'Wróciłeś!' (KATEGORYCZNY ZAKAZ: 'Witaj z powrotem').
+      * 'I hope so' / 'I hope not' -> 'Oby!' / 'Mam nadzieję!' / 'Oby nie!' (ZAKAZ: 'Mam taką nadzieję').
+      * 'There is no way that...' -> 'Wykluczone, by...' / 'To niemożliwe, żeby...'.
+      * Gest podania rekwizytu z angielskim 'Here' -> 'Proszę' / 'Trzymaj' (KARDYNALNY BŁĄD: 'Tutaj!').
+   - W mandatory_direction wymuś nadrzędność dramaturgii i japońskiego audio seiyū nad dosłownym skryptem angielskim.
+
 METADANE Z BAZY ANILIST:
 {anime_metadata_str}
 

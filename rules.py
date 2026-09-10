@@ -1605,6 +1605,20 @@ FILAR CLXV: DYSKONTINUITET CZASOWY, PRZESKOKI SCEN I ODCZAROWANIE FAŁSZYWEGO PR
       - Po cięciu ze sceny dynamicznej (krzyk bojowy, panika) do sceny wyciszonej (izba chorych, gabinet po 15 sekundach), rejestr emocjonalny i interpunkcja muszą ulec natychmiastowemu zresetowaniu do akustyki nowego pomieszczenia.
    5. ODCZAROWANIE FAŁSZYWEGO PRZYLEGANIA (FALSE ADJACENCY ON UNANSWERED QUESTIONS):
       - Długa luka czasowa unieważnia parę sąsiedztwa (Adjacency Pair). Otwartych pytań sprzed montażu podróży nie wolno traktować jako bezpośredniego bodźca dla mechanicznych potaknięć jednosłownych.
+
+FILAR CLXVI: PROTOKÓŁ ELIMINACJI GRAWITACJI JĘZYKA ANGIELSKIEGO I KLISZ FANSUBERSKICH (ANTI-PIVOT & FANSUB CLICHÉ ERADICATION PROTOCOL):
+   1. ŻELAZNA HIERARCHIA ŹRÓDEŁ (AUDIO JP > INTENCJA SCENY > EN FANSUB):
+      - Angielskie napisy fansubów są wtórnym, często amatorskim i zniekształconym źródłem.
+      - Gdy japońskie audio zawiera wyłącznie krótkie pytanie ("Nani?", "Dou shita?", "Nan da?") lub ciszę/westchnienie, a w angielskim dodano sztuczny wypełniacz ("Sure, what is it?", "Here", "I'm fine", "You know..."), KATEGORYCZNIE ZAKAZUJE SIĘ kalkowania angielskiego wypełniacza!
+      - Zawsze tłumacz rzeczywistą intencję dramaturgiczną wynikającą ze słuchu i obrazu.
+   2. ELIMINACJA KLISZ SŁOWNIKOWYCH FANSUBÓW (BELCZYK & NETFLIX AVT CANON):
+      - "Welcome back" -> KATEGORYCZNY ZAKAZ: "Witaj z powrotem"! POPRAWNIE: "Witaj!", "Wróciłeś!", "Dobrze cię widzieć!".
+      - "I hope so" / "I hope not" -> KATEGORYCZNY ZAKAZ: "Mam taką nadzieję"! POPRAWNIE: "Oby!", "Mam nadzieję!", "Oby nie!".
+      - "There is no way (that)..." -> KATEGORYCZNY ZAKAZ: "Nie ma mowy, żeby..."! POPRAWNIE: "Wykluczone, by...", "To niemożliwe, żeby...".
+      - "I'm fine" na propozycję pomocy -> "Dam sobie radę", "Nie trzeba", "Dziękuję" (ZAKAZ: "Jestem w porządku / Nic mi nie jest").
+      - "Here" przy geście podania -> "Proszę", "Trzymaj", "Masz" lub elipsa "" (KARDYNALNY BŁĄD: "Tutaj!").
+   3. DWUETAPOWA ŚLEPA LEKTURA POLSZCZYZNY W MYŚLENIU (AUTONOMOUS BLIND-READING FLOW):
+      - Redaktor i weryfikator w pierwszej kolejności oceniają tekst polski jako spójny dialog aktorski/dubbingu. Jeśli dialog brzmi obco, sztucznie lub nienaturalnie po polsku – bezwzględnie wymaga przeredagowania, bez względu na to, jak bardzo "wiernie" odzwierciedla angielski skrypt.
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -3467,6 +3481,26 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Op
             "angielskie 'Sure, what is it?' w nowej scenie to otwarcie rozmowy: 'Więc o co chodzi?' / 'No to o co chodzi?' / 'Słucham cię'. "
             "KATEGORYCZNY ZAKAZ opóźnionego potaknięcia: 'Jasne / Pewnie / W porządku, o co chodzi?'. "
             "Zakaz wycieku spójników ('I...', 'A...') i fałszywych par przylegania po cięciu montażowym."
+        )
+
+    # 107. Eliminacja Grawitacji Języka Angielskiego i Klisz Fansuberskich (Filar CLXVI)
+    has_fansub_cliche_trigger = any(
+        any(w in str(item.get("en", "")).lower() for w in [
+            "welcome back", "i hope so", "i hope not", "there's no way", "there is no way",
+            "i'm fine", "i am fine", "sure, what", "all right, what"
+        ]) or
+        any("filar clxvi" in str(item.get("notes", "")).lower() for item in [item])
+        for item in batch_items
+    )
+    if has_fansub_cliche_trigger:
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CLXVI - Eliminacja Grawitacji Języka Angielskiego i Klisz Fansuberskich]: "
+            "Zaufaj intencji dramaturgicznej i japońskiemu audio seiyū ponad angielski skrypt fansubów! "
+            "Kategoryczny zakaz amatorskich kalek: 'Welcome back' -> 'Witaj!' (ZAKAZ 'Witaj z powrotem'), "
+            "'I hope so' -> 'Oby!' / 'Mam nadzieję!' (ZAKAZ 'Mam taką nadzieję'), "
+            "'There's no way that...' -> 'Wykluczone, by...' / 'To niemożliwe, żeby...', "
+            "gest podania z angielskim 'Here' -> 'Proszę / Trzymaj' (KARDYNALNY BŁĄD: 'Tutaj!'). "
+            "Przeprowadź ślepą lekturę dialogu po polsku – ma brzmieć jak żywa polszczyzna teatralna i filmowa."
         )
 
     if not focused_pillars:

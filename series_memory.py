@@ -176,10 +176,14 @@ def sanitize_lexical_text(text: str) -> str:
         (r"\b([Ww]znosi(?:ć|m|sz|my|cie|ją|ł|ła|ło|li|ły)?)\s+się\s+w\s+górę\b", r"\1 się"),
         (r"\b[Ww]zajemn(?:a|ej|ą|e|ych|ym|ymi)\s+(współprac(?:a|y|ę|ą|ie|om|ami))\b", lambda m: m.group(1).capitalize() if m.group(0)[0].isupper() else m.group(1)),
         (r"\b([Ff]akt(?:y|ów|om|ami|ach)?)\s+autentyczn(?:e|ych|ym|ymi)\b", r"\1"),
-        # Absolute dialogic calques (Filar IV / CLIII)
+        # Absolute dialogic calques (Filar IV / CLIII / CLXVI)
         (r"\b[Zz]rób\s+swoje\s+najlepsze\b", lambda m: "Daj z siebie wszystko" if m.group(0)[0].isupper() else "daj z siebie wszystko"),
         (r"\b[Zz]róbcie\s+swoje\s+najlepsze\b", lambda m: "Dajcie z siebie wszystko" if m.group(0)[0].isupper() else "dajcie z siebie wszystko"),
         (r"\b[Dd]obrej\s+nocy\b", lambda m: "Dobranoc" if m.group(0)[0].isupper() else "dobranoc"),
+        # Anti-pivot fansub cliché eradication (Filar CLXVI)
+        (r"\b[Ww]itaj\s+z\s+powrotem\b", "Witaj!"),
+        (r"\b([Nn])ie\s+ma\s+mowy,?\s+żeby(śmy|ście|m|ś)?\b", lambda m: ("Wykluczone, by" if m.group(1).isupper() else "wykluczone, by") + (m.group(2) or "")),
+        (r"\b[Mm]am\s+taką\s+nadzieję\b", "Mam nadzieję"),
     ]
     res = text
     for pat, repl in TYPO_NORMALIZATIONS:
