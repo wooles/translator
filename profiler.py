@@ -289,6 +289,22 @@ Twoim zadaniem jest dogłębna, wszechstronna analiza 100% skryptu całego odcin
    - Kategoryczny zakaz wprowadzania lub tolerowania zniekształconych, nieistniejących form leksykalnych i literówek w dialogach i glosariuszu.
    - Czasownik 'spytać / zapytać': w 1. os. lp. czasu przyszłego ma wyłącznie formę 'spytam' lub 'zapytam' (KARDYNALNY BŁĄD [X]: 'spyham' [nieistniejący potworek leksykalny!]; POPRAWNIE: 'spytam / zapytam').
    - Ostrzegaj przed wszelkimi deformacjami ortograficzno-fonetycznymi ('spyham' -> 'spytam', 'wziąść' -> 'wziąć', 'poszłem' -> 'poszedłem', 'włanczać' -> 'włączać').
+14. KANON CZYSTOŚCI WIZUALNEJ AVT, ZASADA ELIPSY SZUMU KINEZJATYCZNEGO I OCHRONA PRZED KALKAMI 'HERE' (FILAR XVIII & IV):
+   - Kakegoe kinestetyczne (odgłosy wysiłku fizycznego seiyū: Yoisho, Dokkoisho, Yotto, Yoi-kora, hai oddechowe przy wstawaniu z krzesła, podnoszeniu ciężaru, siadaniu, kucaniu):
+     * KATEGORYCZNY NAKAZ ELIPSY (pusty napis `""` lub pominięcie kwestii). W polskiej szkole AVT dorosłe postacie nie mają napisów pod stęknięciem przy wstawaniu!
+     * KATEGORYCZNY ZAKAZ infantylnych podpisów w rodzaju 'Hop...', 'I siup...', 'Raz, dwa...' oraz grzecznościowych pomyłek 'Proszę...'.
+   - Gest podawania przedmiotu / częstowania (Hai, Dōzo, Hora -> w EN: 'Here', 'There you go'):
+     * KATEGORYCZNY ZAKAZ KOSZMARNEJ KALKI: 'Here' -> 'Tutaj' / 'Tu' (nikt w Polsce podając herbatę czy klucze nie mówi 'Tutaj!').
+     * POPRAWNIE: w większości scen elipsa `""`, a jeśli gest wymaga zaznaczenia w dialogu: wyłącznie naturalne 'Proszę' lub 'Trzymaj / Masz' (w akcji: 'Łap!').
+   - Bezwzględne niezmienniki językowe: 'w każdym bądź razie' -> 'w każdym razie', 'w cudzysłowiu' -> 'w cudzysłowie', 'po najmniejszej linii oporu' -> 'po linii najmniejszego oporu', 'pod rząd' -> 'z rzędu', 'spowrotem' -> 'z powrotem', 'dlatego bo' -> 'dlatego że', 'Zrób swoje najlepsze!' -> 'Daj z siebie wszystko!', 'Dobrej nocy!' -> 'Dobranoc!'.
+15. DYSKONTINUITET CZASOWY, PRZESKOKI SCEN I ODCZAROWANIE FAŁSZYWEGO PRZYLEGANIA (FILAR CLXV):
+   - Przeskanuj cały odcinek pod kątem kwestii przedzielonych dużą przerwą czasową (Δt ≥ 5-10s) lub cięciem montażowym (przejście do innego pomieszczenia, pleneru, na osobność):
+      * PUŁAPKA OPÓŹNIONEGO POTWIERDZENIA (DELAYED AGREEMENT FALLACY): Gdy postać A prosi o rozmowę na osobności ('Moglibyśmy porozmawiać na osobności?' / 'Can we talk in private?'), a po długiej pauzie (np. 15-25s) postać B w nowej lokacji odpowiada w EN 'Sure, what is it?' / 'All right, what\'s up?':
+        -> KATEGORYCZNY ZAKAZ traktowania tego jako opóźnionej zgody na wyjście: 'Jasne / Pewnie / W porządku, o co chodzi?' (bohaterowie JUŻ tam stoją!).
+        -> NAKAZ otwarcia rozmowy w nowej scenie: 'Więc o co chodzi?' / 'No to o co chodzi?' / 'Słucham cię' / 'O co chodzi?'.
+      * WYCIEK SPÓJNIKÓW PO CIĘCIU (CONJUNCTION BLEED): ZAKAZ zaczynania kwestii po długiej pauzie od spójników łączących ('I co z tego?', 'A więc...').
+      * DRYF ZAIMKOWY I RESET EMOCJONALNY: Zaimki 'to/on' po zmianie kadru muszą być sprecyzowane; krzyk z walki nie może przenikać do cichej sceny po cięciu.
+      * W sekcji danger_lines_prescan bezwzględnie wskaż tego typu luki czasowe i nakaż właściwe otwarcie dialogu!
 
 METADANE Z BAZY ANILIST:
 {anime_metadata_str}

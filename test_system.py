@@ -3980,6 +3980,142 @@ def test_relational_tv_invariance_and_hybrid_vocative_guard():
     print(" -> PASSED: Relacyjna nienaruszalność T-V, tarcza wołacza, eliminacja hybryd pan/ty, Anti-Sama-Drop i ochrona mianownika działają w 100% harmonii (0.00 PLN).")
 
 
+def test_linguistic_invariants_and_kakegoe_noise_elision():
+    """
+    Test 54: Weryfikacja bezwzględnych niezmienników leksykalnych, ortograficznych,
+    pleonastycznych oraz eliminacji szumu kinezjatycznego Kakegoe i kalki 'Here' -> 'Tutaj'.
+    """
+    print("\n[TEST 54] Test bezwzględnych niezmienników i elipsy szumu kinezjatycznego...")
+    from series_memory import sanitize_lexical_text
+    from avt_linter import AVTLinter, EpisodeQualityGate
+    import pysubs2
+
+    # 1. Test sanityzacji leksykalnej w series_memory (Protokół 5 Warstw - Warstwa 2)
+    assert sanitize_lexical_text("W każdym bądź razie to sprawdzimy.") == "W każdym razie to sprawdzimy."
+    assert sanitize_lexical_text("Napisał to słowo w cudzysłowiu.") == "Napisał to słowo w cudzysłowie."
+    assert sanitize_lexical_text("Poszedł po najmniejszej linii oporu.") == "Poszedł po linii najmniejszego oporu."
+    assert sanitize_lexical_text("Wygrał trzy razy pod rząd!") == "Wygrał trzy razy z rzędu!"
+    assert sanitize_lexical_text("Wrócił spowrotem do zamku.") == "Wrócił z powrotem do zamku."
+    assert sanitize_lexical_text("Zrobił to dlatego bo musiał.") == "Zrobił to dlatego że musiał."
+    assert sanitize_lexical_text("Zaatakował ich od nienacka.") == "Zaatakował ich znienacka."
+    assert sanitize_lexical_text("Głaz zaczął spadać w dół.") == "Głaz zaczął spadać."
+    assert sanitize_lexical_text("Dym zaczął wznosić się w górę.") == "Dym zaczął wznosić się."
+    assert sanitize_lexical_text("To były fakty autentyczne.") == "To były fakty."
+    assert sanitize_lexical_text("Nawiązali wzajemną współpracę.") == "Nawiązali współpracę."
+
+    # 2. Test reguł lintera (AVTLinter - Warstwa 4)
+    t_gb, _ = AVTLinter.lint_and_fix_line("Zrób swoje najlepsze, wierzę w ciebie!")
+    assert "Daj z siebie wszystko" in t_gb, f"Błąd lintera: {t_gb}"
+    t_gb_pl, _ = AVTLinter.lint_and_fix_line("Zróbcie swoje najlepsze!")
+    assert "Dajcie z siebie wszystko" in t_gb_pl, f"Błąd lintera: {t_gb_pl}"
+
+    t_gn, _ = AVTLinter.lint_and_fix_line("Dobrej nocy, do jutra.")
+    assert "Dobranoc, do jutra." in t_gn, f"Błąd lintera: {t_gn}"
+
+    t_gw, _ = AVTLinter.lint_and_fix_line("Zgadnij co?")
+    assert t_gw == "Wiesz co?", f"Błąd lintera: {t_gw}"
+
+    t_tw, _ = AVTLinter.lint_and_fix_line("To jest to, o czym mówię!")
+    assert t_tw == "O tym właśnie mówię!", f"Błąd lintera: {t_tw}"
+
+    t_hg, _ = AVTLinter.lint_and_fix_line("Tutaj masz swój płaszcz.")
+    assert "Trzymaj swój płaszcz." in t_hg, f"Błąd lintera: {t_hg}"
+
+    # 3. Test EpisodeQualityGate (Likwidacja 'Tutaj' i elipsa szumu Kakegoe)
+    subs = pysubs2.SSAFile()
+    # Linia 0: Normalny dialog
+    subs.events.append(pysubs2.SSAEvent(start=1000, end=3000, name="Alice", text="Prosiłeś o tę herbatę?"))
+    # Linia 1: Kalka 'Here.' przetłumaczona jako 'Tutaj.' przy podaniu herbaty -> powinno zmienić na 'Proszę.'
+    subs.events.append(pysubs2.SSAEvent(start=3500, end=4500, name="Alice", text="Tutaj."))
+    # Linia 2: Pytanie o miejsce
+    subs.events.append(pysubs2.SSAEvent(start=5000, end=7000, name="Bob", text="Gdzie leżą dokumenty?"))
+    # Linia 3: Prawidłowe wskazanie lokalizacji 'Tutaj.' -> NIE MOŻE zostać zmienione!
+    subs.events.append(pysubs2.SSAEvent(start=7200, end=8500, name="Alice", text="Tutaj."))
+    # Linia 4: Infantylny odgłos wstawania/wysiłku 'Hop...' -> powinien zostać wyciszony do pustego napisu
+    subs.events.append(pysubs2.SSAEvent(start=9000, end=9800, name="Bob", text="Hop..."))
+    # Linia 5: Kolejny infantylny odgłos 'I siup...' -> wyciszony
+    subs.events.append(pysubs2.SSAEvent(start=10000, end=10800, name="Bob", text="I siup..."))
+
+    fixed_subs, fixes = EpisodeQualityGate.audit_and_fix_entire_episode(subs)
+    assert fixed_subs.events[1].text == "Proszę.", f"Błąd likwidacji kalki 'Tutaj': {fixed_subs.events[1].text}"
+    assert fixed_subs.events[3].text == "Tutaj.", f"Błąd: zniszczono poprawną odpowiedź przestrzenną: {fixed_subs.events[3].text}"
+    assert fixed_subs.events[4].text == "", f"Błąd elipsy szumu Kakegoe: {fixed_subs.events[4].text}"
+    assert fixed_subs.events[5].text == "", f"Błąd elipsy szumu Kakegoe: {fixed_subs.events[5].text}"
+    assert any("zlikwidowano kalkę gestu 'Here'" in f for f in fixes)
+    assert any("wyciszono infantylny odgłos kinezjatyczny" in f for f in fixes)
+
+    print(" -> PASSED: Bezwzględne niezmienniki językowe, likwidacja kalki 'Tutaj' i elipsa szumu Kakegoe działają ze 100% precyzją.")
+
+
+def test_temporal_discontinuity_and_scene_boundary_guard():
+    print("[TEST 55] Test protokołu dyskontinuitetu czasowego, przeskoków scen i opóźnionego potwierdzenia (Filar CLXV)...")
+    from avt_linter import EpisodeQualityGate
+    from rules import BELCZYK_AVT_MASTER_CANON, get_focused_rules_for_batch
+    import pysubs2
+
+    # 1. Sprawdzenie obecności Filaru CLXV w Kanonie Belczyka (Warstwa 3)
+    assert "FILAR CLXV: DYSKONTINUITET CZASOWY" in BELCZYK_AVT_MASTER_CANON, "Brak Filaru CLXV w BELCZYK_AVT_MASTER_CANON"
+
+    # 2. Sprawdzenie aktywacji dynamicznego dyspozytora reguł (Warstwa 3)
+    batch_private = [
+        {"en": "Could we talk in private for a moment?", "duration_s": 3.6},
+        {"en": "Sure, what is it?", "duration_s": 2.6}
+    ]
+    f_rules = get_focused_rules_for_batch(batch_private)
+    assert "CLXV" in f_rules, f"Dyspozytor nie aktywował Filaru CLXV: {f_rules}"
+
+    # 3. Przypadek zgłoszony przez użytkownika 1:1 (Anastasia i Eftal, luka 20.43 sekundy) (Warstwa 4)
+    subs = pysubs2.SSAFile()
+    # 0:16:15.18 -> 0:16:18.82 (975180ms - 978820ms)
+    subs.events.append(pysubs2.SSAEvent(
+        start=975180,
+        end=978820,
+        name="Anastasia",
+        text=r"Moglibyśmy porozmawiać\Nprzez chwilę na osobności?"
+    ))
+    # 0:16:39.25 -> 0:16:41.88 (999250ms - 1001880ms) -> luka 20430ms (20.43s)
+    subs.events.append(pysubs2.SSAEvent(
+        start=999250,
+        end=1001880,
+        name="Eftal",
+        text="Jasne, o co chodzi?"
+    ))
+
+    fixed_subs, fixes = EpisodeQualityGate.audit_and_fix_entire_episode(subs)
+    assert fixed_subs.events[1].text == "Więc o co chodzi?", f"Błąd naprawy opóźnionego potwierdzenia: {fixed_subs.events[1].text}"
+    assert any("[Episode Quality Gate - Filar CLXV Dyskontinuitet Czasowy]" in f for f in fixes)
+    assert any("zlikwidowano opóźnione potwierdzenie 'Jasne, o co chodzi'" in f for f in fixes)
+
+    # 4. Test wariantów leksykalnych opóźnionego potwierdzenia po przeskoku sceny (Warstwa 4)
+    variants = [
+        ("Pewnie, o co chodzi?", "Więc o co chodzi?"),
+        ("W porządku, o co chodzi?", "Więc o co chodzi?"),
+        ("Jasne, co się stało?", "Więc co się stało?"),
+        ("Jasne, w czym rzecz?", "Więc w czym rzecz?"),
+        ("Dobrze, o co chodzi?", "Więc o co chodzi?"),
+        ("No dobra, o co chodzi?", "Więc o co chodzi?"),
+        ("Jasne, słucham cię", "Więc słucham cię"),
+        (r"{\i1}Jasne, o co chodzi?{\i0}", r"{\i1}Więc o co chodzi?{\i0}"),
+        (r"Jasne, o co chodzi?\NCo się stało?", r"Więc o co chodzi?\NCo się stało?")
+    ]
+    for orig_t, expected_t in variants:
+        s_test = pysubs2.SSAFile()
+        s_test.events.append(pysubs2.SSAEvent(start=10000, end=14000, name="A", text="Chodźmy na osobność."))
+        s_test.events.append(pysubs2.SSAEvent(start=25000, end=28000, name="B", text=orig_t))  # luka 11s
+        fixed_v, _ = EpisodeQualityGate.audit_and_fix_entire_episode(s_test)
+        assert fixed_v.events[1].text == expected_t, f"Błąd dla wariantu '{orig_t}': otrzymano '{fixed_v.events[1].text}', oczekiwano '{expected_t}'"
+
+    # 5. Tarcza nienaruszalności szybkiego dialogu w tym samym pomieszczeniu (Fast Dialogue Immunity)
+    subs_fast = pysubs2.SSAFile()
+    subs_fast.events.append(pysubs2.SSAEvent(start=10000, end=12000, name="Alice", text="Mogę ci zadać pytanie?"))
+    subs_fast.events.append(pysubs2.SSAEvent(start=13000, end=15000, name="Bob", text="Jasne, o co chodzi?"))  # luka tylko 1.0s
+    fixed_fast, fast_fixes = EpisodeQualityGate.audit_and_fix_entire_episode(subs_fast)
+    assert fixed_fast.events[1].text == "Jasne, o co chodzi?", f"Błąd: naruszono szybki dialog w tej samej scenie: {fixed_fast.events[1].text}"
+    assert len(fast_fixes) == 0, f"Nieoczekiwane poprawki w szybkim dialogu: {fast_fixes}"
+
+    print(" -> PASSED: Protokół dyskontinuitetu czasowego, przeskoki scen i eliminacja 'Jasne, o co chodzi?' (Filar CLXV) działają w 100% harmonii (0.00 PLN).")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -4032,7 +4168,9 @@ if __name__ == "__main__":
     test_lexical_typo_correction_and_orthographic_integrity_guard()
     test_frieren_manga_canon_aura_gilotyna_and_calque_shield()
     test_relational_tv_invariance_and_hybrid_vocative_guard()
-    print("\n Wszystkie testy jednostkowe i integracyjne (53/53) zakończone pełnym sukcesem!\n")
+    test_linguistic_invariants_and_kakegoe_noise_elision()
+    test_temporal_discontinuity_and_scene_boundary_guard()
+    print("\n Wszystkie testy jednostkowe i integracyjne (55/55) zakończone pełnym sukcesem!\n")
 
 
 

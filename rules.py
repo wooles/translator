@@ -193,11 +193,14 @@ FILAR XVIII: ADAPTACJA PARALINGWISTYKI, DŹWIĘKÓW POZAWERBALNYCH I INTERIEKCJI
   * "Itta!" (痛っ!) / "Ita'!" (nagły ból mechaniczny: walnięcie głową w belkę, postrzał, uderzenie piszczelem):
     -> POPRAWNIE: „Ała!”, „Auć!”, „Niech to...!”, „Szlag!”.
     -> KARDYNALNY BŁĄD [X]: „To boli!”.
-  * "Yotto..." (よっと…) / "Yoisho..." (よいしょ…) / "Dokkoisho..." (どっこいしょ…) / "Yoi kora..." (odgłos wysiłku przy podnoszeniu ciężaru, stawianiu wiadra, siadaniu, kucaniu przy dojeniu zwierzęcia):
-    -> POPRAWNIE: "Hop...", "Hopla...", "I siup...", "No i już...", "Raz, dwa..." (lub puste "" jeśli odgłos w audio wystarcza).
-    -> KARDYNALNY BŁĄD [X]: "Proszę...", "Oto..." (kalka z angielskiego "There / Here you go" - postać nie częstuje nikogo grzecznościowo, lecz wykonuje wysiłek fizyczny!).
+  * "Yotto..." (よっと…) / "Yoisho..." (よいしょ…) / "Dokkoisho..." (どっこいしょ…) / "Yoi kora..." (odgłos wysiłku przy podnoszeniu ciężaru, stawianiu wiadra, siadaniu, kucaniu, wstawaniu z krzesła/ziemi):
+    -> POPRAWNIE: BEZWZGLĘDNA ELIPSA "" (pusty napis - widz widzi ruch na ekranie i słyszy wysiłek; brak napisu to najwyższy standard profesjonalizmu AVT Belczyka / Netflixa) lub w ostateczności "No i już..." / "Uch...".
+    -> KARDYNALNY BŁĄD [X]: "Tutaj...", "Proszę...", "Oto..." (kalka z angielskiego "Here / There you go") oraz infantylne podpisy "Hop...", "I siup...", "Raz, dwa..." przy dorosłych postaciach!
+  * Gesty podawania i częstowania ("Hai" / "Dōzo" / "Hora" -> w EN: "Here", "Here you go", "There"):
+    -> POPRAWNIE: w większości scen ELIPSA "" (obraz w 100% wyjaśnia gest podania), a jeśli relacja wymaga zaznaczenia w dialogu: wyłącznie naturalne "Proszę", "Trzymaj", "Masz" (w locie/walce: "Łap!").
+    -> KARDYNALNY BŁĄD [X]: KOSZMARNA KALKA "Tutaj!" / "Tu!" (w języku polskim wręczając komuś herbatę, klucze czy dokument nikt nie mówi "Tutaj!").
   * "Hora!" (ほら) / "Sora!" (そら) (przy rzucie, dynamicznym podaniu przedmiotu w locie):
-    -> POPRAWNIE: "Łap!", "Masz!", "Trzymaj!", "Hop!" (KATEGORYCZNY ZAKAZ: "Proszę!").
+    -> POPRAWNIE: "Łap!", "Masz!", "Trzymaj!" (KATEGORYCZNY ZAKAZ: "Tutaj!" / "Proszę!").
   * "Puhā!" (ぷはーっ!) (sapnięcie ulgi/orzeźwienia po kuflu zimnego piwa lub wynurzeniu z wody):
     -> POPRAWNIE: „Aaaach!”, „Ale dobre!”, „Wreszcie powietrze!” lub puste "" (elipsa szumu).
     -> KARDYNALNY BŁĄD [X]: „Pha!”.
@@ -1587,6 +1590,21 @@ FILAR CLXIV: BEZWZGLĘDNA KONTROLA ORTOGRAFII, LITERÓWEK I CZASOWNIKÓW PYTAJĄ
         * 'narazie' -> 'na razie'
         * 'z przed' -> 'sprzed'
         * 'z poza' -> 'spoza'
+
+FILAR CLXV: DYSKONTINUITET CZASOWY, PRZESKOKI SCEN I ODCZAROWANIE FAŁSZYWEGO PRZYLEGANIA (TEMPORAL DISCONTINUITY & SCENE BOUNDARY RESET PROTOCOL):
+   1. PUŁAPKA OPÓŹNIONEGO POTWIERDZENIA (DELAYED AGREEMENT FALLACY):
+      - Gdy kwestia dialogowa następuje po długiej pauzie (Δt ≥ 5–10+ sekund) lub cięciu montażowym po prośbie o rozmowę w cztery oczy / wyjście na osobność / zmianę lokacji (np. "Moglibyśmy porozmawiać przez chwilę na osobności?"):
+      - Angielskie kwestie typu "Sure, what is it?" / "All right, what's up?" / "Yeah, what's wrong?" w nowej scenie NIE SĄ zgodą na wyjście (zgoda i przejście nastąpiły w diegezie obrazu w ciągu minionych sekund!).
+      - KATEGORYCZNY ZAKAZ KOSZMARNEJ KALKI: "Jasne, o co chodzi?", "Pewnie, co się stało?", "W porządku, słucham". Słowo "Jasne" po 20 sekundach jest całkowicie oderwane od sytuacji dramaturgicznej.
+      - POPRAWNY PRZEKŁAD AVT: Kwestia stanowi otwarcie rozmowy w nowej lokacji: "Więc o co chodzi?", "No to o co chodzi?", "O co chodzi?", "Słucham cię".
+   2. WYCIEK SPÓJNIKÓW WSPÓŁRZĘDNYCH PO CIĘCIU (CONJUNCTION BLEED ACROSS SCENE BOUNDARY):
+      - Po przeskoku montażowym lub pauzie Δt ≥ 5s KATEGORYCZNIE ZABRANIA SIĘ otwierania kwestii spójnikami łączącymi ("I co z tego wynikło?", "A więc...", "Ale dlaczego..."), jeśli kwestia nie stanowi bezpośredniej kontynuacji monologu w tym samym ujęciu.
+   3. DRYF ZAIMKOWY PONAD CIĘCIAMI (CROSS-SCENE PRONOMINAL DRIFT):
+      - Po zmianie lokacji i długiej pauzie zaimki wskazujące ("to", "on", "ona") odnoszące się do rekwizytów/osób z poprzedniej sceny muszą zostać skonkretyzowane rzeczownikiem lub przeredagowane, aby widz nie gubił referencji semiotycznej.
+   4. BEZWŁADNOŚĆ EMOCJONALNA I RESET AFEKTYWNY (EMOTIONAL LAG VS SCENE TONE RESET):
+      - Po cięciu ze sceny dynamicznej (krzyk bojowy, panika) do sceny wyciszonej (izba chorych, gabinet po 15 sekundach), rejestr emocjonalny i interpunkcja muszą ulec natychmiastowemu zresetowaniu do akustyki nowego pomieszczenia.
+   5. ODCZAROWANIE FAŁSZYWEGO PRZYLEGANIA (FALSE ADJACENCY ON UNANSWERED QUESTIONS):
+      - Długa luka czasowa unieważnia parę sąsiedztwa (Adjacency Pair). Otwartych pytań sprzed montażu podróży nie wolno traktować jako bezpośredniego bodźca dla mechanicznych potaknięć jednosłownych.
 """
 
 BELCZYK_TROUBLESOME_DETAILS = """
@@ -3396,19 +3414,59 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Op
             "Dla grupy mężczyzn/mieszanej stosuj męskoosobowe ('zrobiliście', 'byliście gotowi')."
         )
 
-    # 104. Bezwzględna Kontrola Ortografii, Literówek i Czasowników Pytających (Filar CLXIV)
+    # 104. Bezwzględna Kontrola Ortografii, Literówek i Niezmienników Leksykalnych (Filar CLXIV)
     has_typo_or_inquiry_trigger = any(
-        any(w in str(item.get("en", "")).lower() for w in ["ask", "inquire", "question", "personally", "servant", "discovered", "find out"]) or
-        any(w in str(item.get("audio_jp", "")).lower() for w in ["kiku", "kikou", "tazuneru", "tou"]) or
+        any(w in str(item.get("en", "")).lower() for w in ["ask", "inquire", "question", "personally", "servant", "discovered", "find out", "anyways", "least resistance", "good night", "do your best"]) or
+        any(w in str(item.get("audio_jp", "")).lower() for w in ["kiku", "kikou", "tazuneru", "tou", "ganbatte", "oyasumi"]) or
         any("filar clxiv" in str(item.get("notes", "")).lower() for item in [item])
         for item in batch_items
     )
     if has_typo_or_inquiry_trigger:
         focused_pillars.append(
-            "• [SKUP SIĘ NA: FILAR CLXIV - Bezwzględna Kontrola Ortografii, Literówek i Czasowników Pytających]: "
+            "• [SKUP SIĘ NA: FILAR CLXIV - Bezwzględna Kontrola Ortografii, Literówek i Niezmienników Leksykalnych]: "
             "Czasownik 'spytać / zapytać' w 1. os. lp. czasu przyszłego ma wyłącznie postać 'spytam' lub 'zapytam' "
             "(KARDYNALNY BŁĄD [X]: 'spyham' [potworek leksykalny!]; POPRAWNIE: 'spytam / zapytam'). "
-            "Bezwzględny zakaz wszelkich literówek i deformacji wyrazowych (wziąść -> wziąć, poszłem -> poszedłem, włanczać -> włączać)."
+            "Bezwzględny nakaz form poprawnych: 'w każdym razie' (ZAKAZ 'w każdym bądź razie'), 'w cudzysłowie' (ZAKAZ 'w cudzysłowiu'), "
+            "'po linii najmniejszego oporu' (ZAKAZ 'po najmniejszej linii...'), 'z rzędu' (ZAKAZ 'pod rząd'), 'z powrotem' (ZAKAZ 'spowrotem'), "
+            "'dlatego że' (ZAKAZ 'dlatego bo'), 'Daj z siebie wszystko' (ZAKAZ 'Zrób swoje najlepsze'), 'Dobranoc' (ZAKAZ 'Dobrej nocy')."
+        )
+
+    # 105. Kanon Czystości Wizualnej AVT, Elipsa Szumu Kinezjatycznego i Zakaz Kalki 'Here' -> 'Tutaj' (Filar XVIII & IV)
+    has_kakegoe_or_here_trigger = any(
+        any(w in str(item.get("en", "")).lower() for w in ["here", "there you go", "up we go", "hup", "whoa", "easy"]) or
+        any(w in str(item.get("audio_jp", "")).lower() for w in ["yoisho", "dokkoisho", "yotto", "hai", "hora", "douzo", "dōzo"]) or
+        any("filar xviii" in str(item.get("notes", "")).lower() for item in [item])
+        for item in batch_items
+    )
+    if has_kakegoe_or_here_trigger:
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR XVIII & IV - Czystość Wizualna AVT, Elipsa Kakegoe i Zakaz Kalki 'Tutaj']: "
+            "Odgłosy wysiłku fizycznego seiyū (yoisho, dokkoisho, yotto przy wstawaniu z krzesła, siadaniu, podnoszeniu ciężaru) "
+            "BEZWZGLĘDNIE ELIDUJ (pusty napis \"\"). Zakaz infantylnych podpisów 'Hop...', 'I siup...' i pomyłek 'Proszę...'. "
+            "Przy geście podawania przedmiotu KATEGORYCZNY ZAKAZ kalki z angielskiego 'Here' jako 'Tutaj!' / 'Tu!'. "
+            "W polszczyźnie stosuj wyłącznie naturalne 'Proszę' / 'Trzymaj' / 'Masz' (lub elipsę \"\")."
+        )
+
+    # 106. Dyskontinuitet Czasowy, Przeskoki Scen i Odczarowanie Fałszywego Przylegania (Filar CLXV)
+    has_temporal_discontinuity = any(
+        any(w in str(item.get("en", "")).lower() for w in [
+            "in private", "on our own", "talk alone", "what is it", "what's up", "what is wrong", "what's wrong",
+            "sure, what", "all right, what", "yeah, what", "somewhere else", "quiet place"
+        ]) or
+        any(w in str(item.get("audio_jp", "")).lower() for w in [
+            "futari", "hanashi", "doko ka", "nan da", "dou shita", "nani"
+        ]) or
+        any("filar clxv" in str(item.get("notes", "")).lower() for item in [item]) or
+        (float(item.get("duration_s", 0.0)) >= 5.0 and any(w in str(item.get("en", "")).lower() for w in ["sure", "all right", "yeah"]))
+        for item in batch_items
+    )
+    if has_temporal_discontinuity:
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CLXV - Dyskontinuitet Czasowy i Przeskoki Scen]: "
+            "Gdy po prośbie o rozmowę na osobności następuje przerwa czasowa lub zmiana lokacji, "
+            "angielskie 'Sure, what is it?' w nowej scenie to otwarcie rozmowy: 'Więc o co chodzi?' / 'No to o co chodzi?' / 'Słucham cię'. "
+            "KATEGORYCZNY ZAKAZ opóźnionego potaknięcia: 'Jasne / Pewnie / W porządku, o co chodzi?'. "
+            "Zakaz wycieku spójników ('I...', 'A...') i fałszywych par przylegania po cięciu montażowym."
         )
 
     if not focused_pillars:

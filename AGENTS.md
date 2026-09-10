@@ -13,7 +13,30 @@ Ten dokument definiuje nienaruszalne, trwałe reguły postępowania asystenta AI
 
 ---
 
-## 🛡️ 2. OBOWIĄZKOWY PROTOKÓŁ 5 WARSTW (5-LAYER ROOT CAUSE PROTOCOL)
+## 🌐 2. ZASADA CAŁOŚCIOWEGO UOGÓLNIANIA I ELIMINACJI CAŁEJ DZIEDZINY PROBLEMU (HOLISTIC DOMAIN GENERALIZATION MANDATE)
+
+1. **Zakaz doraźnego rozwiązywania pojedynczego zgłoszenia:**
+   Gdy użytkownik zgłasza błąd (np. konkretne słowo, pojedynczą kwestię, niefortunną kalkę po pauzie), asystent ma **kategoryczny zakaz** ograniczania swojej propozycji i naprawy wyłącznie do tego izolowanego przypadku.
+2. **Analiza od podstaw (First Principles):**
+   Każde zgłoszenie błędu nakłada na asystenta obowiązek zbadania problemu u samych podstaw teoretycznych, dramaturgicznych, montażowych i językowych.
+3. **Eliminacja całej dziedziny podobnych problemów:**
+   Asystent musi:
+   - Zidentyfikować fundamentalną klasę zjawiska (np. dyskontinuitet czasowy $\Delta t \ge 5–10$s, asymetria epistemiczna, zmiana audytorium z publicznego na prywatne, elipsa szumu motorycznego),
+   - Opracować kompletną taksonomię pokrewnych pułapek (np. opóźnione potaknięcie, wyciek spójników, dryf zaimkowy, bezwładność emocjonalna, fałszywe pary przylegania),
+   - Zaprojektować i wdrożyć zabezpieczenia neutralizujące **całą dziedzinę pokrewnych defektów** w potoku, a nie tylko zgłoszony egzemplarz.
+
+---
+
+## 📝 3. OBOWIĄZKOWY PROTOKÓŁ PLANOWANIA I AKCEPTACJI PRZED EDYCJĄ KODU (PLANNING & USER APPROVAL GATE)
+
+1. **Zakaz samowolnych modyfikacji kodu:**
+   Przed dokonaniem jakiejkolwiek zmiany w plikach źródłowych (.py, konfiguracjach) asystent ma bezwzględny obowiązek przygotować plan naprawczy w `implementation_plan.md` (z metadanymi `RequestFeedback: true`).
+2. **Czekanie na wyraźną zgodę:**
+   Asystent zatrzymuje się, przedstawia plan i oczekuje na wyraźną akceptację użytkownika przed przystąpieniem do edycji kodu.
+
+---
+
+## 🛡️ 4. OBOWIĄZKOWY PROTOKÓŁ 5 WARSTW (5-LAYER ROOT CAUSE PROTOCOL)
 
 Każde zgłoszenie błędu przez użytkownika nakłada na asystenta obowiązek przeprowadzenia audytu i wdrożenia zabezpieczeń w **5 warstwach architektury**:
 
@@ -27,7 +50,7 @@ Każde zgłoszenie błędu przez użytkownika nakłada na asystenta obowiązek p
 
 ---
 
-## 📋 3. WYMÓG TABELI DOWODOWEJ W ODPOWIEDZI
+## 📋 5. WYMÓG TABELI DOWODOWEJ W ODPOWIEDZI
 
 W odpowiedzi na jakiekolwiek zgłoszenie usterki translatorskiej, asystent **musi** przedstawić tabelę dowodową wskazującą:
 1. Co konkretnie zmieniono w Warstwie 1 (profiler.py),
@@ -41,7 +64,7 @@ Odpowiedź pozbawiona tej ścieżki stanowi bezpośrednie naruszenie reguł work
 
 ---
 
-## ⚖️ 4. ZAKAZ SAMOZACHWYTU I PUSTYCH ZAPEWNIEŃ
+## ⚖️ 6. ZAKAZ SAMOZACHWYTU I PUSTYCH ZAPEWNIEŃ
 
 1. Asystent ma zakaz używania ogólnikowych sformułowań w rodzaju: 'zapewniam, że wszystko stoi na najwyższym poziomie', 'system jest idealny', 'od teraz obiecuję'.
 2. Wiarygodność inżynierska opiera się wyłącznie na:
@@ -51,7 +74,7 @@ Odpowiedź pozbawiona tej ścieżki stanowi bezpośrednie naruszenie reguł work
 
 ---
 
-## 💰 5. ŻELAZNE OGRANICZENIA KOSZTOWE I ŚRODOWISKOWE
+## 💰 7. ŻELAZNE OGRANICZENIA KOSZTOWE I ŚRODOWISKOWE
 
 1. **Bezwzględny zakaz Vertex AI:** use_vertex = 0, brak zależności od GCP billing. Wyłącznie bezpośrednie klucze Google AI Studio API Keys.
 2. **Context Caching:** Wszystkie zapytania muszą wykorzystywać pre-warming i rabat -90%.
@@ -59,7 +82,7 @@ Odpowiedź pozbawiona tej ścieżki stanowi bezpośrednie naruszenie reguł work
 
 ---
 
-## 📖 6. ZASADA ZERO-CONFABULATION W DOKUMENTACJI I KANONIE (GROUND-TRUTH SOURCING)
+## 📖 8. ZASADA ZERO-CONFABULATION W DOKUMENTACJI I KANONIE (GROUND-TRUTH SOURCING)
 
 1. **Zakaz generowania terminów „z pamięci” modelu:**
    Asystent ma bezwzględny zakaz wprowadzania do dokumentacji (README.md, opisy, tabele porównawcze, prompty) jakichkolwiek „przykładowych” lub „kanonicznych” terminów, nazwisk tłumaczy, tytułów czy przydomków na podstawie wewnętrznych wag LLM.

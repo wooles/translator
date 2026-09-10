@@ -420,6 +420,31 @@ class AVTLinter:
         (r"(^|[^\w]|\\[Nnh])([Nn])arazie\b", r"\g<1>\g<2>a razie", "Filar CLXIV - Eliminacja Błędu Pisowni 'narazie' -> 'na razie'"),
         (r"(^|[^\w]|\\[Nnh])([Zz])\s+przed\b", r"\g<1>sprzed", "Filar CLXIV - Eliminacja Błędu Pisowni 'z przed' -> 'sprzed'"),
         (r"(^|[^\w]|\\[Nnh])([Zz])\s+poza\b", r"\g<1>spoza", "Filar CLXIV - Eliminacja Błędu Pisowni 'z poza' -> 'spoza'"),
+        (r"(^|[^\w]|\\[Nnh])([Ww])\s*każdym\s+bądź\s+razie\b", r"\g<1>\g<2> każdym razie", "Filar CLXIV - Eliminacja Skażenia 'w każdym bądź razie' -> 'w każdym razie'"),
+        (r"(^|[^\w]|\\[Nnh])([Ww])\s+cudzysłowiu\b", r"\g<1>\g<2> cudzysłowie", "Filar CLXIV - Eliminacja Błędu Odmiany 'w cudzysłowiu' -> 'w cudzysłowie'"),
+        (r"(^|[^\w]|\\[Nnh])([Pp])o\s+najmniejszej\s+linii\s+oporu\b", r"\g<1>\g<2>o linii najmniejszego oporu", "Filar CLXIV - Eliminacja Błędu Frazeologicznego 'po najmniejszej linii oporu'"),
+        (r"(^|[^\w]|\\[Nnh])spowrotem\b", r"\g<1>z powrotem", "Filar CLXIV - Eliminacja Błędu Pisowni 'spowrotem' -> 'z powrotem'"),
+        (r"(^|[^\w]|\\[Nnh])Spowrotem\b", r"\g<1>Z powrotem", "Filar CLXIV - Eliminacja Błędu Pisowni 'spowrotem' -> 'z powrotem'"),
+        (r"(^|[^\w]|\\[Nnh])([Dd])latego\s+bo\b", r"\g<1>\g<2>latego że", "Filar CLXIV - Eliminacja Pleonazmu Spójnikowego 'dlatego bo' -> 'dlatego że'"),
+        (r"(^|[^\w]|\\[Nnh])([Oo])d\s+nienacka\b", r"\g<1>znienacka", "Filar CLXIV - Eliminacja Błędu Pisowni 'od nienacka' -> 'znienacka'"),
+        (r"\b((?:[A-Za-ząćęłńóśźż0-9]+\s+)?(?:raz|razy|kroć|dni|lat|godzin|minut|sekund|miesięcy|tygodni|kolejek|prób|zwycięstw|porażek))\s+pod\s+rząd\b", r"\1 z rzędu", "Filar CLXIV - Eliminacja Rusycyzmu 'pod rząd' -> 'z rzędu'"),
+        (r"\b([Dd]wa|[Tt]rzy|[Cc]ztery|[Pp]ięć|[Ss]ześć|[Ss]iedem|[Oo]siem|[Dd]ziewięć|[Dd]ziesiąt|[Kk]ilka|[Pp]arę|[Ww]iele|[Kk]olejn[a-ząćęłńóśźż]*)\s+([a-ząćęłńóśźż]+)\s+pod\s+rząd\b", r"\1 \2 z rzędu", "Filar CLXIV - Eliminacja Rusycyzmu 'pod rząd' -> 'z rzędu'"),
+
+        # Pleonasms & tautologies (Filar IV / Belczyk)
+        (r"\b([Ss]pada(?:ć|m|sz|my|cie|ją|ł|ła|ło|li|ły)?)\s+w\s+dół\b", r"\1", "Filar IV - Eliminacja Pleonazmu 'spadać w dół'"),
+        (r"\b([Ww]znosi(?:ć|m|sz|my|cie|ją|ł|ła|ło|li|ły)?)\s+się\s+w\s+górę\b", r"\1 się", "Filar IV - Eliminacja Pleonazmu 'wznosić się w górę'"),
+        (r"\b[Ww]zajemn(?:a|ej|ą|e|ych|ym|ymi)\s+(współprac(?:a|y|ę|ą|ie|om|ami))\b", lambda m: m.group(1).capitalize() if m.group(0)[0].isupper() else m.group(1), "Filar IV - Eliminacja Pleonazmu 'wzajemna współpraca'"),
+        (r"\b([Ff]akt(?:y|ów|om|ami|ach)?)\s+autentyczn(?:e|ych|ym|ymi)\b", r"\1", "Filar IV - Eliminacja Pleonazmu 'fakty autentyczne'"),
+
+        # Dialogic calques & gestural idioms (Filar IV / CXXXVII / XVIII)
+        (r"\b[Zz]rób\s+swoje\s+najlepsze\b", lambda m: "Daj z siebie wszystko" if m.group(0)[0].isupper() else "daj z siebie wszystko", "Filar IV/CLIII - Eliminacja Kalki 'Zrób swoje najlepsze'"),
+        (r"\b[Zz]róbcie\s+swoje\s+najlepsze\b", lambda m: "Dajcie z siebie wszystko" if m.group(0)[0].isupper() else "dajcie z siebie wszystko", "Filar IV/CLIII - Eliminacja Kalki 'Zróbcie swoje najlepsze'"),
+        (r"\b[Dd]obrej\s+nocy\b", lambda m: "Dobranoc" if m.group(0)[0].isupper() else "dobranoc", "Filar IV - Eliminacja Kalki 'Dobrej nocy' -> 'Dobranoc'"),
+        (r"^\s*[Zz]gadnij\s+co\?([!\.\?]*)\s*$", r"Wiesz co?\1", "Filar CXXXVII - Eliminacja Kalki 'Guess what?'"),
+        (r"^\s*[Tt]o\s+jest\s+to,?\s+o\s+czym\s+mówię([!\.\?]*)\s*$", r"O tym właśnie mówię\1", "Filar CXXXVII - Eliminacja Kalki 'That's what I'm talking about'"),
+        (r"\b[Tt]utaj\s+masz\b", lambda m: "Trzymaj" if m.group(0)[0].isupper() else "trzymaj", "Filar IV/XVIII - Eliminacja Kalki Gestu 'Here you go' -> 'Trzymaj'"),
+        (r"\b[Oo]to\s+masz\b", lambda m: "Trzymaj" if m.group(0)[0].isupper() else "trzymaj", "Filar IV/XVIII - Eliminacja Kalki Gestu 'Here you go' -> 'Trzymaj'"),
+        (r"\b[Oo]to\s+jest\b", lambda m: "Proszę" if m.group(0)[0].isupper() else "proszę", "Filar IV/XVIII - Eliminacja Kalki Gestu 'Here it is' -> 'Proszę'"),
     ]
 
     @classmethod
@@ -1657,6 +1682,63 @@ class EpisodeQualityGate:
                             repl_word = "N-Nie" if word.lower().startswith("t-") else ("Nie" if word[0].isupper() else "nie")
                             ev.text = re.sub(rf"\b{re.escape(word)}", repl_word, ev.text, count=1)
                             fixes.append(f"[Episode Quality Gate - Echo Agreement] Linia #{i+1}: zastąpiono '{word}{punct}' przez '{repl_word}{punct}' w reakcji na pytanie z przeczeniem '{prev_clean[:25]}...'")
+
+            # 1c. TEMPORAL DISCONTINUITY & SCENE BOUNDARY AUDIT (Filar CLXV)
+            if not is_sign and prev_clean and prev_ev:
+                time_gap_ms = ev.start - prev_ev.end
+                is_prev_private_request = bool(re.search(
+                    r"\b(na\s+osobności|w\s+cztery\s+oczy|porozmawiać|pogadać|w\s+ustronne\s+miejsce|wyjdźmy|chodźmy|talk\s+in\s+private|alone|somewhere\s+quiet|private)\b",
+                    prev_clean,
+                    re.IGNORECASE
+                ))
+                # Check for delayed agreement fallacy ("Jasne, o co chodzi?" / "Pewnie, o co chodzi?" 5-25s after relocation request)
+                if (time_gap_ms >= 5000 and is_prev_private_request) or time_gap_ms >= 8000:
+                    m_delayed_agree = re.search(
+                        r"^(\s*\{[^\}]*\})*([Jj]asne|[Pp]ewnie|[Ww]\s+porządku|[Dd]obrze|[Tt]ak|[Aa]\s+zatem|[Aa]\s+więc|[Nn]o\s+dobrze|[Nn]o\s+dobra),\s+(o\s+co\s+chodzi|co\s+się\s+stało|w\s+czym\s+rzecz|słucham|słucham\s+cię|co\s+jest|czego\s+chcesz|o\s+czym\s+chcesz|o\s+czym\s+chciałaś|o\s+czym\s+chciałeś)\b",
+                        ev.text,
+                        re.IGNORECASE
+                    )
+                    if m_delayed_agree:
+                        orig_lead = m_delayed_agree.group(0)
+                        is_cap = m_delayed_agree.group(2)[0].isupper()
+                        repl_starter = "Więc" if is_cap else "więc"
+                        q_part = m_delayed_agree.group(3)
+                        tag_prefix = m_delayed_agree.group(1) or ""
+                        repl_full = f"{tag_prefix}{repl_starter} {q_part}"
+                        ev.text = ev.text[:m_delayed_agree.start()] + repl_full + ev.text[m_delayed_agree.end():]
+                        fixes.append(
+                            f"[Episode Quality Gate - Filar CLXV Dyskontinuitet Czasowy] Linia #{i+1}: "
+                            f"zlikwidowano opóźnione potwierdzenie '{orig_lead.strip()}' "
+                            f"(pauza {time_gap_ms/1000.0:.1f}s po prośbie o rozmowę) -> '{repl_full.strip()}'"
+                        )
+
+            # 1b. GESTURAL / PHYSICAL "HERE" -> "TUTAJ" CALQUE & ISOLATED KAKEGOE GUARD (Filar IV & XVIII)
+            if not is_sign:
+                clean_no_tags = re.sub(r"\{[^\}]*\}", "", ev.text).strip()
+                # 1b-1: Lone "Tutaj / Tu / Oto" when NOT answering a spatial wh-question ("Gdzie? / Dokąd?")
+                m_tutaj = re.match(r"^([Tt]utaj|[Tt]u|[Oo]to)([\.!\?…]*)$", clean_no_tags)
+                if m_tutaj:
+                    word = m_tutaj.group(1)
+                    punct = m_tutaj.group(2) or "."
+                    is_answering_loc = False
+                    if prev_clean and prev_ev and (ev.start - prev_ev.end < 6000):
+                        if any(w in prev_clean.lower() for w in ["gdzie", "dokąd", "skąd", "w którym miejscu", "gdzie to"]):
+                            is_answering_loc = True
+                    if not is_answering_loc:
+                        has_informal = False
+                        if prev_clean and any(w in prev_clean.lower() for w in ["masz", "wiesz", "daj", "dzięki", "twoje", "twój", "ty"]):
+                            has_informal = True
+                        repl_w = "Trzymaj" if has_informal else "Proszę"
+                        if not word[0].isupper():
+                            repl_w = repl_w.lower()
+                        ev.text = re.sub(rf"\b{re.escape(word)}", repl_w, ev.text, count=1)
+                        fixes.append(f"[Episode Quality Gate - Filar IV/XVIII] Linia #{i+1}: zlikwidowano kalkę gestu 'Here' -> '{word}{punct}' na rzecz naturalnego '{repl_w}{punct}'")
+
+                # 1b-2: Isolated physical exertion kakegoe ("Hop...", "I siup...", "Raz, dwa...") -> elision
+                m_kakegoe_noise = re.match(r"^([Hh]op[\.!\?…]*|[Ii]\s+siup[\.!\?…]*|[Rr]az,?\s+dwa[\.!\?…]*|[Hh]opla[\.!\?…]*)$", clean_no_tags)
+                if m_kakegoe_noise:
+                    ev.text = ""
+                    fixes.append(f"[Episode Quality Gate - Filar XVIII Elipsa Szumu] Linia #{i+1}: wyciszono infantylny odgłos kinezjatyczny '{clean_no_tags}' do pustego napisu (standard AVT)")
 
             # 2. THOUGHT-TO-SPEECH BOUNDARY: Strip unsolicited thought italics on plain dialogue lines
             if not is_sign and prev_ev:
