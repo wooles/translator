@@ -157,10 +157,35 @@ def sanitize_lexical_text(text: str) -> str:
         (r"(^|[^\w]|\\[Nnh])([Aa])urze\s+od\s+[Gg]ilotyny\b", r"\g<1>\g<2>urze Gilotynie"),
         (r"(^|[^\w]|\\[Nnh])([Aa])urę\s+od\s+[Gg]ilotyny\b", r"\g<1>\g<2>urę Gilotynę"),
         (r"(^|[^\w]|\\[Nnh])([Aa])urą\s+od\s+[Gg]ilotyn(?:ą|y)\b", r"\g<1>\g<2>urą Gilotyną"),
+        # Deformed adjective comparatives / superlatives (e.g. 'najdobrejsze' -> 'najlepsze')
+        (r"(^|[^\w]|\\[Nnh])([Nn])ajdobrejsz(y|ego|emu|ym|a|ej|ą|e|ych|ymi)?\b", r"\g<1>\g<2>ajlepsz\g<3>"),
+        (r"(^|[^\w]|\\[Nnh])dobrejsz(y|ego|emu|ym|a|ej|ą|e|ych|ymi)?\b", r"\g<1>lepsz\g<2>"),
+        (r"(^|[^\w]|\\[Nnh])Dobrejsz(y|ego|emu|ym|a|ej|ą|e|ych|ymi)?\b", r"\g<1>Lepsz\g<2>"),
     ]
     res = text
     for pat, repl in TYPO_NORMALIZATIONS:
         res = re.sub(pat, repl, res)
+
+    # Subject nominative repair: 'pan Eftala zniszczył' -> 'pan Eftal zniszczył' (consonant-ending male names following nominative 'pan')
+    def _fix_nominative_title_subject(m):
+        prefix = m.group(1)
+        pan = m.group(2)
+        sep = m.group(3)
+        name_stem = m.group(4)
+        verb = m.group(5)
+        full_name = name_stem + "a"
+        if full_name.lower() in {
+            "akira", "shira", "soma", "gaara", "ashitaka", "kiba", "kenta",
+            "ryoma", "hanza", "koba", "soya", "toma", "genga"
+        }:
+            return m.group(0)
+        return f"{prefix}{pan}{sep}{name_stem} {verb}"
+
+    res = re.sub(
+        r"(^|[^\w]|\\[Nnh])([Pp]an)(\s+|\\[Nnh]+)([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]*[bcdfghjklmnprstvwxz])a\s+([a-ząćęłńóśźż]+(?:ł|łby|ła|ło|li|ły))\b",
+        _fix_nominative_title_subject,
+        res
+    )
     return res
 
 
@@ -272,6 +297,13 @@ class SeriesBible:
         if is_single_male:
             if "2. os. lp." not in clean_desc.lower() and "-łeś" not in clean_desc.lower():
                 clean_desc = f"{clean_desc} [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]".strip()
+
+        # Safeguard hierarchical honorific relationships and anti-hybrid vocatives (Filar C & CLVII)
+        is_subordinate_or_disciple = any(w in clean_desc.lower() for w in ["uczeń", "uczennica", "służąca", "niewolnica", "adept", "podwładn"])
+        is_master_or_superior = any(w in clean_desc.lower() for w in ["mistrz", "arcymag", "pan ", "mentor", "zwierzchnik", "lord"])
+        if is_subordinate_or_disciple or is_master_or_superior:
+            if "t-v invariance" not in clean_desc.lower() and "panie" not in clean_desc.lower():
+                clean_desc = f"{clean_desc} [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]".strip()
 
         return clean_desc
 

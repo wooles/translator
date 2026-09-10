@@ -1,0 +1,123 @@
+{
+  "anime_title": "Rakudai Kenja no Gakuin Musou",
+  "characters": {
+    "Anastasia -> Eftal": {
+      "description": "Zwrot: 'Mistrzu / na pan' (uczennica / ocalona -> wybawca i mentor) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Merlin -> Eftal": {
+      "description": "Zwrot: 'panie Eftalu' (lojalna powierniczka i była uczennica -> mistrz) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie Eftalu', zakaz poufałego wołacza 'Eftalu' oraz hybryd 'Eftalu... ma pan']"
+    },
+    "Eftal -> Anastasia": {
+      "description": "Zwrot: 'na ty / Anastasio' (mentor -> podopieczna)"
+    },
+    "Eftal -> Merlin": {
+      "description": "Zwrot: 'na ty / Merlin' (dawni towarzysze / zaufani partnerzy)"
+    },
+    "Gaius": {
+      "description": "chłopak (Główny bohater) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Eftal": {
+      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Merlin": {
+      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Anastasia": {
+      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Cliff": {
+      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Seiryu": {
+      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Genie": {
+      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    }
+  },
+  "glossary": {
+    "Contract-Breaker": "Pogromca Paktów",
+    "Lightning Emperor": "Cesarz Gromu",
+    "Flame Emperor": "Ognisty Cesarz",
+    "Ice Emperor": "Lodowy Cesarz",
+    "Earth Emperor": "Cesarz Ziemi",
+    "Magia Monolith": "Monolit Magii",
+    "Magia Burst": "Wybuch Magii",
+    "astral body": "ciało astralne",
+    "Divine Domain": "Boska Domena",
+    "X-Gravity": "X-Grawitacja"
+  },
+  "relationships": {},
+  "declensions": {
+    "Anastasia": {
+      "M": "Anastasia",
+      "D": "Anastasiy",
+      "C": "Anastasie",
+      "B": "Anastasię",
+      "N": "Anastasią",
+      "Ms": "Anastasie",
+      "W": "Anastasio"
+    },
+    "Eftal": {
+      "M": "Eftal",
+      "D": "Eftala",
+      "C": "Eftalowi",
+      "B": "Eftala",
+      "N": "Eftalem",
+      "Ms": "Eftalu",
+      "W": "Eftalu"
+    },
+    "Merlin": {
+      "M": "Merlin",
+      "D": "Merlin",
+      "C": "Merlin",
+      "B": "Merlin",
+      "N": "Merlin",
+      "Ms": "Merlin",
+      "W": "Merlin"
+    },
+    "Gaius": {
+      "M": "Gaius",
+      "D": "Gaiusa",
+      "C": "Gaiusowi",
+      "B": "Gaiusa",
+      "N": "Gaiusem",
+      "Ms": "Gaiusie",
+      "W": "Gaiusie"
+    },
+    "Cliff": {
+      "M": "Cliff",
+      "D": "Cliffa",
+      "C": "Cliffowi",
+      "B": "Cliffa",
+      "N": "Cliffem",
+      "Ms": "Cliffie",
+      "W": "Cliffie"
+    },
+    "Seiryu": {
+      "M": "Seiryu",
+      "D": "Seiryu",
+      "C": "Seiryu",
+      "B": "Seiryu",
+      "N": "Seiryu",
+      "Ms": "Seiryu",
+      "W": "Seiryu"
+    },
+    "Genie": {
+      "M": "Genie",
+      "D": "Genie",
+      "C": "Genie",
+      "B": "Genie",
+      "N": "Genie",
+      "Ms": "Genie",
+      "W": "Genie"
+    }
+  },
+  "plot_anchors": {
+    "Magia Burst": "Stosować jednolicie polską nazwę katastrofy: 'Wybuch Magii' lub zachować termin wielką literą 'Magia Burst'.",
+    "Four Emperors (Lightning, Flame, Ice, Earth)": "Konsekwentnie: Cesarz Gromu, Ognisty Cesarz, Lodowy Cesarz, Cesarz Ziemi."
+  },
+  "episodes_translated": [
+    "[ASW] Rakudai Kenja no Gakuin Musou - 12 [1080p HEVC][8BD533E0]"
+  ]
+}

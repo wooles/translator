@@ -3892,6 +3892,94 @@ def test_frieren_manga_canon_aura_gilotyna_and_calque_shield():
     print(" -> PASSED: Kanon mangowy Frieren (Studio JG / Martyna Zdonek), tarcza 'Aura Gilotyna', eliminacja 'od Gilotyny' oraz audyt dokumentacji README działają w 100% harmonii (0.00 PLN).")
 
 
+def test_relational_tv_invariance_and_hybrid_vocative_guard():
+    print("\n[TEST 53/53] Test Relacyjnej Nienaruszalności T-V, Tarczy Wołacza i Likwidacji Hybryd Pan/Ty...")
+    import pysubs2
+    from avt_linter import AVTLinter, EpisodeQualityGate
+    from series_memory import SeriesBible, sanitize_lexical_text
+    from profiler import EpisodeProfiler
+    from rules import BELCZYK_AVT_MASTER_CANON, get_focused_rules_for_batch
+
+    # Asercja 1 (Warstwa 1 - profiler.py): Prompt Profilera zawiera bezpieczniki relacyjne i zakaz hybryd wołacza
+    dummy_client = None
+    profiler = EpisodeProfiler(dummy_client)
+    # Check that the prompt instruction text includes key invariants
+    import inspect
+    profiler_source = inspect.getsource(EpisodeProfiler.profile_episode)
+    assert "INTRA-CLAUSE T-V HYBRID BAN" in profiler_source, "Błąd Profiler: brak dyrektywy INTRA-CLAUSE T-V HYBRID BAN w promptcie!"
+    assert "ENGLISH '-SAMA' DROP IMMUNITY" in profiler_source, "Błąd Profiler: brak bezpiecznika ENGLISH '-SAMA' DROP IMMUNITY!"
+    assert "odkąd pan Eftal zniszczył" in profiler_source, "Błąd Profiler: brak ochrony mianownika tytulatury podmiotu!"
+
+    # Asercja 2 (Warstwa 2 - series_memory.py): sanitize_lexical_text i SeriesBible oczyszczają błędy gramatyczne
+    # 2a: Deformacja leksykalna 'najdobrejsze' -> 'najlepsze'
+    assert sanitize_lexical_text("miał z nas wszystkich najdobrejsze serce") == "miał z nas wszystkich najlepsze serce"
+    assert sanitize_lexical_text("najdobrejszy wojownik") == "najlepszy wojownik"
+    assert sanitize_lexical_text("dobrejsza opcja") == "lepsza opcja"
+
+    # 2b: Skażenie mianownika tytulatury 'pan Eftala zniszczył' -> 'pan Eftal zniszczył'
+    assert sanitize_lexical_text(r"odkąd pan\NEftala zniszczył twoje piętno") == r"odkąd pan\NEftal zniszczył twoje piętno"
+    assert sanitize_lexical_text("pan Eftala pokonał smoka") == "pan Eftal pokonał smoka"
+    # Imiona orientalne kanonicznie kończące się na -a w mianowniku pozostają nienaruszone:
+    assert sanitize_lexical_text("pan Akira zniszczył pieczęć") == "pan Akira zniszczył pieczęć"
+
+    # 2c: Hierarchiczne relacje w SeriesBible otrzymują bezpiecznik T-V Invariance
+    bible = SeriesBible("Test_Series_TV")
+    clean_entry = bible._sanitize_character_entry("Merlin", "uczennica i powierniczka Eftala sprzed 400 lat, arcymag")
+    assert "T-V Invariance" in clean_entry, "Błąd SeriesBible: brak bezpiecznika T-V Invariance dla relacji hierarchicznej!"
+
+    # Asercja 3 (Warstwa 3 - rules.py): Kanon i dyspozytor reguł koncentrują uwagę na Filarze C i CLVII
+    assert "INTRA-CLAUSE T-V HYBRID BAN" in BELCZYK_AVT_MASTER_CANON, "Błąd rules.py: brak Filar C punkt 5!"
+    assert "ENGLISH \"-SAMA\" DROP IMMUNITY" in BELCZYK_AVT_MASTER_CANON, "Błąd rules.py: brak Filar C punkt 6!"
+    assert "ZAKAZ HYBRYD WOŁACZA Z FORMĄ PAN/PANI" in BELCZYK_AVT_MASTER_CANON, "Błąd rules.py: brak Filar CLVII punkt 5!"
+
+    batch_drift_test = [{"en": "Look, why?! Did you see that?", "pl": "Poza tym, Eftalu... ma pan zaczerwienioną twarz."}]
+    focused = get_focused_rules_for_batch(batch_drift_test)
+    assert "FILAR CLVII" in focused, "Błąd dyspozytora: brak aktywacji Filaru CLVII dla hybrydy adresatywnej!"
+    assert "Zakaz Hybryd Wołacza" in focused, "Błąd dyspozytora: brak wytycznej o zakazie hybryd wołacza!"
+
+    # Asercja 4 (Warstwa 4 - avt_linter.py & EpisodeQualityGate 0.00 PLN):
+    # 4a: Zlikwidowanie hybrydy wołacza 'Eftalu... ma pan' -> 'panie Eftalu... ma pan'
+    subs_hybrid = pysubs2.SSAFile()
+    subs_hybrid.events.append(pysubs2.SSAEvent(
+        start=1000, end=4000, name="Merlin",
+        text=r"Poza tym, Eftalu...\Nma pan zaczerwienioną twarz."
+    ))
+    bible_rakudai = SeriesBible("Rakudai Kenja no Gakuin Musou")
+    fixed_hybrid, fixes_hybrid = EpisodeQualityGate.audit_and_fix_entire_episode(subs_hybrid, series_bible=bible_rakudai)
+    assert fixed_hybrid.events[0].text == r"Poza tym, panie Eftalu...\Nma pan zaczerwienioną twarz.", f"Błąd likwidacji hybrydy: {fixed_hybrid.events[0].text}"
+    assert any("zlikwidowano hybrydę wołacza 'Eftalu'" in f for f in fixes_hybrid)
+
+    # 4b: Naprawa skażenia mianownika tytulatury 'pan Eftala zniszczył' -> 'pan Eftal zniszczył'
+    subs_nom = pysubs2.SSAFile()
+    subs_nom.events.append(pysubs2.SSAEvent(
+        start=1000, end=4000, name="Merlin",
+        text=r"Minął tydzień, odkąd pan\NEftala zniszczył twoje piętno."
+    ))
+    fixed_nom, fixes_nom = EpisodeQualityGate.audit_and_fix_entire_episode(subs_nom, series_bible=bible_rakudai)
+    assert fixed_nom.events[0].text == r"Minął tydzień, odkąd pan\NEftal zniszczył twoje piętno.", f"Błąd mianownika tytulatury: {fixed_nom.events[0].text}"
+    assert any("pan Eftal" in f for f in fixes_nom)
+
+    # 4c: Harmonizacja opuszczonego sufiksu -sama w okrzykach dla stałego mówcy formalnego (Anti-Sama-Drop)
+    subs_sama = pysubs2.SSAFile()
+    # Context events establishing Merlin as strictly formal toward Eftal
+    subs_sama.events.append(pysubs2.SSAEvent(start=1000, end=3000, name="Merlin", text="Zgadza się, panie Eftalu."))
+    subs_sama.events.append(pysubs2.SSAEvent(start=4000, end=6000, name="Merlin", text="Czego właściwie pan szuka, panie Eftalu?"))
+    # The exclamatory line where -sama was dropped in English
+    subs_sama.events.append(pysubs2.SSAEvent(start=7000, end=9000, name="Merlin", text="Co za kunszt, Eftalu!"))
+    subs_sama.events.append(pysubs2.SSAEvent(start=10000, end=12000, name="Merlin", text="T-To było niesamowite, Eftalu!"))
+    fixed_sama, fixes_sama = EpisodeQualityGate.audit_and_fix_entire_episode(subs_sama, series_bible=bible_rakudai)
+    assert fixed_sama.events[2].text == "Co za kunszt, panie Eftalu!", f"Błąd Anti-Sama-Drop: {fixed_sama.events[2].text}"
+    assert fixed_sama.events[3].text == "T-To było niesamowite, panie Eftalu!", f"Błąd Anti-Sama-Drop: {fixed_sama.events[3].text}"
+    assert any("zharmonizowano wołacz formalny dla mówcy 'Merlin'" in f for f in fixes_sama)
+
+    # 4d: Naprawa deformacji leksykalnej 'najdobrejsze' -> 'najlepsze' przez linter
+    t_najd, fixes_najd = AVTLinter.lint_and_fix_line(r"...miał z nas\Nwszystkich najdobrejsze serce!")
+    assert t_najd == r"...miał z nas\Nwszystkich najlepsze serce!", f"Błąd lintera: {t_najd}"
+    assert any("najdobrejszy" in f for f in fixes_najd)
+
+    print(" -> PASSED: Relacyjna nienaruszalność T-V, tarcza wołacza, eliminacja hybryd pan/ty, Anti-Sama-Drop i ochrona mianownika działają w 100% harmonii (0.00 PLN).")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -3943,7 +4031,9 @@ if __name__ == "__main__":
     test_foreign_fantasy_name_declension_and_genitive_possession_guard()
     test_lexical_typo_correction_and_orthographic_integrity_guard()
     test_frieren_manga_canon_aura_gilotyna_and_calque_shield()
-    print("\n Wszystkie testy jednostkowe i integracyjne (52/52) zakończone pełnym sukcesem!\n")
+    test_relational_tv_invariance_and_hybrid_vocative_guard()
+    print("\n Wszystkie testy jednostkowe i integracyjne (53/53) zakończone pełnym sukcesem!\n")
+
 
 
 

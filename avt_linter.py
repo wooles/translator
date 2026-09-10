@@ -77,6 +77,11 @@ class AVTLinter:
         (r"(^|[^\w]|\\[Nnh])([Aa])ur(a|y|ze|ę|ą|o)\s+od\s+[Gg]ilotyn(?:y|ą)?\b", _fix_aura_gilotyna_match, "Filar XCVIII - Oficjalny Kanon Mangowy (Studio JG: Aura Gilotyna)"),
         (r"(^|[^\w]|\\[Nnh])([Aa])ur(a|y|ze|ę|ą|o)\s+[Śś]cięcia\b", _fix_aura_gilotyna_match, "Filar XCVIII - Oficjalny Kanon Mangowy (Studio JG: Aura Gilotyna)"),
 
+        # Deformed adjective comparatives / superlatives (Filar CLXIV)
+        (r"(^|[^\w]|\\[Nnh])([Nn])ajdobrejsz(y|ego|emu|ym|a|ej|ą|e|ych|ymi)?\b", r"\g<1>\g<2>ajlepsz\g<3>", "Filar CLXIV - Eliminacja Zniekształcenia Leksykalnego 'najdobrejszy' -> 'najlepszy'"),
+        (r"(^|[^\w]|\\[Nnh])dobrejsz(y|ego|emu|ym|a|ej|ą|e|ych|ymi)?\b", r"\g<1>lepsz\g<2>", "Filar CLXIV - Eliminacja Zniekształcenia Leksykalnego 'dobrejszy' -> 'lepszy'"),
+        (r"(^|[^\w]|\\[Nnh])Dobrejsz(y|ego|emu|ym|a|ej|ą|e|ych|ymi)?\b", r"\g<1>Lepsz\g<2>", "Filar CLXIV - Eliminacja Zniekształcenia Leksykalnego 'dobrejszy' -> 'lepszy'"),
+
         # Americanisms and lexical calques (Pillar IV / XXXVI)
         (r"\b[Ww]itaj z powrotem\b", "Witaj!", "Filar IV/XXXVI - Eliminacja Kalek Amerykańskich"),
         
@@ -1321,7 +1326,7 @@ POSSESSIVE_GOVERNING_NOUNS_PATTERN = (
     r"brat|brata|bratu|bratem|bracia|braci|braciom|siostr[aieyęą]|sióstr|siostrom|"
     r"ojciec|ojca|ojcu|ojcem|matk[aieyęą]|matek|matkom|"
     r"żon[aieyęą]|żon|żonom|mąż|męża|mężowi|mężem|"
-    r"pan|pana|panu|panem|panowie|panów|władc[aeyęą]|władców|"
+    r"pana|panu|panem|panowie|panów|władc[aeyęą]|władców|"
     r"mistrz|mistrza|mistrzowi|mistrzem|mistrzowie|mistrzów|"
     r"uczeń|ucznia|uczniowi|uczniem|uczniowie|uczniów|"
     r"przyjaciel|przyjaciela|przyjacielowi|przyjacielem|przyjaciele|przyjaciół|"
@@ -1400,6 +1405,8 @@ class EpisodeQualityGate:
         if series_bible and hasattr(series_bible, "data"):
             bible_chars = series_bible.data.get("characters", {})
             for c_key, c_val in bible_chars.items():
+                if "->" in c_key or "/" in c_key or "," in c_key:
+                    continue  # Relationships handled separately, avoid poisoning listener gender
                 desc_str = c_val.get("description", "") if isinstance(c_val, dict) else str(c_val)
                 desc_lower = desc_str.lower()
                 gen = None
@@ -1541,6 +1548,30 @@ class EpisodeQualityGate:
                 dom_voc, dom_count = max(forms.items(), key=lambda x: x[1])
                 if dom_count / total >= 0.75:
                     dominant_voc_names[c_name] = dom_voc
+
+        # Track speaker formality toward candidate characters for T-V vocative harmonization (Anti-Sama-Drop)
+        speaker_formal_char: Dict[Tuple[str, str], int] = {}
+        speaker_informal_to_char: Dict[Tuple[str, str], int] = {}
+        for ev in events:
+            if not ev.text or not ev.text.strip():
+                continue
+            spk = (getattr(ev, "name", "") or "").strip().lower()
+            if not spk:
+                continue
+            clean_t = re.sub(r"\{[^\}]*\}", "", ev.text)
+            clean_t = re.sub(r"\\[Nnh]", " ", clean_t)
+            for c_name in candidate_names:
+                stem_len = max(3, len(c_name) - 2)
+                stem = c_name[:stem_len]
+                if re.search(rf"\b{stem}[a-ząćęłńóśźż]*\b", clean_t, re.IGNORECASE):
+                    # Check formal address
+                    if re.search(rf"\b(?:panie|pan|pana|panu|panem)\s+{stem}[a-ząćęłńóśźż]*\b", clean_t, re.IGNORECASE) or \
+                       re.search(r"\b(?:ma pan|niech pan|pan szuka|pan pamięta|pan prosił|pan wie|pan czuje|źle się pan|smakuje panu)\b", clean_t, re.IGNORECASE):
+                        speaker_formal_char[(spk, c_name)] = speaker_formal_char.get((spk, c_name), 0) + 1
+                    # Check informal address
+                    if re.search(r"\b(?:wiesz|widzisz|myślisz|pamiętasz|rozumiesz|mówisz|robisz|chcesz|możesz|masz|musisz|znasz|słyszysz|jesteś)\b|\b[a-ząćęłńóśźż]+(?:łeś|łaś)\b", clean_t, re.IGNORECASE):
+                        if not re.search(r"\b(?:pan|pani|pana|panu|panie)\b", clean_t, re.IGNORECASE):
+                            speaker_informal_to_char[(spk, c_name)] = speaker_informal_to_char.get((spk, c_name), 0) + 1
 
         for i, ev in enumerate(events):
             if not ev.text or not ev.text.strip():
@@ -1726,6 +1757,85 @@ class EpisodeQualityGate:
                         if re.search(tv_pat, ev.text, re.IGNORECASE):
                             ev.text = re.sub(tv_pat, tv_rep, ev.text, flags=re.IGNORECASE)
                             fixes.append(f"[Episode Quality Gate - Intra-Line T-V Invariance] Linia #{i+1}: zlikwidowano hybrydę 'ty' + zwrot formalny: '{tv_pat}' -> '{tv_rep}'")
+
+            # 3b-3. INTRA-LINE HYBRID VOCATIVE + FORMAL ADDRESS GUARD (Filar C & CLVII)
+            if not is_sign:
+                clean_ev_check = re.sub(r"\\[Nnh]", " ", ev.text)
+                has_formal_address_in_line = bool(re.search(
+                    r"\b(?:ma|niech|chce|chciał|może|widzi|wie|pamięta|szuka|prosił|prosiła|czuje|smakuje|stoi|jest)\s+(?:pan|pani|pana|panu)\b|"
+                    r"\b(?:pan|pani|pana|panu)\s+(?:ma|niech|chce|chciał|może|widzi|wie|pamięta|szuka|prosił|prosiła|czuje|smakuje|stoi|jest|prosił|szuka)\b|"
+                    r"\b(?:u|dla|od|przeciwko)\s+(?:pana|pani|panu)\b|"
+                    r"\bźle\s+się\s+pan\b|\bsmakuje\s+panu\b|\bpanu\s+o\s+tym\b|\bpanu\s+nie\b|\bniech\s+pan\b|\bchciał\s+pan\b|\bpan\s+szuka\b|\bma\s+pan\b",
+                    clean_ev_check,
+                    re.IGNORECASE
+                ))
+                if has_formal_address_in_line:
+                    def _fix_hybrid_voc(m):
+                        name = m.group(1)
+                        name_low = name.lower()
+                        if name_low in {"panie", "pani", "panno", "mistrzu", "panu", "bogu", "czasu", "domu", "końcu", "początku", "bratu", "chłopcu", "wtedy", "znowu", "ogromny", "ognisty", "smakuje", "nigdy"}:
+                            return m.group(0)
+                        # Check that the vocative corresponds to a candidate character name
+                        is_cand = any(name_low.startswith(c[:max(3, len(c)-2)].lower()) for c in candidate_names)
+                        if not is_cand:
+                            return m.group(0)
+                        before = ev.text[:m.start()].rstrip()
+                        is_start = (before == "" or bool(re.search(r"[\.!\?…]$|\\[Nnh]$", before)))
+                        title = "Panie" if is_start else "panie"
+                        fixes.append(f"[Episode Quality Gate - Filar C/CLVII] Linia #{i+1}: zlikwidowano hybrydę wołacza '{name}' + zwrot formalny -> '{title} {name}'")
+                        return f"{title} {name}"
+
+                    ev.text = re.sub(
+                        r"(?<!\bpanie\s)(?<!\bPanie\s)(?<!\bpani\s)(?<!\bPani\s)\b([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]{2,}[uey])\b",
+                        _fix_hybrid_voc,
+                        ev.text
+                    )
+
+            # 3b-4. SUBJECT NOMINATIVE CASE REPAIR FOR TITLE APPOSITION (Filar CLVII)
+            if not is_sign:
+                def _fix_nominative_title_apposition(m):
+                    prefix = m.group(1)
+                    pan = m.group(2)
+                    sep = m.group(3)
+                    name_stem = m.group(4)
+                    verb = m.group(5)
+                    full_name = name_stem + "a"
+                    if full_name.lower() in {
+                        "akira", "shira", "soma", "gaara", "ashitaka", "kiba", "kenta",
+                        "ryoma", "hanza", "koba", "soya", "toma", "genga"
+                    }:
+                        return m.group(0)
+                    fixes.append(f"[Episode Quality Gate - Filar CLVII] Linia #{i+1}: skorygowano skażenie mianownika tytulatury 'pan {full_name}' -> '{pan} {name_stem}'")
+                    return f"{prefix}{pan}{sep}{name_stem} {verb}"
+
+                ev.text = re.sub(
+                    r"(^|[^\w]|\\[Nnh])([Pp]an)(\s+|\\[Nnh]+)([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]*[bcdfghjklmnprstvwxz])a\s+([a-ząćęłńóśźż]+(?:ł|łby|ła|ło|li|ły))\b",
+                    _fix_nominative_title_apposition,
+                    ev.text
+                )
+
+            # 3b-5. EPISODE-LEVEL SPEAKER T-V VOCATIVE HARMONIZATION (Filar C & CLVII Anti-Sama-Drop)
+            if not is_sign and getattr(ev, "name", None):
+                curr_spk = ev.name.strip().lower()
+                for c_name in candidate_names:
+                    if speaker_formal_char.get((curr_spk, c_name), 0) >= 2 and speaker_informal_to_char.get((curr_spk, c_name), 0) == 0:
+                        stem_len = max(3, len(c_name) - 2)
+                        stem = c_name[:stem_len]
+                        def _fix_spk_voc(m):
+                            voc_name = m.group(1)
+                            punct = m.group(2)
+                            before = ev.text[:m.start()].rstrip()
+                            is_start = (before == "" or bool(re.search(r"[\.!\?…]$|\\[Nnh]$", before)))
+                            title = "Panie" if is_start else "panie"
+                            fixes.append(f"[Episode Quality Gate - Filar C/CLVII Anti-Sama-Drop] Linia #{i+1}: zharmonizowano wołacz formalny dla mówcy '{ev.name}': '{title} {voc_name}{punct}'")
+                            return f"{title} {voc_name}{punct}"
+
+                        ev.text = re.sub(
+                            rf"(?<!\bpanie\s)(?<!\bPanie\s)\b({stem}[a-ząćęłńóśźż]*[uey])(!|\s*!)",
+                            _fix_spk_voc,
+                            ev.text,
+                            flags=re.IGNORECASE
+                        )
 
             # 3c. CHARACTER GENDER CONSISTENCY GUARD (Filar CLXII)
             if not is_sign:

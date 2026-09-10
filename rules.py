@@ -824,6 +824,15 @@ FILAR C: JAPOŃSKIE YOBISUTE, SUFIKSY RÓWIEŚNICZE (-KUN, -CHAN, -SAN) I PEŁNA
   * -dono (殿) -> "Wielmożny Panie", "Mości [Imię]".
   * -shishou (師匠) -> "Mistrzu!".
   * -taichou / -buchou (隊長 / 部長) -> "Kapitanie!", "Dowódco!", "Kierowniku!", "Prezesie!".
+- 5. KATEGORYCZNY ZAKAZ HYBRYD WOŁACZA Z FORMĄ GRZECZNOŚCIOWĄ (INTRA-CLAUSE T-V HYBRID BAN):
+  * Kategorycznie zabrania się łączenia w jednej wypowiedzi poufałego wołacza po samym imieniu z honoryfikatywną formą grzecznościową ("pan/pani").
+  * BŁĄD KARDYNALNY [X]: "Poza tym, Eftalu... ma pan zaczerwienioną twarz." (niedopuszczalna hybryda poufałego wołacza "Eftalu" z formą grzecznościową "ma pan").
+  * POPRAWNIE AVT [OK]: "Poza tym, panie Eftalu... ma pan zaczerwienioną twarz." LUB (gdy relacja jest na "ty"): "Poza tym, Eftalu... masz zaczerwienioną twarz.".
+  * Jeśli postać zwraca się per pan/pani, wołacz w języku polskim ZAWSZE musi zawierać tytuł: "Panie [Imię]!" / "Pani [Imię]!".
+- 6. ODPORNOŚĆ NA ANGIELSKIE OPUSZCZANIE SUFIKSU -SAMA (ENGLISH "-SAMA" DROP IMMUNITY):
+  * W zachodnich/angielskich skryptach anime (Crunchyroll, fansuby) tłumacze nagminnie usuwają honoryfikatywny przyrostek "-sama" w okrzykach, zawołaniach i scenach dramatycznych (np. w JP: "Eftal-sama!", a w EN jedynie: "Ephtal!").
+  * KATEGORYCZNY ZAKAZ mechanicznego przepisywania tego jako poufałego wołacza (BŁĄD [X]: "Co za kunszt, Eftalu!" w ustach uczennicy/służącej).
+  * Relacja uczeń-mistrz czy podwładny-pan w polszczyźnie zachowuje stałość rejestru: w zawołaniach i okrzykach BEZWZGLĘDNIE stosuj "Panie [Imię]!" ("Co za kunszt, panie Eftalu!"), a nie poufałe "Eftalu!".
 
 FILAR CI: NADRZĘDNOŚĆ JAPOŃSKIEGO AUDIO I TRIANGULACJA PERSPEKTYWY MÓWCY (KIKANAIDE VS KIKITAKUNAI):
 - Gdy tekst angielski jest wieloznaczny (np. "Don't even ask"), japońskie czasowniki i końcówki w audio bezwzględnie rozstrzygają perspektywę podmiotu:
@@ -1468,6 +1477,10 @@ FILAR CLVII: ZASADA NIENARUSZALNOŚCI FORMY ADRESATYWNEJ (T-V INVARIANCE) I ZAKA
       - KATEGORYCZNY ZAKAZ łączenia w obrębie tej samej kwestii dialogowej lub zdania form poufałych na „ty” (np. „Przecież wiesz”, „Widzisz”, „Myślisz”, „Mówiłeś”) z formami grzecznościowymi per „pan/pani” („a jakoś mnie pan nie wydał”, „stoi pan”, „oferuję panu”)!
       - BŁĄD KARDYNALNY [X]: „Przecież wiesz, kim jestem, a jakoś mnie pan nie wydał.” (niedopuszczalny anacoluthon rejestru).
       - POPRAWNIE AVT [OK]: „Przecież wiesz, kim jestem, a jakoś mnie nie wydałeś / nie wydałaś.” (jednolity rejestr w całej wypowiedzi).
+   5. ZAKAZ HYBRYD WOŁACZA Z FORMĄ PAN/PANI ORAZ ANTY-DRYF TYTULATURY:
+      - Jeśli postać zwraca się do rozmówcy per pan/pani ('ma pan', 'widzi pan', 'niech pan', 'chciał pan'), KATEGORYCZNIE ZABRANIA SIĘ wołacza po samym imieniu ('Eftalu...'). W takich zdaniach dopuszczalne jest wyłącznie 'Panie [Imię]...'.
+      - BŁĄD KARDYNALNY [X]: „Poza tym, Eftalu... ma pan zaczerwienioną twarz.” -> POPRAWNIE [OK]: „Poza tym, panie Eftalu... ma pan zaczerwienioną twarz.”.
+      - W okrzykach i sytuacjach afektywnych nie ulegaj angielskiemu nawykowi usuwania -sama: „Co za kunszt, panie Eftalu!” (ZAKAZ: „Co za kunszt, Eftalu!”).
 
 FILAR CLVIII: ZASADA NIESKAZITELNEGO UCHA WIDZA (THE AUDITORY-SUBTEXT COHERENCE STANDARD)
    1. HARMONIA MIĘDZY SŁUCHEM A NAPISAMI:
@@ -3284,11 +3297,11 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Op
     )
     if has_address_drift_risk:
         focused_pillars.append(
-            "• [SKUP SIĘ NA: FILAR CLVII - Nienaruszalność Formy Adresatywnej i Zakaz Schizofrenii Pan/Ty]: "
+            "• [SKUP SIĘ NA: FILAR CLVII - Nienaruszalność Formy Adresatywnej, Zakaz Hybryd Wołacza i -Sama Drop]: "
             "Jeśli postać zwraca się do rozmówcy po imieniu (np. 'Shizuku, dlaczego?!') lub na 'ty' ('Przecież wiesz...'), w całej scenie KONSEKWENTNIE stosuj formę na 'ty'! "
             "KATEGORYCZNY ZAKAZ wtrącania formy 'pan/pani' ('wygrał pan' -> BŁĄD KARDYNALNY! Należy: 'wygrałeś'). "
-            "ZAKAZ WEWNĄTRZZDANIOWYCH HYBRYD: Niedopuszczalne jest łączenie formy 'ty' ('wiesz') z 'pan nie wydał' w jednym zdaniu (musi być: 'nie wydałeś / nie wydałaś'). "
-            "Wszelkie zwroty 'you / you won / did you' do osoby, z którą jesteś po imieniu, tłumacz w 2. osobie na 'ty'!"
+            "ZAKAZ WEWNĄTRZZDANIOWYCH HYBRYD WOŁACZA: Niedopuszczalne jest łączenie poufałego wołacza imienia z honoryfikatywnym 'pan/pani' ('Poza tym, Eftalu... ma pan' -> BŁĄD KARDYNALNY! Wymagane: 'Poza tym, panie Eftalu... ma pan'). "
+            "ODPORNOŚĆ NA ANGIELSKIE OPUSZCZANIE -SAMA: W okrzykach i zawołaniach podwładnych/uczniów nie kopiuj angielskiego ucinania tytułów ('Co za kunszt, panie Eftalu!', ZAKAZ: 'Co za kunszt, Eftalu!')."
         )
 
     # 98. Zgodność Foniczno-Semantyczna Seiyū i Test Ucha Widza (Filar CLVIII)
