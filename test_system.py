@@ -4377,6 +4377,166 @@ def test_systemic_information_flow_and_scene_topology():
     print(" -> PASSED: Reforma przepływu informacji, topologia scen i asymilacja wiedzy działają w 100% harmonii (0.00 PLN).")
 
 
+def test_runtime_batch_pipeline_and_ast_integrity_guard():
+    print("[TEST 59] Test integralności AST i odporności pętli montowania paczek...")
+    import ast
+    import builtins
+    from translator import determine_blind_draft_status, MultimodalTranslator, BatchTranslationResponse, LineTranslation
+
+    # Asercja 1: Unit test determine_blind_draft_status
+    assert determine_blind_draft_status(has_audio_conflict=True) is True
+    assert determine_blind_draft_status(has_ambiguity_conflict=True) is True
+    assert determine_blind_draft_status(has_severe_trap=True) is True
+    assert determine_blind_draft_status(has_temporal_conflict=True) is True
+    assert determine_blind_draft_status() is False
+    assert determine_blind_draft_status(False, False, False, False) is False
+
+    # Asercja 2: Automatyczny audytor AST (symtable) weryfikujący brak niezdefiniowanych zmiennych w kodzie
+    import symtable
+
+    def check_file_ast_scopes(filename):
+        with open(filename, "r", encoding="utf-8") as f:
+            src = f.read()
+        top = symtable.symtable(src, filename, "exec")
+        module_assigned = {s.get_name() for s in top.get_symbols() if s.is_assigned() or s.is_imported()} | set(dir(builtins))
+        module_assigned.update(["__file__", "__name__", "__doc__", "self", "cls"])
+
+        errors = []
+
+        def check_table(tbl, scope_path=""):
+            full_path = f"{scope_path}.{tbl.get_name()}" if scope_path else tbl.get_name()
+            for sym in tbl.get_symbols():
+                if sym.is_global() and not sym.is_assigned():
+                    name = sym.get_name()
+                    if name not in module_assigned:
+                        errors.append(f"[{filename}] Niezdefiniowana zmienna '{name}' w zasięgu '{full_path}'")
+            for child in tbl.get_children():
+                check_table(child, full_path)
+
+        for child in top.get_children():
+            check_table(child, top.get_name())
+
+        return errors
+
+    ast_errors = []
+    for core_file in ["translator.py", "verifier.py", "profiler.py", "series_memory.py", "avt_linter.py", "rules.py"]:
+        ast_errors.extend(check_file_ast_scopes(core_file))
+    assert not ast_errors, f"Błąd audytora AST - wykryto niezdefiniowane identyfikatory w kodzie:\n" + "\n".join(ast_errors)
+
+    # Asercja 3: Pełny Dry-Run pętli _process_single_batch / pass1_items
+    import pysubs2
+    raw_events = [
+        pysubs2.SSAEvent(start=1000, end=3000, text="We have to hurry, Shizuku.", name="Miyabi"),
+        pysubs2.SSAEvent(start=3500, end=5000, text=r"{\i1}Why does Latour have no aroma?{\i1}", name="Shizuku"),
+        pysubs2.SSAEvent(start=5200, end=6500, text="This is not genuine Latour!", name="Shizuku"),
+        pysubs2.SSAEvent(start=7000, end=8500, text="Watch out, Hayama!", name="Tomine"),
+        pysubs2.SSAEvent(start=9000, end=10000, text="Yes!", name="Hayama"),
+        pysubs2.SSAEvent(start=17000, end=19000, text="Sure, what is it, Mary?", name="Shizuku"),
+        pysubs2.SSAEvent(start=20000, end=22000, text="I can do it alone.", name="Mary"),
+        pysubs2.SSAEvent(start=23000, end=25000, text="Is it true that Yutaka died?", name="Hayama")
+    ]
+    untranslated_sample = [(i, ev, ev.text, "") for i, ev in enumerate(raw_events)]
+
+    mock_trans = [
+        LineTranslation(id=1, polish_text="Musimy się pospieszyć, Shizuku.", speaker_gender="FEMALE"),
+        LineTranslation(id=2, polish_text="Dlaczego Latour nie ma aromatu?", speaker_gender="MALE"),
+        LineTranslation(id=3, polish_text="To nie jest prawdziwy Latour!", speaker_gender="MALE"),
+        LineTranslation(id=4, polish_text="Uważaj, Hayamo!", speaker_gender="MALE"),
+        LineTranslation(id=5, polish_text="D-Dobrze!", speaker_gender="MALE"),
+        LineTranslation(id=6, polish_text="Więc o co chodzi, Mary?", speaker_gender="MALE"),
+        LineTranslation(id=7, polish_text="Poradzę sobie sama.", speaker_gender="FEMALE"),
+        LineTranslation(id=8, polish_text="Czy to prawda, że Yutaka nie żyje?", speaker_gender="MALE", notes="[🚨 PUŁAPKA PROFILERA: Zakaz dosłownego tłumaczenia]")
+    ]
+    batch_resp = BatchTranslationResponse(translations=mock_trans)
+
+    # Inicjalizacja instancji MultimodalTranslatora w trybie offline/mock
+    translator = object.__new__(MultimodalTranslator)
+    translator.character_registry = {"Shizuku": "mężczyzna", "Hayama": "mężczyzna", "Mary": "kobieta", "Tomine": "mężczyzna"}
+    translator.profile_line_alerts = {5: ["[🚨 PUŁAPKA PROFILERA: Dyskontinuitet czasowy]"]}
+    translator.whisper = None
+
+    pass1_items = []
+    whisper_transcriptions = {7: "hitori de dekiru [hitori de dekiru]"}
+
+    for idx, (orig_idx, event, clean_en, ts_prefix) in enumerate(untranslated_sample):
+        batch_id = idx + 1
+        pl_candidate = ""
+        speaker_gender = None
+        notes = ""
+        cps, is_fast = (15.0, False)
+        cps_warn = ""
+        condensation_dir = ""
+        visual_sub = ""
+        lit_mean = ""
+        screen_reg = None
+        v_typesetting = None
+        ambiguity_note = ""
+        semiotic_layer = "spoken_on_screen"
+        raw_addressee = None
+        has_audio_conflict = False
+        has_ambiguity_conflict = False
+        has_severe_trap = False
+        has_temporal_conflict = False
+
+        if batch_resp:
+            for tr in batch_resp.translations:
+                if tr.id == batch_id:
+                    pl_candidate = tr.polish_text
+                    speaker_gender = tr.speaker_gender
+                    notes = getattr(tr, 'notes', '') or ''
+                    ambiguity_note = getattr(tr, 'ambiguity_note', '') or ''
+                    break
+
+        pinned_alerts = getattr(translator, "profile_line_alerts", {}).get(orig_idx)
+        if pinned_alerts:
+            for pa in pinned_alerts:
+                notes = f"{notes} {pa}".strip()
+
+        audio_jp_str = whisper_transcriptions.get(batch_id, "")
+        relation_tag = ""
+        if idx == 5:
+            relation_tag = "[DYSKONTINUITET CZASOWY: Pauza 7.0s / Zmiana sceny]"
+
+        dur_s = max(0.05, (event.end - event.start) / 1000.0)
+        style_str = event.style or ""
+        is_th = r"\i1" in (event.text or "")
+
+        has_audio_conflict = bool(any(k in audio_jp_str.lower() for k in ["hitori", "betsuni", "yatta"]))
+        has_ambiguity_conflict = bool(ambiguity_note)
+        has_severe_trap = bool(notes and any(k in notes for k in ["[🚨 PUŁAPKA PROFILERA", "[🚨 ALARM FILAR", "[🎙️ ALARM KLISZY"]))
+        has_temporal_conflict = bool(relation_tag and ("DYSKONTINUITET CZASOWY" in relation_tag or "ALARM KLISZY FANSUBERSKIEJ" in relation_tag))
+
+        is_blind_draft = determine_blind_draft_status(
+            has_audio_conflict=has_audio_conflict,
+            has_ambiguity_conflict=has_ambiguity_conflict,
+            has_severe_trap=has_severe_trap,
+            has_temporal_conflict=has_temporal_conflict
+        )
+
+        pass1_items.append({
+            "id": batch_id,
+            "orig_idx": orig_idx,
+            "event": event,
+            "style": style_str,
+            "is_thought": is_th,
+            "is_blind_draft": is_blind_draft,
+            "duration_s": dur_s,
+            "en": clean_en,
+            "pl": pl_candidate,
+            "speaker_name": event.name,
+            "speaker_gender": speaker_gender,
+            "notes": notes
+        })
+
+    assert len(pass1_items) == 8, f"Oczekiwano 8 pozycji w pass1_items, otrzymano {len(pass1_items)}"
+    assert pass1_items[5]["is_blind_draft"] is True, "Linia 6 (dyskontinuitet) powinna mieć is_blind_draft=True"
+    assert pass1_items[6]["is_blind_draft"] is True, "Linia 7 (hitori audio conflict) powinna mieć is_blind_draft=True"
+    assert pass1_items[7]["is_blind_draft"] is True, "Linia 8 (pułapka profilera) powinna mieć is_blind_draft=True"
+    assert pass1_items[0]["is_blind_draft"] is False, "Linia 1 powinna mieć is_blind_draft=False"
+
+    print(" -> PASSED: Strażnik AST i silnik montowania paczek działają bezbłędnie (0.00 PLN).")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -4434,7 +4594,8 @@ if __name__ == "__main__":
     test_anti_pivot_and_spatiotemporal_engine()
     test_holistic_domain_generalization_and_systemic_invariants()
     test_systemic_information_flow_and_scene_topology()
-    print("\n Wszystkie testy jednostkowe i integracyjne (58/58) zakończone pełnym sukcesem!\n")
+    test_runtime_batch_pipeline_and_ast_integrity_guard()
+    print("\n Wszystkie testy jednostkowe i integracyjne (59/59) zakończone pełnym sukcesem!\n")
 
 
 

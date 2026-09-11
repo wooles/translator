@@ -39,6 +39,7 @@ import logging
 import threading
 import tempfile
 import sqlite3
+import concurrent.futures
 from typing import List, Optional, Dict, Any, Tuple
 from pathlib import Path
 from PIL import Image
@@ -1202,7 +1203,19 @@ def detect_scene_social_context(
         speakers_str = ", ".join(clean_speakers[:4])
         return f"[KADR ZBIOROWY / UCHI-SOTO: Scena wieloosobowa ({speakers_str}) -> Wymóg zachowania odpowiedniego dystansu społecznego i protokołu relacji (Uchi-Soto)]"
 
-    return None
+def determine_blind_draft_status(
+    has_audio_conflict: bool = False,
+    has_ambiguity_conflict: bool = False,
+    has_severe_trap: bool = False,
+    has_temporal_conflict: bool = False
+) -> bool:
+    """
+    Determines whether a line in Phase 1 draft should be marked as blind draft
+    (requiring autonomous translation from Japanese audio / scene dynamics in Phase 2
+    to eliminate anchoring bias).
+    Guarantees 100% resilient evaluation with default arguments.
+    """
+    return bool(has_audio_conflict or has_ambiguity_conflict or has_severe_trap or has_temporal_conflict)
 
 class MultimodalTranslator:
     _STATUS_LOCK = threading.Lock()
@@ -2313,6 +2326,10 @@ class MultimodalTranslator:
             ambiguity_note = ""
             semiotic_layer = "spoken_on_screen"
             raw_addressee = None
+            has_audio_conflict = False
+            has_ambiguity_conflict = False
+            has_severe_trap = False
+            has_temporal_conflict = False
             if batch_response:
                 for tr in batch_response.translations:
                     if tr.id == batch_id:
@@ -2550,9 +2567,15 @@ class MultimodalTranslator:
             has_audio_conflict = bool(audio_discrepancy_msg) or any(
                 k in audio_jp_str.lower() for k in ["hitori", "一人", "独り", "betsuni", "別に", "yokatta", "よかった", "yatta", "やった"]
             )
+            has_ambiguity_conflict = bool(ambiguity_note)
             has_severe_trap = bool(notes and any(k in notes for k in ["[🚨 PUŁAPKA PROFILERA", "[🚨 ALARM FILAR", "[🎙️ ALARM KLISZY"]))
             has_temporal_conflict = bool(relation_tag and ("DYSKONTINUITET CZASOWY" in relation_tag or "ALARM KLISZY FANSUBERSKIEJ" in relation_tag))
-            is_blind_draft = has_audio_conflict or has_ambiguity_conflict or has_severe_trap or has_temporal_conflict
+            is_blind_draft = determine_blind_draft_status(
+                has_audio_conflict=has_audio_conflict,
+                has_ambiguity_conflict=has_ambiguity_conflict,
+                has_severe_trap=has_severe_trap,
+                has_temporal_conflict=has_temporal_conflict
+            )
 
             pass1_items.append({
                 "id": batch_id,
