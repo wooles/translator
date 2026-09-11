@@ -4537,6 +4537,102 @@ def test_runtime_batch_pipeline_and_ast_integrity_guard():
     print(" -> PASSED: Strażnik AST i silnik montowania paczek działają bezbłędnie (0.00 PLN).")
 
 
+def test_batch_density_scene_coalescence_and_cost_optimization():
+    print("[TEST 60/60] Test optymalizacji partycjonowania scenicznego, koalescencji mikro-paczek i redukcji kosztów...")
+    from pathlib import Path
+    from tempfile import TemporaryDirectory
+    import pysubs2
+    from translator import create_adaptive_batches
+    from rules import BELCZYK_AVT_MASTER_CANON
+    from series_memory import SeriesBible
+    from profiler import EpisodeProfile, DangerLinePreScan, resolve_profile_alerts_to_events
+
+    # Asercja 1: Filar CLXV Canon Verification (Zasada koalescencji scen w jednej paczce)
+    assert "PROTOKÓŁ KOALESCENCJI SCEN W JEDNEJ PACZCE" in BELCZYK_AVT_MASTER_CANON, "Brak protokołu koalescencji scen w BELCZYK_AVT_MASTER_CANON!"
+    assert "[ZMIANA SCENY / CIĘCIE MONTAŻOWE" in BELCZYK_AVT_MASTER_CANON, "Brak znacznika cięcia montażowego w Filarze CLXV!"
+
+    # Asercja 2: Anty-fragmentacja i eliminacja mikro-paczek (< 12-16 kwestii)
+    # Symulujemy strumień 374 kwestii (odpowiadający Kami no Shizuku Ep 23),
+    # gdzie postacie wielokrotnie robią pauzy 4.0s–6.8s na degustacje wina lub zamyślenie
+    raw_stream = []
+    current_t = 0
+    for i in range(374):
+        if i > 0 and i % 10 == 0:
+            current_t += 4500  # Pauza 4.5s (dramaturgiczna pauza w scenie)
+        elif i > 0 and i % 25 == 0:
+            current_t += 8500  # Pauza 8.5s (przeskok montażowy)
+        else:
+            current_t += 1500
+        ev = pysubs2.SSAEvent(start=current_t, end=current_t + 1200, text=f"Dialog line {i}")
+        raw_stream.append((i, ev, f"Dialog line {i}", ""))
+
+    batches = create_adaptive_batches(raw_stream, base_batch_size=24, max_batch_size=34)
+    assert len(batches) <= 19, f"Błąd partycjonowania: wygenerowano aż {len(batches)} paczek (powinno być <= 19)!"
+    for b_idx, b in enumerate(batches[:-1]):
+        assert len(b) >= 12, f"Paczka {b_idx} ma tylko {len(b)} kwestii! Naruszenie minimalnego kworum 12 linii."
+
+    # Test eliminacji mikropaczek: krótka 7-kwestiowa scena z pauzą 4500ms nie może tworzyć osobnej partii
+    micro_stream = []
+    t_acc = 0
+    for i in range(7):
+        t_acc += 1500
+        micro_stream.append((i, pysubs2.SSAEvent(start=t_acc, end=t_acc + 1000, text=f"Micro line {i}"), f"Micro line {i}", ""))
+    t_acc += 4500  # Pauza 4.5s
+    for i in range(7, 24):
+        t_acc += 1500
+        micro_stream.append((i, pysubs2.SSAEvent(start=t_acc, end=t_acc + 1000, text=f"Main scene {i}"), f"Main scene {i}", ""))
+    # Z min_scene_batch=6 ten strumień był bezsensownie rozcinany na 2 paczki (7 i 17). Z min_scene_batch=16 pozostaje 1 zwartą paczką!
+    micro_batches = create_adaptive_batches(micro_stream, base_batch_size=24, max_batch_size=34)
+    assert len(micro_batches) == 1, f"Mikro-scena 7 linii nie powinna tworzyć osobnej paczki (otrzymano {len(micro_batches)} paczek)!"
+
+    # Asercja 3: Pre-pass Line Resolver z obsługą oryginalnych indeksów (Dual-Index Mapping)
+    profile = EpisodeProfile(
+        episode_summary="Winiarski spór",
+        danger_lines_prescan=[
+            DangerLinePreScan(
+                approx_time="00:05:00",
+                english_phrase="This isn't Latour!",
+                contextual_trap="Pułapka fałszywego wina",
+                mandatory_direction="To wcale nie jest Latour!"
+            )
+        ]
+    )
+    ev_wine = pysubs2.SSAEvent(start=300000, end=302000, text="This isn't Latour! It barely has any scent.")
+    stream_sample = [
+        (100, pysubs2.SSAEvent(start=10000, end=12000, text="Line 0"), "Line 0", ""),
+        (101, pysubs2.SSAEvent(start=15000, end=17000, text="Line 1"), "Line 1", ""),
+        (102, pysubs2.SSAEvent(start=20000, end=22000, text="Line 2"), "Line 2", ""),
+        (105, ev_wine, "This isn't Latour! It barely has any scent.", "")
+    ]
+    resolved = resolve_profile_alerts_to_events(profile, stream_sample)
+    assert 3 in resolved or 105 in resolved, "Błąd resolvera: nie dopięto wytycznej!"
+    assert 105 in resolved, "Błąd dual mappingu: brak oryginalnego indeksu 105 w resolved_alerts!"
+    assert any("To wcale nie jest Latour!" in a for a in resolved[105])
+
+    # Asercja 4: Rejestracja gęstości partii i metryk finansowych w SeriesBible
+    with TemporaryDirectory() as tmpdir:
+        bible = SeriesBible("Kami_no_Shizuku_Density_Test", storage_dir=Path(tmpdir))
+        bible.register_episode_execution(
+            episode_name="[ASW] Kami no Shizuku - 23",
+            batch_count=17,
+            dialogue_count=374,
+            cost_pln=1.45
+        )
+        assert "[ASW] Kami no Shizuku - 23" in bible.data["episodes_translated"]
+        assert "[ASW] Kami no Shizuku - 23" in bible.data["batch_stats"]
+        stats = bible.data["batch_stats"]["[ASW] Kami no Shizuku - 23"]
+        assert stats["batches"] == 17
+        assert stats["dialogues"] == 374
+        assert stats["avg_batch_size"] == 22.0
+        assert stats["cost_pln"] == 1.45
+
+        bible_reloaded = SeriesBible("Kami_no_Shizuku_Density_Test", storage_dir=Path(tmpdir))
+        assert "[ASW] Kami no Shizuku - 23" in bible_reloaded.data["batch_stats"]
+        assert bible_reloaded.data["batch_stats"]["[ASW] Kami no Shizuku - 23"]["avg_batch_size"] == 22.0
+
+    print(" -> PASSED: Optymalizacja partycjonowania, eliminacja mikro-paczek i koalescencja scen działają w 100% (0.00 PLN).")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -4595,7 +4691,8 @@ if __name__ == "__main__":
     test_holistic_domain_generalization_and_systemic_invariants()
     test_systemic_information_flow_and_scene_topology()
     test_runtime_batch_pipeline_and_ast_integrity_guard()
-    print("\n Wszystkie testy jednostkowe i integracyjne (59/59) zakończone pełnym sukcesem!\n")
+    test_batch_density_scene_coalescence_and_cost_optimization()
+    print("\n Wszystkie testy jednostkowe i integracyjne (60/60) zakończone pełnym sukcesem!\n")
 
 
 

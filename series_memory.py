@@ -228,7 +228,8 @@ class SeriesBible:
             "relationships": {},      # { "Kokoro->Arata": "po imieniu / na ty", "Uczniowie->Teshima": "pani Teshima" }
             "declensions": {},        # { "Shira": {"M": "Shira", "D": "Shiry", "C": "Shirze", ...} }
             "plot_anchors": {},        # { "kamień jada": "rytualny artefakt wywołujący deszcz", "zbieg z Samarkandy": "Shira" }
-            "episodes_translated": []  # ["odcinek 1", "odcinek 2"]
+            "episodes_translated": [], # ["odcinek 1", "odcinek 2"]
+            "batch_stats": {}          # { "odcinek 1": {"batches": 17, "dialogues": 374, "avg_batch_size": 22.0} }
         }
         self.load()
 
@@ -256,6 +257,32 @@ class SeriesBible:
                 json.dump(self.data, f, ensure_ascii=False, indent=2)
         except Exception:
             pass
+
+    def register_episode_execution(
+        self,
+        episode_name: str,
+        batch_count: int,
+        dialogue_count: int,
+        cost_pln: Optional[float] = None
+    ):
+        """
+        Records execution density and batch stats in Series Bible to monitor and prevent financial/fragmentation drift.
+        """
+        if not hasattr(self, "data") or "episodes_translated" not in self.data:
+            return
+        entry = episode_name.strip()
+        if entry and entry not in self.data["episodes_translated"]:
+            self.data["episodes_translated"].append(entry)
+
+        if "batch_stats" not in self.data:
+            self.data["batch_stats"] = {}
+        self.data["batch_stats"][entry] = {
+            "dialogues": dialogue_count,
+            "batches": batch_count,
+            "avg_batch_size": round(dialogue_count / max(1, batch_count), 1),
+            "cost_pln": cost_pln
+        }
+        self.save()
 
     def _sanitize_character_entry(self, name: str, details: str) -> str:
         """

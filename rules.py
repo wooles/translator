@@ -1605,6 +1605,10 @@ FILAR CLXV: DYSKONTINUITET CZASOWY, PRZESKOKI SCEN I ODCZAROWANIE FAŁSZYWEGO PR
       - Po cięciu ze sceny dynamicznej (krzyk bojowy, panika) do sceny wyciszonej (izba chorych, gabinet po 15 sekundach), rejestr emocjonalny i interpunkcja muszą ulec natychmiastowemu zresetowaniu do akustyki nowego pomieszczenia.
    5. ODCZAROWANIE FAŁSZYWEGO PRZYLEGANIA (FALSE ADJACENCY ON UNANSWERED QUESTIONS):
       - Długa luka czasowa unieważnia parę sąsiedztwa (Adjacency Pair). Otwartych pytań sprzed montażu podróży nie wolno traktować jako bezpośredniego bodźca dla mechanicznych potaknięć jednosłownych.
+   6. PROTOKÓŁ KOALESCENCJI SCEN W JEDNEJ PACZCE (INTRA-BATCH SCENE COALESCENCE PROTOCOL):
+      - Ze względów ekonomicznych (optymalizacja API i eliminacja kosztownych mikro-paczek < 12–16 kwestii) dwie krótkie sceny rozdzielone pauzą montażową Δt ≥ 3.8s mogą znajdować się w tej samej paczce wejściowej.
+      - Gdy w promptcie pojawia się znacznik: [ZMIANA SCENY / CIĘCIE MONTAŻOWE: Δt = X.Xs], modele Fazy 1 i Fazy 2 mają BEZWZGLĘDNY ZAKAZ traktowania kwestii po znaczniku jako kontynuacji kwestii sprzed znacznika!
+      - Znacznik cięcia montażowego oznacza twardy reset tematyczny, foniczny, relacyjny i intencyjny: nowa scena, inne audytorium, zakaz wycieku spójników ('I...', 'A...'), zakaz przenoszenia podmiotu domyślnego oraz bezwzględny zakaz fałszywych par przylegania.
 
 FILAR CLXVI: PROTOKÓŁ ELIMINACJI GRAWITACJI JĘZYKA ANGIELSKIEGO I KLISZ FANSUBERSKICH (ANTI-PIVOT & FANSUB CLICHÉ ERADICATION PROTOCOL):
    1. ŻELAZNA HIERARCHIA ŹRÓDEŁ (AUDIO JP > INTENCJA SCENY > EN FANSUB):

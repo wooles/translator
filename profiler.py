@@ -456,10 +456,13 @@ def resolve_profile_alerts_to_events(
             return 0.0
         return len(s1 & s2) / float(len(s1 | s2))
 
+    orig_idx_map: Dict[int, int] = {}
     parsed_events: List[Tuple[int, int, int, str, Set[str]]] = []
     for idx, ev_item in enumerate(subs_events):
         s_ms, e_ms, txt = _extract_text_and_times_from_event(ev_item)
         parsed_events.append((idx, s_ms, e_ms, txt, _tokenize(txt)))
+        if isinstance(ev_item, (list, tuple)) and len(ev_item) > 0 and isinstance(ev_item[0], int):
+            orig_idx_map[idx] = ev_item[0]
 
     # 1. Resolve danger_lines_prescan
     if getattr(profile, "danger_lines_prescan", None):
@@ -555,6 +558,17 @@ def resolve_profile_alerts_to_events(
                     resolved_alerts[best_idx] = []
                 if tag not in resolved_alerts[best_idx]:
                     resolved_alerts[best_idx].append(tag)
+
+    if orig_idx_map:
+        for seq_idx, alerts in list(resolved_alerts.items()):
+            if seq_idx in orig_idx_map:
+                o_idx = orig_idx_map[seq_idx]
+                if o_idx not in resolved_alerts:
+                    resolved_alerts[o_idx] = list(alerts)
+                else:
+                    for a in alerts:
+                        if a not in resolved_alerts[o_idx]:
+                            resolved_alerts[o_idx].append(a)
 
     return resolved_alerts
 

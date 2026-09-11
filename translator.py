@@ -939,14 +939,25 @@ def apply_simultaneous_dialogue_formatting(events: List[Any]) -> List[Any]:
             ev.text = clean_orphaned_dialogue_dashes(ev.text)
     return events
 
-def create_adaptive_batches(raw_entries: list, base_batch_size: int = 24, max_batch_size: int = 34, min_scene_batch: int = 6) -> list:
+def create_adaptive_batches(
+    raw_entries: list,
+    base_batch_size: int = 24,
+    max_batch_size: int = 34,
+    min_scene_batch: int = 16,
+    min_leap_batch: int = 12,
+    leap_threshold_ms: int = 8000,
+    scene_threshold_ms: int = 3800
+) -> list:
     """
     Groups subtitle events into coherent, scene-aligned batches,
-    adapting to dialogue density and scene pauses:
-    - Major scene break (>= 3800ms gap) starts a new batch if current batch has at least min_scene_batch (6) lines.
-    - Massive temporal leap (>= 7000ms gap) starts a new batch if current batch has at least 4 lines.
+    adapting to dialogue density and scene pauses while preventing costly micro-batch fragmentation:
+    - Major scene break (>= 3800ms gap) starts a new batch if current batch has reached at least min_scene_batch (16) lines.
+    - Massive temporal leap (>= 8000ms gap) starts a new batch if current batch has reached at least min_leap_batch (12) lines.
+    - Standard dramatic beat break (>= 2800ms gap) starts a new batch when current batch has reached at least 18 lines.
     - Continuous dialogue without scene cuts stays together up to max_batch_size (34 lines) or 150 words.
-    Guarantees no Adjacency Pairs or dialogues are split across arbitrary 18-line boundaries.
+    Short sub-scenes (< 12-16 lines) are safely coalesced into the current batch with an explicit intra-batch
+    scene cut marker ([ZMIANA SCENY / CIĘCIE MONTAŻOWE: Δt = X.Xs]), ensuring zero extra API overhead ($0.00 PLN)
+    and 100% dramatic protection.
     """
     if not raw_entries:
         return []
@@ -965,8 +976,8 @@ def create_adaptive_batches(raw_entries: list, base_batch_size: int = 24, max_ba
 
         gap_ms = (ev.start - current_batch[-1][1].end) if current_batch else 0
         is_scene_break = current_batch and (
-            (gap_ms >= 7000 and len(current_batch) >= 4) or
-            (gap_ms >= 3800 and len(current_batch) >= min_scene_batch) or
+            (gap_ms >= leap_threshold_ms and len(current_batch) >= min_leap_batch) or
+            (gap_ms >= scene_threshold_ms and len(current_batch) >= min_scene_batch) or
             (gap_ms >= 2800 and len(current_batch) >= 18)
         )
 
@@ -1712,10 +1723,10 @@ class MultimodalTranslator:
                         clean_en_lower.startswith(w) for w in ["sure,", "sure.", "sure!", "all right,", "all right.", "yeah, what", "ok, what", "okay, what"]
                     )
 
-                    if time_gap_ms >= 5000 and (is_prev_private_request or is_curr_delayed_agreement):
+                    if time_gap_ms >= 3800 and (is_prev_private_request or is_curr_delayed_agreement):
                         relation_tag = f" [DYSKONTINUITET CZASOWY: Pauza {time_gap_ms/1000.0:.1f}s / Zmiana sceny – KATEGORYCZNY ZAKAZ opóźnionego 'Jasne/Pewnie' (Delayed Agreement Filar CLXV); postacie przeszły już na miejsce – tłumacz jako otwarcie rozmowy: 'Więc o co chodzi?' / 'No to o co chodzi?' / 'Słucham cię']"
-                    elif time_gap_ms >= 8000 and not prev_clean.endswith("..."):
-                        relation_tag = f" [DYSKONTINUITET CZASOWY: Pauza {time_gap_ms/1000.0:.1f}s / Nowe ujęcie – ZAKAZ wycieku spójników ('I...', 'A...') i fałszywych par przylegania]"
+                    elif time_gap_ms >= 3800 and not (prev_clean.endswith("...") or prev_clean.endswith("—") or prev_clean.endswith("-")):
+                        relation_tag = f" [ZMIANA SCENY / CIĘCIE MONTAŻOWE: Pauza {time_gap_ms/1000.0:.1f}s – nowa sekwencja (Filar CLXV); KATEGORYCZNY ZAKAZ fałszywych par przylegania, wycieku spójników ('I...', 'A...') i bezwładności emocjonalnej z poprzedniej sceny]"
                     else:
                         # Standardowa analiza par sąsiedztwa w obrębie tej samej sceny
                         curr_is_affirmation = any(
@@ -2478,8 +2489,10 @@ class MultimodalTranslator:
                         clean_en.lower().strip().startswith(w) for w in ["sure,", "sure.", "sure!", "all right,", "all right.", "yeah, what", "ok, what", "okay, what"]
                     )
 
-                    if (time_gap_ms >= 5000 and (is_prev_private_request or is_curr_delayed_agreement)) or (time_gap_ms >= 8000 and not prev_clean.endswith("...")):
+                    if (time_gap_ms >= 3800 and (is_prev_private_request or is_curr_delayed_agreement)):
                         relation_tag = f"[DYSKONTINUITET CZASOWY: Pauza {time_gap_s:.1f}s / Zmiana sceny – KATEGORYCZNY ZAKAZ opóźnionego 'Jasne/Pewnie' (Delayed Agreement Filar CLXV); postacie przeszły już na miejsce – tłumacz jako otwarcie rozmowy: 'Więc o co chodzi?' / 'No to o co chodzi?' / 'Słucham cię']"
+                    elif time_gap_ms >= 3800 and not (prev_clean.endswith("...") or prev_clean.endswith("—") or prev_clean.endswith("-")):
+                        relation_tag = f"[ZMIANA SCENY / CIĘCIE MONTAŻOWE: Pauza {time_gap_s:.1f}s – nowa sekwencja (Filar CLXV); KATEGORYCZNY ZAKAZ fałszywych par przylegania, wycieku spójników ('I...', 'A...') i bezwładności emocjonalnej z poprzedniej sceny]"
                     else:
                         # Sprawdź, czy poprzednia linijka to dyrektywa/ostrzeżenie/polecenie
                         is_prev_directive = any(
@@ -3283,7 +3296,11 @@ class MultimodalTranslator:
         batches = create_adaptive_batches(
             raw_entries,
             base_batch_size=self.batch_size,
-            max_batch_size=min(32, self.batch_size + 8)
+            max_batch_size=min(32, self.batch_size + 8),
+            min_scene_batch=16,
+            min_leap_batch=12,
+            leap_threshold_ms=8000,
+            scene_threshold_ms=3800
         )
 
         with tqdm(
@@ -3843,6 +3860,18 @@ class MultimodalTranslator:
             print(f"  ├─ 🛡️ Rabat Context Cache (-90%): Zaoszczędzono ~{cache_savings_pln:.2f} PLN (Standardowo bez rabatu: ~{std_gross_pln:.2f} PLN brutto)")
             print(f"  └─ ℹ️ Rozliczenia Google Cloud: Wyciągi bankowe zawierają 23% VAT i sumują wszystkie próby oraz testy z danego dnia.")
             print("═" * 72 + "\n")
+
+            if getattr(self, "series_bible", None):
+                ref_name = Path(video_path).stem if video_path else (Path(subs_path).stem if subs_path else "Odcinek")
+                try:
+                    self.series_bible.register_episode_execution(
+                        episode_name=ref_name,
+                        batch_count=len(batches),
+                        dialogue_count=total_lines,
+                        cost_pln=actual_cost_pln
+                    )
+                except Exception:
+                    pass
         except Exception:
             pass
 
