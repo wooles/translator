@@ -2,16 +2,136 @@
   "anime_title": "Clevatess",
   "characters": {
     "Clevatess": {
-      "description": "Król Demonicznych Bestii / Władca Mrocznych Bestii (monstrualny, prastary demon o wielkiej mądrości i sile, potężny, arogancki, dostojny głos)"
+      "description": "MĘŻCZYZNA - Król Demonicznych Bestii / Władca Mrocznych Bestii (monstrualny, prastary demon o wielkiej mądrości i sile, potężny, arogancki, dostojny głos)"
     },
     "Alicia": {
-      "description": "Dziewczyna Rycerz / Bohaterka z 13 Bohaterów, która przeciwstawiła się bezmyślnej rzezi i zawarła pakt z Clevatessem"
+      "description": "KOBIETA - Dziewczyna Rycerz / Bohaterka z 13 Bohaterów, która przeciwstawiła się bezmyślnej rzezi i zawarła pakt z Clevatessem"
     },
     "Nel": {
-      "description": "Niemowlę powierzone Clevatessowi i Alicii"
+      "description": "MĘŻCZYZNA - Niemowlę powierzone Clevatessowi i Alicii"
     },
     "Clen": {
-      "description": "Ludzka forma / wcielenie Clevatessa"
+      "description": "MĘŻCZYZNA - Ludzka forma / wcielenie Clevatessa"
+    },
+    "Naie": {
+      "description": "KOBIETA - kobieta (Nauczycielka w Akademii Solsein, w rzeczywistości skryta szpieg Cesarstwa Boelate) [KATEGORYCZNY NAKAZ form żeńskich: wiedziała / doniosłaby / otrzymała / straciła]"
+    },
+    "Klen": {
+      "description": "MĘŻCZYZNA - mężczyzna (postać)"
+    },
+    "Leon i Tygel": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Zavthier": {
+      "description": "KOBIETA - kobieta (postać)"
+    },
+    "Rathwell": {
+      "description": "MĘŻCZYZNA - mężczyzna (Władca Mrocznych Bestii Wschodu (Błękitny Rathwell), pasożyt zasiedlający ciało Edisona)"
+    },
+    "Edison": {
+      "description": "MĘŻCZYZNA - mężczyzna (postać)"
+    },
+    "Yuriel": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Owen Koath": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Klen / Clevatess": {
+      "description": "MĘŻCZYZNA - mężczyzna (Starożytny Władca Mrocznych Bestii Południa uwięziony w ludzkiej powłoce chłopca)"
+    },
+    "Sarasa": {
+      "description": "KOBIETA - kobieta (postać)"
+    },
+    "Tygel": {
+      "description": "MĘŻCZYZNA - mężczyzna (postać)"
+    },
+    "Leon": {
+      "description": "MĘŻCZYZNA (uczeń akademii)"
+    },
+    "Luna": {
+      "description": "MĘŻCZYZNA - mężczyzna (postać)"
+    },
+    "Lang": {
+      "description": "MĘŻCZYZNA - mężczyzna (postać)"
+    },
+    "Chiffonlits": {
+      "description": "KOBIETA - kobieta (postać)"
+    },
+    "Elro": {
+      "description": "MĘŻCZYZNA - mężczyzna (Dyrektor Akademii, fałszywy kapłan sprzymierzony z mrocznymi siłami)"
+    },
+    "Ray Forester": {
+      "description": "MĘŻCZYZNA - mężczyzna (postać)"
+    },
+    "Andrew": {
+      "description": "MĘŻCZYZNA - mężczyzna (postać)"
+    },
+    "Klen Vatiss (Clevatess)": {
+      "description": "MĘŻCZYZNA - mężczyzna (Ponad 1000 lat, potężny Władca Mrocznych Bestii ukrywający się pod postacią młodzieńca)"
+    },
+    "Drel": {
+      "description": "MĘŻCZYZNA - mężczyzna (postać)"
+    },
+    "Gart": {
+      "description": "MĘŻCZYZNA - mężczyzna (postać)"
+    },
+    "Vordin": {
+      "description": "MĘŻCZYZNA - mężczyzna (postać)"
+    },
+    "Alicia Sleihunt": {
+      "description": "KOBIETA - kobieta (Szkolny alias Alicii Glenfall w Akademii Solsein; KATEGORYCZNY ZAKAZ formy 'Alyssa')"
+    },
+    "Mary Merryweather": {
+      "description": "KOBIETA - kobieta (Uczennica Akademii Solsein, zastępczyni prof. Chiffonlits; w dialogach potocznie Merry)"
+    },
+    "Andrew Hwyp": {
+      "description": "MĘŻCZYZNA (uczeń akademii, badacz magii, z kategorycznym nakazem form męskich) [WOŁACZ: Andrewie Hwypie]"
+    },
+    "Naie Chiffonlits": {
+      "description": "KOBIETA (była nauczycielka, władczyni żelaza, z kategorycznym nakazem form żeńskich)"
+    },
+    "Ray": {
+      "description": "MĘŻCZYZNA (partner badawczy Andrew Hwypa)"
+    },
+    "Carson": {
+      "description": "MĘŻCZYZNA (podwładny Elro Romaina w akademii)"
+    },
+    "Clevatess -> Alicia": {
+      "description": "Zwrot: Alicio / człowiecza dziewko / na ty (wyniosły władca bestii -> ludzka bohaterka)"
+    },
+    "Alicia -> Clevatess": {
+      "description": "Zwrot: Clevatessie / potworze / na ty (wojowniczka -> prastara bestia)"
+    },
+    "Alicia -> Naie": {
+      "description": "Relacja: szantażystka -> zdemaskowana szpieg (zwrot formalny 'pani profesor' w masce uczennicy, przejście na 'ty' w bezpośrednim szantażu: 'nie wydałaś mnie / stoisz / dowiesz się pierwsza') [KATEGORYCZNY ZAKAZ 'panie profesorze/pan']"
+    },
+    "Alicia -> Klen": {
+      "description": "Zwrot: 'Klenie / na ty' (wskrzeszona podwładna -> pan bestii)"
+    },
+    "Leon i Tygel -> Alicia": {
+      "description": "Zwrot: 'dziewczyno z Hiden / ty' (wzajemny sojusz taktyczny rywali)"
+    },
+    "Zavthier -> Clevatess": {
+      "description": "Zwrot: 'Władco Mrocznych Bestii Południa / Clevatessie Księżycowego Blasku / na ty' (odwieczni równorzędni władcy potworów)"
+    },
+    "Rathwell -> Edison": {
+      "description": "Zwrot: 'Eddy / ty' (pasożytnicze bóstwo -> sterroryzowany nosiciel)"
+    },
+    "Yuriel -> Owen Koath": {
+      "description": "Zwrot: 'Święty Miecza Owenie Koath / ty' (król Eslinn -> podległy czempion militarny)"
+    },
+    "Lang -> Chiffonlits": {
+      "description": "Zwrot: 'pani profesor Chiffonlits' (dowódca polowy -> podwładna profesor)"
+    },
+    "Elro -> Ray Forester": {
+      "description": "Zwrot: 'Rayu Foresterze / na ty' (dyrektor akademii -> uczeń)"
+    },
+    "Klen -> Zavthier": {
+      "description": "Zwrot: 'stara wiedźmo / per ty' (starożytny władca -> dawna sojuszniczka bestia)"
+    },
+    "Andrew -> Alicia": {
+      "description": "Zwrot: 'na ty (per szczur)' (oprawca -> ofiara)"
     }
   },
   "glossary": {
@@ -19,12 +139,461 @@
     "Majuu / Demonic Beast / Shadow Beast": "Demoniczna Bestia",
     "Thirteen Heroes / 13 Heroes": "Trzynastu Bohaterów",
     "Hero Armament / Hero Weapon": "Oręż Bohatera",
-    "Kingdom of Hiden": "Królestwo Hiden",
-    "Demon King / King of Beasts": "Król Bestii"
+    "Kingdom of Hiden": "Królestwo Hiden (kraina; zwrot 'z Hiden' to dopełniacz pochodzenia, zakaz 'z Hidenem')",
+    "Hiden": "Hiden (królestwo / kraina)",
+    "Elbe Shaft": "Szyb Elbe (kopalnia / lokacja)",
+    "Solsein": "Solsein (akademia / instytucja)",
+    "Alyssa Sleihunt": "Alicia Sleihunt",
+    "Demon King / King of Beasts": "Król Bestii",
+    "Lord of Dark Beasts": "Władca Mrocznych Bestii",
+    "Dark Ichor": "czarna posoka (rzeczownik rodzaju żeńskiego: ta czarna posoka, tej czarnej posoki, przez czarną posokę; KATEGORYCZNY ZAKAZ 'czarny posok')",
+    "Crest": "Znamię",
+    "Regalia": "Święty Oręż",
+    "Village of Origin": "Wioska Początku",
+    "Sword Saint": "Święty Miecza",
+    "Owen Koath": "Święty Miecza Owen Koath (w wołaczu: Owenie Koacie)",
+    "Church of Elds": "Kościół Elds",
+    "Shamaness Godspeaker": "Szamanka Głosu Boga",
+    "Book of Toah": "Księga Toaha (w dopełniaczu: Księga Toaha; KATEGORYCZNY ZAKAZ 'Księga Toah')",
+    "Book of the Forge": "Księga Kuźni",
+    "arcanacite": "arkanacyt",
+    "Garden Words": "Mowa Ogrodu",
+    "strangling tree": "drzewo-dusiciel",
+    "Zavthier of Delusions": "Zavthier Pani Iluzji / Zavthier Iluzoryczna (Władczyni Zachodu; KATEGORYCZNY ZAKAZ 'Zavthier od Złudzeń')",
+    "Vordin of Flaming Embers": "Vordin Płomiennego Żaru / Płomienny Vordin (Władca Północy; KATEGORYCZNY ZAKAZ 'od Płomiennego Żaru')",
+    "Esleburg": "Esleburg (stolica Eslinn; toponim)",
+    "Eslinn": "Eslinn (królestwo; toponim)",
+    "Hyderat": "Hyderat (stolica Hiden; toponim)",
+    "Mount Luna": "Góra Luny (święta góra; toponim)",
+    "Castle Elden": "Zamek Elden (twierdza w Eslinn; toponim)"
   },
   "relationships": {
     "Clevatess -> Alicia": "Zwrot: Alicio / człowiecza dziewko / na ty (wyniosły władca bestii -> ludzka bohaterka)",
-    "Alicia -> Clevatess": "Zwrot: Clevatessie / potworze / na ty (wojowniczka -> prastara bestia)"
+    "Alicia -> Clevatess": "Zwrot: Clevatessie / potworze / na ty (wojowniczka -> prastara bestia)",
+    "Alicia -> Naie": "Relacja: szantażystka -> zdemaskowana szpieg (zwrot formalny 'pani profesor' w masce uczennicy, przejście na 'ty' w bezpośrednim szantażu: 'nie wydałaś mnie / stoisz / dowiesz się pierwsza') [KATEGORYCZNY ZAKAZ 'panie profesorze/pan']",
+    "Alicia -> Klen": "Zwrot: 'Klenie / na ty' (wskrzeszona podwładna -> pan bestii)",
+    "Leon i Tygel -> Alicia": "Zwrot: 'dziewczyno z Hiden / ty' (wzajemny sojusz taktyczny rywali)",
+    "Zavthier -> Clevatess": "Zwrot: 'Władco Mrocznych Bestii Południa / Clevatessie Księżycowego Blasku / na ty' (odwieczni równorzędni władcy potworów)",
+    "Rathwell -> Edison": "Zwrot: 'Eddy / ty' (pasożytnicze bóstwo -> sterroryzowany nosiciel)",
+    "Yuriel -> Owen Koath": "Zwrot: 'Święty Miecza Owenie Koath / ty' (król Eslinn -> podległy czempion militarny)",
+    "Lang -> Chiffonlits": "Zwrot: 'pani profesor Chiffonlits' (dowódca polowy -> podwładna profesor)",
+    "Elro -> Ray Forester": "Zwrot: 'Rayu Foresterze / na ty' (dyrektor akademii -> uczeń)",
+    "Klen -> Zavthier": "Zwrot: 'stara wiedźmo / per ty' (starożytny władca -> dawna sojuszniczka bestia)",
+    "Andrew -> Alicia": "Zwrot: 'na ty (per szczur)' (oprawca -> ofiara)"
   },
-  "episodes_translated": []
+  "episodes_translated": [
+    "[ASW] Clevatess S2 - 03 [1080p HEVC][AB6D13B4]",
+    "[ASW] Clevatess S2 - 05 [1080p HEVC][CD4F55A3]",
+    "[ASW] Clevatess - 05 [1080p HEVC]",
+    "[ASW] Clevatess - 03 [1080p HEVC]",
+    "[ASW] Clevatess - 04 [1080p HEVC]"
+  ],
+  "declensions": {
+    "Clevatess": {
+      "M": "Clevatess",
+      "D": "Clevatessa",
+      "C": "Clevatessowi",
+      "B": "Clevatessa",
+      "N": "Clevatessem",
+      "Ms": "Clevatessie",
+      "W": "Clevatessie"
+    },
+    "Alicia": {
+      "M": "Alicia",
+      "D": "Aliciy",
+      "C": "Alicie",
+      "B": "Alicię",
+      "N": "Alicią",
+      "Ms": "Alicie",
+      "W": "Alicio"
+    },
+    "Naie": {
+      "M": "Naie",
+      "D": "Naie",
+      "C": "Naie",
+      "B": "Naie",
+      "N": "Naie",
+      "Ms": "Naie",
+      "W": "Naie"
+    },
+    "Zavthier": {
+      "M": "Zavthier",
+      "D": "Zavthier",
+      "C": "Zavthier",
+      "B": "Zavthier",
+      "N": "Zavthier",
+      "Ms": "Zavthier",
+      "W": "Zavthier"
+    },
+    "Rathwell": {
+      "M": "Rathwell",
+      "D": "Rathwella",
+      "C": "Rathwellowi",
+      "B": "Rathwella",
+      "N": "Rathwellem",
+      "Ms": "Rathwellu",
+      "W": "Rathwellu"
+    },
+    "Klen": {
+      "M": "Klen",
+      "D": "Klena",
+      "C": "Klenowi",
+      "B": "Klena",
+      "N": "Klenem",
+      "Ms": "Klenie",
+      "W": "Klenie"
+    },
+    "Sarasa": {
+      "M": "Sarasa",
+      "D": "Sarasy",
+      "C": "Sarasie",
+      "B": "Sarasę",
+      "N": "Sarasą",
+      "Ms": "Sarasie",
+      "W": "Saraso"
+    },
+    "Edison": {
+      "M": "Edison",
+      "D": "Edisona",
+      "C": "Edisonowi",
+      "B": "Edisona",
+      "N": "Edisonem",
+      "Ms": "Edisonie",
+      "W": "Edisonie"
+    },
+    "Tygel": {
+      "M": "Tygel",
+      "D": "Tygela",
+      "C": "Tygelowi",
+      "B": "Tygela",
+      "N": "Tygelem",
+      "Ms": "Tygelu",
+      "W": "Tygelu"
+    },
+    "Leon": {
+      "M": "Leon",
+      "D": "Leona",
+      "C": "Leonowi",
+      "B": "Leona",
+      "N": "Leonem",
+      "Ms": "Leonie",
+      "W": "Leonie"
+    },
+    "Luna": {
+      "M": "Luna",
+      "D": "Luny",
+      "C": "Lunie",
+      "B": "Lunę",
+      "N": "Luną",
+      "Ms": "Lunie",
+      "W": "Luno"
+    },
+    "Lang": {
+      "M": "Lang",
+      "D": "Langa",
+      "C": "Langowi",
+      "B": "Langa",
+      "N": "Langem",
+      "Ms": "Langu",
+      "W": "Langu"
+    },
+    "Chiffonlits": {
+      "M": "Chiffonlits",
+      "D": "Chiffonlitsa",
+      "C": "Chiffonlitsowi",
+      "B": "Chiffonlitsa",
+      "N": "Chiffonlitsem",
+      "Ms": "Chiffonlitsie",
+      "W": "Chiffonlitsie"
+    },
+    "Elro": {
+      "M": "Elro",
+      "D": "Elro",
+      "C": "Elro",
+      "B": "Elro",
+      "N": "Elro",
+      "Ms": "Elro",
+      "W": "Elro"
+    },
+    "Ray Forester": {
+      "M": "Ray Forester",
+      "D": "Ray Forestera",
+      "C": "Ray Foresterowi",
+      "B": "Ray Forestera",
+      "N": "Ray Foresterem",
+      "Ms": "Ray Foresterze",
+      "W": "Ray Foresterze"
+    },
+    "Andrew": {
+      "M": "Andrew",
+      "D": "Andrewa",
+      "C": "Andrewowi",
+      "B": "Andrewa",
+      "N": "Andrewem",
+      "Ms": "Andrewie",
+      "W": "Andrewie"
+    },
+    "Leon i Tygel": {
+      "M": "Leon i Tygel",
+      "D": "Leona i Tygela",
+      "C": "Leonowi i Tygelowi",
+      "B": "Leona i Tygela",
+      "N": "Leonem i Tygelem",
+      "Ms": "Leonie i Tygelu",
+      "W": "Leonie i Tygelu"
+    },
+    "Yuriel": {
+      "M": "Yuriel",
+      "D": "Yuriela",
+      "C": "Yurielowi",
+      "B": "Yuriela",
+      "N": "Yurielem",
+      "Ms": "Yurielu",
+      "W": "Yurielu"
+    },
+    "Owen Koath": {
+      "M": "Owen Koath",
+      "D": "Owena Koatha",
+      "C": "Owenowi Koathowi",
+      "B": "Owena Koatha",
+      "N": "Owenem Koathem",
+      "Ms": "Owenie Koathie",
+      "W": "Owenie Koathie"
+    },
+    "Klen Vatiss (Clevatess)": {
+      "M": "Klen Vatiss (Clevatess)",
+      "D": "Klena Vatissa (Clevatess)a",
+      "C": "Klenowi Vatissowi (Clevatess)owi",
+      "B": "Klena Vatissa (Clevatess)a",
+      "N": "Klenem Vatissem (Clevatess)em",
+      "Ms": "Klenie Vatissie (Clevatess)ie",
+      "W": "Klenie Vatissie (Clevatess)ie"
+    },
+    "Drel": {
+      "M": "Drel",
+      "D": "Drela",
+      "C": "Drelowi",
+      "B": "Drela",
+      "N": "Drelem",
+      "Ms": "Drelu",
+      "W": "Drelu"
+    },
+    "Gart": {
+      "M": "Gart",
+      "D": "Garta",
+      "C": "Gartowi",
+      "B": "Garta",
+      "N": "Gartem",
+      "Ms": "Garcie",
+      "W": "Garcie"
+    },
+    "Vordin": {
+      "M": "Vordin",
+      "D": "Vordina",
+      "C": "Vordinowi",
+      "B": "Vordina",
+      "N": "Vordinem",
+      "Ms": "Vordinie",
+      "W": "Vordinie"
+    },
+    "Nel": {
+      "M": "Nel",
+      "D": "Nela",
+      "C": "Nelowi",
+      "B": "Nela",
+      "N": "Nelem",
+      "Ms": "Nelu",
+      "W": "Nelu"
+    },
+    "Clen": {
+      "M": "Clen",
+      "D": "Clena",
+      "C": "Clenowi",
+      "B": "Clena",
+      "N": "Clenem",
+      "Ms": "Clenie",
+      "W": "Clenie"
+    },
+    "Klen / Clevatess": {
+      "M": "Klen / Clevatess",
+      "D": "Klena / Clevatessa",
+      "C": "Klenowi / Clevatessowi",
+      "B": "Klena / Clevatessa",
+      "N": "Klenem / Clevatessem",
+      "Ms": "Klenie / Clevatessie",
+      "W": "Klenie / Clevatessie"
+    },
+    "Alicia Sleihunt": {
+      "M": "Alicia Sleihunt",
+      "D": "Aliciy Sleihunt",
+      "C": "Alicie Sleihunt",
+      "B": "Alicię Sleihunt",
+      "N": "Alicią Sleihunt",
+      "Ms": "Alicie Sleihunt",
+      "W": "Alicio Sleihunt"
+    },
+    "Mary Merryweather": {
+      "M": "Mary Merryweather",
+      "D": "Mary Merryweather",
+      "C": "Mary Merryweather",
+      "B": "Mary Merryweather",
+      "N": "Mary Merryweather",
+      "Ms": "Mary Merryweather",
+      "W": "Mary Merryweather"
+    },
+    "Andrew Hwyp": {
+      "M": "Andrew Hwyp",
+      "D": "Andrewa Hwypa",
+      "C": "Andrewowi Hwypowi",
+      "B": "Andrewa Hwypa",
+      "N": "Andrewem Hwypem",
+      "Ms": "Andrewie Hwypie",
+      "W": "Andrewie Hwypie"
+    },
+    "Naie Chiffonlits": {
+      "M": "Naie Chiffonlits",
+      "D": "Naie Chiffonlits",
+      "C": "Naie Chiffonlits",
+      "B": "Naie Chiffonlits",
+      "N": "Naie Chiffonlits",
+      "Ms": "Naie Chiffonlits",
+      "W": "Naie Chiffonlits"
+    },
+    "Ray": {
+      "M": "Ray",
+      "D": "Ray",
+      "C": "Ray",
+      "B": "Ray",
+      "N": "Ray",
+      "Ms": "Ray",
+      "W": "Ray"
+    },
+    "Carson": {
+      "M": "Carson",
+      "D": "Carsona",
+      "C": "Carsonowi",
+      "B": "Carsona",
+      "N": "Carsonem",
+      "Ms": "Carsonie",
+      "W": "Carsonie"
+    },
+    "Clevatess -> Alicia": {
+      "M": "Clevatess -> Alicia",
+      "D": "Clevatess -> Aliciy",
+      "C": "Clevatess -> Alicie",
+      "B": "Clevatess -> Alicię",
+      "N": "Clevatess -> Alicią",
+      "Ms": "Clevatess -> Alicie",
+      "W": "Clevatess -> Alicio"
+    },
+    "Alicia -> Clevatess": {
+      "M": "Alicia -> Clevatess",
+      "D": "Aliciy -> Clevatess",
+      "C": "Alicie -> Clevatess",
+      "B": "Alicię -> Clevatess",
+      "N": "Alicią -> Clevatess",
+      "Ms": "Alicie -> Clevatess",
+      "W": "Alicio -> Clevatess"
+    },
+    "Alicia -> Naie": {
+      "M": "Alicia -> Naie",
+      "D": "Aliciy -> Naie",
+      "C": "Alicie -> Naie",
+      "B": "Alicię -> Naie",
+      "N": "Alicią -> Naie",
+      "Ms": "Alicie -> Naie",
+      "W": "Alicio -> Naie"
+    },
+    "Alicia -> Klen": {
+      "M": "Alicia -> Klen",
+      "D": "Aliciy -> Klen",
+      "C": "Alicie -> Klen",
+      "B": "Alicię -> Klen",
+      "N": "Alicią -> Klen",
+      "Ms": "Alicie -> Klen",
+      "W": "Alicio -> Klen"
+    },
+    "Leon i Tygel -> Alicia": {
+      "M": "Leon i Tygel -> Alicia",
+      "D": "Leon i Tygel -> Aliciy",
+      "C": "Leon i Tygel -> Alicie",
+      "B": "Leon i Tygel -> Alicię",
+      "N": "Leon i Tygel -> Alicią",
+      "Ms": "Leon i Tygel -> Alicie",
+      "W": "Leon i Tygel -> Alicio"
+    },
+    "Zavthier -> Clevatess": {
+      "M": "Zavthier -> Clevatess",
+      "D": "Zavthier -> Clevatess",
+      "C": "Zavthier -> Clevatess",
+      "B": "Zavthier -> Clevatess",
+      "N": "Zavthier -> Clevatess",
+      "Ms": "Zavthier -> Clevatess",
+      "W": "Zavthier -> Clevatess"
+    },
+    "Rathwell -> Edison": {
+      "M": "Rathwell -> Edison",
+      "D": "Rathwella -> Edisona",
+      "C": "Rathwellowi -> Edisonowi",
+      "B": "Rathwella -> Edisona",
+      "N": "Rathwellem -> Edisonem",
+      "Ms": "Rathwellu -> Edisonie",
+      "W": "Rathwellu -> Edisonie"
+    },
+    "Yuriel -> Owen Koath": {
+      "M": "Yuriel -> Owen Koath",
+      "D": "Yuriela -> Owena Koatha",
+      "C": "Yurielowi -> Owenowi Koathowi",
+      "B": "Yuriela -> Owena Koatha",
+      "N": "Yurielem -> Owenem Koathem",
+      "Ms": "Yurielu -> Owenie Koathie",
+      "W": "Yurielu -> Owenie Koathie"
+    },
+    "Lang -> Chiffonlits": {
+      "M": "Lang -> Chiffonlits",
+      "D": "Langa -> Chiffonlitsa",
+      "C": "Langowi -> Chiffonlitsowi",
+      "B": "Langa -> Chiffonlitsa",
+      "N": "Langem -> Chiffonlitsem",
+      "Ms": "Langu -> Chiffonlitsie",
+      "W": "Langu -> Chiffonlitsie"
+    },
+    "Elro -> Ray Forester": {
+      "M": "Elro -> Ray Forester",
+      "D": "Elro -> Ray Forestera",
+      "C": "Elro -> Ray Foresterowi",
+      "B": "Elro -> Ray Forestera",
+      "N": "Elro -> Ray Foresterem",
+      "Ms": "Elro -> Ray Foresterze",
+      "W": "Elro -> Ray Foresterze"
+    },
+    "Klen -> Zavthier": {
+      "M": "Klen -> Zavthier",
+      "D": "Klen -> Zavthier",
+      "C": "Klen -> Zavthier",
+      "B": "Klen -> Zavthier",
+      "N": "Klen -> Zavthier",
+      "Ms": "Klen -> Zavthier",
+      "W": "Klen -> Zavthier"
+    },
+    "Andrew -> Alicia": {
+      "M": "Andrew -> Alicia",
+      "D": "Andrew -> Aliciy",
+      "C": "Andrew -> Alicie",
+      "B": "Andrew -> Alicię",
+      "N": "Andrew -> Alicią",
+      "Ms": "Andrew -> Alicie",
+      "W": "Andrew -> Alicio"
+    }
+  },
+  "plot_anchors": {
+    "Dark Ichor (czarny posok / mroczny ichtor)": "Ciecz i nośnik esencji bestii, przez który porozumiewają się Klen i Alicia. Konsekwentnie stosować 'czarny posok' lub 'posok ciemności'.",
+    "Book of Toah (Księga Toah)": "Święty relikt znaleziony przez Klena w Hiden, powiązany z prastarą mową bogów i rozdziałami Legendy o Bohaterze.",
+    "Sword Saint Owen Koath (Święty Miecza Owen Koath)": "Elitarny tytuł wojskowy z Eslinn. Bezwzględnie 'Święty Miecza', nie 'Mistrz Miecza' ani 'Szermierz Święty'.",
+    "Book of Toah / Księga Toah": "Bezwzględnie zachować nazwę 'Księga Toah' jako relikwii tworzącej przestrzeń i fundament magii pierwotnej.",
+    "Lord of Dark Beasts / Władca Mrocznych Bestii": "Zawsze 'Władca Mrocznych Bestii' (w liczbie mnogiej dla czterech władców: 'Czterej Władcy Mrocznych Bestii').",
+    "General Drel / Generał Drel": "Imię męskie Drel bezwzględnie odmieniać: Drela, Drelowi, z Drelem, o Drelu.",
+    "Solsein": "miasto akademickie wzniesione na ruinach Wioski Początku",
+    "Księga Toaha": "magiczna księga rodu Romaina (Toah -> Toaha)"
+  }
 }

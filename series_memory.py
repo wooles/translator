@@ -11,13 +11,18 @@ import json
 from pathlib import Path
 from typing import Dict, List, Any, Optional
 
+import unicodedata
+
 SERIES_MEMORY_DIR = Path(__file__).parent / "series_memory"
 
 def clean_anime_slug(title: str) -> str:
-    """Creates a filesystem-safe identifier slug from anime title."""
+    """Creates a filesystem-safe identifier slug from anime title, normalizing diacritics."""
     if not title:
         return "default_series"
-    slug = re.sub(r"[^\w\s-]", "", title, flags=re.UNICODE).strip()
+    # Normalize unicode diacritics (e.g. Caraméliser -> Carameliser)
+    nfkd = unicodedata.normalize('NFKD', title)
+    title_ascii = "".join([c for c in nfkd if not unicodedata.combining(c)])
+    slug = re.sub(r"[^\w\s-]", "", title_ascii, flags=re.UNICODE).strip()
     slug = re.sub(r"[-\s]+", "_", slug)
     return slug[:50] or "default_series"
 
@@ -31,6 +36,8 @@ def generate_polish_name_declension(name: str, gender: str = "UNKNOWN") -> Dict[
     g = gender.upper()
     if not n:
         return {}
+    if len(n) <= 1 or not any(c.isalpha() for c in n):
+        return {"M": n, "D": n, "C": n, "B": n, "N": n, "Ms": n, "W": n}
 
     words = n.split()
     if len(words) > 1:
@@ -41,151 +48,230 @@ def generate_polish_name_declension(name: str, gender: str = "UNKNOWN") -> Dict[
                 for case in ["M", "D", "C", "B", "N", "Ms", "W"]
             }
 
-    # Female names ending in consonant or vowel other than -a: strictly undeclined in Polish
-    if g == "FEMALE" or "KOBIETA" in g or "ŻEŃSK" in g:
-        if n.endswith("a"):
-            stem = n[:-1]
-            c_ms = stem + "e"
-            if stem.endswith("k"):
-                c_ms = stem[:-1] + "ce"
-            elif stem.endswith("g"):
-                c_ms = stem[:-1] + "dze"
-            elif stem.endswith("r"):
-                c_ms = stem[:-1] + "rze"
-            elif stem.endswith("t"):
-                c_ms = stem[:-1] + "cie"
-            elif stem.endswith("d"):
-                c_ms = stem[:-1] + "dzie"
-            elif stem.endswith("s"):
-                c_ms = stem[:-1] + "sie"
-            elif stem.endswith("n"):
-                c_ms = stem[:-1] + "nie"
-            elif stem.endswith("m"):
-                c_ms = stem[:-1] + "mie"
-            return {
-                "M": n,
-                "D": stem + ("i" if stem[-1] in "kg" else "y"),
-                "C": c_ms,
-                "B": stem + "ę",
-                "N": stem + "ą",
-                "Ms": c_ms,
-                "W": stem + "o"
-            }
-        else:
-            return {"M": n, "D": n, "C": n, "B": n, "N": n, "Ms": n, "W": n}
-    else:
-        # Male / neutral
-        if n.endswith("a"):
-            stem = n[:-1]
-            c_ms = stem + "e"
-            if stem.endswith("k"):
-                c_ms = stem[:-1] + "ce"
-            elif stem.endswith("g"):
-                c_ms = stem[:-1] + "dze"
-            elif stem.endswith("r"):
-                c_ms = stem[:-1] + "rze"
-            elif stem.endswith("t"):
-                c_ms = stem[:-1] + "cie"
-            elif stem.endswith("d"):
-                c_ms = stem[:-1] + "dzie"
-            elif stem.endswith("s"):
-                c_ms = stem[:-1] + "sie"
-            elif stem.endswith("n"):
-                c_ms = stem[:-1] + "nie"
-            elif stem.endswith("m"):
-                c_ms = stem[:-1] + "mie"
-            return {
-                "M": n,
-                "D": stem + ("i" if stem[-1] in "kg" else "y"),
-                "C": c_ms,
-                "B": stem + "ę",
-                "N": stem + "ą",
-                "Ms": c_ms,
-                "W": stem + "o"
-            }
-        elif n[-1].lower() not in "aeiouy":
-            stem = n
-            last_c = n[-1].lower()
-            last_2c = n[-2:].lower() if len(n) >= 2 else ""
-            if last_c in ("l", "k", "g", "j", "c") or last_2c in ("ch", "cz", "sz", "rz"):
-                c_ms = stem + "u"
-                c_w = stem + "u"
-            elif last_c == "r":
-                c_ms = stem[:-1] + "rze"
-                c_w = stem[:-1] + "rze"
-            elif last_c == "t":
-                c_ms = stem[:-1] + "cie"
-                c_w = stem[:-1] + "cie"
-            elif last_c == "d":
-                c_ms = stem[:-1] + "dzie"
-                c_w = stem[:-1] + "dzie"
-            else:
-                c_ms = stem + "ie"
-                c_w = stem + "ie"
+    # Already inflected tokens or non-nominative plural/case endings
+    if n.lower().endswith(("ą", "ę", "ej", "ach", "ami", "om")):
+        return {"M": n, "D": n, "C": n, "B": n, "N": n, "Ms": n, "W": n}
 
+    is_female = (g == "FEMALE" or "KOBIETA" in g or "ŻEŃSK" in g)
+
+    # 1. Names ending in -a (both female and male like Akira, Soma, Luca, Seneca, Alicia, Maria)
+    if n.endswith("a"):
+        stem = n[:-1]
+        if not stem:
+            return {"M": n, "D": n, "C": n, "B": n, "N": n, "Ms": n, "W": n}
+
+        # Phonological alternations in Polish:
+        # -ia (Maria, Alicia, Julia, Silvia) -> D./C./Ms. -ii; B. -ię; N. -ią; W. -io
+        if stem.endswith("i"):
             return {
                 "M": n,
-                "D": stem + "a",
-                "C": stem + "owi",
-                "B": stem + "a",
-                "N": stem + "em",
-                "Ms": c_ms,
-                "W": c_w
+                "D": stem + "i",
+                "C": stem + "i",
+                "B": stem + "ę",
+                "N": stem + "ą",
+                "Ms": stem + "i",
+                "W": stem + "o"
             }
+        # -ya (Freya, Maya, Anya, Kaya) -> D./C./Ms. -i; B. -ę; N. -ą; W. -o
+        elif stem.endswith("y"):
+            return {
+                "M": n,
+                "D": stem + "i",
+                "C": stem + "i",
+                "B": stem + "ę",
+                "N": stem + "ą",
+                "Ms": stem + "i",
+                "W": stem + "o"
+            }
+        # -ca foreign names (Luca, Seneca, Petrarca, Mica) -> hard k stem in D/B/N
+        elif stem.endswith("c"):
+            return {
+                "M": n,
+                "D": stem[:-1] + "ki",
+                "C": stem + "e",
+                "B": stem[:-1] + "kę",
+                "N": stem[:-1] + "ką",
+                "Ms": stem + "e",
+                "W": stem + "o"
+            }
+
+        # Consonant stems before -a
+        if stem.endswith("k"):
+            c_ms = stem[:-1] + "ce"
+            d_case = stem + "i"
+        elif stem.endswith("g"):
+            c_ms = stem[:-1] + "dze"
+            d_case = stem + "i"
+        elif stem.endswith("r"):
+            c_ms = stem[:-1] + "rze"
+            d_case = stem + "y"
+        elif stem.endswith("t"):
+            c_ms = stem[:-1] + "cie"
+            d_case = stem + "y"
+        elif stem.endswith("d"):
+            c_ms = stem[:-1] + "dzie"
+            d_case = stem + "y"
+        elif stem.endswith("s"):
+            c_ms = stem[:-1] + "sie"
+            d_case = stem + "y"
+        elif stem.endswith("z"):
+            c_ms = stem[:-1] + "zie"
+            d_case = stem + "y"
+        elif stem.endswith("n"):
+            c_ms = stem[:-1] + "nie"
+            d_case = stem + "y"
+        elif stem.endswith("m"):
+            c_ms = stem[:-1] + "mie"
+            d_case = stem + "y"
+        elif stem.endswith("b"):
+            c_ms = stem[:-1] + "bie"
+            d_case = stem + "y"
+        elif stem.endswith("p"):
+            c_ms = stem[:-1] + "pie"
+            d_case = stem + "y"
+        elif stem.endswith("w"):
+            c_ms = stem[:-1] + "wie"
+            d_case = stem + "y"
+        elif stem.endswith("ł"):
+            c_ms = stem[:-1] + "le"
+            d_case = stem + "y"
+        elif stem.endswith("l"):
+            c_ms = stem + "i"
+            d_case = stem + "i"
+        elif stem.endswith(("cz", "sz", "rz", "ż")):
+            c_ms = stem + "y"
+            d_case = stem + "y"
         else:
-            return {"M": n, "D": n, "C": n, "B": n, "N": n, "Ms": n, "W": n}
+            c_ms = stem + "e"
+            d_case = stem + "y"
+
+        return {
+            "M": n,
+            "D": d_case,
+            "C": c_ms,
+            "B": stem + "ę",
+            "N": stem + "ą",
+            "Ms": c_ms,
+            "W": stem + "o"
+        }
+
+    # Female names ending in consonant or vowel other than -a: strictly undeclined in Polish (PWN norm)
+    if is_female:
+        return {"M": n, "D": n, "C": n, "B": n, "N": n, "Ms": n, "W": n}
+
+    # 2. Male names ending in consonant
+    if n[-1].lower() not in "aeiouyąęó":
+        stem = n
+        last_c = n[-1].lower()
+        last_2c = n[-2:].lower() if len(n) >= 2 else ""
+
+        # Narzędnik po k, g: -iem (Gujukiem, Güyükiem, Olegiem, Magiem)
+        n_case = stem + "iem" if last_c in ("k", "g") else stem + "em"
+
+        # Miejscownik i Wołacz
+        if last_c in ("l", "k", "g", "j", "c") or last_2c in ("ch", "cz", "sz", "rz", "th"):
+            c_ms = stem + "u"
+            c_w = stem + "u"
+        elif last_c == "r":
+            c_ms = stem[:-1] + "rze"
+            c_w = stem[:-1] + "rze"
+        elif last_c == "t":
+            c_ms = stem[:-1] + "cie"
+            c_w = stem[:-1] + "cie"
+        elif last_c == "d":
+            c_ms = stem[:-1] + "dzie"
+            c_w = stem[:-1] + "dzie"
+        elif last_c == "w":
+            c_ms = stem + "ie"
+            c_w = stem + "ie"
+        else:
+            c_ms = stem + "ie"
+            c_w = stem + "ie"
+
+        return {
+            "M": n,
+            "D": stem + "a",
+            "C": stem + "owi",
+            "B": stem + "a",
+            "N": n_case,
+            "Ms": c_ms,
+            "W": c_w
+        }
+
+    # 3. Male names ending in vowels other than -a (-o, -e, -i, -u, -y)
+    # In Japanese AVT, vowel-ending names are kept uninflected to preserve phonetic integrity (Belczyk/PWN).
+    return {"M": n, "D": n, "C": n, "B": n, "N": n, "Ms": n, "W": n}
+
+
+TYPO_NORMALIZATIONS = [
+    (r"(^|[^\w]|\\[Nnh])([Ss])pyh(am|asz|a|amy|acie|ają|ać|ał|ała|ało|ali|ały|ano)\b", r"\g<1>\g<2>pyt\g<3>"),
+    (r"(^|[^\w]|\\[Nnh])([Ww])ziąść\b", r"\g<1>\g<2>ziąć"),
+    (r"(^|[^\w]|\\[Nnh])([Pp])oszłem\b", r"\g<1>\g<2>oszedłem"),
+    (r"(^|[^\w]|\\[Nnh])([Ww])łancza(ć|m|sz|my|cie|ją|ł|ła|ło|li|ły|no|nie|nia|niem)?\b", r"\g<1>\g<2>łącza\g<3>"),
+    (r"(^|[^\w]|\\[Nnh])([Ww])yłancza(ć|m|sz|my|cie|ją|ł|ła|ło|li|ły|no|nie|nia|niem)?\b", r"\g<1>\g<2>yłącza\g<3>"),
+    (r"(^|[^\w]|\\[Nnh])([Nn])a\s+codzień\b", r"\g<1>\g<2>a co dzień"),
+    (r"(^|[^\w]|\\[Nnh])([Cc])onajmniej\b", r"\g<1>\g<2>o najmniej"),
+    (r"(^|[^\w]|\\[Nnh])([Nn])arazie\b", r"\g<1>\g<2>a razie"),
+    (r"(^|[^\w]|\\[Nnh])([Zz])\s+przed\b", r"\g<1>sprzed"),
+    (r"(^|[^\w]|\\[Nnh])([Zz])\s+poza\b", r"\g<1>spoza"),
+    # Anti-calque titular normalizations: 'Aura od Gilotyny' -> 'Aura Gilotyna' (Filar XCVIII/CLXV)
+    (r"(^|[^\w]|\\[Nnh])([Aa])ura\s+od\s+[Gg]ilotyny\b", r"\g<1>\g<2>ura Gilotyna"),
+    (r"(^|[^\w]|\\[Nnh])([Aa])ury\s+od\s+[Gg]ilotyny\b", r"\g<1>\g<2>ury Gilotyny"),
+    (r"(^|[^\w]|\\[Nnh])([Aa])urze\s+od\s+[Gg]ilotyny\b", r"\g<1>\g<2>urze Gilotynie"),
+    (r"(^|[^\w]|\\[Nnh])([Aa])urę\s+od\s+[Gg]ilotyny\b", r"\g<1>\g<2>urę Gilotynę"),
+    (r"(^|[^\w]|\\[Nnh])([Aa])urą\s+od\s+[Gg]ilotyn(?:ą|y)\b", r"\g<1>\g<2>urą Gilotyną"),
+    # Deformed adjective comparatives / superlatives (e.g. 'najdobrejsze' -> 'najlepsze')
+    (r"(^|[^\w]|\\[Nnh])([Nn])ajdobrejsz(y|ego|emu|ym|a|ej|ą|e|ych|ymi)?\b", r"\g<1>\g<2>ajlepsz\g<3>"),
+    (r"(^|[^\w]|\\[Nnh])dobrejsz(y|ego|emu|ym|a|ej|ą|e|ych|ymi)?\b", r"\g<1>lepsz\g<2>"),
+    (r"(^|[^\w]|\\[Nnh])Dobrejsz(y|ego|emu|ym|a|ej|ą|e|ych|ymi)?\b", r"\g<1>Lepsz\g<2>"),
+    # Absolute linguistic & orthographic invariants (Filar CLXIV)
+    (r"(^|[^\w]|\\[Nnh])([Ww])\s*każdym\s+bądź\s+razie\b", r"\g<1>\g<2> każdym razie"),
+    (r"(^|[^\w]|\\[Nnh])([Ww])\s+cudzysłowiu\b", r"\g<1>\g<2> cudzysłowie"),
+    (r"(^|[^\w]|\\[Nnh])([Pp])o\s+najmniejszej\s+linii\s+oporu\b", r"\g<1>\g<2>o linii najmniejszego oporu"),
+    (r"(^|[^\w]|\\[Nnh])spowrotem\b", r"\g<1>z powrotem"),
+    (r"(^|[^\w]|\\[Nnh])Spowrotem\b", r"\g<1>Z powrotem"),
+    (r"(^|[^\w]|\\[Nnh])([Dd])latego\s+bo\b", r"\g<1>\g<2>latego że"),
+    (r"(^|[^\w]|\\[Nnh])([Oo])d\s+nienacka\b", r"\g<1>znienacka"),
+    (r"\b((?:[A-Za-ząćęłńóśźż0-9]+\s+)?(?:raz|razy|kroć|dni|lat|godzin|minut|sekund|miesięcy|tygodni|kolejek|prób|zwycięstw|porażek))\s+pod\s+rząd\b", r"\1 z rzędu"),
+    (r"\b([Dd]wa|[Tt]rzy|[Cc]ztery|[Pp]ięć|[Ss]ześć|[Ss]iedem|[Oo]siem|[Dd]ziewięć|[Dd]ziesiąt|[Kk]ilka|[Pp]arę|[Ww]iele|[Kk]olejn[a-ząćęłńóśźż]*)\s+([a-ząćęłńóśźż]+)\s+pod\s+rząd\b", r"\1 \2 z rzędu"),
+    # Absolute pleonasms (Filar IV / Belczyk)
+    (r"\b([Ss]pada(?:ć|m|sz|my|cie|ją|ł|ła|ło|li|ły)?)\s+w\s+dół\b", r"\1"),
+    (r"\b([Ww]znosi(?:ć|m|sz|my|cie|ją|ł|ła|ło|li|ły)?)\s+się\s+w\s+górę\b", r"\1 się"),
+    (r"\b[Ww]zajemn(?:a|ej|ą|e|ych|ym|ymi)\s+(współprac(?:a|y|ę|ą|ie|om|ami))\b", lambda m: m.group(1).capitalize() if m.group(0)[0].isupper() else m.group(1)),
+    (r"\b([Ff]akt(?:y|ów|om|ami|ach)?)\s+autentyczn(?:e|ych|ym|ymi)\b", r"\1"),
+    # Absolute dialogic calques (Filar IV / CLIII / CLXVI)
+    (r"\b[Zz]rób\s+swoje\s+najlepsze\b", lambda m: "Daj z siebie wszystko" if m.group(0)[0].isupper() else "daj z siebie wszystko"),
+    (r"\b[Zz]róbcie\s+swoje\s+najlepsze\b", lambda m: "Dajcie z siebie wszystko" if m.group(0)[0].isupper() else "dajcie z siebie wszystko"),
+    (r"\b[Dd]obrej\s+nocy\b", lambda m: "Dobranoc" if m.group(0)[0].isupper() else "dobranoc"),
+    # Anti-pivot fansub cliché eradication (Filar CLXVI)
+    (r"\b([Ww])ita(j|jcie|m|my)\s+z\s+powrotem(!|\.|\.\.\.|,)?(?=\s|$|[,\.!\?])", lambda m: ("Witajcie!" if m.group(2) == "jcie" else ("Witamy!" if m.group(2) == "my" else ("Witam!" if m.group(2) == "m" else "Witaj!")))),
+    (r"\b([Nn])ie\s+ma\s+mowy,?\s+(?:że|a)?by(śmy|ście|m|ś)?\b", lambda m: ("Wykluczone, by" if m.group(1).isupper() else "wykluczone, by") + (m.group(2) or "")),
+    (r"\b([Mm](?:am|asz|a|amy|acie|ają|iałem|iałam|iał|iała|iało|ieliśmy|iałyśmy|ieli|iały|iałby|iałaby|iałoby|ieliby|iałyby)|[Bb]ęd(?:ę|ziesz|zie|ziemy|ziecie|dą)\s+mieć)\s+taką\s+nadzieję\b", r"\1 nadzieję"),
+    (r"\b([Mm](?:am|asz|a|amy|acie|ają|iałem|iałam|iał|iała|iało|ieliśmy|iałyśmy|ieli|iały|iałby|iałaby|iałoby|ieliby|iałyby)|[Bb]ęd(?:ę|ziesz|zie|ziemy|ziecie|dą)\s+mieć)\s+nadzieję\s+na\s+to\b", r"\1 nadzieję"),
+    # Japanese false proper noun & honorific titular repair (Filar II / Kanon)
+    (r"(^|[^\w]|\\[Nnh])Ouji([!\?…]+)", r"\g<1>Książę\g<2>"),
+    (r"(^|[^\w]|\\[Nnh])ouji([!\?…]+)", r"\g<1>książę\g<2>"),
+    # Conversational continuation calque (Filar IV / CLVI)
+    (r"(^|[^\w]|\\[Nnh])([Ii]|[Aa])\s+co\s+z\s+tego\?(\s*\\N\s*|\s+)(?=[Tt]o\s+wy\b|[Cc]hodzicie\b|[Jj]esteście\b|[Cc]o\s+było\b|[Cc]o\s+dalej\b|[Jj]ak\s+to\b)", r"\g<1>\g<2> co?\g<3>"),
+    # Manga canon titular enforcement: 'Książę Kaiju' -> 'Potworny Królewicz' (Filar II / Kanon)
+    (r"(^|[^\w]|\\[Nnh])([Kk])siążę\s+[Kk]aiju\b", lambda m: ("Potworny Królewicz" if m.group(2) == "K" else "potworny królewicz")),
+    (r"(^|[^\w]|\\[Nnh])([Kk])sięcia\s+[Kk]aiju\b", lambda m: ("Potwornego Królewicza" if m.group(2) == "K" else "potwornego królewicza")),
+    (r"(^|[^\w]|\\[Nnh])([Kk])sięciu\s+[Kk]aiju\b", lambda m: ("Potwornemu Królewiczowi" if m.group(2) == "K" else "potwornemu królewiczowi")),
+    (r"(^|[^\w]|\\[Nnh])([Kk])sięciem\s+[Kk]aiju\b", lambda m: ("Potwornym Królewiczem" if m.group(2) == "K" else "potwornym królewiczem")),
+    # Otaku slang adaptation: 'Kuro-taso' -> 'Kuroe' (Filar II / Kanon)
+    (r"(^|[^\w]|\\[Nnh])Kuro-?taso\b", r"\g<1>Kuroe"),
+    (r"(^|[^\w]|\\[Nnh])kuro-?taso\b", r"\g<1>kuroe"),
+    # Binary alternative comma eradication: 'w kapciach, czy bez' -> 'w kapciach czy bez' (Filar XCI)
+    (r"\b([A-Za-ząćęłńóśźż0-9]+),\s+czy\s+(bez|nie|tak)\b", r"\1 czy \2"),
+    # Trailing cut-off speech attached dash: 'Rin–' -> 'Rin...' (Filar XCI)
+    (r"([A-Za-ząćęłńóśźż])–(?=\s*\\N|\s*$|[!\?…])", r"\1..."),
+]
 
 
 def sanitize_lexical_text(text: str) -> str:
     """Sanitizes text against known LLM/OCR typos and deformed Polish words (Filar CLXIV)."""
     if not text:
         return ""
-    TYPO_NORMALIZATIONS = [
-        (r"(^|[^\w]|\\[Nnh])([Ss])pyh(am|asz|a|amy|acie|ają|ać|ał|ała|ało|ali|ały|ano)\b", r"\g<1>\g<2>pyt\g<3>"),
-        (r"(^|[^\w]|\\[Nnh])([Ww])ziąść\b", r"\g<1>\g<2>ziąć"),
-        (r"(^|[^\w]|\\[Nnh])([Pp])oszłem\b", r"\g<1>\g<2>oszedłem"),
-        (r"(^|[^\w]|\\[Nnh])([Ww])łancza(ć|m|sz|my|cie|ją|ł|ła|ło|li|ły|no|nie|nia|niem)?\b", r"\g<1>\g<2>łącza\g<3>"),
-        (r"(^|[^\w]|\\[Nnh])([Ww])yłancza(ć|m|sz|my|cie|ją|ł|ła|ło|li|ły|no|nie|nia|niem)?\b", r"\g<1>\g<2>yłącza\g<3>"),
-        (r"(^|[^\w]|\\[Nnh])([Nn])a\s+codzień\b", r"\g<1>\g<2>a co dzień"),
-        (r"(^|[^\w]|\\[Nnh])([Cc])onajmniej\b", r"\g<1>\g<2>o najmniej"),
-        (r"(^|[^\w]|\\[Nnh])([Nn])arazie\b", r"\g<1>\g<2>a razie"),
-        (r"(^|[^\w]|\\[Nnh])([Zz])\s+przed\b", r"\g<1>sprzed"),
-        (r"(^|[^\w]|\\[Nnh])([Zz])\s+poza\b", r"\g<1>spoza"),
-        # Anti-calque titular normalizations: 'Aura od Gilotyny' -> 'Aura Gilotyna' (Filar XCVIII/CLXV)
-        (r"(^|[^\w]|\\[Nnh])([Aa])ura\s+od\s+[Gg]ilotyny\b", r"\g<1>\g<2>ura Gilotyna"),
-        (r"(^|[^\w]|\\[Nnh])([Aa])ury\s+od\s+[Gg]ilotyny\b", r"\g<1>\g<2>ury Gilotyny"),
-        (r"(^|[^\w]|\\[Nnh])([Aa])urze\s+od\s+[Gg]ilotyny\b", r"\g<1>\g<2>urze Gilotynie"),
-        (r"(^|[^\w]|\\[Nnh])([Aa])urę\s+od\s+[Gg]ilotyny\b", r"\g<1>\g<2>urę Gilotynę"),
-        (r"(^|[^\w]|\\[Nnh])([Aa])urą\s+od\s+[Gg]ilotyn(?:ą|y)\b", r"\g<1>\g<2>urą Gilotyną"),
-        # Deformed adjective comparatives / superlatives (e.g. 'najdobrejsze' -> 'najlepsze')
-        (r"(^|[^\w]|\\[Nnh])([Nn])ajdobrejsz(y|ego|emu|ym|a|ej|ą|e|ych|ymi)?\b", r"\g<1>\g<2>ajlepsz\g<3>"),
-        (r"(^|[^\w]|\\[Nnh])dobrejsz(y|ego|emu|ym|a|ej|ą|e|ych|ymi)?\b", r"\g<1>lepsz\g<2>"),
-        (r"(^|[^\w]|\\[Nnh])Dobrejsz(y|ego|emu|ym|a|ej|ą|e|ych|ymi)?\b", r"\g<1>Lepsz\g<2>"),
-        # Absolute linguistic & orthographic invariants (Filar CLXIV)
-        (r"(^|[^\w]|\\[Nnh])([Ww])\s*każdym\s+bądź\s+razie\b", r"\g<1>\g<2> każdym razie"),
-        (r"(^|[^\w]|\\[Nnh])([Ww])\s+cudzysłowiu\b", r"\g<1>\g<2> cudzysłowie"),
-        (r"(^|[^\w]|\\[Nnh])([Pp])o\s+najmniejszej\s+linii\s+oporu\b", r"\g<1>\g<2>o linii najmniejszego oporu"),
-        (r"(^|[^\w]|\\[Nnh])spowrotem\b", r"\g<1>z powrotem"),
-        (r"(^|[^\w]|\\[Nnh])Spowrotem\b", r"\g<1>Z powrotem"),
-        (r"(^|[^\w]|\\[Nnh])([Dd])latego\s+bo\b", r"\g<1>\g<2>latego że"),
-        (r"(^|[^\w]|\\[Nnh])([Oo])d\s+nienacka\b", r"\g<1>znienacka"),
-        (r"\b((?:[A-Za-ząćęłńóśźż0-9]+\s+)?(?:raz|razy|kroć|dni|lat|godzin|minut|sekund|miesięcy|tygodni|kolejek|prób|zwycięstw|porażek))\s+pod\s+rząd\b", r"\1 z rzędu"),
-        (r"\b([Dd]wa|[Tt]rzy|[Cc]ztery|[Pp]ięć|[Ss]ześć|[Ss]iedem|[Oo]siem|[Dd]ziewięć|[Dd]ziesiąt|[Kk]ilka|[Pp]arę|[Ww]iele|[Kk]olejn[a-ząćęłńóśźż]*)\s+([a-ząćęłńóśźż]+)\s+pod\s+rząd\b", r"\1 \2 z rzędu"),
-        # Absolute pleonasms (Filar IV / Belczyk)
-        (r"\b([Ss]pada(?:ć|m|sz|my|cie|ją|ł|ła|ło|li|ły)?)\s+w\s+dół\b", r"\1"),
-        (r"\b([Ww]znosi(?:ć|m|sz|my|cie|ją|ł|ła|ło|li|ły)?)\s+się\s+w\s+górę\b", r"\1 się"),
-        (r"\b[Ww]zajemn(?:a|ej|ą|e|ych|ym|ymi)\s+(współprac(?:a|y|ę|ą|ie|om|ami))\b", lambda m: m.group(1).capitalize() if m.group(0)[0].isupper() else m.group(1)),
-        (r"\b([Ff]akt(?:y|ów|om|ami|ach)?)\s+autentyczn(?:e|ych|ym|ymi)\b", r"\1"),
-        # Absolute dialogic calques (Filar IV / CLIII / CLXVI)
-        (r"\b[Zz]rób\s+swoje\s+najlepsze\b", lambda m: "Daj z siebie wszystko" if m.group(0)[0].isupper() else "daj z siebie wszystko"),
-        (r"\b[Zz]róbcie\s+swoje\s+najlepsze\b", lambda m: "Dajcie z siebie wszystko" if m.group(0)[0].isupper() else "dajcie z siebie wszystko"),
-        (r"\b[Dd]obrej\s+nocy\b", lambda m: "Dobranoc" if m.group(0)[0].isupper() else "dobranoc"),
-        # Anti-pivot fansub cliché eradication (Filar CLXVI)
-        (r"\b([Ww])ita(j|jcie|m|my)\s+z\s+powrotem(!|\.|\.\.\.|,)?(?=\s|$|[,\.!\?])", lambda m: ("Witajcie!" if m.group(2) == "jcie" else ("Witamy!" if m.group(2) == "my" else ("Witam!" if m.group(2) == "m" else "Witaj!")))),
-        (r"\b([Nn])ie\s+ma\s+mowy,?\s+(?:że|a)?by(śmy|ście|m|ś)?\b", lambda m: ("Wykluczone, by" if m.group(1).isupper() else "wykluczone, by") + (m.group(2) or "")),
-        (r"\b([Mm](?:am|asz|a|amy|acie|ają|iałem|iałam|iał|iała|iało|ieliśmy|iałyśmy|ieli|iały|iałby|iałaby|iałoby|ieliby|iałyby)|[Bb]ęd(?:ę|ziesz|zie|ziemy|ziecie|dą)\s+mieć)\s+taką\s+nadzieję\b", r"\1 nadzieję"),
-        (r"\b([Mm](?:am|asz|a|amy|acie|ają|iałem|iałam|iał|iała|iało|ieliśmy|iałyśmy|ieli|iały|iałby|iałaby|iałoby|ieliby|iałyby)|[Bb]ęd(?:ę|ziesz|zie|ziemy|ziecie|dą)\s+mieć)\s+nadzieję\s+na\s+to\b", r"\1 nadzieję"),
-    ]
     res = text
     for pat, repl in TYPO_NORMALIZATIONS:
         res = re.sub(pat, repl, res)
@@ -227,6 +313,7 @@ class SeriesBible:
             "glossary": {},            # { "Choushi": "czara na sake", "Dragon Slayer": "Pogromca Smoków" }
             "relationships": {},      # { "Kokoro->Arata": "po imieniu / na ty", "Uczniowie->Teshima": "pani Teshima" }
             "declensions": {},        # { "Shira": {"M": "Shira", "D": "Shiry", "C": "Shirze", ...} }
+            "hypocorisms": {},        # { "Kuro": "Kuroe", "Kuro-tan": "Kuroe", "Rin": "Rinko" }
             "plot_anchors": {},        # { "kamień jada": "rytualny artefakt wywołujący deszcz", "zbieg z Samarkandy": "Shira" }
             "episodes_translated": [], # ["odcinek 1", "odcinek 2"]
             "batch_stats": {}          # { "odcinek 1": {"batches": 17, "dialogues": 374, "avg_batch_size": 22.0} }
@@ -284,6 +371,52 @@ class SeriesBible:
         }
         self.save()
 
+    def resolve_canonical_name(self, name_or_stem: str) -> str:
+        """
+        Resolves hypocorisms, pet names, and truncated stems (e.g. 'Kuro-tan', 'Kuro')
+        to the full canonical character name ('Kuroe') registered in the Series Bible.
+        """
+        if not name_or_stem:
+            return ""
+        s = name_or_stem.strip()
+        s_lower = s.lower()
+        # 1. Direct lookup in registered hypocorisms
+        hypo = self.data.get("hypocorisms", {})
+        if s in hypo:
+            return hypo[s]
+        for k, v in hypo.items():
+            if k.lower() == s_lower:
+                return v
+        # 2. Check if stem matches prefix of a confirmed character name
+        chars = self.data.get("characters", {})
+        for c in chars.keys():
+            if "->" not in c:
+                c_first = c.split()[0]
+                if c_first.lower() == s_lower:
+                    return c_first
+                if c_first.lower().startswith(s_lower) and len(s_lower) >= 3:
+                    return c_first
+        return s
+
+    def get_character_gender(self, name: str) -> str:
+        """
+        Returns 'MALE', 'FEMALE', or 'UNKNOWN' based on Series Bible records.
+        """
+        if not name:
+            return "UNKNOWN"
+        n_l = name.strip().lower()
+        chars = self.data.get("characters", {})
+        for k, v in chars.items():
+            if "->" not in k:
+                k_l = k.lower()
+                if k_l == n_l or n_l in k_l.split():
+                    desc_v = str(v.get("description", "") if isinstance(v, dict) else v).lower()
+                    if any(w in desc_v for w in ["female", "kobieta", "dziewczyn", "żeńsk"]):
+                        return "FEMALE"
+                    if any(w in desc_v for w in ["male", "mężczyzna", "chłopak", "męsk"]):
+                        return "MALE"
+        return "UNKNOWN"
+
     def _sanitize_character_entry(self, name: str, details: str) -> str:
         """
         Guards Series Bible against gender poisoning and ambiguous descriptions (Layer 5).
@@ -302,8 +435,53 @@ class SeriesBible:
         clean_desc = sanitize_lexical_text(details.strip())
         name_lower = name.lower()
 
+        # Distinguish standalone characters from relationships (Speaker -> Listener)
+        is_rel = "->" in name
+        speaker = ""
+        listener = ""
+        if is_rel:
+            parts = [p.strip() for p in name.split("->", 1)]
+            speaker = parts[0]
+            listener = parts[1] if len(parts) > 1 else ""
+
+        target_name = listener.lower() if is_rel else name_lower
+        target_is_male = any(m == target_name or f" {m} " in f" {target_name} " for m in CANONICAL_MALE_NAMES)
+        target_is_female = False
+
+        # Look up confirmed target character gender in Series Bible
+        if hasattr(self, "data") and "characters" in self.data:
+            for k, v in self.data["characters"].items():
+                if "->" not in k:
+                    k_l = k.lower()
+                    if k_l == target_name or (len(k_l) >= 3 and k_l in target_name) or (len(target_name) >= 3 and target_name in k_l):
+                        desc_v = str(v.get("description", "") if isinstance(v, dict) else v).lower()
+                        if any(w in desc_v for w in ["male", "mężczyzna", "chłopak", "męsk"]):
+                            target_is_male = True
+                        if any(w in desc_v for w in ["female", "kobieta", "dziewczyna", "żeńsk"]):
+                            target_is_female = True
+
+        # In relationships, extract recipient description part (after '->' in brackets e.g. '(koleżanka -> przyjaciel)')
+        rel_target_desc = clean_desc.split("->")[-1].lower() if ("->" in clean_desc and is_rel) else clean_desc.lower()
+        if any(w in rel_target_desc for w in ["mężczyzna", "chłopak", "syn", "ojciec", "mentor", "mistrz", "pan ", "brat", "starzec", "kupiec"]):
+            target_is_male = True
+        if any(w in rel_target_desc for w in ["kobieta", "dziewczyna", "córka", "matka", "uczennica", "pani ", "siostra"]):
+            target_is_female = True
+
+        # Resolve conflict: target cannot be both male and female
+        if target_is_male and target_is_female:
+            if any(w in rel_target_desc for w in ["mężczyzna", "chłopak", "syn", "ojciec"]):
+                target_is_female = False
+            elif any(w in rel_target_desc for w in ["kobieta", "dziewczyna", "córka", "matka"]):
+                target_is_male = False
+
+        # Clean existing poisoned tags if they contradict target gender
+        if target_is_male:
+            clean_desc = re.sub(r"\s*\[KOBIETA \(Adresat\)[^\]]*\]", "", clean_desc).strip()
+        if target_is_female:
+            clean_desc = re.sub(r"\s*\[MĘŻCZYZNA \(Adresat\)[^\]]*\]", "", clean_desc).strip()
+
         # Check if the relationship or character involves a confirmed male character
-        involves_male = any(m in name_lower for m in CANONICAL_MALE_NAMES)
+        involves_male = target_is_male or any(m in name_lower for m in CANONICAL_MALE_NAMES)
         if not involves_male and hasattr(self, "data") and "characters" in self.data:
             for k, v in self.data["characters"].items():
                 if k.lower() in name_lower:
@@ -339,12 +517,12 @@ class SeriesBible:
                 clean_desc = f"{clean_desc} [GRUPA MĘŻCZYZN - Wymóg rodzaju męskoosobowego: -liście / byliście gotowi]".strip()
 
         # Safeguard singular addressee morphology in Series Bible (Filar CLXIII)
-        is_single_female = any(w in clean_desc.lower() for w in ["kobieta", "female", "dziewczyna", "nauczycielka", "uczennica", "kapłanka", "pani"]) and not is_female_group and not involves_male
+        is_single_female = (target_is_female or any(w in rel_target_desc for w in ["kobieta", "female", "dziewczyna", "nauczycielka", "uczennica", "kapłanka"])) and not is_female_group and not target_is_male
         if is_single_female:
             if "2. os. lp." not in clean_desc.lower() and "-łaś" not in clean_desc.lower():
                 clean_desc = f"{clean_desc} [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]".strip()
 
-        is_single_male = any(w in clean_desc.lower() for w in ["mężczyzna", "male", "chłopak", "żołnierz", "pan", "uczeń"]) and not is_male_group
+        is_single_male = (target_is_male or any(w in rel_target_desc for w in ["mężczyzna", "male", "chłopak", "żołnierz", "pan", "uczeń"])) and not is_male_group and not target_is_female
         if is_single_male:
             if "2. os. lp." not in clean_desc.lower() and "-łeś" not in clean_desc.lower():
                 clean_desc = f"{clean_desc} [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]".strip()
@@ -377,10 +555,35 @@ class SeriesBible:
             self.data["episodes_translated"].append(episode_name)
 
         if characters:
+            FEMALE_KEYWORDS = [
+                "kobieta", "żeńsk", "female", "dziewczyn", "nauczycielk", "czarodziejk",
+                "szpieżk", "wojowniczk", "kapłank", "służąc", "pani", "bohaterk",
+                "arystokratk", "władczyn", "królow", "księżniczk", "matk", "córk", "siostr"
+            ]
+            if "declensions" not in self.data:
+                self.data["declensions"] = {}
+            if "relationships" not in self.data:
+                self.data["relationships"] = {}
+
             for name, details in characters.items():
                 if not name or not details:
                     continue
                 clean_details = self._sanitize_character_entry(name, details)
+                if "->" in name:
+                    self.data["relationships"][name] = clean_details
+                    self.data["characters"][name] = {"description": clean_details}
+                    parts = [p.strip() for p in name.split("->")]
+                    for p in parts:
+                        clean_p = re.sub(r"-(?:sensei|kun|chan|san|sama|senpai)\b", "", p, flags=re.IGNORECASE).strip()
+                        clean_p = re.sub(r"^(?:Pani|Pan|Kapitan|Dziekan|Kardynał|Generał|Doktor|Profesor)\s+", "", clean_p).strip()
+                        if clean_p and len(clean_p) >= 2 and not any(ch in clean_p for ch in "{}[]():;"):
+                            if clean_p not in self.data["characters"]:
+                                p_g = "FEMALE" if any(w in clean_details.lower() for w in FEMALE_KEYWORDS) else "MALE"
+                                g_str = "KOBIETA" if p_g == "FEMALE" else "MĘŻCZYZNA"
+                                self.data["characters"][clean_p] = {"description": f"{g_str} (wyodrębniono z relacji serii)"}
+                                self.data["declensions"][clean_p] = generate_polish_name_declension(clean_p, p_g)
+                    continue
+
                 if name not in self.data["characters"]:
                     self.data["characters"][name] = {"description": clean_details}
                 else:
@@ -407,27 +610,19 @@ class SeriesBible:
                     self.data["characters"][name] = {"description": clean_details}
 
                 # Generate and store 7-case Polish declension matrix
-                FEMALE_KEYWORDS = [
-                    "kobieta", "żeńsk", "female", "dziewczyn", "nauczycielk", "czarodziejk",
-                    "szpieżk", "wojowniczk", "kapłank", "służąc", "pani", "bohaterk",
-                    "arystokratk", "władczyn", "królow", "księżniczk", "matk", "córk", "siostr"
-                ]
-                c_gender = "MALE" if (any(w in clean_details.lower() for w in ["mężczyzna", "męsk", "male", "chłopak"]) and not any(w in clean_details.lower() for w in FEMALE_KEYWORDS)) else ("FEMALE" if any(w in clean_details.lower() for w in FEMALE_KEYWORDS) else "UNKNOWN")
-                if "declensions" not in self.data:
-                    self.data["declensions"] = {}
+                clean_details_sanitized = re.sub(r"zakaz\s+form\s+(?:żeńsk|męsk)[a-ząćęłńóśźż]*", "", clean_details.lower())
+                c_gender = "MALE" if (any(w in clean_details_sanitized for w in ["mężczyzna", "męsk", "male", "chłopak"]) and not any(w in clean_details_sanitized for w in FEMALE_KEYWORDS)) else ("FEMALE" if any(w in clean_details_sanitized for w in FEMALE_KEYWORDS) else "UNKNOWN")
 
-                names_to_decline = [name]
-                if "->" in name:
-                    names_to_decline.extend([p.strip() for p in name.split("->")])
-                elif "/" in name:
-                    names_to_decline.extend([p.strip() for p in name.split("/")])
+                if "/" in name:
+                    names_to_decline = [p.strip() for p in name.split("/")]
+                else:
+                    names_to_decline = [name]
 
                 for single_n in names_to_decline:
                     if single_n and len(single_n) >= 3 and not any(ch in single_n for ch in "->/"):
                         self.data["declensions"][single_n] = generate_polish_name_declension(single_n, c_gender)
 
         if glossary:
-            import re
             for k, v in glossary.items():
                 # Store non-trivial terms only and sanitize parenthetical descriptions
                 if k and v and len(k) > 1 and len(v) > 1:
@@ -458,7 +653,6 @@ class SeriesBible:
                 if rel_k and rel_v:
                     self.data["relationships"][rel_k] = sanitize_lexical_text(str(rel_v).strip())
                     # Also extract names from relationships to decline them
-                    import re
                     for part in re.split(r"->|/|,", rel_k):
                         part_clean = part.strip()
                         if len(part_clean) >= 3 and not any(ch in part_clean for ch in "{}[]():;"):
@@ -535,6 +729,26 @@ class SeriesBible:
                                 self.data["declensions"][existing_name]["D"] = decl_form
                                 has_updates = True
 
+                # Vocative confirmation: e.g. "ujednolicono wołacz na 'Andrewie'"
+                m_voc = re.search(r"ujednolicono wołacz na '([^']+)'", fix_item)
+                if m_voc:
+                    voc_form = m_voc.group(1)
+                    for existing_name in list(self.data["characters"].keys()) + list(self.data["declensions"].keys()):
+                        if len(existing_name) >= 3 and voc_form.lower().startswith(existing_name[:max(3, len(existing_name)-2)].lower()):
+                            if existing_name in self.data["declensions"]:
+                                self.data["declensions"][existing_name]["W"] = voc_form
+                                has_updates = True
+
+                # Locative confirmation: e.g. "ujednolicono formę na 'Nathanie' po przyimku miejscownika"
+                m_loc = re.search(r"ujednolicono formę na '([^']+)' po przyimku miejscownika", fix_item)
+                if m_loc:
+                    loc_form = m_loc.group(1)
+                    for existing_name in list(self.data["characters"].keys()) + list(self.data["declensions"].keys()):
+                        if len(existing_name) >= 3 and loc_form.lower().startswith(existing_name[:max(3, len(existing_name)-2)].lower()):
+                            if existing_name in self.data["declensions"]:
+                                self.data["declensions"][existing_name]["Ms"] = loc_form
+                                has_updates = True
+
         if has_updates:
             self.save()
 
@@ -554,10 +768,16 @@ class SeriesBible:
                     lines.append(f"  - {name}: {desc}")
                 has_content = True
 
+            if self.data.get("relationships"):
+                lines.append("• Kluczowe relacje i formy zwrotu (T-V / Honoryfikatywność):")
+                for rel_k, rel_v in list(self.data["relationships"].items())[:8]:
+                    lines.append(f"  - {rel_k}: {rel_v}")
+                has_content = True
+
             if self.data.get("declensions"):
                 decl_items = []
                 for c_name, c_decl in list(self.data["declensions"].items())[:6]:
-                    if c_decl.get("M") != c_decl.get("D"):
+                    if c_decl and isinstance(c_decl, dict) and c_decl.get("M") != c_decl.get("D"):
                         decl_items.append(f"    * {c_name}: D. {c_decl.get('D')}, C/Ms. {c_decl.get('C')}, B/N. {c_decl.get('B')}/z {c_decl.get('N')}, W. {c_decl.get('W')}!")
                 if decl_items:
                     lines.append("• Wzorzec odmiany imion (Matryca 7 Przypadków - KATEGORYCZNY NAKAZ FLEKSJI):")

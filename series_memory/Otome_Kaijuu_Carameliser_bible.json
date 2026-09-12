@@ -1,0 +1,458 @@
+{
+  "anime_title": "Otome Kaijuu Carameliser",
+  "characters": {
+    "Arata -> Kuroe": {
+      "description": "Zwrot: 'panno Akaishi (Akaishi-san)' (para zakochanych z dystansem szkolnym) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Arata": {
+      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Kuroe": {
+      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Kuroe -> Arata": {
+      "description": "Zwrot: 'Minami-kun' (para zakochanych)"
+    },
+    "Seina -> Arata": {
+      "description": "Zwrot: 'na ty / świeżaku / młody' (doświadczona gwiazda -> debiutant)"
+    },
+    "Seina": {
+      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Raimu -> Kuroe": {
+      "description": "Zwrot: 'Kuroe' (bliskie koleżanki ze szkoły, bezpośredni styl rówieśniczy gyaru) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Raimu": {
+      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Manatsu -> Kuroe": {
+      "description": "Zwrot: 'panno Kuroe (Kuroe-san)' (szkolna znajoma z dystyngowanym szacunkiem) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Manatsu": {
+      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Taichi": {
+      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Kuroe Kurozu": {
+      "description": "kobieta (16 lat, licealistka, pod wpływem emocji zmienia się w gigantycznego kaiju (Harugona)) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Arata Inubaki": {
+      "description": "mężczyzna / chłopak (Główny bohater) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Arata Minami (Inubaki)": {
+      "description": "KOBIETA - mężczyzna (16 lat, popularny uczeń, chłopak Kuroe, wciągnięty w show-biznes) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]"
+    },
+    "Seina Katsuragi": {
+      "description": "kobieta (Licealistka i profesjonalna aktorka, partnerka Araty na planie) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Manatsu Tomita": {
+      "description": "kobieta (Bogata licealistka, fanatyczka kaiju, przyjaciółka Kuroe) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Raimu Kohno": {
+      "description": "kobieta (Licealistka w stylu gyaru, przyjaciółka Kuroe) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Minami": {
+      "description": "KOBIETA - mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Akaishi": {
+      "description": "MĘŻCZYZNA - kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Takamine": {
+      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Harugon": {
+      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Godolla": {
+      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Arata Minami": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Kuroe Akaishi": {
+      "description": "KOBIETA (wyodrębniono z relacji serii)"
+    },
+    "Rinko Akaishi": {
+      "description": "KOBIETA (wyodrębniono z relacji serii)"
+    },
+    "Kotaro Hibino": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Taichi -> Arata": {
+      "description": "Zwrot: 'na ty' (młodszy rywal o względy Kuroe)"
+    },
+    "Arata Minami -> Kuroe Akaishi": {
+      "description": "Zwrot: 'Akaishi / po imieniu' (sympatia / para licealistów)"
+    },
+    "Kuroe Akaishi -> Arata Minami": {
+      "description": "Zwrot: 'Minami' (sympatia / para licealistów)"
+    },
+    "Rinko Akaishi -> Kotaro Hibino": {
+      "description": "Zwrot: 'Kotaro / Profesorze Hibino' (byli współpracownicy / naukowcy)"
+    },
+    "Kotaro Hibino -> Rinko Akaishi": {
+      "description": "Zwrot: 'panno Akaishi / Rinko' (były student -> starsza koleżanka/mentorka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Kotaro -> Rinko": {
+      "description": "Zwrot: 'panno Akaishi / Rinko' (były student -> starsza koleżanka/mentorka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    }
+  },
+  "glossary": {
+    "Kaiju": "Kaiju",
+    "Harugon": "Harugon",
+    "JSDF": "Siły Samoobrony",
+    "Prince of Kaiju": "Potworny Królewicz",
+    "King of Kaiju, Godolla": "Król kaiju Godolla",
+    "Harumi": "Harumi",
+    "Kuroe Akaishi": "Kuroe Akaishi",
+    "Arata Minami": "Arata Minami",
+    "Rinko Akaishi": "Rinko Akaishi",
+    "Raimu Kono": "Raimu Kono",
+    "Kotaro": "Kotaro",
+    "Kinara": "Kinara",
+    "Drago": "Drago",
+    "Psycho-tan": "Psycho-tan",
+    "Monster Prince": "Potworny Królewicz",
+    "Giant Monster": "Gigantyczny potwór",
+    "Flying Monster": "Latające monstrum",
+    "Malulani Island": "Wyspa Malulani",
+    "Tokyo": "Tokio",
+    "High School": "Liceum",
+    "Partial Transformation": "Częściowa transformacja",
+    "Full Transformation": "Pełna transformacja",
+    "Monster Form": "Forma potwora",
+    "Scaly Arm": "Szponiasta łapa",
+    "Scales": "Łuski",
+    "Horns": "Rogi",
+    "Dorsal Spines": "Wypustki na grzbiecie",
+    "Heat Ray": "Promień potwora",
+    "Rare Condition": "Nietypowa przypadłość",
+    "Strong Emotions": "Silne emocje",
+    "Heartbeat": "Bicie serca",
+    "Excitement": "Podekscytowanie",
+    "Love": "Miłość",
+    "Confession": "Wyznanie miłości",
+    "Date": "Randka",
+    "Amusement Park": "Lunapark",
+    "School Trip": "Wycieczka szkolna",
+    "Outcast": "Wyrzutek",
+    "Track and Field Club": "Klub lekkoatletyczny",
+    "School Life": "Szkolne życie",
+    "Classmate": "Kolega z klasy",
+    "Romance": "Romans",
+    "Romantic Comedy": "Komedia romantyczna",
+    "Tropical Island": "Tropikalna wyspa",
+    "Birthplace": "Miejsce narodzin",
+    "Unrequited Love": "Niespełniona miłość",
+    "Monster Incident": "Atak potwora",
+    "Television Star": "Gwiazda telewizyjna",
+    "Media Frenzy": "Szum medialny",
+    "Secret": "Sekret",
+    "Roar": "Ryk potwora",
+    "Destruction": "Zniszczenie",
+    "First Love": "Pierwsza miłość",
+    "Monster Awakening": "Przebudzenie potwora",
+    "Talk Time": "Talk Time",
+    "Cabinet Disaster Task Force HQ": "Sztab Rządowego Zespołu Reagowania Kryzysowego"
+  },
+  "relationships": {
+    "Arata -> Kuroe": "Zwrot: 'panno Akaishi (Akaishi-san)' (para zakochanych z dystansem szkolnym) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Kuroe -> Arata": "Zwrot: 'Minami-kun' (para zakochanych)",
+    "Seina -> Arata": "Zwrot: 'na ty / świeżaku / młody' (doświadczona gwiazda -> debiutant)",
+    "Raimu -> Kuroe": "Zwrot: 'Kuroe' (bliskie koleżanki ze szkoły, bezpośredni styl rówieśniczy gyaru) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Manatsu -> Kuroe": "Zwrot: 'panno Kuroe (Kuroe-san)' (szkolna znajoma z dystyngowanym szacunkiem) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Taichi -> Arata": "Zwrot: 'na ty' (młodszy rywal o względy Kuroe)",
+    "Arata Minami -> Kuroe Akaishi": "Zwrot: 'Akaishi / po imieniu' (sympatia / para licealistów)",
+    "Rinko Akaishi -> Kotaro Hibino": "Zwrot: 'Kotaro / Profesorze Hibino' (byli współpracownicy / naukowcy)",
+    "Kotaro Hibino -> Rinko Akaishi": "Zwrot: 'panno Akaishi / Rinko' (były student -> starsza koleżanka/mentorka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Kotaro -> Rinko": "Zwrot: 'panno Akaishi / Rinko' (były student -> starsza koleżanka/mentorka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+  },
+  "declensions": {
+    "Arata": {
+      "M": "Arata",
+      "D": "Araty",
+      "C": "Aracie",
+      "B": "Aratę",
+      "N": "Aratą",
+      "Ms": "Aracie",
+      "W": "Arato"
+    },
+    "Kuroe": {
+      "M": "Kuroe",
+      "D": "Kuroe",
+      "C": "Kuroe",
+      "B": "Kuroe",
+      "N": "Kuroe",
+      "Ms": "Kuroe",
+      "W": "Kuroe"
+    },
+    "Seina": {
+      "M": "Seina",
+      "D": "Seiny",
+      "C": "Seinie",
+      "B": "Seinę",
+      "N": "Seiną",
+      "Ms": "Seinie",
+      "W": "Seino"
+    },
+    "Raimu": {
+      "M": "Raimu",
+      "D": "Raimu",
+      "C": "Raimu",
+      "B": "Raimu",
+      "N": "Raimu",
+      "Ms": "Raimu",
+      "W": "Raimu"
+    },
+    "Manatsu": {
+      "M": "Manatsu",
+      "D": "Manatsu",
+      "C": "Manatsu",
+      "B": "Manatsu",
+      "N": "Manatsu",
+      "Ms": "Manatsu",
+      "W": "Manatsu"
+    },
+    "Taichi": {
+      "M": "Taichi",
+      "D": "Taichi",
+      "C": "Taichi",
+      "B": "Taichi",
+      "N": "Taichi",
+      "Ms": "Taichi",
+      "W": "Taichi"
+    },
+    "Kuroe Kurozu": {
+      "M": "Kuroe Kurozu",
+      "D": "Kuroe Kurozu",
+      "C": "Kuroe Kurozu",
+      "B": "Kuroe Kurozu",
+      "N": "Kuroe Kurozu",
+      "Ms": "Kuroe Kurozu",
+      "W": "Kuroe Kurozu"
+    },
+    "Arata Inubaki": {
+      "M": "Arata Inubaki",
+      "D": "Araty Inubaki",
+      "C": "Aracie Inubaki",
+      "B": "Aratę Inubaki",
+      "N": "Aratą Inubaki",
+      "Ms": "Aracie Inubaki",
+      "W": "Arato Inubaki"
+    },
+    "Arata Minami (Inubaki)": {
+      "M": "Arata Minami (Inubaki)",
+      "D": "Araty Minami (Inubaki)a",
+      "C": "Aracie Minami (Inubaki)owi",
+      "B": "Aratę Minami (Inubaki)a",
+      "N": "Aratą Minami (Inubaki)em",
+      "Ms": "Aracie Minami (Inubaki)ie",
+      "W": "Arato Minami (Inubaki)ie"
+    },
+    "Seina Katsuragi": {
+      "M": "Seina Katsuragi",
+      "D": "Seiny Katsuragi",
+      "C": "Seinie Katsuragi",
+      "B": "Seinę Katsuragi",
+      "N": "Seiną Katsuragi",
+      "Ms": "Seinie Katsuragi",
+      "W": "Seino Katsuragi"
+    },
+    "Manatsu Tomita": {
+      "M": "Manatsu Tomita",
+      "D": "Manatsu Tomity",
+      "C": "Manatsu Tomicie",
+      "B": "Manatsu Tomitę",
+      "N": "Manatsu Tomitą",
+      "Ms": "Manatsu Tomicie",
+      "W": "Manatsu Tomito"
+    },
+    "Raimu Kohno": {
+      "M": "Raimu Kohno",
+      "D": "Raimu Kohno",
+      "C": "Raimu Kohno",
+      "B": "Raimu Kohno",
+      "N": "Raimu Kohno",
+      "Ms": "Raimu Kohno",
+      "W": "Raimu Kohno"
+    },
+    "Minami": {
+      "M": "Minami",
+      "D": "Minami",
+      "C": "Minami",
+      "B": "Minami",
+      "N": "Minami",
+      "Ms": "Minami",
+      "W": "Minami"
+    },
+    "Akaishi": {
+      "M": "Akaishi",
+      "D": "Akaishi",
+      "C": "Akaishi",
+      "B": "Akaishi",
+      "N": "Akaishi",
+      "Ms": "Akaishi",
+      "W": "Akaishi"
+    },
+    "Takamine": {
+      "M": "Takamine",
+      "D": "Takamine",
+      "C": "Takamine",
+      "B": "Takamine",
+      "N": "Takamine",
+      "Ms": "Takamine",
+      "W": "Takamine"
+    },
+    "Harugon": {
+      "M": "Harugon",
+      "D": "Harugona",
+      "C": "Harugonowi",
+      "B": "Harugona",
+      "N": "Harugonem",
+      "Ms": "Harugonie",
+      "W": "Harugonie"
+    },
+    "Godolla": {
+      "M": "Godolla",
+      "D": "Godolly",
+      "C": "Godolle",
+      "B": "Godollę",
+      "N": "Godollą",
+      "Ms": "Godolle",
+      "W": "Godollo"
+    },
+    "Arata Minami": {
+      "M": "Arata Minami",
+      "D": "Araty Minami",
+      "C": "Aracie Minami",
+      "B": "Aratę Minami",
+      "N": "Aratą Minami",
+      "Ms": "Aracie Minami",
+      "W": "Arato Minami"
+    },
+    "Kuroe Akaishi": {
+      "M": "Kuroe Akaishi",
+      "D": "Kuroe Akaishi",
+      "C": "Kuroe Akaishi",
+      "B": "Kuroe Akaishi",
+      "N": "Kuroe Akaishi",
+      "Ms": "Kuroe Akaishi",
+      "W": "Kuroe Akaishi"
+    },
+    "Rinko Akaishi": {
+      "M": "Rinko Akaishi",
+      "D": "Rinko Akaishi",
+      "C": "Rinko Akaishi",
+      "B": "Rinko Akaishi",
+      "N": "Rinko Akaishi",
+      "Ms": "Rinko Akaishi",
+      "W": "Rinko Akaishi"
+    },
+    "Kotaro Hibino": {
+      "M": "Kotaro Hibino",
+      "D": "Kotaro Hibino",
+      "C": "Kotaro Hibino",
+      "B": "Kotaro Hibino",
+      "N": "Kotaro Hibino",
+      "Ms": "Kotaro Hibino",
+      "W": "Kotaro Hibino"
+    },
+    "Arata -> Kuroe": {
+      "M": "Arata -> Kuroe",
+      "D": "Araty -> Kuroe",
+      "C": "Aracie -> Kuroe",
+      "B": "Aratę -> Kuroe",
+      "N": "Aratą -> Kuroe",
+      "Ms": "Aracie -> Kuroe",
+      "W": "Arato -> Kuroe"
+    },
+    "Kuroe -> Arata": {
+      "M": "Kuroe -> Arata",
+      "D": "Kuroe -> Araty",
+      "C": "Kuroe -> Aracie",
+      "B": "Kuroe -> Aratę",
+      "N": "Kuroe -> Aratą",
+      "Ms": "Kuroe -> Aracie",
+      "W": "Kuroe -> Arato"
+    },
+    "Seina -> Arata": {
+      "M": "Seina -> Arata",
+      "D": "Seiny -> Araty",
+      "C": "Seinie -> Aracie",
+      "B": "Seinę -> Aratę",
+      "N": "Seiną -> Aratą",
+      "Ms": "Seinie -> Aracie",
+      "W": "Seino -> Arato"
+    },
+    "Raimu -> Kuroe": {
+      "M": "Raimu -> Kuroe",
+      "D": "Raimu -> Kuroe",
+      "C": "Raimu -> Kuroe",
+      "B": "Raimu -> Kuroe",
+      "N": "Raimu -> Kuroe",
+      "Ms": "Raimu -> Kuroe",
+      "W": "Raimu -> Kuroe"
+    },
+    "Manatsu -> Kuroe": {
+      "M": "Manatsu -> Kuroe",
+      "D": "Manatsu -> Kuroe",
+      "C": "Manatsu -> Kuroe",
+      "B": "Manatsu -> Kuroe",
+      "N": "Manatsu -> Kuroe",
+      "Ms": "Manatsu -> Kuroe",
+      "W": "Manatsu -> Kuroe"
+    },
+    "Taichi -> Arata": {
+      "M": "Taichi -> Arata",
+      "D": "Taichi -> Araty",
+      "C": "Taichi -> Aracie",
+      "B": "Taichi -> Aratę",
+      "N": "Taichi -> Aratą",
+      "Ms": "Taichi -> Aracie",
+      "W": "Taichi -> Arato"
+    },
+    "Arata Minami -> Kuroe Akaishi": {
+      "M": "Arata Minami -> Kuroe Akaishi",
+      "D": "Araty Minami -> Kuroe Akaishi",
+      "C": "Aracie Minami -> Kuroe Akaishi",
+      "B": "Aratę Minami -> Kuroe Akaishi",
+      "N": "Aratą Minami -> Kuroe Akaishi",
+      "Ms": "Aracie Minami -> Kuroe Akaishi",
+      "W": "Arato Minami -> Kuroe Akaishi"
+    },
+    "Kuroe Akaishi -> Arata Minami": {
+      "M": "Kuroe Akaishi -> Arata Minami",
+      "D": "Kuroe Akaishi -> Araty Minami",
+      "C": "Kuroe Akaishi -> Aracie Minami",
+      "B": "Kuroe Akaishi -> Aratę Minami",
+      "N": "Kuroe Akaishi -> Aratą Minami",
+      "Ms": "Kuroe Akaishi -> Aracie Minami",
+      "W": "Kuroe Akaishi -> Arato Minami"
+    },
+    "Rinko Akaishi -> Kotaro Hibino": {
+      "M": "Rinko Akaishi -> Kotaro Hibino",
+      "D": "Rinko Akaishi -> Kotaro Hibino",
+      "C": "Rinko Akaishi -> Kotaro Hibino",
+      "B": "Rinko Akaishi -> Kotaro Hibino",
+      "N": "Rinko Akaishi -> Kotaro Hibino",
+      "Ms": "Rinko Akaishi -> Kotaro Hibino",
+      "W": "Rinko Akaishi -> Kotaro Hibino"
+    }
+  },
+  "plot_anchors": {
+    "Harugon": "Oficjalne imię nadane kaiju-formie Kuroe przez media i Manatsu; bezwzględnie zachować pisownię 'Harugon' i męski/nijaki rodzaj gramatyczny w narracji mediów.",
+    "Akaishi-san": "Arata konsekwentnie zwraca się do Kuroe per 'panno Akaishi' (Akaishi-san), co stanowi kluczowy element jego szacunku i dystansu."
+  },
+  "episodes_translated": [
+    "[ASW] Otome Kaijuu Carameliser - 11 [1080p HEVC][C2F3683C]",
+    "Kanon Mangi",
+    "[ASW] Otome Kaijuu Carameliser - 09 [1080p HEVC][C3F1AD15]"
+  ],
+  "hypocorisms": {
+    "Kuro": "Kuroe",
+    "Kuro-tan": "Kuroe",
+    "Kuro-taso": "Kuroe",
+    "Rin": "Rinko"
+  }
+}

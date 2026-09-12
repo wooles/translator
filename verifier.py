@@ -143,7 +143,15 @@ class DialogueVerifier:
             "     - Zastosuj trzy soczewki weryfikacyjne:\n"
             "       * 👂 Ucho: oddech, CPS, dynamika ping-ponga (zakaz 'Tak' na ostrzeżenie, zakaz potakiwania na przeczenie - Filar CLIV).\n"
             "       * 🌍 Świat: relacje władzy, nienaruszalność T-V (zakaz 'wygrał pan' na 'ty' - Filar CLVII), perspektywa incognito (Filar CLXI).\n"
-            "       * 🎬 Obraz i Audio: afekt seiyū, gesty, napisy ekranowe vs dialog."
+            "       * 🎬 Obraz i Audio: afekt seiyū, gesty, napisy ekranowe vs dialog.\n"
+            "   KROK 3: PROAKTYWNY AUDYT NEGATYWNY REJESTRU, TYTULATURY I RZĄDU (NEGATIVE LEXICAL & REGISTER GATE - FILAR X & AGENTS.MD §9):\n"
+            "     - Weryfikacja rejestru: bezwzględnie wyeliminuj współczesny slang podwórkowy w światach historycznych / dark fantasy:\n"
+            "       * Klasa A (slang młodzieżowy): 'I gitara' -> 'Doskonale / Świetnie', 'spoko', 'siemanko', 'wchodzę w to' -> 'Przyjmuję ten układ'.\n"
+            "       * Klasa B (agresja podwórkowa): 'stul pysk' -> 'Zamilcz / Milcz', 'zamknij się', 'spuścić łomot' -> 'zmiażdżyć bez trudu', 'oberwę' -> 'poniosę karę / zginę'.\n"
+            "       * Klasa C (metafory potoczne): 'przejmuję stery' -> 'teraz ja mówię', 'dla zabicia czasu' -> 'dla rozrywki', 'kłamstwo jak byk' -> 'bezczelne kłamstwo', 'wylecieć ze szkoły' -> 'zostać wydalonym ze szkoły'.\n"
+            "       * Klasa D (trywializujące zaimki/rzeczowniki): 'ten typ' -> 'ten człowiek / nauczyciel', 'dzikuska / chuliganka' -> 'prostaczka / awanturnica', 'dzieciaki' -> 'uczniowie / młodzież'.\n"
+            "     - Weryfikacja tytulatury: zakaz kalkowania przydomków z 'od' ('Zavthier od Złudzeń' -> 'Zavthier Pani Iluzji', 'Vordin od Płomiennego Żaru' -> 'Płomienny Vordin').\n"
+            "     - Weryfikacja fleksji i rządu: 'posoka' to rzeczownik rodzaju żeńskiego ('ta czarna posoka', 'przez czarną posokę', 'z czarnej posoki'; ZAKAZ: 'czarny posok'), wołacz obcych nazwisk ('Owenie Koacie')."
         )
         prompt_lines.append("W polu 'changes_made' dla KAŻDEJ poprawionej kwestii podaj DOKŁADNE uzasadnienie i numer Filaru AVT (np. '[Filar IV - Szyk Zdania] Usunięto kalkę angielską' lub '[Filar CLVII - Forma Adresatywna] Usunięto 'wygrał pan' -> 'wygrałeś''). Jeśli kwestia nie wymagała poprawek, wpisz null.")
         

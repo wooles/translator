@@ -1,6 +1,39 @@
 {
   "anime_title": "Yumemiru Danshi wa Genjitsushugisha",
   "characters": {
+    "Wataru Sajou": {
+      "description": "MĘŻCZYZNA - chłopak (Główny bohater)"
+    },
+    "Aika Natsukawa": {
+      "description": "KOBIETA - dziewczyna (Główna bohaterka)"
+    },
+    "Kei Ashida": {
+      "description": "KOBIETA - kobieta (postać)"
+    },
+    "Kaede Sajou": {
+      "description": "KOBIETA - dziewczyna (Drugoplanowa bohaterka)"
+    },
+    "Rin Shinomiya": {
+      "description": "MĘŻCZYZNA - kobieta (16-17 lat, przewodnicząca Komitetu Dyscypliny, opanowana i dostojna senpai)"
+    },
+    "Kei Shinomiya": {
+      "description": "MĘŻCZYZNA - dziewczyna (Drugoplanowa bohaterka)"
+    },
+    "Rin Ichinose": {
+      "description": "KOBIETA - dziewczyna (Drugoplanowa bohaterka)"
+    },
+    "Fuka Sasaki": {
+      "description": "KOBIETA - dziewczyna (Drugoplanowa bohaterka)"
+    },
+    "Hayato Ichinose": {
+      "description": "MĘŻCZYZNA - chłopak (Drugoplanowy bohater)"
+    },
+    "Yuyu Inatomi": {
+      "description": "KOBIETA - kobieta (postać)"
+    },
+    "Yamazaki": {
+      "description": "MĘŻCZYZNA - mężczyzna (postać)"
+    },
     "Wataru Sajou -> Aika Natsukawa": {
       "description": "Zwrot: 'na ty / Natsukawa' (kolega z klasy (wymuszony dystans))"
     },
@@ -24,39 +57,6 @@
     },
     "Kaede Sajou -> Wataru Sajou": {
       "description": "Zwrot: 'na ty / Wataru / braciszku' (starsza siostra -> młodszy brat)"
-    },
-    "Wataru Sajou": {
-      "description": "chłopak (Główny bohater)"
-    },
-    "Aika Natsukawa": {
-      "description": "dziewczyna (Główna bohaterka)"
-    },
-    "Kei Shinomiya": {
-      "description": "dziewczyna (Drugoplanowa bohaterka)"
-    },
-    "Kaede Sajou": {
-      "description": "dziewczyna (Drugoplanowa bohaterka)"
-    },
-    "Rin Ichinose": {
-      "description": "dziewczyna (Drugoplanowa bohaterka)"
-    },
-    "Fuka Sasaki": {
-      "description": "dziewczyna (Drugoplanowa bohaterka)"
-    },
-    "Hayato Ichinose": {
-      "description": "chłopak (Drugoplanowy bohater)"
-    },
-    "Rin Shinomiya": {
-      "description": "kobieta (16-17 lat, przewodnicząca Komitetu Dyscypliny, opanowana i dostojna senpai)"
-    },
-    "Kei Ashida": {
-      "description": "kobieta (postać)"
-    },
-    "Yuyu Inatomi": {
-      "description": "kobieta (postać)"
-    },
-    "Yamazaki": {
-      "description": "mężczyzna (postać)"
     }
   },
   "glossary": {
@@ -69,7 +69,16 @@
     "Villager A": "Wieśniak A",
     "lunch break": "długa przerwa"
   },
-  "relationships": {},
+  "relationships": {
+    "Wataru Sajou -> Aika Natsukawa": "Zwrot: 'na ty / Natsukawa' (kolega z klasy (wymuszony dystans))",
+    "Aika Natsukawa -> Wataru Sajou": "Zwrot: 'na ty / Sajo' (koleżanka z klasy (zdezorientowana brakiem atencji))",
+    "Kei Ashida -> Wataru Sajou": "Zwrot: 'Sajotchi' (kumpelska relacja w klasie)",
+    "Kei Ashida -> Aika Natsukawa": "Zwrot: 'Aichi' (bliskie przyjaciółki)",
+    "Wataru Sajou -> Kaede Sajou": "Zwrot: 'siostra / siostrzyczka' (rodzeństwo)",
+    "Wataru Sajou -> Rin Shinomiya": "Zwrot: 'przewodnicząca / panno Shinomiya' (młodszy uczeń -> szanowana starsza rocznikiem)",
+    "Rin Shinomiya -> Wataru Sajou": "Zwrot: 'na ty / Sajo' (starsza uczennica -> młodszy kolega)",
+    "Kaede Sajou -> Wataru Sajou": "Zwrot: 'na ty / Wataru / braciszku' (starsza siostra -> młodszy brat)"
+  },
   "plot_anchors": {
     "Nagła zmiana zachowania Wataru": "Wataru nieustannie pamięta o swoim postanowieniu, że nie zasługuje na Aikę i musi trzymać się z daleka; nie wolno tłumaczyć jego zachowania jako zwykłego obrażenia się.",
     "Incydent z Yuyu Inatomi w korytarzu": "Nawiązanie do sytuacji, w której Wataru chciał pomóc dziewczynie dźwigającej pudła, a został odebrany jako napastnik ze względu na jej andro fobię."
@@ -77,5 +86,178 @@
   "episodes_translated": [
     "[ASW] Yumemiru Danshi wa Genjitsushugisha - 01 [1080p HEVC][96330DB1]",
     "[ASW] Yumemiru Danshi wa Genjitsushugisha - 02 [1080p HEVC][96EF8E5C]"
-  ]
+  ],
+  "declensions": {
+    "Wataru Sajou": {
+      "M": "Wataru Sajou",
+      "D": "Wataru Sajou",
+      "C": "Wataru Sajou",
+      "B": "Wataru Sajou",
+      "N": "Wataru Sajou",
+      "Ms": "Wataru Sajou",
+      "W": "Wataru Sajou"
+    },
+    "Aika Natsukawa": {
+      "M": "Aika Natsukawa",
+      "D": "Aiki Natsukawy",
+      "C": "Aice Natsukawe",
+      "B": "Aikę Natsukawę",
+      "N": "Aiką Natsukawą",
+      "Ms": "Aice Natsukawe",
+      "W": "Aiko Natsukawo"
+    },
+    "Kei Ashida": {
+      "M": "Kei Ashida",
+      "D": "Kei Ashidy",
+      "C": "Kei Ashidzie",
+      "B": "Kei Ashidę",
+      "N": "Kei Ashidą",
+      "Ms": "Kei Ashidzie",
+      "W": "Kei Ashido"
+    },
+    "Kaede Sajou": {
+      "M": "Kaede Sajou",
+      "D": "Kaede Sajou",
+      "C": "Kaede Sajou",
+      "B": "Kaede Sajou",
+      "N": "Kaede Sajou",
+      "Ms": "Kaede Sajou",
+      "W": "Kaede Sajou"
+    },
+    "Rin Shinomiya": {
+      "M": "Rin Shinomiya",
+      "D": "Rina Shinomiyy",
+      "C": "Rinowi Shinomiye",
+      "B": "Rina Shinomiyę",
+      "N": "Rinem Shinomiyą",
+      "Ms": "Rinie Shinomiye",
+      "W": "Rinie Shinomiyo"
+    },
+    "Kei Shinomiya": {
+      "M": "Kei Shinomiya",
+      "D": "Kei Shinomiyy",
+      "C": "Kei Shinomiye",
+      "B": "Kei Shinomiyę",
+      "N": "Kei Shinomiyą",
+      "Ms": "Kei Shinomiye",
+      "W": "Kei Shinomiyo"
+    },
+    "Rin Ichinose": {
+      "M": "Rin Ichinose",
+      "D": "Rin Ichinose",
+      "C": "Rin Ichinose",
+      "B": "Rin Ichinose",
+      "N": "Rin Ichinose",
+      "Ms": "Rin Ichinose",
+      "W": "Rin Ichinose"
+    },
+    "Fuka Sasaki": {
+      "M": "Fuka Sasaki",
+      "D": "Fuki Sasaki",
+      "C": "Fuce Sasaki",
+      "B": "Fukę Sasaki",
+      "N": "Fuką Sasaki",
+      "Ms": "Fuce Sasaki",
+      "W": "Fuko Sasaki"
+    },
+    "Hayato Ichinose": {
+      "M": "Hayato Ichinose",
+      "D": "Hayato Ichinose",
+      "C": "Hayato Ichinose",
+      "B": "Hayato Ichinose",
+      "N": "Hayato Ichinose",
+      "Ms": "Hayato Ichinose",
+      "W": "Hayato Ichinose"
+    },
+    "Yuyu Inatomi": {
+      "M": "Yuyu Inatomi",
+      "D": "Yuyu Inatomi",
+      "C": "Yuyu Inatomi",
+      "B": "Yuyu Inatomi",
+      "N": "Yuyu Inatomi",
+      "Ms": "Yuyu Inatomi",
+      "W": "Yuyu Inatomi"
+    },
+    "Yamazaki": {
+      "M": "Yamazaki",
+      "D": "Yamazaki",
+      "C": "Yamazaki",
+      "B": "Yamazaki",
+      "N": "Yamazaki",
+      "Ms": "Yamazaki",
+      "W": "Yamazaki"
+    },
+    "Wataru Sajou -> Aika Natsukawa": {
+      "M": "Wataru Sajou -> Aika Natsukawa",
+      "D": "Wataru Sajou -> Aiki Natsukawy",
+      "C": "Wataru Sajou -> Aice Natsukawe",
+      "B": "Wataru Sajou -> Aikę Natsukawę",
+      "N": "Wataru Sajou -> Aiką Natsukawą",
+      "Ms": "Wataru Sajou -> Aice Natsukawe",
+      "W": "Wataru Sajou -> Aiko Natsukawo"
+    },
+    "Aika Natsukawa -> Wataru Sajou": {
+      "M": "Aika Natsukawa -> Wataru Sajou",
+      "D": "Aiki Natsukawy -> Wataru Sajou",
+      "C": "Aice Natsukawe -> Wataru Sajou",
+      "B": "Aikę Natsukawę -> Wataru Sajou",
+      "N": "Aiką Natsukawą -> Wataru Sajou",
+      "Ms": "Aice Natsukawe -> Wataru Sajou",
+      "W": "Aiko Natsukawo -> Wataru Sajou"
+    },
+    "Kei Ashida -> Wataru Sajou": {
+      "M": "Kei Ashida -> Wataru Sajou",
+      "D": "Kei Ashidy -> Wataru Sajou",
+      "C": "Kei Ashidzie -> Wataru Sajou",
+      "B": "Kei Ashidę -> Wataru Sajou",
+      "N": "Kei Ashidą -> Wataru Sajou",
+      "Ms": "Kei Ashidzie -> Wataru Sajou",
+      "W": "Kei Ashido -> Wataru Sajou"
+    },
+    "Kei Ashida -> Aika Natsukawa": {
+      "M": "Kei Ashida -> Aika Natsukawa",
+      "D": "Kei Ashidy -> Aiki Natsukawy",
+      "C": "Kei Ashidzie -> Aice Natsukawe",
+      "B": "Kei Ashidę -> Aikę Natsukawę",
+      "N": "Kei Ashidą -> Aiką Natsukawą",
+      "Ms": "Kei Ashidzie -> Aice Natsukawe",
+      "W": "Kei Ashido -> Aiko Natsukawo"
+    },
+    "Wataru Sajou -> Kaede Sajou": {
+      "M": "Wataru Sajou -> Kaede Sajou",
+      "D": "Wataru Sajou -> Kaede Sajou",
+      "C": "Wataru Sajou -> Kaede Sajou",
+      "B": "Wataru Sajou -> Kaede Sajou",
+      "N": "Wataru Sajou -> Kaede Sajou",
+      "Ms": "Wataru Sajou -> Kaede Sajou",
+      "W": "Wataru Sajou -> Kaede Sajou"
+    },
+    "Wataru Sajou -> Rin Shinomiya": {
+      "M": "Wataru Sajou -> Rin Shinomiya",
+      "D": "Wataru Sajou -> Rina Shinomiyy",
+      "C": "Wataru Sajou -> Rinowi Shinomiye",
+      "B": "Wataru Sajou -> Rina Shinomiyę",
+      "N": "Wataru Sajou -> Rinem Shinomiyą",
+      "Ms": "Wataru Sajou -> Rinie Shinomiye",
+      "W": "Wataru Sajou -> Rinie Shinomiyo"
+    },
+    "Rin Shinomiya -> Wataru Sajou": {
+      "M": "Rin Shinomiya -> Wataru Sajou",
+      "D": "Rina Shinomiyy -> Wataru Sajou",
+      "C": "Rinowi Shinomiye -> Wataru Sajou",
+      "B": "Rina Shinomiyę -> Wataru Sajou",
+      "N": "Rinem Shinomiyą -> Wataru Sajou",
+      "Ms": "Rinie Shinomiye -> Wataru Sajou",
+      "W": "Rinie Shinomiyo -> Wataru Sajou"
+    },
+    "Kaede Sajou -> Wataru Sajou": {
+      "M": "Kaede Sajou -> Wataru Sajou",
+      "D": "Kaede Sajou -> Wataru Sajou",
+      "C": "Kaede Sajou -> Wataru Sajou",
+      "B": "Kaede Sajou -> Wataru Sajou",
+      "N": "Kaede Sajou -> Wataru Sajou",
+      "Ms": "Kaede Sajou -> Wataru Sajou",
+      "W": "Kaede Sajou -> Wataru Sajou"
+    }
+  }
 }

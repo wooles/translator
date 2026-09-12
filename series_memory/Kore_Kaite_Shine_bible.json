@@ -1,14 +1,47 @@
 {
   "anime_title": "Kore Kaite Shine",
   "characters": {
+    "Rei Teshima": {
+      "description": "KOBIETA (wyodrębniono z relacji serii)"
+    },
+    "Hebichika": {
+      "description": "KOBIETA (wyodrębniono z relacji serii)"
+    },
+    "Hana": {
+      "description": "KOBIETA (wyodrębniono z relacji serii)"
+    },
+    "Hana Kongouji": {
+      "description": "KOBIETA (wyodrębniono z relacji serii)"
+    },
+    "Nana Teramura": {
+      "description": "KOBIETA (wyodrębniono z relacji serii)"
+    },
+    "Harue Natsukusa": {
+      "description": "KOBIETA (wyodrębniono z relacji serii)"
+    },
+    "Ai Yasumi": {
+      "description": "KOBIETA (wyodrębniono z relacji serii)"
+    },
+    "Kokoro Fujimori": {
+      "description": "KOBIETA (wyodrębniono z relacji serii)"
+    },
+    "Pokota": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Sachi Akafuku": {
+      "description": "KOBIETA (wyodrębniono z relacji serii)"
+    },
     "Rei Teshima -> Hebichika-sensei": {
-      "description": "Zwrot: 'pani Sensei / Sensei' (asystentka -> autorka i mistrzyni)"
+      "description": "Zwrot: 'Pani Hebichiko' / 'Sensei' (asystentka -> autorka i mistrzyni)"
     },
     "Hebichika-sensei -> Rei Teshima": {
       "description": "Zwrot: 'nowicjuszka / Teshima-chan' (główna autorka -> nowa asystentka)"
     },
     "Hana -> Rei Teshima": {
-      "description": "Zwrot: 'Rei-chan / Teshima-san' (redaktorka wydawnictwa -> autorka mangi)"
+      "description": "Zwrot: 'Pani Teshimo / pani [forma per pani]' (redaktorka wydawnictwa Shogakukan -> autorka mangi; ścisła konsekwencja T-V, zakaz form poufałych 'ty' / 'Zaufaj mi')"
+    },
+    "Rei Teshima -> Hana Kongouji": {
+      "description": "Zwrot: 'Pani redaktor / pani Kongouji' (autorka -> redaktorka wydawnictwa, relacja formalna per 'Pani')"
     },
     "Nana Teramura -> Rei Teshima": {
       "description": "Zwrot: 'Rei / Rei-chan' (bliskie przyjaciółki)"
@@ -17,14 +50,26 @@
       "description": "Zwrot: 'Sensei' (główna asystentka -> autorka mangi)"
     },
     "Ai Yasumi -> Rei Teshima": {
-      "description": "Zwrot: 'panno Teshimo / pani profesor' (uczenica -> nauczycielka / mentorka)"
+      "description": "Zwrot: 'pani Teshimo / pani profesor / Teshima-sensei' (uczennica -> nauczycielka / mentorka)"
+    },
+    "Rei Teshima -> Ai Yasumi": {
+      "description": "Zwrot: 'Yasumi / Ai / Yasumi-san' (nauczycielka -> uczennica)"
+    },
+    "Ai Yasumi -> Kokoro Fujimori": {
+      "description": "Zwrot: 'Fujimori / Kokoro' (koleżanki z klasy liceum i klubu mangi, relacja rówieśnicza na 'ty', bezwzględny zakaz 'Pani Fujimori')"
+    },
+    "Kokoro Fujimori -> Ai Yasumi": {
+      "description": "Zwrot: 'Yasumi / Ai' (koleżanki z klasy i klubu mangi, relacja rówieśnicza na 'ty')"
+    },
+    "Pokota -> Rei Teshima": {
+      "description": "Zwrot: 'Pani Teshima / Teshima-sensei' (narrator/maskotka -> nauczycielka)"
     },
     "Sachi Akafuku -> Rei Teshima": {
-      "description": "Zwrot: 'Tessie / pani Teshimo' (uczenica -> nauczycielka (poufała))"
+      "description": "Zwrot: 'Tessie / pani Teshimo' (uczennica -> nauczycielka (poufała))"
     }
   },
   "glossary": {
-    "Storyboard / Storyboards": "scenopis",
+    "Storyboard / Storyboards": "scenopis / scenorys",
     "One-shot": "one-shot",
     "Serialization": "serializacja",
     "Tones / Screentones": "rastry",
@@ -38,11 +83,234 @@
     "Great Road Cut": "Geologiczny Przekrój Drogi",
     "Senzu no Kiritoshi": "Senzu no Kiritoshi",
     "Ura-Sabaku Desert": "Pustynia Ura-Sabaku",
-    "Mount Mihara": "Góra Mihara"
+    "Mount Mihara": "Góra Mihara",
+    "Gojinka": "Gojinka (biernik: Gojinkę)",
+    "Input": "czerpanie inspiracji / chłonięcie wrażeń / zbieranie doświadczeń",
+    "Output": "tworzenie / przelewanie na papier / rysowanie",
+    "Tamaya": "Ale widok! / Cudo! / Ooo! (okrzyk podziwu dla fajerwerków)",
+    "Dark Fuwa": "mroczny chowaniec, Dark Fuwa (biernik: Dark Fuwę)",
+    "Fujimori": "Fujimori (koleżanka z klubu; relacja rówieśnicza na 'ty', zakaz: Pani Fujimori)",
+    "Loup Garou": "Loup Garou (nick internetowy na platformie X)",
+    "Panda Addict": "Panda Addict (użytkowniczka sieci / komentatorka)"
   },
-  "relationships": {},
+  "relationships": {
+    "Rei Teshima -> Hebichika-sensei": "Zwrot: 'Pani Hebichiko' / 'Sensei' (asystentka -> autorka i mistrzyni)",
+    "Hebichika-sensei -> Rei Teshima": "Zwrot: 'nowicjuszka / Teshima-chan' (główna autorka -> nowa asystentka)",
+    "Hana -> Rei Teshima": "Zwrot: 'Pani Teshimo / pani [forma per pani]' (redaktorka wydawnictwa Shogakukan -> autorka mangi; ścisła konsekwencja T-V, zakaz form poufałych 'ty' / 'Zaufaj mi')",
+    "Rei Teshima -> Hana Kongouji": "Zwrot: 'Pani redaktor / pani Kongouji' (autorka -> redaktorka wydawnictwa, relacja formalna per 'Pani')",
+    "Nana Teramura -> Rei Teshima": "Zwrot: 'Rei / Rei-chan' (bliskie przyjaciółki)",
+    "Harue Natsukusa -> Hebichika-sensei": "Zwrot: 'Sensei' (główna asystentka -> autorka mangi)",
+    "Ai Yasumi -> Rei Teshima": "Zwrot: 'pani Teshimo / pani profesor / Teshima-sensei' (uczennica -> nauczycielka / mentorka)",
+    "Rei Teshima -> Ai Yasumi": "Zwrot: 'Yasumi / Ai / Yasumi-san' (nauczycielka -> uczennica)",
+    "Ai Yasumi -> Kokoro Fujimori": "Zwrot: 'Fujimori / Kokoro' (koleżanki z klasy liceum i klubu mangi, relacja rówieśnicza na 'ty', bezwzględny zakaz 'Pani Fujimori')",
+    "Kokoro Fujimori -> Ai Yasumi": "Zwrot: 'Yasumi / Ai' (koleżanki z klasy i klubu mangi, relacja rówieśnicza na 'ty')",
+    "Pokota -> Rei Teshima": "Zwrot: 'Pani Teshima / Teshima-sensei' (narrator/maskotka -> nauczycielka)",
+    "Sachi Akafuku -> Rei Teshima": "Zwrot: 'Tessie / pani Teshimo' (uczennica -> nauczycielka (poufała))"
+  },
   "episodes_translated": [
     "tmpifcrjna7",
-    "[ASW] Kore Kaite Shine - 08 [1080p HEVC][BEE89952]"
-  ]
+    "[ASW] Kore Kaite Shine - 08 [1080p HEVC][BEE89952]",
+    "[ASW] Kore Kaite Shine - 09 [1080p HEVC]"
+  ],
+  "declensions": {
+    "Rei Teshima": {
+      "M": "Rei Teshima",
+      "D": "Rei Teshimy",
+      "C": "Rei Teshimie",
+      "B": "Rei Teshimę",
+      "N": "Rei Teshimą",
+      "Ms": "Rei Teshimie",
+      "W": "Rei Teshimo"
+    },
+    "Hebichika": {
+      "M": "Hebichika",
+      "D": "Hebichiki",
+      "C": "Hebichice",
+      "B": "Hebichikę",
+      "N": "Hebichiką",
+      "Ms": "Hebichice",
+      "W": "Hebichiko"
+    },
+    "Hana": {
+      "M": "Hana",
+      "D": "Hany",
+      "C": "Hanie",
+      "B": "Hanę",
+      "N": "Haną",
+      "Ms": "Hanie",
+      "W": "Hano"
+    },
+    "Hana Kongouji": {
+      "M": "Hana Kongouji",
+      "D": "Hany Kongouji",
+      "C": "Hanie Kongouji",
+      "B": "Hanę Kongouji",
+      "N": "Haną Kongouji",
+      "Ms": "Hanie Kongouji",
+      "W": "Hano Kongouji"
+    },
+    "Nana Teramura": {
+      "M": "Nana Teramura",
+      "D": "Nany Teramury",
+      "C": "Nanie Teramurze",
+      "B": "Nanę Teramurę",
+      "N": "Naną Teramurą",
+      "Ms": "Nanie Teramurze",
+      "W": "Nano Teramuro"
+    },
+    "Harue Natsukusa": {
+      "M": "Harue Natsukusa",
+      "D": "Harue Natsukusy",
+      "C": "Harue Natsukusie",
+      "B": "Harue Natsukusę",
+      "N": "Harue Natsukusą",
+      "Ms": "Harue Natsukusie",
+      "W": "Harue Natsukuso"
+    },
+    "Ai Yasumi": {
+      "M": "Ai Yasumi",
+      "D": "Ai Yasumi",
+      "C": "Ai Yasumi",
+      "B": "Ai Yasumi",
+      "N": "Ai Yasumi",
+      "Ms": "Ai Yasumi",
+      "W": "Ai Yasumi"
+    },
+    "Kokoro Fujimori": {
+      "M": "Kokoro Fujimori",
+      "D": "Kokoro Fujimori",
+      "C": "Kokoro Fujimori",
+      "B": "Kokoro Fujimori",
+      "N": "Kokoro Fujimori",
+      "Ms": "Kokoro Fujimori",
+      "W": "Kokoro Fujimori"
+    },
+    "Pokota": {
+      "M": "Pokota",
+      "D": "Pokoty",
+      "C": "Pokocie",
+      "B": "Pokotę",
+      "N": "Pokotą",
+      "Ms": "Pokocie",
+      "W": "Pokoto"
+    },
+    "Sachi Akafuku": {
+      "M": "Sachi Akafuku",
+      "D": "Sachi Akafuku",
+      "C": "Sachi Akafuku",
+      "B": "Sachi Akafuku",
+      "N": "Sachi Akafuku",
+      "Ms": "Sachi Akafuku",
+      "W": "Sachi Akafuku"
+    },
+    "Rei Teshima -> Hebichika-sensei": {
+      "M": "Rei Teshima -> Hebichika-sensei",
+      "D": "Rei Teshimy -> Hebichika-sensei",
+      "C": "Rei Teshimie -> Hebichika-sensei",
+      "B": "Rei Teshimę -> Hebichika-sensei",
+      "N": "Rei Teshimą -> Hebichika-sensei",
+      "Ms": "Rei Teshimie -> Hebichika-sensei",
+      "W": "Rei Teshimo -> Hebichika-sensei"
+    },
+    "Hebichika-sensei -> Rei Teshima": {
+      "M": "Hebichika-sensei -> Rei Teshima",
+      "D": "Hebichika-sensei -> Rei Teshimy",
+      "C": "Hebichika-sensei -> Rei Teshimie",
+      "B": "Hebichika-sensei -> Rei Teshimę",
+      "N": "Hebichika-sensei -> Rei Teshimą",
+      "Ms": "Hebichika-sensei -> Rei Teshimie",
+      "W": "Hebichika-sensei -> Rei Teshimo"
+    },
+    "Hana -> Rei Teshima": {
+      "M": "Hana -> Rei Teshima",
+      "D": "Hany -> Rei Teshimy",
+      "C": "Hanie -> Rei Teshimie",
+      "B": "Hanę -> Rei Teshimę",
+      "N": "Haną -> Rei Teshimą",
+      "Ms": "Hanie -> Rei Teshimie",
+      "W": "Hano -> Rei Teshimo"
+    },
+    "Rei Teshima -> Hana Kongouji": {
+      "M": "Rei Teshima -> Hana Kongouji",
+      "D": "Rei Teshimy -> Hany Kongouji",
+      "C": "Rei Teshimie -> Hanie Kongouji",
+      "B": "Rei Teshimę -> Hanę Kongouji",
+      "N": "Rei Teshimą -> Haną Kongouji",
+      "Ms": "Rei Teshimie -> Hanie Kongouji",
+      "W": "Rei Teshimo -> Hano Kongouji"
+    },
+    "Nana Teramura -> Rei Teshima": {
+      "M": "Nana Teramura -> Rei Teshima",
+      "D": "Nany Teramury -> Rei Teshimy",
+      "C": "Nanie Teramurze -> Rei Teshimie",
+      "B": "Nanę Teramurę -> Rei Teshimę",
+      "N": "Naną Teramurą -> Rei Teshimą",
+      "Ms": "Nanie Teramurze -> Rei Teshimie",
+      "W": "Nano Teramuro -> Rei Teshimo"
+    },
+    "Harue Natsukusa -> Hebichika-sensei": {
+      "M": "Harue Natsukusa -> Hebichika-sensei",
+      "D": "Harue Natsukusy -> Hebichika-sensei",
+      "C": "Harue Natsukusie -> Hebichika-sensei",
+      "B": "Harue Natsukusę -> Hebichika-sensei",
+      "N": "Harue Natsukusą -> Hebichika-sensei",
+      "Ms": "Harue Natsukusie -> Hebichika-sensei",
+      "W": "Harue Natsukuso -> Hebichika-sensei"
+    },
+    "Ai Yasumi -> Rei Teshima": {
+      "M": "Ai Yasumi -> Rei Teshima",
+      "D": "Ai Yasumi -> Rei Teshimy",
+      "C": "Ai Yasumi -> Rei Teshimie",
+      "B": "Ai Yasumi -> Rei Teshimę",
+      "N": "Ai Yasumi -> Rei Teshimą",
+      "Ms": "Ai Yasumi -> Rei Teshimie",
+      "W": "Ai Yasumi -> Rei Teshimo"
+    },
+    "Rei Teshima -> Ai Yasumi": {
+      "M": "Rei Teshima -> Ai Yasumi",
+      "D": "Rei Teshimy -> Ai Yasumi",
+      "C": "Rei Teshimie -> Ai Yasumi",
+      "B": "Rei Teshimę -> Ai Yasumi",
+      "N": "Rei Teshimą -> Ai Yasumi",
+      "Ms": "Rei Teshimie -> Ai Yasumi",
+      "W": "Rei Teshimo -> Ai Yasumi"
+    },
+    "Ai Yasumi -> Kokoro Fujimori": {
+      "M": "Ai Yasumi -> Kokoro Fujimori",
+      "D": "Ai Yasumi -> Kokoro Fujimori",
+      "C": "Ai Yasumi -> Kokoro Fujimori",
+      "B": "Ai Yasumi -> Kokoro Fujimori",
+      "N": "Ai Yasumi -> Kokoro Fujimori",
+      "Ms": "Ai Yasumi -> Kokoro Fujimori",
+      "W": "Ai Yasumi -> Kokoro Fujimori"
+    },
+    "Kokoro Fujimori -> Ai Yasumi": {
+      "M": "Kokoro Fujimori -> Ai Yasumi",
+      "D": "Kokoro Fujimori -> Ai Yasumi",
+      "C": "Kokoro Fujimori -> Ai Yasumi",
+      "B": "Kokoro Fujimori -> Ai Yasumi",
+      "N": "Kokoro Fujimori -> Ai Yasumi",
+      "Ms": "Kokoro Fujimori -> Ai Yasumi",
+      "W": "Kokoro Fujimori -> Ai Yasumi"
+    },
+    "Pokota -> Rei Teshima": {
+      "M": "Pokota -> Rei Teshima",
+      "D": "Pokoty -> Rei Teshimy",
+      "C": "Pokocie -> Rei Teshimie",
+      "B": "Pokotę -> Rei Teshimę",
+      "N": "Pokotą -> Rei Teshimą",
+      "Ms": "Pokocie -> Rei Teshimie",
+      "W": "Pokoto -> Rei Teshimo"
+    },
+    "Sachi Akafuku -> Rei Teshima": {
+      "M": "Sachi Akafuku -> Rei Teshima",
+      "D": "Sachi Akafuku -> Rei Teshimy",
+      "C": "Sachi Akafuku -> Rei Teshimie",
+      "B": "Sachi Akafuku -> Rei Teshimę",
+      "N": "Sachi Akafuku -> Rei Teshimą",
+      "Ms": "Sachi Akafuku -> Rei Teshimie",
+      "W": "Sachi Akafuku -> Rei Teshimo"
+    }
+  },
+  "plot_anchors": {}
 }

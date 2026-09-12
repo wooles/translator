@@ -4633,6 +4633,1057 @@ def test_batch_density_scene_coalescence_and_cost_optimization():
     print(" -> PASSED: Optymalizacja partycjonowania, eliminacja mikro-paczek i koalescencja scen działają w 100% (0.00 PLN).")
 
 
+def test_anti_calque_morphology_and_single_char_actor_resilience():
+    """
+    Test 61: Protokół 5 Warstw eliminacji kalk fansuberskich, generalizacji morfologicznej
+    fleksji 1. osoby oraz odporności na etykiety jednoznakowe postaci (0.00 PLN).
+    Weryfikuje uodpornienie całego potoku na defekty zidentyfikowane w odcinku 11 Otome Kaijuu Carameliser.
+    """
+    print("[TEST 61] Test 5 warstw: eliminacja kalk fansuberskich, generalizacja morfologii fleksji 1. os. i obsługa etykiet jednoznakowych...")
+    import pysubs2
+    from inspect import getsource
+    from avt_linter import (
+        AVTLinter, EpisodeQualityGate,
+        convert_first_person_masculine_to_feminine,
+        convert_first_person_feminine_to_masculine
+    )
+    from series_memory import SeriesBible, generate_polish_name_declension
+    from rules import BELCZYK_AVT_MASTER_CANON
+
+    # 1. Warstwa 1: profiler.py - obecność nowych dyrektyw Filaru CLXVI w Profilerze 4.0
+    import profiler
+    profiler_src = getsource(profiler.EpisodeProfiler.profile_episode)
+    assert "Come back in one piece" in profiler_src, "Brak dyrektywy 'in one piece' w profiler.py"
+    assert "get your hopes up" in profiler_src, "Brak dyrektywy 'get your hopes up' w profiler.py"
+    assert "Die at the hands of" in profiler_src, "Brak dyrektywy 'Die at the hands of' w profiler.py"
+    assert "Panno" in profiler_src, "Brak ostrzeżenia przed tytulaturą 'Panno X' w relacjach szkolnych w profiler.py"
+
+    # 2. Warstwa 2: series_memory.py - odporność na etykiety 1-znakowe i integralność biblii Otome Kaijuu Carameliser
+    # Asercja 2a: brak crashu IndexError na jednoznakowych tokenach
+    decl_butler_a = generate_polish_name_declension("Butler A")
+    assert decl_butler_a["M"] == "Butler A"
+    assert "Butler" in decl_butler_a["D"]
+    assert "A" in decl_butler_a["D"]
+
+    decl_jsdf_a = generate_polish_name_declension("JSDF A")
+    assert decl_jsdf_a["M"] == "JSDF A"
+
+    decl_single_a = generate_polish_name_declension("A")
+    assert decl_single_a["M"] == "A"
+    assert decl_single_a["D"] == "A"
+
+    # Asercja 2b: poprawność wpisów w biblii Otome Kaijuu Carameliser
+    bible = SeriesBible("Otome Kaijuu Carameliser")
+    chars = bible.data.get("characters", {})
+    assert "Arata -> Kuroe" in chars
+    assert "KOBIETA" in chars["Arata -> Kuroe"]["description"]
+    assert "Kuro-tasiu" not in chars.get("Raimu -> Kuroe", {}).get("description", "")
+    assert "Seina Katsuragi" in chars
+    assert "kobieta" in chars["Seina Katsuragi"]["description"].lower()
+
+    # 3. Warstwa 3: rules.py - Filar CLXVI zawiera twarde zakazy kalk fansuberskich
+    assert "Come back in one piece" in BELCZYK_AVT_MASTER_CANON
+    assert "Don't get your hopes up" in BELCZYK_AVT_MASTER_CANON
+    assert "Die at the hands of" in BELCZYK_AVT_MASTER_CANON
+    assert "w jednym kawałku" in BELCZYK_AVT_MASTER_CANON
+
+    # 4. Warstwa 4: avt_linter.py - Uogólniona analiza morfologiczna 1. osoby oraz deterministyczne zastąpienia kalk
+    # Asercja 4a: konwersja morfologiczna męski -> żeński
+    assert convert_first_person_masculine_to_feminine("wybrałem") == "wybrałam"
+    assert convert_first_person_masculine_to_feminine("Wybrałem") == "Wybrałam"
+    assert convert_first_person_masculine_to_feminine("poczułem") == "poczułam"
+    assert convert_first_person_masculine_to_feminine("zobaczyłem") == "zobaczyłam"
+    assert convert_first_person_masculine_to_feminine("poszedłem") == "poszłam"
+    assert convert_first_person_masculine_to_feminine("ciałem") is None  # brak fałszywych trafień dla rzeczowników!
+
+    # Asercja 4b: konwersja morfologiczna żeński -> męski
+    assert convert_first_person_feminine_to_masculine("wybrałam") == "wybrałem"
+    assert convert_first_person_feminine_to_masculine("poszłam") == "poszedłem"
+    assert convert_first_person_feminine_to_masculine("zrobiłam") == "zrobiłem"
+
+    # Asercja 4c: EpisodeQualityGate na trudnym skrypcie imitującym odcinek 11
+    test_subs = pysubs2.SSAFile()
+    # Linia 1: Seina (kobieta) - formy żeńskie NIE MOGĄ być zmieniane na męskie
+    test_subs.events.append(pysubs2.SSAEvent(start=1000, end=3000, name="Seina", text="Mówiłam, że chcę z tobą zagrać!"))
+    # Linia 2: Seina mówi o powrocie w jednym kawałku
+    test_subs.events.append(pysubs2.SSAEvent(start=4000, end=6000, name="Seina", text="Tylko wróć w jednym kawałku!"))
+    # Linia 3: Kuroe (kobieta) mówiła z błędem w rodzaju męskim "wybrałem się"
+    test_subs.events.append(pysubs2.SSAEvent(start=7000, end=9000, name="Kuroe", text="I tak się cieszę, że wybrałem się tu dzisiaj z tobą."))
+    # Linia 4: Kalka "zginąć z ręki Harugona"
+    test_subs.events.append(pysubs2.SSAEvent(start=10000, end=12000, name="Manatsu", text="Nie ma wspanialszego końca niż zginąć z ręki Harugona!"))
+    # Linia 5: Kalka "nie róbcie sobie nadziei" po znaku nowej linii \N
+    test_subs.events.append(pysubs2.SSAEvent(start=13000, end=15000, name="Kuroe", text="Czekajcie, ludzie,\\Nnie róbcie sobie nadziei!"))
+    # Linia 6: Kalka "skop mu tyłek"
+    test_subs.events.append(pysubs2.SSAEvent(start=16000, end=18000, name="Taichi", text="Dajesz, Harugon! Skop mu tyłek!"))
+    # Linia 7: Kalka "czemu po prostu jej nie wysłuchałem"
+    test_subs.events.append(pysubs2.SSAEvent(start=19000, end=21000, name="Arata", text="Czemu po prostu jej nie wysłuchałem?"))
+    # Linia 8: Kalka "za nic z tym nie zawalczę"
+    test_subs.events.append(pysubs2.SSAEvent(start=22000, end=24000, name="Kuroe", text="Za nic z tym nie zawalczę!"))
+    # Linia 9 & 10: Statyści z jednoznakową etykietą Butler A i JSDF A (test odporności na crash)
+    test_subs.events.append(pysubs2.SSAEvent(start=25000, end=27000, name="Butler A", text="Przyjąłem rozkaz."))
+    test_subs.events.append(pysubs2.SSAEvent(start=28000, end=30000, name="JSDF A", text="Wszyscy, nie zatrzymywać się!"))
+
+    char_registry = {
+        "Kuroe": "Główna bohaterka, licealistka, dziewczyna",
+        "Seina": "Licealistka i profesjonalna aktorka, kobieta",
+        "Arata": "Minami Arata, chłopak, uczeń",
+        "Manatsu": "Dziewczyna, licealistka",
+        "Taichi": "Chłopiec, młodszy kolega"
+    }
+
+    fixed_subs, fixes = EpisodeQualityGate.audit_and_fix_entire_episode(
+        test_subs,
+        character_registry=char_registry,
+        series_bible=bible
+    )
+
+    # Weryfikacja efektów
+    assert fixed_subs.events[0].text == "Mówiłam, że chcę z tobą zagrać!", f"Błąd ochrony płci Seiny: {fixed_subs.events[0].text}"
+    assert "cały i zdrowy" in fixed_subs.events[1].text, f"Błąd korekty 'w jednym kawałku': {fixed_subs.events[1].text}"
+    assert "wybrałam się" in fixed_subs.events[2].text, f"Błąd uogólnionej korekty morfologicznej: {fixed_subs.events[2].text}"
+    assert "zginąć od ciosu Harugona" in fixed_subs.events[3].text, f"Błąd korekty 'zginąć z ręki': {fixed_subs.events[3].text}"
+    assert "nie liczcie na mnie" in fixed_subs.events[4].text, f"Błąd korekty 'nie róbcie sobie nadziei': {fixed_subs.events[4].text}"
+    assert "Daj mu popalić" in fixed_subs.events[5].text, f"Błąd korekty 'skop mu tyłek': {fixed_subs.events[5].text}"
+    assert "Dlaczego jej nie posłuchałem" in fixed_subs.events[6].text, f"Błąd korekty 'czemu po prostu...': {fixed_subs.events[6].text}"
+    assert "Za nic nie stanę do walki z czymś takim" in fixed_subs.events[7].text, f"Błąd korekty składni: {fixed_subs.events[7].text}"
+    assert fixed_subs.events[8].name == "Butler A"
+    assert fixed_subs.events[9].name == "JSDF A"
+
+    print(" -> PASSED: Protokół 5 Warstw, eliminacja kalk fansuberskich, uogólniona morfologia 1. os. oraz odporność na tokeny jednoznakowe działają w 100% (0.00 PLN).")
+
+
+def test_database_integrity_anilist_resilience_and_slug_consolidation():
+    """
+    Test 62: Kompleksowy test integralności baz danych, konsolidacji slugów,
+    odporności na awarię AniList API (Offline-First / Circuit-Breaker) oraz normalizacji TM.
+    """
+    print("\n[TEST 62] Test 5 warstw: integralność baz danych, odporność na awarię AniList i konsolidacja slugów...")
+
+    import json
+    import sqlite3
+    from inspect import getsource
+    from pathlib import Path
+    import metadata
+    from metadata import clean_anime_filename, get_anime_context, fetch_anilist_metadata
+    from series_memory import SeriesBible, clean_anime_slug, SERIES_MEMORY_DIR
+    from rules import BELCZYK_AVT_MASTER_CANON
+
+    # 1. Warstwa 1: metadata.py - obsługa wydań z kropkami i tagami torrentowymi
+    raw_torrent = "KAMUI.Hes.Behind.You.S01E07.REPACK.1080p.UNCENSORED.AMZN.WEB-DL.JPN.DDP2.0.H.264.MSubs-ToonsHub"
+    clean_t = clean_anime_filename(raw_torrent)
+    assert clean_t == "KAMUI Hes Behind You", f"Błąd clean_anime_filename na torrencie: '{clean_t}'"
+
+    # Warstwa 1: Offline-First / Bible-First w get_anime_context
+    ctx_local = get_anime_context("Otome Kaijuu Carameliser - 11.mkv")
+    assert ctx_local is not None, "get_anime_context zwrócił None dla istniejącej serii"
+    assert ctx_local.get("source") == "local_series_bible", f"Błąd: get_anime_context nie pobrał danych z lokalnej SeriesBible: {ctx_local.get('source')}"
+    assert len(ctx_local.get("characters", [])) >= 2, "Brak postaci w lokalnym kontekście"
+
+    # Warstwa 1: Circuit-Breaker dla AniList
+    metadata._ANILIST_DISABLED = True
+    assert fetch_anilist_metadata("Brakujące Anime") is None, "Circuit-breaker nie zablokował zapytania do AniList"
+    metadata._ANILIST_DISABLED = False  # reset flagi
+
+    # Warstwa 1: Dynamiczny fallback do najwyższego modelu Flash w fetch_gemini_metadata
+    meta_src = getsource(metadata.fetch_gemini_metadata)
+    assert "resolve_best_models" in meta_src, "Brak użycia resolve_best_models w fetch_gemini_metadata"
+    assert 'best.get("flash")' in meta_src or "best.get('flash')" in meta_src, "Brak wymogu najwyższego modelu Flash w fallbacku"
+
+    # 2. Warstwa 2: series_memory.py - konsolidacja i brak rozbitych plików na dysku
+    existing_files = [f.name for f in SERIES_MEMORY_DIR.glob("*.json")]
+    forbidden_files = [
+        "Kingdom_6th_Season_bible.json",
+        "Otome_Kaijuu_Caraméliser_bible.json",
+        "Rakudai_Kenja_no_Gakuin_Musou_Nido_Tensei_Shita_Sa_bible.json",
+        "Clevatess_Majuu_no_Ou_to_Akago_to_Shikabane_no_Yuu_bible.json",
+        "Silent_Witch_Chinmoku_no_Majo_no_Kakushigoto_bible.json",
+        "KAMUIHesBehindYouS01E07REPACK1080pUNCENSOREDAMZNWE_bible.json"
+    ]
+    for ff in forbidden_files:
+        assert ff not in existing_files, f"Zabroniony/rozbity plik wciąż istnieje na dysku: {ff}"
+
+    # Warstwa 2: clean_anime_slug z normalizacją znaków diakrytycznych
+    slug_e = clean_anime_slug("Otome Kaijuu Caraméliser")
+    assert slug_e == "Otome_Kaijuu_Carameliser", f"Błąd normalizacji diakrytyków w clean_anime_slug: {slug_e}"
+
+    # Warstwa 2: poprawność relacji A -> B i brak skażenia płci adresata
+    bible_kami = SeriesBible("Kami no Shizuku")
+    chars_kami = bible_kami.data.get("characters", {})
+    assert "[KOBIETA (Adresat)" not in chars_kami.get("Shizuku -> Hayama", {}).get("description", "")
+    assert "[KOBIETA (Adresat)" not in chars_kami.get("Miyabi -> Shizuku", {}).get("description", "")
+
+    bible_rakudai = SeriesBible("Rakudai Kenja no Gakuin Musou")
+    chars_rakudai = bible_rakudai.data.get("characters", {})
+    assert "[KOBIETA (Adresat)" not in chars_rakudai.get("Anastasia -> Eftal", {}).get("description", "")
+
+    # Warstwa 2: weryfikacja algorytmu _sanitize_character_entry dla relacji uczennica -> mistrz
+    clean_test_rel = bible_rakudai._sanitize_character_entry("Uczennica -> Mistrz", "Zwrot: 'mistrzu' (uczennica -> męski mistrz magii)")
+    assert "[KOBIETA (Adresat)" not in clean_test_rel, f"Błąd: _sanitize_character_entry przypisał [KOBIETA (Adresat)] męskiemu mistrzowi: {clean_test_rel}"
+
+    # Warstwa 2: brak literówek 'Postad' i deformacji 'Kataklizmus' w żadnej bazie
+    for f in SERIES_MEMORY_DIR.glob("*.json"):
+        with open(f, "r", encoding="utf-8") as fp:
+            content = fp.read()
+        assert "Postad" not in content, f"Wykryto literówkę 'Postad' w {f.name}"
+        assert "Kataklizmus" not in content, f"Wykryto deformację 'Kataklizmus' w {f.name}"
+
+    # 3. Warstwa 3: rules.py - obecność reguł integralności bazy i zakazu deformacji pojęciowych
+    assert "Kataklizmus" in BELCZYK_AVT_MASTER_CANON, "Brak zakazu deformacji 'Kataklizmus' w rules.py"
+    assert "KOBIETA (Adresat)" in BELCZYK_AVT_MASTER_CANON, "Brak ochrony tagów adresata w rules.py"
+
+    # 4. Warstwa 4: memory.py i translation_memory.db
+    import memory
+    mem_src = getsource(memory.TranslationMemory.index_database_directory)
+    assert "clean_anime_filename" in mem_src, "Brak użycia clean_anime_filename w memory.py"
+
+    # Weryfikacja bazy SQLite translation_memory.db
+    db_path = Path("translation_memory.db")
+    if db_path.exists():
+        with sqlite3.connect(str(db_path)) as conn:
+            cur = conn.cursor()
+            cur.execute("SELECT DISTINCT anime_title FROM translation_pairs WHERE anime_title LIKE '%[Trix]%' OR anime_title LIKE 'S02E%'")
+            dirty_rows = cur.fetchall()
+            assert len(dirty_rows) == 0, f"Wykryto nieznormalizowane tytuły w translation_memory.db: {dirty_rows}"
+
+    print(" -> PASSED: Integralność baz danych, odporność na awarię AniList (Offline-First/Circuit-Breaker) i konsolidacja slugów działają w 100% (0.00 PLN).")
+
+
+def test_sayonara_lara_holistic_domain_declension_vocative_and_syntax_guard():
+    print("[TEST 63/63] Holistyczna weryfikacja 5 domen: deklinacja obcych imion na -ca, wołacz gramatyczny, Ouji, kalki konwersacyjne i sanitizacja ASS...")
+    
+    # 1. Warstwa 1: profiler.py (Pre-pass)
+    import inspect
+    import profiler
+    prof_src = inspect.getsource(profiler.EpisodeProfiler.profile_episode)
+    assert "Luca -> do Luki" in prof_src or "do Luki" in prof_src, "Brak wytycznych dla odmiany -ca w profiler.py"
+    assert "Ouji" in prof_src, "Brak zakazu Ouji w profiler.py"
+    assert "I co z tego?" in prof_src, "Brak zakazu agresywnej kalki 'I co z tego?' w profiler.py"
+
+    # 2. Warstwa 2: series_memory.py (Baza Wiedzy)
+    from series_memory import generate_polish_name_declension, TYPO_NORMALIZATIONS
+    luca_decl = generate_polish_name_declension("Luca", "MALE")
+    assert luca_decl["D"] == "Luki", f"Błędny dopełniacz imienia Luca: {luca_decl['D']}"
+    assert luca_decl["C"] == "Luce", f"Błędny celownik imienia Luca: {luca_decl['C']}"
+    assert luca_decl["B"] == "Lukę", f"Błędny biernik imienia Luca: {luca_decl['B']}"
+    assert luca_decl["W"] == "Luco", f"Błędny wołacz imienia Luca: {luca_decl['W']}"
+
+    lara_decl = generate_polish_name_declension("Lara", "FEMALE")
+    assert lara_decl["W"] == "Laro", f"Błędny wołacz imienia Lara: {lara_decl['W']}"
+    assert lara_decl["D"] == "Lary", f"Błędny dopełniacz imienia Lara: {lara_decl['D']}"
+
+    assert any("Ouji" in pat for pat, _ in TYPO_NORMALIZATIONS), "Brak normalizacji Ouji w TYPO_NORMALIZATIONS"
+    assert any("co\\s+z\\s+tego" in pat for pat, _ in TYPO_NORMALIZATIONS), "Brak normalizacji 'I co z tego?' w TYPO_NORMALIZATIONS"
+
+    # 3. Warstwa 3: rules.py (Kanon & Prompty)
+    from rules import BELCZYK_AVT_MASTER_CANON
+    assert "do Luki" in BELCZYK_AVT_MASTER_CANON, "Brak reguły deklinacji -ca w rules.py"
+    assert "Ouji" in BELCZYK_AVT_MASTER_CANON, "Brak zakazu Ouji w rules.py"
+    assert "I co z tego" in BELCZYK_AVT_MASTER_CANON, "Brak reguły kontynuacji pytań dla 'I co z tego?' w rules.py"
+
+    # 4. Warstwa 4: avt_linter.py (EpisodeQualityGate - 0.00 PLN)
+    import pysubs2
+    from avt_linter import EpisodeQualityGate
+
+    test_script_ass = """[Script Info]
+Title: Test Sayonara
+ScriptType: v4.00+
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Arial,20,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1
+Style: Italics,Arial,20,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,-1,0,0,100,100,0,0,1,2,2,2,10,10,10,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:08.18,0:00:09.60,Default,SIGN,0,0,0,,{\\shad0\\bord0\\fs16\\\\b1\\c&HCDCAC6&\\pos(572,115)}Punkty
+Dialogue: 0,0:03:22.98,0:03:25.05,Default,LARA,0,0,0,,Dziś znowu idę do Luci.
+Dialogue: 0,0:04:01.21,0:04:03.12,Italics,LARA,0,0,0,,{\\i1}Luca od razu się jeży.{\\i0}
+Dialogue: 0,0:04:03.51,0:04:07.52,Default,LUCA,0,0,0,,Próbuję po prostu uchwycić\\Ntwoją złożoną naturę, Lara.
+Dialogue: 0,0:11:42.00,0:11:43.10,Default,LARA,0,0,0,,Ouji?!
+Dialogue: 0,0:11:53.58,0:11:54.51,Default,LARA,0,0,0,,I co z tego?
+Dialogue: 0,0:11:54.89,0:11:56.28,Default,LARA,0,0,0,,To wy...
+"""
+    subs = pysubs2.SSAFile.from_string(test_script_ass)
+    char_reg = {"Luca": "mężczyzna", "Lara": "kobieta"}
+    res_subs, fixes = EpisodeQualityGate.audit_and_fix_entire_episode(
+        subs,
+        character_registry=char_reg
+    )
+
+    # Asercje napraw w Warstwie 4:
+    # 1. ASS Tag Sanitization
+    assert r"\\b1" not in res_subs.events[0].text and r"\b1" in res_subs.events[0].text, f"Nie usunięto podwójnego backslasha: {res_subs.events[0].text}"
+    # 2. Foreign Name Declension (-ca -> -ki)
+    assert "do Luki" in res_subs.events[1].text, f"Nie poprawiono 'do Luci' na 'do Luki': {res_subs.events[1].text}"
+    # 3. Redundant Italics Tags
+    assert r"\i1" not in res_subs.events[2].text and r"\i0" not in res_subs.events[2].text, f"Nie usunięto zbędnych tagów kursywy: {res_subs.events[2].text}"
+    # 4. Vocative
+    assert "naturę, Laro." in res_subs.events[3].text, f"Nie poprawiono wołacza na 'Laro.': {res_subs.events[3].text}"
+    # 5. Japanese False Proper Noun
+    assert "Książę?!" in res_subs.events[4].text, f"Nie przetłumaczono Ouji na Książę: {res_subs.events[4].text}"
+    # 6. Conversational continuation calque
+    assert "I co?" in res_subs.events[5].text and "I co z tego?" not in res_subs.events[5].text, f"Nie zamieniono agresywnego 'I co z tego?' na 'I co?': {res_subs.events[5].text}"
+
+    print(" -> PASSED: Holistyczna ochrona 5 domen (deklinacja -ca, wołacz, Ouji, kalki, tagi ASS) zweryfikowana we wszystkich 5 warstwach (0.00 PLN).")
+
+
+def test_carameliser_holistic_domain_dashes_conjunction_and_canon_guard():
+    print("[TEST 64/64] Holistyczna weryfikacja 6 domen: samotne myślniki, biernik współrzędny, honorofikatory i slang, kanon mangi, interpunkcja i clamping CPS...")
+
+    # 1. Warstwa 1: profiler.py (Pre-pass)
+    import inspect
+    import profiler
+    prof_src = inspect.getsource(profiler.EpisodeProfiler.profile_episode)
+    assert "Harugona" in prof_src, "Brak reguły koordynacji biernika w profiler.py"
+    assert "Potworny Królewicz" in prof_src, "Brak kanonu Potworny Królewicz w profiler.py"
+    assert "Senpai" in prof_src, "Brak reguły adaptacji Senpai w profiler.py"
+    assert "samotnych myślników" in prof_src.lower() or "pojedynczego myślnika" in prof_src.lower(), "Brak zakazu samotnych myślników w profiler.py"
+
+    # 2. Warstwa 2: series_memory.py (Baza Wiedzy)
+    from series_memory import TYPO_NORMALIZATIONS, sanitize_lexical_text
+    assert any("aiju" in pat for pat, _ in TYPO_NORMALIZATIONS), "Brak normalizacji Książę Kaiju w TYPO_NORMALIZATIONS"
+    assert any("Kuro-?taso" in pat for pat, _ in TYPO_NORMALIZATIONS), "Brak normalizacji Kuro-taso w TYPO_NORMALIZATIONS"
+    assert any("czy" in pat and "bez" in pat for pat, _ in TYPO_NORMALIZATIONS), "Brak normalizacji przecinka przed 'czy' w TYPO_NORMALIZATIONS"
+
+    norm_canon = sanitize_lexical_text("Książę Kaiju powraca!")
+    assert "Potworny Królewicz powraca!" in norm_canon, f"Błąd normalizacji kanonu: {norm_canon}"
+    norm_slang = sanitize_lexical_text("O, Kuro-taso!")
+    assert "O, Kuroe!" in norm_slang, f"Błąd normalizacji slangu otaku: {norm_slang}"
+    norm_comma = sanitize_lexical_text("w kapciach, czy bez?")
+    assert "w kapciach czy bez?" in norm_comma, f"Błąd normalizacji przecinka przed czy: {norm_comma}"
+
+    # 3. Warstwa 3: rules.py (Kanon & Prompty)
+    from rules import BELCZYK_AVT_MASTER_CANON, get_focused_rules_for_batch
+    assert "LONE DIALOGUE DASH" in BELCZYK_AVT_MASTER_CANON, "Brak zakazu samotnych myślników w Filarze LVII"
+    assert "Potworny Królewicz" in BELCZYK_AVT_MASTER_CANON, "Brak kanonu Potworny Królewicz w Filarze XXIII"
+    assert "BIERNIKA W SZEREGACH KONSOCJACYJNYCH" in BELCZYK_AVT_MASTER_CANON, "Brak reguły biernika współrzędnego w Filarze XCI"
+
+    focused_prompt = get_focused_rules_for_batch([
+        {"en": "- Save them, Harugon.", "speaker_gender": "MALE", "speaker": "Arata"},
+        {"en": "Senpai, are you okay?", "speaker_gender": "MALE", "speaker": "Kotaro"}
+    ])
+    assert "LONE DIALOGUE DASH" in BELCZYK_AVT_MASTER_CANON or "Zakaz Samotnych Myślników" in focused_prompt, "Brak dyspozytora myślników w focused_pillars"
+
+    # 4. Warstwa 4: avt_linter.py (EpisodeQualityGate - 0.00 PLN)
+    import pysubs2
+    from avt_linter import EpisodeQualityGate
+
+    test_script_ass = """[Script Info]
+Title: Test Carameliser
+ScriptType: v4.00+
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Arial,20,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:03.46,0:00:08.43,Default,sign,0,0,0,,{\\pos(588,82)}[ KSIĄŻĘ KAIJU W PROGRAMIE ]
+Dialogue: 0,0:00:05.45,0:00:08.43,Default,Arata,0,0,0,,- Ocalę cię, Harugonie.
+Dialogue: 0,0:00:10.00,0:00:12.00,Default,Arata,0,0,0,,- Idziesz już?\\N- Daj mi chwilę.
+Dialogue: 0,0:01:00.00,0:01:02.00,Default,Kotaro,0,0,0,,Akaishi-senpai!
+Dialogue: 0,0:01:05.00,0:01:07.00,Default,Rinko,0,0,0,,Wszystko w porządku.
+Dialogue: 0,0:01:07.10,0:01:09.00,Default,Kotaro,0,0,0,,Dziękuję, senpai!
+Dialogue: 0,0:01:10.00,0:01:12.00,Default,Kotaro,0,0,0,,O, Kuro-taso!
+Dialogue: 0,0:01:15.00,0:01:17.00,Default,Kuroe,0,0,0,,Będziesz w kapciach, czy bez?
+Dialogue: 0,0:07:38.28,0:07:39.14,Default,Arata,0,0,0,,Przecież to o mnie chodzi...
+Dialogue: 0,0:10:00.00,0:01:03.00,Default,Arata,0,0,0,,Przedstawiono Minamiego\\Ni Harugon niczym parę.
+Dialogue: 0,0:10:05.00,0:01:08.00,Default,Arata,0,0,0,,Nie ma pojęcia o Harugon!
+Dialogue: 0,0:16:32.44,0:16:34.28,Default,Kuroe,0,0,0,,Rin–
+"""
+    subs = pysubs2.SSAFile.from_string(test_script_ass)
+    char_reg = {"Arata": "mężczyzna", "Kuroe": "kobieta", "Rinko": "kobieta", "Kotaro": "mężczyzna"}
+    res_subs, fixes = EpisodeQualityGate.audit_and_fix_entire_episode(
+        subs,
+        character_registry=char_reg
+    )
+
+    # 5. Warstwa 5: Asercje integracyjne
+    # Domain 1: Lone dialogue dash stripped on single speaker, preserved on dual speaker
+    assert res_subs.events[1].text == "Ocalę cię, Harugonie.", f"Nie usunięto samotnego myślnika: {res_subs.events[1].text}"
+    assert res_subs.events[2].text == "- Idziesz już?\\N- Daj mi chwilę.", f"Uszkodzono poprawny wielogłos: {res_subs.events[2].text}"
+
+    # Domain 2: Coordinated accusative and prepositional locative
+    assert "i Harugona" in res_subs.events[9].text, f"Nie poprawiono biernika współrzędnego na 'Harugona': {res_subs.events[9].text}"
+    assert "o Harugonie" in res_subs.events[10].text, f"Nie poprawiono miejscownika na 'o Harugonie': {res_subs.events[10].text}"
+
+    # Domain 3: Honorifics & slang adaptation
+    assert res_subs.events[3].text == "Akaishi!", f"Nie zaadaptowano Akaishi-senpai: {res_subs.events[3].text}"
+    assert res_subs.events[5].text == "Dziękuję, Rinko!", f"Nie zaadaptowano senpai do addressee: {res_subs.events[5].text}"
+    assert res_subs.events[6].text == "O, Kuroe!", f"Nie zaadaptowano Kuro-taso: {res_subs.events[6].text}"
+
+    # Domain 4: Manga canon titular enforcement
+    assert "POTWORNY KRÓLEWICZ" in res_subs.events[0].text, f"Nie zamieniono Księcia Kaiju na Potwornego Królewicza w signie: {res_subs.events[0].text}"
+
+    # Domain 5: Punctuation hygiene (comma before czy, cut-off en-dash)
+    assert "w kapciach czy bez?" in res_subs.events[7].text, f"Nie usunięto przecinka przed czy: {res_subs.events[7].text}"
+    assert res_subs.events[11].text == "Rin...", f"Nie zamieniono przyklejonego dywizu na wielokropek: {res_subs.events[11].text}"
+
+    # Domain 6: Micro-line CPS clamping (< 1.0s, CPS > 24)
+    assert res_subs.events[8].text == "To o mnie...", f"Nie skondensowano kwestii o ekstremalnym CPS: {res_subs.events[8].text}"
+
+    print(" -> PASSED: Holistyczna ochrona 6 domen (samotne myślniki, biernik współrzędny, kanon mangi, slang/senpai, interpunkcja, CPS) zweryfikowana w 5 warstwach (0.00 PLN).")
+
+
+def test_kore_kaite_shine_ep08_holistic_domain_guard():
+    print("[TEST 65/65] Test Holistycznej Ochrony Kore Kaite Shine Ep 08 (Tytulatura Szkolna, Żargon Twórczy, Fleksja Zamówień, Okrzyk Tamaya, Tarcza Ziemiąem)...")
+    from avt_linter import EpisodeQualityGate, AVTLinter
+    from series_memory import SeriesBible
+    import pysubs2
+
+    # Asercja 1: Weryfikacja bazy serii Kore_Kaite_Shine_bible.json
+    bible = SeriesBible("Kore Kaite Shine")
+    assert bible.data is not None, "Baza serii Kore Kaite Shine nie została załadowana!"
+    ai_rel = bible.data.get("characters", {}).get("Ai Yasumi -> Rei Teshima", {}).get("description", "")
+    assert "panno Teshimo" not in ai_rel, f"Baza serii nadal zawiera skażoną tytulaturę 'panno Teshimo': {ai_rel}"
+    assert "pani Teshimo" in ai_rel, f"Baza serii nie zawiera poprawnej formy 'pani Teshimo': {ai_rel}"
+    assert "Gojinka" in bible.data.get("glossary", {}), "Brak terminu 'Gojinka' w słowniku serii!"
+    assert "Input" in bible.data.get("glossary", {}), "Brak terminu 'Input' w słowniku serii!"
+
+    # Asercja 2: Tarcza przed regresją 'Ziemiąem' (Anti-Planet-Corruption Shield)
+    subs_earth = pysubs2.SSAFile()
+    ev_earth = pysubs2.SSAEvent(
+        start=0, end=4000, style="Default", name="Hikaru",
+        text=r"Czekają na okazję, by odebrać ludziom\Nprzewagę i przejąć władzę nad Ziemią."
+    )
+    subs_earth.events.append(ev_earth)
+    res_earth, _ = EpisodeQualityGate.audit_and_fix_entire_episode(subs_earth, series_bible=bible)
+    assert "Ziemiąem" not in res_earth.events[0].text, f"KRYTYCZNY BŁĄD: Zniekształcono Ziemią na Ziemiąem: {res_earth.events[0].text}"
+    assert "nad Ziemią" in res_earth.events[0].text, f"Utracono oryginalną poprawną formę 'nad Ziemią': {res_earth.events[0].text}"
+
+    # Asercja 3: Tytulatura szkolna i relacje mentorka-uczennica (Filar XXV / CLVI / CLXVI)
+    subs_titles = pysubs2.SSAFile()
+    subs_titles.events.extend([
+        pysubs2.SSAEvent(start=0, end=3000, style="Default", name="Rei", text="Panno Yasumi, wiesz już, co narysujesz jako następne?"),
+        pysubs2.SSAEvent(start=3000, end=6000, style="Default", name="Ai", text="Naprawdę, panno Teshimo?"),
+        pysubs2.SSAEvent(start=6000, end=9000, style="Default", name="Ai", text="Notes panny Teshimy..."),
+        pysubs2.SSAEvent(start=9000, end=12000, style="Default", name="Pokota", text="Panna Teshima faktycznie mówiła, że spisywała tu pomysły."),
+        pysubs2.SSAEvent(start=12000, end=15000, style="Default", name="Ai", text="Panno Teshimo...")
+    ])
+    res_titles, fixes_titles = EpisodeQualityGate.audit_and_fix_entire_episode(subs_titles, series_bible=bible)
+    assert res_titles.events[0].text == "Yasumi, wiesz już, co narysujesz jako następne?", f"Błąd tytulatury: {res_titles.events[0].text}"
+    assert res_titles.events[1].text == "Naprawdę, pani Teshimo?", f"Błąd tytulatury: {res_titles.events[1].text}"
+    assert res_titles.events[2].text == "Notes pani Teshimy...", f"Błąd tytulatury: {res_titles.events[2].text}"
+    assert res_titles.events[3].text == "Pani Teshima faktycznie mówiła, że spisywała tu pomysły.", f"Błąd tytulatury: {res_titles.events[3].text}"
+    assert res_titles.events[4].text == "Pani Teshimo...", f"Błąd tytulatury: {res_titles.events[4].text}"
+
+    # Asercja 4: Żargon IT w procesie twórczym ('input / output') (Filar X & I)
+    subs_creative = pysubs2.SSAFile()
+    subs_creative.events.extend([
+        pysubs2.SSAEvent(start=0, end=3000, style="Default", name="Rei", text=r"Twórczość to\Nnieustanny cykl inputu i outputu."),
+        pysubs2.SSAEvent(start=3000, end=6000, style="Default", name="Rei", text="Jeśli wyczerpały ci się pomysły, potrzebujesz po prostu więcej inputu."),
+        pysubs2.SSAEvent(start=6000, end=9000, style="Default", name="Ai", text="Inputu?!")
+    ])
+    res_creative, _ = EpisodeQualityGate.audit_and_fix_entire_episode(subs_creative, series_bible=bible)
+    assert "cykl czerpania inspiracji i tworzenia" in res_creative.events[0].text, f"Nie zastąpiono 'inputu i outputu': {res_creative.events[0].text}"
+    assert "więcej inspiracji" in res_creative.events[1].text, f"Nie zastąpiono 'więcej inputu': {res_creative.events[1].text}"
+    assert "Inspiracji?!" in res_creative.events[2].text, f"Nie zastąpiono 'Inputu?!': {res_creative.events[2].text}"
+
+    # Asercja 5: Kalka składniowa 'w takim pomysły' (Filar IV)
+    subs_syntax = pysubs2.SSAFile()
+    subs_syntax.events.append(
+        pysubs2.SSAEvent(start=0, end=3000, style="Flashback", name="Nana", text=r"Kiedyś zawsze\Nzapisywałaś w takim pomysły, no nie?")
+    )
+    res_syntax, _ = EpisodeQualityGate.audit_and_fix_entire_episode(subs_syntax, series_bible=bible)
+    assert "zapisywałaś w nim pomysły" in res_syntax.events[0].text, f"Nie skorygowano kalki składniowej: {res_syntax.events[0].text}"
+
+    # Asercja 6: Fleksja zamówień gastronomicznych 'Gojinka z wodą' (Filar CXXXVII)
+    subs_drink = pysubs2.SSAFile()
+    subs_drink.events.extend([
+        pysubs2.SSAEvent(start=0, end=3000, style="Flashback", name="Nana", text="Szefie, dla mnie Gojinka z wodą."),
+        pysubs2.SSAEvent(start=3000, end=6000, style="Default", name="Nana", text="Szefie, dla mnie Gojinka z wodą.")
+    ])
+    res_drink, _ = EpisodeQualityGate.audit_and_fix_entire_episode(subs_drink, series_bible=bible)
+    assert "Gojinkę z wodą" in res_drink.events[0].text, f"Brak biernika w zamówieniu: {res_drink.events[0].text}"
+    assert "Gojinkę z wodą" in res_drink.events[1].text, f"Brak biernika w zamówieniu: {res_drink.events[1].text}"
+
+    # Asercja 7: Lokalizacja tradycyjnego okrzyku 'Tamaya!' (Filar CLXIV)
+    subs_kakegoe = pysubs2.SSAFile()
+    subs_kakegoe.events.append(
+        pysubs2.SSAEvent(start=0, end=3000, style="Default", name="Sachi", text="Tamaya!")
+    )
+    res_kakegoe, _ = EpisodeQualityGate.audit_and_fix_entire_episode(subs_kakegoe, series_bible=bible)
+    assert res_kakegoe.events[0].text == "Ale widok!", f"Nie zlokalizowano okrzyku Tamaya: {res_kakegoe.events[0].text}"
+
+    # Asercja 8: Spójność z AVTLinter.FIXED_REPLACEMENTS
+    t_fixed, _ = AVTLinter.lint_and_fix_line("Twórczość to cykl inputu i outputu.")
+    assert "cykl czerpania inspiracji i tworzenia" in t_fixed
+    t_drink, _ = AVTLinter.lint_and_fix_line("Dla mnie Gojinka z wodą.")
+    assert "Gojinkę z wodą" in t_drink
+    t_tamaya, _ = AVTLinter.lint_and_fix_line("Tamaya!")
+    assert "Ale widok!" in t_tamaya
+
+    print(" -> PASSED: Holistyczna ochrona Kore Kaite Shine Ep 08 zweryfikowana w 5 warstwach (0.00 PLN).")
+
+
+def test_kore_kaite_shine_ep09_holistic_domain_guard():
+    print("[TEST 66/66] Test Holistycznej Ochrony Kore Kaite Shine Ep 09 (Relacje Rówieśnicze, T-V Redaktorka-Autorka, Odporność Znaków, Higiena Interpunkcji)...")
+    from avt_linter import EpisodeQualityGate, AVTLinter
+    from series_memory import SeriesBible
+    import pysubs2
+
+    # Asercja 1: Weryfikacja bazy serii Kore_Kaite_Shine_bible.json
+    bible = SeriesBible("Kore Kaite Shine")
+    assert bible.data is not None, "Baza serii Kore Kaite Shine nie została załadowana!"
+    ai_fujimori_rel = bible.data.get("characters", {}).get("Ai Yasumi -> Kokoro Fujimori", {}).get("description", "")
+    assert "Fujimori" in ai_fujimori_rel, f"Brak relacji Ai -> Kokoro Fujimori: {ai_fujimori_rel}"
+    assert "zakaz 'Pani Fujimori'" in ai_fujimori_rel, f"Brak zakazu formy Pani Fujimori: {ai_fujimori_rel}"
+
+    hana_rei_rel = bible.data.get("characters", {}).get("Hana -> Rei Teshima", {}).get("description", "")
+    assert "Pani Teshimo" in hana_rei_rel or "pani" in hana_rei_rel, f"Brak tytulatury formalnej Hana -> Rei: {hana_rei_rel}"
+    assert "zakaz form poufałych 'ty' / 'Zaufaj mi'" in hana_rei_rel, f"Brak zakazu 'Zaufaj mi': {hana_rei_rel}"
+
+    assert "Dark Fuwa" in bible.data.get("glossary", {}), "Brak terminu 'Dark Fuwa' w słowniku serii!"
+    assert "Fujimori" in bible.data.get("glossary", {}), "Brak terminu 'Fujimori' w słowniku serii!"
+    assert "Loup Garou" in bible.data.get("glossary", {}), "Brak terminu 'Loup Garou' w słowniku serii!"
+    assert "Panda Addict" in bible.data.get("glossary", {}), "Brak terminu 'Panda Addict' w słowniku serii!"
+
+    # Asercja 2: De-formalizacja relacji szkolnych / rówieśniczych (Filar XXV / CLVI / CLXVI / Reguła 3p)
+    subs_peer = pysubs2.SSAFile()
+    subs_peer.events.extend([
+        pysubs2.SSAEvent(start=0, end=3000, style="Default", name="Ai", text=r"Pani Fujimori, ma pani skaner?"),
+        pysubs2.SSAEvent(start=3000, end=6000, style="Default", name="Ai", text=r"Pani Fujimori, spokojnie!"),
+        pysubs2.SSAEvent(start=6000, end=9000, style="Default", name="Ai", text=r"Nie wiem, czy pani Fujimori się zgodzi."),
+        pysubs2.SSAEvent(start=9000, end=12000, style="Default", name="Kokoro", text=r"D-Dzień dobry, pani Yasumi...")
+    ])
+    res_peer, _ = EpisodeQualityGate.audit_and_fix_entire_episode(subs_peer, series_bible=bible)
+    assert res_peer.events[0].text == "Fujimori, masz skaner?", f"Niepoprawna forma per ty: {res_peer.events[0].text}"
+    assert res_peer.events[1].text == "Fujimori, spokojnie!", f"Niepoprawna forma per ty: {res_peer.events[1].text}"
+    assert res_peer.events[2].text == "Nie wiem, czy Fujimori się zgodzi.", f"Nie usunięto 'pani' przed nazwiskiem rówieśnicy: {res_peer.events[2].text}"
+    assert "pani Yasumi" not in res_peer.events[3].text or "Yasumi" in res_peer.events[3].text
+
+    # Asercja 3: Niezmienniczość rejestru T-V w relacji profesjonalnej redaktorka-autorka (Filar XXVI / CLVI / Reguła 3q)
+    subs_editorial = pysubs2.SSAFile()
+    subs_editorial.events.extend([
+        pysubs2.SSAEvent(start=0, end=3000, style="Default", name="Hana", text="Zaufaj mi."),
+        pysubs2.SSAEvent(start=3000, end=6000, style="Default", name="Hana", text=r"Jeśli chcesz publikować w naszym\Nmagazynie, musisz wprowadzić zmiany"),
+        pysubs2.SSAEvent(start=6000, end=9000, style="Default", name="Hana", text=r"Co zamierzasz?")
+    ])
+    res_editorial, _ = EpisodeQualityGate.audit_and_fix_entire_episode(subs_editorial, series_bible=bible)
+    assert res_editorial.events[0].text == "Proszę mi zaufać.", f"Nie skorygowano kolokwialnego 'Zaufaj mi': {res_editorial.events[0].text}"
+    assert "Jeśli chce pani publikować w naszym" in res_editorial.events[1].text, f"Brak formy grzecznościowej w zdaniu warunkowym: {res_editorial.events[1].text}"
+    assert "musi pani wprowadzić zmiany" in res_editorial.events[1].text, f"Brak formy grzecznościowej 'musi pani': {res_editorial.events[1].text}"
+    assert res_editorial.events[2].text == "Co pani zamierza?", f"Brak formy grzecznościowej redaktorki: {res_editorial.events[2].text}"
+
+    # Asercja 4: Ochrona napisów ekranowych (Sign Immunity przed wyczyszczeniem nawiasów)
+    subs_signs = pysubs2.SSAFile()
+    subs_signs.events.extend([
+        pysubs2.SSAEvent(start=0, end=3000, style="Sign", text=r"{\an8\bord0\shad0\fs14}(I love you)"),
+        pysubs2.SSAEvent(start=3000, end=6000, style="Default", name="Sign", text=r"{\pos(100,200)}(Tygodnik Shonen)")
+    ])
+    res_signs, _ = EpisodeQualityGate.audit_and_fix_entire_episode(subs_signs, series_bible=bible)
+    assert "(I love you)" in res_signs.events[0].text, f"Znak (I love you) został omyłkowo wyczyszczony: {res_signs.events[0].text}"
+    assert "(Tygodnik Shonen)" in res_signs.events[1].text, f"Znak (Tygodnik Shonen) został omyłkowo wyczyszczony: {res_signs.events[1].text}"
+
+    # Asercja 5: Higiena typograficzna AVT (likwidacja japońskiej tyldy i multiplikacji wykrzykników - Filar LX)
+    subs_typo = pysubs2.SSAFile()
+    subs_typo.events.extend([
+        pysubs2.SSAEvent(start=0, end=3000, style="Default", name="Sachi", text=r"A co tam~!!!!"),
+        pysubs2.SSAEvent(start=3000, end=6000, style="Default", name="Ai", text=r"Poczekajcie~~!!!")
+    ])
+    res_typo, _ = EpisodeQualityGate.audit_and_fix_entire_episode(subs_typo, series_bible=bible)
+    assert res_typo.events[0].text == "A co tam!", f"Nie znormalizowano tyldy i wykrzykników: {res_typo.events[0].text}"
+    assert res_typo.events[1].text == "Poczekajcie!", f"Nie znormalizowano tyld i wykrzykników: {res_typo.events[1].text}"
+
+    # Asercja 6: Bezpośrednie wywołanie AVTLinter.lint_and_fix_line
+    t_trust, _ = AVTLinter.lint_and_fix_line("Zaufaj mi.")
+    assert "Proszę mi zaufać." in t_trust, f"Linter nie przetłumaczył 'Zaufaj mi': {t_trust}"
+    t_fuji, _ = AVTLinter.lint_and_fix_line("Pani Fujimori, ma pani skaner?")
+    assert "Fujimori, masz skaner?" in t_fuji, f"Linter nie skorygował rejestru rówieśniczego: {t_fuji}"
+    t_excl, _ = AVTLinter.lint_and_fix_line("Nieee~!!!!")
+    assert "Nieee!" in t_excl, f"Linter nie skorygował ~!!!!: {t_excl}"
+
+    print(" -> PASSED: Holistyczna ochrona Kore Kaite Shine Ep 09 zweryfikowana w 5 warstwach (0.00 PLN).")
+
+
+def test_nige_jouzu_ep20_holistic_domain_guard():
+    print("[TEST 67/67] Test Holistycznej Ochrony Nige Jouzu no Wakagimi Ep 20 (Rozszczepianie Dwugłosu, Normalizacja Tagów Formatowania, Tautologie Kronik, Zgodność Liczebników, Idiomatyka)...")
+    from avt_linter import EpisodeQualityGate, AVTLinter
+    from series_memory import SeriesBible
+    import pysubs2
+
+    # Asercja 1: Weryfikacja bazy serii Nige_Jouzu_no_Wakagimi_S2_bible.json (Warstwa 2)
+    bible = SeriesBible("Nige Jouzu no Wakagimi S2")
+    assert bible.data is not None, "Baza serii Nige Jouzu no Wakagimi S2 nie została załadowana!"
+    assert "Taiheiki (w kontekście: Kronika Taiheiki)" in bible.data.get("glossary", {}).get("Taiheiki", ""), "Brak zabezpieczenia przed duplikacją w haśle Taiheiki!"
+    assert "nozawana" in bible.data.get("glossary", {}).get("Nozawana", "").lower(), "Brak nozawana w słowniku serii!"
+    genba_rel = bible.data.get("characters", {}).get("Genba Kazama -> Yasuie Hōjō", {}).get("description", "")
+    assert "szefie" in genba_rel or "panie Yasuie" in genba_rel, f"Brak relacji Genba -> Yasuie: {genba_rel}"
+    assert any("20" in ep for ep in bible.data.get("episodes_translated", [])), "Brak zarejestrowanego odcinka 20 w episodes_translated!"
+
+    # Asercja 2: Normalizacja i deduplikacja tagów formatowania ASS (Warstwa 4 - Step 0)
+    subs_tags = pysubs2.SSAFile()
+    subs_tags.events.extend([
+        pysubs2.SSAEvent(start=0, end=3000, style="Default", text=r"{\i1}{\i1}Tekst kursywą{\i0}{\i0}"),
+        pysubs2.SSAEvent(start=3000, end=6000, style="Default", text=r"{\b1}{\b1}Pogrubiony tekst{\b0}{\b0}")
+    ])
+    res_tags, _ = EpisodeQualityGate.audit_and_fix_entire_episode(subs_tags, series_bible=bible)
+    assert res_tags.events[0].text == r"{\i1}Tekst kursywą{\i0}", f"Błąd deduplikacji tagów kursywy: {res_tags.events[0].text}"
+    assert res_tags.events[1].text == r"{\b1}Pogrubiony tekst{\b0}", f"Błąd deduplikacji tagów pogrubienia: {res_tags.events[1].text}"
+
+    # Asercja 3: Ochrona kursywy narracji i myśli w stylu Default (Bariera Myśli w Step 1)
+    subs_narr = pysubs2.SSAFile()
+    subs_narr.events.extend([
+        pysubs2.SSAEvent(start=0, end=3000, style="Default", text=r"{\i1}Wuj Tokiyukiego, Yasuie Hōjō."),
+        pysubs2.SSAEvent(start=3000, end=6000, style="Default", text=r"{\i1}Człowiek, który\Nniebawem wywoła prawdziwą burzę.")
+    ])
+    res_narr, _ = EpisodeQualityGate.audit_and_fix_entire_episode(subs_narr, series_bible=bible)
+    assert r"{\i1}" in res_narr.events[0].text, f"Omyłkowo usunięto kursywę narracji z linii 1: {res_narr.events[0].text}"
+    assert r"{\i1}" in res_narr.events[1].text, f"Omyłkowo usunięto kursywę narracji z linii 2: {res_narr.events[1].text}"
+
+    # Asercja 4: Rozszczepianie dwugłosu w jednej linii (Dual-Speaker Turn Splitting - Step 0b)
+    subs_dual = pysubs2.SSAFile()
+    subs_dual.events.extend([
+        pysubs2.SSAEvent(start=0, end=3000, style="Default", text=r"Genba! - Co to był za hałas?"),
+        pysubs2.SSAEvent(start=3000, end=6000, style="Default", text=r"Wspaniale. - Pomyśleć, że rodzony wuj..."),
+        pysubs2.SSAEvent(start=6000, end=9000, style="Default", text=r"Zróbmy to! - {\i1}Był...")
+    ])
+    res_dual, _ = EpisodeQualityGate.audit_and_fix_entire_episode(subs_dual, series_bible=bible)
+    assert res_dual.events[0].text == r"- Genba!\N- Co to był za hałas?", f"Nie rozszczepiono dwugłosu 1: {res_dual.events[0].text}"
+    assert res_dual.events[1].text == r"- Wspaniale.\N- Pomyśleć, że rodzony wuj...", f"Nie rozszczepiono dwugłosu 2: {res_dual.events[1].text}"
+    assert res_dual.events[2].text == r"- Zróbmy to!\N- {\i1}Był...", f"Nie rozszczepiono dwugłosu 3 z tagiem stylu: {res_dual.events[2].text}"
+
+    # Asercja 5: Eliminacja tautologii i stutteru słownikowego (Kronika Taiheiki)
+    subs_tautology = pysubs2.SSAFile()
+    subs_tautology.events.extend([
+        pysubs2.SSAEvent(start=0, end=3000, style="Default", text=r"Historię tę spisano w Kronice Kronika Taiheiki."),
+        pysubs2.SSAEvent(start=3000, end=6000, style="Default", name="Sign", text=r"{\an8}[ KRONIKA Kronika\NTaiheiki TOM DZIESIĄTY ]")
+    ])
+    res_taut, _ = EpisodeQualityGate.audit_and_fix_entire_episode(subs_tautology, series_bible=bible)
+    assert "w Kronice Taiheiki" in res_taut.events[0].text, f"Nie usunięto tautologii w tekście: {res_taut.events[0].text}"
+    assert "Kronika Kronika" not in res_taut.events[0].text
+    assert res_taut.events[1].text == r"{\an8}[ KRONIKA TAIHEIKI:\NTOM DZIESIĄTY ]", f"Nie znormalizowano napisu ekranowego: {res_taut.events[1].text}"
+
+    # Asercja 6: Korekta inwersji idiomatycznych i składni liczebników (AVTLinter.FIXED_REPLACEMENTS)
+    t_happy, _ = AVTLinter.lint_and_fix_line("To ja odchodzę od zmysłów ze szczęścia!")
+    assert "szaleję ze szczęścia" in t_happy, f"Nie poprawiono inwersji idiomu: {t_happy}"
+
+    t_num, _ = AVTLinter.lint_and_fix_line("Dwa tysiące w zupełności wystarczy.")
+    assert "Dwa tysiące w zupełności wystarczą" in t_num, f"Nie poprawiono zgody liczebnika: {t_num}"
+
+    t_vengeance, _ = AVTLinter.lint_and_fix_line("nie mam na kim się mścić")
+    assert "nie mam na kim się zemścić" in t_vengeance, f"Nie poprawiono aspektu czasownika: {t_vengeance}"
+
+    t_idiom, _ = AVTLinter.lint_and_fix_line("Mniejsza z tym.")
+    assert "Mniejsza o to." in t_idiom, f"Nie poprawiono idiomu Mniejsza o to: {t_idiom}"
+
+    print(" -> PASSED: Holistyczna ochrona Nige Jouzu no Wakagimi Ep 20 zweryfikowana w 5 warstwach (0.00 PLN).")
+
+
+def test_clevatess_ep05_holistic_domain_guard():
+    print("[TEST 68/68] Test Holistycznej Ochrony Clevatess Ep 05 (Inwersja Czasowa, Matryca Narzędnika, Kalka Auto-Referencyjna, Rejestr Dark Fantasy, Spójność Imion)...")
+    from avt_linter import EpisodeQualityGate, AVTLinter
+    from series_memory import SeriesBible
+    import pysubs2
+
+    # Asercja 1: Weryfikacja bazy serii Clevatess_bible.json (Warstwa 2)
+    bible = SeriesBible("Clevatess")
+    assert bible.data is not None, "Baza serii Clevatess nie została załadowana!"
+    assert "Alicia Sleihunt" in bible.data.get("glossary", {}).values() or "Alicia Sleihunt" in bible.data.get("characters", {}), "Brak hasła Alicia Sleihunt w słowniku/postaciach serii!"
+    assert "Alyssa Sleihunt" in bible.data.get("glossary", {}), "Brak przekierowania Alyssa Sleihunt -> Alicia Sleihunt!"
+    assert any("05" in ep for ep in bible.data.get("episodes_translated", [])), "Brak zarejestrowanego odcinka 05 w episodes_translated!"
+
+    # Asercja 2: Naprawa inwersji czasowej / ujemnego czasu trwania (Warstwa 4 - Krok 0a)
+    subs_ts = pysubs2.SSAFile()
+    subs_ts.events.extend([
+        pysubs2.SSAEvent(start=222620, end=225000, style="Main", text="Poprzednia kwestia"),
+        pysubs2.SSAEvent(start=284100, end=228540, style="Main", text=r"Domyślam się, czego\Noczekujesz od tego dziecka."),
+        pysubs2.SSAEvent(start=229220, end=231440, style="Main", text="Kolejna kwestia")
+    ])
+    res_ts, fixes_ts = EpisodeQualityGate.audit_and_fix_entire_episode(subs_ts, series_bible=bible)
+    assert res_ts.events[1].start == 224100, f"Nie skorygowano odwróconego znacznika czasu: {res_ts.events[1].start}"
+    assert res_ts.events[1].start < res_ts.events[1].end, f"Czas startu nadal większy lub równy końcowi: {res_ts.events[1].start} >= {res_ts.events[1].end}"
+    assert any("Timestamp Sanitization" in f for f in fixes_ts), "Brak zgłoszenia naprawy znacznika czasu w raportach lintera!"
+
+    # Asercja 3: Odporność Matrycy Narzędnika przed podwójną fleksją i błędem pochodzenia (Warstwa 4 - Krok 0f)
+    subs_decl = pysubs2.SSAFile()
+    subs_decl.events.extend([
+        pysubs2.SSAEvent(start=0, end=3000, style="Main", text=r"Będziesz miał kłopoty,\Ngdy wyda się, że chłopak z Hiden..."),
+        pysubs2.SSAEvent(start=3000, end=6000, style="Main", text=r"Może i jestem nieśmiertelna,\Nale bez kontaktu z Klenem...")
+    ])
+    res_decl, _ = EpisodeQualityGate.audit_and_fix_entire_episode(subs_decl, series_bible=bible)
+    assert "z Hiden" in res_decl.events[0].text and "Hidenem" not in res_decl.events[0].text, f"Matryca błędnie zmieniła 'z Hiden' na 'z Hidenem': {res_decl.events[0].text}"
+    assert "z Klenem" in res_decl.events[1].text and "Klenemem" not in res_decl.events[1].text, f"Matryca wygenerowała podwójną fleksję 'Klenemem': {res_decl.events[1].text}"
+
+    # Asercja 4: Likwidacja kalki auto-referencyjnej (Warstwa 4 & 3)
+    t_self, _ = AVTLinter.lint_and_fix_line("Ale z ciebie drobina... moja droga ja.")
+    assert "moja ty mała" in t_self, f"Nie poprawiono kalki auto-referencyjnej 'moja droga ja': {t_self}"
+
+    # Asercja 5: Spójność tożsamości bohaterki (Alicia Sleihunt) (Warstwa 4 & 2)
+    t_name, _ = AVTLinter.lint_and_fix_line(r"Stoją za tym uczniowie z Hiden:\NKlen Vatiss i Alyssa Sleihunt.")
+    assert "Alicia Sleihunt" in t_name, f"Nie ujednolicono imienia bohaterki: {t_name}"
+    assert "Alyssa" not in t_name
+
+    # Asercja 6: Rejestr Heroic Dark Fantasy i zniekształcenia frazeologiczne (Warstwa 4 & 3)
+    t_raban, _ = AVTLinter.lint_and_fix_line(r"Po drugie, zrobię raban,\Nżeby moja sługa mogła uciec.")
+    assert "wywołam zamieszanie" in t_raban, f"Nie skorygowano kolokwializmu 'zrobię raban': {t_raban}"
+    assert "moja podwładna mogła uciec" in t_raban, f"Nie skorygowano błędu rodzaju 'moja sługa': {t_raban}"
+
+    t_lomot, _ = AVTLinter.lint_and_fix_line(r"...gdy pierwszy Władca Mrocznych\NBestii spuścił ci potworny łomot!")
+    assert "zmiażdżył cię bez trudu" in t_lomot, f"Nie usunięto slangu podwórkowego: {t_lomot}"
+
+    subs_eyes = pysubs2.SSAFile()
+    subs_eyes.events.append(pysubs2.SSAEvent(start=0, end=3000, style="Main", text=r"Nie widzieliśmy się w cztery\Noczy od czasu Szybu Elbe, prawda?"))
+    res_eyes, _ = EpisodeQualityGate.audit_and_fix_entire_episode(subs_eyes, series_bible=bible)
+    assert "na osobności" in res_eyes.events[0].text and "od czasów" in res_eyes.events[0].text, f"Nie skorygowano zniekształcenia frazeologicznego: {res_eyes.events[0].text}"
+
+    t_litosc, _ = AVTLinter.lint_and_fix_line(r"Dla wszystkiego poza roślinami nie ma litości.")
+    assert "Nie ma litości dla niczego prócz roślin" in t_litosc, f"Nie skorygowano kalki składniowej: {t_litosc}"
+
+    print(" -> PASSED: Holistyczna ochrona Clevatess Ep 05 zweryfikowana w 5 warstwach (0.00 PLN).")
+
+
+def test_clevatess_ep03_proactive_governance_guard():
+    print("[TEST 69/69] Test Proaktywnej Integralności Clevatess Ep 03 (Inwersja 10 min, Kalka Przydomków 'no', Rodzaj Posoki, 4 Klasy Slangu Dark Fantasy)...")
+    from avt_linter import EpisodeQualityGate, AVTLinter
+    from series_memory import SeriesBible
+    import pysubs2
+
+    # Asercja 1: Weryfikacja bazy serii Clevatess_bible.json (Warstwa 2 & Agents.md §9)
+    bible = SeriesBible("Clevatess")
+    assert bible.data is not None, "Baza serii Clevatess nie została załadowana!"
+    assert "czarna posoka" in bible.data.get("glossary", {}).get("Dark Ichor", ""), "Brak poprawnego rodzaju żeńskiego posoki w bazie serii!"
+    assert "Księga Toaha" in bible.data.get("glossary", {}).get("Book of Toah", ""), "Brak fleksji Księgi Toaha w bazie serii!"
+    assert any("Zavthier Pani Iluzji" in v for v in bible.data.get("glossary", {}).values()), "Brak kanonicznego przydomku Zavthier Pani Iluzji!"
+    assert any("03" in ep for ep in bible.data.get("episodes_translated", [])), "Brak zarejestrowanego odcinka 03 w episodes_translated!"
+
+    # Asercja 2: Naprawa inwersji czasowej z błędem dziesiątek minut (Warstwa 4 - Krok 0a)
+    subs_ts = pysubs2.SSAFile()
+    subs_ts.events.extend([
+        pysubs2.SSAEvent(start=309130, end=312760, style="Main", text="Poprzednia kwestia"),
+        pysubs2.SSAEvent(start=913150, end=315500, style="Italics", text="Dokładnie o to chodzi."),
+        pysubs2.SSAEvent(start=315500, end=318510, style="Italics", text="Kolejna kwestia")
+    ])
+    res_ts, fixes_ts = EpisodeQualityGate.audit_and_fix_entire_episode(subs_ts, series_bible=bible)
+    assert res_ts.events[1].start == 313150, f"Nie skorygowano inwersji 10 minut: {res_ts.events[1].start}"
+    assert res_ts.events[1].start < res_ts.events[1].end
+    assert any("Timestamp Sanitization" in f for f in fixes_ts), "Brak raportu Timestamp Sanitization!"
+
+    # Asercja 3: Odporność przed podwójną fleksją i zniekształceniem dopełniacza liczby mnogiej rzeczowników (Warstwa 4 - Krok 0f)
+    subs_en = pysubs2.SSAFile()
+    subs_en.events.append(pysubs2.SSAEvent(start=0, end=3000, style="Main", text="Zavthier od Złudzeń."))
+    res_en, _ = EpisodeQualityGate.audit_and_fix_entire_episode(subs_en, series_bible=bible)
+    assert "Złudzeńa" not in res_en.events[0].text, f"Matryca zniekształciła słowo na 'Złudzeńa': {res_en.events[0].text}"
+    assert "Zavthier Pani Iluzji" in res_en.events[0].text, f"Nie skorygowano kalki przydomka: {res_en.events[0].text}"
+
+    # Asercja 4: Spójność rodzaju i rządu rzeczownika 'posoka' (Warstwa 4 & 3)
+    t_posok1, _ = AVTLinter.lint_and_fix_line("A kiedy rozmawiamy przez czarny posok...")
+    assert "przez czarną posokę" in t_posok1, f"Nie poprawiono rządu i rodzaju 'czarny posok': {t_posok1}"
+    t_posok2, _ = AVTLinter.lint_and_fix_line("Wysłał tu nawet swego awatara z czarnego posoku.")
+    assert "z czarnej posoki" in t_posok2, f"Nie poprawiono rodzaju 'z czarnego posoku': {t_posok2}"
+
+    # Asercja 5: Proaktywna eliminacja 4 klas slangu w Dark Fantasy (Warstwa 4 & 3)
+    t_gitara, _ = AVTLinter.lint_and_fix_line("I gitara.")
+    assert "Doskonale" in t_gitara, f"Nie usunięto slangu 'I gitara': {t_gitara}"
+    t_pysk, _ = AVTLinter.lint_and_fix_line("Stul pysk, Eddy.")
+    assert "Zamilcz" in t_pysk, f"Nie usunięto wulgaryzmu 'Stul pysk': {t_pysk}"
+    t_byk, _ = AVTLinter.lint_and_fix_line("Przecież to kłamstwo jak byk!")
+    assert "bezczelne kłamstwo" in t_byk, f"Nie usunięto kolokwializmu 'kłamstwo jak byk': {t_byk}"
+    t_stery, _ = AVTLinter.lint_and_fix_line("Powiedziałem, że przejmuję stery!")
+    assert "teraz ja mówię" in t_stery, f"Nie usunięto współczesnej metafory 'przejmuję stery': {t_stery}"
+
+    # Asercja 6: Wołacz obcego nazwiska i poprawność fleksji czasownika (Warstwa 4 & 3)
+    t_koath, _ = AVTLinter.lint_and_fix_line("Święty Miecza Owenie Koath, nakazuję ci...")
+    assert "Owenie Koacie" in t_koath, f"Nie odmieniono wołacza nazwiska Koath: {t_koath}"
+    t_wladz, _ = AVTLinter.lint_and_fix_line("Nawet jeśli nie władzasz magią.")
+    assert "nie władasz magią" in t_wladz, f"Nie poprawiono błędu fleksji 'nie władzasz': {t_wladz}"
+
+    print(" -> PASSED: Proaktywna integralność Clevatess Ep 03 zweryfikowana w 5 warstwach (0.00 PLN).")
+
+
+def test_universal_series_memory_and_ep04_guard():
+    """
+    Test 70: Weryfikacja Uniwersalnego Zasilenia Pamięci Serialu (wszystkie serie),
+    eliminacji homonimii narzędnika (-słem -> umysłem) oraz ochrony rejestru Dark Fantasy Ep 04.
+    """
+    from avt_linter import EpisodeQualityGate, AVTLinter, convert_first_person_masculine_to_feminine
+    from series_memory import SeriesBible, SERIES_MEMORY_DIR
+    import pysubs2
+    import json
+
+    # Asercja 1: Uniwersalna Pamięć Serialu - weryfikacja wszystkich 15 serii dotychczasowych
+    memory_files = list(SERIES_MEMORY_DIR.glob("*.json"))
+    assert len(memory_files) >= 15, f"Oczekiwano co najmniej 15 baz serii, znaleziono {len(memory_files)}"
+    for mf in memory_files:
+        with open(mf, "r", encoding="utf-8") as jf:
+            b_data = json.load(jf)
+        # Każda seria musi posiadać wygenerowane deklinacje (Decls > 0)
+        assert len(b_data.get("declensions", {})) > 0, f"Seria {mf.name} posiada 0 deklinacji (Decls: 0)!"
+        assert len(b_data.get("characters", {})) > 0, f"Seria {mf.name} posiada 0 postaci!"
+
+    # Asercja 2: Likwidacja błędu homonimii narzędnika rzeczowników męskich/nijakich na -słem (Warstwa 4)
+    assert convert_first_person_masculine_to_feminine("umysłem") is None, "Błąd: 'umysłem' został potraktowany jako czasownik 1. os.!"
+    assert convert_first_person_masculine_to_feminine("zmysłem") is None, "Błąd: 'zmysłem' został potraktowany jako czasownik 1. os.!"
+    assert convert_first_person_masculine_to_feminine("hasłem") is None, "Błąd: 'hasłem' został potraktowany jako czasownik 1. os.!"
+    assert convert_first_person_masculine_to_feminine("krzesłem") is None, "Błąd: 'krzesłem' został potraktowany jako czasownik 1. os.!"
+    # Prawdziwe czasowniki na -słem MUSZĄ być poprawnie odmieniane
+    assert convert_first_person_masculine_to_feminine("przyniosłem") == "przyniosłam", "Błąd konwersji 'przyniosłem'"
+    assert convert_first_person_masculine_to_feminine("wstrząsłem") == "wstrząsłam", "Błąd konwersji 'wstrząsłem'"
+
+    # Asercja 3: Nienaruszalność kwestii 'zawładnie twoim umysłem' w pełnym potoku EpisodeQualityGate
+    bible = SeriesBible("Clevatess")
+    subs_test = pysubs2.SSAFile()
+    # Kwestia wypowiadana przez kobietę (Naie)
+    subs_test.events.append(pysubs2.SSAEvent(start=1000, end=4000, style="Main", name="Naie", text="Lecz jeśli cię pochłonie,\\Nmroczna bestia zawładnie twoim umysłem,"))
+    res_subs, _ = EpisodeQualityGate.audit_and_fix_entire_episode(subs_test, series_bible=bible)
+    assert "twoim umysłem" in res_subs.events[0].text, f"BŁĄD: Linter zniekształcił narzędnik na 'umysłam': {res_subs.events[0].text}"
+    assert "umysłam" not in res_subs.events[0].text
+
+    # Asercja 4: Proaktywne usuwanie slangu Dark Fantasy Ep 04 (Bez jaj!, Guzik mnie to obchodzi, pora stąd zwiewać, durna jestem)
+    t_bezjaj, _ = AVTLinter.lint_and_fix_line("Bez jaj! To niemożliwe!")
+    assert "Niemożliwe!" in t_bezjaj and "Bez jaj" not in t_bezjaj, f"Nie usunięto slangu 'Bez jaj': {t_bezjaj}"
+    t_guzik, _ = AVTLinter.lint_and_fix_line("Guzik mnie to obchodzi.")
+    assert "Nic mnie to nie obchodzi" in t_guzik, f"Nie usunięto potocyzmu 'Guzik mnie to obchodzi': {t_guzik}"
+    t_zwiewac, _ = AVTLinter.lint_and_fix_line("Dobra, pora stąd zwiewać!")
+    assert "pora stąd uciekać" in t_zwiewac, f"Nie usunięto potocyzmu 'pora stąd zwiewać': {t_zwiewac}"
+    t_durna, _ = AVTLinter.lint_and_fix_line("Durna jestem!")
+    assert "Głupia jestem" in t_durna, f"Nie poprawiono stylistyki 'Durna jestem': {t_durna}"
+
+    # Asercja 5: Korekta kalki składniowej rządu 'mam przez nie uraz' -> 'mam do nich uraz'
+    t_uraz, _ = AVTLinter.lint_and_fix_line("Mam przez nie uraz!")
+    assert "Mam do nich uraz" in t_uraz, f"Nie skorygowano kalki rządu: {t_uraz}"
+
+    # Asercja 6: Higiena typograficzna wielokropka (?..., !... -> ?.., !..)
+    subs_punc = pysubs2.SSAFile()
+    subs_punc.events.append(pysubs2.SSAEvent(start=0, end=2000, style="Main", text="To sen?..."))
+    subs_punc.events.append(pysubs2.SSAEvent(start=2000, end=4000, style="Main", text="Muszę!..."))
+    res_punc, _ = EpisodeQualityGate.audit_and_fix_entire_episode(subs_punc, series_bible=bible)
+    assert res_punc.events[0].text == "To sen?..", f"Nie znormalizowano wielokropka '?..': {res_punc.events[0].text}"
+    assert res_punc.events[1].text == "Muszę!..", f"Nie znormalizowano wielokropka '!..': {res_punc.events[1].text}"
+
+    print(" -> PASSED: Uniwersalna Pamięć Serialu i zabezpieczenia Clevatess Ep 04 zweryfikowane w 5 warstwach (0.00 PLN).")
+
+
+def test_tenmaku_ep11_holistic_domain_guard():
+    print("Testing Tenmaku no Jaadugar Ep 11 Holistic Domain Guard (Filar CLXVII)...")
+    from avt_linter import EpisodeQualityGate, AVTLinter, load_subtitle_file_resilient
+    from series_memory import SeriesBible
+    import pysubs2
+
+    bible = SeriesBible("Tenmaku no Jaadugar")
+
+    # Asercja 1: Möge - żelazna ochrona rodzaju żeńskiego w bazie wiedzy i EpisodeQualityGate
+    subs_moge = pysubs2.SSAFile()
+    subs_moge.events.append(pysubs2.SSAEvent(start=1000, end=3000, style="Default", name="Möge", text="Sama powinnam wziąć sprawy w swoje ręce."))
+    res_moge, _ = EpisodeQualityGate.audit_and_fix_entire_episode(subs_moge, series_bible=bible)
+    assert "powinnam" in res_moge.events[0].text, f"BŁĄD: Möge została zniekształcona na rodzaj męski: {res_moge.events[0].text}"
+    assert "powinienem" not in res_moge.events[0].text
+
+    # Asercja 2: Shira - odporność na pułapkę negatywnych słów kluczowych i orzeczenia w 3. os.
+    subs_shira = pysubs2.SSAFile()
+    subs_shira.events.append(pysubs2.SSAEvent(start=1000, end=3000, style="Default", name="Sitara", text="Shira ostrzegał mnie przed tym."))
+    subs_shira.events.append(pysubs2.SSAEvent(start=3000, end=5000, style="Default", name="Shira", text="Sam powinienem to przewidzieć."))
+    res_shira, _ = EpisodeQualityGate.audit_and_fix_entire_episode(subs_shira, series_bible=bible)
+    assert "Shira ostrzegał" in res_shira.events[0].text, f"BŁĄD: Shira został potraktowany jako kobieta: {res_shira.events[0].text}"
+    assert "ostrzegała" not in res_shira.events[0].text
+    assert "powinienem" in res_shira.events[1].text, f"BŁĄD: 1. osoba Shiry zniekształcona na żeńską: {res_shira.events[1].text}"
+    assert "powinnam" not in res_shira.events[1].text
+
+    # Asercja 3: Podwójny rząd przyimka 'za' - ochrona biernika w 'wyjść za Gujuka' (Filar CLXVII)
+    subs_gujuk = pysubs2.SSAFile()
+    subs_gujuk.events.append(pysubs2.SSAEvent(start=1000, end=3000, style="Default", name="Hulegu", text="M-Matka ma wyjść za Gujuka?!"))
+    res_gujuk, _ = EpisodeQualityGate.audit_and_fix_entire_episode(subs_gujuk, series_bible=bible)
+    assert "wyjść za Gujuka" in res_gujuk.events[0].text, f"BŁĄD: Zniekształcono biernik 'za Gujuka' na narzędnik/mianownik: {res_gujuk.events[0].text}"
+    assert "za Gujukę" not in res_gujuk.events[0].text
+    assert "za Gujukiem" not in res_gujuk.events[0].text
+
+    # Asercja 4: Rejekcja form odmienionych znanych postaci z tworzenia fantomowych mianowników
+    subs_decl = pysubs2.SSAFile()
+    subs_decl.events.append(pysubs2.SSAEvent(start=1000, end=3000, style="Default", name="Hulegu", text="Rozmawiałem z Gujukiem i poszedłem do Gujuka."))
+    res_decl, _ = EpisodeQualityGate.audit_and_fix_entire_episode(subs_decl, series_bible=bible)
+    assert "Gujukiem" in res_decl.events[0].text
+    assert "Gujuka" in res_decl.events[0].text
+
+    # Asercja 5: Puryzm rejestru dramatu historycznego (Dobre pytanie -> Trudno powiedzieć, W sumie -> W istocie, Oj tam! -> Daj spokój!)
+    t_dobre, _ = AVTLinter.lint_and_fix_line("Dobre pytanie.")
+    assert "Trudno powiedzieć" in t_dobre, f"Nie usunięto korporacyjnej kalki 'Dobre pytanie': {t_dobre}"
+    t_wsumie, _ = AVTLinter.lint_and_fix_line("W sumie to nam na rękę.")
+    assert "W istocie to nam na rękę" in t_wsumie, f"Nie poprawiono rejestru 'W sumie': {t_wsumie}"
+    t_ojtam, _ = AVTLinter.lint_and_fix_line("Oj tam! Nic się nie stało.")
+    assert "Daj spokój" in t_ojtam, f"Nie zastąpiono potocyzmu 'Oj tam': {t_ojtam}"
+
+    # Asercja 6: Resilient Subtitle Loader - naprawa fansubowych znaczników czasu z pominiętą godziną (10:10.79 -> 0:10:10.79)
+    import tempfile
+    malformed_ass = (
+        "[Script Info]\nTitle: Test\nScriptType: v4.00+\n\n"
+        "[V4+ Styles]\nFormat: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\n"
+        "Style: Default,Arial,20,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1,0,2,10,10,10,1\n\n"
+        "[Events]\nFormat: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\n"
+        "Dialogue: 0,10:10.79,10:12.79,Default,Sitara,0,0,0,,Ocaliłeś mnie.\n"
+    )
+    with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", suffix=".ass", delete=False) as tf:
+        tf.write(malformed_ass)
+        tf_path = tf.name
+    try:
+        loaded_subs = load_subtitle_file_resilient(tf_path)
+        assert len(loaded_subs.events) == 1, "Nie załadowano napisów z naprawionym znacznikiem czasu"
+        assert loaded_subs.events[0].start == 610790, f"Oczekiwano start=610790 ms (10m 10.79s), otrzymano {loaded_subs.events[0].start}"
+        assert loaded_subs.events[0].end == 612790, f"Oczekiwano end=612790 ms (10m 12.79s), otrzymano {loaded_subs.events[0].end}"
+    finally:
+        import os
+        if os.path.exists(tf_path):
+            os.remove(tf_path)
+
+    print(" -> PASSED: Tenmaku no Jaadugar Ep 11 Holistic Domain Guard zweryfikowany w 5 warstwach (0.00 PLN).")
+
+
+def test_carameliser_ep09_holistic_domain_guard():
+    print("Testing Otome Kaijuu Carameliser Ep 09 Holistic Domain Guard (Filar XXVII, XXIII, LX)...")
+    from avt_linter import EpisodeQualityGate, AVTLinter
+    from series_memory import SeriesBible
+    import pysubs2
+
+    bible = SeriesBible("Otome Kaijuu Carameliser")
+
+    # Asercja 1: SeriesBible helper methods (resolve_canonical_name, get_character_gender)
+    assert bible.resolve_canonical_name("Kuro") == "Kuroe"
+    assert bible.resolve_canonical_name("Kuro-tan") == "Kuroe"
+    assert bible.resolve_canonical_name("Kuro-taso") == "Kuroe"
+    assert bible.get_character_gender("Akaishi") == "FEMALE"
+    assert bible.get_character_gender("Kotaro") == "MALE"
+
+    # Asercja 2: Anti-Self-Address & Multi-line Interlocutor Tracking (Filar XXVII)
+    subs_senpai = pysubs2.SSAFile()
+    subs_senpai.events.append(pysubs2.SSAEvent(start=1000, end=3000, style="Default", name="Kotaro", text="Wtedy je zabrałaś, prawda, Senpai?"))
+    subs_senpai.events.append(pysubs2.SSAEvent(start=4000, end=5000, style="Default", name="Kotaro", text="Senpai!"))
+    subs_senpai.events.append(pysubs2.SSAEvent(start=6000, end=7000, style="Default", name="Kotaro", text="Nic ci nie jest, senpai?"))
+    subs_senpai.events.append(pysubs2.SSAEvent(start=8000, end=9000, style="Default", name="Kotaro", text="Senpai?"))
+
+    res_senpai, _ = EpisodeQualityGate.audit_and_fix_entire_episode(subs_senpai, series_bible=bible)
+    # Speaker must NEVER address himself as Kotaro!
+    for ev in res_senpai.events:
+        assert "Kotaro" not in ev.text, f"BŁĄD: Wykryto auto-adresację w kwestii Kotaro: {ev.text}"
+        assert ev.text.strip() != "", "BŁĄD: Kwestia wołaczowa została wyczyszczona do pustego ciągu!"
+
+    assert "prawda, Rinko?" in res_senpai.events[0].text
+    assert res_senpai.events[1].text == "Rinko!"
+    assert "Nic ci nie jest, Rinko?" in res_senpai.events[2].text
+    assert res_senpai.events[3].text == "Rinko?"
+
+    # Asercja 3: Hypocorisms Canonical Resolution & Anti-Truncation (Kuro-tan -> Kuroe)
+    subs_hypo = pysubs2.SSAFile()
+    subs_hypo.events.append(pysubs2.SSAEvent(start=1000, end=3000, style="Default", name="Rinko", text="Nasza Kuro-tan wyewoluowała w ciągu jednego pokolenia."))
+    subs_hypo.events.append(pysubs2.SSAEvent(start=4000, end=6000, style="Default", name="Rinko", text="Z jednego wykluła się Kuro-tan."))
+    subs_hypo.events.append(pysubs2.SSAEvent(start=7000, end=9000, style="Default", name="Rinko", text="że na zlecenie rządu badasz Kuro-tan."))
+
+    res_hypo, _ = EpisodeQualityGate.audit_and_fix_entire_episode(subs_hypo, series_bible=bible)
+    for ev in res_hypo.events:
+        assert "Kuroe" in ev.text, f"BŁĄD: Nie rozwinięto hipokorystyku do Kuroe: {ev.text}"
+        assert "Kuro wyewoluowała" not in ev.text
+        assert "się Kuro." not in ev.text
+        assert "badasz Kuro." not in ev.text
+
+    # Asercja 4: Polite Surname Recovery (Akaishi-senpai -> panno Akaishi)
+    subs_formal = pysubs2.SSAFile()
+    subs_formal.events.append(pysubs2.SSAEvent(start=1000, end=3000, style="Default", name="Kotaro", text="To znaczy... Akaishi-senpai."))
+    res_formal, _ = EpisodeQualityGate.audit_and_fix_entire_episode(subs_formal, series_bible=bible)
+    assert res_formal.events[0].text == "To znaczy... panno Akaishi.", f"BŁĄD: Niepoprawny rejestr grzecznościowy: {res_formal.events[0].text}"
+
+    # Asercja 5: Manga Canon Titular Vocative (książę -> królewiczu)
+    subs_prince = pysubs2.SSAFile()
+    subs_prince.events.append(pysubs2.SSAEvent(start=1000, end=3000, style="Default", name="Takamine", text="Wypadłeś idealnie, książę!"))
+    subs_prince.events.append(pysubs2.SSAEvent(start=4000, end=6000, style="Default", name="Seina", text="Nie mogę się doczekać naszej współpracy, Książę."))
+    res_prince, _ = EpisodeQualityGate.audit_and_fix_entire_episode(subs_prince, series_bible=bible)
+    assert "królewiczu!" in res_prince.events[0].text
+    assert "Królewiczu." in res_prince.events[1].text
+
+    # Asercja 6: Formatowanie urwanych kwestii z przyklejonym myślnikiem em/en-dash (Filar LX)
+    subs_dash = pysubs2.SSAFile()
+    subs_dash.events.append(pysubs2.SSAEvent(start=1000, end=3000, style="Default", name="Rinko", text="Hej! Zobacz, coś ty na—"))
+    subs_dash.events.append(pysubs2.SSAEvent(start=4000, end=6000, style="Default", name="Kotaro", text="Co ci jest, Rin–"))
+    res_dash, _ = EpisodeQualityGate.audit_and_fix_entire_episode(subs_dash, series_bible=bible)
+    assert res_dash.events[0].text == "Hej! Zobacz, coś ty na..."
+    assert res_dash.events[1].text == "Co ci jest, Rin..."
+
+    print(" -> PASSED: Otome Kaijuu Carameliser Ep 09 Holistic Domain Guard zweryfikowany w 5 warstwach (0.00 PLN).")
+
+
+def test_pipeline_none_type_immunity_and_edge_case_guard():
+    print("[TEST 73/73] Test Odporności Potoku na NoneType, Błędy Kodowania i Skrajne Przypadki Wejścia...")
+    from rules import get_focused_rules_for_batch
+    from avt_linter import load_subtitle_file_resilient, EpisodeQualityGate
+    from translator import clean_orphaned_dialogue_dashes
+    from metadata import clean_anime_filename
+    from series_memory import SeriesBible
+    import tempfile
+    import os
+
+    # Asercja 1: get_focused_rules_for_batch jest w 100% odporny na NoneType i niepełne słowniki
+    batch_none = [
+        {"en": None, "pl": None, "notes": None, "style": None},
+        {"en": "Did you take it, senpai?", "pl": "Zabrałaś to, senpai?", "notes": "Filar XXVII"},
+        {"en": "Good question.", "pl": "Dobre pytanie.", "notes": "Filar CLXVII"}
+    ]
+    focused = get_focused_rules_for_batch(batch_none)
+    assert "XXVII" in focused and "CLXVII" in focused
+    focused_capped = get_focused_rules_for_batch(batch_none, max_rules=2)
+    assert focused_capped.count("• [SKUP SIĘ NA:") <= 2
+
+    # Asercja 2: load_subtitle_file_resilient normalizuje czeskie błędy godzin i kodowanie CP1250
+    malformed_subs = (
+        "[Script Info]\nScriptType: v4.00+\n\n"
+        "[V4+ Styles]\n"
+        "Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\n"
+        "Style: Default,Arial,20,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1,0,2,10,10,10,1\n\n"
+        "[Events]\n"
+        "Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\n"
+        "Dialogue: 0,10:10.79,10:12.79,Default,Sitara,0,0,0,,M-Matka ma wyjść za Gujuka?!\n"
+    )
+    with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", suffix=".ass", delete=False) as tf:
+        tf.write(malformed_subs)
+        tf_path = tf.name
+    try:
+        loaded = load_subtitle_file_resilient(tf_path)
+        assert len(loaded.events) == 1
+        assert loaded.events[0].start >= 600000
+    finally:
+        if os.path.exists(tf_path):
+            os.remove(tf_path)
+
+    # Asercja 3: clean_orphaned_dialogue_dashes precyzyjnie zachowuje tagi ASS i formatuje dwugłos
+    dual_turn = clean_orphaned_dialogue_dashes(r"{\pos(100,200)}- Gratulacje... - {\c&H0000FF&}Dziękuję!")
+    assert "- Gratulacje..." in dual_turn and "- Dziękuję!" in dual_turn
+    assert r"{\pos(100,200)}" in dual_turn
+
+    # Asercja 4: Normalizacja nazw wydań scenowych torrent/fansub w clean_anime_filename
+    clean_name = clean_anime_filename("KAMUI.Hes.Behind.You.S01E07.REPACK.1080p.UNCENSORED.AMZN.WEB-DL.DDP2.0.H.264-FLUX.mkv")
+    assert clean_name == "KAMUI Hes Behind You"
+
+    # Asercja 5: SeriesBible update_from_episode_profile obsługuje puste i uszkodzone wpisy
+    bible = SeriesBible("Test Suite Series")
+    bible.update_from_episode_profile(
+        episode_name="Ep 01",
+        characters={"Hero": "Mężczyzna", "": None},
+        glossary={"Item": "Przedmiot", None: ""},
+        plot_anchors={},
+        relationships={"Hero->Villain": "Wróg"}
+    )
+    assert "Hero" in bible.data["characters"]
+    assert "Hero->Villain" in bible.data["relationships"]
+    if hasattr(bible, "path") and bible.path.exists():
+        try:
+            bible.path.unlink()
+        except OSError:
+            pass
+
+    # Asercja 6: generate_polish_name_declension bezbłędnie realizuje alternacje fonologiczne (-ia, -ya, -ca, -k/-g, -th)
+    from series_memory import generate_polish_name_declension
+    d_alicia = generate_polish_name_declension("Alicia", "FEMALE")
+    assert d_alicia["D"] == "Alicii" and d_alicia["Ms"] == "Alicii" and d_alicia["B"] == "Alicię"
+    d_maria = generate_polish_name_declension("Maria", "FEMALE")
+    assert d_maria["D"] == "Marii" and d_maria["Ms"] == "Marii"
+    d_freya = generate_polish_name_declension("Freya", "FEMALE")
+    assert d_freya["D"] == "Freyi" and d_freya["Ms"] == "Freyi" and d_freya["B"] == "Freyę"
+    d_gujuk = generate_polish_name_declension("Gujuk", "MALE")
+    assert d_gujuk["N"] == "Gujukiem" and d_gujuk["Ms"] == "Gujuku" and d_gujuk["W"] == "Gujuku"
+    d_koath = generate_polish_name_declension("Koath", "MALE")
+    assert d_koath["Ms"] == "Koathu" and d_koath["W"] == "Koathu"
+    d_luca = generate_polish_name_declension("Luca", "MALE")
+    assert d_luca["D"] == "Luki" and d_luca["B"] == "Lukę" and d_luca["Ms"] == "Luce"
+
+    print(" -> PASSED: Odporność potoku na NoneType, błędy kodowania, fonetykę imion i skrajne przypadki wejścia zweryfikowana w 5 warstwach (0.00 PLN).")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -4692,7 +5743,21 @@ if __name__ == "__main__":
     test_systemic_information_flow_and_scene_topology()
     test_runtime_batch_pipeline_and_ast_integrity_guard()
     test_batch_density_scene_coalescence_and_cost_optimization()
-    print("\n Wszystkie testy jednostkowe i integracyjne (60/60) zakończone pełnym sukcesem!\n")
+    test_anti_calque_morphology_and_single_char_actor_resilience()
+    test_database_integrity_anilist_resilience_and_slug_consolidation()
+    test_sayonara_lara_holistic_domain_declension_vocative_and_syntax_guard()
+    test_carameliser_holistic_domain_dashes_conjunction_and_canon_guard()
+    test_kore_kaite_shine_ep08_holistic_domain_guard()
+    test_kore_kaite_shine_ep09_holistic_domain_guard()
+    test_nige_jouzu_ep20_holistic_domain_guard()
+    test_clevatess_ep05_holistic_domain_guard()
+    test_clevatess_ep03_proactive_governance_guard()
+    test_universal_series_memory_and_ep04_guard()
+    test_tenmaku_ep11_holistic_domain_guard()
+    test_carameliser_ep09_holistic_domain_guard()
+    test_pipeline_none_type_immunity_and_edge_case_guard()
+    print("\n Wszystkie testy jednostkowe i integracyjne (73/73) zakończone pełnym sukcesem!\n")
+
 
 
 

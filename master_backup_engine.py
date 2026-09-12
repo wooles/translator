@@ -158,6 +158,11 @@ echo ================================================================
 echo   PRZYWRACANIE ZAKONCZONE PELNYM SUKCESEM!
 echo   Wszystkie projekty (Translator, Sorter, Kalendarz),
 echo   pamiec AI (.gemini) i baza napisow sa w 100%% gotowe do pracy.
+echo.
+echo   [!] PAMIETAJ O KLUCZACH API (MultiKey Pool - 3 klucze):
+echo   Upewnij sie, ze w folderze translator\.env znajduje sie wpis:
+echo   GEMINI_API_KEY=klucz1,klucz2,klucz3
+echo   (Klucze mozesz rowniez wkleic w oknie Ustawien w gui_app.py).
 echo ================================================================
 pause
 """
@@ -185,7 +190,11 @@ pause
     print("     - 'KOMPLETNY_BACKUP_SYSTEMU.zip'")
     print("     - 'PRZYWROC_SYSTEM_NA_NOWYM_PC.bat'")
     print("  2. Na nowym PC wrzuc je na Pulpit i kliknij 'PRZYWROC_SYSTEM_NA_NOWYM_PC.bat'.")
-    print("  Wszystko (pamiatki AI, projekty, Python, testy) ustawi sie samo!")
+    print("     Wszystko (pamiatki AI, projekty, Python, testy) ustawi sie samo!")
+    print("  3. Skonfiguruj klucze API (tlumacz korzysta z 3 kluczy - MultiKey Pool):")
+    print("     - W folderze 'translator' utworz lub uzupelnij plik .env wpisem:")
+    print("       GEMINI_API_KEY=klucz1,klucz2,klucz3")
+    print("     - Lub wklej klucze w Ustawieniach GUI (gui_app.py) albo ustaw zmienna srodowiskowa.")
     print("=" * 74 + "\n")
 
 

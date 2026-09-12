@@ -1,20 +1,8 @@
 {
   "anime_title": "Rakudai Kenja no Gakuin Musou",
   "characters": {
-    "Anastasia -> Eftal": {
-      "description": "Zwrot: 'Mistrzu / na pan' (uczennica / ocalona -> wybawca i mentor) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
-    },
-    "Merlin -> Eftal": {
-      "description": "Zwrot: 'panie Eftalu' (lojalna powierniczka i była uczennica -> mistrz) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie Eftalu', zakaz poufałego wołacza 'Eftalu' oraz hybryd 'Eftalu... ma pan']"
-    },
-    "Eftal -> Anastasia": {
-      "description": "Zwrot: 'na ty / Anastasio' (mentor -> podopieczna)"
-    },
-    "Eftal -> Merlin": {
-      "description": "Zwrot: 'na ty / Merlin' (dawni towarzysze / zaufani partnerzy)"
-    },
-    "Gaius": {
-      "description": "chłopak (Główny bohater) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    "Anastasia": {
+      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Eftal": {
       "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
@@ -22,8 +10,8 @@
     "Merlin": {
       "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
-    "Anastasia": {
-      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    "Gaius": {
+      "description": "chłopak (Główny bohater) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Cliff": {
       "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
@@ -33,6 +21,33 @@
     },
     "Genie": {
       "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Maria": {
+      "description": "KOBIETA (wyodrębniono z relacji serii)"
+    },
+    "Anastasia -> Eftal": {
+      "description": "Zwrot: 'Mistrzu / na pan' (uczennica / ocalona -> wybawca i mentor)"
+    },
+    "Merlin -> Eftal": {
+      "description": "Zwrot: 'panie Eftalu' (lojalna powierniczka i była uczennica -> mistrz) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie Eftalu', zakaz poufałego wołacza 'Eftalu' oraz hybryd 'Eftalu... ma pan']"
+    },
+    "Eftal -> Anastasia": {
+      "description": "Zwrot: 'na ty / Anastasio' (opiekun i mistrz -> podopieczna)"
+    },
+    "Eftal -> Merlin": {
+      "description": "Zwrot: 'na ty / Merlin' (dawni towarzysze / zaufani partnerzy)"
+    },
+    "Merlin -> Maria": {
+      "description": "Zwrot: 'Siostrzyczko Mario' (udawane dziecko -> nauczycielka)"
+    },
+    "Anastasia -> Merlin": {
+      "description": "Zwrot: 'Merlin' (koleżanki / uczennice tego samego mistrza)"
+    },
+    "Seiryu -> Eftal": {
+      "description": "Zwrot: 'człowieku / nędzny śmiertelniku' (bóstwo paktu -> bezczelny buntownik)"
+    },
+    "Eftal -> Seiryu": {
+      "description": "Zwrot: 'na ty / przerośnięty gadzie' (pogromca paktów -> pokonana bestia)"
     }
   },
   "glossary": {
@@ -45,9 +60,30 @@
     "Magia Burst": "Wybuch Magii",
     "astral body": "ciało astralne",
     "Divine Domain": "Boska Domena",
-    "X-Gravity": "X-Grawitacja"
+    "X-Gravity": "X-Grawitacja",
+    "Noble Inquisition Organization": "Szlachecka Organizacja Inkwizycyjna",
+    "Special Slave Crest": "Specjalna Pieczęć Niewolnicza",
+    "Seraph Dispel": "Rozproszenie Serafina",
+    "Yunotron": "Yunotron",
+    "Four Emperors": "Czterej Cesarze",
+    "Mind Link": "Więź Umysłów",
+    "Physical Enhancement": "Wzmocnienie Fizyczne",
+    "Enhance Divine Domain": "Wzmocnienie Boskiej Domeny",
+    "Thor's Lance": "Włócznia Thora",
+    "Contract beast": "Bestia paktu",
+    "Slave crest": "Piętno niewolnika",
+    "Four Holy Beasts": "Cztery Święte Bestie"
   },
-  "relationships": {},
+  "relationships": {
+    "Anastasia -> Eftal": "Zwrot: 'Mistrzu / na pan' (uczennica / ocalona -> wybawca i mentor)",
+    "Merlin -> Eftal": "Zwrot: 'panie Eftalu' (lojalna powierniczka i była uczennica -> mistrz) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie Eftalu', zakaz poufałego wołacza 'Eftalu' oraz hybryd 'Eftalu... ma pan']",
+    "Eftal -> Anastasia": "Zwrot: 'na ty / Anastasio' (opiekun i mistrz -> podopieczna)",
+    "Eftal -> Merlin": "Zwrot: 'na ty / Merlin' (dawni towarzysze / zaufani partnerzy)",
+    "Merlin -> Maria": "Zwrot: 'Siostrzyczko Mario' (udawane dziecko -> nauczycielka)",
+    "Anastasia -> Merlin": "Zwrot: 'Merlin' (koleżanki / uczennice tego samego mistrza)",
+    "Seiryu -> Eftal": "Zwrot: 'człowieku / nędzny śmiertelniku' (bóstwo paktu -> bezczelny buntownik)",
+    "Eftal -> Seiryu": "Zwrot: 'na ty / przerośnięty gadzie' (pogromca paktów -> pokonana bestia)"
+  },
   "declensions": {
     "Anastasia": {
       "M": "Anastasia",
@@ -69,12 +105,12 @@
     },
     "Merlin": {
       "M": "Merlin",
-      "D": "Merlin",
-      "C": "Merlin",
-      "B": "Merlin",
-      "N": "Merlin",
-      "Ms": "Merlin",
-      "W": "Merlin"
+      "D": "Merlina",
+      "C": "Merlinowi",
+      "B": "Merlina",
+      "N": "Merlinem",
+      "Ms": "Merlinie",
+      "W": "Merlinie"
     },
     "Gaius": {
       "M": "Gaius",
@@ -111,6 +147,87 @@
       "N": "Genie",
       "Ms": "Genie",
       "W": "Genie"
+    },
+    "Maria": {
+      "M": "Maria",
+      "D": "Mariy",
+      "C": "Marie",
+      "B": "Marię",
+      "N": "Marią",
+      "Ms": "Marie",
+      "W": "Mario"
+    },
+    "Anastasia -> Eftal": {
+      "M": "Anastasia -> Eftal",
+      "D": "Anastasiy -> Eftal",
+      "C": "Anastasie -> Eftal",
+      "B": "Anastasię -> Eftal",
+      "N": "Anastasią -> Eftal",
+      "Ms": "Anastasie -> Eftal",
+      "W": "Anastasio -> Eftal"
+    },
+    "Merlin -> Eftal": {
+      "M": "Merlin -> Eftal",
+      "D": "Merlina -> Eftala",
+      "C": "Merlinowi -> Eftalowi",
+      "B": "Merlina -> Eftala",
+      "N": "Merlinem -> Eftalem",
+      "Ms": "Merlinie -> Eftalu",
+      "W": "Merlinie -> Eftalu"
+    },
+    "Eftal -> Anastasia": {
+      "M": "Eftal -> Anastasia",
+      "D": "Eftal -> Anastasiy",
+      "C": "Eftal -> Anastasie",
+      "B": "Eftal -> Anastasię",
+      "N": "Eftal -> Anastasią",
+      "Ms": "Eftal -> Anastasie",
+      "W": "Eftal -> Anastasio"
+    },
+    "Eftal -> Merlin": {
+      "M": "Eftal -> Merlin",
+      "D": "Eftala -> Merlina",
+      "C": "Eftalowi -> Merlinowi",
+      "B": "Eftala -> Merlina",
+      "N": "Eftalem -> Merlinem",
+      "Ms": "Eftalu -> Merlinie",
+      "W": "Eftalu -> Merlinie"
+    },
+    "Merlin -> Maria": {
+      "M": "Merlin -> Maria",
+      "D": "Merlin -> Mariy",
+      "C": "Merlin -> Marie",
+      "B": "Merlin -> Marię",
+      "N": "Merlin -> Marią",
+      "Ms": "Merlin -> Marie",
+      "W": "Merlin -> Mario"
+    },
+    "Anastasia -> Merlin": {
+      "M": "Anastasia -> Merlin",
+      "D": "Anastasiy -> Merlin",
+      "C": "Anastasie -> Merlin",
+      "B": "Anastasię -> Merlin",
+      "N": "Anastasią -> Merlin",
+      "Ms": "Anastasie -> Merlin",
+      "W": "Anastasio -> Merlin"
+    },
+    "Seiryu -> Eftal": {
+      "M": "Seiryu -> Eftal",
+      "D": "Seiryu -> Eftala",
+      "C": "Seiryu -> Eftalowi",
+      "B": "Seiryu -> Eftala",
+      "N": "Seiryu -> Eftalem",
+      "Ms": "Seiryu -> Eftalu",
+      "W": "Seiryu -> Eftalu"
+    },
+    "Eftal -> Seiryu": {
+      "M": "Eftal -> Seiryu",
+      "D": "Eftala -> Seiryu",
+      "C": "Eftalowi -> Seiryu",
+      "B": "Eftala -> Seiryu",
+      "N": "Eftalem -> Seiryu",
+      "Ms": "Eftalu -> Seiryu",
+      "W": "Eftalu -> Seiryu"
     }
   },
   "plot_anchors": {
@@ -118,6 +235,8 @@
     "Four Emperors (Lightning, Flame, Ice, Earth)": "Konsekwentnie: Cesarz Gromu, Ognisty Cesarz, Lodowy Cesarz, Cesarz Ziemi."
   },
   "episodes_translated": [
-    "[ASW] Rakudai Kenja no Gakuin Musou - 12 [1080p HEVC][8BD533E0]"
+    "[ASW] Rakudai Kenja no Gakuin Musou - 12 [1080p HEVC][8BD533E0]",
+    "[ASW] Rakudai Kenja no Gakuin Musou - 10 [1080p HEVC][EB8519C9]",
+    "[ASW] Rakudai Kenja no Gakuin Musou - 11 [1080p HEVC][8821CA16]"
   ]
 }

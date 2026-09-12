@@ -1,6 +1,30 @@
 {
   "anime_title": "Futsutsuka na Akujo dewa Gozaimasu ga",
   "characters": {
+    "Kou Tousetsu": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Shu Keigetsu": {
+      "description": "KOBIETA (wyodrębniono z relacji serii)"
+    },
+    "Shin-U": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Kou Kenshuu": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Leelee": {
+      "description": "KOBIETA (wyodrębniono z relacji serii)"
+    },
+    "Ei Gyoumei": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Służba / Gwardia": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Bunkou": {
+      "description": "KOBIETA (wyodrębniono z relacji serii)"
+    },
     "Shu Keigetsu (dusza Reirin) -> Kou Kenshuu (Cesarzowa)": {
       "description": "Zwrot: 'Wasza Cesarska Mość' (Kandydatka klanowa -> Cesarzowa)"
     },
@@ -55,10 +79,216 @@
     "Archery Vigil": "Łucznicze Czuwanie",
     "Water qi / Fire qi / Earth qi": "Qi Wody"
   },
-  "relationships": {},
+  "relationships": {
+    "Shu Keigetsu (dusza Reirin) -> Kou Kenshuu (Cesarzowa)": "Zwrot: 'Wasza Cesarska Mość' (Kandydatka klanowa -> Cesarzowa)",
+    "Kou Tousetsu -> Kou Kenshuu (Cesarzowa)": "Zwrot: 'Wasza Cesarska Mość' (Główna dama dworu -> Cesarzowa)",
+    "Kou Kenshuu (Cesarzowa) -> Shu Keigetsu": "Zwrot: 'Shu Keigetsu / po imieniu' (Władczyni -> Dama dworu)",
+    "Shin-U -> Kou Kenshuu": "Zwrot: 'Wasza Cesarska Mość' (Kapitan gwardii -> Cesarzowa)",
+    "Shin-U -> Shu Keigetsu": "Zwrot: 'Pani Shu Keigetsu' (dowódca straży -> szlachcianka)",
+    "Leelee -> Shu Keigetsu": "Zwrot: 'Moja Pani / Panienko Keigetsu' (służąca -> pani)",
+    "Ei Gyoumei -> Służba / Gwardia": "Zwrot: 'per wy / tryb rozkazujący' (Następca Tronu -> Podwładni)",
+    "Bunkou -> Shu Keigetsu": "Zwrot: 'Panienko Shu' (Eunuch -> Kandydatka klanu Shu)",
+    "Shu Keigetsu -> Kou Kenshuu (Cesarzowa)": "Zwrot: 'Wasza Cesarska Mość' (poddana / kandydatka na dwór -> władczyni)",
+    "Ei Gyoumei (Książę) -> Kou Kenshuu (Cesarzowa)": "Zwrot: 'Matko / Wasza Cesarska Mość' (Syn i Następca Tronu -> Cesarzowa)",
+    "Shin-U (Kapitan Jastrzębich Oczu) -> Shu Keigetsu": "Zwrot: 'Panienko Keigetsu / Panienko z rodu Shu' (Dowódca Straży -> Dama dworu)",
+    "Shu Keigetsu -> Ei Gyoumei (Następca Tronu)": "Zwrot: 'Wasza Wysokość' (poddana -> książę)",
+    "Kou Kenshuu (Cesarzowa) -> Kou Tousetsu": "Zwrot: 'Tousetsu' (cesarzowa -> Główna Dama Dworu)"
+  },
   "episodes_translated": [
     "tmpc7zbcf40",
     "tmp1udq4xn_",
     "tmp1ne63jmr"
-  ]
+  ],
+  "declensions": {
+    "Kou Tousetsu": {
+      "M": "Kou Tousetsu",
+      "D": "Kou Tousetsu",
+      "C": "Kou Tousetsu",
+      "B": "Kou Tousetsu",
+      "N": "Kou Tousetsu",
+      "Ms": "Kou Tousetsu",
+      "W": "Kou Tousetsu"
+    },
+    "Shu Keigetsu": {
+      "M": "Shu Keigetsu",
+      "D": "Shu Keigetsu",
+      "C": "Shu Keigetsu",
+      "B": "Shu Keigetsu",
+      "N": "Shu Keigetsu",
+      "Ms": "Shu Keigetsu",
+      "W": "Shu Keigetsu"
+    },
+    "Shin-U": {
+      "M": "Shin-U",
+      "D": "Shin-U",
+      "C": "Shin-U",
+      "B": "Shin-U",
+      "N": "Shin-U",
+      "Ms": "Shin-U",
+      "W": "Shin-U"
+    },
+    "Kou Kenshuu": {
+      "M": "Kou Kenshuu",
+      "D": "Kou Kenshuu",
+      "C": "Kou Kenshuu",
+      "B": "Kou Kenshuu",
+      "N": "Kou Kenshuu",
+      "Ms": "Kou Kenshuu",
+      "W": "Kou Kenshuu"
+    },
+    "Leelee": {
+      "M": "Leelee",
+      "D": "Leelee",
+      "C": "Leelee",
+      "B": "Leelee",
+      "N": "Leelee",
+      "Ms": "Leelee",
+      "W": "Leelee"
+    },
+    "Ei Gyoumei": {
+      "M": "Ei Gyoumei",
+      "D": "Ei Gyoumei",
+      "C": "Ei Gyoumei",
+      "B": "Ei Gyoumei",
+      "N": "Ei Gyoumei",
+      "Ms": "Ei Gyoumei",
+      "W": "Ei Gyoumei"
+    },
+    "Służba / Gwardia": {
+      "M": "Służba / Gwardia",
+      "D": "Służby / Gwardiy",
+      "C": "Służbe / Gwardie",
+      "B": "Służbę / Gwardię",
+      "N": "Służbą / Gwardią",
+      "Ms": "Służbe / Gwardie",
+      "W": "Służbo / Gwardio"
+    },
+    "Bunkou": {
+      "M": "Bunkou",
+      "D": "Bunkou",
+      "C": "Bunkou",
+      "B": "Bunkou",
+      "N": "Bunkou",
+      "Ms": "Bunkou",
+      "W": "Bunkou"
+    },
+    "Shu Keigetsu (dusza Reirin) -> Kou Kenshuu (Cesarzowa)": {
+      "M": "Shu Keigetsu (dusza Reirin) -> Kou Kenshuu (Cesarzowa)",
+      "D": "Shu Keigetsu (duszy Reirin) -> Kou Kenshuu (Cesarzowa)",
+      "C": "Shu Keigetsu (dusze Reirin) -> Kou Kenshuu (Cesarzowa)",
+      "B": "Shu Keigetsu (duszę Reirin) -> Kou Kenshuu (Cesarzowa)",
+      "N": "Shu Keigetsu (duszą Reirin) -> Kou Kenshuu (Cesarzowa)",
+      "Ms": "Shu Keigetsu (dusze Reirin) -> Kou Kenshuu (Cesarzowa)",
+      "W": "Shu Keigetsu (duszo Reirin) -> Kou Kenshuu (Cesarzowa)"
+    },
+    "Kou Tousetsu -> Kou Kenshuu (Cesarzowa)": {
+      "M": "Kou Tousetsu -> Kou Kenshuu (Cesarzowa)",
+      "D": "Kou Tousetsu -> Kou Kenshuu (Cesarzowa)",
+      "C": "Kou Tousetsu -> Kou Kenshuu (Cesarzowa)",
+      "B": "Kou Tousetsu -> Kou Kenshuu (Cesarzowa)",
+      "N": "Kou Tousetsu -> Kou Kenshuu (Cesarzowa)",
+      "Ms": "Kou Tousetsu -> Kou Kenshuu (Cesarzowa)",
+      "W": "Kou Tousetsu -> Kou Kenshuu (Cesarzowa)"
+    },
+    "Kou Kenshuu (Cesarzowa) -> Shu Keigetsu": {
+      "M": "Kou Kenshuu (Cesarzowa) -> Shu Keigetsu",
+      "D": "Kou Kenshuu (Cesarzowa) -> Shu Keigetsu",
+      "C": "Kou Kenshuu (Cesarzowa) -> Shu Keigetsu",
+      "B": "Kou Kenshuu (Cesarzowa) -> Shu Keigetsu",
+      "N": "Kou Kenshuu (Cesarzowa) -> Shu Keigetsu",
+      "Ms": "Kou Kenshuu (Cesarzowa) -> Shu Keigetsu",
+      "W": "Kou Kenshuu (Cesarzowa) -> Shu Keigetsu"
+    },
+    "Shin-U -> Kou Kenshuu": {
+      "M": "Shin-U -> Kou Kenshuu",
+      "D": "Shin-U -> Kou Kenshuu",
+      "C": "Shin-U -> Kou Kenshuu",
+      "B": "Shin-U -> Kou Kenshuu",
+      "N": "Shin-U -> Kou Kenshuu",
+      "Ms": "Shin-U -> Kou Kenshuu",
+      "W": "Shin-U -> Kou Kenshuu"
+    },
+    "Shin-U -> Shu Keigetsu": {
+      "M": "Shin-U -> Shu Keigetsu",
+      "D": "Shin-U -> Shu Keigetsu",
+      "C": "Shin-U -> Shu Keigetsu",
+      "B": "Shin-U -> Shu Keigetsu",
+      "N": "Shin-U -> Shu Keigetsu",
+      "Ms": "Shin-U -> Shu Keigetsu",
+      "W": "Shin-U -> Shu Keigetsu"
+    },
+    "Leelee -> Shu Keigetsu": {
+      "M": "Leelee -> Shu Keigetsu",
+      "D": "Leelee -> Shu Keigetsu",
+      "C": "Leelee -> Shu Keigetsu",
+      "B": "Leelee -> Shu Keigetsu",
+      "N": "Leelee -> Shu Keigetsu",
+      "Ms": "Leelee -> Shu Keigetsu",
+      "W": "Leelee -> Shu Keigetsu"
+    },
+    "Ei Gyoumei -> Służba / Gwardia": {
+      "M": "Ei Gyoumei -> Służba / Gwardia",
+      "D": "Ei Gyoumei -> Służby / Gwardiy",
+      "C": "Ei Gyoumei -> Służbe / Gwardie",
+      "B": "Ei Gyoumei -> Służbę / Gwardię",
+      "N": "Ei Gyoumei -> Służbą / Gwardią",
+      "Ms": "Ei Gyoumei -> Służbe / Gwardie",
+      "W": "Ei Gyoumei -> Służbo / Gwardio"
+    },
+    "Bunkou -> Shu Keigetsu": {
+      "M": "Bunkou -> Shu Keigetsu",
+      "D": "Bunkou -> Shu Keigetsu",
+      "C": "Bunkou -> Shu Keigetsu",
+      "B": "Bunkou -> Shu Keigetsu",
+      "N": "Bunkou -> Shu Keigetsu",
+      "Ms": "Bunkou -> Shu Keigetsu",
+      "W": "Bunkou -> Shu Keigetsu"
+    },
+    "Shu Keigetsu -> Kou Kenshuu (Cesarzowa)": {
+      "M": "Shu Keigetsu -> Kou Kenshuu (Cesarzowa)",
+      "D": "Shu Keigetsu -> Kou Kenshuu (Cesarzowa)",
+      "C": "Shu Keigetsu -> Kou Kenshuu (Cesarzowa)",
+      "B": "Shu Keigetsu -> Kou Kenshuu (Cesarzowa)",
+      "N": "Shu Keigetsu -> Kou Kenshuu (Cesarzowa)",
+      "Ms": "Shu Keigetsu -> Kou Kenshuu (Cesarzowa)",
+      "W": "Shu Keigetsu -> Kou Kenshuu (Cesarzowa)"
+    },
+    "Ei Gyoumei (Książę) -> Kou Kenshuu (Cesarzowa)": {
+      "M": "Ei Gyoumei (Książę) -> Kou Kenshuu (Cesarzowa)",
+      "D": "Ei Gyoumei (Książę) -> Kou Kenshuu (Cesarzowa)",
+      "C": "Ei Gyoumei (Książę) -> Kou Kenshuu (Cesarzowa)",
+      "B": "Ei Gyoumei (Książę) -> Kou Kenshuu (Cesarzowa)",
+      "N": "Ei Gyoumei (Książę) -> Kou Kenshuu (Cesarzowa)",
+      "Ms": "Ei Gyoumei (Książę) -> Kou Kenshuu (Cesarzowa)",
+      "W": "Ei Gyoumei (Książę) -> Kou Kenshuu (Cesarzowa)"
+    },
+    "Shin-U (Kapitan Jastrzębich Oczu) -> Shu Keigetsu": {
+      "M": "Shin-U (Kapitan Jastrzębich Oczu) -> Shu Keigetsu",
+      "D": "Shin-U (Kapitan Jastrzębich Oczu) -> Shu Keigetsu",
+      "C": "Shin-U (Kapitan Jastrzębich Oczu) -> Shu Keigetsu",
+      "B": "Shin-U (Kapitan Jastrzębich Oczu) -> Shu Keigetsu",
+      "N": "Shin-U (Kapitan Jastrzębich Oczu) -> Shu Keigetsu",
+      "Ms": "Shin-U (Kapitan Jastrzębich Oczu) -> Shu Keigetsu",
+      "W": "Shin-U (Kapitan Jastrzębich Oczu) -> Shu Keigetsu"
+    },
+    "Shu Keigetsu -> Ei Gyoumei (Następca Tronu)": {
+      "M": "Shu Keigetsu -> Ei Gyoumei (Następca Tronu)",
+      "D": "Shu Keigetsu -> Ei Gyoumei (Następki Tronu)",
+      "C": "Shu Keigetsu -> Ei Gyoumei (Następce Tronu)",
+      "B": "Shu Keigetsu -> Ei Gyoumei (Następkę Tronu)",
+      "N": "Shu Keigetsu -> Ei Gyoumei (Następką Tronu)",
+      "Ms": "Shu Keigetsu -> Ei Gyoumei (Następce Tronu)",
+      "W": "Shu Keigetsu -> Ei Gyoumei (Następko Tronu)"
+    },
+    "Kou Kenshuu (Cesarzowa) -> Kou Tousetsu": {
+      "M": "Kou Kenshuu (Cesarzowa) -> Kou Tousetsu",
+      "D": "Kou Kenshuu (Cesarzowa) -> Kou Tousetsu",
+      "C": "Kou Kenshuu (Cesarzowa) -> Kou Tousetsu",
+      "B": "Kou Kenshuu (Cesarzowa) -> Kou Tousetsu",
+      "N": "Kou Kenshuu (Cesarzowa) -> Kou Tousetsu",
+      "Ms": "Kou Kenshuu (Cesarzowa) -> Kou Tousetsu",
+      "W": "Kou Kenshuu (Cesarzowa) -> Kou Tousetsu"
+    }
+  },
+  "plot_anchors": {}
 }

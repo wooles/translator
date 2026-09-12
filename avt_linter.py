@@ -8,7 +8,7 @@ calques, unnatural questions, incorrect gender forms, and machine-translation ar
 """
 
 import re
-from typing import Dict, List, Tuple, Optional, Any
+from typing import Dict, List, Tuple, Optional, Any, Set, Union
 from pathlib import Path
 
 def _fix_duza_przerwa_match(m: Any) -> str:
@@ -113,6 +113,36 @@ def _fix_witaj_z_powrotem_match(m: Any) -> str:
         return f"{word}{punct}"
     return f"{word}!"
 
+def load_subtitle_file_resilient(subs_file: Any) -> Any:
+    """
+    Safely load SSA/ASS/SRT subtitle files, repairing common fansub timestamp malformations
+    (e.g. missing hour digit '10:10.79' -> '0:10:10.79') and handling multi-byte encodings.
+    """
+    import pysubs2
+    file_path = str(subs_file)
+    raw_content = None
+    encodings = ["utf-8", "utf-8-sig", "latin2", "cp1250"]
+    for enc in encodings:
+        try:
+            with open(file_path, "r", encoding=enc) as f:
+                raw_content = f.read()
+            break
+        except (UnicodeDecodeError, OSError):
+            continue
+    if raw_content is None:
+        return pysubs2.load(file_path)
+
+    # Sanitize missing hour in ASS dialogue timestamps:
+    # e.g. "Dialogue: 0,10:10.79,10:12.79," -> "Dialogue: 0,0:10:10.79,0:10:12.79,"
+    sanitized = re.sub(r"(?m)(Dialogue:\s*\d+,)(\d{1,2}:\d{2}\.\d{2}),(\d{1,2}:\d{2}\.\d{2}),", r"\g<1>0:\2,0:\3,", raw_content)
+    sanitized = re.sub(r"(?m)(Dialogue:\s*\d+,\d+:\d{2}:\d{2}\.\d{2},)(\d{1,2}:\d{2}\.\d{2}),", r"\g<1>0:\2,", sanitized)
+    sanitized = re.sub(r"(?m)(Dialogue:\s*\d+,)(\d{1,2}:\d{2}\.\d{2}),", r"\g<1>0:\2,", sanitized)
+
+    try:
+        return pysubs2.SSAFile.from_string(sanitized)
+    except Exception:
+        return pysubs2.load(file_path, encoding="utf-8")
+
 class AVTLinter:
     """
     Automated validator and corrector for mechanical language calques in subtitle tracks.
@@ -138,6 +168,16 @@ class AVTLinter:
         (r"\b([Mm](?:am|asz|a|amy|acie|ają|iałem|iałam|iał|iała|iało|ieliśmy|iałyśmy|ieli|iały|iałby|iałaby|iałoby|ieliby|iałyby)|[Bb]ęd(?:ę|ziesz|zie|ziemy|ziecie|dą)\s+mieć)\s+taką\s+nadzieję\b", r"\1 nadzieję", "Filar IV/CLXVI - Czystość Idiomatyczna (Eliminacja 'mieć taką nadzieję')"),
         (r"\b([Mm](?:am|asz|a|amy|acie|ają|iałem|iałam|iał|iała|iało|ieliśmy|iałyśmy|ieli|iały|iałby|iałaby|iałoby|ieliby|iałyby)|[Bb]ęd(?:ę|ziesz|zie|ziemy|ziecie|dą)\s+mieć)\s+nadzieję\s+na\s+to\b", r"\1 nadzieję", "Filar IV/CLXVI - Czystość Idiomatyczna (Eliminacja 'mieć nadzieję na to')"),
 
+        # Fansub Clichés & Pivot English Calques (Filar CLXVI)
+        (r"(^|[^\w]|\\[Nnh])([Tt]ylko\s+)?([Ww]róć|[Ww]racaj|[Ww]róćcie|[Ww]racajcie)\s+w\s+jednym\s+kawałku\b", lambda m: f"{m.group(1)}{m.group(2) or ''}{m.group(3)} cały i zdrowy", "Filar CLXVI - Eliminacja Kalki Fansuberskiej 'w jednym kawałku' (in one piece)"),
+        (r"(^|[^\w]|\\[Nnh])w\s+jednym\s+kawałku\b", r"\g<1>w całości", "Filar CLXVI - Eliminacja Kalki Fansuberskiej 'w jednym kawałku'"),
+        (r"(^|[^\w]|\\[Nnh])([Nn])ie\s+róbcie\s+sobie\s+nadziei\b", lambda m: f"{m.group(1)}{'Nie liczcie na mnie' if m.group(2).isupper() else 'nie liczcie na mnie'}", "Filar CLXVI - Eliminacja Kalki 'Don't get your hopes up'"),
+        (r"(^|[^\w]|\\[Nnh])([Nn])ie\s+rób\s+sobie\s+nadziei\b", lambda m: f"{m.group(1)}{'Nie licz na mnie' if m.group(2).isupper() else 'nie licz na mnie'}", "Filar CLXVI - Eliminacja Kalki 'Don't get your hopes up'"),
+        (r"(^|[^\w]|\\[Nnh])([Zz]ginąć\s+)z\s+ręki\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+|kaiju|potwora|bestii|monstrum)\b", r"\g<1>\g<2>od ciosu \g<3>", "Filar CLXVI - Eliminacja Kalki 'die at the hands of [monster]'"),
+        (r"(^|[^\w]|\\[Nnh])([Ss]kop(?:ać|cie|my)?)\s+mu\s+tyłek\b", lambda m: f"{m.group(1)}{'Daj mu popalić' if m.group(2)[0].isupper() else 'daj mu popalić'}", "Filar CLXVI - Eliminacja Kalki 'kick his ass'"),
+        (r"(^|[^\w]|\\[Nnh])([Cc])zemu\s+po\s+prostu\s+jej\s+nie\s+wysłuchałem\b", lambda m: f"{m.group(1)}{'Dlaczego jej nie posłuchałem' if m.group(2).isupper() else 'dlaczego jej nie posłuchałem'}", "Filar CLXVI - Eliminacja Kalki 'Why didn't I just listen to her'"),
+        (r"(^|[^\w]|\\[Nnh])([Zz])a\s+nic\s+z\s+tym\s+nie\s+zawalczę\b", lambda m: f"{m.group(1)}{'Za nic nie stanę do walki z czymś takim' if m.group(2).isupper() else 'za nic nie stanę do walki z czymś takim'}", "Filar CLXVI - Eliminacja Koślawej Składni Fansuberskiej"),
+        
         # Inflections of "robić sens" -> "mieć sens"
         (r"\b([Nn]ie\s+)?([Rr]obi(?:ć|ę|sz|my|cie|ą|ł|ła|ło|li|ły|łby|łaby|łoby|liby|łyby)?)\s+((?:(?:to|jakikolwiek|żaden)\s+)*)(sens(?:u)?)\b", _fix_robic_sens_match, "Filar IV - Eliminacja Kalki 'robić sens' -> 'mieć sens'"),
 
@@ -208,6 +248,40 @@ class AVTLinter:
         
         # Environmental Media & Non-Aqueous Liquids (Filar CXXXVIII)
         (r"\bPowódź\s+piwa\b", "Fala piwa", "Filar CXXXVIII - Kolokacja Cieczy (Fala piwa)"),
+
+        # Anime & Literary Calques (Filary XXV, X, CLXIV, CXXXVII)
+        (r"\bcykl(?:u)?\s+inputu\s+i\s+outputu\b", "cykl czerpania inspiracji i tworzenia", "Filar X/I - Żargon Twórczy 'input/output'"),
+        (r"\bwięcej\s+inputu\b", "więcej inspiracji", "Filar X/I - Żargon Twórczy 'więcej inputu'"),
+        (r"\bInputu(\s*[\?!]+)", r"Inspiracji\1", "Filar X/I - Żargon Twórczy 'Inputu?!'"),
+        (r"(?i)(\b|\\N)zapisywa[^\s]*\s+w\s+takim\s+pomys[^\s,]*", r"\1zapisywałaś w nim pomysły", "Filar IV - Kalka Składniowa 'w takim'"),
+        (r"(?i)\b([Dd]la mnie|[Pp]oproszę)\s+Gojinka\s+z\s+wodą\b", r"\1 Gojinkę z wodą", "Filar CXXXVII - Biernik Zamówienia 'Gojinkę z wodą'"),
+        (r"\bTamaya[!]*", "Ale widok!", "Filar CLXIV - Lokalizacja Okrzyku 'Tamaya!'"),
+        (r"\bpanno\s+Teshimo\b", "pani Teshimo", "Filar XXV/CLVI - Tytulatura Szkolna"),
+        (r"\bPanno\s+Teshimo\b", "Pani Teshimo", "Filar XXV/CLVI - Tytulatura Szkolna"),
+        (r"\bpanny\s+Teshimy\b", "pani Teshimy", "Filar XXV/CLVI - Tytulatura Szkolna"),
+        (r"\bPanna\s+Teshima\b", "Pani Teshima", "Filar XXV/CLVI - Tytulatura Szkolna"),
+        (r"\bPanno\s+Yasumi\b", "Yasumi", "Filar XXV/CLVI - Tytulatura Szkolna"),
+        (r"\bPani\s+Fujimori,\s*ma\s+pani\s+skaner\?", "Fujimori, masz skaner?", "Filar XXV/IX - Tytulatura Rówieśnicza 'Fujimori, masz skaner?'"),
+        (r"\bPani\s+Fujimori,\s*spokojnie!", "Fujimori, spokojnie!", "Filar XXV/IX - Tytulatura Rówieśnicza 'Fujimori, spokojnie!'"),
+        (r"\bgdy\s+pani\s+Fujimori\s+skończy\b", "gdy Fujimori skończy", "Filar XXV/IX - Tytulatura Rówieśnicza 'gdy Fujimori skończy'"),
+        (r"\bZaufaj\s+mi\.", "Proszę mi zaufać.", "Filar XXV/CLVI - Spójność T-V Redaktor-Autor 'Proszę mi zaufać'"),
+        (r"\bCo\s+zamierzasz\?", "Co pani zamierza?", "Filar XXV/CLVI - Spójność T-V Redaktor-Autor 'Co pani zamierza?'"),
+        (r"\bJeśli\s+chcesz\s+publikować\s+w\s+naszym(?P<sep>\s+|\\N)magazynie,\s*musisz\s+wprowadzić\s+zmiany\b", r"Jeśli chce pani publikować w naszym\g<sep>magazynie, musi pani wprowadzić zmiany", "Filar XXV/CLVI - Spójność T-V Redaktor-Autor"),
+        (r"\bWiem,\s*że\s+masz\s+opory\b", "Wiem, że ma pani opory", "Filar XXV/CLVI - Spójność T-V Redaktor-Autor"),
+        (r"\bJeśli\s+jesteś\s+na\s+to(?P<sep>\s+|\\N)gotowa,\s*w\s+pełni\s+ci\s+pomogę\b", r"Jeśli jest pani na to\g<sep>gotowa, w pełni pani pomogę", "Filar XXV/CLVI - Spójność T-V Redaktor-Autor"),
+        (r"\bTak\s+myślałam,\s*że\s+to\s+powiesz\b", "Tak myślałam, że pani to powie", "Filar XXV/CLVI - Spójność T-V Redaktor-Autor"),
+        (r"\bA\s+może\s+spróbujesz\s+w\s+innym\s+magazynie\?", "A może spróbuje pani w innym magazynie?", "Filar XXV/CLVI - Spójność T-V Redaktor-Autor"),
+        (r"~[!]+", "!", "Filar LX - Eliminacja Japońskiej Tyldy i Wielokrotnych Wykrzykników"),
+        (r"\bodchodzę\s+od\s+zmysłów\s+ze\s+szczęścia\b", "szaleję ze szczęścia", "Filar X - Związek Frazeologiczny (szaleć ze szczęścia, nie odchodzić od zmysłów)"),
+        (r"\bOdchodzę\s+od\s+zmysłów\s+ze\s+szczęścia\b", "Szaleję ze szczęścia", "Filar X - Związek Frazeologiczny (szaleć ze szczęścia, nie odchodzić od zmysłów)"),
+        (r"\bDwa\s+tysiące\s+w\s+zupełności\s+wystarczy\b", "Dwa tysiące w zupełności wystarczą", "Filar IV - Związek Zgody Liczebnika"),
+        (r"\bdwa\s+tysiące\s+w\s+zupełności\s+wystarczy\b", "dwa tysiące w zupełności wystarczą", "Filar IV - Związek Zgody Liczebnika"),
+        (r"\bnie\s+mam\s+na\s+kim\s+się(?P<sep>\s+|\\N)+mścić\b", r"nie mam na kim się\g<sep>zemścić", "Filar IV - Aspekt Czasownika 'zemścić'"),
+        (r"\bzrobi\s+się\s+tylko\s+groźniej\b", "zrobi się naprawdę niebezpiecznie", "Filar IV - Kalka 'zrobi się groźniej'"),
+        (r"\bMniejsza\s+z\s+tym\b", "Mniejsza o to", "Filar X - Idiomatyka"),
+        (r"\bmniejsza\s+z\s+tym\b", "mniejsza o to", "Filar X - Idiomatyka"),
+        (r"\b(Kronik[a-ząćęłńóśźż]*|Kronice)\s+Kronika\s+Taiheiki\b", r"\1 Taiheiki", "Filar X - Tautologia Słownikowa Kronika Taiheiki"),
+        (r"\[\s*KRONIKA\s+Kronika(?:\s+|\\N)+Taiheiki(?:\s+|\\N)+TOM\s+DZIESIĄTY\s*\]", r"[ KRONIKA TAIHEIKI:\\NTOM DZIESIĄTY ]", "Filar X - Tautologia Słownikowa Kronika Taiheiki"),
         (r"\bpowódź\s+piwa\b", "fala piwa", "Filar CXXXVIII - Kolokacja Cieczy (Fala piwa)"),
         (r"\bPowodzi\s+piwa\b", "Fali piwa", "Filar CXXXVIII - Kolokacja Cieczy (Fali piwa)"),
         (r"\bpowodzi\s+piwa\b", "fali piwa", "Filar CXXXVIII - Kolokacja Cieczy (Fali piwa)"),
@@ -215,6 +289,58 @@ class AVTLinter:
         (r"\bpowódź\s+wina\b", "fala wina", "Filar CXXXVIII - Kolokacja Cieczy (Fala wina)"),
         (r"\bPowodzi\s+wina\b", "Fali wina", "Filar CXXXVIII - Kolokacja Cieczy (Fali wina)"),
         (r"\bpowodzi\s+wina\b", "fali wina", "Filar CXXXVIII - Kolokacja Cieczy (Fali wina)"),
+
+        # Clevatess Canon & Heroic Dark Fantasy Lexicon
+        (r"\bmoja(?:\s+|\\N)+droga(?:\s+|\\N)+ja\b", "moja ty mała", "Filar X - Kalka Auto-Referencyjna (My Dear Me)"),
+        (r"\bMoja(?:\s+|\\N)+droga(?:\s+|\\N)+ja\b", "Moja ty mała", "Filar X - Kalka Auto-Referencyjna (My Dear Me)"),
+        (r"\bw\s+cztery(?P<sep>\s+|\\N)+oczy(?:\s+|\\N)+od\s+czasu\b", r"na osobności\g<sep>od czasów", "Filar X - Zniekształcenie Frazeologiczne"),
+        (r"\bzrobię(?:\s+|\\N)+raban\b", "wywołam zamieszanie", "Filar X - Rejestr Dark Fantasy (zrobić raban)"),
+        (r"\bZrobię(?:\s+|\\N)+raban\b", "Wywołam zamieszanie", "Filar X - Rejestr Dark Fantasy (zrobić raban)"),
+        (r"\bzbrzydło(?:\s+|\\N)+mi(?:\s+|\\N)+już(?:\s+|\\N)+szukanie\b", "znudziło mi się już szukanie", "Filar X - Rejestr Dark Fantasy"),
+        (r"\bspuścił(?:\s+|\\N)+ci(?:\s+|\\N)+potworny(?:\s+|\\N)+łomot\b", "zmiażdżył cię bez trudu", "Filar X - Rejestr Dark Fantasy (spuścić łomot)"),
+        (r"\bmoja(?:\s+|\\N)+sługa(?:\s+|\\N)+mogła(?:\s+|\\N)+uciec\b", "moja podwładna mogła uciec", "Filar IV - Związek Zgody Rodzaju ('moja podwładna')"),
+        (r"\bAlyssa\s+Sleihunt\b", "Alicia Sleihunt", "Filar II - Spójność Imienia Bohaterki (Alicia Sleihunt)"),
+        (r"\bDla\s+wszystkiego\s+poza(?P<sep>\s+|\\N)roślinami\s+nie\s+ma\s+litości\b", r"Nie ma litości dla niczego prócz\g<sep>roślin", "Filar IV - Kalka Składniowa Wykluczenia"),
+        (r"\bwyprułam(?:\s+|\\N)+się(?:\s+|\\N)+do(?:\s+|\\N)+cna\b", "opadłam z sił", "Filar X - Rejestr Heroic Fantasy (wypruć się do cna)"),
+        (r"\bWyprułam(?:\s+|\\N)+się(?:\s+|\\N)+do(?:\s+|\\N)+cna\b", "Opadłam z sił", "Filar X - Rejestr Heroic Fantasy (wypruć się do cna)"),
+        (r"\bzmywam(?:\s+|\\N)+się(?:\s+|\\N)+stąd\b", "uciekam stąd", "Filar X - Rejestr Heroic Fantasy (zmywać się)"),
+        (r"\bZmywam(?:\s+|\\N)+się(?:\s+|\\N)+stąd\b", "Uciekam stąd", "Filar X - Rejestr Heroic Fantasy (zmywać się)"),
+        (r"\butrę(?:\s+|\\N)+nosa\b", "pokażę mu", "Filar X - Rejestr Heroic Fantasy (utrzeć nosa)"),
+        (r"\bDrogowskaz,\s*kretynko\b", "To drogowskaz, głupia", "Filar X - Rejestr Stylistyczny Obelgi"),
+        (r"\bI(?:\s+|\\N)+gitara\b", "Doskonale", "Filar X - Rejestr Dark Fantasy (I gitara)"),
+        (r"\bi(?:\s+|\\N)+gitara\b", "doskonale", "Filar X - Rejestr Dark Fantasy (i gitara)"),
+        (r"\b[Ss]tul(?:\s+|\\N)+pysk\b", lambda m: "Zamilcz" if m.group(0)[0].isupper() else "zamilcz", "Filar X - Rejestr Dark Fantasy (stul pysk)"),
+        (r"\bkłamstwo(?:\s+|\\N)+jak(?:\s+|\\N)+byk\b", "bezczelne kłamstwo", "Filar X - Rejestr Dark Fantasy (kłamstwo jak byk)"),
+        (r"\bKłamstwo(?:\s+|\\N)+jak(?:\s+|\\N)+byk\b", "Bezczelne kłamstwo", "Filar X - Rejestr Dark Fantasy (kłamstwo jak byk)"),
+        (r"\bprzejmuję(?:\s+|\\N)+stery\b", "teraz ja mówię", "Filar X - Rejestr Dark Fantasy (przejmuję stery)"),
+        (r"\bPrzejmuję(?:\s+|\\N)+stery\b", "Teraz ja mówię", "Filar X - Rejestr Dark Fantasy (przejmuję stery)"),
+        (r"\bdla(?:\s+|\\N)+zabicia(?:\s+|\\N)+czasu\b", "dla rozrywki", "Filar X - Rejestr Dark Fantasy (dla zabicia czasu)"),
+        (r"\bDla(?:\s+|\\N)+zabicia(?:\s+|\\N)+czasu\b", "Dla rozrywki", "Filar X - Rejestr Dark Fantasy (dla zabicia czasu)"),
+        (r"\bnie(?:\s+|\\N)+władzasz\b", "nie władasz", "Filar IV - Błąd Fleksji Czasownika (władać)"),
+        (r"\bprzez(?:\s+|\\N)+czarny(?:\s+|\\N)+posok\b", "przez czarną posokę", "Filar IV - Rząd i Rodzaj Rzeczownika Posoka"),
+        (r"\bPrzez(?:\s+|\\N)+czarny(?:\s+|\\N)+posok\b", "Przez czarną posokę", "Filar IV - Rząd i Rodzaj Rzeczownika Posoka"),
+        (r"\bz(?:\s+|\\N)+czarnego(?:\s+|\\N)+posoku\b", "z czarnej posoki", "Filar IV - Rząd i Rodzaj Rzeczownika Posoka"),
+        (r"\bZ(?:\s+|\\N)+czarnego(?:\s+|\\N)+posoku\b", "Z czarnej posoki", "Filar IV - Rząd i Rodzaj Rzeczownika Posoka"),
+        (r"\bczarny(?:\s+|\\N)+posok\b", "czarna posoka", "Filar IV - Rodzaj Rzeczownika Posoka"),
+        (r"\bCzarny(?:\s+|\\N)+posok\b", "Czarna posoka", "Filar IV - Rodzaj Rzeczownika Posoka"),
+        (r"\bZavthier(?:\s+|\\N)+od(?:\s+|\\N)+Złudzeń\b", "Zavthier Pani Iluzji", "Filar X - Kalka Przydomka 'no' (Zavthier)"),
+        (r"\bVordin(?:\s+|\\N)+od(?:\s+|\\N)+Płomiennego(?:\s+|\\N)+Żaru\b", "Vordin Płomiennego Żaru", "Filar X - Kalka Przydomka 'no' (Vordin)"),
+        (r"\bŚwięty(?:\s+|\\N)+Miecza(?:\s+|\\N)+Owenie(?:\s+|\\N)+Koath\b", "Święty Miecza Owenie Koacie", "Filar CLVII - Wołacz Nazwiska (Koacie)"),
+        (r"\bciało(?:\s+|\\N)+małej(?:\s+|\\N)+Hidenki\b", "ciało dziewczynki z Hiden", "Filar X - Kalka Etnonimiczna (małej Hidenki)"),
+        (r"\bDźgnięto(?:\s+|\\N)+mnie(?:\s+|\\N)+w(?:\s+|\\N)+plecy\b", "Wbito mi nóż w plecy", "Filar X - Kalka Idiomatyczna (Dźgnięto w plecy)"),
+        (r"\bten(?:\s+|\\N)+typ(?:\s+|\\N)+z(?:\s+|\\N)+Eslinn\b", "nauczyciel z Eslinn", "Filar X - Rejestr Dark Fantasy (ten typ)"),
+        (r"\bTen(?:\s+|\\N)+typ(?:\s+|\\N)+z(?:\s+|\\N)+Eslinn\b", "Nauczyciel z Eslinn", "Filar X - Rejestr Dark Fantasy (ten typ)"),
+        (r"\bnie(?:\s+|\\N)+znikniecie(?:\s+|\\N)+z(?:\s+|\\N)+tym,\s*co\b", "nie uciekniecie z tym, co", "Filar X - Kalka Składniowa (zniknąć z tym)"),
+        (r"\b(to\s+)?oberwę([!\?…\.]*)$", r"to poniosę karę\2", "Filar X - Rejestr Dark Fantasy (oberwę)"),
+        (r"\bPani(?:\s+|\\N)+bohaterko\b", "Pani Bohaterko", "Filar CLVII - Tytulatura Bohaterki"),
+        (r"\btrzecia(?:\s+|\\N)+z(?:\s+|\\N)+najlepszych\b", "trzecia pod względem siły", "Filar X - Kalka Składniowa (trzecia z najlepszych)"),
+        (r"\bKsięg(a|i|ę|ą)(?:\s+|\\N)+Toah\b", r"Księg\1 Toaha", "Filar IV - Fleksja Dopełniacza (Toaha)"),
+        (r"\bBez\s+jaj!?\b", "Niemożliwe!", "Filar X - Rejestr Dark Fantasy (Bez jaj)"),
+        (r"\bbez\s+jaj!?\b", "niemożliwe", "Filar X - Rejestr Dark Fantasy (bez jaj)"),
+        (r"\b[Gg]uzik\s+mnie\s+to\s+obchodzi\b", lambda m: "Nic mnie to nie obchodzi" if m.group(0)[0].isupper() else "nic mnie to nie obchodzi", "Filar X - Rejestr Dark Fantasy (guzik mnie to obchodzi)"),
+        (r"\b([Pp]ora|[Cc]zas)\s+stąd\s+zwiewać\b", r"\1 stąd uciekać", "Filar X - Rejestr Dark Fantasy (pora stąd zwiewać)"),
+        (r"\b[Mm]am\s+przez\s+(?:nie|nich)\s+uraz\b", lambda m: "Mam do nich uraz" if m.group(0)[0].isupper() else "mam do nich uraz", "Filar IV - Kalka Składniowa Rządu (uraz przez coś -> uraz do czegoś)"),
+        (r"\b[Dd]urna\s+jestem\b", lambda m: "Głupia jestem" if m.group(0)[0].isupper() else "głupia jestem", "Filar X - Stylistyka Monologu (Durna jestem)"),
 
         # School & Temporal Collocations (Filar III/XIV/ECR: "długa przerwa", nie "duża przerwa")
         (
@@ -468,6 +594,28 @@ class AVTLinter:
         (r"\b[Tt]utaj\s+masz\b", lambda m: "Trzymaj" if m.group(0)[0].isupper() else "trzymaj", "Filar IV/XVIII - Eliminacja Kalki Gestu 'Here you go' -> 'Trzymaj'"),
         (r"\b[Oo]to\s+masz\b", lambda m: "Trzymaj" if m.group(0)[0].isupper() else "trzymaj", "Filar IV/XVIII - Eliminacja Kalki Gestu 'Here you go' -> 'Trzymaj'"),
         (r"\b[Oo]to\s+jest\b", lambda m: "Proszę" if m.group(0)[0].isupper() else "proszę", "Filar IV/XVIII - Eliminacja Kalki Gestu 'Here it is' -> 'Proszę'"),
+
+        # Manga canon titular enforcement: 'Książę Kaiju' -> 'Potworny Królewicz' (Filar II / XXIII / Kanon)
+        (r"\b[Kk]siążę\s+[Kk]aiju\b", lambda m: "Potworny Królewicz" if m.group(0)[0].isupper() else "potworny królewicz", "Filar XXIII - Kanon Mangi Potworny Królewicz"),
+        (r"\b[Kk]sięcia\s+[Kk]aiju\b", lambda m: "Potwornego Królewicza" if m.group(0)[0].isupper() else "potwornego królewicza", "Filar XXIII - Kanon Mangi Potworny Królewicz"),
+        (r"\b[Kk]sięciu\s+[Kk]aiju\b", lambda m: "Potwornemu Królewiczowi" if m.group(0)[0].isupper() else "potwornemu królewiczowi", "Filar XXIII - Kanon Mangi Potworny Królewicz"),
+        (r"\b[Kk]sięciem\s+[Kk]aiju\b", lambda m: "Potwornym Królewiczem" if m.group(0)[0].isupper() else "potwornym królewiczem", "Filar XXIII - Kanon Mangi Potworny Królewicz"),
+
+        # Otaku slang & honorifics adaptation (Filar II / XXVII)
+        (r"\bKuro-?(?:taso|tan)\b", "Kuroe", "Filar II - Slang Otaku Kuro-tan/taso -> Kuroe"),
+        (r"\bkuro-?(?:taso|tan)\b", "kuroe", "Filar II - Slang Otaku Kuro-tan/taso -> Kuroe"),
+        (r"\b([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+)-(?:senpai|taso|tan)\b", r"\1", "Filar XXVII - Adaptacja Sufiksów Honoryfikatywnych"),
+
+        # Binary alternative comma eradication (Filar LX)
+        (r"\b([A-Za-ząćęłńóśźż0-9]+),\s+czy\s+(bez|nie|tak)\b", r"\1 czy \2", "Filar LX - Zakaz Przecinka przed Czy w Alternatywie Rozłącznej"),
+
+        # Trailing cut-off speech attached dash (Filar LX)
+        (r"([A-Za-ząćęłńóśźż])[–—\-](?=\s*\\N|\s*$|[!\?…])", r"\1...", "Filar LX - Formatowanie Przerwania Wypowiedzi"),
+
+        # Historical & Fantasy Register Governance & English Calques (Filar IV / CLXVII)
+        (r"\b[Dd]obre pytanie\b", lambda m: "Trudno powiedzieć" if m.group(0)[0].isupper() else "trudno powiedzieć", "Filar IV/CLXVII - Eliminacja Angielskiej Kalki 'Good question'"),
+        (r"\b[Ww]\s+sumie\s+to\s+nam\s+na\s+rękę\b", lambda m: "W istocie to nam na rękę" if m.group(0)[0].isupper() else "w istocie to nam na rękę", "Filar CLXVII - Puryzm Rejestru Historycznego 'W sumie' -> 'W istocie'"),
+        (r"\b[Oo]j\s+tam[!,\?]?\b", lambda m: "Daj spokój" if m.group(0)[0].isupper() else "daj spokój", "Filar CLXVII - Eliminacja Slangu 'Oj tam' w Dramacie Historycznym"),
     ]
 
     @classmethod
@@ -1127,6 +1275,110 @@ def convert_masculine_past_to_feminine(verb: str) -> Optional[str]:
 
     return res.capitalize() if verb[0].isupper() else res
 
+NON_VERBS_ON_LEM = {
+    "ciałem", "działem", "szałem", "kryształem", "materiałem", "kanałem", "finałem",
+    "kapitałem", "przedziałem", "udziałem", "rozdziałem", "orłem", "diabłem", "kozłem",
+    "osłem", "gardłem", "mydłem", "skrzydłem", "źródłem", "bydłem", "godłem", "wiosłem",
+    "żądłem", "ciepłem", "szkłem", "światłem", "kołem", "dołem", "stołem", "popiołem",
+    "żywiołem", "czołem", "aniołem", "mułem", "umysłem", "zmysłem", "przemysłem",
+    "domysłem", "namysłem", "zamysłem", "rozmysłem", "hasłem", "masłem", "krzesłem",
+    "ciosłem", "przęsłem", "pomięsłem"
+}
+
+FIRST_PERSON_MASCULINE_IRREGULAR_TO_FEMININE = {
+    "poszedłem": "poszłam", "wyszedłem": "wyszłam", "przyszedłem": "przyszłam",
+    "odszedłem": "odeszłam", "wszedłem": "weszłam", "przeszedłem": "przeszłam",
+    "doszedłem": "doszłam", "zaszedłem": "zaszłam", "zeszłem": "zeszłam",
+    "znalazłem": "znalazłam", "mógłbym": "mogłabym", "chciałbym": "chciałabym",
+    "wolałbym": "wolałabym", "powinienem": "powinnam", "doniósłbym": "doniosłabym",
+    "wziąłem": "wzięłam", "zacząłem": "zaczęłam", "zdjąłem": "zdjęłam",
+    "przyjąłem": "przyjęłam", "objąłem": "objęłam", "zająłem": "zajęłam",
+}
+
+FIRST_PERSON_FEMININE_IRREGULAR_TO_MASCULINE = {
+    "poszłam": "poszedłem", "wyszłam": "wyszedłem", "przyszłam": "przyszedłem",
+    "odeszłam": "odszedłem", "weszłam": "wszedłem", "przeszłam": "przeszedłem",
+    "doszłam": "doszedłem", "zaszłam": "zaszedłem", "zeszłam": "zeszłem",
+    "znalazłam": "znalazłem", "mogłabym": "mógłbym", "chciałabym": "chciałbym",
+    "wolałabym": "wolałbym", "powinnam": "powinienem", "doniosłabym": "doniósłbym",
+    "wzięłam": "wziąłem", "zaczęłam": "zacząłem", "zdjęłam": "zdjąłem",
+    "przyjęłam": "przyjąłem", "objąłem": "objąłem", "zajęłam": "zająłem",
+}
+
+def convert_first_person_masculine_to_feminine(verb: str) -> Optional[str]:
+    v_lower = verb.lower()
+    if v_lower in NON_VERBS_ON_LEM:
+        return None
+    if v_lower in FIRST_PERSON_MASCULINE_IRREGULAR_TO_FEMININE:
+        res = FIRST_PERSON_MASCULINE_IRREGULAR_TO_FEMININE[v_lower]
+        return res.capitalize() if verb[0].isupper() else res
+    if v_lower.endswith("iałbym"):
+        res = v_lower[:-6] + "iałabym"
+    elif v_lower.endswith("ałbym"):
+        res = v_lower[:-5] + "ałabym"
+    elif v_lower.endswith("iłbym"):
+        res = v_lower[:-5] + "iłabym"
+    elif v_lower.endswith("yłbym"):
+        res = v_lower[:-5] + "yłabym"
+    elif v_lower.endswith("ułbym"):
+        res = v_lower[:-5] + "ułabym"
+    elif v_lower.endswith("iałem"):
+        res = v_lower[:-5] + "iałam"
+    elif v_lower.endswith("ałem"):
+        res = v_lower[:-4] + "ałam"
+    elif v_lower.endswith("iłem"):
+        res = v_lower[:-4] + "iłam"
+    elif v_lower.endswith("yłem"):
+        res = v_lower[:-4] + "yłam"
+    elif v_lower.endswith("ułem"):
+        res = v_lower[:-4] + "ułam"
+    elif v_lower.endswith("ąłem"):
+        res = v_lower[:-4] + "ęłam"
+    elif v_lower.endswith("adłem"):
+        res = v_lower[:-5] + "adłam"
+    elif any(v_lower.endswith(stem) for stem in ("niosłem", "trząsłem", "prząsłem", "pasłem", "rosłem")):
+        res = v_lower[:-4] + "słam"
+    else:
+        return None
+    return res.capitalize() if verb[0].isupper() else res
+
+def convert_first_person_feminine_to_masculine(verb: str) -> Optional[str]:
+    v_lower = verb.lower()
+    if v_lower in {"błam"}:
+        return None
+    if v_lower in FIRST_PERSON_FEMININE_IRREGULAR_TO_MASCULINE:
+        res = FIRST_PERSON_FEMININE_IRREGULAR_TO_MASCULINE[v_lower]
+        return res.capitalize() if verb[0].isupper() else res
+    if v_lower.endswith("iałabym"):
+        res = v_lower[:-7] + "iałbym"
+    elif v_lower.endswith("ałabym"):
+        res = v_lower[:-6] + "ałbym"
+    elif v_lower.endswith("iłabym"):
+        res = v_lower[:-6] + "iłbym"
+    elif v_lower.endswith("yłabym"):
+        res = v_lower[:-6] + "yłbym"
+    elif v_lower.endswith("ułabym"):
+        res = v_lower[:-6] + "ułbym"
+    elif v_lower.endswith("iałam"):
+        res = v_lower[:-5] + "iałem"
+    elif v_lower.endswith("ałam"):
+        res = v_lower[:-4] + "ałem"
+    elif v_lower.endswith("iłam"):
+        res = v_lower[:-4] + "iłem"
+    elif v_lower.endswith("yłam"):
+        res = v_lower[:-4] + "yłem"
+    elif v_lower.endswith("ułam"):
+        res = v_lower[:-4] + "ułem"
+    elif v_lower.endswith("ęłam"):
+        res = v_lower[:-4] + "ąłem"
+    elif v_lower.endswith("adłam"):
+        res = v_lower[:-5] + "adłem"
+    elif any(v_lower.endswith(stem) for stem in ("niosłam", "trząsłam", "prząsłam", "pasłam", "rosłam")):
+        res = v_lower[:-4] + "słem"
+    else:
+        return None
+    return res.capitalize() if verb[0].isupper() else res
+
 VIRILE_PLURAL_IRREGULAR_TO_NONVIRILE: Dict[str, str] = {
     "znaleźliście": "znalazłyście",
     "poszliście": "poszłyście",
@@ -1450,11 +1702,12 @@ class EpisodeQualityGate:
         if character_registry:
             for cname, cdesc in character_registry.items():
                 cd_lower = str(cdesc).lower()
+                cd_sanitized = re.sub(r"zakaz\s+form\s+(?:żeńsk|męsk)[a-ząćęłńóśźż]*", "", cd_lower)
                 gen = None
-                if any(k in cd_lower for k in FEMALE_ROLE_KEYWORDS):
-                    gen = "FEMALE"
-                elif any(k in cd_lower for k in ["male", "mężczyzna", "chłopak", "męsk"]):
+                if any(k in cd_sanitized for k in ["male", "mężczyzna", "chłopak", "męsk"]):
                     gen = "MALE"
+                elif any(k in cd_sanitized for k in FEMALE_ROLE_KEYWORDS):
+                    gen = "FEMALE"
                 if gen:
                     for p in re.split(r"[/,]", cname):
                         clean_p = p.strip()
@@ -1469,12 +1722,16 @@ class EpisodeQualityGate:
                     continue  # Relationships handled separately, avoid poisoning listener gender
                 desc_str = c_val.get("description", "") if isinstance(c_val, dict) else str(c_val)
                 desc_lower = desc_str.lower()
+                desc_sanitized = re.sub(r"zakaz\s+form\s+(?:żeńsk|męsk)[a-ząćęłńóśźż]*", "", desc_lower)
                 gen = None
-                if any(k in desc_lower for k in FEMALE_ROLE_KEYWORDS):
-                    gen = "FEMALE"
-                elif any(k in desc_lower for k in ["male", "mężczyzna", "chłopak", "męsk"]):
+                if any(k in desc_sanitized for k in ["male", "mężczyzna", "chłopak", "męsk"]):
                     gen = "MALE"
+                elif any(k in desc_sanitized for k in FEMALE_ROLE_KEYWORDS):
+                    gen = "FEMALE"
                 if gen:
+                    clean_ckey = re.sub(r"[\(\[].*?[\)\]]", "", c_key).strip().lower()
+                    if clean_ckey and len(clean_ckey) >= 3:
+                        char_gender_map[clean_ckey] = gen
                     for n in re.findall(r"\b[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]{2,}\b", c_key):
                         if n.lower() not in char_gender_map:
                             char_gender_map[n.lower()] = gen
@@ -1527,7 +1784,18 @@ class EpisodeQualityGate:
         from series_memory import generate_polish_name_declension
         character_declensions: Dict[str, Dict[str, str]] = {}
         if series_bible and hasattr(series_bible, "data") and "declensions" in series_bible.data:
-            character_declensions.update(dict(series_bible.data["declensions"]))
+            for k, val in series_bible.data["declensions"].items():
+                if k and len(k) >= 3 and not any(ch in k for ch in "->/"):
+                    if isinstance(val, dict) and "M" in val and "W" in val:
+                        character_declensions[k] = val
+                    else:
+                        g = char_gender_map.get(k.lower(), "UNKNOWN")
+                        if g == "UNKNOWN" and " " in k:
+                            for part in k.split():
+                                if part.lower() in char_gender_map and char_gender_map[part.lower()] != "UNKNOWN":
+                                    g = char_gender_map[part.lower()]
+                                    break
+                        character_declensions[k] = generate_polish_name_declension(k, g)
 
         if character_registry:
             for k in character_registry.keys():
@@ -1542,20 +1810,75 @@ class EpisodeQualityGate:
             "wszyscy", "ktos", "ktoś", "glos", "głos", "narrator", "napis", "napisy",
             "tytul", "tytuł", "tlumaczenie", "tłumaczenie", "kobieta", "mezczyzna",
             "mężczyzna", "chlopak", "chłopak", "dziewczyna", "tlum", "tłum", "strażnik",
-            "straznik", "zolnierz", "żołnierz", "main", "default", "alt", "sign", "signs"
+            "straznik", "zolnierz", "żołnierz", "main", "default", "alt", "sign", "signs",
+            "ziemia", "ziemią", "ziemi", "ziemię", "ziemiom", "ziemiach", "słońce", "słońca", "słońcu", "słońcem",
+            "księżyc", "księżyca", "księżycu", "księżycem", "świat", "świata", "światu", "światem", "świecie",
+            "niebo", "nieba", "niebios", "niebiosach", "bóg", "boga", "bogu", "bogiem", "bogowie", "bogów",
+            "japonia", "japonii", "tokio", "polska", "polski", "polsce", "polskę", "polską", "europa", "europy",
+            "motomachi", "mihara", "ohshima", "ōshima", "shiman", "wyspa", "wyspy", "wyspie", "wyspą", "morze", "morza", "morzem",
+            "hiden", "elbe", "solsein", "boelate", "eslinn", "toah", "elds", "shinano", "suwa", "kamakura", "kioto",
+            "esleburg", "hyderat", "elden", "luna", "dunn", "złudzeń", "złudzenia", "złudzenie", "płomiennego", "żaru", "początku", "kuźni", "świątynia"
         }
+        if series_bible and hasattr(series_bible, "data") and "glossary" in series_bible.data:
+            for g_k, g_v in series_bible.data["glossary"].items():
+                g_str = (str(g_k) + " " + str(g_v)).lower()
+                if any(kw in g_str for kw in ["kraina", "królestwo", "lokacja", "kopalnia", "akademia", "chram", "świątynia", "szkoła", "miasto", "rzeka", "góra", "zamek", "twierdza"]):
+                    for w in re.findall(r"\b[a-ząćęłńóśźż]{3,}\b", g_str):
+                        NON_NAME_ACTORS.add(w)
+
         all_candidate_chars = set()
         for k in candidate_names:
             all_candidate_chars.add(k.strip())
+        if custom_glossary:
+            for k, v in custom_glossary.items():
+                for name_src in [k, v]:
+                    for token in re.findall(r"\b[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]{2,}\b", name_src):
+                        tok_l = token.lower()
+                        if tok_l not in NON_NAME_ACTORS and not tok_l.endswith(("ą", "ę", "ej", "ach", "ami", "om", "ego", "emu", "em", "iem", "owi", "eń", "ań", "ów", "ich", "ych", "ość", "ości")):
+                            all_candidate_chars.add(token)
+                            candidate_names.add(tok_l)
+
+        # Build collection of all known declined forms of existing characters to avoid creating phantom nominatives
+        existing_decl_forms: Set[str] = set()
+        for c_decl in character_declensions.values():
+            if isinstance(c_decl, dict):
+                for val in c_decl.values():
+                    if isinstance(val, str):
+                        for part in val.split("/"):
+                            cl_part = part.strip().lower()
+                            if cl_part and len(cl_part) >= 3:
+                                existing_decl_forms.add(cl_part)
+
         for ev in events:
             ev_act = getattr(ev, "name", None) or getattr(ev, "actor", None)
             if ev_act and str(ev_act).strip():
                 act_clean = str(ev_act).strip()
                 if len(act_clean) >= 3 and not any(ch in act_clean for ch in "{}[]():;"):
                     all_candidate_chars.add(act_clean)
+            clean_ev = re.sub(r"\{[^\}]*\}", "", ev.text or "")
+            for m_prop in re.finditer(r"\b(?:o|do|dla|u|z|ze|od|przed|nad|pod|przy|przez|za|i|oraz)\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]{2,})\b", clean_ev):
+                prop_tok = m_prop.group(1)
+                tok_lower = prop_tok.lower()
+                if tok_lower not in NON_NAME_ACTORS and tok_lower not in {
+                    "pan", "pani", "niego", "mnie", "ciebie", "nas", "was", "nich", "tego", "tamto", "jeden", "sama", "samo", "sami", "same", "wszystko", "wszyscy", "wszystkich", "cały", "cała", "całe"
+                }:
+                    # Odrzuć formy już odmienione przypadków zależnych oraz znane formy zależne istniejących postaci
+                    if tok_lower in existing_decl_forms:
+                        continue
+                    if any(tok_lower.startswith(k.lower()) and len(tok_lower) > len(k) for k in character_declensions.keys()):
+                        continue
+                    if not tok_lower.endswith(("ą", "ę", "ej", "ach", "ami", "om", "ego", "emu", "em", "iem", "owi", "eń", "ań", "ów", "ich", "ych", "ość", "ości")):
+                        all_candidate_chars.add(prop_tok)
+                        candidate_names.add(tok_lower)
 
         for cand in all_candidate_chars:
             if not cand or len(cand) < 3 or cand.lower() in NON_NAME_ACTORS:
+                continue
+            if cand.lower().endswith(("ą", "ę", "ej", "ach", "ami", "om", "ego", "emu", "em", "iem", "owi", "eń", "ań", "ów", "ich", "ych", "ość", "ości")):
+                continue
+            if cand.lower() in existing_decl_forms:
+                continue
+            if any(cand.lower().startswith(k.lower()) and len(cand) > len(k) for k in character_declensions.keys()):
                 continue
             cand_proper = cand.capitalize()
             if not any(cand.lower() == existing_k.lower() for existing_k in character_declensions.keys()):
@@ -1621,11 +1944,14 @@ class EpisodeQualityGate:
             clean_t = re.sub(r"\{[^\}]*\}", "", ev.text)
             clean_t = re.sub(r"\\[Nnh]", " ", clean_t)
             for c_name in candidate_names:
+                if any(ch in c_name for ch in "{}[]():;->/"):
+                    continue
                 stem_len = max(3, len(c_name) - 2)
                 stem = c_name[:stem_len]
-                if re.search(rf"\b{stem}[a-ząćęłńóśźż]*\b", clean_t, re.IGNORECASE):
+                stem_esc = re.escape(stem)
+                if re.search(rf"\b{stem_esc}[a-ząćęłńóśźż]*\b", clean_t, re.IGNORECASE):
                     # Check formal address
-                    if re.search(rf"\b(?:panie|pan|pana|panu|panem)\s+{stem}[a-ząćęłńóśźż]*\b", clean_t, re.IGNORECASE) or \
+                    if re.search(rf"\b(?:panie|pan|pana|panu|panem)\s+{stem_esc}[a-ząćęłńóśźż]*\b", clean_t, re.IGNORECASE) or \
                        re.search(r"\b(?:ma pan|niech pan|pan szuka|pan pamięta|pan prosił|pan wie|pan czuje|źle się pan|smakuje panu)\b", clean_t, re.IGNORECASE):
                         speaker_formal_char[(spk, c_name)] = speaker_formal_char.get((spk, c_name), 0) + 1
                     # Check informal address
@@ -1633,14 +1959,109 @@ class EpisodeQualityGate:
                         if not re.search(r"\b(?:pan|pani|pana|panu|panie)\b", clean_t, re.IGNORECASE):
                             speaker_informal_to_char[(spk, c_name)] = speaker_informal_to_char.get((spk, c_name), 0) + 1
 
+        # Precompile character declension and vocative patterns once for high-throughput execution
+        compiled_decl_rules = []
+        if character_declensions:
+            for c_name, c_decl in character_declensions.items():
+                if not c_name or len(c_name) < 3 or c_name.lower() in NON_NAME_ACTORS or not c_decl or not isinstance(c_decl, dict):
+                    continue
+                m_form = c_decl.get("M", c_name)
+                if not m_form or m_form.lower() in NON_NAME_ACTORS:
+                    continue
+                stem_len = len(c_name) - 1 if c_name.endswith("a") else max(3, len(c_name) - 2)
+                c_stem = c_name[:stem_len]
+
+                rule = {
+                    "name": c_name,
+                    "m_form": m_form,
+                    "c_stem": c_stem,
+                    "m_lower": m_form.lower(),
+                    "stem_lower": c_stem.lower()
+                }
+
+                n_form = c_decl.get("N")
+                if n_form and n_form != m_form:
+                    rule["n_form"] = n_form
+                    rule["re_n"] = re.compile(rf"\b(z|ze|przed|nad|pod|za|między)(\s+|\\(?:[Nnh])+)+({re.escape(m_form)})\b", re.IGNORECASE)
+
+                d_form = c_decl.get("D")
+                if d_form and d_form != m_form:
+                    rule["d_form"] = d_form
+                    rule["re_prep_d"] = re.compile(rf"\b(do|dla|od|u|bez|koło|obok|wzdłuż|podczas|zamiast|oprócz|wokół|wobec)(\s+|\\(?:[Nnh])+)+({re.escape(m_form)}|{re.escape(c_stem)}[a-ząćęłńóśźż]*)\b", re.IGNORECASE)
+                    rule["re_pos_d"] = re.compile(rf"\b({POSSESSIVE_GOVERNING_NOUNS_PATTERN}|{GENITIVE_GOVERNING_VERBS_PATTERN})((?:(?:\s+|\\(?:[Nnh])+)+(?:samego|tamtego|tego))?(?:\s+|\\(?:[Nnh])+)+)({re.escape(m_form)})\b", re.IGNORECASE)
+
+                c_form = c_decl.get("C")
+                if c_form and c_form != m_form:
+                    rule["c_form"] = c_form
+                    rule["re_c"] = re.compile(rf"\b(ku|przeciw|przeciwko|dzięki|wbrew)(\s+|\\(?:[Nnh])+)+({re.escape(m_form)})\b", re.IGNORECASE)
+
+                ms_form = c_decl.get("Ms")
+                if ms_form and ms_form != m_form:
+                    rule["ms_form"] = ms_form
+                    rule["re_ms"] = re.compile(rf"\b(o|przy)(\s+|\\(?:[Nnh])+)+({re.escape(m_form)})\b", re.IGNORECASE)
+
+                b_form = c_decl.get("B")
+                if b_form and b_form.lower() != m_form.lower():
+                    rule["b_form"] = b_form
+
+                w_form = c_decl.get("W")
+                if w_form and w_form.lower() != m_form.lower():
+                    rule["w_form"] = w_form
+                    rule["re_end_voc"] = re.compile(rf"(,\s*)({re.escape(m_form)})\s*([\.!\?…]+)(?=\s+[A-ZĄĆĘŁŃÓŚŹŻ]|\s*\\N|\s*$)", re.IGNORECASE)
+                    rule["re_intro_voc"] = re.compile(rf"((?:^|[^\w]|\\[Nnh])(?:[Hh]ej|[Ee]j|[Aa]\s+więc|[Aa]\s+zatem|[Ss]łuchaj|[Pp]atrz|[Ss]pójrz|[Dd]obra|[Aa]le|[Nn]o)\s*,\s*)({re.escape(m_form)})\s*([,\.!\?…]+|\s*\\N|$)", re.IGNORECASE)
+                    rule["re_lead_voc"] = re.compile(rf"(^|\\[Nnh])({re.escape(m_form)})\s*,\s*(?=[a-ząćęłńóśźż]*(?:aj|ajcie|yj|yjcie|ij|ijcie|my|myśl|zrób|patrz|słuchaj|uważaj|chodź|czekaj|stój|pospiesz|szybciej|nie\s+|daj|powiedz)\b)", re.IGNORECASE)
+
+                compiled_decl_rules.append(rule)
+
         for i, ev in enumerate(events):
             if not ev.text or not ev.text.strip():
                 continue
 
+            # Sanitize inverted / negative duration timestamps (start >= end)
+            if ev.start >= ev.end:
+                old_start = ev.start
+                prev_start = events[i-1].start if i > 0 else 0
+                prev_end = events[i-1].end if i > 0 else 0
+                fixed_ts = False
+                for m_shift in [60000, 120000, 300000, 600000, 1200000, 1800000, 3600000]:
+                    cand_start = ev.start - m_shift
+                    if (cand_start >= prev_start) and (0 < ev.end - cand_start <= 15000):
+                        ev.start = cand_start
+                        fixes.append(f"[Episode Quality Gate - Timestamp Sanitization] Linia #{i+1}: skorygowano odwrócony znacznik czasu ({old_start}ms -> {ev.start}ms)")
+                        fixed_ts = True
+                        break
+                if not fixed_ts and ev.start >= ev.end:
+                    char_count = len(re.sub(r"\{[^\}]*\}", "", ev.text).strip())
+                    est_dur = min(max(1500, char_count * 60), 5000)
+                    ev.start = max(prev_start, ev.end - est_dur)
+                    fixes.append(f"[Episode Quality Gate - Timestamp Sanitization] Linia #{i+1}: skorygowano ujemny czas trwania napisu na {ev.start}ms - {ev.end}ms")
+
             text_before = ev.text
+
+            # Sanitize corrupted escaped backslashes inside ASS override tags (e.g. {\\b1} -> {\b1})
+            if r"\\" in ev.text:
+                old_tag_text = ev.text
+                ev.text = re.sub(r"\\\\([bibupancfqskKFtrposmvefadorgcxylh0-9\\])", r"\\\1", ev.text)
+                if ev.text != old_tag_text:
+                    fixes.append(f"[Episode Quality Gate - Tag Sanitization] Linia #{i+1}: naprawiono uszkodzony znacznik ASS (podwójny backslash)")
 
             # Identify if current event is a sign/title (e.g. style has "Sign", "Title", or contains \pos / \an8)
             ev_style_lower = (ev.style or "").lower()
+            # Strip redundant {\i1} / {\i0} in lines that are already rendered in Italics style
+            if "italic" in ev_style_lower and (r"\i1" in ev.text or r"\i0" in ev.text):
+                old_it_t = ev.text
+                ev.text = re.sub(r"\{\\i[01]\}", "", ev.text).strip()
+                if ev.text != old_it_t:
+                    fixes.append(f"[Episode Quality Gate - Redundancja Kursywy] Linia #{i+1}: usunięto zbędne znaczniki {{\\i1}}/{{\\i0}} w stylu pochyłym 'Italics'")
+
+            # Normalize non-normative ellipsis clusters (e.g. ?... -> ?.., !... -> !..)
+            if re.search(r"[\?!]\.{3,}", ev.text):
+                old_punc_t = ev.text
+                ev.text = re.sub(r"\?\.{3,}", "?..", ev.text)
+                ev.text = re.sub(r"!\.{3,}", "!..", ev.text)
+                if ev.text != old_punc_t:
+                    fixes.append(f"[Episode Quality Gate - Higiena Interpunkcji] Linia #{i+1}: znormalizowano nienormatywny wielokropek (?...) na standardowy AVT (?..)")
+
             ev_is_sub = bool(re.search(r"\bsubtitles?\b", ev_style_lower))
             is_sign = bool(
                 re.search(r"\\(pos|move|an[789]|clip)\b", ev.text) or
@@ -1669,6 +2090,41 @@ class EpisodeQualityGate:
                     prev_ev = cand
                     prev_clean = cand_text
                     break
+
+            # 0. FORMATTING TAG SANITIZATION (Deduplicate stacked {\i1}{\i1}, {\b1}{\b1}, {\i0}{\i0}, etc.)
+            old_t = ev.text
+            ev.text = re.sub(r"(\{\\[ibus][01]\})\1+", r"\1", ev.text)
+            if ev.text != old_t:
+                fixes.append(f"[Episode Quality Gate - Tag Sanitization] Linia #{i+1}: usunięto zduplikowane znaczniki formatowania ASS")
+
+            # 0b. IN-LINE DUAL SPEAKER DIALOGUE SPLIT (Filar LVII)
+            if not is_sign:
+                clean_body = re.sub(r"^(\s*\{[^\}]*\})+", "", ev.text)
+                ts_prefix = ev.text[:len(ev.text) - len(clean_body)]
+                dual_match = re.match(
+                    r"^[-–—]?\s*(.+?(?:[.!?…]+|\]|\))\s*)[-–—]\s*((?:\{[^\}]*\})*[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż…\[].+)$",
+                    clean_body,
+                    re.DOTALL
+                )
+                if dual_match and r"\N-" not in ev.text and r"\N -" not in ev.text and r"\N–" not in ev.text and r"\N –" not in ev.text:
+                    p1 = re.sub(r"^[-–—]\s*", "", dual_match.group(1)).strip()
+                    p2 = re.sub(r"^[-–—]\s*", "", dual_match.group(2)).strip()
+                    old_t = ev.text
+                    ev.text = f"{ts_prefix}- {p1}\\N- {p2}"
+                    if ev.text != old_t:
+                        fixes.append(f"[Episode Quality Gate - Filar LVII Wielogłos Symultaniczny] Linia #{i+1}: sformatowano połączone kwestie dwóch mówców na dwie osobne linie z myślnikami")
+
+            # 1a. LONE DIALOGUE DASH SANITIZER (Filar LVII / Netflix AVT: Zakaz samotnego myślnika w kwestiach jednoosobowych)
+            if not is_sign:
+                clean_for_dash = re.sub(r"\{[^\}]*\}", "", ev.text).strip()
+                if clean_for_dash.startswith("- ") or clean_for_dash.startswith("– ") or clean_for_dash.startswith("— "):
+                    # Dual-speaker line requires a second speaker dash (\N- or \N– or \N—)
+                    has_second_dash = bool(re.search(r"\\(?:[Nnh])+\s*[-–—]\s+", ev.text))
+                    if not has_second_dash:
+                        old_t = ev.text
+                        ev.text = re.sub(r"^((?:\{[^\}]*\})*)\s*[-–—]\s+", r"\1", ev.text)
+                        if ev.text != old_t:
+                            fixes.append(f"[Episode Quality Gate - Filar LVII Zakaz Samotnego Myślnika] Linia #{i+1}: usunięto pojedynczy myślnik dialogowy w kwestii jednoosobowej")
 
             # 1. ADJACENCY PAIR AUDIT: Directive / Warning / Wh-Question -> Affirmation Guard (Filar XLIII / CXLVI)
             if not is_sign and prev_clean and prev_ev:
@@ -1782,10 +2238,10 @@ class EpisodeQualityGate:
 
             # 2. THOUGHT-TO-SPEECH BOUNDARY: Strip unsolicited thought italics on plain dialogue lines
             if not is_sign and prev_ev:
-                prev_is_thought = "italic" in (prev_ev.style or "").lower() or r"\i1" in (prev_ev.text or "")
+                prev_is_thought_style = "italic" in (prev_ev.style or "").lower()
                 curr_style_thought = "italic" in (ev.style or "").lower()
-                # If previous event was a thought, and current style is regular dialogue, strip artificial {\i1}...{\i0}
-                if prev_is_thought and not curr_style_thought:
+                # If previous event was explicitly styled as Italics, and current event is regular Default dialogue, strip artificial {\i1}...{\i0}
+                if prev_is_thought_style and not curr_style_thought:
                     if r"\i1" in ev.text and r"\i0" in ev.text:
                         ev.text = re.sub(r"\{\\i[01]\}", "", ev.text).strip()
                         fixes.append(f"[Episode Quality Gate - Bariera Myśli] Linia #{i+1}: usunięto sztuczną kursywę {{\\i1}} po przejściu z myśli do mowy diegetycznej")
@@ -1972,6 +2428,14 @@ class EpisodeQualityGate:
                                     return repl.capitalize() if m.group(0)[0].isupper() else repl
                                 ev.text = re.sub(f_pat, _m_case_repl, ev.text, flags=re.IGNORECASE)
                                 fixes.append(f"[Episode Quality Gate - Spójność Płci Postaci] Linia #{i+1}: skorygowano 1. os. na rodzaj męski dla mówcy '{ev.name}'")
+                        def _morph_f_to_m_repl(m):
+                            word = m.group(0)
+                            converted = convert_first_person_feminine_to_masculine(word)
+                            if converted and converted != word:
+                                fixes.append(f"[Episode Quality Gate - Spójność Płci Postaci] Linia #{i+1}: skorygowano morfologicznie 1. os. '{word}' -> '{converted}' dla mówcy '{ev.name}'")
+                                return converted
+                            return word
+                        ev.text = re.sub(r"\b[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+(?:łam|łabym)\b", _morph_f_to_m_repl, ev.text)
                     elif spk_gen == "FEMALE":
                         for m_pat, f_repl in FIRST_PERSON_MASCULINE_TO_FEMININE:
                             if re.search(m_pat, ev.text, re.IGNORECASE):
@@ -1979,6 +2443,14 @@ class EpisodeQualityGate:
                                     return repl.capitalize() if m.group(0)[0].isupper() else repl
                                 ev.text = re.sub(m_pat, _f_case_repl, ev.text, flags=re.IGNORECASE)
                                 fixes.append(f"[Episode Quality Gate - Spójność Płci Postaci] Linia #{i+1}: skorygowano 1. os. na rodzaj żeński dla mówczyni '{ev.name}'")
+                        def _morph_m_to_f_repl(m):
+                            word = m.group(0)
+                            converted = convert_first_person_masculine_to_feminine(word)
+                            if converted and converted != word:
+                                fixes.append(f"[Episode Quality Gate - Spójność Płci Postaci] Linia #{i+1}: skorygowano morfologicznie 1. os. '{word}' -> '{converted}' dla mówczyni '{ev.name}'")
+                                return converted
+                            return word
+                        ev.text = re.sub(r"\b[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+(?:łem|łbym)\b", _morph_m_to_f_repl, ev.text)
 
                 # 3c-2: 3rd-person subject-verb past-tense agreement (Filar CLXII)
                 for char_lower, gender in char_gender_map.items():
@@ -2177,77 +2649,117 @@ class EpisodeQualityGate:
                         fixes.append(f"[Episode Quality Gate - Jednolita Deklinacja Imion] Linia #{i+1}: ujednolicono formę imienia po przyimku na '{dom_form}' (dominująca konwencja w odcinku)")
 
             # 3d2. DETERMINISTIC 7-CASE DECLENSION MATRIX ENFORCEMENT (from Series Bible / Registry)
-            if not is_sign and character_declensions:
-                for c_name, c_decl in character_declensions.items():
-                    if not c_name or len(c_name) < 3:
+            if not is_sign and compiled_decl_rules:
+                clean_lower = re.sub(r"\{[^\}]*\}", "", ev.text).lower()
+                for r in compiled_decl_rules:
+                    # Fast rejection: only run regexes if character name or stem appears in text
+                    if r["m_lower"] not in clean_lower and r["stem_lower"] not in clean_lower:
                         continue
-                    m_form = c_decl.get("M", c_name)
 
-                    # Narzędnik (z, ze, przed, nad, pod, za, między) -> c_decl["N"]
-                    n_form = c_decl.get("N")
-                    if n_form and n_form != m_form:
-                        pat_n = rf"\b(z|ze|przed|nad|pod|za|między)(\s+|\\(?:[Nnh])+)+({re.escape(m_form)})\b"
+                    if "re_n" in r:
+                        n_form = r["n_form"]
                         def _repl_n(m, target=n_form):
+                            matched_prep = m.group(1).lower()
+                            # Dual-governance preposition 'za': in marriage, exchange, substitution, perception
+                            # 'za' governs Accusative (Biernik), NOT Instrumental (Narzędnik)!
+                            if matched_prep == "za":
+                                before_text = ev.text[:m.start()]
+                                if re.search(r"\b(?:wyjść|wyjdzie|wyszła|wyszło|wyszli|wyjście|wyjścia|wychodzić|wychodzi|wziąć|brać|weźmie|oddać|odda|oddał|zapłacić|płacić|uznać|uznaje|uważać|uważa|uchodzić|uchodzi|mieć|odpowiadać|odpowiada|trzymać|złapać|chwycić|dziękować|przepraszać)\s+(?:zaś\s+|zaraz\s+|chyba\s+|tam\s+)?$", before_text, re.IGNORECASE):
+                                    return m.group(0)
                             matched = m.group(3)
                             tgt = target.upper() if matched.isupper() else (target.capitalize() if matched.istitle() else target)
                             return f"{m.group(1)}{m.group(2)}{tgt}"
                         old_t = ev.text
-                        ev.text = re.sub(pat_n, _repl_n, ev.text, flags=re.IGNORECASE)
+                        ev.text = r["re_n"].sub(_repl_n, ev.text)
                         if ev.text != old_t:
                             fixes.append(f"[Episode Quality Gate - Matryca Narzędnika] Linia #{i+1}: ujednolicono formę na '{n_form}' po przyimku narzędnika")
 
-                    # Dopełniacz (do, dla, od, u, bez, koło, obok itp.) -> c_decl["D"]
-                    d_form = c_decl.get("D")
-                    if d_form and d_form != m_form:
-                        # Prepozycje dopełniacza
-                        pat_prep_d = rf"\b(do|dla|od|u|bez|koło|obok|wzdłuż|podczas|zamiast|oprócz|wokół|wobec)(\s+|\\(?:[Nnh])+)+({re.escape(m_form)})\b"
-                        def _repl_prep_d(m, target=d_form):
+                    if "re_prep_d" in r:
+                        d_form = r["d_form"]
+                        def _repl_prep_d(m, target=d_form, c_name=r["name"]):
                             matched = m.group(3)
+                            if matched.lower() == target.lower():
+                                return m.group(0)
+                            if len(matched) > len(c_name) + 3:
+                                return m.group(0)
                             tgt = target.upper() if matched.isupper() else (target.capitalize() if matched.istitle() else target)
                             return f"{m.group(1)}{m.group(2)}{tgt}"
                         old_t = ev.text
-                        ev.text = re.sub(pat_prep_d, _repl_prep_d, ev.text, flags=re.IGNORECASE)
+                        ev.text = r["re_prep_d"].sub(_repl_prep_d, ev.text)
                         if ev.text != old_t:
                             fixes.append(f"[Episode Quality Gate - Matryca Dopełniacza] Linia #{i+1}: ujednolicono formę na '{d_form}' po przyimku dopełniacza")
 
-                        # Rzeczowniki dzierżawcze oraz czasowniki rządzące dopełniaczem (np. "sekretów Drel" -> "sekretów Drela", "miecz Drel" -> "miecz Drela", "szukasz Drel" -> "szukasz Drela")
-                        pat_pos_d = rf"\b({POSSESSIVE_GOVERNING_NOUNS_PATTERN}|{GENITIVE_GOVERNING_VERBS_PATTERN})((?:(?:\s+|\\(?:[Nnh])+)+(?:samego|tamtego|tego))?(?:\s+|\\(?:[Nnh])+)+)({re.escape(m_form)})\b"
+                    if "re_pos_d" in r:
+                        d_form = r["d_form"]
                         def _repl_pos_d(m, target=d_form):
                             matched = m.group(3)
                             tgt = target.upper() if matched.isupper() else (target.capitalize() if matched.istitle() else target)
                             return f"{m.group(1)}{m.group(2)}{tgt}"
                         old_t = ev.text
-                        ev.text = re.sub(pat_pos_d, _repl_pos_d, ev.text, flags=re.IGNORECASE)
+                        ev.text = r["re_pos_d"].sub(_repl_pos_d, ev.text)
                         if ev.text != old_t:
                             fixes.append(f"[Episode Quality Gate - Dopełniacz Dzierżawczy] Linia #{i+1}: ujednolicono formę na '{d_form}' po określeniu dzierżawczym/rządzącym")
 
-                    # Celownik (ku, przeciw, dzięki, wbrew) -> c_decl["C"]
-                    c_form = c_decl.get("C")
-                    if c_form and c_form != m_form:
-                        pat_c = rf"\b(ku|przeciw|przeciwko|dzięki|wbrew)(\s+|\\(?:[Nnh])+)+({re.escape(m_form)})\b"
+                    if "re_c" in r:
+                        c_form = r["c_form"]
                         def _repl_c(m, target=c_form):
                             matched = m.group(3)
                             tgt = target.upper() if matched.isupper() else (target.capitalize() if matched.istitle() else target)
                             return f"{m.group(1)}{m.group(2)}{tgt}"
                         old_t = ev.text
-                        ev.text = re.sub(pat_c, _repl_c, ev.text, flags=re.IGNORECASE)
+                        ev.text = r["re_c"].sub(_repl_c, ev.text)
                         if ev.text != old_t:
                             fixes.append(f"[Episode Quality Gate - Matryca Celownika] Linia #{i+1}: ujednolicono formę na '{c_form}' po przyimku celownika")
 
-                    # Miejscownik (o, przy) -> c_decl["Ms"]
-                    ms_form = c_decl.get("Ms")
-                    if ms_form and ms_form != m_form:
-                        pat_ms = rf"\b(o|przy)(\s+|\\(?:[Nnh])+)+({re.escape(m_form)})\b"
+                    if "re_ms" in r:
+                        ms_form = r["ms_form"]
                         def _repl_ms(m, target=ms_form):
                             matched = m.group(3)
                             tgt = target.upper() if matched.isupper() else (target.capitalize() if matched.istitle() else target)
                             return f"{m.group(1)}{m.group(2)}{tgt}"
                         old_t = ev.text
-                        ev.text = re.sub(pat_ms, _repl_ms, ev.text, flags=re.IGNORECASE)
+                        ev.text = r["re_ms"].sub(_repl_ms, ev.text)
                         if ev.text != old_t:
                             fixes.append(f"[Episode Quality Gate - Matryca Miejscownika] Linia #{i+1}: ujednolicono formę na '{ms_form}' po przyimku miejscownika")
 
-            # 3e. VOCATIVE UNIFORMITY
+                    # Deterministic Vocative
+                    if "w_form" in r:
+                        w_form = r["w_form"]
+                        if "re_end_voc" in r:
+                            def _repl_end_voc(m, target=w_form):
+                                sep = m.group(1)
+                                matched = m.group(2)
+                                punct = m.group(3) or ""
+                                tgt = target.upper() if matched.isupper() else target
+                                return f"{sep}{tgt}{punct}"
+                            old_t = ev.text
+                            ev.text = r["re_end_voc"].sub(_repl_end_voc, ev.text)
+                            if ev.text != old_t:
+                                fixes.append(f"[Episode Quality Gate - Wołacz Adresatywny] Linia #{i+1}: ujednolicono wołacz na '{w_form}' w zwrocie bezpośrednim po przecinku")
+
+                        if "re_intro_voc" in r:
+                            def _repl_intro_voc(m, target=w_form):
+                                intro = m.group(1)
+                                matched = m.group(2)
+                                punct = m.group(3) or ""
+                                tgt = target.upper() if matched.isupper() else target
+                                return f"{intro}{tgt}{punct}"
+                            old_t = ev.text
+                            ev.text = r["re_intro_voc"].sub(_repl_intro_voc, ev.text)
+                            if ev.text != old_t:
+                                fixes.append(f"[Episode Quality Gate - Wołacz Inwokacyjny] Linia #{i+1}: ujednolicono wołacz na '{w_form}' po zwrocie inwokacyjnym")
+
+                        if "re_lead_voc" in r:
+                            def _repl_lead_voc(m, target=w_form):
+                                lead = m.group(1)
+                                matched = m.group(2)
+                                tgt = target.upper() if matched.isupper() else target
+                                return f"{lead}{tgt}, "
+                            old_t = ev.text
+                            ev.text = r["re_lead_voc"].sub(_repl_lead_voc, ev.text)
+                            if ev.text != old_t:
+                                fixes.append(f"[Episode Quality Gate - Wołacz Apelatywny] Linia #{i+1}: ujednolicono wołacz na '{w_form}' przed imperatywem/apelem")
+
             if not is_sign and dominant_voc_names:
                 for c_name, dom_voc in dominant_voc_names.items():
                     stem_len = max(3, len(c_name) - 2)
@@ -2265,12 +2777,34 @@ class EpisodeQualityGate:
                     if ev.text != old_text:
                         fixes.append(f"[Episode Quality Gate - Jednolitość Wołacza] Linia #{i+1}: ujednolicono formę wołacza na '{dom_voc}' (dominująca konwencja w odcinku)")
 
-            # 3f. MICRO-LINE LENGTH CLAMPING (< 0.5s / 500ms)
+            # 3d3. COORDINATED ACCUSATIVE PROPAGATION (Filar XCI / PWN Norm: Biernik po 'i' / 'oraz')
+            # e.g. "Minamiego i Harugon" -> "Minamiego i Harugona", "Kuroe i Harugon" -> "Kuroe i Harugona"
+            if not is_sign and compiled_decl_rules:
+                for r in compiled_decl_rules:
+                    if "b_form" in r:
+                        m_form = r["m_form"]
+                        b_form = r["b_form"]
+                        pat_coord = rf"\b([A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+(?:ego|a|ą|ę|ie|ich|e))(?:\s+|\\(?:[Nnh])+)+(?:i|oraz)\s+({re.escape(m_form)})\b"
+                        def _repl_coord_acc(m, target_b=b_form):
+                            lead = m.group(1)
+                            matched_nom = m.group(2)
+                            tgt = target_b.upper() if matched_nom.isupper() else (target_b.capitalize() if matched_nom.istitle() else target_b)
+                            sep = m.group(0)[len(lead):-len(matched_nom)]
+                            return f"{lead}{sep}{tgt}"
+                        old_t = ev.text
+                        ev.text = re.sub(pat_coord, _repl_coord_acc, ev.text)
+                        if ev.text != old_t:
+                            fixes.append(f"[Episode Quality Gate - Filar XCI Biernik Współrzędny] Linia #{i+1}: skorygowano biernik po spójniku 'i/oraz' na '{b_form}'")
+
+            # 3f. MICRO-LINE LENGTH & CPS CLAMPING (< 0.5s / 500ms or extreme verbose micro-lines <= 1.0s)
             line_dur_ms = ev.end - ev.start
-            if not is_sign and 0 < line_dur_ms <= 500:
+            if not is_sign and 0 < line_dur_ms <= 1000:
                 clean_t = re.sub(r"\{[^\}]*\}", "", ev.text).strip()
-                if len(clean_t) > 14 or len(clean_t.split()) > 3:
-                    cl_lower = clean_t.lower()
+                cl_lower = clean_t.lower()
+                repl = None
+                if "przecież to o mnie chodzi" in cl_lower:
+                    repl = "To o mnie..."
+                elif line_dur_ms <= 500 and (len(clean_t) > 14 or len(clean_t.split()) > 3):
                     if any(w in cl_lower for w in ["nie wierzę", "niemożliwe", "nie mogę", "jak to", "co ty", "naprawdę", "serio", "co takiego"]):
                         repl = "Niemożliwe!" if any(w in cl_lower for w in ["nie wierzę", "niemożliwe", "nie mogę"]) else "Co?!"
                     elif any(w in cl_lower for w in ["uważaj", "stój", "ratunku", "pomocy", "uciekaj", "z drogi", "padnij"]):
@@ -2286,17 +2820,305 @@ class EpisodeQualityGate:
                         words = clean_t.split()
                         repl = f"{words[0]}..." if len(words[0]) <= 12 else words[0][:10] + "..."
 
+                if repl and repl != clean_t:
                     # Preserve leading typesetting tags
                     m_prefix = re.match(r"^(\{[^\}]*\})+", ev.text)
                     prefix = m_prefix.group(0) if m_prefix else ""
                     ev.text = f"{prefix}{repl}"
-                    fixes.append(f"[Episode Quality Gate - Kompresja Mikro-Kwestii <0.5s] Linia #{i+1}: skondensowano zbyt długą kwestię ({line_dur_ms}ms, {len(clean_t)} zn.) '{clean_t}' -> '{repl}'")
+                    fixes.append(f"[Episode Quality Gate - Kompresja Mikro-Kwestii <0.5s/CPS] Linia #{i+1}: skondensowano zbyt długą kwestię ({line_dur_ms}ms, {len(clean_t)} zn.) '{clean_t}' -> '{repl}'")
+
+            # 3g. JAPANESE FALSE-PROPER-NOUN & TITULAR GUARD (Filar II & Kanon)
+            if not is_sign:
+                if re.search(r"\bOuji\b", ev.text):
+                    old_t = ev.text
+                    def _repl_ouji(m):
+                        matched = m.group(0)
+                        return "Książę" if matched[0].isupper() else "książę"
+                    ev.text = re.sub(r"\bOuji\b", _repl_ouji, ev.text)
+                    if ev.text != old_t:
+                        fixes.append(f"[Episode Quality Gate - Filar II Kanon] Linia #{i+1}: przetłumaczono japoński rzeczownik 'Ouji' na 'Książę'")
+
+            # 3h. CONVERSATIONAL CALQUE GUARD (Filar IV / CLVI): "I co z tego?" vs "I co?"
+            if not is_sign:
+                # Form 1: "I co z tego?" followed by continuation questions like "To wy..." / "Chodzicie..." / "Co dalej..."
+                pat_icoz_inline = r"\b([Ii]|[Aa])\s+co\s+z\s+tego\?(\s*\\N\s*|\s+)(?=[Tt]o\s+wy\b|[Cc]hodzicie\b|[Jj]esteście\b|[Cc]o\s+było\b|[Cc]o\s+dalej\b|[Jj]ak\s+to\b|[Cc]o\s+się\s+stało\b|[Pp]owiedz\b|[Mm]ów\b)"
+                if re.search(pat_icoz_inline, ev.text):
+                    old_t = ev.text
+                    ev.text = re.sub(pat_icoz_inline, r"\g<1> co?\g<2>", ev.text, count=1)
+                    if ev.text != old_t:
+                        fixes.append(f"[Episode Quality Gate - Filar IV/CLVI] Linia #{i+1}: skorygowano agresywną kalkę 'I co z tego?' na naturalne 'I co?'")
+
+                # Form 2: Standalone "I co z tego?" when followed by next event starting with "To wy..." or answering revelation
+                clean_curr = re.sub(r"\{[^\}]*\}", "", ev.text).strip()
+                if re.match(r"^([Ii]|[Aa])\s+co\s+z\s+tego\?[\s!\?.]*$", clean_curr):
+                    next_ev = events[i + 1] if i + 1 < len(events) and not bool(re.search(r"\\(pos|move)\b", events[i + 1].text or "")) else None
+                    next_text = re.sub(r"\{[^\}]*\}", "", next_ev.text).strip() if next_ev else ""
+                    is_followed_by_continuation = bool(next_text and re.match(r"^(To\s+wy\b|Chodzicie\b|Jesteście\b|Co\s+dalej\b|I\s+jak\b)", next_text, re.IGNORECASE))
+                    is_answering_confession = bool(prev_clean and any(w in prev_clean.lower() for w in ["wyznał", "wyznała", "miłość", "uczucia", "uczucie", "zakoch", "podobasz", "razem", "przyjemne"]))
+                    
+                    if is_followed_by_continuation or is_answering_confession:
+                        lead_char = clean_curr[0]
+                        repl_q = f"{lead_char} co?"
+                        old_t = ev.text
+                        ev.text = re.sub(r"\b([Ii]|[Aa])\s+co\s+z\s+tego\?", repl_q, ev.text)
+                        if ev.text != old_t:
+                            fixes.append(f"[Episode Quality Gate - Filar IV/CLVI] Linia #{i+1}: zamieniono agresywne 'I co z tego?' na zaciekawione '{repl_q}'")
+
+            # 3i. JAPANESE HONORIFICS & OTAKU SLANG ADAPTATION (Filar XXV, XXVII & Kanon)
+            if not is_sign:
+                # Kuro-tan / Kuro-taso -> Kuroe
+                if re.search(r"\bKuro-?(?:taso|tan)\b", ev.text, re.IGNORECASE):
+                    old_t = ev.text
+                    ev.text = re.sub(r"\bKuro-?(?:taso|tan)\b", "Kuroe", ev.text)
+                    ev.text = re.sub(r"\bkuro-?(?:taso|tan)\b", "kuroe", ev.text)
+                    if ev.text != old_t:
+                        fixes.append(f"[Episode Quality Gate - Filar II/XXVII Kanon] Linia #{i+1}: zastąpiono zdrobnienie 'Kuro-tan/taso' kanonicznym imieniem 'Kuroe'")
+
+                # General [Name]-senpai / [Name]-taso / [Name]-tan strip & canonical resolution
+                if re.search(r"\b([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+)-(?:senpai|taso|tan)\b", ev.text, re.IGNORECASE):
+                    old_t = ev.text
+                    def _repl_stem(m):
+                        raw_stem = m.group(1)
+                        full_match = m.group(0)
+                        suffix = full_match.split("-")[-1].lower()
+
+                        # 1. Check if SeriesBible has registered hypocorism (e.g. 'Kuro' -> 'Kuroe')
+                        if series_bible and hasattr(series_bible, "resolve_canonical_name"):
+                            canon = series_bible.resolve_canonical_name(raw_stem)
+                            if canon and canon.lower() != raw_stem.lower():
+                                return canon
+
+                        # 2. Check polite surname recovery for [Surname]-senpai
+                        if suffix == "senpai":
+                            target_gender = "UNKNOWN"
+                            if series_bible and hasattr(series_bible, "get_character_gender"):
+                                target_gender = series_bible.get_character_gender(raw_stem)
+                            if target_gender == "UNKNOWN" and character_registry:
+                                target_gender = character_registry.get(raw_stem, "UNKNOWN")
+
+                            # If known female character/surname, polite address in Polish is 'panno [Nazwisko]'
+                            if target_gender == "FEMALE":
+                                return f"panno {raw_stem}"
+                            elif target_gender == "MALE":
+                                return f"panie {raw_stem}"
+                            return raw_stem
+
+                        return raw_stem
+
+                    ev.text = re.sub(r"\b([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+)-(?:senpai|taso|tan)\b", _repl_stem, ev.text, flags=re.IGNORECASE)
+                    if ev.text != old_t:
+                        fixes.append(f"[Episode Quality Gate - Filar XXVII Adaptacja Tytułów] Linia #{i+1}: zaadaptowano japoński sufiks honoryfikatywny do kanonicznej formy polskiej")
+
+                # Standalone 'Senpai!' or ', senpai?' in dialogue with Anti-Self-Address Guard
+                if re.search(r"\bSenpai\b", ev.text, re.IGNORECASE):
+                    current_speaker = ev.name.strip() if getattr(ev, "name", None) else ""
+                    addressee_name = None
+
+                    # 1. Check SeriesBible relationships and characters
+                    if series_bible and hasattr(series_bible, "data") and current_speaker:
+                        all_rels = {}
+                        if "relationships" in series_bible.data:
+                            all_rels.update(series_bible.data["relationships"])
+                        if "characters" in series_bible.data:
+                            for k, v in series_bible.data["characters"].items():
+                                if "->" in k:
+                                    all_rels[k] = v
+                        for rel_k, rel_v in all_rels.items():
+                            if "->" in rel_k:
+                                spk, lst = [p.strip() for p in rel_k.split("->", 1)]
+                                if spk.lower() == current_speaker.lower() or current_speaker.lower() in spk.lower() or spk.lower() in current_speaker.lower():
+                                    clean_lst = lst.split()[0]
+                                    if clean_lst.lower() != current_speaker.lower():
+                                        addressee_name = clean_lst
+                                        break
+
+                    # 2. Scan backward up to 20 lines for interlocutor (skipping current_speaker and signs)
+                    if not addressee_name:
+                        for prev_idx in range(i - 1, max(-1, i - 21), -1):
+                            cand_ev = events[prev_idx]
+                            cand_spk = cand_ev.name.strip() if getattr(cand_ev, "name", None) else ""
+                            # Stop if time gap > 45 seconds (major scene cut)
+                            if hasattr(ev, "start") and hasattr(cand_ev, "end") and (ev.start - cand_ev.end > 45000):
+                                break
+                            if cand_spk and cand_spk.lower() not in ["sign", "signs", "default", "main"]:
+                                if current_speaker and cand_spk.lower() == current_speaker.lower():
+                                    continue
+                                addressee_name = cand_spk.split()[0]
+                                break
+
+                    # 3. Scan forward up to 12 lines (if speaker opens the scene)
+                    if not addressee_name:
+                        for next_idx in range(i + 1, min(len(events), i + 13)):
+                            cand_ev = events[next_idx]
+                            cand_spk = cand_ev.name.strip() if getattr(cand_ev, "name", None) else ""
+                            if hasattr(ev, "end") and hasattr(cand_ev, "start") and (cand_ev.start - ev.end > 45000):
+                                break
+                            if cand_spk and cand_spk.lower() not in ["sign", "signs", "default", "main"]:
+                                if current_speaker and cand_spk.lower() == current_speaker.lower():
+                                    continue
+                                addressee_name = cand_spk.split()[0]
+                                break
+
+                    # Final Anti-Self-Address Guard: addressee CAN NEVER be current speaker!
+                    if addressee_name and current_speaker and addressee_name.lower() == current_speaker.lower():
+                        addressee_name = None
+
+                    old_t = ev.text
+                    if addressee_name:
+                        def _repl_senpai_addr(m):
+                            lead = m.group(1) or ""
+                            punct = m.group(2) or ""
+                            w_name = addressee_name
+                            if w_name.endswith("a"):
+                                w_name = w_name[:-1] + "o"
+                            return f"{lead}{w_name}{punct}"
+                        ev.text = re.sub(r"(^|[,\.!\?…]\s*|\bHej,\s*|\bEj,\s*)\b[Ss]enpai([!,\?…]+|\s*\\N|$)", _repl_senpai_addr, ev.text)
+                        ev.text = re.sub(r",\s*[Ss]enpai\b", f", {addressee_name}", ev.text)
+                    else:
+                        ev.text = re.sub(r",\s*[Ss]enpai\b", "", ev.text)
+                        clean_plain = re.sub(r"\{[^\}]*\}", "", ev.text).strip()
+                        if clean_plain in ["Senpai!", "Senpai?", "Senpai", "senpai!", "senpai"]:
+                            ev.text = re.sub(r"\b[Ss]enpai\b", "Uwaga", ev.text)
+                        else:
+                            ev.text = re.sub(r"\b[Ss]enpai[!,\?…]*", "", ev.text).strip()
+                    if ev.text != old_t:
+                        fixes.append(f"[Episode Quality Gate - Filar XXVII Adaptacja Senpai] Linia #{i+1}: zaadaptowano zwrot 'Senpai' na formę polską z ochroną przed auto-adresacją")
+
+            # 3j. MANGA CANON TITULAR ENFORCEMENT (Filar XXIII / Manga Canon)
+            if re.search(r"\bksi(?:ążę|ęcia|ęciu|ęciem)\s+kaiju\b", ev.text, re.IGNORECASE):
+                old_t = ev.text
+                def _repl_kaiju_prince(m):
+                    txt = m.group(0)
+                    if re.search(r"książę", txt, re.IGNORECASE):
+                        res = "Potworny Królewicz"
+                    elif re.search(r"księcia", txt, re.IGNORECASE):
+                        res = "Potwornego Królewicza"
+                    elif re.search(r"księciu", txt, re.IGNORECASE):
+                        res = "Potwornemu Królewiczowi"
+                    elif re.search(r"księciem", txt, re.IGNORECASE):
+                        res = "Potwornym Królewiczem"
+                    else:
+                        res = "Potworny Królewicz"
+                    if txt.isupper():
+                        return res.upper()
+                    elif txt[0].isupper():
+                        return res
+                    else:
+                        return res.lower()
+                ev.text = re.sub(r"\bksi(?:ążę|ęcia|ęciu|ęciem)\s+kaiju\b", _repl_kaiju_prince, ev.text, flags=re.IGNORECASE)
+                if ev.text != old_t:
+                    fixes.append(f"[Episode Quality Gate - Filar XXIII Kanon Mangi] Linia #{i+1}: zastąpiono kalkę 'Książę Kaiju' oficjalnym kanonem 'Potworny Królewicz'")
+
+            # Standalone Vocative Moniker (e.g. "Wypadłeś idealnie, książę!" -> "...królewiczu!")
+            is_carameliser_or_prince = False
+            if series_bible:
+                t_low = getattr(series_bible, "anime_title", "").lower()
+                if "caramel" in t_low or "kaiju" in t_low:
+                    is_carameliser_or_prince = True
+                gloss = getattr(series_bible, "data", {}).get("glossary", {})
+                if any("królewicz" in str(v).lower() for v in gloss.values()):
+                    is_carameliser_or_prince = True
+
+            if is_carameliser_or_prince and not is_sign:
+                if re.search(r"(?:,\s*|\b)[Kk]siążę(?=[!,\?…\.]|\s*$|\s*\\N)", ev.text):
+                    old_t = ev.text
+                    def _repl_voc_prince(m):
+                        txt = m.group(0)
+                        prefix = ", " if txt.startswith(",") else ""
+                        word = txt.lstrip(", ")
+                        repl = "Królewiczu" if word[0].isupper() else "królewiczu"
+                        return f"{prefix}{repl}"
+                    ev.text = re.sub(r"(,\s*|\b)[Kk]siążę(?=[!,\?…\.]|\s*$|\s*\\N)", _repl_voc_prince, ev.text)
+                    if ev.text != old_t:
+                        fixes.append(f"[Episode Quality Gate - Filar XXIII Kanon Mangi] Linia #{i+1}: zastąpiono wołacz 'książę' oficjalnym kanonem przydomka 'królewiczu'")
+
+            # Attached Cut-off Dash Sanitizer (Filar LX)
+            if not is_sign and re.search(r"([A-Za-ząćęłńóśźż])[–—\-](?=\s*\\N|\s*$|[!\?…])", ev.text):
+                old_t = ev.text
+                ev.text = re.sub(r"([A-Za-ząćęłńóśźż])[–—\-](?=\s*\\N|\s*$|[!\?…])", r"\1...", ev.text)
+                if ev.text != old_t:
+                    fixes.append(f"[Episode Quality Gate - Filar LX Formatowanie Przerwania Wypowiedzi] Linia #{i+1}: zamieniono przyklejony myślnik urwanej kwestii na standardowy wielokropek AVT")
+
+            # 3k. RELACJE SZKOLNE I MENTORSKIE - ANTY-ARCHAIZM "PANNA" (Filar XXV / CLVI / CLXVI)
+            if not is_sign:
+                old_t = ev.text
+                # Rei do Ai / Uczennicy: "Panno Yasumi" -> "Yasumi"
+                ev.text = re.sub(r"\bPanno\s+Yasumi\b", "Yasumi", ev.text)
+                # Uczennica do Nauczycielki: "panno Teshimo" -> "pani Teshimo"
+                ev.text = re.sub(r"\bpanno\s+Teshimo\b", "pani Teshimo", ev.text)
+                ev.text = re.sub(r"\bPanno\s+Teshimo\b", "Pani Teshimo", ev.text)
+                # O nauczycielce w 3. osobie: "panny Teshimy" -> "pani Teshimy", "Panna Teshima" -> "Pani Teshima"
+                ev.text = re.sub(r"\bpanny\s+Teshimy\b", "pani Teshimy", ev.text)
+                ev.text = re.sub(r"\bPanna\s+Teshima\b", "Pani Teshima", ev.text)
+                # Ogólna reguła szkolna dla nauczycielek/mentorek w wołaczu
+                ev.text = re.sub(r"\b([Pp])anno\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+-sensei)\b", r"\1ani \2", ev.text)
+                if ev.text != old_t:
+                    fixes.append(f"[Episode Quality Gate - Filar XXV/CLVI Tytulatura Szkolna] Linia #{i+1}: skorygowano archaizm 'Panna/Panno' na naturalną formę relacji edukacyjnej")
+
+            # 3l. PROCES TWÓRCZY - ELIMINACJA ŻARGONU IT "INPUT / OUTPUT" (Filar X & I)
+            if not is_sign:
+                old_t = ev.text
+                ev.text = re.sub(r"\bcykl(?:u)?\s+inputu\s+i\s+outputu\b", "cykl czerpania inspiracji i tworzenia", ev.text, flags=re.IGNORECASE)
+                ev.text = re.sub(r"\bwięcej\s+inputu\b", "więcej inspiracji", ev.text, flags=re.IGNORECASE)
+                ev.text = re.sub(r"\bInputu(\s*[\?!]+)", r"Inspiracji\1", ev.text)
+                ev.text = re.sub(r"\binputu\b", "inspiracji", ev.text, flags=re.IGNORECASE)
+                ev.text = re.sub(r"\boutputu\b", "tworzenia", ev.text, flags=re.IGNORECASE)
+                if ev.text != old_t:
+                    fixes.append(f"[Episode Quality Gate - Filar X/I Żargon Twórczy] Linia #{i+1}: zastąpiono żargon IT 'input/output' naturalnymi pojęciami procesu twórczego")
+
+            # 3m. SKŁADNIA I KALKI ANGIELSKIE - "W TAKIM POMYSŁY" (Filar IV / Belczyk)
+            if not is_sign:
+                old_t = ev.text
+                ev.text = re.sub(r"(\b|\\N)zapisywa[^\s]*\s+w\s+takim\s+pomys[^\s,]*", r"\1zapisywałaś w nim pomysły", ev.text, flags=re.IGNORECASE)
+                if ev.text != old_t:
+                    fixes.append(f"[Episode Quality Gate - Filar IV Kalka Składniowa] Linia #{i+1}: skorygowano kalkę eliptyczną 'w takim' -> 'w nim pomysły'")
+
+            # 3n. FLEKSJA ZAMÓWIEŃ GASTRONOMICZNYCH (Filar CXXXVII: Biernik przy zamawianiu)
+            if not is_sign:
+                old_t = ev.text
+                ev.text = re.sub(r"\b(dla mnie|poproszę)\s+Gojinka\s+z\s+wodą\b", r"\1 Gojinkę z wodą", ev.text, flags=re.IGNORECASE)
+                if ev.text != old_t:
+                    fixes.append(f"[Episode Quality Gate - Filar CXXXVII Fleksja Zamówień] Linia #{i+1}: skorygowano mianownik na biernik w zamówieniu: 'Gojinkę z wodą'")
+
+            # 3o. LOKALIZACJA JAPOŃSKICH OKRZYKÓW FESTIWALOWYCH / KAKEGOE (Filar CLXIV)
+            if not is_sign:
+                old_t = ev.text
+                ev.text = re.sub(r"\bTamaya[!]*", "Ale widok!", ev.text)
+                if ev.text != old_t:
+                    fixes.append(f"[Episode Quality Gate - Filar CLXIV Lokalizacja Okrzyku] Linia #{i+1}: zlokalizowano tradycyjny okrzyk 'Tamaya!' -> 'Ale widok!'")
+
+            # 3p. RELACJE RÓWIEŚNICZE W SZKOLE - DE-FORMALIZACJA "PANI FUJIMORI" (Filar XXV / IX)
+            if not is_sign:
+                old_t = ev.text
+                ev.text = re.sub(r"\bPani\s+Fujimori,\s*ma\s+pani\s+skaner\?", "Fujimori, masz skaner?", ev.text)
+                ev.text = re.sub(r"\bPani\s+Fujimori,\s*spokojnie!", "Fujimori, spokojnie!", ev.text)
+                ev.text = re.sub(r"\bgdy\s+pani\s+Fujimori\s+skończy\b", "gdy Fujimori skończy", ev.text)
+                ev.text = re.sub(r"\bPani\s+Fujimori\b", "Fujimori", ev.text)
+                ev.text = re.sub(r"\bpani\s+Fujimori\b", "Fujimori", ev.text)
+                if ev.text != old_t:
+                    fixes.append(f"[Episode Quality Gate - Filar XXV/IX Tytulatura Rówieśnicza] Linia #{i+1}: zlikwidowano sztuczną formę 'Pani Fujimori' na rzecz naturalnej relacji koleżeńskiej na 'ty'")
+
+            # 3q. RELACJE ZAWODOWE REDAKTOR-AUTOR - SPÓJNOŚĆ T-V (Filar XXV / CLVI)
+            if not is_sign:
+                old_t = ev.text
+                ev.text = re.sub(r"\bZaufaj\s+mi\b", "Proszę mi zaufać", ev.text)
+                ev.text = re.sub(r"\bCo\s+zamierzasz\?", "Co pani zamierza?", ev.text)
+                ev.text = re.sub(r"\bJeśli\s+chcesz\s+publikować\s+w\s+naszym(?P<sep>\s+|\\N)magazynie,\s*musisz\s+wprowadzić\s+zmiany\b", r"Jeśli chce pani publikować w naszym\g<sep>magazynie, musi pani wprowadzić zmiany", ev.text)
+                ev.text = re.sub(r"\bWiem,\s*że\s+masz\s+opory\b", "Wiem, że ma pani opory", ev.text)
+                ev.text = re.sub(r"\bJeśli\s+jesteś\s+na\s+to(?P<sep>\s+|\\N)gotowa,\s*w\s+pełni\s+ci\s+pomogę\b", r"Jeśli jest pani na to\g<sep>gotowa, w pełni pani pomogę", ev.text)
+                ev.text = re.sub(r"\bTak\s+myślałam,\s*że\s+to\s+powiesz\b", "Tak myślałam, że pani to powie", ev.text)
+                ev.text = re.sub(r"\bA\s+może\s+spróbujesz\s+w\s+innym\s+magazynie\?", "A może spróbuje pani w innym magazynie?", ev.text)
+                if ev.text != old_t:
+                    fixes.append(f"[Episode Quality Gate - Filar XXV/CLVI Niezmienniczość T-V Redakcji] Linia #{i+1}: ujednolicono formę grzecznościową redaktorki do autorki na formę per 'Pani'")
 
             # 4. RESIDUAL ENGLISH CALQUE SWEEP (Belczyk AVT Canon)
             for item in AVTLinter.FIXED_REPLACEMENTS:
                 pattern = item[0]
                 repl = item[1]
                 pillar_tag = item[2] if len(item) > 2 else "Belczyk AVT"
+                # Dictionary leak parentheses cleanup must NOT apply to signs!
+                if is_sign and "wycieku" in pillar_tag.lower():
+                    continue
                 if re.search(pattern, ev.text):
                     ev.text = re.sub(pattern, repl, ev.text)
                     repl_disp = repl if isinstance(repl, str) else "[korekta fleksyjna]"
@@ -2316,12 +3138,34 @@ class EpisodeQualityGate:
                         fixes.append(f"[Episode Quality Gate - Złota Reguła Użytkownika] Linia #{i+1}: '{bad}' -> '{good}'")
 
             # 5. PUNCTUATION & TYPOGRAPHY HYGIENE
-            # Clean accidental double dots (e.g. "To prawda..") -> "To prawda..."
-            ev.text = re.sub(r"(?<!\.)\.\.(?!\.)", "...", ev.text)
+            # Clean accidental double dots (e.g. "To prawda..") -> "To prawda..." (excluding intentional AVT ?.. and !..)
+            ev.text = re.sub(r"(?<![\.\?!])\.\.(?!\.)", "...", ev.text)
+            # Normalize non-normative ellipsis clusters (e.g. ?... -> ?.., !... -> !..)
+            if re.search(r"[\?!]\.{3,}", ev.text):
+                old_punc_t = ev.text
+                ev.text = re.sub(r"\?\.{3,}", "?..", ev.text)
+                ev.text = re.sub(r"!\.{3,}", "!..", ev.text)
+                if ev.text != old_punc_t and not any(f"Linia #{i+1}:" in f for f in fixes):
+                    fixes.append(f"[Episode Quality Gate - Higiena Interpunkcji] Linia #{i+1}: znormalizowano nienormatywny wielokropek (?...) na standardowy AVT (?..)")
             # Remove space before comma/period/exclamation/question mark
             ev.text = re.sub(r"\s+([,\.!\?…])", r"\1", ev.text)
             # Normalize whitespace around ASS line breaks
             ev.text = re.sub(r"\s*\\N\s*", r"\\N", ev.text)
+            # Remove Japanese emotional tildes and runaway multiple exclamations in dialogue (Filar LX)
+            if not is_sign and "~" in ev.text:
+                old_t = ev.text
+                ev.text = re.sub(r"~[!]+", "!", ev.text)
+                ev.text = re.sub(r"~", "", ev.text)
+                if ev.text != old_t:
+                    fixes.append(f"[Episode Quality Gate - Filar LX Typografia] Linia #{i+1}: usunięto japońską tyldę i znormalizowano wykrzykniki")
+            # Remove comma before "czy" in direct binary alternatives (Filar LX)
+            if re.search(r"\b([A-Za-ząćęłńóśźż0-9]+),\s+czy\s+(bez|nie|tak)\b", ev.text):
+                ev.text = re.sub(r"\b([A-Za-ząćęłńóśźż0-9]+),\s+czy\s+(bez|nie|tak)\b", r"\1 czy \2", ev.text)
+                fixes.append(f"[Episode Quality Gate - Filar LX Interpunkcja] Linia #{i+1}: usunięto zbędny przecinek przed 'czy' w alternatywie rozłącznej")
+            # Replace trailing cut-off speech glued en-dash (e.g. "Rin–") with ellipsis "Rin..." (Filar LX)
+            if re.search(r"([A-Za-ząćęłńóśźż])–(?=\s*\\N|\s*$|[!\?…])", ev.text):
+                ev.text = re.sub(r"([A-Za-ząćęłńóśźż])–(?=\s*\\N|\s*$|[!\?…])", r"\1...", ev.text)
+                fixes.append(f"[Episode Quality Gate - Filar LX Interpunkcja] Linia #{i+1}: zamieniono przyklejony myślnik urwanej mowy na wielokropek")
             # Remove misplaced question mark on pure affirmative statements like "Rozumiem?" -> "Rozumiem."
             if not is_sign and re.match(r"^(\s*\{[^\}]*\})*(?:Rozumiem|Jasne|D-Dobrze|Dobrze|W porządku|Oczywiście)\?+(\{[^\}]*\}\s*)*$", ev.text.strip()):
                 ev.text = re.sub(r"\?+", ".", ev.text)

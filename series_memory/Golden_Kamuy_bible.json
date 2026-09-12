@@ -1,6 +1,105 @@
 {
   "anime_title": "Golden Kamuy",
   "characters": {
+    "Saichi Sugimoto": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Asirpa": {
+      "description": "KOBIETA (wyodrębniono z relacji serii)"
+    },
+    "Usami": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Kadokura": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Tsukishima": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Koito": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Kikuta": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Kirawus": {
+      "description": "KOBIETA (wyodrębniono z relacji serii)"
+    },
+    "Tsurumi": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Sugimoto": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Shiraishi": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Botaro": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Podwładni": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Sofia": {
+      "description": "KOBIETA (wyodrębniono z relacji serii)"
+    },
+    "Ariko": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Kikuta Mokutarou": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Kaneko Kaeko": {
+      "description": "KOBIETA (wyodrębniono z relacji serii)"
+    },
+    "Tokushirou Tsurumi": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Hidenobu Okuda": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Shinpachi Nagakura": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Tatsuma Ushiyama": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Hijikata": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Nagakura": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Otonoshin Koito": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Toshizou Hijikata": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Tanigaki Genjiro": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Tokishige Usami": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Hajime Tsukishima": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Yoshitake Shiraishi": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Fusataro Oosawa": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Nikaido": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Kaeko": {
+      "description": "KOBIETA (wyodrębniono z relacji serii)"
+    },
+    "Okuda": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
     "Saichi Sugimoto -> Asirpa": {
       "description": "Zwrot: 'panna Asirpa / Asirpa-san' (obrońca i partner)"
     },
@@ -185,7 +284,7 @@
     "Kene": "kene",
     "Cepker": "buty ze skóry łososia",
     "Ainu gold": "Złoto Ajnów",
-    "Regimental flag bearer": "Sztandarowy pułku",
+    "Regimental flag bearer": "sztandarowy pułku",
     "Mitsubishi zaibatsu": "Zaibatsu Mitsubishi",
     "Imperial Hotel": "Hotel Imperialny",
     "Rokumeikan": "Rokumeikan",
@@ -210,12 +309,56 @@
     "Horkew Oskoni": "Horkew Oskoni",
     "Warrant Officer": "starszy chorąży",
     "1st Division": "1. Dywizja",
-    "regimental flag bearer": "chorąży pułku",
     "zaibatsu": "zaibatsu",
     "Fort Goryoukaku": "Goryoukaku",
     "Wenkamuy": "Wenkamuj"
   },
-  "relationships": {},
+  "relationships": {
+    "Saichi Sugimoto -> Asirpa": "Zwrot: 'panna Asirpa / Asirpa-san' (obrońca i partner)",
+    "Asirpa -> Saichi Sugimoto": "Zwrot: 'na ty / po imieniu: Sugimoto' (partnerzy / towarzysze broni)",
+    "Usami -> Kadokura": "Zwrot: 'ty prosiaczku / staruchu' (oprawca -> więzień/ofiara)",
+    "Tsukishima -> Koito": "Zwrot: 'podporuczniku Koito' (podwładny -> przełożony)",
+    "Kikuta -> Koito": "Zwrot: 'podporuczniku Koito' (starszy chorąży -> młodszy stopniem oficer)",
+    "Kirawus -> Saichi Sugimoto": "Zwrot: 'panie Sugimoto / Sugimoto-nispa' (sprzymierzeniec Ajnu -> Sugimoto (zwrot z szacunkiem))",
+    "Tsurumi -> Usami": "Zwrot: 'z imienia: Tokishige-kun / Szeregowy Usami' (dowódca -> podwładny / mistrz -> wyznawca)",
+    "Sugimoto -> Asirpa": "Zwrot: 'Asirpa-san / na ty' (Towarzysze broni, opiekuńczo-partnerska więź)",
+    "Shiraishi -> Botaro": "Zwrot: 'Botaro / Pirat' (Współwięźniowie i kompani)",
+    "Tsurumi -> Podwładni": "Zwrot: 'Po stopniach wojskowych (np. poruczniku Koito)' (Dowódca wojskowy -> podwładni)",
+    "Tsurumi -> Asirpa": "Zwrot: 'Asirpa / Asirpo' (porywacz / manipulator -> zakładniczka)",
+    "Tsurumi -> Sofia": "Zwrot: 'pani Zoyo / Sofio Złotoręka' (przesłuchujący -> więźniarka / dawni znajomi)",
+    "Sugimoto -> Shiraishi": "Zwrot: 'na ty / Shiraishi' (towarzysze broni)",
+    "Ariko -> Sugimoto": "Zwrot: 'Sugimoto / na ty' (tymczasowy sojusznik wojenny)",
+    "Ariko -> Kikuta": "Zwrot: 'panie chorąży / chorąży Kikuta' (podwładny -> starszy stopniem / weterani z jednego okopu)",
+    "Koito -> Tsurumi": "Zwrot: 'poruczniku Tsurumi / panie poruczniku' (zaślepiony podwładny -> dowódca)",
+    "Kikuta Mokutarou -> Saichi Sugimoto": "Zwrot: 'na ty / Norabo / chłopie' (sierżant -> rekrut / podopieczny)",
+    "Saichi Sugimoto -> Kikuta Mokutarou": "Zwrot: 'panie sierżancie / sierżancie Kikuta' (rekrut -> przełożony)",
+    "Kaneko Kaeko -> Saichi Sugimoto": "Zwrot: 'panie Yuusaku / panie Hanazawa' (kandydatka na żonę -> domniemany narzeczony)",
+    "Tokushirou Tsurumi -> Hidenobu Okuda": "Zwrot: 'generale Okuda / panie generale' (podwładny -> dowódca dywizji)",
+    "Sugimoto -> Kikuta": "Zwrot: 'panie sierżancie / panie Kikuta' (młodzieniec -> oficer/instruktor)",
+    "Kikuta -> Sugimoto": "Zwrot: 'na ty / per Norabo' (sierżant / mentor -> młody włóczęga)",
+    "Tsurumi -> Kikuta": "Zwrot: 'chorąży Kikuta / panie Kikuta' (przełożony -> szpieg/podwładny)",
+    "Tokushirou Tsurumi -> Shinpachi Nagakura": "Zwrot: 'panie Nagakura (Nagakura-san)' (wrogowie / gracz polityczny i weteran)",
+    "Tatsuma Ushiyama -> Asirpa": "Zwrot: 'Panienko' (obrońca -> podopieczna)",
+    "Tsurumi -> Tsukishima": "Zwrot: 'sierżancie Tsukishima' (dowódca -> podwładny)",
+    "Hijikata -> Nagakura": "Zwrot: 'Gamushin / Shinpachi / na ty' (wieloletni bracia broni z Shinsengumi)",
+    "Otonoshin Koito -> Tokushirou Tsurumi": "Zwrot: 'panie poruczniku / poruczniku Tsurumi' (podwładny -> dowódca)",
+    "Shinpachi Nagakura -> Toshizou Hijikata": "Zwrot: 'Hijikata / na ty' (bracia broni ze Shinsengumi)",
+    "Asirpa -> Tanigaki Genjiro": "Zwrot: 'Tanigaki-Nispa' (szacunek łowczyni Ainu wobec honorowego towarzysza)",
+    "Hijikata -> Sugimoto": "Zwrot: 'Sugimoto Saichi' (dawny dowódca samurajski szanujący determinację młodego żołnierza)",
+    "Usami -> Tsurumi": "Zwrot: 'panie poruczniku / Tokushirou-san' (podwładny -> dowódca)",
+    "Tokishige Usami -> Tokushirou Tsurumi": "Zwrot: 'poruczniku Tsurumi / panie poruczniku' (podwładny -> ubóstwiany dowódca)",
+    "Hajime Tsukishima -> Otonoshin Koito": "Zwrot: 'panie poruczniku Koito' (podwładny -> przełożony)",
+    "Otonoshin Koito -> Hajime Tsukishima": "Zwrot: 'Tsukishima' (dowódca -> podwładny)",
+    "Yoshitake Shiraishi -> Fusataro Oosawa": "Zwrot: 'Botaro / Fusataro' (towarzysze niedoli)",
+    "Tsukishima -> Tsurumi": "Zwrot: 'panie poruczniku / poruczniku Tsurumi' (podwładny -> przełożony (wojskowa))",
+    "Koito -> Tsukishima": "Zwrot: 'sierżancie Tsukishima / Tsukishima' (oficer -> podoficer)",
+    "Nikaido -> Ariko": "Zwrot: 'Szeregowy Ariko' (żołnierze z tej samej dywizji)",
+    "Kaeko -> Sugimoto": "Zwrot: 'panie Yuusaku (Yuusaku-san)' (arystokratka -> rzekomy kandydat na męża)",
+    "Tsurumi -> Okuda": "Zwrot: 'panie generale' (porucznik -> dowódca dywizji)",
+    "Shiraishi -> Hijikata": "Zwrot: 'staruszku / panie Hijikata' (sojusznicy z przymusu, nuta komediowego lęku przed autorytetem)",
+    "Asirpa -> Hijikata": "Zwrot: 'panie Hijikata / Hijikata-nispa' (Młoda Ajnuka wobec szanowanego starszego przywódcy)",
+    "Tsurumi -> Nagakura": "Zwrot: 'panie Nagakura' (Oficer wywiadu wobec weterana Shinsengumi / przeciwnicy polityczni)"
+  },
   "episodes_translated": [
     "tmp996h2his",
     "[ASW] Golden Kamuy - 52 [1080p HEVC][B92A80B5]",
@@ -230,5 +373,701 @@
     "[ASW] Golden Kamuy - 60 [1080p HEVC][CAF7567C]",
     "[ASW] Golden Kamuy - 61 [1080p HEVC][FFD813D3]",
     "[ASW] Golden Kamuy - 62 [1080p HEVC][E14D8958]"
-  ]
+  ],
+  "declensions": {
+    "Saichi Sugimoto": {
+      "M": "Saichi Sugimoto",
+      "D": "Saichi Sugimoto",
+      "C": "Saichi Sugimoto",
+      "B": "Saichi Sugimoto",
+      "N": "Saichi Sugimoto",
+      "Ms": "Saichi Sugimoto",
+      "W": "Saichi Sugimoto"
+    },
+    "Asirpa": {
+      "M": "Asirpa",
+      "D": "Asirpy",
+      "C": "Asirpe",
+      "B": "Asirpę",
+      "N": "Asirpą",
+      "Ms": "Asirpe",
+      "W": "Asirpo"
+    },
+    "Usami": {
+      "M": "Usami",
+      "D": "Usami",
+      "C": "Usami",
+      "B": "Usami",
+      "N": "Usami",
+      "Ms": "Usami",
+      "W": "Usami"
+    },
+    "Kadokura": {
+      "M": "Kadokura",
+      "D": "Kadokury",
+      "C": "Kadokurze",
+      "B": "Kadokurę",
+      "N": "Kadokurą",
+      "Ms": "Kadokurze",
+      "W": "Kadokuro"
+    },
+    "Tsukishima": {
+      "M": "Tsukishima",
+      "D": "Tsukishimy",
+      "C": "Tsukishimie",
+      "B": "Tsukishimę",
+      "N": "Tsukishimą",
+      "Ms": "Tsukishimie",
+      "W": "Tsukishimo"
+    },
+    "Koito": {
+      "M": "Koito",
+      "D": "Koito",
+      "C": "Koito",
+      "B": "Koito",
+      "N": "Koito",
+      "Ms": "Koito",
+      "W": "Koito"
+    },
+    "Kikuta": {
+      "M": "Kikuta",
+      "D": "Kikuty",
+      "C": "Kikucie",
+      "B": "Kikutę",
+      "N": "Kikutą",
+      "Ms": "Kikucie",
+      "W": "Kikuto"
+    },
+    "Kirawus": {
+      "M": "Kirawus",
+      "D": "Kirawus",
+      "C": "Kirawus",
+      "B": "Kirawus",
+      "N": "Kirawus",
+      "Ms": "Kirawus",
+      "W": "Kirawus"
+    },
+    "Tsurumi": {
+      "M": "Tsurumi",
+      "D": "Tsurumi",
+      "C": "Tsurumi",
+      "B": "Tsurumi",
+      "N": "Tsurumi",
+      "Ms": "Tsurumi",
+      "W": "Tsurumi"
+    },
+    "Sugimoto": {
+      "M": "Sugimoto",
+      "D": "Sugimoto",
+      "C": "Sugimoto",
+      "B": "Sugimoto",
+      "N": "Sugimoto",
+      "Ms": "Sugimoto",
+      "W": "Sugimoto"
+    },
+    "Shiraishi": {
+      "M": "Shiraishi",
+      "D": "Shiraishi",
+      "C": "Shiraishi",
+      "B": "Shiraishi",
+      "N": "Shiraishi",
+      "Ms": "Shiraishi",
+      "W": "Shiraishi"
+    },
+    "Botaro": {
+      "M": "Botaro",
+      "D": "Botaro",
+      "C": "Botaro",
+      "B": "Botaro",
+      "N": "Botaro",
+      "Ms": "Botaro",
+      "W": "Botaro"
+    },
+    "Podwładni": {
+      "M": "Podwładni",
+      "D": "Podwładni",
+      "C": "Podwładni",
+      "B": "Podwładni",
+      "N": "Podwładni",
+      "Ms": "Podwładni",
+      "W": "Podwładni"
+    },
+    "Sofia": {
+      "M": "Sofia",
+      "D": "Sofiy",
+      "C": "Sofie",
+      "B": "Sofię",
+      "N": "Sofią",
+      "Ms": "Sofie",
+      "W": "Sofio"
+    },
+    "Ariko": {
+      "M": "Ariko",
+      "D": "Ariko",
+      "C": "Ariko",
+      "B": "Ariko",
+      "N": "Ariko",
+      "Ms": "Ariko",
+      "W": "Ariko"
+    },
+    "Kikuta Mokutarou": {
+      "M": "Kikuta Mokutarou",
+      "D": "Kikuty Mokutarou",
+      "C": "Kikucie Mokutarou",
+      "B": "Kikutę Mokutarou",
+      "N": "Kikutą Mokutarou",
+      "Ms": "Kikucie Mokutarou",
+      "W": "Kikuto Mokutarou"
+    },
+    "Kaneko Kaeko": {
+      "M": "Kaneko Kaeko",
+      "D": "Kaneko Kaeko",
+      "C": "Kaneko Kaeko",
+      "B": "Kaneko Kaeko",
+      "N": "Kaneko Kaeko",
+      "Ms": "Kaneko Kaeko",
+      "W": "Kaneko Kaeko"
+    },
+    "Tokushirou Tsurumi": {
+      "M": "Tokushirou Tsurumi",
+      "D": "Tokushirou Tsurumi",
+      "C": "Tokushirou Tsurumi",
+      "B": "Tokushirou Tsurumi",
+      "N": "Tokushirou Tsurumi",
+      "Ms": "Tokushirou Tsurumi",
+      "W": "Tokushirou Tsurumi"
+    },
+    "Hidenobu Okuda": {
+      "M": "Hidenobu Okuda",
+      "D": "Hidenobu Okudy",
+      "C": "Hidenobu Okudzie",
+      "B": "Hidenobu Okudę",
+      "N": "Hidenobu Okudą",
+      "Ms": "Hidenobu Okudzie",
+      "W": "Hidenobu Okudo"
+    },
+    "Shinpachi Nagakura": {
+      "M": "Shinpachi Nagakura",
+      "D": "Shinpachi Nagakury",
+      "C": "Shinpachi Nagakurze",
+      "B": "Shinpachi Nagakurę",
+      "N": "Shinpachi Nagakurą",
+      "Ms": "Shinpachi Nagakurze",
+      "W": "Shinpachi Nagakuro"
+    },
+    "Tatsuma Ushiyama": {
+      "M": "Tatsuma Ushiyama",
+      "D": "Tatsumy Ushiyamy",
+      "C": "Tatsumie Ushiyamie",
+      "B": "Tatsumę Ushiyamę",
+      "N": "Tatsumą Ushiyamą",
+      "Ms": "Tatsumie Ushiyamie",
+      "W": "Tatsumo Ushiyamo"
+    },
+    "Hijikata": {
+      "M": "Hijikata",
+      "D": "Hijikaty",
+      "C": "Hijikacie",
+      "B": "Hijikatę",
+      "N": "Hijikatą",
+      "Ms": "Hijikacie",
+      "W": "Hijikato"
+    },
+    "Nagakura": {
+      "M": "Nagakura",
+      "D": "Nagakury",
+      "C": "Nagakurze",
+      "B": "Nagakurę",
+      "N": "Nagakurą",
+      "Ms": "Nagakurze",
+      "W": "Nagakuro"
+    },
+    "Otonoshin Koito": {
+      "M": "Otonoshin Koito",
+      "D": "Otonoshina Koito",
+      "C": "Otonoshinowi Koito",
+      "B": "Otonoshina Koito",
+      "N": "Otonoshinem Koito",
+      "Ms": "Otonoshinie Koito",
+      "W": "Otonoshinie Koito"
+    },
+    "Toshizou Hijikata": {
+      "M": "Toshizou Hijikata",
+      "D": "Toshizou Hijikaty",
+      "C": "Toshizou Hijikacie",
+      "B": "Toshizou Hijikatę",
+      "N": "Toshizou Hijikatą",
+      "Ms": "Toshizou Hijikacie",
+      "W": "Toshizou Hijikato"
+    },
+    "Tanigaki Genjiro": {
+      "M": "Tanigaki Genjiro",
+      "D": "Tanigaki Genjiro",
+      "C": "Tanigaki Genjiro",
+      "B": "Tanigaki Genjiro",
+      "N": "Tanigaki Genjiro",
+      "Ms": "Tanigaki Genjiro",
+      "W": "Tanigaki Genjiro"
+    },
+    "Tokishige Usami": {
+      "M": "Tokishige Usami",
+      "D": "Tokishige Usami",
+      "C": "Tokishige Usami",
+      "B": "Tokishige Usami",
+      "N": "Tokishige Usami",
+      "Ms": "Tokishige Usami",
+      "W": "Tokishige Usami"
+    },
+    "Hajime Tsukishima": {
+      "M": "Hajime Tsukishima",
+      "D": "Hajime Tsukishimy",
+      "C": "Hajime Tsukishimie",
+      "B": "Hajime Tsukishimę",
+      "N": "Hajime Tsukishimą",
+      "Ms": "Hajime Tsukishimie",
+      "W": "Hajime Tsukishimo"
+    },
+    "Yoshitake Shiraishi": {
+      "M": "Yoshitake Shiraishi",
+      "D": "Yoshitake Shiraishi",
+      "C": "Yoshitake Shiraishi",
+      "B": "Yoshitake Shiraishi",
+      "N": "Yoshitake Shiraishi",
+      "Ms": "Yoshitake Shiraishi",
+      "W": "Yoshitake Shiraishi"
+    },
+    "Fusataro Oosawa": {
+      "M": "Fusataro Oosawa",
+      "D": "Fusataro Oosawy",
+      "C": "Fusataro Oosawe",
+      "B": "Fusataro Oosawę",
+      "N": "Fusataro Oosawą",
+      "Ms": "Fusataro Oosawe",
+      "W": "Fusataro Oosawo"
+    },
+    "Nikaido": {
+      "M": "Nikaido",
+      "D": "Nikaido",
+      "C": "Nikaido",
+      "B": "Nikaido",
+      "N": "Nikaido",
+      "Ms": "Nikaido",
+      "W": "Nikaido"
+    },
+    "Kaeko": {
+      "M": "Kaeko",
+      "D": "Kaeko",
+      "C": "Kaeko",
+      "B": "Kaeko",
+      "N": "Kaeko",
+      "Ms": "Kaeko",
+      "W": "Kaeko"
+    },
+    "Okuda": {
+      "M": "Okuda",
+      "D": "Okudy",
+      "C": "Okudzie",
+      "B": "Okudę",
+      "N": "Okudą",
+      "Ms": "Okudzie",
+      "W": "Okudo"
+    },
+    "Saichi Sugimoto -> Asirpa": {
+      "M": "Saichi Sugimoto -> Asirpa",
+      "D": "Saichi Sugimoto -> Asirpy",
+      "C": "Saichi Sugimoto -> Asirpe",
+      "B": "Saichi Sugimoto -> Asirpę",
+      "N": "Saichi Sugimoto -> Asirpą",
+      "Ms": "Saichi Sugimoto -> Asirpe",
+      "W": "Saichi Sugimoto -> Asirpo"
+    },
+    "Asirpa -> Saichi Sugimoto": {
+      "M": "Asirpa -> Saichi Sugimoto",
+      "D": "Asirpy -> Saichi Sugimoto",
+      "C": "Asirpe -> Saichi Sugimoto",
+      "B": "Asirpę -> Saichi Sugimoto",
+      "N": "Asirpą -> Saichi Sugimoto",
+      "Ms": "Asirpe -> Saichi Sugimoto",
+      "W": "Asirpo -> Saichi Sugimoto"
+    },
+    "Usami -> Kadokura": {
+      "M": "Usami -> Kadokura",
+      "D": "Usami -> Kadokury",
+      "C": "Usami -> Kadokurze",
+      "B": "Usami -> Kadokurę",
+      "N": "Usami -> Kadokurą",
+      "Ms": "Usami -> Kadokurze",
+      "W": "Usami -> Kadokuro"
+    },
+    "Tsukishima -> Koito": {
+      "M": "Tsukishima -> Koito",
+      "D": "Tsukishimy -> Koito",
+      "C": "Tsukishimie -> Koito",
+      "B": "Tsukishimę -> Koito",
+      "N": "Tsukishimą -> Koito",
+      "Ms": "Tsukishimie -> Koito",
+      "W": "Tsukishimo -> Koito"
+    },
+    "Kikuta -> Koito": {
+      "M": "Kikuta -> Koito",
+      "D": "Kikuty -> Koito",
+      "C": "Kikucie -> Koito",
+      "B": "Kikutę -> Koito",
+      "N": "Kikutą -> Koito",
+      "Ms": "Kikucie -> Koito",
+      "W": "Kikuto -> Koito"
+    },
+    "Kirawus -> Saichi Sugimoto": {
+      "M": "Kirawus -> Saichi Sugimoto",
+      "D": "Kirawusa -> Saichi Sugimoto",
+      "C": "Kirawusowi -> Saichi Sugimoto",
+      "B": "Kirawusa -> Saichi Sugimoto",
+      "N": "Kirawusem -> Saichi Sugimoto",
+      "Ms": "Kirawusie -> Saichi Sugimoto",
+      "W": "Kirawusie -> Saichi Sugimoto"
+    },
+    "Tsurumi -> Usami": {
+      "M": "Tsurumi -> Usami",
+      "D": "Tsurumi -> Usami",
+      "C": "Tsurumi -> Usami",
+      "B": "Tsurumi -> Usami",
+      "N": "Tsurumi -> Usami",
+      "Ms": "Tsurumi -> Usami",
+      "W": "Tsurumi -> Usami"
+    },
+    "Sugimoto -> Asirpa": {
+      "M": "Sugimoto -> Asirpa",
+      "D": "Sugimoto -> Asirpy",
+      "C": "Sugimoto -> Asirpe",
+      "B": "Sugimoto -> Asirpę",
+      "N": "Sugimoto -> Asirpą",
+      "Ms": "Sugimoto -> Asirpe",
+      "W": "Sugimoto -> Asirpo"
+    },
+    "Shiraishi -> Botaro": {
+      "M": "Shiraishi -> Botaro",
+      "D": "Shiraishi -> Botaro",
+      "C": "Shiraishi -> Botaro",
+      "B": "Shiraishi -> Botaro",
+      "N": "Shiraishi -> Botaro",
+      "Ms": "Shiraishi -> Botaro",
+      "W": "Shiraishi -> Botaro"
+    },
+    "Tsurumi -> Podwładni": {
+      "M": "Tsurumi -> Podwładni",
+      "D": "Tsurumi -> Podwładni",
+      "C": "Tsurumi -> Podwładni",
+      "B": "Tsurumi -> Podwładni",
+      "N": "Tsurumi -> Podwładni",
+      "Ms": "Tsurumi -> Podwładni",
+      "W": "Tsurumi -> Podwładni"
+    },
+    "Tsurumi -> Asirpa": {
+      "M": "Tsurumi -> Asirpa",
+      "D": "Tsurumi -> Asirpy",
+      "C": "Tsurumi -> Asirpe",
+      "B": "Tsurumi -> Asirpę",
+      "N": "Tsurumi -> Asirpą",
+      "Ms": "Tsurumi -> Asirpe",
+      "W": "Tsurumi -> Asirpo"
+    },
+    "Tsurumi -> Sofia": {
+      "M": "Tsurumi -> Sofia",
+      "D": "Tsurumi -> Sofiy",
+      "C": "Tsurumi -> Sofie",
+      "B": "Tsurumi -> Sofię",
+      "N": "Tsurumi -> Sofią",
+      "Ms": "Tsurumi -> Sofie",
+      "W": "Tsurumi -> Sofio"
+    },
+    "Sugimoto -> Shiraishi": {
+      "M": "Sugimoto -> Shiraishi",
+      "D": "Sugimoto -> Shiraishi",
+      "C": "Sugimoto -> Shiraishi",
+      "B": "Sugimoto -> Shiraishi",
+      "N": "Sugimoto -> Shiraishi",
+      "Ms": "Sugimoto -> Shiraishi",
+      "W": "Sugimoto -> Shiraishi"
+    },
+    "Ariko -> Sugimoto": {
+      "M": "Ariko -> Sugimoto",
+      "D": "Ariko -> Sugimoto",
+      "C": "Ariko -> Sugimoto",
+      "B": "Ariko -> Sugimoto",
+      "N": "Ariko -> Sugimoto",
+      "Ms": "Ariko -> Sugimoto",
+      "W": "Ariko -> Sugimoto"
+    },
+    "Ariko -> Kikuta": {
+      "M": "Ariko -> Kikuta",
+      "D": "Ariko -> Kikuty",
+      "C": "Ariko -> Kikucie",
+      "B": "Ariko -> Kikutę",
+      "N": "Ariko -> Kikutą",
+      "Ms": "Ariko -> Kikucie",
+      "W": "Ariko -> Kikuto"
+    },
+    "Koito -> Tsurumi": {
+      "M": "Koito -> Tsurumi",
+      "D": "Koito -> Tsurumi",
+      "C": "Koito -> Tsurumi",
+      "B": "Koito -> Tsurumi",
+      "N": "Koito -> Tsurumi",
+      "Ms": "Koito -> Tsurumi",
+      "W": "Koito -> Tsurumi"
+    },
+    "Kikuta Mokutarou -> Saichi Sugimoto": {
+      "M": "Kikuta Mokutarou -> Saichi Sugimoto",
+      "D": "Kikuty Mokutarou -> Saichi Sugimoto",
+      "C": "Kikucie Mokutarou -> Saichi Sugimoto",
+      "B": "Kikutę Mokutarou -> Saichi Sugimoto",
+      "N": "Kikutą Mokutarou -> Saichi Sugimoto",
+      "Ms": "Kikucie Mokutarou -> Saichi Sugimoto",
+      "W": "Kikuto Mokutarou -> Saichi Sugimoto"
+    },
+    "Saichi Sugimoto -> Kikuta Mokutarou": {
+      "M": "Saichi Sugimoto -> Kikuta Mokutarou",
+      "D": "Saichi Sugimoto -> Kikuty Mokutarou",
+      "C": "Saichi Sugimoto -> Kikucie Mokutarou",
+      "B": "Saichi Sugimoto -> Kikutę Mokutarou",
+      "N": "Saichi Sugimoto -> Kikutą Mokutarou",
+      "Ms": "Saichi Sugimoto -> Kikucie Mokutarou",
+      "W": "Saichi Sugimoto -> Kikuto Mokutarou"
+    },
+    "Kaneko Kaeko -> Saichi Sugimoto": {
+      "M": "Kaneko Kaeko -> Saichi Sugimoto",
+      "D": "Kaneko Kaeko -> Saichi Sugimoto",
+      "C": "Kaneko Kaeko -> Saichi Sugimoto",
+      "B": "Kaneko Kaeko -> Saichi Sugimoto",
+      "N": "Kaneko Kaeko -> Saichi Sugimoto",
+      "Ms": "Kaneko Kaeko -> Saichi Sugimoto",
+      "W": "Kaneko Kaeko -> Saichi Sugimoto"
+    },
+    "Tokushirou Tsurumi -> Hidenobu Okuda": {
+      "M": "Tokushirou Tsurumi -> Hidenobu Okuda",
+      "D": "Tokushirou Tsurumi -> Hidenobu Okudy",
+      "C": "Tokushirou Tsurumi -> Hidenobu Okudzie",
+      "B": "Tokushirou Tsurumi -> Hidenobu Okudę",
+      "N": "Tokushirou Tsurumi -> Hidenobu Okudą",
+      "Ms": "Tokushirou Tsurumi -> Hidenobu Okudzie",
+      "W": "Tokushirou Tsurumi -> Hidenobu Okudo"
+    },
+    "Sugimoto -> Kikuta": {
+      "M": "Sugimoto -> Kikuta",
+      "D": "Sugimoto -> Kikuty",
+      "C": "Sugimoto -> Kikucie",
+      "B": "Sugimoto -> Kikutę",
+      "N": "Sugimoto -> Kikutą",
+      "Ms": "Sugimoto -> Kikucie",
+      "W": "Sugimoto -> Kikuto"
+    },
+    "Kikuta -> Sugimoto": {
+      "M": "Kikuta -> Sugimoto",
+      "D": "Kikuty -> Sugimoto",
+      "C": "Kikucie -> Sugimoto",
+      "B": "Kikutę -> Sugimoto",
+      "N": "Kikutą -> Sugimoto",
+      "Ms": "Kikucie -> Sugimoto",
+      "W": "Kikuto -> Sugimoto"
+    },
+    "Tsurumi -> Kikuta": {
+      "M": "Tsurumi -> Kikuta",
+      "D": "Tsurumi -> Kikuty",
+      "C": "Tsurumi -> Kikucie",
+      "B": "Tsurumi -> Kikutę",
+      "N": "Tsurumi -> Kikutą",
+      "Ms": "Tsurumi -> Kikucie",
+      "W": "Tsurumi -> Kikuto"
+    },
+    "Tokushirou Tsurumi -> Shinpachi Nagakura": {
+      "M": "Tokushirou Tsurumi -> Shinpachi Nagakura",
+      "D": "Tokushirou Tsurumi -> Shinpachi Nagakury",
+      "C": "Tokushirou Tsurumi -> Shinpachi Nagakurze",
+      "B": "Tokushirou Tsurumi -> Shinpachi Nagakurę",
+      "N": "Tokushirou Tsurumi -> Shinpachi Nagakurą",
+      "Ms": "Tokushirou Tsurumi -> Shinpachi Nagakurze",
+      "W": "Tokushirou Tsurumi -> Shinpachi Nagakuro"
+    },
+    "Tatsuma Ushiyama -> Asirpa": {
+      "M": "Tatsuma Ushiyama -> Asirpa",
+      "D": "Tatsumy Ushiyamy -> Asirpy",
+      "C": "Tatsumie Ushiyamie -> Asirpe",
+      "B": "Tatsumę Ushiyamę -> Asirpę",
+      "N": "Tatsumą Ushiyamą -> Asirpą",
+      "Ms": "Tatsumie Ushiyamie -> Asirpe",
+      "W": "Tatsumo Ushiyamo -> Asirpo"
+    },
+    "Tsurumi -> Tsukishima": {
+      "M": "Tsurumi -> Tsukishima",
+      "D": "Tsurumi -> Tsukishimy",
+      "C": "Tsurumi -> Tsukishimie",
+      "B": "Tsurumi -> Tsukishimę",
+      "N": "Tsurumi -> Tsukishimą",
+      "Ms": "Tsurumi -> Tsukishimie",
+      "W": "Tsurumi -> Tsukishimo"
+    },
+    "Hijikata -> Nagakura": {
+      "M": "Hijikata -> Nagakura",
+      "D": "Hijikaty -> Nagakury",
+      "C": "Hijikacie -> Nagakurze",
+      "B": "Hijikatę -> Nagakurę",
+      "N": "Hijikatą -> Nagakurą",
+      "Ms": "Hijikacie -> Nagakurze",
+      "W": "Hijikato -> Nagakuro"
+    },
+    "Otonoshin Koito -> Tokushirou Tsurumi": {
+      "M": "Otonoshin Koito -> Tokushirou Tsurumi",
+      "D": "Otonoshina Koito -> Tokushirou Tsurumi",
+      "C": "Otonoshinowi Koito -> Tokushirou Tsurumi",
+      "B": "Otonoshina Koito -> Tokushirou Tsurumi",
+      "N": "Otonoshinem Koito -> Tokushirou Tsurumi",
+      "Ms": "Otonoshinie Koito -> Tokushirou Tsurumi",
+      "W": "Otonoshinie Koito -> Tokushirou Tsurumi"
+    },
+    "Shinpachi Nagakura -> Toshizou Hijikata": {
+      "M": "Shinpachi Nagakura -> Toshizou Hijikata",
+      "D": "Shinpachi Nagakury -> Toshizou Hijikaty",
+      "C": "Shinpachi Nagakurze -> Toshizou Hijikacie",
+      "B": "Shinpachi Nagakurę -> Toshizou Hijikatę",
+      "N": "Shinpachi Nagakurą -> Toshizou Hijikatą",
+      "Ms": "Shinpachi Nagakurze -> Toshizou Hijikacie",
+      "W": "Shinpachi Nagakuro -> Toshizou Hijikato"
+    },
+    "Asirpa -> Tanigaki Genjiro": {
+      "M": "Asirpa -> Tanigaki Genjiro",
+      "D": "Asirpy -> Tanigaki Genjiro",
+      "C": "Asirpe -> Tanigaki Genjiro",
+      "B": "Asirpę -> Tanigaki Genjiro",
+      "N": "Asirpą -> Tanigaki Genjiro",
+      "Ms": "Asirpe -> Tanigaki Genjiro",
+      "W": "Asirpo -> Tanigaki Genjiro"
+    },
+    "Hijikata -> Sugimoto": {
+      "M": "Hijikata -> Sugimoto",
+      "D": "Hijikaty -> Sugimoto",
+      "C": "Hijikacie -> Sugimoto",
+      "B": "Hijikatę -> Sugimoto",
+      "N": "Hijikatą -> Sugimoto",
+      "Ms": "Hijikacie -> Sugimoto",
+      "W": "Hijikato -> Sugimoto"
+    },
+    "Usami -> Tsurumi": {
+      "M": "Usami -> Tsurumi",
+      "D": "Usami -> Tsurumi",
+      "C": "Usami -> Tsurumi",
+      "B": "Usami -> Tsurumi",
+      "N": "Usami -> Tsurumi",
+      "Ms": "Usami -> Tsurumi",
+      "W": "Usami -> Tsurumi"
+    },
+    "Tokishige Usami -> Tokushirou Tsurumi": {
+      "M": "Tokishige Usami -> Tokushirou Tsurumi",
+      "D": "Tokishige Usami -> Tokushirou Tsurumi",
+      "C": "Tokishige Usami -> Tokushirou Tsurumi",
+      "B": "Tokishige Usami -> Tokushirou Tsurumi",
+      "N": "Tokishige Usami -> Tokushirou Tsurumi",
+      "Ms": "Tokishige Usami -> Tokushirou Tsurumi",
+      "W": "Tokishige Usami -> Tokushirou Tsurumi"
+    },
+    "Hajime Tsukishima -> Otonoshin Koito": {
+      "M": "Hajime Tsukishima -> Otonoshin Koito",
+      "D": "Hajime Tsukishimy -> Otonoshina Koito",
+      "C": "Hajime Tsukishimie -> Otonoshinowi Koito",
+      "B": "Hajime Tsukishimę -> Otonoshina Koito",
+      "N": "Hajime Tsukishimą -> Otonoshinem Koito",
+      "Ms": "Hajime Tsukishimie -> Otonoshinie Koito",
+      "W": "Hajime Tsukishimo -> Otonoshinie Koito"
+    },
+    "Otonoshin Koito -> Hajime Tsukishima": {
+      "M": "Otonoshin Koito -> Hajime Tsukishima",
+      "D": "Otonoshina Koito -> Hajime Tsukishimy",
+      "C": "Otonoshinowi Koito -> Hajime Tsukishimie",
+      "B": "Otonoshina Koito -> Hajime Tsukishimę",
+      "N": "Otonoshinem Koito -> Hajime Tsukishimą",
+      "Ms": "Otonoshinie Koito -> Hajime Tsukishimie",
+      "W": "Otonoshinie Koito -> Hajime Tsukishimo"
+    },
+    "Yoshitake Shiraishi -> Fusataro Oosawa": {
+      "M": "Yoshitake Shiraishi -> Fusataro Oosawa",
+      "D": "Yoshitake Shiraishi -> Fusataro Oosawy",
+      "C": "Yoshitake Shiraishi -> Fusataro Oosawe",
+      "B": "Yoshitake Shiraishi -> Fusataro Oosawę",
+      "N": "Yoshitake Shiraishi -> Fusataro Oosawą",
+      "Ms": "Yoshitake Shiraishi -> Fusataro Oosawe",
+      "W": "Yoshitake Shiraishi -> Fusataro Oosawo"
+    },
+    "Tsukishima -> Tsurumi": {
+      "M": "Tsukishima -> Tsurumi",
+      "D": "Tsukishimy -> Tsurumi",
+      "C": "Tsukishimie -> Tsurumi",
+      "B": "Tsukishimę -> Tsurumi",
+      "N": "Tsukishimą -> Tsurumi",
+      "Ms": "Tsukishimie -> Tsurumi",
+      "W": "Tsukishimo -> Tsurumi"
+    },
+    "Koito -> Tsukishima": {
+      "M": "Koito -> Tsukishima",
+      "D": "Koito -> Tsukishimy",
+      "C": "Koito -> Tsukishimie",
+      "B": "Koito -> Tsukishimę",
+      "N": "Koito -> Tsukishimą",
+      "Ms": "Koito -> Tsukishimie",
+      "W": "Koito -> Tsukishimo"
+    },
+    "Nikaido -> Ariko": {
+      "M": "Nikaido -> Ariko",
+      "D": "Nikaido -> Ariko",
+      "C": "Nikaido -> Ariko",
+      "B": "Nikaido -> Ariko",
+      "N": "Nikaido -> Ariko",
+      "Ms": "Nikaido -> Ariko",
+      "W": "Nikaido -> Ariko"
+    },
+    "Kaeko -> Sugimoto": {
+      "M": "Kaeko -> Sugimoto",
+      "D": "Kaeko -> Sugimoto",
+      "C": "Kaeko -> Sugimoto",
+      "B": "Kaeko -> Sugimoto",
+      "N": "Kaeko -> Sugimoto",
+      "Ms": "Kaeko -> Sugimoto",
+      "W": "Kaeko -> Sugimoto"
+    },
+    "Tsurumi -> Okuda": {
+      "M": "Tsurumi -> Okuda",
+      "D": "Tsurumi -> Okudy",
+      "C": "Tsurumi -> Okudzie",
+      "B": "Tsurumi -> Okudę",
+      "N": "Tsurumi -> Okudą",
+      "Ms": "Tsurumi -> Okudzie",
+      "W": "Tsurumi -> Okudo"
+    },
+    "Shiraishi -> Hijikata": {
+      "M": "Shiraishi -> Hijikata",
+      "D": "Shiraishi -> Hijikaty",
+      "C": "Shiraishi -> Hijikacie",
+      "B": "Shiraishi -> Hijikatę",
+      "N": "Shiraishi -> Hijikatą",
+      "Ms": "Shiraishi -> Hijikacie",
+      "W": "Shiraishi -> Hijikato"
+    },
+    "Asirpa -> Hijikata": {
+      "M": "Asirpa -> Hijikata",
+      "D": "Asirpy -> Hijikaty",
+      "C": "Asirpe -> Hijikacie",
+      "B": "Asirpę -> Hijikatę",
+      "N": "Asirpą -> Hijikatą",
+      "Ms": "Asirpe -> Hijikacie",
+      "W": "Asirpo -> Hijikato"
+    },
+    "Tsurumi -> Nagakura": {
+      "M": "Tsurumi -> Nagakura",
+      "D": "Tsurumi -> Nagakury",
+      "C": "Tsurumi -> Nagakurze",
+      "B": "Tsurumi -> Nagakurę",
+      "N": "Tsurumi -> Nagakurą",
+      "Ms": "Tsurumi -> Nagakurze",
+      "W": "Tsurumi -> Nagakuro"
+    }
+  },
+  "plot_anchors": {}
 }

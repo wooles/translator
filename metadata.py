@@ -10,6 +10,8 @@ import urllib.parse
 from pathlib import Path
 from typing import Optional, Dict, Any, List
 
+_ANILIST_DISABLED: bool = False
+
 def clean_anime_filename(filename_or_path: str) -> str:
     """
     Cleans filename of fansub group tags, quality tags, hashes, and episode numbers
@@ -26,7 +28,10 @@ def clean_anime_filename(filename_or_path: str) -> str:
     name = re.sub(r"\[[0-9a-fA-F]{8}\]", "", name)
     name = re.sub(r"\[(?:1080p|720p|480p|2160p|4K|HEVC|x264|x265|AAC|FLAC)[^\]]*\]", "", name, flags=re.IGNORECASE)
 
-    # 3. Remove episode number (e.g. - 07, _07, EP07, S01E07, Episode 7)
+    # 3. Handle scene/torrent release naming with dots/underscores BEFORE episode strip:
+    # e.g. KAMUI.Hes.Behind.You.S01E07.REPACK.1080p.UNCENSORED...
+    name = re.sub(r"[._](?:S\d+)?(?:E|EP)\d+.*$", "", name, flags=re.IGNORECASE)
+    name = re.sub(r"[._](?:1080p|720p|480p|2160p|4K|HEVC|x264|x265|AMZN|WEB-DL|UNCENSORED|REPACK|PROPER|CR|MultiSub|dual.audio).*$", "", name, flags=re.IGNORECASE)
     name = re.sub(r"\s*-\s*(?:Episode\s*)?(?:S\d+)?(?:E|EP)?\d+(?:v\d+)?.*$", "", name, flags=re.IGNORECASE)
     name = re.sub(r"\s+(?:S\d+)?(?:E|EP)\d+.*$", "", name, flags=re.IGNORECASE)
     name = re.sub(r"\s*-\s*\d+.*$", "", name)
@@ -34,14 +39,22 @@ def clean_anime_filename(filename_or_path: str) -> str:
     # 4. Replace underscores and dots with spaces
     name = name.replace("_", " ").replace(".", " ")
 
-    # 5. Clean duplicate whitespace
+    # 5. Clean scene tags if dots were already converted or remaining
+    name = re.sub(r"\b(?:S\d+)?(?:E|EP)\d+\b.*$", "", name, flags=re.IGNORECASE)
+    name = re.sub(r"\b(?:1080p|720p|480p|2160p|4K|HEVC|x264|x265|AMZN|WEB-DL|UNCENSORED|REPACK|PROPER|MSubs|ToonsHub)\b.*$", "", name, flags=re.IGNORECASE)
+
+    # 6. Clean duplicate whitespace
     name = re.sub(r"\s+", " ", name).strip()
     return name
 
 def fetch_anilist_metadata(title: str) -> Optional[Dict[str, Any]]:
     """
     Queries the AniList GraphQL API to fetch plot synopsis, tags, and character cast.
+    Includes circuit-breaker logic when AniList API is disabled or unreachable.
     """
+    global _ANILIST_DISABLED
+    if _ANILIST_DISABLED:
+        return None
     query = """
     query ($search: String) {
       Media (search: $search) {
@@ -193,12 +206,16 @@ def fetch_anilist_metadata(title: str) -> Optional[Dict[str, Any]]:
                 "characters": characters
             }
     except Exception as e:
+        err_str = str(e).lower()
+        if "403" in err_str or "disabled" in err_str or "stability" in err_str or "forbidden" in err_str:
+            _ANILIST_DISABLED = True
         return None
 
 def fetch_gemini_metadata(title: str, client: Any = None) -> Optional[Dict[str, Any]]:
     """
     Parametric fallback when external GraphQL/REST APIs (AniList) are unreachable or blocked (HTTP 403).
     Queries Gemini to retrieve authoritative character cast, genders, and setting with 100% reliability.
+    Always uses the HIGHEST available Flash model from model_resolver.
     """
     if not title or len(title) < 2:
         return None
@@ -233,8 +250,16 @@ Podaj w formacie JSON oficjalne metadane dla serii anime/mangi: "{title}":
 }}
 W sekcji 'characters' wymień WSZYSTKICH znanych bohaterów z kanonu tej serii, dbając o bezwzględną dokładność biologiczną płci (MALE vs FEMALE) na podstawie obsady seiyū i fabuły."""
 
+        model_to_use = "gemini-3.8-flash"
+        try:
+            from model_resolver import resolve_best_models
+            best = resolve_best_models(client=active_client)
+            model_to_use = best.get("flash") or model_to_use
+        except Exception:
+            pass
+
         resp = active_client.models.generate_content(
-            model="gemini-3.5-flash-lite",
+            model=model_to_use,
             contents=prompt,
             config=types.GenerateContentConfig(
                 response_mime_type="application/json",
@@ -251,11 +276,45 @@ W sekcji 'characters' wymień WSZYSTKICH znanych bohaterów z kanonu tej serii, 
 def get_anime_context(filename_or_path: str, client: Any = None) -> Optional[Dict[str, Any]]:
     """
     Fetches and formats anime metadata based on video/subtitle path or filename.
-    First tries AniList GraphQL API, then automatically falls back to Gemini parametric knowledge.
+    Prioritizes local Series Bible (Offline-First / Zero Cost), then AniList GraphQL API,
+    and finally Gemini parametric knowledge fallback using the highest Flash model.
     """
     clean_title = clean_anime_filename(filename_or_path)
     if not clean_title or len(clean_title) < 2:
         return None
+
+    # 1. Offline-First / Bible-First check (0.00 PLN & 0 ms)
+    try:
+        from series_memory import SeriesBible
+        bible = SeriesBible(anime_title=clean_title)
+        bible_chars = bible.data.get("characters", {})
+        if bible_chars and len(bible_chars) >= 2:
+            characters_list = []
+            for c_name, c_val in bible_chars.items():
+                if "->" in c_name:
+                    continue
+                c_desc = c_val.get("description", "") if isinstance(c_val, dict) else str(c_val)
+                gender_str = "kobieta" if any(w in c_desc.lower() for w in ["kobieta", "female", "dziewczyna"]) else "mężczyzna"
+                characters_list.append({
+                    "name": c_name,
+                    "gender": gender_str,
+                    "gender_raw": "FEMALE" if gender_str == "kobieta" else "MALE",
+                    "role": "Główny bohater" if any(w in c_desc.lower() for w in ["główny", "protagoni"]) else "Postać"
+                })
+            if characters_list:
+                return {
+                    "title_romaji": bible.anime_title,
+                    "title_english": bible.anime_title,
+                    "genres": [],
+                    "tags": [],
+                    "setting_tags": [],
+                    "detected_domains": [],
+                    "description": f"Kontekst serii wczytany z lokalnej bazy wiedzy (SeriesBible): {bible.anime_title}",
+                    "characters": characters_list,
+                    "source": "local_series_bible"
+                }
+    except Exception:
+        pass
 
     meta = fetch_anilist_metadata(clean_title)
     if not meta or not meta.get("characters"):

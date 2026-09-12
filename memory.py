@@ -146,7 +146,8 @@ class TranslationMemory:
             if not pl_events:
                 continue
 
-            anime_name = en_path.stem.split(" - ")[0].replace("[ASW]", "").replace("[Erai-raws]", "").strip()
+            from metadata import clean_anime_filename
+            anime_name = clean_anime_filename(en_path)
 
             for ev_en in subs_en.events:
                 if ev_en.is_comment:

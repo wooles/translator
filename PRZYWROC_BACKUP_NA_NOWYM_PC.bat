@@ -58,5 +58,10 @@ echo ================================================================
 echo   PRZYWRACANIE ZAKONCZONE PELNYM SUKCESEM!
 echo   Wszystkie projekty (Translator, Sorter, Kalendarz),
 echo   pamiec AI (.gemini) i baza napisow sa w 100%% gotowe do pracy.
+echo.
+echo   [!] PAMIETAJ O KLUCZACH API (MultiKey Pool - 3 klucze):
+echo   Upewnij sie, ze w folderze translator\.env znajduje sie wpis:
+echo   GEMINI_API_KEY=klucz1,klucz2,klucz3
+echo   (Klucze mozesz rowniez wkleic w oknie Ustawien w gui_app.py).
 echo ================================================================
 pause

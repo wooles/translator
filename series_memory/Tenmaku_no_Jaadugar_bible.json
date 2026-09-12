@@ -1,6 +1,81 @@
 {
   "anime_title": "Tenmaku no Jaadugar",
   "characters": {
+    "Fatima / Sitara": {
+      "description": "KOBIETA (wyodrębniono z relacji serii)"
+    },
+    "Töregene": {
+      "description": "KOBIETA (wyodrębniono z relacji serii)"
+    },
+    "Ögedei": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Chagatai / Tolui": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Chagatai / Tolui / Chinqai / Temüge": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Boraqchin": {
+      "description": "KOBIETA (wyodrębniono z relacji serii)"
+    },
+    "Möge": {
+      "description": "KOBIETA (Wielka Chatun, żona Czyngis-chana i Ugedeja, z kategorycznym nakazem form żeńskich)"
+    },
+    "Gujuk": {
+      "description": "MĘŻCZYZNA (książę, syn Ugedeja, przyszły Wielki Chan)"
+    },
+    "Güyük": {
+      "description": "MĘŻCZYZNA (książę Gujuk, syn Ugedeja, przyszły Wielki Chan)"
+    },
+    "Temüge": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Otai": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Qadaq": {
+      "description": "MĘŻCZYZNA (zarządca dworu, mentor i sługa księcia Gujuka)"
+    },
+    "Sitara": {
+      "description": "KOBIETA (wyodrębniono z relacji serii)"
+    },
+    "Dayir": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Khulan": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Chagatai": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Tolui": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Hulegu": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Sorghaghtani": {
+      "description": "KOBIETA (wyodrębniono z relacji serii)"
+    },
+    "Subutai": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Dayir Usun": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Chinqai": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Fatima": {
+      "description": "KOBIETA (wyodrębniono z relacji serii)"
+    },
+    "Shira": {
+      "description": "MĘŻCZYZNA (młodzieniec z Samarkandy, tłumacz i strateg, seiyū: Miyu Irino). KATEGORYCZNY NAKAZ form męskich w czasie przeszłym: 'Shira mówił / ostrzegał / wiedział / pomógł / zrobił'. ZAKAZ form żeńskich ('ostrzegała')!"
+    },
+    "Güyük": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
     "Fatima / Sitara -> Töregene": {
       "description": "Zwrot: 'Pani Toregene / Wasza Dostojność' (służąca / zaufana doradczyni -> małżonka chana (chatun))"
     },
@@ -85,9 +160,6 @@
     "Sitara -> Shira": {
       "description": "Zwrot: 'Shira / na ty' (Shira to MĘŻCZYZNA / młodzieniec z Samarkandy, tłumacz w obozie Mongołów; bezwzględnie formy męskie: 'Shira mówił / ostrzegał / pomógł')"
     },
-    "Shira": {
-      "description": "MĘŻCZYZNA (młodzieniec z Samarkandy, tłumacz i strateg, seiyū: Miyu Irino). KATEGORYCZNY NAKAZ form męskich w czasie przeszłym: 'Shira mówił / ostrzegał / wiedział / pomógł / zrobił'. ZAKAZ form żeńskich ('ostrzegała')!"
-    },
     "Qadaq -> Güyük": {
       "description": "Zwrot: 'książę Gujuk / panie' (wierny zarządca/sługa -> młody książę)"
     },
@@ -106,7 +178,7 @@
     "Jin dynasty": "dynastia Jin",
     "Southern Song": "Południowa dynastia Song",
     "Kaifeng": "Kaifeng",
-    "Circle hunt": "nagonka",
+    "Circle hunt": "polowanie z nagonką",
     "Chief Scribe": "Główny skryba",
     "Qi": "energia qi",
     "Mergen": "Mergen",
@@ -114,10 +186,7 @@
     "jada stone": "kamień jada",
     "Great Kha'an": "Wielki Chagan",
     "Great Khatun": "Wielka Chatun",
-    "al-iksir": "al-iksir",
     "danyao": "danyao",
-    "waidan": "Waidan",
-    "rahj al-gar": "rahdż al-gar",
     "sandarac": "sandarak",
     "jada stone / bezoar stone": "Kamień jada",
     "urum": "Urum",
@@ -158,9 +227,9 @@
     "Dayir Usun": "Dayir Usun",
     "Merkit": "Plemię Merkitów",
     "Jurchen / Jin Dynasty": "Dżurdżeni",
-    "Al-iksir": "Eliksir",
+    "Al-iksir": "al-iksir (eliksir)",
     "Danyao": "Danyao",
-    "Rahj al-gar": "Rahj al-gar",
+    "Rahj al-gar": "rahdż al-gar",
     "Sandarac": "Sandarak",
     "Urum": "Urum",
     "Toregene": "Toregene",
@@ -190,16 +259,47 @@
     "Yam": "Örtöö",
     "Deel": "Deel",
     "Khagan": "Chagan",
-    "circle hunt": "polowanie z nagonką",
     "Quanzhen Daoists": "taoistyczna sekta Quanzhen",
     "bezoar stone": "kamień bezoarowy",
     "Jarghuchi": "dżarguczi",
     "Elements": "Elementy",
     "House of Tolui": "Ród Tołuja",
     "House of Ögedei": "Ród Ugedeja",
-    "Waidan": "Zewnętrzna alchemia"
+    "Waidan": "zewnętrzna alchemia (Waidan)"
   },
-  "relationships": {},
+  "relationships": {
+    "Fatima / Sitara -> Töregene": "Zwrot: 'Pani Toregene / Wasza Dostojność' (służąca / zaufana doradczyni -> małżonka chana (chatun))",
+    "Töregene -> Fatima / Sitara": "Zwrot: 'Fatimo / na ty' (pani -> zaufana służąca)",
+    "Ögedei -> Chagatai / Tolui": "Zwrot: 'po imieniu: Czagataju / Tołuju' (Wielki Chan -> młodsi/starsi bracia)",
+    "Chagatai / Tolui / Chinqai / Temüge -> Ögedei": "Zwrot: 'Wielki Chanie / Wasza Dostojność' (wasale i bracia / urzędnicy -> władca Imperium)",
+    "Boraqchin -> Möge": "Zwrot: 'Möge' (pierwsza żona -> czwarta żona)",
+    "Möge -> Boraqchin": "Zwrot: 'Boraqchin' (współżona / bliska przyjaciółka)",
+    "Temüge -> Otai": "Zwrot: 'synu / na ty (błędnie przekręcając imię)' (ojciec (brat Czyngis-chana) -> syn)",
+    "Qadaq -> Fatima / Sitara": "Zwrot: 'na ty / Fatimo' (wojownik / strażnik -> służąca)",
+    "Töregene -> Sitara": "Zwrot: 'Fatima / na ty' (pani -> zaufana służąca)",
+    "Sitara -> Töregene": "Zwrot: 'pani Töregene / Wasza Wysokość' (służąca/doradczyni -> chana żona / arystokratka)",
+    "Dayir -> Töregene": "Zwrot: 'po imieniu: Töregene' (mąż -> żona)",
+    "Khulan -> Dayir": "Zwrot: 'ojcze' (córka -> ojciec)",
+    "Ögedei -> Töregene": "Zwrot: 'po imieniu: Töregene' (mąż / książę -> żona)",
+    "Chagatai -> Ögedei": "Zwrot: 'Wielki Chan Ögedei' (brat/poddany -> Wielki Chan)",
+    "Tolui -> Ögedei": "Zwrot: 'bracie' (młodszy brat -> starszy brat / Wielki Chagan)",
+    "Sitara -> Boraqchin": "Zwrot: 'Wielka Chatun / Wasza Wysokość' (niewolnica/służąca -> pierwsza małżonka Chagana)",
+    "Hulegu -> Sorghaghtani": "Zwrot: 'Matko' (syn -> matka)",
+    "Tolui -> Subutai": "Zwrot: 'po imieniu / Subutai' (wodzowie / książę -> generał)",
+    "Boraqchin -> Sitara": "Zwrot: 'Fatimo / na ty' (cesarzowa -> poddana/służąca)",
+    "Möge -> Sitara": "Zwrot: 'dziewczyno / Fatimo' (księżna -> poddana)",
+    "Dayir Usun -> Töregene": "Zwrot: 'po imieniu: Töregene' (mąż / wódz -> żona)",
+    "Khulan -> Töregene": "Zwrot: 'matko / Töregene' (pasierbica -> macocha / przyjaciółki)",
+    "Töregene -> Dayir": "Zwrot: 'wodzu Dayirze / mężu' (żona -> wódz i mąż)",
+    "Chinqai -> Ögedei": "Zwrot: 'Wielki Chaganie' (wielki pisarz/kanclerz -> władca)",
+    "Fatima -> Boraqchin": "Zwrot: 'Wielka Chatuń / Wasza Wysokość' (poddana / doradczyni -> władczyni)",
+    "Fatima -> Töregene": "Zwrot: 'pani Töregene' (służąca/sojuszniczka -> pani)",
+    "Ögedei -> Tolui": "Zwrot: 'Tołuju / bracie' (starszy brat -> młodszy brat)",
+    "Sitara -> Shira": "Zwrot: 'Shira / na ty' (Shira to MĘŻCZYZNA / młodzieniec z Samarkandy, tłumacz w obozie Mongołów; bezwzględnie formy męskie: 'Shira mówił / ostrzegał / pomógł')",
+    "Qadaq -> Güyük": "Zwrot: 'książę Gujuk / panie' (wierny zarządca/sługa -> młody książę)",
+    "Sitara -> Sorghaghtani": "Zwrot: 'Księżniczko Sorkaktani / pani' (posłanniczka / dawna podwładna -> arystokratka)",
+    "Boraqchin -> Ögedei": "Zwrot: 'Wielki Chaganie / mój panie' (żona/cesarzowa -> mąż/władca)"
+  },
   "episodes_translated": [
     "tmp8mehu8dp",
     "[ASW] Tenmaku no Jaadugar - 06 [1080p HEVC][3304C541]",
@@ -209,5 +309,512 @@
     "Kanon Mangi",
     "[ASW] Tenmaku no Jaadugar - 10 [1080p HEVC][8479EA10]",
     "[ASW] Tenmaku no Jaadugar - 11 [1080p HEVC][2E312ADA]"
-  ]
+  ],
+  "declensions": {
+    "Fatima / Sitara": {
+      "M": "Fatima / Sitara",
+      "D": "Fatimy / Sitary",
+      "C": "Fatimie / Sitarze",
+      "B": "Fatimę / Sitarę",
+      "N": "Fatimą / Sitarą",
+      "Ms": "Fatimie / Sitarze",
+      "W": "Fatimo / Sitaro"
+    },
+    "Töregene": {
+      "M": "Töregene",
+      "D": "Töregene",
+      "C": "Töregene",
+      "B": "Töregene",
+      "N": "Töregene",
+      "Ms": "Töregene",
+      "W": "Töregene"
+    },
+    "Ögedei": {
+      "M": "Ögedei",
+      "D": "Ögedei",
+      "C": "Ögedei",
+      "B": "Ögedei",
+      "N": "Ögedei",
+      "Ms": "Ögedei",
+      "W": "Ögedei"
+    },
+    "Chagatai / Tolui": {
+      "M": "Chagatai / Tolui",
+      "D": "Chagatai / Tolui",
+      "C": "Chagatai / Tolui",
+      "B": "Chagatai / Tolui",
+      "N": "Chagatai / Tolui",
+      "Ms": "Chagatai / Tolui",
+      "W": "Chagatai / Tolui"
+    },
+    "Chagatai / Tolui / Chinqai / Temüge": {
+      "M": "Chagatai / Tolui / Chinqai / Temüge",
+      "D": "Chagatai / Tolui / Chinqai / Temüge",
+      "C": "Chagatai / Tolui / Chinqai / Temüge",
+      "B": "Chagatai / Tolui / Chinqai / Temüge",
+      "N": "Chagatai / Tolui / Chinqai / Temüge",
+      "Ms": "Chagatai / Tolui / Chinqai / Temüge",
+      "W": "Chagatai / Tolui / Chinqai / Temüge"
+    },
+    "Boraqchin": {
+      "M": "Boraqchin",
+      "D": "Boraqchin",
+      "C": "Boraqchin",
+      "B": "Boraqchin",
+      "N": "Boraqchin",
+      "Ms": "Boraqchin",
+      "W": "Boraqchin"
+    },
+    "Möge": {
+      "M": "Möge",
+      "D": "Möge",
+      "C": "Möge",
+      "B": "Möge",
+      "N": "Möge",
+      "Ms": "Möge",
+      "W": "Möge"
+    },
+    "Gujuk": {
+      "M": "Gujuk",
+      "D": "Gujuka",
+      "C": "Gujukowi",
+      "B": "Gujuka",
+      "N": "Gujukiem",
+      "Ms": "Gujuku",
+      "W": "Gujuku"
+    },
+    "Güyük": {
+      "M": "Güyük",
+      "D": "Güyüka",
+      "C": "Güyükowi",
+      "B": "Güyüka",
+      "N": "Güyükiem",
+      "Ms": "Güyüku",
+      "W": "Güyüku"
+    },
+    "Temüge": {
+      "M": "Temüge",
+      "D": "Temüge",
+      "C": "Temüge",
+      "B": "Temüge",
+      "N": "Temüge",
+      "Ms": "Temüge",
+      "W": "Temüge"
+    },
+    "Otai": {
+      "M": "Otai",
+      "D": "Otai",
+      "C": "Otai",
+      "B": "Otai",
+      "N": "Otai",
+      "Ms": "Otai",
+      "W": "Otai"
+    },
+    "Qadaq": {
+      "M": "Qadaq",
+      "D": "Qadaq",
+      "C": "Qadaq",
+      "B": "Qadaq",
+      "N": "Qadaq",
+      "Ms": "Qadaq",
+      "W": "Qadaq"
+    },
+    "Sitara": {
+      "M": "Sitara",
+      "D": "Sitary",
+      "C": "Sitarze",
+      "B": "Sitarę",
+      "N": "Sitarą",
+      "Ms": "Sitarze",
+      "W": "Sitaro"
+    },
+    "Dayir": {
+      "M": "Dayir",
+      "D": "Dayira",
+      "C": "Dayirowi",
+      "B": "Dayira",
+      "N": "Dayirem",
+      "Ms": "Dayirze",
+      "W": "Dayirze"
+    },
+    "Khulan": {
+      "M": "Khulan",
+      "D": "Khulana",
+      "C": "Khulanowi",
+      "B": "Khulana",
+      "N": "Khulanem",
+      "Ms": "Khulanie",
+      "W": "Khulanie"
+    },
+    "Chagatai": {
+      "M": "Chagatai",
+      "D": "Chagatai",
+      "C": "Chagatai",
+      "B": "Chagatai",
+      "N": "Chagatai",
+      "Ms": "Chagatai",
+      "W": "Chagatai"
+    },
+    "Tolui": {
+      "M": "Tolui",
+      "D": "Tolui",
+      "C": "Tolui",
+      "B": "Tolui",
+      "N": "Tolui",
+      "Ms": "Tolui",
+      "W": "Tolui"
+    },
+    "Hulegu": {
+      "M": "Hulegu",
+      "D": "Hulegu",
+      "C": "Hulegu",
+      "B": "Hulegu",
+      "N": "Hulegu",
+      "Ms": "Hulegu",
+      "W": "Hulegu"
+    },
+    "Sorghaghtani": {
+      "M": "Sorghaghtani",
+      "D": "Sorghaghtani",
+      "C": "Sorghaghtani",
+      "B": "Sorghaghtani",
+      "N": "Sorghaghtani",
+      "Ms": "Sorghaghtani",
+      "W": "Sorghaghtani"
+    },
+    "Subutai": {
+      "M": "Subutai",
+      "D": "Subutai",
+      "C": "Subutai",
+      "B": "Subutai",
+      "N": "Subutai",
+      "Ms": "Subutai",
+      "W": "Subutai"
+    },
+    "Dayir Usun": {
+      "M": "Dayir Usun",
+      "D": "Dayira Usuna",
+      "C": "Dayirowi Usunowi",
+      "B": "Dayira Usuna",
+      "N": "Dayirem Usunem",
+      "Ms": "Dayirze Usunie",
+      "W": "Dayirze Usunie"
+    },
+    "Chinqai": {
+      "M": "Chinqai",
+      "D": "Chinqai",
+      "C": "Chinqai",
+      "B": "Chinqai",
+      "N": "Chinqai",
+      "Ms": "Chinqai",
+      "W": "Chinqai"
+    },
+    "Fatima": {
+      "M": "Fatima",
+      "D": "Fatimy",
+      "C": "Fatimie",
+      "B": "Fatimę",
+      "N": "Fatimą",
+      "Ms": "Fatimie",
+      "W": "Fatimo"
+    },
+    "Shira": {
+      "M": "Shira",
+      "D": "Shiry",
+      "C": "Shirze",
+      "B": "Shirę",
+      "N": "Shirą",
+      "Ms": "Shirze",
+      "W": "Shiro"
+    },
+    "Güyük": {
+      "M": "Güyük",
+      "D": "Güyüka",
+      "C": "Güyükowi",
+      "B": "Güyüka",
+      "N": "Güyükem",
+      "Ms": "Güyüku",
+      "W": "Güyüku"
+    },
+    "Fatima / Sitara -> Töregene": {
+      "M": "Fatima / Sitara -> Töregene",
+      "D": "Fatimy / Sitary -> Töregene",
+      "C": "Fatimie / Sitarze -> Töregene",
+      "B": "Fatimę / Sitarę -> Töregene",
+      "N": "Fatimą / Sitarą -> Töregene",
+      "Ms": "Fatimie / Sitarze -> Töregene",
+      "W": "Fatimo / Sitaro -> Töregene"
+    },
+    "Töregene -> Fatima / Sitara": {
+      "M": "Töregene -> Fatima / Sitara",
+      "D": "Töregene -> Fatimy / Sitary",
+      "C": "Töregene -> Fatimie / Sitarze",
+      "B": "Töregene -> Fatimę / Sitarę",
+      "N": "Töregene -> Fatimą / Sitarą",
+      "Ms": "Töregene -> Fatimie / Sitarze",
+      "W": "Töregene -> Fatimo / Sitaro"
+    },
+    "Ögedei -> Chagatai / Tolui": {
+      "M": "Ögedei -> Chagatai / Tolui",
+      "D": "Ögedei -> Chagatai / Tolui",
+      "C": "Ögedei -> Chagatai / Tolui",
+      "B": "Ögedei -> Chagatai / Tolui",
+      "N": "Ögedei -> Chagatai / Tolui",
+      "Ms": "Ögedei -> Chagatai / Tolui",
+      "W": "Ögedei -> Chagatai / Tolui"
+    },
+    "Chagatai / Tolui / Chinqai / Temüge -> Ögedei": {
+      "M": "Chagatai / Tolui / Chinqai / Temüge -> Ögedei",
+      "D": "Chagatai / Tolui / Chinqai / Temüge -> Ögedei",
+      "C": "Chagatai / Tolui / Chinqai / Temüge -> Ögedei",
+      "B": "Chagatai / Tolui / Chinqai / Temüge -> Ögedei",
+      "N": "Chagatai / Tolui / Chinqai / Temüge -> Ögedei",
+      "Ms": "Chagatai / Tolui / Chinqai / Temüge -> Ögedei",
+      "W": "Chagatai / Tolui / Chinqai / Temüge -> Ögedei"
+    },
+    "Boraqchin -> Möge": {
+      "M": "Boraqchin -> Möge",
+      "D": "Boraqchin -> Möge",
+      "C": "Boraqchin -> Möge",
+      "B": "Boraqchin -> Möge",
+      "N": "Boraqchin -> Möge",
+      "Ms": "Boraqchin -> Möge",
+      "W": "Boraqchin -> Möge"
+    },
+    "Möge -> Boraqchin": {
+      "M": "Möge -> Boraqchin",
+      "D": "Möge -> Boraqchin",
+      "C": "Möge -> Boraqchin",
+      "B": "Möge -> Boraqchin",
+      "N": "Möge -> Boraqchin",
+      "Ms": "Möge -> Boraqchin",
+      "W": "Möge -> Boraqchin"
+    },
+    "Temüge -> Otai": {
+      "M": "Temüge -> Otai",
+      "D": "Temüge -> Otai",
+      "C": "Temüge -> Otai",
+      "B": "Temüge -> Otai",
+      "N": "Temüge -> Otai",
+      "Ms": "Temüge -> Otai",
+      "W": "Temüge -> Otai"
+    },
+    "Qadaq -> Fatima / Sitara": {
+      "M": "Qadaq -> Fatima / Sitara",
+      "D": "Qadaq -> Fatimy / Sitary",
+      "C": "Qadaq -> Fatimie / Sitarze",
+      "B": "Qadaq -> Fatimę / Sitarę",
+      "N": "Qadaq -> Fatimą / Sitarą",
+      "Ms": "Qadaq -> Fatimie / Sitarze",
+      "W": "Qadaq -> Fatimo / Sitaro"
+    },
+    "Töregene -> Sitara": {
+      "M": "Töregene -> Sitara",
+      "D": "Töregene -> Sitary",
+      "C": "Töregene -> Sitarze",
+      "B": "Töregene -> Sitarę",
+      "N": "Töregene -> Sitarą",
+      "Ms": "Töregene -> Sitarze",
+      "W": "Töregene -> Sitaro"
+    },
+    "Sitara -> Töregene": {
+      "M": "Sitara -> Töregene",
+      "D": "Sitary -> Töregene",
+      "C": "Sitarze -> Töregene",
+      "B": "Sitarę -> Töregene",
+      "N": "Sitarą -> Töregene",
+      "Ms": "Sitarze -> Töregene",
+      "W": "Sitaro -> Töregene"
+    },
+    "Dayir -> Töregene": {
+      "M": "Dayir -> Töregene",
+      "D": "Dayir -> Töregene",
+      "C": "Dayir -> Töregene",
+      "B": "Dayir -> Töregene",
+      "N": "Dayir -> Töregene",
+      "Ms": "Dayir -> Töregene",
+      "W": "Dayir -> Töregene"
+    },
+    "Khulan -> Dayir": {
+      "M": "Khulan -> Dayir",
+      "D": "Khulana -> Dayira",
+      "C": "Khulanowi -> Dayirowi",
+      "B": "Khulana -> Dayira",
+      "N": "Khulanem -> Dayirem",
+      "Ms": "Khulanie -> Dayirze",
+      "W": "Khulanie -> Dayirze"
+    },
+    "Ögedei -> Töregene": {
+      "M": "Ögedei -> Töregene",
+      "D": "Ögedei -> Töregene",
+      "C": "Ögedei -> Töregene",
+      "B": "Ögedei -> Töregene",
+      "N": "Ögedei -> Töregene",
+      "Ms": "Ögedei -> Töregene",
+      "W": "Ögedei -> Töregene"
+    },
+    "Chagatai -> Ögedei": {
+      "M": "Chagatai -> Ögedei",
+      "D": "Chagatai -> Ögedei",
+      "C": "Chagatai -> Ögedei",
+      "B": "Chagatai -> Ögedei",
+      "N": "Chagatai -> Ögedei",
+      "Ms": "Chagatai -> Ögedei",
+      "W": "Chagatai -> Ögedei"
+    },
+    "Tolui -> Ögedei": {
+      "M": "Tolui -> Ögedei",
+      "D": "Tolui -> Ögedei",
+      "C": "Tolui -> Ögedei",
+      "B": "Tolui -> Ögedei",
+      "N": "Tolui -> Ögedei",
+      "Ms": "Tolui -> Ögedei",
+      "W": "Tolui -> Ögedei"
+    },
+    "Sitara -> Boraqchin": {
+      "M": "Sitara -> Boraqchin",
+      "D": "Sitary -> Boraqchin",
+      "C": "Sitarze -> Boraqchin",
+      "B": "Sitarę -> Boraqchin",
+      "N": "Sitarą -> Boraqchin",
+      "Ms": "Sitarze -> Boraqchin",
+      "W": "Sitaro -> Boraqchin"
+    },
+    "Hulegu -> Sorghaghtani": {
+      "M": "Hulegu -> Sorghaghtani",
+      "D": "Hulegu -> Sorghaghtani",
+      "C": "Hulegu -> Sorghaghtani",
+      "B": "Hulegu -> Sorghaghtani",
+      "N": "Hulegu -> Sorghaghtani",
+      "Ms": "Hulegu -> Sorghaghtani",
+      "W": "Hulegu -> Sorghaghtani"
+    },
+    "Tolui -> Subutai": {
+      "M": "Tolui -> Subutai",
+      "D": "Tolui -> Subutai",
+      "C": "Tolui -> Subutai",
+      "B": "Tolui -> Subutai",
+      "N": "Tolui -> Subutai",
+      "Ms": "Tolui -> Subutai",
+      "W": "Tolui -> Subutai"
+    },
+    "Boraqchin -> Sitara": {
+      "M": "Boraqchin -> Sitara",
+      "D": "Boraqchin -> Sitary",
+      "C": "Boraqchin -> Sitarze",
+      "B": "Boraqchin -> Sitarę",
+      "N": "Boraqchin -> Sitarą",
+      "Ms": "Boraqchin -> Sitarze",
+      "W": "Boraqchin -> Sitaro"
+    },
+    "Möge -> Sitara": {
+      "M": "Möge -> Sitara",
+      "D": "Möge -> Sitary",
+      "C": "Möge -> Sitarze",
+      "B": "Möge -> Sitarę",
+      "N": "Möge -> Sitarą",
+      "Ms": "Möge -> Sitarze",
+      "W": "Möge -> Sitaro"
+    },
+    "Dayir Usun -> Töregene": {
+      "M": "Dayir Usun -> Töregene",
+      "D": "Dayir Usun -> Töregene",
+      "C": "Dayir Usun -> Töregene",
+      "B": "Dayir Usun -> Töregene",
+      "N": "Dayir Usun -> Töregene",
+      "Ms": "Dayir Usun -> Töregene",
+      "W": "Dayir Usun -> Töregene"
+    },
+    "Khulan -> Töregene": {
+      "M": "Khulan -> Töregene",
+      "D": "Khulan -> Töregene",
+      "C": "Khulan -> Töregene",
+      "B": "Khulan -> Töregene",
+      "N": "Khulan -> Töregene",
+      "Ms": "Khulan -> Töregene",
+      "W": "Khulan -> Töregene"
+    },
+    "Töregene -> Dayir": {
+      "M": "Töregene -> Dayir",
+      "D": "Töregene -> Dayir",
+      "C": "Töregene -> Dayir",
+      "B": "Töregene -> Dayir",
+      "N": "Töregene -> Dayir",
+      "Ms": "Töregene -> Dayir",
+      "W": "Töregene -> Dayir"
+    },
+    "Chinqai -> Ögedei": {
+      "M": "Chinqai -> Ögedei",
+      "D": "Chinqai -> Ögedei",
+      "C": "Chinqai -> Ögedei",
+      "B": "Chinqai -> Ögedei",
+      "N": "Chinqai -> Ögedei",
+      "Ms": "Chinqai -> Ögedei",
+      "W": "Chinqai -> Ögedei"
+    },
+    "Fatima -> Boraqchin": {
+      "M": "Fatima -> Boraqchin",
+      "D": "Fatimy -> Boraqchin",
+      "C": "Fatimie -> Boraqchin",
+      "B": "Fatimę -> Boraqchin",
+      "N": "Fatimą -> Boraqchin",
+      "Ms": "Fatimie -> Boraqchin",
+      "W": "Fatimo -> Boraqchin"
+    },
+    "Fatima -> Töregene": {
+      "M": "Fatima -> Töregene",
+      "D": "Fatimy -> Töregene",
+      "C": "Fatimie -> Töregene",
+      "B": "Fatimę -> Töregene",
+      "N": "Fatimą -> Töregene",
+      "Ms": "Fatimie -> Töregene",
+      "W": "Fatimo -> Töregene"
+    },
+    "Ögedei -> Tolui": {
+      "M": "Ögedei -> Tolui",
+      "D": "Ögedei -> Tolui",
+      "C": "Ögedei -> Tolui",
+      "B": "Ögedei -> Tolui",
+      "N": "Ögedei -> Tolui",
+      "Ms": "Ögedei -> Tolui",
+      "W": "Ögedei -> Tolui"
+    },
+    "Sitara -> Shira": {
+      "M": "Sitara -> Shira",
+      "D": "Sitary -> Shiry",
+      "C": "Sitarze -> Shirze",
+      "B": "Sitarę -> Shirę",
+      "N": "Sitarą -> Shirą",
+      "Ms": "Sitarze -> Shirze",
+      "W": "Sitaro -> Shiro"
+    },
+    "Qadaq -> Güyük": {
+      "M": "Qadaq -> Güyük",
+      "D": "Qadaqa -> Güyüka",
+      "C": "Qadaqowi -> Güyükowi",
+      "B": "Qadaqa -> Güyüka",
+      "N": "Qadaqem -> Güyükem",
+      "Ms": "Qadaqie -> Güyüku",
+      "W": "Qadaqie -> Güyüku"
+    },
+    "Sitara -> Sorghaghtani": {
+      "M": "Sitara -> Sorghaghtani",
+      "D": "Sitary -> Sorghaghtani",
+      "C": "Sitarze -> Sorghaghtani",
+      "B": "Sitarę -> Sorghaghtani",
+      "N": "Sitarą -> Sorghaghtani",
+      "Ms": "Sitarze -> Sorghaghtani",
+      "W": "Sitaro -> Sorghaghtani"
+    },
+    "Boraqchin -> Ögedei": {
+      "M": "Boraqchin -> Ögedei",
+      "D": "Boraqchin -> Ögedei",
+      "C": "Boraqchin -> Ögedei",
+      "B": "Boraqchin -> Ögedei",
+      "N": "Boraqchin -> Ögedei",
+      "Ms": "Boraqchin -> Ögedei",
+      "W": "Boraqchin -> Ögedei"
+    }
+  },
+  "plot_anchors": {}
 }

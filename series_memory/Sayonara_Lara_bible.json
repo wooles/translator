@@ -1,6 +1,39 @@
 {
   "anime_title": "Sayonara Lara",
   "characters": {
+    "Lara": {
+      "description": "KOBIETA - kobieta / dziewczyna (Główna bohaterka)"
+    },
+    "Luca": {
+      "description": "MĘŻCZYZNA - mężczyzna (Nastolatek, przyjaciel Mari i Lary, momentami tchórzliwy, lecz w decydującej chwili przezwyciężający strach)"
+    },
+    "Mari": {
+      "description": "KOBIETA - kobieta (postać)"
+    },
+    "Mari Otsu": {
+      "description": "KOBIETA - kobieta (Uczennica szkoły średniej, zawodniczka boksu juniorskiego, oddana przyjaciółka Lary)"
+    },
+    "Leo": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Lisa": {
+      "description": "KOBIETA - kobieta (postać)"
+    },
+    "Kusatsu": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Grace": {
+      "description": "KOBIETA (wyodrębniono z relacji serii)"
+    },
+    "Rowan": {
+      "description": "MĘŻCZYZNA - mężczyzna (Król syren, ojciec Lary, wyniosły i pałający bezwzględną nienawiścią do rodzaju ludzkiego)"
+    },
+    "Yoshiya": {
+      "description": "MĘŻCZYZNA - mężczyzna (Starszy brat Mari, nonszalancki buntownik wagarowicz z praktycznymi znajomościami)"
+    },
+    "Rigmor": {
+      "description": "KOBIETA - kobieta (postać)"
+    },
     "Lara -> Luca": {
       "description": "Zwrot: 'Luca' (nieśmiałe zakochani / przyjaciele)"
     },
@@ -15,9 +48,6 @@
     },
     "Gon (Grace) -> Mari": {
       "description": "PŁEĆ: ŻEŃSKA (Wiedźma/mentorka w akwarium mówiąca do leżącej na łóżku Mari). Obie to KOBIETY! Zawsze formy ŻEŃSKIE (np. 'Chcesz, żebym poszukała?' / 'Mam poszukać?'). Zwrot: 'Mari / na ty'"
-    },
-    "Mari Otsu": {
-      "description": "kobieta (Uczennica szkoły średniej, zawodniczka boksu juniorskiego, oddana przyjaciółka Lary)"
     },
     "Gon (Grace) -> Luca": {
       "description": "PŁEĆ: ŻEŃSKA (Wiedźma/mentorka w akwarium). Zawsze formy ŻEŃSKIE (np. 'Chcesz, żebym poszukała?' / 'Mam poszukać?'). Zwrot: 'Luca / na ty'"
@@ -57,27 +87,6 @@
     },
     "Yoshiya -> Luca": {
       "description": "Zwrot: 'młody / na ty' (starszy chłopak -> intruz / młodszy kolega siostry)"
-    },
-    "Lara": {
-      "description": "kobieta / dziewczyna (Główna bohaterka)"
-    },
-    "Rowan": {
-      "description": "mężczyzna (Król syren, ojciec Lary, wyniosły i pałający bezwzględną nienawiścią do rodzaju ludzkiego)"
-    },
-    "Luca": {
-      "description": "mężczyzna (Nastolatek, przyjaciel Mari i Lary, momentami tchórzliwy, lecz w decydującej chwili przezwyciężający strach)"
-    },
-    "Yoshiya": {
-      "description": "mężczyzna (Starszy brat Mari, nonszalancki buntownik wagarowicz z praktycznymi znajomościami)"
-    },
-    "Mari": {
-      "description": "kobieta (postać)"
-    },
-    "Lisa": {
-      "description": "kobieta (postać)"
-    },
-    "Rigmor": {
-      "description": "kobieta (postać)"
     }
   },
   "glossary": {
@@ -89,7 +98,7 @@
     "Girls Bantamweight Division": "Kategoria kogucia dziewcząt",
     "Red corner / Blue corner": "Czerwony narożnik",
     "Omi's Lightning": "Błyskawica z Omi",
-    "Merfolk": "Syreni ród",
+    "Merfolk": "syreni lud",
     "Vanish into foam": "Rozwiać się w pianę morską",
     "True Love": "Prawdziwa miłość",
     "Witch's potion": "Eliksir czarownicy",
@@ -97,65 +106,29 @@
     "Zeze Castle": "Zamek Zeze",
     "Okishima": "Okishima",
     "Mother Lake": "Matka Jezioro",
-    "merfolk": "syreni lud",
     "light": "światłość"
   },
-  "relationships": {},
+  "relationships": {
+    "Lara -> Luca": "Zwrot: 'Luca' (nieśmiałe zakochani / przyjaciele)",
+    "Luca -> Lara": "Zwrot: 'na ty / po imieniu (Lara)' (znajomi / rozwijające się uczucie)",
+    "Mari -> Lara": "Zwrot: 'na ty / Lara' (bliskie przyjaciółki)",
+    "Gon (Grace) -> Lara": "PŁEĆ: ŻEŃSKA (Wiedźma/mentorka w postaci rybki w akwarium). Zawsze formy ŻEŃSKIE (np. poszukałam, widziałam, mogłabym). Zwrot: 'na ty / po imieniu: Lara'",
+    "Gon (Grace) -> Mari": "PŁEĆ: ŻEŃSKA (Wiedźma/mentorka w akwarium mówiąca do leżącej na łóżku Mari). Obie to KOBIETY! Zawsze formy ŻEŃSKIE (np. 'Chcesz, żebym poszukała?' / 'Mam poszukać?'). Zwrot: 'Mari / na ty'",
+    "Gon (Grace) -> Luca": "PŁEĆ: ŻEŃSKA (Wiedźma/mentorka w akwarium). Zawsze formy ŻEŃSKIE (np. 'Chcesz, żebym poszukała?' / 'Mam poszukać?'). Zwrot: 'Luca / na ty'",
+    "Leo -> Luca": "Zwrot: 'braciszku / bracie' (młodszy brat -> starszy brat)",
+    "Leo -> Lara": "Zwrot: 'Lara' (młodszy brat przyjaciela)",
+    "Lara -> Mari": "Zwrot: 'na ty / po imieniu (Mari)' (przyjaciółki)",
+    "Lisa -> Mari": "Zwrot: 'panieńskie / pełne (Mari Otsu)' (dystans / obca osoba z wrogiego świata)",
+    "Kusatsu -> Mari": "Zwrot: 'po nazwisku (Otsu)' (trener -> zawodniczka)",
+    "Mari -> Luca": "Zwrot: 'po imieniu / na ty' (znajomi / opiekunowie Lary)",
+    "Grace -> Mari": "Zwrot: 'Mari' (wiedźma w akwarium -> opiekunka)",
+    "Lara -> Rowan": "Zwrot: 'ojcze' (córka -> ojciec / król)",
+    "Rowan -> Lara": "Zwrot: 'Lara / córko' (ojciec / monarcha -> córka)",
+    "Luca -> Mari": "Zwrot: 'Otsu / na ty' (znajomi ze szkoły)",
+    "Yoshiya -> Mari": "Zwrot: 'Mari / na ty' (rodzeństwo (starszy brat -> młodsza siostra))",
+    "Yoshiya -> Luca": "Zwrot: 'młody / na ty' (starszy chłopak -> intruz / młodszy kolega siostry)"
+  },
   "declensions": {
-    "Mari -> Lara": {
-      "M": "Mari -> Lara",
-      "D": "Mari -> Lary",
-      "C": "Mari -> Larze",
-      "B": "Mari -> Larę",
-      "N": "Mari -> Larą",
-      "Ms": "Mari -> Larze",
-      "W": "Mari -> Laro"
-    },
-    "Lara -> Rowan": {
-      "M": "Lara -> Rowan",
-      "D": "Lara -> Rowana",
-      "C": "Lara -> Rowanowi",
-      "B": "Lara -> Rowana",
-      "N": "Lara -> Rowanem",
-      "Ms": "Lara -> Rowanie",
-      "W": "Lara -> Rowanie"
-    },
-    "Rowan -> Lara": {
-      "M": "Rowan -> Lara",
-      "D": "Rowan -> Lary",
-      "C": "Rowan -> Larze",
-      "B": "Rowan -> Larę",
-      "N": "Rowan -> Larą",
-      "Ms": "Rowan -> Larze",
-      "W": "Rowan -> Laro"
-    },
-    "Luca -> Mari": {
-      "M": "Luca -> Mari",
-      "D": "Luca -> Mari",
-      "C": "Luca -> Mari",
-      "B": "Luca -> Mari",
-      "N": "Luca -> Mari",
-      "Ms": "Luca -> Mari",
-      "W": "Luca -> Mari"
-    },
-    "Yoshiya -> Mari": {
-      "M": "Yoshiya -> Mari",
-      "D": "Yoshiya -> Mari",
-      "C": "Yoshiya -> Mari",
-      "B": "Yoshiya -> Mari",
-      "N": "Yoshiya -> Mari",
-      "Ms": "Yoshiya -> Mari",
-      "W": "Yoshiya -> Mari"
-    },
-    "Yoshiya -> Luca": {
-      "M": "Yoshiya -> Luca",
-      "D": "Yoshiya -> Lucy",
-      "C": "Yoshiya -> Luce",
-      "B": "Yoshiya -> Lucę",
-      "N": "Yoshiya -> Lucą",
-      "Ms": "Yoshiya -> Luce",
-      "W": "Yoshiya -> Luco"
-    },
     "Lara": {
       "M": "Lara",
       "D": "Lary",
@@ -185,10 +158,10 @@
     },
     "Luca": {
       "M": "Luca",
-      "D": "Lucy",
+      "D": "Luki",
       "C": "Luce",
-      "B": "Lucę",
-      "N": "Lucą",
+      "B": "Lukę",
+      "N": "Luką",
       "Ms": "Luce",
       "W": "Luco"
     },
@@ -227,6 +200,195 @@
       "N": "Rigmor",
       "Ms": "Rigmor",
       "W": "Rigmor"
+    },
+    "Leo": {
+      "M": "Leo",
+      "D": "Leo",
+      "C": "Leo",
+      "B": "Leo",
+      "N": "Leo",
+      "Ms": "Leo",
+      "W": "Leo"
+    },
+    "Kusatsu": {
+      "M": "Kusatsu",
+      "D": "Kusatsu",
+      "C": "Kusatsu",
+      "B": "Kusatsu",
+      "N": "Kusatsu",
+      "Ms": "Kusatsu",
+      "W": "Kusatsu"
+    },
+    "Grace": {
+      "M": "Grace",
+      "D": "Grace",
+      "C": "Grace",
+      "B": "Grace",
+      "N": "Grace",
+      "Ms": "Grace",
+      "W": "Grace"
+    },
+    "Lara -> Luca": {
+      "M": "Lara -> Luca",
+      "D": "Lary -> Luki",
+      "C": "Larze -> Luce",
+      "B": "Larę -> Lukę",
+      "N": "Larą -> Luką",
+      "Ms": "Larze -> Luce",
+      "W": "Laro -> Luko"
+    },
+    "Luca -> Lara": {
+      "M": "Luca -> Lara",
+      "D": "Luki -> Lary",
+      "C": "Luce -> Larze",
+      "B": "Lukę -> Larę",
+      "N": "Luką -> Larą",
+      "Ms": "Luce -> Larze",
+      "W": "Luko -> Laro"
+    },
+    "Mari -> Lara": {
+      "M": "Mari -> Lara",
+      "D": "Mari -> Lary",
+      "C": "Mari -> Larze",
+      "B": "Mari -> Larę",
+      "N": "Mari -> Larą",
+      "Ms": "Mari -> Larze",
+      "W": "Mari -> Laro"
+    },
+    "Gon (Grace) -> Lara": {
+      "M": "Gon (Grace) -> Lara",
+      "D": "Gon (Grace) -> Lary",
+      "C": "Gon (Grace) -> Larze",
+      "B": "Gon (Grace) -> Larę",
+      "N": "Gon (Grace) -> Larą",
+      "Ms": "Gon (Grace) -> Larze",
+      "W": "Gon (Grace) -> Laro"
+    },
+    "Gon (Grace) -> Mari": {
+      "M": "Gon (Grace) -> Mari",
+      "D": "Gon (Grace) -> Mari",
+      "C": "Gon (Grace) -> Mari",
+      "B": "Gon (Grace) -> Mari",
+      "N": "Gon (Grace) -> Mari",
+      "Ms": "Gon (Grace) -> Mari",
+      "W": "Gon (Grace) -> Mari"
+    },
+    "Gon (Grace) -> Luca": {
+      "M": "Gon (Grace) -> Luca",
+      "D": "Gona (Grace)a -> Luki",
+      "C": "Gonowi (Grace)owi -> Luce",
+      "B": "Gona (Grace)a -> Lukę",
+      "N": "Gonem (Grace)em -> Luką",
+      "Ms": "Gonie (Grace)ie -> Luce",
+      "W": "Gonie (Grace)ie -> Luco"
+    },
+    "Leo -> Luca": {
+      "M": "Leo -> Luca",
+      "D": "Leo -> Luki",
+      "C": "Leo -> Luce",
+      "B": "Leo -> Lukę",
+      "N": "Leo -> Luką",
+      "Ms": "Leo -> Luce",
+      "W": "Leo -> Luco"
+    },
+    "Leo -> Lara": {
+      "M": "Leo -> Lara",
+      "D": "Leo -> Lary",
+      "C": "Leo -> Larze",
+      "B": "Leo -> Larę",
+      "N": "Leo -> Larą",
+      "Ms": "Leo -> Larze",
+      "W": "Leo -> Laro"
+    },
+    "Lara -> Mari": {
+      "M": "Lara -> Mari",
+      "D": "Lary -> Mari",
+      "C": "Larze -> Mari",
+      "B": "Larę -> Mari",
+      "N": "Larą -> Mari",
+      "Ms": "Larze -> Mari",
+      "W": "Laro -> Mari"
+    },
+    "Lisa -> Mari": {
+      "M": "Lisa -> Mari",
+      "D": "Lisy -> Mari",
+      "C": "Lisie -> Mari",
+      "B": "Lisę -> Mari",
+      "N": "Lisą -> Mari",
+      "Ms": "Lisie -> Mari",
+      "W": "Liso -> Mari"
+    },
+    "Kusatsu -> Mari": {
+      "M": "Kusatsu -> Mari",
+      "D": "Kusatsu -> Mari",
+      "C": "Kusatsu -> Mari",
+      "B": "Kusatsu -> Mari",
+      "N": "Kusatsu -> Mari",
+      "Ms": "Kusatsu -> Mari",
+      "W": "Kusatsu -> Mari"
+    },
+    "Mari -> Luca": {
+      "M": "Mari -> Luca",
+      "D": "Mari -> Luki",
+      "C": "Mari -> Luce",
+      "B": "Mari -> Lukę",
+      "N": "Mari -> Luką",
+      "Ms": "Mari -> Luce",
+      "W": "Mari -> Luco"
+    },
+    "Grace -> Mari": {
+      "M": "Grace -> Mari",
+      "D": "Grace -> Mari",
+      "C": "Grace -> Mari",
+      "B": "Grace -> Mari",
+      "N": "Grace -> Mari",
+      "Ms": "Grace -> Mari",
+      "W": "Grace -> Mari"
+    },
+    "Lara -> Rowan": {
+      "M": "Lara -> Rowan",
+      "D": "Lary -> Rowan",
+      "C": "Larze -> Rowan",
+      "B": "Larę -> Rowan",
+      "N": "Larą -> Rowan",
+      "Ms": "Larze -> Rowan",
+      "W": "Laro -> Rowan"
+    },
+    "Rowan -> Lara": {
+      "M": "Rowan -> Lara",
+      "D": "Rowan -> Lary",
+      "C": "Rowan -> Larze",
+      "B": "Rowan -> Larę",
+      "N": "Rowan -> Larą",
+      "Ms": "Rowan -> Larze",
+      "W": "Rowan -> Laro"
+    },
+    "Luca -> Mari": {
+      "M": "Luca -> Mari",
+      "D": "Luki -> Mari",
+      "C": "Luce -> Mari",
+      "B": "Lukę -> Mari",
+      "N": "Luką -> Mari",
+      "Ms": "Luce -> Mari",
+      "W": "Luco -> Mari"
+    },
+    "Yoshiya -> Mari": {
+      "M": "Yoshiya -> Mari",
+      "D": "Yoshiyy -> Mari",
+      "C": "Yoshiye -> Mari",
+      "B": "Yoshiyę -> Mari",
+      "N": "Yoshiyą -> Mari",
+      "Ms": "Yoshiye -> Mari",
+      "W": "Yoshiyo -> Mari"
+    },
+    "Yoshiya -> Luca": {
+      "M": "Yoshiya -> Luca",
+      "D": "Yoshiyy -> Luki",
+      "C": "Yoshiye -> Luce",
+      "B": "Yoshiyę -> Lukę",
+      "N": "Yoshiyą -> Luką",
+      "Ms": "Yoshiye -> Luce",
+      "W": "Yoshiyo -> Luco"
     }
   },
   "plot_anchors": {

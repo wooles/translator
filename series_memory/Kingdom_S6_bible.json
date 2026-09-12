@@ -1,6 +1,78 @@
 {
   "anime_title": "Kingdom S6",
   "characters": {
+    "Wang Ben": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Mǎ Nanci": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Fan Yang": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Xin": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Wang Jian": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Bi": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Yang Duanhe": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Shun Shuishu": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Lozo": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Oddział Yu Feng": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Han Chang": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Wei Ping / Song Zuo / Tian Yong": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Ban You": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Ou Hon": {
+      "description": "KOBIETA (wyodrębniono z relacji serii)"
+    },
+    "Heki": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Yotanwa": {
+      "description": "KOBIETA (wyodrębniono z relacji serii)"
+    },
+    "Shun Sui Ju": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Rozo": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Danto": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Shin": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Mou Ten": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Ri Boku": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Meng Tian": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Ding Yang": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
     "Wang Ben -> Mǎ Nanci": {
       "description": "Zwrot: 'po imieniu: Mǎ Nanci / dowódco Zhao' (wrogowie / wrogowie na polu bitwy)"
     },
@@ -33,6 +105,39 @@
     },
     "Xin -> Wei Ping / Song Zuo / Tian Yong": {
       "description": "Zwrot: 'po imieniu / wy, durnie' (dowódca -> towarzysze broni)"
+    },
+    "Ban You -> Ou Hon": {
+      "description": "Zwrot: 'panie Hon / dziedzicu Hon' (sługa / zastępca -> młody pan)"
+    },
+    "Heki -> Yotanwa": {
+      "description": "Zwrot: 'Królowo Yotanwo / Pani' (sojuszniczy generał nizin -> Królowa Gór)"
+    },
+    "Shun Sui Ju -> Rozo": {
+      "description": "Zwrot: 'Królu Kenjuu' (poseł Zhao -> wrogi władca plemienny)"
+    },
+    "Danto -> Heki": {
+      "description": "Zwrot: 'nijaki generale z nizin' (wódz plemienia Feikong -> generał Qin)"
+    },
+    "Shin -> Mou Ten": {
+      "description": "Zwrot: 'Mou Ten' (braterska rywalizacja / sojusznicy z równorzędnych oddziałów)"
+    },
+    "Shin -> Ri Boku": {
+      "description": "Zwrot: 'Ri Boku' (zażarty wróg / śmiertelny przeciwnik)"
+    },
+    "Mou Ten -> Shin": {
+      "description": "Zwrot: 'Shin' (towarzysz broni / przyjaciel)"
+    },
+    "Ri Boku -> Shin": {
+      "description": "Zwrot: 'Dowódco Shin' (szacunek i chłodny dystans wobec obiecującego przeciwnika)"
+    },
+    "Meng Tian -> Xin": {
+      "description": "Zwrot: 'na ty / po imieniu: Shin' (towarzysze broni / rywale)"
+    },
+    "Xin -> Meng Tian": {
+      "description": "Zwrot: 'na ty / po imieniu: Mou Ten' (towarzysze broni / rywale)"
+    },
+    "Ding Yang -> Meng Tian": {
+      "description": "Zwrot: 'Generale Mou Ten / Panie Mou Ten' (podwładny -> tymczasowy dowódca)"
     }
   },
   "glossary": {
@@ -276,9 +381,42 @@
     "Unification of China": "Zjednoczenie Chin pod Jednymi Niebiosami",
     "Legalism": "Praworządność",
     "Weight of a General": "Ciężar Generała",
-    "Bushin": "Bushin"
+    "Bushin": "Bushin",
+    "Gyoku Hou Force": "Oddział Gyoku Hou",
+    "Kenjuu": "Kenjuu",
+    "Shukai Plains": "Równina Shukai",
+    "Ryouyou": "Ryouyou",
+    "Kyoudo": "Kyoudo",
+    "Hi Shin Force": "Oddział Hi Shin",
+    "Gaku Ka Force": "Oddział Gaku Ka",
+    "detached force": "oddział uderzeniowy",
+    "Left flank": "Lewe skrzydło",
+    "Right flank": "Prawe skrzydło"
   },
-  "relationships": {},
+  "relationships": {
+    "Wang Ben -> Mǎ Nanci": "Zwrot: 'po imieniu: Mǎ Nanci / dowódco Zhao' (wrogowie / wrogowie na polu bitwy)",
+    "Fan Yang -> Wang Ben": "Zwrot: 'panie Ben / paniczu Ben' (podwładny -> dowódca / pan feudalny)",
+    "Xin -> Wang Jian": "Zwrot: 'generale Wang Jian' (podwładny -> naczelny wódz)",
+    "Wang Jian -> Xin": "Zwrot: 'na ty / bezpośrednio rozkazująco' (wielki generał -> dowódca oddziału)",
+    "Bi -> Yang Duanhe": "Zwrot: 'Wasza Wysokość / Pani' (sojusznik / dowódca niższy rangą -> Królowa Gór)",
+    "Yang Duanhe -> Bi": "Zwrot: 'Generale Bi' (dowódczyni naczelna -> dowódca posiłków)",
+    "Shun Shuishu -> Lozo": "Zwrot: 'Królu Quanrong' (poseł/strateg -> niezależny władca)",
+    "Lozo -> Shun Shuishu": "Zwrot: 'na ty / człowieku z nizin' (bezwzględny król plemienny -> obcy poseł)",
+    "Wang Ben -> Oddział Yu Feng": "Zwrot: 'Żołnierze Yu Feng / moi ludzie' (dowódca -> podwładni)",
+    "Han Chang -> Wang Ben": "Zwrot: 'Młody panie / dowódco Ben' (przyboczny -> dowódca)",
+    "Xin -> Wei Ping / Song Zuo / Tian Yong": "Zwrot: 'po imieniu / wy, durnie' (dowódca -> towarzysze broni)",
+    "Ban You -> Ou Hon": "Zwrot: 'panie Hon / dziedzicu Hon' (sługa / zastępca -> młody pan)",
+    "Heki -> Yotanwa": "Zwrot: 'Królowo Yotanwo / Pani' (sojuszniczy generał nizin -> Królowa Gór)",
+    "Shun Sui Ju -> Rozo": "Zwrot: 'Królu Kenjuu' (poseł Zhao -> wrogi władca plemienny)",
+    "Danto -> Heki": "Zwrot: 'nijaki generale z nizin' (wódz plemienia Feikong -> generał Qin)",
+    "Shin -> Mou Ten": "Zwrot: 'Mou Ten' (braterska rywalizacja / sojusznicy z równorzędnych oddziałów)",
+    "Shin -> Ri Boku": "Zwrot: 'Ri Boku' (zażarty wróg / śmiertelny przeciwnik)",
+    "Mou Ten -> Shin": "Zwrot: 'Shin' (towarzysz broni / przyjaciel)",
+    "Ri Boku -> Shin": "Zwrot: 'Dowódco Shin' (szacunek i chłodny dystans wobec obiecującego przeciwnika)",
+    "Meng Tian -> Xin": "Zwrot: 'na ty / po imieniu: Shin' (towarzysze broni / rywale)",
+    "Xin -> Meng Tian": "Zwrot: 'na ty / po imieniu: Mou Ten' (towarzysze broni / rywale)",
+    "Ding Yang -> Meng Tian": "Zwrot: 'Generale Mou Ten / Panie Mou Ten' (podwładny -> tymczasowy dowódca)"
+  },
   "episodes_translated": [
     "tmpqhvb5j6p",
     "tmp2s6g9x3n",
@@ -286,6 +424,426 @@
     "tmpymtsp2tj",
     "Kanon Mangi",
     "[ASW] Kingdom S6 - 13 [1080p HEVC][122056AC]",
-    "[ASW] Kingdom S6 - 10 [1080p HEVC][DBC001C4]"
-  ]
+    "[ASW] Kingdom S6 - 10 [1080p HEVC][DBC001C4]",
+    "[Erai-raws] Kingdom 6th Season - 10 (JN) [1080p CR WEBRip HEVC AAC][MultiSub][E0CC5D52]",
+    "[Erai-raws] Kingdom 6th Season - 11 (JN) [1080p CR WEBRip HEVC AAC][MultiSub][31E77681]",
+    "[Erai-raws] Kingdom 6th Season - 12 (JN) [1080p CR WEBRip HEVC AAC][MultiSub][5E6871C6]"
+  ],
+  "declensions": {
+    "Wang Ben": {
+      "M": "Wang Ben",
+      "D": "Wanga Bena",
+      "C": "Wangowi Benowi",
+      "B": "Wanga Bena",
+      "N": "Wangem Benem",
+      "Ms": "Wangu Benie",
+      "W": "Wangu Benie"
+    },
+    "Mǎ Nanci": {
+      "M": "Mǎ Nanci",
+      "D": "Mǎa Nanci",
+      "C": "Mǎowi Nanci",
+      "B": "Mǎa Nanci",
+      "N": "Mǎem Nanci",
+      "Ms": "Mǎie Nanci",
+      "W": "Mǎie Nanci"
+    },
+    "Fan Yang": {
+      "M": "Fan Yang",
+      "D": "Fana Yanga",
+      "C": "Fanowi Yangowi",
+      "B": "Fana Yanga",
+      "N": "Fanem Yangem",
+      "Ms": "Fanie Yangu",
+      "W": "Fanie Yangu"
+    },
+    "Xin": {
+      "M": "Xin",
+      "D": "Xina",
+      "C": "Xinowi",
+      "B": "Xina",
+      "N": "Xinem",
+      "Ms": "Xinie",
+      "W": "Xinie"
+    },
+    "Wang Jian": {
+      "M": "Wang Jian",
+      "D": "Wanga Jiana",
+      "C": "Wangowi Jianowi",
+      "B": "Wanga Jiana",
+      "N": "Wangem Jianem",
+      "Ms": "Wangu Jianie",
+      "W": "Wangu Jianie"
+    },
+    "Bi": {
+      "M": "Bi",
+      "D": "Bi",
+      "C": "Bi",
+      "B": "Bi",
+      "N": "Bi",
+      "Ms": "Bi",
+      "W": "Bi"
+    },
+    "Yang Duanhe": {
+      "M": "Yang Duanhe",
+      "D": "Yanga Duanhe",
+      "C": "Yangowi Duanhe",
+      "B": "Yanga Duanhe",
+      "N": "Yangem Duanhe",
+      "Ms": "Yangu Duanhe",
+      "W": "Yangu Duanhe"
+    },
+    "Shun Shuishu": {
+      "M": "Shun Shuishu",
+      "D": "Shuna Shuishu",
+      "C": "Shunowi Shuishu",
+      "B": "Shuna Shuishu",
+      "N": "Shunem Shuishu",
+      "Ms": "Shunie Shuishu",
+      "W": "Shunie Shuishu"
+    },
+    "Lozo": {
+      "M": "Lozo",
+      "D": "Lozo",
+      "C": "Lozo",
+      "B": "Lozo",
+      "N": "Lozo",
+      "Ms": "Lozo",
+      "W": "Lozo"
+    },
+    "Oddział Yu Feng": {
+      "M": "Oddział Yu Feng",
+      "D": "Oddziała Yu Fenga",
+      "C": "Oddziałowi Yu Fengowi",
+      "B": "Oddziała Yu Fenga",
+      "N": "Oddziałem Yu Fengem",
+      "Ms": "Oddziałie Yu Fengu",
+      "W": "Oddziałie Yu Fengu"
+    },
+    "Han Chang": {
+      "M": "Han Chang",
+      "D": "Hana Changa",
+      "C": "Hanowi Changowi",
+      "B": "Hana Changa",
+      "N": "Hanem Changem",
+      "Ms": "Hanie Changu",
+      "W": "Hanie Changu"
+    },
+    "Wei Ping / Song Zuo / Tian Yong": {
+      "M": "Wei Ping / Song Zuo / Tian Yong",
+      "D": "Wei Pinga / Songa Zuo / Tiana Yonga",
+      "C": "Wei Pingowi / Songowi Zuo / Tianowi Yongowi",
+      "B": "Wei Pinga / Songa Zuo / Tiana Yonga",
+      "N": "Wei Pingem / Songem Zuo / Tianem Yongem",
+      "Ms": "Wei Pingu / Songu Zuo / Tianie Yongu",
+      "W": "Wei Pingu / Songu Zuo / Tianie Yongu"
+    },
+    "Ban You": {
+      "M": "Ban You",
+      "D": "Bana You",
+      "C": "Banowi You",
+      "B": "Bana You",
+      "N": "Banem You",
+      "Ms": "Banie You",
+      "W": "Banie You"
+    },
+    "Ou Hon": {
+      "M": "Ou Hon",
+      "D": "Ou Hon",
+      "C": "Ou Hon",
+      "B": "Ou Hon",
+      "N": "Ou Hon",
+      "Ms": "Ou Hon",
+      "W": "Ou Hon"
+    },
+    "Heki": {
+      "M": "Heki",
+      "D": "Heki",
+      "C": "Heki",
+      "B": "Heki",
+      "N": "Heki",
+      "Ms": "Heki",
+      "W": "Heki"
+    },
+    "Yotanwa": {
+      "M": "Yotanwa",
+      "D": "Yotanwy",
+      "C": "Yotanwe",
+      "B": "Yotanwę",
+      "N": "Yotanwą",
+      "Ms": "Yotanwe",
+      "W": "Yotanwo"
+    },
+    "Shun Sui Ju": {
+      "M": "Shun Sui Ju",
+      "D": "Shuna Sui Ju",
+      "C": "Shunowi Sui Ju",
+      "B": "Shuna Sui Ju",
+      "N": "Shunem Sui Ju",
+      "Ms": "Shunie Sui Ju",
+      "W": "Shunie Sui Ju"
+    },
+    "Rozo": {
+      "M": "Rozo",
+      "D": "Rozo",
+      "C": "Rozo",
+      "B": "Rozo",
+      "N": "Rozo",
+      "Ms": "Rozo",
+      "W": "Rozo"
+    },
+    "Danto": {
+      "M": "Danto",
+      "D": "Danto",
+      "C": "Danto",
+      "B": "Danto",
+      "N": "Danto",
+      "Ms": "Danto",
+      "W": "Danto"
+    },
+    "Shin": {
+      "M": "Shin",
+      "D": "Shina",
+      "C": "Shinowi",
+      "B": "Shina",
+      "N": "Shinem",
+      "Ms": "Shinie",
+      "W": "Shinie"
+    },
+    "Mou Ten": {
+      "M": "Mou Ten",
+      "D": "Mou Tena",
+      "C": "Mou Tenowi",
+      "B": "Mou Tena",
+      "N": "Mou Tenem",
+      "Ms": "Mou Tenie",
+      "W": "Mou Tenie"
+    },
+    "Ri Boku": {
+      "M": "Ri Boku",
+      "D": "Ri Boku",
+      "C": "Ri Boku",
+      "B": "Ri Boku",
+      "N": "Ri Boku",
+      "Ms": "Ri Boku",
+      "W": "Ri Boku"
+    },
+    "Meng Tian": {
+      "M": "Meng Tian",
+      "D": "Menga Tiana",
+      "C": "Mengowi Tianowi",
+      "B": "Menga Tiana",
+      "N": "Mengem Tianem",
+      "Ms": "Mengu Tianie",
+      "W": "Mengu Tianie"
+    },
+    "Ding Yang": {
+      "M": "Ding Yang",
+      "D": "Dinga Yanga",
+      "C": "Dingowi Yangowi",
+      "B": "Dinga Yanga",
+      "N": "Dingem Yangem",
+      "Ms": "Dingu Yangu",
+      "W": "Dingu Yangu"
+    },
+    "Wang Ben -> Mǎ Nanci": {
+      "M": "Wang Ben -> Mǎ Nanci",
+      "D": "Wanga Bena -> Mǎa Nanci",
+      "C": "Wangowi Benowi -> Mǎowi Nanci",
+      "B": "Wanga Bena -> Mǎa Nanci",
+      "N": "Wangem Benem -> Mǎem Nanci",
+      "Ms": "Wangu Benie -> Mǎie Nanci",
+      "W": "Wangu Benie -> Mǎie Nanci"
+    },
+    "Fan Yang -> Wang Ben": {
+      "M": "Fan Yang -> Wang Ben",
+      "D": "Fana Yanga -> Wanga Bena",
+      "C": "Fanowi Yangowi -> Wangowi Benowi",
+      "B": "Fana Yanga -> Wanga Bena",
+      "N": "Fanem Yangem -> Wangem Benem",
+      "Ms": "Fanie Yangu -> Wangu Benie",
+      "W": "Fanie Yangu -> Wangu Benie"
+    },
+    "Xin -> Wang Jian": {
+      "M": "Xin -> Wang Jian",
+      "D": "Xina -> Wanga Jiana",
+      "C": "Xinowi -> Wangowi Jianowi",
+      "B": "Xina -> Wanga Jiana",
+      "N": "Xinem -> Wangem Jianem",
+      "Ms": "Xinie -> Wangu Jianie",
+      "W": "Xinie -> Wangu Jianie"
+    },
+    "Wang Jian -> Xin": {
+      "M": "Wang Jian -> Xin",
+      "D": "Wanga Jiana -> Xina",
+      "C": "Wangowi Jianowi -> Xinowi",
+      "B": "Wanga Jiana -> Xina",
+      "N": "Wangem Jianem -> Xinem",
+      "Ms": "Wangu Jianie -> Xinie",
+      "W": "Wangu Jianie -> Xinie"
+    },
+    "Bi -> Yang Duanhe": {
+      "M": "Bi -> Yang Duanhe",
+      "D": "Bi -> Yanga Duanhe",
+      "C": "Bi -> Yangowi Duanhe",
+      "B": "Bi -> Yanga Duanhe",
+      "N": "Bi -> Yangem Duanhe",
+      "Ms": "Bi -> Yangu Duanhe",
+      "W": "Bi -> Yangu Duanhe"
+    },
+    "Yang Duanhe -> Bi": {
+      "M": "Yang Duanhe -> Bi",
+      "D": "Yanga Duanhe -> Bi",
+      "C": "Yangowi Duanhe -> Bi",
+      "B": "Yanga Duanhe -> Bi",
+      "N": "Yangem Duanhe -> Bi",
+      "Ms": "Yangu Duanhe -> Bi",
+      "W": "Yangu Duanhe -> Bi"
+    },
+    "Shun Shuishu -> Lozo": {
+      "M": "Shun Shuishu -> Lozo",
+      "D": "Shuna Shuishu -> Lozo",
+      "C": "Shunowi Shuishu -> Lozo",
+      "B": "Shuna Shuishu -> Lozo",
+      "N": "Shunem Shuishu -> Lozo",
+      "Ms": "Shunie Shuishu -> Lozo",
+      "W": "Shunie Shuishu -> Lozo"
+    },
+    "Lozo -> Shun Shuishu": {
+      "M": "Lozo -> Shun Shuishu",
+      "D": "Lozo -> Shuna Shuishu",
+      "C": "Lozo -> Shunowi Shuishu",
+      "B": "Lozo -> Shuna Shuishu",
+      "N": "Lozo -> Shunem Shuishu",
+      "Ms": "Lozo -> Shunie Shuishu",
+      "W": "Lozo -> Shunie Shuishu"
+    },
+    "Wang Ben -> Oddział Yu Feng": {
+      "M": "Wang Ben -> Oddział Yu Feng",
+      "D": "Wanga Bena -> Oddziała Yu Fenga",
+      "C": "Wangowi Benowi -> Oddziałowi Yu Fengowi",
+      "B": "Wanga Bena -> Oddziała Yu Fenga",
+      "N": "Wangem Benem -> Oddziałem Yu Fengem",
+      "Ms": "Wangu Benie -> Oddziałie Yu Fengu",
+      "W": "Wangu Benie -> Oddziałie Yu Fengu"
+    },
+    "Han Chang -> Wang Ben": {
+      "M": "Han Chang -> Wang Ben",
+      "D": "Hana Changa -> Wanga Bena",
+      "C": "Hanowi Changowi -> Wangowi Benowi",
+      "B": "Hana Changa -> Wanga Bena",
+      "N": "Hanem Changem -> Wangem Benem",
+      "Ms": "Hanie Changu -> Wangu Benie",
+      "W": "Hanie Changu -> Wangu Benie"
+    },
+    "Xin -> Wei Ping / Song Zuo / Tian Yong": {
+      "M": "Xin -> Wei Ping / Song Zuo / Tian Yong",
+      "D": "Xina -> Wei Pinga / Songa Zuo / Tiana Yonga",
+      "C": "Xinowi -> Wei Pingowi / Songowi Zuo / Tianowi Yongowi",
+      "B": "Xina -> Wei Pinga / Songa Zuo / Tiana Yonga",
+      "N": "Xinem -> Wei Pingem / Songem Zuo / Tianem Yongem",
+      "Ms": "Xinie -> Wei Pingu / Songu Zuo / Tianie Yongu",
+      "W": "Xinie -> Wei Pingu / Songu Zuo / Tianie Yongu"
+    },
+    "Ban You -> Ou Hon": {
+      "M": "Ban You -> Ou Hon",
+      "D": "Ban You -> Ou Hon",
+      "C": "Ban You -> Ou Hon",
+      "B": "Ban You -> Ou Hon",
+      "N": "Ban You -> Ou Hon",
+      "Ms": "Ban You -> Ou Hon",
+      "W": "Ban You -> Ou Hon"
+    },
+    "Heki -> Yotanwa": {
+      "M": "Heki -> Yotanwa",
+      "D": "Heki -> Yotanwy",
+      "C": "Heki -> Yotanwe",
+      "B": "Heki -> Yotanwę",
+      "N": "Heki -> Yotanwą",
+      "Ms": "Heki -> Yotanwe",
+      "W": "Heki -> Yotanwo"
+    },
+    "Shun Sui Ju -> Rozo": {
+      "M": "Shun Sui Ju -> Rozo",
+      "D": "Shuna Sui Ju -> Rozo",
+      "C": "Shunowi Sui Ju -> Rozo",
+      "B": "Shuna Sui Ju -> Rozo",
+      "N": "Shunem Sui Ju -> Rozo",
+      "Ms": "Shunie Sui Ju -> Rozo",
+      "W": "Shunie Sui Ju -> Rozo"
+    },
+    "Danto -> Heki": {
+      "M": "Danto -> Heki",
+      "D": "Danto -> Heki",
+      "C": "Danto -> Heki",
+      "B": "Danto -> Heki",
+      "N": "Danto -> Heki",
+      "Ms": "Danto -> Heki",
+      "W": "Danto -> Heki"
+    },
+    "Shin -> Mou Ten": {
+      "M": "Shin -> Mou Ten",
+      "D": "Shina -> Mou Tena",
+      "C": "Shinowi -> Mou Tenowi",
+      "B": "Shina -> Mou Tena",
+      "N": "Shinem -> Mou Tenem",
+      "Ms": "Shinie -> Mou Tenie",
+      "W": "Shinie -> Mou Tenie"
+    },
+    "Shin -> Ri Boku": {
+      "M": "Shin -> Ri Boku",
+      "D": "Shina -> Ri Boku",
+      "C": "Shinowi -> Ri Boku",
+      "B": "Shina -> Ri Boku",
+      "N": "Shinem -> Ri Boku",
+      "Ms": "Shinie -> Ri Boku",
+      "W": "Shinie -> Ri Boku"
+    },
+    "Mou Ten -> Shin": {
+      "M": "Mou Ten -> Shin",
+      "D": "Mou Tena -> Shina",
+      "C": "Mou Tenowi -> Shinowi",
+      "B": "Mou Tena -> Shina",
+      "N": "Mou Tenem -> Shinem",
+      "Ms": "Mou Tenie -> Shinie",
+      "W": "Mou Tenie -> Shinie"
+    },
+    "Ri Boku -> Shin": {
+      "M": "Ri Boku -> Shin",
+      "D": "Ri Boku -> Shina",
+      "C": "Ri Boku -> Shinowi",
+      "B": "Ri Boku -> Shina",
+      "N": "Ri Boku -> Shinem",
+      "Ms": "Ri Boku -> Shinie",
+      "W": "Ri Boku -> Shinie"
+    },
+    "Meng Tian -> Xin": {
+      "M": "Meng Tian -> Xin",
+      "D": "Menga Tiana -> Xina",
+      "C": "Mengowi Tianowi -> Xinowi",
+      "B": "Menga Tiana -> Xina",
+      "N": "Mengem Tianem -> Xinem",
+      "Ms": "Mengu Tianie -> Xinie",
+      "W": "Mengu Tianie -> Xinie"
+    },
+    "Xin -> Meng Tian": {
+      "M": "Xin -> Meng Tian",
+      "D": "Xina -> Menga Tiana",
+      "C": "Xinowi -> Mengowi Tianowi",
+      "B": "Xina -> Menga Tiana",
+      "N": "Xinem -> Mengem Tianem",
+      "Ms": "Xinie -> Mengu Tianie",
+      "W": "Xinie -> Mengu Tianie"
+    },
+    "Ding Yang -> Meng Tian": {
+      "M": "Ding Yang -> Meng Tian",
+      "D": "Dinga Yanga -> Menga Tiana",
+      "C": "Dingowi Yangowi -> Mengowi Tianowi",
+      "B": "Dinga Yanga -> Menga Tiana",
+      "N": "Dingem Yangem -> Mengem Tianem",
+      "Ms": "Dingu Yangu -> Mengu Tianie",
+      "W": "Dingu Yangu -> Mengu Tianie"
+    }
+  },
+  "plot_anchors": {}
 }

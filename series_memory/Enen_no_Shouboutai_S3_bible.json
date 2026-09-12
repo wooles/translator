@@ -1,6 +1,45 @@
 {
   "anime_title": "Enen no Shouboutai S3",
   "characters": {
+    "Shinra": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Haumea": {
+      "description": "KOBIETA (wyodrębniono z relacji serii)"
+    },
+    "Sho": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Obi": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Maki": {
+      "description": "KOBIETA (wyodrębniono z relacji serii)"
+    },
+    "Licht": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Vulcan": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Obywatele": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Arthur": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Charon": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Inca": {
+      "description": "KOBIETA (wyodrębniono z relacji serii)"
+    },
+    "Iris": {
+      "description": "KOBIETA (wyodrębniono z relacji serii)"
+    },
+    "Hibana": {
+      "description": "KOBIETA (wyodrębniono z relacji serii)"
+    },
     "Shinra -> Haumea": {
       "description": "Zwrot: 'na ty / Haumea' (zbawca -> uratowana kapłanka)"
     },
@@ -48,13 +87,13 @@
     "Fire Force / Fire Soldiers": "Specjalne Siły Pożarnicze",
     "The Great Cataclysm": "Wielki Kataklizm",
     "Evangelist": "Ewangelistka",
-    "Collective Unconscious": "zbiorowa podświadomość",
+    "Collective Unconscious": "zbiorowa nieświadomość",
     "Amaterasu": "Amaterasu",
     "Infernals": "Męczennicy",
     "Látom": "Látom",
-    "Great Cataclysm": "Wielki Kataklizmus",
+    "Great Cataclysm": "Wielki Kataklizm",
     "Pillar": "Filar",
-    "Collective unconscious": "Zbiorowa nieświadomość",
+    "Collective unconscious": "zbiorowa nieświadomość",
     "Pillars": "Filary",
     "Fire Soldier": "strażak",
     "Despair Saintess / Saint": "Święta Rozpaczy",
@@ -68,7 +107,22 @@
     "42-42-564": "42-42-564",
     "Excalibur": "Ekskalibur"
   },
-  "relationships": {},
+  "relationships": {
+    "Shinra -> Haumea": "Zwrot: 'na ty / Haumea' (zbawca -> uratowana kapłanka)",
+    "Sho -> Shinra": "Zwrot: 'bracie (Nii-san)' (młodszy brat -> starszy brat)",
+    "Shinra -> Sho": "Zwrot: 'Sho / braciszku' (starszy brat -> młodszy brat)",
+    "Shinra -> Obi": "Zwrot: 'Kapitanie Obi / Kapitan' (podwładny -> dowódca)",
+    "Maki -> Obi": "Zwrot: 'kapitanie' (podwładna -> dowódca)",
+    "Licht -> Vulcan": "Zwrot: 'Vulcan / po imieniu' (członkowie tego samego oddziału)",
+    "Licht -> Obi": "Zwrot: 'kapitanie / panie kapitanie' (podwładny -> dowódca)",
+    "Haumea -> Shinra": "Zwrot: 'Shinra Bansho Man / Boże' (antagonistka / wyznawczyni rozpaczy wobec zbawiciela)",
+    "Obi -> Obywatele": "Zwrot: 'proszę państwa / spokojnie' (kapitan Brygady -> cywile)",
+    "Arthur -> Shinra": "Zwrot: 'głupcze / diable / bohaterze' (rywal / przyjaciel)",
+    "Charon -> Haumea": "Zwrot: 'Haumea / mała' (oddany strażnik -> podopieczna)",
+    "Inca -> Shinra": "Zwrot: 'Shinra / Shinra-kun / Bohaterze' (natrętna adoratorka / rywalka -> zbawca)",
+    "Iris -> Shinra": "Zwrot: 'panie Shinra (Shinra-san)' (towarzysze broni / wzajemna sympatia)",
+    "Hibana -> Iris": "Zwrot: 'Iris / siostrzyczko' (starsza przybrana siostra -> młodsza siostra)"
+  },
   "episodes_translated": [
     "tmpowy5e9xz",
     "tmpp115zk2e",
@@ -77,5 +131,251 @@
     "tmpkszqixci",
     "tmp8jp2myh5",
     "tmph43s0kjf"
-  ]
+  ],
+  "declensions": {
+    "Shinra": {
+      "M": "Shinra",
+      "D": "Shinry",
+      "C": "Shinrze",
+      "B": "Shinrę",
+      "N": "Shinrą",
+      "Ms": "Shinrze",
+      "W": "Shinro"
+    },
+    "Haumea": {
+      "M": "Haumea",
+      "D": "Haumey",
+      "C": "Haumee",
+      "B": "Haumeę",
+      "N": "Haumeą",
+      "Ms": "Haumee",
+      "W": "Haumeo"
+    },
+    "Sho": {
+      "M": "Sho",
+      "D": "Sho",
+      "C": "Sho",
+      "B": "Sho",
+      "N": "Sho",
+      "Ms": "Sho",
+      "W": "Sho"
+    },
+    "Obi": {
+      "M": "Obi",
+      "D": "Obi",
+      "C": "Obi",
+      "B": "Obi",
+      "N": "Obi",
+      "Ms": "Obi",
+      "W": "Obi"
+    },
+    "Maki": {
+      "M": "Maki",
+      "D": "Maki",
+      "C": "Maki",
+      "B": "Maki",
+      "N": "Maki",
+      "Ms": "Maki",
+      "W": "Maki"
+    },
+    "Licht": {
+      "M": "Licht",
+      "D": "Lichta",
+      "C": "Lichtowi",
+      "B": "Lichta",
+      "N": "Lichtem",
+      "Ms": "Lichcie",
+      "W": "Lichcie"
+    },
+    "Vulcan": {
+      "M": "Vulcan",
+      "D": "Vulcana",
+      "C": "Vulcanowi",
+      "B": "Vulcana",
+      "N": "Vulcanem",
+      "Ms": "Vulcanie",
+      "W": "Vulcanie"
+    },
+    "Obywatele": {
+      "M": "Obywatele",
+      "D": "Obywatele",
+      "C": "Obywatele",
+      "B": "Obywatele",
+      "N": "Obywatele",
+      "Ms": "Obywatele",
+      "W": "Obywatele"
+    },
+    "Arthur": {
+      "M": "Arthur",
+      "D": "Arthura",
+      "C": "Arthurowi",
+      "B": "Arthura",
+      "N": "Arthurem",
+      "Ms": "Arthurze",
+      "W": "Arthurze"
+    },
+    "Charon": {
+      "M": "Charon",
+      "D": "Charona",
+      "C": "Charonowi",
+      "B": "Charona",
+      "N": "Charonem",
+      "Ms": "Charonie",
+      "W": "Charonie"
+    },
+    "Inca": {
+      "M": "Inca",
+      "D": "Inki",
+      "C": "Ince",
+      "B": "Inkę",
+      "N": "Inką",
+      "Ms": "Ince",
+      "W": "Inko"
+    },
+    "Iris": {
+      "M": "Iris",
+      "D": "Iris",
+      "C": "Iris",
+      "B": "Iris",
+      "N": "Iris",
+      "Ms": "Iris",
+      "W": "Iris"
+    },
+    "Hibana": {
+      "M": "Hibana",
+      "D": "Hibany",
+      "C": "Hibanie",
+      "B": "Hibanę",
+      "N": "Hibaną",
+      "Ms": "Hibanie",
+      "W": "Hibano"
+    },
+    "Shinra -> Haumea": {
+      "M": "Shinra -> Haumea",
+      "D": "Shinry -> Haumey",
+      "C": "Shinrze -> Haumee",
+      "B": "Shinrę -> Haumeę",
+      "N": "Shinrą -> Haumeą",
+      "Ms": "Shinrze -> Haumee",
+      "W": "Shinro -> Haumeo"
+    },
+    "Sho -> Shinra": {
+      "M": "Sho -> Shinra",
+      "D": "Sho -> Shinry",
+      "C": "Sho -> Shinrze",
+      "B": "Sho -> Shinrę",
+      "N": "Sho -> Shinrą",
+      "Ms": "Sho -> Shinrze",
+      "W": "Sho -> Shinro"
+    },
+    "Shinra -> Sho": {
+      "M": "Shinra -> Sho",
+      "D": "Shinry -> Sho",
+      "C": "Shinrze -> Sho",
+      "B": "Shinrę -> Sho",
+      "N": "Shinrą -> Sho",
+      "Ms": "Shinrze -> Sho",
+      "W": "Shinro -> Sho"
+    },
+    "Shinra -> Obi": {
+      "M": "Shinra -> Obi",
+      "D": "Shinry -> Obi",
+      "C": "Shinrze -> Obi",
+      "B": "Shinrę -> Obi",
+      "N": "Shinrą -> Obi",
+      "Ms": "Shinrze -> Obi",
+      "W": "Shinro -> Obi"
+    },
+    "Maki -> Obi": {
+      "M": "Maki -> Obi",
+      "D": "Maki -> Obi",
+      "C": "Maki -> Obi",
+      "B": "Maki -> Obi",
+      "N": "Maki -> Obi",
+      "Ms": "Maki -> Obi",
+      "W": "Maki -> Obi"
+    },
+    "Licht -> Vulcan": {
+      "M": "Licht -> Vulcan",
+      "D": "Lichta -> Vulcana",
+      "C": "Lichtowi -> Vulcanowi",
+      "B": "Lichta -> Vulcana",
+      "N": "Lichtem -> Vulcanem",
+      "Ms": "Lichcie -> Vulcanie",
+      "W": "Lichcie -> Vulcanie"
+    },
+    "Licht -> Obi": {
+      "M": "Licht -> Obi",
+      "D": "Lichta -> Obi",
+      "C": "Lichtowi -> Obi",
+      "B": "Lichta -> Obi",
+      "N": "Lichtem -> Obi",
+      "Ms": "Lichcie -> Obi",
+      "W": "Lichcie -> Obi"
+    },
+    "Haumea -> Shinra": {
+      "M": "Haumea -> Shinra",
+      "D": "Haumey -> Shinry",
+      "C": "Haumee -> Shinrze",
+      "B": "Haumeę -> Shinrę",
+      "N": "Haumeą -> Shinrą",
+      "Ms": "Haumee -> Shinrze",
+      "W": "Haumeo -> Shinro"
+    },
+    "Obi -> Obywatele": {
+      "M": "Obi -> Obywatele",
+      "D": "Obi -> Obywatele",
+      "C": "Obi -> Obywatele",
+      "B": "Obi -> Obywatele",
+      "N": "Obi -> Obywatele",
+      "Ms": "Obi -> Obywatele",
+      "W": "Obi -> Obywatele"
+    },
+    "Arthur -> Shinra": {
+      "M": "Arthur -> Shinra",
+      "D": "Arthura -> Shinry",
+      "C": "Arthurowi -> Shinrze",
+      "B": "Arthura -> Shinrę",
+      "N": "Arthurem -> Shinrą",
+      "Ms": "Arthurze -> Shinrze",
+      "W": "Arthurze -> Shinro"
+    },
+    "Charon -> Haumea": {
+      "M": "Charon -> Haumea",
+      "D": "Charon -> Haumey",
+      "C": "Charon -> Haumee",
+      "B": "Charon -> Haumeę",
+      "N": "Charon -> Haumeą",
+      "Ms": "Charon -> Haumee",
+      "W": "Charon -> Haumeo"
+    },
+    "Inca -> Shinra": {
+      "M": "Inca -> Shinra",
+      "D": "Inki -> Shinry",
+      "C": "Ince -> Shinrze",
+      "B": "Inkę -> Shinrę",
+      "N": "Inką -> Shinrą",
+      "Ms": "Ince -> Shinrze",
+      "W": "Inko -> Shinro"
+    },
+    "Iris -> Shinra": {
+      "M": "Iris -> Shinra",
+      "D": "Iris -> Shinry",
+      "C": "Iris -> Shinrze",
+      "B": "Iris -> Shinrę",
+      "N": "Iris -> Shinrą",
+      "Ms": "Iris -> Shinrze",
+      "W": "Iris -> Shinro"
+    },
+    "Hibana -> Iris": {
+      "M": "Hibana -> Iris",
+      "D": "Hibany -> Iris",
+      "C": "Hibanie -> Iris",
+      "B": "Hibanę -> Iris",
+      "N": "Hibaną -> Iris",
+      "Ms": "Hibanie -> Iris",
+      "W": "Hibano -> Iris"
+    }
+  },
+  "plot_anchors": {}
 }

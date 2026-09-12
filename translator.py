@@ -917,7 +917,7 @@ def clean_orphaned_dialogue_dashes(text: str) -> str:
     ts_prefix, clean_body = extract_typesetting_tags(text)
 
     # In-line dual speaker turn (e.g. "Gratulacje... - Rozpacz po przegranej...")
-    dual_turn_match = re.match(r"^[-–—]?\s*(.+?(?:[.!?…]+|\]|\))\s*)[-–—]\s*([A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż…\[].+)$", clean_body)
+    dual_turn_match = re.match(r"^[-–—]?\s*(.+?(?:[.!?…]+|\]|\))\s*)[-–—]\s*((?:\{[^\}]*\})*[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż…\[].+)$", clean_body, re.DOTALL)
     if dual_turn_match:
         p1 = re.sub(r"^[-–—]\s*", "", dual_turn_match.group(1)).strip()
         p2 = re.sub(r"^[-–—]\s*", "", dual_turn_match.group(2)).strip()
@@ -2881,10 +2881,8 @@ class MultimodalTranslator:
 
         is_ass = not str(subs_file).lower().endswith(".srt")
 
-        try:
-            subs = pysubs2.load(str(subs_file), encoding="utf-8")
-        except UnicodeDecodeError:
-            subs = pysubs2.load(str(subs_file), encoding="latin2")
+        from avt_linter import load_subtitle_file_resilient
+        subs = load_subtitle_file_resilient(subs_file)
 
         # Initialize StyleMatrixEngine for geometric and semantic ASS classification
         from style_matrix import analyze_subtitles
@@ -3127,12 +3125,19 @@ class MultimodalTranslator:
                     if cba.term_or_event and cba.continuity_directive:
                         plot_anchors_dict[cba.term_or_event] = cba.continuity_directive
 
+            rels_dict = {}
+            if getattr(episode_profile, "character_relationships", None):
+                for rel in episode_profile.character_relationships:
+                    if rel.speaker and rel.listener:
+                        rels_dict[f"{rel.speaker}->{rel.listener}"] = f"{rel.address_form} ({rel.relationship_type})"
+
             ref_name = Path(video_path).stem if video_path else (Path(subs_path).stem if subs_path else "Odcinek")
             self.series_bible.update_from_episode_profile(
                 episode_name=ref_name,
                 characters=char_dict,
                 glossary=gloss_dict,
-                plot_anchors=plot_anchors_dict
+                plot_anchors=plot_anchors_dict,
+                relationships=rels_dict
             )
 
         # 0c. Match Official Polish Manga Canon

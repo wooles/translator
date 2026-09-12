@@ -1,29 +1,134 @@
 {
   "anime_title": "Nige Jouzu no Wakagimi S2",
   "characters": {
+    "Yorishige Suwa": {
+      "description": "mężczyzna (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Tokiyuki Hōjō": {
+      "description": "mężczyzna (10 lat, prawowity dziedzic siogunatu Kamakura, incognito w Kioto jako Chojumaru.) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Yukiyasu Unno": {
+      "description": "mężczyzna (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Tomomitsu Inukai": {
+      "description": "mężczyzna (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Mochizuki / Shinomiya / Nezu": {
+      "description": "mężczyzna (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Ayako": {
+      "description": "kobieta (Postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Lord Mochizuki": {
+      "description": "mężczyzna (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Muneie Tokoiwa / Mochizuki": {
+      "description": "mężczyzna (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Sadamune Ogasawara": {
+      "description": "mężczyzna (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Tokiyuki i towarzysze": {
+      "description": "mężczyzna (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Sadamune Ogasawara / Tokiyuki": {
+      "description": "mężczyzna (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Tokiyuki Hojo": {
+      "description": "mężczyzna (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Mochizuki / Shinomiya": {
+      "description": "mężczyzna (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Cesarz Go-Daigo": {
+      "description": "mężczyzna (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Kiyohara": {
+      "description": "mężczyzna (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Mochizuki": {
+      "description": "kobieta (Postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Shokan": {
+      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Chojumaru": {
+      "description": "mężczyzna (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Tokiyuki Suwa": {
+      "description": "mężczyzna (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Sojusznicy / Mochizuki": {
+      "description": "kobieta (Postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Gubernator Kiyohara": {
+      "description": "mężczyzna (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Ród Shinomiya": {
+      "description": "mężczyzna (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Yoritsugu": {
+      "description": "mężczyzna (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Tokiyuki": {
+      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Yorishige": {
+      "description": "mężczyzna (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Moritaka": {
+      "description": "mężczyzna (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Yasuie Hōjō": {
+      "description": "mężczyzna (Dorosły wojownik, stryj Tokiyukiego, zbiegły obrońca Kamakury, przywódca spisku w przebraniu cieśli.) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Genba Kazama": {
+      "description": "mężczyzna (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Fubuki": {
+      "description": "mężczyzna (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Suwa Yorishige": {
+      "description": "mężczyzna (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Shizuku": {
+      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Mima Sasaki": {
+      "description": "kobieta (Postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Kojiro": {
+      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Yasuie": {
+      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Kinmune Saionji": {
+      "description": "kobieta (Postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
     "Yorishige Suwa -> Tokiyuki Hōjō": {
-      "description": "Zwrot: 'Panie Tokiyuki / Młody Panie' (opiekun i boski kapłan -> młody dziedzic rodu Hōjō)"
+      "description": "Zwrot: 'Panie Tokiyuki / Młody Panie' (opiekun i boski kapłan -> młody dziedzic rodu Hōjō) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Tokiyuki Hōjō -> Yorishige Suwa": {
-      "description": "Zwrot: 'Panie Yorishige' (młody pan -> opiekun i doradca)"
+      "description": "Zwrot: 'Panie Yorishige' (młody pan -> opiekun i doradca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Yukiyasu Unno -> Tokiyuki Hōjō (Chōjūmaru)": {
-      "description": "Zwrot: 'Chōjūmaru' (generał Suwy -> młody posłaniec pod ukrytym imieniem)"
+      "description": "Zwrot: 'Chōjūmaru' (generał Suwy -> młody posłaniec pod ukrytym imieniem) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Tomomitsu Inukai -> Tokiyuki Hōjō (Chōjūmaru)": {
-      "description": "Zwrot: 'Młody kurierze / Chōjūmaru' (zarządca fortu -> posłaniec)"
+      "description": "Zwrot: 'Młody kurierze / Chōjūmaru' (zarządca fortu -> posłaniec) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Tokiyuki Hōjō (Chojumaru) -> Mochizuki / Shinomiya / Nezu": {
       "description": "Zwrot: 'panie Mochizuki / panie Shinomiya / panie Nezu' (młody dziedzic rodu Hōjō (incognito jako łącznik) -> feudalni dowódcy)"
     },
     "Ayako -> Lord Mochizuki": {
-      "description": "Zwrot: 'Ojcze / panie ojcze' (córka -> ojciec (dowódca rodu Mochizuki))"
+      "description": "Zwrot: 'Ojcze / panie ojcze' (córka -> ojciec (dowódca rodu Mochizuki)) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Muneie Tokoiwa / Mochizuki -> Tokiyuki Hōjō (Chojumaru)": {
       "description": "Zwrot: 'Młody Panie / dzieciaku / Chojumaru' (feudalny dowódca -> pan feudalny / łącznik)"
     },
     "Sadamune Ogasawara -> Tokiyuki i towarzysze": {
-      "description": "Zwrot: 'bachorze / wy / szczury' (wrogi gubernator / dowódca -> Tokiyuki i jego Drużyna Nieuchwytnych)"
+      "description": "Zwrot: 'bachorze / wy / szczury' (wrogi gubernator / dowódca -> Tokiyuki i jego Drużyna Nieuchwytnych) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Yorishige Suwa (Maska Shinano) -> Sadamune Ogasawara / Tokiyuki": {
       "description": "Zwrot: 'Sadamune / Młody Panie' (boski opiekun i kapłan -> wrogi dowódca / podopieczny)"
@@ -32,67 +137,130 @@
       "description": "Zwrot: 'panie Mochizuki / panie Shinomiya' (młody pan / dziedzic -> dowódcy i wasale)"
     },
     "Cesarz Go-Daigo -> Kiyohara": {
-      "description": "Zwrot: 'Kiyoharo' (cesarz -> poddany / urzędnik dworski)"
+      "description": "Zwrot: 'Kiyoharo' (cesarz -> poddany / urzędnik dworski) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Kiyohara -> Cesarz Go-Daigo": {
-      "description": "Zwrot: 'Wasza Cesarska Mość / Panie' (urzędnik -> cesarz)"
+      "description": "Zwrot: 'Wasza Cesarska Mość / Panie' (urzędnik -> cesarz) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Mochizuki -> Tokiyuki Hojo": {
-      "description": "Zwrot: 'młody panie / panie Tokiyuki' (generał Suwa -> młody pan)"
+      "description": "Zwrot: 'młody panie / panie Tokiyuki' (generał Suwa -> młody pan) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Shokan -> Chojumaru": {
-      "description": "Zwrot: 'na ty / Chojumaru' (dowódca / strateg -> podwładny)"
+      "description": "Zwrot: 'na ty / Chojumaru' (dowódca / strateg -> podwładny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]"
     },
     "Tokiyuki Suwa -> Sojusznicy / Mochizuki": {
       "description": "Zwrot: 'młody panie / panie Mochizuki' (młody dziedzic -> dowódcy i wasale)"
     },
     "Gubernator Kiyohara -> Cesarz Go-Daigo": {
-      "description": "Zwrot: 'Wasza Cesarska Mość' (urzędnik cesarski -> cesarz)"
+      "description": "Zwrot: 'Wasza Cesarska Mość' (urzędnik cesarski -> cesarz) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Mochizuki -> Ród Shinomiya": {
-      "description": "Zwrot: 'panie Shinomiya' (jeden z Trzech Wielkich Generałów -> sojusznicze rody)"
+      "description": "Zwrot: 'panie Shinomiya' (jeden z Trzech Wielkich Generałów -> sojusznicze rody) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Shokan -> Sadamune Ogasawara": {
-      "description": "Zwrot: 'panie Sadamune' (strateg -> sojuszniczy dowódca)"
+      "description": "Zwrot: 'panie Sadamune' (strateg -> sojuszniczy dowódca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Yoritsugu -> Tokiyuki": {
-      "description": "Zwrot: 'Tokiyuki / Panicz Tokiyuki' (rywalizujący rówieśnicy, młodzi dziedzice)"
+      "description": "Zwrot: 'Tokiyuki / Panicz Tokiyuki' (rywalizujący rówieśnicy, młodzi dziedzice) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Tokiyuki -> Yoritsugu": {
-      "description": "Zwrot: 'Yoritsugu / Panie Yoritsugu' (młodzi panowie, próba nawiązania przyjaźni)"
+      "description": "Zwrot: 'Yoritsugu / Panie Yoritsugu' (młodzi panowie, próba nawiązania przyjaźni) [GRUPA MĘŻCZYZN - Wymóg rodzaju męskoosobowego: -liście / byliście gotowi]"
     },
     "Yorishige -> Tokiyuki": {
-      "description": "Zwrot: 'Panicz Tokiyuki' (opiekun i boski protektor -> młody dziedzic rodu Hojo)"
+      "description": "Zwrot: 'Panicz Tokiyuki' (opiekun i boski protektor -> młody dziedzic rodu Hojo) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Moritaka -> Tokiyuki": {
-      "description": "Zwrot: 'Panicz Tokiyuki' (poddany wojownik -> młody pan)"
+      "description": "Zwrot: 'Panicz Tokiyuki' (poddany wojownik -> młody pan) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Tokiyuki Hōjō -> Yasuie Hōjō": {
-      "description": "Zwrot: 'Wuju / Wuju Yasuie' (bratanek -> wuj)"
+      "description": "Zwrot: 'wuju / panie Yasuie' (bratanek -> stryj wojownik) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Yasuie Hōjō -> Tokiyuki Hōjō": {
-      "description": "Zwrot: 'panie Tokiyuki' (wuj -> młody pan / głowa rodu)"
+      "description": "Zwrot: 'panie Tokiyuki' (wuj -> młody pan / głowa rodu) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Genba Kazama -> Fubuki": {
-      "description": "Zwrot: 'na ty / Fubuki' (towarzysze broni)"
+      "description": "Zwrot: 'na ty / Fubuki' (towarzysze broni) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Suwa Yorishige -> Tokiyuki Hōjō": {
-      "description": "Zwrot: 'panie Tokiyuki' (opiekuńczy kapłan -> młody dziedzic)"
+      "description": "Zwrot: 'panie Tokiyuki' (opiekuńczy kapłan -> młody dziedzic) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Shizuku -> Tokiyuki Houjou (Chojumaru)": {
-      "description": "Zwrot: 'Młody panie / Panie Tokiyuki (gdy w audio Waka/Waka-sama)' lub 'Bracie' (WYŁĄCZNIE gdy w audio seiyuu mówi Aniki/Aniue). ZAKAZ tłumaczenia 'Waka' jako 'bracie'!"
+      "description": "Zwrot: 'Młody panie / Panie Tokiyuki (gdy w audio Waka/Waka-sama)' lub 'Bracie' (WYŁĄCZNIE gdy w audio seiyuu mówi Aniki/Aniue). ZAKAZ tłumaczenia 'Waka' jako 'bracie'! [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Mima Sasaki -> Tokiyuki Houjou (Chojumaru)": {
-      "description": "Zwrot: 'chłopcze / mały / ty' (wyniosła córka feudała -> zafascynowana protektorka)"
+      "description": "Zwrot: 'chłopcze / mały / ty' (wyniosła córka feudała -> zafascynowana protektorka) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Mima Sasaki -> Shizuku": {
-      "description": "Zwrot: 'wiejska kapłanko / panienko ze wsi' (hazardowa rywalka z pogardzanego prowincjonalnego chramu)"
+      "description": "Zwrot: 'wiejska kapłanko / panienko ze wsi' (hazardowa rywalka z pogardzanego prowincjonalnego chramu) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Kojiro -> Tokiyuki Houjou (Chojumaru)": {
-      "description": "Zwrot: 'Młody panie / Panie' (gdy w audio Waka/Waka-sama) lub 'Chojumaru'. KATEGORYCZNY ZAKAZ tłumaczenia 'Waka' jako 'bracie', nawet w miejscach publicznych (jeśli Kojiro mówi Waka, to odruchowa wpadka, którą należy zachować)!"
+      "description": "Zwrot: 'Młody panie / Panie' (gdy w audio Waka/Waka-sama) lub 'Chojumaru'. KATEGORYCZNY ZAKAZ tłumaczenia 'Waka' jako 'bracie', nawet w miejscach publicznych (jeśli Kojiro mówi Waka, to odruchowa wpadka, którą należy zachować)! [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Yasuie -> Kinmune Saionji": {
-      "description": "Zwrot: 'Wielki Radco / Panie Kinmune' (spiskowiec z Kamakury i dworski dostojnik cesarski)"
+      "description": "Zwrot: 'Wielki Radco / Panie Kinmune' (spiskowiec z Kamakury i dworski dostojnik cesarski) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Genba Kazama -> Yasuie Hōjō": {
+      "description": "Zwrot: 'szefie / panie Yasuie' (shinobi/złodziej -> wuj młodego pana Tokiyukiego) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Tokiyuki Hōjō -> Masashige Kusunoki": {
+      "description": "Zwrot: 'panie Kusunoki / panie Masashige' (uczeń/młodzieniec -> legendarny wódz)"
+    },
+    "Masashige Kusunoki": {
+      "description": "KOBIETA (wyodrębniono z relacji serii)"
+    },
+    "Masashige Kusunoki -> Tokiyuki Hōjō": {
+      "description": "Zwrot: 'chłopcze / młodzieńcze (na ty)' (mistrz taktyki -> tajemniczy chłopak) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]"
+    },
+    "Kojiro -> Tokiyuki Hōjō": {
+      "description": "Zwrot: 'panie Tokiyuki / mój panie (Waka-sama)' (wasal -> młody pan) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Shizuku -> Mima": {
+      "description": "Zwrot: 'Mima / na ty' (znajome rówieśniczki w Kyo) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Mima": {
+      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Mima -> Tokiyuki Hōjō": {
+      "description": "Zwrot: 'chłopcze / mały' (miejska arystokratka -> tajemniczy chłopak z prowincji) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Shinomiya": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Nezu": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Muneie Tokoiwa": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Sojusznicy": {
+      "description": "KOBIETA (wyodrębniono z relacji serii) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Tokiyuki Hōjō (Chojumaru) -> Mochizuki": {
+      "description": "Zwrot: 'panie Mochizuki / panie Shinomiya / panie Nezu' (młody dziedzic rodu Hōjō (incognito jako łącznik) -> feudalni dowódcy)"
+    },
+    "Mochizuki -> Tokiyuki Hōjō (Chojumaru)": {
+      "description": "Zwrot: 'Młody Panie / dzieciaku / Chojumaru' (feudalny dowódca -> pan feudalny / łącznik) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Yorishige Suwa (Maska Shinano) -> Sadamune Ogasawara": {
+      "description": "Zwrot: 'Sadamune / Młody Panie' (boski opiekun i kapłan -> wrogi dowódca / podopieczny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Tokiyuki Hojo -> Mochizuki": {
+      "description": "Zwrot: 'panie Mochizuki / panie Shinomiya' (młody pan / dziedzic -> dowódcy i wasale)"
+    },
+    "Tokiyuki Suwa -> Sojusznicy": {
+      "description": "Zwrot: 'młody panie / panie Mochizuki' (młody dziedzic -> dowódcy i wasale) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Takauji Ashikaga": {
+      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Genba": {
+      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Tamonmaru": {
+      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Doyo Sasaki": {
+      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     }
   },
   "glossary": {
@@ -124,7 +292,7 @@
     "Mikoshi / Battle Mikoshi": "Mikoshi",
     "Provincial Official / Kokushi": "Gubernator prowincji",
     "Emperor Godaigo": "Cesarz Go-Daigo",
-    "Elusive Warriors": "Uciekający Wojownicy",
+    "Elusive Warriors": "Arcymistrzowie Ucieczki",
     "Battle mikoshi": "bojowa mikoshi",
     "Provincial Official (Kokushi)": "gubernator prowincji",
     "Suwa Myojin": "Suwa Myōjin",
@@ -134,7 +302,7 @@
     "Holy Pillar": "Święty Pal",
     "Ashikaga School": "Szkoła Ashikaga",
     "Tengu": "Tengu",
-    "Taiheiki": "Kronika Taiheiki",
+    "Taiheiki": "Taiheiki (w kontekście: Kronika Taiheiki)",
     "Post town": "Miasteczko stacyjne",
     "Kyo": "Kyo",
     "Basara": "Basara",
@@ -143,9 +311,757 @@
     "Willow (game)": "Wierzbina",
     "Holy power": "Moc sakralna",
     "Major Counselor": "Wielki Radca",
-    "Mount Hiei": "Góra Hiei"
+    "Mount Hiei": "Góra Hiei",
+    "Nozawana": "nozawana (kiszona rzepa z Shinano)",
+    "God of War": "Bóg Wojny",
+    "Kusunoki style": "styl Kusunokiego",
+    "Golden Pavilion": "Złoty Pawilon",
+    "artery slash": "cięcie tętnicze"
   },
-  "relationships": {},
+  "relationships": {
+    "Yorishige Suwa -> Tokiyuki Hōjō": "Zwrot: 'Panie Tokiyuki / Młody Panie' (opiekun i boski kapłan -> młody dziedzic rodu Hōjō) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Tokiyuki Hōjō -> Yorishige Suwa": "Zwrot: 'Panie Yorishige' (młody pan -> opiekun i doradca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Yukiyasu Unno -> Tokiyuki Hōjō (Chōjūmaru)": "Zwrot: 'Chōjūmaru' (generał Suwy -> młody posłaniec pod ukrytym imieniem) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Tomomitsu Inukai -> Tokiyuki Hōjō (Chōjūmaru)": "Zwrot: 'Młody kurierze / Chōjūmaru' (zarządca fortu -> posłaniec) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Tokiyuki Hōjō (Chojumaru) -> Mochizuki / Shinomiya / Nezu": "Zwrot: 'panie Mochizuki / panie Shinomiya / panie Nezu' (młody dziedzic rodu Hōjō (incognito jako łącznik) -> feudalni dowódcy)",
+    "Ayako -> Lord Mochizuki": "Zwrot: 'Ojcze / panie ojcze' (córka -> ojciec (dowódca rodu Mochizuki)) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Muneie Tokoiwa / Mochizuki -> Tokiyuki Hōjō (Chojumaru)": "Zwrot: 'Młody Panie / dzieciaku / Chojumaru' (feudalny dowódca -> pan feudalny / łącznik)",
+    "Sadamune Ogasawara -> Tokiyuki i towarzysze": "Zwrot: 'bachorze / wy / szczury' (wrogi gubernator / dowódca -> Tokiyuki i jego Drużyna Nieuchwytnych) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Yorishige Suwa (Maska Shinano) -> Sadamune Ogasawara / Tokiyuki": "Zwrot: 'Sadamune / Młody Panie' (boski opiekun i kapłan -> wrogi dowódca / podopieczny)",
+    "Tokiyuki Hojo -> Mochizuki / Shinomiya": "Zwrot: 'panie Mochizuki / panie Shinomiya' (młody pan / dziedzic -> dowódcy i wasale)",
+    "Cesarz Go-Daigo -> Kiyohara": "Zwrot: 'Kiyoharo' (cesarz -> poddany / urzędnik dworski) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Kiyohara -> Cesarz Go-Daigo": "Zwrot: 'Wasza Cesarska Mość / Panie' (urzędnik -> cesarz) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Mochizuki -> Tokiyuki Hojo": "Zwrot: 'młody panie / panie Tokiyuki' (generał Suwa -> młody pan) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Shokan -> Chojumaru": "Zwrot: 'na ty / Chojumaru' (dowódca / strateg -> podwładny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Tokiyuki Suwa -> Sojusznicy / Mochizuki": "Zwrot: 'młody panie / panie Mochizuki' (młody dziedzic -> dowódcy i wasale)",
+    "Gubernator Kiyohara -> Cesarz Go-Daigo": "Zwrot: 'Wasza Cesarska Mość' (urzędnik cesarski -> cesarz) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Mochizuki -> Ród Shinomiya": "Zwrot: 'panie Shinomiya' (jeden z Trzech Wielkich Generałów -> sojusznicze rody) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Shokan -> Sadamune Ogasawara": "Zwrot: 'panie Sadamune' (strateg -> sojuszniczy dowódca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Yoritsugu -> Tokiyuki": "Zwrot: 'Tokiyuki / Panicz Tokiyuki' (rywalizujący rówieśnicy, młodzi dziedzice) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Tokiyuki -> Yoritsugu": "Zwrot: 'Yoritsugu / Panie Yoritsugu' (młodzi panowie, próba nawiązania przyjaźni) [GRUPA MĘŻCZYZN - Wymóg rodzaju męskoosobowego: -liście / byliście gotowi]",
+    "Yorishige -> Tokiyuki": "Zwrot: 'Panicz Tokiyuki' (opiekun i boski protektor -> młody dziedzic rodu Hojo) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Moritaka -> Tokiyuki": "Zwrot: 'Panicz Tokiyuki' (poddany wojownik -> młody pan) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Tokiyuki Hōjō -> Yasuie Hōjō": "Zwrot: 'wuju / panie Yasuie' (bratanek -> stryj wojownik) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Yasuie Hōjō -> Tokiyuki Hōjō": "Zwrot: 'panie Tokiyuki' (wuj -> młody pan / głowa rodu) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Genba Kazama -> Fubuki": "Zwrot: 'na ty / Fubuki' (towarzysze broni) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Suwa Yorishige -> Tokiyuki Hōjō": "Zwrot: 'panie Tokiyuki' (opiekuńczy kapłan -> młody dziedzic) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Shizuku -> Tokiyuki Houjou (Chojumaru)": "Zwrot: 'Młody panie / Panie Tokiyuki (gdy w audio Waka/Waka-sama)' lub 'Bracie' (WYŁĄCZNIE gdy w audio seiyuu mówi Aniki/Aniue). ZAKAZ tłumaczenia 'Waka' jako 'bracie'! [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Mima Sasaki -> Tokiyuki Houjou (Chojumaru)": "Zwrot: 'chłopcze / mały / ty' (wyniosła córka feudała -> zafascynowana protektorka) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Mima Sasaki -> Shizuku": "Zwrot: 'wiejska kapłanko / panienko ze wsi' (hazardowa rywalka z pogardzanego prowincjonalnego chramu) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Kojiro -> Tokiyuki Houjou (Chojumaru)": "Zwrot: 'Młody panie / Panie' (gdy w audio Waka/Waka-sama) lub 'Chojumaru'. KATEGORYCZNY ZAKAZ tłumaczenia 'Waka' jako 'bracie', nawet w miejscach publicznych (jeśli Kojiro mówi Waka, to odruchowa wpadka, którą należy zachować)! [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Yasuie -> Kinmune Saionji": "Zwrot: 'Wielki Radco / Panie Kinmune' (spiskowiec z Kamakury i dworski dostojnik cesarski) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Genba Kazama -> Yasuie Hōjō": "Zwrot: 'szefie / panie Yasuie' (shinobi/złodziej -> wuj młodego pana Tokiyukiego) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Tokiyuki Hōjō -> Masashige Kusunoki": "Zwrot: 'panie Kusunoki / panie Masashige' (uczeń/młodzieniec -> legendarny wódz)",
+    "Masashige Kusunoki -> Tokiyuki Hōjō": "Zwrot: 'chłopcze / młodzieńcze (na ty)' (mistrz taktyki -> tajemniczy chłopak) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Kojiro -> Tokiyuki Hōjō": "Zwrot: 'panie Tokiyuki / mój panie (Waka-sama)' (wasal -> młody pan) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Shizuku -> Mima": "Zwrot: 'Mima / na ty' (znajome rówieśniczki w Kyo) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Mima -> Tokiyuki Hōjō": "Zwrot: 'chłopcze / mały' (miejska arystokratka -> tajemniczy chłopak z prowincji) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Tokiyuki Hōjō (Chojumaru) -> Mochizuki": "Zwrot: 'panie Mochizuki / panie Shinomiya / panie Nezu' (młody dziedzic rodu Hōjō (incognito jako łącznik) -> feudalni dowódcy)",
+    "Mochizuki -> Tokiyuki Hōjō (Chojumaru)": "Zwrot: 'Młody Panie / dzieciaku / Chojumaru' (feudalny dowódca -> pan feudalny / łącznik) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Yorishige Suwa (Maska Shinano) -> Sadamune Ogasawara": "Zwrot: 'Sadamune / Młody Panie' (boski opiekun i kapłan -> wrogi dowódca / podopieczny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Tokiyuki Hojo -> Mochizuki": "Zwrot: 'panie Mochizuki / panie Shinomiya' (młody pan / dziedzic -> dowódcy i wasale)",
+    "Tokiyuki Suwa -> Sojusznicy": "Zwrot: 'młody panie / panie Mochizuki' (młody dziedzic -> dowódcy i wasale) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+  },
+  "declensions": {
+    "Yorishige Suwa": {
+      "M": "Yorishige Suwa",
+      "D": "Yorishige Suwy",
+      "C": "Yorishige Suwie",
+      "B": "Yorishige Suwę",
+      "N": "Yorishige Suwą",
+      "Ms": "Yorishige Suwie",
+      "W": "Yorishige Suwo"
+    },
+    "Tokiyuki Hōjō": {
+      "M": "Tokiyuki Hōjō",
+      "D": "Tokiyuki Hōjōa",
+      "C": "Tokiyuki Hōjōowi",
+      "B": "Tokiyuki Hōjōa",
+      "N": "Tokiyuki Hōjōem",
+      "Ms": "Tokiyuki Hōjōie",
+      "W": "Tokiyuki Hōjōie"
+    },
+    "Yukiyasu Unno": {
+      "M": "Yukiyasu Unno",
+      "D": "Yukiyasu Unno",
+      "C": "Yukiyasu Unno",
+      "B": "Yukiyasu Unno",
+      "N": "Yukiyasu Unno",
+      "Ms": "Yukiyasu Unno",
+      "W": "Yukiyasu Unno"
+    },
+    "Tomomitsu Inukai": {
+      "M": "Tomomitsu Inukai",
+      "D": "Tomomitsu Inukai",
+      "C": "Tomomitsu Inukai",
+      "B": "Tomomitsu Inukai",
+      "N": "Tomomitsu Inukai",
+      "Ms": "Tomomitsu Inukai",
+      "W": "Tomomitsu Inukai"
+    },
+    "Mochizuki / Shinomiya / Nezu": {
+      "M": "Mochizuki / Shinomiya / Nezu",
+      "D": "Mochizuki / Shinomiyy / Nezu",
+      "C": "Mochizuki / Shinomiye / Nezu",
+      "B": "Mochizuki / Shinomiyę / Nezu",
+      "N": "Mochizuki / Shinomiyą / Nezu",
+      "Ms": "Mochizuki / Shinomiye / Nezu",
+      "W": "Mochizuki / Shinomiyo / Nezu"
+    },
+    "Ayako": {
+      "M": "Ayako",
+      "D": "Ayako",
+      "C": "Ayako",
+      "B": "Ayako",
+      "N": "Ayako",
+      "Ms": "Ayako",
+      "W": "Ayako"
+    },
+    "Lord Mochizuki": {
+      "M": "Lord Mochizuki",
+      "D": "Lorda Mochizuki",
+      "C": "Lordowi Mochizuki",
+      "B": "Lorda Mochizuki",
+      "N": "Lordem Mochizuki",
+      "Ms": "Lordzie Mochizuki",
+      "W": "Lordzie Mochizuki"
+    },
+    "Muneie Tokoiwa / Mochizuki": {
+      "M": "Muneie Tokoiwa / Mochizuki",
+      "D": "Muneie Tokoiwy / Mochizuki",
+      "C": "Muneie Tokoiwe / Mochizuki",
+      "B": "Muneie Tokoiwę / Mochizuki",
+      "N": "Muneie Tokoiwą / Mochizuki",
+      "Ms": "Muneie Tokoiwe / Mochizuki",
+      "W": "Muneie Tokoiwo / Mochizuki"
+    },
+    "Sadamune Ogasawara": {
+      "M": "Sadamune Ogasawara",
+      "D": "Sadamune Ogasawary",
+      "C": "Sadamune Ogasawarze",
+      "B": "Sadamune Ogasawarę",
+      "N": "Sadamune Ogasawarą",
+      "Ms": "Sadamune Ogasawarze",
+      "W": "Sadamune Ogasawaro"
+    },
+    "Tokiyuki i towarzysze": {
+      "M": "Tokiyuki i towarzysze",
+      "D": "Tokiyuki i towarzysze",
+      "C": "Tokiyuki i towarzysze",
+      "B": "Tokiyuki i towarzysze",
+      "N": "Tokiyuki i towarzysze",
+      "Ms": "Tokiyuki i towarzysze",
+      "W": "Tokiyuki i towarzysze"
+    },
+    "Sadamune Ogasawara / Tokiyuki": {
+      "M": "Sadamune Ogasawara / Tokiyuki",
+      "D": "Sadamune Ogasawary / Tokiyuki",
+      "C": "Sadamune Ogasawarze / Tokiyuki",
+      "B": "Sadamune Ogasawarę / Tokiyuki",
+      "N": "Sadamune Ogasawarą / Tokiyuki",
+      "Ms": "Sadamune Ogasawarze / Tokiyuki",
+      "W": "Sadamune Ogasawaro / Tokiyuki"
+    },
+    "Tokiyuki Hojo": {
+      "M": "Tokiyuki Hojo",
+      "D": "Tokiyuki Hojo",
+      "C": "Tokiyuki Hojo",
+      "B": "Tokiyuki Hojo",
+      "N": "Tokiyuki Hojo",
+      "Ms": "Tokiyuki Hojo",
+      "W": "Tokiyuki Hojo"
+    },
+    "Mochizuki / Shinomiya": {
+      "M": "Mochizuki / Shinomiya",
+      "D": "Mochizuki / Shinomiyy",
+      "C": "Mochizuki / Shinomiye",
+      "B": "Mochizuki / Shinomiyę",
+      "N": "Mochizuki / Shinomiyą",
+      "Ms": "Mochizuki / Shinomiye",
+      "W": "Mochizuki / Shinomiyo"
+    },
+    "Cesarz Go-Daigo": {
+      "M": "Cesarz Go-Daigo",
+      "D": "Cesarza Go-Daigo",
+      "C": "Cesarzowi Go-Daigo",
+      "B": "Cesarza Go-Daigo",
+      "N": "Cesarzem Go-Daigo",
+      "Ms": "Cesarzu Go-Daigo",
+      "W": "Cesarzu Go-Daigo"
+    },
+    "Kiyohara": {
+      "M": "Kiyohara",
+      "D": "Kiyohary",
+      "C": "Kiyoharze",
+      "B": "Kiyoharę",
+      "N": "Kiyoharą",
+      "Ms": "Kiyoharze",
+      "W": "Kiyoharo"
+    },
+    "Mochizuki": {
+      "M": "Mochizuki",
+      "D": "Mochizuki",
+      "C": "Mochizuki",
+      "B": "Mochizuki",
+      "N": "Mochizuki",
+      "Ms": "Mochizuki",
+      "W": "Mochizuki"
+    },
+    "Shokan": {
+      "M": "Shokan",
+      "D": "Shokana",
+      "C": "Shokanowi",
+      "B": "Shokana",
+      "N": "Shokanem",
+      "Ms": "Shokanie",
+      "W": "Shokanie"
+    },
+    "Chojumaru": {
+      "M": "Chojumaru",
+      "D": "Chojumaru",
+      "C": "Chojumaru",
+      "B": "Chojumaru",
+      "N": "Chojumaru",
+      "Ms": "Chojumaru",
+      "W": "Chojumaru"
+    },
+    "Tokiyuki Suwa": {
+      "M": "Tokiyuki Suwa",
+      "D": "Tokiyuki Suwy",
+      "C": "Tokiyuki Suwie",
+      "B": "Tokiyuki Suwę",
+      "N": "Tokiyuki Suwą",
+      "Ms": "Tokiyuki Suwie",
+      "W": "Tokiyuki Suwo"
+    },
+    "Sojusznicy / Mochizuki": {
+      "M": "Sojusznicy / Mochizuki",
+      "D": "Sojusznicy / Mochizuki",
+      "C": "Sojusznicy / Mochizuki",
+      "B": "Sojusznicy / Mochizuki",
+      "N": "Sojusznicy / Mochizuki",
+      "Ms": "Sojusznicy / Mochizuki",
+      "W": "Sojusznicy / Mochizuki"
+    },
+    "Gubernator Kiyohara": {
+      "M": "Gubernator Kiyohara",
+      "D": "Gubernatora Kiyohary",
+      "C": "Gubernatorowi Kiyoharze",
+      "B": "Gubernatora Kiyoharę",
+      "N": "Gubernatorem Kiyoharą",
+      "Ms": "Gubernatorze Kiyoharze",
+      "W": "Gubernatorze Kiyoharo"
+    },
+    "Ród Shinomiya": {
+      "M": "Ród Shinomiya",
+      "D": "Róda Shinomiyi",
+      "C": "Ródowi Shinomiyi",
+      "B": "Róda Shinomiyę",
+      "N": "Ródem Shinomiyą",
+      "Ms": "Ródzie Shinomiyi",
+      "W": "Ródzie Shinomiyo"
+    },
+    "Yoritsugu": {
+      "M": "Yoritsugu",
+      "D": "Yoritsugu",
+      "C": "Yoritsugu",
+      "B": "Yoritsugu",
+      "N": "Yoritsugu",
+      "Ms": "Yoritsugu",
+      "W": "Yoritsugu"
+    },
+    "Tokiyuki": {
+      "M": "Tokiyuki",
+      "D": "Tokiyuki",
+      "C": "Tokiyuki",
+      "B": "Tokiyuki",
+      "N": "Tokiyuki",
+      "Ms": "Tokiyuki",
+      "W": "Tokiyuki"
+    },
+    "Yorishige": {
+      "M": "Yorishige",
+      "D": "Yorishige",
+      "C": "Yorishige",
+      "B": "Yorishige",
+      "N": "Yorishige",
+      "Ms": "Yorishige",
+      "W": "Yorishige"
+    },
+    "Moritaka": {
+      "M": "Moritaka",
+      "D": "Moritaki",
+      "C": "Moritace",
+      "B": "Moritakę",
+      "N": "Moritaką",
+      "Ms": "Moritace",
+      "W": "Moritako"
+    },
+    "Yasuie Hōjō": {
+      "M": "Yasuie Hōjō",
+      "D": "Yasuie Hōjōa",
+      "C": "Yasuie Hōjōowi",
+      "B": "Yasuie Hōjōa",
+      "N": "Yasuie Hōjōem",
+      "Ms": "Yasuie Hōjōie",
+      "W": "Yasuie Hōjōie"
+    },
+    "Genba Kazama": {
+      "M": "Genba Kazama",
+      "D": "Genby Kazamy",
+      "C": "Genbie Kazamie",
+      "B": "Genbę Kazamę",
+      "N": "Genbą Kazamą",
+      "Ms": "Genbie Kazamie",
+      "W": "Genbo Kazamo"
+    },
+    "Fubuki": {
+      "M": "Fubuki",
+      "D": "Fubuki",
+      "C": "Fubuki",
+      "B": "Fubuki",
+      "N": "Fubuki",
+      "Ms": "Fubuki",
+      "W": "Fubuki"
+    },
+    "Suwa Yorishige": {
+      "M": "Suwa Yorishige",
+      "D": "Suwy Yorishige",
+      "C": "Suwie Yorishige",
+      "B": "Suwę Yorishige",
+      "N": "Suwą Yorishige",
+      "Ms": "Suwie Yorishige",
+      "W": "Suwo Yorishige"
+    },
+    "Shizuku": {
+      "M": "Shizuku",
+      "D": "Shizuku",
+      "C": "Shizuku",
+      "B": "Shizuku",
+      "N": "Shizuku",
+      "Ms": "Shizuku",
+      "W": "Shizuku"
+    },
+    "Mima Sasaki": {
+      "M": "Mima Sasaki",
+      "D": "Mimy Sasaki",
+      "C": "Mimie Sasaki",
+      "B": "Mimę Sasaki",
+      "N": "Mimą Sasaki",
+      "Ms": "Mimie Sasaki",
+      "W": "Mimo Sasaki"
+    },
+    "Kojiro": {
+      "M": "Kojiro",
+      "D": "Kojiro",
+      "C": "Kojiro",
+      "B": "Kojiro",
+      "N": "Kojiro",
+      "Ms": "Kojiro",
+      "W": "Kojiro"
+    },
+    "Yasuie": {
+      "M": "Yasuie",
+      "D": "Yasuie",
+      "C": "Yasuie",
+      "B": "Yasuie",
+      "N": "Yasuie",
+      "Ms": "Yasuie",
+      "W": "Yasuie"
+    },
+    "Kinmune Saionji": {
+      "M": "Kinmune Saionji",
+      "D": "Kinmune Saionji",
+      "C": "Kinmune Saionji",
+      "B": "Kinmune Saionji",
+      "N": "Kinmune Saionji",
+      "Ms": "Kinmune Saionji",
+      "W": "Kinmune Saionji"
+    },
+    "Yorishige Suwa -> Tokiyuki Hōjō": {
+      "M": "Yorishige Suwa -> Tokiyuki Hōjō",
+      "D": "Yorishige Suwy -> Tokiyuki Hōjōa",
+      "C": "Yorishige Suwe -> Tokiyuki Hōjōowi",
+      "B": "Yorishige Suwę -> Tokiyuki Hōjōa",
+      "N": "Yorishige Suwą -> Tokiyuki Hōjōem",
+      "Ms": "Yorishige Suwe -> Tokiyuki Hōjōie",
+      "W": "Yorishige Suwo -> Tokiyuki Hōjōie"
+    },
+    "Tokiyuki Hōjō -> Yorishige Suwa": {
+      "M": "Tokiyuki Hōjō -> Yorishige Suwa",
+      "D": "Tokiyuki Hōjōa -> Yorishige Suwy",
+      "C": "Tokiyuki Hōjōowi -> Yorishige Suwe",
+      "B": "Tokiyuki Hōjōa -> Yorishige Suwę",
+      "N": "Tokiyuki Hōjōem -> Yorishige Suwą",
+      "Ms": "Tokiyuki Hōjōie -> Yorishige Suwe",
+      "W": "Tokiyuki Hōjōie -> Yorishige Suwo"
+    },
+    "Yukiyasu Unno -> Tokiyuki Hōjō (Chōjūmaru)": {
+      "M": "Yukiyasu Unno -> Tokiyuki Hōjō (Chōjūmaru)",
+      "D": "Yukiyasu Unno -> Tokiyuki Hōjōa (Chōjūmaru)a",
+      "C": "Yukiyasu Unno -> Tokiyuki Hōjōowi (Chōjūmaru)owi",
+      "B": "Yukiyasu Unno -> Tokiyuki Hōjōa (Chōjūmaru)a",
+      "N": "Yukiyasu Unno -> Tokiyuki Hōjōem (Chōjūmaru)em",
+      "Ms": "Yukiyasu Unno -> Tokiyuki Hōjōie (Chōjūmaru)ie",
+      "W": "Yukiyasu Unno -> Tokiyuki Hōjōie (Chōjūmaru)ie"
+    },
+    "Tomomitsu Inukai -> Tokiyuki Hōjō (Chōjūmaru)": {
+      "M": "Tomomitsu Inukai -> Tokiyuki Hōjō (Chōjūmaru)",
+      "D": "Tomomitsu Inukai -> Tokiyuki Hōjōa (Chōjūmaru)a",
+      "C": "Tomomitsu Inukai -> Tokiyuki Hōjōowi (Chōjūmaru)owi",
+      "B": "Tomomitsu Inukai -> Tokiyuki Hōjōa (Chōjūmaru)a",
+      "N": "Tomomitsu Inukai -> Tokiyuki Hōjōem (Chōjūmaru)em",
+      "Ms": "Tomomitsu Inukai -> Tokiyuki Hōjōie (Chōjūmaru)ie",
+      "W": "Tomomitsu Inukai -> Tokiyuki Hōjōie (Chōjūmaru)ie"
+    },
+    "Tokiyuki Hōjō (Chojumaru) -> Mochizuki / Shinomiya / Nezu": {
+      "M": "Tokiyuki Hōjō (Chojumaru) -> Mochizuki / Shinomiya / Nezu",
+      "D": "Tokiyuki Hōjōa (Chojumaru)a -> Mochizuki / Shinomiyy / Nezu",
+      "C": "Tokiyuki Hōjōowi (Chojumaru)owi -> Mochizuki / Shinomiye / Nezu",
+      "B": "Tokiyuki Hōjōa (Chojumaru)a -> Mochizuki / Shinomiyę / Nezu",
+      "N": "Tokiyuki Hōjōem (Chojumaru)em -> Mochizuki / Shinomiyą / Nezu",
+      "Ms": "Tokiyuki Hōjōie (Chojumaru)ie -> Mochizuki / Shinomiye / Nezu",
+      "W": "Tokiyuki Hōjōie (Chojumaru)ie -> Mochizuki / Shinomiyo / Nezu"
+    },
+    "Ayako -> Lord Mochizuki": {
+      "M": "Ayako -> Lord Mochizuki",
+      "D": "Ayako -> Lord Mochizuki",
+      "C": "Ayako -> Lord Mochizuki",
+      "B": "Ayako -> Lord Mochizuki",
+      "N": "Ayako -> Lord Mochizuki",
+      "Ms": "Ayako -> Lord Mochizuki",
+      "W": "Ayako -> Lord Mochizuki"
+    },
+    "Muneie Tokoiwa / Mochizuki -> Tokiyuki Hōjō (Chojumaru)": {
+      "M": "Muneie Tokoiwa / Mochizuki -> Tokiyuki Hōjō (Chojumaru)",
+      "D": "Muneie Tokoiwy / Mochizuki -> Tokiyuki Hōjōa (Chojumaru)a",
+      "C": "Muneie Tokoiwe / Mochizuki -> Tokiyuki Hōjōowi (Chojumaru)owi",
+      "B": "Muneie Tokoiwę / Mochizuki -> Tokiyuki Hōjōa (Chojumaru)a",
+      "N": "Muneie Tokoiwą / Mochizuki -> Tokiyuki Hōjōem (Chojumaru)em",
+      "Ms": "Muneie Tokoiwe / Mochizuki -> Tokiyuki Hōjōie (Chojumaru)ie",
+      "W": "Muneie Tokoiwo / Mochizuki -> Tokiyuki Hōjōie (Chojumaru)ie"
+    },
+    "Sadamune Ogasawara -> Tokiyuki i towarzysze": {
+      "M": "Sadamune Ogasawara -> Tokiyuki i towarzysze",
+      "D": "Sadamune Ogasawary -> Tokiyuki i towarzysze",
+      "C": "Sadamune Ogasawarze -> Tokiyuki i towarzysze",
+      "B": "Sadamune Ogasawarę -> Tokiyuki i towarzysze",
+      "N": "Sadamune Ogasawarą -> Tokiyuki i towarzysze",
+      "Ms": "Sadamune Ogasawarze -> Tokiyuki i towarzysze",
+      "W": "Sadamune Ogasawaro -> Tokiyuki i towarzysze"
+    },
+    "Yorishige Suwa (Maska Shinano) -> Sadamune Ogasawara / Tokiyuki": {
+      "M": "Yorishige Suwa (Maska Shinano) -> Sadamune Ogasawara / Tokiyuki",
+      "D": "Yorishige Suwy (Maski Shinano)a -> Sadamune Ogasawary / Tokiyuki",
+      "C": "Yorishige Suwe (Masce Shinano)owi -> Sadamune Ogasawarze / Tokiyuki",
+      "B": "Yorishige Suwę (Maskę Shinano)a -> Sadamune Ogasawarę / Tokiyuki",
+      "N": "Yorishige Suwą (Maską Shinano)em -> Sadamune Ogasawarą / Tokiyuki",
+      "Ms": "Yorishige Suwe (Masce Shinano)ie -> Sadamune Ogasawarze / Tokiyuki",
+      "W": "Yorishige Suwo (Masko Shinano)ie -> Sadamune Ogasawaro / Tokiyuki"
+    },
+    "Tokiyuki Hojo -> Mochizuki / Shinomiya": {
+      "M": "Tokiyuki Hojo -> Mochizuki / Shinomiya",
+      "D": "Tokiyuki Hojo -> Mochizuki / Shinomiyy",
+      "C": "Tokiyuki Hojo -> Mochizuki / Shinomiye",
+      "B": "Tokiyuki Hojo -> Mochizuki / Shinomiyę",
+      "N": "Tokiyuki Hojo -> Mochizuki / Shinomiyą",
+      "Ms": "Tokiyuki Hojo -> Mochizuki / Shinomiye",
+      "W": "Tokiyuki Hojo -> Mochizuki / Shinomiyo"
+    },
+    "Cesarz Go-Daigo -> Kiyohara": {
+      "M": "Cesarz Go-Daigo -> Kiyohara",
+      "D": "Cesarza Go-Daigo -> Kiyohary",
+      "C": "Cesarzowi Go-Daigo -> Kiyoharze",
+      "B": "Cesarza Go-Daigo -> Kiyoharę",
+      "N": "Cesarzem Go-Daigo -> Kiyoharą",
+      "Ms": "Cesarzu Go-Daigo -> Kiyoharze",
+      "W": "Cesarzu Go-Daigo -> Kiyoharo"
+    },
+    "Kiyohara -> Cesarz Go-Daigo": {
+      "M": "Kiyohara -> Cesarz Go-Daigo",
+      "D": "Kiyohary -> Cesarza Go-Daigo",
+      "C": "Kiyoharze -> Cesarzowi Go-Daigo",
+      "B": "Kiyoharę -> Cesarza Go-Daigo",
+      "N": "Kiyoharą -> Cesarzem Go-Daigo",
+      "Ms": "Kiyoharze -> Cesarzu Go-Daigo",
+      "W": "Kiyoharo -> Cesarzu Go-Daigo"
+    },
+    "Mochizuki -> Tokiyuki Hojo": {
+      "M": "Mochizuki -> Tokiyuki Hojo",
+      "D": "Mochizuki -> Tokiyuki Hojo",
+      "C": "Mochizuki -> Tokiyuki Hojo",
+      "B": "Mochizuki -> Tokiyuki Hojo",
+      "N": "Mochizuki -> Tokiyuki Hojo",
+      "Ms": "Mochizuki -> Tokiyuki Hojo",
+      "W": "Mochizuki -> Tokiyuki Hojo"
+    },
+    "Shokan -> Chojumaru": {
+      "M": "Shokan -> Chojumaru",
+      "D": "Shokana -> Chojumaru",
+      "C": "Shokanowi -> Chojumaru",
+      "B": "Shokana -> Chojumaru",
+      "N": "Shokanem -> Chojumaru",
+      "Ms": "Shokanie -> Chojumaru",
+      "W": "Shokanie -> Chojumaru"
+    },
+    "Tokiyuki Suwa -> Sojusznicy / Mochizuki": {
+      "M": "Tokiyuki Suwa -> Sojusznicy / Mochizuki",
+      "D": "Tokiyuki Suwy -> Sojusznicy / Mochizuki",
+      "C": "Tokiyuki Suwe -> Sojusznicy / Mochizuki",
+      "B": "Tokiyuki Suwę -> Sojusznicy / Mochizuki",
+      "N": "Tokiyuki Suwą -> Sojusznicy / Mochizuki",
+      "Ms": "Tokiyuki Suwe -> Sojusznicy / Mochizuki",
+      "W": "Tokiyuki Suwo -> Sojusznicy / Mochizuki"
+    },
+    "Gubernator Kiyohara -> Cesarz Go-Daigo": {
+      "M": "Gubernator Kiyohara -> Cesarz Go-Daigo",
+      "D": "Gubernatora Kiyohary -> Cesarza Go-Daigo",
+      "C": "Gubernatorowi Kiyoharze -> Cesarzowi Go-Daigo",
+      "B": "Gubernatora Kiyoharę -> Cesarza Go-Daigo",
+      "N": "Gubernatorem Kiyoharą -> Cesarzem Go-Daigo",
+      "Ms": "Gubernatorze Kiyoharze -> Cesarzu Go-Daigo",
+      "W": "Gubernatorze Kiyoharo -> Cesarzu Go-Daigo"
+    },
+    "Mochizuki -> Ród Shinomiya": {
+      "M": "Mochizuki -> Ród Shinomiya",
+      "D": "Mochizuki -> Róda Shinomiyy",
+      "C": "Mochizuki -> Ródowi Shinomiye",
+      "B": "Mochizuki -> Róda Shinomiyę",
+      "N": "Mochizuki -> Ródem Shinomiyą",
+      "Ms": "Mochizuki -> Ródzie Shinomiye",
+      "W": "Mochizuki -> Ródzie Shinomiyo"
+    },
+    "Shokan -> Sadamune Ogasawara": {
+      "M": "Shokan -> Sadamune Ogasawara",
+      "D": "Shokana -> Sadamune Ogasawary",
+      "C": "Shokanowi -> Sadamune Ogasawarze",
+      "B": "Shokana -> Sadamune Ogasawarę",
+      "N": "Shokanem -> Sadamune Ogasawarą",
+      "Ms": "Shokanie -> Sadamune Ogasawarze",
+      "W": "Shokanie -> Sadamune Ogasawaro"
+    },
+    "Yoritsugu -> Tokiyuki": {
+      "M": "Yoritsugu -> Tokiyuki",
+      "D": "Yoritsugu -> Tokiyuki",
+      "C": "Yoritsugu -> Tokiyuki",
+      "B": "Yoritsugu -> Tokiyuki",
+      "N": "Yoritsugu -> Tokiyuki",
+      "Ms": "Yoritsugu -> Tokiyuki",
+      "W": "Yoritsugu -> Tokiyuki"
+    },
+    "Tokiyuki -> Yoritsugu": {
+      "M": "Tokiyuki -> Yoritsugu",
+      "D": "Tokiyuki -> Yoritsugu",
+      "C": "Tokiyuki -> Yoritsugu",
+      "B": "Tokiyuki -> Yoritsugu",
+      "N": "Tokiyuki -> Yoritsugu",
+      "Ms": "Tokiyuki -> Yoritsugu",
+      "W": "Tokiyuki -> Yoritsugu"
+    },
+    "Yorishige -> Tokiyuki": {
+      "M": "Yorishige -> Tokiyuki",
+      "D": "Yorishige -> Tokiyuki",
+      "C": "Yorishige -> Tokiyuki",
+      "B": "Yorishige -> Tokiyuki",
+      "N": "Yorishige -> Tokiyuki",
+      "Ms": "Yorishige -> Tokiyuki",
+      "W": "Yorishige -> Tokiyuki"
+    },
+    "Moritaka -> Tokiyuki": {
+      "M": "Moritaka -> Tokiyuki",
+      "D": "Moritaki -> Tokiyuki",
+      "C": "Moritace -> Tokiyuki",
+      "B": "Moritakę -> Tokiyuki",
+      "N": "Moritaką -> Tokiyuki",
+      "Ms": "Moritace -> Tokiyuki",
+      "W": "Moritako -> Tokiyuki"
+    },
+    "Tokiyuki Hōjō -> Yasuie Hōjō": {
+      "M": "Tokiyuki Hōjō -> Yasuie Hōjō",
+      "D": "Tokiyuki Hōjōa -> Yasuie Hōjōa",
+      "C": "Tokiyuki Hōjōowi -> Yasuie Hōjōowi",
+      "B": "Tokiyuki Hōjōa -> Yasuie Hōjōa",
+      "N": "Tokiyuki Hōjōem -> Yasuie Hōjōem",
+      "Ms": "Tokiyuki Hōjōie -> Yasuie Hōjōie",
+      "W": "Tokiyuki Hōjōie -> Yasuie Hōjōie"
+    },
+    "Yasuie Hōjō -> Tokiyuki Hōjō": {
+      "M": "Yasuie Hōjō -> Tokiyuki Hōjō",
+      "D": "Yasuie Hōjōa -> Tokiyuki Hōjōa",
+      "C": "Yasuie Hōjōowi -> Tokiyuki Hōjōowi",
+      "B": "Yasuie Hōjōa -> Tokiyuki Hōjōa",
+      "N": "Yasuie Hōjōem -> Tokiyuki Hōjōem",
+      "Ms": "Yasuie Hōjōie -> Tokiyuki Hōjōie",
+      "W": "Yasuie Hōjōie -> Tokiyuki Hōjōie"
+    },
+    "Genba Kazama -> Fubuki": {
+      "M": "Genba Kazama -> Fubuki",
+      "D": "Genby Kazamy -> Fubuki",
+      "C": "Genbe Kazamie -> Fubuki",
+      "B": "Genbę Kazamę -> Fubuki",
+      "N": "Genbą Kazamą -> Fubuki",
+      "Ms": "Genbe Kazamie -> Fubuki",
+      "W": "Genbo Kazamo -> Fubuki"
+    },
+    "Suwa Yorishige -> Tokiyuki Hōjō": {
+      "M": "Suwa Yorishige -> Tokiyuki Hōjō",
+      "D": "Suwy Yorishige -> Tokiyuki Hōjōa",
+      "C": "Suwe Yorishige -> Tokiyuki Hōjōowi",
+      "B": "Suwę Yorishige -> Tokiyuki Hōjōa",
+      "N": "Suwą Yorishige -> Tokiyuki Hōjōem",
+      "Ms": "Suwe Yorishige -> Tokiyuki Hōjōie",
+      "W": "Suwo Yorishige -> Tokiyuki Hōjōie"
+    },
+    "Shizuku -> Tokiyuki Houjou (Chojumaru)": {
+      "M": "Shizuku -> Tokiyuki Houjou (Chojumaru)",
+      "D": "Shizuku -> Tokiyuki Houjou (Chojumaru)",
+      "C": "Shizuku -> Tokiyuki Houjou (Chojumaru)",
+      "B": "Shizuku -> Tokiyuki Houjou (Chojumaru)",
+      "N": "Shizuku -> Tokiyuki Houjou (Chojumaru)",
+      "Ms": "Shizuku -> Tokiyuki Houjou (Chojumaru)",
+      "W": "Shizuku -> Tokiyuki Houjou (Chojumaru)"
+    },
+    "Mima Sasaki -> Tokiyuki Houjou (Chojumaru)": {
+      "M": "Mima Sasaki -> Tokiyuki Houjou (Chojumaru)",
+      "D": "Mimy Sasaki -> Tokiyuki Houjou (Chojumaru)a",
+      "C": "Mimie Sasaki -> Tokiyuki Houjou (Chojumaru)owi",
+      "B": "Mimę Sasaki -> Tokiyuki Houjou (Chojumaru)a",
+      "N": "Mimą Sasaki -> Tokiyuki Houjou (Chojumaru)em",
+      "Ms": "Mimie Sasaki -> Tokiyuki Houjou (Chojumaru)ie",
+      "W": "Mimo Sasaki -> Tokiyuki Houjou (Chojumaru)ie"
+    },
+    "Mima Sasaki -> Shizuku": {
+      "M": "Mima Sasaki -> Shizuku",
+      "D": "Mimy Sasaki -> Shizuku",
+      "C": "Mimie Sasaki -> Shizuku",
+      "B": "Mimę Sasaki -> Shizuku",
+      "N": "Mimą Sasaki -> Shizuku",
+      "Ms": "Mimie Sasaki -> Shizuku",
+      "W": "Mimo Sasaki -> Shizuku"
+    },
+    "Kojiro -> Tokiyuki Houjou (Chojumaru)": {
+      "M": "Kojiro -> Tokiyuki Houjou (Chojumaru)",
+      "D": "Kojiro -> Tokiyuki Houjou (Chojumaru)a",
+      "C": "Kojiro -> Tokiyuki Houjou (Chojumaru)owi",
+      "B": "Kojiro -> Tokiyuki Houjou (Chojumaru)a",
+      "N": "Kojiro -> Tokiyuki Houjou (Chojumaru)em",
+      "Ms": "Kojiro -> Tokiyuki Houjou (Chojumaru)ie",
+      "W": "Kojiro -> Tokiyuki Houjou (Chojumaru)ie"
+    },
+    "Yasuie -> Kinmune Saionji": {
+      "M": "Yasuie -> Kinmune Saionji",
+      "D": "Yasuie -> Kinmune Saionji",
+      "C": "Yasuie -> Kinmune Saionji",
+      "B": "Yasuie -> Kinmune Saionji",
+      "N": "Yasuie -> Kinmune Saionji",
+      "Ms": "Yasuie -> Kinmune Saionji",
+      "W": "Yasuie -> Kinmune Saionji"
+    },
+    "Genba Kazama -> Yasuie Hōjō": {
+      "M": "Genba Kazama -> Yasuie Hōjō",
+      "D": "Genby Kazamy -> Yasuie Hōjōa",
+      "C": "Genbe Kazamie -> Yasuie Hōjōowi",
+      "B": "Genbę Kazamę -> Yasuie Hōjōa",
+      "N": "Genbą Kazamą -> Yasuie Hōjōem",
+      "Ms": "Genbe Kazamie -> Yasuie Hōjōie",
+      "W": "Genbo Kazamo -> Yasuie Hōjōie"
+    },
+    "Masashige Kusunoki": {
+      "M": "Masashige Kusunoki",
+      "D": "Masashige Kusunoki",
+      "C": "Masashige Kusunoki",
+      "B": "Masashige Kusunoki",
+      "N": "Masashige Kusunoki",
+      "Ms": "Masashige Kusunoki",
+      "W": "Masashige Kusunoki"
+    },
+    "Mima": {
+      "M": "Mima",
+      "D": "Mimy",
+      "C": "Mimie",
+      "B": "Mimę",
+      "N": "Mimą",
+      "Ms": "Mimie",
+      "W": "Mimo"
+    },
+    "Shinomiya": {
+      "M": "Shinomiya",
+      "D": "Shinomiyi",
+      "C": "Shinomiyi",
+      "B": "Shinomiyę",
+      "N": "Shinomiyą",
+      "Ms": "Shinomiyi",
+      "W": "Shinomiyo"
+    },
+    "Nezu": {
+      "M": "Nezu",
+      "D": "Nezu",
+      "C": "Nezu",
+      "B": "Nezu",
+      "N": "Nezu",
+      "Ms": "Nezu",
+      "W": "Nezu"
+    },
+    "Muneie Tokoiwa": {
+      "M": "Muneie Tokoiwa",
+      "D": "Muneie Tokoiwy",
+      "C": "Muneie Tokoiwie",
+      "B": "Muneie Tokoiwę",
+      "N": "Muneie Tokoiwą",
+      "Ms": "Muneie Tokoiwie",
+      "W": "Muneie Tokoiwo"
+    },
+    "Sojusznicy": {
+      "M": "Sojusznicy",
+      "D": "Sojusznicy",
+      "C": "Sojusznicy",
+      "B": "Sojusznicy",
+      "N": "Sojusznicy",
+      "Ms": "Sojusznicy",
+      "W": "Sojusznicy"
+    },
+    "Takauji Ashikaga": {
+      "M": "Takauji Ashikaga",
+      "D": "Takauji Ashikagi",
+      "C": "Takauji Ashikadze",
+      "B": "Takauji Ashikagę",
+      "N": "Takauji Ashikagą",
+      "Ms": "Takauji Ashikadze",
+      "W": "Takauji Ashikago"
+    },
+    "Genba": {
+      "M": "Genba",
+      "D": "Genby",
+      "C": "Genbie",
+      "B": "Genbę",
+      "N": "Genbą",
+      "Ms": "Genbie",
+      "W": "Genbo"
+    },
+    "Tamonmaru": {
+      "M": "Tamonmaru",
+      "D": "Tamonmaru",
+      "C": "Tamonmaru",
+      "B": "Tamonmaru",
+      "N": "Tamonmaru",
+      "Ms": "Tamonmaru",
+      "W": "Tamonmaru"
+    },
+    "Doyo Sasaki": {
+      "M": "Doyo Sasaki",
+      "D": "Doyo Sasaki",
+      "C": "Doyo Sasaki",
+      "B": "Doyo Sasaki",
+      "N": "Doyo Sasaki",
+      "Ms": "Doyo Sasaki",
+      "W": "Doyo Sasaki"
+    }
+  },
+  "hypocorisms": {},
+  "plot_anchors": {
+    "Przepowiednia Yorishigego o upadku planu wuja Yasuie": "Należy bezwzględnie utrzymać zgodność z wizją kapłana Suwy: bunt Yasuie musi spalić na panewce, a celem drużyny jest wyłącznie bezpieczna ewakuacja wuja do Shinano.",
+    "Przeżycie Shōkana": "Kusunoki wspomina podstęp z podstawieniem zwłok, dzięki któremu Shōkan ocalał. Tokiyuki musi zareagować autentycznym zaskoczeniem na fakt, że mnich-zbójca przeżył ich starcie."
+  },
   "episodes_translated": [
     "tmpnbh3evgk",
     "tmpn97a1c8n",
@@ -154,6 +1070,16 @@
     "tmpgvm6hevq",
     "tmp1ntds3_n",
     "[ASW] Nige Jouzu no Wakagimi S2 - 07 [1080p HEVC][4F700E16]",
-    "[ASW] Nige Jouzu no Wakagimi S2 - 08 [1080p HEVC][84230547]"
-  ]
+    "[ASW] Nige Jouzu no Wakagimi S2 - 08 [1080p HEVC][84230547]",
+    "[ASW] Nige Jouzu no Wakagimi - 20 [1080p HEVC]",
+    "[ASW] Nige Jouzu no Wakagimi S2 - 09 [1080p HEVC][7889D9E6]"
+  ],
+  "batch_stats": {
+    "[ASW] Nige Jouzu no Wakagimi S2 - 09 [1080p HEVC][7889D9E6]": {
+      "dialogues": 358,
+      "batches": 17,
+      "avg_batch_size": 21.1,
+      "cost_pln": 4.37
+    }
+  }
 }

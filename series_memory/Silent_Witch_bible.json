@@ -1,6 +1,24 @@
 {
   "anime_title": "Silent Witch",
   "characters": {
+    "Ike": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Monica": {
+      "description": "KOBIETA (wyodrębniono z relacji serii)"
+    },
+    "Nero": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Felix": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Cyril": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Ryn": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
     "Ike -> Monica": {
       "description": "Zwrot: 'Monico / w myślach: wiewióreczko' (książę pod przykrywką -> nieśmiała znajoma / sekretna ochroniarka)"
     },
@@ -9,16 +27,174 @@
     },
     "Monica -> Nero": {
       "description": "Zwrot: 'Nero' (czarownica -> jej chowaniec)"
+    },
+    "Monica -> Felix": {
+      "description": "Zwrot: 'Ike / na ty (w tej scenie)' (wspólnicy nocnej wyprawy incognito)"
+    },
+    "Felix -> Monica": {
+      "description": "Zwrot: 'Monico / mała wiewiórko / na ty' (opiekun i towarzysz incognito)"
+    },
+    "Monica -> Cyril": {
+      "description": "Zwrot: 'lordzie Cyrilu / panie Cyrilu' (podwładna w radzie uczniowskiej -> wiceprzewodniczący)"
+    },
+    "Cyril -> Monica": {
+      "description": "Zwrot: 'panno Norton / Monico' (przełożony w radzie uczniowskiej -> członkini rady)"
+    },
+    "Ryn -> Monica": {
+      "description": "Zwrot: 'Pani Czarodziejko / Dostojna Wiedźmo' (służebny chowaniec / strażnik -> jedna z Siedmiu Mędrców)"
     }
   },
   "glossary": {
     "Silent Witch": "Milcząca Czarownica",
     "Starweaving Mira": "Gwiazdotkacka Mira",
     "The Fountain of Minerva": "Źródło Minerwy",
-    "Unchanted magecraft": "magia bezliturgiczna"
+    "Unchanted magecraft": "magia bezliturgiczna",
+    "Seven Sages": "Siedmiu Mędrców",
+    "Starseer Witch": "Wiedźma Gwiazdowidząca",
+    "Voiceless Magic": "Magia bezinkantacyjna",
+    "Silence Barrier": "Bariera wyciszająca"
   },
-  "relationships": {},
+  "relationships": {
+    "Ike -> Monica": "Zwrot: 'Monico / w myślach: wiewióreczko' (książę pod przykrywką -> nieśmiała znajoma / sekretna ochroniarka)",
+    "Monica -> Ike": "Zwrot: 'panie Ike' (nieśmiała dziewczyna -> szlachetny przyjaciel)",
+    "Monica -> Nero": "Zwrot: 'Nero' (czarownica -> jej chowaniec)",
+    "Monica -> Felix": "Zwrot: 'Ike / na ty (w tej scenie)' (wspólnicy nocnej wyprawy incognito)",
+    "Felix -> Monica": "Zwrot: 'Monico / mała wiewiórko / na ty' (opiekun i towarzysz incognito)",
+    "Monica -> Cyril": "Zwrot: 'lordzie Cyrilu / panie Cyrilu' (podwładna w radzie uczniowskiej -> wiceprzewodniczący)",
+    "Cyril -> Monica": "Zwrot: 'panno Norton / Monico' (przełożony w radzie uczniowskiej -> członkini rady)",
+    "Ryn -> Monica": "Zwrot: 'Pani Czarodziejko / Dostojna Wiedźmo' (służebny chowaniec / strażnik -> jedna z Siedmiu Mędrców)"
+  },
   "episodes_translated": [
-    "tmpxfweggtg"
-  ]
+    "tmpxfweggtg",
+    "[ASW] Silent Witch - Chinmoku no Majo no Kakushigoto - 13 [1080p HEVC][DEA919F9]"
+  ],
+  "declensions": {
+    "Ike": {
+      "M": "Ike",
+      "D": "Ike",
+      "C": "Ike",
+      "B": "Ike",
+      "N": "Ike",
+      "Ms": "Ike",
+      "W": "Ike"
+    },
+    "Monica": {
+      "M": "Monica",
+      "D": "Moniki",
+      "C": "Monice",
+      "B": "Monikę",
+      "N": "Moniką",
+      "Ms": "Monice",
+      "W": "Moniko"
+    },
+    "Nero": {
+      "M": "Nero",
+      "D": "Nero",
+      "C": "Nero",
+      "B": "Nero",
+      "N": "Nero",
+      "Ms": "Nero",
+      "W": "Nero"
+    },
+    "Felix": {
+      "M": "Felix",
+      "D": "Felixa",
+      "C": "Felixowi",
+      "B": "Felixa",
+      "N": "Felixem",
+      "Ms": "Felixie",
+      "W": "Felixie"
+    },
+    "Cyril": {
+      "M": "Cyril",
+      "D": "Cyrila",
+      "C": "Cyrilowi",
+      "B": "Cyrila",
+      "N": "Cyrilem",
+      "Ms": "Cyrilu",
+      "W": "Cyrilu"
+    },
+    "Ryn": {
+      "M": "Ryn",
+      "D": "Ryna",
+      "C": "Rynowi",
+      "B": "Ryna",
+      "N": "Rynem",
+      "Ms": "Rynie",
+      "W": "Rynie"
+    },
+    "Ike -> Monica": {
+      "M": "Ike -> Monica",
+      "D": "Ike -> Moniki",
+      "C": "Ike -> Monice",
+      "B": "Ike -> Monikę",
+      "N": "Ike -> Moniką",
+      "Ms": "Ike -> Monice",
+      "W": "Ike -> Moniko"
+    },
+    "Monica -> Ike": {
+      "M": "Monica -> Ike",
+      "D": "Moniki -> Ike",
+      "C": "Monice -> Ike",
+      "B": "Monikę -> Ike",
+      "N": "Moniką -> Ike",
+      "Ms": "Monice -> Ike",
+      "W": "Moniko -> Ike"
+    },
+    "Monica -> Nero": {
+      "M": "Monica -> Nero",
+      "D": "Moniki -> Nero",
+      "C": "Monice -> Nero",
+      "B": "Monikę -> Nero",
+      "N": "Moniką -> Nero",
+      "Ms": "Monice -> Nero",
+      "W": "Moniko -> Nero"
+    },
+    "Monica -> Felix": {
+      "M": "Monica -> Felix",
+      "D": "Moniki -> Felix",
+      "C": "Monice -> Felix",
+      "B": "Monikę -> Felix",
+      "N": "Moniką -> Felix",
+      "Ms": "Monice -> Felix",
+      "W": "Moniko -> Felix"
+    },
+    "Felix -> Monica": {
+      "M": "Felix -> Monica",
+      "D": "Felix -> Moniki",
+      "C": "Felix -> Monice",
+      "B": "Felix -> Monikę",
+      "N": "Felix -> Moniką",
+      "Ms": "Felix -> Monice",
+      "W": "Felix -> Moniko"
+    },
+    "Monica -> Cyril": {
+      "M": "Monica -> Cyril",
+      "D": "Moniki -> Cyril",
+      "C": "Monice -> Cyril",
+      "B": "Monikę -> Cyril",
+      "N": "Moniką -> Cyril",
+      "Ms": "Monice -> Cyril",
+      "W": "Moniko -> Cyril"
+    },
+    "Cyril -> Monica": {
+      "M": "Cyril -> Monica",
+      "D": "Cyril -> Moniki",
+      "C": "Cyril -> Monice",
+      "B": "Cyril -> Monikę",
+      "N": "Cyril -> Moniką",
+      "Ms": "Cyril -> Monice",
+      "W": "Cyril -> Moniko"
+    },
+    "Ryn -> Monica": {
+      "M": "Ryn -> Monica",
+      "D": "Ryn -> Moniki",
+      "C": "Ryn -> Monice",
+      "B": "Ryn -> Monikę",
+      "N": "Ryn -> Moniką",
+      "Ms": "Ryn -> Monice",
+      "W": "Ryn -> Moniko"
+    }
+  },
+  "plot_anchors": {}
 }

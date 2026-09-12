@@ -90,3 +90,26 @@ Odpowiedź pozbawiona tej ścieżki stanowi bezpośrednie naruszenie reguł work
    Wszelkie przykłady oficjalnego kanonu podawane w dokumentacji MUSZĄ być zmapowane 1:1 z istniejącymi, zweryfikowanymi wpisami w `manga_canon.py` lub potwierdzone w stopce redakcyjnej licencjonowanego polskiego wydawnictwa papierowego.
 3. **Automatyczny audyt dokumentacji (CI Gate):**
    Każda zmiana w pliku README.md podlega automatycznemu testowi weryfikacyjnemu w `test_system.py` (Asercja 7), który weryfikuje spójność terminologiczną i uniemożliwia zatwierdzenie niesprawdzonych treści.
+
+---
+
+## ⚡ 9. ZASADA PROAKTYWNEJ INTEGRALNOŚCI I ZAKAZ CIĄGŁEGO ŁATANIA (PROACTIVE LEXICAL & REGISTER GOVERNANCE MANDATE)
+
+1. **Zakaz sprowadzania napraw do kolejnych regexów (Anti-Whack-A-Mole):**
+   Asystent ma kategoryczny zakaz traktowania lintera regexów (`FIXED_REPLACEMENTS`) jako głównego narzędzia naprawczego. Reaktywne dopisywanie pojedynczych słów jest bezużyteczne wobec nieskończoności wariantów mowy potocznej. Każdy problem leksykalny i rejestrowy musi zostać rozwiązany **proaktywnie i strukturalnie**.
+2. **Kategoryczna Taksonomia Zakazanego Slangu per Gatunek:**
+   Dla każdego gatunku (w szczególności Dark Fantasy, High Fantasy, Dramat Historyczny) w promptach modelek (Warstwy 1 i 3) musi obowiązywać formalna, 4-klasowa matryca zakazów:
+   - **Klasa A (Slang młodzieżowy/potoczny):** bezwzględny zakaz współczesnych wtrętów (`i gitara`, `spoko`, `siemanko`, `ziomek`, `wchodzę w to`).
+   - **Klasa B (Agresja podwórkowa):** zakaz wulgaryzacji i trywializacji gniewu (`stul pysk`, `zamknij się`, `spuścić łomot`, `dostać w łeb`, `oberwać`).
+   - **Klasa C (Współczesne metafory potoczne):** zakaz metafor z języka potocznego XX/XXI w. (`przejmuję stery`, `dla zabicia czasu`, `kłamstwo jak byk`, `wylecieć ze szkoły`).
+   - **Klasa D (Trywializujące określenia osób):** zakaz dehumanizujących lub potocznych zaimków (`ten typ`, `chuliganka`, `dzikuska`, `dzieciaki`).
+3. **Obligatoryjny Krok Negatywnego Audytu w Fazie 2 CoT:**
+   Faza 2 (Redakcja AVT CoT 6000) **musi** w swoim procesie myślowym (Chain-of-Thought) zawierać jawny, wyodrębniony krok weryfikacji negatywnej (Negative Register & Calque Gate):
+   - Weryfikacja rejestru i eliminacja slangu klas A–D.
+   - Weryfikacja kalek przydomkowych: zakaz konstrukcji `X od Y` (np. `Zavthier od Złudzeń` $\to$ `Zavthier Pani Iluzji` / `Iluzoryczna Zavthier`).
+   - Weryfikacja rządu gramatycznego i rodzaju rzeczowników (`posoka` jest wyłącznie rodzaju żeńskiego).
+4. **Autonomiczne Zasilanie Encyklopedii Serii w Pre-passie:**
+   Profiler ma obowiązek autonomicznie wyodrębnić toponimy, tytulaturę i artefakty przed Fazą 1, zapisać je w `SeriesBible` z właściwą deklinacją i rodzajem, uniemożliwiając linterowi ich błędną interpretację jako odmienianych postaci po przyimkach.
+5. **Uogólniony Sanityzator Błędów Cyfrowych w Znacznikach Czasu:**
+   Algorytm naprawy inwersji czasowych w linterze musi obsługiwać pełen wachlarz czeskich błędów cyfrowych w zapisie czasu (minuty, dziesiątki minut, godziny: $\Delta t \in \{60s, 120s, 600s, 1200s, 3600s\}$).
+
