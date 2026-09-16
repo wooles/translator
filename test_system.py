@@ -7979,6 +7979,139 @@ def test_holistic_whisper_and_ffmpeg_telemetry_reserves_guard():
     print(" -> PASSED: Wykorzystanie rezerw Whisper i FFmpeg (Fade to Black, VAD, Loop Shield, Acoustic Breath Splitter, I-Frame Snapping) działa w 100% (0.00 PLN).")
 
 
+def test_acoustic_primacy_and_contaminated_metadata_guard():
+    """
+    [TEST 96] Filar CLXXIV: Prymat Sygnału Akustycznego nad Skażonymi Tagami Fansubów (.ass),
+    Sanacja Błędnych Przypisań Płci w Jurcie Kobiet oraz Eliminacja Jąkania Tokenów (0.00 PLN).
+    - Warstwa 1 (profiler.py): Ochrona Möge w kartotece postaci i jawny nakaz Filaru CLXXIV w dramatic_sequences.
+    - Warstwa 2 (series_memory.py): audit_speaker_metadata_against_audio wykrywa sprzeczność męskiego kanonu/tagu
+      z żeńskim audio seiyū lub sceną jurty, a infer_scene_cast_from_text eliminuje z obsady postacie genealogiczne (Ögedei, Tolui).
+    - Warstwa 3 (rules.py): Filar CLXXIV w ACTIVE_AVT_CRAFT_CANON oraz Rule 115 w get_focused_rules_for_batch.
+    - Warstwa 4 (translator.py & avt_linter.py):
+      * _arbitrate_speaker_gender wymusza 'kobieta' przy żeńskim audio/scenie mimo tagu 'Ögedei'.
+      * _resolve_line_addressee dla linii 0 (Möge) przez forward lookahead i audyt audio ustala adresata na 'kobieta'.
+      * AVTLinter i EpisodeQualityGate deterministycznie usuwają podwojenia interpunkcyjne (odebrać.odebrać. -> odebrać.)
+      * EpisodeQualityGate koryguje "Wyglądasz na wzburzonego." -> "Wyglądasz na wzburzoną." i chroni formę żeńską "zamierzałam jej odebrać"
+        mimo skażonego tagu aktora Ögedei.
+    """
+    print("\n[TEST 96] Test Prymatu Sygnału Akustycznego nad Skażonymi Tagami Fansubów (Filar CLXXIV, 0.00 PLN)...")
+    import pysubs2
+    from series_memory import SeriesBible
+    from translator import MultimodalTranslator
+    from avt_linter import AVTLinter, EpisodeQualityGate
+    from rules import get_focused_rules_for_batch
+
+    # Asercja 1: SeriesBible.audit_speaker_metadata_against_audio (Warstwa 2)
+    bible = SeriesBible("Tenmaku no Jaadugar")
+    # Ögedei jest kanonicznie MALE w bazie wiedzy
+    res_g, is_cont = bible.audit_speaker_metadata_against_audio("Ögedei", audio_gender="FEMALE")
+    assert res_g == "FEMALE", f"Expected FEMALE resolved gender, got {res_g}"
+    assert is_cont is True, "Expected is_contaminated=True for Ögedei with FEMALE audio"
+
+    # Test dla sceny kobiecej bez bezpośredniego audio
+    res_g_sc, is_cont_sc = bible.audit_speaker_metadata_against_audio("Ögedei", scene_gender="FEMALE")
+    assert res_g_sc == "FEMALE"
+    assert is_cont_sc is True
+
+    # Test dla zgodnego mężczyzny
+    res_g_m, is_cont_m = bible.audit_speaker_metadata_against_audio("Ögedei", audio_gender="MALE")
+    assert res_g_m == "MALE"
+    assert is_cont_m is False
+
+    # Asercja 2: infer_scene_cast_from_text (Warstwa 2) - wykluczenie genealogii i nieobecnych chanów
+    tent_text = (
+        "Sorkaktani przysłała dziś rano posłańca. "
+        "RODY DŻOCZIEGO, UGEDEJA, CZAGATAJA, TOŁUJA I TEMÜGEGO. "
+        "Jeśli taka wola Wielkiego Chana... jest gotowa oddać cztery tysiące jurt Rodu Tołuja. "
+        "Ziemie i poddanych, których od początku sam zamierzałam jej odebrać."
+    )
+    detected_cast, _ = bible.infer_scene_cast_from_text(tent_text)
+    assert "Boraqchin" in detected_cast, f"Boraqchin should be inferred in tent scene, got {detected_cast}"
+    assert "Möge" in detected_cast, f"Möge should be inferred in tent scene, got {detected_cast}"
+    assert "Ögedei" not in detected_cast, f"Ögedei (Great Khan referred in 3rd person) must NOT be in active cast: {detected_cast}"
+    assert "Tolui" not in detected_cast, f"Tolui (deceased lineage) must NOT be in active cast: {detected_cast}"
+
+    # Asercja 3: translator._arbitrate_speaker_gender (Warstwa 4) - Weto Akustyczne Filaru CLXXIV
+    tr = MultimodalTranslator()
+    tr.series_bible = bible
+    ev_ogedei = pysubs2.SSAEvent(start=214630, end=218920, text="...sam zamierzałem jej odebrać.", name="Ögedei")
+    spk_g, alerts = tr._arbitrate_speaker_gender(
+        ev_ogedei,
+        raw_phase1_gender="mężczyzna",
+        speaker_tags={0: "kobieta, alt 210 Hz"},
+        batch_id=0,
+        event_idx=0
+    )
+    assert spk_g == "kobieta", f"Expected 'kobieta' due to acoustic primacy, got {spk_g}"
+    assert any("filar clxxiv" in a.lower() for a in alerts), f"Expected Filar CLXXIV alert in: {alerts}"
+
+    # Asercja 4: translator._resolve_line_addressee (Warstwa 4) - Forward Turn Lookahead w linii 0
+    ev_moge = pysubs2.SSAEvent(start=199130, end=201170, text="Wyglądasz na wzburzonego.", name="Möge")
+    ev_ogedei_turn = pysubs2.SSAEvent(start=203380, end=206460, text="Sorkaktani przysłała dziś rano posłańca.", name="Ögedei")
+    batch_evs = [(0, ev_moge), (1, ev_ogedei_turn)]
+    spk_tags = {1: "kobieta, głos Möge", 2: "kobieta, alt seiyū"}
+    tr.episode_scene_genders = {0: "kobieta", 1: "kobieta"}
+
+    cat_addr, lbl_addr = tr._resolve_line_addressee(
+        event=ev_moge,
+        raw_phase1_addressee=None,
+        batch_events=batch_evs,
+        event_idx=0,
+        speaker_tags=spk_tags
+    )
+    assert cat_addr == "kobieta", f"Expected female addressee for Möge's line, got {cat_addr}"
+    assert "Kobieta" in lbl_addr, f"Expected female in addressee label, got {lbl_addr}"
+
+    # Asercja 5: Deterministyczna sanatyzacja jąkania tokenów (AVTLinter i EpisodeQualityGate - 0.00 PLN)
+    stutter_line = "...sam zamierzałem jej odebrać.odebrać."
+    fixed_stutter, fixes_st = AVTLinter.lint_and_fix_line(stutter_line)
+    assert "odebrać.odebrać." not in fixed_stutter
+    assert fixed_stutter.endswith("odebrać.")
+    assert any("Higiena Tokenów" in f for f in fixes_st)
+
+    # Asercja 6: EpisodeQualityGate na pełnej sekwencji z odcinka 12 Tenmaku no Jaadugar (0.00 PLN)
+    subs_ep12 = pysubs2.SSAFile()
+    subs_ep12.events = [
+        pysubs2.SSAEvent(start=199130, end=201170, text="Wyglądasz na wzburzonego.", name="Möge"),
+        pysubs2.SSAEvent(start=203380, end=206460, text="Sorkaktani przysłała\\Ndziś rano posłańca.", name="Ögedei"),
+        pysubs2.SSAEvent(start=206540, end=207670, text="RODY DŻOCZIEGO, UGEDEJA,\\NCZAGATAJA, TOŁUJA I TEMÜGEGO", name=""),
+        pysubs2.SSAEvent(start=207750, end=209420, text="Jeśli taka wola Wielkiego Chana...", name="Ögedei"),
+        pysubs2.SSAEvent(start=209500, end=214170, text="...jest gotowa oddać cztery tysiące jurt\\NRodu Tołuja.", name="Ögedei"),
+        pysubs2.SSAEvent(start=214630, end=218920, text="Ziemie i poddanych, których\\Nod początku sam zamierzałem jej odebrać.odebrać.", name="Ögedei")
+    ]
+
+    whisper_data = {
+        1: "dou shita no?",
+        2: "sorghaghtani ga tsukai wo yokoshite kita",
+        3: "joci ugedei chagatai tolui temuge",
+        4: "daikan no nozomi nara",
+        5: "tolui ke no yonzen no bakku wo sashidasu to",
+        6: "moto yori watashi ga ubaitorou to omotte ita mono da"
+    }
+
+    fixed_ep12, ep12_fixes = EpisodeQualityGate.audit_and_fix_entire_episode(
+        subs_ep12,
+        series_bible=bible,
+        whisper_transcriptions=whisper_data
+    )
+
+    # Linia 0 (Möge): Adresat żeński wymuszony w jurcie kobiet
+    assert "Wyglądasz na wzburzoną." in fixed_ep12.events[0].text, f"Line 0 not corrected to feminine addressee: {fixed_ep12.events[0].text}"
+
+    # Linia 5 (Ögedei w fansubie): Usunięcie zacięcia tokenu oraz wymuszenie formy żeńskiej seiyū
+    assert "odebrać.odebrać." not in fixed_ep12.events[5].text, f"Stutter not removed: {fixed_ep12.events[5].text}"
+    assert "zamierzałam jej odebrać" in fixed_ep12.events[5].text, f"Speaker line not corrected to feminine verb: {fixed_ep12.events[5].text}"
+
+    # Asercja 7: Dynamic Rule Dispatcher (Warstwa 3) - Filar CLXXIV w promptach
+    sample_batch = [
+        {"speaker": "Ögedei", "speaker_voice": "kobieta, alt", "en": "intended to take back from her"}
+    ]
+    focused_prompt = get_focused_rules_for_batch(sample_batch)
+    assert "FILAR CLXXIV" in focused_prompt, "Filar CLXXIV must be triggered in focused rules for Ögedei/acoustic primacy"
+
+    print(" -> PASSED: Filar CLXXIV (Prymat Sygnału Akustycznego, Sanacja Skażonych Tagów Fansubów i Eliminacja Jąkania) działa w 100% (0.00 PLN).")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -8073,7 +8206,8 @@ if __name__ == "__main__":
     test_holistic_scene_diarization_whisper_triangulation_and_unburdened_gender_guard()
     test_holistic_unburdened_metadata_ffmpeg_whisper_and_anti_guessing_pipeline()
     test_holistic_whisper_and_ffmpeg_telemetry_reserves_guard()
-    print("\n Wszystkie testy jednostkowe i integracyjne (95/95) zakończone pełnym sukcesem!\n")
+    test_acoustic_primacy_and_contaminated_metadata_guard()
+    print("\n Wszystkie testy jednostkowe i integracyjne (96/96) zakończone pełnym sukcesem!\n")
 
 
 

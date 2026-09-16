@@ -713,6 +713,12 @@ class AVTLinter:
                 modified = fixed_nom
                 applied_fixes.append(f"[Filar CLXXIII - Mianownik Wykrzyknikowy] Przywrócono mianownik dla '{source_en.strip()}'")
 
+        # 1c. Token Punctuation Stutter Sanitizer (Filar CLXXIV - 0.00 PLN)
+        stutter_pat = r"\b([A-Za-ząćęłńóśźżA-ZĄĆĘŁŃÓŚŹŻ]{2,}[\.!\?…]+)\s*\1(?!\w)"
+        if re.search(stutter_pat, modified):
+            modified = re.sub(stutter_pat, r"\1", modified)
+            applied_fixes.append("[Filar CLXXIV - Higiena Tokenów] Usunięto zacięcie/jąkanie tokenu z interpunkcją")
+
         # 2. Dynamic user feedback rules
         if user_feedback_rules:
             for fb in user_feedback_rules:
@@ -2610,8 +2616,14 @@ class EpisodeQualityGate:
                     if r_addr:
                         r_lower = str(r_addr).lower()
                         if s_gender == "FEMALE" and any(w in r_lower for w in ["mężczyzna", "male", "chłopak"]):
-                            has_opp_addr = True
-                            break
+                            # Check if male addressee was derived from an audited contaminated tag (e.g. 'Ögedei (Mężczyzna)')
+                            cand_addr_name = re.sub(r"\s*\(.*?\)", "", str(r_addr)).strip()
+                            is_cont_addr = False
+                            if series_bible and hasattr(series_bible, "audit_speaker_metadata_against_audio") and cand_addr_name:
+                                _, is_cont_addr = series_bible.audit_speaker_metadata_against_audio(cand_addr_name, scene_gender=s_gender)
+                            if not is_cont_addr:
+                                has_opp_addr = True
+                                break
                         elif s_gender == "MALE" and any(w in r_lower for w in ["kobieta", "female", "dziewczyn"]):
                             has_opp_addr = True
                             break
@@ -2678,6 +2690,15 @@ class EpisodeQualityGate:
                 ev.text = re.sub(r"!\.{3,}", "!..", ev.text)
                 if ev.text != old_punc_t:
                     fixes.append(f"[Episode Quality Gate - Higiena Interpunkcji] Linia #{i+1}: znormalizowano nienormatywny wielokropek (?...) na standardowy AVT (?..)")
+
+            # Token Punctuation Stutter Sanitizer (Filar CLXXIV - 0.00 PLN)
+            # Eliminates immediate token repetitions with punctuation (e.g. 'odebrać.odebrać.' -> 'odebrać.', 'tak.tak.' -> 'tak.')
+            stutter_pat = r"\b([A-Za-ząćęłńóśźżA-ZĄĆĘŁŃÓŚŹŻ]{2,}[\.!\?…]+)\s*\1(?!\w)"
+            if re.search(stutter_pat, ev.text):
+                old_stutter_t = ev.text
+                ev.text = re.sub(stutter_pat, r"\1", ev.text)
+                if ev.text != old_stutter_t:
+                    fixes.append(f"[Episode Quality Gate - Filar CLXXIV Higiena Tokenów] Linia #{i+1}: usunięto zacięcie/jąkanie tokenu z interpunkcją")
 
             ev_is_sub = bool(re.search(r"\bsubtitles?\b", ev_style_lower))
             is_sign = bool(
@@ -3216,6 +3237,21 @@ class EpisodeQualityGate:
                         if series_bible.is_low_pitch_female(spk_clean):
                             spk_gen = "FEMALE"
 
+                    if spk_gen == "MALE":
+                        # Acoustic & Scene Primacy Shield (Filar CLXXIV - 0.00 PLN):
+                        # If actor tag is MALE (e.g. 'Ögedei'), but scene is confirmed FEMALE
+                        # or physical audio is FEMALE, override spk_gen to FEMALE and prevent masculine mutations!
+                        jp_aud = (whisper_transcriptions.get(i + 1, "") if whisper_transcriptions else "") or (getattr(ev, "audio_jp", "") or "")
+                        w_is_fem = any(m in jp_aud.lower() for m in ["warawa", "妾", "atashi", "あたし", "atai", "あたい", "wa yo", "わよ", "kashira", "かしら"])
+                        sc_is_fem = (event_scene_gender.get(i) == "FEMALE")
+                        is_cont = False
+                        if series_bible and hasattr(series_bible, "audit_speaker_metadata_against_audio"):
+                            aud_res, is_cont = series_bible.audit_speaker_metadata_against_audio(spk_clean, whisper_gender="FEMALE" if w_is_fem else None, scene_gender="FEMALE" if sc_is_fem else None)
+                            if is_cont and aud_res == "FEMALE":
+                                spk_gen = "FEMALE"
+                        if not is_cont and (sc_is_fem or w_is_fem):
+                            spk_gen = "FEMALE"
+
                 # Scene-Level Exclusive Gender Assignment for Anonymous Speaker
                 if not spk_gen and event_scene_gender.get(i):
                     spk_gen = event_scene_gender.get(i)
@@ -3467,7 +3503,16 @@ class EpisodeQualityGate:
                     if addr_norm in ["kobieta", "female", "dziewczyna"] or any(k in addr_norm for k in ["(kobieta)", "(female)"]):
                         is_single_female = True
                     elif addr_norm in ["mężczyzna", "male", "chłopak"] or any(k in addr_norm for k in ["(mężczyzna)", "(male)"]):
-                        is_single_male = True
+                        # Check if male addressee was derived from a contaminated tag in a female scene
+                        cand_addr_name = re.sub(r"\s*\(.*?\)", "", raw_ev_addressee or "").strip()
+                        is_cont_addr = False
+                        if series_bible and hasattr(series_bible, "audit_speaker_metadata_against_audio") and cand_addr_name:
+                            _, is_cont_addr = series_bible.audit_speaker_metadata_against_audio(cand_addr_name, scene_gender=event_scene_gender.get(i))
+                        if is_cont_addr or event_scene_gender.get(i) == "FEMALE":
+                            is_single_female = True
+                            is_single_male = False
+                        else:
+                            is_single_male = True
                     else:
                         # Check character vocative in line
                         if character_registry:

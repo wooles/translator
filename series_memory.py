@@ -1107,10 +1107,40 @@ class SeriesBible:
                 clean_k = extract_clean_speaker_name(k_l)
                 if k_l == n_l or clean_k == n_l or n_l in k_l.split():
                     desc_v = str(v.get("description", "") if isinstance(v, dict) else v).lower()
-                    if any(w in desc_v for w in ["female", "kobieta", "dziewczyn", "żeńsk"]):
+                    # Strip negative prohibition clauses (e.g. 'zakaz form żeńskich', 'zakaz form męskich')
+                    desc_clean = re.sub(r"\b(?:zakaz|nie|brak)\s+[^.!?\n]*?(?:żeńsk\w*|męsk\w*|kobiet\w*|mężczyzn\w*)", "", desc_v)
+
+                    raw_desc = str(v.get("description", "") if isinstance(v, dict) else v)
+                    # Check structured canonical tag first: [KOBIETA (Adresat)...] or [MĘŻCZYZNA (Adresat)...]
+                    m_tag = re.search(r"\[(KOBIETA|MĘŻCZYZNA)\s+\(Adresat\)", raw_desc, re.IGNORECASE)
+                    if m_tag:
+                        return "FEMALE" if m_tag.group(1).upper() == "KOBIETA" else "MALE"
+
+                    # 1. Primary lead gender tag at start of description or in [TAG]
+                    m_lead = re.match(r"^\s*\[?(kobieta|mężczyzna|female|male)\b", desc_clean)
+                    if m_lead:
+                        lead_g = m_lead.group(1).lower()
+                        if lead_g in ("kobieta", "female"):
+                            return "FEMALE"
+                        if lead_g in ("mężczyzna", "male"):
+                            return "MALE"
+
+                    if re.search(r"\b\[kobieta\b", desc_clean) or re.search(r"\(kobieta\)", desc_clean):
                         return "FEMALE"
-                    if any(w in desc_v for w in ["male", "mężczyzna", "chłopak", "męsk"]):
+                    if re.search(r"\b\[mężczyzna\b", desc_clean) or re.search(r"\(mężczyzna\)", desc_clean):
                         return "MALE"
+
+                    # 2. General keywords in cleaned description
+                    has_f = any(w in desc_clean for w in ["female", "kobieta", "dziewczyn", "żeńsk"])
+                    has_m = any(w in desc_clean for w in ["male", "mężczyzna", "chłopak", "męsk"])
+                    if has_f and not has_m:
+                        return "FEMALE"
+                    if has_m and not has_f:
+                        return "MALE"
+                    if has_f and has_m:
+                        pos_f = min(desc_clean.find(w) for w in ["female", "kobieta", "dziewczyn", "żeńsk"] if w in desc_clean)
+                        pos_m = min(desc_clean.find(w) for w in ["male", "mężczyzna", "chłopak", "męsk"] if w in desc_clean)
+                        return "FEMALE" if pos_f < pos_m else "MALE"
 
         # Onomastic female / male name check (for named characters when series records don't specify)
         if not is_generic_actor_or_category(n_l):
@@ -1148,6 +1178,8 @@ class SeriesBible:
         Universal across all 16 series via dynamic scanning of characters and relationships.
         Returns: (detected_cast_set, 'FEMALE' | 'MALE' | None)
         """
+        if isinstance(scene_texts, str):
+            scene_texts = [scene_texts]
         if not scene_texts and not whisper_texts:
             return set(), None
 
@@ -1163,16 +1195,42 @@ class SeriesBible:
             for p in parts:
                 if is_generic_actor_or_category(p) or self.is_non_character_entity(p):
                     continue
-                p_esc = re.escape(p)
-                # Exclude 3rd-person genealogy, deceased houses or historical reference (e.g. Tolui's lineage / rodu Tołuja)
-                is_genealogy = bool(re.search(
-                    rf"\b(?:houses?|lineages?|lineage|house|tomb|tombs|memory|death|grave|graves|ród|rodu|rody|rodów|grobu|grobów|pamięć|pamięci)\s+(?:of\s+|z\s+)?[^.!?\n]*?\b{p_esc}\b|\b{p_esc}'s\s+(?:lineage|lineages|house|houses|memory|tomb|tombs|grave|graves|death|will)\b",
-                    combined_text,
-                    re.IGNORECASE
-                ))
-                if is_genealogy:
-                    continue
-                if re.search(rf"\b{p_esc}\b", combined_text, re.IGNORECASE):
+                # Generate transliteration and phonetic variants (e.g. Ögedei <-> Ogedei <-> Ugedej)
+                variants = {p}
+                p_l = p.lower()
+                if "ö" in p_l:
+                    variants.add(p.replace("Ö", "O").replace("ö", "o"))
+                if "ü" in p_l:
+                    variants.add(p.replace("Ü", "U").replace("ü", "u"))
+                if "sorghaghtani" in p_l:
+                    variants.add("Sorkaktani")
+                if "ögedei" in p_l or "ogedei" in p_l:
+                    variants.update({"Ugedej", "Ugedeja", "Ugedejowi", "Ugedejem"})
+                if "tolui" in p_l:
+                    variants.update({"Tołuj", "Tołuja", "Tołujowi", "Tołujem"})
+                if "chagatai" in p_l:
+                    variants.update({"Czagataj", "Czagataja", "Czagatajowi"})
+                if "temüge" in p_l or "temuge" in p_l:
+                    variants.update({"Temügego", "Temugego", "Temuge"})
+                if "jochi" in p_l:
+                    variants.update({"Dżoczi", "Dżocziego"})
+
+                matched_any = False
+                for v in variants:
+                    v_esc = re.escape(v)
+                    # Exclude 3rd-person genealogy, deceased houses or historical reference (e.g. Tolui's lineage / rodu Tołuja)
+                    is_genealogy = bool(re.search(
+                        rf"\b(?:houses?|lineages?|lineage|house|tomb|tombs|memory|death|grave|graves|ród|rodu|rody|rodów|grobu|grobów|pamięć|pamięci|wola|woli)\s+(?:of\s+|z\s+|wielkiego\s+chana\s+|grand\s+khan'?s?\s+)?(?:[a-ząćęłńóśźżA-ZĄĆĘŁŃÓŚŹŻ,\s]+)?\b{v_esc}\b|\b{v_esc}'s\s+(?:lineage|lineages|house|houses|memory|tomb|tombs|grave|graves|death|will)\b",
+                        combined_text,
+                        re.IGNORECASE
+                    ))
+                    if is_genealogy:
+                        continue
+                    if re.search(rf"\b{v_esc}\b", combined_text, re.IGNORECASE):
+                        matched_any = True
+                        break
+
+                if matched_any:
                     detected_cast.add(p)
 
         # Dynamic relationship scanning across all series (e.g. A -> B where both are female/male)
@@ -1232,6 +1290,10 @@ class SeriesBible:
             "take back from her from the start",
         ]):
             detected_cast.add("Boraqchin")
+            detected_cast.add("Möge")
+            # In the imperial yurt, Ögedei is NOT a physical speaker (referred to in 3rd person as Great Khan)
+            for m_male in ["Ögedei", "Ogedei", "Tolui", "Chagatai", "Jochi", "Temüge", "Temuge"]:
+                detected_cast.discard(m_male)
 
         # Audio Whisper Ground Truth integration (if available)
         combined_whisper = " ".join(whisper_texts or []).lower() if whisper_texts else ""
@@ -1252,6 +1314,38 @@ class SeriesBible:
                 gender_exclusive = "MALE"
 
         return detected_cast, gender_exclusive
+
+    def audit_speaker_metadata_against_audio(
+        self,
+        actor_name: str,
+        audio_gender: Optional[str] = None,
+        f0_hz: Optional[float] = None,
+        whisper_gender: Optional[str] = None,
+        scene_gender: Optional[str] = None
+    ) -> Tuple[str, bool]:
+        """
+        Audits untrusted actor tag from external fansub (.ass) against physical audio ground truth (0.00 PLN).
+        Returns: (resolved_gender, is_contaminated)
+        - If tag indicates MALE (e.g. 'Ögedei'), but audio F0 (>=185Hz / alt żeński), Whisper markers ('FEMALE'),
+          or pre-pass scene exclusivity ('FEMALE') confirm female speaker, tag is demoted to 'UNTRUSTED_CONTRADICTION'
+          and resolved_gender becomes 'FEMALE'.
+        """
+        if not actor_name or is_generic_actor_or_category(actor_name):
+            return (audio_gender or whisper_gender or scene_gender or "UNKNOWN"), False
+
+        actor_clean = extract_clean_speaker_name(actor_name).strip()
+        canon_gender = self.get_character_gender(actor_clean, allow_generic_nouns=False)
+
+        # Contamination condition: Canonical MALE tag contradicted by objective FEMALE physical evidence
+        has_female_audio = (audio_gender == "FEMALE") or (f0_hz is not None and f0_hz >= 185.0) or (whisper_gender == "FEMALE")
+        is_female_space = (scene_gender == "FEMALE")
+
+        if canon_gender == "MALE" and (has_female_audio or is_female_space):
+            return "FEMALE", True
+        elif canon_gender == "FEMALE" and (audio_gender == "MALE" and f0_hz is not None and f0_hz <= 140.0 and whisper_gender == "MALE"):
+            return "MALE", True
+
+        return (canon_gender if canon_gender != "UNKNOWN" else (audio_gender or whisper_gender or scene_gender or "UNKNOWN")), False
 
     def update_character_gender_from_audio(self, name: str, gender: str) -> bool:
         """

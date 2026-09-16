@@ -2260,6 +2260,13 @@ KOMPLEKSOWY RDZEŃ PRZEKŁADU AUDIOWIZUALNEGO (CORE AVT CANON - BELCZYK, BARAŃC
 
 6. CZYSTOŚĆ REJESTRU W EPOKACH DAWNYCH I FANTASY:
 - W seriach historycznych i fantasy bezwzględnie wyeliminuj współczesny slang szkolny i młodzieżowy (klasa A-D: np. 'zmywajmy się' -> 'uciekajmy'; 'jak nas nakryją' -> 'jeśli nas schwytają / odkryją').
+
+7. PRYMAT SYGNAŁU AKUSTYCZNEGO NAD SKAŻONYMI TAGAMI FANSUBÓW (FILAR CLXXIV):
+- Etykieta aktora z zewnętrznego pliku napisów (pole Actor/Name w pliku .ass) to dane niezweryfikowane (untrusted input), które bywają fałszywe lub skażone.
+- Obiektywny sygnał audio seiyū (F0, tembr żeński, zaimki w Whisper) oraz rzeczywistość dramatyczna sceny (zamknięta jurta kobiet) mają BEZWZGLĘDNY PRIORYTET nad etykietą tekstową fansuba.
+- KATEGORYCZNY ZAKAZ ulegania męskiemu tagowi aktora (np. 'Ögedei'), gdy kwestię na ekranie i w głośniku wymawia kobieta: wymóg bezwzględnego stosowania form żeńskich 1. osoby ('zamierzałam', 'chciałam', 'byłam').
+- W dialogu między kobietami adresat jest BEZWZGLĘDNIE żeński ('Wyglądasz na wzburzoną' - ZAKAZ męskiego 'wzburzonego').
+- Zakaz jąkania tokenów: powtórzenia wyrazu z kropką (np. 'odebrać.odebrać.') podlegają bezwzględnej eliminacji.
 """
 
 ACTIVE_AVT_CRAFT_CANON = r"""
@@ -3560,6 +3567,23 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Op
             "1. Aktorstwo i fizjologia emocji seiyū (płacz, panika, drżenie) ZAWSZE biją statyczny portret z Series Bible! Przy załamaniu emocjonalnym odrzuć chłód i oddaj histeryczną fizjologię rozpaczy. "
             "2. Twórz w estetyce polszczyzny bezterminowej: dialog świeży, organiczny, wolny od mód internetowych, naturalny 30 lat temu i za 30 lat. "
             "3. Zastosuj zasadę remy (akcent logiczny na końcu zdania) oraz reakcję na intencję zamiast dosłowności słów."
+        )
+
+    # 115. Prymat Sygnału Akustycznego nad Skażonymi Tagami Aktorów (.ass) (Filar CLXXIV)
+    has_acoustic_primacy_or_tag_contradiction_trigger = any(
+        any(w in str(item.get("speaker_voice", "")).lower() for w in ["żeńsk", "alt", "sopran", "ochrypł", "kobieta"]) or
+        any(w in str(item.get("notes", "")).lower() for w in ["korekta akustyczna", "filar clxxiv", "scena kobieca", "głos seiyū"]) or
+        any(w in str(item.get("speaker", "")).lower() for w in ["ögedei", "ogedei", "möge", "boraqchin"]) or
+        any(w in str(item.get("en", "")).lower() for w in ["four thousand tents", "lineage of tolui", "intended to take back", "strip from her"])
+        for item in batch_items
+    )
+    if has_acoustic_primacy_or_tag_contradiction_trigger:
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CLXXIV - Prymat Sygnału Akustycznego nad Skażonymi Tagami Aktorów (.ass)]: "
+            "1. Rzeczywistość akustyczna seiyū (głos kobiecy F0 >= 185Hz / alt żeński) ZAWSZE bije etykietę aktora z zewnętrznego pliku fansuba! "
+            "Gdy na ekranie i w audio kwestię wypowiada kobieta, KATEGORYCZNY ZAKAZ stosowania męskich form czasowników ('zamierzałem' -> NAKAZ: 'zamierzałam'), nawet jeśli fansuber błędnie otagował linię męskim imieniem (np. Ögedei). "
+            "2. W dialogu między dwiema kobietami w zamkniętej przestrzeni adresat jest BEZWZGLĘDNIE żeński ('Wyglądasz na wzburzoną' - KATEGORYCZNY ZAKAZ męskiego 'wzburzonego'). "
+            "3. Zabezpieczenie przed podwojeniem tokenów: zakaz jąkania wyrazów z interpunkcją na końcu zdań (np. 'odebrać.odebrać.')."
         )
 
     if not focused_pillars:

@@ -1765,6 +1765,30 @@ class MultimodalTranslator:
             return "kobieta", alerts
 
         if canonical_gender == "mężczyzna":
+            # Acoustic Primacy Gate (Filar CLXXIV): Untrusted fansub tag contradicted by female audio or scene
+            tag_text = ((speaker_tags.get(batch_id, "") or speaker_tags.get(event_idx, "")) if speaker_tags else "").lower()
+            tag_is_fem = any(k in tag_text for k in ["żeńsk", "sopran", "kobieta", "alt"])
+            has_female_audio = (acoustic_gender == "kobieta") or jp_female_marker or tag_is_fem
+            is_scene_female = False
+            check_idx = event_idx if event_idx is not None else batch_id
+            if hasattr(self, "episode_scene_genders") and self.episode_scene_genders:
+                if self.episode_scene_genders.get(check_idx) == "kobieta" or self.episode_scene_genders.get(getattr(event, "_orig_idx", None)) == "kobieta":
+                    is_scene_female = True
+
+            if hasattr(self, "series_bible") and self.series_bible and hasattr(self.series_bible, "audit_speaker_metadata_against_audio"):
+                aud_res, is_cont = self.series_bible.audit_speaker_metadata_against_audio(
+                    spk_clean,
+                    audio_gender="FEMALE" if has_female_audio else None,
+                    whisper_gender="FEMALE" if jp_female_marker else None,
+                    scene_gender="FEMALE" if is_scene_female else None
+                )
+                if is_cont and aud_res == "FEMALE":
+                    has_female_audio = True
+
+            if has_female_audio or is_scene_female:
+                alerts.append(f"[🚨 ALARM PRYMATU AKUSTYCZNEGO (Filar CLXXIV): Tag aktora '{spk_clean}' (mężczyzna) sprzeczny z głosem żeńskim seiyū / sceną! Zastosowano korektę akustyczną -> wymuszono 'kobieta']")
+                return "kobieta", alerts
+
             if phase1_is_female:
                 alerts.append(f"[🚨 ALARM ARBITRAŻU: Faza 1 błędnie przypisała rodzaj żeński dla potwierdzonego mężczyzny '{spk_clean}'! Zastosowano Weto Kanonu -> wymuszono 'mężczyzna']")
             return "mężczyzna", alerts
@@ -1833,7 +1857,7 @@ class MultimodalTranslator:
         - addressee_label: np. "Grupa Kobiet (L. mnoga niemęskoosobowa: -łyście)", "Naie (Kobieta)"
         """
         # Pre-pass Episode Scene Cast Check (Continuous Scene Ground Truth)
-        check_idx = orig_idx if orig_idx is not None else getattr(event, "_orig_idx", None)
+        check_idx = orig_idx if orig_idx is not None else (getattr(event, "_orig_idx", None) if getattr(event, "_orig_idx", None) is not None else event_idx)
         if check_idx is not None and hasattr(self, "episode_scene_genders") and self.episode_scene_genders:
             if check_idx in self.episode_scene_genders:
                 sc_g = self.episode_scene_genders[check_idx]
@@ -1928,9 +1952,11 @@ class MultimodalTranslator:
                         return "mężczyzna", f"{prev_spk} (Mężczyzna)"
                 if is_inherently_female_name(prev_spk):
                     return "kobieta", f"{prev_spk} (Kobieta)"
-        elif event_idx == 0 and curr_spk and lookback_history:
-            prev_h = lookback_history[-1]
-            prev_spk = (prev_h.get("speaker") or prev_h.get("speaker_name") or "").strip()
+        elif event_idx == 0 and curr_spk:
+            prev_spk = ""
+            if lookback_history:
+                prev_h = lookback_history[-1]
+                prev_spk = (prev_h.get("speaker") or prev_h.get("speaker_name") or "").strip()
             if prev_spk and prev_spk != curr_spk:
                 prev_g = (prev_h.get("speaker_gender") or "").strip().lower()
                 if prev_g in ["kobieta", "female", "żeński"]:
@@ -1951,6 +1977,29 @@ class MultimodalTranslator:
                         return "mężczyzna", f"{prev_spk} (Mężczyzna)"
                 if is_inherently_female_name(prev_spk):
                     return "kobieta", f"{prev_spk} (Kobieta)"
+            elif len(batch_events) > 1:
+                # Forward Turn Interlocutor Lookahead (e.g. Möge opening dialogue with interlocutor)
+                for n_i in range(1, len(batch_events)):
+                    next_ev = batch_events[n_i][1] if len(batch_events[n_i]) > 1 else None
+                    next_spk = (getattr(next_ev, "name", None) or getattr(next_ev, "actor", None) or "").strip()
+                    if next_spk and next_spk != curr_spk and not is_generic_actor_or_category(next_spk):
+                        next_orig = batch_events[n_i][0] if len(batch_events[n_i]) > 0 else n_i
+                        if hasattr(self, "episode_scene_genders") and self.episode_scene_genders.get(next_orig) == "kobieta":
+                            return "kobieta", f"{next_spk} (Kobieta - Scena Kobieca)"
+                        elif hasattr(self, "episode_scene_genders") and self.episode_scene_genders.get(next_orig) == "mężczyzna":
+                            return "mężczyzna", f"{next_spk} (Mężczyzna - Scena Męska)"
+                        next_v = speaker_tags.get(n_i + 1, "") if speaker_tags else ""
+                        if any(k in next_v.lower() for k in ["żeńsk", "alt", "sopran", "ochrypł"]):
+                            return "kobieta", f"{next_spk} (Kobieta - Audio seiyū)"
+                        if getattr(self, "series_bible", None) and hasattr(self.series_bible, "audit_speaker_metadata_against_audio"):
+                            res_g, is_c = self.series_bible.audit_speaker_metadata_against_audio(next_spk, audio_gender="FEMALE" if any(k in next_v.lower() for k in ["żeńsk", "alt", "sopran", "ochrypł"]) else None)
+                            if is_c and res_g == "FEMALE":
+                                return "kobieta", f"{next_spk} (Kobieta - Korekta Akustyczna)"
+                            elif res_g == "FEMALE":
+                                return "kobieta", f"{next_spk} (Kobieta)"
+                            elif res_g == "MALE":
+                                return "mężczyzna", f"{next_spk} (Mężczyzna)"
+                        break
 
         # 2a. Acoustic F0 Alternation in Anonymous Dialogue
         if speaker_tags:
@@ -2005,6 +2054,17 @@ class MultimodalTranslator:
                 cand_g = "UNKNOWN"
                 if getattr(self, "series_bible", None) and hasattr(self.series_bible, "get_character_gender"):
                     cand_g = self.series_bible.get_character_gender(cand_spk, allow_generic_nouns=False)
+                # Audit contaminated male tags against batch audio/scene
+                if cand_g == "MALE" and getattr(self, "series_bible", None) and hasattr(self.series_bible, "audit_speaker_metadata_against_audio"):
+                    for b_i, b_entry in enumerate(batch_events):
+                        b_ev = b_entry[1] if len(b_entry) > 1 else None
+                        if b_ev and getattr(b_ev, "name", "").strip() == cand_spk:
+                            b_v = speaker_tags.get(b_i + 1, "") if speaker_tags else ""
+                            b_aud_g = "FEMALE" if any(k in b_v.lower() for k in ["żeńsk", "alt", "sopran", "ochrypł"]) else None
+                            b_res_g, is_cont = self.series_bible.audit_speaker_metadata_against_audio(cand_spk, audio_gender=b_aud_g)
+                            if is_cont and b_res_g == "FEMALE":
+                                cand_g = "FEMALE"
+                                break
                 if cand_g != "FEMALE" and not is_inherently_female_name(cand_spk):
                     all_fem = False
                     break

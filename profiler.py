@@ -280,8 +280,8 @@ def format_lean_episode_brief(profile: Any) -> str:
                     if not g and is_inherently_female_name(name):
                         g = "kobieta"
                     lines.append(f"  - {name}: {g} ({role})")
-                    if str(g).lower() in ("female", "kobieta") and any(w in (str(role) + " " + str(voc) + " " + str(name)).lower() for w in ["starsza", "dojrzała", "ochrypł", "babci", "matron", "cesarzow", "chatun", "boraqchin", "fatima", "töregene", "sitara"]):
-                        lines.append(f"    (!) OCHRONA PŁCI ({name}): KOBIETA (niski F0 / ochrypły alt – zakaz męskich form!) – BEZWZGLĘDNY NAKAZ form żeńskich: -łam, -łabym, -łaś (np. 'miałabym', 'wiedziałam', 'zamierzyłam')!")
+                    if str(g).lower() in ("female", "kobieta") and any(w in (str(role) + " " + str(voc) + " " + str(name)).lower() for w in ["starsza", "dojrzała", "ochrypł", "babci", "matron", "cesarzow", "chatun", "boraqchin", "fatima", "töregene", "sitara", "möge"]):
+                        lines.append(f"    (!) OCHRONA PŁCI ({name}): KOBIETA (niski F0 / ochrypły alt / zamknięta przestrzeń – zakaz męskich form!) – BEZWZGLĘDNY NAKAZ form żeńskich: -łam, -łabym, -łaś (np. 'miałabym', 'wiedziałam', 'zamierzałam')!")
         if rels:
             if isinstance(rels, dict):
                 for spk, info in list(rels.items())[:8]:
@@ -373,7 +373,8 @@ Twoim zadaniem jest dogłębna, wszechstronna analiza 100% skryptu całego odcin
 7. MOSTY CIĄGŁOŚCI (continuity_bridge_alerts): Wskaż terminy i wątki wymagające żelaznej spójności z całą serią.
 8. CHRONOLOGICZNA MAPA SEKWENCJI DRAMATURGICZNYCH (dramatic_sequences): Podziel odcinek na 3-4 akty/sekwencje czasowe z opisem napięcia i tonu.
    - DLA KAŻDEJ SEKWENCJI BEZWZGLĘDNIE WSKAŻ characters_present (listę postaci rozmawiających w tej scenie, zwłaszcza gdy linie w skrypcie nie mają wpisanych nazwisk w polu Actor!).
-   - Jeśli w scenie rozmawiają wyłącznie kobiety (np. Fatima i Boraqchin Khatun), BEZWZGLĘDNIE ustaw female_only_scene = True! Zabezpiecza to potok przed domyślnym męskim biasem LLM w dialogach anonimowych.
+   - PRYMAT RZECZYWISTOŚCI SCENICZNEJ I AUDIO NAD SKAŻONYMI TAGAMI FANSUBÓW (FILAR CLXXIV): W zewnętrznych plikach napisów (fansubach) pole Actor/Name bywa fałszywie otagowane (np. wpisany męski władca 'Ögedei', podczas gdy na ekranie w namiocie rozmawiają kobiety: 'Möge' i 'Boraqchin', a seiyū wymawia kwestię żeńskim głosem). W takich sytuacjach BEZWZGLĘDNIE zignoruj błędny tag aktora! Wskaż rzeczywistą obsadę obecną w scenie i ustaw female_only_scene = True! Zabezpiecz sceny przed fałszywym dodawaniem wspominanych w dialogach postaci historycznych/genealogicznych (np. 'rody Ugedeja, Tołuja' nie oznacza obecności tych mężczyzn w scenie!).
+   - Jeśli w scenie rozmawiają wyłącznie kobiety (np. Fatima, Möge i Boraqchin Khatun), BEZWZGLĘDNIE ustaw female_only_scene = True! Zabezpiecza to potok przed domyślnym męskim biasem LLM w dialogach anonimowych.
    - Jeśli w scenie rozmawiają wyłącznie mężczyźni, ustaw male_only_scene = True!
 9. KARTOTEKA OBSADY I IDIOLEKTY YAKUWARIGO (character_dossiers): Określ wiek, status, japońskie zaimki (Ore/Boku/Watashi/Washi/Sessha), dialekt (Kansai-ben) i unikalny polski rejestr mowy (Ojou-sama salonowy, Starzec staroświecki, Samuraj rycerski, Yankii szorstki, Kansai gawędziarski).
 10. TABELA ODMIANY IMION PRZEZ PRZYPADKI (name_declensions) & MATRYCA RELACJI I TYTULATURY (characters):
