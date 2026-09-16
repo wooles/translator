@@ -103,6 +103,8 @@
     "Harugon": "Harugon",
     "JSDF": "Siły Samoobrony",
     "Prince of Kaiju": "Potworny Królewicz",
+    "Kaiju Prince": "Potworny Królewicz",
+    "Książę Kaiju": "Potworny Królewicz",
     "King of Kaiju, Godolla": "Król kaiju Godolla",
     "Harumi": "Harumi",
     "Kuroe Akaishi": "Kuroe Akaishi",
@@ -160,10 +162,10 @@
     "Arata -> Kuroe": "Zwrot: 'panno Akaishi (Akaishi-san)' (para zakochanych z dystansem szkolnym) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Kuroe -> Arata": "Zwrot: 'Minami-kun' (para zakochanych)",
     "Seina -> Arata": "Zwrot: 'na ty / świeżaku / młody' (doświadczona gwiazda -> debiutant)",
-    "Raimu -> Kuroe": "Zwrot: 'Kuroe' (bliskie koleżanki ze szkoły, bezpośredni styl rówieśniczy gyaru) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
-    "Manatsu -> Kuroe": "Zwrot: 'panno Kuroe (Kuroe-san)' (szkolna znajoma z dystyngowanym szacunkiem) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Raimu -> Kuroe": "Zwrot: 'Kuroe' (bliskie koleżanki ze szkoły, bezpośredni styl rówieśniczy gyaru) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]",
+    "Manatsu -> Kuroe": "Zwrot: 'panno Kuroe (Kuroe-san)' (szkolna znajoma z dystyngowanym szacunkiem) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]",
     "Taichi -> Arata": "Zwrot: 'na ty' (młodszy rywal o względy Kuroe)",
-    "Arata Minami -> Kuroe Akaishi": "Zwrot: 'Akaishi / po imieniu' (sympatia / para licealistów)",
+    "Arata Minami -> Kuroe Akaishi": "Zwrot: 'Akaishi / po imieniu' (sympatia / para licealistów) [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]",
     "Rinko Akaishi -> Kotaro Hibino": "Zwrot: 'Kotaro / Profesorze Hibino' (byli współpracownicy / naukowcy)",
     "Kotaro Hibino -> Rinko Akaishi": "Zwrot: 'panno Akaishi / Rinko' (były student -> starsza koleżanka/mentorka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Kotaro -> Rinko": "Zwrot: 'panno Akaishi / Rinko' (były student -> starsza koleżanka/mentorka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
@@ -185,7 +187,8 @@
       "B": "Kuroe",
       "N": "Kuroe",
       "Ms": "Kuroe",
-      "W": "Kuroe"
+      "W": "Kuroe",
+      "gender": "FEMALE"
     },
     "Seina": {
       "M": "Seina",
@@ -194,7 +197,8 @@
       "B": "Seinę",
       "N": "Seiną",
       "Ms": "Seinie",
-      "W": "Seino"
+      "W": "Seino",
+      "gender": "FEMALE"
     },
     "Raimu": {
       "M": "Raimu",
@@ -203,7 +207,8 @@
       "B": "Raimu",
       "N": "Raimu",
       "Ms": "Raimu",
-      "W": "Raimu"
+      "W": "Raimu",
+      "gender": "FEMALE"
     },
     "Manatsu": {
       "M": "Manatsu",
@@ -212,7 +217,8 @@
       "B": "Manatsu",
       "N": "Manatsu",
       "Ms": "Manatsu",
-      "W": "Manatsu"
+      "W": "Manatsu",
+      "gender": "FEMALE"
     },
     "Taichi": {
       "M": "Taichi",
@@ -230,7 +236,8 @@
       "B": "Kuroe Kurozu",
       "N": "Kuroe Kurozu",
       "Ms": "Kuroe Kurozu",
-      "W": "Kuroe Kurozu"
+      "W": "Kuroe Kurozu",
+      "gender": "FEMALE"
     },
     "Arata Inubaki": {
       "M": "Arata Inubaki",
@@ -248,7 +255,8 @@
       "B": "Aratę Minami (Inubaki)a",
       "N": "Aratą Minami (Inubaki)em",
       "Ms": "Aracie Minami (Inubaki)ie",
-      "W": "Arato Minami (Inubaki)ie"
+      "W": "Arato Minami (Inubaki)ie",
+      "gender": "FEMALE"
     },
     "Seina Katsuragi": {
       "M": "Seina Katsuragi",
@@ -257,7 +265,8 @@
       "B": "Seinę Katsuragi",
       "N": "Seiną Katsuragi",
       "Ms": "Seinie Katsuragi",
-      "W": "Seino Katsuragi"
+      "W": "Seino Katsuragi",
+      "gender": "FEMALE"
     },
     "Manatsu Tomita": {
       "M": "Manatsu Tomita",
@@ -266,7 +275,8 @@
       "B": "Manatsu Tomitę",
       "N": "Manatsu Tomitą",
       "Ms": "Manatsu Tomicie",
-      "W": "Manatsu Tomito"
+      "W": "Manatsu Tomito",
+      "gender": "FEMALE"
     },
     "Raimu Kohno": {
       "M": "Raimu Kohno",
@@ -275,7 +285,8 @@
       "B": "Raimu Kohno",
       "N": "Raimu Kohno",
       "Ms": "Raimu Kohno",
-      "W": "Raimu Kohno"
+      "W": "Raimu Kohno",
+      "gender": "FEMALE"
     },
     "Minami": {
       "M": "Minami",
@@ -284,7 +295,8 @@
       "B": "Minami",
       "N": "Minami",
       "Ms": "Minami",
-      "W": "Minami"
+      "W": "Minami",
+      "gender": "FEMALE"
     },
     "Akaishi": {
       "M": "Akaishi",
@@ -293,7 +305,8 @@
       "B": "Akaishi",
       "N": "Akaishi",
       "Ms": "Akaishi",
-      "W": "Akaishi"
+      "W": "Akaishi",
+      "gender": "FEMALE"
     },
     "Takamine": {
       "M": "Takamine",
@@ -302,7 +315,8 @@
       "B": "Takamine",
       "N": "Takamine",
       "Ms": "Takamine",
-      "W": "Takamine"
+      "W": "Takamine",
+      "gender": "FEMALE"
     },
     "Harugon": {
       "M": "Harugon",
@@ -338,7 +352,8 @@
       "B": "Kuroe Akaishi",
       "N": "Kuroe Akaishi",
       "Ms": "Kuroe Akaishi",
-      "W": "Kuroe Akaishi"
+      "W": "Kuroe Akaishi",
+      "gender": "FEMALE"
     },
     "Rinko Akaishi": {
       "M": "Rinko Akaishi",
@@ -347,7 +362,8 @@
       "B": "Rinko Akaishi",
       "N": "Rinko Akaishi",
       "Ms": "Rinko Akaishi",
-      "W": "Rinko Akaishi"
+      "W": "Rinko Akaishi",
+      "gender": "FEMALE"
     },
     "Kotaro Hibino": {
       "M": "Kotaro Hibino",
@@ -365,7 +381,8 @@
       "B": "Aratę -> Kuroe",
       "N": "Aratą -> Kuroe",
       "Ms": "Aracie -> Kuroe",
-      "W": "Arato -> Kuroe"
+      "W": "Arato -> Kuroe",
+      "gender": "FEMALE"
     },
     "Kuroe -> Arata": {
       "M": "Kuroe -> Arata",
@@ -392,7 +409,8 @@
       "B": "Raimu -> Kuroe",
       "N": "Raimu -> Kuroe",
       "Ms": "Raimu -> Kuroe",
-      "W": "Raimu -> Kuroe"
+      "W": "Raimu -> Kuroe",
+      "gender": "FEMALE"
     },
     "Manatsu -> Kuroe": {
       "M": "Manatsu -> Kuroe",
@@ -401,7 +419,8 @@
       "B": "Manatsu -> Kuroe",
       "N": "Manatsu -> Kuroe",
       "Ms": "Manatsu -> Kuroe",
-      "W": "Manatsu -> Kuroe"
+      "W": "Manatsu -> Kuroe",
+      "gender": "FEMALE"
     },
     "Taichi -> Arata": {
       "M": "Taichi -> Arata",
@@ -440,6 +459,12 @@
       "W": "Rinko Akaishi -> Kotaro Hibino"
     }
   },
+  "hypocorisms": {
+    "Kuro": "Kuroe",
+    "Kuro-tan": "Kuroe",
+    "Kuro-taso": "Kuroe",
+    "Rin": "Rinko"
+  },
   "plot_anchors": {
     "Harugon": "Oficjalne imię nadane kaiju-formie Kuroe przez media i Manatsu; bezwzględnie zachować pisownię 'Harugon' i męski/nijaki rodzaj gramatyczny w narracji mediów.",
     "Akaishi-san": "Arata konsekwentnie zwraca się do Kuroe per 'panno Akaishi' (Akaishi-san), co stanowi kluczowy element jego szacunku i dystansu."
@@ -449,10 +474,5 @@
     "Kanon Mangi",
     "[ASW] Otome Kaijuu Carameliser - 09 [1080p HEVC][C3F1AD15]"
   ],
-  "hypocorisms": {
-    "Kuro": "Kuroe",
-    "Kuro-tan": "Kuroe",
-    "Kuro-taso": "Kuroe",
-    "Rin": "Rinko"
-  }
+  "batch_stats": {}
 }

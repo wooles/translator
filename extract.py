@@ -163,6 +163,7 @@ def extract_audio_slice(
         "-t", f"{duration_sec:.3f}",
         "-i", video_path,
         "-vn",
+        "-af", "highpass=f=160,lowpass=f=3800",
         "-ac", "1",
         "-ar", "16000",
         output_path

@@ -176,20 +176,26 @@ def fetch_anilist_metadata(title: str) -> Optional[Dict[str, Any]]:
                 role = edge.get("role", "SUPPORTING")
                 c_name = node.get("name", {}).get("full")
                 c_native = node.get("name", {}).get("native")
-                c_gender = node.get("gender") or "nieznana"
+                raw_gender = (node.get("gender") or "").strip()
                 
-                # Determine gender label for prompt
-                gender_pl = "postać"
-                if c_gender.lower() in ("female", "woman", "girl"):
+                # Verified gender gate (AniList SSOT rule):
+                # Gender is defined from AniList ONLY if there is an explicit, verified entry (Male / Female).
+                # Otherwise gender is None, leaving resolution to dynamic episode-level data.
+                has_verified_gender = False
+                gender_pl = None
+                if raw_gender.lower() in ("female", "woman", "girl"):
                     gender_pl = "kobieta / dziewczyna"
-                elif c_gender.lower() in ("male", "man", "boy"):
+                    has_verified_gender = True
+                elif raw_gender.lower() in ("male", "man", "boy"):
                     gender_pl = "mężczyzna / chłopak"
+                    has_verified_gender = True
 
                 characters.append({
                     "name": c_name,
                     "native_name": c_native,
                     "gender": gender_pl,
-                    "gender_raw": c_gender,
+                    "gender_raw": raw_gender if has_verified_gender else None,
+                    "has_verified_gender": has_verified_gender,
                     "role": "Główny bohater" if role == "MAIN" else "Postać drugoplanowa"
                 })
 

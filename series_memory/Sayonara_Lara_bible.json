@@ -2,91 +2,109 @@
   "anime_title": "Sayonara Lara",
   "characters": {
     "Lara": {
-      "description": "KOBIETA - kobieta / dziewczyna (Główna bohaterka)"
+      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Luca": {
-      "description": "MĘŻCZYZNA - mężczyzna (Nastolatek, przyjaciel Mari i Lary, momentami tchórzliwy, lecz w decydującej chwili przezwyciężający strach)"
+      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Mari": {
-      "description": "KOBIETA - kobieta (postać)"
+      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Mari Otsu": {
-      "description": "KOBIETA - kobieta (Uczennica szkoły średniej, zawodniczka boksu juniorskiego, oddana przyjaciółka Lary)"
+      "description": "kobieta (Młoda dziewczynka mieszkająca na wybrzeżu (retrospekcja)) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Leo": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Lisa": {
-      "description": "KOBIETA - kobieta (postać)"
+      "description": "postać (Postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Kusatsu": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Grace": {
-      "description": "KOBIETA (wyodrębniono z relacji serii)"
+      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Rowan": {
-      "description": "MĘŻCZYZNA - mężczyzna (Król syren, ojciec Lary, wyniosły i pałający bezwzględną nienawiścią do rodzaju ludzkiego)"
+      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Yoshiya": {
-      "description": "MĘŻCZYZNA - mężczyzna (Starszy brat Mari, nonszalancki buntownik wagarowicz z praktycznymi znajomościami)"
+      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Rigmor": {
-      "description": "KOBIETA - kobieta (postać)"
+      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Lara -> Luca": {
-      "description": "Zwrot: 'Luca' (nieśmiałe zakochani / przyjaciele)"
+      "description": "Zwrot: 'Luca' (nieśmiałe zakochani / przyjaciele) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Luca -> Lara": {
-      "description": "Zwrot: 'na ty / po imieniu (Lara)' (znajomi / rozwijające się uczucie)"
+      "description": "Zwrot: 'na ty / po imieniu (Lara)' (znajomi / rozwijające się uczucie) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Mari -> Lara": {
-      "description": "Zwrot: 'na ty / Lara' (bliskie przyjaciółki)"
+      "description": "Zwrot: 'na ty / Lara' (bliskie przyjaciółki) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Gon (Grace) -> Lara": {
-      "description": "PŁEĆ: ŻEŃSKA (Wiedźma/mentorka w postaci rybki w akwarium). Zawsze formy ŻEŃSKIE (np. poszukałam, widziałam, mogłabym). Zwrot: 'na ty / po imieniu: Lara'"
+      "description": "PŁEĆ: ŻEŃSKA (Wiedźma/mentorka w postaci rybki w akwarium). Zawsze formy ŻEŃSKIE (np. poszukałam, widziałam, mogłabym). Zwrot: 'na ty / po imieniu: Lara' [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]"
     },
     "Gon (Grace) -> Mari": {
-      "description": "PŁEĆ: ŻEŃSKA (Wiedźma/mentorka w akwarium mówiąca do leżącej na łóżku Mari). Obie to KOBIETY! Zawsze formy ŻEŃSKIE (np. 'Chcesz, żebym poszukała?' / 'Mam poszukać?'). Zwrot: 'Mari / na ty'"
+      "description": "PŁEĆ: ŻEŃSKA (Wiedźma/mentorka w akwarium mówiąca do leżącej na łóżku Mari). Obie to KOBIETY! Zawsze formy ŻEŃSKIE (np. 'Chcesz, żebym poszukała?' / 'Mam poszukać?'). Zwrot: 'Mari / na ty' [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]"
     },
     "Gon (Grace) -> Luca": {
-      "description": "PŁEĆ: ŻEŃSKA (Wiedźma/mentorka w akwarium). Zawsze formy ŻEŃSKIE (np. 'Chcesz, żebym poszukała?' / 'Mam poszukać?'). Zwrot: 'Luca / na ty'"
+      "description": "PŁEĆ: ŻEŃSKA (Wiedźma/mentorka w akwarium). Zawsze formy ŻEŃSKIE (np. 'Chcesz, żebym poszukała?' / 'Mam poszukać?'). Zwrot: 'Luca / na ty' [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]"
     },
     "Leo -> Luca": {
-      "description": "Zwrot: 'braciszku / bracie' (młodszy brat -> starszy brat)"
+      "description": "Zwrot: 'braciszku / bracie' (młodszy brat -> starszy brat) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Leo -> Lara": {
       "description": "Zwrot: 'Lara' (młodszy brat przyjaciela)"
     },
     "Lara -> Mari": {
-      "description": "Zwrot: 'na ty / po imieniu (Mari)' (przyjaciółki)"
+      "description": "Zwrot: 'na ty / po imieniu (Mari)' (przyjaciółki) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Lisa -> Mari": {
-      "description": "Zwrot: 'panieńskie / pełne (Mari Otsu)' (dystans / obca osoba z wrogiego świata)"
+      "description": "Zwrot: 'panieńskie / pełne (Mari Otsu)' (dystans / obca osoba z wrogiego świata) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Kusatsu -> Mari": {
-      "description": "Zwrot: 'po nazwisku (Otsu)' (trener -> zawodniczka)"
+      "description": "Zwrot: 'po nazwisku (Otsu)' (trener -> zawodniczka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Mari -> Luca": {
-      "description": "Zwrot: 'po imieniu / na ty' (znajomi / opiekunowie Lary)"
+      "description": "Zwrot: 'po imieniu / na ty' (znajomi / opiekunowie Lary) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Grace -> Mari": {
-      "description": "Zwrot: 'Mari' (wiedźma w akwarium -> opiekunka)"
+      "description": "Zwrot: 'Mari' (wiedźma w akwarium -> opiekunka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Lara -> Rowan": {
-      "description": "Zwrot: 'ojcze' (córka -> ojciec / król)"
+      "description": "Zwrot: 'ojcze' (córka -> ojciec / król) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Rowan -> Lara": {
-      "description": "Zwrot: 'Lara / córko' (ojciec / monarcha -> córka)"
+      "description": "Zwrot: 'na ty / po imieniu: Laro' (ojciec -> córka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Luca -> Mari": {
-      "description": "Zwrot: 'Otsu / na ty' (znajomi ze szkoły)"
+      "description": "Zwrot: 'Otsu / na ty' (znajomi ze szkoły) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Yoshiya -> Mari": {
-      "description": "Zwrot: 'Mari / na ty' (rodzeństwo (starszy brat -> młodsza siostra))"
+      "description": "Zwrot: 'Mari / na ty' (rodzeństwo (starszy brat -> młodsza siostra)) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Yoshiya -> Luca": {
-      "description": "Zwrot: 'młody / na ty' (starszy chłopak -> intruz / młodszy kolega siostry)"
+      "description": "Zwrot: 'młody / na ty' (starszy chłopak -> intruz / młodszy kolega siostry) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Grace -> Rigmor": {
+      "description": "Zwrot: 'na ty / po imieniu: Rigmor' (bliźniacze siostry) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Młoda Mari -> Gon (Grace)": {
+      "description": "Zwrot: 'na ty / bezpośrednio' (wybawicielka -> znaleziona mała istotka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Młoda Mari": {
+      "description": "KOBIETA (wyodrębniono z relacji serii)"
+    },
+    "Lucian -> Grace": {
+      "description": "Zwrot: 'na ty / pogardliwie: potworze' (człowiek -> odrzucona syrena) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Lucian": {
+      "description": "KOBIETA (wyodrębniono z relacji serii)"
+    },
+    "Gon": {
+      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     }
   },
   "glossary": {
@@ -98,7 +116,6 @@
     "Girls Bantamweight Division": "Kategoria kogucia dziewcząt",
     "Red corner / Blue corner": "Czerwony narożnik",
     "Omi's Lightning": "Błyskawica z Omi",
-    "Merfolk": "syreni lud",
     "Vanish into foam": "Rozwiać się w pianę morską",
     "True Love": "Prawdziwa miłość",
     "Witch's potion": "Eliksir czarownicy",
@@ -106,27 +123,34 @@
     "Zeze Castle": "Zamek Zeze",
     "Okishima": "Okishima",
     "Mother Lake": "Matka Jezioro",
-    "light": "światłość"
+    "light": "światłość",
+    "merfolk": "syreni lud",
+    "surface": "powierzchnia",
+    "Magic Mirror": "Zwierciadło Magii",
+    "foam": "morska piana"
   },
   "relationships": {
-    "Lara -> Luca": "Zwrot: 'Luca' (nieśmiałe zakochani / przyjaciele)",
-    "Luca -> Lara": "Zwrot: 'na ty / po imieniu (Lara)' (znajomi / rozwijające się uczucie)",
-    "Mari -> Lara": "Zwrot: 'na ty / Lara' (bliskie przyjaciółki)",
-    "Gon (Grace) -> Lara": "PŁEĆ: ŻEŃSKA (Wiedźma/mentorka w postaci rybki w akwarium). Zawsze formy ŻEŃSKIE (np. poszukałam, widziałam, mogłabym). Zwrot: 'na ty / po imieniu: Lara'",
-    "Gon (Grace) -> Mari": "PŁEĆ: ŻEŃSKA (Wiedźma/mentorka w akwarium mówiąca do leżącej na łóżku Mari). Obie to KOBIETY! Zawsze formy ŻEŃSKIE (np. 'Chcesz, żebym poszukała?' / 'Mam poszukać?'). Zwrot: 'Mari / na ty'",
-    "Gon (Grace) -> Luca": "PŁEĆ: ŻEŃSKA (Wiedźma/mentorka w akwarium). Zawsze formy ŻEŃSKIE (np. 'Chcesz, żebym poszukała?' / 'Mam poszukać?'). Zwrot: 'Luca / na ty'",
-    "Leo -> Luca": "Zwrot: 'braciszku / bracie' (młodszy brat -> starszy brat)",
+    "Lara -> Luca": "Zwrot: 'Luca' (nieśmiałe zakochani / przyjaciele) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Luca -> Lara": "Zwrot: 'na ty / po imieniu (Lara)' (znajomi / rozwijające się uczucie) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Mari -> Lara": "Zwrot: 'na ty / Lara' (bliskie przyjaciółki) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]",
+    "Gon (Grace) -> Lara": "PŁEĆ: ŻEŃSKA (Wiedźma/mentorka w postaci rybki w akwarium). Zawsze formy ŻEŃSKIE (np. poszukałam, widziałam, mogłabym). Zwrot: 'na ty / po imieniu: Lara' [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Gon (Grace) -> Mari": "PŁEĆ: ŻEŃSKA (Wiedźma/mentorka w akwarium mówiąca do leżącej na łóżku Mari). Obie to KOBIETY! Zawsze formy ŻEŃSKIE (np. 'Chcesz, żebym poszukała?' / 'Mam poszukać?'). Zwrot: 'Mari / na ty' [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Gon (Grace) -> Luca": "PŁEĆ: ŻEŃSKA (Wiedźma/mentorka w akwarium). Zawsze formy ŻEŃSKIE (np. 'Chcesz, żebym poszukała?' / 'Mam poszukać?'). Zwrot: 'Luca / na ty' [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Leo -> Luca": "Zwrot: 'braciszku / bracie' (młodszy brat -> starszy brat) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Leo -> Lara": "Zwrot: 'Lara' (młodszy brat przyjaciela)",
-    "Lara -> Mari": "Zwrot: 'na ty / po imieniu (Mari)' (przyjaciółki)",
-    "Lisa -> Mari": "Zwrot: 'panieńskie / pełne (Mari Otsu)' (dystans / obca osoba z wrogiego świata)",
-    "Kusatsu -> Mari": "Zwrot: 'po nazwisku (Otsu)' (trener -> zawodniczka)",
-    "Mari -> Luca": "Zwrot: 'po imieniu / na ty' (znajomi / opiekunowie Lary)",
-    "Grace -> Mari": "Zwrot: 'Mari' (wiedźma w akwarium -> opiekunka)",
-    "Lara -> Rowan": "Zwrot: 'ojcze' (córka -> ojciec / król)",
-    "Rowan -> Lara": "Zwrot: 'Lara / córko' (ojciec / monarcha -> córka)",
-    "Luca -> Mari": "Zwrot: 'Otsu / na ty' (znajomi ze szkoły)",
-    "Yoshiya -> Mari": "Zwrot: 'Mari / na ty' (rodzeństwo (starszy brat -> młodsza siostra))",
-    "Yoshiya -> Luca": "Zwrot: 'młody / na ty' (starszy chłopak -> intruz / młodszy kolega siostry)"
+    "Lara -> Mari": "Zwrot: 'na ty / po imieniu (Mari)' (przyjaciółki) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]",
+    "Lisa -> Mari": "Zwrot: 'panieńskie / pełne (Mari Otsu)' (dystans / obca osoba z wrogiego świata) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]",
+    "Kusatsu -> Mari": "Zwrot: 'po nazwisku (Otsu)' (trener -> zawodniczka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Mari -> Luca": "Zwrot: 'po imieniu / na ty' (znajomi / opiekunowie Lary) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Grace -> Mari": "Zwrot: 'Mari' (wiedźma w akwarium -> opiekunka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]",
+    "Lara -> Rowan": "Zwrot: 'ojcze' (córka -> ojciec / król) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Rowan -> Lara": "Zwrot: 'na ty / po imieniu: Laro' (ojciec -> córka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Luca -> Mari": "Zwrot: 'Otsu / na ty' (znajomi ze szkoły) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Yoshiya -> Mari": "Zwrot: 'Mari / na ty' (rodzeństwo (starszy brat -> młodsza siostra)) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Yoshiya -> Luca": "Zwrot: 'młody / na ty' (starszy chłopak -> intruz / młodszy kolega siostry) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Grace -> Rigmor": "Zwrot: 'na ty / po imieniu: Rigmor' (bliźniacze siostry) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]",
+    "Młoda Mari -> Gon (Grace)": "Zwrot: 'na ty / bezpośrednio' (wybawicielka -> znaleziona mała istotka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Lucian -> Grace": "Zwrot: 'na ty / pogardliwie: potworze' (człowiek -> odrzucona syrena) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]"
   },
   "declensions": {
     "Lara": {
@@ -136,7 +160,8 @@
       "B": "Larę",
       "N": "Larą",
       "Ms": "Larze",
-      "W": "Laro"
+      "W": "Laro",
+      "gender": "FEMALE"
     },
     "Rowan": {
       "M": "Rowan",
@@ -154,7 +179,8 @@
       "B": "Mari Otsu",
       "N": "Mari Otsu",
       "Ms": "Mari Otsu",
-      "W": "Mari Otsu"
+      "W": "Mari Otsu",
+      "gender": "FEMALE"
     },
     "Luca": {
       "M": "Luca",
@@ -167,11 +193,11 @@
     },
     "Yoshiya": {
       "M": "Yoshiya",
-      "D": "Yoshiyy",
-      "C": "Yoshiye",
+      "D": "Yoshiyi",
+      "C": "Yoshiyi",
       "B": "Yoshiyę",
       "N": "Yoshiyą",
-      "Ms": "Yoshiye",
+      "Ms": "Yoshiyi",
       "W": "Yoshiyo"
     },
     "Mari": {
@@ -181,7 +207,8 @@
       "B": "Mari",
       "N": "Mari",
       "Ms": "Mari",
-      "W": "Mari"
+      "W": "Mari",
+      "gender": "FEMALE"
     },
     "Lisa": {
       "M": "Lisa",
@@ -190,7 +217,8 @@
       "B": "Lisę",
       "N": "Lisą",
       "Ms": "Lisie",
-      "W": "Liso"
+      "W": "Liso",
+      "gender": "FEMALE"
     },
     "Rigmor": {
       "M": "Rigmor",
@@ -199,7 +227,8 @@
       "B": "Rigmor",
       "N": "Rigmor",
       "Ms": "Rigmor",
-      "W": "Rigmor"
+      "W": "Rigmor",
+      "gender": "FEMALE"
     },
     "Leo": {
       "M": "Leo",
@@ -226,7 +255,8 @@
       "B": "Grace",
       "N": "Grace",
       "Ms": "Grace",
-      "W": "Grace"
+      "W": "Grace",
+      "gender": "FEMALE"
     },
     "Lara -> Luca": {
       "M": "Lara -> Luca",
@@ -244,7 +274,8 @@
       "B": "Lukę -> Larę",
       "N": "Luką -> Larą",
       "Ms": "Luce -> Larze",
-      "W": "Luko -> Laro"
+      "W": "Luko -> Laro",
+      "gender": "FEMALE"
     },
     "Mari -> Lara": {
       "M": "Mari -> Lara",
@@ -253,7 +284,8 @@
       "B": "Mari -> Larę",
       "N": "Mari -> Larą",
       "Ms": "Mari -> Larze",
-      "W": "Mari -> Laro"
+      "W": "Mari -> Laro",
+      "gender": "FEMALE"
     },
     "Gon (Grace) -> Lara": {
       "M": "Gon (Grace) -> Lara",
@@ -307,7 +339,8 @@
       "B": "Larę -> Mari",
       "N": "Larą -> Mari",
       "Ms": "Larze -> Mari",
-      "W": "Laro -> Mari"
+      "W": "Laro -> Mari",
+      "gender": "FEMALE"
     },
     "Lisa -> Mari": {
       "M": "Lisa -> Mari",
@@ -316,7 +349,8 @@
       "B": "Lisę -> Mari",
       "N": "Lisą -> Mari",
       "Ms": "Lisie -> Mari",
-      "W": "Liso -> Mari"
+      "W": "Liso -> Mari",
+      "gender": "FEMALE"
     },
     "Kusatsu -> Mari": {
       "M": "Kusatsu -> Mari",
@@ -325,7 +359,8 @@
       "B": "Kusatsu -> Mari",
       "N": "Kusatsu -> Mari",
       "Ms": "Kusatsu -> Mari",
-      "W": "Kusatsu -> Mari"
+      "W": "Kusatsu -> Mari",
+      "gender": "FEMALE"
     },
     "Mari -> Luca": {
       "M": "Mari -> Luca",
@@ -343,7 +378,8 @@
       "B": "Grace -> Mari",
       "N": "Grace -> Mari",
       "Ms": "Grace -> Mari",
-      "W": "Grace -> Mari"
+      "W": "Grace -> Mari",
+      "gender": "FEMALE"
     },
     "Lara -> Rowan": {
       "M": "Lara -> Rowan",
@@ -352,7 +388,8 @@
       "B": "Larę -> Rowan",
       "N": "Larą -> Rowan",
       "Ms": "Larze -> Rowan",
-      "W": "Laro -> Rowan"
+      "W": "Laro -> Rowan",
+      "gender": "FEMALE"
     },
     "Rowan -> Lara": {
       "M": "Rowan -> Lara",
@@ -361,7 +398,8 @@
       "B": "Rowan -> Larę",
       "N": "Rowan -> Larą",
       "Ms": "Rowan -> Larze",
-      "W": "Rowan -> Laro"
+      "W": "Rowan -> Laro",
+      "gender": "FEMALE"
     },
     "Luca -> Mari": {
       "M": "Luca -> Mari",
@@ -370,7 +408,8 @@
       "B": "Lukę -> Mari",
       "N": "Luką -> Mari",
       "Ms": "Luce -> Mari",
-      "W": "Luco -> Mari"
+      "W": "Luco -> Mari",
+      "gender": "FEMALE"
     },
     "Yoshiya -> Mari": {
       "M": "Yoshiya -> Mari",
@@ -379,7 +418,8 @@
       "B": "Yoshiyę -> Mari",
       "N": "Yoshiyą -> Mari",
       "Ms": "Yoshiye -> Mari",
-      "W": "Yoshiyo -> Mari"
+      "W": "Yoshiyo -> Mari",
+      "gender": "FEMALE"
     },
     "Yoshiya -> Luca": {
       "M": "Yoshiya -> Luca",
@@ -389,15 +429,56 @@
       "N": "Yoshiyą -> Luką",
       "Ms": "Yoshiye -> Luce",
       "W": "Yoshiyo -> Luco"
+    },
+    "Młoda Mari": {
+      "M": "Młoda Mari",
+      "D": "Młody Mari",
+      "C": "Młodzie Mari",
+      "B": "Młodę Mari",
+      "N": "Młodą Mari",
+      "Ms": "Młodzie Mari",
+      "W": "Młodo Mari",
+      "gender": "FEMALE"
+    },
+    "Lucian": {
+      "M": "Lucian",
+      "D": "Lucian",
+      "C": "Lucian",
+      "B": "Lucian",
+      "N": "Lucian",
+      "Ms": "Lucian",
+      "W": "Lucian",
+      "gender": "FEMALE"
+    },
+    "Gon": {
+      "M": "Gon",
+      "D": "Gona",
+      "C": "Gonowi",
+      "B": "Gona",
+      "N": "Gonem",
+      "Ms": "Gonie",
+      "W": "Gonie"
     }
   },
+  "hypocorisms": {},
   "plot_anchors": {
     "Białe kwiaty na tafli jeziora": "Zachować spójność opisu zjawiska jako identycznego ze śladem, który pojawił się przy wcześniejszym użyciu mocy przez Larę.",
-    "Utrata światła i śmierć matki (Rigmor)": "Imię matki Rigmor musi pozostać niezmienne, a jej zabójstwo przez ludzi stanowi niezmienny dogmat nienawiści króla Rowana."
+    "Utrata światła i śmierć matki (Rigmor)": "Imię matki Rigmor musi pozostać niezmienne, a jej zabójstwo przez ludzi stanowi niezmienny dogmat nienawiści króla Rowana.",
+    "Prawdziwe pochodzenie Gona": "Należy zachować pełną ciągłość objawienia: mała stworzonka Gon to w rzeczywistości morska wiedźma Grace, która poświęciła swe potężne ciało, by strzec odrodzenia Lary.",
+    "Zakaz zbliżania się do ludzi i prawo Rowana": "Utrzymać spójność terminologiczną dotyczącą nienawiści Rowana do powierzchni i praw rządzących światem syren."
   },
   "episodes_translated": [
     "Sayonara Lara - 08",
     "[ASW] Sayonara Lara - 09 [1080p HEVC][D0F6BE61]",
-    "[ASW] Sayonara Lara - 10 [1080p HEVC][7AE6081B]"
-  ]
+    "[ASW] Sayonara Lara - 10 [1080p HEVC][7AE6081B]",
+    "[ASW] Sayonara Lara - 11 [1080p HEVC][37D62E7D]"
+  ],
+  "batch_stats": {
+    "[ASW] Sayonara Lara - 11 [1080p HEVC][37D62E7D]": {
+      "dialogues": 310,
+      "batches": 16,
+      "avg_batch_size": 19.4,
+      "cost_pln": 2.88
+    }
+  }
 }

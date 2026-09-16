@@ -73,20 +73,12 @@
     "Wataru Sajou -> Aika Natsukawa": "Zwrot: 'na ty / Natsukawa' (kolega z klasy (wymuszony dystans))",
     "Aika Natsukawa -> Wataru Sajou": "Zwrot: 'na ty / Sajo' (koleżanka z klasy (zdezorientowana brakiem atencji))",
     "Kei Ashida -> Wataru Sajou": "Zwrot: 'Sajotchi' (kumpelska relacja w klasie)",
-    "Kei Ashida -> Aika Natsukawa": "Zwrot: 'Aichi' (bliskie przyjaciółki)",
+    "Kei Ashida -> Aika Natsukawa": "Zwrot: 'Aichi' (bliskie przyjaciółki) [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]",
     "Wataru Sajou -> Kaede Sajou": "Zwrot: 'siostra / siostrzyczka' (rodzeństwo)",
     "Wataru Sajou -> Rin Shinomiya": "Zwrot: 'przewodnicząca / panno Shinomiya' (młodszy uczeń -> szanowana starsza rocznikiem)",
     "Rin Shinomiya -> Wataru Sajou": "Zwrot: 'na ty / Sajo' (starsza uczennica -> młodszy kolega)",
     "Kaede Sajou -> Wataru Sajou": "Zwrot: 'na ty / Wataru / braciszku' (starsza siostra -> młodszy brat)"
   },
-  "plot_anchors": {
-    "Nagła zmiana zachowania Wataru": "Wataru nieustannie pamięta o swoim postanowieniu, że nie zasługuje na Aikę i musi trzymać się z daleka; nie wolno tłumaczyć jego zachowania jako zwykłego obrażenia się.",
-    "Incydent z Yuyu Inatomi w korytarzu": "Nawiązanie do sytuacji, w której Wataru chciał pomóc dziewczynie dźwigającej pudła, a został odebrany jako napastnik ze względu na jej andro fobię."
-  },
-  "episodes_translated": [
-    "[ASW] Yumemiru Danshi wa Genjitsushugisha - 01 [1080p HEVC][96330DB1]",
-    "[ASW] Yumemiru Danshi wa Genjitsushugisha - 02 [1080p HEVC][96EF8E5C]"
-  ],
   "declensions": {
     "Wataru Sajou": {
       "M": "Wataru Sajou",
@@ -104,7 +96,8 @@
       "B": "Aikę Natsukawę",
       "N": "Aiką Natsukawą",
       "Ms": "Aice Natsukawe",
-      "W": "Aiko Natsukawo"
+      "W": "Aiko Natsukawo",
+      "gender": "FEMALE"
     },
     "Kei Ashida": {
       "M": "Kei Ashida",
@@ -113,7 +106,8 @@
       "B": "Kei Ashidę",
       "N": "Kei Ashidą",
       "Ms": "Kei Ashidzie",
-      "W": "Kei Ashido"
+      "W": "Kei Ashido",
+      "gender": "FEMALE"
     },
     "Kaede Sajou": {
       "M": "Kaede Sajou",
@@ -122,7 +116,8 @@
       "B": "Kaede Sajou",
       "N": "Kaede Sajou",
       "Ms": "Kaede Sajou",
-      "W": "Kaede Sajou"
+      "W": "Kaede Sajou",
+      "gender": "FEMALE"
     },
     "Rin Shinomiya": {
       "M": "Rin Shinomiya",
@@ -131,7 +126,8 @@
       "B": "Rina Shinomiyę",
       "N": "Rinem Shinomiyą",
       "Ms": "Rinie Shinomiye",
-      "W": "Rinie Shinomiyo"
+      "W": "Rinie Shinomiyo",
+      "gender": "FEMALE"
     },
     "Kei Shinomiya": {
       "M": "Kei Shinomiya",
@@ -149,7 +145,8 @@
       "B": "Rin Ichinose",
       "N": "Rin Ichinose",
       "Ms": "Rin Ichinose",
-      "W": "Rin Ichinose"
+      "W": "Rin Ichinose",
+      "gender": "FEMALE"
     },
     "Fuka Sasaki": {
       "M": "Fuka Sasaki",
@@ -158,7 +155,8 @@
       "B": "Fukę Sasaki",
       "N": "Fuką Sasaki",
       "Ms": "Fuce Sasaki",
-      "W": "Fuko Sasaki"
+      "W": "Fuko Sasaki",
+      "gender": "FEMALE"
     },
     "Hayato Ichinose": {
       "M": "Hayato Ichinose",
@@ -176,7 +174,8 @@
       "B": "Yuyu Inatomi",
       "N": "Yuyu Inatomi",
       "Ms": "Yuyu Inatomi",
-      "W": "Yuyu Inatomi"
+      "W": "Yuyu Inatomi",
+      "gender": "FEMALE"
     },
     "Yamazaki": {
       "M": "Yamazaki",
@@ -259,5 +258,15 @@
       "Ms": "Kaede Sajou -> Wataru Sajou",
       "W": "Kaede Sajou -> Wataru Sajou"
     }
-  }
+  },
+  "hypocorisms": {},
+  "plot_anchors": {
+    "Nagła zmiana zachowania Wataru": "Wataru nieustannie pamięta o swoim postanowieniu, że nie zasługuje na Aikę i musi trzymać się z daleka; nie wolno tłumaczyć jego zachowania jako zwykłego obrażenia się.",
+    "Incydent z Yuyu Inatomi w korytarzu": "Nawiązanie do sytuacji, w której Wataru chciał pomóc dziewczynie dźwigającej pudła, a został odebrany jako napastnik ze względu na jej andro fobię."
+  },
+  "episodes_translated": [
+    "[ASW] Yumemiru Danshi wa Genjitsushugisha - 01 [1080p HEVC][96330DB1]",
+    "[ASW] Yumemiru Danshi wa Genjitsushugisha - 02 [1080p HEVC][96EF8E5C]"
+  ],
+  "batch_stats": {}
 }

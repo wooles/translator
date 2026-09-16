@@ -417,18 +417,6 @@
     "Xin -> Meng Tian": "Zwrot: 'na ty / po imieniu: Mou Ten' (towarzysze broni / rywale)",
     "Ding Yang -> Meng Tian": "Zwrot: 'Generale Mou Ten / Panie Mou Ten' (podwładny -> tymczasowy dowódca)"
   },
-  "episodes_translated": [
-    "tmpqhvb5j6p",
-    "tmp2s6g9x3n",
-    "tmppw33m3fl",
-    "tmpymtsp2tj",
-    "Kanon Mangi",
-    "[ASW] Kingdom S6 - 13 [1080p HEVC][122056AC]",
-    "[ASW] Kingdom S6 - 10 [1080p HEVC][DBC001C4]",
-    "[Erai-raws] Kingdom 6th Season - 10 (JN) [1080p CR WEBRip HEVC AAC][MultiSub][E0CC5D52]",
-    "[Erai-raws] Kingdom 6th Season - 11 (JN) [1080p CR WEBRip HEVC AAC][MultiSub][31E77681]",
-    "[Erai-raws] Kingdom 6th Season - 12 (JN) [1080p CR WEBRip HEVC AAC][MultiSub][5E6871C6]"
-  ],
   "declensions": {
     "Wang Ben": {
       "M": "Wang Ben",
@@ -554,7 +542,8 @@
       "B": "Ou Hon",
       "N": "Ou Hon",
       "Ms": "Ou Hon",
-      "W": "Ou Hon"
+      "W": "Ou Hon",
+      "gender": "FEMALE"
     },
     "Heki": {
       "M": "Heki",
@@ -572,7 +561,8 @@
       "B": "Yotanwę",
       "N": "Yotanwą",
       "Ms": "Yotanwe",
-      "W": "Yotanwo"
+      "W": "Yotanwo",
+      "gender": "FEMALE"
     },
     "Shun Sui Ju": {
       "M": "Shun Sui Ju",
@@ -689,7 +679,8 @@
       "B": "Bi -> Yanga Duanhe",
       "N": "Bi -> Yangem Duanhe",
       "Ms": "Bi -> Yangu Duanhe",
-      "W": "Bi -> Yangu Duanhe"
+      "W": "Bi -> Yangu Duanhe",
+      "gender": "FEMALE"
     },
     "Yang Duanhe -> Bi": {
       "M": "Yang Duanhe -> Bi",
@@ -761,7 +752,8 @@
       "B": "Heki -> Yotanwę",
       "N": "Heki -> Yotanwą",
       "Ms": "Heki -> Yotanwe",
-      "W": "Heki -> Yotanwo"
+      "W": "Heki -> Yotanwo",
+      "gender": "FEMALE"
     },
     "Shun Sui Ju -> Rozo": {
       "M": "Shun Sui Ju -> Rozo",
@@ -845,5 +837,19 @@
       "W": "Dingu Yangu -> Mengu Tianie"
     }
   },
-  "plot_anchors": {}
+  "hypocorisms": {},
+  "plot_anchors": {},
+  "episodes_translated": [
+    "tmpqhvb5j6p",
+    "tmp2s6g9x3n",
+    "tmppw33m3fl",
+    "tmpymtsp2tj",
+    "Kanon Mangi",
+    "[ASW] Kingdom S6 - 13 [1080p HEVC][122056AC]",
+    "[ASW] Kingdom S6 - 10 [1080p HEVC][DBC001C4]",
+    "[Erai-raws] Kingdom 6th Season - 10 (JN) [1080p CR WEBRip HEVC AAC][MultiSub][E0CC5D52]",
+    "[Erai-raws] Kingdom 6th Season - 11 (JN) [1080p CR WEBRip HEVC AAC][MultiSub][31E77681]",
+    "[Erai-raws] Kingdom 6th Season - 12 (JN) [1080p CR WEBRip HEVC AAC][MultiSub][5E6871C6]"
+  ],
+  "batch_stats": {}
 }

@@ -79,8 +79,8 @@
     "Merlin -> Eftal": "Zwrot: 'panie Eftalu' (lojalna powierniczka i była uczennica -> mistrz) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie Eftalu', zakaz poufałego wołacza 'Eftalu' oraz hybryd 'Eftalu... ma pan']",
     "Eftal -> Anastasia": "Zwrot: 'na ty / Anastasio' (opiekun i mistrz -> podopieczna)",
     "Eftal -> Merlin": "Zwrot: 'na ty / Merlin' (dawni towarzysze / zaufani partnerzy)",
-    "Merlin -> Maria": "Zwrot: 'Siostrzyczko Mario' (udawane dziecko -> nauczycielka)",
-    "Anastasia -> Merlin": "Zwrot: 'Merlin' (koleżanki / uczennice tego samego mistrza)",
+    "Merlin -> Maria": "Zwrot: 'Siostrzyczko Mario' (udawane dziecko -> nauczycielka) [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]",
+    "Anastasia -> Merlin": "Zwrot: 'Merlin' (koleżanki / uczennice tego samego mistrza) [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]",
     "Seiryu -> Eftal": "Zwrot: 'człowieku / nędzny śmiertelniku' (bóstwo paktu -> bezczelny buntownik)",
     "Eftal -> Seiryu": "Zwrot: 'na ty / przerośnięty gadzie' (pogromca paktów -> pokonana bestia)"
   },
@@ -92,7 +92,8 @@
       "B": "Anastasię",
       "N": "Anastasią",
       "Ms": "Anastasie",
-      "W": "Anastasio"
+      "W": "Anastasio",
+      "gender": "FEMALE"
     },
     "Eftal": {
       "M": "Eftal",
@@ -110,7 +111,8 @@
       "B": "Merlina",
       "N": "Merlinem",
       "Ms": "Merlinie",
-      "W": "Merlinie"
+      "W": "Merlinie",
+      "gender": "FEMALE"
     },
     "Gaius": {
       "M": "Gaius",
@@ -146,7 +148,8 @@
       "B": "Genie",
       "N": "Genie",
       "Ms": "Genie",
-      "W": "Genie"
+      "W": "Genie",
+      "gender": "FEMALE"
     },
     "Maria": {
       "M": "Maria",
@@ -155,7 +158,8 @@
       "B": "Marię",
       "N": "Marią",
       "Ms": "Marie",
-      "W": "Mario"
+      "W": "Mario",
+      "gender": "FEMALE"
     },
     "Anastasia -> Eftal": {
       "M": "Anastasia -> Eftal",
@@ -230,6 +234,7 @@
       "W": "Eftalu -> Seiryu"
     }
   },
+  "hypocorisms": {},
   "plot_anchors": {
     "Magia Burst": "Stosować jednolicie polską nazwę katastrofy: 'Wybuch Magii' lub zachować termin wielką literą 'Magia Burst'.",
     "Four Emperors (Lightning, Flame, Ice, Earth)": "Konsekwentnie: Cesarz Gromu, Ognisty Cesarz, Lodowy Cesarz, Cesarz Ziemi."
@@ -238,5 +243,6 @@
     "[ASW] Rakudai Kenja no Gakuin Musou - 12 [1080p HEVC][8BD533E0]",
     "[ASW] Rakudai Kenja no Gakuin Musou - 10 [1080p HEVC][EB8519C9]",
     "[ASW] Rakudai Kenja no Gakuin Musou - 11 [1080p HEVC][8821CA16]"
-  ]
+  ],
+  "batch_stats": {}
 }

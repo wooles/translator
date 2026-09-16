@@ -192,7 +192,8 @@
       "B": "Shizuku",
       "N": "Shizuku",
       "Ms": "Shizuku",
-      "W": "Shizuku"
+      "W": "Shizuku",
+      "gender": "FEMALE"
     },
     "Tomine": {
       "M": "Tomine",
@@ -210,7 +211,8 @@
       "B": "Mary",
       "N": "Mary",
       "Ms": "Mary",
-      "W": "Mary"
+      "W": "Mary",
+      "gender": "FEMALE"
     },
     "Hayama": {
       "M": "Hayama",
@@ -228,7 +230,8 @@
       "B": "Miyabi",
       "N": "Miyabi",
       "Ms": "Miyabi",
-      "W": "Miyabi"
+      "W": "Miyabi",
+      "gender": "FEMALE"
     },
     "Shizuku Kanzaki": {
       "M": "Shizuku Kanzaki",
@@ -255,7 +258,8 @@
       "B": "Miyabi Shinoharę",
       "N": "Miyabi Shinoharą",
       "Ms": "Miyabi Shinoharze",
-      "W": "Miyabi Shinoharo"
+      "W": "Miyabi Shinoharo",
+      "gender": "FEMALE"
     },
     "Yutaka Kanzaki": {
       "M": "Yutaka Kanzaki",
@@ -282,7 +286,8 @@
       "B": "Sarę Tomine",
       "N": "Sarą Tomine",
       "Ms": "Sarze Tomine",
-      "W": "Saro Tomine"
+      "W": "Saro Tomine",
+      "gender": "FEMALE"
     },
     "Kenkichi Kiryu": {
       "M": "Kenkichi Kiryu",
@@ -309,7 +314,8 @@
       "B": "Loulan",
       "N": "Loulan",
       "Ms": "Loulan",
-      "W": "Loulan"
+      "W": "Loulan",
+      "gender": "FEMALE"
     },
     "Kawarage": {
       "M": "Kawarage",
@@ -327,7 +333,8 @@
       "B": "Honokę Tomine",
       "N": "Honoką Tomine",
       "Ms": "Honoce Tomine",
-      "W": "Honoko Tomine"
+      "W": "Honoko Tomine",
+      "gender": "FEMALE"
     },
     "Chousuke Honma": {
       "M": "Chousuke Honma",
@@ -363,7 +370,8 @@
       "B": "Sarę",
       "N": "Sarą",
       "Ms": "Sarze",
-      "W": "Saro"
+      "W": "Saro",
+      "gender": "FEMALE"
     },
     "Kirisawa": {
       "M": "Kirisawa",
@@ -390,7 +398,8 @@
       "B": "Shizuku Kanzaki / Issei Tomine",
       "N": "Shizuku Kanzaki / Issei Tomine",
       "Ms": "Shizuku Kanzaki / Issei Tomine",
-      "W": "Shizuku Kanzaki / Issei Tomine"
+      "W": "Shizuku Kanzaki / Issei Tomine",
+      "gender": "FEMALE"
     },
     "Shizuku Kanzaki -> Miyabi Shinohara": {
       "M": "Shizuku Kanzaki -> Miyabi Shinohara",
@@ -453,7 +462,8 @@
       "B": "Issei Tomine -> Honokę Tomine",
       "N": "Issei Tomine -> Honoką Tomine",
       "Ms": "Issei Tomine -> Honoce Tomine",
-      "W": "Issei Tomine -> Honoko Tomine"
+      "W": "Issei Tomine -> Honoko Tomine",
+      "gender": "FEMALE"
     },
     "Honoka Tomine -> Issei Tomine": {
       "M": "Honoka Tomine -> Issei Tomine",
@@ -462,7 +472,8 @@
       "B": "Honokę Tomine -> Issei Tomine",
       "N": "Honoką Tomine -> Issei Tomine",
       "Ms": "Honoce Tomine -> Issei Tomine",
-      "W": "Honoko Tomine -> Issei Tomine"
+      "W": "Honoko Tomine -> Issei Tomine",
+      "gender": "FEMALE"
     },
     "Shizuku Kanzaki -> Issei Tomine": {
       "M": "Shizuku Kanzaki -> Issei Tomine",
@@ -525,7 +536,8 @@
       "B": "Mary -> Hayamę",
       "N": "Mary -> Hayamą",
       "Ms": "Mary -> Hayamie",
-      "W": "Mary -> Hayamo"
+      "W": "Mary -> Hayamo",
+      "gender": "FEMALE"
     },
     "Shizuku -> Hayama": {
       "M": "Shizuku -> Hayama",
@@ -573,6 +585,7 @@
       "W": "Hayamo -> Shizuku"
     }
   },
+  "hypocorisms": {},
   "plot_anchors": {
     "Ósmy Apostoł (Eighth Apostle)": "Bezwzględna konsekwencja wielkiej litery i terminu: 'Ósmy Apostoł'.",
     "Karuizawa": "Wspomnienie rozpoznawania wina przez butelkę w Karuizawie musi być przywołane precyzyjnie jako fakt z przeszłości.",
@@ -584,5 +597,6 @@
     "[ASW] Kami no Shizuku - 21 [1080p HEVC][97442159]",
     "[ASW] Kami no Shizuku - 22 [1080p HEVC][3F4CB067]",
     "[ASW] Kami no Shizuku - 23 [1080p HEVC][31CBED3E]"
-  ]
+  ],
+  "batch_stats": {}
 }

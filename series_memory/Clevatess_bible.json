@@ -165,12 +165,17 @@
     "Eslinn": "Eslinn (królestwo; toponim)",
     "Hyderat": "Hyderat (stolica Hiden; toponim)",
     "Mount Luna": "Góra Luny (święta góra; toponim)",
-    "Castle Elden": "Zamek Elden (twierdza w Eslinn; toponim)"
+    "Castle Elden": "Zamek Elden (twierdza w Eslinn; toponim)",
+    "Dla wszystkiego poza roślinami nie ma litości": "Nie ma litości dla niczego prócz roślin",
+    "Zavthier od Złudzeń": "Zavthier Pani Iluzji",
+    "Vordin od Płomiennego Żaru": "Vordin Płomiennego Żaru",
+    "Święty Miecza Owenie Koath": "Święty Miecza Owenie Koacie",
+    "Owenie Koath": "Owenie Koacie"
   },
   "relationships": {
     "Clevatess -> Alicia": "Zwrot: Alicio / człowiecza dziewko / na ty (wyniosły władca bestii -> ludzka bohaterka)",
     "Alicia -> Clevatess": "Zwrot: Clevatessie / potworze / na ty (wojowniczka -> prastara bestia)",
-    "Alicia -> Naie": "Relacja: szantażystka -> zdemaskowana szpieg (zwrot formalny 'pani profesor' w masce uczennicy, przejście na 'ty' w bezpośrednim szantażu: 'nie wydałaś mnie / stoisz / dowiesz się pierwsza') [KATEGORYCZNY ZAKAZ 'panie profesorze/pan']",
+    "Alicia -> Naie": "Relacja: szantażystka -> zdemaskowana szpieg (zwrot formalny 'pani profesor' w masce uczennicy, przejście na 'ty' w bezpośrednim szantażu: 'nie wydałaś mnie / stoisz / dowiesz się pierwsza') [KATEGORYCZNY ZAKAZ 'panie profesorze/pan'] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]",
     "Alicia -> Klen": "Zwrot: 'Klenie / na ty' (wskrzeszona podwładna -> pan bestii)",
     "Leon i Tygel -> Alicia": "Zwrot: 'dziewczyno z Hiden / ty' (wzajemny sojusz taktyczny rywali)",
     "Zavthier -> Clevatess": "Zwrot: 'Władco Mrocznych Bestii Południa / Clevatessie Księżycowego Blasku / na ty' (odwieczni równorzędni władcy potworów)",
@@ -181,13 +186,6 @@
     "Klen -> Zavthier": "Zwrot: 'stara wiedźmo / per ty' (starożytny władca -> dawna sojuszniczka bestia)",
     "Andrew -> Alicia": "Zwrot: 'na ty (per szczur)' (oprawca -> ofiara)"
   },
-  "episodes_translated": [
-    "[ASW] Clevatess S2 - 03 [1080p HEVC][AB6D13B4]",
-    "[ASW] Clevatess S2 - 05 [1080p HEVC][CD4F55A3]",
-    "[ASW] Clevatess - 05 [1080p HEVC]",
-    "[ASW] Clevatess - 03 [1080p HEVC]",
-    "[ASW] Clevatess - 04 [1080p HEVC]"
-  ],
   "declensions": {
     "Clevatess": {
       "M": "Clevatess",
@@ -205,7 +203,8 @@
       "B": "Alicię",
       "N": "Alicią",
       "Ms": "Alicie",
-      "W": "Alicio"
+      "W": "Alicio",
+      "gender": "FEMALE"
     },
     "Naie": {
       "M": "Naie",
@@ -214,7 +213,8 @@
       "B": "Naie",
       "N": "Naie",
       "Ms": "Naie",
-      "W": "Naie"
+      "W": "Naie",
+      "gender": "FEMALE"
     },
     "Zavthier": {
       "M": "Zavthier",
@@ -223,7 +223,8 @@
       "B": "Zavthier",
       "N": "Zavthier",
       "Ms": "Zavthier",
-      "W": "Zavthier"
+      "W": "Zavthier",
+      "gender": "FEMALE"
     },
     "Rathwell": {
       "M": "Rathwell",
@@ -250,7 +251,8 @@
       "B": "Sarasę",
       "N": "Sarasą",
       "Ms": "Sarasie",
-      "W": "Saraso"
+      "W": "Saraso",
+      "gender": "FEMALE"
     },
     "Edison": {
       "M": "Edison",
@@ -304,7 +306,8 @@
       "B": "Chiffonlitsa",
       "N": "Chiffonlitsem",
       "Ms": "Chiffonlitsie",
-      "W": "Chiffonlitsie"
+      "W": "Chiffonlitsie",
+      "gender": "FEMALE"
     },
     "Elro": {
       "M": "Elro",
@@ -430,7 +433,8 @@
       "B": "Alicię Sleihunt",
       "N": "Alicią Sleihunt",
       "Ms": "Alicie Sleihunt",
-      "W": "Alicio Sleihunt"
+      "W": "Alicio Sleihunt",
+      "gender": "FEMALE"
     },
     "Mary Merryweather": {
       "M": "Mary Merryweather",
@@ -439,7 +443,8 @@
       "B": "Mary Merryweather",
       "N": "Mary Merryweather",
       "Ms": "Mary Merryweather",
-      "W": "Mary Merryweather"
+      "W": "Mary Merryweather",
+      "gender": "FEMALE"
     },
     "Andrew Hwyp": {
       "M": "Andrew Hwyp",
@@ -457,7 +462,8 @@
       "B": "Naie Chiffonlits",
       "N": "Naie Chiffonlits",
       "Ms": "Naie Chiffonlits",
-      "W": "Naie Chiffonlits"
+      "W": "Naie Chiffonlits",
+      "gender": "FEMALE"
     },
     "Ray": {
       "M": "Ray",
@@ -586,6 +592,7 @@
       "W": "Andrew -> Alicio"
     }
   },
+  "hypocorisms": {},
   "plot_anchors": {
     "Dark Ichor (czarny posok / mroczny ichtor)": "Ciecz i nośnik esencji bestii, przez który porozumiewają się Klen i Alicia. Konsekwentnie stosować 'czarny posok' lub 'posok ciemności'.",
     "Book of Toah (Księga Toah)": "Święty relikt znaleziony przez Klena w Hiden, powiązany z prastarą mową bogów i rozdziałami Legendy o Bohaterze.",
@@ -595,5 +602,13 @@
     "General Drel / Generał Drel": "Imię męskie Drel bezwzględnie odmieniać: Drela, Drelowi, z Drelem, o Drelu.",
     "Solsein": "miasto akademickie wzniesione na ruinach Wioski Początku",
     "Księga Toaha": "magiczna księga rodu Romaina (Toah -> Toaha)"
-  }
+  },
+  "episodes_translated": [
+    "[ASW] Clevatess S2 - 03 [1080p HEVC][AB6D13B4]",
+    "[ASW] Clevatess S2 - 05 [1080p HEVC][CD4F55A3]",
+    "[ASW] Clevatess - 05 [1080p HEVC]",
+    "[ASW] Clevatess - 03 [1080p HEVC]",
+    "[ASW] Clevatess - 04 [1080p HEVC]"
+  ],
+  "batch_stats": {}
 }

@@ -153,6 +153,17 @@ class SpeakerVoiceClassifier:
         }
 
     @classmethod
+    def classify_pitch_register(cls, f0: float) -> str:
+        if f0 is None or f0 <= 0:
+            return "nieokreślony"
+        if f0 <= 155.0:
+            return f"niski tembr (~{int(f0)}Hz: bas/baryton lub ochrypły alt starszej kobiety)"
+        elif f0 <= 195.0:
+            return f"średni tembr (~{int(f0)}Hz: tenor męski / alt żeński)"
+        else:
+            return f"wysoki tembr (~{int(f0)}Hz: sopran żeński / głos dziecięcy)"
+
+    @classmethod
     def classify_scene_speakers(
         cls,
         wav_path: str,
@@ -161,7 +172,7 @@ class SpeakerVoiceClassifier:
     ) -> Dict[int, str]:
         """
         Classifies voice pitch and register for all dialogue events in a batch.
-        Returns a dictionary: {batch_id: 'Głos: żeński/wysoki' | 'Głos: męski/niski'}.
+        Returns a dictionary: {batch_id: 'Głos: ...'}.
         """
         if not wav_path or not os.path.exists(wav_path):
             return {}
@@ -203,12 +214,7 @@ class SpeakerVoiceClassifier:
                 f0 = cls.estimate_pitch_f0(chunk, sample_rate=framerate)
 
                 if f0 is not None:
-                    if f0 <= 155.0:
-                        results[b_id] = f"męski / niski (~{int(f0)}Hz)"
-                    elif f0 <= 190.0:
-                        results[b_id] = f"męski tenor / alt żeński (~{int(f0)}Hz)"
-                    else:
-                        results[b_id] = f"wysoki / dziecięcy / żeński (~{int(f0)}Hz)"
+                    results[b_id] = cls.classify_pitch_register(f0)
 
         except Exception:
             pass

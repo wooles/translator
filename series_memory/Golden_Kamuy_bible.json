@@ -359,21 +359,6 @@
     "Asirpa -> Hijikata": "Zwrot: 'panie Hijikata / Hijikata-nispa' (Młoda Ajnuka wobec szanowanego starszego przywódcy)",
     "Tsurumi -> Nagakura": "Zwrot: 'panie Nagakura' (Oficer wywiadu wobec weterana Shinsengumi / przeciwnicy polityczni)"
   },
-  "episodes_translated": [
-    "tmp996h2his",
-    "[ASW] Golden Kamuy - 52 [1080p HEVC][B92A80B5]",
-    "Kanon Mangi",
-    "[ASW] Golden Kamuy - 53 [1080p HEVC][39C4B9EA]",
-    "[ASW] Golden Kamuy - 54 [1080p HEVC][029DCA46]",
-    "[ASW] Golden Kamuy - 55 [1080p HEVC][F4BE9E19]",
-    "[ASW] Golden Kamuy - 56 [1080p HEVC][A4842B6E]",
-    "[ASW] Golden Kamuy - 57 [1080p HEVC][BC7A67CC]",
-    "[ASW] Golden Kamuy - 58 [1080p HEVC][AE367B6A]",
-    "[ASW] Golden Kamuy - 59 [1080p HEVC][867DEE0B]",
-    "[ASW] Golden Kamuy - 60 [1080p HEVC][CAF7567C]",
-    "[ASW] Golden Kamuy - 61 [1080p HEVC][FFD813D3]",
-    "[ASW] Golden Kamuy - 62 [1080p HEVC][E14D8958]"
-  ],
   "declensions": {
     "Saichi Sugimoto": {
       "M": "Saichi Sugimoto",
@@ -391,7 +376,8 @@
       "B": "Asirpę",
       "N": "Asirpą",
       "Ms": "Asirpe",
-      "W": "Asirpo"
+      "W": "Asirpo",
+      "gender": "FEMALE"
     },
     "Usami": {
       "M": "Usami",
@@ -445,7 +431,8 @@
       "B": "Kirawus",
       "N": "Kirawus",
       "Ms": "Kirawus",
-      "W": "Kirawus"
+      "W": "Kirawus",
+      "gender": "FEMALE"
     },
     "Tsurumi": {
       "M": "Tsurumi",
@@ -499,7 +486,8 @@
       "B": "Sofię",
       "N": "Sofią",
       "Ms": "Sofie",
-      "W": "Sofio"
+      "W": "Sofio",
+      "gender": "FEMALE"
     },
     "Ariko": {
       "M": "Ariko",
@@ -526,7 +514,8 @@
       "B": "Kaneko Kaeko",
       "N": "Kaneko Kaeko",
       "Ms": "Kaneko Kaeko",
-      "W": "Kaneko Kaeko"
+      "W": "Kaneko Kaeko",
+      "gender": "FEMALE"
     },
     "Tokushirou Tsurumi": {
       "M": "Tokushirou Tsurumi",
@@ -661,7 +650,8 @@
       "B": "Kaeko",
       "N": "Kaeko",
       "Ms": "Kaeko",
-      "W": "Kaeko"
+      "W": "Kaeko",
+      "gender": "FEMALE"
     },
     "Okuda": {
       "M": "Okuda",
@@ -1069,5 +1059,22 @@
       "W": "Tsurumi -> Nagakuro"
     }
   },
-  "plot_anchors": {}
+  "hypocorisms": {},
+  "plot_anchors": {},
+  "episodes_translated": [
+    "tmp996h2his",
+    "[ASW] Golden Kamuy - 52 [1080p HEVC][B92A80B5]",
+    "Kanon Mangi",
+    "[ASW] Golden Kamuy - 53 [1080p HEVC][39C4B9EA]",
+    "[ASW] Golden Kamuy - 54 [1080p HEVC][029DCA46]",
+    "[ASW] Golden Kamuy - 55 [1080p HEVC][F4BE9E19]",
+    "[ASW] Golden Kamuy - 56 [1080p HEVC][A4842B6E]",
+    "[ASW] Golden Kamuy - 57 [1080p HEVC][BC7A67CC]",
+    "[ASW] Golden Kamuy - 58 [1080p HEVC][AE367B6A]",
+    "[ASW] Golden Kamuy - 59 [1080p HEVC][867DEE0B]",
+    "[ASW] Golden Kamuy - 60 [1080p HEVC][CAF7567C]",
+    "[ASW] Golden Kamuy - 61 [1080p HEVC][FFD813D3]",
+    "[ASW] Golden Kamuy - 62 [1080p HEVC][E14D8958]"
+  ],
+  "batch_stats": {}
 }

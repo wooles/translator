@@ -4,8 +4,9 @@ Linguistic Verification & Polish Dialogue Polish/Refinement Module (Phase 2).
 Eliminates translationese, mechanical calques, and refines dialogues for natural spoken Polish flow.
 """
 
+import re
 import json
-from typing import List, Optional, Dict, Any, Tuple
+from typing import List, Optional, Dict, Any, Tuple, Union
 from pydantic import BaseModel, Field, ConfigDict
 from google import genai
 from google.genai import types
@@ -104,7 +105,7 @@ class DialogueVerifier:
             else:
                 return min(self.thinking_budget, 2048)
 
-    def verify_batch(
+    def _prepare_verification_prompt(
         self,
         batch_items: List[Dict[str, Any]],
         scene_summary: str = "",
@@ -118,40 +119,83 @@ class DialogueVerifier:
         lookahead_events: Optional[List[Tuple[int, Any, str, str]]] = None,
         character_registry: Optional[Dict[str, str]] = None,
         scene_diagnosis: Optional[Any] = None
-    ) -> List[RefinedLine]:
+    ) -> str:
+        res = self.verify_batch(
+            batch_items=batch_items,
+            scene_summary=scene_summary,
+            episode_profile_str=episode_profile_str,
+            user_feedback_str=user_feedback_str,
+            glossary_str=glossary_str,
+            focused_rules_str=focused_rules_str,
+            series_bible_str=series_bible_str,
+            manga_canon_str=manga_canon_str,
+            history_context=history_context,
+            lookahead_events=lookahead_events,
+            character_registry=character_registry,
+            scene_diagnosis=scene_diagnosis,
+            return_prompt=True
+        )
+        return str(res)
+
+    def verify_batch(
+        self,
+        batch_items: List[Dict[str, Any]],
+        scene_summary: str = "",
+        episode_profile_str: str = "",
+        user_feedback_str: str = "",
+        glossary_str: str = "",
+        focused_rules_str: str = "",
+        series_bible_str: str = "",
+        manga_canon_str: str = "",
+        history_context: Optional[List[Dict[str, Any]]] = None,
+        lookahead_events: Optional[List[Tuple[int, Any, str, str]]] = None,
+        character_registry: Optional[Dict[str, str]] = None,
+        scene_diagnosis: Optional[Any] = None,
+        return_prompt: bool = False
+    ) -> Union[List[RefinedLine], str]:
         """
         Executes editorial refinement and verification for a dialogue batch.
         batch_items contains elements:
         [{'id': int, 'en': str, 'pl': str, 'speaker_gender': str, 'notes': str}, ...]
         """
         if not batch_items:
-            return []
+            return [] if not return_prompt else ""
 
         prompt_lines = []
         prompt_lines.append("Zredaguj poniższe kwestie dialogowe. BEZWZGLĘDNIE wyeliminuj dosłowne tłumaczenie 1 do 1, sztuczne konstrukcje i kalki.")
         prompt_lines.append("Zastąp drewniane sformułowania żywym, potoczystym językiem polskim mówionym (tak jak w profesjonalnym dubbingu / u polskich nastolatków):")
         prompt_lines.append(
-            "WYKORZYSTAJ CZAS NA ZASTANOWIENIE (Thinking / CoT): Jako Główny Reżyser Dubbingu i Script Doctor, przed zatwierdzeniem każdej kwestii przeprowadź DWUETAPOWY AUDYT POZNAWCZY (THE 2-STAGE COGNITIVE AUDIT):\n"
-            "   KROK 1: AUTONOMICZNA ŚLEPA LEKTURA POLSKIEGO DIALOGU (BLIND-READING FLOW AUDIT - FILAR CLXVI):\n"
-            "     - Przeczytaj proponowane kwestie polskie (Szkic PL) JEDNA PO DRUGIEJ, jak gotowy skrypt aktorski/dubbingu, CAŁKOWICIE IGNORUJĄC na tym etapie tekst angielski!\n"
-            "     - Zbadaj: Czy kwestie płyną naturalnie w ustach polskich aktorów? Czy nie ma sztucznych kalek fansubów ('witaj z powrotem', 'mam taką nadzieję', 'nie ma mowy, żeby', 'tutaj' przy podawaniu)?\n"
-            "     - Czy po pauzie czasowej (Δt ≥ 5s / zmiana sceny) postać nie odpowiada absurdalnym opóźnionym potaknięciem ('Jasne, o co chodzi?' -> BŁĄD KARDYNALNY! Zamień na: 'Więc o co chodzi?' / 'O co chodzi?' / 'Słucham cię' - Filar CLXV)?\n"
-            "     - Przeredaguj tekst na bezbłędną, potoczystą polszczyznę literacką i filmową.\n"
-            "   KROK 2: TRIANGULACJA MULTIMODALNA I KONTROLA WIERNOŚCI (MULTIMODAL TRIANGULATION):\n"
-            "     - Dopiero teraz skonfrontuj wyszlifowaną polszczyznę z japońskim audio seiyū i faktami z EN.\n"
-            "     - Zbadaj ton, intonację F0 i ewentualną ironię seiyū (Filar CLVIII). Upewnij się, że nie pominięto kluczowych faktów, imion ani liczb.\n"
-            "     - Zastosuj trzy soczewki weryfikacyjne:\n"
-            "       * 👂 Ucho: oddech, CPS, dynamika ping-ponga (zakaz 'Tak' na ostrzeżenie, zakaz potakiwania na przeczenie - Filar CLIV).\n"
-            "       * 🌍 Świat: relacje władzy, nienaruszalność T-V (zakaz 'wygrał pan' na 'ty' - Filar CLVII), perspektywa incognito (Filar CLXI).\n"
+            "ZASADA PRYMATU AFEKTU (DYNAMIC AFFECTIVE PRIMACY): Głos i emocjonalny afekt seiyū (drżenie, płacz, panika, szept, krzyk) ZAWSZE biją statyczny portret z Series Bible! Jeśli chłodna postać załamuje się i płacze, oddaj fizjologię rozpaczy (urwane słowa, chaos składniowy).\n"
+            "WYKORZYSTAJ CZAS NA ZASTANOWIENIE (Thinking / CoT): Jako Główny Reżyser Dubbingu i Script Doctor, przed zatwierdzeniem każdej kwestii przeprowadź DWUETAPOWY AUDYT POZNAWCZY (THE 2-STAGE COGNITIVE AUDIT / THE 3-STAGE EDITORIAL FUNNEL):\n"
+            "   KROK 1: AUTONOMICZNA ŚLEPA LEKTURA I KREACJA DIALOGU (THE DUBBING & STAGE FLOW - FILAR CLXVI):\n"
+            "     - KONTRAKT POLSZCZYZNY BEZTERMINOWEJ (THE TIMELESS COLLOQUIAL CONTRACT):\n"
+            "       * Twórz dialogi w estetyce polszczyzny bezterminowej: język żywy, organiczny, soczysty i miękki w ustach aktora, wolny od tymczasowych mód internetowych.\n"
+            "       * Pisz tak, jak brzmią klasyki polskiego dubbingu kinowego: dialog ma brzmieć świeżo dzisiaj, naturalnie 30 lat temu i zrozumiale za 30 lat.\n"
+            "       * Wprowadź wektory rzemiosła:\n"
+            "         - Zasada Remy: kluczową informację i emocjonalny akcent logiczny stawiaj na końcu polskiego zdania.\n"
+            "         - Reakcja na Intencję: odpowiadaj na intencję postaci (na ostrzeżenie gotowością: 'Zrozumiałem' / 'Uważam', na propozycję chęcią: 'Chętnie', na pytanie otwarte faktem).\n"
+            "         - Etykieta Gestu: fizyczne podanie przedmiotu kwituj zwrotem grzecznościowym ('Proszę' / 'Trzymaj') lub elipsą.\n"
+            "       * ZAKAZ archaizacji i sztucznego patosu w kinie współczesnym/szkolnym (Filar CLXXII).\n"
+            "       * Żywa, naturalna fraza bez pretensjonalnych zwrotów (np. 'to nie tak, że', 'mam na myśli', 'widzisz', 'tutaj, weź to').\n"
+            "     - PROTOKÓŁ AUTONOMICZNEJ KREACJI (ACTIVE GENERATION FIRST - ANTY-KOTWICZENIE):\n"
+            "       * Najpierw sformułuj w CoT własne, suwerenne polskie zdanie, które idealnie 'leży w ustach' polskiego aktora i pasuje do energii sceny.\n"
+            "       * Dopiero potem spójrz na szkic roboczy PL z Fazy 1.\n"
+            "       * Jeśli szkic z Fazy 1 powiela angielski szyk, zbędne zaimki osobowe ('ja', 'ty'), klisze lub potaknięcia ('Ta...', 'Więc...'), BEZWZGLĘDNIE go odrzuć na rzecz swojej autonomicznej kreacji!\n"
+            "   KROK 2: MULTIMODALNA TRIANGULACJA I PRAWDA AKTORSKA (MULTIMODAL TRIANGULATION & ACTING CHECK):\n"
+            "     - Skonfrontuj polszczyznę z japońskim audio seiyū i faktami ze skryptu EN (w tym wielkimi literami nazw własnych).\n"
+            "     - Zbadaj ton, intonację F0 i ewentualną ironię seiyū (Filar CLVIII). Upewnij się, że nie pominięto kluczowych faktów ani liczb (Filar CLXXI).\n"
+            "     - AUDYT ROZBIEŻNOŚCI PIVOTU (JP-to-EN Pivot Discrepancy Gate - Filar CLXX):\n"
+            "       * Głos seiyū stanowi nadrzędny autorytet w warstwie intencji i afektu.\n"
+            "       * Oddaj intencję seiyū: gdy mówi 'urusai / urusai na' (poirytowanie zrzędzeniem), zastosuj polski akt uciszania ('Ale marudzisz...', 'Daj mi spokój...', 'Nie truj...').\n"
+            "       * Powitania domowe (aisatsu): po 'Wróciłem' postać wita naturalnie: 'Witaj w domu!', 'O, już jesteś?' lub 'Dobrze, że jesteś!'.\n"
+            "       * Tytulatura i imiona: zachowaj poprawną odmianę i wielkie litery imion (np. 'Mistrz Tonden Minoru nie zdążył').\n"
+            "     - Trzy soczewki weryfikacyjne:\n"
+            "       * 👂 Ucho: oddech, CPS, dynamika ping-ponga (Filar CLIV).\n"
+            "       * 🌍 Świat: relacje statusu, nienaruszalność formy Pan/Ty (Filar CLVII), perspektywa incognito (Filar CLXI).\n"
             "       * 🎬 Obraz i Audio: afekt seiyū, gesty, napisy ekranowe vs dialog.\n"
-            "   KROK 3: PROAKTYWNY AUDYT NEGATYWNY REJESTRU, TYTULATURY I RZĄDU (NEGATIVE LEXICAL & REGISTER GATE - FILAR X & AGENTS.MD §9):\n"
-            "     - Weryfikacja rejestru: bezwzględnie wyeliminuj współczesny slang podwórkowy w światach historycznych / dark fantasy:\n"
-            "       * Klasa A (slang młodzieżowy): 'I gitara' -> 'Doskonale / Świetnie', 'spoko', 'siemanko', 'wchodzę w to' -> 'Przyjmuję ten układ'.\n"
-            "       * Klasa B (agresja podwórkowa): 'stul pysk' -> 'Zamilcz / Milcz', 'zamknij się', 'spuścić łomot' -> 'zmiażdżyć bez trudu', 'oberwę' -> 'poniosę karę / zginę'.\n"
-            "       * Klasa C (metafory potoczne): 'przejmuję stery' -> 'teraz ja mówię', 'dla zabicia czasu' -> 'dla rozrywki', 'kłamstwo jak byk' -> 'bezczelne kłamstwo', 'wylecieć ze szkoły' -> 'zostać wydalonym ze szkoły'.\n"
-            "       * Klasa D (trywializujące zaimki/rzeczowniki): 'ten typ' -> 'ten człowiek / nauczyciel', 'dzikuska / chuliganka' -> 'prostaczka / awanturnica', 'dzieciaki' -> 'uczniowie / młodzież'.\n"
-            "     - Weryfikacja tytulatury: zakaz kalkowania przydomków z 'od' ('Zavthier od Złudzeń' -> 'Zavthier Pani Iluzji', 'Vordin od Płomiennego Żaru' -> 'Płomienny Vordin').\n"
-            "     - Weryfikacja fleksji i rządu: 'posoka' to rzeczownik rodzaju żeńskiego ('ta czarna posoka', 'przez czarną posokę', 'z czarnej posoki'; ZAKAZ: 'czarny posok'), wołacz obcych nazwisk ('Owenie Koacie')."
+            "   KROK 3: PROAKTYWNY AUDYT NEGATYWNY REJESTRU (NEGATIVE REGISTER & CALQUE GATE - FILAR X & AGENTS.MD §9):\n"
+            "     - Twarda eliminacja błędów fleksyjnych, literówek i kalek leksykalnych jest w 100% finalizowana przez deterministyczny silnik EpisodeQualityGate (0.00 PLN).\n"
+            "     - W swoim myśleniu skup się wyłącznie na szlachetności, godności i żywości dialogu w świecie przedstawionym.\n"
         )
         prompt_lines.append("W polu 'changes_made' dla KAŻDEJ poprawionej kwestii podaj DOKŁADNE uzasadnienie i numer Filaru AVT (np. '[Filar IV - Szyk Zdania] Usunięto kalkę angielską' lub '[Filar CLVII - Forma Adresatywna] Usunięto 'wygrał pan' -> 'wygrałeś''). Jeśli kwestia nie wymagała poprawek, wpisz null.")
         
@@ -176,14 +220,11 @@ class DialogueVerifier:
                 if len(character_registry) <= 4 or name_stem in batch_corpus:
                     active_chars[name] = details
 
-            if not active_chars:
-                for name, details in list(character_registry.items())[:4]:
-                    active_chars[name] = details
-
-            prompt_lines.append("--- ZNANE POSTACIE W SCENIE (spójność ról, płci i relacji władzy) ---")
-            for name, details in active_chars.items():
-                prompt_lines.append(f"• {name}: {details}")
-            prompt_lines.append("--------------------------------------------------------------------------\n")
+            if active_chars:
+                prompt_lines.append("--- ZNANE POSTACIE W SCENIE (spójność ról, płci i relacji władzy) ---")
+                for name, details in active_chars.items():
+                    prompt_lines.append(f"• {name}: {details}")
+                prompt_lines.append("--------------------------------------------------------------------------\n")
 
         # Structured Scene Diagnosis from Phase 1 (Support both Pydantic model and dict)
         if scene_diagnosis:
@@ -333,12 +374,14 @@ class DialogueVerifier:
             elif item.get('addressee') in ['grupa_mężczyzn', 'grupa_mieszana']:
                 directive_lines.append(f"    • ADRESAT ({'GRUPA MĘŻCZYZN' if item.get('addressee') == 'grupa_mężczyzn' else 'GRUPA MIESZANA'}): Wymóg form męskoosobowych: 'zrobiliście / byliście gotowi / widzieliście' (Filar CLXIII)!")
 
-            # Clean notes from duplicates (remove third_person_subject from notes if already present)
+            # SSOT Sanitizer: Clean notes from duplicates (remove third_person_subject and repeated addressee alarms)
             raw_notes = (item.get('notes') or '').strip()
             if raw_notes:
                 clean_notes = raw_notes
                 if item.get('third_person_subject') and item['third_person_subject'] in clean_notes:
                     clean_notes = clean_notes.replace(item['third_person_subject'], '').strip()
+                clean_notes = re.sub(r"\[(?:🎯|🚨)?\s*ALARM\s+FILAR\s+CLXIII[^\]]*\]", "", clean_notes).strip()
+                clean_notes = re.sub(r"\s+", " ", clean_notes).strip()
                 if clean_notes:
                     directive_lines.append(f"    • Wytyczne redakcyjne: {clean_notes}")
 
@@ -352,12 +395,19 @@ class DialogueVerifier:
             if is_untranslated:
                 pl_display = "  Szkic PL: [🚨 BRAK PRZEKŁADU W FAZIE 1 - PRZETŁUMACZ OD ZERA Z EN I AUDIO JP!]"
             elif item.get("is_blind_draft"):
-                orig_pl = (item.get('pl') or '').strip()
-                ref_hint = f" (Szkic referencyjny: '{orig_pl}')" if orig_pl else ""
-                pl_display = (
-                    f"  Szkic PL (KWESTIA KRYTYCZNA - ANTY-KOTWICZENIE): "
-                    f"[⚠️ WYMÓG NIEZALEŻNEGO PRZEKŁADU! Przetłumacz autonomicznie z audio JP i dynamiki sceny, eliminując kalki i potaknięcia!{ref_hint}]"
-                )
+                calque_sc = float(item.get("calque_score", 0.0) or 0.0)
+                if calque_sc >= 0.65:
+                    pl_display = (
+                        f"  Szkic PL: [⚠️ UKRYTO: Wykryto mechaniczną kalkę angielską (Calque Score: {calque_sc:.2f}). "
+                        f"WYMÓG AUTONOMICZNEJ KREACJI OD ZERA Z EN I AUDIO JP!]"
+                    )
+                else:
+                    orig_pl = (item.get('pl') or '').strip()
+                    ref_hint = f" (Szkic referencyjny: '{orig_pl}')" if orig_pl else ""
+                    pl_display = (
+                        f"  Szkic PL (KWESTIA KRYTYCZNA - ANTY-KOTWICZENIE): "
+                        f"[⚠️ WYMÓG NIEZALEŻNEGO PRZEKŁADU! Przetłumacz autonomicznie z audio JP i dynamiki sceny, eliminując kalki i potaknięcia!{ref_hint}]"
+                    )
             else:
                 pl_display = f"  Szkic PL: {item['pl']}"
 
@@ -371,6 +421,12 @@ class DialogueVerifier:
             )
 
         prompt_text = "\n".join(prompt_lines)
+        self.last_prompt = prompt_text
+        if return_prompt:
+            return prompt_text
+
+        if self.client is None and not getattr(self, "client_pool", None):
+            return []
 
         import time
         attempt = 0

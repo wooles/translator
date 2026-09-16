@@ -201,3 +201,29 @@ class AudioProsodyEngine:
         else:
             return int(duration_s * 5.5)
 
+    @classmethod
+    def detect_emotional_breakdown(
+        cls,
+        prosody_tag: str = "",
+        whisper_text: str = "",
+        energy_std: Optional[float] = None
+    ) -> Optional[str]:
+        """
+        Detects affective breakdowns (crying, sobbing, terror, panic) from phonic cues and Whisper markers.
+        Establishes Dynamic Affective Primacy over static character personas from Series Bible.
+        """
+        prosody_lower = (prosody_tag or "").lower()
+        whisper_lower = (whisper_text or "").lower()
+
+        has_fonic_tremble = "płacz" in prosody_lower or "drżenie głosu" in prosody_lower or (energy_std is not None and energy_std > 0.90)
+        has_whisper_panic = any(k in whisper_lower for k in [
+            "sonna", "そんな", "tasukete", "助けて", "iya", "嫌", "h-hi", "ひっ", "kowai", "怖い", "u...", "うっ", "nande", "何で"
+        ]) or any(whisper_lower.startswith(w) for w in ["h-", "k-", "s-", "n-", "d-", "m-"])
+
+        if has_fonic_tremble or (has_whisper_panic and ("krzyk" in prosody_lower or "szept" in prosody_lower or has_fonic_tremble or len(whisper_lower.split()) <= 4)):
+            return (
+                "[🚨 PRYMAT AFEKTU / ZAŁAMANIE EMOCJONALNE: Fizjologia głosu seiyū i markery audio wskazują na panikę/płacz! "
+                "UCHYLA SIĘ statyczny profil chłodu z Series Bible! Wymóg: histeryczna składnia, urwane słowa, pełna ekspresja rozpaczy]"
+            )
+        return None
+

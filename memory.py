@@ -194,15 +194,23 @@ class TranslationMemory:
         print(f"[Translation Memory] Successfully indexed {len(pairs_to_insert)} authentic dialogue pairs!")
         return len(pairs_to_insert)
 
-    def find_relevant_examples(self, query_texts: List[str], max_examples: int = 5) -> List[Dict[str, str]]:
+    def find_relevant_examples(
+        self,
+        query_texts: List[str],
+        max_examples: int = 5,
+        series_title: Optional[str] = None,
+        require_same_series: bool = False
+    ) -> List[Dict[str, str]]:
         """
         Searches database for the most relevant authentic translation examples
         using SQLite FTS5 (BM25 ranking) and exact phrase matching.
+        Optionally restricts or boosts examples from the same series (Domain-Locked TM).
         """
         if not os.path.exists(self.db_path):
             return []
 
         candidates: Dict[str, Dict[str, Any]] = {}
+        target_series_norm = series_title.strip().lower() if series_title else ""
 
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
@@ -214,13 +222,19 @@ class TranslationMemory:
 
                 # 1. Exact phrase match (Priority 100)
                 cursor.execute(
-                    "SELECT en_text, pl_text, anime_title FROM translation_pairs WHERE en_clean = ? LIMIT 2",
+                    "SELECT en_text, pl_text, anime_title FROM translation_pairs WHERE en_clean = ? LIMIT 4",
                     (clean_q,)
                 )
                 for row in cursor.fetchall():
                     key = row[0]
-                    if key not in candidates:
-                        candidates[key] = {"en": row[0], "pl": row[1], "anime": row[2], "score": 100}
+                    anime_name = (row[2] or "").strip()
+                    anime_lower = anime_name.lower()
+                    is_same_series = bool(target_series_norm and (target_series_norm in anime_lower or anime_lower in target_series_norm))
+                    if require_same_series and target_series_norm and not is_same_series:
+                        continue
+                    score = 100 + (50 if is_same_series else 0)
+                    if key not in candidates or candidates[key]["score"] < score:
+                        candidates[key] = {"en": row[0], "pl": row[1], "anime": anime_name, "score": score}
 
                 # 2. SQLite FTS5 BM25 Match (High-Speed Full-Text Search)
                 try:
@@ -229,39 +243,57 @@ class TranslationMemory:
                         # 2a. Phrase match via FTS5
                         phrase_q = '"' + " ".join(sanitized_tokens[:8]) + '"'
                         cursor.execute(
-                            "SELECT en_clean, pl_text, anime_title, bm25(translation_pairs_fts) FROM translation_pairs_fts WHERE translation_pairs_fts MATCH ? ORDER BY bm25(translation_pairs_fts) LIMIT 2",
+                            "SELECT en_clean, pl_text, anime_title, bm25(translation_pairs_fts) FROM translation_pairs_fts WHERE translation_pairs_fts MATCH ? ORDER BY bm25(translation_pairs_fts) LIMIT 4",
                             (phrase_q,)
                         )
                         for row in cursor.fetchall():
                             key = row[0]
-                            if key not in candidates:
-                                candidates[key] = {"en": row[0], "pl": row[1], "anime": row[2], "score": 85}
+                            anime_name = (row[2] or "").strip()
+                            anime_lower = anime_name.lower()
+                            is_same_series = bool(target_series_norm and (target_series_norm in anime_lower or anime_lower in target_series_norm))
+                            if require_same_series and target_series_norm and not is_same_series:
+                                continue
+                            score = 85 + (50 if is_same_series else 0)
+                            if key not in candidates or candidates[key]["score"] < score:
+                                candidates[key] = {"en": row[0], "pl": row[1], "anime": anime_name, "score": score}
 
                         # 2b. Multi-term AND match on key words (len >= 4)
                         key_tokens = [t for t in sanitized_tokens if len(t) >= 4]
                         if len(key_tokens) >= 2:
                             and_q = " AND ".join(key_tokens[:4])
                             cursor.execute(
-                                "SELECT en_clean, pl_text, anime_title, bm25(translation_pairs_fts) FROM translation_pairs_fts WHERE translation_pairs_fts MATCH ? ORDER BY bm25(translation_pairs_fts) LIMIT 2",
+                                "SELECT en_clean, pl_text, anime_title, bm25(translation_pairs_fts) FROM translation_pairs_fts WHERE translation_pairs_fts MATCH ? ORDER BY bm25(translation_pairs_fts) LIMIT 4",
                                 (and_q,)
                             )
                             for row in cursor.fetchall():
                                 key = row[0]
-                                if key not in candidates:
-                                    candidates[key] = {"en": row[0], "pl": row[1], "anime": row[2], "score": 70}
+                                anime_name = (row[2] or "").strip()
+                                anime_lower = anime_name.lower()
+                                is_same_series = bool(target_series_norm and (target_series_norm in anime_lower or anime_lower in target_series_norm))
+                                if require_same_series and target_series_norm and not is_same_series:
+                                    continue
+                                score = 70 + (50 if is_same_series else 0)
+                                if key not in candidates or candidates[key]["score"] < score:
+                                    candidates[key] = {"en": row[0], "pl": row[1], "anime": anime_name, "score": score}
                 except Exception:
                     # Fallback to sub-phrase LIKE matching if FTS fails
                     words = tokenize(clean_q)
                     if len(words) >= 2:
                         bigram_query = f"%{words[0]} {words[1]}%"
                         cursor.execute(
-                            "SELECT en_text, pl_text, anime_title FROM translation_pairs WHERE en_clean LIKE ? AND word_count <= 14 LIMIT 2",
+                            "SELECT en_text, pl_text, anime_title FROM translation_pairs WHERE en_clean LIKE ? AND word_count <= 14 LIMIT 4",
                             (bigram_query,)
                         )
                         for row in cursor.fetchall():
                             key = row[0]
-                            if key not in candidates:
-                                candidates[key] = {"en": row[0], "pl": row[1], "anime": row[2], "score": 60}
+                            anime_name = (row[2] or "").strip()
+                            anime_lower = anime_name.lower()
+                            is_same_series = bool(target_series_norm and (target_series_norm in anime_lower or anime_lower in target_series_norm))
+                            if require_same_series and target_series_norm and not is_same_series:
+                                continue
+                            score = 60 + (50 if is_same_series else 0)
+                            if key not in candidates or candidates[key]["score"] < score:
+                                candidates[key] = {"en": row[0], "pl": row[1], "anime": anime_name, "score": score}
 
         # Sort by relevance score
         sorted_results = sorted(candidates.values(), key=lambda x: x["score"], reverse=True)

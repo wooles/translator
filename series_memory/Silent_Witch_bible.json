@@ -64,10 +64,6 @@
     "Cyril -> Monica": "Zwrot: 'panno Norton / Monico' (przełożony w radzie uczniowskiej -> członkini rady)",
     "Ryn -> Monica": "Zwrot: 'Pani Czarodziejko / Dostojna Wiedźmo' (służebny chowaniec / strażnik -> jedna z Siedmiu Mędrców)"
   },
-  "episodes_translated": [
-    "tmpxfweggtg",
-    "[ASW] Silent Witch - Chinmoku no Majo no Kakushigoto - 13 [1080p HEVC][DEA919F9]"
-  ],
   "declensions": {
     "Ike": {
       "M": "Ike",
@@ -85,7 +81,8 @@
       "B": "Monikę",
       "N": "Moniką",
       "Ms": "Monice",
-      "W": "Moniko"
+      "W": "Moniko",
+      "gender": "FEMALE"
     },
     "Nero": {
       "M": "Nero",
@@ -196,5 +193,11 @@
       "W": "Ryn -> Moniko"
     }
   },
-  "plot_anchors": {}
+  "hypocorisms": {},
+  "plot_anchors": {},
+  "episodes_translated": [
+    "tmpxfweggtg",
+    "[ASW] Silent Witch - Chinmoku no Majo no Kakushigoto - 13 [1080p HEVC][DEA919F9]"
+  ],
+  "batch_stats": {}
 }

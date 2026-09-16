@@ -1,14 +1,15 @@
 # Multimodal Audiovisual Translation (AVT) Engine (EN/JP → PL)
 
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
-[![Google GenAI SDK](https://img.shields.io/badge/LLM%20Orchestration-Gemini%203.5%20%7C%203.7%20Flash%20%7C%203.1%20Pro-orange.svg)](https://ai.google.dev/)
+[![Google GenAI SDK](https://img.shields.io/badge/LLM%20Orchestration-Gemini%202.5%20Flash%20%7C%202.5%20Pro-orange.svg)](https://ai.google.dev/)
 [![Acoustic Ingestion](https://img.shields.io/badge/Acoustic%20ASR-Kotoba--Whisper%20v2.0%20CTranslate2-green.svg)](https://huggingface.co/kotoba-tech/kotoba-whisper-v2.0-faster)
 [![Architecture](https://img.shields.io/badge/Architecture-5--Layer%20Root%20Cause%20Pipeline-purple.svg)]()
-[![CI/Test Suite](https://img.shields.io/badge/Test%20Harness-52%2F52%20Passing-brightgreen.svg)]()
+[![CI/Test Suite](https://img.shields.io/badge/Test%20Harness-95%2F95%20Passing-brightgreen.svg)]()
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-An asynchronous, multimodal audiovisual localization and translation engine written in Python. It executes high-fidelity semantic translation from Japanese audio tracks, video keyframes, and intermediate English dialogue representations into target Polish dialogue scripts, strictly abiding by professional cinematographic subtitling standards (Belczyk AVT Matrix, Skopos Theory, Polysystem Theory).
+An asynchronous, multimodal audiovisual translation and localization engine engineered in Python. It executes high-fidelity semantic translation from Japanese audio streams, video keyframes, and intermediate dialogue representations into target Polish dialogue scripts, strictly adhering to cinematographic subtitling standards (Belczyk AVT Matrix, Skopos Theory, Polysystem Theory, and Netflix AVT Timed Text Guidelines).
 
-The system integrates **Large Multimodal Models (LMMs)** via structured JSON decoding, **fine-tuned Japanese ASR acoustic grounding (Kotoba-Whisper v2.0 CTranslate2)** with $F_0$ fundamental frequency pitch and prosody extraction, **computer-vision spatial OCR & Pixel-Perfect Typesetting (Grounding 2D)**, **Shot-Cut Snapping (Netflix AVT Standard)**, a **164-Pillar AVT Constraint Solver**, **Profiler 4.0 Pre-Computation**, **Cross-Episode Series Memory (SQLite FTS5 BM25)** with a **7-Case Foreign Name Declension Matrix**, and an **Episode Quality Gate (0.00 PLN)** post-processing safety net.
+The engine integrates **Large Multimodal Models (LMMs)** via structured schema decoding, **fine-tuned Japanese ASR acoustic grounding (Kotoba-Whisper v2.0 CTranslate2)** with $F_0$ fundamental frequency pitch and prosodic contour extraction, **FFmpeg temporal and visual telemetry** (I-frame snapping, Fade to Black boundary isolation, native silence detection), **computer-vision spatial OCR & Pixel-Perfect Typesetting (Grounding 2D)**, a **172-Pillar AVT Constraint Solver**, **Profiler 4.0 Pre-Computation**, **Cross-Episode Series Memory (SQLite FTS5 BM25)** with a **7-Case Foreign Name Declension Matrix**, and an **Episode Quality Gate (0.00 PLN)** offline post-processing safety net.
 
 ---
 
@@ -19,11 +20,14 @@ The pipeline implements an end-to-end, decoupled architecture: **Pre-Inference C
 ```mermaid
 flowchart TD
     Video["Multiplexed Media Stream (MKV / MP4 / TS)"] --> Demux["Demuxing & Frame/Audio Extraction (FFmpeg)"]
-    Demux --> Whisper["Zero-Shot Acoustic Alignment (Kotoba-Whisper v2.0 SOTA)"]
+    Demux --> Whisper["Acoustic Grounding (Kotoba-Whisper v2.0 CTranslate2)"]
     Demux --> F0["Autocorrelation F0 Pitch & Prosody Contour Extraction"]
+    Demux --> FFmpegTelemetry["FFmpeg Telemetry: I-Frames, Black Detect, Silence"]
     Demux --> Vision["1080p Keyframe Sampling & Dynamic Downscaling"]
     Video --> SubtitleParser["Temporal Subtitle Event Ingestion (ASS / SRT)"]
 
+    Whisper --> WhisperTelemetry["Whisper Telemetry: VAD, Loop Shield, Confidence"]
+    
     SubtitleParser --> Profiler["Holistic Pre-Computation Profiler 4.0"]
     Profiler --> Cast["Sociolinguistic Cast Graph & Idiolect Matrix (13 Domains)"]
     Profiler --> Traps["Heuristic Lexical Trap Pre-Scanner (DangerLines)"]
@@ -34,8 +38,12 @@ flowchart TD
     Canon --> ContextCache
     DeclMatrix --> ContextCache
 
-    Whisper --> Phase1["Phase 1: Multimodal Semantic Draft (Gemini Flash)"]
-    F0 --> Phase1
+    Whisper --> SSOT["Compact Line-Level SSOT Header Generator (Unburdened LLM)"]
+    WhisperTelemetry --> SSOT
+    FFmpegTelemetry --> SSOT
+    F0 --> SSOT
+
+    SSOT --> Phase1["Phase 1: Multimodal Semantic Draft (Gemini Flash)"]
     Vision --> Phase1
     ContextCache --> Phase1
 
@@ -49,6 +57,8 @@ flowchart TD
 
     ThreeLenses --> QualityGate["Episode Quality Gate (0.00 PLN Full-Timeline Post-Pass)"]
     QualityGate --> Linter["Deterministic 7-Case Declension & Anti-Typo Enforcement"]
+    QualityGate --> Snapper["Shot-Cut & I-Frame Snapper + Fade-to-Black Isolator"]
+    QualityGate --> BreathSplitter["Acoustic Breath Splitter (Pauzy Oddechowe >= 250ms)"]
     QualityGate --> VisualOCR["Pixel-Perfect 2D Grounding Typesetter (\\pos, \\frz, \\1c, \\3c)"]
     VisualOCR --> ASSOutput["Validated Broadcast-Grade Subtitle Artifact (.ass / .srt)"]
 ```
@@ -63,55 +73,68 @@ To eliminate attention drift across long video sequences, the pre-pass engine pe
 * **Relationship Dynamic Pivots (`RelationshipPivot`):** Detects psychological turning points in dialogue where characters switch forms of address (e.g. from formal *Pan/Pani* to informal *ty*), freezing the exact timestamp to prevent regression in subsequent episodes.
 * **7-Case Foreign Name Declension Matrix (Filar XCI):** Automatically generates the full 7-case grammatical inflection table for fantasy and foreign proper nouns (e.g. *Drel → Drela / Drelowi / Drela / Drelem / Drelu / Drelu*), eliminating uninflected possessive anglicisms (*"sekretów Drel"* ❌ → *"sekretów Drela"* ✅).
 
-### 2. Acoustic Grounding & $F_0$ Diarization (Kotoba-Whisper v2.0)
+### 2. Acoustic Grounding & Whisper Telemetry Subsystem (Kotoba-Whisper v2.0)
 * **Fine-Tuned Japanese ASR Engine (Kotoba-Whisper v2.0 CTranslate2):** Integrates the state-of-the-art Japanese speech recognition model trained on 35,000+ hours of Japanese broadcast audio (*ReazonSpeech Corpus*). Accelerated for sub-2GB VRAM inference, drastically outperforming generic multilingual models in character error rate (CER), homophone disambiguation (Kanji context priors), and noisy acoustic environments.
-* **Bypassing the English Pivot Loss:** Intermediate English fan scripts frequently collapse distinct Japanese honorifics, sentence-ending particles (*Shūjoshi*), and socio-cultural hierarchy. Grounding translation directly in Japanese phonetic transcripts ensures zero semantic loss.
+* **Whisper Anti-Hallucination Loop Shield (`detect_hallucination_loop`):** Intercepts repetitive phrase degenerations and abnormal compression ratios (`compression_ratio > 2.4` or $N$-gram loops), isolating genuine audio transcripts from phantom ASR feedback loops.
+* **Voice Activity Filter (`filter_voice_activity`):** Evaluates `no_speech_prob` ($\ge 0.85$), identifying background music, battle soundscapes, and silent video sections to eliminate phantom subtitle lines.
+* **Acoustic Confidence Metric (`assess_acoustic_confidence`):** Evaluates `avg_logprob` to categorize acoustic clarity (`HIGH` vs `LOW`), alerting downstream engines to muffled voices or screams.
 * **Autocorrelation Prosody & $F_0$ Estimator:** Computes fundamental frequency ($F_0$) contours, acoustic intensity (RMS dBFS), and speech duration metrics, injecting paralinguistic metadata (whisper, shout, emotional tremor) directly into LMM context tokens.
 
-### 3. Multi-Signal Gender & Addressee Arbitration Engine (0.00 PLN)
-* **Gender Hallucination Neutralization:** Triangulates character registry metadata, Whisper Japanese grammatical cues (*ore/boku/watashi/atashi*), and local $F_0$ voice pitch estimation to arbitrate speaker gender deterministically before Phase 2.
+### 3. FFmpeg Temporal & Visual Telemetry Subsystem
+* **Shot-Cut Snapping (Netflix AVT Standard):** Automatically detects shot cuts within 2 frames ($\le 84\text{ms}$) and snaps subtitle boundaries to prevent flash-frames and visual bleeding across cuts.
+* **Keyframe (I-Frame) Snapping (`detect_keyframes_ffmpeg`):** Detects exact I-frames using native FFmpeg packet analysis, snapping dialogue starts to preceding keyframes within a 120ms window for clean visual render entry.
+* **Fade to Black Detection (`detect_black_frames_ffmpeg`):** Utilizes native `blackdetect` filters to identify true scene blackouts, isolating dialogue pacing and resetting conversational momentum.
+* **Native Silence Detection (`detect_silence_ffmpeg`):** Analyzes decibel drop thresholds (`silencedetect=n=-35dB:d=0.25`) to identify inter-sentence pauses.
+
+### 4. Acoustic Breath Splitter (`split_subtitle_at_acoustic_pause`)
+* **Natural AVT Line Breaks:** Long subtitle events ($> 38$ characters) are split at the exact millisecond of acoustic silence ($\ge 250\text{ms}$) detected by FFmpeg and Whisper. This guarantees that visual line transitions match the actor's inhalation, maintaining rhythm and reading comfort.
+
+### 5. Multi-Signal Gender & Addressee Arbitration Engine (0.00 PLN)
+* **Gender Hallucination Neutralization:** Triangulates character registry metadata, Whisper Japanese grammatical cues (*ore/boku/watashi/atashi/sessha*), and local $F_0$ voice pitch estimation to arbitrate speaker gender deterministically before Phase 2.
 * **Multimodal Addressee Resolution (Filar CLXIII):**
   * **2nd-Person Singular Address (*ty*):** Distinguishes whether the single addressee in 1-on-1 dialogue is female (`kobieta` → *-łaś, byłaś, jesteś pewna, gotowa*) or male (`mężczyzna` → *-łeś, byłeś, jesteś pewien, gotowy*).
   * **2nd-Person Plural Group Address (*wy*):** Distinguishes female groups (`grupa_kobiet` → *-łyście, byłyście gotowe*) from male/mixed groups (`grupa_mężczyzn/grupa_mieszana` → *-liście, byliście gotowi*), cross-referenced with Whisper plural markers (*-tachi, omae-ra, minna, shokun*).
 
-### 4. Exception-Driven Architecture & Conflict Shields
+### 6. Dynamic Attention Dispatcher & LLM Unburdening
+* **Dynamic Attention Spotlight (`get_focused_rules_for_batch`):** Out of 172+ codified pillars, dynamically selects **at most 3 high-priority pillars** per batch based on real-time scene parameters (CPS speed, interrogatives, typesetting, group address).
+* **Compact Line-Level SSOT Header (`format_compact_ssot_tag`):** Replaces verbose instructions with a single standardized metadata string (`[SSOT: Spk=... G=... Addr=... Ac=...]`), freeing model attention and eliminating prompt bloat.
+
+### 7. Exception-Driven Architecture & Conflict Shields
 * **Blind-Drafting Protocol:** When a severe acoustic or pragmatic mismatch is detected between the English fan script and Japanese audio keywords (*hitori, betsuni, yokatta, yatta*), the Phase 1 candidate is blinded from the Phase 2 prompt (`is_blind_draft=True`), forcing the Script Doctor to translate autonomously from raw audio and source text without anchoring bias.
-* **Thought-to-Speech Firewall:** Enforces strict styling separation between internal character thoughts (italicized `{\i1}`) and diegetic spoken dialogue, preventing inadvertent thought-leakage across scene transitions.
+* **Thought-to-Speech Firewall:** Enforces strict styling separation between internal character thoughts (italicized `{\i1}`) and diegetic spoken dialogue.
 * **T-V Invariance & Honorific Vocative Shield (Filar CLVII):** Prevents formal address contamination (*Pan/Pani*) in intimate scenes where characters converse on first-name informal terms (*ty*).
 * **Typo Shield & Lexical Integrity (Filar CLXIV):** Enforces 100% lexical hygiene, eliminating keyboard artifacts and non-existent phonetic distortions (*„spyham”* ❌ → *„spytam”* ✅, *„wziąść”* ❌ → *„wziąć”* ✅).
 
-### 5. Deterministic 164-Pillar AVT Canon
-A comprehensive constraint solver implementing cinematographic subtitling theory across 6 major domains:
+### 8. Deterministic 172-Pillar AVT Canon
+A comprehensive constraint solver implementing cinematographic subtitling theory across 7 major domains:
 * **Domain I (Morphosyntax & Flexibility):** De-nominalization, verb-centric phrasing, pronoun stripping, topic-comment structuring.
 * **Domain II (Semiotics & Temporal Pacing):** Cinematographic shot-cut synchronization, semiotics of silence (*Ma*), strict Characters-Per-Second (CPS $\le 17$) enforcement.
 * **Domain III (Realia & Historical Registers):** Feudal titular hierarchies, archaic speech, publisher canon invariance.
 * **Domain IV (Anime Sociolinguistics & Pragmatics):** Social triangulation, relational indebtedness (*Giri*), conversational hedging, indirect refusal decoding (*„...wa ii desu”*).
 * **Domain V (Paralinguistics & Phonetics):** Isomorphic vowel elongation (*Chōon* mapping), prosodic continuity across sentence breaks.
 * **Domain VI (Transcreation, Idiolects & Song Metre):** Polish 7-case noun declension, Stanisław Barańczak syllabic song/rhyme transcreation (**Pillar CXVIII**), Character Idiolect Matrix (**Pillar CXIX**), and Blind Native Polish Critic fluency validation.
+* **Domain VII (Temporal Discontinuity & Register Governance):** Spatiotemporal shifts, anti-pivot cliches, and genre-specific register matrices.
 
-### 6. Dynamic Attention Dispatcher & Line-Level Pinning
-To prevent prompt bloat and the *Lost-in-the-Middle* phenomenon:
-* **Dynamic Attention Spotlight (`get_focused_rules_for_batch`):** Out of 164 pillars, dynamically selects **at most 3 high-priority pillars** per batch based on real-time scene parameters (CPS speed, questions, typesetting, group address).
-* **Line-Level Pinning:** Specific hazard warnings, frozen catchphrases, and Barańczak wordplay adaptations are pinned strictly to the specific subtitle event that triggers them via `[🚨 PUŁAPKA PROFILERA: ...]` or `[🎯 ALARM FILAR CLXIII: ...]`.
-
-### 7. 4-Tier Authority Glossary Hierarchy
+### 9. 4-Tier Authority Glossary Hierarchy
 Terminology is resolved deterministically through a strict 4-tier hierarchy:
 1. **Tier 1 (Highest): Official Polish Manga Publishing Canon** (*Waneko, Studio JG, J.P.Fantastica, Kotori, Hanami, Dango, Egmont*).
 2. **Tier 2: Cross-Episode Series Bible** (Persistent across full seasons, SQLite FTS5 BM25 search).
 3. **Tier 3: Episode Profiler 4.0** (Episodic context and entity discovery).
 4. **Tier 4 (Fallback): User Glossary** (Custom user overrides).
 
-### 8. Enterprise Context Caching (-90% Token Cost) & Multi-Key Pool
+### 10. Enterprise Context Caching (-90% Token Cost) & Multi-Key Pool
 * **Server-Side KV Context Caching:** Persists the entire episode knowledge matrix (Profiler, Series Bible, 4-Tier Glossary, Few-Shot Rules) directly in GPU VRAM on Google AI Studio, slashing input token billing by **-90%**.
-* **Pre-Warming & Hard Cost Lock:** Guarantees `ensure_cache_ready` across all models before dispatching batches. Blocks execution safely if caching fails, protecting user wallets against 10x full-rate charges.
-* **Sliding Keep-Alive Heartbeat (20m TTL):** Refreshes cache leases dynamically per batch, preventing eviction during API 503 or 429 backoff delays.
+* **Pre-Warming & Hard Cost Lock:** Guarantees `ensure_cache_ready` across all models before dispatching batches. Blocks execution safely if caching fails, protecting user budgets against full-rate charges.
+* **Sliding Keep-Alive Heartbeat (20m TTL):** Refreshes cache leases dynamically per batch, preventing eviction during API backoff delays.
 * **Multi-Key Client Pool with Zero-Wait Hopping:** Cycles requests smoothly across multiple Gemini API keys with 200ms micro-pauses, neutralizing rate-limit bottlenecks.
 
-### 9. Episode Quality Gate (0.00 PLN Full-Timeline Post-Pass)
+### 11. Episode Quality Gate (0.00 PLN Full-Timeline Post-Pass)
 Operates on the entire `.ass` subtitle timeline after translation completes, executing deterministic corrections at zero extra API cost:
 * Complete enforcement of the 4-tier glossary and 7-case foreign name declensions (Filar XCI).
 * 2nd-person singular and plural addressee verb and adjective gender agreement (Filar CLXIII).
 * Automatic correction of keyboard typos and malformed verbs (Filar CLXIV).
+* Shot-cut and I-frame boundary snapping.
+* Acoustic breath line splitting for events $\ge 38$ characters.
 * Syntax-aware line breaking (max 42 characters per line) and CPS speed regulation.
 * ASS tag sanitization and typography consistency.
 
@@ -223,6 +246,14 @@ The engine resolves common failure modes of traditional Machine Translation (MT)
 | **Dialogue to single female:**<br>*„Did you go there alone? Were you sure?”* | ❌ *„Poszedłeś tam sam? Byłeś pewien?”*<br>*(Default masculine gender bias)* | ✅ **„Poszłaś tam sama? Byłaś pewna?”**<br>*(Singular female addressee agreement)* | **Pillar CLXIII**<br>(*Singular Addressee Agreement*) |
 | **Dialogue to female group:**<br>*„Did you finish it on time? Are you ready?”* | ❌ *„Zrobiliście to na czas? Jesteście gotowi?”*<br>*(Virile plural bias)* | ✅ **„Zrobiłyście to na czas? Jesteście gotowe?”**<br>*(Non-virile plural group agreement)* | **Pillar CLXIII**<br>(*Plural Group Addressee Agreement*) |
 
+### 11. Acoustic Breath Splitting & Temporal Pacing
+* **Problem:** Dialogue lines exceeding 40 characters often produce cognitive overload when rendered as a single block across natural speaker pauses.
+* **Engine Solution:** `split_subtitle_at_acoustic_pause` detects silence gaps ($\ge 250\text{ms}$) via native audio telemetry and splits the subtitle cleanly (`\N`) at the syntactic boundary closest to the breath pause.
+
+| Context & Acoustic Input | Naive Block Rendering | Acoustic Breath Split (Engine) | Codified Heuristic |
+| :--- | :--- | :--- | :--- |
+| **Speaker:** Scout reporting (4.5s)<br>**Audio:** 500ms breath pause between clauses<br>**Text:** *„Musimy natychmiast opuścić ten zamek i uciekać do lasu.”* | ❌ *„Musimy natychmiast opuścić ten zamek i uciekać do lasu.”*<br>*(Single overloaded visual block)* | ✅ **„Musimy natychmiast opuścić ten zamek\Ni uciekać do lasu.”**<br>*(Synchronized with speaker inhalation)* | **Acoustic Breath Splitter**<br>(*FFmpeg Silence Telemetry*) |
+
 ---
 
 ## 📊 Quality Profiles & Tokenomics
@@ -231,10 +262,10 @@ Estimates per standard 24-minute media unit (~350 subtitle lines / 15 batches):
 
 | Quality Profile | Phase 1 Inference | Phase 2 Refinement | Estimated Cost (24 min) | Target Application |
 | :--- | :--- | :--- | :---: | :--- |
-| **`[1] STANDARD`** | `gemini-3.5-flash-lite` | *Disabled* | **0.00 PLN** | Rapid batch screening, Free-Tier CI/CD |
-| **`[2] STUDIO FLASH`** | `gemini-3.5-flash` | *Disabled / Fast Lint* | **~0.15 PLN** | High-throughput, cost-sensitive pipelines |
-| **`[3] MASTER PRO ⭐`** | `gemini-3.5-flash` | `gemini-3.5-flash` *(Adaptive CoT 2048-6144)* | **~0.40 – 0.65 PLN** | **Production Grade:** Cinema & dubbing (Elastic CoT, 100% Quality Plateau) |
-| **`[4] CINEMA ULTRA 👑`** | `gemini-3.5-flash` | `gemini-3.1-pro` *(Pro CoT 1024-2048)* | **~2.20 – 3.50 PLN** | Maximum depth, Pro script doctoring |
+| **`[1] STANDARD`** | `gemini-2.5-flash-lite` | *Disabled* | **0.00 PLN** | Rapid batch screening, Free-Tier CI/CD |
+| **`[2] STUDIO FLASH`** | `gemini-2.5-flash` | *Disabled / Fast Lint* | **~0.15 PLN** | High-throughput, cost-sensitive pipelines |
+| **`[3] MASTER PRO ⭐`** | `gemini-2.5-flash` | `gemini-2.5-flash` *(Adaptive CoT 2048-6144)* | **~0.40 – 0.65 PLN** | **Production Grade:** Cinema & dubbing (Elastic CoT, 100% Quality Plateau) |
+| **`[4] CINEMA ULTRA 👑`** | `gemini-2.5-flash` | `gemini-2.5-pro` *(Pro CoT 1024-2048)* | **~2.20 – 3.50 PLN** | Maximum depth, Pro script doctoring |
 
 *Note: Calculations reflect active server-side Context Caching (-90% discount) and zero cost for deterministic post-pass Quality Gate checks (0.00 PLN).*
 
@@ -245,7 +276,7 @@ Estimates per standard 24-minute media unit (~350 subtitle lines / 15 batches):
 ### System Requirements
 * **Runtime:** Python 3.10+ (x86_64)
 * **Acoustics/Vision:** `ffmpeg` binary mapped in system `$PATH`
-* **API Access:** Active Google Gemini API Key with Developer API access
+* **API Access:** Google Gemini API Key (Google AI Studio)
 
 ### Automated Provisioning (Windows)
 ```powershell
@@ -312,18 +343,22 @@ python main.py "media.mkv" --play
 
 ## 🧪 Verification Test Harness
 
-The engine is guarded by an automated regression and integration test suite executing **52 modular verification routines**:
+The engine is guarded by an automated regression and integration test suite executing **95 modular verification routines**:
 ```powershell
 python test_system.py
 ```
+
 **Verification Scope:**
 * Pydantic schema validation (`RefinedBatchResponse`, `EpisodeProfile`, `LineTranslation`).
-* Complete coverage and non-contradiction proofs for all **164 AVT Pillars**.
+* Complete coverage and non-contradiction proofs for all **172 AVT Pillars**.
 * Google Context Cache SHA-256 state isolation, rolling keep-alive leases, and memory cleanup.
 * 7-Case Foreign Name Declension Matrix (Filar XCI) & EpisodeQualityGate integration (Test 50).
 * Typo Shield & Lexical Integrity (Filar CLXIV) integration (Test 51).
 * Multimodal Addressee Resolution (Filar CLXIII) for singular female/male and plural groups (Test 46).
 * Official Manga Canon & Titular Calque Shield for Frieren (*Aura Gilotyna*, Studio JG / Martyna Zdonek) (Test 52).
+* Relational T-V Invariance, Vocative Guard & Anti-Sama-Drop (Test 53).
+* Spatiotemporal Engine, Anti-Pivot Guard & 2-Stage Blind Read (Test 56).
+* Whisper & FFmpeg Acoustic-Temporal Telemetry Reserves (Fade to Black, VAD, Loop Shield, Acoustic Breath Splitter, I-Frame Snapping) (Test 95).
 * Tokenomics financial calculations across all quality tiers.
 * Translation Memory SQLite FTS5 BM25 temporal matching ($\Delta t \le 300\text{ms}$).
 

@@ -121,17 +121,8 @@
     "Charon -> Haumea": "Zwrot: 'Haumea / mała' (oddany strażnik -> podopieczna)",
     "Inca -> Shinra": "Zwrot: 'Shinra / Shinra-kun / Bohaterze' (natrętna adoratorka / rywalka -> zbawca)",
     "Iris -> Shinra": "Zwrot: 'panie Shinra (Shinra-san)' (towarzysze broni / wzajemna sympatia)",
-    "Hibana -> Iris": "Zwrot: 'Iris / siostrzyczko' (starsza przybrana siostra -> młodsza siostra)"
+    "Hibana -> Iris": "Zwrot: 'Iris / siostrzyczko' (starsza przybrana siostra -> młodsza siostra) [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]"
   },
-  "episodes_translated": [
-    "tmpowy5e9xz",
-    "tmpp115zk2e",
-    "tmpkmapjaze",
-    "tmp3q0tgomw",
-    "tmpkszqixci",
-    "tmp8jp2myh5",
-    "tmph43s0kjf"
-  ],
   "declensions": {
     "Shinra": {
       "M": "Shinra",
@@ -149,7 +140,8 @@
       "B": "Haumeę",
       "N": "Haumeą",
       "Ms": "Haumee",
-      "W": "Haumeo"
+      "W": "Haumeo",
+      "gender": "FEMALE"
     },
     "Sho": {
       "M": "Sho",
@@ -176,7 +168,8 @@
       "B": "Maki",
       "N": "Maki",
       "Ms": "Maki",
-      "W": "Maki"
+      "W": "Maki",
+      "gender": "FEMALE"
     },
     "Licht": {
       "M": "Licht",
@@ -230,7 +223,8 @@
       "B": "Inkę",
       "N": "Inką",
       "Ms": "Ince",
-      "W": "Inko"
+      "W": "Inko",
+      "gender": "FEMALE"
     },
     "Iris": {
       "M": "Iris",
@@ -239,7 +233,8 @@
       "B": "Iris",
       "N": "Iris",
       "Ms": "Iris",
-      "W": "Iris"
+      "W": "Iris",
+      "gender": "FEMALE"
     },
     "Hibana": {
       "M": "Hibana",
@@ -248,7 +243,8 @@
       "B": "Hibanę",
       "N": "Hibaną",
       "Ms": "Hibanie",
-      "W": "Hibano"
+      "W": "Hibano",
+      "gender": "FEMALE"
     },
     "Shinra -> Haumea": {
       "M": "Shinra -> Haumea",
@@ -377,5 +373,16 @@
       "W": "Hibano -> Iris"
     }
   },
-  "plot_anchors": {}
+  "hypocorisms": {},
+  "plot_anchors": {},
+  "episodes_translated": [
+    "tmpowy5e9xz",
+    "tmpp115zk2e",
+    "tmpkmapjaze",
+    "tmp3q0tgomw",
+    "tmpkszqixci",
+    "tmp8jp2myh5",
+    "tmph43s0kjf"
+  ],
+  "batch_stats": {}
 }

@@ -316,7 +316,11 @@
     "God of War": "Bóg Wojny",
     "Kusunoki style": "styl Kusunokiego",
     "Golden Pavilion": "Złoty Pawilon",
-    "artery slash": "cięcie tętnicze"
+    "artery slash": "cięcie tętnicze",
+    "Kronice Kronika Taiheiki": "Kronice Taiheiki",
+    "Kronika Kronika Taiheiki": "Kronika Taiheiki",
+    "[ KRONIKA Kronika\\NTaiheiki TOM DZIESIĄTY ]": "[ KRONIKA TAIHEIKI:\\NTOM DZIESIĄTY ]",
+    "[ KRONIKA Kronika Taiheiki TOM DZIESIĄTY ]": "[ KRONIKA TAIHEIKI:\\NTOM DZIESIĄTY ]"
   },
   "relationships": {
     "Yorishige Suwa -> Tokiyuki Hōjō": "Zwrot: 'Panie Tokiyuki / Młody Panie' (opiekun i boski kapłan -> młody dziedzic rodu Hōjō) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
@@ -347,14 +351,14 @@
     "Suwa Yorishige -> Tokiyuki Hōjō": "Zwrot: 'panie Tokiyuki' (opiekuńczy kapłan -> młody dziedzic) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Shizuku -> Tokiyuki Houjou (Chojumaru)": "Zwrot: 'Młody panie / Panie Tokiyuki (gdy w audio Waka/Waka-sama)' lub 'Bracie' (WYŁĄCZNIE gdy w audio seiyuu mówi Aniki/Aniue). ZAKAZ tłumaczenia 'Waka' jako 'bracie'! [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Mima Sasaki -> Tokiyuki Houjou (Chojumaru)": "Zwrot: 'chłopcze / mały / ty' (wyniosła córka feudała -> zafascynowana protektorka) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Mima Sasaki -> Shizuku": "Zwrot: 'wiejska kapłanko / panienko ze wsi' (hazardowa rywalka z pogardzanego prowincjonalnego chramu) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Mima Sasaki -> Shizuku": "Zwrot: 'wiejska kapłanko / panienko ze wsi' (hazardowa rywalka z pogardzanego prowincjonalnego chramu) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]",
     "Kojiro -> Tokiyuki Houjou (Chojumaru)": "Zwrot: 'Młody panie / Panie' (gdy w audio Waka/Waka-sama) lub 'Chojumaru'. KATEGORYCZNY ZAKAZ tłumaczenia 'Waka' jako 'bracie', nawet w miejscach publicznych (jeśli Kojiro mówi Waka, to odruchowa wpadka, którą należy zachować)! [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Yasuie -> Kinmune Saionji": "Zwrot: 'Wielki Radco / Panie Kinmune' (spiskowiec z Kamakury i dworski dostojnik cesarski) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Genba Kazama -> Yasuie Hōjō": "Zwrot: 'szefie / panie Yasuie' (shinobi/złodziej -> wuj młodego pana Tokiyukiego) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Tokiyuki Hōjō -> Masashige Kusunoki": "Zwrot: 'panie Kusunoki / panie Masashige' (uczeń/młodzieniec -> legendarny wódz)",
     "Masashige Kusunoki -> Tokiyuki Hōjō": "Zwrot: 'chłopcze / młodzieńcze (na ty)' (mistrz taktyki -> tajemniczy chłopak) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
     "Kojiro -> Tokiyuki Hōjō": "Zwrot: 'panie Tokiyuki / mój panie (Waka-sama)' (wasal -> młody pan) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Shizuku -> Mima": "Zwrot: 'Mima / na ty' (znajome rówieśniczki w Kyo) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Shizuku -> Mima": "Zwrot: 'Mima / na ty' (znajome rówieśniczki w Kyo) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]",
     "Mima -> Tokiyuki Hōjō": "Zwrot: 'chłopcze / mały' (miejska arystokratka -> tajemniczy chłopak z prowincji) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Tokiyuki Hōjō (Chojumaru) -> Mochizuki": "Zwrot: 'panie Mochizuki / panie Shinomiya / panie Nezu' (młody dziedzic rodu Hōjō (incognito jako łącznik) -> feudalni dowódcy)",
     "Mochizuki -> Tokiyuki Hōjō (Chojumaru)": "Zwrot: 'Młody Panie / dzieciaku / Chojumaru' (feudalny dowódca -> pan feudalny / łącznik) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
@@ -415,7 +419,8 @@
       "B": "Ayako",
       "N": "Ayako",
       "Ms": "Ayako",
-      "W": "Ayako"
+      "W": "Ayako",
+      "gender": "FEMALE"
     },
     "Lord Mochizuki": {
       "M": "Lord Mochizuki",
@@ -505,7 +510,8 @@
       "B": "Mochizuki",
       "N": "Mochizuki",
       "Ms": "Mochizuki",
-      "W": "Mochizuki"
+      "W": "Mochizuki",
+      "gender": "FEMALE"
     },
     "Shokan": {
       "M": "Shokan",
@@ -541,7 +547,8 @@
       "B": "Sojusznicy / Mochizuki",
       "N": "Sojusznicy / Mochizuki",
       "Ms": "Sojusznicy / Mochizuki",
-      "W": "Sojusznicy / Mochizuki"
+      "W": "Sojusznicy / Mochizuki",
+      "gender": "FEMALE"
     },
     "Gubernator Kiyohara": {
       "M": "Gubernator Kiyohara",
@@ -640,7 +647,8 @@
       "B": "Shizuku",
       "N": "Shizuku",
       "Ms": "Shizuku",
-      "W": "Shizuku"
+      "W": "Shizuku",
+      "gender": "FEMALE"
     },
     "Mima Sasaki": {
       "M": "Mima Sasaki",
@@ -649,7 +657,8 @@
       "B": "Mimę Sasaki",
       "N": "Mimą Sasaki",
       "Ms": "Mimie Sasaki",
-      "W": "Mimo Sasaki"
+      "W": "Mimo Sasaki",
+      "gender": "FEMALE"
     },
     "Kojiro": {
       "M": "Kojiro",
@@ -676,7 +685,8 @@
       "B": "Kinmune Saionji",
       "N": "Kinmune Saionji",
       "Ms": "Kinmune Saionji",
-      "W": "Kinmune Saionji"
+      "W": "Kinmune Saionji",
+      "gender": "FEMALE"
     },
     "Yorishige Suwa -> Tokiyuki Hōjō": {
       "M": "Yorishige Suwa -> Tokiyuki Hōjō",
@@ -730,7 +740,8 @@
       "B": "Ayako -> Lord Mochizuki",
       "N": "Ayako -> Lord Mochizuki",
       "Ms": "Ayako -> Lord Mochizuki",
-      "W": "Ayako -> Lord Mochizuki"
+      "W": "Ayako -> Lord Mochizuki",
+      "gender": "FEMALE"
     },
     "Muneie Tokoiwa / Mochizuki -> Tokiyuki Hōjō (Chojumaru)": {
       "M": "Muneie Tokoiwa / Mochizuki -> Tokiyuki Hōjō (Chojumaru)",
@@ -928,7 +939,8 @@
       "B": "Mimę Sasaki -> Tokiyuki Houjou (Chojumaru)a",
       "N": "Mimą Sasaki -> Tokiyuki Houjou (Chojumaru)em",
       "Ms": "Mimie Sasaki -> Tokiyuki Houjou (Chojumaru)ie",
-      "W": "Mimo Sasaki -> Tokiyuki Houjou (Chojumaru)ie"
+      "W": "Mimo Sasaki -> Tokiyuki Houjou (Chojumaru)ie",
+      "gender": "FEMALE"
     },
     "Mima Sasaki -> Shizuku": {
       "M": "Mima Sasaki -> Shizuku",
@@ -937,7 +949,8 @@
       "B": "Mimę Sasaki -> Shizuku",
       "N": "Mimą Sasaki -> Shizuku",
       "Ms": "Mimie Sasaki -> Shizuku",
-      "W": "Mimo Sasaki -> Shizuku"
+      "W": "Mimo Sasaki -> Shizuku",
+      "gender": "FEMALE"
     },
     "Kojiro -> Tokiyuki Houjou (Chojumaru)": {
       "M": "Kojiro -> Tokiyuki Houjou (Chojumaru)",
@@ -955,7 +968,8 @@
       "B": "Yasuie -> Kinmune Saionji",
       "N": "Yasuie -> Kinmune Saionji",
       "Ms": "Yasuie -> Kinmune Saionji",
-      "W": "Yasuie -> Kinmune Saionji"
+      "W": "Yasuie -> Kinmune Saionji",
+      "gender": "FEMALE"
     },
     "Genba Kazama -> Yasuie Hōjō": {
       "M": "Genba Kazama -> Yasuie Hōjō",
@@ -973,7 +987,8 @@
       "B": "Masashige Kusunoki",
       "N": "Masashige Kusunoki",
       "Ms": "Masashige Kusunoki",
-      "W": "Masashige Kusunoki"
+      "W": "Masashige Kusunoki",
+      "gender": "FEMALE"
     },
     "Mima": {
       "M": "Mima",
@@ -982,7 +997,8 @@
       "B": "Mimę",
       "N": "Mimą",
       "Ms": "Mimie",
-      "W": "Mimo"
+      "W": "Mimo",
+      "gender": "FEMALE"
     },
     "Shinomiya": {
       "M": "Shinomiya",
@@ -1018,7 +1034,8 @@
       "B": "Sojusznicy",
       "N": "Sojusznicy",
       "Ms": "Sojusznicy",
-      "W": "Sojusznicy"
+      "W": "Sojusznicy",
+      "gender": "FEMALE"
     },
     "Takauji Ashikaga": {
       "M": "Takauji Ashikaga",

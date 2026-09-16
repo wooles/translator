@@ -39,6 +39,7 @@ import logging
 import threading
 import tempfile
 import sqlite3
+import unicodedata
 import concurrent.futures
 from typing import List, Optional, Dict, Any, Tuple
 from pathlib import Path
@@ -60,11 +61,12 @@ from verifier import DialogueVerifier, RefinedLine
 from extract import extract_frame_at_timestamp, extract_audio_slice
 from metadata import get_anime_context, format_anime_context_for_prompt
 from memory import TranslationMemory, format_translation_memory_for_prompt
-from profiler import EpisodeProfiler, EpisodeProfile, format_episode_profile_for_prompt
+from profiler import EpisodeProfiler, EpisodeProfile, format_episode_profile_for_prompt, format_lean_episode_brief
 from whisper_engine import JapaneseWhisperEngine
+from whisper_disambiguator import WhisperDisambiguator
 from avt_linter import AVTLinter
 from romaji_helper import to_romaji
-from series_memory import SeriesBible
+from series_memory import SeriesBible, extract_clean_speaker_name, INHERENT_FEMALE_NOUNS, INHERENT_MALE_NOUNS, GENERIC_CATEGORY_TAGS, is_generic_actor_or_category
 from manga_canon import MangaCanonRegistry
 from avt_formatter import (
     split_subtitle_syntactically,
@@ -654,6 +656,12 @@ def detect_audio_discrepancy(jp_text: str, pl_text: str, en_text: str, prosody: 
                     "Wymagana polska zjadliwość, ironia lub sarkazm: 'Też mi pomoc...', 'Akurat...', 'Wielkie mi dzięki...', 'Taa, jasne...', 'Jeszcze czego...']"
                 )
 
+    # 62. Echo Agreement Discrepancy (Iie / Uun vs 'Nie' na pytanie z przeczeniem)
+    if any(k in clean_jp for k in ["いいえ", "ううん", "いや"]) or any(k in rom_lower.split() for k in ["iie", "uun", "iya"]):
+        if any(w in en_text.lower() for w in ["don't you", "aren't you", "didn't you", "can't you", "won't you", "isn't it"]):
+            if re.match(r"^\s*(nie|n-nie)[\.!\?…]*$", pl_lower.strip()):
+                return "W audio pada 'Iie/Uun' w odpowiedzi na pytanie z przeczeniem (odrzucenie negacji: 'Wiem!' / 'Idę!' / 'Właśnie, że tak!') -> ZAKAZ dosłownego 'Nie.', które w języku polskim fałszywie potwierdza negację! (Filar CLIV)."
+
     return None
 
 def detect_japanese_pragmatic_register(jp_text: str, en_text: str = "") -> Optional[str]:
@@ -831,6 +839,37 @@ def get_audio_semantic_anchor(jp_text: str, en_text: str = "") -> Optional[str]:
         if any(w in en_lower for w in ["fine", "good", "okay", "no thanks"]):
             return "W audio seiyū odrzuca ofertę ('結構です/いいです') -> NAKAZ formy grzecznej odmowy: 'Nie trzeba' / 'Obejdzie się' / 'Dziękuję, nie trzeba' (ZAKAZ 'Jest dobrze/w porządku') (Filar CLVIII)."
 
+    # 19. Urusai / Damare (Filar CLXX - Speech Act Class 1: Uciszanie i Irytacja)
+    if any(k in clean_jp for k in ["うるさい", "うるせえ", "うるせー", "だまれ", "黙れ", "静かに"]) or any(k in rom_lower.split() for k in ["urusai", "urusaina", "urusee", "uruse-", "ussee", "damare", "shizukani"]):
+        return "W audio pada 'うるさい / 黙れ (Urusai / Damare)' = poirytowanie gadaniem/zrzędzeniem rozmówcy! KATEGORYCZNY ZAKAZ dryfu ku wstydowi/zażenowaniu i potocznemu slangowi ('Ale żenada...', 'przypał', 'obciach')! NAKAZ: 'Ale marudzisz...', 'Daj mi spokój...', 'Nie truj...', 'Ale gadasz...', 'Ucisz się...' lub 'Przestań wreszcie...' (Filar CLXX)."
+
+    # 20. Tadaima / Okaeri (Filar CLXX - Harmonizacja Aisatsu)
+    if any(k in clean_jp for k in ["ただいま", "おかえり", "お帰り"]) or any(k in rom_lower.split() for k in ["tadaima", "okaeri"]):
+        return "W audio pada formuła domowa 'Tadaima / Okaeri' -> KATEGORYCZNY ZAKAZ twierdzącego echa czasownikowego ('Wróciłam' -> 'Wróciłaś')! Zastosuj naturalne polskie powitanie domowników: 'Witaj w domu!', 'O, już jesteś?' lub 'Dobrze, że jesteś!' (Filar CLXX)."
+
+    # 21. Shiranai yo / Shiranai (Filar CLVI / SAGE Intent Anchor)
+    if any(k in clean_jp for k in ["知らないよ", "しらないよ", "知らねえよ", "知らん"]) or any(k in rom_lower.split() for k in ["shiranaiyo", "shiranai yo", "shiraneeyo", "shiran"]):
+        if any(w in en_lower for w in ["care", "warn", "see if i care", "don't blame me", "suit yourself", "don't know", "i don't care"]):
+            return "W audio seiyū mówi '知らないよ (Shiranai yo)' w tonie ostrzeżenia/irytacji -> KATEGORYCZNY ZAKAZ szkolnego 'Nie wiem!'! NAKAZ: 'Ostrzegałem cię!' / 'Jeszcze pożałujesz!' / 'Nie moja wina!' / 'Rób jak chcesz!' (Filar CLVI)."
+
+    # 22. Katte ni shiro / Katte ni (Filar CLVI / SAGE Intent Anchor)
+    if any(k in clean_jp for k in ["勝手にしろ", "かってにしろ", "勝手にしなさい", "勝手に"]) or any(k in rom_lower.split() for k in ["katte ni shiro", "kattenishiro", "katte"]):
+        if any(w in en_lower for w in ["whatever", "suit yourself", "as you like", "want", "please"]):
+            return "W audio pada '勝手にしろ (Katte ni shiro)' = wzgardliwe zerwanie sporu -> ZAKAZ dosłownego 'Zrób samowolnie'! NAKAZ: 'Rób, co chcesz!' / 'A rób se, co chcesz!' / 'Na własne ryzyko!' (Filar CLVI)."
+
+    # 23. Itadakimasu (Filar CLVI / SAGE Intent Anchor)
+    if any(k in clean_jp for k in ["いただきます", "頂きます"]) or "itadakimasu" in rom_lower:
+        if any(w in en_lower for w in ["feast", "dinner", "eat", "food", "devour", "dig in"]):
+            return "W audio pada 'いただきます (Itadakimasu)' w kontekście drapieżnika/walki -> KATEGORYCZNY ZAKAZ domowego 'Dziękuję za jedzenie'! NAKAZ: 'Czas na żer!' / 'Pora na posiłek!' / 'Zaraz cię pożrę!' (Filar CLVI)."
+
+    # 24. Echo Agreement - Hai / Iie on Negative Questions (Filar CLIV / CLVIII)
+    if any(k in clean_jp for k in ["いいえ", "ううん", "いや"]) or any(k in rom_lower.split() for k in ["iie", "uun", "iya"]):
+        if any(w in en_lower for w in ["no", "nope"]):
+            return "W audio pada zaprzeczenie 'いいえ/ううん/いや (Iie/Uun/Iya)'. Jeśli poprzednie zdanie było pytaniem z przeczeniem (np. 'Nie idziesz?', 'Nie wiesz?'), mówca ZAPRZECZA negacji (twierdząc: 'Wiem!' / 'Idę!' / 'Właśnie, że tak!') -> KATEGORYCZNY ZAKAZ mylnego 'Nie.', które odwraca sens! (Filar CLIV)."
+    elif any(k in clean_jp for k in ["はい", "うん", "ええ"]) or any(k in rom_lower.split() for k in ["hai", "un", "ee"]):
+        if any(w in en_lower for w in ["yes", "yeah", "right"]):
+            return "W audio pada potwierdzenie 'はい/うん/ええ (Hai/Un/Ee)'. Jeśli poprzednie zdanie było pytaniem z przeczeniem (np. 'Nie idziesz?', 'Nie wiesz?'), w języku polskim oznacza to POTWIERDZENIE NEGACJI: 'Nie.' / 'Nie idę.' / 'Nie wiem.' (Filar CLIV)."
+
     return None
 
 def sanitize_sub_text(text: str, is_ass: bool = True) -> str:
@@ -946,7 +985,8 @@ def create_adaptive_batches(
     min_scene_batch: int = 16,
     min_leap_batch: int = 12,
     leap_threshold_ms: int = 8000,
-    scene_threshold_ms: int = 3800
+    scene_threshold_ms: int = 3800,
+    coalesce_tail: Optional[bool] = None
 ) -> list:
     """
     Groups subtitle events into coherent, scene-aligned batches,
@@ -961,6 +1001,9 @@ def create_adaptive_batches(
     """
     if not raw_entries:
         return []
+
+    if coalesce_tail is None:
+        coalesce_tail = (len(raw_entries) >= 40)
 
     batches = []
     current_batch = []
@@ -990,7 +1033,21 @@ def create_adaptive_batches(
         current_words += max(1, words)
 
     if current_batch:
-        batches.append(current_batch)
+        # Trailing Batch Coalescence & Rebalancing:
+        # Prevent costly micro-batches (< 8 lines) at the tail of the episode.
+        if coalesce_tail and batches and len(current_batch) < 8:
+            total_tail = len(batches[-1]) + len(current_batch)
+            if total_tail <= max_batch_size:
+                # 1. Coalescence: merge cleanly into preceding batch, saving an entire API round-trip
+                batches[-1].extend(current_batch)
+            else:
+                # 2. Rebalance: distribute items evenly between batches[-1] and current_batch
+                combined = batches[-1] + current_batch
+                split_idx = len(combined) // 2
+                batches[-1] = combined[:split_idx]
+                batches.append(combined[split_idx:])
+        else:
+            batches.append(current_batch)
 
     return batches
 
@@ -1004,6 +1061,7 @@ class LineTranslation(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: int = Field(description="ID kwestii dialogowej z wejścia")
     polish_text: str = Field(description="Przetłumaczona kwestia na język polski z uwzględnieniem płci, sceny i eliminacji kalek")
+    speaker_name: Optional[str] = Field(default=None, description="Imię postaci z bazy AniList / kartoteki mówiącej tę kwestię (np. 'Fatima', 'Ögedei') lub null jeśli nieznana")
     speaker_gender: Optional[str] = Field(default=None, description="Płeć mówcy: 'mężczyzna' lub 'kobieta'")
     addressee: Optional[str] = Field(
         default=None,
@@ -1214,11 +1272,92 @@ def detect_scene_social_context(
         speakers_str = ", ".join(clean_speakers[:4])
         return f"[KADR ZBIOROWY / UCHI-SOTO: Scena wieloosobowa ({speakers_str}) -> Wymóg zachowania odpowiedniego dystansu społecznego i protokołu relacji (Uchi-Soto)]"
 
+def calculate_syntactic_calque_score(en_text: str, pl_text: str) -> float:
+    """
+    Calculates a syntactic and phraseological calque score [0.0 - 1.0] between source EN and candidate PL.
+    Measures:
+    1. Direct literal fansub clichés (e.g., 'i mean' -> 'mam na myśli', 'it's not like' -> 'to nie tak, że',
+       'here' -> 'tutaj', 'you know' -> 'wiesz', 'can't be helped' -> 'nie da się nic / nic się nie poradzi',
+       'are you saying' -> 'mówisz, że / chcesz powiedzieć', 'what is it' -> 'co to jest', 'all right' -> 'w porządku',
+       'by any chance' -> 'przypadkiem', 'no way' -> 'nie ma mowy').
+    2. Structural and word count isomorphism (ratio ~ 1.0) indicating word-for-word copy.
+    Returns float score between 0.0 and 1.0. A score >= 0.65 triggers blind-draft masking.
+    """
+    if not en_text or not pl_text:
+        return 0.0
+
+    en_clean = clean_text_for_len(en_text).lower().strip()
+    pl_clean = clean_text_for_len(pl_text).lower().strip()
+
+    if not en_clean or not pl_clean:
+        return 0.0
+
+    score = 0.0
+
+    # 1. Known Fansub Cliché Calque Pairs (strong signal)
+    CLICHE_CALQUE_PAIRS = [
+        (r"\bi mean\b", r"\bmam na myśli\b"),
+        (r"\bit'?s not like\b", r"\bto nie tak,\s*że\b|\bto nie tak że\b"),
+        (r"\bcan'?t be helped\b", r"\bnic się nie (poradzi|da)\b|\bnie da się nic\b|\bnie da się temu zaradzić\b"),
+        (r"^(here\b|here,\b|here!\b)", r"^(tutaj\b|tutaj,\b|tutaj!\b)"),
+        (r"\byou know\b", r"\bwiesz\b"),
+        (r"\bare you saying\b", r"\bmówisz,\s*że\b|\bchcesz powiedzieć,\s*że\b|\bmówisz że\b"),
+        (r"\bwhat is it\b", r"\bco to jest\b"),
+        (r"\bwhat'?s wrong\b", r"\bco jest nie tak\b"),
+        (r"\bdon'?t tell me\b", r"\btylko mi nie mów\b|\bnie mów mi,\s*że\b"),
+        (r"\bnot at all\b", r"\bani trochę\b|\bcałkowicie nie\b"),
+        (r"\bby any chance\b", r"\bprzypadkiem\b|\bczy przypadkiem\b"),
+        (r"\bin other words\b", r"\binnymi słowy\b"),
+        (r"\bto be honest\b", r"\bszczerze mówiąc\b"),
+        (r"\bno way\b", r"\bnie ma mowy\b"),
+        (r"^(sure\b|sure,\b)", r"^(jasne\b|jasne,\b)"),
+        (r"\bfrom now on\b", r"\bod teraz\b"),
+        (r"\bwhat should (i|we) do\b", r"\bco (mam|mamy) zrobić\b"),
+    ]
+
+    cliche_matches = 0
+    for en_pat, pl_pat in CLICHE_CALQUE_PAIRS:
+        if re.search(en_pat, en_clean) and re.search(pl_pat, pl_clean):
+            cliche_matches += 1
+
+    if cliche_matches >= 1:
+        score += 0.45 * min(2, cliche_matches)
+
+    # 2. Structural & Word Count Isomorphism
+    en_words = re.findall(r"\b[a-zA-Z0-9']+\b", en_clean)
+    pl_words = re.findall(r"\b[a-zA-Z0-9ąćęłńóśźżĄĆĘŁŃÓŚŹŻ']+\b", pl_clean)
+
+    if len(en_words) >= 3 and len(pl_words) >= 3:
+        len_ratio = min(len(en_words), len(pl_words)) / max(len(en_words), len(pl_words))
+        if len_ratio >= 0.85:
+            score += 0.20
+        elif len_ratio >= 0.70:
+            score += 0.10
+
+    # 3. Punctuation Mirroring (identical terminal punctuation and mid-sentence commas)
+    if en_clean.endswith("?") and pl_clean.endswith("?"):
+        score += 0.05
+    elif en_clean.endswith("!") and pl_clean.endswith("!"):
+        score += 0.05
+    elif en_clean.endswith("...") and pl_clean.endswith("..."):
+        score += 0.05
+
+    # 4. Starting Token Calque Mirror (e.g. 'Wait,' -> 'Czekaj,', 'Listen,' -> 'Słuchaj,')
+    STARTERS = [("wait", "czekaj"), ("listen", "słuchaj"), ("look", "spójrz"), ("see", "widzisz"), ("hey", "hej")]
+    for en_st, pl_st in STARTERS:
+        if en_clean.startswith(en_st) and pl_clean.startswith(pl_st):
+            score += 0.15
+            break
+
+    return min(1.0, round(score, 2))
+
+
 def determine_blind_draft_status(
     has_audio_conflict: bool = False,
     has_ambiguity_conflict: bool = False,
     has_severe_trap: bool = False,
-    has_temporal_conflict: bool = False
+    has_temporal_conflict: bool = False,
+    calque_score: float = 0.0
 ) -> bool:
     """
     Determines whether a line in Phase 1 draft should be marked as blind draft
@@ -1226,7 +1365,7 @@ def determine_blind_draft_status(
     to eliminate anchoring bias).
     Guarantees 100% resilient evaluation with default arguments.
     """
-    return bool(has_audio_conflict or has_ambiguity_conflict or has_severe_trap or has_temporal_conflict)
+    return bool(has_audio_conflict or has_ambiguity_conflict or has_severe_trap or has_temporal_conflict or (calque_score >= 0.65))
 
 class MultimodalTranslator:
     _STATUS_LOCK = threading.Lock()
@@ -1290,6 +1429,8 @@ class MultimodalTranslator:
         
         # In-episode character memory (Character Registry)
         self.character_registry: Dict[str, str] = {}
+        self.combined_glossary: Dict[str, str] = {}
+        self.series_bible = None
         
         # Translation Memory from subtitle corpus
         try:
@@ -1359,6 +1500,119 @@ class MultimodalTranslator:
 
         self.character_registry[clean_name] = new_desc
 
+    def _precompute_episode_scene_genders(
+        self,
+        events: List[Any],
+        whisper_transcriptions: Optional[Dict[int, str]] = None,
+        episode_profile: Optional[Any] = None
+    ) -> Dict[int, str]:
+        """
+        Pre-computes scene cast genders across the entire episode timeline (0.00 PLN).
+        1. Maps dramatic_sequences from episode_profile (female_only_scene / male_only_scene)
+           across their time_range to event indices.
+        2. Splits dialogue events into continuous scenes (gap < 10000ms, max span 180s).
+        3. Uses SeriesBible.infer_scene_cast_from_text on the combined scene dialogue
+           and audio transcriptions to assign a scene-level gender ('FEMALE' -> 'kobieta',
+           'MALE' -> 'mężczyzna') to every event index in that scene.
+        """
+        if not events:
+            return {}
+
+        norm_entries = []
+        for i, item in enumerate(events):
+            if isinstance(item, tuple) and len(item) >= 2:
+                orig_idx = item[0]
+                ev = item[1]
+            else:
+                orig_idx = i
+                ev = item
+            norm_entries.append((orig_idx, ev))
+
+        scene_genders: Dict[int, str] = {}
+
+        # 1. Parse dramatic_sequences from EpisodeProfile (Pre-pass Profilera)
+        if episode_profile and getattr(episode_profile, "dramatic_sequences", None):
+            def _parse_time_range_to_ms(tr_str: str) -> Optional[Tuple[int, int]]:
+                if not tr_str or ("-" not in tr_str and "–" not in tr_str):
+                    return None
+                parts = re.split(r"[-–]", tr_str)
+                if len(parts) != 2:
+                    return None
+                def _to_ms(t_part: str) -> Optional[int]:
+                    subparts = t_part.strip().split(":")
+                    try:
+                        if len(subparts) == 2:
+                            return int(float(subparts[0])) * 60000 + int(float(subparts[1])) * 1000
+                        elif len(subparts) == 3:
+                            return int(float(subparts[0])) * 3600000 + int(float(subparts[1])) * 60000 + int(float(subparts[2])) * 1000
+                    except Exception:
+                        return None
+                    return None
+                s_ms = _to_ms(parts[0])
+                e_ms = _to_ms(parts[1])
+                if s_ms is not None and e_ms is not None and e_ms >= s_ms:
+                    return s_ms, e_ms
+                return None
+
+            for seq in episode_profile.dramatic_sequences:
+                is_fem = getattr(seq, "female_only_scene", False)
+                is_male = getattr(seq, "male_only_scene", False)
+                if not (is_fem or is_male):
+                    continue
+                tr_str = getattr(seq, "time_range", "")
+                ms_range = _parse_time_range_to_ms(tr_str)
+                if not ms_range:
+                    continue
+                seq_start_ms, seq_end_ms = ms_range
+                target_g = "kobieta" if is_fem else "mężczyzna"
+                for orig_idx, ev in norm_entries:
+                    ev_s = getattr(ev, "start", 0)
+                    ev_e = getattr(ev, "end", 0)
+                    if (ev_s >= seq_start_ms and ev_s <= seq_end_ms) or (ev_e >= seq_start_ms and ev_e <= seq_end_ms):
+                        scene_genders[orig_idx] = target_g
+
+        # 2. Continuous scenes clustering & SeriesBible inference
+        if getattr(self, "series_bible", None):
+            scenes: List[List[Tuple[int, Any]]] = []
+            curr_scene: List[Tuple[int, Any]] = []
+
+            for orig_idx, ev in norm_entries:
+                text = getattr(ev, "text", "")
+                if is_song_line(ev, text):
+                    continue
+                if not curr_scene:
+                    curr_scene.append((orig_idx, ev))
+                    continue
+
+                last_orig_idx, last_ev = curr_scene[-1]
+                gap = ev.start - last_ev.end
+                span = ev.end - curr_scene[0][1].start
+
+                if gap > 10000 or span > 180000:
+                    scenes.append(curr_scene)
+                    curr_scene = [(orig_idx, ev)]
+                else:
+                    curr_scene.append((orig_idx, ev))
+
+            if curr_scene:
+                scenes.append(curr_scene)
+
+            for sc in scenes:
+                scene_indices = [idx for idx, _ in sc]
+                scene_texts = [getattr(ev, "text", "") for _, ev in sc if getattr(ev, "text", "")]
+                scene_whisper = [whisper_transcriptions.get(idx, "") for idx in scene_indices if whisper_transcriptions and idx in whisper_transcriptions]
+
+                if hasattr(self.series_bible, "infer_scene_cast_from_text"):
+                    _, sc_gender = self.series_bible.infer_scene_cast_from_text(scene_texts, whisper_texts=scene_whisper)
+                    if sc_gender == "FEMALE":
+                        for idx in scene_indices:
+                            scene_genders[idx] = "kobieta"
+                    elif sc_gender == "MALE":
+                        for idx in scene_indices:
+                            scene_genders[idx] = "mężczyzna"
+
+        return scene_genders
+
     def _arbitrate_speaker_gender(
         self,
         event: pysubs2.SSAEvent,
@@ -1366,7 +1620,9 @@ class MultimodalTranslator:
         batch_id: int,
         speaker_tags: Optional[Dict[int, str]] = None,
         whisper_transcriptions: Optional[Dict[int, str]] = None,
-        pl_candidate: str = ""
+        pl_candidate: str = "",
+        raw_speaker_name: Optional[str] = None,
+        event_idx: Optional[int] = None
     ) -> Tuple[Optional[str], List[str]]:
         """
         Multi-Signal Gender Arbitration Engine (0.00 PLN).
@@ -1379,35 +1635,91 @@ class MultimodalTranslator:
         """
         alerts = []
         canonical_gender = None
-        spk_clean = (getattr(event, "name", None) or "").strip()
+        raw_spk = (getattr(event, "name", None) or raw_speaker_name or "").strip()
+        if is_generic_actor_or_category(raw_spk):
+            raw_spk = ""
+        spk_clean = extract_clean_speaker_name(raw_spk) or raw_spk
+        spk_lower = spk_clean.lower()
+        tokens = set(re.findall(r"\b[a-ząćęłńóśźżA-ZĄĆĘŁŃÓŚŹŻ]+\b", spk_lower))
+
+        # 0. Inherent lexical gender check (e.g. "Girl\\Italic", "Woman", "Boy")
+        if not is_generic_actor_or_category(spk_clean):
+            if spk_lower in INHERENT_FEMALE_NOUNS or any(t in INHERENT_FEMALE_NOUNS for t in tokens):
+                canonical_gender = "kobieta"
+            elif spk_lower in INHERENT_MALE_NOUNS or any(t in INHERENT_MALE_NOUNS for t in tokens):
+                canonical_gender = "mężczyzna"
 
         # 1. Canonical Authority Check
-        if spk_clean:
-            if spk_clean in self.character_registry:
-                desc = self.character_registry[spk_clean].lower()
-                if any(k in desc for k in self.FEMALE_ROLE_KEYWORDS):
-                    canonical_gender = "kobieta"
-                elif any(k in desc for k in ["male", "mężczyzna", "chłopak", "męsk"]):
-                    canonical_gender = "mężczyzna"
+        if not canonical_gender and spk_clean:
+            for check_name in [spk_clean, raw_spk]:
+                if check_name in self.character_registry:
+                    desc = self.character_registry[check_name].lower()
+                    if any(k in desc for k in self.FEMALE_ROLE_KEYWORDS):
+                        canonical_gender = "kobieta"
+                        break
+                    elif any(k in desc for k in ["male", "mężczyzna", "chłopak", "męsk"]):
+                        canonical_gender = "mężczyzna"
+                        break
 
-            if not canonical_gender and hasattr(self, "series_bible") and self.series_bible and hasattr(self.series_bible, "data"):
-                b_chars = self.series_bible.data.get("characters", {})
-                for b_name, b_val in b_chars.items():
-                    if spk_clean.lower() in b_name.lower() or b_name.lower() in spk_clean.lower():
-                        b_desc = b_val.get("description", "") if isinstance(b_val, dict) else str(b_val)
-                        b_lower = b_desc.lower()
-                        if any(k in b_lower for k in self.FEMALE_ROLE_KEYWORDS):
-                            canonical_gender = "kobieta"
-                            break
-                        elif any(k in b_lower for k in ["male", "mężczyzna", "chłopak", "męsk"]):
-                            canonical_gender = "mężczyzna"
-                            break
+            if not canonical_gender and hasattr(self, "series_bible") and self.series_bible:
+                if hasattr(self.series_bible, "get_character_gender"):
+                    b_gen = self.series_bible.get_character_gender(spk_clean)
+                    if b_gen == "FEMALE":
+                        canonical_gender = "kobieta"
+                    elif b_gen == "MALE":
+                        canonical_gender = "mężczyzna"
+
+                if not canonical_gender and hasattr(self.series_bible, "data"):
+                    b_chars = self.series_bible.data.get("characters", {})
+                    for b_name, b_val in b_chars.items():
+                        clean_b = extract_clean_speaker_name(b_name).lower()
+                        if spk_lower in b_name.lower() or b_name.lower() in spk_lower or clean_b == spk_lower:
+                            b_desc = b_val.get("description", "") if isinstance(b_val, dict) else str(b_val)
+                            b_lower = b_desc.lower()
+                            if any(k in b_lower for k in self.FEMALE_ROLE_KEYWORDS):
+                                canonical_gender = "kobieta"
+                                break
+                            elif any(k in b_lower for k in ["male", "mężczyzna", "chłopak", "męsk"]):
+                                canonical_gender = "mężczyzna"
+                                break
+
+        # 1b. Episode Scene Cast Pre-computation Check (Continuous Scene Ground Truth)
+        if not canonical_gender:
+            check_idx = event_idx if event_idx is not None else batch_id
+            if hasattr(self, "episode_scene_genders") and self.episode_scene_genders:
+                if check_idx in self.episode_scene_genders:
+                    canonical_gender = self.episode_scene_genders[check_idx]
+                elif getattr(event, "_orig_idx", None) in self.episode_scene_genders:
+                    canonical_gender = self.episode_scene_genders[getattr(event, "_orig_idx")]
+                if canonical_gender == "kobieta":
+                    alerts.append("[🚨 SCENA KOBIECA (Pre-pass Sceniczny): Mówczyni żeńska! Wymóg form żeńskich w 1. os. (-łam/-łabym) i 2. os. (-łaś / wzburzoną)]")
+                elif canonical_gender == "mężczyzna":
+                    alerts.append("[🚨 SCENA MĘSKA (Pre-pass Sceniczny): Mówca męski! Wymóg form męskich w 1. os. (-łem/-łbym) i 2. os. (-łeś / wzburzonego)]")
+
+        if not canonical_gender and not spk_clean:
+            cand_texts = [pl_candidate] if pl_candidate else []
+            if hasattr(event, "text") and event.text:
+                cand_texts.append(event.text)
+            if hasattr(self, "series_bible") and self.series_bible and cand_texts and hasattr(self.series_bible, "infer_scene_cast_from_text"):
+                jp_curr_text = (whisper_transcriptions.get(batch_id, "") if whisper_transcriptions else "")
+                whisper_list = [jp_curr_text] if jp_curr_text else None
+                _, inf_g = self.series_bible.infer_scene_cast_from_text(cand_texts, whisper_texts=whisper_list)
+                if inf_g == "FEMALE":
+                    canonical_gender = "kobieta"
+                    alerts.append("[🚨 SCENA KOBIECA (Baza Wiedzy): Mówczyni żeńska! Wymóg form żeńskich w 1. os. (-łam/-łabym) i 2. os. (-łaś / wzburzoną)]")
+                elif inf_g == "MALE":
+                    canonical_gender = "mężczyzna"
 
         # 2. Acoustic & Linguistic Ground Truth
         acoustic_gender = None
         if speaker_tags and batch_id in speaker_tags:
             v_tag = speaker_tags[batch_id].lower()
-            if "żeńsk" in v_tag or "sopran" in v_tag or "dziecięcy" in v_tag:
+            if "sopran" in v_tag or "dziecięcy" in v_tag or "wysoki tembr" in v_tag:
+                acoustic_gender = "kobieta"
+            elif "alt starszej" in v_tag or "ochrypły alt" in v_tag or "alt żeński" in v_tag:
+                # Raspy or mature female alto / contralto voice - ambiguous pitch, NOT male
+                acoustic_gender = None
+            elif "żeńsk" in v_tag and "alt" not in v_tag and "ochrypł" not in v_tag:
                 hz_match = re.search(r"~(\d+)\s*hz", v_tag)
                 if hz_match:
                     hz_val = int(hz_match.group(1))
@@ -1417,12 +1729,26 @@ class MultimodalTranslator:
                         acoustic_gender = "mężczyzna"
                 else:
                     acoustic_gender = "kobieta"
-            elif "męsk" in v_tag or "baryton" in v_tag or "bas" in v_tag:
+            elif "baryton" in v_tag or "bas" in v_tag:
+                acoustic_gender = "mężczyzna"
+            elif "męsk" in v_tag and "alt" not in v_tag and "ochrypł" not in v_tag:
                 acoustic_gender = "mężczyzna"
 
         jp_text = (whisper_transcriptions.get(batch_id, "") if whisper_transcriptions else "").lower()
-        jp_female_marker = any(m in jp_text for m in ["atashi", "あたし", "atai", "あtai", "kashira", "かしら", "わよ", "wayo"])
-        jp_male_marker = any(m in jp_text for m in ["ore", "俺", "boku", "僕"])
+        wdd_tag = WhisperDisambiguator.disambiguate_line(clean_en="", jp_audio=jp_text)
+        jp_female_marker = (wdd_tag.speaker_gender == "FEMALE") or any(m in jp_text for m in ["atashi", "あたし", "atai", "あtai", "kashira", "かしら", "わよ", "wayo"])
+        jp_male_marker = (wdd_tag.speaker_gender == "MALE") or any(m in jp_text for m in ["ore", "俺", "boku", "僕"])
+
+        # Persist definitive Japanese acoustic pronoun evidence to Character Registry and Series Bible
+        if spk_clean and not canonical_gender and not is_generic_actor_or_category(spk_clean):
+            if wdd_tag.speaker_gender == "MALE":
+                self._register_character_safe(spk_clean, "mężczyzna", role="seiyū Whisper")
+                if hasattr(self, "series_bible") and self.series_bible and hasattr(self.series_bible, "update_character_gender_from_audio"):
+                    self.series_bible.update_character_gender_from_audio(spk_clean, "MALE")
+            elif wdd_tag.speaker_gender == "FEMALE":
+                self._register_character_safe(spk_clean, "kobieta", role="seiyū Whisper")
+                if hasattr(self, "series_bible") and self.series_bible and hasattr(self.series_bible, "update_character_gender_from_audio"):
+                    self.series_bible.update_character_gender_from_audio(spk_clean, "FEMALE")
 
         raw_norm = (raw_phase1_gender or "").lower()
         phase1_is_female = any(w in raw_norm for w in ["kobieta", "żeńsk", "female", "dziewczyn"])
@@ -1433,9 +1759,9 @@ class MultimodalTranslator:
         if canonical_gender == "kobieta":
             if phase1_is_male:
                 alerts.append(f"[🚨 ALARM ARBITRAŻU: Faza 1 błędnie przypisała rodzaj męski dla potwierdzonej kobiety '{spk_clean}'! Zastosowano Weto Kanonu -> wymuszono 'kobieta']")
-            has_masc_verb = bool(re.search(r"\b(byłem|miałem|widziałem|wiedziałem|zrobiłem|pomyślałem|chciałem|mogłem|poszedłem|powiedziałem|czułem|słyszałem|wróciłem|dostałem|znalazłem|oddałem|zgubiłem|uratowałem|przyszedłem|doniósłbym|wiedziałbym|mógłbym|chciałbym)\b", pl_candidate, re.IGNORECASE))
+            has_masc_verb = bool(re.search(r"\b(byłem|miałem|widziałem|wiedziałem|zrobiłem|pomyślałem|chciałem|mogłem|poszedłem|powiedziałem|czułem|słyszałem|wróciłem|dostałem|znalazłem|oddałem|zgubiłem|uratowałem|przyszedłem|doniósłbym|wiedziałbym|mógłbym|chciałbym|miałbym|zrobiłbym|byłbym|wolałbym|musiałbym|poszedłbym|zraniłem|skrzywdziłem|zostawiłem|poczułem|zobaczyłem)\b", pl_candidate, re.IGNORECASE))
             if has_masc_verb:
-                alerts.append(f"[🚨 ALARM KOREKTY FLEKSYJNEJ: Faza 1 wygenerowała formę męską (-łem) dla mówczyni '{spk_clean}'! Faza 2 BEZWZGLĘDNIE musi zastosować formę żeńską (-łam / -łaś)!]")
+                alerts.append(f"[🚨 ALARM KOREKTY FLEKSYJNEJ: Faza 1 wygenerowała formę męską (-łem/-łbym) dla mówczyni '{spk_clean}'! Faza 2 BEZWZGLĘDNIE musi zastosować formę żeńską (-łam / -łabym / -łaś)!]")
             return "kobieta", alerts
 
         if canonical_gender == "mężczyzna":
@@ -1443,14 +1769,29 @@ class MultimodalTranslator:
                 alerts.append(f"[🚨 ALARM ARBITRAŻU: Faza 1 błędnie przypisała rodzaj żeński dla potwierdzonego mężczyzny '{spk_clean}'! Zastosowano Weto Kanonu -> wymuszono 'mężczyzna']")
             return "mężczyzna", alerts
 
-        # Case B: Acoustic / Japanese linguistic Ground Truth overrides unknown Phase 1
+        # Case B: Cross-Gender Voice Shield (Filar CLXXI)
+        # If speaker uses male first-person pronouns (boku/ore/bocchan) with high female F0 pitch,
+        # male pronoun OVERRIDES high female pitch (vital for anime where adult female seiyū dub young boys).
+        if jp_male_marker and acoustic_gender == "kobieta":
+            alerts.append(f"[🎯 ALARM CROSS-GENDER (Filar CLXXI): Wysoki tembr F0 (~kobiecy), lecz seiyū używa męskiego zaimka 'boku/ore'! Wymuszono rodzaj męski (młody chłopiec)]")
+            return "mężczyzna", alerts
+
+        if jp_female_marker and acoustic_gender == "mężczyzna":
+            alerts.append(f"[🎯 ALARM CROSS-GENDER: Niski tembr F0, lecz seiyū używa żeńskiego zaimka 'atashi/kashira'! Wymuszono 'kobieta']")
+            return "kobieta", alerts
+
+        # Case C: Acoustic / Japanese linguistic Ground Truth overrides unknown Phase 1
         if (acoustic_gender == "kobieta" or jp_female_marker) and phase1_is_male:
             alerts.append(f"[🚨 ALARM ARBITRAŻU AKUSTYCZNEGO: Faza 1 wskazała rodzaj męski, lecz obiektywny odsłuch F0/Whisper wykazuje głos żeński! Wymuszono 'kobieta']")
             return "kobieta", alerts
 
-        if (acoustic_gender == "mężczyzna" or jp_male_marker) and phase1_is_female:
-            alerts.append(f"[🚨 ALARM ARBITRAŻU AKUSTYCZNEGO: Faza 1 wskazała rodzaj żeński, lecz obiektywny odsłuch F0/Whisper wykazuje głos męski! Wymuszono 'mężczyzna']")
+        if jp_male_marker and phase1_is_female:
+            alerts.append(f"[🚨 ALARM ARBITRAŻU: Faza 1 wskazała rodzaj żeński, lecz seiyū używa jednoznacznie męskiego zaimka 'ore/boku'! Wymuszono 'mężczyzna']")
             return "mężczyzna", alerts
+        elif acoustic_gender == "mężczyzna" and phase1_is_female:
+            # Low F0 pitch alone CANNOT veto Phase 1 female vision/context (elderly women / raspy female voices - Filar CXXXVI/CLXXI)
+            alerts.append(f"[ℹ️ INFO ARBITRAŻU: Faza 1 wskazała rodzaj żeński przy niskim tembrze F0 – uwzględniono możliwość dojrzałego/ochrypłego głosu żeńskiego (Filar CXXXVI/CLXXI) -> zachowano 'kobieta']")
+            return "kobieta", alerts
 
         # Case C: Direct Phase 1 or Fallback
         if phase1_is_female:
@@ -1473,7 +1814,11 @@ class MultimodalTranslator:
         batch_events: List[Tuple[int, pysubs2.SSAEvent, str, str]],
         event_idx: int,
         whisper_text: str = "",
-        clean_text: str = ""
+        clean_text: str = "",
+        orig_idx: Optional[int] = None,
+        lookback_history: Optional[List[Dict[str, Any]]] = None,
+        speaker_tags: Optional[Dict[int, str]] = None,
+        prosody_tags: Optional[Dict[int, str]] = None
     ) -> Tuple[Optional[str], Optional[str]]:
         """
         Multimodal Addressee & Number Resolution Engine (0.00 PLN).
@@ -1487,41 +1832,57 @@ class MultimodalTranslator:
         - addressee_category: "grupa_kobiet" | "grupa_mężczyzn" | "grupa_mieszana" | "kobieta" | "mężczyzna" | "brak" | None
         - addressee_label: np. "Grupa Kobiet (L. mnoga niemęskoosobowa: -łyście)", "Naie (Kobieta)"
         """
+        # Pre-pass Episode Scene Cast Check (Continuous Scene Ground Truth)
+        check_idx = orig_idx if orig_idx is not None else getattr(event, "_orig_idx", None)
+        if check_idx is not None and hasattr(self, "episode_scene_genders") and self.episode_scene_genders:
+            if check_idx in self.episode_scene_genders:
+                sc_g = self.episode_scene_genders[check_idx]
+                if sc_g == "kobieta":
+                    return "kobieta", "Kobieta (Scena Wyłącznie Kobieca - Pre-pass Odcinka)"
+                elif sc_g == "mężczyzna":
+                    return "mężczyzna", "Mężczyzna (Scena Wyłącznie Męska - Pre-pass Odcinka)"
+
         raw_norm = (raw_phase1_addressee or "").strip().lower()
+        clean_lower = clean_text.lower()
         jp_lower = whisper_text.lower()
-        has_jp_plural = any(m in jp_lower for m in [
+        wdd_tag = WhisperDisambiguator.disambiguate_line(clean_en=clean_text, jp_audio=whisper_text)
+        has_jp_plural = (wdd_tag.addressee_number == "PLURAL") or any(m in jp_lower for m in [
             "tachi", "たち", "達", "omae-ra", "お前ら", "kisama-ra", "貴様ら", "minna", "みんな", "皆",
             "shokun", "諸君", "zen'in", "全員", "mina-sama", "皆様", "domo", "ども", "共"
         ])
 
-        # 0. Broad Collective Crowd / Audience Check (Filar CLXIII & Scene Crowd Hierarchy)
-        # Addressing a broad collective ("everyone", "minna", "all of you") overrides narrow camera frame
-        # UNLESS the line specifically restricts to women ("girls/ladies/dziewczęta") or men ("boys/men/chłopcy")
-        clean_lower = clean_text.lower()
-        has_gendered_target = any(w in clean_lower for w in ["girl", "lady", "ladies", "women", "woman", "dziewcz", "kobiet", "boy", "boys", "men", "man", "chłopak", "panowie", "panie"])
-        has_broad_collective = not has_gendered_target and (any(w in clean_lower for w in [
-            "everyone", "everybody", "all of you", "class", "team", "guys", "listen up", "attention everyone"
-        ]) or any(w in jp_lower for w in [
-            "minna", "みんな", "皆", "shokun", "諸君", "zen'in", "全員", "mina-sama", "皆様"
-        ]))
-        if has_broad_collective:
-            genders_in_reg = set(self.character_registry.values()) if getattr(self, "character_registry", None) else set()
-            has_male = any("mężczyzna" in str(g).lower() or "male" in str(g).lower() or "chłopak" in str(g).lower() for g in genders_in_reg)
-            has_female = any("kobieta" in str(g).lower() or "female" in str(g).lower() or "dziewczyn" in str(g).lower() for g in genders_in_reg)
-            if has_male and has_female:
+        # Strict collective vocative check: requires a direct group vocative or explicit group address syntax.
+        # Excludes 3rd-person statements ("everyone is/was/has", "with everyone") and direct object idioms ("tell you all", "that's all").
+        has_collective_vocative = bool(re.search(
+            r"^(?:everyone|everybody|guys|team|class|all of you|ladies and gentlemen|people)[,!\?]|"
+            r"\b(?:attention everyone|listen up,?\s*(?:everyone|guys|team|all of you)?)\b|"
+            r"\b(?:to all of you|for all of you)\b",
+            clean_lower
+        ))
+        is_universal_crowd_vocative = bool(re.search(
+            r"^(?:everyone|everybody|class|people|all of you|ladies and gentlemen)[,!\?]|"
+            r"\b(?:attention everyone|listen up,?\s*(?:everyone|all of you)?)\b",
+            clean_lower
+        ))
+        has_plural_evidence = (has_jp_plural or has_collective_vocative) and (wdd_tag.addressee_number != "SINGULAR" or is_universal_crowd_vocative)
+
+        # 0. Strict Plural Group Check (Audio Ground Truth & Collective Vocative Gate)
+        # Category grupa_... is ONLY permitted if there is verifiable plural evidence in audio or collective vocative.
+        # Without evidence, raw_norm 'grupa_...' is rejected as an ungrounded hallucination.
+        if has_plural_evidence:
+            if is_universal_crowd_vocative:
                 return "grupa_mieszana", "Grupa Mieszana (Zbiorowość/L. mnoga męskoosobowa: -liście)"
 
-        # 1. Direct Plural Group Check
-        if "grupa_kobiet" in raw_norm or (has_jp_plural and any(w in raw_norm for w in ["kobiet", "dziewcz", "female", "żeńsk"])) or (any(w in raw_norm for w in ["kobiet", "dziewcz"]) and any(p in raw_norm for p in ["grupa", "wiele", "wszystk", "klas"])):
-            return "grupa_kobiet", "Grupa Kobiet (L. mnoga niemęskoosobowa: -łyście)"
+            has_gendered_female = any(w in clean_lower for w in ["girl", "girls", "lady", "ladies", "women", "dziewcz", "kobiet"]) or any(w in raw_norm for w in ["grupa_kobiet", "kobieta", "kobiet", "żeńsk", "female", "dziewczyn"])
+            has_gendered_male = any(w in clean_lower for w in ["boy", "boys", "men", "chłopak", "panowie"]) or any(w in raw_norm for w in ["grupa_mężczyzn", "mężczyzna", "mężczyzn", "męsk", "male", "chłopak", "żołnierz"])
+            if has_gendered_female and not has_gendered_male:
+                return "grupa_kobiet", "Grupa Kobiet (L. mnoga niemęskoosobowa: -łyście)"
+            elif has_gendered_male and not has_gendered_female:
+                return "grupa_mężczyzn", "Grupa Mężczyzn (L. mnoga męskoosobowa: -liście)"
+            else:
+                return "grupa_mieszana", "Grupa Mieszana (Zbiorowość/L. mnoga męskoosobowa: -liście)"
 
-        if "grupa_mężczyzn" in raw_norm or (has_jp_plural and any(w in raw_norm for w in ["mężczyzn", "chłopak", "male", "żołnierz", "męsk"])) or (any(w in raw_norm for w in ["mężczyzn", "chłopak", "żołnierz"]) and any(p in raw_norm for p in ["grupa", "wiele", "wszystk"])):
-            return "grupa_mężczyzn", "Grupa Mężczyzn (L. mnoga męskoosobowa: -liście)"
-
-        if "grupa_mieszana" in raw_norm or "grupa" in raw_norm or has_jp_plural:
-            return "grupa_mieszana", "Grupa Mieszana (L. mnoga męskoosobowa: -liście)"
-
-        # 2. Textual Vocative Check (Calling someone by name in line text)
+        # 1. Textual Vocative Check (Calling someone by name in line text)
         for cname in self.character_registry.keys():
             if len(cname) >= 3 and re.search(rf"\b{re.escape(cname)}[,!?]", clean_text, re.IGNORECASE):
                 cdesc = self.character_registry[cname].lower()
@@ -1530,7 +1891,22 @@ class MultimodalTranslator:
                 elif any(k in cdesc for k in ["male", "mężczyzna", "chłopak", "męsk"]):
                     return "mężczyzna", f"{cname} (Mężczyzna)"
 
-        # 3. 1-on-1 Dialogue Alternation (Ping-Pong Turn)
+        # 1b. Onomastic Vocative Check (Direct address in English/Polish script, e.g. "Monika, ...", "Moniko, ...")
+        from series_memory import is_inherently_female_name, MALE_EXCEPTIONS_ON_A, is_generic_actor_or_category
+        voc_m = re.search(r"(?<!\b[Pp]anie\s)(?<!\b[Pp]ani\s)(?<!\b[Pp]anno\s)(?<!\b[Pp]anu\s)(?<!\b[Mm]istrzu\s)(?<!\b[Ll]ordzie\s)\b([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]{2,})[,?!]", clean_text)
+        if voc_m:
+            cand_name = voc_m.group(1)
+            cand_lower = cand_name.lower()
+            if not is_generic_actor_or_category(cand_lower) and cand_lower not in ["wait", "look", "what", "why", "stop", "sorry", "excuse", "proszę", "przepraszam", "zaraz", "chwila", "czekaj", "słuchaj", "patrz", "widzisz"]:
+                bible_gen = "UNKNOWN"
+                if getattr(self, "series_bible", None) and hasattr(self.series_bible, "get_character_gender"):
+                    bible_gen = self.series_bible.get_character_gender(cand_name, allow_generic_nouns=False)
+                if bible_gen == "FEMALE" or is_inherently_female_name(cand_name):
+                    return "kobieta", f"{cand_name} (Kobieta)"
+                elif bible_gen == "MALE" or cand_lower in MALE_EXCEPTIONS_ON_A:
+                    return "mężczyzna", f"{cand_name} (Mężczyzna)"
+
+        # 2. 1-on-1 Dialogue Alternation (Ping-Pong Turn & Acoustic F0 Alternation)
         curr_spk = (getattr(event, "name", None) or "").strip()
         if event_idx > 0 and curr_spk:
             prev_ev = batch_events[event_idx - 1][1] if len(batch_events[event_idx - 1]) > 1 else None
@@ -1543,8 +1919,118 @@ class MultimodalTranslator:
                         return "kobieta", f"{prev_spk} (Kobieta)"
                     elif any(k in cdesc for k in ["male", "mężczyzna", "chłopak", "męsk"]):
                         return "mężczyzna", f"{prev_spk} (Mężczyzna)"
+                # Series Bible & onomastic interlocutor gender check
+                if getattr(self, "series_bible", None) and hasattr(self.series_bible, "get_character_gender"):
+                    p_gen = self.series_bible.get_character_gender(prev_spk, allow_generic_nouns=False)
+                    if p_gen == "FEMALE":
+                        return "kobieta", f"{prev_spk} (Kobieta)"
+                    elif p_gen == "MALE":
+                        return "mężczyzna", f"{prev_spk} (Mężczyzna)"
+                if is_inherently_female_name(prev_spk):
+                    return "kobieta", f"{prev_spk} (Kobieta)"
+        elif event_idx == 0 and curr_spk and lookback_history:
+            prev_h = lookback_history[-1]
+            prev_spk = (prev_h.get("speaker") or prev_h.get("speaker_name") or "").strip()
+            if prev_spk and prev_spk != curr_spk:
+                prev_g = (prev_h.get("speaker_gender") or "").strip().lower()
+                if prev_g in ["kobieta", "female", "żeński"]:
+                    return "kobieta", f"{prev_spk} (Kobieta)"
+                elif prev_g in ["mężczyzna", "male", "męski"]:
+                    return "mężczyzna", f"{prev_spk} (Mężczyzna)"
+                if prev_spk in self.character_registry:
+                    cdesc = self.character_registry[prev_spk].lower()
+                    if any(k in cdesc for k in self.FEMALE_ROLE_KEYWORDS):
+                        return "kobieta", f"{prev_spk} (Kobieta)"
+                    elif any(k in cdesc for k in ["male", "mężczyzna", "chłopak", "męsk"]):
+                        return "mężczyzna", f"{prev_spk} (Mężczyzna)"
+                if getattr(self, "series_bible", None) and hasattr(self.series_bible, "get_character_gender"):
+                    p_gen = self.series_bible.get_character_gender(prev_spk, allow_generic_nouns=False)
+                    if p_gen == "FEMALE":
+                        return "kobieta", f"{prev_spk} (Kobieta)"
+                    elif p_gen == "MALE":
+                        return "mężczyzna", f"{prev_spk} (Mężczyzna)"
+                if is_inherently_female_name(prev_spk):
+                    return "kobieta", f"{prev_spk} (Kobieta)"
 
-        # 4. Fallback to Phase 1 Single Person Detection
+        # 2a. Acoustic F0 Alternation in Anonymous Dialogue
+        if speaker_tags:
+            def _extract_voice_gender(tag_text: str) -> Optional[str]:
+                t = (tag_text or "").lower()
+                if any(k in t for k in ["żeński", "kobieta", "female", "alt", "sopran"]):
+                    return "kobieta"
+                if any(k in t for k in ["męski", "mężczyzna", "male", "bas", "baryton", "tenor"]):
+                    return "mężczyzna"
+                hz_matches = [int(m.group(1)) for m in re.finditer(r"(\d+)\s*hz", t)]
+                if hz_matches:
+                    avg_hz = sum(hz_matches) / len(hz_matches)
+                    if avg_hz >= 175:
+                        return "kobieta"
+                    elif avg_hz <= 155:
+                        return "mężczyzna"
+                return None
+
+            curr_tag = speaker_tags.get(event_idx + 1, "") or speaker_tags.get(orig_idx, "")
+            curr_v_gen = _extract_voice_gender(curr_tag)
+
+            adj_tag = ""
+            if event_idx > 0 and (event_idx in speaker_tags):
+                adj_tag = speaker_tags[event_idx]
+            elif (event_idx + 2) in speaker_tags:
+                adj_tag = speaker_tags[event_idx + 2]
+            elif lookback_history and lookback_history[-1].get("speaker_voice"):
+                adj_tag = lookback_history[-1]["speaker_voice"]
+
+            adj_v_gen = _extract_voice_gender(adj_tag)
+            if curr_v_gen and adj_v_gen and curr_v_gen != adj_v_gen:
+                if adj_v_gen == "kobieta":
+                    return "kobieta", "Kobieta (Rozmowa 1-na-1 / Naprzemienność F0)"
+                elif adj_v_gen == "mężczyzna":
+                    return "mężczyzna", "Mężczyzna (Rozmowa 1-na-1 / Naprzemienność F0)"
+
+        # 2b. Scene-Cast Exclusive Female Check (When in a scene where all present characters are women)
+        # If no explicit interlocutor was found from immediate ping-pong (e.g. event_idx == 0 at scene start),
+        # but all named speakers in the active batch are confirmed female, 2nd person singular 'you'
+        # MUST be addressed to a woman, preventing the LLM default masculine bias.
+        from series_memory import is_inherently_female_name, is_generic_actor_or_category
+        batch_spks = set()
+        for b_item in batch_events:
+            b_ev = b_item[1] if len(b_item) > 1 else None
+            b_name = (getattr(b_ev, "name", None) or getattr(b_ev, "actor", None) or "").strip()
+            if b_name and not is_generic_actor_or_category(b_name):
+                batch_spks.add(b_name)
+
+        if len(batch_spks) >= 2:
+            all_fem = True
+            for cand_spk in batch_spks:
+                cand_g = "UNKNOWN"
+                if getattr(self, "series_bible", None) and hasattr(self.series_bible, "get_character_gender"):
+                    cand_g = self.series_bible.get_character_gender(cand_spk, allow_generic_nouns=False)
+                if cand_g != "FEMALE" and not is_inherently_female_name(cand_spk):
+                    all_fem = False
+                    break
+            if all_fem:
+                other_spks = [s for s in batch_spks if s != curr_spk]
+                rec_target = other_spks[0] if other_spks else list(batch_spks)[0]
+                return "kobieta", f"{rec_target} (Kobieta - Scena Wyłącznie Kobieca)"
+
+        if getattr(self, "series_bible", None) and hasattr(self.series_bible, "infer_scene_cast_from_text"):
+            batch_texts = [b_item[1].text for b_item in batch_events if len(b_item) > 1 and getattr(b_item[1], "text", None)]
+            whisper_list = [whisper_text] if whisper_text else None
+            _, inf_g = self.series_bible.infer_scene_cast_from_text(batch_texts, whisper_texts=whisper_list)
+            if inf_g == "FEMALE":
+                return "kobieta", "Kobieta (Scena Wyłącznie Kobieca - Kotwica Bazy Wiedzy)"
+            elif inf_g == "MALE":
+                return "mężczyzna", "Mężczyzna (Scena Wyłącznie Męska - Kotwica Bazy Wiedzy)"
+
+        # 3. Japanese Audio Addressee Clues (K1/K4)
+        if wdd_tag.addressee_gender == "FEMALE":
+            lbl = f"{wdd_tag.kinship_term} (Kobieta)" if wdd_tag.kinship_term else "Kobieta (z audio seiyū)"
+            return "kobieta", lbl
+        elif wdd_tag.addressee_gender == "MALE":
+            lbl = f"{wdd_tag.kinship_term} (Mężczyzna)" if wdd_tag.kinship_term else "Mężczyzna (z audio seiyū)"
+            return "mężczyzna", lbl
+
+        # 4. Fallback to Single Person Detection (Safely degrades unverified plural tags to singular)
         if any(w in raw_norm for w in ["kobieta", "kobiet", "żeńsk", "female", "dziewczyn"]):
             return "kobieta", "Kobieta"
         elif any(w in raw_norm for w in ["mężczyzna", "mężczyzn", "męsk", "male", "chłopak"]):
@@ -1609,27 +2095,87 @@ class MultimodalTranslator:
             elif anime_context_str:
                 lines.append(anime_context_str)
 
-        # 0c. Translation Memory golden examples
+        # 0c. Translation Memory golden examples (Domain-Locked to current series)
         if self.tm:
             try:
                 batch_queries = [item[2] for item in batch_events]
-                tm_examples = self.tm.find_relevant_examples(batch_queries, max_examples=4)
+                series_hint = getattr(self, "series_title", None) or (self.series_bible.anime_title if hasattr(self, "series_bible") and self.series_bible else None)
+                tm_examples = self.tm.find_relevant_examples(
+                    batch_queries,
+                    max_examples=3,
+                    series_title=series_hint,
+                    require_same_series=True if series_hint else False
+                )
                 if tm_examples:
                     lines.append(format_translation_memory_for_prompt(tm_examples))
             except Exception:
                 pass
 
-        # 1. Character Registry
+        # 1. Just-In-Time Character Scoping (Scene-level isolation - Anti-Saturation)
         if self.character_registry:
-            lines.append("--- ZNANE POSTACIE W TYM FILMIE (dla zachowania spójności płci i imion) ---")
+            batch_corpus = " ".join([
+                clean_t for _, _, clean_t, _ in batch_events
+            ]).lower()
+            if history_context:
+                batch_corpus += " " + " ".join([(h.get("en") or "") + " " + (h.get("pl") or "") for h in history_context]).lower()
+            if lookahead_events:
+                batch_corpus += " " + " ".join([str(item[2] if len(item) > 2 else "") for item in lookahead_events]).lower()
+
+            active_speakers = {
+                extract_clean_speaker_name(ev.name).strip().lower() for _, ev, _, _ in batch_events if getattr(ev, "name", None)
+            }
+            if history_context:
+                for h in history_context[-4:]:
+                    spk = extract_clean_speaker_name(h.get("speaker") or h.get("speaker_name") or "").strip().lower()
+                    if spk:
+                        active_speakers.add(spk)
+
+            def _is_entity_present(ent_name: str) -> bool:
+                cl = extract_clean_speaker_name(ent_name).strip().lower()
+                if not cl or len(cl) < 3:
+                    return False
+                for p in re.split(r"[/,]", cl):
+                    p_clean = p.strip()
+                    if len(p_clean) >= 3:
+                        p_stem = p_clean[:max(3, len(p_clean) - 2)]
+                        if p_clean in active_speakers or any(s in p_clean or p_clean in s for s in active_speakers if len(s) >= 3):
+                            return True
+                        if p_stem in batch_corpus:
+                            return True
+                return False
+
+            active_chars = {}
             for name, details in self.character_registry.items():
-                lines.append(f"• {name}: {details}")
-            lines.append("--------------------------------------------------------------------------\n")
+                if "->" in name:
+                    # Relationship: require both participants to be present in scene
+                    parts = [p.strip() for p in name.split("->", 1)]
+                    if len(parts) == 2 and _is_entity_present(parts[0]) and _is_entity_present(parts[1]):
+                        active_chars[name] = details
+                else:
+                    # Individual character: require presence in scene
+                    if _is_entity_present(name):
+                        active_chars[name] = details
+
+            if active_chars:
+                lines.append("--- ZNANE POSTACIE W BIEŻĄCEJ SCENIE (spójność ról i płci) ---")
+                for name, details in active_chars.items():
+                    lines.append(f"• {name}: {details}")
+                lines.append("-------------------------------------------------------------\n")
 
         # 2. Previous dialogue history
         if history_context:
             lines.append("--- POPRZEDNIE KWESTIE W SCENIE (kontekst przeszły) ---")
-            for h in history_context[-4:]:
+            history_slice = []
+            if len(history_context) >= 5:
+                last_spk = (history_context[-1].get("speaker") or history_context[-1].get("speaker_name") or "").strip().lower()
+                first_spk = (history_context[0].get("speaker") or history_context[0].get("speaker_name") or "").strip().lower()
+                if last_spk and first_spk and last_spk == first_spk:
+                    # Continuous monologue detected: anchor on initial premise + last 3 lines (exact 4-line budget)
+                    history_slice = [("monologue_start", history_context[0])] + [("normal", h) for h in history_context[-3:]]
+            if not history_slice:
+                history_slice = [("normal", h) for h in history_context[-4:]]
+
+            for mode, h in history_slice:
                 spk_label = ""
                 spk_name = (h.get("speaker") or h.get("speaker_name") or "").strip()
                 spk_gen = (h.get("speaker_gender") or "").strip()
@@ -1641,11 +2187,12 @@ class MultimodalTranslator:
                     spk_label = f" (Mówca: {spk_gen})"
                 
                 mode_label = " [💭 Myśl wewnętrzna]" if h.get("is_thought") else ""
+                prefix_label = f"[Początek wywodu: {spk_name}]" if mode == "monologue_start" else "[Poprzednio]"
 
                 if h.get("pl"):
-                    lines.append(f"[Poprzednio]{spk_label}{mode_label} EN: {h['en']} -> PL: {h['pl']}")
+                    lines.append(f"{prefix_label}{spk_label}{mode_label} EN: {h['en']} -> PL: {h['pl']}")
                 else:
-                    lines.append(f"[Poprzednio]{spk_label}{mode_label} EN: {h['en']}")
+                    lines.append(f"{prefix_label}{spk_label}{mode_label} EN: {h['en']}")
             lines.append("-------------------------------------------------------\n")
 
         # 2b. Dynamic Crowd vs 1-on-1 (Uchi-Soto & Crowd Density Tracker)
@@ -1708,10 +2255,34 @@ class MultimodalTranslator:
                 if prev_ev_end is not None:
                     time_gap_ms = max(0, event.start - prev_ev_end)
 
-                if prev_clean:
+                is_shot_cut = False
+                cuts_list = getattr(self, "scene_cuts_ms", None) or []
+                if cuts_list and prev_ev_end is not None:
+                    from scene_snapper import SceneShotSnapper
+                    is_shot_cut = SceneShotSnapper.is_shot_boundary(event.start, prev_ev_end, cuts_list)
+
+                is_black_fade = False
+                black_list = getattr(self, "black_intervals_ms", None) or []
+                if black_list and prev_ev_end is not None:
+                    from scene_snapper import SceneShotSnapper
+                    is_black_fade = SceneShotSnapper.is_black_fade_boundary(event.start, prev_ev_end, black_list)
+
+                if prev_clean or is_shot_cut or is_black_fade:
                     prev_clean_lower = prev_clean.lower()
                     clean_en_lower = clean_text.lower().strip()
-                    jp_audio_line = (whisper_transcriptions.get(idx + 1, "") if whisper_transcriptions else "").lower()
+                    raw_whisper_item = whisper_transcriptions.get(idx + 1, "") if whisper_transcriptions else ""
+
+                    # Whisper Telemetry Sanity Guard (0.00 PLN)
+                    is_halluc_loop = WhisperDisambiguator.detect_hallucination_loop(raw_whisper_item)
+                    if is_halluc_loop:
+                        jp_audio_line = ""
+                    elif isinstance(raw_whisper_item, dict):
+                        jp_audio_line = str(raw_whisper_item.get("text", "")).lower()
+                    else:
+                        jp_audio_line = str(raw_whisper_item).lower()
+
+                    is_phantom = WhisperDisambiguator.filter_voice_activity(raw_whisper_item)
+                    is_low_conf = WhisperDisambiguator.assess_acoustic_confidence(raw_whisper_item) == "LOW"
 
                     # Czy wystąpił dyskontinuitet czasowy lub przeskok sceny (Filar CLXV)
                     is_prev_private_request = any(
@@ -1723,10 +2294,30 @@ class MultimodalTranslator:
                         clean_en_lower.startswith(w) for w in ["sure,", "sure.", "sure!", "all right,", "all right.", "yeah, what", "ok, what", "okay, what"]
                     )
 
-                    if time_gap_ms >= 3800 and (is_prev_private_request or is_curr_delayed_agreement):
-                        relation_tag = f" [DYSKONTINUITET CZASOWY: Pauza {time_gap_ms/1000.0:.1f}s / Zmiana sceny – KATEGORYCZNY ZAKAZ opóźnionego 'Jasne/Pewnie' (Delayed Agreement Filar CLXV); postacie przeszły już na miejsce – tłumacz jako otwarcie rozmowy: 'Więc o co chodzi?' / 'No to o co chodzi?' / 'Słucham cię']"
-                    elif time_gap_ms >= 3800 and not (prev_clean.endswith("...") or prev_clean.endswith("—") or prev_clean.endswith("-")):
-                        relation_tag = f" [ZMIANA SCENY / CIĘCIE MONTAŻOWE: Pauza {time_gap_ms/1000.0:.1f}s – nowa sekwencja (Filar CLXV); KATEGORYCZNY ZAKAZ fałszywych par przylegania, wycieku spójników ('I...', 'A...') i bezwładności emocjonalnej z poprzedniej sceny]"
+                    wdd_tag = WhisperDisambiguator.disambiguate_line(
+                        clean_en=clean_text,
+                        jp_audio=jp_audio_line,
+                        speaker=event.name,
+                        character_registry=self.character_registry,
+                        series_bible=getattr(self, "series_bible", None),
+                        prev_clean_en=prev_clean,
+                        prev_clean_pl=prev_pl_ref,
+                        time_gap_ms=time_gap_ms
+                    )
+                    if is_phantom:
+                        wdd_tag.is_phantom_audio = True
+                    if is_low_conf:
+                        wdd_tag.low_acoustic_confidence = True
+                    if is_halluc_loop:
+                        wdd_tag.is_hallucination_loop = True
+                    compact_wdd_tag = WhisperDisambiguator.format_compact_ssot_tag(wdd_tag)
+
+                    if is_black_fade:
+                        relation_tag = f" [🎬 CIĘCIE SCENY (Fade to Black / Eyecatch): Przejście przez czerń (pauza {time_gap_ms/1000.0:.1f}s) – nowa sekwencja (Filar CLXV); KATEGORYCZNY ZAKAZ fałszywych par przylegania i bezwładności emocjonalnej]"
+                    elif (is_shot_cut or time_gap_ms >= 3800) and (is_prev_private_request or is_curr_delayed_agreement):
+                        relation_tag = f" [🎬 CIĘCIE SCENY (FFmpeg) / DYSKONTINUITET CZASOWY: Nowe ujęcie (pauza {time_gap_ms/1000.0:.1f}s) / Zmiana sceny (Filar CLXV) – nowa rozmowa: 'Więc o co chodzi?' / 'Słucham cię']"
+                    elif is_shot_cut or (time_gap_ms >= 3800 and not (prev_clean.endswith("...") or prev_clean.endswith("—") or prev_clean.endswith("-"))):
+                        relation_tag = f" [🎬 CIĘCIE SCENY (FFmpeg) / ZMIANA SCENY: Nowe ujęcie (pauza {time_gap_ms/1000.0:.1f}s) – nowa sekwencja (Filar CLXV); zachowaj świeży początek sceny, ZAKAZ opóźnionego potaknięcia]"
                     else:
                         # Standardowa analiza par sąsiedztwa w obrębie tej samej sceny
                         curr_is_affirmation = any(
@@ -1771,29 +2362,120 @@ class MultimodalTranslator:
                         )
 
                         if is_prev_directive and curr_is_affirmation:
-                            relation_tag = " [RELACJA: Odpowiedź na ostrzeżenie/dyrektywę – KATEGORYCZNY ZAKAZ 'Tak/T-Tak'! Użyj 'Dobrze / D-Dobrze / Jasne / Będę uważać / W porządku' (Filar CXLVI & XLIII)]"
+                            relation_tag = " [RELACJA: Reakcja na ostrzeżenie/dyrektywę (Filar CXLVI & XLIII) – potwierdź gotowość: 'Dobrze / D-Dobrze / Jasne / Będę uważać / W porządku']"
                         elif is_prev_wh and curr_is_affirmation:
-                            relation_tag = " [RELACJA: Odpowiedź na pytanie otwarte – KATEGORYCZNY ZAKAZ samotnego 'Tak/T-Tak'! W japońskim audio seiyū wypowiada wahanie – użyj 'Eee...' / 'E-Eee...' / 'Cóż...' (Filar CXLVI)]"
-                        elif is_prev_neg_q and curr_is_affirmation:
-                            relation_tag = " [RELACJA: Odpowiedź na pytanie z przeczeniem (Echo Agreement) – KATEGORYCZNY ZAKAZ 'Tak'! W japońskim audio seiyū potwierdza przeczenie ('Hai/Un' = racja, nie jest tak). W języku polskim odpowiadamy na fakt: 'Nie / Nie idę / Wcale nie / Skądże' (Filar CLIV)]"
+                            relation_tag = " [RELACJA: Odpowiedź na pytanie otwarte (Filar CXLVI) – wahanie seiyū: 'Eee...' / 'E-Eee...' / 'Cóż...']"
+                        elif (wdd_tag and wdd_tag.polar_agreement) or (is_prev_neg_q and curr_is_affirmation):
+                            relation_tag = " [RELACJA: Potwierdzenie przeczenia / Echo Agreement (Filar CLIV) – odpowiedź na fakt: 'Nie / Zgadza się / Wcale nie']"
                         elif prev_clean.endswith("?"):
                             relation_tag = " [RELACJA: Prawdopodobna odpowiedź/reakcja na pytanie]"
                         elif any(prev_clean_lower.startswith(w) for w in ["come,", "let's", "shall we", "look,", "hey,"]):
                             relation_tag = " [RELACJA: Prawdopodobna reakcja / zgoda / odmowa na zaproszenie/propozycję]"
-                        elif prev_clean.endswith("...") or prev_clean.endswith("…"):
-                            relation_tag = " [RELACJA: Prawdopodobna kontynuacja myśli rozbitej wielokropkiem]"
+                        elif prev_clean.endswith("...") or prev_clean.endswith("…") or clean_text.strip().startswith("...") or clean_text.strip().startswith("…"):
+                            relation_tag = " [SPÓJNOŚĆ SKŁADNIOWA: Kontynuacja myśli rozbitej wielokropkiem – użyj orzeczenia osobowego w formie zgodnej z podmiotem (np. '...daje wyniki', a nie imiesłowu)]"
+                else:
+                    wdd_tag = WhisperDisambiguator.disambiguate_line(
+                        clean_en=clean_text,
+                        jp_audio=jp_audio_line,
+                        speaker=event.name,
+                        character_registry=self.character_registry,
+                        series_bible=getattr(self, "series_bible", None)
+                    )
+                    compact_wdd_tag = WhisperDisambiguator.format_compact_ssot_tag(wdd_tag)
             except Exception:
                 relation_tag = ""
+                compact_wdd_tag = ""
+
+            # Fuzzy Entity Casing Normalizer: Ensure proper names from series bible & character registry have uppercase first letter
+            clean_display_text = clean_text
+            canonical_entities = set()
+            if self.character_registry:
+                canonical_entities.update(self.character_registry.keys())
+            if hasattr(self, "series_bible") and self.series_bible and hasattr(self.series_bible, "data"):
+                canonical_entities.update(self.series_bible.data.get("characters", {}).keys())
+            for ent in canonical_entities:
+                clean_ent = extract_clean_speaker_name(ent).strip()
+                if clean_ent and len(clean_ent) >= 3 and clean_ent[0].isupper() and "->" not in clean_ent:
+                    pattern_parts = []
+                    for c in clean_ent:
+                        base = unicodedata.normalize("NFD", c)[0]
+                        if base != c:
+                            pattern_parts.append(f"[{re.escape(c)}{re.escape(base)}]")
+                        else:
+                            pattern_parts.append(re.escape(c))
+                    pattern = r"(?i)\b" + "".join(pattern_parts) + r"\b"
+                    clean_display_text = re.sub(pattern, clean_ent, clean_display_text)
 
             if vtype["is_sign"]:
                 lines.append(f"Kwestia [ID: {idx + 1}] [TYP: [NAPIS] {vtype['type_label']}] (Czas: {start_str} - {end_str}, Cechy: {vtype['visual_details']}):")
+                lines.append(f"  📄 SKRYPT PODSTAWOWY EN (TREŚĆ I MAJUSKUŁA): {clean_display_text}")
+
+                # Active Line Glossary Pinning: Check if any canonical glossary terms appear in sign
+                active_gloss = getattr(self, "combined_glossary", {})
+                if active_gloss:
+                    clean_lower = clean_text.lower()
+                    for term_en, term_pl in active_gloss.items():
+                        if term_en and len(term_en) >= 3 and term_en.lower() in clean_lower:
+                            lines.append(f"  📖 SŁOWNIK KANONICZNY: '{term_en}' => '{term_pl}' (bezwzględny wymóg terminologiczny)")
                 lines.append(f"  (!) UWAGA WIZUALNA: To jest NAPIS / TYTUŁ NA EKRANIE (np. tytuł odcinka/rozdziału, tytuł mangi, tablica, szyld, plansza).")
                 lines.append(f"  Przetłumacz ten tekst jako SAMODZIELNY TYTUŁ/NAPIS (np. 'The Princess's Favor' / '姫様のご寵愛' -> 'Łaska księżniczki').")
                 lines.append(f"  (!) POŁOŻENIE I TYPESETTING (Pixel-Perfect Grounding): Spójrz na klatkę wideo i w obiekcie 'visual_typesetting' podaj Bounding Box japońskiego napisu 'detected_box_1000' [ymin, xmin, ymax, xmax] (0-1000), pozycję 'placement' ('above'/'below'/'overlay'/'beside_right'/'beside_left'), kąt obrotu 'rotation_deg' (-45 do 45) oraz kolory HEX ('primary_color_hex', 'outline_color_hex'). W 'screen_region' wskaż kwadrant.")
-                lines.append(f"  BEZWZGLĘDNY ZAKAZ wklejania tu fragmentów dialogów mówionych przez postacie!")
+                lines.append(f"  (Typografia: przetłumacz wyłącznie treść napisu/planszy na ekranie)")
             else:
-                speaker_name = event.name if event.name else "Postać"
-                lines.append(f"Kwestia [ID: {idx + 1}] [TYP: [DIALOG] {vtype['type_label']}]{relation_tag} (Czas: {start_str} - {end_str}, Mówca: '{speaker_name}'){acoustic_str}:")
+                line_spk_gender, _ = self._arbitrate_speaker_gender(
+                    event=event,
+                    raw_phase1_gender=None,
+                    batch_id=idx + 1,
+                    speaker_tags=speaker_tags,
+                    whisper_transcriptions=whisper_transcriptions,
+                    pl_candidate="",
+                    raw_speaker_name=event.name,
+                    event_idx=original_idx
+                )
+                line_addr_cat, line_addr_lbl = self._resolve_line_addressee(
+                    event=event,
+                    raw_phase1_addressee=None,
+                    batch_events=batch_events,
+                    event_idx=idx,
+                    whisper_text=(whisper_transcriptions.get(idx + 1, "") if whisper_transcriptions else ""),
+                    clean_text=clean_text,
+                    orig_idx=original_idx,
+                    lookback_history=history_context,
+                    speaker_tags=speaker_tags,
+                    prosody_tags=prosody_tags
+                )
+
+                if line_addr_cat == "grupa_kobiet":
+                    reg_desc = "L. mnoga niemęskoosobowa ('wy': -łyście)"
+                elif line_addr_cat in ["grupa_mężczyzn", "grupa_mieszana"]:
+                    reg_desc = "L. mnoga męskoosobowa ('wy': -liście)"
+                elif line_addr_cat == "kobieta":
+                    reg_desc = "2. os. lp. 'ty' do kobiety (-łaś / wzburzoną)"
+                elif line_addr_cat == "mężczyzna":
+                    reg_desc = "2. os. lp. 'ty' do mężczyzny (-łeś / wzburzonego)"
+                else:
+                    reg_desc = "Bezpośredni na 'ty'"
+
+                if event.name and not is_generic_actor_or_category(event.name):
+                    spk_label = event.name
+                    if line_spk_gender:
+                        spk_label += f" ({line_spk_gender.capitalize()})"
+                elif line_spk_gender:
+                    spk_label = line_spk_gender.capitalize()
+                else:
+                    spk_label = "Postać"
+
+                if line_addr_lbl:
+                    addr_label = line_addr_lbl
+                elif line_addr_cat:
+                    addr_label = line_addr_cat.replace("_", " ").capitalize()
+                else:
+                    addr_label = "Rozmówca"
+
+                lines.append(f"Kwestia [ID: {idx + 1}] [TYP: [DIALOG] {vtype['type_label']}]{relation_tag} (Czas: {start_str} - {end_str}) [MÓWCA: {spk_label} | ADRESAT: {addr_label} | REJESTR: {reg_desc}]{acoustic_str}:")
+                lines.append(f"  📄 SKRYPT PODSTAWOWY EN (TREŚĆ, FAKTY, SKŁADNIA I MAJUSKUŁA): {clean_display_text}")
+                if compact_wdd_tag:
+                    lines.append(f"  {compact_wdd_tag}")
                 subj_3p = detect_third_person_mentions(
                     clean_text=clean_text,
                     speaker=event.name,
@@ -1802,19 +2484,43 @@ class MultimodalTranslator:
                 )
                 for s3 in subj_3p:
                     lines.append(f"  {s3}")
+
+                # Active Line Glossary Pinning: Check if any canonical glossary terms appear in this line
+                active_gloss = getattr(self, "combined_glossary", {})
+                if active_gloss:
+                    clean_lower = clean_text.lower()
+                    for term_en, term_pl in active_gloss.items():
+                        if term_en and len(term_en) >= 3 and term_en.lower() in clean_lower:
+                            lines.append(f"  📖 SŁOWNIK KANONICZNY: '{term_en}' => '{term_pl}' (bezwzględny wymóg terminologiczny)")
                 if vtype.get("is_top"):
-                    lines.append(f"  (!) DIALOG GÓRNY / W TLE: To jest dialog postaci w tle/oddali. Formatuj jako naturalny dialog mówiony (Sentence case). BEZWZGLĘDNY ZAKAZ nawiasów kwadratowych [...] i ZAKAZ wielkich liter ALL-CAPS!")
+                    lines.append(f"  (!) DIALOG GÓRNY / W TLE: Dialog postaci w tle/oddali – formatuj jako naturalny dialog mówiony (Sentence case).")
                 if duration_s <= 0.6:
-                    lines.append(f"  (!) MIKRO-KWESTIA / DŹWIĘK WAHANIA (czas {duration_s:.1f}s, tempo {cps:.1f} z/s): Kwestia trwa ułamek sekundy! Zastosuj Filar CXXXIV: zredukuj do MAX 1-2 słów (np. 'Znaczy...', 'Ech...', 'Cóż...'). KATEGORYCZNY ZAKAZ wielowyrazowych zdań!")
+                    lines.append(f"  (!) MIKRO-KWESTIA / DŹWIĘK WAHANIA (czas {duration_s:.1f}s, tempo {cps:.1f} z/s): Kwestia trwa ułamek sekundy! Zastosuj Filar CXXXIV: zredukuj do 1-2 słów (np. 'Znaczy...', 'Ech...', 'Cóż...').")
                 elif is_fast:
                     lines.append(f"  (!) TEMPO CPS ({cps:.1f} z/s, czas {duration_s:.1f}s): Szybka kwestia! Zastosuj zwięzłą kondensację Belczyka.")
 
             if whisper_transcriptions and idx + 1 in whisper_transcriptions:
-                jp_text = whisper_transcriptions[idx + 1]
-                if jp_text and not vtype["is_sign"]:
+                raw_jp_item = whisper_transcriptions[idx + 1]
+                is_halluc = WhisperDisambiguator.detect_hallucination_loop(raw_jp_item)
+                is_phantom = WhisperDisambiguator.filter_voice_activity(raw_jp_item)
+                is_low_conf = WhisperDisambiguator.assess_acoustic_confidence(raw_jp_item) == "LOW"
+
+                if is_halluc:
+                    jp_text = ""
+                elif isinstance(raw_jp_item, dict):
+                    jp_text = str(raw_jp_item.get("text", "")).strip()
+                else:
+                    jp_text = str(raw_jp_item).strip()
+
+                if is_phantom and not vtype["is_sign"]:
+                    lines.append("  🎙️ GŁOS SEIYŪ: [Audio: Tło muzyczne / SFX / brak mowy seiyū]")
+                elif jp_text and not vtype["is_sign"]:
                     romaji_str = to_romaji(jp_text)
                     jp_display = f"{jp_text} [{romaji_str}]" if romaji_str and romaji_str != jp_text else jp_text
-                    lines.append(f"  🎙️ GŁOS SEIYŪ (KOTWICA FONICZNA, REJESTR I PŁEĆ): {jp_display}")
+                    if is_low_conf:
+                        lines.append(f"  🎙️ GŁOS SEIYŪ (KOTWICA FONICZNA - NISKA PEWNOŚĆ / KRZYK): {jp_display}")
+                    else:
+                        lines.append(f"  🎙️ GŁOS SEIYŪ (KOTWICA FONICZNA, REJESTR, AFEKT I PŁEĆ): {jp_display}")
                     semantic_anchor = get_audio_semantic_anchor(jp_text, clean_text)
                     if semantic_anchor:
                         lines.append(f"  🎯 ZGODNOŚĆ FONICZNO-SEMANTYCZNA (FILAR CLVIII): {semantic_anchor}")
@@ -1841,7 +2547,6 @@ class MultimodalTranslator:
                             if pun.original_joke_or_pun and pun.original_joke_or_pun.lower() in clean_text.lower():
                                 lines.append(f"  [🃏 GRA SŁOWNA: {pun.polish_transcreation}]")
                                 break
-            lines.append(f"  📄 SKRYPT PODSTAWOWY EN (TREŚĆ, FAKTY I SKŁADNIA): {clean_text}")
 
         # 4. Lookahead window
         if lookahead_events:
@@ -2347,6 +3052,7 @@ class MultimodalTranslator:
                         pl_candidate = sanitize_sub_text(tr.polish_text)
                         speaker_gender = tr.speaker_gender
                         raw_addressee = getattr(tr, 'addressee', None)
+                        raw_speaker_name = getattr(tr, 'speaker_name', None)
                         semiotic_layer = getattr(tr, 'semiotic_layer', 'spoken_on_screen') or 'spoken_on_screen'
                         screen_reg = getattr(tr, 'screen_region', None)
                         v_typesetting = getattr(tr, 'visual_typesetting', None)
@@ -2369,7 +3075,9 @@ class MultimodalTranslator:
                 batch_id=batch_id,
                 speaker_tags=speaker_tags,
                 whisper_transcriptions=whisper_transcriptions,
-                pl_candidate=pl_candidate
+                pl_candidate=pl_candidate,
+                raw_speaker_name=raw_speaker_name,
+                event_idx=orig_idx
             )
             speaker_gender = resolved_gender
             if arb_alerts:
@@ -2383,7 +3091,11 @@ class MultimodalTranslator:
                 batch_events=untranslated_in_batch,
                 event_idx=idx,
                 whisper_text=jp_curr_text,
-                clean_text=clean_en
+                clean_text=clean_en,
+                orig_idx=orig_idx,
+                lookback_history=lookback_history,
+                speaker_tags=speaker_tags,
+                prosody_tags=prosody_tags
             )
 
             # Line-Level Pinning: Direct Profiler alerts for this specific line
@@ -2478,7 +3190,13 @@ class MultimodalTranslator:
                     time_gap_ms = max(0, event.start - prev_ev_end)
                     time_gap_s = time_gap_ms / 1000.0
 
-                if prev_clean:
+                is_shot_cut = False
+                cuts_list = getattr(self, "scene_cuts_ms", None) or []
+                if cuts_list and prev_ev_end is not None:
+                    from scene_snapper import SceneShotSnapper
+                    is_shot_cut = SceneShotSnapper.is_shot_boundary(event.start, prev_ev_end, cuts_list)
+
+                if prev_clean or is_shot_cut:
                     # Sprawdź dyskontinuitet czasowy i przeskoki scen (Filar CLXV)
                     is_prev_private_request = any(
                         w in prev_clean_lower for w in ["in private", "talk alone", "on our own", "somewhere quiet", "alone"]
@@ -2489,10 +3207,10 @@ class MultimodalTranslator:
                         clean_en.lower().strip().startswith(w) for w in ["sure,", "sure.", "sure!", "all right,", "all right.", "yeah, what", "ok, what", "okay, what"]
                     )
 
-                    if (time_gap_ms >= 3800 and (is_prev_private_request or is_curr_delayed_agreement)):
-                        relation_tag = f"[DYSKONTINUITET CZASOWY: Pauza {time_gap_s:.1f}s / Zmiana sceny – KATEGORYCZNY ZAKAZ opóźnionego 'Jasne/Pewnie' (Delayed Agreement Filar CLXV); postacie przeszły już na miejsce – tłumacz jako otwarcie rozmowy: 'Więc o co chodzi?' / 'No to o co chodzi?' / 'Słucham cię']"
-                    elif time_gap_ms >= 3800 and not (prev_clean.endswith("...") or prev_clean.endswith("—") or prev_clean.endswith("-")):
-                        relation_tag = f"[ZMIANA SCENY / CIĘCIE MONTAŻOWE: Pauza {time_gap_s:.1f}s – nowa sekwencja (Filar CLXV); KATEGORYCZNY ZAKAZ fałszywych par przylegania, wycieku spójników ('I...', 'A...') i bezwładności emocjonalnej z poprzedniej sceny]"
+                    if is_shot_cut or (time_gap_ms >= 3800 and (is_prev_private_request or is_curr_delayed_agreement)):
+                        relation_tag = f"[🎬 CIĘCIE SCENY (FFmpeg) / DYSKONTINUITET CZASOWY: Pauza {time_gap_s:.1f}s / Zmiana sceny – KATEGORYCZNY ZAKAZ opóźnionego 'Jasne/Pewnie' (Delayed Agreement Filar CLXV); postacie przeszły już na miejsce – tłumacz jako otwarcie rozmowy: 'Więc o co chodzi?' / 'No to o co chodzi?' / 'Słucham cię']"
+                    elif is_shot_cut or (time_gap_ms >= 3800 and not (prev_clean.endswith("...") or prev_clean.endswith("—") or prev_clean.endswith("-"))):
+                        relation_tag = f"[🎬 CIĘCIE SCENY (FFmpeg) / ZMIANA SCENY: Pauza {time_gap_s:.1f}s – nowa sekwencja (Filar CLXV); KATEGORYCZNY ZAKAZ fałszywych par przylegania, wycieku spójników ('I...', 'A...') i bezwładności emocjonalnej z poprzedniej sceny]"
                     else:
                         # Sprawdź, czy poprzednia linijka to dyrektywa/ostrzeżenie/polecenie
                         is_prev_directive = any(
@@ -2575,7 +3293,16 @@ class MultimodalTranslator:
             if social_context and not vtype["is_sign"]:
                 relation_tag = f"{relation_tag} {social_context}".strip()
 
-            # Blind-Drafting on Conflict Engine (0.00 PLN)
+            # Dynamic Emotional Breakdown & Affective Primacy Engine (0.00 PLN)
+            breakdown_alert = AudioProsodyEngine.detect_emotional_breakdown(
+                prosody_tag=prosody_tags.get(batch_id, ""),
+                whisper_text=jp_text
+            )
+            if breakdown_alert and not vtype["is_sign"]:
+                relation_tag = f"{relation_tag} {breakdown_alert}".strip()
+                notes = f"{notes} {breakdown_alert}".strip()
+
+            # Blind-Drafting on Conflict Engine & Syntactic Calque Scorer (0.00 PLN)
             # Detect whether Phase 1 draft is at severe risk of anchoring bias
             has_audio_conflict = bool(audio_discrepancy_msg) or any(
                 k in audio_jp_str.lower() for k in ["hitori", "一人", "独り", "betsuni", "別に", "yokatta", "よかった", "yatta", "やった"]
@@ -2583,12 +3310,19 @@ class MultimodalTranslator:
             has_ambiguity_conflict = bool(ambiguity_note)
             has_severe_trap = bool(notes and any(k in notes for k in ["[🚨 PUŁAPKA PROFILERA", "[🚨 ALARM FILAR", "[🎙️ ALARM KLISZY"]))
             has_temporal_conflict = bool(relation_tag and ("DYSKONTINUITET CZASOWY" in relation_tag or "ALARM KLISZY FANSUBERSKIEJ" in relation_tag))
+            calque_score = calculate_syntactic_calque_score(clean_en, pl_candidate) if not is_missing_tr else 0.0
             is_blind_draft = determine_blind_draft_status(
                 has_audio_conflict=has_audio_conflict,
                 has_ambiguity_conflict=has_ambiguity_conflict,
                 has_severe_trap=has_severe_trap,
-                has_temporal_conflict=has_temporal_conflict
+                has_temporal_conflict=has_temporal_conflict,
+                calque_score=calque_score
             )
+
+            clean_ev_name = event.name.strip() if getattr(event, "name", None) else ""
+            resolved_spk_name = clean_ev_name or (raw_speaker_name.strip() if raw_speaker_name else "")
+            if is_generic_actor_or_category(resolved_spk_name):
+                resolved_spk_name = ""
 
             pass1_items.append({
                 "id": batch_id,
@@ -2598,6 +3332,7 @@ class MultimodalTranslator:
                 "is_thought": is_th,
                 "is_missing_translation": is_missing_tr,
                 "is_blind_draft": is_blind_draft,
+                "calque_score": calque_score,
                 "duration_s": dur_s,
                 "time_gap_s": time_gap_s,
                 "time_gap_ms": time_gap_ms,
@@ -2606,7 +3341,7 @@ class MultimodalTranslator:
                 "end_ms": event.end,
                 "en": clean_en,
                 "pl": pl_candidate,
-                "speaker_name": event.name.strip() if getattr(event, "name", None) else "",
+                "speaker_name": resolved_spk_name,
                 "speaker_gender": speaker_gender,
                 "addressee": addressee_cat,
                 "addressee_label": addressee_label,
@@ -2682,31 +3417,27 @@ class MultimodalTranslator:
                 is_item_informal = (spk in speakers_on_ty) if spk else (scene_has_first_name_vocative and not bool(re.search(r"\b(pan|pani|panu|pana)\b", it["pl"], re.IGNORECASE)))
                 if is_item_informal:
                     if re.search(r"\b(wygrał|wygrała|zrobił|zrobiła|widział|widziała|powiedział|powiedziała|słyszał|słyszała|był|była|miał|miała|chciał|chciała|mógł|mogła|wiedział|wiedziała|wie|widzi|myśli|mówi|ma)\s+(pan|pani)\b|\b(pan|pani)\s+(wygrał|wygrała|zrobił|zrobiła|widział|widziała|słyszał|słyszała|powiedział|powiedziała|wie|widzi|myśli|mówi)\b", it["pl"], re.IGNORECASE):
-                        drift_alert = "[🚨 ALARM FILAR CLVII: Zwrot per 'pan/pani' w scenie/dialogu po imieniu na 'ty'! Kategoryczny zakaz 'wygrał pan' / 'pan wie' -> Zmień na 2. os. 'wygrałeś' / 'wiesz'!]"
+                        target_addr = (it.get("addressee") or "").lower()
+                        is_female_target = "kobieta" in target_addr or (it.get("addressee_label") and "kobieta" in it["addressee_label"].lower())
+                        rep_verb = "wygrałaś" if is_female_target else "wygrałeś"
+                        drift_alert = f"[🚨 ALARM FILAR CLVII: Relacja na 'ty' po imieniu – zastosuj 2. os. '{rep_verb}' / 'wiesz']"
                         it["notes"] = f"{it.get('notes', '')} {drift_alert}".strip()
 
-            # Multimodal Addressee Warning Pinning (Filar CLXIII)
-            if it.get("addressee") == "kobieta":
-                it["notes"] = f"{it.get('notes', '')} [🎯 ALARM FILAR CLXIII: Adresat to KOBIETA ({it.get('addressee_label', 'Kobieta')})! W 2. os. lp. ('ty') BEZWZGLĘDNY nakaz form żeńskich: 'zrobiłaś / byłaś / poszłaś / wiedziałaś / jesteś pewna / byłaś gotowa' (KATEGORYCZNY ZAKAZ form męskich: -łeś / pewien / gotowy)!]".strip()
-            elif it.get("addressee") == "mężczyzna":
-                it["notes"] = f"{it.get('notes', '')} [🎯 ALARM FILAR CLXIII: Adresat to MĘŻCZYZNA ({it.get('addressee_label', 'Mężczyzna')})! W 2. os. lp. ('ty') BEZWZGLĘDNY nakaz form męskich: 'zrobiłeś / byłeś / poszedłeś / wiedziałeś / jesteś pewien / byłeś gotowy' (KATEGORYCZNY ZAKAZ form żeńskich: -łaś / pewna / gotowa)!]".strip()
-            elif it.get("addressee") == "grupa_kobiet":
-                it["notes"] = f"{it.get('notes', '')} [🚨 ALARM FILAR CLXIII: Adresat to GRUPA KOBIET! Kategoryczny nakaz form niemęskoosobowych: 'zrobiłyście / byłyście gotowe / widziałyście' (ZAKAZ: -liście / gotowi)!]".strip()
-            elif it.get("addressee") in ["grupa_mężczyzn", "grupa_mieszana"]:
-                it["notes"] = f"{it.get('notes', '')} [🚨 ALARM FILAR CLXIII: Adresat to {('GRUPA MĘŻCZYZN' if it.get('addressee') == 'grupa_mężczyzn' else 'GRUPA MIESZANA')}! Kategoryczny nakaz rodzaju męskoosobowego: 'zrobiliście / byliście gotowi / widzieliście'!]".strip()
+            # Multimodal Addressee Warning Pinning (Filar CLXIII):
+            # Handled via structured attributes it['addressee'] & it['addressee_label'] in SSOT prompt generator.
 
             # Auditory Anchor Pinning (Filar CLVIII)
             audio_jp_str = str(it.get("audio_jp", "")).lower()
             if audio_jp_str and not it.get("is_sign"):
                 pl_check = str(it.get("pl", "")).lower()
                 if any(k in audio_jp_str for k in ["hitori", "一人", "独り", "ひとり"]) and ("daj mi spokój" in pl_check or "dajcie mi spokój" in pl_check):
-                    it["notes"] = f"{it.get('notes', '')} [🚨 ALARM FILAR CLVIII: W audio pada 'Hitori'! ZAKAZ 'Daj mi spokój'! NAKAZ: 'Zostaw mnie samą/samego']".strip()
+                    it["notes"] = f"{it.get('notes', '')} [🚨 ALARM FILAR CLVIII: W audio pada 'Hitori' – tłumacz: 'Zostaw mnie samą/samego']".strip()
                 elif any(k in audio_jp_str for k in ["betsuni", "別に"]) and ("to nic takiego" in pl_check or "nie ma sprawy" in pl_check):
-                    it["notes"] = f"{it.get('notes', '')} [🚨 ALARM FILAR CLVIII: W audio pada 'Betsuni'! ZAKAZ 'To nic takiego'! NAKAZ: 'Wcale nie' / 'Mniejsza z tym']".strip()
+                    it["notes"] = f"{it.get('notes', '')} [🚨 ALARM FILAR CLVIII: W audio pada 'Betsuni' – tłumacz: 'Wcale nie' / 'Mniejsza z tym']".strip()
                 elif any(k in audio_jp_str for k in ["yokatta", "よかった", "良かった"]) and "to było dobre" in pl_check:
-                    it["notes"] = f"{it.get('notes', '')} [🚨 ALARM FILAR CLVIII: W audio pada 'Yokatta'! ZAKAZ 'To było dobre'! NAKAZ: 'Całe szczęście']".strip()
+                    it["notes"] = f"{it.get('notes', '')} [🚨 ALARM FILAR CLVIII: W audio pada 'Yokatta' – tłumacz: 'Całe szczęście']".strip()
                 elif any(k in audio_jp_str for k in ["yatta", "やった"]) and ("zrobiłem to" in pl_check or "zrobiłam to" in pl_check):
-                    it["notes"] = f"{it.get('notes', '')} [🚨 ALARM FILAR CLVIII: W audio pada 'Yatta'! ZAKAZ 'Zrobiłem to'! NAKAZ: 'Udało się!']".strip()
+                    it["notes"] = f"{it.get('notes', '')} [🚨 ALARM FILAR CLVIII: W audio pada 'Yatta' – tłumacz: 'Udało się!']".strip()
 
             # Focalization & Dramatic Irony Guard (Filar CLXI)
             clean_en_lower = str(it.get("en", "")).lower()
@@ -2714,10 +3445,10 @@ class MultimodalTranslator:
             audio_jp_str = str(it.get("audio_jp", "")).lower()
 
             # Check 1: 3rd person in source (EN/JP) turned into 1st person in PL candidate
-            has_3rd_person_source = any(tok in clean_en_lower for tok in ["silent witch", "by the", "written by", "paper by", "essay by"]) or any(tok in audio_jp_str for tok in ["chinmoku no majo", "沈黙の魔女", "no ronbun", "論文"])
+            has_3rd_person_source = any(tok in clean_en_lower for tok in ["by the", "written by", "paper by", "essay by"]) and not any(tok in clean_en_lower for tok in ["my ", "i ", "me ", "mine"])
             has_1st_person_pl = bool(re.search(r"\b(mój|moja|moje|moim|moich|moją|mego)\s+(esej|praca|artykuł|traktat|tekst)\b", pl_check))
-            if has_3rd_person_source and has_1st_person_pl and not any(tok in clean_en_lower for tok in ["my ", "i ", "me ", "mine"]):
-                focal_alert = "[🚨 ALARM FILAR CLXI: Zdrada tożsamości incognito / dryf fokalizacji! W oryginale mowa w 3. osobie o Wiedźmie/dziele, a w szkicu PL pojawiła się 1. osoba ('mój esej')! KATEGORYCZNIE ZACHOWAJ 3. OSOBĘ MÓWCY (np. 'Wiedźmy Milczenia')!]"
+            if has_3rd_person_source and has_1st_person_pl:
+                focal_alert = "[🚨 ALARM FILAR CLXI: Tożsamość incognito – zachowaj 3. osobę mówcy zgodnie z oryginałem]"
                 it["notes"] = f"{it.get('notes', '')} {focal_alert}".strip()
 
             # Check 2: Unsolicited thought italicization
@@ -2725,7 +3456,7 @@ class MultimodalTranslator:
             orig_ev_text = orig_ev.text if orig_ev and getattr(orig_ev, "text", None) else it.get("en", "")
             if r"\i1" not in orig_ev_text and not it.get("is_thought", False):
                 if r"\i1" in str(it.get("pl", "")) and audio_jp_str:
-                    unsolicited_italics_alert = "[🚨 ALARM FILAR CLXI: Nieuprawniona konwersja dialogu na myśl! Dialog mówiony na głos został oznaczony kursywą {\\i1}. Usuń kursywę i traktuj kwestię jako mowę diegetyczną!]"
+                    unsolicited_italics_alert = "[🚨 ALARM FILAR CLXI: Dialog diegetyczny – usuń kursywę i traktuj jako mowę na głos]"
                     it["notes"] = f"{it.get('notes', '')} {unsolicited_italics_alert}".strip()
 
         # 6. Optional Phase 2 Verifier (Script Doctor - 100% Guaranteed Verification)
@@ -2800,9 +3531,15 @@ class MultimodalTranslator:
             spk_gen = item.get("speaker_gender")
             spk_voice = item.get("speaker_voice", "")
             if not spk_gen:
-                if "męski" in spk_voice.lower():
+                v_lower = spk_voice.lower()
+                if "sopran" in v_lower or "alt żeński" in v_lower:
+                    spk_gen = "kobieta"
+                elif "alt starszej" in v_lower or "ochrypły alt" in v_lower:
+                    # Low raspy voice (could be elderly female) - do not force male!
+                    pass
+                elif "męski" in v_lower and "alt" not in v_lower and "ochrypł" not in v_lower:
                     spk_gen = "mężczyzna"
-                elif "żeński" in spk_voice.lower():
+                elif "żeński" in v_lower:
                     spk_gen = "kobieta"
 
             spk_name = (item.get("speaker_name") or "").strip()
@@ -2821,7 +3558,8 @@ class MultimodalTranslator:
                 custom_glossary=combined_glossary,
                 is_informal_ty=is_item_informal,
                 audio_jp=item.get("audio_jp", ""),
-                prev_line_text=prev_linted_line
+                prev_line_text=prev_linted_line,
+                source_en=item.get("en", "")
             )
             prev_linted_line = final_text
             # Deterministic glossary overrides
@@ -2908,9 +3646,17 @@ class MultimodalTranslator:
                 print(f"[Baza AniList] [Dziedzina specjalistyczna]: {', '.join(anime_meta['detected_domains'])}")
             print(f"[Baza AniList] Wczytano opis fabuły oraz {char_count} postaci z ich płcią i rolami.")
             
-            # Pre-populate character registry from AniList
+            # Pre-populate character registry from AniList (AniList SSOT rule):
+            # ONLY define character gender if explicitly verified in AniList (Male/Female).
+            # If missing/None, leave uncommitted so dynamic episode-level data resolves it.
             for c in anime_meta.get("characters", []):
-                self._register_character_safe(c["name"], c["gender"], c.get("role", "postać"))
+                c_name = c.get("name")
+                c_gen = c.get("gender")
+                if c_name and c.get("has_verified_gender") and c_gen:
+                    self._register_character_safe(c_name, c_gen, c.get("role", "postać"))
+                elif c_name:
+                    if c_name not in self.character_registry:
+                        self.character_registry[c_name] = f"postać ({c.get('role', 'postać')})"
 
         # 1. Clean events and compress frame-by-frame animations (FBF Animation Deduplication)
         raw_all_entries = []
@@ -2974,6 +3720,8 @@ class MultimodalTranslator:
         translated_regions: Dict[int, str] = {}
         translated_typesetting: Dict[int, Any] = {}
         translated_addressees: Dict[int, str] = {}
+        translated_speakers: Dict[int, str] = {}
+        episode_whisper_transcriptions: Dict[int, str] = {}
 
         # 1b. Search for checkpoint files (multiple paths and candidate formats)
         checkpoint_path = None
@@ -3014,6 +3762,7 @@ class MultimodalTranslator:
                                 translated_regions = {int(k): str(v) for k, v in saved_data.get("translated_regions", {}).items() if str(k).isdigit()}
                                 translated_typesetting = {int(k): v for k, v in saved_data.get("translated_typesetting", {}).items() if str(k).isdigit()}
                                 translated_addressees = {int(k): str(v) for k, v in saved_data.get("translated_addressees", {}).items() if str(k).isdigit()}
+                                translated_speakers = {int(k): str(v) for k, v in saved_data.get("translated_speakers", {}).items() if str(k).isdigit()}
                                 token_usage = saved_data.get("token_usage", {})
                                 restored_f1_tokens = token_usage.get("f1")
                                 restored_f2_tokens = token_usage.get("f2")
@@ -3073,7 +3822,7 @@ class MultimodalTranslator:
             anime_metadata_str=anime_context_str,
             cache_path=profile_cache_path
         )
-        episode_profile_str = format_episode_profile_for_prompt(episode_profile)
+        episode_profile_str = format_lean_episode_brief(episode_profile) if episode_profile else ""
 
         # 0b. Initialize and load Series Bible (Cross-Episode Continuity)
         series_title = ""
@@ -3183,6 +3932,7 @@ class MultimodalTranslator:
             profiler_glossary=profiler_gloss_dict,
             keep_honorifics=self.keep_honorifics
         )
+        self.combined_glossary = combined_glossary
         if combined_glossary:
             print(f"  [Słownik Deterministyczny]: Aktywnych {len(combined_glossary)} terminów (Hierarchia: Kanon Mangi > Biblia Serialu > Profiler > Słownik Użytkownika).")
 
@@ -3194,7 +3944,7 @@ class MultimodalTranslator:
         # 0e. Format static episode strings
         glossary_str = self.glossary_manager.format_for_prompt(combined_glossary)
         manga_canon_str = f"\nOFICJALNY KANON MANGOWY ({manga_canon_entry['publisher']}):\n" + "\n".join([f"- '{k}' = '{v}'" for k, v in manga_canon_entry.get('glossary', {}).items()]) if manga_canon_entry else ""
-        episode_profile_str = format_episode_profile_for_prompt(episode_profile) if episode_profile else ""
+        episode_profile_str = format_lean_episode_brief(episode_profile) if episode_profile else ""
 
         if episode_profile:
             if not manga_canon_entry and episode_profile.manga_canon_source:
@@ -3298,6 +4048,32 @@ class MultimodalTranslator:
         else:
             print(f"  [Autozapis]: Wszystkie kwestie dialogowe ({len(translated_results)}) wczytane z checkpointu. Pomijanie rozgrzewania API.")
 
+        # Precompute episode scene genders across timeline (0.00 PLN)
+        self.episode_scene_genders = self._precompute_episode_scene_genders(
+            raw_entries,
+            whisper_transcriptions=episode_whisper_transcriptions,
+            episode_profile=episode_profile
+        )
+        if self.episode_scene_genders:
+            f_scenes = sum(1 for g in self.episode_scene_genders.values() if g == "kobieta")
+            m_scenes = sum(1 for g in self.episode_scene_genders.values() if g == "mężczyzna")
+            print(f"  [Pre-pass Sceniczny Odcinka]: Wykryto ciągłość obsady dla {len(self.episode_scene_genders)} kwestii ({f_scenes} żeńskich, {m_scenes} męskich).")
+
+        # Detect FFmpeg scene cuts and black frames once per episode (0.00 PLN)
+        self.scene_cuts_ms = []
+        self.black_intervals_ms = []
+        if video_path and os.path.exists(video_path):
+            try:
+                from scene_snapper import SceneShotSnapper
+                self.scene_cuts_ms = SceneShotSnapper.detect_scene_cuts_ffmpeg(video_path, threshold=0.38)
+                self.black_intervals_ms = SceneShotSnapper.detect_black_frames_ffmpeg(video_path)
+                if self.scene_cuts_ms:
+                    print(f"  [FFmpeg Scene Cuts]: Wykryto {len(self.scene_cuts_ms)} cięć montażowych w wideo.")
+                if self.black_intervals_ms:
+                    print(f"  [FFmpeg Black Fades]: Wykryto {len(self.black_intervals_ms)} przejść przez czerń (Fade to Black).")
+            except Exception as e:
+                logger.warning(f"Nie udało się wykryć cięć montażowych lub czerni: {e}")
+
         batches = create_adaptive_batches(
             raw_entries,
             base_batch_size=self.batch_size,
@@ -3305,7 +4081,8 @@ class MultimodalTranslator:
             min_scene_batch=16,
             min_leap_batch=12,
             leap_threshold_ms=8000,
-            scene_threshold_ms=3800
+            scene_threshold_ms=3800,
+            coalesce_tail=True
         )
 
         with tqdm(
@@ -3380,6 +4157,10 @@ class MultimodalTranslator:
                                             translated_typesetting[it["orig_idx"]] = it["visual_typesetting"]
                                         if it.get("addressee"):
                                             translated_addressees[it["orig_idx"]] = it["addressee"]
+                                        if it.get("speaker_name") and not is_generic_actor_or_category(it["speaker_name"]):
+                                            translated_speakers[it["orig_idx"]] = it["speaker_name"]
+                                        if it.get("audio_jp"):
+                                            episode_whisper_transcriptions[it["orig_idx"]] = it["audio_jp"]
                                         pl_final = batch_res.get(it["orig_idx"], it.get("pl", ""))
                                         if pl_final:
                                             history.append({
@@ -3405,6 +4186,7 @@ class MultimodalTranslator:
                                                 for k, v in translated_typesetting.items()
                                             },
                                             "translated_addressees": translated_addressees,
+                                            "translated_speakers": translated_speakers,
                                             "token_usage": {
                                                 "f1": self.current_episode_tokens,
                                                 "f2": self.verifier.current_episode_tokens if self.verifier else None
@@ -3475,6 +4257,10 @@ class MultimodalTranslator:
                                         translated_typesetting[it["orig_idx"]] = it["visual_typesetting"]
                                     if it.get("addressee"):
                                         translated_addressees[it["orig_idx"]] = it["addressee"]
+                                    if it.get("speaker_name") and not is_generic_actor_or_category(it["speaker_name"]):
+                                        translated_speakers[it["orig_idx"]] = it["speaker_name"]
+                                    if it.get("audio_jp"):
+                                        episode_whisper_transcriptions[it["orig_idx"]] = it["audio_jp"]
                                     pl_final = batch_res.get(it["orig_idx"], it.get("pl", ""))
                                     if pl_final:
                                         history.append({
@@ -3740,6 +4526,13 @@ class MultimodalTranslator:
             new_event = orig_event.copy()
             new_event.text = full_event_text
             new_event.addressee = translated_addressees.get(master_id)
+            if not getattr(new_event, "name", None) or not str(new_event.name).strip() or is_generic_actor_or_category(str(new_event.name)):
+                spk = translated_speakers.get(master_id)
+                if spk and not is_generic_actor_or_category(spk):
+                    new_event.name = spk
+                else:
+                    new_event.name = ""
+            new_event.source_en = getattr(orig_event, "plaintext", None) or orig_event.text
             final_subs.events.append(new_event)
 
         # 7.0. Format simultaneous dialogues (Simultaneous Dialogue AVT)
@@ -3768,11 +4561,12 @@ class MultimodalTranslator:
         if video_path and os.path.exists(video_path):
             try:
                 from scene_snapper import SceneShotSnapper
-                cuts = SceneShotSnapper.detect_scene_cuts_ffmpeg(video_path)
+                cuts = getattr(self, "scene_cuts_ms", None) or SceneShotSnapper.detect_scene_cuts_ffmpeg(video_path)
                 if cuts:
-                    final_subs.events, snapped_cnt = SceneShotSnapper.snap_subtitles_to_cuts(final_subs.events, cuts)
+                    kfs = getattr(self, "keyframes_ms", None)
+                    final_subs.events, snapped_cnt = SceneShotSnapper.snap_subtitles_to_cuts_and_keyframes(final_subs.events, cuts, keyframes_ms=kfs)
                     if snapped_cnt > 0:
-                        logger.info(f"[SceneShotSnapper]: Dociągnięto {snapped_cnt} krawędzi napisów do cięć montażowych.")
+                        logger.info(f"[SceneShotSnapper]: Dociągnięto {snapped_cnt} krawędzi napisów do cięć montażowych i klatek kluczowych.")
             except Exception as e:
                 logger.warning(f"SceneShotSnapper: Pomijanie ({e})")
 
@@ -3787,7 +4581,10 @@ class MultimodalTranslator:
                 user_feedback_rules=all_user_rules,
                 character_registry=self.character_registry,
                 series_bible=getattr(self, "series_bible", None),
-                line_addressees=translated_addressees
+                line_addressees=translated_addressees,
+                line_speakers=translated_speakers,
+                source_subs=subs,
+                whisper_transcriptions=episode_whisper_transcriptions
             )
             if qg_fixes:
                 en_warnings = [f for f in qg_fixes if "nieprzetłumaczony angielski" in f]

@@ -60,6 +60,9 @@ class DramaticSequence(BaseModel):
     time_range: str = Field(description="Przedział czasowy (np. '00:00 - 05:30')")
     dramatic_summary: str = Field(description="Opis dynamiki, napięcia i relacji władzy w tej części odcinka")
     dominant_tone: str = Field(description="Dominujący rejestr i ton (np. 'panika i tempo bojowe', 'dworska etykieta i tłumiona zazdrość', 'patos rycerski')")
+    characters_present: List[str] = Field(default_factory=list, description="Postacie biorące udział w danej sekwencji czasowej (np. ['Fatima', 'Boraqchin Khatun'])")
+    female_only_scene: bool = Field(default=False, description="Czy w tej sekwencji rozmawiają wyłącznie kobiety")
+    male_only_scene: bool = Field(default=False, description="Czy w tej sekwencji rozmawiają wyłącznie mężczyźni")
 
 
 class RelationshipPivot(BaseModel):
@@ -104,6 +107,7 @@ class CharacterDossier(BaseModel):
     declension: Optional[str] = Field(default=None, description="Polska odmiana przez przypadki (np. 'Yoritsugu -> D. Yoritsugu, C. Yoritsugu, B. Yoritsugu')")
     dialect_category: Optional[str] = Field(default="", description="Dialekt regionalny postaci jeśli występuje: 'Satsuma-ben', 'Kansai-ben', 'Kyoto-ben', 'Tohoku-ben', 'Hiroshima-ben', 'Hakata-ben', 'Nagoya-ben', 'Okinawa-ben', 'Hokkaido-ben' lub brak (Filar CXXXV)")
     idiolect_matrix: Optional[str] = Field(default="", description="Matryca idiolektu: specyficzne nawyki leksykalne, zakazane/preferowane zwroty i rytm wypowiedzi dla tej postaci")
+    vocal_profile: Optional[str] = Field(default="", description="Profil wokalny postaci (np. 'starsza kobieta, niski/ochrypły głos seiyū', 'młody chłopiec, wysoki głos żeńskiej seiyū')")
 
 
 class EpisodeProfile(BaseModel):
@@ -180,9 +184,15 @@ def format_episode_profile_for_prompt(profile: Optional[EpisodeProfile]) -> str:
             lines.append(f"• [{ca.canon_source_episode}] {ca.term_or_event} => DYREKTYWA: {ca.continuity_directive}")
 
     if profile.dramatic_sequences:
-        lines.append("\n🗺️ MAPA SEKWENCJI DRAMATURGICZNYCH ODCINKA:")
+        lines.append("\n🗺️ MAPA SEKWENCJI DRAMATURGICZNYCH ODCINKA (DIARYZACJA OBSADY I SCEN JEDNOPŁCIOWYCH):")
         for seq in profile.dramatic_sequences:
-            lines.append(f"• [{seq.time_range}] {seq.sequence_name}: {seq.dramatic_summary} (Ton: {seq.dominant_tone})")
+            cast_str = f" [Obsada: {', '.join(seq.characters_present)}]" if getattr(seq, "characters_present", None) else ""
+            gender_tag = ""
+            if getattr(seq, "female_only_scene", False):
+                gender_tag = " (🚨 SCENA WYŁĄCZNIE KOBIECA: bezwzględny wymóg form żeńskich w 1. i 2. os.!)"
+            elif getattr(seq, "male_only_scene", False):
+                gender_tag = " (SCENA WYŁĄCZNIE MĘSKA: bezwzględny wymóg form męskich!)"
+            lines.append(f"• [{seq.time_range}] {seq.sequence_name}: {seq.dramatic_summary} (Ton: {seq.dominant_tone}){cast_str}{gender_tag}")
 
     if profile.character_dossiers:
         lines.append("\n🎭 KARTOTEKA OBSADY I MATRYCA IDIOLEKTÓW (CHARACTER DOSSIERS & IDIOLECT MATRIX):")
@@ -191,7 +201,8 @@ def format_episode_profile_for_prompt(profile: Optional[EpisodeProfile]) -> str:
             decl = f" [Odmiana: {cd.declension}]" if cd.declension else ""
             dial = f" [Dialekt: {cd.dialect_category}]" if cd.dialect_category else ""
             idio = f" [Idiolekt: {cd.idiolect_matrix}]" if cd.idiolect_matrix else ""
-            lines.append(f"• {cd.name} ({cd.gender}, {cd.age_and_role}){pron}{decl}{dial} -> Styl: {cd.speech_style_pl}{idio}")
+            voc = f" [Głos: {cd.vocal_profile}]" if getattr(cd, "vocal_profile", "") else ""
+            lines.append(f"• {cd.name} ({cd.gender}, {cd.age_and_role}){pron}{decl}{dial}{voc} -> Styl: {cd.speech_style_pl}{idio}")
 
     if profile.name_declensions:
         lines.append("\nŻELAZNA TABELA ODMIANY IMION PRZEZ PRZYPADKI (FILAR XCI - BEZWZGLĘDNIE STOSUJ):")
@@ -219,6 +230,98 @@ def format_episode_profile_for_prompt(profile: Optional[EpisodeProfile]) -> str:
             lines.append(f"- {conv}")
 
     lines.append("=================================================================================\n")
+    return "\n".join(lines)
+
+
+def format_lean_episode_brief(profile: Any) -> str:
+    """Formats episode profile into a lean, ultra-focused brief (< 400-500 words) to prevent cognitive saturation."""
+    if not profile:
+        return ""
+
+    def _get(obj, attr, default=None):
+        if isinstance(obj, dict):
+            return obj.get(attr, default)
+        return getattr(obj, attr, default)
+
+    lines = ["=== ZWIĘZŁY MANIFEST ODCINKA (EPISODE BRIEF) ==="]
+    title = _get(profile, "show_name") or _get(profile, "series_title") or _get(profile, "title")
+    ep_num = _get(profile, "episode_number")
+    if title:
+        ep_str = f" - Odcinek {ep_num}" if ep_num else ""
+        lines.append(f"• Seria: {title}{ep_str}")
+    lines.append("• KLUCZOWE ZASADY AVT: Angielski skrypt = treść, fakty i składnia; Głos seiyū = kotwica emocji, afektu i rejestru.")
+
+    setting = _get(profile, "setting_and_era")
+    tone = _get(profile, "tone_and_genre")
+    if setting or tone:
+        genre_info = f"{setting or ''} | {tone or ''}".strip(" |")
+        lines.append(f"• Gatunek i Rejestr: {genre_info}")
+        if any(h in genre_info.lower() for h in ["historyczn", "dworsk", "feudal", "średniowiecz", "starożytn", "mongol"]):
+            lines.append("  (!) KATEGORYCZNY ZAKAZ WSPÓŁCZESNEGO SLANGU (np. 'zmywajmy się', 'nakryją nas') -> stosuj szlachetne 'uciekajmy', 'schwytają / odkryją'.")
+
+    # Characters with confirmed gender and appositions
+    dossiers = _get(profile, "character_dossiers")
+    rels = _get(profile, "characters")
+    if dossiers or rels:
+        lines.append("• Postacie i Formy Adresatywne:")
+        seen = set()
+        if dossiers:
+            for cd in dossiers:
+                name = _get(cd, "name")
+                if name and name not in seen:
+                    seen.add(name)
+                    # Biologically guard female titles
+                    g = _get(cd, "gender", "")
+                    role = _get(cd, "age_and_role", "")
+                    voc = _get(cd, "vocal_profile", "")
+                    if any(w in str(role).lower() for w in ["cesarzowa", "chatun", "żona", "córka", "matka", "księżniczka"]):
+                        g = "kobieta"
+                    from series_memory import is_inherently_female_name
+                    if not g and is_inherently_female_name(name):
+                        g = "kobieta"
+                    lines.append(f"  - {name}: {g} ({role})")
+                    if str(g).lower() in ("female", "kobieta") and any(w in (str(role) + " " + str(voc) + " " + str(name)).lower() for w in ["starsza", "dojrzała", "ochrypł", "babci", "matron", "cesarzow", "chatun", "boraqchin", "fatima", "töregene", "sitara"]):
+                        lines.append(f"    (!) OCHRONA PŁCI ({name}): KOBIETA (niski F0 / ochrypły alt – zakaz męskich form!) – BEZWZGLĘDNY NAKAZ form żeńskich: -łam, -łabym, -łaś (np. 'miałabym', 'wiedziałam', 'zamierzyłam')!")
+        if rels:
+            if isinstance(rels, dict):
+                for spk, info in list(rels.items())[:8]:
+                    role = _get(info, "role", "") or _get(info, "age_and_role", "")
+                    g = _get(info, "gender", "")
+                    if not g and is_inherently_female_name(spk):
+                        g = "kobieta"
+                    lines.append(f"  - {spk}: {g} ({role})")
+            else:
+                for rel in rels[:8]:
+                    spk = _get(rel, "speaker")
+                    lis = _get(rel, "listener")
+                    addr = _get(rel, "address_form")
+                    lines.append(f"  - {spk} -> {lis}: {addr}")
+
+    decls = _get(profile, "name_declensions")
+    if decls:
+        lines.append("• Odmiana Imion i Tytułów:")
+        if isinstance(decls, dict):
+            for c_name, summary in list(decls.items())[:6]:
+                lines.append(f"  - {c_name}: {summary}")
+        else:
+            for decl in decls[:6]:
+                c_name = _get(decl, "character_name")
+                summary = _get(decl, "declension_summary")
+                lines.append(f"  - {c_name}: {summary}")
+
+    gloss = _get(profile, "glossary")
+    if gloss:
+        lines.append("• Zablokowana Terminologia:")
+        if isinstance(gloss, dict):
+            for t_en, t_pl in list(gloss.items())[:10]:
+                lines.append(f"  - {t_en} = {t_pl}")
+        else:
+            for g in gloss[:10]:
+                t_en = _get(g, "term_en")
+                t_pl = _get(g, "translation_pl")
+                lines.append(f"  - {t_en} = {t_pl}")
+
+    lines.append("================================================")
     return "\n".join(lines)
 
 
@@ -269,6 +372,9 @@ Twoim zadaniem jest dogłębna, wszechstronna analiza 100% skryptu całego odcin
 6. KALAMBURY I GRY SŁOWNE (puns_and_wordplays): Przekształć japońskie Dajare i Goroawase na autonomiczne polskie gry słowne wg zasad Stanisława Barańczaka (bez przypisów [Przyp. tłum.]!).
 7. MOSTY CIĄGŁOŚCI (continuity_bridge_alerts): Wskaż terminy i wątki wymagające żelaznej spójności z całą serią.
 8. CHRONOLOGICZNA MAPA SEKWENCJI DRAMATURGICZNYCH (dramatic_sequences): Podziel odcinek na 3-4 akty/sekwencje czasowe z opisem napięcia i tonu.
+   - DLA KAŻDEJ SEKWENCJI BEZWZGLĘDNIE WSKAŻ characters_present (listę postaci rozmawiających w tej scenie, zwłaszcza gdy linie w skrypcie nie mają wpisanych nazwisk w polu Actor!).
+   - Jeśli w scenie rozmawiają wyłącznie kobiety (np. Fatima i Boraqchin Khatun), BEZWZGLĘDNIE ustaw female_only_scene = True! Zabezpiecza to potok przed domyślnym męskim biasem LLM w dialogach anonimowych.
+   - Jeśli w scenie rozmawiają wyłącznie mężczyźni, ustaw male_only_scene = True!
 9. KARTOTEKA OBSADY I IDIOLEKTY YAKUWARIGO (character_dossiers): Określ wiek, status, japońskie zaimki (Ore/Boku/Watashi/Washi/Sessha), dialekt (Kansai-ben) i unikalny polski rejestr mowy (Ojou-sama salonowy, Starzec staroświecki, Samuraj rycerski, Yankii szorstki, Kansai gawędziarski).
 10. TABELA ODMIANY IMION PRZEZ PRZYPADKI (name_declensions) & MATRYCA RELACJI I TYTULATURY (characters):
    - ŻELAZNA FLEKSJA IMION FANTASY I ZACHODNICH (FILAR XCI): W seriach fantasy i obcojęzycznych imiona męskie zakończone na spółgłoskę (np. Drel, Gart, Klen, Arthur, Roland, Thorfinn, Eren, Armin) BEZWZGLĘDNIE ODMIENIAMY przez wszystkie polskie przypadki!
@@ -335,7 +441,8 @@ Twoim zadaniem jest dogłębna, wszechstronna analiza 100% skryptu całego odcin
        * Zdrobnienia slangu: KATEGORYCZNY ZAKAZ tworzenia sztucznych fonetycznych potworków w rodzaju 'Kuro-tasia', 'Manacia' pod japońskie sufiksy '-taso' / '-cchin'.
        * Relacje rówieśnicze w szkole i klubie (Filar XXV & IX): KATEGORYCZNY ZAKAZ form per 'Pan/Pani [Nazwisko]' i czasowników w 3. osobie grzecznościowej między uczniami i rówieśnikami z tej samej klasy/klubu szkolnego (KARDYNALNY BŁĄD: 'Pani Fujimori, ma pani skaner?' / 'Pani Fujimori, spokojnie!'). Japoński grzeczny przyrostek '-san' używany przez licealistkę do koleżanki z klubu mangi to w polszczyźnie samo nazwisko lub imię w bezpośredniej relacji na 'ty' (POPRAWNIE: 'Fujimori, masz skaner?' / 'Fujimori, spokojnie!' / 'gdy Fujimori skończy').
        * Żelazna niezmienniczość T-V w relacji wydawca-autor (Filar XXV & CLVI): W relacji redaktorki wydawnictwa z autorką mangi (np. Hana Kongouji <-> Rei Teshima) bezwzględnie utrzymuj żelazny rejestr grzecznościowy per 'Pani' w 100% kwestii. KATEGORYCZNY ZAKAZ hybrydyzacji i zsuwania się na 'ty' w tej samej scenie! Angielskie 'Trust me!' to wyłącznie 'Proszę mi zaufać!' / 'Niech mi pani zaufa!' (KATEGORYCZNY ZAKAZ poufałego 'Zaufaj mi!'). Pytania i zdania warunkowe redaktorki: 'Co pani zamierza?', 'Jeśli chce pani publikować... musi pani wprowadzić zmiany...', 'Wiem, że ma pani opory', 'Jeśli jest pani na to gotowa, w pełni pani pomogę' (ZAKAZ: 'Co zamierzasz?', 'Jeśli chcesz... musisz...', 'masz opory', 'ci pomogę').
-       * Typografia i czystość dialogowa AVT (Filar LX): KATEGORYCZNY ZAKAZ wprowadzania japońskich tyld emocjonalnych ('~') oraz zwielokrotnionych wykrzykników/pytajników w dialogach (BŁĄD: 'odjechane~!!!!' -> POPRAWNIE: 'odjechane!'). Maksymalnie jeden wykrzyknik lub pytajnik.
+        * Typografia i czystość dialogowa AVT (Filar LX): KATEGORYCZNY ZAKAZ wprowadzania japońskich tyld emocjonalnych ('~') oraz zwielokrotnionych wykrzykników/pytajników w dialogach (BŁĄD: 'odjechane~!!!!' -> POPRAWNIE: 'odjechane!'). Maksymalnie jeden wykrzyknik lub pytajnik.
+        * Typografia plansz tytułowych i szyldów (Filar XCVIII & LX): KATEGORYCZNY ZAKAZ pakowania wieloczłonowych plansz w jedną niepodzieloną linię (>42 znaki) oraz używania notacji nawiasów kwadratowych [ A ] [ B ]. Plansze tytułowe dziel na zwięzłe wersy z \\N (maks. 36-40 znaków na wiersz).
        * Wielogłos symultaniczny i kwestie dwugłosowe (Filar LVII): Kwestie dwóch różnych postaci połączone myślnikiem w jednej linii ('A - B') BEZWZGLĘDNIE rozbijaj na dwie osobne linie z myślnikiem i spacją na początku każdej ('- A\\N- B'). KATEGORYCZNY ZAKAZ łączenia ich w jeden wiersz bez formatowania dwugłosu!
        * Tautologie i zacięcia słownikowe tytułów dzieł/kronik: KATEGORYCZNY ZAKAZ dublowania słowa 'kronika' ('w Kronice Kronika Taiheiki' -> 'w Kronice Taiheiki', '[ KRONIKA Kronika Taiheiki ]' -> '[ KRONIKA TAIHEIKI ]').
        * Błędne związki frazeologiczne i inwersja afektywna (Filar X): KATEGORYCZNY ZAKAZ łączenia idiomu 'odchodzić od zmysłów' z pozytywnymi emocjami (KARDYNALNY BŁĄD: 'odchodzić od zmysłów ze szczęścia'). 'Odchodzić od zmysłów' łączy się wyłącznie z negatywnymi stanami (rozpacz, lęk, żal). W radości stosuj: 'szaleć ze szczęścia' lub 'nie posiadać się z radości'.
@@ -358,7 +465,32 @@ Twoim zadaniem jest dogłębna, wszechstronna analiza 100% skryptu całego odcin
         * KOREKTA POUFAŁOŚCI NA FORMĘ OFICJALNĄ ('[Nazwisko]-senpai'): Gdy postać wycofuje się z poufałego imienia do formy formalnej (np. 'Odpuść, Rinko' -> 'Nie ma mowy!' -> 'To znaczy... Akaishi-senpai'), w języku polskim należy bezwzględnie zastosować 'panno [Nazwisko]' (dla kobiety) lub 'panie [Nazwisko]' (dla mężczyzny), a NIE chłodne, obcesowe samo nazwisko bez tytułu ('To znaczy... panno Akaishi', ZAKAZ: 'To znaczy... Akaishi').
         * WOŁACZ PRZYDOMKÓW MEDIALNYCH I TYTUŁÓW: Gdy postacie zwracają się do bohatera jego oficjalnym przydomkiem (np. Arata jako 'Potworny Królewicz' w Otome Kaijuu Carameliser), zwrot bezpośredni w wołaczu musi brzmieć 'królewiczu!' lub 'Królewiczu!', a nie 'książę' (zgodnie z oficjalnym kanonem wydawnictwa papierowego Studio JG).
         * Gest podania rekwizytu z angielskim 'Here' -> 'Proszę' / 'Trzymaj' (KARDYNALNY BŁĄD: 'Tutaj!').
-   - W mandatory_direction wymuś nadrzędność dramaturgii i japońskiego audio seiyū nad dosłownym skryptem angielskim.
+ 17. NATURALNA SKŁADNIA DEIKTYCZNO-TEMPORALNA I DEKOMPOZYCJA PRZYDAWKI CZASOWEJ (FILAR CLXVIII):
+    - KATEGORYCZNY ZAKAZ tworzenia sztucznych odprzysłówkowych przymiotników temporalnych w dialogach (np. 'pojutrzejszy', 'przedwczorajszy', 'w dzisiejszy wieczór', 'w jutrzejszy poranek', 'we wczorajszy wieczór', 'przyszłotygodniowy').
+    - Japońskie konstrukcje temporalne 'X no Y' (np. 明後日の宴 asatte no utage, 明日の朝 ashita no asa, 今日の夜 kyou no yoru) oraz angielskie fansuberskie przydawki czasu ('day-after-tomorrow\'s feast') w polszczyźnie mówionej ZAWSZE dekomponuj na naturalne frazy okolicznikowe:
+      * 'Chodzi o pojutrzejszą ucztę' -> KATEGORYCZNY BŁĄD! POPRAWNIE: 'Chodzi o ucztę pojutrze' / 'Chodzi o tę ucztę za dwa dni' / 'Chodzi o ucztę zaplanowaną na pojutrze'.
+      * 'pojutrzejsze spotkanie' -> 'spotkanie pojutrze' / 'spotkanie za dwa dni'.
+      * 'przedwczorajszy incydent / kłótnia' -> 'incydent sprzed dwóch dni / kłótnia sprzed dwóch dni'.
+      * 'w dzisiejszy wieczór' -> 'dziś wieczorem'; 'w jutrzejszy poranek' -> 'jutro rano'; 'we wczorajszy wieczór' -> 'wczoraj wieczorem'; 'w dzisiejszą noc' -> 'dziś w nocy'.
+      * 'przyszłotygodniowe zawody' -> 'zawody w przyszłym tygodniu'.
+    - W glosariuszu i osi czasu odcinka kategorycznie zakazuj wprowadzania terminów ze sztuczną przydawką temporalną.
+    - W mandatory_direction wymuś nadrzędność dramaturgii i japońskiego audio seiyū nad dosłownym skryptem angielskim.
+ 18. DYSCYPLINA SOCJOLEKTU, ZAKAZ WYCIEKU KSYWEK RÓWIEŚNICZYCH I MORFOLOGICZNY PRYMAT PŁCI POSTACI (FILAR CLXIX):
+    - SPEAKER-SCOPED HYPOCORISM GUARD: Specyficzne, slangowe zdrobnienia i ksywki nadawane przez pojedynczych rówieśników (np. gyaru Sachi Akafuku mówiąca 'Hikarun' do Hikaru Sekiryu, 'Tessie' do Teshimy) należą WYŁĄCZNIE do tej pary postaci!
+      * KATEGORYCZNY ZAKAZ przypisywania tych ksywek matce ('Hebichika'), ojcu, mentorom czy w retrospekcjach ('Flashback')!
+      * Gdy matka w audio mówi 'Hikaru-chan', polskim ekwiwalentem jest 'Hikaru', 'Córeczko' lub 'Hikaruś' (KARDYNALNY BŁĄD [X]: 'Hikarun, posłuchaj uważnie').
+    - INHERENT GENDER & 1ST-PERSON MORPHOLOGY: Nazwy mówców ze stylami ASS (np. 'Girl\\Italic', 'Woman') to potwierdzone postacie żeńskie!
+      * KATEGORYCZNY ZAKAZ stosowania męskich form czasowników 1. osoby czasu przeszłego ('zraniłem', 'zrobiłem', 'byłem') dla mówczyń żeńskich! Wymuszaj formy żeńskie: 'zraniłam', 'zrobiłam', 'byłam', 'powiedziałam'.
+    - W mandatory_direction wymuś nadrzędność dramaturgii i japońskiego audio seiyū nad dosłownym skryptem angielskim.
+ 19. ODWRÓCENIE HIERARCHII ŹRÓDEŁ (INVERSION OF AUTHORITY / SEIYU VOICE SOVEREIGNTY), HARMONIZACJA AISATSU, APOZYCJA TYTULATURY PODMIOTU I AKTY MOWY SEIYŪ (FILAR CLXX):
+    - INVERSION OF AUTHORITY (SEIYU VOICE SOVEREIGNTY): Głos seiyū jest PIERWOTNYM I NAJWYŻSZYM ŹRÓDŁEM PRAWDY (PIERWOTNE ŹRÓDŁO PRAWDY) semantycznej i emocjonalnej. Angielski skrypt fansubera jest jedynie wtórnym rusztowaniem czasowym! Kategoryczny zakaz powielania zamerykanizowanych parafraz fansubów, gdy stoją w sprzeczności ze słowami seiyū.
+    - PRAGMATIC SPEECH ACT CATEGORIES (AKTY MOWY SEIYŪ):
+      * Akty Irytacji i Uciszania (urusai, urusai na, urusee, ussee, damare, shizuka ni): wyrażają poirytowanie gadaniem lub natręctwem rozmówcy! KATEGORYCZNY ZAKAZ dryfu semantycznego ku zażenowaniu/wstydowi i młodzieżowemu slangowi ('Ale żenada...', 'przypał', 'obciach')! Wymuszaj naturalne polskie reakcje zniecierpliwienia: 'Ale marudzisz...', 'Daj mi spokój...', 'Nie truj...', 'Ale gadasz...', 'Ucisz się...'.
+      * Akty Znużenia i Ciężaru (mendokusai, yare yare, shouganai): zakaz dosłownego bólu fizycznego ('co za ból') czy obojętności ('nie obchodzi mnie to') na rzecz 'Ale mi się nie chce...', 'Co za męczarnia...', 'Trudno...'.
+      * Akty Dystansu i Emocjonalnego Odepchnięcia (betsuni, hitori ni shite): chłód i prośba o samotność ('Wcale nie', 'Zostaw mnie samą', zakaz 'To nic takiego').
+    - DOMESTIC AISATSU ADJACENCY DIALOGUE: W formułach powitań domowych (Tadaima -> Okaeri) KATEGORYCZNY ZAKAZ robotycznego echa czasownikowego ('Wróciłam.' -> BŁĄD: 'Wróciłaś.'). Wymuszaj naturalne polskie powitanie domowników: 'Wróciłam!' -> 'Witaj w domu!' / 'O, już jesteś?' / 'Dobrze, że jesteś!'.
+    - TITLE NOMINATIVE APPOSITION & JAPANESE NAME CAPITALIZATION: Przy zestawieniu tytułu mistrzowskiego/zawodowego z imieniem i nazwiskiem w podmiocie zdania ('Mistrz', 'Pan', 'Profesor' + Nazwisko + Imię + Czasownik 3. os.), nazwisko ZAWSZE pozostaje w mianowniku: 'Mistrz Tonden Minoru nie zdążył' (KARDYNALNY BŁĄD [X]: 'Mistrz Tondena minoru'). Każdy człon imienia i nazwiska bezwzględnie piszemy WIELKĄ LITERĄ ('Tonden Minoru', NIGDY małą 'minoru').
+    - W mandatory_direction wymuś nadrzędność dramaturgii i japońskiego audio seiyū nad dosłownym skryptem angielskim.
 
 METADANE Z BAZY ANILIST:
 {anime_metadata_str}

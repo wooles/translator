@@ -39,7 +39,8 @@
       "B": "Asystentkę",
       "N": "Asystentką",
       "Ms": "Asystentce",
-      "W": "Asystentko"
+      "W": "Asystentko",
+      "gender": "FEMALE"
     },
     "Kamui": {
       "M": "Kamui",
@@ -57,7 +58,8 @@
       "B": "Hanako ze Shimosunagawy",
       "N": "Hanako ze Shimosunagawy",
       "Ms": "Hanako ze Shimosunagawy",
-      "W": "Hanako ze Shimosunagawy"
+      "W": "Hanako ze Shimosunagawy",
+      "gender": "FEMALE"
     },
     "Asystentka -> Kamui": {
       "M": "Asystentka -> Kamui",
@@ -87,6 +89,7 @@
       "W": "Hanako ze Shimosunagawy -> Dziesięć Kwiatów (Rado Hanako)"
     }
   },
+  "hypocorisms": {},
   "plot_anchors": {},
   "episodes_translated": [
     "tmphi7hjotb"

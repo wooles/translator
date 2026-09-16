@@ -104,16 +104,64 @@ def split_subtitle_syntactically(text: str, max_line_len: int = MAX_LINE_LENGTH,
     normalized_content = re.sub(r"\\N|\\n|\n", " ", raw_content)
     normalized_content = re.sub(r"\s+", " ", normalized_content).strip()
 
-    # 2. AUTOMATIC 2-LINE FORMATTING FOR EPISODE/CHAPTER TITLE CARDS (Filar XCVIII)
+    # 1c. Sanitize chained bracket groups for signs (e.g. "[ A ] [ B ]" -> "A\NB" or "ODCINEK 10\NTYTUŁ 1\NTYTUŁ 2")
+    if is_positioned_sign and re.search(r"\]\s*\[", raw_content):
+        bracket_chunks = [re.sub(r"[\[\]]", "", c).strip() for c in re.split(r"\s*\]\s*\[\s*", raw_content) if c.strip()]
+        if len(bracket_chunks) > 1:
+            first_ep = re.match(r"^(ODCINEK|Odcinek|ROZDZIAŁ|Rozdział|AKT|Akt|CZĘŚĆ|Część|EPIZOD|Epizod)\s+(\d+|[IVXLCDM]+)$", bracket_chunks[0])
+            if first_ep:
+                ep_prefix = f"{first_ep.group(1)} {first_ep.group(2)}"
+                formatted_sub_chunks = []
+                for bc in bracket_chunks[1:]:
+                    bc_clean = re.sub(r"^[\s:–—\-]+", "", bc).strip()
+                    if len(clean_text_for_len(bc_clean)) > 45:
+                        formatted_sub_chunks.append(split_subtitle_syntactically(bc_clean, max_line_len=38, is_ass=is_ass, is_sign=True))
+                    elif bc_clean:
+                        formatted_sub_chunks.append(bc_clean)
+                return f"{ts_prefix}{ep_prefix}{sep}{sep.join(formatted_sub_chunks)}"
+            else:
+                formatted_sub_chunks = []
+                for bc in bracket_chunks:
+                    if len(clean_text_for_len(bc)) > max_line_len:
+                        formatted_sub_chunks.append(split_subtitle_syntactically(bc, max_line_len=max_line_len, is_ass=is_ass, is_sign=True))
+                    elif bc:
+                        formatted_sub_chunks.append(bc)
+                return f"{ts_prefix}{sep.join(formatted_sub_chunks)}"
+
+    # 2. AUTOMATIC FORMATTING FOR EPISODE/CHAPTER TITLE CARDS (Filar XCVIII)
     # E.g. "ODCINEK 53 STWORZYĆ OJCZYZNĘ" -> "ODCINEK 53\NSTWORZYĆ OJCZYZNĘ"
     # E.g. "ODCINEK 53: STWORZYĆ OJCZYZNĘ" -> "ODCINEK 53\NSTWORZYĆ OJCZYZNĘ"
     # E.g. "ROZDZIAŁ 12 NOWY POCZĄTEK" -> "ROZDZIAŁ 12\NNOWY POCZĄTEK"
-    ep_match = re.match(r"^(ODCINEK|Odcinek|ROZDZIAŁ|Rozdział|AKT|Akt|CZĘŚĆ|Część|EPIZOD|Epizod)\s+(\d+|[IVXLCDM]+)(?:\s*[:–-]\s*|\s+)(.+)$", normalized_content)
+    # E.g. "[ ODCINEK 10 ] [ DZIEWIĘĆDZIESIĄT PROCENT WSZYSTKIEGO TO CHŁAM ] [ BY POKONAĆ MAMĘ, POTRZEBUJĘ „PRZYJACIÓŁ” ]"
+    ep_match = re.match(r"^\[?\s*(ODCINEK|Odcinek|ROZDZIAŁ|Rozdział|AKT|Akt|CZĘŚĆ|Część|EPIZOD|Epizod)\s+(\d+|[IVXLCDM]+)\s*\]?(?:\s*[:–-]\s*|\s*\]\s*\[\s*|\s+)(.+)$", normalized_content)
     if ep_match:
         ep_prefix = f"{ep_match.group(1)} {ep_match.group(2)}"
         ep_title = ep_match.group(3).strip()
+        ep_title = re.sub(r"^[\s\]\[:–—\-]+", "", ep_title).strip()
+        ep_title = re.sub(r"[\s\]\[]+$", "", ep_title).strip()
         if ep_title:
-            return f"{ts_prefix}{ep_prefix}{sep}{ep_title}"
+            if re.search(r"\]\s*\[", ep_title):
+                raw_chunks = re.split(r"\s*\]\s*\[\s*", ep_title)
+            elif "\\N" in ep_title or "\n" in ep_title:
+                raw_chunks = re.split(r"\\N|\\n|\n", ep_title)
+            else:
+                raw_chunks = [ep_title]
+
+            clean_chunks = [re.sub(r"[\[\]]", "", c).strip() for c in raw_chunks if c.strip()]
+            formatted_chunks = []
+            target_limit = 45
+            for ch in clean_chunks:
+                ch_clean = re.sub(r"^[\s:–—\-]+", "", ch).strip()
+                if not ch_clean:
+                    continue
+                if len(clean_text_for_len(ch_clean)) > target_limit:
+                    sub_split = split_subtitle_syntactically(ch_clean, max_line_len=38, is_ass=is_ass, is_sign=True)
+                    formatted_chunks.append(sub_split)
+                else:
+                    formatted_chunks.append(ch_clean)
+
+            if formatted_chunks:
+                return f"{ts_prefix}{ep_prefix}{sep}{sep.join(formatted_chunks)}"
 
     clean_full = clean_text_for_len(normalized_content)
     if len(clean_full) <= max_line_len:
@@ -345,3 +393,47 @@ def format_diegetic_sound_wall(text: str, is_announcement: bool = False, is_radi
         return f"{{\\an8}}[ WIADOMOŚCI: {clean} ]"
 
     return text
+
+
+def split_subtitle_at_acoustic_pause(
+    text: str,
+    event_start_ms: int,
+    event_end_ms: int,
+    silence_intervals_ms: Optional[list] = None,
+    max_line_len: int = MAX_LINE_LENGTH,
+    is_ass: bool = True
+) -> str:
+    """
+    Acoustic Breath Splitter (AVT Standard):
+    Splits long subtitle line at the exact time offset of an intra-line silence/breath pause
+    detected by FFmpeg/Whisper, or falls back to syntactic line breaking.
+    """
+    if not text or len(clean_text_for_len(text)) <= max_line_len:
+        return text
+
+    if silence_intervals_ms:
+        duration = max(1, event_end_ms - event_start_ms)
+        for s_start, s_end in silence_intervals_ms:
+            # Check if silence interval lies in the interior of the line
+            if (event_start_ms + 300 <= s_start) and (s_end <= event_end_ms - 300):
+                rel_pos = (s_start - event_start_ms) / duration
+                clean = clean_text_for_len(text)
+                target_char_idx = int(len(clean) * rel_pos)
+                words = text.split()
+                cur_len = 0
+                best_split = None
+                best_dist = 9999
+                for i, w in enumerate(words[:-1]):
+                    cur_len += len(w) + 1
+                    dist = abs(cur_len - target_char_idx)
+                    if dist < best_dist:
+                        best_dist = dist
+                        best_split = i + 1
+                if best_split is not None:
+                    sep = "\\N" if is_ass else "\n"
+                    l1 = " ".join(words[:best_split]).strip()
+                    l2 = " ".join(words[best_split:]).strip()
+                    if len(clean_text_for_len(l1)) <= max_line_len + 8 and len(clean_text_for_len(l2)) <= max_line_len + 8:
+                        return f"{l1}{sep}{l2}"
+
+    return split_subtitle_syntactically(text, max_line_len=max_line_len, is_ass=is_ass)

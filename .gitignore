@@ -44,3 +44,9 @@ Thumbs.db
 # Google Cloud private keys
 gcp_key*
 *.json_key
+*.disabled
+
+# Test artifacts
+series_memory/*Test*
+series_memory/*test*
+
