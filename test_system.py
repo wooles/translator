@@ -6705,6 +6705,9 @@ def test_scored_attention_dispatcher_anti_shadowing():
     assert calculate_rule_tier("• [SKUP SIĘ NA: FILAR LIX - Metryzacja i Liczby]") == 10
     assert calculate_rule_tier("• [SKUP SIĘ NA: FILAR CXXXVII - Matryca Idiomów Mostowych]") == 10
     assert calculate_rule_tier("• [SKUP SIĘ NA: FILAR CLXIV - Bezwzględna Kontrola Ortografii]") == 10
+    assert calculate_rule_tier("• [SKUP SIĘ NA: FILAR CLXXV - Zgodność Rodzaju w Grupie Żeńskiej]") == 10
+    assert calculate_rule_tier("• [SKUP SIĘ NA: FILAR XCI - Fleksja Imion Obcych i Dopełniacz Dzierżawczy]") == 10
+    assert calculate_rule_tier("• [SKUP SIĘ NA: FILAR CLXIII - Morfologia Adresatywna 2. Osoby]") == 10
 
     # 3. Weryfikacja Anty-Shadowing (Paczka z płaczem, pytaniem, jednostkami i mówcą o określonej płci)
     batch_mixed = [{

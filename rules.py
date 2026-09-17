@@ -2373,7 +2373,7 @@ TIER_1_PILLARS = {
 
 TIER_3_PILLARS = {
     "LIX", "XXIV", "CXXXVII", "CXXXVIII", "XLI", "LVIII", "CLXIV", "CLXVII", "XVI", "XVII",
-    "XXXVII", "LXXVIII", "XCVIII"
+    "XXXVII", "LXXVIII", "XCVIII", "CLXXV", "CLXXIII", "CLXIII", "XCI"
 }
 
 def calculate_rule_tier(rule_text: str) -> int:
@@ -2392,7 +2392,7 @@ def calculate_rule_tier(rule_text: str) -> int:
         return TIER_SUPREME_AFFECT
     if any(k in lower for k in ["afekt", "seiyū", "seiyuu", "suspens", "prozodia", "pan/ty", "incognito"]):
         return TIER_DRAMA_AFFECT
-    if any(k in lower for k in ["metryzacja", "jednostek", "literówek", "ortografii", "plansz", "interfejs"]):
+    if any(k in lower for k in ["metryzacja", "jednostek", "literówek", "ortografii", "plansz", "interfejs", "morfologia", "fleksja", "dopełniacz", "podwójn"]):
         return TIER_LEXICAL_REALIA
     return TIER_DIALOGUE_FLOW
 
@@ -2783,9 +2783,8 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Op
     has_possessive = any(bool(re.search(r"\b[A-Z][a-z]+'s\b", it.get("en", ""))) or bool(re.search(r"\b(?:secrets?|sword|power|orders?|death|body|blood|will|life|shadow|tomb|castle|tower|realm|son|daughter|brother|father|mother)\s+of\s+[A-Z]", it.get("en", ""))) for it in batch_items)
     if has_possessive or any(w in combined_en for w in ["'s secrets", "'s sword", "'s power", "'s death", "'s life"]):
         focused_pillars.append(
-            "• [SKUP SIĘ NA: FILAR XCI - Żelazna Fleksja Imion Obcych/Fantasy i Dopełniacz Dzierżawczy]: "
-            "KATEGORYCZNY ZAKAZ pozostawiania obcych/fantasy imion w mianowniku (np. 'Drel\'s secrets' -> 'sekretów Drela' [BŁĄD KOSZMARNY: 'sekretów Drel']). "
-            "Imiona męskie na spółgłoskę bezwzględnie odmieniaj: Drel -> Drela, Gart -> Garta, Klen -> Klena."
+            "• [SKUP SIĘ NA: FILAR XCI - Fleksja Imion Obcych i Dopełniacz Dzierżawczy]: "
+            "Obce imiona męskie zakończone na spółgłoskę odmieniaj w dopełniaczu (Drel -> Drela, Gart -> Garta, Klen -> Klena, np. 'Drel's secrets' -> 'sekretów Drela')."
         )
 
     # 40. Asymetria zaimków 3. osoby i triangulacja płci (Filar XCVI)
@@ -3608,11 +3607,8 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Op
     )
     if has_1st_person_plural_female_trigger:
         focused_pillars.append(
-            "• [SKUP SIĘ NA: FILAR CLXXV - Morfologia 1. Osoby Liczby Mnogiej w Grupach Żeńskich]: "
-            "1. W scenach w 100% kobiecych 1. osoba liczby mnogiej BEZWZGLĘDNIE wymaga form niemęskoosobowych: "
-            "czasowniki na '-łyśmy' ('zrobiłyśmy', 'poszłyśmy', 'widziałyśmy', 'byłyśmy') - KATEGORYCZNY ZAKAZ form męskich na '-liśmy' ('zrobiliśmy', 'byliśmy')! "
-            "2. Tryb przypuszczający: '-łybyśmy' ('zrobiłybyśmy', 'byłybyśmy') - ZAKAZ '-libyśmy'. "
-            "3. Orzeczniki złożone i liczebniki podwójne: 'byłyśmy gotowe / pewne / same', 'my obie' (ZAKAZ: 'byliśmy gotowi', 'my obaj / oboje')."
+            "• [SKUP SIĘ NA: FILAR CLXXV - Zgodność Rodzaju w Grupie Żeńskiej]: "
+            "W dialogu prowadzonym wyłącznie przez kobiety stosuj naturalne formy żeńskie liczby mnogiej ('byłyśmy', 'poszłyśmy', 'my obie')."
         )
 
     if not focused_pillars:
