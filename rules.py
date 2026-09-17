@@ -2267,6 +2267,14 @@ KOMPLEKSOWY RDZEŃ PRZEKŁADU AUDIOWIZUALNEGO (CORE AVT CANON - BELCZYK, BARAŃC
 - KATEGORYCZNY ZAKAZ ulegania męskiemu tagowi aktora (np. 'Ögedei'), gdy kwestię na ekranie i w głośniku wymawia kobieta: wymóg bezwzględnego stosowania form żeńskich 1. osoby ('zamierzałam', 'chciałam', 'byłam').
 - W dialogu między kobietami adresat jest BEZWZGLĘDNIE żeński ('Wyglądasz na wzburzoną' - ZAKAZ męskiego 'wzburzonego').
 - Zakaz jąkania tokenów: powtórzenia wyrazu z kropką (np. 'odebrać.odebrać.') podlegają bezwzględnej eliminacji.
+
+8. MORFOLOGIA 1. OSOBY LICZBY MNOGIEJ W GRUPACH ŻEŃSKICH (FILAR CLXXV):
+- W scenach w 100% kobiecych (np. jurta kobiet, klub dziewcząt, zakonnice) lub gdy podmiot reprezentuje grupę kobiet, 1. osoba liczby mnogiej w języku polskim BEZWZGLĘDNIE wymaga form niemęskoosobowych:
+  * Czasowniki czasu przeszłego: końcówka '-łyśmy' (np. 'zrobiłyśmy', 'poszłyśmy', 'widziałyśmy', 'wiedziałyśmy', 'mogłyśmy', 'zaczęłyśmy', 'byłyśmy') - KATEGORYCZNY ZAKAZ MĘSKICH FORM '-liśmy' ('zrobiliśmy', 'byliśmy')!
+  * Czasowniki trybu przypuszczającego: końcówka '-łybyśmy' (np. 'zrobiłybyśmy', 'chciałybyśmy', 'byłybyśmy') - ZAKAZ '-libyśmy'!
+  * Orzeczniki złożone i imiesłowy: 'byłyśmy gotowe / pewne / same / zmuszone / zaskoczone' - ZAKAZ 'byliśmy gotowi / pewni / sami'!
+  * Liczebniki podwójne i zaimki: 'my obie', 'nas obie', 'my same' - ZAKAZ 'my obaj / my oboje'!
+- W scenach mieszanych (gdzie obecny jest choć jeden mężczyzna) zachowaj poprawną polską formę męskoosobową ('zrobiliśmy', 'byliśmy gotowi').
 """
 
 ACTIVE_AVT_CRAFT_CANON = r"""
@@ -3584,6 +3592,27 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Op
             "Gdy na ekranie i w audio kwestię wypowiada kobieta, KATEGORYCZNY ZAKAZ stosowania męskich form czasowników ('zamierzałem' -> NAKAZ: 'zamierzałam'), nawet jeśli fansuber błędnie otagował linię męskim imieniem (np. Ögedei). "
             "2. W dialogu między dwiema kobietami w zamkniętej przestrzeni adresat jest BEZWZGLĘDNIE żeński ('Wyglądasz na wzburzoną' - KATEGORYCZNY ZAKAZ męskiego 'wzburzonego'). "
             "3. Zabezpieczenie przed podwojeniem tokenów: zakaz jąkania wyrazów z interpunkcją na końcu zdań (np. 'odebrać.odebrać.')."
+        )
+
+    # 116. Morfologia 1. Osoby Liczby Mnogiej w Grupach Żeńskich (Filar CLXXV)
+    has_1st_person_plural_female_trigger = any(
+        (
+            any(w in str(item.get("speaker_voice", "")).lower() for w in ["żeńsk", "alt", "sopran", "ochrypł", "kobieta"]) or
+            any(w in str(item.get("notes", "")).lower() for w in ["scena kobieca", "grupa kobiet", "żeńsk"]) or
+            any(w in str(item.get("speaker", "")).lower() for w in ["fatima", "töregene", "boraqchin", "möge", "kuroe", "rinko", "chocola"])
+        ) and any(
+            re.search(r"\b(?:we|us|our|ourselves|we're|we've|we'll|we'd)\b", str(item.get("en", "")), re.IGNORECASE)
+            for item in batch_items
+        )
+        for item in batch_items
+    )
+    if has_1st_person_plural_female_trigger:
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CLXXV - Morfologia 1. Osoby Liczby Mnogiej w Grupach Żeńskich]: "
+            "1. W scenach w 100% kobiecych 1. osoba liczby mnogiej BEZWZGLĘDNIE wymaga form niemęskoosobowych: "
+            "czasowniki na '-łyśmy' ('zrobiłyśmy', 'poszłyśmy', 'widziałyśmy', 'byłyśmy') - KATEGORYCZNY ZAKAZ form męskich na '-liśmy' ('zrobiliśmy', 'byliśmy')! "
+            "2. Tryb przypuszczający: '-łybyśmy' ('zrobiłybyśmy', 'byłybyśmy') - ZAKAZ '-libyśmy'. "
+            "3. Orzeczniki złożone i liczebniki podwójne: 'byłyśmy gotowe / pewne / same', 'my obie' (ZAKAZ: 'byliśmy gotowi', 'my obaj / oboje')."
         )
 
     if not focused_pillars:

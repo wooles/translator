@@ -1902,6 +1902,180 @@ def convert_nonvirile_plural_to_virile(verb: str) -> Optional[str]:
 
     return res.capitalize() if verb[0].isupper() else res
 
+# 1st-person plural irregular past tense mappings (Filar CLXXV - 0.00 PLN)
+VIRILE_1ST_PL_IRREGULAR_TO_NONVIRILE: Dict[str, str] = {
+    "poszliśmy": "poszłyśmy",
+    "przyszliśmy": "przyszłyśmy",
+    "wyszliśmy": "wyszłyśmy",
+    "odeszliśmy": "odeszłyśmy",
+    "weszliśmy": "weszłyśmy",
+    "przeszliśmy": "przeszłyśmy",
+    "doszliśmy": "doszłyśmy",
+    "zeszliśmy": "zeszłyśmy",
+    "znaleźliśmy": "znalazłyśmy",
+    "odnaleźliśmy": "odnalazłyśmy",
+    "mogliśmy": "mogłyśmy",
+    "pomogliśmy": "pomogłyśmy",
+    "byliśmy": "byłyśmy",
+    "widzieliśmy": "widziałyśmy",
+    "słyszeliśmy": "słyszałyśmy",
+    "chcieliśmy": "chciałyśmy",
+    "wiedzieliśmy": "wiedziałyśmy",
+    "myśleliśmy": "myślałyśmy",
+    "powiedzieliśmy": "powiedziałyśmy",
+    "zrozumieliśmy": "zrozumiałyśmy",
+    "zapomnieliśmy": "zapomniałyśmy",
+    "musieliśmy": "musiałyśmy",
+    "mieliśmy": "miałyśmy",
+    "wzięliśmy": "wzięłyśmy",
+    "zaczęliśmy": "zaczęłyśmy",
+    "dopięliśmy": "dopięłyśmy",
+    "stanęliśmy": "stanęłyśmy",
+    "padliśmy": "padłyśmy",
+    "zjedliśmy": "zjadłyśmy",
+    "usiedliśmy": "usiadłyśmy",
+    "biegliśmy": "biegłyśmy",
+    "uciekliśmy": "uciekłyśmy",
+}
+
+NONVIRILE_1ST_PL_IRREGULAR_TO_VIRILE: Dict[str, str] = {
+    v: k for k, v in VIRILE_1ST_PL_IRREGULAR_TO_NONVIRILE.items()
+}
+
+VIRILE_1ST_PL_CONDITIONAL_IRREGULAR_TO_NONVIRILE: Dict[str, str] = {
+    "poszlibyśmy": "poszłybyśmy",
+    "przyszlibyśmy": "przyszłybyśmy",
+    "wyszlibyśmy": "wyszłybyśmy",
+    "odeszlibyśmy": "odeszłybyśmy",
+    "weszlibyśmy": "weszłybyśmy",
+    "przeszlibyśmy": "przeszłybyśmy",
+    "znaleźlibyśmy": "znalazłybyśmy",
+    "moglibyśmy": "mogłybyśmy",
+    "pomoglibyśmy": "pomogłybyśmy",
+    "bylibyśmy": "byłybyśmy",
+    "widzielibyśmy": "widziałybyśmy",
+    "chcielibyśmy": "chciałybyśmy",
+    "wolelibyśmy": "wolałybyśmy",
+    "wiedzielibyśmy": "wiedziałybyśmy",
+    "myślelibyśmy": "myślałybyśmy",
+    "musielibyśmy": "musiałybyśmy",
+    "mielibyśmy": "miałybyśmy",
+    "wzięlibyśmy": "wzięłybyśmy",
+    "zaczęlibyśmy": "zaczęłybyśmy",
+}
+
+NONVIRILE_1ST_PL_CONDITIONAL_IRREGULAR_TO_VIRILE: Dict[str, str] = {
+    v: k for k, v in VIRILE_1ST_PL_CONDITIONAL_IRREGULAR_TO_NONVIRILE.items()
+}
+
+def convert_1st_person_plural_virile_to_nonvirile(verb: str) -> Optional[str]:
+    v_lower = verb.lower()
+    if v_lower in VIRILE_1ST_PL_IRREGULAR_TO_NONVIRILE:
+        res = VIRILE_1ST_PL_IRREGULAR_TO_NONVIRILE[v_lower]
+        return res.capitalize() if verb[0].isupper() else res
+
+    if v_lower.endswith("agliśmy"):
+        res = v_lower[:-7] + "agłyśmy"
+    elif v_lower.endswith("egliśmy"):
+        res = v_lower[:-7] + "egłyśmy"
+    elif v_lower.endswith("ogliśmy"):
+        res = v_lower[:-7] + "ogłyśmy"
+    elif v_lower.endswith("szliśmy"):
+        res = v_lower[:-7] + "szłyśmy"
+    elif v_lower.endswith("ieliśmy"):
+        res = v_lower[:-7] + "iałyśmy"
+    elif v_lower.endswith("aliśmy"):
+        res = v_lower[:-6] + "ałyśmy"
+    elif v_lower.endswith("iliśmy"):
+        res = v_lower[:-6] + "iłyśmy"
+    elif v_lower.endswith("yliśmy"):
+        res = v_lower[:-6] + "yłyśmy"
+    elif v_lower.endswith("ęliśmy"):
+        res = v_lower[:-6] + "ęłyśmy"
+    elif v_lower.endswith("liśmy"):
+        res = v_lower[:-5] + "łyśmy"
+    else:
+        return None
+
+    return res.capitalize() if verb[0].isupper() else res
+
+def convert_1st_person_plural_nonvirile_to_virile(verb: str) -> Optional[str]:
+    v_lower = verb.lower()
+    if v_lower in NONVIRILE_1ST_PL_IRREGULAR_TO_VIRILE:
+        res = NONVIRILE_1ST_PL_IRREGULAR_TO_VIRILE[v_lower]
+        return res.capitalize() if verb[0].isupper() else res
+
+    if v_lower.endswith("agłyśmy"):
+        res = v_lower[:-7] + "agliśmy"
+    elif v_lower.endswith("egłyśmy"):
+        res = v_lower[:-7] + "egliśmy"
+    elif v_lower.endswith("ogłyśmy"):
+        res = v_lower[:-7] + "ogliśmy"
+    elif v_lower.endswith("szłyśmy"):
+        res = v_lower[:-7] + "szliśmy"
+    elif v_lower.endswith("iałyśmy"):
+        res = v_lower[:-7] + "ieliśmy"
+    elif v_lower.endswith("ałyśmy"):
+        res = v_lower[:-6] + "aliśmy"
+    elif v_lower.endswith("iłyśmy"):
+        res = v_lower[:-6] + "iliśmy"
+    elif v_lower.endswith("yłyśmy"):
+        res = v_lower[:-6] + "yliśmy"
+    elif v_lower.endswith("ęłyśmy"):
+        res = v_lower[:-6] + "ęliśmy"
+    elif v_lower.endswith("łyśmy"):
+        res = v_lower[:-5] + "liśmy"
+    else:
+        return None
+
+    return res.capitalize() if verb[0].isupper() else res
+
+def convert_1st_person_plural_conditional_virile_to_nonvirile(verb: str) -> Optional[str]:
+    v_lower = verb.lower()
+    if v_lower in VIRILE_1ST_PL_CONDITIONAL_IRREGULAR_TO_NONVIRILE:
+        res = VIRILE_1ST_PL_CONDITIONAL_IRREGULAR_TO_NONVIRILE[v_lower]
+        return res.capitalize() if verb[0].isupper() else res
+
+    if v_lower.endswith("alibyśmy"):
+        res = v_lower[:-8] + "ałybyśmy"
+    elif v_lower.endswith("ilibyśmy"):
+        res = v_lower[:-8] + "iłybyśmy"
+    elif v_lower.endswith("ylibyśmy"):
+        res = v_lower[:-8] + "yłybyśmy"
+    elif v_lower.endswith("ielibyśmy"):
+        res = v_lower[:-9] + "iałybyśmy"
+    elif v_lower.endswith("ęlibyśmy"):
+        res = v_lower[:-8] + "ęłybyśmy"
+    elif v_lower.endswith("libyśmy"):
+        res = v_lower[:-7] + "łybyśmy"
+    else:
+        return None
+
+    return res.capitalize() if verb[0].isupper() else res
+
+def convert_1st_person_plural_conditional_nonvirile_to_virile(verb: str) -> Optional[str]:
+    v_lower = verb.lower()
+    if v_lower in NONVIRILE_1ST_PL_CONDITIONAL_IRREGULAR_TO_VIRILE:
+        res = NONVIRILE_1ST_PL_CONDITIONAL_IRREGULAR_TO_VIRILE[v_lower]
+        return res.capitalize() if verb[0].isupper() else res
+
+    if v_lower.endswith("ałybyśmy"):
+        res = v_lower[:-8] + "alibyśmy"
+    elif v_lower.endswith("iłybyśmy"):
+        res = v_lower[:-8] + "ilibyśmy"
+    elif v_lower.endswith("yłybyśmy"):
+        res = v_lower[:-8] + "ylibyśmy"
+    elif v_lower.endswith("iałybyśmy"):
+        res = v_lower[:-9] + "ielibyśmy"
+    elif v_lower.endswith("ęłybyśmy"):
+        res = v_lower[:-8] + "ęlibyśmy"
+    elif v_lower.endswith("łybyśmy"):
+        res = v_lower[:-7] + "libyśmy"
+    else:
+        return None
+
+    return res.capitalize() if verb[0].isupper() else res
+
 MASCULINE_2ND_SG_IRREGULAR_TO_FEMININE: Dict[str, str] = {
     "poszedłeś": "poszłaś",
     "przyszedłeś": "przyszłaś",
@@ -2166,6 +2340,10 @@ class EpisodeQualityGate:
 
         fixes: List[str] = []
         events = subs.events
+        orig_speakers: Dict[int, str] = {
+            idx_ev: (getattr(ev_item, "name", "") or getattr(ev_item, "actor", "") or getattr(ev_item, "speaker", "") or (line_speakers.get(idx_ev) if line_speakers else "") or "")
+            for idx_ev, ev_item in enumerate(events)
+        }
 
         # Step 0: Episode-Wide Character Gender Knowledge Base (Filar CLXII)
         CANONICAL_MALE_NAMES_ON_A = {
@@ -2600,7 +2778,12 @@ class EpisodeQualityGate:
                     elif all_m:
                         s_gender = "MALE"
 
-            # 2. If no named speakers (all ev.name blank in scene), infer from textual content / plot anchors
+            # 2. If a female group speaker (e.g. 'grupa_kobiet', 'zakonnice') is in the scene
+            if not s_gender and series_bible and hasattr(series_bible, "is_female_group_speaker"):
+                if any(series_bible.is_female_group_speaker(orig_speakers.get(s_idx, "")) for s_idx in s_block):
+                    s_gender = "FEMALE"
+
+            # 3. If no named speakers (all ev.name blank in scene), infer from textual content / plot anchors
             if not s_gender and series_bible and hasattr(series_bible, "infer_scene_cast_from_text"):
                 scene_whisper = [whisper_transcriptions.get(s_idx + 1, "") for s_idx in s_block if whisper_transcriptions]
                 _, inferred_g = series_bible.infer_scene_cast_from_text(scene_texts, whisper_texts=scene_whisper)
@@ -3785,6 +3968,103 @@ class EpisodeQualityGate:
                                 repl_word = adj_stem + "ego"
                                 ev.text = re.sub(rf"\b{re.escape(prefix)}\s+{re.escape(adj_stem)}ą\b", f"{prefix} {repl_word}", ev.text, count=1)
                                 fixes.append(f"[Episode Quality Gate - Filar CLVII/CLXIII Orzecznik Przymiotnikowy Męski] Linia #{i+1}: skorygowano '{prefix} {adj_stem}ą' -> '{prefix} {repl_word}' (adresat: mężczyzna)")
+
+            # 3c-6. 1ST-PERSON PLURAL FEMININE GROUP AGREEMENT (Filar CLXXV - 0.00 PLN)
+            if not is_sign:
+                is_female_scene_1pl = (event_scene_gender.get(i) == "FEMALE")
+                is_male_scene_1pl = (event_scene_gender.get(i) == "MALE")
+                spk_orig = orig_speakers.get(i, "") or getattr(ev, "name", "") or getattr(ev, "actor", "")
+                if not is_female_scene_1pl and series_bible and hasattr(series_bible, "is_female_group_speaker"):
+                    is_female_scene_1pl = series_bible.is_female_group_speaker(spk_orig)
+
+                if is_female_scene_1pl:
+                    # 1. Convert virile 1st-person plural past tense verbs (-liśmy -> -łyśmy)
+                    for m in list(re.finditer(r"\b([A-Za-ząćęłńóśźż]+liśmy)\b", ev.text)):
+                        v_virile = m.group(1)
+                        v_nonvirile = convert_1st_person_plural_virile_to_nonvirile(v_virile)
+                        if v_nonvirile and v_nonvirile.lower() != v_virile.lower():
+                            ev.text = re.sub(rf"\b{re.escape(v_virile)}\b", v_nonvirile, ev.text, count=1)
+                            fixes.append(f"[Episode Quality Gate - Filar CLXXV Morfologia Niemęskoosobowa 1. os. lm.] Linia #{i+1}: skorygowano formę męskoosobową '{v_virile}' -> '{v_nonvirile}' (scena kobieca)")
+
+                    # 2. Convert virile 1st-person plural conditional verbs (-libyśmy -> -łybyśmy)
+                    for m in list(re.finditer(r"\b([A-Za-ząćęłńóśźż]+libyśmy)\b", ev.text)):
+                        v_virile = m.group(1)
+                        v_nonvirile = convert_1st_person_plural_conditional_virile_to_nonvirile(v_virile)
+                        if v_nonvirile and v_nonvirile.lower() != v_virile.lower():
+                            ev.text = re.sub(rf"\b{re.escape(v_virile)}\b", v_nonvirile, ev.text, count=1)
+                            fixes.append(f"[Episode Quality Gate - Filar CLXXV Tryb Przypuszczający 1. os. lm.] Linia #{i+1}: skorygowano '{v_virile}' -> '{v_nonvirile}' (scena kobieca)")
+
+                    # 3. Convert virile compound predicates and adjectives
+                    for v_adj, nv_adj in VIRILE_ADJECTIVES_TO_NONVIRILE.items():
+                        pat_pred = rf"\b((?:byliśmy|byłyśmy|bylibyśmy|byłybyśmy|jesteśmy|zostaliśmy|zostałyśmy|czujemy\s+się)\s+)({re.escape(v_adj)})\b"
+                        for m in list(re.finditer(pat_pred, ev.text, re.IGNORECASE)):
+                            prefix = m.group(1)
+                            old_adj = m.group(2)
+                            repl_adj = nv_adj.capitalize() if old_adj[0].isupper() else nv_adj
+                            new_prefix = re.sub(r"\bbyliśmy\b", "byłyśmy", prefix, flags=re.IGNORECASE)
+                            new_prefix = re.sub(r"\bbylibyśmy\b", "byłybyśmy", new_prefix, flags=re.IGNORECASE)
+                            new_prefix = re.sub(r"\bzostaliśmy\b", "zostałyśmy", new_prefix, flags=re.IGNORECASE)
+                            ev.text = re.sub(rf"\b{re.escape(prefix)}{re.escape(old_adj)}\b", f"{new_prefix}{repl_adj}", ev.text, count=1)
+                            fixes.append(f"[Episode Quality Gate - Filar CLXXV Orzecznik Niemęskoosobowy 1. os. lm.] Linia #{i+1}: skorygowano '{prefix}{old_adj}' -> '{new_prefix}{repl_adj}' (scena kobieca)")
+
+                    # 4. Numerals and pronouns (1st-person plural requires 'my')
+                    def _repl_my_dual(m):
+                        is_cap = m.group(1).startswith("M")
+                        repl = "My obie" if is_cap else "my obie"
+                        fixes.append(f"[Episode Quality Gate - Filar CLXXV Liczebnik Podwójny 1. os. lm.] Linia #{i+1}: skorygowano '{m.group(0)}' -> '{repl}' (scena kobieca)")
+                        return repl
+                    ev.text = re.sub(r"\b([Mm]y\s+)(?:obaj|oboje)\b", _repl_my_dual, ev.text)
+
+                    def _repl_my_same(m):
+                        is_cap = m.group(1).startswith("M")
+                        repl = "My same" if is_cap else "my same"
+                        fixes.append(f"[Episode Quality Gate - Filar CLXXV Zaimek Niemęskoosobowy 1. os. lm.] Linia #{i+1}: skorygowano '{m.group(0)}' -> '{repl}' (scena kobieca)")
+                        return repl
+                    ev.text = re.sub(r"\b([Mm]y\s+)sami\b", _repl_my_same, ev.text)
+
+                elif is_male_scene_1pl:
+                    # Symmetrical check for male scenes: convert non-virile 1st-person plural -> virile
+                    for m in list(re.finditer(r"\b([A-Za-ząćęłńóśźż]+łyśmy)\b", ev.text)):
+                        v_nonvirile = m.group(1)
+                        v_virile = convert_1st_person_plural_nonvirile_to_virile(v_nonvirile)
+                        if v_virile and v_virile.lower() != v_nonvirile.lower():
+                            ev.text = re.sub(rf"\b{re.escape(v_nonvirile)}\b", v_virile, ev.text, count=1)
+                            fixes.append(f"[Episode Quality Gate - Filar CLXXV Morfologia Męskoosobowa 1. os. lm.] Linia #{i+1}: skorygowano formę niemęskoosobową '{v_nonvirile}' -> '{v_virile}' (scena męska)")
+
+                    for m in list(re.finditer(r"\b([A-Za-ząćęłńóśźż]+łybyśmy)\b", ev.text)):
+                        v_nonvirile = m.group(1)
+                        v_virile = convert_1st_person_plural_conditional_nonvirile_to_virile(v_nonvirile)
+                        if v_virile and v_virile.lower() != v_nonvirile.lower():
+                            ev.text = re.sub(rf"\b{re.escape(v_nonvirile)}\b", v_virile, ev.text, count=1)
+                            fixes.append(f"[Episode Quality Gate - Filar CLXXV Tryb Przypuszczający 1. os. lm.] Linia #{i+1}: skorygowano '{v_nonvirile}' -> '{v_virile}' (scena męska)")
+
+                    # Convert non-virile compound predicates and adjectives
+                    for nv_adj, v_adj in NONVIRILE_ADJECTIVES_TO_VIRILE.items():
+                        pat_pred = rf"\b((?:byłyśmy|byliśmy|byłybyśmy|bylibyśmy|jesteśmy|zostałyśmy|zostaliśmy|czujemy\s+się)\s+)({re.escape(nv_adj)})\b"
+                        for m in list(re.finditer(pat_pred, ev.text, re.IGNORECASE)):
+                            prefix = m.group(1)
+                            old_adj = m.group(2)
+                            repl_adj = v_adj.capitalize() if old_adj[0].isupper() else v_adj
+                            new_prefix = re.sub(r"\bbyłyśmy\b", "byliśmy", prefix, flags=re.IGNORECASE)
+                            new_prefix = re.sub(r"\bbyłybyśmy\b", "bylibyśmy", new_prefix, flags=re.IGNORECASE)
+                            new_prefix = re.sub(r"\bzostałyśmy\b", "zostaliśmy", new_prefix, flags=re.IGNORECASE)
+                            ev.text = re.sub(rf"\b{re.escape(prefix)}{re.escape(old_adj)}\b", f"{new_prefix}{repl_adj}", ev.text, count=1)
+                            fixes.append(f"[Episode Quality Gate - Filar CLXXV Orzecznik Męskoosobowy 1. os. lm.] Linia #{i+1}: skorygowano '{prefix}{old_adj}' -> '{new_prefix}{repl_adj}' (scena męska)")
+
+                    # Numerals and pronouns (1st-person plural requires 'my')
+                    def _repl_my_dual_m(m):
+                        is_cap = m.group(1).startswith("M")
+                        repl = "My obaj" if is_cap else "my obaj"
+                        fixes.append(f"[Episode Quality Gate - Filar CLXXV Liczebnik Podwójny 1. os. lm.] Linia #{i+1}: skorygowano '{m.group(0)}' -> '{repl}' (scena męska)")
+                        return repl
+                    ev.text = re.sub(r"\b([Mm]y\s+)obie\b", _repl_my_dual_m, ev.text)
+
+                    def _repl_my_sami_m(m):
+                        is_cap = m.group(1).startswith("M")
+                        repl = "My sami" if is_cap else "my sami"
+                        fixes.append(f"[Episode Quality Gate - Filar CLXXV Zaimek Męskoosobowy 1. os. lm.] Linia #{i+1}: skorygowano '{m.group(0)}' -> '{repl}' (scena męska)")
+                        return repl
+                    ev.text = re.sub(r"\b([Mm]y\s+)same\b", _repl_my_sami_m, ev.text)
 
             # 3c-5. WHISPER DETERMINISTIC DISAMBIGUATION INTEGRITY (K1-K8 - 0.00 PLN)
             if not is_sign:

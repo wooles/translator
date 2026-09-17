@@ -1171,6 +1171,21 @@ class SeriesBible:
             return False
         return all(self.get_character_gender(c, allow_generic_nouns=False) == "MALE" for c in named)
 
+    def is_female_group_speaker(self, speaker_name: str) -> bool:
+        """
+        Returns True if the speaker label or category represents a confirmed female group
+        (e.g. 'grupa_kobiet', 'zakonnice', 'dziewczęta', 'uczennice', 'służące', 'kobiety', 'matki').
+        """
+        if not speaker_name:
+            return False
+        spk_clean = extract_clean_speaker_name(speaker_name).strip().lower()
+        if any(w in spk_clean for w in [
+            "grupa_kobiet", "grupa kobiet", "dziewczęta", "dziewczyny", "kobiety",
+            "uczennice", "kapłanki", "zakonnice", "służące", "siostry", "matki", "damy dworu"
+        ]):
+            return True
+        return False
+
     def infer_scene_cast_from_text(self, scene_texts: List[str], whisper_texts: Optional[List[str]] = None) -> Tuple[Set[str], Optional[str]]:
         """
         Scans dialogue lines within an anonymous scene (where ev.name is blank) for character mentions,

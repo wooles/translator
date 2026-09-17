@@ -8112,6 +8112,111 @@ def test_acoustic_primacy_and_contaminated_metadata_guard():
     print(" -> PASSED: Filar CLXXIV (Prymat Sygnału Akustycznego, Sanacja Skażonych Tagów Fansubów i Eliminacja Jąkania) działa w 100% (0.00 PLN).")
 
 
+def test_first_person_plural_feminine_group_concordance_guard():
+    print("[TEST 97/97] Test Zgodności 1. Osoby Liczby Mnogiej w Grupach Żeńskich (Filar CLXXV - 0.00 PLN)...")
+    import pysubs2
+    from pathlib import Path
+    import tempfile
+    from series_memory import SeriesBible
+    from rules import get_focused_rules_for_batch
+    from avt_linter import (
+        EpisodeQualityGate,
+        convert_1st_person_plural_virile_to_nonvirile,
+        convert_1st_person_plural_nonvirile_to_virile,
+        convert_1st_person_plural_conditional_virile_to_nonvirile,
+        convert_1st_person_plural_conditional_nonvirile_to_virile,
+    )
+
+    # Asercja 1: Deterministyczna konwersja nieregularnych i regularnych form czasu przeszłego 1. os. lm.
+    assert convert_1st_person_plural_virile_to_nonvirile("poszliśmy") == "poszłyśmy"
+    assert convert_1st_person_plural_virile_to_nonvirile("przyszliśmy") == "przyszłyśmy"
+    assert convert_1st_person_plural_virile_to_nonvirile("widzieliśmy") == "widziałyśmy"
+    assert convert_1st_person_plural_virile_to_nonvirile("mogliśmy") == "mogłyśmy"
+    assert convert_1st_person_plural_virile_to_nonvirile("byliśmy") == "byłyśmy"
+    assert convert_1st_person_plural_virile_to_nonvirile("znaleźliśmy") == "znalazłyśmy"
+    assert convert_1st_person_plural_virile_to_nonvirile("zrobiliśmy") == "zrobiłyśmy"
+    assert convert_1st_person_plural_virile_to_nonvirile("Poszliśmy") == "Poszłyśmy"
+
+    # Odwrotnie: niemęskoosobowy -> męskoosobowy
+    assert convert_1st_person_plural_nonvirile_to_virile("poszłyśmy") == "poszliśmy"
+    assert convert_1st_person_plural_nonvirile_to_virile("widziałyśmy") == "widzieliśmy"
+    assert convert_1st_person_plural_nonvirile_to_virile("byłyśmy") == "byliśmy"
+    assert convert_1st_person_plural_nonvirile_to_virile("zrobiłyśmy") == "zrobiliśmy"
+
+    # Asercja 2: Tryb przypuszczający 1. os. lm. (-libyśmy <-> -łybyśmy)
+    assert convert_1st_person_plural_conditional_virile_to_nonvirile("poszlibyśmy") == "poszłybyśmy"
+    assert convert_1st_person_plural_conditional_virile_to_nonvirile("bylibyśmy") == "byłybyśmy"
+    assert convert_1st_person_plural_conditional_virile_to_nonvirile("zrobilibyśmy") == "zrobiłybyśmy"
+    assert convert_1st_person_plural_conditional_virile_to_nonvirile("chcielibyśmy") == "chciałybyśmy"
+    assert convert_1st_person_plural_conditional_nonvirile_to_virile("poszłybyśmy") == "poszlibyśmy"
+    assert convert_1st_person_plural_conditional_nonvirile_to_virile("byłybyśmy") == "bylibyśmy"
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        bible = SeriesBible("TestPlural1stPerson", storage_dir=Path(tmpdir))
+        bible.data["characters"]["Boraqchin"] = "Kobieta, żona Chana"
+        bible.data["characters"]["Möge"] = "Kobieta, żona Chana"
+        bible.data["characters"]["Ögedei"] = "Mężczyzna, Wielki Chan"
+        bible.data["characters"]["Chagatai"] = "Mężczyzna, chan"
+
+        # Asercja 3: SeriesBible wykrywanie mówców zbiorowych żeńskich
+        assert bible.is_female_group_speaker("grupa_kobiet") is True
+        assert bible.is_female_group_speaker("zakonnice") is True
+        assert bible.is_female_group_speaker("dziewczęta") is True
+        assert bible.is_female_group_speaker("Ögedei") is False
+        assert bible.is_female_group_speaker("") is False
+
+        # Asercja 4: EpisodeQualityGate w scenie w 100% kobiecej (Boraqchin & Möge)
+        subs_fem = pysubs2.SSAFile()
+        subs_fem.events.extend([
+            pysubs2.SSAEvent(start=1000, end=3000, name="Boraqchin", text="Byliśmy gotowi i poszliśmy tam, bo widzieliśmy to na własne oczy."),
+            pysubs2.SSAEvent(start=4000, end=6000, name="Möge", text="My oboje musimy uciekać, zanim zostaniemy pojmani."),
+            pysubs2.SSAEvent(start=7000, end=9000, name="Boraqchin", text="Gdybyśmy mogły, poszlibyśmy tam od razu.")
+        ])
+        fixed_fem, fixes_fem = EpisodeQualityGate.audit_and_fix_entire_episode(subs_fem, series_bible=bible)
+        assert fixed_fem.events[0].text == "Byłyśmy gotowe i poszłyśmy tam, bo widziałyśmy to na własne oczy.", f"Fem 0 mismatch: {fixed_fem.events[0].text}"
+        assert "My obie" in fixed_fem.events[1].text, f"Fem 1 mismatch: {fixed_fem.events[1].text}"
+        assert "poszłybyśmy" in fixed_fem.events[2].text, f"Fem 2 conditional mismatch: {fixed_fem.events[2].text}"
+        assert any("Filar CLXXV Morfologia Niemęskoosobowa 1. os. lm." in f for f in fixes_fem)
+        assert any("Filar CLXXV Orzecznik Niemęskoosobowy 1. os. lm." in f for f in fixes_fem)
+
+        # Asercja 5: Symetria w scenie wyłącznie męskiej (Ögedei & Chagatai)
+        subs_male = pysubs2.SSAFile()
+        subs_male.events.extend([
+            pysubs2.SSAEvent(start=1000, end=3000, name="Ögedei", text="Byłyśmy gotowe i poszłyśmy tam."),
+            pysubs2.SSAEvent(start=4000, end=6000, name="Chagatai", text="Zrobiłybyśmy to bez wahania.")
+        ])
+        fixed_male, fixes_male = EpisodeQualityGate.audit_and_fix_entire_episode(subs_male, series_bible=bible)
+        assert fixed_male.events[0].text == "Byliśmy gotowi i poszliśmy tam.", f"Male 0 mismatch: {fixed_male.events[0].text}"
+        assert "Zrobilibyśmy" in fixed_male.events[1].text, f"Male 1 mismatch: {fixed_male.events[1].text}"
+        assert any("Filar CLXXV Morfologia Męskoosobowa 1. os. lm." in f for f in fixes_male)
+
+        # Asercja 6: Ochrona grup mieszanych (kobieta + mężczyzna -> gramatyka nakazuje formę męskoosobową)
+        subs_mixed = pysubs2.SSAFile()
+        subs_mixed.events.extend([
+            pysubs2.SSAEvent(start=1000, end=3000, name="Boraqchin", text="Byliśmy gotowi i poszliśmy tam razem."),
+            pysubs2.SSAEvent(start=4000, end=6000, name="Ögedei", text="Wiedzieliśmy, że tak się stanie.")
+        ])
+        fixed_mixed, fixes_mixed = EpisodeQualityGate.audit_and_fix_entire_episode(subs_mixed, series_bible=bible)
+        assert fixed_mixed.events[0].text == "Byliśmy gotowi i poszliśmy tam razem.", f"Mixed 0 altered: {fixed_mixed.events[0].text}"
+        assert fixed_mixed.events[1].text == "Wiedzieliśmy, że tak się stanie.", f"Mixed 1 altered: {fixed_mixed.events[1].text}"
+
+        # Asercja 7: Grupa kobieca jako pojedynczy mówca kategorii (np. 'grupa_kobiet')
+        subs_grp = pysubs2.SSAFile()
+        subs_grp.events.append(
+            pysubs2.SSAEvent(start=1000, end=3000, name="grupa_kobiet", text="Byliśmy pewni, że nas ocalicie.")
+        )
+        fixed_grp, fixes_grp = EpisodeQualityGate.audit_and_fix_entire_episode(subs_grp, series_bible=bible)
+        assert fixed_grp.events[0].text == "Byłyśmy pewne, że nas ocalicie.", f"Group speaker mismatch: {fixed_grp.events[0].text}"
+
+    # Asercja 8: Dynamic Rule Dispatcher aktywuje Filar CLXXV dla zaimków 1. os. lm. w kontekście żeńskim
+    prompt_f = get_focused_rules_for_batch([
+        {"speaker_voice": "kobieta, sopran", "en": "We were not ready, but we went anyway."}
+    ])
+    assert "FILAR CLXXV" in prompt_f, "Filar CLXXV must trigger for female voice with 1st person plural pronoun"
+
+    print(" -> PASSED: Filar CLXXV (Zgodność Morfologiczna 1. Osoby Liczby Mnogiej w Grupach Żeńskich) działa w 100% (0.00 PLN).")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -8207,7 +8312,8 @@ if __name__ == "__main__":
     test_holistic_unburdened_metadata_ffmpeg_whisper_and_anti_guessing_pipeline()
     test_holistic_whisper_and_ffmpeg_telemetry_reserves_guard()
     test_acoustic_primacy_and_contaminated_metadata_guard()
-    print("\n Wszystkie testy jednostkowe i integracyjne (96/96) zakończone pełnym sukcesem!\n")
+    test_first_person_plural_feminine_group_concordance_guard()
+    print("\n Wszystkie testy jednostkowe i integracyjne (97/97) zakończone pełnym sukcesem!\n")
 
 
 
