@@ -2275,6 +2275,15 @@ KOMPLEKSOWY RDZEŃ PRZEKŁADU AUDIOWIZUALNEGO (CORE AVT CANON - BELCZYK, BARAŃC
   * Orzeczniki złożone i imiesłowy: 'byłyśmy gotowe / pewne / same / zmuszone / zaskoczone' - ZAKAZ 'byliśmy gotowi / pewni / sami'!
   * Liczebniki podwójne i zaimki: 'my obie', 'nas obie', 'my same' - ZAKAZ 'my obaj / my oboje'!
 - W scenach mieszanych (gdzie obecny jest choć jeden mężczyzna) zachowaj poprawną polską formę męskoosobową ('zrobiliśmy', 'byliśmy gotowi').
+
+9. INTEGRALNOŚĆ TOŻSAMOŚCI PODMIOTOWEJ MÓWCY, BYTÓW KOLEKTYWNYCH I PLURALIS MAIESTATIS (FILAR CLXXVI):
+- Byty Zbiorowe o Składzie Mieszanym (np. Louis Arneb w Re:Zero reprezentująca rodzeństwo Żarłoczności z braćmi Leyem i Royem; symbioty i byty mnogie):
+  * Mówca zachowuje męskoosobowość swojego kolektywu w 1. os. l. mn. ('chcieliśmy', 'byliśmy głodni', 'zjedliśmy'), nawet jeśli fizycznym awatarem w kadrze jest kobieta, a cała scena montażowa składa się z samych kobiet. KATEGORYCZNY ZAKAZ fałszywego sprowadzania do rodzaju niemęskoosobowego ('chciałyśmy').
+- Pluralis Maiestatis (Majestatyczne 'My' Monarchy):
+  * Monarchini żeńska (królowa, cesarzowa) posługująca się liczbą mnogą wymaga form niemęskoosobowych ('postanowiłyśmy', 'byłyśmy zmuszone', 'wybaczamy wam'), nawet w scenach z mężczyznami.
+  * Monarcha męski (król, cesarz) stosuje formy męskoosobowe ('postanowiliśmy', 'byliśmy surowi').
+- Fałszywa Liczba Mnoga w Solilokwium:
+  * W monologach i rozważaniach samotnego bohatera w pustym kadrze eliminuj bezrefleksyjne kalki angielskiego 'we' / 'let's' ('Let's see...' -> 'Pora sprawdzić...' / 'No to zobaczmy...', 'We made it!' -> 'Udało mi się!').
 """
 
 ACTIVE_AVT_CRAFT_CANON = r"""
@@ -2373,7 +2382,7 @@ TIER_1_PILLARS = {
 
 TIER_3_PILLARS = {
     "LIX", "XXIV", "CXXXVII", "CXXXVIII", "XLI", "LVIII", "CLXIV", "CLXVII", "XVI", "XVII",
-    "XXXVII", "LXXVIII", "XCVIII", "CLXXV", "CLXXIII", "CLXIII", "XCI"
+    "XXXVII", "LXXVIII", "XCVIII", "CLXXV", "CLXXVI", "CLXXIII", "CLXIII", "XCI"
 }
 
 def calculate_rule_tier(rule_text: str) -> int:
@@ -2392,7 +2401,7 @@ def calculate_rule_tier(rule_text: str) -> int:
         return TIER_SUPREME_AFFECT
     if any(k in lower for k in ["afekt", "seiyū", "seiyuu", "suspens", "prozodia", "pan/ty", "incognito"]):
         return TIER_DRAMA_AFFECT
-    if any(k in lower for k in ["metryzacja", "jednostek", "literówek", "ortografii", "plansz", "interfejs", "morfologia", "fleksja", "dopełniacz", "podwójn"]):
+    if any(k in lower for k in ["metryzacja", "jednostek", "literówek", "ortografii", "plansz", "interfejs", "morfologia", "fleksja", "dopełniacz", "podwójn", "pluralis", "majestat", "byt zbiorowy"]):
         return TIER_LEXICAL_REALIA
     return TIER_DIALOGUE_FLOW
 
@@ -3609,6 +3618,19 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Op
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR CLXXV - Zgodność Rodzaju w Grupie Żeńskiej]: "
             "W dialogu prowadzonym wyłącznie przez kobiety stosuj naturalne formy żeńskie liczby mnogiej ('byłyśmy', 'poszłyśmy', 'my obie')."
+        )
+
+    # 117. Tożsamość Podmiotowa Mówcy, Byty Zbiorowe i Pluralis Maiestatis (Filar CLXXVI)
+    has_collective_or_majestic_trigger = any(
+        any(w in str(item.get("speaker", "")).lower() for w in ["louis arneb", "rui arnebu", "arneb", "żarłoczność", "królowa", "krolowa", "cesarzowa", "cesarz"]) or
+        any(w in str(item.get("notes", "")).lower() for w in ["pluralis", "majestat", "byt mnogi", "kolektyw", "collective", "żarłoczność"]) or
+        any(re.search(r"\b(?:bokutachi|warera|wareware|watashitachi)\b", str(item.get("jp_audio", "")), re.IGNORECASE) for item in [item])
+        for item in batch_items
+    )
+    if has_collective_or_majestic_trigger:
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CLXXVI - Integralność Tożsamości Podmiotowej Mówcy]: "
+            "Zachowaj tożsamość grupy dla bytów mnogich (dla grupy mieszanej jak Żarłoczność w Re:Zero stosuj rodzaj męskoosobowy: 'chcieliśmy', 'byliśmy', nawet gdy w kadrze jest dziewczynka); dla monarchini w pluralis maiestatis stosuj 'postanowiłyśmy'."
         )
 
     if not focused_pillars:

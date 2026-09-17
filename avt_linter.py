@@ -1824,6 +1824,19 @@ VIRILE_ADJECTIVES_TO_NONVIRILE: Dict[str, str] = {
     "zadowoleni": "zadowolone",
     "zaskoczeni": "zaskoczone",
     "zdziwieni": "zdziwione",
+    "zmuszeni": "zmuszone",
+    "zobowiązani": "zobowiązane",
+    "szczęśliwi": "szczęśliwe",
+    "nieszczęśliwi": "nieszczęśliwe",
+    "spokojni": "spokojne",
+    "świadomi": "świadome",
+    "nieświadomi": "nieświadome",
+    "oburzeni": "oburzone",
+    "przerażeni": "przerażone",
+    "zachwyceni": "zachwycone",
+    "wściekli": "wściekłe",
+    "głodni": "głodne",
+    "spragnieni": "spragnione",
     "gotowiście": "gotoweście",
 }
 
@@ -1837,6 +1850,19 @@ NONVIRILE_ADJECTIVES_TO_VIRILE: Dict[str, str] = {
     "zadowolone": "zadowoleni",
     "zaskoczone": "zaskoczeni",
     "zdziwione": "zdziwieni",
+    "zmuszone": "zmuszeni",
+    "zobowiązane": "zobowiązani",
+    "szczęśliwe": "szczęśliwi",
+    "nieszczęśliwe": "nieszczęśliwi",
+    "spokojne": "spokojni",
+    "świadome": "świadomi",
+    "nieświadome": "nieświadomi",
+    "oburzone": "oburzeni",
+    "przerażone": "przerażeni",
+    "zachwycone": "zachwyceni",
+    "wściekłe": "wściekli",
+    "głodne": "głodni",
+    "spragnione": "spragnieni",
     "gotoweście": "gotowiście",
 }
 
@@ -3969,12 +3995,45 @@ class EpisodeQualityGate:
                                 ev.text = re.sub(rf"\b{re.escape(prefix)}\s+{re.escape(adj_stem)}ą\b", f"{prefix} {repl_word}", ev.text, count=1)
                                 fixes.append(f"[Episode Quality Gate - Filar CLVII/CLXIII Orzecznik Przymiotnikowy Męski] Linia #{i+1}: skorygowano '{prefix} {adj_stem}ą' -> '{prefix} {repl_word}' (adresat: mężczyzna)")
 
-            # 3c-6. 1ST-PERSON PLURAL FEMININE GROUP AGREEMENT (Filar CLXXV - 0.00 PLN)
+            # 3c-6. 1ST-PERSON PLURAL FEMININE GROUP AGREEMENT & SPEAKER ENTITY CONCORDANCE (Filar CLXXV & Filar CLXXVI - 0.00 PLN)
             if not is_sign:
                 is_female_scene_1pl = (event_scene_gender.get(i) == "FEMALE")
                 is_male_scene_1pl = (event_scene_gender.get(i) == "MALE")
                 spk_orig = orig_speakers.get(i, "") or getattr(ev, "name", "") or getattr(ev, "actor", "")
-                if not is_female_scene_1pl and series_bible and hasattr(series_bible, "is_female_group_speaker"):
+
+                # Filar CLXXVI: Speaker Entity Identity Shield & Pluralis Maiestatis Gate (0.00 PLN)
+                is_coll_virile = False
+                is_coll_nonvirile = False
+                is_majestic_fem = False
+                is_majestic_masc = False
+
+                if series_bible and hasattr(series_bible, "get_speaker_entity_type"):
+                    ent_type = series_bible.get_speaker_entity_type(spk_orig)
+                    if ent_type == "COLLECTIVE_VIRILE":
+                        is_coll_virile = True
+                    elif ent_type == "COLLECTIVE_NONVIRILE":
+                        is_coll_nonvirile = True
+                    elif ent_type == "MAJESTIC_FEMALE":
+                        is_majestic_fem = True
+                    elif ent_type == "MAJESTIC_MALE":
+                        is_majestic_masc = True
+
+                if not is_coll_virile and character_registry and spk_orig:
+                    c_desc = character_registry.get(spk_orig, "").lower()
+                    if any(w in c_desc for w in ["collective_virile", "żarłoczność", "zarlocznosc", "byt mnogi męskoosobowy", "byt zbiorowy męskoosobowy"]):
+                        is_coll_virile = True
+                    elif any(w in c_desc for w in ["majestic_female", "pluralis maiestatis (kobieta)", "monarchini"]):
+                        is_majestic_fem = True
+
+                # Apply Filar CLXXVI overrides:
+                if is_coll_virile or is_majestic_masc:
+                    # Immunity Shield: mixed/virile collective or male monarch cannot be overridden by female scene cast!
+                    is_female_scene_1pl = False
+                elif is_majestic_fem or is_coll_nonvirile:
+                    # Sovereign Female / All-female collective enforces non-virile plural even in mixed/neutral scenes!
+                    is_female_scene_1pl = True
+                    is_male_scene_1pl = False
+                elif not is_female_scene_1pl and series_bible and hasattr(series_bible, "is_female_group_speaker"):
                     is_female_scene_1pl = series_bible.is_female_group_speaker(spk_orig)
 
                 if is_female_scene_1pl:

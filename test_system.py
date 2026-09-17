@@ -8220,6 +8220,95 @@ def test_first_person_plural_feminine_group_concordance_guard():
     print(" -> PASSED: Filar CLXXV (Zgodność Morfologiczna 1. Osoby Liczby Mnogiej w Grupach Żeńskich) działa w 100% (0.00 PLN).")
 
 
+def test_speaker_entity_identity_and_collective_concordance_guard():
+    """
+    Test 98: Holistyczna weryfikacja 5 warstw: Integralność Tożsamości Podmiotowej Mówcy,
+    Bytów Kolektywnych i Pluralis Maiestatis (Filar CLXXVI - 0.00 PLN).
+    Zapobiega nadkorekcie lintera w scenach żeńskich dla bytów zbiorowych męskoosobowych
+    (np. Louis Arneb w Re:Zero 4th Season walcząca z Ram) oraz zabezpiecza Pluralis Maiestatis
+    monarchini w scenach mieszanych.
+    """
+    print("\n[TEST 98/98] Test Integralności Tożsamości Podmiotowej Mówcy, Bytów Kolektywnych i Pluralis Maiestatis (Filar CLXXVI - 0.00 PLN)...")
+    import pysubs2
+    from pathlib import Path
+    import tempfile
+    from series_memory import SeriesBible
+    from avt_linter import EpisodeQualityGate
+    from profiler import CharacterDossier
+    from rules import get_focused_rules_for_batch, calculate_rule_tier, TIER_LEXICAL_REALIA
+
+    # Asercja 1: Pydantic CharacterDossier schema obsługuje speaker_entity_type
+    dossier = CharacterDossier(
+        name="Louis Arneb",
+        gender="FEMALE",
+        age_and_role="Arcybiskup Żarłoczności",
+        speech_style_pl="Kolektyw Żarłoczności",
+        speaker_entity_type="COLLECTIVE_VIRILE"
+    )
+    assert dossier.speaker_entity_type == "COLLECTIVE_VIRILE"
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        bible = SeriesBible("TestReZeroSeason4", storage_dir=Path(tmpdir))
+        bible.data["characters"]["Louis Arneb"] = "Kobieta, Arcybiskup Grzechu Żarłoczności (Nasycenie)"
+        bible.data["characters"]["Ram"] = "Kobieta, pokojówka w posiadłości Roswaala"
+        bible.data["characters"]["Królowa"] = "Kobieta, monarchini (Pluralis Maiestatis)"
+        bible.data["characters"]["Rycerz"] = "Mężczyzna, gwardzista królewski"
+
+        # Asercja 2: Metody SeriesBible dla tożsamości podmiotów i pluralis maiestatis
+        assert bible.is_collective_virile_speaker("Louis Arneb") is True
+        assert bible.is_collective_virile_speaker("Rui Arunebu") is True
+        assert bible.is_collective_virile_speaker("Ram") is False
+        assert bible.is_majestic_female_speaker("Królowa") is True
+        assert bible.is_majestic_female_speaker("Ram") is False
+        assert bible.get_speaker_entity_type("Rycerz") == "INDIVIDUAL"
+
+        # Asercja 3: Re:Zero Season 4 - Tarcza immunitetu dla Louis Arneb w scenie z samymi kobietami (Louis + Ram)
+        # Fizycznie w kadrze są wyłącznie kobiety, ale Louis mówi w imieniu męskoosobowej trójcy Żarłoczności!
+        subs_rezero = pysubs2.SSAFile()
+        subs_rezero.events.extend([
+            pysubs2.SSAEvent(start=1000, end=3000, name="Louis Arneb", text="My tylko chcieliśmy być szczęśliwi!"),
+            pysubs2.SSAEvent(start=3500, end=5000, name="Ram", text="Zamilcz, nikczemna bestio."),
+            pysubs2.SSAEvent(start=5500, end=7500, name="Louis Arneb", text="Zjedliśmy tyle wspomnień, a wciąż jesteśmy głodni!"),
+            pysubs2.SSAEvent(start=8000, end=9500, name="Ram", text="Zapłacisz za wszystko.")
+        ])
+        fixed_rezero, fixes_rezero = EpisodeQualityGate.audit_and_fix_entire_episode(subs_rezero, series_bible=bible)
+        # Formy męskoosobowe Louis Arneb NIE MOGĄ zostać zamienione na żeńskie 'chciałyśmy' / 'zjadłyśmy'!
+        assert fixed_rezero.events[0].text == "My tylko chcieliśmy być szczęśliwi!", f"Louis 0 altered: {fixed_rezero.events[0].text}"
+        assert fixed_rezero.events[2].text == "Zjedliśmy tyle wspomnień, a wciąż jesteśmy głodni!", f"Louis 2 altered: {fixed_rezero.events[2].text}"
+        assert not any("Louis Arneb" in f and "Niemęskoosobowa" in f for f in fixes_rezero), f"Overreach fix applied to Louis Arneb: {fixes_rezero}"
+
+        # Asercja 4: Zwykła postać kobieca w scenie żeńskiej NADAL podlega Filarowi CLXXV (brak fałszywego uogólnienia)
+        subs_standard_fem = pysubs2.SSAFile()
+        subs_standard_fem.events.extend([
+            pysubs2.SSAEvent(start=1000, end=3000, name="Ram", text="Byliśmy gotowi i poszliśmy do wieży."),
+            pysubs2.SSAEvent(start=3500, end=5000, name="Rem", text="Zrobiłyśmy to razem.")
+        ])
+        bible.data["characters"]["Rem"] = "Kobieta, siostra Ram"
+        fixed_fem, fixes_fem = EpisodeQualityGate.audit_and_fix_entire_episode(subs_standard_fem, series_bible=bible)
+        assert fixed_fem.events[0].text == "Byłyśmy gotowe i poszłyśmy do wieży.", f"Standard female not corrected: {fixed_fem.events[0].text}"
+
+        # Asercja 5: Pluralis Maiestatis monarchini żeńskiej w scenie mieszanej (Królowa + Rycerz)
+        # W scenie mieszanej Królowa musi mieć formy niemęskoosobowe ('byłyśmy zmuszone'), mimo obecności mężczyzny w kadrze!
+        subs_majestic = pysubs2.SSAFile()
+        subs_majestic.events.extend([
+            pysubs2.SSAEvent(start=1000, end=3000, name="Królowa", text="Byliśmy zmuszeni podjąć taką decyzję."),
+            pysubs2.SSAEvent(start=3500, end=5000, name="Rycerz", text="Rozumiem, wasza wysokość.")
+        ])
+        fixed_maj, fixes_maj = EpisodeQualityGate.audit_and_fix_entire_episode(subs_majestic, series_bible=bible)
+        assert fixed_maj.events[0].text == "Byłyśmy zmuszone podjąć taką decyzję.", f"Majestic female not corrected: {fixed_maj.events[0].text}"
+        assert any("Niemęskoosobowy" in f for f in fixes_maj), f"Expected majestic female fix in fixes: {fixes_maj}"
+
+    # Asercja 6: Dynamic Rule Dispatcher aktywuje Filar CLXXVI i klasyfikuje do Tier 10
+    prompt_rezero = get_focused_rules_for_batch([
+        {"speaker": "Louis Arneb", "en": "We just wanted to be happy! Why won't you understand us?"}
+    ])
+    clxxvi_line = [l for l in prompt_rezero.splitlines() if "FILAR CLXXVI" in l][0]
+    rule_score = calculate_rule_tier(clxxvi_line)
+    assert rule_score == TIER_LEXICAL_REALIA, f"Filar CLXXVI must be Tier 10 (got {rule_score}) to protect Gemini attention"
+
+    print(" -> PASSED: Filar CLXXVI (Integralność Tożsamości Podmiotowej Mówcy, Bytów Kolektywnych i Pluralis Maiestatis) działa w 100% (0.00 PLN).")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -8316,7 +8405,8 @@ if __name__ == "__main__":
     test_holistic_whisper_and_ffmpeg_telemetry_reserves_guard()
     test_acoustic_primacy_and_contaminated_metadata_guard()
     test_first_person_plural_feminine_group_concordance_guard()
-    print("\n Wszystkie testy jednostkowe i integracyjne (97/97) zakończone pełnym sukcesem!\n")
+    test_speaker_entity_identity_and_collective_concordance_guard()
+    print("\n Wszystkie testy jednostkowe i integracyjne (98/98) zakończone pełnym sukcesem!\n")
 
 
 

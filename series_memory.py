@@ -1186,6 +1186,82 @@ class SeriesBible:
             return True
         return False
 
+    def register_speaker_entity_type(self, name: str, entity_type: str) -> None:
+        """
+        Registers speaker grammatical identity type in SeriesBible (Filar CLXXVI - 0.00 PLN).
+        entity_type: 'COLLECTIVE_VIRILE' | 'COLLECTIVE_NONVIRILE' | 'MAJESTIC_FEMALE' | 'MAJESTIC_MALE' | 'INDIVIDUAL'
+        """
+        if not name:
+            return
+        if "speaker_entity_types" not in self.data:
+            self.data["speaker_entity_types"] = {}
+        cl_name = extract_clean_speaker_name(name).strip().lower()
+        self.data["speaker_entity_types"][cl_name] = entity_type
+
+    def get_speaker_entity_type(self, speaker_name: str) -> str:
+        """
+        Retrieves speaker grammatical identity type (Filar CLXXVI - 0.00 PLN).
+        Recognizes canonical known entities (e.g. Louis Arneb -> COLLECTIVE_VIRILE).
+        """
+        if not speaker_name:
+            return "INDIVIDUAL"
+        cl_name = extract_clean_speaker_name(speaker_name).strip().lower()
+        types_map = self.data.get("speaker_entity_types", {})
+        if cl_name in types_map:
+            return types_map[cl_name]
+        for k, v in types_map.items():
+            if k in cl_name or cl_name in k:
+                return v
+
+        # Canonical known patterns across major anime / literature
+        if any(w in cl_name for w in ["louis arneb", "rui arunebu", "rui arnebu", "arneb", "arunebu", "żarłoczność", "zarlocznosc"]):
+            return "COLLECTIVE_VIRILE"
+        chars = self.data.get("characters", {})
+        char_desc = ""
+        for k, v in chars.items():
+            if "->" not in k:
+                k_l = k.lower()
+                clean_k = extract_clean_speaker_name(k_l)
+                if k_l == cl_name or clean_k == cl_name or cl_name in k_l:
+                    char_desc = str(v.get("description", "") if isinstance(v, dict) else v).lower()
+                    break
+
+        if any(w in cl_name for w in ["królowa", "krolowa", "cesarzowa", "queen", "empress"]) or "monarchini" in char_desc:
+            if "pluralis" in char_desc or "majestat" in char_desc or "my" in char_desc or any(w in cl_name for w in ["królowa", "krolowa", "cesarzowa"]):
+                return "MAJESTIC_FEMALE"
+        if any(w in cl_name for w in ["cesarz", "król", "krol", "emperor", "king"]) or "monarcha" in char_desc:
+            if "pluralis" in char_desc or "majestat" in char_desc or "my" in char_desc or any(w in cl_name for w in ["cesarz", "król", "krol"]):
+                return "MAJESTIC_MALE"
+
+        return "INDIVIDUAL"
+
+    def is_collective_virile_speaker(self, speaker_name: str) -> bool:
+        """
+        Returns True if the speaker represents a mixed/virile collective entity
+        (e.g. Louis Arneb in Re:Zero, speaking for Ley, Roy and herself).
+        Requires 1st-person plural virile agreement (-liśmy, byliśmy), immune to female scene overrides!
+        """
+        return self.get_speaker_entity_type(speaker_name) == "COLLECTIVE_VIRILE"
+
+    def is_collective_nonvirile_speaker(self, speaker_name: str) -> bool:
+        """
+        Returns True if the speaker represents an exclusively female collective entity.
+        """
+        return self.get_speaker_entity_type(speaker_name) == "COLLECTIVE_NONVIRILE"
+
+    def is_majestic_female_speaker(self, speaker_name: str) -> bool:
+        """
+        Returns True if the speaker is a female monarch using Pluralis Maiestatis.
+        Requires 1st-person plural non-virile agreement (-łyśmy, byłyśmy), even in mixed/neutral scenes!
+        """
+        return self.get_speaker_entity_type(speaker_name) == "MAJESTIC_FEMALE"
+
+    def is_majestic_male_speaker(self, speaker_name: str) -> bool:
+        """
+        Returns True if the speaker is a male monarch using Pluralis Maiestatis.
+        """
+        return self.get_speaker_entity_type(speaker_name) == "MAJESTIC_MALE"
+
     def infer_scene_cast_from_text(self, scene_texts: List[str], whisper_texts: Optional[List[str]] = None) -> Tuple[Set[str], Optional[str]]:
         """
         Scans dialogue lines within an anonymous scene (where ev.name is blank) for character mentions,

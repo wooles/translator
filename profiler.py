@@ -104,6 +104,7 @@ class CharacterDossier(BaseModel):
     age_and_role: str = Field(description="Wiek, status społeczny i rola (np. '7 lat, młody arystokrata/kapłan, syn Yorishige')")
     speech_style_pl: str = Field(description="Unikalny polski rejestr mowy (np. 'Chłodny, dumny, krótki, arystokratyczny bez poufałości')")
     first_person_pronoun: Optional[str] = Field(default=None, description="Japoński zaimek 'ja' (Ore, Boku, Watashi, Atashi) i profil ego")
+    speaker_entity_type: Optional[str] = Field(default="INDIVIDUAL", description="Typ tożsamości podmiotu: 'INDIVIDUAL' (pojedyncza postać), 'COLLECTIVE_VIRILE' (byt zbiorowy męskoosobowy / grupa mieszana, np. Louis Arneb w Re:Zero), 'COLLECTIVE_NONVIRILE' (byt zbiorowy żeński), 'MAJESTIC_MALE' (pluralis maiestatis monarchy męskiego), 'MAJESTIC_FEMALE' (pluralis maiestatis monarchini żeńskiej) (Filar CLXXVI)")
     declension: Optional[str] = Field(default=None, description="Polska odmiana przez przypadki (np. 'Yoritsugu -> D. Yoritsugu, C. Yoritsugu, B. Yoritsugu')")
     dialect_category: Optional[str] = Field(default="", description="Dialekt regionalny postaci jeśli występuje: 'Satsuma-ben', 'Kansai-ben', 'Kyoto-ben', 'Tohoku-ben', 'Hiroshima-ben', 'Hakata-ben', 'Nagoya-ben', 'Okinawa-ben', 'Hokkaido-ben' lub brak (Filar CXXXV)")
     idiolect_matrix: Optional[str] = Field(default="", description="Matryca idiolektu: specyficzne nawyki leksykalne, zakazane/preferowane zwroty i rytm wypowiedzi dla tej postaci")
@@ -202,7 +203,8 @@ def format_episode_profile_for_prompt(profile: Optional[EpisodeProfile]) -> str:
             dial = f" [Dialekt: {cd.dialect_category}]" if cd.dialect_category else ""
             idio = f" [Idiolekt: {cd.idiolect_matrix}]" if cd.idiolect_matrix else ""
             voc = f" [Głos: {cd.vocal_profile}]" if getattr(cd, "vocal_profile", "") else ""
-            lines.append(f"• {cd.name} ({cd.gender}, {cd.age_and_role}){pron}{decl}{dial}{voc} -> Styl: {cd.speech_style_pl}{idio}")
+            ent = f" [Podmiot: {cd.speaker_entity_type}]" if getattr(cd, "speaker_entity_type", "") and cd.speaker_entity_type != "INDIVIDUAL" else ""
+            lines.append(f"• {cd.name} ({cd.gender}, {cd.age_and_role}){ent}{pron}{decl}{dial}{voc} -> Styl: {cd.speech_style_pl}{idio}")
 
     if profile.name_declensions:
         lines.append("\nŻELAZNA TABELA ODMIANY IMION PRZEZ PRZYPADKI (FILAR XCI - BEZWZGLĘDNIE STOSUJ):")
@@ -492,6 +494,14 @@ Twoim zadaniem jest dogłębna, wszechstronna analiza 100% skryptu całego odcin
     - DOMESTIC AISATSU ADJACENCY DIALOGUE: W formułach powitań domowych (Tadaima -> Okaeri) KATEGORYCZNY ZAKAZ robotycznego echa czasownikowego ('Wróciłam.' -> BŁĄD: 'Wróciłaś.'). Wymuszaj naturalne polskie powitanie domowników: 'Wróciłam!' -> 'Witaj w domu!' / 'O, już jesteś?' / 'Dobrze, że jesteś!'.
     - TITLE NOMINATIVE APPOSITION & JAPANESE NAME CAPITALIZATION: Przy zestawieniu tytułu mistrzowskiego/zawodowego z imieniem i nazwiskiem w podmiocie zdania ('Mistrz', 'Pan', 'Profesor' + Nazwisko + Imię + Czasownik 3. os.), nazwisko ZAWSZE pozostaje w mianowniku: 'Mistrz Tonden Minoru nie zdążył' (KARDYNALNY BŁĄD [X]: 'Mistrz Tondena minoru'). Każdy człon imienia i nazwiska bezwzględnie piszemy WIELKĄ LITERĄ ('Tonden Minoru', NIGDY małą 'minoru').
     - W mandatory_direction wymuś nadrzędność dramaturgii i japońskiego audio seiyū nad dosłownym skryptem angielskim.
+ 20. INTEGRALNOŚĆ TOŻSAMOŚCI PODMIOTOWEJ MÓWCY, BYTÓW KOLEKTYWNYCH I PLURALIS MAIESTATIS (FILAR CLXXVI):
+    - W character_dossiers dla każdej postaci określ speaker_entity_type:
+      * 'COLLECTIVE_VIRILE' – byt zbiorowy męskoosobowy / grupa mieszana (np. Louis Arneb w Re:Zero reprezentująca rodzeństwo Żarłoczności z braćmi Leyem i Royem; symbioty i byty mnogie z mężczyznami w składzie). Formy 1. os. l. mn. są męskoosobowe ('chcieliśmy', 'zjedliśmy', 'byliśmy głodni'), nawet gdy awatar w kadrze to dziewczynka.
+      * 'COLLECTIVE_NONVIRILE' – byt zbiorowy wyłącznie żeński (np. zgromadzenie kapłanek, czarownic).
+      * 'MAJESTIC_FEMALE' – pluralis maiestatis monarchini żeńskiej ('postanowiłyśmy', 'byłyśmy zmuszone').
+      * 'MAJESTIC_MALE' – pluralis maiestatis monarchy męskiego ('postanowiliśmy', 'byliśmy surowi').
+      * 'INDIVIDUAL' – pojedyncza postać (domyślnie).
+    - W danger_lines_prescan oznaczaj kwestie, w których pojedynczy bohater mówi w imieniu kolektywu lub w pluralis maiestatis, oraz eliminuj fałszywe liczby mnogie z angielskiego pivotu w solilokwiach samotnych bohaterów.
 
 METADANE Z BAZY ANILIST:
 {anime_metadata_str}
