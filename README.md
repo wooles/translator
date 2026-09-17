@@ -4,12 +4,12 @@
 [![Google GenAI SDK](https://img.shields.io/badge/LLM%20Orchestration-Gemini%202.5%20Flash%20%7C%202.5%20Pro-orange.svg)](https://ai.google.dev/)
 [![Acoustic Ingestion](https://img.shields.io/badge/Acoustic%20ASR-Kotoba--Whisper%20v2.0%20CTranslate2-green.svg)](https://huggingface.co/kotoba-tech/kotoba-whisper-v2.0-faster)
 [![Architecture](https://img.shields.io/badge/Architecture-5--Layer%20Root%20Cause%20Pipeline-purple.svg)]()
-[![CI/Test Suite](https://img.shields.io/badge/Test%20Harness-95%2F95%20Passing-brightgreen.svg)]()
+[![CI/Test Suite](https://img.shields.io/badge/Test%20Harness-98%2F98%20Passing-brightgreen.svg)]()
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 An asynchronous, multimodal audiovisual translation and localization engine engineered in Python. It executes high-fidelity semantic translation from Japanese audio streams, video keyframes, and intermediate dialogue representations into target Polish dialogue scripts, strictly adhering to cinematographic subtitling standards (Belczyk AVT Matrix, Skopos Theory, Polysystem Theory, and Netflix AVT Timed Text Guidelines).
 
-The engine integrates **Large Multimodal Models (LMMs)** via structured schema decoding, **fine-tuned Japanese ASR acoustic grounding (Kotoba-Whisper v2.0 CTranslate2)** with $F_0$ fundamental frequency pitch and prosodic contour extraction, **FFmpeg temporal and visual telemetry** (I-frame snapping, Fade to Black boundary isolation, native silence detection), **computer-vision spatial OCR & Pixel-Perfect Typesetting (Grounding 2D)**, a **172-Pillar AVT Constraint Solver**, **Profiler 4.0 Pre-Computation**, **Cross-Episode Series Memory (SQLite FTS5 BM25)** with a **7-Case Foreign Name Declension Matrix**, and an **Episode Quality Gate (0.00 PLN)** offline post-processing safety net.
+The engine integrates **Large Multimodal Models (LMMs)** via structured schema decoding, **fine-tuned Japanese ASR acoustic grounding (Kotoba-Whisper v2.0 CTranslate2)** with $F_0$ fundamental frequency pitch and prosodic contour extraction, **FFmpeg temporal and visual telemetry** (I-frame snapping, Fade to Black boundary isolation, native silence detection), **computer-vision spatial OCR & Pixel-Perfect Typesetting (Grounding 2D)**, a **176-Pillar AVT Constraint Solver**, **Profiler 4.0 Pre-Computation**, **Cross-Episode Series Memory (SQLite FTS5 BM25)** with a **7-Case Foreign Name Declension Matrix**, and an **Episode Quality Gate (0.00 PLN)** offline post-processing safety net.
 
 ---
 
@@ -94,18 +94,22 @@ To eliminate attention drift across long video sequences, the pre-pass engine pe
 * **Multimodal Addressee Resolution (Filar CLXIII):**
   * **2nd-Person Singular Address (*ty*):** Distinguishes whether the single addressee in 1-on-1 dialogue is female (`kobieta` → *-łaś, byłaś, jesteś pewna, gotowa*) or male (`mężczyzna` → *-łeś, byłeś, jesteś pewien, gotowy*).
   * **2nd-Person Plural Group Address (*wy*):** Distinguishes female groups (`grupa_kobiet` → *-łyście, byłyście gotowe*) from male/mixed groups (`grupa_mężczyzn/grupa_mieszana` → *-liście, byliście gotowi*), cross-referenced with Whisper plural markers (*-tachi, omae-ra, minna, shokun*).
+* **1st-Person Plural Feminine Group Concordance (Filar CLXXV):** In scenes where characters present are exclusively female, past tense, conditional, adjectival, and numeral 1st-person plural forms (*my*) are deterministically harmonized to non-virile Polish grammar (*-łyśmy*, *-łybyśmy*, *my obie*, *byłyśmy gotowe*), preventing masculine leakage.
+* **Speaker Entity Identity & Collective Concordance Shield (Filar CLXXVI):** Isolates speaker entity types (`COLLECTIVE_VIRILE`, `MAJESTIC_FEMALE`, `INDIVIDUAL`). Shields multi-entity characters manifesting as a single speaker (e.g. *Louis Arneb* representing the masculine/mixed Gluttony Trinity in *Re:Zero S4*) from erroneous feminization in female-only duels, and enforces non-virile *Pluralis Maiestatis* for female monarchs in mixed courts.
 
 ### 6. Dynamic Attention Dispatcher & LLM Unburdening
-* **Dynamic Attention Spotlight (`get_focused_rules_for_batch`):** Out of 172+ codified pillars, dynamically selects **at most 3 high-priority pillars** per batch based on real-time scene parameters (CPS speed, interrogatives, typesetting, group address).
+* **Dynamic Attention Spotlight (`get_focused_rules_for_batch`):** Out of 176+ codified pillars, dynamically selects **at most 3 high-priority pillars** per batch based on real-time scene parameters (CPS speed, interrogatives, typesetting, group address).
+* **Tier 10 Offloading:** Mechanical grammatical rules (such as plural agreement and collective concordances) are offloaded to low-priority background tiers (Tier 10) and positive craft priming, keeping Gemini attention unburdened and reserving token capacity for AVT dialogue transcreation.
 * **Compact Line-Level SSOT Header (`format_compact_ssot_tag`):** Replaces verbose instructions with a single standardized metadata string (`[SSOT: Spk=... G=... Addr=... Ac=...]`), freeing model attention and eliminating prompt bloat.
 
 ### 7. Exception-Driven Architecture & Conflict Shields
 * **Blind-Drafting Protocol:** When a severe acoustic or pragmatic mismatch is detected between the English fan script and Japanese audio keywords (*hitori, betsuni, yokatta, yatta*), the Phase 1 candidate is blinded from the Phase 2 prompt (`is_blind_draft=True`), forcing the Script Doctor to translate autonomously from raw audio and source text without anchoring bias.
+* **Acoustic Primacy Veto (Filar CLXXIV):** Overrules corrupted fansub speaker tags (*Ögedei* attributed to a line spoken by a female seiyū in a tent) in favor of the acoustic ground-truth and scene context.
 * **Thought-to-Speech Firewall:** Enforces strict styling separation between internal character thoughts (italicized `{\i1}`) and diegetic spoken dialogue.
 * **T-V Invariance & Honorific Vocative Shield (Filar CLVII):** Prevents formal address contamination (*Pan/Pani*) in intimate scenes where characters converse on first-name informal terms (*ty*).
 * **Typo Shield & Lexical Integrity (Filar CLXIV):** Enforces 100% lexical hygiene, eliminating keyboard artifacts and non-existent phonetic distortions (*„spyham”* ❌ → *„spytam”* ✅, *„wziąść”* ❌ → *„wziąć”* ✅).
 
-### 8. Deterministic 172-Pillar AVT Canon
+### 8. Deterministic 176-Pillar AVT Canon
 A comprehensive constraint solver implementing cinematographic subtitling theory across 7 major domains:
 * **Domain I (Morphosyntax & Flexibility):** De-nominalization, verb-centric phrasing, pronoun stripping, topic-comment structuring.
 * **Domain II (Semiotics & Temporal Pacing):** Cinematographic shot-cut synchronization, semiotics of silence (*Ma*), strict Characters-Per-Second (CPS $\le 17$) enforcement.
@@ -113,7 +117,7 @@ A comprehensive constraint solver implementing cinematographic subtitling theory
 * **Domain IV (Anime Sociolinguistics & Pragmatics):** Social triangulation, relational indebtedness (*Giri*), conversational hedging, indirect refusal decoding (*„...wa ii desu”*).
 * **Domain V (Paralinguistics & Phonetics):** Isomorphic vowel elongation (*Chōon* mapping), prosodic continuity across sentence breaks.
 * **Domain VI (Transcreation, Idiolects & Song Metre):** Polish 7-case noun declension, Stanisław Barańczak syllabic song/rhyme transcreation (**Pillar CXVIII**), Character Idiolect Matrix (**Pillar CXIX**), and Blind Native Polish Critic fluency validation.
-* **Domain VII (Temporal Discontinuity & Register Governance):** Spatiotemporal shifts, anti-pivot cliches, and genre-specific register matrices.
+* **Domain VII (Temporal Discontinuity, Acoustic Primacy & Collective Entities):** Spatiotemporal shifts, anti-pivot cliches, acoustic primacy over contaminated fansub metadata (**Pillar CLXXIV**), 1st-person plural feminine group concordance (**Pillar CLXXV**), and speaker entity identity / collective concordance shields (**Pillar CLXXVI**).
 
 ### 9. 4-Tier Authority Glossary Hierarchy
 Terminology is resolved deterministically through a strict 4-tier hierarchy:
@@ -256,6 +260,36 @@ The engine resolves common failure modes of traditional Machine Translation (MT)
 
 ---
 
+### 12. Acoustic Primacy Over Contaminated Fansub Metadata (*Tenmaku no Jaadugar Ep. 12*)
+* **Problem:** Intermediate fansub scripts occasionally contain erroneous speaker names (e.g. attributing a dialogue line spoken by a female wife or servant inside a private yurt to the Great Khan *Ögedei*, or stuttering repetitive tokens like *„odebrać.odebrać.”*). Naive MT models blindly trust the corrupted text tag and inflect verbs in the masculine.
+* **Engine Solution:** The Acoustic Ground Truth engine (**Pillar CLXXIV**) audits speaker metadata against Whisper voice acoustics and local scene context, executing a hard veto over contaminated tags, while the `EpisodeQualityGate` cleans repetitive token stutters at 0.00 PLN.
+
+| Context & Raw Inputs | Naive MT / Generic LLM | Multimodal AVT Engine Output | Codified Heuristic |
+| :--- | :--- | :--- | :--- |
+| **Speaker Tag:** *Ögedei* (in tent)<br>**Audio:** Female seiyū (*Boraqchin / Möge*)<br>**Audio Text:** *„...moto yori watashi ga ubaitorou to omotte ita mono da”*<br>**EN Script:** *„...intended to take back from her.take back.”* | ❌ *„...od początku sam zamierzałem jej odebrać.odebrać.”*<br>*(Erroneous masculine gender + token stutter)* | ✅ **„...od początku sama zamierzałam jej odebrać.”**<br>*(Acoustic ground-truth veto & token sanitization)* | **Pillar CLXXIV**<br>(*Acoustic Primacy & Stutter Sanitizer*) |
+
+---
+
+### 13. 1st-Person Plural Feminine Group Concordance (*„Byłyśmy gotowe” / „My obie”*)
+* **Problem:** English uses undifferentiated pronouns (*„we”*, *„we both”*). When translating female group dialogue, generic LLMs default to masculine virile forms (*„byliśmy gotowi”*, *„my oboje”*), breaking immersion in all-female scenes.
+* **Engine Solution:** The 5-layer pipeline and `EpisodeQualityGate` detect all-female scenes and apply **Pillar CLXXV**, enforcing non-virile verb suffixes (*-łyśmy*, *-łybyśmy*), adjectives (*byłyśmy gotowe*), and numerals (*my obie*), while strictly preserving virile forms in mixed or male-only scenes.
+
+| Context & Raw Inputs | Naive MT / Generic LLM | Multimodal AVT Engine Output | Codified Heuristic |
+| :--- | :--- | :--- | :--- |
+| **Speaker:** Boraqchin to Möge (female-only scene)<br>**EN Script:** *„We were ready and we went there... We both must flee.”* | ❌ *„Byliśmy gotowi i poszliśmy tam... My oboje musimy uciekać.”*<br>*(Virile default bias)* | ✅ **„Byłyśmy gotowe i poszłyśmy tam... My obie musimy uciekać.”**<br>*(Deterministic non-virile concordance)* | **Pillar CLXXV**<br>(*1st-Person Plural Feminine Concordance*) |
+
+---
+
+### 14. Speaker Entity Identity & Collective Concordance Shield (*Re:Zero 4th Season*)
+* **Problem:** In *Re:Zero kara Hajimeru Isekai Seikatsu 4th Season*, Louis Arneb physically appears as a young girl, but speaks as a collective entity representing the three Sin Archbishops of Gluttony (*Louis, Ley Batenkaitos, Roy Alphard*). In her confrontation with Ram, all characters visible on screen are female. An overreaching female-scene linter would erroneously feminize Louis's lines to non-virile (*„My tylko chciałyśmy być szczęśliwe!”* ❌). In contrast, female monarchs use *Pluralis Maiestatis* (*„Byłyśmy zmuszone”* ✅) even when surrounded by male royal guards.
+* **Engine Solution:** `CharacterDossier.speaker_entity_type` (`COLLECTIVE_VIRILE`, `MAJESTIC_FEMALE`, `INDIVIDUAL`) and `SeriesBible` grant an Anti-Overreach Immunity Shield (**Pillar CLXXVI**). Collective virile speakers retain masculine plural forms (*chcieliśmy*, *szczęśliwi*), while royal female speakers retain majestic non-virile forms regardless of scene participants.
+
+| Context & Raw Inputs | Naive MT / Generic LLM | Multimodal AVT Engine Output | Codified Heuristic |
+| :--- | :--- | :--- | :--- |
+| **Title:** *Re:Zero S4*<br>**Speaker:** Louis Arneb (Gluttony Trinity) to Ram<br>**Audio:** *„Watashitachi wa tada shiawase ni naritakatta dake!”*<br>**EN Script:** *„We just wanted to be happy!”* | ❌ *„My tylko chciałyśmy być szczęśliwe!”*<br>*(Erroneous feminization of virile collective entity)* | ✅ **„My tylko chcieliśmy być szczęśliwi!”**<br>*(Preserved virile collective identity)* | **Pillar CLXXVI**<br>(*Speaker Entity Identity & Collective Shield*) |
+
+---
+
 ## 📊 Quality Profiles & Tokenomics
 
 Estimates per standard 24-minute media unit (~350 subtitle lines / 15 batches):
@@ -343,14 +377,14 @@ python main.py "media.mkv" --play
 
 ## 🧪 Verification Test Harness
 
-The engine is guarded by an automated regression and integration test suite executing **95 modular verification routines**:
+The engine is guarded by an automated regression and integration test suite executing **98 modular verification routines**:
 ```powershell
 python test_system.py
 ```
 
 **Verification Scope:**
 * Pydantic schema validation (`RefinedBatchResponse`, `EpisodeProfile`, `LineTranslation`).
-* Complete coverage and non-contradiction proofs for all **172 AVT Pillars**.
+* Complete coverage and non-contradiction proofs for all **176 AVT Pillars**.
 * Google Context Cache SHA-256 state isolation, rolling keep-alive leases, and memory cleanup.
 * 7-Case Foreign Name Declension Matrix (Filar XCI) & EpisodeQualityGate integration (Test 50).
 * Typo Shield & Lexical Integrity (Filar CLXIV) integration (Test 51).
@@ -359,6 +393,9 @@ python test_system.py
 * Relational T-V Invariance, Vocative Guard & Anti-Sama-Drop (Test 53).
 * Spatiotemporal Engine, Anti-Pivot Guard & 2-Stage Blind Read (Test 56).
 * Whisper & FFmpeg Acoustic-Temporal Telemetry Reserves (Fade to Black, VAD, Loop Shield, Acoustic Breath Splitter, I-Frame Snapping) (Test 95).
+* Acoustic Primacy over Contaminated Fansub Metadata & Token Stutter Sanitizer (Filar CLXXIV) (Test 96).
+* 1st-Person Plural Feminine Group Concordance (*-łyśmy, -łybyśmy, my obie*) (Filar CLXXV) (Test 97).
+* Speaker Entity Identity, Collective Concordance Shield (*Re:Zero 4th Season* Louis Arneb) & Pluralis Maiestatis (Filar CLXXVI) (Test 98).
 * Tokenomics financial calculations across all quality tiers.
 * Translation Memory SQLite FTS5 BM25 temporal matching ($\Delta t \le 300\text{ms}$).
 
