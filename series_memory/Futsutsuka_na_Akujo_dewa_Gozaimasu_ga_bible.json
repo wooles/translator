@@ -5,7 +5,7 @@
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
     },
     "Shu Keigetsu": {
-      "description": "KOBIETA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
     },
     "Shin-U": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
@@ -102,7 +102,8 @@
       "B": "Kou Tousetsu",
       "N": "Kou Tousetsu",
       "Ms": "Kou Tousetsu",
-      "W": "Kou Tousetsu"
+      "W": "Kou Tousetsu",
+      "gender": "MALE"
     },
     "Shu Keigetsu": {
       "M": "Shu Keigetsu",
@@ -112,7 +113,7 @@
       "N": "Shu Keigetsu",
       "Ms": "Shu Keigetsu",
       "W": "Shu Keigetsu",
-      "gender": "FEMALE"
+      "gender": "MALE"
     },
     "Shin-U": {
       "M": "Shin-U",
@@ -121,7 +122,8 @@
       "B": "Shin-U",
       "N": "Shin-U",
       "Ms": "Shin-U",
-      "W": "Shin-U"
+      "W": "Shin-U",
+      "gender": "MALE"
     },
     "Kou Kenshuu": {
       "M": "Kou Kenshuu",
@@ -150,7 +152,8 @@
       "B": "Ei Gyoumei",
       "N": "Ei Gyoumei",
       "Ms": "Ei Gyoumei",
-      "W": "Ei Gyoumei"
+      "W": "Ei Gyoumei",
+      "gender": "MALE"
     },
     "Służba / Gwardia": {
       "M": "Służba / Gwardia",
@@ -159,7 +162,8 @@
       "B": "Służbę / Gwardię",
       "N": "Służbą / Gwardią",
       "Ms": "Służbe / Gwardie",
-      "W": "Służbo / Gwardio"
+      "W": "Służbo / Gwardio",
+      "gender": "MALE"
     },
     "Bunkou": {
       "M": "Bunkou",

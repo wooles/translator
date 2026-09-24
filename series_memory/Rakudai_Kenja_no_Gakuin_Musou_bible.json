@@ -102,7 +102,8 @@
       "B": "Eftala",
       "N": "Eftalem",
       "Ms": "Eftalu",
-      "W": "Eftalu"
+      "W": "Eftalu",
+      "gender": "MALE"
     },
     "Merlin": {
       "M": "Merlin",
@@ -121,7 +122,8 @@
       "B": "Gaiusa",
       "N": "Gaiusem",
       "Ms": "Gaiusie",
-      "W": "Gaiusie"
+      "W": "Gaiusie",
+      "gender": "MALE"
     },
     "Cliff": {
       "M": "Cliff",
@@ -130,7 +132,8 @@
       "B": "Cliffa",
       "N": "Cliffem",
       "Ms": "Cliffie",
-      "W": "Cliffie"
+      "W": "Cliffie",
+      "gender": "MALE"
     },
     "Seiryu": {
       "M": "Seiryu",
@@ -139,7 +142,8 @@
       "B": "Seiryu",
       "N": "Seiryu",
       "Ms": "Seiryu",
-      "W": "Seiryu"
+      "W": "Seiryu",
+      "gender": "MALE"
     },
     "Genie": {
       "M": "Genie",

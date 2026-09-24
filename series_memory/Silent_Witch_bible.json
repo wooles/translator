@@ -72,7 +72,8 @@
       "B": "Ike",
       "N": "Ike",
       "Ms": "Ike",
-      "W": "Ike"
+      "W": "Ike",
+      "gender": "MALE"
     },
     "Monica": {
       "M": "Monica",
@@ -91,7 +92,8 @@
       "B": "Nero",
       "N": "Nero",
       "Ms": "Nero",
-      "W": "Nero"
+      "W": "Nero",
+      "gender": "MALE"
     },
     "Felix": {
       "M": "Felix",
@@ -100,7 +102,8 @@
       "B": "Felixa",
       "N": "Felixem",
       "Ms": "Felixie",
-      "W": "Felixie"
+      "W": "Felixie",
+      "gender": "MALE"
     },
     "Cyril": {
       "M": "Cyril",
@@ -109,7 +112,8 @@
       "B": "Cyrila",
       "N": "Cyrilem",
       "Ms": "Cyrilu",
-      "W": "Cyrilu"
+      "W": "Cyrilu",
+      "gender": "MALE"
     },
     "Ryn": {
       "M": "Ryn",
@@ -118,7 +122,8 @@
       "B": "Ryna",
       "N": "Rynem",
       "Ms": "Rynie",
-      "W": "Rynie"
+      "W": "Rynie",
+      "gender": "MALE"
     },
     "Ike -> Monica": {
       "M": "Ike -> Monica",

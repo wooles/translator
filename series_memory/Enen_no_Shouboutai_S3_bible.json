@@ -131,7 +131,8 @@
       "B": "Shinrę",
       "N": "Shinrą",
       "Ms": "Shinrze",
-      "W": "Shinro"
+      "W": "Shinro",
+      "gender": "MALE"
     },
     "Haumea": {
       "M": "Haumea",
@@ -150,7 +151,8 @@
       "B": "Sho",
       "N": "Sho",
       "Ms": "Sho",
-      "W": "Sho"
+      "W": "Sho",
+      "gender": "MALE"
     },
     "Obi": {
       "M": "Obi",
@@ -159,7 +161,8 @@
       "B": "Obi",
       "N": "Obi",
       "Ms": "Obi",
-      "W": "Obi"
+      "W": "Obi",
+      "gender": "MALE"
     },
     "Maki": {
       "M": "Maki",
@@ -178,7 +181,8 @@
       "B": "Lichta",
       "N": "Lichtem",
       "Ms": "Lichcie",
-      "W": "Lichcie"
+      "W": "Lichcie",
+      "gender": "MALE"
     },
     "Vulcan": {
       "M": "Vulcan",
@@ -187,7 +191,8 @@
       "B": "Vulcana",
       "N": "Vulcanem",
       "Ms": "Vulcanie",
-      "W": "Vulcanie"
+      "W": "Vulcanie",
+      "gender": "MALE"
     },
     "Obywatele": {
       "M": "Obywatele",
@@ -196,7 +201,8 @@
       "B": "Obywatele",
       "N": "Obywatele",
       "Ms": "Obywatele",
-      "W": "Obywatele"
+      "W": "Obywatele",
+      "gender": "MALE"
     },
     "Arthur": {
       "M": "Arthur",
@@ -205,7 +211,8 @@
       "B": "Arthura",
       "N": "Arthurem",
       "Ms": "Arthurze",
-      "W": "Arthurze"
+      "W": "Arthurze",
+      "gender": "MALE"
     },
     "Charon": {
       "M": "Charon",
@@ -214,7 +221,8 @@
       "B": "Charona",
       "N": "Charonem",
       "Ms": "Charonie",
-      "W": "Charonie"
+      "W": "Charonie",
+      "gender": "MALE"
     },
     "Inca": {
       "M": "Inca",

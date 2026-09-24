@@ -5,7 +5,7 @@
       "description": "MĘŻCZYZNA - Król Demonicznych Bestii / Władca Mrocznych Bestii (monstrualny, prastary demon o wielkiej mądrości i sile, potężny, arogancki, dostojny głos)"
     },
     "Alicia": {
-      "description": "KOBIETA - Dziewczyna Rycerz / Bohaterka z 13 Bohaterów, która przeciwstawiła się bezmyślnej rzezi i zawarła pakt z Clevatessem"
+      "description": "MĘŻCZYZNA - Dziewczyna Rycerz / Bohaterka z 13 Bohaterów, która przeciwstawiła się bezmyślnej rzezi i zawarła pakt z Clevatessem"
     },
     "Nel": {
       "description": "MĘŻCZYZNA - Niemowlę powierzone Clevatessowi i Alicii"
@@ -49,14 +49,11 @@
     "Leon": {
       "description": "MĘŻCZYZNA (uczeń akademii)"
     },
-    "Luna": {
-      "description": "MĘŻCZYZNA - mężczyzna (postać)"
-    },
     "Lang": {
       "description": "MĘŻCZYZNA - mężczyzna (postać)"
     },
     "Chiffonlits": {
-      "description": "KOBIETA - kobieta (postać)"
+      "description": "MĘŻCZYZNA - MĘŻCZYZNA (postać)"
     },
     "Elro": {
       "description": "MĘŻCZYZNA - mężczyzna (Dyrektor Akademii, fałszywy kapłan sprzymierzony z mrocznymi siłami)"
@@ -140,7 +137,12 @@
     "Thirteen Heroes / 13 Heroes": "Trzynastu Bohaterów",
     "Hero Armament / Hero Weapon": "Oręż Bohatera",
     "Kingdom of Hiden": "Królestwo Hiden (kraina; zwrot 'z Hiden' to dopełniacz pochodzenia, zakaz 'z Hidenem')",
-    "Hiden": "Hiden (królestwo / kraina)",
+    "Kingdom of Haiden": "Królestwo Hiden (kraina; toponim; zwrot 'z Hiden' to dopełniacz pochodzenia, zakaz 'z Haidenem')",
+    "Hiden": "Hiden (królestwo / kraina; toponim; dopełniacz pochodzenia: z Hiden, zakaz 'z Hidenem')",
+    "Haiden": "Hiden (królestwo / kraina; toponim; dopełniacz pochodzenia: z Hiden, zakaz 'z Haidenem' i 'z Hidenem')",
+    "Boirate": "Boelate (cesarstwo / kraina; toponim; dopełniacz pochodzenia: z Boelate, zakaz 'z Boiratem')",
+    "Esrin": "Eslinn (królestwo; toponim; dopełniacz pochodzenia: z Eslinn, zakaz 'z Esrinem')",
+    "Haiderat": "Hyderat (stolica Hiden; toponim)",
     "Elbe Shaft": "Szyb Elbe (kopalnia / lokacja)",
     "Solsein": "Solsein (akademia / instytucja)",
     "Alyssa Sleihunt": "Alicia Sleihunt",
@@ -194,17 +196,18 @@
       "B": "Clevatessa",
       "N": "Clevatessem",
       "Ms": "Clevatessie",
-      "W": "Clevatessie"
+      "W": "Clevatessie",
+      "gender": "MALE"
     },
     "Alicia": {
       "M": "Alicia",
-      "D": "Aliciy",
-      "C": "Alicie",
+      "D": "Alicii",
+      "C": "Alicii",
       "B": "Alicię",
       "N": "Alicią",
-      "Ms": "Alicie",
+      "Ms": "Alicii",
       "W": "Alicio",
-      "gender": "FEMALE"
+      "gender": "MALE"
     },
     "Naie": {
       "M": "Naie",
@@ -233,7 +236,8 @@
       "B": "Rathwella",
       "N": "Rathwellem",
       "Ms": "Rathwellu",
-      "W": "Rathwellu"
+      "W": "Rathwellu",
+      "gender": "MALE"
     },
     "Klen": {
       "M": "Klen",
@@ -242,7 +246,8 @@
       "B": "Klena",
       "N": "Klenem",
       "Ms": "Klenie",
-      "W": "Klenie"
+      "W": "Klenie",
+      "gender": "MALE"
     },
     "Sarasa": {
       "M": "Sarasa",
@@ -261,7 +266,8 @@
       "B": "Edisona",
       "N": "Edisonem",
       "Ms": "Edisonie",
-      "W": "Edisonie"
+      "W": "Edisonie",
+      "gender": "MALE"
     },
     "Tygel": {
       "M": "Tygel",
@@ -270,7 +276,8 @@
       "B": "Tygela",
       "N": "Tygelem",
       "Ms": "Tygelu",
-      "W": "Tygelu"
+      "W": "Tygelu",
+      "gender": "MALE"
     },
     "Leon": {
       "M": "Leon",
@@ -279,16 +286,8 @@
       "B": "Leona",
       "N": "Leonem",
       "Ms": "Leonie",
-      "W": "Leonie"
-    },
-    "Luna": {
-      "M": "Luna",
-      "D": "Luny",
-      "C": "Lunie",
-      "B": "Lunę",
-      "N": "Luną",
-      "Ms": "Lunie",
-      "W": "Luno"
+      "W": "Leonie",
+      "gender": "MALE"
     },
     "Lang": {
       "M": "Lang",
@@ -297,7 +296,8 @@
       "B": "Langa",
       "N": "Langem",
       "Ms": "Langu",
-      "W": "Langu"
+      "W": "Langu",
+      "gender": "MALE"
     },
     "Chiffonlits": {
       "M": "Chiffonlits",
@@ -307,7 +307,7 @@
       "N": "Chiffonlitsem",
       "Ms": "Chiffonlitsie",
       "W": "Chiffonlitsie",
-      "gender": "FEMALE"
+      "gender": "MALE"
     },
     "Elro": {
       "M": "Elro",
@@ -316,7 +316,8 @@
       "B": "Elro",
       "N": "Elro",
       "Ms": "Elro",
-      "W": "Elro"
+      "W": "Elro",
+      "gender": "MALE"
     },
     "Ray Forester": {
       "M": "Ray Forester",
@@ -325,7 +326,8 @@
       "B": "Ray Forestera",
       "N": "Ray Foresterem",
       "Ms": "Ray Foresterze",
-      "W": "Ray Foresterze"
+      "W": "Ray Foresterze",
+      "gender": "MALE"
     },
     "Andrew": {
       "M": "Andrew",
@@ -334,7 +336,8 @@
       "B": "Andrewa",
       "N": "Andrewem",
       "Ms": "Andrewie",
-      "W": "Andrewie"
+      "W": "Andrewie",
+      "gender": "MALE"
     },
     "Leon i Tygel": {
       "M": "Leon i Tygel",
@@ -343,7 +346,8 @@
       "B": "Leona i Tygela",
       "N": "Leonem i Tygelem",
       "Ms": "Leonie i Tygelu",
-      "W": "Leonie i Tygelu"
+      "W": "Leonie i Tygelu",
+      "gender": "MALE"
     },
     "Yuriel": {
       "M": "Yuriel",
@@ -352,7 +356,8 @@
       "B": "Yuriela",
       "N": "Yurielem",
       "Ms": "Yurielu",
-      "W": "Yurielu"
+      "W": "Yurielu",
+      "gender": "MALE"
     },
     "Owen Koath": {
       "M": "Owen Koath",
@@ -361,7 +366,8 @@
       "B": "Owena Koatha",
       "N": "Owenem Koathem",
       "Ms": "Owenie Koathie",
-      "W": "Owenie Koathie"
+      "W": "Owenie Koathie",
+      "gender": "MALE"
     },
     "Klen Vatiss (Clevatess)": {
       "M": "Klen Vatiss (Clevatess)",
@@ -370,7 +376,8 @@
       "B": "Klena Vatissa (Clevatess)a",
       "N": "Klenem Vatissem (Clevatess)em",
       "Ms": "Klenie Vatissie (Clevatess)ie",
-      "W": "Klenie Vatissie (Clevatess)ie"
+      "W": "Klenie Vatissie (Clevatess)ie",
+      "gender": "MALE"
     },
     "Drel": {
       "M": "Drel",
@@ -379,7 +386,8 @@
       "B": "Drela",
       "N": "Drelem",
       "Ms": "Drelu",
-      "W": "Drelu"
+      "W": "Drelu",
+      "gender": "MALE"
     },
     "Gart": {
       "M": "Gart",
@@ -388,7 +396,8 @@
       "B": "Garta",
       "N": "Gartem",
       "Ms": "Garcie",
-      "W": "Garcie"
+      "W": "Garcie",
+      "gender": "MALE"
     },
     "Vordin": {
       "M": "Vordin",
@@ -397,7 +406,8 @@
       "B": "Vordina",
       "N": "Vordinem",
       "Ms": "Vordinie",
-      "W": "Vordinie"
+      "W": "Vordinie",
+      "gender": "MALE"
     },
     "Nel": {
       "M": "Nel",
@@ -406,7 +416,8 @@
       "B": "Nela",
       "N": "Nelem",
       "Ms": "Nelu",
-      "W": "Nelu"
+      "W": "Nelu",
+      "gender": "MALE"
     },
     "Clen": {
       "M": "Clen",
@@ -415,7 +426,8 @@
       "B": "Clena",
       "N": "Clenem",
       "Ms": "Clenie",
-      "W": "Clenie"
+      "W": "Clenie",
+      "gender": "MALE"
     },
     "Klen / Clevatess": {
       "M": "Klen / Clevatess",
@@ -424,7 +436,8 @@
       "B": "Klena / Clevatessa",
       "N": "Klenem / Clevatessem",
       "Ms": "Klenie / Clevatessie",
-      "W": "Klenie / Clevatessie"
+      "W": "Klenie / Clevatessie",
+      "gender": "MALE"
     },
     "Alicia Sleihunt": {
       "M": "Alicia Sleihunt",
@@ -453,7 +466,8 @@
       "B": "Andrewa Hwypa",
       "N": "Andrewem Hwypem",
       "Ms": "Andrewie Hwypie",
-      "W": "Andrewie Hwypie"
+      "W": "Andrewie Hwypie",
+      "gender": "MALE"
     },
     "Naie Chiffonlits": {
       "M": "Naie Chiffonlits",
@@ -472,7 +486,8 @@
       "B": "Ray",
       "N": "Ray",
       "Ms": "Ray",
-      "W": "Ray"
+      "W": "Ray",
+      "gender": "MALE"
     },
     "Carson": {
       "M": "Carson",
@@ -481,7 +496,8 @@
       "B": "Carsona",
       "N": "Carsonem",
       "Ms": "Carsonie",
-      "W": "Carsonie"
+      "W": "Carsonie",
+      "gender": "MALE"
     },
     "Clevatess -> Alicia": {
       "M": "Clevatess -> Alicia",

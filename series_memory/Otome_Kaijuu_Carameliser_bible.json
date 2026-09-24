@@ -41,7 +41,7 @@
       "description": "mężczyzna / chłopak (Główny bohater) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Arata Minami (Inubaki)": {
-      "description": "KOBIETA - mężczyzna (16 lat, popularny uczeń, chłopak Kuroe, wciągnięty w show-biznes) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]"
+      "description": "MĘŻCZYZNA - mężczyzna (16 lat, popularny uczeń, chłopak Kuroe, wciągnięty w show-biznes) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]"
     },
     "Seina Katsuragi": {
       "description": "kobieta (Licealistka i profesjonalna aktorka, partnerka Araty na planie) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
@@ -178,7 +178,8 @@
       "B": "Aratę",
       "N": "Aratą",
       "Ms": "Aracie",
-      "W": "Arato"
+      "W": "Arato",
+      "gender": "MALE"
     },
     "Kuroe": {
       "M": "Kuroe",
@@ -227,7 +228,8 @@
       "B": "Taichi",
       "N": "Taichi",
       "Ms": "Taichi",
-      "W": "Taichi"
+      "W": "Taichi",
+      "gender": "MALE"
     },
     "Kuroe Kurozu": {
       "M": "Kuroe Kurozu",
@@ -246,7 +248,8 @@
       "B": "Aratę Inubaki",
       "N": "Aratą Inubaki",
       "Ms": "Aracie Inubaki",
-      "W": "Arato Inubaki"
+      "W": "Arato Inubaki",
+      "gender": "MALE"
     },
     "Arata Minami (Inubaki)": {
       "M": "Arata Minami (Inubaki)",
@@ -256,7 +259,7 @@
       "N": "Aratą Minami (Inubaki)em",
       "Ms": "Aracie Minami (Inubaki)ie",
       "W": "Arato Minami (Inubaki)ie",
-      "gender": "FEMALE"
+      "gender": "MALE"
     },
     "Seina Katsuragi": {
       "M": "Seina Katsuragi",
@@ -325,7 +328,8 @@
       "B": "Harugona",
       "N": "Harugonem",
       "Ms": "Harugonie",
-      "W": "Harugonie"
+      "W": "Harugonie",
+      "gender": "MALE"
     },
     "Godolla": {
       "M": "Godolla",
@@ -334,7 +338,8 @@
       "B": "Godollę",
       "N": "Godollą",
       "Ms": "Godolle",
-      "W": "Godollo"
+      "W": "Godollo",
+      "gender": "MALE"
     },
     "Arata Minami": {
       "M": "Arata Minami",
@@ -343,7 +348,8 @@
       "B": "Aratę Minami",
       "N": "Aratą Minami",
       "Ms": "Aracie Minami",
-      "W": "Arato Minami"
+      "W": "Arato Minami",
+      "gender": "MALE"
     },
     "Kuroe Akaishi": {
       "M": "Kuroe Akaishi",
@@ -372,7 +378,8 @@
       "B": "Kotaro Hibino",
       "N": "Kotaro Hibino",
       "Ms": "Kotaro Hibino",
-      "W": "Kotaro Hibino"
+      "W": "Kotaro Hibino",
+      "gender": "MALE"
     },
     "Arata -> Kuroe": {
       "M": "Arata -> Kuroe",

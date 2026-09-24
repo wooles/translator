@@ -267,7 +267,8 @@
       "B": "Pokotę",
       "N": "Pokotą",
       "Ms": "Pokocie",
-      "W": "Pokoto"
+      "W": "Pokoto",
+      "gender": "MALE"
     },
     "Sachi Akafuku": {
       "M": "Sachi Akafuku",
@@ -425,7 +426,8 @@
       "B": "Tondena Minoru",
       "N": "Tondenem Minoru",
       "Ms": "Tondenie Minoru",
-      "W": "Tondenie Minoru"
+      "W": "Tondenie Minoru",
+      "gender": "MALE"
     }
   },
   "hypocorisms": {},

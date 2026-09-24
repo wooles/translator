@@ -41,13 +41,13 @@
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
     },
     "Ou Hon": {
-      "description": "KOBIETA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
     },
     "Heki": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
     },
     "Yotanwa": {
-      "description": "KOBIETA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
     },
     "Shun Sui Ju": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
@@ -423,9 +423,10 @@
       "D": "Wanga Bena",
       "C": "Wangowi Benowi",
       "B": "Wanga Bena",
-      "N": "Wangem Benem",
+      "N": "Wangiem Benem",
       "Ms": "Wangu Benie",
-      "W": "Wangu Benie"
+      "W": "Wangu Benie",
+      "gender": "MALE"
     },
     "Mǎ Nanci": {
       "M": "Mǎ Nanci",
@@ -434,7 +435,8 @@
       "B": "Mǎa Nanci",
       "N": "Mǎem Nanci",
       "Ms": "Mǎie Nanci",
-      "W": "Mǎie Nanci"
+      "W": "Mǎie Nanci",
+      "gender": "MALE"
     },
     "Fan Yang": {
       "M": "Fan Yang",
@@ -443,7 +445,8 @@
       "B": "Fana Yanga",
       "N": "Fanem Yangem",
       "Ms": "Fanie Yangu",
-      "W": "Fanie Yangu"
+      "W": "Fanie Yangu",
+      "gender": "MALE"
     },
     "Xin": {
       "M": "Xin",
@@ -452,7 +455,8 @@
       "B": "Xina",
       "N": "Xinem",
       "Ms": "Xinie",
-      "W": "Xinie"
+      "W": "Xinie",
+      "gender": "MALE"
     },
     "Wang Jian": {
       "M": "Wang Jian",
@@ -461,7 +465,8 @@
       "B": "Wanga Jiana",
       "N": "Wangem Jianem",
       "Ms": "Wangu Jianie",
-      "W": "Wangu Jianie"
+      "W": "Wangu Jianie",
+      "gender": "MALE"
     },
     "Bi": {
       "M": "Bi",
@@ -470,16 +475,18 @@
       "B": "Bi",
       "N": "Bi",
       "Ms": "Bi",
-      "W": "Bi"
+      "W": "Bi",
+      "gender": "MALE"
     },
     "Yang Duanhe": {
       "M": "Yang Duanhe",
       "D": "Yanga Duanhe",
       "C": "Yangowi Duanhe",
       "B": "Yanga Duanhe",
-      "N": "Yangem Duanhe",
+      "N": "Yangiem Duanhe",
       "Ms": "Yangu Duanhe",
-      "W": "Yangu Duanhe"
+      "W": "Yangu Duanhe",
+      "gender": "MALE"
     },
     "Shun Shuishu": {
       "M": "Shun Shuishu",
@@ -488,7 +495,8 @@
       "B": "Shuna Shuishu",
       "N": "Shunem Shuishu",
       "Ms": "Shunie Shuishu",
-      "W": "Shunie Shuishu"
+      "W": "Shunie Shuishu",
+      "gender": "MALE"
     },
     "Lozo": {
       "M": "Lozo",
@@ -497,16 +505,18 @@
       "B": "Lozo",
       "N": "Lozo",
       "Ms": "Lozo",
-      "W": "Lozo"
+      "W": "Lozo",
+      "gender": "MALE"
     },
     "Oddział Yu Feng": {
       "M": "Oddział Yu Feng",
-      "D": "Oddziała Yu Fenga",
-      "C": "Oddziałowi Yu Fengowi",
-      "B": "Oddziała Yu Fenga",
-      "N": "Oddziałem Yu Fengem",
-      "Ms": "Oddziałie Yu Fengu",
-      "W": "Oddziałie Yu Fengu"
+      "D": "Oddziału Yu Feng",
+      "C": "Oddziałowi Yu Feng",
+      "B": "Oddział Yu Feng",
+      "N": "Oddziałem Yu Feng",
+      "Ms": "Oddziale Yu Feng",
+      "W": "Oddziale Yu Feng",
+      "gender": "MALE"
     },
     "Han Chang": {
       "M": "Han Chang",
@@ -515,16 +525,18 @@
       "B": "Hana Changa",
       "N": "Hanem Changem",
       "Ms": "Hanie Changu",
-      "W": "Hanie Changu"
+      "W": "Hanie Changu",
+      "gender": "MALE"
     },
     "Wei Ping / Song Zuo / Tian Yong": {
       "M": "Wei Ping / Song Zuo / Tian Yong",
       "D": "Wei Pinga / Songa Zuo / Tiana Yonga",
       "C": "Wei Pingowi / Songowi Zuo / Tianowi Yongowi",
       "B": "Wei Pinga / Songa Zuo / Tiana Yonga",
-      "N": "Wei Pingem / Songem Zuo / Tianem Yongem",
+      "N": "Wei Pingiem / Songiem Zuo / Tianem Yongiem",
       "Ms": "Wei Pingu / Songu Zuo / Tianie Yongu",
-      "W": "Wei Pingu / Songu Zuo / Tianie Yongu"
+      "W": "Wei Pingu / Songu Zuo / Tianie Yongu",
+      "gender": "MALE"
     },
     "Ban You": {
       "M": "Ban You",
@@ -533,17 +545,18 @@
       "B": "Bana You",
       "N": "Banem You",
       "Ms": "Banie You",
-      "W": "Banie You"
+      "W": "Banie You",
+      "gender": "MALE"
     },
     "Ou Hon": {
       "M": "Ou Hon",
-      "D": "Ou Hon",
-      "C": "Ou Hon",
-      "B": "Ou Hon",
-      "N": "Ou Hon",
-      "Ms": "Ou Hon",
-      "W": "Ou Hon",
-      "gender": "FEMALE"
+      "D": "Ou Hona",
+      "C": "Ou Honowi",
+      "B": "Ou Hona",
+      "N": "Ou Honem",
+      "Ms": "Ou Honie",
+      "W": "Ou Honie",
+      "gender": "MALE"
     },
     "Heki": {
       "M": "Heki",
@@ -552,17 +565,18 @@
       "B": "Heki",
       "N": "Heki",
       "Ms": "Heki",
-      "W": "Heki"
+      "W": "Heki",
+      "gender": "MALE"
     },
     "Yotanwa": {
       "M": "Yotanwa",
       "D": "Yotanwy",
-      "C": "Yotanwe",
+      "C": "Yotanwie",
       "B": "Yotanwę",
       "N": "Yotanwą",
-      "Ms": "Yotanwe",
+      "Ms": "Yotanwie",
       "W": "Yotanwo",
-      "gender": "FEMALE"
+      "gender": "MALE"
     },
     "Shun Sui Ju": {
       "M": "Shun Sui Ju",
@@ -571,7 +585,8 @@
       "B": "Shuna Sui Ju",
       "N": "Shunem Sui Ju",
       "Ms": "Shunie Sui Ju",
-      "W": "Shunie Sui Ju"
+      "W": "Shunie Sui Ju",
+      "gender": "MALE"
     },
     "Rozo": {
       "M": "Rozo",
@@ -580,7 +595,8 @@
       "B": "Rozo",
       "N": "Rozo",
       "Ms": "Rozo",
-      "W": "Rozo"
+      "W": "Rozo",
+      "gender": "MALE"
     },
     "Danto": {
       "M": "Danto",
@@ -589,7 +605,8 @@
       "B": "Danto",
       "N": "Danto",
       "Ms": "Danto",
-      "W": "Danto"
+      "W": "Danto",
+      "gender": "MALE"
     },
     "Shin": {
       "M": "Shin",
@@ -598,7 +615,8 @@
       "B": "Shina",
       "N": "Shinem",
       "Ms": "Shinie",
-      "W": "Shinie"
+      "W": "Shinie",
+      "gender": "MALE"
     },
     "Mou Ten": {
       "M": "Mou Ten",
@@ -607,7 +625,8 @@
       "B": "Mou Tena",
       "N": "Mou Tenem",
       "Ms": "Mou Tenie",
-      "W": "Mou Tenie"
+      "W": "Mou Tenie",
+      "gender": "MALE"
     },
     "Ri Boku": {
       "M": "Ri Boku",
@@ -616,16 +635,18 @@
       "B": "Ri Boku",
       "N": "Ri Boku",
       "Ms": "Ri Boku",
-      "W": "Ri Boku"
+      "W": "Ri Boku",
+      "gender": "MALE"
     },
     "Meng Tian": {
       "M": "Meng Tian",
       "D": "Menga Tiana",
       "C": "Mengowi Tianowi",
       "B": "Menga Tiana",
-      "N": "Mengem Tianem",
+      "N": "Mengiem Tianem",
       "Ms": "Mengu Tianie",
-      "W": "Mengu Tianie"
+      "W": "Mengu Tianie",
+      "gender": "MALE"
     },
     "Ding Yang": {
       "M": "Ding Yang",
@@ -634,7 +655,8 @@
       "B": "Dinga Yanga",
       "N": "Dingem Yangem",
       "Ms": "Dingu Yangu",
-      "W": "Dingu Yangu"
+      "W": "Dingu Yangu",
+      "gender": "MALE"
     },
     "Wang Ben -> Mǎ Nanci": {
       "M": "Wang Ben -> Mǎ Nanci",
@@ -743,7 +765,8 @@
       "B": "Ban You -> Ou Hon",
       "N": "Ban You -> Ou Hon",
       "Ms": "Ban You -> Ou Hon",
-      "W": "Ban You -> Ou Hon"
+      "W": "Ban You -> Ou Hon",
+      "gender": "MALE"
     },
     "Heki -> Yotanwa": {
       "M": "Heki -> Yotanwa",

@@ -122,6 +122,7 @@ class AudioProsodyEngine:
             return {}
 
         results = {}
+        prev_dbfs: Optional[float] = None
 
         for b_id, ev in events:
             # Relative timestamp in WAV slice
@@ -150,6 +151,10 @@ class AudioProsodyEngine:
                 tags.append("cichy szept / monolog wewnętrzny")
             elif dbfs > -12.0 or peak_dbfs > -1.0:
                 tags.append("krzyk bojowy / silne wzburzenie emocjonalne")
+
+            # Filar CLXXVIII: Detect sudden affective collapse / shock shift (drop >= 12 dBFS or shout -> whisper)
+            if prev_dbfs is not None and cls.detect_affective_shock_shift(prev_dbfs, dbfs):
+                tags.append("pęknięcie afektywne / nagły szok lub zamilknięcie (Ac=SHOCK_DROP)")
 
             # Analyze speech duration and energy variance (trembling / rapid / calm sarcasm)
             duration_s = (ev.end - ev.start) / 1000.0
@@ -180,7 +185,22 @@ class AudioProsodyEngine:
             if tags:
                 results[b_id] = " | ".join(tags)
 
+            prev_dbfs = dbfs
+
         return results
+
+    @classmethod
+    def detect_affective_shock_shift(cls, prev_dbfs: float, curr_dbfs: float) -> bool:
+        """
+        Detects sudden affective collapse / shock shift (Filar CLXXVIII).
+        Triggers when acoustic energy plunges by >= 12 dBFS between consecutive turns
+        or transitions from a shout/high-energy state (>-18 dBFS) directly into near-whisper (<-30 dBFS).
+        """
+        if prev_dbfs - curr_dbfs >= 12.0:
+            return True
+        if prev_dbfs > -18.0 and curr_dbfs < -30.0:
+            return True
+        return False
 
     @classmethod
     def calculate_syllable_budget(cls, duration_s: float, dbfs: float = -20.0) -> int:

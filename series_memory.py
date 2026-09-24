@@ -9,7 +9,7 @@ import os
 import re
 import json
 from pathlib import Path
-from typing import Dict, List, Any, Optional, Set, Tuple
+from typing import Dict, List, Any, Optional, Set, Tuple, Union
 
 import unicodedata
 
@@ -28,23 +28,331 @@ def clean_anime_slug(title: str) -> str:
 
 
 INHERENT_FEMALE_NOUNS = {
-    "girl", "woman", "female", "dziewczyna", "dziewczynka", "kobieta", "matka", "mama",
-    "córka", "siostra", "królowa", "księżniczka", "uczennica", "lady", "miss", "mrs", "ms",
-    "heroine", "witch", "czarownica", "bohaterka", "staruszka", "babcia"
+    # Basic / Family / Age
+    "girl", "woman", "female", "lady", "miss", "mrs", "ms", "heroine", "witch",
+    "dziewczyna", "dziewczynka", "kobieta", "matka", "mama", "mamusia", "mateczka", "mamunia", "macocha",
+    "córka", "córeczka", "córunia", "siostra", "siostrzyczka", "siostrunia",
+    "babcia", "babunia", "babka", "prababka", "staruszka", "starowinka", "starowina", "starucha", "seniorka", "matrona",
+    "wnuczka", "prawnuczka", "ciotka", "ciocia", "ciotunia", "stryjenka", "wujenka", "wujna",
+    "siostrzenica", "bratanica", "teściowa", "świekra", "synowa", "szwagierka", "bratowa", "jątrew",
+    "kuzynka", "krewna", "pociotka", "sierota", "wdowa", "panna", "panienka", "panna młoda", "młodka", "niewiasta", "białogłowa",
+    "pani", "pani domu", "oblubienica", "narzeczona", "wybranka", "ukochana", "małżonka", "żona", "żonka", "żonusia",
+    # Nobility / Administration / Royalty
+    "królowa", "królewna", "królowa-matka", "księżniczka", "księżna", "caryca", "cesarzowa", "cesarzówna", "carówna",
+    "władczyni", "monarchini", "kniagini", "arcyksiężna", "arystokratka", "szlachcianka", "magnatka",
+    "hrabina", "hrabianka", "margrabina", "baronowa", "baronówna", "wicehrabina", "markiza", "wielmożna", "suwerenka",
+    "kasztelanka", "kasztelanowa", "wojewodzina", "wojewodzianka", "starościna", "starościanka", "podkomorzyna",
+    "stolnikowa", "cześnikowa", "miecznikowa", "dziedziczka", "posesorka", "feudałka", "seniorka", "suzerenka",
+    "protektorka", "patronka", "kuratorka", "sędzina", "sędzia", "jurorka", "notariuszka", "mecenaska", "rejentowa",
+    "adwokatka", "prokuratorka", "trybunka", "prefektka", "rajczyni", "burmistrzyni", "prezydentka", "sołtyska", "wójtowa",
+    "kanclerzowa", "kanclerka", "namiestniczka", "urzędniczka", "zarządczyni", "konsulka", "senatorka", "posłanka",
+    "deputowana", "ambasadorka", "dyplomatka", "heroldzica",
+    # Military / Guard / Combat
+    "strażniczka", "wojowniczka", "żołnierka", "rycerka", "komendantka", "kapitanka", "generałowa",
+    "łuczniczka", "szermierka", "zwiadowczyni", "najemniczka", "bohaterka", "oficerka", "rekrutka", "gladiatorka",
+    "kuszniczka", "kanonierka", "partyzantka", "majorka", "pułkownikowa", "admirałowa", "hetmanka", "hetmanowa",
+    "berserkerka", "amazonka", "tarczowniczka", "włóczniczka", "grenadierka", "sapera", "weteranka", "dezerterka", "cichociemna",
+    # Religion / Magic / Science
+    "czarownica", "czarodziejka", "kapłanka", "arcykapłanka", "miko", "westalka", "mniszka", "zakonnica", "opatka", "ksieni",
+    "przeorysza", "siostrzyczka", "nowicjuszka", "postulantka", "misjonarka", "katechetka", "teolożka", "kaznodziejka",
+    "prorokini", "wieszczka", "jasnowidzka", "wyrocznia", "wróżka", "wróżbiarka", "chiromantka", "zielarka", "guślarka",
+    "szamanka", "druidka", "maga", "magini", "arcymaga", "czarnoksiężnica", "zaklinaczka", "nekromantka", "iluzjonistka",
+    "alchemiczka", "astrologini", "mędrczyni", "uczona", "badaczka", "profesorka", "doktorka", "filozofka", "myślicielka",
+    "astronomka", "matematyczka", "algebrzystka", "archeolożka", "historyczka", "kronikarka", "skrybka", "bibliotekarka", "archiwistka", "wiedźma",
+    "demonica", "bogini", "wampirzyca", "wilkołaczka", "nimfa", "rusałka", "driada", "syrena", "harpia", "banshee", "sukuba", "sukub",
+    "elfka", "krasnoludka", "orkini", "trollka", "diablica", "szatanka", "aniołica", "aniolica", "widmo", "zjawa",
+    # Domestic / Service
+    "służąca", "pokojówka", "gosposia", "kucharka", "kuchareczka", "szefowa kuchni", "ochmistrzyni", "panna służąca",
+    "pomocnica", "posługaczka", "pomywaczka", "praczka", "garderobiana", "czesaczka", "fryzjerka", "kosmetyczka",
+    "niańka", "piastunka", "mamka", "guwernantka", "bona", "opiekunka", "pensjonarka", "rezydentka", "odźwierna", "klucznica",
+    "szafarka", "sprzątaczka", "dziewka",
+    # Commoners / Trades / Crafts
+    "wieśniaczka", "chłopka", "rolniczka", "kmiotka", "osadniczka", "kmieciowa", "zagrodniczka", "chałupniczka", "komornica",
+    "pasterka", "owczarka", "dojarza", "gospodyni", "młynarka", "piekarzowa", "piekarka", "cukierniczka", "rzeźniczka", "masarka",
+    "krawcowa", "szwaczka", "hafciarka", "prządka", "tkaczka", "bieliźniarka", "modystka", "kuśnierka", "garbarniczka",
+    "szewcowa", "szewczyni", "kowalka", "kowalowa", "ślusarka", "stolarka", "garncarka", "bednarka", "cieślina", "murarka",
+    "dekarzowa", "szklarzowa", "drukara", "zecerka", "introligatorka", "mydlarka", "świecarka", "bartniczka", "pszczelarka",
+    "rybaczka", "marynarka", "flisaczka", "przewoźniczka", "woźniczka", "kupcowa", "handlarka", "kramarka", "straganiarka",
+    "przekupka", "karczmarka", "szynkarka", "oberżystka", "szynkareczka", "barmanka", "kelnerka", "garkuchnica", "górniczka",
+    # Underworld / Outsiders
+    "bandytka", "rozbójniczka", "zbójniczka", "łotrzyca", "złodziejka", "złodziejaszka", "kasiarka", "kieszonkowniczka",
+    "włamywaczka", "paserka", "szpieżka", "agentka", "wywiadowczyni", "skrytobójczyni", "zabójczyni", "morderczyni", "trucicielka",
+    "piratka", "korsarka", "przemytniczka", "szmuglerka", "oszustka", "szulerka", "szantażystka", "kłusowniczka", "żebraczka",
+    "nędzarka", "banitka", "wygnanka", "uchodźczyni", "tułaczka", "wędrowniczka", "uciekinierka", "zbieg", "renegatka",
+    "apostatka", "heretyczka", "buntowniczka", "powstańczyni", "dywersantka", "partyzantka", "niewolnica", "branka",
+    "więźniarka", "skazana", "potępiona",
+    # School / Youth / Medicine
+    "uczennica", "studentka", "słuchaczka", "wychowanka", "pensjonarka", "abiturientka", "absolwentka", "stażystka",
+    "praktykantka", "asystentka", "nauczycielka", "bakałarzowa", "pedagożka", "lektorka", "korepetytorka", "instruktorka",
+    "mentorka", "mistrzyni", "przewodniczka", "lekarka", "medyczka", "felczerka", "chirurżka", "internistka", "okulistka",
+    "pediatrka", "psychiatra", "psycholożka", "terapeutka", "aptekarka", "farmaceutka", "uzdrowicielka", "znachorka",
+    "sanitariuszka", "pielęgniarka", "siostra miłosierdzia", "salowa", "ratowniczka", "pacjentka", "chora", "ranna", "ozdrowieńcza"
 }
 
 INHERENT_MALE_NOUNS = {
-    "boy", "man", "male", "chłopak", "chłopiec", "mężczyzna", "ojciec", "tata",
-    "syn", "brat", "król", "książę", "uczeń", "lord", "mr", "hero", "bohater",
-    "czarodziej", "wizard", "starzec", "dziadek"
+    # Basic / Family / Age
+    "boy", "man", "male", "lord", "mr", "hero", "wizard",
+    "chłopak", "chłopiec", "mężczyzna", "ojciec", "tata", "tatuś", "ojczym", "syn", "synek", "synuś", "pasierb",
+    "brat", "braciszek", "dziadek", "dziadziuś", "starzec", "staruszek", "senior", "nestor", "starowina",
+    "pradziadek", "wnuk", "wnuczek", "prawnuk", "wuj", "wujek", "stryj", "stryjek", "siostrzeniec", "bratanek",
+    "teść", "świekier", "zięć", "szwagier", "bratankowy", "kuzyn", "krewny", "pociotek", "sierota", "wdowiec",
+    "kawaler", "młodzieniec", "młodzik", "podrostek", "gołowąs", "młodzian", "pan", "panicz", "bocchan",
+    "oblubieniec", "pan młody", "mąż", "małżonek",
+    # Nobility / Administration / Royalty
+    "król", "królewicz", "król-ojciec", "książę", "książątko", "car", "carewicz", "cesarz", "cesarzewicz", "władca",
+    "monarcha", "kniź", "diuk", "arcyksiążę", "arystokrata", "szlachcic", "magnat", "hrabia", "hrabicz", "margrabia",
+    "markiz", "baron", "baronet", "wicehrabia", "wielmoża", "suweren", "kasztelan", "wojewoda", "starosta",
+    "podkomorzy", "stolnik", "cześnik", "miecznik", "dziedzic", "posesor", "feudał", "senior", "suzeren", "wasal",
+    "protektor", "patron", "kurator", "sędzia", "ławnik", "juror", "notariusz", "mecenas", "rejent", "adwokat",
+    "prokurator", "trybun", "konsul", "senator", "poseł", "deputowany", "ambasador", "dyplomata", "legat", "herold",
+    "woźny", "burmistrz", "prezydent", "rajca", "wójt", "sołtys", "kanclerz", "wicekanclerz", "namiestnik", "urzędnik",
+    "poborca", "zarządca", "intendent", "dostojnik", "kuge", "buke",
+    # Military / Guard / Combat
+    "strażnik", "wartownik", "obrońca", "żołnierz", "rycerz", "generał", "dowódca", "kapitan", "komendant",
+    "sierżant", "porucznik", "podporucznik", "pułkownik", "podpułkownik", "major", "rotmistrz", "kapral", "szeregowiec",
+    "kadet", "rekrut", "brygadier", "feldmarszałek", "marszałek", "admirał", "komandor", "sternik", "nawigator",
+    "marynarz", "majtek", "bosman", "fechmistrz", "giermek", "łucznik", "kusznik", "szermierz", "piechur",
+    "zwiadowca", "kanonier", "artylerzysta", "saper", "szpica", "forpoczta", "wojownik", "najemnik", "kondotier",
+    "hetman", "oficer", "samuraj", "bohater", "czempion", "berserker", "gladiator", "tarczownik", "włócznik",
+    "halabardnik", "pikinier", "muszkieter", "dragon", "ułan", "husarz", "kirasjer", "lansjer", "kawalerzysta",
+    "grenadier", "weteran", "inwalida", "dezerter", "partyzant", "powstaniec", "dywersant", "komandos", "snajper",
+    # Religion / Magic / Science
+    "czarodziej", "czarnoksiężnik", "mag", "arcymag", "kapłan", "arcykapłan", "mnich", "zakonnik", "brat zakonny",
+    "nowicjusz", "kleryk", "seminarzysta", "opat", "przeor", "biskup", "arcybiskup", "patriarcha", "kardynał", "papież",
+    "prałat", "kanonik", "proboszcz", "wikary", "wikariusz", "misjonarz", "kaznodzieja", "teolog", "katecheta",
+    "prorok", "wieszcz", "jasnowidz", "wyrocznia", "wróżbita", "astrolog", "chiromanta", "guślarz", "szaman", "druid",
+    "zielarz", "znachor", "czarownik", "zaklinacz", "nekromanta", "iluzjonista", "alchemik", "mędrzec", "uczony",
+    "filozof", "myśliciel", "badacz", "profesor", "doktor", "astronom", "matematyk", "archeolog", "historyk",
+    "kronikarz", "skryba", "kopista", "bibliotekarz", "archiwista",
+    "demon", "bóg", "wampir", "wilkołak", "tryton", "centaur", "satyr", "inkub",
+    "elf", "krasnolud", "ork", "troll", "anioł", "archanioł", "diabeł", "szatan", "czort",
+    # Domestic / Service
+    "służący", "lokaj", "kamerdyner", "majordomus", "ochmistrz", "stangret", "woźnica", "parobek", "parobczak",
+    "pachołek", "stajenny", "masztalerz", "fornal", "ogrodnik", "stróż", "odźwierny", "cerber", "klucznik",
+    "szafarz", "kucharz", "kuchcik", "szef kuchni", "piwniczny", "podczaszy", "kredencerz", "guwerner", "pedagog",
+    "opiekun", "rezydent", "posłaniec", "goniec",
+    # Commoners / Trades / Crafts
+    "wieśniak", "chłop", "kmiotek", "rolnik", "oracz", "siewca", "żniwiarz", "kosiarz", "rataj", "włościanin", "osadnik",
+    "kmieć", "zagrodnik", "chałupnik", "komornik", "pasterz", "owczarz", "pastuszek", "juhas", "gospodarz", "młynarz",
+    "piekarz", "cukiernik", "masarz", "rzeźnik", "krawiec", "szewc", "garbarz", "kuśnierz", "kowal", "ślusarz",
+    "stolarz", "cieśla", "bednarz", "kołodziej", "rymarz", "siodlarz", "garncarz", "zdun", "murarz", "dekarz",
+    "szklarz", "malarz", "kamieniarz", "rzeźbiarz", "drukarz", "zecer", "introligator", "tkacz", "powroźnik",
+    "mydlarz", "świecarz", "zielarz", "bartnik", "pszczelarz", "leśnik", "gajowy", "drwal", "smolarz", "węglarz",
+    "rybak", "flisak", "marynarz", "żeglarz", "przewoźnik", "dorożkarz", "furman", "tragarz", "kurier", "listonosz",
+    "kupiec", "handlarz", "kramarz", "straganiarz", "przekupień", "faktor", "lichwiarz", "bankier", "wekslarz",
+    "karczmarz", "szynkarz", "oberżysta", "barman", "kelner", "garkuchnik", "górnik",
+    # Underworld / Outsiders
+    "bandyta", "zbój", "zbójnik", "rozbójnik", "łotr", "łotrzyk", "rzezimieszek", "złodziej", "złodziejaszek",
+    "kasiarz", "doliniarz", "kieszonkowiec", "włamywacz", "paser", "szpieg", "agent", "wywiadowca", "donosiciel",
+    "kapuś", "skrytobójca", "zabójca", "morderca", "truciciel", "pirat", "korsarz", "kaper", "przemytnik",
+    "szmugler", "oszust", "szuler", "szantażysta", "kłusownik", "żebrak", "nędzarz", "dziad", "łachmaniarz",
+    "banita", "wygnaniec", "uchodźca", "tułacz", "wędrowiec", "pielgrzym", "uciekinier", "zbieg", "renegat",
+    "apostata", "heretyk", "buntownik", "powstaniec", "dywersant", "niewolnik", "jeniec", "więzień", "skazaniec", "potępieniec",
+    # School / Youth / Medicine
+    "uczeń", "student", "żak", "słuchacz", "wychowanek", "pensjonarz", "abiturient", "absolwent", "stażysta",
+    "praktykant", "asystent", "nauczyciel", "profesor", "bakałarz", "pedagog", "lektor", "wychowawca", "korepetytor",
+    "instruktor", "mentor", "mistrz", "przewodnik", "doktor", "lekarz", "medyk", "felczer", "chirurg", "internista",
+    "okulista", "pediatra", "psychiatra", "psycholog", "terapeuta", "aptekarz", "farmaceuta", "uzdrowiciel", "znachor",
+    "sanitariusz", "pielęgniarz", "ratownik", "pacjent", "chory", "ranny", "ozdrowieniec"
 }
 
+INHERENT_PLURAL_NOUNS = {
+    # Polish
+    "strażnicy", "wartownicy", "obrońcy", "żołnierze", "wojownicy", "rycerze", "szermierze", "łucznicy", "kusznicy",
+    "kanonierzy", "saperzy", "zwiadowcy", "piechurzy", "gladiatorzy", "grenadierzy", "kadeci", "rekruci", "kaprale",
+    "sierżanci", "oficerowie", "kapitanowie", "majorowie", "pułkownicy", "generałowie", "marszałkowie", "admirałowie",
+    "marynarze", "weterani", "dezerterzy", "partyzanci", "powstańcy", "komandosi", "snajperzy", "najemnicy", "dowódcy",
+    "berserkerzy", "amazonki", "wojowniczki", "strażniczki", "łuczniczki", "zwiadowczynie",
+    "wieśniacy", "chłopi", "rolnicy", "osadnicy", "pasterze", "młynarze", "piekarze", "rzeźnicy", "krawcy", "szewcy",
+    "kowale", "ślusarze", "stolarze", "cieśle", "murarze", "drukarze", "tkacze", "drwale", "rybacy", "flisacy",
+    "marynarze", "żeglarze", "przewoźnicy", "woźnice", "tragarze", "kurierzy", "gońcy", "posłańcy", "handlarze",
+    "kupcy", "kramarze", "szynkarze", "karczmarze", "barmanki", "kelnerzy", "kelnerki", "wieśniaczki", "chłopki",
+    "krawcowe", "szwaczki", "mieszkańcy", "mieszczanie", "obywatele", "tubylcy", "tutejsi",
+    "arystokraci", "szlachcice", "szlachta", "magnaci", "lordowie", "baronowie", "hrabiowie", "suwereni", "władcy",
+    "władczynie", "królowie", "królowe", "cesarze", "cesarzowe", "książęta", "księżniczki", "sędziowie", "notariusze",
+    "adwokaci", "senatorowie", "posłowie", "dyplomaci", "ambasadorzy",
+    "kapłani", "kapłanki", "mnisi", "zakonnicy", "zakonnice", "mniszki", "biskupi", "druidzi", "szamani", "prorocy",
+    "wieszcze", "czarodzieje", "magowie", "czarnoksiężnicy", "nekromanci", "alchemicy", "mędrcy", "uczeni",
+    "profesorowie", "skrybowie",
+    "słudzy", "służący", "służące", "lokaje", "kamerdynerzy", "pachołkowie", "parobkowie", "stajenni", "ogrodnicy",
+    "stróże", "kucharze", "kucharki", "pokojówki", "niańki", "piastunki", "mamki", "opiekunki",
+    "ludzie", "mężczyźni", "kobiety", "panowie", "panie", "młodzieńcy", "panny", "panny młode", "chłopcy",
+    "dziewczęta", "dziewczyny", "dziewczynki", "dzieci", "maluchy", "berbecie", "dzieciaki", "rodzice", "ojcowie",
+    "matki", "synowie", "córki", "bracia", "siostry", "dziadkowie", "babcie", "wnuki", "wujowie", "stryjowie", "ciotki",
+    "krewni", "pociotkowie", "małżonkowie", "pary", "narzeczeni", "wdowy", "wdowcy", "starcy", "staruszkowie",
+    "staruszki", "seniorzy", "przodkowie",
+    "bandyci", "rozbójnicy", "zbóje", "zbójnicy", "rozbójnicy", "łotry", "rzezimieszki", "złodzieje", "włamywacze",
+    "szpiedzy", "agenci", "skrytobójcy", "zabójcy", "mordercy", "piraci", "korsarze", "przemytnicy", "szulerzy",
+    "żebracy", "nędzarze", "banici", "wygnańcy", "uchodźcy", "uchodźczynie", "tułacze", "uciekinierzy", "renegaci",
+    "buntownicy", "powstańcy", "niewolnicy", "niewolnice", "jeńcy", "więźniowie", "skazańcy",
+    "uczniowie", "uczennice", "studentki", "studenci", "słuchacze", "wychowankowie", "absolwenci", "nauczyciele",
+    "nauczycielki", "lektorzy", "mentorzy", "lekarze", "lekarki", "medycy", "chirurdzy", "aptekarze", "uzdrowiciele",
+    "pielęgniarki", "pielęgniarze", "sanitariusze", "ratownicy", "pacjenci", "pacjentki", "ranni", "chorzy",
+    "tłum", "tłumy", "pospólstwo", "gawiedź", "czeladź", "rzesza", "rzesze", "starszyzna", "plemię", "klan", "ród",
+    "załoga", "armia", "wojsko", "wojska", "oddział", "oddziały", "kompania", "kompanie", "warta", "straż", "patrol",
+    "patrole", "pułk", "pułki", "batalion", "bataliony", "dywizja", "dywizje", "legia", "legie", "horda", "hordy",
+    "wataha", "watahy", "zgraja", "banda", "bandy", "świta", "orszak", "zgromadzenie", "zebrani", "zebranie",
+    "goście", "widzowie", "publiczność", "widownia", "obecni", "uczestnicy", "pasażerowie", "przechodnie", "gapie",
+    "posłańcy", "gońcy",
+    # English
+    "guards", "soldiers", "warriors", "knights", "generals", "commanders", "officers", "mercenaries", "archers",
+    "swordsmen", "spearmen", "scouts", "snipers", "captains", "marshals", "admirals", "sailors", "veterans", "rebels",
+    "partisans", "commandos",
+    "villagers", "peasants", "farmers", "citizens", "townspeople", "merchants", "traders", "people", "settlers",
+    "shepherds", "bakers", "butchers", "smiths", "blacksmiths", "carpenters", "fishermen", "drivers", "couriers",
+    "innkeepers", "bartenders", "waiters", "waitresses",
+    "nobles", "aristocrats", "lords", "ladies", "barons", "dukes", "princes", "princesses", "kings", "queens",
+    "judges", "senators", "diplomats",
+    "priests", "priestesses", "monks", "nuns", "bishops", "shamans", "druids", "wizards", "mages", "sorcerers",
+    "necromancers", "alchemists", "scholars", "scribes",
+    "servants", "maids", "butlers",
+    "men", "women", "boys", "girls", "children", "kids", "toddlers", "parents", "fathers", "mothers", "sons", "daughters",
+    "brothers", "sisters", "grandparents", "ancestors",
+    "bandits", "robbers", "thieves", "burglars", "rogues", "outlaws", "spies", "assassins", "killers", "murderers",
+    "pirates", "smugglers", "beggars", "slaves", "captives", "prisoners", "convicts", "refugees", "exiles", "runaways",
+    "students", "pupils", "teachers", "professors", "mentors", "doctors", "medics", "surgeons", "nurses", "patients",
+    "crowd", "crowds", "mob", "mobs", "crew", "crews", "army", "armies", "patrol", "patrols", "squad", "squads",
+    "company", "unit", "units", "troop", "troops", "bystanders", "guests", "spectators", "audience", "passengers"
+}
+
+CANONICAL_MALE_NAMES = {
+    "shira", "akira", "gaara", "ashitaka", "kiba", "soma", "kenta",
+    "ryoma", "hanza", "koba", "soya", "toma", "genga", "sinbad", "judar", "alibaba",
+    "masashige", "kusunoki", "saionji", "kinmune", "ashikaga", "takauji", "mochizuki",
+    "ou hon", "ouhon", "robert", "tokiyuki"
+}
+
+
+FEMALE_ROLE_KEYWORDS = [
+    "female", "kobieta", "dziewczyn", "żeńsk", "nauczycielk", "czarodziejk",
+    "szpieżk", "wojowniczk", "kapłank", "służąc", "pani ", "panią", "bohaterk",
+    "arystokratk", "władczyn", "królow", "księżniczk", "matk", "córk", "siostr"
+]
+
+MALE_ROLE_KEYWORDS = [
+    "male", "mężczyzna", "chłopak", "chłopiec", "boy", "syn", "młodzieniec", "książę",
+    "król", "wojownik", "męsk", "bocchan", "ojciec", "brat", "panie", "pan ", "samuraj",
+    "generał", "lord", "kuge", "buke", "wasal"
+]
+
+RE_FEMALE_ROLE = re.compile(
+    r"\b(?:kobieta|kobiet[ayęieoó]|kobietami|kobietach|żeńsk[a-ząćęłńóśźż]*|female|dziewczyn[a-ząćęłńóśźż]*|"
+    r"nauczycielk[a-ząćęłńóśźż]*|czarodziejk[a-ząćęłńóśźż]*|szpieżk[a-ząćęłńóśźż]*|wojowniczk[a-ząćęłńóśźż]*|"
+    r"kapłank[a-ząćęłńóśźż]*|miko|służąc[a-ząćęłńóśźż]*|pokojówk[a-ząćęłńóśźż]*|pani(?:ą|ej)?(?!\s*e\b)|bohaterk[a-ząćęłńóśźż]*|"
+    r"arystokratk[a-ząćęłńóśźż]*|władczyn[a-ząćęłńóśźż]*|królow[a-ząćęłńóśźż]*|księżniczk[a-ząćęłńóśźż]*|"
+    r"matk[a-ząćęłńóśźż]*|mam[a-ząćęłńóśźż]*|córk[a-ząćęłńóśźż]*|siostr[a-ząćęłńóśźż]*|cesarzow[a-ząćęłńóśźż]*|"
+    r"strażniczk[a-ząćęłńóśźż]*|wieśniaczk[a-ząćęłńóśźż]*|lekark[a-ząćęłńóśźż]*|pielęgniark[a-ząćęłńóśźż]*|"
+    r"chatun|żon[a-ząćęłńóśźż]*|małżonk[a-ząćęłńóśźż]*|uczennic[a-ząćęłńóśźż]*|girl|woman|lady)\b",
+    re.IGNORECASE
+)
+
+RE_MALE_ROLE = re.compile(
+    r"\b(?:mężczyzn[a-ząćęłńóśźż]*|męsk[a-ząćęłńóśźż]*|male|chłop(?:ak[a-ząćęłńóśźż]*|iec|ca|cem|cowi|cy|ców)?|"
+    r"boy|syn[a-ząćęłńóśźż]*|młodzieniec|młodzieńc[a-ząćęłńóśźż]*|książ(?:ę|ęcia|ęciem|ęciu|ęta)|"
+    r"król(?:a|em|owi|owie|ów)?(?!\s*ow[a-ząćęłńóśźż]*\b)|wojownik(?:a|em|owi|owie|ów)?(?!\s*czk[a-ząćęłńóśźż]*\b)|"
+    r"ojc(?:iec|a|em|owi|owie|ów)?|tat[a-ząćęłńóśźż]*|brat[a-ząćęłńóśźż]*|panie\b|pan(?:em|u|a|owie|ów)?\b|"
+    r"samuraj[a-ząćęłńóśźż]*|rycerz[a-ząćęłńóśźż]*|generał[a-ząćęłńóśźż]*|lord[a-ząćęłńóśźż]*|wasal[a-ząćęłńóśźż]*|"
+    r"strażnik[a-ząćęłńóśźż]*|wieśniak[a-ząćęłńóśźż]*|kupiec|kupc[a-ząćęłńóśźż]*|czarodziej[a-ząćęłńóśźż]*|kapłan[a-ząćęłńóśźż]*|"
+    r"uczeń|uczni[a-ząćęłńóśźż]*|buke|kuge|dostojnik[a-ząćęłńóśźż]*|panicz[a-ząćęłńóśźż]*|bocchan|man)\b",
+    re.IGNORECASE
+)
+
+def is_female_role_text(text: str) -> bool:
+    if not text:
+        return False
+    return bool(RE_FEMALE_ROLE.search(text))
+
+def is_male_role_text(text: str) -> bool:
+    if not text:
+        return False
+    return bool(RE_MALE_ROLE.search(text))
+
+def is_plural_actor(name: str) -> bool:
+    """
+    Determines whether an actor/speaker represents a plural group or collective
+    (e.g. 'Guards', 'Strażnicy', 'Villagers', 'Wieśniacy', 'Dziewczęta', 'Chłopcy').
+    """
+    if not name:
+        return False
+    clean = extract_clean_speaker_name(name).strip().lower()
+    if not clean:
+        return False
+    tokens = set(re.findall(r"\b[a-ząćęłńóśźżA-ZĄĆĘŁŃÓŚŹŻ]+\b", clean))
+    if any(t in INHERENT_PLURAL_NOUNS for t in tokens):
+        return True
+    if clean.startswith(("grupa", "oddział", "tłum", "kompania", "patrol", "banda", "crew", "squad")):
+        return True
+    return False
+
+def resolve_actor_gender(name: str, character_registry: Optional[Dict[str, Any]] = None, series_bible: Optional[Any] = None) -> str:
+    """
+    Determines actor gender ('MALE', 'FEMALE', 'PLURAL', or 'UNKNOWN') deterministically (0.00 PLN).
+    Accurately processes named characters, generic/numbered actor tags, and plural collective actors.
+    """
+    if not name:
+        return "UNKNOWN"
+    clean = extract_clean_speaker_name(name).strip()
+    if not clean:
+        return "UNKNOWN"
+    clean_lower = clean.lower()
+
+    # 0. Check for plural/collective actors first
+    if is_plural_actor(clean):
+        return "PLURAL"
+
+    # 1. Direct character registry lookup if provided
+    if character_registry and clean in character_registry:
+        c_val = character_registry[clean]
+        c_desc = (c_val.get("gender", "") or c_val.get("description", "") or c_val.get("role", "")) if isinstance(c_val, dict) else str(c_val)
+        c_desc_l = c_desc.lower()
+        if "female" in c_desc_l or "kobieta" in c_desc_l or "żeńsk" in c_desc_l:
+            return "FEMALE"
+        if "male" in c_desc_l or "mężczyzna" in c_desc_l or "męsk" in c_desc_l:
+            return "MALE"
+
+    # 2. Series Bible lookup if provided
+    if series_bible and hasattr(series_bible, "get_character_gender"):
+        bg = series_bible.get_character_gender(clean, allow_generic_nouns=True)
+        if bg in ("MALE", "FEMALE"):
+            return bg
+
+    # 3. Canonical name sets
+    if clean_lower in CANONICAL_MALE_NAMES or clean_lower in MALE_EXCEPTIONS_ON_A:
+        return "MALE"
+    if clean_lower in POLISH_FEMALE_NAMES:
+        return "FEMALE"
+
+    # 4. Role & Lexical tokens with strict word boundaries
+    tokens = set(re.findall(r"\b[a-ząćęłńóśźżA-ZĄĆĘŁŃÓŚŹŻ]+\b", clean_lower))
+    if any(t in INHERENT_FEMALE_NOUNS for t in tokens) or is_female_role_text(clean):
+        return "FEMALE"
+    if any(t in INHERENT_MALE_NOUNS for t in tokens) or is_male_role_text(clean):
+        return "MALE"
+
+    # 5. Onomastic heuristics
+    if is_inherently_female_name(clean):
+        return "FEMALE"
+
+    return "UNKNOWN"
+
+
+BOY_ROLE_KEYWORDS = [
+    "chłopiec", "chłopak", "boy", "syn", "młodzieniec", "książę",
+    "dziecko płci męskiej", "pax", "bocchan", "crossgender", "cross-gender", "seiyū żeński", "żeńskie seiyū"
+]
+
 GENERIC_CATEGORY_TAGS = {
+    # Polish technical & crowd tags
     "mężczyzna", "mezczyzna", "kobieta", "grupa_kobiet", "grupa_mężczyzn", "grupa_mezczyzn",
-    "grupa_mieszana", "brak", "narrator", "głos", "glos", "ktoś", "ktos", "wszyscy",
+    "grupa_mieszana", "brak", "narrator", "głos", "glos", "ktoś", "ktos", "nikt", "wszyscy",
     "tłum", "tlum", "napis", "napisy", "tytuł", "tytul", "tłumaczenie", "tlumaczenie",
-    "main", "default", "alt", "sign", "signs", "crowd", "voice", "unknown", "none",
-    "postać", "postac", "interlokutor"
+    "postać", "postac", "interlokutor", "obcy", "nieznajomy", "grupa", "rozmówca", "tło", "tlo",
+    # English technical & crowd tags
+    "main", "default", "alt", "sign", "signs", "crowd", "voice", "voices", "unknown", "none",
+    "all", "everyone", "somebody", "someone", "nobody", "narration", "caption", "captions",
+    "title", "titles", "subtitle", "subtitles", "translation", "background", "mob", "people",
+    "bystander", "bystanders", "audience", "spectators", "person", "character", "speaker",
+    "caller", "announcer"
 }
 
 POLISH_FEMALE_NAMES = {
@@ -65,14 +373,39 @@ POLISH_FEMALE_NAMES = {
     "karina", "lena", "lidia", "lila", "lucja", "łucja", "marika", "marlena",
     "martyna", "milena", "miranda", "nikola", "regina", "roksana", "sabina",
     "sara", "sonia", "stella", "tamara", "tola", "żaneta",
-    # Hypocoristics and popular variants
+    "ada", "adriana", "anastazja", "apolonia", "aurelia", "bernadeta", "blanka",
+    "dagmara", "dobrawa", "dobrochna", "eleonora", "eliza", "eugenia", "faustyna",
+    "florentyna", "franciszka", "gabriela", "gaja", "gertruda", "gizela", "honorata",
+    "hortensja", "inga", "irmina", "izolda", "jagienka", "klementyna", "konstancja",
+    "kordelia", "krystiana", "leokadia", "lilianna", "liwia", "ludmiła", "luiza",
+    "marcelina", "matylda", "melania", "michalina", "mirosława", "nadzieja", "noemi",
+    "otylia", "pelagia", "petronela", "rozalia", "róża", "roza", "salomea", "seweryna",
+    "sławomira", "slawomira", "sydonia", "sybilla", "tekla", "teodora", "waleria",
+    "wiola", "wirginia",
+    # Hypocoristics and popular variants (for vocative conversion)
     "kasia", "basia", "asia", "ania", "ola", "gosia", "madzia", "zosia",
-    "marysia", "natalka", "julka", "krysia", "danka", "ala", "magda"
+    "marysia", "natalka", "julka", "krysia", "danka", "ala", "magda",
+    "agatka", "agnisia", "agusia", "anetka", "andzia", "anitka", "anka", "anusia",
+    "tosia", "tośka", "beatka", "bogusia", "celinka", "domisia", "dorotka", "edytka",
+    "ela", "elka", "elunia", "emilka", "ewka", "ewunia", "halka", "halinka", "helka",
+    "helenka", "iza", "izka", "jadzia", "jadźka", "joasia", "aśka", "juleczka",
+    "justynka", "kamilka", "karolka", "kaśka", "kasiunia", "kingusia", "kryśka",
+    "lucynka", "łucka", "lucka", "madźka", "gośka", "małgośka", "malgoska", "maryśka",
+    "marychna", "martka", "martusia", "martynka", "marzenka", "monia", "moniczka",
+    "natka", "oliwka", "paulinka", "renatka", "roksa", "sylwka", "terenia", "tesia",
+    "ula", "ulka", "ulusia", "werka", "weronisia", "wika", "wikusia", "wiolka",
+    "zośka", "zosieńka", "zuzia", "zuza", "zuźka", "zuzka"
 }
 
 MALE_EXCEPTIONS_ON_A = {
     "kuba", "barnaba", "kosma", "bonawentura", "jarema", "zawisza",
-    "sasza", "mustafa", "joshua", "akira", "luka", "luca"
+    "sasza", "mustafa", "joshua", "akira", "luka", "luca",
+    "shira", "gaara", "kiba", "soma", "kenta", "ryoma", "hanza", "koba", "soya",
+    "toma", "genga", "seneca", "kaligula", "sparta", "spinoza", "buddha", "budda",
+    "dante", "petrarka", "torquemada", "zapata", "garcia", "elijah", "noah", "ezra",
+    "micah", "hosea", "jeremiah", "jonah", "isaiah", "sasha", "misha", "ilja", "kolja",
+    "wania", "alosza", "foma", "grisha", "toya", "shota", "souta", "kota", "shouta",
+    "yuuta", "yuta", "renga", "hakuya", "byakuya", "genya", "katsura"
 }
 
 ETHNONYMS_AND_COLLECTIVES = {
@@ -98,6 +431,10 @@ ETHNONYMS_AND_COLLECTIVES = {
     "ludzie", "ludzi", "lud", "człowiek",
     "demony", "demonów", "elfy", "elfów", "krasnoludy", "krasnoludów",
     "orkowie", "orków", "bestie", "duchy", "potwory"
+}
+
+INDECLINABLE_FRENCH_TOPONYMS = {
+    "bordeaux", "margaux", "calais", "meaux", "pau", "chamonix", "angers", "versailles", "reims", "brest", "nantes"
 }
 
 def is_inherently_female_name(name: str) -> bool:
@@ -179,6 +516,505 @@ def extract_clean_speaker_name(name: str) -> str:
     return clean
 
 
+def is_polish_adjective(word: str) -> bool:
+    w = word.lower().strip()
+    if len(w) < 4:
+        return False
+
+    # Explicit exclusion of common Japanese names ending in -ki, -gi, -na
+    # (e.g. Suzuki, Sasaki, Kawasaki, Miyazaki, Todoroki, Tanuki, Shizuku, Shina, etc.)
+    if any(w.endswith(jp_end) for jp_end in ("saki", "zuki", "zaki", "roki", "nuki", "buki", "muki", "tuki", "yuki", "yaki", "seki", "deki", "heki", "kiki", "giki")):
+        return False
+
+    # Polish feminine nouns ending in -yna, -ina, -anka, -arka, -anna (e.g. gilotyna, dziewczyna, maszyna, cytryna)
+    if w.endswith(("yna", "ina", "anka", "arka", "anna", "otta", "etta")):
+        return False
+
+    # Exclusion of common nouns ending in -na, -ta, -ka, -ga
+    if w in {"kobieta", "dziewczyna", "pani", "chata", "brama", "tarcza", "lanca", "rana", "scena", "wojna", "korona", "strona", "ochrona", "obrona", "wrona", "rzeka", "książka", "ręka", "nauka", "matka", "córka", "dróżka", "papuga", "waga", "droga", "flaga", "saga", "manga", "planeta", "rakieta", "flota", "armata", "herbata", "gazeta"}:
+        return False
+
+    # Polish base adjectives
+    BASE_ADJECTIVES = {
+        "czerwony", "czerwona", "czerwone", "biały", "biała", "białe", "czarny", "czarna", "czarne",
+        "złoty", "złota", "złote", "srebrny", "srebrna", "srebrne", "zielony", "zielona", "zielone",
+        "święty", "święta", "święte", "cichy", "cicha", "ciche", "krwawy", "krwawa", "krwawe",
+        "mroczny", "mroczna", "mroczne", "jasny", "jasna", "jasne", "ciemny", "ciemna", "ciemne",
+        "młody", "młoda", "młode", "stary", "stara", "stare", "nowy", "nowa", "nowe",
+        "dobry", "dobra", "dobre", "zły", "zła", "złe", "szalony", "szalona", "szalone",
+        "dziki", "dzika", "dzike", "wolny", "wolna", "wolne", "żywy", "żywa", "żywe",
+        "martwy", "martwa", "martwe", "zimny", "zimna", "zimne", "gorący", "gorąca", "gorące",
+        "prosty", "prosta", "proste", "gęsty", "gęsta", "gęste", "pusty", "pusta", "puste",
+        "czysty", "czysta", "czyste", "nieśmiertelny", "nieśmiertelna", "nieśmiertelne"
+    }
+    if w in BASE_ADJECTIVES:
+        return True
+
+    # Polish adjective and adjectival participle endings
+    ADJ_ENDINGS = (
+        "ski", "ska", "skie", "cki", "cka", "ckie", "dzki", "dzka", "dzkie",
+        "owy", "owa", "owe", "asty", "asta", "aste", "isty", "ista", "iste",
+        "liwy", "liwa", "liwe", "szy", "sza", "sze", "czy", "cza", "cze",
+        "alny", "alna", "alne", "elny", "elna", "elne", "olny", "olna", "olne",
+        "arny", "arna", "arne", "erny", "erna", "erne", "yczny", "yczna", "yczne",
+        "iczny", "iczna", "iczne", "owny", "owna", "owne", "tywny", "tywna", "tywne",
+        "ienny", "ienna", "ienne", "enny", "enna", "enne",
+        # Active adjectival participles (e.g. płonący, śpiący, latający, milczący)
+        "ący", "ąca", "ące",
+        # Qualitative, diminutive, and expressive adjective suffixes
+        "aty", "ata", "ate", "ity", "ita", "ite",
+        "utki", "utka", "utkie", "eńki", "eńka", "eńkie",
+        "owaty", "owata", "owate", "iasty", "iasta", "iaste"
+    )
+    if any(w.endswith(end) for end in ADJ_ENDINGS):
+        return True
+
+    # Root adjectives ending in -ki, -gi
+    ADJ_ROOTS_ON_KI_GI = {"wielk", "dzik", "krótk", "szyb", "lekk", "ciężk", "miękk", "gładk", "wąsk", "szerok", "wysok", "nisk", "dalek", "blisk", "głębok", "płytk", "gorzk", "słodk", "cienk", "drog", "ubog", "sroga", "tęga", "błoga"}
+    if any(w.startswith(root) for root in ADJ_ROOTS_ON_KI_GI) and w.endswith(("i", "y", "a", "e")):
+        return True
+
+    return False
+
+
+
+def generate_polish_adjective_declension(adj: str, gender: str = "MALE", is_animate: bool = True) -> Dict[str, str]:
+    w = adj.strip()
+    if not w:
+        return {}
+    w_l = w.lower()
+
+    # 1. Feminine adjective on -a
+    if w_l.endswith("a") or gender.upper() in ("FEMALE", "KOBIETA", "ŻEŃSKI", "ŻEŃSKA"):
+        stem = w[:-1] if w_l.endswith("a") else w
+        suffix_d = "iej" if stem.lower().endswith(("k", "g")) and not stem.lower().endswith("i") else "ej"
+        return {
+            "M": w,
+            "D": stem + suffix_d,
+            "C": stem + suffix_d,
+            "B": stem + "ą",
+            "N": stem + "ą",
+            "Ms": stem + suffix_d,
+            "W": w
+        }
+
+    # 2. Neuter adjective on -e
+    if w_l.endswith("e") or gender.upper() in ("NEUTER", "NIJAKI"):
+        stem = w[:-1] if w_l.endswith("e") else w
+        n_ms = stem + "im" if stem.lower().endswith(("k", "g")) else (stem[:-1] + "im" if stem.lower().endswith("i") else stem + "ym")
+        return {
+            "M": w,
+            "D": stem + "ego",
+            "C": stem + "emu",
+            "B": w,
+            "N": n_ms,
+            "Ms": n_ms,
+            "W": w
+        }
+
+    # 3. Masculine adjective on -y / -i
+    if w_l.endswith(("y", "i")):
+        stem = w[:-1]
+        last_c = stem[-1].lower() if stem else ""
+        if w_l.endswith("i"):
+            d_case = stem + "ego" if stem.lower().endswith("i") else stem + "iego"
+            c_case = stem + "emu" if stem.lower().endswith("i") else stem + "iemu"
+            n_ms = stem + "m" if stem.lower().endswith("i") else stem + "im"
+        else:
+            d_case = stem + "ego"
+            c_case = stem + "emu"
+            n_ms = stem + "im" if last_c in ("k", "g") else stem + "ym"
+        b_case = d_case if is_animate else w
+        return {
+            "M": w,
+            "D": d_case,
+            "C": c_case,
+            "B": b_case,
+            "N": n_ms,
+            "Ms": n_ms,
+            "W": w
+        }
+
+    return {"M": w, "D": w, "C": w, "B": w, "N": w, "Ms": w, "W": w}
+
+
+KNOWN_HEAD_NOUN_DECLENSIONS = {
+    "zakon": {"M": "Zakon", "D": "Zakonu", "C": "Zakonowi", "B": "Zakon", "N": "Zakonem", "Ms": "Zakonie", "W": "Zakonie"},
+    "miecz": {"M": "Miecz", "D": "Miecza", "C": "Mieczowi", "B": "Miecz", "N": "Mieczem", "Ms": "Mieczu", "W": "Mieczu"},
+    "księga": {"M": "Księga", "D": "Księgi", "C": "Księdze", "B": "Księgę", "N": "Księgą", "Ms": "Księdze", "W": "Księgo"},
+    "dolina": {"M": "Dolina", "D": "Doliny", "C": "Dolinie", "B": "Dolinę", "N": "Doliną", "Ms": "Dolinie", "W": "Dolino"},
+    "zamek": {"M": "Zamek", "D": "Zamku", "C": "Zamkowi", "B": "Zamek", "N": "Zamkiem", "Ms": "Zamku", "W": "Zamku"},
+    "lanca": {"M": "Lanca", "D": "Lancy", "C": "Lancy", "B": "Lancę", "N": "Lancą", "Ms": "Lancy", "W": "Lanco"},
+    "tarcza": {"M": "Tarcza", "D": "Tarczy", "C": "Tarczy", "B": "Tarczę", "N": "Tarczą", "Ms": "Tarczy", "W": "Tarczo"},
+    "pakt": {"M": "Pakt", "D": "Paktu", "C": "Paktowi", "B": "Pakt", "N": "Paktem", "Ms": "Pakcie", "W": "Pakcie"},
+    "przymierze": {"M": "Przymierze", "D": "Przymierza", "C": "Przymierzu", "B": "Przymierze", "N": "Przymierzem", "Ms": "Przymierzu", "W": "Przymierze"},
+    "amulet": {"M": "Amulet", "D": "Amuletu", "C": "Amuletowi", "B": "Amulet", "N": "Amuletem", "Ms": "Amuletu", "W": "Amuletu"},
+    "zwój": {"M": "Zwój", "D": "Zwoju", "C": "Zwojowi", "B": "Zwój", "N": "Zwojem", "Ms": "Zwoju", "W": "Zwoju"},
+    "kamień": {"M": "Kamień", "D": "Kamienia", "C": "Kamieniowi", "B": "Kamień", "N": "Kamieniem", "Ms": "Kamieniu", "W": "Kamieniu"},
+    "drzewo": {"M": "Drzewo", "D": "Drzewa", "C": "Drzewu", "B": "Drzewo", "N": "Drzewem", "Ms": "Drzewie", "W": "Drzewo"},
+    "wieża": {"M": "Wieża", "D": "Wieży", "C": "Wieży", "B": "Wieżę", "N": "Wieżą", "Ms": "Wieży", "W": "Wieżo"},
+    "brama": {"M": "Brama", "D": "Bramy", "C": "Bramie", "B": "Bramę", "N": "Bramą", "Ms": "Bramie", "W": "Bramo"},
+    "tron": {"M": "Tron", "D": "Tronu", "C": "Tronowi", "B": "Tron", "N": "Tronem", "Ms": "Tronie", "W": "Tronie"},
+    "sztylet": {"M": "Sztylet", "D": "Sztyletu", "C": "Sztyletowi", "B": "Sztylet", "N": "Sztyletem", "Ms": "Sztylecie", "W": "Sztylecie"},
+    "młot": {"M": "Młot", "D": "Młota", "C": "Młotowi", "B": "Młot", "N": "Młotem", "Ms": "Młocie", "W": "Młocie"},
+    "kosa": {"M": "Kosa", "D": "Kosy", "C": "Kosie", "B": "Kosę", "N": "Kosą", "Ms": "Kosie", "W": "Koso"},
+    "hełm": {"M": "Hełm", "D": "Hełmu", "C": "Hełmowi", "B": "Hełm", "N": "Hełmem", "Ms": "Hełmie", "W": "Hełmie"},
+    "zbroja": {"M": "Zbroja", "D": "Zbroi", "C": "Zbroi", "B": "Zbroję", "N": "Zbroją", "Ms": "Zbroi", "W": "Zbrojo"},
+    "gniew": {"M": "Gniew", "D": "Gniewu", "C": "Gniewowi", "B": "Gniew", "N": "Gniewem", "Ms": "Gniewie", "W": "Gniewie"},
+    # Epithets, Titles & Anime Classes (Manga Canon Supreme)
+    "władca": {"M": "Władca", "D": "Władcy", "C": "Władcy", "B": "Władcę", "N": "Władcą", "Ms": "Władcy", "W": "Władco"},
+    "władczyni": {"M": "Władczyni", "D": "Władczyni", "C": "Władczyni", "B": "Władczynię", "N": "Władczynią", "Ms": "Władczyni", "W": "Władczyni"},
+    "demon": {"M": "Demon", "D": "Demona", "C": "Demonowi", "B": "Demona", "N": "Demonem", "Ms": "Demonie", "W": "Demonie"},
+    "demonica": {"M": "Demonica", "D": "Demonicy", "C": "Demonicy", "B": "Demonicę", "N": "Demonicą", "Ms": "Demonicy", "W": "Demonico"},
+    "mistrz": {"M": "Mistrz", "D": "Mistrza", "C": "Mistrzowi", "B": "Mistrza", "N": "Mistrzem", "Ms": "Mistrzu", "W": "Mistrzu"},
+    "mistrzyni": {"M": "Mistrzyni", "D": "Mistrzyni", "C": "Mistrzyni", "B": "Mistrzynię", "N": "Mistrzynią", "Ms": "Mistrzyni", "W": "Mistrzyni"},
+    "pani": {"M": "Pani", "D": "Pani", "C": "Pani", "B": "Panią", "N": "Panią", "Ms": "Pani", "W": "Pani"},
+    "pan": {"M": "Pan", "D": "Pana", "C": "Panu", "B": "Pana", "N": "Panem", "Ms": "Panu", "W": "Panie"},
+    "lord": {"M": "Lord", "D": "Lorda", "C": "Lordowi", "B": "Lorda", "N": "Lordem", "Ms": "Lordzie", "W": "Lordzie"},
+    "bóg": {"M": "Bóg", "D": "Boga", "C": "Bogu", "B": "Boga", "N": "Bogiem", "Ms": "Bogu", "W": "Boże"},
+    "bogini": {"M": "Bogini", "D": "Bogini", "C": "Bogini", "B": "Boginię", "N": "Boginią", "Ms": "Bogini", "W": "Bogini"},
+    "rycerz": {"M": "Rycerz", "D": "Rycerza", "C": "Rycerzowi", "B": "Rycerza", "N": "Rycerzem", "Ms": "Rycerzu", "W": "Rycerzu"},
+    "generał": {"M": "Generał", "D": "Generała", "C": "Generałowi", "B": "Generała", "N": "Generałem", "Ms": "Generale", "W": "Generale"},
+    "dowódca": {"M": "Dowódca", "D": "Dowódcy", "C": "Dowódcy", "B": "Dowódcę", "N": "Dowódcą", "Ms": "Dowódcy", "W": "Dowódco"},
+    "zabójca": {"M": "Zabójca", "D": "Zabójcy", "C": "Zabójcy", "B": "Zabójcę", "N": "Zabójcą", "Ms": "Zabójcy", "W": "Zabójco"},
+    "obrońca": {"M": "Obrońca", "D": "Obrońcy", "C": "Obrońcy", "B": "Obrońcę", "N": "Obrońcą", "Ms": "Obrońcy", "W": "Obrońco"},
+    "łowca": {"M": "Łowca", "D": "Łowcy", "C": "Łowcy", "B": "Łowcę", "N": "Łowcą", "Ms": "Łowcy", "W": "Łowco"},
+    "strażnik": {"M": "Strażnik", "D": "Strażnika", "C": "Strażnikowi", "B": "Strażnika", "N": "Strażnikiem", "Ms": "Strażniku", "W": "Strażniku"},
+    "król": {"M": "Król", "D": "Króla", "C": "Królowi", "B": "Króla", "N": "Królem", "Ms": "Królu", "W": "Królu"},
+    "królowa": {"M": "Królowa", "D": "Królowej", "C": "Królowej", "B": "Królową", "N": "Królową", "Ms": "Królowej", "W": "Królowo"},
+    "książę": {"M": "Książę", "D": "Księcia", "C": "Księciu", "B": "Księcia", "N": "Księciem", "Ms": "Księciu", "W": "Książę"},
+    "księżniczka": {"M": "Księżniczka", "D": "Księżniczki", "C": "Księżniczce", "B": "Księżniczkę", "N": "Księżniczką", "Ms": "Księżniczce", "W": "Księżniczko"},
+    "cesarz": {"M": "Cesarz", "D": "Cesarza", "C": "Cesarzowi", "B": "Cesarza", "N": "Cesarzem", "Ms": "Cesarzu", "W": "Cesarzu"},
+    "cesarzowa": {"M": "Cesarzowa", "D": "Cesarzowej", "C": "Cesarzowej", "B": "Cesarzową", "N": "Cesarzową", "Ms": "Cesarzowej", "W": "Cesarzowo"},
+    "mag": {"M": "Mag", "D": "Maga", "C": "Magowi", "B": "Maga", "N": "Magiem", "Ms": "Magu", "W": "Magu"},
+    "czarnoksiężnik": {"M": "Czarnoksiężnik", "D": "Czarnoksiężnika", "C": "Czarnoksiężnikowi", "B": "Czarnoksiężnika", "N": "Czarnoksiężnikiem", "Ms": "Czarnoksiężniku", "W": "Czarnoksiężniku"},
+    "kapłan": {"M": "Kapłan", "D": "Kapłana", "C": "Kapłanowi", "B": "Kapłana", "N": "Kapłanem", "Ms": "Kapłanie", "W": "Kapłanie"},
+    "kapłanka": {"M": "Kapłanka", "D": "Kapłanki", "C": "Kapłance", "B": "Kapłankę", "N": "Kapłanką", "Ms": "Kapłance", "W": "Kapłanko"},
+    "wojownik": {"M": "Wojownik", "D": "Wojownika", "C": "Wojownikowi", "B": "Wojownika", "N": "Wojownikiem", "Ms": "Wojowniku", "W": "Wojowniku"},
+    "wojowniczka": {"M": "Wojowniczka", "D": "Wojowniczki", "C": "Wojowniczce", "B": "Wojowniczkę", "N": "Wojowniczką", "Ms": "Wojowniczce", "W": "Wojowniczko"},
+    "bohater": {"M": "Bohater", "D": "Bohatera", "C": "Bohaterowi", "B": "Bohatera", "N": "Bohaterem", "Ms": "Bohaterze", "W": "Bohaterze"},
+    "bohaterka": {"M": "Bohaterka", "D": "Bohaterki", "C": "Bohaterce", "B": "Bohaterkę", "N": "Bohaterką", "Ms": "Bohaterce", "W": "Bohaterko"},
+    "cień": {"M": "Cień", "D": "Cienia", "C": "Cieniowi", "B": "Cień", "N": "Cieniem", "Ms": "Cieniu", "W": "Cieniu"},
+    "płomień": {"M": "Płomień", "D": "Płomienia", "C": "Płomieniowi", "B": "Płomień", "N": "Płomieniem", "Ms": "Płomieniu", "W": "Płomieniu"},
+    "krew": {"M": "Krew", "D": "Krwi", "C": "Krwi", "B": "Krew", "N": "Krwią", "Ms": "Krwi", "W": "Krwi"},
+    "serce": {"M": "Serce", "D": "Serca", "C": "Sercu", "B": "Serce", "N": "Sercem", "Ms": "Sercu", "W": "Serce"},
+    "oko": {"M": "Oko", "D": "Oka", "C": "Oku", "B": "Oko", "N": "Okiem", "Ms": "Oku", "W": "Oko"},
+    "ręka": {"M": "Ręka", "D": "Ręki", "C": "Ręce", "B": "Rękę", "N": "Ręką", "Ms": "Ręce", "W": "Ręko"},
+    "pierścień": {"M": "Pierścień", "D": "Pierścienia", "C": "Pierścieniowi", "B": "Pierścień", "N": "Pierścieniem", "Ms": "Pierścieniu", "W": "Pierścieniu"},
+    "korona": {"M": "Korona", "D": "Korony", "C": "Koronie", "B": "Koronę", "N": "Koroną", "Ms": "Koronie", "W": "Korono"},
+    "pieczęć": {"M": "Pieczęć", "D": "Pieczęci", "C": "Pieczęci", "B": "Pieczęć", "N": "Pieczęcią", "Ms": "Pieczęci", "W": "Pieczęci"},
+    "zwierciadło": {"M": "Zwierciadło", "D": "Zwierciadła", "C": "Zwierciadłu", "B": "Zwierciadło", "N": "Zwierciadłem", "Ms": "Zwierciadle", "W": "Zwierciadło"},
+    "kielich": {"M": "Kielich", "D": "Kielicha", "C": "Kielichowi", "B": "Kielich", "N": "Kielichem", "Ms": "Kielichu", "W": "Kielichu"},
+    "światło": {"M": "Światło", "D": "Światła", "C": "Światłu", "B": "Światło", "N": "Światłem", "Ms": "Świetle", "W": "Światło"},
+    "wrota": {"M": "Wrota", "D": "Wrót", "C": "Wrotom", "B": "Wrota", "N": "Wrotami", "Ms": "Wrotach", "W": "Wrota"},
+    "twierdza": {"M": "Twierdza", "D": "Twierdzy", "C": "Twierdzy", "B": "Twierdzę", "N": "Twierdzą", "Ms": "Twierdzy", "W": "Twierdzo"},
+    "świątynia": {"M": "Świątynia", "D": "Świątyni", "C": "Świątyni", "B": "Świątynię", "N": "Świątynią", "Ms": "Świątyni", "W": "Świątynio"},
+    "duch": {"M": "Duch", "D": "Ducha", "C": "Duchowi", "B": "Ducha", "N": "Duchem", "Ms": "Duchu", "W": "Duchu"},
+    "ród": {"M": "Ród", "D": "Rodu", "C": "Rodowi", "B": "Ród", "N": "Rodem", "Ms": "Rodzie", "W": "Rodzie"},
+    "znak": {"M": "Znak", "D": "Znaku", "C": "Znakowi", "B": "Znak", "N": "Znakiem", "Ms": "Znaku", "W": "Znaku"},
+    "łuk": {"M": "Łuk", "D": "Łuku", "C": "Łukowi", "B": "Łuk", "N": "Łukiem", "Ms": "Łuku", "W": "Łuku"},
+    "strzała": {"M": "Strzała", "D": "Strzały", "C": "Strzale", "B": "Strzałę", "N": "Strzałą", "Ms": "Strzale", "W": "Strzało"},
+    "różdżka": {"M": "Różdżka", "D": "Różdżki", "C": "Różdżce", "B": "Różdżkę", "N": "Różdżką", "Ms": "Różdżce", "W": "Różdżko"},
+    "kodeks": {"M": "Kodeks", "D": "Kodeksu", "C": "Kodeksowi", "B": "Kodeks", "N": "Kodeksem", "Ms": "Kodeksie", "W": "Kodeksie"},
+    "opowieść": {"M": "Opowieść", "D": "Opowieści", "C": "Opowieści", "B": "Opowieść", "N": "Opowieścią", "Ms": "Opowieści", "W": "Opowieści"},
+    "legenda": {"M": "Legenda", "D": "Legendy", "C": "Legendzie", "B": "Legendę", "N": "Legendą", "Ms": "Legendzie", "W": "Legendo"},
+    "pieśń": {"M": "Pieśń", "D": "Pieśni", "C": "Pieśni", "B": "Pieśń", "N": "Pieśnią", "Ms": "Pieśni", "W": "Pieśni"},
+    "hymn": {"M": "Hymn", "D": "Hymnu", "C": "Hymnowi", "B": "Hymn", "N": "Hymnem", "Ms": "Hymnie", "W": "Hymnie"},
+    "kronika": {"M": "Kronika", "D": "Kroniki", "C": "Kronice", "B": "Kronikę", "N": "Kroniką", "Ms": "Kronice", "W": "Kroniko"},
+    "droga": {"M": "Droga", "D": "Drogi", "C": "Drodze", "B": "Drogę", "N": "Drogą", "Ms": "Drodze", "W": "Drogo"},
+    "szlak": {"M": "Szlak", "D": "Szlaku", "C": "Szlakowi", "B": "Szlak", "N": "Szlakiem", "Ms": "Szlaku", "W": "Szlaku"},
+    "most": {"M": "Most", "D": "Mostu", "C": "Mostowi", "B": "Most", "N": "Mostem", "Ms": "Moście", "W": "Moście"},
+    "rzeka": {"M": "Rzeka", "D": "Rzeki", "C": "Rzece", "B": "Rzekę", "N": "Rzeką", "Ms": "Rzece", "W": "Rzeko"},
+    "jezioro": {"M": "Jezioro", "D": "Jeziora", "C": "Jezioru", "B": "Jezioro", "N": "Jeziorem", "Ms": "Jeziorze", "W": "Jezioro"},
+    "morze": {"M": "Morze", "D": "Morza", "C": "Morzu", "B": "Morze", "N": "Morzem", "Ms": "Morzu", "W": "Morze"},
+    "góra": {"M": "Góra", "D": "Góry", "C": "Górze", "B": "Górę", "N": "Górą", "Ms": "Górze", "W": "Góro"},
+    "pustynia": {"M": "Pustynia", "D": "Pustyni", "C": "Pustyni", "B": "Pustynię", "N": "Pustynią", "Ms": "Pustyni", "W": "Pustynio"},
+    "zemsta": {"M": "Zemsta", "D": "Zemsty", "C": "Zemście", "B": "Zemstę", "N": "Zemstą", "Ms": "Zemście", "W": "Zemsto"},
+    "klątwa": {"M": "Klątwa", "D": "Klątwy", "C": "Klątwie", "B": "Klątwę", "N": "Klątwą", "Ms": "Klątwie", "W": "Klątwo"},
+    "bunt": {"M": "Bunt", "D": "Buntu", "C": "Buntowi", "B": "Bunt", "N": "Buntem", "Ms": "Buncie", "W": "Buncie"},
+    "upadek": {"M": "Upadek", "D": "Upadku", "C": "Upadkowi", "B": "Upadek", "N": "Upadkiem", "Ms": "Upadku", "W": "Upadku"},
+    "powrót": {"M": "Powrót", "D": "Powrotu", "C": "Powrotowi", "B": "Powrót", "N": "Powrotem", "Ms": "Powrocie", "W": "Powrocie"},
+    "narodziny": {"M": "Narodziny", "D": "Narodzin", "C": "Narodzinom", "B": "Narodziny", "N": "Narodzinami", "Ms": "Narodzinach", "W": "Narodziny"},
+    "koniec": {"M": "Koniec", "D": "Końca", "C": "Końcowi", "B": "Koniec", "N": "Końcem", "Ms": "Końcu", "W": "Końcu"},
+    "początek": {"M": "Początek", "D": "Początku", "C": "Początkowi", "B": "Początek", "N": "Początkiem", "Ms": "Początku", "W": "Początku"},
+    "córka": {"M": "Córka", "D": "Córki", "C": "Córce", "B": "Córkę", "N": "Córką", "Ms": "Córce", "W": "Córko"},
+    "syn": {"M": "Syn", "D": "Syna", "C": "Synowi", "B": "Syna", "N": "Synem", "Ms": "Synu", "W": "Synu"},
+    "matka": {"M": "Matka", "D": "Matki", "C": "Matce", "B": "Matkę", "N": "Matką", "Ms": "Matce", "W": "Matko"},
+    "ojciec": {"M": "Ojciec", "D": "Ojca", "C": "Ojcu", "B": "Ojca", "N": "Ojcem", "Ms": "Ojcu", "W": "Ojcze"},
+    "brat": {"M": "Brat", "D": "Brata", "C": "Bratu", "B": "Brata", "N": "Bratem", "Ms": "Bracie", "W": "Bracie"},
+    "siostra": {"M": "Siostra", "D": "Siostry", "C": "Siostrze", "B": "Siostrę", "N": "Siostrą", "Ms": "Siostrze", "W": "Siostro"},
+    "arcykapłan": {"M": "Arcykapłan", "D": "Arcykapłana", "C": "Arcykapłanowi", "B": "Arcykapłana", "N": "Arcykapłanem", "Ms": "Arcykapłanie", "W": "Arcykapłanie"},
+    "arcymag": {"M": "Arcymag", "D": "Arcymaga", "C": "Arcymagowi", "B": "Arcymaga", "N": "Arcymagiem", "Ms": "Arcymagu", "W": "Arcymagu"},
+    "szaman": {"M": "Szaman", "D": "Szamana", "C": "Szamanowi", "B": "Szamana", "N": "Szamanem", "Ms": "Szamanie", "W": "Szamanie"},
+    "czarownik": {"M": "Czarownik", "D": "Czarownika", "C": "Czarownikowi", "B": "Czarownika", "N": "Czarownikiem", "Ms": "Czarowniku", "W": "Czarowniku"},
+    "czarownica": {"M": "Czarownica", "D": "Czarownicy", "C": "Czarownicy", "B": "Czarownicę", "N": "Czarownicą", "Ms": "Czarownicy", "W": "Czarownico"},
+    "bestia": {"M": "Bestia", "D": "Bestii", "C": "Bestii", "B": "Bestię", "N": "Bestią", "Ms": "Bestii", "W": "Bestio"},
+    "potwór": {"M": "Potwór", "D": "Potwora", "C": "Potworowi", "B": "Potwora", "N": "Potworem", "Ms": "Potworze", "W": "Potworze"},
+    "smok": {"M": "Smok", "D": "Smoka", "C": "Smokowi", "B": "Smoka", "N": "Smokiem", "Ms": "Smoku", "W": "Smoku"},
+    "bóstwo": {"M": "Bóstwo", "D": "Bóstwa", "C": "Bóstwu", "B": "Bóstwo", "N": "Bóstwem", "Ms": "Bóstwie", "W": "Bóstwo"},
+    "anioł": {"M": "Anioł", "D": "Anioła", "C": "Aniołowi", "B": "Anioła", "N": "Aniołem", "Ms": "Aniele", "W": "Aniele"},
+    "wampir": {"M": "Wampir", "D": "Wampira", "C": "Wampirowi", "B": "Wampira", "N": "Wampirem", "Ms": "Wampirze", "W": "Wampirze"},
+    "widmo": {"M": "Widmo", "D": "Widma", "C": "Widmu", "B": "Widmo", "N": "Widmem", "Ms": "Widmie", "W": "Widmo"},
+    "zjawa": {"M": "Zjawa", "D": "Zjawy", "C": "Zjawie", "B": "Zjawę", "N": "Zjawą", "Ms": "Zjawie", "W": "Zjawo"},
+    "kapitan": {'M': 'Kapitan', 'D': 'Kapitana', 'C': 'Kapitanowi', 'B': 'Kapitana', 'N': 'Kapitanem', 'Ms': 'Kapitanie', 'W': 'Kapitanie'},
+    "major": {'M': 'Major', 'D': 'Majora', 'C': 'Majorowi', 'B': 'Majora', 'N': 'Majorem', 'Ms': 'Majorze', 'W': 'Majorze'},
+    "pułkownik": {'M': 'Pułkownik', 'D': 'Pułkownika', 'C': 'Pułkownikowi', 'B': 'Pułkownika', 'N': 'Pułkownikiem', 'Ms': 'Pułkowniku', 'W': 'Pułkowniku'},
+    "porucznik": {'M': 'Porucznik', 'D': 'Porucznika', 'C': 'Porucznikowi', 'B': 'Porucznika', 'N': 'Porucznikiem', 'Ms': 'Poruczniku', 'W': 'Poruczniku'},
+    "sierżant": {'M': 'Sierżant', 'D': 'Sierżanta', 'C': 'Sierżantowi', 'B': 'Sierżanta', 'N': 'Sierżantem', 'Ms': 'Sierżancie', 'W': 'Sierżancie'},
+    "kapral": {'M': 'Kapral', 'D': 'Kaprala', 'C': 'Kapralowi', 'B': 'Kaprala', 'N': 'Kapralem', 'Ms': 'Kapralu', 'W': 'Kapralu'},
+    "admirał": {'M': 'Admirał', 'D': 'Admirała', 'C': 'Admirałowi', 'B': 'Admirała', 'N': 'Admirałem', 'Ms': 'Admirale', 'W': 'Admirale'},
+    "hetman": {'M': 'Hetman', 'D': 'Hetmana', 'C': 'Hetmanowi', 'B': 'Hetmana', 'N': 'Hetmanem', 'Ms': 'Hetmanie', 'W': 'Hetmanie'},
+    "przywódca": {'M': 'Przywódca', 'D': 'Przywódcy', 'C': 'Przywódcy', 'B': 'Przywódcę', 'N': 'Przywódcą', 'Ms': 'Przywódcy', 'W': 'Przywódco'},
+    "przywódczyni": {'M': 'Przywódczyni', 'D': 'Przywódczyni', 'C': 'Przywódczyni', 'B': 'Przywódczynię', 'N': 'Przywódczynią', 'Ms': 'Przywódczyni', 'W': 'Przywódczyni'},
+    "wódz": {'M': 'Wódz', 'D': 'Wodza', 'C': 'Wodzowi', 'B': 'Wodza', 'N': 'Wodzem', 'Ms': 'Wodzu', 'W': 'Wodzu'},
+    "watażka": {'M': 'Watażka', 'D': 'Watażki', 'C': 'Watażce', 'B': 'Watażkę', 'N': 'Watażką', 'Ms': 'Watażce', 'W': 'Watażko'},
+    "czempion": {'M': 'Czempion', 'D': 'Czempiona', 'C': 'Czempionowi', 'B': 'Czempiona', 'N': 'Czempionem', 'Ms': 'Czempionie', 'W': 'Czempionie'},
+    "czempionka": {'M': 'Czempionka', 'D': 'Czempionki', 'C': 'Czempionce', 'B': 'Czempionkę', 'N': 'Czempionką', 'Ms': 'Czempionce', 'W': 'Czempionko'},
+    "oficer": {'M': 'Oficer', 'D': 'Oficera', 'C': 'Oficerowi', 'B': 'Oficera', 'N': 'Oficerem', 'Ms': 'Oficerze', 'W': 'Oficerze'},
+    "żołnierz": {'M': 'Żołnierz', 'D': 'Żołnierza', 'C': 'Żołnierzowi', 'B': 'Żołnierza', 'N': 'Żołnierzem', 'Ms': 'Żołnierzu', 'W': 'Żołnierzu'},
+    "woj": {'M': 'Woj', 'D': 'Woja', 'C': 'Wojowi', 'B': 'Woja', 'N': 'Wojem', 'Ms': 'Woju', 'W': 'Woju'},
+    "najemnik": {'M': 'Najemnik', 'D': 'Najemnika', 'C': 'Najemnikowi', 'B': 'Najemnika', 'N': 'Najemnikiem', 'Ms': 'Najemniku', 'W': 'Najemniku'},
+    "paladyn": {'M': 'Paladyn', 'D': 'Paladyna', 'C': 'Paladynowi', 'B': 'Paladyna', 'N': 'Paladynem', 'Ms': 'Paladynie', 'W': 'Paladynie'},
+    "krzyżowiec": {'M': 'Krzyżowiec', 'D': 'Krzyżowca', 'C': 'Krzyżowcowi', 'B': 'Krzyżowca', 'N': 'Krzyżowcem', 'Ms': 'Krzyżowcu', 'W': 'Krzyżowcu'},
+    "straż": {'M': 'Straż', 'D': 'Straży', 'C': 'Straży', 'B': 'Straż', 'N': 'Strażą', 'Ms': 'Straży', 'W': 'Straży'},
+    "strażniczka": {'M': 'Strażniczka', 'D': 'Strażniczki', 'C': 'Strażniczce', 'B': 'Strażniczkę', 'N': 'Strażniczką', 'Ms': 'Strażniczce', 'W': 'Strażniczko'},
+    "obrończyni": {'M': 'Obrończyni', 'D': 'Obrończyni', 'C': 'Obrończyni', 'B': 'Obrończynię', 'N': 'Obrończynią', 'Ms': 'Obrończyni', 'W': 'Obrończyni'},
+    "łowczyni": {'M': 'Łowczyni', 'D': 'Łowczyni', 'C': 'Łowczyni', 'B': 'Łowczynię', 'N': 'Łowczynią', 'Ms': 'Łowczyni', 'W': 'Łowczyni'},
+    "zabójczyni": {'M': 'Zabójczyni', 'D': 'Zabójczyni', 'C': 'Zabójczyni', 'B': 'Zabójczynię', 'N': 'Zabójczynią', 'Ms': 'Zabójczyni', 'W': 'Zabójczyni'},
+    "zwiadowca": {'M': 'Zwiadowca', 'D': 'Zwiadowcy', 'C': 'Zwiadowcy', 'B': 'Zwiadowcę', 'N': 'Zwiadowcą', 'Ms': 'Zwiadowcy', 'W': 'Zwiadowco'},
+    "tropiciel": {'M': 'Tropiciel', 'D': 'Tropiciela', 'C': 'Tropicielowi', 'B': 'Tropiciela', 'N': 'Tropicielem', 'Ms': 'Tropicielu', 'W': 'Tropicielu'},
+    "barbarzyńca": {'M': 'Barbarzyńca', 'D': 'Barbarzyńcy', 'C': 'Barbarzyńcy', 'B': 'Barbarzyńcę', 'N': 'Barbarzyńcą', 'Ms': 'Barbarzyńcy', 'W': 'Barbarzyńco'},
+    "namiestnik": {'M': 'Namiestnik', 'D': 'Namiestnika', 'C': 'Namiestnikowi', 'B': 'Namiestnika', 'N': 'Namiestnikiem', 'Ms': 'Namiestniku', 'W': 'Namiestniku'},
+    "gubernator": {'M': 'Gubernator', 'D': 'Gubernatora', 'C': 'Gubernatorowi', 'B': 'Gubernatora', 'N': 'Gubernatorem', 'Ms': 'Gubernatorze', 'W': 'Gubernatorze'},
+    "kanclerz": {'M': 'Kanclerz', 'D': 'Kanclerza', 'C': 'Kanclerzowi', 'B': 'Kanclerza', 'N': 'Kanclerzem', 'Ms': 'Kanclerzu', 'W': 'Kanclerzu'},
+    "hrabia": {'M': 'Hrabia', 'D': 'Hrabiego', 'C': 'Hrabiemu', 'B': 'Hrabiego', 'N': 'Hrabią', 'Ms': 'Hrabim', 'W': 'Hrabio'},
+    "hrabina": {'M': 'Hrabina', 'D': 'Hrabiny', 'C': 'Hrabinie', 'B': 'Hrabinę', 'N': 'Hrabiną', 'Ms': 'Hrabinie', 'W': 'Hrabino'},
+    "margrabia": {'M': 'Margrabia', 'D': 'Margrabiego', 'C': 'Margrabiemu', 'B': 'Margrabiego', 'N': 'Margrabią', 'Ms': 'Margrabim', 'W': 'Margrabio'},
+    "baron": {'M': 'Baron', 'D': 'Barona', 'C': 'Baronowi', 'B': 'Barona', 'N': 'Baronem', 'Ms': 'Baronie', 'W': 'Baronie'},
+    "baronowa": {'M': 'Baronowa', 'D': 'Baronowej', 'C': 'Baronowej', 'B': 'Baronową', 'N': 'Baronową', 'Ms': 'Baronowej', 'W': 'Baronowo'},
+    "suweren": {'M': 'Suweren', 'D': 'Suwerena', 'C': 'Suwerenowi', 'B': 'Suwerena', 'N': 'Suwerenem', 'Ms': 'Suwerenie', 'W': 'Suwerenie'},
+    "wasal": {'M': 'Wasal', 'D': 'Wasala', 'C': 'Wasalowi', 'B': 'Wasala', 'N': 'Wasalem', 'Ms': 'Wasalu', 'W': 'Wasalu'},
+    "dziedzic": {'M': 'Dziedzic', 'D': 'Dziedzica', 'C': 'Dziedzicowi', 'B': 'Dziedzica', 'N': 'Dziedzicem', 'Ms': 'Dziedzicu', 'W': 'Dziedzicu'},
+    "dziedziczka": {'M': 'Dziedziczka', 'D': 'Dziedziczki', 'C': 'Dziedziczce', 'B': 'Dziedziczkę', 'N': 'Dziedziczką', 'Ms': 'Dziedziczce', 'W': 'Dziedziczko'},
+    "czarodziej": {'M': 'Czarodziej', 'D': 'Czarodzieja', 'C': 'Czarodziejowi', 'B': 'Czarodzieja', 'N': 'Czarodziejem', 'Ms': 'Czarodzieju', 'W': 'Czarodzieju'},
+    "czarodziejka": {'M': 'Czarodziejka', 'D': 'Czarodziejki', 'C': 'Czarodziejce', 'B': 'Czarodziejkę', 'N': 'Czarodziejką', 'Ms': 'Czarodziejce', 'W': 'Czarodziejko'},
+    "czarnoksiężnica": {'M': 'Czarnoksiężnica', 'D': 'Czarnoksiężnicy', 'C': 'Czarnoksiężnicy', 'B': 'Czarnoksiężnicę', 'N': 'Czarnoksiężnicą', 'Ms': 'Czarnoksiężnicy', 'W': 'Czarnoksiężnico'},
+    "uzdrowiciel": {'M': 'Uzdrowiciel', 'D': 'Uzdrowiciela', 'C': 'Uzdrowicielowi', 'B': 'Uzdrowiciela', 'N': 'Uzdrowicielem', 'Ms': 'Uzdrowicielu', 'W': 'Uzdrowicielu'},
+    "uzdrowicielka": {'M': 'Uzdrowicielka', 'D': 'Uzdrowicielki', 'C': 'Uzdrowicielce', 'B': 'Uzdrowicielkę', 'N': 'Uzdrowicielką', 'Ms': 'Uzdrowicielce', 'W': 'Uzdrowicielko'},
+    "alchemik": {'M': 'Alchemik', 'D': 'Alchemika', 'C': 'Alchemikowi', 'B': 'Alchemika', 'N': 'Alchemikiem', 'Ms': 'Alchemiku', 'W': 'Alchemiku'},
+    "aptekarz": {'M': 'Aptekarz', 'D': 'Aptekarza', 'C': 'Aptekarzowi', 'B': 'Aptekarza', 'N': 'Aptekarzem', 'Ms': 'Aptekarzu', 'W': 'Aptekarzu'},
+    "zielarz": {'M': 'Zielarz', 'D': 'Zielarza', 'C': 'Zielarzowi', 'B': 'Zielarza', 'N': 'Zielarzem', 'Ms': 'Zielarzu', 'W': 'Zielarzu'},
+    "zielarka": {'M': 'Zielarka', 'D': 'Zielarki', 'C': 'Zielarce', 'B': 'Zielarkę', 'N': 'Zielarką', 'Ms': 'Zielarce', 'W': 'Zielarko'},
+    "kowal": {'M': 'Kowal', 'D': 'Kowala', 'C': 'Kowalowi', 'B': 'Kowala', 'N': 'Kowalem', 'Ms': 'Kowalu', 'W': 'Kowalu'},
+    "płatnerz": {'M': 'Płatnerz', 'D': 'Płatnerza', 'C': 'Płatnerzowi', 'B': 'Płatnerza', 'N': 'Płatnerzem', 'Ms': 'Płatnerzu', 'W': 'Płatnerzu'},
+    "kupiec": {'M': 'Kupiec', 'D': 'Kupca', 'C': 'Kupcowi', 'B': 'Kupca', 'N': 'Kupcem', 'Ms': 'Kupcu', 'W': 'Kupcu'},
+    "złodziej": {'M': 'Złodziej', 'D': 'Złodzieja', 'C': 'Złodziejowi', 'B': 'Złodzieja', 'N': 'Złodziejem', 'Ms': 'Złodzieju', 'W': 'Złodzieju'},
+    "złodziejka": {'M': 'Złodziejka', 'D': 'Złodziejki', 'C': 'Złodziejce', 'B': 'Złodziejkę', 'N': 'Złodziejką', 'Ms': 'Złodziejce', 'W': 'Złodziejko'},
+    "szpieg": {'M': 'Szpieg', 'D': 'Szpiega', 'C': 'Szpiegowi', 'B': 'Szpiega', 'N': 'Szpiegiem', 'Ms': 'Szpiegu', 'W': 'Szpiegu'},
+    "uczeń": {'M': 'Uczeń', 'D': 'Ucznia', 'C': 'Uczniowi', 'B': 'Ucznia', 'N': 'Uczniem', 'Ms': 'Uczniu', 'W': 'Uczniu'},
+    "uczennica": {'M': 'Uczennica', 'D': 'Uczennicy', 'C': 'Uczennicy', 'B': 'Uczennicę', 'N': 'Uczennicą', 'Ms': 'Uczennicy', 'W': 'Uczennico'},
+    "nauczyciel": {'M': 'Nauczyciel', 'D': 'Nauczyciela', 'C': 'Nauczycielowi', 'B': 'Nauczyciela', 'N': 'Nauczycielem', 'Ms': 'Nauczycielu', 'W': 'Nauczycielu'},
+    "nauczycielka": {'M': 'Nauczycielka', 'D': 'Nauczycielki', 'C': 'Nauczycielce', 'B': 'Nauczycielkę', 'N': 'Nauczycielką', 'Ms': 'Nauczycielce', 'W': 'Nauczycielko'},
+    "sługa": {'M': 'Sługa', 'D': 'Sługi', 'C': 'Słudze', 'B': 'Sługę', 'N': 'Sługą', 'Ms': 'Słudze', 'W': 'Sługo'},
+    "służąca": {'M': 'Służąca', 'D': 'Służącej', 'C': 'Służącej', 'B': 'Służącą', 'N': 'Służącą', 'Ms': 'Służącej', 'W': 'Służąca'},
+    "kamerdyner": {'M': 'Kamerdyner', 'D': 'Kamerdynera', 'C': 'Kamerdynerowi', 'B': 'Kamerdynera', 'N': 'Kamerdynerem', 'Ms': 'Kamerdynerze', 'W': 'Kamerdynerze'},
+    "opiekun": {'M': 'Opiekun', 'D': 'Opiekuna', 'C': 'Opiekunowi', 'B': 'Opiekuna', 'N': 'Opiekunem', 'Ms': 'Opiekunie', 'W': 'Opiekunie'},
+    "opiekunka": {'M': 'Opiekunka', 'D': 'Opiekunki', 'C': 'Opiekunce', 'B': 'Opiekunkę', 'N': 'Opiekunką', 'Ms': 'Opiekunce', 'W': 'Opiekunko'},
+    "prorok": {'M': 'Prorok', 'D': 'Proroka', 'C': 'Prorokowi', 'B': 'Proroka', 'N': 'Prorokiem', 'Ms': 'Proroku', 'W': 'Proroku'},
+    "prorokini": {'M': 'Prorokini', 'D': 'Prorokini', 'C': 'Prorokini', 'B': 'Prorokinię', 'N': 'Prorokinią', 'Ms': 'Prorokini', 'W': 'Prorokini'},
+    "wyrocznia": {'M': 'Wyrocznia', 'D': 'Wyroczni', 'C': 'Wyroczni', 'B': 'Wyrocznię', 'N': 'Wyrocznią', 'Ms': 'Wyroczni', 'W': 'Wyrocznio'},
+    "mnich": {'M': 'Mnich', 'D': 'Mnicha', 'C': 'Mnichowi', 'B': 'Mnicha', 'N': 'Mnichem', 'Ms': 'Mnichu', 'W': 'Mnichu'},
+    "mniszka": {'M': 'Mniszka', 'D': 'Mniszki', 'C': 'Mniszce', 'B': 'Mniszkę', 'N': 'Mniszką', 'Ms': 'Mniszce', 'W': 'Mniszko'},
+    "biskup": {'M': 'Biskup', 'D': 'Biskupa', 'C': 'Biskupowi', 'B': 'Biskupa', 'N': 'Biskupem', 'Ms': 'Biskupie', 'W': 'Biskupie'},
+    "towarzysz": {'M': 'Towarzysz', 'D': 'Towarzysza', 'C': 'Towarzyszowi', 'B': 'Towarzysza', 'N': 'Towarzyszem', 'Ms': 'Towarzyszu', 'W': 'Towarzyszu'},
+    "towarzyszka": {'M': 'Towarzyszka', 'D': 'Towarzyszki', 'C': 'Towarzyszce', 'B': 'Towarzyszkę', 'N': 'Towarzyszką', 'Ms': 'Towarzyszce', 'W': 'Towarzyszko'},
+    "rywal": {'M': 'Rywal', 'D': 'Rywala', 'C': 'Rywalowi', 'B': 'Rywala', 'N': 'Rywalem', 'Ms': 'Rywalu', 'W': 'Rywalu'},
+    "rywalka": {'M': 'Rywalka', 'D': 'Rywalki', 'C': 'Rywalce', 'B': 'Rywalkę', 'N': 'Rywalką', 'Ms': 'Rywalce', 'W': 'Rywalko'},
+    "zdrajca": {'M': 'Zdrajca', 'D': 'Zdrajcy', 'C': 'Zdrajcy', 'B': 'Zdrajcę', 'N': 'Zdrajcą', 'Ms': 'Zdrajcy', 'W': 'Zdrajco'},
+    "zdrajczyni": {'M': 'Zdrajczyni', 'D': 'Zdrajczyni', 'C': 'Zdrajczyni', 'B': 'Zdrajczynię', 'N': 'Zdrajczynią', 'Ms': 'Zdrajczyni', 'W': 'Zdrajczyni'},
+    "wędrowiec": {'M': 'Wędrowiec', 'D': 'Wędrowca', 'C': 'Wędrowcowi', 'B': 'Wędrowca', 'N': 'Wędrowcem', 'Ms': 'Wędrowcu', 'W': 'Wędrowcu'},
+    "przewodnik": {'M': 'Przewodnik', 'D': 'Przewodnika', 'C': 'Przewodnikowi', 'B': 'Przewodnika', 'N': 'Przewodnikiem', 'Ms': 'Przewodniku', 'W': 'Przewodniku'},
+    "przewodniczka": {'M': 'Przewodniczka', 'D': 'Przewodniczki', 'C': 'Przewodniczce', 'B': 'Przewodniczkę', 'N': 'Przewodniczką', 'Ms': 'Przewodniczce', 'W': 'Przewodniczko'},
+    "walkiria": {'M': 'Walkiria', 'D': 'Walkirii', 'C': 'Walkirii', 'B': 'Walkirię', 'N': 'Walkirią', 'Ms': 'Walkirii', 'W': 'Walkirio'},
+    "nimfa": {'M': 'Nimfa', 'D': 'Nimfy', 'C': 'Nimfie', 'B': 'Nimfę', 'N': 'Nimfą', 'Ms': 'Nimfie', 'W': 'Nimfo'},
+    "syrena": {'M': 'Syrena', 'D': 'Syreny', 'C': 'Syrenie', 'B': 'Syrenę', 'N': 'Syreną', 'Ms': 'Syrenie', 'W': 'Syreno'},
+    "sukkub": {'M': 'Sukkub', 'D': 'Sukkuba', 'C': 'Sukkubowi', 'B': 'Sukkuba', 'N': 'Sukkubem', 'Ms': 'Sukkubie', 'W': 'Sukkubie'},
+    "elf": {'M': 'Elf', 'D': 'Elfa', 'C': 'Elfowi', 'B': 'Elfa', 'N': 'Elfem', 'Ms': 'Elfie', 'W': 'Elfie'},
+    "elfka": {'M': 'Elfka', 'D': 'Elfki', 'C': 'Elfce', 'B': 'Elfkę', 'N': 'Elfką', 'Ms': 'Elfce', 'W': 'Elfko'},
+    "krasnolud": {'M': 'Krasnolud', 'D': 'Krasnoluda', 'C': 'Krasnoludowi', 'B': 'Krasnoluda', 'N': 'Krasnoludem', 'Ms': 'Krasnoludzie', 'W': 'Krasnoludzie'},
+    "krasnoludka": {'M': 'Krasnoludka', 'D': 'Krasnoludki', 'C': 'Krasnoludce', 'B': 'Krasnoludkę', 'N': 'Krasnoludką', 'Ms': 'Krasnoludce', 'W': 'Krasnoludko'},
+    "ork": {'M': 'Ork', 'D': 'Orka', 'C': 'Orkowi', 'B': 'Orka', 'N': 'Orkiem', 'Ms': 'Orku', 'W': 'Orku'},
+    "goblin": {'M': 'Goblin', 'D': 'Goblina', 'C': 'Goblinowi', 'B': 'Goblina', 'N': 'Goblinem', 'Ms': 'Goblinie', 'W': 'Goblinie'},
+    "olbrzym": {'M': 'Olbrzym', 'D': 'Olbrzyma', 'C': 'Olbrzymowi', 'B': 'Olbrzyma', 'N': 'Olbrzymem', 'Ms': 'Olbrzymie', 'W': 'Olbrzymie'},
+    "tytan": {'M': 'Tytan', 'D': 'Tytana', 'C': 'Tytanowi', 'B': 'Tytana', 'N': 'Tytanem', 'Ms': 'Tytanie', 'W': 'Tytanie'},
+    "golem": {'M': 'Golem', 'D': 'Golema', 'C': 'Golemowi', 'B': 'Golema', 'N': 'Golemem', 'Ms': 'Golemie', 'W': 'Golemie'},
+    "upiór": {'M': 'Upiór', 'D': 'Upiora', 'C': 'Upiorowi', 'B': 'Upiora', 'N': 'Upiorem', 'Ms': 'Upiorze', 'W': 'Upiorze'},
+    "wilkołak": {'M': 'Wilkołak', 'D': 'Wilkołaka', 'C': 'Wilkołakowi', 'B': 'Wilkołaka', 'N': 'Wilkołakiem', 'Ms': 'Wilkołaku', 'W': 'Wilkołaku'},
+    "wiedźma": {'M': 'Wiedźma', 'D': 'Wiedźmy', 'C': 'Wiedźmie', 'B': 'Wiedźmę', 'N': 'Wiedźmą', 'Ms': 'Wiedźmie', 'W': 'Wiedźmo'},
+    "gildia": {'M': 'Gildia', 'D': 'Gildii', 'C': 'Gildii', 'B': 'Gildię', 'N': 'Gildią', 'Ms': 'Gildii', 'W': 'Gildio'},
+    "bractwo": {'M': 'Bractwo', 'D': 'Bractwa', 'C': 'Bractwu', 'B': 'Bractwo', 'N': 'Bractwem', 'Ms': 'Bractwie', 'W': 'Bractwo'},
+    "sojusz": {'M': 'Sojusz', 'D': 'Sojuszu', 'C': 'Sojuszowi', 'B': 'Sojusz', 'N': 'Sojuszem', 'Ms': 'Sojuszu', 'W': 'Sojuszu'},
+    "koalicja": {'M': 'Koalicja', 'D': 'Koalicji', 'C': 'Koalicji', 'B': 'Koalicję', 'N': 'Koalicją', 'Ms': 'Koalicji', 'W': 'Koalicjo'},
+    "akademia": {'M': 'Akademia', 'D': 'Akademii', 'C': 'Akademii', 'B': 'Akademię', 'N': 'Akademią', 'Ms': 'Akademii', 'W': 'Akademio'},
+    "senat": {'M': 'Senat', 'D': 'Senatu', 'C': 'Senatowi', 'B': 'Senat', 'N': 'Senatem', 'Ms': 'Senacie', 'W': 'Senacie'},
+    "republika": {'M': 'Republika', 'D': 'Republiki', 'C': 'Republice', 'B': 'Republikę', 'N': 'Republiką', 'Ms': 'Republice', 'W': 'Republiko'},
+    "imperium": {'M': 'Imperium', 'D': 'Imperium', 'C': 'Imperium', 'B': 'Imperium', 'N': 'Imperium', 'Ms': 'Imperium', 'W': 'Imperium'},
+    "cesarstwo": {'M': 'Cesarstwo', 'D': 'Cesarstwa', 'C': 'Cesarstwu', 'B': 'Cesarstwo', 'N': 'Cesarstwem', 'Ms': 'Cesarstwie', 'W': 'Cesarstwo'},
+    "królestwo": {'M': 'Królestwo', 'D': 'Królestwa', 'C': 'Królestwu', 'B': 'Królestwo', 'N': 'Królestwem', 'Ms': 'Królestwie', 'W': 'Królestwo'},
+    "księstwo": {'M': 'Księstwo', 'D': 'Księstwa', 'C': 'Księstwu', 'B': 'Księstwo', 'N': 'Księstwem', 'Ms': 'Księstwie', 'W': 'Księstwo'},
+    "domena": {'M': 'Domena', 'D': 'Domeny', 'C': 'Domenie', 'B': 'Domenę', 'N': 'Domeną', 'Ms': 'Domenie', 'W': 'Domeno'},
+    "kraina": {'M': 'Kraina', 'D': 'Krainy', 'C': 'Krainie', 'B': 'Krainę', 'N': 'Krainą', 'Ms': 'Krainie', 'W': 'Kraino'},
+    "armia": {'M': 'Armia', 'D': 'Armii', 'C': 'Armii', 'B': 'Armię', 'N': 'Armią', 'Ms': 'Armii', 'W': 'Armio'},
+    "oddział": {'M': 'Oddział', 'D': 'Oddziału', 'C': 'Oddziałowi', 'B': 'Oddział', 'N': 'Oddziałem', 'Ms': 'Oddziale', 'W': 'Oddziale'},
+    "legion": {'M': 'Legion', 'D': 'Legionu', 'C': 'Legionowi', 'B': 'Legion', 'N': 'Legionem', 'Ms': 'Legionie', 'W': 'Legionie'},
+    "flota": {'M': 'Flota', 'D': 'Floty', 'C': 'Flocie', 'B': 'Flotę', 'N': 'Flotą', 'Ms': 'Flocie', 'W': 'Floto'},
+    "cytadela": {'M': 'Cytadela', 'D': 'Cytadeli', 'C': 'Cytadeli', 'B': 'Cytadelę', 'N': 'Cytadelą', 'Ms': 'Cytadeli', 'W': 'Cytadelo'},
+    "bastion": {'M': 'Bastion', 'D': 'Bastionu', 'C': 'Bastionowi', 'B': 'Bastion', 'N': 'Bastionem', 'Ms': 'Bastionie', 'W': 'Bastionie'},
+    "forteca": {'M': 'Forteca', 'D': 'Fortecy', 'C': 'Fortecy', 'B': 'Fortecę', 'N': 'Fortecą', 'Ms': 'Fortecy', 'W': 'Forteco'},
+    "pałac": {'M': 'Pałac', 'D': 'Pałacu', 'C': 'Pałacowi', 'B': 'Pałac', 'N': 'Pałacem', 'Ms': 'Pałacu', 'W': 'Pałacu'},
+    "katedra": {'M': 'Katedra', 'D': 'Katedry', 'C': 'Katedrze', 'B': 'Katedrę', 'N': 'Katedrą', 'Ms': 'Katedrze', 'W': 'Katedro'},
+    "sanktuarium": {'M': 'Sanktuarium', 'D': 'Sanktuarium', 'C': 'Sanktuarium', 'B': 'Sanktuarium', 'N': 'Sanktuarium', 'Ms': 'Sanktuarium', 'W': 'Sanktuarium'},
+    "kaplica": {'M': 'Kaplica', 'D': 'Kaplicy', 'C': 'Kaplicy', 'B': 'Kaplicę', 'N': 'Kaplicą', 'Ms': 'Kaplicy', 'W': 'Kaplico'},
+    "klasztor": {'M': 'Klasztor', 'D': 'Klasztoru', 'C': 'Klasztorowi', 'B': 'Klasztor', 'N': 'Klasztorem', 'Ms': 'Klasztorze', 'W': 'Klasztorze'},
+    "krypta": {'M': 'Krypta', 'D': 'Krypty', 'C': 'Krypcie', 'B': 'Kryptę', 'N': 'Kryptą', 'Ms': 'Krypcie', 'W': 'Krypto'},
+    "grobowiec": {'M': 'Grobowiec', 'D': 'Grobowca', 'C': 'Grobowcowi', 'B': 'Grobowiec', 'N': 'Grobowcem', 'Ms': 'Grobowcu', 'W': 'Grobowcu'},
+    "katakumby": {'M': 'Katakumby', 'D': 'Katakumb', 'C': 'Katakumbom', 'B': 'Katakumby', 'N': 'Katakumbami', 'Ms': 'Katakumbach', 'W': 'Katakumby'},
+    "labirynt": {'M': 'Labirynt', 'D': 'Labiryntu', 'C': 'Labiryntowi', 'B': 'Labirynt', 'N': 'Labiryntem', 'Ms': 'Labiryncie', 'W': 'Labiryncie'},
+    "loch": {'M': 'Loch', 'D': 'Lochu', 'C': 'Lochowi', 'B': 'Loch', 'N': 'Lochem', 'Ms': 'Lochu', 'W': 'Lochu'},
+    "miasto": {'M': 'Miasto', 'D': 'Miasta', 'C': 'Miastu', 'B': 'Miasto', 'N': 'Miastem', 'Ms': 'Mieście', 'W': 'Miasto'},
+    "wioska": {'M': 'Wioska', 'D': 'Wioski', 'C': 'Wiosce', 'B': 'Wioskę', 'N': 'Wioską', 'Ms': 'Wiosce', 'W': 'Wiosko'},
+    "wieś": {'M': 'Wieś', 'D': 'Wsi', 'C': 'Wsi', 'B': 'Wieś', 'N': 'Wsią', 'Ms': 'Wsi', 'W': 'Wsi'},
+    "port": {'M': 'Port', 'D': 'Portu', 'C': 'Portowi', 'B': 'Port', 'N': 'Portem', 'Ms': 'Porcie', 'W': 'Porcie'},
+    "przystań": {'M': 'Przystań', 'D': 'Przystani', 'C': 'Przystani', 'B': 'Przystań', 'N': 'Przystanią', 'Ms': 'Przystani', 'W': 'Przystani'},
+    "plac": {'M': 'Plac', 'D': 'Placu', 'C': 'Placowi', 'B': 'Plac', 'N': 'Placem', 'Ms': 'Placu', 'W': 'Placu'},
+    "ulica": {'M': 'Ulica', 'D': 'Ulicy', 'C': 'Ulicy', 'B': 'Ulicę', 'N': 'Ulicą', 'Ms': 'Ulicy', 'W': 'Ulico'},
+    "zaułek": {'M': 'Zaułek', 'D': 'Zaułka', 'C': 'Zaułkowi', 'B': 'Zaułek', 'N': 'Zaułkiem', 'Ms': 'Zaułku', 'W': 'Zaułku'},
+    "las": {'M': 'Las', 'D': 'Lasu', 'C': 'Lasowi', 'B': 'Las', 'N': 'Lasem', 'Ms': 'Lesie', 'W': 'Lesie'},
+    "puszcza": {'M': 'Puszcza', 'D': 'Puszczy', 'C': 'Puszczy', 'B': 'Puszczę', 'N': 'Puszczą', 'Ms': 'Puszczy', 'W': 'Puszczo'},
+    "bór": {'M': 'Bór', 'D': 'Boru', 'C': 'Borowi', 'B': 'Bór', 'N': 'Borem', 'Ms': 'Borze', 'W': 'Borze'},
+    "gaj": {'M': 'Gaj', 'D': 'Gaju', 'C': 'Gajowi', 'B': 'Gaj', 'N': 'Gajem', 'Ms': 'Gaju', 'W': 'Gaju'},
+    "szczyt": {'M': 'Szczyt', 'D': 'Szczytu', 'C': 'Szczytowi', 'B': 'Szczyt', 'N': 'Szczytem', 'Ms': 'Szczycie', 'W': 'Szczycie'},
+    "wąwóz": {'M': 'Wąwóz', 'D': 'Wąwozu', 'C': 'Wąwozowi', 'B': 'Wąwóz', 'N': 'Wąwozem', 'Ms': 'Wąwozie', 'W': 'Wąwozie'},
+    "polana": {'M': 'Polana', 'D': 'Polany', 'C': 'Polanie', 'B': 'Polanę', 'N': 'Polaną', 'Ms': 'Polanie', 'W': 'Polano'},
+    "bagno": {'M': 'Bagno', 'D': 'Bagna', 'C': 'Bagnu', 'B': 'Bagno', 'N': 'Bagnem', 'Ms': 'Bagnie', 'W': 'Bagno'},
+    "oaza": {'M': 'Oaza', 'D': 'Oazy', 'C': 'Oazie', 'B': 'Oazę', 'N': 'Oazą', 'Ms': 'Oazie', 'W': 'Oazo'},
+    "ocean": {'M': 'Ocean', 'D': 'Oceanu', 'C': 'Oceanowi', 'B': 'Ocean', 'N': 'Oceanem', 'Ms': 'Oceanie', 'W': 'Oceanie'},
+    "wyspa": {'M': 'Wyspa', 'D': 'Wyspy', 'C': 'Wyspie', 'B': 'Wyspę', 'N': 'Wyspą', 'Ms': 'Wyspie', 'W': 'Wyspo'},
+    "archipelag": {'M': 'Archipelag', 'D': 'Archipelagu', 'C': 'Archipelagowi', 'B': 'Archipelag', 'N': 'Archipelagiem', 'Ms': 'Archipelagu', 'W': 'Archipelagu'},
+    "półwysep": {'M': 'Półwysep', 'D': 'Półwyspu', 'C': 'Półwyspowi', 'B': 'Półwysep', 'N': 'Półwyspem', 'Ms': 'Półwyspie', 'W': 'Półwyspie'},
+    "wybrzeże": {'M': 'Wybrzeże', 'D': 'Wybrzeża', 'C': 'Wybrzeżu', 'B': 'Wybrzeże', 'N': 'Wybrzeżem', 'Ms': 'Wybrzeżu', 'W': 'Wybrzeże'},
+    "przepaść": {'M': 'Przepaść', 'D': 'Przepaści', 'C': 'Przepaści', 'B': 'Przepaść', 'N': 'Przepaścią', 'Ms': 'Przepaści', 'W': 'Przepaści'},
+    "otchłań": {'M': 'Otchłań', 'D': 'Otchłani', 'C': 'Otchłani', 'B': 'Otchłań', 'N': 'Otchłanią', 'Ms': 'Otchłani', 'W': 'Otchłani'},
+    "pustka": {'M': 'Pustka', 'D': 'Pustki', 'C': 'Pustce', 'B': 'Pustkę', 'N': 'Pustką', 'Ms': 'Pustce', 'W': 'Pustko'},
+    "kryształ": {'M': 'Kryształ', 'D': 'Kryształu', 'C': 'Kryształowi', 'B': 'Kryształ', 'N': 'Kryształem', 'Ms': 'Krysztale', 'W': 'Krysztale'},
+    "klejnot": {'M': 'Klejnot', 'D': 'Klejnotu', 'C': 'Klejnotowi', 'B': 'Klejnot', 'N': 'Klejnotem', 'Ms': 'Klejnocie', 'W': 'Klejnocie'},
+    "diament": {'M': 'Diament', 'D': 'Diamentu', 'C': 'Diamentowi', 'B': 'Diament', 'N': 'Diamentem', 'Ms': 'Diamencie', 'W': 'Diamencie'},
+    "perła": {'M': 'Perła', 'D': 'Perły', 'C': 'Perle', 'B': 'Perłę', 'N': 'Perłą', 'Ms': 'Perle', 'W': 'Perło'},
+    "rubin": {'M': 'Rubin', 'D': 'Rubinu', 'C': 'Rubinowi', 'B': 'Rubin', 'N': 'Rubinem', 'Ms': 'Rubinie', 'W': 'Rubinie'},
+    "szmaragd": {'M': 'Szmaragd', 'D': 'Szmaragdu', 'C': 'Szmaragdowi', 'B': 'Szmaragd', 'N': 'Szmaragdem', 'Ms': 'Szmaragdzie', 'W': 'Szmaragdzie'},
+    "runa": {'M': 'Runa', 'D': 'Runy', 'C': 'Runie', 'B': 'Runę', 'N': 'Runą', 'Ms': 'Runie', 'W': 'Runo'},
+    "talizman": {'M': 'Talizman', 'D': 'Talizmanu', 'C': 'Talizmanowi', 'B': 'Talizman', 'N': 'Talizmanem', 'Ms': 'Talizmanie', 'W': 'Talizmanie'},
+    "relikwia": {'M': 'Relikwia', 'D': 'Relikwii', 'C': 'Relikwii', 'B': 'Relikwię', 'N': 'Relikwią', 'Ms': 'Relikwii', 'W': 'Relikwio'},
+    "artefakt": {'M': 'Artefakt', 'D': 'Artefaktu', 'C': 'Artefaktowi', 'B': 'Artefakt', 'N': 'Artefaktem', 'Ms': 'Artefakcie', 'W': 'Artefakcie'},
+    "laska": {'M': 'Laska', 'D': 'Laski', 'C': 'Lasce', 'B': 'Laskę', 'N': 'Laską', 'Ms': 'Lasce', 'W': 'Lasko'},
+    "kostur": {'M': 'Kostur', 'D': 'Kostura', 'C': 'Kosturowi', 'B': 'Kostur', 'N': 'Kosturem', 'Ms': 'Kosturze', 'W': 'Kosturze'},
+    "topór": {'M': 'Topór', 'D': 'Topora', 'C': 'Toporowi', 'B': 'Topór', 'N': 'Toporem', 'Ms': 'Toporze', 'W': 'Toporze'},
+    "włócznia": {'M': 'Włócznia', 'D': 'Włóczni', 'C': 'Włóczni', 'B': 'Włócznię', 'N': 'Włócznią', 'Ms': 'Włóczni', 'W': 'Włócznio'},
+    "pika": {'M': 'Pika', 'D': 'Piki', 'C': 'Pice', 'B': 'Pikę', 'N': 'Piką', 'Ms': 'Pice', 'W': 'Piko'},
+    "halabarda": {'M': 'Halabarda', 'D': 'Halabardy', 'C': 'Halabardzie', 'B': 'Halabardę', 'N': 'Halabardą', 'Ms': 'Halabardzie', 'W': 'Halabardo'},
+    "kusza": {'M': 'Kusza', 'D': 'Kuszy', 'C': 'Kuszy', 'B': 'Kuszę', 'N': 'Kuszą', 'Ms': 'Kuszy', 'W': 'Kuszo'},
+    "szpada": {'M': 'Szpada', 'D': 'Szpady', 'C': 'Szpadzie', 'B': 'Szpadę', 'N': 'Szpadą', 'Ms': 'Szpadzie', 'W': 'Szpado'},
+    "rapier": {'M': 'Rapier', 'D': 'Rapiera', 'C': 'Rapierowi', 'B': 'Rapier', 'N': 'Rapierem', 'Ms': 'Rapierze', 'W': 'Rapierze'},
+    "szabla": {'M': 'Szabla', 'D': 'Szabli', 'C': 'Szabli', 'B': 'Szablę', 'N': 'Szablą', 'Ms': 'Szabli', 'W': 'Szablo'},
+    "pancerz": {'M': 'Pancerz', 'D': 'Pancerza', 'C': 'Pancerzowi', 'B': 'Pancerz', 'N': 'Pancerzem', 'Ms': 'Pancerzu', 'W': 'Pancerzu'},
+    "rękawica": {'M': 'Rękawica', 'D': 'Rękawicy', 'C': 'Rękawicy', 'B': 'Rękawicę', 'N': 'Rękawicą', 'Ms': 'Rękawicy', 'W': 'Rękawico'},
+    "płaszcz": {'M': 'Płaszcz', 'D': 'Płaszcza', 'C': 'Płaszczowi', 'B': 'Płaszcz', 'N': 'Płaszczem', 'Ms': 'Płaszczu', 'W': 'Płaszczu'},
+    "szata": {'M': 'Szata', 'D': 'Szaty', 'C': 'Szacie', 'B': 'Szatę', 'N': 'Szatą', 'Ms': 'Szacie', 'W': 'Szato'},
+    "maska": {'M': 'Maska', 'D': 'Maski', 'C': 'Masce', 'B': 'Maskę', 'N': 'Maską', 'Ms': 'Masce', 'W': 'Masko'},
+    "zegar": {'M': 'Zegar', 'D': 'Zegara', 'C': 'Zegarowi', 'B': 'Zegar', 'N': 'Zegarem', 'Ms': 'Zegarze', 'W': 'Zegarze'},
+    "klepsydra": {'M': 'Klepsydra', 'D': 'Klepsydry', 'C': 'Klepsydrze', 'B': 'Klepsydrę', 'N': 'Klepsydrą', 'Ms': 'Klepsydrze', 'W': 'Klepsydro'},
+    "książka": {'M': 'Książka', 'D': 'Książki', 'C': 'Książce', 'B': 'Książkę', 'N': 'Książką', 'Ms': 'Książce', 'W': 'Książko'},
+    "sekret": {'M': 'Sekret', 'D': 'Sekretu', 'C': 'Sekretowi', 'B': 'Sekret', 'N': 'Sekretem', 'Ms': 'Sekrecie', 'W': 'Sekrecie'},
+    "tajemnica": {'M': 'Tajemnica', 'D': 'Tajemnicy', 'C': 'Tajemnicy', 'B': 'Tajemnicę', 'N': 'Tajemnicą', 'Ms': 'Tajemnicy', 'W': 'Tajemnico'},
+}
+
+KNOWN_HEAD_NOUNS = {
+    "księga", "księgi", "miecz", "miecze", "lanca", "tarcza", "zakon", "dolina", "pieczęć",
+    "oko", "ręka", "pierścień", "amulet", "zwierciadło", "kielich", "zwój", "zwoje",
+    "królowa", "król", "władca", "władczyni", "cesarz", "cesarzowa", "książę", "księżniczka",
+    "mistrz", "mistrzyni", "demon", "demonica", "pani", "pan", "lord", "bóg", "bogini",
+    "kamień", "drzewo", "kraj", "wyspa", "wieża", "zamek", "twierdza", "świątynia", "krew", "duch",
+    "serce", "płomień", "brama", "wrota", "światło", "cień", "korona", "tron",
+    "ród", "znak", "kosa", "młot", "sztylet", "łuk", "strzała", "zbroja", "hełm",
+    "różdżka", "książka", "kodeks", "tajemnica", "tajemnice", "sekret", "sekrety",
+    "opowieść", "legenda", "pieśń", "hymn", "kronika", "kroniki", "droga", "szlak",
+    "most", "rzeka", "jezioro", "morze", "góra", "góry", "pustynia", "pakt",
+    "przymierze", "zemsta", "klątwa", "gniew", "bunt", "upadek", "powrót",
+    "narodziny", "koniec", "początek", "córka", "syn", "matka", "ojciec",
+    "brat", "siostra", "bohater", "wojownik", "rycerz", "mag", "czarnoksiężnik", "kapłan",
+    "dowódca", "zabójca", "obrońca", "łowca", "strażnik", "generał",
+    "arcykapłan", "arcymag", "szaman", "czarownik", "czarownica", "bestia", "potwór",
+    "smok", "bóstwo", "anioł", "wampir", "widmo", "zjawa", "wojowniczka", "bohaterka",
+    "kapłanka"
+}
+
+TOPONYMIC_INSTITUTION_HEAD_NOUNS = {
+    "miasto", "wieża", "gildia", "akademia", "cytadela", "las", "zamek", "twierdza",
+    "dolina", "rzeka", "jezioro", "morze", "góra", "pałac", "katedra", "sanktuarium",
+    "kaplica", "klasztor", "krypta", "grobowiec", "katakumby", "labirynt", "loch",
+    "wioska", "wieś", "port", "przystań", "plac", "ulica", "zaułek", "puszcza",
+    "bór", "gaj", "szczyt", "wąwóz", "polana", "bagno", "oaza", "ocean", "wyspa",
+    "archipelag", "półwysep", "wybrzeże", "przepaść", "otchłań", "pustka", "bractwo",
+    "zakon", "sojusz", "koalicja", "senat", "republika", "imperium", "cesarstwo",
+    "królestwo", "księstwo", "domena", "kraina", "armia", "oddział", "legion", "flota",
+    "bastion", "forteca", "brama", "wrota", "kościół"
+}
+
+_PREPS_GEN = {"do", "od", "z", "ze", "dla", "bez", "u", "koło", "obok", "blisko", "wokół", "dookoła", "pośród", "wśród", "spod", "zza", "znad", "wzdłuż", "podczas", "mimo", "według", "wskutek", "wobec", "naprzeciw"}
+_PREPS_LOC = {"w", "we", "na", "po", "o", "przy"}
+_PREPS_INST = {"za", "pod", "pode", "nad", "nade", "przed", "przede", "między", "pomiędzy", "poza"}
+_PREPS_DAT = {"dzięki", "przeciw", "przeciwko", "ku", "wbrew"}
+_ALL_TOPONYM_PREPS = _PREPS_GEN | _PREPS_LOC | _PREPS_INST | _PREPS_DAT
+_PREP_PAT = "|".join(sorted(_ALL_TOPONYM_PREPS, key=len, reverse=True))
+_HEAD_PAT = "|".join([k.capitalize() for k in TOPONYMIC_INSTITUTION_HEAD_NOUNS])
+_RE_TOPONYMIC_PREP_GOV = re.compile(rf"\b({_PREP_PAT})\s+({_HEAD_PAT})\b(\s+[A-ZĄĆĘŁŃÓŚŹŻ0-9][a-ząćęłńóśźż0-9]*)", re.IGNORECASE)
+
+def sanitize_toponymic_preposition_governance(text: str) -> str:
+    """
+    Sanitizes nominative freezing of toponym and institution head nouns governed by Polish prepositions
+    (Filar CLXXXIV / Zasada 15 AGENTS.md / 0.00 PLN).
+    Ensures that generic category head nouns (miasto, wieża, gildia, akademia, cytadela, las, etc.)
+    inflect to the proper grammatical case governed by the preceding preposition (Dopełniacz, Miejscownik,
+    Narzędnik, Celownik), while preserving proper names/genitive modifiers and lowercase orthography.
+    """
+    if not text:
+        return ""
+
+    def _repl_toponym_prep(m):
+        prep = m.group(1)
+        head = m.group(2)
+        rest = m.group(3)
+        prep_l = prep.lower()
+        head_l = head.lower()
+        d = KNOWN_HEAD_NOUN_DECLENSIONS.get(head_l)
+        if not d:
+            return m.group(0)
+        if prep_l in _PREPS_GEN:
+            case = "D"
+        elif prep_l in _PREPS_LOC:
+            case = "Ms"
+        elif prep_l in _PREPS_INST:
+            case = "N"
+        elif prep_l in _PREPS_DAT:
+            case = "C"
+        else:
+            case = "D"
+        decl_head = d.get(case, head).lower()
+        return f"{prep} {decl_head}{rest}"
+
+    return _RE_TOPONYMIC_PREP_GOV.sub(_repl_toponym_prep, text)
+
+
 def generate_polish_name_declension(name: str, gender: str = "UNKNOWN") -> Dict[str, str]:
     """
     Generates 7 grammatical cases for Japanese / foreign anime character names
@@ -193,6 +1029,63 @@ def generate_polish_name_declension(name: str, gender: str = "UNKNOWN") -> Dict[
 
     words = n.split()
     if len(words) > 1:
+        # A. Check for prepositional complement: "X z Y", "X ze stali", "X do Y"
+        # e.g. "Księga Toaha z Hiden", "Miecz z Boelate"
+        for prep_idx, w_p in enumerate(words):
+            if prep_idx > 0 and w_p.lower() in ("z", "ze", "od", "do", "w", "we", "o", "pod") and prep_idx < len(words) - 1:
+                head_part = " ".join(words[:prep_idx])
+                prep_part = " ".join(words[prep_idx:])
+                head_decl = generate_polish_name_declension(head_part, gender)
+                if head_decl and head_decl.get("M"):
+                    return {
+                        case: f"{head_decl.get(case, head_part)} {prep_part}"
+                        for case in ["M", "D", "C", "B", "N", "Ms", "W"]
+                    }
+
+        # B. Check for Noun + Genitive Attribute (Przydawka dopełniaczowa)
+        # e.g. "Księga Toaha", "Zakon Feniksa", "Dolina Rozpaczy", "Miecz Prawdy", "Władca Złudzeń", "Demon Krwi"
+        first_lower = words[0].lower()
+        if (first_lower in KNOWN_HEAD_NOUNS or first_lower in KNOWN_HEAD_NOUN_DECLENSIONS) and len(words) >= 2:
+            if first_lower in KNOWN_HEAD_NOUN_DECLENSIONS:
+                is_cap = words[0][0].isupper()
+                head_decl = {
+                    c: (v.capitalize() if is_cap else v.lower())
+                    for c, v in KNOWN_HEAD_NOUN_DECLENSIONS[first_lower].items()
+                }
+            else:
+                head_gender = "FEMALE" if (first_lower.endswith("a") or first_lower in ("pieczęć", "krew", "opowieść", "pieśń")) else (
+                    "NEUTER" if first_lower.endswith(("o", "e")) else (
+                        "MALE" if first_lower in ("syn", "ojciec", "brat", "bohater", "wojownik", "rycerz", "mag", "czarnoksiężnik", "kapłan", "król", "władca", "cesarz", "książę", "mistrz", "arcykapłan", "arcymag", "szaman", "czarownik", "anioł", "wampir", "smok", "potwór") else "MALE_INANIMATE"
+                    )
+                )
+                head_decl = generate_polish_name_declension(words[0], "FEMALE" if head_gender == "FEMALE" else ("MALE" if head_gender == "MALE" else "UNKNOWN"))
+            attr_phrase = " ".join(words[1:])
+            return {
+                case: f"{head_decl.get(case, words[0])} {attr_phrase}"
+                for case in ["M", "D", "C", "B", "N", "Ms", "W"]
+            }
+
+        # C. Check for Adjective + Noun (or Noun + Adjective)
+        if len(words) == 2:
+            w1, w2 = words[0], words[1]
+            if is_polish_adjective(w1) and not is_polish_adjective(w2):
+                adj_g = "FEMALE" if w1.lower().endswith("a") else ("NEUTER" if w1.lower().endswith("e") else (gender if gender != "UNKNOWN" else ("FEMALE" if w2.lower().endswith("a") else "MALE")))
+                adj_decl = generate_polish_adjective_declension(w1, adj_g, is_animate=True)
+                noun_decl = generate_polish_name_declension(w2, adj_g)
+                return {
+                    case: f"{adj_decl.get(case, w1)} {noun_decl.get(case, w2)}"
+                    for case in ["M", "D", "C", "B", "N", "Ms", "W"]
+                }
+            elif is_polish_adjective(w2) and not is_polish_adjective(w1):
+                adj_g = "FEMALE" if w2.lower().endswith("a") else ("NEUTER" if w2.lower().endswith("e") else (gender if gender != "UNKNOWN" else ("FEMALE" if w1.lower().endswith("a") else "MALE")))
+                noun_decl = generate_polish_name_declension(w1, adj_g)
+                adj_decl = generate_polish_adjective_declension(w2, adj_g, is_animate=True)
+                return {
+                    case: f"{noun_decl.get(case, w1)} {adj_decl.get(case, w2)}"
+                    for case in ["M", "D", "C", "B", "N", "Ms", "W"]
+                }
+
+        # D. Default multi-word: decline each word (e.g. Aura Gilotyna, Brandon Heat)
         sub_decls = [generate_polish_name_declension(w, gender) for w in words]
         if all(sub_decls):
             return {
@@ -241,7 +1134,18 @@ def generate_polish_name_declension(name: str, gender: str = "UNKNOWN") -> Dict[
                 "W": stem + "o"
             }
         # -ca foreign names (Luca, Seneca, Petrarca, Mica) -> hard k stem in D/B/N
+        # vs Polish agent nouns in -ca (władca, dowódca, obrońca, zabójca, zdrajca, łowca, stwórca):
         elif stem.endswith("c"):
+            if stem.lower() in ("władc", "dowódc", "dowodc", "obrońc", "obronc", "zabójc", "zabojc", "zdrajc", "łowc", "lowc", "stwórc", "stworc", "twórc", "tworc", "znawc", "morderc", "wykonawc") or len(stem) > 4:
+                return {
+                    "M": n,
+                    "D": stem + "y",
+                    "C": stem + "y",
+                    "B": stem + "ę",
+                    "N": stem + "ą",
+                    "Ms": stem + "y",
+                    "W": stem + "o"
+                }
             return {
                 "M": n,
                 "D": stem[:-1] + "ki",
@@ -322,6 +1226,10 @@ def generate_polish_name_declension(name: str, gender: str = "UNKNOWN") -> Dict[
         last_c = n[-1].lower()
         last_2c = n[-2:].lower() if len(n) >= 2 else ""
 
+        # Mobile 'e' in Polish names ending in -ek (Marek -> Mark-, Jacek -> Jack-, Tomek -> Tomk-, etc.)
+        if len(n) >= 4 and last_2c == "ek" and n.lower() in ("marek", "jacek", "tomek", "janek", "franek", "bartek", "wojtek", "maciek", "leszek", "radek", "przemek", "władek", "staszek", "wiesiek"):
+            stem = n[:-2] + "k"
+
         # Narzędnik po k, g: -iem (Gujukiem, Güyükiem, Olegiem, Magiem)
         n_case = stem + "iem" if last_c in ("k", "g") else stem + "em"
 
@@ -354,6 +1262,10 @@ def generate_polish_name_declension(name: str, gender: str = "UNKNOWN") -> Dict[
             "Ms": c_ms,
             "W": c_w
         }
+
+    # 2b. Adjectives / adjectival names and titles ending in -y / -i (e.g. Nieśmiertelny, Wielki, Sobieski, Czarny)
+    if is_polish_adjective(n):
+        return generate_polish_adjective_declension(n, gender=g if g != "UNKNOWN" else "MALE", is_animate=True)
 
     # 3. Male names ending in vowels other than -a (-o, -e, -i, -u, -y)
     # In Japanese AVT, vowel-ending names are kept uninflected to preserve phonetic integrity (Belczyk/PWN).
@@ -616,7 +1528,7 @@ TYPO_NORMALIZATIONS = [
     # Eradication of youth slang 'żenada' in dialogue (Filar CLXX)
     (r"\b([Aa]le|[Cc]o\s+za)\s+żenada[!\?…\.]*", lambda m: ("Ale marudzisz..." if m.group(1)[0].isupper() else "ale marudzisz...")),
     (r"^\s*([Żż]enada)[!\?…\.]*\s*$", lambda m: ("Ale marudzisz..." if m.group(1)[0].isupper() else "ale marudzisz...")),
-    (r"\b[Ii]\s+gitara\b", lambda m: "Doskonale" if m.group(0)[0].isupper() else "doskonale"),
+    (r"(?<!\bbas\s)(?<!\bperkusja\s)(?<!\bi\s)\b[Ii]\s+gitara[!]+", lambda m: "Doskonale!" if m.group(0)[0].isupper() else "doskonale!"),
     (r"\b[Ss]tul\s+pysk\b", lambda m: "Zamilcz" if m.group(0)[0].isupper() else "zamilcz"),
     (r"\b[Zz]mywajmy\s+się\s+stąd\b", lambda m: "Uciekajmy stąd" if m.group(0)[0].isupper() else "uciekajmy stąd"),
     (r"\b[Zz]mywamy\s+się\s+stąd\b", lambda m: "Uciekamy stąd" if m.group(0)[0].isupper() else "uciekamy stąd"),
@@ -625,6 +1537,18 @@ TYPO_NORMALIZATIONS = [
     (r"\b[Pp]rzejmuję\s+stery\b", lambda m: "Teraz ja mówię" if m.group(0)[0].isupper() else "teraz ja mówię"),
     (r"\b[Dd]la\s+zabicia\s+czasu\b", lambda m: "Dla rozrywki" if m.group(0)[0].isupper() else "dla rozrywki"),
     (r"\b[Ww]ylec(?:ieć|iał|iała|ieli)\s+ze\s+szkoły\b", "zostać wydalonym ze szkoły"),
+    # Closed invariant PWN preposition-pronoun phonetic forms and idioms (0.00 PLN)
+    (r"\b([Dd]la)\s+mię\b", lambda m: "Dla mnie" if m.group(1)[0].isupper() else "dla mnie"),
+    (r"\b([Oo]de)\s+mie\b", lambda m: "Ode mnie" if m.group(1)[0].isupper() else "ode mnie"),
+    (r"\b([Oo]d)\s+mnie\b", lambda m: "Ode mnie" if m.group(1)[0].isupper() else "ode mnie"),
+    (r"\b([Zz])\s+mną\b", lambda m: "Ze mną" if m.group(1)[0].isupper() else "ze mną"),
+    (r"\b([Pp]rzed)\s+mną\b", lambda m: "Przede mną" if m.group(1)[0].isupper() else "przede mną"),
+    (r"\b([Ww])\s+każdym\s+bądź\s+razie\b", lambda m: "W każdym razie" if m.group(1)[0].isupper() else "w każdym razie"),
+    (r"\b([Bb])ez\s+jaj[!]+", lambda m: "To jakieś kpiny!" if m.group(1)[0].isupper() else "to jakieś kpiny!"),
+    (r"\b([Gg])uzik\s+mnie\s+to\s+obchodzi\b", lambda m: "Nic mnie to nie obchodzi" if m.group(1)[0].isupper() else "nic mnie to nie obchodzi"),
+    (r"\b([Pp])omiędzy\s+tobą\s+i\s+mną\b", lambda m: "Między nami" if m.group(1)[0].isupper() else "między nami"),
+    (r"\b([Pp])omiędzy\s+nami\b", lambda m: "Między nami" if m.group(1)[0].isupper() else "między nami"),
+    (r"\b([Ww])\s+mrugnięciu\s+oka\b", lambda m: "W mgnieniu oka" if m.group(1)[0].isupper() else "w mgnieniu oka"),
 ]
 
 
@@ -640,7 +1564,9 @@ def sanitize_lexical_text(text: str) -> str:
     TITLES_SUBJECT_PAT = r"[Pp]an|[Pp]ani|[Mm]istrz|[Pp]rofesor|[Dd]oktor|[Pp]isarz|[Rr]eżyser|[Rr]edaktor|[Aa]utor|[Mm]angaka|[Ss]ensei"
     CANONICAL_A_NAMES = {
         "akira", "shira", "soma", "gaara", "ashitaka", "kiba", "kenta",
-        "ryoma", "hanza", "koba", "soya", "toma", "genga", "teshima"
+        "ryoma", "hanza", "koba", "soya", "toma", "genga", "teshima",
+        "yamada", "maeda", "takeda", "matsuda", "kuroda", "sanada",
+        "shimada", "okada", "ishida", "kawada", "ueda", "baba", "honda", "oda", "aida"
     }
     POLISH_ADVERBS = {
         "faktycznie", "naprawdę", "bardzo", "właśnie", "wczoraj", "dzisiaj", "jutro",
@@ -661,7 +1587,7 @@ def sanitize_lexical_text(text: str) -> str:
         if title.lower() == "pani" or given_name.lower() in POLISH_ADVERBS:
             return m.group(0)
         full_surname = (surname_stem + "a").lower()
-        if full_surname in CANONICAL_A_NAMES:
+        if full_surname in CANONICAL_A_NAMES or full_surname.endswith(("da", "ta", "ka", "ma", "ba")):
             clean_surname = surname_stem + "a"
         else:
             clean_surname = surname_stem
@@ -685,7 +1611,7 @@ def sanitize_lexical_text(text: str) -> str:
         if title.lower() == "pani":
             return m.group(0)
         full_name = (name_stem + "a").lower()
-        if full_name in CANONICAL_A_NAMES:
+        if full_name in CANONICAL_A_NAMES or full_name.endswith(("da", "ta", "ka", "ma", "ba")):
             return m.group(0)
         return f"{prefix}{title}{sep1}{name_stem}{sep2}{verb}"
 
@@ -694,6 +1620,319 @@ def sanitize_lexical_text(text: str) -> str:
         _fix_nominative_title_subject,
         res
     )
+    res = sanitize_pronominal_somatic_possession(res)
+    res = sanitize_deictic_motion_vector(res)
+    res = sanitize_sensory_pleonasm(res)
+    res = sanitize_closed_idioms_and_prepositions(res)
+    return res
+
+
+def sanitize_pronominal_somatic_possession(text: str) -> str:
+    """
+    Eliminates English possessive pronoun calques before body parts,
+    personal belongings, and close relatives (Filar CLXXVII / Pronominal Decoupling).
+    Deterministic offline 0.00 PLN enforcement.
+    """
+    if not text:
+        return ""
+    res = text
+
+    # Prepositional somatic phrases: w moim sercu -> w sercu, w mojej głowie -> w głowie
+    SOMATIC_PREPOSITIONS = [
+        (r"\b([Ww])\s+(?:moim|twoim|swoim|jego|jej|naszym|waszym)\s+sercu\b", r"\1 sercu"),
+        (r"\b([Ww])\s+(?:mojej|twojej|swojej|jego|jej|naszej|waszej)\s+głowie\b", r"\1 głowie"),
+        (r"\b([Ww])\s+(?:moich|twoich|swoich|jego|jej|naszych|waszych)\s+myślach\b", r"\1 myślach"),
+        (r"\b([Ww])\s+(?:moich|twoich|swoich|jego|jej|naszych|waszych)\s+oczach\b", r"\1 oczach"),
+        (r"\b([Ww])\s+(?:moich|twoich|swoich|jego|jej|naszych|waszych)\s+żyłach\b", r"\1 żyłach"),
+        (r"\b([Ww])\s+(?:moich|twoich|swoich|jego|jej|naszych|waszych)\s+ramionach\b", r"\1 ramionach"),
+        (r"\b([Nn]a)\s+(?:moich|twoich|swoich|jego|jej|naszych|waszych)\s+plecach\b", r"\1 plecach"),
+        (r"\b([Nn]a)\s+(?:moich|twoich|swoich|jego|jej|naszych|waszych)\s+ramionach\b", r"\1 ramionach"),
+        (r"\b([Zz])\s+(?:moich|twoich|swoich|jego|jej|naszych|waszych)\s+ust\b", r"\1 ust"),
+    ]
+    for pat, repl in SOMATIC_PREPOSITIONS:
+        res = re.sub(pat, repl, res)
+
+    # Imperatives and somatic verbs:
+    VERBAL_SOMATIC = [
+        (r"\b(zamknij|zamknijcie|otwórz|otwórzcie|przymknij|przymknijcie)\s+(?:twoje|swoje|twoich|swoich)\s+(oczy)\b", r"\1 \2"),
+        (r"\b(podnieś|podnieście|wznieś|wznieście|załóż|załóżcie|rozłóż|rozłóżcie|opuść|opuśćcie|umyj|umyjcie)\s+(?:twoje|swoje|twoich|swoich)\s+(ręce|dłonie|ramiona)\b", r"\1 \2"),
+        (r"\b(zdejmij|zdejmijcie|włóż|włóżcie|załóż|załóżcie|ubierz|ubierzcie)\s+(?:twoje|swoje|twój|twą|twoją)\s+(buty|kurtkę|płaszcz|ubranie|czapkę)\b", r"\1 \2"),
+    ]
+    for pat, repl in VERBAL_SOMATIC:
+        res = re.sub(pat, repl, res, flags=re.IGNORECASE)
+
+    # Life saving: uratowałeś moje życie -> ocaliłeś mi życie / uratowałeś mi życie
+    res = re.sub(r"\b(uratował|uratowała|uratowałeś|uratowałaś|ocalił|ocaliła|ocaliłeś|ocaliłaś|ratując|ocalając)\s+moje\s+życie\b", r"\1 mi życie", res, flags=re.IGNORECASE)
+    res = re.sub(r"\b(uratował|uratowała|uratowałeś|uratowałaś|ocalił|ocaliła|ocaliłeś|ocaliłaś)\s+twoje\s+życie\b", r"\1 ci życie", res, flags=re.IGNORECASE)
+
+    # Relational possession (family):
+    RELATIONAL_PATTERNS = [
+        (r"\b([Zz]|ze|dla|do|u|od)\s+moją\s+(matką|siostrą|córką|babcią)\b", r"\1 \2"),
+        (r"\b([Zz]|ze|dla|do|u|od)\s+moim\s+(ojcem|bratem|synem|dziadkiem)\b", r"\1 \2"),
+        (r"\b([Zz]|ze|dla|do|u|od)\s+moimi\s+(rodzicami|braćmi|siostrami)\b", r"\1 \2"),
+        (r"\b([Zz]|ze|dla|do|u|od)\s+twoją\s+(matką|siostrą|córką|babcią)\b", r"\1 \2"),
+        (r"\b([Zz]|ze|dla|do|u|od)\s+twoim\s+(ojcem|bratem|synem|dziadkiem)\b", r"\1 \2"),
+        (r"\b([Zz]|ze|dla|do|u|od)\s+twoimi\s+(rodzicami|braćmi|siostrami)\b", r"\1 \2"),
+    ]
+    for pat, repl in RELATIONAL_PATTERNS:
+        res = re.sub(r"(?<!a nie\s)(?<!niż\s)(?<!zamiast\s)" + pat, repl, res, flags=re.IGNORECASE)
+
+    # Causal calque: z mojego powodu -> przeze mnie, z twojego powodu -> przez ciebie
+    res = re.sub(
+        r"\b([Zz])\s+mojego\s+powodu\b",
+        lambda m: "Przeze mnie" if m.group(1) == "Z" else "przeze mnie",
+        res
+    )
+    res = re.sub(
+        r"\b([Zz])\s+twojego\s+powodu\b",
+        lambda m: "Przez ciebie" if m.group(1) == "Z" else "przez ciebie",
+        res
+    )
+
+    return res
+
+
+def naturalize_adjacency_rejoinder(prior_q: str, resp: str) -> str:
+    """
+    Eliminates stiff 'Yes, I did' / 'No, I didn't' calques in adjacent conversational pairs (Filar CLXXIX).
+    Transforms 'Tak, poszedłem' -> 'Poszedłem', 'Nie, nie widziałem' -> 'Nie widziałem'.
+    """
+    if not resp:
+        return ""
+    if not prior_q or not prior_q.strip().endswith("?"):
+        return resp
+
+    res = resp.strip()
+
+    m_aff = re.match(r"^Tak,\s+([a-ząćęłńóśźż]+(?:łem|łam|liśmy|łyśmy|em|am|eś|aś|liście|łyście|ł|ła|ło|li|ły|bym|byś|by|byśmy|byście|ę|emy|imy|ymy))\b", res, re.IGNORECASE)
+    if m_aff:
+        verb = m_aff.group(1)
+        rest = res[m_aff.end():]
+        return f"{verb.capitalize()}{rest}"
+
+    m_neg = re.match(r"^Nie,\s+nie\s+([a-ząćęłńóśźż]+)\b", res, re.IGNORECASE)
+    if m_neg:
+        verb = m_neg.group(1)
+        rest = res[m_neg.end():]
+        return f"Nie {verb}{rest}"
+
+    return res
+
+
+def sanitize_deictic_motion_vector(text: str) -> str:
+    """
+    Sanitizes false spatial deixis motion verbs (Filar CLXXX / Cinematic Deixis).
+    Eliminates English/Japanese motion mismatch:
+    'Już przychodzę!' -> 'Już idę!'
+    'Oto przychodzę!' / 'Oto nadchodzę!' -> 'Już idę!' / 'Zaraz będę!'
+    """
+    if not text:
+        return ""
+    res = text
+    DEICTIC_REPLACEMENTS = [
+        (r"\bJuż\s+przychodzę\b", "Już idę"),
+        (r"\bjuż\s+przychodzę\b", "już idę"),
+        (r"\bZaraz\s+przychodzę\b", "Zaraz będę"),
+        (r"\bzaraz\s+przychodzę\b", "zaraz będę"),
+        (r"\bOto\s+przychodzę\b", "Już idę"),
+        (r"\boto\s+przychodzę\b", "już idę"),
+        (r"\bOto\s+nadchodzę\b", "Już idę"),
+        (r"\boto\s+nadchodzę\b", "już idę"),
+        (r"\bZaraz\s+tam\s+przyjdę\b", "Zaraz tam pójdę"),
+        (r"\bzaraz\s+tam\s+przyjdę\b", "zaraz tam pójdę"),
+    ]
+    for pat, repl in DEICTIC_REPLACEMENTS:
+        res = re.sub(pat, repl, res)
+    return res
+
+
+def sanitize_sensory_pleonasm(text: str) -> str:
+    """
+    Eliminates visual-auditory pleonasms and sensory tautologies (Filar CLXXXI).
+    'pada deszcz na zewnątrz' -> 'pada deszcz' / 'na zewnątrz leje'
+    'spada w dół' -> 'spada'
+    'cofa się w tył' -> 'cofa się'
+    'wspina się do góry' -> 'wspina się'
+    'patrzeć moimi własnymi oczami' -> 'patrzeć na własne oczy'
+    """
+    if not text:
+        return ""
+    res = text
+    PLEONASMS = [
+        (r"\b(pada|padał|padający|leje|lał)\s+deszcz\s+na\s+zewnątrz\b", r"\1 deszcz"),
+        (r"\bna\s+zewnątrz\s+pada\s+deszcz\b", "na zewnątrz leje"),
+        (r"\b(spadać|spada|spadają|spadł|spadła|spadło|spadli|spadły|spadłem|spadłam|spadłeś|spadłaś)\s+w\s+dół\b", r"\1"),
+        (r"\b(cofać|cofa|cofają|cofnął|cofnęła|cofnęło|cofnęli|cofnęły|cofam|cofasz|cofamy|cofacie)\s+się\s+w\s+tył\b", r"\1 się"),
+        (r"\b(wspinać|wspina|wspinają|wspiął|wspięła|wspięło|wspinam|wspinasz|wspinamy)\s+się\s+do\s+góry\b", r"\1 się"),
+        (r"\b(patrzeć|widzieć|zobaczyć)\s+(?:na\s+to\s+)?moimi\s+(?:własnymi\s+)?oczami\b", r"\1 na własne oczy"),
+        (r"\b(widziałem|widziałam|widzieliśmy|widziałyśmy)\s+to\s+moimi\s+(?:własnymi\s+)?oczami\b", r"\1 to na własne oczy"),
+    ]
+    for pat, repl in PLEONASMS:
+        res = re.sub(pat, repl, res, flags=re.IGNORECASE)
+    return res
+
+
+def sanitize_toponymic_pleonasms_and_stuttering(text: str) -> str:
+    """
+    Sanitizes toponymic, administrative, geographical, and chronicle pleonasms
+    and identical token stuttering without destroying legitimate stylistic punctuation.
+    (Filar CLXXXIV / 0.00 PLN)
+    """
+    if not text:
+        return ""
+    res = text
+
+    # 1. Identical capitalized word stuttering without punctuation (e.g. 'Prowincja Prowincja' -> 'Prowincja')
+    # Requires identical capitalized tokens of length >= 3 separated by whitespace or \N
+    res = re.sub(
+        r"\b([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]{2,})(?:\s+|\\[Nnh]+)\1\b",
+        r"\1",
+        res
+    )
+
+    # 2. Repeated or multiple inflected/base category descriptors preceding a proper name
+    # Accounts for Polish consonant alternations (k:c, k:cz, g:dz, r:rz, etc.):
+    # - 'z prowincji Prowincja Prowincja Shimotsuke' -> 'z prowincji Shimotsuke'
+    # - 'z prowincji Prowincja Shimotsuke' -> 'z prowincji Shimotsuke'
+    # - 'w kronice Kronika Taiheiki' -> 'w kronice Taiheiki'
+    # - 'na górze Góra Hiei' -> 'na górze Hiei'
+    # - 'w rzece Rzeka Kamogawa' -> 'w rzece Kamogawa'
+    # - 'w mieście Miasto Kioto' -> 'w mieście Kioto'
+    # - 'w prefekturze Prefektura Nagano' -> 'w prefekturze Nagano'
+    CATEGORY_STEM_GROUPS = [
+        r"prowincj",
+        r"prefektur",
+        r"gór|górz",
+        r"rzek|rzec",
+        r"jezior",
+        r"morz",
+        r"dolin",
+        r"wysp",
+        r"zatok|zatoc",
+        r"przełęcz",
+        r"zamk|zame",
+        r"twierdz",
+        r"świątyn",
+        r"chram",
+        r"bram",
+        r"miast|mieśc",
+        r"dystrykt|dystrykc",
+        r"ziem",
+        r"księstw",
+        r"królestw",
+        r"cesarstw",
+        r"państw",
+        r"kraj",
+        r"kronik|kronic",
+        r"księg|księdz",
+        r"traktat|traktac",
+    ]
+
+    for grp in CATEGORY_STEM_GROUPS:
+        pat = re.compile(
+            rf"\b([A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]*(?:{grp})[a-ząćęłńóśźż]*)"
+            rf"(?:(?:\s+|\\[Nnh]+)+[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]*(?:{grp})[a-ząćęłńóśźż]*)+"
+            rf"((?:\s+|\\[Nnh]+)+[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+)\b",
+            re.IGNORECASE
+        )
+        res = pat.sub(r"\1\2", res)
+
+    return res
+
+
+def sanitize_toponymic_origin_and_companionship(text: str, custom_glossary: Optional[Dict[str, str]] = None) -> str:
+    """
+    Sanitizes toponymic origin vs animate companionship errors (Filar CLXXXIV / 0.00 PLN).
+    When a toponym (realm, city, location) qualifies an artifact, object, or person of origin
+    ('from Hiden', 'Haiden's Book of Toah', 'knight from Boelate'), Polish preposition 'z'
+    strictly governs Genitive (Dopełniacz pochodzenia: 'z Hiden', 'z Boelate', 'z Eslinn', 'z Kanyou', 'z Ridill'),
+    NEVER Instrumental (Narzędnik towarzyszenia: '*z Hidenem', '*z Haidenem', '*z Kanyouem').
+    Also handles compound artifact title syntagmas ('Księga Toaha z Hiden'), prevents modifier hyper-inflection
+    ('*z Księgą Toahem' -> 'z Księgą Toaha'), resolves nominative freezing ('z Księga Toaha' -> 'z Księgą Toaha'),
+    and normalizes phonetic/fansub transliteration variants (Haiden -> Hiden) in toponymic contexts,
+    strictly adhering to the Single-Word Invariance Principle (W_i -> W'_i).
+    """
+    if not text:
+        return ""
+    res = text
+
+    # 1. False Instrumental of origin for realms/toponyms ending in consonants across all series
+    # Clevatess realms
+    res = re.sub(r"\b([Zz]\s+)(?:Haidenem|Hidenem)\b", r"\g<1>Hiden", res)
+    res = re.sub(r"\b([Zz]\s+)(?:Boiratem|Boelatem)\b", r"\g<1>Boelate", res)
+    res = re.sub(r"\b([Zz]\s+)(?:Esrinem|Eslinnem)\b", r"\g<1>Eslinn", res)
+    res = re.sub(r"\b([Zz]\s+)(?:Solseinem|Solceynem)\b", r"\g<1>Solsein", res)
+    res = re.sub(r"\b([Zz]\s+)(?:Haideratem|Heideratem)\b", r"\g<1>Hyderatu", res)
+    # Kingdom realms/cities
+    res = re.sub(r"\b([Zz]\s+)(?:Kanyouem|Kanyōem)\b", r"\g<1>Kanyou", res)
+    res = re.sub(r"\b([Zz]\s+)Kantanem\b", r"\g<1>Kantan", res)
+    # Silent Witch realms/cities
+    res = re.sub(r"\b([Zz]\s+)Ridillem\b", r"\g<1>Ridill", res)
+
+    # 1b. False Instrumental of origin for feminine-like toponyms ending in -a in origin/displacement contexts
+    res = re.sub(r"\b(pochodzi[a-ząćęłńóśźż]*|zbieg[a-ząćęłńóśźż]*|wieści|wieść|posłaniec|ucieczka|uciekł[a-ząćęłńóśźż]*|rycerz[a-ząćęłńóśźż]*|chłopak[a-ząćęłńóśźż]*|dziewczyn[a-ząćęłńóśźż]*)\s+([Zz]\s+)Kamakurą\b", r"\g<1> \g<2>Kamakury", res, flags=re.IGNORECASE)
+    res = re.sub(r"\b(pochodzi[a-ząćęłńóśźż]*|zbieg[a-ząćęłńóśźż]*|wieści|wieść|posłaniec|ucieczka|uciekł[a-ząćęłńóśźż]*|rycerz[a-ząćęłńóśźż]*|chłopak[a-ząćęłńóśźż]*|dziewczyn[a-ząćęłńóśźż]*)\s+([Zz]\s+)Suwą\b", r"\g<1> \g<2>Suwy", res, flags=re.IGNORECASE)
+    res = re.sub(r"\b(pochodzi[a-ząćęłńóśźż]*|uczeń|uczennica|uczniowie|akademia)\s+([Zz]\s+)Minervą\b", r"\g<1> \g<2>Minervy", res, flags=re.IGNORECASE)
+
+    # 2. Canonical toponym transliteration normalization after prepositions (z, do, w, o) or in realm names
+    res = re.sub(r"\b([ZzWwOo]|do|dla|ku|przez|od)\s+Haiden\b", r"\g<1> Hiden", res)
+    res = re.sub(r"\b([ZzWwOo]|do|dla|ku|przez|od)\s+Boirate\b", r"\g<1> Boelate", res)
+    res = re.sub(r"\b([ZzWwOo]|do|dla|ku|przez|od)\s+Esrin\b", r"\g<1> Eslinn", res)
+    res = re.sub(r"\b([ZzWwOo]|do|dla|ku|przez|od)\s+Haiderat\b", r"\g<1> Hyderat", res)
+    res = re.sub(r"\b([ZzWwOo]|do|dla|ku|przez|od)\s+Solceyn\b", r"\g<1> Solsein", res)
+
+    # 3. Specific compound realm constructions (Królestwo Haiden -> Królestwo Hiden)
+    res = re.sub(r"\b([Kk]rólestw[a-ząćęłńóśźż]*|[Cc]esarstw[a-ząćęłńóśźż]*|[Kk]rain[a-ząćęłńóśźż]*)\s+Haiden\b", r"\g<1> Hiden", res)
+    res = re.sub(r"\b([Kk]rólestw[a-ząćęłńóśźż]*|[Cc]esarstw[a-ząćęłńóśźż]*|[Kk]rain[a-ząćęłńóśźż]*)\s+Boirate\b", r"\g<1> Boelate", res)
+    res = re.sub(r"\b([Kk]rólestw[a-ząćęłńóśźż]*|[Cc]esarstw[a-ząćęłńóśźż]*|[Kk]rain[a-ząćęłńóśźż]*)\s+Esrin\b", r"\g<1> Eslinn", res)
+
+    # 4. Canonical qualification of relics/titles and modifier hyper-inflection protection:
+    # 'Księga Toaha z Haiden' / 'Księga Toaha z Haidenem' / 'Księga Toaha z Hidenem' -> 'Księga Toaha z Hiden'
+    res = re.sub(r"\bKsięga\s+Toaha\s+z\s+(?:Haidenem|Hidenem|Haiden)\b", "Księga Toaha z Hiden", res)
+    # Protection against modifier hyper-inflection: 'z Księgą Toahem' -> 'z Księgą Toaha'
+    res = re.sub(r"\b([Zz]\s+Księgą)\s+Toahem\b", r"\g<1> Toaha", res)
+    # Protection against double-preposition hyper-inflection: 'z Księgą Toahem z Haidenem' -> 'z Księgą Toaha z Hiden'
+    res = re.sub(r"\b([Zz]\s+Księgą)\s+Toahem\s+([Zz]\s+)(?:Haidenem|Hidenem|Haiden)\b", r"\g<1> Toaha \g<2>Hiden", res)
+    # Protection against nominative freezing after preposition: 'z Księga Toaha' -> 'z Księgą Toaha'
+    res = re.sub(r"\b([Zz]\s+)Księga\s+Toaha\b", r"\g<1>Księgą Toaha", res)
+    # Nominative freezing after genitive verbs: 'szuka/szukam/szukać Księga Toaha' -> 'szukać Księgi Toaha'
+    res = re.sub(r"\b(szuka[a-ząćęłńóśźż]*|pilnuje|pilnowa[a-ząćęłńóśźż]*|używa[a-ząćęłńóśźż]*|strzeż[a-ząćęłńóśźż]*)\s+Księga\s+Toaha\b", r"\g<1> Księgi Toaha", res)
+
+    return res
+
+
+def sanitize_closed_idioms_and_prepositions(text: str) -> str:
+    """
+    Sanitizes closed, invariant register idioms and PWN prepositional-pronominal forms.
+    Guaranteed 100% syntactically closed — zero inflectional risk, zero nominative freezing.
+    """
+    if not text:
+        return ""
+    res = text
+    INVARIANT_RULES = [
+        # PWN Preposition-Pronoun phonetic government
+        (r"\b([Dd]la)\s+mię\b", lambda m: "Dla mnie" if m.group(1)[0].isupper() else "dla mnie"),
+        (r"\b([Oo]de)\s+mie\b", lambda m: "Ode mnie" if m.group(1)[0].isupper() else "ode mnie"),
+        (r"\b([Oo]d)\s+mnie\b", lambda m: "Ode mnie" if m.group(1)[0].isupper() else "ode mnie"),
+        (r"\b([Zz])\s+mną\b", lambda m: "Ze mną" if m.group(1)[0].isupper() else "ze mną"),
+        (r"\b([Pp]rzed)\s+mną\b", lambda m: "Przede mną" if m.group(1)[0].isupper() else "przede mną"),
+        # PWN Preposition phonetic alternations: 'ze' before s/z/sz/ż/ś/ź + consonant, 'we' before w/f + consonant
+        (r"\b([Zz])\s+(stali|złota|żelaza|szkła|srebra|strachu|szmaragdu|złości|zazdrości|związku|Szwecji|Szwajcarii)\b",
+         lambda m: ("Ze " if m.group(1).isupper() else "ze ") + m.group(2)),
+        (r"\b([Zz])e\s+(Hiden|Boelate|Eslinn|Solsein|Kanyou|Kantan|Ridill|Paryża|Londynu)\b",
+         lambda m: ("Z " if m.group(1).isupper() else "z ") + m.group(2)),
+        (r"\b([Ww])\s+(Francji|Florencji|Flandrii|Włoszech|wrześniu|wtorku|wpół)\b",
+         lambda m: ("We " if m.group(1).isupper() else "we ") + m.group(2)),
+        # Closed invariant register idioms
+        (r"\b([Ww])\s+każdym\s+bądź\s+razie\b", lambda m: "W każdym razie" if m.group(1)[0].isupper() else "w każdym razie"),
+        (r"\b([Bb])ez\s+jaj[!]+", lambda m: "To jakieś kpiny!" if m.group(1)[0].isupper() else "to jakieś kpiny!"),
+        (r"\b([Gg])uzik\s+mnie\s+to\s+obchodzi\b", lambda m: "Nic mnie to nie obchodzi" if m.group(1)[0].isupper() else "nic mnie to nie obchodzi"),
+        (r"\b([Pp])omiędzy\s+tobą\s+i\s+mną\b", lambda m: "Między nami" if m.group(1)[0].isupper() else "między nami"),
+        (r"\b([Pp])omiędzy\s+nami\b", lambda m: "Między nami" if m.group(1)[0].isupper() else "między nami"),
+        (r"\b([Ww])\s+mrugnięciu\s+oka\b", lambda m: "W mgnieniu oka" if m.group(1)[0].isupper() else "w mgnieniu oka"),
+    ]
+    for pat, repl in INVARIANT_RULES:
+        res = re.sub(pat, repl, res)
     return res
 
 
@@ -901,15 +2140,71 @@ class SeriesBible:
                             self.data["declensions"][alias] = generate_polish_name_declension(alias, "FEMALE")
                             self.data["declensions"][alias]["gender"] = "FEMALE"
 
-        # Ensure any declension with a female character or female alias has gender = FEMALE
+        # 2b. Check characters table for poisoned male characters (e.g. historical samurai, kuge, generals, lords)
+        MALE_TITLES = {"samuraj", "generał", "buke", "kuge", "wasal", "lord", "pan ", "wojownik", "rycerz", "król", "książę", "cesarz", "wielki radca"}
+        confirmed_males = set()
+        for rel_name, rel_desc in self.data.get("relationships", {}).items():
+            r_str = str(rel_desc)
+            r_lower = r_str.lower()
+            if "->" in rel_name:
+                parts = [p.strip() for p in rel_name.split("->")]
+                spk = parts[0]
+                rec = parts[1] if len(parts) > 1 else ""
+                if re.search(r"\bpanie\s+[A-ZĄĆĘŁŃÓŚŹŻ]", r_str) or any(w in r_lower for w in ["ojciec", "syn", "brat", "generał", "dowódca", "lord", "panicz", "bocchan"]):
+                    confirmed_males.add(rec)
+                if any(w in r_lower for w in ["syn ->", "ojciec ->", "brat ->", "pan ->"]):
+                    confirmed_males.add(spk)
+                # Auto-repair poisoned [KOBIETA (Adresat)] in relationships if recipient is confirmed male or addressed with 'panie'
+                if re.search(r"\bpanie\s+[A-ZĄĆĘŁŃÓŚŹŻ]", r_str) or (rec.lower() in CANONICAL_MALE_NAMES) or any(m in rec.lower() for m in ["masashige", "kusunoki", "saionji", "kinmune", "ashikaga", "takauji", "mochizuki", "ou hon", "robert"]):
+                    if "[KOBIETA (Adresat)" in r_str:
+                        fixed_rel = re.sub(r"\[KOBIETA \(Adresat\)[^\]]*\]", "[MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]", r_str)
+                        self.data["relationships"][rel_name] = fixed_rel
+                        if rel_name in self.data.get("characters", {}):
+                            self.data["characters"][rel_name]["description"] = fixed_rel
+
+        for char_name, c_val in list(self.data.get("characters", {}).items()):
+            if "->" in char_name:
+                continue
+            desc = c_val.get("description", "") if isinstance(c_val, dict) else str(c_val)
+            d_lower = desc.lower()
+
+            is_female_cand = (char_name in confirmed_females) or any(t in d_lower for t in FEMALE_TITLES)
+            is_confirmed_male = (
+                (char_name in confirmed_males)
+                or any(t in d_lower for t in MALE_TITLES)
+                or (char_name.lower() in CANONICAL_MALE_NAMES)
+                or any(m in char_name.lower() for m in ["masashige", "kusunoki", "saionji", "kinmune", "ashikaga", "takauji", "mochizuki", "ou hon", "robert"])
+            ) and not is_female_cand
+
+            if is_confirmed_male:
+                # If marked as female due to past "pani" substring collision in "panie", auto-repair to male
+                if any(f in d_lower for f in ["kobieta", "żeńsk", "female", "kobieta (adresat)"]) and not any(f in d_lower for f in ["córka", "żona", "matka", "księżniczka"]):
+                    clean_desc = re.sub(r"\bkobieta\b", "MĘŻCZYZNA", desc, flags=re.IGNORECASE)
+                    clean_desc = re.sub(r"\[KOBIETA \(Adresat\)[^\]]*\]", "[MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]", clean_desc)
+                    if isinstance(c_val, dict):
+                        c_val["description"] = clean_desc
+                    else:
+                        self.data["characters"][char_name] = {"description": clean_desc}
+
+                # Regenerate declensions for male character
+                if "declensions" in self.data:
+                    if char_name in self.data["declensions"]:
+                        self.data["declensions"][char_name] = generate_polish_name_declension(char_name, "MALE")
+                        self.data["declensions"][char_name]["gender"] = "MALE"
+
+        # Ensure any declension with a female or male character has gender aligned
         if "declensions" in self.data:
             for d_name, d_val in self.data["declensions"].items():
-                if isinstance(d_val, dict) and "gender" not in d_val:
+                if isinstance(d_val, dict):
                     c_info = self.data.get("characters", {}).get(d_name)
                     if c_info:
                         c_desc = c_info.get("description", "") if isinstance(c_info, dict) else str(c_info)
-                        if any(t in c_desc.lower() for t in FEMALE_TITLES) or "kobieta" in c_desc.lower() or "female" in c_desc.lower():
+                        cd_lower = c_desc.lower()
+                        if any(t in cd_lower for t in FEMALE_TITLES) or "kobieta" in cd_lower or "female" in cd_lower:
                             d_val["gender"] = "FEMALE"
+                        elif any(t in cd_lower for t in ["mężczyzna", "male", "chłopak"]) or (d_name.lower() in CANONICAL_MALE_NAMES) or any(m in d_name.lower() for m in ["masashige", "kusunoki", "saionji", "kinmune", "ashikaga", "takauji", "mochizuki", "ou hon", "robert"]):
+                            d_val["gender"] = "MALE"
+
 
         # 3. Systemic Ethnonym & Collective Purge from Characters & Declensions
         for bad_key in list(self.data.get("characters", {}).keys()):
@@ -1101,46 +2396,77 @@ class SeriesBible:
                 return "MALE"
 
         chars = self.data.get("characters", {})
+
+        def _extract_gender_from_val(v) -> Optional[str]:
+            desc_v = str(v.get("description", "") if isinstance(v, dict) else v).lower()
+            # Strip negative prohibition clauses (e.g. 'zakaz form żeńskich', 'zakaz form męskich')
+            desc_clean = re.sub(r"\b(?:zakaz|nie|brak)\s+[^.!?\n]*?(?:żeńsk\w*|męsk\w*|kobiet\w*|mężczyzn\w*)", "", desc_v)
+
+            raw_desc = str(v.get("description", "") if isinstance(v, dict) else v)
+            # Check structured canonical tag first: [KOBIETA (Adresat)...] or [MĘŻCZYZNA (Adresat)...]
+            m_tag = re.search(r"\[(KOBIETA|MĘŻCZYZNA)\s+\(Adresat\)", raw_desc, re.IGNORECASE)
+            if m_tag:
+                return "FEMALE" if m_tag.group(1).upper() == "KOBIETA" else "MALE"
+
+            # 1. Primary lead gender tag at start of description or in [TAG]
+            m_lead = re.match(r"^\s*\[?(kobieta|mężczyzna|female|male)\b", desc_clean)
+            if m_lead:
+                lead_g = m_lead.group(1).lower()
+                if lead_g in ("kobieta", "female"):
+                    return "FEMALE"
+                if lead_g in ("mężczyzna", "male"):
+                    return "MALE"
+
+            if re.search(r"\b\[kobieta\b", desc_clean) or re.search(r"\(kobieta\)", desc_clean):
+                return "FEMALE"
+            if re.search(r"\b\[mężczyzna\b", desc_clean) or re.search(r"\(mężczyzna\)", desc_clean):
+                return "MALE"
+
+            # 2. General keywords in cleaned description
+            has_f = any(w in desc_clean for w in FEMALE_ROLE_KEYWORDS)
+            has_m = any(w in desc_clean for w in MALE_ROLE_KEYWORDS)
+            if has_f and not has_m:
+                return "FEMALE"
+            if has_m and not has_f:
+                return "MALE"
+            if has_f and has_m:
+                pos_f = min(desc_clean.find(w) for w in FEMALE_ROLE_KEYWORDS if w in desc_clean)
+                pos_m = min(desc_clean.find(w) for w in MALE_ROLE_KEYWORDS if w in desc_clean)
+                return "FEMALE" if pos_f < pos_m else "MALE"
+            return None
+
+        # Pass 1: Exact character names only (e.g. 'Tomine', 'Shizuku', 'Issei Tomine')
         for k, v in chars.items():
             if "->" not in k:
                 k_l = k.lower()
                 clean_k = extract_clean_speaker_name(k_l)
-                if k_l == n_l or clean_k == n_l or n_l in k_l.split():
-                    desc_v = str(v.get("description", "") if isinstance(v, dict) else v).lower()
-                    # Strip negative prohibition clauses (e.g. 'zakaz form żeńskich', 'zakaz form męskich')
-                    desc_clean = re.sub(r"\b(?:zakaz|nie|brak)\s+[^.!?\n]*?(?:żeńsk\w*|męsk\w*|kobiet\w*|mężczyzn\w*)", "", desc_v)
+                if k_l == n_l or clean_k == n_l:
+                    g = _extract_gender_from_val(v)
+                    if g:
+                        return g
 
-                    raw_desc = str(v.get("description", "") if isinstance(v, dict) else v)
-                    # Check structured canonical tag first: [KOBIETA (Adresat)...] or [MĘŻCZYZNA (Adresat)...]
-                    m_tag = re.search(r"\[(KOBIETA|MĘŻCZYZNA)\s+\(Adresat\)", raw_desc, re.IGNORECASE)
-                    if m_tag:
-                        return "FEMALE" if m_tag.group(1).upper() == "KOBIETA" else "MALE"
+        # Pass 2: Token / surname matches with collision detection (e.g. 'Tomine' matching 'Issei Tomine' and 'Honoka Tomine')
+        token_matches = []
+        for k, v in chars.items():
+            if "->" not in k:
+                k_l = k.lower()
+                if n_l in k_l.split():
+                    g = _extract_gender_from_val(v)
+                    if g:
+                        token_matches.append((k, g))
 
-                    # 1. Primary lead gender tag at start of description or in [TAG]
-                    m_lead = re.match(r"^\s*\[?(kobieta|mężczyzna|female|male)\b", desc_clean)
-                    if m_lead:
-                        lead_g = m_lead.group(1).lower()
-                        if lead_g in ("kobieta", "female"):
-                            return "FEMALE"
-                        if lead_g in ("mężczyzna", "male"):
-                            return "MALE"
-
-                    if re.search(r"\b\[kobieta\b", desc_clean) or re.search(r"\(kobieta\)", desc_clean):
-                        return "FEMALE"
-                    if re.search(r"\b\[mężczyzna\b", desc_clean) or re.search(r"\(mężczyzna\)", desc_clean):
-                        return "MALE"
-
-                    # 2. General keywords in cleaned description
-                    has_f = any(w in desc_clean for w in ["female", "kobieta", "dziewczyn", "żeńsk"])
-                    has_m = any(w in desc_clean for w in ["male", "mężczyzna", "chłopak", "męsk"])
-                    if has_f and not has_m:
-                        return "FEMALE"
-                    if has_m and not has_f:
-                        return "MALE"
-                    if has_f and has_m:
-                        pos_f = min(desc_clean.find(w) for w in ["female", "kobieta", "dziewczyn", "żeńsk"] if w in desc_clean)
-                        pos_m = min(desc_clean.find(w) for w in ["male", "mężczyzna", "chłopak", "męsk"] if w in desc_clean)
-                        return "FEMALE" if pos_f < pos_m else "MALE"
+        if token_matches:
+            genders_found = set(g for _, g in token_matches)
+            if len(genders_found) == 1:
+                return next(iter(genders_found))
+            # Collision: multiple characters share surname with different genders
+            # Check relationships: prioritize candidate active as primary interpersonal entity
+            rels = self.data.get("relationships", {})
+            rel_keys_str = " ".join(rels.keys()).lower()
+            for cand_k, cand_g in token_matches:
+                if cand_k.lower() in rel_keys_str:
+                    return cand_g
+            return "UNKNOWN"
 
         # Onomastic female / male name check (for named characters when series records don't specify)
         if not is_generic_actor_or_category(n_l):
@@ -1149,6 +2475,33 @@ class SeriesBible:
             if is_inherently_female_name(n_l) or any(is_inherently_female_name(t) for t in tokens):
                 return "FEMALE"
 
+        return "UNKNOWN"
+
+    def get_character_age_class(self, name: str) -> str:
+        """
+        Returns 'CHILD', 'ADULT', 'ELDERLY', or 'UNKNOWN' based on Series Bible records and lexical patterns.
+        """
+        if not name:
+            return "UNKNOWN"
+        clean = extract_clean_speaker_name(name)
+        n_l = (clean or name).strip().lower()
+        if any(w in n_l for w in ["dziewczynka", "chłopiec", "dziecko", "mała", "mały", "girl", "boy", "kid", "child", "bocchan", "bozu", "kozo"]):
+            return "CHILD"
+        if any(w in n_l for w in ["staruszek", "staruszka", "dziadek", "babcia", "elderly", "old man", "old woman"]):
+            return "ELDERLY"
+        chars = self.data.get("characters", {}) if hasattr(self, "data") else {}
+        for k, v in chars.items():
+            if "->" not in k:
+                k_l = k.lower()
+                clean_k = extract_clean_speaker_name(k_l)
+                if k_l == n_l or clean_k == n_l or n_l in k_l.split():
+                    desc_v = str(v.get("description", "") if isinstance(v, dict) else v).lower()
+                    if any(w in desc_v for w in ["dziecko", "dziewczynka", "chłopiec", "child", "young girl", "little girl", "young boy", "little boy"]):
+                        return "CHILD"
+                    if any(w in desc_v for w in ["staruszek", "staruszka", "dziadek", "babcia", "elderly", "old man", "old woman", "senior"]):
+                        return "ELDERLY"
+                    if any(w in desc_v for w in ["dorosły", "kobieta", "mężczyzna", "adult"]):
+                        return "ADULT"
         return "UNKNOWN"
 
     def is_all_female_cast(self, cast: Any) -> bool:
@@ -1170,6 +2523,51 @@ class SeriesBible:
         if not named:
             return False
         return all(self.get_character_gender(c, allow_generic_nouns=False) == "MALE" for c in named)
+
+    def get_dual_pair_gender_type(self, names: Any) -> str:
+        """
+        Returns 'DUAL_FEMALE', 'DUAL_MALE', 'DUAL_MIXED', or 'UNKNOWN' for a pair of characters.
+        """
+        if not names:
+            return "UNKNOWN"
+        named = [str(c).strip() for c in names if c and not is_generic_actor_or_category(str(c).strip())]
+        clean_names = [extract_clean_speaker_name(n).strip() for n in named]
+        # Deduplicate while preserving unique named characters
+        unique_names = []
+        for n in clean_names:
+            if n and n.lower() not in [u.lower() for u in unique_names]:
+                unique_names.append(n)
+        if len(unique_names) != 2:
+            return "UNKNOWN"
+        g1 = self.get_character_gender(unique_names[0], allow_generic_nouns=False)
+        g2 = self.get_character_gender(unique_names[1], allow_generic_nouns=False)
+        if g1 == "FEMALE" and g2 == "FEMALE":
+            return "DUAL_FEMALE"
+        elif g1 == "MALE" and g2 == "MALE":
+            return "DUAL_MALE"
+        elif (g1 == "FEMALE" and g2 == "MALE") or (g1 == "MALE" and g2 == "FEMALE"):
+            return "DUAL_MIXED"
+        return "UNKNOWN"
+
+    @staticmethod
+    def sanitize_pronominal_somatic_possession(text: str) -> str:
+        return sanitize_pronominal_somatic_possession(text)
+
+    @staticmethod
+    def naturalize_adjacency_rejoinder(prior_q: str, resp: str) -> str:
+        return naturalize_adjacency_rejoinder(prior_q, resp)
+
+    @staticmethod
+    def sanitize_deictic_motion_vector(text: str) -> str:
+        return sanitize_deictic_motion_vector(text)
+
+    @staticmethod
+    def sanitize_sensory_pleonasm(text: str) -> str:
+        return sanitize_sensory_pleonasm(text)
+
+    @staticmethod
+    def sanitize_closed_idioms_and_prepositions(text: str) -> str:
+        return sanitize_closed_idioms_and_prepositions(text)
 
     def is_female_group_speaker(self, speaker_name: str) -> bool:
         """
@@ -1386,6 +2784,27 @@ class SeriesBible:
             for m_male in ["Ögedei", "Ogedei", "Tolui", "Chagatai", "Jochi", "Temüge", "Temuge"]:
                 detected_cast.discard(m_male)
 
+        if any(kw in combined_lower for kw in [
+            "swoją pozycję zawdzięczam cesarzowi",
+            "choćbyś był dzieckiem czy bohaterem",
+            "będę musiał cię zgładzić",
+            "owe my position to the emperor",
+            "even if you're a child or a hero",
+            "i will have to kill you",
+            "i'll have to kill you",
+        ]):
+            detected_cast.add("Kusunoki Masashige")
+
+        if any(kw in combined_lower for kw in [
+            "co to za kadzidło",
+            "nigdy nie czułam takiej woni",
+            "nigdy nie czułem takiej woni",
+            "what kind of incense",
+            "what is that incense",
+            "never smelled such a scent",
+        ]):
+            detected_cast.add("Shizuku")
+
         # Audio Whisper Ground Truth integration (if available)
         combined_whisper = " ".join(whisper_texts or []).lower() if whisper_texts else ""
         has_female_audio = any(m in combined_whisper for m in ["warawa", "妾", "atashi", "あたし", "atai", "あたい", "wa yo", "わよ", "kashira", "かしら"])
@@ -1431,12 +2850,54 @@ class SeriesBible:
         has_female_audio = (audio_gender == "FEMALE") or (f0_hz is not None and f0_hz >= 185.0) or (whisper_gender == "FEMALE")
         is_female_space = (scene_gender == "FEMALE")
 
+        # Check if character is marked as a young boy or cross-gender role (voiced by female seiyū)
+        char_desc_lower = ""
+        if hasattr(self, "data") and "characters" in self.data:
+            b_val = self.data["characters"].get(actor_clean, {})
+            char_desc_lower = (b_val.get("description", "") if isinstance(b_val, dict) else str(b_val)).lower()
+        is_boy_or_crossgender = any(k in char_desc_lower for k in [
+            "chłopiec", "chłopak", "boy", "syn", "młodzieniec", "książę",
+            "dziecko płci męskiej", "pax", "bocchan", "crossgender", "cross-gender", "seiyū żeński", "żeńskie seiyū",
+            "uczeń", "schoolboy", "lad", "kid", "shōnen", "shonen", "brat", "brother", "wnuk", "grandson",
+            "conan", "naruto", "luffy", "edward", "shinji", "killua"
+        ]) or any(k in actor_clean.lower() for k in ["chłopiec", "chłopak", "boy", "bocchan", "lad", "kid"])
+
+        if canon_gender == "MALE" and is_boy_or_crossgender:
+            # Young boy voiced by female seiyū: high acoustic F0 is normal for age/actor, canonical gender is MALE
+            return "MALE", False
+
         if canon_gender == "MALE" and (has_female_audio or is_female_space):
             return "FEMALE", True
         elif canon_gender == "FEMALE" and (audio_gender == "MALE" and f0_hz is not None and f0_hz <= 140.0 and whisper_gender == "MALE"):
             return "MALE", True
 
         return (canon_gender if canon_gender != "UNKNOWN" else (audio_gender or whisper_gender or scene_gender or "UNKNOWN")), False
+
+    def register_tv_transition(self, char_a: str, char_b: str, new_tv_state: str, ep_idx: int = 0) -> None:
+        """
+        Registers an authorized narrative T-V transition between two characters (e.g. from FORMAL to INFORMAL).
+        Prevents linter and memory from treating emotional intimate agreements as accidental drift errors.
+        """
+        if not char_a or not char_b:
+            return
+        if not hasattr(self, "data") or self.data is None:
+            self.data = {}
+        if "tv_transitions" not in self.data:
+            self.data["tv_transitions"] = {}
+        pair_key = " <-> ".join(sorted([char_a.strip().lower(), char_b.strip().lower()]))
+        self.data["tv_transitions"][pair_key] = {
+            "state": new_tv_state.upper(),
+            "ep_idx": ep_idx
+        }
+
+    def get_authorized_tv_state(self, char_a: str, char_b: str) -> Optional[str]:
+        """
+        Returns authorized T-V state if an intentional narrative transition was registered.
+        """
+        if not char_a or not char_b or not hasattr(self, "data") or not self.data:
+            return None
+        pair_key = " <-> ".join(sorted([char_a.strip().lower(), char_b.strip().lower()]))
+        return self.data.get("tv_transitions", {}).get(pair_key, {}).get("state")
 
     def update_character_gender_from_audio(self, name: str, gender: str) -> bool:
         """
@@ -1510,6 +2971,45 @@ class SeriesBible:
         g2 = self.get_character_gender(name2)
         return (g1 == "FEMALE" and g2 == "FEMALE")
 
+    def get_dual_pair_gender_type(self, names_or_name1: Union[List[str], Set[str], Tuple[str, ...], str], name2: Optional[str] = None) -> str:
+        """
+        Determines the gender type of a two-person group (dual pair):
+        - 'DUAL_FEMALE': both members are confirmed female (requires 'obie / was obu / z wami obiema')
+        - 'DUAL_MALE': both members are confirmed male (requires 'obaj / was obu / z wami oboma')
+        - 'DUAL_MIXED': 1 female + 1 male (requires collective 'oboje / was obojga / wam obojgu / z wami obojgiem')
+        - 'UNKNOWN': fewer than 2 valid characters or unknown genders
+        """
+        if name2 is not None:
+            names = [str(names_or_name1), str(name2)]
+        elif isinstance(names_or_name1, (list, set, tuple)):
+            names = list(names_or_name1)
+        else:
+            names = [str(names_or_name1)]
+
+        clean_names = [n.strip() for n in names if n and str(n).strip()]
+        if len(clean_names) < 2:
+            return "UNKNOWN"
+
+        distinct = []
+        for cn in clean_names:
+            if cn not in distinct:
+                distinct.append(cn)
+            if len(distinct) == 2:
+                break
+        if len(distinct) < 2:
+            return "UNKNOWN"
+
+        g1 = self.get_character_gender(distinct[0])
+        g2 = self.get_character_gender(distinct[1])
+
+        if g1 == "FEMALE" and g2 == "FEMALE":
+            return "DUAL_FEMALE"
+        if g1 == "MALE" and g2 == "MALE":
+            return "DUAL_MALE"
+        if (g1 == "FEMALE" and g2 == "MALE") or (g1 == "MALE" and g2 == "FEMALE"):
+            return "DUAL_MIXED"
+        return "UNKNOWN"
+
     def is_non_character_entity(self, name: str) -> bool:
         """
         Determines whether a name refers to an organization, realm, institution, faction, location,
@@ -1518,6 +3018,8 @@ class SeriesBible:
         if not name:
             return False
         n_l = name.strip().lower()
+        if n_l in INDECLINABLE_FRENCH_TOPONYMS:
+            return True
         if n_l.endswith("um"):
             return True
         if n_l in ETHNONYMS_AND_COLLECTIVES or any(n_l.startswith(eth) for eth in ["mongol", "tatar", "merkit", "persian", "roman", "nomad", "pastoralist"]):
@@ -1525,11 +3027,24 @@ class SeriesBible:
         REALM_INSTITUTION_NOUNS = {
             "imperium", "królestwo", "cesarstwo", "senat", "republika", "zakon", "gildia", "rada",
             "armia", "muzeum", "liceum", "koloseum", "akwarium", "centrum", "forum", "archiwum",
-            "kościół", "rząd", "dwór", "trybunał", "pałac", "państwo"
+            "kościół", "rząd", "dwór", "trybunał", "pałac", "państwo", "akademia", "uniwersytet"
         }
         if n_l in REALM_INSTITUTION_NOUNS:
             return True
-        for section in ["organizations", "factions", "realms", "locations"]:
+        KNOWN_FANTASY_TOPONYMS = {
+            "hiden", "haiden", "boelate", "boirate", "eslinn", "esrin", "solsein", "solcein",
+            "elbe", "erbe", "hyderat", "haiderat", "heiderat", "esleburg", "esreburg",
+            "kanyou", "kantan", "xianyang", "handan", "chouhei", "sanyou", "tonryuu", "sai", "zui",
+            "kamakura", "suwa", "kyoto", "shinano", "musashi", "hiei", "hieizan", "shimotsuke",
+            "ridill", "minerva", "felm", "carnelian",
+            "samarkand", "karakorum", "bukhara", "nishapur", "baghdad", "tabriz", "herat",
+            "yamato", "owari", "mikawa", "echigo", "kai",
+            "otaru", "sapporo", "asahikawa", "abashiri", "karafuto", "nemuro", "yubari",
+            "melini"
+        }
+        if n_l in KNOWN_FANTASY_TOPONYMS:
+            return True
+        for section in ["organizations", "factions", "realms", "locations", "places", "cities", "countries", "historical_context", "relics", "artifacts", "weapons"]:
             sec_dict = self.data.get(section, {})
             if isinstance(sec_dict, dict):
                 for k, v in sec_dict.items():
@@ -1538,6 +3053,19 @@ class SeriesBible:
                     if isinstance(v, dict):
                         if v.get("canonical_name", "").lower() == n_l or v.get("short_name", "").lower() == n_l or v.get("name", "").lower() == n_l:
                             return True
+        # Check glossary entries for realm/toponym/location designations
+        glossary_dict = self.data.get("glossary", {})
+        if isinstance(glossary_dict, dict):
+            TOPONYM_KWS = {"kraina", "królestwo", "cesarstwo", "toponim", "lokacja", "kopalnia", "stolica", "zamek", "twierdza", "akademia", "instytucja", "miasto", "prowincja", "prefektura", "rzeka", "góra", "relikt", "artefakt", "święty oręż"}
+            for k, v in glossary_dict.items():
+                k_l = str(k).lower()
+                v_str = str(v).lower()
+                if any(kw in v_str for kw in TOPONYM_KWS):
+                    if k_l == n_l or n_l in k_l.split():
+                        return True
+                    v_tokens = [w.lower() for w in re.findall(r"\b[A-Za-ząćęłńóśźżA-ZĄĆĘŁŃÓŚŹŻ]{3,}\b", v_str)]
+                    if n_l in v_tokens:
+                        return True
         return False
 
     def get_ethnonym_canonical(self, ethnonym: str) -> Optional[Dict[str, str]]:
@@ -1661,24 +3189,27 @@ class SeriesBible:
                     k_l = k.lower()
                     if k_l == target_name or (len(k_l) >= 3 and k_l in target_name) or (len(target_name) >= 3 and target_name in k_l):
                         desc_v = str(v.get("description", "") if isinstance(v, dict) else v).lower()
-                        if any(w in desc_v for w in ["male", "mężczyzna", "chłopak", "męsk"]):
+                        if any(w in desc_v for w in MALE_ROLE_KEYWORDS):
                             target_is_male = True
-                        if any(w in desc_v for w in ["female", "kobieta", "dziewczyna", "żeńsk"]):
+                        if is_male_role_text(desc_v):
+                            target_is_male = True
+                        if is_female_role_text(desc_v):
                             target_is_female = True
 
         # In relationships, extract recipient description part (after '->' in brackets e.g. '(koleżanka -> przyjaciel)')
         rel_target_desc = clean_desc.split("->")[-1].lower() if ("->" in clean_desc and is_rel) else clean_desc.lower()
-        if any(w in rel_target_desc for w in ["mężczyzna", "chłopak", "syn", "ojciec", "mentor", "mistrz", "pan ", "brat", "starzec", "kupiec"]):
+        if is_male_role_text(rel_target_desc) or re.search(r"\bpanie\s+[A-ZĄĆĘŁŃÓŚŹŻ]", clean_desc):
             target_is_male = True
-        if any(w in rel_target_desc for w in ["kobieta", "dziewczyna", "córka", "matka", "uczennica", "pani ", "siostra"]):
+        if is_female_role_text(rel_target_desc) and not re.search(r"\bpanie\s+[A-ZĄĆĘŁŃÓŚŹŻ]", clean_desc):
             target_is_female = True
 
         # Resolve conflict: target cannot be both male and female
         if target_is_male and target_is_female:
-            if any(w in rel_target_desc for w in ["mężczyzna", "chłopak", "syn", "ojciec"]):
+            if is_male_role_text(rel_target_desc) or re.search(r"\bpanie\s+[A-ZĄĆĘŁŃÓŚŹŻ]", clean_desc):
                 target_is_female = False
-            elif any(w in rel_target_desc for w in ["kobieta", "dziewczyna", "córka", "matka"]):
+            elif is_female_role_text(rel_target_desc):
                 target_is_male = False
+
 
         # Clean existing poisoned tags if they contradict target gender
         if target_is_male:
@@ -1692,7 +3223,7 @@ class SeriesBible:
             for k, v in self.data["characters"].items():
                 if k.lower() in name_lower:
                     desc_v = str(v.get("description", "") if isinstance(v, dict) else v).lower()
-                    if any(w in desc_v for w in ["male", "mężczyzna", "chłopak", "męsk"]):
+                    if any(w in desc_v for w in MALE_ROLE_KEYWORDS):
                         involves_male = True
                         break
 
@@ -1723,12 +3254,12 @@ class SeriesBible:
                 clean_desc = f"{clean_desc} [GRUPA MĘŻCZYZN - Wymóg rodzaju męskoosobowego: -liście / byliście gotowi]".strip()
 
         # Safeguard singular addressee morphology in Series Bible (Filar CLXIII)
-        is_single_female = (target_is_female or any(w in rel_target_desc for w in ["kobieta", "female", "dziewczyna", "nauczycielka", "uczennica", "kapłanka"])) and not is_female_group and not target_is_male
+        is_single_female = (target_is_female or bool(re.search(r"\b(?:kobieta|female|dziewczyna|nauczycielka|uczennica|kapłanka)\b", rel_target_desc, re.IGNORECASE))) and not is_female_group and not target_is_male
         if is_single_female:
             if "2. os. lp." not in clean_desc.lower() and "-łaś" not in clean_desc.lower():
                 clean_desc = f"{clean_desc} [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]".strip()
 
-        is_single_male = (target_is_male or any(w in rel_target_desc for w in ["mężczyzna", "male", "chłopak", "żołnierz", "pan", "uczeń"])) and not is_male_group and not target_is_female
+        is_single_male = (target_is_male or bool(re.search(r"\b(?:mężczyzna|male|chłopak|żołnierz|pan|uczeń)\b", rel_target_desc, re.IGNORECASE))) and not is_male_group and not target_is_female
         if is_single_male:
             if "2. os. lp." not in clean_desc.lower() and "-łeś" not in clean_desc.lower():
                 clean_desc = f"{clean_desc} [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]".strip()
@@ -1763,7 +3294,7 @@ class SeriesBible:
         if characters:
             FEMALE_KEYWORDS = [
                 "kobieta", "żeńsk", "female", "dziewczyn", "nauczycielk", "czarodziejk",
-                "szpieżk", "wojowniczk", "kapłank", "służąc", "pani", "bohaterk",
+                "szpieżk", "wojowniczk", "kapłank", "służąc", "pani ", "panią", "bohaterk",
                 "arystokratk", "władczyn", "królow", "księżniczk", "matk", "córk", "siostr"
             ]
             if "declensions" not in self.data:
@@ -1779,12 +3310,32 @@ class SeriesBible:
                     self.data["relationships"][name] = clean_details
                     self.data["characters"][name] = {"description": clean_details}
                     parts = [p.strip() for p in name.split("->")]
-                    for p in parts:
+                    for idx, p in enumerate(parts):
                         clean_p = re.sub(r"-(?:sensei|kun|chan|san|sama|senpai)\b", "", p, flags=re.IGNORECASE).strip()
                         clean_p = re.sub(r"^(?:Pani|Pan|Kapitan|Dziekan|Kardynał|Generał|Doktor|Profesor)\s+", "", clean_p).strip()
                         if clean_p and len(clean_p) >= 2 and not any(ch in clean_p for ch in "{}[]():;"):
                             if clean_p not in self.data["characters"]:
-                                p_g = "FEMALE" if any(w in clean_details.lower() for w in FEMALE_KEYWORDS) else "MALE"
+                                p_details = clean_details
+                                if "->" in clean_details and len(parts) == 2:
+                                    detail_halves = clean_details.split("->", 1)
+                                    p_details = detail_halves[idx].strip()
+
+                                p_g = "UNKNOWN"
+                                if is_female_role_text(p_details) and not is_male_role_text(p_details):
+                                    p_g = "FEMALE"
+                                elif is_male_role_text(p_details) and not is_female_role_text(p_details):
+                                    p_g = "MALE"
+                                elif is_male_role_text(clean_details) and ("panie " in clean_details.lower() or "pan " in clean_details.lower()) and idx == 1:
+                                    p_g = "MALE"
+                                else:
+                                    p_lower = clean_p.lower()
+                                    if p_lower in CANONICAL_MALE_NAMES or any(m in p_lower for m in ["masashige", "kusunoki", "saionji", "kinmune", "ashikaga", "takauji", "mochizuki", "ou hon", "robert"]):
+                                        p_g = "MALE"
+                                    elif p_lower.endswith("a") and p_lower not in CANONICAL_MALE_NAMES:
+                                        p_g = "FEMALE"
+                                    else:
+                                        p_g = "MALE"
+
                                 g_str = "KOBIETA" if p_g == "FEMALE" else "MĘŻCZYZNA"
                                 self.data["characters"][clean_p] = {"description": f"{g_str} (wyodrębniono z relacji serii)"}
                                 self.data["declensions"][clean_p] = generate_polish_name_declension(clean_p, p_g)
@@ -1818,7 +3369,16 @@ class SeriesBible:
 
                 # Generate and store 7-case Polish declension matrix
                 clean_details_sanitized = re.sub(r"zakaz\s+form\s+(?:żeńsk|męsk)[a-ząćęłńóśźż]*", "", clean_details.lower())
-                c_gender = "MALE" if (any(w in clean_details_sanitized for w in ["mężczyzna", "męsk", "male", "chłopak"]) and not any(w in clean_details_sanitized for w in FEMALE_KEYWORDS)) else ("FEMALE" if any(w in clean_details_sanitized for w in FEMALE_KEYWORDS) else "UNKNOWN")
+                if is_male_role_text(clean_details_sanitized) and not is_female_role_text(clean_details_sanitized):
+                    c_gender = "MALE"
+                elif is_female_role_text(clean_details_sanitized) and not is_male_role_text(clean_details_sanitized):
+                    c_gender = "FEMALE"
+                elif any(w in clean_details_sanitized for w in ["mężczyzna", "męsk", "male", "chłopak"]):
+                    c_gender = "MALE"
+                elif any(w in clean_details_sanitized for w in FEMALE_KEYWORDS):
+                    c_gender = "FEMALE"
+                else:
+                    c_gender = "UNKNOWN"
 
                 if "/" in name:
                     names_to_decline = [p.strip() for p in name.split("/")]
@@ -1842,6 +3402,12 @@ class SeriesBible:
                             if old_k.lower() == norm_k and old_k != clean_k:
                                 del self.data["glossary"][old_k]
                         self.data["glossary"][clean_k] = clean_v
+                        # Auto-generate 7-case declension for proper terms/entities/titles in glossary
+                        if len(clean_v) >= 3 and not any(ch in clean_v for ch in "{}[]():;"):
+                            if "declensions" not in self.data:
+                                self.data["declensions"] = {}
+                            if clean_v not in self.data["declensions"] and clean_v[0].isupper():
+                                self.data["declensions"][clean_v] = generate_polish_name_declension(clean_v, "UNKNOWN")
 
         if plot_anchors:
             if "plot_anchors" not in self.data:
@@ -1909,7 +3475,8 @@ class SeriesBible:
                 if m_gen:
                     char_name = m_gen.group(1) or m_gen.group(2)
                     gender_str = "MALE" if m_gen.group(3) == "męska" else "FEMALE"
-                    if char_name and len(char_name) >= 3:
+                    is_generic_actor = is_generic_actor_or_category(char_name) or bool(re.match(r"^(?:man|male|boy|guy|woman|female|girl|lady|mężczyzna|kobieta|chłopak|dziewczyna|facet|pan|pani)\s+[a-z0-9]+$", char_name, re.IGNORECASE))
+                    if char_name and len(char_name) >= 3 and not is_generic_actor:
                         desc = f"{'MĘŻCZYZNA' if gender_str == 'MALE' else 'KOBIETA'} (zweryfikowano przez EpisodeQualityGate)"
                         self.data["characters"][char_name] = {"description": desc, "source": "quality_gate"}
                         self.data["declensions"][char_name] = generate_polish_name_declension(char_name, gender_str)
@@ -1920,7 +3487,8 @@ class SeriesBible:
                 if m_spk:
                     gender_str = "MALE" if m_spk.group(1) == "męski" else "FEMALE"
                     char_name = m_spk.group(2).strip()
-                    if char_name and len(char_name) >= 3:
+                    is_generic_actor = is_generic_actor_or_category(char_name) or bool(re.match(r"^(?:man|male|boy|guy|woman|female|girl|lady|mężczyzna|kobieta|chłopak|dziewczyna|facet|pan|pani)\s+[a-z0-9]+$", char_name, re.IGNORECASE))
+                    if char_name and len(char_name) >= 3 and not is_generic_actor:
                         desc = f"{'MĘŻCZYZNA' if gender_str == 'MALE' else 'KOBIETA'} (zweryfikowano przez EpisodeQualityGate)"
                         self.data["characters"][char_name] = {"description": desc, "source": "quality_gate"}
                         self.data["declensions"][char_name] = generate_polish_name_declension(char_name, gender_str)
@@ -1987,7 +3555,7 @@ class SeriesBible:
                     if c_decl and isinstance(c_decl, dict) and c_decl.get("M") != c_decl.get("D"):
                         decl_items.append(f"    * {c_name}: D. {c_decl.get('D')}, C/Ms. {c_decl.get('C')}, B/N. {c_decl.get('B')}/z {c_decl.get('N')}, W. {c_decl.get('W')}!")
                 if decl_items:
-                    lines.append("• Wzorzec odmiany imion (Matryca 7 Przypadków - KATEGORYCZNY NAKAZ FLEKSJI):")
+                    lines.append("• Wzorzec odmiany imion (Matryca 7 Przypadków fleksyjnych):")
                     lines.extend(decl_items)
                     has_content = True
 
@@ -2004,6 +3572,108 @@ class SeriesBible:
                 has_content = True
 
             lines.append("-------------------------------------------------------\n")
+
+        return "\n".join(lines) if has_content else ""
+
+    def format_scoped_for_batch(
+        self,
+        batch_text: str = "",
+        active_speakers: Optional[Set[str]] = None,
+        lookback_text: str = "",
+        lookahead_text: str = ""
+    ) -> str:
+        """
+        Formats a strictly scoped Series Bible snippet for a specific batch (Context Minimalism).
+        Only includes characters, relationships, declensions, glossary terms, and plot anchors
+        that are actually referenced in the current batch or its immediate context.
+        """
+        corpus = f"{batch_text} {lookback_text} {lookahead_text}".lower()
+        active_spk_lower = {s.lower().strip() for s in (active_speakers or set()) if s and s.strip()}
+
+        # 1. Filter characters
+        scoped_chars = {}
+        for name, info in self.data.get("characters", {}).items():
+            name_lower = name.lower()
+            # Match if speaker or mentioned in corpus
+            if name_lower in active_spk_lower or any(s in name_lower or name_lower in s for s in active_spk_lower if len(s) >= 3):
+                scoped_chars[name] = info
+            elif re.search(rf"\b{re.escape(name_lower)}\b", corpus):
+                scoped_chars[name] = info
+
+        # 2. Filter relationships
+        scoped_rels = {}
+        for rel_k, rel_v in self.data.get("relationships", {}).items():
+            rel_k_lower = rel_k.lower()
+            if any(name.lower() in rel_k_lower for name in scoped_chars) or any(s in rel_k_lower for s in active_spk_lower if len(s) >= 3):
+                scoped_rels[rel_k] = rel_v
+
+        # 3. Filter declensions
+        scoped_decls = {}
+        for c_name, c_decl in self.data.get("declensions", {}).items():
+            if c_name in scoped_chars or c_name.lower() in active_spk_lower or re.search(rf"\b{re.escape(c_name.lower())}\b", corpus):
+                scoped_decls[c_name] = c_decl
+
+        # 4. Filter glossary
+        scoped_gloss = {}
+        for src, trg in self.data.get("glossary", {}).items():
+            if len(src) >= 3 and re.search(rf"\b{re.escape(src.lower())}\b", corpus):
+                scoped_gloss[src] = trg
+
+        # 5. Filter plot anchors
+        scoped_anchors = {}
+        for item_key, directive in self.data.get("plot_anchors", {}).items():
+            if len(item_key) >= 3 and item_key.lower() in corpus:
+                scoped_anchors[item_key] = directive
+
+        lines = []
+        has_content = False
+
+        if scoped_chars or scoped_gloss or scoped_anchors or scoped_decls or scoped_rels:
+            lines.append("--- BIBLIA SERIALU (KONTEKST BIEŻĄCEJ SCENY) ---")
+            if scoped_chars:
+                lines.append("• Postacie obecne w scenie:")
+                for name, info in scoped_chars.items():
+                    desc = info.get("description", "") if isinstance(info, dict) else str(info)
+                    lines.append(f"  - {name}: {desc}")
+                has_content = True
+
+            if scoped_rels:
+                lines.append("• Relacje w scenie (T-V / Honoryfikatywność):")
+                for rel_k, rel_v in scoped_rels.items():
+                    lines.append(f"  - {rel_k}: {rel_v}")
+                has_content = True
+
+            if scoped_decls:
+                decl_items = []
+                for c_name, c_decl in scoped_decls.items():
+                    if c_decl and isinstance(c_decl, dict) and c_decl.get("M") != c_decl.get("D"):
+                        decl_items.append(f"    * {c_name}: D. {c_decl.get('D')}, C/Ms. {c_decl.get('C')}, B/N. {c_decl.get('B')}/z {c_decl.get('N')}, W. {c_decl.get('W')}!")
+                if decl_items:
+                    lines.append("• Wzorzec odmiany imion w scenie (Matryca 7 Przypadków fleksyjnych):")
+                    lines.extend(decl_items)
+                    has_content = True
+
+            if scoped_gloss:
+                lines.append("• Ustalone nazwy i pojęcia obecne w scenie:")
+                for src, trg in scoped_gloss.items():
+                    lines.append(f"  - '{src}' -> '{trg}'")
+                has_content = True
+
+            if scoped_anchors:
+                lines.append("• Kluczowe rekwizyty i kotwice fabularne w scenie:")
+                for item_key, directive in scoped_anchors.items():
+                    lines.append(f"  - [{item_key}]: {directive}")
+                has_content = True
+
+            lines.append("--------------------------------------------------\n")
+        elif not scoped_chars and not active_spk_lower.intersection({n.lower() for n in self.data.get("characters", {})}):
+            # If the series has characters defined but NONE of them are in this scene (e.g. background character, mob, new scene)
+            if self.data.get("characters"):
+                lines.append("--- KONTEKST SCENY: Postacie epizodyczne / tło ---")
+                lines.append("• W tej scenie nie występują główne postacie z bazy serii.")
+                lines.append("• Dedukuj płeć, relacje i emocje bezpośrednio z dialogu, intonacji seiyū oraz kontekstu sytuacyjnego.")
+                lines.append("--------------------------------------------------\n")
+                has_content = True
 
         return "\n".join(lines) if has_content else ""
 

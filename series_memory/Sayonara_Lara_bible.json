@@ -8,7 +8,7 @@
       "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Mari": {
-      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "MĘŻCZYZNA (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Mari Otsu": {
       "description": "kobieta (Młoda dziewczynka mieszkająca na wybrzeżu (retrospekcja)) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
@@ -170,7 +170,8 @@
       "B": "Rowana",
       "N": "Rowanem",
       "Ms": "Rowanie",
-      "W": "Rowanie"
+      "W": "Rowanie",
+      "gender": "MALE"
     },
     "Mari Otsu": {
       "M": "Mari Otsu",
@@ -189,7 +190,8 @@
       "B": "Lukę",
       "N": "Luką",
       "Ms": "Luce",
-      "W": "Luco"
+      "W": "Luco",
+      "gender": "MALE"
     },
     "Yoshiya": {
       "M": "Yoshiya",
@@ -198,7 +200,8 @@
       "B": "Yoshiyę",
       "N": "Yoshiyą",
       "Ms": "Yoshiyi",
-      "W": "Yoshiyo"
+      "W": "Yoshiyo",
+      "gender": "MALE"
     },
     "Mari": {
       "M": "Mari",
@@ -208,7 +211,7 @@
       "N": "Mari",
       "Ms": "Mari",
       "W": "Mari",
-      "gender": "FEMALE"
+      "gender": "MALE"
     },
     "Lisa": {
       "M": "Lisa",
@@ -237,7 +240,8 @@
       "B": "Leo",
       "N": "Leo",
       "Ms": "Leo",
-      "W": "Leo"
+      "W": "Leo",
+      "gender": "MALE"
     },
     "Kusatsu": {
       "M": "Kusatsu",
@@ -246,7 +250,8 @@
       "B": "Kusatsu",
       "N": "Kusatsu",
       "Ms": "Kusatsu",
-      "W": "Kusatsu"
+      "W": "Kusatsu",
+      "gender": "MALE"
     },
     "Grace": {
       "M": "Grace",
@@ -265,7 +270,8 @@
       "B": "Larę -> Lukę",
       "N": "Larą -> Luką",
       "Ms": "Larze -> Luce",
-      "W": "Laro -> Luko"
+      "W": "Laro -> Luko",
+      "gender": "MALE"
     },
     "Luca -> Lara": {
       "M": "Luca -> Lara",
@@ -312,7 +318,8 @@
       "B": "Gona (Grace)a -> Lukę",
       "N": "Gonem (Grace)em -> Luką",
       "Ms": "Gonie (Grace)ie -> Luce",
-      "W": "Gonie (Grace)ie -> Luco"
+      "W": "Gonie (Grace)ie -> Luco",
+      "gender": "MALE"
     },
     "Leo -> Luca": {
       "M": "Leo -> Luca",
@@ -321,7 +328,8 @@
       "B": "Leo -> Lukę",
       "N": "Leo -> Luką",
       "Ms": "Leo -> Luce",
-      "W": "Leo -> Luco"
+      "W": "Leo -> Luco",
+      "gender": "MALE"
     },
     "Leo -> Lara": {
       "M": "Leo -> Lara",
@@ -369,7 +377,8 @@
       "B": "Mari -> Lukę",
       "N": "Mari -> Luką",
       "Ms": "Mari -> Luce",
-      "W": "Mari -> Luco"
+      "W": "Mari -> Luco",
+      "gender": "MALE"
     },
     "Grace -> Mari": {
       "M": "Grace -> Mari",
@@ -428,7 +437,8 @@
       "B": "Yoshiyę -> Lukę",
       "N": "Yoshiyą -> Luką",
       "Ms": "Yoshiye -> Luce",
-      "W": "Yoshiyo -> Luco"
+      "W": "Yoshiyo -> Luco",
+      "gender": "MALE"
     },
     "Młoda Mari": {
       "M": "Młoda Mari",
@@ -457,7 +467,8 @@
       "B": "Gona",
       "N": "Gonem",
       "Ms": "Gonie",
-      "W": "Gonie"
+      "W": "Gonie",
+      "gender": "MALE"
     }
   },
   "hypocorisms": {},

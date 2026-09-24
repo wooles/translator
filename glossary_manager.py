@@ -156,7 +156,8 @@ class GlossaryManager:
         lines = [
             "--- BEZWZGLĘDNY SŁOWNICZEK POJĘĆ I TERMINOLOGII (BAZA KANONICZNA W MIANOWNIKU) ---",
             "Poniższe pojęcia to kanoniczne polskie odpowiedniki (podane w mianowniku jako forma bazowa).",
-            "W zdaniach BEZWZGLĘDNIE ODMIENIAJ JE PRZEZ PRZYPADKI zgodnie z polską gramatyką i przyimkami (np. 'Twierdza Goryōkaku' -> 'w twierdzy Goryōkaku', 'do twierdzy Goryōkaku', 'Więzienie Akō' -> 'w więzieniu Akō', 'z więzienia Akō'; ZAKAZ sztywnego mianownika po przyimkach typu 'w Twierdza'!):"
+            "W zdaniach BEZWZGLĘDNIE ODMIENIAJ JE PRZEZ PRZYPADKI zgodnie z polską gramatyką i przyimkami (np. 'Twierdza Goryōkaku' -> 'w twierdzy Goryōkaku', 'do twierdzy Goryōkaku', 'Więzienie Akō' -> 'w więzieniu Akō', 'z więzienia Akō'; ZAKAZ sztywnego mianownika po przyimkach typu 'w Twierdza'!).",
+            "ZAKAZ PLEONAZMÓW DESKRYPTORÓW: jeśli w zdaniu występuje już deskryptor ('z prowincji', 'w twierdzy', 'na górze', 'w rzece', 'w kronice'), NIE DOKLEJAJ go powtórnie z bazy (napisz 'z prowincji Shimotsuke', a KATEGORYCZNIE NIE 'z prowincji Prowincja Shimotsuke'; 'na górze Hiei', a NIE 'na górze Góra Hiei')! ZAKAZ mechanicznego powtarzania tego samego słowa."
         ]
         for src, raw_trg in (glossary_dict or {}).items():
             trg = self.clean_target_term(raw_trg)
@@ -197,6 +198,35 @@ class GlossaryManager:
         modified = text
         applied_fixes = []
 
+        DESCRIPTOR_STEM_GROUPS = [
+            r"prowincj",
+            r"prefektur",
+            r"gór|górz",
+            r"rzek|rzec",
+            r"jezior",
+            r"morz",
+            r"dolin",
+            r"wysp",
+            r"zatok|zatoc",
+            r"przełęcz",
+            r"zamk|zame",
+            r"twierdz",
+            r"świątyn",
+            r"chram",
+            r"bram",
+            r"miast|mieśc",
+            r"dystrykt|dystrykc",
+            r"ziem",
+            r"księstw",
+            r"królestw",
+            r"cesarstw",
+            r"państw",
+            r"kraj",
+            r"kronik|kronic",
+            r"księg|księdz",
+            r"traktat|traktac",
+        ]
+
         # Sort glossary by length descending so longer phrases match first
         sorted_glossary = sorted(glossary_dict.items(), key=lambda kv: len(kv[0]), reverse=True)
 
@@ -219,8 +249,42 @@ class GlossaryManager:
             # Check if source term remains untranslated
             pattern_src = re.compile(rf"\b{re.escape(src)}\b", re.IGNORECASE)
             if pattern_src.search(modified):
-                modified = pattern_src.sub(trg, modified)
-                applied_fixes.append(f"Wymuszenie słownika: '{src}' -> '{trg}'")
+                # Anti-Pleonasm Descriptor Guard:
+                # If target term starts with a descriptor (e.g. 'Prowincja Shimotsuke', 'Góra Hiei')
+                # and the word preceding the match in 'modified' is ALREADY that descriptor in any case
+                # (e.g. 'z prowincji Shimotsuke'), substitute only the core name to avoid 'z prowincji Prowincja Shimotsuke'.
+                trg_parts = trg.split(" ", 1)
+                has_desc = False
+                desc_word = ""
+                core_name = trg
+                matched_grp = None
+                if len(trg_parts) == 2:
+                    desc_word = trg_parts[0]
+                    core_name = trg_parts[1]
+                    for grp in DESCRIPTOR_STEM_GROUPS:
+                        if re.match(rf"^(?:{grp})", desc_word, re.IGNORECASE):
+                            has_desc = True
+                            matched_grp = grp
+                            break
+
+                def _sub_target(m):
+                    if has_desc and matched_grp:
+                        before = modified[:m.start()].rstrip()
+                        prev_word_match = re.search(r"\b([A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+)$", before)
+                        if prev_word_match:
+                            prev_w = prev_word_match.group(1).lower()
+                            if re.match(rf"^(?:{matched_grp})", prev_w, re.IGNORECASE):
+                                return core_name
+                    return trg
+
+                new_mod = pattern_src.sub(_sub_target, modified)
+                if new_mod != modified:
+                    modified = new_mod
+                    applied_fixes.append(f"Wymuszenie słownika: '{src}' -> '{trg}'")
+
+        # Sanitize toponymic and descriptor pleonasms & stuttering (Filar CLXXXIV - 0.00 PLN)
+        from series_memory import sanitize_toponymic_pleonasms_and_stuttering
+        modified = sanitize_toponymic_pleonasms_and_stuttering(modified)
 
         # Clean duplicate parentheses
         modified = re.sub(r"\(([^)]+)\)\s*\(\1\)", r"(\1)", modified)

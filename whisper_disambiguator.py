@@ -22,8 +22,10 @@ import re
 @dataclass
 class DisambiguationTag:
     speaker_gender: Optional[str] = None       # "MALE" | "FEMALE"
+    speaker_age_class: Optional[str] = None    # "CHILD_MALE" | "CHILD_FEMALE" | "ADULT_MALE" | "ADULT_FEMALE" | "ELDERLY_MALE" | "ELDERLY_FEMALE" | "UNKNOWN"
     addressee_gender: Optional[str] = None     # "MALE" | "FEMALE" | "MIXED"
-    addressee_number: Optional[str] = None     # "SINGULAR" | "PLURAL"
+    addressee_age_class: Optional[str] = None  # "CHILD" | "ADULT" | "ELDERLY"
+    addressee_number: Optional[str] = None     # "SINGULAR" | "DUAL" | "PLURAL"
     social_register: Optional[str] = None      # "INFORMAL_TY" | "FORMAL_PAN"
     polar_response: Optional[str] = None       # "NEGATIVE_CONFIRM" (Hai/Un po pytaniu negatywnym -> 'Nie')
     kinship_role: Optional[str] = None         # "STARSZY_BRAT" | "MLODSZY_BRAT" | "STARSZA_SIOSTRA" | "MLODSZA_SIOSTRA" | "SZEF"
@@ -32,6 +34,7 @@ class DisambiguationTag:
     is_phantom_audio: bool = False             # no_speech_prob > 0.85
     low_acoustic_confidence: bool = False     # avg_logprob < -1.0
     is_hallucination_loop: bool = False       # compression_ratio > 2.4 or repetitive n-gram
+    is_shock_drop: bool = False               # Filar CLXXVIII: sudden drop >= 12 dBFS / shout -> whisper
     detected_markers: Optional[List[str]] = None
 
     @property
@@ -67,11 +70,15 @@ class DisambiguationTag:
             return "Ty/Swobodny"
         return self.social_register
 
+    @property
+    def addressee_is_group(self) -> bool:
+        return self.addressee_number in ("PLURAL", "DUAL")
+
     def is_empty(self) -> bool:
         return not any([
             self.speaker_gender, self.addressee_gender, self.addressee_number,
             self.social_register, self.polar_response, self.kinship_role,
-            self.benefactive, self.spatial_deictic
+            self.benefactive, self.spatial_deictic, self.is_shock_drop
         ])
 
 
@@ -89,25 +96,50 @@ class WhisperDisambiguator:
     FEMALE_HONORIFIC_VOCATIVES = ["-chan", "chan", "ちゃん"]
     MALE_HONORIFIC_VOCATIVES = ["-kun", "kun", "君"]
 
-    # --- K2: Liczba mnoga adresata (Plural markers) ---
+    # --- K2: Liczba mnoga i podwójna adresata (Plural & Dual markers) ---
+    DUAL_MARKERS = [
+        "futari", "ふたり", "二人", "futari-tomo", "二人とも", "ryouhou", "両方", "docchi", "どっち"
+    ]
     PLURAL_MARKERS = [
         "tachi", "たち", "達", "omae-ra", "お前ら", "kisama-ra", "貴様ら",
         "minna", "みんな", "皆", "shokun", "諸君", "zen'in", "全員",
         "mina-sama", "皆様", "domo", "ども", "共"
     ]
 
-    # --- K3: Zaimki 1. osoby (Mówca) & Cząstki płciowe ---
+    # --- K3: Zaimki 1. osoby (Mówca), Cząstki płciowe & Rodzajowe imperatywy ---
+    FEMALE_IMPERATIVES = [
+        "nasai", "なさい", "choudai", "ちょうだい"
+    ]
+    MALE_IMPERATIVES = [
+        "tamae", "たまえ", "kure", "くれ", "shiro", "しろ", "koi", "来い", "koiyo", "miro", "見ろ", "yare", "やれ"
+    ]
+    YOUNG_BOY_JP_MARKERS = [
+        "boku", "僕", "oira", "おいら", "bozu", "坊主", "bocchan", "坊ちゃん",
+        "kozo", "小僧", "shounen", "少年", "otouto", "弟", "musuko", "息子"
+    ]
+    YOUNG_BOY_EN_MARKERS = [
+        "boy", "lad", "kiddo", "son", "brother", "little guy", "young master",
+        "schoolboy", "young man"
+    ]
+    YOUNG_GIRL_JP_MARKERS = [
+        "ojousan", "ojou-san", "ojou-chan", "jou-chan", "onnanoko", "shoujo", "musume", "imouto",
+        "女の子", "少女", "嬢ちゃん", "お嬢さん", "お嬢ちゃん", "妹", "娘"
+    ]
+    YOUNG_GIRL_EN_MARKERS = [
+        "little girl", "girl", "lass", "missy", "young lady", "daughter", "little lady",
+        "schoolgirl"
+    ]
     MALE_1ST_PERSON = [
         "ore", "俺", "boku", "僕", "oira", "おいら", "washi", "わし",
         "sessha", "拙者", "ware", "我", "wagahai", "吾輩", "jibun", "自分"
     ]
     FEMALE_1ST_PERSON = [
-        "atashi", "あたし", "atai", "あたい", "atakushi",
+        "atashi", "あたし", "atai", "あtai", "atakushi",
         "warawa", "妾", "uchi", "うち"
     ]
     FEMALE_SENTENCE_PARTICLES = [
         "kashira", "かしら", "wa yo", "わよ", "none", "のね",
-        "no yo", "のよ", "te yo", "てよ", "koto", "こと"
+        "no yo", "のよ", "te yo", "てよ", "koto", "こと", "wa", "わ", "mono", "もの"
     ]
     MALE_SENTENCE_PARTICLES = [
         "da zo", "だぞ", "da ze", "だぜ", "zo", "ぜ", "ぞ", "kai", "かい"
@@ -118,6 +150,12 @@ class WhisperDisambiguator:
     YOUNGER_BROTHER_MARKERS = ["otouto", "弟"]
     OLDER_SISTER_MARKERS = ["onee-san", "onee-chan", "nee-san", "nee-chan", "aneue", "姉", "姉貴", "姉上"]
     YOUNGER_SISTER_MARKERS = ["imouto", "妹"]
+    FATHER_MARKERS = ["otou-san", "tou-san", "chichi", "chichioya", "oyaji", "chichiue", "父", "父親", "親父", "父上", "お父さん"]
+    MOTHER_MARKERS = ["okaa-san", "kaa-san", "haha", "hahaoya", "ofukuro", "hahaue", "母", "母親", "お袋", "母上", "お母さん"]
+    GRANDFATHER_MARKERS = ["ojii-san", "jii-san", "jiji", "sofu", "祖父", "おじいさん", "爺", "じいさん"]
+    GRANDMOTHER_MARKERS = ["obaa-san", "baa-san", "baba", "sobo", "祖母", "おばあさん", "婆", "ばあさん"]
+    UNCLE_MARKERS = ["oji-san", "ojisan", "叔父", "伯父", "おじさん"]
+    AUNT_MARKERS = ["oba-san", "obasan", "叔母", "伯母", "おばさん"]
 
     # --- K5: Wektory przysługi (Benefactives) ---
     BENEFACTIVE_FOR_ME = ["kureru", "kureta", "kure", "kudasaru", "kudasatta", "kudasai", "くれる", "くれた", "くださる", "ください"]
@@ -164,10 +202,10 @@ class WhisperDisambiguator:
         """
         Główna metoda deterministycznego rozstrzygania cech wypowiedzi (0.00 PLN).
         """
-        whisper_text = whisper_text or jp_audio or ""
-        source_en = source_en or clean_en or ""
-        prev_source_en = prev_source_en or prev_clean_en or ""
-        prev_pl = prev_pl or prev_clean_pl or ""
+        whisper_text = whisper_text or jp_audio or kwargs.get("jp_text", "") or kwargs.get("jp", "") or ""
+        source_en = source_en or clean_en or kwargs.get("en_text", "") or kwargs.get("en", "") or ""
+        prev_source_en = prev_source_en or prev_clean_en or kwargs.get("prev_en", "") or ""
+        prev_pl = prev_pl or prev_clean_pl or kwargs.get("prev_pl", "") or ""
 
         tag = DisambiguationTag(detected_markers=[])
         if is_sign or not whisper_text:
@@ -180,22 +218,80 @@ class WhisperDisambiguator:
 
         # -------------------------------------------------------------
         # K3: Płeć autoreferencyjna mówcy 1. osoby (I / me / my)
+        # K3: Płeć autoreferencyjna mówcy 1. osoby ('I / me / my')
         # -------------------------------------------------------------
         has_male_1st = any(re.search(rf"\b{re.escape(m)}\b", jp_lower) for m in cls.MALE_1ST_PERSON)
         has_female_1st = any(re.search(rf"\b{re.escape(m)}\b", jp_lower) for m in cls.FEMALE_1ST_PERSON)
         has_female_particles = any(m in jp_lower for m in cls.FEMALE_SENTENCE_PARTICLES)
         has_male_particles = any(m in jp_lower for m in cls.MALE_SENTENCE_PARTICLES)
 
-        if has_male_1st or (has_male_particles and not has_female_1st):
+        has_young_boy_jp = any(re.search(rf"\b{re.escape(m)}\b", jp_lower) or m in jp_lower for m in cls.YOUNG_BOY_JP_MARKERS)
+        has_young_boy_en = any(re.search(rf"\b{re.escape(m)}\b", en_lower) for m in cls.YOUNG_BOY_EN_MARKERS)
+        has_young_girl_jp = any(re.search(rf"\b{re.escape(m)}\b", jp_lower) or m in jp_lower for m in cls.YOUNG_GIRL_JP_MARKERS)
+        has_young_girl_en = any(re.search(rf"\b{re.escape(m)}\b", en_lower) for m in cls.YOUNG_GIRL_EN_MARKERS)
+        has_female_imperatives = any(re.search(rf"\b{re.escape(m)}\b", jp_lower) or m in jp_lower for m in cls.FEMALE_IMPERATIVES)
+        has_male_imperatives = any(re.search(rf"\b{re.escape(m)}\b", jp_lower) or m in jp_lower for m in cls.MALE_IMPERATIVES)
+
+        spk_is_boy_role = False
+        spk_is_girl_role = False
+        spk_is_elderly_female = False
+        spk_is_elderly_male = False
+        if speaker and (character_registry or series_bible):
+            clean_spk = re.sub(r"\s*\(.*?\)", "", speaker).strip().lower()
+            spk_desc = ""
+            if character_registry and clean_spk in character_registry:
+                c_val = character_registry[clean_spk]
+                spk_desc = (c_val.get("description", "") if isinstance(c_val, dict) else str(c_val)).lower()
+            elif series_bible and hasattr(series_bible, "data") and "characters" in series_bible.data:
+                b_val = series_bible.data["characters"].get(clean_spk, {})
+                spk_desc = (b_val.get("description", "") if isinstance(b_val, dict) else str(b_val)).lower()
+            if any(k in spk_desc for k in ["chłopiec", "chłopak", "boy", "syn", "młodzieniec", "książę", "dziecko płci męskiej", "uczeń", "schoolboy", "lad"]):
+                spk_is_boy_role = True
+            if any(k in spk_desc for k in ["dziewczynka", "girl", "córka", "panienka", "mała dziewczynka", "uczennica", "schoolgirl", "lass"]):
+                spk_is_girl_role = True
+            if any(k in spk_desc for k in ["staruszka", "babcia", "stara kobieta", "elderly female", "grandmother", "old woman"]):
+                spk_is_elderly_female = True
+            if any(k in spk_desc for k in ["starzec", "dziadek", "stary mężczyzna", "elderly male", "grandfather", "old man"]):
+                spk_is_elderly_male = True
+
+        if has_young_boy_jp or has_young_boy_en or spk_is_boy_role:
             tag.speaker_gender = "MALE"
+            tag.speaker_age_class = "CHILD_MALE"
+            tag.detected_markers.append("K3:Chłopiec_M (Seiyū)")
+        elif has_young_girl_jp or has_young_girl_en or spk_is_girl_role:
+            tag.speaker_gender = "FEMALE"
+            tag.speaker_age_class = "CHILD_FEMALE"
+            tag.detected_markers.append("K3:Dziewczynka_K (Seiyū)")
+        elif spk_is_elderly_female:
+            tag.speaker_gender = "FEMALE"
+            tag.speaker_age_class = "ELDERLY_FEMALE"
+            tag.detected_markers.append("K3:Seniorka_K")
+        elif spk_is_elderly_male:
+            tag.speaker_gender = "MALE"
+            tag.speaker_age_class = "ELDERLY_MALE"
+            tag.detected_markers.append("K3:Senior_M")
+        elif has_male_1st or (has_male_particles and not has_female_1st):
+            tag.speaker_gender = "MALE"
+            tag.speaker_age_class = "ADULT_MALE"
             tag.detected_markers.append("K3:Mówca_M")
         elif has_female_1st or has_female_particles:
             tag.speaker_gender = "FEMALE"
+            tag.speaker_age_class = "ADULT_FEMALE"
             tag.detected_markers.append("K3:Mówca_K")
+        elif has_female_imperatives and not has_male_1st:
+            tag.speaker_gender = "FEMALE"
+            tag.speaker_age_class = "ADULT_FEMALE"
+            tag.detected_markers.append("K3:Mówca_K (Imperatyw)")
+        elif has_male_imperatives and not has_female_1st:
+            tag.speaker_gender = "MALE"
+            tag.speaker_age_class = "ADULT_MALE"
+            tag.detected_markers.append("K3:Mówca_M (Imperatyw)")
 
         # -------------------------------------------------------------
-        # K2: Liczba gramatyczna adresata 2. osoby ('you' -> lp. vs lm.)
+        # K2: Liczba gramatyczna adresata 2. osoby ('you' -> lp. vs lm. vs dual)
         # -------------------------------------------------------------
+        has_dual_jp = any(re.search(rf"\b{re.escape(m)}\b", jp_lower) or m in jp_lower for m in cls.DUAL_MARKERS)
+        has_dual_en = bool(re.search(r"\b(?:both\s+of\s+you|you\s+two|two\s+of\s+you|the\s+two\s+of\s+you)\b", en_lower))
         has_jp_plural = any(re.search(rf"\b{re.escape(m)}\b", jp_lower) or m in jp_lower for m in cls.PLURAL_MARKERS)
         has_collective_vocative = bool(re.search(
             r"^(?:everyone|everybody|guys|team|class|all of you|ladies and gentlemen|people)[,!\?]|"
@@ -203,7 +299,10 @@ class WhisperDisambiguator:
             r"\b(?:to all of you|for all of you)\b",
             en_lower
         ))
-        if has_jp_plural or has_collective_vocative:
+        if has_dual_jp or has_dual_en:
+            tag.addressee_number = "DUAL"
+            tag.detected_markers.append("K2:Adresat_DUAL")
+        elif has_jp_plural or has_collective_vocative:
             tag.addressee_number = "PLURAL"
             tag.detected_markers.append("K2:Adresat_LM")
         else:
@@ -216,17 +315,42 @@ class WhisperDisambiguator:
         has_masc_2nd = any(re.search(rf"\b{re.escape(m)}\b", jp_lower) for m in cls.MASC_INFORMAL_2ND_PERSON)
         has_chan = any(m in jp_lower for m in cls.FEMALE_HONORIFIC_VOCATIVES)
         has_kun = any(m in jp_lower for m in cls.MALE_HONORIFIC_VOCATIVES)
+        has_boy_addr_jp = any(re.search(rf"\b{re.escape(m)}\b", jp_lower) or m in jp_lower for m in ["bocchan", "坊ちゃん", "bozu", "坊主", "kozo", "小僧", "shounen", "少年", "otouto", "弟"])
+        has_boy_addr_en = any(re.search(rf"\b{re.escape(m)}\b", en_lower) for m in ["boy", "lad", "kiddo", "son", "young master"])
+        has_girl_addr_jp = any(re.search(rf"\b{re.escape(m)}\b", jp_lower) or m in jp_lower for m in cls.YOUNG_GIRL_JP_MARKERS)
+        has_girl_addr_en = any(re.search(rf"\b{re.escape(m)}\b", en_lower) for m in cls.YOUNG_GIRL_EN_MARKERS)
 
         if tag.addressee_number == "SINGULAR":
-            if has_kun or any(m in jp_lower for m in ["temee", "手前", "kisama", "貴様"]):
-                tag.addressee_gender = "MALE"
-                tag.detected_markers.append("K1:Adresat_M")
-            elif has_chan or "anta" in jp_lower or "あんた" in jp_lower:
+            if has_girl_addr_jp or has_girl_addr_en:
                 tag.addressee_gender = "FEMALE"
+                tag.addressee_age_class = "CHILD"
+                tag.detected_markers.append("K1:Adresat_K (Dziewczynka)")
+            elif has_boy_addr_jp or has_boy_addr_en:
+                tag.addressee_gender = "MALE"
+                tag.addressee_age_class = "CHILD"
+                tag.detected_markers.append("K1:Adresat_M (Chłopiec)")
+            elif has_kun or any(m in jp_lower for m in ["temee", "手前", "kisama", "貴様"]):
+                tag.addressee_gender = "MALE"
+                tag.addressee_age_class = "ADULT"
+                tag.detected_markers.append("K1:Adresat_M (Chłopiec/Mężczyzna)")
+            elif has_chan or "anta" in jp_lower or "あんta" in jp_lower or "あんた" in jp_lower:
+                tag.addressee_gender = "FEMALE"
+                tag.addressee_age_class = "ADULT"
                 tag.detected_markers.append("K1:Adresat_K")
             elif any(m in jp_lower for m in ["omae", "お前"]):
                 tag.addressee_gender = "MALE"
+                tag.addressee_age_class = "ADULT"
                 tag.detected_markers.append("K1:Adresat_M (omae)")
+        elif tag.addressee_number == "DUAL":
+            if has_chan or any(w in en_lower for w in ["girls", "ladies", "women"]):
+                tag.addressee_gender = "FEMALE"
+            elif has_kun or any(w in en_lower for w in ["boys", "men"]):
+                tag.addressee_gender = "MALE"
+            else:
+                tag.addressee_gender = "MIXED"
+        elif tag.addressee_number == "PLURAL":
+            if has_chan or any(w in en_lower for w in ["girls", "ladies", "women", "dziewczęta", "kobiety"]):
+                tag.addressee_gender = "FEMALE"
 
         # -------------------------------------------------------------
         # K4: Hierarchia pokrewieństwa i role społeczne
@@ -235,6 +359,12 @@ class WhisperDisambiguator:
         has_younger_bro = any(m in jp_lower for m in cls.YOUNGER_BROTHER_MARKERS)
         has_older_sis = any(m in jp_lower for m in cls.OLDER_SISTER_MARKERS)
         has_younger_sis = any(m in jp_lower for m in cls.YOUNGER_SISTER_MARKERS)
+        has_father = any(m in jp_lower for m in cls.FATHER_MARKERS)
+        has_mother = any(m in jp_lower for m in cls.MOTHER_MARKERS)
+        has_grandfather = any(m in jp_lower for m in cls.GRANDFATHER_MARKERS)
+        has_grandmother = any(m in jp_lower for m in cls.GRANDMOTHER_MARKERS)
+        has_uncle = any(m in jp_lower for m in cls.UNCLE_MARKERS)
+        has_aunt = any(m in jp_lower for m in cls.AUNT_MARKERS)
 
         if "aniki" in jp_lower or "兄貴" in jp_lower:
             # Sprawdź czy to relacja podwładny-szef czy rodzina
@@ -253,6 +383,24 @@ class WhisperDisambiguator:
         elif has_younger_sis:
             tag.kinship_role = "MLODSZA_SIOSTRA"
             tag.detected_markers.append("K4:MłodszaSiostra")
+        elif has_father:
+            tag.kinship_role = "OJCIEC"
+            tag.detected_markers.append("K4:Ojciec")
+        elif has_mother:
+            tag.kinship_role = "MATKA"
+            tag.detected_markers.append("K4:Matka")
+        elif has_grandfather:
+            tag.kinship_role = "DZIADEK"
+            tag.detected_markers.append("K4:Dziadek")
+        elif has_grandmother:
+            tag.kinship_role = "BABCIA"
+            tag.detected_markers.append("K4:Babcia")
+        elif has_uncle:
+            tag.kinship_role = "WUJ"
+            tag.detected_markers.append("K4:Wuj")
+        elif has_aunt:
+            tag.kinship_role = "CIOTKA"
+            tag.detected_markers.append("K4:Ciotka")
 
         # -------------------------------------------------------------
         # K5: Wektory przysługi i kierunkowość działań
@@ -316,18 +464,38 @@ class WhisperDisambiguator:
             return ""
 
         parts = []
-        if tag.speaker_gender == "MALE":
+        if tag.speaker_age_class == "CHILD_FEMALE":
+            parts.append("Mówca: Mała Dziewczynka (Głos Seiyū / Formy Żeńskie: -łam / Prosty rejestr)")
+        elif tag.speaker_age_class == "CHILD_MALE":
+            parts.append("Mówca: Młody Chłopiec (Głos Seiyū / Formy Męskie: -łem)")
+        elif tag.speaker_age_class == "ELDERLY_FEMALE":
+            parts.append("Mówca: Starsza Kobieta (Głos Seiyū / Formy Żeńskie: -łam)")
+        elif tag.speaker_age_class == "ELDERLY_MALE":
+            parts.append("Mówca: Starszy Mężczyzna (Głos Seiyū / Formy Męskie: -łem)")
+        elif tag.speaker_gender == "MALE":
             parts.append("Mówca: Męski (-łem)")
         elif tag.speaker_gender == "FEMALE":
             parts.append("Mówca: Żeński (-łam)")
 
         if tag.addressee_number == "SINGULAR":
-            if tag.addressee_gender == "MALE":
+            if tag.addressee_age_class == "CHILD":
+                if tag.addressee_gender == "FEMALE":
+                    parts.append("Odbiorca: Mała Dziewczynka (Formy: -łaś / Bezwzględny zakaz 'Pani' / Rejestr: Ty, opiekuńczy)")
+                else:
+                    parts.append("Odbiorca: Mały Chłopiec (Formy: -łeś / Bezwzględny zakaz 'Pan' / Rejestr: Ty, opiekuńczy)")
+            elif tag.addressee_gender == "MALE":
                 parts.append("Odbiorca: Mężczyzna (-łeś/ci)")
             elif tag.addressee_gender == "FEMALE":
                 parts.append("Odbiorca: Kobieta (-łaś/ci)")
             else:
                 parts.append("Odbiorca: 1 osoba (l. poj.: ci/tobie)")
+        elif tag.addressee_number == "DUAL":
+            if tag.addressee_gender == "FEMALE":
+                parts.append("Odbiorca: Dwie Kobiety (L. podwójna: Obie / -łyście)")
+            elif tag.addressee_gender == "MALE":
+                parts.append("Odbiorca: Dwóch Mężczyzn (L. podwójna: Obaj / -liście)")
+            else:
+                parts.append("Odbiorca: Para Mieszana (L. podwójna: Oboje / -liście)")
         elif tag.addressee_number == "PLURAL":
             if tag.addressee_gender == "FEMALE":
                 parts.append("Odbiorca: Grupa Kobiet (-łyście/wam)")
@@ -364,6 +532,8 @@ class WhisperDisambiguator:
             parts.append("Akustyka: Niska pewność/Krzyk")
         if tag.is_hallucination_loop:
             parts.append("Filtr: Artefakt pętli zneutralizowany")
+        if getattr(tag, "is_shock_drop", False):
+            parts.append("Afekt: Załamanie/Szok (Ac=SHOCK_DROP)")
 
         if not parts:
             return ""

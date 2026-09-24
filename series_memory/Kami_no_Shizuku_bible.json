@@ -2,40 +2,42 @@
   "anime_title": "Kami no Shizuku",
   "characters": {
     "Shizuku Kanzaki": {
-      "description": "mężczyzna (20-kilka lat, syn wielkiego krytyka Yutaki Kanzakiego, obdarzony genialną pamięcią sensoryczną pracownik działu win Taiyoh Beer) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "mężczyzna (ok. 26 lat, syn mistrza Yutaki Kanzakiego, początkowo pracownik działu piwa, utalentowany sommelier intuicyjny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]"
     },
     "Miyabi Shinohara": {
-      "description": "kobieta (Młoda sommelierka i współpracowniczka Shizuku w Taiyoh Beer) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "kobieta (ok. 24 lata, sommelierka, wierna asystentka i towarzyszka Shizuku) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Issei Tomine": {
-      "description": "mężczyzna (Młody mistrz krytyki winiarskiej, przybrany syn-rywal Shizuku) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]"
+      "description": "mężczyzna (ok. 28 lat, genialny sommelier o międzynarodowej renomie, adoptowany rywal Shizuku) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Loulan": {
-      "description": "KOBIETA (wyodrębniono z relacji serii)"
+      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Kawarage": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Robert Doi": {
-      "description": "mężczyzna (Postać poboczna) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "mężczyzna (Starszy mężczyzna, przyjaciel Yutaki Kanzakiego, wyznaczony arbiter pojedynku o Apostołów) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Shizuku Kanzaki / Issei Tomine": {
-      "description": "KOBIETA (wyodrębniono z relacji serii)"
+      "description": "postać (Postać)"
     },
     "Honoka Tomine": {
-      "description": "KOBIETA (wyodrębniono z relacji serii)"
+      "description": "postać (Postać)"
     },
     "Chousuke Honma": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Shizuku": {
-      "description": "KOBIETA - mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
+      "source": "quality_gate"
     },
     "Tomine": {
-      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
+      "source": "quality_gate"
     },
     "Mary": {
-      "description": "kobieta (Około 20 lat, córka Hayamy) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "postać (Postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Hayama": {
       "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
@@ -44,43 +46,44 @@
       "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Yutaka Kanzaki": {
-      "description": "mężczyzna (Postać poboczna) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "mężczyzna (Zmarły ojciec Shizuku, światowej sławy krytyk wina) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Sara Tomine": {
-      "description": "kobieta (Postać drugoplanowa) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "postać (Postać)"
     },
     "Kenkichi Kiryu": {
-      "description": "mężczyzna (Postać drugoplanowa) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Tarusuke Kido": {
-      "description": "mężczyzna (Postać drugoplanowa) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Kars": {
-      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
+      "source": "quality_gate"
     },
     "Issei Toomine": {
-      "description": "mężczyzna (Główny bohater) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Główny bohater) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Sara": {
-      "description": "kobieta (Postać poboczna) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "postać (Postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Kirisawa": {
-      "description": "mężczyzna (Postać poboczna) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Issei": {
       "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Shizuku Kanzaki -> Miyabi Shinohara": {
-      "description": "Zwrot: 'na ty / po imieniu: Miyabi-chan' (koleżanka z zespołu / partnerka w poszukiwaniach)"
+      "description": "Zwrot: 'na ty / po imieniu: Miyabi-chan' (koleżanka z zespołu / partnerka w poszukiwaniach) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Miyabi Shinohara -> Shizuku Kanzaki": {
       "description": "Zwrot: 'na ty / Shizuku' (bliscy współpracownicy i partnerzy winiarscy; w dialogach wyłącznie na ty: 'wygrałeś', 'wiesz', kategoryczny zakaz mieszania 'Shizuku' z 'pan') [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Issei Tomine -> Loulan": {
-      "description": "Zwrot: 'po imieniu: Loulan' (przełożony -> asystentka)"
+      "description": "Zwrot: 'po imieniu: Loulan' (przełożony -> asystentka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Loulan -> Issei Tomine": {
-      "description": "Zwrot: 'Issei' (oddana towarzyszka i powierniczka)"
+      "description": "Zwrot: 'Issei' (oddana towarzyszka i powierniczka) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Kawarage -> Shizuku Kanzaki": {
       "description": "Zwrot: 'panie Kanzaki / Kanzaki-kun' (szef działu -> podwładny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
@@ -89,13 +92,13 @@
       "description": "Zwrot: 'panowie / wy / na ty' (arbiter i wykonawca testamentu -> rywalizujący pretendenci)"
     },
     "Issei Tomine -> Honoka Tomine": {
-      "description": "Zwrot: 'matko' (syn -> matka)"
+      "description": "Zwrot: 'matko' (syn -> matka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Honoka Tomine -> Issei Tomine": {
-      "description": "Zwrot: 'po imieniu: Issei' (matka -> syn)"
+      "description": "Zwrot: 'po imieniu: Issei' (matka -> syn) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Shizuku Kanzaki -> Issei Tomine": {
-      "description": "Zwrot: 'Tomine / Issei Tomine' (rywal w walce o spadek)"
+      "description": "Zwrot: 'Tomine / Issei Tomine' (rywal w walce o spadek) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Issei Tomine -> Robert Doi": {
       "description": "Zwrot: 'panie Robert' (sędzia / autorytet winiarski) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
@@ -107,28 +110,54 @@
       "description": "Zwrot: 'Kanzaki' (starszy kolega z działu w Taiyo Beer)"
     },
     "Shizuku -> Tomine": {
-      "description": "Zwrot: 'na ty / Tomine' (rywale w walce o spadek, tymczasowi sojusznicy)"
+      "description": "Zwrot: 'na ty / Tomine' (rywale / bracia z wyboru)"
     },
     "Tomine -> Shizuku": {
-      "description": "Zwrot: 'na ty / Kanzaki' (rywale w konkursie winiarskim)"
+      "description": "Zwrot: 'na ty / Kanzaki' (rywale / bracia z wyboru)"
     },
     "Mary -> Hayama": {
-      "description": "Zwrot: 'tato / tatusiu' (córka -> ojciec)"
+      "description": "Zwrot: 'tato / tatusiu' (córka -> ojciec) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Shizuku -> Hayama": {
-      "description": "Zwrot: 'panie Hayama' (młody gość -> starszy kupiec)"
+      "description": "Zwrot: 'panie Hayama' (młody gość -> starszy kupiec) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Miyabi -> Shizuku": {
-      "description": "Zwrot: 'panie Shizuku / Shizuku-san' (koleżanka z pracy -> przyjaciel)"
+      "description": "Zwrot: 'panie Shizuku / Shizuku' (asystentka -> współpracownik)"
     },
     "Shizuku -> Miyabi": {
-      "description": "Zwrot: 'Miyabi / Miyabi-chan' (przyjaciel -> koleżanka)"
+      "description": "Zwrot: 'Miyabi / Miyabi-chan' (przyjaciel -> koleżanka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Robert Doi -> Shizuku Kanzaki": {
       "description": "Zwrot: 'panowie / wy / na ty' (arbiter i wykonawca testamentu -> rywalizujący pretendenci) [GRUPA MĘŻCZYZN - Wymóg rodzaju męskoosobowego: -liście / byliście gotowi]"
     },
     "Hayama -> Shizuku": {
-      "description": "Zwrot: 'na ty / młodzieńcze' (starszy kupiec -> syn dawnego przyjaciela)"
+      "description": "Zwrot: 'na ty / młodzieńcze' (starszy kupiec -> syn dawnego przyjaciela) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Robert -> Shizuku": {
+      "description": "Zwrot: 'Shizuku' (arbiter / mentor -> zawodnik) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]"
+    },
+    "Robert": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Robert -> Tomine": {
+      "description": "Zwrot: 'Issei' (arbiter / mentor -> zawodnik) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]"
+    },
+    "Loulan -> Tomine": {
+      "description": "Zwrot: 'Issei' (towarzyszka / powiernica)"
+    },
+    "Yutaka": {
+      "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
+      "source": "quality_gate"
+    },
+    "Kiryu": {
+      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Maki": {
+      "description": "MĘŻCZYZNA (zweryfikowano z audio seiyū Whisper)"
+    },
+    "Man": {
+      "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
+      "source": "quality_gate"
     }
   },
   "glossary": {
@@ -149,7 +178,7 @@
     "Syrah / Shiraz": "Syrah",
     "Old Burgundy": "Dojrzałe wino burgundzkie",
     "Eighth Apostle": "Ósmy Apostoł",
-    "Marathon du Médoc": "Marathon du Médoc",
+    "Marathon du Médoc": "Maraton w Médoc",
     "Château Lafite Rothschild": "Château Lafite",
     "Château Latour": "Château Latour",
     "Afterglow / Aftertaste": "Finisz",
@@ -159,30 +188,36 @@
     "Full-bodied": "pełne / o bogatej budowie",
     "vintage": "rocznik",
     "tannins": "taniny",
-    "terroir": "terroir",
-    "sorbet": "sorbet"
+    "sorbet": "sorbet",
+    "Fifth growth": "piąte cru",
+    "Domaine": "posiadłość winiarska",
+    "Château Léoville": "Château Léoville",
+    "Terroir": "terroir"
   },
   "relationships": {
-    "Shizuku Kanzaki -> Miyabi Shinohara": "Zwrot: 'na ty / po imieniu: Miyabi-chan' (koleżanka z zespołu / partnerka w poszukiwaniach)",
+    "Shizuku Kanzaki -> Miyabi Shinohara": "Zwrot: 'na ty / po imieniu: Miyabi-chan' (koleżanka z zespołu / partnerka w poszukiwaniach) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Miyabi Shinohara -> Shizuku Kanzaki": "Zwrot: 'na ty / Shizuku' (bliscy współpracownicy i partnerzy winiarscy; w dialogach wyłącznie na ty: 'wygrałeś', 'wiesz', kategoryczny zakaz mieszania 'Shizuku' z 'pan') [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Issei Tomine -> Loulan": "Zwrot: 'po imieniu: Loulan' (przełożony -> asystentka)",
-    "Loulan -> Issei Tomine": "Zwrot: 'Issei' (oddana towarzyszka i powierniczka)",
+    "Issei Tomine -> Loulan": "Zwrot: 'po imieniu: Loulan' (przełożony -> asystentka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Loulan -> Issei Tomine": "Zwrot: 'Issei' (oddana towarzyszka i powierniczka) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Kawarage -> Shizuku Kanzaki": "Zwrot: 'panie Kanzaki / Kanzaki-kun' (szef działu -> podwładny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Robert Doi -> Shizuku Kanzaki / Issei Tomine": "Zwrot: 'panowie / wy / na ty' (arbiter i wykonawca testamentu -> rywalizujący pretendenci)",
-    "Issei Tomine -> Honoka Tomine": "Zwrot: 'matko' (syn -> matka)",
-    "Honoka Tomine -> Issei Tomine": "Zwrot: 'po imieniu: Issei' (matka -> syn)",
-    "Shizuku Kanzaki -> Issei Tomine": "Zwrot: 'Tomine / Issei Tomine' (rywal w walce o spadek)",
+    "Issei Tomine -> Honoka Tomine": "Zwrot: 'matko' (syn -> matka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Honoka Tomine -> Issei Tomine": "Zwrot: 'po imieniu: Issei' (matka -> syn) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Shizuku Kanzaki -> Issei Tomine": "Zwrot: 'Tomine / Issei Tomine' (rywal w walce o spadek) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Issei Tomine -> Robert Doi": "Zwrot: 'panie Robert' (sędzia / autorytet winiarski) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Issei Tomine -> Shizuku Kanzaki": "Zwrot: 'Kanzaki Shizuku / bracie' (rywale / adoptowani bracia)",
     "Chousuke Honma -> Shizuku Kanzaki": "Zwrot: 'Kanzaki' (starszy kolega z działu w Taiyo Beer)",
-    "Shizuku -> Tomine": "Zwrot: 'na ty / Tomine' (rywale w walce o spadek, tymczasowi sojusznicy)",
-    "Tomine -> Shizuku": "Zwrot: 'na ty / Kanzaki' (rywale w konkursie winiarskim)",
-    "Mary -> Hayama": "Zwrot: 'tato / tatusiu' (córka -> ojciec)",
-    "Shizuku -> Hayama": "Zwrot: 'panie Hayama' (młody gość -> starszy kupiec)",
-    "Miyabi -> Shizuku": "Zwrot: 'panie Shizuku / Shizuku-san' (koleżanka z pracy -> przyjaciel)",
-    "Shizuku -> Miyabi": "Zwrot: 'Miyabi / Miyabi-chan' (przyjaciel -> koleżanka)",
+    "Shizuku -> Tomine": "Zwrot: 'na ty / Tomine' (rywale / bracia z wyboru)",
+    "Tomine -> Shizuku": "Zwrot: 'na ty / Kanzaki' (rywale / bracia z wyboru)",
+    "Mary -> Hayama": "Zwrot: 'tato / tatusiu' (córka -> ojciec) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Shizuku -> Hayama": "Zwrot: 'panie Hayama' (młody gość -> starszy kupiec) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Miyabi -> Shizuku": "Zwrot: 'panie Shizuku / Shizuku' (asystentka -> współpracownik)",
+    "Shizuku -> Miyabi": "Zwrot: 'Miyabi / Miyabi-chan' (przyjaciel -> koleżanka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Robert Doi -> Shizuku Kanzaki": "Zwrot: 'panowie / wy / na ty' (arbiter i wykonawca testamentu -> rywalizujący pretendenci) [GRUPA MĘŻCZYZN - Wymóg rodzaju męskoosobowego: -liście / byliście gotowi]",
-    "Hayama -> Shizuku": "Zwrot: 'na ty / młodzieńcze' (starszy kupiec -> syn dawnego przyjaciela)"
+    "Hayama -> Shizuku": "Zwrot: 'na ty / młodzieńcze' (starszy kupiec -> syn dawnego przyjaciela) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Robert -> Shizuku": "Zwrot: 'Shizuku' (arbiter / mentor -> zawodnik) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Robert -> Tomine": "Zwrot: 'Issei' (arbiter / mentor -> zawodnik) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Loulan -> Tomine": "Zwrot: 'Issei' (towarzyszka / powiernica)"
   },
   "declensions": {
     "Shizuku": {
@@ -193,7 +228,7 @@
       "N": "Shizuku",
       "Ms": "Shizuku",
       "W": "Shizuku",
-      "gender": "FEMALE"
+      "gender": "MALE"
     },
     "Tomine": {
       "M": "Tomine",
@@ -202,7 +237,8 @@
       "B": "Tomine",
       "N": "Tomine",
       "Ms": "Tomine",
-      "W": "Tomine"
+      "W": "Tomine",
+      "gender": "MALE"
     },
     "Mary": {
       "M": "Mary",
@@ -221,7 +257,8 @@
       "B": "Hayamę",
       "N": "Hayamą",
       "Ms": "Hayamie",
-      "W": "Hayamo"
+      "W": "Hayamo",
+      "gender": "MALE"
     },
     "Miyabi": {
       "M": "Miyabi",
@@ -240,7 +277,8 @@
       "B": "Shizuku Kanzaki",
       "N": "Shizuku Kanzaki",
       "Ms": "Shizuku Kanzaki",
-      "W": "Shizuku Kanzaki"
+      "W": "Shizuku Kanzaki",
+      "gender": "MALE"
     },
     "Issei Tomine": {
       "M": "Issei Tomine",
@@ -249,7 +287,8 @@
       "B": "Issei Tomine",
       "N": "Issei Tomine",
       "Ms": "Issei Tomine",
-      "W": "Issei Tomine"
+      "W": "Issei Tomine",
+      "gender": "MALE"
     },
     "Miyabi Shinohara": {
       "M": "Miyabi Shinohara",
@@ -268,7 +307,8 @@
       "B": "Yutakę Kanzaki",
       "N": "Yutaką Kanzaki",
       "Ms": "Yutace Kanzaki",
-      "W": "Yutako Kanzaki"
+      "W": "Yutako Kanzaki",
+      "gender": "MALE"
     },
     "Robert Doi": {
       "M": "Robert Doi",
@@ -277,7 +317,8 @@
       "B": "Roberta Doi",
       "N": "Robertem Doi",
       "Ms": "Robercie Doi",
-      "W": "Robercie Doi"
+      "W": "Robercie Doi",
+      "gender": "MALE"
     },
     "Sara Tomine": {
       "M": "Sara Tomine",
@@ -286,8 +327,7 @@
       "B": "Sarę Tomine",
       "N": "Sarą Tomine",
       "Ms": "Sarze Tomine",
-      "W": "Saro Tomine",
-      "gender": "FEMALE"
+      "W": "Saro Tomine"
     },
     "Kenkichi Kiryu": {
       "M": "Kenkichi Kiryu",
@@ -296,7 +336,8 @@
       "B": "Kenkichi Kiryu",
       "N": "Kenkichi Kiryu",
       "Ms": "Kenkichi Kiryu",
-      "W": "Kenkichi Kiryu"
+      "W": "Kenkichi Kiryu",
+      "gender": "MALE"
     },
     "Tarusuke Kido": {
       "M": "Tarusuke Kido",
@@ -305,7 +346,8 @@
       "B": "Tarusuke Kido",
       "N": "Tarusuke Kido",
       "Ms": "Tarusuke Kido",
-      "W": "Tarusuke Kido"
+      "W": "Tarusuke Kido",
+      "gender": "MALE"
     },
     "Loulan": {
       "M": "Loulan",
@@ -324,7 +366,8 @@
       "B": "Kawarage",
       "N": "Kawarage",
       "Ms": "Kawarage",
-      "W": "Kawarage"
+      "W": "Kawarage",
+      "gender": "MALE"
     },
     "Honoka Tomine": {
       "M": "Honoka Tomine",
@@ -343,7 +386,8 @@
       "B": "Chousuke Honmę",
       "N": "Chousuke Honmą",
       "Ms": "Chousuke Honmie",
-      "W": "Chousuke Honmo"
+      "W": "Chousuke Honmo",
+      "gender": "MALE"
     },
     "Kars": {
       "M": "Kars",
@@ -352,7 +396,8 @@
       "B": "Karsa",
       "N": "Karsem",
       "Ms": "Karsie",
-      "W": "Karsie"
+      "W": "Karsie",
+      "gender": "MALE"
     },
     "Issei Toomine": {
       "M": "Issei Toomine",
@@ -361,7 +406,8 @@
       "B": "Issei Toomine",
       "N": "Issei Toomine",
       "Ms": "Issei Toomine",
-      "W": "Issei Toomine"
+      "W": "Issei Toomine",
+      "gender": "MALE"
     },
     "Sara": {
       "M": "Sara",
@@ -376,11 +422,12 @@
     "Kirisawa": {
       "M": "Kirisawa",
       "D": "Kirisawy",
-      "C": "Kirisawe",
+      "C": "Kirisawie",
       "B": "Kirisawę",
       "N": "Kirisawą",
-      "Ms": "Kirisawe",
-      "W": "Kirisawo"
+      "Ms": "Kirisawie",
+      "W": "Kirisawo",
+      "gender": "MALE"
     },
     "Issei": {
       "M": "Issei",
@@ -389,7 +436,8 @@
       "B": "Issei",
       "N": "Issei",
       "Ms": "Issei",
-      "W": "Issei"
+      "W": "Issei",
+      "gender": "MALE"
     },
     "Shizuku Kanzaki / Issei Tomine": {
       "M": "Shizuku Kanzaki / Issei Tomine",
@@ -408,7 +456,8 @@
       "B": "Shizuku Kanzaki -> Miyabi Shinoharę",
       "N": "Shizuku Kanzaki -> Miyabi Shinoharą",
       "Ms": "Shizuku Kanzaki -> Miyabi Shinoharze",
-      "W": "Shizuku Kanzaki -> Miyabi Shinoharo"
+      "W": "Shizuku Kanzaki -> Miyabi Shinoharo",
+      "gender": "FEMALE"
     },
     "Miyabi Shinohara -> Shizuku Kanzaki": {
       "M": "Miyabi Shinohara -> Shizuku Kanzaki",
@@ -417,7 +466,8 @@
       "B": "Miyabi Shinoharę -> Shizuku Kanzaki",
       "N": "Miyabi Shinoharą -> Shizuku Kanzaki",
       "Ms": "Miyabi Shinoharze -> Shizuku Kanzaki",
-      "W": "Miyabi Shinoharo -> Shizuku Kanzaki"
+      "W": "Miyabi Shinoharo -> Shizuku Kanzaki",
+      "gender": "MALE"
     },
     "Issei Tomine -> Loulan": {
       "M": "Issei Tomine -> Loulan",
@@ -426,7 +476,8 @@
       "B": "Issei Tomine -> Loulana",
       "N": "Issei Tomine -> Loulanem",
       "Ms": "Issei Tomine -> Loulanie",
-      "W": "Issei Tomine -> Loulanie"
+      "W": "Issei Tomine -> Loulanie",
+      "gender": "FEMALE"
     },
     "Loulan -> Issei Tomine": {
       "M": "Loulan -> Issei Tomine",
@@ -435,7 +486,8 @@
       "B": "Loulana -> Issei Tomine",
       "N": "Loulanem -> Issei Tomine",
       "Ms": "Loulanie -> Issei Tomine",
-      "W": "Loulanie -> Issei Tomine"
+      "W": "Loulanie -> Issei Tomine",
+      "gender": "MALE"
     },
     "Kawarage -> Shizuku Kanzaki": {
       "M": "Kawarage -> Shizuku Kanzaki",
@@ -444,7 +496,8 @@
       "B": "Kawarage -> Shizuku Kanzaki",
       "N": "Kawarage -> Shizuku Kanzaki",
       "Ms": "Kawarage -> Shizuku Kanzaki",
-      "W": "Kawarage -> Shizuku Kanzaki"
+      "W": "Kawarage -> Shizuku Kanzaki",
+      "gender": "MALE"
     },
     "Robert Doi -> Shizuku Kanzaki / Issei Tomine": {
       "M": "Robert Doi -> Shizuku Kanzaki / Issei Tomine",
@@ -453,7 +506,8 @@
       "B": "Robert Doi -> Shizuku Kanzaki / Issei Tomine",
       "N": "Robert Doi -> Shizuku Kanzaki / Issei Tomine",
       "Ms": "Robert Doi -> Shizuku Kanzaki / Issei Tomine",
-      "W": "Robert Doi -> Shizuku Kanzaki / Issei Tomine"
+      "W": "Robert Doi -> Shizuku Kanzaki / Issei Tomine",
+      "gender": "MALE"
     },
     "Issei Tomine -> Honoka Tomine": {
       "M": "Issei Tomine -> Honoka Tomine",
@@ -482,7 +536,8 @@
       "B": "Shizuku Kanzaki -> Issei Tomine",
       "N": "Shizuku Kanzaki -> Issei Tomine",
       "Ms": "Shizuku Kanzaki -> Issei Tomine",
-      "W": "Shizuku Kanzaki -> Issei Tomine"
+      "W": "Shizuku Kanzaki -> Issei Tomine",
+      "gender": "MALE"
     },
     "Issei Tomine -> Robert Doi": {
       "M": "Issei Tomine -> Robert Doi",
@@ -491,7 +546,8 @@
       "B": "Issei Tomine -> Roberta Doi",
       "N": "Issei Tomine -> Robertem Doi",
       "Ms": "Issei Tomine -> Robercie Doi",
-      "W": "Issei Tomine -> Robercie Doi"
+      "W": "Issei Tomine -> Robercie Doi",
+      "gender": "MALE"
     },
     "Issei Tomine -> Shizuku Kanzaki": {
       "M": "Issei Tomine -> Shizuku Kanzaki",
@@ -546,7 +602,8 @@
       "B": "Shizuku -> Hayamę",
       "N": "Shizuku -> Hayamą",
       "Ms": "Shizuku -> Hayamie",
-      "W": "Shizuku -> Hayamo"
+      "W": "Shizuku -> Hayamo",
+      "gender": "MALE"
     },
     "Miyabi -> Shizuku": {
       "M": "Miyabi -> Shizuku",
@@ -564,7 +621,8 @@
       "B": "Shizuku -> Miyabi",
       "N": "Shizuku -> Miyabi",
       "Ms": "Shizuku -> Miyabi",
-      "W": "Shizuku -> Miyabi"
+      "W": "Shizuku -> Miyabi",
+      "gender": "FEMALE"
     },
     "Robert Doi -> Shizuku Kanzaki": {
       "M": "Robert Doi -> Shizuku Kanzaki",
@@ -573,7 +631,8 @@
       "B": "Robert Doi -> Shizuku Kanzaki",
       "N": "Robert Doi -> Shizuku Kanzaki",
       "Ms": "Robert Doi -> Shizuku Kanzaki",
-      "W": "Robert Doi -> Shizuku Kanzaki"
+      "W": "Robert Doi -> Shizuku Kanzaki",
+      "gender": "MALE"
     },
     "Hayama -> Shizuku": {
       "M": "Hayama -> Shizuku",
@@ -582,21 +641,82 @@
       "B": "Hayamę -> Shizuku",
       "N": "Hayamą -> Shizuku",
       "Ms": "Hayamie -> Shizuku",
-      "W": "Hayamo -> Shizuku"
+      "W": "Hayamo -> Shizuku",
+      "gender": "MALE"
+    },
+    "Robert": {
+      "M": "Robert",
+      "D": "Roberta",
+      "C": "Robertowi",
+      "B": "Roberta",
+      "N": "Robertem",
+      "Ms": "Robercie",
+      "W": "Robercie",
+      "gender": "MALE"
+    },
+    "Yutaka": {
+      "M": "Yutaka",
+      "D": "Yutaki",
+      "C": "Yutace",
+      "B": "Yutakę",
+      "N": "Yutaką",
+      "Ms": "Yutace",
+      "W": "Yutako",
+      "gender": "MALE"
+    },
+    "Kiryu": {
+      "M": "Kiryu",
+      "D": "Kiryu",
+      "C": "Kiryu",
+      "B": "Kiryu",
+      "N": "Kiryu",
+      "Ms": "Kiryu",
+      "W": "Kiryu",
+      "gender": "MALE"
+    },
+    "Maki": {
+      "M": "Maki",
+      "D": "Maki",
+      "C": "Maki",
+      "B": "Maki",
+      "N": "Maki",
+      "Ms": "Maki",
+      "W": "Maki",
+      "gender": "MALE"
+    },
+    "Man": {
+      "M": "Man",
+      "D": "Mana",
+      "C": "Manowi",
+      "B": "Mana",
+      "N": "Manem",
+      "Ms": "Manie",
+      "W": "Manie",
+      "gender": "MALE"
     }
   },
   "hypocorisms": {},
   "plot_anchors": {
     "Ósmy Apostoł (Eighth Apostle)": "Bezwzględna konsekwencja wielkiej litery i terminu: 'Ósmy Apostoł'.",
     "Karuizawa": "Wspomnienie rozpoznawania wina przez butelkę w Karuizawie musi być przywołane precyzyjnie jako fakt z przeszłości.",
-    "Ósmy Apostoł (Eighth Apostle / Daihachi no Shito)": "Bezwzględnie zachować nazwę 'Ósmy Apostoł'. Zakaz innych wariantów numeracji."
+    "Ósmy Apostoł (Eighth Apostle / Daihachi no Shito)": "Bezwzględnie zachować nazwę 'Ósmy Apostoł'. Zakaz innych wariantów numeracji.",
+    "Eighth Apostle (Ósmy Apostoł)": "Zawsze 'Ósmy Apostoł' wielką literą jako wino z testamentu Yutaki Kanzakiego.",
+    "Médoc Classification of 1855": "Konsekwentnie stosować termin 'Klasyfikacja z 1855 roku' oraz poziomy 'premiers crus' do 'cinquièmes crus' (pierwsze do piątych cru)."
   },
   "episodes_translated": [
     "tmpt2h6cv7l",
     "tmpnioruazt",
     "[ASW] Kami no Shizuku - 21 [1080p HEVC][97442159]",
     "[ASW] Kami no Shizuku - 22 [1080p HEVC][3F4CB067]",
-    "[ASW] Kami no Shizuku - 23 [1080p HEVC][31CBED3E]"
+    "[ASW] Kami no Shizuku - 23 [1080p HEVC][31CBED3E]",
+    "[Erai-raws] Kami no Shizuku - 24 [1080p CR WEB-DL AVC AAC][MultiSub][BB14311D]"
   ],
-  "batch_stats": {}
+  "batch_stats": {
+    "[Erai-raws] Kami no Shizuku - 24 [1080p CR WEB-DL AVC AAC][MultiSub][BB14311D]": {
+      "dialogues": 307,
+      "batches": 15,
+      "avg_batch_size": 20.5,
+      "cost_pln": 3.06
+    }
+  }
 }

@@ -430,7 +430,8 @@
       "B": "Ögedei",
       "N": "Ögedei",
       "Ms": "Ögedei",
-      "W": "Ögedei"
+      "W": "Ögedei",
+      "gender": "MALE"
     },
     "Chagatai / Tolui": {
       "M": "Chagatai / Tolui",
@@ -439,7 +440,8 @@
       "B": "Chagatai / Tolui",
       "N": "Chagatai / Tolui",
       "Ms": "Chagatai / Tolui",
-      "W": "Chagatai / Tolui"
+      "W": "Chagatai / Tolui",
+      "gender": "MALE"
     },
     "Chagatai / Tolui / Chinqai / Temüge": {
       "M": "Chagatai / Tolui / Chinqai / Temüge",
@@ -448,7 +450,8 @@
       "B": "Chagatai / Tolui / Chinqai / Temüge",
       "N": "Chagatai / Tolui / Chinqai / Temüge",
       "Ms": "Chagatai / Tolui / Chinqai / Temüge",
-      "W": "Chagatai / Tolui / Chinqai / Temüge"
+      "W": "Chagatai / Tolui / Chinqai / Temüge",
+      "gender": "MALE"
     },
     "Boraqchin": {
       "M": "Boraqchin",
@@ -477,7 +480,8 @@
       "B": "Gujuka",
       "N": "Gujukiem",
       "Ms": "Gujuku",
-      "W": "Gujuku"
+      "W": "Gujuku",
+      "gender": "MALE"
     },
     "Güyük": {
       "M": "Güyük",
@@ -486,7 +490,8 @@
       "B": "Güyüka",
       "N": "Güyükiem",
       "Ms": "Güyüku",
-      "W": "Güyüku"
+      "W": "Güyüku",
+      "gender": "MALE"
     },
     "Temüge": {
       "M": "Temüge",
@@ -495,7 +500,8 @@
       "B": "Temüge",
       "N": "Temüge",
       "Ms": "Temüge",
-      "W": "Temüge"
+      "W": "Temüge",
+      "gender": "MALE"
     },
     "Otai": {
       "M": "Otai",
@@ -504,7 +510,8 @@
       "B": "Otai",
       "N": "Otai",
       "Ms": "Otai",
-      "W": "Otai"
+      "W": "Otai",
+      "gender": "MALE"
     },
     "Qadaq": {
       "M": "Qadaq",
@@ -513,7 +520,8 @@
       "B": "Qadaqa",
       "N": "Qadaqem",
       "Ms": "Qadaqie",
-      "W": "Qadaqie"
+      "W": "Qadaqie",
+      "gender": "MALE"
     },
     "Sitara": {
       "M": "Sitara",
@@ -532,7 +540,8 @@
       "B": "Dayira",
       "N": "Dayirem",
       "Ms": "Dayirze",
-      "W": "Dayirze"
+      "W": "Dayirze",
+      "gender": "MALE"
     },
     "Khulan": {
       "M": "Khulan",
@@ -561,7 +570,8 @@
       "B": "Chagatai",
       "N": "Chagatai",
       "Ms": "Chagatai",
-      "W": "Chagatai"
+      "W": "Chagatai",
+      "gender": "MALE"
     },
     "Tolui": {
       "M": "Tolui",
@@ -570,7 +580,8 @@
       "B": "Tolui",
       "N": "Tolui",
       "Ms": "Tolui",
-      "W": "Tolui"
+      "W": "Tolui",
+      "gender": "MALE"
     },
     "Hulegu": {
       "M": "Hulegu",
@@ -579,7 +590,8 @@
       "B": "Hulegu",
       "N": "Hulegu",
       "Ms": "Hulegu",
-      "W": "Hulegu"
+      "W": "Hulegu",
+      "gender": "MALE"
     },
     "Sorghaghtani": {
       "M": "Sorghaghtani",
@@ -598,7 +610,8 @@
       "B": "Subutai",
       "N": "Subutai",
       "Ms": "Subutai",
-      "W": "Subutai"
+      "W": "Subutai",
+      "gender": "MALE"
     },
     "Dayir Usun": {
       "M": "Dayir Usun",
@@ -607,7 +620,8 @@
       "B": "Dayira Usuna",
       "N": "Dayirem Usunem",
       "Ms": "Dayirze Usunie",
-      "W": "Dayirze Usunie"
+      "W": "Dayirze Usunie",
+      "gender": "MALE"
     },
     "Chinqai": {
       "M": "Chinqai",
@@ -616,7 +630,8 @@
       "B": "Chinqai",
       "N": "Chinqai",
       "Ms": "Chinqai",
-      "W": "Chinqai"
+      "W": "Chinqai",
+      "gender": "MALE"
     },
     "Fatima": {
       "M": "Fatima",
@@ -635,7 +650,8 @@
       "B": "Shirę",
       "N": "Shirą",
       "Ms": "Shirze",
-      "W": "Shiro"
+      "W": "Shiro",
+      "gender": "MALE"
     },
     "Fatima / Sitara -> Töregene": {
       "M": "Fatima / Sitara -> Töregene",
@@ -701,7 +717,8 @@
       "B": "Temüge -> Otai",
       "N": "Temüge -> Otai",
       "Ms": "Temüge -> Otai",
-      "W": "Temüge -> Otai"
+      "W": "Temüge -> Otai",
+      "gender": "MALE"
     },
     "Qadaq -> Fatima / Sitara": {
       "M": "Qadaq -> Fatima / Sitara",
@@ -769,7 +786,8 @@
       "B": "Chagatai -> Ögedei",
       "N": "Chagatai -> Ögedei",
       "Ms": "Chagatai -> Ögedei",
-      "W": "Chagatai -> Ögedei"
+      "W": "Chagatai -> Ögedei",
+      "gender": "MALE"
     },
     "Tolui -> Ögedei": {
       "M": "Tolui -> Ögedei",
@@ -778,7 +796,8 @@
       "B": "Tolui -> Ögedei",
       "N": "Tolui -> Ögedei",
       "Ms": "Tolui -> Ögedei",
-      "W": "Tolui -> Ögedei"
+      "W": "Tolui -> Ögedei",
+      "gender": "MALE"
     },
     "Sitara -> Boraqchin": {
       "M": "Sitara -> Boraqchin",
@@ -807,7 +826,8 @@
       "B": "Tolui -> Subutai",
       "N": "Tolui -> Subutai",
       "Ms": "Tolui -> Subutai",
-      "W": "Tolui -> Subutai"
+      "W": "Tolui -> Subutai",
+      "gender": "MALE"
     },
     "Boraqchin -> Sitara": {
       "M": "Boraqchin -> Sitara",
@@ -866,7 +886,8 @@
       "B": "Chinqai -> Ögedei",
       "N": "Chinqai -> Ögedei",
       "Ms": "Chinqai -> Ögedei",
-      "W": "Chinqai -> Ögedei"
+      "W": "Chinqai -> Ögedei",
+      "gender": "MALE"
     },
     "Fatima -> Boraqchin": {
       "M": "Fatima -> Boraqchin",
@@ -895,7 +916,8 @@
       "B": "Ögedei -> Tolui",
       "N": "Ögedei -> Tolui",
       "Ms": "Ögedei -> Tolui",
-      "W": "Ögedei -> Tolui"
+      "W": "Ögedei -> Tolui",
+      "gender": "MALE"
     },
     "Sitara -> Shira": {
       "M": "Sitara -> Shira",
@@ -904,7 +926,8 @@
       "B": "Sitarę -> Shirę",
       "N": "Sitarą -> Shirą",
       "Ms": "Sitarze -> Shirze",
-      "W": "Sitaro -> Shiro"
+      "W": "Sitaro -> Shiro",
+      "gender": "MALE"
     },
     "Qadaq -> Güyük": {
       "M": "Qadaq -> Güyük",
@@ -913,7 +936,8 @@
       "B": "Qadaqa -> Güyüka",
       "N": "Qadaqem -> Güyükem",
       "Ms": "Qadaqie -> Güyüku",
-      "W": "Qadaqie -> Güyüku"
+      "W": "Qadaqie -> Güyüku",
+      "gender": "MALE"
     },
     "Sitara -> Sorghaghtani": {
       "M": "Sitara -> Sorghaghtani",
@@ -942,7 +966,8 @@
       "B": "Ilüge",
       "N": "Ilüge",
       "Ms": "Ilüge",
-      "W": "Ilüge"
+      "W": "Ilüge",
+      "gender": "MALE"
     },
     "Ugedej": {
       "M": "Ugedej",
@@ -951,7 +976,8 @@
       "B": "Ugedej",
       "N": "Ugedej",
       "Ms": "Ugedej",
-      "W": "Ugedej"
+      "W": "Ugedej",
+      "gender": "MALE"
     },
     "Ugedej (Ögedei)": {
       "M": "Ugedej (Ögedei)",
@@ -960,7 +986,8 @@
       "B": "Ugedej (Ögedei)a",
       "N": "Ugedej (Ögedei)em",
       "Ms": "Ugedej (Ögedei)ie",
-      "W": "Ugedej (Ögedei)ie"
+      "W": "Ugedej (Ögedei)ie",
+      "gender": "MALE"
     },
     "Gujuk (Güyük)": {
       "M": "Gujuk (Güyük)",
@@ -969,7 +996,8 @@
       "B": "Gujuka (Güyük)a",
       "N": "Gujukiem (Güyük)em",
       "Ms": "Gujuku (Güyük)ie",
-      "W": "Gujuku (Güyük)ie"
+      "W": "Gujuku (Güyük)ie",
+      "gender": "MALE"
     },
     "Sorkaktani": {
       "M": "Sorkaktani",
@@ -988,7 +1016,8 @@
       "B": "Tołuja",
       "N": "Tołujem",
       "Ms": "Tołuju",
-      "W": "Tołuju"
+      "W": "Tołuju",
+      "gender": "MALE"
     },
     "mężczyzna": {
       "M": "mężczyzna",
@@ -997,7 +1026,8 @@
       "B": "mężczyznę",
       "N": "mężczyzną",
       "Ms": "mężczyznie",
-      "W": "mężczyzno"
+      "W": "mężczyzno",
+      "gender": "MALE"
     },
     "Sorghaghtani Beki": {
       "M": "Sorghaghtani Beki",

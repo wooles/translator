@@ -367,7 +367,8 @@
       "B": "Saichi Sugimoto",
       "N": "Saichi Sugimoto",
       "Ms": "Saichi Sugimoto",
-      "W": "Saichi Sugimoto"
+      "W": "Saichi Sugimoto",
+      "gender": "MALE"
     },
     "Asirpa": {
       "M": "Asirpa",
@@ -386,7 +387,8 @@
       "B": "Usami",
       "N": "Usami",
       "Ms": "Usami",
-      "W": "Usami"
+      "W": "Usami",
+      "gender": "MALE"
     },
     "Kadokura": {
       "M": "Kadokura",
@@ -395,7 +397,8 @@
       "B": "Kadokurę",
       "N": "Kadokurą",
       "Ms": "Kadokurze",
-      "W": "Kadokuro"
+      "W": "Kadokuro",
+      "gender": "MALE"
     },
     "Tsukishima": {
       "M": "Tsukishima",
@@ -404,7 +407,8 @@
       "B": "Tsukishimę",
       "N": "Tsukishimą",
       "Ms": "Tsukishimie",
-      "W": "Tsukishimo"
+      "W": "Tsukishimo",
+      "gender": "MALE"
     },
     "Koito": {
       "M": "Koito",
@@ -413,7 +417,8 @@
       "B": "Koito",
       "N": "Koito",
       "Ms": "Koito",
-      "W": "Koito"
+      "W": "Koito",
+      "gender": "MALE"
     },
     "Kikuta": {
       "M": "Kikuta",
@@ -422,7 +427,8 @@
       "B": "Kikutę",
       "N": "Kikutą",
       "Ms": "Kikucie",
-      "W": "Kikuto"
+      "W": "Kikuto",
+      "gender": "MALE"
     },
     "Kirawus": {
       "M": "Kirawus",
@@ -441,7 +447,8 @@
       "B": "Tsurumi",
       "N": "Tsurumi",
       "Ms": "Tsurumi",
-      "W": "Tsurumi"
+      "W": "Tsurumi",
+      "gender": "MALE"
     },
     "Sugimoto": {
       "M": "Sugimoto",
@@ -450,7 +457,8 @@
       "B": "Sugimoto",
       "N": "Sugimoto",
       "Ms": "Sugimoto",
-      "W": "Sugimoto"
+      "W": "Sugimoto",
+      "gender": "MALE"
     },
     "Shiraishi": {
       "M": "Shiraishi",
@@ -459,7 +467,8 @@
       "B": "Shiraishi",
       "N": "Shiraishi",
       "Ms": "Shiraishi",
-      "W": "Shiraishi"
+      "W": "Shiraishi",
+      "gender": "MALE"
     },
     "Botaro": {
       "M": "Botaro",
@@ -468,7 +477,8 @@
       "B": "Botaro",
       "N": "Botaro",
       "Ms": "Botaro",
-      "W": "Botaro"
+      "W": "Botaro",
+      "gender": "MALE"
     },
     "Podwładni": {
       "M": "Podwładni",
@@ -477,7 +487,8 @@
       "B": "Podwładni",
       "N": "Podwładni",
       "Ms": "Podwładni",
-      "W": "Podwładni"
+      "W": "Podwładni",
+      "gender": "MALE"
     },
     "Sofia": {
       "M": "Sofia",
@@ -496,7 +507,8 @@
       "B": "Ariko",
       "N": "Ariko",
       "Ms": "Ariko",
-      "W": "Ariko"
+      "W": "Ariko",
+      "gender": "MALE"
     },
     "Kikuta Mokutarou": {
       "M": "Kikuta Mokutarou",
@@ -505,7 +517,8 @@
       "B": "Kikutę Mokutarou",
       "N": "Kikutą Mokutarou",
       "Ms": "Kikucie Mokutarou",
-      "W": "Kikuto Mokutarou"
+      "W": "Kikuto Mokutarou",
+      "gender": "MALE"
     },
     "Kaneko Kaeko": {
       "M": "Kaneko Kaeko",
@@ -524,7 +537,8 @@
       "B": "Tokushirou Tsurumi",
       "N": "Tokushirou Tsurumi",
       "Ms": "Tokushirou Tsurumi",
-      "W": "Tokushirou Tsurumi"
+      "W": "Tokushirou Tsurumi",
+      "gender": "MALE"
     },
     "Hidenobu Okuda": {
       "M": "Hidenobu Okuda",
@@ -533,7 +547,8 @@
       "B": "Hidenobu Okudę",
       "N": "Hidenobu Okudą",
       "Ms": "Hidenobu Okudzie",
-      "W": "Hidenobu Okudo"
+      "W": "Hidenobu Okudo",
+      "gender": "MALE"
     },
     "Shinpachi Nagakura": {
       "M": "Shinpachi Nagakura",
@@ -542,7 +557,8 @@
       "B": "Shinpachi Nagakurę",
       "N": "Shinpachi Nagakurą",
       "Ms": "Shinpachi Nagakurze",
-      "W": "Shinpachi Nagakuro"
+      "W": "Shinpachi Nagakuro",
+      "gender": "MALE"
     },
     "Tatsuma Ushiyama": {
       "M": "Tatsuma Ushiyama",
@@ -551,7 +567,8 @@
       "B": "Tatsumę Ushiyamę",
       "N": "Tatsumą Ushiyamą",
       "Ms": "Tatsumie Ushiyamie",
-      "W": "Tatsumo Ushiyamo"
+      "W": "Tatsumo Ushiyamo",
+      "gender": "MALE"
     },
     "Hijikata": {
       "M": "Hijikata",
@@ -560,7 +577,8 @@
       "B": "Hijikatę",
       "N": "Hijikatą",
       "Ms": "Hijikacie",
-      "W": "Hijikato"
+      "W": "Hijikato",
+      "gender": "MALE"
     },
     "Nagakura": {
       "M": "Nagakura",
@@ -569,7 +587,8 @@
       "B": "Nagakurę",
       "N": "Nagakurą",
       "Ms": "Nagakurze",
-      "W": "Nagakuro"
+      "W": "Nagakuro",
+      "gender": "MALE"
     },
     "Otonoshin Koito": {
       "M": "Otonoshin Koito",
@@ -578,7 +597,8 @@
       "B": "Otonoshina Koito",
       "N": "Otonoshinem Koito",
       "Ms": "Otonoshinie Koito",
-      "W": "Otonoshinie Koito"
+      "W": "Otonoshinie Koito",
+      "gender": "MALE"
     },
     "Toshizou Hijikata": {
       "M": "Toshizou Hijikata",
@@ -587,7 +607,8 @@
       "B": "Toshizou Hijikatę",
       "N": "Toshizou Hijikatą",
       "Ms": "Toshizou Hijikacie",
-      "W": "Toshizou Hijikato"
+      "W": "Toshizou Hijikato",
+      "gender": "MALE"
     },
     "Tanigaki Genjiro": {
       "M": "Tanigaki Genjiro",
@@ -596,7 +617,8 @@
       "B": "Tanigaki Genjiro",
       "N": "Tanigaki Genjiro",
       "Ms": "Tanigaki Genjiro",
-      "W": "Tanigaki Genjiro"
+      "W": "Tanigaki Genjiro",
+      "gender": "MALE"
     },
     "Tokishige Usami": {
       "M": "Tokishige Usami",
@@ -605,7 +627,8 @@
       "B": "Tokishige Usami",
       "N": "Tokishige Usami",
       "Ms": "Tokishige Usami",
-      "W": "Tokishige Usami"
+      "W": "Tokishige Usami",
+      "gender": "MALE"
     },
     "Hajime Tsukishima": {
       "M": "Hajime Tsukishima",
@@ -614,7 +637,8 @@
       "B": "Hajime Tsukishimę",
       "N": "Hajime Tsukishimą",
       "Ms": "Hajime Tsukishimie",
-      "W": "Hajime Tsukishimo"
+      "W": "Hajime Tsukishimo",
+      "gender": "MALE"
     },
     "Yoshitake Shiraishi": {
       "M": "Yoshitake Shiraishi",
@@ -623,7 +647,8 @@
       "B": "Yoshitake Shiraishi",
       "N": "Yoshitake Shiraishi",
       "Ms": "Yoshitake Shiraishi",
-      "W": "Yoshitake Shiraishi"
+      "W": "Yoshitake Shiraishi",
+      "gender": "MALE"
     },
     "Fusataro Oosawa": {
       "M": "Fusataro Oosawa",
@@ -632,7 +657,8 @@
       "B": "Fusataro Oosawę",
       "N": "Fusataro Oosawą",
       "Ms": "Fusataro Oosawe",
-      "W": "Fusataro Oosawo"
+      "W": "Fusataro Oosawo",
+      "gender": "MALE"
     },
     "Nikaido": {
       "M": "Nikaido",
@@ -641,7 +667,8 @@
       "B": "Nikaido",
       "N": "Nikaido",
       "Ms": "Nikaido",
-      "W": "Nikaido"
+      "W": "Nikaido",
+      "gender": "MALE"
     },
     "Kaeko": {
       "M": "Kaeko",
@@ -660,7 +687,8 @@
       "B": "Okudę",
       "N": "Okudą",
       "Ms": "Okudzie",
-      "W": "Okudo"
+      "W": "Okudo",
+      "gender": "MALE"
     },
     "Saichi Sugimoto -> Asirpa": {
       "M": "Saichi Sugimoto -> Asirpa",

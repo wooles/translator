@@ -87,7 +87,8 @@
       "B": "Wataru Sajou",
       "N": "Wataru Sajou",
       "Ms": "Wataru Sajou",
-      "W": "Wataru Sajou"
+      "W": "Wataru Sajou",
+      "gender": "MALE"
     },
     "Aika Natsukawa": {
       "M": "Aika Natsukawa",
@@ -136,7 +137,8 @@
       "B": "Kei Shinomiyę",
       "N": "Kei Shinomiyą",
       "Ms": "Kei Shinomiye",
-      "W": "Kei Shinomiyo"
+      "W": "Kei Shinomiyo",
+      "gender": "MALE"
     },
     "Rin Ichinose": {
       "M": "Rin Ichinose",
@@ -165,7 +167,8 @@
       "B": "Hayato Ichinose",
       "N": "Hayato Ichinose",
       "Ms": "Hayato Ichinose",
-      "W": "Hayato Ichinose"
+      "W": "Hayato Ichinose",
+      "gender": "MALE"
     },
     "Yuyu Inatomi": {
       "M": "Yuyu Inatomi",
@@ -184,7 +187,8 @@
       "B": "Yamazaki",
       "N": "Yamazaki",
       "Ms": "Yamazaki",
-      "W": "Yamazaki"
+      "W": "Yamazaki",
+      "gender": "MALE"
     },
     "Wataru Sajou -> Aika Natsukawa": {
       "M": "Wataru Sajou -> Aika Natsukawa",

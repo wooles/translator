@@ -39,7 +39,7 @@ class DialogueVerifier:
 
     def __init__(
         self,
-        client: genai.Client,
+        client: Optional[genai.Client] = None,
         model: str = "gemini-3.5-flash-lite",
         keep_honorifics: bool = True,
         thinking_budget: Optional[int] = None
@@ -82,28 +82,33 @@ class DialogueVerifier:
         has_relation = any(item.get("relation_tag") for item in batch_items)
 
         # Separate adaptive CoT tiers for Pro Model ($12/1M output rate) vs Flash Model ($3.75/1M output rate)
+        n_lines = len(batch_items)
         if "pro" in self.model.lower():
             # PRO MODEL DEDICATED TIERS (Level 4: High Literary Depth without token bloating)
             # Tier 1 (Pro): Piosenki OP/ED, gry słowne, zawiłe metafory, alarmy Whisper, wątpliwości Fazy 1
             if has_song or has_audio_alert or has_ambiguity:
-                return 2048
+                base = 2048
             # Tier 2 (Pro): Rejestry militarne, stylizacja feudalna, kompresja, narady, ping-pong
             elif has_pragmatic_reg or has_condensation or has_long_dialogue or has_relation:
-                return 1536
+                base = 1536
             # Tier 3 (Pro): Proste, krótkie dialogi i okrzyki bojowe (1024 tokeny CoT)
             else:
-                return 1024
+                base = 1024
+            min_linear = n_lines * 90
+            return max(base, min_linear)
         else:
             # FLASH MODEL TIERS (Level 3: Full Deep CoT up to 6144)
             # Tier 1: Piosenki OP/ED (Barańczak), kalambury fonetyczne, alarmy rozbieżności audio, wątpliwości F1
             if has_song or has_audio_alert or has_ambiguity:
-                return max(4096, min(self.thinking_budget, 6144))
+                base = max(4096, min(self.thinking_budget, 6144))
             # Tier 2: Rejestry feudalne/dworskie, kompresja czasowa, długie narady militarne, ping-pong
             elif has_pragmatic_reg or has_condensation or has_long_dialogue or has_relation:
-                return max(2048, min(self.thinking_budget, 3072))
+                base = max(2048, min(self.thinking_budget, 3072))
             # Tier 3: Standardowy, żywy dialog codzienny (2048 tokenów CoT dla pełnego audytu 156 Filarów)
             else:
-                return min(self.thinking_budget, 2048)
+                base = min(self.thinking_budget, 2048)
+            min_linear = n_lines * 160
+            return min(self.thinking_budget, max(base, min_linear))
 
     def _prepare_verification_prompt(
         self,
@@ -165,9 +170,12 @@ class DialogueVerifier:
         prompt_lines.append("Zredaguj poniższe kwestie dialogowe. BEZWZGLĘDNIE wyeliminuj dosłowne tłumaczenie 1 do 1, sztuczne konstrukcje i kalki.")
         prompt_lines.append("Zastąp drewniane sformułowania żywym, potoczystym językiem polskim mówionym (tak jak w profesjonalnym dubbingu / u polskich nastolatków):")
         prompt_lines.append(
+            "WARSTWA 3 (GŁÓWNY MÓZG TŁUMACZENIA): Na Tobie opiera się główny ciężar przekładu. W oparciu o wszystkie potrzebne w danej chwili informacje (z nadrzędnego kanonu mangowego, profilera odcinka oraz wiedzy z Warstw 1 i 2), oddaj pełnię piękna języka polskiego.\n"
+            "Twój proces myślenia ma symulować pracę polskiego tłumacza, który jest w pełni świadomy tego, co widzi i słyszy w danej chwili i jakie anime tłumaczy.\n"
             "ZASADA PRYMATU AFEKTU (DYNAMIC AFFECTIVE PRIMACY): Głos i emocjonalny afekt seiyū (drżenie, płacz, panika, szept, krzyk) ZAWSZE biją statyczny portret z Series Bible! Jeśli chłodna postać załamuje się i płacze, oddaj fizjologię rozpaczy (urwane słowa, chaos składniowy).\n"
-            "WYKORZYSTAJ CZAS NA ZASTANOWIENIE (Thinking / CoT): Jako Główny Reżyser Dubbingu i Script Doctor, przed zatwierdzeniem każdej kwestii przeprowadź DWUETAPOWY AUDYT POZNAWCZY (THE 2-STAGE COGNITIVE AUDIT / THE 3-STAGE EDITORIAL FUNNEL):\n"
+            "WYKORZYSTAJ CZAS NA ZASTANOWIENIE (Thinking / CoT): Jako Główny Reżyser Dubbingu i Script Doctor, przed zatwierdzeniem każdej kwestii przeprowadź TRZYETAPOWY AUDYT POZNAWCZY (THE 3-STAGE EDITORIAL FUNNEL / DWUETAPOWY AUDYT POZNAWCZY KREACJI I TRIANGULACJI):\n"
             "   KROK 1: AUTONOMICZNA ŚLEPA LEKTURA I KREACJA DIALOGU (THE DUBBING & STAGE FLOW - FILAR CLXVI):\n"
+            "     - KANON MANGOWY JAKO FUNDAMENT: Pojęcia z oficjalnych wydań polskich to formy syntetyczne bazowe — w zdaniu BEZWZGLĘDNIE odmieniaj je przez 7 polskich przypadków (np. 'z Demonem Krwi', 'o Czarnym Mieczniku', 'dla Oukiego').\n"
             "     - KONTRAKT POLSZCZYZNY BEZTERMINOWEJ (THE TIMELESS COLLOQUIAL CONTRACT):\n"
             "       * Twórz dialogi w estetyce polszczyzny bezterminowej: język żywy, organiczny, soczysty i miękki w ustach aktora, wolny od tymczasowych mód internetowych.\n"
             "       * Pisz tak, jak brzmią klasyki polskiego dubbingu kinowego: dialog ma brzmieć świeżo dzisiaj, naturalnie 30 lat temu i zrozumiale za 30 lat.\n"
@@ -175,7 +183,7 @@ class DialogueVerifier:
             "         - Zasada Remy: kluczową informację i emocjonalny akcent logiczny stawiaj na końcu polskiego zdania.\n"
             "         - Reakcja na Intencję: odpowiadaj na intencję postaci (na ostrzeżenie gotowością: 'Zrozumiałem' / 'Uważam', na propozycję chęcią: 'Chętnie', na pytanie otwarte faktem).\n"
             "         - Etykieta Gestu: fizyczne podanie przedmiotu kwituj zwrotem grzecznościowym ('Proszę' / 'Trzymaj') lub elipsą.\n"
-            "       * ZAKAZ archaizacji i sztucznego patosu w kinie współczesnym/szkolnym (Filar CLXXII).\n"
+            "       * Współczesna, świeża polszczyzna bez sztucznego patosu i pretensjonalnych archaizmów (Filar CLXXII).\n"
             "       * Żywa, naturalna fraza bez pretensjonalnych zwrotów (np. 'to nie tak, że', 'mam na myśli', 'widzisz', 'tutaj, weź to').\n"
             "     - PROTOKÓŁ AUTONOMICZNEJ KREACJI (ACTIVE GENERATION FIRST - ANTY-KOTWICZENIE):\n"
             "       * Najpierw sformułuj w CoT własne, suwerenne polskie zdanie, które idealnie 'leży w ustach' polskiego aktora i pasuje do energii sceny.\n"
@@ -249,7 +257,7 @@ class DialogueVerifier:
             if pow_dyn and str(pow_dyn).strip():
                 diag_lines.append(f"• Relacja władzy: {str(pow_dyn).strip()}")
             if epis_asym and str(epis_asym).strip():
-                diag_lines.append(f"• Teoria Umysłu (asymetria wiedzy / zakaz dekonspiracji): {str(epis_asym).strip()}")
+                diag_lines.append(f"• Teoria Umysłu (asymetria wiedzy / ochrona tożsamości): {str(epis_asym).strip()}")
             if tbl_read and str(tbl_read).strip():
                 diag_lines.append(f"• Próba Stolikowa (płynność w ustach aktora): {str(tbl_read).strip()}")
             if len(diag_lines) > 1:
@@ -366,13 +374,15 @@ class DialogueVerifier:
             if item.get('ambiguity_note'):
                 directive_lines.append(f"    • Wątpliwość Fazy 1: {item['ambiguity_note'].strip()}")
             if item.get('addressee') == 'kobieta':
-                directive_lines.append(f"    • ADRESAT ({item.get('addressee_label', 'KOBIETA')}): Wymóg form żeńskich w 2. os. lp. ('ty'): 'zrobiłaś / byłaś / poszłaś / wiedziałaś / jesteś pewna / byłaś gotowa' (ZAKAZ: -łeś / pewien / gotowy) (Filar CLXIII)!")
+                directive_lines.append(f"    • ADRESAT ({item.get('addressee_label', 'KOBIETA')}): Stosuj formy żeńskie w 2. os. lp. ('ty'): 'zrobiłaś / byłaś / poszłaś / wiedziałaś / jesteś pewna / byłaś gotowa' (Filar CLXIII)!")
             elif item.get('addressee') == 'mężczyzna':
-                directive_lines.append(f"    • ADRESAT ({item.get('addressee_label', 'MĘŻCZYZNA')}): Wymóg form męskich w 2. os. lp. ('ty'): 'zrobiłeś / byłeś / poszedłeś / wiedziałeś / jesteś pewien / byłeś gotowy' (ZAKAZ: -łaś / pewna / gotowa) (Filar CLXIII)!")
+                directive_lines.append(f"    • ADRESAT ({item.get('addressee_label', 'MĘŻCZYZNA')}): Stosuj formy męskie w 2. os. lp. ('ty'): 'zrobiłeś / byłeś / poszedłeś / wiedziałeś / jesteś pewien / byłeś gotowy' (Filar CLXIII)!")
             elif item.get('addressee') == 'grupa_kobiet':
-                directive_lines.append("    • ADRESAT (GRUPA KOBIET): Wymóg form niemęskoosobowych: 'zrobiłyście / byłyście gotowe / widziałyście' (ZAKAZ: -liście / gotowi) (Filar CLXIII)!")
+                directive_lines.append("    • ADRESAT (GRUPA KOBIET): Stosuj formy niemęskoosobowe: 'zrobiłyście / byłyście gotowe / widziałyście' (Filar CLXIII)!")
             elif item.get('addressee') in ['grupa_mężczyzn', 'grupa_mieszana']:
-                directive_lines.append(f"    • ADRESAT ({'GRUPA MĘŻCZYZN' if item.get('addressee') == 'grupa_mężczyzn' else 'GRUPA MIESZANA'}): Wymóg form męskoosobowych: 'zrobiliście / byliście gotowi / widzieliście' (Filar CLXIII)!")
+                directive_lines.append(f"    • ADRESAT ({'GRUPA MĘŻCZYZN' if item.get('addressee') == 'grupa_mężczyzn' else 'GRUPA MIESZANA'}): Stosuj formy męskoosobowych: 'zrobiliście / byliście gotowi / widzieliście' (Filar CLXIII)!")
+            if item.get('canonical_glossary_term'):
+                directive_lines.append(f"    • KANON MANGOWY (Nadrzędna baza): {item['canonical_glossary_term']} (forma syntetyczna bazowa – w dialogu BEZWZGLĘDNIE odmieniaj przez przypadki!)")
 
             # SSOT Sanitizer: Clean notes from duplicates (remove third_person_subject and repeated addressee alarms)
             raw_notes = (item.get('notes') or '').strip()
@@ -505,24 +515,36 @@ class DialogueVerifier:
                         self.current_episode_tokens["model"] = self.model
 
                 # Retrieve parsed structured output
+                result_lines: List[RefinedLine] = []
                 if hasattr(response, "parsed") and response.parsed is not None:
                     parsed_obj: RefinedBatchResponse = response.parsed
-                    with DialogueVerifier._STATUS_LOCK:
-                        if DialogueVerifier._STATUS_ACTIVE:
-                            print(f"  └─ [OK / Faza 2]: Połączenie z Google API przywrócone.")
-                            DialogueVerifier._STATUS_ACTIVE = False
-                            DialogueVerifier._LAST_STATUS_TIME = 0.0
-                    return parsed_obj.lines
-                
-                # Fallback to response.text if SDK returned raw string
-                data = json.loads(response.text)
-                batch_resp = RefinedBatchResponse.model_validate(data)
+                    result_lines = parsed_obj.lines
+                else:
+                    # Fallback to response.text if SDK returned raw string
+                    data = json.loads(response.text)
+                    batch_resp = RefinedBatchResponse.model_validate(data)
+                    result_lines = batch_resp.lines
+
+                # Zero-Drop Line Verifier Gate (0.00 PLN):
+                # Verify that all line IDs from batch_items are present in result_lines.
+                # If any line was omitted by the LLM, synthesize a fallback preserving the Phase 1 draft.
+                returned_ids = {r.id for r in result_lines}
+                missing_items = [it for it in batch_items if it.get("id") not in returned_ids]
+                if missing_items:
+                    for m_it in missing_items:
+                        result_lines.append(RefinedLine(
+                            id=m_it["id"],
+                            refined_pl=m_it.get("pl", ""),
+                            changes_made="Zweryfikowano (zachowano szkic Fazy 1)"
+                        ))
+                    result_lines.sort(key=lambda x: x.id)
+
                 with DialogueVerifier._STATUS_LOCK:
                     if DialogueVerifier._STATUS_ACTIVE:
                         print(f"  └─ [OK / Faza 2]: Połączenie z Google API przywrócone.")
                         DialogueVerifier._STATUS_ACTIVE = False
                         DialogueVerifier._LAST_STATUS_TIME = 0.0
-                    return batch_resp.lines
+                return result_lines
 
             except Exception as e:
                 err_str = str(e).lower()

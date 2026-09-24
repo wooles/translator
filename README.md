@@ -4,12 +4,12 @@
 [![Google GenAI SDK](https://img.shields.io/badge/LLM%20Orchestration-Gemini%202.5%20Flash%20%7C%202.5%20Pro-orange.svg)](https://ai.google.dev/)
 [![Acoustic Ingestion](https://img.shields.io/badge/Acoustic%20ASR-Kotoba--Whisper%20v2.0%20CTranslate2-green.svg)](https://huggingface.co/kotoba-tech/kotoba-whisper-v2.0-faster)
 [![Architecture](https://img.shields.io/badge/Architecture-5--Layer%20Root%20Cause%20Pipeline-purple.svg)]()
-[![CI/Test Suite](https://img.shields.io/badge/Test%20Harness-98%2F98%20Passing-brightgreen.svg)]()
+[![CI/Test Suite](https://img.shields.io/badge/Test%20Harness-125%2F125%20Passing-brightgreen.svg)]()
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 An asynchronous, multimodal audiovisual translation and localization engine engineered in Python. It executes high-fidelity semantic translation from Japanese audio streams, video keyframes, and intermediate dialogue representations into target Polish dialogue scripts, strictly adhering to cinematographic subtitling standards (Belczyk AVT Matrix, Skopos Theory, Polysystem Theory, and Netflix AVT Timed Text Guidelines).
 
-The engine integrates **Large Multimodal Models (LMMs)** via structured schema decoding, **fine-tuned Japanese ASR acoustic grounding (Kotoba-Whisper v2.0 CTranslate2)** with $F_0$ fundamental frequency pitch and prosodic contour extraction, **FFmpeg temporal and visual telemetry** (I-frame snapping, Fade to Black boundary isolation, native silence detection), **computer-vision spatial OCR & Pixel-Perfect Typesetting (Grounding 2D)**, a **176-Pillar AVT Constraint Solver**, **Profiler 4.0 Pre-Computation**, **Cross-Episode Series Memory (SQLite FTS5 BM25)** with a **7-Case Foreign Name Declension Matrix**, and an **Episode Quality Gate (0.00 PLN)** offline post-processing safety net.
+The engine integrates **Large Multimodal Models (LMMs)** via structured schema decoding, **fine-tuned Japanese ASR acoustic grounding (Kotoba-Whisper v2.0 CTranslate2)** with $F_0$ fundamental frequency pitch and prosodic contour extraction, **FFmpeg temporal and visual telemetry** (I-frame snapping, Fade to Black boundary isolation, native silence detection), **computer-vision spatial OCR & Pixel-Perfect Typesetting (Grounding 2D)**, a **186-Pillar AVT Constraint Solver**, **Profiler 4.0 Pre-Computation**, **Cross-Episode Series Memory (SQLite FTS5 BM25)** with an **Exhaustive 7-Case Foreign and Head Noun Declension Matrix (180+ matrices, Zasada 15)**, an **Exhaustive 1000+ Entry Lexical & Non-Verb Shield**, and an **Episode Quality Gate (0.00 PLN)** offline post-processing safety net.
 
 ---
 
@@ -98,8 +98,8 @@ To eliminate attention drift across long video sequences, the pre-pass engine pe
 * **Speaker Entity Identity & Collective Concordance Shield (Filar CLXXVI):** Isolates speaker entity types (`COLLECTIVE_VIRILE`, `MAJESTIC_FEMALE`, `INDIVIDUAL`). Shields multi-entity characters manifesting as a single speaker (e.g. *Louis Arneb* representing the masculine/mixed Gluttony Trinity in *Re:Zero S4*) from erroneous feminization in female-only duels, and enforces non-virile *Pluralis Maiestatis* for female monarchs in mixed courts.
 
 ### 6. Dynamic Attention Dispatcher & LLM Unburdening
-* **Dynamic Attention Spotlight (`get_focused_rules_for_batch`):** Out of 176+ codified pillars, dynamically selects **at most 3 high-priority pillars** per batch based on real-time scene parameters (CPS speed, interrogatives, typesetting, group address).
-* **Tier 10 Offloading:** Mechanical grammatical rules (such as plural agreement and collective concordances) are offloaded to low-priority background tiers (Tier 10) and positive craft priming, keeping Gemini attention unburdened and reserving token capacity for AVT dialogue transcreation.
+* **Dynamic Attention Spotlight (`get_focused_rules_for_batch`):** Out of 186+ codified pillars, dynamically selects **at most 3 high-priority pillars** per batch based on real-time scene parameters (CPS speed, interrogatives, typesetting, group address).
+* **Tier 10 Offloading:** Mechanical grammatical rules (such as plural agreement, prepositional governance, and collective concordances) are offloaded to low-priority background tiers (Tier 10) and deterministically solved offline, keeping Gemini attention unburdened and reserving token capacity for authentic AVT dialogue transcreation.
 * **Compact Line-Level SSOT Header (`format_compact_ssot_tag`):** Replaces verbose instructions with a single standardized metadata string (`[SSOT: Spk=... G=... Addr=... Ac=...]`), freeing model attention and eliminating prompt bloat.
 
 ### 7. Exception-Driven Architecture & Conflict Shields
@@ -109,8 +109,8 @@ To eliminate attention drift across long video sequences, the pre-pass engine pe
 * **T-V Invariance & Honorific Vocative Shield (Filar CLVII):** Prevents formal address contamination (*Pan/Pani*) in intimate scenes where characters converse on first-name informal terms (*ty*).
 * **Typo Shield & Lexical Integrity (Filar CLXIV):** Enforces 100% lexical hygiene, eliminating keyboard artifacts and non-existent phonetic distortions (*„spyham”* ❌ → *„spytam”* ✅, *„wziąść”* ❌ → *„wziąć”* ✅).
 
-### 8. Deterministic 176-Pillar AVT Canon
-A comprehensive constraint solver implementing cinematographic subtitling theory across 7 major domains:
+### 8. Deterministic 186-Pillar AVT Canon
+A comprehensive constraint solver implementing cinematographic subtitling theory across 8 major domains:
 * **Domain I (Morphosyntax & Flexibility):** De-nominalization, verb-centric phrasing, pronoun stripping, topic-comment structuring.
 * **Domain II (Semiotics & Temporal Pacing):** Cinematographic shot-cut synchronization, semiotics of silence (*Ma*), strict Characters-Per-Second (CPS $\le 17$) enforcement.
 * **Domain III (Realia & Historical Registers):** Feudal titular hierarchies, archaic speech, publisher canon invariance.
@@ -118,6 +118,7 @@ A comprehensive constraint solver implementing cinematographic subtitling theory
 * **Domain V (Paralinguistics & Phonetics):** Isomorphic vowel elongation (*Chōon* mapping), prosodic continuity across sentence breaks.
 * **Domain VI (Transcreation, Idiolects & Song Metre):** Polish 7-case noun declension, Stanisław Barańczak syllabic song/rhyme transcreation (**Pillar CXVIII**), Character Idiolect Matrix (**Pillar CXIX**), and Blind Native Polish Critic fluency validation.
 * **Domain VII (Temporal Discontinuity, Acoustic Primacy & Collective Entities):** Spatiotemporal shifts, anti-pivot cliches, acoustic primacy over contaminated fansub metadata (**Pillar CLXXIV**), 1st-person plural feminine group concordance (**Pillar CLXXV**), and speaker entity identity / collective concordance shields (**Pillar CLXXVI**).
+* **Domain VIII (Pragmatic Decoupling, Motion Deictics & Dyadic Concordance):** Pronominal decoupling & inalienable somatics (**Pillar CLXXVII**), affective inertia reset (**Pillar CLXXVIII**), adjacency pairs & verbal ellipsis (**Pillar CLXXIX**), motion deictic vectors (**Pillar CLXXX**), image coexistence & sensory pleonasms (**Pillar CLXXXI**), and dyadic addressee gender & number concordance across all Polish prepositions (**Pillar CLXXXVI & Zasada 15**).
 
 ### 9. 4-Tier Authority Glossary Hierarchy
 Terminology is resolved deterministically through a strict 4-tier hierarchy:
@@ -134,8 +135,12 @@ Terminology is resolved deterministically through a strict 4-tier hierarchy:
 
 ### 11. Episode Quality Gate (0.00 PLN Full-Timeline Post-Pass)
 Operates on the entire `.ass` subtitle timeline after translation completes, executing deterministic corrections at zero extra API cost:
-* Complete enforcement of the 4-tier glossary and 7-case foreign name declensions (Filar XCI).
-* 2nd-person singular and plural addressee verb and adjective gender agreement (Filar CLXIII).
+* Complete enforcement of the 4-tier glossary and 7-case foreign and head noun declensions for 180+ matrices (Filar XCI & Zasada 15).
+* Toponymic and institutional prepositional governance across all Polish prepositions (`sanitize_toponymic_preposition_governance`).
+* 2nd-person singular and plural addressee verb and adjective gender agreement (Filar CLXIII & CLXXXVI).
+* Complete prepositional pronoun harmonization in dyadic relations across all Polish prepositions (K1–K7).
+* Symmetrical predicate noun agreement in Narzędnik for 30 pairs with up to 3 chained adjectives, with 100% preservation of sentence word order ($W_i \to W'_i$).
+* Contiguous dialogue cluster tracking and montage cut isolation ($\Delta t \ge 3800$ ms).
 * Automatic correction of keyboard typos and malformed verbs (Filar CLXIV).
 * Shot-cut and I-frame boundary snapping.
 * Acoustic breath line splitting for events $\ge 38$ characters.
@@ -290,6 +295,18 @@ The engine resolves common failure modes of traditional Machine Translation (MT)
 
 ---
 
+### 15. Prepositional Governance & Sentence Word Order Invariance ($W_i \to W'_i$) Across All 7 Polish Cases (Zasada 15)
+* **Problem:** English prepositions like *"in"*, *"to"*, *"with"*, *"from"* govern nouns with zero case inflection, whereas Polish requires precise morphosyntactic government across all 7 grammatical cases. Generic MT produces ungrammatical nominative freezing (*„w Miasto Elds”*, *„z Wieża Babel”*), leaks English plural pronouns into 1-on-1 dialogue (*„Wierzę w was”*, *„Zrobiłem to dzięki wam”*), or mutates multiple words in a line, destroying subtitle reading cadence.
+* **Engine Solution:** The engine implements **Żelazna Zasada 15** and **Pillar CLXXXVI**. It governs toponyms and institutions across all Polish prepositions (Genitive, Locative, Instrumental, Dative), harmonizes dyadic prepositional pronouns (*w ciebie, blisko ciebie, dzięki tobie, przed tobą, po tobie*), and guarantees strict single-token mutations ($W_i \to W'_i$), preserving 100% of original sentence word order.
+
+| Context & Raw Inputs | Naive MT / Generic LLM | Multimodal AVT Engine Output | Codified Heuristic |
+| :--- | :--- | :--- | :--- |
+| **Toponym & Preposition:**<br>*„Let's meet in Elds City.”*<br>*„Flee from Tower of Babel.”* | ❌ *„Spotkajmy się w Miasto Elds.”*<br>❌ *„Uciekajcie z Wieża Babel.”*<br>*(Nominative freezing)* | ✅ **„Spotkajmy się w mieście Elds.”**<br>✅ **„Uciekajcie z wieży Babel.”**<br>*(Full 7-case prepositional governance)* | **Zasada 15 & Filar XCI**<br>(*All-Preposition Toponym Governance*) |
+| **Dyadic Prepositional Pronouns:**<br>*„I believe in you and stand with you.”* (to single partner) | ❌ *„Wierzę w was i stoję z wami.”*<br>*(English 'you' plural leakage)* | ✅ **„Wierzę w ciebie i stoję z tobą.”**<br>*(Dyadic prepositional concordance)* | **Pillar CLXXXVI**<br>(*Dyadic All-Preposition Concordance*) |
+| **Symmetrical Predicate Noun:**<br>*„You have become a great healer.”* (addressed to female) | ❌ *„Zostałaś wspaniałym uzdrowicielem.”*<br>*(Masculine predicate leakage)* | ✅ **„Zostałaś wspaniałą uzdrowicielką.”**<br>*(Symmetrical Narzędnik, $W_i \to W'_i$ preserved)* | **Zasada 15 & Filar CLXIII**<br>(*Word Order Invariant Concordance*) |
+
+---
+
 ## 📊 Quality Profiles & Tokenomics
 
 Estimates per standard 24-minute media unit (~350 subtitle lines / 15 batches):
@@ -377,25 +394,35 @@ python main.py "media.mkv" --play
 
 ## 🧪 Verification Test Harness
 
-The engine is guarded by an automated regression and integration test suite executing **98 modular verification routines**:
+The engine is guarded by an automated regression and integration test suite executing **125 modular verification routines**:
 ```powershell
 python test_system.py
 ```
 
 **Verification Scope:**
 * Pydantic schema validation (`RefinedBatchResponse`, `EpisodeProfile`, `LineTranslation`).
-* Complete coverage and non-contradiction proofs for all **176 AVT Pillars**.
+* Complete coverage and non-contradiction proofs for all **186 AVT Pillars**.
 * Google Context Cache SHA-256 state isolation, rolling keep-alive leases, and memory cleanup.
-* 7-Case Foreign Name Declension Matrix (Filar XCI) & EpisodeQualityGate integration (Test 50).
+* 7-Case Foreign & Head Noun Declension Matrix (Filar XCI & Zasada 15) & EpisodeQualityGate integration (Tests 50, 121, 125).
 * Typo Shield & Lexical Integrity (Filar CLXIV) integration (Test 51).
-* Multimodal Addressee Resolution (Filar CLXIII) for singular female/male and plural groups (Test 46).
-* Official Manga Canon & Titular Calque Shield for Frieren (*Aura Gilotyna*, Studio JG / Martyna Zdonek) (Test 52).
+* Multimodal Addressee Resolution (Filar CLXIII & CLXXXVI) for singular female/male and plural groups across 7 English ambiguity classes (Tests 46, 112, 114).
+* Official Manga Publishing Canon & Titular Calque Shield for Frieren (*Aura Gilotyna*, Studio JG / Martyna Zdonek) and Jujutsu Kaisen (*Prosta Domena*, Waneko / D. Bruszewska) (Tests 52, 121).
 * Relational T-V Invariance, Vocative Guard & Anti-Sama-Drop (Test 53).
 * Spatiotemporal Engine, Anti-Pivot Guard & 2-Stage Blind Read (Test 56).
 * Whisper & FFmpeg Acoustic-Temporal Telemetry Reserves (Fade to Black, VAD, Loop Shield, Acoustic Breath Splitter, I-Frame Snapping) (Test 95).
 * Acoustic Primacy over Contaminated Fansub Metadata & Token Stutter Sanitizer (Filar CLXXIV) (Test 96).
 * 1st-Person Plural Feminine Group Concordance (*-łyśmy, -łybyśmy, my obie*) (Filar CLXXV) (Test 97).
 * Speaker Entity Identity, Collective Concordance Shield (*Re:Zero 4th Season* Louis Arneb) & Pluralis Maiestatis (Filar CLXXVI) (Test 98).
+* Pronominal Decoupling & Inalienable Somatics, Affective Inertia Reset, Adjacency Pairs & Motion Deictics (Filar CLXXVII–CLXXXI) (Tests 99–103).
+* Balanced 5-Tier Attention Matrix, Lean F1 Mode & Cross-Gender Seiyū Boy Shield (Tests 104–106).
+* 10 Offline Safety Domains, Toponymic Pleonasm Elimination & Inversion Sanity (Filar CLXXXIV) (Tests 107–110).
+* Monologue Gender Concordance, JIT Context Pruning & Institutional Synecdoche (Filar CLXXXV) (Tests 111, 113, 116).
+* Sentence Word Order Invariance ($W_i \to W'_i$) & Single-Token Atomic Mutation Gate (Tests 117, 121, 125).
+* Comprehensive Elimination of 10 Polish Language Trap Families and Prepositional Government (Test 120).
+* Multi-Word Manga Canon Syntagms ($\ge 2$ words) & 7 Past-Tense Alternation Classes (Test 121).
+* Full Scene Topology Matrix (Soliloquy N=1, Dyad N=2, Polylogue N>=3), Dualis, Non-Virile Pluralis & Montage Cut Isolation ($\Delta t \ge 3800$ ms) (Test 122).
+* Holistic Lexical Governance & 1000+ Entry Lexical Vulnerability Shields (Test 124).
+* Full Implementation of Żelazna Zasada 15: All 7 Polish Cases for 180+ Head Nouns, All-Preposition Toponymic & Institutional Governance, Exhaustive Dyadic Prepositional Pronouns, and 30 Symmetrical Predicate Noun Pairs in Narzędnik (Test 125).
 * Tokenomics financial calculations across all quality tiers.
 * Translation Memory SQLite FTS5 BM25 temporal matching ($\Delta t \le 300\text{ms}$).
 
