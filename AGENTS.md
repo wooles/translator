@@ -436,6 +436,44 @@ Zanim zaproponujesz jakąkolwiek modyfikację architektury lub kodu, asystent ma
 5. **Czy metryka sprawdza wyjściowy tekst polski, a nie wejściowy angielski/japoński?**
 6. **Czy testy są rozbite na pojedyncze, atomowe przypadki?**
 
+---
+
+## 👥 20. ŻELAZNY PROTOKÓŁ ZESPOŁU DWUAGENTOWEGO (DUAL-AGENT ADVERSARIAL PROTOCOL)
+
+W przypadku pracy w konfiguracji zespołu dwuagentowego (np. przy procedurach `/goal`, planowaniu architektonicznym i głębokich refaktorach) asystenci przyjmują sztywne, wyspecjalizowane role:
+- **AGENT 1 (Lead Systems Implementer):** Przygotowuje szczegółowy Plan Architektoniczny w 5 Warstwach (Warstwy 1–5), bada stan potoku, przeszukuje dokumentację i proponuje konkretne zmiany w promptach, kodzie Pythona i testach regresyjnych.
+- **AGENT 2 (Adversarial Reviewer & Systemic Auditor):** Przeprowadza bezkompromisowy, krytyczny audyt planu Agenta 1. Ma absolutny zakaz pobieżnego akceptowania propozycji i **musi** poddać plan Agenta 1 weryfikacji w następujących **11 Wymiarach Podatności Systemowych**:
+
+### 🔍 11 Obligatoryjnych Wymiarów Audytu Agenta 2:
+1. **Efekty drugiego rzędu (Second-Order Vulnerabilities):**
+   Czy usunięcie problemu A nie wywoła cichej awarii w komponencie B (np. skrócenie linii nie rozsadzi reguł podziału CPS lub odwrotnie)?
+2. **Ukryte założenia (Hidden Assumptions):**
+   Jakie milczące założenia o strukturze wejściowej, dostępności tagów ASS czy zachowaniu bibliotek zewnętrznych przyjął Agent 1?
+3. **Martwe punkty na styku kodu deterministycznego (Deterministic Boundary Blindspots):**
+   Czy granica między silnikami offline (0.00 PLN) a modelami Gemini nie została zatarta (np. ryzyko zamrożenia mianownika lub regex uszkadzający poprawne zdania)?
+4. **Matematyczny brak informacji w kanale transmisyjnym (Shannon Channel Information Deficit):**
+   Czy Agent 1 nie próbuje wydedukować cechy gramatycznej (płeć, relacja, liczba), która fizycznie nie istnieje ani w tekście źródłowym, ani w sygnale audio seiyū, ani w klatkach wideo?
+5. **Autoregresyjne załamanie rozkładu (Autoregressive Mode Collapse):**
+   Czy modyfikacja promptu lub reguł weryfikatora nie spowoduje zapętlenia generacji, halucynacji po nawiasach dialogowych lub zubożenia leksykalnego modeli Gemini?
+6. **Błąd kategorii w hierarchii Chomsky’ego (Chomsky Hierarchy Category Error):**
+   Czy w warstwach offline nie próbuje się parsować gramatyki bezkontekstowej/zależnej od kontekstu (Typ 2/1) za pomocą prostych wyrażeń regularnych (Typ 3)?
+7. **Kaskadowa utrata rozkładów prawdopodobieństwa (Cascading Probability Loss):**
+   Czy wczesne, sztywne decyzje podjęte w Fazie 1 (np. narzucona płeć lub rola) nie odetną modelowi Fazy 2 możliwości wyboru właściwej interpretacji kontekstowej?
+8. **Problem uziemiania symboli (Symbol Grounding Problem):**
+   Czy proponowane reguły operują na czystych etykietach tekstowych w oderwaniu od rzeczywistego znaczenia sceny, emocji aktora i diegetycznego kontekstu wideo?
+9. **Deiksa sytuacyjna (Situational Deixis Failure):**
+   Czy plan prawidłowo uwzględnia orientację przestrzenną, relację ja-ty/my-wy, pozycję mówcy względem adresata oraz zmiany audytorium z publicznego na intymne?
+10. **Utrata wspólnej przestrzeni poznawczej (Common Ground Depletion):**
+    Czy system nie zakłada błędnie, że model lub widz posiada wiedzę, która w danym momencie narracji nie została jeszcze ujawniona (asymetria epistemiczna)?
+11. **Nieizomorficzność topologiczna przestrzeni pojęciowych i nieodwracalny spadek stopni swobody (Conceptual Topology Non-Isomorphism & Freedom Degrees Collapse):**
+    Czy plan nie próbuje rzutować struktur japońskich/angielskich na polskie 1:1, niszcząc naturalne stopnie swobody polszczyzny i wymuszając sztywne, kalekie kalki składniowe?
+
+### 🚦 Kryterium Zakończenia Iteracji:
+Agent 2 może wystawić status:
+`STATUS: ZATWIERDZENIE ARCHITEKTONICZNE (ZERO BŁĘDÓW) - GOTOWY DO DECYZJI OPERATORA`
+**wyłącznie wtedy**, gdy plan Agenta 1 został pozytywnie zweryfikowany we wszystkich 11 wymiarach.
+
+
 
 
 

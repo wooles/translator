@@ -46,3 +46,28 @@ Dokument ten stanowi trwały, zsynchronizowany most wiedzy pomiędzy komputerami
   - Aby pobrać i uzupełnić kod o zmiany z drugiego PC: uruchom `POBIERZ_ZMIANY_Z_CHMURY.bat`.
   - Aby wysłać swoje nowe zmiany do drugiego PC: uruchom `WYSLIJ_ZMIANY_DO_CHMURY.bat`.
 - Git wykonuje bezpieczne scalenie trójstronne (3-way merge) – **żadne lokalne usprawnienia nie są nadpisywane**.
+
+---
+
+## 👥 4. ŻELAZNY PROTOKÓŁ ZESPOŁU DWUAGENTOWEGO (Zasada 20 AGENTS.md, /learn)
+
+Podczas pracy w konfiguracji zespołu dwuagentowego (np. przy procedurze `/goal` lub głębokim refaktorze potoku):
+- **Agent 1:** Lead Systems Implementer (przygotowuje plan w 5 warstwach, analizuje kod, projektuje architekturę i testy).
+- **Agent 2:** Adversarial Reviewer & Systemic Auditor (przeprowadza bezkompromisowy audyt planu Agenta 1).
+
+### 🔍 11 Wymiarów Audytu Agenta 2:
+1. **Efekty drugiego rzędu (Second-Order Vulnerabilities)** – czy naprawa jednego błędu nie psuje innego modułu.
+2. **Ukryte założenia (Hidden Assumptions)** – niewypowiedziane domysły o strukturze wejściowej i tagach ASS.
+3. **Martwe punkty na styku kodu deterministycznego (Deterministic Boundary Blindspots)** – zachowanie czystej granicy 0.00 PLN vs LLM.
+4. **Matematyczny brak informacji w kanale transmisyjnym (Shannon Information Deficit)** – unikanie zgadywania cech bez sygnału źródłowego.
+5. **Autoregresyjne załamanie rozkładu (Autoregressive Mode Collapse)** – prewencja pętli powtórzeń i zubożenia leksykalnego.
+6. **Błąd kategorii w hierarchii Chomsky’ego (Chomsky Hierarchy Category Error)** – zakaz parsowania gramatyk złożonych prostym regexem.
+7. **Kaskadowa utrata rozkładów prawdopodobieństwa (Cascading Probability Loss)** – zakaz przedwczesnego blokowania interpretacji w Fazie 1.
+8. **Problem uziemiania symboli (Symbol Grounding Problem)** – uziemianie pojęć w semantyce sceny, seiyū i wideo.
+9. **Deiksa sytuacyjna (Situational Deixis Failure)** – poprawna orientacja przestrzenna, relacja ja-ty i zmiana audytorium.
+10. **Utrata wspólnej przestrzeni poznawczej (Common Ground Depletion)** – uwzględnianie asymetrii wiedzy postaci i widza.
+11. **Nieizomorficzność topologiczna przestrzeni pojęciowych i spadek stopni swobody** – zakaz sztucznego rzutowania struktur JA/EN na PL.
+
+Iteracja kończy się dopiero po wystawieniu przez Agenta 2:
+`STATUS: ZATWIERDZENIE ARCHITEKTONICZNE (ZERO BŁĘDÓW) - GOTOWY DO DECYZJI OPERATORA`.
+
