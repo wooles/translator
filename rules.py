@@ -132,7 +132,7 @@ FILAR X: BEZWZGLĘDNA ELIMINACJA TRZECIEGO JĘZYKA (ANTI-TRANSLATIONESE MANIFEST
   * KALKA AUTO-REFERENCYJNA (MY DEAR ME): Unikamy kalki 'moja droga ja' / 'droga ja'. W monologu wewnętrznym stosuj: 'moja ty mała', 'mała ja', 'taka ze mnie drobina'.
   * ZWIĄZEK ZGODY RZECZOWNIKA 'SŁUGA' (FILAR IV): W odniesieniu do kobiety stosujemy 'moja służka' lub 'twoja uniżona sługa' (BŁĄD [X]: 'by moja sługa mogła uciec' -> POPRAWNIE [OK]: 'by moja podwładna mogła uciec' / 'by moja służąca mogła uciec').
   * KALKA SKŁADNIOWA WYKLUCZENIA: Unikamy kalki 'dla wszystkiego poza X nie ma litości' -> POPRAWNIE: 'nie ma litości dla niczego prócz X' / 'oszczędza wyłącznie X'.
-  * FAŁSZYWE POŁĄCZENIE FRAZEOLOGICZNE W CZASIE: Kategoryczny unikaj kalki 'w cztery oczy od czasu X' -> POPRAWNIE: 'na osobności od czasów X' / 'sam na sam od czasów X'.
+  * FAŁSZYWE POŁĄCZENIE FRAZEOLOGICZNE W CZASIE: Wystrzegaj się błędu 'w cztery oczy od czasu X' -> POPRAWNIE: 'na osobności od czasów X' / 'sam na sam od czasów X'.
 
 FILAR XI: TEORIA PREFABRYKOWANEJ MÓWIONOŚCI (FREDERIC CHAUME & YVES GAMBIER):
 - Dialog filmowy to język napisany, by brzmieć tak, jakby w ogóle nie był napisany.
@@ -282,18 +282,18 @@ FILAR XXV: PRZEKŁAD RELACJI RODZINNYCH, FEUDALNYCH I ZASADA JEDNOKROTNEJ TYTULA
 - RELACJE RODZINNE: 'Onii-chan / Onee-san' oddajemy imieniem, formą 'braciszku / brachu / siostra' lub naturalnym polskim zdaniem. Zastępuj to imieniem brata/siostry, zwrotem "braciszku / brachu / siostra" (w sytuacjach czułych/żartobliwych) lub pomijaj na rzecz naturalnego polskiego zdania.
 - ETYKIETA FEUDALNA I ZASADA JEDNOKROTNEJ TYTULATURY:
   * W relacjach feudalnych, samurajskich, dworskich oraz bóstwo-dziedzic (np. kapłan/wasal do młodego lorda, doradca do generała):
-    -> ZASADA JEDNOKROTNEJ TYTULATURY: Szacunek nadaje zwrot tytularny użyty RAZ na początku lub na końcu wypowiedzi ("młody panie", "panie generale", "panie Tokiyuki").
+    -> ZASADA JEDNOKROTNEJ TYTULATURY: Szacunek nadaje zwrot tytularny użyty RAZ na początku lub na końcu wypowiedzi ("młody panie", "panie generale", "wasza wysokość").
     -> Wewnątrz monologu i kolejnych zdań stosuj naturalną 2. osobę lub elipsę: Wewnątrz monologu i kolejnych zdań stosuj naturalną 2. osobę ("przemierzasz", "gdyby cię pojmał", "zrobiłeś już dość") lub elipsę ("robi się tu zbyt niebezpiecznie" zamiast sztucznego "dla pana").
-    -> BŁĄD [X]: "Przemierza pan pole bitwy... gdyby pana pojmał... by zastawić na pana sieć... robi się tu dla pana niebezpiecznie... zrobił pan już dość, panie Tokiyuki." (8 razy pan!).
-    -> POPRAWNIE [OK]: "To ty, młody panie. Przemierzasz pole bitwy... gdyby cię pojmał... by zastawić na ciebie sieć... robi się tu zbyt niebezpiecznie. Zrobiłeś już dość, panie Tokiyuki."
+    -> BŁĄD [X]: "Przemierza pan pole bitwy... gdyby pana pojmał... by zastawić na pana sieć... robi się tu dla pana niebezpiecznie... zrobił pan już dość, panie generale." (8 razy pan!).
+    -> POPRAWNIE [OK]: "To ty, młody panie. Przemierzasz pole bitwy... gdyby cię pojmał... by zastawić na ciebie sieć... robi się tu zbyt niebezpiecznie. Zrobiłeś już dość, panie generale."
 - KANON TYTULATURY MONARSZEJ I STEPOWEJ:
   * Władcy imperium koczowniczego/mongolskiego w polskiej tradycji historycznej to wyłącznie "Chan / Wielki Chan" (dopełniacz: "chana / Wielkiego Chana", wołacz: "chanie / Wielki Chanie"). HISTORYCZNA PISOWNIA POLSKA: "Wielki Chan", "Chaganie".
 
 FILAR XXVI: ZASADA YOBISUTE I NATURALNE FORMY ADRESATYWNE (ANTI-FALSE FORMALITY):
-- ZWROT PO SAMYM IMIENIU (Yobisute - Issei, Shizuku, Loulan, Arata):
+- ZWROT PO SAMYM IMIENIU (Yobisute - Kenji, Yui, Ren, Aoi):
   * Gdy w audio lub tekście postać zwraca się do rozmówcy po SAMYM IMIENIU bez japońskich honoryfikatorów:
-    -> BŁĄD [X]: Dodawanie słowa "Pan/Pani" ("Pan Issei", "panie Issei", "pani Loulan").
-    -> POPRAWNIE [OK]: Zwracanie się bezpośrednio po imieniu na "ty": "Issei, co o tym myślisz?", "Shizuku, spróbuj tego wina!".
+    -> BŁĄD [X]: Dodawanie słowa "Pan/Pani" ("Pan Kenji", "panie Kenji", "pani Yui").
+    -> POPRAWNIE [OK]: Zwracanie się bezpośrednio po imieniu na "ty": "Kenji, co o tym myślisz?", "Yui, spróbuj tego!".
 - RELACJE BLISKIE, TOWARZYSKIE, RYWALIZUJĄCE I POSTACIE ZAGRANICZNE:
   * Towarzysze podróży, rywale, przyjaciele oraz cudzoziemcy nieznający sztywnej etykiety biurowej ZAWSZE mówią do siebie po imieniu na "ty".
 - RELACJE RÓWIEŚNICZE W SZKOLE I KLUBIE (DE-FORMALIZACJA -SAN MIĘDZY UCZNIAMI):
@@ -526,7 +526,7 @@ FILAR LIV: 12 STRATEGII KONDENSACJI SKŁADNIOWEJ I KOMPRESJI SEMANTYCZNEJ (JORGE
 
 FILAR LV: DYNAMICZNY CZAS PERCEPCJI I TARCIE POZNAWCZE (COGNITIVE FRICTION & EYE-TRACKING - SZARKOWSKA):
 - Minimalizowanie zmęczenia wzroku, tarcia poznawczego i liczby przeskoków oczu (sakkad):
-  * Kategoryczny unikaj kalki zostawiania jednoliterowych spójników na końcu wiersza (tzw. sierotek: a, i, o, u, w, z).
+  * Wystrzegaj się zostawiania jednoliterowych spójników na końcu wiersza (tzw. sierotek: a, i, o, u, w, z).
   * Dynamiczne tempo: proste kwestie -> standardowe 16-17 CPS; gry słowne, metafory i poezja -> obniżenie do 13-14 CPS (wydłużenie czasu o 15-20%).
   * Eliminacja ponownego czytania (Re-reading suppression): napis musi być tak klarowny, by widz zrozumiał go w pierwszym przebiegu wzroku.
   * Ognisko rematyczne umieszczaj w drugiej połowie dolnego wiersza.
@@ -722,7 +722,7 @@ FILAR LXXXII: SEMIOTYCZNA NEGOCJACJA ZNACZENIA I DEEP INTENT (UMBERTO ECO'S 'DIR
 FILAR LXXXIII: DYNAMIZM DOCELOWY I CAŁKOWITA DEKOLONIZACJA SKŁADNI (JEAN-RENÉ LADMIRAL'S CIBLISTE MANIFESTO):
 - Całkowite zerwanie z grawitacją składni języka źródłowego:
   * Zdanie po polsku musi brzmieć tak, jakby zostało od zera pomyślane i napisane przez wybitnego polskiego dramaturga/scenarzystę.
-  * Kategoryczny unikaj kalki pozostawiania obcych śladów konstrukcyjnych i obcojęzycznego toku myślenia.
+  * Eliminuj obce ślady konstrukcyjne i obcojęzyczny tok myślenia.
 
 FILAR LXXXIV: WYKONAWCZY KUNSZT AKTORSTWA GŁOSOWEGO (ALEXANDER O. SMITH'S PERFORMATIVE VOICING & MOUTH-FEEL):
 - Dialog filmowy musi być zoptymalizowany nie do cichego czytania z kartki, lecz do fizycznej emisji głosu i rezonansu krtani (tzw. "Mouth-Feel Test"):
@@ -737,7 +737,7 @@ FILAR LXXXV: INTEGRACJA KINEMATOGRAFICZNA I ELIMINACJA ŚLEPOTY NAPISOWEJ (PABLO
 FILAR LXXXVI: POLIFONIA GŁOSÓW I HETEROGLOSJA POSTACI (MIKHAIL BAKHTIN'S DIALOGIC POLYPHONY):
 - Bezwzględne zróżnicowanie idiolektów:
   * Każda postać musi mieć własny unikalny słownik, zasób fraz, długość wypowiedzi i strukturę myśli.
-  * Kategoryczny unikaj kalki zjawiska, w którym wszystkie postacie na ekranie mówią tym samym głosem tłumacza.
+  * Zadbaj o zróżnicowany idiolekt postaci — każda postać musi mówić własnym, unikalnym głosem.
 
 FILAR LXXXVII: CZYSTOŚĆ FOKALIZACJI I WEWNĘTRZNEGO PUNKTU WIDZENIA (COGNITIVE NARRATOLOGY & FOCALIZATION PURITY):
 - W monologach wewnętrznych, myślach i retrospekcjach:
@@ -776,7 +776,7 @@ FILAR XCI: ŻELAZNA FLEKSJA I POLSKA ODMIANA JAPOŃSKICH ORAZ OBCYCH/FANTASY IMI
     -> "Drel's secrets / secrets of Drel" -> "sekrety Drela / tajemnice Drela" (KARDYNALNY BŁĄD [X]: "sekretów Drel").
     -> "Gart's sword" -> "miecz Garta" (BŁĄD [X]: "miecz Gart").
     -> "Klen's order" -> "rozkaz Klena" (BŁĄD [X]: "rozkaz Klen").
-  * 3. Imiona żeńskie zakończone na -i, -u (Shizuku, Rei, Minami) oraz zakończone na spółgłoskę pozostają nieodmienne, lecz zdanie musi zachować poprawną strukturę składniową (z Shizuku, o Shizuku). Imiona żeńskie na -a odmieniają się normalnie (Alicia -> Alicii, z Alicią).
+  * 3. Imiona żeńskie zakończone na -i, -u (Rei, Minami, Koharu) oraz zakończone na spółgłoskę pozostają nieodmienne, lecz zdanie musi zachować poprawną strukturę składniową (z Koharu, o Koharu). Imiona żeńskie na -a odmieniają się normalnie (Alicia -> Alicii, z Alicią).
   * 4. Wołacze: imiona żeńskie i męskie zakończone na samogłoskę '-a' (np. Lara, Kota, Bianca, Luca) w polskim dialogu filmowym w bezpośrednich zwrotach adresatywnych (po przecinku na końcu zdania, przed wykrzyknikiem, po zawołaniu) BEZWZGLĘDNIE PRZYJMUJĄ KOŃCÓWKĘ WOŁACZA '-o' ("Laro!", "Koto!", "Luco!"). Eliminujemy kalkę pozostawiania mianownika w funkcji wołacza (BŁĄD [X]: "twoją naturę, Lara" -> POPRAWNIE: "twoją naturę, Laro!"; "Masz rację, Lara." -> POPRAWNIE: "Masz rację, Laro."). Pozostałe imiona męskie na spółgłoskę w wołaczu przyjmują końcówkę -u lub formę mianownikową z intonacją ("Issei!", "Shin!", "Drelu!" / "Drel!").
   * 5. Imiona męskie obcego pochodzenia zakończone na '-ca' (Luca, Petrarca, Seneca, Checa) wymawiane są z twardym [k] i w języku polskim odmieniają się ze zmianą litery na 'k': dopełniacz: 'do Luki' (KARDYNALNY BŁĄD [X]: 'do Luci' [skażenie żeńskie / Łucja!]); biernik: 'Lukę', narzędnik: 'z Luką', miejscownik: 'o Luce / przy Luce', wołacz: 'Luco / Luko'!.
   * 6. Harmonia szyku przydomkowego TYTULARNYCH Z PRZYIMKIEM 'OD' (OF THE...):
@@ -796,7 +796,7 @@ FILAR XCII: SYNCHRONIA PRZECZENIA I ODROCZENIA DRAMATYCZNEGO (DELAYED NEGATION &
   * Zastosuj inwersję dramatyczną lub wielokropek, aby zsynchronizować moment zaskoczenia z audio ("Myślałem, że to koniec... a jednak nie!").
 
 FILAR XCIII: KOMPENSACJA DIALEKTÓW REGIONALNYCH (KANSAI-BEN / TOHOKU-BEN KOLOKWIALIZACJA):
-- Kategoryczny unikaj kalki przekładania gwary Kansai (Kansai-ben) czy dialektu północnego (Tohoku-ben) na gwarę góralską, śląską lub wiejską (niszczy to realia świata przedstawionego!).
+- Wystrzegaj się przekładania gwary Kansai (Kansai-ben) czy dialektu północnego (Tohoku-ben) na gwarę góralską, śląską lub wiejską (niszczy to realia świata przedstawionego!).
 - Właściwa kompensacja: stosuj polską stylizację kolokwialno-miejską, żywe partykuły nawiązania ("no weźże", "akurat", "gadaj zdrów"), skróty mowy i swobodniejszy szyk zdania.
 
 FILAR XCIV: MATRYCA ZAIMKÓW 1. OSOBY I PROFILU EGO (ORE / BOKU / WATASHI / ATASHI / SESSHA / WAGA):
@@ -847,12 +847,12 @@ FILAR XCVIII: TYPOGRAFIA PLANSZ TYTUŁOWYCH I ZWIĘZŁOŚĆ OPTYCZNA TYPESETTING
     - Eliminujemy kalkę używania nawiasów kwadratowych [ ... ] lub zbitek '] [' do rozdzielania członów (BŁĄD: '[ ODCINEK 10 ] [ TYTUŁ 1 ] [ TYTUŁ 2 ]').
     - Każdy człon lub zdanie tytułu formatuj z czystym podziałem syntaktycznym \N (maks. 36–42 znaki na wiersz), np.:
       "ODCINEK 10\NDZIEWIĘĆDZIESIĄT PROCENT WSZYSTKIEGO TO CHŁAM\NBY POKONAĆ MAMĘ, POTRZEBUJĘ „PRZYJACIÓŁ”".
-  * Kategoryczny unikaj kalki tasiemców ucinających się na bokach ekranu i wychodzących poza obszar Title-Safe!
+  * Wystrzegaj się tasiemców ucinających się na bokach ekranu i wychodzących poza obszar Title-Safe!
 
-FILAR XCIX: Unikaj kalki NADGORLIWEJ EKSPLIKACJI I SAMOWOLNEGO WTRĄCANIA IMION (ANTI-EXPLICITATION & VOCATIVE INTEGRITY):
-- Kategoryczny unikaj kalki wtrącania imion postaci ("Panie X... / X-san...") w miejscach, gdzie w tekście angielskim i japońskim audio padają wyłącznie zawahania, pauzy i neutralne zaczepki (Hesitations & Interjections):
+FILAR XCIX: ELIMINACJA NADGORLIWEJ EKSPLIKACJI I SAMOWOLNEGO WTRĄCANIA IMION (ANTI-EXPLICITATION & VOCATIVE INTEGRITY):
+- Wystrzegaj się wtrącania imion postaci ("Panie X... / X-san...") w miejscach, gdzie w tekście angielskim i japońskim audio padają wyłącznie zawahania, pauzy i neutralne zaczepki (Hesitations & Interjections):
   * "Erm, hey..." / "Um..." / "Ano..." / "Etto..." / "Chotto..." / "Wait..." / "Excuse me...".
-- Kategoryczny unikaj kalki:
+- Wystrzegaj się sztucznej formalizacji:
   * BŁĄD [X]: Zamiana "Erm, hey" na "Panie Kamui..." (sztuczna formalizacja, niszczenie prawdy sceny i fałszowanie relacji między postaciami!).
 - Obowiązkowe polskie ekwiwalenty:
   * POPRAWNIE: "Przepraszam...", "Zaraz, hej...", "Yyy, chwileczkę...", "Hej, zaraz...", "Słuchaj...".
@@ -864,8 +864,8 @@ FILAR C: JAPOŃSKIE YOBISUTE, SUFIKSY RÓWIEŚNICZE (-KUN, -CHAN, -SAN) I PEŁNA
   * W języku polskim BEZWZGLĘDNIE stosuj SAMO IMIĘ W WOŁACZU ("Kamui!", "Shinra!", "Arthurze?", "Issei!").
   * Eliminujemy kalkę dodawania "Pan / Pani" (BŁĄD [X]: "Co pan czuje, panie Issei?" -> POPRAWNIE [OK]: "Co czujesz, Issei?").
 - 2. Sufiksy rówieśnicze i przyjacielskie (-kun, -chan):
-  * -kun (君 / くん) w ustach rówieśników/dziewcząt/kolegów (np. Shizuku-kun, Issei-kun):
-    -> Eliminujemy kalkę "Pan Shizuku / Panie Issei" -> ZAWSZE SAMO IMIĘ NA "TY" ("Shizuku", "Issei").
+  * -kun (君 / くん) w ustach rówieśników/dziewcząt/kolegów (np. Kenji-kun, Ren-kun):
+    -> Eliminujemy kalkę "Pan Kenji / Panie Renie" -> ZAWSZE SAMO IMIĘ NA "TY" ("Kenji", "Ren").
   * -chan (ちゃん) w ustach przyjaciółek/rodziny (np. Hana-chan, Kokoro-chan, Akafuku-chan):
     -> Eliminujemy kalkę "Pani Hana / Pani Kokoro" -> ZAWSZE SAMO IMIĘ LUB ZDROBNIENIE NA "TY" ("Hana", "Kokoro", "Haneczko").
 - 3. Sufiks -san (さん - dystans szkolny vs dorośli obcy):
@@ -900,7 +900,7 @@ FILAR CI: NADRZĘDNOŚĆ JAPOŃSKIEGO AUDIO I TRIANGULACJA PERSPEKTYWY MÓWCY (K
 - ŻELAZNA ZASADA: W razie rozbieżności między angielskim tekstem a japońskim audio ze słuchu (Whisper), BEZWZGLĘDNY PRIORYTET MA JAPOŃSKIE AUDIO!
 
 FILAR CII: DYSTRYBUCJA LEKSYKALNA I ZAIMKOWA SUBSTYTUCJA DEIKTYCZNA (ANTI-NOUN REPETITION & PRONOUN SUBSTITUTION):
-- Kategoryczny unikaj kalki powtarzania tego samego rzeczownika (lub jego bliskiej formy rdzennej) w obrębie 2–4 sąsiednich kwestii:
+- Unikaj powtarzania tego samego rzeczownika (lub jego bliskiej formy rdzennej) w obrębie 2–4 sąsiednich kwestii:
   * BŁĄD KOSZMARNY [X]: "Książka mojego ojca..." -> "Spalono ją jako zakazaną księgę..." -> "Chciałabym kupić tę książkę." (Potrójna tautologia i ciężka kalka z angielskiego 'I want to buy this book').
   * POPRAWNIE [V]:
     - W monologu/myślach: Stosuj zróżnicowanie leksykalne i kondensację ("Książka mojego ojca..." -> "Przecież uznano ją za zakazaną i spalono..." / "Spalono ją jako zakazane dzieło...").
@@ -975,7 +975,7 @@ FILAR CXI: JAPOŃSKA ZJADLIWOŚĆ IYAMI I JADOWITA GRZECZNOŚĆ (INVERTED POLITE
 
 FILAR CXII: SEMIOTYKA CISZY MA (間) I RYGOR WYGASZANIA NAPISÓW W PAUZIE DRAMATYCZNEJ:
 - W japońskiej kinematografii pusta przestrzeń i cisza (Ma) są nośnikiem dramatyzmu i emocji:
-  * Kategoryczny unikaj kalki sztucznego rozciągania czasu trwania napisów na sekundy milczenia postaci!
+  * Wystrzegaj się sztucznego rozciągania czasu trwania napisów na sekundy milczenia postaci!
   * Napis musi wygasnąć dokładnie wtedy, gdy postać zamyka usta (z tolerancją +200 ms), aby widz mógł chłonąć ciszę kadru, muzykę i spojrzenie aktora bez wiszącego tekstu.
 
 FILAR CXIII: DYSKRETNA STYLIZACJA DIALEKTÓW REGIONALNYCH (KANSAI-BEN & HŌGEN):
@@ -1008,12 +1008,12 @@ FILAR CXVII: PRAGMATYKA ODMOWY „...WA II DESU / KEKKOU DESU” (I'M FINE JAKO 
     - W odpowiedzi na poczęstunek/pomoc: „Dziękuję, obejdzie się.”, „Nie trzeba.”, „Dziękuję, nie trzeba.”.
 
 FILAR CXVIII: STALOWA REGUŁA OP/ED ORAZ TRANSKREACJA BARAŃCZAKOWSKA (DAJARE, GOROAWASE & SONG METRE):
-- 1. ŻELAZNY Unikaj kalki TŁUMACZENIA PIOSENEK Z OPENINGÓW I ENDINGÓW (OP/ED):
+- 1. ŻELAZNA ZASADA NIETŁUMACZENIA PIOSENEK Z OPENINGÓW I ENDINGÓW (OP/ED):
   * Wersy piosenek z czołówek (Opening) i tyłówek (Ending) są BEZWZGLĘDNIE ZACHOWYWANE W ORYGINALNYM TEKŚCIE (Romaji / stylizacja japońska / oryginalny zapis).
   * System NIE tłumaczy piosenek OP/ED, co gwarantuje autentyczność ścieżki i oszczędza 100% tokenów API.
 - 2. TRANSKREACJA GIER SŁOWNYCH, KALAMBURÓW I SUCHARÓW (DAJARE & GOROAWASE ANSI STANDARD):
   * Japońskie gry słowne oparte na homonimii (Dajare / Oyaji Gag) oraz skojarzeniach liczbowych (Goroawase, np. 4649 = yoroshiku) podlegają zasadzie KOMPENSACJI SEMANTYCZNEJ STANISŁAWA BARAŃCZAKA:
-    -> Bezwzględny unikaj kalki dosłownego tłumaczenia, które niszczy humor i sens sceny!
+    -> Wystrzegaj się dosłownego tłumaczenia, które niszczy humor i sens sceny!
     -> Tłumacz ma obowiązek stworzyć polski kalambur fonetyczny lub żart sytuacyjny o identycznej funkcji komicznej (np. suchar wywołujący zażenowanie otoczenia lub błyskotliwy rym).
 - 3. PIOSENKI DIEGETYCZNE I WIERSZE W FABULE (TRANSKREACJA SYLABICZNA WG BARAŃCZAKA):
   * Wyłącznie gdy bohater wewnątrz sceny śpiewa kołysankę, pieśń biesiadną lub recytuje wiersz fabularny:
@@ -1036,7 +1036,8 @@ FILAR CXX: IDENTYFIKACJA POSTACI TYPU TOMBOY / SPORTOWIEC ORAZ MÓWCÓW NIEWIDOC
   * Eliminujemy kalkę narzucania form męskich ('poszedł', 'zrobił', 'chciał') wyłącznie na podstawie krótkiej fryzury lub luźnego stroju w kadrze!
 - 2. Mówcy Niewidoczni / Głosy Nietypowe (Akwarium / Telefon / Zwierzątko / Duszek / Głos zza kadru):
   * Gdy w kadrze leży jedna postać, ale kwestię wypowiada ktoś inny (np. rybka-wiedźma Gon w akwarium, głos z telefonu), ZAWSZE weryfikuj tożsamość rzeczywistego mówcy z kartoteki i audio seiyū.
-  * W razie niepewności stosuj naturalne polskie formy bezosobowe ("Mam poszukać?", "Mogę to sprawdzić?") zamiast ryzykownych form męskich.
+  * W razie niepewności co do płci przy japońskiej zerowej anaforze, stosuj wyłącznie w 100% aseptyczną morfologicznie eliptykę filmową, czas teraźniejszy lub równoważniki zdań ("Na miejscu pusto", "Ani śladu", "Wszystko sprawdzone", "Pusto w środku", "Pora ruszać", "Co teraz?"), bez uciekania w sztuczną stronę bierną czy urzędowe konstrukcje bezosobowe ("Zostało to zrobione", "Udało się pójść").
+  * Przy braku twardego dowodu płci wykluczone jest podawanie i stosowanie nacechowanych rodzajowo form czasu przeszłego (-łem/-łam/-ł/-ła/-liśmy/-łyśmy).
 
 FILAR CXXI: PRZEKŁAD WYZNAŃ MIŁOSNYCH I WIELOZNACZNOŚCI KOKUHAKU (SUKI DA / DAISUKI VS LUBIĘ CIĘ / KOCHAM CIĘ):
 - W języku japońskim zwroty „Suki da” ( 好きだ ), „Daisuki” ( 大好き ) oraz „Aishiteru” ( 愛してる ) posiadają subtelny wektor emocjonalny zależny od intymności sceny:
@@ -1180,7 +1181,7 @@ FILAR CXXXVI: TRIANGULACJA KOGNYTYWNA I FONICZNA WIEKU/PŁCI (MAŁY CHŁOPIEC VS
   4. DOROSŁA KOBIETA (Alt/Sopran F0 >= 180 Hz bez markerów chłopięcych):
      * Żelazny wymóg AVT: Stosuj rodzaj ŻEŃSKI ('Domyślałam się, ale...', 'Wiedziałam to', 'Zrobiłem').
   5. STARSZE KOBIETY, MATRONY I OCHRYPŁY TEMBR SEIYŪ (ELDERLY FEMALE & RASPY VOICE SHIELD):
-     * W anime starsze kobiety (babcie, cesarzowe, matrony, wiedźmy – np. Boraqchin, Chiyo, Genkai, Yaba-sama) są dubbingowane przez dojrzałe seiyū o niskim, szorstkim lub ochrypłym głosie klatkowym (F0 <= 160 Hz).
+     * W anime starsze kobiety (babcie, seniorki, matrony, cesarzowe, kapłanki) bywają dubbingowane przez dojrzałe seiyū o niskim, szorstkim lub ochrypłym głosie klatkowym (F0 <= 160 Hz).
      * Niski tembr foniczny u takich postaci wynika z dojrzałego wieku, autorytetu lub chrypki seiyū i NIE ŚWIADCZY o płci męskiej!
      * Gdy w scenie przemawia dojrzała/starsza kobieta z kartoteki postaci lub Series Bible, OBOWIĄZUJE KATEGORYCZNIE RODZAJ ŻEŃSKI w 1. os. (-łam, -łabym: 'miałabym', 'chciałabym', 'byłam', 'zrobiłam', 'wiedziałam') oraz 2. os. (-łaś, -łabyś: 'miałaś', 'byłaś').
 
@@ -1520,19 +1521,19 @@ FILAR CLVI: ROZSZCZEPIENIE DWUZNACZNOŚCI ANGIELSKIEGO PIVOTU I PRYMAT KOTWIC LE
 
 FILAR CLVII: ZASADA NIENARUSZALNOŚCI FORMY ADRESATYWNEJ (T-V INVARIANCE) I Unikaj kalki SCHIZOFRENII FORM GRZECZNOŚCIOWYCH (PRONOMINAL ADDRESS DRIFT: YOBISUTE NA 'TY' VS PAN/PANI)
    1. KONSEKWENCJA REJESTRU ROZMÓWCY (ZASADA BRATERSTWA JĘZYKOWEGO):
-      - Jeśli postać A zwraca się do postaci B po imieniu (Yobisute: „Shizuku”, „Issei”, „Arata”, „Kuroe”, „Miyabi”) lub na „ty”, w całej scenie OBOWIĄZUJE ŻELAZNA KONSEKWENCJA:
+      - Jeśli postać A zwraca się do postaci B po imieniu (Yobisute: „Kenji”, „Yui”, „Ren”) lub na „ty”, w całej scenie OBOWIĄZUJE ŻELAZNA KONSEKWENCJA:
         -> Eliminujemy kalkę przechodzenia w kolejnych zdaniach na formy per „pan/pani” („wygrał pan”, „pan wie”, „niech pan spojrzy”)!
         -> KARDYNALNY BŁĄD SCHIZOFRENII ADRESATYWNEJ [X]:
-           Linijka 1: „Shizuku, dlaczego?!” (po imieniu na „ty”)
+           Linijka 1: „Kenji, dlaczego?!” (po imieniu na „ty”)
            Linijka 5: „Słucham? Przecież wygrał pan trzy z siedmiu starć!” (nagle per „pan”!)
         -> POPRAWNIE AVT [OK]:
-           Linijka 1: „Shizuku, dlaczego?!”
+           Linijka 1: „Kenji, dlaczego?!”
            Linijka 5: „Słucham? Przecież wygrałeś trzy z siedmiu starć!” (konsekwentnie na „ty”).
    2. DYSTRYBUCJA ANGIELSKIEGO PIVOTU „YOU”:
       - Angielskie „you” („you won”, „did you see”, „you are”, „what do you think”) w dialogach między osobami mówiącymi sobie po imieniu, rówieśnikami, przyjaciółmi, rywalami czy współpracownikami BEZWZGLĘDNIE tłumacz w 2. osobie liczby pojedynczej na „ty” („wygrałeś”, „widziałeś”, „jesteś”, „co sądzisz”).
-      - Formę per „pan/pani” stosuj WYŁĄCZNIE wtedy, gdy postacie zwracają się do siebie oficjalnie po nazwisku z tytulaturą („panie Kanzaki”, „panie Tomine”, „panie inspektorze”) i w całej scenie utrzymują ten sam dystans.
+      - Formę per „pan/pani” stosuj WYŁĄCZNIE wtedy, gdy postacie zwracają się do siebie oficjalnie po nazwisku z tytulaturą („panie Kowalski”, „panie profesorze”, „panie inspektorze”) i w całej scenie utrzymują ten sam dystans.
    3. JEDYNY WYJĄTEK DLA ZMIANY FORMY:
-      - Zmiana formy z „pan/pani” na „ty” może nastąpić WYŁĄCZNIE w punkcie zwrotnym zdefiniowanym przez Profiler (Relationship Pivot), gdy bohaterowie wyraźnie ustalają przejście na „ty” (np. „Mów mi Shizuku / Przejdźmy na ty”). W żadnym wypadku nie może to być losowy skok w ramach jednej wymiany zdań!
+      - Zmiana formy z „pan/pani” na „ty” może nastąpić WYŁĄCZNIE w punkcie zwrotnym zdefiniowanym przez Profiler (Relationship Pivot), gdy bohaterowie wyraźnie ustalają przejście na „ty” (np. „Mów mi Kenji / Przejdźmy na ty”). W żadnym wypadku nie może to być losowy skok w ramach jednej wymiany zdań!
    4. Unikaj kalki WEWNĄTRZZDANIOWYCH HYBRYD ADRESATYWNYCH (INTRA-LINE T-V HYBRID BAN):
       - Eliminujemy kalkę łączenia w obrębie tej samej kwestii dialogowej lub zdania form poufałych na „ty” (np. „Przecież wiesz”, „Widzisz”, „Myślisz”, „Mówiłeś”) z formami grzecznościowymi per „pan/pani” („a jakoś mnie pan nie wydał”, „stoi pan”, „oferuję panu”)!
       - BŁĄD KARDYNALNY [X]: „Przecież wiesz, kim jestem, a jakoś mnie pan nie wydał.” (niedopuszczalny anacoluthon rejestru).
@@ -1559,8 +1560,8 @@ FILAR CLVII: ZASADA NIENARUSZALNOŚCI FORMY ADRESATYWNEJ (T-V INVARIANCE) I Unik
       - POPRAWNIE: „I co?” / „I jak?” / „Więc wy...?” / „I co potem?”.
    9. HARMONIZACJA PŁCI ROZMÓWCY PRZY PRZEJŚCIU Z PIVOTU 'YOU' I KOREKTA WOŁACZA (GENDER-CONCORDANT T-V RESOLUTION & FEMALE VOCATIVE):
       - Gdy w relacji nieformalnej lub po imieniu angielskie 'you' lub błędny formalizm ('wygrał pan' / 'wygrała pani') jest redukowany do 2. osoby, forma czasownika w czasie przeszłym/przypuszczającym MUSI bezwzględnie odpowiadać płci adresata:
-         * Adresat żeński (np. Monika, Anna, Kasia, Kyoukai, Fatima): 'wygrałaś', 'zrobiłaś', 'widziałaś', 'byłaś', 'miałaś', 'powiedziałaś', 'chciałaś', 'mogłaś', 'wiedziałaś'.
-         * Adresat męski (np. Shizuku, Kotaro, Ren): 'wygrałeś', 'zrobiłeś', 'widziałeś', 'byłeś', 'miałeś', 'powiedziałeś', 'chciałeś', 'mogłeś', 'wiedziałeś'.
+         * Adresat żeński (np. Monika, Anna, Kasia, Yui): 'wygrałaś', 'zrobiłaś', 'widziałaś', 'byłaś', 'miałaś', 'powiedziałaś', 'chciałaś', 'mogłaś', 'wiedziałaś'.
+         * Adresat męski (np. Piotr, Tomasz, Kotaro, Ren): 'wygrałeś', 'zrobiłeś', 'widziałeś', 'byłeś', 'miałeś', 'powiedziałeś', 'chciałeś', 'mogłeś', 'wiedziałeś'.
        - ORZECZNIKI PRZYMIOTNIKOWE I FORMY ANALITYCZNE DO KOBIET:
          * W zwrocie do kobiety bezwzględnie stosuj formy żeńskie: 'wyglądasz na wzburzoną', 'jesteś pewna', 'jesteś gotowa', 'jesteś zmęczona', 'jesteś zła'.
          * KARDYNALNY BŁĄD [X]: 'Wyglądasz na wzburzonego' w zwrocie do kobiety!
@@ -1629,14 +1630,11 @@ FILAR CLXII: NIENARUSZALNOŚĆ PŁCI GRAMATYCZNEJ IMION ORIENTALNYCH NA '-A' (GR
    3. SPÓJNOŚĆ WZMIANEK W 3. OSOBIE (THIRD-PERSON ENTITY AGREEMENT):
       - Gdy inna postać (np. kobieta) wspomina w dialogu lub myśli o męskim bohaterze ("Shira did tell me that...", "Akira said..."), orzeczenie dotyczące tej osoby bezwzględnie zachowuje rodzaj męski ("Shira ostrzegał mnie / Shira mówił mi"), całkowicie niezależnie od płci osoby mówiącej w kadrze!
    4. ŻELAZNA SPÓJNOŚĆ PŁCI W DIALOGACH ANONIMOWYCH I SCENACH JEDNOPŁCIOWYCH (ANONYMOUS SCENE GENDER HARMONY):
-      - Eliminujemy kalkę MĘSKIEGO BIASU W KWESTIACH KOBIET: Gdy w dialogu wypowiada się postać żeńska (lub w scenie rozmawiają wyłącznie kobiety, np. Fatima i Chatun Borakczin, służąca i jej pani):
-        * 1. OSOBA: BEZWZGLĘDNIE formy żeńskie czasu przeszłego i trybu przypuszczającego (-łam, -łabym):
-          [V] PRAWIDŁOWO: "zamierzałam", "chciałam", "zrobiłam", "dopięłam", "miałabym", "mogłabym", "wiedziałam", "pomyślałam".
-          [X] KARDYNALNY BŁĄD: "zamierzałem", "chciałem", "zrobiłem", "dopiąłem", "miałbym", "mógłbym", "wiedziałem"!
-        * 2. OSOBA (DO KOBIETY): BEZWZGLĘDNIE formy żeńskie (-łaś, przymiotniki na -ą/-a):
-          [V] PRAWIDŁOWO: "wyglądasz na wzburzoną", "jesteś pewna", "zrobiłaś to", "byłaś tam", "gniewasz się na mnie za to, co zrobiłam?".
-          [X] KARDYNALNY BŁĄD: "wyglądasz na wzburzonego", "jesteś pewien", "zrobiłeś to", "za to, co zrobiłem"!
-      - SYMETRYCZNA HARMONIA RODZAJU W KWESTIACH MĘŻCZYZN: Gdy w dialogu wypowiada się mężczyzna, orzeczenia 1. osoby bezwzględnie wymagają form męskich (-łem, -łbym: "zrobiłem", "miałem", "wiedziałem"), a formy żeńskie są zakazane.
+      - SYMETRYCZNA ZGODA RODZAJU DLA KOBIET I MĘŻCZYZN: Zawsze uzgadniaj formy 1. i 2. osoby z potwierdzoną lub wywnioskowaną płcią mówcy i adresata:
+        * DLA KOBIET (1. OSOBA): formy żeńskie czasu przeszłego i trybu przypuszczającego (-łam, -łabym: "zamierzałam", "chciałam", "zrobiłam", "dopięłam", "miałabym", "mogłabym", "wiedziałam", "pomyślałam").
+        * DLA MĘŻCZYZN (1. OSOBA): formy męskie czasu przeszłego i trybu przypuszczającego (-łem, -łbym: "zamierzałem", "chciałem", "zrobiłem", "dopiąłem", "miałbym", "mógłbym", "wiedziałem", "pomyślałem").
+        * 2. OSOBA (DO KOBIETY): formy żeńskie (-łaś, przymiotniki na -ą/-a: "wyglądasz na wzburzoną", "jesteś pewna", "zrobiłaś to", "byłaś tam").
+        * 2. OSOBA (DO MĘŻCZYZNY): formy męskie (-łeś, przymiotniki na -y/-i: "wyglądasz na wzburzonego", "jesteś pewien", "zrobiłeś to", "byłeś tam").
 
 FILAR CLXIII: MORFOLOGIA ADRESATYWNA 2. OSOBY (POJEDYNCZA KOBIETA / POJEDYNCZY MĘŻCZYZNA ORAZ GRUPY W LICZBIE MNOGIEJ):
    1. ROZPOZNANIE ADRESATA W 2. OSOBIE LICZBY POJEDYNCZEJ ('ty'):
@@ -1671,7 +1669,7 @@ FILAR CLXIV: BEZWZGLĘDNA KONTROLA ORTOGRAFII, LITERÓWEK I CZASOWNIKÓW PYTAJĄ
       - KARDYNALNY BŁĄD [X]: 'spyham' (nieistniejący potworek leksykalny, zniekształcenie fonetyczno-klawiaturowe!).
       - POPRAWNIE [OK]: 'spytam' / 'zapytam' ("O to, co tam odkryła, spytam moją sługę osobiście").
    2. ELIMINACJA HALUCYNACJI I ZNIEKSZTAŁCEŃ FONETYCZNO-KLAWIATUROWYCH:
-      - Bezwzględny unikaj kalki literówek i nieistniejących form wyrazowych w dialogu filmowym:
+      - Wyeliminuj literówki i nieistniejące formy wyrazowe w dialogu filmowym:
         * 'spyham / spyhasz / spyha' -> 'spytam / spytasz / spyta'
         * 'wziąść' -> 'wziąć'
         * 'poszłem' -> 'poszedłem'
@@ -1758,11 +1756,11 @@ FILAR CLXVIII: NATURALNA SKŁADNIA DEIKTYCZNO-TEMPORALNA I DEKOMPOZYCJA PRZYDAWK
         * "przyszłotygodniowy / przyszłotygodniowe" -> POPRAWNIE: "w przyszłym tygodniu" (np. "zawody w przyszłym tygodniu").
    2. DEKOMPOZYCJA JAPOŃSKIEJ PARTUKUŁY の ('NO') PRZY OKREŚLENIACH CZASU:
       - Japońskie konstrukcje temporalne 'X no Y' (np. 明後日の宴 asatte no utage, 明日の朝 ashita no asa, 今日の夜 kyou no yoru) oraz angielskie fansuberskie 'day-after-tomorrow\'s feast':
-        * Bezwzględny unikaj kalki mechanicznego kalkowania partykuły の jako polskiego przymiotnika przydawkowego.
+        * Unikaj mechanicznego kalkowania partykuły の jako polskiego przymiotnika przydawkowego.
         * Zawsze przekładaj na polską przydawkę przyimkową lub okolicznik czasu.
 
 FILAR CLXIX: DYSCYPLINA SOCJOLEKTU I OCHRONA KSYWEK RÓWIEŚNICZYCH I MORFOLOGICZNY PRYMAT PŁCI POSTACI (SPEAKER-SCOPED IDIOLECT, HYPOCORISM BLEED ERADICATION & INHERENT GENDER MORPHOLOGY):
-   1. Unikaj kalki EKSTERYTORIALNEGO WYCIEKU KSYWEK RÓWIEŚNICZYCH (SPEAKER-SCOPED HYPOCORISM GUARD):
+   1. ELIMINACJA EKSTERYTORIALNEGO WYCIEKU KSYWEK RÓWIEŚNICZYCH (SPEAKER-SCOPED HYPOCORISM GUARD):
       - Specyficzne, slangowe lub pieszczotliwe ksywki rówieśnicze i gyaru (np. 'Hikarun', 'Aoi-chan') są ściśle ograniczone do postaci, która je nadała w danej relacji.
       - Eliminujemy kalkę przypisywania ksywek szkolnych/gyaru rodzicom, ojcom, nauczycielom, mentorom oraz postaciom w retrospekcjach (Flashback)!
       - Gdy matka w audio seiyū mówi 'Hikaru-chan', jedynym naturalnym polskim ekwiwalentem jest 'Hikaru', 'Córeczko' lub 'Hikaruś' (KARDYNALNY BŁĄD [X]: 'Hikarun, posłuchaj uważnie').
@@ -1793,17 +1791,17 @@ FILAR CLXX: SYSTEMOWY PRYMAT GŁOSU SEIYŪ NAD ANGIELSKIM PIVOTEM, KATEGORIE AKT
 
 FILAR CLXXI: ZGODNOŚĆ LICZEBNIKÓW, WIERNOŚĆ FAKTOGRAFICZNA I PRYMAT ZAIMKÓW MĘSKICH NAD WYSOKIM F0 (NUMERICAL INTEGRITY, FACTUAL FIDELITY & CROSS-GENDER PRONOUN PRECEDENCE):
    1. WIERNIE PRZENOSZONE LICZBY I DANE FAKTOGRAFICZNE:
-      - Kategoryczny unikaj kalki gubienia, dopisywania lub mutowania liczb, lat, kwot, odległości i dat!
+      - Wystrzegaj się gubienia, dopisywania lub mutowania liczb, lat, kwot, odległości i dat!
       - '300 years' to ZAWSZE '300 lat' (KARDYNALNY BŁĄD [X]: '30 lat', 'kilkaset lat'). '3 days' to 'trzy dni', '100 gold' to '100 sztuk złota'.
    2. PRYMAT ZAIMKÓW MĘSKICH NAD TEMBREM F0 (CROSS-GENDER SEIYŪ DEFENSE):
       - W anime dorosłe kobiety często dubbingują małych chłopców (archetyp shōnen).
       - Użycie przez postać zaimków 'boku' (僕) lub 'ore' (俺) przy wysokim tembrze głosu (>180 Hz) to BEZWZGLĘDNY DOWÓD PŁCI MĘSKIEJ!
-      - Kategoryczny unikaj kalki form żeńskich ('byłam', 'zrobiłam', 'gotowa') dla chłopców mówiących 'boku/ore' – obowiązek form męskich ('byłem', 'zrobiłem', 'gotowy').
+      - Bezwzględny obowiązek form męskich ('byłem', 'zrobiłem', 'gotowy') dla chłopców mówiących 'boku/ore' (nie stosuj form żeńskich: 'byłam', 'zrobiłam', 'gotowa').
    3. MAJUSKUŁA NAZW WŁASNYCH I ENCYKLOPEDII ŚWIATA:
-      - Wszystkie imiona postaci, tytulatura dynastyczna i toponimy (np. Töregene, Ilüge, Fatima, Chulan) MUSZĄ zaczynać się wielką literą, nawet jeśli angielski fansub zapisał je z błędem małą literą ('toregene' -> 'Töregene').
+      - Wszystkie imiona postaci, tytulatura dynastyczna i toponimy MUSZĄ zaczynać się wielką literą, nawet jeśli angielski fansub zapisał je z błędem małą literą.
    4. PRYMAT KANONICZNEJ PŁCI ŻEŃSKIEJ NAD NISKIM F0 SEIYŪ (CROSS-GENDER MATRON DEFENSE):
       - Niski tembr F0 seiyū (<=160 Hz) u postaci żeńskich (seniorki, władczynie, matrony, wojowniczki o ochrypłym głosie) NIE MOŻE naruszać form żeńskich!
-      - Postać zdefiniowana w AniList lub Series Bible jako KOBIETA (np. Boraqchin) bezwzględnie zachowuje formy żeńskie (-łam / -łabym: 'miałam', 'miałabym', 'wiedziałam'), nawet jeśli czujnik F0 raportuje niski tembr głosu seiyū.
+      - Postać zdefiniowana w AniList lub Series Bible jako KOBIETA bezwzględnie zachowuje formy żeńskie (-łam / -łabym: 'miałam', 'miałabym', 'wiedziałam'), nawet jeśli czujnik F0 raportuje niski tembr głosu seiyū.
 
 FILAR CLXXII: DYNAMICZNY PRYMAT AFEKTU, KONTRAKT POLSZCZYZNY BEZTERMINOWEJ I POZYTYWNE WEKTORY RZEMIOSŁA DIALOGOWEGO (DYNAMIC AFFECTIVE PRIMACY, TIMELESS COLLOQUIAL CRAFT & POSITIVE VECTORS):
    1. PRYMAT AFEKTU I ZAŁAMANIA EMOCJONALNEGO NAD STATYCZNĄ BIBLE:
@@ -2166,7 +2164,7 @@ SPECYFIKA PRZEKŁADU ANIME, GŁOSU ORAZ JĘZYKA JAPOŃSKIEGO:
        -> BŁĄD [X]: "Głupi jesteś?", "Jesteś pewien?", "Widziałeś to?".
        -> POPRAWNIE [OK]: "Głupia jesteś?" / "Oszalałaś?", "Jesteś pewna?", "Widziałaś to?".
      * Formy 1. osoby mówiącej dziewczyny: "poszłam", "zrobiłam", "pomyślałam".
-   - Kategoryczny unikaj kalki domyślnego używania rodzaju męskiego w dialogach między dziewczętami/kobietami!
+   - Wystrzegaj się domyślnego używania rodzaju męskiego w dialogach między dziewczętami/kobietami!
    - "ore", "boku" -> styl męski / chłopięcy (męskie formy: "zrobiłem", "poszedłem").
    - "watashi", "atashi" -> styl damski lub neutralny/oficjalny (żeńskie formy: "zrobiłam", "poszłam").
 {honorifics_text}
@@ -2230,7 +2228,7 @@ POZIOM 4: ERGONOMIA I LIMITY AVT
 
 POZIOM 5: WSKAZÓWKI I KOREKTY UŻYTKOWNIKA (Few-Shot Context)
 - Uwagi użytkownika traktowane są jako cenne WSKAZÓWKI JAKOŚCIOWE, drogowskaz stylu i impuls do doskonalenia, a NIE jako sztywna dogmatyka ponad regułami wyższych poziomów!
-- Kategoryczny unikaj kalki mechanicznego, bezmyślnego stosowania reguł w oderwaniu od kontekstu sceny i fizyczności obrazu.
+- Wystrzegaj się mechanicznego, bezmyślnego stosowania reguł w oderwaniu od kontekstu sceny i fizyczności obrazu.
 ================================================================================
 """
 
@@ -2250,7 +2248,7 @@ KOMPLEKSOWY RDZEŃ PRZEKŁADU AUDIOWIZUALNEGO (CORE AVT CANON - BELCZYK, BARAŃC
 
 3. SPÓJNOŚĆ SKŁADNIOWA ZDAŃ ROZBITYCH (SYNTAX CONTINUITY / FILAR CLXIX):
 - Gdy zdanie jest rozbite wielokropkiem między linijkami (...), stanowi JEDNO niepodzielne zdanie gramatyczne.
-- Kategoryczny unikaj kalki ucinania zdań i zastępowania orzeczenia wiszącym imiesłowem przysłówkowym.
+- Wystrzegaj się ucinania zdań i zastępowania orzeczenia wiszącym imiesłowem przysłówkowym.
 
 4. PODZIAŁ RÓL MODALNOŚCI (SKRYPT EN VS AUDIO JP):
 - Skrypt angielski (EN) dostarcza kompletną strukturę zdania, fakty, liczby oraz prawidłową majuskułę (wielkie litery) nazw własnych, rodów i toponimów.
@@ -2270,13 +2268,13 @@ KOMPLEKSOWY RDZEŃ PRZEKŁADU AUDIOWIZUALNEGO (CORE AVT CANON - BELCZYK, BARAŃC
 
 7. PRYMAT SYGNAŁU AKUSTYCZNEGO NAD SKAŻONYMI TAGAMI FANSUBÓW (FILAR CLXXIV):
 - Etykieta aktora z zewnętrznego pliku napisów (pole Actor/Name w pliku .ass) to dane niezweryfikowane (untrusted input), które bywają fałszywe lub skażone.
-- Obiektywny sygnał audio seiyū (F0, tembr żeński, zaimki w Whisper) oraz rzeczywistość dramatyczna sceny (zamknięta jurta kobiet) mają BEZWZGLĘDNY PRIORYTET nad etykietą tekstową fansuba.
-- Eliminujemy kalkę ulegania męskiemu tagowi aktora (np. 'Ögedei'), gdy kwestię na ekranie i w głośniku wymawia kobieta: wymóg bezwzględnego stosowania form żeńskich 1. osoby ('zamierzałam', 'chciałam', 'byłam').
+- Obiektywny sygnał audio seiyū (F0, tembr żeński, zaimki w Whisper) oraz rzeczywistość dramatyczna sceny (zamknięta przestrzeń kobiet) mają BEZWZGLĘDNY PRIORYTET nad etykietą tekstową fansuba.
+- Eliminujemy kalkę ulegania męskiemu tagowi aktora, gdy kwestię na ekranie i w głośniku wymawia kobieta: wymóg bezwzględnego stosowania form żeńskich 1. osoby ('zamierzałam', 'chciałam', 'byłam').
 - W dialogu między kobietami adresat jest BEZWZGLĘDNIE żeński ('Wyglądasz na wzburzoną' - Unikaj kalki męskiego 'wzburzonego').
 - Płynność tokenów: powtórzenia wyrazu z kropką (np. 'odebrać.odebrać.') podlegają bezwzględnej eliminacji.
 
 8. MORFOLOGIA 1. OSOBY LICZBY MNOGIEJ W GRUPACH ŻEŃSKICH (FILAR CLXXV):
-- W scenach w 100% kobiecych (np. jurta kobiet, klub dziewcząt, zakonnice) lub gdy podmiot reprezentuje grupę kobiet, 1. osoba liczby mnogiej w języku polskim BEZWZGLĘDNIE wymaga form niemęskoosobowych:
+- W scenach wyłącznie żeńskich (np. klub dziewcząt, zakonnice) lub gdy podmiot reprezentuje grupę kobiet, 1. osoba liczby mnogiej w języku polskim BEZWZGLĘDNIE wymaga form niemęskoosobowych:
   * Czasowniki czasu przeszłego: końcówka '-łyśmy' (np. 'zrobiłyśmy', 'poszłyśmy', 'widziałyśmy', 'wiedziałyśmy', 'mogłyśmy', 'zaczęłyśmy', 'byłyśmy') - Eliminujemy kalkę MĘSKICH FORM '-liśmy' ('zrobiliśmy', 'byliśmy')!
   * Czasowniki trybu przypuszczającego: końcówka '-łybyśmy' (np. 'zrobiłybyśmy', 'chciałybyśmy', 'byłybyśmy') - Unikaj kalki '-libyśmy'!
   * Orzeczniki złożone i imiesłowy: 'byłyśmy gotowe / pewne / same / zmuszone / zaskoczone' - Unikaj kalki 'byliśmy gotowi / pewni / sami'!
@@ -2298,7 +2296,7 @@ KOMPLEKSOWY RDZEŃ PRZEKŁADU AUDIOWIZUALNEGO (CORE AVT CANON - BELCZYK, BARAŃC
 
 11. RESET INERCJI AFEKTYWNEJ PRZY PĘKNIĘCIU DYNAMIKI (FILAR CLXXVIII):
 - Gdy seiyū gwałtownie załamuje głos (krzyk -> szept/szok, spadek energii RMS, znacznik Ac=SHOCK_DROP), natychmiast wygaś rozpęd stylistyczny poprzednich kwestii.
-- Kategoryczny unikaj kalki bezwładnego kontynuowania agresywnych wykrzyknień i wulgaryzmów; przejdź na zdławiony, urywany szept lub lakoniczny szok.
+- Wystrzegaj się bezwładnego kontynuowania agresywnych wykrzyknień i wulgaryzmów; przejdź na zdławiony, urywany szept lub lakoniczny szok.
 
 12. DIALOGOWE PARY PRZYLEGANIA I ELIPSY FILMOWE (FILAR CLXXIX):
 - Naturalne odpowiedzi zamiast szkolnego kalkowania formuł 'Yes, I did' / 'No, I wasn't' jako 'Tak, zrobiłem' / 'Nie, nie byłem'.
@@ -2306,7 +2304,7 @@ KOMPLEKSOWY RDZEŃ PRZEKŁADU AUDIOWIZUALNEGO (CORE AVT CANON - BELCZYK, BARAŃC
 
 13. SPATIAL DEIXIS I WEKTORY RUCHU IKU/KURU (FILAR CLXXX):
 - Japońskie czasowniki ruchu (iku/kuru) w wołaczach i replikach ('Ima iku yo!', 'Iku zo!') z angielskim 'I'm coming!' przekładaj jako 'Już idę!', 'Zaraz będę!', 'Ruszam!'.
-- Kategoryczny unikaj kalki nienaturalnej kalki 'Już przychodzę!' w odniesieniu do zmierzania ku wołającemu.
+- Wystrzegaj się nienaturalnej kalki 'Już przychodzę!' w odniesieniu do zmierzania ku wołającemu.
 
 14. KOEGZYSTENCJA Z OBRAZEM I TŁUMIENIE PLEONAZMÓW (FILAR CLXXXI):
 - Napisy nie dublują tego, co widać na ekranie. Unikaj werbalnej hiper-eksplikacji i pleonazmów sensoryczno-przestrzennych.
@@ -2317,19 +2315,19 @@ KOMPLEKSOWY RDZEŃ PRZEKŁADU AUDIOWIZUALNEGO (CORE AVT CANON - BELCZYK, BARAŃC
 - Punkty zwrotne rejestru T-V: Autoryzowane skrócenie dystansu (przejście na 'ty' zainicjowane przez 'mów mi po imieniu', 'przejdźmy na ty', 'keigo wa yamete', 'yobisute') lub pęknięcie afektywne ma bezwzględny priorytet nad statyczną niezmienniczością relacji.
 
 16. ZGODNOŚĆ LICZBY W ZAIMKACH Z LICZEBNIKAMI, PURYZM TYTULATURY I TOPONIMY OBCOJĘZYCZNE (FILAR CLXXXIII):
-- Zgodność liczby w zaimkach z liczebnikami: Angielskie 'you two', 'you both', 'you three' to w polszczyźnie 2. osoba liczby mnogiej: 'wy dwie', 'wy dwaj', 'wy dwoje', 'wy troje', 'wy wszyscy'. Kategoryczny unikaj kalki hybryd liczbowych 'ty dwie', 'ty dwaj', 'ty dwoje'!
-- Puryzm tytulatury w dopełnieniu: Zwrot grzecznościowy po przyimku wymaga czystego dopełniacza bez wycieku wołacza ('od pana Hayamy', 'dla pana Kanzakiego'). Kategoryczny unikaj kalki zbitki 'od pana panie X'!
+- Zgodność liczby w zaimkach z liczebnikami: Angielskie 'you two', 'you both', 'you three' to w polszczyźnie 2. osoba liczby mnogiej: 'wy dwie', 'wy dwaj', 'wy dwoje', 'wy troje', 'wy wszyscy'. Wystrzegaj się hybryd liczbowych 'ty dwie', 'ty dwaj', 'ty dwoje'!
+- Puryzm tytulatury w dopełnieniu: Zwrot grzecznościowy po przyimku wymaga czystego dopełniacza bez wycieku wołacza ('od pana Hayamy', 'dla pana Kanzakiego'). Wystrzegaj się zbitki 'od pana panie X'!
 - Nieodmienność toponimów obcojęzycznych: Francuskie nazwy własne i apelacje winiarskie zakończone na nieme spółgłoski lub -eaux/-aux/-ais (Bordeaux, Margaux, Calais, Pau) są w polszczyźnie nieodmienne ('do Bordeaux', 'w Bordeaux', 'z Margaux', 'do Calais' - eliminujemy kalkę 'Bordeauxa', 'Margauxa').
 
 17. ELIMINACJA PLEONAZMÓW TOPONIMICZNYCH, TAUTOLOGII KLASYFIKATORÓW I JĄKANIA SŁOWNIKOWEGO (FILAR CLXXXIV):
-- Prewencja pleonazmów toponimicznych i administracyjnych: Kategoryczny unikaj kalki podwajania lub potrajania deskryptorów kategorialnych (prowincja, prefektura, góra, rzeka, miasto, zamek, kronika). Gdy w zdaniu występuje już odmieniony deskryptor ('z prowincji', 'na górze', 'w rzece', 'w mieście', 'w kronice'), nazwę własną podajemy bezpośrednio bez powtórzonego mianownika: wyłącznie 'z prowincji Shimotsuke' (eliminujemy kalkę potworków 'z prowincji Prowincja Shimotsuke' oraz 'z prowincji Prowincja Prowincja Shimotsuke'!), 'na górze Hiei', 'w rzece Kamogawa', 'w Kronice Taiheiki'.
-- Likwidacja mechanicznego jąkania słownikowego: Bezwzględny unikaj kalki powtarzania tego samego tokenu bez interpunkcji ('Prowincja Prowincja' -> 'Prowincja', 'Kronika Kronika' -> 'Kronika').
+- Prewencja pleonazmów toponimicznych i administracyjnych: Wystrzegaj się podwajania lub potrajania deskryptorów kategorialnych (prowincja, prefektura, góra, rzeka, miasto, zamek, kronika). Gdy w zdaniu występuje już odmieniony deskryptor ('z prowincji', 'na górze', 'w rzece', 'w mieście', 'w kronice'), nazwę własną podajemy bezpośrednio bez powtórzonego mianownika: wyłącznie 'z prowincji Shimotsuke' (eliminujemy kalkę potworków 'z prowincji Prowincja Shimotsuke' oraz 'z prowincji Prowincja Prowincja Shimotsuke'!), 'na górze Hiei', 'w rzece Kamogawa', 'w Kronice Taiheiki'.
+- Likwidacja mechanicznego jąkania słownikowego: Wyeliminuj powtarzanie tego samego tokenu bez interpunkcji ('Prowincja Prowincja' -> 'Prowincja', 'Kronika Kronika' -> 'Kronika').
 - Rząd przyimka pochodzenia z toponimami i syntagmy reliktów: Krainy i toponimy po przyimku 'z' określające pochodzenie obiektu, reliktu lub postaci ('from Hiden', 'Haiden's Book', 'knight from Boelate') w języku polskim rządzą dopełniaczem ('Księga Toaha z Hiden', 'chłopak z Hiden', 'rycerz z Boelate'). W syntagmach artefaktów i oręża człon nadrzędny odmienia się swobodnie w zdaniu zależnym ('Szukam Księgi Toaha', 'z Księgą Toaha'), a przydawka imienna pozostaje w dopełniaczu.
 
 18. SPÓJNOŚĆ PŁCIOWA MONOLOGÓW, NIENARUSZALNOŚĆ STRONY BIERNEJ I ODPORNOŚĆ NA SKAŻONE TAGI MÓWCÓW (FILAR CLXXXV):
 - Spójność morfologiczna monologów i narracji: Cała wypowiedź postaci wygłaszana w obrębie sceny (zwłaszcza w kursywie {\i1} lub w powiązanych linijkach z pauzami dramatycznymi) musi zachowywać 100% spójności rodzaju gramatycznego w 1. osobie. Męskie 'będę musiał' na końcu kwestii bezwzględnie wymusza formy męskie na początku ('Bałem się', 'przyszedłem'; eliminujemy kalkę rozszczepienia płci: 'Bałam się' / 'przyszłam'!).
 - Nienaruszalność i symetria strony biernej: W konstrukcjach strony biernej czasownik posiłkowy (został / została) oraz wszystkie imiesłowy bierne (pojmany / pojmana, stracony / stracona) muszą bezwzględnie zgadzać się w rodzaju gramatycznym z podmiotem (dla mężczyzn: 'został pojmany i stracony'; eliminujemy kalkę niespójnych potworków: 'została pojmany i stracony'!).
-- Tarcza głosu towarzyszki (Companion Voice Shield) i spójność kwestii: Gdy kwestia zawiera autentyczną formę żeńską 1. osoby mówioną żeńskim głosem seiyū (np. Shizuku mówiąca o woniach/kadzidłach: 'czułam', 'Mogłam zapytać'), zachowaj w całości formy żeńskie ('czułam', 'mogłam'), nawet jeśli zewnętrzny plik fansuberski omyłkowo przypisał kwestię postaci męskiej (Tokiyuki). Kategoryczny unikaj kalki rozszczepiania sąsiadujących linijek tego samego dialogu na różne rodzaje ('czułem' vs 'Mogłam')!
+- Spójność kwestii sąsiadujących: Kategorycznie eliminuj rozszczepianie sąsiadujących linijek tej samej wypowiedzi postaci na różne rodzaje gramatyczne w 1. osobie. Gdy linijki stanowią jedną wypowiedź podzieloną pauzą lub montażem, zachowaj w nich jednolity rodzaj gramatyczny.
 
 19. ŚWIADOMOŚĆ RELACJI DIADYCZNEJ I HARMONIZACJA FORM ADRESATYWNYCH (FILAR CLXXXVI):
 - Świadomość partnera dialogowego: W dynamicznym dialogu dwuosobowym (szczególnie między postaciami tego samego rejestru lub oznaczonymi tagami ról jak Man A / Man B czy Woman A / Woman B) formy czasowników 2. osoby czasu przeszłego i przypuszczającego oraz orzeczniki przymiotnikowe muszą harmonizować z płcią bezpośredniego rozmówcy.
@@ -2536,7 +2534,7 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Op
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR XLI & LX - Napisy Ekranowe, Plansze i AVT]: "
             "Napisy ekranowe i plansze tłumacz jako odrębne tytuły/nazwy (plansze: [ WERSALIKAMI W NAWIASIE ]). "
-            "Kategoryczny unikaj kalki wklejania w pole napisu ekranowego fragmentów dialogu mówionego!"
+            "Nigdy nie wklejaj w pole napisu ekranowego fragmentów dialogu mówionego!"
         )
 
     # 2b. Wielogłos, dialogi nakładające się i dymki mangi na ekranie (Filar LVII)
@@ -2553,7 +2551,7 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Op
             "• [SKUP SIĘ NA: FILAR LVII - Standard Wielogłosu i Czystość Myślników]: "
             "Gdy w jednej kwestii odzywają się dwie postacie (z myślnikami '- ') LUB kwestia łączy dymek mangi/planszę z dialogiem mówionym: "
             "BEZWZGLĘDNIE zachowaj format DWÓCH OSOBNYCH LINII z myślnikiem ze spacją na początku KAŻDEJ ('- Kwestia 1\\N- Kwestia 2'). "
-            "ZASADA POJEDYNCZEJ KWESTII (BEZ MYŚLNIKA): jeśli kwestię wypowiada jedna postać, Unikaj kalki wstawiania myślnika na początku ('- Ocalę cię' -> BŁĄD! Wymagane: 'Ocalę cię')! "
+            "ZASADA POJEDYNCZEJ KWESTII (BEZ MYŚLNIKA): jeśli kwestię wypowiada jedna postać, nie wstawiaj myślnika na początku ('- Ocalę cię' -> BŁĄD! Wymagane: 'Ocalę cię')! "
             "Wypowiedzi różnych osób rozdzielamy znakiem \\N; myślnik stawiamy wyłącznie na początku linii dialogu wielogłosowego ('Kwestia 1 - Kwestia 2' -> BŁĄD KARDYNALNY)!"
         )
 
@@ -2562,10 +2560,10 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Op
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR XXV, XXVII & XXVIII - Tytulatura, Etykieta i Adaptacja Honoryfikatorów]: "
             "Stosuj naturalną 2. osobę ('To ty, młody panie'), "
-            "unikaj kalki hybryd ('Pani Sensei' -> 'Sensei'), "
+            "unikaj hybryd ('Pani Sensei' -> 'Sensei'), "
             "senpai adaptuj do imienia rozmówcy w wołaczu ('Rinko!' zamiast 'Senpai!') lub zwrotu na 'ty', "
             "sufiksy otaku (-taso, -tan) adaptuj do pełnego imienia w zależności od rejestru serii, "
-            "unikaj kalki powtarzania 'pan/pana' w każdym zdaniu (tytuł raz, potem naturalna 2. osoba)."
+            "unikaj powtarzania 'pan/pana' w każdym zdaniu (tytuł raz, potem naturalna 2. osoba)."
         )
 
     # 4. Zwroty Yobisute i relacje rówieśnicze
@@ -2707,8 +2705,8 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Op
     if any(k in combined_en for k in env_keys):
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR CXXXVIII & SOCZEWKA 2 (ŚWIAT) - Fizyczność Scenerii i Izotopia Środowiskowa]: "
-            "Szanuj materię sceny! Jeśli postacie są w browarze z piwem/bagnie/kadzi wina -> Unikaj kalki słowa 'woda' (He dragged him underwater -> 'Pociągnął go na dno' / 'Wciągnął go pod powierzchnię'). "
-            "Kategoryczny unikaj kalki 'powódź piwa' -> 'fala piwa' / 'morze piwa'!"
+            "Szanuj materię sceny! Jeśli postacie są w browarze z piwem/bagnie/kadzi wina -> nie używaj słowa 'woda' (He dragged him underwater -> 'Pociągnął go na dno' / 'Wciągnął go pod powierzchnię'). "
+            "Stosuj naturalną plastykę języka: 'fala piwa' / 'morze piwa' (zamiast kalki 'powódź piwa')!"
         )
 
     # 20. Matryca Idiomów Mostowych i Przeczeń Eliptycznych (Filar CXXXVII)
@@ -2878,7 +2876,7 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Op
     if any(w in combined_en for w in ["drinking", "drink", "have one", "cheers", "sake", "beer", "toast"]):
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR XCVII - Pragmatyka Biesiadna i Kumpelskie Zaproszenia]: "
-            "Pytania o alkohol ('You're drinking, right?') tłumacz biesiadnie ('Chyba nie odmówisz?', 'Ze mną się nie napijesz?'), Unikaj kalki dosłownego 'Przecież pijesz'!"
+            "Pytania o alkohol ('You're drinking, right?') tłumacz biesiadnie ('Chyba nie odmówisz?', 'Ze mną się nie napijesz?') — unikaj dosłownego 'Przecież pijesz'!"
         )
 
     # 42. Typografia plansz tytułowych (Filar XCVIII)
@@ -2895,7 +2893,7 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Op
             "Zwykłe zawahania ('Erm, hey') tłumacz jako 'Przepraszam...', 'Zaraz, hej...'. Eliminujemy kalkę samowolnego wklejania imion postaci ('Panie Kamui...')!"
         )
 
-    # 44. Japońskie Yobisute i unikaj kalki fałszywej tytulatury (Filar C)
+    # 44. Japońskie Yobisute i eliminacja fałszywej tytulatury (Filar C)
     if any(len(item.get("en", "").split()) <= 2 and "?" in item.get("en", "") for item in batch_items) or any(w in combined_en for w in ["kamui", "shinra", "arthur", "lord", "mr."]):
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR C - Japońskie Yobisute i Naturalne Formy Adresatywne]: "
@@ -2920,7 +2918,7 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Op
     if any(w in combined_en for w in ["please", "help me", "can you", "could you", "give me", "kure", "kase", "kudasai"]):
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR CIII - Pragmatyka Próśb i Rozkazów (Kure / Moraeru / Kudasai)]: "
-            "W scenach walki i pośpiechu ('Tasukete kure!') stosuj twarde rozkazy ('Pomóż mi!', 'Ratuj!'), Unikaj kalki sztucznego 'Proszę, pomóż mi'. Prośby kumpelskie ('Kashite') tłumacz jako 'Dawaj to!', 'Pożycz mi to!'."
+            "W scenach walki i pośpiechu ('Tasukete kure!') stosuj twarde rozkazy ('Pomóż mi!', 'Ratuj!') zamiast sztucznego 'Proszę, pomóż mi'. Prośby kumpelskie ('Kashite') tłumacz jako 'Dawaj to!', 'Pożycz mi to!'."
         )
 
     # 48. Somatyka emocji i mimetyki (Filar CIV)
@@ -2948,7 +2946,7 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Op
     if any(w in combined_en for w in ["lord", "master", "sir", "lady", "senpai", "sama", "dono"]):
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR CVII - Asymetria Społeczna Keigo (Sonkeigo vs Kenjōgo)]: "
-            "Różnicuj uniżanie siebie ('pozwolę sobie zauważyć', 'służę pomocą') od wywyższania szefa/seniora ('raczy pan spocząć', 'czy zechciałby pan'). Unikaj kalki spłaszczania obu do 'Please sit'."
+            "Różnicuj uniżanie siebie ('pozwolę sobie zauważyć', 'służę pomocą') od wywyższania szefa/seniora ('raczy pan spocząć', 'czy zechciałby pan') — unikaj spłaszczania obu do 'Please sit'."
         )
 
     # 52. Kinezyka spojrzenia i subtekst mikromimiki (Filar CVIII)
@@ -2976,7 +2974,7 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Op
     if any(w in combined_en for w in ["good job", "hard work", "impressive", "such an honor", "gokurou"]):
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR CXI - Japońska Zjadliwość Iyami (Inverted Politeness)]: "
-            "Fałszywe komplementy wrogów w Keigo tłumacz jako jadowitą polską ironię salonową ('Doprawdy, imponujący wyczyn...', 'Cóż za popis...'). Unikaj kalki brania pochwał dosłownie!"
+            "Fałszywe komplementy wrogów w Keigo tłumacz jako jadowitą polską ironię salonową ('Doprawdy, imponujący wyczyn...', 'Cóż za popis...') — nie bierz fałszywych pochwał dosłownie!"
         )
 
     # 56. Semiotyka ciszy Ma (Filar CXII)
@@ -3163,7 +3161,7 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Op
     if any(w in combined_en for w in kin_patterns):
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR CXL - Społeczne Metafory Pokrewieństwa (Onii-san / Ojisan Sanitization)]: "
-            "Unikaj kalki TWORZENIA FAŁSZYWYCH BRACI I WUJKÓW! Gdy dziecko lub nastolatek mówi do obcego człowieka na ulicy/w walce 'Onii-san' / 'Onee-san' / 'Ojisan': "
+            "ELIMINACJA TWORZENIA FAŁSZYWYCH BRACI I WUJKÓW! Gdy dziecko lub nastolatek mówi do obcego człowieka na ulicy/w walce 'Onii-san' / 'Onee-san' / 'Ojisan': "
             "Eliminujemy kalkę: „mój bracie!”, „braciszku!”, „wujku!”. Tłumacz jako: „Proszę pana!”, „Hej, panie!”, „Kolego!”, „Młodzieńcze!”, „Proszę pani!”. "
             "Gdy w tagach audio występuje [Ton: emocjonalne drżenie głosu / płacz], 'Onii-chan, tasukete!' -> „Proszę pana, pomocy!”!"
         )
@@ -3285,7 +3283,7 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Op
     if any(any(tok in str(item.get("audio_jp", "")).lower() for tok in kandoushi_tokens) for item in batch_items) or any(any(w in str(item.get("en", "")).lower() for w in en_kandoushi_keys) for item in batch_items):
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR CLIII - Wielka Matryca Kandōshi (Westchnienia i Emocje)]: "
-            "Kategoryczny unikaj kalki dosłownych kalek! Yare yare -> 'Ja nie mogę...' / 'Litości...' / 'Ręce opadają...' / 'Uff...'; "
+            "Stosuj naturalne polskie ekwiwalenty zamiast dosłownych kalek: Yare yare -> 'Ja nie mogę...' / 'Litości...' / 'Ręce opadają...' / 'Uff...'; "
             "Mendokusai -> 'Ale mi się nie chce...' / 'Co za męczarnia...'; Shou ga nai -> 'Trudno...' / 'Nic na to nie poradzimy'; "
             "Oi oi -> 'Ej, zaraz, zaraz...' / 'Ej, bez przesady!'; Maa maa -> 'Spokojnie, no już...' / 'Bez nerwów...'; "
             "Iikagen ni shiro -> 'Przestań wreszcie!' / 'Dość tego!'; Yokatta -> 'Całe szczęście...'; Yatta -> 'Udało się!' / 'Mamy to!'."
@@ -3322,9 +3320,9 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Op
     if has_overlap_and_italics or has_panic_mantra:
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR CLV - Repetycje Myśli i Separacja Mowy]: "
-            "Kategoryczny unikaj kalki halucynacyjnego zlewania myśli z dialogiem na głos! "
+            "Wyraźnie oddzielaj myśli wewnętrzne od dialogu na głos — nie zlewaj ich w jedną kwestię! "
             "Repetycje paniki/stresu w myślach (np. 'I can't stop it' powtórzone 3 razy -> 'Nie powstrzymam tego...') zachowaj wiernie jako mantrę. "
-            "Unikaj kalki samowolnego wygładzania i wklejania do myśli słów z sąsiedniej linijki mówionej na głos!"
+            "Nie wygładzaj samowolnie tekstu ani nie wklejaj do myśli słów z sąsiedniej linijki mówionej na głos!"
         )
 
     # 96. Rozszczepienie Dwuznaczności Angielskiego Pivotu (Filar CLVI - Hitori vs Hottoite, Betsuni, Mou ii)
@@ -3349,7 +3347,7 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Op
     if has_address_drift_risk:
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR CLVII - Nienaruszalność Formy Adresatywnej, Harmonia Wołacza i -Sama Drop]: "
-            "Jeśli postać zwraca się do rozmówcy po imieniu (np. 'Shizuku, dlaczego?!') lub na 'ty' ('Przecież wiesz...'), w całej scenie KONSEKWENTNIE stosuj formę na 'ty'! "
+            "Jeśli postać zwraca się do rozmówcy po imieniu (np. 'Ren, dlaczego?!') lub na 'ty' ('Przecież wiesz...'), w całej scenie KONSEKWENTNIE stosuj formę na 'ty'! "
             "W dialogu bezpośrednim stosuj naturalną 2. osobę bez sztucznego 'pan/pani' ('wygrał pan' -> BŁĄD KARDYNALNY! Należy: 'wygrałeś' / 'wygrałaś' zależnie od płci adresata). "
             "HARMONIA WOŁACZA: Zachowaj jednolitość rejestru w zdaniu: Niedopuszczalne jest łączenie poufałego wołacza imienia z honoryfikatywnym 'pan/pani' ('Poza tym, Eftalu... ma pan' -> BŁĄD KARDYNALNY! Wymagane: 'Poza tym, panie Eftalu... ma pan'). "
             "ODPORNOŚĆ NA ANGIELSKIE OPUSZCZANIE -SAMA: W okrzykach i zawołaniach podwładnych/uczniów nie kopiuj angielskiego ucinania tytułów ('Co za kunszt, panie Eftalu!', zamiast 'Co za kunszt, Eftalu!')."
@@ -3396,7 +3394,7 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Op
     if has_semiotic_mix:
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR CLX - Dekompozycja Semiotyczna i Nienaruszalność Warstw]: "
-            "Oddzielaj żywą mowę od dymków mangowych i plansz! Kategoryczny unikaj kalki sklejania dymka halucynacji z dialogiem mówionym w jedno zdanie."
+            "Oddzielaj żywą mowę od dymków mangowych i plansz! Nigdy nie sklejaj dymka z dialogiem mówionym w jedno zdanie."
         )
 
     # 101. Nienaruszalność Perspektywy Narracyjnej i Ochrona Tożsamości Incognito (Filar CLXI)
@@ -3422,7 +3420,7 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Op
     has_name_on_a_trigger = any(
         re.search(r"\b(shira|akira|gaara|ashitaka|kiba|soma|kenta|ryoma|hanza|koba|soya|toma|genga|sinbad|judar|alibaba)\b", str(item.get("en", "")), re.IGNORECASE) or
         any("filar clxii" in str(item.get("notes", "")).lower() for item in [item]) or
-        any(w in str(item.get("notes", "")).lower() for w in ["scena wyłącznie kobieca", "mówczyni", "boraqchin", "fatima"]) or
+        any(w in str(item.get("notes", "")).lower() for w in ["scena wyłącznie kobieca", "mówczyni"]) or
         any(re.search(r"\b(i intended|i wanted|i did|i got|what i did|you look agitated|wyglądasz na wzburzon)\b", str(item.get("en", "")), re.IGNORECASE) for item in [item])
         for item in batch_items
     )
@@ -3446,7 +3444,7 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Op
             "• [SKUP SIĘ NA: FILAR CLXIII - Morfologia Adresatywna 2. Osoby ('ty' kobieta/mężczyzna, dzieci oraz 'wy' grupy i pary)]: "
             "1) Dla małego dziecka ('dziewczynka' lub 'chłopiec') BEZWZGLĘDNIE stosuj bezpośrednie 'ty' w rejestrze opiekuńczym ('zgubiłaś się, mała?', 'uważaj, bo spadniesz') – KATEGORYCZNY ZAKAZ dystansowania dziecka per 'Pan/Pani'! "
             "2) Dla pojedynczej kobiety ('kobieta') w 2. os. lp. 'ty' BEZWZGLĘDNIE stosuj formy żeńskie ('byłaś', 'zrobiłaś', 'poszłaś', 'jesteś pewna', 'gotowa'). "
-            "3) Dla pojedynczego mężczyzny ('mężczyzna') stosuj formy męskie ('byłeś', 'zrobiłeś', 'poszedłeś', 'jesteś pewien', 'gotowy'). "
+            "3) Dla pojedynczego mężczyzny ('mężczyzna') w 2. os. lp. 'ty' BEZWZGLĘDNIE stosuj formy męskie ('byłeś', 'zrobiłeś', 'poszedłeś', 'jesteś pewien', 'gotowy'). "
             "4) Dla pary dwóch kobiet stosuj 'obie / was dwie' ('obie poszłyście'), dla dwóch mężczyzn 'obaj / was dwóch' ('obaj poszliście'), dla pary mieszanej 'oboje / was dwoje'. "
             "5) Dla grupy samych kobiet ('grupa_kobiet') stosuj formy niemęskoosobowe ('zrobiłyście', 'byłyście gotowe'). Dla grupy mężczyzn/mieszanej stosuj męskoosobowe ('zrobiliście', 'byliście gotowi')."
         )
@@ -3617,7 +3615,7 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Op
             "• [SKUP SIĘ NA: FILAR CLXX - Prymat Głosu Seiyū, Akty Mowy, Echa Powitań i Apozycja Tytulatury]: "
             "1. Oryginał japoński seiyū jest pierwotnym źródłem intencji i emocji! Przy 'urusai' / 'urusai na' "
             "W dialogu zachowaj naturalne polskie wykładniki zniecierpliwienia ('Ale żenada...', 'przypał'). Zastosuj polskie wykładniki uciszania/zniecierpliwienia: 'Ale marudzisz...', 'Daj mi spokój...', 'Nie truj...'. "
-            "2. Po powitaniu domowym stosuj naturalną odpowiedź ('Witaj w domu!', 'O, już jesteś?'): po 'Wróciłam.' / 'Wróciłem.' Unikaj kalki echa 'Wróciłaś.' / 'Wróciłeś.' -> zastosuj 'Witaj w domu!', 'O, już jesteś?' lub 'Dobrze, że jesteś!'. "
+            "2. Po powitaniu domowym stosuj naturalną odpowiedź ('Witaj w domu!', 'O, już jesteś?'): po 'Wróciłam.' / 'Wróciłem.' unikaj echa 'Wróciłaś.' / 'Wróciłeś.' -> zastosuj 'Witaj w domu!', 'O, już jesteś?' lub 'Dobrze, że jesteś!'. "
             "3. Nienaruszalność mianownika nazwiska przy tytulaturze podmiotu w relacji tytuł + nazwisko (np. 'Mistrz Kowalski' a nie 'Mistrz Kowalskiego')."
         )
 
@@ -3634,8 +3632,8 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Op
             "• [SKUP SIĘ NA: FILAR CLXXI - Wierność Faktograficzna, Liczebniki i Zaimki Męskie nad F0]: "
             "1. Liczby, lata i kwoty tłumacz ze 100% precyzją faktograficzną: '300 years' -> '300 lat'. "
             "2. W japońskim anime chłopcy dubbingowani przez kobiety używający 'boku/ore' wymagają BEZWZGLĘDNIE form męskich ('zrobiłem', 'byłem gotowy', a NIE: 'zrobiłam', 'gotowa')! "
-            "3. Nienaruszalność majuskuły encji i nazw własnych (Töregene, Ilüge, Fatima, Chulan). "
-            "4. Ochrona starszych kobiet i matron: niski tembr F0 seiyū (<=160 Hz) u postaci żeńskich (np. Boraqchin) NIE MOŻE naruszać form żeńskich – wymagane formy żeńskie: 'miałam', 'miałabym', 'wiedziałam'."
+            "3. Nienaruszalność majuskuły encji i nazw własnych. "
+            "4. Ochrona starszych kobiet i matron: niski tembr F0 seiyū (<=160 Hz) u postaci żeńskich NIE MOŻE naruszać form żeńskich – wymagane formy żeńskie: 'miałam', 'miałabym', 'wiedziałam'."
         )
 
     # 114. Dynamiczny Prymat Afektu, Kontrakt Polszczyzny Bezterminowej i Pozytywne Wektory Rzemiosła (Filar CLXXII)
@@ -3660,17 +3658,16 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Op
     has_acoustic_primacy_or_tag_contradiction_trigger = any(
         any(w in str(item.get("speaker_voice", "")).lower() for w in ["żeńsk", "alt", "sopran", "ochrypł", "kobieta"]) or
         any(w in str(item.get("notes", "")).lower() for w in ["korekta akustyczna", "filar clxxiv", "scena kobieca", "głos seiyū"]) or
-        any(w in str(item.get("speaker", "")).lower() for w in ["ögedei", "ogedei", "möge", "boraqchin"]) or
-        any(w in str(item.get("en", "")).lower() for w in ["four thousand tents", "lineage of tolui", "intended to take back", "strip from her"])
+        any(w in str(item.get("notes", "")).lower() for w in ["aktora żeńska", "błędny tag aktora"])
         for item in batch_items
     )
     if has_acoustic_primacy_or_tag_contradiction_trigger:
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR CLXXIV - Prymat Sygnału Akustycznego nad Skażonymi Tagami Aktorów (.ass)]: "
-            "1. Rzeczywistość akustyczna seiyū (głos kobiecy F0 >= 185Hz / alt żeński) ZAWSZE bije etykietę aktora z zewnętrznego pliku fansuba! "
-            "Gdy na ekranie i w audio kwestię wypowiada kobieta, Gdy kwestię wypowiada kobieta, stosuj formy żeńskie czasowników ('zamierzałem' -> Wymagana forma: 'zamierzałam'), nawet jeśli fansuber błędnie otagował linię męskim imieniem (np. Ögedei). "
+            "1. Rzeczywistość akustyczna seiyū (głos kobiecy F0 >= 185Hz / alt żeński vs głos męski baryton/bas lub zaimek ore/boku) ZAWSZE bije błędną etykietę aktora z zewnętrznego pliku fansuba! "
+            "Gdy na ekranie i w audio kwestię wypowiada kobieta, stosuj formy żeńskie czasowników ('zamierzałam'), a gdy mężczyzna – formy męskie ('zamierzałem'), nawet jeśli fansuber błędnie otagował linię imieniem przeciwnej płci. "
             "2. W dialogu między dwiema kobietami w zamkniętej przestrzeni adresat jest BEZWZGLĘDNIE żeński ('Wyglądasz na wzburzoną' - w dialogu między kobietami stosuj formę żeńską 'wzburzoną'). "
-            "3. Zabezpieczenie przed podwojeniem tokenów: unikaj kalki jąkania wyrazów z interpunkcją na końcu zdań (np. 'odebrać.odebrać.')."
+            "3. Zabezpieczenie przed podwojeniem tokenów: eliminuj jąkanie wyrazów z interpunkcją na końcu zdań (np. 'odebrać.odebrać.')."
         )
 
     # 116. Morfologia 1. Osoby Liczby Mnogiej w Grupach Żeńskich (Filar CLXXV)
@@ -3678,7 +3675,7 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Op
         (
             any(w in str(item.get("speaker_voice", "")).lower() for w in ["żeńsk", "alt", "sopran", "ochrypł", "kobieta"]) or
             any(w in str(item.get("notes", "")).lower() for w in ["scena kobieca", "grupa kobiet", "żeńsk"]) or
-            any(w in str(item.get("speaker", "")).lower() for w in ["fatima", "töregene", "boraqchin", "möge", "kuroe", "rinko", "chocola"])
+            any(w in str(item.get("notes", "")).lower() for w in ["scena kobieca", "dialog kobiet"])
         ) and any(
             re.search(r"\b(?:we|us|our|ourselves|we're|we've|we'll|we'd)\b", str(item.get("en", "")), re.IGNORECASE)
             for item in batch_items
@@ -3786,7 +3783,7 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Op
             "• [SKUP SIĘ NA: FILAR CLXXXIII - Zgodność Liczby, Puryzm Tytulatury i Toponimy Obcojęzyczne]: "
             "1. Angielskie 'you two' / 'you both' przekładaj w liczbie mnogiej: 'wy dwie' / 'wy dwaj' / 'wy dwoje' (eliminujemy kalkę hybryd liczbowych 'ty dwie'). "
             "2. W zwrotach grzecznościowych w dopełnieniu stosuj czystą konstrukcję: 'od pana Hayamy'. "
-            "3. Francuskie toponimy na nieme głoski (Bordeaux, Margaux, Calais) pozostają bezwzględnie nieodmienne ('do Bordeaux', unikaj kalki 'Bordeauxa')."
+            "3. Francuskie toponimy na nieme głoski (Bordeaux, Margaux, Calais) pozostają bezwzględnie nieodmienne ('do Bordeaux', nie: 'Bordeauxa')."
         )
 
     # 125. Eliminacja Pleonazmów Toponimicznych, Toponimów i Syntagm Reliktów (Filar CLXXXIV)
@@ -3804,19 +3801,19 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Op
             "4. W syntagmach artefaktów człon nadrzędny odmieniaj naturalnie w zdaniu zależnym ('Szukam Księgi Toaha', 'z Księgą Toaha'), zachowując przydawkę imienną w dopełniaczu."
         )
 
-    # 126. Spójność Płciowa Monologów, Nienaruszalność Strony Biernej i Tarcza Towarzyszki (Filar CLXXXV)
+    # 126. Spójność Płciowa Monologów i Nienaruszalność Strony Biernej (Filar CLXXXV)
     has_monologue_passive_voice_trigger = any(
-        bool(re.search(r"\b(?:capture|captured|executed|slain|kill|must|afraid|came|could|scent|incense|smell|saionji|kusunoki)\b", str(item.get("en", "")).lower()))
-        or bool(re.search(r"\b(?:został|została|pojmany|stracony|musiał|musiała|bałem|bałam|przyszedłem|przyszłam|czułem|czułam|mogłem|mogłam|kadzidł|woni|zapach|saionji|kusunoki)\b", str(item.get("pl", "")).lower()))
+        bool(re.search(r"\b(?:capture|captured|executed|slain|kill|must|afraid|came|could)\b", str(item.get("en", "")).lower()))
+        or bool(re.search(r"\b(?:został|została|pojmany|stracony|musiał|musiała|bałem|bałam|przyszedłem|przyszłam)\b", str(item.get("pl", "")).lower()))
         or "{\\i1}" in str(item.get("pl", ""))
         for item in batch_items
     )
     if has_monologue_passive_voice_trigger:
         focused_pillars.append(
-            "• [SKUP SIĘ NA: FILAR CLXXXV - Spójność Monologów, Strona Bierna i Tarcza Towarzyszki]: "
+            "• [SKUP SIĘ NA: FILAR CLXXXV - Spójność Monologów i Strona Bierna]: "
             "1. Monologi i kwestie ciągłe (zwłaszcza w kursywie) wymagają 100% spójności rodzaju 1. osoby: męskie 'będę musiał' wymusza 'Bałem się' i 'przyszedłem'. "
             "2. W stronie biernej czasownik i imiesłowy muszą zachowywać pełną zgodność rodzaju z podmiotem męskim: 'został pojmany i stracony' (eliminujemy kalkę hybrydy 'została pojmany'). "
-            "3. Gdy kwestia mówiona jest żeńskim głosem towarzyszki (Shizuku: wonie/kadzidła), zachowaj formy żeńskie ('czułam', 'mogłam'), eliminując rozszczepienia płci w sąsiadujących linijkach."
+            "3. Spójność kwestii ciągłych: Kategorycznie eliminuj rozszczepianie sąsiadujących linijek tej samej wypowiedzi na różne rodzaje gramatyczne."
         )
 
     # 127. Świadomość Relacji Diadycznej i Harmonizacja Form Adresatywnych (Filar CLXXXVI)

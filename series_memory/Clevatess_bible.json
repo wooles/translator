@@ -2,10 +2,12 @@
   "anime_title": "Clevatess",
   "characters": {
     "Clevatess": {
-      "description": "MĘŻCZYZNA - Król Demonicznych Bestii / Władca Mrocznych Bestii (monstrualny, prastary demon o wielkiej mądrości i sile, potężny, arogancki, dostojny głos)"
+      "description": "MĘŻCZYZNA - Król Demonicznych Bestii / Władca Mrocznych Bestii (monstrualny, prastary demon o wielkiej mądrości i sile, potężny, arogancki, dostojny głos)",
+      "gender": "MALE"
     },
     "Alicia": {
-      "description": "MĘŻCZYZNA - Dziewczyna Rycerz / Bohaterka z 13 Bohaterów, która przeciwstawiła się bezmyślnej rzezi i zawarła pakt z Clevatessem"
+      "description": "MĘŻCZYZNA - Dziewczyna Rycerz / Bohaterka z 13 Bohaterów, która przeciwstawiła się bezmyślnej rzezi i zawarła pakt z Clevatessem",
+      "gender": "MALE"
     },
     "Nel": {
       "description": "MĘŻCZYZNA - Niemowlę powierzone Clevatessowi i Alicii"
@@ -53,7 +55,8 @@
       "description": "MĘŻCZYZNA - mężczyzna (postać)"
     },
     "Chiffonlits": {
-      "description": "MĘŻCZYZNA - MĘŻCZYZNA (postać)"
+      "description": "MĘŻCZYZNA - MĘŻCZYZNA (postać)",
+      "gender": "MALE"
     },
     "Elro": {
       "description": "MĘŻCZYZNA - mężczyzna (Dyrektor Akademii, fałszywy kapłan sprzymierzony z mrocznymi siłami)"

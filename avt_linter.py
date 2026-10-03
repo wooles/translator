@@ -218,6 +218,34 @@ class AVTLinter:
         # Inflections of "robić sens" -> "mieć sens"
         (r"\b([Nn]ie\s+)?([Rr]obi(?:ć|ę|sz|my|cie|ą|ł|ła|ło|li|ły|łby|łaby|łoby|liby|łyby)?)\s+((?:(?:to|jakikolwiek|żaden)\s+)*)(sens(?:u)?)\b", _fix_robic_sens_match, "Filar IV - Eliminacja Kalki 'robić sens' -> 'mieć sens'"),
 
+        # Module C: Polish clitic pronoun syntax at start of utterance/turn (PWN Canon)
+        # Słownik poprawnej polszczyzny PWN: "Formy krótkie zaimków (mi, cię, go, mu) nigdy nie mogą stać na początku zdania ani po pauzie."
+        (r"(^|\\[Nnh]|[-–—]\s*)Mi\b\s+([a-ząćęłńóśźż]+)", r"\g<1>Mnie \g<2>", "PWN Składnia Zaimkowa - Eliminacja Formy Ściągniętej 'Mi' w Nagłosie"),
+        (r"(^|\\[Nnh]|[-–—]\s*)Cię\b\s+([a-ząćęłńóśźż]+)", r"\g<1>Ciebie \g<2>", "PWN Składnia Zaimkowa - Eliminacja Formy Ściągniętej 'Cię' w Nagłosie"),
+        (r"(^|\\[Nnh]|[-–—]\s*)Go\b\s+([a-ząćęłńóśźż]+)", r"\g<1>Jego \g<2>", "PWN Składnia Zaimkowa - Eliminacja Formy Ściągniętej 'Go' w Nagłosie"),
+        (r"(^|\\[Nnh]|[-–—]\s*)Mu\b\s+([a-ząćęłńóśźż]+)", r"\g<1>Jemu \g<2>", "PWN Składnia Zaimkowa - Eliminacja Formy Ściągniętej 'Mu' w Nagłosie"),
+
+        # Module D1: Verbal Dative Government (Eliminacja kalek accusative)
+        (r"\b([Uu]fam)\s+ciebie\b", r"\1 ci", "PWN Rekcja Czasowników - Prymat Celownika ('ufam ciebie' -> 'ufam ci')"),
+        (r"\b([Uu]fam)\s+was\b", r"\1 wam", "PWN Rekcja Czasowników - Prymat Celownika ('ufam was' -> 'ufam wam')"),
+        (r"\b([Ww]ybacz)\s+mnie\b", r"\1 mi", "PWN Rekcja Czasowników - Prymat Celownika ('wybacz mnie' -> 'wybacz mi')"),
+        (r"\b([Pp]omóż)\s+mnie\b", r"\1 mi", "PWN Rekcja Czasowników - Prymat Celownika ('pomóż mnie' -> 'pomóż mi')"),
+        (r"\b([Pp]omóżcie)\s+mnie\b", r"\1 mi", "PWN Rekcja Czasowników - Prymat Celownika ('pomóżcie mnie' -> 'pomóżcie mi')"),
+        (r"\b([Zz]azdroszczę)\s+ciebie\b", r"\1 ci", "PWN Rekcja Czasowników - Prymat Celownika ('zazdroszczę ciebie' -> 'zazdroszczę ci')"),
+        (r"\b([Ww]ybaczam)\s+ciebie\b", r"\1 ci", "PWN Rekcja Czasowników - Prymat Celownika ('wybaczam ciebie' -> 'wybaczam ci')"),
+
+        # Module D2: Genitive of Negation (Genetivus Negationis) for Fixed Collocations
+        (r"\b([Nn]ie\s+mam)\s+czas\b", r"\1 czasu", "PWN Dopełniacz Negacji - Stała Kolokacja ('nie mam czas' -> 'nie mam czasu')"),
+        (r"\b([Nn]ie\s+ma)\s+sens\b", r"\1 sensu", "PWN Dopełniacz Negacji - Stała Kolokacja ('nie ma sens' -> 'nie ma sensu')"),
+        (r"\b([Nn]ie\s+widzę)\s+problem\b", r"\1 problemu", "PWN Dopełniacz Negacji - Stała Kolokacja ('nie widzę problem' -> 'nie widzę problemu')"),
+        (r"\b([Nn]ie\s+widzę)\s+różnica\b", r"\1 różnicy", "PWN Dopełniacz Negacji - Stała Kolokacja ('nie widzę różnica' -> 'nie widzę różnicy')"),
+        (r"\b([Nn]ie\s+czuję)\s+ból\b", r"\1 bólu", "PWN Dopełniacz Negacji - Stała Kolokacja ('nie czuję ból' -> 'nie czuję bólu')"),
+        (r"\b([Nn]ie\s+ma)\s+mowa\b", r"\1 mowy", "PWN Dopełniacz Negacji - Stała Kolokacja ('nie ma mowa' -> 'nie ma mowy')"),
+        (r"\b([Nn]ie\s+mam)\s+pojęcie\b", r"\1 pojęcia", "PWN Dopełniacz Negacji - Stała Kolokacja ('nie mam pojęcie' -> 'nie mam pojęcia')"),
+        (r"\b([Nn]ie\s+ma)\s+potrzeba\b", r"\1 potrzeby", "PWN Dopełniacz Negacji - Stała Kolokacja ('nie ma potrzeba' -> 'nie ma potrzeby')"),
+        (r"\b([Nn]ie\s+ma)\s+wyjście\b", r"\1 wyjścia", "PWN Dopełniacz Negacji - Stała Kolokacja ('nie ma wyjście' -> 'nie ma wyjścia')"),
+        (r"\b([Nn]ie\s+ma)\s+znaczenie\b", r"\1 znaczenia", "PWN Dopełniacz Negacji - Stała Kolokacja ('nie ma znaczenie' -> 'nie ma znaczenia')"),
+
         (r"\b[Jj]esteś w porządku\?", "Wszystko w porządku?", "Filar IV - Szablony Angielskie"),
         (r"\b[Bb]yłem w stanie to znaleźć\b", "Udało mi się to znaleźć", "Filar IV - Konstrukcje Obce"),
         (r"\b[Bb]yłam w stanie to znaleźć\b", "Udało mi się to znaleźć", "Filar IV - Konstrukcje Obce"),
@@ -226,14 +254,11 @@ class AVTLinter:
         (r"\b[Ww]ydaje się być\b", "Wydaje się", "Filar IV - Konstrukcje Obce"),
         (r"\b[Pp]oniosło klapę\b", "Nie wyszło", "Filar IV - Idiomatyka"),
         (r"\b[Ww]asz [Hh]onor\b", "Wysoki Sądzie", "Filar XVI - Realia Sądownicze"),
-        (r"\b[Pp]rzekroczył(?:a|o|i|y)?\s+punkt\s+bez\s+powrotu\b", "nie ma już odwrotu", "Filar IV/LIX - Eliminacja Kalki 'Point of no return'"),
-        (r"\b[Pp]rzekroczy(?:ć|cie|my)?\s+punkt\s+bez\s+powrotu\b", "nie mieć już odwrotu", "Filar IV/LIX - Eliminacja Kalki 'Point of no return'"),
-        (r"\b[Pp]unkt\s+bez\s+powrotu\b", "droga bez odwrotu", "Filar IV/LIX - Eliminacja Kalki 'Point of no return'"),
         
         # AnimeSub.info (ANSI) Anti-Translationese & Phatic Calques
         (r"\b[Zz]godnie z oczekiwaniami\b", "tak jak myślałem", "Filar CXLVII - Eliminacja Kalki 'As expected'"),
-        (r"\b[Nn]ie da się pomóc\b", "nic na to nie poradzimy", "Filar CXLVII - Eliminacja Kalki 'It can't be helped'"),
-        (r"\b[Nn]ie można pomóc\b", "nic nie poradzimy", "Filar CXLVII - Eliminacja Kalki 'It can't be helped'"),
+        (r"(^|\\[Nnh]|[-–]\s*)\s*[Nn]ie da się pomóc([.!?…]*(?:\s*(?=$|\\[Nnh])))", r"\1nic na to nie poradzimy\2", "Filar CXLVII - Eliminacja Kalki 'It can't be helped'"),
+        (r"(^|\\[Nnh]|[-–]\s*)\s*[Nn]ie można pomóc([.!?…]*(?:\s*(?=$|\\[Nnh])))", r"\1nic nie poradzimy\2", "Filar CXLVII - Eliminacja Kalki 'It can't be helped'"),
         (r"(?i)(^|\\[Nnh]|[-–]\s*)\s*Oho,?\s+spokojnie(?:\.{1,3}|[!])\s*(?=$|\\[Nnh])", r"\1Ło, ło, ło...", "Filar XVIII - Eliminacja Kalki Somatycznej 'Whoa, easy' (Ottotto)"),
         (r"(^|\\[Nnh]|[-–]\s*)\s*[Tt]o\s+jest\s+gorące(?:[!]+(?:\s*(?=[A-ZĄĆĘŁŃÓŚŹŻ])|\s*$|\s*\\[Nnh])|(?=\s*$|\s*\\[Nnh]))", r"\1Parzy!", "Filar XVIII - Eliminacja Opisu Bólu (Acchichi)"),
         (r"(^|\\[Nnh]|[-–]\s*)\s*[Tt]o\s+boli(?:[!]+(?:\s*(?=[A-ZĄĆĘŁŃÓŚŹŻ])|\s*$|\s*\\[Nnh])|(?=\s*$|\s*\\[Nnh]))", r"\1Ała!", "Filar XVIII - Eliminacja Opisu Bólu (Itta)"),
@@ -733,7 +758,8 @@ class AVTLinter:
         cls,
         text: str,
         speaker_gender: Optional[str] = None,
-        is_all_girls_scene: bool = True,
+        addressee_gender: Optional[str] = None,
+        is_all_girls_scene: bool = False,
         is_sign: bool = False,
         user_feedback_rules: Optional[List[Dict[str, Any]]] = None,
         custom_glossary: Optional[Dict[str, str]] = None,
@@ -868,17 +894,19 @@ class AVTLinter:
             spk_norm = (speaker_gender or "").lower()
             is_boy_role = any(w in spk_norm for w in ["chłopiec", "chłopak", "boy", "syn", "młodzieniec", "bocchan", "książę"])
             is_male_speaker = (any(w in spk_norm for w in ["mężczyzna", "male", "męski"]) and not any(w in spk_norm for w in ["alt", "kobieta", "żeńsk", "starszej"])) or is_boy_role
-            is_explicit_female_speaker = not is_boy_role and any(w in spk_norm for w in ["kobieta", "dziewczynka", "female", "girl", "żeński", "alt starszej", "alt dojrzały", "boraqchin", "cesarzowa", "chatun", "matrona"])
-            is_female_speaker = is_explicit_female_speaker or (is_all_girls_scene and not is_male_speaker)
+            is_explicit_female_speaker = not is_boy_role and any(w in spk_norm for w in ["kobieta", "dziewczynka", "female", "girl", "żeński", "alt starszej", "alt dojrzały", "cesarzowa", "chatun", "matrona"])
+            is_female_speaker = is_explicit_female_speaker
 
+            # 4a. 1st-PERSON (SPEAKER) MORPHOLOGY: Ja / Mówca (Filar CLXIX)
             if is_male_speaker:
-                male_fixes = [
+                male_1st_fixes = [
                     (r"\b[Dd]omyślałam się\b", lambda m: "Domyślałem się" if m.group(0)[0].isupper() else "domyślałem się"),
                     (r"\b[Mm]yślałam\b", lambda m: "Myślałem" if m.group(0)[0].isupper() else "myślałem"),
                     (r"\b[Ww]iedziałam\b", lambda m: "Wiedziałem" if m.group(0)[0].isupper() else "wiedziałem"),
                     (r"\b[Ww]idziałam\b", lambda m: "Widziałem" if m.group(0)[0].isupper() else "widziałem"),
                     (r"\b[Zz]robiłam\b", lambda m: "Zrobiłem" if m.group(0)[0].isupper() else "zrobiłem"),
                     (r"\b[Pp]oszłam\b", lambda m: "Poszedłem" if m.group(0)[0].isupper() else "poszedłem"),
+                    (r"\b[Pp]rzyszłam\b", lambda m: "Przyszedłem" if m.group(0)[0].isupper() else "przyszedłem"),
                     (r"\b[Zz]nalazłam\b", lambda m: "Znalazłem" if m.group(0)[0].isupper() else "znalazłem"),
                     (r"\b[Cc]zułam\b", lambda m: "Czułem" if m.group(0)[0].isupper() else "czułem"),
                     (r"\b[Ss]łyszałam\b", lambda m: "Słyszałem" if m.group(0)[0].isupper() else "słyszałem"),
@@ -886,36 +914,114 @@ class AVTLinter:
                     (r"\b[Mm]ogłam\b", lambda m: "Mogłem" if m.group(0)[0].isupper() else "mogłem"),
                     (r"\b[Zz]rozumiałam\b", lambda m: "Zrozumiałem" if m.group(0)[0].isupper() else "zrozumiałem"),
                     (r"\b[Pp]owiedziałam\b", lambda m: "Powiedziałem" if m.group(0)[0].isupper() else "powiedziałem"),
-                    (r"\b[Bb]ałam się\b", lambda m: "Bałam się" if m.group(0)[0].isupper() else "bałam się"),
+                    (r"\b[Bb]ałam się\b", lambda m: "Bałem się" if m.group(0)[0].isupper() else "bałem się"),
                     (r"\b[Uu]dałam się\b", lambda m: "Udałem się" if m.group(0)[0].isupper() else "udałem się"),
                     (r"\b[Bb]yłam\b", lambda m: "Byłem" if m.group(0)[0].isupper() else "byłem"),
+                    (r"\b[Mm]iałam\b", lambda m: "Miałem" if m.group(0)[0].isupper() else "miałem"),
+                    (r"\b[Ww]róciłam\b", lambda m: "Wróciłem" if m.group(0)[0].isupper() else "wróciłem"),
+                    (r"\b[Dd]ostałam\b", lambda m: "Dostałem" if m.group(0)[0].isupper() else "dostałem"),
+                    (r"\b[Pp]omyślałam\b", lambda m: "Pomyślałem" if m.group(0)[0].isupper() else "pomyślałem"),
                     (r"\b[Zz]gubiłam się\b", lambda m: "Zgubiłem się" if m.group(0)[0].isupper() else "zgubiłem się"),
+                    (r"\b[Zz]raniłam\b", lambda m: "Zraniłem" if m.group(0)[0].isupper() else "zraniłem"),
+                    (r"\b[Ss]krzywdziłam\b", lambda m: "Skrzywdziłem" if m.group(0)[0].isupper() else "skrzywdziłem"),
+                    (r"\b[Uu]ratowałam\b", lambda m: "Uratowałem" if m.group(0)[0].isupper() else "uratowałem"),
+                    (r"\b[Oo]ddałam\b", lambda m: "Oddałem" if m.group(0)[0].isupper() else "oddałem"),
                     (r"\b[Mm]iałabym\b", lambda m: "Miałbym" if m.group(0)[0].isupper() else "miałbym"),
                     (r"\b[Cc]hciałabym\b", lambda m: "Chciałbym" if m.group(0)[0].isupper() else "chciałbym"),
                     (r"\b[Mm]ogłabym\b", lambda m: "Mógłbym" if m.group(0)[0].isupper() else "mógłbym"),
+                    (r"\b[Ww]olałabym\b", lambda m: "Wolałbym" if m.group(0)[0].isupper() else "wolałbym"),
+                    (r"\b[Mm]usiałabym\b", lambda m: "Musiałbym" if m.group(0)[0].isupper() else "musiałbym"),
                     (r"\b[Ww]iedziałabym\b", lambda m: "Wiedziałbym" if m.group(0)[0].isupper() else "wiedziałbym"),
                     (r"\b[Zz]robiłabym\b", lambda m: "Zrobiłbym" if m.group(0)[0].isupper() else "zrobiłbym"),
                     (r"\b[Bb]yłabym\b", lambda m: "Byłbym" if m.group(0)[0].isupper() else "byłbym"),
-                    (r"\b[Jj]esteś pewna\?", "Jesteś pewien?"),
-                    (r"\b[Gg]łupia jesteś\?", "Głupi jesteś?"),
-                    (r"\b[Oo]szalałaś\?", "Oszalałeś?"),
-                    (r"\b[Zz]głupiałaś\?", "Zgłupiałeś?"),
+                    (r"\b[Pp]oszłabym\b", lambda m: "Poszedłbym" if m.group(0)[0].isupper() else "poszedłbym"),
+                    (r"\b[Pp]rzyszłabym\b", lambda m: "Przyszedłbym" if m.group(0)[0].isupper() else "przyszedłbym"),
+                    (r"\b[Zz]nalazłabym\b", lambda m: "Znalazłbym" if m.group(0)[0].isupper() else "znalazłbym"),
+                    (r"\b[Pp]owiedziałabym\b", lambda m: "Powiedziałbym" if m.group(0)[0].isupper() else "powiedziałbym"),
+                    (r"\b[Cc]zułabym\b", lambda m: "Czułbym" if m.group(0)[0].isupper() else "czułbym"),
+                    (r"\b[Ww]idziałabym\b", lambda m: "Widziałbym" if m.group(0)[0].isupper() else "widziałbym"),
+                    (r"\b[Pp]omyślałbym\b", lambda m: "Pomyślałabym" if m.group(0)[0].isupper() else "pomyślałabym"),
                 ]
-                for pattern, repl in male_fixes:
+                for pattern, repl in male_1st_fixes:
                     if re.search(pattern, modified):
                         modified = re.sub(pattern, repl, modified)
-                        applied_fixes.append(f"[Filar CXXXVI - Mówca Męski/Chłopiec] Korekta rodzaju żeńskiego na męski: {pattern}")
+                        applied_fixes.append(f"[Filar CXXXVI/CLXIX - Mówca Męski/Chłopiec 1. os.] Korekta rodzaju żeńskiego na męski: {pattern}")
 
                 def _morph_f_to_m_repl(m):
                     word = m.group(0)
                     converted = convert_first_person_feminine_to_masculine(word)
                     if converted and converted != word:
-                        applied_fixes.append(f"[Filar CXXXVI - Mówca Męski 1. os.] Korekta rodzaju żeńskiego na męski: '{word}' -> '{converted}'")
+                        applied_fixes.append(f"[Filar CXXXVI/CLXIX - Mówca Męski 1. os.] Korekta rodzaju żeńskiego na męski: '{word}' -> '{converted}'")
                         return converted
                     return word
                 modified = re.sub(r"\b[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+(?:łam|łabym)\b", _morph_f_to_m_repl, modified)
 
-            elif is_female_speaker:
+            elif is_female_speaker and is_explicit_female_speaker:
+                female_1st_person_fixes = [
+                    (r"\b[Dd]omyślałem się\b", lambda m: "Domyślałam się" if m.group(0)[0].isupper() else "domyślałam się"),
+                    (r"\b[Mm]yślałem\b", lambda m: "Myślałam" if m.group(0)[0].isupper() else "myślałam"),
+                    (r"\b[Ww]iedziałem\b", lambda m: "Wiedziałam" if m.group(0)[0].isupper() else "wiedziałam"),
+                    (r"\b[Ww]idziałem\b", lambda m: "Widziałam" if m.group(0)[0].isupper() else "widziałam"),
+                    (r"\b[Zz]robiłem\b", lambda m: "Zrobiłam" if m.group(0)[0].isupper() else "zrobiłam"),
+                    (r"\b[Pp]oszedłem\b", lambda m: "Poszłam" if m.group(0)[0].isupper() else "poszłam"),
+                    (r"\b[Pp]rzyszedłem\b", lambda m: "Przyszłam" if m.group(0)[0].isupper() else "przyszłam"),
+                    (r"\b[Zz]nalazłem\b", lambda m: "Znalazłam" if m.group(0)[0].isupper() else "znalazłam"),
+                    (r"\b[Cc]zułem\b", lambda m: "Czułam" if m.group(0)[0].isupper() else "czułam"),
+                    (r"\b[Ss]łyszałem\b", lambda m: "Słyszałam" if m.group(0)[0].isupper() else "słyszałam"),
+                    (r"\b[Chch]ciałem\b", lambda m: "Chciałam" if m.group(0)[0].isupper() else "chciałam"),
+                    (r"\b[Mm]ogłem\b", lambda m: "Mogłam" if m.group(0)[0].isupper() else "mogłam"),
+                    (r"\b[Zz]rozumiałem\b", lambda m: "Zrozumiałam" if m.group(0)[0].isupper() else "zrozumiałam"),
+                    (r"\b[Pp]owiedziałem\b", lambda m: "Powiedziałam" if m.group(0)[0].isupper() else "powiedziałam"),
+                    (r"\b[Bb]ałem się\b", lambda m: "Bałam się" if m.group(0)[0].isupper() else "bałam się"),
+                    (r"\b[Uu]dałem się\b", lambda m: "Udałam się" if m.group(0)[0].isupper() else "udałam się"),
+                    (r"\b[Bb]yłem\b", lambda m: "Byłam" if m.group(0)[0].isupper() else "byłam"),
+                    (r"\b[Mm]iałem\b", lambda m: "Miałam" if m.group(0)[0].isupper() else "miałam"),
+                    (r"\b[Ww]róciłem\b", lambda m: "Wróciłam" if m.group(0)[0].isupper() else "wróciłam"),
+                    (r"\b[Dd]ostałem\b", lambda m: "Dostałam" if m.group(0)[0].isupper() else "dostałam"),
+                    (r"\b[Pp]omyślałem\b", lambda m: "Pomyślałam" if m.group(0)[0].isupper() else "pomyślałam"),
+                    (r"\b[Zz]gubiłem się\b", lambda m: "Zgubiłem się" if m.group(0)[0].isupper() else "zgubiłem się"),
+                    (r"\b[Zz]raniłem\b", lambda m: "Zraniłam" if m.group(0)[0].isupper() else "zraniłam"),
+                    (r"\b[Ss]krzywdziłem\b", lambda m: "Skrzywdziłam" if m.group(0)[0].isupper() else "skrzywdziłam"),
+                    (r"\b[Uu]ratowałem\b", lambda m: "Uratowałam" if m.group(0)[0].isupper() else "uratowałam"),
+                    (r"\b[Oo]ddałem\b", lambda m: "Oddałam" if m.group(0)[0].isupper() else "oddałam"),
+                    (r"\b[Mm]iałbym\b", lambda m: "Miałabym" if m.group(0)[0].isupper() else "miałabym"),
+                    (r"\b[Cc]hciałbym\b", lambda m: "Chciałabym" if m.group(0)[0].isupper() else "chciałabym"),
+                    (r"\b[Mm]ógłbym\b", lambda m: "Mogłabym" if m.group(0)[0].isupper() else "mogłabym"),
+                    (r"\b[Ww]olałbym\b", lambda m: "Wolałabym" if m.group(0)[0].isupper() else "wolałabym"),
+                    (r"\b[Mm]usiałbym\b", lambda m: "Musiałabym" if m.group(0)[0].isupper() else "musiałabym"),
+                    (r"\b[Ww]iedziałbym\b", lambda m: "Wiedziałabym" if m.group(0)[0].isupper() else "wiedziałabym"),
+                    (r"\b[Zz]robiłbym\b", lambda m: "Zrobiłabym" if m.group(0)[0].isupper() else "zrobiłabym"),
+                    (r"\b[Bb]yłbym\b", lambda m: "Byłabym" if m.group(0)[0].isupper() else "byłabym"),
+                    (r"\b[Pp]oszedłbym\b", lambda m: "Poszłabym" if m.group(0)[0].isupper() else "poszłabym"),
+                    (r"\b[Pp]rzyszzedłbym\b", lambda m: "Przyszłabym" if m.group(0)[0].isupper() else "przyszłabym"),
+                    (r"\b[Zz]nalazłbym\b", lambda m: "Znalazłabym" if m.group(0)[0].isupper() else "znalazłabym"),
+                    (r"\b[Pp]owiedziałbym\b", lambda m: "Powiedziałabym" if m.group(0)[0].isupper() else "powiedziałabym"),
+                    (r"\b[Cc]zułbym\b", lambda m: "Czułabym" if m.group(0)[0].isupper() else "czułabym"),
+                    (r"\b[Ww]idziałbym\b", lambda m: "Widziałabym" if m.group(0)[0].isupper() else "widziałabym"),
+                    (r"\b[Pp]omyślałbym\b", lambda m: "Pomyślałabym" if m.group(0)[0].isupper() else "pomyślałabym"),
+                ]
+                for pattern, repl in female_1st_person_fixes:
+                    if re.search(pattern, modified):
+                        modified = re.sub(pattern, repl, modified)
+                        applied_fixes.append(f"[Filar XIII/CXXXVI/CLXIX - Mówczyni Żeńska 1. os.] Korekta rodzaju męskiego na żeński: {pattern}")
+
+                def _morph_m_to_f_repl(m):
+                    word = m.group(0)
+                    converted = convert_first_person_masculine_to_feminine(word)
+                    if converted and converted != word:
+                        applied_fixes.append(f"[Filar XIII/CXXXVI/CLXIX - Mówczyni Żeńska 1. os.] Korekta rodzaju męskiego na żeński: '{word}' -> '{converted}'")
+                        return converted
+                    return word
+                modified = re.sub(r"\b[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+(?:łem|łbym)\b", _morph_m_to_f_repl, modified)
+
+            # 4b. 2nd-PERSON (ADDRESSEE) MORPHOLOGY: Ty / Adresat (Filar XIII & CLXIII)
+            addr_norm = (addressee_gender or "").lower()
+            is_boy_addr = any(re.search(rf"\b{re.escape(w)}\b", addr_norm) for w in ["chłopiec", "chłopak", "boy", "syn", "młodzieniec", "bocchan", "książę"])
+            is_male_addressee = (any(re.search(rf"\b{re.escape(w)}\b", addr_norm) for w in ["mężczyzna", "male", "męski", "man", "on"]) and not any(re.search(rf"\b{re.escape(w)}\b", addr_norm) for w in ["alt", "kobieta", "żeńsk", "starszej"])) or is_boy_addr
+            is_explicit_female_addressee = not is_boy_addr and any(re.search(rf"\b{re.escape(w)}\b", addr_norm) for w in ["kobieta", "dziewczynka", "female", "girl", "żeński", "alt starszej", "alt dojrzały", "cesarzowa", "chatun", "matrona", "ona"])
+            is_female_addressee = is_explicit_female_addressee
+
+            if is_female_addressee:
                 female_address_fixes = [
                     (r"\b[Gg]łupi jesteś\?", "Głupia jesteś?"),
                     (r"\b[Jj]esteś pewien\?", "Jesteś pewna?"),
@@ -938,63 +1044,27 @@ class AVTLinter:
                         modified = re.sub(pattern, repl, modified)
                         applied_fixes.append(f"[Filar XIII/CXXXVI - Adresat Żeński/Dziewczynka] Korekta rodzaju męskiego na żeński: {pattern}")
 
-                if is_explicit_female_speaker:
-                    female_1st_person_fixes = [
-                        (r"\b[Dd]omyślałem się\b", lambda m: "Domyślałam się" if m.group(0)[0].isupper() else "domyślałam się"),
-                        (r"\b[Mm]yślałem\b", lambda m: "Myślałam" if m.group(0)[0].isupper() else "myślałam"),
-                        (r"\b[Ww]iedziałem\b", lambda m: "Wiedziałam" if m.group(0)[0].isupper() else "wiedziałam"),
-                        (r"\b[Ww]idziałem\b", lambda m: "Widziałam" if m.group(0)[0].isupper() else "widziałam"),
-                        (r"\b[Zz]robiłem\b", lambda m: "Zrobiłam" if m.group(0)[0].isupper() else "zrobiłam"),
-                        (r"\b[Pp]oszedłem\b", lambda m: "Poszłam" if m.group(0)[0].isupper() else "poszłam"),
-                        (r"\b[Pp]rzyszedłem\b", lambda m: "Przyszłam" if m.group(0)[0].isupper() else "przyszłam"),
-                        (r"\b[Zz]nalazłem\b", lambda m: "Znalazłam" if m.group(0)[0].isupper() else "znalazłam"),
-                        (r"\b[Cc]zułem\b", lambda m: "Czułam" if m.group(0)[0].isupper() else "czułam"),
-                        (r"\b[Ss]łyszałem\b", lambda m: "Słyszałam" if m.group(0)[0].isupper() else "słyszałam"),
-                        (r"\b[Chch]ciałem\b", lambda m: "Chciałam" if m.group(0)[0].isupper() else "chciałam"),
-                        (r"\b[Mm]ogłem\b", lambda m: "Mogłam" if m.group(0)[0].isupper() else "mogłam"),
-                        (r"\b[Zz]rozumiałem\b", lambda m: "Zrozumiałam" if m.group(0)[0].isupper() else "zrozumiałam"),
-                        (r"\b[Pp]owiedziałem\b", lambda m: "Powiedziałam" if m.group(0)[0].isupper() else "powiedziałam"),
-                        (r"\b[Bb]ałem się\b", lambda m: "Bałam się" if m.group(0)[0].isupper() else "bałam się"),
-                        (r"\b[Uu]dałem się\b", lambda m: "Udałam się" if m.group(0)[0].isupper() else "udałam się"),
-                        (r"\b[Bb]yłem\b", lambda m: "Byłam" if m.group(0)[0].isupper() else "byłam"),
-                        (r"\b[Mm]iałem\b", lambda m: "Miałam" if m.group(0)[0].isupper() else "miałam"),
-                        (r"\b[Ww]róciłem\b", lambda m: "Wróciłam" if m.group(0)[0].isupper() else "wróciłam"),
-                        (r"\b[Dd]ostałem\b", lambda m: "Dostałam" if m.group(0)[0].isupper() else "dostałam"),
-                        (r"\b[Pp]omyślałem\b", lambda m: "Pomyślałam" if m.group(0)[0].isupper() else "pomyślałam"),
-                        (r"\b[Zz]gubiłem się\b", lambda m: "Zgubiłam się" if m.group(0)[0].isupper() else "zgubiłam się"),
-                        (r"\b[Zz]raniłem\b", lambda m: "Zraniłam" if m.group(0)[0].isupper() else "zraniłam"),
-                        (r"\b[Ss]krzywdziłem\b", lambda m: "Skrzywdziłam" if m.group(0)[0].isupper() else "skrzywdziłam"),
-                        (r"\b[Uu]ratowałem\b", lambda m: "Uratowałam" if m.group(0)[0].isupper() else "uratowałam"),
-                        (r"\b[Oo]ddałem\b", lambda m: "Oddałam" if m.group(0)[0].isupper() else "oddałam"),
-                        (r"\b[Mm]iałbym\b", lambda m: "Miałabym" if m.group(0)[0].isupper() else "miałabym"),
-                        (r"\b[Cc]hciałbym\b", lambda m: "Chciałbym" if m.group(0)[0].isupper() else "chciałabym"),
-                        (r"\b[Mm]ógłbym\b", lambda m: "Mogłabym" if m.group(0)[0].isupper() else "mogłabym"),
-                        (r"\b[Ww]olałbym\b", lambda m: "Wolałabym" if m.group(0)[0].isupper() else "wolałabym"),
-                        (r"\b[Mm]usiałbym\b", lambda m: "Musiałabym" if m.group(0)[0].isupper() else "musiałabym"),
-                        (r"\b[Ww]iedziałbym\b", lambda m: "Wiedziałabym" if m.group(0)[0].isupper() else "wiedziałabym"),
-                        (r"\b[Zz]robiłbym\b", lambda m: "Zrobiłabym" if m.group(0)[0].isupper() else "zrobiłabym"),
-                        (r"\b[Bb]yłbym\b", lambda m: "Byłabym" if m.group(0)[0].isupper() else "byłabym"),
-                        (r"\b[Pp]oszedłbym\b", lambda m: "Poszłabym" if m.group(0)[0].isupper() else "poszłabym"),
-                        (r"\b[Pp]rzyszedłbym\b", lambda m: "Przyszłabym" if m.group(0)[0].isupper() else "przyszłabym"),
-                        (r"\b[Zz]nalazłbym\b", lambda m: "Znalazłabym" if m.group(0)[0].isupper() else "znalazłabym"),
-                        (r"\b[Pp]owiedziałbym\b", lambda m: "Powiedziałabym" if m.group(0)[0].isupper() else "powiedziałabym"),
-                        (r"\b[Cc]zułbym\b", lambda m: "Czułabym" if m.group(0)[0].isupper() else "czułabym"),
-                        (r"\b[Ww]idziałbym\b", lambda m: "Widziałabym" if m.group(0)[0].isupper() else "widziałabym"),
-                        (r"\b[Pp]omyślałbym\b", lambda m: "Pomyślałabym" if m.group(0)[0].isupper() else "pomyślałabym"),
-                    ]
-                    for pattern, repl in female_1st_person_fixes:
-                        if re.search(pattern, modified):
-                            modified = re.sub(pattern, repl, modified)
-                            applied_fixes.append(f"[Filar XIII/CXXXVI/CLXIX - Mówczyni Żeńska 1. os.] Korekta rodzaju męskiego na żeński: {pattern}")
-
-                    def _morph_m_to_f_repl(m):
-                        word = m.group(0)
-                        converted = convert_first_person_masculine_to_feminine(word)
-                        if converted and converted != word:
-                            applied_fixes.append(f"[Filar XIII/CXXXVI/CLXIX - Mówczyni Żeńska 1. os.] Korekta rodzaju męskiego na żeński: '{word}' -> '{converted}'")
-                            return converted
-                        return word
-                    modified = re.sub(r"\b[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+(?:łem|łbym)\b", _morph_m_to_f_repl, modified)
+            elif is_male_addressee:
+                male_address_fixes = [
+                    (r"\b[Gg]łupia jesteś\?", "Głupi jesteś?"),
+                    (r"\b[Jj]esteś pewna\?", "Jesteś pewien?"),
+                    (r"\b[Oo]szalałaś\?", "Oszalałeś?"),
+                    (r"\b[Zz]głupiałaś\?", "Zgłupiałeś?"),
+                    (r"\b[Ww]idziałaś to\?", "Widziałeś to?"),
+                    (r"\b[Ss]łyszałaś to\?", "Słyszałeś to?"),
+                    (r"\b[Zz]robiłaś to\?", "Zrobiłeś to?"),
+                    (r"\b[Pp]oszłaś tam\?", "Poszedłeś tam?"),
+                    (r"\b[Mm]yślałaś, że\b", "Myślałeś, że"),
+                    (r"\b[Ww]yglądasz na wzburzoną\b", "Wyglądasz na wzburzonego"),
+                    (r"\bwyglądasz na wzburzoną\b", "wyglądasz na wzburzonego"),
+                    (r"\b[Jj]esteś pewna\b", lambda m: "Jesteś pewien" if m.group(0)[0].isupper() else "jesteś pewien"),
+                    (r"\b[Jj]esteś gotowa\b", lambda m: "Jesteś gotowy" if m.group(0)[0].isupper() else "jesteś gotowy"),
+                    (r"\b[Jj]esteś sama\b", lambda m: "Jesteś sam" if m.group(0)[0].isupper() else "jesteś sam"),
+                ]
+                for pattern, repl in male_address_fixes:
+                    if re.search(pattern, modified):
+                        modified = re.sub(pattern, repl, modified)
+                        applied_fixes.append(f"[Filar XIII/CLXIII - Adresat Męski/Chłopiec] Korekta rodzaju żeńskiego na męski: {pattern}")
 
         # 4a-2. Female Vocative Case Harmonization (Filar LX & CLVII: Mianownik -> Wołacz dla imion żeńskich na -a)
         if not is_sign:
@@ -1037,7 +1107,7 @@ class AVTLinter:
                     if first_w not in ["panie", "pani", "panno", "panu", "pana", "proszę", "przepraszam", "doktorze", "profesorze", "inspektorze", "zaraz", "chwila", "czekaj", "słuchaj", "patrz", "widzisz"]:
                         line_has_yobisute = True
 
-                # Also check vocative at the start of the line: e.g. "Moniko, ..." or "Shizuku, ..."
+                # Also check vocative at the start of the line: e.g. "Moniko, ..." or "Anno, ..."
                 if not line_has_yobisute:
                     start_voc_m = re.match(r"^([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]{2,})[,?!]", modified)
                     if start_voc_m:
@@ -1185,20 +1255,20 @@ class AVTLinter:
         if not is_sign and audio_jp:
             clean_audio_jp = audio_jp.lower()
             spk_norm = (speaker_gender or "").lower()
-            is_boy_spk = any(w in spk_norm for w in ["chłopiec", "chłopak", "boy", "syn", "młodzieniec", "bocchan", "książę"])
-            is_male_spk = any(w in spk_norm for w in ["mężczyzna", "chłopiec", "male", "boy", "męski"]) or is_boy_spk
-            is_female_spk = not is_boy_spk and (any(w in spk_norm for w in ["kobieta", "dziewczynka", "female", "girl", "żeński"]) or (is_all_girls_scene and not is_male_spk))
+            is_boy_spk = any(re.search(rf"\b{re.escape(w)}\b", spk_norm) for w in ["chłopiec", "chłopak", "boy", "syn", "młodzieniec", "bocchan", "książę"])
+            is_male_spk = (any(re.search(rf"\b{re.escape(w)}\b", spk_norm) for w in ["mężczyzna", "chłopiec", "male", "boy", "męski"]) and not any(re.search(rf"\b{re.escape(w)}\b", spk_norm) for w in ["alt", "kobieta", "żeńsk"])) or is_boy_spk
+            is_female_spk = not is_boy_spk and any(re.search(rf"\b{re.escape(w)}\b", spk_norm) for w in ["kobieta", "dziewczynka", "female", "girl", "żeński"])
 
             # 1. HITORI (一人 / 独り / ひとり): w audio prośba o samotność -> ZAKAZ 'daj mi spokój'
             if any(k in clean_audio_jp for k in ["hitori", "一人", "独り", "ひとり"]):
                 if re.search(r"\b[Dd]aj(?:\s+|\\N)+mi(?:\s+|\\N)+spokój\b", modified):
-                    repl_hitori = "Zostaw mnie samą" if is_female_spk else "Zostaw mnie samego"
+                    repl_hitori = "Zostaw mnie samą" if is_female_spk else ("Zostaw mnie samego" if is_male_spk else "Zostaw mnie w spokoju")
                     def _hitori_repl(m, r=repl_hitori):
                         return r if m.group(0)[0].isupper() else r.lower()
                     modified = re.sub(r"\b[Dd]aj(?:\s+|\\N)+mi(?:\s+|\\N)+spokój\b", _hitori_repl, modified)
                     applied_fixes.append(f"[Filar CLVIII - Zgodność Foniczna Seiyū] Wykryto 'Hitori' w audio: zastąpiono 'daj mi spokój' przez '{repl_hitori.lower()}'")
                 elif re.search(r"\b[Dd]ajcie(?:\s+|\\N)+mi(?:\s+|\\N)+spokój\b", modified):
-                    repl_hitori = "Zostawcie mnie samą" if is_female_spk else "Zostawcie mnie samego"
+                    repl_hitori = "Zostawcie mnie samą" if is_female_spk else ("Zostawcie mnie samego" if is_male_spk else "Zostawcie mnie w spokoju")
                     def _hitori_pl_repl(m, r=repl_hitori):
                         return r if m.group(0)[0].isupper() else r.lower()
                     modified = re.sub(r"\b[Dd]ajcie(?:\s+|\\N)+mi(?:\s+|\\N)+spokój\b", _hitori_pl_repl, modified)
@@ -3035,6 +3105,306 @@ FEMININE_SG_ADJECTIVES_TO_MASCULINE: Dict[str, str] = {
     "uwolniona": "uwolniony",
 }
 
+# ==============================================================================
+# 82 CANONICAL PREDICATE NOUN PAIRS & MODIFIERS (Zasada 12 & 15 AGENTS.md - 0.00 PLN)
+# Full symmetrical paradigm for 1st & 2nd person (Instrumental & Nominative)
+# ==============================================================================
+
+PREDICATE_NOUNS_INSTRUMENTAL_PAIRS: List[Tuple[str, str]] = [
+    # 1. Relacje rodzinne i bliskie (12 par)
+    ("przyjacielem", "przyjaciółką"),
+    ("bratem", "siostrą"),
+    ("synem", "córką"),
+    ("ojcem", "matką"),
+    ("kuzynem", "kuzynką"),
+    ("partnerem", "partnerką"),
+    ("narzeczonym", "narzeczoną"),
+    ("małżonkiem", "małżonką"),
+    ("mężem", "żoną"),
+    ("towarzyszem", "towarzyszką"),
+    ("sąsiadem", "sąsiadką"),
+    ("opiekunem", "opiekunką"),
+    # 2. Relacje militarne, rycerskie i feudalne (16 par)
+    ("wojownikiem", "wojowniczką"),
+    ("rycerzem", "rycerką"),
+    ("żołnierzem", "żołnierką"),
+    ("dowódcą", "dowódczynią"),
+    ("strażnikiem", "strażniczką"),
+    ("zwiadowcą", "zwiadowczynią"),
+    ("obrońcą", "obrończynią"),
+    ("czempionem", "czempionką"),
+    ("bohaterem", "bohaterką"),
+    ("szpiegiem", "agentką"),
+    ("wasalem", "wasalką"),
+    ("władcą", "władczynią"),
+    ("księciem", "księżniczką"),
+    ("królem", "królową"),
+    ("szlachcicem", "szlachcianką"),
+    ("kapitanem", "panią kapitan"),
+    # 3. Klasy fantasy, magia i religia (14 par)
+    ("czarodziejem", "czarodziejką"),
+    ("magiem", "maginią"),
+    ("czarnoksiężnikiem", "czarownicą"),
+    ("kapłanem", "kapłanką"),
+    ("uzdrowicielem", "uzdrowicielką"),
+    ("medykiem", "medyczką"),
+    ("łowcą", "łowczynią"),
+    ("zabójcą", "zabójczynią"),
+    ("złodziejem", "złodziejką"),
+    ("wędrowcem", "wędrowniczką"),
+    ("przewodnikiem", "przewodniczką"),
+    ("sługą", "służącą"),
+    ("niewolnikiem", "niewolnicą"),
+    ("więźniem", "więźniarką"),
+    # 4. Relacje edukacyjne i hierarchiczne (10 par)
+    ("mistrzem", "mistrzynią"),
+    ("uczniem", "uczennicą"),
+    ("nauczycielem", "nauczycielką"),
+    ("lekarzem", "lekarką"),
+    ("sojusznikiem", "sojuszniczką"),
+    ("rywalem", "rywalką"),
+    ("wrogiem", "nieprzyjaciółką"),
+    ("zdrajcą", "zdrajczynią"),
+    ("członkiem", "członkinią"),
+    ("gościem", "gościnią"),
+    # 5. Statusy i tożsamości (12 par)
+    ("obcym", "obcą"),
+    ("nieznajomym", "nieznajomą"),
+    ("samotnikiem", "samotniczką"),
+    ("żebrakiem", "żebraczką"),
+    ("świadkiem", "świadkinią"),
+    ("zbawcą", "wybawicielką"),
+    ("zdobywcą", "zdobywczynią"),
+    ("zwycięzcą", "zwyciężczynią"),
+    ("przegranym", "przegraną"),
+    ("szczęściarzem", "szczęściarą"),
+    ("pechowcem", "pechową"),
+    ("potworem", "potworem"),  # epicene protected
+    # 6. Cechy ekspresywne i emocjonalne (18 par)
+    ("kłamcą", "kłamczynią"),
+    ("tchórzem", "tchórzawką"),
+    ("głupcem", "głupią"),
+    ("szaleńcem", "szaloną"),
+    ("wsiarzem", "dziewką"),
+    ("naiwniakiem", "naiwniaczką"),
+    ("szkodnikiem", "szkodniczką"),
+    ("okrutnikiem", "okrutnicą"),
+    ("leniem", "leniuchą"),
+    ("prostakiem", "prostaczką"),
+    ("bękartem", "bękarcicą"),
+    ("dzieckiem", "dzieckiem"),  # neuter protected
+    ("włóczęgą", "włóczęgą"),  # epicene protected
+]
+
+PREDICATE_NOUNS_NOMINATIVE_PAIRS: List[Tuple[str, str]] = [
+    # 1. Relacje rodzinne i bliskie
+    ("przyjaciel", "przyjaciółka"),
+    ("brat", "siostra"),
+    ("syn", "córka"),
+    ("ojciec", "matka"),
+    ("kuzyn", "kuzynka"),
+    ("partner", "partnerka"),
+    ("narzeczony", "narzeczona"),
+    ("małżonek", "małżonka"),
+    ("mąż", "żona"),
+    ("towarzysz", "towarzyszka"),
+    ("sąsiad", "sąsiadka"),
+    ("opiekun", "opiekunka"),
+    # 2. Relacje militarne i feudalne
+    ("wojownik", "wojowniczka"),
+    ("rycerz", "rycerka"),
+    ("żołnierz", "żołnierka"),
+    ("dowódca", "dowódczyni"),
+    ("strażnik", "strażniczka"),
+    ("zwiadowca", "zwiadowczyni"),
+    ("obrońca", "obrończyni"),
+    ("czempion", "czempionka"),
+    ("bohater", "bohaterka"),
+    ("szpieg", "agentka"),
+    ("wasal", "wasalka"),
+    ("władca", "władczyni"),
+    ("książę", "księżniczka"),
+    ("król", "królowa"),
+    ("szlachcic", "szlachcianka"),
+    ("kapitan", "pani kapitan"),
+    # 3. Klasy fantasy, magia i religia
+    ("czarodziej", "czarodziejka"),
+    ("mag", "magini"),
+    ("czarnoksiężnik", "czarownica"),
+    ("kapłan", "kapłanka"),
+    ("uzdrowiciel", "uzdrowicielka"),
+    ("medyk", "medyczka"),
+    ("łowca", "łowczyni"),
+    ("zabójca", "zabójczyni"),
+    ("złodziej", "złodziejka"),
+    ("wędrowiec", "wędrowniczka"),
+    ("przewodnik", "przewodniczka"),
+    ("sługa", "służąca"),
+    ("niewolnik", "niewolnica"),
+    ("więzień", "więźniarka"),
+    # 4. Relacje edukacyjne i hierarchiczne
+    ("mistrz", "mistrzyni"),
+    ("uczeń", "uczennica"),
+    ("nauczyciel", "nauczycielka"),
+    ("lekarz", "lekarka"),
+    ("sojusznik", "sojuszniczka"),
+    ("rywal", "rywalka"),
+    ("wróg", "nieprzyjaciółka"),
+    ("zdrajca", "zdrajczyni"),
+    ("członek", "członkini"),
+    ("gość", "gościni"),
+    # 5. Statusy i tożsamości
+    ("obcy", "obca"),
+    ("nieznajomy", "nieznajoma"),
+    ("samotnik", "samotniczka"),
+    ("żebrak", "żebraczka"),
+    ("świadek", "świadkini"),
+    ("zbawca", "wybawicielka"),
+    ("zdobywca", "zdobywczyni"),
+    ("zwycięzca", "zwyciężczyni"),
+    ("przegrany", "przegrana"),
+    ("szczęściarz", "szczęściara"),
+    ("pechowiec", "pechowa"),
+    ("potwór", "potwór"),
+    # 6. Cechy ekspresywne
+    ("kłamca", "kłamczyni"),
+    ("tchórz", "tchórzawka"),
+    ("głupiec", "głupia"),
+    ("szaleniec", "szalona"),
+    ("wsiarz", "dziewka"),
+    ("naiwniak", "naiwniaczka"),
+    ("szkodnik", "szkodniczka"),
+    ("okrutnik", "okrutnica"),
+    ("leń", "leniucha"),
+    ("prostak", "prostaczka"),
+    ("bękart", "bękarcica"),
+    ("dziecko", "dziecko"),
+    ("włóczęga", "włóczęga"),
+]
+
+PREDICATE_MODS_INSTRUMENTAL: List[Tuple[str, str]] = [
+    ("dobrym", "dobrą"), ("złym", "złą"), ("prawdziwym", "prawdziwą"),
+    ("najlepszym", "najlepszą"), ("moim", "moją"), ("naszym", "naszą"),
+    ("twoim", "twoją"), ("jedynym", "jedyną"), ("wiernym", "wierną"),
+    ("nowym", "nową"), ("lojalnym", "lojalną"), ("wspaniałym", "wspaniałą"),
+    ("dzielnym", "dzielną"), ("potężnym", "potężną"), ("wielkim", "wielką"),
+    ("bliskim", "bliską"), ("drogim", "drogą"), ("kochanym", "kochaną"),
+    ("ostatnim", "ostatnią"), ("pierwszym", "pierwszą"),
+]
+
+PREDICATE_MODS_NOMINATIVE: List[Tuple[str, str]] = [
+    ("dobry", "dobra"), ("zły", "zła"), ("prawdziwy", "prawdziwa"),
+    ("najlepszy", "najlepsza"), ("mój", "moja"), ("nasz", "nasza"),
+    ("twój", "twoja"), ("jedyny", "jedyna"), ("wierny", "wierna"),
+    ("nowy", "nowa"), ("lojalny", "lojalna"), ("wspaniały", "wspaniała"),
+    ("dzielny", "dzielna"), ("potężny", "potężna"), ("wielki", "wielka"),
+    ("bliski", "bliska"), ("drogi", "droga"), ("kochany", "kochana"),
+    ("ostatni", "ostatnia"), ("pierwszy", "pierwsza"),
+]
+
+PREDICATE_NOUNS_PLURAL_INSTRUMENTAL_PAIRS: List[Tuple[str, str]] = [
+    # 40 par (męskoosobowy, niemęskoosobowy) w narzędniku l. mn.
+    ("przyjaciółmi", "przyjaciółkami"),
+    ("żołnierzami", "żołnierkami"),
+    ("wojownikami", "wojowniczkami"),
+    ("bohaterami", "bohaterkami"),
+    ("magami", "maginiami"),
+    ("obrońcami", "obrończyniami"),
+    ("strażnikami", "strażniczkami"),
+    ("towarzyszami", "towarzyszkami"),
+    ("zabójcami", "zabójczyniami"),
+    ("zdrajcami", "zdrajczyniami"),
+    ("sługami", "służącymi"),
+    ("uczniami", "uczennicami"),
+    ("nauczycielami", "nauczycielkami"),
+    ("władcami", "władczyniami"),
+    ("królami", "królowymi"),
+    ("książętami", "księżniczkami"),
+    ("kapłanami", "kapłankami"),
+    ("rycerzami", "rycerkami"),
+    ("czarodziejami", "czarodziejkami"),
+    ("doradcami", "doradczyniami"),
+    ("opiekunami", "opiekunkami"),
+    ("mistrzami", "mistrzyniami"),
+    ("dowódcami", "dowódczyniami"),
+    ("szpiegami", "szpieżkami"),
+    ("niewolnikami", "niewolnicami"),
+    ("jeńcami", "jenkiniami"),
+    ("rebeliantami", "rebeliantkami"),
+    ("sojusznikami", "sojuszniczkami"),
+    ("wrogami", "wroginiami"),
+    ("przeciwnikami", "przeciwniczkami"),
+    ("przewodnikami", "przewodniczkami"),
+    ("członkami", "członkiniami"),
+    ("reprezentantami", "reprezentantkami"),
+    ("świadkami", "świadkiniami"),
+    ("posłańcami", "posłanniczkami"),
+    ("wędrowcami", "wędrowniczkami"),
+    ("zbawcami", "zbawczyniami"),
+    ("następcami", "następczyniami"),
+    ("pomocnikami", "pomocniczkami"),
+    ("potworami", "potworami"),
+    ("dziećmi", "dziećmi"),
+]
+
+PREDICATE_NOUNS_PLURAL_NOMINATIVE_PAIRS: List[Tuple[str, str]] = [
+    # 40 par (męskoosobowy, niemęskoosobowy) w mianowniku l. mn.
+    ("przyjaciele", "przyjaciółki"),
+    ("żołnierze", "żołnierki"),
+    ("wojownicy", "wojowniczki"),
+    ("bohaterowie", "bohaterki"),
+    ("magowie", "maginie"),
+    ("obrońcy", "obrończynie"),
+    ("strażnicy", "strażniczki"),
+    ("towarzysze", "towarzyszki"),
+    ("zabójcy", "zabójczynie"),
+    ("zdrajcy", "zdrajczynie"),
+    ("słudzy", "służące"),
+    ("uczniowie", "uczennice"),
+    ("nauczyciele", "nauczycielki"),
+    ("władcy", "władczynie"),
+    ("królowie", "królowe"),
+    ("książęta", "księżniczki"),
+    ("kapłani", "kapłanki"),
+    ("rycerze", "rycerki"),
+    ("czarodzieje", "czarodziejki"),
+    ("doradcy", "doradczynie"),
+    ("opiekunowie", "opiekunki"),
+    ("mistrzowie", "mistrzynie"),
+    ("dowódcy", "dowódczynie"),
+    ("szpiedzy", "szpieżki"),
+    ("niewolnicy", "niewolnice"),
+    ("jeńcy", "jenkinie"),
+    ("rebelianci", "rebeliantki"),
+    ("sojusznicy", "sojuszniczki"),
+    ("wrogowie", "wroginie"),
+    ("przeciwnicy", "przeciwniczki"),
+    ("przewodnicy", "przewodniczki"),
+    ("członkowie", "członkinie"),
+    ("reprezentanci", "reprezentantki"),
+    ("świadkowie", "świadkinie"),
+    ("posłańcy", "posłanniczki"),
+    ("wędrowcy", "wędrowniczki"),
+    ("zbawcy", "zbawczynie"),
+    ("następcy", "następczynie"),
+    ("pomocnicy", "pomocniczki"),
+    ("potwory", "potwory"),
+    ("dzieci", "dzieci"),
+]
+
+PREDICATE_MODS_PLURAL_NOMINATIVE: List[Tuple[str, str]] = [
+    ("moi", "moje"), ("twoi", "twoje"), ("nasi", "nasze"), ("wasi", "wasze"),
+    ("sami", "same"), ("jedyni", "jedyne"), ("wierni", "wierne"),
+    ("dzielni", "dzielne"), ("wspaniali", "wspaniałe"), ("nowi", "nowe"),
+    ("prawdziwi", "prawdziwe"), ("najlepsi", "najlepsze"), ("pierwsi", "pierwsze"),
+    ("ostatni", "ostatnie"), ("dobrzy", "dobre"), ("źli", "złe"),
+    ("bliscy", "bliskie"), ("drodzy", "drogie"), ("kochani", "kochane"),
+    ("lojalni", "lojalne"),
+]
+
+PREDICATE_NOUNS_PAIRS = PREDICATE_NOUNS_INSTRUMENTAL_PAIRS
+PREDICATE_MODS = PREDICATE_MODS_INSTRUMENTAL
+
 INSTITUTIONAL_COLLECTIVE_NOUNS_PATTERN: str = (
     r"(?:klan(?:ie|u|em)?|rodzin(?:a|y|ie|ę|ą|o|om|ach)?|rodzic(?:e|ów|om|ami|ach)|"
     r"ród|rod(?:u|em|zie|a)?|oddział(?:u|em|a)?|oddziale|drużyn(?:a|y|ie|ę|ą|o|om|ach)?|"
@@ -3365,7 +3735,9 @@ class EpisodeQualityGate:
         source_subs: Optional[Any] = None,
         line_speakers: Optional[Dict[int, str]] = None,
         whisper_transcriptions: Optional[Dict[int, str]] = None,
-        prosody_tags: Optional[Dict[int, str]] = None
+        prosody_tags: Optional[Dict[int, str]] = None,
+        enforce_line_split: bool = False,
+        report_cps_fixes: bool = False
     ) -> Tuple[Any, List[str]]:
         if not subs or not hasattr(subs, "events") or not subs.events:
             return subs, []
@@ -3377,7 +3749,38 @@ class EpisodeQualityGate:
             for idx_ev, ev_item in enumerate(events)
         }
 
+        # Step 0a: Temporal Subtitle Collision & Screen Elevation (Filar LVII & Netflix AVT Standard)
+        # When two dialogue events overlap in time by > 400ms without explicit vertical positioning,
+        # elevate the secondary event to the top of the screen {\an8} to prevent pixel stacking and visual unreadability.
+        non_sign_dialogues = []
+        for idx_ev, ev_item in enumerate(events):
+            ev_style_l = (ev_item.style or "").lower()
+            ev_is_sub = bool(re.search(r"\bsubtitles?\b", ev_style_l))
+            ev_is_sign = bool(
+                re.search(r"\\(pos|move|an[789]|clip)\b", ev_item.text or "") or
+                (not ev_is_sub and (
+                    bool(re.search(r"\b(sign|signs|title|titles|caption|captions|typeset|typesetting|op|ed)\b", ev_style_l))
+                    or ev_style_l.startswith("caption")
+                ))
+            )
+            if not ev_is_sign and ev_item.text and ev_item.text.strip():
+                non_sign_dialogues.append((idx_ev, ev_item))
+
+        for d_i in range(len(non_sign_dialogues) - 1):
+            idx_a, ev_a = non_sign_dialogues[d_i]
+            idx_b, ev_b = non_sign_dialogues[d_i + 1]
+            overlap_ms = ev_a.end - ev_b.start
+            if overlap_ms > 400 and ev_b.end > ev_a.start:
+                has_pos_a = bool(re.search(r"\\(pos|move|an[1-9])\b", ev_a.text))
+                has_pos_b = bool(re.search(r"\\(pos|move|an[1-9])\b", ev_b.text))
+                if not has_pos_a and not has_pos_b:
+                    target_ev = ev_b if len(ev_b.text) <= len(ev_a.text) else ev_a
+                    target_idx = idx_b if len(ev_b.text) <= len(ev_a.text) else idx_a
+                    target_ev.text = r"{\an8}" + target_ev.text
+                    fixes.append(f"[Episode Quality Gate - Filar LVII Kolizja Czasowa] Linia #{target_idx+1}: podniesiono nakładającą się kwestię dialogową na górę kadru (\\an8)")
+
         # Step 0: Episode-Wide Character Gender Knowledge Base (Filar CLXII)
+        from series_memory import CANONICAL_MALE_NAMES
         CANONICAL_MALE_NAMES_ON_A = {
             "shira", "akira", "gaara", "ashitaka", "kiba", "soma", "kenta",
             "ryoma", "hanza", "koba", "soya", "toma", "genga", "sinbad", "judar", "alibaba"
@@ -3402,7 +3805,7 @@ class EpisodeQualityGate:
             elif clean_spk in INHERENT_FEMALE_NOUNS or any(t in INHERENT_FEMALE_NOUNS for t in tokens):
                 char_gender_map[clean_spk] = "FEMALE"
                 char_gender_map[spk_norm] = "FEMALE"
-            elif clean_spk in INHERENT_MALE_NOUNS or any(t in INHERENT_MALE_NOUNS for t in tokens):
+            elif clean_spk in INHERENT_MALE_NOUNS or any(t in INHERENT_MALE_NOUNS for t in tokens) or clean_spk in CANONICAL_MALE_NAMES or any(t in CANONICAL_MALE_NAMES for t in tokens):
                 char_gender_map[clean_spk] = "MALE"
                 char_gender_map[spk_norm] = "MALE"
 
@@ -3448,15 +3851,17 @@ class EpisodeQualityGate:
             for c_key, c_val in bible_chars.items():
                 if "->" in c_key or "/" in c_key or "," in c_key:
                     continue  # Relationships handled separately, avoid poisoning listener gender
-                desc_str = c_val.get("description", "") if isinstance(c_val, dict) else str(c_val)
-                desc_lower = desc_str.lower()
-                desc_sanitized = re.sub(r"zakaz\s+form\s+(?:żeńsk|męsk)[a-ząćęłńóśźż]*", "", desc_lower)
-                gen = None
-                if any(k in desc_sanitized for k in MALE_ROLE_KEYWORDS):
-                    gen = "MALE"
-                elif any(k in desc_sanitized for k in FEMALE_ROLE_KEYWORDS):
-                    gen = "FEMALE"
-                if gen:
+                gen = series_bible.get_character_gender(c_key, allow_generic_nouns=False) if hasattr(series_bible, "get_character_gender") else None
+                if gen not in ("MALE", "FEMALE"):
+                    desc_str = c_val.get("description", "") if isinstance(c_val, dict) else str(c_val)
+                    desc_lower = desc_str.lower()
+                    desc_sanitized = re.sub(r"zakaz\s+form\s+(?:żeńsk|męsk)[a-ząćęłńóśźż]*", "", desc_lower)
+                    from series_memory import RE_FEMALE_ROLE, RE_MALE_ROLE
+                    if RE_FEMALE_ROLE.search(desc_sanitized):
+                        gen = "FEMALE"
+                    elif RE_MALE_ROLE.search(desc_sanitized):
+                        gen = "MALE"
+                if gen in ("MALE", "FEMALE"):
                     clean_ckey = extract_clean_speaker_name(c_key).strip().lower()
                     if clean_ckey and len(clean_ckey) >= 3:
                         char_gender_map[clean_ckey] = gen
@@ -3466,15 +3871,17 @@ class EpisodeQualityGate:
             for c_key, c_val in bible_chars.items():
                 if "->" in c_key or "/" in c_key or "," in c_key:
                     continue
-                desc_str = c_val.get("description", "") if isinstance(c_val, dict) else str(c_val)
-                desc_lower = desc_str.lower()
-                desc_sanitized = re.sub(r"zakaz\s+form\s+(?:żeńsk|męsk)[a-ząćęłńóśźż]*", "", desc_lower)
-                gen = None
-                if any(k in desc_sanitized for k in MALE_ROLE_KEYWORDS):
-                    gen = "MALE"
-                elif any(k in desc_sanitized for k in FEMALE_ROLE_KEYWORDS):
-                    gen = "FEMALE"
-                if gen:
+                gen = series_bible.get_character_gender(c_key, allow_generic_nouns=False) if hasattr(series_bible, "get_character_gender") else None
+                if gen not in ("MALE", "FEMALE"):
+                    desc_str = c_val.get("description", "") if isinstance(c_val, dict) else str(c_val)
+                    desc_lower = desc_str.lower()
+                    desc_sanitized = re.sub(r"zakaz\s+form\s+(?:żeńsk|męsk)[a-ząćęłńóśźż]*", "", desc_lower)
+                    from series_memory import RE_FEMALE_ROLE, RE_MALE_ROLE
+                    if RE_FEMALE_ROLE.search(desc_sanitized):
+                        gen = "FEMALE"
+                    elif RE_MALE_ROLE.search(desc_sanitized):
+                        gen = "MALE"
+                if gen in ("MALE", "FEMALE"):
                     for n in re.findall(r"\b[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]{2,}\b", c_key):
                         nl = n.lower()
                         if nl not in token_gender_candidates:
@@ -3660,6 +4067,9 @@ class EpisodeQualityGate:
                 tok_lower = prop_tok.lower()
                 if tok_lower in ETHNONYMS_AND_COLLECTIVES or tok_lower in glossary_source_tokens or (series_bible and hasattr(series_bible, "is_non_character_entity") and series_bible.is_non_character_entity(prop_tok)):
                     continue
+                from series_memory import is_proper_noun_homonym
+                if is_proper_noun_homonym(tok_lower):
+                    continue
                 if tok_lower in NON_NAME_ACTORS or tok_lower in {
                     "pan", "pani", "niego", "mnie", "ciebie", "nas", "was", "nich", "tego", "tamto", "jeden", "sama", "samo", "sami", "same", "wszystko", "wszyscy", "wszystkich", "cały", "cała", "całe"
                 }:
@@ -3679,7 +4089,18 @@ class EpisodeQualityGate:
                 if prep_word in {"do", "dla", "od", "u", "bez", "przez", "za"}:
                     # Po przyimkach rządzących dopełniaczem lub biernikiem męskie imiona spółgłoskowe przyjmują końcówkę -a (np. do Brandona, dla Klena, od Leona).
                     # Uznanie tej formy za mianownik (Brandona, Klena) powoduje błędne wygenerowanie żeńskiej odmiany na -y (do Brandony, do Kleny).
-                    if tok_lower.endswith("a") and tok_lower not in CANONICAL_MALE_NAMES_ON_A and cand_gender != "FEMALE":
+                    from series_memory import is_inherently_female_name, POLISH_FEMALE_NAMES, UNIVERSAL_FEMALE_NAMES_ON_A
+                    is_known_female = (
+                        cand_gender == "FEMALE" or
+                        is_inherently_female_name(prop_tok) or
+                        tok_lower in POLISH_FEMALE_NAMES or
+                        tok_lower in UNIVERSAL_FEMALE_NAMES_ON_A or
+                        (series_bible and hasattr(series_bible, "get_character_gender") and series_bible.get_character_gender(prop_tok, allow_generic_nouns=False) == "FEMALE")
+                    )
+                    if is_known_female:
+                        cand_nom = prop_tok
+                        cand_gender = "FEMALE"
+                    elif tok_lower.endswith("a") and tok_lower not in CANONICAL_MALE_NAMES_ON_A:
                         cand_nom = prop_tok[:-1]
                         cand_gender = "MALE"
                 elif prep_word in {"z", "ze", "przed", "nad", "pod"}:
@@ -4011,7 +4432,7 @@ class EpisodeQualityGate:
                     if r_addr:
                         r_lower = str(r_addr).lower()
                         if s_gender == "FEMALE" and any(w in r_lower for w in ["mężczyzna", "male", "chłopak"]):
-                            # Check if male addressee was derived from an audited contaminated tag (e.g. 'Ögedei (Mężczyzna)')
+                            # Check if male addressee was derived from an audited contaminated tag (e.g. 'Actor (Mężczyzna)')
                             cand_addr_name = re.sub(r"\s*\(.*?\)", "", str(r_addr)).strip()
                             is_cont_addr = False
                             if series_bible and hasattr(series_bible, "audit_speaker_metadata_against_audio") and cand_addr_name:
@@ -4146,6 +4567,29 @@ class EpisodeQualityGate:
                     ev.text = f"{ts_prefix}- {p1}\\N- {p2}"
                     if ev.text != old_t:
                         fixes.append(f"[Episode Quality Gate - Filar LVII Wielogłos Symultaniczny] Linia #{i+1}: sformatowano połączone kwestie dwóch mówców na dwie osobne linie z myślnikami")
+                elif r"\N" in clean_body:
+                    parts = re.split(r"\\N", clean_body)
+                    if len(parts) == 2:
+                        p0 = parts[0].strip()
+                        p1 = parts[1].strip()
+                        has_dash0 = bool(re.match(r"^[-–—]\s+", p0))
+                        has_dash1 = bool(re.match(r"^[-–—]\s+", p1))
+                        if has_dash0 and not has_dash1:
+                            if re.search(r"[.!?…]$", p0) and re.match(r"^[A-ZĄĆĘŁŃÓŚŹŻ0-9„\"'\(]", p1):
+                                clean_p0 = re.sub(r"^[-–—]\s*", "", p0).strip()
+                                clean_p1 = re.sub(r"^[-–—]\s*", "", p1).strip()
+                                old_t = ev.text
+                                ev.text = f"{ts_prefix}- {clean_p0}\\N- {clean_p1}"
+                                if ev.text != old_t:
+                                    fixes.append(f"[Episode Quality Gate - Filar LVII Symetria Myślników AVT] Linia #{i+1}: uzupełniono brakujący myślnik w drugim wersie dwugłosu")
+                        elif not has_dash0 and has_dash1:
+                            if re.search(r"[.!?…]$", p0) and re.match(r"^[A-ZĄĆĘŁŃÓŚŹŻ0-9„\"'\(]", p1):
+                                clean_p0 = re.sub(r"^[-–—]\s*", "", p0).strip()
+                                clean_p1 = re.sub(r"^[-–—]\s*", "", p1).strip()
+                                old_t = ev.text
+                                ev.text = f"{ts_prefix}- {clean_p0}\\N- {clean_p1}"
+                                if ev.text != old_t:
+                                    fixes.append(f"[Episode Quality Gate - Filar LVII Symetria Myślników AVT] Linia #{i+1}: uzupełniono brakujący myślnik w pierwszym wersie dwugłosu")
 
             # 0c. DIEGETIC SPOKEN DIALOGUE ITALICS PURISM (Filar LX / AVT Belczyk & Netflix Canon)
             # Remove artificial {\i1}...{\i0} flashback/thought wrappers on direct diegetic speech between characters
@@ -4662,12 +5106,16 @@ class EpisodeQualityGate:
             # 3b-4. SUBJECT NOMINATIVE CASE REPAIR FOR TITLE APPOSITION (Filar CLVII / CLXX)
             if not is_sign:
                 TITLES_SUBJECT_PAT = r"[Pp]an|[Pp]ani|[Mm]istrz|[Pp]rofesor|[Dd]oktor|[Pp]isarz|[Rr]eżyser|[Rr]edaktor|[Aa]utor|[Mm]angaka|[Ss]ensei"
-                CANONICAL_A_NAMES = {
-                    "akira", "shira", "soma", "gaara", "ashitaka", "kiba", "kenta",
-                    "ryoma", "hanza", "koba", "soya", "toma", "genga", "teshima",
-                    "yamada", "maeda", "takeda", "matsuda", "kuroda", "sanada",
-                    "shimada", "okada", "ishida", "kawada", "ueda", "baba", "honda", "oda", "aida"
-                }
+
+                # Closed-World Invariance (Aksjomat 4):
+                # Trimming '-a' in title apposition is PERMITTED ONLY IF the base stem
+                # explicitly exists in the project's knowledge base (series_memory, candidate_names, series_bible).
+                # Otherwise, proper names are invariant!
+                known_stems = {n.lower() for n in candidate_names}
+                if series_bible and hasattr(series_bible, "character_names"):
+                    known_stems.update({n.lower() for n in series_bible.character_names})
+                if character_registry:
+                    known_stems.update({k.lower() for k in character_registry.keys()})
 
                 # Case 1: Title + Surname + Given Name + Verb (e.g. 'Mistrz Tondena minoru\Nnie zdążył' -> 'Mistrz Tonden Minoru\Nnie zdążył')
                 def _fix_nominative_two_part_title_apposition(m):
@@ -4681,20 +5129,23 @@ class EpisodeQualityGate:
                     verb = m.group(8)
                     if title.lower() == "pani":
                         return m.group(0)
-                    full_surname = (surname_stem + "a").lower()
-                    if full_surname in CANONICAL_A_NAMES or full_surname.endswith(("da", "ta", "ka", "ma", "ba")):
-                        clean_surname = surname_stem + "a"
-                    else:
+                    
+                    if surname_stem.lower() in known_stems:
                         clean_surname = surname_stem
+                    else:
+                        clean_surname = surname_stem + "a"
+
                     clean_given = given_name.capitalize()
-                    fixes.append(
-                        f"[Episode Quality Gate - Filar CLVII/CLXX] Linia #{i+1}: "
-                        f"skorygowano mianownik i wielkość liter tytulatury '{title} {surname_stem}a {given_name}' -> '{title} {clean_surname} {clean_given}'"
-                    )
-                    return f"{prefix}{title}{sep1}{clean_surname}{sep2}{clean_given}{sep3}{verb}"
+                    if clean_surname != surname_stem + "a" or clean_given != given_name:
+                        fixes.append(
+                            f"[Episode Quality Gate - Filar CLVII/CLXX] Linia #{i+1}: "
+                            f"skorygowano mianownik i wielkość liter tytulatury '{title} {surname_stem}a {given_name}' -> '{title} {clean_surname} {clean_given}'"
+                        )
+                        return f"{prefix}{title}{sep1}{clean_surname}{sep2}{clean_given}{sep3}{verb}"
+                    return m.group(0)
 
                 ev.text = re.sub(
-                    rf"(^|[^\w]|\\[Nnh])({TITLES_SUBJECT_PAT})(\s+|\\[Nnh]+)([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]*[bcdfghjklmnprstvwxz])a(\s+|\\[Nnh]+)([A-Za-ząćęłńóśźż]+)(\s+|\\[Nnh]+)((?:nie\s+)?[a-ząćęłńóśźż]+(?:ł|łby|ła|ło|li|ły))\b",
+                    rf"(^|[^\w]|\\[Nnh])({TITLES_SUBJECT_PAT})(\s+|\\[Nnh]+)([A-ZĄĆĘŁŃÓŚŹŻŌŪĀĒĪ][a-ząćęłńóśźżōūāēī]*[bcdfghjklmnprstvwxz])a(\s+|\\[Nnh]+)([A-Za-ząćęłńóśźżōūāēī]+)(\s+|\\[Nnh]+)((?:nie\s+)?[a-ząćęłńóśźż]+(?:ł|łby|ła|ło|li|ły))\b",
                     _fix_nominative_two_part_title_apposition,
                     ev.text
                 )
@@ -4709,14 +5160,16 @@ class EpisodeQualityGate:
                     verb = m.group(6)
                     if title.lower() == "pani":
                         return m.group(0)
-                    full_name = (name_stem + "a").lower()
-                    if full_name in CANONICAL_A_NAMES or full_name.endswith(("da", "ta", "ka", "ma", "ba")):
-                        return m.group(0)
-                    fixes.append(f"[Episode Quality Gate - Filar CLVII/CLXX] Linia #{i+1}: skorygowano skażenie mianownika tytulatury '{title} {name_stem}a' -> '{title} {name_stem}'")
-                    return f"{prefix}{title}{sep1}{name_stem}{sep2}{verb}"
+                    
+                    if name_stem.lower() in known_stems:
+                        fixes.append(f"[Episode Quality Gate - Filar CLVII/CLXX] Linia #{i+1}: skorygowano skażenie mianownika tytulatury '{title} {name_stem}a' -> '{title} {name_stem}'")
+                        return f"{prefix}{title}{sep1}{name_stem}{sep2}{verb}"
+                    
+                    # Name is invariant (e.g. Luca, Joshua, Sasha, Vegeta, Kiba, Katsura, Asura)
+                    return m.group(0)
 
                 ev.text = re.sub(
-                    rf"(^|[^\w]|\\[Nnh])({TITLES_SUBJECT_PAT})(\s+|\\[Nnh]+)([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]*[bcdfghjklmnprstvwxz])a(\s+|\\[Nnh]+)((?:nie\s+)?[a-ząćęłńóśźż]+(?:ł|łby|ła|ło|li|ły))\b",
+                    rf"(^|[^\w]|\\[Nnh])({TITLES_SUBJECT_PAT})(\s+|\\[Nnh]+)([A-ZĄĆĘŁŃÓŚŹŻŌŪĀĒĪ][a-ząćęłńóśźżōūāēī]*[bcdfghjklmnprstvwxz])a(\s+|\\[Nnh]+)((?:nie\s+)?[a-ząćęłńóśźż]+(?:ł|łby|ła|ło|li|ły))\b",
                     _fix_nominative_title_apposition,
                     ev.text
                 )
@@ -4796,51 +5249,37 @@ class EpisodeQualityGate:
                         if series_bible.is_low_pitch_female(spk_clean):
                             spk_gen = "FEMALE"
 
-                    jp_aud_check = (whisper_transcriptions.get(i + 1, "") if whisper_transcriptions else "") or (getattr(ev, "audio_jp", "") or "")
-                    if not spk_gen and jp_aud_check:
-                        if "CHILD_FEMALE" in jp_aud_check or "Mówca_K" in jp_aud_check:
+                # Acoustic, Prosody & Pronoun Gender Check (Runs for both named and anonymous speakers)
+                jp_aud_check = (whisper_transcriptions.get(i + 1, "") if whisper_transcriptions else "") or (getattr(ev, "audio_jp", "") or "")
+                pt_val = (prosody_tags.get(i, "") if prosody_tags else "") or getattr(ev, "prosody", "") or ""
+                pt_lower = str(pt_val).lower()
+                has_female_prosody = bool(re.search(r"\b(?:sopran|alt|żeńsk[a-ząćęłńóśźż]*|mowca_k|speaker_f|dziewczyn[a-ząćęłńóśźż]*|kobiet[a-ząćęłńóśźż]*|girl|f0\s*>=\s*185|wysoki\s+f0)\b", pt_lower))
+                has_male_prosody = not has_female_prosody and bool(re.search(r"\b(?:baryton|bas|męsk[a-ząćęłńóśźż]*|mowca_m|speaker_m|chłopak[a-ząćęłńóśźż]*|chłopiec|chłopca|chłopcu|chłopcem|chłopce|chłopcy|mężczyzn[a-ząćęłńóśźż]*|boy|f0\s*<=\s*165|niski\s+f0)\b", pt_lower))
+                has_male_jp_pronoun = any(re.search(rf"\b{pr}\b", jp_aud_check, re.IGNORECASE) for pr in ["boku", "ore", "washi", "僕", "俺", "Mówca_M", "CHILD_MALE"])
+                if not spk_gen:
+                    if "CHILD_FEMALE" in jp_aud_check or "Mówca_K" in jp_aud_check or has_female_prosody:
+                        spk_gen = "FEMALE"
+                    elif "CHILD_MALE" in jp_aud_check or "Mówca_M" in jp_aud_check or has_male_prosody or has_male_jp_pronoun:
+                        spk_gen = "MALE"
+
+                if spk_gen == "MALE":
+                    # Acoustic & Scene Primacy Shield (Filar CLXXIV - 0.00 PLN):
+                    # If actor tag is MALE, but scene is confirmed FEMALE
+                    # or physical audio is FEMALE, override spk_gen to FEMALE only if contaminated!
+                    jp_aud = (whisper_transcriptions.get(i + 1, "") if whisper_transcriptions else "") or (getattr(ev, "audio_jp", "") or "")
+                    w_is_fem = any(m in jp_aud.lower() for m in ["warawa", "妾", "atashi", "あたし", "atai", "あtai", "wa yo", "わよ", "kashira", "かしら"])
+                    sc_is_fem = (event_scene_gender.get(i) == "FEMALE")
+                    is_cont = False
+                    checked_bible = False
+                    spk_c = extract_clean_speaker_name(str(spk_name)).lower() if spk_name else ""
+                    if series_bible and hasattr(series_bible, "audit_speaker_metadata_against_audio") and spk_c:
+                        aud_res, is_cont = series_bible.audit_speaker_metadata_against_audio(spk_c, whisper_gender="FEMALE" if w_is_fem else None, scene_gender="FEMALE" if sc_is_fem else None)
+                        checked_bible = True
+                        if is_cont and aud_res == "FEMALE":
                             spk_gen = "FEMALE"
-                        elif "CHILD_MALE" in jp_aud_check or "Mówca_M" in jp_aud_check:
-                            spk_gen = "MALE"
+                    if not checked_bible and not spk_c and (sc_is_fem or w_is_fem):
+                        spk_gen = "FEMALE"
 
-                    if spk_gen == "MALE":
-                        # Acoustic & Scene Primacy Shield (Filar CLXXIV - 0.00 PLN):
-                        # If actor tag is MALE (e.g. 'Ögedei'), but scene is confirmed FEMALE
-                        # or physical audio is FEMALE, override spk_gen to FEMALE and prevent masculine mutations!
-                        jp_aud = (whisper_transcriptions.get(i + 1, "") if whisper_transcriptions else "") or (getattr(ev, "audio_jp", "") or "")
-                        w_is_fem = any(m in jp_aud.lower() for m in ["warawa", "妾", "atashi", "あたし", "atai", "あtai", "wa yo", "わよ", "kashira", "かしら"])
-                        sc_is_fem = (event_scene_gender.get(i) == "FEMALE")
-                        is_cont = False
-                        if series_bible and hasattr(series_bible, "audit_speaker_metadata_against_audio"):
-                            aud_res, is_cont = series_bible.audit_speaker_metadata_against_audio(spk_clean, whisper_gender="FEMALE" if w_is_fem else None, scene_gender="FEMALE" if sc_is_fem else None)
-                            if is_cont and aud_res == "FEMALE":
-                                spk_gen = "FEMALE"
-                        if not is_cont and (sc_is_fem or w_is_fem):
-                            spk_gen = "FEMALE"
-
-                        # Companion Voice Shield (Filar CLXXXV - 0.00 PLN):
-                        # Protect female companion lines misattributed to male lead (e.g. Shizuku tagged as Tokiyuki):
-                        # Checks for sensory/ritual/incense/companion keywords + 1st person feminine forms in current or adjacent turn lines.
-                        if spk_gen == "MALE":
-                            turn_texts = [ev.text or ""]
-                            if i > 0 and (ev.start - events[i-1].end < 2500):
-                                turn_texts.append(events[i-1].text or "")
-                            if i < len(events) - 1 and (events[i+1].start - ev.end < 2500):
-                                turn_texts.append(events[i+1].text or "")
-                            combined_turn = " ".join(turn_texts)
-
-                            has_companion_topic = bool(re.search(
-                                r"\b(?:kadzidł[oauey]|kadzidłem|pachniał[ao]|woni|aromat|zapach|ołtarz|kapłank[aię]|miko)\b",
-                                combined_turn,
-                                re.IGNORECASE
-                            ))
-                            has_fem_1st_marker = bool(re.search(
-                                r"\b(?:mogłam|czułam|chciałam|miałam|wiedziałam|prosiłam|zapytałam|bałam\s+się)\b",
-                                combined_turn,
-                                re.IGNORECASE
-                            ))
-                            if has_companion_topic and has_fem_1st_marker:
-                                spk_gen = "FEMALE"
 
                 # Scene-Level Exclusive Gender Assignment for Anonymous Speaker
                 if not spk_gen and event_scene_gender.get(i):
@@ -4911,12 +5350,27 @@ class EpisodeQualityGate:
                     if re.search(r"\b[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+(?:łem|łbym|szedłem)\b|\b(?:będę)\s+[A-Za-ząćęłńóśźż]+(?:ał|ił|ył|eł|ół|ógł)\b", tev.text or "", re.IGNORECASE)
                 )
 
-                # Prevent circular LLM bias locking: only infer from turn counts when not already determined from scene/bible
+                # Zero-Evidence Invariance Gate: Only determine spk_gen from hard external evidence
+                # (metadata, character registry, acoustics, or Japanese audio pronouns).
+                # KATEGORYCZNY ZAKAZ auto-zgadywania płci z tekstu wygenerowanego przez LLM,
+                # co tworzyło błędne koło inferencji i narzucało fałszywą maskulinizację/feminizację.
                 if spk_gen is None:
+                    pt_val = (prosody_tags.get(i, "") if prosody_tags else "") or getattr(ev, "prosody", "") or ""
+                    pt_lower = str(pt_val).lower()
+                    has_female_prosody_turn = bool(re.search(r"\b(?:sopran|alt|żeńsk[a-ząćęłńóśźż]*|mowca_k|speaker_f|dziewczyn[a-ząćęłńóśźż]*|kobiet[a-ząćęłńóśźż]*|girl|f0\s*>=\s*185|wysoki\s+f0)\b", pt_lower))
+                    has_male_acoustic = not has_female_prosody_turn and bool(re.search(r"\b(?:baryton|bas|męsk[a-ząćęłńóśźż]*|mowca_m|speaker_m|chłopak[a-ząćęłńóśźż]*|chłopiec|chłopca|chłopcu|chłopcem|chłopce|chłopcy|mężczyzn[a-ząćęłńóśźż]*|boy|f0\s*<=\s*165|niski\s+f0)\b", pt_lower))
+                    jp_aud_line = (whisper_transcriptions.get(i + 1, "") if whisper_transcriptions else "") or (getattr(ev, "audio_jp", "") or "")
+                    has_male_jp = any(re.search(rf"\b{pr}\b", jp_aud_line, re.IGNORECASE) for pr in ["boku", "ore", "washi", "僕", "俺", "Mówca_M", "CHILD_MALE"])
+                    has_fem_jp = any(re.search(rf"\b{pr}\b", jp_aud_line, re.IGNORECASE) for pr in ["atashi", "atai", "あたし", "Mówca_K", "CHILD_FEMALE"])
+
                     has_masc_modal = any(re.search(r"\b(?:będę\s+musiał|musiałem|będę\s+mógł|będę\s+chciał)\b", tev.text or "", re.IGNORECASE) for tev in turn_evs)
                     has_fem_modal = any(re.search(r"\b(?:będę\s+musiała|musiałam|będę\s+mogła|będę\s+chciała)\b", tev.text or "", re.IGNORECASE) for tev in turn_evs)
 
-                    if has_masc_modal and not has_fem_modal:
+                    if has_female_prosody_turn or has_fem_jp:
+                        spk_gen = "FEMALE"
+                    elif has_male_acoustic or has_male_jp:
+                        spk_gen = "MALE"
+                    elif has_masc_modal and not has_fem_modal:
                         spk_gen = "MALE"
                     elif has_fem_modal and not has_masc_modal:
                         spk_gen = "FEMALE"
@@ -5000,6 +5454,51 @@ class EpisodeQualityGate:
                         if c_masc and c_masc.lower() != c_verb.lower():
                             ev.text = re.sub(rf"\b{re.escape(c_prefix)}{re.escape(c_verb)}\b", f"{c_prefix}{c_masc}", ev.text, count=1)
                             fixes.append(f"[Episode Quality Gate - Spójność Płci Postaci] Linia #{i+1}: skorygowano klitykę 1. os. na rodzaj męski dla mówcy '{label_spk}' ('{c_prefix}{c_verb}' -> '{c_prefix}{c_masc}')")
+                    # Predicate nouns for male speaker in 1st person (Zasada 12 & 15)
+                    mods_m_pat_1p = "|".join([m for m, f in PREDICATE_MODS_INSTRUMENTAL])
+                    mods_f_pat_1p = "|".join([f for m, f in PREDICATE_MODS_INSTRUMENTAL])
+                    all_mods_pat_1p = f"{mods_m_pat_1p}|{mods_f_pat_1p}"
+                    masc_all_nouns_pat_1p = "|".join([m for m, f in PREDICATE_NOUNS_INSTRUMENTAL_PAIRS if m != f])
+                    has_1p_copula_m = bool(re.search(r"\b(?:byłem|byłam|zostałem|zostałam|stałem\s+się|stałam\s+się|będę|jestem)\b", ev.text, re.IGNORECASE))
+                    if has_1p_copula_m:
+                        for m_n, f_n in PREDICATE_NOUNS_INSTRUMENTAL_PAIRS:
+                            if m_n == f_n:
+                                continue
+                            pat_pn = rf"((?:\b(?:byłem|byłam|zostałem|zostałam|stałem\s+się|stałam\s+się|będę|jestem)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:{mods_f_pat_1p})\s+){{0,3}})({re.escape(f_n)})\b"
+                            for match in list(re.finditer(pat_pn, ev.text, re.IGNORECASE)):
+                                pref = match.group(1)
+                                old_n = match.group(2)
+                                if re.search(rf"\b(?:z|ze|do|od|dla|o|u|w|we|na|przez|nad|pod|przed|za|między)\s+(?:(?:{all_mods_pat_1p})\s+)*{re.escape(old_n)}\b", ev.text, re.IGNORECASE):
+                                    continue
+                                repl_n = m_n.capitalize() if old_n[0].isupper() else m_n
+                                ev.text = re.sub(rf"({re.escape(pref)})({re.escape(old_n)})\b", rf"\g<1>{repl_n}", ev.text, count=1)
+                                fixes.append(f"[Episode Quality Gate - Spójność Płci Postaci] Linia #{i+1}: skorygowano orzecznik rzeczownikowy 1. os. na rodzaj męski dla mówcy '{label_spk}' ('{old_n}' -> '{repl_n}')")
+                        for m_mod, f_mod in PREDICATE_MODS_INSTRUMENTAL:
+                            pat_mod = rf"((?:\b(?:byłem|byłam|zostałem|zostałam|stałem\s+się|stałam\s+się|będę|jestem)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:{all_mods_pat_1p})\s+){{0,2}})({re.escape(f_mod)})(\s+(?:(?:{all_mods_pat_1p})\s+)*(?:{masc_all_nouns_pat_1p}))\b"
+                            ev.text = re.sub(pat_mod, rf"\g<1>{m_mod}\g<3>", ev.text, flags=re.IGNORECASE)
+
+                    # Predicate nouns for male speaker in Nominative 1st person
+                    mods_m_nom_pat_1p = "|".join([m for m, f in PREDICATE_MODS_NOMINATIVE])
+                    mods_f_nom_pat_1p = "|".join([f for m, f in PREDICATE_MODS_NOMINATIVE])
+                    all_mods_nom_pat_1p = f"{mods_m_nom_pat_1p}|{mods_f_nom_pat_1p}"
+                    masc_all_nouns_nom_pat_1p = "|".join([m for m, f in PREDICATE_NOUNS_NOMINATIVE_PAIRS if m != f])
+                    has_1p_nom_copula_m = bool(re.search(r"\b(?:jestem|byłem|byłam|zostałem|zostałam|to\s+jest|to)\b", ev.text, re.IGNORECASE))
+                    if has_1p_nom_copula_m:
+                        for m_n, f_n in PREDICATE_NOUNS_NOMINATIVE_PAIRS:
+                            if m_n == f_n:
+                                continue
+                            pat_pn_nom = rf"((?:\b(?:jestem|byłem|byłam|zostałem|zostałam|to\s+jest|to)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:{mods_f_nom_pat_1p})\s+){{0,3}})({re.escape(f_n)})\b"
+                            for match in list(re.finditer(pat_pn_nom, ev.text, re.IGNORECASE)):
+                                pref = match.group(1)
+                                old_n = match.group(2)
+                                if re.search(rf"\b(?:z|ze|do|od|dla|o|u|w|we|na|przez|nad|pod|przed|za|między)\s+(?:(?:{all_mods_nom_pat_1p})\s+)*{re.escape(old_n)}\b", ev.text, re.IGNORECASE):
+                                    continue
+                                repl_n = m_n.capitalize() if old_n[0].isupper() else m_n
+                                ev.text = re.sub(rf"({re.escape(pref)})({re.escape(old_n)})\b", rf"\g<1>{repl_n}", ev.text, count=1)
+                                fixes.append(f"[Episode Quality Gate - Spójność Płci Postaci] Linia #{i+1}: skorygowano mianownik orzecznikowy 1. os. na rodzaj męski dla mówcy '{label_spk}' ('{old_n}' -> '{repl_n}')")
+                        for m_mod, f_mod in PREDICATE_MODS_NOMINATIVE:
+                            pat_mod_nom = rf"((?:\b(?:jestem|byłem|byłam|zostałem|zostałam|to\s+jest|to)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:{all_mods_nom_pat_1p})\s+){{0,2}})({re.escape(f_mod)})(\s+(?:(?:{all_mods_nom_pat_1p})\s+)*(?:{masc_all_nouns_nom_pat_1p}))\b"
+                            ev.text = re.sub(pat_mod_nom, rf"\g<1>{m_mod}\g<3>", ev.text, flags=re.IGNORECASE)
                 elif spk_gen == "FEMALE":
                     for m_pat, f_repl in FIRST_PERSON_MASCULINE_TO_FEMININE:
                         match = re.search(m_pat, ev.text, re.IGNORECASE)
@@ -5043,18 +5542,149 @@ class EpisodeQualityGate:
                         if c_fem and c_fem.lower() != c_verb.lower():
                             ev.text = re.sub(rf"\b{re.escape(c_prefix)}{re.escape(c_verb)}\b", f"{c_prefix}{c_fem}", ev.text, count=1)
                             fixes.append(f"[Episode Quality Gate - Spójność Płci Postaci] Linia #{i+1}: skorygowano klitykę 1. os. na rodzaj żeński dla mówczyni '{label_spk}' ('{c_prefix}{c_verb}' -> '{c_prefix}{c_fem}')")
+                    # Predicate nouns for female speaker in 1st person (Zasada 12 & 15)
+                    mods_m_pat_1p = "|".join([m for m, f in PREDICATE_MODS_INSTRUMENTAL])
+                    mods_f_pat_1p = "|".join([f for m, f in PREDICATE_MODS_INSTRUMENTAL])
+                    all_mods_pat_1p = f"{mods_m_pat_1p}|{mods_f_pat_1p}"
+                    fem_all_nouns_pat_1p = "|".join([f for m, f in PREDICATE_NOUNS_INSTRUMENTAL_PAIRS if m != f])
+                    has_1p_copula_f = bool(re.search(r"\b(?:byłam|byłem|zostałam|zostałem|stałam\s+się|stałem\s+się|będę|jestem)\b", ev.text, re.IGNORECASE))
+                    if has_1p_copula_f:
+                        for m_n, f_n in PREDICATE_NOUNS_INSTRUMENTAL_PAIRS:
+                            if m_n == f_n:
+                                continue
+                            pat_pn = rf"((?:\b(?:byłam|byłem|zostałam|zostałem|stałam\s+się|stałem\s+się|będę|jestem)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:{mods_m_pat_1p})\s+){{0,3}})({re.escape(m_n)})\b"
+                            for match in list(re.finditer(pat_pn, ev.text, re.IGNORECASE)):
+                                pref = match.group(1)
+                                old_n = match.group(2)
+                                if re.search(rf"\b(?:z|ze|do|od|dla|o|u|w|we|na|przez|nad|pod|przed|za|między)\s+(?:(?:{all_mods_pat_1p})\s+)*{re.escape(old_n)}\b", ev.text, re.IGNORECASE):
+                                    continue
+                                repl_n = f_n.capitalize() if old_n[0].isupper() else f_n
+                                ev.text = re.sub(rf"({re.escape(pref)})({re.escape(old_n)})\b", rf"\g<1>{repl_n}", ev.text, count=1)
+                                fixes.append(f"[Episode Quality Gate - Spójność Płci Postaci] Linia #{i+1}: skorygowano orzecznik rzeczownikowy 1. os. na rodzaj żeński dla mówczyni '{label_spk}' ('{old_n}' -> '{repl_n}')")
+                        for m_mod, f_mod in PREDICATE_MODS_INSTRUMENTAL:
+                            pat_mod = rf"((?:\b(?:byłam|byłem|zostałam|zostałem|stałam\s+się|stałem\s+się|będę|jestem)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:{all_mods_pat_1p})\s+){{0,2}})({re.escape(m_mod)})(\s+(?:(?:{all_mods_pat_1p})\s+)*(?:{fem_all_nouns_pat_1p}))\b"
+                            ev.text = re.sub(pat_mod, rf"\g<1>{f_mod}\g<3>", ev.text, flags=re.IGNORECASE)
+
+                    # Predicate nouns for female speaker in Nominative 1st person
+                    mods_m_nom_pat_1p = "|".join([m for m, f in PREDICATE_MODS_NOMINATIVE])
+                    mods_f_nom_pat_1p = "|".join([f for m, f in PREDICATE_MODS_NOMINATIVE])
+                    all_mods_nom_pat_1p = f"{mods_m_nom_pat_1p}|{mods_f_nom_pat_1p}"
+                    fem_all_nouns_nom_pat_1p = "|".join([f for m, f in PREDICATE_NOUNS_NOMINATIVE_PAIRS if m != f])
+                    has_1p_nom_copula_f = bool(re.search(r"\b(?:jestem|byłam|byłem|zostałam|zostałem|to\s+jest|to)\b", ev.text, re.IGNORECASE))
+                    if has_1p_nom_copula_f:
+                        for m_n, f_n in PREDICATE_NOUNS_NOMINATIVE_PAIRS:
+                            if m_n == f_n:
+                                continue
+                            pat_pn_nom = rf"((?:\b(?:jestem|byłam|byłem|zostałam|zostałem|to\s+jest|to)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:{mods_m_nom_pat_1p})\s+){{0,3}})({re.escape(m_n)})\b"
+                            for match in list(re.finditer(pat_pn_nom, ev.text, re.IGNORECASE)):
+                                pref = match.group(1)
+                                old_n = match.group(2)
+                                if re.search(rf"\b(?:z|ze|do|od|dla|o|u|w|we|na|przez|nad|pod|przed|za|między)\s+(?:(?:{all_mods_nom_pat_1p})\s+)*{re.escape(old_n)}\b", ev.text, re.IGNORECASE):
+                                    continue
+                                repl_n = f_n.capitalize() if old_n[0].isupper() else f_n
+                                ev.text = re.sub(rf"({re.escape(pref)})({re.escape(old_n)})\b", rf"\g<1>{repl_n}", ev.text, count=1)
+                                fixes.append(f"[Episode Quality Gate - Spójność Płci Postaci] Linia #{i+1}: skorygowano mianownik orzecznikowy 1. os. na rodzaj żeński dla mówczyni '{label_spk}' ('{old_n}' -> '{repl_n}')")
+                        for m_mod, f_mod in PREDICATE_MODS_NOMINATIVE:
+                            pat_mod_nom = rf"((?:\b(?:jestem|byłam|byłem|zostałam|zostałem|to\s+jest|to)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:{all_mods_nom_pat_1p})\s+){{0,2}})({re.escape(m_mod)})(\s+(?:(?:{all_mods_nom_pat_1p})\s+)*(?:{fem_all_nouns_nom_pat_1p}))\b"
+                            ev.text = re.sub(pat_mod_nom, rf"\g<1>{f_mod}\g<3>", ev.text, flags=re.IGNORECASE)
 
                 if quote_shield_map:
                     for q_key, q_val in quote_shield_map.items():
                         ev.text = ev.text.replace(q_key, q_val)
 
                 # 3c-2: 3rd-person subject-verb past-tense agreement & compound passive voice (Filar CLXII/CLXXXV)
+                # Protected by Preposition Shield & Possessive Headword Shield (0.00 PLN)
+                prep_pattern = (
+                    r"\b(?:"
+                    r"do|od|dla|z|ze|u|w|we|na|o|po|za|przed|przede|nad|nade|pod|pode|"
+                    r"między|pomiędzy|przez|przeze|koło|obok|wokół|ku|bez|beze|według|"
+                    r"przeciwko|naprzeciw|naprzeciwko|wobec|dzięki|oprócz|mimo|pomimo|"
+                    r"wśród|pośród|wskutek|dookoła"
+                    r")\s*(?:pana|pani|świętego|świętej|młodego|młodej|małego|małej|samego|samej)?\s*$"
+                )
+                possessive_headwords_pattern = (
+                    r"\b(?:"
+                    r"ojciec|ojca|ojcu|ojcem|ojcze|"
+                    r"matka|matki|matce|matkę|matko|matką|"
+                    r"tata|taty|tacie|tatę|tato|tatą|"
+                    r"mama|mamy|mamie|mamę|mamo|mamą|"
+                    r"brat|brata|bratu|bratem|bracie|bracia|braci|braćmi|"
+                    r"siostra|siostry|siostrze|siostrę|siostro|siostrą|sióstr|siostrom|siostrami|"
+                    r"syn|syna|synowi|synem|synu|synowie|synów|"
+                    r"córka|córki|córce|córkę|córko|córką|córek|córkom|córkami|"
+                    r"żona|żony|żonie|żonę|żono|żoną|"
+                    r"mąż|męża|mężowi|mężem|mężu|"
+                    r"dziadek|dziadka|dziadkowi|dziadkiem|dziadku|"
+                    r"babcia|babci|babcię|babciu|babcią|"
+                    r"wuj|wuja|wujowi|wujem|wuju|wujek|wujka|wujkowi|wujkiem|wujku|"
+                    r"ciotka|ciotki|ciotce|ciotkę|ciotko|ciotką|ciocia|cioci|ciocię|ciociu|ciocią|"
+                    r"kolega|kolegi|koledze|kolegę|kolego|kolegą|"
+                    r"koleżanka|koleżanki|koleżance|koleżankę|koleżanko|koleżanką|"
+                    r"przyjaciel|przyjaciela|przyjacielowi|przyjacielem|przyjacielu|przyjaciele|przyjaciół|"
+                    r"przyjaciółka|przyjaciółki|przyjaciółce|przyjaciółkę|przyjaciółko|przyjaciółką|"
+                    r"towarzysz|towarzysza|towarzyszowi|towarzyszem|towarzyszu|"
+                    r"mistrz|mistrza|mistrzowi|mistrzem|mistrzu|"
+                    r"pan|pana|panu|panem|panie|"
+                    r"pani|panią|"
+                    r"dowódca|dowódcy|dowódcę|dowódco|dowódcą|"
+                    r"sługa|sługi|słudze|sługę|sługo|sługą|"
+                    r"oddział|oddziału|oddziałem|oddziale|"
+                    r"armia|armii|armię|armią|"
+                    r"rodzina|rodziny|rodzinie|rodzinę|rodzino|rodziną|"
+                    r"dom|domu|domem|domie|"
+                    r"imię|imienia|imieniu|imieniem|"
+                    r"nazwisko|nazwiska|nazwisku|nazwiskiem|"
+                    r"głos|głosu|głosem|głosie|"
+                    r"cień|cienia|cieniem|cieniu|"
+                    r"ciało|ciała|ciele|ciałem|"
+                    r"miecz|miecza|mieczem|mieczu|"
+                    r"broń|broni|bronią|"
+                    r"statek|statku|statkiem|"
+                    r"pokój|pokoju|pokojem|"
+                    r"list|listu|listem|liście|"
+                    r"wiadomość|wiadomości|wiadomością|"
+                    r"zdjęcie|zdjęcia|zdjęciu|zdjęciem|"
+                    r"słowa|słów|słowom|słowami|"
+                    r"wypowiedź|wypowiedzi|wypowiedzią|"
+                    r"decyzja|decyzji|decyzję|decyzją|"
+                    r"rozkaz|rozkazu|rozkazem|rozkazie|"
+                    r"śmierć|śmierci|śmiercią|"
+                    r"życie|życia|życiu|życiem|"
+                    r"los|losu|losem|losie|"
+                    r"znajomy|znajomego|znajomemu|znajomym|"
+                    r"znajoma|znajomej|znajomą|"
+                    r"wróg|wroga|wrogowi|wrogiem|wrogu"
+                    r")\s*$"
+                )
+                any_prep_pattern = (
+                    r"\b(?:"
+                    r"do|od|dla|z|ze|u|w|we|na|o|po|za|przed|przede|nad|nade|pod|pode|"
+                    r"między|pomiędzy|przez|przeze|koło|obok|wokół|ku|bez|beze|według|"
+                    r"przeciwko|naprzeciw|naprzeciwko|wobec|dzięki|oprócz|mimo|pomimo|"
+                    r"wśród|pośród|wskutek|dookoła"
+                    r")\b"
+                )
+
                 for char_lower, gender in char_gender_map.items():
                     if len(char_lower) < 3:
+                        continue
+                    if char_lower not in ev.text.lower():
                         continue
 
                     # 1. Forward search: [Name] ... [verb / passive compound]
                     for m in list(re.finditer(rf"\b{re.escape(char_lower)}\b", ev.text, re.IGNORECASE)):
+                        before_pos = m.start()
+                        prefix = ev.text[:before_pos]
+                        clause_prefix_match = re.search(r"[^\.,!\?;—–-]+$", prefix)
+                        clause_prefix = clause_prefix_match.group(0) if clause_prefix_match else prefix
+
+                        # Shield 1: Prepositional object guard (e.g. "poszedł do Yui", "wiadomość od Shira")
+                        if re.search(prep_pattern, clause_prefix, re.IGNORECASE):
+                            continue
+                        # Shield 2: Possessive attribute guard (e.g. "ojciec Yui", "matka Shira")
+                        if re.search(possessive_headwords_pattern, clause_prefix, re.IGNORECASE):
+                            continue
+
                         after_pos = m.end()
                         remainder = ev.text[after_pos:]
                         clause_match = re.match(r"^[^\.,!\?;—–-]+", remainder)
@@ -5111,8 +5741,21 @@ class EpisodeQualityGate:
                         clause_match = re.search(r"[^\.,!\?;—–-]+$", prefix)
                         if clause_match:
                             clause_text = clause_match.group(0)
+
+                            # Shield 1: Direct Preposition Shield (e.g. "poszedł do Yui", "od Shira")
+                            if re.search(prep_pattern, clause_text, re.IGNORECASE):
+                                continue
+                            # Shield 2: Possessive Headword Shield (e.g. "ojciec Yui", "matka Shira")
+                            if re.search(possessive_headwords_pattern, clause_text, re.IGNORECASE):
+                                continue
+
                             tokens = list(re.finditer(r"\b[A-Za-ząćęłńóśźż]+\b", clause_text))
                             for tok in reversed(tokens[-4:]):  # check backwards within last 4 words in clause
+                                between_text = clause_text[tok.end():]
+                                # Shield 3: Preposition between verb and Name (e.g. "poszedł do ... Yui", "rozmawiał z ... Shirą")
+                                if re.search(any_prep_pattern, between_text, re.IGNORECASE):
+                                    continue
+
                                 w = tok.group(0)
                                 if gender == "MALE":
                                     new_v = convert_feminine_past_to_masculine(w)
@@ -5190,9 +5833,19 @@ class EpisodeQualityGate:
                 has_female_vocative = bool(re.search(r"\b(dziewczęta|dziewczyny|panie|kobiety|siostry|uczennice|kapłanki)[!,\?]", clean_ev_text, re.IGNORECASE))
                 has_male_vocative = bool(re.search(r"\b(chłopaki|panowie|mężczyźni|żołnierze|bracia|chłopcy)[!,\?]", clean_ev_text, re.IGNORECASE))
 
-                is_female_dual = bool(re.search(r"\b(dwie\s+kobiety|obie|kobiety\s*\(dual\))\b", addr_norm)) or ("obie" in clean_ev_text.lower() and bool(re.search(r"\b(dziewczęta|dziewczyny|siostry|kobiety)\b", clean_ev_text, re.IGNORECASE)))
-                is_male_dual = bool(re.search(r"\b(dwóch\s+mężczyzn|dwaj\s+mężczyźni|obaj)\b", addr_norm))
-                is_mixed_dual = bool(re.search(r"\b(para\s+mieszana|oboje)\b", addr_norm))
+                if not has_female_vocative and not has_male_vocative and prev_ev:
+                    prev_spk = getattr(prev_ev, "name", "") or ""
+                    curr_spk = getattr(ev, "name", "") or ""
+                    if (prev_spk == curr_spk or not prev_spk or not curr_spk) and (ev.start - prev_ev.end < 3500):
+                        prev_clean_t = re.sub(r"\{[^\}]*\}", "", prev_ev.text or "").strip()
+                        if re.search(r"\b(dziewczęta|dziewczyny|panie|kobiety|siostry|uczennice|kapłanki)[!,\?]", prev_clean_t, re.IGNORECASE):
+                            has_female_vocative = True
+                        elif re.search(r"\b(chłopaki|panowie|mężczyźni|żołnierze|bracia|chłopcy)[!,\?]", prev_clean_t, re.IGNORECASE):
+                            has_male_vocative = True
+
+                is_female_dual = bool(re.search(r"\b(kobieta_dual|dwie\s+kobiety|obie|kobiety\s*\(dual\))\b", addr_norm)) or ("obie" in clean_ev_text.lower() and bool(re.search(r"\b(dziewczęta|dziewczyny|siostry|kobiety)\b", clean_ev_text, re.IGNORECASE)))
+                is_male_dual = bool(re.search(r"\b(mężczyzna_dual|dwóch\s+mężczyzn|dwaj\s+mężczyźni|obaj)\b", addr_norm))
+                is_mixed_dual = bool(re.search(r"\b(para_mieszana_dual|para\s+mieszana|oboje)\b", addr_norm))
 
                 is_female_group = ("grupa_kobiet" in addr_norm or "grupa kobiet" in addr_norm or is_female_dual) or has_female_vocative
                 is_male_group = ("grupa_mężczyzn" in addr_norm or "grupa mężczyzn" in addr_norm or is_male_dual) or has_male_vocative
@@ -5236,6 +5889,45 @@ class EpisodeQualityGate:
                             ev.text = re.sub(rf"\b{re.escape(prefix)}{re.escape(old_adj)}\b", f"{prefix}{repl_adj}", ev.text, count=1)
                             fixes.append(f"[Episode Quality Gate - Filar CLXIII Przymiotnik Niemęskoosobowy] Linia #{i+1}: skorygowano '{prefix}{old_adj}' -> '{prefix}{repl_adj}' (adresat: grupa kobiet)")
 
+                    # 3. Predicate nouns in instrumental plural for female groups
+                    has_2pl_copula_f = bool(re.search(r"\b(?:jesteście|będziecie|byłyście|byliście|zostałyście|zostaliście|bądźcie)\b", ev.text, re.IGNORECASE))
+                    if has_2pl_copula_f:
+                        for m_n, f_n in PREDICATE_NOUNS_PLURAL_INSTRUMENTAL_PAIRS:
+                            if m_n == f_n:
+                                continue
+                            pat_pn = rf"((?:\b(?:jesteście|będziecie|byłyście|byliście|zostałyście|zostaliście|bądźcie)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:[A-Za-ząćęłńóśźż]+(?:ymi|imi)|moimi|twoimi|naszymi|waszymi|ich|swoimi)\s+){{0,3}})({re.escape(m_n)})\b"
+                            for m in list(re.finditer(pat_pn, ev.text, re.IGNORECASE)):
+                                pref = m.group(1)
+                                old_n = m.group(2)
+                                if re.search(rf"\b(?:z|ze|do|od|dla|o|u|w|we|na|przez|nad|pod|przed|za|między)\s+(?:[A-Za-ząćęłńóśźż]+\s+)*{re.escape(old_n)}\b", ev.text, re.IGNORECASE):
+                                    continue
+                                repl_n = f_n.capitalize() if old_n[0].isupper() else f_n
+                                ev.text = re.sub(rf"({re.escape(pref)})({re.escape(old_n)})\b", rf"\g<1>{repl_n}", ev.text, count=1)
+                                fixes.append(f"[Episode Quality Gate - Filar CLXIII Rzeczownik Orzecznikowy Niemęskoosobowy lm.] Linia #{i+1}: skorygowano '{old_n}' -> '{repl_n}' (adresat: grupa kobiet)")
+
+                    # 4. Predicate nouns in nominative plural for female groups
+                    has_2pl_nom_copula_f = bool(re.search(r"\b(?:jesteście|będziecie|byłyście|byliście|zostałyście|zostaliście|to\s+są|to)\b", ev.text, re.IGNORECASE))
+                    if has_2pl_nom_copula_f:
+                        mods_m_nom_pl_pat = "|".join([m for m, f in PREDICATE_MODS_PLURAL_NOMINATIVE])
+                        mods_f_nom_pl_pat = "|".join([f for m, f in PREDICATE_MODS_PLURAL_NOMINATIVE])
+                        all_mods_nom_pl_pat = f"{mods_m_nom_pl_pat}|{mods_f_nom_pl_pat}"
+                        fem_all_nouns_nom_pl_pat = "|".join([f for m, f in PREDICATE_NOUNS_PLURAL_NOMINATIVE_PAIRS if m != f])
+                        for m_n, f_n in PREDICATE_NOUNS_PLURAL_NOMINATIVE_PAIRS:
+                            if m_n == f_n:
+                                continue
+                            pat_pn_nom = rf"((?:\b(?:jesteście|będziecie|byłyście|byliście|zostałyście|zostaliście|to\s+są|to)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:{mods_m_nom_pl_pat})\s+){{0,3}})({re.escape(m_n)})\b"
+                            for m in list(re.finditer(pat_pn_nom, ev.text, re.IGNORECASE)):
+                                pref = m.group(1)
+                                old_n = m.group(2)
+                                if re.search(rf"\b(?:z|ze|do|od|dla|o|u|w|we|na|przez|nad|pod|przed|za|między)\s+(?:(?:{all_mods_nom_pl_pat})\s+)*{re.escape(old_n)}\b", ev.text, re.IGNORECASE):
+                                    continue
+                                repl_n = f_n.capitalize() if old_n[0].isupper() else f_n
+                                ev.text = re.sub(rf"({re.escape(pref)})({re.escape(old_n)})\b", rf"\g<1>{repl_n}", ev.text, count=1)
+                                fixes.append(f"[Episode Quality Gate - Filar CLXIII Mianownik Orzecznikowy Niemęskoosobowy lm.] Linia #{i+1}: skorygowano '{old_n}' -> '{repl_n}' (adresat: grupa kobiet)")
+                        for m_mod, f_mod in PREDICATE_MODS_PLURAL_NOMINATIVE:
+                            pat_mod_nom = rf"((?:\b(?:jesteście|będziecie|byłyście|byliście|zostałyście|zostaliście|to\s+są|to)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:{all_mods_nom_pl_pat})\s+){{0,2}})({re.escape(m_mod)})(\s+(?:(?:{all_mods_nom_pl_pat})\s+)*(?:{fem_all_nouns_nom_pl_pat}))\b"
+                            ev.text = re.sub(pat_mod_nom, rf"\g<1>{f_mod}\g<3>", ev.text, flags=re.IGNORECASE)
+
                 elif is_male_group or is_mixed_group:
                     # Convert non-virile 2nd-person plural verbs (-łyście) -> virile (-liście)
                     for m in list(re.finditer(r"\b([A-Za-ząćęłńóśźż]+łyście)\b", ev.text)):
@@ -5255,6 +5947,45 @@ class EpisodeQualityGate:
                             ev.text = re.sub(rf"\b{re.escape(prefix)}{re.escape(old_adj)}\b", f"{prefix}{repl_adj}", ev.text, count=1)
                             fixes.append(f"[Episode Quality Gate - Filar CLXIII Przymiotnik Męskoosobowy] Linia #{i+1}: skorygowano '{prefix}{old_adj}' -> '{prefix}{repl_adj}' (adresat: {'grupa mężczyzn' if is_male_group else 'grupa mieszana'})")
 
+                    # 3. Predicate nouns in instrumental plural for male groups
+                    has_2pl_copula_m = bool(re.search(r"\b(?:jesteście|będziecie|byliście|byłyście|zostaliście|zostałyście|bądźcie)\b", ev.text, re.IGNORECASE))
+                    if has_2pl_copula_m:
+                        for m_n, f_n in PREDICATE_NOUNS_PLURAL_INSTRUMENTAL_PAIRS:
+                            if m_n == f_n:
+                                continue
+                            pat_pn = rf"((?:\b(?:jesteście|będziecie|byliście|byłyście|zostaliście|zostałyście|bądźcie)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:[A-Za-ząćęłńóśźż]+(?:ymi|imi)|moimi|twoimi|naszymi|waszymi|ich|swoimi)\s+){{0,3}})({re.escape(f_n)})\b"
+                            for m in list(re.finditer(pat_pn, ev.text, re.IGNORECASE)):
+                                pref = m.group(1)
+                                old_n = m.group(2)
+                                if re.search(rf"\b(?:z|ze|do|od|dla|o|u|w|we|na|przez|nad|pod|przed|za|między)\s+(?:[A-Za-ząćęłńóśźż]+\s+)*{re.escape(old_n)}\b", ev.text, re.IGNORECASE):
+                                    continue
+                                repl_n = m_n.capitalize() if old_n[0].isupper() else m_n
+                                ev.text = re.sub(rf"({re.escape(pref)})({re.escape(old_n)})\b", rf"\g<1>{repl_n}", ev.text, count=1)
+                                fixes.append(f"[Episode Quality Gate - Filar CLXIII Rzeczownik Orzecznikowy Męskoosobowy lm.] Linia #{i+1}: skorygowano '{old_n}' -> '{repl_n}' (adresat: grupa mężczyzn)")
+
+                    # 4. Predicate nouns in nominative plural for male groups
+                    has_2pl_nom_copula_m = bool(re.search(r"\b(?:jesteście|będziecie|byliście|byłyście|zostaliście|zostałyście|to\s+są|to)\b", ev.text, re.IGNORECASE))
+                    if has_2pl_nom_copula_m:
+                        mods_m_nom_pl_pat = "|".join([m for m, f in PREDICATE_MODS_PLURAL_NOMINATIVE])
+                        mods_f_nom_pl_pat = "|".join([f for m, f in PREDICATE_MODS_PLURAL_NOMINATIVE])
+                        all_mods_nom_pl_pat = f"{mods_m_nom_pl_pat}|{mods_f_nom_pl_pat}"
+                        masc_all_nouns_nom_pl_pat = "|".join([m for m, f in PREDICATE_NOUNS_PLURAL_NOMINATIVE_PAIRS if m != f])
+                        for m_n, f_n in PREDICATE_NOUNS_PLURAL_NOMINATIVE_PAIRS:
+                            if m_n == f_n:
+                                continue
+                            pat_pn_nom = rf"((?:\b(?:jesteście|będziecie|byliście|byłyście|zostaliście|zostałyście|to\s+są|to)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:{mods_f_nom_pl_pat})\s+){{0,3}})({re.escape(f_n)})\b"
+                            for m in list(re.finditer(pat_pn_nom, ev.text, re.IGNORECASE)):
+                                pref = m.group(1)
+                                old_n = m.group(2)
+                                if re.search(rf"\b(?:z|ze|do|od|dla|o|u|w|we|na|przez|nad|pod|przed|za|między)\s+(?:(?:{all_mods_nom_pl_pat})\s+)*{re.escape(old_n)}\b", ev.text, re.IGNORECASE):
+                                    continue
+                                repl_n = m_n.capitalize() if old_n[0].isupper() else m_n
+                                ev.text = re.sub(rf"({re.escape(pref)})({re.escape(old_n)})\b", rf"\g<1>{repl_n}", ev.text, count=1)
+                                fixes.append(f"[Episode Quality Gate - Filar CLXIII Mianownik Orzecznikowy Męskoosobowy lm.] Linia #{i+1}: skorygowano '{old_n}' -> '{repl_n}' (adresat: grupa mężczyzn)")
+                        for m_mod, f_mod in PREDICATE_MODS_PLURAL_NOMINATIVE:
+                            pat_mod_nom = rf"((?:\b(?:jesteście|będziecie|byliście|byłyście|zostaliście|zostałyście|to\s+są|to)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:{all_mods_nom_pl_pat})\s+){{0,2}})({re.escape(f_mod)})(\s+(?:(?:{all_mods_nom_pl_pat})\s+)*(?:{masc_all_nouns_nom_pl_pat}))\b"
+                            ev.text = re.sub(pat_mod_nom, rf"\g<1>{m_mod}\g<3>", ev.text, flags=re.IGNORECASE)
+
                 else:
                     # 2ND-PERSON SINGULAR ADDRESSEE AGREEMENT (kobieta vs mężczyzna)
                     is_single_female = False
@@ -5266,9 +5997,14 @@ class EpisodeQualityGate:
                         # Check if male addressee was derived from a contaminated tag in a female scene
                         cand_addr_name = re.sub(r"\s*\(.*?\)", "", raw_ev_addressee or "").strip()
                         is_cont_addr = False
+                        checked_addr_bible = False
                         if series_bible and hasattr(series_bible, "audit_speaker_metadata_against_audio") and cand_addr_name:
                             _, is_cont_addr = series_bible.audit_speaker_metadata_against_audio(cand_addr_name, scene_gender=event_scene_gender.get(i))
-                        if is_cont_addr or event_scene_gender.get(i) == "FEMALE":
+                            checked_addr_bible = True
+                        if is_cont_addr:
+                            is_single_female = True
+                            is_single_male = False
+                        elif not checked_addr_bible and not cand_addr_name and event_scene_gender.get(i) == "FEMALE":
                             is_single_female = True
                             is_single_male = False
                         else:
@@ -5476,9 +6212,9 @@ class EpisodeQualityGate:
                                     all_females = False
                                 if cand_g != "MALE":
                                     all_males = False
-                            if all_females and len(nearby_speakers) >= 1:
+                            if all_females and len(nearby_speakers) >= 2:
                                 scene_cast_female_only = True
-                            elif all_males and len(nearby_speakers) >= 1:
+                            elif all_males and len(nearby_speakers) >= 2:
                                 scene_cast_male_only = True
 
                     is_confirmed_single = (is_single_female or is_single_male or (partner_gender in ("MALE", "FEMALE"))) and not (is_female_group or is_male_group or is_mixed_group)
@@ -5634,6 +6370,9 @@ class EpisodeQualityGate:
                         )) or bool(re.search(
                             rf"\b(?:wy\s+i\s+(?:wasz|wasza|wasze)|wy,?\s+(?:[a-ząćęłńóśźż]+\s+)?(?:arystokraci|rebelianci|wrogowie|najeźdźcy|potwory|demony|obcy|[a-ząćęłńóśźż]+(?:owie|y|i|e))|wy\s+(?:z\s+)?{INSTITUTIONAL_COLLECTIVE_NOUNS_PATTERN})\b",
                             clean_ev_text, re.IGNORECASE
+                        )) or bool(re.search(
+                            r"\b(?:jesteście|będziecie|macie|chcecie|wiecie|możecie|musicie|uważajcie|bądźcie|idźcie|powiedzcie|dajcie|pomóżcie|słuchajcie|chodźcie|patrzcie|zróbcie|weźcie|stańcie|poczekajcie|ratujcie|zostawcie|przestańcie|[A-Za-ząćęłńóśźż]+(?:liście|łyście|libyście|łybyście))\b",
+                            clean_ev_text, re.IGNORECASE
                         ))
 
                         if not has_expl_pl_poss:
@@ -5732,41 +6471,51 @@ class EpisodeQualityGate:
                                 t = re.sub(rf"\b({re.escape(prefix)})({re.escape(part_m)})\b", rf"\g<1>{repl_part}", t, count=1)
                                 fixes_list.append(f"[Episode Quality Gate - Filar CLXIII Strona Bierna Żeńska] Linia #{line_num}: skorygowano '{part_m}' -> '{repl_part}' (adresat: kobieta)")
 
-                            # 5. Predicate nouns (Zasada 15 AGENTS.md) - strictly atomic single-word mutations
-                            PREDICATE_NOUNS_PAIRS = [
-                                ("przyjacielem", "przyjaciółką"), ("uczniem", "uczennicą"), ("kapłanem", "kapłanką"),
-                                ("wojownikiem", "wojowniczką"), ("mistrzem", "mistrzynią"), ("nauczycielem", "nauczycielką"),
-                                ("lekarzem", "lekarką"), ("medykiem", "medyczką"), ("obrońcą", "obrończynią"),
-                                ("strażnikiem", "strażniczką"), ("opiekunem", "opiekunką"), ("łowcą", "łowczynią"),
-                                ("zabójcą", "zabójczynią"), ("bohaterem", "bohaterką"), ("zdrajcą", "zdrajczynią"),
-                                ("uzdrowicielem", "uzdrowicielką"), ("czarodziejem", "czarodziejką"), ("czarnoksiężnikiem", "czarownicą"),
-                                ("sługą", "służącą"), ("władcą", "władczynią"), ("towarzyszem", "towarzyszką"),
-                                ("rywalem", "rywalką"), ("złodziejem", "złodziejką"), ("przewodnikiem", "przewodniczką"),
-                                ("sąsiadem", "sąsiadką"), ("sojusznikiem", "sojuszniczką"), ("dowódcą", "dowódczynią"),
-                                ("czempionem", "czempionką"), ("zwiadowcą", "zwiadowczynią"),
-                            ]
-                            PREDICATE_MODS = [
-                                ("dobrym", "dobrą"), ("złym", "złą"), ("prawdziwym", "prawdziwą"),
-                                ("najlepszym", "najlepszą"), ("moim", "moją"), ("naszym", "naszą"),
-                                ("twoim", "twoją"), ("jedynym", "jedyną"), ("wiernym", "wierną"),
-                                ("nowym", "nową"), ("lojalnym", "lojalną"), ("wspaniałym", "wspaniałą"),
-                                ("dzielnym", "dzielną")
-                            ]
-                            mods_m_pat = "|".join([m for m, f in PREDICATE_MODS])
-                            mods_f_pat = "|".join([f for m, f in PREDICATE_MODS])
+                            # 5. Predicate nouns in Instrumental (Zasada 12 & 15 AGENTS.md - 82 pairs)
+                            mods_m_pat = "|".join([m for m, f in PREDICATE_MODS_INSTRUMENTAL])
+                            mods_f_pat = "|".join([f for m, f in PREDICATE_MODS_INSTRUMENTAL])
                             all_mods_pat = f"{mods_m_pat}|{mods_f_pat}"
-                            fem_all_nouns_pat = "|".join([f for m, f in PREDICATE_NOUNS_PAIRS])
-                            for m_n, f_n in PREDICATE_NOUNS_PAIRS:
-                                pat_pn = rf"\b((?:jesteś|będziesz|byłaś|zostałaś|stajesz\s+się)\s+(?:(?:{mods_m_pat})\s+){{0,3}})({re.escape(m_n)})\b"
-                                for m in list(re.finditer(pat_pn, t, re.IGNORECASE)):
-                                    pref = m.group(1)
-                                    old_n = m.group(2)
-                                    repl_n = f_n.capitalize() if old_n[0].isupper() else f_n
-                                    t = re.sub(rf"\b({re.escape(pref)})({re.escape(old_n)})\b", rf"\g<1>{repl_n}", t, count=1)
-                                    fixes_list.append(f"[Episode Quality Gate - Filar CLXIII Rzeczownik Orzecznikowy Żeński] Linia #{line_num}: skorygowano '{old_n}' -> '{repl_n}' (adresat: kobieta)")
-                            for m_mod, f_mod in PREDICATE_MODS:
-                                pat_mod = rf"\b((?:jesteś|będziesz|byłaś|zostałaś|stajesz\s+się)\s+(?:(?:{all_mods_pat})\s+){{0,2}})({re.escape(m_mod)})(\s+(?:(?:{all_mods_pat})\s+)*(?:{fem_all_nouns_pat}))\b"
-                                t = re.sub(pat_mod, rf"\g<1>{f_mod}\g<3>", t, flags=re.IGNORECASE)
+                            fem_all_nouns_pat = "|".join([f for m, f in PREDICATE_NOUNS_INSTRUMENTAL_PAIRS if m != f])
+                            has_2nd_copula_f = bool(re.search(r"\b(?:jesteś|będziesz|byłaś|zostałaś|stajesz\s+się)\b", t, re.IGNORECASE))
+                            if has_2nd_copula_f:
+                                for m_n, f_n in PREDICATE_NOUNS_INSTRUMENTAL_PAIRS:
+                                    if m_n == f_n:
+                                        continue
+                                    pat_pn = rf"((?:\b(?:jesteś|będziesz|byłaś|zostałaś|stajesz\s+się)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:{mods_m_pat})\s+){{0,3}})({re.escape(m_n)})\b"
+                                    for m in list(re.finditer(pat_pn, t, re.IGNORECASE)):
+                                        pref = m.group(1)
+                                        old_n = m.group(2)
+                                        if re.search(rf"\b(?:z|ze|do|od|dla|o|u|w|we|na|przez|nad|pod|przed|za|między)\s+(?:(?:{all_mods_pat})\s+)*{re.escape(old_n)}\b", t, re.IGNORECASE):
+                                            continue
+                                        repl_n = f_n.capitalize() if old_n[0].isupper() else f_n
+                                        t = re.sub(rf"({re.escape(pref)})({re.escape(old_n)})\b", rf"\g<1>{repl_n}", t, count=1)
+                                        fixes_list.append(f"[Episode Quality Gate - Filar CLXIII Rzeczownik Orzecznikowy Żeński] Linia #{line_num}: skorygowano '{old_n}' -> '{repl_n}' (adresat: kobieta)")
+                                for m_mod, f_mod in PREDICATE_MODS_INSTRUMENTAL:
+                                    pat_mod = rf"((?:\b(?:jesteś|będziesz|byłaś|zostałaś|stajesz\s+się)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:{all_mods_pat})\s+){{0,2}})({re.escape(m_mod)})(\s+(?:(?:{all_mods_pat})\s+)*(?:{fem_all_nouns_pat}))\b"
+                                    t = re.sub(pat_mod, rf"\g<1>{f_mod}\g<3>", t, flags=re.IGNORECASE)
+
+                            # 6. Predicate nouns in Nominative (Mianownik orzecznikowy)
+                            mods_m_nom_pat = "|".join([m for m, f in PREDICATE_MODS_NOMINATIVE])
+                            mods_f_nom_pat = "|".join([f for m, f in PREDICATE_MODS_NOMINATIVE])
+                            all_mods_nom_pat = f"{mods_m_nom_pat}|{mods_f_nom_pat}"
+                            fem_all_nouns_nom_pat = "|".join([f for m, f in PREDICATE_NOUNS_NOMINATIVE_PAIRS if m != f])
+                            has_2nd_nom_copula_f = bool(re.search(r"\b(?:jesteś|będziesz|byłaś|zostałaś|to\s+jest|to)\b", t, re.IGNORECASE))
+                            if has_2nd_nom_copula_f:
+                                for m_n, f_n in PREDICATE_NOUNS_NOMINATIVE_PAIRS:
+                                    if m_n == f_n:
+                                        continue
+                                    pat_pn_nom = rf"((?:\b(?:jesteś|będziesz|byłaś|zostałaś|to\s+jest|to)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:{mods_m_nom_pat})\s+){{0,3}})({re.escape(m_n)})\b"
+                                    for m in list(re.finditer(pat_pn_nom, t, re.IGNORECASE)):
+                                        pref = m.group(1)
+                                        old_n = m.group(2)
+                                        if re.search(rf"\b(?:z|ze|do|od|dla|o|u|w|we|na|przez|nad|pod|przed|za|między)\s+(?:(?:{all_mods_nom_pat})\s+)*{re.escape(old_n)}\b", t, re.IGNORECASE):
+                                            continue
+                                        repl_n = f_n.capitalize() if old_n[0].isupper() else f_n
+                                        t = re.sub(rf"({re.escape(pref)})({re.escape(old_n)})\b", rf"\g<1>{repl_n}", t, count=1)
+                                        fixes_list.append(f"[Episode Quality Gate - Filar CLXIII Mianownik Orzecznikowy Żeński] Linia #{line_num}: skorygowano '{old_n}' -> '{repl_n}' (adresat: kobieta)")
+                                for m_mod, f_mod in PREDICATE_MODS_NOMINATIVE:
+                                    pat_mod_nom = rf"((?:\b(?:jesteś|będziesz|byłaś|zostałaś|to\s+jest|to)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:{all_mods_nom_pat})\s+){{0,2}})({re.escape(m_mod)})(\s+(?:(?:{all_mods_nom_pat})\s+)*(?:{fem_all_nouns_nom_pat}))\b"
+                                    t = re.sub(pat_mod_nom, rf"\g<1>{f_mod}\g<3>", t, flags=re.IGNORECASE)
 
                         elif target_male:
                             # 1. Convert feminine 2nd-person singular past/conditional/modal verbs -> masculine
@@ -5817,41 +6566,51 @@ class EpisodeQualityGate:
                                 t = re.sub(rf"\b({re.escape(prefix)})({re.escape(part_f)})\b", rf"\g<1>{repl_part}", t, count=1)
                                 fixes_list.append(f"[Episode Quality Gate - Filar CLXIII Strona Bierna Męska] Linia #{line_num}: skorygowano '{part_f}' -> '{repl_part}' (adresat: mężczyzna)")
 
-                            # 5. Predicate nouns (Zasada 15 AGENTS.md) - strictly atomic single-word mutations
-                            PREDICATE_NOUNS_PAIRS_M = [
-                                ("przyjacielem", "przyjaciółką"), ("uczniem", "uczennicą"), ("kapłanem", "kapłanką"),
-                                ("wojownikiem", "wojowniczką"), ("mistrzem", "mistrzynią"), ("nauczycielem", "nauczycielką"),
-                                ("lekarzem", "lekarką"), ("medykiem", "medyczką"), ("obrońcą", "obrończynią"),
-                                ("strażnikiem", "strażniczką"), ("opiekunem", "opiekunką"), ("łowcą", "łowczynią"),
-                                ("zabójcą", "zabójczynią"), ("bohaterem", "bohaterką"), ("zdrajcą", "zdrajczynią"),
-                                ("uzdrowicielem", "uzdrowicielką"), ("czarodziejem", "czarodziejką"), ("czarnoksiężnikiem", "czarownicą"),
-                                ("sługą", "służącą"), ("władcą", "władczynią"), ("towarzyszem", "towarzyszką"),
-                                ("rywalem", "rywalką"), ("złodziejem", "złodziejką"), ("przewodnikiem", "przewodniczką"),
-                                ("sąsiadem", "sąsiadką"), ("sojusznikiem", "sojuszniczką"), ("dowódcą", "dowódczynią"),
-                                ("czempionem", "czempionką"), ("zwiadowcą", "zwiadowczynią"),
-                            ]
-                            PREDICATE_MODS_M = [
-                                ("dobrym", "dobrą"), ("złym", "złą"), ("prawdziwym", "prawdziwą"),
-                                ("najlepszym", "najlepszą"), ("moim", "moją"), ("naszym", "naszą"),
-                                ("twoim", "twoją"), ("jedynym", "jedyną"), ("wiernym", "wierną"),
-                                ("nowym", "nową"), ("lojalnym", "lojalną"), ("wspaniałym", "wspaniałą"),
-                                ("dzielnym", "dzielną")
-                            ]
-                            mods_m_pat = "|".join([m for m, f in PREDICATE_MODS_M])
-                            mods_f_pat = "|".join([f for m, f in PREDICATE_MODS_M])
+                            # 5. Predicate nouns in Instrumental (Zasada 12 & 15 AGENTS.md - 82 pairs)
+                            mods_m_pat = "|".join([m for m, f in PREDICATE_MODS_INSTRUMENTAL])
+                            mods_f_pat = "|".join([f for m, f in PREDICATE_MODS_INSTRUMENTAL])
                             all_mods_pat = f"{mods_m_pat}|{mods_f_pat}"
-                            masc_all_nouns_pat = "|".join([m for m, f in PREDICATE_NOUNS_PAIRS_M])
-                            for m_n, f_n in PREDICATE_NOUNS_PAIRS_M:
-                                pat_pn = rf"\b((?:jesteś|będziesz|byłeś|zostałeś|stajesz\s+się)\s+(?:(?:{mods_f_pat})\s+){{0,3}})({re.escape(f_n)})\b"
-                                for m in list(re.finditer(pat_pn, t, re.IGNORECASE)):
-                                    pref = m.group(1)
-                                    old_n = m.group(2)
-                                    repl_n = m_n.capitalize() if old_n[0].isupper() else m_n
-                                    t = re.sub(rf"\b({re.escape(pref)})({re.escape(old_n)})\b", rf"\g<1>{repl_n}", t, count=1)
-                                    fixes_list.append(f"[Episode Quality Gate - Filar CLXIII Rzeczownik Orzecznikowy Męski] Linia #{line_num}: skorygowano '{old_n}' -> '{repl_n}' (adresat: mężczyzna)")
-                            for m_mod, f_mod in PREDICATE_MODS_M:
-                                pat_mod = rf"\b((?:jesteś|będziesz|byłeś|zostałeś|stajesz\s+się)\s+(?:(?:{all_mods_pat})\s+){{0,2}})({re.escape(f_mod)})(\s+(?:(?:{all_mods_pat})\s+)*(?:{masc_all_nouns_pat}))\b"
-                                t = re.sub(pat_mod, rf"\g<1>{m_mod}\g<3>", t, flags=re.IGNORECASE)
+                            masc_all_nouns_pat = "|".join([m for m, f in PREDICATE_NOUNS_INSTRUMENTAL_PAIRS if m != f])
+                            has_2nd_copula_m = bool(re.search(r"\b(?:jesteś|będziesz|byłeś|zostałeś|stajesz\s+się)\b", t, re.IGNORECASE))
+                            if has_2nd_copula_m:
+                                for m_n, f_n in PREDICATE_NOUNS_INSTRUMENTAL_PAIRS:
+                                    if m_n == f_n:
+                                        continue
+                                    pat_pn = rf"((?:\b(?:jesteś|będziesz|byłeś|zostałeś|stajesz\s+się)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:{mods_f_pat})\s+){{0,3}})({re.escape(f_n)})\b"
+                                    for m in list(re.finditer(pat_pn, t, re.IGNORECASE)):
+                                        pref = m.group(1)
+                                        old_n = m.group(2)
+                                        if re.search(rf"\b(?:z|ze|do|od|dla|o|u|w|we|na|przez|nad|pod|przed|za|między)\s+(?:(?:{all_mods_pat})\s+)*{re.escape(old_n)}\b", t, re.IGNORECASE):
+                                            continue
+                                        repl_n = m_n.capitalize() if old_n[0].isupper() else m_n
+                                        t = re.sub(rf"({re.escape(pref)})({re.escape(old_n)})\b", rf"\g<1>{repl_n}", t, count=1)
+                                        fixes_list.append(f"[Episode Quality Gate - Filar CLXIII Rzeczownik Orzecznikowy Męski] Linia #{line_num}: skorygowano '{old_n}' -> '{repl_n}' (adresat: mężczyzna)")
+                                for m_mod, f_mod in PREDICATE_MODS_INSTRUMENTAL:
+                                    pat_mod = rf"((?:\b(?:jesteś|będziesz|byłeś|zostałeś|stajesz\s+się)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:{all_mods_pat})\s+){{0,2}})({re.escape(f_mod)})(\s+(?:(?:{all_mods_pat})\s+)*(?:{masc_all_nouns_pat}))\b"
+                                    t = re.sub(pat_mod, rf"\g<1>{m_mod}\g<3>", t, flags=re.IGNORECASE)
+
+                            # 6. Predicate nouns in Nominative (Mianownik orzecznikowy)
+                            mods_m_nom_pat = "|".join([m for m, f in PREDICATE_MODS_NOMINATIVE])
+                            mods_f_nom_pat = "|".join([f for m, f in PREDICATE_MODS_NOMINATIVE])
+                            all_mods_nom_pat = f"{mods_m_nom_pat}|{mods_f_nom_pat}"
+                            masc_all_nouns_nom_pat = "|".join([m for m, f in PREDICATE_NOUNS_NOMINATIVE_PAIRS if m != f])
+                            has_2nd_nom_copula_m = bool(re.search(r"\b(?:jesteś|będziesz|byłeś|zostałeś|to\s+jest|to)\b", t, re.IGNORECASE))
+                            if has_2nd_nom_copula_m:
+                                for m_n, f_n in PREDICATE_NOUNS_NOMINATIVE_PAIRS:
+                                    if m_n == f_n:
+                                        continue
+                                    pat_pn_nom = rf"((?:\b(?:jesteś|będziesz|byłeś|zostałeś|to\s+jest|to)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:{mods_f_nom_pat})\s+){{0,3}})({re.escape(f_n)})\b"
+                                    for m in list(re.finditer(pat_pn_nom, t, re.IGNORECASE)):
+                                        pref = m.group(1)
+                                        old_n = m.group(2)
+                                        if re.search(rf"\b(?:z|ze|do|od|dla|o|u|w|we|na|przez|nad|pod|przed|za|między)\s+(?:(?:{all_mods_nom_pat})\s+)*{re.escape(old_n)}\b", t, re.IGNORECASE):
+                                            continue
+                                        repl_n = m_n.capitalize() if old_n[0].isupper() else m_n
+                                        t = re.sub(rf"({re.escape(pref)})({re.escape(old_n)})\b", rf"\g<1>{repl_n}", t, count=1)
+                                        fixes_list.append(f"[Episode Quality Gate - Filar CLXIII Mianownik Orzecznikowy Męski] Linia #{line_num}: skorygowano '{old_n}' -> '{repl_n}' (adresat: mężczyzna)")
+                                for m_mod, f_mod in PREDICATE_MODS_NOMINATIVE:
+                                    pat_mod_nom = rf"((?:\b(?:jesteś|będziesz|byłeś|zostałeś|to\s+jest|to)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:{all_mods_nom_pat})\s+){{0,2}})({re.escape(f_mod)})(\s+(?:(?:{all_mods_nom_pat})\s+)*(?:{masc_all_nouns_nom_pat}))\b"
+                                    t = re.sub(pat_mod_nom, rf"\g<1>{m_mod}\g<3>", t, flags=re.IGNORECASE)
                         return t
 
                     # Check for split addressees in the line (e.g. Elena, ... Marku, ...)
@@ -5948,10 +6707,20 @@ class EpisodeQualityGate:
                     c_val = character_registry.get(spk_orig, "")
                     c_desc = (c_val.get("description", "") or c_val.get("role", "") or c_val.get("gender", "")) if isinstance(c_val, dict) else str(c_val)
                     c_desc = c_desc.lower()
+                    c_gen = (c_val.get("gender", "") if isinstance(c_val, dict) else "").upper()
                     if any(w in c_desc for w in ["collective_virile", "żarłoczność", "zarlocznosc", "byt mnogi męskoosobowy", "byt zbiorowy męskoosobowy"]):
                         is_coll_virile = True
                     elif any(w in c_desc for w in ["majestic_female", "pluralis maiestatis (kobieta)", "monarchini"]):
                         is_majestic_fem = True
+                    elif c_gen in ("FEMALE_GROUP", "FEMALE") and (is_plural_actor(spk_orig) or any(w in c_desc for w in ["kobiety", "dziewczęt", "dziewczyn", "collective_nonvirile", "grupa kobiet"])):
+                        is_coll_nonvirile = True
+                    elif c_gen in ("MALE_GROUP", "MALE") and (is_plural_actor(spk_orig) or any(w in c_desc for w in ["mężczyź", "chłopak", "collective_virile", "grupa mężczyzn"])):
+                        is_coll_virile = True
+
+                if not is_coll_nonvirile and (spk_orig.lower() in ("kobiety", "dziewczęta", "dziewczyny", "siostry", "zakonnice", "kapłanki") or (is_plural_actor(spk_orig) and char_gender_map.get(spk_orig.lower()) == "FEMALE")):
+                    is_coll_nonvirile = True
+                if not is_coll_virile and (spk_orig.lower() in ("mężczyźni", "chłopaki", "chłopcy", "panowie", "bracia", "żołnierze") or (is_plural_actor(spk_orig) and char_gender_map.get(spk_orig.lower()) == "MALE")):
+                    is_coll_virile = True
 
                 # Apply Filar CLXXVI overrides:
                 if is_coll_virile or is_majestic_masc:
@@ -6005,6 +6774,45 @@ class EpisodeQualityGate:
                         return f"{m.group(1)}same"
                     ev.text = re.sub(r"\b([Mm]y\s+)(sami)\b", _repl_my_same, ev.text)
 
+                    # 5. Predicate nouns in instrumental plural for 1st-person female scene
+                    has_1pl_copula_f = bool(re.search(r"\b(?:jesteśmy|będziemy|byłyśmy|byliśmy|zostałyśmy|zostaliśmy)\b", ev.text, re.IGNORECASE))
+                    if has_1pl_copula_f:
+                        for m_n, f_n in PREDICATE_NOUNS_PLURAL_INSTRUMENTAL_PAIRS:
+                            if m_n == f_n:
+                                continue
+                            pat_pn = rf"((?:\b(?:jesteśmy|będziemy|byłyśmy|byliśmy|zostałyśmy|zostaliśmy)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:[A-Za-ząćęłńóśźż]+(?:ymi|imi)|moimi|twoimi|naszymi|waszymi|ich|swoimi)\s+){{0,3}})({re.escape(m_n)})\b"
+                            for m in list(re.finditer(pat_pn, ev.text, re.IGNORECASE)):
+                                pref = m.group(1)
+                                old_n = m.group(2)
+                                if re.search(rf"\b(?:z|ze|do|od|dla|o|u|w|we|na|przez|nad|pod|przed|za|między)\s+(?:[A-Za-ząćęłńóśźż]+\s+)*{re.escape(old_n)}\b", ev.text, re.IGNORECASE):
+                                    continue
+                                repl_n = f_n.capitalize() if old_n[0].isupper() else f_n
+                                ev.text = re.sub(rf"({re.escape(pref)})({re.escape(old_n)})\b", rf"\g<1>{repl_n}", ev.text, count=1)
+                                fixes.append(f"[Episode Quality Gate - Filar CLXXV Rzeczownik Orzecznikowy Niemęskoosobowy 1. os. lm.] Linia #{i+1}: skorygowano '{old_n}' -> '{repl_n}' (scena kobieca)")
+
+                    # 6. Predicate nouns in nominative plural for 1st-person female scene
+                    has_1pl_nom_copula_f = bool(re.search(r"\b(?:jesteśmy|będziemy|byłyśmy|byliśmy|zostałyśmy|zostaliśmy|to\s+są|to)\b", ev.text, re.IGNORECASE))
+                    if has_1pl_nom_copula_f:
+                        mods_m_nom_pl_pat = "|".join([m for m, f in PREDICATE_MODS_PLURAL_NOMINATIVE])
+                        mods_f_nom_pl_pat = "|".join([f for m, f in PREDICATE_MODS_PLURAL_NOMINATIVE])
+                        all_mods_nom_pl_pat = f"{mods_m_nom_pl_pat}|{mods_f_nom_pl_pat}"
+                        fem_all_nouns_nom_pl_pat = "|".join([f for m, f in PREDICATE_NOUNS_PLURAL_NOMINATIVE_PAIRS if m != f])
+                        for m_n, f_n in PREDICATE_NOUNS_PLURAL_NOMINATIVE_PAIRS:
+                            if m_n == f_n:
+                                continue
+                            pat_pn_nom = rf"((?:\b(?:jesteśmy|będziemy|byłyśmy|byliśmy|zostałyśmy|zostaliśmy|to\s+są|to)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:{mods_m_nom_pl_pat})\s+){{0,3}})({re.escape(m_n)})\b"
+                            for m in list(re.finditer(pat_pn_nom, ev.text, re.IGNORECASE)):
+                                pref = m.group(1)
+                                old_n = m.group(2)
+                                if re.search(rf"\b(?:z|ze|do|od|dla|o|u|w|we|na|przez|nad|pod|przed|za|między)\s+(?:(?:{all_mods_nom_pl_pat})\s+)*{re.escape(old_n)}\b", ev.text, re.IGNORECASE):
+                                    continue
+                                repl_n = f_n.capitalize() if old_n[0].isupper() else f_n
+                                ev.text = re.sub(rf"({re.escape(pref)})({re.escape(old_n)})\b", rf"\g<1>{repl_n}", ev.text, count=1)
+                                fixes.append(f"[Episode Quality Gate - Filar CLXXV Mianownik Orzecznikowy Niemęskoosobowy 1. os. lm.] Linia #{i+1}: skorygowano '{old_n}' -> '{repl_n}' (scena kobieca)")
+                        for m_mod, f_mod in PREDICATE_MODS_PLURAL_NOMINATIVE:
+                            pat_mod_nom = rf"((?:\b(?:jesteśmy|będziemy|byłyśmy|byliśmy|zostałyśmy|zostaliśmy|to\s+są|to)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:{all_mods_nom_pl_pat})\s+){{0,2}})({re.escape(m_mod)})(\s+(?:(?:{all_mods_nom_pl_pat})\s+)*(?:{fem_all_nouns_nom_pl_pat}))\b"
+                            ev.text = re.sub(pat_mod_nom, rf"\g<1>{f_mod}\g<3>", ev.text, flags=re.IGNORECASE)
+
                 elif is_male_scene_1pl:
                     # Symmetrical check for male scenes: convert non-virile 1st-person plural -> virile
                     for m in list(re.finditer(r"\b([A-Za-ząćęłńóśźż]+łyśmy)\b", ev.text)):
@@ -6028,7 +6836,7 @@ class EpisodeQualityGate:
                             prefix = m.group(1)
                             old_adj = m.group(2)
                             repl_adj = v_adj.capitalize() if old_adj[0].isupper() else v_adj
-                            ev.text = re.sub(rf"\b({re.escape(prefix)})({re.escape(old_adj)})\b", rf"\g<1>{repl_adj}", ev.text, count=1)
+                            ev.text = re.sub(rf"\b({re.escape(prefix)})({re.escape(old_adj)}\b)", rf"\g<1>{repl_adj}", ev.text, count=1)
                             fixes.append(f"[Episode Quality Gate - Filar CLXXV Orzecznik Męskoosobowy 1. os. lm.] Linia #{i+1}: skorygowano '{old_adj}' -> '{repl_adj}' (scena męska)")
 
                     # Numerals and pronouns (1st-person plural requires 'my')
@@ -6044,6 +6852,45 @@ class EpisodeQualityGate:
                         fixes.append(f"[Episode Quality Gate - Filar CLXXV Zaimek Męskoosobowy 1. os. lm.] Linia #{i+1}: skorygowano '{m.group(2)}' -> 'sami' (scena męska)")
                         return f"{m.group(1)}sami"
                     ev.text = re.sub(r"\b([Mm]y\s+)(same)\b", _repl_my_sami_m, ev.text)
+
+                    # 5. Predicate nouns in instrumental plural for 1st-person male scene
+                    has_1pl_copula_m = bool(re.search(r"\b(?:jesteśmy|będziemy|byliśmy|byłyśmy|zostaliśmy|zostałyśmy)\b", ev.text, re.IGNORECASE))
+                    if has_1pl_copula_m:
+                        for m_n, f_n in PREDICATE_NOUNS_PLURAL_INSTRUMENTAL_PAIRS:
+                            if m_n == f_n:
+                                continue
+                            pat_pn = rf"((?:\b(?:jesteśmy|będziemy|byliśmy|byłyśmy|zostaliśmy|zostałyśmy)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:[A-Za-ząćęłńóśźż]+(?:ymi|imi)|moimi|twoimi|naszymi|waszymi|ich|swoimi)\s+){{0,3}})({re.escape(f_n)})\b"
+                            for m in list(re.finditer(pat_pn, ev.text, re.IGNORECASE)):
+                                pref = m.group(1)
+                                old_n = m.group(2)
+                                if re.search(rf"\b(?:z|ze|do|od|dla|o|u|w|we|na|przez|nad|pod|przed|za|między)\s+(?:[A-Za-ząćęłńóśźż]+\s+)*{re.escape(old_n)}\b", ev.text, re.IGNORECASE):
+                                    continue
+                                repl_n = m_n.capitalize() if old_n[0].isupper() else m_n
+                                ev.text = re.sub(rf"({re.escape(pref)})({re.escape(old_n)})\b", rf"\g<1>{repl_n}", ev.text, count=1)
+                                fixes.append(f"[Episode Quality Gate - Filar CLXXV Rzeczownik Orzecznikowy Męskoosobowy 1. os. lm.] Linia #{i+1}: skorygowano '{old_n}' -> '{repl_n}' (scena męska)")
+
+                    # 6. Predicate nouns in nominative plural for 1st-person male scene
+                    has_1pl_nom_copula_m = bool(re.search(r"\b(?:jesteśmy|będziemy|byliśmy|byłyśmy|zostaliśmy|zostałyśmy|to\s+są|to)\b", ev.text, re.IGNORECASE))
+                    if has_1pl_nom_copula_m:
+                        mods_m_nom_pl_pat = "|".join([m for m, f in PREDICATE_MODS_PLURAL_NOMINATIVE])
+                        mods_f_nom_pl_pat = "|".join([f for m, f in PREDICATE_MODS_PLURAL_NOMINATIVE])
+                        all_mods_nom_pl_pat = f"{mods_m_nom_pl_pat}|{mods_f_nom_pl_pat}"
+                        masc_all_nouns_nom_pl_pat = "|".join([m for m, f in PREDICATE_NOUNS_PLURAL_NOMINATIVE_PAIRS if m != f])
+                        for m_n, f_n in PREDICATE_NOUNS_PLURAL_NOMINATIVE_PAIRS:
+                            if m_n == f_n:
+                                continue
+                            pat_pn_nom = rf"((?:\b(?:jesteśmy|będziemy|byliśmy|byłyśmy|zostaliśmy|zostałyśmy|to\s+są|to)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:{mods_f_nom_pl_pat})\s+){{0,3}})({re.escape(f_n)})\b"
+                            for m in list(re.finditer(pat_pn_nom, ev.text, re.IGNORECASE)):
+                                pref = m.group(1)
+                                old_n = m.group(2)
+                                if re.search(rf"\b(?:z|ze|do|od|dla|o|u|w|we|na|przez|nad|pod|przed|za|między)\s+(?:(?:{all_mods_nom_pl_pat})\s+)*{re.escape(old_n)}\b", ev.text, re.IGNORECASE):
+                                    continue
+                                repl_n = m_n.capitalize() if old_n[0].isupper() else m_n
+                                ev.text = re.sub(rf"({re.escape(pref)})({re.escape(old_n)})\b", rf"\g<1>{repl_n}", ev.text, count=1)
+                                fixes.append(f"[Episode Quality Gate - Filar CLXXV Mianownik Orzecznikowy Męskoosobowy 1. os. lm.] Linia #{i+1}: skorygowano '{old_n}' -> '{repl_n}' (scena męska)")
+                        for m_mod, f_mod in PREDICATE_MODS_PLURAL_NOMINATIVE:
+                            pat_mod_nom = rf"((?:\b(?:jesteśmy|będziemy|byliśmy|byłyśmy|zostaliśmy|zostałyśmy|to\s+są|to)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:{all_mods_nom_pl_pat})\s+){{0,2}})({re.escape(f_mod)})(\s+(?:(?:{all_mods_nom_pl_pat})\s+)*(?:{masc_all_nouns_nom_pl_pat}))\b"
+                            ev.text = re.sub(pat_mod_nom, rf"\g<1>{m_mod}\g<3>", ev.text, flags=re.IGNORECASE)
 
             # 3c-7. PRONOMINAL DECOUPLING & INALIENABLE SOMATIC POSSESSION (Filar CLXXVII - 0.00 PLN)
             if not is_sign and ev.text:
@@ -6230,7 +7077,7 @@ class EpisodeQualityGate:
                             is_mixed_dual = True
                         elif len(female_names_found) >= 2:
                             is_female_dual = True
-                        elif any(p in joined_ctx for p in ["ty i töregene", "ty i toregene", "töregene i ty", "fatima i töregene", "fatimie i töregene", "odnalazły", "odnalazłyście"]):
+                        elif any(p in joined_ctx for p in ["odnalazły", "odnalazłyście"]):
                             is_female_dual = True
 
                 if not (is_female_dual or is_mixed_dual or is_male_dual):
@@ -6945,6 +7792,16 @@ class EpisodeQualityGate:
                     ev.text = split_subtitle_syntactically(ev.text, max_line_len=38, is_ass=True, is_sign=True)
                     fixes.append(f"[Episode Quality Gate - Filar XCVIII (Plansze i Szyldy)] Linia #{i+1}: sformatowano napis ekranowy zapobiegając przepełnieniu kadru")
 
+            # 7c. STRICT SINGLE-LINE AVT OVERFLOW PROTECTION (Belczyk & Netflix AVT: Max 40 znaków)
+            if enforce_line_split and not is_sign and r"\N" not in ev.text:
+                from avt_formatter import clean_text_for_len, split_subtitle_syntactically
+                clean_l = clean_text_for_len(ev.text)
+                if len(clean_l) > 40:
+                    old_single_text = ev.text
+                    ev.text = split_subtitle_syntactically(ev.text, max_line_len=38, is_ass=True, is_sign=False)
+                    if ev.text != old_single_text:
+                        fixes.append(f"[Episode Quality Gate - Filar LVII (Podział Zbyt Długiej Linii)] Linia #{i+1}: podzielono wers {len(clean_l)} zn. na 2 wersy AVT")
+
             # 8. META-LEAK FIREWALL & PURGE (Absolute zero tolerance for meta-language in subtitles)
             meta_leak_pat = r"(?i)\b(zgodnie\s+z\s+polskim\s+kanonem\s+avt|kanon(?:em)?\s*avt|kanon\s+avt|filar\s+[ivxlcdm0-9]+|few-shot|system\s*prompt|prompt\s*leak)\b"
             if re.search(meta_leak_pat, ev.text):
@@ -6954,8 +7811,166 @@ class EpisodeQualityGate:
                 ev.text = re.sub(r"\s+\\N", r"\\N", ev.text).strip()
                 fixes.append(f"[Episode Quality Gate - ALARM: Wykryto i usunięto wyciek meta-języka AVT] Linia #{i+1}: wyczyszczono frazę meta-kanoniczną")
 
+            # 9. POLISH SUBTITLE CPS MONITORING & FILLER CONDENSATION (Filar CLIV / Aksjomat 2 & 5)
+            if not is_sign and ev.end > ev.start:
+                ev_dur_s = max((ev.end - ev.start) / 1000.0, 0.5)
+                pure_text = cls.get_pure_onscreen_text(ev.text)
+                pl_clean_len = len(pure_text)
+                pl_cps = pl_clean_len / ev_dur_s
+
+                # Dynamic token-level filler condensation when CPS exceeds recommended ceiling (Aksjomat 2 & Dyrektywa 3)
+                if pl_cps > 20.0 and pl_clean_len > 16:
+                    condensed_text = cls.condense_filler_words_token_level(ev.text)
+                    if condensed_text != ev.text:
+                        ev.text = condensed_text
+                        pure_text = cls.get_pure_onscreen_text(ev.text)
+                        pl_clean_len = len(pure_text)
+                        pl_cps = pl_clean_len / ev_dur_s
+                        fixes.append(
+                            f"[Episode Quality Gate - Filar CLIV/Aksjomat 2 (Kondensacja Waty)] Linia #{i+1}: "
+                            f"zredukowano zbędną watę słowną dla wysokiego CPS (nowy CPS: {pl_cps:.1f})"
+                        )
+
+                if report_cps_fixes and pl_cps > 22.0:
+                    fixes.append(
+                        f"[Episode Quality Gate - Filar CLIV (Wysoki CPS)] Linia #{i+1}: "
+                        f"tempo czytania {pl_cps:.1f} CPS ({pl_clean_len} zn. na {ev_dur_s:.1f}s) przekracza zalecany limit AVT 17-20 CPS"
+                    )
+
             # Record if text changed due to hygiene
             if ev.text != text_before and not any(f"Linia #{i+1}:" in f for f in fixes):
                 fixes.append(f"[Episode Quality Gate - Higiena Tekstu] Linia #{i+1}: oczyszczono interpunkcję i formatowanie")
 
         return subs, fixes
+
+    @staticmethod
+    def get_pure_onscreen_text(raw_text: str) -> str:
+        """
+        Normalizes ASS line into pure visible onscreen text (Dyrektywa 4 / Aksjomat 5):
+        strips override tags {...}, translates \\N and \\h into space, collapses whitespace.
+        Ensures reading speed (CPS) is calculated strictly on what the human eye perceives.
+        """
+        pure_text = re.sub(r"\{[^}]*\}", "", raw_text or "").replace(r"\N", " ").replace(r"\h", " ").strip()
+        pure_text = re.sub(r"\s+", " ", pure_text)
+        return pure_text
+
+    @staticmethod
+    def condense_filler_words_token_level(text: str) -> str:
+        """
+        Token-level filler condensation with sentence segmentation, capitalization,
+        and strict punctuation hygiene (Aksjomat 2 & Dyrektywa 3).
+        - Evaluates length (protection <= 2 words) per individual sentence segment (. ! ? …).
+        - Short questions/lines like 'Naprawdę?' or 'Po prostu.' are 100% protected.
+        - Capitalizes first preserved letter of sentence if initial token was removed.
+        - Cleans hanging punctuation: ,, -> ,, spaces before punct, commas before .?!
+        """
+        if not text:
+            return text
+
+        is_leading_continuation = bool(re.match(r"^(\s*\{[^}]*\})*(\.{3,}|…)", text.strip()))
+
+        def _capitalize_after_prefix(s: str) -> str:
+            pat = r'^((\s*\{[^}]*\}|\s*[-–—]|\s*\\[Nnh]|\s+)*)([a-ząćęłńóśźż])'
+            return re.sub(pat, lambda m: m.group(1) + m.group(3).upper(), s, count=1)
+
+        def _capitalize_all_dialogue_starts(s: str, is_continuation: bool = False) -> str:
+            if not is_continuation:
+                s = _capitalize_after_prefix(s)
+            # Wewnątrz segmentu wielka litera po \N wymaga jawnego myślnika dialogowego (Korekta 1):
+            pat_n = r'(\\[Nnh](?:\s*\{[^}]*\})*\s*[-–—]\s*)([a-ząćęłńóśźż])'
+            return re.sub(pat_n, lambda m: m.group(1) + m.group(2).upper(), s)
+
+        def _process_segment(seg: str, is_first_text_seg: bool = False) -> str:
+            lead_space = ""
+            m_lead = re.match(r"^(\s+)", seg)
+            if m_lead:
+                lead_space = m_lead.group(1)
+                seg_body = seg[len(lead_space):]
+            else:
+                seg_body = seg
+
+            is_cont = is_leading_continuation and is_first_text_seg
+
+            clean_body = re.sub(r'\{[^}]*\}|\\[Nnh]', ' ', seg_body)
+            words = re.findall(r'[A-Za-ząćęłńóśźżĄĆĘŁŃÓŚŹŻ0-9]+', clean_body)
+            if len(words) <= 2:
+                return lead_space + _capitalize_all_dialogue_starts(seg_body, is_continuation=is_cont)
+
+            # len(words) > 2: execute reduction of filler words
+            for f in ['po prostu', 'naprawdę', 'naprawde']:
+                # Pomiędzy przecinkami: ', po prostu,' -> ','
+                seg_body = re.sub(rf'(?i),\s*{re.escape(f)}\s*,', ',', seg_body)
+                # Na początku linii, po \N, po myślniku z opcjonalnymi tagami ASS:
+                seg_body = re.sub(rf'(?i)(^|[\r\n]|\\N|[-–—]\s*)((?:\{{[^}}]*\}}|\s)*){re.escape(f)}\s*,?\s*', r'\1\2', seg_body)
+                # Przed końcem linii/przecinkiem:
+                seg_body = re.sub(rf'(?i),\s*{re.escape(f)}(?=[\s\.,?!–—]|$)', '', seg_body)
+                # Wewnątrz zdania:
+                seg_body = re.sub(rf'(?i)(^|[\s\-,–—]|\\[Nnh]){re.escape(f)}(?=[\s\.,?!–—]|$)', r'\1', seg_body)
+
+            # Punctuation hygiene
+            seg_body = re.sub(r',\s*,+', ',', seg_body)
+            seg_body = re.sub(r'\s+([,\.!\?…])', r'\1', seg_body)
+            seg_body = re.sub(r',\s*([\.!\?…])', r'\1', seg_body)
+            seg_body = re.sub(r'(^|[\r\n]|\\N)\s*([-–—])\s*,+\s*', r'\1\2 ', seg_body)
+            seg_body = re.sub(r'(^|[\r\n]|\\N)\s*,+\s*', r'\1', seg_body)
+            seg_body = re.sub(r'^\s*,\s*', '', seg_body)
+            seg_body = re.sub(r'[ \t]+', ' ', seg_body)
+
+            seg_body = _capitalize_all_dialogue_starts(seg_body, is_continuation=is_cont)
+            return lead_space + seg_body
+
+        # Split text into sentence segments bounded by . ! ? …
+        parts = re.split(r"([\.!\?…]+)", text)
+        processed_parts = []
+        seen_first_text = False
+        for part in parts:
+            if re.match(r"^[\.!\?…]+$", part):
+                processed_parts.append(part)
+            else:
+                is_first = False
+                if not seen_first_text and part.strip():
+                    is_first = True
+                    seen_first_text = True
+                processed_parts.append(_process_segment(part, is_first_text_seg=is_first))
+
+        out = "".join(processed_parts)
+        out = re.sub(r",\s*,+", ",", out)
+        out = re.sub(r"\s+([,\.!\?…])", r"\1", out)
+        out = re.sub(r",\s*([\.!\?…])", r"\1", out)
+        out = re.sub(r"[ \t]+", " ", out)
+        out = re.sub(r"\s*\\N\s*", r"\\N", out)
+        return out.strip()
+
+    @classmethod
+    def get_cps_warnings(cls, subs: Any, max_cps: float = 22.0) -> List[str]:
+        """
+        Non-destructive Polish AVT reading speed (CPS) auditor (Filar CLIV - 0.00 PLN).
+        Identifies lines exceeding recommended AVT thresholds without mutating subtitle text.
+        Strips ASS override tags and uses max(duration, 0.5) per Dyrektywy 4 & 5.
+        """
+        if not subs or not hasattr(subs, "events") or not subs.events:
+            return []
+        warnings: List[str] = []
+        for i, ev in enumerate(subs.events):
+            if getattr(ev, "is_comment", False) or ev.end <= ev.start:
+                continue
+            ev_style_l = (getattr(ev, "style", "") or "").lower()
+            if any(tag in ev_style_l for tag in ["sign", "title", "szyld", "napis"]):
+                continue
+            ev_dur_s = max((ev.end - ev.start) / 1000.0, 0.5)
+            pure_text = cls.get_pure_onscreen_text(ev.text or "")
+            pl_clean_len = len(pure_text)
+            pl_cps = pl_clean_len / ev_dur_s
+            if pl_cps > max_cps:
+                warnings.append(
+                    f"[Episode Quality Gate - Filar CLIV (Wysoki CPS)] Linia #{i+1}: "
+                    f"tempo czytania {pl_cps:.1f} CPS ({pl_clean_len} zn. na {ev_dur_s:.1f}s) przekracza zalecany limit AVT 17-20 CPS"
+                )
+        return warnings
+
+
+# Bind methods to AVTLinter as well for seamless access
+AVTLinter.get_pure_onscreen_text = staticmethod(EpisodeQualityGate.get_pure_onscreen_text)
+AVTLinter.condense_filler_words_token_level = staticmethod(EpisodeQualityGate.condense_filler_words_token_level)
+
+

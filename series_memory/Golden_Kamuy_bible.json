@@ -2,34 +2,40 @@
   "anime_title": "Golden Kamuy",
   "characters": {
     "Saichi Sugimoto": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE"
     },
     "Asirpa": {
       "description": "KOBIETA (wyodrębniono z relacji serii)"
     },
     "Usami": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE"
     },
     "Kadokura": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
     },
     "Tsukishima": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE"
     },
     "Koito": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
     },
     "Kikuta": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE"
     },
     "Kirawus": {
       "description": "KOBIETA (wyodrębniono z relacji serii)"
     },
     "Tsurumi": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE"
     },
     "Sugimoto": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE"
     },
     "Shiraishi": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
@@ -38,7 +44,8 @@
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
     },
     "Podwładni": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE"
     },
     "Sofia": {
       "description": "KOBIETA (wyodrębniono z relacji serii)"
@@ -53,22 +60,27 @@
       "description": "KOBIETA (wyodrębniono z relacji serii)"
     },
     "Tokushirou Tsurumi": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE"
     },
     "Hidenobu Okuda": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE"
     },
     "Shinpachi Nagakura": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE"
     },
     "Tatsuma Ushiyama": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
     },
     "Hijikata": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE"
     },
     "Nagakura": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE"
     },
     "Otonoshin Koito": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
@@ -83,7 +95,8 @@
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
     },
     "Hajime Tsukishima": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE"
     },
     "Yoshitake Shiraishi": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
@@ -98,7 +111,8 @@
       "description": "KOBIETA (wyodrębniono z relacji serii)"
     },
     "Okuda": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE"
     },
     "Saichi Sugimoto -> Asirpa": {
       "description": "Zwrot: 'panna Asirpa / Asirpa-san' (obrońca i partner)"
@@ -572,12 +586,12 @@
     },
     "Hijikata": {
       "M": "Hijikata",
-      "D": "Hijikaty",
-      "C": "Hijikacie",
-      "B": "Hijikatę",
+      "D": "Hijikatej",
+      "C": "Hijikatej",
+      "B": "Hijikatą",
       "N": "Hijikatą",
-      "Ms": "Hijikacie",
-      "W": "Hijikato",
+      "Ms": "Hijikatej",
+      "W": "Hijikata",
       "gender": "MALE"
     },
     "Nagakura": {

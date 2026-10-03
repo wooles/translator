@@ -2,7 +2,8 @@
   "anime_title": "Yumemiru Danshi wa Genjitsushugisha",
   "characters": {
     "Wataru Sajou": {
-      "description": "MĘŻCZYZNA - chłopak (Główny bohater)"
+      "description": "MĘŻCZYZNA - chłopak (Główny bohater)",
+      "gender": "MALE"
     },
     "Aika Natsukawa": {
       "description": "KOBIETA - dziewczyna (Główna bohaterka)"

@@ -41,7 +41,8 @@
       "description": "mężczyzna / chłopak (Główny bohater) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Arata Minami (Inubaki)": {
-      "description": "MĘŻCZYZNA - mężczyzna (16 lat, popularny uczeń, chłopak Kuroe, wciągnięty w show-biznes) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]"
+      "description": "MĘŻCZYZNA - mężczyzna (16 lat, popularny uczeń, chłopak Kuroe, wciągnięty w show-biznes) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+      "gender": "MALE"
     },
     "Seina Katsuragi": {
       "description": "kobieta (Licealistka i profesjonalna aktorka, partnerka Araty na planie) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
@@ -253,12 +254,12 @@
     },
     "Arata Minami (Inubaki)": {
       "M": "Arata Minami (Inubaki)",
-      "D": "Araty Minami (Inubaki)a",
-      "C": "Aracie Minami (Inubaki)owi",
-      "B": "Aratę Minami (Inubaki)a",
+      "D": "Aratej Minami (Inubaki)a",
+      "C": "Aratej Minami (Inubaki)owi",
+      "B": "Aratą Minami (Inubaki)a",
       "N": "Aratą Minami (Inubaki)em",
-      "Ms": "Aracie Minami (Inubaki)ie",
-      "W": "Arato Minami (Inubaki)ie",
+      "Ms": "Aratej Minami (Inubaki)ie",
+      "W": "Arata Minami (Inubaki)ie",
       "gender": "MALE"
     },
     "Seina Katsuragi": {

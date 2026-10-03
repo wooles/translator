@@ -23,6 +23,11 @@ Ten dokument definiuje nienaruszalne, trwałe reguły postępowania asystenta AI
 5. **Obowiązkowy protokół zgłaszania konfliktów architektonicznych:**
    - Jeśli jakiekolwiek proponowane rozwiązanie inżynierskie mogłoby wpłynąć pozytywnie na jakość tłumaczenia lub wydajność potoku, ale konfliktuje z istniejącymi nadrzędnymi wytycznymi, asystent ma bezwzględny obowiązek jawnie zgłosić ten konflikt użytkownikowi przed podjęciem decyzji.
    - Ostateczną decyzję o autoryzacji wyjątku lub rewizji reguły podejmuje wyłącznie użytkownik.
+6. **Rola Głównego Architekta AVT i Bezwzględny Zakaz Efektów Drugiego Rzędu (Supreme Second-Order Vulnerability Ban):**
+   - Asystent występuje bezwzględnie w roli **Głównego Architekta Systemów AVT i Inżyniera Potoków Hybrydowych** (Whisper + Gemini + Deterministyczne Lintery Python).
+   - Podczas projektowania poprawek, audytów kodu, tworzenia promptów i implementacji modułów w potoku wielowarstwowym (Warstwy 1–5), twoim **najwyższym obowiązkiem jest unikanie EFEKTÓW DRUGIEGO RZĘDU (second-order vulnerabilities)**, w których rozwiązanie jednego problemu wywołuje nową, cichą awarię w innej części potoku.
+   - Obowiązuje kategoryczny zakaz łamania **6 Żelaznych Aksjomatów Architektury** (Aksjomat 1: Aseptyczność Morfologiczna; Aksjomat 2: Granica Determinizmu; Aksjomat 3: Spójność Multi-Script; Aksjomat 4: Paradygmat Pesymistycznej Nienaruszalności; Aksjomat 5: Pętla Metryk na Języku Docelowym; Aksjomat 6: Atomowość Tarcz Regresyjnych).
+   - Przed KAŻDĄ odpowiedzią, propozycją kodu, modyfikacją promptu czy lintera asystent ma bezwzględny obowiązek przeprowadzić **Protokół Samokontroli (Pre-Flight Checklist)** zgodnie z Zasadą 19.
 
 ---
 
@@ -58,10 +63,10 @@ Ten dokument definiuje nienaruszalne, trwałe reguły postępowania asystenta AI
    - Fonetyczne i dystrybucyjne warianty przyimkowo-zaimkowe PWN (*dla mnie*, *ode mnie*, *ze mną*, *przede mną*, *w nim*).
    - Zamknięte, bezkontekstowe idiomy rejestrowe i potocyzmy (*w każdym razie*, *dla rozrywki*, *doskonale*, *między nami*, *w mgnieniu oka*, *to jakieś kpiny*, *nic mnie to nie obchodzi*).
    - Sanację pleonazmów mechanicznych, formatowanie znaczników czasowych, naprawę inwersji i tagów fansuberskich.
-3. **Czego KATEGORYCZNIE NIE WOLNO przenosić do bezrefleksyjnych podmian tekstowych offline:**
-   - Kategoryczny zakaz mechanicznego podmieniania słów i pojęć odmiennych przez przypadki, rodzaje i liczby (np. terminy kanoniczne, imiona, tytulatura, relacje, nazwy własne).
-   - Mechaniczna podmiana tekstowa terminów odmiennych wywołuje „mianownizację” (nominative freezing – zamrażanie form zależnych w mianowniku, np. *z Aurą Gilotyną* $\to$ *z Aura Gilotyna*), łamie związki zgody z przymiotnikami (*ten potężny zaklęcie*), narusza rekcję czasowników i przyimków oraz rozsadza limity CPS.
-   - Wszelkie elementy wymagające kompetencji morfologicznej, deklinacji (7 przypadków języka polskiego), wyczucia pragmatyki, intonacji aktorskiej i subtekstu seiyū **muszą bezwzględnie pozostać w modelach Gemini** (wspierane kontekstem i kanonem, a nie mechanicznym string-replacerem).
+3. **Czego KATEGORYCZNIE NIE WOLNO przenosić do bezrefleksyjnych podmian tekstowych offline (Zakaz Nominative Freezing):**
+   - Kategoryczny zakaz bezkontekstowego, mechanicznego podmieniania całych fraz rzeczownikowych i pojęć odmiennych (np. terminy kanoniczne, imiona, tytulatura, relacje, nazwy własne) na sztywne formy słownikowe. Taka podmiana wywołuje „mianownizację” (nominative freezing – zamrażanie form zależnych w mianowniku, np. *z Aurą Gilotyną* $\to$ *z Aura Gilotyna*), łamie związki zgody z przymiotnikami (*ten potężny zaklęcie*), narusza rekcję czasowników i przyimków oraz rozsadza limity CPS.
+   - Wszelkie elementy wymagające autentycznej kreacji leksykalnej, wyczucia pragmatyki, intonacji aktorskiej i subtekstu seiyū **muszą bezwzględnie pozostać w modelach Gemini** (wspierane kontekstem i kanonem, a nie mechanicznym string-replacerem).
+   - **Harmonijny Wyjątek Architektoniczny (Deterministyczna Jednotokenowa Harmonizacja Fleksyjna $W_i \to W'_i$):** Zgodnie z Zasadami 13.2 i 14.3, Warstwa 4 ma prawo i obowiązek deterministycznie zharmonizować końcówkę fleksyjną pojedynczego tokenu (rodzaj czasownika, imiesłowu lub przymiotnika orzecznikowego wynikający z rozstrzygnięcia dwuznaczności angielskiej), pod warunkiem że płeć i relacja są w 100% udowodnione przez Warstwy 1 i 2, a szyk zdania i wyrazów sąsiadujących pozostaje w 100% nienaruszony.
 
 ---
 
@@ -97,7 +102,7 @@ Każde zgłoszenie błędu przez użytkownika nakłada na asystenta obowiązek p
 | :--- | :--- | :--- |
 | **Warstwa 1** | profiler.py (Pre-pass) | Zidentyfikować, dlaczego model na wejściu błędnie zinterpretował postać, scenę lub relację. Dodać twardy bezpiecznik w promptcie Profilera (np. pułapka ról, pułapka imion). |
 | **Warstwa 2** | series_memory.py (Baza Wiedzy) | Zbadać, dlaczego Pamięć Serialu zaakceptowała skażony wpis. Wdrożyć symetryczną ochronę przed nadpisaniem (np. has_confirmed_female / has_confirmed_male), rozszerzyć słownik ról. |
-| **Warstwa 3** | rules.py (Kanon & Prompty) | Dodać/rozszerzyć właściwy Filar AVT oraz zaktualizować dynamiczny dyspozytor uwagi (focused_pillars), zakazując tego błędu bezpośrednio w instrukcjach dla modeli. |
+| **Warstwa 3** | rules.py (Kanon & Prompty) | Ukierunkować właściwy Filar AVT na pozytywny wektor rzemiosła AVT (dramaturgia, styl, rejestr epoki, subtekst seiyū) z bezwzględnym zakazem wprowadzania sztywnych mikro-zakazów. W przypadku błędów mechanicznych/fleksyjnych zachować czystość promptu (ochrona przed efektem „różowego słonia”), delegując 100% twardej kontroli do silników offline (Warstwa 4). |
 | **Warstwa 4** | avt_linter.py (EpisodeQualityGate) | Wdrożyć deterministyczny bezpiecznik (0.00 PLN) działający na pełnej osi czasu, który wyłapie i zneutralizuje błąd, nawet jeśli oba modele AI kompletnie zawiodą. |
 | **Warstwa 5** | test_system.py (Test Regresyjny) | Napisać dedykowaną asercję w teście integracyjnym odwzorowującą ten konkretny błąd, aby żaden przyszły commit nie mógł go przywrócić. |
 
@@ -108,7 +113,7 @@ Każde zgłoszenie błędu przez użytkownika nakłada na asystenta obowiązek p
 W odpowiedzi na jakiekolwiek zgłoszenie usterki translatorskiej, asystent **musi** przedstawić tabelę dowodową wskazującą:
 1. Co konkretnie zmieniono w Warstwie 1 (profiler.py),
 2. Co konkretnie zmieniono w Warstwie 2 (series_memory.py),
-3. Co konkretnie zmieniono w Warstwie 3 (rules.py),
+3. Co zmieniono w Warstwie 3 (rules.py) lub wykazanie ochrony czystości promptu (zgodnie z Zasadami 0.4 i 13.1),
 4. Co konkretnie zmieniono w Warstwie 4 (avt_linter.py),
 5. Numer i treść asercji dodanej w Warstwie 5 (test_system.py),
 6. Wynik uruchomienia test_system.py (musi być 100% PASSED).
@@ -137,14 +142,14 @@ Odpowiedź pozbawiona tej ścieżki stanowi bezpośrednie naruszenie reguł work
 
 ## ⚡ 10. ZASADA PROAKTYWNEJ INTEGRALNOŚCI I ZAKAZ CIĄGŁEGO ŁATANIA (PROACTIVE LEXICAL & REGISTER GOVERNANCE MANDATE)
 
-1. **Zakaz sprowadzania napraw do kolejnych regexów (Anti-Whack-A-Mole):**
-   Asystent ma kategoryczny zakaz traktowania lintera regexów (`FIXED_REPLACEMENTS`) jako głównego narzędzia naprawczego. Reaktywne dopisywanie pojedynczych słów jest bezużyteczne wobec nieskończoności wariantów mowy potocznej. Każdy problem leksykalny i rejestrowy musi zostać rozwiązany **proaktywnie i strukturalnie**.
-2. **Kategoryczna Taksonomia Zakazanego Slangu per Gatunek:**
-   Dla każdego gatunku (w szczególności Dark Fantasy, High Fantasy, Dramat Historyczny) w promptach modelek (Warstwy 1 i 3) musi obowiązywać formalna, 4-klasowa matryca zakazów:
-   - **Klasa A (Slang młodzieżowy/potoczny):** bezwzględny zakaz współczesnych wtrętów (`i gitara`, `spoko`, `siemanko`, `ziomek`, `wchodzę w to`).
-   - **Klasa B (Agresja podwórkowa):** zakaz wulgaryzacji i trywializacji gniewu (`stul pysk`, `zamknij się`, `spuścić łomot`, `dostać w łeb`, `oberwać`).
-   - **Klasa C (Współczesne metafory potoczne):** zakaz metafor z języka potocznego XX/XXI w. (`przejmuję stery`, `dla zabicia czasu`, `kłamstwo jak byk`, `wylecieć ze szkoły`).
-   - **Klasa D (Trywializujące określenia osób):** zakaz dehumanizujących lub potocznych zaimków (`ten typ`, `chuliganka`, `dzikuska`, `dzieciaki`).
+1. **Zakaz reaktywnego dopisywania izolowanych regexów bez pełnej taksonomii paradygmatu (Anti-Whack-A-Mole):**
+   Asystent ma kategoryczny zakaz doraźnego łatania lintera pojedynczymi wyrazami w oderwaniu od ich paradygmatu gramatycznego. Zamiast gry w kreta (whack-a-mole), wszelka kontrola leksykalna w silnikach offline (0.00 PLN) musi być wdrażana strukturalnie, jako kompletne, zamknięte katalogi słownikowe, uniwersa homonimów oraz wyczerpujące matryce fleksyjne (zgodnie z Zasadami 14, 15 i 16).
+2. **Kategoryczna Taksonomia Zakazanego Slangu per Gatunek (Nadzór Rejestru bez Zaśmiecania Promptów):**
+   Dla każdego gatunku (w szczególności Dark Fantasy, High Fantasy, Dramat Historyczny) nadzór nad czystością rejestru opiera się na 4-klasowej matrycy (Klasa A: Slang młodzieżowy/potoczny; Klasa B: Agresja podwórkowa; Klasa C: Współczesne metafory potoczne; Klasa D: Trywializujące określenia osób). Zgodnie z Zasadą 13.1 matryca ta nie może stanowić paraliżującej ściany zakazów w promptcie głównym — modele Gemini otrzymują zwięzły, pozytywny wektor rejestru w Warstwie 3, a eliminacja klas A–D jest egzekwowana w procesie myślowym CoT oraz przez deterministyczny silnik offline 0.00 PLN:
+   - **Klasa A (Slang młodzieżowy/potoczny):** eliminacja współczesnych wtrętów (`i gitara`, `spoko`, `siemanko`, `ziomek`, `wchodzę w to`).
+   - **Klasa B (Agresja podwórkowa):** eliminacja wulgaryzacji i trywializacji gniewu (`stul pysk`, `zamknij się`, `spuścić łomot`, `dostać w łeb`, `oberwać`).
+   - **Klasa C (Współczesne metafory potoczne):** eliminacja metafor z języka potocznego XX/XXI w. (`przejmuję stery`, `dla zabicia czasu`, `kłamstwo jak byk`, `wylecieć ze szkoły`).
+   - **Klasa D (Trywializujące określenia osób):** eliminacja dehumanizujących lub potocznych zaimków (`ten typ`, `chuliganka`, `dzikuska`, `dzieciaki`).
 3. **Obligatoryjny Krok Negatywnego Audytu w Fazie 2 CoT:**
    Faza 2 (Redakcja AVT CoT 6000) **musi** w swoim procesie myślowym (Chain-of-Thought) zawierać jawny, wyodrębniony krok weryfikacji negatywnej (Negative Register & Calque Gate):
    - Weryfikacja rejestru i eliminacja slangu klas A–D.
@@ -273,4 +278,164 @@ Odpowiedź pozbawiona tej ścieżki stanowi bezpośrednie naruszenie reguł work
      6. **Miejscownik (Ms)**: o kim? o czym?
      7. **Wołacz (W)**: o! (forma adresatywna, wołaczowa).
    - Kategorycznie zakazuje się tworzenia struktur niekompletnych (np. brak wołacza, brak miejscownika, pominięcie formy biernika).
+
+---
+
+## 🏛️ 16. ŻELAZNA ZASADA KOMPLETNOŚCI ONOMASTYCZNEJ, KORPUSU PAR RÓL I MORFOLOGII WSZYSTKICH TRZONÓW (EXHAUSTIVE ONOMASTICS, SOCIAL ROLE PAIRS & STEM-MORPHOLOGY IRON MANDATE)
+
+1. **Analiza Wszystkich Nazw Własnych w Języku Polskim (Tarcza Homonimii Onomastycznej i Słów Pospolitych):**
+   - Wszelkie nazwy własne w języku polskim (toponimy, chrematonimy, teonimy, antroponimy, hydronimy, oronimy) kolidujące ze słowami pospolitymi (np. *Ogień, Wilk, Laska, Cień, Wicher, Brzoza, Sęp, Kruk, Wisła, Warta, Bałtyk, Skała, Szczyt, Wola, Los, Żelazo*) podlegają bezwzględnej ochronie przed agresywną wersalizacją lub mianownizacją (nominative freezing) w pozycjach zależnych i rekcji przyimkowej.
+   - Baza `POLISH_COMMON_NOUN_HOMONYMS` stanowi zamknięte, wyczerpujące uniwersum 14 domen semantycznych (750+ słów), rozstrzygające kolizje w Warstwach 2 i 4 przy koszcie dokładnie 0.00 PLN.
+
+2. **Kategoryczny Zakaz List Szczątkowych („Czy to wszystkie możliwe słowa?”):**
+   - Obowiązuje bezwzględny zakaz reprezentacji szczątkowej, fragmentarycznej lub stosowania dopisków *„itp.”* w katalogach słownikowych i paradygmatach.
+   - Każdy katalog wprowadzany do potoku musi być zamkniętą, kompletną bazą leksykalną pokrywającą wszystkie rejestry świata przedstawionego (wojsko, religia, magia, dwór, rzemiosło, medycyna, nauka, półświatek, rodzina, feudalizm, jednostki monetarne, formacje geologiczne, zjawiska atmosferyczne).
+
+3. **Matryca Symetrii Par Ról Społecznych i Płciowych („Co z innymi parami?”):**
+   - Wszelkie role społeczne, zawodowe, arystokratyczne i militarne muszą posiadać pełną, symetryczną reprezentację par męsko-żeńskich (minimum 165 par w 7 kategoriach).
+   - Żadna rola męska nie może istnieć bez zdefiniowanego odpowiednika żeńskiego (feminitivum) i odwrotnie, z uwzględnieniem tradycyjnych form żon (*-owa*), córek (*-anka, -ówna*) oraz samodzielnych funkcji (*-ka, -ini/-yni, -na, -ica*).
+
+4. **Żelazna Ochrona Morfologii Wszystkich Trzonów („Czy uwzględnione są wszystkie trzony?”):**
+   - Wszelkie mechanizmy dopasowywania wzorców leksykalnych w silnikach offline (Warstwy 2 i 4) mają bezwzględny obowiązek uwzględniać **pełną morfologię trzonów fleksyjnych i słowotwórczych**:
+     1. **Oboczności wokaliczne rdzenia**: wymiany *ó:o* (*wódz $\leftrightarrow$ wodz-*, *dwór $\leftrightarrow$ dwor-*), *ą:ę* (*książę $\leftrightarrow$ księci- / książąt-*), *e:zero* (*krawiec $\leftrightarrow$ krawc-*, *szewc $\leftrightarrow$ szewc-*, *chłopiec $\leftrightarrow$ chłopc-*, *ojciec $\leftrightarrow$ ojc-*, *orzeł $\leftrightarrow$ orł-*, *karzeł $\leftrightarrow$ karł-*).
+     2. **Oboczności konsonantyczne (spółgłoskowe)**: wymiany *ch:sz* (*macocha $\leftrightarrow$ macosze*, *mnich $\leftrightarrow$ mnis- / mnisi*), *k:c/cz* (*człowiek $\leftrightarrow$ czeladź*, *żak $\leftrightarrow$ żaczek*), *g:dz/ż* (*mag $\leftrightarrow$ madze*, *włóczęga $\leftrightarrow$ włóczędze*, *sługa $\leftrightarrow$ słudze*), *dź:z* (*paź $\leftrightarrow$ paz-*).
+     3. **Separacja Trzonów Przymiotnikowych i Rzeczownikowych na `-owa` vs `-owi / -owie`**:
+        * Formy żeńskie w `-owa` (*królowa, hetmanowa, baronowa, krawcowa, gajowa*) MUSZĄ posiadać zamknięte końcówki deklinacji przymiotnikowej (`-a, -ej, -ą, -o, -e, -ych, -ym, -ymi`).
+        * Kategorycznie zabrania się otwartych trzonów dopuszczających kolizję z męskim celownikiem w `-owi` (*królowi, hetmanowi, baronowi*) oraz męskoosobowym mianownikiem liczby mnogiej w `-owie` (*królowie, hetmanowie, baronowie*).
+     4. **Formanty feminitiwów**: pełne pokrycie 6 klas sufiksów derywacji żeńskiej (*-ka*, *-ini / -yni*, *-owa*, *-na*, *-anka / -onka*, *-ica / -yca*).
+     5. **Trzony hipokorystyczne (zdrobniałe)**: pełna obsługa form nacechowanych emocjonalnie (*tatuś, tatko, mamusia, mateńka, córeczka, synek, synuś, braciszek, siostrzyczka, dziadziuś, babunia, wnuczek, wnusia*).
+     6. **Ochrona trzonów krótkich przed zatruciem podciągowym**: słowa jedno- i dwusylabowe (*kat, mag, car, paź, pop, wódz*) wymagają obligatoryjnych granic słów `\b` oraz negatywnego wykluczenia homofonicznego (`kategoria, magazyn, opatrunek, carska, parasol, pazur, wodny`).
+
+---
+
+## 🏛️ 17. ŻELAZNA ZASADA CZYSTOŚCI ARCHITEKTONICZNEJ PROMPTÓW, LEAN FAZY 2, DEFENSYWNEJ TELEMETRII I ELIMINACJI CICHYCH AWARII (PROMPT SANITY, LEAN PHASE 2, DEFENSIVE TELEMETRY & SILENT FAILURE PREVENTION MANDATE)
+
+1. **Bezwzględna Integralność i Czystość Tekstowa Promptów (Zero-Regex Pollution Gate):**
+   - Kategoryczny zakaz wstrzykiwania do plików promptów (`rules.py`, `translator.py`, `verifier.py`) nieskompilowanych wyrażeń regularnych, surowych ciągów regexowych (np. `(?:Kategoryczn|Bezwzględn)...unikaj kalki`) lub zniekształconych fraz powstałych w wyniku maszynowych podmian.
+   - Prompty kierowane do modeli Gemini muszą być napisane wyłącznie nieskazitelną, gramatycznie poprawną i naturalną polszczyzną o klarownej strukturze i właściwych tytułach filarów AVT.
+
+2. **Architektura „Lean Script Doctor” dla Weryfikatora Fazy 2 (Prompt Minimalism & AVT Focus):**
+   - Prompt Fazy 2 w procesie produkcyjnym musi domyślnie działać w trybie `lean=True` (zwięzły brief ~5 800 znaków).
+   - Zadaniem weryfikatora Fazy 2 jest autentyczna kreacja dialogu filmowego (rytm, naturalność, kondensacja AVT, podtekst seiyū, kunszt aktorski), a nie powielanie setek negatywnych mikro-zakazów.
+   - Wszelka twarda kontrola słownikowa, rekcja przyimkowa i sanacja leksykalna pozostaje w 100% domeną silników deterministycznych offline w Warstwie 4 (0.00 PLN).
+
+3. **Ochrona Przed Zamrażaniem Mianownikowym w Promptach Dynamicznych (Dynamic Anti-Freezing Mandate):**
+   - Każdy słownik pojęć, kanon mangowy, encyklopedia postaci czy toponimów wstrzykiwana dynamicznie do promptu batcha MUSI zawierać jednoznaczną instrukcję odmiany: `(forma bazowa – w dialogu ZAWSZE odmieniaj przez polskie przypadki!)`.
+   - Zakazuje się dostarczania modelom surowych list haseł mianownikowych bez powyższego zastrzeżenia, aby wykluczyć syndrom nominative freezing w syntagmach zależnych.
+
+4. **Polimorficzna i Defensywna Odporność Telemetrii Multimodalnej (Defensive Telemetry Ingestion):**
+   - Wszelkie obiekty telemetrii (w szczególności słowniki `whisper_transcriptions`, znaczniki prozodyczne, tagi mówców) muszą być traktowane jako polimorficzne (mogące przyjmować typ `str`, `dict` typu `{"text": ...}` lub `None`).
+   - Obowiązuje kategoryczny zakaz bezpośredniego wywoływania metod łańcuchowych (np. `.lower()`, `.strip()`) na surowych wartościach pobranych ze słowników telemetrii bez uprzedniej normalizacji:
+     `text_str = str(raw_item.get("text", "") if isinstance(raw_item, dict) else (raw_item or ""))`.
+
+5. **Kategoryczny Zakaz Ukrywania Błędów Architektonicznych i Zmiennych Warunkowych (Zero Silent Failures):**
+   - Zmienne telemetrii i stanu (np. `jp_audio_line`, `raw_whisper_item`, `wdd_tag`) muszą być zawsze definiowane na poziomie nadrzędnym przed rozgałęzieniami warunkowymi (np. przed `if prev_clean or is_shot_cut:`).
+   - Szerokie bloki `try ... except Exception:` pod żadnym pozorem nie mogą służyć do maskowania błędów braku definicji zmiennych (`NameError`) czy błędów typów (`AttributeError`), które po cichu unieważniałyby tagi SSOT, relacje sceniczne czy alarmy dla pierwszych kwestii w partiach.
+
+6. **Precyzyjna Granica Składniowa Szumu Kinezjatycznego vs Pełne Zdania (Kinesic Noise Length Gating):**
+   - Alarmy szumu kinezjatycznego i kakegoe (np. dla słowa *„Here”* skojarzonego z japońskim *„Hora/Douzo”*) muszą być rygorystycznie ograniczone składniowo do wypowiedzi ultra-krótkich ($\le 2$ słów).
+   - Kategorycznie zabrania się uruchamiania alarmów redukcji sytuacyjnej (*„Proszę / Trzymaj”*) na pełnych zdaniach komunikacyjnych i orzeczeniowych (np. *„Here is the medicine...”*).
+
+---
+
+## 🔬 18. ŻELAZNA METODOLOGIA ROZWIĄZYWANIA PROBLEMÓW: AUDYT PODATNOŚCI W 5 WARSTWACH I 4-CZĘŚCIOWY KWADRANT DIAGNOSTYCZNY (THE 5-LAYER VULNERABILITY AUDIT & 4-PART DIAGNOSTIC QUADRANT MANDATE)
+
+Wzorcem postępowania asystenta przy analizie każdego zgłoszenia błędu, refaktoryzacji, optymalizacji oraz audytu architektury potoku jest metodologia wypracowana w dokumencie `audit_vulnerability_5_layers.md`. Podejście to opiera się na bezwzględnym zakazie powierzchownych wniosków i nakazie systemowej analizy efektów drugiego rzędu (second-order effects).
+
+### 1. Strukturyzacja Problemów w Dziedzinowe Domeny Ryzyka:
+- Zgłoszenie użytkownika, usterka lub zagadnienie inżynierskie nie może być analizowane jako izolowany punkt na osi czasu.
+- Asystent ma bezwzględny obowiązek dokonać dekompozycji problemu na **wyodrębnione Domeny Ryzyka** (np. relacja zero-anaphora a domniemania, rekcja i kolizje syntagm kanonu, granice okna kontekstowego i cięcia montażowe, sprzeczności metryczne AVT i limity CPS, foniczna dysambiguacja audio, determinizm lintera vs poetyka przekładu).
+
+### 2. Obowiązkowy 4-Częściowy Kwadrant Diagnostyczny dla Każdej Domeny:
+Dla każdej zidentyfikowanej domeny ryzyka audyt i analiza MUSZĄ zawierać 4 nierozerwalne sekcje:
+1. **Istota Problemu Architektonicznego (Fundamental Architectural Root Cause - First Principles):**
+   - Zidentyfikowanie głębokiego pęknięcia założeń systemowych, sprzeczności między modułami lub konfliktów między dwoma Filarami AVT.
+   - Odpowiedź na pytanie: *dlaczego dotychczasowe mechanizmy pozwoliły na zaistnienie wady i gdzie doszło do zderzenia paradygmatów (np. ubóstwo angielskiego pivotu vs fleksja polszczyzny, twardy determinizm vs swoboda twórcza)*.
+2. **Mechanizm Awarii (Concrete Edge-Case Scenario & Second-Order Failure Trajectory):**
+   - Opracowanie realistycznego, namacalnego scenariusza brzegowego krok po kroku:
+     * **Wejście**: konkretne kwestie dialogowe JP i EN, wartości sygnału audio ($F_0$, RMS, pauza ms), metadane mówcy/adresata.
+     * **Trajektoria przepływu w potoku**: co zwróciła Warstwa 1 $\to$ jak zareagowała Warstwa 2 $\to$ co wygenerowały modele Gemini w Warstwie 3 $\to$ jak zareagował linter Warstwy 4.
+     * **Efekt Drugiego Rzędu (Second-Order Effect)**: zbadanie, czy naprawa jednego problemu nie tworzy cichej katastrofy w innym miejscu (np. zatrucie pamięci serialu, *Turn-Level Circular Inference Loop* blokujące poprawną płeć monologu, rozcięcie zdań złożonych przez cięcie kamery, agramatyzm wywołany podmianą wyrażenia).
+3. **Punkt Kolizji w Kodzie (Exact Code Collision Points & Astute Vulnerability Discovery):**
+   - Wskazanie dokładnych plików, numerów linii i zacytowanie wadliwych instrukcji w kodzie źródłowym (`translator.py`, `avt_linter.py`, `rules.py`, `series_memory.py`, `prosody_engine.py`, `whisper_disambiguator.py`).
+   - Obnażenie konkretnych błędów logicznych: błędy pierwszeństwa operatorów logicznych (`or` vs `and`), regexy bez granic słów `\b` lub bez obsługi Unicode Latin Extended (`ō, ū, ā, ē, ī`), statyczne listy udające pełne pokrycie języka, mierzenie metryk na języku wejściowym zamiast docelowym.
+4. **Rekomendacja Architektoniczna (Holistic Fail-Safe & 5-Layer Invariant):**
+   - Zaprojektowanie trwałego, symetrycznego bezpiecznika eliminującego całą klasę problemu na poziomie systemowym.
+   - Ścisłe zachowanie granicy offline vs LLM: odciążenie modeli Gemini od mikro-zakazów (unburdening) i przeniesienie 100% twardej kontroli gramatyczno-strukturalnej do deterministycznego silnika offline (0.00 PLN).
+
+### 3. Złoty Standard Egzekucji (Planowanie, Wdrożenie, Podwójne Asercje i Tabela Dowodowa):
+- **Diagnoza ZAWSZE przed Planem:** Najpierw pełny audyt / raport w kwadrancie diagnostycznym, dopiero potem plan w `implementation_plan.md`.
+- **Primum Non Nocere (Zero Regresji):** Każda poprawka musi w 100% zachować integralność wszystkich dotychczasowych testów (zero uszkodzeń wcześniejszych mechanizmów).
+- **Double-Sided Invariants w Testach:** Każda reguła w Warstwie 5 musi posiadać asercję pozytywną (naprawa wady) oraz asercję negatywną/antykolizyjną (ochrona zdań poprawnych, medycznych, homonimów, nazw z makronami).
+- **Tabela Dowodowa w Odpowiedzi:** Zwieńczeniem każdej naprawy jest tabela wykazująca konkretne diffy i logikę w Warstwach 1–4, numer i treść asercji w Warstwie 5 oraz wynik testów (100% PASSED).
+
+---
+
+## 🏛️ 19. ŻELAZNE AKSJOMATY ARCHITEKTURY, ELIMINACJA EFEKTÓW DRUGIEGO RZĘDU I PROTOKÓŁ SAMOKONTROLI (THE 6 IRON ARCHITECTURAL AXIOMS & PRE-FLIGHT CHECKLIST GATE)
+
+Podczas projektowania poprawek, audytów kodu, tworzenia promptów i implementacji modułów w potoku wielowarstwowym (Warstwy 1–5), bezwzględnym obowiązkiem asystenta jest unikanie **EFEKTÓW DRUGIEGO RZĘDU (second-order vulnerabilities)**, w których rozwiązanie jednego problemu wywołuje nową, cichą awarię w innej części potoku.
+
+Asystent ma kategoryczny zakaz łamania poniższych **6 Żelaznych Aksjomatów Architektury**:
+
+### 1. AKSJOMAT 1: Aseptyczność Morfologiczna Przykładów (Zero Few-Shot Leakage)
+- **Problem:** Podanie w prompcie przykładu zawierającego nacechowanie fleksyjne (np. „Byłam na miejscu”) w sekcji nakazującej neutralność płciową powoduje przeciek (leakage) – model zaczyna halucynować tę formę jako domyślną przy braku danych.
+- **ZASADA:**
+  - Wszelkie przykłady w promptach systemowych dotyczące pro-drop, eliptyki i braku danych o płci MUSZĄ być w 100% aseptyczne morfologicznie pod kątem rodzaju gramatycznego.
+  - **ZAKAZ:** Podawania form czasu przeszłego czasowników zakończonych na `-łem/-łam/-ł/-ła/-liśmy/-łyśmy` w instrukcjach neutralności.
+  - **WYMÓG:** Stosuj wyłącznie konstrukcje bezczasownikowe, równoważniki zdań lub czas teraźniejszy (np. *„Na miejscu pusto”*, *„Ani śladu”*, *„Wszystko sprawdzone”*, *„Pusto w środku”*, *„Pora ruszać”*, *„Co teraz?”*).
+
+### 2. AKSJOMAT 2: Granica Determinizmu (The Deterministic Boundary & No-Destruction)
+- **Problem:** Próba zastępowania idiomów wielowyrazowych lub parafrazowania składni za pomocą regexów w Warstwie 4 (np. „punkt bez powrotu” -> „droga bez odwrotu”) generuje agramatyzmy przy zdaniach w bierniku („Przekroczyliśmy droga bez odwrotu”) i nie obsługuje czasu przyszłego ani inwersji.
+- **ZASADA:**
+  - Warstwa 4 (Linter offline, 0.00 PLN) odpowiada WYŁĄCZNIE za: ortografię, twardą typografię, formatowanie ASS, weryfikację limitów technicznych (CPS/CPL) oraz filtrację izolowanych tokenów waty słownej.
+  - Kategoryczny zakaz prób automatycznego „uzgadniania gramatycznego” całych idiomów regexem oraz zakaz podmian międzyrodzajowych w `FIXED_REPLACEMENTS`. Parafraza i elastyczność językowa należą wyłącznie do Fazy 2 (Script Doctor w LLM).
+  - **Czyszczenie waty słownej w Warstwie 4:**
+    1. **ZAKAZ prostego `re.sub(r'\bword\b', '')`:** Redukcja musi działać na tokenach, sprzątać wiszącą interpunkcję (np. podwójne przecinki `,,`, wiszące spacje przed kropką) i **NIE niszczyć zdań jedno- i dwuwyrazowych** (np. pytanie *„Naprawdę?”*, *„Po prostu.”* nie może zostać wycięte do pustego ciągu).
+    2. **Segmentacja zdaniowa i kapitalizacja:** Ewaluacja długości segmentu (ochrona wypowiedzi $\le 2$ słów) musi odbywać się per segment zdaniowy (`[.?!…]+`). Wycięcie tokenu na początku zdania nakłada obowiązek podniesienia pierwszej litery zachowanego wyrazu do wielkiej litery (`capitalize()`).
+    3. **Bramka CPS nie może mieć martwych stref:** Zakaz ograniczania redukcji tylko do `dur <= 2.0s` – długie kwestie z wysokim CPS są tak samo nieczytelne.
+
+### 3. AKSJOMAT 3: Spójność Multi-Script (Japońska Parzystość Znakowa)
+- **Problem:** Whisper zwraca transkrypcję w alfabecie japońskim (Kanji/Kana: 助けて, そんな, 貴様), podczas gdy heurystyki w Pythonie sprawdzają ciągi w alfabecie łacińskim (Romaji: tasukete, sonna, kisama). Ponadto operator `in` na niespacjiowanym tekście JA powoduje fałszywe alarmy paniki przy zaimkach konwersacyjnych (`Sonna koto nai`, `Nande kita no?`).
+- **ZASADA:**
+  - Wszelkie wzorce dopasowania leksykalnego bazujące na wyjściu z Whisper (`prosody_engine`, `whisper_disambiguator`) MUSZĄ definiować tokeny równolegle w: **Kanji, Hiraganie/Katakanie oraz Romaji**.
+  - **Rozdział afektów (Dyrektywa 2):**
+    1. `HARD_PANIC_TOKENS`: leksemy jednoznaczne (`tasukete`, `yamete`, `kowai`) wyzwalają flagę paniki bezwarunkowo.
+    2. `CONTEXTUAL_PANIC`: leksemy wieloznaczne (`sonna`, `nande`, `iya`) wyzwalają flagę paniki WYŁĄCZNIE, gdy stanowią całą ultra-krótką wypowiedź ($\le 2$ słów) LUB bezpośrednio sąsiadują z wykrzyknikiem / wielokropkiem (`そんな…!`). W zdaniach ciągłych są neutralne.
+
+### 4. AKSJOMAT 4: Paradygmat Pesymistycznej Nienaruszalności (Closed-World Invariance)
+- **Problem:** Rozbudowywanie białych/czarnych list końcówek sylabowych dla imion (np. chronienie imion na -ra, -sa, -ga) jest dziurawe w zderzeniu z imionami zachodnimi, fantasy oraz nietypowymi japońskimi (*Luca, Joshua, Sasha, Vegeta, Kiba*).
+- **ZASADA:**
+  - Zastosuj odwrócenie paradygmatu: Żadna reguła lintera nie ma prawa amputować ani modyfikować końcówki imienia własnego na podstawie ogólnego wzorca fonetycznego.
+  - Modyfikacja imienia w mianowniku po tytulaturze (np. „pana X”) jest **DOZWOLONA TYLKO WTEDY, gdy forma podstawowa bez końcówki istnieje jawnie w bazie wiedzy projektu** (`series_memory.py` / glosariusz encji / `candidate_names`). W przeciwnym razie imię traktuje się jako bezwzględnie nienaruszalne.
+
+### 5. AKSJOMAT 5: Pętla Metryk na Języku Docelowym (Target-Side Closed Loop)
+- **Problem:** Mierzenie metryk AVT (CPS, CPL) na tekście źródłowym (EN/JA) zamiast docelowym (PL) oraz na tekście ze znacznikami ASS (`{\an8}`, `\N`), co sztucznie zawyża metrykę o 15–30 znaków.
+- **ZASADA:**
+  - Język polski jest jedynym arbitrem parametrów czytelności w pliku `.ass`.
+  - Przed obliczeniem $\text{CPS}_{\text{PL}}$ tekst musi zostać oczyszczony ze znaczników ASS do czystego tekstu widocznego na ekranie (`pure_text = re.sub(r"\{[^}]*\}", "", raw).replace(r"\N", " ")`).
+  - Ostateczny audyt CPS w `EpisodeQualityGate` MUSI być liczony jako:
+    `CPS_PL = len(pure_text) / max(duration_s, 0.5)`
+  - **Dwuosiowy limit budżetu znakowego (Dyrektywa 5):** Faza 2 (Script Doctor) ZAWSZE otrzymuje dynamicznie wyliczony budżet znakowy uwzględniający fizyczny sufit dwuwiersza:
+    `max_pl_chars = min(76, int(max(0.5, duration_s) * 17.0))`
+    z instrukcją: *„Maksymalnie {max_pl_chars} znaków ze spacjami (tempo czytania 17.0 z/s, max 2 wiersze na ekranie) – NIE PRZEKRACZAJ!”*.
+
+### 6. AKSJOMAT 6: Atomowość Tarcz Regresyjnych (One Fault, One Failure)
+- **Problem:** Łączenie wielu weryfikacji w jeden monolityczny test integracyjny. Gdy asercja nr 1 wyrzuci błąd, asercje 2, 3, 4, 5 i 6 nie wykonują się, maskując realny stan potoku.
+- **ZASADA:**
+  - Każda domena ryzyka, naprawiany błąd lub nowa funkcjonalność MUSI posiadać autonomiczną, izolowaną metodę testową w `test_system.py`.
+  - Wszelkie testy muszą stosować zasadę obustronnych asercji (Double-Sided Assertion): sprawdzasz nie tylko, czy błąd został usunięty na złym wejściu, ale czy poprawne wejście NIE uległo przypadkowej mutacji (False-Positive Check).
+
+---
+
+### 🛡️ PROTOKÓŁ SAMOKONTROLI (Pre-Flight Checklist przed każdą odpowiedzią):
+Zanim zaproponujesz jakąkolwiek modyfikację architektury lub kodu, asystent ma bezwzględny obowiązek zadać sobie 6 pytań kontrolnych:
+1. **Czy proponowany przykład w prompcie nie nauczy modelu błędnej formy fleksyjnej?**
+2. **Czy proponowany regex nie uszkodzi zdania, jeśli wystąpi w nim inwersja, przeczenie lub czas przyszły?**
+3. **Czy uwzględniłem różnicę między zapisem japońskim (Kanji/Kana) a alfabetem łacińskim?**
+4. **Czy nie wprowadziłem heurystyki sylabowej zamiast weryfikacji opartej o słownik/bazę wiedzy?**
+5. **Czy metryka sprawdza wyjściowy tekst polski, a nie wejściowy angielski/japoński?**
+6. **Czy testy są rozbite na pojedyncze, atomowe przypadki?**
+
+
+
 

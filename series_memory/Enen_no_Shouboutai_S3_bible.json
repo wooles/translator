@@ -2,16 +2,19 @@
   "anime_title": "Enen no Shouboutai S3",
   "characters": {
     "Shinra": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE"
     },
     "Haumea": {
       "description": "KOBIETA (wyodrębniono z relacji serii)"
     },
     "Sho": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE"
     },
     "Obi": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE"
     },
     "Maki": {
       "description": "KOBIETA (wyodrębniono z relacji serii)"

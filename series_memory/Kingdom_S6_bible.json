@@ -2,7 +2,8 @@
   "anime_title": "Kingdom S6",
   "characters": {
     "Wang Ben": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE"
     },
     "Mǎ Nanci": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
@@ -11,16 +12,19 @@
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
     },
     "Xin": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE"
     },
     "Wang Jian": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
     },
     "Bi": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE"
     },
     "Yang Duanhe": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE"
     },
     "Shun Shuishu": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
@@ -29,25 +33,30 @@
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
     },
     "Oddział Yu Feng": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE"
     },
     "Han Chang": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
     },
     "Wei Ping / Song Zuo / Tian Yong": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE"
     },
     "Ban You": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
     },
     "Ou Hon": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE"
     },
     "Heki": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE"
     },
     "Yotanwa": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE"
     },
     "Shun Sui Ju": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
@@ -62,13 +71,15 @@
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
     },
     "Mou Ten": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE"
     },
     "Ri Boku": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
     },
     "Meng Tian": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE"
     },
     "Ding Yang": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"

@@ -966,6 +966,19 @@ def clean_orphaned_dialogue_dashes(text: str) -> str:
         sep = r"\N"
         return f"{ts_prefix}- {p1}{sep}- {p2}"
 
+    # Asymmetric dual speaker lines where line 1 starts with a dash and line 2 starts a distinct sentence
+    if r"\N" in clean_body or "\n" in clean_body:
+        parts = re.split(r"\\N|\\n|\n", clean_body)
+        if len(parts) == 2:
+            p0 = parts[0].strip()
+            p1 = parts[1].strip()
+            if re.match(r"^[-–—]\s+", p0) and re.search(r"[.!?…]$", p0):
+                if re.match(r"^[A-ZĄĆĘŁŃÓŚŹŻ0-9„\"'\(]", p1):
+                    clean_p0 = re.sub(r"^[-–—]\s*", "", p0).strip()
+                    clean_p1 = re.sub(r"^[-–—]\s*", "", p1).strip()
+                    sep = r"\N" if r"\N" in text else "\n"
+                    return f"{ts_prefix}- {clean_p0}{sep}- {clean_p1}"
+
     # Strip leading dash on genuine single-speaker line
     clean_body = re.sub(r"^[-–—]\s*", "", clean_body)
     return f"{ts_prefix}{clean_body}" if ts_prefix else clean_body
@@ -1028,9 +1041,9 @@ def create_adaptive_batches(
         )
 
         # Syntactic Sentence Boundary Coalescence:
-        # Prevent cutting batches across compound sentences / enjambment when gap < 2000ms
+        # Prevent cutting batches across compound sentences / enjambment when gap < 2000ms (or 3500ms for incomplete sentences)
         is_sentence_continuation = False
-        if current_batch and gap_ms < 2000 and len(current_batch) < (max_batch_size + 4):
+        if current_batch and len(current_batch) < (max_batch_size + 4):
             prev_txt = clean_text_for_len(current_batch[-1][2]).strip()
             curr_txt = text_clean.strip()
             prev_ends_incomplete = (
@@ -1044,7 +1057,9 @@ def create_adaptive_batches(
                 curr_txt,
                 re.IGNORECASE
             ))
-            is_sentence_continuation = prev_ends_incomplete or curr_starts_lower or (not prev_has_terminal_punct and curr_starts_continuation_word)
+            max_cont_gap = 3500 if (prev_ends_incomplete or curr_starts_lower) else 2000
+            if gap_ms < max_cont_gap:
+                is_sentence_continuation = prev_ends_incomplete or curr_starts_lower or (not prev_has_terminal_punct and curr_starts_continuation_word)
 
         if (is_full or is_dense or is_scene_break) and not is_sentence_continuation:
             batches.append(current_batch)
@@ -1083,7 +1098,7 @@ class LineTranslation(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: int = Field(description="ID kwestii dialogowej z wejścia")
     polish_text: str = Field(description="Przetłumaczona kwestia na język polski z uwzględnieniem płci, sceny i eliminacji kalek")
-    speaker_name: Optional[str] = Field(default=None, description="Imię postaci z bazy AniList / kartoteki mówiącej tę kwestię (np. 'Fatima', 'Ögedei') lub null jeśli nieznana")
+    speaker_name: Optional[str] = Field(default=None, description="Imię postaci z bazy AniList / kartoteki mówiącej tę kwestię (np. 'Kenji', 'Yui') lub null jeśli nieznana")
     speaker_gender: Optional[str] = Field(default=None, description="Płeć mówcy: 'mężczyzna' lub 'kobieta'")
     addressee: Optional[str] = Field(
         default=None,
@@ -1112,9 +1127,7 @@ class BatchTranslationResponse(BaseModel):
 
 CANONICAL_MALE_NAMES_ON_A = {
     "shira", "akira", "gaara", "ashitaka", "kiba", "soma", "kenta",
-    "ryoma", "hanza", "koba", "soya", "toma", "genga", "sinbad", "judar", "alibaba",
-    "masashige", "kusunoki", "saionji", "kinmune", "ashikaga", "takauji", "mochizuki",
-    "ou hon", "ouhon", "robert"
+    "ryoma", "hanza", "koba", "soya", "toma", "genga", "sinbad", "judar", "alibaba"
 }
 
 def detect_third_person_mentions(
@@ -1721,8 +1734,8 @@ class MultimodalTranslator:
                         if cand_gens and len(set(cand_gens)) == 1:
                             canonical_gender = cand_gens[0]
 
-        # 1b. Episode Scene Cast Pre-computation Check (Continuous Scene Ground Truth)
-        if not canonical_gender:
+        # 1b. Episode Scene Cast Pre-computation Check (Continuous Scene Ground Truth for Anonymous Lines)
+        if not canonical_gender and not spk_clean:
             check_idx = event_idx if event_idx is not None else batch_id
             if hasattr(self, "episode_scene_genders") and self.episode_scene_genders:
                 if check_idx in self.episode_scene_genders:
@@ -1772,7 +1785,11 @@ class MultimodalTranslator:
             elif "męsk" in v_tag and "alt" not in v_tag and "ochrypł" not in v_tag:
                 acoustic_gender = "mężczyzna"
 
-        jp_text = (whisper_transcriptions.get(batch_id, "") if whisper_transcriptions else "").lower()
+        raw_jp = whisper_transcriptions.get(batch_id, "") if whisper_transcriptions else ""
+        if isinstance(raw_jp, dict):
+            jp_text = str(raw_jp.get("text", "")).lower()
+        else:
+            jp_text = str(raw_jp).lower()
         wdd_tag = WhisperDisambiguator.disambiguate_line(clean_en="", jp_audio=jp_text)
         jp_female_marker = (wdd_tag.speaker_gender == "FEMALE") or any(m in jp_text for m in ["atashi", "あたし", "atai", "あtai", "kashira", "かしら", "わよ", "wayo"])
         jp_male_marker = (wdd_tag.speaker_gender == "MALE") or any(m in jp_text for m in ["ore", "俺", "boku", "僕"])
@@ -1797,7 +1814,13 @@ class MultimodalTranslator:
         if canonical_gender == "kobieta":
             # Acoustic Primacy: If voice is confirmed male (acoustic_gender == "mężczyzna" or jp_male_marker),
             # reject false female assignment (e.g. from family surname collision like Honoka Tomine vs Issei Tomine)
-            if acoustic_gender == "mężczyzna" or jp_male_marker:
+            char_d = (self.character_registry.get(spk_clean, "") or "") if spk_clean else ""
+            char_d_low = char_d.lower()
+            is_low_pitch = any(k in char_d_low for k in ["starsza", "dojrzała", "babcia", "matrona", "cesarzow", "chatun", "wiedźma", "ochrypł"])
+            if hasattr(self, "series_bible") and self.series_bible and hasattr(self.series_bible, "is_low_pitch_female") and self.series_bible.is_low_pitch_female(spk_clean):
+                is_low_pitch = True
+
+            if (acoustic_gender == "mężczyzna" and not is_low_pitch) or jp_male_marker:
                 alerts.append(f"[🚨 WETO AKUSTYCZNE SEIYŪ: Męski głos F0/Whisper unieważnił fałszywy tag żeński dla '{spk_clean}'! Zastosowano 'mężczyzna']")
                 canonical_gender = "mężczyzna"
             else:
@@ -1833,6 +1856,7 @@ class MultimodalTranslator:
                 if self.episode_scene_genders.get(check_idx) == "kobieta" or self.episode_scene_genders.get(getattr(event, "_orig_idx", None)) == "kobieta":
                     is_scene_female = True
 
+            is_cont = False
             if hasattr(self, "series_bible") and self.series_bible and hasattr(self.series_bible, "audit_speaker_metadata_against_audio"):
                 aud_res, is_cont = self.series_bible.audit_speaker_metadata_against_audio(
                     spk_clean,
@@ -1843,8 +1867,8 @@ class MultimodalTranslator:
                 if is_cont and aud_res == "FEMALE":
                     has_female_audio = True
 
-            if has_female_audio or is_scene_female:
-                alerts.append(f"[🚨 ALARM PRYMATU AKUSTYCZNEGO (Filar CLXXIV): Tag aktora '{spk_clean}' (mężczyzna) sprzeczny z głosem żeńskim seiyū / sceną! Zastosowano korektę akustyczną -> wymuszono 'kobieta']")
+            if has_female_audio or (is_scene_female and is_cont):
+                alerts.append(f"[🚨 ALARM PRYMATU AKUSTYCZNEGO (Filar CLXXIV): Tag aktora '{spk_clean}' (mężczyzna) sprzeczny z głosem żeńskim seiyū / skażony w scenie! Zastosowano korektę akustyczną -> wymuszono 'kobieta']")
                 return "kobieta", alerts
 
             if phase1_is_female:
@@ -1877,9 +1901,16 @@ class MultimodalTranslator:
             alerts.append(f"[🚨 ALARM ARBITRAŻU: Faza 1 wskazała rodzaj żeński, lecz seiyū używa jednoznacznie męskiego zaimka 'ore/boku'! Wymuszono 'mężczyzna']")
             return "mężczyzna", alerts
         elif acoustic_gender == "mężczyzna" and phase1_is_female:
-            # Low F0 pitch alone CANNOT veto Phase 1 female vision/context (elderly women / raspy female voices - Filar CXXXVI/CLXXI)
-            alerts.append(f"[ℹ️ INFO ARBITRAŻU: Faza 1 wskazała rodzaj żeński przy niskim tembrze F0 – uwzględniono możliwość dojrzałego/ochrypłego głosu żeńskiego (Filar CXXXVI/CLXXI) -> zachowano 'kobieta']")
-            return "kobieta", alerts
+            char_d = (self.character_registry.get(spk_clean, "") or "") if spk_clean else ""
+            char_d_low = char_d.lower()
+            is_matron = any(k in char_d_low for k in ["starsza", "dojrzała", "babcia", "matrona", "cesarzow", "chatun", "wiedźma", "ochrypł"])
+            if self.series_bible and hasattr(self.series_bible, "is_low_pitch_female") and self.series_bible.is_low_pitch_female(spk_clean):
+                is_matron = True
+            if is_matron:
+                alerts.append(f"[ℹ️ INFO ARBITRAŻU: Faza 1 wskazała rodzaj żeński przy niskim tembrze F0 – potwierdzono dojrzały/ochrypły głos żeński (Filar CXXXVI/CLXXI) -> zachowano 'kobieta']")
+                return "kobieta", alerts
+            alerts.append(f"[🚨 ALARM ARBITRAŻU AKUSTYCZNEGO: Faza 1 wskazała rodzaj żeński, lecz obiektywny odsłuch F0 wykazuje głos męski (baryton/bas)! Wymuszono 'mężczyzna']")
+            return "mężczyzna", alerts
 
         # Case C: Direct Phase 1 or Fallback
         if phase1_is_female:
@@ -1920,16 +1951,10 @@ class MultimodalTranslator:
         - addressee_category: "grupa_kobiet" | "grupa_mężczyzn" | "grupa_mieszana" | "kobieta" | "mężczyzna" | "brak" | None
         - addressee_label: np. "Grupa Kobiet (L. mnoga niemęskoosobowa: -łyście)", "Naie (Kobieta)"
         """
-        # Pre-pass Episode Scene Cast Check (Continuous Scene Ground Truth)
-        check_idx = orig_idx if orig_idx is not None else (getattr(event, "_orig_idx", None) if getattr(event, "_orig_idx", None) is not None else event_idx)
-        if check_idx is not None and hasattr(self, "episode_scene_genders") and self.episode_scene_genders:
-            if check_idx in self.episode_scene_genders:
-                sc_g = self.episode_scene_genders[check_idx]
-                if sc_g == "kobieta":
-                    return "kobieta", "Kobieta (Scena Wyłącznie Kobieca - Pre-pass Odcinka)"
-                elif sc_g == "mężczyzna":
-                    return "mężczyzna", "Mężczyzna (Scena Wyłącznie Męska - Pre-pass Odcinka)"
-
+        if isinstance(whisper_text, dict):
+            whisper_text = str(whisper_text.get("text", ""))
+        else:
+            whisper_text = str(whisper_text or "")
         raw_norm = (raw_phase1_addressee or "").strip().lower()
         clean_lower = clean_text.lower()
         jp_lower = whisper_text.lower()
@@ -2001,11 +2026,18 @@ class MultimodalTranslator:
             if is_universal_crowd_vocative:
                 return "grupa_mieszana", "Grupa Mieszana (Zbiorowość/L. mnoga męskoosobowa: -liście)"
 
-            has_gendered_female = any(w in clean_lower for w in ["girl", "girls", "lady", "ladies", "women", "dziewcz", "kobiet"]) or any(w in raw_norm for w in ["grupa_kobiet", "kobieta", "kobiet", "żeńsk", "female", "dziewczyn"])
-            has_gendered_male = any(w in clean_lower for w in ["boy", "boys", "men", "chłopak", "panowie"]) or any(w in raw_norm for w in ["grupa_mężczyzn", "mężczyzna", "mężczyzn", "męsk", "male", "chłopak", "żołnierz"])
-            if has_gendered_female and not has_gendered_male:
+            check_idx = orig_idx if orig_idx is not None else (getattr(event, "_orig_idx", None) if getattr(event, "_orig_idx", None) is not None else event_idx)
+            sc_g = (self.episode_scene_genders.get(check_idx) if hasattr(self, "episode_scene_genders") and self.episode_scene_genders else None)
+
+            has_explicit_male = any(w in clean_lower for w in ["boy", "boys", "men", "chłopak", "panowie"]) or any(w in raw_norm for w in ["grupa_mężczyzn", "mężczyzna", "mężczyzn", "męsk", "male", "chłopak", "żołnierz"])
+            has_explicit_female = any(w in clean_lower for w in ["girl", "girls", "lady", "ladies", "women", "dziewcz", "kobiet"]) or any(w in raw_norm for w in ["grupa_kobiet", "kobieta", "kobiet", "żeńsk", "female", "dziewczyn"])
+
+            has_gendered_female = has_explicit_female or (sc_g == "kobieta")
+            has_gendered_male = has_explicit_male or (sc_g == "mężczyzna")
+
+            if has_gendered_female and not has_explicit_male:
                 return "grupa_kobiet", "Grupa Kobiet (L. mnoga niemęskoosobowa: -łyście)"
-            elif has_gendered_male and not has_gendered_female:
+            elif has_gendered_male and not has_explicit_female:
                 return "grupa_mężczyzn", "Grupa Mężczyzn (L. mnoga męskoosobowa: -liście)"
             else:
                 return "grupa_mieszana", "Grupa Mieszana (Zbiorowość/L. mnoga męskoosobowa: -liście)"
@@ -2040,6 +2072,7 @@ class MultimodalTranslator:
 
         # 1. Multi-Step Backward Interlocutor Search (up to 4 events, delta_t <= 8.0s)
         prev_interlocutor = None
+        prev_interlocutor_ev = None
         if event_idx > 0 and curr_spk:
             curr_clean = extract_clean_speaker_name(curr_spk).lower()
             for b_off in range(1, min(5, event_idx + 1)):
@@ -2051,6 +2084,7 @@ class MultimodalTranslator:
                     break
                 if cand_clean and cand_clean != curr_clean:
                     prev_interlocutor = cand_spk
+                    prev_interlocutor_ev = cand_ev
                     break
         elif event_idx == 0 and curr_spk:
             curr_clean = extract_clean_speaker_name(curr_spk).lower()
@@ -2069,6 +2103,27 @@ class MultimodalTranslator:
 
         if prev_interlocutor:
             p_res = resolve_actor_gender(prev_interlocutor, self.character_registry, getattr(self, "series_bible", None))
+            if getattr(self, "series_bible", None) and hasattr(self.series_bible, "audit_speaker_metadata_against_audio"):
+                p_sc_g = None
+                p_orig_idx = getattr(prev_interlocutor_ev, "_orig_idx", None) if (prev_interlocutor_ev and getattr(prev_interlocutor_ev, "_orig_idx", None) is not None) else None
+                if p_orig_idx is None and 'b_off' in locals():
+                    p_orig_idx = event_idx - b_off
+                if p_orig_idx is not None and hasattr(self, "episode_scene_genders") and self.episode_scene_genders:
+                    raw_sc = self.episode_scene_genders.get(p_orig_idx)
+                    if raw_sc in ["kobieta", "female", "FEMALE"]:
+                        p_sc_g = "FEMALE"
+                    elif raw_sc in ["mężczyzna", "male", "MALE"]:
+                        p_sc_g = "MALE"
+                p_audio_g = None
+                if speaker_tags and p_orig_idx is not None:
+                    p_tag = (speaker_tags.get(p_orig_idx + 1) or speaker_tags.get(p_orig_idx) or "").lower()
+                    if any(w in p_tag for w in ["żeński", "kobieta", "female", "alt", "sopran"]):
+                        p_audio_g = "FEMALE"
+                    elif any(w in p_tag for w in ["męski", "mężczyzna", "male", "baryton", "bas"]):
+                        p_audio_g = "MALE"
+                p_res_audited, is_cont = self.series_bible.audit_speaker_metadata_against_audio(prev_interlocutor, audio_gender=p_audio_g, scene_gender=p_sc_g)
+                if is_cont:
+                    p_res = p_res_audited
             if p_res == "FEMALE":
                 return "kobieta", f"{prev_interlocutor} (Kobieta)"
             elif p_res == "MALE":
@@ -2086,6 +2141,25 @@ class MultimodalTranslator:
                     break
                 if next_clean and next_clean != curr_clean:
                     next_res = resolve_actor_gender(next_spk, self.character_registry, getattr(self, "series_bible", None))
+                    if getattr(self, "series_bible", None) and hasattr(self.series_bible, "audit_speaker_metadata_against_audio"):
+                        next_sc_g = None
+                        next_orig_idx = getattr(next_ev, "_orig_idx", None) if getattr(next_ev, "_orig_idx", None) is not None else (event_idx + f_off)
+                        if hasattr(self, "episode_scene_genders") and self.episode_scene_genders:
+                            raw_sc = self.episode_scene_genders.get(next_orig_idx)
+                            if raw_sc in ["kobieta", "female", "FEMALE"]:
+                                next_sc_g = "FEMALE"
+                            elif raw_sc in ["mężczyzna", "male", "MALE"]:
+                                next_sc_g = "MALE"
+                        next_audio_g = None
+                        if speaker_tags and next_orig_idx is not None:
+                            n_tag = (speaker_tags.get(next_orig_idx + 1) or speaker_tags.get(next_orig_idx) or "").lower()
+                            if any(w in n_tag for w in ["żeński", "kobieta", "female", "alt", "sopran"]):
+                                next_audio_g = "FEMALE"
+                            elif any(w in n_tag for w in ["męski", "mężczyzna", "male", "baryton", "bas"]):
+                                next_audio_g = "MALE"
+                        next_res_audited, is_cont = self.series_bible.audit_speaker_metadata_against_audio(next_spk, audio_gender=next_audio_g, scene_gender=next_sc_g)
+                        if is_cont:
+                            next_res = next_res_audited
                     if next_res == "FEMALE":
                         return "kobieta", f"{next_spk} (Kobieta)"
                     elif next_res == "MALE":
@@ -2162,6 +2236,16 @@ class MultimodalTranslator:
                 return "kobieta", "Kobieta (Scena Wyłącznie Kobieca - Kotwica Bazy Wiedzy)"
             elif inf_g == "MALE":
                 return "mężczyzna", "Mężczyzna (Scena Wyłącznie Męska - Kotwica Bazy Wiedzy)"
+
+        # 2c. Pre-pass Episode Scene Cast Check (Fallback for Continuous Scene Ground Truth)
+        check_idx = orig_idx if orig_idx is not None else (getattr(event, "_orig_idx", None) if getattr(event, "_orig_idx", None) is not None else event_idx)
+        if check_idx is not None and hasattr(self, "episode_scene_genders") and self.episode_scene_genders:
+            if check_idx in self.episode_scene_genders:
+                sc_g = self.episode_scene_genders[check_idx]
+                if sc_g == "kobieta":
+                    return "kobieta", "Kobieta (Scena Wyłącznie Kobieca - Pre-pass Odcinka)"
+                elif sc_g == "mężczyzna":
+                    return "mężczyzna", "Mężczyzna (Scena Wyłącznie Męska - Pre-pass Odcinka)"
 
         # 3. Japanese Audio Addressee Clues (K1/K4)
         if wdd_tag.addressee_gender == "FEMALE":
@@ -2408,22 +2492,23 @@ class MultimodalTranslator:
                     from scene_snapper import SceneShotSnapper
                     is_black_fade = SceneShotSnapper.is_black_fade_boundary(event.start, prev_ev_end, black_list)
 
+                raw_whisper_item = whisper_transcriptions.get(idx + 1, "") if whisper_transcriptions else ""
+
+                # Whisper Telemetry Sanity Guard (0.00 PLN)
+                is_halluc_loop = WhisperDisambiguator.detect_hallucination_loop(raw_whisper_item)
+                if is_halluc_loop:
+                    jp_audio_line = ""
+                elif isinstance(raw_whisper_item, dict):
+                    jp_audio_line = str(raw_whisper_item.get("text", "")).lower()
+                else:
+                    jp_audio_line = str(raw_whisper_item).lower()
+
+                is_phantom = WhisperDisambiguator.filter_voice_activity(raw_whisper_item)
+                is_low_conf = WhisperDisambiguator.assess_acoustic_confidence(raw_whisper_item) == "LOW"
+
                 if prev_clean or is_shot_cut or is_black_fade:
                     prev_clean_lower = prev_clean.lower()
                     clean_en_lower = clean_text.lower().strip()
-                    raw_whisper_item = whisper_transcriptions.get(idx + 1, "") if whisper_transcriptions else ""
-
-                    # Whisper Telemetry Sanity Guard (0.00 PLN)
-                    is_halluc_loop = WhisperDisambiguator.detect_hallucination_loop(raw_whisper_item)
-                    if is_halluc_loop:
-                        jp_audio_line = ""
-                    elif isinstance(raw_whisper_item, dict):
-                        jp_audio_line = str(raw_whisper_item.get("text", "")).lower()
-                    else:
-                        jp_audio_line = str(raw_whisper_item).lower()
-
-                    is_phantom = WhisperDisambiguator.filter_voice_activity(raw_whisper_item)
-                    is_low_conf = WhisperDisambiguator.assess_acoustic_confidence(raw_whisper_item) == "LOW"
 
                     # Czy wystąpił dyskontinuitet czasowy lub przeskok sceny (Filar CLXV)
                     is_prev_private_request = any(
@@ -2455,13 +2540,18 @@ class MultimodalTranslator:
                         wdd_tag.is_shock_drop = True
                     compact_wdd_tag = WhisperDisambiguator.format_compact_ssot_tag(wdd_tag)
 
-                    if is_black_fade:
+                    is_split_continuation = bool(
+                        prev_clean.endswith(("...", "—", "-", "…")) or clean_text.strip().startswith(("...", "…"))
+                    )
+                    if is_split_continuation:
+                        relation_tag = " [🔗 SPÓJNOŚĆ SKŁADNIOWA: Kontynuacja myśli urwanej wielokropkiem przez cięcie montażowe (L-cut/J-cut) – ZACHOWAJ MAŁĄ LITERĘ I CIĄGŁOŚĆ ZDANIA!]"
+                    elif is_black_fade:
                         relation_tag = f" [🎬 CIĘCIE SCENY (Fade to Black / Eyecatch): Przejście przez czerń (pauza {time_gap_ms/1000.0:.1f}s) – nowa sekwencja (Filar CLXV); otwórz scenę ze świeżą energią i adekwatną intonacją]"
                     elif prosody_tags and "Ac=SHOCK_DROP" in prosody_tags.get(idx + 1, ""):
                         relation_tag = f" [⚡ PĘKNIĘCIE AFEKTYWNE (Filar CLXXVIII, Ac=SHOCK_DROP): Gwałtowne załamanie energii seiyū (szok/zamilknięcie); wygaś ładunek emocjonalny do szeptu/zduszonego głosu w harmonii z aktorem]"
                     elif (is_shot_cut or time_gap_ms >= 3800) and (is_prev_private_request or is_curr_delayed_agreement):
                         relation_tag = f" [🎬 CIĘCIE SCENY (FFmpeg) / DYSKONTINUITET CZASOWY: Nowe ujęcie (pauza {time_gap_ms/1000.0:.1f}s) / Zmiana sceny (Filar CLXV) – nowa rozmowa: 'Więc o co chodzi?' / 'Słucham cię']"
-                    elif is_shot_cut or (time_gap_ms >= 3800 and not (prev_clean.endswith("...") or prev_clean.endswith("—") or prev_clean.endswith("-"))):
+                    elif (is_shot_cut or time_gap_ms >= 3800) and not is_split_continuation:
                         relation_tag = f" [🎬 CIĘCIE SCENY (FFmpeg) / ZMIANA SCENY: Nowe ujęcie (pauza {time_gap_ms/1000.0:.1f}s) – nowa sekwencja (Filar CLXV); zachowaj świeży początek nowej sceny]"
                     else:
                         # Standardowa analiza par sąsiedztwa w obrębie tej samej sceny
@@ -2473,9 +2563,11 @@ class MultimodalTranslator:
 
                         prev_jp = ""
                         if idx > 0 and whisper_transcriptions:
-                            prev_jp = whisper_transcriptions.get(idx, "").lower()
+                            prev_raw = whisper_transcriptions.get(idx, "")
+                            prev_jp = (str(prev_raw.get("text", "")) if isinstance(prev_raw, dict) else str(prev_raw or "")).lower()
                         elif idx == 0 and history_context:
-                            prev_jp = history_context[-1].get("audio_jp", "").lower()
+                            hist_raw = history_context[-1].get("audio_jp", "")
+                            prev_jp = (str(hist_raw.get("text", "")) if isinstance(hist_raw, dict) else str(hist_raw or "")).lower()
 
                         is_prev_directive = any(
                             w in prev_clean_lower for w in [
@@ -2527,6 +2619,18 @@ class MultimodalTranslator:
                         series_bible=getattr(self, "series_bible", None)
                     )
                     compact_wdd_tag = WhisperDisambiguator.format_compact_ssot_tag(wdd_tag)
+
+                # Whisper JP-First Semantic Override & Anti-Pivot Cliché Detection (Filar CLXVI)
+                clean_en_lower = clean_text.lower().strip()
+                is_en_cliche = any(clean_en_lower.startswith(w) for w in ["sure", "all right", "yeah", "here", "i'm fine", "i am fine", "wait"])
+                has_jp_affirmation = any(tok in jp_audio_line for tok in ["hai", "ee", "un", "wakatta", "はい", "ええ", "うん", "分かった"])
+                if is_en_cliche and not has_jp_affirmation and jp_audio_line:
+                    if any(tok in jp_audio_line for tok in ["nani", "dou shita", "doushita", "nan da", "何", "どうした", "なんだ"]):
+                        k_alert = f"[🎙️ ALARM KLISZY FANSUBERSKIEJ (Filar CLXVI): W audio padło pytanie '{jp_audio_line}' bez potaknięcia – zignoruj angielskie 'Sure/Yeah', tłumacz: 'O co chodzi?' / 'Co się stało?']"
+                        relation_tag = f"{relation_tag} {k_alert}".strip() if relation_tag else f" {k_alert}"
+                    elif len(clean_text.split()) <= 2 and any(w == "here" for w in re.findall(r"\b[a-zA-Z]+\b", clean_en_lower)) and any(tok in jp_audio_line for tok in ["yoisho", "dokkoisho", "hora", "douzo"]):
+                        s_alert = "[🎙️ ALARM SZUMU KINEZJATYCZNEGO (Filar IV/XVIII/CLXVI): W audio seiyū jest gest/kakegoe – oddaj sytuacyjnie: 'Proszę / Trzymaj' lub zastosuj elipsę]"
+                        relation_tag = f"{relation_tag} {s_alert}".strip() if relation_tag else f" {s_alert}"
             except Exception:
                 relation_tag = ""
                 compact_wdd_tag = ""
@@ -2601,7 +2705,7 @@ class MultimodalTranslator:
                 elif line_addr_cat == "mężczyzna":
                     reg_desc = "2. os. lp. 'ty' do mężczyzny (-łeś / wzburzonego)"
                 else:
-                    reg_desc = "Bezpośredni na 'ty'"
+                    reg_desc = "Kontekstowy / Naturalny"
 
                 if event.name and not is_generic_actor_or_category(event.name):
                     spk_label = event.name
@@ -2617,7 +2721,7 @@ class MultimodalTranslator:
                 elif line_addr_cat:
                     addr_label = line_addr_cat.replace("_", " ").capitalize()
                 else:
-                    addr_label = "Rozmówca"
+                    addr_label = "Nieokreślony / Monolog"
 
                 lines.append(f"Kwestia [ID: {idx + 1}] [TYP: [DIALOG] {vtype['type_label']}]{relation_tag} (Czas: {start_str} - {end_str}) [MÓWCA: {spk_label} | ADRESAT: {addr_label} | REJESTR: {reg_desc}]{acoustic_str}:")
                 lines.append(f"  📄 SKRYPT PODSTAWOWY EN (TREŚĆ, FAKTY, SKŁADNIA I MAJUSKUŁA): {clean_display_text}")
@@ -2638,13 +2742,24 @@ class MultimodalTranslator:
                     clean_lower = clean_text.lower()
                     for term_en, term_pl in active_gloss.items():
                         if term_en and len(term_en) >= 3 and term_en.lower() in clean_lower:
-                            lines.append(f"  📖 SŁOWNIK KANONICZNY: '{term_en}' => '{term_pl}' (wymóg terminologiczny; unikaj powtarzania deskryptorów: jeśli w zdaniu jest już 'z prowincji', 'na górze', stosuj samą nazwę)")
+                            lines.append(f"  📖 SŁOWNIK KANONICZNY: '{term_en}' => '{term_pl}' (forma bazowa – w dialogu ZAWSZE odmieniaj przez polskie przypadki!; unikaj powtarzania deskryptorów: jeśli w zdaniu jest już 'z prowincji', 'na górze', stosuj samą nazwę)")
                 if vtype.get("is_top"):
                     lines.append(f"  (!) DIALOG GÓRNY / W TLE: Dialog postaci w tle/oddali – formatuj jako naturalny dialog mówiony (Sentence case).")
-                if duration_s <= 0.6:
+                is_split_part = (
+                    clean_text.strip().startswith("...")
+                    or clean_text.strip().startswith("…")
+                    or prev_clean.endswith("...")
+                    or prev_clean.endswith("…")
+                )
+                if duration_s <= 0.6 and not is_split_part:
                     lines.append(f"  (!) MIKRO-KWESTIA / DŹWIĘK WAHANIA (czas {duration_s:.1f}s, tempo {cps:.1f} z/s): Kwestia trwa ułamek sekundy! Zastosuj Filar CXXXIV: zredukuj do 1-2 słów (np. 'Znaczy...', 'Ech...', 'Cóż...').")
+                elif duration_s <= 0.6 and is_split_part:
+                    lines.append(f"  (!) KRÓTKI CZAS TRWANIA ({duration_s:.1f}s, tempo {cps:.1f} z/s): Fragment zdania rozbitego wielokropkiem! ZACHOWAJ CIĄGŁOŚĆ SKŁADNIOWĄ (Filar LVI & CLXIX) i zwięzłość AVT.")
                 elif is_fast:
                     lines.append(f"  (!) TEMPO CPS ({cps:.1f} z/s, czas {duration_s:.1f}s): Szybka kwestia! Zastosuj zwięzłą kondensację Belczyka.")
+
+                max_pl_chars = min(76, int(max(0.5, duration_s) * 17.0))
+                lines.append(f"  (!) BUDŻET ZNAKOWY AVT: Maksymalnie {max_pl_chars} znaków ze spacjami (tempo czytania 17.0 z/s, max 2 wiersze na ekranie) – NIE PRZEKRACZAJ!")
 
             if whisper_transcriptions and idx + 1 in whisper_transcriptions:
                 raw_jp_item = whisper_transcriptions[idx + 1]
@@ -3120,7 +3235,11 @@ class MultimodalTranslator:
 
         # 4. Call Gemini (Vision + Whisper text context)
         if whisper_transcriptions:
-            jp_raw_list = [v for v in whisper_transcriptions.values() if v]
+            jp_raw_list = [
+                str(v.get("text", "")).strip() if isinstance(v, dict) else str(v or "").strip()
+                for v in whisper_transcriptions.values() if v
+            ]
+            jp_raw_list = [t for t in jp_raw_list if t]
             if jp_raw_list:
                 romaji_samples = [to_romaji(text) for text in jp_raw_list[:2]]
                 romaji_line = " | ".join(romaji_samples)
@@ -3293,7 +3412,8 @@ class MultimodalTranslator:
             )
             subj_3p_str = " ".join(subj_3p) if subj_3p else ""
 
-            jp_text = whisper_transcriptions.get(batch_id, "") if whisper_transcriptions else ""
+            raw_jp_cand = whisper_transcriptions.get(batch_id, "") if whisper_transcriptions else ""
+            jp_text = str(raw_jp_cand.get("text", "")).strip() if isinstance(raw_jp_cand, dict) else str(raw_jp_cand or "").strip()
             romaji_str = to_romaji(jp_text) if jp_text else ""
             audio_jp_str = f"{jp_text} [{romaji_str}]" if romaji_str and romaji_str != jp_text else jp_text
 
@@ -3429,7 +3549,7 @@ class MultimodalTranslator:
                     if is_en_cliche and not has_jp_affirmation and jp_text:
                         if any(tok in jp_text.lower() for tok in ["nani", "dou shita", "doushita", "nan da", "何", "どうした", "なんだ"]):
                             relation_tag = f"{relation_tag} [🎙️ ALARM KLISZY FANSUBERSKIEJ (Filar CLXVI): W audio padło pytanie '{jp_text}' bez potaknięcia – zignoruj angielskie 'Sure/Yeah', tłumacz: 'O co chodzi?' / 'Co się stało?']".strip()
-                        elif "here" in clean_en.lower().strip() and any(tok in jp_text.lower() for tok in ["yoisho", "dokkoisho", "hora", "douzo"]):
+                        elif len(clean_en.split()) <= 2 and any(w == "here" for w in re.findall(r"\b[a-zA-Z]+\b", clean_en.lower())) and any(tok in jp_text.lower() for tok in ["yoisho", "dokkoisho", "hora", "douzo"]):
                             relation_tag = f"{relation_tag} [🎙️ ALARM SZUMU KINEZJATYCZNEGO (Filar IV/XVIII/CLXVI): W audio seiyū jest gest/kakegoe – oddaj sytuacyjnie: 'Proszę / Trzymaj' lub zastosuj elipsę]".strip()
             except Exception:
                 relation_tag = ""
@@ -3702,6 +3822,21 @@ class MultimodalTranslator:
             # Triangulate effective gender from character registry, audio F0 voice, and pragmatic clues (Filar CXXXVI)
             spk_gen = item.get("speaker_gender")
             spk_voice = item.get("speaker_voice", "")
+            spk_name = (item.get("speaker_name") or "").strip()
+            if not spk_gen and spk_name:
+                if spk_name in self.character_registry:
+                    cd = self.character_registry[spk_name].lower()
+                    if any(k in cd for k in self.FEMALE_ROLE_KEYWORDS):
+                        spk_gen = "kobieta"
+                    elif any(k in cd for k in self.MALE_ROLE_KEYWORDS):
+                        spk_gen = "mężczyzna"
+                elif hasattr(self, "series_bible") and self.series_bible and hasattr(self.series_bible, "get_character_gender"):
+                    bg = self.series_bible.get_character_gender(spk_name, allow_generic_nouns=False)
+                    if bg == "FEMALE":
+                        spk_gen = "kobieta"
+                    elif bg == "MALE":
+                        spk_gen = "mężczyzna"
+
             if not spk_gen:
                 v_lower = spk_voice.lower()
                 if "sopran" in v_lower or "alt żeński" in v_lower:
@@ -3709,12 +3844,11 @@ class MultimodalTranslator:
                 elif "alt starszej" in v_lower or "ochrypły alt" in v_lower:
                     # Low raspy voice (could be elderly female) - do not force male!
                     pass
-                elif "męski" in v_lower and "alt" not in v_lower and "ochrypł" not in v_lower:
+                elif any(k in v_lower for k in ["baryton", "bas", "tenor", "chłopięcy", "męski"]) and "alt" not in v_lower and "ochrypł" not in v_lower:
                     spk_gen = "mężczyzna"
                 elif "żeński" in v_lower:
                     spk_gen = "kobieta"
 
-            spk_name = (item.get("speaker_name") or "").strip()
             has_formal_voc = bool(re.search(
                 r"\b(panie|pani|panno|panu|pana)\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+|doktorze|profesorze|inspektorze|prezesie|dyrektorze|kierowniku|komisarzu)\b",
                 raw_final,
@@ -3724,14 +3858,15 @@ class MultimodalTranslator:
             final_text, fixes = AVTLinter.lint_and_fix_line(
                 text=raw_final,
                 speaker_gender=spk_gen,
-                is_all_girls_scene=(spk_gen in ["kobieta", "dziewczynka"]),
+                is_all_girls_scene=False,
                 is_sign=item.get("is_sign", False),
                 user_feedback_rules=all_user_rules,
                 custom_glossary=combined_glossary,
                 is_informal_ty=is_item_informal,
                 audio_jp=item.get("audio_jp", ""),
                 prev_line_text=prev_linted_line,
-                source_en=item.get("en", "")
+                source_en=item.get("en", ""),
+                addressee_gender=item.get("addressee")
             )
             prev_linted_line = final_text
             # Deterministic glossary overrides
@@ -4757,7 +4892,8 @@ class MultimodalTranslator:
                 line_addressees=translated_addressees,
                 line_speakers=translated_speakers,
                 source_subs=subs,
-                whisper_transcriptions=episode_whisper_transcriptions
+                whisper_transcriptions=episode_whisper_transcriptions,
+                enforce_line_split=True
             )
             if qg_fixes:
                 en_warnings = [f for f in qg_fixes if "nieprzetłumaczony angielski" in f]
