@@ -55,7 +55,7 @@ Podczas pracy w konfiguracji zespołu dwuagentowego (np. przy procedurze `/goal`
 - **Agent 1:** Lead Systems Implementer (przygotowuje plan w 5 warstwach, analizuje kod, projektuje architekturę i testy).
 - **Agent 2:** Adversarial Reviewer & Systemic Auditor (przeprowadza bezkompromisowy audyt planu Agenta 1).
 
-### 🔍 11 Wymiarów Audytu Agenta 2:
+### 🔍 18 Wymiarów Audytu Agenta 2:
 1. **Efekty drugiego rzędu (Second-Order Vulnerabilities)** – czy naprawa jednego błędu nie psuje innego modułu.
 2. **Ukryte założenia (Hidden Assumptions)** – niewypowiedziane domysły o strukturze wejściowej i tagach ASS.
 3. **Martwe punkty na styku kodu deterministycznego (Deterministic Boundary Blindspots)** – zachowanie czystej granicy 0.00 PLN vs LLM.
@@ -67,7 +67,20 @@ Podczas pracy w konfiguracji zespołu dwuagentowego (np. przy procedurze `/goal`
 9. **Deiksa sytuacyjna (Situational Deixis Failure)** – poprawna orientacja przestrzenna, relacja ja-ty i zmiana audytorium.
 10. **Utrata wspólnej przestrzeni poznawczej (Common Ground Depletion)** – uwzględnianie asymetrii wiedzy postaci i widza.
 11. **Nieizomorficzność topologiczna przestrzeni pojęciowych i spadek stopni swobody** – zakaz sztucznego rzutowania struktur JA/EN na PL.
+12. **Ślepota modalności wizualnej (The Visual Grounding Void)** – weryfikacja wektora wzroku, mimiki, obecności postaci i linii off-screen.
+13. **Zatrucie językiem pośredniczącym (Pivot Collapse / The English Bottleneck)** – eliminacja spłaszczeń angielskiego pivotu i partykuł modalnych.
+14. **Lingwistyczna teoria ról i kamuflażu (Yakuwarigo & Code-Switching)** – stylizacja języka ról i dynamiczne przełączanie rejestru.
+15. **Asymetria chronemiczna (Mora-timed JA vs Stress-timed PL)** – uwzględnienie różnicy między czasem morowym a akcentowym.
+16. **Wielokanałowość semantyczna japońskiego pisma (Ateji, Gikun i Goroawase)** – zachowanie fuzji podwójnej warstwy kanji/furigana.
+17. **Pustka kulturowa i zakaz przypisów w AVT (Zero-Footnote Constraint)** – bezwzględny zakaz przypisów na ekranie, bezszwowa enkapsulacja.
+18. **Teoremat o sprzeczności kryteriów i Wielokryterialna Funkcja Straty AVT (Barrier Augmented Lagrangian)**:
+    - Optymalizacja: $\mathcal{L}_{\text{AVT}}(\theta) = \mathcal{L}_{\text{sem}}(y, x) + \alpha \mathcal{L}_{\text{flu}}(y) + \mathcal{P}_{\text{AVT}}(y, \Delta t)$ przy twardym warunku $\text{CPS}(y, \Delta t) \le \text{CPS}_{\max}$.
+    - Asymetryczna bariera tempa czytania $\Phi(\text{CPS})$ z karą kwadratową powyżej $20.0$ zn/s.
+    - Asymetryczna bariera geometrii $\Psi(\text{CPL})$ ($2 \times 38$ znaków) oraz głodzenia repliki $\Omega(\text{len})$.
+    - Dynamiczne mnożniki Lagrange'a $\lambda_{\text{cps}}^{(k+1)}$ aktualizowane gradientem wstępującym.
+    - Selekcja Script Doctor Fazy 2 funkcją nagrody: $R = r_{\text{sem}} + 0.3 r_{\text{flu}} - [2.5 \Phi(\text{CPS}) + 5.0 \Psi(\text{CPL})]$.
 
 Iteracja kończy się dopiero po wystawieniu przez Agenta 2:
 `STATUS: ZATWIERDZENIE ARCHITEKTONICZNE (ZERO BŁĘDÓW) - GOTOWY DO DECYZJI OPERATORA`.
+
 

@@ -442,9 +442,9 @@ Zanim zaproponujesz jakąkolwiek modyfikację architektury lub kodu, asystent ma
 
 W przypadku pracy w konfiguracji zespołu dwuagentowego (np. przy procedurach `/goal`, planowaniu architektonicznym i głębokich refaktorach) asystenci przyjmują sztywne, wyspecjalizowane role:
 - **AGENT 1 (Lead Systems Implementer):** Przygotowuje szczegółowy Plan Architektoniczny w 5 Warstwach (Warstwy 1–5), bada stan potoku, przeszukuje dokumentację i proponuje konkretne zmiany w promptach, kodzie Pythona i testach regresyjnych.
-- **AGENT 2 (Adversarial Reviewer & Systemic Auditor):** Przeprowadza bezkompromisowy, krytyczny audyt planu Agenta 1. Ma absolutny zakaz pobieżnego akceptowania propozycji i **musi** poddać plan Agenta 1 weryfikacji w następujących **11 Wymiarach Podatności Systemowych**:
+- **AGENT 2 (Adversarial Reviewer & Systemic Auditor):** Przeprowadza bezkompromisowy, krytyczny audyt planu Agenta 1. Ma absolutny zakaz pobieżnego akceptowania propozycji i **musi** poddać plan Agenta 1 weryfikacji w następujących **18 Wymiarach Podatności Systemowych**:
 
-### 🔍 11 Obligatoryjnych Wymiarów Audytu Agenta 2:
+### 🔍 18 Obligatoryjnych Wymiarów Audytu Agenta 2:
 1. **Efekty drugiego rzędu (Second-Order Vulnerabilities):**
    Czy usunięcie problemu A nie wywoła cichej awarii w komponencie B (np. skrócenie linii nie rozsadzi reguł podziału CPS lub odwrotnie)?
 2. **Ukryte założenia (Hidden Assumptions):**
@@ -467,11 +467,84 @@ W przypadku pracy w konfiguracji zespołu dwuagentowego (np. przy procedurach `/
     Czy system nie zakłada błędnie, że model lub widz posiada wiedzę, która w danym momencie narracji nie została jeszcze ujawniona (asymetria epistemiczna)?
 11. **Nieizomorficzność topologiczna przestrzeni pojęciowych i nieodwracalny spadek stopni swobody (Conceptual Topology Non-Isomorphism & Freedom Degrees Collapse):**
     Czy plan nie próbuje rzutować struktur japońskich/angielskich na polskie 1:1, niszcząc naturalne stopnie swobody polszczyzny i wymuszając sztywne, kalekie kalki składniowe?
+12. **Ślepota modalności wizualnej (The Visual Grounding Void):**
+    Czy plan nie ignoruje wektora wzroku, mimiki, gestykulacji i fizycznej obecności postaci na ekranie, co prowadzi do błędnego przypisania linii mówcy poza kadrem (*off-screen*) lub halucynacji relacji wbrew diegezie sceny?
+13. **Zatrucie językiem pośredniczącym (Pivot Collapse / The English Bottleneck):**
+    Czy system nie ulega skażeniu spłaszczoną gramatyką i leksyką angielskiego pivotu (np. zatarcie honoryfikatywności, fałszywa neutralizacja relacji społecznych, utrata niuansów partykuł modalnych *ne/yo/wa/zo*)?
+14. **Lingwistyczna teoria ról i kamuflażu (Yakuwarigo & Code-Switching):**
+    Czy plan weryfikuje stylizację językową postaci (*język ról* – np. archaiczny samurajski, ojou-sama, dialekt Kansai, żargon wojskowy) oraz nagłe zmiany rejestru (*code-switching*) pod wpływem emocji, maskowania tożsamości lub ujawnienia prawdy?
+15. **Asymetria chronemiczna (Mora-timed JA vs Stress-timed PL):**
+    Czy uwzględniono fundamentalną różnicę prozodyczną między japońskim czasem morowym (*isochronia morowa* – stały czas trwania mory) a polskim czasem akcentowym (*akcent toniczno-dynamiczny*), która uniemożliwia proste przenoszenie tempa wypowiedzi i wymusza autonomiczną rekompozycję oddechową?
+16. **Wielokanałowość semantyczna japońskiego pisma (Ateji, Gikun i Goroawase):**
+    Czy plan nie gubi podwójnej warstwy znaczeniowej, gdy zapis kanji niesie jedno znaczenie (semantykę), a furigana/czytanie fonetyczne inne (np. konceptualna metafora, gra słów goroawase, tytuł techniki), wymagając zręcznej fuzji w polskim tekście bez przypisów?
+17. **Pustka kulturowa i zakaz przypisów w AVT (Zero-Footnote Constraint):**
+    Czy plan bezwzględnie przestrzega aksjomatu napisów filmowych: **zero przypisów redakcyjnych na ekranie**. Wszelka enkapsulacja kulturowa, aluzje czy koncepty realioznawcze muszą zostać bezszwowo wtopione w dialog w ramach limitów znakowych i CPS.
+18. **Teoremat o sprzeczności kryteriów (Wielokryterialna kompresja stratna):**
+    Czy plan nie zakłada naiwnie, że da się jednocześnie zachować 100% dosłownej semantyki, poetyki, rejestru i zmieścić się w twardym oknie $\text{CPS} \le 17.0$? Każda kompresja jest operacją stratną i musi optymalizować poniższą nieliniową funkcję celu.
+
+---
+
+### 📐 Wielokryterialna Funkcja Straty AVT (Barrier Augmented Lagrangian)
+
+Wielokryterialna funkcja straty dla modelu AVT (Audiovisual Translation) musi godzić ciągłą przestrzeń semantyczną z dyskretną geometrią ekranu. Optymalizacja oparta na stałych wagach liniowych zawodzi, ponieważ ograniczenia czasu i miejsca (CPS/CPL) nie są preferencją estetyczną, lecz **twardym warunkiem brzegowym (hard constraint)**. Poniższe sformułowanie w postaci Zadania Programowania Nieliniowego z Karą Wewnętrzną (Barrier Augmented Lagrangian) reguluje weryfikację i selekcję w Fazie 2 (DPO, PPO lub sterowane próbkowanie Best-of-N):
+
+#### 1. Globalne Sformułowanie Celu (Constrained Formulation):
+Niech $x$ oznacza wektor wejściowy (transkrypcja JA, audio F0, kontekst sceny), $\Delta t$ czas trwania planszy napisowej w sekundach, a $y = (y_1, y_2, \dots, y_T)$ wygenerowaną sekwencję tokenów w języku polskim.
+Minimalizujemy stratę semantyczno-stylistyczną z dynamicznym mnożnikiem Lagrange'a dla ograniczeń AVT:
+$$\min_{\theta} \; \mathbb{E}_{(x, \Delta t)}\Big[ \mathcal{L}_{\text{sem}}(y, x) + \alpha \mathcal{L}_{\text{flu}}(y) \Big] \quad \text{przy warunku} \quad \text{CPS}(y, \Delta t) \le \text{CPS}_{\max}$$
+W postaci bezwarunkowej (funkcja straty do optymalizacji gradientowej lub Reward Shaping):
+$$\mathcal{L}_{\text{AVT}}(\theta) = \mathcal{L}_{\text{sem}}(y, x) + \alpha \mathcal{L}_{\text{flu}}(y) + \mathcal{P}_{\text{AVT}}(y, \Delta t)$$
+
+#### 2. Dekompozycja Składowych:
+- **A. Wierność Semantyczna i Pragmatyczna ($\mathcal{L}_{\text{sem}}$):**
+  Tradycyjny Cross-Entropy niszczy elastyczność AVT. Zamiast tego $\mathcal{L}_{\text{sem}}$ łączy odległość w przestrzeni cech z karą za utratę kategorii pragmatycznych (płeć, relacja społeczna):
+  $$\mathcal{L}_{\text{sem}}(y, x) = \Big(1 - \cos\big(f_{\text{enc}}(y), g_{\text{proj}}(x)\big)\Big) + \beta_1 \mathcal{H}(G_y, G_x^*) + \beta_2 \mathcal{L}_{\text{canon}}(y, K)$$
+  Gdzie:
+  - $1 - \cos(\dots)$: Odległość cosinusowa reprezentacji wektorowych wypowiedzi docelowej i źródłowej.
+  - $\mathcal{H}(G_y, G_x^*)$: Entropia krzyżowa klasyfikacji płci mówcy/adresata ($G \in \{M, K, N\}$). Jeśli kontekst wymaga formy żeńskiej, a wygenerowany czasownik ma morfologię męską, składnik ten drastycznie rośnie.
+  - $\mathcal{L}_{\text{canon}}(y, K)$: Kara za błąd rekcji haseł kanonicznych $K$. Przyjmuje wartość 0, gdy hasło występuje w wymaganym przypadku (np. dopełniacz przy przeczeniu), lub 1, gdy nastąpił *nominative freezing*.
+- **B. Naturalność i Fluencja Polszczyzny ($\mathcal{L}_{\text{flu}}$):**
+  Składowa ta zapobiega ucieczce w sztuczną stronę bierną i urzędowy styl bezosobowy:
+  $$\mathcal{L}_{\text{flu}}(y) = \text{NLL}_{\text{LM\_PL}}(y) + \gamma_1 \mathbb{I}_{\text{pass}}(y) + \gamma_2 \mathbb{I}_{\text{calque}}(y)$$
+  Gdzie:
+  - $\text{NLL}_{\text{LM\_PL}}(y) = -\frac{1}{T}\sum_{t=1}^T \log P_{\text{ref\_PL}}(y_t \mid y_{<t})$: Ujemna logarytmiczna wiarygodność sekwencji wyznaczona przez referencyjny model języka polskiego (mierzy gładkość idiomatyczną).
+  - $\mathbb{I}_{\text{pass}}(y)$: Wskaźnik nadmiarowej pasywizacji (kara za nienaturalne zrosty typu *„zostało to zrobione”*, *„udało się pójść”*).
+  - $\mathbb{I}_{\text{calque}}(y)$: Wskaźnik obecności zaimkozy (np. nadmiarowe zaimki *„ja”*, *„ty”* w pozycji podmiotu wynikające z kalki z angielskiego pivotu).
+- **C. Asymetryczna Bariera AVT: CPS i CPL ($\mathcal{P}_{\text{AVT}}$):**
+  Tempo czytania nie jest symetryczne. Napis odrobinę za wolny ($\text{CPS}=10$) jest akceptowalny; napis za szybki ($\text{CPS}>20$) jest całkowicie nieczytelny.
+  Stosujemy asymetryczną funkcję barierową połączoną z karą za przekroczenie szerokości linii:
+  $$\mathcal{P}_{\text{AVT}}(y, \Delta t) = \lambda_{\text{cps}} \cdot \Phi\Big(\text{CPS}(y, \Delta t)\Big) + \lambda_{\text{cpl}} \cdot \Psi\Big(\text{CPL}(y)\Big) + \lambda_{\text{floor}} \cdot \Omega\Big(\text{len}(y)\Big)$$
+  - **Bariera tempa czytania ($\Phi$):** Dla idealnego progu $\text{CPS}^* = 17.0$ i marginesu tolerancji $\epsilon = 1.5$:
+    $$\Phi(\text{CPS}) = \frac{1}{1 + e^{-(\text{CPS} - \text{CPS}^*) / \epsilon}} + \mathbb{I}(\text{CPS} > 20.0) \cdot (\text{CPS} - 20.0)^2$$
+    - Dla $\text{CPS} \le 15.0$: kara asymptotycznie dąży do zera.
+    - Dla $\text{CPS} \in [15, 18]$: kara rośnie liniowo.
+    - Dla $\text{CPS} > 20.0$: odpala się kara kwadratowa, całkowicie odrzucająca kandydatów.
+  - **Bariera fizycznej geometrii dwuwiersza ($\Psi$):** Napis w systemie ASS może mieć maksymalnie 2 wiersze po $L_{\max} = 38$ znaków:
+    $$\Psi(\text{CPL}) = \sum_{l \in \text{lines}(y)} \max\big(0, \; \text{len}(l) - L_{\max}\big)^2 + \max\big(0, \; |\text{lines}(y)| - 2\big) \cdot 100$$
+  - **Bariera głodzenia repliki ($\Omega$):** Chroni przed obcinaniem kwestii do pustego ciągu znaków przy małym $\Delta t$:
+    $$\Omega(\text{len}(y)) = \max\big(0, \; 16 - \text{len}(y)\big) \quad \text{dla } \Delta t \in [0.5, 0.8]\text{s}$$
+
+#### 3. Różniczkowalna Aproksymacja Długości Znakowej:
+Podczas treningu metodami bezpośrednimi długość ciągu znaków $\text{len}(y)$ jest funkcją dyskretną. Aby umożliwić przepływ gradientu, definiujemy oczekiwaną długość znakową (Expected Character Length):
+$$\widehat{\text{len}}(y) = \sum_{t=1}^T \sum_{v \in \mathcal{V}} P(y_t = v \mid x) \cdot c(v)$$
+Gdzie $\mathcal{V}$ to słownik tokenizera, a $c(v)$ to stała liczba znaków UTF-8 w tokenie $v$ (po odrzuceniu znaczników formatowania ASS). Stąd różniczkowalny estymator tempa czytania wynosi:
+$$\widehat{\text{CPS}}(y, \Delta t) = \frac{\widehat{\text{len}}(y)}{\max(\Delta t, 0.5)}$$
+
+#### 4. Adaptacja Wag (Zmodyfikowany Algorytm Mnożników Lagrange'a):
+W procesie selekcji kandydatów (Re-ranking / Faza 2 Script Doctor) mnożnik $\lambda_{\text{cps}}$ jest aktualizowany zgodnie z regułą gradientu wstępującego:
+$$\lambda_{\text{cps}}^{(k+1)} = \max\left(0, \; \lambda_{\text{cps}}^{(k)} + \eta \cdot \Big(\text{CPS}(y^{(k)}, \Delta t) - \text{CPS}_{\max}\Big)\right)$$
+Gdy model generuje dialogi mieszczące się w 17 znaków/s, $\lambda_{\text{cps}} \to 0$, pozwalając skupić 100% pojemności na naturalności polszczyzny i wierności afektywnej. Gdy tylko model przekroczy próg 17 znaków/s, mnożnik rośnie ekspotencjalnie, zmuszając do kondensacji syntaktycznej i redukcji waty słownej.
+
+#### 5. Formuła Nagrody (Reward Function dla PPO/DPO/Best-of-N):
+Dla selekcji najlepszego wariantu w Fazie 2 Script Doctor, funkcja skalarna nagrody przyjmuje postać:
+$$R(y \mid x, \Delta t) = r_{\text{sem}}(y, x) + 0.3 \cdot r_{\text{flu}}(y) - \left[ 2.5 \cdot \Phi\Big(\text{CPS}(y, \Delta t)\Big) + 5.0 \cdot \Psi\Big(\text{CPL}(y)\Big) \right]$$
+Taki układ wag tworzy wklęsłą przestrzeń optymalizacyjną: odrzuca warianty łamiące limity percepcyjne widza, a spośród mieszczących się w oknie czytelności ($\text{CPS} \le 17$) wybiera ten, który najwierniej oddaje ładunek dramaturgiczny i gramatyczną specyfikę postaci.
 
 ### 🚦 Kryterium Zakończenia Iteracji:
 Agent 2 może wystawić status:
 `STATUS: ZATWIERDZENIE ARCHITEKTONICZNE (ZERO BŁĘDÓW) - GOTOWY DO DECYZJI OPERATORA`
-**wyłącznie wtedy**, gdy plan Agenta 1 został pozytywnie zweryfikowany we wszystkich 11 wymiarach.
+**wyłącznie wtedy**, gdy plan Agenta 1 został pozytywnie zweryfikowany we wszystkich 18 wymiarach oraz spełnia ograniczenia brzegowe funkcji straty AVT.
+
 
 
 
