@@ -39,6 +39,13 @@ echo.
 echo [1/3] Dodawanie plikow do paczki (git add)...
 git add .
 
+:: Sprawdz czy git ma skonfigurowanego uzytkownika (zabezpieczenie nowego PC)
+git config user.name >nul 2>&1
+if %ERRORLEVEL% neq 0 (
+    git config user.name "Piotrek"
+    git config user.email "piotrek@translator.local"
+)
+
 echo [2/3] Zapisywanie zmian (git commit)...
 git commit -m "%COMMIT_MSG%"
 
