@@ -45,38 +45,43 @@ git commit -m "%COMMIT_MSG%"
 echo [3/3] Wysylanie do chmury GitHuba (git push)...
 git push origin main
 
-if %ERRORLEVEL% equ 0 (
-    echo.
-    echo ================================================================
-    echo [SUKCES] Zmiany zostaly pomyslnie wyslane do GitHuba!
-    echo Mozesz teraz przejsc na drugi komputer i uruchomic tam:
-    echo   -> POBIERZ_ZMIANY_Z_CHMURY.bat
-    echo ================================================================
-    goto :end_ok
-) else (
-    echo.
-    echo [INFO] W chmurze znajduja sie nowsze zmiany z drugiego komputera.
-    echo Proba automatycznego scalenia (git pull --no-rebase)...
-    git pull --no-rebase origin main --no-edit
-    if %ERRORLEVEL% equ 0 (
-        echo [OK] Zmiany zostaly pomyslnie scalone! Ponawiam wysylanie...
-        git push origin main
-        if %ERRORLEVEL% equ 0 (
-            echo.
-            echo ================================================================
-            echo [SUKCES] Zmiany zostaly pomyslnie scalone i wyslane do GitHuba!
-            echo ================================================================
-            goto :end_ok
-        )
-    )
-    echo.
-    echo ================================================================
-    echo [BLAD] Nie udalo sie wyslac zmian do GitHuba.
-    echo Sprawdz polaczenie internetowe lub uprawnienia do repozytorium.
-    echo ================================================================
-)
+if %ERRORLEVEL% equ 0 goto :success_push
 
-:end_ok
+echo.
+echo [INFO] W chmurze znajduja sie nowsze zmiany z drugiego komputera.
+echo Proba automatycznego scalenia (git pull --no-rebase)...
+git pull --no-rebase origin main --no-edit
+if %ERRORLEVEL% neq 0 goto :error_push
+
+echo [OK] Zmiany zostaly pomyslnie scalone! Ponawiam wysylanie...
+git push origin main
+if %ERRORLEVEL% equ 0 goto :success_merge_push
+
+:error_push
+echo.
+echo ================================================================
+echo [BLAD] Nie udalo sie wyslac zmian do GitHuba.
+echo Sprawdz polaczenie internetowe lub uprawnienia do repozytorium.
+echo ================================================================
+goto :end_script
+
+:success_merge_push
+echo.
+echo ================================================================
+echo [SUKCES] Zmiany zostaly pomyslnie scalone i wyslane do GitHuba!
+echo ================================================================
+goto :end_script
+
+:success_push
+echo.
+echo ================================================================
+echo [SUKCES] Zmiany zostaly pomyslnie wyslane do GitHuba!
+echo Mozesz teraz przejsc na drugi komputer i uruchomic tam:
+echo   -> POBIERZ_ZMIANY_Z_CHMURY.bat
+echo ================================================================
+goto :end_script
+
+:end_script
 echo.
 echo Nacisnij dowolny klawisz, aby zamknac to okno...
 pause >nul
