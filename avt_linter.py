@@ -5381,35 +5381,15 @@ class EpisodeQualityGate:
 
                 label_spk = spk_name or ("kobieta" if spk_gen == "FEMALE" else "mężczyzna")
 
-                # Quote & Indirect Speech Shield (Filar CLXX - 0.00 PLN)
-                # Protect reported speech enclosed within quotes („...”, "...", »...«)
-                # when preceded by dialogue reporting verbs/colons or followed by dialogue attribution dashes
+                # Quote & Indirect Speech Shield (Filar CLXX / CLXXXVII - 0.00 PLN)
+                # Protect reported speech enclosed within quotes („...”, "...", »...«, «...»)
                 quote_shield_map = {}
                 def _quote_shield_repl(qm):
-                    prefix = qm.group(1) or ""
-                    quoted = qm.group(2)
-                    suffix = qm.group(3) or ""
                     q_key = f"__QUOTE_SHIELD_{len(quote_shield_map)}__"
-                    quote_shield_map[q_key] = quoted
-                    return f"{prefix}{q_key}{suffix}"
+                    quote_shield_map[q_key] = qm.group(0)
+                    return q_key
 
-                # Reported speech introduced by colon or reporting verbs
-                quote_pat = (
-                    r"(\b(?:powiedział[a-ząćęłńóśźż]*|mówi[łła][a-ząćęłńóśźż]*|rzek[łła][a-ząćęłńóśźż]*|krzykn[ąę][łła][a-ząćęłńóśźż]*|"
-                    r"napisa[łła][a-ząćęłńóśźż]*|twierdzi[łła][a-ząćęłńóśźż]*|odpar[łła][a-ząćęłńóśźż]*|powtarza[łła][a-ząćęłńóśźż]*|"
-                    r"brzmi|głosi|słowa|cytat)\s*:\s*|:\s*)"
-                    r"(„[^”\r\n]+”|\"[^\"\r\n]+\"|»[^«\r\n]+«|«[^»\r\n]+»)"
-                    r"()"
-                )
-                ev.text = re.sub(quote_pat, _quote_shield_repl, ev.text, flags=re.IGNORECASE)
-
-                # Reported speech followed by dialogue attribution dash
-                quote_tag_pat = (
-                    r"()"
-                    r"(„[^”\r\n]+”|\"[^\"\r\n]+\"|»[^«\r\n]+«|«[^»\r\n]+»)"
-                    r"(\s*[-–—]\s*(?:powiedział[a-ząćęłńóśźż]*|mówi[łła][a-ząćęłńóśźż]*|rzek[łła][a-ząćęłńóśźż]*|krzykn[ąę][łła][a-ząćęłńóśźż]*|odpar[łła][a-ząćęłńóśźż]*|doda[łła][a-ząćęłńóśźż]*))"
-                )
-                ev.text = re.sub(quote_tag_pat, _quote_shield_repl, ev.text, flags=re.IGNORECASE)
+                ev.text = re.sub(r'(„[^”\r\n]+”|\"[^\"\r\n]+\"|»[^«\r\n]+«|«[^»\r\n]+»)', _quote_shield_repl, ev.text)
 
                 if spk_gen == "MALE":
                     for f_pat, m_repl in FIRST_PERSON_FEMININE_TO_MASCULINE:
@@ -7723,6 +7703,19 @@ class EpisodeQualityGate:
                             return f"{prefix}{voc}{punct}"
                     return m.group(0)
                 ev.text = re.sub(r"(^|[\\\/][Nnh]|\b(?:och|ach|hej|o|ej|halo),?\s+)([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]{2,})([,?!])", _eqg_fem_voc_repl, ev.text)
+
+            # 4g. GENITIVE OF NEGATION & CANON OBLIQUE CASE NORMALIZATION (Filar CLXXXVIII - 0.00 PLN)
+            if not is_sign and ev.text:
+                from series_memory import sanitize_genitive_of_negation, sanitize_canon_compound_oblique_cases
+                old_neg_t = ev.text
+                ev.text = sanitize_genitive_of_negation(ev.text)
+                if ev.text != old_neg_t:
+                    fixes.append(f"[Episode Quality Gate - Filar CLXXXVIII Rekcja Zaprzeczona] Linia #{i+1}: skorygowano biernik na dopełniacz przy zaprzeczeniu -> '{ev.text}'")
+
+                old_obl_t = ev.text
+                ev.text = sanitize_canon_compound_oblique_cases(ev.text)
+                if ev.text != old_obl_t:
+                    fixes.append(f"[Episode Quality Gate - Filar CLXXXVIII Prewencja Mianownizacji Kanonu] Linia #{i+1}: skorygowano zamrożony mianownik terminu po przyimku -> '{ev.text}'")
 
             # 5. PUNCTUATION & TYPOGRAPHY HYGIENE
             # Purge punctuation collisions: exclamation mark immediately preceding comma (!,) -> comma

@@ -203,9 +203,12 @@ class DialogueVerifier:
             "       * 👂 Ucho: oddech, CPS, dynamika ping-ponga (Filar CLIV).\n"
             "       * 🌍 Świat: relacje statusu, nienaruszalność formy Pan/Ty (Filar CLVII), perspektywa incognito (Filar CLXI).\n"
             "       * 🎬 Obraz i Audio: afekt seiyū, gesty, napisy ekranowe vs dialog.\n"
-            "   KROK 3: PROAKTYWNY AUDYT NEGATYWNY REJESTRU (NEGATIVE REGISTER & CALQUE GATE - FILAR X & AGENTS.MD §9):\n"
-            "     - Twarda eliminacja błędów fleksyjnych, literówek i kalek leksykalnych jest w 100% finalizowana przez deterministyczny silnik EpisodeQualityGate (0.00 PLN).\n"
-            "     - W swoim myśleniu skup się wyłącznie na szlachetności, godności i żywości dialogu w świecie przedstawionym.\n"
+            "   KROK 3: PROAKTYWNY AUDYT NEGATYWNY REJESTRU, PŁCI I REKCJI (NEGATIVE REGISTER, GENDER & CALQUE GATE - FILAR X, CLXXXVII, CLXXXVIII):\n"
+            "     - Zgodność płciowa: Upewnij się, że końcówki 1. osoby mówczyń (-am, -ałam, -łabym) oraz formy 2. osoby do adresatek (-aś, -ałaś, jesteś pewna) i grup żeńskich (-yście, one) są bezwzględnie poprawne.\n"
+            "     - Ścisła rekcja zaprzeczona (Genitive of Negation): Każdy czasownik przechodni podlegający negacji (nie mam, nie widzę, nie znam) BEZWZGLĘDNIE wymaga dopełniacza (nie mam czasu, nie widzę sensu).\n"
+            "     - Prewencja mianownizacji kanonu: Terminy kanoniczne odmieniaj swobodnie przez przypadki po przyimkach (np. 'z Aurą Gilotyną', 'dla Wielkiego Chana').\n"
+            "     - Twarda eliminacja błędów fleksyjnych, literówek i kalek leksykalnych jest dodatkowo w 100% asekurowana przez deterministyczny silnik EpisodeQualityGate (0.00 PLN).\n"
+            "     - W swoim myśleniu skup się na autentyczności, szlachetności i żywości dialogu w świecie przedstawionym.\n"
         )
         prompt_lines.append("W polu 'changes_made' dla KAŻDEJ poprawionej kwestii podaj DOKŁADNE uzasadnienie i numer Filaru AVT (np. '[Filar IV - Szyk Zdania] Usunięto kalkę angielską' lub '[Filar CLVII - Forma Adresatywna] Usunięto 'wygrał pan' -> 'wygrałeś''). Jeśli kwestia nie wymagała poprawek, wpisz null.")
         

@@ -2334,6 +2334,14 @@ KOMPLEKSOWY RDZEŃ PRZEKŁADU AUDIOWIZUALNEGO (CORE AVT CANON - BELCZYK, BARAŃC
 - W rozmowie dwóch mężczyzn wszelkie zapytania kierowane do rozmówcy formułujemy w rodzaju męskim ('Czytałeś to może?', 'Widziałeś to?', 'Byłeś tam?'; eliminujemy formy żeńskie 'Czytałaś?' / 'Widziałaś?' wynikające z bezrodzajowości angielskiego 'you').
 - W rozmowie dwóch kobiet wszelkie zapytania kierowane do rozmówczyni formułujemy w rodzaju żeńskim ('Czytałaś to może?', 'Widziałaś to?', 'Byłaś tam?'; eliminujemy formy męskie 'Czytałeś?' / 'Widziałeś?').
 - Płynność relacyjna i autentyczność dialogu: Zachowaj naturalny styl i rytm żywego dialogu filmowego wypracowany w Fazie 2, dbając o czystą harmonię gramatyczną form adresatywnych z tożsamością interlokutora.
+
+20. ZARZĄDZANIE PŁCIĄ W TOPOLOGII SCENY (FILAR CLXXXVII):
+- Topologia mówca-odbiorca: W monologu i dialogu płeć gramatyczna mówcy (1. osoba: -am, -ałam, -łabym u kobiet; -em, -iłem, -łbym u mężczyzn) oraz adresata (2. osoba: -aś, -ałaś, jesteś pewna u kobiety; -eś, -iłeś, jesteś pewien u mężczyzny) musi być w 100% spójna z tożsamością postaci.
+- Liczba mnoga i grupy żeńskie: Zwracając się do grupy kobiet (liczba mnoga niemęskoosobowa/żeńska) stosuj formy: -yście (np. 'przyszłyście', 'widziałyście', 'zrobiłyście') oraz zaimek 'one', kategorycznie eliminując męskoosobowe formy '-iście' ('przyszliście', 'widzieliście', 'oni').
+
+21. ŚCISŁA REKCJA ZAPRZECZONA I PREWENCJA MIANOWNIZACJI KANONU (FILAR CLXXXVIII):
+- Genitive of Negation: Każdy czasownik przechodni rządu biernikowego podlegający zaprzeczeniu partykułą 'nie' bezwzględnie wymusza zmianę przypadku dopełnienia bliższego z Biernika na Dopełniacz ('nie mam czasu', 'nie widzę sensu', 'nie znam tej prawdy', 'nie pamiętam tej chwili', 'nie rozumiem tej sprawy'; eliminujemy kalki biernikowe: 'nie mam czas', 'nie widzę sens').
+- Prewencja mianownizacji terminów kanonicznych: Wszelkie zarejestrowane terminy i tytuły kanoniczne (złożone z przydawki lub członu nadrzędnego) muszą swobodnie i harmonijnie odmieniać się przez przypadki zależne po przyimkach ('z Aurą Gilotyną', 'dla Wielkiego Chana', 'u boku Mistrza Eru'; kategorycznie eliminujemy zamrażanie form w mianowniku: 'z Aura Gilotyna', 'dla Wielki Chan').
 """
 
 ACTIVE_AVT_CRAFT_CANON = r"""
@@ -3829,6 +3837,32 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Op
             "W dynamicznym dialogu dwuosobowym (np. Man A / Man B lub Woman A / Woman B) formy czasowników 2. osoby "
             "czasu przeszłego/przypuszczającego oraz orzeczniki przymiotnikowe harmonizuj z płcią interlokutora: "
             "w rozmowie mężczyzn pytaj po męsku ('Czytałeś to może?', 'Widziałeś to?'), eliminując kalkę żeńskich końcówek z angielskiego 'you'."
+        )
+
+    # 128. Zarządzanie Płcią w Topologii Sceny (Filar CLXXXVII)
+    has_topology_gender_trigger = any(
+        any(k in str(item.get("notes", "")).lower() for k in ["female", "kobieta", "dziewczyn", "mówczyni", "speaker: woman", "filar clxxxvii", "grupa kobiet", "panie", "obie"]) or
+        any(k in str(item.get("pl", "")).lower() for k in ["byłam", "zrobiłam", "poszłam", "wiedziałam", "byłaś", "przyszłyście", "zrobiłyście"]) or
+        re.search(r"\b(you\s+(?:girls|women|ladies)|you\s+all)\b", str(item.get("en", "")), re.IGNORECASE)
+        for item in batch_items
+    )
+    if has_topology_gender_trigger:
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CLXXXVII - Zarządzanie Płcią w Topologii Sceny]: "
+            "Uzgadniaj formy 1. i 2. osoby z płcią postaci: u mówczyń stosuj formy żeńskie (-am, -ałam, -łabym), "
+            "zwracając się do kobiety formy żeńskie (-aś, jesteś pewna), a do grupy kobiet formy niemęskoosobowe (-yście, one)."
+        )
+
+    # 129. Ścisła Rekcja Zaprzeczona i Prewencja Mianownizacji Kanonu (Filar CLXXXVIII)
+    has_negation_or_canon_freezing_trigger = any(
+        re.search(r"\b(don't have|no time|no choice|can't see|not know|don't know|not remember|nie mam|nie widzę|nie znam|nie pamiętam|aura|chan)\b", str(item.get("en", "")) + " " + str(item.get("pl", "")), re.IGNORECASE)
+        for item in batch_items
+    )
+    if has_negation_or_canon_freezing_trigger:
+        focused_pillars.append(
+            "• [SKUP SIĘ NA: FILAR CLXXXVIII - Ścisła Rekcja Zaprzeczona i Kanon]: "
+            "Czasowniki przechodnie zaprzeczone partykułą 'nie' bezwzględnie wymuszają dopełniacz ('nie mam czasu', 'nie widzę sensu'). "
+            "Wieloczłonowe terminy kanoniczne odmieniaj swobodnie po przyimkach ('z Aurą Gilotyną', 'dla Wielkiego Chana')."
         )
 
     if not focused_pillars:

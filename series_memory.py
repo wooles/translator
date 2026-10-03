@@ -744,6 +744,12 @@ INVARIABLE_JAPANESE_FEMALE_NAMES = {
     "himeko", "seele", "bronya", "raiden", "yae"
 }
 
+FOREIGN_FEMALE_CONSONANT_NAMES = {
+    "chulan", "frieren", "fern", "carmen", "miriam", "ines", "rachel", "astrid", "judith",
+    "gwen", "karin", "marin", "rin", "shion", "sion", "helen", "ellen", "karen", "vivian",
+    "lyn", "lynn", "ann", "anne", "jean", "joan", "jill", "kim", "dawn", "megan", "beth"
+}
+
 def is_inherently_female_name(name: str) -> bool:
     """
     Returns True if the name is an inherently female first name (Polish or universal female name
@@ -758,7 +764,7 @@ def is_inherently_female_name(name: str) -> bool:
         return False
     if clean in MALE_EXCEPTIONS_ON_A:
         return False
-    if clean in POLISH_FEMALE_NAMES or clean in UNIVERSAL_FEMALE_NAMES_ON_A or clean in INVARIABLE_JAPANESE_FEMALE_NAMES:
+    if clean in POLISH_FEMALE_NAMES or clean in UNIVERSAL_FEMALE_NAMES_ON_A or clean in INVARIABLE_JAPANESE_FEMALE_NAMES or clean in FOREIGN_FEMALE_CONSONANT_NAMES:
         return True
 
     # Vocative of known Polish female name ending with -o or -u
@@ -1406,7 +1412,7 @@ def generate_polish_name_declension(name: str, gender: str = "UNKNOWN") -> Dict[
         return {"M": n, "D": n, "C": n, "B": n, "N": n, "Ms": n, "W": n}
 
     is_female = (g == "FEMALE" or "KOBIETA" in g or "ŻEŃSK" in g)
-    if not is_female and (n.lower() in INVARIABLE_JAPANESE_FEMALE_NAMES or is_inherently_female_name(n)):
+    if not is_female and (n.lower() in INVARIABLE_JAPANESE_FEMALE_NAMES or n.lower() in FOREIGN_FEMALE_CONSONANT_NAMES or is_inherently_female_name(n)):
         is_female = True
 
     # 0a. Adjectives / adjectival names and titles (e.g. Wielka, Wielki, Czarna, Czarny, Nieśmiertelny, Sobieski)
@@ -1866,6 +1872,77 @@ TYPO_NORMALIZATIONS = [
 ]
 
 
+def replace_with_case_preservation(pattern: str, replacement: str, text: str) -> str:
+    """Replaces matches of pattern with replacement, preserving initial capitalization of matched token."""
+    def _sub_cb(m):
+        orig = m.group(0)
+        if orig and orig[0].isupper():
+            return replacement[0].upper() + replacement[1:]
+        return replacement.lower()
+    return re.sub(pattern, _sub_cb, text, flags=re.IGNORECASE)
+
+
+TRANSITIVE_NEGATION_REPLACEMENTS = [
+    # nie mam + B. -> D.
+    (r"\bnie\s+mam\s+czas\b", "nie mam czasu"),
+    (r"\bnie\s+mam\s+wybór\b", "nie mam wyboru"),
+    (r"\bnie\s+mam\s+ochotę\b", "nie mam ochoty"),
+    (r"\bnie\s+mam\s+nadzieję\b", "nie mam nadziei"),
+    (r"\bnie\s+mam\s+siłę\b", "nie mam siły"),
+    # nie znam / nie zna + B. -> D.
+    (r"\bnie\s+znam\s+tę\s+prawdę\b", "nie znam tej prawdy"),
+    (r"\bnie\s+znam\s+odpowiedź\b", "nie znam odpowiedzi"),
+    (r"\bnie\s+zna\s+litość\b", "nie zna litości"),
+    (r"\bnie\s+zna\s+granice\b", "nie zna granic"),
+    # nie widzę / nie widzi + B. -> D.
+    (r"\bnie\s+widzę\s+żaden\s+sens\b", "nie widzę żadnego sensu"),
+    (r"\bnie\s+widzę\s+inny\s+sposób\b", "nie widzę innego sposobu"),
+    (r"\bnie\s+widzi\s+przeszkody\b", "nie widzi przeszkód"),
+    # nie czuję / nie pamiętam + B. -> D.
+    (r"\bnie\s+pamiętam\s+ten\s+dzień\b", "nie pamiętam tego dnia"),
+    (r"\bnie\s+czuję\s+strach\b", "nie czuję strachu"),
+]
+
+
+def sanitize_genitive_of_negation(text: str) -> str:
+    """
+    Enforces Genitive of Negation on closed high-certainty transitive verb collocations (Filar CLXXXVIII / 0.00 PLN).
+    Preserves case capitalization.
+    """
+    if not text:
+        return ""
+    res = text
+    for pat, repl in TRANSITIVE_NEGATION_REPLACEMENTS:
+        res = replace_with_case_preservation(pat, repl, res)
+    return res
+
+
+CANON_OBLIQUE_CORRECTIONS = [
+    # Narzędnik po z/ze
+    (r"\b([Zz]e?)\s+Aura\s+Gilotyna\b", r"\1 Aurą Gilotyną"),
+    (r"\b([Zz]e?)\s+Wielki\s+Chan\b", r"\1 Wielkim Chanem"),
+    # Dopełniacz po u/do/od/dla
+    (r"\b([Dd]la|[Uu]|[Oo]d|[Dd]o)\s+Aura\s+Gilotyna\b", r"\1 Aury Gilotyny"),
+    (r"\b([Dd]la|[Uu]|[Oo]d|[Dd]o)\s+Wielki\s+Chan\b", r"\1 Wielkiego Chana"),
+    # Celownik po przeciwko/ku
+    (r"\b([Pp]rzeciwko|[Kk]u)\s+Aura\s+Gilotyna\b", r"\1 Aurze Gilotynie"),
+    (r"\b([Pp]rzeciwko|[Kk]u)\s+Wielki\s+Chan\b", r"\1 Wielkiemu Chanowi"),
+]
+
+
+def sanitize_canon_compound_oblique_cases(text: str) -> str:
+    """
+    Corrects frozen nominative compound canon syntagmas governed by prepositions (Filar CLXXXVIII / 0.00 PLN).
+    'z Aura Gilotyna' -> 'z Aurą Gilotyną', 'dla Wielki Chan' -> 'dla Wielkiego Chana'.
+    """
+    if not text:
+        return ""
+    res = text
+    for pat, repl in CANON_OBLIQUE_CORRECTIONS:
+        res = re.sub(pat, repl, res)
+    return res
+
+
 def sanitize_lexical_text(text: str) -> str:
     """Sanitizes text against known LLM/OCR typos and deformed Polish words (Filar CLXIV/CLXX)."""
     if not text:
@@ -2002,6 +2079,9 @@ def sanitize_pronominal_somatic_possession(text: str) -> str:
         lambda m: "Przez ciebie" if m.group(1) == "Z" else "przez ciebie",
         res
     )
+
+    res = sanitize_genitive_of_negation(res)
+    res = sanitize_canon_compound_oblique_cases(res)
 
     return res
 

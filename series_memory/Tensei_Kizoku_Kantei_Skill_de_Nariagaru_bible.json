@@ -10,7 +10,8 @@
     },
     "Ars": {
       "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
-      "source": "quality_gate"
+      "source": "quality_gate",
+      "gender": "MALE"
     },
     "Charlotte -> Ars": {
       "description": "Zwrot: 'na ty / Arsie' (bliska towarzyszka / przyjaciółka -> suweren) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
@@ -45,13 +46,15 @@
     },
     "Braham": {
       "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
-      "source": "quality_gate"
+      "source": "quality_gate",
+      "gender": "MALE"
     },
     "Ars Louvent": {
       "description": "mężczyzna (13-14 lat, młody namiestnik okręgu Canarre i głowa rodu Louvent) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Rietz Muses": {
-      "description": "mężczyzna (Ok. 24 lata, pierwszy rycerz i prawa ręka Arsa, pochodzący z ludu Marka) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "mężczyzna (Ok. 24 lata, pierwszy rycerz i prawa ręka Arsa, pochodzący z ludu Marka) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+      "gender": "MALE"
     },
     "Charlotte Wraith": {
       "description": "kobieta (Ok. 16 lat, naczelna czarodziejka rodu Louvent) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
@@ -144,7 +147,8 @@
       "B": "Rietza",
       "N": "Rietzem",
       "Ms": "Rietzie",
-      "W": "Rietzie"
+      "W": "Rietzie",
+      "gender": "MALE"
     },
     "Ars": {
       "M": "Ars",
@@ -153,7 +157,8 @@
       "B": "Arsa",
       "N": "Arsem",
       "Ms": "Arsie",
-      "W": "Arsie"
+      "W": "Arsie",
+      "gender": "MALE"
     },
     "Charlotte": {
       "M": "Charlotte",
@@ -162,7 +167,8 @@
       "B": "Charlotte",
       "N": "Charlotte",
       "Ms": "Charlotte",
-      "W": "Charlotte"
+      "W": "Charlotte",
+      "gender": "MALE"
     },
     "Mireille": {
       "M": "Mireille",
@@ -171,7 +177,8 @@
       "B": "Mireille",
       "N": "Mireille",
       "Ms": "Mireille",
-      "W": "Mireille"
+      "W": "Mireille",
+      "gender": "MALE"
     },
     "Licia": {
       "M": "Licia",
@@ -180,7 +187,8 @@
       "B": "Licię",
       "N": "Licią",
       "Ms": "Licii",
-      "W": "Licio"
+      "W": "Licio",
+      "gender": "MALE"
     },
     "Zaht": {
       "M": "Zaht",
@@ -189,7 +197,8 @@
       "B": "Zahta",
       "N": "Zahtem",
       "Ms": "Zahcie",
-      "W": "Zahcie"
+      "W": "Zahcie",
+      "gender": "MALE"
     },
     "Braham": {
       "M": "Braham",
@@ -198,7 +207,8 @@
       "B": "Brahama",
       "N": "Brahamem",
       "Ms": "Brahamie",
-      "W": "Brahamie"
+      "W": "Brahamie",
+      "gender": "MALE"
     },
     "Ars Louvent": {
       "M": "Ars Louvent",
@@ -207,7 +217,8 @@
       "B": "Arsa Louventa",
       "N": "Arsem Louventem",
       "Ms": "Arsie Louvencie",
-      "W": "Arsie Louvencie"
+      "W": "Arsie Louvencie",
+      "gender": "MALE"
     },
     "Rietz Muses": {
       "M": "Rietz Muses",
@@ -216,7 +227,8 @@
       "B": "Rietza Musesa",
       "N": "Rietzem Musesem",
       "Ms": "Rietzie Musesie",
-      "W": "Rietzie Musesie"
+      "W": "Rietzie Musesie",
+      "gender": "MALE"
     },
     "Charlotte Wraith": {
       "M": "Charlotte Wraith",
@@ -225,7 +237,8 @@
       "B": "Charlotte Wraith",
       "N": "Charlotte Wraith",
       "Ms": "Charlotte Wraith",
-      "W": "Charlotte Wraith"
+      "W": "Charlotte Wraith",
+      "gender": "FEMALE"
     },
     "Rosell Kischa": {
       "M": "Rosell Kischa",
@@ -234,7 +247,8 @@
       "B": "Rosella Kischę",
       "N": "Rosellem Kischą",
       "Ms": "Rosellu Kische",
-      "W": "Rosellu Kischo"
+      "W": "Rosellu Kischo",
+      "gender": "MALE"
     },
     "Lycia Plaid": {
       "M": "Lycia Plaid",
@@ -243,7 +257,8 @@
       "B": "Lycię Plaid",
       "N": "Lycią Plaid",
       "Ms": "Lycii Plaid",
-      "W": "Lycio Plaid"
+      "W": "Lycio Plaid",
+      "gender": "FEMALE"
     },
     "Raven Louvent": {
       "M": "Raven Louvent",
@@ -252,7 +267,8 @@
       "B": "Ravena Louventa",
       "N": "Ravenem Louventem",
       "Ms": "Ravenie Louvencie",
-      "W": "Ravenie Louvencie"
+      "W": "Ravenie Louvencie",
+      "gender": "MALE"
     },
     "Mireille Grangeon": {
       "M": "Mireille Grangeon",
@@ -261,7 +277,8 @@
       "B": "Mireille Grangeon",
       "N": "Mireille Grangeon",
       "Ms": "Mireille Grangeon",
-      "W": "Mireille Grangeon"
+      "W": "Mireille Grangeon",
+      "gender": "FEMALE"
     },
     "Fam": {
       "M": "Fam",
@@ -270,7 +287,8 @@
       "B": "Fama",
       "N": "Famem",
       "Ms": "Famie",
-      "W": "Famie"
+      "W": "Famie",
+      "gender": "MALE"
     },
     "Lumeire Pyres": {
       "M": "Lumeire Pyres",
@@ -279,7 +297,8 @@
       "B": "Lumeire Pyresa",
       "N": "Lumeire Pyresem",
       "Ms": "Lumeire Pyresie",
-      "W": "Lumeire Pyresie"
+      "W": "Lumeire Pyresie",
+      "gender": "MALE"
     },
     "Sofia Louvent": {
       "M": "Sofia Louvent",
@@ -288,7 +307,8 @@
       "B": "Sofię Louvent",
       "N": "Sofią Louvent",
       "Ms": "Sofii Louvent",
-      "W": "Sofio Louvent"
+      "W": "Sofio Louvent",
+      "gender": "FEMALE"
     },
     "Krall Orslo": {
       "M": "Krall Orslo",
@@ -297,7 +317,8 @@
       "B": "Kralla Orslo",
       "N": "Krallem Orslo",
       "Ms": "Krallu Orslo",
-      "W": "Krallu Orslo"
+      "W": "Krallu Orslo",
+      "gender": "MALE"
     },
     "Menas Lenard": {
       "M": "Menas Lenard",
@@ -306,7 +327,8 @@
       "B": "Menasa Lenarda",
       "N": "Menasem Lenardem",
       "Ms": "Menasie Lenardzie",
-      "W": "Menasie Lenardzie"
+      "W": "Menasie Lenardzie",
+      "gender": "MALE"
     },
     "Hammond Plaid": {
       "M": "Hammond Plaid",
@@ -315,7 +337,8 @@
       "B": "Hammonda Plaida",
       "N": "Hammondem Plaidem",
       "Ms": "Hammondzie Plaidzie",
-      "W": "Hammondzie Plaidzie"
+      "W": "Hammondzie Plaidzie",
+      "gender": "MALE"
     },
     "Kreitz Louvent": {
       "M": "Kreitz Louvent",
@@ -324,7 +347,8 @@
       "B": "Kreitza Louventa",
       "N": "Kreitzem Louventem",
       "Ms": "Kreitzie Louvencie",
-      "W": "Kreitzie Louvencie"
+      "W": "Kreitzie Louvencie",
+      "gender": "MALE"
     },
     "Ren Louvent": {
       "M": "Ren Louvent",
@@ -333,7 +357,8 @@
       "B": "Ren Louvent",
       "N": "Ren Louvent",
       "Ms": "Ren Louvent",
-      "W": "Ren Louvent"
+      "W": "Ren Louvent",
+      "gender": "FEMALE"
     },
     "Couran Salamakhia": {
       "M": "Couran Salamakhia",
@@ -342,7 +367,8 @@
       "B": "Courana Salamakhię",
       "N": "Couranem Salamakhią",
       "Ms": "Couranie Salamakhii",
-      "W": "Couranie Salamakhio"
+      "W": "Couranie Salamakhio",
+      "gender": "MALE"
     },
     "Zaht Brozud": {
       "M": "Zaht Brozud",
@@ -351,7 +377,8 @@
       "B": "Zahta Brozuda",
       "N": "Zahtem Brozudem",
       "Ms": "Zahcie Brozudzie",
-      "W": "Zahcie Brozudzie"
+      "W": "Zahcie Brozudzie",
+      "gender": "MALE"
     },
     "Musia Trick": {
       "M": "Musia Trick",
@@ -360,7 +387,8 @@
       "B": "Musię Trick",
       "N": "Musią Trick",
       "Ms": "Musii Trick",
-      "W": "Musio Trick"
+      "W": "Musio Trick",
+      "gender": "FEMALE"
     },
     "Rosell": {
       "M": "Rosell",
@@ -369,7 +397,8 @@
       "B": "Rosella",
       "N": "Rosellem",
       "Ms": "Rosellu",
-      "W": "Rosellu"
+      "W": "Rosellu",
+      "gender": "MALE"
     },
     "Musia": {
       "M": "Musia",
@@ -378,7 +407,8 @@
       "B": "Musię",
       "N": "Musią",
       "Ms": "Musii",
-      "W": "Musio"
+      "W": "Musio",
+      "gender": "FEMALE"
     },
     "Krantz": {
       "M": "Krantz",
@@ -387,7 +417,8 @@
       "B": "Krantza",
       "N": "Krantzem",
       "Ms": "Krantzie",
-      "W": "Krantzie"
+      "W": "Krantzie",
+      "gender": "MALE"
     },
     "Shin Seymarrow": {
       "M": "Shin Seymarrow",
@@ -396,7 +427,8 @@
       "B": "Shina Seymarrowa",
       "N": "Shinem Seymarrowem",
       "Ms": "Shinie Seymarrowie",
-      "W": "Shinie Seymarrowie"
+      "W": "Shinie Seymarrowie",
+      "gender": "MALE"
     },
     "Vasmarque": {
       "M": "Vasmarque",
@@ -405,7 +437,8 @@
       "B": "Vasmarque",
       "N": "Vasmarque",
       "Ms": "Vasmarque",
-      "W": "Vasmarque"
+      "W": "Vasmarque",
+      "gender": "MALE"
     },
     "Cesarstwo Summerforth": {
       "M": "Cesarstwo Summerforth",
@@ -441,7 +474,8 @@
       "B": "Guarda Captaina",
       "N": "Guardem Captainem",
       "Ms": "Guardzie Captainie",
-      "W": "Guardzie Captainie"
+      "W": "Guardzie Captainie",
+      "gender": "MALE"
     }
   },
   "hypocorisms": {},
