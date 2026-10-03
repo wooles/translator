@@ -13340,6 +13340,81 @@ def test_canon_compound_oblique_preposition_and_nominative_unfreezing_guard():
     print(" -> PASSED: Test 142 w 100% potwierdza eliminację mianownizacji terminów kanonicznych po przyimkach (0.00 PLN).")
 
 
+def test_global_quote_shield_and_adverbial_negation_guard():
+    print("[TEST 143/144] Test Globalnego QuoteShield w 3. Osobie oraz Dopełniacza Negacji z Wtrąceniami (0.00 PLN)...")
+    from series_memory import sanitize_genitive_of_negation
+    from avt_linter import EpisodeQualityGate
+    import pysubs2
+
+    # Asercja 1: QuoteShield chroni cytowane wypowiedzi w 3. osobie przed maskulinizacją
+    subs = pysubs2.SSAFile()
+    subs.events = [
+        pysubs2.SSAEvent(start=1000, end=2500, name="Shira", text="Shira powiedział: „Byłam wyczerpana i głodna”."),
+        pysubs2.SSAEvent(start=3000, end=4500, name="Eru", text="Eru zapytał: „Dlaczego to zrobiłaś?”."),
+        pysubs2.SSAEvent(start=5000, end=6500, name="Shira", text="Mówca rzekł: „Byłam tam”, a potem: „Nie poszłam”.")
+    ]
+    out_subs, fixes = EpisodeQualityGate.audit_and_fix_entire_episode(subs=subs)
+    assert out_subs.events[0].text == "Shira powiedział: „Byłam wyczerpana i głodna”."
+    assert out_subs.events[1].text == "Eru zapytał: „Dlaczego to zrobiłaś?”."
+    assert out_subs.events[2].text == "Mówca rzekł: „Byłam tam”, a potem: „Nie poszłam”."
+
+    # Asercja 2: Elastyczny dopełniacz zaprzeczenia z oknem wtrąceń (już, teraz, wcale, w tym, etc.)
+    negation_cases = [
+        ("Nie mam już czas na zbędne dyskusje.", "Nie mam już czasu na zbędne dyskusje."),
+        ("Nie mam teraz wybór w tej sprawie.", "Nie mam teraz wyboru w tej sprawie."),
+        ("Nie widzę w tym sens, by kontynuować.", "Nie widzę w tym sensu, by kontynuować."),
+        ("Nie widzę wcale sens w twoich słowach.", "Nie widzę wcale sensu w twoich słowach."),
+        ("Nie czuję ani trochę strach przed wami.", "Nie czuję ani trochę strachu przed wami."),
+        ("Nie mam siłę, by wstać.", "Nie mam siły, by wstać."),
+        ("Nie znam tej prawdy o przeszłości.", "Nie znam tej prawdy o przeszłości."),
+        # Antykolizja: zdanie z przecinkiem nie może mutować
+        ("Nie mam, co robić w wolnym czasie.", "Nie mam, co robić w wolnym czasie."),
+        # Poprawny dopełniacz nie ulega degradacji
+        ("Nie mam już czasu na nic.", "Nie mam już czasu na nic."),
+        ("Nie widzę w tym żadnego sensu.", "Nie widzę w tym żadnego sensu.")
+    ]
+    for inp, expected in negation_cases:
+        out = sanitize_genitive_of_negation(inp)
+        assert out == expected, f"BŁĄD rekcji zaprzeczonej: '{inp}' -> '{out}', oczekiwano '{expected}'"
+
+    print(" -> PASSED: Test 143 w 100% potwierdza działanie globalnego QuoteShield w 3. osobie oraz elastycznego dopełniacza negacji (0.00 PLN).")
+
+
+def test_series_bible_onomastic_precedence_and_2line_cpl_rebalancer_guard():
+    print("[TEST 144/144] Test Hierarchii Prawdy Onomastycznej SeriesBible oraz Rebalancera Dwuwiersza Psi(CPL) (0.00 PLN)...")
+    from series_memory import SeriesBible, is_inherently_female_name
+    from avt_linter import EpisodeQualityGate
+    import pysubs2
+
+    # Asercja 1: Epistemic Precedence w is_inherently_female_name
+    # 1a. Bez SeriesBible 'Jean' traktowane jest domyślnie jako obca spółgłoska żeńska
+    assert is_inherently_female_name("Jean") is True
+    # 1b. Z SeriesBible definiującą 'Jean' jako MĘŻCZYZNĘ, heurystyka jest blokowana
+    bible = SeriesBible("Test_Anime_Universe")
+    bible.data["characters"]["Jean"] = {"gender": "MALE", "role": "kapitan"}
+    assert is_inherently_female_name("Jean", series_bible=bible) is False
+
+    # 1c. Kanoniczne imiona męskie są chronione przed żeńską heurystyką
+    assert is_inherently_female_name("Shira") is False
+    assert is_inherently_female_name("Akira") is False
+    assert is_inherently_female_name("Robert") is False
+
+    # Asercja 2: Rebalancer dwuwiersza Psi(CPL) w EpisodeQualityGate
+    subs_cpl = pysubs2.SSAFile()
+    # Pierwsza linia ma 46 znaków (przekracza barierę 38), druga 12 znaków
+    subs_cpl.events = [
+        pysubs2.SSAEvent(start=1000, end=4000, text=r"To jest niesłychanie długa kwestia dialogowa\Nkrótki wers.")
+    ]
+    out_cpl, fixes_cpl = EpisodeQualityGate.audit_and_fix_entire_episode(subs=subs_cpl, enforce_line_split=True)
+    # Sprawdź, czy nastąpił rebalancing dwuwiersza i czy linie nie przekraczają 38 znaków
+    lines = out_cpl.events[0].text.split(r"\N")
+    assert len(lines) == 2, f"BŁĄD: Oczekiwano 2 linii po rebalansie, otrzymano: {lines}"
+    assert all(len(l.strip()) <= 38 for l in lines), f"BŁĄD: Linie przekraczają 38 znaków po rebalansie: {lines}"
+    assert any("Bariera CPL (Rebalans Dwuwiersza)" in f for f in fixes_cpl), f"BŁĄD: Brak wpisu o rebalansie dwuwiersza w fixes: {fixes_cpl}"
+
+    print(" -> PASSED: Test 144 w 100% potwierdza hierarchię prawdy onomastycznej SeriesBible oraz rebalancer dwuwiersza Psi(CPL) (0.00 PLN).")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -13481,6 +13556,8 @@ if __name__ == "__main__":
     test_transitive_genitive_of_negation_and_case_preservation_guard()
     test_foreign_female_consonant_name_invariance_and_male_inflection_guard()
     test_canon_compound_oblique_preposition_and_nominative_unfreezing_guard()
-    print("\n Wszystkie testy jednostkowe i integracyjne (142/142) zakończone pełnym sukcesem!\n")
+    test_global_quote_shield_and_adverbial_negation_guard()
+    test_series_bible_onomastic_precedence_and_2line_cpl_rebalancer_guard()
+    print("\n Wszystkie testy jednostkowe i integracyjne (144/144) zakończone pełnym sukcesem!\n")
 
 

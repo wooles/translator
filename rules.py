@@ -2338,10 +2338,12 @@ KOMPLEKSOWY RDZEŃ PRZEKŁADU AUDIOWIZUALNEGO (CORE AVT CANON - BELCZYK, BARAŃC
 20. ZARZĄDZANIE PŁCIĄ W TOPOLOGII SCENY (FILAR CLXXXVII):
 - Topologia mówca-odbiorca: W monologu i dialogu płeć gramatyczna mówcy (1. osoba: -am, -ałam, -łabym u kobiet; -em, -iłem, -łbym u mężczyzn) oraz adresata (2. osoba: -aś, -ałaś, jesteś pewna u kobiety; -eś, -iłeś, jesteś pewien u mężczyzny) musi być w 100% spójna z tożsamością postaci.
 - Liczba mnoga i grupy żeńskie: Zwracając się do grupy kobiet (liczba mnoga niemęskoosobowa/żeńska) stosuj formy: -yście (np. 'przyszłyście', 'widziałyście', 'zrobiłyście') oraz zaimek 'one', kategorycznie eliminując męskoosobowe formy '-iście' ('przyszliście', 'widzieliście', 'oni').
+- Nienaruszalność cytatów w polilogach: Cytowane wypowiedzi („...”) zachowują tożsamość i płeć oryginalnego autora, niezależnie od płci postaci aktualnie cytującej.
 
-21. ŚCISŁA REKCJA ZAPRZECZONA I PREWENCJA MIANOWNIZACJI KANONU (FILAR CLXXXVIII):
-- Genitive of Negation: Każdy czasownik przechodni rządu biernikowego podlegający zaprzeczeniu partykułą 'nie' bezwzględnie wymusza zmianę przypadku dopełnienia bliższego z Biernika na Dopełniacz ('nie mam czasu', 'nie widzę sensu', 'nie znam tej prawdy', 'nie pamiętam tej chwili', 'nie rozumiem tej sprawy'; eliminujemy kalki biernikowe: 'nie mam czas', 'nie widzę sens').
+21. ŚCISŁA REKCJA ZAPRZECZONA, KANON I ASYMETRYCZNE BARIERY AVT (FILAR CLXXXVIII):
+- Genitive of Negation: Każdy czasownik przechodni rządu biernikowego podlegający zaprzeczeniu partykułą 'nie' bezwzględnie wymusza zmianę przypadku dopełnienia bliższego z Biernika na Dopełniacz ('nie mam czasu', 'nie widzę sensu', 'nie znam tej prawdy', 'nie pamiętam tej chwili', 'nie rozumiem tej sprawy'; eliminujemy kalki biernikowe: 'nie mam czas', 'nie widzę sens'). Zasada obejmuje również wtrącenia partykułowo-przysłówkowe ('nie mam już czasu', 'nie widzę wcale sensu', 'nie widzę w tym sensu').
 - Prewencja mianownizacji terminów kanonicznych: Wszelkie zarejestrowane terminy i tytuły kanoniczne (złożone z przydawki lub członu nadrzędnego) muszą swobodnie i harmonijnie odmieniać się przez przypadki zależne po przyimkach ('z Aurą Gilotyną', 'dla Wielkiego Chana', 'u boku Mistrza Eru'; kategorycznie eliminujemy zamrażanie form w mianowniku: 'z Aura Gilotyna', 'dla Wielki Chan').
+- Asymetryczna bariera percepcji AVT: Przestrzegaj twardych ograniczeń geometryczno-percepcyjnych: tempo czytania $\Phi(\text{CPS}) \le 17$ zn./s oraz fizyczna długość wiersza $\Psi(\text{CPL}) \le 38$ znaków na wiersz.
 """
 
 ACTIVE_AVT_CRAFT_CANON = r"""
@@ -3850,7 +3852,8 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Op
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR CLXXXVII - Zarządzanie Płcią w Topologii Sceny]: "
             "Uzgadniaj formy 1. i 2. osoby z płcią postaci: u mówczyń stosuj formy żeńskie (-am, -ałam, -łabym), "
-            "zwracając się do kobiety formy żeńskie (-aś, jesteś pewna), a do grupy kobiet formy niemęskoosobowe (-yście, one)."
+            "zwracając się do kobiety formy żeńskie (-aś, jesteś pewna), a do grupy kobiet formy niemęskoosobowe (-yście, one). "
+            "Cytaty („...”) zachowują płeć oryginalnego autora."
         )
 
     # 129. Ścisła Rekcja Zaprzeczona i Prewencja Mianownizacji Kanonu (Filar CLXXXVIII)
@@ -3860,9 +3863,9 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Op
     )
     if has_negation_or_canon_freezing_trigger:
         focused_pillars.append(
-            "• [SKUP SIĘ NA: FILAR CLXXXVIII - Ścisła Rekcja Zaprzeczona i Kanon]: "
-            "Czasowniki przechodnie zaprzeczone partykułą 'nie' bezwzględnie wymuszają dopełniacz ('nie mam czasu', 'nie widzę sensu'). "
-            "Wieloczłonowe terminy kanoniczne odmieniaj swobodnie po przyimkach ('z Aurą Gilotyną', 'dla Wielkiego Chana')."
+            "• [SKUP SIĘ NA: FILAR CLXXXVIII - Ścisła Rekcja Zaprzeczona i Bariery AVT]: "
+            "Czasowniki przechodnie zaprzeczone partykułą 'nie' bezwzględnie wymuszają dopełniacz również przy wtrąceniach ('nie mam już czasu', 'nie widzę w tym sensu'). "
+            "Wieloczłonowe terminy kanoniczne odmieniaj po przyimkach ('z Aurą Gilotyną'). Zachowaj barierę CPS <= 17 i CPL <= 38."
         )
 
     if not focused_pillars:

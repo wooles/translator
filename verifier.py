@@ -204,9 +204,9 @@ class DialogueVerifier:
             "       * 🌍 Świat: relacje statusu, nienaruszalność formy Pan/Ty (Filar CLVII), perspektywa incognito (Filar CLXI).\n"
             "       * 🎬 Obraz i Audio: afekt seiyū, gesty, napisy ekranowe vs dialog.\n"
             "   KROK 3: PROAKTYWNY AUDYT NEGATYWNY REJESTRU, PŁCI I REKCJI (NEGATIVE REGISTER, GENDER & CALQUE GATE - FILAR X, CLXXXVII, CLXXXVIII):\n"
-            "     - Zgodność płciowa: Upewnij się, że końcówki 1. osoby mówczyń (-am, -ałam, -łabym) oraz formy 2. osoby do adresatek (-aś, -ałaś, jesteś pewna) i grup żeńskich (-yście, one) są bezwzględnie poprawne.\n"
-            "     - Ścisła rekcja zaprzeczona (Genitive of Negation): Każdy czasownik przechodni podlegający negacji (nie mam, nie widzę, nie znam) BEZWZGLĘDNIE wymaga dopełniacza (nie mam czasu, nie widzę sensu).\n"
-            "     - Prewencja mianownizacji kanonu: Terminy kanoniczne odmieniaj swobodnie przez przypadki po przyimkach (np. 'z Aurą Gilotyną', 'dla Wielkiego Chana').\n"
+            "     - Zgodność płciowa i cytaty: Upewnij się, że końcówki 1. osoby mówczyń (-am, -ałam, -łabym) oraz formy 2. osoby do adresatek (-aś, -ałaś, jesteś pewna) i grup żeńskich (-yście, one) są bezwzględnie poprawne. Cytaty („...”) w dialogach zachowują płeć oryginalnego autora.\n"
+            "     - Ścisła rekcja zaprzeczona (Genitive of Negation): Każdy czasownik przechodni podlegający negacji (nie mam, nie widzę, nie znam) BEZWZGLĘDNIE wymaga dopełniacza również przy wtrąceniach (nie mam już czasu, nie widzę w tym sensu).\n"
+            "     - Prewencja mianownizacji kanonu i bariery AVT: Terminy kanoniczne odmieniaj swobodnie przez przypadki po przyimkach (np. 'z Aurą Gilotyną'). Przestrzegaj twardych barier AVT: tempo czytania CPS <= 17 i długość wiersza CPL <= 38.\n"
             "     - Twarda eliminacja błędów fleksyjnych, literówek i kalek leksykalnych jest dodatkowo w 100% asekurowana przez deterministyczny silnik EpisodeQualityGate (0.00 PLN).\n"
             "     - W swoim myśleniu skup się na autentyczności, szlachetności i żywości dialogu w świecie przedstawionym.\n"
         )

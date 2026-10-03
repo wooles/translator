@@ -750,20 +750,32 @@ FOREIGN_FEMALE_CONSONANT_NAMES = {
     "lyn", "lynn", "ann", "anne", "jean", "joan", "jill", "kim", "dawn", "megan", "beth"
 }
 
-def is_inherently_female_name(name: str) -> bool:
+def is_inherently_female_name(name: str, series_bible: Any = None) -> bool:
     """
     Returns True if the name is an inherently female first name (Polish or universal female name
     in the curated onomastic database or its vocative form on -o/-u).
     Excludes male exceptions on -a (Kuba, Barnaba, Kosma, etc.), interjections ('ała'),
-    and generic grammatical categories ('kobieta', 'mężczyzna').
+    generic grammatical categories ('kobieta', 'mężczyzna'), and canonical male names.
+    If series_bible is provided, epistemic precedence checks whether the character is registered as MALE.
     """
     if not name:
         return False
     clean = extract_clean_speaker_name(name).strip().lower()
     if is_generic_actor_or_category(clean):
         return False
-    if clean in MALE_EXCEPTIONS_ON_A:
+    if clean in MALE_EXCEPTIONS_ON_A or clean in CANONICAL_MALE_NAMES:
         return False
+
+    if series_bible and hasattr(series_bible, "get_character_gender"):
+        try:
+            bible_gen = series_bible.get_character_gender(clean, allow_generic_nouns=False)
+            if bible_gen == "MALE":
+                return False
+            if bible_gen == "FEMALE":
+                return True
+        except Exception:
+            pass
+
     if clean in POLISH_FEMALE_NAMES or clean in UNIVERSAL_FEMALE_NAMES_ON_A or clean in INVARIABLE_JAPANESE_FEMALE_NAMES or clean in FOREIGN_FEMALE_CONSONANT_NAMES:
         return True
 
@@ -1882,23 +1894,45 @@ def replace_with_case_preservation(pattern: str, replacement: str, text: str) ->
     return re.sub(pattern, _sub_cb, text, flags=re.IGNORECASE)
 
 
-TRANSITIVE_NEGATION_REPLACEMENTS = [
+TRANSITIVE_NEGATION_BASE_COLLOCATIONS = [
+    # (verb_pattern, direct_object_pattern, genitive_replacement)
     # nie mam + B. -> D.
+    (r"nie\s+mam", r"czas", "czasu"),
+    (r"nie\s+mam", r"wybór", "wyboru"),
+    (r"nie\s+mam", r"ochotę", "ochoty"),
+    (r"nie\s+mam", r"nadzieję", "nadziei"),
+    (r"nie\s+mam", r"siłę", "siły"),
+    # nie znam / nie zna + B. -> D.
+    (r"nie\s+znam", r"tę\s+prawdę", "tej prawdy"),
+    (r"nie\s+znam", r"odpowiedź", "odpowiedzi"),
+    (r"nie\s+zna", r"litość", "litości"),
+    (r"nie\s+zna", r"granice", "granic"),
+    # nie widzę / nie widzi + B. -> D.
+    (r"nie\s+widzę", r"żaden\s+sens", "żadnego sensu"),
+    (r"nie\s+widzę", r"inny\s+sposób", "innego sposobu"),
+    (r"nie\s+widzę", r"sens", "sensu"),
+    (r"nie\s+widzi", r"przeszkody", "przeszkód"),
+    # nie czuję / nie pamiętam + B. -> D.
+    (r"nie\s+pamiętam", r"ten\s+dzień", "tego dnia"),
+    (r"nie\s+czuję", r"strach", "strachu"),
+]
+
+# Safe conversational adverbs/particles (<= 2 words, strictly no commas)
+NEGATION_ADVERBIAL_SPAN = r"(?:\s+(?:już|teraz|wcale|ani\s+trochę|tutaj|tu|tam|wciąż|nadal|przecież|nawet|zresztą|zbytnio|w\s+tym|chyba|naprawdę))?"
+
+TRANSITIVE_NEGATION_REPLACEMENTS = [
     (r"\bnie\s+mam\s+czas\b", "nie mam czasu"),
     (r"\bnie\s+mam\s+wybór\b", "nie mam wyboru"),
     (r"\bnie\s+mam\s+ochotę\b", "nie mam ochoty"),
     (r"\bnie\s+mam\s+nadzieję\b", "nie mam nadziei"),
     (r"\bnie\s+mam\s+siłę\b", "nie mam siły"),
-    # nie znam / nie zna + B. -> D.
     (r"\bnie\s+znam\s+tę\s+prawdę\b", "nie znam tej prawdy"),
     (r"\bnie\s+znam\s+odpowiedź\b", "nie znam odpowiedzi"),
     (r"\bnie\s+zna\s+litość\b", "nie zna litości"),
     (r"\bnie\s+zna\s+granice\b", "nie zna granic"),
-    # nie widzę / nie widzi + B. -> D.
     (r"\bnie\s+widzę\s+żaden\s+sens\b", "nie widzę żadnego sensu"),
     (r"\bnie\s+widzę\s+inny\s+sposób\b", "nie widzę innego sposobu"),
     (r"\bnie\s+widzi\s+przeszkody\b", "nie widzi przeszkód"),
-    # nie czuję / nie pamiętam + B. -> D.
     (r"\bnie\s+pamiętam\s+ten\s+dzień\b", "nie pamiętam tego dnia"),
     (r"\bnie\s+czuję\s+strach\b", "nie czuję strachu"),
 ]
@@ -1906,14 +1940,22 @@ TRANSITIVE_NEGATION_REPLACEMENTS = [
 
 def sanitize_genitive_of_negation(text: str) -> str:
     """
-    Enforces Genitive of Negation on closed high-certainty transitive verb collocations (Filar CLXXXVIII / 0.00 PLN).
+    Enforces Genitive of Negation on closed high-certainty transitive verb collocations
+    including optional conversational adverbial/particle insertions (<= 2 words, no commas) (Filar CLXXXVIII / 0.00 PLN).
     Preserves case capitalization.
     """
     if not text:
         return ""
     res = text
-    for pat, repl in TRANSITIVE_NEGATION_REPLACEMENTS:
-        res = replace_with_case_preservation(pat, repl, res)
+    for verb_pat, obj_pat, gen_target in TRANSITIVE_NEGATION_BASE_COLLOCATIONS:
+        pat = rf"\b({verb_pat})({NEGATION_ADVERBIAL_SPAN})\s+({obj_pat})\b"
+        def _sub_neg(m, tgt=gen_target):
+            v_matched = m.group(1)
+            adv_matched = m.group(2) or ""
+            obj_matched = m.group(3)
+            repl_tgt = tgt[0].upper() + tgt[1:] if obj_matched[0].isupper() else tgt
+            return f"{v_matched}{adv_matched} {repl_tgt}"
+        res = re.sub(pat, _sub_neg, res, flags=re.IGNORECASE)
     return res
 
 

@@ -4525,6 +4525,9 @@ class EpisodeQualityGate:
                 ))
             )
 
+            # Per-event Quote & Indirect Speech Shield map (Filary CLXX & CLXXXVII - 0.00 PLN)
+            quote_shield_map: Dict[str, str] = {}
+
             # Find preceding dialogue event (skip signs and empty events)
             prev_ev = None
             prev_clean = ""
@@ -5199,6 +5202,15 @@ class EpisodeQualityGate:
 
             # 3c. CHARACTER GENDER CONSISTENCY GUARD (Filar CLXII)
             if not is_sign:
+                # Quote & Indirect Speech Shield (Filar CLXX / CLXXXVII - 0.00 PLN)
+                # Protect reported speech enclosed within quotes („...”, "...", »...«, «...») across ALL grammatical passes
+                def _quote_shield_repl(qm):
+                    q_key = f"__QUOTE_SHIELD_{len(quote_shield_map)}__"
+                    quote_shield_map[q_key] = qm.group(0)
+                    return q_key
+
+                ev.text = re.sub(r'(„[^”\r\n]+”|\"[^\"\r\n]+\"|»[^«\r\n]+«|«[^»\r\n]+»)', _quote_shield_repl, ev.text)
+
                 # Sanitize event name against generic category nouns
                 if getattr(ev, "name", None) and is_generic_actor_or_category(str(ev.name)):
                     ev.name = ""
@@ -5381,16 +5393,6 @@ class EpisodeQualityGate:
 
                 label_spk = spk_name or ("kobieta" if spk_gen == "FEMALE" else "mężczyzna")
 
-                # Quote & Indirect Speech Shield (Filar CLXX / CLXXXVII - 0.00 PLN)
-                # Protect reported speech enclosed within quotes („...”, "...", »...«, «...»)
-                quote_shield_map = {}
-                def _quote_shield_repl(qm):
-                    q_key = f"__QUOTE_SHIELD_{len(quote_shield_map)}__"
-                    quote_shield_map[q_key] = qm.group(0)
-                    return q_key
-
-                ev.text = re.sub(r'(„[^”\r\n]+”|\"[^\"\r\n]+\"|»[^«\r\n]+«|«[^»\r\n]+»)', _quote_shield_repl, ev.text)
-
                 if spk_gen == "MALE":
                     for f_pat, m_repl in FIRST_PERSON_FEMININE_TO_MASCULINE:
                         match = re.search(f_pat, ev.text, re.IGNORECASE)
@@ -5567,10 +5569,6 @@ class EpisodeQualityGate:
                         for m_mod, f_mod in PREDICATE_MODS_NOMINATIVE:
                             pat_mod_nom = rf"((?:\b(?:jestem|byłam|byłem|zostałam|zostałem|to\s+jest|to)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:{all_mods_nom_pat_1p})\s+){{0,2}})({re.escape(m_mod)})(\s+(?:(?:{all_mods_nom_pat_1p})\s+)*(?:{fem_all_nouns_nom_pat_1p}))\b"
                             ev.text = re.sub(pat_mod_nom, rf"\g<1>{f_mod}\g<3>", ev.text, flags=re.IGNORECASE)
-
-                if quote_shield_map:
-                    for q_key, q_val in quote_shield_map.items():
-                        ev.text = ev.text.replace(q_key, q_val)
 
                 # 3c-2: 3rd-person subject-verb past-tense agreement & compound passive voice (Filar CLXII/CLXXXV)
                 # Protected by Preposition Shield & Possessive Headword Shield (0.00 PLN)
@@ -7717,6 +7715,12 @@ class EpisodeQualityGate:
                 if ev.text != old_obl_t:
                     fixes.append(f"[Episode Quality Gate - Filar CLXXXVIII Prewencja Mianownizacji Kanonu] Linia #{i+1}: skorygowano zamrożony mianownik terminu po przyimku -> '{ev.text}'")
 
+            # Unpack QuoteShield after all grammatical and lexical passes (Filary CLXX, CLXXXVII, CLXXXVIII - 0.00 PLN)
+            if quote_shield_map:
+                for q_key, q_val in quote_shield_map.items():
+                    ev.text = ev.text.replace(q_key, q_val)
+                quote_shield_map.clear()
+
             # 5. PUNCTUATION & TYPOGRAPHY HYGIENE
             # Purge punctuation collisions: exclamation mark immediately preceding comma (!,) -> comma
             if "!," in ev.text:
@@ -7785,15 +7789,26 @@ class EpisodeQualityGate:
                     ev.text = split_subtitle_syntactically(ev.text, max_line_len=38, is_ass=True, is_sign=True)
                     fixes.append(f"[Episode Quality Gate - Filar XCVIII (Plansze i Szyldy)] Linia #{i+1}: sformatowano napis ekranowy zapobiegając przepełnieniu kadru")
 
-            # 7c. STRICT SINGLE-LINE AVT OVERFLOW PROTECTION (Belczyk & Netflix AVT: Max 40 znaków)
-            if enforce_line_split and not is_sign and r"\N" not in ev.text:
+            # 7c. STRICT AVT CPL & 2-LINE REBALANCING OVERFLOW PROTECTION (Belczyk & Netflix AVT: Max 38-40 znaków)
+            if enforce_line_split and not is_sign:
                 from avt_formatter import clean_text_for_len, split_subtitle_syntactically
-                clean_l = clean_text_for_len(ev.text)
-                if len(clean_l) > 40:
-                    old_single_text = ev.text
-                    ev.text = split_subtitle_syntactically(ev.text, max_line_len=38, is_ass=True, is_sign=False)
-                    if ev.text != old_single_text:
-                        fixes.append(f"[Episode Quality Gate - Filar LVII (Podział Zbyt Długiej Linii)] Linia #{i+1}: podzielono wers {len(clean_l)} zn. na 2 wersy AVT")
+                if r"\N" not in ev.text:
+                    clean_l = clean_text_for_len(ev.text)
+                    if len(clean_l) > 40:
+                        old_single_text = ev.text
+                        ev.text = split_subtitle_syntactically(ev.text, max_line_len=38, is_ass=True, is_sign=False)
+                        if ev.text != old_single_text:
+                            fixes.append(f"[Episode Quality Gate - Filar LVII (Podział Zbyt Długiej Linii)] Linia #{i+1}: podzielono wers {len(clean_l)} zn. na 2 wersy AVT")
+                else:
+                    parts = ev.text.split(r"\N")
+                    if len(parts) == 2:
+                        clean_lines = [clean_text_for_len(p) for p in parts]
+                        if any(len(l) > 38 for l in clean_lines):
+                            old_2line_text = ev.text
+                            rebalanced = split_subtitle_syntactically(ev.text, max_line_len=38, is_ass=True, is_sign=False)
+                            if rebalanced != old_2line_text:
+                                ev.text = rebalanced
+                                fixes.append(f"[Episode Quality Gate - Filar LVII / Bariera CPL (Rebalans Dwuwiersza)] Linia #{i+1}: przeprowadzono rebalancing dwuwiersza (przekroczenie limitu 38 znaków)")
 
             # 8. META-LEAK FIREWALL & PURGE (Absolute zero tolerance for meta-language in subtitles)
             meta_leak_pat = r"(?i)\b(zgodnie\s+z\s+polskim\s+kanonem\s+avt|kanon(?:em)?\s*avt|kanon\s+avt|filar\s+[ivxlcdm0-9]+|few-shot|system\s*prompt|prompt\s*leak)\b"
@@ -7824,7 +7839,7 @@ class EpisodeQualityGate:
                             f"zredukowano zbędną watę słowną dla wysokiego CPS (nowy CPS: {pl_cps:.1f})"
                         )
 
-                if report_cps_fixes and pl_cps > 22.0:
+                if report_cps_fixes and pl_cps > 20.0:
                     fixes.append(
                         f"[Episode Quality Gate - Filar CLIV (Wysoki CPS)] Linia #{i+1}: "
                         f"tempo czytania {pl_cps:.1f} CPS ({pl_clean_len} zn. na {ev_dur_s:.1f}s) przekracza zalecany limit AVT 17-20 CPS"
