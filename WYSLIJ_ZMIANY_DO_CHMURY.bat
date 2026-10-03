@@ -52,7 +52,23 @@ if %ERRORLEVEL% equ 0 (
     echo Mozesz teraz przejsc na drugi komputer i uruchomic tam:
     echo   -> POBIERZ_ZMIANY_Z_CHMURY.bat
     echo ================================================================
+    goto :end_ok
 ) else (
+    echo.
+    echo [INFO] W chmurze znajduja sie nowsze zmiany z drugiego komputera.
+    echo Proba automatycznego scalenia (git pull --no-rebase)...
+    git pull --no-rebase origin main --no-edit
+    if %ERRORLEVEL% equ 0 (
+        echo [OK] Zmiany zostaly pomyslnie scalone! Ponawiam wysylanie...
+        git push origin main
+        if %ERRORLEVEL% equ 0 (
+            echo.
+            echo ================================================================
+            echo [SUKCES] Zmiany zostaly pomyslnie scalone i wyslane do GitHuba!
+            echo ================================================================
+            goto :end_ok
+        )
+    )
     echo.
     echo ================================================================
     echo [BLAD] Nie udalo sie wyslac zmian do GitHuba.
@@ -60,6 +76,7 @@ if %ERRORLEVEL% equ 0 (
     echo ================================================================
 )
 
+:end_ok
 echo.
 echo Nacisnij dowolny klawisz, aby zamknac to okno...
 pause >nul
