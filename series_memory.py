@@ -1423,8 +1423,9 @@ def generate_polish_name_declension(name: str, gender: str = "UNKNOWN") -> Dict[
     if n.lower().endswith(("ą", "ę", "ej", "ach", "ami", "om")):
         return {"M": n, "D": n, "C": n, "B": n, "N": n, "Ms": n, "W": n}
 
+    is_male = (g == "MALE" or "MĘSK" in g or "MALE" in g)
     is_female = (g == "FEMALE" or "KOBIETA" in g or "ŻEŃSK" in g)
-    if not is_female and (n.lower() in INVARIABLE_JAPANESE_FEMALE_NAMES or n.lower() in FOREIGN_FEMALE_CONSONANT_NAMES or is_inherently_female_name(n)):
+    if not is_female and not is_male and (n.lower() in INVARIABLE_JAPANESE_FEMALE_NAMES or n.lower() in FOREIGN_FEMALE_CONSONANT_NAMES or is_inherently_female_name(n)):
         is_female = True
 
     # 0a. Adjectives / adjectival names and titles (e.g. Wielka, Wielki, Czarna, Czarny, Nieśmiertelny, Sobieski)
@@ -1894,27 +1895,51 @@ def replace_with_case_preservation(pattern: str, replacement: str, text: str) ->
     return re.sub(pattern, _sub_cb, text, flags=re.IGNORECASE)
 
 
+VERB_PAT_MIEĆ = r"nie\s+(?:mam|masz|ma|mamy|macie|mają|miał(?:em|am|eś|aś|a|o)?|miel(?:i|iśmy|iście)|miały(?:śmy|ście)?|będ(?:ę|ziesz|zie|ziemy|ziecie|ą)\s+(?:mieć|miał(?:a)?))"
+VERB_PAT_WIDZIEĆ = r"nie\s+(?:widz(?:ę|isz|i|imy|icie|ą)|widział(?:em|am|eś|aś|a|o)?|widziel(?:i|iśmy|iście)|widziały(?:śmy|ście)?|będ(?:ę|ziesz|zie|ziemy|ziecie|ą)\s+(?:widzieć|widział(?:a)?))"
+VERB_PAT_CZUĆ = r"nie\s+(?:czuj(?:ę|esz|e|emy|ecie|ą)|czuł(?:em|am|eś|aś|a|o)?|czul(?:i|iśmy|iście)|czuły(?:śmy|ście)?|będ(?:ę|ziesz|zie|ziemy|ziecie|ą)\s+(?:czuć|czuł(?:a)?))"
+VERB_PAT_ZNAĆ = r"nie\s+(?:zna(?:m|sz|my|cie|ją)?|znał(?:em|am|eś|aś|a|o)?|znal(?:i|iśmy|iście)|znały(?:śmy|ście)?|będ(?:ę|ziesz|zie|ziemy|ziecie|ą)\s+(?:znać|znał(?:a)?))"
+VERB_PAT_PAMIĘTAĆ = r"nie\s+(?:pamięta(?:m|sz|my|cie|ją)?|pamiętał(?:em|am|eś|aś|a|o)?|pamiętal(?:i|iśmy|iście)|pamiętały(?:śmy|ście)?|będ(?:ę|ziesz|zie|ziemy|ziecie|ą)\s+(?:pamiętać|pamiętał(?:a)?))"
+VERB_PAT_SŁYSZEĆ = r"nie\s+(?:słysz(?:ę|ysz|y|ymy|ycie|ą)|słyszał(?:em|am|eś|aś|a|o)?|słyszel(?:i|iśmy|iście)|słyszały(?:śmy|ście)?|będ(?:ę|ziesz|zie|ziemy|ziecie|ą)\s+(?:słyszeć|słyszał(?:a)?))"
+VERB_PAT_SPRAWIAĆ = r"nie\s+(?:sprawia(?:m|sz|my|cie|ją)?|sprawiał(?:em|am|eś|aś|a|o)?|sprawi(?:ł|ła|ło|li|ły|ć)?)"
+
 TRANSITIVE_NEGATION_BASE_COLLOCATIONS = [
     # (verb_pattern, direct_object_pattern, genitive_replacement)
-    # nie mam + B. -> D.
-    (r"nie\s+mam", r"czas", "czasu"),
-    (r"nie\s+mam", r"wybór", "wyboru"),
-    (r"nie\s+mam", r"ochotę", "ochoty"),
-    (r"nie\s+mam", r"nadzieję", "nadziei"),
-    (r"nie\s+mam", r"siłę", "siły"),
-    # nie znam / nie zna + B. -> D.
-    (r"nie\s+znam", r"tę\s+prawdę", "tej prawdy"),
-    (r"nie\s+znam", r"odpowiedź", "odpowiedzi"),
-    (r"nie\s+zna", r"litość", "litości"),
-    (r"nie\s+zna", r"granice", "granic"),
-    # nie widzę / nie widzi + B. -> D.
-    (r"nie\s+widzę", r"żaden\s+sens", "żadnego sensu"),
-    (r"nie\s+widzę", r"inny\s+sposób", "innego sposobu"),
-    (r"nie\s+widzę", r"sens", "sensu"),
-    (r"nie\s+widzi", r"przeszkody", "przeszkód"),
-    # nie czuję / nie pamiętam + B. -> D.
-    (r"nie\s+pamiętam", r"ten\s+dzień", "tego dnia"),
-    (r"nie\s+czuję", r"strach", "strachu"),
+    # mieć + B. -> D.
+    (VERB_PAT_MIEĆ, r"czas", "czasu"),
+    (VERB_PAT_MIEĆ, r"wybór", "wyboru"),
+    (VERB_PAT_MIEĆ, r"ochotę", "ochoty"),
+    (VERB_PAT_MIEĆ, r"nadzieję", "nadziei"),
+    (VERB_PAT_MIEĆ, r"siłę", "siły"),
+    (VERB_PAT_MIEĆ, r"pojęcie", "pojęcia"),
+    (VERB_PAT_MIEĆ, r"powód", "powodu"),
+    (VERB_PAT_MIEĆ, r"problem", "problemu"),
+    (VERB_PAT_MIEĆ, r"wątpliwość", "wątpliwości"),
+    # znać + B. -> D.
+    (VERB_PAT_ZNAĆ, r"tę\s+prawdę", "tej prawdy"),
+    (VERB_PAT_ZNAĆ, r"odpowiedź", "odpowiedzi"),
+    (VERB_PAT_ZNAĆ, r"litość", "litości"),
+    (VERB_PAT_ZNAĆ, r"granice", "granic"),
+    # widzieć + B. -> D.
+    (VERB_PAT_WIDZIEĆ, r"żaden\s+sens", "żadnego sensu"),
+    (VERB_PAT_WIDZIEĆ, r"inny\s+sposób", "innego sposobu"),
+    (VERB_PAT_WIDZIEĆ, r"sens", "sensu"),
+    (VERB_PAT_WIDZIEĆ, r"przeszkody", "przeszkód"),
+    (VERB_PAT_WIDZIEĆ, r"powód", "powodu"),
+    (VERB_PAT_WIDZIEĆ, r"problem", "problemu"),
+    # czuć + B. -> D.
+    (VERB_PAT_CZUĆ, r"strach", "strachu"),
+    (VERB_PAT_CZUĆ, r"ból", "bólu"),
+    (VERB_PAT_CZUĆ, r"litość", "litości"),
+    # pamiętać + B. -> D.
+    (VERB_PAT_PAMIĘTAĆ, r"ten\s+dzień", "tego dnia"),
+    (VERB_PAT_PAMIĘTAĆ, r"tę\s+chwilę", "tej chwili"),
+    # słyszeć + B. -> D.
+    (VERB_PAT_SŁYSZEĆ, r"żaden\s+głos", "żadnego głosu"),
+    (VERB_PAT_SŁYSZEĆ, r"głos", "głosu"),
+    # sprawiać + B. -> D.
+    (VERB_PAT_SPRAWIAĆ, r"problem", "problemu"),
+    (VERB_PAT_SPRAWIAĆ, r"ból", "bólu"),
 ]
 
 # Safe conversational adverbs/particles (<= 2 words, strictly no commas)
@@ -1960,15 +1985,35 @@ def sanitize_genitive_of_negation(text: str) -> str:
 
 
 CANON_OBLIQUE_CORRECTIONS = [
-    # Narzędnik po z/ze
-    (r"\b([Zz]e?)\s+Aura\s+Gilotyna\b", r"\1 Aurą Gilotyną"),
-    (r"\b([Zz]e?)\s+Wielki\s+Chan\b", r"\1 Wielkim Chanem"),
-    # Dopełniacz po u/do/od/dla
-    (r"\b([Dd]la|[Uu]|[Oo]d|[Dd]o)\s+Aura\s+Gilotyna\b", r"\1 Aury Gilotyny"),
-    (r"\b([Dd]la|[Uu]|[Oo]d|[Dd]o)\s+Wielki\s+Chan\b", r"\1 Wielkiego Chana"),
-    # Celownik po przeciwko/ku
-    (r"\b([Pp]rzeciwko|[Kk]u)\s+Aura\s+Gilotyna\b", r"\1 Aurze Gilotynie"),
-    (r"\b([Pp]rzeciwko|[Kk]u)\s+Wielki\s+Chan\b", r"\1 Wielkiemu Chanowi"),
+    # Narzędnik po z/ze/przed/nad/pod/za/między
+    (r"\b([Zz]e?|[Pp]rzed|[Nn]ad|[Pp]od|[Zz]a|[Mm]iędzy)\s+(?:Aura\s+Gilotyna|Aurą\s+Gilotyna|Aura\s+Gilotyną)\b", r"\1 Aurą Gilotyną"),
+    (r"\b([Zz]e?|[Pp]rzed|[Nn]ad|[Pp]od|[Zz]a|[Mm]iędzy)\s+(?:Wielki\s+Chan|Wielkim\s+Chan|Wielki\s+Chanem)\b", r"\1 Wielkim Chanem"),
+    (r"\b([Zz]e?|[Pp]rzed|[Nn]ad|[Pp]od|[Zz]a|[Mm]iędzy)\s+(?:Król|Królem)\s+Demonów\b", r"\1 Królem Demonów"),
+    (r"\b([Zz]e?|[Pp]rzed|[Nn]ad|[Pp]od|[Zz]a|[Mm]iędzy)\s+(?:Czarny\s+Rycerz|Czarnym\s+Rycerz|Czarny\s+Rycerzem)\b", r"\1 Czarnym Rycerzem"),
+
+    # Dopełniacz po u/do/od/dla/bez/zza
+    (r"\b([Dd]la|[Uu]|[Oo]d|[Dd]o|[Bb]ez|[Zz]za)\s+(?:Aura\s+Gilotyna|Aury\s+Gilotyna|Aura\s+Gilotyny)\b", r"\1 Aury Gilotyny"),
+    (r"\b([Dd]la|[Uu]|[Oo]d|[Dd]o|[Bb]ez|[Zz]za)\s+(?:Wielki\s+Chan|Wielkiego\s+Chan|Wielki\s+Chana)\b", r"\1 Wielkiego Chana"),
+    (r"\b([Dd]la|[Uu]|[Oo]d|[Dd]o|[Bb]ez|[Zz]za)\s+(?:Król|Króla)\s+Demonów\b", r"\1 Króla Demonów"),
+    (r"\b([Dd]la|[Uu]|[Oo]d|[Dd]o|[Bb]ez|[Zz]za)\s+(?:Czarny\s+Rycerz|Czarnego\s+Rycerz|Czarny\s+Rycerza)\b", r"\1 Czarnego Rycerza"),
+
+    # Celownik po przeciwko/ku/dzięki
+    (r"\b([Pp]rzeciwko|[Kk]u|[Dd]zięki)\s+(?:Aura\s+Gilotyna|Aurze\s+Gilotyna|Aura\s+Gilotynie)\b", r"\1 Aurze Gilotynie"),
+    (r"\b([Pp]rzeciwko|[Kk]u|[Dd]zięki)\s+(?:Wielki\s+Chan|Wielkiemu\s+Chan|Wielki\s+Chanowi)\b", r"\1 Wielkiemu Chanowi"),
+    (r"\b([Pp]rzeciwko|[Kk]u|[Dd]zięki)\s+(?:Król|Królowi)\s+Demonów\b", r"\1 Królowi Demonów"),
+    (r"\b([Pp]rzeciwko|[Kk]u|[Dd]zięki)\s+(?:Czarny\s+Rycerz|Czarnemu\s+Rycerz|Czarny\s+Rycerzowi)\b", r"\1 Czarnemu Rycerzowi"),
+
+    # Biernik po przez
+    (r"\b([Pp]rzez)\s+(?:Aura\s+Gilotyna|Aurę\s+Gilotyna|Aura\s+Gilotynę)\b", r"\1 Aurę Gilotynę"),
+    (r"\b([Pp]rzez)\s+(?:Wielki\s+Chan|Wielkiego\s+Chan|Wielki\s+Chana)\b", r"\1 Wielkiego Chana"),
+    (r"\b([Pp]rzez)\s+(?:Król|Króla)\s+Demonów\b", r"\1 Króla Demonów"),
+    (r"\b([Pp]rzez)\s+(?:Czarny\s+Rycerz|Czarnego\s+Rycerz|Czarny\s+Rycerza)\b", r"\1 Czarnego Rycerza"),
+
+    # Miejscownik po o/przy
+    (r"\b([Oo]|[Pp]rzy)\s+(?:Aura\s+Gilotyna|Aurze\s+Gilotyna|Aura\s+Gilotynie)\b", r"\1 Aurze Gilotynie"),
+    (r"\b([Oo]|[Pp]rzy)\s+(?:Wielki\s+Chan|Wielkim\s+Chan|Wielki\s+Chanie)\b", r"\1 Wielkim Chanie"),
+    (r"\b([Oo]|[Pp]rzy)\s+(?:Król|Królu)\s+Demonów\b", r"\1 Królu Demonów"),
+    (r"\b([Oo]|[Pp]rzy)\s+(?:Czarny\s+Rycerz|Czarnym\s+Rycerz|Czarny\s+Rycerzu)\b", r"\1 Czarnym Rycerzu"),
 ]
 
 
@@ -2121,9 +2166,6 @@ def sanitize_pronominal_somatic_possession(text: str) -> str:
         lambda m: "Przez ciebie" if m.group(1) == "Z" else "przez ciebie",
         res
     )
-
-    res = sanitize_genitive_of_negation(res)
-    res = sanitize_canon_compound_oblique_cases(res)
 
     return res
 

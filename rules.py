@@ -2341,8 +2341,8 @@ KOMPLEKSOWY RDZEŃ PRZEKŁADU AUDIOWIZUALNEGO (CORE AVT CANON - BELCZYK, BARAŃC
 - Nienaruszalność cytatów w polilogach: Cytowane wypowiedzi („...”) zachowują tożsamość i płeć oryginalnego autora, niezależnie od płci postaci aktualnie cytującej.
 
 21. ŚCISŁA REKCJA ZAPRZECZONA, KANON I ASYMETRYCZNE BARIERY AVT (FILAR CLXXXVIII):
-- Genitive of Negation: Każdy czasownik przechodni rządu biernikowego podlegający zaprzeczeniu partykułą 'nie' bezwzględnie wymusza zmianę przypadku dopełnienia bliższego z Biernika na Dopełniacz ('nie mam czasu', 'nie widzę sensu', 'nie znam tej prawdy', 'nie pamiętam tej chwili', 'nie rozumiem tej sprawy'; eliminujemy kalki biernikowe: 'nie mam czas', 'nie widzę sens'). Zasada obejmuje również wtrącenia partykułowo-przysłówkowe ('nie mam już czasu', 'nie widzę wcale sensu', 'nie widzę w tym sensu').
-- Prewencja mianownizacji terminów kanonicznych: Wszelkie zarejestrowane terminy i tytuły kanoniczne (złożone z przydawki lub członu nadrzędnego) muszą swobodnie i harmonijnie odmieniać się przez przypadki zależne po przyimkach ('z Aurą Gilotyną', 'dla Wielkiego Chana', 'u boku Mistrza Eru'; kategorycznie eliminujemy zamrażanie form w mianowniku: 'z Aura Gilotyna', 'dla Wielki Chan').
+- Genitive of Negation: Każdy czasownik przechodni rządu biernikowego podlegający zaprzeczeniu partykułą 'nie' w KAŻDYM czasie (teraźniejszym, przeszłym i przyszłym: 'nie mam/nie miałam czasu', 'nie widziałem/nie widziałam sensu', 'nie czułam strachu', 'nie będę miał wyboru') bezwzględnie wymusza zmianę przypadku dopełnienia bliższego z Biernika na Dopełniacz ('nie mam czasu', 'nie widzę sensu', 'nie znam tej prawdy', 'nie pamiętam tej chwili', 'nie rozumiem tej sprawy'; eliminujemy kalki biernikowe: 'nie mam czas', 'nie widzę sens'). Zasada obejmuje również wtrącenia partykułowo-przysłówkowe ('nie mam już czasu', 'nie widzę wcale sensu', 'nie widzę w tym sensu').
+- Prewencja mianownizacji terminów kanonicznych: Wszelkie zarejestrowane terminy i tytuły kanoniczne (złożone z przydawki lub członu nadrzędnego) muszą swobodnie i harmonijnie odmieniać się przez przypadki zależne po przyimkach we wszystkich kontekstach syntaktycznych: Narzędnik ('z Aurą Gilotyną', 'przed Wielkim Chanem'), Dopełniacz ('dla Wielkiego Chana', 'u boku Mistrza Eru'), Biernik ('przez Aurę Gilotynę', 'przez Króla Demonów') oraz Miejscownik ('o Aurze Gilotynie', 'przy Królu Demonów'); kategorycznie eliminujemy zamrażanie form w mianowniku ('z Aura Gilotyna', 'przez Wielki Chan', 'o Aura Gilotyna').
 - Asymetryczna bariera percepcji AVT: Przestrzegaj twardych ograniczeń geometryczno-percepcyjnych: tempo czytania $\Phi(\text{CPS}) \le 17$ zn./s oraz fizyczna długość wiersza $\Psi(\text{CPL}) \le 38$ znaków na wiersz.
 """
 
@@ -3858,14 +3858,14 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Op
 
     # 129. Ścisła Rekcja Zaprzeczona i Prewencja Mianownizacji Kanonu (Filar CLXXXVIII)
     has_negation_or_canon_freezing_trigger = any(
-        re.search(r"\b(don't have|no time|no choice|can't see|not know|don't know|not remember|nie mam|nie widzę|nie znam|nie pamiętam|aura|chan)\b", str(item.get("en", "")) + " " + str(item.get("pl", "")), re.IGNORECASE)
+        re.search(r"\b(don't have|didn't have|won't have|no time|no choice|can't see|not know|don't know|not remember|nie mam|nie miałem|nie miałam|nie będę|nie widzę|nie widziałem|nie widziałam|nie znam|nie pamiętam|aura|chan|demon|rycerz)\b", str(item.get("en", "")) + " " + str(item.get("pl", "")), re.IGNORECASE)
         for item in batch_items
     )
     if has_negation_or_canon_freezing_trigger:
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR CLXXXVIII - Ścisła Rekcja Zaprzeczona i Bariery AVT]: "
-            "Czasowniki przechodnie zaprzeczone partykułą 'nie' bezwzględnie wymuszają dopełniacz również przy wtrąceniach ('nie mam już czasu', 'nie widzę w tym sensu'). "
-            "Wieloczłonowe terminy kanoniczne odmieniaj po przyimkach ('z Aurą Gilotyną'). Zachowaj barierę CPS <= 17 i CPL <= 38."
+            "Czasowniki przechodnie zaprzeczone partykułą 'nie' w każdym czasie (teraźniejszym, przeszłym i przyszłym) bezwzględnie wymuszają dopełniacz również przy wtrąceniach ('nie miałem już czasu', 'nie widzę w tym sensu', 'nie czułam strachu'). "
+            "Wieloczłonowe terminy kanoniczne odmieniaj po przyimkach we wszystkich przypadkach ('z Aurą Gilotyną', 'przez Wielkiego Chana', 'o Królu Demonów'). Zachowaj barierę CPS <= 17 i CPL <= 38."
         )
 
     if not focused_pillars:

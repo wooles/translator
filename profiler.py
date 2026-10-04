@@ -331,8 +331,8 @@ def format_lean_episode_brief(profile: Any) -> str:
     lines.append("  - Mówczyni (kobieta) w 1. os. lp. czasu przeszłego BEZWZGLĘDNIE stosuje formy żeńskie: -am, -ałam, -łabym, -obym (byłam, wiedziałam, zrobiłam, poszłam).")
     lines.append("  - Zwracając się do kobiety w 2. os. lp. BEZWZGLĘDNIE stosuj formy żeńskie: -aś, -ałaś, jesteś pewna (byłaś, zrobiłaś, wiedziałaś).")
     lines.append("  - Zwracając się do grupy kobiet (liczba mnoga niemęskoosobowa/żeńska) stosuj: -yście (np. przyszłyście, zrobiłyście, byłyście) i 'one', NIGDY męskoosobowego '-iście' (byliście).")
-    lines.append("  - ŚCISŁA REKCJA ZAPRZECZONA (Genitive of Negation): Czasowniki przechodnie podlegające negacji partykułą 'nie' bezwzględnie wymuszają dopełniacz również przy wtrąceniach przysłówkowych (nie mam już czasu, nie widzę wcale sensu, nie znam tej prawdy).")
-    lines.append("  - OCHRONA CYTATÓW I IMION: Cytowane wypowiedzi („...”) zachowują płeć oryginalnego autora. Płeć postaci z bazy serii ma bezwzględne pierwszeństwo nad domysłami onomastycznymi.")
+    lines.append("  - ŚCISŁA REKCJA ZAPRZECZONA (Genitive of Negation): Czasowniki przechodnie podlegające negacji partykułą 'nie' w KAŻDYM czasie (teraźniejszym, przeszłym i przyszłym: nie mam/nie miałam/nie będę miał) bezwzględnie wymuszają dopełniacz również przy wtrąceniach przysłówkowych (nie miałem już czasu, nie widzę wcale sensu, nie czułam strachu).")
+    lines.append("  - OCHRONA CYTATÓW I DEKLINACJA KANONU: Cytowane wypowiedzi („...”) zachowują płeć oryginalnego autora. Terminy kanoniczne odmieniaj przez wszystkie przypadki po przyimkach (również Biernik 'przez' i Miejscownik 'o/przy'). Płeć z bazy serii ma bezwzględne pierwszeństwo.")
 
 
     lines.append("================================================")

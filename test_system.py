@@ -13415,6 +13415,156 @@ def test_series_bible_onomastic_precedence_and_2line_cpl_rebalancer_guard():
     print(" -> PASSED: Test 144 w 100% potwierdza hierarchię prawdy onomastycznej SeriesBible oraz rebalancer dwuwiersza Psi(CPL) (0.00 PLN).")
 
 
+def test_full_tense_transitive_genitive_of_negation_guard():
+    print("[TEST 145/146] Test Pełnoczasowej Rekcji Zaprzeczonej i Ochrony Nowych Dopełnień Bliższych (0.00 PLN)...")
+    from series_memory import sanitize_genitive_of_negation
+    from avt_linter import EpisodeQualityGate
+    import pysubs2
+
+    # Asercja 1: Czas przeszły męski i żeński oraz wtrącenia partykułowe
+    past_cases = [
+        ("Nie miałem już czas na zbędne dyskusje.", "Nie miałem już czasu na zbędne dyskusje."),
+        ("Nie miałam wcale ochotę tam iść.", "Nie miałam wcale ochoty tam iść."),
+        ("Nie widziałem w tym żaden sens.", "Nie widziałem w tym żadnego sensu."),
+        ("Nie widziałam inny sposób na ratunek.", "Nie widziałam innego sposobu na ratunek."),
+        ("Nie czułem ani trochę strach przed wami.", "Nie czułem ani trochę strachu przed wami."),
+        ("Nie czułam ból po upadku.", "Nie czułam bólu po upadku."),
+        ("Nie pamiętałem ten dzień z przeszłości.", "Nie pamiętałem tego dnia z przeszłości."),
+        ("Nie słyszałem żaden głos w ciemności.", "Nie słyszałem żadnego głosu w ciemności."),
+    ]
+    for inp, expected in past_cases:
+        out = sanitize_genitive_of_negation(inp)
+        assert out == expected, f"BŁĄD rekcji w czasie przeszłym: '{inp}' -> '{out}', oczekiwano '{expected}'"
+
+    # Asercja 2: Czas przyszły
+    future_cases = [
+        ("Nie będę miał wybór w tej sytuacji.", "Nie będę miał wyboru w tej sytuacji."),
+        ("Nie będę miała siłę na dalszą walkę.", "Nie będę miała siły na dalszą walkę."),
+        ("Nie będziemy mieć czas na odpoczynek.", "Nie będziemy mieć czasu na odpoczynek."),
+    ]
+    for inp, expected in future_cases:
+        out = sanitize_genitive_of_negation(inp)
+        assert out == expected, f"BŁĄD rekcji w czasie przyszłym: '{inp}' -> '{out}', oczekiwano '{expected}'"
+
+    # Asercja 3: Nowe dopełnienia (pojęcie, powód, problem, wątpliwość)
+    new_objects_cases = [
+        ("Nie miałem pojęcie o jego planach.", "Nie miałem pojęcia o jego planach."),
+        ("Nie widzę powód do zmartwień.", "Nie widzę powodu do zmartwień."),
+        ("To nie sprawia problem dla nikogo.", "To nie sprawia problemu dla nikogo."),
+        ("Nie mam wątpliwość co do wyniku.", "Nie mam wątpliwości co do wyniku."),
+    ]
+    for inp, expected in new_objects_cases:
+        out = sanitize_genitive_of_negation(inp)
+        assert out == expected, f"BŁĄD rekcji nowego dopełnienia: '{inp}' -> '{out}', oczekiwano '{expected}'"
+
+    # Asercja 4: Antykolizja (Zasada 11 - zdania złożone z przecinkami i istniejący dopełniacz nie mutują)
+    anti_collision_cases = [
+        ("Nie miałem, gdzie pójść w nocy.", "Nie miałem, gdzie pójść w nocy."),
+        ("Nie widziałem, jak to się stało.", "Nie widziałem, jak to się stało."),
+        ("Nie czułem, by cokolwiek się zmieniło.", "Nie czułem, by cokolwiek się zmieniło."),
+        ("Nie miałem czasu na nic.", "Nie miałem czasu na nic."),
+        ("Nie widziałem żadnego sensu.", "Nie widziałem żadnego sensu."),
+        ("Nie czułam bólu po operacji.", "Nie czułam bólu po operacji."),
+    ]
+    for inp, expected in anti_collision_cases:
+        out = sanitize_genitive_of_negation(inp)
+        assert out == expected, f"BŁĄD antykolizji: '{inp}' nieprawidłowo zmutował w '{out}'"
+
+    # Asercja 5: Integracja w EpisodeQualityGate na pełnej osi czasu
+    subs = pysubs2.SSAFile()
+    subs.events = [
+        pysubs2.SSAEvent(start=1000, end=2500, text="Nie miałem już czas na wyjaśnienia."),
+        pysubs2.SSAEvent(start=3000, end=4500, text="Nie będę miał wybór, muszę walczyć.")
+    ]
+    out_subs, fixes = EpisodeQualityGate.audit_and_fix_entire_episode(subs=subs)
+    assert out_subs.events[0].text == "Nie miałem już czasu na wyjaśnienia."
+    assert out_subs.events[1].text == "Nie będę miał wyboru, muszę walczyć."
+    assert any("Filar CLXXXVIII Rekcja Zaprzeczona" in f for f in fixes)
+
+    print(" -> PASSED: Test 145 w 100% potwierdza pełnoczasową rekcję zaprzeczoną i ochronę nowych obiektów (0.00 PLN).")
+
+
+def test_comprehensive_canon_oblique_prepositions_and_male_consonant_declension_guard():
+    print("[TEST 146/146] Test Uniwersum Przyimków Terminów Kanonu oraz Męskiej Odmiany Imion Obcych na Spółgłoskę (0.00 PLN)...")
+    from series_memory import sanitize_canon_compound_oblique_cases, generate_polish_name_declension
+    from avt_linter import EpisodeQualityGate
+    import pysubs2
+
+    # Asercja 1: Biernik (Accusative) po 'przez'
+    acc_cases = [
+        ("Został pokonany przez Aura Gilotyna.", "Został pokonany przez Aurę Gilotynę."),
+        ("Rozkaz został wydany przez Wielki Chan.", "Rozkaz został wydany przez Wielkiego Chana."),
+        ("Zostali wezwani przez Król Demonów.", "Zostali wezwani przez Króla Demonów."),
+        ("Wioska została zniszczona przez Czarny Rycerz.", "Wioska została zniszczona przez Czarnego Rycerza."),
+    ]
+    for inp, expected in acc_cases:
+        out = sanitize_canon_compound_oblique_cases(inp)
+        assert out == expected, f"BŁĄD biernika po przez: '{inp}' -> '{out}', oczekiwano '{expected}'"
+
+    # Asercja 2: Miejscownik (Locative) po 'o' i 'przy'
+    loc_cases = [
+        ("Rozmawialiśmy o Aura Gilotyna i jej magii.", "Rozmawialiśmy o Aurze Gilotynie i jej magii."),
+        ("Legendy o Wielki Chan przetrwały wieki.", "Legendy o Wielkim Chanie przetrwały wieki."),
+        ("Opowiadano o Król Demonów z trwogą.", "Opowiadano o Królu Demonów z trwogą."),
+        ("Pieśni o Czarny Rycerz śpiewano wszędzie.", "Pieśni o Czarnym Rycerzu śpiewano wszędzie."),
+        ("Stałem przy Wielki Chan podczas bitwy.", "Stałem przy Wielkim Chanie podczas bitwy."),
+        ("Byliśmy przy Król Demonów w jego komnacie.", "Byliśmy przy Królu Demonów w jego komnacie."),
+    ]
+    for inp, expected in loc_cases:
+        out = sanitize_canon_compound_oblique_cases(inp)
+        assert out == expected, f"BŁĄD miejscownika po o/przy: '{inp}' -> '{out}', oczekiwano '{expected}'"
+
+    # Asercja 3: Narzędnik po 'przed / nad / pod / za / między'
+    ins_cases = [
+        ("Uciekliśmy przed Król Demonów do lasu.", "Uciekliśmy przed Królem Demonów do lasu."),
+        ("Drżeli przed Wielki Chan i jego armią.", "Drżeli przed Wielkim Chanem i jego armią."),
+        ("Ukryli się przed Aura Gilotyna w ruinach.", "Ukryli się przed Aurą Gilotyną w ruinach."),
+        ("Stanęliśmy za Czarny Rycerz gotowi do walki.", "Stanęliśmy za Czarnym Rycerzem gotowi do walki."),
+    ]
+    for inp, expected in ins_cases:
+        out = sanitize_canon_compound_oblique_cases(inp)
+        assert out == expected, f"BŁĄD narzędnika po przed/za: '{inp}' -> '{out}', oczekiwano '{expected}'"
+
+    # Asercja 4: Antykolizja (Zasada 11 - poprawne formy oraz mianownik podmiotowy bez przyimka)
+    anti_cases = [
+        ("Aura Gilotyna wkroczyła do miasta.", "Aura Gilotyna wkroczyła do miasta."),
+        ("Wielki Chan powrócił z wyprawy.", "Wielki Chan powrócił z wyprawy."),
+        ("Król Demonów zasiadł na tronie.", "Król Demonów zasiadł na tronie."),
+        ("Został pokonany przez Aurę Gilotynę.", "Został pokonany przez Aurę Gilotynę."),
+        ("Rozmawialiśmy o Królu Demonów.", "Rozmawialiśmy o Królu Demonów."),
+    ]
+    for inp, expected in anti_cases:
+        out = sanitize_canon_compound_oblique_cases(inp)
+        assert out == expected, f"BŁĄD antykolizji kanonu: '{inp}' nieprawidłowo zmutował w '{out}'"
+
+    # Asercja 5: Męska odmiana imion obcych na spółgłoskę (np. Jean z gender='MALE')
+    decl_jean_m = generate_polish_name_declension("Jean", "MALE")
+    assert decl_jean_m["M"] == "Jean"
+    assert decl_jean_m["D"] == "Jeana", f"Błędny Dopełniacz męskiego Jean: {decl_jean_m['D']}"
+    assert decl_jean_m["C"] == "Jeanowi", f"Błędny Celownik męskiego Jean: {decl_jean_m['C']}"
+    assert decl_jean_m["B"] == "Jeana", f"Błędny Biernik męskiego Jean: {decl_jean_m['B']}"
+    assert decl_jean_m["N"] == "Jeanem", f"Błędny Narzędnik męskiego Jean: {decl_jean_m['N']}"
+    assert decl_jean_m["Ms"] == "Jeanie", f"Błędny Miejscownik męskiego Jean: {decl_jean_m['Ms']}"
+
+    # Kobiece imię Jean wciąż pozostaje nieodmienne
+    decl_jean_f = generate_polish_name_declension("Jean", "FEMALE")
+    for c in ["M", "D", "C", "B", "N", "Ms", "W"]:
+        assert decl_jean_f[c] == "Jean", f"Błąd: żeńskie Jean nie powinno się odmieniać: {decl_jean_f[c]}"
+
+    # Asercja 6: Integracja w EpisodeQualityGate
+    subs = pysubs2.SSAFile()
+    subs.events = [
+        pysubs2.SSAEvent(start=1000, end=2000, text="Został wysłany przez Król Demonów."),
+        pysubs2.SSAEvent(start=2500, end=3500, text="Rozmawiali o Aura Gilotyna całą noc.")
+    ]
+    out_subs, fixes = EpisodeQualityGate.audit_and_fix_entire_episode(subs=subs)
+    assert out_subs.events[0].text == "Został wysłany przez Króla Demonów."
+    assert out_subs.events[1].text == "Rozmawiali o Aurze Gilotynie całą noc."
+    assert any("Filar CLXXXVIII Prewencja Mianownizacji Kanonu" in f for f in fixes)
+
+    print(" -> PASSED: Test 146 w 100% potwierdza uniwersum przyimków kanonu i poprawną odmianę męskich imion obcych na spółgłoskę (0.00 PLN).")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -13558,6 +13708,8 @@ if __name__ == "__main__":
     test_canon_compound_oblique_preposition_and_nominative_unfreezing_guard()
     test_global_quote_shield_and_adverbial_negation_guard()
     test_series_bible_onomastic_precedence_and_2line_cpl_rebalancer_guard()
-    print("\n Wszystkie testy jednostkowe i integracyjne (144/144) zakończone pełnym sukcesem!\n")
+    test_full_tense_transitive_genitive_of_negation_guard()
+    test_comprehensive_canon_oblique_prepositions_and_male_consonant_declension_guard()
+    print("\n Wszystkie testy jednostkowe i integracyjne (146/146) zakończone pełnym sukcesem!\n")
 
 
