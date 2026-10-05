@@ -551,5 +551,105 @@ Agent 2 może wystawić status:
 `STATUS: ZATWIERDZENIE ARCHITEKTONICZNE (ZERO BŁĘDÓW) - GOTOWY DO DECYZJI OPERATORA`
 **wyłącznie wtedy**, gdy plan Agenta 1 został pozytywnie zweryfikowany we wszystkich 18 wymiarach oraz spełnia ograniczenia brzegowe funkcji straty AVT.
 
+---
+
+## 🚨 21. PROTOKÓŁ OBSŁUGI INCYDENTU TRANSLATORSKIEGO (INCIDENT RESPONSE PROTOCOL — BILETY INC-AVT)
+
+Niniejsza procedura stanowi trwały, żelazny standard reagowania na błędy translacji zgłaszane przez OPERATORA w architekturze Eval-Driven.
+
+### 🔒 Żelazna Bramka Operatora (Bezwzględna Blokada I/O)
+1. **Kategoryczny zakaz zapisu:** Żaden agent (ani Agent 1, ani Agent 2, ani Agent 3) nie ma prawa modyfikować, nadpisywać, tworzyć ani usuwać jakichkolwiek plików w repozytorium przed jawną, ostateczną zgodą OPERATORA.
+2. **Weto anty-prowizoryczne (Anti-Hack Veto):** Kategoryczny zakaz doraźnego maskowania problemu lokalnym wyrażeniem regularnym w linterze lub dopisywania ad-hoc mikro-zakazów do promptu ogólnego. Wszelkie próby obejścia problemu protezą są bezwzględnie wetowane przez Agenta 3.
+3. **Jedyny dysponent zgody:** Dopiero po komendzie Operatora:
+   `ZATWIERDZAM DOSSIER ZMIANY - WDROŻYĆ DO KODU`
+   Agent 1 uzyskuje jednorazową autoryzację do edycji plików na dysku.
+
+---
+
+### 👥 Struktura i Podział Ról w Zespole
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                       OPERATOR (UŻYTKOWNIK)                                 │
+│         - Zgłasza surowy błąd w tłumaczeniu (kwestia, timestamp, objaw)     │
+│         - Ostateczny decydent i jedyny dysponent zgody na edycję plików     │
+└──────────────────────────────────────┬──────────────────────────────────────┘
+                                       │ Surowe zgłoszenie błędu
+                                       ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│   AGENT 3: Chief Epistemic Architect & AVT Dramaturge                       │
+│   - Redaguje surowe zgłoszenie Operatora w formalny Bilet Incydentu         │
+│   - Diagnozuje przyczynę źródłową i tworzy czerwony test regresyjny         │
+│   - Wydaje twarde wytyczne implementacyjne dla Agenta 1 i brzegowe dla A2   │
+│   - Deadlock Arbiter i strażnik Golden Corpus (200 scen, CI/CD >= 98%)      │
+└──────────────────────┬──────────────────────────────────────┬───────────────┘
+                       │ Formalny Bilet Incydentu (Zadanie)   │ Werdykt / Akceptacja
+                       ▼                                      ▲
+┌─────────────────────────────┐        Audyt          ┌───────────────────────┐
+│ AGENT 1: Lead Implementer   ├──────────────────────►│ AGENT 2: Adversarial  │
+│ - Projektuje zmiany w RAM   │◄──────────────────────┤          Reviewer     │
+│ - Przygotowuje Diff Preview │     Kontrprzykłady    │ - Atakuje założenia   │
+│ - Koduje zielony test       │                       │ - Weryfikuje ASS/CPS  │
+└─────────────────────────────┘                       └───────────────────────┘
+
+---
+
+### 📋 Szablon Biletu Incydentu (INC-AVT Ticket Template)
+Każde zgłoszenie Operatora Agent 3 natychmiast przekształca w sformalizowany bilet:
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│ INCIDENT TICKET ID: INC-AVT-[NUMER]                                       │
+│ STATUS: TRIAGE COMPLETE / READY FOR IMPLEMENTATION                        │
+│                                                                           │
+│ 1. DANE WEJŚCIOWE ZGŁOSZENIA:                                             │
+│    - Linia ASS: [Oryginalna linijka zgłoszona przez Operatora]            │
+│    - Kontekst: [Scena, timing, timestamp, identyfikator odcinka]          │
+│                                                                           │
+│ 2. DIAGNOZA ONTO-INFORMACYJNA (ROOT CAUSE ANALYSIS):                      │
+│    - Zlokalizowany węzeł awarii: [Warstwa 1 DSP / Warstwa 2 SSOT /        │
+│      Warstwa 3 De-merger i Dyskurs / Warstwa 4 Script Doctor]             │
+│    - Mechanizm błędu: [Utrata F0 / Zlanie dwugłosu / Fałszywe dziedziczenie│
+│      aktora / Nominative Freezing / Asymetria deiktyczna]                 │
+│    - Weto anty-prowizoryczne: [Czego kategorycznie NIE wolno robić]       │
+│                                                                           │
+│ 3. CZERWONY TEST REGRESYJNY (GOLDEN CORPUS ASYGNACJA):                    │
+│    - Sygnatura testu: test_regression_inc_[numer]()                       │
+│    - Warunki brzegowe (Fixtures): Audio F0, klatki wideo, transkrypcja JA │
+│    - Stan początkowy: FAIL (udokumentowany zrzut błędu)                   │
+│                                                                           │
+│ 4. DYREKTYWA IMPLEMENTACYJNA DLA AGENTA 1:                                │
+│    - Wymagany moduł docelowy: [np. series_memory.py / scene_discourse.py] │
+│    - Kontrakt danych: [Dokładny kształt schematu JSON / stanu przed wejściem]
+│    - Kryterium sukcesu: Czerwony test zamienia się w PASS.                │
+│                                                                           │
+│ 5. ZAKRES AUDYTU ADVERSARIALNEGO DLA AGENTA 2:                            │
+│    - Wskazanie potencjalnych wektorów regresji: [Tagi ASS \pos, kolizje   │
+│      wielogłosów, postacie androgyniczne, budżet znaków CPL/CPS]          │
+└───────────────────────────────────────────────────────────────────────────┘
+
+---
+
+### 🔄 Potok Wykonawczy (5 Kroków Obsługi Incydentu)
+
+1. **KROK 1: Redagowanie Zgłoszenia i Formalny Bilet Incydentu (AGENT 3)**
+   - Natychmiast po zgłoszeniu wadliwej linii przez Operatora Agent 3 generuje bilet `INC-AVT-[NUMER]`.
+   - Identyfikuje węzeł awarii w 5 warstwach i formułuje czerwony test regresyjny `FAIL`.
+2. **KROK 2: Projekt Architektoniczny i Diff Preview w RAM (AGENT 1)**
+   - Agent 1 pobiera bilet i bez dotykania plików na dysku projektuje rozwiązanie w pamięci (RAM Diff Preview).
+   - Koduje rozwiązanie w docelowym module i wykazuje, że test z biletu przechodzi w stan `PASS`.
+   - Przekazuje diff i stan testu do Agenta 2.
+3. **KROK 3: Adversarialny Audyt Brzegowy (AGENT 2)**
+   - Agent 2 przeprowadza bezwzględny audyt diffu Agenta 1 pod kątem 18 wymiarów podatności (m.in. Style-Bleed `{\an...}`, limity CPS/CPL, kolizje wielogłosów, mianownizacja).
+   - Wydaje werdykt: `STATUS: WYMAGANA REWIZJA` lub `STATUS: REKOMENDACJA DLA AGENTA 3`.
+   - W razie impasu Agent 3 występuje jako Deadlock Arbiter.
+4. **KROK 4: Walidacja Systemowa i Dossier Zmiany dla Operatora (AGENT 3)**
+   - Agent 3 weryfikuje integralność na Golden Corpus (200 scen; próg: $\ge 98.0\%$).
+   - Kompiluje Dossier Zmiany dla OPERATORA (Bilet ID, Diff preview, wynik testu PASS, oświadczenie o braku protez).
+   - Formułuje wniosek: `OCZEKIWANIE NA DECYZJĘ OPERATORA`.
+5. **KROK 5: Decyzja Operatora i Fizyczna Aplikacja Zmian (OPERATOR -> AGENT 1)**
+   - Operator analizuje Dossier i wydaje polecenie: `ODRZUCONO` lub `ZATWIERDZAM DOSSIER ZMIANY - WDROŻYĆ DO KODU`.
+   - Dopiero po autoryzacji Agent 1 fizycznie modyfikuje pliki w repozytorium.
+   - Agent 3 uruchamia oficjalny test produkcyjny, weryfikuje sukces i zamyka Bilet Incydentu.
+
+
 
 

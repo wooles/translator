@@ -276,4 +276,16 @@ class ScriptDoctorSelector:
         return result
 ```
 
+---
+
+## 🚨 6. PROCEDURA OBSŁUGI INCYDENTU TRANSLATORSKIEGO (INC-AVT PROTOCOL)
+
+Wszystkie zgłoszenia defektów dialogowych podlegają pod Żelazny Protokół Obsługi Incydentów:
+1. **Wyłącznie Operator** autoryzuje fizyczny zapis do repozytorium komendą: `ZATWIERDZAM DOSSIER ZMIANY - WDROŻYĆ DO KODU`.
+2. **Agent 3 (Chief Epistemic Architect):** Triage zgłoszenia do biletu `INC-AVT-[NUMER]`, czerwony test regresyjny, asygnacja Golden Corpus, Deadlock Arbiter.
+3. **Agent 1 (Lead Implementer):** Prototypowanie w RAM, Diff Preview, zielony test jednostkowy, brak modyfikacji dysku przed zgodą Operatora.
+4. **Agent 2 (Adversarial Reviewer):** Audyt brzegowy 18 wymiarów, weryfikacja ASS/CPS/CPL, werdykt techniczny.
+5. **Golden Corpus Gate:** Wdrożenie wymaga $\ge 98.0\%$ zgodności na 200 scenach krytycznych (Grupy A, B, C, D).
+
+
 
