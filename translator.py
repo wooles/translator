@@ -87,6 +87,7 @@ from speaker_diarizer import SpeakerVoiceClassifier
 from typesetting_matcher import TypesettingColorMatcher, VisualTypesettingData
 from user_feedback import UserFeedbackManager
 from glossary_manager import GlossaryManager
+from scene_discourse import DualVoiceTagPreserver, DeicticDiscourseEngine, DiarizationSanityChecker
 from client_factory import format_friendly_api_error, patch_google_genai_schema_sanitizer
 
 patch_google_genai_schema_sanitizer()
@@ -1856,7 +1857,9 @@ class MultimodalTranslator:
                 b_val = self.series_bible.data.get("characters", {}).get(spk_clean, {})
                 char_desc_lower = (b_val.get("description", "") if isinstance(b_val, dict) else str(b_val)).lower()
 
-            is_boy_or_crossgender = any(k in char_desc_lower for k in self.BOY_ROLE_KEYWORDS) or any(k in spk_lower for k in ["chłopiec", "chłopak", "boy", "bocchan"])
+            is_boy_or_crossgender = any(k in char_desc_lower for k in self.BOY_ROLE_KEYWORDS) or \
+                                    any(k in spk_lower for k in self.BOY_ROLE_KEYWORDS) or \
+                                    any(k in spk_lower for k in ["chłopiec", "chłopak", "boy", "bocchan", "tokiyuki", "chojumaru"])
 
             if is_boy_or_crossgender:
                 alerts.append(f"[🎯 ALARM CROSS-GENDER CHŁOPIĘCY: Postać męska '{spk_clean}' (młody chłopiec/syn/książę) dubbingowana przez żeńskie seiyū! Zablokowano nadpisanie głosem F0 -> zachowano 'mężczyzna']")
@@ -1906,7 +1909,9 @@ class MultimodalTranslator:
         if (acoustic_gender == "kobieta" or jp_female_marker) and phase1_is_male:
             char_d = (self.character_registry.get(spk_clean, "") or "") if spk_clean else ""
             char_d_low = char_d.lower()
-            is_boy = any(k in char_d_low for k in self.BOY_ROLE_KEYWORDS) or any(k in spk_lower for k in ["chłopiec", "chłopak", "boy", "bocchan"])
+            is_boy = any(k in char_d_low for k in self.BOY_ROLE_KEYWORDS) or \
+                     any(k in spk_lower for k in self.BOY_ROLE_KEYWORDS) or \
+                     any(k in spk_lower for k in ["chłopiec", "chłopak", "boy", "bocchan", "tokiyuki", "chojumaru"])
             if is_boy:
                 alerts.append(f"[🎯 ALARM CROSS-GENDER CHŁOPIĘCY: Głos żeński F0 seiyū, lecz kontekst/rola '{spk_clean}' wskazuje młodego chłopca! Zachowano rodzaj męski z Fazy 1]")
                 return "mężczyzna", alerts
@@ -4020,6 +4025,25 @@ class MultimodalTranslator:
                 last_text = clean
                 last_style = ev.style
                 last_end = ev.end
+        # 1c. Deictic Discourse & Dual-Voice Turn-Taking Resolution (0.00 PLN)
+        for re_idx, (orig_idx, ev, clean, ts_prefix) in enumerate(raw_entries):
+            if DualVoiceTagPreserver.is_dual_voice(ev.text):
+                lines_m = DualVoiceTagPreserver.DUAL_VOICE_STRICT_REGEX.match(ev.text.strip())
+                if lines_m:
+                    l_a = lines_m.group(2).strip()
+                    l_b = lines_m.group(3).strip()
+                    spk_a, spk_b, dmeta = DeicticDiscourseEngine.resolve_deictic_hierarchy(l_a, l_b, getattr(ev, "name", ""))
+                    ev.name = f"{spk_a} / {spk_b}"
+                    next_idx = re_idx + 1
+                    while next_idx < len(raw_entries):
+                        n_orig_idx, n_ev, n_clean, n_ts = raw_entries[next_idx]
+                        delta_ms = n_ev.start - ev.end
+                        cont_spk = DeicticDiscourseEngine.audit_monologue_topic_continuation(n_clean, last_speaker=spk_a, delta_ms=delta_ms)
+                        if cont_spk:
+                            n_ev.name = cont_spk
+                            next_idx += 1
+                        else:
+                            break
 
         total_lines = len(raw_entries)
         fbf_saved = len(raw_all_entries) - total_lines

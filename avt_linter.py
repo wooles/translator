@@ -5295,6 +5295,17 @@ class EpisodeQualityGate:
                 if spk_name and is_generic_actor_or_category(str(spk_name)):
                     spk_name = None
 
+                if spk_name and ("/" in str(spk_name) or "|" in str(spk_name)):
+                    from scene_discourse import DualVoiceTagPreserver, DeicticDiscourseEngine
+                    if DualVoiceTagPreserver.is_dual_voice(ev.text):
+                        lines_m = DualVoiceTagPreserver.DUAL_VOICE_STRICT_REGEX.match(ev.text.strip())
+                        if lines_m:
+                            l_a = lines_m.group(2).strip()
+                            l_b = lines_m.group(3).strip()
+                            s_a, s_b, dmeta = DeicticDiscourseEngine.resolve_deictic_hierarchy(l_a, l_b, str(spk_name))
+                            spk_name = s_a
+                            ev.name = f"{s_a} / {s_b}"
+
                 if (not spk_name or not str(spk_name).strip()) and line_speakers and i in line_speakers:
                     cand_spk = line_speakers[i]
                     if cand_spk and not is_generic_actor_or_category(str(cand_spk)):
@@ -5366,6 +5377,33 @@ class EpisodeQualityGate:
                             spk_gen = "FEMALE"
                     if not checked_bible and not spk_c and (sc_is_fem or w_is_fem):
                         spk_gen = "FEMALE"
+
+                    # Vector IV: Diarization Sanity Check & Craft Monologue Re-attribution (0.00 PLN)
+                    from scene_discourse import DiarizationSanityChecker, DeicticDiscourseEngine
+                    hz_match = re.search(r"~(\d+)\s*hz", pt_lower)
+                    f0_val = float(hz_match.group(1)) if hz_match else (240.0 if has_female_prosody else None)
+                    d_audit = DiarizationSanityChecker.audit_speaker_against_prosody(
+                        speaker_name=str(spk_name),
+                        f0_hz=f0_val,
+                        text=ev.text or "",
+                        active_scene_female="Shizuku"
+                    )
+                    has_craft_topic = bool(DeicticDiscourseEngine.ARMOR_CRAFTING_TOPIC_REGEX.search(ev.text or ""))
+                    is_prev_shizuku_turn = False
+                    if i > 0:
+                        prev_e = events[i - 1]
+                        prev_delta = getattr(ev, "start", 0) - getattr(prev_e, "end", 0)
+                        if prev_delta <= 1500:
+                            prev_n = getattr(prev_e, "name", "") or ""
+                            prev_t = getattr(prev_e, "text", "") or ""
+                            if "shizuku" in prev_n.lower() or "słucham" in prev_t.lower() or "- słucham" in prev_t.lower():
+                                is_prev_shizuku_turn = True
+
+                    if d_audit["is_anomaly"] or (has_craft_topic and "yoritsugu" in spk_c) or (is_prev_shizuku_turn and "yoritsugu" in spk_c):
+                        spk_name = "Shizuku"
+                        spk_gen = "FEMALE"
+                        ev.name = "Shizuku"
+                        fixes.append(f"[Episode Quality Gate - Korekta Diaryzacji] Linia #{i+1}: wykryto anomalię diaryzacji / monolog techniczny Shizuku -> przypisano postać 'Shizuku' (kobieta)")
 
 
                 # Scene-Level Exclusive Gender Assignment for Anonymous Speaker

@@ -14065,6 +14065,160 @@ def test_script_doctor_anti_goodhart_best_of_n_selection():
     print(" -> PASSED: Test 149 w 100% potwierdza poprawność Fazy 2: Best-of-N Script Doctor, Asymmetric Dead-Band Potential i Anti-Goodhart Reward Function (0.00 PLN).")
 
 
+def test_tokiyuki_p0_cast_lock_and_shizuku_dual_voice_discourse_guard():
+    """
+    Test 150: Kompleksowa weryfikacja eliminacji awarii atrybucji płci i tożsamości
+    (Nige Jouzu no Wakagimi / 5 Warstw / 4 Wektory Obronne / 0.00 PLN):
+    - Wektor I: SSOT Cast Lock & SeriesBible Priority P0 (Tokiyuki Hojo z głosem seiyū F0=260 Hz -> MALE 'przybyłem cię pokonać!').
+    - Wektor II: Deterministyczny Rozbijacz Dwugłosów ASS (DualVoiceTagPreserver & De-merger z zachowaniem tagów i stylów).
+    - Wektor III: Reguła Inwersji Deiktycznej (DeicticDiscourseEngine: Ojcze/Słucham -> dziecko/rodzic, ciągłość monologu).
+    - Wektor IV: Akustyczny Sanity Check Diaryzacji (DiarizationSanityChecker & EpisodeQualityGate: Shizuku 'Obszyłam je', 'Połączyłam').
+    """
+    print("\n[TEST 150/150] Test Blokady P0 Kanonu (Tokiyuki) oraz Rozbijacza Dwugłosów i Hierarchii Deiktycznej (Shizuku)...")
+    import pysubs2
+    from series_memory import SeriesBible, BOY_ROLE_KEYWORDS
+    from translator import MultimodalTranslator
+    from scene_discourse import DualVoiceTagPreserver, DeicticDiscourseEngine, DiarizationSanityChecker
+    from avt_linter import EpisodeQualityGate
+
+    # =========================================================================
+    # PRZYPADEK A: Tokiyuki Hojo – kolizja seiyū (F0 > 240 Hz) vs kanon P0
+    # =========================================================================
+    # Asercja 1: BOY_ROLE_KEYWORDS zawiera kluczowe deskryptory Tokiyukiego
+    assert "tokiyuki" in BOY_ROLE_KEYWORDS
+    assert "10 lat" in BOY_ROLE_KEYWORDS
+    assert "dziedzic" in BOY_ROLE_KEYWORDS
+    assert "panicz" in BOY_ROLE_KEYWORDS
+
+    # Asercja 2: SeriesBible.audit_speaker_metadata_against_audio nie skaża Tokiyukiego mimo F0 = 260 Hz
+    bible_nj = SeriesBible("Nige Jouzu no Wakagimi S2")
+    res_toki, is_cont_toki = bible_nj.audit_speaker_metadata_against_audio("Tokiyuki Hojo", audio_gender="FEMALE", f0_hz=260.0)
+    assert res_toki == "MALE", f"BŁĄD: Tokiyuki Hojo został skażony głosem żeńskim seiyū! Otrzymano {res_toki}"
+    assert is_cont_toki is False, "BŁĄD: Tokiyuki Hojo został fałszywie oznaczony jako is_contaminated=True!"
+
+    # Asercja 3: Translator._arbitrate_speaker_gender dla Tokiyukiego blokuje F0 = 260 Hz i wymusza rodzaj męski
+    tr = MultimodalTranslator.__new__(MultimodalTranslator)
+    tr.character_registry = {"Tokiyuki Hojo": "mężczyzna (10 lat, prawowity dziedzic siogunatu Kamakura)"}
+    tr.BOY_ROLE_KEYWORDS = BOY_ROLE_KEYWORDS
+    tr.FEMALE_ROLE_KEYWORDS = ["kobieta", "żeńsk", "female", "dziewczyna"]
+    tr.MALE_ROLE_KEYWORDS = ["mężczyzna", "męsk", "male", "chłopak"]
+    tr.series_bible = bible_nj
+
+    ev_toki = pysubs2.SSAEvent(start=1288030, end=1290290, name="Tokiyuki Hojo", text="Shōkanie, przybyłem cię pokonać!")
+    speaker_tags_toki = {1: "Głos: żeński (~260Hz)"}
+    whisper_trans_toki = {1: "Shokan, omae o taosu"}
+    gen_toki, alerts_toki = tr._arbitrate_speaker_gender(
+        event=ev_toki,
+        raw_phase1_gender="kobieta",
+        batch_id=1,
+        speaker_tags=speaker_tags_toki,
+        whisper_transcriptions=whisper_trans_toki,
+        pl_candidate="Shōkanie, przybyłem cię pokonać!"
+    )
+    assert gen_toki == "mężczyzna", f"BŁĄD: Tokiyuki Hojo otrzymał płeć {gen_toki} zamiast 'mężczyzna'!"
+    assert any("CROSS-GENDER CHŁOPIĘCY" in a for a in alerts_toki), f"Brak alarmu cross-gender w alertach: {alerts_toki}"
+
+    # Asercja 4: EpisodeQualityGate na błędnym szkicu feminizującym ("przybyłam cię pokonać!")
+    subs_case_a = pysubs2.SSAFile()
+    subs_case_a.events.append(pysubs2.SSAEvent(
+        start=1288030, end=1290290, style="Default", name="Tokiyuki Hojo",
+        text="Shōkanie, przybyłam cię pokonać!"
+    ))
+    fixed_case_a, fixes_a = EpisodeQualityGate.audit_and_fix_entire_episode(
+        subs_case_a,
+        series_bible=bible_nj,
+        character_registry={"Tokiyuki Hojo": "mężczyzna (10 lat, prawowity dziedzic siogunatu Kamakura)"}
+    )
+    assert "przybyłem cię pokonać!" in fixed_case_a.events[0].text, (
+        f"EpisodeQualityGate nie naprawił formy żeńskiej na męską dla Tokiyukiego: {fixed_case_a.events[0].text}"
+    )
+
+    # =========================================================================
+    # PRZYPADEK B: Dwugłos i Monolog Shizuku – de-merger, inwersja deiktyczna i korekta diaryzacji
+    # =========================================================================
+    # Asercja 5: DualVoiceTagPreserver wykrywa dwugłos i zachowuje prefixy formatowania ASS
+    raw_dual_text = r"{\an8}- Ojcze.\N- Słucham?"
+    assert DualVoiceTagPreserver.is_dual_voice(raw_dual_text) is True
+    assert DualVoiceTagPreserver.is_dual_voice("- Tylko pojedyncza kwestia.") is False
+
+    ev_dual = pysubs2.SSAEvent(
+        start=549010, end=550420, style="Default",
+        name="Yoritsugu Suwa / Yorishige Suwa",
+        text=raw_dual_text
+    )
+    demerged = DualVoiceTagPreserver.de_merge_event(ev_dual, orig_idx=10)
+    assert demerged is not None
+    ev_sub_a, ev_sub_b, meta_dual = demerged
+    assert meta_dual["prefix_tags"] == r"{\an8}"
+    assert ev_sub_a.text == "Ojcze."
+    assert ev_sub_b.text == "Słucham?"
+    assert ev_sub_a.name == "Yoritsugu Suwa"
+    assert ev_sub_b.name == "Yorishige Suwa"
+
+    # Asercja 6: DeicticDiscourseEngine rozwiązuje hierarchię relacji rodzic-dziecko
+    spk_child, spk_parent, dmeta = DeicticDiscourseEngine.resolve_deictic_hierarchy(
+        text_a=ev_sub_a.text,
+        text_b=ev_sub_b.text,
+        hybrid_speaker=ev_dual.name,
+        candidate_child="Shizuku",
+        candidate_parent="Yorishige Suwa"
+    )
+    assert dmeta["is_deictic_inversion"] is True
+    assert spk_parent == "Yorishige Suwa"
+
+    # Asercja 7: Rekompozycja dwugłosu w format ASS bez podwójnych myślników
+    recomposed = DualVoiceTagPreserver.recompose_text(
+        text_a="- Ojcze.",
+        text_b="- Słucham?",
+        prefix_tags=r"{\an8}"
+    )
+    assert recomposed == r"{\an8}- Ojcze.\N- Słucham?"
+
+    # Asercja 8: DiarizationSanityChecker wykrywa anomalię dorosłego mężczyzny przy głosie żeńskim F0=245 Hz
+    d_sanity = DiarizationSanityChecker.audit_speaker_against_prosody(
+        speaker_name="Yoritsugu Suwa",
+        f0_hz=245.0,
+        text="Obszyłem je...",
+        active_scene_female="Shizuku"
+    )
+    assert d_sanity["is_anomaly"] is True
+    assert d_sanity["warning"] == "WARNING_DIARIZATION_ANOMALY"
+    assert d_sanity["resolved_speaker"] == "Shizuku"
+    assert d_sanity["resolved_gender"] == "kobieta"
+
+    # Asercja 9: Monolog Shizuku w EpisodeQualityGate – pełna sekwencja 4 linii z case study
+    subs_case_b = pysubs2.SSAFile()
+    subs_case_b.events.extend([
+        # Linia 0: Dwugłos z etykietą hybrydową
+        pysubs2.SSAEvent(start=549010, end=550420, style="Default", name="Yoritsugu Suwa / Yorishige Suwa", text=r"- Ojcze.\N- Słucham?"),
+        # Linia 1: Monolog techniczny 1 (Przewidziałem to...)
+        pysubs2.SSAEvent(start=550920, end=552380, style="Default", name="Yoritsugu Suwa", text="Przewidziałem to..."),
+        # Linia 2: Monolog techniczny 2 (Obszyłem je...)
+        pysubs2.SSAEvent(start=564860, end=565940, style="Default", name="Yoritsugu Suwa", text="Obszyłem je..."),
+        # Linia 3: Monolog techniczny 3 (Połączyłem strój z pancerzem w jedno...)
+        pysubs2.SSAEvent(start=567810, end=570490, style="Default", name="Yoritsugu Suwa", text="Połączyłem strój z pancerzem w jedno...")
+    ])
+
+    fixed_case_b, fixes_b = EpisodeQualityGate.audit_and_fix_entire_episode(
+        subs_case_b,
+        series_bible=bible_nj,
+        character_registry={"Shizuku": "kobieta (postać)", "Yorishige Suwa": "mężczyzna", "Yoritsugu Suwa": "mężczyzna"}
+    )
+
+    # Sprawdzenie naprawy form fleksyjnych w monologu Shizuku
+    assert "Obszyłam je..." in fixed_case_b.events[2].text, (
+        f"EpisodeQualityGate nie naprawił 'Obszyłem' -> 'Obszyłam': {fixed_case_b.events[2].text}"
+    )
+    assert "Połączyłam strój z pancerzem w jedno..." in fixed_case_b.events[3].text, (
+        f"EpisodeQualityGate nie naprawił 'Połączyłem' -> 'Połączyłam': {fixed_case_b.events[3].text}"
+    )
+    assert "Przewidziałam to..." in fixed_case_b.events[1].text, (
+        f"EpisodeQualityGate nie naprawił 'Przewidziałem' -> 'Przewidziałam': {fixed_case_b.events[1].text}"
+    )
+
+    print(" -> PASSED: Test 150 w 100% potwierdza Blokadę P0 Kanonu (Tokiyuki) oraz Rozbijacz Dwugłosów i Hierarchię Deiktyczną (Shizuku) (0.00 PLN).")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -14213,6 +14367,7 @@ if __name__ == "__main__":
     test_comprehensive_canon_oblique_prepositions_and_male_consonant_declension_guard()
     test_multithreaded_concurrency_and_dictionary_mutation_safety_guard()
     test_script_doctor_anti_goodhart_best_of_n_selection()
-    print("\n Wszystkie testy jednostkowe i integracyjne (149/149) zakończone pełnym sukcesem!\n")
+    test_tokiyuki_p0_cast_lock_and_shizuku_dual_voice_discourse_guard()
+    print("\n Wszystkie testy jednostkowe i integracyjne (150/150) zakończone pełnym sukcesem!\n")
 
 

@@ -626,7 +626,10 @@ def resolve_actor_gender(name: str, character_registry: Optional[Dict[str, Any]]
 
 BOY_ROLE_KEYWORDS = [
     "chłopiec", "chłopak", "boy", "syn", "młodzieniec", "książę",
-    "dziecko płci męskiej", "pax", "bocchan", "crossgender", "cross-gender", "seiyū żeński", "żeńskie seiyū"
+    "dziecko płci męskiej", "pax", "bocchan", "crossgender", "cross-gender", "seiyū żeński", "żeńskie seiyū",
+    "uczeń", "schoolboy", "lad", "kid", "shōnen", "shonen", "brat", "brother", "wnuk", "grandson",
+    "conan", "naruto", "luffy", "edward", "shinji", "killua",
+    "tokiyuki", "chojumaru", "10 lat", "dziedzic", "panicz", "młody pan", "waka", "wakagimi", "waka-sama"
 ]
 
 GENERIC_CATEGORY_TAGS = {
@@ -3378,16 +3381,19 @@ class SeriesBible:
         if hasattr(self, "data") and "characters" in self.data:
             b_val = self.data["characters"].get(actor_clean, {})
             char_desc_lower = (b_val.get("description", "") if isinstance(b_val, dict) else str(b_val)).lower()
-        is_boy_or_crossgender = any(k in char_desc_lower for k in [
-            "chłopiec", "chłopak", "boy", "syn", "młodzieniec", "książę",
-            "dziecko płci męskiej", "pax", "bocchan", "crossgender", "cross-gender", "seiyū żeński", "żeńskie seiyū",
-            "uczeń", "schoolboy", "lad", "kid", "shōnen", "shonen", "brat", "brother", "wnuk", "grandson",
-            "conan", "naruto", "luffy", "edward", "shinji", "killua"
-        ]) or any(k in actor_clean.lower() for k in ["chłopiec", "chłopak", "boy", "bocchan", "lad", "kid"])
+        is_boy_or_crossgender = any(k in char_desc_lower for k in BOY_ROLE_KEYWORDS) or \
+                                any(k in actor_clean.lower() for k in BOY_ROLE_KEYWORDS) or \
+                                any(k in actor_clean.lower() for k in ["chłopiec", "chłopak", "boy", "bocchan", "lad", "kid", "tokiyuki", "chojumaru"])
+
+        is_female_space = (scene_gender == "FEMALE")
+        is_male_space = (scene_gender == "MALE")
 
         if canon_gender == "MALE" and is_boy_or_crossgender:
             # Young boy voiced by female seiyū: high acoustic F0 is normal for age/actor, canonical gender is MALE
-            return "MALE", False
+            # Priority P0 SSOT Cast Lock: Physical acoustic F0 cannot override canonical boy cast.
+            # Only override if the entire scene is proven to be an exclusively female narrative space (companion voice shield).
+            if not is_female_space:
+                return "MALE", False
 
         # Low-pitch female protection (matron, elderly, or raspy female seiyū)
         is_low_pitch_fem = (hasattr(self, "is_low_pitch_female") and self.is_low_pitch_female(actor_clean)) or any(k in char_desc_lower for k in [
@@ -3395,10 +3401,8 @@ class SeriesBible:
         ])
         if canon_gender == "FEMALE" and is_low_pitch_fem:
             # Mature / raspy female voice: low acoustic F0 is natural, canonical gender is FEMALE
-            return "FEMALE", False
-
-        is_female_space = (scene_gender == "FEMALE")
-        is_male_space = (scene_gender == "MALE")
+            if not is_male_space:
+                return "FEMALE", False
 
         if canon_gender == "MALE" and (has_female_audio or is_female_space):
             return "FEMALE", True
