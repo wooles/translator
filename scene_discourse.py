@@ -35,7 +35,7 @@ class DualVoiceTagPreserver:
     """
 
     DUAL_VOICE_STRICT_REGEX = re.compile(
-        r"^((?:\{[^}]*\})*)\s*[-–—]\s*(.+?)(?:\\[Nnh]|\n)\s*[-–—]\s*(.+)$",
+        r"^((?:\{[^}]*\})*)\s*[-–—]\s*(.+?)(?:\\[Nnh]|\n)\s*((?:\{[^}]*\})*)\s*[-–—]\s*(.+)$",
         re.DOTALL
     )
 
@@ -63,9 +63,11 @@ class DualVoiceTagPreserver:
         if not m:
             return None
 
-        prefix_tags = m.group(1) or ""
+        tags_a = m.group(1) or ""
         line_a = m.group(2).strip()
-        line_b = m.group(3).strip()
+        tags_b = m.group(3) or ""
+        line_b = m.group(4).strip()
+        prefix_tags = tags_a
 
         # Rozbicie etykiety hybrydowej aktora, np. "Yoritsugu Suwa / Yorishige Suwa" -> ("Yoritsugu Suwa", "Yorishige Suwa")
         raw_name = getattr(event, "name", "") or ""
@@ -90,7 +92,8 @@ class DualVoiceTagPreserver:
         setattr(ev_a, "_is_dual_voice_sub", True)
         setattr(ev_a, "_dual_voice_part", "A")
         setattr(ev_a, "_master_orig_idx", orig_idx)
-        setattr(ev_a, "_prefix_tags", prefix_tags)
+        setattr(ev_a, "_prefix_tags", tags_a)
+        setattr(ev_a, "_tags_a", tags_a)
 
         ev_b = event.copy()
         ev_b.text = line_b
@@ -98,11 +101,14 @@ class DualVoiceTagPreserver:
         setattr(ev_b, "_is_dual_voice_sub", True)
         setattr(ev_b, "_dual_voice_part", "B")
         setattr(ev_b, "_master_orig_idx", orig_idx)
-        setattr(ev_b, "_prefix_tags", prefix_tags)
+        setattr(ev_b, "_prefix_tags", tags_b)
+        setattr(ev_b, "_tags_b", tags_b)
 
         meta = {
             "orig_idx": orig_idx,
             "prefix_tags": prefix_tags,
+            "tags_a": tags_a,
+            "tags_b": tags_b,
             "speaker_a": spk_a,
             "speaker_b": spk_b,
             "raw_name": raw_name,
@@ -113,11 +119,11 @@ class DualVoiceTagPreserver:
         return ev_a, ev_b, meta
 
     @classmethod
-    def recompose_text(cls, text_a: str, text_b: str, prefix_tags: str = "") -> str:
+    def recompose_text(cls, text_a: str, text_b: str, prefix_tags: str = "", tags_a: str = "", tags_b: str = "") -> str:
         """
         Rekomponuje przetłumaczone kwestie A i B w pojedynczy poprawny format ASS:
-        prefix_tags + "- " + text_a + "\\N- " + text_b
-        Usuwa nadmiarowe, zduplikowane myślniki i spacje.
+        tags_a + "- " + text_a + "\\N" + tags_b + "- " + text_b
+        Usuwa nadmiarowe, zduplikowane myślniki i spacje oraz zapobiega zjawisku Style-Bleed.
         """
         clean_a = (text_a or "").strip()
         clean_b = (text_b or "").strip()
@@ -130,8 +136,12 @@ class DualVoiceTagPreserver:
         clean_a = re.sub(r"\\[Nnh]+", " ", clean_a).strip()
         clean_b = re.sub(r"\\[Nnh]+", " ", clean_b).strip()
 
-        tags = prefix_tags.strip() if prefix_tags else ""
-        return f"{tags}- {clean_a}\\N- {clean_b}".strip()
+        t_a = tags_a.strip() if tags_a else (prefix_tags.strip() if prefix_tags else "")
+        t_b = tags_b.strip() if tags_b else ""
+
+        prefix_a = f"{t_a}- " if t_a else "- "
+        sep_b = f"{t_b}- " if t_b else "- "
+        return f"{prefix_a}{clean_a}\\N{sep_b}{clean_b}".strip()
 
 
 class DeicticDiscourseEngine:
@@ -220,18 +230,18 @@ class DeicticDiscourseEngine:
     ) -> Optional[str]:
         """
         Weryfikuje ciągłość monologu technicznego po dwugłosie:
-        Jeśli Δt <= max_delta_ms i (temat kontynuuje rzemiosło/zbroję,
-        lub następuje bezpośrednio po replice ojca 'Słucham?',
-        lub tembr F0 >= 220 Hz wskazuje głos dziewczynki/kobiety),
-        utrzymuje tożsamość mówcy (np. Shizuku) i blokuje maskulinizację.
+        Dwuwektorowa kotwica ciągłości (Topic & Voice Signature Anchor):
+        1. Jeśli temat kontynuuje rzemiosło/zbroję (has_topic) lub tembr F0 >= 220 Hz wskazuje głos dziewczęcy,
+           utrzymuje tożsamość mówcy (np. Shizuku) niezależnie od przerw montażowych (w tym luki 8.77s).
+        2. W przeciwnym razie wymaga bezpośredniego następstwa po replice ojca (Δt <= max_delta_ms).
         """
-        if delta_ms > max_delta_ms and not (audio_f0 and audio_f0 >= 220.0):
-            return None
-
-        has_topic = bool(cls.ARMOR_CRAFTING_TOPIC_REGEX.search(text))
+        has_topic = bool(cls.ARMOR_CRAFTING_TOPIC_REGEX.search(text or ""))
         has_female_f0 = (audio_f0 is not None and audio_f0 >= 220.0)
 
-        if is_after_acknowledgment or has_topic or has_female_f0:
+        if has_topic or has_female_f0:
+            return last_speaker
+
+        if delta_ms <= max_delta_ms and is_after_acknowledgment:
             return last_speaker
 
         return None

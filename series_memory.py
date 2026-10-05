@@ -3411,6 +3411,48 @@ class SeriesBible:
 
         return (canon_gender if canon_gender != "UNKNOWN" else (audio_gender or whisper_gender or scene_gender or "UNKNOWN")), False
 
+    def audit_speaker_metadata_with_details(
+        self,
+        actor_name: str,
+        audio_gender: Optional[str] = None,
+        f0_hz: Optional[float] = None,
+        whisper_gender: Optional[str] = None,
+        scene_gender: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        Detailed version of audit_speaker_metadata_against_audio returning full epistemic metadata:
+        - resolved_gender: str
+        - is_contaminated: bool
+        - applied_gender: str
+        - gender_source: 'SERIES_BIBLE_P0' | 'SERIES_BIBLE' | 'ACOUSTIC'
+        - acoustic_prior_rejected: bool
+        """
+        res_g, is_cont = self.audit_speaker_metadata_against_audio(
+            actor_name, audio_gender=audio_gender, f0_hz=f0_hz, whisper_gender=whisper_gender, scene_gender=scene_gender
+        )
+        actor_clean = extract_clean_speaker_name(actor_name).strip() if actor_name else ""
+        canon_g = self.get_character_gender(actor_clean, allow_generic_nouns=False)
+
+        char_desc_lower = ""
+        if hasattr(self, "data") and "characters" in self.data:
+            b_val = self.data["characters"].get(actor_clean, {})
+            char_desc_lower = (b_val.get("description", "") if isinstance(b_val, dict) else str(b_val)).lower()
+        is_boy_or_crossgender = any(k in char_desc_lower for k in BOY_ROLE_KEYWORDS) or \
+                                any(k in actor_clean.lower() for k in BOY_ROLE_KEYWORDS) or \
+                                any(k in actor_clean.lower() for k in ["chłopiec", "chłopak", "boy", "bocchan", "lad", "kid", "tokiyuki", "chojumaru"])
+
+        has_female_audio = (audio_gender == "FEMALE") or (f0_hz is not None and f0_hz >= 185.0) or (whisper_gender == "FEMALE")
+        acoustic_rejected = bool(has_female_audio and res_g == "MALE" and is_boy_or_crossgender)
+        gender_source = "SERIES_BIBLE_P0" if (canon_g == "MALE" and is_boy_or_crossgender) else ("SERIES_BIBLE" if canon_g != "UNKNOWN" else "ACOUSTIC")
+
+        return {
+            "resolved_gender": res_g,
+            "is_contaminated": is_cont,
+            "applied_gender": res_g,
+            "gender_source": gender_source,
+            "acoustic_prior_rejected": acoustic_rejected
+        }
+
     def register_tv_transition(self, char_a: str, char_b: str, new_tv_state: str, ep_idx: int = 0) -> None:
         """
         Registers an authorized narrative T-V transition between two characters (e.g. from FORMAL to INFORMAL).

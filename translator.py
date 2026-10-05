@@ -4031,7 +4031,7 @@ class MultimodalTranslator:
                 lines_m = DualVoiceTagPreserver.DUAL_VOICE_STRICT_REGEX.match(ev.text.strip())
                 if lines_m:
                     l_a = lines_m.group(2).strip()
-                    l_b = lines_m.group(3).strip()
+                    l_b = (lines_m.group(4) if lines_m.lastindex >= 4 else lines_m.group(3)).strip()
                     spk_a, spk_b, dmeta = DeicticDiscourseEngine.resolve_deictic_hierarchy(l_a, l_b, getattr(ev, "name", ""))
                     ev.name = f"{spk_a} / {spk_b}"
                     next_idx = re_idx + 1

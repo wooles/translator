@@ -14095,6 +14095,10 @@ def test_tokiyuki_p0_cast_lock_and_shizuku_dual_voice_discourse_guard():
     res_toki, is_cont_toki = bible_nj.audit_speaker_metadata_against_audio("Tokiyuki Hojo", audio_gender="FEMALE", f0_hz=260.0)
     assert res_toki == "MALE", f"BŁĄD: Tokiyuki Hojo został skażony głosem żeńskim seiyū! Otrzymano {res_toki}"
     assert is_cont_toki is False, "BŁĄD: Tokiyuki Hojo został fałszywie oznaczony jako is_contaminated=True!"
+    det_toki = bible_nj.audit_speaker_metadata_with_details("Tokiyuki Hojo", audio_gender="FEMALE", f0_hz=260.0)
+    assert det_toki["applied_gender"] == "MALE"
+    assert det_toki["gender_source"] == "SERIES_BIBLE_P0"
+    assert det_toki["acoustic_prior_rejected"] is True
 
     # Asercja 3: Translator._arbitrate_speaker_gender dla Tokiyukiego blokuje F0 = 260 Hz i wymusza rodzaj męski
     tr = MultimodalTranslator.__new__(MultimodalTranslator)
@@ -14155,6 +14159,21 @@ def test_tokiyuki_p0_cast_lock_and_shizuku_dual_voice_discourse_guard():
     assert ev_sub_a.name == "Yoritsugu Suwa"
     assert ev_sub_b.name == "Yorishige Suwa"
 
+    # Asercja 5b: DualVoiceTagPreserver chroni przed Style-Bleed (osobne tagi dla wiersza A i B)
+    raw_dual_style = r"{\an8}- Ojcze!\N{\an2}- Stój tam!"
+    ev_style = pysubs2.SSAEvent(start=1000, end=3000, style="Default", text=raw_dual_style)
+    dem_style = DualVoiceTagPreserver.de_merge_event(ev_style)
+    assert dem_style is not None
+    assert dem_style[2]["tags_a"] == r"{\an8}"
+    assert dem_style[2]["tags_b"] == r"{\an2}"
+    recom_style = DualVoiceTagPreserver.recompose_text(
+        text_a=dem_style[0].text,
+        text_b=dem_style[1].text,
+        tags_a=dem_style[2]["tags_a"],
+        tags_b=dem_style[2]["tags_b"]
+    )
+    assert recom_style == r"{\an8}- Ojcze!\N{\an2}- Stój tam!"
+
     # Asercja 6: DeicticDiscourseEngine rozwiązuje hierarchię relacji rodzic-dziecko
     spk_child, spk_parent, dmeta = DeicticDiscourseEngine.resolve_deictic_hierarchy(
         text_a=ev_sub_a.text,
@@ -14186,17 +14205,23 @@ def test_tokiyuki_p0_cast_lock_and_shizuku_dual_voice_discourse_guard():
     assert d_sanity["resolved_speaker"] == "Shizuku"
     assert d_sanity["resolved_gender"] == "kobieta"
 
-    # Asercja 9: Monolog Shizuku w EpisodeQualityGate – pełna sekwencja 4 linii z case study
+    # Asercja 9: Monolog Shizuku w EpisodeQualityGate – pełna sekwencja 7 linii z case study
     subs_case_b = pysubs2.SSAFile()
     subs_case_b.events.extend([
-        # Linia 0: Dwugłos z etykietą hybrydową
+        # Linia 0: Dwugłos z etykietą hybrydową (L1)
         pysubs2.SSAEvent(start=549010, end=550420, style="Default", name="Yoritsugu Suwa / Yorishige Suwa", text=r"- Ojcze.\N- Słucham?"),
-        # Linia 1: Monolog techniczny 1 (Przewidziałem to...)
+        # Linia 1: Monolog techniczny 1 (L2: Przewidziałem to...)
         pysubs2.SSAEvent(start=550920, end=552380, style="Default", name="Yoritsugu Suwa", text="Przewidziałem to..."),
-        # Linia 2: Monolog techniczny 2 (Obszyłem je...)
+        # Linia 2: Monolog techniczny 2 (L3: zleciłem wykonanie prototypu)
+        pysubs2.SSAEvent(start=552460, end=556090, style="Default", name="Yoritsugu Suwa", text=r"Przed wyjazdem do Kyo\Nzleciłem wykonanie prototypu."),
+        # Linia 3: Monolog techniczny 3 (L4: Obszyłem je... po luce montażowej 8.77s)
         pysubs2.SSAEvent(start=564860, end=565940, style="Default", name="Yoritsugu Suwa", text="Obszyłem je..."),
-        # Linia 3: Monolog techniczny 3 (Połączyłem strój z pancerzem w jedno...)
-        pysubs2.SSAEvent(start=567810, end=570490, style="Default", name="Yoritsugu Suwa", text="Połączyłem strój z pancerzem w jedno...")
+        # Linia 4: Monolog techniczny 4 (L5: ...tylko tam, gdzie trzeba.)
+        pysubs2.SSAEvent(start=566020, end=567730, style="Default", name="Yoritsugu Suwa", text="...tylko tam, gdzie trzeba."),
+        # Linia 5: Monolog techniczny 5 (L6: Połączyłem strój z pancerzem w jedno...)
+        pysubs2.SSAEvent(start=567810, end=570490, style="Default", name="Yoritsugu Suwa", text="Połączyłem strój z pancerzem w jedno..."),
+        # Linia 6: Monolog techniczny 6 (L7: ...i maksymalnie go zwęziłem...)
+        pysubs2.SSAEvent(start=570570, end=572650, style="Default", name="Yoritsugu Suwa", text="...i maksymalnie go zwęziłem...")
     ])
 
     fixed_case_b, fixes_b = EpisodeQualityGate.audit_and_fix_entire_episode(
@@ -14206,14 +14231,26 @@ def test_tokiyuki_p0_cast_lock_and_shizuku_dual_voice_discourse_guard():
     )
 
     # Sprawdzenie naprawy form fleksyjnych w monologu Shizuku
-    assert "Obszyłam je..." in fixed_case_b.events[2].text, (
-        f"EpisodeQualityGate nie naprawił 'Obszyłem' -> 'Obszyłam': {fixed_case_b.events[2].text}"
-    )
-    assert "Połączyłam strój z pancerzem w jedno..." in fixed_case_b.events[3].text, (
-        f"EpisodeQualityGate nie naprawił 'Połączyłem' -> 'Połączyłam': {fixed_case_b.events[3].text}"
+    assert fixed_case_b.events[0].text == r"- Ojcze.\N- Słucham?", (
+        f"Linia 0 dwugłosu została uszkodzona: {fixed_case_b.events[0].text}"
     )
     assert "Przewidziałam to..." in fixed_case_b.events[1].text, (
         f"EpisodeQualityGate nie naprawił 'Przewidziałem' -> 'Przewidziałam': {fixed_case_b.events[1].text}"
+    )
+    assert "zleciłam wykonanie prototypu" in fixed_case_b.events[2].text, (
+        f"EpisodeQualityGate nie naprawił 'zleciłem' -> 'zleciłam': {fixed_case_b.events[2].text}"
+    )
+    assert "Obszyłam je..." in fixed_case_b.events[3].text, (
+        f"EpisodeQualityGate nie naprawił 'Obszyłem' -> 'Obszyłam': {fixed_case_b.events[3].text}"
+    )
+    assert "Połączyłam strój z pancerzem w jedno..." in fixed_case_b.events[5].text, (
+        f"EpisodeQualityGate nie naprawił 'Połączyłem' -> 'Połączyłam': {fixed_case_b.events[5].text}"
+    )
+    assert "zwęziłam" in fixed_case_b.events[6].text, (
+        f"EpisodeQualityGate nie naprawił 'zwęziłem' -> 'zwęziłam': {fixed_case_b.events[6].text}"
+    )
+    assert all(fixed_case_b.events[idx].name == "Shizuku" for idx in range(1, 7)), (
+        f"Mówcy nie zostali poprawnie re-atrybuowani do Shizuku: {[e.name for e in fixed_case_b.events]}"
     )
 
     print(" -> PASSED: Test 150 w 100% potwierdza Blokadę P0 Kanonu (Tokiyuki) oraz Rozbijacz Dwugłosów i Hierarchię Deiktyczną (Shizuku) (0.00 PLN).")

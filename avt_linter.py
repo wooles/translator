@@ -5301,7 +5301,7 @@ class EpisodeQualityGate:
                         lines_m = DualVoiceTagPreserver.DUAL_VOICE_STRICT_REGEX.match(ev.text.strip())
                         if lines_m:
                             l_a = lines_m.group(2).strip()
-                            l_b = lines_m.group(3).strip()
+                            l_b = (lines_m.group(4) if lines_m.lastindex >= 4 else lines_m.group(3)).strip()
                             s_a, s_b, dmeta = DeicticDiscourseEngine.resolve_deictic_hierarchy(l_a, l_b, str(spk_name))
                             spk_name = s_a
                             ev.name = f"{s_a} / {s_b}"
