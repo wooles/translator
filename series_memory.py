@@ -744,21 +744,38 @@ INVARIABLE_JAPANESE_FEMALE_NAMES = {
     "himeko", "seele", "bronya", "raiden", "yae"
 }
 
-def is_inherently_female_name(name: str) -> bool:
+FOREIGN_FEMALE_CONSONANT_NAMES = {
+    "chulan", "frieren", "fern", "carmen", "miriam", "ines", "rachel", "astrid", "judith",
+    "gwen", "karin", "marin", "rin", "shion", "sion", "helen", "ellen", "karen", "vivian",
+    "lyn", "lynn", "ann", "anne", "jean", "joan", "jill", "kim", "dawn", "megan", "beth"
+}
+
+def is_inherently_female_name(name: str, series_bible: Any = None) -> bool:
     """
     Returns True if the name is an inherently female first name (Polish or universal female name
     in the curated onomastic database or its vocative form on -o/-u).
     Excludes male exceptions on -a (Kuba, Barnaba, Kosma, etc.), interjections ('ała'),
-    and generic grammatical categories ('kobieta', 'mężczyzna').
+    generic grammatical categories ('kobieta', 'mężczyzna'), and canonical male names.
+    If series_bible is provided, epistemic precedence checks whether the character is registered as MALE.
     """
     if not name:
         return False
     clean = extract_clean_speaker_name(name).strip().lower()
     if is_generic_actor_or_category(clean):
         return False
-    if clean in MALE_EXCEPTIONS_ON_A:
+    if clean in MALE_EXCEPTIONS_ON_A or clean in CANONICAL_MALE_NAMES:
         return False
-    if clean in POLISH_FEMALE_NAMES or clean in UNIVERSAL_FEMALE_NAMES_ON_A or clean in INVARIABLE_JAPANESE_FEMALE_NAMES:
+    if series_bible and hasattr(series_bible, "get_character_gender"):
+        try:
+            bible_gen = series_bible.get_character_gender(clean, allow_generic_nouns=False)
+            if bible_gen == "MALE":
+                return False
+            if bible_gen == "FEMALE":
+                return True
+        except Exception:
+            pass
+
+    if clean in POLISH_FEMALE_NAMES or clean in UNIVERSAL_FEMALE_NAMES_ON_A or clean in INVARIABLE_JAPANESE_FEMALE_NAMES or clean in FOREIGN_FEMALE_CONSONANT_NAMES:
         return True
 
     # Vocative of known Polish female name ending with -o or -u
@@ -1405,8 +1422,9 @@ def generate_polish_name_declension(name: str, gender: str = "UNKNOWN") -> Dict[
     if n.lower().endswith(("ą", "ę", "ej", "ach", "ami", "om")):
         return {"M": n, "D": n, "C": n, "B": n, "N": n, "Ms": n, "W": n}
 
+    is_male = (g == "MALE" or "MĘSK" in g or "MALE" in g)
     is_female = (g == "FEMALE" or "KOBIETA" in g or "ŻEŃSK" in g)
-    if not is_female and (n.lower() in INVARIABLE_JAPANESE_FEMALE_NAMES or is_inherently_female_name(n)):
+    if not is_female and not is_male and (n.lower() in INVARIABLE_JAPANESE_FEMALE_NAMES or n.lower() in FOREIGN_FEMALE_CONSONANT_NAMES or is_inherently_female_name(n)):
         is_female = True
 
     # 0a. Adjectives / adjectival names and titles (e.g. Wielka, Wielki, Czarna, Czarny, Nieśmiertelny, Sobieski)
@@ -1864,6 +1882,151 @@ TYPO_NORMALIZATIONS = [
     (r"\b([Pp])omiędzy\s+nami\b", lambda m: "Między nami" if m.group(1)[0].isupper() else "między nami"),
     (r"\b([Ww])\s+mrugnięciu\s+oka\b", lambda m: "W mgnieniu oka" if m.group(1)[0].isupper() else "w mgnieniu oka"),
 ]
+
+
+def replace_with_case_preservation(pattern: str, replacement: str, text: str) -> str:
+    """Replaces matches of pattern with replacement, preserving initial capitalization of matched token."""
+    def _sub_cb(m):
+        orig = m.group(0)
+        if orig and orig[0].isupper():
+            return replacement[0].upper() + replacement[1:]
+        return replacement.lower()
+    return re.sub(pattern, _sub_cb, text, flags=re.IGNORECASE)
+
+
+VERB_PAT_MIEĆ = r"nie\s+(?:mam|masz|ma|mamy|macie|mają|miał(?:em|am|eś|aś|a|o)?|miel(?:i|iśmy|iście)|miały(?:śmy|ście)?|będ(?:ę|ziesz|zie|ziemy|ziecie|ą)\s+(?:mieć|miał(?:a)?))"
+VERB_PAT_WIDZIEĆ = r"nie\s+(?:widz(?:ę|isz|i|imy|icie|ą)|widział(?:em|am|eś|aś|a|o)?|widziel(?:i|iśmy|iście)|widziały(?:śmy|ście)?|będ(?:ę|ziesz|zie|ziemy|ziecie|ą)\s+(?:widzieć|widział(?:a)?))"
+VERB_PAT_CZUĆ = r"nie\s+(?:czuj(?:ę|esz|e|emy|ecie|ą)|czuł(?:em|am|eś|aś|a|o)?|czul(?:i|iśmy|iście)|czuły(?:śmy|ście)?|będ(?:ę|ziesz|zie|ziemy|ziecie|ą)\s+(?:czuć|czuł(?:a)?))"
+VERB_PAT_ZNAĆ = r"nie\s+(?:zna(?:m|sz|my|cie|ją)?|znał(?:em|am|eś|aś|a|o)?|znal(?:i|iśmy|iście)|znały(?:śmy|ście)?|będ(?:ę|ziesz|zie|ziemy|ziecie|ą)\s+(?:znać|znał(?:a)?))"
+VERB_PAT_PAMIĘTAĆ = r"nie\s+(?:pamięta(?:m|sz|my|cie|ją)?|pamiętał(?:em|am|eś|aś|a|o)?|pamiętal(?:i|iśmy|iście)|pamiętały(?:śmy|ście)?|będ(?:ę|ziesz|zie|ziemy|ziecie|ą)\s+(?:pamiętać|pamiętał(?:a)?))"
+VERB_PAT_SŁYSZEĆ = r"nie\s+(?:słysz(?:ę|ysz|y|ymy|ycie|ą)|słyszał(?:em|am|eś|aś|a|o)?|słyszel(?:i|iśmy|iście)|słyszały(?:śmy|ście)?|będ(?:ę|ziesz|zie|ziemy|ziecie|ą)\s+(?:słyszeć|słyszał(?:a)?))"
+VERB_PAT_SPRAWIAĆ = r"nie\s+(?:sprawia(?:m|sz|my|cie|ją)?|sprawiał(?:em|am|eś|aś|a|o)?|sprawi(?:ł|ła|ło|li|ły|ć)?)"
+
+TRANSITIVE_NEGATION_BASE_COLLOCATIONS = [
+    # (verb_pattern, direct_object_pattern, genitive_replacement)
+    # mieć + B. -> D.
+    (VERB_PAT_MIEĆ, r"czas", "czasu"),
+    (VERB_PAT_MIEĆ, r"wybór", "wyboru"),
+    (VERB_PAT_MIEĆ, r"ochotę", "ochoty"),
+    (VERB_PAT_MIEĆ, r"nadzieję", "nadziei"),
+    (VERB_PAT_MIEĆ, r"siłę", "siły"),
+    (VERB_PAT_MIEĆ, r"pojęcie", "pojęcia"),
+    (VERB_PAT_MIEĆ, r"powód", "powodu"),
+    (VERB_PAT_MIEĆ, r"problem", "problemu"),
+    (VERB_PAT_MIEĆ, r"wątpliwość", "wątpliwości"),
+    # znać + B. -> D.
+    (VERB_PAT_ZNAĆ, r"tę\s+prawdę", "tej prawdy"),
+    (VERB_PAT_ZNAĆ, r"odpowiedź", "odpowiedzi"),
+    (VERB_PAT_ZNAĆ, r"litość", "litości"),
+    (VERB_PAT_ZNAĆ, r"granice", "granic"),
+    # widzieć + B. -> D.
+    (VERB_PAT_WIDZIEĆ, r"żaden\s+sens", "żadnego sensu"),
+    (VERB_PAT_WIDZIEĆ, r"inny\s+sposób", "innego sposobu"),
+    (VERB_PAT_WIDZIEĆ, r"sens", "sensu"),
+    (VERB_PAT_WIDZIEĆ, r"przeszkody", "przeszkód"),
+    (VERB_PAT_WIDZIEĆ, r"powód", "powodu"),
+    (VERB_PAT_WIDZIEĆ, r"problem", "problemu"),
+    # czuć + B. -> D.
+    (VERB_PAT_CZUĆ, r"strach", "strachu"),
+    (VERB_PAT_CZUĆ, r"ból", "bólu"),
+    (VERB_PAT_CZUĆ, r"litość", "litości"),
+    # pamiętać + B. -> D.
+    (VERB_PAT_PAMIĘTAĆ, r"ten\s+dzień", "tego dnia"),
+    (VERB_PAT_PAMIĘTAĆ, r"tę\s+chwilę", "tej chwili"),
+    # słyszeć + B. -> D.
+    (VERB_PAT_SŁYSZEĆ, r"żaden\s+głos", "żadnego głosu"),
+    (VERB_PAT_SŁYSZEĆ, r"głos", "głosu"),
+    # sprawiać + B. -> D.
+    (VERB_PAT_SPRAWIAĆ, r"problem", "problemu"),
+    (VERB_PAT_SPRAWIAĆ, r"ból", "bólu"),
+]
+
+# Safe conversational adverbs/particles (<= 2 words, strictly no commas)
+NEGATION_ADVERBIAL_SPAN = r"(?:\s+(?:już|teraz|wcale|ani\s+trochę|tutaj|tu|tam|wciąż|nadal|przecież|nawet|zresztą|zbytnio|w\s+tym|chyba|naprawdę))?"
+
+TRANSITIVE_NEGATION_REPLACEMENTS = [
+    (r"\bnie\s+mam\s+czas\b", "nie mam czasu"),
+    (r"\bnie\s+mam\s+wybór\b", "nie mam wyboru"),
+    (r"\bnie\s+mam\s+ochotę\b", "nie mam ochoty"),
+    (r"\bnie\s+mam\s+nadzieję\b", "nie mam nadziei"),
+    (r"\bnie\s+mam\s+siłę\b", "nie mam siły"),
+    (r"\bnie\s+znam\s+tę\s+prawdę\b", "nie znam tej prawdy"),
+    (r"\bnie\s+znam\s+odpowiedź\b", "nie znam odpowiedzi"),
+    (r"\bnie\s+zna\s+litość\b", "nie zna litości"),
+    (r"\bnie\s+zna\s+granice\b", "nie zna granic"),
+    (r"\bnie\s+widzę\s+żaden\s+sens\b", "nie widzę żadnego sensu"),
+    (r"\bnie\s+widzę\s+inny\s+sposób\b", "nie widzę innego sposobu"),
+    (r"\bnie\s+widzi\s+przeszkody\b", "nie widzi przeszkód"),
+    (r"\bnie\s+pamiętam\s+ten\s+dzień\b", "nie pamiętam tego dnia"),
+    (r"\bnie\s+czuję\s+strach\b", "nie czuję strachu"),
+]
+
+
+def sanitize_genitive_of_negation(text: str) -> str:
+    """
+    Enforces Genitive of Negation on closed high-certainty transitive verb collocations
+    including optional conversational adverbial/particle insertions (<= 2 words, no commas) (Filar CLXXXVIII / 0.00 PLN).
+    Preserves case capitalization.
+    """
+    if not text:
+        return ""
+    res = text
+    for verb_pat, obj_pat, gen_target in TRANSITIVE_NEGATION_BASE_COLLOCATIONS:
+        pat = rf"\b({verb_pat})({NEGATION_ADVERBIAL_SPAN})\s+({obj_pat})\b"
+        def _sub_neg(m, tgt=gen_target):
+            v_matched = m.group(1)
+            adv_matched = m.group(2) or ""
+            obj_matched = m.group(3)
+            repl_tgt = tgt[0].upper() + tgt[1:] if obj_matched[0].isupper() else tgt
+            return f"{v_matched}{adv_matched} {repl_tgt}"
+        res = re.sub(pat, _sub_neg, res, flags=re.IGNORECASE)
+    return res
+
+
+CANON_OBLIQUE_CORRECTIONS = [
+    # Narzędnik po z/ze/przed/nad/pod/za/między
+    (r"\b([Zz]e?|[Pp]rzed|[Nn]ad|[Pp]od|[Zz]a|[Mm]iędzy)\s+(?:Aura\s+Gilotyna|Aurą\s+Gilotyna|Aura\s+Gilotyną)\b", r"\1 Aurą Gilotyną"),
+    (r"\b([Zz]e?|[Pp]rzed|[Nn]ad|[Pp]od|[Zz]a|[Mm]iędzy)\s+(?:Wielki\s+Chan|Wielkim\s+Chan|Wielki\s+Chanem)\b", r"\1 Wielkim Chanem"),
+    (r"\b([Zz]e?|[Pp]rzed|[Nn]ad|[Pp]od|[Zz]a|[Mm]iędzy)\s+(?:Król|Królem)\s+Demonów\b", r"\1 Królem Demonów"),
+    (r"\b([Zz]e?|[Pp]rzed|[Nn]ad|[Pp]od|[Zz]a|[Mm]iędzy)\s+(?:Czarny\s+Rycerz|Czarnym\s+Rycerz|Czarny\s+Rycerzem)\b", r"\1 Czarnym Rycerzem"),
+
+    # Dopełniacz po u/do/od/dla/bez/zza
+    (r"\b([Dd]la|[Uu]|[Oo]d|[Dd]o|[Bb]ez|[Zz]za)\s+(?:Aura\s+Gilotyna|Aury\s+Gilotyna|Aura\s+Gilotyny)\b", r"\1 Aury Gilotyny"),
+    (r"\b([Dd]la|[Uu]|[Oo]d|[Dd]o|[Bb]ez|[Zz]za)\s+(?:Wielki\s+Chan|Wielkiego\s+Chan|Wielki\s+Chana)\b", r"\1 Wielkiego Chana"),
+    (r"\b([Dd]la|[Uu]|[Oo]d|[Dd]o|[Bb]ez|[Zz]za)\s+(?:Król|Króla)\s+Demonów\b", r"\1 Króla Demonów"),
+    (r"\b([Dd]la|[Uu]|[Oo]d|[Dd]o|[Bb]ez|[Zz]za)\s+(?:Czarny\s+Rycerz|Czarnego\s+Rycerz|Czarny\s+Rycerza)\b", r"\1 Czarnego Rycerza"),
+
+    # Celownik po przeciwko/ku/dzięki
+    (r"\b([Pp]rzeciwko|[Kk]u|[Dd]zięki)\s+(?:Aura\s+Gilotyna|Aurze\s+Gilotyna|Aura\s+Gilotynie)\b", r"\1 Aurze Gilotynie"),
+    (r"\b([Pp]rzeciwko|[Kk]u|[Dd]zięki)\s+(?:Wielki\s+Chan|Wielkiemu\s+Chan|Wielki\s+Chanowi)\b", r"\1 Wielkiemu Chanowi"),
+    (r"\b([Pp]rzeciwko|[Kk]u|[Dd]zięki)\s+(?:Król|Królowi)\s+Demonów\b", r"\1 Królowi Demonów"),
+    (r"\b([Pp]rzeciwko|[Kk]u|[Dd]zięki)\s+(?:Czarny\s+Rycerz|Czarnemu\s+Rycerz|Czarny\s+Rycerzowi)\b", r"\1 Czarnemu Rycerzowi"),
+
+    # Biernik po przez
+    (r"\b([Pp]rzez)\s+(?:Aura\s+Gilotyna|Aurę\s+Gilotyna|Aura\s+Gilotynę)\b", r"\1 Aurę Gilotynę"),
+    (r"\b([Pp]rzez)\s+(?:Wielki\s+Chan|Wielkiego\s+Chan|Wielki\s+Chana)\b", r"\1 Wielkiego Chana"),
+    (r"\b([Pp]rzez)\s+(?:Król|Króla)\s+Demonów\b", r"\1 Króla Demonów"),
+    (r"\b([Pp]rzez)\s+(?:Czarny\s+Rycerz|Czarnego\s+Rycerz|Czarny\s+Rycerza)\b", r"\1 Czarnego Rycerza"),
+
+    # Miejscownik po o/przy
+    (r"\b([Oo]|[Pp]rzy)\s+(?:Aura\s+Gilotyna|Aurze\s+Gilotyna|Aura\s+Gilotynie)\b", r"\1 Aurze Gilotynie"),
+    (r"\b([Oo]|[Pp]rzy)\s+(?:Wielki\s+Chan|Wielkim\s+Chan|Wielki\s+Chanie)\b", r"\1 Wielkim Chanie"),
+    (r"\b([Oo]|[Pp]rzy)\s+(?:Król|Królu)\s+Demonów\b", r"\1 Królu Demonów"),
+    (r"\b([Oo]|[Pp]rzy)\s+(?:Czarny\s+Rycerz|Czarnym\s+Rycerz|Czarny\s+Rycerzu)\b", r"\1 Czarnym Rycerzu"),
+]
+
+
+def sanitize_canon_compound_oblique_cases(text: str) -> str:
+    """
+    Corrects frozen nominative compound canon syntagmas governed by prepositions (Filar CLXXXVIII / 0.00 PLN).
+    'z Aura Gilotyna' -> 'z Aurą Gilotyną', 'dla Wielki Chan' -> 'dla Wielkiego Chana'.
+    """
+    if not text:
+        return ""
+    res = text
+    for pat, repl in CANON_OBLIQUE_CORRECTIONS:
+        res = re.sub(pat, repl, res)
+    return res
 
 
 def sanitize_lexical_text(text: str) -> str:
