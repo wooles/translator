@@ -3884,7 +3884,7 @@ class EpisodeQualityGate:
 
         # 0a. From Character Registry
         if character_registry:
-            for cname, cdesc in character_registry.items():
+            for cname, cdesc in list(character_registry.items()):
                 gen = None
                 if isinstance(cdesc, dict):
                     c_g = str(cdesc.get("gender", "")).upper()
@@ -4016,7 +4016,7 @@ class EpisodeQualityGate:
 
         candidate_names = set(char_gender_map.keys())
         if character_registry:
-            for k in character_registry.keys():
+            for k in list(character_registry.keys()):
                 for p in re.split(r"[/,]", k):
                     clean_p = p.strip().lower()
                     if len(clean_p) >= 3:
@@ -4026,7 +4026,8 @@ class EpisodeQualityGate:
         from series_memory import generate_polish_name_declension
         character_declensions: Dict[str, Dict[str, str]] = {}
         if series_bible and hasattr(series_bible, "data") and "declensions" in series_bible.data:
-            for k, val in series_bible.data["declensions"].items():
+            bible_decls = series_bible.get_declensions_snapshot() if hasattr(series_bible, "get_declensions_snapshot") else dict(series_bible.data.get("declensions", {}))
+            for k, val in list(bible_decls.items()):
                 if k and len(k) >= 3 and not any(ch in k for ch in "->/"):
                     if isinstance(val, dict) and "M" in val and "W" in val:
                         character_declensions[k] = val
@@ -4040,18 +4041,19 @@ class EpisodeQualityGate:
                         character_declensions[k] = generate_polish_name_declension(k, g)
 
         if series_bible and hasattr(series_bible, "data") and "characters" in series_bible.data:
-            for k in series_bible.data["characters"].keys():
+            bible_chars = series_bible.get_characters_snapshot() if hasattr(series_bible, "get_characters_snapshot") else dict(series_bible.data.get("characters", {}))
+            for k in list(bible_chars.keys()):
                 if k and len(k) >= 3 and not any(ch in k for ch in "->/"):
                     clean_k = extract_clean_speaker_name(k).strip()
-                    if clean_k and not any(clean_k.lower() == existing_k.lower() for existing_k in character_declensions.keys()):
+                    if clean_k and not any(clean_k.lower() == existing_k.lower() for existing_k in list(character_declensions.keys())):
                         g = char_gender_map.get(clean_k.lower(), "UNKNOWN")
                         character_declensions[clean_k] = generate_polish_name_declension(clean_k, g)
 
         if character_registry:
-            for k in character_registry.keys():
+            for k in list(character_registry.keys()):
                 for p in re.split(r"[/,]", k):
                     clean_p = p.strip()
-                    if len(clean_p) >= 3 and not any(clean_p.lower() == existing_k.lower() for existing_k in character_declensions.keys()):
+                    if len(clean_p) >= 3 and not any(clean_p.lower() == existing_k.lower() for existing_k in list(character_declensions.keys())):
                         g = char_gender_map.get(clean_p.lower(), "UNKNOWN")
                         character_declensions[clean_p] = generate_polish_name_declension(clean_p, g)
 
@@ -5191,7 +5193,7 @@ class EpisodeQualityGate:
                 if series_bible and hasattr(series_bible, "character_names"):
                     known_stems.update({n.lower() for n in series_bible.character_names})
                 if character_registry:
-                    known_stems.update({k.lower() for k in character_registry.keys()})
+                    known_stems.update({k.lower() for k in list(character_registry.keys())})
 
                 # Case 1: Title + Surname + Given Name + Verb (e.g. 'Mistrz Tondena minoru\Nnie zdążył' -> 'Mistrz Tonden Minoru\Nnie zdążył')
                 def _fix_nominative_two_part_title_apposition(m):
@@ -6063,7 +6065,7 @@ class EpisodeQualityGate:
                     else:
                         # Check character vocative in line
                         if character_registry:
-                            for cname, cdesc in character_registry.items():
+                            for cname, cdesc in list(character_registry.items()):
                                 if len(cname) >= 3 and re.search(rf"\b{re.escape(cname)}[!,\?]", clean_ev_text, re.IGNORECASE):
                                     if isinstance(cdesc, dict):
                                         c_gender = str(cdesc.get("gender", "")).upper()

@@ -8,6 +8,8 @@ across consecutive episodes of the same anime, ensuring 100% consistency across 
 import os
 import re
 import json
+import threading
+import copy
 from pathlib import Path
 from typing import Dict, List, Any, Optional, Set, Tuple, Union
 
@@ -2522,7 +2524,15 @@ def resolve_definite_article_nominative(en_text: str, pl_text: str) -> Tuple[str
 
 
 class SeriesBible:
+    _lock = threading.RLock()
+
+    def __new__(cls, *args, **kwargs):
+        inst = super().__new__(cls)
+        inst._lock = threading.RLock()
+        return inst
+
     def __init__(self, anime_title: str, storage_dir: Optional[Path] = None):
+        self._lock = threading.RLock()
         self.anime_title = anime_title.strip() if anime_title else "Nieznana Seria"
         self.slug = clean_anime_slug(self.anime_title)
         self.storage_dir = storage_dir or SERIES_MEMORY_DIR
@@ -2542,42 +2552,59 @@ class SeriesBible:
         }
         self.load()
 
+    def get_characters_snapshot(self) -> Dict[str, Any]:
+        with self._lock:
+            return dict(self.data.get("characters", {}))
+
+    def get_declensions_snapshot(self) -> Dict[str, Any]:
+        with self._lock:
+            return dict(self.data.get("declensions", {}))
+
+    def get_relationships_snapshot(self) -> Dict[str, Any]:
+        with self._lock:
+            return dict(self.data.get("relationships", {}))
+
+    def get_glossary_snapshot(self) -> Dict[str, Any]:
+        with self._lock:
+            return dict(self.data.get("glossary", {}))
+
     def load(self):
-        """Loads existing Series Bible from disk."""
-        if self.file_path.exists():
+        """Loads existing Series Bible from disk (Thread-Safe)."""
+        with self._lock:
+            if self.file_path.exists():
+                try:
+                    with open(self.file_path, "r", encoding="utf-8") as f:
+                        saved_data = json.load(f)
+                        if isinstance(saved_data, dict):
+                            for k, v in saved_data.items():
+                                if k in self.data and isinstance(v, dict):
+                                    self.data[k].update(v)
+                                elif k in self.data and isinstance(v, list):
+                                    for item in v:
+                                        if item not in self.data[k]:
+                                            self.data[k].append(item)
+                    self._sanitize_bible_integrity()
+                except Exception:
+                    pass
+
+            # Auto-integrate verified Fansub Canon Lexicon from fansub_miner (0.00 PLN)
             try:
-                with open(self.file_path, "r", encoding="utf-8") as f:
-                    saved_data = json.load(f)
-                    if isinstance(saved_data, dict):
-                        for k, v in saved_data.items():
-                            if k in self.data and isinstance(v, dict):
-                                self.data[k].update(v)
-                            elif k in self.data and isinstance(v, list):
-                                for item in v:
-                                    if item not in self.data[k]:
-                                        self.data[k].append(item)
-                self._sanitize_bible_integrity()
+                from fansub_miner import load_fansub_lexicon
+                fansub_lex = load_fansub_lexicon(self.anime_title)
+                if fansub_lex and "terms" in fansub_lex:
+                    if "fansub_canon" not in self.data:
+                        self.data["fansub_canon"] = {}
+                    self.data["fansub_canon"].update(fansub_lex["terms"])
+                    if "glossary" not in self.data:
+                        self.data["glossary"] = {}
+                    for t_key, t_val in fansub_lex["terms"].items():
+                        if isinstance(t_val, dict) and "canonical_pl" in t_val:
+                            en_keys = t_val.get("en", [t_key])
+                            for ek in en_keys:
+                                if ek not in self.data["glossary"]:
+                                    self.data["glossary"][ek] = t_val["canonical_pl"]
             except Exception:
                 pass
-
-        # Auto-integrate verified Fansub Canon Lexicon from fansub_miner (0.00 PLN)
-        try:
-            from fansub_miner import load_fansub_lexicon
-            fansub_lex = load_fansub_lexicon(self.anime_title)
-            if fansub_lex and "terms" in fansub_lex:
-                if "fansub_canon" not in self.data:
-                    self.data["fansub_canon"] = {}
-                self.data["fansub_canon"].update(fansub_lex["terms"])
-                if "glossary" not in self.data:
-                    self.data["glossary"] = {}
-                for t_key, t_val in fansub_lex["terms"].items():
-                    if isinstance(t_val, dict) and "canonical_pl" in t_val:
-                        en_keys = t_val.get("en", [t_key])
-                        for ek in en_keys:
-                            if ek not in self.data["glossary"]:
-                                self.data["glossary"][ek] = t_val["canonical_pl"]
-        except Exception:
-            pass
 
     def _sanitize_bible_integrity(self):
         """
@@ -2592,7 +2619,7 @@ class SeriesBible:
 
         # 1. Collect female names from relationships or explicit notes
         confirmed_females = set()
-        for rel_name, rel_desc in self.data.get("relationships", {}).items():
+        for rel_name, rel_desc in list(self.data.get("relationships", {}).items()):
             r_lower = str(rel_desc).lower()
             if "->" in rel_name:
                 parts = [p.strip() for p in rel_name.split("->")]
@@ -2639,7 +2666,7 @@ class SeriesBible:
         # 2b. Check characters table for poisoned male characters (e.g. historical samurai, kuge, generals, lords)
         MALE_TITLES = {"samuraj", "generał", "buke", "kuge", "wasal", "lord", "pan ", "wojownik", "rycerz", "król", "książę", "cesarz", "wielki radca"}
         confirmed_males = set()
-        for rel_name, rel_desc in self.data.get("relationships", {}).items():
+        for rel_name, rel_desc in list(self.data.get("relationships", {}).items()):
             r_str = str(rel_desc)
             r_lower = r_str.lower()
             if "->" in rel_name:
@@ -2701,7 +2728,7 @@ class SeriesBible:
 
         # Ensure any declension with a female or male character has gender aligned
         if "declensions" in self.data:
-            for d_name, d_val in self.data["declensions"].items():
+            for d_name, d_val in list(self.data["declensions"].items()):
                 if isinstance(d_val, dict):
                     c_info = self.data.get("characters", {}).get(d_name)
                     if c_info:
@@ -2730,7 +2757,7 @@ class SeriesBible:
         # 4. Systemic Historical Titling Sanity Audit (Khagan/Chagan -> Wielki Chan/Chan)
         if "glossary" in self.data and isinstance(self.data["glossary"], dict):
             new_gloss = {}
-            for gk, gv in self.data["glossary"].items():
+            for gk, gv in list(self.data["glossary"].items()):
                 gk_str = str(gk)
                 gv_str = str(gv)
                 # Normalize key if it's Great Kha'an or Khagan
@@ -2778,7 +2805,7 @@ class SeriesBible:
                 self.data["relationships"][rk] = rv_clean
 
         # 5. Sanitize character descriptions and relation keys in characters table
-        for c_k, c_v in self.data.get("characters", {}).items():
+        for c_k, c_v in list(self.data.get("characters", {}).items()):
             if isinstance(c_v, dict) and "description" in c_v:
                 d_s = c_v["description"]
                 d_s = re.sub(r"\bWielki Chaganie\b", "Wielki Chanie", d_s)
@@ -2803,12 +2830,14 @@ class SeriesBible:
                 self.data["characters"][c_k] = d_s
 
     def save(self):
-        """Saves current Series Bible state to disk."""
-        try:
-            with open(self.file_path, "w", encoding="utf-8") as f:
-                json.dump(self.data, f, ensure_ascii=False, indent=2)
-        except Exception:
-            pass
+        """Saves current Series Bible state to disk (Thread-Safe)."""
+        with self._lock:
+            try:
+                dump_data = copy.deepcopy(self.data)
+                with open(self.file_path, "w", encoding="utf-8") as f:
+                    json.dump(dump_data, f, ensure_ascii=False, indent=2)
+            except Exception:
+                pass
 
     def register_episode_execution(
         self,
@@ -2820,21 +2849,22 @@ class SeriesBible:
         """
         Records execution density and batch stats in Series Bible to monitor and prevent financial/fragmentation drift.
         """
-        if not hasattr(self, "data") or "episodes_translated" not in self.data:
-            return
-        entry = episode_name.strip()
-        if entry and entry not in self.data["episodes_translated"]:
-            self.data["episodes_translated"].append(entry)
+        with self._lock:
+            if not hasattr(self, "data") or "episodes_translated" not in self.data:
+                return
+            entry = episode_name.strip()
+            if entry and entry not in self.data["episodes_translated"]:
+                self.data["episodes_translated"].append(entry)
 
-        if "batch_stats" not in self.data:
-            self.data["batch_stats"] = {}
-        self.data["batch_stats"][entry] = {
-            "dialogues": dialogue_count,
-            "batches": batch_count,
-            "avg_batch_size": round(dialogue_count / max(1, batch_count), 1),
-            "cost_pln": cost_pln
-        }
-        self.save()
+            if "batch_stats" not in self.data:
+                self.data["batch_stats"] = {}
+            self.data["batch_stats"][entry] = {
+                "dialogues": dialogue_count,
+                "batches": batch_count,
+                "avg_batch_size": round(dialogue_count / max(1, batch_count), 1),
+                "cost_pln": cost_pln
+            }
+            self.save()
 
     def resolve_canonical_name(self, name_or_stem: str) -> str:
         """
@@ -2846,15 +2876,16 @@ class SeriesBible:
         s = name_or_stem.strip()
         s_lower = s.lower()
         # 1. Direct lookup in registered hypocorisms
-        hypo = self.data.get("hypocorisms", {})
+        with self._lock:
+            hypo = dict(self.data.get("hypocorisms", {}))
+            chars_keys = list(self.data.get("characters", {}).keys())
         if s in hypo:
             return hypo[s]
         for k, v in hypo.items():
             if k.lower() == s_lower:
                 return v
         # 2. Check if stem matches prefix of a confirmed character name
-        chars = self.data.get("characters", {})
-        for c in chars.keys():
+        for c in chars_keys:
             if "->" not in c:
                 c_first = c.split()[0]
                 if c_first.lower() == s_lower:
@@ -2871,8 +2902,9 @@ class SeriesBible:
         if not name or is_generic_actor_or_category(name):
             return False
         clean = extract_clean_speaker_name(name).strip().lower()
-        chars = self.data.get("characters", {})
-        for k in chars.keys():
+        with self._lock:
+            chars_keys = list(self.data.get("characters", {}).keys())
+        for k in chars_keys:
             if "->" not in k:
                 if k.lower() == clean or extract_clean_speaker_name(k).strip().lower() == clean:
                     return True
@@ -2903,7 +2935,9 @@ class SeriesBible:
             if n_l in INHERENT_MALE_NOUNS or any(t in INHERENT_MALE_NOUNS for t in tokens):
                 return "MALE"
 
-        chars = self.data.get("characters", {})
+        with self._lock:
+            chars_items = list(self.data.get("characters", {}).items())
+            rels_keys_str = " ".join(list(self.data.get("relationships", {}).keys())).lower()
 
         def _extract_gender_from_val(v) -> Optional[str]:
             if isinstance(v, dict):
@@ -2977,7 +3011,7 @@ class SeriesBible:
             return None
 
         # Pass 1: Exact character names only (e.g. 'Tomine', 'Shizuku', 'Issei Tomine')
-        for k, v in chars.items():
+        for k, v in chars_items:
             if "->" not in k:
                 k_l = k.lower()
                 clean_k = extract_clean_speaker_name(k_l)
@@ -2988,7 +3022,7 @@ class SeriesBible:
 
         # Pass 2: Token / surname matches with collision detection (e.g. 'Tomine' matching 'Issei Tomine' and 'Honoka Tomine')
         token_matches = []
-        for k, v in chars.items():
+        for k, v in chars_items:
             if "->" not in k:
                 k_l = k.lower()
                 if n_l in k_l.split():
@@ -3002,10 +3036,8 @@ class SeriesBible:
                 return next(iter(genders_found))
             # Collision: multiple characters share surname with different genders
             # Check relationships: prioritize candidate active as primary interpersonal entity
-            rels = self.data.get("relationships", {})
-            rel_keys_str = " ".join(rels.keys()).lower()
             for cand_k, cand_g in token_matches:
-                if cand_k.lower() in rel_keys_str:
+                if cand_k.lower() in rels_keys_str:
                     return cand_g
             return "UNKNOWN"
 
@@ -3035,8 +3067,8 @@ class SeriesBible:
             return "CHILD"
         if any(w in n_l for w in ["staruszek", "staruszka", "dziadek", "babcia", "elderly", "old man", "old woman"]):
             return "ELDERLY"
-        chars = self.data.get("characters", {}) if hasattr(self, "data") else {}
-        for k, v in chars.items():
+        chars = self.get_characters_snapshot() if hasattr(self, "get_characters_snapshot") else (self.data.get("characters", {}) if hasattr(self, "data") else {})
+        for k, v in list(chars.items()):
             if "->" not in k:
                 k_l = k.lower()
                 clean_k = extract_clean_speaker_name(k_l)
@@ -3150,19 +3182,18 @@ class SeriesBible:
         if not speaker_name:
             return "INDIVIDUAL"
         cl_name = extract_clean_speaker_name(speaker_name).strip().lower()
-        types_map = self.data.get("speaker_entity_types", {})
-        if cl_name in types_map:
-            return types_map[cl_name]
-        for k, v in types_map.items():
-            if k in cl_name or cl_name in k:
+        with self._lock:
+            types_items = list(self.data.get("speaker_entity_types", {}).items())
+            chars_items = list(self.data.get("characters", {}).items())
+        for k, v in types_items:
+            if k == cl_name or k in cl_name or cl_name in k:
                 return v
 
         # Canonical known patterns across major anime / literature
         if any(w in cl_name for w in ["louis arneb", "rui arunebu", "rui arnebu", "arneb", "arunebu", "żarłoczność", "zarlocznosc"]):
             return "COLLECTIVE_VIRILE"
-        chars = self.data.get("characters", {})
         char_desc = ""
-        for k, v in chars.items():
+        for k, v in chars_items:
             if "->" not in k:
                 k_l = k.lower()
                 clean_k = extract_clean_speaker_name(k_l)
@@ -3222,8 +3253,9 @@ class SeriesBible:
         combined_lower = combined_text.lower()
         detected_cast: Set[str] = set()
 
-        chars = self.data.get("characters", {})
-        for k in chars.keys():
+        with self._lock:
+            chars_keys = list(self.data.get("characters", {}).keys())
+        for k in chars_keys:
             if "->" in k:
                 continue
             parts = [p.strip() for p in k.split("/") if len(p.strip()) >= 3]
@@ -3269,8 +3301,9 @@ class SeriesBible:
                     detected_cast.add(p)
 
         # Dynamic relationship scanning across all series (e.g. A -> B where both are female/male)
-        rels = self.data.get("relationships", {})
-        for rel_k in rels.keys():
+        with self._lock:
+            rels_keys = list(self.data.get("relationships", {}).keys()) if hasattr(self, "data") else []
+        for rel_k in rels_keys:
             if "->" in rel_k:
                 p_from, p_to = [p.strip() for p in rel_k.split("->", 1)]
                 p_from_clean = extract_clean_speaker_name(p_from)
@@ -3405,44 +3438,46 @@ class SeriesBible:
         Updates an unconfirmed character's gender in Series Bible using definitive Japanese
         first-person audio markers (ore/boku -> MALE, atashi/atai -> FEMALE).
         Protected by symmetrical locks: cannot downgrade or overwrite confirmed MALE with FEMALE or vice versa.
+        Thread-safe under concurrent batch processing.
         """
         if not name or gender not in ("MALE", "FEMALE"):
             return False
-        clean_name = name.strip()
-        existing_entry = self.data.get("characters", {}).get(clean_name)
-        desc_v = ""
-        if isinstance(existing_entry, dict):
-            desc_v = str(existing_entry.get("description", ""))
-        elif existing_entry:
-            desc_v = str(existing_entry)
+        with self._lock:
+            clean_name = name.strip()
+            existing_entry = self.data.get("characters", {}).get(clean_name)
+            desc_v = ""
+            if isinstance(existing_entry, dict):
+                desc_v = str(existing_entry.get("description", ""))
+            elif existing_entry:
+                desc_v = str(existing_entry)
 
-        # Symmetrical lock: already confirmed definitively by audio, quality gate, or explicit gender field
-        has_confirmed_audio = "zweryfikowano z audio" in desc_v
-        has_confirmed_qg = "zweryfikowano przez EpisodeQualityGate" in desc_v
-        has_canonical_tag = bool(re.search(r"\[(KOBIETA|MĘŻCZYZNA)\s+\(Adresat\)", desc_v, re.IGNORECASE))
-        has_explicit_gender = isinstance(existing_entry, dict) and existing_entry.get("gender") in ("MALE", "FEMALE")
+            # Symmetrical lock: already confirmed definitively by audio, quality gate, or explicit gender field
+            has_confirmed_audio = "zweryfikowano z audio" in desc_v
+            has_confirmed_qg = "zweryfikowano przez EpisodeQualityGate" in desc_v
+            has_canonical_tag = bool(re.search(r"\[(KOBIETA|MĘŻCZYZNA)\s+\(Adresat\)", desc_v, re.IGNORECASE))
+            has_explicit_gender = isinstance(existing_entry, dict) and existing_entry.get("gender") in ("MALE", "FEMALE")
 
-        if has_confirmed_audio or has_confirmed_qg or has_canonical_tag or has_explicit_gender:
-            return False
+            if has_confirmed_audio or has_confirmed_qg or has_canonical_tag or has_explicit_gender:
+                return False
 
-        existing_gender = self.get_character_gender(clean_name, allow_generic_nouns=False)
-        if existing_gender in ("MALE", "FEMALE") and existing_gender != gender:
-            # Symmetrical lock: cannot overwrite inferred gender with opposite audio gender
-            return False
+            existing_gender = self.get_character_gender(clean_name, allow_generic_nouns=False)
+            if existing_gender in ("MALE", "FEMALE") and existing_gender != gender:
+                # Symmetrical lock: cannot overwrite inferred gender with opposite audio gender
+                return False
 
-        desc = f"{'MĘŻCZYZNA' if gender == 'MALE' else 'KOBIETA'} (zweryfikowano z audio seiyū Whisper)"
-        if clean_name not in self.data["characters"]:
-            self.data["characters"][clean_name] = {"description": desc}
-        else:
-            entry = self.data["characters"][clean_name]
-            if isinstance(entry, dict):
-                cur_desc = entry.get("description", "")
-                entry["description"] = f"{cur_desc}; {desc}".strip("; ")
+            desc = f"{'MĘŻCZYZNA' if gender == 'MALE' else 'KOBIETA'} (zweryfikowano z audio seiyū Whisper)"
+            if clean_name not in self.data["characters"]:
+                self.data["characters"][clean_name] = {"description": desc}
             else:
-                self.data["characters"][clean_name] = {"description": f"{entry}; {desc}".strip("; ")}
+                entry = self.data["characters"][clean_name]
+                if isinstance(entry, dict):
+                    cur_desc = entry.get("description", "")
+                    entry["description"] = f"{cur_desc}; {desc}".strip("; ")
+                else:
+                    self.data["characters"][clean_name] = {"description": f"{entry}; {desc}".strip("; ")}
 
-        self.data["declensions"][clean_name] = generate_polish_name_declension(clean_name, gender)
-        return True
+            self.data["declensions"][clean_name] = generate_polish_name_declension(clean_name, gender)
+            return True
 
     def is_low_pitch_female(self, name: str) -> bool:
         """
@@ -3459,8 +3494,8 @@ class SeriesBible:
             "pierwsza małżonka", "wiedźma", "seniorka", "staruszka", "ochrypł", "niski głos"
         ]
 
-        chars = self.data.get("characters", {})
-        for k, v in chars.items():
+        chars = self.get_characters_snapshot() if hasattr(self, "get_characters_snapshot") else (self.data.get("characters", {}) if hasattr(self, "data") else {})
+        for k, v in list(chars.items()):
             if "->" not in k:
                 k_l = k.lower()
                 clean_k = extract_clean_speaker_name(k_l)
@@ -3557,19 +3592,21 @@ class SeriesBible:
         if n_l in KNOWN_FANTASY_TOPONYMS:
             return True
         for section in ["organizations", "factions", "realms", "locations", "places", "cities", "countries", "historical_context", "relics", "artifacts", "weapons"]:
-            sec_dict = self.data.get(section, {})
-            if isinstance(sec_dict, dict):
-                for k, v in sec_dict.items():
+            with self._lock:
+                sec_dict = dict(self.data.get(section, {})) if isinstance(self.data.get(section, {}), dict) else {}
+            if sec_dict:
+                for k, v in list(sec_dict.items()):
                     if k.lower() == n_l:
                         return True
                     if isinstance(v, dict):
                         if v.get("canonical_name", "").lower() == n_l or v.get("short_name", "").lower() == n_l or v.get("name", "").lower() == n_l:
                             return True
         # Check glossary entries for realm/toponym/location designations
-        glossary_dict = self.data.get("glossary", {})
-        if isinstance(glossary_dict, dict):
+        with self._lock:
+            glossary_dict = dict(self.data.get("glossary", {})) if isinstance(self.data.get("glossary", {}), dict) else {}
+        if glossary_dict:
             TOPONYM_KWS = {"kraina", "królestwo", "cesarstwo", "toponim", "lokacja", "kopalnia", "stolica", "zamek", "twierdza", "akademia", "instytucja", "miasto", "prowincja", "prefektura", "rzeka", "góra", "relikt", "artefakt", "święty oręż"}
-            for k, v in glossary_dict.items():
+            for k, v in list(glossary_dict.items()):
                 k_l = str(k).lower()
                 v_str = str(v).lower()
                 if any(kw in v_str for kw in TOPONYM_KWS):
@@ -3613,9 +3650,10 @@ class SeriesBible:
         res = ETHNONYMS_CANONICAL.get(eth_norm)
         if res:
             return res
-        factions = self.data.get("factions", {})
-        if isinstance(factions, dict):
-            for f_key, f_val in factions.items():
+        with self._lock:
+            factions = dict(self.data.get("factions", {})) if isinstance(self.data.get("factions", {}), dict) else {}
+        if factions:
+            for f_key, f_val in list(factions.items()):
                 if f_key.lower() == eth_norm and isinstance(f_val, dict) and "cases_pl" in f_val:
                     return f_val["cases_pl"]
                 if isinstance(f_val, dict) and f_val.get("name", "").lower() == eth_norm and "cases_pl" in f_val:
@@ -3639,8 +3677,9 @@ class SeriesBible:
         speakers_clean = {extract_clean_speaker_name(s).strip().lower() for s in (speakers or set()) if s}
         corpus_lower = (dialogue_text or "").lower()
 
-        bible_chars = self.data.get("characters", {})
-        for name, info in bible_chars.items():
+        with self._lock:
+            bible_chars = list(self.data.get("characters", {}).items())
+        for name, info in bible_chars:
             if "->" in name:
                 continue
             desc = info.get("description", "") if isinstance(info, dict) else str(info)
@@ -3656,7 +3695,7 @@ class SeriesBible:
 
         # Fallback if no characters matched: return top characters capped at max_chars
         if not active_chars and bible_chars:
-            for name, info in list(bible_chars.items())[:max_chars]:
+            for name, info in bible_chars[:max_chars]:
                 if "->" not in name:
                     desc = info.get("description", "") if isinstance(info, dict) else str(info)
                     active_chars[name] = desc
@@ -3696,7 +3735,9 @@ class SeriesBible:
 
         # Look up confirmed target character gender in Series Bible
         if hasattr(self, "data") and "characters" in self.data:
-            for k, v in self.data["characters"].items():
+            with self._lock:
+                chars_items = list(self.data["characters"].items())
+            for k, v in chars_items:
                 if "->" not in k:
                     k_l = k.lower()
                     if k_l == target_name or (len(k_l) >= 3 and k_l in target_name) or (len(target_name) >= 3 and target_name in k_l):
@@ -3732,7 +3773,9 @@ class SeriesBible:
         # Check if the relationship or character involves a confirmed male character
         involves_male = target_is_male or any(m in name_lower for m in CANONICAL_MALE_NAMES)
         if not involves_male and hasattr(self, "data") and "characters" in self.data:
-            for k, v in self.data["characters"].items():
+            with self._lock:
+                chars_items_male = list(self.data["characters"].items())
+            for k, v in chars_items_male:
                 if k.lower() in name_lower:
                     desc_v = str(v.get("description", "") if isinstance(v, dict) else v).lower()
                     if any(w in desc_v for w in MALE_ROLE_KEYWORDS):
@@ -3799,153 +3842,154 @@ class SeriesBible:
         plot_anchors: Optional[Dict[str, str]] = None,
         relationships: Optional[Dict[str, str]] = None,
     ):
-        """Updates glossary, character registry, relationships, and plot anchors based on Profiler output of a new episode."""
-        if episode_name and episode_name not in self.data["episodes_translated"]:
-            self.data["episodes_translated"].append(episode_name)
+        """Updates glossary, character registry, relationships, and plot anchors based on Profiler output of a new episode (Thread-Safe)."""
+        with self._lock:
+            if episode_name and episode_name not in self.data["episodes_translated"]:
+                self.data["episodes_translated"].append(episode_name)
 
-        if characters:
-            FEMALE_KEYWORDS = [
-                "kobieta", "żeńsk", "female", "dziewczyn", "nauczycielk", "czarodziejk",
-                "szpieżk", "wojowniczk", "kapłank", "służąc", "pani ", "panią", "bohaterk",
-                "arystokratk", "władczyn", "królow", "księżniczk", "matk", "córk", "siostr"
-            ]
-            if "declensions" not in self.data:
-                self.data["declensions"] = {}
-            if "relationships" not in self.data:
-                self.data["relationships"] = {}
+            if characters:
+                FEMALE_KEYWORDS = [
+                    "kobieta", "żeńsk", "female", "dziewczyn", "nauczycielk", "czarodziejk",
+                    "szpieżk", "wojowniczk", "kapłank", "służąc", "pani ", "panią", "bohaterk",
+                    "arystokratk", "władczyn", "królow", "księżniczk", "matk", "córk", "siostr"
+                ]
+                if "declensions" not in self.data:
+                    self.data["declensions"] = {}
+                if "relationships" not in self.data:
+                    self.data["relationships"] = {}
 
-            for name, details in characters.items():
-                if not name or not details:
-                    continue
-                clean_details = self._sanitize_character_entry(name, details)
-                if "->" in name:
-                    self.data["relationships"][name] = clean_details
-                    self.data["characters"][name] = {"description": clean_details}
-                    parts = [p.strip() for p in name.split("->")]
-                    for idx, p in enumerate(parts):
-                        clean_p = re.sub(r"-(?:sensei|kun|chan|san|sama|senpai)\b", "", p, flags=re.IGNORECASE).strip()
-                        clean_p = re.sub(r"^(?:Pani|Pan|Kapitan|Dziekan|Kardynał|Generał|Doktor|Profesor)\s+", "", clean_p).strip()
-                        if clean_p and len(clean_p) >= 2 and not any(ch in clean_p for ch in "{}[]():;"):
-                            if clean_p not in self.data["characters"]:
-                                p_details = clean_details
-                                if "->" in clean_details and len(parts) == 2:
-                                    detail_halves = clean_details.split("->", 1)
-                                    p_details = detail_halves[idx].strip()
+                for name, details in list(characters.items()):
+                    if not name or not details:
+                        continue
+                    clean_details = self._sanitize_character_entry(name, details)
+                    if "->" in name:
+                        self.data["relationships"][name] = clean_details
+                        self.data["characters"][name] = {"description": clean_details}
+                        parts = [p.strip() for p in name.split("->")]
+                        for idx, p in enumerate(parts):
+                            clean_p = re.sub(r"-(?:sensei|kun|chan|san|sama|senpai)\b", "", p, flags=re.IGNORECASE).strip()
+                            clean_p = re.sub(r"^(?:Pani|Pan|Kapitan|Dziekan|Kardynał|Generał|Doktor|Profesor)\s+", "", clean_p).strip()
+                            if clean_p and len(clean_p) >= 2 and not any(ch in clean_p for ch in "{}[]():;"):
+                                if clean_p not in self.data["characters"]:
+                                    p_details = clean_details
+                                    if "->" in clean_details and len(parts) == 2:
+                                        detail_halves = clean_details.split("->", 1)
+                                        p_details = detail_halves[idx].strip()
 
-                                p_g = "UNKNOWN"
-                                if is_female_role_text(p_details) and not is_male_role_text(p_details):
-                                    p_g = "FEMALE"
-                                elif is_male_role_text(p_details) and not is_female_role_text(p_details):
-                                    p_g = "MALE"
-                                elif is_male_role_text(clean_details) and ("panie " in clean_details.lower() or "pan " in clean_details.lower()) and idx == 1:
-                                    p_g = "MALE"
-                                else:
-                                    p_lower = clean_p.lower()
-                                    p_tokens = p_lower.split()
-                                    if p_lower in CANONICAL_MALE_NAMES or any(t in CANONICAL_MALE_NAMES for t in p_tokens):
-                                        p_g = "MALE"
-                                    elif p_lower.endswith("a") and (p_lower not in CANONICAL_MALE_NAMES and not any(t in CANONICAL_MALE_NAMES for t in p_tokens)):
+                                    p_g = "UNKNOWN"
+                                    if is_female_role_text(p_details) and not is_male_role_text(p_details):
                                         p_g = "FEMALE"
-                                    else:
+                                    elif is_male_role_text(p_details) and not is_female_role_text(p_details):
                                         p_g = "MALE"
+                                    elif is_male_role_text(clean_details) and ("panie " in clean_details.lower() or "pan " in clean_details.lower()) and idx == 1:
+                                        p_g = "MALE"
+                                    else:
+                                        p_lower = clean_p.lower()
+                                        p_tokens = p_lower.split()
+                                        if p_lower in CANONICAL_MALE_NAMES or any(t in CANONICAL_MALE_NAMES for t in p_tokens):
+                                            p_g = "MALE"
+                                        elif p_lower.endswith("a") and (p_lower not in CANONICAL_MALE_NAMES and not any(t in CANONICAL_MALE_NAMES for t in p_tokens)):
+                                            p_g = "FEMALE"
+                                        else:
+                                            p_g = "MALE"
 
-                                g_str = "KOBIETA" if p_g == "FEMALE" else "MĘŻCZYZNA"
-                                self.data["characters"][clean_p] = {"description": f"{g_str} (wyodrębniono z relacji serii)"}
-                                self.data["declensions"][clean_p] = generate_polish_name_declension(clean_p, p_g)
-                    continue
-
-                if name not in self.data["characters"]:
-                    self.data["characters"][name] = {"description": clean_details}
-                else:
-                    existing_entry = self.data["characters"][name]
-                    existing_desc = existing_entry.get("description", "") if isinstance(existing_entry, dict) else str(existing_entry)
-                    existing_lower = existing_desc.lower()
-
-                    # Protect confirmed gender against downgrading or overwriting (both male and female)
-                    is_definite_female = any(w in clean_details.lower() for w in ["córka", "cesarzowa", "chatun", "żona", "małżonka", "matka", "księżniczka", "królowa"])
-                    has_confirmed_male = any(w in existing_lower for w in ["mężczyzna", "męsk", "male", "kategoryczny nakaz form męskich"]) and not is_definite_female
-                    is_incoming_female = any(w in clean_details.lower() for w in ["kobieta", "żeńsk", "female", "służąca", "nauczycielka", "dziewczyna", "cesarzowa", "chatun", "córka", "żona"])
-                    if has_confirmed_male and is_incoming_female:
+                                    g_str = "KOBIETA" if p_g == "FEMALE" else "MĘŻCZYZNA"
+                                    self.data["characters"][clean_p] = {"description": f"{g_str} (wyodrębniono z relacji serii)"}
+                                    self.data["declensions"][clean_p] = generate_polish_name_declension(clean_p, p_g)
                         continue
 
-                    has_confirmed_female = any(w in existing_lower for w in ["kobieta", "żeńsk", "female", "dziewczyna", "kategoryczny nakaz form żeńskich", "nauczycielka"])
-                    is_incoming_male = any(w in clean_details.lower() for w in ["mężczyzna", "męsk", "male", "chłopak"])
-                    if has_confirmed_female and is_incoming_male:
-                        continue
+                    if name not in self.data["characters"]:
+                        self.data["characters"][name] = {"description": clean_details}
+                    else:
+                        existing_entry = self.data["characters"][name]
+                        existing_desc = existing_entry.get("description", "") if isinstance(existing_entry, dict) else str(existing_entry)
+                        existing_lower = existing_desc.lower()
 
-                    # If existing entry has rich directives/seiyū, do not overwrite with bare string
-                    has_rich_directives = any(w in existing_lower for w in ["kategoryczny", "nakaz", "seiyū", "bezwzględnie formy"])
-                    if has_rich_directives and not any(w in clean_details.lower() for w in ["kategoryczny", "nakaz"]):
-                        continue
+                        # Protect confirmed gender against downgrading or overwriting (both male and female)
+                        is_definite_female = any(w in clean_details.lower() for w in ["córka", "cesarzowa", "chatun", "żona", "małżonka", "matka", "księżniczka", "królowa"])
+                        has_confirmed_male = any(w in existing_lower for w in ["mężczyzna", "męsk", "male", "kategoryczny nakaz form męskich"]) and not is_definite_female
+                        is_incoming_female = any(w in clean_details.lower() for w in ["kobieta", "żeńsk", "female", "służąca", "nauczycielka", "dziewczyna", "cesarzowa", "chatun", "córka", "żona"])
+                        if has_confirmed_male and is_incoming_female:
+                            continue
 
-                    self.data["characters"][name] = {"description": clean_details}
+                        has_confirmed_female = any(w in existing_lower for w in ["kobieta", "żeńsk", "female", "dziewczyna", "kategoryczny nakaz form żeńskich", "nauczycielka"])
+                        is_incoming_male = any(w in clean_details.lower() for w in ["mężczyzna", "męsk", "male", "chłopak"])
+                        if has_confirmed_female and is_incoming_male:
+                            continue
 
-                # Generate and store 7-case Polish declension matrix
-                clean_details_sanitized = re.sub(r"zakaz\s+form\s+(?:żeńsk|męsk)[a-ząćęłńóśźż]*", "", clean_details.lower())
-                if is_male_role_text(clean_details_sanitized) and not is_female_role_text(clean_details_sanitized):
-                    c_gender = "MALE"
-                elif is_female_role_text(clean_details_sanitized) and not is_male_role_text(clean_details_sanitized):
-                    c_gender = "FEMALE"
-                elif any(w in clean_details_sanitized for w in ["mężczyzna", "męsk", "male", "chłopak"]):
-                    c_gender = "MALE"
-                elif any(w in clean_details_sanitized for w in FEMALE_KEYWORDS):
-                    c_gender = "FEMALE"
-                else:
-                    c_gender = "UNKNOWN"
+                        # If existing entry has rich directives/seiyū, do not overwrite with bare string
+                        has_rich_directives = any(w in existing_lower for w in ["kategoryczny", "nakaz", "seiyū", "bezwzględnie formy"])
+                        if has_rich_directives and not any(w in clean_details.lower() for w in ["kategoryczny", "nakaz"]):
+                            continue
 
-                if "/" in name:
-                    names_to_decline = [p.strip() for p in name.split("/")]
-                else:
-                    names_to_decline = [name]
+                        self.data["characters"][name] = {"description": clean_details}
 
-                for single_n in names_to_decline:
-                    if single_n and len(single_n) >= 3 and not any(ch in single_n for ch in "->/"):
-                        self.data["declensions"][single_n] = generate_polish_name_declension(single_n, c_gender)
+                    # Generate and store 7-case Polish declension matrix
+                    clean_details_sanitized = re.sub(r"zakaz\s+form\s+(?:żeńsk|męsk)[a-ząćęłńóśźż]*", "", clean_details.lower())
+                    if is_male_role_text(clean_details_sanitized) and not is_female_role_text(clean_details_sanitized):
+                        c_gender = "MALE"
+                    elif is_female_role_text(clean_details_sanitized) and not is_male_role_text(clean_details_sanitized):
+                        c_gender = "FEMALE"
+                    elif any(w in clean_details_sanitized for w in ["mężczyzna", "męsk", "male", "chłopak"]):
+                        c_gender = "MALE"
+                    elif any(w in clean_details_sanitized for w in FEMALE_KEYWORDS):
+                        c_gender = "FEMALE"
+                    else:
+                        c_gender = "UNKNOWN"
 
-        if glossary:
-            for k, v in glossary.items():
-                # Store non-trivial terms only and sanitize parenthetical descriptions
-                if k and v and len(k) > 1 and len(v) > 1:
-                    clean_k = str(k).strip()
-                    clean_v = sanitize_lexical_text(re.sub(r"\s*[\(\[].*?[\)\]]", "", v).strip())
-                    if clean_k and clean_v:
-                        # Case-insensitive update to prevent duplicate collisions
-                        norm_k = clean_k.lower()
-                        for old_k in list(self.data["glossary"].keys()):
-                            if old_k.lower() == norm_k and old_k != clean_k:
-                                del self.data["glossary"][old_k]
-                        self.data["glossary"][clean_k] = clean_v
-                        # Auto-generate 7-case declension for proper terms/entities/titles in glossary
-                        if len(clean_v) >= 3 and not any(ch in clean_v for ch in "{}[]():;"):
-                            if "declensions" not in self.data:
-                                self.data["declensions"] = {}
-                            if clean_v not in self.data["declensions"] and clean_v[0].isupper():
-                                self.data["declensions"][clean_v] = generate_polish_name_declension(clean_v, "UNKNOWN")
+                    if "/" in name:
+                        names_to_decline = [p.strip() for p in name.split("/")]
+                    else:
+                        names_to_decline = [name]
 
-        if plot_anchors:
-            if "plot_anchors" not in self.data:
-                self.data["plot_anchors"] = {}
-            for k, v in plot_anchors.items():
-                if k and v:
-                    clean_k = str(k).strip()
-                    clean_v = sanitize_lexical_text(str(v).strip())
-                    if clean_k and clean_v:
-                        self.data["plot_anchors"][clean_k] = clean_v
+                    for single_n in names_to_decline:
+                        if single_n and len(single_n) >= 3 and not any(ch in single_n for ch in "->/"):
+                            self.data["declensions"][single_n] = generate_polish_name_declension(single_n, c_gender)
 
-        if relationships:
-            if "relationships" not in self.data:
-                self.data["relationships"] = {}
-            for rel_k, rel_v in relationships.items():
-                if rel_k and rel_v:
-                    self.data["relationships"][rel_k] = sanitize_lexical_text(str(rel_v).strip())
-                    # Also extract names from relationships to decline them
-                    for part in re.split(r"->|/|,", rel_k):
-                        part_clean = part.strip()
-                        if len(part_clean) >= 3 and not any(ch in part_clean for ch in "{}[]():;"):
-                            if part_clean not in self.data["declensions"]:
-                                self.data["declensions"][part_clean] = generate_polish_name_declension(part_clean, "UNKNOWN")
+            if glossary:
+                for k, v in list(glossary.items()):
+                    # Store non-trivial terms only and sanitize parenthetical descriptions
+                    if k and v and len(k) > 1 and len(v) > 1:
+                        clean_k = str(k).strip()
+                        clean_v = sanitize_lexical_text(re.sub(r"\s*[\(\[].*?[\)\]]", "", v).strip())
+                        if clean_k and clean_v:
+                            # Case-insensitive update to prevent duplicate collisions
+                            norm_k = clean_k.lower()
+                            for old_k in list(self.data["glossary"].keys()):
+                                if old_k.lower() == norm_k and old_k != clean_k:
+                                    del self.data["glossary"][old_k]
+                            self.data["glossary"][clean_k] = clean_v
+                            # Auto-generate 7-case declension for proper terms/entities/titles in glossary
+                            if len(clean_v) >= 3 and not any(ch in clean_v for ch in "{}[]():;"):
+                                if "declensions" not in self.data:
+                                    self.data["declensions"] = {}
+                                if clean_v not in self.data["declensions"] and clean_v[0].isupper():
+                                    self.data["declensions"][clean_v] = generate_polish_name_declension(clean_v, "UNKNOWN")
 
-        self.save()
+            if plot_anchors:
+                if "plot_anchors" not in self.data:
+                    self.data["plot_anchors"] = {}
+                for k, v in list(plot_anchors.items()):
+                    if k and v:
+                        clean_k = str(k).strip()
+                        clean_v = sanitize_lexical_text(str(v).strip())
+                        if clean_k and clean_v:
+                            self.data["plot_anchors"][clean_k] = clean_v
+
+            if relationships:
+                if "relationships" not in self.data:
+                    self.data["relationships"] = {}
+                for rel_k, rel_v in list(relationships.items()):
+                    if rel_k and rel_v:
+                        self.data["relationships"][rel_k] = sanitize_lexical_text(str(rel_v).strip())
+                        # Also extract names from relationships to decline them
+                        for part in re.split(r"->|/|,", rel_k):
+                            part_clean = part.strip()
+                            if len(part_clean) >= 3 and not any(ch in part_clean for ch in "{}[]():;"):
+                                if part_clean not in self.data["declensions"]:
+                                    self.data["declensions"][part_clean] = generate_polish_name_declension(part_clean, "UNKNOWN")
+
+            self.save()
 
     def assimilate_quality_gate_invariants(self, quality_gate_fixes: List[Any]):
         """
@@ -3957,139 +4001,149 @@ class SeriesBible:
         if not quality_gate_fixes:
             return
 
-        has_updates = False
-        if "characters" not in self.data:
-            self.data["characters"] = {}
-        if "declensions" not in self.data:
-            self.data["declensions"] = {}
+        with self._lock:
+            has_updates = False
+            if "characters" not in self.data:
+                self.data["characters"] = {}
+            if "declensions" not in self.data:
+                self.data["declensions"] = {}
 
-        for fix_item in quality_gate_fixes:
-            # 1. Structured fix dictionary
-            if isinstance(fix_item, dict):
-                f_type = fix_item.get("type", "")
-                c_name = fix_item.get("character") or fix_item.get("name")
-                if c_name and f_type == "gender":
-                    gen = fix_item.get("gender", "").upper()
-                    if gen in ["MALE", "FEMALE"]:
-                        desc = f"{'MĘŻCZYZNA' if gen == 'MALE' else 'KOBIETA'} (zweryfikowano przez EpisodeQualityGate)"
-                        self.data["characters"][c_name] = {"description": desc, "source": "quality_gate"}
-                        self.data["declensions"][c_name] = generate_polish_name_declension(c_name, gen)
-                        has_updates = True
-                elif c_name and f_type == "declension":
-                    decl_map = fix_item.get("declension")
-                    if isinstance(decl_map, dict):
-                        self.data["declensions"][c_name] = decl_map
-                        has_updates = True
+            for fix_item in quality_gate_fixes:
+                # 1. Structured fix dictionary
+                if isinstance(fix_item, dict):
+                    f_type = fix_item.get("type", "")
+                    c_name = fix_item.get("character") or fix_item.get("name")
+                    if c_name and f_type == "gender":
+                        gen = fix_item.get("gender", "").upper()
+                        if gen in ["MALE", "FEMALE"]:
+                            desc = f"{'MĘŻCZYZNA' if gen == 'MALE' else 'KOBIETA'} (zweryfikowano przez EpisodeQualityGate)"
+                            self.data["characters"][c_name] = {"description": desc, "source": "quality_gate"}
+                            self.data["declensions"][c_name] = generate_polish_name_declension(c_name, gen)
+                            has_updates = True
+                    elif c_name and f_type == "declension":
+                        decl_map = fix_item.get("declension")
+                        if isinstance(decl_map, dict):
+                            self.data["declensions"][c_name] = decl_map
+                            has_updates = True
 
-            # 2. String parsing from EpisodeQualityGate log lines
-            elif isinstance(fix_item, str):
-                # Gender confirmation: e.g. "potwierdzona płeć męska" or "potwierdzona płeć żeńska"
-                m_gen = re.search(r"'(?:([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+)\.\.\.[^']*|[^']*\.\.\.\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+))'.*?potwierdzona płeć (męska|żeńska)", fix_item)
-                if m_gen:
-                    char_name = m_gen.group(1) or m_gen.group(2)
-                    gender_str = "MALE" if m_gen.group(3) == "męska" else "FEMALE"
-                    is_generic_actor = is_generic_actor_or_category(char_name) or bool(re.match(r"^(?:man|male|boy|guy|woman|female|girl|lady|mężczyzna|kobieta|chłopak|dziewczyna|facet|pan|pani)\s+[a-z0-9]+$", char_name, re.IGNORECASE))
-                    if char_name and len(char_name) >= 3 and not is_generic_actor:
-                        desc = f"{'MĘŻCZYZNA' if gender_str == 'MALE' else 'KOBIETA'} (zweryfikowano przez EpisodeQualityGate)"
-                        self.data["characters"][char_name] = {"description": desc, "source": "quality_gate"}
-                        self.data["declensions"][char_name] = generate_polish_name_declension(char_name, gender_str)
-                        has_updates = True
+                # 2. String parsing from EpisodeQualityGate log lines
+                elif isinstance(fix_item, str):
+                    # Gender confirmation: e.g. "potwierdzona płeć męska" or "potwierdzona płeć żeńska"
+                    m_gen = re.search(r"'(?:([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+)\.\.\.[^']*|[^']*\.\.\.\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+))'.*?potwierdzona płeć (męska|żeńska)", fix_item)
+                    if m_gen:
+                        char_name = m_gen.group(1) or m_gen.group(2)
+                        gender_str = "MALE" if m_gen.group(3) == "męska" else "FEMALE"
+                        is_generic_actor = is_generic_actor_or_category(char_name) or bool(re.match(r"^(?:man|male|boy|guy|woman|female|girl|lady|mężczyzna|kobieta|chłopak|dziewczyna|facet|pan|pani)\s+[a-z0-9]+$", char_name, re.IGNORECASE))
+                        if char_name and len(char_name) >= 3 and not is_generic_actor:
+                            desc = f"{'MĘŻCZYZNA' if gender_str == 'MALE' else 'KOBIETA'} (zweryfikowano przez EpisodeQualityGate)"
+                            self.data["characters"][char_name] = {"description": desc, "source": "quality_gate"}
+                            self.data["declensions"][char_name] = generate_polish_name_declension(char_name, gender_str)
+                            has_updates = True
 
-                # 1st-person speaker gender confirmation:
-                m_spk = re.search(r"skorygowano 1\. os\. na rodzaj (męski|żeński) dla mówc(?:y|zyni) '([^']+)'", fix_item)
-                if m_spk:
-                    gender_str = "MALE" if m_spk.group(1) == "męski" else "FEMALE"
-                    char_name = m_spk.group(2).strip()
-                    is_generic_actor = is_generic_actor_or_category(char_name) or bool(re.match(r"^(?:man|male|boy|guy|woman|female|girl|lady|mężczyzna|kobieta|chłopak|dziewczyna|facet|pan|pani)\s+[a-z0-9]+$", char_name, re.IGNORECASE))
-                    if char_name and len(char_name) >= 3 and not is_generic_actor:
-                        desc = f"{'MĘŻCZYZNA' if gender_str == 'MALE' else 'KOBIETA'} (zweryfikowano przez EpisodeQualityGate)"
-                        self.data["characters"][char_name] = {"description": desc, "source": "quality_gate"}
-                        self.data["declensions"][char_name] = generate_polish_name_declension(char_name, gender_str)
-                        has_updates = True
+                    # 1st-person speaker gender confirmation:
+                    m_spk = re.search(r"skorygowano 1\. os\. na rodzaj (męski|żeński) dla mówc(?:y|zyni) '([^']+)'", fix_item)
+                    if m_spk:
+                        gender_str = "MALE" if m_spk.group(1) == "męski" else "FEMALE"
+                        char_name = m_spk.group(2).strip()
+                        is_generic_actor = is_generic_actor_or_category(char_name) or bool(re.match(r"^(?:man|male|boy|guy|woman|female|girl|lady|mężczyzna|kobieta|chłopak|dziewczyna|facet|pan|pani)\s+[a-z0-9]+$", char_name, re.IGNORECASE))
+                        if char_name and len(char_name) >= 3 and not is_generic_actor:
+                            desc = f"{'MĘŻCZYZNA' if gender_str == 'MALE' else 'KOBIETA'} (zweryfikowano przez EpisodeQualityGate)"
+                            self.data["characters"][char_name] = {"description": desc, "source": "quality_gate"}
+                            self.data["declensions"][char_name] = generate_polish_name_declension(char_name, gender_str)
+                            has_updates = True
 
-                # Prepositional Foreign Name Declension: e.g. "ujednolicono formę imienia po przyimku na 'Drela'"
-                m_prep = re.search(r"ujednolicono formę (?:imienia po przyimku|na) '([^']+)'", fix_item)
-                if m_prep:
-                    decl_form = m_prep.group(1)
-                    for existing_name in list(self.data["characters"].keys()) + list(self.data["declensions"].keys()):
-                        if len(existing_name) >= 3 and decl_form.lower().startswith(existing_name[:max(3, len(existing_name)-2)].lower()):
-                            if existing_name in self.data["declensions"]:
-                                self.data["declensions"][existing_name]["D"] = decl_form
-                                has_updates = True
+                    # Prepositional Foreign Name Declension: e.g. "ujednolicono formę imienia po przyimku na 'Drela'"
+                    m_prep = re.search(r"ujednolicono formę (?:imienia po przyimku|na) '([^']+)'", fix_item)
+                    if m_prep:
+                        decl_form = m_prep.group(1)
+                        for existing_name in list(self.data["characters"].keys()) + list(self.data["declensions"].keys()):
+                            if len(existing_name) >= 3 and decl_form.lower().startswith(existing_name[:max(3, len(existing_name)-2)].lower()):
+                                if existing_name in self.data["declensions"]:
+                                    self.data["declensions"][existing_name]["D"] = decl_form
+                                    has_updates = True
 
-                # Vocative confirmation: e.g. "ujednolicono wołacz na 'Andrewie'"
-                m_voc = re.search(r"ujednolicono wołacz na '([^']+)'", fix_item)
-                if m_voc:
-                    voc_form = m_voc.group(1)
-                    for existing_name in list(self.data["characters"].keys()) + list(self.data["declensions"].keys()):
-                        if len(existing_name) >= 3 and voc_form.lower().startswith(existing_name[:max(3, len(existing_name)-2)].lower()):
-                            if existing_name in self.data["declensions"]:
-                                self.data["declensions"][existing_name]["W"] = voc_form
-                                has_updates = True
+                    # Vocative confirmation: e.g. "ujednolicono wołacz na 'Andrewie'"
+                    m_voc = re.search(r"ujednolicono wołacz na '([^']+)'", fix_item)
+                    if m_voc:
+                        voc_form = m_voc.group(1)
+                        for existing_name in list(self.data["characters"].keys()) + list(self.data["declensions"].keys()):
+                            if len(existing_name) >= 3 and voc_form.lower().startswith(existing_name[:max(3, len(existing_name)-2)].lower()):
+                                if existing_name in self.data["declensions"]:
+                                    self.data["declensions"][existing_name]["W"] = voc_form
+                                    has_updates = True
 
-                # Locative confirmation: e.g. "ujednolicono formę na 'Nathanie' po przyimku miejscownika"
-                m_loc = re.search(r"ujednolicono formę na '([^']+)' po przyimku miejscownika", fix_item)
-                if m_loc:
-                    loc_form = m_loc.group(1)
-                    for existing_name in list(self.data["characters"].keys()) + list(self.data["declensions"].keys()):
-                        if len(existing_name) >= 3 and loc_form.lower().startswith(existing_name[:max(3, len(existing_name)-2)].lower()):
-                            if existing_name in self.data["declensions"]:
-                                self.data["declensions"][existing_name]["Ms"] = loc_form
-                                has_updates = True
+                    # Locative confirmation: e.g. "ujednolicono formę na 'Nathanie' po przyimku miejscownika"
+                    m_loc = re.search(r"ujednolicono formę na '([^']+)' po przyimku miejscownika", fix_item)
+                    if m_loc:
+                        loc_form = m_loc.group(1)
+                        for existing_name in list(self.data["characters"].keys()) + list(self.data["declensions"].keys()):
+                            if len(existing_name) >= 3 and loc_form.lower().startswith(existing_name[:max(3, len(existing_name)-2)].lower()):
+                                if existing_name in self.data["declensions"]:
+                                    self.data["declensions"][existing_name]["Ms"] = loc_form
+                                    has_updates = True
 
-        if has_updates:
-            self.save()
+            if has_updates:
+                self.save()
 
     def format_for_prompt(self) -> str:
-        """Formats Series Bible into a compact section for LLM prompt injection."""
+        """Formats Series Bible into a compact section for LLM prompt injection (Thread-Safe)."""
         lines = []
         has_content = False
 
-        if self.data["characters"] or self.data["glossary"] or self.data.get("plot_anchors") or self.data.get("declensions"):
+        with self._lock:
+            chars_items = list(self.data.get("characters", {}).items())[:8]
+            rels_items = list(self.data.get("relationships", {}).items())[:8]
+            decls_items = list(self.data.get("declensions", {}).items())[:6]
+            gloss_items = list(self.data.get("glossary", {}).items())[:12]
+            canon_items = list(self.data.get("fansub_canon", {}).items())[:8]
+            anchors_items = list(self.data.get("plot_anchors", {}).items())[:8]
+            ep_count = len(self.data.get("episodes_translated", []))
+
+        if chars_items or gloss_items or anchors_items or decls_items or canon_items:
             lines.append("--- BIBLIA SERIALU (PAMIĘĆ MIĘDZYODCINKOWA SEZONU) ---")
-            lines.append(f"Seria: '{self.anime_title}' (Przetłumaczono odcinków: {len(self.data['episodes_translated'])})")
+            lines.append(f"Seria: '{self.anime_title}' (Przetłumaczono odcinków: {ep_count})")
             
-            if self.data["characters"]:
+            if chars_items:
                 lines.append("• Kluczowe postacie z poprzednich odcinków:")
-                for name, info in list(self.data["characters"].items())[:8]:
+                for name, info in chars_items:
                     desc = info.get("description", "") if isinstance(info, dict) else str(info)
                     lines.append(f"  - {name}: {desc}")
                 has_content = True
 
-            if self.data.get("relationships"):
+            if rels_items:
                 lines.append("• Kluczowe relacje i formy zwrotu (T-V / Honoryfikatywność):")
-                for rel_k, rel_v in list(self.data["relationships"].items())[:8]:
+                for rel_k, rel_v in rels_items:
                     lines.append(f"  - {rel_k}: {rel_v}")
                 has_content = True
 
-            if self.data.get("declensions"):
-                decl_items = []
-                for c_name, c_decl in list(self.data["declensions"].items())[:6]:
+            if decls_items:
+                decl_items_out = []
+                for c_name, c_decl in decls_items:
                     if c_decl and isinstance(c_decl, dict) and c_decl.get("M") != c_decl.get("D"):
-                        decl_items.append(f"    * {c_name}: D. {c_decl.get('D')}, C/Ms. {c_decl.get('C')}, B/N. {c_decl.get('B')}/z {c_decl.get('N')}, W. {c_decl.get('W')}!")
-                if decl_items:
+                        decl_items_out.append(f"    * {c_name}: D. {c_decl.get('D')}, C/Ms. {c_decl.get('C')}, B/N. {c_decl.get('B')}/z {c_decl.get('N')}, W. {c_decl.get('W')}!")
+                if decl_items_out:
                     lines.append("• Wzorzec odmiany imion (Matryca 7 Przypadków fleksyjnych):")
-                    lines.extend(decl_items)
+                    lines.extend(decl_items_out)
                     has_content = True
 
-            if self.data["glossary"]:
+            if gloss_items:
                 lines.append("• Ustalone nazwy i terminologia z poprzednich odcinków (ZACHOWAJ SPÓJNOŚĆ!):")
-                for src, trg in list(self.data["glossary"].items())[:12]:
+                for src, trg in gloss_items:
                     lines.append(f"  - '{src}' -> '{trg}'")
                 has_content = True
 
-            if self.data.get("fansub_canon"):
+            if canon_items:
                 lines.append("• Sprawdzony kanon fansuberski dla tej serii (ZACHOWAJ 100% SPÓJNOŚCI!):")
-                for f_term, f_info in list(self.data["fansub_canon"].items())[:8]:
+                for f_term, f_info in canon_items:
                     if isinstance(f_info, dict) and "instruction" in f_info:
                         lines.append(f"  - {f_info['instruction']}")
                     elif isinstance(f_info, dict) and "canonical_pl" in f_info:
                         lines.append(f"  - '{f_term}' -> '{f_info['canonical_pl']}'")
                 has_content = True
 
-            if self.data.get("plot_anchors"):
+            if anchors_items:
                 lines.append("• Kluczowe rekwizyty i kotwice fabularne (PLOT ANCHORS - ZACHOWAJ CIĄGŁOŚĆ!):")
-                for item_key, directive in list(self.data["plot_anchors"].items())[:8]:
+                for item_key, directive in anchors_items:
                     lines.append(f"  - [{item_key}]: {directive}")
                 has_content = True
 
@@ -4108,13 +4162,22 @@ class SeriesBible:
         Formats a strictly scoped Series Bible snippet for a specific batch (Context Minimalism).
         Only includes characters, relationships, declensions, glossary terms, and plot anchors
         that are actually referenced in the current batch or its immediate context.
+        Thread-safe under concurrent batch processing.
         """
         corpus = f"{batch_text} {lookback_text} {lookahead_text}".lower()
         active_spk_lower = {s.lower().strip() for s in (active_speakers or set()) if s and s.strip()}
 
+        with self._lock:
+            chars_items = list(self.data.get("characters", {}).items())
+            rels_items = list(self.data.get("relationships", {}).items())
+            decls_items = list(self.data.get("declensions", {}).items())
+            gloss_items = list(self.data.get("glossary", {}).items())
+            anchors_items = list(self.data.get("plot_anchors", {}).items())
+            canon_items = list(self.data.get("fansub_canon", {}).items())
+
         # 1. Filter characters
         scoped_chars = {}
-        for name, info in self.data.get("characters", {}).items():
+        for name, info in chars_items:
             name_lower = name.lower()
             # Match if speaker or mentioned in corpus
             if name_lower in active_spk_lower or any(s in name_lower or name_lower in s for s in active_spk_lower if len(s) >= 3):
@@ -4124,32 +4187,32 @@ class SeriesBible:
 
         # 2. Filter relationships
         scoped_rels = {}
-        for rel_k, rel_v in self.data.get("relationships", {}).items():
+        for rel_k, rel_v in rels_items:
             rel_k_lower = rel_k.lower()
             if any(name.lower() in rel_k_lower for name in scoped_chars) or any(s in rel_k_lower for s in active_spk_lower if len(s) >= 3):
                 scoped_rels[rel_k] = rel_v
 
         # 3. Filter declensions
         scoped_decls = {}
-        for c_name, c_decl in self.data.get("declensions", {}).items():
+        for c_name, c_decl in decls_items:
             if c_name in scoped_chars or c_name.lower() in active_spk_lower or re.search(rf"\b{re.escape(c_name.lower())}\b", corpus):
                 scoped_decls[c_name] = c_decl
 
         # 4. Filter glossary
         scoped_gloss = {}
-        for src, trg in self.data.get("glossary", {}).items():
+        for src, trg in gloss_items:
             if len(src) >= 3 and re.search(rf"\b{re.escape(src.lower())}\b", corpus):
                 scoped_gloss[src] = trg
 
         # 5. Filter plot anchors
         scoped_anchors = {}
-        for item_key, directive in self.data.get("plot_anchors", {}).items():
+        for item_key, directive in anchors_items:
             if len(item_key) >= 3 and item_key.lower() in corpus:
                 scoped_anchors[item_key] = directive
 
         # 6. Filter fansub canon
         scoped_canon = {}
-        for f_term, f_info in self.data.get("fansub_canon", {}).items():
+        for f_term, f_info in canon_items:
             en_words = [f_term]
             if isinstance(f_info, dict) and "en" in f_info:
                 en_words.extend(f_info["en"])
@@ -4220,25 +4283,30 @@ class SeriesBible:
         return "\n".join(lines) if has_content else ""
 
     def generate_html_report(self) -> str:
-        """Generates a responsive modern dark-mode HTML continuity report of the Series Bible."""
+        """Generates a responsive modern dark-mode HTML continuity report of the Series Bible (Thread-Safe)."""
+        with self._lock:
+            chars_items = list(self.data.get("characters", {}).items())
+            gloss_items = list(self.data.get("glossary", {}).items())
+            rel_items = list(self.data.get("relationships", {}).items())
+            anchor_items = list(self.data.get("plot_anchors", {}).items())
+            episodes_list = ", ".join(self.data.get("episodes_translated", [])) or "Brak przetłumaczonych odcinków"
+
         chars_rows = ""
-        for name, info in self.data.get("characters", {}).items():
+        for name, info in chars_items:
             desc = info.get("description", "") if isinstance(info, dict) else str(info)
             chars_rows += f"<tr><td><strong>{name}</strong></td><td>{desc}</td></tr>"
 
         gloss_rows = ""
-        for src, trg in self.data.get("glossary", {}).items():
+        for src, trg in gloss_items:
             gloss_rows += f"<tr><td><code>{src}</code></td><td><strong>{trg}</strong></td></tr>"
 
         rel_rows = ""
-        for pair, rel in self.data.get("relationships", {}).items():
+        for pair, rel in rel_items:
             rel_rows += f"<tr><td><strong>{pair}</strong></td><td>{rel}</td></tr>"
 
         anchor_rows = ""
-        for p_item, p_dir in self.data.get("plot_anchors", {}).items():
+        for p_item, p_dir in anchor_items:
             anchor_rows += f"<tr><td><strong>{p_item}</strong></td><td>{p_dir}</td></tr>"
-
-        episodes_list = ", ".join(self.data.get("episodes_translated", [])) or "Brak przetłumaczonych odcinków"
 
         html = f"""<!DOCTYPE html>
 <html lang="pl">

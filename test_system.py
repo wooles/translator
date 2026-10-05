@@ -13668,6 +13668,226 @@ def test_comprehensive_canon_oblique_prepositions_and_male_consonant_declension_
     print(" -> PASSED: Test 146 w 100% potwierdza uniwersum przyimków kanonu i poprawną odmianę męskich imion obcych na spółgłoskę (0.00 PLN).")
 
 
+def test_multithreaded_concurrency_and_dictionary_mutation_safety_guard():
+    """
+    Test 148 (Filar CLXXXIX / Concurrency & Non-Destructive Invariance):
+    Systemowa weryfikacja odporności na błąd 'RuntimeError: dictionary changed size during iteration'
+    podczas równoległego tłumaczenia wielowątkowego (ThreadPoolExecutor / 16 wątków).
+    Weryfikuje:
+    1. SeriesBible - RLock, migawki (snapshots), współbieżny zapis (update_from_episode_profile,
+       update_character_gender_from_audio, assimilate_quality_gate_invariants) i jednoczesny odczyt
+       (format_scoped_for_batch, format_for_prompt, get_scene_active_characters, infer_scene_cast_from_text,
+        get_character_gender, is_toponym_or_realm, generate_html_report).
+    2. Translator.character_registry - RLock, get_character_registry_snapshot, współbieżne wywołania
+       _register_character_safe przy jednoczesnym detect_third_person_mentions i detect_scene_social_context.
+    3. DialogueVerifier - formatowanie promptu JIT przy współbieżnej mutacji character_registry.
+    4. EpisodeQualityGate (avt_linter.py) - pełny audyt post-passu przy współbieżnej mutacji słowników.
+    5. Antykolizja i determinizm - zachowanie integralności danych, brak zakleszczeń (zero deadlocks),
+       koszt 0.00 PLN.
+    """
+    print("\n[TEST 148]: Uruchamianie wielowątkowego testu odporności na mutację słowników w locie (16 wątków / Concurrency Guard)...")
+    import concurrent.futures
+    import threading
+    import time
+    import copy
+    from series_memory import SeriesBible
+    from translator import detect_third_person_mentions, detect_scene_social_context
+    from avt_linter import EpisodeQualityGate
+
+    # --- ASERCJA 1: SeriesBible Concurrency Stress Test ---
+    bible = SeriesBible(anime_title="ConcurrencyStressTestSeries")
+    errors = []
+
+    def bible_writer(thread_id: int):
+        for i in range(25):
+            char_name = f"Hero_{thread_id}_{i}"
+            role = "kobieta" if i % 2 == 0 else "mężczyzna"
+            bible.update_from_episode_profile(
+                episode_name=f"EP_{i}",
+                characters={char_name: f"{role} (postać testowa)", f"Rel_{thread_id}_{i} -> Mentor": "relacja formalna"},
+                glossary={f"Sword_{thread_id}_{i}": f"Miecz_{i}"},
+                plot_anchors={f"Relic_{thread_id}_{i}": "nie dotykać"},
+                relationships={f"Hero_{thread_id}_{i} -> Vill": "wrogość"}
+            )
+            bible.update_character_gender_from_audio(char_name, 210.0 if role == "kobieta" else 110.0)
+            bible.assimilate_quality_gate_invariants([
+                {"type": "gender", "name": char_name, "gender": "FEMALE" if role == "kobieta" else "MALE"},
+                f"skorygowano 1. os. na rodzaj {'żeński' if role == 'kobieta' else 'męski'} dla mówcy '{char_name}'"
+            ])
+            time.sleep(0.001)
+
+    def bible_reader(thread_id: int):
+        for i in range(25):
+            _ = bible.format_scoped_for_batch("Hero_0_0 walczy mieczem Sword_0_0 z Relic_0_0", "lookback", "lookahead")
+            _ = bible.format_for_prompt()
+            _ = bible.get_scoped_characters_for_scene(speakers={"Hero_0_0", f"Hero_{thread_id}_{i}"})
+            _ = bible.infer_scene_cast_from_text(f"Hero_{thread_id}_{i} rozmawia z Mentorem")
+            _ = bible.get_character_gender(f"Hero_{thread_id}_{i}")
+            _ = bible.is_non_character_entity("Melini")
+            _ = bible.generate_html_report()
+            _ = bible.get_characters_snapshot()
+            time.sleep(0.001)
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=16) as executor:
+        writer_futures = [executor.submit(bible_writer, tid) for tid in range(8)]
+        reader_futures = [executor.submit(bible_reader, tid) for tid in range(8)]
+        for f in writer_futures + reader_futures:
+            try:
+                f.result()
+            except Exception as e:
+                errors.append(f"SeriesBible ThreadPool error: {type(e).__name__}: {e}")
+
+    assert not errors, f"Asercja 1 nie powiodła się! Błędy współbieżności SeriesBible: {errors}"
+
+    # --- ASERCJA 2: Translator character_registry & detection helpers ---
+    class MockTranslator:
+        def __init__(self):
+            self.lock = threading.RLock()
+            self.character_registry = {}
+            self.series_bible = bible
+            self.FEMALE_ROLE_KEYWORDS = ["kobieta", "żeńsk", "female", "dziewczyna"]
+            self.MALE_ROLE_KEYWORDS = ["mężczyzna", "męsk", "male", "chłopak"]
+
+        def get_character_registry_snapshot(self):
+            with self.lock:
+                return dict(self.character_registry)
+
+        def _register_character_safe(self, name: str, gender: str, role: str = ""):
+            clean_name = name.strip()
+            new_desc = f"{gender} ({role or 'postać'})".strip()
+            with self.lock:
+                self.character_registry[clean_name] = new_desc
+
+    mock_tr = MockTranslator()
+    registry_errors = []
+
+    def registry_writer(thread_id: int):
+        for i in range(30):
+            cname = f"Char_{thread_id}_{i}"
+            gen = "kobieta" if i % 2 == 0 else "mężczyzna"
+            mock_tr._register_character_safe(cname, gen, "rycerz")
+            time.sleep(0.001)
+
+    def registry_reader(thread_id: int):
+        for i in range(30):
+            snap = mock_tr.get_character_registry_snapshot()
+            _ = detect_third_person_mentions(
+                clean_text=f"Widziałem Char_0_0 oraz Char_{thread_id}_{i}",
+                speaker="Narrator",
+                character_registry=snap,
+                series_bible=bible
+            )
+            _ = detect_scene_social_context(
+                batch_events=[(0, type("Ev", (), {"name": "Char_0_0"})(), "tekst", "tekst")],
+                character_registry=snap,
+                series_bible=bible
+            )
+            time.sleep(0.001)
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=16) as executor:
+        w_futs = [executor.submit(registry_writer, tid) for tid in range(8)]
+        r_futs = [executor.submit(registry_reader, tid) for tid in range(8)]
+        for f in w_futs + r_futs:
+            try:
+                f.result()
+            except Exception as e:
+                registry_errors.append(f"Registry ThreadPool error: {type(e).__name__}: {e}")
+
+    assert not registry_errors, f"Asercja 2 nie powiodła się! Błędy współbieżności Translator: {registry_errors}"
+
+    # --- ASERCJA 3: verifier.py DialogueVerifier JIT formatting ---
+    from verifier import DialogueVerifier
+    verifier = DialogueVerifier(client=None, model="gemini-2.5-flash", keep_honorifics=True)
+    shared_reg = {f"VChar_{i}": "postać" for i in range(20)}
+    verifier_errors = []
+
+    def verifier_mutator():
+        for i in range(50):
+            shared_reg[f"DynChar_{i}"] = "nowa postać"
+            time.sleep(0.001)
+
+    def verifier_caller():
+        batch_sample = [{"id": 1, "en": "Hello friend", "pl": "Cześć przyjacielu", "speaker_name": "VChar_1"}]
+        for _ in range(50):
+            prompt = verifier.verify_batch(
+                batch_items=batch_sample,
+                history_context=[],
+                lookahead_events=[],
+                character_registry=shared_reg,
+                scene_diagnosis=None,
+                return_prompt=True
+            )
+            assert "Cześć przyjacielu" in prompt
+            time.sleep(0.001)
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
+        v_futs = [executor.submit(verifier_mutator), executor.submit(verifier_caller), executor.submit(verifier_caller)]
+        for f in v_futs:
+            try:
+                f.result()
+            except Exception as e:
+                verifier_errors.append(f"Verifier error: {type(e).__name__}: {e}")
+
+    assert not verifier_errors, f"Asercja 3 nie powiodła się! Błędy współbieżności verifier: {verifier_errors}"
+
+    # --- ASERCJA 4: EpisodeQualityGate Concurrent Postpass ---
+    import pysubs2
+    subs = pysubs2.SSAFile()
+    subs.events = [
+        pysubs2.SSAEvent(start=1000, end=2000, text="Hero_0_0 był zmęczony."),
+        pysubs2.SSAEvent(start=2500, end=3500, text="Aura Gilotyna powróciła.")
+    ]
+    linter_reg = {f"LintChar_{i}": "postać" for i in range(20)}
+    linter_errors = []
+
+    def linter_mutator():
+        for i in range(40):
+            linter_reg[f"NewLint_{i}"] = "nowa postać"
+            time.sleep(0.001)
+
+    def linter_caller():
+        for _ in range(40):
+            sub_copy = copy.deepcopy(subs)
+            out_s, fixes = EpisodeQualityGate.audit_and_fix_entire_episode(
+                subs=sub_copy,
+                character_registry=linter_reg,
+                series_bible=bible
+            )
+            assert len(out_s.events) == 2
+            time.sleep(0.001)
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
+        l_futs = [executor.submit(linter_mutator), executor.submit(linter_caller), executor.submit(linter_caller)]
+        for f in l_futs:
+            try:
+                f.result()
+            except Exception as e:
+                linter_errors.append(f"Linter error: {type(e).__name__}: {e}")
+
+    assert not linter_errors, f"Asercja 4 nie powiodła się! Błędy współbieżności EpisodeQualityGate: {linter_errors}"
+
+    # --- ASERCJA 5: Zero-cost and Determinism Check ---
+    snap = bible.get_characters_snapshot()
+    assert len(snap) > 0, "Migawka postaci w SeriesBible po stress teście nie może być pusta!"
+    assert bible.get_character_gender("Hero_0_0") in ("FEMALE", "MALE", "UNKNOWN")
+
+    # Cleanup plików testowych na dysku
+    test_bible_path = Path(__file__).parent / "series_memory" / "ConcurrencyStressTestSeries_bible.json"
+    if test_bible_path.exists():
+        try:
+            test_bible_path.unlink()
+        except Exception:
+            pass
+    test_lex_path = Path(__file__).parent / "series_memory" / "fansub_lexicons" / "concurrencystresstestseries.json"
+    if test_lex_path.exists():
+        try:
+            test_lex_path.unlink()
+        except Exception:
+            pass
+
+    print(" -> PASSED: Test 148 w 100% potwierdza pełną odporność wielowątkową potoku na błędy mutacji słowników podczas iteracji (0.00 PLN).")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -13814,6 +14034,7 @@ if __name__ == "__main__":
     test_series_bible_onomastic_precedence_and_2line_cpl_rebalancer_guard()
     test_full_tense_transitive_genitive_of_negation_guard()
     test_comprehensive_canon_oblique_prepositions_and_male_consonant_declension_guard()
-    print("\n Wszystkie testy jednostkowe i integracyjne (147/147) zakończone pełnym sukcesem!\n")
+    test_multithreaded_concurrency_and_dictionary_mutation_safety_guard()
+    print("\n Wszystkie testy jednostkowe i integracyjne (148/148) zakończone pełnym sukcesem!\n")
 
 

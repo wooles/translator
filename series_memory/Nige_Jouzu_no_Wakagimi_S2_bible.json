@@ -18,18 +18,18 @@
       "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Mochizuki / Shinomiya / Nezu": {
-      "description": "postać (Postać) [MĘŻCZYZNA]",
+      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
       "gender": "MALE"
     },
     "Ayako": {
-      "description": "postać (Postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "kobieta (Młoda wojowniczka, lojalna towarzyszka Tokiyukiego) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Lord Mochizuki": {
-      "description": "postać (Postać) [MĘŻCZYZNA]",
+      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
       "gender": "MALE"
     },
     "Muneie Tokoiwa / Mochizuki": {
-      "description": "postać (Postać)"
+      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Sadamune Ogasawara": {
       "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
@@ -44,12 +44,11 @@
       "gender": "MALE"
     },
     "Tokiyuki Hojo": {
-      "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
-      "source": "quality_gate",
+      "description": "mężczyzna (10 lat, prawowity dziedzic siogunatu Kamakura, wódz powstania) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
       "gender": "MALE"
     },
     "Mochizuki / Shinomiya": {
-      "description": "postać (Postać) [MĘŻCZYZNA]",
+      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
       "gender": "MALE"
     },
     "Cesarz Go-Daigo": {
@@ -59,14 +58,14 @@
       "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Mochizuki": {
-      "description": "postać (Postać) [MĘŻCZYZNA]",
+      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
       "gender": "MALE"
     },
     "Shokan": {
-      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Chojumaru": {
-      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
       "gender": "MALE"
     },
     "Tokiyuki Suwa": {
@@ -74,7 +73,7 @@
       "gender": "MALE"
     },
     "Sojusznicy / Mochizuki": {
-      "description": "postać (Postać) [MĘŻCZYZNA]",
+      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
       "gender": "MALE"
     },
     "Gubernator Kiyohara": {
@@ -88,12 +87,11 @@
       "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Tokiyuki": {
-      "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
-      "source": "quality_gate",
+      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
       "gender": "MALE"
     },
     "Yorishige": {
-      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Moritaka": {
       "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
@@ -126,14 +124,14 @@
       "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Kinmune Saionji": {
-      "description": "postać (Postać) [MĘŻCZYZNA]",
+      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
       "gender": "MALE"
     },
     "Yorishige Suwa -> Tokiyuki Hōjō": {
-      "description": "Zwrot: 'paniczu Tokiyuki' (boski opiekun -> dziedzic Hōjō) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "Zwrot: 'panie Tokiyuki / paniczu' (bóstwo i mentor -> młody dziedzic Hojo) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Tokiyuki Hōjō -> Yorishige Suwa": {
-      "description": "Zwrot: 'Panie Yorishige' (młody pan -> opiekun i doradca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "Zwrot: 'panie Yorishige' (podopieczny -> opiekun / żywe bóstwo) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Yukiyasu Unno -> Tokiyuki Hōjō (Chōjūmaru)": {
       "description": "Zwrot: 'Chōjūmaru' (generał Suwy -> młody posłaniec pod ukrytym imieniem) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
@@ -229,7 +227,7 @@
       "description": "Zwrot: 'panie Kusunoki / panie Masashige' (uczeń/młodzieniec -> legendarny wódz) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Masashige Kusunoki": {
-      "description": "postać (Postać) [MĘŻCZYZNA]",
+      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
       "gender": "MALE"
     },
     "Masashige Kusunoki -> Tokiyuki Hōjō": {
@@ -257,7 +255,7 @@
       "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Sojusznicy": {
-      "description": "postać (Postać) [MĘŻCZYZNA]",
+      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
       "gender": "MALE"
     },
     "Tokiyuki Hōjō (Chojumaru) -> Mochizuki": {
@@ -276,11 +274,12 @@
       "description": "Zwrot: 'młody panie / panie Mochizuki' (młody dziedzic -> dowódcy i wasale) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Takauji Ashikaga": {
-      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
       "gender": "MALE"
     },
     "Genba": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+      "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
+      "source": "quality_gate",
       "gender": "MALE"
     },
     "Tamonmaru": {
@@ -319,8 +318,7 @@
       "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Kusunoki": {
-      "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
-      "source": "quality_gate",
+      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
       "gender": "MALE"
     },
     "Yoshisada": {
@@ -347,16 +345,39 @@
       "description": "Zwrot: 'Chojumaru / młody panie' (weteran wojenny -> pozorny giermek/młodzik) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Hachiro Miura": {
-      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Wiejska dziewczynka -> Shokan": {
       "description": "Zwrot: 'panie zarządco' (chłopka -> zarządca majątku ziemskiego) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Wiejska dziewczynka": {
-      "description": "KOBIETA (wyodrębniono z relacji serii)"
+      "description": "postać (Postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Tokitsugu": {
-      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Yoritsugu Suwa -> Yorishige Suwa": {
+      "description": "Zwrot: 'ojcze' (syn -> ojciec) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Yoritsugu Suwa": {
+      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+      "gender": "MALE"
+    },
+    "Ayako -> Tokiyuki Hōjō": {
+      "description": "Zwrot: 'młody panie / braciszku' (towarzyszka broni -> młody wódz) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Kojiro Nezu": {
+      "description": "mężczyzna (Chłopiec-szermierz, przyszły przywódca klanu Nezu) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Shogen Hirano": {
+      "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
+      "source": "quality_gate"
+    },
+    "Dworzanin": {
+      "description": "KOBIETA (zweryfikowano z audio seiyū Whisper)"
+    },
+    "Doradca Suwy": {
+      "description": "KOBIETA (zweryfikowano z audio seiyū Whisper)"
     }
   },
   "glossary": {
@@ -377,7 +398,7 @@
     "Kamakura Shogunate": "Szogunat Kamakura",
     "Kenmu Restoration": "Restauracja Kenmu",
     "Nanboku-cho period": "Okres Nanboku-chō",
-    "Nakasendai Rebellion": "Powstanie Nakasendai",
+    "Nakasendai Rebellion": "powstanie Nakasendai",
     "Inuoumono": "Inuoumono",
     "Yabusame": "Yabusame",
     "Kasagake": "Kasagake",
@@ -393,7 +414,7 @@
     "Suwa Myojin": "Suwa Myōjin",
     "Genpuku": "Genpuku",
     "Eboshi-oya": "Eboshi-oya",
-    "Arahitogami": "Arahitogami",
+    "Arahitogami": "żywe bóstwo",
     "Holy Pillar": "Święty Pal",
     "Ashikaga School": "Szkoła Ashikaga",
     "Tengu": "Tengu",
@@ -423,11 +444,13 @@
     "Manor Steward": "Zarządca posiadłości",
     "Two-Fanged Bare Blade": "Bliźniacze Ostrze Dwoistego Kła",
     "Demon-heart Buddha Blade": "Ostrze Demona Przecinające Buddę",
-    "Imperial Command": "Rozkaz cesarski"
+    "Imperial Command": "Rozkaz cesarski",
+    "Onbashira": "święte pnie Onbashira",
+    "Lamellar plates (kozane)": "płytki lamelkowe"
   },
   "relationships": {
-    "Yorishige Suwa -> Tokiyuki Hōjō": "Zwrot: 'paniczu Tokiyuki' (boski opiekun -> dziedzic Hōjō) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Tokiyuki Hōjō -> Yorishige Suwa": "Zwrot: 'Panie Yorishige' (młody pan -> opiekun i doradca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Yorishige Suwa -> Tokiyuki Hōjō": "Zwrot: 'panie Tokiyuki / paniczu' (bóstwo i mentor -> młody dziedzic Hojo) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Tokiyuki Hōjō -> Yorishige Suwa": "Zwrot: 'panie Yorishige' (podopieczny -> opiekun / żywe bóstwo) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Yukiyasu Unno -> Tokiyuki Hōjō (Chōjūmaru)": "Zwrot: 'Chōjūmaru' (generał Suwy -> młody posłaniec pod ukrytym imieniem) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Tomomitsu Inukai -> Tokiyuki Hōjō (Chōjūmaru)": "Zwrot: 'Młody kurierze / Chōjūmaru' (zarządca fortu -> posłaniec) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Tokiyuki Hōjō (Chojumaru) -> Mochizuki / Shinomiya / Nezu": "Zwrot: 'panie Mochizuki / panie Shinomiya / panie Nezu' (młody dziedzic rodu Hōjō (incognito jako łącznik) -> feudalni dowódcy)",
@@ -476,7 +499,9 @@
     "Tokiyuki Hojo -> Yorishige Suwa": "Zwrot: 'panie Yorishige / mistrzu Yorishige' (podopieczny -> opiekun i kapłan) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Yorishige Suwa -> Tokiyuki Hojo": "Zwrot: 'paniczu Tokiyuki / panie Tokiyuki' (opiekun -> dziedzic rodu Hōjō) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Hachiro Miura -> Tokiyuki Hojo": "Zwrot: 'Chojumaru / młody panie' (weteran wojenny -> pozorny giermek/młodzik) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Wiejska dziewczynka -> Shokan": "Zwrot: 'panie zarządco' (chłopka -> zarządca majątku ziemskiego) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    "Wiejska dziewczynka -> Shokan": "Zwrot: 'panie zarządco' (chłopka -> zarządca majątku ziemskiego) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Yoritsugu Suwa -> Yorishige Suwa": "Zwrot: 'ojcze' (syn -> ojciec) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Ayako -> Tokiyuki Hōjō": "Zwrot: 'młody panie / braciszku' (towarzyszka broni -> młody wódz) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
   },
   "declensions": {
     "Yorishige Suwa": {
@@ -1412,6 +1437,56 @@
       "N": "Rozkazem cesarskim",
       "Ms": "Rozkazie cesarskim",
       "W": "Rozkazie cesarski"
+    },
+    "Yoritsugu Suwa": {
+      "M": "Yoritsugu Suwa",
+      "D": "Yoritsugu Suwy",
+      "C": "Yoritsugu Suwie",
+      "B": "Yoritsugu Suwę",
+      "N": "Yoritsugu Suwą",
+      "Ms": "Yoritsugu Suwie",
+      "W": "Yoritsugu Suwo",
+      "gender": "MALE"
+    },
+    "Kojiro Nezu": {
+      "M": "Kojiro Nezu",
+      "D": "Kojiro Nezu",
+      "C": "Kojiro Nezu",
+      "B": "Kojiro Nezu",
+      "N": "Kojiro Nezu",
+      "Ms": "Kojiro Nezu",
+      "W": "Kojiro Nezu",
+      "gender": "MALE"
+    },
+    "Shogen Hirano": {
+      "M": "Shogen Hirano",
+      "D": "Shogena Hirano",
+      "C": "Shogenowi Hirano",
+      "B": "Shogena Hirano",
+      "N": "Shogenem Hirano",
+      "Ms": "Shogenie Hirano",
+      "W": "Shogenie Hirano",
+      "gender": "MALE"
+    },
+    "Dworzanin": {
+      "M": "Dworzanin",
+      "D": "Dworzanin",
+      "C": "Dworzanin",
+      "B": "Dworzanin",
+      "N": "Dworzanin",
+      "Ms": "Dworzanin",
+      "W": "Dworzanin",
+      "gender": "FEMALE"
+    },
+    "Doradca Suwy": {
+      "M": "Doradca Suwy",
+      "D": "Doradcy Suwy",
+      "C": "Doradcy Suwy",
+      "B": "Doradcę Suwy",
+      "N": "Doradcą Suwy",
+      "Ms": "Doradcy Suwy",
+      "W": "Doradco Suwy",
+      "gender": "FEMALE"
     }
   },
   "hypocorisms": {},
@@ -1421,7 +1496,9 @@
     "Zdrada i upadek Kamakury": "Takauji Ashikaga zdradził ród Hōjō i doprowadził do rzezi w Kamakurze; Tokiyuki nosi tę traumę nieprzerwanie, co nadaje ciężar scenie spotkania w ogrodzie.",
     "Kinkaku-ji (Złoty Pawilon)": "Posiadłość Kinmune Saionjiego po jego egzekucji przeszła w ręce cesarstwa, a później rodu Ashikaga, stając się miejscem budowy Kinkaku-ji. Zachować dosłowne brzmienie 'Świątynia Kinkaku-ji' lub 'Złoty Pawilon'.",
     "Kamakura Party (Kamakura-tō)": "Utrzymać jednolitą nazwę frakcji: 'Partia z Kamakury' lub 'Związek z Kamakury'.",
-    "Demon-heart Buddha Blade (Kishin Butsumetsutou)": "Stosować kanoniczną nazwę techniki: 'Ostrze Demona Przecinające Buddę' lub 'Miecz Asury Niweczący Buddę'."
+    "Demon-heart Buddha Blade (Kishin Butsumetsutou)": "Stosować kanoniczną nazwę techniki: 'Ostrze Demona Przecinające Buddę' lub 'Miecz Asury Niweczący Buddę'.",
+    "Powstanie Nakasendai (Nakasendai no Ran)": "Kluczowa historyczna rebelia z 1335 roku – nazwa musi brzmieć konsekwentnie 'Powstanie Nakasendai'.",
+    "Kłody Onbashira": "Święte pnie jodłowe zsuwane ze stromych zboczy podczas rytuałów Suwa – zachować spójność nazewnictwa i sakralnego charakteru."
   },
   "episodes_translated": [
     "tmpnbh3evgk",
@@ -1435,7 +1512,8 @@
     "[ASW] Nige Jouzu no Wakagimi - 20 [1080p HEVC]",
     "[ASW] Nige Jouzu no Wakagimi S2 - 09 [1080p HEVC][7889D9E6]",
     "[ASW] Nige Jouzu no Wakagimi S2 - 10 [1080p HEVC][3B40A65A]",
-    "[ASW] Nige Jouzu no Wakagimi S2 - 11 [1080p HEVC][E11F3C25]"
+    "[ASW] Nige Jouzu no Wakagimi S2 - 11 [1080p HEVC][E11F3C25]",
+    "[ASW] Nige Jouzu no Wakagimi S2 - 12 [1080p HEVC][B08F81A8]"
   ],
   "batch_stats": {
     "[ASW] Nige Jouzu no Wakagimi S2 - 09 [1080p HEVC][7889D9E6]": {
@@ -1455,6 +1533,12 @@
       "batches": 15,
       "avg_batch_size": 22.1,
       "cost_pln": 3.44
+    },
+    "[ASW] Nige Jouzu no Wakagimi S2 - 12 [1080p HEVC][B08F81A8]": {
+      "dialogues": 353,
+      "batches": 17,
+      "avg_batch_size": 20.8,
+      "cost_pln": 3.76
     }
   },
   "fansub_canon": {}

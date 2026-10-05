@@ -227,7 +227,7 @@ class DialogueVerifier:
                 batch_corpus += " " + " ".join([str(item[2] if len(item) > 2 else "") for item in lookahead_events[:2]]).lower()
 
             active_chars = {}
-            for name, details in character_registry.items():
+            for name, details in list(character_registry.items()):
                 name_clean = name.strip()
                 name_stem = name_clean[:max(3, len(name_clean) - 2)].lower()
                 if len(character_registry) <= 4 or name_stem in batch_corpus:

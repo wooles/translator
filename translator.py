@@ -38,6 +38,7 @@ import json
 import logging
 import threading
 import tempfile
+import contextlib
 import sqlite3
 import unicodedata
 import concurrent.futures
@@ -1155,7 +1156,7 @@ def detect_third_person_mentions(
 
     # 1. From Character Registry
     if character_registry:
-        for full_name, details in character_registry.items():
+        for full_name, details in list(character_registry.items()):
             if not full_name:
                 continue
             desc_lower = str(details).lower()
@@ -1173,8 +1174,8 @@ def detect_third_person_mentions(
 
     # 2. From Series Bible characters
     if series_bible and hasattr(series_bible, "data"):
-        bible_chars = series_bible.data.get("characters", {})
-        for c_key, c_val in bible_chars.items():
+        bible_chars = series_bible.get_characters_snapshot() if hasattr(series_bible, "get_characters_snapshot") else dict(series_bible.data.get("characters", {}))
+        for c_key, c_val in list(bible_chars.items()):
             desc_str = c_val.get("description", "") if isinstance(c_val, dict) else str(c_val)
             desc_lower = desc_str.lower()
             gen = None
@@ -1276,15 +1277,16 @@ def detect_scene_social_context(
     high_status_found: Optional[str] = None
     all_known_chars: Dict[str, str] = {}
     if character_registry:
-        all_known_chars.update(character_registry)
+        all_known_chars.update(dict(character_registry))
     if series_bible and hasattr(series_bible, "data") and "characters" in series_bible.data:
-        for k, v in series_bible.data["characters"].items():
+        bible_chars = series_bible.get_characters_snapshot() if hasattr(series_bible, "get_characters_snapshot") else dict(series_bible.data.get("characters", {}))
+        for k, v in list(bible_chars.items()):
             desc = v.get("description", "") if isinstance(v, dict) else str(v)
             if k not in all_known_chars:
                 all_known_chars[k] = desc
 
     for spk in clean_speakers:
-        for cname, cdesc in all_known_chars.items():
+        for cname, cdesc in list(all_known_chars.items()):
             if cname.lower() in spk.lower() or spk.lower() in cname.lower():
                 cd_lower = str(cdesc).lower()
                 if any(k in cd_lower for k in HIGH_STATUS_KEYWORDS):
@@ -1496,7 +1498,7 @@ class MultimodalTranslator:
         # Real token counter for the current episode
         self.current_episode_tokens: Dict[str, Any] = {"prompt": 0, "cached": 0, "output": 0, "model": self.model}
         import threading
-        self.lock = threading.Lock()
+        self.lock = threading.RLock()
         # Smart Batch Queueing & Pacing:
         # Default to 1-by-1 streaming pacing mode (eliminates TPU congestion and provides live instant updates)
         default_concurrency = 1
@@ -1505,12 +1507,21 @@ class MultimodalTranslator:
     FEMALE_ROLE_KEYWORDS = FEMALE_ROLE_KEYWORDS
     MALE_ROLE_KEYWORDS = MALE_ROLE_KEYWORDS
     BOY_ROLE_KEYWORDS = BOY_ROLE_KEYWORDS
+    lock = threading.RLock()
+
+    def get_character_registry_snapshot(self) -> Dict[str, str]:
+        """Returns a thread-safe atomic snapshot copy of character_registry."""
+        lock = getattr(self, "lock", None)
+        ctx = lock if lock is not None else contextlib.nullcontext()
+        with ctx:
+            reg = getattr(self, "character_registry", None)
+            return dict(reg) if reg else {}
 
     def _register_character_safe(self, name: str, gender: str, role: str = "") -> None:
         """
         Safely registers or updates a character in self.character_registry with
         symmetrical immutable protection (cannot downgrade/overwrite confirmed FEMALE with MALE
-        or confirmed MALE with FEMALE).
+        or confirmed MALE with FEMALE). Thread-safe.
         """
         if not name:
             return
@@ -1518,23 +1529,28 @@ class MultimodalTranslator:
         new_desc = f"{gender} ({role or 'postać'})".strip()
         new_lower = new_desc.lower()
 
-        if clean_name in self.character_registry:
-            existing_desc = self.character_registry[clean_name]
-            existing_lower = existing_desc.lower()
+        lock = getattr(self, "lock", None)
+        ctx = lock if lock is not None else contextlib.nullcontext()
+        with ctx:
+            if not hasattr(self, "character_registry") or self.character_registry is None:
+                self.character_registry = {}
+            if clean_name in self.character_registry:
+                existing_desc = self.character_registry[clean_name]
+                existing_lower = existing_desc.lower()
 
-            has_confirmed_female = any(w in existing_lower for w in self.FEMALE_ROLE_KEYWORDS)
-            is_incoming_male = any(w in new_lower for w in self.MALE_ROLE_KEYWORDS)
-            if has_confirmed_female and is_incoming_male:
-                # Symmetrical lock: reject male overwrite for confirmed female
-                return
+                has_confirmed_female = any(w in existing_lower for w in self.FEMALE_ROLE_KEYWORDS)
+                is_incoming_male = any(w in new_lower for w in self.MALE_ROLE_KEYWORDS)
+                if has_confirmed_female and is_incoming_male:
+                    # Symmetrical lock: reject male overwrite for confirmed female
+                    return
 
-            has_confirmed_male = any(w in existing_lower for w in self.MALE_ROLE_KEYWORDS)
-            is_incoming_female = any(w in new_lower for w in self.FEMALE_ROLE_KEYWORDS)
-            if has_confirmed_male and is_incoming_female:
-                # Symmetrical lock: reject female overwrite for confirmed male
-                return
+                has_confirmed_male = any(w in existing_lower for w in self.MALE_ROLE_KEYWORDS)
+                is_incoming_female = any(w in new_lower for w in self.FEMALE_ROLE_KEYWORDS)
+                if has_confirmed_male and is_incoming_female:
+                    # Symmetrical lock: reject female overwrite for confirmed male
+                    return
 
-        self.character_registry[clean_name] = new_desc
+            self.character_registry[clean_name] = new_desc
 
     def _precompute_episode_scene_genders(
         self,
@@ -1993,7 +2009,7 @@ class MultimodalTranslator:
                         b_spk = (getattr(b_ev, "name", None) or getattr(b_ev, "actor", None) or "").strip()
                         if b_spk and b_spk.lower() != curr_spk_str and b_spk not in other_chars:
                             other_chars.append(b_spk)
-            for cname in (self.character_registry.keys() if hasattr(self, "character_registry") and self.character_registry else []):
+            for cname in (list(self.character_registry.keys()) if hasattr(self, "character_registry") and self.character_registry else []):
                 if len(cname) >= 3 and re.search(rf"\b{re.escape(cname)}\b", clean_text, re.IGNORECASE):
                     if cname not in other_chars and cname.lower() != curr_spk_str:
                         other_chars.append(cname)
@@ -2043,9 +2059,9 @@ class MultimodalTranslator:
                 return "grupa_mieszana", "Grupa Mieszana (Zbiorowość/L. mnoga męskoosobowa: -liście)"
 
         # 1. Textual Vocative Check (Calling someone by name in line text)
-        for cname in self.character_registry.keys():
+        for cname in list(self.character_registry.keys()):
             if len(cname) >= 3 and re.search(rf"\b{re.escape(cname)}[,!?]", clean_text, re.IGNORECASE):
-                cdesc = self.character_registry[cname].lower()
+                cdesc = self.character_registry.get(cname, "").lower()
                 if any(k in cdesc for k in self.FEMALE_ROLE_KEYWORDS):
                     return "kobieta", f"{cname} (Kobieta)"
                 elif any(k in cdesc for k in self.MALE_ROLE_KEYWORDS):
@@ -2370,7 +2386,7 @@ class MultimodalTranslator:
                 return False
 
             active_chars = {}
-            for name, details in self.character_registry.items():
+            for name, details in list(self.character_registry.items()):
                 if "->" in name:
                     # Relationship: require both participants to be present in scene
                     parts = [p.strip() for p in name.split("->", 1)]
@@ -2425,7 +2441,7 @@ class MultimodalTranslator:
             batch_events=batch_events,
             history_context=history_context,
             lookahead_events=lookahead_events,
-            character_registry=self.character_registry,
+            character_registry=self.get_character_registry_snapshot(),
             series_bible=getattr(self, "series_bible", None)
         )
         if social_context:
@@ -2639,9 +2655,9 @@ class MultimodalTranslator:
             clean_display_text = clean_text
             canonical_entities = set()
             if self.character_registry:
-                canonical_entities.update(self.character_registry.keys())
+                canonical_entities.update(list(self.character_registry.keys()))
             if hasattr(self, "series_bible") and self.series_bible and hasattr(self.series_bible, "data"):
-                canonical_entities.update(self.series_bible.data.get("characters", {}).keys())
+                canonical_entities.update(list(self.series_bible.data.get("characters", {}).keys()))
             for ent in canonical_entities:
                 clean_ent = extract_clean_speaker_name(ent).strip()
                 if clean_ent and len(clean_ent) >= 3 and clean_ent[0].isupper() and "->" not in clean_ent:
@@ -4170,7 +4186,7 @@ class MultimodalTranslator:
                 char_dict[char_key] = f"Zwrot: '{c.address_form}' ({c.relationship_type})"
 
             # Also persist standalone confirmed characters from Character Registry into Series Bible
-            for cname, creg in self.character_registry.items():
+            for cname, creg in list(self.character_registry.items()):
                 if cname and cname not in char_dict:
                     char_dict[cname] = creg
 
@@ -4487,17 +4503,17 @@ class MultimodalTranslator:
                                     # Save checkpoint safely
                                     try:
                                         checkpoint_payload = {
-                                            "translated_results": translated_results,
-                                            "translated_regions": translated_regions,
+                                            "translated_results": dict(translated_results),
+                                            "translated_regions": dict(translated_regions),
                                             "translated_typesetting": {
                                                 str(k): (v.model_dump() if hasattr(v, "model_dump") else (v.dict() if hasattr(v, "dict") else v))
-                                                for k, v in translated_typesetting.items()
+                                                for k, v in list(translated_typesetting.items())
                                             },
-                                            "translated_addressees": translated_addressees,
-                                            "translated_speakers": translated_speakers,
+                                            "translated_addressees": dict(translated_addressees),
+                                            "translated_speakers": dict(translated_speakers),
                                             "token_usage": {
-                                                "f1": self.current_episode_tokens,
-                                                "f2": self.verifier.current_episode_tokens if self.verifier else None
+                                                "f1": dict(self.current_episode_tokens),
+                                                "f2": dict(self.verifier.current_episode_tokens) if self.verifier and hasattr(self.verifier, "current_episode_tokens") else None
                                             }
                                         }
                                         with open(checkpoint_path, "w", encoding="utf-8") as cp_file:
