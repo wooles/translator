@@ -42,7 +42,8 @@ class DialogueVerifier:
         client: Optional[genai.Client] = None,
         model: str = "gemini-3.5-flash-lite",
         keep_honorifics: bool = True,
-        thinking_budget: Optional[int] = None
+        thinking_budget: Optional[int] = None,
+        lean: bool = True
     ):
         self.client = client
         if hasattr(client, "get_client") and hasattr(client, "clients"):
@@ -53,7 +54,8 @@ class DialogueVerifier:
             self.client_pool = MultiKeyClientPool(raw_keys=os.getenv("GEMINI_API_KEY"), timeout_sec=timeout_sec)
         self.model = model
         self.keep_honorifics = keep_honorifics
-        self.system_prompt = get_verifier_system_prompt(keep_honorifics=keep_honorifics)
+        self.lean = lean
+        self.system_prompt = get_verifier_system_prompt(keep_honorifics=keep_honorifics, lean=lean)
         self.current_episode_tokens: Dict[str, Any] = {"prompt": 0, "cached": 0, "output": 0, "model": self.model}
         import threading
         self.lock = threading.Lock()
@@ -365,6 +367,12 @@ class DialogueVerifier:
                 directive_lines.append(f"    • Alarm audio: {item['audio_alert'].strip()}")
             if item.get('third_person_subject'):
                 directive_lines.append(f"    • Płeć 3. osoby: {item['third_person_subject'].strip()}")
+            if item.get('duration_s') and item['duration_s'] > 0:
+                dur_s = float(item['duration_s'])
+                max_pl_chars = min(76, int(max(0.5, dur_s) * 17.0))
+                if max_pl_chars < 15:
+                    max_pl_chars = 15
+                directive_lines.append(f"    • BUDŻET ZNAKOWY AVT: Maksymalnie {max_pl_chars} znaków ze spacjami (tempo czytania 17.0 z/s, max 2 wiersze na ekranie) – NIE PRZEKRACZAJ!")
             if item.get('condensation_directive'):
                 directive_lines.append(f"    • Kondensacja: {item['condensation_directive'].strip()}")
             elif item.get('cps_warning'):
@@ -377,6 +385,12 @@ class DialogueVerifier:
                 directive_lines.append(f"    • ADRESAT ({item.get('addressee_label', 'KOBIETA')}): Stosuj formy żeńskie w 2. os. lp. ('ty'): 'zrobiłaś / byłaś / poszłaś / wiedziałaś / jesteś pewna / byłaś gotowa' (Filar CLXIII)!")
             elif item.get('addressee') == 'mężczyzna':
                 directive_lines.append(f"    • ADRESAT ({item.get('addressee_label', 'MĘŻCZYZNA')}): Stosuj formy męskie w 2. os. lp. ('ty'): 'zrobiłeś / byłeś / poszedłeś / wiedziałeś / jesteś pewien / byłeś gotowy' (Filar CLXIII)!")
+            elif item.get('addressee') == 'kobieta_dual':
+                directive_lines.append(f"    • ADRESAT ({item.get('addressee_label', 'DWIE KOBIETY')}): Liczba podwójna: 'obie / was dwie' / formy niemęskoosobowe: 'obie byłyście / zrobiłyście' (Filar CLXIII)!")
+            elif item.get('addressee') == 'mężczyzna_dual':
+                directive_lines.append(f"    • ADRESAT ({item.get('addressee_label', 'DWÓCH MĘŻCZYZN')}): Liczba podwójna: 'obaj / was dwóch' / formy męskoosobowe: 'obaj byliście / zrobiliście' (Filar CLXIII)!")
+            elif item.get('addressee') == 'para_mieszana_dual':
+                directive_lines.append(f"    • ADRESAT ({item.get('addressee_label', 'PARA MIESZANA')}): Liczba podwójna / liczebnik zbiorowy: 'oboje / was oboje' / formy męskoosobowe: 'oboje byliście / zrobiliście' (Filar CLXIII)!")
             elif item.get('addressee') == 'grupa_kobiet':
                 directive_lines.append("    • ADRESAT (GRUPA KOBIET): Stosuj formy niemęskoosobowe: 'zrobiłyście / byłyście gotowe / widziałyście' (Filar CLXIII)!")
             elif item.get('addressee') in ['grupa_mężczyzn', 'grupa_mieszana']:
@@ -384,13 +398,13 @@ class DialogueVerifier:
             if item.get('canonical_glossary_term'):
                 directive_lines.append(f"    • KANON MANGOWY (Nadrzędna baza): {item['canonical_glossary_term']} (forma syntetyczna bazowa – w dialogu BEZWZGLĘDNIE odmieniaj przez przypadki!)")
 
-            # SSOT Sanitizer: Clean notes from duplicates (remove third_person_subject and repeated addressee alarms)
+            # SSOT Sanitizer: Clean notes from duplicates (remove third_person_subject and repeated alarm tags)
             raw_notes = (item.get('notes') or '').strip()
             if raw_notes:
                 clean_notes = raw_notes
                 if item.get('third_person_subject') and item['third_person_subject'] in clean_notes:
                     clean_notes = clean_notes.replace(item['third_person_subject'], '').strip()
-                clean_notes = re.sub(r"\[(?:🎯|🚨)?\s*ALARM\s+FILAR\s+CLXIII[^\]]*\]", "", clean_notes).strip()
+                clean_notes = re.sub(r"\[(?:🎯|🚨|🎙️|⚠️)?\s*ALARM(?:\s+FILAR\s+[A-Z0-9]+|\s+[^\]]+)?\]", "", clean_notes).strip()
                 clean_notes = re.sub(r"\s+", " ", clean_notes).strip()
                 if clean_notes:
                     directive_lines.append(f"    • Wytyczne redakcyjne: {clean_notes}")

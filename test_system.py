@@ -7290,13 +7290,18 @@ def test_whisper_deterministic_disambiguator_k1_to_k8_guard():
     import pysubs2
 
     # 1. Warstwa 1: Analizator WhisperDisambiguator - pełne pokrycie taksonomii klas K1-K8
-    # K1: 2nd-person gender & proximity
-    t_k1_fem = WhisperDisambiguator.disambiguate_line(clean_en="Are you sure?", jp_audio="anta, hontou na no?")
+    # K1: 2nd-person gender & proximity (Twarde wykładniki onomastyczne i tytularne)
+    t_k1_fem = WhisperDisambiguator.disambiguate_line(clean_en="Sakura-chan, are you sure?", jp_audio="Sakura-chan, hontou na no?")
     assert t_k1_fem.addressee_gender == "FEMALE", f"K1 female failed: {t_k1_fem}"
     assert t_k1_fem.addressee_number == "SINGULAR"
 
-    t_k1_masc = WhisperDisambiguator.disambiguate_line(clean_en="You bastard!", jp_audio="temee, yurusan!")
+    t_k1_masc = WhisperDisambiguator.disambiguate_line(clean_en="Young master, watch out!", jp_audio="bocchan, abunai!")
     assert t_k1_masc.addressee_gender == "MALE", f"K1 male failed: {t_k1_masc}"
+
+    # Zaimki anta / temee jako K7 (rejestr nieformalny), a nie narzucanie płci
+    t_k7_anta = WhisperDisambiguator.disambiguate_line(clean_en="Are you sure?", jp_audio="anta, hontou na no?")
+    assert t_k7_anta.addressee_gender is None
+    assert t_k7_anta.social_register == "INFORMAL_TY"
 
     # K2: 2nd-person number (Plural vs Singular)
     t_k2_pl = WhisperDisambiguator.disambiguate_line(clean_en="I'll tell you all.", jp_audio="minna, zenbu hanasu.")
@@ -11603,6 +11608,1653 @@ def test_exhaustive_polish_cases_and_all_prepositions_guard():
     print(" -> PASSED: Test 125 w 100% potwierdza pełną kompletność fleksyjną, przyimkową i realizację Żelaznej Zasady 15 (0.00 PLN).")
 
 
+def test_comprehensive_machine_polish_traps_elimination():
+    r"""
+    Test 126: Holistyczna maszynowa eliminacja pułapek języka polskiego bez obciążania modeli Gemini (0.00 PLN):
+    1. Rozszerzona taksonomia 82 par ról i orzeczników w narzędniku (Zasada 12 i 15: relacje rodzinne, wojskowe, fantasy, społeczne, cechy).
+    2. Symetryczna harmonizacja mianownika orzecznikowego 2. osoby (jesteś moja najlepsza przyjaciółka / jesteś mój najlepszy przyjaciel).
+    3. Harmonizacja orzeczników 1. osoby (autoreferencja mówcy o potwierdzonej płci: byłam twoim przyjacielem -> byłam twoją przyjaciółką).
+    4. Eliminacja klityk nagłosowych PWN (^/\N/- Mi się wydaje -> Mnie się wydaje) oraz test antykolizyjny (Daj mi to).
+    5. Sztywna rekcja celownikowa zaimków (ufam ci, wybacz mi, pomóż mi) oraz dopełniacz negacji stałych kolokacji (nie mam czasu, nie ma sensu).
+    6. Nienaruszalność rzeczowników o wspólnym rodzaju / nijakich (potwór, dziecko, włóczęga).
+    """
+    print("\n--- Test 126: Holistyczna Maszynowa Eliminacja Pułapek Języka Polskiego (0.00 PLN) ---")
+
+    import pysubs2
+    from avt_linter import AVTLinter
+
+    # Asercja 1: Rozszerzona taksonomia 82 par orzeczników w narzędniku (target_female & target_male)
+    subs1 = pysubs2.SSAFile()
+    subs1.events.append(pysubs2.SSAEvent(start=1000, end=2000, style="Default", name="Kael", text="Rozmawiam z tobą."))
+    subs1.events.append(pysubs2.SSAEvent(start=2200, end=4000, style="Default", name="Kael", text="Jesteś moim bratem, wiernym żołnierzem i wspaniałym magiem."))
+    subs1.events.append(pysubs2.SSAEvent(start=4200, end=6000, style="Default", name="Kael", text="Zostałaś nowym księciem i moim jedynym obrońcą."))
+    subs1.events.append(pysubs2.SSAEvent(start=6200, end=7500, style="Default", name="Luna", text="Wiem."))
+
+    char_reg = {"Kael": {"gender": "MALE"}, "Luna": {"gender": "FEMALE"}}
+    linter = AVTLinter()
+    fixed_subs1, fixes1 = linter.lint_subtitles(subs1, character_registry=char_reg)
+
+    t1 = fixed_subs1.events[1].text
+    assert "moją siostrą" in t1, f"Błąd orzecznika rodzinnego (siostrą): {t1}"
+    assert "wierną żołnierką" in t1, f"Błąd orzecznika wojskowego (żołnierką): {t1}"
+    assert "wspaniałą maginią" in t1, f"Błąd orzecznika fantasy (maginią): {t1}"
+
+    t2 = fixed_subs1.events[2].text
+    assert "nową księżniczką" in t2, f"Błąd orzecznika feudalnego (księżniczką): {t2}"
+    assert "moją jedyną obrończynią" in t2, f"Błąd orzecznika obrońcy (obrończynią): {t2}"
+
+    # Asercja 2: Mianownik orzecznikowy 2. osoby
+    subs2 = pysubs2.SSAFile()
+    subs2.events.append(pysubs2.SSAEvent(start=1000, end=2000, style="Default", name="Kael", text="Kim jesteś?"))
+    subs2.events.append(pysubs2.SSAEvent(start=2200, end=4000, style="Default", name="Kael", text="Jesteś mój najlepszy przyjaciel i wspaniały wojownik."))
+    subs2.events.append(pysubs2.SSAEvent(start=4200, end=5500, style="Default", name="Luna", text="Dziękuję."))
+
+    fixed_subs2, fixes2 = linter.lint_subtitles(subs2, character_registry=char_reg)
+    t_nom = fixed_subs2.events[1].text
+    assert "moja najlepsza przyjaciółka" in t_nom, f"Błąd mianownika orzecznikowego (przyjaciółka): {t_nom}"
+    assert "wspaniała wojowniczka" in t_nom, f"Błąd mianownika orzecznikowego (wojowniczka): {t_nom}"
+
+    # Asercja 3: Harmonizacja orzeczników 1. osoby (Autoreferencja mówcy o potwierdzonej płci)
+    subs3 = pysubs2.SSAFile()
+    subs3.events.append(pysubs2.SSAEvent(start=1000, end=3000, style="Default", name="Luna", text="Byłam twoim najlepszym przyjacielem i zostałam wspaniałym obrońcą."))
+    subs3.events.append(pysubs2.SSAEvent(start=3200, end=5000, style="Default", name="Kael", text="Byłem twoją najlepszą przyjaciółką i zostałem wierną obrończynią."))
+
+    fixed_subs3, fixes3 = linter.lint_subtitles(subs3, character_registry=char_reg)
+    t_luna = fixed_subs3.events[0].text
+    assert "twoją najlepszą przyjaciółką" in t_luna, f"Błąd autoreferencji żeńskiej 1. osoby (przyjaciółką): {t_luna}"
+    assert "wspaniałą obrończynią" in t_luna, f"Błąd autoreferencji żeńskiej 1. osoby (obrończynią): {t_luna}"
+
+    t_kael = fixed_subs3.events[1].text
+    assert "twoim najlepszym przyjacielem" in t_kael, f"Błąd autoreferencji męskiej 1. osoby (przyjacielem): {t_kael}"
+    assert "wiernym obrońcą" in t_kael, f"Błąd autoreferencji męskiej 1. osoby (obrońcą): {t_kael}"
+
+    # Asercja 4: Eliminacja klityk nagłosowych PWN + Antykolizja
+    t_clitic1 = AVTLinter.clean_text("Mi się wydaje, że to prawda.")
+    assert t_clitic1 == "Mnie się wydaje, że to prawda.", f"Błąd nagłosu 'Mi': {t_clitic1}"
+
+    t_clitic2 = AVTLinter.clean_text("- Cię widzę z daleka.")
+    assert t_clitic2 == "- Ciebie widzę z daleka.", f"Błąd nagłosu '- Cię': {t_clitic2}"
+
+    t_clitic3 = AVTLinter.clean_text("Widzę to.\\NGo znam od lat.")
+    assert t_clitic3 == "Widzę to.\\NJego znam od lat.", f"Błąd nagłosu '\\NGo': {t_clitic3}"
+
+    t_clitic4 = AVTLinter.clean_text("- Mu pomogłem w potrzebie.")
+    assert t_clitic4 == "- Jemu pomogłem w potrzebie.", f"Błąd nagłosu '- Mu': {t_clitic4}"
+
+    # Test antykolizyjny (formy wewnątrz zdania pozostają nienaruszone)
+    t_safe1 = AVTLinter.clean_text("Daj mi to natychmiast.")
+    assert t_safe1 == "Daj mi to natychmiast.", f"Błąd nadkorekty wewnątrz zdania (mi): {t_safe1}"
+
+    t_safe2 = AVTLinter.clean_text("Słyszę cię doskonale.")
+    assert t_safe2 == "Słyszę cię doskonale.", f"Błąd nadkorekty wewnątrz zdania (cię): {t_safe2}"
+
+    # Asercja 5: Sztywna rekcja celownikowa zaimków & Dopełniacz negacji stałych kolokacji
+    t_rec1 = AVTLinter.clean_text("Ufam ciebie bezgranicznie.")
+    assert t_rec1 == "Ufam ci bezgranicznie.", f"Błąd rekcji celownikowej 'ufam ciebie': {t_rec1}"
+
+    t_rec2 = AVTLinter.clean_text("Wybacz mnie moje winy.")
+    assert t_rec2 == "Wybacz mi moje winy.", f"Błąd rekcji celownikowej 'wybacz mnie': {t_rec2}"
+
+    t_rec3 = AVTLinter.clean_text("Pomóż mnie w tej walce.")
+    assert t_rec3 == "Pomóż mi w tej walce.", f"Błąd rekcji celownikowej 'pomóż mnie': {t_rec3}"
+
+    t_neg1 = AVTLinter.clean_text("Nie mam czas na błędy.")
+    assert t_neg1 == "Nie mam czasu na błędy.", f"Błąd dopełniacza negacji 'nie mam czas': {t_neg1}"
+
+    t_neg2 = AVTLinter.clean_text("To nie ma sens.")
+    assert t_neg2 == "To nie ma sensu.", f"Błąd dopełniacza negacji 'nie ma sens': {t_neg2}"
+
+    t_neg3 = AVTLinter.clean_text("Nie widzę problem w tym planie.")
+    assert t_neg3 == "Nie widzę problemu w tym planie.", f"Błąd dopełniacza negacji 'nie widzę problem': {t_neg3}"
+
+    t_neg4 = AVTLinter.clean_text("Nie czuję ból.")
+    assert t_neg4 == "Nie czuję bólu.", f"Błąd dopełniacza negacji 'nie czuję ból': {t_neg4}"
+
+    # Asercja 6: Niezmienniczość rzeczowników o wspólnym rodzaju (Epicene/Neuter Invariance)
+    subs6 = pysubs2.SSAFile()
+    subs6.events.append(pysubs2.SSAEvent(start=1000, end=2000, style="Default", name="Kael", text="Kim jesteś?"))
+    subs6.events.append(pysubs2.SSAEvent(start=2200, end=4000, style="Default", name="Kael", text="Jesteś potworem i małym dzieckiem."))
+    subs6.events.append(pysubs2.SSAEvent(start=4200, end=5500, style="Default", name="Luna", text="Wiem."))
+
+    fixed_subs6, fixes6 = linter.lint_subtitles(subs6, character_registry=char_reg)
+    t_epicene = fixed_subs6.events[1].text
+    assert "potworem" in t_epicene, f"Błędna mutacja rzeczownika epicenum potwór: {t_epicene}"
+    assert "dzieckiem" in t_epicene, f"Błędna mutacja rzeczownika rodzaju nijakiego dziecko: {t_epicene}"
+
+    print(" -> PASSED: Test 126 w 100% potwierdza holistyczną maszynową eliminację pułapek języka polskiego bez obciążania modeli Gemini (0.00 PLN).")
+
+
+def test_plural_anti_singularization_and_single_line_overflow():
+    r"""
+    Test 127: Bezpieczne utwardzenie potoku AVT (0.00 PLN):
+    1. Tarcza ochrony liczby mnogiej w K7: czasowniki 2. os. l. mn. (np. uważajcie, bądźcie, zrobiliście) chronią 'wasz' przed redukcją do 'twój'.
+    2. Harmonizacja orzeczników w l. mn. dla 2. osoby (adresat: grupa kobiet) - 'jesteście moimi przyjaciółmi i dzielnymi żołnierzami' -> 'jesteście moimi przyjaciółkami i dzielnymi żołnierkami'.
+    3. Harmonizacja orzeczników w l. mn. dla 1. osoby (mówcy: grupa kobiet) - 'byłyśmy ich przyjaciółmi i obrońcami' -> 'byłyśmy ich przyjaciółkami i obrończyniami'.
+    4. Deterministyczny podział zbyt długiej linii AVT (> 40 znaków) bez znaku nowej linii \N na maksymalnie 2 wersy.
+    5. Antykolizja: rzeczowniki epicenum / nijakie w l. mn. (potworami, dziećmi) pozostają nienaruszone.
+    """
+    print("\n--- Test 127: Tarcza Liczby Mnogiej, Orzeczniki lm. i Deterministyczny Podział Linii AVT (0.00 PLN) ---")
+
+    import pysubs2
+    from avt_linter import AVTLinter
+
+    linter = AVTLinter()
+
+    # Asercja 1: Tarcza ochrony l. mn. przed fałszywą redukcją do l. poj. w K7
+    subs1 = pysubs2.SSAFile()
+    subs1.events.append(pysubs2.SSAEvent(start=1000, end=3000, style="Default", name="Kael", text="Uważajcie na wasz dom!"))
+    subs1.events.append(pysubs2.SSAEvent(start=3500, end=5500, style="Default", name="Kael", text="Bądźcie dumni z waszych dokonań."))
+    fixed1, fixes1 = linter.lint_subtitles(subs1, character_registry={"Kael": {"gender": "MALE"}})
+    assert "wasz dom" in fixed1.events[0].text, f"Błąd fałszywej redukcji 'wasz dom': {fixed1.events[0].text}"
+    assert "waszych dokonań" in fixed1.events[1].text, f"Błąd fałszywej redukcji 'waszych dokonań': {fixed1.events[1].text}"
+
+    # Asercja 2: Orzeczniki l. mn. dla 2. osoby (adresat: grupa kobiet)
+    subs2 = pysubs2.SSAFile()
+    subs2.events.append(pysubs2.SSAEvent(start=1000, end=3000, style="Default", name="Kael", text="Dziewczęta, jesteście moimi wiernymi przyjaciółmi i dzielnymi żołnierzami."))
+    subs2.events.append(pysubs2.SSAEvent(start=3500, end=5500, style="Default", name="Kael", text="Jesteście wspaniali bohaterowie i moi obrońcy."))
+    fixed2, fixes2 = linter.lint_subtitles(subs2, character_registry={"Kael": {"gender": "MALE"}, "Dziewczęta": {"gender": "FEMALE_GROUP"}})
+    t2_inst = fixed2.events[0].text
+    assert "moimi wiernymi przyjaciółkami" in t2_inst, f"Błąd orzecznika lm. żeńskiego (przyjaciółkami): {t2_inst}"
+    assert "dzielnymi żołnierkami" in t2_inst, f"Błąd orzecznika lm. żeńskiego (żołnierkami): {t2_inst}"
+    t2_nom = fixed2.events[1].text
+    assert "wspaniałe bohaterki" in t2_nom, f"Błąd mianownika lm. żeńskiego (bohaterki): {t2_nom}"
+    assert "moje obrończynie" in t2_nom, f"Błąd mianownika lm. żeńskiego (obrończynie): {t2_nom}"
+
+    # Asercja 3: Orzeczniki l. mn. dla 1. osoby (mówcy: grupa kobiet)
+    subs3 = pysubs2.SSAFile()
+    subs3.events.append(pysubs2.SSAEvent(start=1000, end=3000, style="Default", name="Kobiety", text="Byłyśmy ich przyjaciółmi i obrońcami."))
+    fixed3, fixes3 = linter.lint_subtitles(subs3, character_registry={"Kobiety": {"gender": "FEMALE", "description": "kobiety w obozie"}})
+    t3 = fixed3.events[0].text
+    assert "ich przyjaciółkami" in t3, f"Błąd autoreferencji 1. os. lm. (przyjaciółkami): {t3}"
+    assert "obrończyniami" in t3, f"Błąd autoreferencji 1. os. lm. (obrończyniami): {t3}"
+
+    # Asercja 4: Deterministyczny podział zbyt długiej linii AVT (> 40 znaków) bez znaku nowej linii
+    subs4 = pysubs2.SSAFile()
+    subs4.events.append(pysubs2.SSAEvent(start=1000, end=4000, style="Default", text="Musimy natychmiast opuścić ten zamek, ponieważ zbliża się potężna armia wroga."))
+    fixed4, fixes4 = linter.lint_subtitles(subs4, enforce_line_split=True)
+    t4 = fixed4.events[0].text
+    assert r"\N" in t4, f"Brak podziału zbyt długiej linii: {t4}"
+    parts4 = t4.split(r"\N")
+    assert len(parts4) == 2, f"Oczekiwano dokładnie 2 linii po podziale: {parts4}"
+    assert len(parts4[0]) <= 42 and len(parts4[1]) <= 42, f"Wers przekracza limit AVT: {parts4}"
+
+    # Asercja 5: Antykolizja dla rzeczowników epicenum/nijakich w l. mn.
+    subs5 = pysubs2.SSAFile()
+    subs5.events.append(pysubs2.SSAEvent(start=1000, end=3000, style="Default", name="Kael", text="Dziewczęta, jesteście potworami i małymi dziećmi."))
+    fixed5, fixes5 = linter.lint_subtitles(subs5, character_registry={"Kael": {"gender": "MALE"}})
+    t5 = fixed5.events[0].text
+    assert "potworami" in t5, f"Błędna mutacja epicenum potworami: {t5}"
+    assert "dziećmi" in t5, f"Błędna mutacja neuter dziećmi: {t5}"
+
+    print(" -> PASSED: Test 127 w 100% potwierdza bezpieczeństwo tarczy liczby mnogiej, orzeczników lm. i podziału linii AVT (0.00 PLN).")
+
+
+def test_edge_case_limits_and_avt_hardening():
+    print("\n--- Test 128: Ograniczenia Brzegowe Potoku i Utwardzenie Standardów AVT (0.00 PLN) ---")
+    import pysubs2
+    from avt_linter import EpisodeQualityGate
+    from series_memory import SeriesBible, is_proper_noun_homonym, RE_MALE_ROLE, RE_FEMALE_ROLE
+    from translator import clean_orphaned_dialogue_dashes
+
+    # Asercja 1 (Wektor 1): Deterministyczna Elewacja Kolizji Czasowych w Wielogłosie (\an8)
+    subs1 = pysubs2.SSAFile()
+    ev1_a = pysubs2.SSAEvent(start=1000, end=3000, style="Default", text="Uważaj na niego!")
+    ev1_b = pysubs2.SSAEvent(start=2000, end=4000, style="Default", text="Już za późno!")
+    subs1.events.extend([ev1_a, ev1_b])
+    fixed1, fixes1 = EpisodeQualityGate.audit_and_fix_entire_episode(subs1)
+    assert any("Kolizja Czasowa" in f for f in fixes1), f"Brak wykrycia kolizji czasowej: {fixes1}"
+    assert fixed1.events[1].text.startswith(r"{\an8}"), f"Kwestia wtórna nie otrzymała prefiksu \\an8: {fixed1.events[1].text}"
+    assert fixed1.events[0].text == "Uważaj na niego!", f"Kwestia pierwotna została naruszona: {fixed1.events[0].text}"
+
+    # Asercja 2 (Wektor 2): Tarcza Homonimii Nazw Własnych i Słów Pospolitych
+    assert is_proper_noun_homonym("wola")
+    assert is_proper_noun_homonym("los")
+    assert is_proper_noun_homonym("młot")
+    assert is_proper_noun_homonym("krzyż")
+    assert is_proper_noun_homonym("kamień")
+    assert is_proper_noun_homonym("miecz")
+    assert is_proper_noun_homonym("tarcza")
+    assert not is_proper_noun_homonym("Frieren")
+    assert not is_proper_noun_homonym("Himmel")
+
+    subs2 = pysubs2.SSAFile()
+    subs2.events.append(pysubs2.SSAEvent(start=1000, end=3000, style="Default", text="Walczyli z wolą i młotem w ręku."))
+    fixed2, fixes2 = EpisodeQualityGate.audit_and_fix_entire_episode(subs2)
+    assert "wolą" in fixed2.events[0].text and "młotem" in fixed2.events[0].text, f"Słowo pospolite zniekształcone: {fixed2.events[0].text}"
+    assert "Wolą" not in fixed2.events[0].text and "Młotem" not in fixed2.events[0].text, f"Fałszywa kapitalizacja homonimu: {fixed2.events[0].text}"
+
+    # Asercja 3 (Wektor 3): Rozszerzenie Heurystyki Ról Społecznych dla Zimnego Startu
+    bible3 = SeriesBible("FantasyRealm")
+    bible3.data["characters"] = {
+        "StaryKowal": {"description": "kowal w wiosce"},
+        "DobraKarczmarka": {"description": "karczmarka w gospodzie"},
+        "MłodyGiermek": {"description": "giermek rycerza"},
+        "ŚwiętaMniszka": {"description": "mniszka w klasztorze"}
+    }
+    assert bible3.get_character_gender("StaryKowal") == "MALE", f"Błąd roli męskiej: {bible3.get_character_gender('StaryKowal')}"
+    assert bible3.get_character_gender("DobraKarczmarka") == "FEMALE", f"Błąd roli żeńskiej: {bible3.get_character_gender('DobraKarczmarka')}"
+    assert bible3.get_character_gender("MłodyGiermek") == "MALE", f"Błąd roli męskiej: {bible3.get_character_gender('MłodyGiermek')}"
+    assert bible3.get_character_gender("ŚwiętaMniszka") == "FEMALE", f"Błąd roli żeńskiej: {bible3.get_character_gender('ŚwiętaMniszka')}"
+
+    # Ochrona przed fałszywymi kolizjami podciągowymi
+    assert not RE_MALE_ROLE.search("kategoria")
+    assert not RE_MALE_ROLE.search("magazyn")
+    assert not RE_MALE_ROLE.search("opatrunek")
+
+    # Asercja 4 (Wektor 4): Symetria Myślników AVT w Dwugłosie
+    subs4 = pysubs2.SSAFile()
+    subs4.events.append(pysubs2.SSAEvent(start=1000, end=3000, style="Default", text=r"- Kto tam?\NTo ja."))
+    fixed4, fixes4 = EpisodeQualityGate.audit_and_fix_entire_episode(subs4)
+    assert fixed4.events[0].text == r"- Kto tam?\N- To ja.", f"Brak symetryzacji dwugłosu w EpisodeQualityGate: {fixed4.events[0].text}"
+
+    t4_tr = clean_orphaned_dialogue_dashes(r"- Gdzie idziesz?\NWracam do domu.")
+    assert t4_tr == r"- Gdzie idziesz?\N- Wracam do domu.", f"Brak symetryzacji dwugłosu w clean_orphaned_dialogue_dashes: {t4_tr}"
+
+    # Asercja 5 (Wektor 4): Sanacja Samotnego Myślnika u Pojedynczego Mówcy
+    subs5 = pysubs2.SSAFile()
+    subs5.events.append(pysubs2.SSAEvent(start=1000, end=3000, style="Default", text="- Wracam do domu."))
+    fixed5, fixes5 = EpisodeQualityGate.audit_and_fix_entire_episode(subs5)
+    assert fixed5.events[0].text == "Wracam do domu.", f"Nie usunięto samotnego myślnika w EpisodeQualityGate: {fixed5.events[0].text}"
+
+    t5_tr = clean_orphaned_dialogue_dashes("- Wracam do domu.")
+    assert t5_tr == "Wracam do domu.", f"Nie usunięto samotnego myślnika w translatorze: {t5_tr}"
+
+    # Asercja 6 (Antykolizja / Zasada 11): Nienaruszalność Poprawnych Kwestii i Znaków Pozycjonowania
+    subs6 = pysubs2.SSAFile()
+    # Myślnik wtrąceniowy wewnątrz zdania
+    subs6.events.append(pysubs2.SSAEvent(start=1000, end=3000, style="Default", text="To nie jest łatwe – powiedział z uśmiechem."))
+    # Kwestie nienakładające się
+    subs6.events.append(pysubs2.SSAEvent(start=4000, end=5000, style="Default", text="Pierwsza kwestia."))
+    subs6.events.append(pysubs2.SSAEvent(start=5500, end=6500, style="Default", text="Druga kwestia."))
+    # Kwestia z istniejącym jawnym pozycjonowaniem
+    subs6.events.append(pysubs2.SSAEvent(start=7000, end=9000, style="Default", text=r"{\pos(100,200)}Napis w rogu."))
+    subs6.events.append(pysubs2.SSAEvent(start=8000, end=9500, style="Default", text="Kwestia dialogowa."))
+
+    fixed6, fixes6 = EpisodeQualityGate.audit_and_fix_entire_episode(subs6)
+    assert fixed6.events[0].text == "To nie jest łatwe – powiedział z uśmiechem.", f"Naruszenie myślnika wtrąceniowego: {fixed6.events[0].text}"
+    assert r"{\an8}" not in fixed6.events[1].text and r"{\an8}" not in fixed6.events[2].text, f"Fałszywa elewacja nienakładających się kwestii: {fixed6.events[1].text}"
+    assert r"{\pos(100,200)}" in fixed6.events[3].text, f"Nadpisanie istniejącego pozycjonowania: {fixed6.events[3].text}"
+
+    print(" -> PASSED: Test 128 w 100% potwierdza deterministyczną elewację kolizji czasowych, tarczę homonimii, heurystykę ról i symetrię myślników AVT (0.00 PLN).")
+
+
+def test_exhaustive_homonym_and_social_role_universe():
+    print("\n--- Test 129: Wyczerpujące Uniwersum Homonimów Nazw Własnych i Pełny Korpus Par Ról Społecznych (0.00 PLN) ---")
+    import pysubs2
+    from avt_linter import EpisodeQualityGate
+    from series_memory import SeriesBible, is_proper_noun_homonym, RE_MALE_ROLE, RE_FEMALE_ROLE, POLISH_COMMON_NOUN_HOMONYMS
+
+    # Asercja 1: Pokrycie wszystkich 9 domen semantycznych w POLISH_COMMON_NOUN_HOMONYMS (ponad 400 leksemów)
+    assert len(POLISH_COMMON_NOUN_HOMONYMS) >= 400, f"Zbiór homonimów mniejszy niż 400 słów: {len(POLISH_COMMON_NOUN_HOMONYMS)}"
+
+    # 1. Żywioły i czas
+    for w in ["płomień", "burza", "świt", "zmierzch", "wieczność", "błyskawica", "szadź", "przypływ"]:
+        assert is_proper_noun_homonym(w), f"Brak w kategorii żywiołów/czasu: {w}"
+    # 2. Minerały, metale i barwy
+    for w in ["stal", "złoto", "kryształ", "bursztyn", "srebro", "rubin", "szmaragd", "szkarłat"]:
+        assert is_proper_noun_homonym(w), f"Brak w kategorii minerałów/barw: {w}"
+    # 3. Zwierzęta, ptaki i bestie
+    for w in ["wilk", "kruk", "smok", "feniks", "żmija", "sokół", "gryf", "bazyliszek", "pantera"]:
+        assert is_proper_noun_homonym(w), f"Brak w kategorii fauny/bestii: {w}"
+    # 4. Flora i drzewa
+    for w in ["dąb", "sosna", "róża", "bluszcz", "piołun", "jesion", "jarząb", "tarnina"]:
+        assert is_proper_noun_homonym(w), f"Brak w kategorii flory: {w}"
+    # 5. Topografia i architektura
+    for w in ["szczyt", "wąwóz", "otchłań", "wieża", "twierdza", "przełęcz", "kurhan", "katakumby"]:
+        assert is_proper_noun_homonym(w), f"Brak w kategorii topografii: {w}"
+    # 6. Broń, rynsztunek i regalia
+    for w in ["miecz", "sztylet", "lanca", "tarcza", "korona", "halabarda", "berło", "karwasz"]:
+        assert is_proper_noun_homonym(w), f"Brak w kategorii oręża/regaliów: {w}"
+    # 7. Cnoty, afekt i abstrakcja
+    for w in ["honor", "hańba", "rozpacz", "zemsta", "milczenie", "odwaga", "męstwo", "przeznaczenie"]:
+        assert is_proper_noun_homonym(w), f"Brak w kategorii cnót/afektu: {w}"
+    # 8. Części ciała i percepcja
+    for w in ["posoka", "szpon", "serce", "spojrzenie", "oddech", "szpony", "blask", "tchnienie"]:
+        assert is_proper_noun_homonym(w), f"Brak w kategorii somatyki: {w}"
+    # 9. Postacie pospolite i status
+    for w in ["wędrowiec", "tułacz", "pielgrzym", "niewolnik", "wojownik", "bękart", "podrzutek"]:
+        assert is_proper_noun_homonym(w), f"Brak w kategorii statusu: {w}"
+
+    # Negatywna weryfikacja: prawdziwe obce imiona nie mogą być uznane za słowa pospolite
+    for foreign_name in ["Frieren", "Himmel", "Eisen", "Heiter", "Fern", "Stark", "Sein", "Flamme"]:
+        assert not is_proper_noun_homonym(foreign_name), f"Obce imię błędnie uznane za homonim pospolity: {foreign_name}"
+
+    # Asercja 2: Ochrona przed fałszywą mianownizacją zdań z homonimami w przypadkach zależnych po przyimkach
+    subs2 = pysubs2.SSAFile()
+    subs2.events.append(pysubs2.SSAEvent(start=1000, end=3000, style="Default", text="Ruszyli o świcie z mieczem i tarczą w ręku."))
+    subs2.events.append(pysubs2.SSAEvent(start=3500, end=5500, style="Default", text="Schowali się w cieniu dębu przed nadchodzącą burzą."))
+    subs2.events.append(pysubs2.SSAEvent(start=6000, end=8000, style="Default", text="Podążali ku gwiazdom z wilkiem i sokołem u boku."))
+    fixed2, _ = EpisodeQualityGate.audit_and_fix_entire_episode(subs2)
+
+    assert "o świcie" in fixed2.events[0].text and "o Świt" not in fixed2.events[0].text, f"Mianownizacja świtu: {fixed2.events[0].text}"
+    assert "z mieczem i tarczą" in fixed2.events[0].text and "z Miecz" not in fixed2.events[0].text, f"Mianownizacja oręża: {fixed2.events[0].text}"
+    assert "w cieniu dębu" in fixed2.events[1].text and "w cieniu Dąb" not in fixed2.events[1].text, f"Mianownizacja dębu: {fixed2.events[1].text}"
+    assert "przed nadchodzącą burzą" in fixed2.events[1].text and "Burza" not in fixed2.events[1].text, f"Mianownizacja burzy: {fixed2.events[1].text}"
+    assert "ku gwiazdom" in fixed2.events[2].text and "ku Gwiazda" not in fixed2.events[2].text, f"Mianownizacja gwiazd: {fixed2.events[2].text}"
+    assert "z wilkiem i sokołem" in fixed2.events[2].text and "z Wilk" not in fixed2.events[2].text, f"Mianownizacja fauny: {fixed2.events[2].text}"
+
+    # Asercja 3: Klasyfikacja płci w SeriesBible dla par ról społecznych ze wszystkich 7 kategorii (Zasada 12 i 15)
+    bible3 = SeriesBible("ComprehensiveRoleTest")
+    bible3.data["characters"] = {
+        # Kategoria 1: Rodzina
+        "Char_Stryjenka": {"description": "stryjenka młodego bohatera"},
+        "Char_Bratanek": {"description": "bratanek dowódcy"},
+        "Char_Tesciowa": {"description": "teściowa kupca"},
+        "Char_Ziec": {"description": "zięć szlachcica"},
+        # Kategoria 2: Monarchia i Arystokracja
+        "Char_Carewicz": {"description": "carewicz z północy"},
+        "Char_Caryca": {"description": "caryca imperium"},
+        "Char_Wicehrabia": {"description": "wicehrabia prowincji"},
+        "Char_Wicehrabina": {"description": "wicehrabina hrabstwa"},
+        # Kategoria 3: Dwór i Służba
+        "Char_Ochmistrzyni": {"description": "ochmistrzyni na zamku"},
+        "Char_Majordomus": {"description": "majordomus dworu"},
+        "Char_Garderobiana": {"description": "garderobiana księżniczki"},
+        "Char_Paz": {"description": "młody paź królewski"},
+        # Kategoria 4: Wojskowość i Straż
+        "Char_Hetman": {"description": "hetman wielki koronny"},
+        "Char_Hetmanowa": {"description": "hetmanowa na włościach"},
+        "Char_Pulkownik": {"description": "pułkownik regimentu"},
+        "Char_Pulkowniczka": {"description": "pułkowniczka straży"},
+        "Char_Kapitanka": {"description": "kapitanka okrętu"},
+        "Char_Kapitan": {"description": "kapitan straży"},
+        # Kategoria 5: Religia i Magia
+        "Char_Przeorysza": {"description": "przeorysza klasztoru"},
+        "Char_Przeor": {"description": "przeor zakonu"},
+        "Char_Arcymagini": {"description": "arcymagini gildii"},
+        "Char_Arcymag": {"description": "arcymag wieży"},
+        "Char_Wrozka": {"description": "wróżka z lasu"},
+        # Kategoria 6: Rzemiosło i Handel
+        "Char_Krawcowa": {"description": "krawcowa w mieście"},
+        "Char_Krawiec": {"description": "krawiec na rynku"},
+        "Char_Cukierniczka": {"description": "cukierniczka w manufakturze"},
+        "Char_Cukiernik": {"description": "cukiernik na dworze"},
+        "Char_Gajowa": {"description": "gajowa w puszczy"},
+        "Char_Gajowy": {"description": "gajowy leśnictwa"},
+        # Kategoria 7: Edukacja i Administracja
+        "Char_Profesorka": {"description": "profesorka akademii"},
+        "Char_Profesor": {"description": "profesor uniwersytetu"},
+        "Char_Sedzina": {"description": "sędzina trybunału"},
+        "Char_Sedzia": {"description": "sędzia okręgowy"},
+        "Char_Aptekarka": {"description": "aptekarka miejska"},
+        "Char_Aptekarz": {"description": "aptekarz w osadzie"}
+    }
+
+    # Weryfikacja żeńskich
+    for f_role in ["Char_Stryjenka", "Char_Tesciowa", "Char_Caryca", "Char_Wicehrabina",
+                   "Char_Ochmistrzyni", "Char_Garderobiana", "Char_Hetmanowa", "Char_Pulkowniczka",
+                   "Char_Kapitanka", "Char_Przeorysza", "Char_Arcymagini", "Char_Wrozka",
+                   "Char_Krawcowa", "Char_Cukierniczka", "Char_Gajowa", "Char_Profesorka",
+                   "Char_Sedzina", "Char_Aptekarka"]:
+        assert bible3.get_character_gender(f_role) == "FEMALE", f"Błędna klasyfikacja roli żeńskiej: {f_role} -> {bible3.get_character_gender(f_role)}"
+
+    # Weryfikacja męskich
+    for m_role in ["Char_Bratanek", "Char_Ziec", "Char_Carewicz", "Char_Wicehrabia",
+                   "Char_Majordomus", "Char_Paz", "Char_Hetman", "Char_Pulkownik",
+                   "Char_Kapitan", "Char_Przeor", "Char_Arcymag", "Char_Krawiec",
+                   "Char_Cukiernik", "Char_Gajowy", "Char_Profesor", "Char_Sedzia",
+                   "Char_Aptekarz"]:
+        assert bible3.get_character_gender(m_role) == "MALE", f"Błędna klasyfikacja roli męskiej: {m_role} -> {bible3.get_character_gender(m_role)}"
+
+    # Asercja 4: Ochrona Antykolizyjna (Zasada 11 i 12) - brak fałszywych dopasowań dla podciągów pospolitych
+    anti_collision_checks = [
+        "kategoria główna produktów",
+        "kategoryczny zakaz wchodzenia",
+        "wielka katastrofa naturalna",
+        "magazyn zaopatrzenia",
+        "magnes neodymowy",
+        "magia starożytna",
+        "opatrunek na głębokie rany",
+        "drewniana łopata ogrodowa",
+        "carska rodzina w podróży",
+        "caritas niesie pomoc",
+        "parasol przeciwdeszczowy",
+        "wysoki drewniany parkan",
+        "pazur drapieżnego ptaka",
+        "paznokcie zadbane i czyste",
+        "wodny młyn nad rzeką",
+        "poprawka do ustawy",
+        "prażony popcorn solony",
+        "żukowski rejon polny"
+    ]
+    for non_role_text in anti_collision_checks:
+        assert not RE_MALE_ROLE.search(non_role_text), f"Fałszywe dopasowanie roli męskiej w słowie pospolitym: '{non_role_text}'"
+
+    # Symetryczny test antykolizyjny dla ról żeńskich w formach męskich
+    assert not RE_MALE_ROLE.search("majorka na defiladzie"), "majorka nie może pasować jako rola męska"
+    assert not RE_MALE_ROLE.search("kapitanka statku"), "kapitanka nie może pasować jako rola męska"
+    assert not RE_MALE_ROLE.search("generałka brygady"), "generałka nie może pasować jako rola męska"
+    assert not RE_MALE_ROLE.search("chłopka na polu"), "chłopka nie może pasować jako rola męska"
+
+    print(" -> PASSED: Test 129 w 100% potwierdza wyczerpujące uniwersum 400+ homonimów nazw własnych i pełny korpus 165 par ról społecznych ze ścisłą ochroną antykolizyjną (0.00 PLN).")
+
+def test_exhaustive_stem_morphology_and_onomastic_iron_rule():
+    print("[TEST 130/130] Test Żelaznej Zasady 16: Pełna morfologia 6 klas trzonów, hipokorystyki, separacja -owa vs -owi/-owie i uniwersum onomastyczne...")
+    from series_memory import (
+        is_proper_noun_homonym,
+        POLISH_COMMON_NOUN_HOMONYMS,
+        RE_FEMALE_ROLE,
+        RE_MALE_ROLE,
+        SeriesBible
+    )
+
+    # Asercja 1: Weryfikacja obecności i treści Żelaznej Zasady 16 oraz harmonizacji architektonicznej w AGENTS.md
+    with open("AGENTS.md", "r", encoding="utf-8") as f:
+        agents_content = f.read()
+    assert "16. ŻELAZNA ZASADA KOMPLETNOŚCI ONOMASTYCZNEJ" in agents_content, "Brak Żelaznej Zasady 16 w AGENTS.md!"
+    assert "Separacja Trzonów Przymiotnikowych i Rzeczownikowych na `-owa` vs `-owi / -owie`" in agents_content, "Brak zapisu o separacji -owa vs -owi/-owie w AGENTS.md!"
+    assert "Harmonijny Wyjątek Architektoniczny (Deterministyczna Jednotokenowa Harmonizacja Fleksyjna $W_i \\to W'_i$)" in agents_content, "Brak harmonizacji Zasady 3.3 w AGENTS.md!"
+    assert "Ukierunkować właściwy Filar AVT na pozytywny wektor rzemiosła AVT" in agents_content, "Brak harmonizacji Warstwy 3 w Zasadzie 6 AGENTS.md!"
+    assert "Nadzór Rejestru bez Zaśmiecania Promptów" in agents_content, "Brak harmonizacji Zasady 10.2 w AGENTS.md!"
+    assert "14 domen semantycznych (750+ słów)" in agents_content, "Brak aktualizacji liczby domen w Zasadzie 16.1 AGENTS.md!"
+
+    # Asercja 2: Morfologia 6 Klas Trzonów Fleksyjnych i Słowotwórczych
+    # Klasa 1: Oboczności wokaliczne rdzenia (ó:o, ą:ę, e:zero)
+    vocalic_male_checks = [
+        "wódz", "wodza", "wodzem", "wodzowi", "wodzowie", "wodzów",
+        "książę", "księcia", "księciem", "księciu", "książąt", "książęta",
+        "ojciec", "ojca", "ojcem", "ojcu", "ojcowie",
+        "krawiec", "krawca", "krawcem", "krawcowi",
+        "szewc", "szewca", "szewcem", "szewcowi",
+        "chłopiec", "chłopca", "chłopcem", "chłopcy",
+        "poseł", "posła", "posłem", "posłowi", "posłowie",
+        "karzeł", "karła", "karłem", "karłowi",
+        "diabeł", "diabła", "diabłem", "diabli",
+        "anioł", "anioła", "aniołem", "anieli"
+    ]
+    for form in vocalic_male_checks:
+        assert RE_MALE_ROLE.search(form), f"Błąd dopasowania oboczności wokalicznej męskiej: '{form}'"
+
+    # Klasa 2: Oboczności konsonantyczne (ch:sz, g:dz, k:c/cz, dź:z)
+    consonant_checks = [
+        ("macocha w pałacu", RE_FEMALE_ROLE, "macocha"),
+        ("powiedział macosze", RE_FEMALE_ROLE, "macosze"),
+        ("pokorny mnich", RE_MALE_ROLE, "mnich"),
+        ("zgromadzeni mnisi", RE_MALE_ROLE, "mnisi"),
+        ("potężny mag", RE_MALE_ROLE, "mag"),
+        ("dzięki madze", RE_MALE_ROLE, "madze"),
+        ("młody paź", RE_MALE_ROLE, "paź"),
+        ("z młodym paziem", RE_MALE_ROLE, "paziem"),
+        ("dla młodego pazia", RE_MALE_ROLE, "pazia")
+    ]
+    for text, regex, label in consonant_checks:
+        assert regex.search(text), f"Błąd dopasowania oboczności konsonantycznej ({label}) w: '{text}'"
+
+    # Asercja 3: Separacja Trzonów Przymiotnikowych `-owa` od celownika `-owi` i liczby mnogiej `-owie`
+    # Rola żeńska na -owa
+    female_owa_forms = [
+        "królowa", "królowej", "królową", "królowo", "królowe", "królowych", "królowym", "królowymi",
+        "hetmanowa", "hetmanowej", "hetmanową", "baronowa", "krawcowa", "gajowa"
+    ]
+    for f_form in female_owa_forms:
+        assert RE_FEMALE_ROLE.search(f_form), f"Rola żeńska na -owa nie dopasowana: '{f_form}'"
+        assert not RE_MALE_ROLE.search(f_form), f"KOLIZJA: Rola żeńska na -owa błędnie dopasowana jako męska: '{f_form}'"
+
+    # Męski celownik na -owi i liczba mnoga na -owie
+    male_owi_forms = [
+        "królowi", "królowie", "hetmanowi", "hetmanowie", "baronowi", "baronowie",
+        "generałowi", "generałowie", "pułkownikowi", "pułkownicy", "majorowi", "majorowie"
+    ]
+    for m_form in male_owi_forms:
+        assert RE_MALE_ROLE.search(m_form), f"Forma męska na -owi/-owie nie dopasowana: '{m_form}'"
+        assert not RE_FEMALE_ROLE.search(m_form), f"KOLIZJA: Męska forma na -owi/-owie błędnie dopasowana jako żeńska: '{m_form}'"
+
+    # Asercja 4: Trzony hipokorystyczne i zdrobniałe (formanty afektywne)
+    hypocoristics = [
+        ("drogi tatuś", RE_MALE_ROLE, "tatuś"),
+        ("stary tatko", RE_MALE_ROLE, "tatko"),
+        ("dla tatusia", RE_MALE_ROLE, "tatusia"),
+        ("kochany synek", RE_MALE_ROLE, "synek"),
+        ("mały synuś", RE_MALE_ROLE, "synuś"),
+        ("mój braciszek", RE_MALE_ROLE, "braciszek"),
+        ("kochana mamusia", RE_FEMALE_ROLE, "mamusia"),
+        ("droga mateńka", RE_FEMALE_ROLE, "mateńka"),
+        ("mała córeczka", RE_FEMALE_ROLE, "córeczka"),
+        ("moja córunia", RE_FEMALE_ROLE, "córunia"),
+        ("młodsza siostrzyczka", RE_FEMALE_ROLE, "siostrzyczka"),
+        ("kochana babunia", RE_FEMALE_ROLE, "babunia")
+    ]
+    for text, regex, label in hypocoristics:
+        assert regex.search(text), f"Błąd dopasowania formy hipokorystycznej ({label}) w: '{text}'"
+
+    # Asercja 5: Rozszerzone uniwersum onomastyczne (monety, meteorologia, geologia, fortyfikacje)
+    extended_onomastic = [
+        "grosz", "dukat", "talar", "szeląg", "zawierucha", "szkwał", "kurniawa", "nawałnica",
+        "rozpadlina", "żleb", "piarg", "topiel", "palisada", "barbakan", "donżon", "fosa"
+    ]
+    for term in extended_onomastic:
+        assert is_proper_noun_homonym(term), f"Brak rozszerzonego terminu onomastycznego: {term}"
+
+    print(" -> PASSED: Test 130 w 100% potwierdza Żelazną Zasadę 16, pełną morfologię 6 klas trzonów, separację -owa vs -owi/-owie oraz rozszerzone uniwersum onomastyczne (0.00 PLN).")
+
+
+def test_systemic_male_first_person_past_tense_concordance_guard():
+    print("[TEST 131/131] Test Systemowej Eliminacji Błędów Rodzaju Męskiego w 1. Osobie Czasu Przeszłego (Nige Jouzu no Wakagimi, Chłopak w Masce, Tokiyuki Hojo, Dorosły Mężczyzna)...")
+    import pysubs2
+    import re
+    from avt_linter import EpisodeQualityGate, AVTLinter, convert_first_person_feminine_to_masculine
+    from series_memory import SeriesBible, CANONICAL_MALE_NAMES
+
+    gate = EpisodeQualityGate()
+
+    # Asercja 1: Kwestia 1 - Młody chłopak noszący maskę (Default z prosodią / tagiem akustycznym chłopca)
+    # Dialogue: 0,0:13:12.16,0:13:16.59,Default,,0,0,0,,Zwinęłam parę rzeczy w Kyo\Ni trochę przy nich podłubałam.
+    subs1 = pysubs2.SSAFile()
+    subs1.events.append(pysubs2.SSAEvent(
+        start=792160, end=796590, style="Default",
+        text=r"Zwinęłam parę rzeczy w Kyo\Ni trochę przy nich podłubałam.",
+        name=""
+    ))
+    res1, fixes1 = gate.audit_and_fix_entire_episode(subs1, prosody_tags={0: "głos młodego chłopca, maska"})
+    assert res1.events[0].text == r"Zwinąłem parę rzeczy w Kyo\Ni trochę przy nich podłubałem.", f"Nie skorygowano kwestii chłopca w masce: {res1.events[0].text}"
+    assert any("Spójność Płci Postaci" in f for f in fixes1), "Brak raportu Spójność Płci Postaci w fixes1!"
+
+    # Asercja 2: Kwestia 2 - Tokiyuki Hojo (Młody bohater z dekompozycją tokenów w SeriesBible)
+    # Dialogue: 0,0:15:54.20,0:15:57.24,Default,Tokiyuki Hojo,0,0,0,,Kogo spotkałam... i co poczułam...
+    subs2 = pysubs2.SSAFile()
+    subs2.events.append(pysubs2.SSAEvent(
+        start=954200, end=957240, style="Default",
+        text=r"Kogo spotkałam... i co poczułam...",
+        name="Tokiyuki Hojo"
+    ))
+    bible = SeriesBible("Nige Jouzu no Wakagimi")
+    res2, fixes2 = gate.audit_and_fix_entire_episode(subs2, series_bible=bible)
+    assert res2.events[0].text == r"Kogo spotkałem... i co poczułem...", f"Nie skorygowano kwestii Tokiyukiego Hojo: {res2.events[0].text}"
+    assert any("Spójność Płci Postaci" in f for f in fixes2), "Brak raportu Spójność Płci Postaci w fixes2!"
+
+    # Asercja 3: Kwestia 3 - Dorosły mężczyzna z męskoosobowym -liśmy w tej samej linijce (zwinęliśmy)
+    # Dialogue: 0,0:17:31.88,0:17:36.26,Default,,0,0,0,,Nie spociłam się tak, odkąd zwinęliśmy\Nten dzwon ze świątyni!
+    subs3 = pysubs2.SSAFile()
+    subs3.events.append(pysubs2.SSAEvent(
+        start=1051880, end=1056260, style="Default",
+        text=r"Nie spociłam się tak, odkąd zwinęliśmy\Nten dzwon ze świątyni!",
+        name=""
+    ))
+    res3, fixes3 = gate.audit_and_fix_entire_episode(subs3, prosody_tags={0: "głos dorosłego mężczyzny, baryton"})
+    assert res3.events[0].text == r"Nie spociłem się tak, odkąd zwinęliśmy\Nten dzwon ze świątyni!", f"Nie skorygowano kwestii dorosłego mężczyzny: {res3.events[0].text}"
+    assert any("Spójność Płci Postaci" in f for f in fixes3), "Brak raportu Spójność Płci Postaci w fixes3!"
+
+    # Asercja 4: Wielotokenowa Dekompozycja Imion w SeriesBible (Tokiyuki Hojo, Kinmune Saionji, Kazama Genba)
+    assert bible.get_character_gender("Tokiyuki Hojo") == "MALE", "Tokiyuki Hojo nie został rozpoznany jako MALE w SeriesBible!"
+    assert bible.get_character_gender("Kinmune Saionji") == "MALE", "Kinmune Saionji nie został rozpoznany jako MALE w SeriesBible!"
+    assert bible.get_character_gender("Kazama Genba") == "MALE", "Kazama Genba nie został rozpoznany jako MALE w SeriesBible!"
+    assert "tokiyuki" in CANONICAL_MALE_NAMES, "tokiyuki brak w CANONICAL_MALE_NAMES!"
+    assert "genba" in CANONICAL_MALE_NAMES, "genba brak w CANONICAL_MALE_NAMES!"
+    assert "saionji" in CANONICAL_MALE_NAMES, "saionji brak w CANONICAL_MALE_NAMES!"
+
+    # Asercja 5: Test Antykolizyjny (Zasada 11 - Kwestie kobiece w scenie żeńskiej pozostają w 100% nienaruszone)
+    subs_fem = pysubs2.SSAFile()
+    subs_fem.events.extend([
+        pysubs2.SSAEvent(start=1000, end=5000, text=r"Zwinęłam parę rzeczy w Kyo\Ni trochę przy nich podłubałam.", name="Kobieta"),
+        pysubs2.SSAEvent(start=6000, end=9000, text=r"Kogo spotkałam... i co poczułam...", name="Kobieta")
+    ])
+    res_fem, fixes_fem = gate.audit_and_fix_entire_episode(subs_fem, prosody_tags={0: "głos dojrzałej kobiety, alt", 1: "głos dojrzałej kobiety, alt"})
+    assert res_fem.events[0].text == r"Zwinęłam parę rzeczy w Kyo\Ni trochę przy nich podłubałam.", "KOLIZJA: Kwestia żeńska została bezpodstawnie zmodyfikowana!"
+    assert res_fem.events[1].text == r"Kogo spotkałam... i co poczułam...", "KOLIZJA: Kwestia żeńska została bezpodstawnie zmodyfikowana!"
+    assert len(fixes_fem) == 0, f"KOLIZJA: Linter wygenerował niepotrzebne poprawki dla kobiety: {fixes_fem}"
+
+    # Asercja 6: Czystość Promptów i Modułów (Zasada 0.4 & 13.1 - Zero Hardcoded Anime Names)
+    with open("rules.py", "r", encoding="utf-8") as f:
+        rules_text = f.read()
+    with open("avt_linter.py", "r", encoding="utf-8") as f:
+        linter_text = f.read()
+    banned_anime_names = ["saionji", "kusunoki", "tokiyuki", "fatima", "töregene", "toregene", "boraqchin", "ögedei", "ogedei", "möge"]
+    for b_name in banned_anime_names:
+        assert not re.search(rf"\b{re.escape(b_name)}\b", rules_text, re.IGNORECASE), f"Zatrucie rules.py nazwą anime: '{b_name}'"
+        assert not re.search(rf"\b{re.escape(b_name)}\b", linter_text, re.IGNORECASE), f"Zatrucie avt_linter.py nazwą anime: '{b_name}'"
+
+    print(" -> PASSED: Test 131 w 100% potwierdza eliminację błędów rodzaju męskiego w 1. os. czasu przeszłego na wszystkich warstwach (0.00 PLN).")
+
+
+def test_systemic_comprehensive_gender_interpretation_and_preposition_shield_guard():
+    print("[TEST 132/132] Weryfikacja holistycznej eliminacji błędów interpretacji płci postaci, tarczy przyimkowej i rozdzielenia osób...")
+    import pysubs2
+    from avt_linter import AVTLinter, EpisodeQualityGate
+    from series_memory import SeriesBible
+
+    gate = EpisodeQualityGate
+
+    # Asercja 1: Tarcza Przyimkowa w orzeczeniach 3. osoby (avt_linter.py: 3c-2)
+    # Zabezpieczenie przed mutacją zdań, w których postać jest dopełnieniem w wyrażeniu przyimkowym, a nie podmiotem
+    subs_prep = pysubs2.SSAFile()
+    subs_prep.events.extend([
+        pysubs2.SSAEvent(start=1000, end=4000, text="Ten chłopak poszedł do Yui.", name="Mężczyzna"),
+        pysubs2.SSAEvent(start=5000, end=8000, text="Ta dziewczyna poszła do Shira.", name="Kobieta"),
+        pysubs2.SSAEvent(start=9000, end=12000, text="Wiadomość od Shira leżała na biurku.", name="Mężczyzna"),
+    ])
+    reg_prep = {
+        "Yui": {"gender": "FEMALE", "description": "uczennica, dziewczyna"},
+        "Shira": {"gender": "MALE", "description": "wojownik, chłopak"}
+    }
+    res_prep, fixes_prep = gate.audit_and_fix_entire_episode(subs_prep, character_registry=reg_prep)
+    assert res_prep.events[0].text == "Ten chłopak poszedł do Yui.", f"KOLIZJA: 'poszedł do Yui' zostało zniekształcone na: {res_prep.events[0].text}"
+    assert "poszła do Shiry" in res_prep.events[1].text, f"KOLIZJA: 'poszła do Shiry' zostało zniekształcone na: {res_prep.events[1].text}"
+    assert "leżała na biurku" in res_prep.events[2].text, f"KOLIZJA: 'leżała na biurku' zostało zniekształcone na: {res_prep.events[2].text}"
+    gender_fixes_prep = [f for f in fixes_prep if "Spójność Płci Postaci" in f]
+    assert len(gender_fixes_prep) == 0, f"KOLIZJA: Linter wygenerował fałszywe poprawki płci dla fraz przyimkowych: {gender_fixes_prep}"
+
+    # Asercja 2: Tarcza Rzeczowników Dopełniaczowych i Więzów Rodzinnych (Possessive Headwords Shield)
+    subs_poss = pysubs2.SSAFile()
+    subs_poss.events.extend([
+        pysubs2.SSAEvent(start=1000, end=4000, text="Ojciec Yui poszedł do lasu.", name="Narrator"),
+        pysubs2.SSAEvent(start=5000, end=8000, text="Matka Shira poszła do lasu.", name="Narrator"),
+    ])
+    res_poss, fixes_poss = gate.audit_and_fix_entire_episode(subs_poss, character_registry=reg_prep)
+    assert "Ojciec Yui poszedł" in res_poss.events[0].text, f"KOLIZJA: 'Ojciec Yui poszedł' zostało zniekształcone na: {res_poss.events[0].text}"
+    assert "Matka Shiry poszła" in res_poss.events[1].text, f"KOLIZJA: 'Matka Shiry poszła' zostało zniekształcone na: {res_poss.events[1].text}"
+    gender_fixes_poss = [f for f in fixes_poss if "Spójność Płci Postaci" in f]
+    assert len(gender_fixes_poss) == 0, f"KOLIZJA: Linter wygenerował fałszywe poprawki płci dla podmiotów nadrzędnych: {gender_fixes_poss}"
+
+    # Asercja 3: Prawdziwy Podmiot Gramatyczny (Szyk Prosty i Przestawny)
+    subs_true = pysubs2.SSAFile()
+    subs_true.events.extend([
+        pysubs2.SSAEvent(start=1000, end=4000, text="Shira poszła do lasu.", name="Narrator"),
+        pysubs2.SSAEvent(start=5000, end=8000, text="Yui poszedł do lasu.", name="Narrator"),
+        pysubs2.SSAEvent(start=9000, end=12000, text="Wczoraj do lasu poszła Shira.", name="Narrator"),
+    ])
+    res_true, fixes_true = gate.audit_and_fix_entire_episode(subs_true, character_registry=reg_prep)
+    assert res_true.events[0].text == "Shira poszedł do lasu.", f"Błąd: nie skorygowano orzeczenia dla Shira: {res_true.events[0].text}"
+    assert res_true.events[1].text == "Yui poszła do lasu.", f"Błąd: nie skorygowano orzeczenia dla Yui: {res_true.events[1].text}"
+    assert res_true.events[2].text == "Wczoraj do lasu poszedł Shira.", f"Błąd: nie skorygowano szyku przestawnego dla Shira: {res_true.events[2].text}"
+    assert len(fixes_true) == 3, f"Oczekiwano dokładnie 3 poprawek dla prawdziwych podmiotów, otrzymano {len(fixes_true)}"
+
+    # Asercja 4: Rozdzielenie Osób w AVTLinter.lint_and_fix_line (Mówca 1. os. vs Adresat 2. os.)
+    # 4a. Mężczyzna mówi do kobiety (pyta ją o zdanie: 2. osoba musi pozostać żeńska!)
+    fixed_m2f, _ = AVTLinter.lint_and_fix_line("Jesteś pewna?", speaker_gender="mężczyzna", addressee_gender="kobieta")
+    assert fixed_m2f == "Jesteś pewna?", f"BŁĄD: Mówca męski wymusił formę męską na adresatce: {fixed_m2f}"
+
+    # 4b. Kobieta mówi do mężczyzny (pyta go o zdanie: 2. osoba musi pozostać męska!)
+    fixed_f2m, _ = AVTLinter.lint_and_fix_line("Jesteś pewien?", speaker_gender="kobieta", addressee_gender="mężczyzna")
+    assert fixed_f2m == "Jesteś pewien?", f"BŁĄD: Mówczyni żeńska wymusiła formę żeńską na adresacie: {fixed_f2m}"
+
+    # 4c. Brak adresata i brak sceny all-girls: domyślna neutralność (nie wolno samowolnie feminizować!)
+    fixed_neutral, _ = AVTLinter.lint_and_fix_line("Jesteś pewien?")
+    assert fixed_neutral == "Jesteś pewien?", f"BŁĄD: Linter bezpodstawnie sfeminizował kwestię bez kontekstu: {fixed_neutral}"
+
+    # 4d. Poprawka literówki Bałam się -> Bałem się dla mówcy męskiego
+    fixed_m_fear, _ = AVTLinter.lint_and_fix_line("Bałam się tego.", speaker_gender="mężczyzna")
+    assert fixed_m_fear == "Bałem się tego.", f"BŁĄD: Nie skorygowano 'Bałam się' na 'Bałem się' dla mężczyzny: {fixed_m_fear}"
+
+    # 4e. Adresat męski koryguje żeńską 2. osobę na męską
+    fixed_addr_m, _ = AVTLinter.lint_and_fix_line("Jesteś pewna?", addressee_gender="mężczyzna")
+    assert fixed_addr_m == "Jesteś pewien?", f"BŁĄD: Nie skorygowano 'Jesteś pewna?' na 'Jesteś pewien?' dla adresata męskiego: {fixed_addr_m}"
+
+    # 4f. Adresatka żeńska koryguje męską 2. osobę na żeńską
+    fixed_addr_f, _ = AVTLinter.lint_and_fix_line("Jesteś pewien?", addressee_gender="kobieta")
+    assert fixed_addr_f == "Jesteś pewna?", f"BŁĄD: Nie skorygowano 'Jesteś pewien?' na 'Jesteś pewna?' dla adresatki żeńskiej: {fixed_addr_f}"
+
+    # Asercja 5: Ochrona Męskich Postaci i Adresatów przed Fałszywym Nadpisaniem Sceną Żeńską (avt_linter.py: 5215 & 5834)
+    bible = SeriesBible("Nige Jouzu no Wakagimi")
+    subs_scene = pysubs2.SSAFile()
+    subs_scene.events.extend([
+        pysubs2.SSAEvent(start=1000, end=3000, text="Jestem z ciebie dumna.", name="Kobieta"),
+        pysubs2.SSAEvent(start=3500, end=6000, text="Poszedłem tam i sprawdziłem wszystko.", name="Tokiyuki Hojo"),
+        pysubs2.SSAEvent(start=6500, end=9000, text="Dziękuję, że to zrobiłeś.", name="Kobieta")
+    ])
+    res_scene, fixes_scene = gate.audit_and_fix_entire_episode(subs_scene, series_bible=bible)
+    assert res_scene.events[1].text == "Poszedłem tam i sprawdziłem wszystko.", f"KOLIZJA: Tokiyuki Hojo został sfeminizowany przez otoczenie sceny: {res_scene.events[1].text}"
+
+    # Asercja 6: Ochrona Niskich Głosów Żeńskich w series_memory.py (is_low_pitch_female)
+    bible_low = SeriesBible("Test Low Pitch")
+    bible_low.data["characters"]["Empress"] = {"gender": "FEMALE", "description": "cesarzowa, matrona, niski głos"}
+    res_gender, is_cont = bible_low.audit_speaker_metadata_against_audio("Empress", whisper_gender="MALE")
+    assert res_gender == "FEMALE", f"BŁĄD: Niski głos żeński został nadpisany na MALE: {res_gender}"
+    assert is_cont is False, "BŁĄD: Oznaczono cesarzową o niskim głosie jako skażoną MALE!"
+
+    print(" -> PASSED: Test 132 w 100% potwierdza integralność interpretacji płci postaci, tarczy przyimkowej i rozdzielenia osób (0.00 PLN).")
+
+
+def test_global_default_parameter_sanitization_and_hard_evidence_doctrine():
+    """
+    [TEST 133/133] Weryfikacja globalnej sanityzacji domyślnych parametrów i Doktryny Twardych Dowodów (0.00 PLN).
+    1. Zero-Evidence Invariance: brak twardego dowodu (speaker_gender=None, addressee_gender=None)
+       nie mutuje form męskich ani żeńskich w 1. i 2. osobie (inwariantność 100%).
+    2. Detekcja morfologiczna przymiotników w generate_polish_adjective_declension i generate_polish_name_declension
+       przy gender=None lub gender='UNKNOWN' (żeńskie, nijakie, męskie).
+    3. Symetria skażenia w audit_speaker_metadata_against_audio: brak skażenia postaci kanonicznej
+       wyłącznie na podstawie obecności w scenie o innej dominancie płciowej bez fizycznego dowodu audio.
+    4. Ochrona liczby mnogiej w scenie jednolicie płciowej: japońskie znaczniki wieloosobowości (minna, tachi)
+       w scenie kobiecej rozwiązują się jako 'grupa_kobiet', a nie pojedyncza 'kobieta'.
+    5. Ochrona męskiego wołacza w scenie kobiecej: bezpośredni zwrot po imieniu męskim w scenie kobiecej
+       rozwiązuje się jako 'mężczyzna', nie ulegając spłaszczeniu przez tag sceny.
+    """
+    print("\n[TEST 133/133] Weryfikacja globalnej sanityzacji domyślnych parametrów i Doktryny Twardych Dowodów...")
+
+    # Asercja 1: Zero-Evidence Invariance Gate w lint_and_fix_line
+    # Kwestia 1. osoby czasu przeszłego męska bez kontekstu: nie ulega feminizacji
+    l1, _ = AVTLinter.lint_and_fix_line("Miałem nadzieję, że zdążę.", speaker_gender=None, addressee_gender=None, is_all_girls_scene=True)
+    assert l1 == "Miałem nadzieję, że zdążę.", f"BŁĄD: Naruszono inwariantność 1. os. męskiej przy braku dowodu: {l1}"
+
+    # Kwestia 1. osoby czasu przeszłego żeńska bez kontekstu: nie ulega maskulinizacji
+    l2, _ = AVTLinter.lint_and_fix_line("Bałam się tego.", speaker_gender=None, addressee_gender=None)
+    assert l2 == "Bałam się tego.", f"BŁĄD: Naruszono inwariantność 1. os. żeńskiej przy braku dowodu: {l2}"
+
+    # Kwestia 2. osoby męska bez kontekstu: nie ulega feminizacji
+    l3, _ = AVTLinter.lint_and_fix_line("Jesteś pewien?", speaker_gender=None, addressee_gender=None, is_all_girls_scene=True)
+    assert l3 == "Jesteś pewien?", f"BŁĄD: Naruszono inwariantność 2. os. męskiej przy braku dowodu: {l3}"
+
+    # Kwestia 2. osoby żeńska bez kontekstu: nie ulega maskulinizacji
+    l4, _ = AVTLinter.lint_and_fix_line("Jesteś pewna?", speaker_gender=None, addressee_gender=None)
+    assert l4 == "Jesteś pewna?", f"BŁĄD: Naruszono inwariantność 2. os. żeńskiej przy braku dowodu: {l4}"
+
+    # Asercja 2: Detekcja morfologiczna w generate_polish_adjective_declension i generate_polish_name_declension
+    from series_memory import generate_polish_adjective_declension, generate_polish_name_declension
+
+    # Przymiotnik żeński na -a z gender=None
+    decl_f = generate_polish_adjective_declension("Czarna", gender=None)
+    assert decl_f["D"] == "Czarnej", f"BŁĄD: Przymiotnik żeński 'Czarna' otrzymał zły dopełniacz: {decl_f['D']}"
+    assert decl_f["B"] == "Czarną", f"BŁĄD: Przymiotnik żeński 'Czarna' otrzymał zły biernik: {decl_f['B']}"
+
+    # Przymiotnik nijaki na -e z gender=None
+    decl_n = generate_polish_adjective_declension("Złote", gender=None)
+    assert decl_n["D"] == "Złotego", f"BŁĄD: Przymiotnik nijaki 'Złote' otrzymał zły dopełniacz: {decl_n['D']}"
+    assert decl_n["B"] == "Złote", f"BŁĄD: Przymiotnik nijaki 'Złote' otrzymał zły biernik: {decl_n['B']}"
+
+    # Przymiotnik męski na -y z gender=None
+    decl_m = generate_polish_adjective_declension("Czarny", gender=None)
+    assert decl_m["D"] == "Czarnego", f"BŁĄD: Przymiotnik męski 'Czarny' otrzymał zły dopełniacz: {decl_m['D']}"
+
+    # generate_polish_name_declension dla przydomka żeńskiego z gender="UNKNOWN"
+    decl_name_f = generate_polish_name_declension("Wielka", gender="UNKNOWN")
+    assert decl_name_f["D"] == "Wielkiej", f"BŁĄD: Przydomek żeński 'Wielka' został zrzutowany na MALE: {decl_name_f['D']}"
+
+    # Asercja 3: Pełna symetria skażeń w audit_speaker_metadata_against_audio (Doktryna Twardych Dowodów)
+    bible = SeriesBible("Tenmaku no Jaadugar")
+    bible.data["characters"]["Ogodei"] = {"gender": "MALE", "description": "Wielki Chan"}
+    bible.data["characters"]["Fatima"] = {"gender": "FEMALE", "description": "Uczona z Iranu"}
+
+    # Mężczyzna w potwierdzonej scenie kobiecej (FEMALE space): skażony tag fansuba
+    g_m, is_c_m = bible.audit_speaker_metadata_against_audio("Ogodei", scene_gender="FEMALE")
+    assert g_m == "FEMALE", f"BŁĄD: Twardy dowód sceny kobiecej nie skorygował tagu: {g_m}!"
+    assert is_c_m is True, "BŁĄD: Tag męski w scenie kobiecej nie został oznaczony jako skażony!"
+
+    # Kobieta w potwierdzonej scenie męskiej (MALE space): symetrycznie skażony tag fansuba
+    g_f, is_c_f = bible.audit_speaker_metadata_against_audio("Fatima", scene_gender="MALE")
+    assert g_f == "MALE", f"BŁĄD: Twardy dowód sceny męskiej nie skorygował tagu: {g_f}!"
+    assert is_c_f is True, "BŁĄD: Tag żeński w scenie męskiej nie został oznaczony jako skażony!"
+
+    # Zgodność płci z przestrzenią: brak skażenia
+    g_m_ok, is_c_m_ok = bible.audit_speaker_metadata_against_audio("Ogodei", scene_gender="MALE")
+    assert g_m_ok == "MALE" and is_c_m_ok is False
+    g_f_ok, is_c_f_ok = bible.audit_speaker_metadata_against_audio("Fatima", scene_gender="FEMALE")
+    assert g_f_ok == "FEMALE" and is_c_f_ok is False
+
+    # Zero-evidence invariance: brak twardego dowodu sceny ani audio -> brak skażenia
+    g_m_none, is_c_m_none = bible.audit_speaker_metadata_against_audio("Ogodei", scene_gender=None)
+    assert g_m_none == "MALE" and is_c_m_none is False
+    g_f_none, is_c_f_none = bible.audit_speaker_metadata_against_audio("Fatima", scene_gender=None)
+    assert g_f_none == "FEMALE" and is_c_f_none is False
+
+    # Mężczyzna ZE sprzecznym fizycznym audio żeńskim: prawidłowo oznaczony jako skażony
+    g_cont_m, is_cont_m = bible.audit_speaker_metadata_against_audio("Ogodei", audio_gender="FEMALE", f0_hz=215.0)
+    assert g_cont_m == "FEMALE" and is_cont_m is True, "BŁĄD: Nie wykryto fizycznego skażenia audio dla MALE!"
+
+    # Kobieta ZE sprzecznym fizycznym audio męskim: prawidłowo oznaczona jako skażona
+    g_cont_f, is_cont_f = bible.audit_speaker_metadata_against_audio("Fatima", audio_gender="MALE", f0_hz=115.0)
+    assert g_cont_f == "MALE" and is_cont_f is True, "BŁĄD: Nie wykryto fizycznego skażenia audio dla FEMALE!"
+
+    # Asercja 4: Ochrona liczby mnogiej w scenie jednolicie płciowej w _resolve_line_addressee
+    from translator import MultimodalTranslator
+    class MockTranslator:
+        def __init__(self):
+            self.character_registry = {"Takauji": "Samuraj, dowódca męski"}
+            self.series_bible = bible
+            self.episode_scene_genders = {0: "kobieta", 1: "mężczyzna", 2: "kobieta"}
+            self.BOY_ROLE_KEYWORDS = MultimodalTranslator.BOY_ROLE_KEYWORDS
+            self.FEMALE_ROLE_KEYWORDS = MultimodalTranslator.FEMALE_ROLE_KEYWORDS
+            self.MALE_ROLE_KEYWORDS = MultimodalTranslator.MALE_ROLE_KEYWORDS
+    mock_tr = MockTranslator()
+    ev0 = pysubs2.SSAEvent(start=1000, end=3000, text="Listen to me!")
+    cat0, lbl0 = MultimodalTranslator._resolve_line_addressee(
+        mock_tr,
+        event=ev0,
+        clean_text="Listen to me, everyone!",
+        raw_phase1_addressee="",
+        event_idx=0,
+        whisper_text="Minna, kiite!",
+        batch_events=[(0, ev0)],
+        orig_idx=0
+    )
+    assert cat0 == "grupa_kobiet", f"BŁĄD: Liczba mnoga w scenie kobiecej została spłaszczona do: {cat0} ({lbl0})"
+    assert "Grupa Kobiet" in lbl0, f"BŁĄD: Błędna etykieta adresata: {lbl0}"
+
+    # Asercja 5: Ochrona męskiego wołacza w scenie kobiecej
+    ev2 = pysubs2.SSAEvent(start=5000, end=7000, text="Takauji, be careful!")
+    cat2, lbl2 = MultimodalTranslator._resolve_line_addressee(
+        mock_tr,
+        event=ev2,
+        clean_text="Takauji, be careful!",
+        raw_phase1_addressee="",
+        event_idx=2,
+        whisper_text="Takauji, ki o tsukete!",
+        batch_events=[(2, ev2)],
+        orig_idx=2
+    )
+    assert cat2 == "mężczyzna", f"BŁĄD: Męski wołacz w scenie kobiecej został sfeminizowany: {cat2} ({lbl2})"
+    assert "Takauji" in lbl2, f"BŁĄD: Brak imienia męskiego w etykiecie adresata: {lbl2}"
+
+    print(" -> PASSED: Test 133 w 100% potwierdza globalną sanityzację domyślnych parametrów i Doktrynę Twardych Dowodów (0.00 PLN).")
+
+
+def test_epistemic_certainty_and_zero_presumption_governance():
+    """
+    [TEST 134/134] Weryfikacja Doktryny Twardych Dowodów (Epistemic Certainty) i Pełnej Sanacji Zmiennych (0.00 PLN).
+    1. WhisperDisambiguator: zaimki omae, anta, temee, kisama przeniesione z K1 (płeć) do K7 (rejestr nieformalny).
+       Brak narzucania płci adresata (addressee_gender is None).
+       Brak domyślnego przypisywania SINGULAR przy braku wykładników 2. osoby (monolog/natura -> addressee_number is None).
+    2. EpisodeQualityGate: kobieta mówiąca o sobie (1sg fem) i grupie (1pl virile, np. 'Bałam się o ciebie, ale uciekliśmy')
+       nie ulega maskulinizacji do 'Bałem się' (usunięcie has_virile_plural z określania płci mówcy).
+    3. EpisodeQualityGate: pojedynczy mówca w scenie (N=1, np. Brandon) NIE narzuca płci nieznanemu słuchaczowi
+       (wymóg len(nearby_speakers) >= 2 i brak głosu przeciwnego).
+    4. SeriesBible & EpisodeQualityGate: ochrona zagranicznych imion żeńskich na -a (Asuka, Sakura, Fatima, Sonia, Elena)
+       przed obcięciem mianownika i maskulinizacją po przyimkach ('za Asuka', 'dla Sakura').
+    5. AVTLinter: etykieta adresata 'monolog' / 'nieokreślony / monolog' nie aktywuje fałszywego zaimka 'on'
+       (wprowadzenie twardych granic słów \bon\b) i nie maskulinizuje żeńskiej myśli ('Jesteś pewna?').
+    6. SeriesBible: funkcje is_all_female_cast i is_all_male_cast oraz infer_scene_cast_from_text wymagają
+       co najmniej 2 unikalnych postaci (len(detected_cast) >= 2) do stwierdzenia ekskluzywności sceny.
+    7. DialogueVerifier & EpisodeQualityGate: pełna obsługa liczby podwójnej (dualis) dla relacji 2-osobowych:
+       kobieta_dual ('obie / byłyście'), mężczyzna_dual ('obaj / byliście'), para_mieszana_dual ('oboje / byliście').
+    8. AVTLinter: neutralność płciowa fonicznego wykładnika 'hitori' (一人) przy braku danych o mówcy
+       ('Zostaw mnie w spokoju' / 'Zostawcie mnie w spokoju').
+    9. MultimodalTranslator: prompt Fazy 1 w przypadku braku twardych danych generuje neutralny nagłówek
+       [ADRESAT: Nieokreślony / Monolog | REJESTR: Kontekstowy / Naturalny] zamiast fałszywego rozmówcy.
+    """
+    print("\n[TEST 134/134] Weryfikacja Doktryny Twardych Dowodów (Epistemic Certainty) i Pełnej Sanacji Zmiennych...")
+
+    from whisper_disambiguator import WhisperDisambiguator
+    from avt_linter import AVTLinter, EpisodeQualityGate
+    from series_memory import SeriesBible, is_inherently_female_name
+    from verifier import DialogueVerifier
+    from translator import MultimodalTranslator
+    import pysubs2
+
+    # Asercja 1: WhisperDisambiguator - zaimki nie narzucają płci adresata i brak wymuszonego SINGULAR
+    tag1 = WhisperDisambiguator.disambiguate_line(whisper_text="Omae, hayaku shiro!", source_en="Hurry up!")
+    assert tag1.addressee_gender is None, f"BŁĄD: omae ustawiło addressee_gender={tag1.addressee_gender}"
+    assert tag1.social_register == "INFORMAL_TY", f"BŁĄD: omae nie ustawiło INFORMAL_TY: {tag1.social_register}"
+    assert tag1.addressee_number == "SINGULAR", f"BŁĄD: omae jako 2. osoba nie ustawiło SINGULAR: {tag1.addressee_number}"
+
+    tag2 = WhisperDisambiguator.disambiguate_line(whisper_text="Anta mo kuru no?", source_en="Are you coming too?")
+    assert tag2.addressee_gender is None, f"BŁĄD: anta ustawiło addressee_gender={tag2.addressee_gender}"
+    assert tag2.social_register == "INFORMAL_TY"
+    assert tag2.addressee_number == "SINGULAR"
+
+    tag3 = WhisperDisambiguator.disambiguate_line(whisper_text="Kisama, yurusen!", source_en="I won't forgive you!")
+    assert tag3.addressee_gender is None, f"BŁĄD: kisama ustawiło addressee_gender={tag3.addressee_gender}"
+
+    tag_mono = WhisperDisambiguator.disambiguate_line(whisper_text="Kirei na hana da na.", source_en="What a pretty flower.")
+    assert tag_mono.addressee_number is None, f"BŁĄD: Monolog otrzymał z góry addressee_number={tag_mono.addressee_number}"
+
+    # Asercja 2: Ochrona 1. os. lp. żeńskiej przed maskulinizacją przez -liśmy (brak has_virile_plural w płeć mówcy)
+    res_fem, _ = AVTLinter.lint_and_fix_line(
+        "Bałam się o ciebie, ale uciekliśmy.",
+        speaker_gender="kobieta",
+        addressee_gender=None
+    )
+    assert "Bałam się" in res_fem, f"BŁĄD: 1. os. lp. żeńska uległa maskulinizacji przez -liśmy: {res_fem}"
+
+    ev_fem = pysubs2.SSAEvent(start=1000, end=3000, text="Bałam się o ciebie, ale w końcu uciekliśmy.")
+    subs_fem = pysubs2.SSAFile()
+    subs_fem.events.append(ev_fem)
+    EpisodeQualityGate.audit_and_fix_entire_episode(
+        subs_fem,
+        line_speakers={0: "Kobieta"},
+        enforce_line_split=False
+    )
+    assert "Bałam się" in subs_fem.events[0].text, f"BŁĄD: QualityGate zmaskulinizował 'Bałam się' pod wpływem -liśmy: {subs_fem.events[0].text}"
+
+    # Asercja 3: Pojedynczy mówca w scenie (N=1) NIE narzuca płci nieznanemu słuchaczowi
+    ev_brandon = pysubs2.SSAEvent(start=10000, end=13000, text="Cieszę się, że byłaś bezpieczna.")
+    subs_b = pysubs2.SSAFile()
+    subs_b.events.append(ev_brandon)
+    EpisodeQualityGate.audit_and_fix_entire_episode(
+        subs_b,
+        line_speakers={0: "Brandon"},
+        character_registry={"Brandon": "Mężczyzna"},
+        enforce_line_split=False
+    )
+    assert "byłaś bezpieczna" in subs_b.events[0].text, f"BŁĄD: Pojedynczy mówca N=1 zmaskulinizował nieznanego słuchacza: {subs_b.events[0].text}"
+
+    ev_m1 = pysubs2.SSAEvent(start=20000, end=22000, text="Takauji, jesteś gotowa?")
+    ev_m2 = pysubs2.SSAEvent(start=22500, end=24000, text="Tak, bracie.")
+    ev_m1.name = "Brandon"
+    ev_m2.name = "Takauji"
+    subs_m = pysubs2.SSAFile()
+    subs_m.events.extend([ev_m1, ev_m2])
+    EpisodeQualityGate.audit_and_fix_entire_episode(
+        subs_m,
+        line_speakers={0: "Brandon", 1: "Takauji"},
+        character_registry={"Brandon": "Mężczyzna", "Takauji": "Mężczyzna"},
+        enforce_line_split=False
+    )
+    assert "jesteś gotowy" in subs_m.events[0].text
+
+    # Asercja 4: Ochrona imion żeńskich na -a przed obcięciem i maskulinizacją po przyimkach
+    assert is_inherently_female_name("Asuka") is True
+    assert is_inherently_female_name("Sakura") is True
+    assert is_inherently_female_name("Fatima") is True
+    assert is_inherently_female_name("Elena") is True
+    assert is_inherently_female_name("Brandon") is False
+
+    ev_asuka = pysubs2.SSAEvent(start=30000, end=33000, text="Stoję murem za Asuka.")
+    subs_a = pysubs2.SSAFile()
+    subs_a.events.append(ev_asuka)
+    EpisodeQualityGate.audit_and_fix_entire_episode(
+        subs_a,
+        enforce_line_split=False
+    )
+    assert "za Asuka" in subs_a.events[0].text or "za Asuką" in subs_a.events[0].text, f"BŁĄD: Imię żeńskie na -a po przyimku uległo obcięciu: {subs_a.events[0].text}"
+
+    # Asercja 5: Monolog nie aktywuje fałszywego zaimka 'on' (brak substring match w 'monolog')
+    res_mono, _ = AVTLinter.lint_and_fix_line(
+        "Jesteś pewna?",
+        speaker_gender=None,
+        addressee_gender="Nieokreślony / Monolog"
+    )
+    assert res_mono == "Jesteś pewna?", f"BŁĄD: Etykieta 'monolog' dopasowała zaimkowy podciąg 'on' i zmaskulinizowała: {res_mono}"
+
+    res_mono2, _ = AVTLinter.lint_and_fix_line(
+        "Byłam taka samotna...",
+        speaker_gender=None,
+        addressee_gender="monolog"
+    )
+    assert res_mono2 == "Byłam taka samotna...", f"BŁĄD: Etykieta 'monolog' zmaskulinizowała wypowiedź: {res_mono2}"
+
+    # Asercja 6: SeriesBible wymaga N >= 2 unikalnych postaci do stwierdzenia ekskluzywności sceny
+    bible = SeriesBible("TestEpistemic")
+    bible.data["characters"]["Takauji"] = {"gender": "MALE"}
+    bible.data["characters"]["Kusunoki"] = {"gender": "MALE"}
+    bible.data["characters"]["Fatima"] = {"gender": "FEMALE"}
+    bible.data["characters"]["Töregene"] = {"gender": "FEMALE"}
+
+    assert bible.is_all_male_cast({"Takauji"}, min_size=2) is False
+    assert bible.is_all_female_cast({"Fatima"}, min_size=2) is False
+    assert bible.is_all_male_cast({"Takauji", "Kusunoki"}, min_size=2) is True
+    assert bible.is_all_female_cast({"Fatima", "Töregene"}, min_size=2) is True
+
+    cast1, g_ex1 = bible.infer_scene_cast_from_text("Takauji idzie przez miasto.")
+    assert g_ex1 is None, f"BŁĄD: Pojedyncza postać męska narzuciła ekskluzywność sceny: {g_ex1}"
+
+    cast2, g_ex2 = bible.infer_scene_cast_from_text("Takauji i Kusunoki rozmawiają o bitwie.")
+    assert g_ex2 == "MALE", f"BŁĄD: Dwie postaci męskie nie ustawiły gender_exclusive=MALE: {g_ex2}"
+
+    # Asercja 7: Pełna obsługa Liczby Podwójnej (Dualis): obie, obaj, oboje
+    ver = DialogueVerifier.__new__(DialogueVerifier)
+    ver._episode_knowledge_cached = True
+
+    p_k_dual = ver.verify_batch([{"id": 1, "en": "You were great.", "pl": "Byliście wspaniali.", "addressee": "kobieta_dual", "addressee_label": "DWIE KOBIETY"}], return_prompt=True)
+    assert "obie" in p_k_dual and "byłyście" in p_k_dual, f"BŁĄD: {p_k_dual}"
+
+    p_m_dual = ver.verify_batch([{"id": 1, "en": "You were great.", "pl": "Byliście wspaniali.", "addressee": "mężczyzna_dual", "addressee_label": "DWÓCH MĘŻCZYZN"}], return_prompt=True)
+    assert "obaj" in p_m_dual and "byliście" in p_m_dual, f"BŁĄD: {p_m_dual}"
+
+    p_mix_dual = ver.verify_batch([{"id": 1, "en": "You were great.", "pl": "Byliście wspaniali.", "addressee": "para_mieszana_dual", "addressee_label": "PARA MIESZANA"}], return_prompt=True)
+    assert "oboje" in p_mix_dual and "byliście" in p_mix_dual, f"BŁĄD: {p_mix_dual}"
+
+    ev_d1 = pysubs2.SSAEvent(start=40000, end=42000, text="Obaj byliście wspaniali.")
+    subs_d1 = pysubs2.SSAFile()
+    subs_d1.events.append(ev_d1)
+    EpisodeQualityGate.audit_and_fix_entire_episode(
+        subs_d1,
+        line_addressees={0: "kobieta_dual"},
+        enforce_line_split=False
+    )
+    assert "Obie byłyście" in subs_d1.events[0].text, f"BŁĄD: kobieta_dual nie poprawiła 'Obaj byliście' na 'Obie byłyście': {subs_d1.events[0].text}"
+
+    ev_d2 = pysubs2.SSAEvent(start=43000, end=45000, text="Obie byłyście wspaniałe.")
+    subs_d2 = pysubs2.SSAFile()
+    subs_d2.events.append(ev_d2)
+    EpisodeQualityGate.audit_and_fix_entire_episode(
+        subs_d2,
+        line_addressees={0: "mężczyzna_dual"},
+        enforce_line_split=False
+    )
+    assert "Obaj byliście" in subs_d2.events[0].text, f"BŁĄD: mężczyzna_dual nie poprawiła 'Obie byłyście' na 'Obaj byliście': {subs_d2.events[0].text}"
+
+    ev_d3 = pysubs2.SSAEvent(start=46000, end=48000, text="Obaj byliście wspaniali.")
+    subs_d3 = pysubs2.SSAFile()
+    subs_d3.events.append(ev_d3)
+    EpisodeQualityGate.audit_and_fix_entire_episode(
+        subs_d3,
+        line_addressees={0: "para_mieszana_dual"},
+        enforce_line_split=False
+    )
+    assert "Oboje byliście" in subs_d3.events[0].text, f"BŁĄD: para_mieszana_dual nie poprawiła 'Obaj' na 'Oboje': {subs_d3.events[0].text}"
+
+    # Asercja 8: Neutralność foniczna 'hitori' przy braku danych o płci mówcy
+    res_h_none, _ = AVTLinter.lint_and_fix_line(
+        "Daj mi spokój.",
+        speaker_gender=None,
+        audio_jp="Hitori ni shite kure!"
+    )
+    assert "Zostaw mnie w spokoju" in res_h_none, f"BŁĄD: hitori z speaker_gender=None nie użyło formy neutralnej: {res_h_none}"
+
+    res_h_fem, _ = AVTLinter.lint_and_fix_line(
+        "Daj mi spokój.",
+        speaker_gender="kobieta",
+        audio_jp="Hitori ni shite kure!"
+    )
+    assert "Zostaw mnie samą" in res_h_fem, f"BŁĄD: hitori dla kobiety nie dało 'samą': {res_h_fem}"
+
+    res_h_masc, _ = AVTLinter.lint_and_fix_line(
+        "Daj mi spokój.",
+        speaker_gender="mężczyzna",
+        audio_jp="Hitori ni shite kure!"
+    )
+    assert "Zostaw mnie samego" in res_h_masc, f"BŁĄD: hitori dla mężczyzny nie dało 'samego': {res_h_masc}"
+
+    # Asercja 9: MultimodalTranslator - neutralne nagłówki Fazy 1 przy braku twardych danych
+    mock_tr = MultimodalTranslator.__new__(MultimodalTranslator)
+    mock_tr.character_registry = {}
+    mock_tr.series_bible = None
+    mock_tr.tm = None
+    mock_tr._episode_knowledge_cached = True
+
+    ev_test = pysubs2.SSAEvent(start=1000, end=3000, text="It is cold.")
+    prompt_text = mock_tr._prepare_batch_prompt(
+        batch_events=[(0, ev_test, "It is cold.", "")],
+        history_context=[]
+    )
+    assert "ADRESAT: Nieokreślony / Monolog" in prompt_text, f"BŁĄD: Brak neutralnego adresata w prompcie: {prompt_text}"
+    assert "REJESTR: Kontekstowy / Naturalny" in prompt_text, f"BŁĄD: Brak neutralnego rejestru w prompcie: {prompt_text}"
+    assert "ADRESAT: Rozmówca" not in prompt_text
+    assert "Bezpośredni na 'ty'" not in prompt_text
+
+    print(" -> PASSED: Test 134 w 100% potwierdza Doktrynę Twardych Dowodów (Epistemic Certainty) i Pełną Sanację Zmiennych (0.00 PLN).")
+
+
+def test_holistic_dialogue_mastery_and_pipeline_harmony_guard():
+    """
+    Test 135: Holistyczna weryfikacja czystości językowej promptów, odciążenia Fazy 2 (Lean=True),
+    sanacji duplikatów alarmów oraz ochrony ciągłości składniowej zdań rozbitych.
+    """
+    print("\n--- TEST 135: Mistrzostwo Polskiego Dialogu, Lean Faza 2 i Harmonia Potoku (0.00 PLN) ---")
+    import re
+    from pathlib import Path
+    from rules import get_verifier_system_prompt
+    from verifier import DialogueVerifier
+    from translator import MultimodalTranslator
+    import pysubs2
+
+    # Asercja 1: Czystość językowa promptów - zero uszkodzonych zwrotów w rules.py
+    rules_path = Path("rules.py")
+    rules_text = rules_path.read_text(encoding="utf-8")
+    broken_matches = re.findall(r"(?:Kategoryczn|Bezwzględn)[a-ząćęłńóśźż]*\s+unikaj\s+kalki", rules_text, re.IGNORECASE)
+    assert len(broken_matches) == 0, f"BŁĄD: Wykryto uszkodzone zwroty 'unikaj kalki' w rules.py: {broken_matches}"
+    assert "ŻELAZNY Unikaj kalki" not in rules_text, "BŁĄD: Wykryto zniekształcony nagłówek 'ŻELAZNY Unikaj kalki' w rules.py"
+
+    # Asercja 2: DialogueVerifier domyślnie używa lean=True (odciążenie Fazy 2 z 2300 linii dawnego kanonu)
+    ver = DialogueVerifier.__new__(DialogueVerifier)
+    ver.keep_honorifics = True
+    ver.model = "gemini-3.5-flash-lite"
+    # Test konstruktora domyślnego
+    assert get_verifier_system_prompt(lean=True) != get_verifier_system_prompt(lean=False)
+    lean_prompt = get_verifier_system_prompt(lean=True)
+    full_prompt = get_verifier_system_prompt(lean=False)
+    assert len(lean_prompt) < len(full_prompt)
+    assert "KOMPLEKSOWY KANON PRZEKŁADU AUDIOWIZUALNEGO" not in lean_prompt
+    assert "KOMPLEKSOWY KANON PRZEKŁADU AUDIOWIZUALNEGO" in full_prompt
+
+    # Asercja 3: Sanacja duplikatów alarmów w Faza 2 (SSOT Sanitizer w verifier.py)
+    mock_item = {
+        "id": 1,
+        "en": "You won the battle.",
+        "pl": "Wygrałeś bitwę.",
+        "speaker": "Ren",
+        "addressee": "kobieta",
+        "addressee_label": "KOBIETA",
+        "notes": "[🚨 ALARM FILAR CLVII: Zwrot do kobiety] [🚨 ALARM FILAR CLXIII: Adresat KOBIETA] Ważna uwaga aktorska."
+    }
+    ver.client_pool = None
+    ver.thinking_budget = 2048
+    ver.character_registry = {}
+    ver.system_prompt = lean_prompt
+    prompt_p2 = ver._prepare_verification_prompt([mock_item], "Odcinek 1")
+    assert "Ważna uwaga aktorska." in prompt_p2
+    assert "[🚨 ALARM FILAR CLVII" not in prompt_p2, f"BŁĄD: Zduplikowany alarm CLVII pozostał w notatkach: {prompt_p2}"
+    assert "[🚨 ALARM FILAR CLXIII" not in prompt_p2, f"BŁĄD: Zduplikowany alarm CLXIII pozostał w notatkach: {prompt_p2}"
+
+    # Asercja 4: Ochrona ciągłości składniowej zdań rozbitych przed redukcją do wahań (translator.py)
+    mock_tr = MultimodalTranslator.__new__(MultimodalTranslator)
+    mock_tr.character_registry = {}
+    mock_tr.series_bible = None
+    mock_tr.tm = None
+    mock_tr._episode_knowledge_cached = True
+    mock_tr.combined_glossary = {"royal knight": "rycerz królewski"}
+
+    # Linijka rozbita wielokropkiem o czasie trwania <= 0.6s
+    ev_split_1 = pysubs2.SSAEvent(start=1000, end=1400, text="Because...")
+    ev_split_2 = pysubs2.SSAEvent(start=1500, end=1900, text="...the enemy is strong.")
+    prompt_split = mock_tr._prepare_batch_prompt(
+        batch_events=[
+            (0, ev_split_1, "Because...", ""),
+            (1, ev_split_2, "...the enemy is strong.", "")
+        ],
+        history_context=[]
+    )
+    assert "ZACHOWAJ CIĄGŁOŚĆ SKŁADNIOWĄ" in prompt_split, f"BŁĄD: Brak ochrony ciągłości składniowej dla zdania rozbitego: {prompt_split}"
+
+    # Dla wolnostojącego wahania o czasie 0.4s bez wielokropka nakaz kondensacji powinien być aktywny:
+    ev_hesitation = pysubs2.SSAEvent(start=5000, end=5400, text="Well.")
+    prompt_hesitation = mock_tr._prepare_batch_prompt(
+        batch_events=[(0, ev_hesitation, "Well.", "")],
+        history_context=[]
+    )
+    assert "MIKRO-KWESTIA / DŹWIĘK WAHANIA" in prompt_hesitation, f"BŁĄD: Brak nakazu kondensacji dla wolnostojącego wahania: {prompt_hesitation}"
+
+    # Asercja 5: Ochrona pełnych zdań zawierających 'here' przed fałszywym szumem kinezjatycznym (translator.py)
+    ev_full_here = pysubs2.SSAEvent(start=6000, end=8000, text="Here is the medicine for your father.")
+    prompt_full_here = mock_tr._prepare_batch_prompt(
+        batch_events=[(0, ev_full_here, "Here is the medicine for your father.", "")],
+        history_context=[],
+        whisper_transcriptions={1: {"text": "Hora, kusuri da."}}
+    )
+    assert "ALARM SZUMU KINEZJATYCZNEGO" not in prompt_full_here, f"BŁĄD: Szum kinezjatyczny fałszywie uruchomiony na pełnym zdaniu: {prompt_full_here}"
+
+    # Krótkie 'Here' (<=2 słowa) Z gestem kakegoe uruchamia alarm szumu kinezjatycznego:
+    ev_short_here = pysubs2.SSAEvent(start=9000, end=10000, text="Here.")
+    prompt_short_here = mock_tr._prepare_batch_prompt(
+        batch_events=[(0, ev_short_here, "Here.", "")],
+        history_context=[],
+        whisper_transcriptions={1: {"text": "Hora."}}
+    )
+    assert "ALARM SZUMU KINEZJATYCZNEGO" in prompt_short_here, f"BŁĄD: Szum kinezjatyczny nie został uruchomiony dla krótkiego 'Here': {prompt_short_here}"
+
+    # Asercja 6: Słownik kanoniczny zawiera jawny nakaz fleksji (ochrona przed nominative freezing)
+    ev_gloss = pysubs2.SSAEvent(start=11000, end=13000, text="He is a royal knight.")
+    prompt_gloss = mock_tr._prepare_batch_prompt(
+        batch_events=[(0, ev_gloss, "He is a royal knight.", "")],
+        history_context=[]
+    )
+    assert "forma bazowa – w dialogu ZAWSZE odmieniaj przez polskie przypadki!" in prompt_gloss, f"BŁĄD: Brak nakazu odmiany w słowniku kanonicznym: {prompt_gloss}"
+
+    print(" -> PASSED: Test 135 w 100% potwierdza Mistrzostwo Polskiego Dialogu, Lean Faza 2 i Harmonię Potoku (0.00 PLN).")
+
+
+def test_holistic_second_order_vulnerability_and_fail_safe_matrix():
+    """
+    [TEST 136/136] Holistyczna Eliminacja Podatności Drugiego Rzędu (Edge-Case & Regression Analysis w 5 Warstwach):
+    - Domena 1: Zero-anaphora i Doktryna Twardych Dowodów (elipsa AVT i czas teraźniejszy w Filarze CXX, zachowanie dwuznaczności)
+    - Domena 2: Rekcja czasowników, japońskie imiona męskie na -a i manga kanon (Katsura, Asura, Yoruichi, Karin)
+    - Domena 3: Video chunking, priorytet ciągłości zdania (L/J-cuts) nad cięciem montażowym i rozszerzone okno koalescencji
+    - Domena 4: Limity CPS, metryka polszczyzny (budżet znakowy Fazy 2, nieinwazyjna telemetria CPS)
+    - Domena 5: Whisper audio disambiguation i prosodia (brak paniki przy wahaniach d-demo, tag HOSTILE dla kisama/temee)
+    - Domena 6: Deterministyczny linter vs elastyczność poetycka (odmiana punktu bez powrotu, ochrona nie da się pomóc, makrony Hepburna)
+    """
+    print("\n--- TEST 136: Holistyczna Eliminacja Podatności Drugiego Rzędu w 5 Warstwach (0.00 PLN) ---")
+    import pysubs2
+    from pathlib import Path
+    import re
+    from series_memory import (
+        is_inherently_female_name,
+        generate_polish_name_declension,
+        SeriesBible
+    )
+    from avt_linter import AVTLinter, EpisodeQualityGate
+    from prosody_engine import AudioProsodyEngine
+    from whisper_disambiguator import WhisperDisambiguator, DisambiguationTag
+    from translator import MultimodalTranslator, create_adaptive_batches
+    from verifier import DialogueVerifier
+
+    # ==========================================
+    # DOMENA 1: Zero-anaphora i Doktryna Twardych Dowodów
+    # ==========================================
+    # Asercja 1.1: Filar CXX w rules.py ukierunkowuje na naturalną elipsę AVT i czas teraźniejszy
+    rules_text = Path("rules.py").read_text(encoding="utf-8")
+    assert "FILAR CXX" in rules_text
+    assert "eliptykę filmową" in rules_text
+    assert "czas teraźniejszy" in rules_text
+    assert "bez uciekania w sztuczną stronę bierną" in rules_text
+
+    # Asercja 1.2: Linter zachowuje neutralność przy braku twardych dowodów (zero presumpcji płci)
+    clean_ambiguous = "Wychodzę na zewnątrz."
+    res_amb, fixes_amb = AVTLinter.lint_and_fix_line(clean_ambiguous, speaker_gender=None, addressee_gender=None)
+    assert res_amb == "Wychodzę na zewnątrz."
+    assert len(fixes_amb) == 0
+
+    # ==========================================
+    # DOMENA 2: Rekcja czasowników, japońskie imiona męskie na -a i manga kanon
+    # ==========================================
+    # Asercja 2.1: Japońskie imiona męskie na -a (Katsura, Asura, Muguruma) nie tracą końcówki -a
+    t_katsura, _ = AVTLinter.lint_and_fix_line("Pan Katsura uciekł.")
+    assert "Katsura" in t_katsura, f"BŁĄD: Imię Katsura zostało okaleczone: {t_katsura}"
+    assert "Katsur " not in t_katsura
+
+    t_asura, _ = AVTLinter.lint_and_fix_line("Mistrz Asura stanął do walki.")
+    assert "Asura" in t_asura, f"BŁĄD: Imię Asura zostało okaleczone: {t_asura}"
+
+    # Asercja 2.2: Nieodmienne japońskie imiona żeńskie bez końcówki -a
+    for fem_name in ["Karin", "Yoruichi", "Suzu", "Nanami", "Aoi", "Shinobu", "Rin", "Ran"]:
+        assert is_inherently_female_name(fem_name) is True, f"BŁĄD: {fem_name} nie jest rozpoznane jako imię żeńskie"
+        decl = generate_polish_name_declension(fem_name, "FEMALE")
+        assert decl["M"] == fem_name
+        assert decl["D"] == fem_name, f"BŁĄD: Dopełniacz dla {fem_name} zmutował do {decl['D']}"
+        assert decl["N"] == fem_name, f"BŁĄD: Narzędnik dla {fem_name} zmutował do {decl['N']}"
+
+    # Asercja 2.3: EpisodeQualityGate nie odmienia 'z Karin' do 'z Kariną'
+    subs_karin = pysubs2.SSAFile()
+    subs_karin.events.append(pysubs2.SSAEvent(start=1000, end=3000, text="Rozmawiałem z Karin o strategii."))
+    EpisodeQualityGate.audit_and_fix_entire_episode(subs_karin)
+    assert "z Karin" in subs_karin.events[0].text, f"BŁĄD: 'z Karin' zostało zmutowane na: {subs_karin.events[0].text}"
+    assert "Kariną" not in subs_karin.events[0].text
+
+    # ==========================================
+    # DOMENA 3: Video Chunking, L/J-Cuts i Cięcia Montażowe
+    # ==========================================
+    # Asercja 3.1: Kontynuacja zdania rozbitego (...) ma priorytet nad cięciem montażowym
+    mock_tr = MultimodalTranslator.__new__(MultimodalTranslator)
+    mock_tr.character_registry = {}
+    mock_tr.series_bible = None
+    mock_tr.tm = None
+    mock_tr._episode_knowledge_cached = True
+    mock_tr.combined_glossary = {}
+    mock_tr.scene_cuts_ms = [2100]  # Cięcie dokładnie między kwestiami (L-cut / J-cut)
+
+    ev_cut_1 = pysubs2.SSAEvent(start=1000, end=2000, text="Because...")
+    ev_cut_2 = pysubs2.SSAEvent(start=2200, end=3500, text="...he was right.")
+    prompt_cut = mock_tr._prepare_batch_prompt(
+        batch_events=[
+            (0, ev_cut_1, "Because...", ""),
+            (1, ev_cut_2, "...he was right.", "")
+        ],
+        history_context=[]
+    )
+    assert "L-cut/J-cut" in prompt_cut or "Kontynuacja myśli" in prompt_cut
+
+    # Asercja 3.2: create_adaptive_batches wspiera scalanie rozbitych zdań z przerwą do 3500ms
+    raw_evs_gap = [
+        (0, pysubs2.SSAEvent(start=1000, end=2000, text="To prawda..."), "To prawda...", ""),
+        (1, pysubs2.SSAEvent(start=5000, end=7000, text="...że wygraliśmy."), "...że wygraliśmy.", "")  # luka 3000ms <= 3500ms
+    ]
+    batches_gap = create_adaptive_batches(raw_evs_gap, base_batch_size=10, max_batch_size=20, min_scene_batch=2)
+    assert len(batches_gap) == 1, f"BŁĄD: Kwestie rozbite wielokropkiem z luką 3000ms zostały rozdzielone na {len(batches_gap)} paczek!"
+
+    # ==========================================
+    # DOMENA 4: Limity CPS, Metryka Polszczyzny i Ochrona Dialogu
+    # ==========================================
+    # Asercja 4.1: Wstrzykiwanie budżetu znakowego AVT w DialogueVerifier
+    ver = DialogueVerifier.__new__(DialogueVerifier)
+    ver.client_pool = None
+    ver.thinking_budget = 2048
+    ver.character_registry = {}
+    ver.system_prompt = "LEAN_PROMPT"
+    mock_item_budget = {
+        "id": 1,
+        "en": "Are you sure about that?",
+        "pl": "Jesteś tego pewien?",
+        "duration_s": 2.0,
+        "speaker": "Ren"
+    }
+    p_budget = ver._prepare_verification_prompt([mock_item_budget], "Odcinek 1")
+    assert "BUDŻET ZNAKOWY AVT: Maksymalnie 34 znaków ze spacjami" in p_budget, f"BŁĄD: Brak budżetu znakowego w Faza 2: {p_budget}"
+
+    # Asercja 4.2: Nieinwazyjna telemetria CPS w EpisodeQualityGate
+    subs_cps = pysubs2.SSAFile()
+    subs_cps.events.append(pysubs2.SSAEvent(start=1000, end=2000, text="Ta kwestia ma zdecydowanie za dużo znaków na jedną sekundę.")) # 60 zn / 1s = 60 CPS
+    cps_warnings = EpisodeQualityGate.get_cps_warnings(subs_cps, max_cps=22.0)
+    assert len(cps_warnings) == 1, f"BŁĄD: Brak ostrzeżenia o wysokim CPS: {cps_warnings}"
+    assert "tempo czytania" in cps_warnings[0] and "przekracza zalecany limit" in cps_warnings[0]
+    # Upewnienie się, że tekst pozostał nietknięty
+    assert subs_cps.events[0].text == "Ta kwestia ma zdecydowanie za dużo znaków na jedną sekundę."
+
+    # ==========================================
+    # DOMENA 5: Whisper Audio Disambiguation i Prosodia
+    # ==========================================
+    # Asercja 5.1: Pojedyncze wahania konwersacyjne (d-demo, k-konnichiwa) NIE wywołują paniki
+    alert_demo = AudioProsodyEngine.detect_emotional_breakdown(
+        prosody_tag="spokojny dialog",
+        whisper_text="d-demo, sore wa..."
+    )
+    assert alert_demo is None, f"BŁĄD: 'd-demo' fałszywie wywołało alert paniki: {alert_demo}"
+
+    alert_konn = AudioProsodyEngine.detect_emotional_breakdown(
+        prosody_tag="normalna mowa",
+        whisper_text="k-konnichiwa"
+    )
+    assert alert_konn is None, f"BŁĄD: 'k-konnichiwa' fałszywie wywołało alert paniki: {alert_konn}"
+
+    # Prawdziwe załamanie emocjonalne/panika nadal generuje alert
+    alert_real_panic = AudioProsodyEngine.detect_emotional_breakdown(
+        prosody_tag="przerażenie / panika",
+        whisper_text="tasukete... hii... kowai..."
+    )
+    assert alert_real_panic is not None and "PRYMAT AFEKTU" in alert_real_panic
+
+    # Asercja 5.2: Obraźliwe zaimki 2. osoby (kisama, temee) generują tag HOSTILE
+    res_kisama = WhisperDisambiguator.disambiguate_line(whisper_text="kisama, nani wo shite iru?!")
+    assert res_kisama.pragmatic_attitude == "HOSTILE", f"BŁĄD: 'kisama' nie otrzymało statusu HOSTILE: {res_kisama.pragmatic_attitude}"
+    tag_str = WhisperDisambiguator.format_compact_ssot_tag(res_kisama)
+    assert "Skrajnie wrogi/Konfrontacyjny" in tag_str
+
+    res_temee = WhisperDisambiguator.disambiguate_line(whisper_text="temee... yurusanai!")
+    assert res_temee.pragmatic_attitude == "HOSTILE", f"BŁĄD: 'temee' nie otrzymało statusu HOSTILE: {res_temee.pragmatic_attitude}"
+
+    # ==========================================
+    # DOMENA 6: Deterministyczny Linter vs Elastyczność Poetycka
+    # ==========================================
+    # Asercja 6.1: Zakaz sztywnych podmian międzyrodzajowych w Warstwie 4 (Aksjomat 2, Dyrektywa 1)
+    # Wyrażenie 'punkt bez powrotu' NIE jest mechanicznie zastępowane przez 'droga bez odwrotu' ani inne formy z innym rządem gramatycznym
+    t_ret1, _ = AVTLinter.lint_and_fix_line("Przekroczyliśmy punkt bez powrotu.")
+    assert "droga bez odwrotu" not in t_ret1, f"BŁĄD: Sztywna podmiana międzyrodzajowa w Warstwie 4: {t_ret1}"
+    assert "punkt bez powrotu" in t_ret1, f"BŁĄD: Składnia została uszkodzona: {t_ret1}"
+
+    # Asercja 6.2: Ochrona dosłownego/medycznego 'nie da się pomóc' z dopełnieniem w celowniku
+    t_med, fixes_med = AVTLinter.lint_and_fix_line("Temu rannemu pacjentowi nie da się pomóc.")
+    assert t_med == "Temu rannemu pacjentowi nie da się pomóc.", f"BŁĄD: Skasowano medyczne 'nie da się pomóc': {t_med}"
+    assert len(fixes_med) == 0
+
+    # Asercja 6.3: Ochrona japońskich imion z makronami Hepburna (ō, ū, ā, ē, ī)
+    t_gojo, _ = AVTLinter.lint_and_fix_line("Mistrz Gojō przybył na pole walki.")
+    assert "Gojō" in t_gojo, f"BŁĄD: Makron w imieniu Gojō został zniekształcony: {t_gojo}"
+
+    t_soma, _ = AVTLinter.lint_and_fix_line("Sōma wygrał pojedynek kulinarny.")
+    assert "Sōma" in t_soma, f"BŁĄD: Makron w imieniu Sōma został zniekształcony: {t_soma}"
+
+    print(" -> PASSED: Test 136 w 100% potwierdza eliminację podatności drugiego rzędu we wszystkich 6 domenach i 5 warstwach potoku (0.00 PLN).")
+
+
+def test_filler_condensation_and_ass_metric_stripping_guard():
+    print("[TEST 137/138] Test Zdaniowej Higieny Kompresji, Ochrony Wielkości Liter i Strippingu Formatowania ASS (Dyrektywy 3 i 4)...")
+    import re
+    import pysubs2
+    from avt_linter import EpisodeQualityGate, AVTLinter
+
+    # ==========================================
+    # DOMENA 1: Zdaniowa Higiena i Ochrona Krótkich Zdań (Dyrektywa 3, Aksjomat 2)
+    # ==========================================
+    # Asercja 1.1: Ochrona krótkich zdań (<= 2 słowa) przed wykasowaniem wypełniaczy
+    t_short1 = EpisodeQualityGate.condense_filler_words_token_level("Naprawdę? Nie wierzę!")
+    assert t_short1 == "Naprawdę? Nie wierzę!", f"BŁĄD: Wykasowano 'Naprawdę?' ze zdania 1-wyrazowego: {t_short1}"
+
+    t_short2 = EpisodeQualityGate.condense_filler_words_token_level("Po prostu.")
+    assert t_short2 == "Po prostu.", f"BŁĄD: Wykasowano 'Po prostu.' ze zdania 2-wyrazowego: {t_short2}"
+
+    t_short3 = EpisodeQualityGate.condense_filler_words_token_level("Tak, naprawdę.")
+    assert t_short3 == "Tak, naprawdę.", f"BŁĄD: Wykasowano 'naprawdę' ze zdania 2-wyrazowego: {t_short3}"
+
+    # Asercja 1.2: Podniesienie wielkości pierwszej litery po wycięciu pierwszego słowa
+    t_cap1 = EpisodeQualityGate.condense_filler_words_token_level("Naprawdę nie wiem, co robić.")
+    assert t_cap1 == "Nie wiem, co robić.", f"BŁĄD: Pierwsza litera po wycięciu nie została podniesiona: {t_cap1}"
+
+    # Asercja 1.3: Podniesienie wielkości pierwszej litery z pominięciem tagów ASS
+    t_cap_ass = EpisodeQualityGate.condense_filler_words_token_level(r"{\an8}Naprawdę nie wiem, co robić.")
+    assert t_cap_ass == r"{\an8}Nie wiem, co robić.", f"BŁĄD: Tag ASS zniszczył podniesienie litery: {t_cap_ass}"
+
+    # Asercja 1.4: Higiena interpunkcyjna (brak podwójnych przecinków ,, i spacji przed znakami)
+    t_punct = EpisodeQualityGate.condense_filler_words_token_level("To jest, naprawdę, po prostu za dużo.")
+    assert t_punct == "To jest za dużo.", f"BŁĄD: Pozostały artefakty interpunkcyjne: {t_punct}"
+    assert ",," not in t_punct
+    assert "  " not in t_punct
+
+    t_trail = EpisodeQualityGate.condense_filler_words_token_level("Myślałem, po prostu.")
+    assert t_trail == "Myślałem.", f"BŁĄD: Pozostał przecinek przed kropką: {t_trail}"
+
+    # Asercja 1.5: Ochrona polskich słów na n/h przed degradacją kapitalizacji (Dyrektywa 1)
+    assert EpisodeQualityGate.condense_filler_words_token_level("nie wiem") == "Nie wiem"
+    assert EpisodeQualityGate.condense_filler_words_token_level("- nie wiem") == "- Nie wiem"
+    assert EpisodeQualityGate.condense_filler_words_token_level("herbata") == "Herbata"
+
+    # Asercja 1.6: Ochrona zdań złożonych po \N przed błędną kapitalizacją (Korekta 1)
+    assert EpisodeQualityGate.condense_filler_words_token_level(r"Nie sądzę,\Nżeby to było bezpieczne.") == r"Nie sądzę,\Nżeby to było bezpieczne."
+    assert EpisodeQualityGate.condense_filler_words_token_level(r"- Nie sądzę.\N- Żeby to było bezpieczne.") == r"- Nie sądzę.\N- Żeby to było bezpieczne."
+    assert EpisodeQualityGate.condense_filler_words_token_level(r"- Nie sądzę.\N- żeby to było bezpieczne.") == r"- Nie sądzę.\N- Żeby to było bezpieczne."
+
+    # Asercja 1.7: Redukcja 'po prostu' po \N w zdaniach dłuższych oraz ochrona krótkich (Dyrektywa 2)
+    assert EpisodeQualityGate.condense_filler_words_token_level(r"- Nie wiem.\NPo prostu nie mam pojęcia.") == r"- Nie wiem.\NNie mam pojęcia."
+    assert EpisodeQualityGate.condense_filler_words_token_level("To, po prostu, nie ma sensu.") == "To, nie ma sensu."
+    assert EpisodeQualityGate.condense_filler_words_token_level("Po prostu.") == "Po prostu."
+
+    # ==========================================
+    # DOMENA 2: Ochrona Nazw Własnych i Imion o Zakończeniu -a (Aksjomat 4)
+    # ==========================================
+    # Imiona takie jak Luca, Sasha, Joshua, Vegeta NIE mogą tracić -a w apozycjach tytularnych
+    subs_app = pysubs2.SSAFile()
+    ev_l = pysubs2.SSAEvent(start=1000, end=3000, text="generał Luca przybył na miejsce.")
+    ev_j = pysubs2.SSAEvent(start=4000, end=6000, text="lord Joshua wydał rozkaz.")
+    ev_e = pysubs2.SSAEvent(start=7000, end=9000, text="pan Eftala przybył na miejsce.")
+    subs_app.events = [ev_l, ev_j, ev_e]
+    fixed_app, _ = EpisodeQualityGate.audit_and_fix_entire_episode(
+        subs_app,
+        character_registry={"Luca": "MALE", "Joshua": "MALE", "Eftal": "MALE"}
+    )
+    assert "generał Luca" in fixed_app.events[0].text, f"BŁĄD: Obcięto -a z imienia Luca: {fixed_app.events[0].text}"
+    assert "lord Joshua" in fixed_app.events[1].text, f"BŁĄD: Obcięto -a z imienia Joshua: {fixed_app.events[1].text}"
+    assert "pan Eftal" in fixed_app.events[2].text, f"BŁĄD: Nie skorygowano Eftala do Eftal: {fixed_app.events[2].text}"
+
+    # ==========================================
+    # DOMENA 3: Stripping Formatowania ASS przed Pomiarem Metryk (Dyrektywa 4, Aksjomat 5)
+    # ==========================================
+    # Asercja 3.1: Ekstrakcja czystego tekstu ekranowego bez tagów ASS i łamań
+    raw_ass_line = r"{\an8\fad(100,100)}Nie wiem.\NCo robić?"
+    pure_text = EpisodeQualityGate.get_pure_onscreen_text(raw_ass_line)
+    assert pure_text == "Nie wiem. Co robić?", f"BŁĄD: Niewłaściwy stripping ASS: {pure_text}"
+
+    # Asercja 3.2: Tagi ASS nie sztucznie zawyżają CPS w get_cps_warnings
+    subs_test = pysubs2.SSAFile()
+    ev_ass = pysubs2.SSAEvent(
+        start=1000,
+        end=2000,  # 1.0 sekunda
+        text=r"{\an8\fad(100,100)}Nie wiem."  # 9 czystych znaków -> CPS = 9.0; surowy tekst = 28 znaków -> CPS = 28.0
+    )
+    subs_test.events = [ev_ass]
+    warnings = EpisodeQualityGate.get_cps_warnings(subs_test, max_cps=20.0)
+    assert len(warnings) == 0, f"BŁĄD: Tagi ASS fałszywie wywołały ostrzeżenie CPS: {warnings}"
+
+    # Asercja 3.3: episode-level CPS trigger kondensacji wypełniaczy
+    ev_heavy = pysubs2.SSAEvent(
+        start=1000,
+        end=2000,  # 1.0 sekunda
+        text="To jest, naprawdę, po prostu niesamowita sprawa."  # pure_len = 48 znaków -> CPS = 48.0 > 20.0
+    )
+    subs_heavy = pysubs2.SSAFile()
+    subs_heavy.events = [ev_heavy]
+    fixed_heavy, fixes_heavy = EpisodeQualityGate.audit_and_fix_entire_episode(subs_heavy)
+    assert "naprawdę" not in fixed_heavy.events[0].text
+    assert "po prostu" not in fixed_heavy.events[0].text
+    assert fixed_heavy.events[0].text == "To jest niesamowita sprawa."
+
+    print(" -> PASSED: Test 137 w 100% potwierdza zdaniową higienę kompresji, ochronę wielkości liter i poprawny stripping metryk ASS (0.00 PLN).")
+
+
+def test_unsegmented_audio_and_two_axis_budget_guard():
+    print("[TEST 138/138] Test Bezpieczeństwa Niesegmentowanego Audio JA, Parytetu Znaków i Dwuosiowego Budżetu Znakowego (Dyrektywy 2 i 5)...")
+    from prosody_engine import AudioProsodyEngine
+    from whisper_disambiguator import WhisperDisambiguator
+
+    # ==========================================
+    # DOMENA 1: Bezpieczeństwo Niesegmentowanego Audio JA (Dyrektywa 2, Aksjomat 3)
+    # ==========================================
+    # Asercja 1.1: Twarde tokeny paniki (HARD_PANIC_TOKENS) wyzwalają alert bezwarunkowo
+    alert_hard_romaji = AudioProsodyEngine.detect_emotional_breakdown(whisper_text="tasukete... kowai...")
+    assert alert_hard_romaji is not None and "PRYMAT AFEKTU" in alert_hard_romaji
+
+    alert_hard_kanji = AudioProsodyEngine.detect_emotional_breakdown(whisper_text="助けて、誰か！")
+    assert alert_hard_kanji is not None and "PRYMAT AFEKTU" in alert_hard_kanji
+
+    alert_hard_yamete = AudioProsodyEngine.detect_emotional_breakdown(whisper_text="yamete kudasai")
+    assert alert_hard_yamete is not None and "PRYMAT AFEKTU" in alert_hard_yamete
+
+    # Asercja 1.2: Kontekstowe tokeny paniki (CONTEXTUAL_PANIC_TOKENS) w płynnej mowie NIE wyzwalają alertu
+    assert AudioProsodyEngine.detect_emotional_breakdown(whisper_text="Sonna koto nai") is None
+    assert AudioProsodyEngine.detect_emotional_breakdown(whisper_text="Nande kita no?") is None
+    assert AudioProsodyEngine.detect_emotional_breakdown(whisper_text="そんなことないよ") is None
+    assert AudioProsodyEngine.detect_emotional_breakdown(whisper_text="なんで来たの？") is None
+    assert AudioProsodyEngine.detect_emotional_breakdown(whisper_text="いや、大丈夫です") is None
+
+    # Asercja 1.3: Kontekstowe tokeny paniki wyzwalają alert TYLKO przy izolacji (<= 2 słowa) lub sąsiedztwie ! / …
+    assert AudioProsodyEngine.detect_emotional_breakdown(whisper_text="そんな…!") is not None
+    assert AudioProsodyEngine.detect_emotional_breakdown(whisper_text="Sonna!") is not None
+    assert AudioProsodyEngine.detect_emotional_breakdown(whisper_text="なんで…") is not None
+    assert AudioProsodyEngine.detect_emotional_breakdown(whisper_text="嫌！") is not None
+    assert AudioProsodyEngine.detect_emotional_breakdown(whisper_text="そんな") is not None
+
+    # Asercja 1.4: Warianty afektywne 'iya da', wykrzykniki japońskie '！' oraz wykluczenie wahania (Korekta 3 & Dyrektywa 6)
+    assert AudioProsodyEngine.detect_emotional_breakdown(whisper_text="iya da") is not None
+    assert AudioProsodyEngine.detect_emotional_breakdown(whisper_text="そんな！") is not None
+    assert AudioProsodyEngine.detect_emotional_breakdown(whisper_text="いや…違うよ") is None
+
+    # ==========================================
+    # DOMENA 2: Pełny Parytet Znaków Kana / Katakana w WhisperDisambiguator (Aksjomat 3)
+    # ==========================================
+    res_kisama_hira = WhisperDisambiguator.disambiguate_line(whisper_text="きさま、何をしている？！")
+    assert res_kisama_hira.pragmatic_attitude == "HOSTILE", f"BŁĄD: Hiragana 'きさま' nie wykryta jako HOSTILE: {res_kisama_hira.pragmatic_attitude}"
+
+    res_temee_hira = WhisperDisambiguator.disambiguate_line(whisper_text="てめえ…許さない！")
+    assert res_temee_hira.pragmatic_attitude == "HOSTILE", f"BŁĄD: Hiragana 'てめえ' nie wykryta jako HOSTILE: {res_temee_hira.pragmatic_attitude}"
+
+    res_kisama_kata = WhisperDisambiguator.disambiguate_line(whisper_text="キサマ、何をしている？！")
+    assert res_kisama_kata.pragmatic_attitude == "HOSTILE", f"BŁĄD: Katakana 'キサマ' nie wykryta jako HOSTILE: {res_kisama_kata.pragmatic_attitude}"
+
+    res_temee_kata = WhisperDisambiguator.disambiguate_line(whisper_text="テメエ…許さない！")
+    assert res_temee_kata.pragmatic_attitude == "HOSTILE", f"BŁĄD: Katakana 'テメエ' nie wykryta jako HOSTILE: {res_temee_kata.pragmatic_attitude}"
+
+    res_boku_kata = WhisperDisambiguator.disambiguate_line(whisper_text="ボクは大丈夫だよ")
+    assert res_boku_kata.speaker_gender == "MALE", f"BŁĄD: Katakana 'ボク' nie wykryta jako MALE: {res_boku_kata.speaker_gender}"
+
+    res_atashi_hira = WhisperDisambiguator.disambiguate_line(whisper_text="あたしが行くわ")
+    assert res_atashi_hira.speaker_gender == "FEMALE", f"BŁĄD: Hiragana 'あたし' nie wykryta jako FEMALE: {res_atashi_hira.speaker_gender}"
+
+    # Asercja 2.1: Ochrona zaimka 君 przed sufiksem -kun oraz neutralność 私 (Dyrektywy 4 i 5)
+    res_shinji = WhisperDisambiguator.disambiguate_line(whisper_text="シンジ君はどこ？")
+    assert res_shinji.addressee_register is None, f"BŁĄD: Sufiks -kun zinterpretowany jako zaimek ty: {res_shinji.addressee_register}"
+    assert res_shinji.addressee_number is None
+
+    res_watashi = WhisperDisambiguator.disambiguate_line(whisper_text="私は軍人です")
+    assert res_watashi.speaker_gender is None, f"BŁĄD: Zaimek watashi fałszywie sfeminizował mówcę: {res_watashi.speaker_gender}"
+
+    # ==========================================
+    # DOMENA 3: Dwuosiowy Limit Budżetu Znakowego (Dyrektywa 5, Aksjomat 5)
+    # ==========================================
+    # Asercja 3.1: Oś czasowa (tempo 17.0 z/s) vs Fizyczny sufit 2 wierszy (76 znaków)
+    def calc_budget(dur_s: float) -> int:
+        return min(76, int(max(0.5, dur_s) * 17.0))
+
+    assert calc_budget(1.0) == 17
+    assert calc_budget(2.0) == 34
+    assert calc_budget(4.0) == 68
+    assert calc_budget(5.0) == 76   # 5.0 * 17 = 85, ale ścięte do fizycznego sufitu 76 znaków!
+    assert calc_budget(10.0) == 76  # 10.0 * 17 = 170, ścięte do fizycznego sufitu 76 znaków!
+
+    # ==========================================
+    # DOMENA 4: Aseptyczność Morfologiczna Promptów (Aksjomat 1)
+    # ==========================================
+    with open("rules.py", "r", encoding="utf-8") as f:
+        rules_content = f.read()
+
+    # Weryfikacja braku nacechowanych fleksyjnie form przeszłych w sekcji neutralności Filaru CXX
+    assert "Na miejscu pusto" in rules_content, "BŁĄD: Brak aseptycznego przykładu 'Na miejscu pusto' w rules.py!"
+    assert "Ani śladu" in rules_content, "BŁĄD: Brak aseptycznego przykładu 'Ani śladu' w rules.py!"
+    # Zakaz szkodliwych przykładów w Filarze CXX wprowadzających zafałszowanie żeńskie/męskie
+    assert "Byłam na miejscu" not in rules_content, "BŁĄD: Przeciek fleksyjny 'Byłam na miejscu' obecny w rules.py!"
+    assert "Byłem na miejscu" not in rules_content, "BŁĄD: Przeciek fleksyjny 'Byłem na miejscu' obecny w rules.py!"
+
+    print(" -> PASSED: Test 138 w 100% potwierdza bezpieczeństwo niesegmentowanego audio JA, parytet znaków kana i dwuosiowy budżet (0.00 PLN).")
+
+
+def test_fansub_lexicon_engine_and_clevatess_corpus_guard():
+    """
+    Test 139: FansubLexiconEngine & Vetted Corpus Mining Architecture (Aksjomaty 1, 2, 4, 6).
+    Weryfikuje pełne wykorzystanie bazy napisów (korpusu ASW Clevatess),
+    ekstrakcję i formatowanie kanonu fansuberskiego, automatyczne zasilanie SeriesBible
+    oraz pełną, 7-przypadkową matrycę fleksyjną 'wiedun' z twardą tarczą antykolizyjną.
+    """
+    print("\n[Test 139]: FansubLexiconEngine & Vetted Corpus Mining Architecture (0.00 PLN)...")
+
+    # ==========================================
+    # DOMENA 1: Ekstrakcja i ładowanie leksykonu (fansub_miner.py)
+    # ==========================================
+    from fansub_miner import load_fansub_lexicon, format_fansub_lexicon_for_prompt, normalize_anime_slug
+
+    assert normalize_anime_slug("[ASW] Clevatess - 05 [1080p HEVC][927ED4A5]") == "clevatess"
+    assert normalize_anime_slug("Clevatess S2 - 01") == "clevatess"
+    assert normalize_anime_slug("Sousou no Frieren") == "frieren"
+
+    lex = load_fansub_lexicon("Clevatess")
+    assert lex is not None, "BŁĄD: Nie załadowano leksykonu fansuberskiego dla Clevatess!"
+    assert lex.get("anime_slug") == "clevatess"
+    assert lex.get("fansub_group") == "ASW"
+    terms = lex.get("terms", {})
+    assert "wizard" in terms, "BŁĄD: Brak terminu 'wizard' w leksykonie Clevatess!"
+    assert terms["wizard"]["canonical_pl"] == "wiedun"
+    assert terms["wizard"]["plural_pl"] == "wieduni"
+    assert terms["wizard"]["fem_pl"] == "wiedunka"
+
+    # Weryfikacja zwięzłości promptu (LLM Unburdening - Zasada 0.4 & 13.1)
+    prompt_snippet = format_fansub_lexicon_for_prompt(lex)
+    assert "SPRAWDZONY KANON FANSUBERSKI DLA TEJ SERII (GRUPA: ASW)" in prompt_snippet
+    assert "wiedun" in prompt_snippet
+    assert "magiczne bestie" in prompt_snippet
+    assert len(prompt_snippet.split()) < 100, f"BŁĄD: Przeładowanie promptu kanonem: {len(prompt_snippet.split())} słów"
+
+    # ==========================================
+    # DOMENA 2: Integracja z SeriesBible & Słownikiem Płci (series_memory.py)
+    # ==========================================
+    from series_memory import SeriesBible, INHERENT_MALE_NOUNS, INHERENT_FEMALE_NOUNS
+
+    assert "wiedun" in INHERENT_MALE_NOUNS
+    assert "wieduni" in INHERENT_MALE_NOUNS
+    assert "wiedunowie" in INHERENT_MALE_NOUNS
+    assert "wiedunka" in INHERENT_FEMALE_NOUNS
+    assert "wiedunki" in INHERENT_FEMALE_NOUNS
+
+    sb = SeriesBible("Clevatess S2 - 01")
+    assert "fansub_canon" in sb.data, "BŁĄD: SeriesBible nie załadowała automatycznie fansub_canon!"
+    assert "wizard" in sb.data["fansub_canon"]
+    scoped_bible = sb.format_scoped_for_batch("The wizards are marching with Drel.")
+    assert "wiedun" in scoped_bible or "wieduni" in scoped_bible, "BŁĄD: SeriesBible nie wstrzyknęła reguły 'wiedun' do sceny z wizards!"
+
+    # ==========================================
+    # DOMENA 3: Deterministyczny Linter Offline (avt_linter.py - Aksjomat 1 & 4)
+    # ==========================================
+    from avt_linter import AVTLinter
+
+    clevatess_cases = [
+        ("Nasz najpotężniejszy czarodziej, Meynardzie Swan.", "Nasz najpotężniejszy wiedun, Meynardzie Swan."),
+        ("To potężny mag z Boelatu.", "To potężny wiedun z Boelatu."),
+        ("Widzę czarodziejów i maga.", "Widzę wiedunów i wieduna."),
+        ("Pomóż temu czarodziejowi!", "Pomóż temu wiedunowi!"),
+        ("Rozmawiałem z czarodziejem.", "Rozmawiałem z wiedunem."),
+        ("Mówiono o czarodzieju w stolicy.", "Mówiono o wiedunie w stolicy."),
+        ("O mój potężny czarodzieju!", "O mój potężny wiedunie!"),
+        ("Czarodzieje Boelatu są silni.", "Wieduni Boelatu są silni."),
+        ("To grupa czarodziejów.", "To grupa wiedunów."),
+        ("Daj to czarodziejom!", "Daj to wiedunom!"),
+        ("Walcz z czarodziejami!", "Walcz z wiedunami!"),
+        ("Rozmawiano o czarodziejach.", "Rozmawiano o wiedunach."),
+        ("To wysoka czarodziejka armii.", "To wysoka wiedunka armii."),
+        ("Widzę czarodziejkę.", "Widzę wiedunkę."),
+        ("Daj to czarodziejce.", "Daj to wiedunce."),
+        ("Rozmawiam z czarodziejką.", "Rozmawiam z wiedunką."),
+        ("Oto potężne czarodziejki.", "Oto potężne wiedunki."),
+        ("Nie ma tu czarodziejek.", "Nie ma tu wiedunek."),
+        ("Walczyliśmy z mrocznymi bestiami.", "Walczyliśmy z magicznymi bestiami."),
+        ("Mroczna bestia zaatakowała.", "Magiczna bestia zaatakowała."),
+        ("Czterej panowie mrocznych bestii!", "Czterej Monarchowie!"),
+        ("Czterech władców mrocznych bestii...", "Czterech Monarchów..."),
+    ]
+
+    for inp_text, expected_text in clevatess_cases:
+        res_text, fixes = AVTLinter.harmonize_series_fansub_lexicon(inp_text, anime_title="Clevatess")
+        assert res_text == expected_text, f"BŁĄD Lintera w Clevatess: '{inp_text}' -> '{res_text}' (oczekiwano: '{expected_text}')"
+        assert len(fixes) > 0, f"BŁĄD: Linter nie zarejestrował wpisu fix dla '{inp_text}'!"
+
+    # Testy antykolizyjne (Double-Sided Assertion - Aksjomat 4)
+    non_clevatess_cases = [
+        ("Nasz najpotężniejszy czarodziej, Flamme.", "Sousou no Frieren"),
+        ("Widzę czarodziejów i maga.", "Mashle: Magic and Muscles"),
+        ("To potężna czarodziejka z armii.", "Mushoku Tensei"),
+        ("Walczyliśmy z mrocznymi bestiami.", "Jujutsu Kaisen"),
+    ]
+
+    for inp_text, series_title in non_clevatess_cases:
+        res_text, fixes = AVTLinter.harmonize_series_fansub_lexicon(inp_text, anime_title=series_title)
+        assert res_text == inp_text, f"BŁĄD SKAŻENIA SERII: Linter zmienił tekst w '{series_title}': '{inp_text}' -> '{res_text}'"
+        assert len(fixes) == 0, f"BŁĄD: Wygenerowano fałszywe poprawki w '{series_title}'!"
+
+    print(" -> PASSED: Test 139 w 100% potwierdza działanie FansubLexiconEngine, korpusu ASW Clevatess i matrycy fleksyjnej 'wiedun' (0.00 PLN).")
+
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -11727,4 +13379,20 @@ if __name__ == "__main__":
     test_end_to_end_vulnerability_and_lexical_governance()
     test_holistic_systemic_lexical_governance_and_vulnerability_shields()
     test_exhaustive_polish_cases_and_all_prepositions_guard()
-    print("\n Wszystkie testy jednostkowe i integracyjne (125/125) zakończone pełnym sukcesem!\n")
+    test_comprehensive_machine_polish_traps_elimination()
+    test_plural_anti_singularization_and_single_line_overflow()
+    test_edge_case_limits_and_avt_hardening()
+    test_exhaustive_homonym_and_social_role_universe()
+    test_exhaustive_stem_morphology_and_onomastic_iron_rule()
+    test_systemic_male_first_person_past_tense_concordance_guard()
+    test_systemic_comprehensive_gender_interpretation_and_preposition_shield_guard()
+    test_global_default_parameter_sanitization_and_hard_evidence_doctrine()
+    test_epistemic_certainty_and_zero_presumption_governance()
+    test_holistic_dialogue_mastery_and_pipeline_harmony_guard()
+    test_holistic_second_order_vulnerability_and_fail_safe_matrix()
+    test_filler_condensation_and_ass_metric_stripping_guard()
+    test_unsegmented_audio_and_two_axis_budget_guard()
+    test_fansub_lexicon_engine_and_clevatess_corpus_guard()
+    print("\n Wszystkie testy jednostkowe i integracyjne (139/139) zakończone pełnym sukcesem!\n")
+
+

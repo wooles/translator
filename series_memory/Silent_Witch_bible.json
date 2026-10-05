@@ -2,7 +2,8 @@
   "anime_title": "Silent Witch",
   "characters": {
     "Ike": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE"
     },
     "Monica": {
       "description": "KOBIETA (wyodrębniono z relacji serii)"
@@ -14,7 +15,8 @@
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
     },
     "Cyril": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE"
     },
     "Ryn": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
@@ -204,5 +206,6 @@
     "tmpxfweggtg",
     "[ASW] Silent Witch - Chinmoku no Majo no Kakushigoto - 13 [1080p HEVC][DEA919F9]"
   ],
-  "batch_stats": {}
+  "batch_stats": {},
+  "fansub_canon": {}
 }

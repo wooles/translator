@@ -6,6 +6,7 @@ allowing the model to distinguish whisper, shout, trembling voice, and rapid mon
 """
 
 import os
+import re
 import wave
 import math
 from typing import Dict, List, Tuple, Any, Optional
@@ -221,6 +222,20 @@ class AudioProsodyEngine:
         else:
             return int(duration_s * 5.5)
 
+    # Multi-Script Affective Tokens (Aksjomat 3 & Dyrektywa 2)
+    HARD_PANIC_TOKENS = {
+        "tasukete", "助けて", "たすけて", "タスケテ",
+        "yamete", "やめて", "ヤメテ",
+        "kowai", "怖い", "こわい", "コワイ",
+        "h-hi", "ひっ", "u...", "うっ"
+    }
+
+    CONTEXTUAL_PANIC_TOKENS = {
+        "sonna", "そんな", "ソンナ",
+        "nande", "なんで", "何で", "ナンデ",
+        "iya", "いや", "嫌", "イヤ"
+    }
+
     @classmethod
     def detect_emotional_breakdown(
         cls,
@@ -231,19 +246,60 @@ class AudioProsodyEngine:
         """
         Detects affective breakdowns (crying, sobbing, terror, panic) from phonic cues and Whisper markers.
         Establishes Dynamic Affective Primacy over static character personas from Series Bible.
+        Distinguishes HARD_PANIC from CONTEXTUAL_PANIC to prevent false alarms on continuous speech (Dyrektywa 2).
         """
         prosody_lower = (prosody_tag or "").lower()
         whisper_lower = (whisper_text or "").lower()
 
         has_fonic_tremble = "płacz" in prosody_lower or "drżenie głosu" in prosody_lower or (energy_std is not None and energy_std > 0.90)
-        has_whisper_panic = any(k in whisper_lower for k in [
-            "sonna", "そんな", "tasukete", "助けて", "iya", "嫌", "h-hi", "ひっ", "kowai", "怖い", "u...", "うっ", "nande", "何で"
-        ]) or any(whisper_lower.startswith(w) for w in ["h-", "k-", "s-", "n-", "d-", "m-"])
 
-        if has_fonic_tremble or (has_whisper_panic and ("krzyk" in prosody_lower or "szept" in prosody_lower or has_fonic_tremble or len(whisper_lower.split()) <= 4)):
+        # 1. HARD_PANIC_TOKENS: semantically unambiguous panic triggers
+        has_hard_panic = any(k in whisper_lower for k in cls.HARD_PANIC_TOKENS) or any(
+            whisper_lower.startswith(w) for w in ["h-hi", "h-h-", "u-wa", "a-a-", "k-kya"]
+        )
+
+        # 2. CONTEXTUAL_PANIC_TOKENS: ambiguous words (sonna, nande, iya, dame)
+        # Qualified as panic ONLY if:
+        # a) Standalone micro-utterance: len <= 2 words for spaced, or token constitutes entire utterance (len <= len(w)+1) for unspaced Japanese
+        # b) Directly neighbors emotional punctuation (! or … or ?!)
+        has_contextual_panic = False
+        clean_txt = whisper_lower.strip(" .!?…~-‥！")
+        words = whisper_lower.split()
+        is_spaced = len(words) > 1
+
+        for w in cls.CONTEXTUAL_PANIC_TOKENS:
+            if w in whisper_lower:
+                if w in {"iya", "いや", "嫌", "イヤ"}:
+                    # Korekta 3 & Dyrektywa 6: obsługa wariantu ze spacją 'iya da' oraz japońskich wykrzykników
+                    has_emphatic = bool(re.search(r"(?:嫌だ|イヤだ|iyada|iya\s+da|いやだ)", whisper_lower))
+                    has_exclamation = bool(
+                        re.search(rf"{re.escape(w)}\s*[!！]+", whisper_lower) or
+                        re.search(rf"[!！]+\s*{re.escape(w)}", whisper_lower)
+                    )
+                    if has_emphatic or has_exclamation:
+                        has_contextual_panic = True
+                        break
+                    continue
+
+                if is_spaced:
+                    is_short_utterance = len(words) <= 2 and len(clean_txt) <= len(w) + 3
+                else:
+                    is_short_utterance = len(clean_txt) <= len(w) + 1
+
+                # Korekta 3: obsługa pełnoszerokościowego '！' oraz japońskiego dwukropka poziomego '‥'
+                has_excl_or_ellipsis = bool(
+                    re.search(rf"{re.escape(w)}\s*([!！…‥]+|\.{{2,}})", whisper_lower) or
+                    re.search(rf"([!！…‥]+|\.{{2,}})\s*{re.escape(w)}", whisper_lower)
+                )
+                if is_short_utterance or has_excl_or_ellipsis:
+                    has_contextual_panic = True
+                    break
+
+        if has_fonic_tremble or has_hard_panic or has_contextual_panic:
             return (
                 "[🚨 PRYMAT AFEKTU / ZAŁAMANIE EMOCJONALNE: Fizjologia głosu seiyū i markery audio wskazują na panikę/płacz! "
                 "UCHYLA SIĘ statyczny profil chłodu z Series Bible! Wymóg: histeryczna składnia, urwane słowa, pełna ekspresja rozpaczy]"
             )
         return None
+
 

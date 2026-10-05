@@ -2,13 +2,15 @@
   "anime_title": "Kami no Shizuku",
   "characters": {
     "Shizuku Kanzaki": {
-      "description": "mężczyzna (ok. 26 lat, syn mistrza Yutaki Kanzakiego, początkowo pracownik działu piwa, utalentowany sommelier intuicyjny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]"
+      "description": "mężczyzna (ok. 26 lat, syn mistrza Yutaki Kanzakiego, początkowo pracownik działu piwa, utalentowany sommelier intuicyjny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+      "gender": "MALE"
     },
     "Miyabi Shinohara": {
       "description": "kobieta (ok. 24 lata, sommelierka, wierna asystentka i towarzyszka Shizuku) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Issei Tomine": {
-      "description": "mężczyzna (ok. 28 lat, genialny sommelier o międzynarodowej renomie, adoptowany rywal Shizuku) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "mężczyzna (ok. 28 lat, genialny sommelier o międzynarodowej renomie, adoptowany rywal Shizuku) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+      "gender": "MALE"
     },
     "Loulan": {
       "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
@@ -17,7 +19,8 @@
       "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Robert Doi": {
-      "description": "mężczyzna (Starszy mężczyzna, przyjaciel Yutaki Kanzakiego, wyznaczony arbiter pojedynku o Apostołów) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "mężczyzna (Starszy mężczyzna, przyjaciel Yutaki Kanzakiego, wyznaczony arbiter pojedynku o Apostołów) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+      "gender": "MALE"
     },
     "Shizuku Kanzaki / Issei Tomine": {
       "description": "postać (Postać)"
@@ -30,7 +33,8 @@
     },
     "Shizuku": {
       "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
-      "source": "quality_gate"
+      "source": "quality_gate",
+      "gender": "MALE"
     },
     "Tomine": {
       "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
@@ -40,7 +44,8 @@
       "description": "postać (Postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Hayama": {
-      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+      "gender": "MALE"
     },
     "Miyabi": {
       "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
@@ -137,7 +142,8 @@
       "description": "Zwrot: 'Shizuku' (arbiter / mentor -> zawodnik) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]"
     },
     "Robert": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE"
     },
     "Robert -> Tomine": {
       "description": "Zwrot: 'Issei' (arbiter / mentor -> zawodnik) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]"
@@ -718,5 +724,6 @@
       "avg_batch_size": 20.5,
       "cost_pln": 3.06
     }
-  }
+  },
+  "fansub_canon": {}
 }

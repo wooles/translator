@@ -5,7 +5,8 @@
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
     },
     "Shu Keigetsu": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE"
     },
     "Shin-U": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
@@ -305,5 +306,6 @@
     "tmp1udq4xn_",
     "tmp1ne63jmr"
   ],
-  "batch_stats": {}
+  "batch_stats": {},
+  "fansub_canon": {}
 }

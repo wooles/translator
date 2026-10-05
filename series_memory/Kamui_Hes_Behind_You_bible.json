@@ -5,7 +5,8 @@
       "description": "KOBIETA (wyodrębniono z relacji serii)"
     },
     "Kamui": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE"
     },
     "Hanako ze Shimosunagawy": {
       "description": "KOBIETA (wyodrębniono z relacji serii)"
@@ -95,5 +96,6 @@
   "episodes_translated": [
     "tmphi7hjotb"
   ],
-  "batch_stats": {}
+  "batch_stats": {},
+  "fansub_canon": {}
 }

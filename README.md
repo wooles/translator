@@ -4,7 +4,7 @@
 [![Google GenAI SDK](https://img.shields.io/badge/LLM%20Orchestration-Gemini%202.5%20Flash%20%7C%202.5%20Pro-orange.svg)](https://ai.google.dev/)
 [![Acoustic Ingestion](https://img.shields.io/badge/Acoustic%20ASR-Kotoba--Whisper%20v2.0%20CTranslate2-green.svg)](https://huggingface.co/kotoba-tech/kotoba-whisper-v2.0-faster)
 [![Architecture](https://img.shields.io/badge/Architecture-5--Layer%20Root%20Cause%20Pipeline-purple.svg)]()
-[![CI/Test Suite](https://img.shields.io/badge/Test%20Harness-125%2F125%20Passing-brightgreen.svg)]()
+[![CI/Test Suite](https://img.shields.io/badge/Test%20Harness-130%2F130%20Passing-brightgreen.svg)]()
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 An asynchronous, multimodal audiovisual translation and localization engine engineered in Python. It executes high-fidelity semantic translation from Japanese audio streams, video keyframes, and intermediate dialogue representations into target Polish dialogue scripts, strictly adhering to cinematographic subtitling standards (Belczyk AVT Matrix, Skopos Theory, Polysystem Theory, and Netflix AVT Timed Text Guidelines).
@@ -394,7 +394,7 @@ python main.py "media.mkv" --play
 
 ## 🧪 Verification Test Harness
 
-The engine is guarded by an automated regression and integration test suite executing **125 modular verification routines**:
+The engine is guarded by an automated regression and integration test suite executing **130 modular verification routines**:
 ```powershell
 python test_system.py
 ```
@@ -423,6 +423,10 @@ python test_system.py
 * Full Scene Topology Matrix (Soliloquy N=1, Dyad N=2, Polylogue N>=3), Dualis, Non-Virile Pluralis & Montage Cut Isolation ($\Delta t \ge 3800$ ms) (Test 122).
 * Holistic Lexical Governance & 1000+ Entry Lexical Vulnerability Shields (Test 124).
 * Full Implementation of Żelazna Zasada 15: All 7 Polish Cases for 180+ Head Nouns, All-Preposition Toponymic & Institutional Governance, Exhaustive Dyadic Prepositional Pronouns, and 30 Symmetrical Predicate Noun Pairs in Narzędnik (Test 125).
+* Plural Anti-Singularization Pronoun Shield, Predicate Noun Concordance (40 Plural Instrumental/Nominative Pairs) & Deterministic Single-Line AVT Overflow Splitter (Test 127).
+* Temporal Collision Screen Elevation ({\an8}), Proper Noun Homonym Disambiguation Shield, Cold-Start Social Role Heuristic Expansion (50 Pairs) & Dual-Speaker Dialogue Dash Symmetry (Test 128).
+* Exhaustive Proper Noun Homonym Disambiguation Shield (400+ Polish Common Nouns across 9 Domains) & Complete Social Role Gender Universe (165 Pairs across 7 Categories with Substring Anti-Collision Invariance) (Test 129).
+* Full Implementation of Żelazna Zasada 16: Exhaustive 6-Class Stem Morphology (Vocalic, Consonant, Mobile-E), Separation of Feminine Adjective-Nouns in -owa from Masculine Dative -owi / Virile Plural -owie, Complete Hypocoristics/Diminutives (-uś, -enka, -ek), and Expanded 750+ Onomastic Homonym Universe (Test 130).
 * Tokenomics financial calculations across all quality tiers.
 * Translation Memory SQLite FTS5 BM25 temporal matching ($\Delta t \le 300\text{ms}$).
 

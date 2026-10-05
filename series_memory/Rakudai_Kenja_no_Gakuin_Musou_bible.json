@@ -5,7 +5,8 @@
       "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Eftal": {
-      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+      "gender": "MALE"
     },
     "Merlin": {
       "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
@@ -248,5 +249,6 @@
     "[ASW] Rakudai Kenja no Gakuin Musou - 10 [1080p HEVC][EB8519C9]",
     "[ASW] Rakudai Kenja no Gakuin Musou - 11 [1080p HEVC][8821CA16]"
   ],
-  "batch_stats": {}
+  "batch_stats": {},
+  "fansub_canon": {}
 }

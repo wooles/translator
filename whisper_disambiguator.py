@@ -27,6 +27,7 @@ class DisambiguationTag:
     addressee_age_class: Optional[str] = None  # "CHILD" | "ADULT" | "ELDERLY"
     addressee_number: Optional[str] = None     # "SINGULAR" | "DUAL" | "PLURAL"
     social_register: Optional[str] = None      # "INFORMAL_TY" | "FORMAL_PAN"
+    pragmatic_attitude: Optional[str] = None   # "HOSTILE" | None (Kisama / Temee)
     polar_response: Optional[str] = None       # "NEGATIVE_CONFIRM" (Hai/Un po pytaniu negatywnym -> 'Nie')
     kinship_role: Optional[str] = None         # "STARSZY_BRAT" | "MLODSZY_BRAT" | "STARSZA_SIOSTRA" | "MLODSZA_SIOSTRA" | "SZEF"
     benefactive: Optional[str] = None          # "FOR_ME" | "FOR_THEM"
@@ -74,10 +75,19 @@ class DisambiguationTag:
     def addressee_is_group(self) -> bool:
         return self.addressee_number in ("PLURAL", "DUAL")
 
+    @property
+    def addressee_register(self) -> Optional[str]:
+        return self.social_register
+
+    @addressee_register.setter
+    def addressee_register(self, value: Optional[str]):
+        self.social_register = value
+
     def is_empty(self) -> bool:
         return not any([
             self.speaker_gender, self.addressee_gender, self.addressee_number,
-            self.social_register, self.polar_response, self.kinship_role,
+            self.social_register, getattr(self, "pragmatic_attitude", None),
+            self.polar_response, self.kinship_role,
             self.benefactive, self.spatial_deictic, self.is_shock_drop
         ])
 
@@ -88,13 +98,29 @@ class WhisperDisambiguator:
     Mapuje wykładniki języka japońskiego na jednoznaczne dyskryminatory fleksyjno-semantyczne.
     """
 
+    # --- Kanji Pronoun Anchors chroniące przed sufiksem -kun i złożeniami jukugo (Dyrektywy 4 i 5) ---
+    KANJI_PRONOUN_PATTERNS = {
+        "私": r"私(?=[はがのもにをと、,\s]|$)",
+        "君": r"(?<![\u4e00-\u9fff\u3040-\u30ff])君(?=[はがのもにをと、,\s]|$)",
+        "手前": r"手前(?=[はがも！!…\s、,]|$)"
+    }
+
+    @classmethod
+    def _match_jp_token(cls, m: str, text: str) -> bool:
+        if m in cls.KANJI_PRONOUN_PATTERNS:
+            return bool(re.search(cls.KANJI_PRONOUN_PATTERNS[m], text))
+        if any('\u3040' <= c <= '\u309f' or '\u30a0' <= c <= '\u30ff' or '\u4e00' <= c <= '\u9fff' for c in m):
+            return m in text
+        return bool(re.search(rf"\b{re.escape(m)}\b", text))
+
     # --- K1: Zaimki 2. osoby (Adresat) ---
+    HOSTILE_2ND_PERSON = ["temee", "手前", "てめえ", "テメエ", "kisama", "貴様", "きさま", "キサマ"]
     MASC_INFORMAL_2ND_PERSON = [
-        "omae", "お前", "temee", "手前", "kisama", "貴様", "anta", "あんた"
+        "omae", "お前", "おまえ", "オマエ", "temee", "手前", "てめえ", "テメエ", "kisama", "貴様", "きさま", "キサマ", "anta", "あんた", "アンタ"
     ]
-    EQUAL_JUNIOR_2ND_PERSON = ["kimi", "君"]
-    FEMALE_HONORIFIC_VOCATIVES = ["-chan", "chan", "ちゃん"]
-    MALE_HONORIFIC_VOCATIVES = ["-kun", "kun", "君"]
+    EQUAL_JUNIOR_2ND_PERSON = ["kimi", "君", "きみ", "キミ"]
+    FEMALE_HONORIFIC_VOCATIVES = ["-chan", "chan", "ちゃん", "チャン"]
+    MALE_HONORIFIC_VOCATIVES = ["-kun", "kun", "君", "くん", "クン"]
 
     # --- K2: Liczba mnoga i podwójna adresata (Plural & Dual markers) ---
     DUAL_MARKERS = [
@@ -130,11 +156,11 @@ class WhisperDisambiguator:
         "schoolgirl"
     ]
     MALE_1ST_PERSON = [
-        "ore", "俺", "boku", "僕", "oira", "おいら", "washi", "わし",
+        "ore", "俺", "おれ", "オレ", "boku", "僕", "ぼく", "ボク", "oira", "おいら", "オイラ", "washi", "わし",
         "sessha", "拙者", "ware", "我", "wagahai", "吾輩", "jibun", "自分"
     ]
     FEMALE_1ST_PERSON = [
-        "atashi", "あたし", "atai", "あtai", "atakushi",
+        "atashi", "あたし", "アタシ", "atai", "あtai", "アタイ", "atakushi",
         "warawa", "妾", "uchi", "うち"
     ]
     FEMALE_SENTENCE_PARTICLES = [
@@ -220,8 +246,8 @@ class WhisperDisambiguator:
         # K3: Płeć autoreferencyjna mówcy 1. osoby (I / me / my)
         # K3: Płeć autoreferencyjna mówcy 1. osoby ('I / me / my')
         # -------------------------------------------------------------
-        has_male_1st = any(re.search(rf"\b{re.escape(m)}\b", jp_lower) for m in cls.MALE_1ST_PERSON)
-        has_female_1st = any(re.search(rf"\b{re.escape(m)}\b", jp_lower) for m in cls.FEMALE_1ST_PERSON)
+        has_male_1st = any(cls._match_jp_token(m, jp_lower) for m in cls.MALE_1ST_PERSON)
+        has_female_1st = any(cls._match_jp_token(m, jp_lower) for m in cls.FEMALE_1ST_PERSON)
         has_female_particles = any(m in jp_lower for m in cls.FEMALE_SENTENCE_PARTICLES)
         has_male_particles = any(m in jp_lower for m in cls.MALE_SENTENCE_PARTICLES)
 
@@ -299,6 +325,15 @@ class WhisperDisambiguator:
             r"\b(?:to all of you|for all of you)\b",
             en_lower
         ))
+
+        # Adresatywne znaczniki tytularne i wiekowe
+        has_chan = any(m in jp_lower for m in cls.FEMALE_HONORIFIC_VOCATIVES)
+        has_kun = any(m in jp_lower for m in cls.MALE_HONORIFIC_VOCATIVES)
+        has_boy_addr_jp = any(re.search(rf"\b{re.escape(m)}\b", jp_lower) or m in jp_lower for m in ["bocchan", "坊ちゃん", "bozu", "坊主", "kozo", "小僧", "shounen", "少年", "otouto", "弟"])
+        has_boy_addr_en = any(re.search(rf"\b{re.escape(m)}\b", en_lower) for m in ["boy", "lad", "kiddo", "son", "young master"])
+        has_girl_addr_jp = any(re.search(rf"\b{re.escape(m)}\b", jp_lower) or m in jp_lower for m in cls.YOUNG_GIRL_JP_MARKERS)
+        has_girl_addr_en = any(re.search(rf"\b{re.escape(m)}\b", en_lower) for m in cls.YOUNG_GIRL_EN_MARKERS)
+
         if has_dual_jp or has_dual_en:
             tag.addressee_number = "DUAL"
             tag.detected_markers.append("K2:Adresat_DUAL")
@@ -306,19 +341,18 @@ class WhisperDisambiguator:
             tag.addressee_number = "PLURAL"
             tag.detected_markers.append("K2:Adresat_LM")
         else:
-            # Prymat relacji diadycznej (Singular Dyadic Primacy)
-            tag.addressee_number = "SINGULAR"
+            # Doktryna Twardych Dowodów (Epistemic Proof Chain):
+            # Liczbę pojedynczą adresata przypisujemy wyłącznie przy twardym dowodzie obecności zaimka 2. os.,
+            # wołacza lub tytulatury adresatywnej. W przeciwnym razie liczba adresata pozostaje None (Zero-Evidence Invariance Gate).
+            has_2nd_person = any(cls._match_jp_token(m, jp_lower) for m in cls.MASC_INFORMAL_2ND_PERSON + cls.EQUAL_JUNIOR_2ND_PERSON + ["anata", "あなた"]) or bool(re.search(r"\b(?:you|your|yours|yourself)\b", en_lower))
+            if has_2nd_person or has_boy_addr_jp or has_boy_addr_en or has_girl_addr_jp or has_girl_addr_en:
+                tag.addressee_number = "SINGULAR"
+            else:
+                tag.addressee_number = None
 
         # -------------------------------------------------------------
-        # K1: Płeć i rejestr adresata 2. osoby ('you')
+        # K1: Płeć i wiek adresata 2. osoby ('you') - Twarde Dowody Onomastyczne i Tytularne
         # -------------------------------------------------------------
-        has_masc_2nd = any(re.search(rf"\b{re.escape(m)}\b", jp_lower) for m in cls.MASC_INFORMAL_2ND_PERSON)
-        has_chan = any(m in jp_lower for m in cls.FEMALE_HONORIFIC_VOCATIVES)
-        has_kun = any(m in jp_lower for m in cls.MALE_HONORIFIC_VOCATIVES)
-        has_boy_addr_jp = any(re.search(rf"\b{re.escape(m)}\b", jp_lower) or m in jp_lower for m in ["bocchan", "坊ちゃん", "bozu", "坊主", "kozo", "小僧", "shounen", "少年", "otouto", "弟"])
-        has_boy_addr_en = any(re.search(rf"\b{re.escape(m)}\b", en_lower) for m in ["boy", "lad", "kiddo", "son", "young master"])
-        has_girl_addr_jp = any(re.search(rf"\b{re.escape(m)}\b", jp_lower) or m in jp_lower for m in cls.YOUNG_GIRL_JP_MARKERS)
-        has_girl_addr_en = any(re.search(rf"\b{re.escape(m)}\b", en_lower) for m in cls.YOUNG_GIRL_EN_MARKERS)
 
         if tag.addressee_number == "SINGULAR":
             if has_girl_addr_jp or has_girl_addr_en:
@@ -329,18 +363,15 @@ class WhisperDisambiguator:
                 tag.addressee_gender = "MALE"
                 tag.addressee_age_class = "CHILD"
                 tag.detected_markers.append("K1:Adresat_M (Chłopiec)")
-            elif has_kun or any(m in jp_lower for m in ["temee", "手前", "kisama", "貴様"]):
-                tag.addressee_gender = "MALE"
-                tag.addressee_age_class = "ADULT"
-                tag.detected_markers.append("K1:Adresat_M (Chłopiec/Mężczyzna)")
-            elif has_chan or "anta" in jp_lower or "あんta" in jp_lower or "あんた" in jp_lower:
+            elif has_chan:
                 tag.addressee_gender = "FEMALE"
                 tag.addressee_age_class = "ADULT"
-                tag.detected_markers.append("K1:Adresat_K")
-            elif any(m in jp_lower for m in ["omae", "お前"]):
+                tag.detected_markers.append("K1:Adresat_K (-chan)")
+            elif has_kun:
                 tag.addressee_gender = "MALE"
                 tag.addressee_age_class = "ADULT"
-                tag.detected_markers.append("K1:Adresat_M (omae)")
+                tag.detected_markers.append("K1:Adresat_M (-kun)")
+            # Zaimki omae, anta, temee, kisama celowo NIE definiują płci (przeniesione do K7 jako rejestr nieformalny)
         elif tag.addressee_number == "DUAL":
             if has_chan or any(w in en_lower for w in ["girls", "ladies", "women"]):
                 tag.addressee_gender = "FEMALE"
@@ -434,8 +465,15 @@ class WhisperDisambiguator:
         # K7: Rejestr społeczny T-V
         # -------------------------------------------------------------
         has_keigo = any(m in jp_lower for m in cls.KEIGO_FORMAL_MARKERS)
-        has_kudaketa = any(m in jp_lower for m in cls.KUDAKETA_INFORMAL_MARKERS) or has_masc_2nd
-        if has_keigo and not has_kudaketa:
+        has_hostile = any(cls._match_jp_token(m, jp_lower) for m in cls.HOSTILE_2ND_PERSON)
+        has_2nd_informal = any(cls._match_jp_token(m, jp_lower) for m in cls.MASC_INFORMAL_2ND_PERSON + cls.EQUAL_JUNIOR_2ND_PERSON)
+        has_kudaketa = any(m in jp_lower for m in cls.KUDAKETA_INFORMAL_MARKERS) or has_2nd_informal or has_hostile
+
+        if has_hostile:
+            tag.pragmatic_attitude = "HOSTILE"
+            tag.social_register = "INFORMAL_TY"
+            tag.detected_markers.append("K7:Wrogi (Kisama/Temee)")
+        elif has_keigo and not has_kudaketa:
             tag.social_register = "FORMAL_PAN"
             tag.detected_markers.append("K7:Formalny (Keigo)")
         elif has_kudaketa and not has_keigo:
@@ -521,7 +559,9 @@ class WhisperDisambiguator:
         elif tag.benefactive == "FOR_THEM":
             parts.append("Kierunek: Dla kogoś (ageru)")
 
-        if tag.social_register == "FORMAL_PAN":
+        if getattr(tag, "pragmatic_attitude", None) == "HOSTILE":
+            parts.append("Dystans: Skrajnie wrogi/Konfrontacyjny (Kisama/Temee) -> oddaj pogardę i agresję!")
+        elif tag.social_register == "FORMAL_PAN":
             parts.append("Dystans: Formalny (Pan/Pani)")
         elif tag.social_register == "INFORMAL_TY":
             parts.append("Dystans: Bezpośredni (Ty)")
