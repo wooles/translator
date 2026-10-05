@@ -13888,6 +13888,183 @@ def test_multithreaded_concurrency_and_dictionary_mutation_safety_guard():
     print(" -> PASSED: Test 148 w 100% potwierdza pełną odporność wielowątkową potoku na błędy mutacji słowników podczas iteracji (0.00 PLN).")
 
 
+def test_script_doctor_anti_goodhart_best_of_n_selection():
+    """
+    [TEST 149]: Architektura Fazy 2 potoku AVT: Selekcja Best-of-N z wielokryterialną
+    funkcją nagrody anty-Goodhart i asymetryczną studnią potencjału (0.00 PLN).
+    Weryfikuje:
+    1. prepare_doctor_payload - poprawna kalkulacja gęstości mor, podłogi anty-Goodhart i geometrii CPL.
+    2. Asymetryczny sufit CPS: CPS <= 17 (kara 0.0), 17 < CPS <= 20 (kara liniowa), CPS > 20 (kara 50+ dyskwalifikacja).
+    3. Bezpiecznik anty-Goodhart: kara floor za kastrację ekspresji przy gęstej mowie seiyū (mora_density >= 9.0).
+    4. Integralność afektywna audio-tekst: kara 10.0 za brak ładunku przy arousal AGGRESSIVE/HYSTERIC, kara 8.0 za wycięcie wahania głosu.
+    5. Geometria linii ASS: kara kwadratowa za linie > 38 znaków oraz za > 2 linie.
+    6. Deterministyczny bezpiecznik Warstwy 4: _post_validate awaryjnie przycina kwestie > 20 CPS do limitu 38 CPL.
+    7. ScriptDoctorSelector: poprawna selekcja optymalnego kandydata Best-of-N w trybie offline (0.00 PLN).
+    """
+    print("\n[TEST 149]: Uruchamianie weryfikacji Fazy 2: Best-of-N & Anti-Goodhart Reward Function (0.00 PLN)...")
+    from script_doctor_selector import (
+        prepare_doctor_payload,
+        compute_anti_goodhart_penalties_offline,
+        ScriptDoctorSelector,
+        SCRIPT_DOCTOR_SYSTEM_INSTRUCTION,
+        SCRIPT_DOCTOR_RESPONSE_SCHEMA
+    )
+
+    # --- ASERCJA 1: prepare_doctor_payload & mora density calculation ---
+    raw_candidates = [
+        "To niemożliwe, żebyś to zrobił!",
+        "Nie ma mowy!",
+        "To po prostu całkowicie wykluczone i niewyobrażalne w tej chwili!"
+    ]
+    payload = prepare_doctor_payload(
+        candidates_raw=raw_candidates,
+        duration_s=2.0,
+        source_ja="そんなことあるわけないだろ！",
+        source_mora_count=18,
+        audio_telemetry={"arousal": "AGGRESSIVE", "has_hesitation": False},
+        discourse_context={"speaker_gender": "MALE", "addressee_gender": "MALE"}
+    )
+    assert payload["timing"]["duration_s"] == 2.0
+    assert payload["source"]["mora_density"] == 9.0  # 18 / 2.0
+    assert payload["timing"]["cps_target_floor"] == min(13.5, 7.5 + 0.5 * 9.0)  # 12.0
+    assert len(payload["candidates"]) == 3
+    assert payload["candidates"][0]["cps"] == round(len("To niemożliwe, żebyś to zrobił!") / 2.0, 2)
+
+    # --- ASERCJA 2: Asymetryczny sufit CPS (Fizjologia oka) ---
+    # Kandydat w normie (CPS <= 17.0)
+    pen_norm = compute_anti_goodhart_penalties_offline(
+        candidate_text="Wszystko gra.",
+        duration_s=1.0,
+        source_mora_density=5.0
+    )
+    assert pen_norm["cps_ceiling_penalty"] == 0.0
+
+    # Kandydat w strefie ostrzegawczej (17.0 < CPS <= 20.0, np. 19.0)
+    pen_warn = compute_anti_goodhart_penalties_offline(
+        candidate_text="A" * 19,
+        duration_s=1.0,
+        source_mora_density=5.0
+    )
+    assert pen_warn["cps_ceiling_penalty"] == round(3.0 * (19.0 - 17.0), 2)  # 6.0
+
+    # Kandydat przekraczający barierę odrzucenia (CPS > 20.0, np. 22.0)
+    pen_reject = compute_anti_goodhart_penalties_offline(
+        candidate_text="A" * 22,
+        duration_s=1.0,
+        source_mora_density=5.0
+    )
+    assert pen_reject["cps_ceiling_penalty"] >= 50.0
+
+    # --- ASERCJA 3: Bezpiecznik anty-Goodhart (Podłoga CPS przy gęstym audio) ---
+    # Zbyt krótki kandydat (sterylny równoważnik) przy mora_density = 10.0 (floor = 12.5), CPS = 6.0
+    pen_sterile = compute_anti_goodhart_penalties_offline(
+        candidate_text="Nie ma.",  # 7 znaków / 1.0s = 7.0 CPS
+        duration_s=1.0,
+        source_mora_density=10.0,
+        cps_target_floor=12.5
+    )
+    assert pen_sterile["anti_goodhart_floor_penalty"] == round(2.5 * (12.5 - 7.0), 2)
+    assert pen_sterile["anti_goodhart_floor_penalty"] > 0.0
+
+    # Ten sam krótki kandydat przy rzadkim dialogu (mora_density = 4.0) nie dostaje kary podłogowej
+    pen_loose = compute_anti_goodhart_penalties_offline(
+        candidate_text="Nie ma.",
+        duration_s=1.0,
+        source_mora_density=4.0,
+        cps_target_floor=9.5
+    )
+    assert pen_loose["anti_goodhart_floor_penalty"] == 0.0
+
+    # --- ASERCJA 4: Integralność afektywno-dramaturgiczna ---
+    # Audio agresywne, tekst bez wykrzyknika i wzmocnienia -> kara 10.0
+    pen_no_arousal = compute_anti_goodhart_penalties_offline(
+        candidate_text="Zrobisz to teraz.",
+        duration_s=2.0,
+        source_mora_density=5.0,
+        audio_telemetry={"arousal": "AGGRESSIVE"}
+    )
+    assert pen_no_arousal["affective_penalty"] == 10.0
+
+    # Audio agresywne, tekst z wykrzyknikiem -> brak kary
+    pen_with_arousal = compute_anti_goodhart_penalties_offline(
+        candidate_text="Zrobisz to natychmiast!",
+        duration_s=2.0,
+        source_mora_density=5.0,
+        audio_telemetry={"arousal": "AGGRESSIVE"}
+    )
+    assert pen_with_arousal["affective_penalty"] == 0.0
+
+    # Audio z wahaniem głosu, tekst bez wielokropka -> kara 8.0
+    pen_no_hes = compute_anti_goodhart_penalties_offline(
+        candidate_text="Nie wiem co powiedzieć.",
+        duration_s=2.0,
+        source_mora_density=5.0,
+        audio_telemetry={"has_hesitation": True}
+    )
+    assert pen_no_hes["affective_penalty"] == 8.0
+
+    # Audio z wahaniem głosu, tekst z wielokropkiem -> brak kary
+    pen_with_hes = compute_anti_goodhart_penalties_offline(
+        candidate_text="Nie wiem... co powiedzieć.",
+        duration_s=2.0,
+        source_mora_density=5.0,
+        audio_telemetry={"has_hesitation": True}
+    )
+    assert pen_with_hes["affective_penalty"] == 0.0
+
+    # --- ASERCJA 5: Geometria linii ASS (CPL i liczba linii) ---
+    # Linia z 51 znakami (13 znaków nadmiaru = kara 52.0)
+    pen_cpl = compute_anti_goodhart_penalties_offline(
+        candidate_text="To jest linia tekstu o długości powyżej limitu trzydziestu ośmiu znaków!",
+        duration_s=4.0,
+        source_mora_density=5.0
+    )
+    assert pen_cpl["cpl_geometry_penalty"] > 0.0
+
+    # 3 linie tekstu (kara dyskwalifikująca 50.0)
+    pen_3lines = compute_anti_goodhart_penalties_offline(
+        candidate_text="Linia pierwsza\\NLinia druga\\NLinia trzecia",
+        duration_s=4.0,
+        source_mora_density=5.0
+    )
+    assert pen_3lines["cpl_geometry_penalty"] >= 50.0
+
+    # --- ASERCJA 6: ScriptDoctorSelector Best-of-N Re-ranking & Warstwa 4 Failsafe ---
+    selector = ScriptDoctorSelector(client=None)  # tryb deterministyczny offline 0.00 PLN
+    candidates_test = [
+        "Nie.",
+        "Wcale tak nie uważam!",
+        "Nie zgadzam się z tobą w żaden możliwy sposób na tym świecie i nigdy się nie zgodzę!"
+    ]
+    test_payload = prepare_doctor_payload(
+        candidates_raw=candidates_test,
+        duration_s=2.0,
+        source_ja="そんなことは絶対に思わない！",
+        source_mora_count=18,
+        audio_telemetry={"arousal": "AGGRESSIVE", "has_hesitation": False},
+        discourse_context={"speaker_gender": "FEMALE", "addressee_gender": "MALE"}
+    )
+    res = selector.select_and_repair(test_payload)
+    assert res["selected_candidate_id"] == 1, f"Oczekiwano wyboru kandydata 1, wybrano {res['selected_candidate_id']}"
+    assert "Wcale tak nie uważam!" in res["final_subtitle_text"]
+
+    # Failsafe Warstwa 4: jeśli final_subtitle_text > 20 CPS, awaryjne przycięcie
+    overflow_res = {
+        "selected_candidate_id": 0,
+        "requires_micro_repair": False,
+        "final_subtitle_text": "To jest gigantyczna kwestia, która w żadnym razie nie może się zmieścić w pół sekundy!",
+        "total_penalty": 0.0,
+        "verdict_rationale": "Test"
+    }
+    short_payload = {"timing": {"duration_s": 0.5}}
+    safe_res = selector._post_validate(overflow_res, short_payload)
+    assert "przycięto awaryjnie w post-walidacji" in safe_res["verdict_rationale"]
+    pure_safe = safe_res["final_subtitle_text"]
+    assert len(pure_safe) <= 38
+
+    print(" -> PASSED: Test 149 w 100% potwierdza poprawność Fazy 2: Best-of-N Script Doctor, Asymmetric Dead-Band Potential i Anti-Goodhart Reward Function (0.00 PLN).")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -14035,6 +14212,7 @@ if __name__ == "__main__":
     test_full_tense_transitive_genitive_of_negation_guard()
     test_comprehensive_canon_oblique_prepositions_and_male_consonant_declension_guard()
     test_multithreaded_concurrency_and_dictionary_mutation_safety_guard()
-    print("\n Wszystkie testy jednostkowe i integracyjne (148/148) zakończone pełnym sukcesem!\n")
+    test_script_doctor_anti_goodhart_best_of_n_selection()
+    print("\n Wszystkie testy jednostkowe i integracyjne (149/149) zakończone pełnym sukcesem!\n")
 
 

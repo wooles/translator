@@ -510,19 +510,25 @@ $$\mathcal{L}_{\text{AVT}}(\theta) = \mathcal{L}_{\text{sem}}(y, x) + \alpha \ma
   - $\text{NLL}_{\text{LM\_PL}}(y) = -\frac{1}{T}\sum_{t=1}^T \log P_{\text{ref\_PL}}(y_t \mid y_{<t})$: Ujemna logarytmiczna wiarygodność sekwencji wyznaczona przez referencyjny model języka polskiego (mierzy gładkość idiomatyczną).
   - $\mathbb{I}_{\text{pass}}(y)$: Wskaźnik nadmiarowej pasywizacji (kara za nienaturalne zrosty typu *„zostało to zrobione”*, *„udało się pójść”*).
   - $\mathbb{I}_{\text{calque}}(y)$: Wskaźnik obecności zaimkozy (np. nadmiarowe zaimki *„ja”*, *„ty”* w pozycji podmiotu wynikające z kalki z angielskiego pivotu).
-- **C. Asymetryczna Bariera AVT: CPS i CPL ($\mathcal{P}_{\text{AVT}}$):**
-  Tempo czytania nie jest symetryczne. Napis odrobinę za wolny ($\text{CPS}=10$) jest akceptowalny; napis za szybki ($\text{CPS}>20$) jest całkowicie nieczytelny.
-  Stosujemy asymetryczną funkcję barierową połączoną z karą za przekroczenie szerokości linii:
-  $$\mathcal{P}_{\text{AVT}}(y, \Delta t) = \lambda_{\text{cps}} \cdot \Phi\Big(\text{CPS}(y, \Delta t)\Big) + \lambda_{\text{cpl}} \cdot \Psi\Big(\text{CPL}(y)\Big) + \lambda_{\text{floor}} \cdot \Omega\Big(\text{len}(y)\Big)$$
-  - **Bariera tempa czytania ($\Phi$):** Dla idealnego progu $\text{CPS}^* = 17.0$ i marginesu tolerancji $\epsilon = 1.5$:
-    $$\Phi(\text{CPS}) = \frac{1}{1 + e^{-(\text{CPS} - \text{CPS}^*) / \epsilon}} + \mathbb{I}(\text{CPS} > 20.0) \cdot (\text{CPS} - 20.0)^2$$
-    - Dla $\text{CPS} \le 15.0$: kara asymptotycznie dąży do zera.
-    - Dla $\text{CPS} \in [15, 18]$: kara rośnie liniowo.
-    - Dla $\text{CPS} > 20.0$: odpala się kara kwadratowa, całkowicie odrzucająca kandydatów.
+- **C. Asymetryczna Bariera AVT: Dwustronna Studnia Potencjału Anty-Goodhart ($P_{\text{band}}$ & $\Psi$):**
+  Zwykłe karanie wyłącznie za przekroczenie CPS > 17 wywołuje **efekt Goodharta**: model kandydujący kastruje emocje, partykuły modalne (*przecież*, *no*, *zaś*) i stylizację seiyū, uciekając w jałowe równoważniki zdań.
+  Stosujemy dwustronną asymetryczną studnię potencjału (Asymmetric Dead-Band Potential):
+  $$P_{\text{band}}(y, \Delta t, \rho_x) = \lambda_{\text{ceil}} \cdot \Phi_{\text{ceil}}(\text{CPS}) + \lambda_{\text{floor}} \cdot \Phi_{\text{floor}}(\text{CPS}, \rho_x)$$
+  - **Asymetryczny sufit CPS (Fizjologia oka - Hard Barrier):**
+    $$\Phi_{\text{ceil}}(\text{CPS}) = \ln\left(1 + \exp\left(\frac{\text{CPS} - 17.0}{0.8}\right)\right) + \mathbb{I}(\text{CPS} > 20.0) \cdot (\text{CPS} - 20.0)^2$$
+    - $\text{CPS} \le 17.0$: Kara $\approx 0.0$.
+    - $17.0 < \text{CPS} \le 20.0$: Kara rośnie liniowo ($3.0 \cdot (\text{CPS} - 17.0)$).
+    - $\text{CPS} > 20.0$: Bezwzględna dyskwalifikacja kandydata (kara kwadratowa $50.0+$).
+  - **Bezpiecznik anty-Goodhart (Podłoga CPS zależna od gęstości mor - Anti-Sterility Barrier):**
+    Dla gęstości mor japońskich $\rho_x = \frac{\text{moras}(x)}{\Delta t}$:
+    $$\text{CPS}_{\text{target}}(\rho_x) = \min(13.5, \; 7.5 + 0.5 \cdot \rho_x)$$
+    $$\Phi_{\text{floor}}(\text{CPS}, \rho_x) = \max\big(0, \; \text{CPS}_{\text{target}}(\rho_x) - \text{CPS}\big)^2$$
+    Chroni przed amputacją treści: jeśli seiyū wypowiada gęstą kwestię ($\rho_x \ge 9.0$ mor/s), kandydat ze sztucznie zaniżonym CPS zostaje odrzucony jako emocjonalnie jałowy.
+  - **Integralność afektywno-dramaturgiczna ($L_{\text{drama}} / D_{\text{aff}}$):**
+    $$D_{\text{aff}} = \| e_{\text{text}}(y) - a_{\text{audio}} \|_2^2$$
+    Niezgodność ładunku afektywnego (np. brak wykrzyknika i leksyki wzmacniającej przy audio `AGGRESSIVE`/`HYSTERIC`) nakłada karę $10.0$, a wycięcie zawieszenia głosu (`has_vocal_hesitation == True` bez `...`/`—`) karę $8.0$.
   - **Bariera fizycznej geometrii dwuwiersza ($\Psi$):** Napis w systemie ASS może mieć maksymalnie 2 wiersze po $L_{\max} = 38$ znaków:
-    $$\Psi(\text{CPL}) = \sum_{l \in \text{lines}(y)} \max\big(0, \; \text{len}(l) - L_{\max}\big)^2 + \max\big(0, \; |\text{lines}(y)| - 2\big) \cdot 100$$
-  - **Bariera głodzenia repliki ($\Omega$):** Chroni przed obcinaniem kwestii do pustego ciągu znaków przy małym $\Delta t$:
-    $$\Omega(\text{len}(y)) = \max\big(0, \; 16 - \text{len}(y)\big) \quad \text{dla } \Delta t \in [0.5, 0.8]\text{s}$$
+    $$\Psi(\text{CPL}) = \sum_{l \in \text{lines}(y)} \max\big(0, \; \text{len}(l) - L_{\max}\big)^2 + \mathbb{I}(|\text{lines}(y)| > 2) \cdot 50.0$$
 
 #### 3. Różniczkowalna Aproksymacja Długości Znakowej:
 Podczas treningu metodami bezpośrednimi długość ciągu znaków $\text{len}(y)$ jest funkcją dyskretną. Aby umożliwić przepływ gradientu, definiujemy oczekiwaną długość znakową (Expected Character Length):
@@ -535,10 +541,10 @@ W procesie selekcji kandydatów (Re-ranking / Faza 2 Script Doctor) mnożnik $\l
 $$\lambda_{\text{cps}}^{(k+1)} = \max\left(0, \; \lambda_{\text{cps}}^{(k)} + \eta \cdot \Big(\text{CPS}(y^{(k)}, \Delta t) - \text{CPS}_{\max}\Big)\right)$$
 Gdy model generuje dialogi mieszczące się w 17 znaków/s, $\lambda_{\text{cps}} \to 0$, pozwalając skupić 100% pojemności na naturalności polszczyzny i wierności afektywnej. Gdy tylko model przekroczy próg 17 znaków/s, mnożnik rośnie ekspotencjalnie, zmuszając do kondensacji syntaktycznej i redukcji waty słownej.
 
-#### 5. Formuła Nagrody (Reward Function dla PPO/DPO/Best-of-N):
+#### 5. Formuła Nagrody Anty-Goodhart (Reward Function dla Best-of-N Script Doctor):
 Dla selekcji najlepszego wariantu w Fazie 2 Script Doctor, funkcja skalarna nagrody przyjmuje postać:
-$$R(y \mid x, \Delta t) = r_{\text{sem}}(y, x) + 0.3 \cdot r_{\text{flu}}(y) - \left[ 2.5 \cdot \Phi\Big(\text{CPS}(y, \Delta t)\Big) + 5.0 \cdot \Psi\Big(\text{CPL}(y)\Big) \right]$$
-Taki układ wag tworzy wklęsłą przestrzeń optymalizacyjną: odrzuca warianty łamiące limity percepcyjne widza, a spośród mieszczących się w oknie czytelności ($\text{CPS} \le 17$) wybiera ten, który najwierniej oddaje ładunek dramaturgiczny i gramatyczną specyfikę postaci.
+$$R_{\text{AVT}}(y \mid x, \Delta t, a) = R_{\text{base}}(y, x) - \Big[ P_{\text{band}}(y, \Delta t, \rho_x) + \lambda_{\text{cpl}} \cdot \Psi(\text{CPL}(y)) + L_{\text{drama}}(y, x, a) \Big]$$
+Taki układ wag tworzy dwustronną asymetryczną studnię potencjału: odrzuca warianty łamiące limity percepcyjne widza ($\text{CPS} > 17.0$, $\text{CPL} > 38$), ale jednocześnie eliminuje zubożałe, wykastrowane warianty ($\text{CPS} < \text{CPS}_{\text{target}}$) w gęstych partiach dramatycznych seiyū. Kandydat o najmniejszej sumie kar wygrywa, a w razie $\text{Total\_Penalty} > 0$ podlega deterministycznej mikronaprawie w paśmie $[\text{CPS}_{\text{target}}, 17.0]$.
 
 ### 🚦 Kryterium Zakończenia Iteracji:
 Agent 2 może wystawić status:
