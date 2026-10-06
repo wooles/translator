@@ -14256,6 +14256,43 @@ def test_tokiyuki_p0_cast_lock_and_shizuku_dual_voice_discourse_guard():
     print(" -> PASSED: Test 150 w 100% potwierdza Blokadę P0 Kanonu (Tokiyuki) oraz Rozbijacz Dwugłosów i Hierarchię Deiktyczną (Shizuku) (0.00 PLN).")
 
 
+def test_avt_formatter_style_bleed_and_strict_cpl_38_guard():
+    """
+    TEST 151: Weryfikacja eliminacji Style-Bleed w avt_formatter.py
+    oraz twardego limitu 38 znaków CPL dla dialogów postaci (0.00 PLN).
+    """
+    from avt_formatter import split_subtitle_syntactically
+
+    # 1. Test eliminacji Style-Bleed w dwugłosach z tagami ASS per wiersz
+    raw_dual = r"{\an8}- Ojcze!\N{\an2}- Stój tam!"
+    res_dual = split_subtitle_syntactically(raw_dual, is_ass=True, is_sign=False)
+    assert res_dual == r"{\an8}- Ojcze!\N{\an2}- Stój tam!", (
+        f"Style-Bleed wykryty w split_subtitle_syntactically: {res_dual}"
+    )
+
+    # 2. Test in-line turn-taking z tagami formatowania w drugiej części
+    raw_inline = r"{\an8}- Czekaj! - {\an2}Nie ma czasu!"
+    res_inline = split_subtitle_syntactically(raw_inline, is_ass=True, is_sign=False)
+    assert res_inline == r"{\an8}- Czekaj!\N{\an2}- Nie ma czasu!", (
+        f"Błędne rozbicie in-line dual turn: {res_inline}"
+    )
+
+    # 3. Test twardego limitu CPL 38 znaków dla standardowego dialogu (is_sign=False)
+    # Linia o długości 45 znaków (przekracza 38, ale mieściłaby się w starym limicie 42)
+    long_dialogue = "To jest dokładnie czterdzieści znaków tekstu."
+    split_res = split_subtitle_syntactically(long_dialogue, max_line_len=38, is_ass=True, is_sign=False)
+    assert r"\N" in split_res, f"Dialog przekraczający 38 znaków nie został podzielony na 2 wiersze: {split_res}"
+    for line in split_res.split(r"\N"):
+        assert len(line.strip()) <= 38, f"Wiersz dialogu przekracza 38 znaków: {line}"
+
+    # 4. Test bufora dla signów (is_sign=True)
+    sign_text = "BARDZO DŁUGI TYTUŁ ROZDZIAŁU ANIME"
+    res_sign = split_subtitle_syntactically(sign_text, max_line_len=36, is_ass=True, is_sign=True)
+    assert r"\N" not in res_sign, f"Sign nie powinien być dzielony poniżej 36 znaków: {res_sign}"
+
+    print(" -> PASSED: Test 151 w 100% potwierdza eliminację Style-Bleed w avt_formatter i twardy limit 38 znaków CPL (0.00 PLN).")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -14405,6 +14442,7 @@ if __name__ == "__main__":
     test_multithreaded_concurrency_and_dictionary_mutation_safety_guard()
     test_script_doctor_anti_goodhart_best_of_n_selection()
     test_tokiyuki_p0_cast_lock_and_shizuku_dual_voice_discourse_guard()
-    print("\n Wszystkie testy jednostkowe i integracyjne (150/150) zakończone pełnym sukcesem!\n")
+    test_avt_formatter_style_bleed_and_strict_cpl_38_guard()
+    print("\n Wszystkie testy jednostkowe i integracyjne (151/151) zakończone pełnym sukcesem!\n")
 
 
