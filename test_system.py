@@ -14293,6 +14293,93 @@ def test_avt_formatter_style_bleed_and_strict_cpl_38_guard():
     print(" -> PASSED: Test 151 w 100% potwierdza eliminację Style-Bleed w avt_formatter i twardy limit 38 znaków CPL (0.00 PLN).")
 
 
+def test_speaker_and_addressee_gender_concordance_and_copula_guard():
+    """
+    TEST 152: Weryfikacja orzeczników 1. os. (czas teraźniejszy/przyszły: jestem, nie jestem, będę, nie będę, stałem/stałam się)
+    z rozszerzonym zakresem przysłówków (już, jeszcze, teraz, do końca itp.) oraz zgodności addressee dla grup kobiet (0.00 PLN).
+    """
+    import pysubs2
+    from avt_linter import EpisodeQualityGate
+
+    subs = pysubs2.SSAFile()
+    subs.events.extend([
+        # 1. Męski mówca: orzeczniki czasu teraźniejszego i przysłówki wtrącone
+        pysubs2.SSAEvent(start=1000, end=2000, style="Default", name="Tokiyuki", text="Nie jestem do końca pewna, ale jestem już gotowa."),
+        # 2. Męski mówca: orzecznik czasu przyszłego i imiesłów bierny
+        pysubs2.SSAEvent(start=2500, end=3500, style="Default", name="Tokiyuki", text="Będę zaskoczona, jeśli to zadziała."),
+        # 3. Żeńska mówczyni: orzeczniki czasu teraźniejszego i przyszłego z przysłówkami
+        pysubs2.SSAEvent(start=4000, end=5000, style="Default", name="Shizuku", text="Nadal nie jestem pewien, czy będę zaskoczony."),
+        # 4. Żeńska mówczyni: orzecznik czasu przyszłego i imiesłów bierny
+        pysubs2.SSAEvent(start=5500, end=6500, style="Default", name="Shizuku", text="Nie będę zachwycony tym obrotem spraw."),
+        # 5. Męski mówca: orzecznik czasownika posiłkowego stać się
+        pysubs2.SSAEvent(start=6600, end=6900, style="Default", name="Tokiyuki", text="Stałam się pewna siebie."),
+        # 6. Adresat - grupa kobiet w wołaczu tekstowym (dziewczęta)
+        pysubs2.SSAEvent(start=7000, end=8000, style="Default", name="Tokiyuki", text="Czy już to widzieliście, dziewczęta?"),
+        # 7. Adresat - grupa kobiet w metadanych (ev.addressee)
+        pysubs2.SSAEvent(start=8200, end=8800, style="Default", name="Tokiyuki", text="Byliście gotowi?"),
+        # 8. Izolacja zdań złożonych - nienaruszalność 3. osoby (brak fałszywego nadpisywania)
+        pysubs2.SSAEvent(start=9000, end=10000, style="Default", name="Tokiyuki", text="Jestem pewien, że ona była zmęczona."),
+        # 9. Test antykolizyjny - zdanie z 2. osobą (jesteś pewna) i 3. osobą (jest gotowa) nie może być mutowane
+        pysubs2.SSAEvent(start=10100, end=10900, style="Default", name="Tokiyuki", text="Wiem, że jesteś pewna siebie, Mario. Maria jest już gotowa.")
+    ])
+    subs.events[6].addressee = "grupa_kobiet"
+
+    fixed_subs, fixes = EpisodeQualityGate.audit_and_fix_entire_episode(
+        subs,
+        character_registry={
+            "Tokiyuki": "mężczyzna (chłopiec)",
+            "Shizuku": "kobieta (dziewczynka)"
+        }
+    )
+
+    # Asercja 1: Męski mówca - orzeczniki czasu teraźniejszego z zakresem przysłówków
+    assert fixed_subs.events[0].text == "Nie jestem do końca pewien, ale jestem już gotowy.", (
+        f"Niepoprawna korekta męskiego mówcy 1. os. teraźniejszy: {fixed_subs.events[0].text}"
+    )
+
+    # Asercja 2: Męski mówca - orzecznik czasu przyszłego i imiesłów
+    assert fixed_subs.events[1].text == "Będę zaskoczony, jeśli to zadziała.", (
+        f"Niepoprawna korekta męskiego mówcy 1. os. przyszły: {fixed_subs.events[1].text}"
+    )
+
+    # Asercja 3: Żeńska mówczyni - orzeczniki czasu teraźniejszego i przyszłego z przysłówkami
+    assert fixed_subs.events[2].text == "Nadal nie jestem pewna, czy będę zaskoczona.", (
+        f"Niepoprawna korekta żeńskiej mówczyni 1. os.: {fixed_subs.events[2].text}"
+    )
+
+    # Asercja 4: Żeńska mówczyni - orzecznik czasu przyszłego i imiesłów
+    assert fixed_subs.events[3].text == "Nie będę zachwycona tym obrotem spraw.", (
+        f"Niepoprawna korekta żeńskiej mówczyni imiesłów: {fixed_subs.events[3].text}"
+    )
+
+    # Asercja 5: Męski mówca - stałem się
+    assert fixed_subs.events[4].text == "Stałem się pewien siebie.", (
+        f"Niepoprawna korekta stałam -> stałem: {fixed_subs.events[4].text}"
+    )
+
+    # Asercja 6: Adresat - grupa kobiet z wołaczem
+    assert fixed_subs.events[5].text == "Czy już to widziałyście, dziewczęta?", (
+        f"Niepoprawna korekta grupy kobiet z wołaczem: {fixed_subs.events[5].text}"
+    )
+
+    # Asercja 7: Adresat - grupa kobiet z metadanych
+    assert fixed_subs.events[6].text == "Byłyście gotowe?", (
+        f"Niepoprawna korekta grupy kobiet z metadanych: {fixed_subs.events[6].text}"
+    )
+
+    # Asercja 8: Nienaruszalność zdań złożonych
+    assert fixed_subs.events[7].text == "Jestem pewien, że ona była zmęczona.", (
+        f"Zdanie złożone zostało uszkodzone: {fixed_subs.events[7].text}"
+    )
+
+    # Asercja 9: Test antykolizyjny (ochrona 2. i 3. osoby)
+    assert fixed_subs.events[8].text == "Wiem, że jesteś pewna siebie, Mario. Maria jest już gotowa.", (
+        f"Test antykolizyjny nie powiódł się: {fixed_subs.events[8].text}"
+    )
+
+    print(" -> PASSED: Test 152 w 100% potwierdza zgodność orzeczników 1. os. (czas teraźniejszy/przyszły + przysłówki) oraz addressee dla grup kobiet (0.00 PLN).")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -14443,6 +14530,7 @@ if __name__ == "__main__":
     test_script_doctor_anti_goodhart_best_of_n_selection()
     test_tokiyuki_p0_cast_lock_and_shizuku_dual_voice_discourse_guard()
     test_avt_formatter_style_bleed_and_strict_cpl_38_guard()
-    print("\n Wszystkie testy jednostkowe i integracyjne (151/151) zakończone pełnym sukcesem!\n")
+    test_speaker_and_addressee_gender_concordance_and_copula_guard()
+    print("\n Wszystkie testy jednostkowe i integracyjne (152/152) zakończone pełnym sukcesem!\n")
 
 

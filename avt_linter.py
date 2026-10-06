@@ -5524,21 +5524,24 @@ class EpisodeQualityGate:
                         return word
                     ev.text = re.sub(r"\b[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+(?:łam|łabym)\b", _morph_f_to_m_repl, ev.text)
                     # Compound predicates for male speaker
+                    SAFE_INTERVENING_SPAN_1P = (
+                        r"(?:(?:już|jeszcze|teraz|zbyt|tak|bardzo|dość|naprawdę|wreszcie|wtedy|znowu|ciągle|przecież|chyba|pewnie|całkiem|aż\s+tak|w\s+końcu|do\s+końca|nadal)\s+){0,3}"
+                    )
                     for f_adj, m_adj in FEMININE_SG_ADJECTIVES_TO_MASCULINE.items():
-                        pat_pred = rf"\b((?:byłem|byłam|czułem\s+się|czułam\s+się|zostałem|zostałam|poczułem\s+się|poczułam\s+się)\s+)({re.escape(f_adj)})\b"
+                        pat_pred = rf"\b((?:jestem|nie\s+jestem|byłem|byłam|będę|nie\s+będę|czułem\s+się|czułam\s+się|zostałem|zostałam|poczułem\s+się|poczułam\s+się|stałem\s+się|stałam\s+się)\s+{SAFE_INTERVENING_SPAN_1P})({re.escape(f_adj)})\b"
                         for match in list(re.finditer(pat_pred, ev.text, re.IGNORECASE)):
                             p_prefix = match.group(1)
                             p_adj = match.group(2)
                             p_repl = m_adj.capitalize() if p_adj[0].isupper() else m_adj
-                            ev.text = re.sub(rf"\b{re.escape(p_prefix)}{re.escape(p_adj)}\b", f"{p_prefix}{p_repl}", ev.text, count=1)
+                            ev.text = re.sub(rf"({re.escape(p_prefix)})({re.escape(p_adj)})\b", rf"\g<1>{p_repl}", ev.text, count=1)
                             fixes.append(f"[Episode Quality Gate - Spójność Płci Postaci] Linia #{i+1}: skorygowano orzecznik 1. os. na rodzaj męski dla mówcy '{label_spk}' ('{p_prefix}{p_adj}' -> '{p_prefix}{p_repl}')")
-                    dyn_part_pat_m = rf"\b((?:byłem|byłam|czułem\s+się|czułam\s+się|zostałem|zostałam|poczułem\s+się|poczułam\s+się)\s+)([A-Za-ząćęłńóśźż]+(?:ona|ana|ta|iona))\b"
+                    dyn_part_pat_m = rf"\b((?:jestem|nie\s+jestem|byłem|byłam|będę|nie\s+będę|czułem\s+się|czułam\s+się|zostałem|zostałam|poczułem\s+się|poczułam\s+się|stałem\s+się|stałam\s+się)\s+{SAFE_INTERVENING_SPAN_1P})([A-Za-ząćęłńóśźż]+(?:ona|ana|ta|iona))\b"
                     for match in list(re.finditer(dyn_part_pat_m, ev.text, re.IGNORECASE)):
                         p_prefix = match.group(1)
                         p_part = match.group(2)
                         p_masc = convert_passive_participle_to_masculine(p_part)
                         if p_masc and p_masc.lower() != p_part.lower():
-                            ev.text = re.sub(rf"\b{re.escape(p_prefix)}{re.escape(p_part)}\b", f"{p_prefix}{p_masc}", ev.text, count=1)
+                            ev.text = re.sub(rf"({re.escape(p_prefix)})({re.escape(p_part)})\b", rf"\g<1>{p_masc}", ev.text, count=1)
                             fixes.append(f"[Episode Quality Gate - Spójność Płci Postaci] Linia #{i+1}: skorygowano imiesłów 1. os. na rodzaj męski dla mówcy '{label_spk}' ('{p_prefix}{p_part}' -> '{p_prefix}{p_masc}')")
                     # Clitics for male speaker
                     clitic_pat = r"\b((?:gdybym|jakbym|żebym|abym|bym|choćbym|chociażbym)\s+)([A-Za-ząćęłńóśźż]+(?:ała|iła|yła|ęła))\b"
@@ -5612,21 +5615,24 @@ class EpisodeQualityGate:
                         return word
                     ev.text = re.sub(r"\b[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+(?:łem|łbym)\b", _morph_m_to_f_repl, ev.text)
                     # Compound predicates for female speaker
+                    SAFE_INTERVENING_SPAN_1P = (
+                        r"(?:(?:już|jeszcze|teraz|zbyt|tak|bardzo|dość|naprawdę|wreszcie|wtedy|znowu|ciągle|przecież|chyba|pewnie|całkiem|aż\s+tak|w\s+końcu|do\s+końca|nadal)\s+){0,3}"
+                    )
                     for m_adj, f_adj in MASCULINE_SG_ADJECTIVES_TO_FEMININE.items():
-                        pat_pred = rf"\b((?:byłam|byłem|czułam\s+się|czułem\s+się|zostałam|zostałem|poczułam\s+się|poczułem\s+się)\s+)({re.escape(m_adj)})\b"
+                        pat_pred = rf"\b((?:jestem|nie\s+jestem|byłam|byłem|będę|nie\s+będę|czułam\s+się|czułem\s+się|zostałam|zostałem|poczułam\s+się|poczułem\s+się|stałam\s+się|stałem\s+się)\s+{SAFE_INTERVENING_SPAN_1P})({re.escape(m_adj)})\b"
                         for match in list(re.finditer(pat_pred, ev.text, re.IGNORECASE)):
                             p_prefix = match.group(1)
                             p_adj = match.group(2)
                             p_repl = f_adj.capitalize() if p_adj[0].isupper() else f_adj
-                            ev.text = re.sub(rf"\b{re.escape(p_prefix)}{re.escape(p_adj)}\b", f"{p_prefix}{p_repl}", ev.text, count=1)
+                            ev.text = re.sub(rf"({re.escape(p_prefix)})({re.escape(p_adj)})\b", rf"\g<1>{p_repl}", ev.text, count=1)
                             fixes.append(f"[Episode Quality Gate - Spójność Płci Postaci] Linia #{i+1}: skorygowano orzecznik 1. os. na rodzaj żeński dla mówczyni '{label_spk}' ('{p_prefix}{p_adj}' -> '{p_prefix}{p_repl}')")
-                    dyn_part_pat_f = rf"\b((?:byłam|byłem|czułam\s+się|czułem\s+się|zostałam|zostałem|poczułam\s+się|poczułem\s+się)\s+)([A-Za-ząćęłńóśźż]+(?:ony|any|ty|iony))\b"
+                    dyn_part_pat_f = rf"\b((?:jestem|nie\s+jestem|byłam|byłem|będę|nie\s+będę|czułam\s+się|czułem\s+się|zostałam|zostałem|poczułam\s+się|poczułem\s+się|stałam\s+się|stałem\s+się)\s+{SAFE_INTERVENING_SPAN_1P})([A-Za-ząćęłńóśźż]+(?:ony|any|ty|iony))\b"
                     for match in list(re.finditer(dyn_part_pat_f, ev.text, re.IGNORECASE)):
                         p_prefix = match.group(1)
                         p_part = match.group(2)
                         p_fem = convert_passive_participle_to_feminine(p_part)
                         if p_fem and p_fem.lower() != p_part.lower():
-                            ev.text = re.sub(rf"\b{re.escape(p_prefix)}{re.escape(p_part)}\b", f"{p_prefix}{p_fem}", ev.text, count=1)
+                            ev.text = re.sub(rf"({re.escape(p_prefix)})({re.escape(p_part)})\b", rf"\g<1>{p_fem}", ev.text, count=1)
                             fixes.append(f"[Episode Quality Gate - Spójność Płci Postaci] Linia #{i+1}: skorygowano imiesłów 1. os. na rodzaj żeński dla mówczyni '{label_spk}' ('{p_prefix}{p_part}' -> '{p_prefix}{p_fem}')")
                     # Clitics for female speaker
                     clitic_pat = r"\b((?:gdybym|jakbym|żebym|abym|bym|choćbym|chociażbym)\s+)([A-Za-ząćęłńóśźż]+(?:ał|ił|ył|eł|ół|ął))\b"
