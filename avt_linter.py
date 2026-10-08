@@ -4591,13 +4591,21 @@ class EpisodeQualityGate:
                 if ev.text != old_stutter_t:
                     fixes.append(f"[Episode Quality Gate - Filar CLXXIV Higiena Tokenów] Linia #{i+1}: usunięto zacięcie/jąkanie tokenu z interpunkcją")
 
+            ev_name_lower = (getattr(ev, "name", None) or getattr(ev, "actor", None) or "").lower()
             ev_is_sub = bool(re.search(r"\bsubtitles?\b", ev_style_lower))
+            is_explicit_sign = bool(
+                re.search(r"\b(sign|signs|title|titles|caption|captions|typeset|typesetting|op|ed|poster|card)\b", ev_style_lower)
+                or re.search(r"\b(sign|signs|title|titles|caption|captions|typeset|typesetting|op|ed|poster|card)\b", ev_name_lower)
+                or ev_style_lower.startswith("caption")
+            )
+            is_bracket_title = bool(re.match(r"^\s*(?:\{[^}]*\}\s*)*\[\s*[A-ZĄĆĘŁŃÓŚŹŻ0-9]", ev.text))
+            has_dialogue_dash = bool(re.search(r"(?:^|[\r\n]|\\[Nnh])\s*[-–—]", ev.text))
+
             is_sign = bool(
-                re.search(r"\\(pos|move|an[789]|clip)\b", ev.text) or
-                (not ev_is_sub and (
-                    bool(re.search(r"\b(sign|signs|title|titles|caption|captions|typeset|typesetting|op|ed)\b", ev_style_lower))
-                    or ev_style_lower.startswith("caption")
-                ))
+                re.search(r"\\(clip|p1|frz|org)\b", ev.text)
+                or is_explicit_sign
+                or is_bracket_title
+                or (not ev_is_sub and not has_dialogue_dash and bool(re.search(r"\\(pos|move|an[789])\b", ev.text)))
             )
 
             # Per-event Quote & Indirect Speech Shield map (Filary CLXX & CLXXXVII - 0.00 PLN)
@@ -4610,13 +4618,20 @@ class EpisodeQualityGate:
                 cand = events[j]
                 cand_text = re.sub(r"\{[^\}]*\}", "", cand.text or "").strip()
                 cand_style_lower = (cand.style or "").lower()
+                cand_name_lower = (getattr(cand, "name", None) or getattr(cand, "actor", None) or "").lower()
                 cand_is_sub = bool(re.search(r"\bsubtitles?\b", cand_style_lower))
+                cand_is_explicit_sign = bool(
+                    re.search(r"\b(sign|signs|title|titles|caption|captions|typeset|typesetting|op|ed|poster|card)\b", cand_style_lower)
+                    or re.search(r"\b(sign|signs|title|titles|caption|captions|typeset|typesetting|op|ed|poster|card)\b", cand_name_lower)
+                    or cand_style_lower.startswith("caption")
+                )
+                cand_is_bracket = bool(re.match(r"^\s*(?:\{[^}]*\}\s*)*\[\s*[A-ZĄĆĘŁŃÓŚŹŻ0-9]", cand.text or ""))
+                cand_has_dash = bool(re.search(r"(?:^|[\r\n]|\\[Nnh])\s*[-–—]", cand.text or ""))
                 cand_is_sign = bool(
-                    re.search(r"\\(pos|move|an[789]|clip)\b", cand.text or "") or
-                    (not cand_is_sub and (
-                        bool(re.search(r"\b(sign|signs|title|titles|caption|captions|typeset|typesetting|op|ed)\b", cand_style_lower))
-                        or cand_style_lower.startswith("caption")
-                    ))
+                    re.search(r"\\(clip|p1|frz|org)\b", cand.text or "")
+                    or cand_is_explicit_sign
+                    or cand_is_bracket
+                    or (not cand_is_sub and not cand_has_dash and bool(re.search(r"\\(pos|move|an[789])\b", cand.text or "")))
                 )
                 if cand_text and not cand_is_sign:
                     prev_ev = cand
@@ -4674,7 +4689,8 @@ class EpisodeQualityGate:
             if not is_sign and (r"\i1" in ev.text or r"\i0" in ev.text):
                 ev_style_l = (ev.style or "").lower()
                 is_song = bool(re.search(r"\b(song|music|op|ed|karaoke)\b", ev_style_l)) or ("♪" in ev.text) or ("♫" in ev.text)
-                if not is_song:
+                is_thought_or_internal = bool(re.search(r"\b(thought|thoughts|mysl|myśli|inner|internal|monolog|flashback)\b", ev_style_l))
+                if not is_song and not is_thought_or_internal:
                     clean_no_tags = re.sub(r"\{[^\}]*\}", "", ev.text).strip()
                     raw_spk = getattr(ev, "name", None) or getattr(ev, "actor", None) or (line_speakers.get(i) if line_speakers else None)
                     spk_clean = extract_clean_speaker_name(str(raw_spk or "")).strip() if raw_spk else ""
@@ -4694,7 +4710,10 @@ class EpisodeQualityGate:
                     
                     is_diegetic_speech = has_direct_vocative or (has_char_speaker and has_dialogue_alternation) or (has_char_speaker and has_qa_markers and prev_ev and (ev.start - prev_ev.end < 3000))
                     
-                    if is_diegetic_speech:
+                    is_whole_line_wrapper = bool(
+                        re.match(r"^(?:\{[^\}]*\})*\s*\{\\i1\}(?:(?!\{\\i[01]\}).)+\{\\i0\}\s*(?:\{[^\}]*\})*$", ev.text, re.DOTALL)
+                    )
+                    if is_diegetic_speech and is_whole_line_wrapper:
                         old_it_text = ev.text
                         ev.text = re.sub(r"\{\\i[01]\}", "", ev.text).strip()
                         if ev.text != old_it_text:
@@ -5525,7 +5544,7 @@ class EpisodeQualityGate:
                     ev.text = re.sub(r"\b[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+(?:łam|łabym)\b", _morph_f_to_m_repl, ev.text)
                     # Compound predicates for male speaker
                     SAFE_INTERVENING_SPAN_1P = (
-                        r"(?:(?:już|jeszcze|teraz|zbyt|tak|bardzo|dość|naprawdę|wreszcie|wtedy|znowu|ciągle|przecież|chyba|pewnie|całkiem|aż\s+tak|w\s+końcu|do\s+końca|nadal)\s+){0,3}"
+                        r"(?:(?:już|jeszcze|teraz|zbyt|tak|bardzo|dość|naprawdę|wreszcie|wtedy|znowu|ciągle|przecież|chyba|pewnie|całkiem|aż\s+tak|w\s+końcu|do\s+końca|nadal)\s+){0,3}(?:\{[^}]*\}\s*)?"
                     )
                     for f_adj, m_adj in FEMININE_SG_ADJECTIVES_TO_MASCULINE.items():
                         pat_pred = rf"\b((?:jestem|nie\s+jestem|byłem|byłam|będę|nie\s+będę|czułem\s+się|czułam\s+się|zostałem|zostałam|poczułem\s+się|poczułam\s+się|stałem\s+się|stałam\s+się)\s+{SAFE_INTERVENING_SPAN_1P})({re.escape(f_adj)})\b"
@@ -5616,7 +5635,7 @@ class EpisodeQualityGate:
                     ev.text = re.sub(r"\b[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+(?:łem|łbym)\b", _morph_m_to_f_repl, ev.text)
                     # Compound predicates for female speaker
                     SAFE_INTERVENING_SPAN_1P = (
-                        r"(?:(?:już|jeszcze|teraz|zbyt|tak|bardzo|dość|naprawdę|wreszcie|wtedy|znowu|ciągle|przecież|chyba|pewnie|całkiem|aż\s+tak|w\s+końcu|do\s+końca|nadal)\s+){0,3}"
+                        r"(?:(?:już|jeszcze|teraz|zbyt|tak|bardzo|dość|naprawdę|wreszcie|wtedy|znowu|ciągle|przecież|chyba|pewnie|całkiem|aż\s+tak|w\s+końcu|do\s+końca|nadal)\s+){0,3}(?:\{[^}]*\}\s*)?"
                     )
                     for m_adj, f_adj in MASCULINE_SG_ADJECTIVES_TO_FEMININE.items():
                         pat_pred = rf"\b((?:jestem|nie\s+jestem|byłam|byłem|będę|nie\s+będę|czułam\s+się|czułem\s+się|zostałam|zostałem|poczułam\s+się|poczułem\s+się|stałam\s+się|stałem\s+się)\s+{SAFE_INTERVENING_SPAN_1P})({re.escape(m_adj)})\b"

@@ -28,6 +28,10 @@ Ten dokument definiuje nienaruszalne, trwałe reguły postępowania asystenta AI
    - Podczas projektowania poprawek, audytów kodu, tworzenia promptów i implementacji modułów w potoku wielowarstwowym (Warstwy 1–5), twoim **najwyższym obowiązkiem jest unikanie EFEKTÓW DRUGIEGO RZĘDU (second-order vulnerabilities)**, w których rozwiązanie jednego problemu wywołuje nową, cichą awarię w innej części potoku.
    - Obowiązuje kategoryczny zakaz łamania **6 Żelaznych Aksjomatów Architektury** (Aksjomat 1: Aseptyczność Morfologiczna; Aksjomat 2: Granica Determinizmu; Aksjomat 3: Spójność Multi-Script; Aksjomat 4: Paradygmat Pesymistycznej Nienaruszalności; Aksjomat 5: Pętla Metryk na Języku Docelowym; Aksjomat 6: Atomowość Tarcz Regresyjnych).
    - Przed KAŻDĄ odpowiedzią, propozycją kodu, modyfikacją promptu czy lintera asystent ma bezwzględny obowiązek przeprowadzić **Protokół Samokontroli (Pre-Flight Checklist)** zgodnie z Zasadą 19.
+7. **Eliminacja „Syndromu Zamiatacza” i Twardy Kontrakt Danych (Post-hoc Sanitation Drift Ban):**
+   - **Koniec ze zrzucaniem walidacji na linter:** Przenoszenie ciężaru inferencji gramatycznej na `avt_linter.py` (rozbudowywanie setek regexów dla orzeczników czasu teraźniejszego/przyszłego) jest błędem kategorii. Linter nie zastępuje reprezentacji wiedzy.
+   - **Twardy kontrakt Pydantic na wejściu (Faza 1):** Wymuszenie pola `speaker_grammatical_gender: "MASCULINE" | "FEMININE"` jako zwalidowanego warunku w schemacie wyjściowym LLM (`LineTranslation`). Jeśli sygnał audio (seiyū żeńska) stoi w sprzeczności z kanonem postaci (cross-gender casting, np. Tokiyuki Hōjō), model ma bezwzględny zakaz ulegania akustyce kosztem tożsamości.
+   - **Zakaz fetyszyzowania reguł offline za wszelką cenę:** Jeśli rozwiązanie problemu wielowymiarowego wymaga pisania 100-linijkowego, kruchego i podatnego na kolizje potwora regexowego w Pythonie, dopuszcza się mikro-zapytanie semantyczne (tani call LLM do 5 tokenów) zamiast powiększać dług technologiczny lintera.
 
 ---
 
@@ -67,6 +71,9 @@ Ten dokument definiuje nienaruszalne, trwałe reguły postępowania asystenta AI
    - Kategoryczny zakaz bezkontekstowego, mechanicznego podmieniania całych fraz rzeczownikowych i pojęć odmiennych (np. terminy kanoniczne, imiona, tytulatura, relacje, nazwy własne) na sztywne formy słownikowe. Taka podmiana wywołuje „mianownizację” (nominative freezing – zamrażanie form zależnych w mianowniku, np. *z Aurą Gilotyną* $\to$ *z Aura Gilotyna*), łamie związki zgody z przymiotnikami (*ten potężny zaklęcie*), narusza rekcję czasowników i przyimków oraz rozsadza limity CPS.
    - Wszelkie elementy wymagające autentycznej kreacji leksykalnej, wyczucia pragmatyki, intonacji aktorskiej i subtekstu seiyū **muszą bezwzględnie pozostać w modelach Gemini** (wspierane kontekstem i kanonem, a nie mechanicznym string-replacerem).
    - **Harmonijny Wyjątek Architektoniczny (Deterministyczna Jednotokenowa Harmonizacja Fleksyjna $W_i \to W'_i$):** Zgodnie z Zasadami 13.2 i 14.3, Warstwa 4 ma prawo i obowiązek deterministycznie zharmonizować końcówkę fleksyjną pojedynczego tokenu (rodzaj czasownika, imiesłowu lub przymiotnika orzecznikowego wynikający z rozstrzygnięcia dwuznaczności angielskiej), pod warunkiem że płeć i relacja są w 100% udowodnione przez Warstwy 1 i 2, a szyk zdania i wyrazów sąsiadujących pozostaje w 100% nienaruszony.
+4. **Wyjątek Mikro-Zapytań Semantycznych (Semantic Micro-Query Allowance):**
+   - Obowiązuje zakaz fetyszyzowania reguł offline za wszelką cenę.
+   - Gdy deterministyczne rozwiązanie problemu wielowymiarowego (np. subtelna dwuznaczność pragmatyczna, wielowariantowa struktura relacyjna) wymagałoby tworzenia 100-linijkowego, kruchego i podatnego na kolizje potwora regexowego w Pythonie, potok ma prawo i obowiązek dopuścić mikro-zapytanie semantyczne (tani call LLM do 5 tokenów w warstwie arbitrażu/weryfikacji), chroniąc kod lintera przed długiem technologicznym i kaskadowymi awariami.
 
 ---
 
@@ -593,8 +600,25 @@ Niniejsza procedura stanowi trwały, żelazny standard reagowania na błędy tra
 
 ---
 
-### 📋 Szablon Biletu Incydentu (INC-AVT Ticket Template)
-Każde zgłoszenie Operatora Agent 3 natychmiast przekształca w sformalizowany bilet:
+### 🚦 Dwutorowy Potok Triage (Two-Track Dispatcher)
+
+W zależności od natury usterki zgłoszonej przez Operatora, Agent 3 kieruje sprawę na właściwy tor:
+
+#### ⚡ Tor 1: Ścieżka Szybka (Fast-Track — Błędy Leksykalne, Słowniki, Kanon 0.00 PLN)
+- **Kiedy stosować:** Oczywiste literówki w nazwach własnych, brakujące pozycje w słownikach wyrazów nieodmiennych, nowa pozycja w kanonie mangowym, twarda podmiana bezkontekstowa PWN.
+- **Procedura:** 
+  1. Agent 3 pomija pełną procedurę biletową (brak zbędnego narzutu tokenów i biurokratycznego paraliżu).
+  2. Agent 1 przygotowuje diff w RAM i uruchamia dwustronną asercję antykolizyjną (pozytywna + negatywna).
+  3. Błyskawiczny audyt Agenta 2 (weryfikacja braku kolizji homonimicznych).
+  4. Natychmiastowe Dossier Zmiany dla Operatora z podglądem diffa.
+
+#### 🏛️ Tor 2: Ścieżka Głęboka (Deep Architectural Track — Przepływ Danych, Płeć, Dwugłosy, ASS, Prompty)
+- **Kiedy stosować:** Błędy atrybucji płci mówcy/odbiorcy, asymetria F0/Whisper, zlanie dwugłosów, interferencja stylów i pozycjonowania ASS, modyfikacja promptów Fazy 1/2 oraz bazy wiedzy.
+- **Procedura:** Pełny 5-krokowy protokół z formalnym Biletem Incydentu `INC-AVT-[NUMER]`, analizą ontologiczną na stykach modalności i audytem ASS-Fuzzing.
+
+---
+
+### 📋 Szablon Biletu Incydentu Ścieżki Głębokiej (INC-AVT Ticket Template)
 
 ┌───────────────────────────────────────────────────────────────────────────┐
 │ INCIDENT TICKET ID: INC-AVT-[NUMER]                                       │
@@ -608,47 +632,57 @@ Każde zgłoszenie Operatora Agent 3 natychmiast przekształca w sformalizowany 
 │    - Zlokalizowany węzeł awarii: [Warstwa 1 DSP / Warstwa 2 SSOT /        │
 │      Warstwa 3 De-merger i Dyskurs / Warstwa 4 Script Doctor]             │
 │    - Mechanizm błędu: [Utrata F0 / Zlanie dwugłosu / Fałszywe dziedziczenie│
-│      aktora / Nominative Freezing / Asymetria deiktyczna]                 │
+│      aktora / Asymetria deiktyczna / Brak walidacji w kontrakcie Pydantic]│
 │    - Weto anty-prowizoryczne: [Czego kategorycznie NIE wolno robić]       │
 │                                                                           │
 │ 3. CZERWONY TEST REGRESYJNY (GOLDEN CORPUS ASYGNACJA):                    │
 │    - Sygnatura testu: test_regression_inc_[numer]()                       │
-│    - Warunki brzegowe (Fixtures): Audio F0, klatki wideo, transkrypcja JA │
-│    - Stan początkowy: FAIL (udokumentowany zrzut błędu)                   │
+│    - Fixtures: Audio F0, klatki wideo, transkrypcja JA, zagnieżdżone ASS  │
+│    - Stan początkowy: FAIL                                                │
 │                                                                           │
-│ 4. DYREKTYWA IMPLEMENTACYJNA DLA AGENTA 1:                                │
+│ 4. DYREKTYWA DLA AGENTA 1 (LEAD IMPLEMENTER):                             │
 │    - Wymagany moduł docelowy: [np. series_memory.py / scene_discourse.py] │
-│    - Kontrakt danych: [Dokładny kształt schematu JSON / stanu przed wejściem]
-│    - Kryterium sukcesu: Czerwony test zamienia się w PASS.                │
+│    - Kontrakt danych: Twarde wymuszenie typu w Pydantic przed LLM          │
+│    - Kryterium sukcesu: Czerwony test przechodzi w PASS.                  │
 │                                                                           │
-│ 5. ZAKRES AUDYTU ADVERSARIALNEGO DLA AGENTA 2:                            │
-│    - Wskazanie potencjalnych wektorów regresji: [Tagi ASS \pos, kolizje   │
-│      wielogłosów, postacie androgyniczne, budżet znaków CPL/CPS]          │
+│ 5. REŻIM AUDYTU DLA AGENTA 2 (ADVERSARIAL ASS-FUZZING):                   │
+│    - Obowiązkowe wektory: zagnieżdżone tagi {\i1}, \pos, \an8, \N, \h,    │
+│      metryka Anti-Goodhart (zakaz kastracji dramatycznej tekstu).         │
 └───────────────────────────────────────────────────────────────────────────┘
 
 ---
 
-### 🔄 Potok Wykonawczy (5 Kroków Obsługi Incydentu)
+### 🔄 Potok Wykonawczy Ścieżki Głębokiej (5 Kroków Obsługi Incydentu)
 
 1. **KROK 1: Redagowanie Zgłoszenia i Formalny Bilet Incydentu (AGENT 3)**
-   - Natychmiast po zgłoszeniu wadliwej linii przez Operatora Agent 3 generuje bilet `INC-AVT-[NUMER]`.
-   - Identyfikuje węzeł awarii w 5 warstwach i formułuje czerwony test regresyjny `FAIL`.
+   - Agent 3 generuje bilet `INC-AVT-[NUMER]`, formułuje czerwony test regresyjny `FAIL` i definiuje wymagania brzegowe.
 2. **KROK 2: Projekt Architektoniczny i Diff Preview w RAM (AGENT 1)**
-   - Agent 1 pobiera bilet i bez dotykania plików na dysku projektuje rozwiązanie w pamięci (RAM Diff Preview).
-   - Koduje rozwiązanie w docelowym module i wykazuje, że test z biletu przechodzi w stan `PASS`.
-   - Przekazuje diff i stan testu do Agenta 2.
-3. **KROK 3: Adversarialny Audyt Brzegowy (AGENT 2)**
-   - Agent 2 przeprowadza bezwzględny audyt diffu Agenta 1 pod kątem 18 wymiarów podatności (m.in. Style-Bleed `{\an...}`, limity CPS/CPL, kolizje wielogłosów, mianownizacja).
+   - Agent 1 projektuje rozwiązanie w pamięci (RAM Diff Preview) u źródła (kontrakt danych Pydantic / kanon) bez puchnięcia lintera.
+   - Wykazuje, że czerwony test przechodzi w stan `PASS`. Przekazuje diff do Agenta 2.
+3. **KROK 3: Adversarialny Audyt Brzegowy & ASS-Fuzzing (AGENT 2)**
+   - Agent 2 przeprowadza bezwzględny audyt diffu pod kątem złośliwych zagnieżdżeń ASS (`{\i1}`, `{\pos}`, `{\an8}`, `\N`, `\h`), metryki Anti-Goodhart oraz zjawisk spoza okna (plurale tantum, partykuły `-żeż`, wołacz zaimkowy).
    - Wydaje werdykt: `STATUS: WYMAGANA REWIZJA` lub `STATUS: REKOMENDACJA DLA AGENTA 3`.
-   - W razie impasu Agent 3 występuje jako Deadlock Arbiter.
+   - W razie impasu Agent 3 występuje jako Deadlock Arbiter (z obowiązkiem wpisania ryzyka do Rejestru Długu Technicznego).
 4. **KROK 4: Walidacja Systemowa i Dossier Zmiany dla Operatora (AGENT 3)**
-   - Agent 3 weryfikuje integralność na Golden Corpus (200 scen; próg: $\ge 98.0\%$).
-   - Kompiluje Dossier Zmiany dla OPERATORA (Bilet ID, Diff preview, wynik testu PASS, oświadczenie o braku protez).
+   - Weryfikacja integralności: **100.0% na Anchor Scenes**, $\ge 99.0\%$ na Broader Corpus, $\ge 99.8\%$ na atrybucji płci.
+   - Kompilacja Dossier Zmiany (Bilet ID, Diff preview, wynik testu PASS, Rejestr Długu Technicznego).
    - Formułuje wniosek: `OCZEKIWANIE NA DECYZJĘ OPERATORA`.
 5. **KROK 5: Decyzja Operatora i Fizyczna Aplikacja Zmian (OPERATOR -> AGENT 1)**
-   - Operator analizuje Dossier i wydaje polecenie: `ODRZUCONO` lub `ZATWIERDZAM DOSSIER ZMIANY - WDROŻYĆ DO KODU`.
-   - Dopiero po autoryzacji Agent 1 fizycznie modyfikuje pliki w repozytorium.
-   - Agent 3 uruchamia oficjalny test produkcyjny, weryfikuje sukces i zamyka Bilet Incydentu.
+   - Dopiero po komendzie Operatora `ZATWIERDZAM DOSSIER ZMIANY - WDROŻYĆ DO KODU` Agent 1 fizycznie modyfikuje pliki w repozytorium.
+   - Agent 3 uruchamia test produkcyjny, weryfikuje sukces i zamyka Bilet Incydentu.
+
+---
+
+### 🛡️ 4 Żelazne Bezpieczniki Zreformowanego Potoku
+
+1. **Metryka Dramaturgiczna Prozodii (Anti-Goodhart & Breathing Space Index):**
+   Kategoryczny zakaz skracania lub kastracji polskiego dialogu do poziomu sztucznego telegramu wyłącznie po to, by zmieścić się w CPL $\le 38$ lub CPS $\le 17$. Jeśli kwestia wymaga oddechu aktorskiego, dopuszczalne jest syntaktyczne rozbicie dwuwiersza (`\N`) lub zbalansowanie pauz, przy bezwzględnym zachowaniu ładunku emocjonalnego i idiolektu seiyū.
+2. **Obowiązkowy Audyt ASS-Fuzzing (Agent 2):**
+   Każda propozycja zmiany w Warstwie 4 musi zostać przetestowana z wstrzykniętymi tagami stylizacyjnymi fansubu: `{\i1}Tekst{\i0}`, `{\pos(x,y)}`, `{\an8}`, twardymi spacjami `\h` oraz łamaniami `\N`. Linter musi operować na wyabstrahowanym drzewie tokenów wizualnych, nigdy na surowym tekście z ryzykiem uszkodzenia nawiasów klamrowych `{}`. Naruszenie składni klamer ASS lub ominięcie reguły przez obecność tagu oznacza natychmiastowe WETO Agenta 2.
+3. **Absolutny Próg Regresji Golden Corpus = 100.0% na Scenach Kotwiczących (Anchor Scenes):**
+   Likwidacja tolerancji 98.0%. Na zbiorze Scen Kotwiczących (Anchor Scenes — kluczowe punkty zwrotne fabuły, kanoniczne konfrontacje, wyznania) próg regresji wynosi bezwzględne **100.0% (Zero Regression Tolerance)**. Broader Corpus wymaga $\ge 99.0\%$ z zerową tolerancją degradacji płciowej ($\ge 99.8\%$).
+4. **Leczenie Źródła w Kontraktach Danych (True Root Cause over Linter Bloat):**
+   Jeśli błąd wynika z atrybucji płci lub tożsamości postaci, Agent 1 ma obowiązek zablokować błąd w kontrakcie wejściowym (Warstwa 1 i Warstwa 2 — Pydantic schema `speaker_grammatical_gender` / SeriesBible), zamiast dokładać kolejne setki linii regexów do `avt_linter.py`.
 
 
 

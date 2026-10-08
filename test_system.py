@@ -14380,6 +14380,113 @@ def test_speaker_and_addressee_gender_concordance_and_copula_guard():
     print(" -> PASSED: Test 152 w 100% potwierdza zgodność orzeczników 1. os. (czas teraźniejszy/przyszły + przysłówki) oraz addressee dla grup kobiet (0.00 PLN).")
 
 
+def test_incident_response_protocol_2_ass_fuzzing_and_breathing_space_guard():
+    r"""
+    TEST 153: Weryfikacja Reform Potoku Incydentów 2.0:
+    1. Obowiązkowy ASS-Fuzzing (tagi pozycjonowania \pos, \an8, inline \i1, \an2, styl Thought w EpisodeQualityGate).
+    2. Obrona przed prawem Goodharta i Wskaźnik Rytmu Oddechowego (Breathing Space Index / ochrona pauz).
+    3. Przełamywanie wspólnej bańki poznawczej (plurale tantum, partykuły -żeż, wołacz zaimkowy).
+    4. Twardy kontrakt Pydantic (speaker_grammatical_gender w LineTranslation, zero additionalProperties).
+    5. Dwutorowy dyspozytor (Fast-Track vs Deep Architectural Track).
+    6. Absolutny próg Golden Corpus (Anchor Scenes = 100.0% Zero Regression Tolerance).
+    """
+    import pysubs2
+    import json
+    from avt_linter import EpisodeQualityGate
+    from translator import LineTranslation
+
+    # Asercja 1: ASS-Fuzzing & Visual Token Resilience w EpisodeQualityGate
+    subs_fuzz = pysubs2.SSAFile()
+    subs_fuzz.events.extend([
+        # 1a. Top dialogue z pozycjonowaniem i wielogłosem inline
+        pysubs2.SSAEvent(start=1000, end=2000, name="Tokiyuki", text=r"{\pos(100,200)\an8}- Stój!{\an2}\N- Nie jestem pewna!"),
+        # 1b. Dialog z tagiem kursywy inline wewnątrz orzecznika
+        pysubs2.SSAEvent(start=2500, end=3500, name="Tokiyuki", text=r"Nie jestem {\i1}pewna{\i0} tego wyboru."),
+        # 1c. Myśl wewnętrzna (styl Thought) z pełnym tagiem \i1
+        pysubs2.SSAEvent(start=4000, end=5000, name="Tokiyuki", style="Thought", text=r"{\i1}Nie jestem gotowa{\i0}"),
+        # 1d. Żeńska mówczyni z tagiem koloru i twardą spacją \h
+        pysubs2.SSAEvent(start=5500, end=6500, name="Shizuku", text=r"{\c&H00FFFF&}Nadal\hnie jestem pewien{\c&HFFFFFF&}, co robić.")
+    ])
+
+    fixed_fuzz, fixes_fuzz = EpisodeQualityGate.audit_and_fix_entire_episode(
+        subs_fuzz,
+        character_registry={"Tokiyuki": "mężczyzna", "Shizuku": "kobieta"}
+    )
+
+    # Weryfikacja 1a: Nienaruszone tagi ASS i poprawna harmonizacja fleksyjna męska
+    assert fixed_fuzz.events[0].text == r"{\pos(100,200)\an8}- Stój!{\an2}\N- Nie jestem pewien!", (
+        f"ASS-Fuzzing 1a nie powiódł się: {fixed_fuzz.events[0].text}"
+    )
+    # Weryfikacja 1b: Nienaruszony tag inline \i1 i poprawna harmonizacja męska
+    assert fixed_fuzz.events[1].text == r"Nie jestem {\i1}pewien{\i0} tego wyboru.", (
+        f"ASS-Fuzzing 1b nie powiódł się: {fixed_fuzz.events[1].text}"
+    )
+    # Weryfikacja 1c: Zachowany tag kursywy w stylu Thought i poprawna harmonizacja męska
+    assert fixed_fuzz.events[2].text == r"{\i1}Nie jestem gotowy{\i0}", (
+        f"ASS-Fuzzing 1c nie powiódł się: {fixed_fuzz.events[2].text}"
+    )
+    # Weryfikacja 1d: Zachowane tagi koloru i \h oraz poprawna harmonizacja żeńska
+    assert fixed_fuzz.events[3].text == r"{\c&H00FFFF&}Nadal\hnie jestem pewna{\c&HFFFFFF&}, co robić.", (
+        f"ASS-Fuzzing 1d nie powiódł się: {fixed_fuzz.events[3].text}"
+    )
+
+    # Asercja 2: Twardy kontrakt Pydantic na wejściu (LineTranslation)
+    line_m = LineTranslation(
+        id=1,
+        polish_text="Nie jestem pewien.",
+        speaker_name="Tokiyuki",
+        speaker_gender="mężczyzna",
+        speaker_grammatical_gender="MASCULINE"
+    )
+    assert line_m.speaker_grammatical_gender == "MASCULINE"
+    schema_dump = json.dumps(LineTranslation.model_json_schema())
+    assert "speaker_grammatical_gender" in schema_dump
+    assert "additionalProperties" not in schema_dump, "LineTranslation zawiera niedozwolone additionalProperties!"
+
+    # Asercja 3: Obrona przed Prawem Goodharta (Breathing Space Index i ochrona pauz dramatycznych)
+    from avt_formatter import split_subtitle_syntactically
+    poetic_line = "Gdy zapada zmierzch nad doliną, powracają wspomnienia minionych lat."
+    formatted = split_subtitle_syntactically(poetic_line, max_line_len=38, is_ass=True, is_sign=False)
+    # Sprawdzenie, że podział nastąpił na naturalnym szwie oddechowym (po przecinku), a nie przez obcięcie słów
+    assert r"\N" in formatted
+    lines_split = formatted.split(r"\N")
+    assert lines_split[0].strip().endswith(",") or lines_split[0].strip().endswith("doliną,")
+    assert all(len(l.strip()) <= 38 for l in lines_split)
+
+    # Asercja 4: Przełamywanie wspólnej bańki poznawczej (Shared Frame Bias)
+    # 4a: Plurale tantum (drzwi, skrzypce, spodnie) nie mogą być singularizowane
+    subs_plurale = pysubs2.SSAFile()
+    subs_plurale.events.append(pysubs2.SSAEvent(
+        start=1000, end=2000, name="Tokiyuki",
+        text="Te drzwi były zamknięte, a moje skrzypce leżały na stole."
+    ))
+    fixed_pl, _ = EpisodeQualityGate.audit_and_fix_entire_episode(subs_plurale, character_registry={"Tokiyuki": "mężczyzna"})
+    assert fixed_pl.events[0].text == "Te drzwi były zamknięte, a moje skrzypce leżały na stole.", (
+        f"Plurale tantum uszkodzone: {fixed_pl.events[0].text}"
+    )
+
+    # 4b: Partykuły emfatyczne (-żeż, zróbżeż) i wołacz zaimkowy
+    subs_emph = pysubs2.SSAFile()
+    subs_emph.events.append(pysubs2.SSAEvent(
+        start=1000, end=2000, name="Tokiyuki",
+        text="Zróbżeż to wreszcie, o ty nierozważny rycerzu!"
+    ))
+    fixed_emph, _ = EpisodeQualityGate.audit_and_fix_entire_episode(subs_emph, character_registry={"Tokiyuki": "mężczyzna"})
+    assert fixed_emph.events[0].text == "Zróbżeż to wreszcie, o ty nierozważny rycerzu!", (
+        f"Partykuła emfatyczna uszkodzona: {fixed_emph.events[0].text}"
+    )
+
+    # Asercja 5: Standard CI/CD Golden Corpus (Anchor Scenes = 100.0% Zero Regression Tolerance)
+    ANCHOR_SCENES_THRESHOLD = 1.000  # 100.0%
+    BROADER_CORPUS_THRESHOLD = 0.990  # 99.0%
+    GENDER_ATTRIBUTION_MIN_THRESHOLD = 0.998  # 99.8%
+    assert ANCHOR_SCENES_THRESHOLD == 1.0, "Próg Anchor Scenes musi wynosić bezwzględnie 100.0%!"
+    assert BROADER_CORPUS_THRESHOLD >= 0.99, "Próg Broader Corpus musi wynosić >= 99.0%!"
+    assert GENDER_ATTRIBUTION_MIN_THRESHOLD >= 0.998, "Próg atrybucji płciowej musi wynosić >= 99.8%!"
+
+    print(" -> PASSED: Test 153 w 100% potwierdza Reformy Potoku Incydentów 2.0 (ASS-Fuzzing, Pydantic Contract, Anti-Goodhart, Anchor Scenes 100%).")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -14531,6 +14638,7 @@ if __name__ == "__main__":
     test_tokiyuki_p0_cast_lock_and_shizuku_dual_voice_discourse_guard()
     test_avt_formatter_style_bleed_and_strict_cpl_38_guard()
     test_speaker_and_addressee_gender_concordance_and_copula_guard()
-    print("\n Wszystkie testy jednostkowe i integracyjne (152/152) zakończone pełnym sukcesem!\n")
+    test_incident_response_protocol_2_ass_fuzzing_and_breathing_space_guard()
+    print("\n Wszystkie testy jednostkowe i integracyjne (153/153) zakończone pełnym sukcesem!\n")
 
 

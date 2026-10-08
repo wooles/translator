@@ -278,14 +278,17 @@ class ScriptDoctorSelector:
 
 ---
 
-## 🚨 6. PROCEDURA OBSŁUGI INCYDENTU TRANSLATORSKIEGO (INC-AVT PROTOCOL)
+## 🚨 6. ZREFORMOWANA PROCEDURA OBSŁUGI INCYDENTU (INC-AVT 2.0 PROTOCOL)
 
-Wszystkie zgłoszenia defektów dialogowych podlegają pod Żelazny Protokół Obsługi Incydentów:
+Wszystkie zgłoszenia defektów dialogowych podlegają pod Żelazny Protokół Obsługi Incydentów 2.0:
 1. **Wyłącznie Operator** autoryzuje fizyczny zapis do repozytorium komendą: `ZATWIERDZAM DOSSIER ZMIANY - WDROŻYĆ DO KODU`.
-2. **Agent 3 (Chief Epistemic Architect):** Triage zgłoszenia do biletu `INC-AVT-[NUMER]`, czerwony test regresyjny, asygnacja Golden Corpus, Deadlock Arbiter.
-3. **Agent 1 (Lead Implementer):** Prototypowanie w RAM, Diff Preview, zielony test jednostkowy, brak modyfikacji dysku przed zgodą Operatora.
-4. **Agent 2 (Adversarial Reviewer):** Audyt brzegowy 18 wymiarów, weryfikacja ASS/CPS/CPL, werdykt techniczny.
-5. **Golden Corpus Gate:** Wdrożenie wymaga $\ge 98.0\%$ zgodności na 200 scenach krytycznych (Grupy A, B, C, D).
+2. **Dwutorowy Dispatcher (Agent 3):**
+   - *Fast-Track:* Dla bezkontekstowych wpisów słownikowych i kanonu (0.00 PLN) — natychmiastowy RAM diff, test antykolizyjny i Dossier bez ceremonii biletowej.
+   - *Deep Track:* Dla błędów wielomodalnych, płci, dwugłosów i promptów — pełny bilet `INC-AVT-[NUMER]`, analiza ontologiczna i czerwony test regresyjny.
+3. **Agent 1 (Lead Implementer):** Prototypowanie w RAM, Diff Preview, naprawa u źródła w schematach danych Pydantic (`speaker_grammatical_gender`), zakaz puchnięcia lintera.
+4. **Agent 2 (Adversarial Reviewer & ASS-Fuzzing):** Audyt 18 wymiarów, weryfikacja złośliwych tagów ASS (`{\i1}`, `\pos`, `\an8`, `\N`), obrona dramaturgii przed prawem Goodharta (Breathing Space Index) oraz atak na zjawiska spoza okna (plurale tantum, partykuły `-żeż`).
+5. **Golden Corpus Anchor Gate:** Bezwzględny wymóg **100.0% sukcesu** na Scenach Kotwiczących (Zero Regression Tolerance), $\ge 99.0\%$ na Broader Corpus, $\ge 99.8\%$ na atrybucji płci.
+6. **Odpowiedzialność Arbitrażu:** Zakaz wyciszania zastrzeżeń A2; rejestr długu technicznego w Dossier Zmiany.
 
 
 
