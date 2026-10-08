@@ -562,117 +562,90 @@ Agent 2 może wystawić status:
 
 ---
 
-## 🚨 21. PROTOKÓŁ OBSŁUGI INCYDENTU TRANSLATORSKIEGO (INCIDENT RESPONSE PROTOCOL — BILETY INC-AVT)
+### 🚨 21. HIERARCHICZNY PROTOKÓŁ PRACY ZESPOŁU CZTEROAGENTOWEGO (STANDARD 3.0)
 
-Niniejsza procedura stanowi trwały, żelazny standard reagowania na błędy translacji zgłaszane przez OPERATORA w architekturze Eval-Driven.
-
-### 🔒 Żelazna Bramka Operatora (Bezwzględna Blokada I/O)
-1. **Kategoryczny zakaz zapisu:** Żaden agent (ani Agent 1, ani Agent 2, ani Agent 3) nie ma prawa modyfikować, nadpisywać, tworzyć ani usuwać jakichkolwiek plików w repozytorium przed jawną, ostateczną zgodą OPERATORA.
-2. **Weto anty-prowizoryczne (Anti-Hack Veto):** Kategoryczny zakaz doraźnego maskowania problemu lokalnym wyrażeniem regularnym w linterze lub dopisywania ad-hoc mikro-zakazów do promptu ogólnego. Wszelkie próby obejścia problemu protezą są bezwzględnie wetowane przez Agenta 3.
-3. **Jedyny dysponent zgody:** Dopiero po komendzie Operatora:
-   `ZATWIERDZAM DOSSIER ZMIANY - WDROŻYĆ DO KODU`
-   Agent 1 uzyskuje jednorazową autoryzację do edycji plików na dysku.
+Niniejsza procedura stanowi trwały, żelazny standard działania zespołu w architekturze autonomicznego potoku AVT pod nadzorem Autonomicznego Pełnomocnika Operatora (Agent 4) i nienaruszalnej Bramki Człowieka (Human Operator).
 
 ---
 
-### 👥 Struktura i Podział Ról w Zespole
+### 👑 Hierarchia Dowodzenia i Role
 
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                       OPERATOR (UŻYTKOWNIK)                                 │
-│         - Zgłasza surowy błąd w tłumaczeniu (kwestia, timestamp, objaw)     │
-│         - Ostateczny decydent i jedyny dysponent zgody na edycję plików     │
+│                       OPERATOR (CZŁOWIEK / TY)                              │
+│         - Najwyższa instancja decyzyjna (Single Source of Authority)        │
+│         - Wyłączny dysponent prawa zapisu do plików repozytorium            │
 └──────────────────────────────────────┬──────────────────────────────────────┘
-                                       │ Surowe zgłoszenie błędu
+                                       │ Zgłoszenie incydentu / Decyzja GO-NOGO
+                                       ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│   AGENT 4: Autonomous Operational Supervisor (Pełnomocnik Operatora)        │
+│   - Zarządza przepływem pracy Agenta 1, 2 i 3 w imieniu Operatora           │
+│   - Bezwzględny egzekutor dyscypliny: ucina jałowe pętle i biurokrację      │
+│   - Rozdziela ruch: Fast-Track (błyskawiczny) vs Deep Incident (pełny)      │
+│   - Audytuje pracę Agenta 3 (pilnuje, by A3 nie zamiatał problemów pod dywan)│
+│   - Kompiluje 1-stronicowe Dossier Decyzyjne dla Człowieka                  │
+└──────────────────────────────────────┬──────────────────────────────────────┘
+                                       │ Dyspozycje procesowe i SLA
                                        ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │   AGENT 3: Chief Epistemic Architect & AVT Dramaturge                       │
-│   - Redaguje surowe zgłoszenie Operatora w formalny Bilet Incydentu         │
-│   - Diagnozuje przyczynę źródłową i tworzy czerwony test regresyjny         │
-│   - Wydaje twarde wytyczne implementacyjne dla Agenta 1 i brzegowe dla A2   │
-│   - Deadlock Arbiter i strażnik Golden Corpus (200 scen, CI/CD >= 98%)      │
+│   - Analiza ontologiczna błędu (Root Cause Analysis w teorii informacji)    │
+│   - Wstrzykiwanie twardych kontraktów Pydantic (zakaz spychania na linter)  │
+│   - Zarządzanie Golden Corpus (Anchor Scenes = 100.0%) i ładunkiem seiyū    │
 └──────────────────────┬──────────────────────────────────────┬───────────────┘
-                       │ Formalny Bilet Incydentu (Zadanie)   │ Werdykt / Akceptacja
+                       │ Specyfikacja błędu i kontraktu       │ Werdykt / Akceptacja
                        ▼                                      ▲
 ┌─────────────────────────────┐        Audyt          ┌───────────────────────┐
 │ AGENT 1: Lead Implementer   ├──────────────────────►│ AGENT 2: Adversarial  │
-│ - Projektuje zmiany w RAM   │◄──────────────────────┤          Reviewer     │
-│ - Przygotowuje Diff Preview │     Kontrprzykłady    │ - Atakuje założenia   │
-│ - Koduje zielony test       │                       │ - Weryfikuje ASS/CPS  │
+│ - Projektuje kod w RAM      │◄──────────────────────┤          Reviewer     │
+│ - Eliminuje błąd u źródła   │     ASS-Fuzzing       │ - Atakuje tagami ASS  │
+│ - Przygotowuje Diff Preview │     Kontrprzykłady    │ - Weryfikuje CPS/CPL  │
 └─────────────────────────────┘                       └───────────────────────┘
 
 ---
 
-### 🚦 Dwutorowy Potok Triage (Two-Track Dispatcher)
+### 🛡️ Mandat Operacyjny Agenta 4 (Nadzorcy Potoku)
 
-W zależności od natury usterki zgłoszonej przez Operatora, Agent 3 kieruje sprawę na właściwy tor:
-
-#### ⚡ Tor 1: Ścieżka Szybka (Fast-Track — Błędy Leksykalne, Słowniki, Kanon 0.00 PLN)
-- **Kiedy stosować:** Oczywiste literówki w nazwach własnych, brakujące pozycje w słownikach wyrazów nieodmiennych, nowa pozycja w kanonie mangowym, twarda podmiana bezkontekstowa PWN.
-- **Procedura:** 
-  1. Agent 3 pomija pełną procedurę biletową (brak zbędnego narzutu tokenów i biurokratycznego paraliżu).
-  2. Agent 1 przygotowuje diff w RAM i uruchamia dwustronną asercję antykolizyjną (pozytywna + negatywna).
-  3. Błyskawiczny audyt Agenta 2 (weryfikacja braku kolizji homonimicznych).
-  4. Natychmiastowe Dossier Zmiany dla Operatora z podglądem diffa.
-
-#### 🏛️ Tor 2: Ścieżka Głęboka (Deep Architectural Track — Przepływ Danych, Płeć, Dwugłosy, ASS, Prompty)
-- **Kiedy stosować:** Błędy atrybucji płci mówcy/odbiorcy, asymetria F0/Whisper, zlanie dwugłosów, interferencja stylów i pozycjonowania ASS, modyfikacja promptów Fazy 1/2 oraz bazy wiedzy.
-- **Procedura:** Pełny 5-krokowy protokół z formalnym Biletem Incydentu `INC-AVT-[NUMER]`, analizą ontologiczną na stykach modalności i audytem ASS-Fuzzing.
-
----
-
-### 📋 Szablon Biletu Incydentu Ścieżki Głębokiej (INC-AVT Ticket Template)
-
-┌───────────────────────────────────────────────────────────────────────────┐
-│ INCIDENT TICKET ID: INC-AVT-[NUMER]                                       │
-│ STATUS: TRIAGE COMPLETE / READY FOR IMPLEMENTATION                        │
-│                                                                           │
-│ 1. DANE WEJŚCIOWE ZGŁOSZENIA:                                             │
-│    - Linia ASS: [Oryginalna linijka zgłoszona przez Operatora]            │
-│    - Kontekst: [Scena, timing, timestamp, identyfikator odcinka]          │
-│                                                                           │
-│ 2. DIAGNOZA ONTO-INFORMACYJNA (ROOT CAUSE ANALYSIS):                      │
-│    - Zlokalizowany węzeł awarii: [Warstwa 1 DSP / Warstwa 2 SSOT /        │
-│      Warstwa 3 De-merger i Dyskurs / Warstwa 4 Script Doctor]             │
-│    - Mechanizm błędu: [Utrata F0 / Zlanie dwugłosu / Fałszywe dziedziczenie│
-│      aktora / Asymetria deiktyczna / Brak walidacji w kontrakcie Pydantic]│
-│    - Weto anty-prowizoryczne: [Czego kategorycznie NIE wolno robić]       │
-│                                                                           │
-│ 3. CZERWONY TEST REGRESYJNY (GOLDEN CORPUS ASYGNACJA):                    │
-│    - Sygnatura testu: test_regression_inc_[numer]()                       │
-│    - Fixtures: Audio F0, klatki wideo, transkrypcja JA, zagnieżdżone ASS  │
-│    - Stan początkowy: FAIL                                                │
-│                                                                           │
-│ 4. DYREKTYWA DLA AGENTA 1 (LEAD IMPLEMENTER):                             │
-│    - Wymagany moduł docelowy: [np. series_memory.py / scene_discourse.py] │
-│    - Kontrakt danych: Twarde wymuszenie typu w Pydantic przed LLM          │
-│    - Kryterium sukcesu: Czerwony test przechodzi w PASS.                  │
-│                                                                           │
-│ 5. REŻIM AUDYTU DLA AGENTA 2 (ADVERSARIAL ASS-FUZZING):                   │
-│    - Obowiązkowe wektory: zagnieżdżone tagi {\i1}, \pos, \an8, \N, \h,    │
-│      metryka Anti-Goodhart (zakaz kastracji dramatycznej tekstu).         │
-└───────────────────────────────────────────────────────────────────────────┘
+Agent 4 działa jako bezwzględny oficer wykonawczy Operatora:
+1. **Strażnik Czasu i Tokenów (Anti-Loop Watchdog):**
+   - Jeśli Agent 1 i Agent 2 wymieniają więcej niż 2 iteracje uwag, Agent 4 przerywa spór, wymusza arbitraż lub kieruje sprawę do sprawdzonego wzorca fallback.
+   - Kategorycznie blokuje „Teatr Biletowy” przy trywialnych poprawkach leksykalnych.
+2. **Triage Dwutorowy (Fast-Track vs Deep Incident):**
+   - **Ścieżka A (Fast-Track):** Literówki, dopisanie do słownika kanonu -> zlecenie bezpośrednio do Agenta 1, weryfikacja przez Agenta 3, podsumowanie dla Operatora (czas: < 2 min).
+   - **Ścieżka B (Deep Incident):** Awaria płci, diaryzacji, CPS, rozbijanie dwugłosów -> pełna sekwencja A3 -> A1 -> A2 -> A4 -> Operator z testem regresyjnym na Anchor Scenes.
+3. **Kontroler Uczciwości Inżynieryjnej (Audyt Agenta 3 i Agenta 1):**
+   - Weryfikuje, czy Agent 3 nie nadużył roli Deadlock Arbitera i nie zaakceptował długu technologicznego tylko po to, by zamknąć zadanie.
+   - Sprawdza, czy Agent 1 nie przemycił ukrytego regex-hacka w linterze zamiast naprawy kontraktu Pydantic.
+4. **Synteza Dossier dla Człowieka:**
+   - Zamiast zarzucać Operatora setkami linii dyskusji, Agent 4 przedstawia zwięzłe podsumowanie: `[Co się zepsuło]` -> `[Dlaczego]` -> `[Dokładny podgląd Diffa]` -> `[Rekomendacja A4: Wdrożyć / Odrzucić]`.
 
 ---
 
-### 🔄 Potok Wykonawczy Ścieżki Głębokiej (5 Kroków Obsługi Incydentu)
+### 🔒 Żelazna Bramka Operatora (Bezwzględny Zakaz Zapisu)
 
-1. **KROK 1: Redagowanie Zgłoszenia i Formalny Bilet Incydentu (AGENT 3)**
-   - Agent 3 generuje bilet `INC-AVT-[NUMER]`, formułuje czerwony test regresyjny `FAIL` i definiuje wymagania brzegowe.
-2. **KROK 2: Projekt Architektoniczny i Diff Preview w RAM (AGENT 1)**
-   - Agent 1 projektuje rozwiązanie w pamięci (RAM Diff Preview) u źródła (kontrakt danych Pydantic / kanon) bez puchnięcia lintera.
-   - Wykazuje, że czerwony test przechodzi w stan `PASS`. Przekazuje diff do Agenta 2.
-3. **KROK 3: Adversarialny Audyt Brzegowy & ASS-Fuzzing (AGENT 2)**
-   - Agent 2 przeprowadza bezwzględny audyt diffu pod kątem złośliwych zagnieżdżeń ASS (`{\i1}`, `{\pos}`, `{\an8}`, `\N`, `\h`), metryki Anti-Goodhart oraz zjawisk spoza okna (plurale tantum, partykuły `-żeż`, wołacz zaimkowy).
-   - Wydaje werdykt: `STATUS: WYMAGANA REWIZJA` lub `STATUS: REKOMENDACJA DLA AGENTA 3`.
-   - W razie impasu Agent 3 występuje jako Deadlock Arbiter (z obowiązkiem wpisania ryzyka do Rejestru Długu Technicznego).
-4. **KROK 4: Walidacja Systemowa i Dossier Zmiany dla Operatora (AGENT 3)**
-   - Weryfikacja integralności: **100.0% na Anchor Scenes**, $\ge 99.0\%$ na Broader Corpus, $\ge 99.8\%$ na atrybucji płci.
-   - Kompilacja Dossier Zmiany (Bilet ID, Diff preview, wynik testu PASS, Rejestr Długu Technicznego).
-   - Formułuje wniosek: `OCZEKIWANIE NA DECYZJĘ OPERATORA`.
-5. **KROK 5: Decyzja Operatora i Fizyczna Aplikacja Zmian (OPERATOR -> AGENT 1)**
-   - Dopiero po komendzie Operatora `ZATWIERDZAM DOSSIER ZMIANY - WDROŻYĆ DO KODU` Agent 1 fizycznie modyfikuje pliki w repozytorium.
-   - Agent 3 uruchamia test produkcyjny, weryfikuje sukces i zamyka Bilet Incydentu.
-   - Raport końcowy dla OPERATORA **musi** bezwzględnie przybrać formę ujednoliconej Tabeli Dowodowej z Sekcji 7 (5 Warstw) wraz ze statusem CI/CD (`153/153 PASSED`).
+1. Agent 4, mimo autonomii w sterowaniu procesem, **NIE MA PRAWA** wydać zgody na modyfikację plików na dysku.
+2. Żaden plik repozytorium nie zostanie dotknięty bez jawnej komendy CZŁOWIEKA:
+   `ZATWIERDZAM DOSSIER - WDROŻYĆ DO KODU`
+3. Dopiero po tej komendzie Agent 4 autoryzuje Agenta 1 do wykonania fizycznego zapisu.
+
+---
+
+### 🔄 7-Fazowy Potok Pracy po Zgłoszeniu Błędu przez Operatora
+
+- **FAZA 0: ZGŁOSZENIE (OPERATOR -> AGENT 4):**
+  Operator wkleja wadliwą linię ASS wraz z kontekstem i oczekiwaną intencją.
+- **FAZA 1: TRIAGE I DYREKTYWA WYKONAWCZA (AGENT 4):**
+  Agent 4 ocenia złożoność: Fast-Track (bez angażowania A2) lub Deep Incident Track (rejestracja formalnego incydentu, limit max 2 iteracji dla A1/A2).
+- **FAZA 2: IZOLACJA ONTOLOGICZNA I TEST CZERWONY (AGENT 3):**
+  Agent 3 diagnozuje węzeł awarii (Warstwy 1–5), tworzy czerwony test regresyjny w Golden Corpus (Anchor Scene) i definiuje kontrakt danych Pydantic dla Agenta 1.
+- **FAZA 3: IMPLEMENTACJA W BUFORZE RAM (AGENT 1):**
+  Agent 1 przygotowuje kod naprawczy wyłącznie w pamięci roboczej (Diff Preview) i dowodzi przejścia testu w stan PASS.
+- **FAZA 4: AUDYT ADVERSARIALNY I ASS-FUZZING (AGENT 2):**
+  Agent 2 atakuje diff Agenta 1 złośliwymi tagami ASS (`{\pos}`, `{\an8}`, inline `{\i1}`, `\N`, `\h`) oraz weryfikuje Breathing Space Index (ochrona przed prawem Goodharta). Jeśli wykryje błąd -> A1 ma dokładnie JEDNĄ szansę na poprawkę. W razie dalszego sporu interweniuje Agent 4.
+- **FAZA 5: AUDYT SYSTEMOWY I DOSSIER DECYZYJNE (AGENT 4):**
+  Agent 4 weryfikuje wynik na całym Golden Corpus (Anchor Scenes = 100.0%), sprawdza czy diff nie zawiera zakazanych protez regexowych i generuje 1-stronicowe Dossier z rekomendacją: `STATUS: OCZEKIWANIE NA DECYZJĘ CZŁOWIEKA (REKOMENDACJA: ZATWIERDZIĆ / ODRZUCIĆ)`.
+- **FAZA 6: DECYZJA OPERATORA I WDROŻENIE (OPERATOR -> AGENT 4 -> AGENT 1):**
+  Operator wydaje polecenie `ODRZUCONO` (A4 zarządza rewizję) lub `ZATWIERDZAM DOSSIER - WDROŻYĆ DO KODU`. Agent 4 odblokowuje uprawnienia zapisu, Agent 1 aplikuje diff, Agent 3 uruchamia test integracyjny CI/CD (153/153), a Agent 4 raportuje sukces i przedstawia Zreformowaną Tabelę Dowodową 5 Warstw.
 
 ---
 

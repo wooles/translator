@@ -278,17 +278,15 @@ class ScriptDoctorSelector:
 
 ---
 
-## 🚨 6. ZREFORMOWANA PROCEDURA OBSŁUGI INCYDENTU (INC-AVT 2.0 PROTOCOL)
+## 🚨 6. HIERARCHICZNY PROTOKÓŁ PRACY ZESPOŁU CZTEROAGENTOWEGO (STANDARD 3.0)
 
-Wszystkie zgłoszenia defektów dialogowych podlegają pod Żelazny Protokół Obsługi Incydentów 2.0:
-1. **Wyłącznie Operator** autoryzuje fizyczny zapis do repozytorium komendą: `ZATWIERDZAM DOSSIER ZMIANY - WDROŻYĆ DO KODU`.
-2. **Dwutorowy Dispatcher (Agent 3):**
-   - *Fast-Track:* Dla bezkontekstowych wpisów słownikowych i kanonu (0.00 PLN) — natychmiastowy RAM diff, test antykolizyjny i Dossier bez ceremonii biletowej.
-   - *Deep Track:* Dla błędów wielomodalnych, płci, dwugłosów i promptów — pełny bilet `INC-AVT-[NUMER]`, analiza ontologiczna i czerwony test regresyjny.
-3. **Agent 1 (Lead Implementer):** Prototypowanie w RAM, Diff Preview, naprawa u źródła w schematach danych Pydantic (`speaker_grammatical_gender`), zakaz puchnięcia lintera.
-4. **Agent 2 (Adversarial Reviewer & ASS-Fuzzing):** Audyt 18 wymiarów, weryfikacja złośliwych tagów ASS (`{\i1}`, `\pos`, `\an8`, `\N`), obrona dramaturgii przed prawem Goodharta (Breathing Space Index) oraz atak na zjawiska spoza okna (plurale tantum, partykuły `-żeż`).
-5. **Golden Corpus Anchor Gate:** Bezwzględny wymóg **100.0% sukcesu** na Scenach Kotwiczących (Zero Regression Tolerance), $\ge 99.0\%$ na Broader Corpus, $\ge 99.8\%$ na atrybucji płci.
-6. **Odpowiedzialność Arbitrażu:** Zakaz wyciszania zastrzeżeń A2; rejestr długu technicznego w Dossier Zmiany.
+Wszystkie zgłoszenia defektów dialogowych podlegają pod Żelazny Protokół Obsługi Incydentów 3.0:
+1. **OPERATOR (Jedyny Właściciel I/O):** Fizyczny zapis do repozytorium następuje wyłącznie po komendzie: `ZATWIERDZAM DOSSIER - WDROŻYĆ DO KODU`.
+2. **AGENT 4 (Autonomous Operational Supervisor):** Pełnomocnik Operatora i jedyny punkt kontaktu. Egzekwuje dyscyplinę, przerywa spory po 2 iteracjach (Anti-Loop Watchdog), rozdziela ruch na Fast-Track (< 2 min) i Deep Incident Track, audytuje rzetelność A3 i A1 oraz syntetyzuje 1-stronicowe Dossier Decyzyjne.
+3. **AGENT 3 (Chief Epistemic Architect):** Analiza ontologiczna (Root Cause), twarde kontrakty Pydantic (`speaker_grammatical_gender`), czerwony test regresyjny i Wskaźnik Rytmu Oddechowego (Breathing Space Index).
+4. **AGENT 1 (Lead Implementer):** Prototypowanie w RAM, Diff Preview, naprawa u źródła w schematach danych Pydantic, zakaz puchnięcia lintera.
+5. **AGENT 2 (Adversarial Reviewer & ASS-Fuzzing):** Audyt 18 wymiarów, weryfikacja złośliwych tagów ASS (`{\i1}`, `\pos`, `\an8`, `\N`, `\h`), obrona dramaturgii przed prawem Goodharta oraz atak na zjawiska spoza okna (max 1 runda poprawek).
+6. **Golden Corpus Anchor Gate:** Bezwzględny wymóg **100.0% sukcesu** na Scenach Kotwiczących (Zero Regression Tolerance), $\ge 99.0\%$ na Broader Corpus, $\ge 99.8\%$ na atrybucji płci.
 7. **Permanentny Standard Raportowania (Ujednolicona Tabela Dowodowa 5 Warstw):** Każda odpowiedź asystenta podsumowująca obsługę błędu Operatora musi zawierać zreformowaną Tabelę Dowodową 5 Warstw (Warstwa 1: Kontrakt Pydantic; Warstwa 2: Fast/Deep Track & Rejestr Długu; Warstwa 3: Anti-Goodhart & Breathing Space Index; Warstwa 4: ASS-Fuzzing & Visual Token Resilience; Warstwa 5: Anchor Scenes 100.0% & CI/CD PASS) stanowiącą twardy certyfikat inżynierski.
 
 
