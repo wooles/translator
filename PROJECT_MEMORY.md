@@ -289,6 +289,7 @@ Wszystkie zgłoszenia defektów dialogowych podlegają pod Żelazny Protokół O
 4. **Agent 2 (Adversarial Reviewer & ASS-Fuzzing):** Audyt 18 wymiarów, weryfikacja złośliwych tagów ASS (`{\i1}`, `\pos`, `\an8`, `\N`), obrona dramaturgii przed prawem Goodharta (Breathing Space Index) oraz atak na zjawiska spoza okna (plurale tantum, partykuły `-żeż`).
 5. **Golden Corpus Anchor Gate:** Bezwzględny wymóg **100.0% sukcesu** na Scenach Kotwiczących (Zero Regression Tolerance), $\ge 99.0\%$ na Broader Corpus, $\ge 99.8\%$ na atrybucji płci.
 6. **Odpowiedzialność Arbitrażu:** Zakaz wyciszania zastrzeżeń A2; rejestr długu technicznego w Dossier Zmiany.
+7. **Permanentny Standard Raportowania (Ujednolicona Tabela Dowodowa 5 Warstw):** Każda odpowiedź asystenta podsumowująca obsługę błędu Operatora musi zawierać zreformowaną Tabelę Dowodową 5 Warstw (Warstwa 1: Kontrakt Pydantic; Warstwa 2: Fast/Deep Track & Rejestr Długu; Warstwa 3: Anti-Goodhart & Breathing Space Index; Warstwa 4: ASS-Fuzzing & Visual Token Resilience; Warstwa 5: Anchor Scenes 100.0% & CI/CD PASS) stanowiącą twardy certyfikat inżynierski.
 
 
 

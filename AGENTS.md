@@ -115,17 +115,19 @@ Każde zgłoszenie błędu przez użytkownika nakłada na asystenta obowiązek p
 
 ---
 
-## 📋 7. WYMÓG TABELI DOWODOWEJ W ODPOWIEDZI
+## 📋 7. WYMÓG ZREFORMOWANEJ TABELI DOWODOWEJ W ODPOWIEDZI NA BŁĄD OPERATORA (STANDARYZACJA PROTOKOŁU 2.0)
 
-W odpowiedzi na jakiekolwiek zgłoszenie usterki translatorskiej, asystent **musi** przedstawić tabelę dowodową wskazującą:
-1. Co konkretnie zmieniono w Warstwie 1 (profiler.py),
-2. Co konkretnie zmieniono w Warstwie 2 (series_memory.py),
-3. Co zmieniono w Warstwie 3 (rules.py) lub wykazanie ochrony czystości promptu (zgodnie z Zasadami 0.4 i 13.1),
-4. Co konkretnie zmieniono w Warstwie 4 (avt_linter.py),
-5. Numer i treść asercji dodanej w Warstwie 5 (test_system.py),
-6. Wynik uruchomienia test_system.py (musi być 100% PASSED).
+W odpowiedzi na jakiekolwiek zgłoszenie usterki translatorskiej przez OPERATORA, asystent ma **bezwzględny obowiązek** oprzeć swoje działanie i raport końcowy na zreformowanym standardzie 5 Warstw:
 
-Odpowiedź pozbawiona tej ścieżki stanowi bezpośrednie naruszenie reguł workspace.
+| Warstwa | Komponent | Obowiązkowy Rygor i Dowód w Odpowiedzi |
+| :--- | :--- | :--- |
+| **Warstwa 1** | `translator.py` & Kontrakt Pydantic | **Leczenie u Źródła:** Walidacja w schemacie wejściowym/wyjściowym Pydantic (`speaker_grammatical_gender: Optional[str]`, `additionalProperties: false`). Zakaz zrzucania problemu tożsamości na linter. |
+| **Warstwa 2** | `series_memory.py` / `manga_canon.py` | **Dwutorowy Dyspozytor & Rygor Wiedzy:** Skierowanie na Fast-Track (0.00 PLN słowniki/kanon) lub Deep Track. Wpisanie każdego arbitrażu do Rejestru Długu Technicznego. Dopuszczenie mikro-zapytań semantycznych (do 5 tokenów) zamiast kruchych 100-linijkowych regexów. |
+| **Warstwa 3** | `rules.py` / `avt_formatter.py` | **Obrona przed Prawem Goodharta:** Wskaźnik Rytmu Oddechowego (*Breathing Space Index*) i ochrona szwów oddechowych seiyū. Bezwzględny zakaz kastracji dramatycznej pod CPS/CPL. Czystość promptu bez paraliżujących mikro-zakazów. |
+| **Warstwa 4** | `avt_linter.py` (EpisodeQualityGate) | **ASS-Fuzzing & Visual Token Resilience:** Odporność na zagnieżdżenia formatowania ASS (`{\i1}`, `{\pos}`, `{\an8}`, `\N`, `\h`). Ochrona stylów `Thought`/`Internal`, precyzyjne rozróżnianie plansz `is_sign` i dialogów. |
+| **Warstwa 5** | `test_system.py` (CI/CD Golden Corpus) | **Anchor Scenes = 100.0% Zero Regression Tolerance:** Dedykowany test regresyjny z ASS-fuzzingiem. Wynik pełnego pakietu (obecnie 153/153) musi wynosić bezwzględnie 100% PASSED. |
+
+Odpowiedź pozbawiona tej ścieżki lub poprzestająca na doraźnym łataniu stanowi bezpośrednie naruszenie reguł workspace.
 
 ---
 
@@ -670,6 +672,7 @@ W zależności od natury usterki zgłoszonej przez Operatora, Agent 3 kieruje sp
 5. **KROK 5: Decyzja Operatora i Fizyczna Aplikacja Zmian (OPERATOR -> AGENT 1)**
    - Dopiero po komendzie Operatora `ZATWIERDZAM DOSSIER ZMIANY - WDROŻYĆ DO KODU` Agent 1 fizycznie modyfikuje pliki w repozytorium.
    - Agent 3 uruchamia test produkcyjny, weryfikuje sukces i zamyka Bilet Incydentu.
+   - Raport końcowy dla OPERATORA **musi** bezwzględnie przybrać formę ujednoliconej Tabeli Dowodowej z Sekcji 7 (5 Warstw) wraz ze statusem CI/CD (`153/153 PASSED`).
 
 ---
 
