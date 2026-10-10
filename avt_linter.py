@@ -4591,7 +4591,11 @@ class EpisodeQualityGate:
                 if ev.text != old_stutter_t:
                     fixes.append(f"[Episode Quality Gate - Filar CLXXIV Higiena Tokenów] Linia #{i+1}: usunięto zacięcie/jąkanie tokenu z interpunkcją")
 
-            ev_name_lower = (getattr(ev, "name", None) or getattr(ev, "actor", None) or "").lower()
+            ev_name_raw = (getattr(ev, "name", None) or getattr(ev, "actor", None) or (line_speakers.get(i) if line_speakers else None) or "")
+            clean_spk_curr = extract_clean_speaker_name(str(ev_name_raw)).strip()
+            is_char_spk_curr = bool(clean_spk_curr and not is_generic_actor_or_category(clean_spk_curr))
+            has_dial_toks_curr = bool(re.search(r"\b(ja|ty|mnie|mi|cię|ciebie|tobie|nas|wam|was|jestem|jesteś|nie|to|co|jak|dlaczego|[A-Za-ząćęłńóśźż]+(?:łem|łam|łeś|łaś|ł|ła|my|cie))\b", re.sub(r"\{[^\}]*\}", "", ev.text), re.IGNORECASE))
+            ev_name_lower = str(ev_name_raw).lower()
             ev_is_sub = bool(re.search(r"\bsubtitles?\b", ev_style_lower))
             is_explicit_sign = bool(
                 re.search(r"\b(sign|signs|title|titles|caption|captions|typeset|typesetting|op|ed|poster|card)\b", ev_style_lower)
@@ -4605,7 +4609,7 @@ class EpisodeQualityGate:
                 re.search(r"\\(clip|p1|frz|org)\b", ev.text)
                 or is_explicit_sign
                 or is_bracket_title
-                or (not ev_is_sub and not has_dialogue_dash and bool(re.search(r"\\(pos|move|an[789])\b", ev.text)))
+                or (not ev_is_sub and not has_dialogue_dash and bool(re.search(r"\\(pos|move|an[789])\b", ev.text)) and not (is_char_spk_curr and has_dial_toks_curr))
             )
 
             # Per-event Quote & Indirect Speech Shield map (Filary CLXX & CLXXXVII - 0.00 PLN)
@@ -4618,7 +4622,11 @@ class EpisodeQualityGate:
                 cand = events[j]
                 cand_text = re.sub(r"\{[^\}]*\}", "", cand.text or "").strip()
                 cand_style_lower = (cand.style or "").lower()
-                cand_name_lower = (getattr(cand, "name", None) or getattr(cand, "actor", None) or "").lower()
+                cand_spk_raw = (getattr(cand, "name", None) or getattr(cand, "actor", None) or (line_speakers.get(j) if line_speakers else None) or "")
+                cand_cl_spk = extract_clean_speaker_name(str(cand_spk_raw)).strip()
+                cand_is_char = bool(cand_cl_spk and not is_generic_actor_or_category(cand_cl_spk))
+                cand_has_tokens = bool(re.search(r"\b(ja|ty|mnie|mi|cię|ciebie|tobie|nas|wam|was|jestem|jesteś|nie|to|co|jak|dlaczego|[A-Za-ząćęłńóśźż]+(?:łem|łam|łeś|łaś|ł|ła|my|cie))\b", cand_text, re.IGNORECASE))
+                cand_name_lower = str(cand_spk_raw).lower()
                 cand_is_sub = bool(re.search(r"\bsubtitles?\b", cand_style_lower))
                 cand_is_explicit_sign = bool(
                     re.search(r"\b(sign|signs|title|titles|caption|captions|typeset|typesetting|op|ed|poster|card)\b", cand_style_lower)
@@ -4631,7 +4639,7 @@ class EpisodeQualityGate:
                     re.search(r"\\(clip|p1|frz|org)\b", cand.text or "")
                     or cand_is_explicit_sign
                     or cand_is_bracket
-                    or (not cand_is_sub and not cand_has_dash and bool(re.search(r"\\(pos|move|an[789])\b", cand.text or "")))
+                    or (not cand_is_sub and not cand_has_dash and bool(re.search(r"\\(pos|move|an[789])\b", cand.text or "")) and not (cand_is_char and cand_has_tokens))
                 )
                 if cand_text and not cand_is_sign:
                     prev_ev = cand

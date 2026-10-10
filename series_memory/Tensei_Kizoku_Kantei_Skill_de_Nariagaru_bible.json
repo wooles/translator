@@ -96,13 +96,15 @@
       "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Musia Trick": {
-      "description": "postać (Postać)"
+      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+      "gender": "FEMALE"
     },
     "Rosell": {
       "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Musia": {
-      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+      "gender": "FEMALE"
     },
     "Krantz": {
       "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
@@ -437,12 +439,13 @@
     },
     "Musia Trick": {
       "M": "Musia Trick",
-      "D": "Musii Tricka",
-      "C": "Musii Trickowi",
-      "B": "Musię Tricka",
-      "N": "Musią Trickiem",
-      "Ms": "Musii Tricku",
-      "W": "Musio Tricku"
+      "D": "Musii Trick",
+      "C": "Musii Trick",
+      "B": "Musię Trick",
+      "N": "Musią Trick",
+      "Ms": "Musii Trick",
+      "W": "Musio Trick",
+      "gender": "FEMALE"
     },
     "Rosell": {
       "M": "Rosell",

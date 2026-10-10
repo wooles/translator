@@ -685,7 +685,8 @@ POLISH_FEMALE_NAMES = {
     "marychna", "martka", "martusia", "martynka", "marzenka", "monia", "moniczka",
     "natka", "oliwka", "paulinka", "renatka", "roksa", "sylwka", "terenia", "tesia",
     "ula", "ulka", "ulusia", "werka", "weronisia", "wika", "wikusia", "wiolka",
-    "zośka", "zosieńka", "zuzia", "zuza", "zuźka", "zuzka"
+    "zośka", "zosieńka", "zuzia", "zuza", "zuźka", "zuzka",
+    "musia", "tusia", "lusia", "dusia", "stasia", "frania", "mania", "danusia", "halszka"
 }
 
 MALE_EXCEPTIONS_ON_A = {
@@ -781,6 +782,10 @@ def is_inherently_female_name(name: str, series_bible: Any = None) -> bool:
             pass
 
     if clean in POLISH_FEMALE_NAMES or clean in UNIVERSAL_FEMALE_NAMES_ON_A or clean in INVARIABLE_JAPANESE_FEMALE_NAMES or clean in FOREIGN_FEMALE_CONSONANT_NAMES:
+        return True
+
+    clean_words = clean.split()
+    if len(clean_words) >= 2 and (clean_words[0] in POLISH_FEMALE_NAMES or clean_words[0] in UNIVERSAL_FEMALE_NAMES_ON_A or clean_words[0] in INVARIABLE_JAPANESE_FEMALE_NAMES or clean_words[0] in FOREIGN_FEMALE_CONSONANT_NAMES):
         return True
 
     # Vocative of known Polish female name ending with -o or -u

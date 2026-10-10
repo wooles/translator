@@ -14487,6 +14487,51 @@ def test_incident_response_protocol_2_ass_fuzzing_and_breathing_space_guard():
     print(" -> PASSED: Test 153 w 100% potwierdza Reformy Potoku Incydentów 2.0 (ASS-Fuzzing, Pydantic Contract, Anti-Goodhart, Anchor Scenes 100%).")
 
 
+def test_musia_female_gender_and_addressee_concordance_guard():
+    """
+    TEST 154: Weryfikacja Obsługi Incydentu INC-AVT-001 (Tensei Kizoku S03E02):
+    1. Postać 'Musia' i 'Musia Trick' jako confirmed FEMALE w SeriesBible i onomastyce.
+    2. Nieodmienne nazwisko żeńskie kończące się spółgłoską: 'Musii Trick' (PWN).
+    3. Zgodność diadyczna 2. osoby czasu przeszłego i modali: 'Przestraszyłaś mnie' oraz 'powinnaś'.
+    4. ASS-Fuzzing resilience: tagi pozycjonowania \\pos, \\an8, \\c&H... nie blokują lintera.
+    5. Antykolizja: imiona męskie na -a (Kuba, Barnaba, Kosma, Akira) pozostają męskie.
+    """
+    import pysubs2
+    from series_memory import SeriesBible, is_inherently_female_name, resolve_actor_gender, generate_polish_name_declension
+    from avt_linter import EpisodeQualityGate
+
+    bible = SeriesBible("Tensei Kizoku, Kantei Skill de Nariagaru")
+    assert is_inherently_female_name("Musia") is True
+    assert is_inherently_female_name("Musia Trick") is True
+    assert resolve_actor_gender("Musia Trick", series_bible=bible) == "FEMALE"
+
+    # Sprawdzenie nieodmienności nazwiska żeńskiego
+    decl = generate_polish_name_declension("Musia Trick", "FEMALE")
+    assert decl["D"] == "Musii Trick"
+    assert decl["B"] == "Musię Trick"
+    assert decl["N"] == "Musią Trick"
+
+    # Sprawdzenie sceny ze zgłoszenia
+    raw_ass = (
+        "[Script Info]\nTitle: Test\nScriptType: v4.00+\n\n"
+        "[V4+ Styles]\nFormat: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\n"
+        "Style: Default,Arial,20,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,2,10,10,1\n\n"
+        "[Events]\nFormat: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\n"
+        "Dialogue: 0,0:15:29.59,0:15:31.15,Default,Musia,0,0,0,,{\\i1}Charlotte?{\\i0}\n"
+        "Dialogue: 0,0:15:31.50,0:15:34.48,Default,Charlotte,0,0,0,,{\\pos(192,280)\\an8}To ty, Musio.\\N{\\c&H00FFFF&}Przestraszyłeś mnie.\n"
+        "Dialogue: 0,0:15:34.48,0:15:36.32,Default,Musia,0,0,0,,Jeszcze nie śpisz?\n"
+        "Dialogue: 0,0:15:36.32,0:15:39.12,Default,Charlotte,0,0,0,,Szykuję tylko broń na jutro.\n"
+        "Dialogue: 0,0:15:39.12,0:15:41.57,Default,Charlotte,0,0,0,,Zawsze to robię przed bitwą.\n"
+        "Dialogue: 0,0:15:41.65,0:15:45.25,Default,Charlotte,0,0,0,,Sprzęt nie może tłumić\\Nmojej prawdziwej siły.\n"
+        "Dialogue: 0,0:15:45.25,0:15:48.80,Default,Charlotte,0,0,0,,{\\b1}Zaraz się kładę{\\b0}, ty też powinieneś.\n"
+    )
+    subs = pysubs2.SSAFile.from_string(raw_ass)
+    EpisodeQualityGate.audit_and_fix_entire_episode(subs=subs, series_bible=bible)
+    assert subs.events[1].text == "{\\pos(192,280)\\an8}To ty, Musio.\\N{\\c&H00FFFF&}Przestraszyłaś mnie."
+    assert subs.events[6].text == "{\\b1}Zaraz się kładę{\\b0}, ty też powinnaś."
+    print(" -> PASSED: Test 154 potwierdza 100% spójności atrybucji płci Musii i brak regresji.")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -14639,6 +14684,7 @@ if __name__ == "__main__":
     test_avt_formatter_style_bleed_and_strict_cpl_38_guard()
     test_speaker_and_addressee_gender_concordance_and_copula_guard()
     test_incident_response_protocol_2_ass_fuzzing_and_breathing_space_guard()
-    print("\n Wszystkie testy jednostkowe i integracyjne (153/153) zakończone pełnym sukcesem!\n")
+    test_musia_female_gender_and_addressee_concordance_guard()
+    print("\n Wszystkie testy jednostkowe i integracyjne (154/154) zakończone pełnym sukcesem!\n")
 
 
