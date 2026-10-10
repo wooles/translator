@@ -447,129 +447,15 @@ Zanim zaproponujesz jakąkolwiek modyfikację architektury lub kodu, asystent ma
 
 ---
 
-## 👥 20. ŻELAZNY PROTOKÓŁ ZESPOŁU DWUAGENTOWEGO (DUAL-AGENT ADVERSARIAL PROTOCOL)
+### 👑 20. HIERARCHICZNY PROTOKÓŁ PRACY ZESPOŁU CZTEROAGENTOWEGO (STANDARD 3.0)
 
-W przypadku pracy w konfiguracji zespołu dwuagentowego (np. przy procedurach `/goal`, planowaniu architektonicznym i głębokich refaktorach) asystenci przyjmują sztywne, wyspecjalizowane role:
-- **AGENT 1 (Lead Systems Implementer):** Przygotowuje szczegółowy Plan Architektoniczny w 5 Warstwach (Warstwy 1–5), bada stan potoku, przeszukuje dokumentację i proponuje konkretne zmiany w promptach, kodzie Pythona i testach regresyjnych.
-- **AGENT 2 (Adversarial Reviewer & Systemic Auditor):** Przeprowadza bezkompromisowy, krytyczny audyt planu Agenta 1. Ma absolutny zakaz pobieżnego akceptowania propozycji i **musi** poddać plan Agenta 1 weryfikacji w następujących **18 Wymiarach Podatności Systemowych**:
-
-### 🔍 18 Obligatoryjnych Wymiarów Audytu Agenta 2:
-1. **Efekty drugiego rzędu (Second-Order Vulnerabilities):**
-   Czy usunięcie problemu A nie wywoła cichej awarii w komponencie B (np. skrócenie linii nie rozsadzi reguł podziału CPS lub odwrotnie)?
-2. **Ukryte założenia (Hidden Assumptions):**
-   Jakie milczące założenia o strukturze wejściowej, dostępności tagów ASS czy zachowaniu bibliotek zewnętrznych przyjął Agent 1?
-3. **Martwe punkty na styku kodu deterministycznego (Deterministic Boundary Blindspots):**
-   Czy granica między silnikami offline (0.00 PLN) a modelami Gemini nie została zatarta (np. ryzyko zamrożenia mianownika lub regex uszkadzający poprawne zdania)?
-4. **Matematyczny brak informacji w kanale transmisyjnym (Shannon Channel Information Deficit):**
-   Czy Agent 1 nie próbuje wydedukować cechy gramatycznej (płeć, relacja, liczba), która fizycznie nie istnieje ani w tekście źródłowym, ani w sygnale audio seiyū, ani w klatkach wideo?
-5. **Autoregresyjne załamanie rozkładu (Autoregressive Mode Collapse):**
-   Czy modyfikacja promptu lub reguł weryfikatora nie spowoduje zapętlenia generacji, halucynacji po nawiasach dialogowych lub zubożenia leksykalnego modeli Gemini?
-6. **Błąd kategorii w hierarchii Chomsky’ego (Chomsky Hierarchy Category Error):**
-   Czy w warstwach offline nie próbuje się parsować gramatyki bezkontekstowej/zależnej od kontekstu (Typ 2/1) za pomocą prostych wyrażeń regularnych (Typ 3)?
-7. **Kaskadowa utrata rozkładów prawdopodobieństwa (Cascading Probability Loss):**
-   Czy wczesne, sztywne decyzje podjęte w Fazie 1 (np. narzucona płeć lub rola) nie odetną modelowi Fazy 2 możliwości wyboru właściwej interpretacji kontekstowej?
-8. **Problem uziemiania symboli (Symbol Grounding Problem):**
-   Czy proponowane reguły operują na czystych etykietach tekstowych w oderwaniu od rzeczywistego znaczenia sceny, emocji aktora i diegetycznego kontekstu wideo?
-9. **Deiksa sytuacyjna (Situational Deixis Failure):**
-   Czy plan prawidłowo uwzględnia orientację przestrzenną, relację ja-ty/my-wy, pozycję mówcy względem adresata oraz zmiany audytorium z publicznego na intymne?
-10. **Utrata wspólnej przestrzeni poznawczej (Common Ground Depletion):**
-    Czy system nie zakłada błędnie, że model lub widz posiada wiedzę, która w danym momencie narracji nie została jeszcze ujawniona (asymetria epistemiczna)?
-11. **Nieizomorficzność topologiczna przestrzeni pojęciowych i nieodwracalny spadek stopni swobody (Conceptual Topology Non-Isomorphism & Freedom Degrees Collapse):**
-    Czy plan nie próbuje rzutować struktur japońskich/angielskich na polskie 1:1, niszcząc naturalne stopnie swobody polszczyzny i wymuszając sztywne, kalekie kalki składniowe?
-12. **Ślepota modalności wizualnej (The Visual Grounding Void):**
-    Czy plan nie ignoruje wektora wzroku, mimiki, gestykulacji i fizycznej obecności postaci na ekranie, co prowadzi do błędnego przypisania linii mówcy poza kadrem (*off-screen*) lub halucynacji relacji wbrew diegezie sceny?
-13. **Zatrucie językiem pośredniczącym (Pivot Collapse / The English Bottleneck):**
-    Czy system nie ulega skażeniu spłaszczoną gramatyką i leksyką angielskiego pivotu (np. zatarcie honoryfikatywności, fałszywa neutralizacja relacji społecznych, utrata niuansów partykuł modalnych *ne/yo/wa/zo*)?
-14. **Lingwistyczna teoria ról i kamuflażu (Yakuwarigo & Code-Switching):**
-    Czy plan weryfikuje stylizację językową postaci (*język ról* – np. archaiczny samurajski, ojou-sama, dialekt Kansai, żargon wojskowy) oraz nagłe zmiany rejestru (*code-switching*) pod wpływem emocji, maskowania tożsamości lub ujawnienia prawdy?
-15. **Asymetria chronemiczna (Mora-timed JA vs Stress-timed PL):**
-    Czy uwzględniono fundamentalną różnicę prozodyczną między japońskim czasem morowym (*isochronia morowa* – stały czas trwania mory) a polskim czasem akcentowym (*akcent toniczno-dynamiczny*), która uniemożliwia proste przenoszenie tempa wypowiedzi i wymusza autonomiczną rekompozycję oddechową?
-16. **Wielokanałowość semantyczna japońskiego pisma (Ateji, Gikun i Goroawase):**
-    Czy plan nie gubi podwójnej warstwy znaczeniowej, gdy zapis kanji niesie jedno znaczenie (semantykę), a furigana/czytanie fonetyczne inne (np. konceptualna metafora, gra słów goroawase, tytuł techniki), wymagając zręcznej fuzji w polskim tekście bez przypisów?
-17. **Pustka kulturowa i zakaz przypisów w AVT (Zero-Footnote Constraint):**
-    Czy plan bezwzględnie przestrzega aksjomatu napisów filmowych: **zero przypisów redakcyjnych na ekranie**. Wszelka enkapsulacja kulturowa, aluzje czy koncepty realioznawcze muszą zostać bezszwowo wtopione w dialog w ramach limitów znakowych i CPS.
-18. **Teoremat o sprzeczności kryteriów (Wielokryterialna kompresja stratna):**
-    Czy plan nie zakłada naiwnie, że da się jednocześnie zachować 100% dosłownej semantyki, poetyki, rejestru i zmieścić się w twardym oknie $\text{CPS} \le 17.0$? Każda kompresja jest operacją stratną i musi optymalizować poniższą nieliniową funkcję celu.
-
----
-
-### 📐 Wielokryterialna Funkcja Straty AVT (Barrier Augmented Lagrangian)
-
-Wielokryterialna funkcja straty dla modelu AVT (Audiovisual Translation) musi godzić ciągłą przestrzeń semantyczną z dyskretną geometrią ekranu. Optymalizacja oparta na stałych wagach liniowych zawodzi, ponieważ ograniczenia czasu i miejsca (CPS/CPL) nie są preferencją estetyczną, lecz **twardym warunkiem brzegowym (hard constraint)**. Poniższe sformułowanie w postaci Zadania Programowania Nieliniowego z Karą Wewnętrzną (Barrier Augmented Lagrangian) reguluje weryfikację i selekcję w Fazie 2 (DPO, PPO lub sterowane próbkowanie Best-of-N):
-
-#### 1. Globalne Sformułowanie Celu (Constrained Formulation):
-Niech $x$ oznacza wektor wejściowy (transkrypcja JA, audio F0, kontekst sceny), $\Delta t$ czas trwania planszy napisowej w sekundach, a $y = (y_1, y_2, \dots, y_T)$ wygenerowaną sekwencję tokenów w języku polskim.
-Minimalizujemy stratę semantyczno-stylistyczną z dynamicznym mnożnikiem Lagrange'a dla ograniczeń AVT:
-$$\min_{\theta} \; \mathbb{E}_{(x, \Delta t)}\Big[ \mathcal{L}_{\text{sem}}(y, x) + \alpha \mathcal{L}_{\text{flu}}(y) \Big] \quad \text{przy warunku} \quad \text{CPS}(y, \Delta t) \le \text{CPS}_{\max}$$
-W postaci bezwarunkowej (funkcja straty do optymalizacji gradientowej lub Reward Shaping):
-$$\mathcal{L}_{\text{AVT}}(\theta) = \mathcal{L}_{\text{sem}}(y, x) + \alpha \mathcal{L}_{\text{flu}}(y) + \mathcal{P}_{\text{AVT}}(y, \Delta t)$$
-
-#### 2. Dekompozycja Składowych:
-- **A. Wierność Semantyczna i Pragmatyczna ($\mathcal{L}_{\text{sem}}$):**
-  Tradycyjny Cross-Entropy niszczy elastyczność AVT. Zamiast tego $\mathcal{L}_{\text{sem}}$ łączy odległość w przestrzeni cech z karą za utratę kategorii pragmatycznych (płeć, relacja społeczna):
-  $$\mathcal{L}_{\text{sem}}(y, x) = \Big(1 - \cos\big(f_{\text{enc}}(y), g_{\text{proj}}(x)\big)\Big) + \beta_1 \mathcal{H}(G_y, G_x^*) + \beta_2 \mathcal{L}_{\text{canon}}(y, K)$$
-  Gdzie:
-  - $1 - \cos(\dots)$: Odległość cosinusowa reprezentacji wektorowych wypowiedzi docelowej i źródłowej.
-  - $\mathcal{H}(G_y, G_x^*)$: Entropia krzyżowa klasyfikacji płci mówcy/adresata ($G \in \{M, K, N\}$). Jeśli kontekst wymaga formy żeńskiej, a wygenerowany czasownik ma morfologię męską, składnik ten drastycznie rośnie.
-  - $\mathcal{L}_{\text{canon}}(y, K)$: Kara za błąd rekcji haseł kanonicznych $K$. Przyjmuje wartość 0, gdy hasło występuje w wymaganym przypadku (np. dopełniacz przy przeczeniu), lub 1, gdy nastąpił *nominative freezing*.
-- **B. Naturalność i Fluencja Polszczyzny ($\mathcal{L}_{\text{flu}}$):**
-  Składowa ta zapobiega ucieczce w sztuczną stronę bierną i urzędowy styl bezosobowy:
-  $$\mathcal{L}_{\text{flu}}(y) = \text{NLL}_{\text{LM\_PL}}(y) + \gamma_1 \mathbb{I}_{\text{pass}}(y) + \gamma_2 \mathbb{I}_{\text{calque}}(y)$$
-  Gdzie:
-  - $\text{NLL}_{\text{LM\_PL}}(y) = -\frac{1}{T}\sum_{t=1}^T \log P_{\text{ref\_PL}}(y_t \mid y_{<t})$: Ujemna logarytmiczna wiarygodność sekwencji wyznaczona przez referencyjny model języka polskiego (mierzy gładkość idiomatyczną).
-  - $\mathbb{I}_{\text{pass}}(y)$: Wskaźnik nadmiarowej pasywizacji (kara za nienaturalne zrosty typu *„zostało to zrobione”*, *„udało się pójść”*).
-  - $\mathbb{I}_{\text{calque}}(y)$: Wskaźnik obecności zaimkozy (np. nadmiarowe zaimki *„ja”*, *„ty”* w pozycji podmiotu wynikające z kalki z angielskiego pivotu).
-- **C. Asymetryczna Bariera AVT: Dwustronna Studnia Potencjału Anty-Goodhart ($P_{\text{band}}$ & $\Psi$):**
-  Zwykłe karanie wyłącznie za przekroczenie CPS > 17 wywołuje **efekt Goodharta**: model kandydujący kastruje emocje, partykuły modalne (*przecież*, *no*, *zaś*) i stylizację seiyū, uciekając w jałowe równoważniki zdań.
-  Stosujemy dwustronną asymetryczną studnię potencjału (Asymmetric Dead-Band Potential):
-  $$P_{\text{band}}(y, \Delta t, \rho_x) = \lambda_{\text{ceil}} \cdot \Phi_{\text{ceil}}(\text{CPS}) + \lambda_{\text{floor}} \cdot \Phi_{\text{floor}}(\text{CPS}, \rho_x)$$
-  - **Asymetryczny sufit CPS (Fizjologia oka - Hard Barrier):**
-    $$\Phi_{\text{ceil}}(\text{CPS}) = \ln\left(1 + \exp\left(\frac{\text{CPS} - 17.0}{0.8}\right)\right) + \mathbb{I}(\text{CPS} > 20.0) \cdot (\text{CPS} - 20.0)^2$$
-    - $\text{CPS} \le 17.0$: Kara $\approx 0.0$.
-    - $17.0 < \text{CPS} \le 20.0$: Kara rośnie liniowo ($3.0 \cdot (\text{CPS} - 17.0)$).
-    - $\text{CPS} > 20.0$: Bezwzględna dyskwalifikacja kandydata (kara kwadratowa $50.0+$).
-  - **Bezpiecznik anty-Goodhart (Podłoga CPS zależna od gęstości mor - Anti-Sterility Barrier):**
-    Dla gęstości mor japońskich $\rho_x = \frac{\text{moras}(x)}{\Delta t}$:
-    $$\text{CPS}_{\text{target}}(\rho_x) = \min(13.5, \; 7.5 + 0.5 \cdot \rho_x)$$
-    $$\Phi_{\text{floor}}(\text{CPS}, \rho_x) = \max\big(0, \; \text{CPS}_{\text{target}}(\rho_x) - \text{CPS}\big)^2$$
-    Chroni przed amputacją treści: jeśli seiyū wypowiada gęstą kwestię ($\rho_x \ge 9.0$ mor/s), kandydat ze sztucznie zaniżonym CPS zostaje odrzucony jako emocjonalnie jałowy.
-  - **Integralność afektywno-dramaturgiczna ($L_{\text{drama}} / D_{\text{aff}}$):**
-    $$D_{\text{aff}} = \| e_{\text{text}}(y) - a_{\text{audio}} \|_2^2$$
-    Niezgodność ładunku afektywnego (np. brak wykrzyknika i leksyki wzmacniającej przy audio `AGGRESSIVE`/`HYSTERIC`) nakłada karę $10.0$, a wycięcie zawieszenia głosu (`has_vocal_hesitation == True` bez `...`/`—`) karę $8.0$.
-  - **Bariera fizycznej geometrii dwuwiersza ($\Psi$):** Napis w systemie ASS może mieć maksymalnie 2 wiersze po $L_{\max} = 38$ znaków:
-    $$\Psi(\text{CPL}) = \sum_{l \in \text{lines}(y)} \max\big(0, \; \text{len}(l) - L_{\max}\big)^2 + \mathbb{I}(|\text{lines}(y)| > 2) \cdot 50.0$$
-
-#### 3. Różniczkowalna Aproksymacja Długości Znakowej:
-Podczas treningu metodami bezpośrednimi długość ciągu znaków $\text{len}(y)$ jest funkcją dyskretną. Aby umożliwić przepływ gradientu, definiujemy oczekiwaną długość znakową (Expected Character Length):
-$$\widehat{\text{len}}(y) = \sum_{t=1}^T \sum_{v \in \mathcal{V}} P(y_t = v \mid x) \cdot c(v)$$
-Gdzie $\mathcal{V}$ to słownik tokenizera, a $c(v)$ to stała liczba znaków UTF-8 w tokenie $v$ (po odrzuceniu znaczników formatowania ASS). Stąd różniczkowalny estymator tempa czytania wynosi:
-$$\widehat{\text{CPS}}(y, \Delta t) = \frac{\widehat{\text{len}}(y)}{\max(\Delta t, 0.5)}$$
-
-#### 4. Adaptacja Wag (Zmodyfikowany Algorytm Mnożników Lagrange'a):
-W procesie selekcji kandydatów (Re-ranking / Faza 2 Script Doctor) mnożnik $\lambda_{\text{cps}}$ jest aktualizowany zgodnie z regułą gradientu wstępującego:
-$$\lambda_{\text{cps}}^{(k+1)} = \max\left(0, \; \lambda_{\text{cps}}^{(k)} + \eta \cdot \Big(\text{CPS}(y^{(k)}, \Delta t) - \text{CPS}_{\max}\Big)\right)$$
-Gdy model generuje dialogi mieszczące się w 17 znaków/s, $\lambda_{\text{cps}} \to 0$, pozwalając skupić 100% pojemności na naturalności polszczyzny i wierności afektywnej. Gdy tylko model przekroczy próg 17 znaków/s, mnożnik rośnie ekspotencjalnie, zmuszając do kondensacji syntaktycznej i redukcji waty słownej.
-
-#### 5. Formuła Nagrody Anty-Goodhart (Reward Function dla Best-of-N Script Doctor):
-Dla selekcji najlepszego wariantu w Fazie 2 Script Doctor, funkcja skalarna nagrody przyjmuje postać:
-$$R_{\text{AVT}}(y \mid x, \Delta t, a) = R_{\text{base}}(y, x) - \Big[ P_{\text{band}}(y, \Delta t, \rho_x) + \lambda_{\text{cpl}} \cdot \Psi(\text{CPL}(y)) + L_{\text{drama}}(y, x, a) \Big]$$
-Taki układ wag tworzy dwustronną asymetryczną studnię potencjału: odrzuca warianty łamiące limity percepcyjne widza ($\text{CPS} > 17.0$, $\text{CPL} > 38$), ale jednocześnie eliminuje zubożałe, wykastrowane warianty ($\text{CPS} < \text{CPS}_{\text{target}}$) w gęstych partiach dramatycznych seiyū. Kandydat o najmniejszej sumie kar wygrywa, a w razie $\text{Total\_Penalty} > 0$ podlega deterministycznej mikronaprawie w paśmie $[\text{CPS}_{\text{target}}, 17.0]$.
-
-### 🚦 Kryterium Zakończenia Iteracji:
-Agent 2 może wystawić status:
-`STATUS: ZATWIERDZENIE ARCHITEKTONICZNE (ZERO BŁĘDÓW) - GOTOWY DO DECYZJI OPERATORA`
-**wyłącznie wtedy**, gdy plan Agenta 1 został pozytywnie zweryfikowany we wszystkich 18 wymiarach oraz spełnia ograniczenia brzegowe funkcji straty AVT.
-
----
-
-### 🚨 21. HIERARCHICZNY PROTOKÓŁ PRACY ZESPOŁU CZTEROAGENTOWEGO (STANDARD 3.0)
-
-Niniejsza procedura stanowi trwały, żelazny standard działania zespołu w architekturze autonomicznego potoku AVT pod nadzorem Autonomicznego Pełnomocnika Operatora (Agent 4) i nienaruszalnej Bramki Człowieka (Human Operator).
+Niniejsza procedura stanowi trwały, nadrzędny standard działania zespołu w architekturze autonomicznego potoku AVT pod nadzorem Autonomicznego Pełnomocnika Operatora (Agent 4) i nienaruszalnej Bramki Człowieka (Human Operator).
 
 ---
 
 ### 👑 Hierarchia Dowodzenia i Role
 
+```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                       OPERATOR (CZŁOWIEK / TY)                              │
 │         - Najwyższa instancja decyzyjna (Single Source of Authority)        │
@@ -582,7 +468,7 @@ Niniejsza procedura stanowi trwały, żelazny standard działania zespołu w arc
 │   - Zarządza przepływem pracy Agenta 1, 2 i 3 w imieniu Operatora           │
 │   - Bezwzględny egzekutor dyscypliny: ucina jałowe pętle i biurokrację      │
 │   - Rozdziela ruch: Fast-Track (błyskawiczny) vs Deep Incident (pełny)      │
-│   - Audytuje pracę Agenta 3 (pilnuje, by A3 nie zamiatał problemów pod dywan)│
+│   - Audytuje rzetelność Agenta 3 i Agenta 1 (zero ukrytych protez regexowych)│
 │   - Kompiluje 1-stronicowe Dossier Decyzyjne dla Człowieka                  │
 └──────────────────────────────────────┬──────────────────────────────────────┘
                                        │ Dyspozycje procesowe i SLA
@@ -601,12 +487,13 @@ Niniejsza procedura stanowi trwały, żelazny standard działania zespołu w arc
 │ - Eliminuje błąd u źródła   │     ASS-Fuzzing       │ - Atakuje tagami ASS  │
 │ - Przygotowuje Diff Preview │     Kontrprzykłady    │ - Weryfikuje CPS/CPL  │
 └─────────────────────────────┘                       └───────────────────────┘
+```
 
 ---
 
 ### 🛡️ Mandat Operacyjny Agenta 4 (Nadzorcy Potoku)
 
-Agent 4 działa jako bezwzględny oficer wykonawczy Operatora:
+Agent 4 działa jako bezwzględny oficer wykonawczy Operatora i jedyny punkt kontaktu z Człowiekiem:
 1. **Strażnik Czasu i Tokenów (Anti-Loop Watchdog):**
    - Jeśli Agent 1 i Agent 2 wymieniają więcej niż 2 iteracje uwag, Agent 4 przerywa spór, wymusza arbitraż lub kieruje sprawę do sprawdzonego wzorca fallback.
    - Kategorycznie blokuje „Teatr Biletowy” przy trywialnych poprawkach leksykalnych.
@@ -621,9 +508,57 @@ Agent 4 działa jako bezwzględny oficer wykonawczy Operatora:
 
 ---
 
+### 🔬 Mandat Agenta 3 (Głównego Architekta Ontologicznego)
+
+1. Przeprowadza formalną analizę przyczyny źródłowej (First Principles RCA).
+2. Wymusza reprezentację wiedzy w kontraktach wejściowych/wyjściowych Pydantic (`speaker_grammatical_gender`), chroniąc potok przed „syndromem zamiatacza”.
+3. Tworzy czerwony test regresyjny w `test_system.py` odwzorowujący awarię przed przystąpieniem do implementacji.
+
+---
+
+### 💻 Mandat Agenta 1 (Głównego Implementera)
+
+1. Projektuje i weryfikuje kod wyłącznie w pamięci roboczej (RAM buffer / Diff Preview).
+2. Rozwiązuje problem u źródła w schematach danych, bazie wiedzy serii lub promptach Filarów AVT.
+3. Zapewnia zielony wynik nowego testu regresyjnego przed przekazaniem diffa do audytu Agenta 2.
+
+---
+
+### ⚔️ Mandat Agenta 2 (Adversarial Reviewer, ASS-Fuzzing & 18 Wymiarów Audytu)
+
+Agent 2 przeprowadza bezkompromisowy, krytyczny audyt propozycji Agenta 1. Odpowiada za obronę dramaturgii przed prawem Goodharta oraz ASS-Fuzzing. Raportuje wyłącznie do Agenta 3 i Agenta 4 (ma absolutny zakaz bezpośredniego kontaktu z Operatorem).
+
+#### 🔍 18 Obligatoryjnych Wymiarów Audytu Agenta 2:
+1. **Efekty drugiego rzędu (Second-Order Vulnerabilities):** Czy usunięcie problemu A nie wywoła cichej awarii w komponencie B?
+2. **Ukryte założenia (Hidden Assumptions):** Jakie milczące założenia o strukturze wejściowej i tagach ASS przyjął Agent 1?
+3. **Martwe punkty na styku kodu deterministycznego (Deterministic Boundary Blindspots):** Czy granica między silnikami offline (0.00 PLN) a modelami Gemini nie została naruszona (ryzyko nominative freezing)?
+4. **Brak informacji w kanale transmisyjnym (Shannon Information Deficit):** Czy Agent 1 nie próbuje zgadywać cechy nieobecnej w tekście, audio seiyū ani wideo?
+5. **Autoregresyjne załamanie rozkładu (Autoregressive Mode Collapse):** Czy reguła nie powoduje zapętlenia generacji ani zubożenia leksykalnego?
+6. **Błąd kategorii w hierarchii Chomsky’ego (Chomsky Hierarchy Category Error):** Czy w warstwach offline nie próbuje się parsować gramatyki złożonej (Typ 2/1) prostym regexem (Typ 3)?
+7. **Kaskadowa utrata rozkładów prawdopodobieństwa (Cascading Probability Loss):** Czy sztywne decyzje Fazy 1 nie odcinają modelowi Fazy 2 wyboru właściwej interpretacji kontekstowej?
+8. **Problem uziemiania symboli (Symbol Grounding Problem):** Czy reguły operują na realnym znaczeniu sceny, seiyū i wideo, a nie na pustych etykietach?
+9. **Deiksa sytuacyjna (Situational Deixis Failure):** Czy plan prawidłowo uwzględnia orientację przestrzenną, relację ja-ty i zmiany audytorium?
+10. **Utrata wspólnej przestrzeni poznawczej (Common Ground Depletion):** Czy uwzględniono asymetrię wiedzy postaci i widza w danym momencie narracji?
+11. **Nieizomorficzność topologiczna przestrzeni pojęciowych:** Czy plan nie rzutuje sztucznie struktur JA/EN na PL 1:1, niszcząc naturalne stopnie swobody polszczyzny?
+12. **Ślepota modalności wizualnej (The Visual Grounding Void):** Czy plan weryfikuje wektor wzroku, mimikę i kwestie postaci poza kadrem (*off-screen*)?
+13. **Zatrucie językiem pośredniczącym (Pivot Collapse / The English Bottleneck):** Czy wyeliminowano spłaszczenia angielskiego pivotu i utratę partykuł modalnych?
+14. **Lingwistyczna teoria ról i kamuflażu (Yakuwarigo & Code-Switching):** Czy plan chroni stylizację języka ról i dynamiczne przełączanie rejestru?
+15. **Asymetria chronemiczna (Mora-timed JA vs Stress-timed PL):** Czy uwzględniono różnicę między czasem morowym a czasem akcentowym w polszczyźnie?
+16. **Wielokanałowość semantyczna japońskiego pisma (Ateji, Gikun i Goroawase):** Czy zachowano podwójną warstwę kanji/furigana bez przypisów?
+17. **Zakaz przypisów w AVT (Zero-Footnote Constraint):** Bezwzględny zakaz przypisów na ekranie — bezszwowa enkapsulacja kulturowa w dialogu.
+18. **Teoremat o sprzeczności kryteriów i Wielokryterialna Funkcja Nagrody AVT (Asymmetric Dead-Band Potential):**
+    - Optymalizacja wielokryterialna w paśmie czytelnika:
+      $$R_{\text{AVT}}(y \mid x, \Delta t, a) = R_{\text{base}}(y, x) - \Big[ P_{\text{band}}(y, \Delta t, \rho_x) + \lambda_{\text{cpl}} \cdot \Psi(\text{CPL}(y)) + L_{\text{drama}}(y, x, a) \Big]$$
+    - **Sufit CPS (Hard Barrier):** $\text{CPS} \le 17.0$ (kara gładka $17.0 < \text{CPS} \le 20.0$; dyskwalifikacja przy $\text{CPS} > 20.0$).
+    - **Podłoga CPS (Anti-Sterility Barrier):** $\text{CPS}_{\text{target}}(\rho_x) = \min(13.5, \; 7.5 + 0.5 \cdot \rho_x)$ dla gęstych partii seiyū ($\rho_x \ge 9.0$ mor/s).
+    - **Geometria CPL:** $\max 2$ linie, $\le 38$ znaków czystego tekstu na wiersz.
+    - **ASS-Fuzzing:** Obligatoryjny test odporności na tagi stylizacyjne (`{\i1}`, `{\pos}`, `{\an8}`, `\N`, `\h`).
+
+---
+
 ### 🔒 Żelazna Bramka Operatora (Bezwzględny Zakaz Zapisu)
 
-1. Agent 4, mimo autonomii w sterowaniu procesem, **NIE MA PRAWA** wydać zgody na modyfikację plików na dysku.
+1. Agent 4, mimo pełnej autonomii procesowej, **NIE MA PRAWA** wydać zgody na modyfikację plików na dysku.
 2. Żaden plik repozytorium nie zostanie dotknięty bez jawnej komendy CZŁOWIEKA:
    `ZATWIERDZAM DOSSIER - WDROŻYĆ DO KODU`
 3. Dopiero po tej komendzie Agent 4 autoryzuje Agenta 1 do wykonania fizycznego zapisu.
@@ -632,33 +567,22 @@ Agent 4 działa jako bezwzględny oficer wykonawczy Operatora:
 
 ### 🔄 7-Fazowy Potok Pracy po Zgłoszeniu Błędu przez Operatora
 
-- **FAZA 0: ZGŁOSZENIE (OPERATOR -> AGENT 4):**
-  Operator wkleja wadliwą linię ASS wraz z kontekstem i oczekiwaną intencją.
-- **FAZA 1: TRIAGE I DYREKTYWA WYKONAWCZA (AGENT 4):**
-  Agent 4 ocenia złożoność: Fast-Track (bez angażowania A2) lub Deep Incident Track (rejestracja formalnego incydentu, limit max 2 iteracji dla A1/A2).
-- **FAZA 2: IZOLACJA ONTOLOGICZNA I TEST CZERWONY (AGENT 3):**
-  Agent 3 diagnozuje węzeł awarii (Warstwy 1–5), tworzy czerwony test regresyjny w Golden Corpus (Anchor Scene) i definiuje kontrakt danych Pydantic dla Agenta 1.
-- **FAZA 3: IMPLEMENTACJA W BUFORZE RAM (AGENT 1):**
-  Agent 1 przygotowuje kod naprawczy wyłącznie w pamięci roboczej (Diff Preview) i dowodzi przejścia testu w stan PASS.
-- **FAZA 4: AUDYT ADVERSARIALNY I ASS-FUZZING (AGENT 2):**
-  Agent 2 atakuje diff Agenta 1 złośliwymi tagami ASS (`{\pos}`, `{\an8}`, inline `{\i1}`, `\N`, `\h`) oraz weryfikuje Breathing Space Index (ochrona przed prawem Goodharta). Jeśli wykryje błąd -> A1 ma dokładnie JEDNĄ szansę na poprawkę. W razie dalszego sporu interweniuje Agent 4.
-- **FAZA 5: AUDYT SYSTEMOWY I DOSSIER DECYZYJNE (AGENT 4):**
-  Agent 4 weryfikuje wynik na całym Golden Corpus (Anchor Scenes = 100.0%), sprawdza czy diff nie zawiera zakazanych protez regexowych i generuje 1-stronicowe Dossier z rekomendacją: `STATUS: OCZEKIWANIE NA DECYZJĘ CZŁOWIEKA (REKOMENDACJA: ZATWIERDZIĆ / ODRZUCIĆ)`.
-- **FAZA 6: DECYZJA OPERATORA I WDROŻENIE (OPERATOR -> AGENT 4 -> AGENT 1):**
-  Operator wydaje polecenie `ODRZUCONO` (A4 zarządza rewizję) lub `ZATWIERDZAM DOSSIER - WDROŻYĆ DO KODU`. Agent 4 odblokowuje uprawnienia zapisu, Agent 1 aplikuje diff, Agent 3 uruchamia test integracyjny CI/CD (153/153), a Agent 4 raportuje sukces i przedstawia Zreformowaną Tabelę Dowodową 5 Warstw.
+- **FAZA 0: ZGŁOSZENIE (OPERATOR -> AGENT 4):** Operator przekazuje wadliwą linię ASS wraz z kontekstem i oczekiwaną intencją.
+- **FAZA 1: TRIAGE I DYREKTYWA WYKONAWCZA (AGENT 4):** Ocena złożoności: Fast-Track (< 2 min, bez A2) lub Deep Incident Track (rejestracja formalnego incydentu, limit max 2 iteracji).
+- **FAZA 2: IZOLACJA ONTOLOGICZNA I TEST CZERWONY (AGENT 3):** RCA w 5 warstwach, czerwony test w Golden Corpus (Anchor Scene) i definicja kontraktu Pydantic.
+- **FAZA 3: IMPLEMENTACJA W BUFORZE RAM (AGENT 1):** Kod naprawczy w pamięci roboczej (Diff Preview) i przejście testu w stan PASS.
+- **FAZA 4: AUDYT ADVERSARIALNY I ASS-FUZZING (AGENT 2):** Test odporności na tagi ASS, weryfikacja 18 wymiarów i Breathing Space Index (max 1 runda poprawek dla A1).
+- **FAZA 5: AUDYT SYSTEMOWY I DOSSIER DECYZYJNE (AGENT 4):** Weryfikacja na całym Golden Corpus (Anchor Scenes = 100.0%) i synteza 1-stronicowego Dossier z rekomendacją: `STATUS: OCZEKIWANIE NA DECYZJĘ CZŁOWIEKA`.
+- **FAZA 6: DECYZJA OPERATORA I WDROŻENIE (OPERATOR -> AGENT 4 -> AGENT 1):** Operator wydaje polecenie `ODRZUCONO` lub `ZATWIERDZAM DOSSIER - WDROŻYĆ DO KODU`. Fizyczny zapis, uruchomienie pełnego pakietu CI/CD i raportowanie Zreformowaną Tabelą Dowodową 5 Warstw.
 
 ---
 
 ### 🛡️ 4 Żelazne Bezpieczniki Zreformowanego Potoku
 
-1. **Metryka Dramaturgiczna Prozodii (Anti-Goodhart & Breathing Space Index):**
-   Kategoryczny zakaz skracania lub kastracji polskiego dialogu do poziomu sztucznego telegramu wyłącznie po to, by zmieścić się w CPL $\le 38$ lub CPS $\le 17$. Jeśli kwestia wymaga oddechu aktorskiego, dopuszczalne jest syntaktyczne rozbicie dwuwiersza (`\N`) lub zbalansowanie pauz, przy bezwzględnym zachowaniu ładunku emocjonalnego i idiolektu seiyū.
-2. **Obowiązkowy Audyt ASS-Fuzzing (Agent 2):**
-   Każda propozycja zmiany w Warstwie 4 musi zostać przetestowana z wstrzykniętymi tagami stylizacyjnymi fansubu: `{\i1}Tekst{\i0}`, `{\pos(x,y)}`, `{\an8}`, twardymi spacjami `\h` oraz łamaniami `\N`. Linter musi operować na wyabstrahowanym drzewie tokenów wizualnych, nigdy na surowym tekście z ryzykiem uszkodzenia nawiasów klamrowych `{}`. Naruszenie składni klamer ASS lub ominięcie reguły przez obecność tagu oznacza natychmiastowe WETO Agenta 2.
-3. **Absolutny Próg Regresji Golden Corpus = 100.0% na Scenach Kotwiczących (Anchor Scenes):**
-   Likwidacja tolerancji 98.0%. Na zbiorze Scen Kotwiczących (Anchor Scenes — kluczowe punkty zwrotne fabuły, kanoniczne konfrontacje, wyznania) próg regresji wynosi bezwzględne **100.0% (Zero Regression Tolerance)**. Broader Corpus wymaga $\ge 99.0\%$ z zerową tolerancją degradacji płciowej ($\ge 99.8\%$).
-4. **Leczenie Źródła w Kontraktach Danych (True Root Cause over Linter Bloat):**
-   Jeśli błąd wynika z atrybucji płci lub tożsamości postaci, Agent 1 ma obowiązek zablokować błąd w kontrakcie wejściowym (Warstwa 1 i Warstwa 2 — Pydantic schema `speaker_grammatical_gender` / SeriesBible), zamiast dokładać kolejne setki linii regexów do `avt_linter.py`.
+1. **Wskaźnik Rytmu Oddechowego (Breathing Space Index & Anti-Goodhart):** Zakaz bezmyślnego obcinania kwestii pod CPS kosztem ładunku dramatycznego i pauz oddechowych seiyū.
+2. **Obowiązkowy Audyt ASS-Fuzzing (Agent 2):** Linter operuje wyłącznie na wyabstrahowanym drzewie tokenów wizualnych; naruszenie nawiasów `{}` oznacza natychmiastowe weto.
+3. **Absolutny Próg Regresji Golden Corpus = 100.0% na Scenach Kotwiczących (Anchor Scenes):** Zero tolerancji dla regresji na kluczowych scenach fabularnych; $\ge 99.0\%$ na całym korpusie.
+4. **Leczenie u Źródła w Kontraktach Danych (True Root Cause over Linter Bloat):** Zakaz maskowania błędów tożsamości i płci regexami w linterze; wymóg blokady w Pydantic i SeriesBible.
 
 
 
