@@ -1,0 +1,378 @@
+{
+  "anime_title": "Mahou Shoujo Ikusei Keikaku: restart",
+  "characters": {
+    "Pechka -> Ninomiya": {
+      "description": "Zwrot: 'Ninomiya / po nazwisku' (uczennica -> szkolna miłość) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]"
+    },
+    "Pechka": {
+      "description": "kobieta (Licealistka, początkująca czarodziejka potrafiąca przygotowywać pyszne jedzenie) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Ninomiya": {
+      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Nokkochan -> Magical Daisy": {
+      "description": "Zwrot: 'Magical Daisy / po imieniu z podziwem' (młoda fanka -> starsza idolka)"
+    },
+    "Nokkochan": {
+      "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
+      "source": "quality_gate"
+    },
+    "Magical Daisy": {
+      "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
+      "source": "quality_gate"
+    },
+    "Kanoe Hitokouji -> Mamori Totoyama": {
+      "description": "Zwrot: 'Mamori' (liderka / arystokratka -> zaufana służąca) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [OCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu zakaz opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?']"
+    },
+    "Kanoe Hitokouji": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Mamori Totoyama": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Koyuki Himekawa": {
+      "description": "kobieta / dziewczyna (Postać drugoplanowa) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Noriko Nonohara": {
+      "description": "postać (Postać drugoplanowa)"
+    },
+    "Karin Sonoda": {
+      "description": "postać (Postać drugoplanowa)"
+    },
+    "Chika Tatehara": {
+      "description": "postać (Postać drugoplanowa)"
+    },
+    "Nene Ono": {
+      "description": "kobieta / dziewczyna (Postać drugoplanowa) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Anna Sarizae": {
+      "description": "kobieta / dziewczyna (Postać drugoplanowa) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Shinobu Hioka": {
+      "description": "kobieta / dziewczyna (Postać drugoplanowa) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Kiku Yakumo": {
+      "description": "kobieta / dziewczyna (Postać drugoplanowa) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Lapis Lazuline": {
+      "description": "kobieta / dziewczyna (Postać drugoplanowa) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Keek": {
+      "description": "kobieta / dziewczyna (Postać drugoplanowa) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Fal": {
+      "description": "postać (Postać drugoplanowa); KOBIETA (zweryfikowano z audio seiyū Whisper)"
+    },
+    "Konomi Mita": {
+      "description": "kobieta / dziewczyna (Postać drugoplanowa) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Cherna Mouse": {
+      "description": "kobieta / dziewczyna (Postać drugoplanowa) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Akane Fuwa": {
+      "description": "kobieta / dziewczyna (Postać drugoplanowa) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Snow White": {
+      "description": "kobieta (Weteranka poprzedniego projektu wychowania czarodziejek, bezwzględna pogromczyni zła) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Mamori": {
+      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Rionetta": {
+      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    }
+  },
+  "glossary": {
+    "Land of Magic": "Kraina Magii",
+    "Magical Candies": "Magiczne Cukierki",
+    "Magical Girl Raising Project": "Projekt Wychowania Czarodziejek",
+    "Tutorial Mode": "Tryb samouczka"
+  },
+  "relationships": {
+    "Pechka -> Ninomiya": "Zwrot: 'Ninomiya / po nazwisku' (uczennica -> szkolna miłość) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Nokkochan -> Magical Daisy": "Zwrot: 'Magical Daisy / po imieniu z podziwem' (młoda fanka -> starsza idolka)",
+    "Kanoe Hitokouji -> Mamori Totoyama": "Zwrot: 'Mamori' (liderka / arystokratka -> zaufana służąca) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [OCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu zakaz opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?']"
+  },
+  "declensions": {
+    "Pechka": {
+      "M": "Pechka",
+      "D": "Pechki",
+      "C": "Pechce",
+      "B": "Pechkę",
+      "N": "Pechką",
+      "Ms": "Pechce",
+      "W": "Pechko",
+      "gender": "FEMALE"
+    },
+    "Ninomiya": {
+      "M": "Ninomiya",
+      "D": "Ninomiyi",
+      "C": "Ninomiyi",
+      "B": "Ninomiyę",
+      "N": "Ninomiyą",
+      "Ms": "Ninomiyi",
+      "W": "Ninomiyo",
+      "gender": "MALE"
+    },
+    "Nokkochan": {
+      "M": "Nokkochan",
+      "D": "Nokkochana",
+      "C": "Nokkochanowi",
+      "B": "Nokkochana",
+      "N": "Nokkochanem",
+      "Ms": "Nokkochanie",
+      "W": "Nokkochanie",
+      "gender": "MALE"
+    },
+    "Magical Daisy": {
+      "M": "Magical Daisy",
+      "D": "Magicala Daisy",
+      "C": "Magicalowi Daisy",
+      "B": "Magicala Daisy",
+      "N": "Magicalem Daisy",
+      "Ms": "Magicalu Daisy",
+      "W": "Magicalu Daisy",
+      "gender": "MALE"
+    },
+    "Kanoe Hitokouji": {
+      "M": "Kanoe Hitokouji",
+      "D": "Kanoe Hitokouji",
+      "C": "Kanoe Hitokouji",
+      "B": "Kanoe Hitokouji",
+      "N": "Kanoe Hitokouji",
+      "Ms": "Kanoe Hitokouji",
+      "W": "Kanoe Hitokouji",
+      "gender": "MALE"
+    },
+    "Mamori Totoyama": {
+      "M": "Mamori Totoyama",
+      "D": "Mamori Totoyamy",
+      "C": "Mamori Totoyamie",
+      "B": "Mamori Totoyamę",
+      "N": "Mamori Totoyamą",
+      "Ms": "Mamori Totoyamie",
+      "W": "Mamori Totoyamo",
+      "gender": "MALE"
+    },
+    "Koyuki Himekawa": {
+      "M": "Koyuki Himekawa",
+      "D": "Koyuki Himekawy",
+      "C": "Koyuki Himekawie",
+      "B": "Koyuki Himekawę",
+      "N": "Koyuki Himekawą",
+      "Ms": "Koyuki Himekawie",
+      "W": "Koyuki Himekawo",
+      "gender": "FEMALE"
+    },
+    "Noriko Nonohara": {
+      "M": "Noriko Nonohara",
+      "D": "Noriko Nonohary",
+      "C": "Noriko Nonoharze",
+      "B": "Noriko Nonoharę",
+      "N": "Noriko Nonoharą",
+      "Ms": "Noriko Nonoharze",
+      "W": "Noriko Nonoharo"
+    },
+    "Karin Sonoda": {
+      "M": "Karin Sonoda",
+      "D": "Karin Sonody",
+      "C": "Karin Sonodzie",
+      "B": "Karin Sonodę",
+      "N": "Karin Sonodą",
+      "Ms": "Karin Sonodzie",
+      "W": "Karin Sonodo"
+    },
+    "Chika Tatehara": {
+      "M": "Chika Tatehara",
+      "D": "Chiki Tatehary",
+      "C": "Chice Tateharze",
+      "B": "Chikę Tateharę",
+      "N": "Chiką Tateharą",
+      "Ms": "Chice Tateharze",
+      "W": "Chiko Tateharo"
+    },
+    "Nene Ono": {
+      "M": "Nene Ono",
+      "D": "Nene Ono",
+      "C": "Nene Ono",
+      "B": "Nene Ono",
+      "N": "Nene Ono",
+      "Ms": "Nene Ono",
+      "W": "Nene Ono",
+      "gender": "FEMALE"
+    },
+    "Anna Sarizae": {
+      "M": "Anna Sarizae",
+      "D": "Anny Sarizae",
+      "C": "Annie Sarizae",
+      "B": "Annę Sarizae",
+      "N": "Anną Sarizae",
+      "Ms": "Annie Sarizae",
+      "W": "Anno Sarizae",
+      "gender": "FEMALE"
+    },
+    "Shinobu Hioka": {
+      "M": "Shinobu Hioka",
+      "D": "Shinobu Hioki",
+      "C": "Shinobu Hioce",
+      "B": "Shinobu Hiokę",
+      "N": "Shinobu Hioką",
+      "Ms": "Shinobu Hioce",
+      "W": "Shinobu Hioko",
+      "gender": "FEMALE"
+    },
+    "Kiku Yakumo": {
+      "M": "Kiku Yakumo",
+      "D": "Kiku Yakumo",
+      "C": "Kiku Yakumo",
+      "B": "Kiku Yakumo",
+      "N": "Kiku Yakumo",
+      "Ms": "Kiku Yakumo",
+      "W": "Kiku Yakumo",
+      "gender": "FEMALE"
+    },
+    "Lapis Lazuline": {
+      "M": "Lapis Lazuline",
+      "D": "Lapis Lazuline",
+      "C": "Lapis Lazuline",
+      "B": "Lapis Lazuline",
+      "N": "Lapis Lazuline",
+      "Ms": "Lapis Lazuline",
+      "W": "Lapis Lazuline",
+      "gender": "FEMALE"
+    },
+    "Keek": {
+      "M": "Keek",
+      "D": "Keek",
+      "C": "Keek",
+      "B": "Keek",
+      "N": "Keek",
+      "Ms": "Keek",
+      "W": "Keek",
+      "gender": "FEMALE"
+    },
+    "Fal": {
+      "M": "Fal",
+      "D": "Fal",
+      "C": "Fal",
+      "B": "Fal",
+      "N": "Fal",
+      "Ms": "Fal",
+      "W": "Fal",
+      "gender": "FEMALE"
+    },
+    "Konomi Mita": {
+      "M": "Konomi Mita",
+      "D": "Konomi Mitej",
+      "C": "Konomi Mitej",
+      "B": "Konomi Mitą",
+      "N": "Konomi Mitą",
+      "Ms": "Konomi Mitej",
+      "W": "Konomi Mita",
+      "gender": "FEMALE"
+    },
+    "Cherna Mouse": {
+      "M": "Cherna Mouse",
+      "D": "Chernej Mouse",
+      "C": "Chernej Mouse",
+      "B": "Cherną Mouse",
+      "N": "Cherną Mouse",
+      "Ms": "Chernej Mouse",
+      "W": "Cherna Mouse",
+      "gender": "FEMALE"
+    },
+    "Akane Fuwa": {
+      "M": "Akane Fuwa",
+      "D": "Akane Fuwy",
+      "C": "Akane Fuwie",
+      "B": "Akane Fuwę",
+      "N": "Akane Fuwą",
+      "Ms": "Akane Fuwie",
+      "W": "Akane Fuwo",
+      "gender": "FEMALE"
+    },
+    "Snow White": {
+      "M": "Snow White",
+      "D": "Snowa Whitego",
+      "C": "Snowowi Whitemu",
+      "B": "Snowa White",
+      "N": "Snowem Whitym",
+      "Ms": "Snowie Whitym",
+      "W": "Snowie White",
+      "gender": "FEMALE"
+    },
+    "Mamori": {
+      "M": "Mamori",
+      "D": "Mamori",
+      "C": "Mamori",
+      "B": "Mamori",
+      "N": "Mamori",
+      "Ms": "Mamori",
+      "W": "Mamori",
+      "gender": "FEMALE"
+    },
+    "Rionetta": {
+      "M": "Rionetta",
+      "D": "Rionetty",
+      "C": "Rionetcie",
+      "B": "Rionettę",
+      "N": "Rionettą",
+      "Ms": "Rionetcie",
+      "W": "Rionetto",
+      "gender": "FEMALE"
+    },
+    "Kraina Magii": {
+      "M": "Kraina Magii",
+      "D": "Krainy Magii",
+      "C": "Krainie Magii",
+      "B": "Krainę Magii",
+      "N": "Krainą Magii",
+      "Ms": "Krainie Magii",
+      "W": "Kraino Magii"
+    },
+    "Magiczne Cukierki": {
+      "M": "Magiczne Cukierki",
+      "D": "Magicznego Cukierki",
+      "C": "Magicznemu Cukierki",
+      "B": "Magiczne Cukierki",
+      "N": "Magicznym Cukierki",
+      "Ms": "Magicznym Cukierki",
+      "W": "Magiczne Cukierki"
+    },
+    "Projekt Wychowania Czarodziejek": {
+      "M": "Projekt Wychowania Czarodziejek",
+      "D": "Projekta Wychowanii Czarodziejeka",
+      "C": "Projektowi Wychowanii Czarodziejekowi",
+      "B": "Projekta Wychowanię Czarodziejeka",
+      "N": "Projektem Wychowanią Czarodziejekiem",
+      "Ms": "Projekcie Wychowanii Czarodziejeku",
+      "W": "Projekcie Wychowanio Czarodziejeku"
+    },
+    "Tryb samouczka": {
+      "M": "Tryb samouczka",
+      "D": "Tryba samouczki",
+      "C": "Trybowi samouczce",
+      "B": "Tryba samouczkę",
+      "N": "Trybem samouczką",
+      "Ms": "Trybie samouczce",
+      "W": "Trybie samouczko"
+    }
+  },
+  "hypocorisms": {},
+  "plot_anchors": {
+    "Magical Candies": "Bezwzględnie zachować kanoniczną nazwę „Magiczne Cukierki” jako walutę i wskaźnik przeżycia w grze.",
+    "Snow White / Biały Płatek Śniegu": "Utrzymać imię „Snow White” w oryginalnej transkrypcji z polskiego fandomu/wydania jako miano Czarodziejki Łowczyni."
+  },
+  "episodes_translated": [
+    "Magical.Girl.Raising.Project.Restart.S01E01.1080p.UNEXT.WEB-DL.JPN.AAC2.0.H.264.MSubs-ToonsHub"
+  ],
+  "batch_stats": {
+    "Magical.Girl.Raising.Project.Restart.S01E01.1080p.UNEXT.WEB-DL.JPN.AAC2.0.H.264.MSubs-ToonsHub": {
+      "dialogues": 299,
+      "batches": 15,
+      "avg_batch_size": 19.9,
+      "cost_pln": 2.6
+    }
+  },
+  "fansub_canon": {}
+}

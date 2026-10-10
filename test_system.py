@@ -14532,6 +14532,56 @@ def test_musia_female_gender_and_addressee_concordance_guard():
     print(" -> PASSED: Test 154 potwierdza 100% spójności atrybucji płci Musii i brak regresji.")
 
 
+def test_sasaki_to_piichan_s2_holistic_incident_guard():
+    """
+    TEST 155: Weryfikacja Obsługi Incydentu INC-AVT-002 (Sasaki to Pii-chan S2):
+    1. Diada chłopięca Boy A / Boy B: ochrona cross-gender seiyū i zgodność 2. os. (kupiłeś).
+    2. Pakt Sasaki <-> Peeps: wzajemna męska atrybucja fleksyjna (wróciłeś, przewidziałeś).
+    3. Tytulatura monarska Króla Herz: eliminacja kalki 'twoja wysokość' -> 'Wasza Wysokość'.
+    4. Kakegoe fatyczne: sanacja halucynacji 'Dzikie?' -> 'Rozumiem.'.
+    5. Mowa zapośredniczona w stylu Italics (telefon Shizuki do Sasakiego): 'Spałeś? Czy zrobiłeś'.
+    6. Rząd przyimka 'o': 'wspomniałam o tobie' (Locativus) z pełną antykolizją dla czasowników troski.
+    """
+    import pysubs2
+    from series_memory import SeriesBible, resolve_actor_gender
+    from avt_linter import EpisodeQualityGate
+
+    bible = SeriesBible("Sasaki to Pii-chan 2nd Season")
+    assert resolve_actor_gender("Boy A", series_bible=bible) == "MALE"
+    assert resolve_actor_gender("Boy B", series_bible=bible) == "MALE"
+    assert bible.get_character_gender("Herz") == "MALE"
+
+    raw_ass = (
+        "[Script Info]\nTitle: Test\nScriptType: v4.00+\n\n"
+        "[V4+ Styles]\nFormat: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\n"
+        "Style: Default,Arial,20,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,2,10,10,1\n"
+        "Style: Flashback,Arial,20,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,2,10,10,1\n"
+        "Style: Italics,Arial,20,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,1,0,0,100,100,0,0,1,2,2,2,10,10,1\n\n"
+        "[Events]\nFormat: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\n"
+        "Dialogue: 0,0:05:04.41,0:05:07.38,Flashback,Boy A,0,0,0,,I co tam kupiłaś?\n"
+        "Dialogue: 0,0:05:07.38,0:05:08.57,Flashback,Boy B,0,0,0,,Czekoladki z tofu.\n"
+        "Dialogue: 0,0:13:05.11,0:13:06.67,Default,Peeps,0,0,0,,O, wróciłaś?\n"
+        "Dialogue: 0,0:13:14.65,0:13:17.59,Default,Sasaki,0,0,0,,Tak, dokładnie jak przewidziałaś.\n"
+        "Dialogue: 0,0:20:48.95,0:20:53.01,Default,Sasaki,0,0,0,,Proszę, by twoja wysokość\\Nomówił to z księciem Einhardtem.\n"
+        "Dialogue: 0,0:21:00.40,0:21:02.89,Default,Herz,0,0,0,,Dziękuję, twoja wysokość.\n"
+        "Dialogue: 0,0:23:16.55,0:23:17.65,Default,Sasaki,0,0,0,,Dzikie?\n"
+        "Dialogue: 0,0:40:28.09,0:40:30.51,Italics,Shizuka,0,0,0,,Spałaś? Czy zrobiłaś sobie przerwę?\n"
+        "Dialogue: 0,0:40:30.51,0:40:33.54,Default,Sasaki,0,0,0,,Czyli to chyba nic pilnego?\n"
+        "Dialogue: 0,0:42:00.96,0:42:07.27,Default,Shizuka,0,0,0,,Lecz gdy wspomniałam o ciebie,\\Nwciąż upierał się przy swoim.\n"
+    )
+    subs = pysubs2.SSAFile.from_string(raw_ass)
+    EpisodeQualityGate.audit_and_fix_entire_episode(subs=subs, series_bible=bible)
+    assert subs.events[0].text == "I co tam kupiłeś?"
+    assert subs.events[2].text == "O, wróciłeś?"
+    assert subs.events[3].text == "Tak, dokładnie jak przewidziałeś."
+    assert "Wasza Wysokość" in subs.events[4].text
+    assert "Wasza Wysokość" in subs.events[5].text
+    assert subs.events[6].text == "Rozumiem."
+    assert subs.events[7].text == "Spałeś? Czy zrobiłeś sobie przerwę?"
+    assert "wspomniałam o tobie" in subs.events[9].text
+    print(" -> PASSED: Test 155 potwierdza 100% eliminacji wszystkich 6 defektów incydentu INC-AVT-002.")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -14685,6 +14735,7 @@ if __name__ == "__main__":
     test_speaker_and_addressee_gender_concordance_and_copula_guard()
     test_incident_response_protocol_2_ass_fuzzing_and_breathing_space_guard()
     test_musia_female_gender_and_addressee_concordance_guard()
-    print("\n Wszystkie testy jednostkowe i integracyjne (154/154) zakończone pełnym sukcesem!\n")
+    test_sasaki_to_piichan_s2_holistic_incident_guard()
+    print("\n Wszystkie testy jednostkowe i integracyjne (155/155) zakończone pełnym sukcesem!\n")
 
 

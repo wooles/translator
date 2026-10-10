@@ -574,6 +574,7 @@ FILAR LX: POLSKI KANON ORTOGRAFII I INTERPUNKCJI AUDIOWIZUALNEJ (PWN & NETFLIX C
   * PURYZM KURSYWY AVT:
     - W polskim standardzie AVT kursywa przysługuje wyłącznie: myślom bez ruchu ust (is_thought), narracji voice-over zza kadru, komunikacji przez urządzenia (telefon, radio, megafon) oraz pieśniom.
     - Eliminujemy kalkę kopiowania kursywy fansuberskiej z całych scen retrospekcji (flashbacków)! Dialog toczony na głos między postaciami w retrospekcji bezwzględnie zapisuj antykwą (czcionką prostą).
+  * TYTULATURA MONARSZA I DWORSKA (PWN): Do monarchy (król, cesarz, suweren, książę panujący) zwracamy się wielkimi literami: 'Wasza Wysokość' (lub 'Wasza Królewska Mość'), bezwzględnie unikając angielskiej kalki 'twoja wysokość'.
 
 FILAR LXI: TIMING KOGNITYWNY, REŻYSERIA SPOJRZENIA I GRANICE CIĘĆ MONTAŻOWYCH (SHOT-CHANGE OVERHANG):
 - Ergonomia percepcji audiowizualnej:

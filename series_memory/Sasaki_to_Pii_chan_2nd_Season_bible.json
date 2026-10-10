@@ -1,0 +1,440 @@
+{
+  "anime_title": "Sasaki to Pii-chan 2nd Season",
+  "characters": {
+    "Sasaki -> Peeps": {
+      "description": "Zwrot: 'na ty / Peepsie' (partnerzy, pakt magiczny z szacunkiem mentora) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]"
+    },
+    "Sasaki": {
+      "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
+      "source": "quality_gate",
+      "gender": "MALE"
+    },
+    "Peeps": {
+      "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
+      "source": "quality_gate"
+    },
+    "Peeps -> Sasaki": {
+      "description": "Zwrot: 'na ty / Sasaki' (mistrz i uczeń, powiernicy) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]"
+    },
+    "Akutsu -> Sasaki": {
+      "description": "Zwrot: 'panie Sasaki / Sasaki-kun' (przełożony -> podwładny w służbach specjalnych) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Akutsu": {
+      "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
+      "source": "quality_gate"
+    },
+    "Akutsu -> Futari Shizuka": {
+      "description": "Zwrot: 'Futari Shizuka / pani Shizuka' (przełożony -> zwerbowana agentka)"
+    },
+    "Futari Shizuka": {
+      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Futari Shizuka -> Sasaki": {
+      "description": "Zwrot: 'na ty / Sasaki' (współpracownicy w biurze ds. zjawisk nadprzyrodzonych) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Shizuka -> Sasaki": {
+      "description": "Zwrot: 'na ty / Sasaki' (współpracownicy w biurze ds. zjawisk nadprzyrodzonych) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Hrabia Müller -> Sasaki": {
+      "description": "Zwrot: 'panie Sasaki / Sasaki-dono / baronie Sasaki' (arystokrata sojusznik -> nowo mianowany baron) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Hrabia Müller": {
+      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Otonari-san -> Sasaki": {
+      "description": "Zwrot: 'proszę pana / panie Sasaki' (sąsiadka z gimnazjum -> dorosły sąsiad) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Otonari": {
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+    },
+    "Abaddon -> Otonari-san": {
+      "description": "Zwrot: 'na ty / mała' (demon patron -> ludzka apostołka) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Abaddon": {
+      "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
+      "source": "quality_gate"
+    },
+    "Pii-chan (Peeps)": {
+      "description": "postać (Główny bohater) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Hoshizaki-san": {
+      "description": "postać (Postać drugoplanowa)"
+    },
+    "Otonari-san": {
+      "description": "postać (Postać drugoplanowa) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Elsa von Mueller": {
+      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Magical Pink (Shizuka Hachikai)": {
+      "description": "postać (Postać drugoplanowa)"
+    },
+    "Shura": {
+      "description": "postać (Postać epizodyczna)"
+    },
+    "Marc": {
+      "description": "postać (Postać drugoplanowa)"
+    },
+    "Sebastian": {
+      "description": "postać (Postać drugoplanowa)"
+    },
+    "Hrabia Mueller": {
+      "description": "postać (Postać drugoplanowa)"
+    },
+    "Wicehrabia French": {
+      "description": "postać (Postać drugoplanowa)"
+    },
+    "Josef": {
+      "description": "postać (Postać drugoplanowa)"
+    },
+    "Maximilian": {
+      "description": "postać (Postać drugoplanowa)"
+    },
+    "Peeps (Pii-chan)": {
+      "description": "mężczyzna (Starożytny arcymag (Gwiezdny Mędrzec) odrodzony w ciele kanarka (ryżowca siwego)) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+      "gender": "MALE"
+    },
+    "Otonari-san (Sąsiadka)": {
+      "description": "MĘŻCZYZNA (Uczennica gimnazjum, sąsiadka Sasakiego, apostołka demona Abaddona) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+      "gender": "MALE"
+    },
+    "Książę Adonis": {
+      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Książę Einhart": {
+      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Hoshizaki": {
+      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Równiny Rectan": {
+      "description": "toponim (kraina geograficzna / równiny w innym świecie) [NIE-POSTAĆ]"
+    },
+    "Herz": {
+      "description": "MĘŻCZYZNA (Król Herz, władca królestwa) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+      "gender": "MALE"
+    },
+    "Neighbor": {
+      "description": "KOBIETA (zweryfikowano z audio seiyū Whisper)"
+    },
+    "Mother": {
+      "description": "KOBIETA (zweryfikowano z audio seiyū Whisper)"
+    },
+    "Boyfriend": {
+      "description": "MĘŻCZYZNA (zweryfikowano z audio seiyū Whisper)"
+    },
+    "Masayuki": {
+      "description": "KOBIETA (zweryfikowano z audio seiyū Whisper)"
+    }
+  },
+  "glossary": {
+    "Cabinet Office Special Division": "Wydział Specjalny Kancelarii Premiera",
+    "Starsage": "Gwiezdny Mędrzec",
+    "Quarantine space": "przestrzeń kwarantanny",
+    "Death game": "gra na śmierć i życie",
+    "Disciples": "apostołowie",
+    "Rectan Plains": "Równiny Rectan",
+    "Kingdom of Herz": "Królestwo Herz",
+    "Ohgen Empire": "Cesarstwo Ohgen",
+    "Java sparrow": "ryżowiec siwy"
+  },
+  "relationships": {
+    "Sasaki -> Peeps": "Zwrot: 'na ty / Peepsie' (partnerzy, pakt magiczny z szacunkiem mentora) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Futari Shizuka -> Sasaki": "Zwrot: 'na ty / Sasaki' (współpracownicy w biurze ds. zjawisk nadprzyrodzonych) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Shizuka -> Sasaki": "Zwrot: 'na ty / Sasaki' (współpracownicy w biurze ds. zjawisk nadprzyrodzonych) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Peeps -> Sasaki": "Zwrot: 'na ty / Sasaki' (mistrz i uczeń, powiernicy) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Akutsu -> Sasaki": "Zwrot: 'panie Sasaki / Sasaki-kun' (przełożony -> podwładny w służbach specjalnych) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Akutsu -> Futari Shizuka": "Zwrot: 'Futari Shizuka / pani Shizuka' (przełożony -> zwerbowana agentka)",
+    "Hrabia Müller -> Sasaki": "Zwrot: 'panie Sasaki / Sasaki-dono / baronie Sasaki' (arystokrata sojusznik -> nowo mianowany baron) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Otonari-san -> Sasaki": "Zwrot: 'proszę pana / panie Sasaki' (sąsiadka z gimnazjum -> dorosły sąsiad) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Abaddon -> Otonari-san": "Zwrot: 'na ty / mała' (demon patron -> ludzka apostołka) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+  },
+  "declensions": {
+    "Sasaki": {
+      "M": "Sasaki",
+      "D": "Sasaki",
+      "C": "Sasaki",
+      "B": "Sasaki",
+      "N": "Sasaki",
+      "Ms": "Sasaki",
+      "W": "Sasaki",
+      "gender": "MALE"
+    },
+    "Peeps": {
+      "M": "Peeps",
+      "D": "Peepsa",
+      "C": "Peepsowi",
+      "B": "Peepsa",
+      "N": "Peepsem",
+      "Ms": "Peepsie",
+      "W": "Peepsie",
+      "gender": "MALE"
+    },
+    "Akutsu": {
+      "M": "Akutsu",
+      "D": "Akutsu",
+      "C": "Akutsu",
+      "B": "Akutsu",
+      "N": "Akutsu",
+      "Ms": "Akutsu",
+      "W": "Akutsu",
+      "gender": "MALE"
+    },
+    "Futari Shizuka": {
+      "M": "Futari Shizuka",
+      "D": "Futari Shizuki",
+      "C": "Futari Shizuce",
+      "B": "Futari Shizukę",
+      "N": "Futari Shizuką",
+      "Ms": "Futari Shizuce",
+      "W": "Futari Shizuko",
+      "gender": "FEMALE"
+    },
+    "Hrabia Müller": {
+      "M": "Hrabia Müller",
+      "D": "Hrabiego Müller",
+      "C": "Hrabiemu Müller",
+      "B": "Hrabiego Müller",
+      "N": "Hrabią Müller",
+      "Ms": "Hrabim Müller",
+      "W": "Hrabio Müller",
+      "gender": "MALE"
+    },
+    "Otonari": {
+      "M": "Otonari",
+      "D": "Otonari",
+      "C": "Otonari",
+      "B": "Otonari",
+      "N": "Otonari",
+      "Ms": "Otonari",
+      "W": "Otonari",
+      "gender": "MALE"
+    },
+    "Abaddon": {
+      "M": "Abaddon",
+      "D": "Abaddona",
+      "C": "Abaddonowi",
+      "B": "Abaddona",
+      "N": "Abaddonem",
+      "Ms": "Abaddonie",
+      "W": "Abaddonie",
+      "gender": "MALE"
+    },
+    "Elsa von Mueller": {
+      "M": "Elsa von Mueller",
+      "D": "Elsy von Mueller",
+      "C": "Elsie von Mueller",
+      "B": "Elsę von Mueller",
+      "N": "Elsą von Mueller",
+      "Ms": "Elsie von Mueller",
+      "W": "Elso von Mueller",
+      "gender": "FEMALE"
+    },
+    "Magical Pink (Shizuka Hachikai)": {
+      "M": "Magical Pink (Shizuka Hachikai)",
+      "D": "Magicala Pinka (Shizuki Hachikai)a",
+      "C": "Magicalowi Pinkowi (Shizuce Hachikai)owi",
+      "B": "Magicala Pinka (Shizukę Hachikai)a",
+      "N": "Magicalem Pinkiem (Shizuką Hachikai)em",
+      "Ms": "Magicalu Pinku (Shizuce Hachikai)ie",
+      "W": "Magicalu Pinku (Shizuko Hachikai)ie"
+    },
+    "Shura": {
+      "M": "Shura",
+      "D": "Shury",
+      "C": "Shurze",
+      "B": "Shurę",
+      "N": "Shurą",
+      "Ms": "Shurze",
+      "W": "Shuro"
+    },
+    "Marc": {
+      "M": "Marc",
+      "D": "Marca",
+      "C": "Marcowi",
+      "B": "Marca",
+      "N": "Marcem",
+      "Ms": "Marcu",
+      "W": "Marcu"
+    },
+    "Sebastian": {
+      "M": "Sebastian",
+      "D": "Sebastiana",
+      "C": "Sebastianowi",
+      "B": "Sebastiana",
+      "N": "Sebastianem",
+      "Ms": "Sebastianie",
+      "W": "Sebastianie"
+    },
+    "Hrabia Mueller": {
+      "M": "Hrabia Mueller",
+      "D": "Hrabiego Mueller",
+      "C": "Hrabiemu Mueller",
+      "B": "Hrabiego Mueller",
+      "N": "Hrabią Mueller",
+      "Ms": "Hrabim Mueller",
+      "W": "Hrabio Mueller"
+    },
+    "Wicehrabia French": {
+      "M": "Wicehrabia French",
+      "D": "Wicehrabii Frencha",
+      "C": "Wicehrabii Frenchowi",
+      "B": "Wicehrabię Frencha",
+      "N": "Wicehrabią Frenchem",
+      "Ms": "Wicehrabii Frenchu",
+      "W": "Wicehrabio Frenchu"
+    },
+    "Josef": {
+      "M": "Josef",
+      "D": "Josefa",
+      "C": "Josefowi",
+      "B": "Josefa",
+      "N": "Josefem",
+      "Ms": "Josefie",
+      "W": "Josefie"
+    },
+    "Maximilian": {
+      "M": "Maximilian",
+      "D": "Maximiliana",
+      "C": "Maximilianowi",
+      "B": "Maximiliana",
+      "N": "Maximilianem",
+      "Ms": "Maximilianie",
+      "W": "Maximilianie"
+    },
+    "Książę Adonis": {
+      "M": "Książę Adonis",
+      "D": "Księcia Adonis",
+      "C": "Księciu Adonis",
+      "B": "Księcia Adonis",
+      "N": "Księciem Adonis",
+      "Ms": "Księciu Adonis",
+      "W": "Książę Adonis",
+      "gender": "MALE"
+    },
+    "Książę Einhart": {
+      "M": "Książę Einhart",
+      "D": "Księcia Einhart",
+      "C": "Księciu Einhart",
+      "B": "Księcia Einhart",
+      "N": "Księciem Einhart",
+      "Ms": "Księciu Einhart",
+      "W": "Książę Einhart",
+      "gender": "MALE"
+    },
+    "Hoshizaki": {
+      "M": "Hoshizaki",
+      "D": "Hoshizaki",
+      "C": "Hoshizaki",
+      "B": "Hoshizaki",
+      "N": "Hoshizaki",
+      "Ms": "Hoshizaki",
+      "W": "Hoshizaki",
+      "gender": "FEMALE"
+    },
+    "Równiny Rectan": {
+      "M": "Równiny Rectan",
+      "D": "Równiny Rectan",
+      "C": "Równiny Rectan",
+      "B": "Równiny Rectan",
+      "N": "Równiny Rectan",
+      "Ms": "Równiny Rectan",
+      "W": "Równiny Rectan",
+      "gender": "FEMALE"
+    },
+    "Wydział Specjalny Kancelarii Premiera": {
+      "M": "Wydział Specjalny Kancelarii Premiera",
+      "D": "Wydziała Specjalnego Kancelarii Premiery",
+      "C": "Wydziałowi Specjalnemu Kancelarii Premierze",
+      "B": "Wydziała Specjalnego Kancelarii Premierę",
+      "N": "Wydziałem Specjalnym Kancelarii Premierą",
+      "Ms": "Wydziałie Specjalnym Kancelarii Premierze",
+      "W": "Wydziałie Specjalny Kancelarii Premiero"
+    },
+    "Gwiezdny Mędrzec": {
+      "M": "Gwiezdny Mędrzec",
+      "D": "Gwiezdny Mędrzeca",
+      "C": "Gwiezdny Mędrzecowi",
+      "B": "Gwiezdny Mędrzeca",
+      "N": "Gwiezdny Mędrzecem",
+      "Ms": "Gwiezdny Mędrzecu",
+      "W": "Gwiezdny Mędrzecu"
+    },
+    "Królestwo Herz": {
+      "M": "Królestwo Herz",
+      "D": "Królestwa Herz",
+      "C": "Królestwu Herz",
+      "B": "Królestwo Herz",
+      "N": "Królestwem Herz",
+      "Ms": "Królestwie Herz",
+      "W": "Królestwo Herz"
+    },
+    "Cesarstwo Ohgen": {
+      "M": "Cesarstwo Ohgen",
+      "D": "Cesarstwa Ohgen",
+      "C": "Cesarstwu Ohgen",
+      "B": "Cesarstwo Ohgen",
+      "N": "Cesarstwem Ohgen",
+      "Ms": "Cesarstwie Ohgen",
+      "W": "Cesarstwo Ohgen"
+    },
+    "Neighbor": {
+      "M": "Neighbor",
+      "D": "Neighbor",
+      "C": "Neighbor",
+      "B": "Neighbor",
+      "N": "Neighbor",
+      "Ms": "Neighbor",
+      "W": "Neighbor",
+      "gender": "FEMALE"
+    },
+    "Mother": {
+      "M": "Mother",
+      "D": "Mother",
+      "C": "Mother",
+      "B": "Mother",
+      "N": "Mother",
+      "Ms": "Mother",
+      "W": "Mother",
+      "gender": "FEMALE"
+    },
+    "Boyfriend": {
+      "M": "Boyfriend",
+      "D": "Boyfrienda",
+      "C": "Boyfriendowi",
+      "B": "Boyfrienda",
+      "N": "Boyfriendem",
+      "Ms": "Boyfriendzie",
+      "W": "Boyfriendzie",
+      "gender": "MALE"
+    },
+    "Masayuki": {
+      "M": "Masayuki",
+      "D": "Masayuki",
+      "C": "Masayuki",
+      "B": "Masayuki",
+      "N": "Masayuki",
+      "Ms": "Masayuki",
+      "W": "Masayuki",
+      "gender": "FEMALE"
+    }
+  },
+  "hypocorisms": {},
+  "plot_anchors": {
+    "Incydent z jaszczuroludem (Lizardman incident)": "Bezwzględnie utrzymać termin 'jaszczurolud' i spójność odniesień do bitwy, w której poległ przybysz z innego świata.",
+    "Biuro ds. Zjawisk Nadprzyrodzonych (Cabinet Office Special Division / Naikaku)": "Utrzymać oficjalną nazwę rządowej agencji esperów oraz stopnie: Akutsu jako 'naczelnik' / 'szef' (Chief).",
+    "Przymierze z Kompanią Handlową Marca i Keplera": "Zachować kanoniczne nazwy gildii kupieckich: Kompania Marca (Marc Trading Company) i Kompania Keplera."
+  },
+  "episodes_translated": [
+    "[ASW] Sasaki to Pii-chan S2 - 01 [1080p HEVC][C00D1DD5]"
+  ],
+  "batch_stats": {
+    "[ASW] Sasaki to Pii-chan S2 - 01 [1080p HEVC][C00D1DD5]": {
+      "dialogues": 660,
+      "batches": 30,
+      "avg_batch_size": 22.0,
+      "cost_pln": 6.18
+    }
+  },
+  "fansub_canon": {}
+}

@@ -2932,6 +2932,12 @@ class SeriesBible:
         if not allow_generic_nouns and is_generic_actor_or_category(n_l):
             return "UNKNOWN"
 
+        # Specific numbered/lettered boy/girl role tags are always gender-locked
+        if re.match(r"^(?:boy|chłopiec|chłopak|man|mężczyzna)\s+[a-z0-9]+$", n_l):
+            return "MALE"
+        if re.match(r"^(?:girl|dziewczynka|dziewczyna|woman|kobieta)\s+[a-z0-9]+$", n_l):
+            return "FEMALE"
+
         if self.is_non_character_entity(name) or n_l in ETHNONYMS_AND_COLLECTIVES:
             return "UNKNOWN"
 
@@ -3393,7 +3399,7 @@ class SeriesBible:
         is_female_space = (scene_gender == "FEMALE")
         is_male_space = (scene_gender == "MALE")
 
-        if canon_gender == "MALE" and is_boy_or_crossgender:
+        if (canon_gender == "MALE" or is_boy_or_crossgender) and is_boy_or_crossgender:
             # Young boy voiced by female seiyū: high acoustic F0 is normal for age/actor, canonical gender is MALE
             # Priority P0 SSOT Cast Lock: Physical acoustic F0 cannot override canonical boy cast.
             # Only override if the entire scene is proven to be an exclusively female narrative space (companion voice shield).
@@ -3616,6 +3622,16 @@ class SeriesBible:
         if not name:
             return False
         n_l = name.strip().lower()
+
+        # If explicitly registered in characters as a living character, protect from false toponym classification
+        with self._lock:
+            chars_dict = self.data.get("characters", {})
+            for c_k, c_v in chars_dict.items():
+                if "->" not in c_k and c_k.strip().lower() == n_l:
+                    c_desc = (c_v.get("description", "") if isinstance(c_v, dict) else str(c_v)).lower()
+                    if any(w in c_desc for w in ["mężczyzna", "kobieta", "król", "książę", "postać", "bohater", "rycerz"]):
+                        if "nie-postać" not in c_desc and "toponim" not in c_desc:
+                            return False
         if n_l in INDECLINABLE_FRENCH_TOPONYMS:
             return True
         if n_l.endswith("um"):

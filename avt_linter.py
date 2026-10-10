@@ -489,7 +489,8 @@ class AVTLinter:
         (r"\bto pani, [Mm]łoda [Pp]ani\b", "to ty, młoda pani", "Filar XXV - Eliminacja Tautologii Honoryfikatywnej"),
         (r"\b[Mm]łody [Pp]anie\b", "młody panie", "Filar LX - Ortografia Wołacza i Małe Litery"),
         (r"\b[Mm]łoda [Pp]ani\b", "młoda pani", "Filar LX - Ortografia Wołacza i Małe Litery"),
-        (r"\b[Ww]asza [Ww]ysokość\b", "wasza wysokość", "Filar LX - Ortografia Wołacza i Małe Litery"),
+        (r"\b[Tt]woja [Ww]ysokość\b", "Wasza Wysokość", "Filar LX - Tytulatura Monarsza PWN"),
+        (r"\bwasza wysokość\b", "Wasza Wysokość", "Filar LX - Tytulatura Monarsza PWN"),
         (r"\b[Ss]tarszy bracie\b", lambda m: "Bracie" if m.group(0)[0].isupper() else "bracie", "Filar XXV - Relacje Rodzinne"),
         (r"\b[Ss]tarsza siostro\b", lambda m: "Siostro" if m.group(0)[0].isupper() else "siostro", "Filar XXV - Relacje Rodzinne"),
 
@@ -6210,10 +6211,10 @@ class EpisodeQualityGate:
                                 if win_spk_cl and not is_generic_actor_or_category(win_spk_cl):
                                     nearby_active_speakers.add(win_spk_cl.lower())
                         is_polylogue = (len(nearby_active_speakers) >= 3)
+                        has_2nd_person_marker = bool(re.search(r"\b(?:ty|cię|ciebie|tobie|twoj\w*|spałaś|spałeś|zrobiłaś|zrobiłeś|jesteś|byłaś|byłeś|masz|wiesz|widzisz|chcesz|[a-ząćęłńóśźż]+(?:łeś|łaś|łbyś|łabyś)|powinnaś|powinieneś)\b", clean_ev_text, re.IGNORECASE))
                         is_soliloquy = bool(
-                            re.search(r"\{\\i1\}", ev.text) or
-                            "italic" in (getattr(ev, "style", "") or "").lower() or
-                            (len(nearby_active_speakers) <= 1 and not re.search(r"[,\?!]\s*(?:ty|ciebie|cię|tobie|twoje|twój)\b", clean_ev_text, re.IGNORECASE))
+                            ((re.search(r"\{\\i1\}", ev.text) or "italic" in (getattr(ev, "style", "") or "").lower()) and not has_2nd_person_marker) or
+                            (len(nearby_active_speakers) <= 1 and not re.search(r"[,\?!]\s*(?:ty|ciebie|cię|tobie|twoje|twój)\b", clean_ev_text, re.IGNORECASE) and not has_2nd_person_marker)
                         )
 
                         if not is_soliloquy:
@@ -6541,6 +6542,48 @@ class EpisodeQualityGate:
                                     f"[Episode Quality Gate - Filar CLXIII Zgodność Liczby w Relacji Diadycznej] Linia #{i+1}: "
                                     f"zharmonizowano formę 2. os. l. mn. -> l. poj. w dialogu 1-na-1: '{old_poss_t}' -> '{ev.text}'"
                                 )
+
+                    # Royal & Courtly Honorific Sanitizer: 'twoja wysokość' calque -> 'Wasza Wysokość' (PWN)
+                    old_royal_t = ev.text
+                    ev.text = re.sub(r"\btwoja\s+wysokość\b", "Wasza Wysokość", ev.text)
+                    ev.text = re.sub(r"\bTwoja\s+wysokość\b", "Wasza Wysokość", ev.text)
+                    ev.text = re.sub(r"\btwojej\s+wysokości\b", "Waszej Wysokości", ev.text)
+                    ev.text = re.sub(r"\bTwojej\s+wysokości\b", "Waszej Wysokości", ev.text)
+                    ev.text = re.sub(r"\btwoją\s+wysokość\b", "Waszą Wysokość", ev.text)
+                    ev.text = re.sub(r"\bTwoją\s+wysokość\b", "Waszą Wysokość", ev.text)
+                    ev.text = re.sub(r"\btwoja\s+królewska\s+mość\b", "Wasza Królewska Mość", ev.text, flags=re.IGNORECASE)
+                    ev.text = re.sub(r"\btwojej\s+królewskiej\s+mości\b", "Waszej Królewskiej Mości", ev.text, flags=re.IGNORECASE)
+                    if ev.text != old_royal_t:
+                        clean_ev_text = re.sub(r"\{[^\}]*\}", "", ev.text)
+                        fixes.append(
+                            f"[Episode Quality Gate - Tytulatura Monarska PWN] Linia #{i+1}: "
+                            f"skorygowano zwrot monarszy: '{old_royal_t}' -> '{ev.text}'"
+                        )
+
+                    # Phatic Affirmation / Kakegoe Hallucination Gate: isolated 'Dzikie?' -> 'Rozumiem.'
+                    old_kakegoe_t = ev.text
+                    ev.text = re.sub(r"^(\s*(?:\{\\[^}]+\})*\s*)[Dd]zikie\?(\s*)$", r"\g<1>Rozumiem.\g<2>", ev.text)
+                    if ev.text != old_kakegoe_t:
+                        clean_ev_text = re.sub(r"\{[^\}]*\}", "", ev.text)
+                        fixes.append(
+                            f"[Episode Quality Gate - Partykuła Fatyczna] Linia #{i+1}: "
+                            f"zastąpiono halucynację pytajną naturalnym potwierdzeniem: '{old_kakegoe_t}' -> '{ev.text}'"
+                        )
+
+                    # Prepositional Case Government Gate: 'wspomnieć o' + Miejscownik ('o tobie', NOT 'o ciebie')
+                    old_prep_case_t = ev.text
+                    ev.text = re.sub(
+                        r"\b(wspomn[a-ząćęłńóśźż]*|mówi[a-ząćęłńóśźż]*|powiedzia[a-ząćęłńóśźż]*|napisa[a-ząćęłńóśźż]*|pisz[a-ząćęłńóśźż]*|słysza[a-ząćęłńóśźż]*|słysz[a-ząćęłńóśźż]*|opowiada[a-ząćęłńóśźż]*|opowiedzia[a-ząćęłńóśźż]*|czyta[a-ząćęłńóśźż]*|przeczyta[a-ząćęłńóśźż]*|wiedzia[a-ząćęłńóśźż]*|wie[a-ząćęłńóśźż]*|pamięta[a-ząćęłńóśźż]*|zapomni[a-ząćęłńóśźż]*|rozmawia[a-ząćęłńóśźż]*|dyskutowa[a-ząćęłńóśźż]*|gada[a-ząćęłńóśźż]*)\s+o\s+ciebie\b",
+                        r"\g<1> o tobie",
+                        ev.text,
+                        flags=re.IGNORECASE
+                    )
+                    if ev.text != old_prep_case_t:
+                        clean_ev_text = re.sub(r"\{[^\}]*\}", "", ev.text)
+                        fixes.append(
+                            f"[Episode Quality Gate - Rząd Przyimka 'o' PWN] Linia #{i+1}: "
+                            f"skorygowano rząd przyimka (biernik -> miejscownik): '{old_prep_case_t}' -> '{ev.text}'"
+                        )
 
                     is_target_female = (is_single_female or scene_cast_female_only or partner_gender == "FEMALE") and not (is_single_male or partner_gender == "MALE")
                     is_target_male = (is_single_male or scene_cast_male_only or partner_gender == "MALE") and not (is_single_female or partner_gender == "FEMALE")
