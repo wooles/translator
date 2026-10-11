@@ -47,11 +47,51 @@ def clean_anime_filename(filename_or_path: str) -> str:
     name = re.sub(r"\s+", " ", name).strip()
     return name
 
-def fetch_anilist_metadata(title: str) -> Optional[Dict[str, Any]]:
+def strip_season_suffix(title: str) -> Optional[str]:
     """
-    Queries the AniList GraphQL API to fetch plot synopsis, tags, and character cast.
-    Includes circuit-breaker logic when AniList API is disabled or unreachable.
+    Strips season suffixes (e.g. S2, Season 2, 2nd Season, Part 2, Cour 2, Roman numerals)
+    from the end of a series title to enable fallback queries for the parent franchise in AniList.
+    Returns cleaned parent title or None if no season suffix was present.
     """
+    if not title or not isinstance(title, str):
+        return None
+    raw = title.strip()
+    if len(raw) < 2:
+        return None
+
+    # Pre-clean fansub/quality tags if raw title is a full filename
+    target = clean_anime_filename(raw) or raw
+
+    # 1. Bracketed or parenthesized season suffixes at end of string
+    bracket_pat = r"[\s\-_:]*[\(\[]\s*(?:(?:Season|Part|Cour)\s*(?:\d+|[IVXLCDM]+)|\d+(?:st|nd|rd|th)\s+(?:Season|Cour|Part)|S\d+)\s*[\)\]]\s*$"
+    cleaned = re.sub(bracket_pat, "", target, flags=re.IGNORECASE).strip()
+
+    # 2. Standalone unbracketed season suffixes at end of string
+    patterns = [
+        r"[\s\-_:]+\bS\d+\b\s*$",
+        r"[\s\-_:]+\bSeason\s*(?:\d+|[IVXLCDM]+)\b\s*$",
+        r"[\s\-_:]+\b\d+(?:st|nd|rd|th)\s+Season\b\s*$",
+        r"[\s\-_:]+\bPart\s*(?:\d+|[IVXLCDM]+)\b\s*$",
+        r"[\s\-_:]+\b\d+(?:st|nd|rd|th)\s+Part\b\s*$",
+        r"[\s\-_:]+\bCour\s*(?:\d+|[IVXLCDM]+)\b\s*$",
+        r"[\s\-_:]+\b\d+(?:st|nd|rd|th)\s+Cour\b\s*$",
+        r"[\s\-_:]+\b(?:II|III|IV|VI|VII|VIII|IX|X)\b\s*$",
+    ]
+    for pat in patterns:
+        new_cleaned = re.sub(pat, "", cleaned, flags=re.IGNORECASE).strip()
+        if new_cleaned != cleaned:
+            cleaned = new_cleaned
+            break
+
+    # Strip any trailing delimiters (: - _)
+    cleaned = re.sub(r"[\s\-_:]+$", "", cleaned).strip()
+
+    if cleaned and cleaned != raw and len(cleaned) >= 2:
+        return cleaned
+    return None
+
+def _raw_fetch_anilist_metadata(title: str) -> Optional[Dict[str, Any]]:
+    """Internal helper to execute AniList GraphQL query for a specific title string."""
     global _ANILIST_DISABLED
     if _ANILIST_DISABLED:
         return None
@@ -216,6 +256,31 @@ def fetch_anilist_metadata(title: str) -> Optional[Dict[str, Any]]:
         if "403" in err_str or "disabled" in err_str or "stability" in err_str or "forbidden" in err_str:
             _ANILIST_DISABLED = True
         return None
+
+def fetch_anilist_metadata(title: str) -> Optional[Dict[str, Any]]:
+    """
+    Queries the AniList GraphQL API to fetch plot synopsis, tags, and character cast.
+    Includes circuit-breaker logic and automatic normalization fallback (strip_season_suffix)
+    for sequels (S2, Season 2, etc.) when AniList only indexes the parent franchise.
+    """
+    global _ANILIST_DISABLED
+    if _ANILIST_DISABLED or not title:
+        return None
+
+    res = _raw_fetch_anilist_metadata(title)
+    if res and res.get("characters"):
+        return res
+
+    # Fallback: strip season suffix and query parent franchise
+    stripped = strip_season_suffix(title)
+    if stripped and stripped != title and not _ANILIST_DISABLED:
+        fallback_res = _raw_fetch_anilist_metadata(stripped)
+        if fallback_res and fallback_res.get("characters"):
+            return fallback_res
+        if fallback_res:
+            return fallback_res
+
+    return res
 
 def fetch_gemini_metadata(title: str, client: Any = None) -> Optional[Dict[str, Any]]:
     """

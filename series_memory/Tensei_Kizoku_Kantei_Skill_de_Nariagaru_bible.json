@@ -5,7 +5,8 @@
       "description": "Zwrot: 'panie Arsie / Lordzie Arsie' (wierny wasal -> pan lenny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Rietz": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+      "gender": "MALE"
     },
     "Ars": {
       "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
@@ -235,7 +236,8 @@
       "B": "Mireille",
       "N": "Mireille",
       "Ms": "Mireille",
-      "W": "Mireille"
+      "W": "Mireille",
+      "gender": "FEMALE"
     },
     "Licia": {
       "M": "Licia",

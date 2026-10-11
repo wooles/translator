@@ -6,7 +6,7 @@
       "gender": "MALE"
     },
     "Alicia": {
-      "description": "MĘŻCZYZNA - Dziewczyna Rycerz / Bohaterka z 13 Bohaterów, która przeciwstawiła się bezmyślnej rzezi i zawarła pakt z Clevatessem",
+      "description": "KOBIETA - Dziewczyna Rycerz / Bohaterka z 13 Bohaterów, która przeciwstawiła się bezmyślnej rzezi i zawarła pakt z Clevatessem",
       "gender": "MALE"
     },
     "Nel": {
@@ -219,7 +219,7 @@
       "N": "Alicią",
       "Ms": "Alicii",
       "W": "Alicio",
-      "gender": "MALE"
+      "gender": "FEMALE"
     },
     "Naie": {
       "M": "Naie",
@@ -453,11 +453,11 @@
     },
     "Alicia Sleihunt": {
       "M": "Alicia Sleihunt",
-      "D": "Aliciy Sleihunt",
-      "C": "Alicie Sleihunt",
+      "D": "Alicii Sleihunt",
+      "C": "Alicii Sleihunt",
       "B": "Alicię Sleihunt",
       "N": "Alicią Sleihunt",
-      "Ms": "Alicie Sleihunt",
+      "Ms": "Alicii Sleihunt",
       "W": "Alicio Sleihunt",
       "gender": "FEMALE"
     },

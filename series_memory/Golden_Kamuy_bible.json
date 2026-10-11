@@ -387,10 +387,10 @@
     "Asirpa": {
       "M": "Asirpa",
       "D": "Asirpy",
-      "C": "Asirpe",
+      "C": "Asirpie",
       "B": "Asirpę",
       "N": "Asirpą",
-      "Ms": "Asirpe",
+      "Ms": "Asirpie",
       "W": "Asirpo",
       "gender": "FEMALE"
     },
@@ -506,11 +506,11 @@
     },
     "Sofia": {
       "M": "Sofia",
-      "D": "Sofiy",
-      "C": "Sofie",
+      "D": "Sofii",
+      "C": "Sofii",
       "B": "Sofię",
       "N": "Sofią",
-      "Ms": "Sofie",
+      "Ms": "Sofii",
       "W": "Sofio",
       "gender": "FEMALE"
     },

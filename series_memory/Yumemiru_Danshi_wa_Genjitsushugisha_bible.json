@@ -15,10 +15,10 @@
       "description": "KOBIETA - dziewczyna (Drugoplanowa bohaterka)"
     },
     "Rin Shinomiya": {
-      "description": "MĘŻCZYZNA - kobieta (16-17 lat, przewodnicząca Komitetu Dyscypliny, opanowana i dostojna senpai)"
+      "description": "KOBIETA - kobieta (16-17 lat, przewodnicząca Komitetu Dyscypliny, opanowana i dostojna senpai)"
     },
     "Kei Shinomiya": {
-      "description": "MĘŻCZYZNA - dziewczyna (Drugoplanowa bohaterka)"
+      "description": "KOBIETA - dziewczyna (Drugoplanowa bohaterka)"
     },
     "Rin Ichinose": {
       "description": "KOBIETA - dziewczyna (Drugoplanowa bohaterka)"
@@ -94,10 +94,10 @@
     "Aika Natsukawa": {
       "M": "Aika Natsukawa",
       "D": "Aiki Natsukawy",
-      "C": "Aice Natsukawe",
+      "C": "Aice Natsukawie",
       "B": "Aikę Natsukawę",
       "N": "Aiką Natsukawą",
-      "Ms": "Aice Natsukawe",
+      "Ms": "Aice Natsukawie",
       "W": "Aiko Natsukawo",
       "gender": "FEMALE"
     },
@@ -123,23 +123,23 @@
     },
     "Rin Shinomiya": {
       "M": "Rin Shinomiya",
-      "D": "Rina Shinomiyy",
-      "C": "Rinowi Shinomiye",
-      "B": "Rina Shinomiyę",
-      "N": "Rinem Shinomiyą",
-      "Ms": "Rinie Shinomiye",
-      "W": "Rinie Shinomiyo",
+      "D": "Rin Shinomiyi",
+      "C": "Rin Shinomiyi",
+      "B": "Rin Shinomiyę",
+      "N": "Rin Shinomiyą",
+      "Ms": "Rin Shinomiyi",
+      "W": "Rin Shinomiyo",
       "gender": "FEMALE"
     },
     "Kei Shinomiya": {
       "M": "Kei Shinomiya",
-      "D": "Kei Shinomiyy",
-      "C": "Kei Shinomiye",
+      "D": "Kei Shinomiyi",
+      "C": "Kei Shinomiyi",
       "B": "Kei Shinomiyę",
       "N": "Kei Shinomiyą",
-      "Ms": "Kei Shinomiye",
+      "Ms": "Kei Shinomiyi",
       "W": "Kei Shinomiyo",
-      "gender": "MALE"
+      "gender": "FEMALE"
     },
     "Rin Ichinose": {
       "M": "Rin Ichinose",
@@ -234,7 +234,8 @@
       "B": "Wataru Sajou -> Kaede Sajou",
       "N": "Wataru Sajou -> Kaede Sajou",
       "Ms": "Wataru Sajou -> Kaede Sajou",
-      "W": "Wataru Sajou -> Kaede Sajou"
+      "W": "Wataru Sajou -> Kaede Sajou",
+      "gender": "FEMALE"
     },
     "Wataru Sajou -> Rin Shinomiya": {
       "M": "Wataru Sajou -> Rin Shinomiya",
@@ -261,7 +262,8 @@
       "B": "Kaede Sajou -> Wataru Sajou",
       "N": "Kaede Sajou -> Wataru Sajou",
       "Ms": "Kaede Sajou -> Wataru Sajou",
-      "W": "Kaede Sajou -> Wataru Sajou"
+      "W": "Kaede Sajou -> Wataru Sajou",
+      "gender": "FEMALE"
     }
   },
   "hypocorisms": {},

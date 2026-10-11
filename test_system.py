@@ -14582,6 +14582,125 @@ def test_sasaki_to_piichan_s2_holistic_incident_guard():
     print(" -> PASSED: Test 155 potwierdza 100% eliminacji wszystkich 6 defektów incydentu INC-AVT-002.")
 
 
+def test_hyouken_s2_root_cause_anilist_fallback_and_addressee_guard():
+    """
+    TEST 156: Weryfikacja Standardu 3.0 i Pełnej Eliminacji Źródłowej INC-AVT-003:
+    1. metadata.py: strip_season_suffix() dla wielosezonowych tytułów (S2, Season 2, Part 2, Cour 2, 2nd Season, Roman numerals, brackets).
+    2. metadata.py: Fallback do franszyzy macierzystej w AniList - 'Hyouken no Majutsushi ga Sekai wo Suberu S2' zwraca poprawny profil Raya White'a (Male, verified=True).
+    3. series_memory.py: Izolacja mówcy (idx=0) od tagów adresata [KOBIETA (Adresat)] i form 2. os. (byłaś/zrobiłaś) w update_from_episode_profile().
+    4. series_memory.py: Priorytet P0 dla zweryfikowanej płci z AniList (zakaz nadpisywania przez relacje heurystyczne i symetryczna blokada).
+    5. series_memory.py: Bezpiecznik relacji hierarchicznych (usunięcie fałszywego wymuszenia MĘŻCZYZNA dla przełożonych kobiet z panie/pan).
+    6. SeriesBible & EpisodeQualityGate: Weryfikacja bazy Hyouken S2 (Ray White: MALE, Ariane Olgren: FEMALE, Rebecca Bradley: FEMALE, Lydia Ainsworth: FEMALE, Stella White: FEMALE) oraz test naprawy linii ASS bez regresji.
+    """
+    import pysubs2
+    import tempfile
+    from pathlib import Path
+    from metadata import strip_season_suffix, fetch_anilist_metadata
+    from series_memory import SeriesBible, resolve_actor_gender
+    from avt_linter import EpisodeQualityGate
+
+    # 1. strip_season_suffix
+    assert strip_season_suffix("Hyouken no Majutsushi ga Sekai wo Suberu S2") == "Hyouken no Majutsushi ga Sekai wo Suberu"
+    assert strip_season_suffix("Mushoku Tensei Season 2") == "Mushoku Tensei"
+    assert strip_season_suffix("Spy x Family Part 2") == "Spy x Family"
+    assert strip_season_suffix("Bleach: Thousand-Year Blood War - The Conflict - Cour 2") == "Bleach: Thousand-Year Blood War - The Conflict"
+    assert strip_season_suffix("Re:Zero 2nd Season") == "Re:Zero"
+    assert strip_season_suffix("Overlord IV") == "Overlord"
+    assert strip_season_suffix("[ASW] Hyouken no Majutsushi ga Sekai wo Suberu S2 [1080p]") == "Hyouken no Majutsushi ga Sekai wo Suberu"
+
+    # 2. AniList Fallback
+    anilist_meta = fetch_anilist_metadata("Hyouken no Majutsushi ga Sekai wo Suberu S2")
+    assert anilist_meta is not None
+    char_map = {c["name"]: c for c in anilist_meta.get("characters", [])}
+    assert "Ray White" in char_map
+    assert char_map["Ray White"].get("gender_raw") == "Male" or "mężczyzna" in str(char_map["Ray White"].get("gender", "")).lower()
+    assert char_map["Ray White"].get("has_verified_gender") is True
+    assert "Amelia Rose" in char_map
+    assert char_map["Amelia Rose"].get("gender_raw") == "Female" or "kobieta" in str(char_map["Amelia Rose"].get("gender", "")).lower()
+
+    # 3. Synthetic SeriesBible
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        test_bible = SeriesBible("Synthetic Test Anime", storage_dir=Path(tmp_dir))
+        synthetic_chars = {
+            "Hero -> Princess": "Zwrot: 'na ty' (partner / księżniczka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś]",
+            "Sorceress -> Knight": "Zwrot: 'panie rycerzu' (czarodziejka / rycerz) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś]",
+            "Ray White -> Amelia Rose": "Zwrot: 'na ty' [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś]",
+            "Ariane Olgren -> Ray White": "Zwrot: 'na ty / Rayu' (kadetka / dowódca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś] [RELACJA HIERARCHICZNA: Pan / Panie]",
+            "Ray White -> Rebecca Bradley": "Zwrot: 'pani przewodnicząca' (uczeń / przewodnicząca) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś] [RELACJA HIERARCHICZNA: Pan / Panie]",
+            "Ray White -> Lydia Ainsworth": "Zwrot: 'Mistrzyni' (uczeń / mistrzyni) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś] [RELACJA HIERARCHICZNA: Pan / Panie]"
+        }
+        synthetic_rels = dict(synthetic_chars)
+        test_bible.update_from_episode_profile(
+            episode_name="Odcinek 1",
+            characters=synthetic_chars,
+            relationships=synthetic_rels
+        )
+        assert test_bible.get_character_gender("Hero") == "MALE"
+        assert test_bible.get_character_gender("Princess") == "FEMALE"
+        assert test_bible.get_character_gender("Sorceress") == "FEMALE"
+        assert test_bible.get_character_gender("Knight") == "MALE"
+        assert test_bible.get_character_gender("Ray White") == "MALE"
+        assert test_bible.get_character_gender("Amelia Rose") == "FEMALE"
+        assert test_bible.get_character_gender("Ariane Olgren") == "FEMALE"
+        assert test_bible.get_character_gender("Rebecca Bradley") == "FEMALE"
+        assert test_bible.get_character_gender("Lydia Ainsworth") == "FEMALE"
+
+        # P0 priority
+        test_bible.data["characters"]["Ray White"] = {
+            "gender": "MALE",
+            "has_verified_gender": True,
+            "description": "MĘŻCZYZNA (zweryfikowano z AniList)"
+        }
+        poison_chars = {
+            "Ray White -> Other": "postać [KOBIETA (Adresat)] (wyodrębniono z relacji)"
+        }
+        test_bible.update_from_episode_profile(
+            episode_name="Odcinek 2",
+            characters=poison_chars
+        )
+        assert test_bible.get_character_gender("Ray White") == "MALE"
+
+    # 4. Hyouken S2 Bible check
+    bible = SeriesBible("Hyouken no Majutsushi ga Sekai wo Suberu S2")
+    assert resolve_actor_gender("Ray White", series_bible=bible) == "MALE"
+    assert resolve_actor_gender("Ariane Olgren", series_bible=bible) == "FEMALE"
+    assert resolve_actor_gender("Rebecca Bradley", series_bible=bible) == "FEMALE"
+    assert resolve_actor_gender("Lydia Ainsworth", series_bible=bible) == "FEMALE"
+    assert resolve_actor_gender("Stella White", series_bible=bible) == "FEMALE"
+    assert bible.get_character_gender("Ray White") == "MALE"
+    assert bible.get_character_gender("Ariane Olgren") == "FEMALE"
+    assert bible.get_character_gender("Rebecca Bradley") == "FEMALE"
+    assert bible.get_character_gender("Lydia Ainsworth") == "FEMALE"
+    assert bible.get_character_gender("Stella White") == "FEMALE"
+
+    decl = bible.data.get("declensions", {})
+    assert decl.get("Ray White", {}).get("D") == "Raya White'a"
+    assert decl.get("Ariane Olgren", {}).get("D") == "Ariane Olgren"
+    assert decl.get("Rebecca Bradley", {}).get("D") == "Rebeccy Bradley"
+    assert decl.get("Lydia Ainsworth", {}).get("D") == "Lydii Ainsworth"
+    assert decl.get("Stella White", {}).get("D") == "Stelli White"
+
+    # 5. ASS lines fix
+    raw_ass = (
+        "[Script Info]\nTitle: Test\nScriptType: v4.00+\n\n"
+        "[V4+ Styles]\nFormat: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\n"
+        "Style: Default,Arial,20,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,2,10,10,1\n\n"
+        "[Events]\nFormat: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\n"
+        "Dialogue: 0,0:01:00.00,0:01:03.00,Default,Ray White,0,0,0,,Sama to zrobiłam, gdy byłam w akademii.\n"
+        "Dialogue: 0,0:01:05.00,0:01:08.00,Default,Amelia Rose,0,0,0,,Rayu, przecież mówiłaś, że wróciłaś wczoraj.\n"
+        "Dialogue: 0,0:01:10.00,0:01:13.00,Default,Ray White,0,0,0,,Ariane, spóźniłeś się na zbiórkę.\n"
+        "Dialogue: 0,0:01:15.00,0:01:18.00,Default,Ray White,0,0,0,,Panno Rebecco, byłeś wczoraj u dyrektora?\n"
+    )
+    subs = pysubs2.SSAFile.from_string(raw_ass)
+    EpisodeQualityGate.audit_and_fix_entire_episode(subs=subs, series_bible=bible)
+    assert "byłem" in subs.events[0].text
+    assert "mówiłeś" in subs.events[1].text and "wróciłeś" in subs.events[1].text
+    assert "spóźniłaś się" in subs.events[2].text
+    assert "byłaś" in subs.events[3].text
+
+    print(" -> PASSED: Test 156 potwierdza 100% eliminacji fabryki błędów INC-AVT-003 i pełną zgodność ze Standardem 3.0.")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -14736,6 +14855,7 @@ if __name__ == "__main__":
     test_incident_response_protocol_2_ass_fuzzing_and_breathing_space_guard()
     test_musia_female_gender_and_addressee_concordance_guard()
     test_sasaki_to_piichan_s2_holistic_incident_guard()
-    print("\n Wszystkie testy jednostkowe i integracyjne (155/155) zakończone pełnym sukcesem!\n")
+    test_hyouken_s2_root_cause_anilist_fallback_and_addressee_guard()
+    print("\n Wszystkie testy jednostkowe i integracyjne (156/156) zakończone pełnym sukcesem!\n")
 
 

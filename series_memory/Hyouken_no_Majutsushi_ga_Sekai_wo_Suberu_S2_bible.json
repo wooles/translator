@@ -1,0 +1,421 @@
+{
+  "anime_title": "Hyouken no Majutsushi ga Sekai wo Suberu S2",
+  "characters": {
+    "Ray White -> Amelia Rose": {
+      "description": "Zwrot: 'na ty / po imieniu: Amelio / kadetko Amelio (w trybie musztry)' (przyjaciele z klasy / instruktor i rekrutka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Ray White": {
+      "description": "mężczyzna / chłopak (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+      "gender": "MALE"
+    },
+    "Amelia Rose": {
+      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Amelia Rose -> Ray White": {
+      "description": "Zwrot: 'na ty / po imieniu: Rayu' (bliska przyjaciółka / skryte uczucie) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Ray White -> Ariane Olgren": {
+      "description": "Zwrot: 'na ty / Ariane / kadetko Ariane Algren' (towarzysz z drużyny / surowy dowódca) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Ariane Olgren": {
+      "description": "kobieta / dziewczyna (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Ariane Olgren -> Ray White": {
+      "description": "Zwrot: 'na ty / po imieniu: Rayu (z wojskowym respektem)' (podwładna w obozie / zafascynowana rywalka) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]"
+    },
+    "Ray White -> Rebecca Bradley": {
+      "description": "Zwrot: 'pani przewodnicząca / Rebecco-senpai (lub per starsza koleżanko)' (młodszy kolega z klubu -> starsza mentorka) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]"
+    },
+    "Rebecca Bradley": {
+      "description": "kobieta / dziewczyna (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Rebecca Bradley -> Ray White": {
+      "description": "Zwrot: 'na ty / po imieniu: Rayu' (starsza koleżanka zakochana w młodszym koledze) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Ray White -> Lydia Ainsworth": {
+      "description": "Zwrot: 'Mistrzyni / Shishou' (uczeń -> mistrzyni) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]"
+    },
+    "Lydia Ainsworth": {
+      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Lydia Ainsworth -> Ray White": {
+      "description": "Zwrot: 'na ty / Rayu' (mistrzyni -> uczeń) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]"
+    },
+    "Rebecca Bradley -> Amelia Rose": {
+      "description": "Zwrot: 'na ty / po imieniu: Amelio' (senpai -> kouhai / sojuszniczki w miłości) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Amelia Rose -> Rebecca Bradley": {
+      "description": "Zwrot: 'panno Rebecco / przewodnicząca Rebecco' (kouhai -> senpai) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Elisa Griffith": {
+      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Claris Cleveland": {
+      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Evi Armstrong": {
+      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Abbie Garnet": {
+      "description": "postać (Postać drugoplanowa)"
+    },
+    "Carol Caroline": {
+      "description": "postać (Postać drugoplanowa)"
+    },
+    "Albert Alium": {
+      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Helena Grady": {
+      "description": "postać (Postać drugoplanowa)"
+    },
+    "Lucas Bradley": {
+      "description": "postać (Postać drugoplanowa)"
+    },
+    "Wanda Wykes": {
+      "description": "postać (Postać drugoplanowa)"
+    },
+    "Stella White": {
+      "description": "kobieta / dziewczynka (młodsza siostra Raya) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Lieselotte": {
+      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Dina": {
+      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Lily": {
+      "description": "MĘŻCZYZNA (zweryfikowano z audio seiyū Whisper)"
+    },
+    "Carla": {
+      "description": "MĘŻCZYZNA (zweryfikowano z audio seiyū Whisper)"
+    },
+    "Zuina": {
+      "description": "MĘŻCZYZNA (zweryfikowano z audio seiyū Whisper)"
+    },
+    "Cusuechs": {
+      "description": "MĘŻCZYZNA (zweryfikowano z audio seiyū Whisper)"
+    },
+    "Takenoko": {
+      "description": "KOBIETA (zweryfikowano z audio seiyū Whisper)"
+    },
+    "Animals": {
+      "description": "KOBIETA (zweryfikowano z audio seiyū Whisper)"
+    },
+    "Ray": {
+      "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
+      "source": "quality_gate"
+    }
+  },
+  "glossary": {
+    "Iceblade Sorcerer": "Mag Lodowego Miecza",
+    "Magicks War": "Wojna Magii / Magicks War",
+    "Grand Sorcerers": "Wielcy Magowie",
+    "Inside code": "kod wewnętrzny",
+    "Far East War": "Wojna na Dalekim Wschodzie",
+    "Ainsworth-style bootcamp": "obóz przetrwania szkoły Ainsworth",
+    "Overheating": "przegrzanie"
+  },
+  "relationships": {
+    "Ray White -> Amelia Rose": "Zwrot: 'na ty / po imieniu: Amelio / kadetko Amelio (w trybie musztry)' (przyjaciele z klasy / instruktor i rekrutka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Amelia Rose -> Ray White": "Zwrot: 'na ty / po imieniu: Rayu' (bliska przyjaciółka / skryte uczucie) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Ray White -> Ariane Olgren": "Zwrot: 'na ty / Ariane / kadetko Ariane Algren' (towarzysz z drużyny / surowy dowódca) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Ariane Olgren -> Ray White": "Zwrot: 'na ty / po imieniu: Rayu (z wojskowym respektem)' (podwładna w obozie / zafascynowana rywalka) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Ray White -> Rebecca Bradley": "Zwrot: 'pani przewodnicząca / Rebecco-senpai (lub per starsza koleżanko)' (młodszy kolega z klubu -> starsza mentorka) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Rebecca Bradley -> Ray White": "Zwrot: 'na ty / po imieniu: Rayu' (starsza koleżanka zakochana w młodszym koledze) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Ray White -> Lydia Ainsworth": "Zwrot: 'Mistrzyni / Shishou' (uczeń -> mistrzyni) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Lydia Ainsworth -> Ray White": "Zwrot: 'na ty / Rayu' (mistrzyni -> uczeń) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Rebecca Bradley -> Amelia Rose": "Zwrot: 'na ty / po imieniu: Amelio' (senpai -> kouhai / sojuszniczki w miłości) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]",
+    "Amelia Rose -> Rebecca Bradley": "Zwrot: 'panno Rebecco / przewodnicząca Rebecco' (kouhai -> senpai) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]"
+  },
+  "declensions": {
+    "Ray White": {
+      "M": "Ray White",
+      "D": "Raya White'a",
+      "C": "Rayowi White'owi",
+      "B": "Raya White'a",
+      "N": "Rayem White'em",
+      "Ms": "Rayu White'cie",
+      "W": "Rayu White",
+      "gender": "MALE"
+    },
+    "Amelia Rose": {
+      "M": "Amelia Rose",
+      "D": "Amelii Rose",
+      "C": "Amelii Rose",
+      "B": "Amelię Rose",
+      "N": "Amelią Rose",
+      "Ms": "Amelii Rose",
+      "W": "Amelio Rose",
+      "gender": "FEMALE"
+    },
+    "Ariane Olgren": {
+      "M": "Ariane Olgren",
+      "D": "Ariane Olgren",
+      "C": "Ariane Olgren",
+      "B": "Ariane Olgren",
+      "N": "Ariane Olgren",
+      "Ms": "Ariane Olgren",
+      "W": "Ariane Olgren",
+      "gender": "FEMALE"
+    },
+    "Rebecca Bradley": {
+      "M": "Rebecca Bradley",
+      "D": "Rebeccy Bradley",
+      "C": "Rebeccy Bradley",
+      "B": "Rebeccę Bradley",
+      "N": "Rebeccą Bradley",
+      "Ms": "Rebeccy Bradley",
+      "W": "Rebecco Bradley",
+      "gender": "FEMALE"
+    },
+    "Lydia Ainsworth": {
+      "M": "Lydia Ainsworth",
+      "D": "Lydii Ainsworth",
+      "C": "Lydii Ainsworth",
+      "B": "Lydię Ainsworth",
+      "N": "Lydią Ainsworth",
+      "Ms": "Lydii Ainsworth",
+      "W": "Lydio Ainsworth",
+      "gender": "FEMALE"
+    },
+    "Elisa Griffith": {
+      "M": "Elisa Griffith",
+      "D": "Elisy Griffith",
+      "C": "Elisie Griffith",
+      "B": "Elisę Griffith",
+      "N": "Elisą Griffith",
+      "Ms": "Elisie Griffith",
+      "W": "Eliso Griffith",
+      "gender": "FEMALE"
+    },
+    "Claris Cleveland": {
+      "M": "Claris Cleveland",
+      "D": "Claris Cleveland",
+      "C": "Claris Cleveland",
+      "B": "Claris Cleveland",
+      "N": "Claris Cleveland",
+      "Ms": "Claris Cleveland",
+      "W": "Claris Cleveland",
+      "gender": "FEMALE"
+    },
+    "Evi Armstrong": {
+      "M": "Evi Armstrong",
+      "D": "Evi Armstronga",
+      "C": "Evi Armstrongowi",
+      "B": "Evi Armstronga",
+      "N": "Evi Armstrongiem",
+      "Ms": "Evi Armstrongu",
+      "W": "Evi Armstrongu",
+      "gender": "MALE"
+    },
+    "Abbie Garnet": {
+      "M": "Abbie Garnet",
+      "D": "Abbie Garneta",
+      "C": "Abbie Garnetowi",
+      "B": "Abbie Garneta",
+      "N": "Abbie Garnetem",
+      "Ms": "Abbie Garnecie",
+      "W": "Abbie Garnecie"
+    },
+    "Carol Caroline": {
+      "M": "Carol Caroline",
+      "D": "Carola Caroline",
+      "C": "Carolowi Caroline",
+      "B": "Carola Caroline",
+      "N": "Carolem Caroline",
+      "Ms": "Carolu Caroline",
+      "W": "Carolu Caroline"
+    },
+    "Albert Alium": {
+      "M": "Albert Alium",
+      "D": "Alberta Alium",
+      "C": "Albertowi Alium",
+      "B": "Alberta Alium",
+      "N": "Albertem Alium",
+      "Ms": "Albercie Alium",
+      "W": "Albercie Alium",
+      "gender": "MALE"
+    },
+    "Helena Grady": {
+      "M": "Helena Grady",
+      "D": "Heleny Grady",
+      "C": "Helenie Grady",
+      "B": "Helenę Grady",
+      "N": "Heleną Grady",
+      "Ms": "Helenie Grady",
+      "W": "Heleno Grady"
+    },
+    "Lucas Bradley": {
+      "M": "Lucas Bradley",
+      "D": "Lucasa Bradley",
+      "C": "Lucasowi Bradley",
+      "B": "Lucasa Bradley",
+      "N": "Lucasem Bradley",
+      "Ms": "Lucasie Bradley",
+      "W": "Lucasie Bradley"
+    },
+    "Wanda Wykes": {
+      "M": "Wanda Wykes",
+      "D": "Wandy Wykesa",
+      "C": "Wandzie Wykesowi",
+      "B": "Wandę Wykesa",
+      "N": "Wandą Wykesem",
+      "Ms": "Wandzie Wykesie",
+      "W": "Wando Wykesie"
+    },
+    "Stella White": {
+      "M": "Stella White",
+      "D": "Stelli White",
+      "C": "Stelli White",
+      "B": "Stellę White",
+      "N": "Stellą White",
+      "Ms": "Stelli White",
+      "W": "Stello White",
+      "gender": "FEMALE"
+    },
+    "Lieselotte": {
+      "M": "Lieselotte",
+      "D": "Lieselotte",
+      "C": "Lieselotte",
+      "B": "Lieselotte",
+      "N": "Lieselotte",
+      "Ms": "Lieselotte",
+      "W": "Lieselotte",
+      "gender": "FEMALE"
+    },
+    "Dina": {
+      "M": "Dina",
+      "D": "Diny",
+      "C": "Dinie",
+      "B": "Dinę",
+      "N": "Diną",
+      "Ms": "Dinie",
+      "W": "Dino",
+      "gender": "FEMALE"
+    },
+    "Mag Lodowego Miecza": {
+      "M": "Mag Lodowego Miecza",
+      "D": "Maga Lodowego Miecza",
+      "C": "Magowi Lodowego Miecza",
+      "B": "Maga Lodowego Miecza",
+      "N": "Magiem Lodowego Miecza",
+      "Ms": "Magu Lodowego Miecza",
+      "W": "Magu Lodowego Miecza"
+    },
+    "Wojna Magii / Magicks War": {
+      "M": "Wojna Magii / Magicks War",
+      "D": "Wojny Magii / Magicksa Wara",
+      "C": "Wojnie Magii / Magicksowi Warowi",
+      "B": "Wojnę Magii / Magicksa Wara",
+      "N": "Wojną Magii / Magicksem Warem",
+      "Ms": "Wojnie Magii / Magicksie Warze",
+      "W": "Wojno Magii / Magicksie Warze"
+    },
+    "Wielcy Magowie": {
+      "M": "Wielcy Magowie",
+      "D": "Wielcy Magowie",
+      "C": "Wielcy Magowie",
+      "B": "Wielcy Magowie",
+      "N": "Wielcy Magowie",
+      "Ms": "Wielcy Magowie",
+      "W": "Wielcy Magowie"
+    },
+    "Wojna na Dalekim Wschodzie": {
+      "M": "Wojna na Dalekim Wschodzie",
+      "D": "Wojny ny Dalekima Wschodzie",
+      "C": "Wojnie nie Dalekimowi Wschodzie",
+      "B": "Wojnę nę Dalekima Wschodzie",
+      "N": "Wojną ną Dalekimem Wschodzie",
+      "Ms": "Wojnie nie Dalekimie Wschodzie",
+      "W": "Wojno no Dalekimie Wschodzie"
+    },
+    "Lily": {
+      "M": "Lily",
+      "D": "Lily",
+      "C": "Lily",
+      "B": "Lily",
+      "N": "Lily",
+      "Ms": "Lily",
+      "W": "Lily",
+      "gender": "MALE"
+    },
+    "Carla": {
+      "M": "Carla",
+      "D": "Carli",
+      "C": "Carli",
+      "B": "Carlę",
+      "N": "Carlą",
+      "Ms": "Carli",
+      "W": "Carlo",
+      "gender": "MALE"
+    },
+    "Zuina": {
+      "M": "Zuina",
+      "D": "Zuiny",
+      "C": "Zuinie",
+      "B": "Zuinę",
+      "N": "Zuiną",
+      "Ms": "Zuinie",
+      "W": "Zuino",
+      "gender": "MALE"
+    },
+    "Cusuechs": {
+      "M": "Cusuechs",
+      "D": "Cusuechsa",
+      "C": "Cusuechsowi",
+      "B": "Cusuechsa",
+      "N": "Cusuechsem",
+      "Ms": "Cusuechsie",
+      "W": "Cusuechsie",
+      "gender": "MALE"
+    },
+    "Takenoko": {
+      "M": "Takenoko",
+      "D": "Takenoko",
+      "C": "Takenoko",
+      "B": "Takenoko",
+      "N": "Takenoko",
+      "Ms": "Takenoko",
+      "W": "Takenoko",
+      "gender": "FEMALE"
+    },
+    "Animals": {
+      "M": "Animals",
+      "D": "Animals",
+      "C": "Animals",
+      "B": "Animals",
+      "N": "Animals",
+      "Ms": "Animals",
+      "W": "Animals",
+      "gender": "FEMALE"
+    },
+    "Ray": {
+      "M": "Ray",
+      "D": "Ray",
+      "C": "Ray",
+      "B": "Ray",
+      "N": "Ray",
+      "Ms": "Ray",
+      "W": "Ray",
+      "gender": "MALE"
+    }
+  },
+  "hypocorisms": {},
+  "plot_anchors": {
+    "Magic Chevalier": "Utrzymać nazwę turnieju jako 'Magic Chevalier' (nie tłumaczyć jako 'Magiczny Rycerz'). Amelia jest jego aktualną mistrzynią.",
+    "Overheating (Przegrzanie rdzenia)": "Termin medyczno-magiczny oznaczający przeciążenie obwodu magii Raya po Wojnie na Dalekim Wschodzie. Tłumaczyć konsekwentnie jako 'przegrzanie'.",
+    "Seven Grand Sorcerers": "Tłumaczyć wyłącznie jako 'Siedmiu Wielkich Magów'."
+  },
+  "episodes_translated": [
+    "[ASW] Hyouken no Majutsushi ga Sekai wo Suberu S2 - 01 [1080p HEVC][84D39E5E]"
+  ],
+  "batch_stats": {
+    "[ASW] Hyouken no Majutsushi ga Sekai wo Suberu S2 - 01 [1080p HEVC][84D39E5E]": {
+      "dialogues": 466,
+      "batches": 19,
+      "avg_batch_size": 24.5,
+      "cost_pln": 3.98
+    }
+  },
+  "fansub_canon": {}
+}

@@ -28,7 +28,7 @@
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
     },
     "Mamori Totoyama": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "KOBIETA (wyodrębniono z relacji serii)"
     },
     "Koyuki Himekawa": {
       "description": "kobieta / dziewczyna (Postać drugoplanowa) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
@@ -152,7 +152,7 @@
       "N": "Mamori Totoyamą",
       "Ms": "Mamori Totoyamie",
       "W": "Mamori Totoyamo",
-      "gender": "MALE"
+      "gender": "FEMALE"
     },
     "Koyuki Himekawa": {
       "M": "Koyuki Himekawa",
@@ -293,12 +293,12 @@
     },
     "Snow White": {
       "M": "Snow White",
-      "D": "Snowa Whitego",
-      "C": "Snowowi Whitemu",
-      "B": "Snowa White",
-      "N": "Snowem Whitym",
-      "Ms": "Snowie Whitym",
-      "W": "Snowie White",
+      "D": "Snow White",
+      "C": "Snow White",
+      "B": "Snow White",
+      "N": "Snow White",
+      "Ms": "Snow White",
+      "W": "Snow White",
       "gender": "FEMALE"
     },
     "Mamori": {

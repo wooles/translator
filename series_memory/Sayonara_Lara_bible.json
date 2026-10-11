@@ -9,7 +9,7 @@
       "gender": "MALE"
     },
     "Mari": {
-      "description": "MĘŻCZYZNA (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+      "description": "KOBIETA (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
       "gender": "MALE"
     },
     "Mari Otsu": {
@@ -138,8 +138,8 @@
     "Lara -> Luca": "Zwrot: 'Luca' (nieśmiałe zakochani / przyjaciele) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Luca -> Lara": "Zwrot: 'na ty / po imieniu (Lara)' (znajomi / rozwijające się uczucie) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Mari -> Lara": "Zwrot: 'na ty / Lara' (bliskie przyjaciółki) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]",
-    "Gon (Grace) -> Lara": "PŁEĆ: ŻEŃSKA (Wiedźma/mentorka w postaci rybki w akwarium). Zawsze formy ŻEŃSKIE (np. poszukałam, widziałam, mogłabym). Zwrot: 'na ty / po imieniu: Lara' [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
-    "Gon (Grace) -> Mari": "PŁEĆ: ŻEŃSKA (Wiedźma/mentorka w akwarium mówiąca do leżącej na łóżku Mari). Obie to KOBIETY! Zawsze formy ŻEŃSKIE (np. 'Chcesz, żebym poszukała?' / 'Mam poszukać?'). Zwrot: 'Mari / na ty' [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Gon (Grace) -> Lara": "PŁEĆ: ŻEŃSKA (Wiedźma/mentorka w postaci rybki w akwarium). Zawsze formy ŻEŃSKIE (np. poszukałam, widziałam, mogłabym). Zwrot: 'na ty / po imieniu: Lara' [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]",
+    "Gon (Grace) -> Mari": "PŁEĆ: ŻEŃSKA (Wiedźma/mentorka w akwarium mówiąca do leżącej na łóżku Mari). Obie to KOBIETY! Zawsze formy ŻEŃSKIE (np. 'Chcesz, żebym poszukała?' / 'Mam poszukać?'). Zwrot: 'Mari / na ty' [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]",
     "Gon (Grace) -> Luca": "PŁEĆ: ŻEŃSKA (Wiedźma/mentorka w akwarium). Zawsze formy ŻEŃSKIE (np. 'Chcesz, żebym poszukała?' / 'Mam poszukać?'). Zwrot: 'Luca / na ty' [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
     "Leo -> Luca": "Zwrot: 'braciszku / bracie' (młodszy brat -> starszy brat) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Leo -> Lara": "Zwrot: 'Lara' (młodszy brat przyjaciela)",
@@ -216,7 +216,7 @@
       "N": "Mari",
       "Ms": "Mari",
       "W": "Mari",
-      "gender": "MALE"
+      "gender": "FEMALE"
     },
     "Lisa": {
       "M": "Lisa",
@@ -447,12 +447,12 @@
     },
     "Młoda Mari": {
       "M": "Młoda Mari",
-      "D": "Młody Mari",
-      "C": "Młodzie Mari",
-      "B": "Młodę Mari",
+      "D": "Młodej Mari",
+      "C": "Młodej Mari",
+      "B": "Młodą Mari",
       "N": "Młodą Mari",
-      "Ms": "Młodzie Mari",
-      "W": "Młodo Mari",
+      "Ms": "Młodej Mari",
+      "W": "Młoda Mari",
       "gender": "FEMALE"
     },
     "Lucian": {

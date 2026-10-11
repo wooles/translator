@@ -54,10 +54,10 @@
       "description": "kobieta (Licealistka w stylu gyaru, przyjaciółka Kuroe) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Minami": {
-      "description": "KOBIETA - mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "KOBIETA - KOBIETA (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Akaishi": {
-      "description": "MĘŻCZYZNA - kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "KOBIETA - kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Takamine": {
       "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
@@ -274,12 +274,12 @@
     },
     "Manatsu Tomita": {
       "M": "Manatsu Tomita",
-      "D": "Manatsu Tomity",
-      "C": "Manatsu Tomicie",
-      "B": "Manatsu Tomitę",
+      "D": "Manatsu Tomitej",
+      "C": "Manatsu Tomitej",
+      "B": "Manatsu Tomitą",
       "N": "Manatsu Tomitą",
-      "Ms": "Manatsu Tomicie",
-      "W": "Manatsu Tomito",
+      "Ms": "Manatsu Tomitej",
+      "W": "Manatsu Tomita",
       "gender": "FEMALE"
     },
     "Raimu Kohno": {

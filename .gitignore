@@ -50,3 +50,5 @@ gcp_key*
 series_memory/*Test*
 series_memory/*test*
 
+# Agent teamwork metadata
+.agents/

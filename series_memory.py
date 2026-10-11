@@ -429,7 +429,7 @@ RE_FEMALE_ROLE = re.compile(
     r"\b(?:"
     # General / Base
     r"kobieta|kobiet[ayęieoó]|kobietami|kobietach|żeńsk[a-ząćęłńóśźż]*|female|dziewczyn[a-ząćęłńóśźż]*|"
-    r"pani(?:ą|ej)?(?!\s*e\b)|bohaterk[a-ząćęłńóśźż]*|chatun|girl|woman|lady|"
+    r"pani(?:ą|ej)?(?!\s*e\b)|bohaterk[a-ząćęłńóśźż]*|chatun|girl|woman|lady|sorceress|princess|heroine|priestess|witch|queen|empress|goddess|"
     # Rodzina (18) + Hipokorystyki i Oboczności (np. ch:sz macocha/macosze)
     r"matk[a-ząćęłńóśźż]*|mam[a-ząćęłńóśźż]*|mamusi[a-ząćęłńóśźż]*|mateńk[a-ząćęłńóśźż]*|córk[a-ząćęłńóśźż]*|córeczk[a-ząćęłńóśźż]*|córuni[a-ząćęłńóśźż]*|siostr[a-ząćęłńóśźż]*|siostrzyczk[a-ząćęłńóśźż]*|siostruni[a-ząćęłńóśźż]*|"
     r"bab(?:ka|ce|kę|ką|ki|ek|kom|kami|kach)|babci[a-ząćęłńóśźż]*|babuni[a-ząćęłńóśźż]*|prabab(?:ka|ce|kę|ką|ki|ek|kom|kami|kach)|prababci[a-ząćęłńóśźż]*|"
@@ -482,7 +482,7 @@ RE_FEMALE_ROLE = re.compile(
 RE_MALE_ROLE = re.compile(
     r"\b(?:"
     # General / Base
-    r"mężczyzn[a-ząćęłńóśźż]*|męsk[a-ząćęłńóśźż]*|male|man|bocchan|"
+    r"mężczyzn[a-ząćęłńóśźż]*|męsk[a-ząćęłńóśźż]*|male|man|bocchan|hero|knight|prince|wizard|sorcerer|king|emperor|"
     r"chłop(?:ak[a-ząćęłńóśźż]*|iec|ca|cem|cu|cowi|cy|ców|om|ami|ach|a|em|u|i)?|boy|"
     r"młodzieniec|młodzieńc[a-ząćęłńóśźż]*|panie\b|pan(?:em|u|a|owie|ów)?\b|"
     # Rodzina (18) + Hipokorystyki i Oboczności (np. tatko, tatusia, synuś, braciszek)
@@ -864,8 +864,8 @@ def is_polish_adjective(word: str) -> bool:
     if w.endswith(("yna", "ina", "anka", "arka", "anna", "otta", "etta")):
         return False
 
-    # Exclusion of common nouns ending in -na, -ta, -ka, -ga
-    if w in {"kobieta", "dziewczyna", "pani", "chata", "brama", "tarcza", "lanca", "rana", "scena", "wojna", "korona", "strona", "ochrona", "obrona", "wrona", "rzeka", "książka", "ręka", "nauka", "matka", "córka", "dróżka", "papuga", "waga", "droga", "flaga", "saga", "manga", "planeta", "rakieta", "flota", "armata", "herbata", "gazeta"}:
+    # Exclusion of common nouns ending in -na, -ta, -ka, -ga and foreign names in -ite (e.g. White)
+    if w in {"kobieta", "dziewczyna", "pani", "chata", "brama", "tarcza", "lanca", "rana", "scena", "wojna", "korona", "strona", "ochrona", "obrona", "wrona", "rzeka", "książka", "ręka", "nauka", "matka", "córka", "dróżka", "papuga", "waga", "droga", "flaga", "saga", "manga", "planeta", "rakieta", "flota", "armata", "herbata", "gazeta", "white", "elite", "site", "bite", "mite", "kite"}:
         return False
 
     # Polish base adjectives
@@ -2623,7 +2623,7 @@ class SeriesBible:
         if not hasattr(self, "data") or "characters" not in self.data:
             return
 
-        FEMALE_TITLES = {"cesarzowa", "chatun", "małżonka", "żona", "córka", "matka", "księżniczka", "królowa", "lady"}
+        FEMALE_TITLES = {"cesarzowa", "chatun", "małżonka", "żona", "córka", "matka", "księżniczka", "królowa", "lady", "kobieta", "dziewczyna", "dziewczynka", "kadetka", "siostra", "mistrzyni", "czarodziejka", "kapłanka"}
 
         # 1. Collect female names from relationships or explicit notes
         confirmed_females = set()
@@ -2633,9 +2633,9 @@ class SeriesBible:
                 parts = [p.strip() for p in rel_name.split("->")]
                 spk = parts[0]
                 rec = parts[1] if len(parts) > 1 else ""
-                if any(w in r_lower for w in ["córka ->", "żona ->", "pasierbica ->", "cesarzowa ->"]):
+                if any(w in r_lower for w in ["córka ->", "żona ->", "pasierbica ->", "cesarzowa ->", "kadetka ->", "mistrzyni ->"]):
                     confirmed_females.add(spk)
-                if any(w in r_lower for w in ["-> córka", "-> żona", "-> matka", "-> macocha", "-> cesarzowa"]):
+                if any(w in r_lower for w in ["-> córka", "-> żona", "-> matka", "-> macocha", "-> cesarzowa", "-> kadetka", "-> mistrzyni"]) or "[kobieta (adresat)" in r_lower:
                     confirmed_females.add(rec)
 
         # 2. Check characters table
@@ -2681,13 +2681,20 @@ class SeriesBible:
                 parts = [p.strip() for p in rel_name.split("->")]
                 spk = parts[0]
                 rec = parts[1] if len(parts) > 1 else ""
-                if re.search(r"\bpanie\s+[A-ZĄĆĘŁŃÓŚŹŻ]", r_str) or any(w in r_lower for w in ["ojciec", "syn", "brat", "generał", "dowódca", "lord", "panicz", "bocchan"]):
-                    confirmed_males.add(rec)
+                rec_is_female = (
+                    "[kobieta (adresat)" in r_lower
+                    or rec in confirmed_females
+                    or any(t in r_lower for t in FEMALE_TITLES)
+                )
+                if not rec_is_female:
+                    if re.search(r"\bpanie\s+[A-ZĄĆĘŁŃÓŚŹŻ]", r_str) or any(w in r_lower for w in ["ojciec", "syn", "brat", "panicz", "bocchan"]) or "[mężczyzna (adresat)" in r_lower:
+                        confirmed_males.add(rec)
                 if any(w in r_lower for w in ["syn ->", "ojciec ->", "brat ->", "pan ->"]):
-                    confirmed_males.add(spk)
+                    if not (spk in confirmed_females or "[kobieta (adresat)" in r_lower):
+                        confirmed_males.add(spk)
                 # Auto-repair poisoned [KOBIETA (Adresat)] in relationships if recipient is confirmed male or addressed with 'panie'
                 rec_tokens = extract_clean_speaker_name(rec).lower().split()
-                if re.search(r"\bpanie\s+[A-ZĄĆĘŁŃÓŚŹŻ]", r_str) or (rec.lower() in CANONICAL_MALE_NAMES) or any(t in CANONICAL_MALE_NAMES for t in rec_tokens):
+                if (re.search(r"\bpanie\s+[A-ZĄĆĘŁŃÓŚŹŻ]", r_str) or (rec.lower() in CANONICAL_MALE_NAMES) or any(t in CANONICAL_MALE_NAMES for t in rec_tokens)) and not rec_is_female:
                     if "[KOBIETA (Adresat)" in r_str:
                         fixed_rel = re.sub(r"\[KOBIETA \(Adresat\)[^\]]*\]", "[MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]", r_str)
                         self.data["relationships"][rel_name] = fixed_rel
@@ -2701,7 +2708,12 @@ class SeriesBible:
             d_lower = desc.lower()
             c_tokens = extract_clean_speaker_name(char_name).lower().split()
 
-            is_female_cand = (char_name in confirmed_females) or any(t in d_lower for t in FEMALE_TITLES)
+            is_female_cand = (
+                (char_name in confirmed_females)
+                or any(t in d_lower for t in FEMALE_TITLES)
+                or "[kobieta (adresat)" in d_lower
+                or (isinstance(c_val, dict) and str(c_val.get("gender", "")).upper() in ("FEMALE", "KOBIETA"))
+            )
             is_confirmed_male = (
                 (char_name in confirmed_males)
                 or any(t in d_lower for t in MALE_TITLES)
@@ -2710,14 +2722,16 @@ class SeriesBible:
             ) and not is_female_cand
 
             if is_confirmed_male:
+                repaired_from_female = False
                 # If marked as female due to past "pani" substring collision in "panie", auto-repair to male
-                if any(f in d_lower for f in ["kobieta", "żeńsk", "female", "kobieta (adresat)"]) and not any(f in d_lower for f in ["córka", "żona", "matka", "księżniczka"]):
+                if any(f in d_lower for f in ["kobieta", "żeńsk", "female", "kobieta (adresat)"]) and not any(f in d_lower for f in ["córka", "żona", "matka", "księżniczka", "kadetka", "dziewczyna", "dziewczynka", "siostra", "mistrzyni", "czarodziejka"]):
                     clean_desc = re.sub(r"\bkobieta\b", "MĘŻCZYZNA", desc, flags=re.IGNORECASE)
                     clean_desc = re.sub(r"\[KOBIETA \(Adresat\)[^\]]*\]", "[MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]", clean_desc)
                     if isinstance(c_val, dict):
                         c_val["description"] = clean_desc
                     else:
                         self.data["characters"][char_name] = {"description": clean_desc}
+                    repaired_from_female = True
                 elif "postać" in d_lower and not any(m in d_lower for m in ["mężczyzna", "male", "chłopak"]):
                     clean_desc = f"{desc} [MĘŻCZYZNA]"
                     if isinstance(c_val, dict):
@@ -2728,8 +2742,8 @@ class SeriesBible:
                 if isinstance(c_val, dict):
                     c_val["gender"] = "MALE"
 
-                # Regenerate declensions for male character
-                if "declensions" in self.data:
+                # Regenerate declensions for male character ONLY IF repaired from female
+                if repaired_from_female and "declensions" in self.data:
                     if char_name in self.data["declensions"]:
                         self.data["declensions"][char_name] = generate_polish_name_declension(char_name, "MALE")
                         self.data["declensions"][char_name]["gender"] = "MALE"
@@ -3816,19 +3830,37 @@ class SeriesBible:
                         if is_female_role_text(desc_v):
                             target_is_female = True
 
-        # In relationships, extract recipient description part (after '->' in brackets e.g. '(koleżanka -> przyjaciel)')
-        rel_target_desc = clean_desc.split("->")[-1].lower() if ("->" in clean_desc and is_rel) else clean_desc.lower()
-        if is_male_role_text(rel_target_desc) or re.search(r"\bpanie\s+[A-ZĄĆĘŁŃÓŚŹŻ]", clean_desc):
-            target_is_male = True
-        if is_female_role_text(rel_target_desc) and not re.search(r"\bpanie\s+[A-ZĄĆĘŁŃÓŚŹŻ]", clean_desc):
-            target_is_female = True
+        # In relationships, extract recipient description part (after '->' in brackets e.g. '(koleżanka -> przyjaciel)', '(roleA / roleB)', '(roleA i roleB)')
+        rel_target_desc = clean_desc.lower()
+        if is_rel:
+            m_role = re.search(r"\(([^)]+)\)", clean_desc)
+            if m_role:
+                rc = m_role.group(1).strip()
+                for sep in ["->", "/", " i "]:
+                    if sep in rc:
+                        rel_target_desc = rc.split(sep, 1)[1].strip().lower()
+                        break
+            elif "->" in clean_desc:
+                rel_target_desc = clean_desc.split("->")[-1].lower()
 
-        # Resolve conflict: target cannot be both male and female
-        if target_is_male and target_is_female:
+        if "[kobieta (adresat)" in clean_desc.lower():
+            target_is_female = True
+            target_is_male = False
+        elif "[mężczyzna (adresat)" in clean_desc.lower():
+            target_is_male = True
+            target_is_female = False
+        else:
             if is_male_role_text(rel_target_desc) or re.search(r"\bpanie\s+[A-ZĄĆĘŁŃÓŚŹŻ]", clean_desc):
-                target_is_female = False
-            elif is_female_role_text(rel_target_desc):
-                target_is_male = False
+                target_is_male = True
+            if is_female_role_text(rel_target_desc) and not re.search(r"\bpanie\s+[A-ZĄĆĘŁŃÓŚŹŻ]", clean_desc):
+                target_is_female = True
+
+            # Resolve conflict: target cannot be both male and female
+            if target_is_male and target_is_female:
+                if is_male_role_text(rel_target_desc) or re.search(r"\bpanie\s+[A-ZĄĆĘŁŃÓŚŹŻ]", clean_desc):
+                    target_is_female = False
+                elif is_female_role_text(rel_target_desc):
+                    target_is_male = False
 
 
         # Clean existing poisoned tags if they contradict target gender
@@ -3942,13 +3974,30 @@ class SeriesBible:
                                     if "->" in clean_details and len(parts) == 2:
                                         detail_halves = clean_details.split("->", 1)
                                         p_details = detail_halves[idx].strip()
+                                    elif len(parts) == 2:
+                                        m_role = re.search(r"\(([^)]+)\)", clean_details)
+                                        if m_role:
+                                            rc = m_role.group(1).strip()
+                                            for sep in ["->", "/", " i "]:
+                                                if sep in rc:
+                                                    p_details = rc.split(sep, 1)[idx].strip()
+                                                    break
+
+                                    if idx == 0:
+                                        # Strict Speaker Slot Isolation (R3.2):
+                                        # Speaker (nadawca) must NEVER inherit addressee traits or 2nd person verbal markers!
+                                        p_details = re.sub(r"\[[^\]]*\bAdresat\b[^\]]*\]", "", p_details, flags=re.IGNORECASE)
+                                        p_details = re.sub(r"\[RELACJA HIERARCHICZNA[^\]]*\]", "", p_details, flags=re.IGNORECASE)
+                                        p_details = re.sub(r"\b(?:byłaś|zrobiłaś|jesteś pewna|byłeś|zrobiłeś|jesteś pewien|2\.\s*os\.\s*lp\.)\b", "", p_details, flags=re.IGNORECASE)
 
                                     p_g = "UNKNOWN"
-                                    if is_female_role_text(p_details) and not is_male_role_text(p_details):
+                                    if idx == 1 and "[kobieta (adresat)" in clean_details.lower():
                                         p_g = "FEMALE"
-                                    elif is_male_role_text(p_details) and not is_female_role_text(p_details):
+                                    elif idx == 1 and "[mężczyzna (adresat)" in clean_details.lower():
                                         p_g = "MALE"
-                                    elif is_male_role_text(clean_details) and ("panie " in clean_details.lower() or "pan " in clean_details.lower()) and idx == 1:
+                                    elif is_female_role_text(clean_p) or (is_female_role_text(p_details) and not is_male_role_text(p_details)):
+                                        p_g = "FEMALE"
+                                    elif is_male_role_text(clean_p) or (is_male_role_text(p_details) and not is_female_role_text(p_details)):
                                         p_g = "MALE"
                                     else:
                                         p_lower = clean_p.lower()
@@ -3972,22 +4021,31 @@ class SeriesBible:
                         existing_desc = existing_entry.get("description", "") if isinstance(existing_entry, dict) else str(existing_entry)
                         existing_lower = existing_desc.lower()
 
-                        # Protect confirmed gender against downgrading or overwriting (both male and female)
-                        is_definite_female = any(w in clean_details.lower() for w in ["córka", "cesarzowa", "chatun", "żona", "małżonka", "matka", "księżniczka", "królowa"])
-                        has_confirmed_male = any(w in existing_lower for w in ["mężczyzna", "męsk", "male", "kategoryczny nakaz form męskich"]) and not is_definite_female
-                        is_incoming_female = any(w in clean_details.lower() for w in ["kobieta", "żeńsk", "female", "służąca", "nauczycielka", "dziewczyna", "cesarzowa", "chatun", "córka", "żona"])
-                        if has_confirmed_male and is_incoming_female:
+                        existing_is_verified = bool(isinstance(existing_entry, dict) and existing_entry.get("has_verified_gender")) or "zweryfikowan" in existing_lower or "anilist" in existing_lower
+                        existing_is_heuristic = "(wyodrębniono z relacji" in existing_lower or "wyodrębniono z relacji" in existing_lower
+                        incoming_is_verified = bool(isinstance(details, dict) and details.get("has_verified_gender")) or "zweryfikowan" in clean_details.lower() or "anilist" in clean_details.lower()
+
+                        if existing_is_verified and not incoming_is_verified:
+                            # P0 Priority (R3.3): verified AniList entry cannot be overridden by unverified text relation heuristic
                             continue
 
-                        has_confirmed_female = any(w in existing_lower for w in ["kobieta", "żeńsk", "female", "dziewczyna", "kategoryczny nakaz form żeńskich", "nauczycielka"])
-                        is_incoming_male = any(w in clean_details.lower() for w in ["mężczyzna", "męsk", "male", "chłopak"])
-                        if has_confirmed_female and is_incoming_male:
-                            continue
+                        if not existing_is_heuristic:
+                            # Protect confirmed gender against downgrading or overwriting (both male and female)
+                            is_definite_female = any(w in clean_details.lower() for w in ["córka", "cesarzowa", "chatun", "żona", "małżonka", "matka", "księżniczka", "królowa"])
+                            has_confirmed_male = any(w in existing_lower for w in ["mężczyzna", "męsk", "male", "kategoryczny nakaz form męskich"]) and not is_definite_female
+                            is_incoming_female = any(w in clean_details.lower() for w in ["kobieta", "żeńsk", "female", "służąca", "nauczycielka", "dziewczyna", "cesarzowa", "chatun", "córka", "żona"])
+                            if has_confirmed_male and is_incoming_female:
+                                continue
 
-                        # If existing entry has rich directives/seiyū, do not overwrite with bare string
-                        has_rich_directives = any(w in existing_lower for w in ["kategoryczny", "nakaz", "seiyū", "bezwzględnie formy"])
-                        if has_rich_directives and not any(w in clean_details.lower() for w in ["kategoryczny", "nakaz"]):
-                            continue
+                            has_confirmed_female = any(w in existing_lower for w in ["kobieta", "żeńsk", "female", "dziewczyna", "kategoryczny nakaz form żeńskich", "nauczycielka"])
+                            is_incoming_male = any(w in clean_details.lower() for w in ["mężczyzna", "męsk", "male", "chłopak"])
+                            if has_confirmed_female and is_incoming_male:
+                                continue
+
+                            # If existing entry has rich directives/seiyū, do not overwrite with bare string
+                            has_rich_directives = any(w in existing_lower for w in ["kategoryczny", "nakaz", "seiyū", "bezwzględnie formy"])
+                            if has_rich_directives and not any(w in clean_details.lower() for w in ["kategoryczny", "nakaz"]):
+                                continue
 
                         self.data["characters"][name] = {"description": clean_details}
 

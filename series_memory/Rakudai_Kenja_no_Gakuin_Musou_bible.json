@@ -88,11 +88,11 @@
   "declensions": {
     "Anastasia": {
       "M": "Anastasia",
-      "D": "Anastasiy",
-      "C": "Anastasie",
+      "D": "Anastasii",
+      "C": "Anastasii",
       "B": "Anastasię",
       "N": "Anastasią",
-      "Ms": "Anastasie",
+      "Ms": "Anastasii",
       "W": "Anastasio",
       "gender": "FEMALE"
     },
@@ -108,12 +108,12 @@
     },
     "Merlin": {
       "M": "Merlin",
-      "D": "Merlina",
-      "C": "Merlinowi",
-      "B": "Merlina",
-      "N": "Merlinem",
-      "Ms": "Merlinie",
-      "W": "Merlinie",
+      "D": "Merlin",
+      "C": "Merlin",
+      "B": "Merlin",
+      "N": "Merlin",
+      "Ms": "Merlin",
+      "W": "Merlin",
       "gender": "FEMALE"
     },
     "Gaius": {
@@ -158,11 +158,11 @@
     },
     "Maria": {
       "M": "Maria",
-      "D": "Mariy",
-      "C": "Marie",
+      "D": "Marii",
+      "C": "Marii",
       "B": "Marię",
       "N": "Marią",
-      "Ms": "Marie",
+      "Ms": "Marii",
       "W": "Mario",
       "gender": "FEMALE"
     },

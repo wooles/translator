@@ -5,17 +5,17 @@ Zasady normatywne i aksjomaty inżynierskie definiuje wyłącznie `AGENTS.md` (S
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 10.10.2026)
-- **Status CI/CD:** `STATUS: WDROŻONE I ZWERYFIKOWANE (155/155 PASSED) - KOD W CHMURZE GITHUB`
-- **Gałąź i Commit:** `main` (commit: `1ea2260` — pełna integracja INC-AVT-002)
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 11.10.2026)
+- **Status CI/CD:** `STATUS: WDROŻONE I ZWERYFIKOWANE (156/156 PASSED) - KOD W CHMURZE GITHUB`
+- **Gałąź i Commit:** `main` (pełna integracja Standardu 3.0, Zero-Cosmetic Protocol i INC-AVT-003)
 - **Środowisko:** Python 3.13 (.venv), Windows PowerShell, bezpośrednie klucze Google AI Studio API (`use_vertex = 0`)
 - **Format pracy zespołu:** Hierarchiczny Protokół Czteroagentowy (Standard 3.0):
   * **OPERATOR (Człowiek):** Wyłączny właściciel praw zapisu I/O (autoryzacja komendą: `ZATWIERDZAM DOSSIER - WDROŻYĆ DO KODU`).
-  * **AGENT 4:** Autonomous Operational Supervisor (Anti-Loop Watchdog, Triage, Dossier dla Operatora).
-  * **AGENT 3:** Chief Epistemic Architect & AVT Dramaturge (Ontologia, kontrakty Pydantic, czerwony test).
-  * **AGENT 1:** Lead Systems Implementer (Prototypowanie RAM, Diff Preview).
+  * **AGENT 4:** Autonomous Operational Supervisor (Anti-Loop Watchdog, Triage, Dossier dla Operatora, weto Zero-Cosmetic: `STATUS: ODRZUCONO WEWNĘTRZNIE - WYKRYTO PUDROWANIE SYMPTOMÓW ZAMIAST NAPRAWY KODU SILNIKA`).
+  * **AGENT 3:** Chief Epistemic Architect & AVT Dramaturge (Ontologia, 4-stopniowy audyt Root-Cause Deconstruction, kontrakty Pydantic, czerwony test).
+  * **AGENT 1:** Lead Systems Implementer (Prototypowanie RAM, Diff Preview, eliminacja fabryk błędów u źródła).
   * **AGENT 2:** Adversarial Reviewer & ASS-Fuzzing (18 Wymiarów Audytu, Breathing Space Index).
-  * **Żelazny Bezpiecznik Potoku:** Zero Premature Synthesis – bezwzględny zakaz pomijania Fazy 2 i Faz 3–4; każde Dossier musi opierać się na rzeczywistych logach laboratoryjnych ze środowiska RAM.
+  * **Żelazny Bezpiecznik Potoku:** Zero Premature Synthesis oraz Zero-Cosmetic Gate – bezwzględny zakaz pomijania Fazy 2 i Faz 3–4; każde Dossier musi zawierać [CERTYFIKAT ELIMINACJI ŹRÓDŁOWEJ] i opierać się na rzeczywistych logach laboratoryjnych ze środowiska RAM.
 
 ---
 
@@ -58,6 +58,19 @@ Zasady normatywne i aksjomaty inżynierskie definiuje wyłącznie `AGENTS.md` (S
   4. *Warstwa 4 (`avt_linter.py`):* Obsługa `has_2nd_person_marker` w stylach `Italics` wykluczająca fałszywe solilokwium; deterministyczny sanitizer tytulatury, kakegoe oraz rządu przyimka `o tobie`.
   5. *Warstwa 5 (`test_system.py`):* Test 155 (`test_sasaki_to_piichan_s2_holistic_incident_guard`), stan testów: 155/155 PASSED (100.0%).
 
+### 🔹 INC-AVT-003 (*Hyouken no Majutsushi ga Sekai wo Suberu S2*)
+- **Defekty:**
+  1. Ślepota AniList na zapytania z sufiksem sezonu `S2` skutkująca błędem 404, pustym wynikiem i brakiem pobrania zweryfikowanej obsady z serii macierzystej.
+  2. Błąd odwróconej inferencji relacji A -> B w `update_from_episode_profile()`: przypisanie tagu `[KOBIETA (Adresat)]` i form 2. os. lp. do podmiotu mówcy (Ray White) oraz form męskich do postaci żeńskich (Ariane, Rebecca, Lydia) przez wadliwy warunek `panie / pan`.
+  3. Przebicie heurystyki relacji nad zweryfikowaną płcią z AniList (`has_verified_gender = True`) i blokada nadpisywania wpisów heurystycznych.
+  4. Skażenie bazy wiedzy `Hyouken_no_Majutsushi_ga_Sekai_wo_Suberu_S2_bible.json` i zapętlenie cache w `get_anime_context()`.
+- **Wdrożenie 5 Warstw:**
+  1. *Warstwa 1 (`metadata.py`):* Normalizacja zapytań AniList z fallbackiem `strip_season_suffix()` odcinającym sufiksy sezonowe (`S2`, `Season 2`, `Part 2`, `Cour 2`, `2nd Season`) oraz priorytet P0 dla zweryfikowanej płci (`has_verified_gender = True`).
+  2. *Warstwa 2 (`series_memory.py` & JSON):* Eliminacja odwróconej inferencji w `update_from_episode_profile()` (izolacja slotu mówcy od tagów adresatywnych, usunięcie wadliwego warunku linii 3951-3952, odblokowanie nadpisywania wpisów relacyjnych przez dane zweryfikowane). Oczyszczenie `Hyouken_no_Majutsushi_ga_Sekai_wo_Suberu_S2_bible.json`.
+  3. *Warstwa 3 (`rules.py` / `AGENTS.md`):* Zero-Cosmetic Protocol, 4-stopniowy audyt fabryki błędów, [CERTYFIKAT ELIMINACJI ŹRÓDŁOWEJ].
+  4. *Warstwa 4 (`avt_linter.py`):* EpisodeQualityGate zasilany nieskażonym rejestrem postaci z priorytetem zweryfikowanej płci P0.
+  5. *Warstwa 5 (`test_system.py`):* Test 156 (`test_hyouken_s2_root_cause_anilist_fallback_and_addressee_guard`), stan testów: 156/156 PASSED (100.0%).
+
 ---
 
 ## 📐 4. METRYKI OPERACYJNE POTOKU I ARCHITEKTURA ANTY-GOODHART
@@ -84,3 +97,6 @@ Zasady normatywne i aksjomaty inżynierskie definiuje wyłącznie `AGENTS.md` (S
 | **2026-10-10** | `ARB-002` | Onomastyka / Realm Masking | Naprawa `is_non_character_entity()` — encje zarejestrowane jawnie jako postaci w `characters` mają priorytet nad toponimami glosariusza (`Herz` vs `Kingdom of Herz`). | 0.00 PLN |
 | **2026-10-10** | `ARB-003` | Mowa Zapośredniczona | Styl `Italics` z markerami 2. osoby (`has_2nd_person_marker`) traktowany jako rozmowa (telefon/radio), a nie solilokwium wewnętrzne. | 0.00 PLN |
 | **2026-10-10** | `ARB-004` | Granica Determinizmu | Brak aktywnych mikro-zapytań LLM w Warstwie 4; zachowano 100% determinizmu offline (0.00 PLN). Dług technologiczny regexów: 0. | 0.00 PLN |
+| **2026-10-11** | `ARB-005` | Architektura / Jakość | **Zero-Cosmetic Protocol (Standard 3.0)**: Kategoryczny zakaz uznawania za rozwiązanie poprawek w JSON/linterze/ASS bez naprawy silnika Pythona. Weto Agenta 4. | 0.00 PLN |
+| **2026-10-11** | `ARB-006` | Metadane / API | **AniList Season Fallback**: Automatyczne usuwanie sufiksów sezonowych (`S2`, `Season 2` etc.) w przypadku błędu 404 zapytania bazowego, gwarantujące pobranie kanonicznej obsady. | 0.00 PLN |
+| **2026-10-11** | `ARB-007` | Pamięć Serii / Relacje | **Strict Addressee Slot Separation & P0 Gender Priority**: Tagi `[... (Adresat)]` i cechy 2. os. lp. aplikowane wyłącznie do odbiorcy (idx=1), zakaz modyfikacji cech podmiotu mówcy (idx=0). Zweryfikowana płeć AniList ma priorytet P0 nad heurystykami. | 0.00 PLN |

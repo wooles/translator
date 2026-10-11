@@ -1548,17 +1548,19 @@ class MultimodalTranslator:
                 existing_desc = self.character_registry[clean_name]
                 existing_lower = existing_desc.lower()
 
-                has_confirmed_female = any(w in existing_lower for w in self.FEMALE_ROLE_KEYWORDS)
-                is_incoming_male = any(w in new_lower for w in self.MALE_ROLE_KEYWORDS)
-                if has_confirmed_female and is_incoming_male:
-                    # Symmetrical lock: reject male overwrite for confirmed female
-                    return
+                is_heuristic_existing = "(wyodrębniono z relacji" in existing_lower or "wyodrębniono z relacji" in existing_lower
+                if not is_heuristic_existing:
+                    has_confirmed_female = any(w in existing_lower for w in self.FEMALE_ROLE_KEYWORDS)
+                    is_incoming_male = any(w in new_lower for w in self.MALE_ROLE_KEYWORDS)
+                    if has_confirmed_female and is_incoming_male:
+                        # Symmetrical lock: reject male overwrite for confirmed female
+                        return
 
-                has_confirmed_male = any(w in existing_lower for w in self.MALE_ROLE_KEYWORDS)
-                is_incoming_female = any(w in new_lower for w in self.FEMALE_ROLE_KEYWORDS)
-                if has_confirmed_male and is_incoming_female:
-                    # Symmetrical lock: reject female overwrite for confirmed male
-                    return
+                    has_confirmed_male = any(w in existing_lower for w in self.MALE_ROLE_KEYWORDS)
+                    is_incoming_female = any(w in new_lower for w in self.FEMALE_ROLE_KEYWORDS)
+                    if has_confirmed_male and is_incoming_female:
+                        # Symmetrical lock: reject female overwrite for confirmed male
+                        return
 
             self.character_registry[clean_name] = new_desc
 

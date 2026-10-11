@@ -234,7 +234,7 @@
       "B": "Inkę",
       "N": "Inką",
       "Ms": "Ince",
-      "W": "Inko",
+      "W": "Inco",
       "gender": "FEMALE"
     },
     "Iris": {
@@ -264,7 +264,8 @@
       "B": "Shinrę -> Haumeę",
       "N": "Shinrą -> Haumeą",
       "Ms": "Shinrze -> Haumee",
-      "W": "Shinro -> Haumeo"
+      "W": "Shinro -> Haumeo",
+      "gender": "FEMALE"
     },
     "Sho -> Shinra": {
       "M": "Sho -> Shinra",
@@ -381,7 +382,8 @@
       "B": "Hibanę -> Iris",
       "N": "Hibaną -> Iris",
       "Ms": "Hibanie -> Iris",
-      "W": "Hibano -> Iris"
+      "W": "Hibano -> Iris",
+      "gender": "FEMALE"
     }
   },
   "hypocorisms": {},

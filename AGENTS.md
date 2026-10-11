@@ -14,11 +14,19 @@ Dokument ten definiuje nienaruszalne, trwałe reguły postępowania asystenta AI
    - Zakaz zrzucania walidacji na linter: rozbudowa setek regexów dla inferencji gramatycznej to błąd kategorii (Chomsky Typ 3). Linter nie zastępuje reprezentacji wiedzy.
    - Twardy kontrakt Pydantic (Faza 1): wymuszenie pola `speaker_grammatical_gender: "MASCULINE" | "FEMININE"` jako zwalidowanego warunku w schemacie `LineTranslation`. Akustyka seiyū nie może łamać tożsamości postaci.
    - Zakaz fetyszyzowania reguł offline: dopuszcza się mikro-zapytanie semantyczne (call LLM do 5 tokenów) zamiast kruchych 100-linijkowych potworów regexowych w Pythonie.
+7. **Żelazna Dyrektywa Usuwania Przyczyn Źródłowych (True Root-Cause & Zero-Cosmetic Mandate):** Bezwzględny zakaz maskowania defektów silnika za pomocą doraźnych modyfikacji baz danych (*_bible.json, glosariuszy), lintera (Warstwa 4) lub napisów `.ass`. Każda awaria musi zostać usunięta algorytmicznie w kodzie Pythona silnika.
 
 ---
 
-## 🚫 1. KATEGORYCZNY ZAKAZ DORAŹNEGO ŁATANIA (ANTI-PATCHING MANDATE)
-Defekt tłumaczenia to zawsze awaria potoku. Poprawienie pliku `.ass` jest dopuszczalne wyłącznie jako ostatni krok, po usunięciu źródła błędu w architekturze.
+## 🚫 1. KATEGORYCZNY ZAKAZ DORAŹNEGO ŁATANIA I PUDROWANIA SYMPTOMÓW (ZERO-COSMETIC PROTOCOL & ANTI-PATCHING MANDATE)
+Defekt tłumaczenia to zawsze awaria potoku. Kategorycznie zakazuje się uznawania za rozwiązanie problemu:
+1. Ręcznej modyfikacji pliku bazy danych na dysku (`*_bible.json`, glosariusza, plików konfiguracyjnych),
+2. Dodania pojedynczego regexa w `avt_linter.py` (Warstwa 4), maskującego błąd na wyjściu,
+3. Ręcznego poprawienia linijki w pliku napisów `.ass`.
+
+Każda próba zamknięcia incydentu bez równoległej naprawy wadliwego algorytmu w kodzie Pythona silnika skutkuje automatycznym wetem Agenta 4:  
+`STATUS: ODRZUCONO WEWNĘTRZNIE - WYKRYTO PUDROWANIE SYMPTOMÓW ZAMIAST NAPRAWY KODU SILNIKA`.  
+Poprawienie pliku `.ass` lub bazy danych jest dopuszczalne wyłącznie jako wtórny krok konsolidacyjny PO fizycznej naprawie logiki silnika w plikach `.py`.
 
 ---
 
@@ -157,8 +165,8 @@ Nadrzędna procedura działania potoku pod nadzorem Autonomicznego Pełnomocnika
 
 ### 👑 Hierarchia Dowodzenia i Role
 - **OPERATOR (Człowiek):** Najwyższa instancja decyzyjna. Wyłączny dysponent prawa zapisu do plików repozytorium (autoryzacja komendą: `ZATWIERDZAM DOSSIER - WDROŻYĆ DO KODU`).
-- **AGENT 4 (Supervisor):** Pełnomocnik Operatora i jedyny punkt kontaktu z Człowiekiem. Anti-Loop Watchdog (przerywa spory po 2 iteracjach), Triage (Fast-Track < 2 min vs Deep Incident), audyt rzetelności A1 i A3, synteza 1-stronicowego Dossier Decyzyjnego.
-- **AGENT 3 (Chief Epistemic Architect):** Analiza ontologiczna (RCA), wstrzykiwanie twardych kontraktów Pydantic (`speaker_grammatical_gender`), czerwony test w Golden Corpus (Anchor Scenes = 100.0%).
+- **AGENT 4 (Supervisor):** Pełnomocnik Operatora i jedyny punkt kontaktu z Człowiekiem. Anti-Loop Watchdog (przerywa spory po 2 iteracjach), Triage (Fast-Track < 2 min vs Deep Incident), audyt rzetelności A1 i A3, synteza 1-stronicowego Dossier Decyzyjnego. Posiada prawo i obowiązek automatycznego weta: `STATUS: ODRZUCONO WEWNĘTRZNIE - WYKRYTO PUDROWANIE SYMPTOMÓW ZAMIAST NAPRAWY KODU SILNIKA` w przypadku braku fizycznego diffu w logice silnika Pythona.
+- **AGENT 3 (Chief Epistemic Architect):** Analiza ontologiczna (RCA), 4-stopniowy audyt fabryki błędów (Root-Cause Deconstruction), wstrzykiwanie twardych kontraktów Pydantic (`speaker_grammatical_gender`), czerwony test w Golden Corpus (Anchor Scenes = 100.0%).
 - **AGENT 1 (Lead Implementer):** Prototypowanie w buforze RAM (Diff Preview), eliminacja błędu u źródła w schematach danych, bazie wiedzy lub promptach Filarów.
 - **AGENT 2 (Adversarial Reviewer & ASS-Fuzzing):**
   * **18 Wymiarów Audytu:** Efekty drugiego rzędu, ukryte założenia, martwe punkty determinizmu, deficyt Shannona, mode collapse, hierarchia Chomsky'ego, utrata rozkładów, symbol grounding, deiksa sytuacyjna, common ground, nieizomorficzność topologiczna, ślepota wideo, zatrucie pivotem EN, Yakuwarigo/code-switching, asymetria chronemiczna (mora vs akcent), pismo japońskie (Ateji/furigana), zakaz przypisów w AVT (Zero-Footnote Constraint), wielokryterialna funkcja nagrody AVT.
@@ -167,13 +175,32 @@ Nadrzędna procedura działania potoku pod nadzorem Autonomicznego Pełnomocnika
     gdzie sufit $\text{CPS} \le 17.0$, podłoga $\text{CPS}_{\text{target}}(\rho_x) = \min(13.5, \; 7.5 + 0.5 \rho_x)$ dla $\rho_x \ge 9.0\text{ mor/s}$, a geometria $\text{CPL} \le 38$ (max 2 linie).
   * **ASS-Fuzzing:** Test odporności na tagi fanowskie (`{\pos}`, `{\an8}`, inline `{\i1}`, `\N`, `\h`). Raportuje wyłącznie do Agenta 3 i 4 (zakaz bezpośredniego kontaktu z Operatorem).
 
+### 🔬 Obowiązkowy 4-Stopniowy Audyt Fabryki Błędów (Root-Cause Deconstruction)
+Przy każdym zgłoszonym incydencie Agent 3 (w analizie RCA) oraz Agent 4 (w Dossier) mają bezwzględny obowiązek udokumentowania 4 etapów:
+1. **Identyfikacja fabryki błędów w kodzie silnika:** Wskazanie dokładnego pliku `.py`, nazwy funkcji, numeru linii i mechanizmu wygenerowania defektu (zderzenie założeń z danymi wejściowymi).
+2. **Audyt asymetrii źródeł zewnętrznych (Ground-Truth Failure Audit):** Wyjaśnienie, dlaczego autorytatywne źródła zewnętrzne (AniList GraphQL, Manga Canon, VNDB) nie zapobiegły defektowi (analiza normalizacji zapytań, filtrów sezonowych, ślepoty API i stanu cache).
+3. **Test generalizacji („Co z innymi instancjami?”):** Wykazanie, że naprawa zabezpiecza całą klasę zjawiska w architekturze silnika, a nie tylko jednostkowy przypadek ze zgłoszenia.
+4. **Fizyczna reprezentacja w kodzie Pythona:** Przedstawienie rzeczywistego diffu w logice silnika Pythona (`metadata.py`, `series_memory.py`, `translator.py` itp.), a nie wyłącznie modyfikacji bazy danych JSON.
+
 ### 🔄 7-Fazowy Potok Pracy i Żelazna Bramka Zapisu
-- **Faza 0:** Zgłoszenie kwestii przez Operatora $\to$ **Faza 1:** Triage Agenta 4 $\to$ **Faza 2:** RCA i czerwony test Agenta 3 $\to$ **Faza 3:** Implementacja w RAM Agenta 1 $\to$ **Faza 4:** Audyt ASS-Fuzzing i 18 wymiarów Agenta 2 $\to$ **Faza 5:** Złożenie Dossier przez Agenta 4 $\to$ **Faza 6:** Komenda Operatora `ZATWIERDZAM DOSSIER - WDROŻYĆ DO KODU` $\to$ fizyczny zapis, uruchomienie CI/CD (155/155) i raport Zreformowaną Tabelą Dowodową 5 Warstw.
+- **Faza 0:** Zgłoszenie kwestii przez Operatora $\to$ **Faza 1:** Triage Agenta 4 $\to$ **Faza 2:** RCA i czerwony test Agenta 3 $\to$ **Faza 3:** Implementacja w RAM Agenta 1 $\to$ **Faza 4:** Audyt ASS-Fuzzing i 18 wymiarów Agenta 2 $\to$ **Faza 5:** Złożenie Dossier przez Agenta 4 $\to$ **Faza 6:** Komenda Operatora `ZATWIERDZAM DOSSIER - WDROŻYĆ DO KODU` $\to$ fizyczny zapis, uruchomienie CI/CD (156/156) i raport Zreformowaną Tabelą Dowodową 5 Warstw.
 - **Wymóg Nienaruszalności Potoku:** Każda faza (od 0 do 5) musi zostać faktycznie wykonana i wylegitymowana rzeczywistym wyjściem testowym z bufora RAM przed przejściem do fazy następnej. Zakaz przeskakiwania faz, kompresji do samej Fazy 5 oraz przedwczesnej syntezy bez dowodów laboratoryjnych.
 
-### 🛡️ 5 Żelaznych Bezpieczników Potoku
+### 📄 Obowiązkowy Standard Executive Dossier (Standard 3.0)
+Każde Dossier przedkładane Operatorowi przez Agenta 4 musi bezwzględnie zawierać sekcję:
+```markdown
+### [CERTYFIKAT ELIMINACJI ŹRÓDŁOWEJ]:
+1. Punkt pęknięcia algorytmu: [Plik, funkcja, linia]
+2. Dlaczego API/Ground-Truth nie zadziałało: [Wyjaśnienie ślepoty API/cache]
+3. Poprawka w kodzie silnika: [Diff w plikach .py, a nie tylko .json]
+4. Dowód generalizacji: [Test laboratoryjny na danych syntetycznych]
+5. Brak konieczności ręcznych interwencji w przyszłości: [POTWIERDZONO / WYMAGA UWAGI]
+```
+
+### 🛡️ 6 Żelaznych Bezpieczników Potoku
 1. **Breathing Space Index & Anti-Goodhart:** Zakaz kastracji kwestii pod CPS kosztem ładunku dramatycznego i pauz oddechowych seiyū.
 2. **Audyt ASS-Fuzzing:** Operowanie na drzewie tokenów wizualnych; ochrona nawiasów `{}`.
 3. **Golden Corpus Anchor Gate = 100.0%:** Zero regresji na Scenach Kotwiczących; $\ge 99.0\%$ na całym korpusie.
 4. **Leczenie u Źródła w Kontraktach Danych:** Blokada błędów tożsamości i płci w Pydantic i SeriesBible, zakaz puchnięcia lintera.
 5. **Kategoryczny Zakaz Skracania Potoku (Zero Premature Synthesis Mandate):** Agent 4 ma absolutny zakaz przeskakiwania z Fazy 1 bezpośrednio do Fazy 5. Faza 2 (Czerwony Test Agenta 3) oraz Faza 3–4 (Prototyp w RAM Agenta 1 + Audyt ASS-Fuzzing Agenta 2) MUSZĄ zostać fizycznie uruchomione w środowisku scratch/RAM i udokumentowane w odpowiedzi twardymi logami wykonania przed przedłożeniem Dossier Operatorowi.
+6. **Zero-Cosmetic Gate (Weto Agenta 4):** Bezwzględne weto `STATUS: ODRZUCONO WEWNĘTRZNIE - WYKRYTO PUDROWANIE SYMPTOMÓW ZAMIAST NAPRAWY KODU SILNIKA` przy braku fizycznego diffu w kodzie silnika Pythona. Zakaz pudrowania problemów przez doraźną modyfikację `*_bible.json`, lintera lub pliku `.ass`.
