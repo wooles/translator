@@ -52,6 +52,7 @@ def strip_season_suffix(title: str) -> Optional[str]:
     Strips season suffixes (e.g. S2, Season 2, 2nd Season, Part 2, Cour 2, Roman numerals)
     from the end of a series title to enable fallback queries for the parent franchise in AniList.
     Returns cleaned parent title or None if no season suffix was present.
+    Titles containing dots (Dr. Stone) or slashes (Fate/Zero) are strictly preserved.
     """
     if not title or not isinstance(title, str):
         return None
@@ -59,12 +60,25 @@ def strip_season_suffix(title: str) -> Optional[str]:
     if len(raw) < 2:
         return None
 
-    # Pre-clean fansub/quality tags if raw title is a full filename
-    target = clean_anime_filename(raw) or raw
+    # Only strip actual media file extensions if present at the very end
+    target = re.sub(r"\.(?:mkv|mp4|avi|ts|ass|srt|m4v|flv)$", "", raw, flags=re.IGNORECASE).strip()
+
+    # Pre-clean fansub release prefix (e.g. [ASW], [SubsPlease]) at the start if present
+    target = re.sub(r"^\[[^\]]+\]\s*", "", target)
+
+    # Strip trailing quality / hash brackets (e.g. [1080p], [AE584971]) at the very end if present
+    target = re.sub(r"\s*\[(?:1080p|720p|480p|2160p|4K|HEVC|x264|x265|AAC|FLAC|[0-9a-fA-F]{8})[^\]]*\]\s*$", "", target, flags=re.IGNORECASE)
+    target = re.sub(r"\s*\((?:1080p|720p|480p|2160p|4K|HEVC|x264|x265|AAC|FLAC)\)\s*$", "", target, flags=re.IGNORECASE)
+
+    season_matched = False
+    cleaned = target
 
     # 1. Bracketed or parenthesized season suffixes at end of string
     bracket_pat = r"[\s\-_:]*[\(\[]\s*(?:(?:Season|Part|Cour)\s*(?:\d+|[IVXLCDM]+)|\d+(?:st|nd|rd|th)\s+(?:Season|Cour|Part)|S\d+)\s*[\)\]]\s*$"
-    cleaned = re.sub(bracket_pat, "", target, flags=re.IGNORECASE).strip()
+    new_cleaned = re.sub(bracket_pat, "", cleaned, flags=re.IGNORECASE).strip()
+    if new_cleaned != cleaned:
+        cleaned = new_cleaned
+        season_matched = True
 
     # 2. Standalone unbracketed season suffixes at end of string
     patterns = [
@@ -75,18 +89,20 @@ def strip_season_suffix(title: str) -> Optional[str]:
         r"[\s\-_:]+\b\d+(?:st|nd|rd|th)\s+Part\b\s*$",
         r"[\s\-_:]+\bCour\s*(?:\d+|[IVXLCDM]+)\b\s*$",
         r"[\s\-_:]+\b\d+(?:st|nd|rd|th)\s+Cour\b\s*$",
-        r"[\s\-_:]+\b(?:II|III|IV|VI|VII|VIII|IX|X)\b\s*$",
+        r"[\s\-_:]+\b(?:The\s+)?Final\s+Season\b\s*$",
+        r"[\s\-_:]+\b(?:II|III|IV|V|VI|VII|VIII|IX|X)\b\s*$",
     ]
     for pat in patterns:
         new_cleaned = re.sub(pat, "", cleaned, flags=re.IGNORECASE).strip()
         if new_cleaned != cleaned:
             cleaned = new_cleaned
+            season_matched = True
             break
 
     # Strip any trailing delimiters (: - _)
     cleaned = re.sub(r"[\s\-_:]+$", "", cleaned).strip()
 
-    if cleaned and cleaned != raw and len(cleaned) >= 2:
+    if season_matched and cleaned and len(cleaned) >= 2:
         return cleaned
     return None
 

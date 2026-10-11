@@ -14586,20 +14586,25 @@ def test_hyouken_s2_root_cause_anilist_fallback_and_addressee_guard():
     """
     TEST 156: Weryfikacja Standardu 3.0 i Pełnej Eliminacji Źródłowej INC-AVT-003:
     1. metadata.py: strip_season_suffix() dla wielosezonowych tytułów (S2, Season 2, Part 2, Cour 2, 2nd Season, Roman numerals, brackets).
+       - Zachowanie kropek i ukośników: Fate/Zero 2nd Season -> Fate/Zero, Dr. Stone Season 3 -> Dr. Stone.
+       - Obsługa rzymskiej cyfry V: Date A Live V -> Date A Live.
+       - Negatywne próby kontrolne (brak sufiksu sezonu): Fate/Zero -> None, Dr. Stone -> None, D.N.Angel -> None, Chainsaw Man -> None.
     2. metadata.py: Fallback do franszyzy macierzystej w AniList - 'Hyouken no Majutsushi ga Sekai wo Suberu S2' zwraca poprawny profil Raya White'a (Male, verified=True).
-    3. series_memory.py: Izolacja mówcy (idx=0) od tagów adresata [KOBIETA (Adresat)] i form 2. os. (byłaś/zrobiłaś) w update_from_episode_profile().
-    4. series_memory.py: Priorytet P0 dla zweryfikowanej płci z AniList (zakaz nadpisywania przez relacje heurystyczne i symetryczna blokada).
-    5. series_memory.py: Bezpiecznik relacji hierarchicznych (usunięcie fałszywego wymuszenia MĘŻCZYZNA dla przełożonych kobiet z panie/pan).
-    6. SeriesBible & EpisodeQualityGate: Weryfikacja bazy Hyouken S2 (Ray White: MALE, Ariane Olgren: FEMALE, Rebecca Bradley: FEMALE, Lydia Ainsworth: FEMALE, Stella White: FEMALE) oraz test naprawy linii ASS bez regresji.
+    3. series_memory.py: Izolacja mówcy i uczestników pośrednich (idx < len(parts)-1) od tagów adresata [KOBIETA (Adresatka)] i form 2. os. (byłaś/zrobiłaś).
+    4. series_memory.py: Odporność na payloads typu dict w update_from_episode_profile() bez błędu AttributeError.
+    5. series_memory.py: Uzdrawianie przestarzałych heurystyk (stale heuristics) przez wpisy zweryfikowane z AniList bez wtórnej infekcji.
+    6. series_memory.py: Wieloczłonowe strzałki (Arthur -> Merlin -> Morgana) i wieloczłonowe imiona żeńskie bez końcówki -a na nazwisku (Amelia Rose, Rebecca Bradley, Stella White).
+    7. series_memory.py: Natywna deklinacja w silniku Pythona dla męskich imion obcych zakończonych na nieme -e z apostrofem (White'a, White'owi, White'em, White'cie) oraz dyftong vowel+y (Ray -> Raya).
+    8. SeriesBible & EpisodeQualityGate: Weryfikacja bazy Hyouken S2 (Ray White: MALE, Ariane Olgren: FEMALE, Rebecca Bradley: FEMALE, Lydia Ainsworth: FEMALE, Stella White: FEMALE) oraz test naprawy linii ASS bez regresji.
     """
     import pysubs2
     import tempfile
     from pathlib import Path
     from metadata import strip_season_suffix, fetch_anilist_metadata
-    from series_memory import SeriesBible, resolve_actor_gender
+    from series_memory import SeriesBible, resolve_actor_gender, generate_polish_name_declension
     from avt_linter import EpisodeQualityGate
 
-    # 1. strip_season_suffix
+    # 1. strip_season_suffix - Positive & Negative Control Double-Sided Assertions
     assert strip_season_suffix("Hyouken no Majutsushi ga Sekai wo Suberu S2") == "Hyouken no Majutsushi ga Sekai wo Suberu"
     assert strip_season_suffix("Mushoku Tensei Season 2") == "Mushoku Tensei"
     assert strip_season_suffix("Spy x Family Part 2") == "Spy x Family"
@@ -14607,8 +14612,32 @@ def test_hyouken_s2_root_cause_anilist_fallback_and_addressee_guard():
     assert strip_season_suffix("Re:Zero 2nd Season") == "Re:Zero"
     assert strip_season_suffix("Overlord IV") == "Overlord"
     assert strip_season_suffix("[ASW] Hyouken no Majutsushi ga Sekai wo Suberu S2 [1080p]") == "Hyouken no Majutsushi ga Sekai wo Suberu"
+    # Challenger 1 Edge Cases:
+    assert strip_season_suffix("Fate/Zero 2nd Season") == "Fate/Zero"
+    assert strip_season_suffix("Fate/stay night [Unlimited Blade Works] S2") == "Fate/stay night [Unlimited Blade Works]"
+    assert strip_season_suffix("Dr. Stone Season 3") == "Dr. Stone"
+    assert strip_season_suffix("Dr. Stone: New World Cour 2") == "Dr. Stone: New World"
+    assert strip_season_suffix("Date A Live V") == "Date A Live"
+    # Negative controls (must return None when no season suffix was present):
+    assert strip_season_suffix("Fate/Zero") is None
+    assert strip_season_suffix("Dr. Stone") is None
+    assert strip_season_suffix("D.N.Angel") is None
+    assert strip_season_suffix("Chainsaw Man") is None
 
-    # 2. AniList Fallback
+    # 2. Native Python Engine Declension for Foreign Names (Reviewer 2 Mandate - Zero-Cosmetic)
+    ray_white_decl = generate_polish_name_declension("Ray White", "MALE")
+    expected_ray_white_decl = {
+        "M": "Ray White",
+        "D": "Raya White'a",
+        "C": "Rayowi White'owi",
+        "B": "Raya White'a",
+        "N": "Rayem White'em",
+        "Ms": "Rayu White'cie",
+        "W": "Rayu White",
+    }
+    assert ray_white_decl == expected_ray_white_decl, f"Engine declension mismatch: {ray_white_decl} != {expected_ray_white_decl}"
+
+    # 3. AniList Fallback
     anilist_meta = fetch_anilist_metadata("Hyouken no Majutsushi ga Sekai wo Suberu S2")
     assert anilist_meta is not None
     char_map = {c["name"]: c for c in anilist_meta.get("characters", [])}
@@ -14618,16 +14647,21 @@ def test_hyouken_s2_root_cause_anilist_fallback_and_addressee_guard():
     assert "Amelia Rose" in char_map
     assert char_map["Amelia Rose"].get("gender_raw") == "Female" or "kobieta" in str(char_map["Amelia Rose"].get("gender", "")).lower()
 
-    # 3. Synthetic SeriesBible
+    # 4. Synthetic SeriesBible - Adversarial Edge Cases & Epistemic Robustness
     with tempfile.TemporaryDirectory() as tmp_dir:
         test_bible = SeriesBible("Synthetic Test Anime", storage_dir=Path(tmp_dir))
         synthetic_chars = {
             "Hero -> Princess": "Zwrot: 'na ty' (partner / księżniczka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś]",
             "Sorceress -> Knight": "Zwrot: 'panie rycerzu' (czarodziejka / rycerz) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś]",
-            "Ray White -> Amelia Rose": "Zwrot: 'na ty' [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś]",
+            # Test Adresatka inflection (Polish feminine)
+            "Ray White -> Amelia Rose": "Zwrot: 'na ty' [KOBIETA (Adresatka) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś]",
             "Ariane Olgren -> Ray White": "Zwrot: 'na ty / Rayu' (kadetka / dowódca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś] [RELACJA HIERARCHICZNA: Pan / Panie]",
             "Ray White -> Rebecca Bradley": "Zwrot: 'pani przewodnicząca' (uczeń / przewodnicząca) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś] [RELACJA HIERARCHICZNA: Pan / Panie]",
-            "Ray White -> Lydia Ainsworth": "Zwrot: 'Mistrzyni' (uczeń / mistrzyni) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś] [RELACJA HIERARCHICZNA: Pan / Panie]"
+            "Ray White -> Lydia Ainsworth": "Zwrot: 'Mistrzyni' (uczeń / mistrzyni) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś] [RELACJA HIERARCHICZNA: Pan / Panie]",
+            # Multi-arrow relationship (Arthur -> Merlin -> Morgana)
+            "Arthur -> Merlin -> Morgana": "Zwrot: 'pani' (król / mag / czarownica) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś]",
+            # Multi-token female name with non-A surname
+            "Amelia Rose -> Ray White": "Zwrot: 'na ty' [MĘŻCZYZNA (Adresat)]",
         }
         synthetic_rels = dict(synthetic_chars)
         test_bible.update_from_episode_profile(
@@ -14644,24 +14678,63 @@ def test_hyouken_s2_root_cause_anilist_fallback_and_addressee_guard():
         assert test_bible.get_character_gender("Ariane Olgren") == "FEMALE"
         assert test_bible.get_character_gender("Rebecca Bradley") == "FEMALE"
         assert test_bible.get_character_gender("Lydia Ainsworth") == "FEMALE"
+        # Multi-arrow assertions: Merlin (non-terminal) is MALE, Morgana (terminal) is FEMALE
+        assert test_bible.get_character_gender("Arthur") == "MALE"
+        assert test_bible.get_character_gender("Merlin") == "MALE"
+        assert test_bible.get_character_gender("Morgana") == "FEMALE"
 
-        # P0 priority
-        test_bible.data["characters"]["Ray White"] = {
-            "gender": "MALE",
-            "has_verified_gender": True,
-            "description": "MĘŻCZYZNA (zweryfikowano z AniList)"
+        # 4b. Dict Payload Handling without AttributeError crash & structure preservation
+        dict_payload = {
+            "Ray White": {
+                "gender": "MALE",
+                "has_verified_gender": True,
+                "description": "MĘŻCZYZNA (zweryfikowano z AniList)"
+            },
+            "Stella White": {
+                "gender": "FEMALE",
+                "has_verified_gender": True,
+                "description": "KOBIETA (zweryfikowano z AniList) - młodsza siostra"
+            }
         }
+        test_bible.update_from_episode_profile(
+            episode_name="Odcinek 2",
+            characters=dict_payload
+        )
+        assert test_bible.get_character_gender("Ray White") == "MALE"
+        assert test_bible.get_character_gender("Stella White") == "FEMALE"
+        assert test_bible.data["characters"]["Ray White"].get("has_verified_gender") is True
+        assert test_bible.data["characters"]["Stella White"].get("has_verified_gender") is True
+
+        # 4c. Stale Heuristic Healing (Lydia Ainsworth: corrupted male -> verified female without reinfection)
+        test_bible.data["characters"]["Lydia Ainsworth"] = {
+            "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+        }
+        assert test_bible.get_character_gender("Lydia Ainsworth") == "MALE"
+        corrective_update = {
+            "Lydia Ainsworth": "KOBIETA (zweryfikowano z AniList) - arcymag"
+        }
+        test_bible.update_from_episode_profile(
+            episode_name="Odcinek 3",
+            characters=corrective_update
+        )
+        assert test_bible.get_character_gender("Lydia Ainsworth") == "FEMALE"
+        lydia_desc = str(test_bible.data["characters"]["Lydia Ainsworth"].get("description", ""))
+        assert "[MĘŻCZYZNA (Adresat)" not in lydia_desc, f"Contradictory male addressee tag injected: {lydia_desc}"
+
+        # 4d. P0 Priority against relational attacks
         poison_chars = {
             "Ray White -> Other": "postać [KOBIETA (Adresat)] (wyodrębniono z relacji)"
         }
         test_bible.update_from_episode_profile(
-            episode_name="Odcinek 2",
+            episode_name="Odcinek 4",
             characters=poison_chars
         )
         assert test_bible.get_character_gender("Ray White") == "MALE"
 
-    # 4. Hyouken S2 Bible check
+    # 5. Hyouken S2 Bible check
     bible = SeriesBible("Hyouken no Majutsushi ga Sekai wo Suberu S2")
+    # Verify _sanitize_bible_integrity does not wipe Ray White declensions
+    bible._sanitize_bible_integrity()
     assert resolve_actor_gender("Ray White", series_bible=bible) == "MALE"
     assert resolve_actor_gender("Ariane Olgren", series_bible=bible) == "FEMALE"
     assert resolve_actor_gender("Rebecca Bradley", series_bible=bible) == "FEMALE"
@@ -14680,7 +14753,7 @@ def test_hyouken_s2_root_cause_anilist_fallback_and_addressee_guard():
     assert decl.get("Lydia Ainsworth", {}).get("D") == "Lydii Ainsworth"
     assert decl.get("Stella White", {}).get("D") == "Stelli White"
 
-    # 5. ASS lines fix
+    # 6. ASS lines fix
     raw_ass = (
         "[Script Info]\nTitle: Test\nScriptType: v4.00+\n\n"
         "[V4+ Styles]\nFormat: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\n"

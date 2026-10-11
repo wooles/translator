@@ -25,10 +25,10 @@ Potok AVT (Standard 3.0) składa się z 5 warstw:
 ## Milestones
 | # | Name | Scope | Dependencies | Status |
 |---|------|-------|-------------|--------|
-| 1 | M1: Kodyfikacja Zasad i Szablonu Dossier | AGENTS.md (Zasada 0, Zasada 1, Sekcja 20) oraz PROJECT_MEMORY.md (ARB-005..007, INC-AVT-003, telemetria) | none | IN_PROGRESS |
-| 2 | M2: Naprawa Silnika Algorytmicznego | metadata.py (strip_season_suffix, fetch_anilist_metadata fallback), series_memory.py (update_from_episode_profile, P0 verified gender priority), translator.py | none | PLANNED |
-| 3 | M3: Sanacja Bazy Wiedzy Hyouken S2 | Hyouken_no_Majutsushi_ga_Sekai_wo_Suberu_S2_bible.json (korekta 5 postaci, usunięcie skażonych tagów relacji i błędnych deklinacji) | M2 | PLANNED |
-| 4 | M4: Test Regresyjny 156, CI/CD 156/156 i Git Sync | test_system.py (Test 156 + main runner), uruchomienie testów (156/156 PASSED), synchronizacja git | M1, M2, M3 | PLANNED |
+| 1 | M1: Kodyfikacja Zasad i Szablonu Dossier | AGENTS.md (Zasada 0, Zasada 1, Sekcja 20) oraz PROJECT_MEMORY.md (ARB-005..007, INC-AVT-003, telemetria) | none | DONE |
+| 2 | M2: Naprawa Silnika Algorytmicznego | metadata.py (strip_season_suffix, fetch_anilist_metadata fallback), series_memory.py (update_from_episode_profile, P0 verified gender priority), translator.py | none | DONE |
+| 3 | M3: Sanacja Bazy Wiedzy Hyouken S2 | Hyouken_no_Majutsushi_ga_Sekai_wo_Suberu_S2_bible.json (korekta 5 postaci, usunięcie skażonych tagów relacji i błędnych deklinacji) | M2 | DONE |
+| 4 | M4: Test Regresyjny 156, CI/CD 156/156 i Git Sync | test_system.py (Test 156 + main runner), uruchomienie testów (156/156 PASSED), synchronizacja git | M1, M2, M3 | DONE |
 
 ## Interface Contracts
 ### metadata.py ↔ series_memory.py & translator.py
