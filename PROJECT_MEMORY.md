@@ -15,6 +15,7 @@ Zasady normatywne i aksjomaty inżynierskie definiuje wyłącznie `AGENTS.md` (S
   * **AGENT 3:** Chief Epistemic Architect & AVT Dramaturge (Ontologia, kontrakty Pydantic, czerwony test).
   * **AGENT 1:** Lead Systems Implementer (Prototypowanie RAM, Diff Preview).
   * **AGENT 2:** Adversarial Reviewer & ASS-Fuzzing (18 Wymiarów Audytu, Breathing Space Index).
+  * **Żelazny Bezpiecznik Potoku:** Zero Premature Synthesis – bezwzględny zakaz pomijania Fazy 2 i Faz 3–4; każde Dossier musi opierać się na rzeczywistych logach laboratoryjnych ze środowiska RAM.
 
 ---
 

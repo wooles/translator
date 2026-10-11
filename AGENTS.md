@@ -169,9 +169,11 @@ Nadrzędna procedura działania potoku pod nadzorem Autonomicznego Pełnomocnika
 
 ### 🔄 7-Fazowy Potok Pracy i Żelazna Bramka Zapisu
 - **Faza 0:** Zgłoszenie kwestii przez Operatora $\to$ **Faza 1:** Triage Agenta 4 $\to$ **Faza 2:** RCA i czerwony test Agenta 3 $\to$ **Faza 3:** Implementacja w RAM Agenta 1 $\to$ **Faza 4:** Audyt ASS-Fuzzing i 18 wymiarów Agenta 2 $\to$ **Faza 5:** Złożenie Dossier przez Agenta 4 $\to$ **Faza 6:** Komenda Operatora `ZATWIERDZAM DOSSIER - WDROŻYĆ DO KODU` $\to$ fizyczny zapis, uruchomienie CI/CD (155/155) i raport Zreformowaną Tabelą Dowodową 5 Warstw.
+- **Wymóg Nienaruszalności Potoku:** Każda faza (od 0 do 5) musi zostać faktycznie wykonana i wylegitymowana rzeczywistym wyjściem testowym z bufora RAM przed przejściem do fazy następnej. Zakaz przeskakiwania faz, kompresji do samej Fazy 5 oraz przedwczesnej syntezy bez dowodów laboratoryjnych.
 
-### 🛡️ 4 Żelazne Bezpieczniki Potoku
+### 🛡️ 5 Żelaznych Bezpieczników Potoku
 1. **Breathing Space Index & Anti-Goodhart:** Zakaz kastracji kwestii pod CPS kosztem ładunku dramatycznego i pauz oddechowych seiyū.
 2. **Audyt ASS-Fuzzing:** Operowanie na drzewie tokenów wizualnych; ochrona nawiasów `{}`.
 3. **Golden Corpus Anchor Gate = 100.0%:** Zero regresji na Scenach Kotwiczących; $\ge 99.0\%$ na całym korpusie.
 4. **Leczenie u Źródła w Kontraktach Danych:** Blokada błędów tożsamości i płci w Pydantic i SeriesBible, zakaz puchnięcia lintera.
+5. **Kategoryczny Zakaz Skracania Potoku (Zero Premature Synthesis Mandate):** Agent 4 ma absolutny zakaz przeskakiwania z Fazy 1 bezpośrednio do Fazy 5. Faza 2 (Czerwony Test Agenta 3) oraz Faza 3–4 (Prototyp w RAM Agenta 1 + Audyt ASS-Fuzzing Agenta 2) MUSZĄ zostać fizycznie uruchomione w środowisku scratch/RAM i udokumentowane w odpowiedzi twardymi logami wykonania przed przedłożeniem Dossier Operatorowi.
