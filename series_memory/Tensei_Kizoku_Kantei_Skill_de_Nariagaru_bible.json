@@ -5,7 +5,8 @@
       "description": "Zwrot: 'panie Arsie / Lordzie Arsie' (wierny wasal -> pan lenny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Rietz": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+      "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
+      "source": "quality_gate",
       "gender": "MALE"
     },
     "Ars": {
@@ -17,45 +18,49 @@
       "description": "Zwrot: 'na ty / Arsie' (bliska towarzyszka / przyjaciółka -> suweren) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Charlotte": {
-      "description": "postać (Postać)"
+      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Mireille -> Ars": {
       "description": "Zwrot: 'młody / panie Arsie' (zastępczyni lorda -> młody senior) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Mireille": {
-      "description": "postać (Postać)"
+      "description": "postać (Postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Ars -> Mireille": {
-      "description": "Zwrot: 'pani Mireille / na ty' (suweren -> zaufana doradczyni) [OCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu zakaz opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?'] [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "Zwrot: 'pani Mireille / na ty' (suweren -> zaufana doradczyni) [OCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu zakaz opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?'\\NKOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Licia -> Ars": {
       "description": "Zwrot: 'panie Arsie / Lordzie Arsie' (narzeczona -> narzeczony) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Licia": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać)"
     },
     "Zaht -> Braham": {
-      "description": "Zwrot: 'kapitanie / na ty' (zastępca dowódcy -> dowódca oddziału) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "Zwrot: 'Kapitanie / Braham' (zastępca -> dowódca oddziału) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Zaht": {
       "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
-      "source": "quality_gate"
+      "source": "quality_gate",
+      "gender": "MALE"
     },
     "Braham": {
-      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+      "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
+      "source": "quality_gate",
       "gender": "MALE"
     },
     "Ars Louvent": {
-      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "mężczyzna (Młody lord Canarre, głowa rodu Louvent) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+      "gender": "MALE"
     },
     "Rietz Muses": {
-      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "mężczyzna (Naczelny wódz sił Canarre, wasal Arsa Louventa) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+      "gender": "MALE"
     },
     "Charlotte Wraith": {
-      "description": "kobieta (Czarodziejka na służbie Arsa, dowódczyni jednostki magicznej) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "postać (Postać)"
     },
     "Rosell Kischa": {
-      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Lycia Plaid": {
       "description": "postać (Główny bohater) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
@@ -64,7 +69,7 @@
       "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Mireille Grangeon": {
-      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "postać (Postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Fam": {
       "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
@@ -91,21 +96,19 @@
       "description": "postać (Postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Couran Salamakhia": {
-      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Zaht Brozud": {
       "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Musia Trick": {
-      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
-      "gender": "FEMALE"
+      "description": "postać (Postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Rosell": {
       "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Musia": {
-      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
-      "gender": "FEMALE"
+      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Krantz": {
       "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
@@ -117,34 +120,35 @@
       "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Guard Captain": {
-      "description": "MĘŻCZYZNA (zweryfikowano z audio seiyū Whisper)"
+      "description": "MĘŻCZYZNA (zweryfikowano z audio seiyū Whisper)",
+      "gender": "MALE"
     },
     "Ars -> Rietz": {
-      "description": "Zwrot: 'na ty / Rietz' (pan lenny -> prawa ręka) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]"
+      "description": "Zwrot: 'na ty / Rietz' (pan lenny -> prawa ręka) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]"
     },
     "Charlotte -> Musia": {
       "description": "Zwrot: 'na ty / Musia' (starsza czarodziejka -> nowa rekrutka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Musia -> Charlotte": {
-      "description": "Zwrot: 'na ty / Charlotte' (podziwiająca uczennica -> mentorka) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]"
+      "description": "Zwrot: 'na ty / Charlotte' (podziwiająca uczennica -> mentorka) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Licia Plaid": {
-      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "postać (Postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Hammond Pleide": {
-      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Vasmarque Salamakhia": {
-      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Grenda Domatheson": {
-      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Borotz Heygand": {
-      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Lantark Lodder": {
-      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Pham": {
       "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
@@ -172,6 +176,110 @@
     "Couran": {
       "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
       "source": "quality_gate"
+    },
+    "Braham -> Rietz": {
+      "description": "Zwrot: 'Mistrzu / Panie Rietzu' (uczeń -> mistrz wojskowy) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Rietz -> Braham": {
+      "description": "Zwrot: 'Brahamie / po imieniu na ty' (dowódca / mistrz -> uczeń) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]"
+    },
+    "Braham -> Zaht": {
+      "description": "Zwrot: 'Zaht / po imieniu na ty' (dowódca -> zastępca / towarzysz broni) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Lantorque -> Borotz": {
+      "description": "Zwrot: 'Dowódco Borotzu / Panie dowódco' (podwładny -> głównodowodzący) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Lantorque": {
+      "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
+      "source": "quality_gate"
+    },
+    "Borotz": {
+      "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
+      "source": "quality_gate",
+      "gender": "MALE"
+    },
+    "Braham Joe": {
+      "description": "mężczyzna (17 lat, kapitan elitarnego oddziału uderzeniowego Canarre, porywczy wojownik) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+      "gender": "MALE"
+    },
+    "Canarre C": {
+      "description": "KOBIETA (zweryfikowano z audio seiyū Whisper)"
+    },
+    "Canarre D": {
+      "description": "KOBIETA (zweryfikowano z audio seiyū Whisper)"
+    },
+    "Clamant": {
+      "description": "MĘŻCZYZNA (zweryfikowano z audio seiyū Whisper)"
+    },
+    "Elite A": {
+      "description": "MĘŻCZYZNA (zweryfikowano z audio seiyū Whisper)"
+    },
+    "Mercenary A": {
+      "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
+      "source": "quality_gate"
+    },
+    "Mercenary B": {
+      "description": "MĘŻCZYZNA (zweryfikowano z audio seiyū Whisper)"
+    },
+    "Braham's Bro": {
+      "description": "MĘŻCZYZNA (brat Brahama)",
+      "gender": "MALE",
+      "polish_declension": {
+        "M": "Braham's Bro",
+        "D": "Braham's Bro",
+        "C": "Braham's Bro",
+        "B": "Braham's Bro",
+        "N": "Braham's Bro",
+        "Ms": "Braham's Bro",
+        "W": "Braham's Bro"
+      }
+    },
+    "Braham Bro": {
+      "description": "MĘŻCZYZNA (brat Brahama)",
+      "gender": "MALE"
+    },
+    "Young Braham": {
+      "description": "MĘŻCZYZNA (młody Braham w retrospekcji)",
+      "gender": "MALE",
+      "polish_declension": {
+        "M": "Young Braham",
+        "D": "Young Brahama",
+        "C": "Young Brahamowi",
+        "B": "Young Brahama",
+        "N": "Young Brahamem",
+        "Ms": "Young Brahamie",
+        "W": "Young Brahamie"
+      }
+    },
+    "Verzud Captain": {
+      "description": "MĘŻCZYZNA (zweryfikowano z audio seiyū Whisper)",
+      "gender": "MALE"
+    },
+    "Seitz Captain": {
+      "description": "MĘŻCZYZNA (kapitan wojsk Seitz)",
+      "gender": "MALE",
+      "polish_declension": {
+        "M": "Seitz Captain",
+        "D": "Seitz Captaina",
+        "C": "Seitz Captainowi",
+        "B": "Seitz Captaina",
+        "N": "Seitz Captainem",
+        "Ms": "Seitz Captainie",
+        "W": "Seitz Captainie"
+      }
+    },
+    "Zaht's Kid": {
+      "description": "MĘŻCZYZNA (syn Zahta, młody chłopiec)",
+      "gender": "MALE",
+      "polish_declension": {
+        "M": "Zaht's Kid",
+        "D": "Zaht's Kida",
+        "C": "Zaht's Kidowi",
+        "B": "Zaht's Kida",
+        "N": "Zaht's Kidem",
+        "Ms": "Zaht's Kidzie",
+        "W": "Zaht's Kidzie"
+      }
     }
   },
   "glossary": {
@@ -186,18 +294,26 @@
     "Seitz": "Seitz",
     "Coumeire Domain": "domena Coumeire",
     "Torbequista": "Torbequista",
-    "Rulla leaves": "liście rulla"
+    "Rulla leaves": "liście rulla",
+    "Reaper of Louvent": "Żniwiarz z Louvent",
+    "aqua magia": "magia wody",
+    "rear guard": "ariergarda",
+    "catalyzer": "katalizator magii"
   },
   "relationships": {
     "Rietz -> Ars": "Zwrot: 'panie Arsie / Lordzie Arsie' (wierny wasal -> pan lenny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Charlotte -> Ars": "Zwrot: 'na ty / Arsie' (bliska towarzyszka / przyjaciółka -> suweren) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Mireille -> Ars": "Zwrot: 'młody / panie Arsie' (zastępczyni lorda -> młody senior) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Ars -> Mireille": "Zwrot: 'pani Mireille / na ty' (suweren -> zaufana doradczyni) [OCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu zakaz opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?'] [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Ars -> Mireille": "Zwrot: 'pani Mireille / na ty' (suweren -> zaufana doradczyni) [OCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu zakaz opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?'\\NKOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Licia -> Ars": "Zwrot: 'panie Arsie / Lordzie Arsie' (narzeczona -> narzeczony) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Zaht -> Braham": "Zwrot: 'kapitanie / na ty' (zastępca dowódcy -> dowódca oddziału) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Ars -> Rietz": "Zwrot: 'na ty / Rietz' (pan lenny -> prawa ręka) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Zaht -> Braham": "Zwrot: 'Kapitanie / Braham' (zastępca -> dowódca oddziału) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Ars -> Rietz": "Zwrot: 'na ty / Rietz' (pan lenny -> prawa ręka) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
     "Charlotte -> Musia": "Zwrot: 'na ty / Musia' (starsza czarodziejka -> nowa rekrutka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]",
-    "Musia -> Charlotte": "Zwrot: 'na ty / Charlotte' (podziwiająca uczennica -> mentorka) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]"
+    "Musia -> Charlotte": "Zwrot: 'na ty / Charlotte' (podziwiająca uczennica -> mentorka) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]",
+    "Braham -> Rietz": "Zwrot: 'Mistrzu / Panie Rietzu' (uczeń -> mistrz wojskowy) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Rietz -> Braham": "Zwrot: 'Brahamie / po imieniu na ty' (dowódca / mistrz -> uczeń) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Braham -> Zaht": "Zwrot: 'Zaht / po imieniu na ty' (dowódca -> zastępca / towarzysz broni) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Lantorque -> Borotz": "Zwrot: 'Dowódco Borotzu / Panie dowódco' (podwładny -> głównodowodzący) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
   },
   "declensions": {
     "Rietz": {
@@ -227,7 +343,8 @@
       "B": "Charlotte",
       "N": "Charlotte",
       "Ms": "Charlotte",
-      "W": "Charlotte"
+      "W": "Charlotte",
+      "gender": "FEMALE"
     },
     "Mireille": {
       "M": "Mireille",
@@ -246,8 +363,7 @@
       "B": "Licię",
       "N": "Licią",
       "Ms": "Licii",
-      "W": "Licio",
-      "gender": "MALE"
+      "W": "Licio"
     },
     "Zaht": {
       "M": "Zaht",
@@ -291,13 +407,12 @@
     },
     "Charlotte Wraith": {
       "M": "Charlotte Wraith",
-      "D": "Charlotte Wraith",
-      "C": "Charlotte Wraith",
-      "B": "Charlotte Wraith",
-      "N": "Charlotte Wraith",
-      "Ms": "Charlotte Wraith",
-      "W": "Charlotte Wraith",
-      "gender": "FEMALE"
+      "D": "Charlotte'a Wraitha",
+      "C": "Charlotte'owi Wraithowi",
+      "B": "Charlotte'a Wraitha",
+      "N": "Charlotte'em Wraithem",
+      "Ms": "Charlotte'cie Wraithu",
+      "W": "Charlotte Wraithu"
     },
     "Rosell Kischa": {
       "M": "Rosell Kischa",
@@ -351,11 +466,11 @@
     },
     "Lumeire Pyres": {
       "M": "Lumeire Pyres",
-      "D": "Lumeire Pyresa",
-      "C": "Lumeire Pyresowi",
-      "B": "Lumeire Pyresa",
-      "N": "Lumeire Pyresem",
-      "Ms": "Lumeire Pyresie",
+      "D": "Lumeire'a Pyresa",
+      "C": "Lumeire'owi Pyresowi",
+      "B": "Lumeire'a Pyresa",
+      "N": "Lumeire'em Pyresem",
+      "Ms": "Lumeire'u Pyresie",
       "W": "Lumeire Pyresie",
       "gender": "MALE"
     },
@@ -508,24 +623,6 @@
       "Ms": "Cesarstwie Summerforth",
       "W": "Cesarstwo Summerforth"
     },
-    "Lamberg": {
-      "M": "Lamberg",
-      "D": "Lambergiem",
-      "C": "Lambergowi",
-      "B": "Lamberga",
-      "N": "Lambergiem",
-      "Ms": "Lambergu",
-      "W": "Lambergu"
-    },
-    "Canarre": {
-      "M": "Canarre",
-      "D": "Canarre",
-      "C": "Canarre",
-      "B": "Canarre",
-      "N": "Canarre",
-      "Ms": "Canarre",
-      "W": "Canarre"
-    },
     "Guard Captain": {
       "M": "Guard Captain",
       "D": "Guarda Captaina",
@@ -548,11 +645,11 @@
     },
     "Hammond Pleide": {
       "M": "Hammond Pleide",
-      "D": "Hammonda Pleide",
-      "C": "Hammondowi Pleide",
-      "B": "Hammonda Pleide",
-      "N": "Hammondem Pleide",
-      "Ms": "Hammondzie Pleide",
+      "D": "Hammonda Pleide'a",
+      "C": "Hammondowi Pleide'owi",
+      "B": "Hammonda Pleide'a",
+      "N": "Hammondem Pleide'em",
+      "Ms": "Hammondzie Pleide'dzie",
       "W": "Hammondzie Pleide",
       "gender": "MALE"
     },
@@ -604,24 +701,6 @@
       "N": "Oceną",
       "Ms": "Ocenie",
       "W": "Oceno"
-    },
-    "Seitz": {
-      "M": "Seitz",
-      "D": "Seitza",
-      "C": "Seitzowi",
-      "B": "Seitza",
-      "N": "Seitzem",
-      "Ms": "Seitzie",
-      "W": "Seitzie"
-    },
-    "Torbequista": {
-      "M": "Torbequista",
-      "D": "Torbequistym",
-      "C": "Torbequistej",
-      "B": "Torbequistą",
-      "N": "Torbequistą",
-      "Ms": "Torbequistej",
-      "W": "Torbequista"
     },
     "Pham": {
       "M": "Pham",
@@ -702,6 +781,165 @@
       "Ms": "Couranie",
       "W": "Couranie",
       "gender": "MALE"
+    },
+    "Lantorque": {
+      "M": "Lantorque",
+      "D": "Lantorque",
+      "C": "Lantorque",
+      "B": "Lantorque",
+      "N": "Lantorque",
+      "Ms": "Lantorque",
+      "W": "Lantorque",
+      "gender": "MALE"
+    },
+    "Borotz": {
+      "M": "Borotz",
+      "D": "Borotza",
+      "C": "Borotzowi",
+      "B": "Borotza",
+      "N": "Borotzem",
+      "Ms": "Borotzie",
+      "W": "Borotzie",
+      "gender": "MALE"
+    },
+    "Braham Joe": {
+      "M": "Braham Joe",
+      "D": "Brahama Joe",
+      "C": "Brahamowi Joe",
+      "B": "Brahama Joe",
+      "N": "Brahamem Joe",
+      "Ms": "Brahamie Joe",
+      "W": "Brahamie Joe",
+      "gender": "MALE"
+    },
+    "Żniwiarz z Louvent": {
+      "M": "Żniwiarz z Louvent",
+      "D": "Żniwiarza z Louvent",
+      "C": "Żniwiarzowi z Louvent",
+      "B": "Żniwiarza z Louvent",
+      "N": "Żniwiarzem z Louvent",
+      "Ms": "Żniwiarzu z Louvent",
+      "W": "Żniwiarzu z Louvent"
+    },
+    "Canarre C": {
+      "M": "Canarre C",
+      "D": "Canarre C",
+      "C": "Canarre C",
+      "B": "Canarre C",
+      "N": "Canarre C",
+      "Ms": "Canarre C",
+      "W": "Canarre C",
+      "gender": "FEMALE"
+    },
+    "Canarre D": {
+      "M": "Canarre D",
+      "D": "Canarre D",
+      "C": "Canarre D",
+      "B": "Canarre D",
+      "N": "Canarre D",
+      "Ms": "Canarre D",
+      "W": "Canarre D",
+      "gender": "FEMALE"
+    },
+    "Clamant": {
+      "M": "Clamant",
+      "D": "Clamanta",
+      "C": "Clamantowi",
+      "B": "Clamanta",
+      "N": "Clamantem",
+      "Ms": "Clamancie",
+      "W": "Clamancie",
+      "gender": "MALE"
+    },
+    "Elite A": {
+      "M": "Elite A",
+      "D": "Elite'a A",
+      "C": "Elite'owi A",
+      "B": "Elite'a A",
+      "N": "Elite'em A",
+      "Ms": "Elite'cie A",
+      "W": "Elite A",
+      "gender": "MALE"
+    },
+    "Mercenary A": {
+      "M": "Mercenary A",
+      "D": "Mercenary A",
+      "C": "Mercenary A",
+      "B": "Mercenary A",
+      "N": "Mercenary A",
+      "Ms": "Mercenary A",
+      "W": "Mercenary A",
+      "gender": "MALE"
+    },
+    "Mercenary B": {
+      "M": "Mercenary B",
+      "D": "Mercenary B",
+      "C": "Mercenary B",
+      "B": "Mercenary B",
+      "N": "Mercenary B",
+      "Ms": "Mercenary B",
+      "W": "Mercenary B",
+      "gender": "MALE"
+    },
+    "Braham's Bro": {
+      "M": "Braham's Bro",
+      "D": "Braham's Bro",
+      "C": "Braham's Bro",
+      "B": "Braham's Bro",
+      "N": "Braham's Bro",
+      "Ms": "Braham's Bro",
+      "W": "Braham's Bro",
+      "gender": "MALE"
+    },
+    "Braham Bro": {
+      "M": "Braham Bro",
+      "D": "Brahama Bro",
+      "C": "Brahamowi Bro",
+      "B": "Brahama Bro",
+      "N": "Brahamem Bro",
+      "Ms": "Brahamie Bro",
+      "W": "Brahamie Bro",
+      "gender": "MALE"
+    },
+    "Young Braham": {
+      "M": "Young Braham",
+      "D": "Younga Brahama",
+      "C": "Youngowi Brahamowi",
+      "B": "Younga Brahama",
+      "N": "Youngiem Brahamem",
+      "Ms": "Youngu Brahamie",
+      "W": "Youngu Brahamie",
+      "gender": "MALE"
+    },
+    "Verzud Captain": {
+      "M": "Verzud Captain",
+      "D": "Verzuda Captaina",
+      "C": "Verzudowi Captainowi",
+      "B": "Verzuda Captaina",
+      "N": "Verzudem Captainem",
+      "Ms": "Verzudzie Captainie",
+      "W": "Verzudzie Captainie",
+      "gender": "MALE"
+    },
+    "Seitz Captain": {
+      "M": "Seitz Captain",
+      "D": "Seitz Captain",
+      "C": "Seitz Captain",
+      "B": "Seitz Captain",
+      "N": "Seitz Captain",
+      "Ms": "Seitz Captain",
+      "W": "Seitz Captain",
+      "gender": "MALE"
+    },
+    "Zaht's Kid": {
+      "M": "Zaht's Kid",
+      "D": "Zaht's Kid",
+      "C": "Zaht's Kid",
+      "B": "Zaht's Kid",
+      "N": "Zaht's Kid",
+      "Ms": "Zaht's Kid",
+      "W": "Zaht's Kid",
+      "gender": "MALE"
     }
   },
   "hypocorisms": {},
@@ -709,11 +947,14 @@
     "Headman of Canarre District": "Stosuj jednolite określenie 'namiestnik okręgu Canarre' (lub zarządca Canarre), nie zmieniaj na wójta ani sołtysa.",
     "Missian Succession War": "Konsekwentna nazwa konfliktu: 'wojna sukcesyjna w Missian'.",
     "Ocena (Appraisal)": "Niezmienna nazwa unikalnego daru Arsa, rozpoznawanego przez wszystkich dostojników jako 'umiejętność Oceny' / 'dar Oceny'.",
-    "Magiczne kamienie płomienia (Flame magistone)": "Rzadki minerał wydobywany w Missian, dowodzący sojuszu Vasmarque'a z nowym rządem prowincji Seitz."
+    "Magiczne kamienie płomienia (Flame magistone)": "Rzadki minerał wydobywany w Missian, dowodzący sojuszu Vasmarque'a z nowym rządem prowincji Seitz.",
+    "Katalizatory magii (catalyzers)": "Utrzymać termin 'katalizator magii' dla dużych urządzeń wzmacniających zaklęcia Charlotte i czarodziejów.",
+    "Żniwiarz z Louvent (Reaper of Louvent)": "Przydomek bojowy Rietza Musesa. Nie zmieniać na 'Kosiarz' ani inne warianty."
   },
   "episodes_translated": [
     "[DKB] Tensei Kizoku, Kantei Skill de Nariagaru - S03E01 [1080p][HEVC x265 10bit][Multi-Subs][30E39E34]",
-    "[DKB] Tensei Kizoku, Kantei Skill de Nariagaru - S03E02 [1080p][HEVC x265 10bit][Multi-Subs][6FFAB792]"
+    "[DKB] Tensei Kizoku, Kantei Skill de Nariagaru - S03E02 [1080p][HEVC x265 10bit][Multi-Subs][6FFAB792]",
+    "[ASW] Tensei Kizoku, Kantei Skill de Nariagaru - 27 [1080p HEVC][619E51AE]"
   ],
   "batch_stats": {
     "[DKB] Tensei Kizoku, Kantei Skill de Nariagaru - S03E01 [1080p][HEVC x265 10bit][Multi-Subs][30E39E34]": {
@@ -727,6 +968,12 @@
       "batches": 15,
       "avg_batch_size": 23.1,
       "cost_pln": 3.05
+    },
+    "[ASW] Tensei Kizoku, Kantei Skill de Nariagaru - 27 [1080p HEVC][619E51AE]": {
+      "dialogues": 359,
+      "batches": 15,
+      "avg_batch_size": 23.9,
+      "cost_pln": 3.3
     }
   },
   "fansub_canon": {}

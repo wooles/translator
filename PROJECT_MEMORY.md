@@ -5,10 +5,12 @@ Zasady normatywne i aksjomaty inżynierskie definiuje wyłącznie `AGENTS.md` (S
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 11.10.2026)
-- **Status CI/CD:** `STATUS: WDROŻONE I ZWERYFIKOWANE (156/156 PASSED) - KOD W CHMURZE GITHUB`
-- **Gałąź i Commit:** `main` (pełna integracja Standardu 3.0, Zero-Cosmetic Protocol i INC-AVT-003)
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 12.10.2026)
+- **Status CI/CD:** `STATUS: WDROŻONE I ZWERYFIKOWANE (157/157 PASSED) - VICTORY CONFIRMED`
+- **Gałąź i Commit:** `main` (pełna integracja Standardu 3.0, Zero-Cosmetic Protocol, INC-AVT-004 i Autonomous Multi-Agent Mandate)
 - **Środowisko:** Python 3.13 (.venv), Windows PowerShell, bezpośrednie klucze Google AI Studio API (`use_vertex = 0`)
+- **Mandat Autonomicznego Zespołu Wieloagentowego:**
+  Rozwiązywanie wszelkich błędów zgłoszonych przez Operatora odbywa się wyłącznie przez autonomiczny zespół wieloagentowy (Autonomous AVT Team) z podwójną kontradyktoryjną bramką jakości (Reviewers & Challengers) oraz niezależnym audytem kryminalistycznym (wymóg uzyskania werdyktu VICTORY CONFIRMED przed raportem końcowym).
 - **Format pracy zespołu:** Hierarchiczny Protokół Czteroagentowy (Standard 3.0):
   * **OPERATOR (Człowiek):** Wyłączny właściciel praw zapisu I/O (autoryzacja komendą: `ZATWIERDZAM DOSSIER - WDROŻYĆ DO KODU`).
   * **AGENT 4:** Autonomous Operational Supervisor (Anti-Loop Watchdog, Triage, Dossier dla Operatora, weto Zero-Cosmetic: `STATUS: ODRZUCONO WEWNĘTRZNIE - WYKRYTO PUDROWANIE SYMPTOMÓW ZAMIAST NAPRAWY KODU SILNIKA`).
@@ -71,6 +73,21 @@ Zasady normatywne i aksjomaty inżynierskie definiuje wyłącznie `AGENTS.md` (S
   4. *Warstwa 4 (`avt_linter.py`):* EpisodeQualityGate zasilany nieskażonym rejestrem postaci z priorytetem zweryfikowanej płci P0.
   5. *Warstwa 5 (`test_system.py`):* Test 156 (`test_hyouken_s2_root_cause_anilist_fallback_and_addressee_guard`), stan testów: 156/156 PASSED (100.0%).
 
+### 🔹 INC-AVT-004 (*Tensei Kizoku, Kantei Skill de Nariagaru 3rd Season*)
+- **Defekty:**
+  1. Toponim Seitz: błędna odmiana "ci z Seitzem" zamiast "ci z Seitz" w obecności znaków nowego wiersza `\N` łamiących dopasowania regexowe `\b`.
+  2. Liczba mnoga audytorium: "Mam do ciebie pytanie!" do wrogich żołnierzy zamiast "Mam do was pytanie!" przy wykrytym audytorium mnogim.
+  3. Męska postać w retrospekcji: Verzud Captain do Young Brahama "Nie bądź naiwna" zamiast "Nie bądź naiwny" (błędna atrybucja żeńska młodocianego chłopca).
+  4. Harmonizacja par ról z zaimkiem dzierżawczym: "Jesteś moją najlepszą uczennicą" do męskiego Brahama zamiast "Jesteś moim najlepszym uczniem".
+  5. Skażenie audio seiyū: syn Zahta (*Zaht's Kid*) oznaczony jako kobieta przez wysoki tembr dorosłej aktorki seiyū ("Wiem, ale wolałabym...").
+  6. Wołacz męski a forma czasownika: "Tylko ty byłaś w stanie, Rietzie" do mężczyzny Rietza zamiast "byłeś w stanie".
+- **Wdrożenie 5 Warstw:**
+  1. *Warstwa 1 (`translator.py` & `series_memory.py`):* Blokada atrybucji `FEMALE` dla ról dziecięcych męskich (`is_boy_or_male_role`) na podstawie wysokiego tembru audio seiyū ($F_0 \ge 195\text{ Hz}$) oraz kontrakt `speaker_grammatical_gender`.
+  2. *Warstwa 2 (`series_memory.py` & JSON):* Uniwersalna ochrona toponimów `(?:^|\\[Nnh]|[^\w])` odporna na znaczniki `\N`, katalog `KNOWN_FANTASY_TOPONYMS`, blokada wstrzykiwania toponimów do słownika postaci w `update_from_episode_profile()`, rekurencyjne dziedziczenie płci dla prefiksów wieku (`Young`, `Kid`, `Little`, `Baby`, `Child`, `Młody`, `Mały`), sanacja `Tensei_Kizoku_Kantei_Skill_de_Nariagaru_bible.json`.
+  3. *Warstwa 3 (`whisper_disambiguator.py` & Prompty):* Rozszerzenie japońskich markerów mnogich (`anta-tachi`, `temee-ra`, `kimi-tachi`) i angielskich wołaczy zbiorowych (`you guys`, `soldiers`, `troops`, `men`) z wymuszeniem `addressee_is_group = True`.
+  4. *Warstwa 4 (`avt_linter.py`):* `harmonize_2nd_person_singular_to_plural_pronouns()` z odpornością na znaki podziału linii `\N`, rozszerzenie `PLURAL_2ND_PERSON_VERB_PAT` o końcówki spółgłoskowe trybu rozkazującego (`-czcie`, `-ńcie`, `-żcie`, `-rzcie`, `-dźcie`, `-ście`, `-źcie`), strażnik składniowy miejscownika dla `powiecie`, obsługa negacji trybu rozkazującego `nie bądź` + przymiotnik, kaskadowe rozszerzenie orzeczników o zaimki dzierżawcze (`swoim`/`swoją`, `waszym`/`waszą`), deterministyczna tarcza wołacza męskiego `decl["W"]` zakotwiczona interpunkcją.
+  5. *Warstwa 5 (`test_system.py`):* Test 157 (`test_tensei_kizoku_s3_root_cause_vocative_and_audience_guard`), 157/157 PASSED (100.0%).
+
 ---
 
 ## 📐 4. METRYKI OPERACYJNE POTOKU I ARCHITEKTURA ANTY-GOODHART
@@ -100,3 +117,7 @@ Zasady normatywne i aksjomaty inżynierskie definiuje wyłącznie `AGENTS.md` (S
 | **2026-10-11** | `ARB-005` | Architektura / Jakość | **Zero-Cosmetic Protocol (Standard 3.0)**: Kategoryczny zakaz uznawania za rozwiązanie poprawek w JSON/linterze/ASS bez naprawy silnika Pythona. Weto Agenta 4. | 0.00 PLN |
 | **2026-10-11** | `ARB-006` | Metadane / API | **AniList Season Fallback**: Automatyczne usuwanie sufiksów sezonowych (`S2`, `Season 2` etc.) w przypadku błędu 404 zapytania bazowego, gwarantujące pobranie kanonicznej obsady. | 0.00 PLN |
 | **2026-10-11** | `ARB-007` | Pamięć Serii / Relacje | **Strict Addressee Slot Separation & P0 Gender Priority**: Tagi `[... (Adresat)]` i cechy 2. os. lp. aplikowane wyłącznie do odbiorcy (idx=1), zakaz modyfikacji cech podmiotu mówcy (idx=0). Zweryfikowana płeć AniList ma priorytet P0 nad heurystykami. | 0.00 PLN |
+| **2026-10-12** | `ARB-008` | Onomastyka / Toponimy | **Toponym Origin & ASS `\N` Isolation**: Zastąpienie `\b` uniwersalnym separatorem granic `(^|\\[Nnh]|[^\w])` chroniącym przed łamaniem dopasowań przez twardy enter ASS `\N`. Dodanie `KNOWN_FANTASY_TOPONYMS` i ochrona relacji pochodzenia. | 0.00 PLN |
+| **2026-10-12** | `ARB-009` | Składnia / Liczba Mnoga | **Plural Addressee Guard & Consonant Imperatives**: Wykrywanie audytorium mnogiego w WDD i linterze z obsługą spółgłoskowych tematów rozkazujących (`-czcie`, `-ńcie`, `-żcie` itd.) oraz strażnikiem homonimicznym `powiecie` (rzeczownik w miejscowniku vs czasownik). | 0.00 PLN |
+| **2026-10-12** | `ARB-010` | Płeć / Seiyū Audio | **Age-Variant Gender Inheritance & Seiyū Boy Role Guard**: Rekurencyjne dziedziczenie płci z imienia bazowego dla prefiksów wieku (`Young`, `Kid`) oraz twardy bezpiecznik blokujący nadpisywanie płci postaci chłopięcych przez akustyczny pitch dorosłych aktorek seiyū. | 0.00 PLN |
+| **2026-10-12** | `ARB-011` | Fleksja / Wołacz | **Masculine Vocative Shield**: Deterministyczna harmonizacja form 2. os. lp. w oparciu o wołacz ze słownika odmian (`decl["W"]`) zakotwiczony interpunkcją (`Rietzie, ... byłaś -> byłeś`), chroniący orzeczenia 3. osoby. | 0.00 PLN |

@@ -128,6 +128,8 @@ class WhisperDisambiguator:
     ]
     PLURAL_MARKERS = [
         "tachi", "たち", "達", "omae-ra", "お前ら", "kisama-ra", "貴様ら",
+        "temee-ra", "てめえら", "テメエら", "anta-tachi", "あんたら", "あんたたち",
+        "kimi-tachi", "君たち", "anata-tachi", "あなたたち", "koitsura", "aitsura", "こいつら", "あいつら",
         "minna", "みんな", "皆", "shokun", "諸君", "zen'in", "全員",
         "mina-sama", "皆様", "domo", "ども", "共"
     ]
@@ -234,7 +236,7 @@ class WhisperDisambiguator:
         prev_pl = prev_pl or prev_clean_pl or kwargs.get("prev_pl", "") or ""
 
         tag = DisambiguationTag(detected_markers=[])
-        if is_sign or not whisper_text:
+        if is_sign or (not whisper_text and not source_en):
             return tag
 
         jp_lower = whisper_text.lower()
@@ -320,8 +322,9 @@ class WhisperDisambiguator:
         has_dual_en = bool(re.search(r"\b(?:both\s+of\s+you|you\s+two|two\s+of\s+you|the\s+two\s+of\s+you)\b", en_lower))
         has_jp_plural = any(re.search(rf"\b{re.escape(m)}\b", jp_lower) or m in jp_lower for m in cls.PLURAL_MARKERS)
         has_collective_vocative = bool(re.search(
-            r"^(?:everyone|everybody|guys|team|class|all of you|ladies and gentlemen|people)[,!\?]|"
-            r"\b(?:attention everyone|listen up,?\s*(?:everyone|guys|team|all of you)?)\b|"
+            r"^(?:everyone|everybody|guys|team|class|all of you|ladies and gentlemen|people|soldiers|warriors|troops|men|you guys|you all)[,!\?]|"
+            r"\b(?:you\s+guys|you\s+all)\b|"
+            r"\b(?:attention everyone|listen up,?\s*(?:everyone|guys|team|all of you|soldiers|men)?)\b|"
             r"\b(?:to all of you|for all of you)\b",
             en_lower
         ))

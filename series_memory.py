@@ -588,6 +588,19 @@ def resolve_actor_gender(name: str, character_registry: Optional[Dict[str, Any]]
     if is_plural_actor(clean):
         return "PLURAL"
 
+    # 0b. Age prefix inheritance & kinship suffixes in resolve_actor_gender
+    age_prefix_match = re.match(r"^(?:young|kid|little|baby|child|teen|old|młody|młoda|mały|mała)\s+(.+)$", clean_lower, re.IGNORECASE)
+    if age_prefix_match:
+        base_char_name = age_prefix_match.group(1).strip()
+        bg = resolve_actor_gender(base_char_name, character_registry=character_registry, series_bible=series_bible)
+        if bg in ("MALE", "FEMALE"):
+            return bg
+
+    if re.search(r"(?:'s\s+|\b)(?:bro|brother|son|boy|brat|syn|chłopak|chłopiec)\b", clean_lower):
+        return "MALE"
+    if re.search(r"(?:'s\s+|\b)(?:daughter|sis|sister|córka|siostra|dziewczyna|dziewczynka)\b", clean_lower):
+        return "FEMALE"
+
     # 1. Direct character registry lookup if provided
     if character_registry and clean in character_registry:
         c_val = character_registry[clean]
@@ -2348,13 +2361,28 @@ def sanitize_toponymic_pleonasms_and_stuttering(text: str) -> str:
     return res
 
 
+KNOWN_FANTASY_TOPONYMS = {
+    "hiden", "haiden", "boelate", "boelat", "boelatu", "boirate", "eslinn", "esrin", "solsein", "solcein",
+    "elbe", "erbe", "hyderat", "haiderat", "heiderat", "esleburg", "esreburg", "edsea", "edthea",
+    "kanyou", "kantan", "xianyang", "handan", "chouhei", "sanyou", "tonryuu", "sai", "zui",
+    "kamakura", "suwa", "kyoto", "shinano", "musashi", "hiei", "hieizan", "shimotsuke",
+    "ridill", "minerva", "felm", "carnelian",
+    "samarkand", "karakorum", "bukhara", "nishapur", "baghdad", "tabriz", "herat",
+    "yamato", "owari", "mikawa", "echigo", "kai",
+    "otaru", "sapporo", "asahikawa", "abashiri", "karafuto", "nemuro", "yubari",
+    "melini",
+    # Tensei Kizoku toponyms
+    "seitz", "canarre", "lamberg", "missian", "coumeire", "torbequista", "summerforth"
+}
+
+
 def sanitize_toponymic_origin_and_companionship(text: str, custom_glossary: Optional[Dict[str, str]] = None) -> str:
     """
     Sanitizes toponymic origin vs animate companionship errors (Filar CLXXXIV / 0.00 PLN).
     When a toponym (realm, city, location) qualifies an artifact, object, or person of origin
-    ('from Hiden', 'Haiden's Book of Toah', 'knight from Boelate'), Polish preposition 'z'
-    strictly governs Genitive (Dopełniacz pochodzenia: 'z Hiden', 'z Boelate', 'z Eslinn', 'z Kanyou', 'z Ridill'),
-    NEVER Instrumental (Narzędnik towarzyszenia: '*z Hidenem', '*z Haidenem', '*z Kanyouem').
+    ('from Hiden', 'Haiden's Book of Toah', 'knight from Boelate', 'ci z Seitz'), Polish preposition 'z'
+    strictly governs Genitive (Dopełniacz pochodzenia: 'z Hiden', 'z Boelate', 'z Eslinn', 'z Kanyou', 'z Ridill', 'z Seitz', 'z Canarre', 'z Lamberg'),
+    NEVER Instrumental (Narzędnik towarzyszenia: '*z Hidenem', '*z Haidenem', '*z Kanyouem', '*z Seitzem', '*z Canarrem', '*z Lambergem').
     Also handles compound artifact title syntagmas ('Księga Toaha z Hiden'), prevents modifier hyper-inflection
     ('*z Księgą Toahem' -> 'z Księgą Toaha'), resolves nominative freezing ('z Księga Toaha' -> 'z Księgą Toaha'),
     and normalizes phonetic/fansub transliteration variants (Haiden -> Hiden) in toponymic contexts,
@@ -2365,22 +2393,64 @@ def sanitize_toponymic_origin_and_companionship(text: str, custom_glossary: Opti
     res = text
 
     # 1. False Instrumental of origin for realms/toponyms ending in consonants across all series
+    # Helper to fix preposition (z/ze) before toponyms with support for ASS line breaks (\N, \n, \h) and inline tags
+    def _fix_toponym_companionship(src: str, inflected_names: str, target: str) -> str:
+        pat = rf"(^|\\[Nnh]|[^\w])([Zz])(?:e)?((?:\s|\\[Nnh]|\{{[^}}]+\}})+)(?:{inflected_names})\b"
+        return re.sub(pat, rf"\g<1>\g<2>\g<3>{target}", src)
+
     # Clevatess realms
-    res = re.sub(r"\b([Zz]\s+)(?:Haidenem|Hidenem)\b", r"\g<1>Hiden", res)
-    res = re.sub(r"\b([Zz]\s+)(?:Boiratem|Boelatem)\b", r"\g<1>Boelate", res)
-    res = re.sub(r"\b([Zz]\s+)(?:Esrinem|Eslinnem)\b", r"\g<1>Eslinn", res)
-    res = re.sub(r"\b([Zz]\s+)(?:Solseinem|Solceynem)\b", r"\g<1>Solsein", res)
-    res = re.sub(r"\b([Zz]\s+)(?:Haideratem|Heideratem)\b", r"\g<1>Hyderatu", res)
+    res = _fix_toponym_companionship(res, "Haidenem|Hidenem", "Hiden")
+    res = _fix_toponym_companionship(res, "Boiratem|Boelatem", "Boelate")
+    res = _fix_toponym_companionship(res, "Esrinem|Eslinnem", "Eslinn")
+    res = _fix_toponym_companionship(res, "Solseinem|Solceynem", "Solsein")
+    res = _fix_toponym_companionship(res, "Haideratem|Heideratem", "Hyderatu")
     # Kingdom realms/cities
-    res = re.sub(r"\b([Zz]\s+)(?:Kanyouem|Kanyōem)\b", r"\g<1>Kanyou", res)
-    res = re.sub(r"\b([Zz]\s+)Kantanem\b", r"\g<1>Kantan", res)
+    res = _fix_toponym_companionship(res, "Kanyouem|Kanyōem", "Kanyou")
+    res = _fix_toponym_companionship(res, "Kantanem", "Kantan")
     # Silent Witch realms/cities
-    res = re.sub(r"\b([Zz]\s+)Ridillem\b", r"\g<1>Ridill", res)
+    res = _fix_toponym_companionship(res, "Ridillem", "Ridill")
+    # Tensei Kizoku realms/cities
+    res = _fix_toponym_companionship(res, "Seitzem", "Seitz")
+    res = _fix_toponym_companionship(res, "Canarrem", "Canarre")
+    res = _fix_toponym_companionship(res, "Lambergem", "Lamberg")
+    res = _fix_toponym_companionship(res, "Missianem", "Missian")
+    res = _fix_toponym_companionship(res, "Coumeirem", "Coumeire")
+    res = _fix_toponym_companionship(res, "Torbequistem", "Torbequista")
+    res = _fix_toponym_companionship(res, "Summerforthem", "Summerforth")
 
     # 1b. False Instrumental of origin for feminine-like toponyms ending in -a in origin/displacement contexts
-    res = re.sub(r"\b(pochodzi[a-ząćęłńóśźż]*|zbieg[a-ząćęłńóśźż]*|wieści|wieść|posłaniec|ucieczka|uciekł[a-ząćęłńóśźż]*|rycerz[a-ząćęłńóśźż]*|chłopak[a-ząćęłńóśźż]*|dziewczyn[a-ząćęłńóśźż]*)\s+([Zz]\s+)Kamakurą\b", r"\g<1> \g<2>Kamakury", res, flags=re.IGNORECASE)
-    res = re.sub(r"\b(pochodzi[a-ząćęłńóśźż]*|zbieg[a-ząćęłńóśźż]*|wieści|wieść|posłaniec|ucieczka|uciekł[a-ząćęłńóśźż]*|rycerz[a-ząćęłńóśźż]*|chłopak[a-ząćęłńóśźż]*|dziewczyn[a-ząćęłńóśźż]*)\s+([Zz]\s+)Suwą\b", r"\g<1> \g<2>Suwy", res, flags=re.IGNORECASE)
-    res = re.sub(r"\b(pochodzi[a-ząćęłńóśźż]*|uczeń|uczennica|uczniowie|akademia)\s+([Zz]\s+)Minervą\b", r"\g<1> \g<2>Minervy", res, flags=re.IGNORECASE)
+    res = re.sub(r"(^|\\[Nnh]|[^\w])(pochodzi[a-ząćęłńóśźż]*|zbieg[a-ząćęłńóśźż]*|wieści|wieść|posłaniec|ucieczka|uciekł[a-ząćęłńóśźż]*|rycerz[a-ząćęłńóśźż]*|chłopak[a-ząćęłńóśźż]*|dziewczyn[a-ząćęłńóśźż]*)((?:\s|\\[Nnh])+)([Zz])(?:e)?((?:\s|\\[Nnh])+)Kamakurą\b", r"\g<1>\g<2>\g<3>\g<4>\g<5>Kamakury", res, flags=re.IGNORECASE)
+    res = re.sub(r"(^|\\[Nnh]|[^\w])(pochodzi[a-ząćęłńóśźż]*|zbieg[a-ząćęłńóśźż]*|wieści|wieść|posłaniec|ucieczka|uciekł[a-ząćęłńóśźż]*|rycerz[a-ząćęłńóśźż]*|chłopak[a-ząćęłńóśźż]*|dziewczyn[a-ząćęłńóśźż]*)((?:\s|\\[Nnh])+)([Zz])(?:e)?((?:\s|\\[Nnh])+)Suwą\b", r"\g<1>\g<2>\g<3>\g<4>\g<5>Suwy", res, flags=re.IGNORECASE)
+    res = re.sub(r"(^|\\[Nnh]|[^\w])(pochodzi[a-ząćęłńóśźż]*|uczeń|uczennica|uczniowie|akademia)((?:\s|\\[Nnh])+)([Zz])(?:e)?((?:\s|\\[Nnh])+)Minervą\b", r"\g<1>\g<2>\g<3>\g<4>\g<5>Minervy", res, flags=re.IGNORECASE)
+
+    # 1c. False Instrumental of origin for realms preceded by origin / collective demonstratives ("ci z Seitz")
+    DEMONSTRATIVE_ORIGIN_NOUNS = r"(ci|tamci|oni|ten|ta|to|ludzie|żołnierze|wojska|oddział|oddziały|armia|wojownicy|posłaniec|uciekinierzy|zbieg|pochodzi[a-ząćęłńóśźż]*|przybył[a-ząćęłńóśźż]*|wrócił[a-ząćęłńóśźż]*)"
+    SEP = r"((?:\s|\\[Nnh]|\{{[^}}]+\}})+)"
+    res = re.sub(rf"(^|\\[Nnh]|[^\w]){DEMONSTRATIVE_ORIGIN_NOUNS}{SEP}(?:[Zz]e|[Zz]){SEP}(?:Seitzem|Seitzu|Seitz)\b", r"\g<1>\g<2>\g<3>z\g<4>Seitz", res, flags=re.IGNORECASE)
+    res = re.sub(rf"(^|\\[Nnh]|[^\w]){DEMONSTRATIVE_ORIGIN_NOUNS}{SEP}(?:[Zz]e|[Zz]){SEP}(?:Canarrem|Canarre)\b", r"\g<1>\g<2>\g<3>z\g<4>Canarre", res, flags=re.IGNORECASE)
+    res = re.sub(rf"(^|\\[Nnh]|[^\w]){DEMONSTRATIVE_ORIGIN_NOUNS}{SEP}(?:[Zz]e|[Zz]){SEP}(?:Lambergem|Lambergu|Lamberg)\b", r"\g<1>\g<2>\g<3>z\g<4>Lamberg", res, flags=re.IGNORECASE)
+
+    # Dynamic integration of custom_glossary and fantasy toponyms
+    if custom_glossary and isinstance(custom_glossary, dict):
+        TOPONYM_KEYWORDS = {"kraina", "prowincja", "domena", "królestwo", "cesarstwo", "miasto", "zamek", "okręg", "district", "province", "domain", "kingdom", "empire", "realm", "toponim", "miejsce", "twierdza"}
+        for k, v in custom_glossary.items():
+            k_clean = str(k).strip()
+            v_clean = str(v).strip()
+            k_lower = k_clean.lower()
+            v_lower = v_clean.lower()
+            is_toponym = (
+                k_lower in KNOWN_FANTASY_TOPONYMS or
+                v_lower in KNOWN_FANTASY_TOPONYMS or
+                any(kw in v_lower for kw in TOPONYM_KEYWORDS) or
+                any(kw in k_lower for kw in TOPONYM_KEYWORDS)
+            )
+            if is_toponym and len(v_clean) >= 3 and v_clean[0].isupper():
+                cand_target = v_clean
+                if cand_target.endswith("e"):
+                    stem = cand_target[:-1]
+                    res = _fix_toponym_companionship(res, f"{re.escape(cand_target)}m|{re.escape(stem)}em", cand_target)
+                else:
+                    res = _fix_toponym_companionship(res, f"{re.escape(cand_target)}em", cand_target)
 
     # 2. Canonical toponym transliteration normalization after prepositions (z, do, w, o) or in realm names
     res = re.sub(r"\b([ZzWwOo]|do|dla|ku|przez|od)\s+Haiden\b", r"\g<1> Hiden", res)
@@ -2427,8 +2497,8 @@ def sanitize_closed_idioms_and_prepositions(text: str) -> str:
         # PWN Preposition phonetic alternations: 'ze' before s/z/sz/ż/ś/ź + consonant, 'we' before w/f + consonant
         (r"\b([Zz])\s+(stali|złota|żelaza|szkła|srebra|strachu|szmaragdu|złości|zazdrości|związku|Szwecji|Szwajcarii)\b",
          lambda m: ("Ze " if m.group(1).isupper() else "ze ") + m.group(2)),
-        (r"\b([Zz])e\s+(Hiden|Boelate|Eslinn|Solsein|Kanyou|Kantan|Ridill|Paryża|Londynu)\b",
-         lambda m: ("Z " if m.group(1).isupper() else "z ") + m.group(2)),
+        (r"(^|\\[Nnh]|[^\w])([Zz])e((?:\s|\\[Nnh])+)(Hiden|Boelate|Eslinn|Solsein|Kanyou|Kantan|Ridill|Seitz|Canarre|Lamberg|Paryża|Londynu)\b",
+         lambda m: m.group(1) + ("Z" if m.group(2).isupper() else "z") + m.group(3) + m.group(4)),
         (r"\b([Ww])\s+(Francji|Florencji|Flandrii|Włoszech|wrześniu|wtorku|wpół)\b",
          lambda m: ("We " if m.group(1).isupper() else "we ") + m.group(2)),
         # Closed invariant register idioms
@@ -2740,6 +2810,7 @@ class SeriesBible:
                 or any(t in d_lower for t in MALE_TITLES)
                 or (char_name.lower() in CANONICAL_MALE_NAMES)
                 or any(t in CANONICAL_MALE_NAMES for t in c_tokens)
+                or bool(re.search(r"(?:'s\s+|\b)(?:kid|son|boy|bro|brother|brat|syn|chłopak|chłopiec|captain|kapitan)\b|^young\s+", char_name.lower()))
             ) and not is_female_cand
 
             if is_confirmed_male:
@@ -2971,6 +3042,20 @@ class SeriesBible:
         if re.match(r"^(?:boy|chłopiec|chłopak|man|mężczyzna)\s+[a-z0-9]+$", n_l):
             return "MALE"
         if re.match(r"^(?:girl|dziewczynka|dziewczyna|woman|kobieta)\s+[a-z0-9]+$", n_l):
+            return "FEMALE"
+
+        # Pass 0a: Age prefix inheritance (Young Braham -> Braham, Kid X -> X, etc.)
+        age_prefix_match = re.match(r"^(?:young|kid|little|baby|child|teen|old|młody|młoda|mały|mała)\s+(.+)$", n_l, re.IGNORECASE)
+        if age_prefix_match:
+            base_char_name = age_prefix_match.group(1).strip()
+            base_gender = self.get_character_gender(base_char_name, allow_generic_nouns=allow_generic_nouns)
+            if base_gender in ("MALE", "FEMALE"):
+                return base_gender
+
+        # Pass 0b: Kinship / brother / son / daughter suffixes ('s Bro -> MALE, 's Son -> MALE, etc.)
+        if re.search(r"(?:'s\s+|\b)(?:bro|brother|son|boy|brat|syn|chłopak|chłopiec)\b", n_l):
+            return "MALE"
+        if re.search(r"(?:'s\s+|\b)(?:daughter|sis|sister|córka|siostra|dziewczyna|dziewczynka)\b", n_l):
             return "FEMALE"
 
         if self.is_non_character_entity(name) or n_l in ETHNONYMS_AND_COLLECTIVES:
@@ -3557,6 +3642,15 @@ class SeriesBible:
                 # Symmetrical lock: cannot overwrite inferred gender with opposite audio gender
                 return False
 
+            if gender == "FEMALE":
+                clean_name_l = clean_name.lower()
+                is_boy_or_male_role = (
+                    any(k in clean_name_l for k in ["kid", "son", "boy", "young", "bro", "brother", "chłopiec", "chłopak", "syn", "brat", "captain", "kapitan"]) or
+                    self.get_character_gender(clean_name, allow_generic_nouns=False) == "MALE"
+                )
+                if is_boy_or_male_role:
+                    return False
+
             desc = f"{'MĘŻCZYZNA' if gender == 'MALE' else 'KOBIETA'} (zweryfikowano z audio seiyū Whisper)"
             if clean_name not in self.data["characters"]:
                 self.data["characters"][clean_name] = {"description": desc}
@@ -3680,17 +3774,6 @@ class SeriesBible:
         }
         if n_l in REALM_INSTITUTION_NOUNS:
             return True
-        KNOWN_FANTASY_TOPONYMS = {
-            "hiden", "haiden", "boelate", "boelat", "boelatu", "boirate", "eslinn", "esrin", "solsein", "solcein",
-            "elbe", "erbe", "hyderat", "haiderat", "heiderat", "esleburg", "esreburg", "edsea", "edthea",
-            "kanyou", "kantan", "xianyang", "handan", "chouhei", "sanyou", "tonryuu", "sai", "zui",
-            "kamakura", "suwa", "kyoto", "shinano", "musashi", "hiei", "hieizan", "shimotsuke",
-            "ridill", "minerva", "felm", "carnelian",
-            "samarkand", "karakorum", "bukhara", "nishapur", "baghdad", "tabriz", "herat",
-            "yamato", "owari", "mikawa", "echigo", "kai",
-            "otaru", "sapporo", "asahikawa", "abashiri", "karafuto", "nemuro", "yubari",
-            "melini"
-        }
         if n_l in KNOWN_FANTASY_TOPONYMS:
             return True
         for section in ["organizations", "factions", "realms", "locations", "places", "cities", "countries", "historical_context", "relics", "artifacts", "weapons"]:
@@ -4165,7 +4248,7 @@ class SeriesBible:
                             if len(clean_v) >= 3 and not any(ch in clean_v for ch in "{}[]():;"):
                                 if "declensions" not in self.data:
                                     self.data["declensions"] = {}
-                                if clean_v not in self.data["declensions"] and clean_v[0].isupper():
+                                if clean_v not in self.data["declensions"] and clean_v[0].isupper() and not self.is_non_character_entity(clean_v):
                                     self.data["declensions"][clean_v] = generate_polish_name_declension(clean_v, "UNKNOWN")
 
             if plot_anchors:
@@ -4188,7 +4271,7 @@ class SeriesBible:
                         for part in re.split(r"->|/|,", rel_k):
                             part_clean = part.strip()
                             if len(part_clean) >= 3 and not any(ch in part_clean for ch in "{}[]():;"):
-                                if part_clean not in self.data["declensions"]:
+                                if part_clean not in self.data["declensions"] and not self.is_non_character_entity(part_clean):
                                     self.data["declensions"][part_clean] = generate_polish_name_declension(part_clean, "UNKNOWN")
 
             self.save()

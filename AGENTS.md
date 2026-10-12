@@ -204,3 +204,13 @@ Każde Dossier przedkładane Operatorowi przez Agenta 4 musi bezwzględnie zawie
 4. **Leczenie u Źródła w Kontraktach Danych:** Blokada błędów tożsamości i płci w Pydantic i SeriesBible, zakaz puchnięcia lintera.
 5. **Kategoryczny Zakaz Skracania Potoku (Zero Premature Synthesis Mandate):** Agent 4 ma absolutny zakaz przeskakiwania z Fazy 1 bezpośrednio do Fazy 5. Faza 2 (Czerwony Test Agenta 3) oraz Faza 3–4 (Prototyp w RAM Agenta 1 + Audyt ASS-Fuzzing Agenta 2) MUSZĄ zostać fizycznie uruchomione w środowisku scratch/RAM i udokumentowane w odpowiedzi twardymi logami wykonania przed przedłożeniem Dossier Operatorowi.
 6. **Zero-Cosmetic Gate (Weto Agenta 4):** Bezwzględne weto `STATUS: ODRZUCONO WEWNĘTRZNIE - WYKRYTO PUDROWANIE SYMPTOMÓW ZAMIAST NAPRAWY KODU SILNIKA` przy braku fizycznego diffu w kodzie silnika Pythona. Zakaz pudrowania problemów przez doraźną modyfikację `*_bible.json`, lintera lub pliku `.ass`.
+
+### 🛡️ Żelazna Reguła Obsługi Zgłoszeń Operatora (Autonomous Multi-Agent Mandate)
+Każde zgłoszenie defektu lub błędu przez Operatora MUSI być bezwzględnie procesowane przez autonomiczny zespół wieloagentowy (Autonomous AVT Team) w pełnym rygorze Standardu 3.0:
+1. **Równoległa Eksploracja i Implementacja u Źródła:** Mapowanie przyczyn źródłowych (RCA) na 5 warstwach potoku oraz fizyczna naprawa logiki w kodzie Pythona silnika (Zero-Cosmetic Mandate).
+2. **Podwójna Kontradyktoryjna Bramka Jakości (Dual Adversarial Quality Gate):**
+   - Minimum 2 Reviewerów (weryfikacja 18 wymiarów AVT i nienaruszalności aksjomatów).
+   - Minimum 2 Challengerów (agresywny stress-testing, ASS-fuzzing, walidacja przełamań `\N` i dialogu).
+3. **Niezależny Audyt Kryminalistyczny (Forensic Victory Audit):**
+   - Żadne zadanie nie może zostać uznane za ukończone ani przedstawione Operatorowi jako sukces bez niezależnego audytu kryminalistycznego i formalnego werdyktu **VICTORY CONFIRMED**.
+   - W przypadku werdyktu `VICTORY REJECTED` lub `REQUEST_CHANGES` zespół automatycznie wchodzi w kolejną iterację naprawczą.

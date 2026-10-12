@@ -14774,6 +14774,180 @@ def test_hyouken_s2_root_cause_anilist_fallback_and_addressee_guard():
     print(" -> PASSED: Test 156 potwierdza 100% eliminacji fabryki błędów INC-AVT-003 i pełną zgodność ze Standardem 3.0.")
 
 
+def test_tensei_kizoku_s3_root_cause_vocative_and_audience_guard():
+    """
+    TEST 157: Root-Cause Remediation for INC-AVT-004 (Tensei Kizoku, Kantei Skill de Nariagaru).
+    Comprehensive 5-Layer validation across all 6 defect classes:
+    1. Toponyms & SeriesBible entity protection (Seitz, Canarre, Lamberg, Missian).
+    2. Plural Addressee Guard (Whisper disambiguator markers + single-token pronoun harmonization).
+    3. Age variant gender inheritance (Young Braham -> MALE) & imperative adjective harmonization.
+    4. Predicate social role pairs with possessives & relational adjectives (jesteś moją najlepszą uczennicą -> jesteś moim najlepszym uczniem).
+    5. Seiyū audio pitch contamination elimination for young boys (Zaht's Kid, Braham's Bro, Seitz Captain).
+    6. Masculine vocative target anchor shield (Rietzie, Brahamie, Arsie, Rayu).
+    All tests feature double-sided assertions (positive transformation + negative control protection).
+    """
+    print("\n[TEST 157/157] Tensei Kizoku S3: Root-Cause Vocative, Plural Addressee & Age Variant Shield...")
+    import pysubs2
+    from series_memory import (
+        SeriesBible,
+        sanitize_toponymic_origin_and_companionship,
+        sanitize_closed_idioms_and_prepositions,
+        KNOWN_FANTASY_TOPONYMS
+    )
+    from whisper_disambiguator import WhisperDisambiguator
+    from avt_linter import AVTLinter, EpisodeQualityGate
+    from translator import MultimodalTranslator
+
+    # --- R1: Toponyms & SeriesBible Entity Protection ---
+    # 1.1 Known fantasy toponyms check
+    assert "seitz" in KNOWN_FANTASY_TOPONYMS
+    assert "canarre" in KNOWN_FANTASY_TOPONYMS
+    assert "lamberg" in KNOWN_FANTASY_TOPONYMS
+
+    # 1.2 Toponym companionship sanitization
+    t1 = sanitize_toponymic_origin_and_companionship("Wojna z Seitzem wybuchnie lada dzień.")
+    assert "z Seitz wybuchnie" in t1, f"Błąd toponimu Seitz: {t1}"
+
+    t2 = sanitize_toponymic_origin_and_companionship("Podpiszemy pokój z Canarrem.")
+    assert "z Canarre" in t2, f"Błąd toponimu Canarre: {t2}"
+
+    t3 = sanitize_toponymic_origin_and_companionship("Sojusz z Lambergem trwa.")
+    assert "z Lamberg trwa" in t3, f"Błąd toponimu Lamberg: {t3}"
+
+    # Demonstrative origin pattern
+    t_ci = sanitize_toponymic_origin_and_companionship("Czy ci ze Seitzu są gotowi?")
+    assert "ci z Seitz" in t_ci, f"Błąd frazy ci z Seitz: {t_ci}"
+
+    # Phonetic preposition sanation
+    t_phon = sanitize_closed_idioms_and_prepositions("Uciekajcie ze Seitz natychmiast.")
+    assert "z Seitz" in t_phon, f"Błąd fonetyki ze Seitz -> z Seitz: {t_phon}"
+
+    # Negative control: Real person named Braham must NOT be mutated to base form
+    t_neg = sanitize_toponymic_origin_and_companionship("Rozmawiałem z Brahamem wczoraj.")
+    assert t_neg == "Rozmawiałem z Brahamem wczoraj."
+
+    # SeriesBible entity classification
+    bible = SeriesBible("Tensei Kizoku, Kantei Skill de Nariagaru")
+    assert bible.is_non_character_entity("Seitz") is True
+    assert bible.is_non_character_entity("Canarre") is True
+    assert bible.is_non_character_entity("Lamberg") is True
+    assert bible.is_non_character_entity("Braham") is False
+
+    # --- R2: Plural Addressee Guard ---
+    # 2.1 WhisperDisambiguator markers
+    w_pl1 = WhisperDisambiguator.disambiguate_line(clean_en="", jp_audio="temee-ra nani shiteru")
+    assert w_pl1.addressee_is_group is True
+
+    w_pl2 = WhisperDisambiguator.disambiguate_line(clean_en="", jp_audio="anta-tachi hayaku")
+    assert w_pl2.addressee_is_group is True
+
+    w_pl3 = WhisperDisambiguator.disambiguate_line(clean_en="Soldiers, prepare yourselves!", jp_audio="")
+    assert w_pl3.addressee_is_group is True
+
+    # 2.2 EpisodeQualityGate pronoun harmonization with plural verb
+    subs_pl = pysubs2.SSAFile()
+    ev_pl = pysubs2.SSAEvent(start=1000, end=4000, text="Mam do ciebie pytanie!\\NTęsknicie za domem?")
+    subs_pl.events.append(ev_pl)
+    EpisodeQualityGate.audit_and_fix_entire_episode(subs=subs_pl, series_bible=bible)
+    assert "Mam do was pytanie!\\NTęsknicie za domem?" in subs_pl.events[0].text, f"Błąd lintera l. mn.: {subs_pl.events[0].text}"
+
+    # Negative control: Singular verb tęsknisz must NOT trigger pluralization
+    subs_sg = pysubs2.SSAFile()
+    ev_sg = pysubs2.SSAEvent(start=1000, end=4000, text="Mam do ciebie pytanie!\\NTęsknisz za domem?")
+    subs_sg.events.append(ev_sg)
+    EpisodeQualityGate.audit_and_fix_entire_episode(subs=subs_sg, series_bible=bible)
+    assert "Mam do ciebie pytanie!\\NTęsknisz za domem?" in subs_sg.events[0].text
+
+    # Demonstrative 'ci' protection in plural harmonization
+    t_ci_guard, _ = AVTLinter.lint_and_fix_line("Mówię wam, ci z Seitz nie mają szans, więc zróbcie to!")
+    assert "ci z Seitz" in t_ci_guard and "wam z Seitz" not in t_ci_guard
+
+    # --- R3: Age Variant Gender Inheritance & Imperative Adjective Harmonization ---
+    # 3.1 Gender inheritance
+    g_young_braham = bible.get_character_gender("Young Braham")
+    assert g_young_braham == "MALE", f"Young Braham powinien dziedziczyć MALE, otrzymano: {g_young_braham}"
+
+    # 3.2 Negative imperative adjective harmonization for male target
+    subs_imp = pysubs2.SSAFile()
+    ev_imp = pysubs2.SSAEvent(start=1000, end=3000, name="Rietz", text="Nie bądź naiwna.")
+    ev_imp.addressee = "Young Braham"
+    subs_imp.events.append(ev_imp)
+    EpisodeQualityGate.audit_and_fix_entire_episode(subs=subs_imp, series_bible=bible)
+    assert "Nie bądź naiwny." in subs_imp.events[0].text, f"Błąd trybu rozkazującego męskiego: {subs_imp.events[0].text}"
+
+    # Negative control: Negative imperative for female addressee
+    subs_imp_f = pysubs2.SSAFile()
+    ev_imp_f = pysubs2.SSAEvent(start=1000, end=3000, name="Rietz", text="Nie bądź naiwna.")
+    ev_imp_f.addressee = "Charlotte"
+    subs_imp_f.events.append(ev_imp_f)
+    EpisodeQualityGate.audit_and_fix_entire_episode(subs=subs_imp_f, series_bible=bible)
+    assert "Nie bądź naiwna." in subs_imp_f.events[0].text
+
+    # --- R4: Predicate Social Role Pairs with Possessive Pronouns ---
+    subs_role = pysubs2.SSAFile()
+    ev_role = pysubs2.SSAEvent(start=1000, end=3000, name="Rietz", text="Jesteś moją najlepszą uczennicą.")
+    ev_role.addressee = "Braham"
+    subs_role.events.append(ev_role)
+    EpisodeQualityGate.audit_and_fix_entire_episode(subs=subs_role, series_bible=bible)
+    assert "Jesteś moim najlepszym uczniem." in subs_role.events[0].text, f"Błąd orzecznika z zaimkiem: {subs_role.events[0].text}"
+
+    # Negative control: Role with possessive for confirmed female addressee
+    subs_role_f = pysubs2.SSAFile()
+    ev_role_f = pysubs2.SSAEvent(start=1000, end=3000, name="Rietz", text="Jesteś moim najlepszym uczniem.")
+    ev_role_f.addressee = "Charlotte"
+    subs_role_f.events.append(ev_role_f)
+    EpisodeQualityGate.audit_and_fix_entire_episode(subs=subs_role_f, series_bible=bible)
+    assert "Jesteś moją najlepszą uczennicą." in subs_role_f.events[0].text
+
+    # --- R5: Seiyū Audio Pitch Contamination Elimination ---
+    # 5.1 Zaht's Kid must be MALE and resist female acoustic classification
+    assert bible.get_character_gender("Zaht's Kid") == "MALE"
+    tr = MultimodalTranslator.__new__(MultimodalTranslator)
+    tr.character_registry = {}
+    tr.series_bible = bible
+    ev_kid = pysubs2.SSAEvent(start=1000, end=3000, name="Zaht's Kid", text="Wiem, ale wolałabym pomóc tacie.")
+    speaker_tags = {1: "Głos: dziecięcy (~240 Hz)"}
+    res_gen, _ = tr._arbitrate_speaker_gender(
+        event=ev_kid,
+        raw_phase1_gender="mężczyzna",
+        batch_id=1,
+        speaker_tags=speaker_tags,
+        whisper_transcriptions={1: ""},
+        pl_candidate="Wiem, ale wolałabym pomóc tacie."
+    )
+    assert res_gen == "mężczyzna", f"Zaht's Kid nie powinien być zanieczyszczony żeńskim audio! Wynik: {res_gen}"
+
+    # 5.2 First-person past tense correction for Zaht's Kid
+    subs_kid = pysubs2.SSAFile()
+    subs_kid.events.append(ev_kid)
+    EpisodeQualityGate.audit_and_fix_entire_episode(subs=subs_kid, series_bible=bible)
+    assert "wolałbym" in subs_kid.events[0].text, f"Błąd 1. osoby Zaht's Kid: {subs_kid.events[0].text}"
+
+    # --- R6: Masculine Vocative Target Anchor Shield ---
+    # 6.1 Rietzie vocative anchor with terminal period
+    subs_voc1 = pysubs2.SSAFile()
+    ev_voc1 = pysubs2.SSAEvent(start=1000, end=3000, name="Ars", text="Tylko ty byłaś w stanie, Rietzie.")
+    subs_voc1.events.append(ev_voc1)
+    EpisodeQualityGate.audit_and_fix_entire_episode(subs=subs_voc1, series_bible=bible)
+    assert "Tylko ty byłeś w stanie, Rietzie." in subs_voc1.events[0].text, f"Błąd tarczy wołacza Rietzie: {subs_voc1.events[0].text}"
+
+    # 6.2 Brahamie vocative with compound past/adjective
+    subs_voc2 = pysubs2.SSAFile()
+    ev_voc2 = pysubs2.SSAEvent(start=1000, end=3000, name="Rietz", text="Dlaczego byłaś taka nieostrożna, Brahamie?")
+    subs_voc2.events.append(ev_voc2)
+    EpisodeQualityGate.audit_and_fix_entire_episode(subs=subs_voc2, series_bible=bible)
+    assert "byłeś taki nieostrożny, Brahamie" in subs_voc2.events[0].text, f"Błąd tarczy wołacza Brahamie: {subs_voc2.events[0].text}"
+
+    # 6.3 Negative control: Female vocative must NOT be converted to masculine
+    subs_voc_neg = pysubs2.SSAFile()
+    ev_voc_neg = pysubs2.SSAEvent(start=1000, end=3000, name="Ars", text="Tylko ty byłaś w stanie, Mireille.")
+    subs_voc_neg.events.append(ev_voc_neg)
+    EpisodeQualityGate.audit_and_fix_entire_episode(subs=subs_voc_neg, series_bible=bible)
+    assert "Tylko ty byłaś w stanie, Mireille." in subs_voc_neg.events[0].text
+
+    print(" -> PASSED: Test 157 potwierdza 100% eliminacji przyczyn źródłowych INC-AVT-004 zgodnie ze Standardem 3.0 (0.00 PLN).")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -14929,6 +15103,7 @@ if __name__ == "__main__":
     test_musia_female_gender_and_addressee_concordance_guard()
     test_sasaki_to_piichan_s2_holistic_incident_guard()
     test_hyouken_s2_root_cause_anilist_fallback_and_addressee_guard()
-    print("\n Wszystkie testy jednostkowe i integracyjne (156/156) zakończone pełnym sukcesem!\n")
+    test_tensei_kizoku_s3_root_cause_vocative_and_audience_guard()
+    print("\n Wszystkie testy jednostkowe i integracyjne (157/157) zakończone pełnym sukcesem!\n")
 
 

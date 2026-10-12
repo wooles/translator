@@ -1789,12 +1789,29 @@ class MultimodalTranslator:
                 elif inf_g == "MALE":
                     canonical_gender = "mężczyzna"
 
+        # Check if speaker is explicitly a boy or young male character to prevent female pitch contamination
+        is_boy_actor = False
+        if spk_clean:
+            is_boy_actor = bool(re.search(r"\b(kid|son|boy|young|bro|brother|chłopak|chłopiec|syn|brat|młodzieniec)\b", spk_clean, re.IGNORECASE))
+            if not is_boy_actor and spk_clean in self.character_registry:
+                c_desc = str(self.character_registry[spk_clean]).lower()
+                is_boy_actor = any(k in c_desc for k in ["kid", "son", "boy", "young", "bro", "brother", "chłopak", "chłopiec", "syn", "brat", "młodzieniec", "syn zahta"])
+            if not is_boy_actor and hasattr(self, "series_bible") and self.series_bible and hasattr(self.series_bible, "data"):
+                b_info = self.series_bible.data.get("characters", {}).get(spk_clean, {})
+                b_desc = (b_info.get("description", "") if isinstance(b_info, dict) else str(b_info)).lower()
+                is_boy_actor = any(k in b_desc for k in ["kid", "son", "boy", "young", "bro", "brother", "chłopak", "chłopiec", "syn", "brat", "młodzieniec", "syn zahta"])
+
         # 2. Acoustic & Linguistic Ground Truth
         acoustic_gender = None
         if speaker_tags and batch_id in speaker_tags:
             v_tag = speaker_tags[batch_id].lower()
-            if "sopran" in v_tag or "dziecięcy" in v_tag or "wysoki tembr" in v_tag:
-                acoustic_gender = "kobieta"
+            if "dziecięcy" in v_tag:
+                # Young boy characters frequently voiced by female seiyū - do NOT force female
+                if not is_boy_actor:
+                    acoustic_gender = "kobieta"
+            elif "sopran" in v_tag or "wysoki tembr" in v_tag:
+                if not is_boy_actor:
+                    acoustic_gender = "kobieta"
             elif "alt starszej" in v_tag or "ochrypły alt" in v_tag or "alt żeński" in v_tag:
                 # Raspy or mature female alto / contralto voice - ambiguous pitch, NOT male
                 acoustic_gender = None
@@ -1803,11 +1820,11 @@ class MultimodalTranslator:
                 if hz_match:
                     hz_val = int(hz_match.group(1))
                     if hz_val >= 195:
-                        acoustic_gender = "kobieta"
+                        acoustic_gender = "kobieta" if not is_boy_actor else None
                     elif hz_val <= 150:
                         acoustic_gender = "mężczyzna"
                 else:
-                    acoustic_gender = "kobieta"
+                    acoustic_gender = "kobieta" if not is_boy_actor else None
             elif "baryton" in v_tag or "bas" in v_tag:
                 acoustic_gender = "mężczyzna"
             elif "męsk" in v_tag and "alt" not in v_tag and "ochrypł" not in v_tag:
@@ -1818,7 +1835,13 @@ class MultimodalTranslator:
             jp_text = str(raw_jp.get("text", "")).lower()
         else:
             jp_text = str(raw_jp).lower()
-        wdd_tag = WhisperDisambiguator.disambiguate_line(clean_en="", jp_audio=jp_text)
+        wdd_tag = WhisperDisambiguator.disambiguate_line(
+            clean_en="",
+            jp_audio=jp_text,
+            speaker=spk_clean,
+            character_registry=self.character_registry,
+            series_bible=getattr(self, "series_bible", None)
+        )
         jp_female_marker = (wdd_tag.speaker_gender == "FEMALE") or any(m in jp_text for m in ["atashi", "あたし", "atai", "あtai", "kashira", "かしら", "わよ", "wayo"])
         jp_male_marker = (wdd_tag.speaker_gender == "MALE") or any(m in jp_text for m in ["ore", "俺", "boku", "僕"])
 
@@ -1829,9 +1852,10 @@ class MultimodalTranslator:
                 if hasattr(self, "series_bible") and self.series_bible and hasattr(self.series_bible, "update_character_gender_from_audio"):
                     self.series_bible.update_character_gender_from_audio(spk_clean, "MALE")
             elif wdd_tag.speaker_gender == "FEMALE":
-                self._register_character_safe(spk_clean, "kobieta", role="seiyū Whisper")
-                if hasattr(self, "series_bible") and self.series_bible and hasattr(self.series_bible, "update_character_gender_from_audio"):
-                    self.series_bible.update_character_gender_from_audio(spk_clean, "FEMALE")
+                if not is_boy_actor:
+                    self._register_character_safe(spk_clean, "kobieta", role="seiyū Whisper")
+                    if hasattr(self, "series_bible") and self.series_bible and hasattr(self.series_bible, "update_character_gender_from_audio"):
+                        self.series_bible.update_character_gender_from_audio(spk_clean, "FEMALE")
 
         raw_norm = (raw_phase1_gender or "").lower()
         phase1_is_female = any(w in raw_norm for w in ["kobieta", "żeńsk", "female", "dziewczyn"])

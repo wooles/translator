@@ -1140,6 +1140,12 @@ class AVTLinter:
                         modified = re.sub(pattern, repl, modified)
                         applied_fixes.append(f"[Filar XIII/CLXIII - Adresat Męski/Chłopiec] Korekta rodzaju żeńskiego na męski: {pattern}")
 
+        # 4a-1b. Plural Addressee Pronoun Harmonization (W_i -> W'_i, 0.00 PLN)
+        if not is_sign and has_2nd_person_plural_verb(modified):
+            modified, p_fixes = harmonize_2nd_person_singular_to_plural_pronouns(modified)
+            if p_fixes:
+                applied_fixes.extend(p_fixes)
+
         # 4a-2. Female Vocative Case Harmonization (Filar LX & CLVII: Mianownik -> Wołacz dla imion żeńskich na -a)
         if not is_sign:
             from series_memory import is_inherently_female_name, to_polish_female_vocative
@@ -3359,20 +3365,24 @@ PREDICATE_NOUNS_NOMINATIVE_PAIRS: List[Tuple[str, str]] = [
 PREDICATE_MODS_INSTRUMENTAL: List[Tuple[str, str]] = [
     ("dobrym", "dobrą"), ("złym", "złą"), ("prawdziwym", "prawdziwą"),
     ("najlepszym", "najlepszą"), ("moim", "moją"), ("naszym", "naszą"),
-    ("twoim", "twoją"), ("jedynym", "jedyną"), ("wiernym", "wierną"),
+    ("twoim", "twoją"), ("swoim", "swoją"), ("waszym", "waszą"),
+    ("jedynym", "jedyną"), ("wiernym", "wierną"),
     ("nowym", "nową"), ("lojalnym", "lojalną"), ("wspaniałym", "wspaniałą"),
     ("dzielnym", "dzielną"), ("potężnym", "potężną"), ("wielkim", "wielką"),
     ("bliskim", "bliską"), ("drogim", "drogą"), ("kochanym", "kochaną"),
+    ("ulubionym", "ulubioną"), ("ukochanym", "ukochaną"),
     ("ostatnim", "ostatnią"), ("pierwszym", "pierwszą"),
 ]
 
 PREDICATE_MODS_NOMINATIVE: List[Tuple[str, str]] = [
     ("dobry", "dobra"), ("zły", "zła"), ("prawdziwy", "prawdziwa"),
     ("najlepszy", "najlepsza"), ("mój", "moja"), ("nasz", "nasza"),
-    ("twój", "twoja"), ("jedyny", "jedyna"), ("wierny", "wierna"),
+    ("twój", "twoja"), ("swój", "swoja"), ("wasz", "wasza"),
+    ("jedyny", "jedyna"), ("wierny", "wierna"),
     ("nowy", "nowa"), ("lojalny", "lojalna"), ("wspaniały", "wspaniała"),
     ("dzielny", "dzielna"), ("potężny", "potężna"), ("wielki", "wielka"),
     ("bliski", "bliska"), ("drogi", "droga"), ("kochany", "kochana"),
+    ("ulubiony", "ulubiona"), ("ukochany", "ukochana"),
     ("ostatni", "ostatnia"), ("pierwszy", "pierwsza"),
 ]
 
@@ -3731,6 +3741,102 @@ def convert_2nd_person_feminine_to_masculine(verb: str) -> Optional[str]:
         return None
 
     return res.capitalize() if verb[0].isupper() else res
+
+
+PLURAL_2ND_PERSON_VERB_PAT = re.compile(
+    r"\b("
+    r"[A-Za-ząćęłńóśźż]+(?:liście|łyście|libyście|łybyście|ajcie|ejcie|ujcie|yjcie|ijcie|czcie|ńcie|żcie|rzcie|dźcie|śćcie)|"
+    r"bądźcie|weźcie|idźcie|chodźcie|spójrzcie|patrzcie|stójcie|puśćcie|zostawcie|zróbcie|odpowiedzcie|zamknijcie|powiedzcie|zobaczcie|"
+    r"tęsknicie|myślicie|widzicie|robicie|mówicie|słyszycie|wierzycie|liczycie|walczycie|bronicie|boicie|możecie|musicie|wiecie|chcecie|rozumiecie|będziecie|staniecie|idziecie|jedziecie|"
+    r"powiecie|odpowiecie"
+    r")\b",
+    re.IGNORECASE
+)
+EXCLUDED_NOUNS_CIE = {
+    "życie", "mieście", "świecie", "błocie", "złocie", "kwiecie", "locie", "aucie", "kocie", "pocie",
+    "bracie", "picie", "bicie", "mycie", "wycie", "krycie", "okrycie", "odkrycie", "przeżycie", "nabycie",
+    "spożycie", "zużycie", "obrocie", "powrocie", "namiocie", "płocie", "liście"
+}
+
+def has_2nd_person_plural_verb(text: str) -> bool:
+    """Detects authentic 2nd-person plural verbs while excluding homophonic Polish locative/nominative nouns on -cie."""
+    if not text:
+        return False
+    # ASS-Fuzzing: clean override tags {} and normalize ASS line break tags \N, \n, \h to spaces
+    clean = re.sub(r"\{[^\}]*\}", " ", text)
+    clean = re.sub(r"\\[Nnh]", " ", clean)
+    for m in PLURAL_2ND_PERSON_VERB_PAT.finditer(clean):
+        token = m.group(1).lower()
+        if token in EXCLUDED_NOUNS_CIE:
+            continue
+        if token == "powiecie":
+            preceding = clean[:m.start(1)].rstrip()
+            if re.search(r"\b(?:w|we|o|po|przy)(?:\s+[A-Za-ząćęłńóśźż]+){0,2}$", preceding, re.IGNORECASE):
+                continue
+            return True
+        return True
+    return False
+
+def harmonize_2nd_person_singular_to_plural_pronouns(text: str) -> Tuple[str, List[str]]:
+    """
+    Harmonizes singular 2nd-person pronouns ('do ciebie', 'cię', 'tobie', 'z tobą') to plural ('do was', 'was', 'wam', 'z wami')
+    when the addressee is plural/group (0.00 PLN).
+    Strictly adheres to Single-Token Invariance (W_i -> W'_i).
+    PROTECTS demonstrative pronoun 'ci' (NEVER replaces 'ci' -> 'wam' to avoid mutating 'ci ludzie', 'ci z Seitz').
+    """
+    if not text:
+        return text, []
+    fixes = []
+    res = text
+
+    # Prepositional transformations
+    # Anchor prefix: (?:^|[^\w]|\\[Nnh]) allows matching at start of line, after punctuation, whitespace, or ASS newline (\N, \n, \h)
+    prep_transformations = [
+        (r"(^|[^\w]|\\[Nnh])([Dd]o)((?:\s|\\[Nnh])+)ciebie\b", r"\g<1>\g<2>\g<3>was", "do ciebie -> do was"),
+        (r"(^|[^\w]|\\[Nnh])([Dd]la)((?:\s|\\[Nnh])+)ciebie\b", r"\g<1>\g<2>\g<3>was", "dla ciebie -> dla was"),
+        (r"(^|[^\w]|\\[Nnh])([Oo]d)((?:\s|\\[Nnh])+)ciebie\b", r"\g<1>\g<2>\g<3>was", "od ciebie -> od was"),
+        (r"(^|[^\w]|\\[Nnh])([Nn]a)((?:\s|\\[Nnh])+)ciebie\b", r"\g<1>\g<2>\g<3>was", "na ciebie -> na was"),
+        (r"(^|[^\w]|\\[Nnh])([Ww])((?:\s|\\[Nnh])+)ciebie\b", r"\g<1>\g<2>\g<3>was", "w ciebie -> w was"),
+        (r"(^|[^\w]|\\[Nnh])([Pp]rzez)((?:\s|\\[Nnh])+)ciebie\b", r"\g<1>\g<2>\g<3>was", "przez ciebie -> przez was"),
+        (r"(^|[^\w]|\\[Nnh])([Oo])((?:\s|\\[Nnh])+)tobie\b", r"\g<1>\g<2>\g<3>was", "o tobie -> o was"),
+        (r"(^|[^\w]|\\[Nnh])([Uu])((?:\s|\\[Nnh])+)ciebie\b", r"\g<1>\g<2>\g<3>was", "u ciebie -> u was"),
+        (r"(^|[^\w]|\\[Nnh])([Pp]o)((?:\s|\\[Nnh])+)tobie\b", r"\g<1>\g<2>\g<3>was", "po tobie -> po was"),
+        (r"(^|[^\w]|\\[Nnh])([Pp]rzy)((?:\s|\\[Nnh])+)tobie\b", r"\g<1>\g<2>\g<3>was", "przy tobie -> przy was"),
+        (r"(^|[^\w]|\\[Nnh])([Dd]zięki)((?:\s|\\[Nnh])+)tobie\b", r"\g<1>\g<2>\g<3>wam", "dzięki tobie -> dzięki wam"),
+        (r"(^|[^\w]|\\[Nnh])([Pp]rzeciw(?:ko)?)((?:\s|\\[Nnh])+)tobie\b", r"\g<1>\g<2>\g<3>wam", "przeciw tobie -> przeciw wam"),
+        (r"(^|[^\w]|\\[Nnh])([Zz]e)((?:\s|\\[Nnh])+)tobą\b", lambda m: f"{m.group(1)}{'Z' if m.group(2)[0].isupper() else 'z'}{m.group(3)}wami", "ze tobą -> z wami"),
+        (r"(^|[^\w]|\\[Nnh])([Zz])((?:\s|\\[Nnh])+)tobą\b", r"\g<1>\g<2>\g<3>wami", "z tobą -> z wami"),
+    ]
+
+    for pat, repl, label in prep_transformations:
+        if callable(repl):
+            new_res, count = re.subn(pat, repl, res)
+        else:
+            new_res, count = re.subn(pat, repl, res)
+        if count > 0:
+            fixes.append(f"[Plural Addressee Guard] {label} (x{count})")
+            res = new_res
+
+    # Standalone pronouns: tobie -> wam, cię/ciebie -> was, tobą -> wami
+    # Do NOT mutate 'ci' (homonym: demonstrative pronoun 'ci')
+    standalone_transformations = [
+        (r"(^|[^\w]|\\[Nnh])Tobie\b", r"\g<1>Wam", "Tobie -> Wam"),
+        (r"(^|[^\w]|\\[Nnh])tobie\b", r"\g<1>wam", "tobie -> wam"),
+        (r"(^|[^\w]|\\[Nnh])Cię\b", r"\g<1>Was", "Cię -> Was"),
+        (r"(^|[^\w]|\\[Nnh])cię\b", r"\g<1>was", "cię -> was"),
+        (r"(^|[^\w]|\\[Nnh])Ciebie\b", r"\g<1>Was", "Ciebie -> Was"),
+        (r"(^|[^\w]|\\[Nnh])ciebie\b", r"\g<1>was", "ciebie -> was"),
+        (r"(^|[^\w]|\\[Nnh])Tobą\b", r"\g<1>Wami", "Tobą -> Wami"),
+        (r"(^|[^\w]|\\[Nnh])tobą\b", r"\g<1>wami", "tobą -> wami"),
+    ]
+    for pat, repl, label in standalone_transformations:
+        new_res, count = re.subn(pat, repl, res)
+        if count > 0:
+            fixes.append(f"[Plural Addressee Guard] {label} (x{count})")
+            res = new_res
+
+    return res, fixes
+
 
 POSSESSIVE_GOVERNING_NOUNS_PATTERN = (
     r"(?:sekret|sekretu|sekretom|sekrety|sekretów|"
@@ -5951,6 +6057,16 @@ class EpisodeQualityGate:
 
             # 3c-3. 2ND-PERSON PLURAL ADDRESSEE GROUP AGREEMENT (Filar CLXIII - 0.00 PLN)
             if not is_sign:
+                # Plural Addressee Pronoun Harmonization Gate (Filar CLXIII - 0.00 PLN)
+                if has_2nd_person_plural_verb(ev.text):
+                    old_pl_t = ev.text
+                    ev.text, p_fixes = harmonize_2nd_person_singular_to_plural_pronouns(ev.text)
+                    if ev.text != old_pl_t:
+                        fixes.append(
+                            f"[Episode Quality Gate - Filar CLXIII Adresat Zbiorowy] Linia #{i+1}: "
+                            f"zharmonizowano zaimek l. poj. -> l. mn. ze względu na czasownik 2. os. l. mn.: '{old_pl_t}' -> '{ev.text}'"
+                        )
+
                 raw_ev_addressee = getattr(ev, "addressee", None) or (line_addressees.get(i) if line_addressees else None)
                 addr_norm = (raw_ev_addressee or "").strip().lower()
 
@@ -6211,7 +6327,7 @@ class EpisodeQualityGate:
                                 if win_spk_cl and not is_generic_actor_or_category(win_spk_cl):
                                     nearby_active_speakers.add(win_spk_cl.lower())
                         is_polylogue = (len(nearby_active_speakers) >= 3)
-                        has_2nd_person_marker = bool(re.search(r"\b(?:ty|cię|ciebie|tobie|twoj\w*|spałaś|spałeś|zrobiłaś|zrobiłeś|jesteś|byłaś|byłeś|masz|wiesz|widzisz|chcesz|[a-ząćęłńóśźż]+(?:łeś|łaś|łbyś|łabyś)|powinnaś|powinieneś)\b", clean_ev_text, re.IGNORECASE))
+                        has_2nd_person_marker = bool(re.search(r"\b(?:ty|cię|ciebie|tobie|twoj\w*|bądź|bądźcie|spałaś|spałeś|zrobiłaś|zrobiłeś|jesteś|byłaś|byłeś|masz|wiesz|widzisz|chcesz|[a-ząćęłńóśźż]+(?:łeś|łaś|łbyś|łabyś)|powinnaś|powinieneś)\b", clean_ev_text, re.IGNORECASE))
                         is_soliloquy = bool(
                             ((re.search(r"\{\\i1\}", ev.text) or "italic" in (getattr(ev, "style", "") or "").lower()) and not has_2nd_person_marker) or
                             (len(nearby_active_speakers) <= 1 and not re.search(r"[,\?!]\s*(?:ty|ciebie|cię|tobie|twoje|twój)\b", clean_ev_text, re.IGNORECASE) and not has_2nd_person_marker)
@@ -6607,7 +6723,7 @@ class EpisodeQualityGate:
                                 r"(?!(?:i|a|oraz|ale|lecz|lub|albo|czy|że|gdy|kiedy|ponieważ|bo|jeśli|gdyby|choć|chociaż)\b)[A-Za-ząćęłńóśźż]{1,15})\s+){0,4}"
                             )
                             for m_adj, f_adj in MASCULINE_SG_ADJECTIVES_TO_FEMININE.items():
-                                pat_adj = rf"\b((?:byłaś|byłeś|jesteś|bądź|zostałaś|zostałeś|zostań|będziesz|czujesz\s+się|wydajesz\s+się|stajesz\s+się|wyglądasz|nie\s+wyglądasz|[A-Za-ząćęłńóśźż]+(?:łeś|łaś|łbyś|łabyś)(?:\s+\w+)?)\s+{SAFE_INTERVENING_SPAN})({re.escape(m_adj)})\b"
+                                pat_adj = rf"\b((?:nie\s+bądź|bądź|nie\s+bądźcie|bądźcie|nie\s+zostań|zostań|nie\s+zostańcie|zostańcie|byłaś|byłeś|jesteś|nie\s+będziesz|będziesz|zostałaś|zostałeś|czujesz\s+się|wydajesz\s+się|stajesz\s+się|wyglądasz|nie\s+wyglądasz|[A-Za-ząćęłńóśźż]+(?:łeś|łaś|łbyś|łabyś)(?:\s+\w+)?)\s+{SAFE_INTERVENING_SPAN})({re.escape(m_adj)})\b"
                                 for m in list(re.finditer(pat_adj, t, re.IGNORECASE)):
                                     prefix = m.group(1)
                                     old_adj = m.group(2)
@@ -6641,14 +6757,14 @@ class EpisodeQualityGate:
                             # 5. Predicate nouns in Instrumental (Zasada 12 & 15 AGENTS.md - 82 pairs)
                             mods_m_pat = "|".join([m for m, f in PREDICATE_MODS_INSTRUMENTAL])
                             mods_f_pat = "|".join([f for m, f in PREDICATE_MODS_INSTRUMENTAL])
-                            all_mods_pat = f"{mods_m_pat}|{mods_f_pat}"
+                            all_mods_pat = f"{mods_m_pat}|{mods_f_pat}|[A-Za-ząćęłńóśźż]{{3,}}(?:ą|ym|im)"
                             fem_all_nouns_pat = "|".join([f for m, f in PREDICATE_NOUNS_INSTRUMENTAL_PAIRS if m != f])
                             has_2nd_copula_f = bool(re.search(r"\b(?:jesteś|będziesz|byłaś|zostałaś|stajesz\s+się)\b", t, re.IGNORECASE))
                             if has_2nd_copula_f:
                                 for m_n, f_n in PREDICATE_NOUNS_INSTRUMENTAL_PAIRS:
                                     if m_n == f_n:
                                         continue
-                                    pat_pn = rf"((?:\b(?:jesteś|będziesz|byłaś|zostałaś|stajesz\s+się)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:{mods_m_pat})\s+){{0,3}})({re.escape(m_n)})\b"
+                                    pat_pn = rf"((?:\b(?:jesteś|będziesz|byłaś|zostałaś|stajesz\s+się)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:{mods_m_pat}|[A-Za-ząćęłńóśźż]{{3,}}(?:ym|im))\s+){{0,4}})({re.escape(m_n)})\b"
                                     for m in list(re.finditer(pat_pn, t, re.IGNORECASE)):
                                         pref = m.group(1)
                                         old_n = m.group(2)
@@ -6657,21 +6773,22 @@ class EpisodeQualityGate:
                                         repl_n = f_n.capitalize() if old_n[0].isupper() else f_n
                                         t = re.sub(rf"({re.escape(pref)})({re.escape(old_n)})\b", rf"\g<1>{repl_n}", t, count=1)
                                         fixes_list.append(f"[Episode Quality Gate - Filar CLXIII Rzeczownik Orzecznikowy Żeński] Linia #{line_num}: skorygowano '{old_n}' -> '{repl_n}' (adresat: kobieta)")
-                                for m_mod, f_mod in PREDICATE_MODS_INSTRUMENTAL:
-                                    pat_mod = rf"((?:\b(?:jesteś|będziesz|byłaś|zostałaś|stajesz\s+się)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:{all_mods_pat})\s+){{0,2}})({re.escape(m_mod)})(\s+(?:(?:{all_mods_pat})\s+)*(?:{fem_all_nouns_pat}))\b"
-                                    t = re.sub(pat_mod, rf"\g<1>{f_mod}\g<3>", t, flags=re.IGNORECASE)
+                                for _ in range(2):
+                                    for m_mod, f_mod in PREDICATE_MODS_INSTRUMENTAL:
+                                        pat_mod = rf"((?:\b(?:jesteś|będziesz|byłaś|zostałaś|stajesz\s+się)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:{all_mods_pat})\s+){{0,3}})({re.escape(m_mod)})(\s+(?:(?:{all_mods_pat})\s+)*(?:{fem_all_nouns_pat}))\b"
+                                        t = re.sub(pat_mod, lambda m, fm=f_mod: f"{m.group(1)}{fm.capitalize() if m.group(2)[0].isupper() else fm}{m.group(3)}", t, flags=re.IGNORECASE)
 
                             # 6. Predicate nouns in Nominative (Mianownik orzecznikowy)
                             mods_m_nom_pat = "|".join([m for m, f in PREDICATE_MODS_NOMINATIVE])
                             mods_f_nom_pat = "|".join([f for m, f in PREDICATE_MODS_NOMINATIVE])
-                            all_mods_nom_pat = f"{mods_m_nom_pat}|{mods_f_nom_pat}"
+                            all_mods_nom_pat = f"{mods_m_nom_pat}|{mods_f_nom_pat}|[A-Za-ząćęłńóśźż]{{3,}}(?:a|y|i)"
                             fem_all_nouns_nom_pat = "|".join([f for m, f in PREDICATE_NOUNS_NOMINATIVE_PAIRS if m != f])
                             has_2nd_nom_copula_f = bool(re.search(r"\b(?:jesteś|będziesz|byłaś|zostałaś|to\s+jest|to)\b", t, re.IGNORECASE))
                             if has_2nd_nom_copula_f:
                                 for m_n, f_n in PREDICATE_NOUNS_NOMINATIVE_PAIRS:
                                     if m_n == f_n:
                                         continue
-                                    pat_pn_nom = rf"((?:\b(?:jesteś|będziesz|byłaś|zostałaś|to\s+jest|to)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:{mods_m_nom_pat})\s+){{0,3}})({re.escape(m_n)})\b"
+                                    pat_pn_nom = rf"((?:\b(?:jesteś|będziesz|byłaś|zostałaś|to\s+jest|to)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:{mods_m_nom_pat}|[A-Za-ząćęłńóśźż]{{3,}}(?:y|i))\s+){{0,4}})({re.escape(m_n)})\b"
                                     for m in list(re.finditer(pat_pn_nom, t, re.IGNORECASE)):
                                         pref = m.group(1)
                                         old_n = m.group(2)
@@ -6680,9 +6797,10 @@ class EpisodeQualityGate:
                                         repl_n = f_n.capitalize() if old_n[0].isupper() else f_n
                                         t = re.sub(rf"({re.escape(pref)})({re.escape(old_n)})\b", rf"\g<1>{repl_n}", t, count=1)
                                         fixes_list.append(f"[Episode Quality Gate - Filar CLXIII Mianownik Orzecznikowy Żeński] Linia #{line_num}: skorygowano '{old_n}' -> '{repl_n}' (adresat: kobieta)")
-                                for m_mod, f_mod in PREDICATE_MODS_NOMINATIVE:
-                                    pat_mod_nom = rf"((?:\b(?:jesteś|będziesz|byłaś|zostałaś|to\s+jest|to)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:{all_mods_nom_pat})\s+){{0,2}})({re.escape(m_mod)})(\s+(?:(?:{all_mods_nom_pat})\s+)*(?:{fem_all_nouns_nom_pat}))\b"
-                                    t = re.sub(pat_mod_nom, rf"\g<1>{f_mod}\g<3>", t, flags=re.IGNORECASE)
+                                for _ in range(2):
+                                    for m_mod, f_mod in PREDICATE_MODS_NOMINATIVE:
+                                        pat_mod_nom = rf"((?:\b(?:jesteś|będziesz|byłaś|zostałaś|to\s+jest|to)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:{all_mods_nom_pat})\s+){{0,3}})({re.escape(m_mod)})(\s+(?:(?:{all_mods_nom_pat})\s+)*(?:{fem_all_nouns_nom_pat}))\b"
+                                        t = re.sub(pat_mod_nom, lambda m, fm=f_mod: f"{m.group(1)}{fm.capitalize() if m.group(2)[0].isupper() else fm}{m.group(3)}", t, flags=re.IGNORECASE)
 
                         elif target_male:
                             # 1. Convert feminine 2nd-person singular past/conditional/modal verbs -> masculine
@@ -6702,7 +6820,7 @@ class EpisodeQualityGate:
                                 r"(?!(?:i|a|oraz|ale|lecz|lub|albo|czy|że|gdy|kiedy|ponieważ|bo|jeśli|gdyby|choć|chociaż)\b)[A-Za-ząćęłńóśźż]{1,15})\s+){0,4}"
                             )
                             for f_adj, m_adj in FEMININE_SG_ADJECTIVES_TO_MASCULINE.items():
-                                pat_adj = rf"\b((?:byłeś|byłaś|jesteś|bądź|zostałeś|zostałaś|zostań|będziesz|czujesz\s+się|wydajesz\s+się|stajesz\s+się|wyglądasz|nie\s+wyglądasz|[A-Za-ząćęłńóśźż]+(?:łeś|łaś|łbyś|łabyś)(?:\s+\w+)?)\s+{SAFE_INTERVENING_SPAN})({re.escape(f_adj)})\b"
+                                pat_adj = rf"\b((?:nie\s+bądź|bądź|nie\s+bądźcie|bądźcie|nie\s+zostań|zostań|nie\s+zostańcie|zostańcie|byłeś|byłaś|jesteś|nie\s+będziesz|będziesz|zostałeś|zostałaś|czujesz\s+się|wydajesz\s+się|stajesz\s+się|wyglądasz|nie\s+wyglądasz|[A-Za-ząćęłńóśźż]+(?:łeś|łaś|łbyś|łabyś)(?:\s+\w+)?)\s+{SAFE_INTERVENING_SPAN})({re.escape(f_adj)})\b"
                                 for m in list(re.finditer(pat_adj, t, re.IGNORECASE)):
                                     prefix = m.group(1)
                                     old_adj = m.group(2)
@@ -6736,14 +6854,14 @@ class EpisodeQualityGate:
                             # 5. Predicate nouns in Instrumental (Zasada 12 & 15 AGENTS.md - 82 pairs)
                             mods_m_pat = "|".join([m for m, f in PREDICATE_MODS_INSTRUMENTAL])
                             mods_f_pat = "|".join([f for m, f in PREDICATE_MODS_INSTRUMENTAL])
-                            all_mods_pat = f"{mods_m_pat}|{mods_f_pat}"
+                            all_mods_pat = f"{mods_m_pat}|{mods_f_pat}|[A-Za-ząćęłńóśźż]{{3,}}(?:ą|ym|im)"
                             masc_all_nouns_pat = "|".join([m for m, f in PREDICATE_NOUNS_INSTRUMENTAL_PAIRS if m != f])
                             has_2nd_copula_m = bool(re.search(r"\b(?:jesteś|będziesz|byłeś|zostałeś|stajesz\s+się)\b", t, re.IGNORECASE))
                             if has_2nd_copula_m:
                                 for m_n, f_n in PREDICATE_NOUNS_INSTRUMENTAL_PAIRS:
                                     if m_n == f_n:
                                         continue
-                                    pat_pn = rf"((?:\b(?:jesteś|będziesz|byłeś|zostałeś|stajesz\s+się)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:{mods_f_pat})\s+){{0,3}})({re.escape(f_n)})\b"
+                                    pat_pn = rf"((?:\b(?:jesteś|będziesz|byłeś|zostałeś|stajesz\s+się)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:{mods_f_pat}|[A-Za-ząćęłńóśźż]{{3,}}ą)\s+){{0,4}})({re.escape(f_n)})\b"
                                     for m in list(re.finditer(pat_pn, t, re.IGNORECASE)):
                                         pref = m.group(1)
                                         old_n = m.group(2)
@@ -6752,21 +6870,22 @@ class EpisodeQualityGate:
                                         repl_n = m_n.capitalize() if old_n[0].isupper() else m_n
                                         t = re.sub(rf"({re.escape(pref)})({re.escape(old_n)})\b", rf"\g<1>{repl_n}", t, count=1)
                                         fixes_list.append(f"[Episode Quality Gate - Filar CLXIII Rzeczownik Orzecznikowy Męski] Linia #{line_num}: skorygowano '{old_n}' -> '{repl_n}' (adresat: mężczyzna)")
-                                for m_mod, f_mod in PREDICATE_MODS_INSTRUMENTAL:
-                                    pat_mod = rf"((?:\b(?:jesteś|będziesz|byłeś|zostałeś|stajesz\s+się)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:{all_mods_pat})\s+){{0,2}})({re.escape(f_mod)})(\s+(?:(?:{all_mods_pat})\s+)*(?:{masc_all_nouns_pat}))\b"
-                                    t = re.sub(pat_mod, rf"\g<1>{m_mod}\g<3>", t, flags=re.IGNORECASE)
+                                for _ in range(2):
+                                    for m_mod, f_mod in PREDICATE_MODS_INSTRUMENTAL:
+                                        pat_mod = rf"((?:\b(?:jesteś|będziesz|byłeś|zostałeś|stajesz\s+się)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:{all_mods_pat})\s+){{0,3}})({re.escape(f_mod)})(\s+(?:(?:{all_mods_pat})\s+)*(?:{masc_all_nouns_pat}))\b"
+                                        t = re.sub(pat_mod, lambda m, mm=m_mod: f"{m.group(1)}{mm.capitalize() if m.group(2)[0].isupper() else mm}{m.group(3)}", t, flags=re.IGNORECASE)
 
                             # 6. Predicate nouns in Nominative (Mianownik orzecznikowy)
                             mods_m_nom_pat = "|".join([m for m, f in PREDICATE_MODS_NOMINATIVE])
                             mods_f_nom_pat = "|".join([f for m, f in PREDICATE_MODS_NOMINATIVE])
-                            all_mods_nom_pat = f"{mods_m_nom_pat}|{mods_f_nom_pat}"
+                            all_mods_nom_pat = f"{mods_m_nom_pat}|{mods_f_nom_pat}|[A-Za-ząćęłńóśźż]{{3,}}(?:a|y|i)"
                             masc_all_nouns_nom_pat = "|".join([m for m, f in PREDICATE_NOUNS_NOMINATIVE_PAIRS if m != f])
                             has_2nd_nom_copula_m = bool(re.search(r"\b(?:jesteś|będziesz|byłeś|zostałeś|to\s+jest|to)\b", t, re.IGNORECASE))
                             if has_2nd_nom_copula_m:
                                 for m_n, f_n in PREDICATE_NOUNS_NOMINATIVE_PAIRS:
                                     if m_n == f_n:
                                         continue
-                                    pat_pn_nom = rf"((?:\b(?:jesteś|będziesz|byłeś|zostałeś|to\s+jest|to)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:{mods_f_nom_pat})\s+){{0,3}})({re.escape(f_n)})\b"
+                                    pat_pn_nom = rf"((?:\b(?:jesteś|będziesz|byłeś|zostałeś|to\s+jest|to)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:{mods_f_nom_pat}|[A-Za-ząćęłńóśźż]{{3,}}(?:a|e))\s+){{0,4}})({re.escape(f_n)})\b"
                                     for m in list(re.finditer(pat_pn_nom, t, re.IGNORECASE)):
                                         pref = m.group(1)
                                         old_n = m.group(2)
@@ -6775,9 +6894,10 @@ class EpisodeQualityGate:
                                         repl_n = m_n.capitalize() if old_n[0].isupper() else m_n
                                         t = re.sub(rf"({re.escape(pref)})({re.escape(old_n)})\b", rf"\g<1>{repl_n}", t, count=1)
                                         fixes_list.append(f"[Episode Quality Gate - Filar CLXIII Mianownik Orzecznikowy Męski] Linia #{line_num}: skorygowano '{old_n}' -> '{repl_n}' (adresat: mężczyzna)")
-                                for m_mod, f_mod in PREDICATE_MODS_NOMINATIVE:
-                                    pat_mod_nom = rf"((?:\b(?:jesteś|będziesz|byłeś|zostałeś|to\s+jest|to)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:{all_mods_nom_pat})\s+){{0,2}})({re.escape(f_mod)})(\s+(?:(?:{all_mods_nom_pat})\s+)*(?:{masc_all_nouns_nom_pat}))\b"
-                                    t = re.sub(pat_mod_nom, rf"\g<1>{m_mod}\g<3>", t, flags=re.IGNORECASE)
+                                for _ in range(2):
+                                    for m_mod, f_mod in PREDICATE_MODS_NOMINATIVE:
+                                        pat_mod_nom = rf"((?:\b(?:jesteś|będziesz|byłeś|zostałeś|to\s+jest|to)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:{all_mods_nom_pat})\s+){{0,3}})({re.escape(f_mod)})(\s+(?:(?:{all_mods_nom_pat})\s+)*(?:{masc_all_nouns_nom_pat}))\b"
+                                        t = re.sub(pat_mod_nom, lambda m, mm=m_mod: f"{m.group(1)}{mm.capitalize() if m.group(2)[0].isupper() else mm}{m.group(3)}", t, flags=re.IGNORECASE)
                         return t
 
                     # Check for split addressees in the line (e.g. Elena, ... Marku, ...)
@@ -6785,10 +6905,23 @@ class EpisodeQualityGate:
                     has_male_voc = bool(re.search(r"\b(chłopcze|młodzieńcze|bracie|ojcze|tato)\b", clean_ev_text, re.IGNORECASE))
                     found_female_names = []
                     found_male_names = []
-                    for c_name, c_gen in char_gender_map.items():
+
+                    merged_chars = dict(char_gender_map)
+                    if series_bible and hasattr(series_bible, "characters") and isinstance(series_bible.characters, dict):
+                        for b_name, b_data in series_bible.characters.items():
+                            if isinstance(b_data, dict):
+                                b_g = b_data.get("gender")
+                                if b_g in ("MALE", "FEMALE") and b_name.lower() not in merged_chars:
+                                    merged_chars[b_name.lower()] = b_g
+
+                    for c_name, c_gen in merged_chars.items():
                         if len(c_name) >= 3 and c_gen in ("MALE", "FEMALE"):
                             c_w_form = None
                             decl_entry = character_declensions.get(c_name) or character_declensions.get(c_name.capitalize()) or character_declensions.get(c_name.title())
+                            if not decl_entry and series_bible and hasattr(series_bible, "characters") and isinstance(series_bible.characters, dict):
+                                c_info = series_bible.characters.get(c_name) or series_bible.characters.get(c_name.capitalize()) or series_bible.characters.get(c_name.title())
+                                if isinstance(c_info, dict):
+                                    decl_entry = c_info.get("polish_declension")
                             if decl_entry and isinstance(decl_entry, dict):
                                 c_w_form = decl_entry.get("W")
                             else:
@@ -6799,7 +6932,7 @@ class EpisodeQualityGate:
                             matched_name_tokens = [c_name]
                             if c_w_form and c_w_form.lower() != c_name.lower():
                                 matched_name_tokens.append(c_w_form)
-                            name_pat = rf"\b(?:{'|'.join(re.escape(t) for t in matched_name_tokens)})[,!\?]"
+                            name_pat = rf"\b(?:{'|'.join(re.escape(t) for t in matched_name_tokens)})\b(?:\s*[,.!?…\-\–]|\s*\\N|$)"
                             if re.search(name_pat, clean_ev_text, re.IGNORECASE):
                                 if c_gen == "FEMALE":
                                     found_female_names.extend(matched_name_tokens)
@@ -6807,6 +6940,13 @@ class EpisodeQualityGate:
                                     found_male_names.extend(matched_name_tokens)
 
                     is_split_addressee = (has_female_voc or found_female_names) and (has_male_voc or found_male_names)
+                    if not is_split_addressee:
+                        if (has_male_voc or found_male_names) and not (has_female_voc or found_female_names):
+                            is_target_male = True
+                            is_target_female = False
+                        elif (has_female_voc or found_female_names) and not (has_male_voc or found_male_names):
+                            is_target_female = True
+                            is_target_male = False
                     has_dual_dash_turns = bool(re.search(r"(?:^|[\r\n]|\\[Nnh])\s*[-–—]\s*.*\\[Nnh]\s*[-–—]\s*", ev.text))
 
                     if is_split_addressee:
