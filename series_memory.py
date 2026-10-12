@@ -11,7 +11,220 @@ import json
 import threading
 import copy
 from pathlib import Path
-from typing import Dict, List, Any, Optional, Set, Tuple, Union
+from typing import Dict, List, Any, Optional, Set, Tuple, Union, Literal
+from pydantic import BaseModel, Field, ConfigDict
+
+class PersonaInterval(BaseModel):
+    apparent_gender: Literal["MASCULINE", "FEMININE"]
+    valid_from_ep: int
+    valid_to_ep: Optional[int] = None
+    public_facade: bool = True
+
+
+class CharacterIdentity(BaseModel):
+    canonical_id: str
+    true_gender: Literal["MASCULINE", "FEMININE"]
+    discourse_states: List[PersonaInterval] = Field(default_factory=list)
+
+    def get_effective_gender(
+        self,
+        episode_index: int,
+        is_private_confidant: bool = False,
+        in_multi_person_scene: bool = False,
+        is_monologue: bool = False
+    ) -> str:
+        """
+        Zwraca obowiązującą płeć gramatyczną w zależności od odcinka,
+        statusu monologu, obecności powiernika tajemnicy i sceny wieloosobowej.
+        """
+        if is_monologue:
+            return self.true_gender
+
+        if is_private_confidant and not in_multi_person_scene:
+            return self.true_gender
+
+        for interval in self.discourse_states:
+            if interval.valid_from_ep <= episode_index:
+                if interval.valid_to_ep is None or episode_index <= interval.valid_to_ep:
+                    if interval.public_facade:
+                        return interval.apparent_gender
+                    return self.true_gender
+
+        return self.true_gender
+
+    def register_epistemic_rupture(self, episode_index: int, new_gender: Literal["MASCULINE", "FEMININE"]):
+        """
+        Zamyka poprzedni stan maski (valid_to_ep = episode_index - 1)
+        i rejestruje dekonspirację (valid_from_ep = episode_index).
+        """
+        for interval in self.discourse_states:
+            if interval.valid_to_ep is None or interval.valid_to_ep >= episode_index:
+                interval.valid_to_ep = episode_index - 1
+
+        self.discourse_states.append(
+            PersonaInterval(
+                apparent_gender=new_gender,
+                valid_from_ep=episode_index,
+                valid_to_ep=None,
+                public_facade=False
+            )
+        )
+
+
+class DeclensionParadigm(BaseModel):
+    nominative: str = Field(description="Mianownik (M)")
+    genitive: str = Field(description="Dopełniacz (D)")
+    dative: str = Field(description="Celownik (C)")
+    accusative: str = Field(description="Biernik (B)")
+    instrumental: str = Field(description="Narzędnik (N)")
+    locative: str = Field(description="Miejscownik (Ms)")
+    vocative: str = Field(description="Wołacz (W)")
+
+    @property
+    def M(self) -> str:
+        return self.nominative
+
+    @property
+    def D(self) -> str:
+        return self.genitive
+
+    @property
+    def C(self) -> str:
+        return self.dative
+
+    @property
+    def B(self) -> str:
+        return self.accusative
+
+    @property
+    def N(self) -> str:
+        return self.instrumental
+
+    @property
+    def Ms(self) -> str:
+        return self.locative
+
+    @property
+    def W(self) -> str:
+        return self.vocative
+
+    def to_dict(self) -> Dict[str, str]:
+        return {
+            "M": self.nominative,
+            "D": self.genitive,
+            "C": self.dative,
+            "B": self.accusative,
+            "N": self.instrumental,
+            "Ms": self.locative,
+            "W": self.vocative
+        }
+
+    @classmethod
+    def from_dict(cls, d: Dict[str, str]) -> "DeclensionParadigm":
+        return cls(
+            nominative=d.get("M", ""),
+            genitive=d.get("D", ""),
+            dative=d.get("C", ""),
+            accusative=d.get("B", ""),
+            instrumental=d.get("N", ""),
+            locative=d.get("Ms", ""),
+            vocative=d.get("W", "")
+        )
+
+
+JAPANESE_VOWEL_E_NAMES: Set[str] = {
+    "sasuke", "daisuke", "ryunosuke", "shusuke", "sosuke", "akane", "kaede", "sanosuke", "kotone", "sakurae"
+}
+
+def clean_fake_name_apostrophes(text: str) -> str:
+    """
+    Zasada poprawnego użycia apostrofu (Zero Fake Apostrophes - Standard PWN):
+    Apostrof występuje WYŁĄCZNIE wtedy, gdy ostatnia litera obcego imienia/nazwiska jest niema
+    fonetycznie (np. White -> White'a, Wayne -> Wayne'a, Blade -> Blade'a, George -> George'a).
+    Kategoryczny zakaz stosowania apostrofu przy imionach czytanych fonetycznie
+    (np. Ray'a -> Raya, Sasuke'a -> Sasuke, Rin'a -> Rin, Ren'em -> Renem).
+    """
+    if not text or "'" not in text:
+        return text
+
+    def _apostrophe_repl(m: re.Match) -> str:
+        name = m.group(1)
+        ending = m.group(2)
+        n_low = name.lower()
+
+        # 1. Japońskie imiona na samogłoskę lub żeńskie nieodmienne
+        if n_low in JAPANESE_VOWEL_E_NAMES or n_low in INVARIABLE_JAPANESE_FEMALE_NAMES or n_low in FOREIGN_FEMALE_CONSONANT_NAMES:
+            return name
+
+        # 2. Imiona męskie na samogłoskę + y (Ray, Roy, Gray) -> fonetyczne połączenie bez apostrofu
+        if len(name) >= 2 and name[-1].lower() == 'y' and name[-2].lower() in 'aeiou':
+            return name + ending
+
+        # 3. Nieme fonetycznie -e (spółgłoska + e, np. White, Wayne, Blade, George, Locke, Moore) -> apostrof poprawny
+        if len(name) >= 3 and name[-1].lower() == 'e' and name[-2].lower() in 'bcdfghjklmnpqrstvwxz':
+            return m.group(0)
+
+        # 4. Imiona męskie na spółgłoskę czytaną fonetycznie (Ren, Conan, Lelouch, Braham, Rietz) -> bez apostrofu
+        if name[-1].lower() not in 'aeiouyąęó':
+            return name + ending
+
+        # 5. Imiona na inne samogłoski fonetyczne (Naruto'a -> Naruta)
+        if name[-1].lower() in 'aeiouy':
+            return name[:-1] + ending
+
+        return m.group(0)
+
+    return re.sub(r"\b([A-Z][a-z]+)'([a-ząćęłńóśźż]+)\b", _apostrophe_repl, text)
+
+
+def fix_undecorated_male_names(text: str, character_names: Optional[List[str]] = None, series_bible: Optional[Any] = None) -> str:
+    """
+    Koryguje błędy pozostawienia męskiego imienia w mianowniku w pozycji zależnej / po przyimkach:
+    np. 'Dałem to Ray' -> 'Dałem to Rayowi'
+        'dla Ray' -> 'dla Raya'
+        'z Ren' -> 'z Renem'
+    """
+    if not text:
+        return text
+
+    gen_preps = r"(?:dla|do|od|bez|u|koło|obok|blisko|wokół|dookoła|spod|zza|znad|według|mimo|wobec|naprzeciw|wskutek)"
+    dat_preps = r"(?:dzięki|przeciw|przeciwko|ku|wbrew|dałem\s+to|dałam\s+to|dał\s+to|dała\s+to|podarowałem|podarowałam|powiedziałem|powiedziałam)"
+    ins_preps = r"(?:z|ze|przed|przede|nad|nade|pod|pode|między|pomiędzy|za)"
+
+    names = character_names or ["Ray", "Ren", "Lelouch", "Braham", "Rietz", "Jean", "Raven"]
+    result = text
+    for name in names:
+        if not name or len(name) < 2:
+            continue
+        decl = generate_polish_name_declension(name, "MALE")
+        if not decl or decl.get("M") != name:
+            continue
+
+        # 1. Genitive check: "dla Ray" -> "dla Raya"
+        result = re.sub(
+            rf"\b({gen_preps})\s+{re.escape(name)}\b",
+            lambda m, c=decl.get("D", name): f"{m.group(1)} {c}",
+            result,
+            flags=re.IGNORECASE
+        )
+
+        # 2. Dative check: "ku Ray" -> "ku Rayowi", "dałem to Ray" -> "dałem to Rayowi", "podarowałem miecz Ray" -> "podarowałem miecz Rayowi"
+        result = re.sub(
+            rf"\b({dat_preps}(?:\s+[a-ząćęłńóśźż]+)?)\s+{re.escape(name)}\b",
+            lambda m, c=decl.get("C", name): f"{m.group(1)} {c}",
+            result,
+            flags=re.IGNORECASE
+        )
+
+        # 3. Instrumental check: "z Ren" -> "z Renem", "przed Ray" -> "przed Rayem"
+        result = re.sub(
+            rf"\b({ins_preps})\s+{re.escape(name)}\b",
+            lambda m, c=decl.get("N", name): f"{m.group(1)} {c}",
+            result,
+            flags=re.IGNORECASE
+        )
+
+    return result
 
 import unicodedata
 
@@ -2667,6 +2880,65 @@ class SeriesBible:
         with self._lock:
             return dict(self.data.get("glossary", {}))
 
+    def register_character_identity(self, identity: CharacterIdentity) -> None:
+        """Rejestruje tożsamość diegetyczną postaci ze stanami dyskursu."""
+        with self._lock:
+            if "character_identities" not in self.data:
+                self.data["character_identities"] = {}
+            self.data["character_identities"][identity.canonical_id] = identity.model_dump()
+
+    def get_character_identity(self, canonical_id: str) -> Optional[CharacterIdentity]:
+        """Pobiera zarejestrowaną tożsamość diegetyczną postaci."""
+        with self._lock:
+            raw = self.data.get("character_identities", {}).get(canonical_id)
+            if raw:
+                try:
+                    return CharacterIdentity(**raw)
+                except Exception:
+                    return None
+            return None
+
+    def get_declension_paradigm(self, character_name: str) -> Optional[DeclensionParadigm]:
+        """Zwraca lub generuje 7-przypadkowy paradygmat fleksyjny dla postaci."""
+        with self._lock:
+            decl = self.data.get("declensions", {}).get(character_name)
+            if decl and isinstance(decl, dict) and "M" in decl:
+                return DeclensionParadigm.from_dict(decl)
+
+            gender = self.get_character_gender(character_name)
+            generated = generate_polish_name_declension(character_name, gender)
+            if generated and "M" in generated:
+                return DeclensionParadigm.from_dict(generated)
+            return None
+
+    def register_sparse_dialogue_character(
+        self,
+        character_name: str,
+        line_count: int = 1,
+        f0_hz: Optional[float] = None,
+        has_anaphora: bool = False
+    ) -> None:
+        """
+        Sparse-Dialogue Protocol:
+        Postać epizodyczna (1-2 kwestie w tle) bez twardych dowodów anaforycznych i z F0 > 135 Hz
+        otrzymuje status grammatical_gender = 'NEUTRAL', confidence = 0.50, is_transient = True.
+        Brak blokady P0 otwiera postać na leniwą promocję w kolejnych odcinkach.
+        """
+        if not character_name:
+            return
+        with self._lock:
+            if line_count <= 2 and not has_anaphora and (f0_hz is None or f0_hz > 135.0):
+                entry = {
+                    "gender": "NEUTRAL",
+                    "confidence": 0.50,
+                    "is_transient": True,
+                    "has_verified_gender": False,
+                    "description": "Postać epizodyczna (sparse dialogue / tło) - status NEUTRAL, brak blokady P0"
+                }
+                self.data.setdefault("characters", {})[character_name] = entry
+                return entry
+            return None
+
     def load(self):
         """Loads existing Series Bible from disk (Thread-Safe)."""
         with self._lock:
@@ -3080,6 +3352,8 @@ class SeriesBible:
                     return "FEMALE"
                 if raw_g in ("MALE", "MĘŻCZYZNA", "MALE_GROUP"):
                     return "MALE"
+                if raw_g in ("NEUTRAL", "BEZPŁCIOWY"):
+                    return "NEUTRAL"
 
             desc_v = str(v.get("description", "") if isinstance(v, dict) else v).lower()
             # Strip negative prohibition clauses (e.g. 'zakaz form żeńskich', 'zakaz form męskich')

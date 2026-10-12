@@ -14948,6 +14948,379 @@ def test_tensei_kizoku_s3_root_cause_vocative_and_audience_guard():
     print(" -> PASSED: Test 157 potwierdza 100% eliminacji przyczyn źródłowych INC-AVT-004 zgodnie ze Standardem 3.0 (0.00 PLN).")
 
 
+def test_epistemic_triangulation_and_audio_purity():
+    """
+    TEST 155: Epistemic Gender Triangulation, Audio Purity & NLP Anaphora Scoring.
+    1. FFmpeg Japanese audio extraction flags isolation.
+    2. EpistemicAudioTriangulator pYIN & BGM filter (sampling <=10s, noise rejection std > 50Hz, F0 <= 135Hz hard masculine).
+    3. SpaCy scene discourse paragraph merge (<1.5s gap), vocative filtering, and 6 canonical epistemic archetypes.
+    """
+    print("\n[TEST 155/160] Epistemic Triangulation, Audio Purity & NLP Discourse Analysis...")
+    import numpy as np
+    from pathlib import Path
+    import pysubs2
+    from profiler import (
+        extract_japanese_audio_track,
+        EpistemicAudioTriangulator,
+        SpaCyAnaphoraDiscourseAnalyzer,
+    )
+
+    # 1. FFmpeg extraction command test
+    cmd = extract_japanese_audio_track(Path("dummy_video.mkv"), Path("dummy_audio.wav"))
+    assert cmd[0] == "ffmpeg"
+    assert "-map" in cmd and "0:a:m:language:jpn?" in cmd and "0:a:0" in cmd
+    assert "-acodec" in cmd and "pcm_s16le" in cmd
+    assert "-ar" in cmd and "16000" in cmd
+    assert "-ac" in cmd and "1" in cmd
+
+    # 2. EpistemicAudioTriangulator pYIN & BGM Filter
+    sr = 16000
+    t = np.linspace(0, 1.5, int(sr * 1.5), endpoint=False)
+    male_wave = (0.5 * np.sin(2 * np.pi * 120 * t)).astype(np.float32)
+    noisy_t = np.linspace(0, 1.5, int(sr * 1.5), endpoint=False)
+    freqs = np.linspace(80, 300, len(noisy_t))
+    noisy_wave = (0.5 * np.sin(2 * np.pi * freqs * noisy_t)).astype(np.float32)
+
+    tri = EpistemicAudioTriangulator()
+    
+    # 3-5 clips limit & max 10s total check
+    male_wave_long = (0.5 * np.sin(2 * np.pi * 120 * np.linspace(0, 15.0, int(sr * 15.0), endpoint=False))).astype(np.float32)
+    clips = tri.extract_clean_speech_clips(male_wave_long, sample_rate=sr)
+    assert len(clips) <= 5
+    total_dur = sum(len(c) / sr for c in clips)
+    assert total_dur <= 10.0
+
+    # pYIN estimation on clean male
+    f0_m = tri.estimate_f0_pyin(male_wave, sr=sr)
+    assert f0_m is not None
+    assert 110.0 <= f0_m <= 130.0
+
+    # Noisy rejection check (std > 50Hz causes disqualification -> returns None)
+    f0_noise = tri.estimate_f0_pyin(noisy_wave, sr=sr)
+    assert f0_noise is None
+
+    # Asymmetry rule
+    gen_m, conf_m, hard_masc = tri.triangulate_f0_gender(125.0)
+    assert gen_m == "MALE" and conf_m == 1.0 and hard_masc is True
+
+    gen_f, conf_f, hard_f = tri.triangulate_f0_gender(230.0)
+    assert gen_f is None and conf_f == 0.0 and hard_f is False
+
+    # 3. SpaCy discourse & anaphora
+    analyzer = SpaCyAnaphoraDiscourseAnalyzer()
+    
+    # Paragraph reconstruction (<1.5s gap merge)
+    p_events = [
+        pysubs2.SSAEvent(start=1000, end=2500, text="Ray was walking in the garden."),
+        pysubs2.SSAEvent(start=3000, end=4500, text="He looked at the sky."),
+        pysubs2.SSAEvent(start=8000, end=9500, text="Later, he arrived home.")
+    ]
+    paras = analyzer.reconstruct_scene_paragraphs(p_events)
+    assert len(paras) == 2
+    assert "Ray was walking" in paras[0] and "He looked" in paras[0]
+    assert "Later, he arrived" in paras[1]
+
+    # Vocative filter: "Ray, you should leave." must not count "Ray" as 3rd person target
+    clean_text = analyzer.filter_vocative_from_text("Ray, you must leave now!", "Ray")
+    assert "Ray" not in clean_text
+    # Negative control: "He saw Ray yesterday." is not vocative
+    clean_text2 = analyzer.filter_vocative_from_text("He saw Ray yesterday.", "Ray")
+    assert "Ray" in clean_text2
+
+    # English scoring: pronouns x4, titles x5
+    score_m = analyzer.score_english_anaphora("He saw him and his friend himself. Lord King Sir.")
+    assert score_m == (4 * 4) + (3 * 5)
+
+    score_f = analyzer.score_english_anaphora("She gave her book to herself. Lady Queen.")
+    assert score_f == -(3 * 4 + 2 * 5)
+
+    # 6 Epistemic profiles
+    p1 = analyzer.triangulate_epistemic_gender(f0_hz=120.0, en_score=0)
+    assert p1["resolved_gender"] == "MALE" and p1["f0_hard_masculine"] is True and p1["archetype"] == "F0_HARD_MASCULINE_VETO"
+
+    p2 = analyzer.triangulate_epistemic_gender(f0_hz=240.0, en_score=-10)
+    assert p2["resolved_gender"] == "FEMALE" and p2["archetype"] == "HIGH_FEMALE_ACOUSTIC_AND_ANAPHORA"
+
+    p3 = analyzer.triangulate_epistemic_gender(f0_hz=None, jp_pronoun="ore", en_score=0)
+    assert p3["resolved_gender"] == "MALE" and p3["archetype"] == "DEEP_MALE_ACOUSTIC_AND_ANAPHORA"
+
+    p4 = analyzer.triangulate_epistemic_gender(f0_hz=None, jp_pronoun="watashi", en_score=8)
+    assert p4["resolved_gender"] == "MALE" and p4["archetype"] == "PURE_MORPHOSYNTAX_OVERRIDE"
+
+    p5 = analyzer.triangulate_epistemic_gender(f0_hz=None, jp_pronoun=None, en_score=0)
+    assert p5["resolved_gender"] == "NEUTRAL" and p5.get("is_transient") is True
+
+    p6 = analyzer.triangulate_epistemic_gender(f0_hz=240.0, jp_pronoun="boku", en_score=8)
+    assert p6["resolved_gender"] == "MALE" and p6["archetype"] == "CROSS_GENDER_SEIYU_BOY_ROLE"
+    print(" -> PASSED: Test 155 potwierdza 100% spójności triangulacji epistemicznej i czystości audio.")
+
+
+def test_diegetic_persona_and_out_of_order_lifecycle():
+    """
+    TEST 156: Diegetic Persona Automaton & Out-of-Order Lifecycle Safety.
+    1. PersonaInterval & CharacterIdentity with out-of-order episode indices.
+    2. Epistemic rupture phase transition.
+    3. Secret consciousness graph (monologue -> true_gender, confidant -> true_gender, unaware scene -> apparent_gender).
+    """
+    print("\n[TEST 156/160] Diegetic Persona Automaton & Consciousness Resolution...")
+    from series_memory import PersonaInterval, CharacterIdentity
+    from scene_discourse import resolve_diegetic_persona_gender
+
+    intervals = [
+        PersonaInterval(apparent_gender="MASCULINE", valid_from_ep=1, valid_to_ep=10, public_facade=True),
+        PersonaInterval(apparent_gender="FEMININE", valid_from_ep=11, valid_to_ep=24, public_facade=False),
+    ]
+    char_id = CharacterIdentity(
+        canonical_id="Charlotte",
+        true_gender="FEMININE",
+        discourse_states=intervals
+    )
+
+    # Out of order queries: [12, 1, 5, 24]
+    assert char_id.get_effective_gender(episode_index=12) == "FEMININE"
+    assert char_id.get_effective_gender(episode_index=1) == "MASCULINE"
+    assert char_id.get_effective_gender(episode_index=5) == "MASCULINE"
+    assert char_id.get_effective_gender(episode_index=24) == "FEMININE"
+
+    # Epistemic rupture
+    char_id.register_epistemic_rupture(episode_index=8, new_gender="FEMININE")
+    assert char_id.get_effective_gender(episode_index=7) == "MASCULINE"
+    assert char_id.get_effective_gender(episode_index=8) == "FEMININE"
+
+    # 2. Diegetic Consciousness & Secret Graph
+    g_mono = resolve_diegetic_persona_gender(char_id, is_monologue=True)
+    assert g_mono == "FEMININE"
+
+    g_conf = resolve_diegetic_persona_gender(
+        char_id,
+        episode_index=5,
+        audience=["Confidant"],
+        secret_knowers={"Confidant"},
+        is_monologue=False
+    )
+    assert g_conf == "FEMININE"
+
+    g_pub = resolve_diegetic_persona_gender(
+        char_id,
+        episode_index=5,
+        audience=["Confidant", "Guard"],
+        secret_knowers={"Confidant"},
+        is_monologue=False
+    )
+    assert g_pub == "MASCULINE"
+    print(" -> PASSED: Test 156 potwierdza poprawność automatu tożsamości diegetycznej i odporność na asynchroniczność.")
+
+
+def test_subtitle_sanitizer_and_japanese_quote_gate():
+    """
+    TEST 157: Subtitle Discourse Sanitizer & CJK Quote Monologue Gate.
+    1. Japanese dialogue quotes 「 」 and 『 』 are NEVER internal monologue.
+    2. Status brackets 【 】, 《 》, ［ ］ are NEVER internal monologue.
+    3. Removal of translator notes [TL: ...] and didascalia [SFX: ...].
+    4. Internal monologue gate requires parentheses, thoughts style, or italics, with no radio/addressee.
+    """
+    print("\n[TEST 157/160] Subtitle Discourse Sanitizer & CJK Quote Gate...")
+    import pysubs2
+    from scene_discourse import SubtitleDiscourseSanitizer, is_internal_monologue
+
+    sanitizer = SubtitleDiscourseSanitizer()
+    
+    # 1. CJK quotes are NEVER internal monologue
+    ev_quote = pysubs2.SSAEvent(text="「Chcę go pokonać!」", style="Default")
+    assert sanitizer.is_dialogue_quote(ev_quote.text) is True
+    assert is_internal_monologue(ev_quote) is False
+
+    ev_dquote = pysubs2.SSAEvent(text="『To jest mój cel!』", style="Default")
+    assert sanitizer.is_dialogue_quote(ev_dquote.text) is True
+    assert is_internal_monologue(ev_dquote) is False
+
+    # Special brackets
+    ev_bracket = pysubs2.SSAEvent(text="【Ognista Kula】", style="Default")
+    assert sanitizer.is_skill_or_system_bracket(ev_bracket.text) is True
+    assert is_internal_monologue(ev_bracket) is False
+
+    # 2. Translator notes & SFX cleaning
+    t_clean = sanitizer.sanitize_subtitles_for_nlp("To jest plan. [TL: dosłownie tak] (gasp) [SFX: boom]")
+    assert "[TL:" not in t_clean
+    assert "(gasp)" not in t_clean
+    assert "[SFX:" not in t_clean
+    assert "To jest plan." in t_clean
+
+    # 3. Valid monologue conditions
+    ev_mono = pysubs2.SSAEvent(text="(Muszę zachować spokój...)", style="Default")
+    assert is_internal_monologue(ev_mono) is True
+
+    # Radio prefix disqualification
+    ev_radio = pysubs2.SSAEvent(text="[Radio] (Odbiór, jesteśmy na pozycji.)", style="Default")
+    assert is_internal_monologue(ev_radio) is False
+
+    # Addressee whisper disqualification
+    ev_whisper = pysubs2.SSAEvent(text="(Uciekaj stąd...)", style="Default")
+    ev_whisper.addressee = "Braham"
+    assert is_internal_monologue(ev_whisper) is False
+    print(" -> PASSED: Test 157 potwierdza odporność na japońskie cudzysłowy i higienę napisów.")
+
+
+def test_sparse_dialogue_and_impersonal_syntax():
+    """
+    TEST 158: Sparse Dialogue Protocol & Impersonal Syntax Enforcement.
+    1. Background characters (1-2 lines, F0 > 135Hz, no anaphora) get NEUTRAL and is_transient=True with confidence=0.50.
+    2. Protection against P0 lock for transient characters.
+    3. Impersonal syntax enforcement in EpisodeQualityGate for NEUTRAL characters.
+    4. Negative control: main characters are not mutated to impersonal syntax.
+    """
+    print("\n[TEST 158/160] Sparse Dialogue Protocol & Impersonal Syntax...")
+    import pysubs2
+    from series_memory import SeriesBible
+    from avt_linter import EpisodeQualityGate
+
+    bible = SeriesBible("TestSeries")
+    entry = bible.register_sparse_dialogue_character("Villager A")
+    assert entry["gender"] == "NEUTRAL"
+    assert entry["is_transient"] is True
+    assert entry["confidence"] == 0.50
+    assert bible.get_character_gender("Villager A") == "NEUTRAL"
+
+    # Impersonal syntax enforcement in EpisodeQualityGate
+    subs = pysubs2.SSAFile()
+    ev1 = pysubs2.SSAEvent(start=1000, end=3000, name="Villager A", text="Musiałem uciekać przed potworem!")
+    ev2 = pysubs2.SSAEvent(start=3500, end=5500, name="Villager A", text="Zauważyłem zamek w oddali.")
+    ev3 = pysubs2.SSAEvent(start=6000, end=8000, name="Villager A", text="Zrobiłem to natychmiast.")
+    ev4 = pysubs2.SSAEvent(start=8500, end=10500, name="Villager A", text="Odkryłem wyciek w rurze.")
+    ev5 = pysubs2.SSAEvent(start=11000, end=13000, name="Villager A", text="Powinienem sprawdzić ten korytarz.")
+    subs.events.extend([ev1, ev2, ev3, ev4, ev5])
+
+    EpisodeQualityGate.audit_and_fix_entire_episode(subs=subs, series_bible=bible)
+    assert "trzeba uciekać" in subs.events[0].text
+    assert "widać stąd zamek" in subs.events[1].text
+    assert "zrobiono to" in subs.events[2].text
+    assert "odkryto wyciek" in subs.events[3].text
+    assert "warto sprawdzić" in subs.events[4].text
+
+    # Negative control: Main masculine character must NOT be converted to impersonal
+    subs_main = pysubs2.SSAFile()
+    ev_main = pysubs2.SSAEvent(start=1000, end=3000, name="Ray", text="Musiałem uciekać przed wrogiem.")
+    subs_main.events.append(ev_main)
+    bible_main = SeriesBible("TestSeries2")
+    bible_main.data.setdefault("characters", {})["Ray"] = {"gender": "MALE", "description": "mężczyzna"}
+    EpisodeQualityGate.audit_and_fix_entire_episode(subs=subs_main, series_bible=bible_main)
+    assert "Musiałem uciekać" in subs_main.events[0].text
+    print(" -> PASSED: Test 158 potwierdza protokół rzadkich dialogów i bezosobową składnię dla NEUTRAL.")
+
+
+def test_full_polish_morphosyntactic_agreement():
+    """
+    TEST 159: Full Polish Morphosyntactic Agreement & Gender Concordance.
+    1. Predicate adjectives (jestem pewien vs pewna, zostałem sam vs zostałam sama).
+    2. Compound future (będę robił vs będę robiła).
+    3. Conditional mood (zrobiłbym vs zrobiłabym).
+    4. Plural nonvirile agreement for female addressee groups (-łyście vs -liście, same vs sami).
+    """
+    print("\n[TEST 159/160] Full Polish Morphosyntactic Agreement...")
+    import pysubs2
+    from series_memory import SeriesBible
+    from avt_linter import EpisodeQualityGate
+
+    bible = SeriesBible("SyntaxSeries")
+    bible.data.setdefault("characters", {})["Hero"] = {"gender": "MALE", "description": "mężczyzna"}
+    bible.data.setdefault("characters", {})["Heroine"] = {"gender": "FEMALE", "description": "kobieta"}
+
+    subs = pysubs2.SSAFile()
+    ev_m1 = pysubs2.SSAEvent(start=1000, end=3000, name="Hero", text="Jestem pewna, że to prawda.")
+    ev_m2 = pysubs2.SSAEvent(start=3500, end=5500, name="Hero", text="Zostałam sama na polu bitwy.")
+    ev_f1 = pysubs2.SSAEvent(start=6000, end=8000, name="Heroine", text="Jestem pewien swego losu.")
+    ev_f2 = pysubs2.SSAEvent(start=8500, end=10500, name="Heroine", text="Zostałem sam.")
+
+    ev_m3 = pysubs2.SSAEvent(start=11000, end=13000, name="Hero", text="Będę walczyła do końca.")
+    ev_f3 = pysubs2.SSAEvent(start=13500, end=15500, name="Heroine", text="Będę czekał na ciebie.")
+
+    ev_m4 = pysubs2.SSAEvent(start=16000, end=18000, name="Hero", text="Zrobiłabym to dla ciebie.")
+    ev_f4 = pysubs2.SSAEvent(start=18500, end=20500, name="Heroine", text="Zrobiłbym to dla ciebie.")
+
+    subs.events.extend([ev_m1, ev_m2, ev_f1, ev_f2, ev_m3, ev_f3, ev_m4, ev_f4])
+    EpisodeQualityGate.audit_and_fix_entire_episode(subs=subs, series_bible=bible)
+
+    assert "Jestem pewien" in subs.events[0].text
+    assert "Zostałem sam" in subs.events[1].text
+    assert "Jestem pewna" in subs.events[2].text
+    assert "Zostałam sama" in subs.events[3].text
+    assert "Będę walczył" in subs.events[4].text
+    assert "Będę czekała" in subs.events[5].text
+    assert "Zrobiłbym" in subs.events[6].text
+    assert "Zrobiłabym" in subs.events[7].text
+
+    # Plural nonvirile agreement for female group
+    subs_pl = pysubs2.SSAFile()
+    ev_pl = pysubs2.SSAEvent(start=1000, end=3000, name="Commander", text="Zrobiliście to same, byłyście wspaniałe.")
+    ev_pl.addressee = "grupa_kobiet"
+    subs_pl.events.append(ev_pl)
+    EpisodeQualityGate.audit_and_fix_entire_episode(subs=subs_pl, series_bible=bible)
+    assert "Zrobiłyście to same" in subs_pl.events[0].text
+    print(" -> PASSED: Test 159 potwierdza pełną zgodność morfosyntaktyczną języka polskiego.")
+
+
+def test_proper_name_declension_matrix_and_inflection_safety():
+    """
+    TEST 160: Proper Name Declension Matrix & PWN Inflection Safety.
+    1. DeclensionParadigm 7 cases (M, D, C, B, N, Ms, W).
+    2. Female foreign consonant names: zero inflection (Rin, Megumi).
+    3. Female names on -a: regular feminine inflection (Asuka).
+    4. PWN Zero Fake Apostrophes (Ray'a -> Raya, Sasuke'a -> Sasuke, preserving White'a).
+    5. Automatic correction of undecorated male names after Polish prepositions.
+    """
+    print("\n[TEST 160/160] Proper Name Declension Matrix & Inflection Safety...")
+    from series_memory import (
+        DeclensionParadigm,
+        clean_fake_name_apostrophes,
+        fix_undecorated_male_names,
+        generate_polish_name_declension,
+    )
+
+    # 1. DeclensionParadigm 7 cases
+    par = DeclensionParadigm.from_dict(generate_polish_name_declension("Ray", "MALE"))
+    assert par.M == "Ray"
+    assert par.D == "Raya"
+    assert par.C == "Rayowi"
+    assert par.B == "Raya"
+    assert par.N == "Rayem"
+    assert par.Ms == "Rayu"
+    assert par.W == "Rayu"
+
+    # 2. Female foreign consonant names: zero inflection
+    par_rin = DeclensionParadigm.from_dict(generate_polish_name_declension("Rin", "FEMALE"))
+    assert par_rin.D == "Rin"
+    assert par_rin.N == "Rin"
+    assert par_rin.C == "Rin"
+
+    par_megumi = DeclensionParadigm.from_dict(generate_polish_name_declension("Megumi", "FEMALE"))
+    assert par_megumi.D == "Megumi"
+    assert par_megumi.N == "Megumi"
+
+    # 3. Female name on -a: regular feminine inflection
+    par_asuka = DeclensionParadigm.from_dict(generate_polish_name_declension("Asuka", "FEMALE"))
+    assert par_asuka.D == "Asuki"
+    assert par_asuka.C == "Asuce"
+    assert par_asuka.B == "Asukę"
+    assert par_asuka.N == "Asuką"
+
+    # 4. PWN Zero Fake Apostrophes
+    assert clean_fake_name_apostrophes("Widziałem Ray'a wczoraj.") == "Widziałem Raya wczoraj."
+    assert clean_fake_name_apostrophes("Daj to Sasuke'a!") == "Daj to Sasuke!"
+    assert clean_fake_name_apostrophes("Rozmawiałem z Rin'a.") == "Rozmawiałem z Rin."
+    assert clean_fake_name_apostrophes("Widziałem White'a w bazie.") == "Widziałem White'a w bazie."
+    assert clean_fake_name_apostrophes("To jest dom Wayne'a.") == "To jest dom Wayne'a."
+
+    # 5. Fix undecorated male names after Polish prepositions
+    assert fix_undecorated_male_names("To jest prezent dla Ray.") == "To jest prezent dla Raya."
+    assert fix_undecorated_male_names("Poszedłem na spacer z Ren.") == "Poszedłem na spacer z Renem."
+    assert fix_undecorated_male_names("Podarowałem miecz Ray.") == "Podarowałem miecz Rayowi."
+
+    # Negative control: Female name after preposition must NOT be inflected with masculine endings
+    assert fix_undecorated_male_names("To jest list dla Rin.") == "To jest list dla Rin."
+    assert fix_undecorated_male_names("Poszedłem na spacer z Megumi.") == "Poszedłem na spacer z Megumi."
+    print(" -> PASSED: Test 160 potwierdza 100% bezpieczeństwa fleksyjnego i matrycy deklinacji nazw własnych.")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -15104,6 +15477,12 @@ if __name__ == "__main__":
     test_sasaki_to_piichan_s2_holistic_incident_guard()
     test_hyouken_s2_root_cause_anilist_fallback_and_addressee_guard()
     test_tensei_kizoku_s3_root_cause_vocative_and_audience_guard()
-    print("\n Wszystkie testy jednostkowe i integracyjne (157/157) zakończone pełnym sukcesem!\n")
+    test_epistemic_triangulation_and_audio_purity()
+    test_diegetic_persona_and_out_of_order_lifecycle()
+    test_subtitle_sanitizer_and_japanese_quote_gate()
+    test_sparse_dialogue_and_impersonal_syntax()
+    test_full_polish_morphosyntactic_agreement()
+    test_proper_name_declension_matrix_and_inflection_safety()
+    print("\n Wszystkie testy jednostkowe i integracyjne (160/160) zakończone pełnym sukcesem!\n")
 
 

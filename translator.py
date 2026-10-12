@@ -1105,8 +1105,8 @@ class LineTranslation(BaseModel):
     speaker_grammatical_gender: Optional[str] = Field(
         default=None,
         description=(
-            "Twarda płeć gramatyczna wypowiedzi w 1. osobie: 'MASCULINE' lub 'FEMININE'. "
-            "Wymusza zgodność morfologiczną orzeczeń (-łem vs -łam, jestem gotowy vs jestem gotowa). "
+            "Twarda płeć gramatyczna wypowiedzi w 1. osobie: 'MASCULINE', 'FEMININE' lub 'NEUTRAL' (dla postaci epizodycznych/bezosobowych). "
+            "Wymusza zgodność morfologiczną orzeczeń (-łem vs -łam, jestem gotowy vs jestem gotowa, lub formy bezosobowe). "
             "W przypadku postaci chłopięcych/męskich dubbingowanych przez żeńskie seiyū "
             "(cross-gender casting, np. Tokiyuki Hōjō) bezwzględny wymóg 'MASCULINE'."
         )

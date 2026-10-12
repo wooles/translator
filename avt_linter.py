@@ -3995,7 +3995,7 @@ class EpisodeQualityGate:
                 gen = None
                 if isinstance(cdesc, dict):
                     c_g = str(cdesc.get("gender", "")).upper()
-                    if c_g in ("MALE", "FEMALE"):
+                    if c_g in ("MALE", "FEMALE", "NEUTRAL"):
                         gen = c_g
                     else:
                         cd_desc = str(cdesc.get("description", "") or cdesc.get("role", "")).lower()
@@ -4032,7 +4032,7 @@ class EpisodeQualityGate:
                 if "->" in c_key or "/" in c_key or "," in c_key:
                     continue  # Relationships handled separately, avoid poisoning listener gender
                 gen = series_bible.get_character_gender(c_key, allow_generic_nouns=False) if hasattr(series_bible, "get_character_gender") else None
-                if gen not in ("MALE", "FEMALE"):
+                if gen not in ("MALE", "FEMALE", "NEUTRAL"):
                     desc_str = c_val.get("description", "") if isinstance(c_val, dict) else str(c_val)
                     desc_lower = desc_str.lower()
                     desc_sanitized = re.sub(r"zakaz\s+form\s+(?:żeńsk|męsk)[a-ząćęłńóśźż]*", "", desc_lower)
@@ -4041,7 +4041,7 @@ class EpisodeQualityGate:
                         gen = "FEMALE"
                     elif RE_MALE_ROLE.search(desc_sanitized):
                         gen = "MALE"
-                if gen in ("MALE", "FEMALE"):
+                if gen in ("MALE", "FEMALE", "NEUTRAL"):
                     clean_ckey = extract_clean_speaker_name(c_key).strip().lower()
                     if clean_ckey and len(clean_ckey) >= 3:
                         char_gender_map[clean_ckey] = gen
@@ -4697,6 +4697,18 @@ class EpisodeQualityGate:
                 ev.text = re.sub(stutter_pat, r"\1", ev.text)
                 if ev.text != old_stutter_t:
                     fixes.append(f"[Episode Quality Gate - Filar CLXXIV Higiena Tokenów] Linia #{i+1}: usunięto zacięcie/jąkanie tokenu z interpunkcją")
+
+            # Name declension & apostrophe hygiene pass (Filar CLXX - 0.00 PLN)
+            from series_memory import clean_fake_name_apostrophes, fix_undecorated_male_names
+            c_text = clean_fake_name_apostrophes(ev.text)
+            if c_text != ev.text:
+                ev.text = c_text
+                fixes.append(f"[Episode Quality Gate - Deklinacja Imion] Linia #{i+1}: usunięto fałszywy apostrof w imieniu")
+
+            f_text = fix_undecorated_male_names(ev.text)
+            if f_text != ev.text:
+                ev.text = f_text
+                fixes.append(f"[Episode Quality Gate - Deklinacja Imion] Linia #{i+1}: skorygowano nieodmienione imię męskie po przyimku")
 
             ev_name_raw = (getattr(ev, "name", None) or getattr(ev, "actor", None) or (line_speakers.get(i) if line_speakers else None) or "")
             clean_spk_curr = extract_clean_speaker_name(str(ev_name_raw)).strip()
@@ -5469,13 +5481,13 @@ class EpisodeQualityGate:
                     spk_gen = char_gender_map.get(spk_clean) or char_gender_map.get(spk_name_lower)
                     if not spk_gen and series_bible and hasattr(series_bible, "get_character_gender"):
                         b_g = series_bible.get_character_gender(spk_clean, allow_generic_nouns=False)
-                        if b_g in ("FEMALE", "MALE"):
+                        if b_g in ("FEMALE", "MALE", "NEUTRAL"):
                             spk_gen = b_g
                     if not spk_gen and series_bible and hasattr(series_bible, "get_character_age_class"):
                         if series_bible.get_character_age_class(spk_clean) == "CHILD":
                             if hasattr(series_bible, "get_character_gender"):
                                 b_g = series_bible.get_character_gender(spk_clean, allow_generic_nouns=False)
-                                if b_g in ("FEMALE", "MALE"):
+                                if b_g in ("FEMALE", "MALE", "NEUTRAL"):
                                     spk_gen = b_g
                     if not spk_gen and series_bible and hasattr(series_bible, "is_low_pitch_female"):
                         if series_bible.is_low_pitch_female(spk_clean):
@@ -5686,6 +5698,15 @@ class EpisodeQualityGate:
                         if c_masc and c_masc.lower() != c_verb.lower():
                             ev.text = re.sub(rf"\b{re.escape(c_prefix)}{re.escape(c_verb)}\b", f"{c_prefix}{c_masc}", ev.text, count=1)
                             fixes.append(f"[Episode Quality Gate - Spójność Płci Postaci] Linia #{i+1}: skorygowano klitykę 1. os. na rodzaj męski dla mówcy '{label_spk}' ('{c_prefix}{c_verb}' -> '{c_prefix}{c_masc}')")
+                    # Compound future for male speaker
+                    fut_pat_m = r"\b((?:będę|nie\s+będę)\s+)([A-Za-ząćęłńóśźż]+(?:ała|iła|yła|ęła|ogła))\b"
+                    for match in list(re.finditer(fut_pat_m, ev.text, re.IGNORECASE)):
+                        f_prefix = match.group(1)
+                        f_verb = match.group(2)
+                        f_masc = convert_feminine_past_to_masculine(f_verb)
+                        if f_masc and f_masc.lower() != f_verb.lower():
+                            ev.text = re.sub(rf"\b{re.escape(f_prefix)}{re.escape(f_verb)}\b", f"{f_prefix}{f_masc}", ev.text, count=1)
+                            fixes.append(f"[Episode Quality Gate - Spójność Płci Postaci] Linia #{i+1}: skorygowano czas przyszły złożony na rodzaj męski dla mówcy '{label_spk}' ('{f_prefix}{f_verb}' -> '{f_prefix}{f_masc}')")
                     # Predicate nouns for male speaker in 1st person (Zasada 12 & 15)
                     mods_m_pat_1p = "|".join([m for m, f in PREDICATE_MODS_INSTRUMENTAL])
                     mods_f_pat_1p = "|".join([f for m, f in PREDICATE_MODS_INSTRUMENTAL])
@@ -5777,6 +5798,15 @@ class EpisodeQualityGate:
                         if c_fem and c_fem.lower() != c_verb.lower():
                             ev.text = re.sub(rf"\b{re.escape(c_prefix)}{re.escape(c_verb)}\b", f"{c_prefix}{c_fem}", ev.text, count=1)
                             fixes.append(f"[Episode Quality Gate - Spójność Płci Postaci] Linia #{i+1}: skorygowano klitykę 1. os. na rodzaj żeński dla mówczyni '{label_spk}' ('{c_prefix}{c_verb}' -> '{c_prefix}{c_fem}')")
+                    # Compound future for female speaker
+                    fut_pat_f = r"\b((?:będę|nie\s+będę)\s+)([A-Za-ząćęłńóśźż]+(?:ał|ił|ył|eł|ół|ął|ógł))\b"
+                    for match in list(re.finditer(fut_pat_f, ev.text, re.IGNORECASE)):
+                        f_prefix = match.group(1)
+                        f_verb = match.group(2)
+                        f_fem = convert_masculine_past_to_feminine(f_verb)
+                        if f_fem and f_fem.lower() != f_verb.lower():
+                            ev.text = re.sub(rf"\b{re.escape(f_prefix)}{re.escape(f_verb)}\b", f"{f_prefix}{f_fem}", ev.text, count=1)
+                            fixes.append(f"[Episode Quality Gate - Spójność Płci Postaci] Linia #{i+1}: skorygowano czas przyszły złożony na rodzaj żeński dla mówczyni '{label_spk}' ('{f_prefix}{f_verb}' -> '{f_prefix}{f_fem}')")
                     # Predicate nouns for female speaker in 1st person (Zasada 12 & 15)
                     mods_m_pat_1p = "|".join([m for m, f in PREDICATE_MODS_INSTRUMENTAL])
                     mods_f_pat_1p = "|".join([f for m, f in PREDICATE_MODS_INSTRUMENTAL])
@@ -5822,6 +5852,17 @@ class EpisodeQualityGate:
                         for m_mod, f_mod in PREDICATE_MODS_NOMINATIVE:
                             pat_mod_nom = rf"((?:\b(?:jestem|byłam|byłem|zostałam|zostałem|to\s+jest|to)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:{all_mods_nom_pat_1p})\s+){{0,2}})({re.escape(m_mod)})(\s+(?:(?:{all_mods_nom_pat_1p})\s+)*(?:{fem_all_nouns_nom_pat_1p}))\b"
                             ev.text = re.sub(pat_mod_nom, rf"\g<1>{f_mod}\g<3>", ev.text, flags=re.IGNORECASE)
+                elif spk_gen == "NEUTRAL":
+                    # Impersonal syntax enforcement for transient NEUTRAL speakers (Filar CLXX - 0.00 PLN)
+                    old_neut_text = ev.text
+                    ev.text = re.sub(r"\b(?:musiałem|musiałam)\s+uciekać\b", "trzeba uciekać", ev.text, flags=re.IGNORECASE)
+                    ev.text = re.sub(r"\b(?:musiałem|musiałam)\b", "trzeba było", ev.text, flags=re.IGNORECASE)
+                    ev.text = re.sub(r"\b(?:zauważyłem|zauważyłam|zobaczyłem|zobaczyłam)\s+(?:stąd\s+)?zamek\b", "widać stąd zamek", ev.text, flags=re.IGNORECASE)
+                    ev.text = re.sub(r"\b(?:zrobiłem|zrobiłam)\s+to\b", "zrobiono to", ev.text, flags=re.IGNORECASE)
+                    ev.text = re.sub(r"\b(?:odkryłem|odkryłam)\s+wyciek\b", "odkryto wyciek", ev.text, flags=re.IGNORECASE)
+                    ev.text = re.sub(r"\b(?:powinienem|powinnam)\s+sprawdzić\b", "warto sprawdzić", ev.text, flags=re.IGNORECASE)
+                    if ev.text != old_neut_text:
+                        fixes.append(f"[Episode Quality Gate - Składnia Bezpłciowa] Linia #{i+1}: wymuszono konstrukcję bezosobową dla postaci o statusie NEUTRAL ('{old_neut_text}' -> '{ev.text}')")
 
                 # 3c-2: 3rd-person subject-verb past-tense agreement & compound passive voice (Filar CLXII/CLXXXV)
                 # Protected by Preposition Shield & Possessive Headword Shield (0.00 PLN)

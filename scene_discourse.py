@@ -25,7 +25,7 @@ Odpowiedzialność:
 """
 
 import re
-from typing import List, Dict, Any, Tuple, Optional
+from typing import List, Dict, Any, Tuple, Optional, Set
 
 
 class DualVoiceTagPreserver:
@@ -292,3 +292,131 @@ class DiarizationSanityChecker:
             return result
 
         return result
+
+
+class SubtitleDiscourseSanitizer:
+    """
+    Sanitizer napisów i bramka znaków CJK (Zero-Poisoning Subtitle Sanitizer, 0.00 PLN).
+    - Odrzuca japońskie cudzysłowy dialogowe 「 」 i 『 』 jako monolog (zawsze mowa na głos).
+    - Odrzuca oznaczenia skilli/statusu/szyldów 【 】, 《 》, ［ ］.
+    - Automatycznie usuwa didaskalia dźwiękowe [SFX: ...], [Gasp], (screams), szyldy [Sign: ...], [Title: ...].
+    - Usuwa notki tłumacza [TL: ...], [T/N: ...], (Note: ...).
+    """
+
+    TL_NOTE_REGEX = re.compile(r"\[(?:TL|T/N|Note):.*?\]|\((?:TL|T/N|Note):.*?\)", re.IGNORECASE)
+    SFX_AND_SIGNS_REGEX = re.compile(
+        r"\[(?:SFX|Gasp|Screams?|Music|Sound|Sign|Title):.*?\]|\((?:gasp|screams?|sighs|crying|groans|applause)\)",
+        re.IGNORECASE
+    )
+    ASS_TAGS_REGEX = re.compile(r"\{[^}]*\}")
+    DIALOGUE_QUOTES_REGEX = re.compile(r"[「」『』]")
+    SKILL_BRACKETS_REGEX = re.compile(r"[【】《》［］]")
+
+    @classmethod
+    def sanitize_subtitles_for_nlp(cls, text: str) -> str:
+        """Oczyszcza tekst napisów z notek tłumacza, didaskaliów, szyldów i tagów ASS."""
+        if not text:
+            return ""
+        clean = cls.TL_NOTE_REGEX.sub("", text)
+        clean = cls.SFX_AND_SIGNS_REGEX.sub("", clean)
+        clean = cls.ASS_TAGS_REGEX.sub("", clean)
+        return clean.strip()
+
+    @classmethod
+    def is_dialogue_quote(cls, text: str) -> bool:
+        """Zwraca True, jeśli linia zawiera japońskie cudzysłowy dialogowe 「 」 lub 『 』 (mowa na głos)."""
+        return bool(cls.DIALOGUE_QUOTES_REGEX.search(text or ""))
+
+    @classmethod
+    def is_skill_or_system_bracket(cls, text: str) -> bool:
+        """Zwraca True, jeśli linia zawiera nawiasy statusu/skilli/szyldów 【 】, 《 》, ［ ］."""
+        return bool(cls.SKILL_BRACKETS_REGEX.search(text or ""))
+
+
+def is_internal_monologue(event_or_text: Any, target_speaker: Optional[str] = None) -> bool:
+    """
+    Kryteria zatwierdzenia monologu wewnętrznego (is_internal_monologue = True):
+    Kwestia otrzymuje dostęp do true_gender postaci WYŁĄCZNIE wtedy, gdy spełnia łącznie:
+    1) Cała linia ujęta jest w nawiasy okrągłe ASCII ( ) lub CJK （ ） ALBO posiada styl ASS typu 'Thoughts'/'Internal'
+       ALBO jest w całości zapisana kursywą {\\i1}.
+    2) ORAZ nie zawiera prefiksów radiowych/telefonicznych ([Radio], [Phone], [Comm]).
+    3) ORAZ nie posiada zdefiniowanego adresata w grafie dyskursu (target_speaker is None; brak szeptu do towarzysza).
+    4) ORAZ nie zawiera japońskich cudzysłowów dialogowych 「 」/『 』 ani nawiasów skilli 【 】/《 》.
+    """
+    if event_or_text is None:
+        return False
+
+    raw_text = getattr(event_or_text, "text", str(event_or_text)) or ""
+    style = getattr(event_or_text, "style", "") or ""
+
+    # Odrzucenie cudzysłowów dialogowych i nawiasów skilli
+    if SubtitleDiscourseSanitizer.is_dialogue_quote(raw_text):
+        return False
+    if SubtitleDiscourseSanitizer.is_skill_or_system_bracket(raw_text):
+        return False
+
+    # Sprawdzenie prefiksów radiowych/telefonicznych
+    if re.search(r"\[(?:Radio|Phone|Comm)\]", raw_text, re.IGNORECASE):
+        return False
+
+    # Sprawdzenie zdefiniowanego adresata
+    target = target_speaker if target_speaker is not None else (getattr(event_or_text, "addressee", None) or getattr(event_or_text, "target", None))
+    if target is not None and str(target).strip():
+        return False
+
+    # Oczyszczenie z tagów ASS dla analizy nawiasów
+    pure_text = SubtitleDiscourseSanitizer.ASS_TAGS_REGEX.sub("", raw_text).strip()
+
+    # 1. Styl "Thoughts" / "Internal"
+    style_low = style.lower()
+    if any(k in style_low for k in ["thought", "internal", "myśl"]):
+        return True
+
+    # 2. Nawiasy okrągłe ASCII ( ) lub CJK （ ） obejmujące całą linię
+    if (pure_text.startswith("(") and pure_text.endswith(")")) or (pure_text.startswith("（") and pure_text.endswith("）")):
+        return True
+
+    # 3. W całości zapisana kursywą {\i1}
+    if raw_text.strip().startswith("{\\i1}") and ("{\\i0}" not in raw_text or raw_text.strip().endswith("{\\i0}")):
+        return True
+
+    return False
+
+
+def resolve_diegetic_persona_gender(
+    character_identity: Any,
+    episode_index: int = 1,
+    is_monologue: bool = False,
+    audience: Optional[List[str]] = None,
+    secret_knowers: Optional[Set[str]] = None
+) -> str:
+    """
+    Rozstrzyga płeć postaci w oparciu o stan diegetyczny, monolog i świadomość tajemnicy (knows_secret):
+    - Monolog wewnętrzny: true_gender.
+    - Dialog sam na sam z powiernikiem sekretu (len(audience) == 1 i audience[0] in secret_knowers): true_gender.
+    - Scena wieloosobowa lub dialog z osobą nieświadomą: apparent_gender (maska publiczna).
+    """
+    if character_identity is None:
+        return "UNKNOWN"
+
+    audience = audience or []
+    secret_knowers = {s.lower() for s in (secret_knowers or set())}
+
+    # 1. Monolog wewnętrzny
+    if is_monologue:
+        return getattr(character_identity, "true_gender", "UNKNOWN")
+
+    # 2. Sam na sam z powiernikiem sekretu
+    if len(audience) == 1 and audience[0].lower() in secret_knowers:
+        return getattr(character_identity, "true_gender", "UNKNOWN")
+
+    # 3. Scena wieloosobowa lub nieświadomy adresat -> pobierz stan maski dla episode_index
+    if hasattr(character_identity, "get_effective_gender"):
+        return character_identity.get_effective_gender(
+            episode_index=episode_index,
+            is_private_confidant=False,
+            in_multi_person_scene=(len(audience) > 1),
+            is_monologue=False
+        )
+
+    return getattr(character_identity, "true_gender", "UNKNOWN")

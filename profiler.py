@@ -10,8 +10,10 @@ import os
 import re
 import json
 import logging
+import subprocess
 from pathlib import Path
-from typing import List, Optional, Dict, Any, Set, Tuple
+from typing import List, Optional, Dict, Any, Set, Tuple, Union
+import numpy as np
 from pydantic import BaseModel, Field, ConfigDict
 from google import genai
 from google.genai import types
@@ -780,4 +782,427 @@ def resolve_profile_alerts_to_events(
                             resolved_alerts[o_idx].append(a)
 
     return resolved_alerts
+
+
+def extract_japanese_audio_track(video_path: Union[str, Path], output_wav: Union[str, Path], execute: bool = False) -> List[str]:
+    """
+    Ekstrakcja ścieżki audio z japońskim strumieniem za pomocą FFmpeg:
+    ffmpeg -y -i <video> -map 0:a:m:language:jpn? -map 0:a:0 -vn -acodec pcm_s16le -ar 16000 -ac 1 <output.wav>
+    Zabezpieczenia Windows:
+    - ścieżki typu pathlib.Path,
+    - argumenty przekazywane jako lista stringów,
+    - bez shell=True.
+    """
+    v_path = Path(video_path)
+    o_path = Path(output_wav)
+    cmd = [
+        "ffmpeg",
+        "-y",
+        "-i",
+        str(v_path),
+        "-map",
+        "0:a:m:language:jpn?",
+        "-map",
+        "0:a:0",
+        "-vn",
+        "-acodec",
+        "pcm_s16le",
+        "-ar",
+        "16000",
+        "-ac",
+        "1",
+        str(o_path),
+    ]
+    if execute and v_path.exists():
+        subprocess.run(cmd, capture_output=True, check=True)
+    return cmd
+
+
+class EpistemicAudioTriangulator:
+    """
+    Triangulator akustyczny z limitem próbkowania pYIN oraz filtrem szumu tła (BGM/SFX).
+    - Limit próbkowania pYIN: wyłącznie 3-5 najczystszych wycinków mowy per postać (1.5-2.0s, max 10s audio).
+    - Dyskwalifikacja próbek, w których odchylenie standardowe F0 > 50 Hz (artefakt muzyki/krzyku).
+    - Asymetria fizjologiczna krtani:
+      Mediana F0 <= 135 Hz nadaje twardy determinizm męski (F0_hard_masculine = True, pewność 1.0; prawo weta anaforycznego przy score <= -8).
+      W strefie F0 > 170 Hz waga F0 = 0% (unieważnienie, delegacja do morfosyntaktyki i anaforyki).
+    """
+
+    @classmethod
+    def extract_clean_speech_clips(
+        cls,
+        samples: np.ndarray,
+        sample_rate: int = 16000,
+        max_clips: int = 5,
+        clip_duration_sec: float = 1.5,
+        max_total_sec: float = 10.0,
+        sr: Optional[int] = None
+    ) -> List[np.ndarray]:
+        if sr is not None:
+            sample_rate = sr
+        if samples is None or len(samples) == 0:
+            return []
+
+        clip_len = int(sample_rate * clip_duration_sec)
+        if len(samples) < clip_len:
+            if len(samples) >= int(sample_rate * 0.5):
+                return [samples]
+            return []
+
+        clips = []
+        total_samples = 0
+        max_total_samples = int(sample_rate * max_total_sec)
+
+        step = clip_len
+        candidate_slices = []
+        for start in range(0, len(samples) - clip_len + 1, step):
+            cand = samples[start:start + clip_len]
+            energy = float(np.mean(cand ** 2))
+            var = float(np.var(cand))
+            if energy > 1e-4:
+                candidate_slices.append((var, cand))
+
+        candidate_slices.sort(key=lambda x: x[0])
+
+        for _, cand in candidate_slices:
+            if len(clips) >= max_clips or (total_samples + len(cand)) > max_total_samples:
+                break
+            clips.append(cand)
+            total_samples += len(cand)
+
+        if not clips and candidate_slices:
+            clips.append(candidate_slices[0][1])
+
+        return clips
+
+    @classmethod
+    def estimate_f0_pyin(cls, clip: np.ndarray, sample_rate: int = 16000, sr: Optional[int] = None) -> Optional[float]:
+        """
+        Oblicza medianę F0 z ramek voiced librosa.pyin.
+        Jeśli odchylenie standardowe F0 w próbce przekracza 50 Hz, próbka jest dyskwalifikowana.
+        """
+        if sr is not None:
+            sample_rate = sr
+        if clip is None or len(clip) < int(sample_rate * 0.2):
+            return None
+
+        try:
+            import librosa
+            y = clip.astype(np.float32)
+            if np.max(np.abs(y)) > 1.0:
+                y = y / max(np.max(np.abs(y)), 1.0)
+
+            f0, voiced_flag, _ = librosa.pyin(
+                y,
+                fmin=60,
+                fmax=400,
+                sr=sample_rate,
+                frame_length=1024
+            )
+            if f0 is None or voiced_flag is None:
+                return None
+
+            valid_f0 = f0[voiced_flag & ~np.isnan(f0)]
+            if len(valid_f0) < 3:
+                return None
+
+            std_f0 = float(np.std(valid_f0))
+            if std_f0 > 50.0:
+                logger.debug(f"Dyskwalifikacja próbki: odchylenie standardowe F0 = {std_f0:.1f} Hz > 50.0 Hz")
+                return None
+
+            return float(np.median(valid_f0))
+        except Exception as e:
+            logger.debug(f"Błąd librosa.pyin: {e}")
+            return None
+
+    @classmethod
+    def triangulate_f0_gender(cls, median_f0: Optional[float]) -> Tuple[Optional[str], float, bool]:
+        """
+        Zwraca (gender, confidence, F0_hard_masculine):
+        - F0 <= 135 Hz: ('MALE', 1.0, True) - prawo weta anaforycznego przy score <= -8
+        - F0 > 170 Hz: (None, 0.0, False) - waga F0 = 0% (unieważnienie, delegacja)
+        - 135 < F0 <= 170 Hz: ('MALE', 0.65, False)
+        """
+        if median_f0 is None:
+            return None, 0.0, False
+
+        if median_f0 <= 135.0:
+            return "MALE", 1.0, True
+
+        if median_f0 > 170.0:
+            return None, 0.0, False
+
+        return "MALE", 0.65, False
+
+
+def resolve_event_speaker_cascade(event: Any, prev_event: Optional[Any] = None, jp_text: str = "") -> Optional[str]:
+    """
+    Trzystopniowa kaskada rozwiązywania tożsamości mówcy w zdarzeniu pysubs2:
+    Krok A: Wartość pola event.name (jeśli wypełniona).
+    Krok B: Unikalna nazwa w event.style (jeśli styl mapuje się na postać, np. 'Ray_Dialogue' -> 'Ray').
+    Krok C: Jeśli styl to 'Default' a event.name jest puste:
+            przypisuje postać WYŁĄCZNIE wtedy, gdy w transkrypcji JA występuje autoprezentacja
+            (np. 'Ore wa [Name]...') LUB gdy w linii bezpośrednio poprzedzającej inna postać wywołała ją po imieniu
+            (Adresat -> Mówca w kolejnej linii). W przeciwnym razie mowa anonimowa (None).
+    """
+    if event is None:
+        return None
+
+    # Krok A: event.name
+    name = (getattr(event, "name", "") or "").strip()
+    if name:
+        return name
+
+    # Krok B: event.style
+    style = (getattr(event, "style", "") or "").strip()
+    if style and style.lower() != "default":
+        clean_style = re.sub(r"_(?:dialogue|speech|voice|line|text)$", "", style, flags=re.IGNORECASE).strip()
+        if clean_style and clean_style.lower() not in ("main", "italics", "flashback", "narration", "thoughts", "sign", "title", "top"):
+            return clean_style
+
+    # Krok C: Styl Default i brak name
+    # 1. Autoprezentacja w transkrypcji JA
+    if jp_text:
+        intro_match = re.search(
+            r"\b(?:ore|watashi|boku)\s+wa\s+([A-Z][a-z]+|[A-Za-z]+)",
+            jp_text,
+            re.IGNORECASE
+        )
+        if intro_match:
+            candidate = intro_match.group(1).strip()
+            if candidate.lower() not in ("hitori", "dareka", "koko"):
+                return candidate
+
+    # 2. Wywołanie po imieniu w linii bezpośrednio poprzedzającej
+    if prev_event is not None:
+        prev_addressee = getattr(prev_event, "addressee", None)
+        if prev_addressee and str(prev_addressee).strip():
+            return str(prev_addressee).strip()
+
+        prev_text = getattr(prev_event, "text", "") or ""
+        voc_match = re.search(r"\b([A-Z][a-z]+)\s*[!?,]", prev_text)
+        if voc_match:
+            cand_name = voc_match.group(1).strip()
+            if cand_name.lower() not in ("wait", "look", "listen", "hey", "hello", "stop", "come", "help", "yes", "no"):
+                return cand_name
+
+    return None
+
+
+class SpaCyAnaphoraDiscourseAnalyzer:
+    """
+    Analizator dyskursu anaforycznego z filtracją wołacza (Vocative Filter) i rekonstrukcją akapitową.
+    Wzór wagowy Filaru EN:
+    Score_EN_pronouns = (he, him, his, himself) - (she, her, hers, herself) [waga: x4]
+    Score_EN_nouns = (męskie_tytuły) - (żeńskie_tytuły) [waga: x5]
+    """
+
+    MALE_TITLES = {
+        "boy", "guy", "man", "sir", "lord", "brother", "son", "prince", "king",
+        "father", "uncle", "nephew", "lad", "gentleman"
+    }
+    FEMALE_TITLES = {
+        "girl", "woman", "lady", "dame", "sister", "daughter", "princess", "queen",
+        "mother", "aunt", "niece", "lass", "gentlewoman"
+    }
+
+    _nlp_instance = None
+
+    @classmethod
+    def get_nlp(cls):
+        if cls._nlp_instance is None:
+            try:
+                import spacy
+                cls._nlp_instance = spacy.load("en_core_web_sm", disable=["ner"])
+            except Exception:
+                cls._nlp_instance = None
+        return cls._nlp_instance
+
+    @classmethod
+    def reconstruct_scene_paragraphs(cls, events: List[Any], max_gap_sec: float = 1.5) -> List[str]:
+        """
+        Łączy sąsiadujące linie z tej samej sceny (odstęp < 1.5s) w spójny akapit tekstu,
+        aby umożliwić rozwiązanie koreferencji międzyzdaniowej w spaCy.
+        """
+        if not events:
+            return []
+
+        sorted_events = sorted(events, key=lambda ev: getattr(ev, "start", 0))
+        paragraphs = []
+        current_chunk = []
+        last_end = None
+
+        for ev in sorted_events:
+            start_sec = getattr(ev, "start", 0) / 1000.0
+            end_sec = getattr(ev, "end", 0) / 1000.0
+            raw_t = getattr(ev, "text", str(ev))
+            clean_t = re.sub(r"\{[^}]*\}", "", raw_t).strip()
+            clean_t = re.sub(r"\\[Nnh]+", " ", clean_t).strip()
+            if not clean_t:
+                continue
+
+            if last_end is not None and (start_sec - last_end) > max_gap_sec:
+                if current_chunk:
+                    paragraphs.append(" ".join(current_chunk))
+                    current_chunk = []
+
+            current_chunk.append(clean_t)
+            last_end = end_sec
+
+        if current_chunk:
+            paragraphs.append(" ".join(current_chunk))
+
+        return paragraphs
+
+    @classmethod
+    def filter_vocative_from_text(cls, text: str, character_name: str) -> str:
+        """
+        Wykluczenie wołacza (Vocative Filter):
+        Jeśli imię postaci występuje w strukturze z przecinkiem i zaimkiem 2. osoby
+        (np. 'Ray, you have to go', 'Look out, Ray!'), konstrukcja ta jest KATEGORYCZNIE WYKLUCZONA
+        ze zliczania punktów w 3. osobie (to zwrot do adresata, a nie deklaracja podmiotu).
+        """
+        if not text or not character_name:
+            return text
+
+        c_escaped = re.escape(character_name)
+        filtered = re.sub(rf"\b{c_escaped}\s*,\s*you\b(?:\s+\w+)?", "", text, flags=re.IGNORECASE)
+        filtered = re.sub(rf"\byou\s*,\s*{c_escaped}\b", "", filtered, flags=re.IGNORECASE)
+        filtered = re.sub(rf",\s*{c_escaped}\s*([!?.])", r"\1", filtered, flags=re.IGNORECASE)
+        filtered = re.sub(rf"\b{c_escaped}\s*,\s*", "", filtered, flags=re.IGNORECASE)
+        return filtered.strip()
+
+    @classmethod
+    def score_english_anaphora(cls, text: str, character_name: str = "") -> int:
+        """
+        Oblicza łączny wynik anaforyczny w tekście angielskim:
+        Score_EN_pronouns = (he, him, his, himself) - (she, her, hers, herself) [waga: x4]
+        Score_EN_nouns = sum(męskie_tytuły) - sum(żeńskie_tytuły) [waga: x5]
+        """
+        if not text:
+            return 0
+
+        clean_text = cls.filter_vocative_from_text(text, character_name) if character_name else text
+        nlp = cls.get_nlp()
+
+        he_count = 0
+        she_count = 0
+        male_noun_count = 0
+        female_noun_count = 0
+
+        if nlp is not None:
+            doc = nlp(clean_text)
+            for token in doc:
+                t_lower = token.lemma_.lower()
+                text_lower = token.text.lower()
+                if text_lower in ("he", "him", "his", "himself"):
+                    he_count += 1
+                elif text_lower in ("she", "her", "hers", "herself"):
+                    she_count += 1
+
+                if t_lower in cls.MALE_TITLES or text_lower in cls.MALE_TITLES:
+                    male_noun_count += 1
+                elif t_lower in cls.FEMALE_TITLES or text_lower in cls.FEMALE_TITLES:
+                    female_noun_count += 1
+        else:
+            words = [w.lower() for w in re.findall(r"\b[A-Za-z]+\b", clean_text)]
+            for w in words:
+                if w in ("he", "him", "his", "himself"):
+                    he_count += 1
+                elif w in ("she", "her", "hers", "herself"):
+                    she_count += 1
+
+                if w in cls.MALE_TITLES:
+                    male_noun_count += 1
+                elif w in cls.FEMALE_TITLES:
+                    female_noun_count += 1
+
+        score_pronouns = (he_count - she_count) * 4
+        score_nouns = (male_noun_count - female_noun_count) * 5
+        return score_pronouns + score_nouns
+
+    @classmethod
+    def triangulate_epistemic_gender(
+        cls,
+        f0_hz: Optional[float] = None,
+        jp_pronoun: Optional[str] = None,
+        en_score: int = 0
+    ) -> Dict[str, Any]:
+        """
+        Syntetyzuje 3 filary wiedzy (Acoustic F0, Japanese Morphosyntax, English Discourse Anaphora)
+        rozstrzygając 6 kanonicznych archetypów epistemicznych:
+        1. Deep male acoustic + male anaphora
+        2. High female acoustic + female anaphora
+        3. Cross-gender seiyū (boy role voiced by female)
+        4. F0 Hard Masculine Veto (F0 <= 135 Hz z prawem weta anaforycznego)
+        5. Sparse / Ambiguous background voice
+        6. Pure morphosyntax override
+        """
+        f0_gender, f0_conf, f0_hard_masc = EpistemicAudioTriangulator.triangulate_f0_gender(f0_hz)
+
+        jp_p_low = (jp_pronoun or "").lower()
+        jp_gender = "MALE" if jp_p_low in ("ore", "boku", "sessha") else ("FEMALE" if jp_p_low in ("watashi", "atashi", "atai") else None)
+
+        if f0_hard_masc:
+            if en_score <= -8:
+                return {
+                    "resolved_gender": "FEMALE",
+                    "confidence": 0.85,
+                    "archetype": "EP_RUPTURE_ANAPHORA_OVERRIDE",
+                    "f0_hard_masculine": True
+                }
+            return {
+                "resolved_gender": "MALE",
+                "confidence": 1.0,
+                "archetype": "F0_HARD_MASCULINE_VETO",
+                "f0_hard_masculine": True
+            }
+
+        if f0_hz is not None and f0_hz > 170.0 and (jp_gender == "MALE" or en_score > 0):
+            return {
+                "resolved_gender": "MALE",
+                "confidence": 0.95,
+                "archetype": "CROSS_GENDER_SEIYU_BOY_ROLE",
+                "f0_hard_masculine": False
+            }
+
+        if (f0_gender == "MALE" or jp_gender == "MALE") and en_score >= 0:
+            return {
+                "resolved_gender": "MALE",
+                "confidence": 0.95,
+                "archetype": "DEEP_MALE_ACOUSTIC_AND_ANAPHORA",
+                "f0_hard_masculine": False
+            }
+
+        if (f0_hz is not None and f0_hz > 170.0 or jp_gender == "FEMALE") and en_score < 0:
+            return {
+                "resolved_gender": "FEMALE",
+                "confidence": 0.95,
+                "archetype": "HIGH_FEMALE_ACOUSTIC_AND_ANAPHORA",
+                "f0_hard_masculine": False
+            }
+
+        if f0_hz is None and (jp_gender == "MALE" and en_score >= 4 or en_score >= 8):
+            return {
+                "resolved_gender": "MALE",
+                "confidence": 0.90,
+                "archetype": "PURE_MORPHOSYNTAX_OVERRIDE",
+                "f0_hard_masculine": False
+            }
+        if f0_hz is None and (jp_gender == "FEMALE" and en_score <= -4 or en_score <= -8):
+            return {
+                "resolved_gender": "FEMALE",
+                "confidence": 0.90,
+                "archetype": "PURE_MORPHOSYNTAX_OVERRIDE",
+                "f0_hard_masculine": False
+            }
+
+        return {
+            "resolved_gender": "NEUTRAL",
+            "confidence": 0.50,
+            "archetype": "SPARSE_AMBI_BACKGROUND",
+            "is_transient": True,
+            "f0_hard_masculine": False
+        }
 
