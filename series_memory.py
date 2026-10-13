@@ -13,62 +13,97 @@ import copy
 from pathlib import Path
 from typing import Dict, List, Any, Optional, Set, Tuple, Union, Literal
 from pydantic import BaseModel, Field, ConfigDict
+from enum import Enum
 
-class PersonaInterval(BaseModel):
-    apparent_gender: Literal["MASCULINE", "FEMININE"]
-    valid_from_ep: int
-    valid_to_ep: Optional[int] = None
-    public_facade: bool = True
+class EntityCategory(str, Enum):
+    ANTHROPONYM = "ANTHROPONYM"
+    TOPONYM = "TOPONYM"
+    CHREMATONYM = "CHREMATONYM"
 
 
-class CharacterIdentity(BaseModel):
-    canonical_id: str
-    true_gender: Literal["MASCULINE", "FEMININE"]
-    discourse_states: List[PersonaInterval] = Field(default_factory=list)
+# Sylabiczny profil japoński i fonotaktyka końcowego -e (Filar IV / Zasada 15 AGENTS.md)
+ENGLISH_CONSONANT_CLUSTERS: Tuple[str, ...] = (
+    "wh", "th", "gh", "ph", "cl", "st", "ld", "br", "cr"
+)
 
-    def get_effective_gender(
-        self,
-        episode_index: int,
-        is_private_confidant: bool = False,
-        in_multi_person_scene: bool = False,
-        is_monologue: bool = False
-    ) -> str:
-        """
-        Zwraca obowiązującą płeć gramatyczną w zależności od odcinka,
-        statusu monologu, obecności powiernika tajemnicy i sceny wieloosobowej.
-        """
-        if is_monologue:
-            return self.true_gender
+JAPANESE_OPEN_E_MORAS: Tuple[str, ...] = (
+    "ke", "te", "ne", "me", "re", "se", "ze", "be", "ge", "de", "he", "pe"
+)
 
-        if is_private_confidant and not in_multi_person_scene:
-            return self.true_gender
+KNOWN_SILENT_E_NAMES: Set[str] = {
+    "white", "wayne", "blade", "george", "locke", "moore", "clarke", "stone", "drake",
+    "chase", "cole", "bruce", "luke", "mike", "pete", "steve", "dave", "dale"
+}
 
-        for interval in self.discourse_states:
-            if interval.valid_from_ep <= episode_index:
-                if interval.valid_to_ep is None or episode_index <= interval.valid_to_ep:
-                    if interval.public_facade:
-                        return interval.apparent_gender
-                    return self.true_gender
+JAPANESE_VOWEL_E_NAMES: Set[str] = {
+    "sasuke", "daisuke", "ryunosuke", "shusuke", "sosuke", "akane", "kaede", "sanosuke", "kotone", "sakurae"
+}
 
-        return self.true_gender
+def is_japanese_cv_mora_e_name(name: str) -> bool:
+    """
+    Detektor CV-Mora dla wygłosu -e (Filar IV / Zasada 15 AGENTS.md):
+    Jeśli nazwa własna ma sylabiczny profil japoński (brak angielskich zbitek spółgłoskowych
+    wh, th, gh, ph, cl, st, ld, br, cr oraz wygłos na otwartą morę
+    -ke, -te, -ne, -me, -re, -se, -ze, -be, -ge, -de, -he, -pe po samogłosce lub n),
+    traktuje końcowe -e jako wymawianą samogłoskę fonetyczną i blokuje wstawianie apostrofu.
+    Apostrof dozwolony wyłącznie dla niemego fonetycznie -e (White'a, Wayne'a, George'a).
+    """
+    if not name or len(name) < 3:
+        return False
+    w = name.strip().lower()
+    if not w.endswith("e"):
+        return False
+    if w in KNOWN_SILENT_E_NAMES:
+        return False
+    if w in JAPANESE_VOWEL_E_NAMES:
+        return True
 
-    def register_epistemic_rupture(self, episode_index: int, new_gender: Literal["MASCULINE", "FEMININE"]):
-        """
-        Zamyka poprzedni stan maski (valid_to_ep = episode_index - 1)
-        i rejestruje dekonspirację (valid_from_ep = episode_index).
-        """
-        for interval in self.discourse_states:
-            if interval.valid_to_ep is None or interval.valid_to_ep >= episode_index:
-                interval.valid_to_ep = episode_index - 1
+    # 1. Brak angielskich zbitek spółgłoskowych
+    if any(cluster in w for cluster in ENGLISH_CONSONANT_CLUSTERS):
+        return False
 
-        self.discourse_states.append(
-            PersonaInterval(
-                apparent_gender=new_gender,
-                valid_from_ep=episode_index,
-                valid_to_ep=None,
-                public_facade=False
-            )
-        )
+    # 2. Wygłos na otwartą morę (-ke, -te, -ne, -me, -re, -se, -ze, -be, -ge, -de, -he, -pe)
+    matched_mora = None
+    for mora in JAPANESE_OPEN_E_MORAS:
+        if w.endswith(mora):
+            matched_mora = mora
+            break
+    if not matched_mora:
+        return False
+
+    # 3. Mora po samogłosce (a, e, i, o, u) lub n
+    prefix = w[:-len(matched_mora)]
+    if not prefix:
+        return False
+    preceding_char = prefix[-1]
+    if preceding_char in "aeiou" or preceding_char == "n":
+        return True
+
+    return False
+
+
+def _compute_vocative(name: str, gender: str = "MALE") -> str:
+    """
+    Zwraca formę wołacza (W) dla podanego imienia:
+    - Dla odmiennych imion męskich na (tz, c, dz, cz, sz, rz, ż, sh, ch, k, g, j, y, l): wyłącznie końcówka -u.
+    - Dla japońskich imion z sylabicznym wygłosem -e (CV-mora): bez apostrofu i bez zmian.
+    - W pozostałych przypadkach: Wołacz wygenerowany przez generate_polish_name_declension.
+    """
+    if not name:
+        return ""
+    clean_name = str(name).strip()
+    c_lower = clean_name.lower()
+    # Korekta błędnych wołaczy na -tzie -> -tzu (np. Rietzie -> Rietzu)
+    if c_lower.endswith("tzie"):
+        return clean_name[:-4] + ("tzu" if clean_name[-4:].islower() else "TZU")
+    if is_japanese_cv_mora_e_name(clean_name):
+        return clean_fake_name_apostrophes(clean_name)
+    gen_func = globals().get("generate_polish_name_declension")
+    if callable(gen_func):
+        decl = gen_func(clean_name, gender)
+        if decl and "W" in decl:
+            return decl["W"]
+    return clean_name
 
 
 class DeclensionParadigm(BaseModel):
@@ -131,10 +166,247 @@ class DeclensionParadigm(BaseModel):
             vocative=d.get("W", "")
         )
 
+    @classmethod
+    def create_for_name(cls, name: str, gender: str = "UNKNOWN") -> "DeclensionParadigm":
+        gen_func = globals().get("generate_polish_name_declension")
+        if callable(gen_func):
+            decl = gen_func(name, gender)
+            if decl and "M" in decl:
+                return cls.from_dict(decl)
+        return cls.from_dict({"M": name, "D": name, "C": name, "B": name, "N": name, "Ms": name, "W": name})
 
-JAPANESE_VOWEL_E_NAMES: Set[str] = {
-    "sasuke", "daisuke", "ryunosuke", "shusuke", "sosuke", "akane", "kaede", "sanosuke", "kotone", "sakurae"
-}
+    @classmethod
+    def get_vocative(cls, name: Optional[str] = None, gender: str = "MALE") -> str:
+        """
+        Zwraca formę wołacza (W) dla podanego imienia:
+        - Dla odmiennych imion męskich na (tz, c, dz, cz, sz, rz, ż, sh, ch, k, g, j, y, l): wyłącznie końcówka -u.
+        - Dla japońskich imion z sylabicznym wygłosem -e (CV-mora): bez apostrofu i bez zmian.
+        - W pozostałych przypadkach: Wołacz wygenerowany przez generate_polish_name_declension.
+        """
+        if not name:
+            return ""
+        return _compute_vocative(name, gender)
+
+
+MODIFIER_PREFIX_RE: re.Pattern = re.compile(
+    r"^(?:Young|Child|Kid|Little|Baby|Teen|Old|Elder|Future|Past|Adult|Masked|True|Fake|Dark|Shadow|Młody|Młoda|Mały|Mała|Stary|Stara)\s+(.+)$",
+    re.IGNORECASE
+)
+
+
+class PersonaInterval(BaseModel):
+    apparent_gender: Literal["MASCULINE", "FEMININE"]
+    valid_from_ep: int
+    valid_to_ep: Optional[int] = None
+    public_facade: bool = True
+
+
+class CharacterIdentity(BaseModel):
+    canonical_id: str
+    true_gender: Literal["MASCULINE", "FEMININE"]
+    discourse_states: List[PersonaInterval] = Field(default_factory=list)
+    entity_category: EntityCategory = Field(default=EntityCategory.ANTHROPONYM)
+    declension_paradigm: Optional[DeclensionParadigm] = Field(default=None)
+    base_canonical_id: Optional[str] = Field(default=None)
+
+    def get_effective_gender(
+        self,
+        episode_index: int,
+        is_private_confidant: bool = False,
+        in_multi_person_scene: bool = False,
+        is_monologue: bool = False
+    ) -> str:
+        """
+        Zwraca obowiązującą płeć gramatyczną w zależności od odcinka,
+        statusu monologu, obecności powiernika tajemnicy i sceny wieloosobowej.
+        """
+        if is_monologue:
+            return self.true_gender
+
+        if is_private_confidant and not in_multi_person_scene:
+            return self.true_gender
+
+        for interval in self.discourse_states:
+            if interval.valid_from_ep <= episode_index:
+                if interval.valid_to_ep is None or episode_index <= interval.valid_to_ep:
+                    if interval.public_facade:
+                        return interval.apparent_gender
+                    return self.true_gender
+
+        return self.true_gender
+
+    def register_epistemic_rupture(
+        self,
+        episode_index: int,
+        new_gender: Optional[Literal["MASCULINE", "FEMININE"]] = None,
+        anaphora_score: Optional[int] = None,
+        prev_anaphora_score: Optional[int] = None,
+        delta_score_en: Optional[int] = None,
+        f0_hz: Optional[float] = None
+    ) -> bool:
+        """
+        Zamyka poprzedni stan maski (valid_to_ep = episode_index - 1)
+        i rejestruje dekonspirację (valid_from_ep = episode_index).
+        Uwolnienie dekonspiracji (EP_RUPTURE) od basu:
+        Wyzwalana na podstawie przejścia fazowego anaforyki (Delta Score_EN)
+        lub silnego kontrastu anaforycznego (|Score_EN| >= 8) niezależnie od wysokości F0.
+        """
+        current_mask = self.get_effective_gender(episode_index=episode_index)
+        resolved_gender = new_gender
+
+        if delta_score_en is None and prev_anaphora_score is not None and anaphora_score is not None:
+            delta_score_en = anaphora_score - prev_anaphora_score
+
+        if resolved_gender is None:
+            if anaphora_score is not None:
+                if anaphora_score <= -8 or (delta_score_en is not None and delta_score_en <= -5 and anaphora_score < 0):
+                    resolved_gender = "FEMININE"
+                elif anaphora_score >= 8 or (delta_score_en is not None and delta_score_en >= 5 and anaphora_score > 0):
+                    resolved_gender = "MASCULINE"
+            elif delta_score_en is not None:
+                if delta_score_en <= -5:
+                    resolved_gender = "FEMININE"
+                elif delta_score_en >= 5:
+                    resolved_gender = "MASCULINE"
+
+        if resolved_gender is None:
+            resolved_gender = "FEMININE" if current_mask == "MASCULINE" else "MASCULINE"
+
+        for interval in self.discourse_states:
+            if interval.valid_to_ep is None or interval.valid_to_ep >= episode_index:
+                interval.valid_to_ep = episode_index - 1
+
+        self.discourse_states.append(
+            PersonaInterval(
+                apparent_gender=resolved_gender,
+                valid_from_ep=episode_index,
+                valid_to_ep=None,
+                public_facade=False
+            )
+        )
+        return True
+
+    def evaluate_anaphora_rupture(
+        self,
+        anaphora_score: int,
+        episode_index: int,
+        prev_anaphora_score: Optional[int] = None,
+        delta_score_en: Optional[int] = None,
+        f0_hz: Optional[float] = None
+    ) -> bool:
+        """
+        Uwolnienie dekonspiracji (EP_RUPTURE) od basu:
+        Wyzwalanie dekonspiracji niezależnie od wysokości F0, gdy silny kontrast
+        anaforyczny (|Score_EN| >= 8) lub przejście fazowe anaforyki (Delta Score_EN)
+        przełamuje dotychczasową maskę apparent_gender.
+        """
+        if delta_score_en is None and prev_anaphora_score is not None:
+            delta_score_en = anaphora_score - prev_anaphora_score
+
+        current_mask = self.get_effective_gender(episode_index=episode_index)
+
+        # 1. Silny kontrast anaforyczny (|Score_EN| >= 8) niezależnie od wysokości F0
+        if current_mask == "MASCULINE" and anaphora_score <= -8:
+            self.register_epistemic_rupture(episode_index, "FEMININE", anaphora_score=anaphora_score, delta_score_en=delta_score_en, f0_hz=f0_hz)
+            return True
+        elif current_mask == "FEMININE" and anaphora_score >= 8:
+            self.register_epistemic_rupture(episode_index, "MASCULINE", anaphora_score=anaphora_score, delta_score_en=delta_score_en, f0_hz=f0_hz)
+            return True
+
+        # 2. Przejście fazowe anaforyki (Delta Score_EN) niezależnie od wysokości F0
+        if delta_score_en is not None:
+            if current_mask == "MASCULINE" and (delta_score_en <= -5 or (prev_anaphora_score is not None and prev_anaphora_score > 0 and anaphora_score < 0 and abs(delta_score_en) >= 6)):
+                self.register_epistemic_rupture(episode_index, "FEMININE", anaphora_score=anaphora_score, delta_score_en=delta_score_en, f0_hz=f0_hz)
+                return True
+            elif current_mask == "FEMININE" and (delta_score_en >= 5 or (prev_anaphora_score is not None and prev_anaphora_score < 0 and anaphora_score > 0 and abs(delta_score_en) >= 6)):
+                self.register_epistemic_rupture(episode_index, "MASCULINE", anaphora_score=anaphora_score, delta_score_en=delta_score_en, f0_hz=f0_hz)
+                return True
+
+        return False
+
+
+GEOGRAPHIC_ORIGIN_PATTERNS: List[re.Pattern] = [
+    # English: from [Name], people/soldiers/forces/kingdom/city/land of [Name], those [Name] guys/soldiers
+    re.compile(r"\bfrom\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźżA-Z0-9'-]+(?:\s+[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźżA-Z0-9'-]+)?)\b"),
+    re.compile(r"\b(?:people|soldiers|forces|kingdom|city|land|troops|warriors|army|citizens|folk|residents|inhabitants|men|guards)\s+of\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźżA-Z0-9'-]+(?:\s+[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźżA-Z0-9'-]+)?)\b", re.IGNORECASE),
+    re.compile(r"\bthose\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźżA-Z0-9'-]+)\s+(?:guys|soldiers|troops|warriors|forces|people|men|knights)\b", re.IGNORECASE),
+    re.compile(r"\b([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźżA-Z0-9'-]+)\s+(?:domain|realm|kingdom|territory|province|city|castle|fortress)\b", re.IGNORECASE),
+    # Japanese: [Name] no mono/gun/hei/shou/kuni/tami
+    re.compile(r"\b([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźżA-Z0-9'-]+)\s*no\s*(?:mono|gun|hei|shou|kuni|tami)\b", re.IGNORECASE),
+    re.compile(r"([A-Za-z\u3040-\u30ff\u4e00-\u9faf]+)(?:の者|の軍|の兵|の将|の国|の民)"),
+    # Polish: ci z [Name], ludzie z [Name], żołnierze z [Name], oddział z [Name], etc.
+    re.compile(r"\b(?:ci|tamci|ludzie|żołnierze|wojska|oddziały|armia|wojownicy)\s+z\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźżA-Z0-9'-]+)\b", re.IGNORECASE),
+    re.compile(r"\b(?:królestwo|kraina|miasto|zamek|twierdza|prowincja)\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźżA-Z0-9'-]+)\b", re.IGNORECASE),
+]
+
+def classify_entity_category(
+    name: str,
+    context: Optional[str] = None,
+    is_speaking_actor: bool = False,
+    series_bible: Optional[Any] = None
+) -> EntityCategory:
+    """
+    Klasyfikacja ontologiczna EntityCategory (ANTHROPONYM | TOPONYM | CHREMATONYM):
+    Nazwy własne występujące w konstrukcjach pochodzenia/geograficznych (from [Name],
+    people/soldiers/forces/kingdom/city/land of [Name], those [Name] guys/soldiers,
+    JA [Name] no mono/gun) i niebędące mówiącymi aktorami w polu event.name
+    oznaczane są jako EntityCategory.TOPONYM (nieodmienne po przyimku z).
+    """
+    if not name:
+        return EntityCategory.ANTHROPONYM
+
+    clean_n = name.strip()
+    clean_lower = clean_n.lower()
+
+    # 1. Speaking actors in event.name default to ANTHROPONYM unless explicitly inanimate
+    if is_speaking_actor:
+        if series_bible and hasattr(series_bible, "is_non_character_entity") and series_bible.is_non_character_entity(clean_n):
+            pass  # proceed to check if non-character
+        else:
+            return EntityCategory.ANTHROPONYM
+
+    # 2. Check series_bible explicit registries
+    if series_bible and hasattr(series_bible, "data") and series_bible.data:
+        saved_cat = series_bible.data.get("entity_categories", {}).get(clean_n)
+        if saved_cat:
+            try:
+                return EntityCategory(saved_cat)
+            except Exception:
+                pass
+
+    # 3. Contextual evaluation: origin / geographic constructions
+    if context:
+        for pat in GEOGRAPHIC_ORIGIN_PATTERNS:
+            for match in pat.finditer(context):
+                matched_val = match.group(1).strip()
+                if matched_val.lower() == clean_lower:
+                    if not is_speaking_actor:
+                        return EntityCategory.TOPONYM
+
+    # 4. Known toponyms database & French indeclinable toponyms
+    toponyms_set = globals().get("KNOWN_FANTASY_TOPONYMS", set())
+    french_set = globals().get("INDECLINABLE_FRENCH_TOPONYMS", set())
+    if clean_lower in toponyms_set or clean_lower in french_set:
+        if not is_speaking_actor:
+            return EntityCategory.TOPONYM
+
+    # 5. Chrematonyms: artifacts, weapons, books, spells, relics
+    head_nouns_set = globals().get("KNOWN_HEAD_NOUNS", set())
+    if clean_lower in head_nouns_set or any(clean_lower.startswith(w + " ") for w in ("księga", "miecz", "amulet", "tarcza", "lanca", "zwój", "korona", "pierścień")):
+        return EntityCategory.CHREMATONYM
+
+    if series_bible and hasattr(series_bible, "is_non_character_entity") and series_bible.is_non_character_entity(clean_n):
+        if hasattr(series_bible, "data") and series_bible.data:
+            for sec in ("relics", "artifacts", "weapons"):
+                if clean_n in series_bible.data.get(sec, {}):
+                    return EntityCategory.CHREMATONYM
+            for sec in ("realms", "locations", "places", "cities", "countries"):
+                if clean_n in series_bible.data.get(sec, {}):
+                    return EntityCategory.TOPONYM
+        return EntityCategory.TOPONYM
+
+    return EntityCategory.ANTHROPONYM
+
 
 def clean_fake_name_apostrophes(text: str) -> str:
     """
@@ -153,7 +425,9 @@ def clean_fake_name_apostrophes(text: str) -> str:
         n_low = name.lower()
 
         # 1. Japońskie imiona na samogłoskę lub żeńskie nieodmienne
-        if n_low in JAPANESE_VOWEL_E_NAMES or n_low in INVARIABLE_JAPANESE_FEMALE_NAMES or n_low in FOREIGN_FEMALE_CONSONANT_NAMES:
+        invariable_fem = globals().get("INVARIABLE_JAPANESE_FEMALE_NAMES", set())
+        foreign_fem = globals().get("FOREIGN_FEMALE_CONSONANT_NAMES", set())
+        if n_low in JAPANESE_VOWEL_E_NAMES or is_japanese_cv_mora_e_name(name) or n_low in invariable_fem or n_low in foreign_fem:
             return name
 
         # 2. Imiona męskie na samogłoskę + y (Ray, Roy, Gray) -> fonetyczne połączenie bez apostrofu
@@ -162,6 +436,8 @@ def clean_fake_name_apostrophes(text: str) -> str:
 
         # 3. Nieme fonetycznie -e (spółgłoska + e, np. White, Wayne, Blade, George, Locke, Moore) -> apostrof poprawny
         if len(name) >= 3 and name[-1].lower() == 'e' and name[-2].lower() in 'bcdfghjklmnpqrstvwxz':
+            if is_japanese_cv_mora_e_name(name) or n_low in JAPANESE_VOWEL_E_NAMES:
+                return name
             return m.group(0)
 
         # 4. Imiona męskie na spółgłoskę czytaną fonetycznie (Ren, Conan, Lelouch, Braham, Rietz) -> bez apostrofu
@@ -217,9 +493,29 @@ def fix_undecorated_male_names(text: str, character_names: Optional[List[str]] =
         )
 
         # 3. Instrumental check: "z Ren" -> "z Renem", "przed Ray" -> "przed Rayem"
+        def _ins_repl(m):
+            prep = m.group(1)
+            prep_lower = prep.lower()
+            if prep_lower in ("z", "ze"):
+                # Guard against toponyms and origin / ablative constructions
+                is_toponym = (
+                    classify_entity_category(name, context=result, series_bible=series_bible) == EntityCategory.TOPONYM
+                    or (series_bible and (series_bible.is_non_character_entity(name) or series_bible.get_entity_category(name) == EntityCategory.TOPONYM))
+                    or name.lower() in globals().get("KNOWN_FANTASY_TOPONYMS", set())
+                    or name.lower() in globals().get("INDECLINABLE_FRENCH_TOPONYMS", set())
+                )
+                if is_toponym:
+                    return m.group(0)
+                # Check preceding context for group/origin indicators or ablative verbs
+                start_pos = m.start()
+                preceding_text = result[max(0, start_pos - 40):start_pos]
+                if re.search(r"\b(ci|tamci|ludzie|goście|żołnierze|rycerze|oddział|wojska|posłowie|przybysze|pochodzi\w*|wraca\w*|wróci\w*|przyby\w*|uciek\w*)\s*$", preceding_text, re.IGNORECASE):
+                    return m.group(0)
+            return f"{prep} {decl.get('N', name)}"
+
         result = re.sub(
             rf"\b({ins_preps})\s+{re.escape(name)}\b",
-            lambda m, c=decl.get("N", name): f"{m.group(1)} {c}",
+            _ins_repl,
             result,
             flags=re.IGNORECASE
         )
@@ -801,10 +1097,14 @@ def resolve_actor_gender(name: str, character_registry: Optional[Dict[str, Any]]
     if is_plural_actor(clean):
         return "PLURAL"
 
-    # 0b. Age prefix inheritance & kinship suffixes in resolve_actor_gender
-    age_prefix_match = re.match(r"^(?:young|kid|little|baby|child|teen|old|młody|młoda|mały|mała)\s+(.+)$", clean_lower, re.IGNORECASE)
-    if age_prefix_match:
-        base_char_name = age_prefix_match.group(1).strip()
+    # 0b. Canonical inheritance for age, temporal, and state prefixes
+    modifier_match = MODIFIER_PREFIX_RE.match(clean)
+    if modifier_match:
+        base_char_name = modifier_match.group(1).strip()
+        if series_bible and hasattr(series_bible, "get_character_identity"):
+            base_ident = series_bible.get_character_identity(base_char_name)
+            if base_ident:
+                return "MALE" if base_ident.true_gender == "MASCULINE" else "FEMALE"
         bg = resolve_actor_gender(base_char_name, character_registry=character_registry, series_bible=series_bible)
         if bg in ("MALE", "FEMALE"):
             return bg
@@ -1646,6 +1946,18 @@ def generate_polish_name_declension(name: str, gender: str = "UNKNOWN") -> Dict[
                     for case in ["M", "D", "C", "B", "N", "Ms", "W"]
                 }
 
+        # C2. Check for Modifier Prefix (Young Braham, Kid Rietz, Dark Lord, etc.)
+        if MODIFIER_PREFIX_RE.match(n):
+            m_pref = MODIFIER_PREFIX_RE.match(n)
+            base_word = m_pref.group(1).strip()
+            prefix_word = n[:len(n) - len(base_word)].strip()
+            base_decl = generate_polish_name_declension(base_word, gender)
+            if base_decl and base_decl.get("M"):
+                return {
+                    case: f"{prefix_word} {base_decl.get(case, base_word)}"
+                    for case in ["M", "D", "C", "B", "N", "Ms", "W"]
+                }
+
         # D. Default multi-word: decline each word (e.g. Aura Gilotyna, Brandon Heat)
         sub_decls = [generate_polish_name_declension(w, gender) for w in words]
         if all(sub_decls):
@@ -1790,6 +2102,8 @@ def generate_polish_name_declension(name: str, gender: str = "UNKNOWN") -> Dict[
 
     # 2a. Male foreign names ending in silent -e with apostrophe declension (e.g. White, Wayne, Blade, Locke, Moore)
     if not is_female and n.endswith("e") and len(n) >= 3 and n[-2].lower() in "bcdfghjklmnpqrstvwxz":
+        if is_japanese_cv_mora_e_name(n) or n.lower() in JAPANESE_VOWEL_E_NAMES:
+            return {"M": n, "D": n, "C": n, "B": n, "N": n, "Ms": n, "W": n}
         stem = n
         last_c = n[-2].lower()
         if last_c == "t":
@@ -1822,8 +2136,11 @@ def generate_polish_name_declension(name: str, gender: str = "UNKNOWN") -> Dict[
         # Narzędnik po k, g: -iem (Gujukiem, Güyükiem, Olegiem, Magiem)
         n_case = stem + "iem" if last_c in ("k", "g") else stem + "em"
 
-        # Miejscownik i Wołacz
-        if last_c in ("l", "k", "g", "j", "c") or last_2c in ("ch", "cz", "sz", "rz", "th"):
+        # Miejscownik i Wołacz (Dystrybucja końcówki -u wg Task 3 / Zasada 15 AGENTS.md):
+        # Dla odmiennych imion męskich zakończonych na głoski stwardniałe, afrykaty, tylnojęzykowe i miękkie
+        # (tz, c, dz, cz, sz, rz, ż, sh, ch, k, g, j, y, l) generuj w Miejscowniku i Wołaczu wyłącznie końcówkę -u
+        # (temat na -tz -> -tzu, -c -> -cu; całkowity zakaz form na -tzie / -cie dla tych tematów).
+        if last_2c in ("tz", "dz", "cz", "sz", "rz", "sh", "ch", "th") or last_c in ("c", "ż", "k", "g", "j", "l") or last_c == "y" or is_diphthong_y:
             c_ms = stem + "u"
             c_w = stem + "u"
         elif last_c == "r":
@@ -2885,31 +3202,193 @@ class SeriesBible:
         with self._lock:
             if "character_identities" not in self.data:
                 self.data["character_identities"] = {}
+            if identity.declension_paradigm is None:
+                identity.declension_paradigm = self.get_declension_paradigm(identity.canonical_id)
             self.data["character_identities"][identity.canonical_id] = identity.model_dump()
 
     def get_character_identity(self, canonical_id: str) -> Optional[CharacterIdentity]:
-        """Pobiera zarejestrowaną tożsamość diegetyczną postaci."""
+        """Pobiera zarejestrowaną tożsamość diegetyczną postaci lub dziedziczy kanonicznie z bytu bazowego."""
+        if not canonical_id:
+            return None
+        clean_id = canonical_id.strip()
         with self._lock:
-            raw = self.data.get("character_identities", {}).get(canonical_id)
+            identities = self.data.get("character_identities", {})
+            raw = identities.get(clean_id)
+            if not raw:
+                for k, v in identities.items():
+                    if k.lower() == clean_id.lower():
+                        raw = v
+                        break
             if raw:
                 try:
                     return CharacterIdentity(**raw)
                 except Exception:
-                    return None
+                    pass
+
+            # Kanoniczne dziedziczenie dla prefiksów wiekowych, czasowych i stanowych
+            m = MODIFIER_PREFIX_RE.match(clean_id)
+            if m:
+                base_name = m.group(1).strip()
+                # 1. Base from character_identities
+                base_id = None
+                base_raw = identities.get(base_name)
+                if not base_raw:
+                    for k, v in identities.items():
+                        if k.lower() == base_name.lower():
+                            base_raw = v
+                            break
+                if base_raw:
+                    try:
+                        base_id = CharacterIdentity(**base_raw)
+                    except Exception:
+                        pass
+
+                if base_id:
+                    inherited_decl = self.get_declension_paradigm(clean_id)
+                    return CharacterIdentity(
+                        canonical_id=clean_id,
+                        true_gender=base_id.true_gender,
+                        discourse_states=copy.deepcopy(base_id.discourse_states),
+                        entity_category=base_id.entity_category,
+                        declension_paradigm=inherited_decl,
+                        base_canonical_id=base_id.canonical_id
+                    )
+
+                # 2. Base from general characters in SeriesBible
+                base_gender = self.get_character_gender(base_name, allow_generic_nouns=False)
+                if base_gender in ("MALE", "FEMALE"):
+                    t_g = "MASCULINE" if base_gender == "MALE" else "FEMININE"
+                    return CharacterIdentity(
+                        canonical_id=clean_id,
+                        true_gender=t_g,
+                        discourse_states=[],
+                        entity_category=EntityCategory.ANTHROPONYM,
+                        declension_paradigm=self.get_declension_paradigm(clean_id),
+                        base_canonical_id=base_name
+                    )
+
+            # Check if canonical_id itself exists in characters with confirmed gender
+            c_gender = self.get_character_gender(clean_id, allow_generic_nouns=False)
+            if c_gender in ("MALE", "FEMALE"):
+                t_g = "MASCULINE" if c_gender == "MALE" else "FEMININE"
+                return CharacterIdentity(
+                    canonical_id=clean_id,
+                    true_gender=t_g,
+                    discourse_states=[],
+                    entity_category=EntityCategory.ANTHROPONYM,
+                    declension_paradigm=self.get_declension_paradigm(clean_id)
+                )
+
             return None
 
     def get_declension_paradigm(self, character_name: str) -> Optional[DeclensionParadigm]:
         """Zwraca lub generuje 7-przypadkowy paradygmat fleksyjny dla postaci."""
+        if not character_name:
+            return None
         with self._lock:
             decl = self.data.get("declensions", {}).get(character_name)
             if decl and isinstance(decl, dict) and "M" in decl:
-                return DeclensionParadigm.from_dict(decl)
+                d_copy = dict(decl)
+                c_name = character_name.strip()
+                # Sanityzacja stwardniałych końcówek wołacza/miejscownika (-tzie -> -tzu, -cie -> -cu)
+                if c_name.lower().endswith("tz"):
+                    if d_copy.get("W", "").lower().endswith("tzie"):
+                        d_copy["W"] = c_name[:-2] + "tzu"
+                    if d_copy.get("Ms", "").lower().endswith("tzie"):
+                        d_copy["Ms"] = c_name[:-2] + "tzu"
+                elif c_name.lower().endswith("c"):
+                    if d_copy.get("W", "").lower().endswith("cie"):
+                        d_copy["W"] = c_name[:-1] + "cu"
+                    if d_copy.get("Ms", "").lower().endswith("cie"):
+                        d_copy["Ms"] = c_name[:-1] + "cu"
+                return DeclensionParadigm.from_dict(d_copy)
 
             gender = self.get_character_gender(character_name)
             generated = generate_polish_name_declension(character_name, gender)
             if generated and "M" in generated:
                 return DeclensionParadigm.from_dict(generated)
             return None
+
+    def register_epistemic_rupture(
+        self,
+        canonical_id: str,
+        episode_index: int,
+        new_gender: Optional[Literal["MASCULINE", "FEMININE"]] = None,
+        anaphora_score: Optional[int] = None,
+        prev_anaphora_score: Optional[int] = None,
+        delta_score_en: Optional[int] = None,
+        f0_hz: Optional[float] = None
+    ) -> bool:
+        """Rejestruje dekonspirację (EP_RUPTURE) w tożsamości postaci w SeriesBible."""
+        ident = self.get_character_identity(canonical_id)
+        if not ident:
+            c_gen = self.get_character_gender(canonical_id, allow_generic_nouns=False)
+            t_gen = "MASCULINE" if c_gen == "MALE" else ("FEMININE" if c_gen == "FEMALE" else "MASCULINE")
+            ident = CharacterIdentity(
+                canonical_id=canonical_id,
+                true_gender=t_gen,
+                discourse_states=[]
+            )
+        res = ident.register_epistemic_rupture(
+            episode_index=episode_index,
+            new_gender=new_gender,
+            anaphora_score=anaphora_score,
+            prev_anaphora_score=prev_anaphora_score,
+            delta_score_en=delta_score_en,
+            f0_hz=f0_hz
+        )
+        self.register_character_identity(ident)
+        return res
+
+    def evaluate_anaphora_rupture(
+        self,
+        canonical_id: str,
+        anaphora_score: int,
+        episode_index: int,
+        prev_anaphora_score: Optional[int] = None,
+        delta_score_en: Optional[int] = None,
+        f0_hz: Optional[float] = None
+    ) -> bool:
+        """Wyzwalanie dekonspiracji postaci w SeriesBible na podstawie anaforyki (Delta Score_EN lub |Score| >= 8)."""
+        ident = self.get_character_identity(canonical_id)
+        if not ident:
+            return False
+        res = ident.evaluate_anaphora_rupture(
+            anaphora_score=anaphora_score,
+            episode_index=episode_index,
+            prev_anaphora_score=prev_anaphora_score,
+            delta_score_en=delta_score_en,
+            f0_hz=f0_hz
+        )
+        if res:
+            self.register_character_identity(ident)
+        return res
+
+    def classify_entity(
+        self,
+        name: str,
+        context: Optional[str] = None,
+        is_speaking_actor: bool = False
+    ) -> EntityCategory:
+        """Klasyfikuje encję do kategorii ontologicznej (ANTHROPONYM | TOPONYM | CHREMATONYM)."""
+        return classify_entity_category(name, context=context, is_speaking_actor=is_speaking_actor, series_bible=self)
+
+    def get_entity_category(
+        self,
+        name: str,
+        context: Optional[str] = None,
+        is_speaking_actor: bool = False
+    ) -> EntityCategory:
+        """Pobiera kategorię ontologiczną encji."""
+        return self.classify_entity(name, context=context, is_speaking_actor=is_speaking_actor)
+
+    def register_entity_category(self, name: str, category: Union[EntityCategory, str]) -> None:
+        """Rejestruje kategorię ontologiczną encji w bazie wiedzy."""
+        cat_enum = EntityCategory(category) if isinstance(category, str) else category
+        with self._lock:
+            if "entity_categories" not in self.data:
+                self.data["entity_categories"] = {}
+            self.data["entity_categories"][name.strip()] = cat_enum.value
 
     def register_sparse_dialogue_character(
         self,
@@ -3316,10 +3795,13 @@ class SeriesBible:
         if re.match(r"^(?:girl|dziewczynka|dziewczyna|woman|kobieta)\s+[a-z0-9]+$", n_l):
             return "FEMALE"
 
-        # Pass 0a: Age prefix inheritance (Young Braham -> Braham, Kid X -> X, etc.)
-        age_prefix_match = re.match(r"^(?:young|kid|little|baby|child|teen|old|młody|młoda|mały|mała)\s+(.+)$", n_l, re.IGNORECASE)
-        if age_prefix_match:
-            base_char_name = age_prefix_match.group(1).strip()
+        # Pass 0a: Canonical inheritance for age, temporal, and state prefixes
+        modifier_match = MODIFIER_PREFIX_RE.match(clean or name)
+        if modifier_match:
+            base_char_name = modifier_match.group(1).strip()
+            base_ident = self.get_character_identity(base_char_name)
+            if base_ident:
+                return "MALE" if base_ident.true_gender == "MASCULINE" else "FEMALE"
             base_gender = self.get_character_gender(base_char_name, allow_generic_nouns=allow_generic_nouns)
             if base_gender in ("MALE", "FEMALE"):
                 return base_gender
@@ -3918,8 +4400,14 @@ class SeriesBible:
 
             if gender == "FEMALE":
                 clean_name_l = clean_name.lower()
+                m_pref = MODIFIER_PREFIX_RE.match(clean_name)
+                is_pref_male = False
+                if m_pref:
+                    base_n = m_pref.group(1).strip()
+                    is_pref_male = (self.get_character_gender(base_n, allow_generic_nouns=False) == "MALE")
                 is_boy_or_male_role = (
-                    any(k in clean_name_l for k in ["kid", "son", "boy", "young", "bro", "brother", "chłopiec", "chłopak", "syn", "brat", "captain", "kapitan"]) or
+                    any(k in clean_name_l for k in ["kid", "son", "boy", "young", "child", "little", "baby", "teen", "bro", "brother", "chłopiec", "chłopak", "syn", "brat", "captain", "kapitan"]) or
+                    is_pref_male or
                     self.get_character_gender(clean_name, allow_generic_nouns=False) == "MALE"
                 )
                 if is_boy_or_male_role:

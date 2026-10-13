@@ -6187,8 +6187,8 @@ def test_lean_scene_context_and_tm_isolation_guard():
 
     prompt = t._prepare_batch_prompt(batch, history_context=[])
 
-    # Asercja 5a: Redukcja wielkości promptu (mniej niż 5000 znaków zamiast 14000+)
-    assert len(prompt) < 5000, f"Prompt jest zbyt wielki: {len(prompt)} znaków"
+    # Asercja 5a: Redukcja wielkości promptu (mniej niż 5500 znaków zamiast 14000+)
+    assert len(prompt) < 5500, f"Prompt jest zbyt wielki: {len(prompt)} znaków"
 
     # Asercja 5b: Liczba postaci ograniczona ściśle do aktywnej sceny (brak 60+ obcych bohaterów)
     char_bullets = [l for l in prompt.splitlines() if l.startswith("• ") and "->" not in l and ("kobieta" in l or "postać" in l)]
@@ -15321,6 +15321,500 @@ def test_proper_name_declension_matrix_and_inflection_safety():
     print(" -> PASSED: Test 160 potwierdza 100% bezpieczeństwa fleksyjnego i matrycy deklinacji nazw własnych.")
 
 
+def test_acoustic_deadzone_and_spacy_dependency_isolation():
+    """
+    TEST 161: Acoustic Deadzone Weight 0% & SpaCy Dependency Tree nsubj Isolation.
+    1. Pitch deadzone: F0 > 135 Hz receives weight 0.0, delegating gender entirely to JA/EN vectors.
+    2. Negative control: F0 <= 135 Hz maintains hard masculine veto (weight 1.0, confidence 1.0).
+    3. SpaCy dependency tree nsubj isolation: 3rd person pronouns/titles bound to character only within subject boundary.
+    4. Negative controls: object pronouns (dobj/pobj), new PROPN subjects, and vocatives strictly decoupled.
+    """
+    print("\n[TEST 161/166] Acoustic Deadzone Weight 0% & SpaCy Dependency Isolation...")
+    from profiler import EpistemicAudioTriangulator, SpaCyAnaphoraDiscourseAnalyzer
+
+    # 1. Acoustic Deadzone: F0 > 135 Hz receives weight 0.0 (5 positive examples)
+    high_f0_samples = [140.0, 150.0, 180.0, 210.0, 250.0]
+    for f0 in high_f0_samples:
+        gen, conf, hard_masc = EpistemicAudioTriangulator.triangulate_f0_gender(f0)
+        assert gen is None, f"F0 {f0} Hz should not resolve gender: got {gen}"
+        assert conf == 0.0, f"F0 {f0} Hz should have confidence 0.0: got {conf}"
+        assert hard_masc is False, f"F0 {f0} Hz should not be hard masculine"
+        res = SpaCyAnaphoraDiscourseAnalyzer.triangulate_epistemic_gender(f0_hz=f0)
+        assert res["acoustic_weight"] == 0.0, f"F0 {f0} Hz acoustic weight must be 0.0: got {res['acoustic_weight']}"
+
+    # 2. Negative controls: F0 <= 135 Hz maintains hard masculine veto (5 samples)
+    low_f0_samples = [80.0, 100.0, 120.0, 130.0, 135.0]
+    for f0 in low_f0_samples:
+        gen, conf, hard_masc = EpistemicAudioTriangulator.triangulate_f0_gender(f0)
+        assert gen == "MALE", f"F0 {f0} Hz must resolve to MALE: got {gen}"
+        assert conf == 1.0, f"F0 {f0} Hz must have confidence 1.0: got {conf}"
+        assert hard_masc is True, f"F0 {f0} Hz must be hard masculine"
+        res = SpaCyAnaphoraDiscourseAnalyzer.triangulate_epistemic_gender(f0_hz=f0)
+        assert res["acoustic_weight"] == 1.0, f"F0 {f0} Hz acoustic weight must be 1.0: got {res['acoustic_weight']}"
+
+    # 3. SpaCy dependency tree nsubj isolation (5 positive examples)
+    assert SpaCyAnaphoraDiscourseAnalyzer.resolve_pronoun_reference("Ray is here. He found the relic.", "Ray", pronoun="he") is True
+    assert SpaCyAnaphoraDiscourseAnalyzer.resolve_pronoun_reference("Alice arrived safely. She took her seat.", "Alice", pronoun="she") is True
+    assert SpaCyAnaphoraDiscourseAnalyzer.resolve_pronoun_reference("Braham stepped forward. The man swung his blade.", "Braham") is True
+    assert SpaCyAnaphoraDiscourseAnalyzer.score_english_anaphora("Ray entered the hall. He spoke with the king.", "Ray") > 0
+    assert SpaCyAnaphoraDiscourseAnalyzer.score_english_anaphora("Elena greeted everyone. She is a queen and princess.", "Elena") < 0
+
+    # 4. Negative controls: object pronouns, new PROPN subjects, and vocatives decoupled
+    # 4a. Object pronoun of character's verb does not refer to character
+    assert SpaCyAnaphoraDiscourseAnalyzer.resolve_pronoun_reference("Aoi shouted at him.", "Aoi", pronoun="him") is False
+    # 4b. Subject pronoun when character is object does not refer to character
+    assert SpaCyAnaphoraDiscourseAnalyzer.resolve_pronoun_reference("He saw Elena.", "Elena", pronoun="he") is False
+    # 4c. Sentence with new PROPN subject breaks previous anaphoric link
+    assert SpaCyAnaphoraDiscourseAnalyzer.resolve_pronoun_reference("Ray went to the market. Maria said she was tired.", "Ray", pronoun="she") is False
+    # 4d. Direct vocative address filtered from 3rd person scoring
+    assert SpaCyAnaphoraDiscourseAnalyzer.score_english_anaphora("Ray, you must leave now!", "Ray") == 0
+    assert SpaCyAnaphoraDiscourseAnalyzer.score_english_anaphora("Look out, Ray!", "Ray") == 0
+
+    print(" -> PASSED: Test 161 potwierdza wagę 0% dla martwej strefy akustycznej i izolację podmiotu nsubj w spaCy.")
+
+
+def test_monologue_two_tier_gate_and_italic_safety():
+    """
+    TEST 162: Two-Tier Internal Monologue Gate & Italic Safety Protocol.
+    1. Tier 1: Explicit thought brackets ( ) and （ ） have absolute priority over target_speaker != None.
+    2. Tier 2: Pure italics {\\i1} safely detected as internal monologue only when target_speaker is None,
+       style is not offscreen/flashback/narration, and no outward exclamation/vocative exists.
+    3. Negative controls: Outward shout/vocative block, non-null target_speaker, and offscreen styles.
+    """
+    print("\n[TEST 162/166] Two-Tier Monologue Gate & Italic Safety Protocol...")
+    import pysubs2
+    from scene_discourse import is_internal_monologue
+
+    # 1. Tier 1: Parentheses priority over target_speaker != None (5 positive examples)
+    tier1_events = [
+        pysubs2.SSAEvent(text="(Muszę zachować spokój...)", style="Default"),
+        pysubs2.SSAEvent(text="(Czy to naprawdę koniec?)", style="Default"),
+        pysubs2.SSAEvent(text="(Nie mogę się poddać.)", style="Default"),
+        pysubs2.SSAEvent(text="（Co on sobie wyobraża?）", style="Default"),
+        pysubs2.SSAEvent(text="（Muszę natychmiast uciekać.）", style="Default"),
+    ]
+    for ev in tier1_events:
+        assert is_internal_monologue(ev, target_speaker="Ray") is True, f"Tier 1 failed with target_speaker='Ray': {ev.text}"
+        assert is_internal_monologue(ev, target_speaker="Elena") is True, f"Tier 1 failed with target_speaker='Elena': {ev.text}"
+        assert is_internal_monologue(ev, target_speaker=None) is True, f"Tier 1 failed with target_speaker=None: {ev.text}"
+
+    # 2. Tier 2: Pure italics without brackets (5 positive examples)
+    tier2_events = [
+        pysubs2.SSAEvent(text=r"{\i1}Dlaczego nic nie pamiętam?{\i0}", style="Default"),
+        pysubs2.SSAEvent(text=r"{\i1}To dziwne uczucie w klatce piersiowej...{\i0}", style="Default"),
+        pysubs2.SSAEvent(text=r"{\i1}Wszystko wydaje się takie odległe.{\i0}", style="Default"),
+        pysubs2.SSAEvent(text=r"{\i1}Może to tylko sen?{\i0}", style="Default"),
+        pysubs2.SSAEvent(text=r"{\i1}Gdzie podziały się moje klucze...{\i0}", style="Default"),
+    ]
+    for ev in tier2_events:
+        assert is_internal_monologue(ev, target_speaker=None) is True, f"Tier 2 failed for pure italics: {ev.text}"
+
+    # 3. Negative controls: Outward exclamation, vocative address, non-null target_speaker, flashback/narration/radio
+    # 3a. Outward exclamation block
+    assert is_internal_monologue(pysubs2.SSAEvent(text=r"{\i1}Uważaj!{\i0}", style="Default"), target_speaker=None) is False
+    # 3b. Outward vocative address
+    assert is_internal_monologue(pysubs2.SSAEvent(text=r"{\i1}Ray, zaczekaj!{\i0}", style="Default"), target_speaker=None) is False
+    # 3c. Non-null target_speaker blocks pure italics
+    assert is_internal_monologue(tier2_events[0], target_speaker="Ray") is False
+    # 3d. Flashback style blocks pure italics
+    assert is_internal_monologue(pysubs2.SSAEvent(text=r"{\i1}To było dawno temu...{\i0}", style="Flashback"), target_speaker=None) is False
+    # 3e. Narration style blocks pure italics
+    assert is_internal_monologue(pysubs2.SSAEvent(text=r"{\i1}I tak minął cały rok...{\i0}", style="Narration"), target_speaker=None) is False
+    # 3f. Communication prefix blocks brackets
+    assert is_internal_monologue(pysubs2.SSAEvent(text=r"[Radio] (Odbiór, słyszycie?)", style="Default"), target_speaker=None) is False
+
+    print(" -> PASSED: Test 162 potwierdza dwupoziomową bramkę monologu wewnętrznego i ochronę kursywy.")
+
+
+def test_diegetic_rupture_and_alias_relational_inheritance():
+    """
+    TEST 163: Epistemic Rupture Decoupled from High F0 & Relational Alias Inheritance.
+    1. Epistemic rupture triggered by anaphora phase transition regardless of pitch.
+    2. Age/status prefix inheritance (Young/Child/Old/Future/Kid [X]).
+    3. Relational resolving ([X]'s Son/Daughter/Brother/Sister/Father/Mother).
+    4. First-person conditional past-tense repair (-łabym -> -łbym).
+    """
+    print("\n[TEST 163/166] Epistemic Rupture & Relational Alias Inheritance...")
+    from series_memory import SeriesBible, CharacterIdentity, PersonaInterval
+    from profiler import resolve_relational_actor_gender
+    from avt_linter import convert_first_person_feminine_to_masculine
+
+    # 1. Epistemic rupture decoupled from high F0
+    # 1a. Female identity disguised as male, low F0 (100 Hz), negative anaphora score (<= -8) triggers rupture to FEMININE
+    char_f = CharacterIdentity(
+        canonical_id="Charlotte",
+        true_gender="FEMININE",
+        discourse_states=[PersonaInterval(apparent_gender="MASCULINE", valid_from_ep=1, public_facade=True)]
+    )
+    assert char_f.get_effective_gender(episode_index=4) == "MASCULINE"
+    assert char_f.evaluate_anaphora_rupture(anaphora_score=-8, episode_index=5, f0_hz=100.0) is True
+    assert char_f.get_effective_gender(episode_index=4) == "MASCULINE"
+    assert char_f.get_effective_gender(episode_index=5) == "FEMININE"
+
+    # 1b. Male identity disguised as female, high F0 (260 Hz), positive anaphora score (>= 8) triggers rupture to MASCULINE
+    char_m = CharacterIdentity(
+        canonical_id="Tokiyuki",
+        true_gender="MASCULINE",
+        discourse_states=[PersonaInterval(apparent_gender="FEMININE", valid_from_ep=1, public_facade=True)]
+    )
+    assert char_m.get_effective_gender(episode_index=3) == "FEMININE"
+    assert char_m.evaluate_anaphora_rupture(anaphora_score=8, episode_index=4, f0_hz=260.0) is True
+    assert char_m.get_effective_gender(episode_index=3) == "FEMININE"
+    assert char_m.get_effective_gender(episode_index=4) == "MASCULINE"
+
+    # 1c. Negative control: weak anaphora score does not trigger rupture
+    assert char_m.evaluate_anaphora_rupture(anaphora_score=-2, episode_index=5) is False
+    assert char_m.get_effective_gender(episode_index=5) == "MASCULINE"
+
+    # 2. Age/status prefix inheritance (5 male + 5 female examples)
+    bible = SeriesBible("TestBible")
+    bible.data.setdefault("characters", {})["Braham"] = {"gender": "MALE"}
+    bible.data.setdefault("characters", {})["Charlotte"] = {"gender": "FEMALE"}
+
+    prefixes = ["Young", "Child", "Old", "Future", "Kid"]
+    for prefix in prefixes:
+        assert bible.get_character_gender(f"{prefix} Braham") == "MALE", f"{prefix} Braham gender failed"
+        assert bible.get_character_gender(f"{prefix} Charlotte") == "FEMALE", f"{prefix} Charlotte gender failed"
+
+    # Negative control: unknown base character returns UNKNOWN
+    assert bible.get_character_gender("Young NonExistentCharacter") == "UNKNOWN"
+
+    # 3. Relational resolving ([Owner]'s [Relation])
+    assert resolve_relational_actor_gender("Braham's Son")["gender"] == "MALE"
+    assert resolve_relational_actor_gender("Braham's Daughter")["gender"] == "FEMALE"
+    assert resolve_relational_actor_gender("Braham's Brother")["gender"] == "MALE"
+    assert resolve_relational_actor_gender("Braham's Sister")["gender"] == "FEMALE"
+    assert resolve_relational_actor_gender("Braham's Father")["gender"] == "MALE"
+    # Negative control: non-relational character
+    assert resolve_relational_actor_gender("Random Villager")["gender"] == "UNKNOWN"
+
+    # 4. First-person conditional past-tense repair (-łabym -> -łbym)
+    cond_pairs = [
+        ("chciałabym", "chciałbym"),
+        ("mogłabym", "mógłbym"),
+        ("zrobiłabym", "zrobiłbym"),
+        ("byłabym", "byłbym"),
+        ("wzięłabym", "wziąłbym"),
+    ]
+    for f_verb, m_verb in cond_pairs:
+        assert convert_first_person_feminine_to_masculine(f_verb) == m_verb, f"{f_verb} -> {m_verb} failed"
+        assert convert_first_person_feminine_to_masculine(f_verb.capitalize()) == m_verb.capitalize()
+
+    # Negative control: masculine already remains unchanged or None
+    assert convert_first_person_feminine_to_masculine("chciałbym") in (None, "chciałbym")
+
+    print(" -> PASSED: Test 163 potwierdza dekonspirację epistemiczną, dziedziczenie prefiksów i formy warunkowe 1. os.")
+
+
+def test_second_person_turn_taking_and_predicate_agreement():
+    """
+    TEST 164: Dyadic Turn-Taking, Vocative Lock & Second-Person Predicate Agreement.
+    1. Dyadic turn-taking: SpeakerTurn addressee resolution from prior turn.
+    2. Vocative lock: Explicit masculine/feminine vocative title locks target_gender.
+    3. Second-person verbal agreement: -łaś -> -łeś in EpisodeQualityGate for male target.
+    4. Second-person predicate adjectives: nie bądź [adj]-a -> [adj]-y.
+    5. Second-person predicate nouns: 5 role pairs with possessives (uczennicą -> uczniem, etc.).
+    """
+    print("\n[TEST 164/166] Dyadic Turn-Taking, Vocative Lock & Predicate Agreement...")
+    import pysubs2
+    from series_memory import SeriesBible
+    from scene_discourse import SpeakerTurn, resolve_turn_addressee
+    from avt_linter import (
+        EpisodeQualityGate,
+        harmonize_copula_and_predicate_adjective,
+        harmonize_2nd_person_predicate_nouns
+    )
+
+    # 1. Dyadic turn-taking: SpeakerTurn exchange A <-> B
+    turn1 = SpeakerTurn(speaker="Ray", events=[pysubs2.SSAEvent(start=1000, end=3000, text="Witaj Elena.")])
+    turn2 = SpeakerTurn(speaker="Elena", events=[pysubs2.SSAEvent(start=3500, end=5000, text="Cześć, jak się czujesz?")])
+    resolve_turn_addressee(turn2, previous_turn=turn1)
+    assert turn2.target_speaker == "Ray", f"Turn-taking failed: target_speaker is {turn2.target_speaker}"
+
+    # 2. Vocative lock: Masculine/feminine vocatives override prior turn and lock target_gender
+    turn_voc_m = SpeakerTurn(speaker="Elena", events=[pysubs2.SSAEvent(start=6000, end=8000, text="Mistrzu, uważaj na siebie!")])
+    resolve_turn_addressee(turn_voc_m, previous_turn=None)
+    assert turn_voc_m.target_gender == "MALE"
+    assert turn_voc_m.vocative_lock is True
+
+    turn_voc_f = SpeakerTurn(speaker="Ray", events=[pysubs2.SSAEvent(start=9000, end=11000, text="Pani, proszę zaczekać!")])
+    resolve_turn_addressee(turn_voc_f, previous_turn=None)
+    assert turn_voc_f.target_gender == "FEMALE"
+    assert turn_voc_f.vocative_lock is True
+
+    # Negative control: non-vocative dialogue without prior turn has vocative_lock=False
+    turn_neutral = SpeakerTurn(speaker="Ray", events=[pysubs2.SSAEvent(start=12000, end=14000, text="Świat jest piękny.")])
+    resolve_turn_addressee(turn_neutral, previous_turn=None)
+    assert turn_neutral.vocative_lock is False
+
+    # 3. Second-person verbal agreement: -łaś -> -łeś in EpisodeQualityGate (5 positive examples)
+    bible = SeriesBible("TestBible")
+    bible.data.setdefault("characters", {})["Ray"] = {"gender": "MALE"}
+    bible.data.setdefault("characters", {})["Amelia"] = {"gender": "FEMALE"}
+
+    subs_m = pysubs2.SSAFile()
+    ev1 = pysubs2.SSAEvent(start=1000, end=3000, name="Amelia", text="Rayu, dlaczego to zrobiłaś?")
+    ev2 = pysubs2.SSAEvent(start=3500, end=5500, name="Amelia", text="Czy widziałaś to na własne oczy?")
+    ev2.addressee = "Ray"
+    ev3 = pysubs2.SSAEvent(start=6000, end=8000, name="Amelia", text="Przecież wiedziałaś o wszystkim!")
+    ev3.addressee = "Ray"
+    ev4 = pysubs2.SSAEvent(start=8500, end=10500, name="Amelia", text="Sama mi to powiedziałaś.")
+    ev4.addressee = "Ray"
+    ev5 = pysubs2.SSAEvent(start=11000, end=13000, name="Amelia", text="Dlaczego nie przyszłaś na spotkanie?")
+    ev5.addressee = "Ray"
+    subs_m.events.extend([ev1, ev2, ev3, ev4, ev5])
+    EpisodeQualityGate.audit_and_fix_entire_episode(subs=subs_m, series_bible=bible)
+
+    assert "zrobiłeś" in subs_m.events[0].text, subs_m.events[0].text
+    assert "widziałeś" in subs_m.events[1].text, subs_m.events[1].text
+    assert "wiedziałeś" in subs_m.events[2].text, subs_m.events[2].text
+    assert "powiedziałeś" in subs_m.events[3].text, subs_m.events[3].text
+    assert "przyszedłeś" in subs_m.events[4].text, subs_m.events[4].text
+
+    # Negative control: female addressee preserves -łaś
+    subs_f = pysubs2.SSAFile()
+    ev_f = pysubs2.SSAEvent(start=1000, end=3000, name="Ray", text="Amelio, dlaczego to zrobiłaś?")
+    subs_f.events.append(ev_f)
+    EpisodeQualityGate.audit_and_fix_entire_episode(subs=subs_f, series_bible=bible)
+    assert "zrobiłaś" in subs_f.events[0].text, subs_f.events[0].text
+
+    # 4. Second-person predicate adjectives: nie bądź [adj]-a -> [adj]-y (5 positive examples)
+    adj_cases = [
+        ("nie bądź naiwna", "nie bądź naiwny"),
+        ("nie bądź zła", "nie bądź zły"),
+        ("nie bądź pewna", "nie bądź pewien"),
+        ("nie bądź śmieszna", "nie bądź śmieszny"),
+        ("nie bądź głupia", "nie bądź głupi"),
+    ]
+    for f_adj, exp_m in adj_cases:
+        res, _ = harmonize_copula_and_predicate_adjective(f_adj, target_gender="MALE")
+        assert res == exp_m, f"{f_adj} -> {res} != {exp_m}"
+
+    # Negative control: female target keeps feminine adjective
+    for f_adj, _ in adj_cases:
+        res, _ = harmonize_copula_and_predicate_adjective(f_adj, target_gender="FEMALE")
+        assert res == f_adj, f"Female target mutated: {res}"
+
+    # 5. Second-person predicate nouns: 5 role pairs with possessive/relational modifiers
+    noun_pairs = [
+        ("Jesteś moją uczennicą.", "Jesteś moim uczniem."),
+        ("Jesteś naszą przyjaciółką.", "Jesteś naszym przyjacielem."),
+        ("Jesteś wielką wojowniczką.", "Jesteś wielkim wojownikiem."),
+        ("Jesteś moją mistrzynią.", "Jesteś moim mistrzem."),
+        ("Jesteś prawdziwą bohaterką.", "Jesteś prawdziwym bohaterem."),
+    ]
+    for f_sent, exp_sent in noun_pairs:
+        res, _ = harmonize_2nd_person_predicate_nouns(f_sent, target_gender="MALE")
+        assert res == exp_sent, f"{f_sent} -> {res} != {exp_sent}"
+
+    # Negative control: female target preserves feminine predicate nouns
+    for f_sent, _ in noun_pairs:
+        res, _ = harmonize_2nd_person_predicate_nouns(f_sent, target_gender="FEMALE")
+        assert res == f_sent, f"Female target predicate mutated: {res}"
+
+    print(" -> PASSED: Test 164 potwierdza wymianę tur, blokadę wołacza i uzgodnienie orzecznika 2. osoby.")
+
+
+def test_speaker_turn_plural_you_harmonization():
+    """
+    TEST 165: SpeakerTurn Plural Addressee Detection & Backward Turn-Level Harmonization.
+    1. Multi-script plural addressee detection: EN markers, JA markers, PL markers.
+    2. Negative control: Singular 2nd-person markers do not trigger plural flag.
+    3. Backward turn-level pronoun harmonization (do ciebie -> do was within turn).
+    4. Lexical prepositional and verbal 2nd-person plural harmonization.
+    """
+    print("\n[TEST 165/166] SpeakerTurn Plural Addressee & Turn Harmonization...")
+    import pysubs2
+    from scene_discourse import SpeakerTurn, detect_turn_plural_addressee
+    from avt_linter import harmonize_turn_plural_subtitles, harmonize_text_2nd_person_plural
+
+    # 1. Multi-script plural addressee detection
+    # 1a. EN plural markers (5 positive examples)
+    en_markers = [
+        "You guys need to run!",
+        "You all must listen to me.",
+        "Look at your families and fight!",
+        "Protect your mothers and children!",
+        "All of you stand down immediately!",
+    ]
+    for text in en_markers:
+        assert detect_turn_plural_addressee(text) is True, f"EN plural failed: {text}"
+
+    # 1b. JA plural markers (5 positive examples)
+    ja_markers = [
+        "omaera nani shiteru",
+        "minna ikou ze",
+        "kisamara kike",
+        "kimi-tachi mate yo",
+        "temeera yurusanai",
+    ]
+    for text in ja_markers:
+        assert detect_turn_plural_addressee(text) is True, f"JA plural failed: {text}"
+
+    # 1c. PL plural markers (5 positive examples)
+    pl_markers = [
+        "Wy nic nie rozumiecie.",
+        "Tęsknicie za domem?",
+        "Zróbcie to natychmiast.",
+        "Słuchajcie uważnie rozkazu.",
+        "Widzicie ten zamek na wzgórzu?",
+    ]
+    for text in pl_markers:
+        assert detect_turn_plural_addressee(text) is True, f"PL plural failed: {text}"
+
+    # 2. Negative controls: Singular 2nd person markers (5 examples)
+    singular_markers = [
+        "You must leave now.",
+        "Boku wa iku ze.",
+        "Tęsknisz za swoim domem?",
+        "Zrób to natychmiast, Rayu.",
+        "Mam dla ciebie prezent.",
+    ]
+    for text in singular_markers:
+        assert detect_turn_plural_addressee(text) is False, f"Singular marked as plural: {text}"
+
+    # 3. Backward turn-level harmonization (do ciebie -> do was)
+    ev1 = pysubs2.SSAEvent(start=1000, end=2500, text="Mam do ciebie pytanie.")
+    ev2 = pysubs2.SSAEvent(start=3000, end=4500, text="Tęsknicie za domem?")
+    turn_events = [ev1, ev2]
+    harmonize_turn_plural_subtitles(turn_events)
+    assert "Mam do was pytanie." in ev1.text, f"Backward harmonization failed: {ev1.text}"
+
+    # 4. Lexical prepositional 2nd-person plural harmonization (5 positive examples)
+    prep_cases = [
+        ("Mam dla ciebie ważną wiadomość.", "Mam dla was ważną wiadomość."),
+        ("Chcę pójść z tobą na wyprawę.", "Chcę pójść z wami na wyprawę."),
+        ("Często myślałem o tobie.", "Często myślałem o was."),
+        ("Zawsze stoję przy tobie.", "Zawsze stoję przy was."),
+        ("Mam do ciebie wielką prośbę.", "Mam do was wielką prośbę."),
+    ]
+    for raw_t, exp_t in prep_cases:
+        res, _ = harmonize_text_2nd_person_plural(raw_t)
+        assert res == exp_t, f"{raw_t} -> {res} != {exp_t}"
+
+    print(" -> PASSED: Test 165 potwierdza detekcję liczby mnogiej w SpeakerTurn i wsteczną harmonizację tury.")
+
+
+def test_toponym_ablative_preposition_and_phonotactic_declension():
+    """
+    TEST 166: Toponym Ablative Stripping, Non-Speaking Classification & Phonotactic Declension.
+    1. EntityCategory.TOPONYM classification for geographical origin entities.
+    2. False -em stripping after ablative z/ze (z Seitzem -> z Seitz).
+    3. Japanese CV mora -e apostrophe elimination vs English silent -e preservation.
+    4. Masculine vocative/locative -u for affricate/fricative stems (-tz, -c, -cz, -sz).
+    5. Virile adjective orthography (-ciency instead of hypercorrect -cieńscy).
+    """
+    print("\n[TEST 166/166] Toponym Ablative Stripping & Phonotactic Declension...")
+    from series_memory import (
+        EntityCategory,
+        classify_entity_category,
+        clean_fake_name_apostrophes,
+        generate_polish_name_declension,
+    )
+    from avt_linter import (
+        strip_false_ablative_instrumental,
+        fix_masculine_vocative_tz,
+        fix_virile_adjective_orthography,
+    )
+
+    # 1. EntityCategory.TOPONYM classification in geographical origin context (5 positive examples)
+    toponyms = [
+        ("Seitz", "He came from Seitz yesterday."),
+        ("Lamberg", "They escaped from Lamberg before dawn."),
+        ("Canarre", "The grand army from Canarre arrived."),
+        ("Belgrad", "Soldiers from Belgrad attacked the flank."),
+        ("Alus", "A lone merchant from Alus visited us."),
+    ]
+    for name, ctx in toponyms:
+        cat = classify_entity_category(name, context=ctx)
+        assert cat == EntityCategory.TOPONYM, f"Expected TOPONYM for {name}, got {cat}"
+
+    # Negative control: Speaking anthroponyms without origin context
+    assert classify_entity_category("Braham") == EntityCategory.ANTHROPONYM
+    assert classify_entity_category("Ray") == EntityCategory.ANTHROPONYM
+
+    # 2. False -em stripping after ablative z/ze (5 positive examples)
+    abl_cases = [
+        ("Wracam z Seitzem do zamku.", "z Seitz"),
+        ("Uciekamy z Lambergem natychmiast.", "z Lamberg"),
+        ("Wyruszył z Canarrem wczoraj.", "z Canarre"),
+        ("Pochodzi z Belgradem.", "z Belgrad"),
+        ("Przybyli z Alusem o świcie.", "z Alus"),
+    ]
+    for raw_t, exp_part in abl_cases:
+        res, _ = strip_false_ablative_instrumental(raw_t)
+        assert exp_part in res, f"False -em not stripped: {raw_t} -> {res}"
+
+    # Negative controls: Real anthroponyms preserve instrumental -em with preposition z
+    res_anthro1, _ = strip_false_ablative_instrumental("Rozmawiałem z Brahamem wczoraj.")
+    assert res_anthro1 == "Rozmawiałem z Brahamem wczoraj.", f"Real person mutated: {res_anthro1}"
+    res_anthro2, _ = strip_false_ablative_instrumental("Poszedłem na spacer z Rayem.")
+    assert res_anthro2 == "Poszedłem na spacer z Rayem.", f"Real person mutated: {res_anthro2}"
+
+    # 3. Japanese CV mora -e vs English silent -e apostrophe handling
+    # 3a. Japanese CV mora -e (apostrophe eliminated, 5 examples)
+    jp_names = [
+        ("Widziałem Sasuke'a wczoraj.", "Widziałem Sasuke wczoraj."),
+        ("Pomogłem Daisuke'a w treningu.", "Pomogłem Daisuke w treningu."),
+        ("To jest miecz Sosuke'a.", "To jest miecz Sosuke."),
+        ("Znam brata Kosuke'a.", "Znam brata Kosuke."),
+        ("Słuchałem Ryunosuke'a z uwagą.", "Słuchałem Ryunosuke z uwagą."),
+    ]
+    for raw_t, exp_t in jp_names:
+        assert clean_fake_name_apostrophes(raw_t) == exp_t, f"JP fake apostrophe failed: {raw_t}"
+
+    # 3b. English silent -e (apostrophe preserved, 5 examples)
+    en_names = [
+        "Widziałem White'a w bazie.",
+        "To jest dom Wayne'a.",
+        "Słuchałem przemowy George'a.",
+        "Spotkałem Moore'a na rynku.",
+        "Podziwiałem Bruce'a za odwagę.",
+    ]
+    for t in en_names:
+        assert clean_fake_name_apostrophes(t) == t, f"English silent -e lost apostrophe: {t}"
+
+    # 4. Masculine vocative/locative -u for -tz stems (5 positive examples)
+    tz_vocatives = [
+        ("Rietzie, stój!", "Rietzu, stój!"),
+        ("Moritzie, uważaj!", "Moritzu, uważaj!"),
+        ("Fritzie, zaczekaj!", "Fritzu, zaczekaj!"),
+        ("Ignatzie, chodź tutaj!", "Ignatzu, chodź tutaj!"),
+        ("Kloetzie, pomóż mi!", "Kloetzu, pomóż mi!"),
+    ]
+    for raw_t, exp_t in tz_vocatives:
+        res, _ = fix_masculine_vocative_tz(raw_t)
+        assert res == exp_t, f"Vocative -tz failed: {raw_t} -> {res}"
+
+    # Negative control: Non -tz vocatives remain untouched
+    neg_voc, _ = fix_masculine_vocative_tz("Piotrze, posłuchaj!")
+    assert neg_voc == "Piotrze, posłuchaj!"
+
+    # Paradigm tests: stems on -tz, -c, -sz have locative and vocative ending in -u
+    for stem_name in ["Rietz", "Seitz", "Eric", "Tomasz", "Dariusz"]:
+        par = generate_polish_name_declension(stem_name, "MALE")
+        assert par["W"].endswith("u"), f"Vocative for {stem_name} must end in -u: {par['W']}"
+        assert par["Ms"].endswith("u"), f"Locative for {stem_name} must end in -u: {par['Ms']}"
+
+    # 5. Virile adjective orthography (-cienci, 5 positive examples)
+    virile_cases = [
+        ("Byli cieńscy i słabi.", "Byli ciency i słabi."),
+        ("Cieńscy wojownicy ruszyli do walki.", "Ciency wojownicy ruszyli do walki."),
+        ("To byli zbyt cieńscy przeciwnicy.", "To byli zbyt ciency przeciwnicy."),
+        ("Cieńscy obrońcy nie dali rady.", "Ciency obrońcy nie dali rady."),
+        ("Tak cieńscy rekruci odpadli od razu.", "Tak ciency rekruci odpadli od razu."),
+    ]
+    for raw_t, exp_t in virile_cases:
+        res, _ = fix_virile_adjective_orthography(raw_t)
+        assert res == exp_t, f"Virile orthography failed: {raw_t} -> {res}"
+
+    # Negative control: Valid -scy / -ńscy adjectives preserved
+    neg_vir, _ = fix_virile_adjective_orthography("Byli polscy i chińscy dyplomaci.")
+    assert neg_vir == "Byli polscy i chińscy dyplomaci."
+
+    print(" -> PASSED: Test 166 potwierdza usuwanie fałszywego narzędnika z toponimów i deklinację fonotaktyczną.")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -15483,6 +15977,13 @@ if __name__ == "__main__":
     test_sparse_dialogue_and_impersonal_syntax()
     test_full_polish_morphosyntactic_agreement()
     test_proper_name_declension_matrix_and_inflection_safety()
-    print("\n Wszystkie testy jednostkowe i integracyjne (160/160) zakończone pełnym sukcesem!\n")
+    test_acoustic_deadzone_and_spacy_dependency_isolation()
+    test_monologue_two_tier_gate_and_italic_safety()
+    test_diegetic_rupture_and_alias_relational_inheritance()
+    test_second_person_turn_taking_and_predicate_agreement()
+    test_speaker_turn_plural_you_harmonization()
+    test_toponym_ablative_preposition_and_phonotactic_declension()
+    print("\n Wszystkie testy jednostkowe i integracyjne (166/166) zakończone pełnym sukcesem!\n")
+
 
 

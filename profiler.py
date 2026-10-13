@@ -921,8 +921,8 @@ class EpistemicAudioTriangulator:
         """
         Zwraca (gender, confidence, F0_hard_masculine):
         - F0 <= 135 Hz: ('MALE', 1.0, True) - prawo weta anaforycznego przy score <= -8
-        - F0 > 170 Hz: (None, 0.0, False) - waga F0 = 0% (unieważnienie, delegacja)
-        - 135 < F0 <= 170 Hz: ('MALE', 0.65, False)
+        - F0 > 135 Hz: (None, 0.0, False) - waga F0 = 0% (likwidacja martwej strefy akustycznej 135-170 Hz,
+          ochrona niskich głosów kobiecych i wysokich głosów chłopięcych, pełna delegacja do JA/EN).
         """
         if median_f0 is None:
             return None, 0.0, False
@@ -930,10 +930,28 @@ class EpistemicAudioTriangulator:
         if median_f0 <= 135.0:
             return "MALE", 1.0, True
 
-        if median_f0 > 170.0:
-            return None, 0.0, False
+        return None, 0.0, False
 
-        return "MALE", 0.65, False
+    @classmethod
+    def triangulate_epistemic_gender(
+        cls,
+        f0_hz: Optional[float] = None,
+        jp_pronoun: Optional[str] = None,
+        en_score: int = 0,
+        median_f0: Optional[float] = None,
+    ) -> Dict[str, Any]:
+        """
+        Syntetyzuje 3 filary wiedzy (Acoustic F0, Japanese Morphosyntax, English Discourse Anaphora).
+        Dla każdej mediany F0 > 135 Hz waga akustyczna wynosi 0.0 (decyzję podejmują wyłącznie wektory JA i EN).
+        """
+        if median_f0 is not None and f0_hz is None:
+            f0_hz = median_f0
+        return SpaCyAnaphoraDiscourseAnalyzer.triangulate_epistemic_gender(
+            f0_hz=f0_hz,
+            jp_pronoun=jp_pronoun,
+            en_score=en_score,
+            median_f0=median_f0
+        )
 
 
 def resolve_event_speaker_cascade(event: Any, prev_event: Optional[Any] = None, jp_text: str = "") -> Optional[str]:
@@ -1093,18 +1111,61 @@ class SpaCyAnaphoraDiscourseAnalyzer:
 
         if nlp is not None:
             doc = nlp(clean_text)
-            for token in doc:
-                t_lower = token.lemma_.lower()
-                text_lower = token.text.lower()
-                if text_lower in ("he", "him", "his", "himself"):
-                    he_count += 1
-                elif text_lower in ("she", "her", "hers", "herself"):
-                    she_count += 1
+            if character_name:
+                char_tokens = {w.lower() for w in re.findall(r"\b[A-Za-z0-9]+\b", character_name)}
+                sents = list(doc.sents)
+                for i, sent in enumerate(sents):
+                    has_char = any(t.text.lower() in char_tokens for t in sent)
+                    is_valid_sent = False
+                    is_same_sentence = False
+                    if has_char:
+                        is_valid_sent = True
+                        is_same_sentence = True
+                    elif i > 0:
+                        prev_sent = sents[i - 1]
+                        prev_had_char = any(t.text.lower() in char_tokens for t in prev_sent)
+                        if prev_had_char:
+                            # Sentence i follows sentence i-1 with character.
+                            # Attribute to character ONLY IF no other proper noun subject exists in sentence i!
+                            new_propn_subj = any(
+                                (t.pos_ == "PROPN" or (t.text and t.text[0].isupper() and t.pos_ in ("PROPN", "NOUN")))
+                                and t.text.lower() not in char_tokens
+                                and t.dep_ in ("nsubj", "nsubjpass")
+                                for t in sent
+                            )
+                            if not new_propn_subj:
+                                is_valid_sent = True
+                                is_same_sentence = False
 
-                if t_lower in cls.MALE_TITLES or text_lower in cls.MALE_TITLES:
-                    male_noun_count += 1
-                elif t_lower in cls.FEMALE_TITLES or text_lower in cls.FEMALE_TITLES:
-                    female_noun_count += 1
+                    if is_valid_sent:
+                        for token in sent:
+                            if not cls._token_refers_to_character(token, sent, char_tokens, is_same_sentence):
+                                continue
+
+                            t_lower = token.lemma_.lower()
+                            text_lower = token.text.lower()
+                            if text_lower in ("he", "him", "his", "himself"):
+                                he_count += 1
+                            elif text_lower in ("she", "her", "hers", "herself"):
+                                she_count += 1
+
+                            if t_lower in cls.MALE_TITLES or text_lower in cls.MALE_TITLES:
+                                male_noun_count += 1
+                            elif t_lower in cls.FEMALE_TITLES or text_lower in cls.FEMALE_TITLES:
+                                female_noun_count += 1
+            else:
+                for token in doc:
+                    t_lower = token.lemma_.lower()
+                    text_lower = token.text.lower()
+                    if text_lower in ("he", "him", "his", "himself"):
+                        he_count += 1
+                    elif text_lower in ("she", "her", "hers", "herself"):
+                        she_count += 1
+
+                    if t_lower in cls.MALE_TITLES or text_lower in cls.MALE_TITLES:
+                        male_noun_count += 1
+                    elif t_lower in cls.FEMALE_TITLES or text_lower in cls.FEMALE_TITLES:
+                        female_noun_count += 1
         else:
             words = [w.lower() for w in re.findall(r"\b[A-Za-z]+\b", clean_text)]
             for w in words:
@@ -1123,11 +1184,172 @@ class SpaCyAnaphoraDiscourseAnalyzer:
         return score_pronouns + score_nouns
 
     @classmethod
+    def _token_refers_to_character(
+        cls,
+        token: Any,
+        sent: Any,
+        char_tokens: Set[str],
+        is_same_sentence: bool
+    ) -> bool:
+        """
+        Izolacja podmiotu po drzewie zależności (token.dep_):
+        Wiąże zaimki 3. osoby (he/she) i tytuły z badaną postacią X:
+        - W tym samym zdaniu: wyklucza zaimki dopełnieniowe (dobj/pobj/iobj) tego samego orzeczenia,
+          którego podmiotem jest X (np. 'Aoi shouted at him' -> 'him' nie odnosi się do Aoi),
+          oraz podmioty orzeczenia, którego dopełnieniem jest X (np. 'He saw Aoi' -> 'He' nie odnosi się do Aoi).
+        - W zdaniu bezpośrednio następującym: wyklucza zaimki dopełnieniowe skierowane na inne obiekty,
+          jeśli podmiot zdania przejął referencję do X.
+        """
+        text_lower = token.text.lower()
+        t_lemma = token.lemma_.lower()
+        is_3rd_pron = text_lower in ("he", "him", "his", "himself", "she", "her", "hers", "herself")
+        is_title = t_lemma in cls.MALE_TITLES or text_lower in cls.MALE_TITLES or t_lemma in cls.FEMALE_TITLES or text_lower in cls.FEMALE_TITLES
+        if not (is_3rd_pron or is_title):
+            return False
+
+        if not is_same_sentence:
+            subj_tokens = [t for t in sent if t.dep_ in ("nsubj", "nsubjpass") and t.text.lower() in ("he", "she")]
+            if subj_tokens:
+                subj = subj_tokens[0]
+                head_verb = token.head if token.head.pos_ == "VERB" else token.head.head
+                if head_verb == subj.head and token.dep_ in ("dobj", "pobj", "iobj") and not text_lower.endswith("self"):
+                    return False
+            return True
+
+        char_nodes = [t for t in sent if t.text.lower() in char_tokens]
+        if not char_nodes:
+            return False
+
+        char_subj_verbs = {c.head for c in char_nodes if c.dep_ in ("nsubj", "nsubjpass")}
+        char_obj_verbs = set()
+        for c in char_nodes:
+            if c.dep_ in ("dobj", "iobj"):
+                char_obj_verbs.add(c.head)
+            elif c.dep_ == "pobj" and c.head.head.pos_ == "VERB":
+                char_obj_verbs.add(c.head.head)
+
+        token_verb = token.head if token.head.pos_ == "VERB" else (token.head.head if token.head.head.pos_ == "VERB" else None)
+        if token_verb in char_subj_verbs:
+            if token.dep_ in ("dobj", "pobj", "iobj") and not text_lower.endswith("self"):
+                return False
+
+        if token_verb in char_obj_verbs and token.dep_ in ("nsubj", "nsubjpass"):
+            return False
+
+        return True
+
+    @classmethod
+    def resolve_pronoun_reference(
+        cls,
+        text_or_doc: Any,
+        character_name: str = "",
+        pronoun: Optional[Any] = None,
+        **kwargs
+    ) -> bool:
+        """
+        Izolacja podmiotu po drzewie zależności (token.dep_):
+        Wiąże zaimki 3. osoby (he/she) i tytuły z badaną postacią X:
+        - Zlicza / przypisuje zaimki z tego samego zdania, w którym występuje X.
+        - Zaimki ze zdania bezpośrednio następującego przypisuje do X WYŁĄCZNIE wtedy,
+          gdy w tym następującym zdaniu nie pojawia się inna nazwa własna (pos_ == "PROPN")
+          pełniąca funkcję nowego podmiotu (dep_ in ("nsubj", "nsubjpass")), która przejęłaby
+          referencję anaforyczną.
+        """
+        if not text_or_doc:
+            return False
+
+        # Support argument order flexibility
+        if isinstance(character_name, str) and not any(c in character_name for c in " .!?") and isinstance(text_or_doc, str) and any(c in text_or_doc for c in " .!?"):
+            pass
+        elif isinstance(text_or_doc, str) and not any(c in text_or_doc for c in " .!?") and isinstance(character_name, str) and any(c in character_name for c in " .!?"):
+            text_or_doc, character_name = character_name, text_or_doc
+
+        # If a spacy token was passed directly:
+        if hasattr(text_or_doc, "dep_") and hasattr(text_or_doc, "sent"):
+            token = text_or_doc
+            sent = token.sent
+            char_tokens = {w.lower() for w in re.findall(r"\b[A-Za-z0-9]+\b", character_name)}
+            if any(t.text.lower() in char_tokens for t in sent):
+                return cls._token_refers_to_character(token, sent, char_tokens, True)
+            doc = sent.doc
+            sents = list(doc.sents)
+            try:
+                idx = sents.index(sent)
+            except ValueError:
+                idx = -1
+            if idx > 0:
+                prev_sent = sents[idx - 1]
+                if any(t.text.lower() in char_tokens for t in prev_sent):
+                    new_propn_subj = any(
+                        (t.pos_ == "PROPN" or (t.text and t.text[0].isupper() and t.pos_ in ("PROPN", "NOUN")))
+                        and t.text.lower() not in char_tokens
+                        and t.dep_ in ("nsubj", "nsubjpass")
+                        for t in sent
+                    )
+                    if not new_propn_subj:
+                        return cls._token_refers_to_character(token, sent, char_tokens, False)
+            return False
+
+        nlp = cls.get_nlp()
+        if nlp is None:
+            if not character_name:
+                return False
+            return character_name.lower() in str(text_or_doc).lower()
+
+        doc = text_or_doc if hasattr(text_or_doc, "sents") else nlp(str(text_or_doc))
+        char_tokens = {w.lower() for w in re.findall(r"\b[A-Za-z0-9]+\b", character_name)}
+        sents = list(doc.sents)
+
+        target_prons = None
+        if pronoun is not None:
+            if hasattr(pronoun, "text"):
+                target_prons = {pronoun.text.lower()}
+            elif isinstance(pronoun, str):
+                target_prons = {pronoun.strip().lower()}
+
+        ALL_3RD_PERSON_PRONS = {"he", "him", "his", "himself", "she", "her", "hers", "herself"}
+
+        for i, sent in enumerate(sents):
+            has_char = any(t.text.lower() in char_tokens for t in sent)
+            is_valid = False
+            is_same = False
+            if has_char:
+                is_valid = True
+                is_same = True
+            elif i > 0:
+                prev_sent = sents[i - 1]
+                if any(t.text.lower() in char_tokens for t in prev_sent):
+                    new_propn = any(
+                        (t.pos_ == "PROPN" or (t.text and t.text[0].isupper() and t.pos_ in ("PROPN", "NOUN")))
+                        and t.text.lower() not in char_tokens
+                        and t.dep_ in ("nsubj", "nsubjpass")
+                        for t in sent
+                    )
+                    if not new_propn:
+                        is_valid = True
+                        is_same = False
+
+            if is_valid:
+                for t in sent:
+                    if not cls._token_refers_to_character(t, sent, char_tokens, is_same):
+                        continue
+                    w = t.text.lower()
+                    if target_prons:
+                        if w in target_prons:
+                            return True
+                    else:
+                        if w in ALL_3RD_PERSON_PRONS or t.lemma_.lower() in cls.MALE_TITLES or t.lemma_.lower() in cls.FEMALE_TITLES:
+                            return True
+
+        return False
+
+    @classmethod
     def triangulate_epistemic_gender(
         cls,
         f0_hz: Optional[float] = None,
         jp_pronoun: Optional[str] = None,
-        en_score: int = 0
+        en_score: int = 0,
+        median_f0: Optional[float] = None,
     ) -> Dict[str, Any]:
         """
         Syntetyzuje 3 filary wiedzy (Acoustic F0, Japanese Morphosyntax, English Discourse Anaphora)
@@ -1138,71 +1360,330 @@ class SpaCyAnaphoraDiscourseAnalyzer:
         4. F0 Hard Masculine Veto (F0 <= 135 Hz z prawem weta anaforycznego)
         5. Sparse / Ambiguous background voice
         6. Pure morphosyntax override
+
+        Likwidacja martwej strefy akustycznej (135–170 Hz):
+        Każda mediana F0 > 135 Hz otrzymuje wagę akustyczną 0.0 przy rozstrzyganiu płci.
+        Powyżej progu fizjologicznego basu męskiego (135 Hz) decyzję podejmują wyłącznie
+        wektory morfosyntaktyczne (JA) i anaforyczne (EN), chroniąc niskie głosy kobiece
+        i wysokie głosy chłopięce.
         """
+        if median_f0 is not None and f0_hz is None:
+            f0_hz = median_f0
+
+        acoustic_weight = 1.0 if (f0_hz is not None and f0_hz <= 135.0) else 0.0
         f0_gender, f0_conf, f0_hard_masc = EpistemicAudioTriangulator.triangulate_f0_gender(f0_hz)
 
         jp_p_low = (jp_pronoun or "").lower()
         jp_gender = "MALE" if jp_p_low in ("ore", "boku", "sessha") else ("FEMALE" if jp_p_low in ("watashi", "atashi", "atai") else None)
 
+        # 4. F0 Hard Masculine Veto (F0 <= 135 Hz)
         if f0_hard_masc:
             if en_score <= -8:
                 return {
                     "resolved_gender": "FEMALE",
                     "confidence": 0.85,
                     "archetype": "EP_RUPTURE_ANAPHORA_OVERRIDE",
-                    "f0_hard_masculine": True
+                    "f0_hard_masculine": True,
+                    "acoustic_weight": 1.0,
                 }
             return {
                 "resolved_gender": "MALE",
                 "confidence": 1.0,
                 "archetype": "F0_HARD_MASCULINE_VETO",
-                "f0_hard_masculine": True
+                "f0_hard_masculine": True,
+                "acoustic_weight": 1.0,
             }
 
-        if f0_hz is not None and f0_hz > 170.0 and (jp_gender == "MALE" or en_score > 0):
+        # 2. High female acoustic + female anaphora (or low female voice 135-170 Hz with female anaphora / JP pronoun)
+        if (f0_hz is not None and f0_hz > 135.0 and (jp_gender == "FEMALE" or en_score < 0)) or (jp_gender == "FEMALE" and en_score <= 0):
+            return {
+                "resolved_gender": "FEMALE",
+                "confidence": 0.95,
+                "archetype": "HIGH_FEMALE_ACOUSTIC_AND_ANAPHORA" if f0_hz is not None else "PURE_MORPHOSYNTAX_OVERRIDE",
+                "f0_hard_masculine": False,
+                "acoustic_weight": acoustic_weight,
+            }
+
+        # 3. Cross-gender seiyū (boy role voiced by female, F0 > 135 Hz with male pronoun)
+        if f0_hz is not None and f0_hz > 135.0 and jp_gender == "MALE":
             return {
                 "resolved_gender": "MALE",
                 "confidence": 0.95,
                 "archetype": "CROSS_GENDER_SEIYU_BOY_ROLE",
-                "f0_hard_masculine": False
+                "f0_hard_masculine": False,
+                "acoustic_weight": 0.0,
             }
 
+        # Epistemic rupture detection: High pitch + strong male anaphora (|en_score| >= 8)
+        if en_score >= 8 and (jp_gender != "FEMALE" or jp_p_low == "watashi"):
+            return {
+                "resolved_gender": "MALE",
+                "confidence": 0.95,
+                "archetype": "EP_RUPTURE_ANAPHORA_OVERRIDE" if (f0_hz is not None and f0_hz > 170.0 and jp_gender is None) else "PURE_MORPHOSYNTAX_OVERRIDE",
+                "f0_hard_masculine": False,
+                "acoustic_weight": acoustic_weight,
+            }
+        if en_score <= -8:
+            return {
+                "resolved_gender": "FEMALE",
+                "confidence": 0.95,
+                "archetype": "EP_RUPTURE_ANAPHORA_OVERRIDE",
+                "f0_hard_masculine": False,
+                "acoustic_weight": acoustic_weight,
+            }
+
+        # Any other F0 > 135 Hz: acoustic weight is 0.0. Morphosyntax and anaphora rule!
+        if f0_hz is not None and f0_hz > 135.0 and en_score > 0:
+            return {
+                "resolved_gender": "MALE",
+                "confidence": 0.95,
+                "archetype": "CROSS_GENDER_SEIYU_BOY_ROLE" if f0_hz > 170.0 else "MALE_DISCOURSE_OVERRIDE",
+                "f0_hard_masculine": False,
+                "acoustic_weight": 0.0,
+            }
+
+        # 1. Deep male acoustic + male anaphora (or male pronoun without F0)
         if (f0_gender == "MALE" or jp_gender == "MALE") and en_score >= 0:
             return {
                 "resolved_gender": "MALE",
                 "confidence": 0.95,
                 "archetype": "DEEP_MALE_ACOUSTIC_AND_ANAPHORA",
-                "f0_hard_masculine": False
+                "f0_hard_masculine": False,
+                "acoustic_weight": acoustic_weight,
             }
 
-        if (f0_hz is not None and f0_hz > 170.0 or jp_gender == "FEMALE") and en_score < 0:
-            return {
-                "resolved_gender": "FEMALE",
-                "confidence": 0.95,
-                "archetype": "HIGH_FEMALE_ACOUSTIC_AND_ANAPHORA",
-                "f0_hard_masculine": False
-            }
-
+        # 6. Pure morphosyntax override (when F0 is None)
         if f0_hz is None and (jp_gender == "MALE" and en_score >= 4 or en_score >= 8):
             return {
                 "resolved_gender": "MALE",
                 "confidence": 0.90,
                 "archetype": "PURE_MORPHOSYNTAX_OVERRIDE",
-                "f0_hard_masculine": False
+                "f0_hard_masculine": False,
+                "acoustic_weight": 0.0,
             }
         if f0_hz is None and (jp_gender == "FEMALE" and en_score <= -4 or en_score <= -8):
             return {
                 "resolved_gender": "FEMALE",
                 "confidence": 0.90,
                 "archetype": "PURE_MORPHOSYNTAX_OVERRIDE",
-                "f0_hard_masculine": False
+                "f0_hard_masculine": False,
+                "acoustic_weight": 0.0,
+            }
+        if f0_hz is None and en_score > 0:
+            return {
+                "resolved_gender": "MALE",
+                "confidence": 0.90,
+                "archetype": "PURE_MORPHOSYNTAX_OVERRIDE",
+                "f0_hard_masculine": False,
+                "acoustic_weight": 0.0,
+            }
+        if f0_hz is None and en_score < 0:
+            return {
+                "resolved_gender": "FEMALE",
+                "confidence": 0.90,
+                "archetype": "HIGH_FEMALE_ACOUSTIC_AND_ANAPHORA",
+                "f0_hard_masculine": False,
+                "acoustic_weight": 0.0,
             }
 
+        # 5. Sparse / Ambiguous background voice (including F0 > 135 Hz with 0.0 weight and en_score == 0)
         return {
             "resolved_gender": "NEUTRAL",
             "confidence": 0.50,
             "archetype": "SPARSE_AMBI_BACKGROUND",
             "is_transient": True,
-            "f0_hard_masculine": False
+            "f0_hard_masculine": False,
+            "acoustic_weight": acoustic_weight,
         }
+
+
+def triangulate_epistemic_gender(
+    f0_hz: Optional[float] = None,
+    jp_pronoun: Optional[str] = None,
+    en_score: int = 0,
+    median_f0: Optional[float] = None,
+) -> Dict[str, Any]:
+    """
+    Modułowa funkcja triangulacji epistemicznej płci (deleguje do SpaCyAnaphoraDiscourseAnalyzer).
+    """
+    if median_f0 is not None and f0_hz is None:
+        f0_hz = median_f0
+    return SpaCyAnaphoraDiscourseAnalyzer.triangulate_epistemic_gender(
+        f0_hz=f0_hz,
+        jp_pronoun=jp_pronoun,
+        en_score=en_score,
+        median_f0=median_f0
+    )
+
+
+def resolve_relational_actor_gender(
+    actor_name: str,
+    episode_dialogue: Optional[Any] = None,
+    is_flashback: bool = False
+) -> Dict[str, Any]:
+    """
+    Epizodyczne rozwiązywanie etykiet relacyjnych ([Owner]'s [Relation]):
+    - Człony jawnie nacechowane (Son, Boy, Brother, Father, Husband -> MALE; Daughter, Girl, Sister, Mother, Wife -> FEMALE)
+      otrzymują płeć z pewnością 1.0.
+    - Człony neutralne (Kid, Child, Apprentice, Student, Subordinate):
+      Skanuje kwestie właściciela ([Owner]) oraz sceny z jego udziałem pod kątem koreferencji
+      (son/boy/he lub JA musuko/boku/ore -> MALE vs daughter/girl/she lub JA musume/atashi -> FEMALE).
+      W braku pozytywnych dowodów żeńskich w retrospekcjach (Flashback), nadaje profilowi blokadę
+      przeciwko domyślnej feminizacji (prevent_female_bias=True, prevent_default_feminization=True).
+    """
+    if not actor_name:
+        return {
+            "gender": "UNKNOWN",
+            "inferred_gender": "UNKNOWN",
+            "confidence": 0.0,
+            "owner": "",
+            "base_name": "",
+            "relation": "",
+            "relation_type": "",
+            "prevent_female_bias": False,
+            "prevent_default_feminization": False,
+        }
+
+    cleaned_name = actor_name.strip()
+    if not is_flashback and any(fb in cleaned_name.lower() for fb in ("flashback", "retrospekcja", "past")):
+        is_flashback = True
+
+    rel_m = re.match(
+        r"^(.+?)(?:'s|s')\s+(Kid|Child|Son|Daughter|Boy|Girl|Brother|Sister|Bro|Sis|Father|Mother|Dad|Mom|Wife|Husband|Apprentice|Student|Subordinate)$",
+        cleaned_name,
+        re.IGNORECASE
+    )
+    if not rel_m:
+        return {
+            "gender": "UNKNOWN",
+            "inferred_gender": "UNKNOWN",
+            "confidence": 0.0,
+            "owner": cleaned_name,
+            "base_name": cleaned_name,
+            "relation": "",
+            "relation_type": "",
+            "prevent_female_bias": False,
+            "prevent_default_feminization": False,
+        }
+
+    owner = rel_m.group(1).strip()
+    rel = rel_m.group(2).strip().lower()
+
+    MALE_RELATIONS = {"son", "boy", "brother", "bro", "father", "dad", "husband"}
+    FEMALE_RELATIONS = {"daughter", "girl", "sister", "sis", "mother", "mom", "wife"}
+
+    if rel in MALE_RELATIONS:
+        return {
+            "gender": "MALE",
+            "inferred_gender": "MALE",
+            "confidence": 1.0,
+            "owner": owner,
+            "base_name": owner,
+            "relation": rel,
+            "relation_type": rel,
+            "prevent_female_bias": True,
+            "prevent_default_feminization": True,
+        }
+    if rel in FEMALE_RELATIONS:
+        return {
+            "gender": "FEMALE",
+            "inferred_gender": "FEMALE",
+            "confidence": 1.0,
+            "owner": owner,
+            "base_name": owner,
+            "relation": rel,
+            "relation_type": rel,
+            "prevent_female_bias": False,
+            "prevent_default_feminization": False,
+        }
+
+    # Neutral relation (Kid, Child, Apprentice, Student, Subordinate)
+    if episode_dialogue is not None:
+        if isinstance(episode_dialogue, str):
+            d_text = episode_dialogue
+        elif isinstance(episode_dialogue, list):
+            collected = []
+            for item in episode_dialogue:
+                if isinstance(item, str):
+                    collected.append(item)
+                else:
+                    txt = getattr(item, "text", "") or ""
+                    collected.append(txt)
+            d_text = " ".join(collected)
+        elif isinstance(episode_dialogue, dict):
+            d_text = " ".join(str(v) for v in episode_dialogue.values())
+        else:
+            d_text = str(episode_dialogue)
+
+        d_lower = d_text.lower()
+        male_hits = len(re.findall(r"\b(?:son|my boy|our boy|the boy|he|his|him|musuko|boku|ore)\b", d_lower))
+        female_hits = len(re.findall(r"\b(?:daughter|my girl|our girl|the girl|she|her|hers|musume|atashi)\b", d_lower))
+        if male_hits > female_hits:
+            return {
+                "gender": "MALE",
+                "inferred_gender": "MALE",
+                "confidence": 0.95,
+                "owner": owner,
+                "base_name": owner,
+                "relation": rel,
+                "relation_type": rel,
+                "prevent_female_bias": True,
+                "prevent_default_feminization": True,
+            }
+        if female_hits > male_hits:
+            return {
+                "gender": "FEMALE",
+                "inferred_gender": "FEMALE",
+                "confidence": 0.95,
+                "owner": owner,
+                "base_name": owner,
+                "relation": rel,
+                "relation_type": rel,
+                "prevent_female_bias": False,
+                "prevent_default_feminization": False,
+            }
+
+    if is_flashback:
+        return {
+            "gender": "MALE",
+            "inferred_gender": "MALE",
+            "confidence": 0.85,
+            "owner": owner,
+            "base_name": owner,
+            "relation": rel,
+            "relation_type": rel,
+            "prevent_female_bias": True,
+            "prevent_default_feminization": True,
+            "flashback_guard": True,
+        }
+
+    return {
+        "gender": "MALE",
+        "inferred_gender": "MALE",
+        "confidence": 0.70,
+        "owner": owner,
+        "base_name": owner,
+        "relation": rel,
+        "relation_type": rel,
+        "prevent_female_bias": True,
+        "prevent_default_feminization": True,
+    }
+
+
+def resolve_relational_actor(
+    actor_name: str,
+    episode_dialogue: Optional[Any] = None,
+    is_flashback: bool = False
+) -> Tuple[str, str, str, float]:
+    """
+    Epizodyczne rozwiązywanie etykiet relacyjnych ([Owner]'s [Relation]).
+    Zwraca krotkę: (base_name, relation_type, inferred_gender, confidence).
+    """
+    res = resolve_relational_actor_gender(actor_name, episode_dialogue=episode_dialogue, is_flashback=is_flashback)
+    return (
+        res.get("base_name", res.get("owner", actor_name)),
+        res.get("relation_type", res.get("relation", "")),
+        res.get("inferred_gender", res.get("gender", "UNKNOWN")),
+        float(res.get("confidence", 0.0))
+    )
 

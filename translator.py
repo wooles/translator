@@ -65,12 +65,18 @@ from memory import TranslationMemory, format_translation_memory_for_prompt
 from profiler import EpisodeProfiler, EpisodeProfile, format_episode_profile_for_prompt, format_lean_episode_brief
 from whisper_engine import JapaneseWhisperEngine
 from whisper_disambiguator import WhisperDisambiguator
-from avt_linter import AVTLinter
+from avt_linter import (
+    AVTLinter, harmonize_text_2nd_person_plural, harmonize_verbal_gender_1st_and_2nd,
+    harmonize_copula_and_predicate_adjective, harmonize_2nd_person_predicate_nouns,
+    strip_false_ablative_instrumental, fix_masculine_vocative_tz,
+    fix_virile_adjective_orthography, has_2nd_person_plural_verb
+)
 from romaji_helper import to_romaji
 from series_memory import (
     SeriesBible, extract_clean_speaker_name, INHERENT_FEMALE_NOUNS, INHERENT_MALE_NOUNS,
     GENERIC_CATEGORY_TAGS, is_generic_actor_or_category, FEMALE_ROLE_KEYWORDS,
-    MALE_ROLE_KEYWORDS, BOY_ROLE_KEYWORDS
+    MALE_ROLE_KEYWORDS, BOY_ROLE_KEYWORDS, EntityCategory, DeclensionParadigm,
+    classify_entity_category, generate_polish_name_declension, is_plural_actor
 )
 from manga_canon import MangaCanonRegistry
 from avt_formatter import (
@@ -1121,6 +1127,14 @@ class LineTranslation(BaseModel):
             "'grupa_mieszana' (mężczyźni i kobiety / tłum - wymóg form: zrobiliście/byliście) "
             "lub 'brak' (myśl/monolog)"
         )
+    )
+    target_gender: Optional[str] = Field(
+        default=None,
+        description="Płeć adresata/odbiorcy kwestii: 'MASCULINE', 'FEMININE' lub null."
+    )
+    addressee_number: Optional[str] = Field(
+        default=None,
+        description="Liczba gramatyczna adresata: 'SINGULAR' (l. pojedyncza 'ty') lub 'PLURAL' (l. mnoga 'wy')."
     )
     semiotic_layer: Optional[str] = Field(default="spoken_on_screen", description="Warstwa semiotyczna: 'spoken_on_screen' (mowa w kadrze), 'spoken_off_screen' (komentarz zza kadru), 'manga_balloon' (dymek/halucynacja), 'inner_thought' (myśli), 'diegetic_sign' (plansza/napis)")
     screen_region: Optional[str] = Field(default=None, description="Dla planszy/tytułu/napisu ekranowego: wskaż wykryte na kadrze położenie japońskiego napisu: 'bottom_right' (prawy dolny róg), 'bottom_left' (lewy dolny róg), 'top_right' (prawy górny róg), 'top_left' (lewy górny róg), 'bottom_center' (dół), 'top_center' (góra), 'center' (środek) lub null dla zwykłych dialogów.")
@@ -2781,6 +2795,72 @@ class MultimodalTranslator:
 
                 lines.append(f"Kwestia [ID: {idx + 1}] [TYP: [DIALOG] {vtype['type_label']}]{relation_tag} (Czas: {start_str} - {end_str}) [MÓWCA: {spk_label} | ADRESAT: {addr_label} | REJESTR: {reg_desc}]{acoustic_str}:")
                 lines.append(f"  📄 SKRYPT PODSTAWOWY EN (TREŚĆ, FAKTY, SKŁADNIA I MAJUSKUŁA): {clean_display_text}")
+
+                # Pre-Generation Morphosyntactic Contract (Stream 4 - Standard 3.0)
+                contract_spk_gender = "UNKNOWN"
+                if line_spk_gender:
+                    g_l = line_spk_gender.lower()
+                    if any(k in g_l for k in ["mężczyzna", "male", "chłopak", "boy"]):
+                        contract_spk_gender = "MASCULINE"
+                    elif any(k in g_l for k in ["kobieta", "female", "dziewczyn", "girl"]):
+                        contract_spk_gender = "FEMININE"
+
+                contract_target_gender = "UNKNOWN"
+                if line_addr_cat:
+                    a_l = line_addr_cat.lower()
+                    if any(k in a_l for k in ["kobieta", "female", "dziewczyn", "kobieta_dual", "grupa_kobiet"]):
+                        contract_target_gender = "FEMININE"
+                    elif any(k in a_l for k in ["mężczyzna", "male", "chłopak", "mężczyzna_dual", "grupa_mężczyzn"]):
+                        contract_target_gender = "MASCULINE"
+
+                contract_addr_number = "PLURAL" if (
+                    line_addr_cat in ["grupa_kobiet", "grupa_mężczyzn", "grupa_mieszana", "kobieta_dual", "mężczyzna_dual", "para_mieszana_dual"]
+                    or is_plural_actor(addr_label)
+                ) else "SINGULAR"
+
+                detected_entities: List[str] = []
+                if event.name and not is_generic_actor_or_category(event.name):
+                    cl_spk = extract_clean_speaker_name(event.name).strip()
+                    if cl_spk and len(cl_spk) >= 3 and cl_spk not in detected_entities:
+                        detected_entities.append(cl_spk)
+
+                known_names = set()
+                if self.character_registry:
+                    known_names.update([extract_clean_speaker_name(k).strip() for k in self.character_registry.keys() if "->" not in k])
+                sb_inst = getattr(self, "series_bible", None)
+                if sb_inst and hasattr(sb_inst, "data"):
+                    known_names.update([extract_clean_speaker_name(k).strip() for k in sb_inst.data.get("characters", {}).keys() if "->" not in k])
+                    known_names.update(list(sb_inst.data.get("places", {}).keys()))
+
+                for kn in sorted(known_names, key=lambda x: len(x), reverse=True):
+                    if len(kn) >= 3 and re.search(rf"\b{re.escape(kn)}\b", clean_text, re.IGNORECASE):
+                        if kn not in detected_entities and len(detected_entities) < 2:
+                            detected_entities.append(kn)
+
+                entity_cat_strs = []
+                paradigm_strs = []
+                for ent in detected_entities:
+                    cat_enum = classify_entity_category(ent, series_bible=sb_inst)
+                    entity_cat_strs.append(f"{ent}: {cat_enum.value}")
+                    par = None
+                    if sb_inst and hasattr(sb_inst, "get_declension_paradigm"):
+                        par = sb_inst.get_declension_paradigm(ent)
+                    if not par:
+                        ent_g = "MALE" if contract_spk_gender == "MASCULINE" and ent == event.name else ("FEMALE" if contract_spk_gender == "FEMININE" and ent == event.name else "UNKNOWN")
+                        par = DeclensionParadigm.create_for_name(ent, gender=ent_g)
+                    if par:
+                        paradigm_strs.append(f"{ent}(D:{par.D}, C:{par.C}, B:{par.B}, N:{par.N}, Ms:{par.Ms}, W:{par.W})")
+
+                contract_parts = [
+                    f"speaker={contract_spk_gender}",
+                    f"target={contract_target_gender}",
+                    f"number={contract_addr_number}"
+                ]
+                if entity_cat_strs:
+                    contract_parts.append(f"EntityCategory: {', '.join(entity_cat_strs)}")
+                if paradigm_strs:
+                    contract_parts.append(f"DeclensionParadigm: {'; '.join(paradigm_strs)}")
+                lines.append(f"  📋 TWARDY KONTRAKT: {' | '.join(contract_parts)}")
                 if compact_wdd_tag:
                     lines.append(f"  {compact_wdd_tag}")
                 subj_3p = detect_third_person_mentions(
@@ -2798,7 +2878,7 @@ class MultimodalTranslator:
                     clean_lower = clean_text.lower()
                     for term_en, term_pl in active_gloss.items():
                         if term_en and len(term_en) >= 3 and term_en.lower() in clean_lower:
-                            lines.append(f"  📖 SŁOWNIK KANONICZNY: '{term_en}' => '{term_pl}' (forma bazowa – w dialogu ZAWSZE odmieniaj przez polskie przypadki!; unikaj powtarzania deskryptorów: jeśli w zdaniu jest już 'z prowincji', 'na górze', stosuj samą nazwę)")
+                            lines.append(f"  📖 SŁOWNIK KANONICZNY: '{term_en}' => '{term_pl}' (forma bazowa – w dialogu ZAWSZE odmieniaj przez polskie przypadki!)")
                 if vtype.get("is_top"):
                     lines.append(f"  (!) DIALOG GÓRNY / W TLE: Dialog postaci w tle/oddali – formatuj jako naturalny dialog mówiony (Sentence case).")
                 is_split_part = (
@@ -3872,6 +3952,51 @@ class MultimodalTranslator:
             if not any_redaction_printed:
                 pbar.write(f" └─ [Redaktor Dialogów] Zweryfikowano bez uwag (100% zgodności z Kanonem AVT)")
 
+        # Turn-Level Plural Number Harmonizer (Stream 4 - Standard 3.0)
+        speaker_turns: List[List[Dict[str, Any]]] = []
+        curr_turn_group: List[Dict[str, Any]] = []
+        for it in pass1_items:
+            if not curr_turn_group:
+                curr_turn_group.append(it)
+            else:
+                prev_it = curr_turn_group[-1]
+                spk_curr = (it.get("speaker_name") or "").strip()
+                spk_prev = (prev_it.get("speaker_name") or "").strip()
+                t_gap = max(0, it.get("start_ms", 0) - prev_it.get("end_ms", 0))
+                same_speaker = (spk_curr == spk_prev) or (not spk_curr and not spk_prev)
+                if same_speaker and t_gap <= 2500:
+                    curr_turn_group.append(it)
+                else:
+                    speaker_turns.append(curr_turn_group)
+                    curr_turn_group = [it]
+        if curr_turn_group:
+            speaker_turns.append(curr_turn_group)
+
+        for t_group in speaker_turns:
+            turn_plural = False
+            for it in t_group:
+                addr_str = str(it.get("addressee") or "").upper()
+                addr_num = str(it.get("addressee_number") or "").upper()
+                if "PLURAL" in addr_num or any(k in addr_str for k in ["PLURAL", "GRUPA", "DUAL"]):
+                    turn_plural = True
+                    break
+                line_pl_t = refined_dict.get(it["id"], it.get("pl", ""))
+                if has_2nd_person_plural_verb(line_pl_t):
+                    turn_plural = True
+                    break
+                if re.search(r"\b(?:you\s+guys|you\s+all|you\s+lot|listen\s+up|everyone)\b", it.get("en", ""), re.IGNORECASE):
+                    turn_plural = True
+                    break
+            if turn_plural:
+                for it in t_group:
+                    orig_t = refined_dict.get(it["id"], it.get("pl", ""))
+                    new_t, p_fixes = harmonize_text_2nd_person_plural(orig_t)
+                    if new_t != orig_t:
+                        refined_dict[it["id"]] = new_t
+                        it["pl"] = new_t
+                        for fx in p_fixes:
+                            pbar.write(f"  [Harmonizator Liczby Mnogiej Tury] #{it['id']}: {fx}")
+
         prev_linted_line = (lookback_history[-1]["pl"] if lookback_history else "")
         for item in pass1_items:
             raw_final = sanitize_sub_text(refined_dict.get(item["id"], item["pl"]))
@@ -3922,7 +4047,9 @@ class MultimodalTranslator:
                 audio_jp=item.get("audio_jp", ""),
                 prev_line_text=prev_linted_line,
                 source_en=item.get("en", ""),
-                addressee_gender=item.get("addressee")
+                addressee_gender=item.get("target_gender") or item.get("addressee"),
+                target_gender=item.get("target_gender") or item.get("addressee"),
+                addressee_number=item.get("addressee_number")
             )
             prev_linted_line = final_text
             # Deterministic glossary overrides

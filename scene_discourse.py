@@ -27,6 +27,21 @@ Odpowiedzialność:
 import re
 from typing import List, Dict, Any, Tuple, Optional, Set
 
+__all__ = [
+    "DualVoiceTagPreserver",
+    "DeicticDiscourseEngine",
+    "DiarizationSanityChecker",
+    "SubtitleDiscourseSanitizer",
+    "SpeakerTurn",
+    "detect_turn_plural_addressee",
+    "group_speaker_turns",
+    "resolve_turn_addressee",
+    "resolve_all_speaker_turns",
+    "process_scene_discourse",
+    "is_internal_monologue",
+    "resolve_diegetic_persona_gender",
+]
+
 
 class DualVoiceTagPreserver:
     """
@@ -333,54 +348,165 @@ class SubtitleDiscourseSanitizer:
         return bool(cls.SKILL_BRACKETS_REGEX.search(text or ""))
 
 
-def is_internal_monologue(event_or_text: Any, target_speaker: Optional[str] = None) -> bool:
+POLISH_COMMON_INTERJECTIONS_STOPLIST: Set[str] = {
+    "nie", "tak", "cóż", "ale", "oto", "ach", "och", "hej", "halo", "ej", "o",
+    "aha", "no", "naprawdę", "jasne", "dobrze", "zrozumiałem", "rozumiem",
+    "chwila", "moment", "uwaga", "stój", "czekaj", "pomocy", "spokojnie",
+    "dlaczego", "gdzie", "kiedy", "jak", "kto", "co", "czemu", "tylko", "znowu"
+}
+
+VOCATIVE_OUTWARD_TITLES: Set[str] = {
+    "mistrzu", "panie", "kapitanie", "królu", "bracie", "chłopcze", "dowódco",
+    "ojcze", "tato", "lordzie", "książę", "generale", "stryju", "wuju", "synu",
+    "wojowniku", "młodzieńcze", "przyjacielu", "rycerzu", "starcze", "staruszku",
+    "pani", "królowo", "siostro", "matko", "mamo", "dziewczyno", "księżniczko",
+    "mistrzyni", "córko", "wojowniczko", "przyjaciółko"
+}
+
+VOCATIVE_OUTWARD_TITLES_REGEX = re.compile(
+    r"(?:^|[\s,–—])(?:" + "|".join(VOCATIVE_OUTWARD_TITLES) + r")(?:[,.!?…\s–—]|$)",
+    re.IGNORECASE
+)
+
+VOCATIVE_PUNCT_ANCHOR_REGEX = re.compile(
+    r"(?:,\s*([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+(?:ie|u|o))[,.!?…\s–—]*$)|"
+    r"(?:^([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+(?:ie|u|o))[,!]\s+)|"
+    r"(?:,\s*([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+(?:ie|u|o)),)",
+    re.UNICODE
+)
+
+
+def _has_outward_vocative(text: str) -> bool:
+    """Sprawdza, czy kwestia zawiera wołacz tytułu lub imienia skierowany na zewnątrz."""
+    if not text:
+        return False
+    if VOCATIVE_OUTWARD_TITLES_REGEX.search(text):
+        return True
+    for m in VOCATIVE_PUNCT_ANCHOR_REGEX.finditer(text):
+        name = m.group(1) or m.group(2) or m.group(3)
+        if name and name.lower() not in POLISH_COMMON_INTERJECTIONS_STOPLIST:
+            return True
+    return False
+
+
+def is_internal_monologue(
+    event_or_text: Any,
+    target_speaker: Optional[str] = None,
+    style: Optional[str] = None
+) -> bool:
     """
-    Kryteria zatwierdzenia monologu wewnętrznego (is_internal_monologue = True):
-    Kwestia otrzymuje dostęp do true_gender postaci WYŁĄCZNIE wtedy, gdy spełnia łącznie:
-    1) Cała linia ujęta jest w nawiasy okrągłe ASCII ( ) lub CJK （ ） ALBO posiada styl ASS typu 'Thoughts'/'Internal'
-       ALBO jest w całości zapisana kursywą {\\i1}.
-    2) ORAZ nie zawiera prefiksów radiowych/telefonicznych ([Radio], [Phone], [Comm]).
-    3) ORAZ nie posiada zdefiniowanego adresata w grafie dyskursu (target_speaker is None; brak szeptu do towarzysza).
-    4) ORAZ nie zawiera japońskich cudzysłowów dialogowych 「 」/『 』 ani nawiasów skilli 【 】/《 》.
+    Dwuwarstwowa Bramka Monologu Wewnętrznego (Standard 3.0 / 0.00 PLN Offline):
+    Kwestia otrzymuje status monologu wewnętrznego (is_internal_monologue = True) według dwóch ścieżek:
+
+    1. Ścieżka Jawnych Nawiasów Myśli i Stylu (Explicit Thought Marker):
+       Gdy cała kwestia jest ujęta w nawiasy okrągłe ASCII ( ) lub CJK （ ）
+       ALBO ma styl ASS zawierający 'Thought' / 'Internal' / 'Monologue' / 'Myśl',
+       zwraca is_internal_monologue = True NIEZALEŻNIE od tego, czy target_speaker w scenie jest ustawiony (!= None)
+       (wewnętrzne myśli podczas rozmowy z kimś w scenie zawsze zachowują true_gender).
+       Wyjątek: jeśli target_speaker is None, a obiekt zdarzenia ma jawnie zdefiniowany atrybut addressee
+       (np. szept skierowany do towarzysza: ev.addressee = 'Braham'), kwestia zostaje odrzucona.
+
+    2. Ścieżka Kursywy {\\i1} (Italic Safety Gate):
+       Sama kursywa {\\i1} (bez nawiasów myśli i bez stylu Thoughts) zwraca is_internal_monologue = True
+       WYŁĄCZNIE wtedy, gdy:
+       - target_speaker is None (brak zdefiniowanego rozmówcy w scenie oraz brak atrybutu addressee/target),
+       - styl nie oznacza głosu spoza kadru (Offscreen / Flashback / Retrospekcja / Narration / Voiceover),
+       - a tekst nie zawiera wykrzykników ('!', '！') ani wołaczy skierowanych na zewnątrz.
+
+    Przed oceną obu ścieżek bezwzględnie odrzucane są:
+    - Japońskie cudzysłowy dialogowe 「 」 i 『 』 (mowa na głos),
+    - Nawiasy skilli/statusu/szyldów 【 】, 《 》, ［ ］,
+    - Tagi komunikacyjne [Radio], [Phone], [Comm],
+    - Czyste didaskalia dźwiękowe i SFX.
     """
     if event_or_text is None:
         return False
 
     raw_text = getattr(event_or_text, "text", str(event_or_text)) or ""
-    style = getattr(event_or_text, "style", "") or ""
+    if not raw_text.strip():
+        return False
 
-    # Odrzucenie cudzysłowów dialogowych i nawiasów skilli
+    eff_style = style if style is not None else (getattr(event_or_text, "style", "") or "")
+    eff_style_low = eff_style.lower()
+
+    # Krok 0: Odrzucenie cudzysłowów dialogowych i nawiasów skilli/systemu
     if SubtitleDiscourseSanitizer.is_dialogue_quote(raw_text):
         return False
     if SubtitleDiscourseSanitizer.is_skill_or_system_bracket(raw_text):
         return False
 
-    # Sprawdzenie prefiksów radiowych/telefonicznych
+    # Krok 0b: Odrzucenie prefiksów radiowych/telefonicznych/komunikacyjnych
     if re.search(r"\[(?:Radio|Phone|Comm)\]", raw_text, re.IGNORECASE):
         return False
 
-    # Sprawdzenie zdefiniowanego adresata
-    target = target_speaker if target_speaker is not None else (getattr(event_or_text, "addressee", None) or getattr(event_or_text, "target", None))
-    if target is not None and str(target).strip():
+    # Krok 0c: Odrzucenie czystych tagów SFX / didaskaliów
+    if re.search(r"\[(?:SFX|Sound|Music)\]", raw_text, re.IGNORECASE):
         return False
 
-    # Oczyszczenie z tagów ASS dla analizy nawiasów
+    # Oczyszczenie z tagów ASS dla analizy tekstu
     pure_text = SubtitleDiscourseSanitizer.ASS_TAGS_REGEX.sub("", raw_text).strip()
+    if not pure_text:
+        return False
 
-    # 1. Styl "Thoughts" / "Internal"
-    style_low = style.lower()
-    if any(k in style_low for k in ["thought", "internal", "myśl"]):
+    # Odrzucenie didaskaliów dźwiękowych w nawiasach typu (gasp), (screams)
+    if re.fullmatch(r"\(\s*(?:gasp|screams?|sighs|crying|groans|applause|sfx.*?)\s*\)", pure_text, re.IGNORECASE):
+        return False
+
+    # Wykrycie jawnych nawiasów myśli ASCII ( ) lub CJK （ ） obejmujących całą kwestię
+    has_thought_brackets = (
+        (pure_text.startswith("(") and pure_text.endswith(")")) or
+        (pure_text.startswith("（") and pure_text.endswith("）"))
+    )
+
+    # Wykrycie stylu dedykowanego myślom
+    has_thought_style = any(k in eff_style_low for k in ["thought", "internal", "monologue", "myśl"])
+
+    # Sprawdzenie jawnego szeptu do towarzysza (addressee na obiekcie przy braku target_speaker w wywołaniu)
+    event_addressee = getattr(event_or_text, "addressee", None)
+    if event_addressee and target_speaker is None:
+        return False
+
+    # =========================================================================
+    # ŚCIEŻKA 1: Jawne Nawiasy Myśli i Styl Dedykowany (Explicit Thought Marker)
+    # =========================================================================
+    if has_thought_brackets or has_thought_style:
+        # Myśl w nawiasach lub stylu Thoughts jest monologiem wewnętrznym ZAWSZE,
+        # nawet gdy target_speaker != None (rozmowa z kimś w scenie nie niweluje wewnętrznych myśli)
         return True
 
-    # 2. Nawiasy okrągłe ASCII ( ) lub CJK （ ） obejmujące całą linię
-    if (pure_text.startswith("(") and pure_text.endswith(")")) or (pure_text.startswith("（") and pure_text.endswith("）")):
-        return True
+    # =========================================================================
+    # ŚCIEŻKA 2: Kursywa {\i1} (Italic Safety Gate)
+    # =========================================================================
+    # Sprawdzenie obecności kursywy ASS {\i1} lub stylu kursywy
+    has_italics = ("{\\i1}" in raw_text) or ("italic" in eff_style_low)
+    if not has_italics:
+        return False
 
-    # 3. W całości zapisana kursywą {\i1}
-    if raw_text.strip().startswith("{\\i1}") and ("{\\i0}" not in raw_text or raw_text.strip().endswith("{\\i0}")):
-        return True
+    # Bezpiecznik 2a: target_speaker is None (oraz brak addressee/target na obiekcie)
+    if target_speaker is not None and str(target_speaker).strip():
+        return False
+    target_attr = getattr(event_or_text, "target", None)
+    if target_attr and str(target_attr).strip():
+        return False
 
-    return False
+    # Bezpiecznik 2b: Styl nie oznacza głosu spoza kadru, retrospekcji ani narracji
+    if any(k in eff_style_low for k in [
+        "offscreen", "off-screen", "off_screen", "os", "o.s.",
+        "flashback", "retrospekcja",
+        "narration", "narrator", "narrative",
+        "voiceover", "voice-over", "vo", "v.o."
+    ]):
+        return False
+
+    # Bezpiecznik 2c: Tekst nie zawiera wykrzykników ani wołaczy skierowanych na zewnątrz
+    if "!" in pure_text or "！" in pure_text:
+        return False
+
+    # Sprawdzenie wołaczy zewnętrznych (tytuły i imiona zawołane na głos)
+    if _has_outward_vocative(pure_text):
+        return False
+
+    return True
 
 
 def resolve_diegetic_persona_gender(
@@ -420,3 +546,481 @@ def resolve_diegetic_persona_gender(
         )
 
     return getattr(character_identity, "true_gender", "UNKNOWN")
+
+
+# =============================================================================
+# FILAR 2 & 3: SPEAKER TURN GROUPING, DYADIC TURN-TAKING & PLURAL ADDRESSEE
+# =============================================================================
+
+EN_PLURAL_ADDRESSEE_REGEX = re.compile(
+    r"\b(?:"
+    r"you\s+guys|you\s+all|y'all|you\s+lot|everyone|everybody|listen\s+up|"
+    r"all\s+of\s+you|"
+    r"your\s+(?:mothers|mommies|mommas|families|parents|lives|heads|homes|weapons|wives|husbands|children|kids|comrades|ancestors|brothers|sisters|folks|clans|souls|swords|shields|lands|troops|men)|"
+    r"(?:hey|listen|look|now)?\s*(?:soldiers|warriors|men|folks|people|guards|knights|comrades|brothers|sisters|friends)\b"
+    r")",
+    re.IGNORECASE
+)
+
+JA_PLURAL_ADDRESSEE_REGEX = re.compile(
+    r"\b(?:omaera|omae-tachi|omaetachi|kisamara|temeera|temera|kimi-tachi|kimitachi|anata-tachi|anatachi|minna|mina-san|minasan|shokun)\b|"
+    r"(?:お前ら|お前達|貴様ら|貴様達|手前ら|君たち|君達|あなた達|皆さん|皆様|諸君|みんな)",
+    re.IGNORECASE
+)
+
+PL_PLURAL_PRONOUN_REGEX = re.compile(
+    r"\b(?:wy|was|wam|wami|wasz|wasza|wasze|waszych|waszym|waszymi|waszą|waszemu)\b",
+    re.IGNORECASE
+)
+
+PL_PLURAL_PAST_VERB_REGEX = re.compile(
+    r"\b[a-ząćęłńóśźż]+(?:liście|łyście)\b",
+    re.IGNORECASE
+)
+
+PL_PLURAL_PRESENT_VERB_REGEX = re.compile(
+    r"\b(?:"
+    r"jesteście|będziecie|macie|wiecie|chcecie|możecie|musicie|idziecie|robicie|myślicie|widzicie|słyszycie|"
+    r"rozumiecie|znacie|bądźcie|słuchajcie|patrzcie|chodźcie|czekajcie|poddajcie|walczcie|spójrzcie|uważajcie|"
+    r"idźcie|powiedzcie|zróbcie|stójcie|bierzcie|dajcie|ratujcie|brońcie|uciekajcie|przestańcie|mówcie|zostawcie|"
+    r"tęsknicie|zobaczycie|pamiętajcie|wybaczcie|zaufajcie|powstrzymajcie|pomóżcie|wracajcie|ruszajcie|"
+    r"zabijcie|spalcie|zniszczcie|strzeżcie|wstańcie|siadajcie|wierzycie|szukacie|znajdziecie|czujecie|"
+    r"przejdźcie"
+    r")\b",
+    re.IGNORECASE
+)
+
+PL_NON_VERB_CIE_WORDS: Set[str] = {
+    "życie", "picie", "bicie", "mycie", "szycie", "krycie", "wycie", "bycie",
+    "spicie", "odkrycie", "przeżycie", "ubicie", "mieście", "świecie", "lecie",
+    "stulecie", "tysiąclecie", "półwiecze", "powiecie", "kwiecie", "aucie",
+    "błocie", "złocie", "locie", "płocie", "odlocie", "wylocie", "przylocie",
+    "przelocie", "grzbiecie", "pakiecie", "bilecie", "kobiecie", "swecie",
+    "komitecie", "kolecie", "namiocie", "zamiecie", "trzecie", "obficie",
+    "całkowicie", "należycie", "znakomicie", "sowicie", "rzęsiście", "oczywiście",
+    "żywo", "wicie", "poszycie", "przebicie", "podbicie", "rozbicie", "wybicie",
+    "nabicie", "zdobycie", "przybycie", "obycie", "zbycie", "korycie", "kopycie",
+    "jelicie", "zenicie", "sekrecie", "konkrecie", "balecie", "szkielecie",
+    "facecie", "akcie", "kontakcie", "pakcie", "trakcie", "fakcie", "punkcie"
+}
+
+PL_GENERAL_CIE_VERB_REGEX = re.compile(r"\b([a-ząćęłńóśźż]{3,})cie\b", re.IGNORECASE)
+
+
+def detect_turn_plural_addressee(turn_or_text: Any) -> bool:
+    """
+    Weryfikuje, czy w wypowiedzi lub turze występuje wskaźnik liczby mnogiej adresata (addressee_number = 'PLURAL').
+    Obejmuje:
+    - EN: you guys, you all, you lot, everyone, listen up, plural vocative, your + [plural people/family/life/weapon],
+    - JA: omaera, omae-tachi, kisamara, temeera, kimi-tachi, anata-tachi, minna, mina-san, shokun,
+    - PL: zaimek wy/was/wam/wami/wasz, czasownik na -cie / -liście / -łyście.
+    """
+    if turn_or_text is None:
+        return False
+
+    texts: List[str] = []
+    if isinstance(turn_or_text, str):
+        texts = [turn_or_text]
+    elif hasattr(turn_or_text, "lines"):
+        texts = turn_or_text.lines
+    elif hasattr(turn_or_text, "events"):
+        texts = [getattr(ev, "text", str(ev)) or "" for ev in turn_or_text.events]
+    elif hasattr(turn_or_text, "text"):
+        texts = [getattr(turn_or_text, "text", "") or ""]
+    else:
+        texts = [str(turn_or_text)]
+
+    for raw in texts:
+        if not raw:
+            continue
+        clean = SubtitleDiscourseSanitizer.ASS_TAGS_REGEX.sub("", raw).strip()
+        if not clean:
+            continue
+
+        # 1. EN
+        if EN_PLURAL_ADDRESSEE_REGEX.search(clean):
+            return True
+
+        # 2. JA
+        if JA_PLURAL_ADDRESSEE_REGEX.search(clean):
+            return True
+
+        # 3. PL zaimki 2. os. lm.
+        if PL_PLURAL_PRONOUN_REGEX.search(clean):
+            return True
+
+        # 4. PL formy czasu przeszłego (-liście, -łyście)
+        if PL_PLURAL_PAST_VERB_REGEX.search(clean):
+            return True
+
+        # 5. PL znane czasowniki teraźniejsze i trybu rozkazującego (-cie)
+        if PL_PLURAL_PRESENT_VERB_REGEX.search(clean):
+            return True
+
+        # 6. PL ogólne czasowniki na -cie z filtrem stoplisty rzeczowników i przyimków
+        for m in PL_GENERAL_CIE_VERB_REGEX.finditer(clean):
+            word = m.group(0).lower()
+            if word not in PL_NON_VERB_CIE_WORDS:
+                start_idx = m.start()
+                pre_ctx = clean[:start_idx].strip().lower()
+                if re.search(r"\b(?:w|we|o|na|po|przy|do|z|ze|od|dla)\s+$", pre_ctx):
+                    continue
+                return True
+
+    return False
+
+
+class SpeakerTurn:
+    """
+    Reprezentacja ciągłej tury wypowiedzi pojedynczego mówcy (SpeakerTurn).
+    Grupuje mikrokwestie tego samego aktora oddalone o Δt < 2.5 s (2500 ms).
+    Przechowuje topologię adresata: target_speaker, target_gender, addressee_number.
+    """
+    def __init__(
+        self,
+        speaker: str = "",
+        events: Optional[List[Any]] = None,
+        addressee_number: str = "SINGULAR",
+        target_speaker: Optional[str] = None,
+        target_gender: Optional[str] = None,
+        vocative_lock: bool = False,
+        scene_id: Optional[str] = None,
+    ):
+        self.speaker: str = (speaker or "").strip()
+        self.events: List[Any] = list(events or [])
+        self.addressee_number: str = addressee_number  # "SINGULAR" | "PLURAL" | "DUAL"
+        self.target_speaker: Optional[str] = target_speaker
+        self.target_gender: Optional[str] = target_gender  # "MALE" | "FEMALE" | "NEUTRAL"
+        self.vocative_lock: bool = vocative_lock
+        self.scene_id: Optional[str] = scene_id
+
+        # Automatyczna weryfikacja liczby mnogiej przy inicjalizacji
+        if self.events and self.addressee_number == "SINGULAR":
+            if detect_turn_plural_addressee(self):
+                self.addressee_number = "PLURAL"
+
+    @property
+    def target_actor(self) -> Optional[str]:
+        return self.target_speaker
+
+    @target_actor.setter
+    def target_actor(self, val: Optional[str]):
+        self.target_speaker = val
+
+    @property
+    def start(self) -> int:
+        if self.events and hasattr(self.events[0], "start"):
+            return getattr(self.events[0], "start", 0)
+        return 0
+
+    @property
+    def end(self) -> int:
+        if self.events and hasattr(self.events[-1], "end"):
+            return getattr(self.events[-1], "end", 0)
+        return 0
+
+    @property
+    def duration_ms(self) -> int:
+        return max(0, self.end - self.start)
+
+    @property
+    def lines(self) -> List[str]:
+        res = []
+        for ev in self.events:
+            txt = getattr(ev, "text", str(ev)) or ""
+            res.append(txt)
+        return res
+
+    @property
+    def text(self) -> str:
+        return " ".join(self.lines)
+
+    @property
+    def is_plural(self) -> bool:
+        return self.addressee_number == "PLURAL"
+
+    def append(self, event: Any):
+        self.events.append(event)
+        if self.addressee_number != "PLURAL" and detect_turn_plural_addressee(event):
+            self.addressee_number = "PLURAL"
+
+    def detect_plural_addressee(self) -> bool:
+        """Weryfikuje i aktualizuje status addressee_number tury."""
+        if detect_turn_plural_addressee(self):
+            self.addressee_number = "PLURAL"
+            return True
+        return False
+
+    @classmethod
+    def is_plural_text(cls, text: str) -> bool:
+        return detect_turn_plural_addressee(text)
+
+    def __len__(self) -> int:
+        return len(self.events)
+
+    def __iter__(self):
+        return iter(self.events)
+
+    def __getitem__(self, idx: int) -> Any:
+        return self.events[idx]
+
+    def __repr__(self) -> str:
+        return (
+            f"<SpeakerTurn speaker='{self.speaker}' events={len(self.events)} "
+            f"target='{self.target_speaker}' gender='{self.target_gender}' "
+            f"number='{self.addressee_number}' lock={self.vocative_lock}>"
+        )
+
+
+MASCULINE_VOCATIVE_TITLES_LIST = [
+    "mistrzu", "panie", "kapitanie", "królu", "bracie", "chłopcze", "dowódco",
+    "ojcze", "tato", "lordzie", "książę", "generale", "stryju", "wuju", "synu",
+    "wojowniku", "młodzieńcze", "przyjacielu", "rycerzu", "starcze", "staruszku"
+]
+
+FEMININE_VOCATIVE_TITLES_LIST = [
+    "pani", "królowo", "siostro", "matko", "mamo", "dziewczyno", "księżniczko",
+    "mistrzyni", "córko", "wojowniczko", "przyjaciółko"
+]
+
+MASC_TITLE_REGEX = re.compile(
+    r"(?:^|[\s,–—])(" + "|".join(MASCULINE_VOCATIVE_TITLES_LIST) + r")(?:[,.!?…\s–—]|$)",
+    re.IGNORECASE
+)
+
+FEM_TITLE_REGEX = re.compile(
+    r"(?:^|[\s,–—])(" + "|".join(FEMININE_VOCATIVE_TITLES_LIST) + r")(?:[,.!?…\s–—]|$)",
+    re.IGNORECASE
+)
+
+
+def _detect_turn_vocative(
+    turn: SpeakerTurn,
+    series_bible: Optional[Any] = None
+) -> Tuple[Optional[str], Optional[str]]:
+    """
+    Skanuje wszystkie linie tury pod kątem obecności wołacza (tytułu lub imienia).
+    Zwraca (target_actor, target_gender) lub (None, None).
+    """
+    lines = turn.lines if hasattr(turn, "lines") else [str(turn)]
+    for raw in lines:
+        if not raw:
+            continue
+        clean = SubtitleDiscourseSanitizer.ASS_TAGS_REGEX.sub("", raw).strip()
+        if not clean:
+            continue
+
+        # 1. Sprawdzenie zarejestrowanych postaci w SeriesBible (jeśli dostępne)
+        if series_bible:
+            # 1a. Sprawdzenie ze słownika deklinacji
+            decls = (
+                series_bible.get_declensions_snapshot()
+                if hasattr(series_bible, "get_declensions_snapshot")
+                else (getattr(series_bible, "data", {}).get("declensions", {}) if hasattr(series_bible, "data") else {})
+            )
+            if decls:
+                for char_name, decl_data in decls.items():
+                    if char_name == turn.speaker:
+                        continue
+                    char_gender = None
+                    if isinstance(decl_data, dict):
+                        char_gender = decl_data.get("gender")
+                    if not char_gender and hasattr(series_bible, "get_character_gender"):
+                        char_gender = series_bible.get_character_gender(char_name)
+
+                    voc_w = None
+                    if isinstance(decl_data, dict):
+                        voc_w = decl_data.get("W") or decl_data.get("vocative")
+                    cand_forms = [voc_w, char_name] if voc_w else [char_name]
+                    parts = char_name.split()
+                    if len(parts) > 1:
+                        cand_forms.append(parts[0])
+
+                    for voc in cand_forms:
+                        if not voc or len(voc) < 2:
+                            continue
+                        pat = rf"(?:^|[\s,–—]){re.escape(voc)}(?:[,.!?…\s–—]|$)"
+                        if re.search(pat, clean, re.IGNORECASE):
+                            target_g = "MALE" if char_gender in ["MALE", "MĘŻCZYZNA", "mężczyzna"] else (
+                                "FEMALE" if char_gender in ["FEMALE", "KOBIETA", "kobieta"] else "NEUTRAL"
+                            )
+                            return char_name, target_g
+
+            # 1b. Sprawdzenie z profilu postaci (get_characters_snapshot)
+            chars = (
+                series_bible.get_characters_snapshot()
+                if hasattr(series_bible, "get_characters_snapshot")
+                else (getattr(series_bible, "data", {}).get("characters", {}) if hasattr(series_bible, "data") else {})
+            )
+            if chars:
+                for char_name in chars:
+                    if "->" in char_name or char_name == turn.speaker:
+                        continue
+                    char_gender = series_bible.get_character_gender(char_name) if hasattr(series_bible, "get_character_gender") else None
+                    cand_forms = [char_name]
+                    parts = char_name.split()
+                    if len(parts) > 1:
+                        cand_forms.append(parts[0])
+                    for voc in cand_forms:
+                        if not voc or len(voc) < 2:
+                            continue
+                        pat = rf"(?:^|[\s,–—]){re.escape(voc)}(?:[,.!?…\s–—]|$)"
+                        if re.search(pat, clean, re.IGNORECASE):
+                            target_g = "MALE" if char_gender in ["MALE", "MĘŻCZYZNA", "mężczyzna"] else (
+                                "FEMALE" if char_gender in ["FEMALE", "KOBIETA", "kobieta"] else "NEUTRAL"
+                            )
+                            return char_name, target_g
+
+        # 2. Sprawdzenie męskich tytułów wołaczowych (Vocative-Predicate Lock -> MALE)
+        m_masc = MASC_TITLE_REGEX.search(clean)
+        if m_masc:
+            title_word = m_masc.group(1).capitalize()
+            return title_word, "MALE"
+
+        # 3. Sprawdzenie żeńskich tytułów wołaczowych (Vocative-Predicate Lock -> FEMALE)
+        m_fem = FEM_TITLE_REGEX.search(clean)
+        if m_fem:
+            title_word = m_fem.group(1).capitalize()
+            return title_word, "FEMALE"
+
+        # 4. Sprawdzenie zakotwiczonych imion w wołaczu bez SeriesBible (np. Rietzie, Brahamie, Arsie, Rayu)
+        for m in VOCATIVE_PUNCT_ANCHOR_REGEX.finditer(clean):
+            matched_name = m.group(1) or m.group(2) or m.group(3)
+            if matched_name and matched_name != turn.speaker:
+                low = matched_name.lower()
+                if low in POLISH_COMMON_INTERJECTIONS_STOPLIST:
+                    continue
+                # Końcówki męskie wołacza: -ie (Rietzie, Brahamie, Arsie), -u (Rayu, Mistrzu)
+                if low.endswith("ie") or low.endswith("u"):
+                    base = re.sub(r"ie$", "", matched_name)
+                    return (base if len(base) >= 2 else matched_name), "MALE"
+                elif low.endswith("o"):
+                    base = re.sub(r"o$", "a", matched_name)
+                    return base, "FEMALE"
+
+    return None, None
+
+
+def resolve_turn_addressee(
+    turn: SpeakerTurn,
+    previous_turn: Optional[SpeakerTurn] = None,
+    series_bible: Optional[Any] = None,
+    max_exchange_gap_ms: int = 5000
+) -> SpeakerTurn:
+    """
+    Dyadic Turn-Taking (Rozwiązywanie adresata 2. osoby) i Vocative-Predicate Lock:
+    - Krok 1 (Jawny Wołacz): Jeśli w bieżącej linii lub w sąsiedniej linii tej samej tury mówcy
+      (SpeakerTurn, Δt < 2.5 s) występuje wołacz imienia lub tytuł adresatywny, przypisz tę postać
+      jako target_actor (target_gender) dla całej tury.
+    - Krok 2 (Wymiana Tur A <-> B): Jeśli brak jawnego wołacza, a mówca A odzywa się bezpośrednio
+      po postaci B (Δt < 5.0 s w tej samej scenie/stylu), przypisz poprzedniego mówcę B jako target_actor dla A.
+    - Vocative-Predicate Lock: Obecność męskiego wołacza (z DeclensionParadigm lub tytułu Mistrzu, Panie,
+      Kapitanie, Królu, Bracie, Chłopcze, Dowódco) w obrębie SpeakerTurn bezwzględnie wymusza
+      target_gender = 'MALE' na całą turę (i analogicznie FEMALE dla wołacza żeńskiego).
+    """
+    if turn is None:
+        return turn
+
+    # Krok 1: Weryfikacja jawnego wołacza w obrębie całej tury
+    voc_actor, voc_gender = _detect_turn_vocative(turn, series_bible=series_bible)
+    if voc_actor and voc_gender:
+        turn.target_speaker = voc_actor
+        turn.target_gender = voc_gender
+        turn.vocative_lock = True
+    elif not turn.vocative_lock:
+        # Krok 2: Wymiana tur A <-> B (jeśli brak wołacza)
+        if (
+            previous_turn is not None and
+            previous_turn.speaker and
+            previous_turn.speaker != turn.speaker
+        ):
+            gap_ms = max(0, turn.start - previous_turn.end)
+            if gap_ms <= max_exchange_gap_ms:
+                turn.target_speaker = previous_turn.speaker
+                if series_bible and hasattr(series_bible, "get_character_gender"):
+                    turn.target_gender = series_bible.get_character_gender(previous_turn.speaker)
+                elif hasattr(previous_turn, "speaker_gender") and previous_turn.speaker_gender:
+                    turn.target_gender = previous_turn.speaker_gender
+
+    # Propagacja metadanych dyskursu na wszystkie zdarzenia tury
+    for ev in turn.events:
+        setattr(ev, "target_speaker", turn.target_speaker)
+        setattr(ev, "target_actor", turn.target_speaker)
+        setattr(ev, "target_gender", turn.target_gender)
+        setattr(ev, "addressee_number", turn.addressee_number)
+        setattr(ev, "vocative_lock", turn.vocative_lock)
+        setattr(ev, "speaker_turn", turn)
+
+    return turn
+
+
+def group_speaker_turns(
+    events: List[Any],
+    max_gap_ms: int = 2500,
+    series_bible: Optional[Any] = None
+) -> List[SpeakerTurn]:
+    """
+    Grupuje ciągłe wypowiedzi tego samego mówcy (Δt < 2.5 s / 2500 ms) w obiekt SpeakerTurn.
+    Automatycznie weryfikuje liczbę mnogą adresata dla każdej tury.
+    """
+    if not events:
+        return []
+
+    turns: List[SpeakerTurn] = []
+    current_turn: Optional[SpeakerTurn] = None
+
+    for ev in events:
+        spk = (
+            getattr(ev, "name", "") or
+            getattr(ev, "actor", "") or
+            getattr(ev, "speaker", "") or
+            ""
+        ).strip()
+        start = getattr(ev, "start", 0)
+        end = getattr(ev, "end", 0)
+
+        if current_turn is None:
+            current_turn = SpeakerTurn(speaker=spk, events=[ev])
+        else:
+            gap_ms = start - current_turn.end
+            # Jeśli ten sam mówca i przerwa <= max_gap_ms (w tym nakładanie się / gap < 0):
+            if spk == current_turn.speaker and gap_ms <= max_gap_ms:
+                current_turn.append(ev)
+            else:
+                turns.append(current_turn)
+                current_turn = SpeakerTurn(speaker=spk, events=[ev])
+
+    if current_turn is not None:
+        turns.append(current_turn)
+
+    return turns
+
+
+def resolve_all_speaker_turns(
+    turns: List[SpeakerTurn],
+    series_bible: Optional[Any] = None,
+    max_exchange_gap_ms: int = 5000
+) -> List[SpeakerTurn]:
+    """Przetwarza sekwencję tur mówców stosując dyadic turn-taking i blokadę wołacza."""
+    prev_turn: Optional[SpeakerTurn] = None
+    for turn in turns:
+        resolve_turn_addressee(
+            turn,
+            previous_turn=prev_turn,
+            series_bible=series_bible,
+            max_exchange_gap_ms=max_exchange_gap_ms
+        )
+        prev_turn = turn
+    return turns
+
+
+def process_scene_discourse(
+    events: List[Any],
+    series_bible: Optional[Any] = None,
+    max_turn_gap_ms: int = 2500,
+    max_exchange_gap_ms: int = 5000
+) -> List[SpeakerTurn]:
+    """Główny punkt wejścia Filaru 2 & 3: grupowanie w tury i rozwiązanie topologii dyskursu."""
+    turns = group_speaker_turns(events, max_gap_ms=max_turn_gap_ms, series_bible=series_bible)
+    return resolve_all_speaker_turns(turns, series_bible=series_bible, max_exchange_gap_ms=max_exchange_gap_ms)
+
