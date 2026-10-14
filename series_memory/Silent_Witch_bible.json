@@ -208,5 +208,13 @@
     "[ASW] Silent Witch - Chinmoku no Majo no Kakushigoto - 13 [1080p HEVC][DEA919F9]"
   ],
   "batch_stats": {},
+  "entity_categories": {
+    "Ike": "ANTHROPONYM",
+    "Monica": "ANTHROPONYM",
+    "Nero": "ANTHROPONYM",
+    "Felix": "ANTHROPONYM",
+    "Cyril": "ANTHROPONYM",
+    "Ryn": "ANTHROPONYM"
+  },
   "fansub_canon": {}
 }

@@ -10,6 +10,7 @@ import re
 import json
 import threading
 import copy
+import unicodedata
 from pathlib import Path
 from typing import Dict, List, Any, Optional, Set, Tuple, Union, Literal
 from pydantic import BaseModel, Field, ConfigDict
@@ -339,6 +340,18 @@ GEOGRAPHIC_ORIGIN_PATTERNS: List[re.Pattern] = [
     re.compile(r"\b(?:królestwo|kraina|miasto|zamek|twierdza|prowincja)\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźżA-Z0-9'-]+)\b", re.IGNORECASE),
 ]
 
+def normalize_name_nfkd(name: str) -> str:
+    """
+    Normalizuje znaki diakrytyczne Unicode (NFKD) w nazwach własnych:
+    usuwa znaki łączone (combining characters), zachowując litery bazowe ASCII,
+    np. 'Schröder' -> 'Schroder', 'René' -> 'Rene'.
+    """
+    if not name:
+        return ""
+    nfkd = unicodedata.normalize('NFKD', str(name))
+    return "".join(c for c in nfkd if not unicodedata.combining(c)).strip()
+
+
 def classify_entity_category(
     name: str,
     context: Optional[str] = None,
@@ -367,7 +380,16 @@ def classify_entity_category(
 
     # 2. Check series_bible explicit registries
     if series_bible and hasattr(series_bible, "data") and series_bible.data:
-        saved_cat = series_bible.data.get("entity_categories", {}).get(clean_n)
+        saved_cat = None
+        categories = series_bible.data.get("entity_categories", {})
+        clean_norm = normalize_name_nfkd(clean_n).lower()
+        if clean_n in categories:
+            saved_cat = categories[clean_n]
+        else:
+            for k, v in categories.items():
+                if k.lower() == clean_lower or normalize_name_nfkd(k).lower() == clean_norm:
+                    saved_cat = v
+                    break
         if saved_cat:
             try:
                 return EntityCategory(saved_cat)
@@ -497,6 +519,16 @@ def fix_undecorated_male_names(text: str, character_names: Optional[List[str]] =
             prep = m.group(1)
             prep_lower = prep.lower()
             if prep_lower in ("z", "ze"):
+                target_inst = decl.get('N', name)
+                start_pos = m.start()
+                preceding_text = result[max(0, start_pos - 60):start_pos]
+                if target_inst.endswith("ą") or name.endswith("a"):
+                    if series_bible and hasattr(series_bible, "can_inflect_feminine_instrumental_after_z"):
+                        allowed = series_bible.can_inflect_feminine_instrumental_after_z(name, preceding_text=preceding_text)
+                    else:
+                        allowed = is_feminine_instrumental_after_z_allowed(name, preceding_text=preceding_text, series_bible=series_bible)
+                    if not allowed:
+                        return m.group(0)
                 # Guard against toponyms and origin / ablative constructions
                 is_toponym = (
                     classify_entity_category(name, context=result, series_bible=series_bible) == EntityCategory.TOPONYM
@@ -507,9 +539,7 @@ def fix_undecorated_male_names(text: str, character_names: Optional[List[str]] =
                 if is_toponym:
                     return m.group(0)
                 # Check preceding context for group/origin indicators or ablative verbs
-                start_pos = m.start()
-                preceding_text = result[max(0, start_pos - 40):start_pos]
-                if re.search(r"\b(ci|tamci|ludzie|goście|żołnierze|rycerze|oddział|wojska|posłowie|przybysze|pochodzi\w*|wraca\w*|wróci\w*|przyby\w*|uciek\w*)\s*$", preceding_text, re.IGNORECASE):
+                if re.search(rf"\b(?:{ORIGIN_GROUP_NOUNS_PATTERN}|{ABLATIVE_MOTION_VERBS_PATTERN})\s*$", preceding_text, re.IGNORECASE):
                     return m.group(0)
             return f"{prep} {decl.get('N', name)}"
 
@@ -1081,6 +1111,114 @@ def is_plural_actor(name: str) -> bool:
         return True
     return False
 
+# -------------------------------------------------------------------------
+# Klaster C & D: Heurystyki Onomastyczne, Bramka Instytucjonalna i Dwupoziomowa Blokada (0.00 PLN)
+# -------------------------------------------------------------------------
+INSTITUTION_NOUNS: Set[str] = {
+    "biuro", "miasto", "królestwo", "cesarstwo", "księstwo", "imperium",
+    "ministerstwo", "centrum", "laboratorium", "archiwum", "dowództwo"
+}
+
+INSTITUTIONAL_SUFFIXES: Tuple[str, ...] = ("stwo", "ctwo", "sko")
+
+ORIGIN_GROUP_NOUNS_PATTERN: str = (
+    r"(?:ludzie|ci|tamci|agenci|pracownicy|oddział|oddziały|goście|koledzy|szef|"
+    r"żołnierze|rycerze|wojska|posłowie|przybysze|wojownicy|armia|zbieg|uciekinierzy)"
+)
+
+ABLATIVE_MOTION_VERBS_PATTERN: str = (
+    r"(?:dotarli|dotarł|dotarła|docierają|"
+    r"przybyli|przybył|przybyła|przybywa|przybywają|"
+    r"wrócili|wrócił|wróciła|wraca|wracają|wracał|wracała|"
+    r"przyszli|przyszedł|przyszła|przychodzą|"
+    r"wyszli|wyszedł|wyszła|wychodzą|"
+    r"pochodzą|pochodzi|pochodził|pochodziła|"
+    r"dzwonią|dzwoni|dzwonił|dzwoniła|"
+    r"uciekli|uciekł|uciekła|uciekają)"
+)
+
+JAPANESE_MALE_NAME_SUFFIXES: Tuple[str, ...] = (
+    "nosuke", "shirou", "tarou", "jirou", "yoshi", "hiko",
+    "suke", "maru", "zou", "hito", "masa", "nobu", "taka",
+    "rou", "ichi", "aki", "taro", "jiro", "shiro", "zo"
+)
+
+OFFICIAL_COURT_CONSONANT_SUFFIXES: Tuple[str, ...] = (
+    "er", "el", "on", "an", "ard", "olf"
+)
+
+OFFICIAL_COURT_TITLES_AND_ROLES: Set[str] = {
+    "minister", "kanclerz", "sędzia", "prefekt", "hrabia", "baron", "margrabia",
+    "wicehrabia", "książę", "radca", "namiestnik", "urzędnik", "dworzanin", "herold",
+    "konsul", "komendant", "lord", "sir", "szambelan", "marszałek", "sekretarz",
+    "prezes", "dyrektor", "oficer", "kapitan", "generał", "komisarz", "poseł",
+    "ambasador", "trybun", "archont", "kanclerka", "magistrate", "chancellor",
+    "judge", "count", "duke", "inspector", "courtier", "bureaucrat", "nobleman",
+    "official", "governor", "premier", "prezydent", "burmistrz", "kasztelan"
+}
+
+
+def has_japanese_male_name_suffix(name: str) -> bool:
+    """
+    Wyprowadza heurystykę onomastyczną dla imion japońskich:
+    imiona lub tokeny kończące się na:
+    -yoshi, -hiko, -rou, -tarou, -jirou, -shirou, -ichi, -suke, -maru, -nosuke, -zou, -hito, -masa, -nobu, -taka, -aki
+    otrzymują silny wektor MALE.
+    """
+    if not name:
+        return False
+    w = normalize_name_nfkd(name).lower()
+    if w in INVARIABLE_JAPANESE_FEMALE_NAMES or w in UNIVERSAL_FEMALE_NAMES_ON_A or w in POLISH_FEMALE_NAMES:
+        return False
+    tokens = [t.strip("-") for t in re.split(r"[\s_/-]+", w) if t.strip("-")]
+    for t in tokens:
+        if len(t) < 4 or t in INVARIABLE_JAPANESE_FEMALE_NAMES:
+            continue
+        for suf in JAPANESE_MALE_NAME_SUFFIXES:
+            if t.endswith(suf) and len(t) >= len(suf) + 2:
+                return True
+    return False
+
+
+def is_official_or_court_consonant_name(name: str, context: Optional[str] = None, series_bible: Optional[Any] = None) -> bool:
+    """
+    Weryfikuje, czy postać posiada nazwisko spółgłoskowe na -er, -el, -on, -an, -ard, -olf
+    w rejestrach urzędowych/dworskich (lub poprzedzona jest tytułem urzędowym/dworskim).
+    Takie postacie nie mogą domyślnie otrzymywać płci żeńskiej.
+    """
+    if not name:
+        return False
+    clean = re.sub(r"[\(\[].*?[\)\]]", "", re.split(r"[\\\/]", str(name))[0]).strip().lower()
+    clean_norm = normalize_name_nfkd(clean).lower()
+    tokens = [t for t in re.split(r"[\s_/-]+", clean_norm) if t]
+    if not tokens:
+        return False
+
+    surname = tokens[-1]
+    has_consonant_suffix = any(surname.endswith(suf) for suf in OFFICIAL_COURT_CONSONANT_SUFFIXES) and len(surname) >= 3
+    if not has_consonant_suffix:
+        return False
+
+    if any(t in OFFICIAL_COURT_TITLES_AND_ROLES for t in tokens):
+        return True
+
+    if context:
+        ctx_lower = context.lower()
+        if any(role in ctx_lower for role in OFFICIAL_COURT_TITLES_AND_ROLES) or any(kw in ctx_lower for kw in ["urząd", "dwór", "rejestr", "court", "official", "magistrat", "pałac", "rada"]):
+            return True
+
+    if series_bible and hasattr(series_bible, "data") and isinstance(series_bible.data, dict):
+        chars = series_bible.data.get("characters", {})
+        for k, v in chars.items():
+            k_norm = normalize_name_nfkd(k).lower()
+            if k_norm == clean_norm or clean_norm in k_norm.split():
+                desc = str(v.get("description", "") if isinstance(v, dict) else v).lower()
+                if any(role in desc for role in OFFICIAL_COURT_TITLES_AND_ROLES) or any(kw in desc for kw in ["urząd", "dwór", "rejestr", "court", "official", "magistrat", "minister", "sędzia", "prefekt", "hrabia"]):
+                    return True
+
+    return False
+
+
 def resolve_actor_gender(name: str, character_registry: Optional[Dict[str, Any]] = None, series_bible: Optional[Any] = None) -> str:
     """
     Determines actor gender ('MALE', 'FEMALE', 'PLURAL', or 'UNKNOWN') deterministically (0.00 PLN).
@@ -1115,14 +1253,23 @@ def resolve_actor_gender(name: str, character_registry: Optional[Dict[str, Any]]
         return "FEMALE"
 
     # 1. Direct character registry lookup if provided
-    if character_registry and clean in character_registry:
-        c_val = character_registry[clean]
-        c_desc = (c_val.get("gender", "") or c_val.get("description", "") or c_val.get("role", "")) if isinstance(c_val, dict) else str(c_val)
-        c_desc_l = c_desc.lower()
-        if "female" in c_desc_l or "kobieta" in c_desc_l or "żeńsk" in c_desc_l:
-            return "FEMALE"
-        if "male" in c_desc_l or "mężczyzna" in c_desc_l or "męsk" in c_desc_l:
-            return "MALE"
+    if character_registry:
+        c_val = None
+        if clean in character_registry:
+            c_val = character_registry[clean]
+        else:
+            clean_norm = normalize_name_nfkd(clean).lower()
+            for r_k, r_v in character_registry.items():
+                if r_k.lower() == clean_lower or normalize_name_nfkd(r_k).lower() == clean_norm:
+                    c_val = r_v
+                    break
+        if c_val is not None:
+            c_desc = (c_val.get("gender", "") or c_val.get("description", "") or c_val.get("role", "")) if isinstance(c_val, dict) else str(c_val)
+            c_desc_l = c_desc.lower()
+            if "female" in c_desc_l or "kobieta" in c_desc_l or "żeńsk" in c_desc_l:
+                return "FEMALE"
+            if "male" in c_desc_l or "mężczyzna" in c_desc_l or "męsk" in c_desc_l:
+                return "MALE"
 
     # 2. Series Bible lookup if provided
     if series_bible and hasattr(series_bible, "get_character_gender"):
@@ -1143,8 +1290,16 @@ def resolve_actor_gender(name: str, character_registry: Optional[Dict[str, Any]]
     if any(t in INHERENT_MALE_NOUNS for t in tokens) or is_male_role_text(clean):
         return "MALE"
 
+    # 4b. Japanese male name suffixes heuristic (Klaster D)
+    if has_japanese_male_name_suffix(clean):
+        return "MALE"
+
+    # 4c. Consonant surnames in official/court registers cannot default to FEMALE (Klaster D)
+    if is_official_or_court_consonant_name(clean, series_bible=series_bible):
+        return "MALE"
+
     # 5. Onomastic heuristics
-    if is_inherently_female_name(clean):
+    if is_inherently_female_name(clean, series_bible=series_bible):
         return "FEMALE"
 
     return "UNKNOWN"
@@ -1257,7 +1412,7 @@ INDECLINABLE_FRENCH_TOPONYMS = {
 
 UNIVERSAL_FEMALE_NAMES_ON_A = {
     "asuka", "sakura", "elena", "fatima", "sonia", "hinata", "mikasa", "historia",
-    "erza", "ayaka", "kaori", "shizuka", "ayame", "kana", "chika", "rika",
+    "erza", "ayaka", "kaori", "yuka", "ayame", "kana", "chika", "rika",
     "akane", "haruka", "nanami", "hina", "marin", "kanna", "alya", "tanya",
     "alisa", "fiona", "eliza", "clara", "rebecca", "teresa", "selena", "vanessa",
     "melissa", "natasha", "tatiana", "olga", "sveta", "katrina", "sabrina", "sarah"
@@ -1297,15 +1452,18 @@ def is_inherently_female_name(name: str, series_bible: Any = None) -> bool:
         return False
     if clean in MALE_EXCEPTIONS_ON_A or clean in CANONICAL_MALE_NAMES:
         return False
-    if series_bible and hasattr(series_bible, "get_character_gender"):
-        try:
-            bible_gen = series_bible.get_character_gender(clean, allow_generic_nouns=False)
-            if bible_gen == "MALE":
-                return False
-            if bible_gen == "FEMALE":
-                return True
-        except Exception:
-            pass
+    if series_bible and hasattr(series_bible, "data") and isinstance(series_bible.data, dict):
+        chars = series_bible.data.get("characters", {})
+        for k, v in chars.items():
+            if "->" not in k:
+                k_clean = extract_clean_speaker_name(k).strip().lower()
+                if k_clean == clean or clean in k_clean.split():
+                    val = v.get("gender") if isinstance(v, dict) else v
+                    g = str(val or "").upper()
+                    if "MALE" in g or "MĘSK" in g:
+                        return False
+                    if "FEM" in g or "ŻEŃSK" in g:
+                        return True
 
     if clean in POLISH_FEMALE_NAMES or clean in UNIVERSAL_FEMALE_NAMES_ON_A or clean in INVARIABLE_JAPANESE_FEMALE_NAMES or clean in FOREIGN_FEMALE_CONSONANT_NAMES:
         return True
@@ -1313,6 +1471,11 @@ def is_inherently_female_name(name: str, series_bible: Any = None) -> bool:
     clean_words = clean.split()
     if len(clean_words) >= 2 and (clean_words[0] in POLISH_FEMALE_NAMES or clean_words[0] in UNIVERSAL_FEMALE_NAMES_ON_A or clean_words[0] in INVARIABLE_JAPANESE_FEMALE_NAMES or clean_words[0] in FOREIGN_FEMALE_CONSONANT_NAMES):
         return True
+
+    if has_japanese_male_name_suffix(clean):
+        return False
+    if is_official_or_court_consonant_name(clean, series_bible=series_bible):
+        return False
 
     # Vocative of known Polish female name ending with -o or -u
     if clean.endswith("o") and len(clean) >= 4:
@@ -1376,13 +1539,165 @@ def extract_clean_speaker_name(name: str) -> str:
     return clean
 
 
+def is_feminine_instrumental_after_z_allowed(
+    name: str,
+    preceding_text: str = "",
+    series_bible: Optional[Any] = None,
+    context: Optional[str] = None
+) -> bool:
+    """
+    Dwupoziomowa bramka bezpieczeństwa dla żeńskiego narzędnika -ą po przyimku pochodzenia z (Klaster C):
+    a) Zamiana z [Nazwa]a -> z [Nazwa]ą może zajść WYŁĄCZNIE wtedy, gdy [Nazwa] jest zarejestrowanym w SeriesBible
+       imieniem postaci ludzkiej (EntityCategory.ANTHROPONYM o gender == 'FEMALE'),
+       ORAZ nie należy do polskich słów pospolitych/instytucji (POLISH_COMMON_NOUN_HOMONYMS, instytucje:
+       biuro, miasto, królestwo, cesarstwo, księstwo, imperium, ministerstwo, centrum, laboratorium, archiwum, dowództwo
+       ani sufiksy -stwo, -ctwo, -sko).
+    b) Bezwzględny zakaz zamiany -a -> -ą po z, gdy przed z stoi rzeczownik grupy/pochodzenia
+       (ludzie z, ci z, agenci z, pracownicy z, oddział z, goście z, koledzy z, szef z)
+       lub czasownik ruchu/ablatywny (dotarli z, przybyli z, wrócili z, przyszli z, wyszli z, pochodzą z, dzwonią z).
+    """
+    if not name:
+        return False
+    clean_name = extract_clean_speaker_name(name).strip()
+    c_lower = clean_name.lower()
+    c_norm = normalize_name_nfkd(clean_name).lower()
+
+    # 1. Poziom B: Bezwzględny zakaz zamiany, gdy przed 'z' stoi rzeczownik grupy/pochodzenia lub czasownik ruchu/ablatywny
+    if preceding_text:
+        prec_clean = preceding_text.strip()
+        prec_pat = rf"(?:^|[\s,.\-!?;:\"'()\[\]\\])(?:{ORIGIN_GROUP_NOUNS_PATTERN}|{ABLATIVE_MOTION_VERBS_PATTERN})(?:\s+(?:[Zz]e|[Zz]))?\s*$"
+        if re.search(prec_pat, prec_clean, re.IGNORECASE):
+            return False
+
+    # 2. Poziom A: Wykluczenie polskich słów pospolitych (POLISH_COMMON_NOUN_HOMONYMS)
+    if is_proper_noun_homonym(clean_name) or c_lower in globals().get("POLISH_COMMON_NOUN_HOMONYMS", set()) or c_norm in globals().get("POLISH_COMMON_NOUN_HOMONYMS", set()):
+        return False
+
+    # 3. Poziom A: Wykluczenie instytucji i sufiksów instytucjonalnych (-stwo, -ctwo, -sko)
+    if c_lower in INSTITUTION_NOUNS or c_norm in INSTITUTION_NOUNS:
+        return False
+    if any(c_lower.endswith(suf) or c_norm.endswith(suf) for suf in INSTITUTIONAL_SUFFIXES):
+        return False
+    if any(re.search(rf"(?:{re.escape(suf[:-1])}[a-ząćęłńóśźż]+)$", c_lower) for suf in ("stwie", "ctwie", "stwem", "ctwem", "stwu", "ctwu", "skiem", "skiej")):
+        return False
+
+    # 4. Poziom A: Wykluczenie toponimów i chrematonimów
+    if c_lower in globals().get("KNOWN_FANTASY_TOPONYMS", set()) or c_lower in globals().get("INDECLINABLE_FRENCH_TOPONYMS", set()):
+        return False
+
+    # 5. Poziom A: Wymóg rejestracji w SeriesBible jako ludzka postać żeńska (EntityCategory.ANTHROPONYM o gender == 'FEMALE')
+    if series_bible is not None:
+        if hasattr(series_bible, "is_non_character_entity") and series_bible.is_non_character_entity(clean_name):
+            return False
+        cat = series_bible.get_entity_category(clean_name, context=context) if hasattr(series_bible, "get_entity_category") else classify_entity_category(clean_name, context=context, series_bible=series_bible)
+        if cat != EntityCategory.ANTHROPONYM:
+            return False
+        bg = series_bible.get_character_gender(clean_name, allow_generic_nouns=False) if hasattr(series_bible, "get_character_gender") else "UNKNOWN"
+        if bg != "FEMALE":
+            return False
+        return True
+    else:
+        cat = classify_entity_category(clean_name, context=context)
+        if cat != EntityCategory.ANTHROPONYM:
+            return False
+        if not is_inherently_female_name(clean_name):
+            return False
+        return True
+
+
+def fix_undecorated_female_names(
+    text: str,
+    character_names: Optional[List[str]] = None,
+    series_bible: Optional[Any] = None
+) -> str:
+    """
+    Koryguje błędy pozostawienia żeńskiego imienia w mianowniku po przyimkach,
+    z pełną dwupoziomową blokadą po przyimku pochodzenia z (Klaster C).
+    """
+    if not text:
+        return text
+
+    gen_preps = r"(?:dla|do|od|bez|u|koło|obok|blisko|wokół|dookoła|spod|zza|znad|według|mimo|wobec|naprzeciw|wskutek)"
+    dat_preps = r"(?:dzięki|przeciw|przeciwko|ku|wbrew|dałem\s+to|dałam\s+to|dał\s+to|dała\s+to|podarowałem|podarowałam|powiedziałem|powiedziałam)"
+    ins_preps = r"(?:z|ze|przed|przede|nad|nade|pod|pode|między|pomiędzy|za)"
+
+    names = character_names
+    if not names:
+        if series_bible and hasattr(series_bible, "data") and isinstance(series_bible.data, dict):
+            names = [
+                k for k in series_bible.data.get("characters", {}).keys()
+                if "->" not in k and series_bible.get_character_gender(k, allow_generic_nouns=False) == "FEMALE"
+            ]
+        else:
+            names = []
+
+    result = text
+    for name in names:
+        if not name or len(name) < 2:
+            continue
+        decl = generate_polish_name_declension(name, "FEMALE")
+        if not decl or decl.get("M") != name:
+            continue
+
+        # 1. Dopełniacz: "dla Asuka" -> "dla Asuki"
+        result = re.sub(
+            rf"\b({gen_preps})\s+{re.escape(name)}\b",
+            lambda m, c=decl.get("D", name): f"{m.group(1)} {c}",
+            result,
+            flags=re.IGNORECASE
+        )
+
+        # 2. Celownik: "dzięki Asuka" -> "dzięki Asuce"
+        result = re.sub(
+            rf"\b({dat_preps}(?:\s+[a-ząćęłńóśźż]+)?)\s+{re.escape(name)}\b",
+            lambda m, c=decl.get("C", name): f"{m.group(1)} {c}",
+            result,
+            flags=re.IGNORECASE
+        )
+
+        # 3. Narzędnik: "z Asuka" -> "z Asuką" z dwupoziomową blokadą
+        def _ins_repl(m, n=name, d=decl):
+            prep = m.group(1)
+            prep_lower = prep.lower()
+            if prep_lower in ("z", "ze"):
+                start_pos = m.start()
+                preceding_text = result[max(0, start_pos - 60):start_pos]
+                if series_bible and hasattr(series_bible, "can_inflect_feminine_instrumental_after_z"):
+                    allowed = series_bible.can_inflect_feminine_instrumental_after_z(n, preceding_text=preceding_text)
+                else:
+                    allowed = is_feminine_instrumental_after_z_allowed(n, preceding_text=preceding_text, series_bible=series_bible)
+                if not allowed:
+                    return m.group(0)
+            return f"{prep} {d.get('N', n)}"
+
+        result = re.sub(
+            rf"\b({ins_preps})\s+{re.escape(name)}\b",
+            _ins_repl,
+            result,
+            flags=re.IGNORECASE
+        )
+
+    return result
+
+
+def fix_undecorated_names(
+    text: str,
+    character_names: Optional[List[str]] = None,
+    series_bible: Optional[Any] = None
+) -> str:
+    """Koryguje brak fleksji imion męskich i żeńskich po przyimkach z dwupoziomową bramką Klastra C."""
+    res = fix_undecorated_male_names(text, character_names=character_names, series_bible=series_bible)
+    res = fix_undecorated_female_names(res, character_names=character_names, series_bible=series_bible)
+    return res
+
+
 def is_polish_adjective(word: str) -> bool:
     w = word.lower().strip()
     if len(w) < 4:
         return False
 
     # Explicit exclusion of common Japanese names ending in -ki, -gi, -na
-    # (e.g. Suzuki, Sasaki, Kawasaki, Miyazaki, Todoroki, Tanuki, Shizuku, Shina, etc.)
+    # (e.g. Suzuki, Takahashi, Kawasaki, Miyazaki, Todoroki, Tanuki, Tomoe, Shina, etc.)
     if any(w.endswith(jp_end) for jp_end in ("saki", "zuki", "zaki", "roki", "nuki", "buki", "muki", "tuki", "yuki", "yaki", "seki", "deki", "heki", "kiki", "giki")):
         return False
 
@@ -1972,8 +2287,11 @@ def generate_polish_name_declension(name: str, gender: str = "UNKNOWN") -> Dict[
 
     is_male = (g == "MALE" or "MĘSK" in g or "MALE" in g)
     is_female = (g == "FEMALE" or "KOBIETA" in g or "ŻEŃSK" in g)
-    if not is_female and not is_male and (n.lower() in INVARIABLE_JAPANESE_FEMALE_NAMES or n.lower() in FOREIGN_FEMALE_CONSONANT_NAMES or is_inherently_female_name(n)):
-        is_female = True
+    if not is_female and not is_male:
+        if has_japanese_male_name_suffix(n) or is_official_or_court_consonant_name(n):
+            is_male = True
+        elif (n.lower() in INVARIABLE_JAPANESE_FEMALE_NAMES or n.lower() in FOREIGN_FEMALE_CONSONANT_NAMES or is_inherently_female_name(n)):
+            is_female = True
 
     # 0a. Adjectives / adjectival names and titles (e.g. Wielka, Wielki, Czarna, Czarny, Nieśmiertelny, Sobieski)
     if is_polish_adjective(n):
@@ -2948,7 +3266,39 @@ def sanitize_toponymic_origin_and_companionship(text: str, custom_glossary: Opti
     res = _fix_toponym_companionship(res, "Torbequistem", "Torbequista")
     res = _fix_toponym_companionship(res, "Summerforthem", "Summerforth")
 
-    # 1b. False Instrumental of origin for feminine-like toponyms ending in -a in origin/displacement contexts
+    # 1b. False Instrumental of origin for feminine-like toponyms and entities in origin contexts
+    def _repl_origin_feminine_inst(m):
+        prefix_lead = m.group(1) or ""
+        trigger = m.group(2)
+        sep1 = m.group(3)
+        prep = m.group(4)
+        sep2 = m.group(5)
+        noun_inst = m.group(6)
+        stem = noun_inst[:-1]
+        base_nom = stem + "a"
+        if not is_feminine_instrumental_after_z_allowed(base_nom, preceding_text=f"{trigger} {prep}"):
+            gen_ending = "i" if stem.endswith(("k", "g")) else "y"
+            target_gen = stem + gen_ending
+            return f"{prefix_lead}{trigger}{sep1}{prep}{sep2}{target_gen}"
+        return m.group(0)
+
+    pat_origin_fem = rf"(^|\\[Nnh]|[^\w])({ORIGIN_GROUP_NOUNS_PATTERN}|{ABLATIVE_MOTION_VERBS_PATTERN})((?:\s|\\[Nnh])+)([Zz])(?:e)?((?:\s|\\[Nnh])+)([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+ą)\b"
+    res = re.sub(pat_origin_fem, _repl_origin_feminine_inst, res)
+
+    # 1b-2. False Instrumental of origin for institutional nouns after z
+    INSTITUTION_GENITIVE_MAP = {
+        "biurem": "biura",
+        "miastem": "miasta",
+        "królestwem": "królestwa",
+        "cesarstwem": "cesarstwa",
+        "księstwem": "księstwa",
+        "ministerstwem": "ministerstwa",
+        "dowództwem": "dowództwa",
+    }
+    for bad_inst, good_inst in INSTITUTION_GENITIVE_MAP.items():
+        pat_inst = rf"(^|\\[Nnh]|[^\w])({ORIGIN_GROUP_NOUNS_PATTERN}|{ABLATIVE_MOTION_VERBS_PATTERN})((?:\s|\\[Nnh])+)([Zz])(?:e)?((?:\s|\\[Nnh])+){bad_inst}\b"
+        res = re.sub(pat_inst, rf"\g<1>\g<2>\g<3>\g<4>\g<5>{good_inst}", res, flags=re.IGNORECASE)
+
     res = re.sub(r"(^|\\[Nnh]|[^\w])(pochodzi[a-ząćęłńóśźż]*|zbieg[a-ząćęłńóśźż]*|wieści|wieść|posłaniec|ucieczka|uciekł[a-ząćęłńóśźż]*|rycerz[a-ząćęłńóśźż]*|chłopak[a-ząćęłńóśźż]*|dziewczyn[a-ząćęłńóśźż]*)((?:\s|\\[Nnh])+)([Zz])(?:e)?((?:\s|\\[Nnh])+)Kamakurą\b", r"\g<1>\g<2>\g<3>\g<4>\g<5>Kamakury", res, flags=re.IGNORECASE)
     res = re.sub(r"(^|\\[Nnh]|[^\w])(pochodzi[a-ząćęłńóśźż]*|zbieg[a-ząćęłńóśźż]*|wieści|wieść|posłaniec|ucieczka|uciekł[a-ząćęłńóśźż]*|rycerz[a-ząćęłńóśźż]*|chłopak[a-ząćęłńóśźż]*|dziewczyn[a-ząćęłńóśźż]*)((?:\s|\\[Nnh])+)([Zz])(?:e)?((?:\s|\\[Nnh])+)Suwą\b", r"\g<1>\g<2>\g<3>\g<4>\g<5>Suwy", res, flags=re.IGNORECASE)
     res = re.sub(r"(^|\\[Nnh]|[^\w])(pochodzi[a-ząćęłńóśźż]*|uczeń|uczennica|uczniowie|akademia)((?:\s|\\[Nnh])+)([Zz])(?:e)?((?:\s|\\[Nnh])+)Minervą\b", r"\g<1>\g<2>\g<3>\g<4>\g<5>Minervy", res, flags=re.IGNORECASE)
@@ -3215,8 +3565,9 @@ class SeriesBible:
             identities = self.data.get("character_identities", {})
             raw = identities.get(clean_id)
             if not raw:
+                clean_norm = normalize_name_nfkd(clean_id).lower()
                 for k, v in identities.items():
-                    if k.lower() == clean_id.lower():
+                    if k.lower() == clean_id.lower() or normalize_name_nfkd(k).lower() == clean_norm:
                         raw = v
                         break
             if raw:
@@ -3233,8 +3584,9 @@ class SeriesBible:
                 base_id = None
                 base_raw = identities.get(base_name)
                 if not base_raw:
+                    base_norm = normalize_name_nfkd(base_name).lower()
                     for k, v in identities.items():
-                        if k.lower() == base_name.lower():
+                        if k.lower() == base_name.lower() or normalize_name_nfkd(k).lower() == base_norm:
                             base_raw = v
                             break
                 if base_raw:
@@ -3287,6 +3639,12 @@ class SeriesBible:
             return None
         with self._lock:
             decl = self.data.get("declensions", {}).get(character_name)
+            if not decl:
+                c_norm = normalize_name_nfkd(character_name).lower()
+                for k, v in self.data.get("declensions", {}).items():
+                    if k.lower() == character_name.lower() or normalize_name_nfkd(k).lower() == c_norm:
+                        decl = v
+                        break
             if decl and isinstance(decl, dict) and "M" in decl:
                 d_copy = dict(decl)
                 c_name = character_name.strip()
@@ -3561,6 +3919,10 @@ class SeriesBible:
                 or any(t in d_lower for t in MALE_TITLES)
                 or (char_name.lower() in CANONICAL_MALE_NAMES)
                 or any(t in CANONICAL_MALE_NAMES for t in c_tokens)
+                or has_japanese_male_name_suffix(char_name)
+                or any(has_japanese_male_name_suffix(t) for t in c_tokens)
+                or is_official_or_court_consonant_name(char_name, series_bible=self)
+                or any(is_official_or_court_consonant_name(t, series_bible=self) for t in c_tokens)
                 or bool(re.search(r"(?:'s\s+|\b)(?:kid|son|boy|bro|brother|brat|syn|chłopak|chłopiec|captain|kapitan)\b|^young\s+", char_name.lower()))
             ) and not is_female_cand
 
@@ -3618,6 +3980,11 @@ class SeriesBible:
                 clean_k = extract_clean_speaker_name(bad_key).strip().lower()
                 if clean_k in ETHNONYMS_AND_COLLECTIVES or self.is_non_character_entity(bad_key):
                     del self.data["declensions"][bad_key]
+
+        # 3b. Register verified characters into ontology category ANTHROPONYM
+        for valid_char in list(self.data.get("characters", {}).keys()):
+            if isinstance(valid_char, str) and "->" not in valid_char:
+                self.register_entity_category(valid_char, EntityCategory.ANTHROPONYM)
 
         # 4. Systemic Historical Titling Sanity Audit (Khagan/Chagan -> Wielki Chan/Chan)
         if "glossary" in self.data and isinstance(self.data["glossary"], dict):
@@ -3740,6 +4107,7 @@ class SeriesBible:
             return ""
         s = name_or_stem.strip()
         s_lower = s.lower()
+        norm_s = normalize_name_nfkd(s_lower)
         # 1. Direct lookup in registered hypocorisms
         with self._lock:
             hypo = dict(self.data.get("hypocorisms", {}))
@@ -3747,15 +4115,17 @@ class SeriesBible:
         if s in hypo:
             return hypo[s]
         for k, v in hypo.items():
-            if k.lower() == s_lower:
+            if k.lower() == s_lower or normalize_name_nfkd(k.lower()) == norm_s:
                 return v
         # 2. Check if stem matches prefix of a confirmed character name
         for c in chars_keys:
             if "->" not in c:
                 c_first = c.split()[0]
-                if c_first.lower() == s_lower:
+                c_first_l = c_first.lower()
+                norm_c_first = normalize_name_nfkd(c_first_l)
+                if c_first_l == s_lower or norm_c_first == norm_s:
                     return c_first
-                if c_first.lower().startswith(s_lower) and len(s_lower) >= 3:
+                if (c_first_l.startswith(s_lower) or norm_c_first.startswith(norm_s)) and len(s_lower) >= 3:
                     return c_first
         return s
 
@@ -3767,11 +4137,18 @@ class SeriesBible:
         if not name or is_generic_actor_or_category(name):
             return False
         clean = extract_clean_speaker_name(name).strip().lower()
+        norm_clean = normalize_name_nfkd(clean)
         with self._lock:
             chars_keys = list(self.data.get("characters", {}).keys())
         for k in chars_keys:
             if "->" not in k:
-                if k.lower() == clean or extract_clean_speaker_name(k).strip().lower() == clean:
+                k_clean = extract_clean_speaker_name(k).strip().lower()
+                if (
+                    k.lower() == clean
+                    or k_clean == clean
+                    or normalize_name_nfkd(k.lower()) == norm_clean
+                    or normalize_name_nfkd(k_clean) == norm_clean
+                ):
                     return True
         return False
 
@@ -3900,12 +4277,18 @@ class SeriesBible:
                         return "FEMALE" if f_pos[1] >= m_pos[1] else "MALE"
             return None
 
-        # Pass 1: Exact character names only (e.g. 'Tomine', 'Shizuku', 'Issei Tomine')
+        # Pass 1: Exact character names only (e.g. 'Tomine', 'Kuroe', 'Issei Tomine')
+        norm_nl = normalize_name_nfkd(n_l)
         for k, v in chars_items:
             if "->" not in k:
                 k_l = k.lower()
                 clean_k = extract_clean_speaker_name(k_l)
-                if k_l == n_l or clean_k == n_l:
+                if (
+                    k_l == n_l
+                    or clean_k == n_l
+                    or normalize_name_nfkd(k_l) == norm_nl
+                    or normalize_name_nfkd(clean_k) == norm_nl
+                ):
                     g = _extract_gender_from_val(v)
                     if g:
                         return g
@@ -3915,7 +4298,9 @@ class SeriesBible:
         for k, v in chars_items:
             if "->" not in k:
                 k_l = k.lower()
-                if n_l in k_l.split():
+                k_tokens = k_l.split()
+                norm_tokens_k = [normalize_name_nfkd(tok) for tok in k_tokens]
+                if n_l in k_tokens or norm_nl in norm_tokens_k:
                     g = _extract_gender_from_val(v)
                     if g:
                         token_matches.append((k, g))
@@ -3938,9 +4323,13 @@ class SeriesBible:
                 or any(t in CANONICAL_MALE_NAMES for t in tokens)
                 or n_l in MALE_EXCEPTIONS_ON_A
                 or any(t in MALE_EXCEPTIONS_ON_A for t in tokens)
+                or has_japanese_male_name_suffix(n_l)
+                or any(has_japanese_male_name_suffix(t) for t in tokens)
+                or is_official_or_court_consonant_name(n_l, series_bible=self)
+                or any(is_official_or_court_consonant_name(t, series_bible=self) for t in tokens)
             ):
                 return "MALE"
-            if is_inherently_female_name(n_l) or any(is_inherently_female_name(t) for t in tokens):
+            if is_inherently_female_name(n_l, series_bible=self) or any(is_inherently_female_name(t, series_bible=self) for t in tokens):
                 return "FEMALE"
 
         return "UNKNOWN"
@@ -4036,6 +4425,19 @@ class SeriesBible:
     @staticmethod
     def sanitize_closed_idioms_and_prepositions(text: str) -> str:
         return sanitize_closed_idioms_and_prepositions(text)
+
+    def can_inflect_feminine_instrumental_after_z(self, name: str, preceding_text: str = "", context: Optional[str] = None) -> bool:
+        """Dwupoziomowa bramka bezpieczeństwa dla żeńskiego narzędnika -ą po przyimku pochodzenia z (Klaster C)."""
+        return is_feminine_instrumental_after_z_allowed(name, preceding_text=preceding_text, series_bible=self, context=context)
+
+    def fix_undecorated_names(self, text: str, character_names: Optional[List[str]] = None) -> str:
+        """Koryguje brak fleksji imion męskich i żeńskich po przyimkach z dwupoziomową bramką Klastra C."""
+        return fix_undecorated_names(text, character_names=character_names, series_bible=self)
+
+    @staticmethod
+    def sanitize_toponymic_origin_and_companionship(text: str, custom_glossary: Optional[Dict[str, str]] = None) -> str:
+        """Dwupoziomowa sanitizacja narzędnika toponimów i antroponimów po przyimkach z/ze."""
+        return sanitize_toponymic_origin_and_companionship(text, custom_glossary=custom_glossary)
 
     def is_female_group_speaker(self, speaker_name: str) -> bool:
         """
@@ -4513,21 +4915,34 @@ class SeriesBible:
         if not name:
             return False
         n_l = name.strip().lower()
+        norm_nl = normalize_name_nfkd(n_l)
 
         # If explicitly registered in characters as a living character, protect from false toponym classification
         with self._lock:
             chars_dict = self.data.get("characters", {})
             for c_k, c_v in chars_dict.items():
-                if "->" not in c_k and c_k.strip().lower() == n_l:
-                    c_desc = (c_v.get("description", "") if isinstance(c_v, dict) else str(c_v)).lower()
-                    if any(w in c_desc for w in ["mężczyzna", "kobieta", "król", "książę", "postać", "bohater", "rycerz"]):
-                        if "nie-postać" not in c_desc and "toponim" not in c_desc:
-                            return False
+                if "->" not in c_k:
+                    c_clean = c_k.strip().lower()
+                    if c_clean == n_l or normalize_name_nfkd(c_clean) == norm_nl:
+                        c_desc = (c_v.get("description", "") if isinstance(c_v, dict) else str(c_v)).lower()
+                        if any(w in c_desc for w in ["mężczyzna", "kobieta", "król", "książę", "postać", "bohater", "rycerz"]):
+                            if "nie-postać" not in c_desc and "toponim" not in c_desc:
+                                return False
+            if "entity_categories" in self.data:
+                cat = self.data["entity_categories"].get(name.strip())
+                if cat in (EntityCategory.TOPONYM.value, EntityCategory.CHREMATONYM.value):
+                    return True
+                if cat == EntityCategory.ANTHROPONYM.value:
+                    return False
         if n_l in INDECLINABLE_FRENCH_TOPONYMS:
             return True
         if n_l.endswith("um"):
             return True
         if n_l in ETHNONYMS_AND_COLLECTIVES or any(n_l.startswith(eth) for eth in ["mongol", "tatar", "merkit", "persian", "roman", "nomad", "pastoralist"]):
+            return True
+        if n_l in INSTITUTION_NOUNS or norm_nl in INSTITUTION_NOUNS:
+            return True
+        if any(n_l.endswith(suf) or norm_nl.endswith(suf) for suf in INSTITUTIONAL_SUFFIXES):
             return True
         REALM_INSTITUTION_NOUNS = {
             "imperium", "królestwo", "cesarstwo", "senat", "republika", "zakon", "gildia", "rada",
@@ -5066,6 +5481,7 @@ class SeriesBible:
                             desc = f"{'MĘŻCZYZNA' if gen == 'MALE' else 'KOBIETA'} (zweryfikowano przez EpisodeQualityGate)"
                             self.data["characters"][c_name] = {"description": desc, "source": "quality_gate"}
                             self.data["declensions"][c_name] = generate_polish_name_declension(c_name, gen)
+                            self.register_entity_category(c_name, EntityCategory.ANTHROPONYM)
                             has_updates = True
                     elif c_name and f_type == "declension":
                         decl_map = fix_item.get("declension")
@@ -5085,6 +5501,7 @@ class SeriesBible:
                             desc = f"{'MĘŻCZYZNA' if gender_str == 'MALE' else 'KOBIETA'} (zweryfikowano przez EpisodeQualityGate)"
                             self.data["characters"][char_name] = {"description": desc, "source": "quality_gate"}
                             self.data["declensions"][char_name] = generate_polish_name_declension(char_name, gender_str)
+                            self.register_entity_category(char_name, EntityCategory.ANTHROPONYM)
                             has_updates = True
 
                     # 1st-person speaker gender confirmation:
@@ -5097,6 +5514,7 @@ class SeriesBible:
                             desc = f"{'MĘŻCZYZNA' if gender_str == 'MALE' else 'KOBIETA'} (zweryfikowano przez EpisodeQualityGate)"
                             self.data["characters"][char_name] = {"description": desc, "source": "quality_gate"}
                             self.data["declensions"][char_name] = generate_polish_name_declension(char_name, gender_str)
+                            self.register_entity_category(char_name, EntityCategory.ANTHROPONYM)
                             has_updates = True
 
                     # Prepositional Foreign Name Declension: e.g. "ujednolicono formę imienia po przyimku na 'Drela'"

@@ -497,5 +497,21 @@
       "cost_pln": 2.88
     }
   },
+  "entity_categories": {
+    "Lara": "ANTHROPONYM",
+    "Luca": "ANTHROPONYM",
+    "Mari": "ANTHROPONYM",
+    "Mari Otsu": "ANTHROPONYM",
+    "Leo": "ANTHROPONYM",
+    "Lisa": "ANTHROPONYM",
+    "Kusatsu": "ANTHROPONYM",
+    "Grace": "ANTHROPONYM",
+    "Rowan": "ANTHROPONYM",
+    "Yoshiya": "ANTHROPONYM",
+    "Rigmor": "ANTHROPONYM",
+    "Młoda Mari": "ANTHROPONYM",
+    "Lucian": "ANTHROPONYM",
+    "Gon": "ANTHROPONYM"
+  },
   "fansub_canon": {}
 }

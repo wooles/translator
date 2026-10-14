@@ -32,13 +32,15 @@
       "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Taichi": {
-      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+      "gender": "MALE"
     },
     "Kuroe Kurozu": {
       "description": "kobieta (16 lat, licealistka, pod wpływem emocji zmienia się w gigantycznego kaiju (Harugona)) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Arata Inubaki": {
-      "description": "mężczyzna / chłopak (Główny bohater) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "mężczyzna / chłopak (Główny bohater) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+      "gender": "MALE"
     },
     "Arata Minami (Inubaki)": {
       "description": "MĘŻCZYZNA - mężczyzna (16 lat, popularny uczeń, chłopak Kuroe, wciągnięty w show-biznes) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
@@ -78,7 +80,8 @@
       "description": "KOBIETA (wyodrębniono z relacji serii)"
     },
     "Kotaro Hibino": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE"
     },
     "Taichi -> Arata": {
       "description": "Zwrot: 'na ty' (młodszy rywal o względy Kuroe)"
@@ -483,5 +486,28 @@
     "[ASW] Otome Kaijuu Carameliser - 09 [1080p HEVC][C3F1AD15]"
   ],
   "batch_stats": {},
+  "entity_categories": {
+    "Arata": "ANTHROPONYM",
+    "Kuroe": "ANTHROPONYM",
+    "Seina": "ANTHROPONYM",
+    "Raimu": "ANTHROPONYM",
+    "Manatsu": "ANTHROPONYM",
+    "Taichi": "ANTHROPONYM",
+    "Kuroe Kurozu": "ANTHROPONYM",
+    "Arata Inubaki": "ANTHROPONYM",
+    "Arata Minami (Inubaki)": "ANTHROPONYM",
+    "Seina Katsuragi": "ANTHROPONYM",
+    "Manatsu Tomita": "ANTHROPONYM",
+    "Raimu Kohno": "ANTHROPONYM",
+    "Minami": "ANTHROPONYM",
+    "Akaishi": "ANTHROPONYM",
+    "Takamine": "ANTHROPONYM",
+    "Harugon": "ANTHROPONYM",
+    "Godolla": "ANTHROPONYM",
+    "Arata Minami": "ANTHROPONYM",
+    "Kuroe Akaishi": "ANTHROPONYM",
+    "Rinko Akaishi": "ANTHROPONYM",
+    "Kotaro Hibino": "ANTHROPONYM"
+  },
   "fansub_canon": {}
 }

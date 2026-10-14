@@ -1,0 +1,433 @@
+{
+  "anime_title": "Sasaki to Pii-chan",
+  "characters": {
+    "Sasaki -> Shizuka Futari": {
+      "description": "Zwrot: 'pani Shizuko / Futari-san' (współpracownicy / partnerzy z Biura)"
+    },
+    "Sasaki": {
+      "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
+      "source": "quality_gate",
+      "gender": "MALE"
+    },
+    "Shizuka Futari": {
+      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Shizuka Futari -> Sasaki": {
+      "description": "Zwrot: 'Sasaki / panie Sasaki' (przekorna seniorka / partnerka z Biura) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Magical Pink -> Sasaki": {
+      "description": "Zwrot: 'panie Magiku' (chwilowy sojusznik z przymusu) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Magical Pink": {
+      "description": "kobieta / dziewczyna (Postać drugoplanowa) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Sasaki -> Akutsu": {
+      "description": "Zwrot: 'naczelniku / panie naczelniku' (podwładny -> przełożony)"
+    },
+    "Akutsu": {
+      "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
+      "source": "quality_gate"
+    },
+    "Müller -> Sasaki": {
+      "description": "Zwrot: 'panie Sasaki / baronie Sasaki' (arystokratyczna relacja partnerska) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Müller": {
+      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+      "gender": "MALE"
+    },
+    "Müller -> Peeps": {
+      "description": "Zwrot: 'Czcigodny Mędrcu Gwiazd' (feudalny szacunek wobec arcymaga) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]"
+    },
+    "Peeps": {
+      "description": "UNKNOWN (Nieokreślony (reinkarnowany Mędrzec Gwiazd Piercarlo pod postacią małego kanarka)) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+      "gender": "MALE"
+    },
+    "Piercarlo": {
+      "description": "postać (Główny bohater)"
+    },
+    "Kurosu": {
+      "description": "kobieta / dziewczyna (Postać drugoplanowa) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Elsa Müller": {
+      "description": "kobieta / dziewczyna (Postać drugoplanowa) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Adonis": {
+      "description": "mężczyzna / chłopak (Postać drugoplanowa) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Marc": {
+      "description": "mężczyzna / chłopak (Postać drugoplanowa) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "French": {
+      "description": "mężczyzna / chłopak (Postać drugoplanowa) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Hoshizaki-san": {
+      "description": "kobieta / dziewczyna (Postać drugoplanowa) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Elsa": {
+      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Louis": {
+      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+    },
+    "Takayoshi": {
+      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+      "gender": "MALE"
+    },
+    "Naomi": {
+      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    },
+    "Abaddon": {
+      "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
+      "source": "quality_gate"
+    },
+    "Disciple B": {
+      "description": "MĘŻCZYZNA (zweryfikowano z audio seiyū Whisper)"
+    },
+    "Neighbor": {
+      "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
+      "source": "quality_gate"
+    },
+    "Disciple A": {
+      "description": "KOBIETA (zweryfikowano z audio seiyū Whisper)"
+    },
+    "Muller": {
+      "description": "KOBIETA (zweryfikowano z audio seiyū Whisper)"
+    },
+    "Guard": {
+      "description": "KOBIETA (zweryfikowano z audio seiyū Whisper)"
+    }
+  },
+  "glossary": {
+    "Quarantine Space": "Przestrzeń kwarantanny",
+    "Disciple": "Poplecznik",
+    "Proxy War": "Wojna zastępcza",
+    "Magical Field": "Pole magiczne",
+    "Magical Beam": "Magiczny Promień",
+    "First Concubine": "Pierwsza konkubina"
+  },
+  "relationships": {
+    "Sasaki -> Shizuka Futari": "Zwrot: 'pani Shizuko / Futari-san' (współpracownicy / partnerzy z Biura)",
+    "Shizuka Futari -> Sasaki": "Zwrot: 'Sasaki / panie Sasaki' (przekorna seniorka / partnerka z Biura) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Magical Pink -> Sasaki": "Zwrot: 'panie Magiku' (chwilowy sojusznik z przymusu) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Sasaki -> Akutsu": "Zwrot: 'naczelniku / panie naczelniku' (podwładny -> przełożony)",
+    "Müller -> Sasaki": "Zwrot: 'panie Sasaki / baronie Sasaki' (arystokratyczna relacja partnerska) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Müller -> Peeps": "Zwrot: 'Czcigodny Mędrcu Gwiazd' (feudalny szacunek wobec arcymaga) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]"
+  },
+  "declensions": {
+    "Sasaki": {
+      "M": "Sasaki",
+      "D": "Sasaki",
+      "C": "Sasaki",
+      "B": "Sasaki",
+      "N": "Sasaki",
+      "Ms": "Sasaki",
+      "W": "Sasaki",
+      "gender": "MALE"
+    },
+    "Shizuka Futari": {
+      "M": "Shizuka Futari",
+      "D": "Shizuki Futari",
+      "C": "Shizuce Futari",
+      "B": "Shizukę Futari",
+      "N": "Shizuką Futari",
+      "Ms": "Shizuce Futari",
+      "W": "Shizuko Futari",
+      "gender": "FEMALE"
+    },
+    "Magical Pink": {
+      "M": "Magical Pink",
+      "D": "Magical Pink",
+      "C": "Magical Pink",
+      "B": "Magical Pink",
+      "N": "Magical Pink",
+      "Ms": "Magical Pink",
+      "W": "Magical Pink",
+      "gender": "FEMALE"
+    },
+    "Akutsu": {
+      "M": "Akutsu",
+      "D": "Akutsu",
+      "C": "Akutsu",
+      "B": "Akutsu",
+      "N": "Akutsu",
+      "Ms": "Akutsu",
+      "W": "Akutsu",
+      "gender": "MALE"
+    },
+    "Müller": {
+      "M": "Müller",
+      "D": "Müllera",
+      "C": "Müllerowi",
+      "B": "Müllera",
+      "N": "Müllerem",
+      "Ms": "Müllerze",
+      "W": "Müllerze",
+      "gender": "MALE"
+    },
+    "Peeps": {
+      "M": "Peeps",
+      "D": "Peepsa",
+      "C": "Peepsowi",
+      "B": "Peepsa",
+      "N": "Peepsem",
+      "Ms": "Peepsie",
+      "W": "Peepsie",
+      "gender": "MALE"
+    },
+    "Piercarlo": {
+      "M": "Piercarlo",
+      "D": "Piercarlo",
+      "C": "Piercarlo",
+      "B": "Piercarlo",
+      "N": "Piercarlo",
+      "Ms": "Piercarlo",
+      "W": "Piercarlo"
+    },
+    "Kurosu": {
+      "M": "Kurosu",
+      "D": "Kurosu",
+      "C": "Kurosu",
+      "B": "Kurosu",
+      "N": "Kurosu",
+      "Ms": "Kurosu",
+      "W": "Kurosu",
+      "gender": "FEMALE"
+    },
+    "Elsa Müller": {
+      "M": "Elsa Müller",
+      "D": "Elsy Müller",
+      "C": "Elsie Müller",
+      "B": "Elsę Müller",
+      "N": "Elsą Müller",
+      "Ms": "Elsie Müller",
+      "W": "Elso Müller",
+      "gender": "FEMALE"
+    },
+    "Adonis": {
+      "M": "Adonis",
+      "D": "Adonisa",
+      "C": "Adonisowi",
+      "B": "Adonisa",
+      "N": "Adonisem",
+      "Ms": "Adonisie",
+      "W": "Adonisie",
+      "gender": "MALE"
+    },
+    "Marc": {
+      "M": "Marc",
+      "D": "Marca",
+      "C": "Marcowi",
+      "B": "Marca",
+      "N": "Marcem",
+      "Ms": "Marcu",
+      "W": "Marcu",
+      "gender": "MALE"
+    },
+    "French": {
+      "M": "French",
+      "D": "Frencha",
+      "C": "Frenchowi",
+      "B": "Frencha",
+      "N": "Frenchem",
+      "Ms": "Frenchu",
+      "W": "Frenchu",
+      "gender": "MALE"
+    },
+    "Elsa": {
+      "M": "Elsa",
+      "D": "Elsy",
+      "C": "Elsie",
+      "B": "Elsę",
+      "N": "Elsą",
+      "Ms": "Elsie",
+      "W": "Elso",
+      "gender": "FEMALE"
+    },
+    "Louis": {
+      "M": "Louis",
+      "D": "Louisa",
+      "C": "Louisowi",
+      "B": "Louisa",
+      "N": "Louisem",
+      "Ms": "Louisie",
+      "W": "Louisie",
+      "gender": "MALE"
+    },
+    "Takayoshi": {
+      "M": "Takayoshi",
+      "D": "Takayoshi",
+      "C": "Takayoshi",
+      "B": "Takayoshi",
+      "N": "Takayoshi",
+      "Ms": "Takayoshi",
+      "W": "Takayoshi",
+      "gender": "MALE"
+    },
+    "Naomi": {
+      "M": "Naomi",
+      "D": "Naomi",
+      "C": "Naomi",
+      "B": "Naomi",
+      "N": "Naomi",
+      "Ms": "Naomi",
+      "W": "Naomi",
+      "gender": "FEMALE"
+    },
+    "Abaddon": {
+      "M": "Abaddon",
+      "D": "Abaddona",
+      "C": "Abaddonowi",
+      "B": "Abaddona",
+      "N": "Abaddonem",
+      "Ms": "Abaddonie",
+      "W": "Abaddonie",
+      "gender": "MALE"
+    },
+    "Przestrzeń kwarantanny": {
+      "M": "Przestrzeń kwarantanny",
+      "D": "Przestrzeńa kwarantanny",
+      "C": "Przestrzeńowi kwarantanny",
+      "B": "Przestrzeńa kwarantanny",
+      "N": "Przestrzeńem kwarantanny",
+      "Ms": "Przestrzeńie kwarantanny",
+      "W": "Przestrzeńie kwarantanny"
+    },
+    "Poplecznik": {
+      "M": "Poplecznik",
+      "D": "Poplecznika",
+      "C": "Poplecznikowi",
+      "B": "Poplecznika",
+      "N": "Poplecznikiem",
+      "Ms": "Popleczniku",
+      "W": "Popleczniku"
+    },
+    "Wojna zastępcza": {
+      "M": "Wojna zastępcza",
+      "D": "Wojny zastępczej",
+      "C": "Wojnie zastępczej",
+      "B": "Wojnę zastępczą",
+      "N": "Wojną zastępczą",
+      "Ms": "Wojnie zastępczej",
+      "W": "Wojno zastępcza"
+    },
+    "Pole magiczne": {
+      "M": "Pole magiczne",
+      "D": "Pole'a magicznego",
+      "C": "Pole'owi magicznemu",
+      "B": "Pole'a magiczne",
+      "N": "Pole'em magicznym",
+      "Ms": "Pole'u magicznym",
+      "W": "Pole magiczne"
+    },
+    "Magiczny Promień": {
+      "M": "Magiczny Promień",
+      "D": "Magicznego Promieńa",
+      "C": "Magicznemu Promieńowi",
+      "B": "Magicznego Promieńa",
+      "N": "Magicznym Promieńem",
+      "Ms": "Magicznym Promieńie",
+      "W": "Magiczny Promieńie"
+    },
+    "Pierwsza konkubina": {
+      "M": "Pierwsza konkubina",
+      "D": "Pierwszej konkubiny",
+      "C": "Pierwszej konkubinie",
+      "B": "Pierwszą konkubinę",
+      "N": "Pierwszą konkubiną",
+      "Ms": "Pierwszej konkubinie",
+      "W": "Pierwsza konkubino"
+    },
+    "Disciple B": {
+      "M": "Disciple B",
+      "D": "Disciple'a B",
+      "C": "Disciple'owi B",
+      "B": "Disciple'a B",
+      "N": "Disciple'em B",
+      "Ms": "Disciple'u B",
+      "W": "Disciple B",
+      "gender": "MALE"
+    },
+    "Neighbor": {
+      "M": "Neighbor",
+      "D": "Neighbora",
+      "C": "Neighborowi",
+      "B": "Neighbora",
+      "N": "Neighborem",
+      "Ms": "Neighborze",
+      "W": "Neighborze",
+      "gender": "MALE"
+    },
+    "Disciple A": {
+      "M": "Disciple A",
+      "D": "Disciple A",
+      "C": "Disciple A",
+      "B": "Disciple A",
+      "N": "Disciple A",
+      "Ms": "Disciple A",
+      "W": "Disciple A",
+      "gender": "FEMALE"
+    },
+    "Muller": {
+      "M": "Muller",
+      "D": "Muller",
+      "C": "Muller",
+      "B": "Muller",
+      "N": "Muller",
+      "Ms": "Muller",
+      "W": "Muller",
+      "gender": "FEMALE"
+    },
+    "Guard": {
+      "M": "Guard",
+      "D": "Guard",
+      "C": "Guard",
+      "B": "Guard",
+      "N": "Guard",
+      "Ms": "Guard",
+      "W": "Guard",
+      "gender": "FEMALE"
+    }
+  },
+  "hypocorisms": {},
+  "plot_anchors": {
+    "Kariyushi / Psionic Power vs Magic": "Bezwzględne rozróżnienie pomiędzy zdolnościami esperów ze świata ziemskiego (Inouryokusha -> esperzy / moce parapsychiczne) a magią innego świata, którą Sasaki otrzymał od Pii-chana (Mahou -> magia).",
+    "Awans Sasakiego": "Stopnie policyjne Sasakiego: z 'asystenta inspektora / podkomisarza' na 'inspektora / komisarza' Biura Bezpieczeństwa."
+  },
+  "episodes_translated": [
+    "[ASW] Sasaki to Pii-chan S2 - 02 [1080p HEVC][F6C61A27]"
+  ],
+  "batch_stats": {
+    "[ASW] Sasaki to Pii-chan S2 - 02 [1080p HEVC][F6C61A27]": {
+      "dialogues": 333,
+      "batches": 15,
+      "avg_batch_size": 22.2,
+      "cost_pln": 3.38
+    }
+  },
+  "entity_categories": {
+    "Sasaki": "ANTHROPONYM",
+    "Shizuka Futari": "ANTHROPONYM",
+    "Magical Pink": "ANTHROPONYM",
+    "Akutsu": "ANTHROPONYM",
+    "Müller": "ANTHROPONYM",
+    "Peeps": "ANTHROPONYM",
+    "Piercarlo": "ANTHROPONYM",
+    "Kurosu": "ANTHROPONYM",
+    "Elsa Müller": "ANTHROPONYM",
+    "Adonis": "ANTHROPONYM",
+    "Marc": "ANTHROPONYM",
+    "French": "ANTHROPONYM",
+    "Hoshizaki-san": "ANTHROPONYM",
+    "Elsa": "ANTHROPONYM",
+    "Louis": "ANTHROPONYM",
+    "Takayoshi": "ANTHROPONYM",
+    "Naomi": "ANTHROPONYM",
+    "Abaddon": "ANTHROPONYM",
+    "Disciple B": "ANTHROPONYM",
+    "Neighbor": "ANTHROPONYM",
+    "Disciple A": "ANTHROPONYM",
+    "Muller": "ANTHROPONYM",
+    "Guard": "ANTHROPONYM"
+  },
+  "fansub_canon": {}
+}

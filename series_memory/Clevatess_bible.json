@@ -62,7 +62,8 @@
       "description": "MĘŻCZYZNA - mężczyzna (Dyrektor Akademii, fałszywy kapłan sprzymierzony z mrocznymi siłami)"
     },
     "Ray Forester": {
-      "description": "MĘŻCZYZNA - mężczyzna (postać)"
+      "description": "MĘŻCZYZNA - mężczyzna (postać)",
+      "gender": "MALE"
     },
     "Andrew": {
       "description": "MĘŻCZYZNA - mężczyzna (postać)"
@@ -639,6 +640,39 @@
     "[ASW] Clevatess - 04 [1080p HEVC]"
   ],
   "batch_stats": {},
+  "entity_categories": {
+    "Clevatess": "ANTHROPONYM",
+    "Alicia": "ANTHROPONYM",
+    "Nel": "ANTHROPONYM",
+    "Clen": "ANTHROPONYM",
+    "Naie": "ANTHROPONYM",
+    "Klen": "ANTHROPONYM",
+    "Leon i Tygel": "ANTHROPONYM",
+    "Zavthier": "ANTHROPONYM",
+    "Rathwell": "ANTHROPONYM",
+    "Edison": "ANTHROPONYM",
+    "Yuriel": "ANTHROPONYM",
+    "Owen Koath": "ANTHROPONYM",
+    "Klen / Clevatess": "ANTHROPONYM",
+    "Sarasa": "ANTHROPONYM",
+    "Tygel": "ANTHROPONYM",
+    "Leon": "ANTHROPONYM",
+    "Lang": "ANTHROPONYM",
+    "Chiffonlits": "ANTHROPONYM",
+    "Elro": "ANTHROPONYM",
+    "Ray Forester": "ANTHROPONYM",
+    "Andrew": "ANTHROPONYM",
+    "Klen Vatiss (Clevatess)": "ANTHROPONYM",
+    "Drel": "ANTHROPONYM",
+    "Gart": "ANTHROPONYM",
+    "Vordin": "ANTHROPONYM",
+    "Alicia Sleihunt": "ANTHROPONYM",
+    "Mary Merryweather": "ANTHROPONYM",
+    "Andrew Hwyp": "ANTHROPONYM",
+    "Naie Chiffonlits": "ANTHROPONYM",
+    "Ray": "ANTHROPONYM",
+    "Carson": "ANTHROPONYM"
+  },
   "fansub_canon": {
     "wizard": {
       "en": [

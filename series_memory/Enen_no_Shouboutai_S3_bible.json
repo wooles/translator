@@ -398,5 +398,20 @@
     "tmph43s0kjf"
   ],
   "batch_stats": {},
+  "entity_categories": {
+    "Shinra": "ANTHROPONYM",
+    "Haumea": "ANTHROPONYM",
+    "Sho": "ANTHROPONYM",
+    "Obi": "ANTHROPONYM",
+    "Maki": "ANTHROPONYM",
+    "Licht": "ANTHROPONYM",
+    "Vulcan": "ANTHROPONYM",
+    "Obywatele": "ANTHROPONYM",
+    "Arthur": "ANTHROPONYM",
+    "Charon": "ANTHROPONYM",
+    "Inca": "ANTHROPONYM",
+    "Iris": "ANTHROPONYM",
+    "Hibana": "ANTHROPONYM"
+  },
   "fansub_canon": {}
 }

@@ -417,5 +417,31 @@
       "cost_pln": 3.98
     }
   },
+  "entity_categories": {
+    "Ray White": "ANTHROPONYM",
+    "Amelia Rose": "ANTHROPONYM",
+    "Ariane Olgren": "ANTHROPONYM",
+    "Rebecca Bradley": "ANTHROPONYM",
+    "Lydia Ainsworth": "ANTHROPONYM",
+    "Elisa Griffith": "ANTHROPONYM",
+    "Claris Cleveland": "ANTHROPONYM",
+    "Evi Armstrong": "ANTHROPONYM",
+    "Abbie Garnet": "ANTHROPONYM",
+    "Carol Caroline": "ANTHROPONYM",
+    "Albert Alium": "ANTHROPONYM",
+    "Helena Grady": "ANTHROPONYM",
+    "Lucas Bradley": "ANTHROPONYM",
+    "Wanda Wykes": "ANTHROPONYM",
+    "Stella White": "ANTHROPONYM",
+    "Lieselotte": "ANTHROPONYM",
+    "Dina": "ANTHROPONYM",
+    "Lily": "ANTHROPONYM",
+    "Carla": "ANTHROPONYM",
+    "Zuina": "ANTHROPONYM",
+    "Cusuechs": "ANTHROPONYM",
+    "Takenoko": "ANTHROPONYM",
+    "Animals": "ANTHROPONYM",
+    "Ray": "ANTHROPONYM"
+  },
   "fansub_canon": {}
 }

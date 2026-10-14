@@ -40,7 +40,8 @@
       "description": "Zwrot: 'panie Sasaki / Sasaki-dono / baronie Sasaki' (arystokrata sojusznik -> nowo mianowany baron) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Hrabia Müller": {
-      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+      "gender": "MALE"
     },
     "Otonari-san -> Sasaki": {
       "description": "Zwrot: 'proszę pana / panie Sasaki' (sąsiadka z gimnazjum -> dorosły sąsiad) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
@@ -59,7 +60,8 @@
       "description": "postać (Główny bohater) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Hoshizaki-san": {
-      "description": "postać (Postać drugoplanowa)"
+      "description": "postać (Postać drugoplanowa) [MĘŻCZYZNA]",
+      "gender": "MALE"
     },
     "Otonari-san": {
       "description": "postać (Postać drugoplanowa) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
@@ -81,7 +83,8 @@
       "description": "postać (Postać drugoplanowa)"
     },
     "Hrabia Mueller": {
-      "description": "postać (Postać drugoplanowa)"
+      "description": "postać (Postać drugoplanowa) [MĘŻCZYZNA]",
+      "gender": "MALE"
     },
     "Wicehrabia French": {
       "description": "postać (Postać drugoplanowa)"
@@ -275,7 +278,8 @@
       "B": "Hrabiego Mueller",
       "N": "Hrabią Mueller",
       "Ms": "Hrabim Mueller",
-      "W": "Hrabio Mueller"
+      "W": "Hrabio Mueller",
+      "gender": "MALE"
     },
     "Wicehrabia French": {
       "M": "Wicehrabia French",
@@ -437,6 +441,38 @@
       "avg_batch_size": 22.0,
       "cost_pln": 6.18
     }
+  },
+  "entity_categories": {
+    "Sasaki": "ANTHROPONYM",
+    "Peeps": "ANTHROPONYM",
+    "Akutsu": "ANTHROPONYM",
+    "Futari Shizuka": "ANTHROPONYM",
+    "Hrabia Müller": "ANTHROPONYM",
+    "Otonari": "ANTHROPONYM",
+    "Abaddon": "ANTHROPONYM",
+    "Pii-chan (Peeps)": "ANTHROPONYM",
+    "Hoshizaki-san": "ANTHROPONYM",
+    "Otonari-san": "ANTHROPONYM",
+    "Elsa von Mueller": "ANTHROPONYM",
+    "Magical Pink (Shizuka Hachikai)": "ANTHROPONYM",
+    "Shura": "ANTHROPONYM",
+    "Marc": "ANTHROPONYM",
+    "Sebastian": "ANTHROPONYM",
+    "Hrabia Mueller": "ANTHROPONYM",
+    "Wicehrabia French": "ANTHROPONYM",
+    "Josef": "ANTHROPONYM",
+    "Maximilian": "ANTHROPONYM",
+    "Peeps (Pii-chan)": "ANTHROPONYM",
+    "Otonari-san (Sąsiadka)": "ANTHROPONYM",
+    "Książę Adonis": "ANTHROPONYM",
+    "Książę Einhart": "ANTHROPONYM",
+    "Hoshizaki": "ANTHROPONYM",
+    "Równiny Rectan": "ANTHROPONYM",
+    "Herz": "ANTHROPONYM",
+    "Neighbor": "ANTHROPONYM",
+    "Mother": "ANTHROPONYM",
+    "Boyfriend": "ANTHROPONYM",
+    "Masayuki": "ANTHROPONYM"
   },
   "fansub_canon": {}
 }

@@ -307,5 +307,15 @@
     "tmp1ne63jmr"
   ],
   "batch_stats": {},
+  "entity_categories": {
+    "Kou Tousetsu": "ANTHROPONYM",
+    "Shu Keigetsu": "ANTHROPONYM",
+    "Shin-U": "ANTHROPONYM",
+    "Kou Kenshuu": "ANTHROPONYM",
+    "Leelee": "ANTHROPONYM",
+    "Ei Gyoumei": "ANTHROPONYM",
+    "Służba / Gwardia": "ANTHROPONYM",
+    "Bunkou": "ANTHROPONYM"
+  },
   "fansub_canon": {}
 }

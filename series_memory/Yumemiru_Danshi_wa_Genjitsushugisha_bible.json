@@ -33,7 +33,8 @@
       "description": "KOBIETA - kobieta (postać)"
     },
     "Yamazaki": {
-      "description": "MĘŻCZYZNA - mężczyzna (postać)"
+      "description": "MĘŻCZYZNA - mężczyzna (postać)",
+      "gender": "MALE"
     },
     "Wataru Sajou -> Aika Natsukawa": {
       "description": "Zwrot: 'na ty / Natsukawa' (kolega z klasy (wymuszony dystans))"
@@ -276,5 +277,18 @@
     "[ASW] Yumemiru Danshi wa Genjitsushugisha - 02 [1080p HEVC][96EF8E5C]"
   ],
   "batch_stats": {},
+  "entity_categories": {
+    "Wataru Sajou": "ANTHROPONYM",
+    "Aika Natsukawa": "ANTHROPONYM",
+    "Kei Ashida": "ANTHROPONYM",
+    "Kaede Sajou": "ANTHROPONYM",
+    "Rin Shinomiya": "ANTHROPONYM",
+    "Kei Shinomiya": "ANTHROPONYM",
+    "Rin Ichinose": "ANTHROPONYM",
+    "Fuka Sasaki": "ANTHROPONYM",
+    "Hayato Ichinose": "ANTHROPONYM",
+    "Yuyu Inatomi": "ANTHROPONYM",
+    "Yamazaki": "ANTHROPONYM"
+  },
   "fansub_canon": {}
 }

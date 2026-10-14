@@ -69,7 +69,8 @@ from avt_linter import (
     AVTLinter, harmonize_text_2nd_person_plural, harmonize_verbal_gender_1st_and_2nd,
     harmonize_copula_and_predicate_adjective, harmonize_2nd_person_predicate_nouns,
     strip_false_ablative_instrumental, fix_masculine_vocative_tz,
-    fix_virile_adjective_orthography, has_2nd_person_plural_verb
+    fix_virile_adjective_orthography, has_2nd_person_plural_verb,
+    harmonize_virile_group_1st_person_plural, strip_false_feminine_instrumental
 )
 from romaji_helper import to_romaji
 from series_memory import (
@@ -3997,6 +3998,34 @@ class MultimodalTranslator:
                         for fx in p_fixes:
                             pbar.write(f"  [Harmonizator Liczby Mnogiej Tury] #{it['id']}: {fx}")
 
+        scene_has_male = False
+        for it in pass1_items:
+            s_name = (it.get("speaker_name") or "").strip()
+            s_gen = it.get("speaker_gender")
+            t_gen = it.get("target_gender")
+            s_str = str(s_gen or "").lower()
+            t_str = str(t_gen or "").lower()
+            if s_gen and "female" not in s_str and "kobieta" not in s_str and "dziewczyna" not in s_str and any(w in s_str for w in ["male", "mężczyzna", "chłopak"]):
+                scene_has_male = True
+                break
+            if t_gen and "female" not in t_str and "kobieta" not in t_str and "dziewczyna" not in t_str and any(w in t_str for w in ["male", "mężczyzna", "chłopak"]):
+                scene_has_male = True
+                break
+            if s_name:
+                if hasattr(self, "series_bible") and self.series_bible and hasattr(self.series_bible, "get_character_gender"):
+                    if self.series_bible.get_character_gender(s_name, allow_generic_nouns=False) == "MALE":
+                        scene_has_male = True
+                        break
+                elif s_name in getattr(self, "character_registry", {}):
+                    cd = self.character_registry[s_name].lower()
+                    if any(k in cd for k in getattr(self, "MALE_ROLE_KEYWORDS", [])):
+                        scene_has_male = True
+                        break
+            v_voice = str(it.get("speaker_voice", "")).lower()
+            if any(k in v_voice for k in ["baryton", "bas", "tenor", "chłopięcy", "męski"]) and "alt" not in v_voice:
+                scene_has_male = True
+                break
+
         prev_linted_line = (lookback_history[-1]["pl"] if lookback_history else "")
         for item in pass1_items:
             raw_final = sanitize_sub_text(refined_dict.get(item["id"], item["pl"]))
@@ -4049,8 +4078,15 @@ class MultimodalTranslator:
                 source_en=item.get("en", ""),
                 addressee_gender=item.get("target_gender") or item.get("addressee"),
                 target_gender=item.get("target_gender") or item.get("addressee"),
-                addressee_number=item.get("addressee_number")
+                addressee_number=item.get("addressee_number"),
+                scene_has_male_participant=scene_has_male
             )
+            # Deterministic post-processing: strip false feminine instrumental & virile plural harmonization
+            final_text, fem_inst_fixes = strip_false_feminine_instrumental(final_text, series_bible=getattr(self, "series_bible", None))
+            fixes.extend(fem_inst_fixes)
+            if scene_has_male:
+                final_text, vir_pl_fixes = harmonize_virile_group_1st_person_plural(final_text, scene_has_male_participant=True)
+                fixes.extend(vir_pl_fixes)
             prev_linted_line = final_text
             # Deterministic glossary overrides
             final_text, gloss_fixes = GlossaryManager.apply_deterministic_overrides(final_text, combined_glossary)

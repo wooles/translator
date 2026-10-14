@@ -41,7 +41,8 @@
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
     },
     "Botaro": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE"
     },
     "Podwładni": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
@@ -54,7 +55,8 @@
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
     },
     "Kikuta Mokutarou": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE"
     },
     "Kaneko Kaeko": {
       "description": "KOBIETA (wyodrębniono z relacji serii)"
@@ -86,10 +88,12 @@
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
     },
     "Toshizou Hijikata": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE"
     },
     "Tanigaki Genjiro": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE"
     },
     "Tokishige Usami": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
@@ -102,7 +106,8 @@
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
     },
     "Fusataro Oosawa": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE"
     },
     "Nikaido": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
@@ -1119,5 +1124,40 @@
     "[ASW] Golden Kamuy - 62 [1080p HEVC][E14D8958]"
   ],
   "batch_stats": {},
+  "entity_categories": {
+    "Saichi Sugimoto": "ANTHROPONYM",
+    "Asirpa": "ANTHROPONYM",
+    "Usami": "ANTHROPONYM",
+    "Kadokura": "ANTHROPONYM",
+    "Tsukishima": "ANTHROPONYM",
+    "Koito": "ANTHROPONYM",
+    "Kikuta": "ANTHROPONYM",
+    "Kirawus": "ANTHROPONYM",
+    "Tsurumi": "ANTHROPONYM",
+    "Sugimoto": "ANTHROPONYM",
+    "Shiraishi": "ANTHROPONYM",
+    "Botaro": "ANTHROPONYM",
+    "Podwładni": "ANTHROPONYM",
+    "Sofia": "ANTHROPONYM",
+    "Ariko": "ANTHROPONYM",
+    "Kikuta Mokutarou": "ANTHROPONYM",
+    "Kaneko Kaeko": "ANTHROPONYM",
+    "Tokushirou Tsurumi": "ANTHROPONYM",
+    "Hidenobu Okuda": "ANTHROPONYM",
+    "Shinpachi Nagakura": "ANTHROPONYM",
+    "Tatsuma Ushiyama": "ANTHROPONYM",
+    "Hijikata": "ANTHROPONYM",
+    "Nagakura": "ANTHROPONYM",
+    "Otonoshin Koito": "ANTHROPONYM",
+    "Toshizou Hijikata": "ANTHROPONYM",
+    "Tanigaki Genjiro": "ANTHROPONYM",
+    "Tokishige Usami": "ANTHROPONYM",
+    "Hajime Tsukishima": "ANTHROPONYM",
+    "Yoshitake Shiraishi": "ANTHROPONYM",
+    "Fusataro Oosawa": "ANTHROPONYM",
+    "Nikaido": "ANTHROPONYM",
+    "Kaeko": "ANTHROPONYM",
+    "Okuda": "ANTHROPONYM"
+  },
   "fansub_canon": {}
 }

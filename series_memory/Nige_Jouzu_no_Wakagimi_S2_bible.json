@@ -97,7 +97,8 @@
       "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Moritaka": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+      "gender": "MALE"
     },
     "Yasuie Hōjō": {
       "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
@@ -121,7 +122,8 @@
       "description": "postać (Postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Kojiro": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+      "gender": "MALE"
     },
     "Yasuie": {
       "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
@@ -286,10 +288,12 @@
       "gender": "MALE"
     },
     "Tamonmaru": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+      "gender": "MALE"
     },
     "Doyo Sasaki": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+      "gender": "MALE"
     },
     "Fubuki -> Tokiyuki Hōjō": {
       "description": "Zwrot: 'panie Tokiyuki / paniczu' (strateg i wasal -> młody lord) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
@@ -370,7 +374,8 @@
       "description": "Zwrot: 'młody panie / braciszku' (towarzyszka broni -> młody wódz) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
     },
     "Kojiro Nezu": {
-      "description": "mężczyzna (Chłopiec-szermierz, przyszły przywódca klanu Nezu) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "mężczyzna (Chłopiec-szermierz, przyszły przywódca klanu Nezu) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+      "gender": "MALE"
     },
     "Shogen Hirano": {
       "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
@@ -1543,6 +1548,70 @@
       "avg_batch_size": 20.8,
       "cost_pln": 3.76
     }
+  },
+  "entity_categories": {
+    "Yorishige Suwa": "ANTHROPONYM",
+    "Tokiyuki Hōjō": "ANTHROPONYM",
+    "Yukiyasu Unno": "ANTHROPONYM",
+    "Tomomitsu Inukai": "ANTHROPONYM",
+    "Mochizuki / Shinomiya / Nezu": "ANTHROPONYM",
+    "Ayako": "ANTHROPONYM",
+    "Lord Mochizuki": "ANTHROPONYM",
+    "Muneie Tokoiwa / Mochizuki": "ANTHROPONYM",
+    "Sadamune Ogasawara": "ANTHROPONYM",
+    "Tokiyuki i towarzysze": "ANTHROPONYM",
+    "Sadamune Ogasawara / Tokiyuki": "ANTHROPONYM",
+    "Tokiyuki Hojo": "ANTHROPONYM",
+    "Mochizuki / Shinomiya": "ANTHROPONYM",
+    "Cesarz Go-Daigo": "ANTHROPONYM",
+    "Kiyohara": "ANTHROPONYM",
+    "Mochizuki": "ANTHROPONYM",
+    "Shokan": "ANTHROPONYM",
+    "Chojumaru": "ANTHROPONYM",
+    "Tokiyuki Suwa": "ANTHROPONYM",
+    "Sojusznicy / Mochizuki": "ANTHROPONYM",
+    "Gubernator Kiyohara": "ANTHROPONYM",
+    "Ród Shinomiya": "ANTHROPONYM",
+    "Yoritsugu": "ANTHROPONYM",
+    "Tokiyuki": "ANTHROPONYM",
+    "Yorishige": "ANTHROPONYM",
+    "Moritaka": "ANTHROPONYM",
+    "Yasuie Hōjō": "ANTHROPONYM",
+    "Genba Kazama": "ANTHROPONYM",
+    "Fubuki": "ANTHROPONYM",
+    "Suwa Yorishige": "ANTHROPONYM",
+    "Shizuku": "ANTHROPONYM",
+    "Mima Sasaki": "ANTHROPONYM",
+    "Kojiro": "ANTHROPONYM",
+    "Yasuie": "ANTHROPONYM",
+    "Kinmune Saionji": "ANTHROPONYM",
+    "Masashige Kusunoki": "ANTHROPONYM",
+    "Mima": "ANTHROPONYM",
+    "Shinomiya": "ANTHROPONYM",
+    "Nezu": "ANTHROPONYM",
+    "Muneie Tokoiwa": "ANTHROPONYM",
+    "Sojusznicy": "ANTHROPONYM",
+    "Takauji Ashikaga": "ANTHROPONYM",
+    "Genba": "ANTHROPONYM",
+    "Tamonmaru": "ANTHROPONYM",
+    "Doyo Sasaki": "ANTHROPONYM",
+    "Takauji": "ANTHROPONYM",
+    "Kinmune": "ANTHROPONYM",
+    "Moronao": "ANTHROPONYM",
+    "Moroyasu": "ANTHROPONYM",
+    "Kusunoki": "ANTHROPONYM",
+    "Yoshisada": "ANTHROPONYM",
+    "Kusunoki Masashige": "ANTHROPONYM",
+    "kobieta": "ANTHROPONYM",
+    "Saionji": "ANTHROPONYM",
+    "Hachiro Miura": "ANTHROPONYM",
+    "Wiejska dziewczynka": "ANTHROPONYM",
+    "Tokitsugu": "ANTHROPONYM",
+    "Yoritsugu Suwa": "ANTHROPONYM",
+    "Kojiro Nezu": "ANTHROPONYM",
+    "Shogen Hirano": "ANTHROPONYM",
+    "Dworzanin": "ANTHROPONYM",
+    "Doradca Suwy": "ANTHROPONYM"
   },
   "fansub_canon": {}
 }

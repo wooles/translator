@@ -676,5 +676,25 @@
       "cost_pln": 3.24
     }
   },
+  "entity_categories": {
+    "Rei Teshima": "ANTHROPONYM",
+    "Hebichika": "ANTHROPONYM",
+    "Hana": "ANTHROPONYM",
+    "Hana Kongouji": "ANTHROPONYM",
+    "Nana Teramura": "ANTHROPONYM",
+    "Harue Natsukusa": "ANTHROPONYM",
+    "Ai Yasumi": "ANTHROPONYM",
+    "Kokoro Fujimori": "ANTHROPONYM",
+    "Pokota": "ANTHROPONYM",
+    "Sachi Akafuku": "ANTHROPONYM",
+    "Hikaru Sekiryu": "ANTHROPONYM",
+    "Miya Enma": "ANTHROPONYM",
+    "Tonden Minoru": "ANTHROPONYM",
+    "Hikaru": "ANTHROPONYM",
+    "Ryoji Minagawa": "ANTHROPONYM",
+    "SFX": "ANTHROPONYM",
+    "Alien": "ANTHROPONYM",
+    "Band Leader Cat": "ANTHROPONYM"
+  },
   "fansub_canon": {}
 }

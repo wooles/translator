@@ -374,5 +374,30 @@
       "cost_pln": 2.6
     }
   },
+  "entity_categories": {
+    "Pechka": "ANTHROPONYM",
+    "Ninomiya": "ANTHROPONYM",
+    "Nokkochan": "ANTHROPONYM",
+    "Magical Daisy": "ANTHROPONYM",
+    "Kanoe Hitokouji": "ANTHROPONYM",
+    "Mamori Totoyama": "ANTHROPONYM",
+    "Koyuki Himekawa": "ANTHROPONYM",
+    "Noriko Nonohara": "ANTHROPONYM",
+    "Karin Sonoda": "ANTHROPONYM",
+    "Chika Tatehara": "ANTHROPONYM",
+    "Nene Ono": "ANTHROPONYM",
+    "Anna Sarizae": "ANTHROPONYM",
+    "Shinobu Hioka": "ANTHROPONYM",
+    "Kiku Yakumo": "ANTHROPONYM",
+    "Lapis Lazuline": "ANTHROPONYM",
+    "Keek": "ANTHROPONYM",
+    "Fal": "ANTHROPONYM",
+    "Konomi Mita": "ANTHROPONYM",
+    "Cherna Mouse": "ANTHROPONYM",
+    "Akane Fuwa": "ANTHROPONYM",
+    "Snow White": "ANTHROPONYM",
+    "Mamori": "ANTHROPONYM",
+    "Rionetta": "ANTHROPONYM"
+  },
   "fansub_canon": {}
 }

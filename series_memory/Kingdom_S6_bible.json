@@ -16,7 +16,8 @@
       "gender": "MALE"
     },
     "Wang Jian": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE"
     },
     "Bi": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
@@ -30,7 +31,8 @@
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
     },
     "Lozo": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE"
     },
     "Oddział Yu Feng": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
@@ -62,7 +64,8 @@
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
     },
     "Rozo": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE"
     },
     "Danto": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
@@ -886,5 +889,31 @@
     "[Erai-raws] Kingdom 6th Season - 12 (JN) [1080p CR WEBRip HEVC AAC][MultiSub][5E6871C6]"
   ],
   "batch_stats": {},
+  "entity_categories": {
+    "Wang Ben": "ANTHROPONYM",
+    "Mǎ Nanci": "ANTHROPONYM",
+    "Fan Yang": "ANTHROPONYM",
+    "Xin": "ANTHROPONYM",
+    "Wang Jian": "ANTHROPONYM",
+    "Bi": "ANTHROPONYM",
+    "Yang Duanhe": "ANTHROPONYM",
+    "Shun Shuishu": "ANTHROPONYM",
+    "Lozo": "ANTHROPONYM",
+    "Oddział Yu Feng": "ANTHROPONYM",
+    "Han Chang": "ANTHROPONYM",
+    "Wei Ping / Song Zuo / Tian Yong": "ANTHROPONYM",
+    "Ban You": "ANTHROPONYM",
+    "Ou Hon": "ANTHROPONYM",
+    "Heki": "ANTHROPONYM",
+    "Yotanwa": "ANTHROPONYM",
+    "Shun Sui Ju": "ANTHROPONYM",
+    "Rozo": "ANTHROPONYM",
+    "Danto": "ANTHROPONYM",
+    "Shin": "ANTHROPONYM",
+    "Mou Ten": "ANTHROPONYM",
+    "Ri Boku": "ANTHROPONYM",
+    "Meng Tian": "ANTHROPONYM",
+    "Ding Yang": "ANTHROPONYM"
+  },
   "fansub_canon": {}
 }

@@ -838,7 +838,8 @@ class AVTLinter:
         anime_title: str = "",
         target_gender: Optional[str] = None,
         addressee_number: Optional[str] = None,
-        series_bible: Optional[Any] = None
+        series_bible: Optional[Any] = None,
+        scene_has_male_participant: bool = False
     ) -> Tuple[str, List[str]]:
         """
         Comprehensive AVT linter. Checks Polish subtitle line against multiple AVT rules
@@ -910,6 +911,11 @@ class AVTLinter:
         if mod_abl != modified:
             applied_fixes.extend(abl_fixes)
             modified = mod_abl
+
+        mod_sfi, sfi_fixes = strip_false_feminine_instrumental(modified, series_bible=series_bible)
+        if mod_sfi != modified:
+            applied_fixes.extend(sfi_fixes)
+            modified = mod_sfi
 
         mod_voc, voc_fixes = fix_masculine_vocative_tz(modified)
         if mod_voc != modified:
@@ -1044,13 +1050,17 @@ class AVTLinter:
                         applied_fixes.append(f"[Filar CXXXVI/CLXIX - Mówca Męski/Chłopiec 1. os.] Korekta rodzaju żeńskiego na męski: {pattern}")
 
                 def _morph_f_to_m_repl(m):
-                    word = m.group(0)
-                    converted = convert_first_person_feminine_to_masculine(word)
+                    pref = m.group(1) or ""
+                    word = m.group(2)
+                    if word.lower() == "powinnam":
+                        converted = "Powinienem" if word[0].isupper() else "powinienem"
+                    else:
+                        converted = convert_first_person_feminine_to_masculine(word)
                     if converted and converted != word:
                         applied_fixes.append(f"[Filar CXXXVI/CLXIX - Mówca Męski 1. os.] Korekta rodzaju żeńskiego na męski: '{word}' -> '{converted}'")
-                        return converted
-                    return word
-                modified = re.sub(r"\b[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+(?:łam|łabym)\b", _morph_f_to_m_repl, modified)
+                        return f"{pref}{converted}"
+                    return m.group(0)
+                modified = re.sub(r"((?:^|\\[Nnh]|[^\w]))([A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+(?:łam|łabym)|[Pp]owinnam)\b", _morph_f_to_m_repl, modified)
 
             elif is_female_speaker and is_explicit_female_speaker:
                 female_1st_person_fixes = [
@@ -1102,13 +1112,17 @@ class AVTLinter:
                         applied_fixes.append(f"[Filar XIII/CXXXVI/CLXIX - Mówczyni Żeńska 1. os.] Korekta rodzaju męskiego na żeński: {pattern}")
 
                 def _morph_m_to_f_repl(m):
-                    word = m.group(0)
-                    converted = convert_first_person_masculine_to_feminine(word)
+                    pref = m.group(1) or ""
+                    word = m.group(2)
+                    if word.lower() == "powinienem":
+                        converted = "Powinnam" if word[0].isupper() else "powinnam"
+                    else:
+                        converted = convert_first_person_masculine_to_feminine(word)
                     if converted and converted != word:
                         applied_fixes.append(f"[Filar XIII/CXXXVI/CLXIX - Mówczyni Żeńska 1. os.] Korekta rodzaju męskiego na żeński: '{word}' -> '{converted}'")
-                        return converted
-                    return word
-                modified = re.sub(r"\b[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+(?:łem|łbym)\b", _morph_m_to_f_repl, modified)
+                        return f"{pref}{converted}"
+                    return m.group(0)
+                modified = re.sub(r"((?:^|\\[Nnh]|[^\w]))([A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+(?:łem|łbym)|[Pp]owinienem)\b", _morph_m_to_f_repl, modified)
 
             # 4b. 2nd-PERSON (ADDRESSEE) MORPHOLOGY: Ty / Adresat (Filar XIII & CLXIII)
             addr_norm = (addressee_gender or "").lower()
@@ -1119,21 +1133,22 @@ class AVTLinter:
 
             if is_female_addressee:
                 female_address_fixes = [
-                    (r"\b[Gg]łupi jesteś\?", "Głupia jesteś?"),
-                    (r"\b[Jj]esteś pewien\?", "Jesteś pewna?"),
+                    (r"((?:^|\\[Nnh]|[^\w]))([Gg]łupi)(?:\\[Nnh]|\s)+(jesteś\?)", lambda m: f"{m.group(1)}{'Głupia' if m.group(2)[0].isupper() else 'głupia'} {m.group(3)}"),
+                    (r"((?:^|\\[Nnh]|[^\w]))([Jj]esteś)(?:\\[Nnh]|\s)+(pewien\?)", lambda m: f"{m.group(1)}{m.group(2)} {'Pewna?' if m.group(3)[0].isupper() else 'pewna?'}"),
                     (r"\b[Oo]szalałeś\?", "Oszalałaś?"),
                     (r"\b[Zz]głupiałeś\?", "Zgłupiałaś?"),
-                    (r"\b[Ww]idziałeś to\?", "Widziałaś to?"),
-                    (r"\b[Ss]łyszałeś to\?", "Słyszałaś to?"),
-                    (r"\b[Zz]robiłeś to\?", "Zrobiłaś to?"),
-                    (r"\b[Pp]oszedłeś tam\?", "Poszłaś tam?"),
-                    (r"\b[Mm]yślałeś, że\b", "Myślałaś, że"),
-                    (r"\b([Ww]yglądasz\s+na|[Ss]prawiasz\s+wrażenie)\s+([A-Za-ząćęłńóśźż]{3,})ego\b", lambda m: f"{m.group(1)} {m.group(2)}ą" if m.group(2).lower() not in {"cz", "k", "dlacz", "tamt", "t", "nicz", "jakieś", "wszystki", "jedn"} else m.group(0)),
-                    (r"\b[Ww]yglądasz na wzburzonego\b", "Wyglądasz na wzburzoną"),
-                    (r"\bwyglądasz na wzburzonego\b", "wyglądasz na wzburzoną"),
-                    (r"\b[Jj]esteś pewien\b", lambda m: "Jesteś pewna" if m.group(0)[0].isupper() else "jesteś pewna"),
-                    (r"\b[Jj]esteś gotowy\b", lambda m: "Jesteś gotowa" if m.group(0)[0].isupper() else "jesteś gotowa"),
-                    (r"\b[Jj]esteś sam\b", lambda m: "Jesteś sama" if m.group(0)[0].isupper() else "jesteś sama"),
+                    (r"((?:^|\\[Nnh]|[^\w]))([Ww]idziałeś)(?:\\[Nnh]|\s)+(to\?)", lambda m: f"{m.group(1)}{'Widziałaś' if m.group(2)[0].isupper() else 'widziałaś'} {m.group(3)}"),
+                    (r"((?:^|\\[Nnh]|[^\w]))([Ss]łyszałeś)(?:\\[Nnh]|\s)+(to\?)", lambda m: f"{m.group(1)}{'Słyszałaś' if m.group(2)[0].isupper() else 'słyszałaś'} {m.group(3)}"),
+                    (r"((?:^|\\[Nnh]|[^\w]))([Zz]robiłeś)(?:\\[Nnh]|\s)+(to\?)", lambda m: f"{m.group(1)}{'Zrobiłaś' if m.group(2)[0].isupper() else 'zrobiłaś'} {m.group(3)}"),
+                    (r"((?:^|\\[Nnh]|[^\w]))([Pp]oszedłeś)(?:\\[Nnh]|\s)+(tam\?)", lambda m: f"{m.group(1)}{'Poszłaś' if m.group(2)[0].isupper() else 'poszłaś'} {m.group(3)}"),
+                    (r"((?:^|\\[Nnh]|[^\w]))([Mm]yślałeś,)(?:\\[Nnh]|\s)+(że)\b", lambda m: f"{m.group(1)}{'Myślałaś,' if m.group(2)[0].isupper() else 'myślałaś,'} {m.group(3)}"),
+                    (r"\b([Ww]yglądasz(?:\\[Nnh]|\s)+na|[Ss]prawiasz(?:\\[Nnh]|\s)+wrażenie)(?:\\[Nnh]|\s)+([A-Za-ząćęłńóśźż]{3,})ego\b", lambda m: f"{m.group(1)} {m.group(2)}ą" if m.group(2).lower() not in {"cz", "k", "dlacz", "tamt", "t", "nicz", "jakieś", "wszystki", "jedn"} else m.group(0)),
+                    (r"\b[Ww]yglądasz(?:\\[Nnh]|\s)+na(?:\\[Nnh]|\s)+wzburzonego\b", "Wyglądasz na wzburzoną"),
+                    (r"\bwyglądasz(?:\\[Nnh]|\s)+na(?:\\[Nnh]|\s)+wzburzonego\b", "wyglądasz na wzburzoną"),
+                    (r"((?:^|\\[Nnh]|[^\w]))([Jj]esteś)(?:\\[Nnh]|\s)+(pewien)\b", lambda m: f"{m.group(1)}{m.group(2)} {'Pewna' if m.group(3)[0].isupper() else 'pewna'}"),
+                    (r"((?:^|\\[Nnh]|[^\w]))([Jj]esteś)(?:\\[Nnh]|\s)+(gotowy)\b", lambda m: f"{m.group(1)}{m.group(2)} {'Gotowa' if m.group(3)[0].isupper() else 'gotowa'}"),
+                    (r"((?:^|\\[Nnh]|[^\w]))([Jj]esteś)(?:\\[Nnh]|\s)+(sam)\b", lambda m: f"{m.group(1)}{m.group(2)} {'Sama' if m.group(3)[0].isupper() else 'sama'}"),
+                    (r"((?:^|\\[Nnh]|[^\w]))([Tt]o(?:\\[Nnh]|\s)+ty)(?:\\[Nnh]|\s)+([A-Za-ząćęłńóśźż]+(?:łeś|łbyś)|powinieneś)\b", lambda m: f"{m.group(1)}{m.group(2)} {convert_2nd_person_masculine_to_feminine(m.group(3)) or m.group(3)}"),
                 ]
                 for pattern, repl in female_address_fixes:
                     if re.search(pattern, modified):
@@ -1142,20 +1157,21 @@ class AVTLinter:
 
             elif is_male_addressee:
                 male_address_fixes = [
-                    (r"\b[Gg]łupia jesteś\?", "Głupi jesteś?"),
-                    (r"\b[Jj]esteś pewna\?", "Jesteś pewien?"),
+                    (r"((?:^|\\[Nnh]|[^\w]))([Gg]łupia)(?:\\[Nnh]|\s)+(jesteś\?)", lambda m: f"{m.group(1)}{'Głupi' if m.group(2)[0].isupper() else 'głupi'} {m.group(3)}"),
+                    (r"((?:^|\\[Nnh]|[^\w]))([Jj]esteś)(?:\\[Nnh]|\s)+(pewna\?)", lambda m: f"{m.group(1)}{m.group(2)} {'Pewien?' if m.group(3)[0].isupper() else 'pewien?'}"),
                     (r"\b[Oo]szalałaś\?", "Oszalałeś?"),
                     (r"\b[Zz]głupiałaś\?", "Zgłupiałeś?"),
-                    (r"\b[Ww]idziałaś to\?", "Widziałeś to?"),
-                    (r"\b[Ss]łyszałaś to\?", "Słyszałeś to?"),
-                    (r"\b[Zz]robiłaś to\?", "Zrobiłeś to?"),
-                    (r"\b[Pp]oszłaś tam\?", "Poszedłeś tam?"),
-                    (r"\b[Mm]yślałaś, że\b", "Myślałeś, że"),
-                    (r"\b[Ww]yglądasz na wzburzoną\b", "Wyglądasz na wzburzonego"),
-                    (r"\bwyglądasz na wzburzoną\b", "wyglądasz na wzburzonego"),
-                    (r"\b[Jj]esteś pewna\b", lambda m: "Jesteś pewien" if m.group(0)[0].isupper() else "jesteś pewien"),
-                    (r"\b[Jj]esteś gotowa\b", lambda m: "Jesteś gotowy" if m.group(0)[0].isupper() else "jesteś gotowy"),
-                    (r"\b[Jj]esteś sama\b", lambda m: "Jesteś sam" if m.group(0)[0].isupper() else "jesteś sam"),
+                    (r"((?:^|\\[Nnh]|[^\w]))([Ww]idziałaś)(?:\\[Nnh]|\s)+(to\?)", lambda m: f"{m.group(1)}{'Widziałeś' if m.group(2)[0].isupper() else 'widziałeś'} {m.group(3)}"),
+                    (r"((?:^|\\[Nnh]|[^\w]))([Ss]łyszałaś)(?:\\[Nnh]|\s)+(to\?)", lambda m: f"{m.group(1)}{'Słyszałeś' if m.group(2)[0].isupper() else 'słyszałeś'} {m.group(3)}"),
+                    (r"((?:^|\\[Nnh]|[^\w]))([Zz]robiłaś)(?:\\[Nnh]|\s)+(to\?)", lambda m: f"{m.group(1)}{'Zrobiłeś' if m.group(2)[0].isupper() else 'zrobiłeś'} {m.group(3)}"),
+                    (r"((?:^|\\[Nnh]|[^\w]))([Pp]oszłaś)(?:\\[Nnh]|\s)+(tam\?)", lambda m: f"{m.group(1)}{'Poszedłeś' if m.group(2)[0].isupper() else 'poszedłeś'} {m.group(3)}"),
+                    (r"((?:^|\\[Nnh]|[^\w]))([Mm]yślałaś,)(?:\\[Nnh]|\s)+(że)\b", lambda m: f"{m.group(1)}{'Myślałeś,' if m.group(2)[0].isupper() else 'myślałeś,'} {m.group(3)}"),
+                    (r"\b[Ww]yglądasz(?:\\[Nnh]|\s)+na(?:\\[Nnh]|\s)+wzburzoną\b", "Wyglądasz na wzburzonego"),
+                    (r"\bwyglądasz(?:\\[Nnh]|\s)+na(?:\\[Nnh]|\s)+wzburzoną\b", "wyglądasz na wzburzonego"),
+                    (r"((?:^|\\[Nnh]|[^\w]))([Jj]esteś)(?:\\[Nnh]|\s)+(pewna)\b", lambda m: f"{m.group(1)}{m.group(2)} {'Pewien' if m.group(3)[0].isupper() else 'pewien'}"),
+                    (r"((?:^|\\[Nnh]|[^\w]))([Jj]esteś)(?:\\[Nnh]|\s)+(gotowa)\b", lambda m: f"{m.group(1)}{m.group(2)} {'Gotowy' if m.group(3)[0].isupper() else 'gotowy'}"),
+                    (r"((?:^|\\[Nnh]|[^\w]))([Jj]esteś)(?:\\[Nnh]|\s)+(sama)\b", lambda m: f"{m.group(1)}{m.group(2)} {'Sam' if m.group(3)[0].isupper() else 'sam'}"),
+                    (r"((?:^|\\[Nnh]|[^\w]))([Tt]o(?:\\[Nnh]|\s)+ty)(?:\\[Nnh]|\s)+([A-Za-ząćęłńóśźż]+(?:łaś|łabyś)|powinnaś)\b", lambda m: f"{m.group(1)}{m.group(2)} {convert_2nd_person_feminine_to_masculine(m.group(3)) or m.group(3)}"),
                 ]
                 for pattern, repl in male_address_fixes:
                     if re.search(pattern, modified):
@@ -1186,6 +1202,19 @@ class AVTLinter:
             modified, p_fixes = harmonize_text_2nd_person_plural(modified)
             if p_fixes:
                 applied_fixes.extend(p_fixes)
+
+        # 4a-1c. 1st-Person Plural Virile Group Agreement (Męskoosobowy 1. os. lm. -łyśmy -> -liśmy)
+        sg_str = str(speaker_gender or "").upper()
+        tg_str = str(addressee_gender or target_gender or "").upper()
+        spk_is_female = any(k in sg_str for k in ["FEMALE", "KOBIETA", "DZIEWCZYNA"])
+        spk_is_male = not spk_is_female and any(k in sg_str for k in ["MALE", "MEZCZYZNA", "MĘŻCZYZNA", "CHLOPIEC", "CHŁOPIEC", "CHLOPAK", "CHŁOPAK"])
+        tgt_is_female = any(k in tg_str for k in ["FEMALE", "KOBIETA", "DZIEWCZYNA"])
+        tgt_is_male = not tgt_is_female and any(k in tg_str for k in ["MALE", "MEZCZYZNA", "MĘŻCZYZNA", "CHLOPIEC", "CHŁOPIEC", "CHLOPAK", "CHŁOPAK"])
+        has_male_context = scene_has_male_participant or spk_is_male or tgt_is_male
+        if not is_sign and has_male_context:
+            modified, vir_fixes = harmonize_virile_group_1st_person_plural(modified, scene_has_male_participant=True)
+            if vir_fixes:
+                applied_fixes.extend(vir_fixes)
 
         # 4a-2. Female Vocative Case Harmonization (Filar LX & CLVII: Mianownik -> Wołacz dla imion żeńskich na -a)
         if not is_sign:
@@ -2810,6 +2839,51 @@ def convert_1st_person_plural_conditional_nonvirile_to_virile(verb: str) -> Opti
 
     return res.capitalize() if verb[0].isupper() else res
 
+def harmonize_virile_group_1st_person_plural(
+    text: str,
+    scene_has_male_participant: bool = False
+) -> Tuple[str, List[str]]:
+    """
+    Deterministyczny korektor rodzaju męskoosobowego 1. os. lm. (Filar CLXXV):
+    Gdy w scenie jest mężczyzna (scene_has_male_participant == True),
+    zamienia żeńskie formy 1. os. lm. (-łyśmy, -łybyśmy) na formy męskoosobowe (-liśmy, -libyśmy)
+    z pełnym uwzględnieniem oboczności rdzennych (np. wróciłyśmy -> wróciliśmy, widziałyśmy -> widzieliśmy,
+    znalazłyśmy -> znaleźliśmy, poszłyśmy -> poszliśmy, mogłyśmy -> mogliśmy).
+    """
+    if not text or not scene_has_male_participant:
+        return text, []
+
+    fixes = []
+    result = text
+
+    # Past tense: -łyśmy -> -liśmy
+    def _repl_past(m):
+        prefix = m.group(1) or ""
+        verb = m.group(2)
+        v_virile = convert_1st_person_plural_nonvirile_to_virile(verb)
+        if v_virile and v_virile.lower() != verb.lower():
+            fixes.append(f"[Episode Quality Gate - Filar CLXXV Morfologia Męskoosobowa 1. os. lm.] '{verb}' -> '{v_virile}'")
+            return f"{prefix}{v_virile}"
+        return m.group(0)
+
+    pat_past = r"((?:^|\\[Nnh]|[^\w]))([A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+łyśmy)\b"
+    result = re.sub(pat_past, _repl_past, result)
+
+    # Conditional tense: -łybyśmy -> -libyśmy
+    def _repl_cond(m):
+        prefix = m.group(1) or ""
+        verb = m.group(2)
+        v_virile = convert_1st_person_plural_conditional_nonvirile_to_virile(verb)
+        if v_virile and v_virile.lower() != verb.lower():
+            fixes.append(f"[Episode Quality Gate - Filar CLXXV Tryb Przypuszczający Męskoosobowy 1. os. lm.] '{verb}' -> '{v_virile}'")
+            return f"{prefix}{v_virile}"
+        return m.group(0)
+
+    pat_cond = r"((?:^|\\[Nnh]|[^\w]))([A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+łybyśmy)\b"
+    result = re.sub(pat_cond, _repl_cond, result)
+
+    return result, fixes
+
 MASCULINE_2ND_SG_IRREGULAR_TO_FEMININE: Dict[str, str] = {
     "poszedłeś": "poszłaś",
     "przyszedłeś": "przyszłaś",
@@ -4002,6 +4076,95 @@ def strip_false_ablative_instrumental(text: str, series_bible: Optional[Any] = N
 
     return result, fixes
 
+NEUTER_INSTITUTIONS_FALSE_FEMININE_MAP: Dict[str, str] = {
+    "biurą": "biura",
+    "miastą": "miasta",
+    "królestwą": "królestwa",
+    "ministerstwą": "ministerstwa",
+    "dowództwą": "dowództwa",
+    "kierownictwą": "kierownictwa",
+    "województwą": "województwa",
+    "państwą": "państwa",
+    "cesarstwą": "cesarstwa",
+    "imperiumą": "imperium",
+    "sztabą": "sztabu",
+    "oddziałą": "oddziału",
+}
+
+GROUP_ABLATIVE_TRIGGERS_PATTERN = (
+    r"(?:ludzie|członkowie|ci|tamci|agenci|pracownicy|oddział|goście|koledzy|szef|żołnierze|rycerze|wojska|posłowie|przybysze|"
+    r"dotarli|dotarł|dotarła|przybyli|przybył|przybyła|wrócili|wrócił|wróciła|przyszli|przyszedł|przyszła|"
+    r"wyszedł|wyszli|wyszła|uciekł|uciekli|uciekła|pochodzi|pochodzą|pochodził|pochodziła|pochodzili)"
+)
+
+def strip_false_feminine_instrumental(text: str, series_bible: Optional[Any] = None) -> Tuple[str, List[str]]:
+    """
+    Striper fałszywego narzędnika żeńskiego (Filar IV / Filar CLVI):
+    W konstrukcjach pochodzenia / grupy:
+    - np. 'ci z Biurą' -> 'ci z Biura'
+    - 'ludzie z Miastą' -> 'ludzie z Miasta'
+    - 'wrócili z Królestwą' -> 'wrócili z Królestwa'
+    - 'wyszedł z Ministerstwą' -> 'wyszedł z Ministerstwa'
+    oraz ogólnie dla rzeczowników pospolitych i instytucji po 'z/ze'.
+    """
+    if not text:
+        return text, []
+
+    fixes = []
+    result = text
+
+    # 1. Rzeczowniki pospolite / instytucje bezpośrednio po z/ze z fałszywym -ą
+    for bad_w, good_w in NEUTER_INSTITUTIONS_FALSE_FEMININE_MAP.items():
+        pat_inst = rf"((?:^|\\[Nnh]|[^\w])(?:z|ze)(?:\\[Nnh]|\s)+)({re.escape(bad_w)})\b"
+        def _repl_inst(m, gw=good_w):
+            lead = m.group(1)
+            old_w = m.group(2)
+            repl = gw.capitalize() if old_w[0].isupper() else gw
+            fixes.append(f"[False Feminine Instrumental] Skorygowano narzędnik na dopełniacz: '{old_w}' -> '{repl}'")
+            return f"{lead}{repl}"
+        result = re.sub(pat_inst, _repl_inst, result, flags=re.IGNORECASE)
+
+    # 2. Konstrukcje grupy lub czasowników ruchu/pochodzenia z/ze + rzeczownik z -ą
+    from series_memory import (
+        is_inherently_female_name, INSTITUTION_NOUNS, INSTITUTIONAL_SUFFIXES,
+        EntityCategory
+    )
+    pat_group = rf"\b({GROUP_ABLATIVE_TRIGGERS_PATTERN})((?:\\[Nnh]|\s)+(?:z|ze)(?:\\[Nnh]|\s)+)([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+)ą\b"
+    def _repl_group(m):
+        trigger = m.group(1)
+        sep = m.group(2)
+        stem = m.group(3)
+        lower_full = f"{stem.lower()}ą"
+        cand_neuter = f"{stem.lower()}o"
+        cand_fem_name = f"{stem}a"
+
+        # Protection: real feminine anthroponyms / female persons are true companions (z Anną, z Martą, z Marią)
+        if is_inherently_female_name(cand_fem_name, series_bible=series_bible):
+            return m.group(0)
+        if series_bible and hasattr(series_bible, "get_entity_category"):
+            if series_bible.get_entity_category(cand_fem_name) == EntityCategory.ANTHROPONYM:
+                return m.group(0)
+
+        # Mutate ONLY if confirmed neuter institution or registered toponym/chrematonym
+        if lower_full in NEUTER_INSTITUTIONS_FALSE_FEMININE_MAP:
+            corr = NEUTER_INSTITUTIONS_FALSE_FEMININE_MAP[lower_full]
+            corr = corr.capitalize() if stem[0].isupper() else corr
+        elif cand_neuter in INSTITUTION_NOUNS or any(cand_neuter.endswith(suf) for suf in INSTITUTIONAL_SUFFIXES):
+            corr = f"{stem}a"
+        elif series_bible and hasattr(series_bible, "is_non_character_entity") and series_bible.is_non_character_entity(cand_neuter):
+            corr = f"{stem}a"
+        elif series_bible and hasattr(series_bible, "get_entity_category") and series_bible.get_entity_category(stem) in (EntityCategory.TOPONYM, EntityCategory.CHREMATONYM):
+            paradigm = series_bible.get_entity_paradigm(stem) if hasattr(series_bible, "get_entity_paradigm") else None
+            corr = getattr(paradigm, "D", f"{stem}a") if paradigm else f"{stem}a"
+        else:
+            return m.group(0)
+
+        fixes.append(f"[False Feminine Instrumental] Przywrócono dopełniacz: '{m.group(0)}' -> '{trigger}{sep}{corr}'")
+        return f"{trigger}{sep}{corr}"
+
+    result = re.sub(pat_group, _repl_group, result)
+    return result, fixes
+
 def fix_masculine_vocative_tz(text: str) -> Tuple[str, List[str]]:
     """
     Naprawia w tekście błędne końcówki wołacza/miejscownika -tzie -> -tzu dla imion męskich:
@@ -4149,19 +4312,21 @@ def harmonize_copula_and_predicate_adjective(
     fixes = []
     result = text
 
+    SEP = r"(?:\\[Nnh]|\s)+"
     COPULA_PAT = (
-        r"\b((?:nie\s+bądź|bądź|nie\s+jesteś|jesteś|nie\s+byłeś|byłeś|nie\s+byłaś|byłaś|"
-        r"nie\s+stałeś\s+się|stałeś\s+się|nie\s+stałaś\s+się|stałaś\s+się|nie\s+jestem|jestem)\s+"
-        r"(?:(?:zbyt|tak|taki|taka|całkowicie)\s+)?)([A-Za-ząćęłńóśźż]+)"
-        r"(?:(\s+(?:i|oraz|ani)\s+(?:(?:zbyt|tak|taki|taka|całkowicie)\s+)?)([A-Za-ząćęłńóśźż]+))?\b"
+        rf"((?:^|\\[Nnh]|[^\w]))((?:nie{SEP}bądź|bądź|nie{SEP}jesteś|jesteś|nie{SEP}byłeś|byłeś|nie{SEP}byłaś|byłaś|"
+        rf"nie{SEP}stałeś{SEP}się|stałeś{SEP}się|nie{SEP}stałaś{SEP}się|stałaś{SEP}się|nie{SEP}jestem|jestem){SEP}"
+        rf"(?:(?:zbyt|tak|taki|taka|całkowicie){SEP})?)([A-Za-ząćęłńóśźż]+)"
+        rf"(?:({SEP}(?:i|oraz|ani){SEP}(?:(?:zbyt|tak|taki|taka|całkowicie){SEP})?)([A-Za-ząćęłńóśźż]+))?\b"
     )
 
     def _repl(m):
         full = m.group(0)
-        prefix = m.group(1)
-        adj = m.group(2)
-        coord_prefix = m.group(3) or ""
-        adj2 = m.group(4) or ""
+        lead = m.group(1) or ""
+        prefix = m.group(2)
+        adj = m.group(3)
+        coord_prefix = m.group(4) or ""
+        adj2 = m.group(5) or ""
 
         # Determine if this clause is 1st person or 2nd person
         is_1p = bool(re.search(r"\bjestem\b", prefix, re.IGNORECASE))
@@ -4180,25 +4345,25 @@ def harmonize_copula_and_predicate_adjective(
             if re.search(r"\bbyłaś\b", new_prefix, re.IGNORECASE):
                 new_prefix = re.sub(r"\bByłaś\b", "Byłeś", new_prefix)
                 new_prefix = re.sub(r"\bbyłaś\b", "byłeś", new_prefix)
-            if re.search(r"\bstałaś\s+się\b", new_prefix, re.IGNORECASE):
-                new_prefix = re.sub(r"\bStałaś\s+się\b", "Stałeś się", new_prefix)
-                new_prefix = re.sub(r"\bstałaś\s+się\b", "stałeś się", new_prefix)
+            if re.search(rf"\bstałaś{SEP}się\b", new_prefix, re.IGNORECASE):
+                new_prefix = re.sub(rf"\bStałaś{SEP}się\b", "Stałeś się", new_prefix)
+                new_prefix = re.sub(rf"\bstałaś{SEP}się\b", "stałeś się", new_prefix)
             # 2. Modifier adjustment
-            if re.search(r"\btaka\s+", new_prefix, re.IGNORECASE):
-                new_prefix = re.sub(r"\bTaka\s+", "Taki ", new_prefix)
-                new_prefix = re.sub(r"\btaka\s+", "taki ", new_prefix)
+            if re.search(rf"\btaka{SEP}", new_prefix, re.IGNORECASE):
+                new_prefix = re.sub(rf"\bTaka{SEP}", "Taki ", new_prefix)
+                new_prefix = re.sub(rf"\btaka{SEP}", "taki ", new_prefix)
         elif is_female:
             # 1. Copula adjustment if masculine
             if re.search(r"\bbyłeś\b", new_prefix, re.IGNORECASE):
                 new_prefix = re.sub(r"\bByłeś\b", "Byłaś", new_prefix)
                 new_prefix = re.sub(r"\bbyłeś\b", "byłaś", new_prefix)
-            if re.search(r"\bstałeś\s+się\b", new_prefix, re.IGNORECASE):
-                new_prefix = re.sub(r"\bStałeś\s+się\b", "Stałaś się", new_prefix)
-                new_prefix = re.sub(r"\bstałeś\s+się\b", "stałaś się", new_prefix)
+            if re.search(rf"\bstałeś{SEP}się\b", new_prefix, re.IGNORECASE):
+                new_prefix = re.sub(rf"\bStałeś{SEP}się\b", "Stałaś się", new_prefix)
+                new_prefix = re.sub(rf"\bstałeś{SEP}się\b", "stałaś się", new_prefix)
             # 2. Modifier adjustment
-            if re.search(r"\btaki\s+", new_prefix, re.IGNORECASE):
-                new_prefix = re.sub(r"\bTaki\s+", "Taka ", new_prefix)
-                new_prefix = re.sub(r"\btaki\s+", "taka ", new_prefix)
+            if re.search(rf"\btaki{SEP}", new_prefix, re.IGNORECASE):
+                new_prefix = re.sub(rf"\bTaki{SEP}", "Taka ", new_prefix)
+                new_prefix = re.sub(rf"\btaki{SEP}", "taka ", new_prefix)
 
         def _convert_single_adj(w: str) -> str:
             if not w:
@@ -4237,7 +4402,7 @@ def harmonize_copula_and_predicate_adjective(
         new_adj = _convert_single_adj(adj)
         new_adj2 = _convert_single_adj(adj2) if adj2 else ""
 
-        res_clause = f"{new_prefix}{new_adj}{coord_prefix}{new_adj2}"
+        res_clause = f"{lead}{new_prefix}{new_adj}{coord_prefix}{new_adj2}"
         if res_clause != full:
             fixes.append(f"[Zgodność Orzecznika Przymiotnikowego] '{full}' -> '{res_clause}'")
             return res_clause
@@ -4307,25 +4472,27 @@ def harmonize_2nd_person_predicate_nouns(
     }
     MOD_MAP_M_TO_F = {v: k for k, v in MOD_MAP_F_TO_M.items()}
 
+    SEP = r"(?:\\[Nnh]|\s)+"
     if is_male:
         nouns_pat = "|".join(re.escape(k) for k in NOUN_MAP_F_TO_M.keys())
         mods_pat = "|".join(re.escape(k) for k in MOD_MAP_F_TO_M.keys())
-        pat = rf"\b((?:nie\s+jesteś|jesteś|nie\s+byłeś|byłeś|nie\s+byłaś|byłaś|nie\s+stałeś\s+się|stałeś\s+się|nie\s+stałaś\s+się|stałaś\s+się)\s+)((?:(?:{mods_pat})\s+)*)({nouns_pat})(?:(\s+(?:i|oraz|ani)\s+)((?:(?:{mods_pat})\s+)*)({nouns_pat}))?\b"
+        pat = rf"((?:^|\\[Nnh]|[^\w]))((?:nie{SEP}jesteś|jesteś|nie{SEP}byłeś|byłeś|nie{SEP}byłaś|byłaś|nie{SEP}stałeś{SEP}się|stałeś{SEP}się|nie{SEP}stałaś{SEP}się|stałaś{SEP}się){SEP})((?:(?:{mods_pat}){SEP})*)({nouns_pat})(?:({SEP}(?:i|oraz|ani){SEP})((?:(?:{mods_pat}){SEP})*)({nouns_pat}))?\b"
 
         def _repl_m(m):
-            copula = m.group(1)
-            mods_str = m.group(2)
-            noun = m.group(3)
-            coord = m.group(4) or ""
-            mods_str2 = m.group(5) or ""
-            noun2 = m.group(6) or ""
+            lead = m.group(1) or ""
+            copula = m.group(2)
+            mods_str = m.group(3)
+            noun = m.group(4)
+            coord = m.group(5) or ""
+            mods_str2 = m.group(6) or ""
+            noun2 = m.group(7) or ""
 
             if re.search(r"\bbyłaś\b", copula, re.IGNORECASE):
                 copula = re.sub(r"\bByłaś\b", "Byłeś", copula)
                 copula = re.sub(r"\bbyłaś\b", "byłeś", copula)
-            if re.search(r"\bstałaś\s+się\b", copula, re.IGNORECASE):
-                copula = re.sub(r"\bStałaś\s+się\b", "Stałeś się", copula)
-                copula = re.sub(r"\bstałaś\s+się\b", "stałeś się", copula)
+            if re.search(rf"\bstałaś{SEP}się\b", copula, re.IGNORECASE):
+                copula = re.sub(rf"\bStałaś{SEP}się\b", "Stałeś się", copula)
+                copula = re.sub(rf"\bstałaś{SEP}się\b", "stałeś się", copula)
 
             def _convert_phrase_m(m_str, n):
                 new_mods = []
@@ -4343,7 +4510,7 @@ def harmonize_2nd_person_predicate_nouns(
 
             p1 = _convert_phrase_m(mods_str, noun)
             p2 = f"{coord}{_convert_phrase_m(mods_str2, noun2)}" if coord and noun2 else ""
-            fixed = f"{copula}{p1}{p2}"
+            fixed = f"{lead}{copula}{p1}{p2}"
             fixes.append(f"[Harmonizacja Roli Predykatywnej 2. os. (MALE)] '{m.group(0)}' -> '{fixed}'")
             return fixed
 
@@ -4352,22 +4519,23 @@ def harmonize_2nd_person_predicate_nouns(
     elif is_female:
         nouns_pat = "|".join(re.escape(k) for k in NOUN_MAP_M_TO_F.keys())
         mods_pat = "|".join(re.escape(k) for k in MOD_MAP_M_TO_F.keys())
-        pat = rf"\b((?:nie\s+jesteś|jesteś|nie\s+byłeś|byłeś|nie\s+byłaś|byłaś|nie\s+stałeś\s+się|stałeś\s+się|nie\s+stałaś\s+się|stałaś\s+się)\s+)((?:(?:{mods_pat})\s+)*)({nouns_pat})(?:(\s+(?:i|oraz|ani)\s+)((?:(?:{mods_pat})\s+)*)({nouns_pat}))?\b"
+        pat = rf"((?:^|\\[Nnh]|[^\w]))((?:nie{SEP}jesteś|jesteś|nie{SEP}byłeś|byłeś|nie{SEP}byłaś|byłaś|nie{SEP}stałeś{SEP}się|stałeś{SEP}się|nie{SEP}stałaś{SEP}się|stałaś{SEP}się){SEP})((?:(?:{mods_pat}){SEP})*)({nouns_pat})(?:({SEP}(?:i|oraz|ani){SEP})((?:(?:{mods_pat}){SEP})*)({nouns_pat}))?\b"
 
         def _repl_f(m):
-            copula = m.group(1)
-            mods_str = m.group(2)
-            noun = m.group(3)
-            coord = m.group(4) or ""
-            mods_str2 = m.group(5) or ""
-            noun2 = m.group(6) or ""
+            lead = m.group(1) or ""
+            copula = m.group(2)
+            mods_str = m.group(3)
+            noun = m.group(4)
+            coord = m.group(5) or ""
+            mods_str2 = m.group(6) or ""
+            noun2 = m.group(7) or ""
 
             if re.search(r"\bbyłeś\b", copula, re.IGNORECASE):
                 copula = re.sub(r"\bByłeś\b", "Byłaś", copula)
                 copula = re.sub(r"\bbyłeś\b", "byłaś", copula)
-            if re.search(r"\bstałeś\s+się\b", copula, re.IGNORECASE):
-                copula = re.sub(r"\bStałeś\s+się\b", "Stałaś się", copula)
-                copula = re.sub(r"\bstałeś\s+się\b", "stałaś się", copula)
+            if re.search(rf"\bstałeś{SEP}się\b", copula, re.IGNORECASE):
+                copula = re.sub(rf"\bStałeś{SEP}się\b", "Stałaś się", copula)
+                copula = re.sub(rf"\bstałeś{SEP}się\b", "stałaś się", copula)
 
             def _convert_phrase_f(m_str, n):
                 new_mods = []
@@ -4385,7 +4553,7 @@ def harmonize_2nd_person_predicate_nouns(
 
             p1 = _convert_phrase_f(mods_str, noun)
             p2 = f"{coord}{_convert_phrase_f(mods_str2, noun2)}" if coord and noun2 else ""
-            fixed = f"{copula}{p1}{p2}"
+            fixed = f"{lead}{copula}{p1}{p2}"
             fixes.append(f"[Harmonizacja Roli Predykatywnej 2. os. (FEMALE)] '{m.group(0)}' -> '{fixed}'")
             return fixed
 
@@ -4419,13 +4587,17 @@ def harmonize_verbal_gender_1st_and_2nd(
 
         if is_spk_male:
             def _repl_1p_m(m):
-                w = m.group(0)
-                converted = convert_first_person_feminine_to_masculine(w)
+                pref = m.group(1) or ""
+                w = m.group(2)
+                if w.lower() == "powinnam":
+                    converted = "Powinienem" if w[0].isupper() else "powinienem"
+                else:
+                    converted = convert_first_person_feminine_to_masculine(w)
                 if converted and converted.lower() != w.lower():
                     fixes.append(f"[Korektor Czasowników 1. os. (MALE)] '{w}' -> '{converted}'")
-                    return converted
-                return w
-            result = re.sub(r"\b[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+(?:łam|łabym)\b", _repl_1p_m, result)
+                    return f"{pref}{converted}"
+                return m.group(0)
+            result = re.sub(r"((?:^|\\[Nnh]|[^\w]))([A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+(?:łam|łabym)|[Pp]owinnam)\b", _repl_1p_m, result)
 
             def _repl_fut_1m(m):
                 pref = m.group(1)
@@ -4435,17 +4607,21 @@ def harmonize_verbal_gender_1st_and_2nd(
                     fixes.append(f"[Czas Przyszły Złożony 1. os. (MALE)] '{pref}{verb}' -> '{pref}{c_verb}'")
                     return f"{pref}{c_verb}"
                 return m.group(0)
-            result = re.sub(r"\b(będę\s+)([a-ząćęłńóśźż]+(?:ła|szła|mogła|niosła|wiozła|wiodła|ł))\b", _repl_fut_1m, result, flags=re.IGNORECASE)
+            result = re.sub(r"\b(będę(?:\\[Nnh]|\s)+)([a-ząćęłńóśźż]+(?:ła|szła|mogła|niosła|wiozła|wiodła|ł))\b", _repl_fut_1m, result, flags=re.IGNORECASE)
 
         elif is_spk_female:
             def _repl_1p_f(m):
-                w = m.group(0)
-                converted = convert_first_person_masculine_to_feminine(w)
+                pref = m.group(1) or ""
+                w = m.group(2)
+                if w.lower() == "powinienem":
+                    converted = "Powinnam" if w[0].isupper() else "powinnam"
+                else:
+                    converted = convert_first_person_masculine_to_feminine(w)
                 if converted and converted.lower() != w.lower():
                     fixes.append(f"[Korektor Czasowników 1. os. (FEMALE)] '{w}' -> '{converted}'")
-                    return converted
-                return w
-            result = re.sub(r"\b[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+(?:łem|łbym)\b", _repl_1p_f, result)
+                    return f"{pref}{converted}"
+                return m.group(0)
+            result = re.sub(r"((?:^|\\[Nnh]|[^\w]))([A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+(?:łem|łbym)|[Pp]owinienem)\b", _repl_1p_f, result)
 
             def _repl_fut_1f(m):
                 pref = m.group(1)
@@ -4455,7 +4631,7 @@ def harmonize_verbal_gender_1st_and_2nd(
                     fixes.append(f"[Czas Przyszły Złożony 1. os. (FEMALE)] '{pref}{verb}' -> '{pref}{c_verb}'")
                     return f"{pref}{c_verb}"
                 return m.group(0)
-            result = re.sub(r"\b(będę\s+)([a-ząćęłńóśźż]+(?:ł|szedł|mógł|niósł|wiózł|wiódł))\b", _repl_fut_1f, result, flags=re.IGNORECASE)
+            result = re.sub(r"\b(będę(?:\\[Nnh]|\s)+)([a-ząćęłńóśźż]+(?:ł|szedł|mógł|niósł|wiózł|wiódł))\b", _repl_fut_1f, result, flags=re.IGNORECASE)
 
     # --- 2. PERSON VERBS (ADDRESSEE) ---
     if target_gender:
@@ -4465,13 +4641,17 @@ def harmonize_verbal_gender_1st_and_2nd(
 
         if is_tgt_male:
             def _repl_2p_m(m):
-                w = m.group(0)
-                converted = convert_2nd_person_feminine_to_masculine(w)
+                pref = m.group(1) or ""
+                w = m.group(2)
+                if w.lower() == "powinnaś":
+                    converted = "Powinieneś" if w[0].isupper() else "powinieneś"
+                else:
+                    converted = convert_2nd_person_feminine_to_masculine(w)
                 if converted and converted.lower() != w.lower():
                     fixes.append(f"[Korektor Czasowników 2. os. (MALE)] '{w}' -> '{converted}'")
-                    return converted
-                return w
-            result = re.sub(r"\b[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+(?:łaś|łabyś)\b", _repl_2p_m, result)
+                    return f"{pref}{converted}"
+                return m.group(0)
+            result = re.sub(r"((?:^|\\[Nnh]|[^\w]))([A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+(?:łaś|łabyś)|[Pp]owinnaś)\b", _repl_2p_m, result)
 
             def _repl_fut_2m(m):
                 pref = m.group(1)
@@ -4481,17 +4661,21 @@ def harmonize_verbal_gender_1st_and_2nd(
                     fixes.append(f"[Czas Przyszły Złożony 2. os. (MALE)] '{pref}{verb}' -> '{pref}{c_verb}'")
                     return f"{pref}{c_verb}"
                 return m.group(0)
-            result = re.sub(r"\b(będziesz\s+)([a-ząćęłńóśźż]+(?:ła|szła|mogła|niosła|wiozła|wiodła|ł))\b", _repl_fut_2m, result, flags=re.IGNORECASE)
+            result = re.sub(r"\b(będziesz(?:\\[Nnh]|\s)+)([a-ząćęłńóśźż]+(?:ła|szła|mogła|niosła|wiozła|wiodła|ł))\b", _repl_fut_2m, result, flags=re.IGNORECASE)
 
         elif is_tgt_female:
             def _repl_2p_f(m):
-                w = m.group(0)
-                converted = convert_2nd_person_masculine_to_feminine(w)
+                pref = m.group(1) or ""
+                w = m.group(2)
+                if w.lower() == "powinieneś":
+                    converted = "Powinnaś" if w[0].isupper() else "powinnaś"
+                else:
+                    converted = convert_2nd_person_masculine_to_feminine(w)
                 if converted and converted.lower() != w.lower():
                     fixes.append(f"[Korektor Czasowników 2. os. (FEMALE)] '{w}' -> '{converted}'")
-                    return converted
-                return w
-            result = re.sub(r"\b[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+(?:łeś|łbyś)\b", _repl_2p_f, result)
+                    return f"{pref}{converted}"
+                return m.group(0)
+            result = re.sub(r"((?:^|\\[Nnh]|[^\w]))([A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+(?:łeś|łbyś)|[Pp]owinieneś)\b", _repl_2p_f, result)
 
             def _repl_2pl_f(m):
                 w = m.group(0)
@@ -4510,7 +4694,7 @@ def harmonize_verbal_gender_1st_and_2nd(
                     fixes.append(f"[Czas Przyszły Złożony 2. os. (FEMALE)] '{pref}{verb}' -> '{pref}{c_verb}'")
                     return f"{pref}{c_verb}"
                 return m.group(0)
-            result = re.sub(r"\b(będziesz\s+)([a-ząćęłńóśźż]+(?:ł|szedł|mógł|niósł|wiózł|wiódł))\b", _repl_fut_2f, result, flags=re.IGNORECASE)
+            result = re.sub(r"\b(będziesz(?:\\[Nnh]|\s)+)([a-ząćęłńóśźż]+(?:ł|szedł|mógł|niósł|wiózł|wiódł))\b", _repl_fut_2f, result, flags=re.IGNORECASE)
 
     return result, fixes
 
@@ -5347,6 +5531,7 @@ class EpisodeQualityGate:
         # Groups events into scene blocks based on temporal gap (>= 3200ms) or scene boundary.
         # Resolves scene-level gender exclusivity when individual events have empty ev.name.
         event_scene_gender: Dict[int, str] = {}  # event_idx -> 'FEMALE' | 'MALE'
+        event_scene_has_male: Dict[int, bool] = {}  # event_idx -> bool
 
         scene_blocks: List[List[int]] = []
         cur_scene: List[int] = []
@@ -5430,6 +5615,30 @@ class EpisodeQualityGate:
                 if not has_opp_addr:
                     for s_idx in s_block:
                         event_scene_gender[s_idx] = s_gender
+
+            scene_has_m = False
+            for s_idx in s_block:
+                s_ev = events[s_idx]
+                s_act = getattr(s_ev, "name", None) or getattr(s_ev, "actor", None) or (line_speakers.get(s_idx) if line_speakers else None)
+                if s_act and not is_generic_actor_or_category(str(s_act)):
+                    cl_act = extract_clean_speaker_name(str(s_act))
+                    if char_gender_map.get(cl_act.lower()) == "MALE":
+                        scene_has_m = True
+                        break
+                r_addr = getattr(s_ev, "addressee", None) or (line_addressees.get(s_idx) if line_addressees else None)
+                if r_addr and not is_generic_actor_or_category(str(r_addr)):
+                    cl_addr = extract_clean_speaker_name(str(r_addr))
+                    if char_gender_map.get(cl_addr.lower()) == "MALE":
+                        scene_has_m = True
+                        break
+                pt_val = (prosody_tags.get(s_idx, "") if prosody_tags else "") or getattr(s_ev, "prosody", "") or ""
+                if any(w in str(pt_val).lower() for w in ["baryton", "bas", "męsk", "mowca_m", "speaker_m"]):
+                    scene_has_m = True
+                    break
+            if not scene_has_m:
+                scene_has_m = (s_gender == "MALE") or any(char_gender_map.get(s.lower()) == "MALE" for s in scene_spks)
+            for s_idx in s_block:
+                event_scene_has_male[s_idx] = scene_has_m
 
         for i, ev in enumerate(events):
             if not ev.text or not ev.text.strip():
@@ -5517,6 +5726,11 @@ class EpisodeQualityGate:
             if f_abl_text != ev.text:
                 ev.text = f_abl_text
                 fixes.extend([f"Linia #{i+1}: {fx}" for fx in abl_fixes])
+
+            f_fem_inst_text, fem_inst_fixes = strip_false_feminine_instrumental(ev.text, series_bible=series_bible)
+            if f_fem_inst_text != ev.text:
+                ev.text = f_fem_inst_text
+                fixes.extend([f"Linia #{i+1}: {fx}" for fx in fem_inst_fixes])
 
             if has_2nd_person_plural_verb(ev.text) and not re.search(r"\b(?:wy\s+obaj|wy\s+obie)\b", ev.text, re.IGNORECASE):
                 f_pl_text, pl_fixes = harmonize_text_2nd_person_plural(ev.text)
@@ -6481,13 +6695,17 @@ class EpisodeQualityGate:
                             ev.text = re.sub(f_pat, _m_case_repl, ev.text, flags=re.IGNORECASE)
                             fixes.append(f"[Episode Quality Gate - Spójność Płci Postaci] Linia #{i+1}: skorygowano 1. os. na rodzaj męski dla mówcy '{label_spk}' ('{matched_word}' -> '{m_repl}')")
                     def _morph_f_to_m_repl(m):
-                        word = m.group(0)
-                        converted = convert_first_person_feminine_to_masculine(word)
+                        lead = m.group(1)
+                        word = m.group(2)
+                        if word.lower() == "powinnam":
+                            converted = "Powinienem" if word[0].isupper() else "powinienem"
+                        else:
+                            converted = convert_first_person_feminine_to_masculine(word)
                         if converted and converted != word:
                             fixes.append(f"[Episode Quality Gate - Spójność Płci Postaci] Linia #{i+1}: skorygowano 1. os. na rodzaj męski dla mówcy '{label_spk}' ('{word}' -> '{converted}')")
-                            return converted
-                        return word
-                    ev.text = re.sub(r"\b[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+(?:łam|łabym)\b", _morph_f_to_m_repl, ev.text)
+                            return lead + converted
+                        return lead + word
+                    ev.text = re.sub(r"((?:^|\\[Nnh]|[^\w]))([A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+(?:łam|łabym)|[Pp]owinnam)\b", _morph_f_to_m_repl, ev.text)
                     # Compound predicates for male speaker
                     SAFE_INTERVENING_SPAN_1P = (
                         r"(?:(?:już|jeszcze|teraz|zbyt|tak|bardzo|dość|naprawdę|wreszcie|wtedy|znowu|ciągle|przecież|chyba|pewnie|całkiem|aż\s+tak|w\s+końcu|do\s+końca|nadal)\s+){0,3}(?:\{[^}]*\}\s*)?"
@@ -6586,13 +6804,17 @@ class EpisodeQualityGate:
                             ev.text = re.sub(m_pat, _f_case_repl, ev.text, flags=re.IGNORECASE)
                             fixes.append(f"[Episode Quality Gate - Spójność Płci Postaci] Linia #{i+1}: skorygowano 1. os. na rodzaj żeński dla mówczyni '{label_spk}' ('{matched_word}' -> '{f_repl}')")
                     def _morph_m_to_f_repl(m):
-                        word = m.group(0)
-                        converted = convert_first_person_masculine_to_feminine(word)
+                        lead = m.group(1)
+                        word = m.group(2)
+                        if word.lower() == "powinienem":
+                            converted = "Powinnam" if word[0].isupper() else "powinnam"
+                        else:
+                            converted = convert_first_person_masculine_to_feminine(word)
                         if converted and converted != word:
                             fixes.append(f"[Episode Quality Gate - Spójność Płci Postaci] Linia #{i+1}: skorygowano 1. os. na rodzaj żeński dla mówczyni '{label_spk}' ('{word}' -> '{converted}')")
-                            return converted
-                        return word
-                    ev.text = re.sub(r"\b[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+(?:łem|łbym)\b", _morph_m_to_f_repl, ev.text)
+                            return lead + converted
+                        return lead + word
+                    ev.text = re.sub(r"((?:^|\\[Nnh]|[^\w]))([A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+(?:łem|łbym)|[Pp]owinienem)\b", _morph_m_to_f_repl, ev.text)
                     # Compound predicates for female speaker
                     SAFE_INTERVENING_SPAN_1P = (
                         r"(?:(?:już|jeszcze|teraz|zbyt|tak|bardzo|dość|naprawdę|wreszcie|wtedy|znowu|ciągle|przecież|chyba|pewnie|całkiem|aż\s+tak|w\s+końcu|do\s+końca|nadal)\s+){0,3}(?:\{[^}]*\}\s*)?"
@@ -7577,33 +7799,36 @@ class EpisodeQualityGate:
                     def _harmonize_2nd_person_gender(t: str, target_female: bool, target_male: bool, line_num: int, fixes_list: List[str]) -> str:
                         if target_female:
                             # 1. Convert masculine 2nd-person singular past/conditional/modal verbs -> feminine
-                            for m in list(re.finditer(r"\b([A-Za-ząćęłńóśźż]+(?:łeś|łbyś)|powinieneś)\b", t, re.IGNORECASE)):
-                                v_masc = m.group(1)
+                            def _repl_2p_m_to_f(m):
+                                lead = m.group(1)
+                                v_masc = m.group(2)
                                 v_fem = convert_2nd_person_masculine_to_feminine(v_masc)
                                 if v_fem and v_fem.lower() != v_masc.lower():
-                                    t = re.sub(rf"\b{re.escape(v_masc)}\b", v_fem, t, count=1)
                                     fixes_list.append(f"[Episode Quality Gate - Filar CLXIII Morfologia Żeńska 2. os. lp.] Linia #{line_num}: skorygowano formę męską '{v_masc}' -> '{v_fem}' (adresat: kobieta)")
+                                    return lead + v_fem
+                                return lead + v_masc
+                            t = re.sub(r"((?:^|\\[Nnh]|[^\w]))([A-Za-ząćęłńóśźż]+(?:łeś|łbyś)|powinieneś)\b", _repl_2p_m_to_f, t, flags=re.IGNORECASE)
                             # Harmonize auxiliary 'był' -> 'była' after 2nd-person feminine modal/verb (strictly single word)
-                            t = re.sub(r"\b((?:[Pp]owinnaś|[Bb]yłaś|[Mm]iałaś)\s+)(był)\b", r"\g<1>była", t)
+                            t = re.sub(r"((?:^|\\[Nnh]|[^\w])(?:[Pp]owinnaś|[Bb]yłaś|[Mm]iałaś)(?:\\[Nnh]|\s)+)(był)\b", r"\g<1>była", t)
 
                             # 2. Convert masculine adjectives / participles -> feminine (with safe long-distance span up to 4 words)
                             # Mutates strictly the adjective token, keeping prefix 100% untouched
                             SAFE_INTERVENING_SPAN = (
                                 r"(?:(?:taki|taka|zbyt|tak|bardzo|dość|naprawdę|wreszcie|wtedy|znowu|ciągle|przecież|chyba|pewnie|całkiem|aż\s+tak|w\s+końcu|"
-                                r"(?!(?:i|a|oraz|ale|lecz|lub|albo|czy|że|gdy|kiedy|ponieważ|bo|jeśli|gdyby|choć|chociaż)\b)[A-Za-ząćęłńóśźż]{1,15})\s+){0,4}"
+                                r"(?!(?:i|a|oraz|ale|lecz|lub|albo|czy|że|gdy|kiedy|ponieważ|bo|jeśli|gdyby|choć|chociaż)\b)[A-Za-ząćęłńóśźż]{1,15})(?:\\[Nnh]|\s)+){0,4}"
                             )
                             for m_adj, f_adj in MASCULINE_SG_ADJECTIVES_TO_FEMININE.items():
-                                pat_adj = rf"\b((?:nie\s+bądź|bądź|nie\s+bądźcie|bądźcie|nie\s+zostań|zostań|nie\s+zostańcie|zostańcie|byłaś|byłeś|jesteś|nie\s+będziesz|będziesz|zostałaś|zostałeś|czujesz\s+się|wydajesz\s+się|stajesz\s+się|wyglądasz|nie\s+wyglądasz|[A-Za-ząćęłńóśźż]+(?:łeś|łaś|łbyś|łabyś)(?:\s+\w+)?)\s+{SAFE_INTERVENING_SPAN})({re.escape(m_adj)})\b"
+                                pat_adj = rf"\b((?:nie\s+bądź|bądź|nie\s+bądźcie|bądźcie|nie\s+zostań|zostań|nie\s+zostańcie|zostańcie|byłaś|byłeś|jesteś|nie\s+będziesz|będziesz|zostałaś|zostałeś|czujesz\s+się|wydajesz\s+się|stajesz\s+się|wyglądasz|nie\s+wyglądasz|[A-Za-ząćęłńóśźż]+(?:łeś|łaś|łbyś|łabyś)(?:(?:\\[Nnh]|\s)+\w+)?)(?:\\[Nnh]|\s)+{SAFE_INTERVENING_SPAN})({re.escape(m_adj)})\b"
                                 for m in list(re.finditer(pat_adj, t, re.IGNORECASE)):
                                     prefix = m.group(1)
                                     old_adj = m.group(2)
                                     repl_adj = f_adj.capitalize() if old_adj[0].isupper() else f_adj
-                                    t = re.sub(rf"\b({re.escape(prefix)})({re.escape(old_adj)})\b", rf"\g<1>{repl_adj}", t, count=1)
+                                    t = re.sub(rf"({re.escape(prefix)})({re.escape(old_adj)})\b", rf"\g<1>{repl_adj}", t, count=1)
                                     fixes_list.append(f"[Episode Quality Gate - Filar CLXIII Przymiotnik Żeński 2. os. lp.] Linia #{line_num}: skorygowano '{old_adj}' -> '{repl_adj}' (adresat: kobieta)")
                                     # If the preceding token in prefix is 'taki', harmonize it to 'taka' as a strictly single-word mutation
-                                    if re.search(r"\btaki\s*$", prefix, re.IGNORECASE):
-                                        t = re.sub(rf"\b(taki)(\s+{re.escape(repl_adj)})\b", r"taka\g<2>", t)
-                                        t = re.sub(rf"\b(Taki)(\s+{re.escape(repl_adj)})\b", r"Taka\g<2>", t)
+                                    if re.search(r"\btaki(?:\\[Nnh]|\s)*$", prefix, re.IGNORECASE):
+                                        t = re.sub(rf"\b(taki)((?:\\[Nnh]|\s)+{re.escape(repl_adj)})\b", r"taka\g<2>", t)
+                                        t = re.sub(rf"\b(Taki)((?:\\[Nnh]|\s)+{re.escape(repl_adj)})\b", r"Taka\g<2>", t)
 
                             # 3. Convert masculine prepositional predicate adjectives (wyglądasz na wzburzonego -> wyglądasz na wzburzoną)
                             prep_adj_pat = rf"\b((?:nie\s+)?(?:wyglądasz|sprawiasz\s+wrażenie)\s+na\s+{SAFE_INTERVENING_SPAN})([A-Za-ząćęłńóśźż]{{3,}})ego\b"
@@ -7674,33 +7899,36 @@ class EpisodeQualityGate:
 
                         elif target_male:
                             # 1. Convert feminine 2nd-person singular past/conditional/modal verbs -> masculine
-                            for m in list(re.finditer(r"\b([A-Za-ząćęłńóśźż]+(?:łaś|łabyś)|powinnaś)\b", t, re.IGNORECASE)):
-                                v_fem = m.group(1)
+                            def _repl_2p_f_to_m(m):
+                                lead = m.group(1)
+                                v_fem = m.group(2)
                                 v_masc = convert_2nd_person_feminine_to_masculine(v_fem)
                                 if v_masc and v_masc.lower() != v_fem.lower():
-                                    t = re.sub(rf"\b{re.escape(v_fem)}\b", v_masc, t, count=1)
                                     fixes_list.append(f"[Episode Quality Gate - Filar CLXIII Morfologia Męska 2. os. lp.] Linia #{line_num}: skorygowano formę żeńską '{v_fem}' -> '{v_masc}' (adresat: mężczyzna)")
+                                    return lead + v_masc
+                                return lead + v_fem
+                            t = re.sub(r"((?:^|\\[Nnh]|[^\w]))([A-Za-ząćęłńóśźż]+(?:łaś|łabyś)|powinnaś)\b", _repl_2p_f_to_m, t, flags=re.IGNORECASE)
                             # Harmonize auxiliary 'była' -> 'był' after 2nd-person masculine modal/verb (strictly single word)
-                            t = re.sub(r"\b((?:[Pp]owinieneś|[Bb]yłeś|[Mm]iałeś)\s+)(była)\b", r"\g<1>był", t)
+                            t = re.sub(r"((?:^|\\[Nnh]|[^\w])(?:[Pp]owinieneś|[Bb]yłeś|[Mm]iałeś)(?:\\[Nnh]|\s)+)(była)\b", r"\g<1>był", t)
 
                             # 2. Convert feminine adjectives / participles -> masculine (with safe long-distance span up to 4 words)
                             # Mutates strictly the adjective token, keeping prefix 100% untouched
                             SAFE_INTERVENING_SPAN = (
                                 r"(?:(?:taki|taka|zbyt|tak|bardzo|dość|naprawdę|wreszcie|wtedy|znowu|ciągle|przecież|chyba|pewnie|całkiem|aż\s+tak|w\s+końcu|"
-                                r"(?!(?:i|a|oraz|ale|lecz|lub|albo|czy|że|gdy|kiedy|ponieważ|bo|jeśli|gdyby|choć|chociaż)\b)[A-Za-ząćęłńóśźż]{1,15})\s+){0,4}"
+                                r"(?!(?:i|a|oraz|ale|lecz|lub|albo|czy|że|gdy|kiedy|ponieważ|bo|jeśli|gdyby|choć|chociaż)\b)[A-Za-ząćęłńóśźż]{1,15})(?:\\[Nnh]|\s)+){0,4}"
                             )
                             for f_adj, m_adj in FEMININE_SG_ADJECTIVES_TO_MASCULINE.items():
-                                pat_adj = rf"\b((?:nie\s+bądź|bądź|nie\s+bądźcie|bądźcie|nie\s+zostań|zostań|nie\s+zostańcie|zostańcie|byłeś|byłaś|jesteś|nie\s+będziesz|będziesz|zostałeś|zostałaś|czujesz\s+się|wydajesz\s+się|stajesz\s+się|wyglądasz|nie\s+wyglądasz|[A-Za-ząćęłńóśźż]+(?:łeś|łaś|łbyś|łabyś)(?:\s+\w+)?)\s+{SAFE_INTERVENING_SPAN})({re.escape(f_adj)})\b"
+                                pat_adj = rf"\b((?:nie\s+bądź|bądź|nie\s+bądźcie|bądźcie|nie\s+zostań|zostań|nie\s+zostańcie|zostańcie|byłeś|byłaś|jesteś|nie\s+będziesz|będziesz|zostałeś|zostałaś|czujesz\s+się|wydajesz\s+się|stajesz\s+się|wyglądasz|nie\s+wyglądasz|[A-Za-ząćęłńóśźż]+(?:łeś|łaś|łbyś|łabyś)(?:(?:\\[Nnh]|\s)+\w+)?)(?:\\[Nnh]|\s)+{SAFE_INTERVENING_SPAN})({re.escape(f_adj)})\b"
                                 for m in list(re.finditer(pat_adj, t, re.IGNORECASE)):
                                     prefix = m.group(1)
                                     old_adj = m.group(2)
                                     repl_adj = m_adj.capitalize() if old_adj[0].isupper() else m_adj
-                                    t = re.sub(rf"\b({re.escape(prefix)})({re.escape(old_adj)})\b", rf"\g<1>{repl_adj}", t, count=1)
+                                    t = re.sub(rf"({re.escape(prefix)})({re.escape(old_adj)})\b", rf"\g<1>{repl_adj}", t, count=1)
                                     fixes_list.append(f"[Episode Quality Gate - Filar CLXIII Przymiotnik Męski 2. os. lp.] Linia #{line_num}: skorygowano '{old_adj}' -> '{repl_adj}' (adresat: mężczyzna)")
                                     # If the preceding token in prefix is 'taka', harmonize it to 'taki' as a strictly single-word mutation
-                                    if re.search(r"\btaka\s*$", prefix, re.IGNORECASE):
-                                        t = re.sub(rf"\b(taka)(\s+{re.escape(repl_adj)})\b", r"taki\g<2>", t)
-                                        t = re.sub(rf"\b(Taka)(\s+{re.escape(repl_adj)})\b", r"Taki\g<2>", t)
+                                    if re.search(r"\btaka(?:\\[Nnh]|\s)*$", prefix, re.IGNORECASE):
+                                        t = re.sub(rf"\b(taka)((?:\\[Nnh]|\s)+{re.escape(repl_adj)})\b", r"taki\g<2>", t)
+                                        t = re.sub(rf"\b(Taka)((?:\\[Nnh]|\s)+{re.escape(repl_adj)})\b", r"Taki\g<2>", t)
 
                             # 3. Convert feminine prepositional predicate adjectives (wyglądasz na wzburzoną -> wyglądasz na wzburzonego)
                             prep_adj_pat = rf"\b((?:nie\s+)?(?:wyglądasz|sprawiasz\s+wrażenie)\s+na\s+{SAFE_INTERVENING_SPAN})([A-Za-ząćęłńóśźż]{{3,}})ą\b"
@@ -8014,21 +8242,10 @@ class EpisodeQualityGate:
                             pat_mod_nom = rf"((?:\b(?:jesteśmy|będziemy|byłyśmy|byliśmy|zostałyśmy|zostaliśmy|to\s+są|to)\s+|\s*,\s*|\s+(?:i|oraz)\s+)(?:(?:{all_mods_nom_pl_pat})\s+){{0,2}})({re.escape(m_mod)})(\s+(?:(?:{all_mods_nom_pl_pat})\s+)*(?:{fem_all_nouns_nom_pl_pat}))\b"
                             ev.text = re.sub(pat_mod_nom, rf"\g<1>{f_mod}\g<3>", ev.text, flags=re.IGNORECASE)
 
-                elif is_male_scene_1pl:
-                    # Symmetrical check for male scenes: convert non-virile 1st-person plural -> virile
-                    for m in list(re.finditer(r"\b([A-Za-ząćęłńóśźż]+łyśmy)\b", ev.text)):
-                        v_nonvirile = m.group(1)
-                        v_virile = convert_1st_person_plural_nonvirile_to_virile(v_nonvirile)
-                        if v_virile and v_virile.lower() != v_nonvirile.lower():
-                            ev.text = re.sub(rf"\b{re.escape(v_nonvirile)}\b", v_virile, ev.text, count=1)
-                            fixes.append(f"[Episode Quality Gate - Filar CLXXV Morfologia Męskoosobowa 1. os. lm.] Linia #{i+1}: skorygowano formę niemęskoosobową '{v_nonvirile}' -> '{v_virile}' (scena męska)")
-
-                    for m in list(re.finditer(r"\b([A-Za-ząćęłńóśźż]+łybyśmy)\b", ev.text)):
-                        v_nonvirile = m.group(1)
-                        v_virile = convert_1st_person_plural_conditional_nonvirile_to_virile(v_nonvirile)
-                        if v_virile and v_virile.lower() != v_nonvirile.lower():
-                            ev.text = re.sub(rf"\b{re.escape(v_nonvirile)}\b", v_virile, ev.text, count=1)
-                            fixes.append(f"[Episode Quality Gate - Filar CLXXV Tryb Przypuszczający 1. os. lm.] Linia #{i+1}: skorygowano '{v_nonvirile}' -> '{v_virile}' (scena męska)")
+                elif is_male_scene_1pl or is_coll_virile or is_majestic_masc or event_scene_has_male.get(i, False):
+                    # Symmetrical check for male / virile group scenes: convert non-virile 1st-person plural -> virile
+                    ev.text, v_pl_fixes = harmonize_virile_group_1st_person_plural(ev.text, scene_has_male_participant=True)
+                    fixes.extend([f"Linia #{i+1}: {fx}" for fx in v_pl_fixes])
 
                     # Convert non-virile compound predicates and adjectives
                     for nv_adj, v_adj in NONVIRILE_ADJECTIVES_TO_VIRILE.items():

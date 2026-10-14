@@ -11603,7 +11603,10 @@ def test_exhaustive_polish_cases_and_all_prepositions_guard():
     # Asercja 6: Trwałość zapisu Żelaznej Zasady 15 w AGENTS.md
     with open(r'c:\Users\Piotrek\Desktop\translator\AGENTS.md', 'r', encoding='utf-8') as f_ag:
         agents_text = f_ag.read()
-    assert "## 🔒 15. ŻELAZNA ZASADA BEZWZGLĘDNEJ KOMPLETNOŚCI LEKSYKALNEJ, PRZYIMKOWEJ I PRZYPADKOWEJ" in agents_text, "Brak Żelaznej Zasady 15 w AGENTS.md!"
+    assert (
+        "## 🔒 15. ŻELAZNA ZASADA BEZWZGLĘDNEJ KOMPLETNOŚCI LEKSYKALNEJ, PRZYIMKOWEJ I PRZYPADKOWEJ" in agents_text
+        or "4. KOMPLETNA MORFOSYNTAKTYKA POLSKA, TOPOLOGIA 2. OSOBY I ONOMASTYKA PWN" in agents_text
+    ), "Brak Żelaznej Zasady 15 / Standardu 4.0 w AGENTS.md!"
 
     print(" -> PASSED: Test 125 w 100% potwierdza pełną kompletność fleksyjną, przyimkową i realizację Żelaznej Zasady 15 (0.00 PLN).")
 
@@ -12041,12 +12044,30 @@ def test_exhaustive_stem_morphology_and_onomastic_iron_rule():
     # Asercja 1: Weryfikacja obecności i treści Żelaznej Zasady 16 oraz harmonizacji architektonicznej w AGENTS.md
     with open("AGENTS.md", "r", encoding="utf-8") as f:
         agents_content = f.read()
-    assert "16. ŻELAZNA ZASADA KOMPLETNOŚCI ONOMASTYCZNEJ" in agents_content, "Brak Żelaznej Zasady 16 w AGENTS.md!"
-    assert "Separacja Trzonów Przymiotnikowych i Rzeczownikowych na `-owa` vs `-owi / -owie`" in agents_content, "Brak zapisu o separacji -owa vs -owi/-owie w AGENTS.md!"
-    assert "Harmonijny Wyjątek Architektoniczny (Deterministyczna Jednotokenowa Harmonizacja Fleksyjna $W_i \\to W'_i$)" in agents_content, "Brak harmonizacji Zasady 3.3 w AGENTS.md!"
-    assert "Ukierunkować właściwy Filar AVT na pozytywny wektor rzemiosła AVT" in agents_content, "Brak harmonizacji Warstwy 3 w Zasadzie 6 AGENTS.md!"
-    assert "Nadzór Rejestru bez Zaśmiecania Promptów" in agents_content, "Brak harmonizacji Zasady 10.2 w AGENTS.md!"
-    assert "14 domen semantycznych (750+ słów)" in agents_content, "Brak aktualizacji liczby domen w Zasadzie 16.1 AGENTS.md!"
+    assert (
+        "16. ŻELAZNA ZASADA KOMPLETNOŚCI ONOMASTYCZNEJ" in agents_content
+        or "4. KOMPLETNA MORFOSYNTAKTYKA POLSKA, TOPOLOGIA 2. OSOBY I ONOMASTYKA PWN" in agents_content
+    ), "Brak Żelaznej Zasady 16 / Standardu 4.0 w AGENTS.md!"
+    assert (
+        "Separacja Trzonów Przymiotnikowych i Rzeczownikowych na `-owa` vs `-owi / -owie`" in agents_content
+        or "separacja żeńskich końcówek przymiotnikowych `-owa` od męskiego celownika `-owi`/mianownika lm `-owie`" in agents_content
+    ), "Brak zapisu o separacji -owa vs -owi/-owie w AGENTS.md!"
+    assert (
+        "Harmonijny Wyjątek Architektoniczny (Deterministyczna Jednotokenowa Harmonizacja Fleksyjna $W_i \\to W'_i$)" in agents_content
+        or "Jednotokenowa harmonizacja fleksyjna (`W_i -> W'_i`)" in agents_content
+    ), "Brak harmonizacji Zasady 3.3 w AGENTS.md!"
+    assert (
+        "Ukierunkować właściwy Filar AVT na pozytywny wektor rzemiosła AVT" in agents_content
+        or "Czyste prompty nastawione na dramaturgię i subtekst seiyū" in agents_content
+    ), "Brak harmonizacji Warstwy 3 w Zasadzie 6 AGENTS.md!"
+    assert (
+        "Nadzór Rejestru bez Zaśmiecania Promptów" in agents_content
+        or "Nadzór Rejestru i Bezpieczeństwo Warstwy 4" in agents_content
+    ), "Brak harmonizacji Zasady 10.2 w AGENTS.md!"
+    assert (
+        "14 domen semantycznych (750+ słów)" in agents_content
+        or "pełny korpus >= 165 par ról społecznych" in agents_content
+    ), "Brak aktualizacji liczby domen w Zasadzie 16.1 AGENTS.md!"
 
     # Asercja 2: Morfologia 6 Klas Trzonów Fleksyjnych i Słowotwórczych
     # Klasa 1: Oboczności wokaliczne rdzenia (ó:o, ą:ę, e:zero)
@@ -15815,6 +15836,276 @@ def test_toponym_ablative_preposition_and_phonotactic_declension():
     print(" -> PASSED: Test 166 potwierdza usuwanie fałszywego narzędnika z toponimów i deklinację fonotaktyczną.")
 
 
+def test_isomorphic_batch_sasaki_s2_repairs_and_pipeline_harmony():
+    """
+    TEST 167: Isomorphic Batch Repairs & Pipeline Harmony (Sasaki to Pii-chan S2 Standard 4.0).
+    Covering all 4 Clusters across 5 architectural layers:
+    - Cluster A: 2nd-person MALE agreement with root vowel alternations (o:ó, ą:ę, e:a) and ASS \\N resilience;
+                 Turn-Taking Lookback (prior turn context maintenance);
+                 Turn-Taking Lookahead (initial question answered immediately by male speaker);
+                 Vocative / Nominative detection after address interjections ('Hej, [Name]!').
+    - Cluster B: 1st-person plural virile agreement (-łyśmy -> -liśmy) when male participant present in scene
+                 (scene_has_male_participant == True), with negative control for all-female scenes.
+    - Cluster C: Two-tier genitive governance after preposition 'z' for neuter nouns / institutions
+                 (Biuro, Miasto, Królestwo, Ministerstwo), with negative control preserving feminine instrumental -ą
+                 for genuine female companions (poszedł z Anną).
+    - Cluster D: Diacritic normalization (Unicode NFKD Müller == Muller, Schröder == Schroder);
+                 watakushi yakuwarigo weight recalibrated to 0 in epistemic triangulation;
+                 Japanese male name suffix recognition (-yoshi -> MALE);
+                 1st-person past tense masculine agreement across ASS \\N and at sentence start.
+    """
+    print("\n[TEST 167/167] Isomorphic Batch Sasaki S2 Repairs & Pipeline Harmony...")
+    import pysubs2
+    from series_memory import (
+        SeriesBible,
+        EntityCategory,
+        classify_entity_category,
+        normalize_name_nfkd,
+        has_japanese_male_name_suffix,
+        is_official_or_court_consonant_name,
+        is_feminine_instrumental_after_z_allowed,
+    )
+    from scene_discourse import (
+        SpeakerTurn,
+        group_speaker_turns,
+        resolve_all_speaker_turns,
+        resolve_turn_addressee,
+        resolve_scene_participants,
+    )
+    from avt_linter import (
+        convert_2nd_person_feminine_to_masculine,
+        convert_2nd_person_masculine_to_feminine,
+        harmonize_verbal_gender_1st_and_2nd,
+        convert_1st_person_plural_nonvirile_to_virile,
+        convert_1st_person_plural_virile_to_nonvirile,
+        harmonize_virile_group_1st_person_plural,
+        strip_false_feminine_instrumental,
+        EpisodeQualityGate,
+    )
+    from metadata import (
+        compare_character_names,
+        normalize_diacritics,
+        match_character_in_metadata,
+    )
+    from profiler import (
+        EpistemicAudioTriangulator,
+        SpaCyAnaphoraDiscourseAnalyzer,
+    )
+
+    # =========================================================================
+    # 1. KLASTER A: 2. osoba MALE z obocznościami rdzennymi, Turn-Taking i Wołacz
+    # =========================================================================
+    # 1a. Morphological unit conversions (min. 5 leksykalnie różnych przykładów)
+    assert convert_2nd_person_feminine_to_masculine("Mogłabyś") == "Mógłbyś"
+    assert convert_2nd_person_feminine_to_masculine("Wzięłabyś") == "Wziąłbyś"
+    assert convert_2nd_person_feminine_to_masculine("Pomogłabyś") == "Pomógłbyś"
+    assert convert_2nd_person_feminine_to_masculine("brałaś") == "brałeś"
+    assert convert_2nd_person_feminine_to_masculine("widziałaś") == "widziałeś"
+
+    # 1b. Sentence-level harmonization for target_gender="MALE" with root alternations and ASS \N
+    k_a_cases = [
+        ("Mogłabyś zadbać o wszystko?", "Mógłbyś zadbać o wszystko?"),
+        ("Wzięłabyś to dla nas?", "Wziąłbyś to dla nas?"),
+        ("Pomogłabyś mi w walce?", "Pomógłbyś mi w walce?"),
+        ("Po co brałaś anioła ze sobą?", "Po co brałeś anioła ze sobą?"),
+        ("To ty\\Nwidziałaś mnie wczoraj?", "To ty\\Nwidziałeś mnie wczoraj?"),
+    ]
+    for raw_t, exp_t in k_a_cases:
+        res_m, _ = harmonize_verbal_gender_1st_and_2nd(raw_t, target_gender="MALE")
+        assert res_m == exp_t, f"Cluster A verb agreement failed: {raw_t} -> {res_m} != {exp_t}"
+
+    # Negative counterexamples: target_gender="FEMALE" preserves feminine forms
+    for raw_t, _ in k_a_cases:
+        res_f, _ = harmonize_verbal_gender_1st_and_2nd(raw_t, target_gender="FEMALE")
+        assert res_f == raw_t, f"Cluster A negative control mutated: {raw_t} -> {res_f}"
+
+    # Symmetrical M->F conversions (5 positive examples)
+    k_a_sym = [
+        ("Mógłbyś zadbać o to?", "Mogłabyś zadbać o to?"),
+        ("Wziąłbyś to dla nas?", "Wzięłabyś to dla nas?"),
+        ("Pomógłbyś mi w walce?", "Pomogłabyś mi w walce?"),
+        ("Po co brałeś anioła ze sobą?", "Po co brałaś anioła ze sobą?"),
+        ("To ty\\Nwidziałeś mnie wczoraj?", "To ty\\Nwidziałaś mnie wczoraj?"),
+    ]
+    for raw_m, exp_f in k_a_sym:
+        res_sym, _ = harmonize_verbal_gender_1st_and_2nd(raw_m, target_gender="FEMALE")
+        assert res_sym == exp_f, f"Cluster A symmetrical agreement failed: {raw_m} -> {res_sym} != {exp_f}"
+
+    # 1c. Test Turn-Taking Lookback (utrzymanie MALE po wcześniejszym 'Niby taki poważny...')
+    turn_lb1 = SpeakerTurn(
+        speaker="Shizuka",
+        events=[pysubs2.SSAEvent(start=1000, end=2500, text="Niby taki poważny...")]
+    )
+    turn_lb2 = SpeakerTurn(
+        speaker="Shizuka",
+        events=[pysubs2.SSAEvent(start=3000, end=5000, text="A jednak mogłabyś zadbać o nas.")]
+    )
+    turns_lb = resolve_all_speaker_turns([turn_lb1, turn_lb2])
+    assert turns_lb[1].target_gender == "MALE", f"Lookback failed: target_gender is {turns_lb[1].target_gender}"
+
+    # 1d. Test Turn-Taking Lookahead (pytanie inicjujące w 2. os., na które natychmiast odpowiada mężczyzna)
+    bible_la = SeriesBible("TestBibleLookahead")
+    bible_la.data.setdefault("characters", {})["Sasaki"] = {"gender": "MALE"}
+    bible_la.data.setdefault("characters", {})["Ojou"] = {"gender": "FEMALE"}
+
+    turn_la1 = SpeakerTurn(
+        speaker="Ojou",
+        events=[pysubs2.SSAEvent(start=1000, end=3000, text="Zaraz. To ty\\Nwidziałaś mnie już wcześniej?")]
+    )
+    turn_la2 = SpeakerTurn(
+        speaker="Sasaki",
+        events=[pysubs2.SSAEvent(start=4000, end=6000, text="Tak, pamiętam cię doskonale.")]
+    )
+    turns_la = resolve_all_speaker_turns([turn_la1, turn_la2], series_bible=bible_la)
+    assert turns_la[0].target_speaker == "Sasaki", f"Lookahead speaker failed: {turns_la[0].target_speaker}"
+    assert turns_la[0].target_gender == "MALE", f"Lookahead gender failed: {turns_la[0].target_gender}"
+
+    # 1e. Test wołacza/mianownika męskiego po 'Hej, [Name]!' w SpeakerTurn
+    bible_voc = SeriesBible("TestBibleVoc")
+    bible_voc.data.setdefault("characters", {})["Takayoshi"] = {"gender": "MALE"}
+    bible_voc.data.setdefault("characters", {})["Braham"] = {"gender": "MALE"}
+
+    turn_voc1 = SpeakerTurn(
+        speaker="Elena",
+        events=[pysubs2.SSAEvent(start=1000, end=3000, text="Hej, Takayoshi! Mogłabyś zadbać o to?")]
+    )
+    resolve_turn_addressee(turn_voc1, series_bible=bible_voc)
+    assert turn_voc1.target_speaker == "Takayoshi", f"Vocative speaker failed: {turn_voc1.target_speaker}"
+    assert turn_voc1.target_gender == "MALE", f"Vocative gender failed: {turn_voc1.target_gender}"
+    assert turn_voc1.vocative_lock is True, "vocative_lock should be True"
+
+    turn_voc2 = SpeakerTurn(
+        speaker="Elena",
+        events=[pysubs2.SSAEvent(start=4000, end=6000, text="Ej, Braham! Zaczekaj na nas!")]
+    )
+    resolve_turn_addressee(turn_voc2, series_bible=bible_voc)
+    assert turn_voc2.target_speaker == "Braham", f"Interjection vocative failed: {turn_voc2.target_speaker}"
+    assert turn_voc2.target_gender == "MALE", f"Interjection gender failed: {turn_voc2.target_gender}"
+    assert turn_voc2.vocative_lock is True, "vocative_lock should be True"
+
+    # =========================================================================
+    # 2. KLASTER B: 1. os. lm. męskoosobowy przy obecności mężczyzny w scenie
+    # =========================================================================
+    # 2a. Konwersja morfologiczna 1. os. lm. (-łyśmy -> -liśmy, 5 positive examples)
+    assert convert_1st_person_plural_nonvirile_to_virile("wróciłyśmy") == "wróciliśmy"
+    assert convert_1st_person_plural_nonvirile_to_virile("Wróciłyśmy") == "Wróciliśmy"
+    assert convert_1st_person_plural_nonvirile_to_virile("zrobiłyśmy") == "zrobiliśmy"
+    assert convert_1st_person_plural_nonvirile_to_virile("Zrobiłyśmy") == "Zrobiliśmy"
+    assert convert_1st_person_plural_nonvirile_to_virile("widziałyśmy") == "widzieliśmy"
+    assert convert_1st_person_plural_nonvirile_to_virile("poszłyśmy") == "poszliśmy"
+    assert convert_1st_person_plural_nonvirile_to_virile("mogłyśmy") == "mogliśmy"
+
+    # 2b. Harmonizacja zdań 1. os. lm. przy scene_has_male_participant=True (5 positive examples)
+    k_b_cases = [
+        ("Wróciłyśmy do bazy o zmierzchu.", "Wróciliśmy do bazy o zmierzchu."),
+        ("Zrobiłyśmy wszystko zgodnie z planem.", "Zrobiliśmy wszystko zgodnie z planem."),
+        ("Widziałyśmy ten raport wczoraj.", "Widzieliśmy ten raport wczoraj."),
+        ("Poszłyśmy na spotkanie z agentami.", "Poszliśmy na spotkanie z agentami."),
+        ("Mogłyśmy to przewidzieć wcześniej.", "Mogliśmy to przewidzieć wcześniej."),
+    ]
+    for raw_t, exp_t in k_b_cases:
+        res_vir, _ = harmonize_virile_group_1st_person_plural(raw_t, scene_has_male_participant=True)
+        assert res_vir == exp_t, f"Cluster B virile agreement failed: {raw_t} -> {res_vir} != {exp_t}"
+
+    # 2c. Kontrprzykład negatywny: scena wyłącznie z kobietami (scene_has_male_participant=False) zachowuje formy żeńskie
+    for raw_t, _ in k_b_cases:
+        res_nonvir, _ = harmonize_virile_group_1st_person_plural(raw_t, scene_has_male_participant=False)
+        assert res_nonvir == raw_t, f"Cluster B negative control mutated: {raw_t} -> {res_nonvir}"
+
+    # 2d. Inwariant Grupy Mieszanej w dyskursie (resolve_scene_participants)
+    turn_m = SpeakerTurn(speaker="Sasaki", events=[pysubs2.SSAEvent(start=1000, end=3000, text="Jestem tutaj.")])
+    turn_f = SpeakerTurn(speaker="Ojou", events=[pysubs2.SSAEvent(start=4000, end=6000, text="Wróciłyśmy do domu.")])
+    turns_group = resolve_all_speaker_turns([turn_m, turn_f], series_bible=bible_la)
+    assert turns_group[1].scene_has_male_participant is True, "scene_has_male_participant should be True for mixed turn"
+
+    # =========================================================================
+    # 3. KLASTER C: Dopełniacz rzeczowników nijakich/instytucji po 'z'
+    # =========================================================================
+    # 3a. Usunięcie fałszywego narzędnika instytucji (5 positive examples)
+    k_c_cases = [
+        ("To są ludzie z Biurą i agenci wywiadu.", "To są ludzie z Biura i agenci wywiadu."),
+        ("Wszyscy agenci z Biurą złożyli meldunek.", "Wszyscy agenci z Biura złożyli meldunek."),
+        ("Wczoraj dotarli z Miastą do stolicy.", "Wczoraj dotarli z Miasta do stolicy."),
+        ("Ten oddział z Królestwą przyszedł z pomocą.", "Ten oddział z Królestwa przyszedł z pomocą."),
+        ("Wszyscy wrócili z Ministerstwą o zmierzchu.", "Wszyscy wrócili z Ministerstwa o zmierzchu."),
+    ]
+    for raw_t, exp_t in k_c_cases:
+        res_c, _ = strip_false_feminine_instrumental(raw_t)
+        assert res_c == exp_t, f"Cluster C genitive fix failed: {raw_t} -> {res_c} != {exp_t}"
+
+    # 3b. Kontrprzykład negatywny: prawdziwa kobieta w kontekście towarzyszenia (poszedł z Anną, rozmawiał z Martą)
+    neg_companion1, _ = strip_false_feminine_instrumental("Poszedł na spacer z Anną.")
+    assert neg_companion1 == "Poszedł na spacer z Anną.", f"Real companion mutated: {neg_companion1}"
+
+    neg_companion2, _ = strip_false_feminine_instrumental("Rozmawiał długo z Martą wczoraj.")
+    assert neg_companion2 == "Rozmawiał długo z Martą wczoraj.", f"Real companion mutated: {neg_companion2}"
+
+    neg_companion3, _ = strip_false_feminine_instrumental("Współpracował ściśle z Marią.")
+    assert neg_companion3 == "Współpracował ściśle z Marią.", f"Real companion mutated: {neg_companion3}"
+
+    # 3c. Dwupoziomowa bramka bezpieczeństwa w series_memory:
+    assert is_feminine_instrumental_after_z_allowed("Biuro", preceding_text="ludzie z") is False
+    assert is_feminine_instrumental_after_z_allowed("Miasto", preceding_text="dotarli z") is False
+    assert is_feminine_instrumental_after_z_allowed("Królestwo", preceding_text="oddział z") is False
+    assert is_feminine_instrumental_after_z_allowed("Ministerstwo", preceding_text="wrócili z") is False
+
+    # =========================================================================
+    # 4. KLASTER D: Normalizacja diakrytyków, watakushi, męskie sufiksy JA i 1. os. przez \N
+    # =========================================================================
+    # 4a. Normalizacja diakrytyków (Unicode NFKD ASCII-folding, 5 positive examples)
+    assert compare_character_names("Müller", "Muller") is True
+    assert compare_character_names("Schröder", "Schroder") is True
+    assert compare_character_names("René", "Rene") is True
+    assert compare_character_names("Frédéric", "Frederic") is True
+    assert compare_character_names("Königsberg", "Konigsberg") is True
+
+    assert normalize_name_nfkd("Müller") == "Muller"
+    assert normalize_name_nfkd("Schröder") == "Schroder"
+    assert normalize_diacritics("Müller") == "Muller"
+    assert normalize_diacritics("Schröder") == "Schroder"
+
+    # 4b. Watakushi waga 0 (formalny / neutralny rejestr w epistemicznej triangulacji)
+    assert SpaCyAnaphoraDiscourseAnalyzer.score_japanese_pronoun("watakushi") == 0
+    assert SpaCyAnaphoraDiscourseAnalyzer.score_japanese_pronoun("watashi") == 0
+    assert SpaCyAnaphoraDiscourseAnalyzer.score_japanese_pronoun("私") == 0
+    assert EpistemicAudioTriangulator.score_japanese_pronoun("watakushi") == 0
+    # Kontrprzykłady dla watakushi: jednoznaczne zaimki zachowują swoje wagi (+3 męskie, -3 żeńskie)
+    assert SpaCyAnaphoraDiscourseAnalyzer.score_japanese_pronoun("atashi") == -3
+    assert SpaCyAnaphoraDiscourseAnalyzer.score_japanese_pronoun("atai") == -3
+    assert SpaCyAnaphoraDiscourseAnalyzer.score_japanese_pronoun("uchi") == -3
+    assert SpaCyAnaphoraDiscourseAnalyzer.score_japanese_pronoun("ore") == 3
+    assert SpaCyAnaphoraDiscourseAnalyzer.score_japanese_pronoun("boku") == 3
+
+    # 4c. Japoński sufiks męski -yoshi, -hiko, -rou itp. nadaje wektor MALE (5 positive examples)
+    assert has_japanese_male_name_suffix("Takayoshi") is True
+    assert has_japanese_male_name_suffix("Nobuyoshi") is True
+    assert has_japanese_male_name_suffix("Katsuhiko") is True
+    assert has_japanese_male_name_suffix("Gentarou") is True
+    assert has_japanese_male_name_suffix("Shinichi") is True
+
+    # Nazwiska urzędowe/dworskie na -er, -el nie domyślnie żeńskie
+    assert is_official_or_court_consonant_name("Baron Muller", context="urzędnik dworski") is True
+
+    # 4d. 1. osoba czasu przeszłego dla MALE przez \N i na początku zdania (5 positive examples)
+    k_d_1p = [
+        ("wolałam\\Npowiedzieć całą prawdę", "wolałem\\Npowiedzieć całą prawdę"),
+        ("Radziłam się mistrza w tej sprawie.", "Radziłem się mistrza w tej sprawie."),
+        ("Chciałam\\Npomóc wam w zadaniu.", "Chciałem\\Npomóc wam w zadaniu."),
+        ("Myślałam\\No tym przez całą noc.", "Myślałem\\No tym przez całą noc."),
+        ("Słyszałam\\No twoim sukcesie.", "Słyszałem\\No twoim sukcesie."),
+    ]
+    for raw_t, exp_t in k_d_1p:
+        res_1m, _ = harmonize_verbal_gender_1st_and_2nd(raw_t, speaker_gender="MALE")
+        assert res_1m == exp_t, f"Cluster D 1st-person MALE failed: {raw_t} -> {res_1m} != {exp_t}"
+
+    # Kontrprzykład negatywny: dla mówcy żeńskiego formy żeńskie zachowane
+    for raw_t, _ in k_d_1p:
+        res_1f, _ = harmonize_verbal_gender_1st_and_2nd(raw_t, speaker_gender="FEMALE")
+        assert res_1f == raw_t, f"Cluster D 1st-person female mutated: {raw_t} -> {res_1f}"
+
+    print(" -> PASSED: Test 167 potwierdza pełną odporność izomorficzną Klastrów A, B, C, D (Sasaki S2).")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -15983,7 +16274,8 @@ if __name__ == "__main__":
     test_second_person_turn_taking_and_predicate_agreement()
     test_speaker_turn_plural_you_harmonization()
     test_toponym_ablative_preposition_and_phonotactic_declension()
-    print("\n Wszystkie testy jednostkowe i integracyjne (166/166) zakończone pełnym sukcesem!\n")
+    test_isomorphic_batch_sasaki_s2_repairs_and_pipeline_harmony()
+    print("\n Wszystkie testy jednostkowe i integracyjne (167/167) zakończone pełnym sukcesem!\n")
 
 
 

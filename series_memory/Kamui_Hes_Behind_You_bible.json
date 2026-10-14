@@ -97,5 +97,10 @@
     "tmphi7hjotb"
   ],
   "batch_stats": {},
+  "entity_categories": {
+    "Asystentka": "ANTHROPONYM",
+    "Kamui": "ANTHROPONYM",
+    "Hanako ze Shimosunagawy": "ANTHROPONYM"
+  },
   "fansub_canon": {}
 }

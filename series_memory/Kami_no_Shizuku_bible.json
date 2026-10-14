@@ -23,13 +23,15 @@
       "gender": "MALE"
     },
     "Shizuku Kanzaki / Issei Tomine": {
-      "description": "postać (Postać)"
+      "description": "postać (Postać) [MĘŻCZYZNA]",
+      "gender": "MALE"
     },
     "Honoka Tomine": {
       "description": "postać (Postać)"
     },
     "Chousuke Honma": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+      "gender": "MALE"
     },
     "Shizuku": {
       "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
@@ -51,16 +53,19 @@
       "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
     },
     "Yutaka Kanzaki": {
-      "description": "mężczyzna (Zmarły ojciec Shizuku, światowej sławy krytyk wina) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "mężczyzna (Zmarły ojciec Shizuku, światowej sławy krytyk wina) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+      "gender": "MALE"
     },
     "Sara Tomine": {
       "description": "postać (Postać)"
     },
     "Kenkichi Kiryu": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+      "gender": "MALE"
     },
     "Tarusuke Kido": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+      "gender": "MALE"
     },
     "Kars": {
       "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
@@ -153,7 +158,8 @@
     },
     "Yutaka": {
       "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
-      "source": "quality_gate"
+      "source": "quality_gate",
+      "gender": "MALE"
     },
     "Kiryu": {
       "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
@@ -453,7 +459,7 @@
       "N": "Shizuku Kanzaki / Issei Tomine",
       "Ms": "Shizuku Kanzaki / Issei Tomine",
       "W": "Shizuku Kanzaki / Issei Tomine",
-      "gender": "FEMALE"
+      "gender": "MALE"
     },
     "Shizuku Kanzaki -> Miyabi Shinohara": {
       "M": "Shizuku Kanzaki -> Miyabi Shinohara",
@@ -724,6 +730,36 @@
       "avg_batch_size": 20.5,
       "cost_pln": 3.06
     }
+  },
+  "entity_categories": {
+    "Shizuku Kanzaki": "ANTHROPONYM",
+    "Miyabi Shinohara": "ANTHROPONYM",
+    "Issei Tomine": "ANTHROPONYM",
+    "Loulan": "ANTHROPONYM",
+    "Kawarage": "ANTHROPONYM",
+    "Robert Doi": "ANTHROPONYM",
+    "Shizuku Kanzaki / Issei Tomine": "ANTHROPONYM",
+    "Honoka Tomine": "ANTHROPONYM",
+    "Chousuke Honma": "ANTHROPONYM",
+    "Shizuku": "ANTHROPONYM",
+    "Tomine": "ANTHROPONYM",
+    "Mary": "ANTHROPONYM",
+    "Hayama": "ANTHROPONYM",
+    "Miyabi": "ANTHROPONYM",
+    "Yutaka Kanzaki": "ANTHROPONYM",
+    "Sara Tomine": "ANTHROPONYM",
+    "Kenkichi Kiryu": "ANTHROPONYM",
+    "Tarusuke Kido": "ANTHROPONYM",
+    "Kars": "ANTHROPONYM",
+    "Issei Toomine": "ANTHROPONYM",
+    "Sara": "ANTHROPONYM",
+    "Kirisawa": "ANTHROPONYM",
+    "Issei": "ANTHROPONYM",
+    "Robert": "ANTHROPONYM",
+    "Yutaka": "ANTHROPONYM",
+    "Kiryu": "ANTHROPONYM",
+    "Maki": "ANTHROPONYM",
+    "Man": "ANTHROPONYM"
   },
   "fansub_canon": {}
 }

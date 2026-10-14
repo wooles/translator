@@ -250,5 +250,15 @@
     "[ASW] Rakudai Kenja no Gakuin Musou - 11 [1080p HEVC][8821CA16]"
   ],
   "batch_stats": {},
+  "entity_categories": {
+    "Anastasia": "ANTHROPONYM",
+    "Eftal": "ANTHROPONYM",
+    "Merlin": "ANTHROPONYM",
+    "Gaius": "ANTHROPONYM",
+    "Cliff": "ANTHROPONYM",
+    "Seiryu": "ANTHROPONYM",
+    "Genie": "ANTHROPONYM",
+    "Maria": "ANTHROPONYM"
+  },
   "fansub_canon": {}
 }

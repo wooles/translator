@@ -1,216 +1,98 @@
-# 🏛️ KODEKS ZASAD POTOKU AVT (WORKSPACE RULES — TRANSLATOR)
+# 🏛️ KODEKS ZASAD POTOKU AVT (WORKSPACE RULES — TRANSLATOR STANDARD 4.0)
 
-Dokument ten definiuje nienaruszalne, trwałe reguły postępowania asystenta AI w repozytorium translator. Został wdrożony jako permanentny bezpiecznik architektoniczny i jest automatycznie ładowany do kontekstu na każdym kroku pracy.
-
----
-
-## 🎯 0. NADRZĘDNA ŻELAZNA ZASADA: DROGOWSKAZ, AWARIA CAŁEGO TŁUMACZA, 5 WARSTW I MINIMALIZM PROMPTÓW (SUPREME BEACON & HOLISTIC MANDATE)
-1. **Uwagi użytkownika jako drogowskaz:** Każde zgłoszenie wyznacza wektor poszukiwań i nakłada obowiązek całościowej diagnozy — zakaz ograniczania się do pojedynczego słowa czy linijki.
-2. **Awaria całego tłumacza:** Problem jest analizowany jako wada systemowa w całym łańcuchu (Profiler $\to$ Baza Wiedzy $\to$ Faza 1 i 2 $\to$ Arbitraż $\to$ Linter $\to$ Montaż .ass).
-3. **Eliminacja całej dziedziny w 5 Warstwach:** Likwidacja kompletnej taksonomii pokrewnych pułapek semantycznych, pragmatycznych i syntaktycznych symetrycznie na wszystkich 5 warstwach potoku.
-4. **Maksymalne odciążenie modeli Gemini:** Zakaz mnożenia mikro-zakazów paraliżujących dialog (efekt „różowego słonia”). Kontekst LLM rezerwowany na dramaturgię i subtekst seiyū. Twarda kontrola leksykalna przenoszona do silników offline (0.00 PLN).
-5. **Rola Głównego Architekta AVT i Zakaz Efektów Drugiego Rzędu:** Obowiązek unikania awarii kaskadowych i bezwzględne przestrzeganie 6 Aksjomatów Architektury oraz Pre-Flight Checklist (Zasada 19).
-6. **Eliminacja „Syndromu Zamiatacza” i Twardy Kontrakt Danych:**
-   - Zakaz zrzucania walidacji na linter: rozbudowa setek regexów dla inferencji gramatycznej to błąd kategorii (Chomsky Typ 3). Linter nie zastępuje reprezentacji wiedzy.
-   - Twardy kontrakt Pydantic (Faza 1): wymuszenie pola `speaker_grammatical_gender: "MASCULINE" | "FEMININE"` jako zwalidowanego warunku w schemacie `LineTranslation`. Akustyka seiyū nie może łamać tożsamości postaci.
-   - Zakaz fetyszyzowania reguł offline: dopuszcza się mikro-zapytanie semantyczne (call LLM do 5 tokenów) zamiast kruchych 100-linijkowych potworów regexowych w Pythonie.
-7. **Żelazna Dyrektywa Usuwania Przyczyn Źródłowych (True Root-Cause & Zero-Cosmetic Mandate):** Bezwzględny zakaz maskowania defektów silnika za pomocą doraźnych modyfikacji baz danych (*_bible.json, glosariuszy), lintera (Warstwa 4) lub napisów `.ass`. Każda awaria musi zostać usunięta algorytmicznie w kodzie Pythona silnika.
+Dokument ten stanowi jedyne źródło prawdy (Single Source of Truth) definiujące nienaruszalne reguły architektoniczne, lingwistyczne i procesowe asystenta AI oraz zespołów wieloagentowych w repozytorium `translator`.
 
 ---
 
-## 🚫 1. KATEGORYCZNY ZAKAZ DORAŹNEGO ŁATANIA I PUDROWANIA SYMPTOMÓW (ZERO-COSMETIC PROTOCOL & ANTI-PATCHING MANDATE)
-Defekt tłumaczenia to zawsze awaria potoku. Kategorycznie zakazuje się uznawania za rozwiązanie problemu:
-1. Ręcznej modyfikacji pliku bazy danych na dysku (`*_bible.json`, glosariusza, plików konfiguracyjnych),
-2. Dodania pojedynczego regexa w `avt_linter.py` (Warstwa 4), maskującego błąd na wyjściu,
-3. Ręcznego poprawienia linijki w pliku napisów `.ass`.
-
-Każda próba zamknięcia incydentu bez równoległej naprawy wadliwego algorytmu w kodzie Pythona silnika skutkuje automatycznym wetem Agenta 4:  
-`STATUS: ODRZUCONO WEWNĘTRZNIE - WYKRYTO PUDROWANIE SYMPTOMÓW ZAMIAST NAPRAWY KODU SILNIKA`.  
-Poprawienie pliku `.ass` lub bazy danych jest dopuszczalne wyłącznie jako wtórny krok konsolidacyjny PO fizycznej naprawie logiki silnika w plikach `.py`.
-
----
-
-## 🌐 2. ZASADA CAŁOŚCIOWEGO UOGÓLNIANIA (HOLISTIC DOMAIN GENERALIZATION MANDATE)
-Zakaz izolowanych poprawek. Obowiązek zbadania problemu od podstaw (First Principles), zidentyfikowania klasy zjawiska (np. $\Delta t \ge 5\text{s}$, zmiana audytorium) i neutralizacji całej taksonomii pokrewnych pułapek.
+## 🎯 1. NADRZĘDNA FILOZOFIA: ELIMINACJA PRZYCZYN ŹRÓDŁOWYCH W 5 WARSTWACH
+1. **Uwagi Operatora jako Drogowskaz Taksonomiczny:** Każde zgłoszenie błędu wskazuje na awarię całej klasy zjawisk w silniku. Obowiązuje kategoryczny zakaz ograniczania naprawy do pojedynczego słowa, zdania czy tytułu anime.
+2. **Obowiązkowy Protokół 5 Warstw (Ingress -> State -> Egress):**
+   Każda modyfikacja architektoniczna musi symetrycznie zabezpieczać cały potok:
+   - **Warstwa 1 (Profiler & Triangulacja – `profiler.py`, `metadata.py`):** Epistemiczna Triangulacja Płci (asymetryczna akustyka F0 `librosa.pyin` + morfosyntaktyka JA *yakuwarigo* + koreferencja `spaCy` EN z izolacją podmiotu `nsubj`), odporny parsing napisów (`pysubs2`), kanoniczny fallback sezonowy API (`strip_season_suffix`).
+   - **Warstwa 2 (Pamięć Serii & Ontologia – `series_memory.py`, `scene_discourse.py`):** Modele Pydantic (`CharacterProfile`, `CharacterIdentity`, `PersonaInterval`), klasyfikacja ontologiczna (`ANTHROPONYM`, `TOPONYM`, `CHREMATONYM`), Automat Tożsamości Diegetycznej (`apparent_gender` vs `true_gender`), dziedziczenie aliasów wiekowych (`Young/Child X`), `SpeakerTurn` (propagacja liczby mnogiej i Dyadic Turn-Taking 2. osoby) oraz zamrożona matryca 7 przypadków `DeclensionParadigm`.
+   - **Warstwa 3 (Kanon & Kontrakt Tłumacza – `translator.py`, `rules.py`, `manga_canon.py`):** Nadrzędność oficjalnego polskiego kanonu mangowego. Czyste prompty nastawione na dramaturgię i subtekst seiyū (Lean Script Doctor ~5 800 znaków), zasilane twardym kontraktem Pydantic (`speaker_gender`, `target_gender`, `addressee_number`, `DeclensionParadigm` z nakazem odmiany przez przypadki).
+   - **Warstwa 4 (Deterministyczna Bramka Jakości – `avt_linter.py`, `translator.py`):** W 100% deterministyczny silnik korekty morfosyntaktycznej post-generation oraz kontroli technicznej (0.00 PLN, brak wywołań LLM).
+   - **Warstwa 5 (Tarcza Regresyjna CI/CD – `test_system.py`):** Atomowe testy rodzin izomorficznych (minimum 5 różnych leksykalnie przykładów na klasę problemu + kontrprzykłady negatywne).
 
 ---
 
-## ⚖️ 3. GRANICA MIĘDZY SILNIKIEM OFFLINE A MODELAMI GEMINI (OFFLINE VS LLM BOUNDARY MANDATE)
-1. **Silnik offline (0.00 PLN):** Struktury w 100% zamknięte, warianty fonetyczne PWN (*dla mnie*, *ze mną*), idiomy rejestrowe (*w każdym razie*), sanacja pleonazmów, formatowanie znaczników ASS i limity CPS/CPL.
-2. **Zakaz Nominative Freezing:** Kategoryczny zakaz mechanicznego podmieniania pojęć odmiennych i nazw na sztywne mianowniki (*z Aurą Gilotyną* $\to$ *z Aura Gilotyna*), co łamie związki zgody i rekcję.
-3. **Harmonijny Wyjątek Architektoniczny (Deterministyczna Jednotokenowa Harmonizacja Fleksyjna $W_i \to W'_i$):** Warstwa 4 ma prawo i obowiązek deterministycznie zharmonizować końcówkę fleksyjną pojedynczego tokenu wynikającą z rozstrzygnięcia dwuznaczności angielskiej, jeśli płeć i relacja są w 100% udowodnione przez Warstwy 1 i 2, a szyk zdania pozostaje w 100% nienaruszony.
-4. **Wyjątek Mikro-Zapytań Semantycznych:** Dopuszczenie mikro-zapytania semantycznego (do 5 tokenów), gdy determinizm wymagałby podatnego na kolizje potwora regexowego.
+## 🚫 2. ŻELAZNY PROTOKÓŁ ZERO-COSMETIC I 4 RYGLE ANTY-PROTEZOWE
+Kategorycznie ZAKAZUJE SIĘ uznawania jakiegokolwiek błędu za naprawiony poprzez:
+1. **Ręczną edycję danych lub wyjścia:** Modyfikację plików `*_bible.json`, glosariuszy, cache'u lub wyjściowych napisów `.ass`/`.srt` (pliki danych mogą zmieniać się wyłącznie jako automatyczny rezultat działania naprawionego kodu Pythona).
+2. **Łatanie powierzchniowe w Linterze:** Dopisywanie doraźnych regexów w `avt_linter.py` maskujących pojedynczy objaw bez naprawy reprezentacji wiedzy w Warstwach 1–3.
+3. **Ukryte Hardkodowanie w Kodzie Pythona (Zero-Literal & Zero-Stem Leakage):** Umieszczanie w produkcyjnych plikach `.py` (poza `test_system.py`) konkretnych imion własnych, nazw krain, frakcji czy ich rdzeni słowotwórczych pochodzących ze zgłoszenia błędu (zakaz słowników wyjątków typu `EXCEPTIONS = {"Imię": "Forma"}`).
+4. **Pozorowane „Łatanie Promptem” (No Prompt-Stuffing):** Dopisanie samej instrukcji tekstowej do promptu LLM bez wdrożenia deterministycznej logiki w Pythonie (parsera, reguły grafu dyskursu, walidatora Pydantic i korektora morfosyntaktycznego).
 
 ---
 
-## 📝 4. PROTOKÓŁ PLANOWANIA I AKCEPTACJI PRZED EDYCJĄ KODU (PLANNING & USER APPROVAL GATE)
-Najpierw pełna diagnoza źródłowa i mapa rodziny problemu. Zakaz samowolnych edycji plików źródłowych (.py, konfiguracji) bez całościowego planu w `implementation_plan.md` i wyraźnej zgody Operatora.
+## 🎙️ 3. EPISTEMICZNA TRIANGULACJA PŁCI, AUTOMAT DIEGETYCZNY I PARSING NAPISÓW
+1. **Higiena Strumienia Audio i Limit CPU (`librosa.pyin`):**
+   - Jawne mapowanie japońskiej ścieżki audio w FFmpeg: `-map 0:a:m:language:jpn? -map 0:a:0 -vn -acodec pcm_s16le -ar 16000 -ac 1`.
+   - Zakaz mielenia 24 minut audio przez pYIN: pobranie 3–5 czystych wycinków mowy (1.5–2.0 s, łącznie <= 10 s per postać). Dyskwalifikacja próbek z muzyką/krzykiem (std(F0) > 50 Hz).
+   - **Asymetria Fizjologiczna Krtani:** Mediana F0 <= 135 Hz nadaje twardy determinizm męski (`F0_hard_masculine = True`, pewność 1.0, prawo weta łamane tylko przy Score_EN <= -8). Dla całego pasma F0 > 135 Hz waga akustyki wynosi `0.0` (ochrona przed niskimi głosami kobiecymi 140–170 Hz oraz kobiecymi seiyū dubbingującymi chłopców >170 Hz).
+2. **Czystość Analizy NLP i Drzewo Zależności (`spaCy en_core_web_sm`):**
+   - Łączenie kwestii z przerwą Delta_t < 1.5 s w akapity przed analizą koreferencji.
+   - **Vocative Filter:** Wykluczenie zwrotów adresatywnych w 2. osobie (*"Ray, you..."*) ze zliczania podmiotów 3. osoby.
+   - **Dependency Subject Isolation:** Zaimki `he/she` ze zdania następującego są przypisywane do postaci X wyłącznie wtedy, gdy w zdaniu tym nie wystąpiła inna nazwa własna (`PROPN`) jako nowy podmiot (`nsubj`/`nsubjpass`).
+3. **Dwuwarstwowa Bramka Monologu Wewnętrznego i Sanitacja CJK:**
+   - Cudzysłowy `「 」` i `『 』` to zawsze mowa głośna (zakaz traktowania jako myśli). Nawiasy `【 】`, `《 》`, `［ ］` to skille/szyldy. Notki `[TL: ...]` i `[SFX: ...]` są wycinane przed analizą NLP.
+   - **Ścieżka 1 (Nawiasy Myśli):** Cała kwestia w `( )` lub `（ ）` albo styl `Thoughts/Internal` -> `is_internal_monologue = True` (niezależnie od tego, czy w scenie istnieje `target_speaker`).
+   - **Ścieżka 2 (Sama Kursywa `{\i1}`):** Daje `is_internal_monologue = True` WYŁĄCZNIE gdy `target_speaker is None`, brak wołacza/wykrzyknika zewnętrznego, brak znaczników 2. osoby (`has_2nd_person_marker`) i brak stylu `Offscreen/Radio/Flashback`.
+4. **Automat Tożsamości Diegetycznej i Dziedziczenie Aliasów:**
+   - Wiązanie interwałów `PersonaInterval(apparent_gender, valid_from_ep, valid_to_ep)` z `episode_index` (odporność na tłumaczenie odcinków poza kolejnością).
+   - Egzekwowanie `apparent_gender` w dialogu publicznym; aktywacja `true_gender` wyłącznie w monologu wewnętrznym lub rozmowie sam na sam z powiernikiem (`knows_secret`). Dekonspiracja (`EP_RUPTURE`) wyzwalana skokiem fazowym Delta Score_EN niezależnie od wysokości F0.
+   - Rekurencyjne dziedziczenie `true_gender` dla prefiksów temporalnych/stanowych (`Young, Child, Kid, Little, Baby, Old, Future, Past, Masked`) oraz rozwiązywanie etykiet posesywnych (`[Owner]'s Son/Daughter/Kid`) z blokadą domyślnej feminizacji ról dziecięcych w retrospekcjach.
 
 ---
 
-## 📖 5. NADRZĘDNOŚĆ KANONU MANGOWEGO (MANGA CANON SUPREME GROUND-TRUTH)
-Oficjalny polski kanon mangowy (`manga_canon.py`, tomy papierowe) jest nadrzędnym źródłem prawdy. Obowiązuje permanentny zakaz wprowadzania terminów „z pamięci” modelu oraz wymóg weryfikacji 1:1 w bazie kodu (audyt CI w Teście 7).
+## ✍️ 4. KOMPLETNA MORFOSYNTAKTYKA POLSKA, TOPOLOGIA 2. OSOBY I ONOMASTYKA PWN
+1. **Topologia Dyskursu 2. Osoby i Okno Tury (`SpeakerTurn`):**
+   - **Dyadic Turn-Taking:** Rozwiązywanie `target_actor` (`target_gender`) z jawnego wołacza w turze (Delta_t < 2.5 s) lub automatycznie z poprzedniego mówcy w wymianie zdań (Delta_t < 5.0 s).
+   - **Vocative-Predicate Lock:** Męski wołacz (`decl["W"]` lub tytuł męski) w obrębie tury bezwzględnie blokuje żeńskie końcówki czasowników (`-łaś -> -łeś`, `-łabyś -> -łbyś`), przymiotników orzecznikowych (`nie bądź naiwna -> naiwny`) oraz rzeczowników predykatywnych w narzędniku (`moją najlepszą uczennicą -> moim najlepszym uczniem`).
+   - **Harmonizacja Liczby Adresata (`PLURAL "YOU"`):** Wykrycie wykładnika mnogiego w którejkolwiek linii tury (polskie `-cie`, angielskie `you guys/all`, konstrukcje dystrybucyjne `your + [plural_noun]`, japońskie `omaera, kisamara, temeera, minna, -tachi`) wymusza wsteczną i progresywną konwersję pojedynczych form 2. os. na mnogie (`do ciebie -> do was`, `ty -> wy`, `jesteś -> jesteście`) w całej turze.
+2. **Klasyfikacja Ontologiczna Bytów i Rekcja Przyimkowa:**
+   - Rozróżnienie `ANTHROPONYM` (osoba; pierwszeństwo rejestracji w `characters` nad toponimami glosariusza) vs `TOPONYM` (kraina/miasto po konstrukcjach `from [Place]`, `people of [Place]`, `ci z [Place]`) vs `CHREMATONYM`.
+   - **Wszystkie Polskie Przyimki i Rozdział Semantyczny `z`:**
+     * *Dopełniacz:* `dla, do, od, z/ze (pochodzenie: skąd?), bez, u, koło, obok, blisko, wokół, pośród, wśród, spod, zza, znad, wzdłuż, podczas, mimo, według, wskutek, wobec, naprzeciw`. Przyimek pochodzenia `z` przed `TOPONYM` (`ci z [Toponym]`) kategorycznie blokuje i usuwa fałszywy sufiks narzędnika `-em`!
+     * *Celownik:* `dzięki, przeciw, przeciwko, ku, wbrew`.
+     * *Biernik:* `przez, na, w, o, za, pod, nad, przed, między, poza (ruch dynamiczny)`.
+     * *Narzędnik:* `z/ze (towarzystwo: z kim? + ANTHROPONYM), za, pod, nad, przed, między, poza (stan statyczny)`.
+     * *Miejscownik:* `o (o tobie, zakaz biernika *o ciebie*), w, na, po, przy`.
+   - **Odporność na podział wiersza ASS:** Zastąpienie naiwnego `\b` przy nazwach własnych granicą odporną na znaczniki ASS: `(?:^|\\[Nnh]|[^\w])`.
+3. **Paradygmat 7 Przypadków (`DeclensionParadigm`) i Norma Ortograficzna PWN:**
+   - Zamrożona matryca (M, D, C, B, N, Ms, W) w `SeriesBible` (zakaz *Nominative Freezing*).
+   - **Nieodmienność żeńska:** Obce i japońskie imiona żeńskie zakończone na spółgłoskę lub samogłoskę inną niż `-a` (*Rin, Megumi, Yuki*) są bezwzględnie nieodmienne.
+   - **Zasada Apostrofu PWN (CV-Mora Detector):** Apostrof wyłącznie po niemym fonetycznie `-e` (*White'a, Wayne'a, George'a*). Kategoryczny zakaz apostrofu po wymawianych spółgłoskach (*Raya, Renem*) oraz po japońskich otwartych morach zakończonych na wymawiane `-e` (*-ke, -te, -ne, -me, -re, -se, -ze, -be, -ge*).
+   - **Dystrybucja końcówki `-u` w Ms i W:** Tematy męskie zakończone na afrykaty, głoski stwardniałe, tylnojęzykowe i miękkie (`tz, c, dz, cz, sz, rz, ż, sh, ch, k, g, j, y, l`) przyjmują w Miejscowniku i Wołaczu końcówkę **`-u`** (np. `-tz -> -tzu`; automatyczna korekta błędnego `-tzie -> -tzu`).
+   - **Morfologia trzonów i ortografia:** Pełna obsługa oboczności (*ó:o, ą:ę, e:zero, k:c, g:dz*), separacja żeńskich końcówek przymiotnikowych `-owa` od męskiego celownika `-owi`/mianownika lm `-owie`, korekta alternacji męskoosobowych od tematów `-nki` (`ciency`, blokada `cieńscy`), tarcza homonimii (`POLISH_COMMON_NOUN_HOMONYMS`, strażnik miejscownika `w powiecie` vs czasownika `powiecie`) oraz pełny korpus >= 165 par ról społecznych.
+   - **Postacie Epizodyczne (`NEUTRAL`, 1–2 kwestie):** Status `is_transient = True` (brak blokady P0, otwarcie na leniwą promocję) oraz bezwzględny wymóg form bezczasownikowych/bezosobowych/teraźniejszych.
 
 ---
 
-## 🛡️ 6. OBOWIĄZKOWY PROTOKÓŁ 5 WARSTW (5-LAYER ROOT CAUSE PROTOCOL)
-Każda naprawa musi objąć pełen łańcuch:
-- **Warstwa 1 (Profiler / Kontrakt Pydantic):** Walidacja tożsamości u źródła, twardy schemat danych.
-- **Warstwa 2 (Baza Wiedzy / SeriesBible):** Odporność pamięci na skażenie, dwutorowy dyspozytor (Fast/Deep Track).
-- **Warstwa 3 (Kanon & Prompty):** Ukierunkować właściwy Filar AVT na pozytywny wektor rzemiosła AVT (dramaturgia, styl, rejestr) bez paraliżujących mikro-zakazów.
-- **Warstwa 4 (EpisodeQualityGate offline 0.00 PLN):** Deterministyczny bezpiecznik na pełnej osi czasu (CPS/CPL, ASS-Fuzzing, $W_i \to W'_i$).
-- **Warstwa 5 (Test Regresyjny):** Atomowy test regresyjny z podwójnymi asercjami (Positive + False-Positive Check).
+## 📐 5. METRYKI EKRANOWE ASS, FUNKCJA NAGRODY AVT I HIGIENA REJESTRU
+1. **Fizyczne Ograniczenia Planszy i Pętla na Tekście Polskim:**
+   - `CPS_PL = len(pure_text_bez_tagow_ASS) / max(Delta_t, 0.5) <= 17.0` (dynamiczny sufit znaków: `min(76, int(Delta_t * 17.0))`, max 2 linie, `CPL <= 38`).
+   - **Wielokryterialna Funkcja Nagrody AVT (Asymmetric Dead-Band Potential – ochrona przed kastracją dialogu):**
+     `R_AVT(y | x, Delta_t, a) = R_base(y, x) - [ P_band(y, Delta_t, rho_x) + lambda_cpl * Psi(CPL(y)) + L_drama(y, x, a) ]`
+     Dla gęstego dialogu japońskiego (`rho_x = moras(x) / Delta_t >= 9.0 mor/s`) obowiązuje minimalna podłoga `CPS_target(rho_x) = min(13.5, 7.5 + 0.5 * rho_x)`.
+2. **Nadzór Rejestru i Bezpieczeństwo Warstwy 4 (Primum Non Nocere):**
+   - Eliminacja 4 klas slangu w gatunkach historycznych/fantasy: Klasa A (młodzieżowy: *spoko, i gitara*), Klasa B (wulgarny: *stul pysk*), Klasa C (współczesne metafory: *przejmuję stery*), Klasa D (trywializacje: *ten typ, dzikuska*).
+   - Jednotokenowa harmonizacja fleksyjna (`W_i -> W'_i`) z ochroną cytatów (`QuoteShield`). Zakaz otwartych wzorców dla wykrzykników (wymagane zakotwiczenie `^`, `\N`, `[-–]` i `!`), redukcja *kakegoe* wyłącznie przy wypowiedziach <= 2 słów. Zakaz lookbehindów o zmiennej długości.
+   - Defensywna telemetria (brak cichych bloków `except:`) oraz sanityzacja czeskich błędów zegara (`Delta_t in {60, 120, 600, 1200, 3600} s`).
 
 ---
 
-## 📋 7. WYMÓG ZREFORMOWANEJ TABELI DOWODOWEJ (STANDARYZACJA PROTOKOŁU 2.0 / 3.0)
-Raport z każdego incydentu musi zawierać tabelę dowodową: Warstwa 1 (Pydantic), Warstwa 2 (Baza Wiedzy & Rejestr Długu), Warstwa 3 (Pozytywny Wektor & Breathing Space Index), Warstwa 4 (ASS-Fuzzing), Warstwa 5 (Anchor Scenes 100.0% PASS).
-
----
-
-## ⚖️ 8. ZAKAZ SAMOZACHWYTU I PUSTYCH ZAPEWNIEŃ
-Wiarygodność opiera się wyłącznie na twardych diffach w kodzie, konkretnych asercjach i przechodzących testach CI/CD.
-
----
-
-## 💰 9. ŻELAZNE OGRANICZENIA KOSZTOWE I ŚRODOWISKOWE
-Zakaz Vertex AI (`use_vertex = 0`). Wyłącznie bezpośrednie klucze Google AI Studio. Context Caching (-90% kosztu tokenów). Silniki lintera, pamięci i audytu mają koszt dokładnie 0.00 PLN.
-
----
-
-## ⚡ 10. PROAKTYWNA INTEGRALNOŚĆ LEKSYKALNA I NADZÓR REJESTRU (PROACTIVE GOVERNANCE)
-1. **Zakaz doraźnych regexów (Anti-Whack-A-Mole):** Kontrola leksykalna w silnikach offline (0.00 PLN) wdrażana wyłącznie jako kompletne, zamknięte katalogi słownikowe i matryce fleksyjne.
-2. **Kategoryczna Taksonomia Zakazanego Slangu (Nadzór Rejestru bez Zaśmiecania Promptów):** Eliminacja 4 klas slangu w gatunkach historycznych/fantasy (Klasa A: Slang młodzieżowy `i gitara`, `spoko`; Klasa B: Agresja podwórkowa `stul pysk`, `łomot`; Klasa C: Współczesne metafory potoczne `przejmuję stery`; Klasa D: Trywializujące określenia `ten typ`, `dzikuska`). Egzekwowana deterministycznie w Warstwie 4 i w CoT, bez zaśmiecania promptu głównego ścianami zakazów.
-3. **Krok Negatywnego Audytu w CoT Fazy 2:** Weryfikacja rejestru klas A–D, eliminacja kalek przydomkowych `X od Y` oraz poprawność rządu gramatycznego.
-4. **Encyklopedia Serii i Sanityzator Znaczników Czasu:** Autonomiczne zasilanie toponimów i tytulatury w pre-passie; obsługa czeskich błędów cyfrowych w znacznikach czasowych ($\Delta t \in \{60\text{s}, 120\text{s}, 600\text{s}, 1200\text{s}, 3600\text{s}\}$).
-
----
-
-## 🔒 11. ZERO DESTRUKCJI I BEZPIECZEŃSTWO WARSTW OFFLINE (NON-DESTRUCTIVE OFFLINE GATE)
-1. **Primum Non Nocere:** Zakaz wprowadzania reguł generujących błędy w poprawnych kwestiach.
-2. **Zakaz otwartych wzorców `\bFRAZA\b`:** Wykrzykniki i paralingwistyka (*Ała!*, *Uważaj!*) muszą być zakotwiczone (`^`, `\N`, `[-–]`) i wymagać wykrzyknika, by nie usuwać orzeczeń zdań złożonych.
-3. **Audyt 4 Wymiarów Kolizji:** Wymiar dosłowny/medyczny, dziedzinowy/homonimiczny, składniowy/orzeczeniowy oraz fleksyjny.
-4. **Obowiązkowe Obustronne Asercje:** Test pozytywny (naprawa wady) + test negatywny (ochrona zdań poprawnych). Zakaz lookbehindów o zmiennej długości (`re.PatternError`).
-
----
-
-## 🔬 12. DIAGNOZA ŹRÓDŁOWA PRZED PLANEM (ROOT-CAUSE-FIRST MANDATE)
-Diagnoza źródłowa zawsze przed planem. Obowiązkowy audyt 3 pytań kontrolnych: „A co z innymi słowami?”, „A co z innymi parami/formami fleksyjnymi?”, „Jakie inne byty podlegają temu mechanizmowi?”. Plan musi od razu eliminować całą rodzinę powiązanych błędów.
-
----
-
-## 🕊️ 13. ODCIĄŻENIE MODELI GEMINI I MECHANICZNA KOREKTA EN W WARSTWIE 4 (LLM UNBURDENING)
-1. **Czystość Promptów:** Filary Warstwy 3 zawierają wyłącznie zwięzłe, pozytywne wektory rzemiosła AVT. Zakaz zaśmiecania modeli sztywnymi zakazami.
-2. **Warstwa 4 jako Tarcza Dwuznaczności EN:** Deterministyczna harmonizacja końcówek pojedynczego tokenu ($W_i \to W'_i$) wynikająca z ubóstwa angielskiego pivotu (*you*, *you were*, wspólny rodzaj) w oparciu o 100% pewne fakty z Warstw 1 i 2, przy zachowaniu nienaruszonej tkanki dialogu.
-
----
-
-## 🌐 14. POKRYCIE CAŁEJ DOMENY JĘZYKA POLSKIEGO W PLANIE (EXHAUSTIVE DOMAIN MANDATE)
-1. **Pełne Paradygmaty Fleksyjne:** Plany naprawcze obejmują wszystkie 7 przypadków, osoby, liczby, rodzaje oraz oboczności wokaliczno-spółgłoskowe.
-2. **Jednotokenowa Niezmienniczość ($W_i \to W'_i$):** Wymiana wyłącznie docelowego tokenu, ochrona szyku wyrazów i oryginalnej melodii dialogu.
-
----
-
-## 🔒 15. ŻELAZNA ZASADA BEZWZGLĘDNEJ KOMPLETNOŚCI LEKSYKALNEJ, PRZYIMKOWEJ I PRZYPADKOWEJ
-1. **Zero List Szczątkowych:** Zakaz list reprezentatywnych z dopiskiem „itp.”. Obowiązek pełnych katalogów słownikowych gotowych do deterministycznego działania.
-2. **Wszystkie Polskie Przyimki:**
-   - **Dopełniacz:** *dla, do, od, z, ze, bez, u, koło, obok, blisko, wokół, dookoła, pośród, wśród, spod, zza, znad, wzdłuż, podczas, mimo, według, wskutek, wobec, naprzeciw*.
-   - **Celownik:** *dzięki, przeciw, przeciwko, ku, wbrew*.
-   - **Biernik:** *przez, przeze, na, w, we, o, za, pod, pode, nad, nade, przed, przede, między, pomiędzy, poza*.
-   - **Narzędnik:** *z, ze, za, pod, pode, nad, nade, przed, przede, między, pomiędzy, poza*.
-   - **Miejscownik:** *o, w, we, na, po, przy*.
-3. **Wszystkie 7 Przypadków Gramatycznych:** Pełne paradygmaty dla każdego wprowadzanego pojęcia: Mianownik (M), Dopełniacz (D), Celownik (C), Biernik (B), Narzędnik (N), Miejscownik (Ms), Wołacz (W).
-
----
-
-## 🏛️ 16. ŻELAZNA ZASADA KOMPLETNOŚCI ONOMASTYCZNEJ, KORPUSU PAR RÓL I MORFOLOGII WSZYSTKICH TRZONÓW
-1. **Tarcza Homonimii Nazw Własnych:** Baza `POLISH_COMMON_NOUN_HOMONYMS` obejmująca 14 domen semantycznych (750+ słów) rozstrzygająca kolizje onomastyczne w Warstwach 2 i 4 przy koszcie 0.00 PLN.
-2. **Symetria Par Ról Społecznych:** Pełne paradygmaty ról męsko-żeńskich (minimum 165 par w 7 kategoriach) z formami żon (*-owa*), córek (*-anka, -ówna*) i funkcji samodzielnych (*-ka, -ini/-yni*).
-3. **Morfologia Wszystkich Trzonów:**
-   - Oboczności wokaliczne (*ó:o*, *ą:ę*, *e:zero*) i konsonantyczne (*ch:sz*, *k:c/cz*, *g:dz/ż*, *dź:z*).
-   - Separacja Trzonów Przymiotnikowych i Rzeczownikowych na `-owa` vs `-owi / -owie` (formy żeńskie przymiotnikowe `-a, -ej, -ą` vs męski celownik `-owi` i mianownik lm. `-owie`).
-   - Ochrona trzonów krótkich jedno- i dwusylabowych (`\b` + negatywne wykluczenia homofonów).
-
----
-
-## 🏛️ 17. CZYSTOŚĆ ARCHITEKTONICZNA PROMPTÓW, LEAN FAZY 2 I DEFENSYWNA TELEMETRIA
-1. **Czystość Promptów:** Zakaz wstrzykiwania surowych regexów. Lean Script Doctor w Fazie 2 (~5 800 znaków briefu). Wstrzykiwane słowniki ZAWSZE z instrukcją: `(forma bazowa – w dialogu ZAWSZE odmieniaj przez polskie przypadki!)` przeciw zamrażaniu mianownikowemu.
-2. **Defensywna Telemetria i Zero Cichych Awarii:** Obiekty telemetrii normalizowane polimorficznie (`str`, `dict`, `None`). Zmienne definiowane na poziomie nadrzędnym przed rozgałęzieniami warunkowymi — zakaz maskowania błędów blokami `except:`.
-3. **Bramkowanie Szumu Kinezjatycznego:** Redukcja sytuacyjna kakegoe dopuszczalna wyłącznie przy wypowiedziach $\le 2$ słów; zakaz redukcji na pełnych zdaniach orzeczeniowych.
-
----
-
-## 🔬 18. AUDYT PODATNOŚCI W 5 WARSTWACH I 4-CZĘŚCIOWY KWADRANT DIAGNOSTYCZNY
-Każda domena ryzyka analizowana obowiązkowo w 4 krokach:
-1. **Istota Problemu Architektonicznego:** Zderzenie paradygmatów i First Principles RCA.
-2. **Mechanizm Awarii i Scenariusz Brzegowy:** Wejście, trajektoria przepływu w 5 warstwach i badanie efektów drugiego rzędu.
-3. **Punkt Kolizji w Kodzie:** Dokładne pliki, linie i błędy logiczne w kodzie źródłowym.
-4. **Rekomendacja Architektoniczna:** Trwały, symetryczny bezpiecznik w 5 warstwach z zachowaniem granicy offline vs LLM.
-
----
-
-## 🏛️ 19. ŻELAZNE AKSJOMATY ARCHITEKTURY I PROTOKÓŁ SAMOKONTROLI
-- **Aksjomat 1 (Aseptyczność Morfologiczna Przykładów):** Zero nacechowanych fleksyjnie form w przykładach neutralności (zakaz form `-łem/-łam`; wyłącznie formy bezczasownikowe).
-- **Aksjomat 2 (Granica Determinizmu):** Zakaz regexowych parafraz idiomów w Warstwie 4. Redukcja waty słownej operuje na tokenach i segmentach zdaniowych, chroniąc kwestie $\le 2$ słów i naprawiając wielką literę po cięciu.
-- **Aksjomat 3 (Spójność Multi-Script):** Jednoczesna definicja wzorców w Kanji, Hiraganie/Katakanie i Romaji. Rozdział `HARD_PANIC` od `CONTEXTUAL_PANIC`.
-- **Aksjomat 4 (Paradygmat Pesymistycznej Nienaruszalności):** Zakaz heurystyk sylabowych dla imion. Odmiana imienia dozwolona wyłącznie, gdy forma bazowa istnieje w bazie wiedzy.
-- **Aksjomat 5 (Pętla Metryk na Języku Docelowym):** $\text{CPS}_{\text{PL}}$ liczony wyłącznie na czystym tekście polskim bez tagów ASS: `len(pure_text) / max(duration_s, 0.5)`. Dynamiczny sufit: `min(76, int(dur * 17.0))`.
-- **Aksjomat 6 (Atomowość Tarcz Regresyjnych):** Dedykowana metoda testowa dla każdej domeny z obustronnymi asercjami (Double-Sided: błąd naprawiony + zdanie poprawne nietknięte).
-- **Protokół Samokontroli (Pre-Flight Checklist przed każdą odpowiedzią):** Weryfikacja 6 pytań kontrolnych (aseptyczność przykładów, odporność regexów na inwersję, multi-script JA/Romaji, brak heurystyk sylabowych, metryki na tekście PL, atomowość testów).
-
----
-
-## 👑 20. HIERARCHICZNY PROTOKÓŁ PRACY ZESPOŁU CZTEROAGENTOWEGO (STANDARD 3.0)
-Nadrzędna procedura działania potoku pod nadzorem Autonomicznego Pełnomocnika Operatora (Agent 4) i Bramki Człowieka (Human Operator).
-
-### 👑 Hierarchia Dowodzenia i Role
-- **OPERATOR (Człowiek):** Najwyższa instancja decyzyjna. Wyłączny dysponent prawa zapisu do plików repozytorium (autoryzacja komendą: `ZATWIERDZAM DOSSIER - WDROŻYĆ DO KODU`).
-- **AGENT 4 (Supervisor):** Pełnomocnik Operatora i jedyny punkt kontaktu z Człowiekiem. Anti-Loop Watchdog (przerywa spory po 2 iteracjach), Triage (Fast-Track < 2 min vs Deep Incident), audyt rzetelności A1 i A3, synteza 1-stronicowego Dossier Decyzyjnego. Posiada prawo i obowiązek automatycznego weta: `STATUS: ODRZUCONO WEWNĘTRZNIE - WYKRYTO PUDROWANIE SYMPTOMÓW ZAMIAST NAPRAWY KODU SILNIKA` w przypadku braku fizycznego diffu w logice silnika Pythona.
-- **AGENT 3 (Chief Epistemic Architect):** Analiza ontologiczna (RCA), 4-stopniowy audyt fabryki błędów (Root-Cause Deconstruction), wstrzykiwanie twardych kontraktów Pydantic (`speaker_grammatical_gender`), czerwony test w Golden Corpus (Anchor Scenes = 100.0%).
-- **AGENT 1 (Lead Implementer):** Prototypowanie w buforze RAM (Diff Preview), eliminacja błędu u źródła w schematach danych, bazie wiedzy lub promptach Filarów.
-- **AGENT 2 (Adversarial Reviewer & ASS-Fuzzing):**
-  * **18 Wymiarów Audytu:** Efekty drugiego rzędu, ukryte założenia, martwe punkty determinizmu, deficyt Shannona, mode collapse, hierarchia Chomsky'ego, utrata rozkładów, symbol grounding, deiksa sytuacyjna, common ground, nieizomorficzność topologiczna, ślepota wideo, zatrucie pivotem EN, Yakuwarigo/code-switching, asymetria chronemiczna (mora vs akcent), pismo japońskie (Ateji/furigana), zakaz przypisów w AVT (Zero-Footnote Constraint), wielokryterialna funkcja nagrody AVT.
-  * **Wielokryterialna Funkcja Nagrody AVT (Asymmetric Dead-Band Potential):**
-    $$R_{\text{AVT}}(y \mid x, \Delta t, a) = R_{\text{base}}(y, x) - \Big[ P_{\text{band}}(y, \Delta t, \rho_x) + \lambda_{\text{cpl}} \cdot \Psi(\text{CPL}(y)) + L_{\text{drama}}(y, x, a) \Big]$$
-    gdzie sufit $\text{CPS} \le 17.0$, podłoga $\text{CPS}_{\text{target}}(\rho_x) = \min(13.5, \; 7.5 + 0.5 \rho_x)$ dla $\rho_x \ge 9.0\text{ mor/s}$, a geometria $\text{CPL} \le 38$ (max 2 linie).
-  * **ASS-Fuzzing:** Test odporności na tagi fanowskie (`{\pos}`, `{\an8}`, inline `{\i1}`, `\N`, `\h`). Raportuje wyłącznie do Agenta 3 i 4 (zakaz bezpośredniego kontaktu z Operatorem).
-
-### 🔬 Obowiązkowy 4-Stopniowy Audyt Fabryki Błędów (Root-Cause Deconstruction)
-Przy każdym zgłoszonym incydencie Agent 3 (w analizie RCA) oraz Agent 4 (w Dossier) mają bezwzględny obowiązek udokumentowania 4 etapów:
-1. **Identyfikacja fabryki błędów w kodzie silnika:** Wskazanie dokładnego pliku `.py`, nazwy funkcji, numeru linii i mechanizmu wygenerowania defektu (zderzenie założeń z danymi wejściowymi).
-2. **Audyt asymetrii źródeł zewnętrznych (Ground-Truth Failure Audit):** Wyjaśnienie, dlaczego autorytatywne źródła zewnętrzne (AniList GraphQL, Manga Canon, VNDB) nie zapobiegły defektowi (analiza normalizacji zapytań, filtrów sezonowych, ślepoty API i stanu cache).
-3. **Test generalizacji („Co z innymi instancjami?”):** Wykazanie, że naprawa zabezpiecza całą klasę zjawiska w architekturze silnika, a nie tylko jednostkowy przypadek ze zgłoszenia.
-4. **Fizyczna reprezentacja w kodzie Pythona:** Przedstawienie rzeczywistego diffu w logice silnika Pythona (`metadata.py`, `series_memory.py`, `translator.py` itp.), a nie wyłącznie modyfikacji bazy danych JSON.
-
-### 🔄 7-Fazowy Potok Pracy i Żelazna Bramka Zapisu
-- **Faza 0:** Zgłoszenie kwestii przez Operatora $\to$ **Faza 1:** Triage Agenta 4 $\to$ **Faza 2:** RCA i czerwony test Agenta 3 $\to$ **Faza 3:** Implementacja w RAM Agenta 1 $\to$ **Faza 4:** Audyt ASS-Fuzzing i 18 wymiarów Agenta 2 $\to$ **Faza 5:** Złożenie Dossier przez Agenta 4 $\to$ **Faza 6:** Komenda Operatora `ZATWIERDZAM DOSSIER - WDROŻYĆ DO KODU` $\to$ fizyczny zapis, uruchomienie CI/CD (156/156) i raport Zreformowaną Tabelą Dowodową 5 Warstw.
-- **Wymóg Nienaruszalności Potoku:** Każda faza (od 0 do 5) musi zostać faktycznie wykonana i wylegitymowana rzeczywistym wyjściem testowym z bufora RAM przed przejściem do fazy następnej. Zakaz przeskakiwania faz, kompresji do samej Fazy 5 oraz przedwczesnej syntezy bez dowodów laboratoryjnych.
-
-### 📄 Obowiązkowy Standard Executive Dossier (Standard 3.0)
-Każde Dossier przedkładane Operatorowi przez Agenta 4 musi bezwzględnie zawierać sekcję:
-```markdown
-### [CERTYFIKAT ELIMINACJI ŹRÓDŁOWEJ]:
-1. Punkt pęknięcia algorytmu: [Plik, funkcja, linia]
-2. Dlaczego API/Ground-Truth nie zadziałało: [Wyjaśnienie ślepoty API/cache]
-3. Poprawka w kodzie silnika: [Diff w plikach .py, a nie tylko .json]
-4. Dowód generalizacji: [Test laboratoryjny na danych syntetycznych]
-5. Brak konieczności ręcznych interwencji w przyszłości: [POTWIERDZONO / WYMAGA UWAGI]
-```
-
-### 🛡️ 6 Żelaznych Bezpieczników Potoku
-1. **Breathing Space Index & Anti-Goodhart:** Zakaz kastracji kwestii pod CPS kosztem ładunku dramatycznego i pauz oddechowych seiyū.
-2. **Audyt ASS-Fuzzing:** Operowanie na drzewie tokenów wizualnych; ochrona nawiasów `{}`.
-3. **Golden Corpus Anchor Gate = 100.0%:** Zero regresji na Scenach Kotwiczących; $\ge 99.0\%$ na całym korpusie.
-4. **Leczenie u Źródła w Kontraktach Danych:** Blokada błędów tożsamości i płci w Pydantic i SeriesBible, zakaz puchnięcia lintera.
-5. **Kategoryczny Zakaz Skracania Potoku (Zero Premature Synthesis Mandate):** Agent 4 ma absolutny zakaz przeskakiwania z Fazy 1 bezpośrednio do Fazy 5. Faza 2 (Czerwony Test Agenta 3) oraz Faza 3–4 (Prototyp w RAM Agenta 1 + Audyt ASS-Fuzzing Agenta 2) MUSZĄ zostać fizycznie uruchomione w środowisku scratch/RAM i udokumentowane w odpowiedzi twardymi logami wykonania przed przedłożeniem Dossier Operatorowi.
-6. **Zero-Cosmetic Gate (Weto Agenta 4):** Bezwzględne weto `STATUS: ODRZUCONO WEWNĘTRZNIE - WYKRYTO PUDROWANIE SYMPTOMÓW ZAMIAST NAPRAWY KODU SILNIKA` przy braku fizycznego diffu w kodzie silnika Pythona. Zakaz pudrowania problemów przez doraźną modyfikację `*_bible.json`, lintera lub pliku `.ass`.
-
-### 🛡️ Żelazna Reguła Obsługi Zgłoszeń Operatora (Autonomous Multi-Agent Mandate)
-Każde zgłoszenie defektu lub błędu przez Operatora MUSI być bezwzględnie procesowane przez autonomiczny zespół wieloagentowy (Autonomous AVT Team) w pełnym rygorze Standardu 3.0:
-1. **Równoległa Eksploracja i Implementacja u Źródła:** Mapowanie przyczyn źródłowych (RCA) na 5 warstwach potoku oraz fizyczna naprawa logiki w kodzie Pythona silnika (Zero-Cosmetic Mandate).
-2. **Podwójna Kontradyktoryjna Bramka Jakości (Dual Adversarial Quality Gate):**
-   - Minimum 2 Reviewerów (weryfikacja 18 wymiarów AVT i nienaruszalności aksjomatów).
-   - Minimum 2 Challengerów (agresywny stress-testing, ASS-fuzzing, walidacja przełamań `\N` i dialogu).
-3. **Niezależny Audyt Kryminalistyczny (Forensic Victory Audit):**
-   - Żadne zadanie nie może zostać uznane za ukończone ani przedstawione Operatorowi jako sukces bez niezależnego audytu kryminalistycznego i formalnego werdyktu **VICTORY CONFIRMED**.
-   - W przypadku werdyktu `VICTORY REJECTED` lub `REQUEST_CHANGES` zespół automatycznie wchodzi w kolejną iterację naprawczą.
+## 👑 6. TRYBY PRACY ZESPOŁU WIELOAGENTOWEGO, AUDYT ŚLEDCZY I DYREKTYWA PYTEST
+1. **Dwa Tryby Wywołania:**
+   - **Tryb Autonomiczny (`/goal`, `/teamwork-preview`):** Zespół wieloagentowy (Project Orchestrator, równoległe sub-agenty wykonawcze, Reviewers & Challengers w 18 wymiarach AVT + ASS-Fuzzing, Forensic AST Auditor oraz Victory Auditor) realizuje pełny cykl naprawczy z fizyczną modyfikacją plików `.py` aż do uzyskania werdyktu **`VICTORY CONFIRMED`**. W trybie `/teamwork-preview STANDBY` zespół oczekuje na wklejenie listy błędów przed startem Fazy 0.
+   - **Tryb Konsultacyjny / Planowania:** Gdy Operator prosi wyłącznie o analizę lub plan bez komendy wdrożeniowej, edycja plików następuje po akceptacji Operatora.
+2. **Obowiązkowa Weryfikacja Śledcza (`audit_diff.ps1`) i Dyrektywa Szybkości `pytest`:**
+   - **Ochrona przed 12-minutowym wąskim gardłem pytest:** W trakcie implementacji (Fazy 1–3) obowiązuje KATEGORYCZNY ZAKAZ uruchamiania pełnego pakietu testów. Agenty uruchamiają wyłącznie szybkie testy celowane (< 2 s):
+     `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_nowego_testu>"`
+   - **Forensic AST Audit:** Przed zamknięciem zadania audytor weryfikuje `git diff` skryptem:
+     `powershell -ExecutionPolicy Bypass -File .\audit_diff.ps1 -ForbiddenTerms "<DYNAMIC_LITERAL_BLACKLIST>"`
+     (kod wyjścia `0`: brak zmian w JSON/ASS, brak wycieku nazw własnych do kodu produkcyjnego, brak martwego kodu, brak mockowania logiki domenowej). Zakaz modyfikacji pliku `audit_diff.ps1`.
+   - **Finalny Acceptance Gate (Faza 4):** Niezależny Victory Auditor uruchamia DOKŁADNIE RAZ pełny pakiet wszystkich testów (`.\.venv\Scripts\python.exe -m pytest`, wymagane 100% PASSED, Zero Regression) i publikuje **Executive Dossier** z sekcją `[CERTYFIKAT ELIMINACJI ŹRÓDŁOWEJ]`.
+3. **Ograniczenia Środowiskowe i Kosztowe:**
+   - Środowisko Windows (`.venv`), ścieżki przez `pathlib.Path`, wywołania `subprocess` jako lista argumentów bez `shell=True`.
+   - Zakaz Vertex AI (`use_vertex = 0`), zakaz zewnętrznych modeli wymagających tokenów chmurowych (`pyannote.audio`). Wszystkie silniki profilera, triangulacji, pamięci i lintera działają lokalnie przy koszcie dokładnie **0.00 PLN**.

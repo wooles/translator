@@ -953,6 +953,11 @@ class EpistemicAudioTriangulator:
             median_f0=median_f0
         )
 
+    @classmethod
+    def score_japanese_pronoun(cls, pronoun: Optional[str] = None, text: Optional[str] = None) -> int:
+        """Modułowa funkcja oceny wagi zaimka 1. osoby (deleguje do SpaCyAnaphoraDiscourseAnalyzer)."""
+        return SpaCyAnaphoraDiscourseAnalyzer.score_japanese_pronoun(pronoun=pronoun, text=text)
+
 
 def resolve_event_speaker_cascade(event: Any, prev_event: Optional[Any] = None, jp_text: str = "") -> Optional[str]:
     """
@@ -983,7 +988,7 @@ def resolve_event_speaker_cascade(event: Any, prev_event: Optional[Any] = None, 
     # 1. Autoprezentacja w transkrypcji JA
     if jp_text:
         intro_match = re.search(
-            r"\b(?:ore|watashi|boku)\s+wa\s+([A-Z][a-z]+|[A-Za-z]+)",
+            r"\b(?:ore|watashi|watakushi|boku)\s+wa\s+([A-Z][a-z]+|[A-Za-z]+)",
             jp_text,
             re.IGNORECASE
         )
@@ -1184,6 +1189,46 @@ class SpaCyAnaphoraDiscourseAnalyzer:
         return score_pronouns + score_nouns
 
     @classmethod
+    def score_japanese_pronoun(cls, pronoun: Optional[str] = None, text: Optional[str] = None) -> int:
+        """
+        Zwraca wagę morfosyntaktyczną zaimka 1. osoby (yakuwarigo):
+        - Męskie: 'ore', 'boku', 'sessha', 'washi', 'oira', 'wagahai', 'ware' -> +3
+        - Jednoznacznie żeńskie: 'atashi', 'atai', 'uchi', 'atakushi', 'warawa' -> -3
+        - Neutralne / formalne (dworskie, urzędowe, wojskowe): 'watakushi', 'watashi', '私' -> 0
+          (rejestr formalny używany powszechnie przez mężczyzn i kobiety; o płci decydują wektory F0,
+          angielskie he/she w spaCy oraz tytuły dworskie/urzędowe).
+        """
+        raw = (pronoun or text or "").strip().lower()
+        if not raw:
+            return 0
+
+        # 1. Dokładne dopasowanie (exact match)
+        neutral_exact = {"watakushi", "watashi", "私", "わたくし", "わたし"}
+        if raw in neutral_exact:
+            return 0
+
+        female_exact = {"atashi", "atai", "uchi", "atakushi", "warawa", "あたし", "アタシ", "アタイ", "妾"}
+        if raw in female_exact:
+            return -3
+
+        male_exact = {"ore", "boku", "sessha", "washi", "oira", "wagahai", "ware",
+                      "俺", "僕", "拙者", "わし", "おいら", "吾輩", "我"}
+        if raw in male_exact:
+            return 3
+
+        # 2. Token match / wzorce z granicami słów
+        if re.search(r"\b(?:watakushi|watashi)\b", raw) or any(k in raw for k in ("わたくし", "わたし", "私")):
+            return 0
+
+        if re.search(r"\b(?:atashi|atai|uchi|atakushi|warawa)\b", raw) or any(k in raw for k in ("あたし", "アタシ", "アタイ", "妾")):
+            return -3
+
+        if re.search(r"\b(?:ore|boku|sessha|washi|oira|wagahai|ware)\b", raw) or any(k in raw for k in ("俺", "僕", "拙者", "わし", "おいら", "吾輩", "我")):
+            return 3
+
+        return 0
+
+    @classmethod
     def _token_refers_to_character(
         cls,
         token: Any,
@@ -1373,8 +1418,9 @@ class SpaCyAnaphoraDiscourseAnalyzer:
         acoustic_weight = 1.0 if (f0_hz is not None and f0_hz <= 135.0) else 0.0
         f0_gender, f0_conf, f0_hard_masc = EpistemicAudioTriangulator.triangulate_f0_gender(f0_hz)
 
-        jp_p_low = (jp_pronoun or "").lower()
-        jp_gender = "MALE" if jp_p_low in ("ore", "boku", "sessha") else ("FEMALE" if jp_p_low in ("watashi", "atashi", "atai") else None)
+        jp_p_low = (jp_pronoun or "").strip().lower()
+        jp_score = cls.score_japanese_pronoun(jp_p_low)
+        jp_gender = "MALE" if jp_score > 0 else ("FEMALE" if jp_score < 0 else None)
 
         # 4. F0 Hard Masculine Veto (F0 <= 135 Hz)
         if f0_hard_masc:
@@ -1415,7 +1461,7 @@ class SpaCyAnaphoraDiscourseAnalyzer:
             }
 
         # Epistemic rupture detection: High pitch + strong male anaphora (|en_score| >= 8)
-        if en_score >= 8 and (jp_gender != "FEMALE" or jp_p_low == "watashi"):
+        if en_score >= 8 and (jp_gender != "FEMALE" or jp_p_low in ("watashi", "watakushi")):
             return {
                 "resolved_gender": "MALE",
                 "confidence": 0.95,
@@ -1514,6 +1560,14 @@ def triangulate_epistemic_gender(
         en_score=en_score,
         median_f0=median_f0
     )
+
+
+def score_japanese_pronoun(pronoun: Optional[str] = None, text: Optional[str] = None) -> int:
+    """
+    Modułowa funkcja oceny wagi morfosyntaktycznej zaimka japońskiego (yakuwarigo).
+    Deleguje do SpaCyAnaphoraDiscourseAnalyzer.
+    """
+    return SpaCyAnaphoraDiscourseAnalyzer.score_japanese_pronoun(pronoun=pronoun, text=text)
 
 
 def resolve_relational_actor_gender(

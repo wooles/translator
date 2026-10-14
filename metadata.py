@@ -7,10 +7,83 @@ import re
 import json
 import urllib.request
 import urllib.parse
+import unicodedata
 from pathlib import Path
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any, List, Union
 
 _ANILIST_DISABLED: bool = False
+
+def normalize_diacritics(text: str) -> str:
+    """
+    Normalizuje znaki diakrytyczne (Unicode NFKD ASCII-folding):
+    usuwa umlauty, akcenty i ogonki (np. ä -> a, é -> e, ö -> o, ü -> u).
+    """
+    if not text or not isinstance(text, str):
+        return ""
+    nfkd = unicodedata.normalize("NFKD", text)
+    return "".join(c for c in nfkd if not unicodedata.combining(c))
+
+
+def compare_character_names(name1: str, name2: str) -> bool:
+    """
+    Porównuje imiona postaci z odpornością na znaki diakrytyczne (Unicode NFKD ASCII-folding)
+    oraz wielkość liter i znaki przestankowe. Ignoruje umlauty i akcenty.
+    """
+    if not name1 or not name2:
+        return False
+    norm1 = normalize_diacritics(name1).strip().lower()
+    norm2 = normalize_diacritics(name2).strip().lower()
+    if norm1 == norm2:
+        return True
+    clean1 = re.sub(r"[^\w\s]", "", norm1).strip()
+    clean2 = re.sub(r"[^\w\s]", "", norm2).strip()
+    return clean1 == clean2 and len(clean1) >= 2
+
+
+def match_character_in_metadata(
+    character_name: str,
+    meta_or_characters: Union[Dict[str, Any], List[Dict[str, Any]]]
+) -> Optional[Dict[str, Any]]:
+    """
+    Dopasowuje imię postaci do wpisu w obsadzie serii (AniList / SeriesBible)
+    z pełną odpornością na znaki diakrytyczne (Unicode NFKD ASCII-folding).
+    Ignoruje umlauty i akcenty w zapytaniach oraz w nazwach z obsady.
+    """
+    if not character_name or not meta_or_characters:
+        return None
+
+    characters_list: List[Dict[str, Any]] = []
+    if isinstance(meta_or_characters, dict):
+        characters_list = meta_or_characters.get("characters", [])
+    elif isinstance(meta_or_characters, list):
+        characters_list = meta_or_characters
+
+    if not characters_list:
+        return None
+
+    # 1. Dokładne dopasowanie po znormalizowanych diakrytykach
+    for c in characters_list:
+        c_name = c.get("name") or ""
+        if compare_character_names(character_name, c_name):
+            return c
+        c_native = c.get("native_name") or ""
+        if c_native and character_name.strip() == c_native.strip():
+            return c
+
+    # 2. Dopasowanie tokenowe (imię / nazwisko) po znormalizowanych diakrytykach
+    target_folded = normalize_diacritics(character_name).strip().lower()
+    target_tokens = set(re.findall(r"\b\w+\b", target_folded))
+    sig_target = {t for t in target_tokens if len(t) >= 3}
+
+    for c in characters_list:
+        c_name = c.get("name") or ""
+        c_folded = normalize_diacritics(c_name).strip().lower()
+        c_tokens = set(re.findall(r"\b\w+\b", c_folded))
+        sig_c = {t for t in c_tokens if len(t) >= 3}
+        if sig_target and sig_c and (sig_target.issubset(sig_c) or sig_c.issubset(sig_target)):
+            return c
+
+    return None
 
 def clean_anime_filename(filename_or_path: str) -> str:
     """
@@ -276,8 +349,9 @@ def _raw_fetch_anilist_metadata(title: str) -> Optional[Dict[str, Any]]:
 def fetch_anilist_metadata(title: str) -> Optional[Dict[str, Any]]:
     """
     Queries the AniList GraphQL API to fetch plot synopsis, tags, and character cast.
-    Includes circuit-breaker logic and automatic normalization fallback (strip_season_suffix)
-    for sequels (S2, Season 2, etc.) when AniList only indexes the parent franchise.
+    Includes circuit-breaker logic, automatic normalization fallback (strip_season_suffix)
+    for sequels (S2, Season 2, etc.), and diacritics normalization (Unicode NFKD ASCII-folding)
+    when AniList or the title uses variations in umlauts or accents.
     """
     global _ANILIST_DISABLED
     if _ANILIST_DISABLED or not title:
@@ -287,14 +361,31 @@ def fetch_anilist_metadata(title: str) -> Optional[Dict[str, Any]]:
     if res and res.get("characters"):
         return res
 
-    # Fallback: strip season suffix and query parent franchise
+    # Fallback 1: strip season suffix and query parent franchise
     stripped = strip_season_suffix(title)
     if stripped and stripped != title and not _ANILIST_DISABLED:
         fallback_res = _raw_fetch_anilist_metadata(stripped)
         if fallback_res and fallback_res.get("characters"):
             return fallback_res
-        if fallback_res:
-            return fallback_res
+        if fallback_res and not res:
+            res = fallback_res
+
+    # Fallback 2: Unicode NFKD ASCII-folding diacritics normalization
+    folded = normalize_diacritics(title)
+    if folded and folded != title and not _ANILIST_DISABLED:
+        folded_res = _raw_fetch_anilist_metadata(folded)
+        if folded_res and folded_res.get("characters"):
+            return folded_res
+        if folded_res and not res:
+            res = folded_res
+
+        stripped_folded = strip_season_suffix(folded)
+        if stripped_folded and stripped_folded != folded and not _ANILIST_DISABLED:
+            fallback_folded = _raw_fetch_anilist_metadata(stripped_folded)
+            if fallback_folded and fallback_folded.get("characters"):
+                return fallback_folded
+            if fallback_folded and not res:
+                res = fallback_folded
 
     return res
 
@@ -375,10 +466,20 @@ def get_anime_context(filename_or_path: str, client: Any = None) -> Optional[Dic
         from series_memory import SeriesBible
         bible = SeriesBible(anime_title=clean_title)
         bible_chars = bible.data.get("characters", {})
+        if not bible_chars or len(bible_chars) < 2:
+            folded_title = normalize_diacritics(clean_title)
+            if folded_title and folded_title != clean_title:
+                bible_folded = SeriesBible(anime_title=folded_title)
+                if bible_folded.data.get("characters"):
+                    bible = bible_folded
+                    bible_chars = bible.data.get("characters", {})
+
         if bible_chars and len(bible_chars) >= 2:
             characters_list = []
             for c_name, c_val in bible_chars.items():
                 if "->" in c_name:
+                    continue
+                if match_character_in_metadata(c_name, characters_list):
                     continue
                 c_desc = c_val.get("description", "") if isinstance(c_val, dict) else str(c_val)
                 gender_str = "kobieta" if any(w in c_desc.lower() for w in ["kobieta", "female", "dziewczyna"]) else "mężczyzna"
