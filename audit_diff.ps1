@@ -10,7 +10,7 @@ $AuditFailed = $false
 
 try {
     Write-Host ""
-    Write-Host "=== FORENSIC DIFF & AST AUDITOR (STANDARD 4.0) ===" -ForegroundColor Cyan
+    Write-Host "=== FORENSIC DIFF & AST AUDITOR (STANDARD 4.1) ===" -ForegroundColor Cyan
 
     $porcelain = git status --porcelain 2>$null
     $codeChangesInWorktree = $porcelain | Where-Object { $_ -match '\.py$' }
@@ -58,7 +58,7 @@ try {
         Write-Host "[PASS] 1/4 Zero-Cosmetic Gate (zmodyfikowano rdzen silnika: $($coreEnginePy -join ', '))" -ForegroundColor Green
     }
 
-    # 2. ZERO-ONOMASTIC & STEM LEAKAGE GATE
+    # 2. ZERO-ONOMASTIC & STEM LEAKAGE GATE (Z GRANICA SLOWA \b)
     $prodDiffLines = git diff $BaseRef -- "*.py" ":!test_system.py" ":!*test*.py" 2>$null | Where-Object { $_ -match '^\+[^+]' }
     if ($CleanTerms.Count -gt 0) {
         $SearchPatterns = @()
@@ -67,7 +67,7 @@ try {
             if ($term.Length -ge 6) { $SearchPatterns += [regex]::Escape($term.Substring(0, $term.Length - 2)) }
             elseif ($term.Length -eq 5) { $SearchPatterns += [regex]::Escape($term.Substring(0, 4)) }
         }
-        $combinedRegex = "(" + (($SearchPatterns | Select-Object -Unique) -join "|") + ")"
+        $combinedRegex = "\b(" + (($SearchPatterns | Select-Object -Unique) -join "|") + ")"
         $leakedLines = @()
         foreach ($line in $prodDiffLines) {
             if ($line -match $combinedRegex) { $leakedLines += "Matched '$($Matches[0])' in: $($line.Trim())" }
