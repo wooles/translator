@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Dict, List, Any, Optional, Set, Tuple, Union, Literal
 from pydantic import BaseModel, Field, ConfigDict
 from enum import Enum
+from metadata import normalize_ascii_diacritics
 
 class EntityCategory(str, Enum):
     ANTHROPONYM = "ANTHROPONYM"
@@ -188,11 +189,96 @@ class DeclensionParadigm(BaseModel):
             return ""
         return _compute_vocative(name, gender)
 
+    def to_reference_table(self, entity_name: Optional[str] = None) -> str:
+        """
+        Pasywna tablica referencyjna 7 przypadków dla encji (chroni przed nominative freezing,
+        nie narzuca powtarzania nazwy własnej kosztem zaimka/elipsy).
+        Format: Imię(M:..., D:..., C:..., B:..., N:..., Ms:..., W:...)
+        """
+        lbl = entity_name or self.nominative
+        return f"{lbl}(M:{self.nominative}, D:{self.genitive}, C:{self.dative}, B:{self.accusative}, N:{self.instrumental}, Ms:{self.locative}, W:{self.vocative})"
+
 
 MODIFIER_PREFIX_RE: re.Pattern = re.compile(
     r"^(?:Young|Child|Kid|Little|Baby|Teen|Old|Elder|Future|Past|Adult|Masked|True|Fake|Dark|Shadow|Młody|Młoda|Mały|Mała|Stary|Stara)\s+(.+)$",
     re.IGNORECASE
 )
+
+def extract_base_canonical_name(name: str) -> str:
+    """
+    Wyodrębnia rdzeń kanoniczny nazwy aktora usuwając prefiksy temporalne/wiekowe/stanowe
+    (Young, Child, Kid, Little, Baby, Old, Future, Past, Masked itp.).
+    """
+    if not name:
+        return ""
+    current = name.strip()
+    while True:
+        m = MODIFIER_PREFIX_RE.match(current)
+        if m:
+            current = m.group(1).strip()
+        else:
+            break
+    return current
+
+
+def resolve_possessive_relation_gender(
+    name: str,
+    dialogue_context: Optional[str] = None,
+    is_flashback: bool = False,
+    series_bible: Optional[Any] = None
+) -> Tuple[str, float]:
+    """
+    Wyznacza płeć dla aktorów w relacjach posesywnych ([Owner]'s Son/Daughter/Kid):
+    - Człony jawnie męskie (Son, Boy, Brother, Father, Husband itp.) -> MALE (confidence=1.0)
+    - Człony jawnie żeńskie (Daughter, Girl, Sister, Mother, Wife itp.) -> FEMALE (confidence=1.0)
+    - Człony neutralne (Kid, Child, Apprentice itp.):
+      analiza koreferencji dialogowej i blokada domyślnej feminizacji w retrospekcjach (Flashback -> MALE).
+    """
+    if not name:
+        return ("UNKNOWN", 0.0)
+    raw = name.strip()
+    clean = extract_clean_speaker_name(raw).strip()
+
+    in_flashback = is_flashback or any(fb in raw.lower() for fb in ("flashback", "retrospekcj", "past"))
+
+    rel_m = re.match(
+        r"^(.+?)(?:'s|s')\s+(Kid|Child|Son|Daughter|Boy|Girl|Brother|Sister|Bro|Sis|Father|Mother|Dad|Mom|Wife|Husband|Apprentice|Student|Subordinate)$",
+        clean,
+        re.IGNORECASE
+    )
+    if not rel_m:
+        return ("UNKNOWN", 0.0)
+
+    owner = rel_m.group(1).strip()
+    rel = rel_m.group(2).strip().lower()
+
+    male_rels = {"son", "boy", "brother", "bro", "father", "dad", "husband", "syn", "brat", "ojciec", "chłopak", "chłopiec"}
+    female_rels = {"daughter", "girl", "sister", "sis", "mother", "mom", "wife", "córka", "siostra", "matka", "dziewczyna", "dziewczynka"}
+
+    if rel in male_rels:
+        return ("MALE", 1.0)
+    if rel in female_rels:
+        return ("FEMALE", 1.0)
+
+    # Neutral relation (Kid, Child, Apprentice itp.)
+    if dialogue_context:
+        ctx_l = dialogue_context.lower()
+        m_hits = len(re.findall(r"\b(?:son|my boy|our boy|the boy|he|his|him|musuko|boku|ore|syn|chłopak|on|jego|mu)\b", ctx_l))
+        f_hits = len(re.findall(r"\b(?:daughter|my girl|our girl|the girl|she|her|hers|musume|atashi|córka|dziewczyna|ona|jej|ją)\b", ctx_l))
+        if m_hits > f_hits:
+            return ("MALE", 0.95)
+        if f_hits > m_hits:
+            return ("FEMALE", 0.95)
+
+    if in_flashback:
+        return ("MALE", 0.85)
+
+    if series_bible and hasattr(series_bible, "get_character_gender"):
+        owner_g = series_bible.get_character_gender(owner, allow_generic_nouns=False)
+        if owner_g == "MALE" and in_flashback:
+            return ("MALE", 0.90)
+
+    return ("UNKNOWN", 0.0)
 
 
 class PersonaInterval(BaseModel):
@@ -332,12 +418,20 @@ GEOGRAPHIC_ORIGIN_PATTERNS: List[re.Pattern] = [
     re.compile(r"\b(?:people|soldiers|forces|kingdom|city|land|troops|warriors|army|citizens|folk|residents|inhabitants|men|guards)\s+of\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźżA-Z0-9'-]+(?:\s+[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźżA-Z0-9'-]+)?)\b", re.IGNORECASE),
     re.compile(r"\bthose\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźżA-Z0-9'-]+)\s+(?:guys|soldiers|troops|warriors|forces|people|men|knights)\b", re.IGNORECASE),
     re.compile(r"\b([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźżA-Z0-9'-]+)\s+(?:domain|realm|kingdom|territory|province|city|castle|fortress)\b", re.IGNORECASE),
+    # Motion and origin verbs in English (came from, escaped from, arrived from)
+    re.compile(r"\b(?:came|comes|escaped|escape|fled|arrived|arrives|returned|journeyed|departed)\s+from\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźżA-Z0-9'-]+(?:\s+[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźżA-Z0-9'-]+)?)\b", re.IGNORECASE),
     # Japanese: [Name] no mono/gun/hei/shou/kuni/tami
     re.compile(r"\b([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźżA-Z0-9'-]+)\s*no\s*(?:mono|gun|hei|shou|kuni|tami)\b", re.IGNORECASE),
     re.compile(r"([A-Za-z\u3040-\u30ff\u4e00-\u9faf]+)(?:の者|の軍|の兵|の将|の国|の民)"),
     # Polish: ci z [Name], ludzie z [Name], żołnierze z [Name], oddział z [Name], etc.
     re.compile(r"\b(?:ci|tamci|ludzie|żołnierze|wojska|oddziały|armia|wojownicy)\s+z\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźżA-Z0-9'-]+)\b", re.IGNORECASE),
     re.compile(r"\b(?:królestwo|kraina|miasto|zamek|twierdza|prowincja)\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźżA-Z0-9'-]+)\b", re.IGNORECASE),
+    re.compile(r"\b(?:dotarli|dotarł|dotarła|przybyli|przybył|przybyła|wrócili|wrócił|wróciła|przyszli|przyszedł|przyszła|wyszli|wyszedł|wyszła|pochodzą|pochodzi|pochodził|pochodziła|uciekli|uciekł|uciekła)\s+(?:z|ze)\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźżA-Z0-9'-]+)\b", re.IGNORECASE),
+]
+
+CHREMATONYM_PATTERNS: List[re.Pattern] = [
+    re.compile(r"\b(?:księga|miecz|amulet|tarcza|lanca|zwój|korona|pierścień|relikwia|artefakt|topór|sztylet|berło)\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźżA-Z0-9'-]+)\b", re.IGNORECASE),
+    re.compile(r"\b(?:book|sword|blade|amulet|shield|spear|scroll|crown|ring|relic|artifact|axe|dagger|scepter)\s+of\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźżA-Z0-9'-]+)\b", re.IGNORECASE),
 ]
 
 def normalize_name_nfkd(name: str) -> str:
@@ -403,28 +497,46 @@ def classify_entity_category(
                 matched_val = match.group(1).strip()
                 if matched_val.lower() == clean_lower:
                     if not is_speaking_actor:
+                        if series_bible and hasattr(series_bible, "register_entity_category"):
+                            series_bible.register_entity_category(clean_n, EntityCategory.TOPONYM)
                         return EntityCategory.TOPONYM
+
+        for pat in CHREMATONYM_PATTERNS:
+            for match in pat.finditer(context):
+                matched_val = match.group(1).strip()
+                if matched_val.lower() == clean_lower:
+                    if not is_speaking_actor:
+                        if series_bible and hasattr(series_bible, "register_entity_category"):
+                            series_bible.register_entity_category(clean_n, EntityCategory.CHREMATONYM)
+                        return EntityCategory.CHREMATONYM
 
     # 4. Known toponyms database & French indeclinable toponyms
     toponyms_set = globals().get("KNOWN_FANTASY_TOPONYMS", set())
     french_set = globals().get("INDECLINABLE_FRENCH_TOPONYMS", set())
     if clean_lower in toponyms_set or clean_lower in french_set:
         if not is_speaking_actor:
+            if series_bible and hasattr(series_bible, "register_entity_category"):
+                series_bible.register_entity_category(clean_n, EntityCategory.TOPONYM)
             return EntityCategory.TOPONYM
 
     # 5. Chrematonyms: artifacts, weapons, books, spells, relics
     head_nouns_set = globals().get("KNOWN_HEAD_NOUNS", set())
     if clean_lower in head_nouns_set or any(clean_lower.startswith(w + " ") for w in ("księga", "miecz", "amulet", "tarcza", "lanca", "zwój", "korona", "pierścień")):
+        if series_bible and hasattr(series_bible, "register_entity_category"):
+            series_bible.register_entity_category(clean_n, EntityCategory.CHREMATONYM)
         return EntityCategory.CHREMATONYM
 
     if series_bible and hasattr(series_bible, "is_non_character_entity") and series_bible.is_non_character_entity(clean_n):
         if hasattr(series_bible, "data") and series_bible.data:
             for sec in ("relics", "artifacts", "weapons"):
                 if clean_n in series_bible.data.get(sec, {}):
+                    series_bible.register_entity_category(clean_n, EntityCategory.CHREMATONYM)
                     return EntityCategory.CHREMATONYM
             for sec in ("realms", "locations", "places", "cities", "countries"):
                 if clean_n in series_bible.data.get(sec, {}):
+                    series_bible.register_entity_category(clean_n, EntityCategory.TOPONYM)
                     return EntityCategory.TOPONYM
+        series_bible.register_entity_category(clean_n, EntityCategory.TOPONYM)
         return EntityCategory.TOPONYM
 
     return EntityCategory.ANTHROPONYM
@@ -1236,9 +1348,8 @@ def resolve_actor_gender(name: str, character_registry: Optional[Dict[str, Any]]
         return "PLURAL"
 
     # 0b. Canonical inheritance for age, temporal, and state prefixes
-    modifier_match = MODIFIER_PREFIX_RE.match(clean)
-    if modifier_match:
-        base_char_name = modifier_match.group(1).strip()
+    base_char_name = extract_base_canonical_name(clean)
+    if base_char_name and base_char_name.lower() != clean_lower:
         if series_bible and hasattr(series_bible, "get_character_identity"):
             base_ident = series_bible.get_character_identity(base_char_name)
             if base_ident:
@@ -1247,10 +1358,14 @@ def resolve_actor_gender(name: str, character_registry: Optional[Dict[str, Any]]
         if bg in ("MALE", "FEMALE"):
             return bg
 
-    if re.search(r"(?:'s\s+|\b)(?:bro|brother|son|boy|brat|syn|chłopak|chłopiec)\b", clean_lower):
-        return "MALE"
-    if re.search(r"(?:'s\s+|\b)(?:daughter|sis|sister|córka|siostra|dziewczyna|dziewczynka)\b", clean_lower):
-        return "FEMALE"
+    # 0c. Relational resolving ([Owner]'s [Relation])
+    rel_gender, rel_conf = resolve_possessive_relation_gender(
+        name,
+        is_flashback=any(fb in name.lower() for fb in ("flashback", "retrospekcj", "past")),
+        series_bible=series_bible
+    )
+    if rel_gender in ("MALE", "FEMALE"):
+        return rel_gender
 
     # 1. Direct character registry lookup if provided
     if character_registry:
@@ -3354,7 +3469,7 @@ def sanitize_toponymic_origin_and_companionship(text: str, custom_glossary: Opti
     # Protection against nominative freezing after preposition: 'z Księga Toaha' -> 'z Księgą Toaha'
     res = re.sub(r"\b([Zz]\s+)Księga\s+Toaha\b", r"\g<1>Księgą Toaha", res)
     # Nominative freezing after genitive verbs: 'szuka/szukam/szukać Księga Toaha' -> 'szukać Księgi Toaha'
-    res = re.sub(r"\b(szuka[a-ząćęłńóśźż]*|pilnuje|pilnowa[a-ząćęłńóśźż]*|używa[a-ząćęłńóśźż]*|strzeż[a-ząćęłńóśźż]*)\s+Księga\s+Toaha\b", r"\g<1> Księgi Toaha", res)
+    res = re.sub(r"\b([Ss]zuka[a-ząćęłńóśźż]*|[Pp]ilnuje|[Pp]ilnowa[a-ząćęłńóśźż]*|[Uu]żywa[a-ząćęłńóśźż]*|[Ss]trzeż[a-ząćęłńóśźż]*)\s+Księga\s+Toaha\b", r"\g<1> Księgi Toaha", res)
 
     return res
 
@@ -3577,9 +3692,8 @@ class SeriesBible:
                     pass
 
             # Kanoniczne dziedziczenie dla prefiksów wiekowych, czasowych i stanowych
-            m = MODIFIER_PREFIX_RE.match(clean_id)
-            if m:
-                base_name = m.group(1).strip()
+            base_name = extract_base_canonical_name(clean_id)
+            if base_name and base_name.lower() != clean_id.lower():
                 # 1. Base from character_identities
                 base_id = None
                 base_raw = identities.get(base_name)
@@ -3619,6 +3733,23 @@ class SeriesBible:
                         base_canonical_id=base_name
                     )
 
+            # Relational resolving ([Owner]'s Son/Daughter/Kid)
+            rel_gender, rel_conf = resolve_possessive_relation_gender(
+                clean_id,
+                is_flashback=any(fb in clean_id.lower() for fb in ("flashback", "retrospekcj", "past")),
+                series_bible=self
+            )
+            if rel_gender in ("MALE", "FEMALE"):
+                t_g = "MASCULINE" if rel_gender == "MALE" else "FEMININE"
+                return CharacterIdentity(
+                    canonical_id=clean_id,
+                    true_gender=t_g,
+                    discourse_states=[],
+                    entity_category=EntityCategory.ANTHROPONYM,
+                    declension_paradigm=self.get_declension_paradigm(clean_id),
+                    base_canonical_id=clean_id
+                )
+
             # Check if canonical_id itself exists in characters with confirmed gender
             c_gender = self.get_character_gender(clean_id, allow_generic_nouns=False)
             if c_gender in ("MALE", "FEMALE"):
@@ -3649,12 +3780,20 @@ class SeriesBible:
                 d_copy = dict(decl)
                 c_name = character_name.strip()
                 # Sanityzacja stwardniałych końcówek wołacza/miejscownika (-tzie -> -tzu, -cie -> -cu)
-                if c_name.lower().endswith("tz"):
+                c_low = c_name.lower()
+                last_2 = c_low[-2:] if len(c_low) >= 2 else ""
+                last_1 = c_low[-1:] if len(c_low) >= 1 else ""
+                if last_2 in ("tz", "dz", "cz", "sz", "rz", "sh", "ch", "th") or last_1 in ("c", "ż", "k", "g", "j", "l", "y", "x"):
+                    if d_copy.get("W", "").lower().endswith("ie") and not d_copy.get("W", "").lower().endswith("u"):
+                        d_copy["W"] = c_name + "u" if not c_low.endswith(("tz", "c")) else (c_name[:-2] + "tzu" if c_low.endswith("tz") else c_name[:-1] + "cu")
+                    if d_copy.get("Ms", "").lower().endswith("ie") and not d_copy.get("Ms", "").lower().endswith("u"):
+                        d_copy["Ms"] = c_name + "u" if not c_low.endswith(("tz", "c")) else (c_name[:-2] + "tzu" if c_low.endswith("tz") else c_name[:-1] + "cu")
+                elif c_low.endswith("tz"):
                     if d_copy.get("W", "").lower().endswith("tzie"):
                         d_copy["W"] = c_name[:-2] + "tzu"
                     if d_copy.get("Ms", "").lower().endswith("tzie"):
                         d_copy["Ms"] = c_name[:-2] + "tzu"
-                elif c_name.lower().endswith("c"):
+                elif c_low.endswith("c"):
                     if d_copy.get("W", "").lower().endswith("cie"):
                         d_copy["W"] = c_name[:-1] + "cu"
                     if d_copy.get("Ms", "").lower().endswith("cie"):
@@ -3729,7 +3868,10 @@ class SeriesBible:
         is_speaking_actor: bool = False
     ) -> EntityCategory:
         """Klasyfikuje encję do kategorii ontologicznej (ANTHROPONYM | TOPONYM | CHREMATONYM)."""
-        return classify_entity_category(name, context=context, is_speaking_actor=is_speaking_actor, series_bible=self)
+        cat = classify_entity_category(name, context=context, is_speaking_actor=is_speaking_actor, series_bible=self)
+        if cat in (EntityCategory.TOPONYM, EntityCategory.CHREMATONYM) and not is_speaking_actor:
+            self.register_entity_category(name, cat)
+        return cat
 
     def get_entity_category(
         self,
@@ -3792,6 +3934,7 @@ class SeriesBible:
                                         if item not in self.data[k]:
                                             self.data[k].append(item)
                     self._sanitize_bible_integrity()
+                    self._sanitize_loaded_bible_in_ram()
                 except Exception:
                     pass
 
@@ -3813,6 +3956,8 @@ class SeriesBible:
                                     self.data["glossary"][ek] = t_val["canonical_pl"]
             except Exception:
                 pass
+
+            self._sanitize_loaded_bible_in_ram()
 
     def _sanitize_bible_integrity(self):
         """
@@ -4061,6 +4206,199 @@ class SeriesBible:
                 d_s = re.sub(r"\bchagan\b", "chan", d_s, flags=re.IGNORECASE)
                 self.data["characters"][c_k] = d_s
 
+    def _sanitize_loaded_bible_in_ram(self):
+        """
+        Samolecząca walidacja i sanitacja bazy wiedzy w RAM (0.00 PLN):
+        a) Scala zduplikowane rekordy postaci różniące się wyłącznie znakami diakrytycznymi/umlautami
+           (używając normalize_ascii_diacritics z metadata.py), zachowując najwyższy priorytet weryfikacji (P0).
+        b) Odfiltrowuje ze słownika postaci ludzkich (characters) wszelkie wpisy zaklasyfikowane jako
+           EntityCategory.TOPONYM, EntityCategory.CHREMATONYM lub pokrywające się z POLISH_COMMON_NOUN_HOMONYMS.
+        c) Wycofuje niezweryfikowane etykiety FEMALE powstałe z niskiej pewności wektorów
+           (formalne watakushi lub wysokie F0 w retrospekcjach).
+        """
+        with self._lock:
+            if not hasattr(self, "data") or not isinstance(self.data, dict):
+                return
+
+            if "characters" not in self.data or not isinstance(self.data["characters"], dict):
+                return
+
+            # -------------------------------------------------------------
+            # a) Scalanie zduplikowanych rekordów postaci (diakrytyki / umlauty)
+            # -------------------------------------------------------------
+            char_entries = list(self.data["characters"].items())
+            groups: Dict[str, List[Tuple[str, Any]]] = {}
+            for name, val in char_entries:
+                if not name or "->" in name:
+                    continue
+                folded_key = normalize_ascii_diacritics(str(name)).strip().lower()
+                groups.setdefault(folded_key, []).append((str(name).strip(), val))
+
+            for folded_key, candidates in groups.items():
+                if len(candidates) > 1:
+                    def _score_entry(cand: Tuple[str, Any]) -> Tuple[int, float, int, int]:
+                        c_name, c_val = cand
+                        desc = c_val.get("description", "") if isinstance(c_val, dict) else str(c_val)
+                        desc_l = desc.lower()
+                        is_p0 = (
+                            (isinstance(c_val, dict) and bool(c_val.get("has_verified_gender")))
+                            or "zweryfikowan" in desc_l
+                            or "anilist" in desc_l
+                            or (isinstance(c_val, dict) and c_val.get("priority") == "P0")
+                            or (isinstance(c_val, dict) and c_val.get("source") in ("anilist", "quality_gate"))
+                        )
+                        p0_score = 100 if is_p0 else 0
+                        conf = float(c_val.get("confidence", 0.0)) if isinstance(c_val, dict) else 0.0
+                        richness = len(desc)
+                        has_diacritics = 1 if c_name != normalize_ascii_diacritics(c_name) else 0
+                        return (p0_score, conf, richness, has_diacritics)
+
+                    best_name, best_val = max(candidates, key=_score_entry)
+                    for other_name, other_val in candidates:
+                        if other_name != best_name:
+                            # Merge details
+                            if isinstance(best_val, dict) and isinstance(other_val, dict):
+                                if not best_val.get("has_verified_gender") and other_val.get("has_verified_gender"):
+                                    best_val["has_verified_gender"] = True
+                                    best_val["gender"] = other_val.get("gender", best_val.get("gender"))
+                                if "forms" in other_val and "forms" not in best_val:
+                                    best_val["forms"] = other_val["forms"]
+                            del self.data["characters"][other_name]
+                            if "declensions" in self.data and isinstance(self.data["declensions"], dict):
+                                if other_name in self.data["declensions"]:
+                                    if best_name not in self.data["declensions"]:
+                                        self.data["declensions"][best_name] = self.data["declensions"][other_name]
+                                    del self.data["declensions"][other_name]
+
+            # -------------------------------------------------------------
+            # b) Odfiltrowanie TOPONYM, CHREMATONYM i POLISH_COMMON_NOUN_HOMONYMS
+            # -------------------------------------------------------------
+            # Rejestracja toponimów i chrematonimów ze słownika i plot_anchors
+            if "glossary" in self.data and isinstance(self.data["glossary"], dict):
+                for gk, gv in list(self.data["glossary"].items()):
+                    cat_g = classify_entity_category(gk, context=str(gv), series_bible=self)
+                    if cat_g in (EntityCategory.TOPONYM, EntityCategory.CHREMATONYM):
+                        self.register_entity_category(gk, cat_g)
+
+            if "plot_anchors" in self.data and isinstance(self.data["plot_anchors"], dict):
+                for pk, pv in list(self.data["plot_anchors"].items()):
+                    cat_p = classify_entity_category(pk, context=str(pv), series_bible=self)
+                    if cat_p in (EntityCategory.TOPONYM, EntityCategory.CHREMATONYM):
+                        self.register_entity_category(pk, cat_p)
+
+            for char_k in list(self.data["characters"].keys()):
+                if "->" in char_k:
+                    continue
+                clean_k = extract_clean_speaker_name(char_k).strip()
+                k_lower = clean_k.lower()
+                norm_lower = normalize_ascii_diacritics(clean_k).strip().lower()
+
+                # Badanie homonimii z polskimi rzeczownikami pospolitymi
+                is_homonym = (
+                    k_lower in POLISH_COMMON_NOUN_HOMONYMS
+                    or norm_lower in POLISH_COMMON_NOUN_HOMONYMS
+                    or is_proper_noun_homonym(clean_k)
+                )
+
+                # Badanie kategorii ontologicznej
+                cat = self.get_entity_category(clean_k)
+                is_toponym = (cat == EntityCategory.TOPONYM)
+                is_chrematonym = (cat == EntityCategory.CHREMATONYM)
+                is_non_char = self.is_non_character_entity(char_k)
+
+                if is_toponym:
+                    self.register_entity_category(char_k, EntityCategory.TOPONYM)
+                    del self.data["characters"][char_k]
+                    if "declensions" in self.data and char_k in self.data["declensions"]:
+                        del self.data["declensions"][char_k]
+                elif is_chrematonym:
+                    self.register_entity_category(char_k, EntityCategory.CHREMATONYM)
+                    del self.data["characters"][char_k]
+                    if "declensions" in self.data and char_k in self.data["declensions"]:
+                        del self.data["declensions"][char_k]
+                elif is_non_char or is_homonym:
+                    del self.data["characters"][char_k]
+                    if "declensions" in self.data and char_k in self.data["declensions"]:
+                        del self.data["declensions"][char_k]
+
+            # -------------------------------------------------------------
+            # c) Wycofanie niezweryfikowanych etykiet FEMALE (watakushi, wysokie F0 w retrospekcjach)
+            # -------------------------------------------------------------
+            for char_name, c_val in list(self.data["characters"].items()):
+                if "->" in char_name:
+                    continue
+                desc = c_val.get("description", "") if isinstance(c_val, dict) else str(c_val)
+                d_lower = desc.lower()
+                c_tokens = extract_clean_speaker_name(char_name).lower().split()
+
+                is_verified = (
+                    (isinstance(c_val, dict) and bool(c_val.get("has_verified_gender")))
+                    or "zweryfikowan" in d_lower
+                    or "anilist" in d_lower
+                    or (isinstance(c_val, dict) and c_val.get("source") in ("anilist", "quality_gate"))
+                )
+                if is_verified:
+                    continue
+
+                is_female = (
+                    (isinstance(c_val, dict) and str(c_val.get("gender", "")).upper() in ("FEMALE", "KOBIETA"))
+                    or "kobieta" in d_lower
+                    or "żeńsk" in d_lower
+                    or "female" in d_lower
+                )
+                if not is_female:
+                    continue
+
+                has_watakushi = ("watakushi" in d_lower or "formalne" in d_lower)
+                is_flashback = any(fb in d_lower or fb in char_name.lower() for fb in ("flashback", "retrospekcj", "past", "young", "child", "kid"))
+                has_high_f0 = ("f0" in d_lower or "akustyk" in d_lower or "pitch" in d_lower or (isinstance(c_val, dict) and c_val.get("f0_hz", 0) > 170.0))
+                low_conf = (isinstance(c_val, dict) and (c_val.get("confidence", 1.0) < 0.75 or c_val.get("is_transient", False)))
+
+                has_male_clues = (
+                    char_name.lower() in CANONICAL_MALE_NAMES
+                    or any(t in CANONICAL_MALE_NAMES for t in c_tokens)
+                    or has_japanese_male_name_suffix(char_name)
+                    or any(has_japanese_male_name_suffix(t) for t in c_tokens)
+                    or is_official_or_court_consonant_name(char_name, series_bible=self)
+                    or is_male_role_text(d_lower)
+                    or any(w in d_lower for w in BOY_ROLE_KEYWORDS)
+                    or bool(re.search(r"(?:'s\s+|\b)(?:kid|son|boy|brother|brat|syn|chłopak|chłopiec)\b", char_name.lower()))
+                )
+
+                if has_watakushi or (is_flashback and has_high_f0) or (is_flashback and has_male_clues) or (low_conf and has_watakushi):
+                    if has_male_clues or (is_flashback and not any(w in d_lower for w in FEMALE_ROLE_KEYWORDS)):
+                        # Poprawa na MĘŻCZYZNA
+                        clean_desc = re.sub(r"\b(?:kobieta|żeńsk\w*|female)\b", "MĘŻCZYZNA", desc, flags=re.IGNORECASE)
+                        clean_desc = re.sub(r"\[KOBIETA \(Adresat[^\]]*\]", "[MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]", clean_desc, flags=re.IGNORECASE)
+                        if isinstance(c_val, dict):
+                            c_val["gender"] = "MALE"
+                            c_val["has_verified_gender"] = True
+                            c_val["confidence"] = 1.0
+                            c_val["description"] = clean_desc
+                        else:
+                            self.data["characters"][char_name] = {"description": clean_desc, "gender": "MALE", "has_verified_gender": True, "confidence": 1.0}
+                        if "declensions" in self.data and char_name in self.data["declensions"]:
+                            self.data["declensions"][char_name] = generate_polish_name_declension(char_name, "MALE")
+                    else:
+                        # Wycofanie niezweryfikowanej etykiety na neutralną
+                        clean_desc = re.sub(r"\b(?:kobieta|żeńsk\w*|female)\b", "POSTAĆ", desc, flags=re.IGNORECASE)
+                        clean_desc = re.sub(r"\[KOBIETA \(Adresat[^\]]*\]", "", clean_desc, flags=re.IGNORECASE)
+                        if isinstance(c_val, dict):
+                            c_val["gender"] = "UNKNOWN"
+                            c_val["has_verified_gender"] = False
+                            c_val["description"] = clean_desc
+                        else:
+                            self.data["characters"][char_name] = {"description": clean_desc, "gender": "UNKNOWN", "has_verified_gender": False}
+                        if "declensions" in self.data and char_name in self.data["declensions"]:
+                            self.data["declensions"][char_name] = generate_polish_name_declension(char_name, "UNKNOWN")
+
+            # Pasywna weryfikacja paradygmatów fleksyjnych postaci
+            for c_k in list(self.data["characters"].keys()):
+                if "->" not in c_k:
+                    p_paradigm = self.get_declension_paradigm(c_k)
+                    if p_paradigm:
+                        _ = p_paradigm.to_reference_table(c_k)
+
     def save(self):
         """Saves current Series Bible state to disk (Thread-Safe)."""
         with self._lock:
@@ -4173,9 +4511,8 @@ class SeriesBible:
             return "FEMALE"
 
         # Pass 0a: Canonical inheritance for age, temporal, and state prefixes
-        modifier_match = MODIFIER_PREFIX_RE.match(clean or name)
-        if modifier_match:
-            base_char_name = modifier_match.group(1).strip()
+        base_char_name = extract_base_canonical_name(clean or name)
+        if base_char_name and base_char_name.lower() != n_l:
             base_ident = self.get_character_identity(base_char_name)
             if base_ident:
                 return "MALE" if base_ident.true_gender == "MASCULINE" else "FEMALE"
@@ -4183,11 +4520,14 @@ class SeriesBible:
             if base_gender in ("MALE", "FEMALE"):
                 return base_gender
 
-        # Pass 0b: Kinship / brother / son / daughter suffixes ('s Bro -> MALE, 's Son -> MALE, etc.)
-        if re.search(r"(?:'s\s+|\b)(?:bro|brother|son|boy|brat|syn|chłopak|chłopiec)\b", n_l):
-            return "MALE"
-        if re.search(r"(?:'s\s+|\b)(?:daughter|sis|sister|córka|siostra|dziewczyna|dziewczynka)\b", n_l):
-            return "FEMALE"
+        # Pass 0b: Kinship / possessive relation suffixes ([Owner]'s Son/Daughter/Kid)
+        rel_gender, rel_conf = resolve_possessive_relation_gender(
+            clean or name,
+            is_flashback=any(fb in n_l for fb in ("flashback", "retrospekcj", "past")),
+            series_bible=self
+        )
+        if rel_gender in ("MALE", "FEMALE"):
+            return rel_gender
 
         if self.is_non_character_entity(name) or n_l in ETHNONYMS_AND_COLLECTIVES:
             return "UNKNOWN"
@@ -5250,6 +5590,7 @@ class SeriesBible:
     ):
         """Updates glossary, character registry, relationships, and plot anchors based on Profiler output of a new episode (Thread-Safe)."""
         with self._lock:
+            self._sanitize_loaded_bible_in_ram()
             if episode_name and episode_name not in self.data["episodes_translated"]:
                 self.data["episodes_translated"].append(episode_name)
 
@@ -5451,6 +5792,7 @@ class SeriesBible:
                                 if part_clean not in self.data["declensions"] and not self.is_non_character_entity(part_clean):
                                     self.data["declensions"][part_clean] = generate_polish_name_declension(part_clean, "UNKNOWN")
 
+            self._sanitize_loaded_bible_in_ram()
             self.save()
 
     def assimilate_quality_gate_invariants(self, quality_gate_fixes: List[Any]):

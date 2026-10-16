@@ -13,15 +13,18 @@ from typing import Optional, Dict, Any, List, Union
 
 _ANILIST_DISABLED: bool = False
 
-def normalize_diacritics(text: str) -> str:
+def normalize_ascii_diacritics(text: str) -> str:
     """
-    Normalizuje znaki diakrytyczne (Unicode NFKD ASCII-folding):
-    usuwa umlauty, akcenty i ogonki (np. ä -> a, é -> e, ö -> o, ü -> u).
+    Normalizuje znaki diakrytyczne (dwustronna normalizacja Unicode NFKD ASCII-folding):
+    usuwa znaki diakrytyczne, akcenty i przegłosy/umlauty z alfabetów łacińskich (np. ä -> a, é -> e, ö -> o, ü -> u).
     """
     if not text or not isinstance(text, str):
         return ""
     nfkd = unicodedata.normalize("NFKD", text)
     return "".join(c for c in nfkd if not unicodedata.combining(c))
+
+
+normalize_diacritics = normalize_ascii_diacritics
 
 
 def compare_character_names(name1: str, name2: str) -> bool:
@@ -31,8 +34,8 @@ def compare_character_names(name1: str, name2: str) -> bool:
     """
     if not name1 or not name2:
         return False
-    norm1 = normalize_diacritics(name1).strip().lower()
-    norm2 = normalize_diacritics(name2).strip().lower()
+    norm1 = normalize_ascii_diacritics(name1).strip().lower()
+    norm2 = normalize_ascii_diacritics(name2).strip().lower()
     if norm1 == norm2:
         return True
     clean1 = re.sub(r"[^\w\s]", "", norm1).strip()
@@ -71,13 +74,13 @@ def match_character_in_metadata(
             return c
 
     # 2. Dopasowanie tokenowe (imię / nazwisko) po znormalizowanych diakrytykach
-    target_folded = normalize_diacritics(character_name).strip().lower()
+    target_folded = normalize_ascii_diacritics(character_name).strip().lower()
     target_tokens = set(re.findall(r"\b\w+\b", target_folded))
     sig_target = {t for t in target_tokens if len(t) >= 3}
 
     for c in characters_list:
         c_name = c.get("name") or ""
-        c_folded = normalize_diacritics(c_name).strip().lower()
+        c_folded = normalize_ascii_diacritics(c_name).strip().lower()
         c_tokens = set(re.findall(r"\b\w+\b", c_folded))
         sig_c = {t for t in c_tokens if len(t) >= 3}
         if sig_target and sig_c and (sig_target.issubset(sig_c) or sig_c.issubset(sig_target)):
@@ -371,7 +374,7 @@ def fetch_anilist_metadata(title: str) -> Optional[Dict[str, Any]]:
             res = fallback_res
 
     # Fallback 2: Unicode NFKD ASCII-folding diacritics normalization
-    folded = normalize_diacritics(title)
+    folded = normalize_ascii_diacritics(title)
     if folded and folded != title and not _ANILIST_DISABLED:
         folded_res = _raw_fetch_anilist_metadata(folded)
         if folded_res and folded_res.get("characters"):

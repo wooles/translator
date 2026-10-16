@@ -16106,6 +16106,487 @@ def test_isomorphic_batch_sasaki_s2_repairs_and_pipeline_harmony():
     print(" -> PASSED: Test 167 potwierdza pełną odporność izomorficzną Klastrów A, B, C, D (Sasaki S2).")
 
 
+def test_bidirectional_turn_taking_and_stem_vowel_alternation_2nd_person():
+    """
+    Test 168: Dwukierunkowe Turn-Taking 2. osoby, oboczności rdzenne samogłosek (o:ó, ę:ą),
+    zamknięta biała lista klitek (bym/byś/żeś), inwersja czasu przyszłego oraz ochrona
+    przed fałszywymi klitkami i uogólnieniami (0.00 PLN).
+    """
+    print("\n[TEST 168/171] Bidirectional Turn-Taking, Stem-First Alternations & 2nd Person Concordance...")
+    import pysubs2
+    from series_memory import SeriesBible
+    from scene_discourse import (
+        SpeakerTurn,
+        resolve_all_speaker_turns,
+        resolve_turn_addressee,
+        is_internal_monologue,
+        is_addressee_pivot,
+        partition_subturns,
+    )
+    from avt_linter import (
+        convert_2nd_person_feminine_to_masculine,
+        convert_2nd_person_masculine_to_feminine,
+        convert_first_person_feminine_to_masculine,
+        convert_first_person_masculine_to_feminine,
+        harmonize_verbal_gender_1st_and_2nd,
+        harmonize_2nd_person_predicate_nouns,
+        harmonize_copula_and_predicate_adjective,
+    )
+
+    # 1. Oboczności rdzenne o:ó oraz ę:ą (Stem-First Execution Order)
+    assert convert_2nd_person_feminine_to_masculine("mogłaś") == "mogłeś"
+    assert convert_2nd_person_feminine_to_masculine("mogłabyś") == "mógłbyś"
+    assert convert_2nd_person_feminine_to_masculine("pomogłabyś") == "pomógłbyś"
+    assert convert_2nd_person_feminine_to_masculine("wzięłaś") == "wziąłeś"
+    assert convert_2nd_person_feminine_to_masculine("wzięłabyś") == "wziąłbyś"
+    assert convert_2nd_person_feminine_to_masculine("zaczęłaś") == "zacząłeś"
+    assert convert_2nd_person_feminine_to_masculine("brałaś") == "brałeś"
+    assert convert_2nd_person_feminine_to_masculine("widziałaś") == "widziałeś"
+
+    # Symetria M -> F
+    assert convert_2nd_person_masculine_to_feminine("mógłbyś") == "mogłabyś"
+    assert convert_2nd_person_masculine_to_feminine("pomógłbyś") == "pomogłabyś"
+    assert convert_2nd_person_masculine_to_feminine("wziąłeś") == "wzięłaś"
+    assert convert_2nd_person_masculine_to_feminine("wziąłbyś") == "wzięłabyś"
+    assert convert_2nd_person_masculine_to_feminine("brałeś") == "brałaś"
+
+    # 1. osoba oboczności rdzenne
+    assert convert_first_person_feminine_to_masculine("wolałabym") == "wolałbym"
+    assert convert_first_person_feminine_to_masculine("wzięłam") == "wziąłem"
+    assert convert_first_person_masculine_to_feminine("wolałbym") == "wolałabym"
+    assert convert_first_person_masculine_to_feminine("wziąłem") == "wzięłam"
+
+    # 2. Zdaniowa harmonizacja 2. osoby dla target_gender="MALE" (5 positive examples)
+    cases_2m = [
+        ("Mogłabyś zadbać o naszą twierdzę?", "Mógłbyś zadbać o naszą twierdzę?"),
+        ("Gdybyś wzięła ten amulet ze sobą...", "Gdybyś wziął ten amulet ze sobą..."),
+        ("To ty\\Nwidziałaś mnie wczoraj w zamku?", "To ty\\Nwidziałeś mnie wczoraj w zamku?"),
+        ("Po co brałaś ten zwój do gabinetu?", "Po co brałeś ten zwój do gabinetu?"),
+        ("Czy pomogłabyś mi w tej bitwie?", "Czy pomógłbyś mi w tej bitwie?"),
+    ]
+    for raw_t, exp_t in cases_2m:
+        res_m, _ = harmonize_verbal_gender_1st_and_2nd(raw_t, target_gender="MALE")
+        assert res_m == exp_t, f"Failed 2M agreement: {raw_t} -> {res_m} != {exp_t}"
+
+    # Inwersja czasu przyszłego złożonego (forward & inverted)
+    res_inv1, _ = harmonize_verbal_gender_1st_and_2nd("czekała będziesz na sygnał", target_gender="MALE")
+    assert res_inv1 == "czekał będziesz na sygnał"
+
+    res_inv2, _ = harmonize_verbal_gender_1st_and_2nd("walczył będziesz do końca", target_gender="FEMALE")
+    assert res_inv2 == "walczyła będziesz do końca"
+
+    # 3. Asercje negatywne: ochrona czasu teraźniejszego 1. os. na -am / -em
+    neg_present = [
+        "mam pełne zaufanie do rady",
+        "znam ten stary szlak handlowy",
+        "czekam na znak od zwiadowcy",
+        "wiem wszystko o tej przepowiedni",
+        "rozumiem twoje obawy i lęki",
+    ]
+    for pres_t in neg_present:
+        res_pres, _ = harmonize_verbal_gender_1st_and_2nd(pres_t, speaker_gender="MALE")
+        assert res_pres == pres_t, f"Present tense mutated: {pres_t} -> {res_pres}"
+
+    # Ochrona 3. osoby po zaimkach narzędnikowych i nieokreślonych oraz podmiotach uogólniających
+    neg_clitics = [
+        "z tym człowiekiem rozmawiał wczoraj",
+        "ktoś przyszedł o świcie do bramy",
+        "coś się stało w lesie",
+        "nikt nie brał udziału w naradzie",
+        "każda wiedziała o tajemnicy rodu",
+        "ktokolwiek widział posłańca niech mówi",
+    ]
+    for clit_t in neg_clitics:
+        res_clit, _ = harmonize_verbal_gender_1st_and_2nd(clit_t, target_gender="MALE")
+        assert res_clit == clit_t, f"False clitic/generalizing subject mutated: {clit_t} -> {res_clit}"
+
+    # 4. Wiązanie wołacza i progresywny Lookahead (< 2.0 s) ze znacznikami \\N
+    bible = SeriesBible("TestIsomorphicTurnTaking")
+    bible.data.setdefault("characters", {})["Dorian"] = {"gender": "MALE"}
+    bible.data.setdefault("characters", {})["Aurelia"] = {"gender": "FEMALE"}
+
+    turn_lh1 = SpeakerTurn(
+        speaker="Aurelia",
+        events=[pysubs2.SSAEvent(start=1000, end=3000, text="Czy ty\\Nwidziałaś tę mapę?")]
+    )
+    turn_lh2 = SpeakerTurn(
+        speaker="Dorian",
+        events=[pysubs2.SSAEvent(start=3800, end=5500, text="Owszem, widziałem ją rano.")]
+    )
+    turns_lh = resolve_all_speaker_turns([turn_lh1, turn_lh2], series_bible=bible)
+    assert turns_lh[0].target_speaker == "Dorian"
+    assert turns_lh[0].target_gender == "MALE"
+    assert turns_lh[0].target_confidence >= 0.85
+
+    # Wołacz w turze
+    turn_voc = SpeakerTurn(
+        speaker="Aurelia",
+        events=[pysubs2.SSAEvent(start=1000, end=3000, text="Dorianie! Mogłabyś mi pomóc?")]
+    )
+    resolve_turn_addressee(turn_voc, series_bible=bible)
+    assert turn_voc.target_speaker == "Dorian"
+    assert turn_voc.target_gender == "MALE"
+    assert turn_voc.vocative_lock is True
+
+    # 5. SubTurn Pivot Partitioning & Niewidzialność monologu wewnętrznego
+    ev_dialogue = pysubs2.SSAEvent(start=1000, end=2000, text="Dorianie, zaczekaj!")
+    ev_thought = pysubs2.SSAEvent(start=2200, end=3500, text="(Czy on naprawdę mnie słyszy?)")
+    ev_external = pysubs2.SSAEvent(start=3800, end=5000, text="Aurelio, spójrz tam!")
+
+    assert is_internal_monologue(ev_thought.text) is True
+    assert is_internal_monologue(ev_dialogue.text) is False
+
+    turn_split = SpeakerTurn(speaker="Kaelen", events=[ev_dialogue, ev_external])
+    assert is_addressee_pivot(ev_dialogue, ev_external, series_bible=bible) is True
+    subturns = partition_subturns(turn_split, series_bible=bible)
+    assert len(subturns) == 2, f"Expected 2 subturns from addressee pivot, got {len(subturns)}"
+
+    # 6. Uzgadnianie par ról osobowych vs Ochrona rzeczowników metaforycznych / abstrakcyjnych
+    res_role1, _ = harmonize_2nd_person_predicate_nouns("jesteś moją najlepszą uczennicą", target_gender="MALE")
+    assert res_role1 == "jesteś moim najlepszym uczniem"
+
+    res_role2, _ = harmonize_2nd_person_predicate_nouns("byłaś naszą wierną towarzyszką", target_gender="MALE")
+    assert res_role2 == "byłeś naszym wiernym towarzyszem"
+
+    meta_cases = [
+        "jesteś moją nadzieją na ocalenie",
+        "jesteś moją jedyną szansą w tym turnieju",
+        "jesteś naszą ostatnią ostoją",
+        "jesteś moją zgubą i przeznaczeniem",
+        "jesteś moją opoką w trudnych chwilach",
+    ]
+    for m_text in meta_cases:
+        res_meta, _ = harmonize_2nd_person_predicate_nouns(m_text, target_gender="MALE")
+        assert res_meta == m_text, f"Metaphorical/abstract predicate mutated: {m_text} -> {res_meta}"
+
+    # 7. Idempotentność f(f(x)) == f(x) i QuoteShield
+    sample_text = "To ty\\Nwidziałaś mnie wczoraj w zamku?"
+    first_pass, _ = harmonize_verbal_gender_1st_and_2nd(sample_text, target_gender="MALE")
+    second_pass, _ = harmonize_verbal_gender_1st_and_2nd(first_pass, target_gender="MALE")
+    assert first_pass == second_pass, f"Idempotence failed: {first_pass} != {second_pass}"
+
+    quote_text = 'On powiedział: „Mogłabyś zadbać o to”, a potem odszedł.'
+    res_quote, _ = harmonize_verbal_gender_1st_and_2nd(quote_text, target_gender="MALE")
+    assert "„Mogłabyś zadbać o to”" in res_quote, f"QuoteShield breached: {res_quote}"
+
+    print(" -> PASSED: Test 168 potwierdza pełną spójność Turn-Taking, oboczności rdzennych i ochrony 2. osoby.")
+
+
+def test_mixed_gender_scene_virile_plural_and_turn_you_harmonization():
+    """
+    Test 169: Wymuszenie form męskoosobowych w scenach mieszanych (We_Group == VIRILE),
+    ochrona grup kobiecych (NON_VIRILE), rachunek zbiorów We_Group, ochrona podmiotu
+    ekskluzywnego oraz harmonizacja zaimków 2. os. ze strażnikiem miejscownika (0.00 PLN).
+    """
+    print("\n[TEST 169/171] Mixed-Gender Virile Plural, We_Group Set Algebra & Addressee Harmonization...")
+    import pysubs2
+    from series_memory import SeriesBible
+    from scene_discourse import (
+        SpeakerTurn,
+        compute_we_group,
+        classify_we_group_gender,
+        is_discourse_ignorable,
+        is_plural_text,
+        resolve_all_speaker_turns,
+        resolve_scene_participants,
+    )
+    from avt_linter import (
+        convert_1st_person_plural_nonvirile_to_virile,
+        convert_1st_person_plural_virile_to_nonvirile,
+        harmonize_virile_group_1st_person_plural,
+        harmonize_plural_group_gender,
+        harmonize_2nd_person_singular_to_plural_pronouns,
+    )
+
+    # 1. Konwersje jednostkowe 1. os. lm. (5 positive examples)
+    assert convert_1st_person_plural_nonvirile_to_virile("wróciłyśmy") == "wróciliśmy"
+    assert convert_1st_person_plural_nonvirile_to_virile("poszłyśmy") == "poszliśmy"
+    assert convert_1st_person_plural_nonvirile_to_virile("widziałyśmy") == "widzieliśmy"
+    assert convert_1st_person_plural_nonvirile_to_virile("zrobiłyśmy") == "zrobiliśmy"
+    assert convert_1st_person_plural_nonvirile_to_virile("mogłyśmy") == "mogliśmy"
+
+    assert convert_1st_person_plural_virile_to_nonvirile("wróciliśmy") == "wróciłyśmy"
+    assert convert_1st_person_plural_virile_to_nonvirile("poszliśmy") == "poszłyśmy"
+    assert convert_1st_person_plural_virile_to_nonvirile("widzieliśmy") == "widziałyśmy"
+
+    # 2. Zdaniowa harmonizacja 1. os. lm. dla scen mieszanych (scene_has_male_participant=True)
+    cases_vir = [
+        ("Wróciłyśmy do twierdzy o zmierzchu.", "Wróciliśmy do twierdzy o zmierzchu."),
+        ("Zrobiłyśmy wszystko zgodnie z rozkazem.", "Zrobiliśmy wszystko zgodnie z rozkazem."),
+        ("Widziałyśmy ten raport wczoraj.", "Widzieliśmy ten raport wczoraj."),
+        ("Poszłyśmy na spotkanie ze zwiadowcami.", "Poszliśmy na spotkanie ze zwiadowcami."),
+        ("Mogłyśmy to przewidzieć wcześniej.", "Mogliśmy to przewidzieć wcześniej."),
+    ]
+    for raw_t, exp_t in cases_vir:
+        res_vir, _ = harmonize_virile_group_1st_person_plural(raw_t, scene_has_male_participant=True)
+        assert res_vir == exp_t, f"Virile 1p plural failed: {raw_t} -> {res_vir} != {exp_t}"
+
+    # Kontrprzykład negatywny: scena wyłącznie kobieca zachowuje formy niemęskoosobowe
+    for raw_t, _ in cases_vir:
+        res_nonvir, _ = harmonize_virile_group_1st_person_plural(raw_t, scene_has_male_participant=False)
+        assert res_nonvir == raw_t, f"Negative control mutated: {raw_t} -> {res_nonvir}"
+
+    # 3. Rachunek zbiorów We_Group: ochrona podmiotu ekskluzywnego
+    bible = SeriesBible("TestIsomorphicSetAlgebra")
+    bible.data.setdefault("characters", {})["Dorian"] = {"gender": "MALE"}
+    bible.data.setdefault("characters", {})["Valeria"] = {"gender": "FEMALE"}
+    bible.data.setdefault("characters", {})["Aurelia"] = {"gender": "FEMALE"}
+
+    ev_excl = pysubs2.SSAEvent(start=1000, end=3000, text="Mówiłyśmy ci o tym wielokrotnie.")
+    setattr(ev_excl, "target_speaker", "Dorian")
+    setattr(ev_excl, "target_actor", "Dorian")
+    we_excl = compute_we_group(ev_excl, ["Valeria", "Aurelia", "Dorian"])
+    assert we_excl == {"Valeria", "Aurelia"}, f"Exclusive addressee not removed: {we_excl}"
+
+    g_excl, has_m_excl = classify_we_group_gender(we_excl, series_bible=bible)
+    assert g_excl == "NON_VIRILE"
+    assert has_m_excl is False
+
+    # Inkluzywne My (wspólna czynność)
+    ev_incl = pysubs2.SSAEvent(start=4000, end=6000, text="Razem zbadamy tę kryptę.")
+    we_incl = compute_we_group(ev_incl, ["Valeria", "Dorian"])
+    g_incl, has_m_incl = classify_we_group_gender(we_incl, series_bible=bible)
+    assert g_incl == "VIRILE"
+    assert has_m_incl is True
+
+    # 4. Izolacja cięcia montażowego i wykluczenie bytów narracyjnych
+    assert is_discourse_ignorable("Narrator") is True
+    assert is_discourse_ignorable("Radio") is True
+    assert is_discourse_ignorable("System") is True
+    assert is_discourse_ignorable("Voiceover") is True
+    assert is_discourse_ignorable("Dorian") is False
+
+    turn_a = SpeakerTurn(speaker="Valeria", events=[pysubs2.SSAEvent(start=1000, end=2500, text="Jestem tutaj.")])
+    turn_b = SpeakerTurn(speaker="Dorian", events=[pysubs2.SSAEvent(start=15000, end=17000, text="Cisza w eterze.")])
+    turns_cross = resolve_all_speaker_turns([turn_a, turn_b], series_bible=bible)
+    assert turn_b.speaker not in turns_cross[0].scene_participants
+
+    # 5. Harmonizacja zaimków 2. osoby ze Strażnikiem Miejscownika
+    assert is_plural_text("w powiecie") is False
+    assert is_plural_text("na świecie") is False
+    assert is_plural_text("w mieście") is False
+    assert is_plural_text("Chodźcie ze mną!") is True
+    assert is_plural_text("wy wszyscy") is True
+
+    res_pronouns, _ = harmonize_2nd_person_singular_to_plural_pronouns("Mówię do ciebie, chodźcie ze mną!")
+    assert res_pronouns == "Mówię do was, chodźcie ze mną!"
+
+    print(" -> PASSED: Test 169 potwierdza We_Group set algebra, virility oraz strażnika homonimii miejscownika.")
+
+
+def test_institutional_genitive_and_toponym_ablative_whitelist_guard():
+    """
+    Test 170: Ścisła biała lista dopełniacza instytucji po 'z' (z biura, z ministerstwa),
+    usuwanie fałszywego narzędnika toponimów (Ablative Stripper), poprawność alternacji
+    przymiotników męskoosobowych (-nki -> ciency) oraz wołacz afrykat (-tzie -> -tzu) (0.00 PLN).
+    """
+    print("\n[TEST 170/171] Institutional Genitive Whitelist, Ablative Stripper & Phonotactics...")
+    from series_memory import SeriesBible, EntityCategory
+    from avt_linter import (
+        strip_false_feminine_instrumental,
+        strip_false_ablative_instrumental,
+        fix_virile_adjective_orthography,
+        fix_masculine_vocative_tz,
+    )
+
+    # 1. Ścisła biała lista dopełniacza rzeczowników nijakich instytucji po 'z' (5 positive examples)
+    cases_inst = [
+        ("Wszyscy agenci z Biurą złożyli meldunek.", "Wszyscy agenci z Biura złożyli meldunek."),
+        ("Wszyscy wrócili z Ministerstwą o zmierzchu.", "Wszyscy wrócili z Ministerstwa o zmierzchu."),
+        ("Wyjechali z Miastą wczoraj rano.", "Wyjechali z Miasta wczoraj rano."),
+        ("Posiłki z\\NKrólestwą dotarły na czas.", "Posiłki z\\NKrólestwa dotarły na czas."),
+        ("Raport z Dowództwą przekazano dowódcy.", "Raport z Dowództwa przekazano dowódcy."),
+    ]
+    for raw_t, exp_t in cases_inst:
+        res_inst, _ = strip_false_feminine_instrumental(raw_t)
+        assert res_inst == exp_t, f"Failed institutional genitive fix: {raw_t} -> {res_inst} != {exp_t}"
+
+    # Kontrprzykłady negatywne: prawdziwe kobiety w relacji towarzyszenia (poszedł z Anną)
+    neg_companions = [
+        "Poszedł na spacer z Anną.",
+        "Rozmawiał długo z Martą.",
+        "Spotkał się wczoraj z Marią.",
+        "Współpracował ściśle z Heleną.",
+        "Przyszedł na naradę z Valerią.",
+    ]
+    for comp_t in neg_companions:
+        res_comp, _ = strip_false_feminine_instrumental(comp_t)
+        assert res_comp == comp_t, f"Real female companion mutated: {comp_t} -> {res_comp}"
+
+    # 2. Ablative Stripper: usuwanie fałszywego narzędnika (-em) po przyimku pochodzenia 'z'
+    bible_top = SeriesBible("TestIsomorphicToponymAblative")
+    bible_top.register_entity_category("Erebor", EntityCategory.TOPONYM)
+    bible_top.register_entity_category("Gondor", EntityCategory.TOPONYM)
+    bible_top.register_entity_category("Rivendell", EntityCategory.TOPONYM)
+
+    cases_abl = [
+        ("Oddział z Ereborem dotarł na miejsce.", "Oddział z Erebor dotarł na miejsce."),
+        ("Ludzie z\\NGondorem przybyli do portu.", "Ludzie z\\NGondor przybyli do portu."),
+        ("Posłańcy z Rivendellem przynieśli wieści.", "Posłańcy z Rivendell przynieśli wieści."),
+    ]
+    for raw_a, exp_a in cases_abl:
+        res_abl, _ = strip_false_ablative_instrumental(raw_a, series_bible=bible_top)
+        assert res_abl == exp_a, f"Failed ablative stripper: {raw_a} -> {res_abl} != {exp_a}"
+
+    # 3. Ortografia przymiotników męskoosobowych od tematów twardych -nki (ciency, blokada cieńscy)
+    cases_ortho = [
+        ("Byli zbyt cieńscy na tę trudną wyprawę.", "Byli zbyt ciency na tę trudną wyprawę."),
+        ("Cieńscy wojownicy wycofali się za rzekę.", "Ciency wojownicy wycofali się za rzekę."),
+        ("Wszyscy oni byli cieńscy w walce wręcz.", "Wszyscy oni byli ciency w walce wręcz."),
+    ]
+    for raw_o, exp_o in cases_ortho:
+        res_ortho, _ = fix_virile_adjective_orthography(raw_o)
+        assert res_ortho == exp_o, f"Virile orthography fix failed: {raw_o} -> {res_ortho} != {exp_o}"
+
+    # 4. Korekta wołacza tematów na afrykaty (-tzie -> -tzu)
+    cases_tz = [
+        ("Witaj, Laurentzie!", "Witaj, Laurentzu!"),
+        ("Odpocznij, Ignatzie!", "Odpocznij, Ignatzu!"),
+        ("Zaczekaj na nas, Hubertzie!", "Zaczekaj na nas, Hubertzu!"),
+    ]
+    for raw_z, exp_z in cases_tz:
+        res_tz, _ = fix_masculine_vocative_tz(raw_z)
+        assert res_tz == exp_z, f"Vocative -tzu fix failed: {raw_z} -> {res_tz} != {exp_z}"
+
+    print(" -> PASSED: Test 170 potwierdza dopełniacz instytucji, ablative stripper, ortografię -nki i wołacz -tzu.")
+
+
+def test_diacritic_folding_formal_pronoun_neutrality_and_adaptive_pooling():
+    """
+    Test 171: Normalizacja znaków diakrytycznych (Unicode NFKD ASCII-folding),
+    neutralność formalnego watakushi=0.0, Directional Consensus Purity, Voiced-Frame Pooling
+    (>= 25 ramek, filtracja IQR) oraz dziedziczenie płci dla prefiksów wiekowych w retrospekcjach (0.00 PLN).
+    """
+    print("\n[TEST 171/171] Diacritic Folding, Watakushi Neutrality, Directional Purity & Adaptive Pooling...")
+    import numpy as np
+    import tempfile
+    from pathlib import Path
+    from metadata import (
+        normalize_ascii_diacritics,
+        compare_character_names,
+    )
+    from profiler import (
+        EpistemicAudioTriangulator,
+        SpaCyAnaphoraDiscourseAnalyzer,
+        triangulate_epistemic_gender,
+        resolve_relational_actor_gender,
+    )
+    from series_memory import (
+        SeriesBible,
+        has_japanese_male_name_suffix,
+        is_official_or_court_consonant_name,
+    )
+    from avt_linter import harmonize_verbal_gender_1st_and_2nd
+
+    # 1. Normalizacja diakrytyków i samoleczenie bazy w RAM (5 positive examples)
+    assert normalize_ascii_diacritics("Hélène") == "Helene"
+    assert normalize_ascii_diacritics("François") == "Francois"
+    assert normalize_ascii_diacritics("Björn") == "Bjorn"
+    assert normalize_ascii_diacritics("Renée") == "Renee"
+    assert normalize_ascii_diacritics("Gérard") == "Gerard"
+
+    assert compare_character_names("Hélène", "Helene") is True
+    assert compare_character_names("Björn", "Bjorn") is True
+    assert compare_character_names("François", "Francois") is True
+    assert compare_character_names("Gérard", "Gerard") is True
+
+    with tempfile.TemporaryDirectory() as td:
+        bible = SeriesBible("TestDiacriticMerge", storage_dir=Path(td))
+        bible.data.setdefault("characters", {})["Hélène"] = {
+            "gender": "FEMALE",
+            "confidence": 1.0,
+            "has_verified_gender": True,
+            "description": "Zweryfikowana bohaterka"
+        }
+        bible.data["characters"]["Helene"] = {
+            "gender": "UNKNOWN",
+            "confidence": 0.5,
+            "description": "Wpis roboczy"
+        }
+        bible._sanitize_loaded_bible_in_ram()
+        assert len(bible.data["characters"]) == 1, f"Failed diacritic merge: {bible.data['characters']}"
+        entry = list(bible.data["characters"].values())[0]
+        assert entry["gender"] == "FEMALE"
+        assert entry["has_verified_gender"] is True
+
+    # 2. Neutralność formalnych zaimków JA (watakushi = 0.0)
+    assert SpaCyAnaphoraDiscourseAnalyzer.score_japanese_pronoun("watakushi") == 0
+    assert SpaCyAnaphoraDiscourseAnalyzer.score_japanese_pronoun("watashi") == 0
+    assert EpistemicAudioTriangulator.score_japanese_pronoun("watakushi") == 0
+
+    # Kontrprzykłady nacechowane (+3 / -3)
+    assert SpaCyAnaphoraDiscourseAnalyzer.score_japanese_pronoun("ore") == 3
+    assert SpaCyAnaphoraDiscourseAnalyzer.score_japanese_pronoun("boku") == 3
+    assert SpaCyAnaphoraDiscourseAnalyzer.score_japanese_pronoun("atashi") == -3
+
+    # Directional Consensus Purity
+    # Czysty konsensus (purity == 1.0, >= 2 sygnały) -> confidence >= 0.85
+    res_clean = triangulate_epistemic_gender(median_f0=120.0, en_score=4, jp_pronoun="ore")
+    assert res_clean["purity"] == 1.0
+    assert res_clean["confidence"] >= 0.85
+
+    # Zanieczyszczone/sprzeczne sygnały (purity < 0.65) -> confidence tłumione poniżej 0.95 (do 0.70)
+    res_conflict = triangulate_epistemic_gender(median_f0=120.0, en_score=-6, jp_pronoun="atashi")
+    assert res_conflict["purity"] < 0.65
+    assert res_conflict["confidence"] < 0.75
+
+    # 3. Voiced-Frame Pooling (librosa.pyin)
+    # A) Niewystarczająca liczba ramek (< 25) -> zwraca None
+    t_short = np.linspace(0, 0.08, 1280, endpoint=False)
+    clip_short = np.sin(2 * np.pi * 120.0 * t_short)
+    assert EpistemicAudioTriangulator.estimate_f0_pyin(clip_short, sample_rate=16000) is None
+
+    # B) Szum / wysoka dyspersja (IQR/median > 0.35 i std > 50 Hz) -> zwraca None
+    np.random.seed(42)
+    clip_noise = np.random.uniform(-1.0, 1.0, 32000)
+    assert EpistemicAudioTriangulator.estimate_f0_pyin(clip_noise, sample_rate=16000) is None
+
+    # C) Czysty ton sinusoidalny 120 Hz (>= 25 ramek voiced) -> zwraca poprawną medianę F0
+    t_clean = np.linspace(0, 1.0, 16000, endpoint=False)
+    clip_clean = np.sin(2 * np.pi * 120.0 * t_clean)
+    f0_measured = EpistemicAudioTriangulator.estimate_f0_pyin(clip_clean, sample_rate=16000)
+    assert f0_measured is not None
+    assert 115.0 <= f0_measured <= 125.0
+
+    # 4. Dziedziczenie płci dla modyfikatorów wiekowych i relacyjnych w retrospekcjach
+    with tempfile.TemporaryDirectory() as td:
+        bible_rel = SeriesBible("TestInheritRel", storage_dir=Path(td))
+        bible_rel.data.setdefault("characters", {})["Dorian"] = {"gender": "MALE", "has_verified_gender": True}
+        bible_rel.data.setdefault("characters", {})["Valeria"] = {"gender": "FEMALE", "has_verified_gender": True}
+
+        assert bible_rel.get_character_gender("Child Dorian") == "MALE"
+        assert bible_rel.get_character_gender("Young Dorian") == "MALE"
+        assert bible_rel.get_character_gender("Child Valeria") == "FEMALE"
+        assert bible_rel.get_character_gender("Young Valeria") == "FEMALE"
+
+    rel_son = resolve_relational_actor_gender("Dorian's Son")
+    assert rel_son["gender"] == "MALE"
+    assert rel_son["confidence"] == 1.0
+
+    rel_daughter = resolve_relational_actor_gender("Valeria's Daughter")
+    assert rel_daughter["gender"] == "FEMALE"
+    assert rel_daughter["confidence"] == 1.0
+
+    # 5. Uzgadnianie form 1. osoby czasu przeszłego przez znaczniki \\N (5 positive examples)
+    cases_1m = [
+        ("wolałam\\Npowiedzieć całą prawdę", "wolałem\\Npowiedzieć całą prawdę"),
+        ("chciałam\\Npomóc wam w zadaniu", "chciałem\\Npomóc wam w zadaniu"),
+        ("myślałam\\No tym przez całą noc", "myślałem\\No tym przez całą noc"),
+        ("widziałam\\Nciebie wczoraj w lesie", "widziałem\\Nciebie wczoraj w lesie"),
+        ("słyszałam\\No tym wielkim sukcesie", "słyszałem\\No tym wielkim sukcesie"),
+    ]
+    for raw_1m, exp_1m in cases_1m:
+        res_1m, _ = harmonize_verbal_gender_1st_and_2nd(raw_1m, speaker_gender="MALE")
+        assert res_1m == exp_1m, f"1M \\N agreement failed: {raw_1m} -> {res_1m} != {exp_1m}"
+
+    # Kontrprzykład negatywny: dla mówcy FEMALE formy żeńskie zachowane
+    for raw_1m, _ in cases_1m:
+        res_1f, _ = harmonize_verbal_gender_1st_and_2nd(raw_1m, speaker_gender="FEMALE")
+        assert res_1f == raw_1m, f"1F negative control mutated: {raw_1m} -> {res_1f}"
+
+    print(" -> PASSED: Test 171 potwierdza diacritic folding, neutralność watakushi, pooling audio i dziedziczenie.")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -16275,7 +16756,11 @@ if __name__ == "__main__":
     test_speaker_turn_plural_you_harmonization()
     test_toponym_ablative_preposition_and_phonotactic_declension()
     test_isomorphic_batch_sasaki_s2_repairs_and_pipeline_harmony()
-    print("\n Wszystkie testy jednostkowe i integracyjne (167/167) zakończone pełnym sukcesem!\n")
+    test_bidirectional_turn_taking_and_stem_vowel_alternation_2nd_person()
+    test_mixed_gender_scene_virile_plural_and_turn_you_harmonization()
+    test_institutional_genitive_and_toponym_ablative_whitelist_guard()
+    test_diacritic_folding_formal_pronoun_neutrality_and_adaptive_pooling()
+    print("\n Wszystkie testy jednostkowe i integracyjne (171/171) zakończone pełnym sukcesem!\n")
 
 
 

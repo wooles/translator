@@ -1,17 +1,17 @@
 # 🧠 PAMIĘĆ PROJEKTU I STANU SESJI ANTIGRAVITY (PROJECT MEMORY & OPERATIONAL TELEMETRY)
 
-Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemetrii CI/CD, historii incydentów oraz most wiedzy pomiędzy komputerami roboczymi (PC 1 i PC 2). Zasady normatywne definiuje wyłącznie `AGENTS.md` (Standard 4.0).
+Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemetrii CI/CD, historii incydentów oraz most wiedzy pomiędzy komputerami roboczymi (PC 1 i PC 2). Zasady normatywne definiuje wyłącznie `AGENTS.md` (Standard 4.9).
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 13.10.2026)
-- **Status CI/CD:** `STATUS: WDROŻONE I ZWERYFIKOWANE (160/160 PASSED -> CEL ROZBUDOWY: 166/166 PASSED) - VICTORY CONFIRMED`
-- **Gałąź i Architektura:** `main` (Standard 4.0: Epistemiczna Triangulacja Płci, Odporny Parsing CJK, Automat Tożsamości Diegetycznej, Deterministyczna Fleksja `DeclensionParadigm`, Zero-Literal-Leakage Protocol & `audit_diff.ps1` Forensic Gate)
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 16.10.2026)
+- **Status CI/CD:** `STATUS: WDROŻONE I ZWERYFIKOWANE (167/167 -> 171/171 PASSED) - VICTORY CONFIRMED`
+- **Gałąź i Architektura:** `main` (Standard 4.9: Stylistic Freedom Invariance, Modular World-State Telemetry, Voiced-Frame Pooling, Directional Consensus Purity, SubTurn Pivot Partitioning, Symetryczny Rachunek Zbiorów We_Group, Stem-First Execution Order, Inwariant Morfemu Przeszłego `-ł-` / `-l-`, Zamknięta Biała Lista Nośników Ruchomych Końcówek, Ochrona Zaimków Uogólniających, Strażnik Homonimii Miejscownika w `is_plural_text`, Ochrona Korpusu Par Ról Osobowych, Zero-Literal-Leakage Protocol & `audit_diff.ps1` Forensic Gate)
 - **Środowisko:** Python 3.13 (`.venv`), Windows PowerShell, `ffmpeg` (PATH), `librosa.pyin`, `soundfile`, `pysubs2`, `spaCy en_core_web_sm` (100% offline 0.00 PLN), bezpośrednie klucze Google AI Studio API (`use_vertex = 0`).
 - **Dyrektywa Wykonawcza Testów:**
   * Testy przyrostowe podczas kodowania (< 2 s): `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_testu>"`
   * Audyt śledczy diffu: `powershell -ExecutionPolicy Bypass -File .\audit_diff.ps1 -ForbiddenTerms "<lista>"`
-  * Pełny pakiet regresyjny (~12 min, uruchamiany wyłącznie raz w Fazie 4): `.\.venv\Scripts\python.exe -m pytest`
+  * Pełny pakiet regresyjny (~12 min, uruchamiany wyłącznie raz w Fazie 4): `.\.venv\Scripts\python.exe -m pytest` (171/171 PASSED)
 
 ---
 
@@ -41,7 +41,16 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
   1. *Epistemiczna Triangulacja Płci (`profiler.py`):* Ekstrakcja japońskiej ścieżki FFmpeg, oszczędne próbkowanie `librosa.pyin` (<= 10 s, filtr szumu std(F0) > 50 Hz), twardy determinizm męski dla F0 <= 135 Hz i zerowa waga akustyki dla F0 > 135 Hz, rekonstrukcja akapitowa i izolacja podmiotu `nsubj` w `spaCy`.
   2. *Odporny Parsing Napisów (`scene_discourse.py`):* Ochrona japońskich cudzysłowów mowy głośnej `「 」`/`『 』` i tagów skilli `【 】`/`《 》`, wycinanie notek `[TL: ...]`, dwuwarstwowa bramka `is_internal_monologue()` (priorytet nawiasów `( )`/`（ ）` nad `target_speaker` oraz rygorystyczna bramka bezpieczeństwa dla samej kursywy `{\i1}`).
   3. *Automat Tożsamości Diegetycznej (`series_memory.py`, `scene_discourse.py`):* Interwały `PersonaInterval` powiązane z `episode_index` (Out-of-Order Safety), ochrona maski `apparent_gender` w dialogu publicznym, aktywacja `true_gender` w myślach i z powiernikiem (`knows_secret`), detekcja dekonspiracji (`EP_RUPTURE`) ze skoku fazowego anaforyki.
-  4. *Deterministyczna Fleksja Nazw Własnych (`series_memory.py`, `translator.py`, `avt_linter.py`):* Zamrożona matryca 7 przypadków `DeclensionParadigm`, detektor japońskich mor CV `-e` (brak apostrofu dla wymawianego `-e`, ochrona dla angielskiego niemego `-e` w *White'a*), końcówka `-u` w Miejscowniku i Wołaczu dla tematów na afrykaty i spółgłoski stwardniałe (`-tz, -c, -cz, -sz`), pełny kontrakt i korektor 1. oraz 2. osoby (Testy 155–160, 160/160 PASSED; rozszerzenie do Testów 161–166).
+  4. *Deterministyczna Fleksja Nazw Własnych (`series_memory.py`, `translator.py`, `avt_linter.py`):* Zamrożona matryca 7 przypadków `DeclensionParadigm`, detektor japońskich mor CV `-e` (brak apostrofu dla wymawianego `-e`, ochrona dla angielskiego niemego `-e` w *White'a*), końcówka `-u` w Miejscowniku i Wołaczu dla tematów na afrykaty i spółgłoski stwardniałe (`-tz, -c, -cz, -sz`), pełny kontrakt i korektor 1. oraz 2. osoby (Testy 155–160, 160/160 PASSED; rozszerzenie do Testów 161–167).
+
+### 🔹 INC-AVT-006 (Architektura Standardu 4.9: *Stylistic Freedom, World-State Telemetry, Set Algebra & Isomorphic Defense*)
+- **Wdrożenie 6 Modułów Systemowych (Offline 0.00 PLN):**
+  1. *Stylistic Freedom Invariance & World-State Telemetry (`translator.py`):* Pełna swoboda stylistyczna LLM (elipsa, inwersja, czas teraźniejszy, ruchome końcówki). Generowanie mikro-tagu `format_dry_telemetry_tag` przy progu pewności >= 0.80 bez emitowania wartości pustych lub niejednoznacznych.
+  2. *Voiced-Frame Pooling & Directional Consensus Purity (`profiler.py`):* Agregacja >= 25 ramek dźwięcznych `librosa.pyin` z filtracją `IQR/median > 0.35` i `std > 50 Hz`. Tłumienie pewności < 0.95 (do 0.70) przy `purity < 0.65` i podnoszenie do >= 0.85 przy czystym konsensusie 1.0. Neutralność formalnych zaimków JA (*watakushi* = 0.0).
+  3. *SubTurn Pivot Partitioning & Ściana Cięcia Sceny (`scene_discourse.py`):* Automatyczny podział ciągłej tury na pod-segmenty (SubTurn) przy zmianie adresata, spójnikach przeciwstawnych lub zmianie rejestru mowy/myśli. Niewidzialność monologu wewnętrznego dla dyskursu zewnętrznego.
+  4. *Symetryczny Rachunek Zbiorów We_Group i Trójstanowa Virility (`scene_discourse.py`):* `We_Group = scene_participants - excluded_addressee`. Odjęcie zewnętrznego adresata w 2. os. zachowuje formy niemęskoosobowe (`NON_VIRILE`, *-łyśmy*) dla grup kobiecych. Wykluczenie Narratora i Radio.
+  5. *Stem-First Execution Order & Inwariant Morfemu Przeszłego (`avt_linter.py`):* Oboczności samogłosek rdzennych `o:ó` i `ę:ą` przed sufiksami ogólnymi. Ochrona czasu teraźniejszego 1. os. na `-am`/`-em` oraz 3. osoby po zaimkach narzędnikowych i nieokreślonych (`tym, ktoś, coś`) i podmiotach przeczących (`nikt, każdy`).
+  6. *Ochrona Onomastyczna i Par Ról (`avt_linter.py`, `series_memory.py`):* Ścisła biała lista dopełniacza instytucji nijakich po `z` (*z biura, z ministerstwa, z miasta*), naprawa wołacza afrykat *-tzie -> -tzu*, ortografia przymiotników *-nki -> ciency*, Strażnik Homonimii Miejscownika w `is_plural_text` (*w powiecie, na świecie*), ochrona rzeczowników metaforycznych (*jesteś moją nadzieją*) i QuoteShield. Rozszerzenie suity testowej do 171 testów (Testy 168–171, 171/171 PASSED).
 
 ---
 
@@ -71,3 +80,13 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 | **2026-10-13** | `ARB-013` | Automat Diegetyczny | Interwały `PersonaInterval` z `episode_index`, dwuwarstwowa bramka monologu i ochrona cudzysłowów `「 」`/`『 』`. | 0.00 PLN |
 | **2026-10-13** | `ARB-014` | Fleksja PWN | `DeclensionParadigm`: detektor japońskich mor CV `-e` (zakaz apostrofu) vs nieme angielskie `-e`, końcówka `-u` w W/Ms po afrykatach (`-tz -> -tzu`). | 0.00 PLN |
 | **2026-10-13** | `ARB-015` | Audyt Śledczy AST | Wdrożenie `Zero-Literal & Stem Leakage` oraz obowiązkowego skanera `audit_diff.ps1` i szybkiej ścieżki `pytest -k`. | 0.00 PLN |
+| **2026-10-16** | `ARB-016` | Swoboda Stylistyczna | **Stylistic Freedom Invariance**: Pełna autonomia stylistyczna LLM (elipsa, inwersja, czas teraźniejszy, ruchome końcówki). | 0.00 PLN |
+| **2026-10-16** | `ARB-017` | Telemetria | **Modular World-State Telemetry**: `format_dry_telemetry_tag` przy progu >= 0.80, kategoryczny zakaz emitowania None/AMBIGUOUS. | 0.00 PLN |
+| **2026-10-16** | `ARB-018` | Akustyka Audio | **Voiced-Frame Pooling**: Agregacja >= 25 ramek voiced `librosa.pyin` z filtracją `IQR/median > 0.35` i `std > 50 Hz`. | 0.00 PLN |
+| **2026-10-16** | `ARB-019` | Epistemologia | **Directional Consensus Purity**: Tłumienie pewności < 0.95 przy purity < 0.65; wektor >= 0.85 przy czystym konsensusie 1.0. | 0.00 PLN |
+| **2026-10-16** | `ARB-020` | Graf Dyskursu | **SubTurn Pivot Partitioning**: Rozcinanie tury mówcy na niezależne pod-tury przy Addressee Pivot oraz izolacja myśli. | 0.00 PLN |
+| **2026-10-16** | `ARB-021` | Liczba Mnoga | **We_Group Set Algebra**: `We_Group = scene_participants - excluded_addressee` z trójstanową virility (VIRILE/NON_VIRILE/AMBIGUOUS). | 0.00 PLN |
+| **2026-10-16** | `ARB-022` | Morfosyntaktyka | **Stem-First Execution Order**: Oboczności rdzenne `o:ó` i `ę:ą` przed ogólną podmianą sufiksów fleksyjnych. | 0.00 PLN |
+| **2026-10-16** | `ARB-023` | Czas Przeszły | **Inwariant Morfemu Przeszłego `-ł-` / `-l-`**: Ochrona czasu teraźniejszego na `-am`/`-em` przed fałszywą fleksją przeszłą. | 0.00 PLN |
+| **2026-10-16** | `ARB-024` | Klitki i Podmioty | **Zamknięta Biała Lista Klitkowa**: `bym/byś/żeś` z ochroną fałszywych klitek (`tym/ktoś/coś`) i podmiotów przeczących (`nikt/każdy`). | 0.00 PLN |
+| **2026-10-16** | `ARB-025` | Homonimia PWN | **Strażnik Homonimii Miejscownika**: `w powiecie`, `na świecie`, `w mieście` wykluczone z flagowania jako 2. os. lm. czasownika. | 0.00 PLN |

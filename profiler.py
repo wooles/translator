@@ -18,6 +18,7 @@ from pydantic import BaseModel, Field, ConfigDict
 from google import genai
 from google.genai import types
 from client_factory import format_friendly_api_error, patch_google_genai_schema_sanitizer
+from metadata import normalize_ascii_diacritics
 
 patch_google_genai_schema_sanitizer()
 
@@ -821,11 +822,14 @@ def extract_japanese_audio_track(video_path: Union[str, Path], output_wav: Union
 class EpistemicAudioTriangulator:
     """
     Triangulator akustyczny z limitem próbkowania pYIN oraz filtrem szumu tła (BGM/SFX).
-    - Limit próbkowania pYIN: wyłącznie 3-5 najczystszych wycinków mowy per postać (1.5-2.0s, max 10s audio).
-    - Dyskwalifikacja próbek, w których odchylenie standardowe F0 > 50 Hz (artefakt muzyki/krzyku).
+    - Limit próbkowania pYIN: adaptacyjny pooling ramek dźwięcznych (voiced_prob >= 0.60)
+      z maksymalnie 8 najczystszych wypowiedzi postaci (budżet łączny do 10.0 s audio).
+    - Pomiar jest ważny, gdy zebrano łącznie MINIMUM 25 ramek dźwięcznych.
+    - Filtracja intonacji IQR: dyskwalifikacja próbek wykazujących jednocześnie
+      wysoką dyspersję względną i bezwzględną: IQR(F0) / median(F0) > 0.35 ORAZ std(F0) > 50 Hz.
     - Asymetria fizjologiczna krtani:
       Mediana F0 <= 135 Hz nadaje twardy determinizm męski (F0_hard_masculine = True, pewność 1.0; prawo weta anaforycznego przy score <= -8).
-      W strefie F0 > 170 Hz waga F0 = 0% (unieważnienie, delegacja do morfosyntaktyki i anaforyki).
+      W strefie F0 > 135 Hz waga F0 = 0% (unieważnienie, delegacja do morfosyntaktyki i anaforyki).
     """
 
     @classmethod
@@ -845,7 +849,8 @@ class EpistemicAudioTriangulator:
 
         clip_len = int(sample_rate * clip_duration_sec)
         if len(samples) < clip_len:
-            if len(samples) >= int(sample_rate * 0.5):
+            # Zamiast odrzucać krótkie linie (<0.5s), zachowaj jako wycinek do poolingu
+            if len(samples) >= int(sample_rate * 0.1):
                 return [samples]
             return []
 
@@ -876,42 +881,108 @@ class EpistemicAudioTriangulator:
         return clips
 
     @classmethod
-    def estimate_f0_pyin(cls, clip: np.ndarray, sample_rate: int = 16000, sr: Optional[int] = None) -> Optional[float]:
+    def estimate_f0_pyin(
+        cls,
+        clip: Union[np.ndarray, List[np.ndarray], Tuple[np.ndarray, ...]],
+        sample_rate: int = 16000,
+        sr: Optional[int] = None,
+        min_voiced_frames: int = 25,
+        max_utterances: int = 8,
+        max_total_sec: float = 10.0
+    ) -> Optional[float]:
         """
-        Oblicza medianę F0 z ramek voiced librosa.pyin.
-        Jeśli odchylenie standardowe F0 w próbce przekracza 50 Hz, próbka jest dyskwalifikowana.
+        Oblicza medianę F0 z ramek voiced librosa.pyin (Voiced-Frame Pooling).
+        - Zamiast odrzucać krótkie linie, agreguje ramki dźwięczne (voiced_flag == True oraz voiced_prob >= 0.60)
+          z maksymalnie 8 najczystszych wypowiedzi postaci (budżet łączny do 10.0 s audio).
+        - Pomiar jest ważny, gdy zebrano łącznie MINIMUM 25 ramek dźwięcznych.
+        - Filtracja intonacji IQR: odrzuca próbki wykazujące jednocześnie wysoką dyspersję względną
+          i bezwzględną: IQR(F0) / median(F0) > 0.35 ORAZ std(F0) > 50 Hz.
         """
         if sr is not None:
             sample_rate = sr
-        if clip is None or len(clip) < int(sample_rate * 0.2):
+        if clip is None:
+            return None
+
+        if isinstance(clip, (list, tuple)):
+            if len(clip) == 0:
+                return None
+            utterances = [c for c in clip if c is not None and len(c) >= int(sample_rate * 0.05)]
+            utterances = utterances[:max_utterances]
+        else:
+            if not isinstance(clip, np.ndarray) or len(clip) < int(sample_rate * 0.05):
+                return None
+            utterances = [clip]
+
+        if not utterances:
             return None
 
         try:
             import librosa
-            y = clip.astype(np.float32)
-            if np.max(np.abs(y)) > 1.0:
-                y = y / max(np.max(np.abs(y)), 1.0)
+            all_valid_f0 = []
+            total_samples = 0
+            max_total_samples = int(sample_rate * max_total_sec)
 
-            f0, voiced_flag, _ = librosa.pyin(
-                y,
-                fmin=60,
-                fmax=400,
-                sr=sample_rate,
-                frame_length=1024
-            )
-            if f0 is None or voiced_flag is None:
+            for utt in utterances:
+                if total_samples >= max_total_samples:
+                    break
+                remaining = max_total_samples - total_samples
+                curr_utt = utt[:remaining] if len(utt) > remaining else utt
+                total_samples += len(curr_utt)
+
+                y = curr_utt.astype(np.float32)
+                max_abs = float(np.max(np.abs(y)))
+                if max_abs > 1.0:
+                    y = y / max_abs
+
+                flen = 1024
+                if len(y) < flen:
+                    flen = max(256, 2 ** int(np.floor(np.log2(len(y)))))
+                if len(y) < flen:
+                    continue
+
+                pyin_res = librosa.pyin(
+                    y,
+                    fmin=60,
+                    fmax=400,
+                    sr=sample_rate,
+                    frame_length=flen
+                )
+                if pyin_res is None or len(pyin_res) < 2:
+                    continue
+
+                f0_arr = pyin_res[0]
+                voiced_flag = pyin_res[1]
+                voiced_prob = pyin_res[2] if len(pyin_res) > 2 else None
+
+                if f0_arr is None or voiced_flag is None:
+                    continue
+
+                mask = (voiced_flag == True) & ~np.isnan(f0_arr)
+                if voiced_prob is not None:
+                    mask = mask & (voiced_prob >= 0.60)
+
+                valid_frames = f0_arr[mask]
+                if len(valid_frames) > 0:
+                    all_valid_f0.extend(valid_frames.tolist())
+
+            if len(all_valid_f0) < min_voiced_frames:
+                logger.debug(f"Niewystarczająca liczba ramek dźwięcznych: {len(all_valid_f0)} < {min_voiced_frames}")
                 return None
 
-            valid_f0 = f0[voiced_flag & ~np.isnan(f0)]
-            if len(valid_f0) < 3:
+            valid_f0_np = np.array(all_valid_f0, dtype=np.float32)
+            med_f0 = float(np.median(valid_f0_np))
+            std_f0 = float(np.std(valid_f0_np))
+            q75, q25 = np.percentile(valid_f0_np, [75, 25])
+            iqr_f0 = float(q75 - q25)
+
+            dispersion_rel = iqr_f0 / max(med_f0, 1e-5)
+            if dispersion_rel > 0.35 and std_f0 > 50.0:
+                logger.debug(
+                    f"Dyskwalifikacja próbki: IQR/median = {dispersion_rel:.2f} > 0.35 oraz std = {std_f0:.1f} Hz > 50.0 Hz"
+                )
                 return None
 
-            std_f0 = float(np.std(valid_f0))
-            if std_f0 > 50.0:
-                logger.debug(f"Dyskwalifikacja próbki: odchylenie standardowe F0 = {std_f0:.1f} Hz > 50.0 Hz")
-                return None
-
-            return float(np.median(valid_f0))
+            return med_f0
         except Exception as e:
             logger.debug(f"Błąd librosa.pyin: {e}")
             return None
@@ -939,18 +1010,26 @@ class EpistemicAudioTriangulator:
         jp_pronoun: Optional[str] = None,
         en_score: int = 0,
         median_f0: Optional[float] = None,
+        character_name: str = "",
+        title: Optional[str] = None,
+        **kwargs
     ) -> Dict[str, Any]:
         """
         Syntetyzuje 3 filary wiedzy (Acoustic F0, Japanese Morphosyntax, English Discourse Anaphora).
         Dla każdej mediany F0 > 135 Hz waga akustyczna wynosi 0.0 (decyzję podejmują wyłącznie wektory JA i EN).
         """
+        if f0_hz is None and kwargs.get("audio_clip") is not None:
+            f0_hz = cls.estimate_f0_pyin(kwargs.get("audio_clip"))
         if median_f0 is not None and f0_hz is None:
             f0_hz = median_f0
         return SpaCyAnaphoraDiscourseAnalyzer.triangulate_epistemic_gender(
             f0_hz=f0_hz,
             jp_pronoun=jp_pronoun,
             en_score=en_score,
-            median_f0=median_f0
+            median_f0=median_f0,
+            character_name=character_name,
+            title=title,
+            **kwargs
         )
 
     @classmethod
@@ -1043,14 +1122,21 @@ class SpaCyAnaphoraDiscourseAnalyzer:
         return cls._nlp_instance
 
     @classmethod
-    def reconstruct_scene_paragraphs(cls, events: List[Any], max_gap_sec: float = 1.5) -> List[str]:
+    def reconstruct_scene_paragraphs(
+        cls,
+        events: List[Any],
+        max_gap_sec: float = 1.5,
+        max_scene_gap_sec: float = 4.0,
+        within_scene: bool = False
+    ) -> List[str]:
         """
-        Łączy sąsiadujące linie z tej samej sceny (odstęp < 1.5s) w spójny akapit tekstu,
+        Łączy sąsiadujące linie wewnątrz sceny (do 4.0s lub domyślnie 1.5s bez cięcia stylu) w spójny akapit tekstu,
         aby umożliwić rozwiązanie koreferencji międzyzdaniowej w spaCy.
         """
         if not events:
             return []
 
+        gap_limit = max_scene_gap_sec if within_scene else max_gap_sec
         sorted_events = sorted(events, key=lambda ev: getattr(ev, "start", 0))
         paragraphs = []
         current_chunk = []
@@ -1065,7 +1151,7 @@ class SpaCyAnaphoraDiscourseAnalyzer:
             if not clean_t:
                 continue
 
-            if last_end is not None and (start_sec - last_end) > max_gap_sec:
+            if last_end is not None and (start_sec - last_end) > gap_limit:
                 if current_chunk:
                     paragraphs.append(" ".join(current_chunk))
                     current_chunk = []
@@ -1077,6 +1163,57 @@ class SpaCyAnaphoraDiscourseAnalyzer:
             paragraphs.append(" ".join(current_chunk))
 
         return paragraphs
+
+    @classmethod
+    def classify_anthroponym_and_title(cls, name_or_title: Optional[str] = None) -> Tuple[Optional[str], float]:
+        """
+        Deterministyczna klasyfikacja produktywnych sufiksów imion japońskich
+        oraz tytułów społecznych, wojskowych i szlacheckich w EN/JA jako silnych wektorów.
+        Zwraca: (gender: 'MALE' | 'FEMALE' | None, weight: float)
+        """
+        if not name_or_title or not isinstance(name_or_title, str):
+            return None, 0.0
+
+        raw = name_or_title.strip()
+        if not raw:
+            return None, 0.0
+
+        clean = normalize_ascii_diacritics(raw).lower()
+        clean = re.sub(r"[^\w\s-]", "", clean).strip()
+        tokens = [t.strip("-") for t in re.split(r"[\s_/-]+", clean) if t.strip("-")]
+
+        # 1. Tytuły społeczne, wojskowe i szlacheckie (EN/PL)
+        MALE_STRONG_TITLES = {
+            "lord", "sir", "baron", "count", "duke", "prince", "king", "emperor",
+            "general", "admiral", "captain", "commander", "marshal", "knight",
+            "boy", "guy", "man", "father", "son", "brother", "uncle", "nephew", "lad", "gentleman",
+            "hrabia", "ksiaze", "krol", "cesarz", "general", "kapitan", "rycerz", "ojciec", "syn", "brat"
+        }
+        FEMALE_STRONG_TITLES = {
+            "lady", "dame", "baroness", "countess", "duchess", "princess", "queen", "empress",
+            "girl", "woman", "mother", "daughter", "sister", "aunt", "niece", "lass", "gentlewoman",
+            "hrabina", "baronowa", "ksiezna", "krolowa", "cesarzowa", "matka", "corka", "siostra"
+        }
+
+        for t in tokens:
+            if t in MALE_STRONG_TITLES:
+                return "MALE", 5.0
+            if t in FEMALE_STRONG_TITLES:
+                return "FEMALE", 5.0
+
+        # 2. Produktywne sufiksy imion japońskich
+        JP_MALE_SUFFIXES = (
+            "nosuke", "shirou", "tarou", "jirou", "yoshi", "hiko",
+            "suke", "maru", "zou", "hito", "masa", "nobu", "taka",
+            "rou", "ichi", "aki", "taro", "jiro", "shiro", "zo"
+        )
+        for t in tokens:
+            if len(t) >= 4:
+                for suf in JP_MALE_SUFFIXES:
+                    if t.endswith(suf) and len(t) >= len(suf) + 2:
+                        return "MALE", 5.0
+
+        return None, 0.0
 
     @classmethod
     def filter_vocative_from_text(cls, text: str, character_name: str) -> str:
@@ -1097,16 +1234,22 @@ class SpaCyAnaphoraDiscourseAnalyzer:
         return filtered.strip()
 
     @classmethod
-    def score_english_anaphora(cls, text: str, character_name: str = "") -> int:
+    def score_english_anaphora(cls, text: Union[str, List[Any]], character_name: str = "") -> int:
         """
-        Oblicza łączny wynik anaforyczny w tekście angielskim:
+        Oblicza łączny wynik anaforyczny w tekście angielskim lub zrekonstruowanych akapitach sceny:
         Score_EN_pronouns = (he, him, his, himself) - (she, her, hers, herself) [waga: x4]
         Score_EN_nouns = sum(męskie_tytuły) - sum(żeńskie_tytuły) [waga: x5]
         """
         if not text:
             return 0
 
-        clean_text = cls.filter_vocative_from_text(text, character_name) if character_name else text
+        if isinstance(text, list):
+            paras = cls.reconstruct_scene_paragraphs(text, within_scene=True)
+            clean_text = " ".join(paras) if paras else " ".join(str(getattr(x, "text", x)) for x in text)
+        else:
+            clean_text = str(text)
+
+        clean_text = cls.filter_vocative_from_text(clean_text, character_name) if character_name else clean_text
         nlp = cls.get_nlp()
 
         he_count = 0
@@ -1184,6 +1327,13 @@ class SpaCyAnaphoraDiscourseAnalyzer:
                 elif w in cls.FEMALE_TITLES:
                     female_noun_count += 1
 
+        if character_name:
+            t_gen, _ = cls.classify_anthroponym_and_title(character_name)
+            if t_gen == "MALE":
+                male_noun_count += 1
+            elif t_gen == "FEMALE":
+                female_noun_count += 1
+
         score_pronouns = (he_count - she_count) * 4
         score_nouns = (male_noun_count - female_noun_count) * 5
         return score_pronouns + score_nouns
@@ -1194,16 +1344,22 @@ class SpaCyAnaphoraDiscourseAnalyzer:
         Zwraca wagę morfosyntaktyczną zaimka 1. osoby (yakuwarigo):
         - Męskie: 'ore', 'boku', 'sessha', 'washi', 'oira', 'wagahai', 'ware' -> +3
         - Jednoznacznie żeńskie: 'atashi', 'atai', 'uchi', 'atakushi', 'warawa' -> -3
-        - Neutralne / formalne (dworskie, urzędowe, wojskowe): 'watakushi', 'watashi', '私' -> 0
+        - Neutralne / formalne (dworskie, urzędowe, wojskowe, keigo):
+          'watakushi', 'watakushi-domo', 'watakushidomo', 'watashi', 'watashitachi', '私', 'わたくし' -> 0
           (rejestr formalny używany powszechnie przez mężczyzn i kobiety; o płci decydują wektory F0,
-          angielskie he/she w spaCy oraz tytuły dworskie/urzędowe).
+          angielskie he/she w spaCy oraz tytuły dworskie/urzędowe/antroponimy).
         """
         raw = (pronoun or text or "").strip().lower()
         if not raw:
             return 0
 
         # 1. Dokładne dopasowanie (exact match)
-        neutral_exact = {"watakushi", "watashi", "私", "わたくし", "わたし"}
+        neutral_exact = {
+            "watakushi", "watashi", "私", "わたくし", "わたし",
+            "watakushi-domo", "watakushidomo", "わたくしども", "私ども",
+            "watashitachi", "watashi-tachi", "私達", "わたしたち",
+            "kochira", "kotchi", "jibun"
+        }
         if raw in neutral_exact:
             return 0
 
@@ -1217,13 +1373,19 @@ class SpaCyAnaphoraDiscourseAnalyzer:
             return 3
 
         # 2. Token match / wzorce z granicami słów
-        if re.search(r"\b(?:watakushi|watashi)\b", raw) or any(k in raw for k in ("わたくし", "わたし", "私")):
+        if re.search(r"\b(?:watakushi(?:-?domo)?|watashi(?:-?tachi)?|jibun)\b", raw) or any(
+            k in raw for k in ("わたくし", "わたし", "私", "わたくしども", "私ども")
+        ):
             return 0
 
-        if re.search(r"\b(?:atashi|atai|uchi|atakushi|warawa)\b", raw) or any(k in raw for k in ("あたし", "アタシ", "アタイ", "妾")):
+        if re.search(r"\b(?:atashi|atai|uchi|atakushi|warawa)\b", raw) or any(
+            k in raw for k in ("あたし", "アタシ", "アタイ", "妾")
+        ):
             return -3
 
-        if re.search(r"\b(?:ore|boku|sessha|washi|oira|wagahai|ware)\b", raw) or any(k in raw for k in ("俺", "僕", "拙者", "わし", "おいら", "吾輩", "我")):
+        if re.search(r"\b(?:ore|boku|sessha|washi|oira|wagahai|ware)\b", raw) or any(
+            k in raw for k in ("俺", "僕", "拙者", "わし", "おいら", "吾輩", "我")
+        ):
             return 3
 
         return 0
@@ -1395,15 +1557,18 @@ class SpaCyAnaphoraDiscourseAnalyzer:
         jp_pronoun: Optional[str] = None,
         en_score: int = 0,
         median_f0: Optional[float] = None,
+        character_name: str = "",
+        title: Optional[str] = None,
+        **kwargs
     ) -> Dict[str, Any]:
         """
         Syntetyzuje 3 filary wiedzy (Acoustic F0, Japanese Morphosyntax, English Discourse Anaphora)
-        rozstrzygając 6 kanonicznych archetypów epistemicznych:
+        oraz morfologię antroponimiczną i tytulaturę, rozstrzygając 6 kanonicznych archetypów epistemicznych:
         1. Deep male acoustic + male anaphora
         2. High female acoustic + female anaphora
         3. Cross-gender seiyū (boy role voiced by female)
         4. F0 Hard Masculine Veto (F0 <= 135 Hz z prawem weta anaforycznego)
-        5. Sparse / Ambiguous background voice
+        5. Sparse / Ambiguous background voice (SPARSE_AMBI_BACKGROUND)
         6. Pure morphosyntax override
 
         Likwidacja martwej strefy akustycznej (135–170 Hz):
@@ -1412,6 +1577,8 @@ class SpaCyAnaphoraDiscourseAnalyzer:
         wektory morfosyntaktyczne (JA) i anaforyczne (EN), chroniąc niskie głosy kobiece
         i wysokie głosy chłopięce.
         """
+        if f0_hz is None and kwargs.get("audio_clip") is not None:
+            f0_hz = EpistemicAudioTriangulator.estimate_f0_pyin(kwargs.get("audio_clip"))
         if median_f0 is not None and f0_hz is None:
             f0_hz = median_f0
 
@@ -1422,125 +1589,160 @@ class SpaCyAnaphoraDiscourseAnalyzer:
         jp_score = cls.score_japanese_pronoun(jp_p_low)
         jp_gender = "MALE" if jp_score > 0 else ("FEMALE" if jp_score < 0 else None)
 
+        name_target = title or character_name or ""
+        title_gender, title_weight = cls.classify_anthroponym_and_title(name_target)
+
+        male_weight = 0.0
+        female_weight = 0.0
+        male_evidence_count = 0
+        female_evidence_count = 0
+
+        # Filar 1: Akustyka (asymetria fizjologiczna krtani)
+        if f0_hard_masc:
+            male_weight += 5.0
+            male_evidence_count += 1
+        # F0 > 135 Hz ma wagę akustyczną 0.0 (blokada inferencji FEMALE z wysokiego F0)
+
+        # Filar 2: Morfosyntaktyka japońska (yakuwarigo)
+        if jp_score > 0:
+            male_weight += float(jp_score)
+            male_evidence_count += 1
+        elif jp_score < 0:
+            female_weight += float(abs(jp_score))
+            female_evidence_count += 1
+        # Formalne watakushi / watakushi-domo dają jp_score == 0 (waga 0.0)
+
+        # Filar 3: Dyskurs i anaforyka angielska (spaCy)
+        if en_score > 0:
+            male_weight += float(en_score)
+            male_evidence_count += 1
+        elif en_score < 0:
+            female_weight += float(abs(en_score))
+            female_evidence_count += 1
+
+        # Filar 4: Morfologia antroponimiczna i tytulatura
+        if title_gender == "MALE":
+            male_weight += title_weight
+            male_evidence_count += 1
+        elif title_gender == "FEMALE":
+            female_weight += title_weight
+            female_evidence_count += 1
+
+        tot_weight = male_weight + female_weight
+        purity = abs(male_weight - female_weight) / max(1.0, tot_weight)
+
+        resolved_gender = "NEUTRAL"
+        confidence = 0.50
+        archetype = "SPARSE_AMBI_BACKGROUND"
+        is_transient = False
+
         # 4. F0 Hard Masculine Veto (F0 <= 135 Hz)
         if f0_hard_masc:
             if en_score <= -8:
-                return {
-                    "resolved_gender": "FEMALE",
-                    "confidence": 0.85,
-                    "archetype": "EP_RUPTURE_ANAPHORA_OVERRIDE",
-                    "f0_hard_masculine": True,
-                    "acoustic_weight": 1.0,
-                }
-            return {
-                "resolved_gender": "MALE",
-                "confidence": 1.0,
-                "archetype": "F0_HARD_MASCULINE_VETO",
-                "f0_hard_masculine": True,
-                "acoustic_weight": 1.0,
-            }
+                resolved_gender = "FEMALE"
+                confidence = 0.85
+                archetype = "EP_RUPTURE_ANAPHORA_OVERRIDE"
+            else:
+                resolved_gender = "MALE"
+                confidence = 1.0
+                archetype = "F0_HARD_MASCULINE_VETO"
 
         # 2. High female acoustic + female anaphora (or low female voice 135-170 Hz with female anaphora / JP pronoun)
-        if (f0_hz is not None and f0_hz > 135.0 and (jp_gender == "FEMALE" or en_score < 0)) or (jp_gender == "FEMALE" and en_score <= 0):
-            return {
-                "resolved_gender": "FEMALE",
-                "confidence": 0.95,
-                "archetype": "HIGH_FEMALE_ACOUSTIC_AND_ANAPHORA" if f0_hz is not None else "PURE_MORPHOSYNTAX_OVERRIDE",
-                "f0_hard_masculine": False,
-                "acoustic_weight": acoustic_weight,
-            }
+        elif (f0_hz is not None and f0_hz > 135.0 and (jp_gender == "FEMALE" or en_score < 0)) or (jp_gender == "FEMALE" and en_score <= 0):
+            resolved_gender = "FEMALE"
+            confidence = 0.95
+            archetype = "HIGH_FEMALE_ACOUSTIC_AND_ANAPHORA" if f0_hz is not None else "PURE_MORPHOSYNTAX_OVERRIDE"
 
         # 3. Cross-gender seiyū (boy role voiced by female, F0 > 135 Hz with male pronoun)
-        if f0_hz is not None and f0_hz > 135.0 and jp_gender == "MALE":
-            return {
-                "resolved_gender": "MALE",
-                "confidence": 0.95,
-                "archetype": "CROSS_GENDER_SEIYU_BOY_ROLE",
-                "f0_hard_masculine": False,
-                "acoustic_weight": 0.0,
-            }
+        elif f0_hz is not None and f0_hz > 135.0 and jp_gender == "MALE":
+            resolved_gender = "MALE"
+            confidence = 0.95
+            archetype = "CROSS_GENDER_SEIYU_BOY_ROLE"
 
         # Epistemic rupture detection: High pitch + strong male anaphora (|en_score| >= 8)
-        if en_score >= 8 and (jp_gender != "FEMALE" or jp_p_low in ("watashi", "watakushi")):
-            return {
-                "resolved_gender": "MALE",
-                "confidence": 0.95,
-                "archetype": "EP_RUPTURE_ANAPHORA_OVERRIDE" if (f0_hz is not None and f0_hz > 170.0 and jp_gender is None) else "PURE_MORPHOSYNTAX_OVERRIDE",
-                "f0_hard_masculine": False,
-                "acoustic_weight": acoustic_weight,
-            }
-        if en_score <= -8:
-            return {
-                "resolved_gender": "FEMALE",
-                "confidence": 0.95,
-                "archetype": "EP_RUPTURE_ANAPHORA_OVERRIDE",
-                "f0_hard_masculine": False,
-                "acoustic_weight": acoustic_weight,
-            }
+        elif en_score >= 8 and (jp_gender != "FEMALE" or jp_p_low in ("watashi", "watakushi", "watakushi-domo", "watakushidomo")):
+            resolved_gender = "MALE"
+            confidence = 0.95
+            archetype = "EP_RUPTURE_ANAPHORA_OVERRIDE" if (f0_hz is not None and f0_hz > 170.0 and jp_gender is None) else "PURE_MORPHOSYNTAX_OVERRIDE"
+
+        elif en_score <= -8:
+            resolved_gender = "FEMALE"
+            confidence = 0.95
+            archetype = "EP_RUPTURE_ANAPHORA_OVERRIDE"
 
         # Any other F0 > 135 Hz: acoustic weight is 0.0. Morphosyntax and anaphora rule!
-        if f0_hz is not None and f0_hz > 135.0 and en_score > 0:
-            return {
-                "resolved_gender": "MALE",
-                "confidence": 0.95,
-                "archetype": "CROSS_GENDER_SEIYU_BOY_ROLE" if f0_hz > 170.0 else "MALE_DISCOURSE_OVERRIDE",
-                "f0_hard_masculine": False,
-                "acoustic_weight": 0.0,
-            }
+        elif f0_hz is not None and f0_hz > 135.0 and en_score > 0:
+            resolved_gender = "MALE"
+            confidence = 0.95
+            archetype = "CROSS_GENDER_SEIYU_BOY_ROLE" if f0_hz > 170.0 else "MALE_DISCOURSE_OVERRIDE"
 
         # 1. Deep male acoustic + male anaphora (or male pronoun without F0)
-        if (f0_gender == "MALE" or jp_gender == "MALE") and en_score >= 0:
-            return {
-                "resolved_gender": "MALE",
-                "confidence": 0.95,
-                "archetype": "DEEP_MALE_ACOUSTIC_AND_ANAPHORA",
-                "f0_hard_masculine": False,
-                "acoustic_weight": acoustic_weight,
-            }
+        elif (f0_gender == "MALE" or jp_gender == "MALE") and en_score >= 0:
+            resolved_gender = "MALE"
+            confidence = 0.95
+            archetype = "DEEP_MALE_ACOUSTIC_AND_ANAPHORA"
 
         # 6. Pure morphosyntax override (when F0 is None)
-        if f0_hz is None and (jp_gender == "MALE" and en_score >= 4 or en_score >= 8):
-            return {
-                "resolved_gender": "MALE",
-                "confidence": 0.90,
-                "archetype": "PURE_MORPHOSYNTAX_OVERRIDE",
-                "f0_hard_masculine": False,
-                "acoustic_weight": 0.0,
-            }
-        if f0_hz is None and (jp_gender == "FEMALE" and en_score <= -4 or en_score <= -8):
-            return {
-                "resolved_gender": "FEMALE",
-                "confidence": 0.90,
-                "archetype": "PURE_MORPHOSYNTAX_OVERRIDE",
-                "f0_hard_masculine": False,
-                "acoustic_weight": 0.0,
-            }
-        if f0_hz is None and en_score > 0:
-            return {
-                "resolved_gender": "MALE",
-                "confidence": 0.90,
-                "archetype": "PURE_MORPHOSYNTAX_OVERRIDE",
-                "f0_hard_masculine": False,
-                "acoustic_weight": 0.0,
-            }
-        if f0_hz is None and en_score < 0:
-            return {
-                "resolved_gender": "FEMALE",
-                "confidence": 0.90,
-                "archetype": "HIGH_FEMALE_ACOUSTIC_AND_ANAPHORA",
-                "f0_hard_masculine": False,
-                "acoustic_weight": 0.0,
-            }
+        elif f0_hz is None and (jp_gender == "MALE" and en_score >= 4 or en_score >= 8):
+            resolved_gender = "MALE"
+            confidence = 0.90
+            archetype = "PURE_MORPHOSYNTAX_OVERRIDE"
 
-        # 5. Sparse / Ambiguous background voice (including F0 > 135 Hz with 0.0 weight and en_score == 0)
-        return {
-            "resolved_gender": "NEUTRAL",
-            "confidence": 0.50,
-            "archetype": "SPARSE_AMBI_BACKGROUND",
-            "is_transient": True,
-            "f0_hard_masculine": False,
-            "acoustic_weight": acoustic_weight,
+        elif f0_hz is None and (jp_gender == "FEMALE" and en_score <= -4 or en_score <= -8):
+            resolved_gender = "FEMALE"
+            confidence = 0.90
+            archetype = "PURE_MORPHOSYNTAX_OVERRIDE"
+
+        elif f0_hz is None and en_score > 0:
+            resolved_gender = "MALE"
+            confidence = 0.90
+            archetype = "PURE_MORPHOSYNTAX_OVERRIDE"
+
+        elif f0_hz is None and en_score < 0:
+            resolved_gender = "FEMALE"
+            confidence = 0.90
+            archetype = "HIGH_FEMALE_ACOUSTIC_AND_ANAPHORA"
+
+        # Silny wektor antroponimiczny / tytularny w braku innych dowodów
+        elif title_gender in ("MALE", "FEMALE"):
+            resolved_gender = title_gender
+            confidence = 0.85
+            archetype = "PURE_MORPHOSYNTAX_OVERRIDE"
+
+        # 5. Sparse / Ambiguous background voice
+        else:
+            resolved_gender = "NEUTRAL"
+            confidence = 0.50
+            archetype = "SPARSE_AMBI_BACKGROUND"
+            is_transient = True
+
+        # Directional Consensus Purity i Epistemiczna Pokora
+        if resolved_gender in ("MALE", "FEMALE"):
+            winning_evidence = male_evidence_count if resolved_gender == "MALE" else female_evidence_count
+            has_strong_title = (title_gender == resolved_gender and title_weight >= 5.0)
+
+            # Jeśli purity == 1.0 i min. 2 niezależne dowody (lub 1 silny tytularny/antroponimiczny >= 5) -> confidence >= 0.85
+            if purity >= 1.0 and (winning_evidence >= 2 or has_strong_title):
+                confidence = max(confidence, 0.85)
+
+            # Jeśli purity < 0.65 -> ogranicz confidence poniżej 0.95 (blokada lintera post-gen)
+            if purity < 0.65:
+                confidence = min(confidence, 0.70)
+
+        result = {
+            "resolved_gender": resolved_gender,
+            "confidence": float(confidence),
+            "archetype": archetype,
+            "f0_hard_masculine": f0_hard_masc,
+            "acoustic_weight": float(acoustic_weight),
+            "purity": round(float(purity), 3),
+            "male_weight": float(male_weight),
+            "female_weight": float(female_weight),
         }
+        if is_transient or archetype == "SPARSE_AMBI_BACKGROUND":
+            result["is_transient"] = True
+
+        return result
 
 
 def triangulate_epistemic_gender(
@@ -1548,6 +1750,9 @@ def triangulate_epistemic_gender(
     jp_pronoun: Optional[str] = None,
     en_score: int = 0,
     median_f0: Optional[float] = None,
+    character_name: str = "",
+    title: Optional[str] = None,
+    **kwargs
 ) -> Dict[str, Any]:
     """
     Modułowa funkcja triangulacji epistemicznej płci (deleguje do SpaCyAnaphoraDiscourseAnalyzer).
@@ -1558,7 +1763,10 @@ def triangulate_epistemic_gender(
         f0_hz=f0_hz,
         jp_pronoun=jp_pronoun,
         en_score=en_score,
-        median_f0=median_f0
+        median_f0=median_f0,
+        character_name=character_name,
+        title=title,
+        **kwargs
     )
 
 
@@ -1598,7 +1806,7 @@ def resolve_relational_actor_gender(
             "prevent_default_feminization": False,
         }
 
-    cleaned_name = actor_name.strip()
+    cleaned_name = normalize_ascii_diacritics(actor_name).strip()
     if not is_flashback and any(fb in cleaned_name.lower() for fb in ("flashback", "retrospekcja", "past")):
         is_flashback = True
 
@@ -1608,6 +1816,19 @@ def resolve_relational_actor_gender(
         re.IGNORECASE
     )
     if not rel_m:
+        t_gender, t_w = SpaCyAnaphoraDiscourseAnalyzer.classify_anthroponym_and_title(cleaned_name)
+        if t_gender in ("MALE", "FEMALE"):
+            return {
+                "gender": t_gender,
+                "inferred_gender": t_gender,
+                "confidence": 0.90,
+                "owner": cleaned_name,
+                "base_name": cleaned_name,
+                "relation": "title_or_onomastic",
+                "relation_type": "title_or_onomastic",
+                "prevent_female_bias": (t_gender == "MALE"),
+                "prevent_default_feminization": (t_gender == "MALE"),
+            }
         return {
             "gender": "UNKNOWN",
             "inferred_gender": "UNKNOWN",
@@ -1656,14 +1877,18 @@ def resolve_relational_actor_gender(
         if isinstance(episode_dialogue, str):
             d_text = episode_dialogue
         elif isinstance(episode_dialogue, list):
-            collected = []
-            for item in episode_dialogue:
-                if isinstance(item, str):
-                    collected.append(item)
-                else:
-                    txt = getattr(item, "text", "") or ""
-                    collected.append(txt)
-            d_text = " ".join(collected)
+            paras = SpaCyAnaphoraDiscourseAnalyzer.reconstruct_scene_paragraphs(episode_dialogue, within_scene=True)
+            if paras:
+                d_text = " ".join(paras)
+            else:
+                collected = []
+                for item in episode_dialogue:
+                    if isinstance(item, str):
+                        collected.append(item)
+                    else:
+                        txt = getattr(item, "text", "") or ""
+                        collected.append(txt)
+                d_text = " ".join(collected)
         elif isinstance(episode_dialogue, dict):
             d_text = " ".join(str(v) for v in episode_dialogue.values())
         else:

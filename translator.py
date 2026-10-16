@@ -70,7 +70,8 @@ from avt_linter import (
     harmonize_copula_and_predicate_adjective, harmonize_2nd_person_predicate_nouns,
     strip_false_ablative_instrumental, fix_masculine_vocative_tz,
     fix_virile_adjective_orthography, has_2nd_person_plural_verb,
-    harmonize_virile_group_1st_person_plural, strip_false_feminine_instrumental
+    harmonize_virile_group_1st_person_plural, strip_false_feminine_instrumental,
+    harmonize_plural_group_gender
 )
 from romaji_helper import to_romaji
 from series_memory import (
@@ -98,6 +99,67 @@ from scene_discourse import DualVoiceTagPreserver, DeicticDiscourseEngine, Diari
 from client_factory import format_friendly_api_error, patch_google_genai_schema_sanitizer
 
 patch_google_genai_schema_sanitizer()
+
+def format_dry_telemetry_tag(
+    speaker_gender: Optional[str] = None,
+    speaker_confidence: float = 1.0,
+    target_gender: Optional[str] = None,
+    target_confidence: float = 1.0,
+    plural_group_gender: Optional[str] = None,
+    plural_confidence: float = 1.0,
+    **kwargs: Any
+) -> str:
+    """
+    Buduje zwięzły opisowy mikro-tag dołączając wyłącznie segmenty (Mówca, Adresat, Grupa_1os_lm),
+    których pewność wynosi >= 0.80. Nigdy nie emituje wartości None ani AMBIGUOUS!
+    """
+    spk = speaker_gender or kwargs.get("speaker") or kwargs.get("spk")
+    spk_conf = kwargs.get("spk_conf", kwargs.get("speaker_conf", speaker_confidence))
+
+    tgt = target_gender or kwargs.get("target") or kwargs.get("addressee") or kwargs.get("addressee_gender")
+    tgt_conf = kwargs.get("tgt_conf", kwargs.get("target_conf", target_confidence))
+
+    grp = plural_group_gender or kwargs.get("plural_group") or kwargs.get("group_gender") or kwargs.get("grupa_1os_lm")
+    grp_conf = kwargs.get("grp_conf", kwargs.get("plural_conf", kwargs.get("group_conf", plural_confidence)))
+
+    segments = []
+
+    def _is_valid_telemetry_val(val: Any) -> bool:
+        if val is None:
+            return False
+        s = str(val).strip()
+        if not s or s.upper() in ("NONE", "AMBIGUOUS", "UNKNOWN", "NIEZNANA", "NIEZNANY"):
+            return False
+        return True
+
+    try:
+        spk_c = float(spk_conf)
+    except Exception:
+        spk_c = 1.0 if _is_valid_telemetry_val(spk) else 0.0
+
+    try:
+        tgt_c = float(tgt_conf)
+    except Exception:
+        tgt_c = 1.0 if _is_valid_telemetry_val(tgt) else 0.0
+
+    try:
+        grp_c = float(grp_conf)
+    except Exception:
+        grp_c = 1.0 if _is_valid_telemetry_val(grp) else 0.0
+
+    if _is_valid_telemetry_val(spk) and spk_c >= 0.80:
+        segments.append(f"Mówca: {spk}")
+
+    if _is_valid_telemetry_val(tgt) and tgt_c >= 0.80:
+        segments.append(f"Adresat: {tgt}")
+
+    if _is_valid_telemetry_val(grp) and grp_c >= 0.80:
+        segments.append(f"Grupa_1os_lm: {grp}")
+
+    if not segments:
+        return ""
+
+    return f"[{' | '.join(segments)}]"
 
 def extract_typesetting_tags(raw_text: str) -> Tuple[str, str]:
     """
@@ -2862,6 +2924,16 @@ class MultimodalTranslator:
                 if paradigm_strs:
                     contract_parts.append(f"DeclensionParadigm: {'; '.join(paradigm_strs)}")
                 lines.append(f"  📋 TWARDY KONTRAKT: {' | '.join(contract_parts)}")
+                dry_telemetry = format_dry_telemetry_tag(
+                    speaker_gender=contract_spk_gender,
+                    speaker_confidence=1.0 if contract_spk_gender in ("MASCULINE", "FEMININE") else 0.0,
+                    target_gender=contract_target_gender,
+                    target_confidence=1.0 if contract_target_gender in ("MASCULINE", "FEMININE") else 0.0,
+                    plural_group_gender="VIRILE" if (line_addr_cat in ["grupa_mężczyzn", "mężczyzna_dual"] or (contract_addr_number == "PLURAL" and getattr(self, "scene_has_male", False))) else ("NON_VIRILE" if contract_addr_number == "PLURAL" else None),
+                    plural_confidence=1.0 if contract_addr_number == "PLURAL" else 0.0
+                )
+                if dry_telemetry:
+                    lines.append(f"  📡 TELEMETRIA: {dry_telemetry} (Swoboda stylistyczna: elipsa, inwersja, ruchome końcówki, czas teraźniejszy)")
                 if compact_wdd_tag:
                     lines.append(f"  {compact_wdd_tag}")
                 subj_3p = detect_third_person_mentions(
@@ -4081,12 +4153,31 @@ class MultimodalTranslator:
                 addressee_number=item.get("addressee_number"),
                 scene_has_male_participant=scene_has_male
             )
-            # Deterministic post-processing: strip false feminine instrumental & virile plural harmonization
+            # Deterministic post-processing: surgical safety net (próg >= 0.95)
             final_text, fem_inst_fixes = strip_false_feminine_instrumental(final_text, series_bible=getattr(self, "series_bible", None))
             fixes.extend(fem_inst_fixes)
+            final_text, abl_fixes = strip_false_ablative_instrumental(final_text, series_bible=getattr(self, "series_bible", None))
+            fixes.extend(abl_fixes)
+            final_text, tz_fixes = fix_masculine_vocative_tz(final_text)
+            fixes.extend(tz_fixes)
+            final_text, vir_adj_fixes = fix_virile_adjective_orthography(final_text)
+            fixes.extend(vir_adj_fixes)
+            spk_g = item.get("speaker_gender")
+            tgt_g = item.get("target_gender") or item.get("addressee")
+            if spk_g or tgt_g:
+                final_text, verb_fixes = harmonize_verbal_gender_1st_and_2nd(final_text, speaker_gender=spk_g, target_gender=tgt_g)
+                fixes.extend(verb_fixes)
+                final_text, cop_fixes = harmonize_copula_and_predicate_adjective(final_text, target_gender=tgt_g, speaker_gender=spk_g)
+                fixes.extend(cop_fixes)
+            if tgt_g:
+                final_text, pred_n_fixes = harmonize_2nd_person_predicate_nouns(final_text, target_gender=tgt_g)
+                fixes.extend(pred_n_fixes)
             if scene_has_male:
                 final_text, vir_pl_fixes = harmonize_virile_group_1st_person_plural(final_text, scene_has_male_participant=True)
                 fixes.extend(vir_pl_fixes)
+            elif item.get("addressee_number") == "PLURAL":
+                final_text, pl_fixes = harmonize_plural_group_gender(final_text, plural_group_gender=item.get("plural_group_gender", "NON_VIRILE"))
+                fixes.extend(pl_fixes)
             prev_linted_line = final_text
             # Deterministic glossary overrides
             final_text, gloss_fixes = GlossaryManager.apply_deterministic_overrides(final_text, combined_glossary)
