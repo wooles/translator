@@ -6060,7 +6060,7 @@ def test_tenmaku_ep12_holistic_domain_guard():
     # 4. Warstwa 4: translator.py i avt_linter.py
     import translator
     trans_src = inspect.getsource(translator.MultimodalTranslator._prepare_batch_prompt)
-    assert "SKRYPT PODSTAWOWY EN (TREŚĆ, FAKTY, SKŁADNIA I MAJUSKUŁA)" in trans_src, "Angielski nie jest sekcją 1 w translator.py"
+    assert "SKRYPT PODSTAWOWY EN (TREŚĆ SEMANTYCZNA I FAKTY)" in trans_src, "Angielski nie jest sekcją 1 w translator.py"
     assert "GŁOS SEIYŪ (KOTWICA FONICZNA, REJESTR, AFEKT I PŁEĆ)" in trans_src, "Głos seiyū nie jest sekcją 2 w translator.py"
     assert "SPÓJNOŚĆ SKŁADNIOWA" in trans_src or "Filar CLXIX" in trans_src, "Brak Syntax Continuity Stitcher w translator.py"
 
@@ -7832,7 +7832,7 @@ def test_holistic_unburdened_metadata_ffmpeg_whisper_and_anti_guessing_pipeline(
     # Sprawdź, czy usunięto anonimowe Mówca: 'Postać' i zastąpiono je pełnym nagłówkiem SSOT
     assert "Mówca: 'Postać'" not in prompt_ssot, "Nadal występuje niejednoznaczne Mówca: 'Postać' w Fazie 1!"
     assert "[MÓWCA: Kobieta | ADRESAT: Kobieta" in prompt_ssot, "Brak deterministycznego deskryptora mówcy i adresata w Fazie 1!"
-    assert "REJESTR: 2. os. lp. 'ty' do kobiety (-łaś / wzburzoną)" in prompt_ssot, "Brak deterministycznego rejestru AVT w Fazie 1!"
+    assert "REJESTR: 2. os. lp. 'ty' do kobiety" in prompt_ssot, "Brak deterministycznego rejestru AVT w Fazie 1!"
     # Sprawdź, czy cięcie montażowe FFmpeg przy 2550ms zostało odnotowane
     assert "🎬 CIĘCIE SCENY (FFmpeg)" in prompt_ssot, "Brak znacznika cięcia montażowego FFmpeg w prompcie!"
 

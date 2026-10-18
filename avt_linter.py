@@ -5043,6 +5043,20 @@ def strip_false_ablative_instrumental(text: str, series_bible: Optional[Any] = N
     def _repl_group(m):
         lead = m.group(1)
         stem = m.group(2)
+        if series_bible:
+            try:
+                from series_memory import EntityCategory
+                if hasattr(series_bible, "get_entity_category"):
+                    if series_bible.get_entity_category(stem) == EntityCategory.ANTHROPONYM or series_bible.get_entity_category(stem + "e") == EntityCategory.ANTHROPONYM:
+                        return m.group(0)
+                if hasattr(series_bible, "characters") and isinstance(series_bible.characters, dict):
+                    if stem in series_bible.characters or (stem + "e") in series_bible.characters:
+                        return m.group(0)
+                if hasattr(series_bible, "is_character_male"):
+                    if series_bible.is_character_male(stem) or series_bible.is_character_male(stem + "e"):
+                        return m.group(0)
+            except Exception:
+                pass
         target_name = _resolve_toponym_base(stem, series_bible=series_bible)
         fixes.append(f"[Ablative Stripper] Usunięto fałszywy narzędnik pochodzenia: '{m.group(0).strip()}' -> '{lead.lstrip()}{target_name}'")
         return f"{lead}{target_name}"
@@ -5054,6 +5068,20 @@ def strip_false_ablative_instrumental(text: str, series_bible: Optional[Any] = N
     def _repl_verb(m):
         lead = m.group(1)
         stem = m.group(2)
+        if series_bible:
+            try:
+                from series_memory import EntityCategory
+                if hasattr(series_bible, "get_entity_category"):
+                    if series_bible.get_entity_category(stem) == EntityCategory.ANTHROPONYM or series_bible.get_entity_category(stem + "e") == EntityCategory.ANTHROPONYM:
+                        return m.group(0)
+                if hasattr(series_bible, "characters") and isinstance(series_bible.characters, dict):
+                    if stem in series_bible.characters or (stem + "e") in series_bible.characters:
+                        return m.group(0)
+                if hasattr(series_bible, "is_character_male"):
+                    if series_bible.is_character_male(stem) or series_bible.is_character_male(stem + "e"):
+                        return m.group(0)
+            except Exception:
+                pass
         target_name = _resolve_toponym_base(stem, series_bible=series_bible)
         fixes.append(f"[Ablative Stripper] Usunięto fałszywy narzędnik po czasowniku ablatywnym: '{m.group(0).strip()}' -> '{lead.lstrip()}{target_name}'")
         return f"{lead}{target_name}"
@@ -9996,7 +10024,7 @@ class EpisodeQualityGate:
                             is_female_dual = True
 
                 if not (is_female_dual or is_mixed_dual or is_male_dual):
-                    if re.search(r"\b[a-ząćęłńóśźż]+(?:li|liście|liśmy)\b", clean_line_lower):
+                    if re.search(r"\b[a-ząćęłńóśźż]+li\b", clean_line_lower):
                         is_male_dual = True
 
                 if is_female_dual:

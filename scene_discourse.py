@@ -1970,7 +1970,7 @@ def classify_we_group_gender(
     """
     Klasyfikuje płeć gramatyczną grupy We_Group:
     - min. 1 potwierdzony mężczyzna w We_Group (w SeriesBible po kluczu lub aliasie pierwszego imienia,
-      ze znacznika metadanych lub z użycia męskoosobowej formy 1. os. lm. -liśmy w tej scenie)
+      ze znacznika metadanych lub determinizmu akustycznego F0 <= 135 Hz)
       -> plural_group_gender = 'VIRILE', we_has_male = True
     - zbiór liczy >= 2 uczestników i każdy element posiada zweryfikowaną w SeriesBible płeć FEMALE
       (confidence >= 0.95) przy zerowej liczbie mężczyzn i zerowej liczbie nieznanych (unknown_count == 0)
@@ -1979,12 +1979,6 @@ def classify_we_group_gender(
     """
     if not we_group:
         return "AMBIGUOUS", False
-
-    # Sprawdzenie formy -liśmy w kontekście bieżącej kwestii / sceny
-    if context_item:
-        c_text = getattr(context_item, "text", "") or ""
-        if re.search(r"\b[a-ząćęłńóśźż]+liśmy\b", c_text, re.IGNORECASE):
-            return "VIRILE", True
 
     has_male = False
     confirmed_females = 0
@@ -2045,19 +2039,13 @@ def classify_you_group_gender(
     """
     Klasyfikuje płeć gramatyczną grupy You_Group (2. os. lm.):
     - Status 'VIRILE': zbiór zawiera przynajmniej jednego uczestnika o potwierdzonej płci męskiej
-      (w SeriesBible po kluczu lub aliasie pierwszego imienia, ze znacznika metadanych lub z użycia -liście).
+      (w SeriesBible po kluczu lub aliasie pierwszego imienia, ze znacznika metadanych lub determinizmu akustycznego F0 <= 135 Hz).
     - Status 'NON_VIRILE': zbiór liczy >= 2 uczestników i każdy element posiada zweryfikowaną w SeriesBible
       płeć FEMALE (confidence >= 0.95) przy zerowej liczbie mężczyzn i zerowej liczbie nieustalonej płci (unknown_count == 0).
     - Wszystkie pozostałe konfiguracje przyjmują status 'AMBIGUOUS' (odwzorowanie identycznościowe T(x) = x).
     """
     if not you_group:
         return "AMBIGUOUS"
-
-    # Sprawdzenie formy -liście w kontekście bieżącej kwestii
-    if context_item:
-        c_text = getattr(context_item, "text", "") or ""
-        if re.search(r"\b[a-ząćęłńóśźż]+liście\b", c_text, re.IGNORECASE):
-            return "VIRILE"
 
     has_male = False
     confirmed_females = 0
@@ -2186,9 +2174,9 @@ def resolve_scene_participants(
             if s_tag_g == "MALE":
                 scene_has_male = True
 
-            # Sprawdzenie czy w kwestii użyto formy -liśmy (męskoosobowa 1. os. lm.) lub męskiej 1. os. lp.
+            # Weryfikacja morfologii męskiej 1. os. lp. mówcy
             s_txt = getattr(s_item, "text", "") or ""
-            if re.search(r"\b[a-ząćęłńóśźż]+liśmy\b", s_txt, re.IGNORECASE) or _detect_first_person_speech_gender(s_txt) == "MALE":
+            if _detect_first_person_speech_gender(s_txt) == "MALE":
                 scene_has_male = True
 
             s_effective_spk = s_clean_spk or s_spk

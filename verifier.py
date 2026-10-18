@@ -204,7 +204,8 @@ class DialogueVerifier:
             "       * 🌍 Świat: relacje statusu, nienaruszalność formy Pan/Ty (Filar CLVII), perspektywa incognito (Filar CLXI).\n"
             "       * 🎬 Obraz i Audio: afekt seiyū, gesty, napisy ekranowe vs dialog.\n"
             "   KROK 3: PROAKTYWNY AUDYT NEGATYWNY REJESTRU, PŁCI I REKCJI (NEGATIVE REGISTER, GENDER & CALQUE GATE - FILAR X, CLXXXVII, CLXXXVIII):\n"
-            "     - Zgodność płciowa i cytaty: Upewnij się, że końcówki 1. osoby mówczyń (-am, -ałam, -łabym) oraz formy 2. osoby do adresatek (-aś, -ałaś, jesteś pewna) i grup żeńskich (-yście, one) są w pełni poprawne. Cytaty („...”) w dialogach zachowują płeć oryginalnego autora.\n"
+            "     - Ścisła zgodność z telemetrią ontologiczną: Wszelkie poprawki stylistyczne i redakcyjne respektują ustaloną telemetrię ontologiczną sceny (płeć mówcy, adresata, virility grup We/You o pewności >= 0.95 oraz podane paradygmaty odmiany imion). Zachowaj uzgodnienia fleksyjne ustalone w Fazie 1 na podstawie telemetrii.\n"
+            "     - Zgodność płciowa i cytaty: Upewnij się, że końcówki 1. osoby mówczyń (-am, -ałam, -łabym) oraz formy 2. osoby do adresatek (-aś, -ałaś) i grup żeńskich (-yście, one) są w pełni poprawne. Cytaty („...”) w dialogach zachowują płeć oryginalnego autora.\n"
             "     - Ścisła rekcja zaprzeczona (Genitive of Negation): Każdy czasownik przechodni podlegający negacji w KAŻDYM czasie (teraźniejszym, przeszłym i przyszłym: nie mam/nie miałam, nie widziałem, nie czułam, nie będę miał) ściśle wymaga dopełniacza również przy wtrąceniach (nie miałem już czasu, nie widzę w tym sensu, nie czułam strachu).\n"
             "     - Prewencja mianownizacji kanonu i bariery AVT: Terminy kanoniczne podlegają pełnej fleksji po przyimkach we wszystkich przypadkach zależnych. Przestrzegaj ograniczeń AVT: tempo czytania CPS <= 17 i długość wiersza CPL <= 38.\n"
             "     - Twarda eliminacja usterek fleksyjnych, literówek i kalek leksykalnych jest dodatkowo w 100% asekurowana przez deterministyczny silnik EpisodeQualityGate (0.00 PLN).\n"
@@ -384,6 +385,11 @@ class DialogueVerifier:
                 directive_lines.append("    • PIOSENKA: Wymóg rymu i metrum sylabicznego (Filar CXVIII - Barańczak)!")
             if item.get('ambiguity_note'):
                 directive_lines.append(f"    • Wątpliwość Fazy 1: {item['ambiguity_note'].strip()}")
+            if item.get('telemetry_tag'):
+                directive_lines.append(f"    • Telemetria ontologiczna: {item['telemetry_tag']}")
+            if item.get('declension_paradigms'):
+                par_str = '; '.join(item['declension_paradigms']) if isinstance(item['declension_paradigms'], list) else str(item['declension_paradigms'])
+                directive_lines.append(f"    • Paradygmat odmiany: {par_str}")
             if item.get('addressee') == 'kobieta':
                 directive_lines.append(f"    • Adresat: kobieta (2. os. lp. żeńska: -łaś, jesteś pewna - Filar CLXIII)")
             elif item.get('addressee') == 'mężczyzna':

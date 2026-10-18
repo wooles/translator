@@ -56,7 +56,7 @@ class DangerLinePreScan(BaseModel):
     english_phrase: str = Field(description="Wieloznaczna lub zdradliwa fraza źródłowa wymagająca weryfikacji")
     speaker: Optional[str] = Field(default=None, description="Mówca kwestii")
     contextual_trap: str = Field(description="Opis pułapki kontekstowej lub pragmatyki japońskiego audio")
-    mandatory_direction: str = Field(description="Precyzyjny wektor znaczeniowy i kierunek interpretacji dla tłumacza")
+    mandatory_direction: str = Field(description="Deklaratywny opis kontekstu semantycznego, idiomu lub intencji postaci")
 
 
 class DramaticSequence(BaseModel):
@@ -74,7 +74,7 @@ class RelationshipPivot(BaseModel):
     approx_time: str = Field(description="Przybliżony czas zmiany w odcinku")
     characters_involved: str = Field(description="Postacie objęte przełomem w relacji")
     nature_of_shift: str = Field(description="Przyczyna i charakter ewolucji rejestru lub dystansu")
-    strict_direction_pl: str = Field(description="Docelowy rejestr i ustalona forma zwrotu")
+    strict_direction_pl: str = Field(description="Deklaratywny opis ewolucji relacji i formy zwrotu w scenie")
 
 
 class CharacterCatchphrase(BaseModel):
@@ -100,7 +100,7 @@ class PunWordplayPlan(BaseModel):
 class ContinuityBridgeAlert(BaseModel):
     term_or_event: str = Field(description="Kluczowy termin, nazwa rekwizytu lub wydarzenie z przeszłości")
     canon_source_episode: str = Field(description="Źródło kanonu lub numer wcześniejszego odcinka")
-    continuity_directive: str = Field(description="Ścisły wymóg spójności dla tłumacza w tym odcinku")
+    continuity_directive: str = Field(description="Deklaratywny kontekst spójności terminologicznej i fabularnej")
 
 
 class CharacterDossier(BaseModel):
@@ -163,12 +163,12 @@ def format_episode_profile_for_prompt(profile: Optional[EpisodeProfile]) -> str:
         lines.append("\nSKANER MIN JĘZYKOWYCH I PUŁAPEK WIELOZNACZNOŚCI (DANGER-LINES PRE-SCAN):")
         for dl in profile.danger_lines_prescan:
             spk = f" ({dl.speaker})" if dl.speaker else ""
-            lines.append(f"• [{dl.approx_time}]{spk} '{dl.english_phrase}' -> PUŁAPKA: {dl.contextual_trap} => DYREKTYWA: {dl.mandatory_direction}")
+            lines.append(f"• [{dl.approx_time}]{spk} '{dl.english_phrase}' -> PUŁAPKA: {dl.contextual_trap} => Znaczenie kontekstowe: {dl.mandatory_direction}")
 
     if profile.relationship_pivots:
         lines.append("\n🔄 PUNKTY ZWROTNE I ZMIANY RELACJI W TRAKCIE ODCINKA (RELATIONSHIP PIVOTS):")
         for rp in profile.relationship_pivots:
-            lines.append(f"• [{rp.approx_time}] {rp.characters_involved}: {rp.nature_of_shift} => NAKAZ: {rp.strict_direction_pl}")
+            lines.append(f"• [{rp.approx_time}] {rp.characters_involved}: {rp.nature_of_shift} => Relacja: {rp.strict_direction_pl}")
 
     if profile.character_catchphrases:
         lines.append("\n💬 ZAMROŻONE POWIEDZONKA I KWESTIE-WIZYTÓWKI (CATCHPHRASES):")
@@ -188,7 +188,7 @@ def format_episode_profile_for_prompt(profile: Optional[EpisodeProfile]) -> str:
     if profile.continuity_bridge_alerts:
         lines.append("\n🌉 MOSTY CIĄGŁOŚCI MIĘDZYODCINKOWEJ (CONTINUITY ALERTS):")
         for ca in profile.continuity_bridge_alerts:
-            lines.append(f"• [{ca.canon_source_episode}] {ca.term_or_event} => DYREKTYWA: {ca.continuity_directive}")
+            lines.append(f"• [{ca.canon_source_episode}] {ca.term_or_event} => Ciągłość terminologiczna: {ca.continuity_directive}")
 
     if profile.dramatic_sequences:
         lines.append("\n🗺️ MAPA SEKWENCJI DRAMATURGICZNYCH ODCINKA (DIARYZACJA OBSADY I SCEN JEDNOPŁCIOWYCH):")
@@ -259,7 +259,7 @@ def format_lean_episode_brief(profile: Any) -> str:
     if title:
         ep_str = f" - Odcinek {ep_num}" if ep_num else ""
         lines.append(f"• Seria: {title}{ep_str}")
-    lines.append("• KLUCZOWE ZASADY AVT: Angielski skrypt = treść, fakty i składnia; Głos seiyū = kotwica emocji, afektu i rejestru.")
+    lines.append("• KLUCZOWE ZASADY AVT: Skrypt EN = treść semantyczna i fakty; Składnia i szyk wyrazów = naturalna polszczyzna; Głos seiyū = kotwica emocji, afektu i rejestru.")
 
     setting = _get(profile, "setting_and_era")
     tone = _get(profile, "tone_and_genre")

@@ -109,10 +109,12 @@ def format_dry_telemetry_tag(
     target_confidence: float = 1.0,
     plural_group_gender: Optional[str] = None,
     plural_confidence: float = 1.0,
+    you_group_gender: Optional[str] = None,
+    you_group_confidence: float = 1.0,
     **kwargs: Any
 ) -> str:
     """
-    Buduje zwięzły opisowy mikro-tag dołączając wyłącznie segmenty (Mówca, Adresat, Grupa_1os_lm),
+    Buduje zwięzły opisowy mikro-tag dołączając wyłącznie segmenty (Mówca, Adresat, Grupa_1os_lm, Grupa_2os_lm),
     których pewność wynosi >= 0.80. Nigdy nie emituje wartości None ani AMBIGUOUS!
     """
     spk = speaker_gender or kwargs.get("speaker") or kwargs.get("spk")
@@ -123,6 +125,9 @@ def format_dry_telemetry_tag(
 
     grp = plural_group_gender or kwargs.get("plural_group") or kwargs.get("group_gender") or kwargs.get("grupa_1os_lm")
     grp_conf = kwargs.get("grp_conf", kwargs.get("plural_conf", kwargs.get("group_conf", plural_confidence)))
+
+    you_grp = you_group_gender or kwargs.get("you_group") or kwargs.get("grupa_2os_lm")
+    you_conf = kwargs.get("you_conf", kwargs.get("you_group_conf", kwargs.get("you_confidence", you_group_confidence)))
 
     segments = []
 
@@ -149,6 +154,11 @@ def format_dry_telemetry_tag(
     except Exception:
         grp_c = 1.0 if _is_valid_telemetry_val(grp) else 0.0
 
+    try:
+        you_c = float(you_conf)
+    except Exception:
+        you_c = 1.0 if _is_valid_telemetry_val(you_grp) else 0.0
+
     if _is_valid_telemetry_val(spk) and spk_c >= 0.80:
         segments.append(f"Mówca: {spk}")
 
@@ -157,6 +167,9 @@ def format_dry_telemetry_tag(
 
     if _is_valid_telemetry_val(grp) and grp_c >= 0.80:
         segments.append(f"Grupa_1os_lm: {grp}")
+
+    if _is_valid_telemetry_val(you_grp) and you_c >= 0.80:
+        segments.append(f"Grupa_2os_lm: {you_grp}")
 
     if not segments:
         return ""
@@ -2049,8 +2062,10 @@ class MultimodalTranslator:
 
         # Case C: Direct Phase 1 or Fallback
         if phase1_is_female:
+            alerts.append(f"[TELEMETRIA: hipoteza_faza_1: mówca='{spk_clean}', płeć=kobieta, confidence=0.70]")
             return "kobieta", alerts
         elif phase1_is_male:
+            alerts.append(f"[TELEMETRIA: hipoteza_faza_1: mówca='{spk_clean}', płeć=mężczyzna, confidence=0.70]")
             return "mężczyzna", alerts
         elif acoustic_gender:
             return acoustic_gender, alerts
@@ -2833,15 +2848,15 @@ class MultimodalTranslator:
                 )
 
                 if line_addr_cat in ["grupa_kobiet", "kobieta_dual"]:
-                    reg_desc = "L. mnoga niemęskoosobowa / dwie kobiety ('wy': -łyście / 'obie')"
+                    reg_desc = "L. mnoga niemęskoosobowa"
                 elif line_addr_cat in ["grupa_mężczyzn", "mężczyzna_dual"]:
-                    reg_desc = "L. mnoga męskoosobowa / dwóch mężczyzn ('wy': -liście / 'obaj')"
+                    reg_desc = "L. mnoga męskoosobowa"
                 elif line_addr_cat in ["grupa_mieszana", "para_mieszana_dual"]:
-                    reg_desc = "L. mnoga / para mieszana ('wy': -liście / liczebnik zbiorowy: 'oboje')"
+                    reg_desc = "L. mnoga / para mieszana"
                 elif line_addr_cat == "kobieta":
-                    reg_desc = "2. os. lp. 'ty' do kobiety (-łaś / wzburzoną)"
+                    reg_desc = "2. os. lp. 'ty' do kobiety"
                 elif line_addr_cat == "mężczyzna":
-                    reg_desc = "2. os. lp. 'ty' do mężczyzny (-łeś / wzburzonego)"
+                    reg_desc = "2. os. lp. 'ty' do mężczyzny"
                 else:
                     reg_desc = "Kontekstowy / Naturalny"
 
@@ -2862,7 +2877,7 @@ class MultimodalTranslator:
                     addr_label = "Nieokreślony / Monolog"
 
                 lines.append(f"Kwestia [ID: {idx + 1}] [TYP: [DIALOG] {vtype['type_label']}]{relation_tag} (Czas: {start_str} - {end_str}) [MÓWCA: {spk_label} | ADRESAT: {addr_label} | REJESTR: {reg_desc}]{acoustic_str}:")
-                lines.append(f"  📄 SKRYPT PODSTAWOWY EN (TREŚĆ, FAKTY, SKŁADNIA I MAJUSKUŁA): {clean_display_text}")
+                lines.append(f"  📄 SKRYPT PODSTAWOWY EN (TREŚĆ SEMANTYCZNA I FAKTY): {clean_display_text}")
 
                 # Pre-Generation Morphosyntactic Contract (Stream 4 - Standard 3.0)
                 contract_spk_gender = "UNKNOWN"
@@ -2925,7 +2940,9 @@ class MultimodalTranslator:
                     target_gender=contract_target_gender,
                     target_confidence=1.0 if str(contract_target_gender).lower() in ("masculine", "feminine") else 0.0,
                     plural_group_gender="VIRILE" if (line_addr_cat in ["grupa_mężczyzn", "mężczyzna_dual"] or (contract_addr_number == "PLURAL" and getattr(self, "scene_has_male", False))) else ("NON_VIRILE" if contract_addr_number == "PLURAL" else None),
-                    plural_confidence=1.0 if contract_addr_number == "PLURAL" else 0.0
+                    plural_confidence=1.0 if contract_addr_number == "PLURAL" else 0.0,
+                    you_group_gender="VIRILE" if line_addr_cat in ["grupa_mężczyzn", "mężczyzna_dual", "grupa_mieszana", "para_mieszana_dual"] else ("NON_VIRILE" if line_addr_cat in ["grupa_kobiet", "kobieta_dual"] else None),
+                    you_group_confidence=1.0 if line_addr_cat in ["grupa_mężczyzn", "mężczyzna_dual", "grupa_mieszana", "para_mieszana_dual", "grupa_kobiet", "kobieta_dual"] else 0.0
                 )
                 if dry_telemetry:
                     lines.append(f"  📡 TELEMETRIA: {dry_telemetry}")
@@ -3586,10 +3603,17 @@ class MultimodalTranslator:
                 prosody_tags=prosody_tags
             )
 
+            is_spk_hypothesis = any("hipoteza_faza_1" in a for a in arb_alerts)
+            is_tgt_hypothesis = bool(addressee_label and "Hipoteza Faza 1" in addressee_label)
+            spk_conf = 0.70 if is_spk_hypothesis else (1.0 if speaker_gender else 0.0)
+            tgt_conf = 0.70 if is_tgt_hypothesis else (1.0 if addressee_cat else 0.0)
+
             # Declarative Scene State Telemetry Vector (Standard 7.0 SSOT)
             line_dry_telemetry = format_dry_telemetry_tag(
                 speaker_gender="MASCULINE" if speaker_gender and any(w in str(speaker_gender).lower() for w in ["male", "mężczyzna", "chłopak"]) else ("FEMININE" if speaker_gender and any(w in str(speaker_gender).lower() for w in ["female", "kobieta", "dziewczyna"]) else None),
+                speaker_confidence=spk_conf,
                 target_gender="FEMININE" if addressee_cat in ["kobieta", "kobieta_dual", "grupa_kobiet"] else ("MASCULINE" if addressee_cat in ["mężczyzna", "mężczyzna_dual", "grupa_mężczyzn"] else None),
+                target_confidence=tgt_conf,
                 plural_group_gender="VIRILE" if (addressee_cat in ["grupa_mężczyzn", "mężczyzna_dual"] or (addressee_cat in ["grupa_mieszana", "para_mieszana_dual"])) else ("NON_VIRILE" if addressee_cat in ["grupa_kobiet", "kobieta_dual"] else None)
             )
             if line_dry_telemetry:
@@ -3832,6 +3856,18 @@ class MultimodalTranslator:
                         manga_canon_line_alerts.append(f"'{t_src}' => '{t_trg}'")
             manga_canon_line_str = " | ".join(manga_canon_line_alerts[:3]) if manga_canon_line_alerts else ""
 
+            p2_paradigms: List[str] = []
+            if resolved_spk_name and len(resolved_spk_name) >= 3:
+                sb_inst = getattr(self, "series_bible", None)
+                par = None
+                if sb_inst and hasattr(sb_inst, "get_declension_paradigm"):
+                    par = sb_inst.get_declension_paradigm(resolved_spk_name)
+                if not par:
+                    ent_g = "MALE" if (speaker_gender and any(w in str(speaker_gender).lower() for w in ["male", "mężczyzna", "chłopak"])) else ("FEMALE" if (speaker_gender and any(w in str(speaker_gender).lower() for w in ["female", "kobieta", "dziewczyna"])) else "UNKNOWN")
+                    par = DeclensionParadigm.create_for_name(resolved_spk_name, gender=ent_g)
+                if par:
+                    p2_paradigms.append(f"{resolved_spk_name}(D:{par.D}, C:{par.C}, B:{par.B}, N:{par.N}, Ms:{par.Ms}, W:{par.W})")
+
             pass1_items.append({
                 "id": batch_id,
                 "orig_idx": orig_idx,
@@ -3850,9 +3886,16 @@ class MultimodalTranslator:
                 "en": clean_en,
                 "pl": pl_candidate,
                 "speaker_name": resolved_spk_name,
-                "speaker_gender": speaker_gender,
-                "addressee": addressee_cat,
+                "speaker_gender": speaker_gender if spk_conf >= 0.95 else None,
+                "speaker_confidence": spk_conf,
+                "raw_speaker_gender_hypothesis": speaker_gender if spk_conf < 0.95 else None,
+                "addressee": addressee_cat if tgt_conf >= 0.95 else None,
+                "target_gender": addressee_cat if tgt_conf >= 0.95 else None,
+                "target_confidence": tgt_conf,
+                "raw_addressee_hypothesis": addressee_cat if tgt_conf < 0.95 else None,
                 "addressee_label": addressee_label,
+                "telemetry_tag": line_dry_telemetry,
+                "declension_paradigms": p2_paradigms,
                 "semiotic_layer": semiotic_layer,
                 "screen_region": screen_reg,
                 "visual_typesetting": v_typesetting,
