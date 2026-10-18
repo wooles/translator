@@ -470,7 +470,7 @@ def test_profiler_and_whisper():
                 english_phrase="I'm… fine.",
                 speaker="Yoritsugu",
                 contextual_trap="Odmowa wyjścia [boku wa ii desu], a nie stan zdrowia!",
-                mandatory_direction="Tłumacz jako: Ja... podziękuję. ZAKAZ: Nic mi nie jest."
+                contextual_guidance="Tłumacz jako: Ja... podziękuję. ZAKAZ: Nic mi nie jest."
             )
         ],
         relationship_pivots=[
@@ -478,7 +478,7 @@ def test_profiler_and_whisper():
                 approx_time="00:14:20",
                 characters_involved="Shin i Kyoukai",
                 nature_of_shift="Przejście ze sztywnego dystansu na poufałość",
-                strict_direction_pl="Od tej minuty ZAKAZ formy per pani, przejście na ty / po imieniu: Kyoukai"
+                relational_guidance="Od tej minuty ZAKAZ formy per pani, przejście na ty / po imieniu: Kyoukai"
             )
         ],
         character_catchphrases=[
@@ -508,7 +508,7 @@ def test_profiler_and_whisper():
             ContinuityBridgeAlert(
                 term_or_event="Smoczy Kieł",
                 canon_source_episode="Odcinek 2",
-                continuity_directive="Utrzymuj 'Smoczy Kieł', zakaz 'Kieł Smoka'"
+                continuity_guidance="Utrzymuj 'Smoczy Kieł', zakaz 'Kieł Smoka'"
             )
         ],
         dramatic_sequences=[
@@ -4308,7 +4308,7 @@ def test_systemic_information_flow_and_scene_topology():
                 approx_time="00:16:39",
                 english_phrase="Sure, what is it?",
                 contextual_trap="Pułapka dyskontinuitetu czasowego po pauzie",
-                mandatory_direction="Więc o co chodzi? (ZAKAZ: Jasne...)"
+                contextual_guidance="Więc o co chodzi? (ZAKAZ: Jasne...)"
             )
         ]
     )
@@ -4591,7 +4591,7 @@ def test_batch_density_scene_coalescence_and_cost_optimization():
                 approx_time="00:05:00",
                 english_phrase="This isn't Latour!",
                 contextual_trap="Pułapka fałszywego wina",
-                mandatory_direction="To wcale nie jest Latour!"
+                contextual_guidance="To wcale nie jest Latour!"
             )
         ]
     )
@@ -15723,7 +15723,7 @@ def test_toponym_ablative_preposition_and_phonotactic_declension():
     2. False -em stripping after ablative z/ze (z Seitzem -> z Seitz).
     3. Japanese CV mora -e apostrophe elimination vs English silent -e preservation.
     4. Masculine vocative/locative -u for affricate/fricative stems (-tz, -c, -cz, -sz).
-    5. Virile adjective orthography (-ciency instead of hypercorrect -cieńscy).
+    5. Ontological EntityCategory.TOPONYM rigor in false ablative stripping vs ANTHROPONYM preservation.
     """
     print("\n[TEST 166/166] Toponym Ablative Stripping & Phonotactic Declension...")
     from series_memory import (
@@ -15735,7 +15735,6 @@ def test_toponym_ablative_preposition_and_phonotactic_declension():
     from avt_linter import (
         strip_false_ablative_instrumental,
         fix_masculine_vocative_tz,
-        fix_virile_adjective_orthography,
     )
 
     # 1. EntityCategory.TOPONYM classification in geographical origin context (5 positive examples)
@@ -15817,21 +15816,25 @@ def test_toponym_ablative_preposition_and_phonotactic_declension():
         assert par["W"].endswith("u"), f"Vocative for {stem_name} must end in -u: {par['W']}"
         assert par["Ms"].endswith("u"), f"Locative for {stem_name} must end in -u: {par['Ms']}"
 
-    # 5. Virile adjective orthography (-cienci, 5 positive examples)
-    virile_cases = [
-        ("Byli cieńscy i słabi.", "Byli ciency i słabi."),
-        ("Cieńscy wojownicy ruszyli do walki.", "Ciency wojownicy ruszyli do walki."),
-        ("To byli zbyt cieńscy przeciwnicy.", "To byli zbyt ciency przeciwnicy."),
-        ("Cieńscy obrońcy nie dali rady.", "Ciency obrońcy nie dali rady."),
-        ("Tak cieńscy rekruci odpadli od razu.", "Tak ciency rekruci odpadli od razu."),
-    ]
-    for raw_t, exp_t in virile_cases:
-        res, _ = fix_virile_adjective_orthography(raw_t)
-        assert res == exp_t, f"Virile orthography failed: {raw_t} -> {res}"
+    # 5. Ontological EntityCategory.TOPONYM rigor in strip_false_ablative_instrumental
+    from series_memory import SeriesBible
+    test_bible = SeriesBible("TestToponymRigor", db_path=":memory:")
+    test_bible.register_entity_category("Alus", EntityCategory.TOPONYM)
+    test_bible.register_entity_category("Belgrad", EntityCategory.TOPONYM)
+    test_bible.register_entity_category("Jan", EntityCategory.ANTHROPONYM)
+    test_bible.register_entity_category("Piotr", EntityCategory.ANTHROPONYM)
 
-    # Negative control: Valid -scy / -ńscy adjectives preserved
-    neg_vir, _ = fix_virile_adjective_orthography("Byli polscy i chińscy dyplomaci.")
-    assert neg_vir == "Byli polscy i chińscy dyplomaci."
+    # TOPONYM: false -em stripped
+    res_top1, _ = strip_false_ablative_instrumental("Wracam z Alusem do domu.", series_bible=test_bible)
+    assert "z Alus" in res_top1, f"Expected toponym Alus stripped, got: {res_top1}"
+    res_top2, _ = strip_false_ablative_instrumental("Oddział z Belgradem przybył.", series_bible=test_bible)
+    assert "z Belgrad" in res_top2, f"Expected toponym Belgrad stripped, got: {res_top2}"
+
+    # ANTHROPONYM: instrumental -em strictly preserved (accompaniment)
+    res_anthro_b1, _ = strip_false_ablative_instrumental("Oddział z Janem dotarł na miejsce.", series_bible=test_bible)
+    assert res_anthro_b1 == "Oddział z Janem dotarł na miejsce.", f"Anthroponym Jan mutated: {res_anthro_b1}"
+    res_anthro_b2, _ = strip_false_ablative_instrumental("Wracam z Piotrem do domu.", series_bible=test_bible)
+    assert res_anthro_b2 == "Wracam z Piotrem do domu.", f"Anthroponym Piotr mutated: {res_anthro_b2}"
 
     print(" -> PASSED: Test 166 potwierdza usuwanie fałszywego narzędnika z toponimów i deklinację fonotaktyczną.")
 
@@ -16377,15 +16380,14 @@ def test_mixed_gender_scene_virile_plural_and_turn_you_harmonization():
 def test_institutional_genitive_and_toponym_ablative_whitelist_guard():
     """
     Test 170: Ścisła biała lista dopełniacza instytucji po 'z' (z biura, z ministerstwa),
-    usuwanie fałszywego narzędnika toponimów (Ablative Stripper), poprawność alternacji
-    przymiotników męskoosobowych (-nki -> ciency) oraz wołacz afrykat (-tzie -> -tzu) (0.00 PLN).
+    usuwanie fałszywego narzędnika toponimów (Ablative Stripper), rygor ontologiczny
+    EntityCategory.TOPONYM oraz wołacz afrykat (-tzie -> -tzu) (0.00 PLN).
     """
     print("\n[TEST 170/171] Institutional Genitive Whitelist, Ablative Stripper & Phonotactics...")
     from series_memory import SeriesBible, EntityCategory
     from avt_linter import (
         strip_false_feminine_instrumental,
         strip_false_ablative_instrumental,
-        fix_virile_adjective_orthography,
         fix_masculine_vocative_tz,
     )
 
@@ -16414,7 +16416,7 @@ def test_institutional_genitive_and_toponym_ablative_whitelist_guard():
         assert res_comp == comp_t, f"Real female companion mutated: {comp_t} -> {res_comp}"
 
     # 2. Ablative Stripper: usuwanie fałszywego narzędnika (-em) po przyimku pochodzenia 'z'
-    bible_top = SeriesBible("TestIsomorphicToponymAblative")
+    bible_top = SeriesBible("TestIsomorphicToponymAblative", db_path=":memory:")
     bible_top.register_entity_category("Erebor", EntityCategory.TOPONYM)
     bible_top.register_entity_category("Gondor", EntityCategory.TOPONYM)
     bible_top.register_entity_category("Rivendell", EntityCategory.TOPONYM)
@@ -16428,15 +16430,13 @@ def test_institutional_genitive_and_toponym_ablative_whitelist_guard():
         res_abl, _ = strip_false_ablative_instrumental(raw_a, series_bible=bible_top)
         assert res_abl == exp_a, f"Failed ablative stripper: {raw_a} -> {res_abl} != {exp_a}"
 
-    # 3. Ortografia przymiotników męskoosobowych od tematów twardych -nki (ciency, blokada cieńscy)
-    cases_ortho = [
-        ("Byli zbyt cieńscy na tę trudną wyprawę.", "Byli zbyt ciency na tę trudną wyprawę."),
-        ("Cieńscy wojownicy wycofali się za rzekę.", "Ciency wojownicy wycofali się za rzekę."),
-        ("Wszyscy oni byli cieńscy w walce wręcz.", "Wszyscy oni byli ciency w walce wręcz."),
-    ]
-    for raw_o, exp_o in cases_ortho:
-        res_ortho, _ = fix_virile_adjective_orthography(raw_o)
-        assert res_ortho == exp_o, f"Virile orthography fix failed: {raw_o} -> {res_ortho} != {exp_o}"
+    # 3. Ontologiczny rygor EntityCategory.TOPONYM: ochrona narzędnika towarzyszenia dla ANTHROPONYM
+    bible_top.register_entity_category("Aragorn", EntityCategory.ANTHROPONYM)
+    bible_top.register_entity_category("Boromir", EntityCategory.ANTHROPONYM)
+    res_anth1, _ = strip_false_ablative_instrumental("Oddział z Aragornem wyruszył w drogę.", series_bible=bible_top)
+    assert res_anth1 == "Oddział z Aragornem wyruszył w drogę.", f"Anthroponym mutated: {res_anth1}"
+    res_anth2, _ = strip_false_ablative_instrumental("Ludzie z Boromirem dotarli do rzeki.", series_bible=bible_top)
+    assert res_anth2 == "Ludzie z Boromirem dotarli do rzeki.", f"Anthroponym mutated: {res_anth2}"
 
     # 4. Korekta wołacza tematów na afrykaty (-tzie -> -tzu)
     cases_tz = [

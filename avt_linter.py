@@ -1270,11 +1270,6 @@ class AVTLinter:
             applied_fixes.extend(voc_fixes)
             modified = mod_voc
 
-        mod_orth, orth_fixes = fix_virile_adjective_orthography(modified)
-        if mod_orth != modified:
-            applied_fixes.extend(orth_fixes)
-            modified = mod_orth
-
         # 2. Dynamic user feedback rules
         if user_feedback_rules:
             for fb in user_feedback_rules:
@@ -5226,24 +5221,6 @@ def fix_masculine_vocative_tz(text: str) -> Tuple[str, List[str]]:
     result = re.sub(pat_tz, _repl_tz, text)
     return result, fixes
 
-def fix_virile_adjective_orthography(text: str) -> Tuple[str, List[str]]:
-    """
-    Naprawia hiperpoprawną palatalizację przymiotników męskoosobowych od tematów twardych -nki.
-    """
-    if not text:
-        return text, []
-
-    fixes = []
-    def _repl_ciency(m):
-        full = m.group(0)
-        prefix = m.group(1)
-        fixed = f"{prefix}iency"
-        fixes.append(f"[Ortografia Męskoosobowa -nki] Skorygowano hiperpoprawność: '{full}' -> '{fixed}'")
-        return fixed
-
-    pat = r"\b([Cc])ieńscy\b"
-    result = re.sub(pat, _repl_ciency, text)
-    return result, fixes
 
 def enhanced_fix_undecorated_male_names(
     text: str,
@@ -6225,12 +6202,9 @@ def apply_strict_positive_domain_pipeline(
     res, sfi_fixes = strip_false_feminine_instrumental(res, series_bible=series_bible)
     fixes.extend(sfi_fixes)
 
-    # 3. Masculine Vocative -tzu & Virile Adjective Orthography
+    # 3. Masculine Vocative -tzu
     res, voc_fixes = fix_masculine_vocative_tz(res)
     fixes.extend(voc_fixes)
-
-    res, orth_fixes = fix_virile_adjective_orthography(res)
-    fixes.extend(orth_fixes)
 
     if not is_sign:
         # 4. Verbal Morphology (1st & 2nd person past, conditionals, future, clitics, powinien)
@@ -7181,11 +7155,6 @@ class EpisodeQualityGate:
                     if f_pl_text != ev.text:
                         ev.text = f_pl_text
                         fixes.extend([f"Linia #{i+1}: {fx}" for fx in pl_fixes])
-
-                f_orth_text, orth_fixes = fix_virile_adjective_orthography(ev.text)
-                if f_orth_text != ev.text:
-                    ev.text = f_orth_text
-                    fixes.extend([f"Linia #{i+1}: {fx}" for fx in orth_fixes])
 
             ev_name_raw = (getattr(ev, "name", None) or getattr(ev, "actor", None) or (line_speakers.get(i) if line_speakers else None) or "")
             clean_spk_curr = extract_clean_speaker_name(str(ev_name_raw)).strip()

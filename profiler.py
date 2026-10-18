@@ -56,7 +56,7 @@ class DangerLinePreScan(BaseModel):
     english_phrase: str = Field(description="Wieloznaczna lub zdradliwa fraza źródłowa wymagająca weryfikacji")
     speaker: Optional[str] = Field(default=None, description="Mówca kwestii")
     contextual_trap: str = Field(description="Opis pułapki kontekstowej lub pragmatyki japońskiego audio")
-    mandatory_direction: str = Field(description="Deklaratywny opis kontekstu semantycznego, idiomu lub intencji postaci")
+    contextual_guidance: str = Field(description="Deskryptywny opis kontekstu semantycznego, idiomu lub intencji postaci")
 
 
 class DramaticSequence(BaseModel):
@@ -74,7 +74,7 @@ class RelationshipPivot(BaseModel):
     approx_time: str = Field(description="Przybliżony czas zmiany w odcinku")
     characters_involved: str = Field(description="Postacie objęte przełomem w relacji")
     nature_of_shift: str = Field(description="Przyczyna i charakter ewolucji rejestru lub dystansu")
-    strict_direction_pl: str = Field(description="Deklaratywny opis ewolucji relacji i formy zwrotu w scenie")
+    relational_guidance: str = Field(description="Deskryptywny opis ewolucji relacji i formy zwrotu w scenie")
 
 
 class CharacterCatchphrase(BaseModel):
@@ -100,7 +100,7 @@ class PunWordplayPlan(BaseModel):
 class ContinuityBridgeAlert(BaseModel):
     term_or_event: str = Field(description="Kluczowy termin, nazwa rekwizytu lub wydarzenie z przeszłości")
     canon_source_episode: str = Field(description="Źródło kanonu lub numer wcześniejszego odcinka")
-    continuity_directive: str = Field(description="Deklaratywny kontekst spójności terminologicznej i fabularnej")
+    continuity_guidance: str = Field(description="Deskryptywny kontekst spójności terminologicznej i fabularnej")
 
 
 class CharacterDossier(BaseModel):
@@ -163,12 +163,12 @@ def format_episode_profile_for_prompt(profile: Optional[EpisodeProfile]) -> str:
         lines.append("\nSKANER MIN JĘZYKOWYCH I PUŁAPEK WIELOZNACZNOŚCI (DANGER-LINES PRE-SCAN):")
         for dl in profile.danger_lines_prescan:
             spk = f" ({dl.speaker})" if dl.speaker else ""
-            lines.append(f"• [{dl.approx_time}]{spk} '{dl.english_phrase}' -> PUŁAPKA: {dl.contextual_trap} => Znaczenie kontekstowe: {dl.mandatory_direction}")
+            lines.append(f"• [{dl.approx_time}]{spk} '{dl.english_phrase}' -> PUŁAPKA: {dl.contextual_trap} => Znaczenie kontekstowe: {dl.contextual_guidance}")
 
     if profile.relationship_pivots:
         lines.append("\n🔄 PUNKTY ZWROTNE I ZMIANY RELACJI W TRAKCIE ODCINKA (RELATIONSHIP PIVOTS):")
         for rp in profile.relationship_pivots:
-            lines.append(f"• [{rp.approx_time}] {rp.characters_involved}: {rp.nature_of_shift} => Relacja: {rp.strict_direction_pl}")
+            lines.append(f"• [{rp.approx_time}] {rp.characters_involved}: {rp.nature_of_shift} => Relacja: {rp.relational_guidance}")
 
     if profile.character_catchphrases:
         lines.append("\n💬 ZAMROŻONE POWIEDZONKA I KWESTIE-WIZYTÓWKI (CATCHPHRASES):")
@@ -188,7 +188,7 @@ def format_episode_profile_for_prompt(profile: Optional[EpisodeProfile]) -> str:
     if profile.continuity_bridge_alerts:
         lines.append("\n🌉 MOSTY CIĄGŁOŚCI MIĘDZYODCINKOWEJ (CONTINUITY ALERTS):")
         for ca in profile.continuity_bridge_alerts:
-            lines.append(f"• [{ca.canon_source_episode}] {ca.term_or_event} => Ciągłość terminologiczna: {ca.continuity_directive}")
+            lines.append(f"• [{ca.canon_source_episode}] {ca.term_or_event} => Ciągłość terminologiczna: {ca.continuity_guidance}")
 
     if profile.dramatic_sequences:
         lines.append("\n🗺️ MAPA SEKWENCJI DRAMATURGICZNYCH ODCINKA (DIARYZACJA OBSADY I SCEN JEDNOPŁCIOWYCH):")
@@ -658,7 +658,8 @@ def resolve_profile_alerts_to_events(
                             best_idx = idx
 
             if best_idx is not None:
-                tag = f"[TELEMETRIA: pułapka_profilera: {dl.contextual_trap} | dyrektywa: {dl.mandatory_direction}]"
+                guide = dl.contextual_guidance
+                tag = f"[TELEMETRIA: pułapka_profilera: {dl.contextual_trap} | wskazówka: {guide}]"
                 if best_idx not in resolved_alerts:
                     resolved_alerts[best_idx] = []
                 if tag not in resolved_alerts[best_idx]:

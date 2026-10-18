@@ -69,7 +69,7 @@ from avt_linter import (
     AVTLinter, harmonize_text_2nd_person_plural, harmonize_verbal_gender_1st_and_2nd,
     harmonize_copula_and_predicate_adjective, harmonize_2nd_person_predicate_nouns,
     strip_false_ablative_instrumental, fix_masculine_vocative_tz,
-    fix_virile_adjective_orthography, has_2nd_person_plural_verb,
+    has_2nd_person_plural_verb,
     harmonize_virile_group_1st_person_plural, strip_false_feminine_instrumental,
     harmonize_plural_group_gender, fix_hybrid_ty_jestescie,
     restore_deictic_masculine_role_from_context, harmonize_powinien_paradigm,
@@ -1187,21 +1187,19 @@ class LineTranslation(BaseModel):
     speaker_grammatical_gender: Optional[str] = Field(
         default=None,
         description=(
-            "Twarda płeć gramatyczna wypowiedzi w 1. osobie: 'MASCULINE', 'FEMININE' lub 'NEUTRAL' (dla postaci epizodycznych/bezosobowych). "
-            "Wymusza zgodność morfologiczną orzeczeń (-łem vs -łam, jestem gotowy vs jestem gotowa, lub formy bezosobowe). "
-            "W przypadku postaci chłopięcych/męskich dubbingowanych przez żeńskie seiyū "
-            "(cross-gender casting, chłopiec/mężczyzna grany przez kobietę) wymagany wariant 'MASCULINE'."
+            "Płeć gramatyczna wypowiedzi w 1. osobie: 'MASCULINE', 'FEMININE' lub 'NEUTRAL' (dla form bezosobowych). "
+            "Określa zgodność morfologiczną orzeczeń 1. osoby w języku polskim. "
+            "W przypadku ról chłopięcych/męskich granych przez żeńskie seiyū (cross-gender casting) "
+            "wskazana jest wartość 'MASCULINE'."
         )
     )
     addressee: Optional[str] = Field(
         default=None,
         description=(
-            "Odbiorca kwestii na kadrze/w scenie: "
-            "'kobieta' (pojedyncza), 'mężczyzna' (pojedynczy), "
-            "'grupa_kobiet' (grupa samych kobiet/dziewcząt - wymóg form: zrobiłyście/byłyście), "
-            "'grupa_mężczyzn' (grupa samych mężczyzn - wymóg form: zrobiliście/byliście), "
-            "'grupa_mieszana' (mężczyźni i kobiety / tłum - wymóg form: zrobiliście/byliście) "
-            "lub 'brak' (myśl/monolog)"
+            "Odbiorca kwestii w scenie: "
+            "'kobieta', 'mężczyzna', 'grupa_kobiet' (niemęskoosobowa), "
+            "'grupa_mężczyzn' (męskoosobowa), 'grupa_mieszana' (męskoosobowa) "
+            "lub 'brak' (monolog wewnętrzny/myśl)."
         )
     )
     target_gender: Optional[str] = Field(
@@ -1863,9 +1861,9 @@ class MultimodalTranslator:
                 elif getattr(event, "_orig_idx", None) in self.episode_scene_genders:
                     canonical_gender = self.episode_scene_genders[getattr(event, "_orig_idx")]
                 if canonical_gender == "kobieta":
-                    alerts.append("[TELEMETRIA: mówca_sceny=żeński, forma_1os=-łam/-łabym, 2os=-łaś]")
+                    alerts.append("[TELEMETRIA: mówca_sceny=żeński]")
                 elif canonical_gender == "mężczyzna":
-                    alerts.append("[TELEMETRIA: mówca_sceny=męski, forma_1os=-łem/-łbym, 2os=-łeś]")
+                    alerts.append("[TELEMETRIA: mówca_sceny=męski]")
 
         if not canonical_gender and not spk_clean:
             cand_texts = [pl_candidate] if pl_candidate else []
@@ -1877,7 +1875,7 @@ class MultimodalTranslator:
                 _, inf_g = self.series_bible.infer_scene_cast_from_text(cand_texts, whisper_texts=whisper_list)
                 if inf_g == "FEMALE":
                     canonical_gender = "kobieta"
-                    alerts.append("[TELEMETRIA: baza_wiedzy_scena=żeńska, forma_1os=-łam/-łabym, 2os=-łaś]")
+                    alerts.append("[TELEMETRIA: baza_wiedzy_scena=żeńska]")
                 elif inf_g == "MALE":
                     canonical_gender = "mężczyzna"
 
@@ -2174,7 +2172,7 @@ class MultimodalTranslator:
         # Without evidence, raw_norm 'grupa_...' is rejected as an ungrounded hallucination.
         if has_plural_evidence:
             if is_universal_crowd_vocative:
-                return "grupa_mieszana", "Grupa Mieszana (Zbiorowość/L. mnoga męskoosobowa: -liście)"
+                return "grupa_mieszana", "Grupa Mieszana (Zbiorowość/L. mnoga męskoosobowa)"
 
             check_idx = orig_idx if orig_idx is not None else (getattr(event, "_orig_idx", None) if getattr(event, "_orig_idx", None) is not None else event_idx)
             sc_g = (self.episode_scene_genders.get(check_idx) if hasattr(self, "episode_scene_genders") and self.episode_scene_genders else None)
@@ -2186,11 +2184,11 @@ class MultimodalTranslator:
             has_gendered_male = has_explicit_male or (sc_g == "mężczyzna")
 
             if has_gendered_female and not has_explicit_male:
-                return "grupa_kobiet", "Grupa Kobiet (L. mnoga niemęskoosobowa: -łyście)"
+                return "grupa_kobiet", "Grupa Kobiet (L. mnoga niemęskoosobowa)"
             elif has_gendered_male and not has_explicit_female:
-                return "grupa_mężczyzn", "Grupa Mężczyzn (L. mnoga męskoosobowa: -liście)"
+                return "grupa_mężczyzn", "Grupa Mężczyzn (L. mnoga męskoosobowa)"
             else:
-                return "grupa_mieszana", "Grupa Mieszana (Zbiorowość/L. mnoga męskoosobowa: -liście)"
+                return "grupa_mieszana", "Grupa Mieszana (Zbiorowość/L. mnoga męskoosobowa)"
 
         # 1. Textual Vocative Check (Calling someone by name in line text)
         for cname in list(self.character_registry.keys()):
@@ -3022,7 +3020,8 @@ class MultimodalTranslator:
                     if getattr(episode_profile, "danger_lines_prescan", None):
                         for dl in episode_profile.danger_lines_prescan:
                             if dl.english_phrase and dl.english_phrase.lower() in clean_text.lower():
-                                lines.append(f"  [TELEMETRIA: pułapka_kontekstowa: {dl.contextual_trap} | zalecenie: {dl.mandatory_direction}]")
+                                guide = getattr(dl, "contextual_guidance", "")
+                                lines.append(f"  [TELEMETRIA: pułapka_kontekstowa: {dl.contextual_trap} | wskazówka: {guide}]")
                                 break
                     if getattr(episode_profile, "character_catchphrases", None):
                         for cp in episode_profile.character_catchphrases:
@@ -3628,7 +3627,8 @@ class MultimodalTranslator:
                 if getattr(episode_profile, "danger_lines_prescan", None):
                     for dl in episode_profile.danger_lines_prescan:
                         if dl.english_phrase and dl.english_phrase.lower() in clean_en.lower():
-                            trap_tag = f"[TELEMETRIA: pułapka_profilera: {dl.contextual_trap} | zalecenie: {dl.mandatory_direction}]"
+                            guide = getattr(dl, "contextual_guidance", "")
+                            trap_tag = f"[TELEMETRIA: pułapka_profilera: {dl.contextual_trap} | wskazówka: {guide}]"
                             notes = f"{notes} {trap_tag}".strip()
                             break
                 if getattr(episode_profile, "character_catchphrases", None):
@@ -3971,8 +3971,7 @@ class MultimodalTranslator:
                     if re.search(r"\b(wygrał|wygrała|zrobił|zrobiła|widział|widziała|powiedział|powiedziała|słyszał|słyszała|był|była|miał|miała|chciał|chciała|mógł|mogła|wiedział|wiedziała|wie|widzi|myśli|mówi|ma)\s+(pan|pani)\b|\b(pan|pani)\s+(wygrał|wygrała|zrobił|zrobiła|widział|widziała|słyszał|słyszała|powiedział|powiedziała|wie|widzi|myśli|mówi)\b", it["pl"], re.IGNORECASE):
                         target_addr = (it.get("addressee") or "").lower()
                         is_female_target = "kobieta" in target_addr or (it.get("addressee_label") and "kobieta" in it["addressee_label"].lower())
-                        rep_verb = "wygrałaś" if is_female_target else "wygrałeś"
-                        drift_alert = f"[TELEMETRIA: relacja_na_ty: 2. os. '{rep_verb}']"
+                        drift_alert = "[TELEMETRIA: relacja_na_ty: rejestr_bezpośredni]"
                         it["notes"] = f"{it.get('notes', '')} {drift_alert}".strip()
 
             # Multimodal Addressee Warning Pinning (Filar CLXIII):
@@ -4510,8 +4509,9 @@ class MultimodalTranslator:
             plot_anchors_dict = {}
             if getattr(episode_profile, "continuity_bridge_alerts", None):
                 for cba in episode_profile.continuity_bridge_alerts:
-                    if cba.term_or_event and cba.continuity_directive:
-                        plot_anchors_dict[cba.term_or_event] = cba.continuity_directive
+                    c_guide = getattr(cba, "continuity_guidance", "")
+                    if cba.term_or_event and c_guide:
+                        plot_anchors_dict[cba.term_or_event] = c_guide
 
             rels_dict = {}
             if getattr(episode_profile, "character_relationships", None):
