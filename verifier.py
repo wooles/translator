@@ -351,6 +351,8 @@ class DialogueVerifier:
             multimodal_lines = []
             if item.get("audio_jp"):
                 multimodal_lines.append(f"    • JP (Audio seiyū): {item['audio_jp']}")
+            if item.get('semantic_anchor'):
+                multimodal_lines.append(f"    • Kotwica semantyczna: {item['semantic_anchor']}")
             if item.get('visual_subtext'):
                 multimodal_lines.append(f"    • Obraz i mimika: {item['visual_subtext']}")
             if item.get('literal_meaning'):

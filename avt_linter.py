@@ -1126,7 +1126,11 @@ class AVTLinter:
         series_bible: Optional[Any] = None,
         scene_has_male_participant: bool = False,
         is_production: Optional[bool] = None,
-        strict_positive_domain: bool = True
+        strict_positive_domain: bool = True,
+        plural_group_gender: str = "AMBIGUOUS",
+        you_group_gender: str = "AMBIGUOUS",
+        speaker_confidence: float = 1.0,
+        target_confidence: float = 1.0
     ) -> Tuple[str, List[str]]:
         """
         Comprehensive AVT linter. Checks Polish subtitle line against multiple AVT rules
@@ -1150,18 +1154,20 @@ class AVTLinter:
             # Preserves LLM stylistic freedom & vocabulary (T(x) = x for dialogue text).
             # Executes exclusively unified, idempotent operators of D_pos under mask_ass_tags_and_quotes.
             tgt_g = target_gender or addressee_gender
-            you_grp = "VIRILE" if (addressee_number == "PLURAL" and scene_has_male_participant) else None
-            pl_grp = "VIRILE" if scene_has_male_participant else None
+            eff_pl = plural_group_gender if plural_group_gender not in ("AMBIGUOUS", "UNKNOWN", None) else ("VIRILE" if scene_has_male_participant else "AMBIGUOUS")
+            eff_you = you_group_gender if you_group_gender not in ("AMBIGUOUS", "UNKNOWN", None) else ("VIRILE" if (addressee_number == "PLURAL" and scene_has_male_participant) else "AMBIGUOUS")
 
             dpos_text, dpos_fixes = apply_strict_positive_domain_pipeline(
                 text=text,
                 speaker_gender=speaker_gender,
                 target_gender=tgt_g,
-                plural_group_gender=pl_grp,
-                you_group_gender=you_grp,
+                plural_group_gender=eff_pl,
+                you_group_gender=eff_you,
                 scene_has_male_participant=scene_has_male_participant,
                 series_bible=series_bible,
-                is_sign=is_sign
+                is_sign=is_sign,
+                speaker_confidence=speaker_confidence,
+                target_confidence=target_confidence
             )
             dpos_text = re.sub(r"[ \t]+", " ", dpos_text).strip()
             return LintResult(dpos_text, fixes_prefix + dpos_fixes)
@@ -3315,7 +3321,12 @@ def harmonize_plural_group_gender(
     if not text:
         return text, []
 
-    eff_gender = "VIRILE" if scene_has_male_participant else (str(plural_group_gender).upper() if plural_group_gender else None)
+    if plural_group_gender:
+        eff_gender = str(plural_group_gender).upper()
+    elif scene_has_male_participant:
+        eff_gender = "VIRILE"
+    else:
+        eff_gender = None
     if not eff_gender or eff_gender in ("AMBIGUOUS", "UNKNOWN", "NONE"):
         return text, []
 
@@ -5445,6 +5456,9 @@ def harmonize_copula_and_predicate_adjective(
         rf"(?:((?:,\s*(?:czy|i|oraz|albo|lub|ani|ale)|{SEP}(?:czy|i|oraz|albo|lub|ani|ale)){SEP}(?:(?:zbyt|tak|taki|taka|całkowicie){SEP})?)([A-Za-ząćęłńóśźż]+))?\b"
     )
 
+    COPULA_BARRIER = re.compile(r"[,;\.\-–—]|(?:\b(?:że|bo|ponieważ|gdyż|gdy|kiedy|który|która|które)\b)", re.IGNORECASE)
+    SUBORDINATE_BARRIER = re.compile(r"[;\.\-–—]|(?:\b(?:że|bo|ponieważ|gdyż|gdy|kiedy|który|która|które)\b)", re.IGNORECASE)
+
     def _repl(m: Any) -> str:
         full = m.group(0)
         lead = m.group(1) or ""
@@ -5452,6 +5466,10 @@ def harmonize_copula_and_predicate_adjective(
         adj = m.group(3)
         coord_prefix = m.group(4) or ""
         adj2 = m.group(5) or ""
+
+        # D_pos(CopulaAdj) Clause barrier check: copula-to-predicate matching must not cross clause boundaries or subordinating conjunctions
+        if COPULA_BARRIER.search(prefix) or (coord_prefix and SUBORDINATE_BARRIER.search(coord_prefix)):
+            return full
 
         is_1p = bool(re.search(r"\b(?:jestem|byłem|byłam|stałem|stałam|zostałem|zostałam)\b", prefix, re.IGNORECASE))
         applicable_gender = speaker_gender if is_1p else target_gender
@@ -5532,6 +5550,9 @@ def harmonize_copula_and_predicate_adjective(
         lead = m.group(1) or ""
         adj = m.group(2)
         copula_suffix = m.group(3)
+
+        if COPULA_BARRIER.search(lead) or COPULA_BARRIER.search(copula_suffix):
+            return full
 
         is_1p = bool(re.search(r"\b(?:jestem|byłem|byłam|stałem|stałam|zostałem|zostałam)\b", copula_suffix, re.IGNORECASE))
         applicable_gender = speaker_gender if is_1p else target_gender
@@ -5667,6 +5688,9 @@ def harmonize_2nd_person_predicate_nouns(
         if not is_m and not is_f:
             return res_text
 
+        ROLE_CLAUSE_BARRIER = re.compile(r"[,;\.\-–—]|(?:\b(?:że|bo|ponieważ|gdyż|gdy|kiedy|który|która|które)\b)", re.IGNORECASE)
+        ROLE_COORD_BARRIER = re.compile(r"[;\.\-–—]|(?:\b(?:że|bo|ponieważ|gdyż|gdy|kiedy|który|która|które)\b)", re.IGNORECASE)
+
         if is_m:
             nouns_pat = "|".join(re.escape(k) for k in NOUN_MAP_F_TO_M.keys())
             mods_pat = "|".join(re.escape(k) for k in MOD_MAP_F_TO_M.keys())
@@ -5682,6 +5706,10 @@ def harmonize_2nd_person_predicate_nouns(
                 coord = m.group(5) or ""
                 mods_str2 = m.group(6) or ""
                 noun2 = m.group(7) or ""
+
+                # D_pos(RolePair_Instrumental) Clause barrier check
+                if ROLE_CLAUSE_BARRIER.search(copula + mods_str) or (coord and ROLE_COORD_BARRIER.search(coord + mods_str2)):
+                    return m.group(0)
 
                 if re.search(r"\bbyłaś\b", copula, re.IGNORECASE):
                     copula = re.sub(r"\bByłaś\b", "Byłeś", copula)
@@ -5741,6 +5769,10 @@ def harmonize_2nd_person_predicate_nouns(
                 coord = m.group(5) or ""
                 mods_str2 = m.group(6) or ""
                 noun2 = m.group(7) or ""
+
+                # D_pos(RolePair_Instrumental) Clause barrier check
+                if ROLE_CLAUSE_BARRIER.search(copula + mods_str) or (coord and ROLE_COORD_BARRIER.search(coord + mods_str2)):
+                    return m.group(0)
 
                 if re.search(r"\bbyłeś\b", copula, re.IGNORECASE):
                     copula = re.sub(r"\bByłeś\b", "Byłaś", copula)
@@ -6170,7 +6202,9 @@ def apply_strict_positive_domain_pipeline(
     you_group_gender: Optional[str] = None,
     scene_has_male_participant: bool = False,
     series_bible: Optional[Any] = None,
-    is_sign: bool = False
+    is_sign: bool = False,
+    speaker_confidence: float = 1.0,
+    target_confidence: float = 1.0
 ) -> Tuple[str, List[str]]:
     """
     Standard 7.1 Pure Positive Domain Invariant Architecture:
@@ -6207,41 +6241,45 @@ def apply_strict_positive_domain_pipeline(
     fixes.extend(voc_fixes)
 
     if not is_sign:
+        # Strict Positive Domain Gating: 1st person requires speaker_confidence >= 0.95; 2nd person requires target_confidence >= 0.95
+        eff_speaker_gender = speaker_gender if speaker_confidence >= 0.95 else None
+        eff_target_gender = target_gender if target_confidence >= 0.95 else None
+
         # 4. Verbal Morphology (1st & 2nd person past, conditionals, future, clitics, powinien)
         res, v_fixes = harmonize_verbal_gender_1st_and_2nd(
-            res, speaker_gender=speaker_gender, target_gender=target_gender
+            res, speaker_gender=eff_speaker_gender, target_gender=eff_target_gender
         )
         fixes.extend(v_fixes)
 
         # 5. Predicate Adjectives & Copulas (1st & 2nd person)
         res, adj_fixes = harmonize_copula_and_predicate_adjective(
-            res, speaker_gender=speaker_gender, target_gender=target_gender
+            res, speaker_gender=eff_speaker_gender, target_gender=eff_target_gender
         )
         fixes.extend(adj_fixes)
 
         # 6. Predicate Nouns & Social Role Pairs (1st & 2nd person)
         res, noun_fixes = harmonize_2nd_person_predicate_nouns(
-            res, target_gender=target_gender, speaker_gender=speaker_gender
+            res, target_gender=eff_target_gender, speaker_gender=eff_speaker_gender
         )
         fixes.extend(noun_fixes)
 
         # 7. Group Virility (1st & 2nd person plural, VIRILE vs NON_VIRILE)
-        eff_pl1 = plural_group_gender or ("VIRILE" if scene_has_male_participant else None)
-        if eff_pl1:
+        # Operator D_pos(PluralGroup) for 1st person pl. is driven solely by plural_group_gender
+        if plural_group_gender in ("VIRILE", "NON_VIRILE"):
             res, pl1_fixes = harmonize_plural_group_gender(
                 res,
-                plural_group_gender=eff_pl1,
-                scene_has_male_participant=scene_has_male_participant,
+                plural_group_gender=plural_group_gender,
+                scene_has_male_participant=(plural_group_gender == "VIRILE"),
                 is_2nd_person=False
             )
             fixes.extend(pl1_fixes)
 
-        eff_pl2 = you_group_gender
-        if eff_pl2:
+        # Operator D_pos(PluralGroup) for 2nd person pl. is driven solely by you_group_gender
+        if you_group_gender in ("VIRILE", "NON_VIRILE"):
             res, pl2_fixes = harmonize_plural_group_gender(
                 res,
-                plural_group_gender=eff_pl2,
-                scene_has_male_participant=scene_has_male_participant,
+                plural_group_gender=you_group_gender,
+                scene_has_male_participant=(you_group_gender == "VIRILE"),
                 is_2nd_person=True
             )
             fixes.extend(pl2_fixes)
@@ -7354,7 +7392,8 @@ class EpisodeQualityGate:
                     is_sign=is_sign,
                     enforce_line_split=enforce_line_split,
                     report_cps_fixes=report_cps_fixes,
-                    text_before=text_before
+                    text_before=text_before,
+                    strict_positive_domain=eff_strict_positive_domain
                 )
                 continue
 
@@ -10697,7 +10736,8 @@ class EpisodeQualityGate:
                 is_sign=is_sign,
                 enforce_line_split=enforce_line_split,
                 report_cps_fixes=report_cps_fixes,
-                text_before=text_before
+                text_before=text_before,
+                strict_positive_domain=eff_strict_positive_domain
             )
 
         return subs, fixes
@@ -10711,7 +10751,8 @@ class EpisodeQualityGate:
         is_sign: bool,
         enforce_line_split: bool,
         report_cps_fixes: bool,
-        text_before: str
+        text_before: str,
+        strict_positive_domain: bool = True
     ) -> None:
         """
         Phase 7: Punctuation, typography, CPL line-splitting, English sweep, and CPS monitoring.
@@ -10823,7 +10864,8 @@ class EpisodeQualityGate:
             pl_cps = pl_clean_len / ev_dur_s
 
             # Dynamic token-level filler condensation when CPS exceeds recommended ceiling (Aksjomat 2 & Dyrektywa 3)
-            if pl_cps > 20.0 and pl_clean_len > 16:
+            # In strict positive domain, word deletion / lexical mutation is blocked: T(x) = x
+            if not strict_positive_domain and pl_cps > 20.0 and pl_clean_len > 16:
                 condensed_text = cls.condense_filler_words_token_level(ev.text)
                 if condensed_text != ev.text:
                     ev.text = condensed_text
@@ -10831,8 +10873,8 @@ class EpisodeQualityGate:
                     pl_clean_len = len(pure_text)
                     pl_cps = pl_clean_len / ev_dur_s
                     fixes.append(
-                        f"[Episode Quality Gate - Filar CLIV/Aksjomat 2 (Kondensacja Waty)] Linia #{i+1}: "
-                        f"zredukowano zbędną watę słowną dla wysokiego CPS (nowy CPS: {pl_cps:.1f})"
+                        f"[Episode Quality Gate - Filar CLIV/Aksjomat 2 (Redukcja CPS)] Linia #{i+1}: "
+                        f"zredukowano nadmiarowe słowa dla wysokiego CPS (nowy CPS: {pl_cps:.1f})"
                     )
 
             if report_cps_fixes and pl_cps > 20.0:

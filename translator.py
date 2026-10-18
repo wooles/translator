@@ -111,23 +111,30 @@ def format_dry_telemetry_tag(
     plural_confidence: float = 1.0,
     you_group_gender: Optional[str] = None,
     you_group_confidence: float = 1.0,
+    speaker_name: Optional[str] = None,
+    target_name: Optional[str] = None,
+    register: Optional[str] = None,
     **kwargs: Any
 ) -> str:
     """
-    Buduje zwięzły opisowy mikro-tag dołączając wyłącznie segmenty (Mówca, Adresat, Grupa_1os_lm, Grupa_2os_lm),
+    Buduje zwięzły opisowy mikro-tag dołączając wyłącznie segmenty (Mówca, Adresat, Grupa_1os_lm, Grupa_2os_lm, Rejestr),
     których pewność wynosi >= 0.80. Nigdy nie emituje wartości None ani AMBIGUOUS!
     """
     spk = speaker_gender or kwargs.get("speaker") or kwargs.get("spk")
     spk_conf = kwargs.get("spk_conf", kwargs.get("speaker_conf", speaker_confidence))
+    spk_n = speaker_name or kwargs.get("spk_name") or kwargs.get("speaker_actor") or kwargs.get("speaker_name")
 
     tgt = target_gender or kwargs.get("target") or kwargs.get("addressee") or kwargs.get("addressee_gender")
     tgt_conf = kwargs.get("tgt_conf", kwargs.get("target_conf", target_confidence))
+    tgt_n = target_name or kwargs.get("tgt_name") or kwargs.get("target_actor") or kwargs.get("target_name")
 
     grp = plural_group_gender or kwargs.get("plural_group") or kwargs.get("group_gender") or kwargs.get("grupa_1os_lm")
     grp_conf = kwargs.get("grp_conf", kwargs.get("plural_conf", kwargs.get("group_conf", plural_confidence)))
 
     you_grp = you_group_gender or kwargs.get("you_group") or kwargs.get("grupa_2os_lm")
     you_conf = kwargs.get("you_conf", kwargs.get("you_group_conf", kwargs.get("you_confidence", you_group_confidence)))
+
+    reg = register or kwargs.get("register") or kwargs.get("social_register") or kwargs.get("pragmatic_register") or kwargs.get("rejestr")
 
     segments = []
 
@@ -160,16 +167,25 @@ def format_dry_telemetry_tag(
         you_c = 1.0 if _is_valid_telemetry_val(you_grp) else 0.0
 
     if _is_valid_telemetry_val(spk) and spk_c >= 0.80:
-        segments.append(f"Mówca: {spk}")
+        if _is_valid_telemetry_val(spk_n):
+            segments.append(f"Mówca: {spk_n} ({spk})")
+        else:
+            segments.append(f"Mówca: {spk}")
 
     if _is_valid_telemetry_val(tgt) and tgt_c >= 0.80:
-        segments.append(f"Adresat: {tgt}")
+        if _is_valid_telemetry_val(tgt_n):
+            segments.append(f"Adresat: {tgt_n} ({tgt})")
+        else:
+            segments.append(f"Adresat: {tgt}")
 
     if _is_valid_telemetry_val(grp) and grp_c >= 0.80:
         segments.append(f"Grupa_1os_lm: {grp}")
 
     if _is_valid_telemetry_val(you_grp) and you_c >= 0.80:
         segments.append(f"Grupa_2os_lm: {you_grp}")
+
+    if _is_valid_telemetry_val(reg):
+        segments.append(f"Rejestr: {reg}")
 
     if not segments:
         return ""
@@ -2587,7 +2603,7 @@ class MultimodalTranslator:
         # 3. Lines to translate
         lines.append("Przekład kwestii na naturalną, żywą polszczyznę mówioną z zachowaniem filmowego rytmu dialogu:\n"
                      "1. Syntaktyka i ciągłość: całe zdania rozbite na linijki tworzą spójną całość z naturalnym polskim szykiem wyrazów.\n"
-                     "2. Liczba i płeć: w dialogach bezpośrednich forma 2. os. lp. ('ty'), formy przeszłe zgodne z wektorem stanu sceny i audio seiyū.\n"
+                     "2. Liczba i płeć: w dialogach bezpośrednich forma adresatywna (bezpośrednia lub grzecznościowa) oraz formy fleksyjne zgodne z relacją społeczną postaci, wektorem stanu sceny i rejestrem seiyū.\n"
                      "3. Triangulacja EN+JP+obraz: skrypt EN dostarcza treść i fakty, japońskie audio rejestr emocjonalny, a kadr obrazu napisy ekranowe.\n"
                      "4. Kwestie wielogłosu: wypowiedzi dwóch osób w jednej kwestii rozdzielane na osobne linie ('- Kwestia 1\\N- Kwestia 2').\n"
                      "5. Naturalność: żywy język dialogowy zamiast kalek dosłownych i struktur obcojęzycznych:")
@@ -2932,6 +2948,10 @@ class MultimodalTranslator:
                     if par:
                         paradigm_strs.append(f"{ent}(D:{par.D}, C:{par.C}, B:{par.B}, N:{par.N}, Ms:{par.Ms}, W:{par.W})")
 
+                target_actor_name = line_addr_lbl if line_addr_lbl else (getattr(event, "target_actor", None) or getattr(event, "target_speaker", None))
+                pragmatic_reg = detect_japanese_pragmatic_register(jp_audio_line, clean_text) if (jp_audio_line and "detect_japanese_pragmatic_register" in globals()) else None
+                reg_name = pragmatic_reg or (reg_desc if reg_desc and "Kontekstowy" not in reg_desc else getattr(event, "register", None))
+
                 dry_telemetry = format_dry_telemetry_tag(
                     speaker_gender=contract_spk_gender,
                     speaker_confidence=1.0 if str(contract_spk_gender).lower() in ("masculine", "feminine") else 0.0,
@@ -2940,7 +2960,10 @@ class MultimodalTranslator:
                     plural_group_gender="VIRILE" if (line_addr_cat in ["grupa_mężczyzn", "mężczyzna_dual"] or (contract_addr_number == "PLURAL" and getattr(self, "scene_has_male", False))) else ("NON_VIRILE" if contract_addr_number == "PLURAL" else None),
                     plural_confidence=1.0 if contract_addr_number == "PLURAL" else 0.0,
                     you_group_gender="VIRILE" if line_addr_cat in ["grupa_mężczyzn", "mężczyzna_dual", "grupa_mieszana", "para_mieszana_dual"] else ("NON_VIRILE" if line_addr_cat in ["grupa_kobiet", "kobieta_dual"] else None),
-                    you_group_confidence=1.0 if line_addr_cat in ["grupa_mężczyzn", "mężczyzna_dual", "grupa_mieszana", "para_mieszana_dual", "grupa_kobiet", "kobieta_dual"] else 0.0
+                    you_group_confidence=1.0 if line_addr_cat in ["grupa_mężczyzn", "mężczyzna_dual", "grupa_mieszana", "para_mieszana_dual", "grupa_kobiet", "kobieta_dual"] else 0.0,
+                    speaker_name=event.name if event.name else None,
+                    target_name=target_actor_name if target_actor_name else None,
+                    register=reg_name if reg_name else None
                 )
                 if dry_telemetry:
                     lines.append(f"  📡 TELEMETRIA: {dry_telemetry}")
@@ -2949,7 +2972,11 @@ class MultimodalTranslator:
                 elif entity_cat_strs:
                     lines.append(f"  🏷️ Kategorie encji: {', '.join(entity_cat_strs)}")
                 if compact_wdd_tag:
-                    lines.append(f"  {compact_wdd_tag}")
+                    cleaned_wdd = re.sub(r"\bK[13]\b", "", compact_wdd_tag)
+                    cleaned_wdd = re.sub(r"\[\s*\]", "", cleaned_wdd)
+                    cleaned_wdd = re.sub(r"\s+", " ", cleaned_wdd).strip()
+                    if cleaned_wdd and cleaned_wdd not in ("🎙️", "🎙️ :"):
+                        lines.append(f"  {cleaned_wdd}")
                 subj_3p = detect_third_person_mentions(
                     clean_text=clean_text,
                     speaker=event.name,
@@ -3607,13 +3634,19 @@ class MultimodalTranslator:
             spk_conf = 0.70 if is_spk_hypothesis else (1.0 if speaker_gender else 0.0)
             tgt_conf = 0.70 if is_tgt_hypothesis else (1.0 if addressee_cat else 0.0)
 
+            line_pl_grp = "VIRILE" if (addressee_cat in ["grupa_mężczyzn", "mężczyzna_dual", "grupa_mieszana", "para_mieszana_dual"] or getattr(self, "scene_has_male", False)) else ("NON_VIRILE" if addressee_cat in ["grupa_kobiet", "kobieta_dual"] else "AMBIGUOUS")
+            line_you_grp = "VIRILE" if addressee_cat in ["grupa_mężczyzn", "mężczyzna_dual", "grupa_mieszana", "para_mieszana_dual"] else ("NON_VIRILE" if addressee_cat in ["grupa_kobiet", "kobieta_dual"] else "AMBIGUOUS")
+
             # Declarative Scene State Telemetry Vector (Standard 7.0 SSOT)
             line_dry_telemetry = format_dry_telemetry_tag(
                 speaker_gender="MASCULINE" if speaker_gender and any(w in str(speaker_gender).lower() for w in ["male", "mężczyzna", "chłopak"]) else ("FEMININE" if speaker_gender and any(w in str(speaker_gender).lower() for w in ["female", "kobieta", "dziewczyna"]) else None),
                 speaker_confidence=spk_conf,
                 target_gender="FEMININE" if addressee_cat in ["kobieta", "kobieta_dual", "grupa_kobiet"] else ("MASCULINE" if addressee_cat in ["mężczyzna", "mężczyzna_dual", "grupa_mężczyzn"] else None),
                 target_confidence=tgt_conf,
-                plural_group_gender="VIRILE" if (addressee_cat in ["grupa_mężczyzn", "mężczyzna_dual"] or (addressee_cat in ["grupa_mieszana", "para_mieszana_dual"])) else ("NON_VIRILE" if addressee_cat in ["grupa_kobiet", "kobieta_dual"] else None)
+                plural_group_gender=line_pl_grp if line_pl_grp != "AMBIGUOUS" else None,
+                plural_confidence=1.0 if line_pl_grp != "AMBIGUOUS" else 0.0,
+                you_group_gender=line_you_grp if line_you_grp != "AMBIGUOUS" else None,
+                you_group_confidence=1.0 if line_you_grp != "AMBIGUOUS" else 0.0
             )
             if line_dry_telemetry:
                 notes = f"{notes} {line_dry_telemetry}".strip()
@@ -3913,6 +3946,9 @@ class MultimodalTranslator:
                 "condensation_directive": condensation_dir or "",
                 "notes": notes,
                 "third_person_subject": subj_3p_str,
+                "plural_group_gender": line_pl_grp,
+                "you_group_gender": line_you_grp,
+                "semantic_anchor": semantic_anchor or "",
                 "is_sign": vtype["is_sign"],
                 "visual_type": vtype["type_label"],
                 "visual_details": vtype["visual_details"],
@@ -4149,6 +4185,7 @@ class MultimodalTranslator:
                 final_text, fixes = self.linter.lint_and_fix_line(
                     text=raw_final,
                     speaker_gender=spk_gen,
+                    speaker_confidence=item.get("speaker_confidence", 1.0),
                     is_all_girls_scene=False,
                     is_sign=item.get("is_sign", False),
                     user_feedback_rules=all_user_rules,
@@ -4159,7 +4196,10 @@ class MultimodalTranslator:
                     source_en=item.get("en", ""),
                     addressee_gender=item.get("target_gender") or item.get("addressee"),
                     target_gender=item.get("target_gender") or item.get("addressee"),
+                    target_confidence=item.get("target_confidence", 1.0),
                     addressee_number=item.get("addressee_number"),
+                    plural_group_gender=item.get("plural_group_gender", "AMBIGUOUS"),
+                    you_group_gender=item.get("you_group_gender", "AMBIGUOUS"),
                     scene_has_male_participant=scene_has_male,
                     strict_positive_domain=True
                 )

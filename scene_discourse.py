@@ -2310,12 +2310,20 @@ def resolve_turn_addressee(
                 next_turn=next_turn,
                 prior_turns=prior_turns
             )
-        first_st = turn.sub_turns[0]
-        turn.target_speaker = first_st.target_speaker
-        turn.target_gender = first_st.target_gender
-        turn.target_confidence = first_st.target_confidence
-        turn.vocative_lock = first_st.vocative_lock
-        turn.addressee_number = first_st.addressee_number
+        sub_genders = {st.target_gender for st in turn.sub_turns if st.target_gender and st.target_gender not in ("AMBIGUOUS", "UNKNOWN")}
+        if len(sub_genders) > 1:
+            turn.target_speaker = None
+            turn.target_gender = "AMBIGUOUS"
+            turn.target_confidence = 0.0
+            turn.vocative_lock = False
+            turn.addressee_number = "PLURAL"
+        else:
+            first_st = turn.sub_turns[0]
+            turn.target_speaker = first_st.target_speaker
+            turn.target_gender = first_st.target_gender
+            turn.target_confidence = first_st.target_confidence
+            turn.vocative_lock = first_st.vocative_lock
+            turn.addressee_number = first_st.addressee_number
         return turn
 
     # Niewidzialność myśli dla dyskursu zewnętrznego
@@ -2435,10 +2443,12 @@ def resolve_turn_addressee(
                         if gap_ms >= 3500 and not is_ping_pong:
                             break
 
-                        if gap_ms < 2500:
-                            # Styk Delta_t < 2.5 s: dziedzicz z poprzedniego mówcy głośnego
+                        if gap_ms < 3500:
+                            # Styk Delta_t < 3.5 s: dziedzicz z poprzedniego mówcy głośnego
+                            part_count = len(getattr(turn, "scene_participants", []) or [])
+                            is_dyadic = (part_count <= 2)
                             turn.target_speaker = prev.speaker
-                            turn.target_confidence = 0.95 if is_ping_pong else 0.85
+                            turn.target_confidence = 0.95 if (is_dyadic and (is_ping_pong or gap_ms < 2500)) else 0.85
                             _, prev_g, _ = _resolve_character_canonical_and_gender(
                                 prev.speaker, series_bible=series_bible, context_item=prev
                             )
@@ -2452,7 +2462,7 @@ def resolve_turn_addressee(
 
                             if is_ping_pong or is_question_to_curr:
                                 turn.target_speaker = prev.speaker
-                                turn.target_confidence = 0.90
+                                turn.target_confidence = 0.85
                                 _, prev_g, _ = _resolve_character_canonical_and_gender(
                                     prev.speaker, series_bible=series_bible, context_item=prev
                                 )
@@ -2501,7 +2511,7 @@ def resolve_turn_addressee(
                     if norm_resp_g or resp_speaker:
                         turn.target_speaker = resp_speaker
                         turn.target_gender = norm_resp_g
-                        turn.target_confidence = 0.95 if forward_gap_ms <= 2000 else 0.85
+                        turn.target_confidence = 0.85
                         lookahead_resolved = True
 
         # Krok 4: Wymiana tur A <-> B (fallback przy braku wołacza, lookback i lookahead)

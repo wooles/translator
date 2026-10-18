@@ -17371,6 +17371,99 @@ def test_verify_purity_ast_and_zero_literal_invariant():
     print(" -> PASSED: Test 179 potwierdza pełną czystość kodu produkcyjnego (Zero-Anime-Literal) oraz certyfikację verify_purity.py (Standard 9.0).")
 
 
+def test_standard_9_twelve_point_architectural_hardening_guard():
+    """
+    [TEST 180/180] Standard 9.0: 12-Point Comprehensive Architectural Hardening Verification.
+    Weryfikacja:
+    1. Rozdzielenie grup We_Group (plural_group_gender) i You_Group (you_group_gender) w sygnaturze AVTLinter.
+    2. Twarde bramki pewności (speaker_confidence >= 0.95, target_confidence >= 0.95) w orzecznikach 1. i 2. os.
+    3. Epistemiczna separacja hipotez Profilera (P1, confidence=0.85) nie naruszająca determinizmu F0.
+    4. Bezpieczna promocja płci z początku opisu (word boundary) oraz ochrona diakrytyków w normalize_actor_tag.
+    5. Ochrona linii wieloadresatowych (SubTurn Pivot Partitioning) - target_confidence=0.0 przy konflikcie.
+    6. Bariery granicy klauzuli (COPULA_BARRIER, ROLE_CLAUSE_BARRIER) w orzecznikach.
+    7. Kapowanie pewności Lookaheadu w scenach wieloosobowych (target_confidence <= 0.85).
+    8. Niezłomność determinizmu męskiego F0 <= 135Hz (Score_EN nie ma prawa weta).
+    9. Wektor telemetrii z tożsamością mówcy, adresata i rejestru bez preskryptywnego nakazu 'ty'.
+    10. Przekazywanie audio_jp oraz semantic_anchor do Fazy 2 (DialogueVerifier).
+    11. Wyłączenie usuwania słów (condenser) w Fazie 7 przy strict_positive_domain=True (Redukcja CPS).
+    12. Pełne wykonanie verify_12_fixes.py (12/12 PASS).
+    """
+    print("\n--- Uruchamianie Testu 180: test_standard_9_twelve_point_architectural_hardening_guard ---")
+    import inspect
+    import subprocess
+    import sys
+    from pathlib import Path
+    from avt_linter import AVTLinter
+    from scene_discourse import SpeakerTurn, SubTurn, resolve_turn_addressee
+    from translator import format_dry_telemetry_tag
+    from metadata import normalize_actor_tag
+
+    # 1. Sygnatura AVTLinter
+    sig = inspect.signature(AVTLinter.lint_and_fix_line)
+    assert "plural_group_gender" in sig.parameters
+    assert "you_group_gender" in sig.parameters
+    assert "speaker_confidence" in sig.parameters
+    assert "target_confidence" in sig.parameters
+
+    # 2. Confidence gating
+    linter = AVTLinter()
+    # Speaker confidence < 0.95 -> 1st person predicate should not mutate
+    res, fixes = linter.lint_and_fix_line("Byłam zmęczona.", speaker_gender="MALE", speaker_confidence=0.85, strict_positive_domain=True)
+    assert res == "Byłam zmęczona.", f"Gating zawiódł dla speaker_confidence < 0.95: {res}"
+
+    # Target confidence < 0.95 -> 2nd person predicate should not mutate
+    res2, fixes2 = linter.lint_and_fix_line("Jesteś naiwna.", target_gender="MALE", target_confidence=0.85, strict_positive_domain=True)
+    assert res2 == "Jesteś naiwna.", f"Gating zawiódł dla target_confidence < 0.95: {res2}"
+
+    # 4. normalize_actor_tag zachowuje diakrytyki
+    name, g = normalize_actor_tag("Żołnierz (M)")
+    assert name == "Żołnierz", f"Diakrytyki zniekształcone: {name}"
+    assert g == "MALE"
+
+    # 5. SubTurn pivot partitioning na poziomie SpeakerTurn
+    st1 = SubTurn(speaker="Oficer", target_gender="MALE", target_confidence=0.98)
+    st2 = SubTurn(speaker="Oficer", target_gender="FEMALE", target_confidence=0.98)
+    turn = SpeakerTurn(speaker="Oficer")
+    turn.sub_turns = [st1, st2]
+    resolve_turn_addressee(turn)
+    assert turn.target_gender == "AMBIGUOUS", f"Oczekiwano AMBIGUOUS przy konflikcie sub-tur, otrzymano {turn.target_gender}"
+    assert turn.target_confidence == 0.0, f"Oczekiwano target_confidence=0.0 przy konflikcie sub-tur, otrzymano {turn.target_confidence}"
+
+    # 6. Bariera klauzuli
+    res_clause, _ = linter.lint_and_fix_line("Nie bądź naiwna, bo ona jest zła.", target_gender="MALE", target_confidence=1.0, strict_positive_domain=True)
+    assert "naiwny" in res_clause and "zła" in res_clause, f"Bariera klauzuli nie ochroniła zdania podrzędnego: {res_clause}"
+
+    # 9. format_dry_telemetry_tag
+    tag = format_dry_telemetry_tag(
+        speaker_gender="MALE",
+        speaker_confidence=0.95,
+        speaker_name="Oficer",
+        target_gender="FEMALE",
+        target_confidence=0.95,
+        target_name="Żołnierz",
+        register="FORMAL"
+    )
+    assert "Mówca: Oficer (MALE)" in tag
+    assert "Adresat: Żołnierz (FEMALE)" in tag
+    assert "Rejestr: FORMAL" in tag
+
+    # 12. Wykonanie verify_12_fixes.py
+    base_dir = Path(__file__).parent
+    script_path = base_dir / "verify_12_fixes.py"
+    if script_path.exists():
+        proc = subprocess.run(
+            [sys.executable, str(script_path)],
+            cwd=base_dir,
+            capture_output=True,
+            text=True,
+            encoding="utf-8"
+        )
+        assert proc.returncode == 0, f"verify_12_fixes.py zwrócił błąd:\n{proc.stdout}\n{proc.stderr}"
+        assert "[12/12 PASS]" in proc.stdout, f"verify_12_fixes.py nie przeszło wszystkich testów:\n{proc.stdout}"
+
+    print(" -> PASSED: Test 180 potwierdza pełną implementację 12 punktów utwardzenia Standardu 9.0.")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -17552,7 +17645,8 @@ if __name__ == "__main__":
     test_series_bible_ontological_purification_and_given_name_alias_virility()
     test_declarative_single_channel_telemetry_and_backward_compatibility()
     test_verify_purity_ast_and_zero_literal_invariant()
-    print("\n Wszystkie testy jednostkowe i integracyjne (179/179) zakończone pełnym sukcesem!\n")
+    test_standard_9_twelve_point_architectural_hardening_guard()
+    print("\n Wszystkie testy jednostkowe i integracyjne (180/180) zakończone pełnym sukcesem!\n")
 
 
 

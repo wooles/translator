@@ -8,7 +8,8 @@ if sys.stderr and hasattr(sys.stderr, "reconfigure"):
 FILES_TO_AUDIT = [
     "translator.py", "avt_linter.py", "series_memory.py",
     "scene_discourse.py", "profiler.py", "metadata.py",
-    "rules.py", "verifier.py", "whisper_disambiguator.py"
+    "rules.py", "verifier.py", "whisper_disambiguator.py",
+    "PELNY_RAPORT_TECHNICZNY_POTOKU.md"
 ]
 
 RULE_AND_PROMPT_FILES = ["rules.py", "profiler.py", "translator.py", "verifier.py", "metadata.py"]
@@ -91,11 +92,13 @@ for fname in FILES_TO_AUDIT:
     with open(fname, "r", encoding="utf-8", errors="replace") as f:
         src = f.read()
 
-    try:
-        tree = ast.parse(src)
-    except SyntaxError as e:
-        violations["ast_syntax"].append((fname, e.lineno, "SyntaxError", e.msg))
-        continue
+    tree = None
+    if fname.endswith(".py"):
+        try:
+            tree = ast.parse(src)
+        except SyntaxError as e:
+            violations["ast_syntax"].append((fname, e.lineno, "SyntaxError", e.msg))
+            continue
 
     for idx, line in enumerate(src.splitlines(), 1):
         if "ZERO-LITERAL" in line or "POSITIVE DOMAIN" in line or "Standard 9.0" in line:
@@ -118,7 +121,7 @@ for fname in FILES_TO_AUDIT:
             if m := RE_QUOTED_EXEMPLARY_SPEECH.search(line):
                 violations["quoted_speech"].append((fname, idx, m.group(0), line.strip()))
 
-    if fname in LOGIC_FILES:
+    if fname in LOGIC_FILES and tree is not None:
         for node in ast.walk(tree):
             # Bramka 8: Statyczne kolekcje imion pisanych wielką literą
             if isinstance(node, (ast.List, ast.Set, ast.Tuple)):

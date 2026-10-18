@@ -61,7 +61,7 @@ Każdy obiekt `pysubs2.SSAEvent` posiada następujące fizyczne atrybuty:
 - `start` (`int`): Czas początku wyświetlania w milisekundach.
 - `end` (`int`): Czas końca wyświetlania w milisekundach.
 - `style` (`str`): Nazwa przypisanego stylu ASS (np. `Default`, `Italics`, `Top`, `Sign`, `Flashback`).
-- `name` (`str`): Etykieta aktora / mówcy (np. `Kowalski (M)`, `Heroine`, `Narrator`).
+- `name` (`str`): Etykieta aktora / mówcy (np. `Aktor (M)`, `Bohaterka`, `Narrator`).
 - `text` (`str`): Surowy tekst kwestii zawierający znaczniki formatowania ASS (np. `{\i1}Tekst{\i0}`, `\N`, `{\pos(960,540)}`).
 - `effect` (`str`): Dodatkowe efekty ASS (np. `karaoke`, `banner`).
 - `margin_l`, `margin_r`, `margin_v` (`int`): Niestandardowe marginesy geometrii planszy.
@@ -84,7 +84,7 @@ Każde zdarzenie przechodzi przez funkcję `detect_event_visual_type(event, ts_p
 #### A. Ekstrakcja tytułu i czyszczenie nazwy pliku
 1. `clean_anime_filename(file_path: str) -> str`: Usuwa sumy kontrolne CRC32 (np. `[A1B2C3D4]`), prefiksy grup fansuberskich (np. `[Erai-raws]`, `[SubsPlease]`), oznaczenia rozdzielczości (`1080p`, `720p`), kodeków (`x264`, `HEVC`, `AAC`) oraz numer odcinka, pozostawiając czysty tytuł serii.
 2. `strip_season_suffix(title: str) -> str`: Odrzyna sufiksy sezonowe (`Season 2`, `2nd Season`, `S2`, `Part II`, `Cour 2`, `IV`), umożliwiając odpytanie bazy AniList o sezon macierzysty w przypadku braku wyników dla sequela.
-3. `normalize_anime_slug(title: str) -> str`: Przekształca tytuł w jednolity identyfikator alfanumeryczny w formacie snake_case (np. `Hoshi no Tabibito` -> `hoshi_no_tabibito`).
+3. `normalize_anime_slug(title: str) -> str`: Przekształca tytuł w jednolity identyfikator alfanumeryczny w formacie snake_case (poprzez usunięcie znaków specjalnych i zastąpienie spacji podkreśleniami).
 
 #### B. Zapytanie AniList GraphQL API (`fetch_anilist_metadata`)
 Metadane pobierane są metodą POST z endpointu `https://graphql.anilist.co`. Zapytanie ma następującą strukturę GraphQL:
@@ -161,7 +161,7 @@ Główne postacie (Kanon):
 #### A. Wycinanie segmentów audio i buforowanie PCM
 Dla każdej kwestii dialogowej potok ekstrahuje powiązany fragment japońskiej ścieżki audio:
 1. Polecenie FFmpeg mapuje strumień japoński: `-map 0:a:m:language:jpn? -map 0:a:0 -vn -acodec pcm_s16le -ar 16000 -ac 1`.
-2. Segment czasowy `[start_ms - 100 ms, end_ms + 100 ms]` ładowany jest do pamięci RAM jako tablica NumPy `np.ndarray` próbek mono 16-bitowych o częstotliwości próbkowania 16 000 Hz.
+2. Segment czasowy `[start_ms - 100 ms, end_ms + 100 ms]` ładowany jest do pamięci RAM jako tablica NumPy `numpy.ndarray` próbek mono 16-bitowych o częstotliwości próbkowania 16 000 Hz.
 
 #### B. Przetwarzanie DSP (`librosa.pyin`) w `EpistemicAudioTriangulator`
 Algorytm `EpistemicAudioTriangulator.estimate_f0_pyin` realizuje estymację częstotliwości podstawowej $F_0$:
@@ -174,7 +174,7 @@ Algorytm `EpistemicAudioTriangulator.estimate_f0_pyin` realizuje estymację czę
 
 #### C. Asymetria fizjologiczna krtani i wagi akustyczne
 1. **Twardy Determinizm Męski ($F_0 \le 135\text{ Hz}$):**
-   Jeśli $\text{median}(F_0) \le 135.0\text{ Hz}$, algorytm ustawia flagę `F0_hard_masculine = True` z wagą męską $+5.0$ i pewnością `confidence = 1.0`. Prawo weta męskiego może zostać przełamane wyłącznie przy potężnym skumulowanym dowodzie anaforycznym języka angielskiego ($\text{Score}_{\text{EN}} \le -8$, oznaczającym błąd rozbicia na głosy lub dekonspirację tożsamości).
+   Jeśli $\text{median}(F_0) \le 135.0\text{ Hz}$, algorytm ustawia flagę `F0_hard_masculine = True` z wagą męską $+5.0$ i pewnością `confidence = 1.0`. Pomiar ten jest nieprzełamywalny przez analizę zaimków angielskich i ustępuje wyłącznie jawnemu rekordowi P0 `FEMALE` w `SeriesBible` lub jawnemu znacznikowi `(F)` w etykiecie aktora.
 2. **Likwidacja Martwej Strefy ($F_0 > 135\text{ Hz}$):**
    Dla całego pasma $F_0 > 135.0\text{ Hz}$ waga sygnału akustycznego wynosi **$0.0$**. Eliminuje to fałszywą feminizację niskich głosów kobiecych (140–170 Hz) oraz dorastających chłopców dubbingowanych przez kobiety seiyū (>170 Hz). Decyzję o płci w tym paśmie podejmują wyłącznie wektory morfosyntaktyczne i dyskursywne.
 
@@ -203,7 +203,7 @@ Algorytm `EpistemicAudioTriangulator.estimate_f0_pyin` realizuje estymację czę
 - **K3 (Autoreferencja 1. os. - zaimki i imperatywy):** `ore`, `boku`, `washi`, `sessha` -> męski; `atashi`, `atai` -> żeński; imperatywy: `kurenai ka` -> żeński; `kure / kure yo` -> męski; formalne `watakushi` -> waga neutralna 0.0.
 - **K4 (Role społeczne i pokrewieństwo):** `aniki`, `ani` -> starszy brat; `otouto` -> młodszy brat; `ane` -> starsza siostra; `imouto` -> młodsza siostra; `chichi/otousan` -> ojciec; `haha/okaasan` -> matka; `ojiisan` -> dziadek; `obaasan` -> babcia.
 - **K5 (Wektory przysługi - benefactives):** `kureru / kudasaru` -> czynność skierowana do mówcy (dla mnie); `ageru / yaru` -> czynność wykonana dla adresata (dla ciebie).
-- **K6 (Odwrócona biegunowość pytań - Echo Agreement):** Japońskie potwierdzenie `hai` po pytaniu z negacją oznacza zgodę z formą gramatyczną pytania, co w polszczyźnie wymaga odwrócenia znaku na przeczenie: *"Tak, nie przyszedł"* -> *"Nie, nie przyszedł"*.
+- **K6 (Odwrócona biegunowość pytań - Echo Agreement):** Japońskie potwierdzenie `hai` po pytaniu z negacją oznacza zgodę z formą gramatyczną pytania, co w polszczyźnie wymaga dostosowania partykuły potwierdzenia do sensu przeczącego całej klauzuli.
 - **K7 (Rejestr pragmatyczny T-V):** `temee`, `kisama` -> rejestr wrogi/pogardliwy; `desu`, `masu`, formy honoryfikatywne -> formalny (Pan/Pani); `omae`, `anta` -> bezpośredni poufały (Ty).
 - **K8 (Deiksa przestrzenna Ko-So-A-Do):** `kore/kono` -> obiekt blisko mówcy (ten); `sore/sono` -> obiekt blisko słuchacza (tamten); `are/ano` -> obiekt oddalony od obu rozmówców (ów, tamten odległy); `dore/dono` -> zaimek pytający (który).
 
@@ -236,7 +236,7 @@ Baza wiedzy serii przechowywana jest w pliku `series_memory/{anime_slug}_bible.j
 #### B. Samolecząca sanitacja bazy w pamięci RAM (`_sanitize_loaded_bible_in_ram`)
 Po załadowaniu pliku z dysku metoda `_sanitize_loaded_bible_in_ram` wykonuje procedurę uzgadniania stanu bez modyfikacji dysku (koszt 0.00 PLN):
 1. **Owijanie w `CharacterRegistryDict`:** Słownik `characters` zostaje zastąpiony strukturą `CharacterRegistryDict(self.data["characters"], bible_data=self.data)`. Wrapper ten przechwytuje zapytania o relacje skierowane, delegując je bezpośrednio do sekcji `relations`.
-2. **Separacja relacji skierowanych:** Wszystkie klucze zawierające operator skierowany `->` (np. `PostaćA -> PostaćB`) są bezwzględnie usuwane ze słownika `characters` i przenoszone do sekcji `relations`.
+2. **Separacja relacji skierowanych:** Wszystkie klucze zawierające operator skierowany `->` (np. `PostaćA -> PostaćB`) są deterministycznie usuwane ze słownika `characters` i przenoszone do sekcji `relations`.
 3. **Ekstrakcja płci P0 i odcinanie nawiasów:** Każdy klucz postaci poddawany jest funkcji `normalize_actor_tag`. Jeśli klucz zawierał znacznik techniczny (np. `Bohater (M)`), rekord zostaje przeniesiony pod czysty identyfikator `Bohater`, a w polu `gender` ustawiana jest wartość `MALE` z `confidence = 1.0`, `priority = "P0"` oraz `has_verified_gender = True`.
 4. **Promocja płci z opisów fabularnych:** Jeśli pole `gender` miało wartość `None` lub `UNKNOWN`, a w tekście pola `description` znajduje się znacznik `[MĘŻCZYZNA (Adresat)...]` lub słowo `mężczyzna`/`kobieta`, cecha płci zostaje wypromowana do strukturalnego pola `gender`, a pole `description` oczyszczone ze zbędnych instrukcji gramatycznych.
 5. **Budowa indeksu aliasów pierwszych imion w czasie $O(1)$:**
@@ -282,7 +282,7 @@ Funkcja przyjmuje `(name: str, gender: str = "UNKNOWN") -> Dict[str, str]`:
 1. **Ochrona form odmienionych i deskrypcji:** Jeśli funkcja `is_complex_description(name)` lub `is_adjectival_oblique_token(name)` wykryje, że leksem kończy się już na polski sufiks przymiotnikowy w przypadku zależnym (`-ego`, `-emu`, `-ym`, `-im`, `-ych`, `-ich`, `-ymi`, `-imi`, `-ą`), generator natychmiast zwraca odwzorowanie tożsamościowe:
    $$\forall c \in \{M, D, C, B, N, Ms, W\}, \quad \text{decl}[c] = \text{name}$$
    Zapobiega to potworkom językowym typu *-ymem*.
-2. **Obsługa przydawki dopełniaczowej i złożeń:** W nazwach wieloczłonowych typu *"X z Y"* lub *"Rycerz Śmierci"*, odmieniany jest wyłącznie człon główny (*Rycerz -> Rycerza, Rycerzowi*), a człon określający pozostaje zamrożony.
+2. **Obsługa przydawki dopełniaczowej i złożeń:** W nazwach wieloczłonowych typu *"X z Y"* lub z przydawką dopełniaczową, odmieniany jest wyłącznie człon główny, a człon określający pozostaje zamrożony.
 3. **Fonotaktyka imion męskich obcych:**
    - Zakończone na spółgłoskę twardą: Mianownik $-\emptyset$; Dopełniacz/Biernik `-a`; Celownik `-owi`; Narzędnik `-em`; Miejscownik/Wołacz `-ie` (z alternacją fonetyczną tematu).
    - Zakończone na afrykaty `-tz`, `-z`: Miejscownik i Wołacz przyjmują końcówkę `-u` (*tematy na -tz: końcówka -tzu* zamiast błędnego *-tzie*).
@@ -323,18 +323,18 @@ Zapytanie wysyłane jest do modelu Gemini z parametrami: `temperature = 0.2`, `r
 1. `EpisodeProfile`:
    - `episode_summary` (`str`): Zwięzłe streszczenie dramaturgiczne odcinka.
    - `setting_and_era` (`str`): Czas akcji, ustrój, realia materialne i poziom technologii.
-   - `domain_expertise` (`str`): Specjalistyczna wiedza domenowa (np. szermierka, medycyna, magia).
-   - `dialogue_stylization` (`str`): Rejestr stylistyczny języka polskiego (np. stylizacja szlachecka, współczesna).
+   - `domain_expertise` (`str`): Specjalistyczna wiedza domenowa (wiedza z zakresu rzemiosła, medycyny, magii).
+   - `dialogue_stylization` (`str`): Rejestr stylistyczny języka polskiego (stylizacja szlachecka, stylizacja współczesna).
    - `manga_canon_source` (`str`): Źródło polskiego kanonu mangowego.
    - `tone_and_genre` (`str`): Dominująca tonacja emocjonalna.
    - `danger_lines_prescan` (`List[DangerLinePreScan]`):
      * `approx_time` (`str`): Przybliżony czas kwestii (np. `04:15`).
      * `english_phrase` (`str`): Fraza źródłowa EN.
      * `speaker` (`str`): Domniemany mówca.
-     * `contextual_trap` (`str`): Opis pułapki translacyjnej (np. dosłowna kalka).
+     * `contextual_trap` (`str`): Opis pułapki translacyjnej (kalka językowa, fałszywy przyjaciel).
      * `contextual_guidance` (`str`): Deklaratywna analiza kontekstu semantycznego i idiomatycznego (opis znaczenia frazy dla autonomii modelu Fazy 1 bez dyrektyw nakazowych).
    - `relationship_pivots` (`List[RelationshipPivot]`):
-     * `approx_time` (`str`), `characters_involved` (`str`), `nature_of_shift` (`str`), `relational_guidance` (`str`): Deklaratywny opis charakteru relacji i dynamiki społecznej (np. przejście na 'ty' lub zwrot grzecznościowy).
+     * `approx_time` (`str`), `characters_involved` (`str`), `nature_of_shift` (`str`), `relational_guidance` (`str`): Deklaratywny opis charakteru relacji i dynamiki społecznej (zmiana na rejestr bezpośredni lub zwrot grzecznościowy).
    - `character_catchphrases` (`List[CharacterCatchphrase]`):
      * `character_name` (`str`), `original_phrase` (`str`), `canonical_pl` (`str`), `context_notes` (`str`).
    - `song_transcreation_plans` (`List[SongTranscreationPlan]`):
@@ -381,16 +381,16 @@ Wygenerowany profil zasila bazę `SeriesBible`:
    - Wystąpiło cięcie montażowe wykryte przez FFmpeg / przejście przez czerń (`is_black_fade`).
    - Zmienił się styl ASS z dialogu na narrację, retrospekcję (`Flashback`) lub napis ekranowy (`Sign`).
    Uczestnicy i stan adresata z poprzedniej sceny nie przenikają przez `SceneBoundaryWall`.
-2. **SubTurn Pivot Partitioning:** Wypowiedź jednego mówcy złożona z kilku zdań zostaje rozcięta na niezależne pod-segmenty (`SubTurn`), gdy wewnątrz wypowiedzi następuje zmiana adresata (np. zwrot do towarzysza, a po spójniku zwrot do wroga).
+2. **SubTurn Pivot Partitioning:** Wypowiedź jednego mówcy złożona z kilku zdań zostaje rozcięta na niezależne pod-segmenty (`SubTurn`), gdy wewnątrz wypowiedzi następuje zmiana adresata (wypowiedź z przełączeniem odbiorcy, gdzie pierwsze zdanie kierowane jest do jednej osoby, a kolejne do innej). Jeśli pod-segmenty SubTurn posiadają sprzeczne płcie adresatów, cała tura otrzymuje target_gender = "AMBIGUOUS" oraz target_confidence = 0.0, chroniąc oba zdania przed nadpisaniem w linterze.
 
 #### B. Trójstopniowy automat wyznaczania adresata 2. osoby
 W ramach tury `SpeakerTurn` adresat (`target_speaker`, `target_gender`, `target_confidence`) wyznaczany jest hierarchicznie:
 1. **Stopień 1: Wewnątrzzdaniowy Wołacz (Vocative Lock):**
-   Jeśli w linii występuje jawny wołacz imienny (`decl["W"]` lub tytuł) oddzielony przecinkiem lub wykrzyknikiem: adresat zostaje natychmiast przypisany z `confidence = 0.98`. Wołacz męski bezwzględnie blokuje formy żeńskie w orzeczeniu.
+   Jeśli w linii występuje jawny wołacz imienny (`decl["W"]` lub tytuł) oddzielony przecinkiem lub wykrzyknikiem: adresat zostaje natychmiast przypisany z `confidence = 0.98`. Wołacz męski deterministycznie blokuje formy żeńskie w orzeczeniu.
 2. **Stopień 2: Naprzemienność Diadyczna 1-na-1 (Dyadic Turn-Taking):**
-   Gdy w scenie uczestniczą dwie osoby i nie wystąpił wołacz, adresatem wypowiedzi mówcy $A$ staje się poprzedni mówca $B$ (pod warunkiem $\Delta t < 5.0\text{ s}$).
-3. **Stopień 3: Progresywny Lookahead i Ciągłość Tury:**
-   W pytaniach otwartych algorytm bada wypowiedź następną ($\Delta t < 2.0\text{ s}$). Osoba udzielająca odpowiedzi zostaje wstecznie uznana za adresata pytania. Monologi wewnętrzne (`is_internal_monologue == True`), napisy i narratorzy są wykluczeni z roli adresata.
+   Gdy w scenie uczestniczą dokładnie dwie osoby (`len(scene_participants) == 2`) i nie wystąpił wołacz, adresatem wypowiedzi mówcy $A$ staje się poprzedni mówca $B$ (przy $\Delta t < 3.5\text{ s}$ z pewnością `confidence = 0.95`).
+3. **Stopień 3: Progresywny Lookahead i Sceny Wieloosobowe:**
+   W pytaniach otwartych algorytm bada wypowiedź następną ($\Delta t < 2.0\text{ s}$). W scenach wieloosobowych (`len(scene_participants) > 2`) lub przy lookaheadzie pewność adresata jest ograniczona do limitu `confidence = 0.85` (co zasila telemetrię $\ge 0.80$, lecz nie przekracza twardego progu $0.95$ w linterze). Monologi wewnętrzne (`is_internal_monologue == True`), napisy i narratorzy są wykluczeni z roli adresata.
 
 #### C. Matematyczne wyznaczanie rozłącznych zbiorów liczby mnogiej
 Potok rozdziela algebrę grupy mówiącej ("My", 1. os. lm.) od grupy słuchaczy ("Wy", 2. os. lm.):
@@ -403,7 +403,7 @@ Potok rozdziela algebrę grupy mówiącej ("My", 1. os. lm.) od grupy słuchaczy
 3. **Trójstanowa Kategoryzacja Virility (`VIRILE` / `NON_VIRILE` / `AMBIGUOUS`):**
    - **`VIRILE` (Męskoosobowy):** Występuje przynajmniej jeden potwierdzony mężczyzna w zbiorze (wyłącznie na podstawie ontologii P0 z bazy `SeriesBible`, aliasów pierwszego imienia, jawnego znacznika płci w tagu aktora z `normalize_actor_tag` lub twardego determinizmu akustycznego $F_0 \le 135\text{ Hz}$). Całkowicie wykluczone jest wnioskowanie virility z form czasownikowych polskiego tekstu (-liśmy / -liście). Wymusza formy: *-liśmy / -liście*, *byliśmy / byliście*.
    - **`NON_VIRILE` (Niemęskoosobowy):** Zbiór liczy $\ge 2$ osoby i **każdy** uczestnik posiada zweryfikowaną płeć żeńską P0 (`confidence >= 0.95`), przy czym liczba mężczyzn wynosi zero i liczba postaci nieznanych wynosi zero (`unknown_count == 0`). Wymusza formy: *-łyśmy / -łyście*, *byłyśmy / byłyście*.
-   - **`AMBIGUOUS` (Niejednoznaczny):** Brak pełnej wiedzy o składzie płciowym grupy. Obowiązuje funkcja tożsamościowa $T(x) = x$ (zakaz arbitralnego wymuszania końcówek).
+   - **`AMBIGUOUS` (Niejednoznaczny):** Brak pełnej wiedzy o składzie płciowym grupy. Obowiązuje funkcja tożsamościowa $T(x) = x$ (brak arbitralnego wymuszania końcówek).
 
 ---
 
@@ -452,16 +452,16 @@ Dla każdej linii w paczce potok generuje zestaw pasywnych metadanych:
 1. `_arbitrate_speaker_gender`: Ustala płeć mówcy na podstawie bazy wiedzy P0, jawnego tagu aktora `normalize_actor_tag` oraz triangulacji F0.
 2. `detect_audio_discrepancy`: Wykrywa rozbieżności między skryptem EN a japońskim audio seiyū, generując deskryptor:
    `"Sygnał audio JP: [treść okrzyku / potwierdzenia]"`
-3. `get_audio_semantic_anchor`: Wykrywa kluczowe kotwice semantyczne (np. formy przeczące, honoryfikatory).
+3. `get_audio_semantic_anchor`: Wykrywa kluczowe kotwice semantyczne (partykuły przeczące, wykładniki honoryfikatywne).
 4. `detect_japanese_pragmatic_register`: Zwraca deskryptor stylu (np. `"Rejestr formalny dworski"`, `"Rejestr wrogi/bojowy"`).
 5. **Jednokanałowy Wektor Telemetrii (`format_dry_telemetry_tag`):**
    Buduje zwięzły mikro-tag dołączając wyłącznie segmenty o pewności $\ge 0.80$:
    ```text
    [Mówca: MASCULINE | Adresat: FEMININE | Grupa_1os_lm: VIRILE]
    ```
-   Wartości `None`, `UNKNOWN` oraz `AMBIGUOUS` są bezwzględnie pomijane.
+   Wartości `None`, `UNKNOWN` oraz `AMBIGUOUS` są w całości pomijane. Wektor telemetrii przekazuje kanoniczną nazwę mówcy i adresata wraz z rodzajem gramatycznym i rejestrem społecznym.
 6. **Czystość Nagłówków Kwestii i Brak Preskryptywności (Standard 9.0):**
-   W szablonach formatowania linii dialogowych wewnątrz `_prepare_batch_prompt` oraz `_process_single_batch` kategorycznie wyeliminowano wstrzykiwanie preskryptywnych podpowiedzi końcówek fleksyjnych w nawiasach (takich jak `(-łaś)`, `(-łem)`, `(-łabym)`, `(-łbym)` czy `(-łyście)`). Płeć i liczba przekazywane są do modelu wyłącznie jako czyste miano roli w nagłówku oraz jednokanałowy wektor telemetrii w wierszu `📡 TELEMETRIA: [Mówca: ... | Adresat: ...]`, bez sugerowania czasów gramatycznych ani konkretnych morfemów w tekście pomocniczym. Skrypt angielski dostarcza wyłącznie treści semantycznej i faktów, nie narzucając polskiej składni, co gwarantuje pełną autonomię stylistyczną modelu LLM.
+   W szablonach formatowania linii dialogowych wewnątrz `_prepare_batch_prompt` oraz `_process_single_batch` w pełni wyeliminowano wstrzykiwanie preskryptywnych podpowiedzi końcówek fleksyjnych w nawiasach (takich jak `(-łaś)`, `(-łem)`, `(-łabym)`, `(-łbym)` czy `(-łyście)`). Płeć i liczba przekazywane są do modelu wyłącznie jako czyste miano roli w nagłówku oraz jednokanałowy wektor telemetrii w wierszu `📡 TELEMETRIA: [Mówca: ... | Adresat: ...]`, bez sugerowania czasów gramatycznych ani konkretnych morfemów w tekście pomocniczym. Skrypt angielski dostarcza wyłącznie treści semantycznej i faktów, nie narzucając polskiej składni, co gwarantuje pełną autonomię stylistyczną modelu LLM.
 
 ---
 
@@ -473,7 +473,7 @@ Poniżej przedstawiono dokładną strukturę promptu wysyłanego do LLM:
 ```text
 Przekład kwestii na naturalną, żywą polszczyznę mówioną z zachowaniem filmowego rytmu dialogu:
 1. Syntaktyka i ciągłość: całe zdania rozbite na linijki tworzą spójną całość z naturalnym polskim szykiem wyrazów.
-2. Liczba i płeć: w dialogach bezpośrednich forma 2. os. lp. ('ty'), formy przeszłe zgodne z wektorem stanu sceny i audio seiyū.
+2. Liczba i płeć: w dialogach bezpośrednich forma adresatywna (bezpośrednia lub grzecznościowa) oraz formy fleksyjne zgodne z relacją społeczną postaci, wektorem stanu sceny i rejestrem seiyū.
 3. Triangulacja EN+JP+obraz: skrypt EN dostarcza treść i fakty, japońskie audio rejestr emocjonalny, a kadr obrazu napisy ekranowe.
 4. Kwestie wielogłosu: wypowiedzi dwóch osób w jednej kwestii rozdzielane na osobne linie ('- Kwestia 1\N- Kwestia 2').
 5. Naturalność: żywy język dialogowy zamiast kalek dosłownych i struktur obcojęzycznych:
@@ -594,6 +594,10 @@ Metoda `AVTLinter.lint_and_fix_line` przyjmuje następujący kompletny zestaw ar
 - `addressee_number` (`Optional[str]`): Liczba adresata (`SINGULAR`, `PLURAL`).
 - `series_bible` (`Optional[Any]`): Instancja bazy wiedzy serii.
 - `scene_has_male_participant` (`bool`): Obecność mężczyzny w scenie.
+- `plural_group_gender` (`str`, domyślnie `"AMBIGUOUS"`): Klasyfikacja grupy "My" (1. os. lm. We_Group).
+- `you_group_gender` (`str`, domyślnie `"AMBIGUOUS"`): Klasyfikacja grupy "Wy" (2. os. lm. You_Group).
+- `speaker_confidence` (`float`, domyślnie `1.0`): Próg pewności mówcy (wymagane $\ge 0.95$ dla operacji 1. os.).
+- `target_confidence` (`float`, domyślnie `1.0`): Próg pewności adresata (wymagane $\ge 0.95$ dla operacji 2. os.).
 - `is_production` (`Optional[bool]`): Flaga środowiska produkcyjnego.
 - `strict_positive_domain` (`bool`, **domyślnie `True`**): Wymuszenie czystej domeny pozytywnej.
 
@@ -619,26 +623,28 @@ W trybie `strict_positive_domain=True` linter pomija arbitralne podmiany słowni
 
 2. **$D_{\text{pos}}(\text{CopulaAdj})$ — Orzeczniki przymiotnikowe i imiesłowowe:**
    - Uzgadnia rodzaj przymiotników i imiesłowów po czasownikach łącznikowych (*być, stać się, zostać*):
-     * 1. os. lp.: *jestem gotowy <-> jestem gotowa* (według `speaker_gender`).
-     * 2. os. lp.: *jesteś pewien <-> jesteś pewna*, *bądź ostrożny <-> bądź ostrożna* (według `target_gender`).
+     * 1. os. lp.: *jestem gotowy <-> jestem gotowa* (według `speaker_gender`, pod warunkiem `speaker_confidence >= 0.95`).
+     * 2. os. lp.: *jesteś pewien <-> jesteś pewna*, *bądź ostrożny <-> bądź ostrożna* (według `target_gender`, pod warunkiem `target_confidence >= 0.95`).
+   - **Bariera Granicy Klauzuli:** Dopasowanie łącznikowe jest blokowane na interpunkcji (`,`, `;`, `.`, `-`) oraz spójnikach zdań podrzędnych (*że, bo, ponieważ, gdyż, gdy, kiedy, który*), zabezpieczając przymiotniki 3. osoby w zdaniach złożonych.
    - **Koordynacja Szeregów Współrzędnych:** W konstrukcjach z przymiotnikami połączonymi spójnikiem (*czy, i, oraz, albo, lub, ani, ale*) oba człony szeregu są harmonizowane symetrycznie jako jeden wektor (*jesteś naiwna czy głupia -> jesteś naiwny czy głupi*).
 
 3. **$D_{\text{pos}}(\text{RolePair\_Instrumental})$ — Pary ról społecznych w narzędniku:**
-   - Działa **wyłącznie** na rzeczownikach w Narzędniku rządzonych przez łącznik 1. lub 2. osoby (*jesteś moim najlepszym uczniem <-> jesteś moją najlepszą uczennicą*).
-   - **Immunitet Mianownika 3. Osoby:** Zdania prezentacyjne i deiktyczne 3. osoby w mianowniku (*"To wspaniały syn"*, *"To nasza jedyna nadzieja"*) posiadają bezwzględny immunitet i nie podlegają modyfikacjom na formy żeńskie.
+   - Działa **wyłącznie** na rzeczownikach w Narzędniku rządzonych przez łącznik 1. lub 2. osoby w tej samej klauzuli (*jesteś moim najlepszym uczniem <-> jesteś moją najlepszą uczennicą*), pod warunkiem `target_confidence >= 0.95`.
+   - **Bariera Granicy Klauzuli:** Weryfikacja orzecznika narzędnikowego nie przekracza przecinków ani spójników podrzędnych.
+   - **Immunitet Mianownika 3. Osoby:** Zdania prezentacyjne i deiktyczne 3. osoby w mianowniku (*"To wspaniały syn"*, *"To nasza jedyna nadzieja"*) posiadają pełny immunitet i nie podlegają modyfikacjom na formy żeńskie.
    - Ochrona rzeczowników metaforycznych i epikoenicznych (*jesteś moją nadzieją / zgubą* pozostaje nienaruszone).
 
 4. **$D_{\text{pos}}(\text{PluralGroup})$ — Virility grup We i You:**
-   - Uzgadnia formy 1. os. lm. według `plural_group_gender` oraz 2. os. lm. według `you_group_gender`.
-   - Grupa o statusie `VIRILE` (obecny mężczyzna) wymusza końcówki męskoosobowe: *-liśmy*, *-liście*, *byliśmy*, *byliście*. Błędne formy niemęskoosobowe są korygowane (*poszłyście -> poszliście*, *zrobiłyście -> zrobiliście*).
-   - Grupa o statusie `NON_VIRILE` chroni formy niemęskoosobowe: *-łyśmy*, *-łyście*.
-   - Grupa o statusie `AMBIGUOUS` zachowuje tożsamość $T(x) = x$.
+   - Uzgadnia formy 1. os. lm. (`-liśmy / -łyśmy`) wyłącznie według `plural_group_gender` oraz 2. os. lm. (`-liście / -łyście`) wyłącznie według `you_group_gender`.
+   - Grupa o statusie `VIRILE` (potwierdzony mężczyzna w danej grupie) wymusza końcówki męskoosobowe: *-liśmy*, *-liście*, *byliśmy*, *byliście*. Błędne formy niemęskoosobowe są korygowane (*poszłyście -> poszliście*, *zrobiłyście -> zrobiliście*).
+   - Grupa o statusie `NON_VIRILE` (wyłącznie zweryfikowane kobiety P0) chroni formy niemęskoosobowe: *-łyśmy*, *-łyście*.
+   - Grupa o statusie `AMBIGUOUS` zachowuje tożsamość $T(x) = x$ (brak mutacji przy braku pewności ontologicznej).
 
 5. **$D_{\text{pos}}(\text{PrepDeclension})$ — Rekcja przyimkowa i higiena onomastyczna:**
-   - Koryguje formy mianownikowe imion po przyimkach nieablatywnych (*dla [Imię] -> dla [Imienia]*).
+   - Koryguje formy mianownikowe imion po przyimkach nieablatywnych (*dla [Imię] -> dla [Imienia]*). Odmiana dotyczy wyłącznie tokenu równego formie mianownika (`token == paradigm.M`) nieposiadającego sufiksu przymiotnikowego.
    - **Ochrona przed podwójną deklinacją:** Blokuje doklejanie końcówek do wyrazów posiadających już sufiksy przymiotnikowe w przypadkach zależnych (*-ymem -> -ym*).
-   - **Rygor ontologiczny EntityCategory.TOPONYM:** Funkcja `strip_false_ablative_instrumental` usuwa fałszywy narzędnik ablatywny po przyimku pochodzenia `z` (*z [Toponim]* zamiast *-em*) wyłącznie dla bytów zweryfikowanych w ontologii jako toponimy, bezwzględnie chroniąc relację towarzyszenia dla `EntityCategory.ANTHROPONYM` (*z Janem*, *z Anną* pozostają w 100% nienaruszone).
-   - Koryguje wołacz tematów na afrykaty (*-tzu*, np. tematy obcojęzyczne zakończone na afrykaty: *-tz -> -tzu* zamiast *-tzie*).
+   - **Rygor ontologiczny EntityCategory.TOPONYM:** Funkcja `strip_false_ablative_instrumental` usuwa fałszywy narzędnik ablatywny po przyimku pochodzenia `z` (*z [Toponim]* zamiast *-em*) wyłącznie dla bytów zweryfikowanych w ontologii jako toponimy, w pełni chroniąc relację towarzyszenia dla `EntityCategory.ANTHROPONYM` (*z [AntroponimMęski]*, *z [AntroponimŻeński]* pozostają w 100% nienaruszone).
+   - Koryguje wołacz tematów obcojęzycznych na afrykaty (*-tzu*, tematy na afrykaty: *-tz -> -tzu* zamiast *-tzie*).
    - **Eliminacja kazuistycznych łat przymiotnikowych:** Zgodnie z zasadą Primary LLM Translation Authority i Zero-Literal, usunięto protezę `fix_virile_adjective_orthography` – model LLM stanowi nadrzędny autorytet w doborze naturalnych form przymiotnikowych polszczyzny.
 
 ---
@@ -658,6 +664,7 @@ Dzięki temu model LLM zachowuje pełną suwerenność stylistyczną, leksykaln�
    ```
 
 #### C. Faza 7: Geometria planszy, metryki ekranowe i higiena interpunkcji
+W trybie `strict_positive_domain=True` wykluczono usuwanie słów w dialogu pod pretekstem redukcji CPS (pełna ochrona integralności wypowiedzi modelu LLM: $T(x) = x$). Faza 7 ogranicza się do technicznego łamania wierszy `\N` (CPL $\le 38$, max 2 wiersze), higieny interpunkcji oraz nieinwazyjnego logowania ostrzeżeń CPS.
 1. **Pomiary Metryk AVT:**
    - **CPS (Znaki na sekundę):** $\text{CPS} = \frac{\text{długość czystego tekstu}}{\max(\Delta t, 0.5)} \le 17.0\text{ z/s}$.
    - **CPL (Znaki w wierszu):** Maksymalnie 38 znaków na wiersz ($\text{CPL} \le 38$).
@@ -689,8 +696,8 @@ Poniższa macierz przedstawia kompletny, fizyczny przepływ informacji przez wsz
 | **2** | System plików | `avt_linter.py:load_subtitle_file_resilient` | Plik `.ass` / `.srt` na dysku | `translator.py` | Obiekt `pysubs2.SSAFile` (lista `SSAEvent`) | Bezstratne załadowanie bazy czasowej i stylów napisów |
 | **3** | `metadata.py` | `clean_anime_filename` & `strip_season_suffix` | Nazwa pliku wideo / napisów (`str`) | `metadata.py` | Czysty ciąg znaków tytułu (`str`) | Usunięcie sum kontrolnych, tagów fansub i sufiksów sequeli |
 | **4** | AniList API | `metadata.py:fetch_anilist_metadata` | GraphQL HTTP POST (`graphql.anilist.co`) | `metadata.py` | Słownik JSON metadanych serii | Pozyskanie oficjalnych realiów, gatunków i 16 głównych postaci |
-| **5** | Kontener MKV/MP4 | FFmpeg subprocess | Strumień japońskiego audio PCM 16kHz mono | `profiler.py` | Tablica próbek `np.ndarray` float32 w RAM | Przygotowanie sygnału do analizy DSP i transkrypcji |
-| **6** | `profiler.py` | `EpistemicAudioTriangulator.estimate_f0_pyin` | Próbki audio PCM (`np.ndarray`) | `profiler.py` | Wartość numeryczna $\text{median}(F_0)$ (`float`) | Wyznaczenie wysokości głosu seiyū i twardego determinizmu męskiego |
+| **5** | Kontener MKV/MP4 | FFmpeg subprocess | Strumień japońskiego audio PCM 16kHz mono | `profiler.py` | Tablica próbek `numpy.ndarray` float32 w RAM | Przygotowanie sygnału do analizy DSP i transkrypcji |
+| **6** | `profiler.py` | `EpistemicAudioTriangulator.estimate_f0_pyin` | Próbki audio PCM (`numpy.ndarray`) | `profiler.py` | Wartość numeryczna $\text{median}(F_0)$ (`float`) | Wyznaczenie wysokości głosu seiyū i twardego determinizmu męskiego |
 | **7** | Faster-Whisper | `whisper_disambiguator.py:disambiguate_line` | Próbki audio + tekst EN | `translator.py` | Obiekt `DisambiguationTag` | Identyfikacja rejestru K1–K8, deiksy i polaryzacji |
 | **8** | Dysk / Gemini | `profiler.py:EpisodeProfiler.profile_episode` | Pierwsze 100k znaków dialogu + metadane | `series_memory.py` | Obiekt Pydantic `EpisodeProfile` | Ekstrakcja relacji, kanonu mangi, pułapek i idiolektów |
 | **9** | Dysk / RAM | `series_memory.py:_sanitize_loaded_bible_in_ram` | Plik `{slug}_bible.json` | `series_memory.py` | Wrapper `CharacterRegistryDict` w RAM | Samolecząca promocja płci do P0, separacja relacji i indeks $O(1)$ |
@@ -712,23 +719,27 @@ Poniższa macierz przedstawia kompletny, fizyczny przepływ informacji przez wsz
 
 W celu zagwarantowania niezmienności reguł architektonicznych i eliminacji regresji, potok chroniony jest przez 4 zautomatyzowane bramki weryfikacyjne:
 
-### 1. Weryfikator Integralności 8 Poprawek Architektonicznych (`verify_8_fixes.py`)
-Skrypt audytuje 8 kluczowych filarów architektury (8/8 [PASS]):
-1. **Likwidacja cyklicznego virility:** Virility wynika wyłącznie z tożsamości uczestników sceny (zakaz wnioskowania z polskich form czasownikowych `-liśmy / -liście`).
-2. **Autonomia składniowa polskiego przekładu:** Skrypt EN dostarcza wyłącznie treści semantycznej i faktów, bez narzucania polskiej składni.
-3. **Czystość nagłówków kwestii:** Brak preskryptywnych podpowiedzi końcówek (`-łaś / -łem`) w promptach; stan przekazywany jednokanałowo przez wektor telemetrii.
-4. **Deklaratywny Profiler:** Zastąpienie imperatywnych pól polami opisowymi (`contextual_guidance`, `relational_guidance`, `continuity_guidance` zamiast `mandatory_direction`, `strict_direction_pl`, `continuity_directive`).
-5. **Zasilanie Fazy 2 wektorem telemetrii:** Verifier weryfikuje styl z zachowaniem ustalonej telemetrii ontologicznej i paradygmatów fleksyjnych.
-6. **Bariera epistemiczna wyjścia Fazy 1:** Zgadywana płeć z wyjścia LLM (`confidence = 0.70`) nie zanieczyszcza zweryfikowanej bazy P0 (`has_verified_gender = True`).
-7. **Czystość PrepDeclension i rygor TOPONYM:** Eliminacja protezy przymiotnikowej `fix_virile_adjective_orthography` oraz twardy rygor `EntityCategory.TOPONYM` przy ablatywnym `z`.
-8. **Spójność dokumentacji:** Pełna zgodność raportu technicznego z faktycznym kodem.
+### 1. Weryfikator Integralności 12 Poprawek Architektonicznych (`verify_12_fixes.py`)
+Skrypt audytuje 12 kluczowych filarów architektury Standardu 9.0 (12/12 [PASS]):
+1. **Rozdzielenie grup We_Group i You_Group w sygnaturze lintera:** Niezależne parametry `plural_group_gender` oraz `you_group_gender`.
+2. **Twarde bramki pewności:** Wymóg `speaker_confidence >= 0.95` oraz `target_confidence >= 0.95` w operatorach $D_{\text{pos}}$ lintera.
+3. **Separacja epistemiczna P0 vs P1 dla Profilera:** Hipotezy tekstowe z Pre-Passu Profilera otrzymują status P1 (`confidence = 0.85`), nie blokując pomiarów F0.
+4. **Bezpieczna promocja płci z początku opisu i ochrona diakrytyków:** Kotwiczenie na początku pola `description` oraz zachowanie polskich znaków w `normalize_actor_tag`.
+5. **Ochrona linii wieloadresatowych (SubTurn Pivot Partitioning):** Przy sprzecznych adresatach w pod-turach cała linia otrzymuje `target_gender = "AMBIGUOUS"` i `target_confidence = 0.0`.
+6. **Bariera granicy klauzuli w CopulaAdj i RolePair_Instrumental:** Blokada przenikania orzecznika przez interpunkcję i spójniki podrzędne.
+7. **Kapowanie pewności Lookaheadu w scenach wieloosobowych do 0.85:** 3-stopniowa gradacja (Wołacz = 0.98, Diada = 0.95, Lookahead = 0.85).
+8. **Nieprzełamywalność determinizmu męskiego F0 <= 135 Hz:** Wykluczenie przełamywania pomiaru fonicznego F0 przez zaimki angielskie.
+9. **Pełna tożsamość w TELEMETRIA i eliminacja sztywnego nakazu 'ty':** Przekazywanie tożsamości mówcy, adresata i rejestru społecznego.
+10. **Przekazywanie audio_jp i semantic_anchor do Fazy 2 (DialogueVerifier):** Zasilanie Script Doctora transkrypcją seiyū i kotwicą semantyczną.
+11. **Brak usuwania słów w Fazie 7 i czysta rekcja PrepDeclension:** Eliminacja usuwania wypełniaczy w trybie ścisłym i ochrona mianownika.
+12. **Czystość metajęzykowa dokumentacji i kodu:** Raport wolny od instancji onomastycznych, kamuflaży i preskryptywności.
 
-### 2. Skaner Czystości Strukturalnej i Zakazu Instancji (`verify_purity.py`)
+### 2. Skaner Czystości Strukturalnej i Eliminacji Instancji (`verify_purity.py`)
 11-bramkowy walidator AST (11/11 [PASS], Standard 9.0):
-- **Bramka 1:** Składnia i integralność AST we wszystkich plikach `.py`.
-- **Bramki 2–4:** Zakaz instancji postaci i krain ze zgłoszeń, zakaz cytowanych dialogów w regułach, zakaz etykiet kontrastowych.
-- **Bramki 5–6:** Zakaz słów ALL-CAPS w tekście opisowym, zakaz preskryptywności i alarmów w promptach.
-- **Bramki 7–9:** Zakaz zahardkodowanych slugów serii, statycznych kolekcji nazw i ręcznych łat odmian.
+- **Bramka 1:** Składnia i integralność AST we wszystkich plikach `.py` oraz dokumentacji.
+- **Bramki 2–4:** Eliminacja instancji postaci i krain ze zgłoszeń, wykluczenie cytowanych dialogów w regułach, brak etykiet kontrastowych.
+- **Bramki 5–6:** Eliminacja słów ALL-CAPS w tekście opisowym, wykluczenie preskryptywności i alarmów w promptach.
+- **Bramki 7–9:** Eliminacja zahardkodowanych slugów serii, statycznych kolekcji nazw i ręcznych łat odmian.
 - **Bramki 10–11:** Czystość kodu DSP/NumPy oraz obowiązkowy domyślny parametr `strict_positive_domain=True`.
 
 ### 3. Forensic Diff & AST Auditor (`audit_diff.ps1`)
@@ -736,7 +747,7 @@ Audytor zmian w systemie kontroli wersji Git (VICTORY CONFIRMED):
 - **1/4 Zero-Cosmetic Gate:** Wymóg fizycznej modyfikacji rdzenia silnika (Warstwy 1–4) przy zakazie ręcznej edycji plików `.ass`/`.srt`/`*_bible.json`.
 - **2/4 Zero-Onomastic & Stem Leakage Gate:** Zero wycieku nazw własnych ani ich rdzeni do kodu produkcyjnego.
 - **3/4 End-to-End Wiring Gate:** Brak martwego kodu (każda nowa definicja musi mieć min. 2 wystąpienia).
-- **4/4 Test Integrity Gate:** Wymóg testów jednostkowych i zakaz mockowania logiki domenowej silnika (`unittest.mock.patch`).
+- **4/4 Test Integrity Gate:** Wymóg testów jednostkowych i wykluczenie mockowania logiki domenowej silnika (`unittest.mock.patch`).
 
 ### 4. Pakiet Testów Regresyjnych Pytest (`test_system.py`)
 - **179/179 PASSED (100% testów zielonych, Zero Regression Lock):**
