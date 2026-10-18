@@ -3,155 +3,335 @@
   "characters": {
     "Wang Ben": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Ben",
+        "Wang Ben"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Mǎ Nanci": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Ma",
+        "Mǎ",
+        "Mǎ Nanci",
+        "Nanci"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Fan Yang": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Fan",
+        "Fan Yang",
+        "Yang"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Xin": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Xin"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Wang Jian": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Jian",
+        "Wang Jian"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Bi": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Bi"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Yang Duanhe": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
-      "gender": "MALE"
+      "description": "KOBIETA (wyodrębniono z relacji serii)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Duanhe",
+        "Yang",
+        "Yang Duanhe"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Shun Shuishu": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Shuishu",
+        "Shun Shuishu"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Lozo": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Lozo"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Oddział Yu Feng": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Feng",
+        "Oddział",
+        "Oddział Yu Feng",
+        "Yu"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Han Chang": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Chang",
+        "Han",
+        "Han Chang"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Wei Ping / Song Zuo / Tian Yong": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Ping",
+        "Wei Ping",
+        "Wei Ping / Song Zuo / Tian Yong"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Ban You": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Ban",
+        "Ban You",
+        "You"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Ou Hon": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Hon",
+        "Ou",
+        "Ou Hon"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Heki": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Heki"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Yotanwa": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
-      "gender": "MALE"
+      "description": "KOBIETA (wyodrębniono z relacji serii)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Yotanwa"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Shun Sui Ju": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Ju",
+        "Shun Sui Ju",
+        "Sui"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Rozo": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Rozo"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Danto": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Danto"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Shin": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Shin"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Mou Ten": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Mou",
+        "Mou Ten",
+        "Ten"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Ri Boku": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Boku",
+        "Ri",
+        "Ri Boku"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Meng Tian": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Meng",
+        "Meng Tian",
+        "Tian"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Ding Yang": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Ding",
+        "Ding Yang",
+        "Yang"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
-    "Wang Ben -> Mǎ Nanci": {
-      "description": "Zwrot: 'po imieniu: Mǎ Nanci / dowódco Zhao' (wrogowie / wrogowie na polu bitwy)"
-    },
-    "Fan Yang -> Wang Ben": {
-      "description": "Zwrot: 'panie Ben / paniczu Ben' (podwładny -> dowódca / pan feudalny)"
-    },
-    "Xin -> Wang Jian": {
-      "description": "Zwrot: 'generale Wang Jian' (podwładny -> naczelny wódz)"
-    },
-    "Wang Jian -> Xin": {
-      "description": "Zwrot: 'na ty / bezpośrednio rozkazująco' (wielki generał -> dowódca oddziału)"
-    },
-    "Bi -> Yang Duanhe": {
-      "description": "Zwrot: 'Wasza Wysokość / Pani' (sojusznik / dowódca niższy rangą -> Królowa Gór)"
-    },
-    "Yang Duanhe -> Bi": {
-      "description": "Zwrot: 'Generale Bi' (dowódczyni naczelna -> dowódca posiłków)"
-    },
-    "Shun Shuishu -> Lozo": {
-      "description": "Zwrot: 'Królu Quanrong' (poseł/strateg -> niezależny władca)"
-    },
-    "Lozo -> Shun Shuishu": {
-      "description": "Zwrot: 'na ty / człowieku z nizin' (bezwzględny król plemienny -> obcy poseł)"
-    },
-    "Wang Ben -> Oddział Yu Feng": {
-      "description": "Zwrot: 'Żołnierze Yu Feng / moi ludzie' (dowódca -> podwładni)"
-    },
-    "Han Chang -> Wang Ben": {
-      "description": "Zwrot: 'Młody panie / dowódco Ben' (przyboczny -> dowódca)"
-    },
-    "Xin -> Wei Ping / Song Zuo / Tian Yong": {
-      "description": "Zwrot: 'po imieniu / wy, durnie' (dowódca -> towarzysze broni)"
-    },
-    "Ban You -> Ou Hon": {
-      "description": "Zwrot: 'panie Hon / dziedzicu Hon' (sługa / zastępca -> młody pan)"
-    },
-    "Heki -> Yotanwa": {
-      "description": "Zwrot: 'Królowo Yotanwo / Pani' (sojuszniczy generał nizin -> Królowa Gór)"
-    },
-    "Shun Sui Ju -> Rozo": {
-      "description": "Zwrot: 'Królu Kenjuu' (poseł Zhao -> wrogi władca plemienny)"
-    },
-    "Danto -> Heki": {
-      "description": "Zwrot: 'nijaki generale z nizin' (wódz plemienia Feikong -> generał Qin)"
-    },
-    "Shin -> Mou Ten": {
-      "description": "Zwrot: 'Mou Ten' (braterska rywalizacja / sojusznicy z równorzędnych oddziałów)"
-    },
-    "Shin -> Ri Boku": {
-      "description": "Zwrot: 'Ri Boku' (zażarty wróg / śmiertelny przeciwnik)"
-    },
-    "Mou Ten -> Shin": {
-      "description": "Zwrot: 'Shin' (towarzysz broni / przyjaciel)"
-    },
-    "Ri Boku -> Shin": {
-      "description": "Zwrot: 'Dowódco Shin' (szacunek i chłodny dystans wobec obiecującego przeciwnika)"
-    },
-    "Meng Tian -> Xin": {
-      "description": "Zwrot: 'na ty / po imieniu: Shin' (towarzysze broni / rywale)"
-    },
-    "Xin -> Meng Tian": {
-      "description": "Zwrot: 'na ty / po imieniu: Mou Ten' (towarzysze broni / rywale)"
-    },
-    "Ding Yang -> Meng Tian": {
-      "description": "Zwrot: 'Generale Mou Ten / Panie Mou Ten' (podwładny -> tymczasowy dowódca)"
+    "Wei Ping": {
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "description": "mężczyzna (postać)",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Ping",
+        "Wei Ping"
+      ],
+      "entity_category": "ANTHROPONYM"
     }
   },
   "glossary": {
@@ -408,28 +588,52 @@
     "Right flank": "Prawe skrzydło"
   },
   "relationships": {
-    "Wang Ben -> Mǎ Nanci": "Zwrot: 'po imieniu: Mǎ Nanci / dowódco Zhao' (wrogowie / wrogowie na polu bitwy)",
-    "Fan Yang -> Wang Ben": "Zwrot: 'panie Ben / paniczu Ben' (podwładny -> dowódca / pan feudalny)",
-    "Xin -> Wang Jian": "Zwrot: 'generale Wang Jian' (podwładny -> naczelny wódz)",
-    "Wang Jian -> Xin": "Zwrot: 'na ty / bezpośrednio rozkazująco' (wielki generał -> dowódca oddziału)",
-    "Bi -> Yang Duanhe": "Zwrot: 'Wasza Wysokość / Pani' (sojusznik / dowódca niższy rangą -> Królowa Gór)",
-    "Yang Duanhe -> Bi": "Zwrot: 'Generale Bi' (dowódczyni naczelna -> dowódca posiłków)",
-    "Shun Shuishu -> Lozo": "Zwrot: 'Królu Quanrong' (poseł/strateg -> niezależny władca)",
-    "Lozo -> Shun Shuishu": "Zwrot: 'na ty / człowieku z nizin' (bezwzględny król plemienny -> obcy poseł)",
-    "Wang Ben -> Oddział Yu Feng": "Zwrot: 'Żołnierze Yu Feng / moi ludzie' (dowódca -> podwładni)",
-    "Han Chang -> Wang Ben": "Zwrot: 'Młody panie / dowódco Ben' (przyboczny -> dowódca)",
-    "Xin -> Wei Ping / Song Zuo / Tian Yong": "Zwrot: 'po imieniu / wy, durnie' (dowódca -> towarzysze broni)",
-    "Ban You -> Ou Hon": "Zwrot: 'panie Hon / dziedzicu Hon' (sługa / zastępca -> młody pan)",
-    "Heki -> Yotanwa": "Zwrot: 'Królowo Yotanwo / Pani' (sojuszniczy generał nizin -> Królowa Gór)",
-    "Shun Sui Ju -> Rozo": "Zwrot: 'Królu Kenjuu' (poseł Zhao -> wrogi władca plemienny)",
-    "Danto -> Heki": "Zwrot: 'nijaki generale z nizin' (wódz plemienia Feikong -> generał Qin)",
-    "Shin -> Mou Ten": "Zwrot: 'Mou Ten' (braterska rywalizacja / sojusznicy z równorzędnych oddziałów)",
-    "Shin -> Ri Boku": "Zwrot: 'Ri Boku' (zażarty wróg / śmiertelny przeciwnik)",
-    "Mou Ten -> Shin": "Zwrot: 'Shin' (towarzysz broni / przyjaciel)",
-    "Ri Boku -> Shin": "Zwrot: 'Dowódco Shin' (szacunek i chłodny dystans wobec obiecującego przeciwnika)",
-    "Meng Tian -> Xin": "Zwrot: 'na ty / po imieniu: Shin' (towarzysze broni / rywale)",
-    "Xin -> Meng Tian": "Zwrot: 'na ty / po imieniu: Mou Ten' (towarzysze broni / rywale)",
-    "Ding Yang -> Meng Tian": "Zwrot: 'Generale Mou Ten / Panie Mou Ten' (podwładny -> tymczasowy dowódca)"
+    "Wang Ben -> Mǎ Nanci": "Zwrot: 'po imieniu: Mǎ Nanci / dowódco Zhao' (wrogowie / wrogowie na polu bitwy) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Fan Yang -> Wang Ben": "Zwrot: 'panie Ben / paniczu Ben' (podwładny -> dowódca / pan feudalny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Xin -> Wang Jian": "Zwrot: 'generale Wang Jian' (podwładny -> naczelny wódz) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Wang Jian -> Xin": "Zwrot: 'na ty / bezpośrednio rozkazująco' (wielki generał -> dowódca oddziału) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Bi -> Yang Duanhe": "Zwrot: 'Wasza Wysokość / Pani' (sojusznik / dowódca niższy rangą -> Królowa Gór) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Yang Duanhe -> Bi": "Zwrot: 'Generale Bi' (dowódczyni naczelna -> dowódca posiłków) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Shun Shuishu -> Lozo": "Zwrot: 'Królu Quanrong' (poseł/strateg -> niezależny władca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Lozo -> Shun Shuishu": "Zwrot: 'na ty / człowieku z nizin' (bezwzględny król plemienny -> obcy poseł) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Wang Ben -> Oddział Yu Feng": "Zwrot: 'Żołnierze Yu Feng / moi ludzie' (dowódca -> podwładni) [GRUPA MĘŻCZYZN - Wymóg rodzaju męskoosobowego: -liście / byliście gotowi] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Han Chang -> Wang Ben": "Zwrot: 'Młody panie / dowódco Ben' (przyboczny -> dowódca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Xin -> Wei Ping / Song Zuo / Tian Yong": "Zwrot: 'po imieniu / wy, durnie' (dowódca -> towarzysze broni) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Ban You -> Ou Hon": "Zwrot: 'panie Hon / dziedzicu Hon' (sługa / zastępca -> młody pan) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Heki -> Yotanwa": "Zwrot: 'Królowo Yotanwo / Pani' (sojuszniczy generał nizin -> Królowa Gór) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Shun Sui Ju -> Rozo": "Zwrot: 'Królu Kenjuu' (poseł Zhao -> wrogi władca plemienny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Danto -> Heki": "Zwrot: 'nijaki generale z nizin' (wódz plemienia Feikong -> generał Qin) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Shin -> Mou Ten": "Zwrot: 'Mou Ten' (braterska rywalizacja / sojusznicy z równorzędnych oddziałów) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Shin -> Ri Boku": "Zwrot: 'Ri Boku' (zażarty wróg / śmiertelny przeciwnik) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Mou Ten -> Shin": "Zwrot: 'Shin' (towarzysz broni / przyjaciel) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Ri Boku -> Shin": "Zwrot: 'Dowódco Shin' (szacunek i chłodny dystans wobec obiecującego przeciwnika) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Meng Tian -> Xin": "Zwrot: 'na ty / po imieniu: Shin' (towarzysze broni / rywale) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Xin -> Meng Tian": "Zwrot: 'na ty / po imieniu: Mou Ten' (towarzysze broni / rywale) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Ding Yang -> Meng Tian": "Zwrot: 'Generale Mou Ten / Panie Mou Ten' (podwładny -> tymczasowy dowódca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+  },
+  "relations": {
+    "Wang Ben -> Mǎ Nanci": "Zwrot: 'po imieniu: Mǎ Nanci / dowódco Zhao' (wrogowie / wrogowie na polu bitwy) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Fan Yang -> Wang Ben": "Zwrot: 'panie Ben / paniczu Ben' (podwładny -> dowódca / pan feudalny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Xin -> Wang Jian": "Zwrot: 'generale Wang Jian' (podwładny -> naczelny wódz) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Wang Jian -> Xin": "Zwrot: 'na ty / bezpośrednio rozkazująco' (wielki generał -> dowódca oddziału) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Bi -> Yang Duanhe": "Zwrot: 'Wasza Wysokość / Pani' (sojusznik / dowódca niższy rangą -> Królowa Gór) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Yang Duanhe -> Bi": "Zwrot: 'Generale Bi' (dowódczyni naczelna -> dowódca posiłków) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Shun Shuishu -> Lozo": "Zwrot: 'Królu Quanrong' (poseł/strateg -> niezależny władca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Lozo -> Shun Shuishu": "Zwrot: 'na ty / człowieku z nizin' (bezwzględny król plemienny -> obcy poseł) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Wang Ben -> Oddział Yu Feng": "Zwrot: 'Żołnierze Yu Feng / moi ludzie' (dowódca -> podwładni) [GRUPA MĘŻCZYZN - Wymóg rodzaju męskoosobowego: -liście / byliście gotowi] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Han Chang -> Wang Ben": "Zwrot: 'Młody panie / dowódco Ben' (przyboczny -> dowódca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Xin -> Wei Ping / Song Zuo / Tian Yong": "Zwrot: 'po imieniu / wy, durnie' (dowódca -> towarzysze broni) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Ban You -> Ou Hon": "Zwrot: 'panie Hon / dziedzicu Hon' (sługa / zastępca -> młody pan) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Heki -> Yotanwa": "Zwrot: 'Królowo Yotanwo / Pani' (sojuszniczy generał nizin -> Królowa Gór) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Shun Sui Ju -> Rozo": "Zwrot: 'Królu Kenjuu' (poseł Zhao -> wrogi władca plemienny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Danto -> Heki": "Zwrot: 'nijaki generale z nizin' (wódz plemienia Feikong -> generał Qin) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Shin -> Mou Ten": "Zwrot: 'Mou Ten' (braterska rywalizacja / sojusznicy z równorzędnych oddziałów) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Shin -> Ri Boku": "Zwrot: 'Ri Boku' (zażarty wróg / śmiertelny przeciwnik) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Mou Ten -> Shin": "Zwrot: 'Shin' (towarzysz broni / przyjaciel) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Ri Boku -> Shin": "Zwrot: 'Dowódco Shin' (szacunek i chłodny dystans wobec obiecującego przeciwnika) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Meng Tian -> Xin": "Zwrot: 'na ty / po imieniu: Shin' (towarzysze broni / rywale) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Xin -> Meng Tian": "Zwrot: 'na ty / po imieniu: Mou Ten' (towarzysze broni / rywale) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Ding Yang -> Meng Tian": "Zwrot: 'Generale Mou Ten / Panie Mou Ten' (podwładny -> tymczasowy dowódca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
   },
   "declensions": {
     "Wang Ben": {
@@ -494,13 +698,13 @@
     },
     "Yang Duanhe": {
       "M": "Yang Duanhe",
-      "D": "Yanga Duanhe",
-      "C": "Yangowi Duanhe",
-      "B": "Yanga Duanhe",
-      "N": "Yangiem Duanhe",
-      "Ms": "Yangu Duanhe",
-      "W": "Yangu Duanhe",
-      "gender": "MALE"
+      "D": "Yang Duanhe",
+      "C": "Yang Duanhe",
+      "B": "Yang Duanhe",
+      "N": "Yang Duanhe",
+      "Ms": "Yang Duanhe",
+      "W": "Yang Duanhe",
+      "gender": "FEMALE"
     },
     "Shun Shuishu": {
       "M": "Shun Shuishu",
@@ -542,16 +746,6 @@
       "W": "Hanie Changu",
       "gender": "MALE"
     },
-    "Wei Ping / Song Zuo / Tian Yong": {
-      "M": "Wei Ping / Song Zuo / Tian Yong",
-      "D": "Wei Pinga / Songa Zuo / Tiana Yonga",
-      "C": "Wei Pingowi / Songowi Zuo / Tianowi Yongowi",
-      "B": "Wei Pinga / Songa Zuo / Tiana Yonga",
-      "N": "Wei Pingiem / Songiem Zuo / Tianem Yongiem",
-      "Ms": "Wei Pingu / Songu Zuo / Tianie Yongu",
-      "W": "Wei Pingu / Songu Zuo / Tianie Yongu",
-      "gender": "MALE"
-    },
     "Ban You": {
       "M": "Ban You",
       "D": "Bana You",
@@ -590,7 +784,7 @@
       "N": "Yotanwą",
       "Ms": "Yotanwie",
       "W": "Yotanwo",
-      "gender": "MALE"
+      "gender": "FEMALE"
     },
     "Shun Sui Ju": {
       "M": "Shun Sui Ju",
@@ -671,207 +865,6 @@
       "Ms": "Dingu Yangu",
       "W": "Dingu Yangu",
       "gender": "MALE"
-    },
-    "Wang Ben -> Mǎ Nanci": {
-      "M": "Wang Ben -> Mǎ Nanci",
-      "D": "Wanga Bena -> Mǎa Nanci",
-      "C": "Wangowi Benowi -> Mǎowi Nanci",
-      "B": "Wanga Bena -> Mǎa Nanci",
-      "N": "Wangem Benem -> Mǎem Nanci",
-      "Ms": "Wangu Benie -> Mǎie Nanci",
-      "W": "Wangu Benie -> Mǎie Nanci"
-    },
-    "Fan Yang -> Wang Ben": {
-      "M": "Fan Yang -> Wang Ben",
-      "D": "Fana Yanga -> Wanga Bena",
-      "C": "Fanowi Yangowi -> Wangowi Benowi",
-      "B": "Fana Yanga -> Wanga Bena",
-      "N": "Fanem Yangem -> Wangem Benem",
-      "Ms": "Fanie Yangu -> Wangu Benie",
-      "W": "Fanie Yangu -> Wangu Benie"
-    },
-    "Xin -> Wang Jian": {
-      "M": "Xin -> Wang Jian",
-      "D": "Xina -> Wanga Jiana",
-      "C": "Xinowi -> Wangowi Jianowi",
-      "B": "Xina -> Wanga Jiana",
-      "N": "Xinem -> Wangem Jianem",
-      "Ms": "Xinie -> Wangu Jianie",
-      "W": "Xinie -> Wangu Jianie"
-    },
-    "Wang Jian -> Xin": {
-      "M": "Wang Jian -> Xin",
-      "D": "Wanga Jiana -> Xina",
-      "C": "Wangowi Jianowi -> Xinowi",
-      "B": "Wanga Jiana -> Xina",
-      "N": "Wangem Jianem -> Xinem",
-      "Ms": "Wangu Jianie -> Xinie",
-      "W": "Wangu Jianie -> Xinie"
-    },
-    "Bi -> Yang Duanhe": {
-      "M": "Bi -> Yang Duanhe",
-      "D": "Bi -> Yanga Duanhe",
-      "C": "Bi -> Yangowi Duanhe",
-      "B": "Bi -> Yanga Duanhe",
-      "N": "Bi -> Yangem Duanhe",
-      "Ms": "Bi -> Yangu Duanhe",
-      "W": "Bi -> Yangu Duanhe",
-      "gender": "FEMALE"
-    },
-    "Yang Duanhe -> Bi": {
-      "M": "Yang Duanhe -> Bi",
-      "D": "Yanga Duanhe -> Bi",
-      "C": "Yangowi Duanhe -> Bi",
-      "B": "Yanga Duanhe -> Bi",
-      "N": "Yangem Duanhe -> Bi",
-      "Ms": "Yangu Duanhe -> Bi",
-      "W": "Yangu Duanhe -> Bi"
-    },
-    "Shun Shuishu -> Lozo": {
-      "M": "Shun Shuishu -> Lozo",
-      "D": "Shuna Shuishu -> Lozo",
-      "C": "Shunowi Shuishu -> Lozo",
-      "B": "Shuna Shuishu -> Lozo",
-      "N": "Shunem Shuishu -> Lozo",
-      "Ms": "Shunie Shuishu -> Lozo",
-      "W": "Shunie Shuishu -> Lozo"
-    },
-    "Lozo -> Shun Shuishu": {
-      "M": "Lozo -> Shun Shuishu",
-      "D": "Lozo -> Shuna Shuishu",
-      "C": "Lozo -> Shunowi Shuishu",
-      "B": "Lozo -> Shuna Shuishu",
-      "N": "Lozo -> Shunem Shuishu",
-      "Ms": "Lozo -> Shunie Shuishu",
-      "W": "Lozo -> Shunie Shuishu"
-    },
-    "Wang Ben -> Oddział Yu Feng": {
-      "M": "Wang Ben -> Oddział Yu Feng",
-      "D": "Wanga Bena -> Oddziała Yu Fenga",
-      "C": "Wangowi Benowi -> Oddziałowi Yu Fengowi",
-      "B": "Wanga Bena -> Oddziała Yu Fenga",
-      "N": "Wangem Benem -> Oddziałem Yu Fengem",
-      "Ms": "Wangu Benie -> Oddziałie Yu Fengu",
-      "W": "Wangu Benie -> Oddziałie Yu Fengu"
-    },
-    "Han Chang -> Wang Ben": {
-      "M": "Han Chang -> Wang Ben",
-      "D": "Hana Changa -> Wanga Bena",
-      "C": "Hanowi Changowi -> Wangowi Benowi",
-      "B": "Hana Changa -> Wanga Bena",
-      "N": "Hanem Changem -> Wangem Benem",
-      "Ms": "Hanie Changu -> Wangu Benie",
-      "W": "Hanie Changu -> Wangu Benie"
-    },
-    "Xin -> Wei Ping / Song Zuo / Tian Yong": {
-      "M": "Xin -> Wei Ping / Song Zuo / Tian Yong",
-      "D": "Xina -> Wei Pinga / Songa Zuo / Tiana Yonga",
-      "C": "Xinowi -> Wei Pingowi / Songowi Zuo / Tianowi Yongowi",
-      "B": "Xina -> Wei Pinga / Songa Zuo / Tiana Yonga",
-      "N": "Xinem -> Wei Pingem / Songem Zuo / Tianem Yongem",
-      "Ms": "Xinie -> Wei Pingu / Songu Zuo / Tianie Yongu",
-      "W": "Xinie -> Wei Pingu / Songu Zuo / Tianie Yongu"
-    },
-    "Ban You -> Ou Hon": {
-      "M": "Ban You -> Ou Hon",
-      "D": "Ban You -> Ou Hon",
-      "C": "Ban You -> Ou Hon",
-      "B": "Ban You -> Ou Hon",
-      "N": "Ban You -> Ou Hon",
-      "Ms": "Ban You -> Ou Hon",
-      "W": "Ban You -> Ou Hon",
-      "gender": "MALE"
-    },
-    "Heki -> Yotanwa": {
-      "M": "Heki -> Yotanwa",
-      "D": "Heki -> Yotanwy",
-      "C": "Heki -> Yotanwe",
-      "B": "Heki -> Yotanwę",
-      "N": "Heki -> Yotanwą",
-      "Ms": "Heki -> Yotanwe",
-      "W": "Heki -> Yotanwo",
-      "gender": "FEMALE"
-    },
-    "Shun Sui Ju -> Rozo": {
-      "M": "Shun Sui Ju -> Rozo",
-      "D": "Shuna Sui Ju -> Rozo",
-      "C": "Shunowi Sui Ju -> Rozo",
-      "B": "Shuna Sui Ju -> Rozo",
-      "N": "Shunem Sui Ju -> Rozo",
-      "Ms": "Shunie Sui Ju -> Rozo",
-      "W": "Shunie Sui Ju -> Rozo"
-    },
-    "Danto -> Heki": {
-      "M": "Danto -> Heki",
-      "D": "Danto -> Heki",
-      "C": "Danto -> Heki",
-      "B": "Danto -> Heki",
-      "N": "Danto -> Heki",
-      "Ms": "Danto -> Heki",
-      "W": "Danto -> Heki"
-    },
-    "Shin -> Mou Ten": {
-      "M": "Shin -> Mou Ten",
-      "D": "Shina -> Mou Tena",
-      "C": "Shinowi -> Mou Tenowi",
-      "B": "Shina -> Mou Tena",
-      "N": "Shinem -> Mou Tenem",
-      "Ms": "Shinie -> Mou Tenie",
-      "W": "Shinie -> Mou Tenie"
-    },
-    "Shin -> Ri Boku": {
-      "M": "Shin -> Ri Boku",
-      "D": "Shina -> Ri Boku",
-      "C": "Shinowi -> Ri Boku",
-      "B": "Shina -> Ri Boku",
-      "N": "Shinem -> Ri Boku",
-      "Ms": "Shinie -> Ri Boku",
-      "W": "Shinie -> Ri Boku"
-    },
-    "Mou Ten -> Shin": {
-      "M": "Mou Ten -> Shin",
-      "D": "Mou Tena -> Shina",
-      "C": "Mou Tenowi -> Shinowi",
-      "B": "Mou Tena -> Shina",
-      "N": "Mou Tenem -> Shinem",
-      "Ms": "Mou Tenie -> Shinie",
-      "W": "Mou Tenie -> Shinie"
-    },
-    "Ri Boku -> Shin": {
-      "M": "Ri Boku -> Shin",
-      "D": "Ri Boku -> Shina",
-      "C": "Ri Boku -> Shinowi",
-      "B": "Ri Boku -> Shina",
-      "N": "Ri Boku -> Shinem",
-      "Ms": "Ri Boku -> Shinie",
-      "W": "Ri Boku -> Shinie"
-    },
-    "Meng Tian -> Xin": {
-      "M": "Meng Tian -> Xin",
-      "D": "Menga Tiana -> Xina",
-      "C": "Mengowi Tianowi -> Xinowi",
-      "B": "Menga Tiana -> Xina",
-      "N": "Mengem Tianem -> Xinem",
-      "Ms": "Mengu Tianie -> Xinie",
-      "W": "Mengu Tianie -> Xinie"
-    },
-    "Xin -> Meng Tian": {
-      "M": "Xin -> Meng Tian",
-      "D": "Xina -> Menga Tiana",
-      "C": "Xinowi -> Mengowi Tianowi",
-      "B": "Xina -> Menga Tiana",
-      "N": "Xinem -> Mengem Tianem",
-      "Ms": "Xinie -> Mengu Tianie",
-      "W": "Xinie -> Mengu Tianie"
-    },
-    "Ding Yang -> Meng Tian": {
-      "M": "Ding Yang -> Meng Tian",
-      "D": "Dinga Yanga -> Menga Tiana",
-      "C": "Dingowi Yangowi -> Mengowi Tianowi",
-      "B": "Dinga Yanga -> Menga Tiana",
-      "N": "Dingem Yangem -> Mengem Tianem",
-      "Ms": "Dingu Yangu -> Mengu Tianie",
-      "W": "Dingu Yangu -> Mengu Tianie"
     }
   },
   "hypocorisms": {},
@@ -913,7 +906,92 @@
     "Mou Ten": "ANTHROPONYM",
     "Ri Boku": "ANTHROPONYM",
     "Meng Tian": "ANTHROPONYM",
-    "Ding Yang": "ANTHROPONYM"
+    "Ding Yang": "ANTHROPONYM",
+    "Wei Ping": "ANTHROPONYM",
+    "Quanrong": "TOPONYM",
+    "Xiongnu": "TOPONYM",
+    "Laoyang": "TOPONYM",
+    "Laoyang Castle": "TOPONYM",
+    "Kyoukai": "TOPONYM",
+    "Kyourei": "TOPONYM",
+    "Hyou": "TOPONYM",
+    "Sosui": "TOPONYM",
+    "Garo": "TOPONYM",
+    "Gakurai": "TOPONYM",
+    "Naki": "TOPONYM",
+    "Suugen": "TOPONYM",
+    "Shousa": "TOPONYM",
+    "Hairou": "TOPONYM",
+    "Denei": "TOPONYM",
+    "Ryuro": "TOPONYM",
+    "Bihei": "TOPONYM",
+    "Bitou": "TOPONYM",
+    "Kanto": "TOPONYM",
+    "Seki": "TOPONYM",
+    "Kyou": "TOPONYM",
+    "Hakuki": "TOPONYM",
+    "Oukotsu": "TOPONYM",
+    "Koushou": "TOPONYM",
+    "Shibasaku": "TOPONYM",
+    "Ouhon": "TOPONYM",
+    "Banyou": "TOPONYM",
+    "Kanjou": "TOPONYM",
+    "Mouten": "TOPONYM",
+    "Rikusen": "TOPONYM",
+    "Kozen": "TOPONYM",
+    "Rokuomi": "TOPONYM",
+    "Kanou": "TOPONYM",
+    "Akou": "TOPONYM",
+    "Makou": "TOPONYM",
+    "Sou'ou": "TOPONYM",
+    "Shiryou": "TOPONYM",
+    "Denrimi": "TOPONYM",
+    "Raido": "TOPONYM",
+    "Maron": "TOPONYM",
+    "Ringyoku": "TOPONYM",
+    "Koku'ou": "TOPONYM",
+    "Zenou": "TOPONYM",
+    "Bajio": "TOPONYM",
+    "Tajifu": "TOPONYM",
+    "Shunmen": "TOPONYM",
+    "Kitari": "TOPONYM",
+    "Katari": "TOPONYM",
+    "Kaioku": "TOPONYM",
+    "Rishi": "TOPONYM",
+    "Saitaku": "TOPONYM",
+    "Seikyou": "TOPONYM",
+    "Rui": "TOPONYM",
+    "Kou": "TOPONYM",
+    "Youka": "TOPONYM",
+    "Houken": "TOPONYM",
+    "Rinko": "TOPONYM",
+    "Genpou": "TOPONYM",
+    "Kaishibou": "TOPONYM",
+    "Kyouen": "TOPONYM",
+    "Kaine": "TOPONYM",
+    "Futei": "TOPONYM",
+    "Batei": "TOPONYM",
+    "Ryuutou": "TOPONYM",
+    "Shunsuiju": "TOPONYM",
+    "Gakuei": "TOPONYM",
+    "Chougaryuu": "TOPONYM",
+    "Gyou'un": "TOPONYM",
+    "Kakukai": "TOPONYM",
+    "Kouyoku": "TOPONYM",
+    "Hakurei": "TOPONYM",
+    "Man'u": "TOPONYM",
+    "Sento'un": "TOPONYM",
+    "Juko'ou": "TOPONYM",
+    "Gen'u": "TOPONYM",
+    "Gaimou": "TOPONYM",
+    "Reiou": "TOPONYM",
+    "Ranbihaku": "TOPONYM",
+    "City of Sai": "TOPONYM",
+    "City of Gyou": "TOPONYM",
+    "Bushin": "TOPONYM",
+    "Kenjuu": "TOPONYM",
+    "Ryouyou": "TOPONYM",
+    "Kyoudo": "TOPONYM"
   },
   "fansub_canon": {}
 }

@@ -1,135 +1,361 @@
 {
   "anime_title": "Sasaki to Pii-chan 2nd Season",
   "characters": {
-    "Sasaki -> Peeps": {
-      "description": "Zwrot: 'na ty / Peepsie' (partnerzy, pakt magiczny z szacunkiem mentora) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]"
-    },
     "Sasaki": {
       "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
       "source": "quality_gate",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Sasaki"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Peeps": {
       "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
       "source": "quality_gate",
-      "gender": "MALE"
-    },
-    "Peeps -> Sasaki": {
-      "description": "Zwrot: 'na ty / Sasaki' (mistrz i uczeń, powiernicy) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]"
-    },
-    "Akutsu -> Sasaki": {
-      "description": "Zwrot: 'panie Sasaki / Sasaki-kun' (przełożony -> podwładny w służbach specjalnych) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Peeps"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Akutsu": {
       "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
-      "source": "quality_gate"
-    },
-    "Akutsu -> Futari Shizuka": {
-      "description": "Zwrot: 'Futari Shizuka / pani Shizuka' (przełożony -> zwerbowana agentka)"
+      "source": "quality_gate",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Akutsu"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Futari Shizuka": {
-      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
-    },
-    "Futari Shizuka -> Sasaki": {
-      "description": "Zwrot: 'na ty / Sasaki' (współpracownicy w biurze ds. zjawisk nadprzyrodzonych) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
-    },
-    "Shizuka -> Sasaki": {
-      "description": "Zwrot: 'na ty / Sasaki' (współpracownicy w biurze ds. zjawisk nadprzyrodzonych) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
-    },
-    "Hrabia Müller -> Sasaki": {
-      "description": "Zwrot: 'panie Sasaki / Sasaki-dono / baronie Sasaki' (arystokrata sojusznik -> nowo mianowany baron) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "kobieta (postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Futari",
+        "Futari Shizuka",
+        "Shizuka"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Hrabia Müller": {
-      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-      "gender": "MALE"
-    },
-    "Otonari-san -> Sasaki": {
-      "description": "Zwrot: 'proszę pana / panie Sasaki' (sąsiadka z gimnazjum -> dorosły sąsiad) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "mężczyzna (postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Hrabia Müller",
+        "Muller",
+        "Müller"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Otonari": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
-    },
-    "Abaddon -> Otonari-san": {
-      "description": "Zwrot: 'na ty / mała' (demon patron -> ludzka apostołka) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Otonari"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Abaddon": {
       "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
-      "source": "quality_gate"
-    },
-    "Pii-chan (Peeps)": {
-      "description": "postać (Główny bohater) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "source": "quality_gate",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Abaddon"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Hoshizaki-san": {
       "description": "postać (Postać drugoplanowa) [MĘŻCZYZNA]",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Hoshizaki-san"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Otonari-san": {
-      "description": "postać (Postać drugoplanowa) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-      "gender": "MALE"
+      "description": "postać (Postać drugoplanowa) [MĘŻCZYZNA]",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Otonari-san"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Elsa von Mueller": {
-      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
-    },
-    "Magical Pink (Shizuka Hachikai)": {
-      "description": "postać (Postać drugoplanowa)"
+      "description": "kobieta (postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Elsa",
+        "Elsa von Mueller",
+        "Mueller"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Shura": {
-      "description": "postać (Postać epizodyczna)"
+      "description": "postać (Postać epizodyczna)",
+      "gender": "UNKNOWN",
+      "grammatical_gender": "UNKNOWN",
+      "confidence": 0.5,
+      "priority": "P1",
+      "has_verified_gender": false,
+      "aliases": [
+        "Shura"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Marc": {
-      "description": "postać (Postać drugoplanowa)"
+      "description": "postać (Postać drugoplanowa)",
+      "gender": "UNKNOWN",
+      "grammatical_gender": "UNKNOWN",
+      "confidence": 0.5,
+      "priority": "P1",
+      "has_verified_gender": false,
+      "aliases": [
+        "Marc"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Sebastian": {
-      "description": "postać (Postać drugoplanowa)"
+      "description": "postać (Postać drugoplanowa)",
+      "gender": "UNKNOWN",
+      "grammatical_gender": "UNKNOWN",
+      "confidence": 0.5,
+      "priority": "P1",
+      "has_verified_gender": false,
+      "aliases": [
+        "Sebastian"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Hrabia Mueller": {
       "description": "postać (Postać drugoplanowa) [MĘŻCZYZNA]",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Hrabia Mueller",
+        "Mueller"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Wicehrabia French": {
-      "description": "postać (Postać drugoplanowa)"
+      "description": "postać (Postać drugoplanowa)",
+      "gender": "UNKNOWN",
+      "grammatical_gender": "UNKNOWN",
+      "confidence": 0.5,
+      "priority": "P1",
+      "has_verified_gender": false,
+      "aliases": [
+        "French",
+        "Wicehrabia",
+        "Wicehrabia French"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Josef": {
-      "description": "postać (Postać drugoplanowa)"
+      "description": "postać (Postać drugoplanowa)",
+      "gender": "UNKNOWN",
+      "grammatical_gender": "UNKNOWN",
+      "confidence": 0.5,
+      "priority": "P1",
+      "has_verified_gender": false,
+      "aliases": [
+        "Josef"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Maximilian": {
-      "description": "postać (Postać drugoplanowa)"
-    },
-    "Peeps (Pii-chan)": {
-      "description": "mężczyzna (Starożytny arcymag (Gwiezdny Mędrzec) odrodzony w ciele kanarka (ryżowca siwego)) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
-      "gender": "MALE"
-    },
-    "Otonari-san (Sąsiadka)": {
-      "description": "MĘŻCZYZNA (Uczennica gimnazjum, sąsiadka Sasakiego, apostołka demona Abaddona) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
-      "gender": "MALE"
+      "description": "postać (Postać drugoplanowa)",
+      "gender": "UNKNOWN",
+      "grammatical_gender": "UNKNOWN",
+      "confidence": 0.5,
+      "priority": "P1",
+      "has_verified_gender": false,
+      "aliases": [
+        "Maximilian"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Książę Adonis": {
-      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "mężczyzna (postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Adonis",
+        "Książę Adonis"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Książę Einhart": {
-      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "mężczyzna (postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Einhart",
+        "Książę Einhart"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Hoshizaki": {
-      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "kobieta (postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Hoshizaki"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Równiny Rectan": {
-      "description": "toponim (kraina geograficzna / równiny w innym świecie) [NIE-POSTAĆ]"
+      "description": "toponim (kraina geograficzna / równiny w innym świecie) [NIE-POSTAĆ]",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Rectan",
+        "Rowniny",
+        "Równiny",
+        "Równiny Rectan"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Herz": {
-      "description": "MĘŻCZYZNA (Król Herz, władca królestwa) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-      "gender": "MALE"
+      "description": "MĘŻCZYZNA (Król Herz, władca królestwa)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Herz"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Neighbor": {
-      "description": "KOBIETA (zweryfikowano z audio seiyū Whisper)"
+      "description": "KOBIETA (zweryfikowano z audio seiyū Whisper)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Neighbor"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Mother": {
-      "description": "KOBIETA (zweryfikowano z audio seiyū Whisper)"
+      "description": "KOBIETA (zweryfikowano z audio seiyū Whisper)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Mother"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Boyfriend": {
-      "description": "MĘŻCZYZNA (zweryfikowano z audio seiyū Whisper)"
+      "description": "MĘŻCZYZNA (zweryfikowano z audio seiyū Whisper)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Boyfriend"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Masayuki": {
-      "description": "KOBIETA (zweryfikowano z audio seiyū Whisper)"
+      "description": "KOBIETA (zweryfikowano z audio seiyū Whisper)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Masayuki"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Pii-chan": {
+      "description": "postać (Główny bohater)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Pii-chan"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Magical Pink": {
+      "description": "postać (Postać drugoplanowa)",
+      "gender": "UNKNOWN",
+      "grammatical_gender": "UNKNOWN",
+      "confidence": 0.5,
+      "priority": "P1",
+      "has_verified_gender": false,
+      "aliases": [
+        "Magical",
+        "Magical Pink",
+        "Pink"
+      ],
+      "entity_category": "ANTHROPONYM"
     }
   },
   "glossary": {
@@ -144,12 +370,23 @@
     "Java sparrow": "ryżowiec siwy"
   },
   "relationships": {
-    "Sasaki -> Peeps": "Zwrot: 'na ty / Peepsie' (partnerzy, pakt magiczny z szacunkiem mentora) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Sasaki -> Peeps": "Zwrot: 'na ty / Peepsie' (partnerzy, pakt magiczny z szacunkiem mentora) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
     "Futari Shizuka -> Sasaki": "Zwrot: 'na ty / Sasaki' (współpracownicy w biurze ds. zjawisk nadprzyrodzonych) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Shizuka -> Sasaki": "Zwrot: 'na ty / Sasaki' (współpracownicy w biurze ds. zjawisk nadprzyrodzonych) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Peeps -> Sasaki": "Zwrot: 'na ty / Sasaki' (mistrz i uczeń, powiernicy) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Peeps -> Sasaki": "Zwrot: 'na ty / Sasaki' (mistrz i uczeń, powiernicy) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
     "Akutsu -> Sasaki": "Zwrot: 'panie Sasaki / Sasaki-kun' (przełożony -> podwładny w służbach specjalnych) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Akutsu -> Futari Shizuka": "Zwrot: 'Futari Shizuka / pani Shizuka' (przełożony -> zwerbowana agentka)",
+    "Akutsu -> Futari Shizuka": "Zwrot: 'Futari Shizuka / pani Shizuka' (przełożony -> zwerbowana agentka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Hrabia Müller -> Sasaki": "Zwrot: 'panie Sasaki / Sasaki-dono / baronie Sasaki' (arystokrata sojusznik -> nowo mianowany baron) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Otonari-san -> Sasaki": "Zwrot: 'proszę pana / panie Sasaki' (sąsiadka z gimnazjum -> dorosły sąsiad) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Abaddon -> Otonari-san": "Zwrot: 'na ty / mała' (demon patron -> ludzka apostołka) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+  },
+  "relations": {
+    "Sasaki -> Peeps": "Zwrot: 'na ty / Peepsie' (partnerzy, pakt magiczny z szacunkiem mentora) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Peeps -> Sasaki": "Zwrot: 'na ty / Sasaki' (mistrz i uczeń, powiernicy) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Akutsu -> Sasaki": "Zwrot: 'panie Sasaki / Sasaki-kun' (przełożony -> podwładny w służbach specjalnych) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Akutsu -> Futari Shizuka": "Zwrot: 'Futari Shizuka / pani Shizuka' (przełożony -> zwerbowana agentka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Futari Shizuka -> Sasaki": "Zwrot: 'na ty / Sasaki' (współpracownicy w biurze ds. zjawisk nadprzyrodzonych) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Shizuka -> Sasaki": "Zwrot: 'na ty / Sasaki' (współpracownicy w biurze ds. zjawisk nadprzyrodzonych) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Hrabia Müller -> Sasaki": "Zwrot: 'panie Sasaki / Sasaki-dono / baronie Sasaki' (arystokrata sojusznik -> nowo mianowany baron) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Otonari-san -> Sasaki": "Zwrot: 'proszę pana / panie Sasaki' (sąsiadka z gimnazjum -> dorosły sąsiad) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Abaddon -> Otonari-san": "Zwrot: 'na ty / mała' (demon patron -> ludzka apostołka) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
@@ -234,15 +471,6 @@
       "Ms": "Elsie von Mueller",
       "W": "Elso von Mueller",
       "gender": "FEMALE"
-    },
-    "Magical Pink (Shizuka Hachikai)": {
-      "M": "Magical Pink (Shizuka Hachikai)",
-      "D": "Magicala Pinka (Shizuki Hachikai)a",
-      "C": "Magicalowi Pinkowi (Shizuce Hachikai)owi",
-      "B": "Magicala Pinka (Shizukę Hachikai)a",
-      "N": "Magicalem Pinkiem (Shizuką Hachikai)em",
-      "Ms": "Magicalu Pinku (Shizuce Hachikai)ie",
-      "W": "Magicalu Pinku (Shizuko Hachikai)ie"
     },
     "Shura": {
       "M": "Shura",
@@ -423,6 +651,15 @@
       "Ms": "Masayuki",
       "W": "Masayuki",
       "gender": "FEMALE"
+    },
+    "Magical Pink": {
+      "M": "Magical Pink (Shizuka Hachikai)",
+      "D": "Magicala Pinka (Shizuki Hachikai)a",
+      "C": "Magicalowi Pinkowi (Shizuce Hachikai)owi",
+      "B": "Magicala Pinka (Shizukę Hachikai)a",
+      "N": "Magicalem Pinkiem (Shizuką Hachikai)em",
+      "Ms": "Magicalu Pinku (Shizuce Hachikai)ie",
+      "W": "Magicalu Pinku (Shizuko Hachikai)ie"
     }
   },
   "hypocorisms": {},
@@ -450,11 +687,9 @@
     "Hrabia Müller": "ANTHROPONYM",
     "Otonari": "ANTHROPONYM",
     "Abaddon": "ANTHROPONYM",
-    "Pii-chan (Peeps)": "ANTHROPONYM",
     "Hoshizaki-san": "ANTHROPONYM",
     "Otonari-san": "ANTHROPONYM",
     "Elsa von Mueller": "ANTHROPONYM",
-    "Magical Pink (Shizuka Hachikai)": "ANTHROPONYM",
     "Shura": "ANTHROPONYM",
     "Marc": "ANTHROPONYM",
     "Sebastian": "ANTHROPONYM",
@@ -462,8 +697,6 @@
     "Wicehrabia French": "ANTHROPONYM",
     "Josef": "ANTHROPONYM",
     "Maximilian": "ANTHROPONYM",
-    "Peeps (Pii-chan)": "ANTHROPONYM",
-    "Otonari-san (Sąsiadka)": "ANTHROPONYM",
     "Książę Adonis": "ANTHROPONYM",
     "Książę Einhart": "ANTHROPONYM",
     "Hoshizaki": "ANTHROPONYM",
@@ -472,7 +705,11 @@
     "Neighbor": "ANTHROPONYM",
     "Mother": "ANTHROPONYM",
     "Boyfriend": "ANTHROPONYM",
-    "Masayuki": "ANTHROPONYM"
+    "Masayuki": "ANTHROPONYM",
+    "Pii-chan": "ANTHROPONYM",
+    "Magical Pink": "ANTHROPONYM",
+    "Kingdom of Herz": "TOPONYM",
+    "Ohgen Empire": "TOPONYM"
   },
   "fansub_canon": {}
 }

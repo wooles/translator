@@ -3,47 +3,75 @@
   "characters": {
     "Ike": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Ike"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Monica": {
-      "description": "KOBIETA (wyodrębniono z relacji serii)"
+      "description": "KOBIETA (wyodrębniono z relacji serii)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Monica"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Nero": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Nero"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Felix": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Felix"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Cyril": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Cyril"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Ryn": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
-    },
-    "Ike -> Monica": {
-      "description": "Zwrot: 'Monico / w myślach: wiewióreczko' (książę pod przykrywką -> nieśmiała znajoma / sekretna ochroniarka)"
-    },
-    "Monica -> Ike": {
-      "description": "Zwrot: 'panie Ike' (nieśmiała dziewczyna -> szlachetny przyjaciel)"
-    },
-    "Monica -> Nero": {
-      "description": "Zwrot: 'Nero' (czarownica -> jej chowaniec)"
-    },
-    "Monica -> Felix": {
-      "description": "Zwrot: 'Ike / na ty (w tej scenie)' (wspólnicy nocnej wyprawy incognito)"
-    },
-    "Felix -> Monica": {
-      "description": "Zwrot: 'Monico / mała wiewiórko / na ty' (opiekun i towarzysz incognito)"
-    },
-    "Monica -> Cyril": {
-      "description": "Zwrot: 'lordzie Cyrilu / panie Cyrilu' (podwładna w radzie uczniowskiej -> wiceprzewodniczący)"
-    },
-    "Cyril -> Monica": {
-      "description": "Zwrot: 'panno Norton / Monico' (przełożony w radzie uczniowskiej -> członkini rady)"
-    },
-    "Ryn -> Monica": {
-      "description": "Zwrot: 'Pani Czarodziejko / Dostojna Wiedźmo' (służebny chowaniec / strażnik -> jedna z Siedmiu Mędrców)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Ryn"
+      ],
+      "entity_category": "ANTHROPONYM"
     }
   },
   "glossary": {
@@ -57,14 +85,24 @@
     "Silence Barrier": "Bariera wyciszająca"
   },
   "relationships": {
-    "Ike -> Monica": "Zwrot: 'Monico / w myślach: wiewióreczko' (książę pod przykrywką -> nieśmiała znajoma / sekretna ochroniarka)",
-    "Monica -> Ike": "Zwrot: 'panie Ike' (nieśmiała dziewczyna -> szlachetny przyjaciel)",
-    "Monica -> Nero": "Zwrot: 'Nero' (czarownica -> jej chowaniec)",
-    "Monica -> Felix": "Zwrot: 'Ike / na ty (w tej scenie)' (wspólnicy nocnej wyprawy incognito)",
-    "Felix -> Monica": "Zwrot: 'Monico / mała wiewiórko / na ty' (opiekun i towarzysz incognito)",
-    "Monica -> Cyril": "Zwrot: 'lordzie Cyrilu / panie Cyrilu' (podwładna w radzie uczniowskiej -> wiceprzewodniczący)",
-    "Cyril -> Monica": "Zwrot: 'panno Norton / Monico' (przełożony w radzie uczniowskiej -> członkini rady)",
-    "Ryn -> Monica": "Zwrot: 'Pani Czarodziejko / Dostojna Wiedźmo' (służebny chowaniec / strażnik -> jedna z Siedmiu Mędrców)"
+    "Ike -> Monica": "Zwrot: 'Monico / w myślach: wiewióreczko' (książę pod przykrywką -> nieśmiała znajoma / sekretna ochroniarka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [OCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu eliminacja opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?']",
+    "Monica -> Ike": "Zwrot: 'panie Ike' (nieśmiała dziewczyna -> szlachetny przyjaciel) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Monica -> Nero": "Zwrot: 'Nero' (czarownica -> jej chowaniec) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Monica -> Felix": "Zwrot: 'Ike / na ty (w tej scenie)' (wspólnicy nocnej wyprawy incognito) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Felix -> Monica": "Zwrot: 'Monico / mała wiewiórko / na ty' (opiekun i towarzysz incognito) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Monica -> Cyril": "Zwrot: 'lordzie Cyrilu / panie Cyrilu' (podwładna w radzie uczniowskiej -> wiceprzewodniczący) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Cyril -> Monica": "Zwrot: 'panno Norton / Monico' (przełożony w radzie uczniowskiej -> członkini rady) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Ryn -> Monica": "Zwrot: 'Pani Czarodziejko / Dostojna Wiedźmo' (służebny chowaniec / strażnik -> jedna z Siedmiu Mędrców) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+  },
+  "relations": {
+    "Ike -> Monica": "Zwrot: 'Monico / w myślach: wiewióreczko' (książę pod przykrywką -> nieśmiała znajoma / sekretna ochroniarka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [OCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu eliminacja opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?']",
+    "Monica -> Ike": "Zwrot: 'panie Ike' (nieśmiała dziewczyna -> szlachetny przyjaciel) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Monica -> Nero": "Zwrot: 'Nero' (czarownica -> jej chowaniec) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Monica -> Felix": "Zwrot: 'Ike / na ty (w tej scenie)' (wspólnicy nocnej wyprawy incognito) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Felix -> Monica": "Zwrot: 'Monico / mała wiewiórko / na ty' (opiekun i towarzysz incognito) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Monica -> Cyril": "Zwrot: 'lordzie Cyrilu / panie Cyrilu' (podwładna w radzie uczniowskiej -> wiceprzewodniczący) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Cyril -> Monica": "Zwrot: 'panno Norton / Monico' (przełożony w radzie uczniowskiej -> członkini rady) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Ryn -> Monica": "Zwrot: 'Pani Czarodziejko / Dostojna Wiedźmo' (służebny chowaniec / strażnik -> jedna z Siedmiu Mędrców) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
   },
   "declensions": {
     "Ike": {
@@ -126,79 +164,6 @@
       "Ms": "Rynie",
       "W": "Rynie",
       "gender": "MALE"
-    },
-    "Ike -> Monica": {
-      "M": "Ike -> Monica",
-      "D": "Ike -> Moniki",
-      "C": "Ike -> Monice",
-      "B": "Ike -> Monikę",
-      "N": "Ike -> Moniką",
-      "Ms": "Ike -> Monice",
-      "W": "Ike -> Moniko"
-    },
-    "Monica -> Ike": {
-      "M": "Monica -> Ike",
-      "D": "Moniki -> Ike",
-      "C": "Monice -> Ike",
-      "B": "Monikę -> Ike",
-      "N": "Moniką -> Ike",
-      "Ms": "Monice -> Ike",
-      "W": "Moniko -> Ike",
-      "gender": "FEMALE"
-    },
-    "Monica -> Nero": {
-      "M": "Monica -> Nero",
-      "D": "Moniki -> Nero",
-      "C": "Monice -> Nero",
-      "B": "Monikę -> Nero",
-      "N": "Moniką -> Nero",
-      "Ms": "Monice -> Nero",
-      "W": "Moniko -> Nero"
-    },
-    "Monica -> Felix": {
-      "M": "Monica -> Felix",
-      "D": "Moniki -> Felix",
-      "C": "Monice -> Felix",
-      "B": "Monikę -> Felix",
-      "N": "Moniką -> Felix",
-      "Ms": "Monice -> Felix",
-      "W": "Moniko -> Felix"
-    },
-    "Felix -> Monica": {
-      "M": "Felix -> Monica",
-      "D": "Felix -> Moniki",
-      "C": "Felix -> Monice",
-      "B": "Felix -> Monikę",
-      "N": "Felix -> Moniką",
-      "Ms": "Felix -> Monice",
-      "W": "Felix -> Moniko"
-    },
-    "Monica -> Cyril": {
-      "M": "Monica -> Cyril",
-      "D": "Moniki -> Cyril",
-      "C": "Monice -> Cyril",
-      "B": "Monikę -> Cyril",
-      "N": "Moniką -> Cyril",
-      "Ms": "Monice -> Cyril",
-      "W": "Moniko -> Cyril"
-    },
-    "Cyril -> Monica": {
-      "M": "Cyril -> Monica",
-      "D": "Cyril -> Moniki",
-      "C": "Cyril -> Monice",
-      "B": "Cyril -> Monikę",
-      "N": "Cyril -> Moniką",
-      "Ms": "Cyril -> Monice",
-      "W": "Cyril -> Moniko"
-    },
-    "Ryn -> Monica": {
-      "M": "Ryn -> Monica",
-      "D": "Ryn -> Moniki",
-      "C": "Ryn -> Monice",
-      "B": "Ryn -> Monikę",
-      "N": "Ryn -> Moniką",
-      "Ms": "Ryn -> Monice",
-      "W": "Ryn -> Moniko"
     }
   },
   "hypocorisms": {},

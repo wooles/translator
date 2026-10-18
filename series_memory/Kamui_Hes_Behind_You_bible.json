@@ -2,23 +2,43 @@
   "anime_title": "Kamui: He's Behind You",
   "characters": {
     "Asystentka": {
-      "description": "KOBIETA (wyodrębniono z relacji serii)"
+      "description": "KOBIETA (wyodrębniono z relacji serii)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Asystentka"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Kamui": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Kamui"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Hanako ze Shimosunagawy": {
-      "description": "KOBIETA (wyodrębniono z relacji serii)"
-    },
-    "Asystentka -> Kamui": {
-      "description": "Zwrot: 'panie Kamui / mistrzu' (pomocnica -> egzorcysta / mistrz)"
-    },
-    "Kamui -> Asystentka": {
-      "description": "Zwrot: 'mała / dziewczynko' (mistrz -> młodsza asystentka)"
-    },
-    "Hanako ze Shimosunagawy -> Dziesięć Kwiatów (Rada Hanako)": {
-      "description": "Zwrot: 'szanowne panie / starszyzno' (reprezentantka szkoly -> rada dostojników duchów)"
+      "description": "KOBIETA (wyodrębniono z relacji serii)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Hanako",
+        "Hanako ze Shimosunagawy",
+        "Shimosunagawy",
+        "ze"
+      ],
+      "entity_category": "ANTHROPONYM"
     }
   },
   "glossary": {
@@ -28,9 +48,14 @@
     "Spirited away": "Porwanie przez duchy"
   },
   "relationships": {
-    "Asystentka -> Kamui": "Zwrot: 'panie Kamui / mistrzu' (pomocnica -> egzorcysta / mistrz)",
-    "Kamui -> Asystentka": "Zwrot: 'mała / dziewczynko' (mistrz -> młodsza asystentka)",
-    "Hanako ze Shimosunagawy -> Dziesięć Kwiatów (Rada Hanako)": "Zwrot: 'szanowne panie / starszyzno' (reprezentantka szkoly -> rada dostojników duchów)"
+    "Asystentka -> Kamui": "Zwrot: 'panie Kamui / mistrzu' (pomocnica -> egzorcysta / mistrz) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Kamui -> Asystentka": "Zwrot: 'mała / dziewczynko' (mistrz -> młodsza asystentka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Hanako ze Shimosunagawy -> Dziesięć Kwiatów (Rada Hanako)": "Zwrot: 'szanowne panie / starszyzno' (reprezentantka szkoly -> rada dostojników duchów) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+  },
+  "relations": {
+    "Asystentka -> Kamui": "Zwrot: 'panie Kamui / mistrzu' (pomocnica -> egzorcysta / mistrz) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Kamui -> Asystentka": "Zwrot: 'mała / dziewczynko' (mistrz -> młodsza asystentka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Hanako ze Shimosunagawy -> Dziesięć Kwiatów (Rada Hanako)": "Zwrot: 'szanowne panie / starszyzno' (reprezentantka szkoly -> rada dostojników duchów) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
   },
   "declensions": {
     "Asystentka": {
@@ -62,33 +87,6 @@
       "Ms": "Hanako ze Shimosunagawy",
       "W": "Hanako ze Shimosunagawy",
       "gender": "FEMALE"
-    },
-    "Asystentka -> Kamui": {
-      "M": "Asystentka -> Kamui",
-      "D": "Asystentki -> Kamui",
-      "C": "Asystentce -> Kamui",
-      "B": "Asystentkę -> Kamui",
-      "N": "Asystentką -> Kamui",
-      "Ms": "Asystentce -> Kamui",
-      "W": "Asystentko -> Kamui"
-    },
-    "Kamui -> Asystentka": {
-      "M": "Kamui -> Asystentka",
-      "D": "Kamui -> Asystentki",
-      "C": "Kamui -> Asystentce",
-      "B": "Kamui -> Asystentkę",
-      "N": "Kamui -> Asystentką",
-      "Ms": "Kamui -> Asystentce",
-      "W": "Kamui -> Asystentko"
-    },
-    "Hanako ze Shimosunagawy -> Dziesięć Kwiatów (Rada Hanako)": {
-      "M": "Hanako ze Shimosunagawy -> Dziesięć Kwiatów (Rada Hanako)",
-      "D": "Hanako ze Shimosunagawy -> Dziesięć Kwiatów (Rady Hanako)",
-      "C": "Hanako ze Shimosunagawy -> Dziesięć Kwiatów (Radzie Hanako)",
-      "B": "Hanako ze Shimosunagawy -> Dziesięć Kwiatów (Radę Hanako)",
-      "N": "Hanako ze Shimosunagawy -> Dziesięć Kwiatów (Radą Hanako)",
-      "Ms": "Hanako ze Shimosunagawy -> Dziesięć Kwiatów (Radzie Hanako)",
-      "W": "Hanako ze Shimosunagawy -> Dziesięć Kwiatów (Rado Hanako)"
     }
   },
   "hypocorisms": {},
@@ -100,7 +98,8 @@
   "entity_categories": {
     "Asystentka": "ANTHROPONYM",
     "Kamui": "ANTHROPONYM",
-    "Hanako ze Shimosunagawy": "ANTHROPONYM"
+    "Hanako ze Shimosunagawy": "ANTHROPONYM",
+    "Shikigami": "TOPONYM"
   },
   "fansub_canon": {}
 }

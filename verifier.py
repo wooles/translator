@@ -177,7 +177,7 @@ class DialogueVerifier:
             "ZASADA PRYMATU AFEKTU (DYNAMIC AFFECTIVE PRIMACY): Głos i emocjonalny afekt seiyū (drżenie, płacz, panika, szept, krzyk) ZAWSZE biją statyczny portret z Series Bible! Jeśli chłodna postać załamuje się i płacze, oddaj fizjologię rozpaczy (urwane słowa, chaos składniowy).\n"
             "WYKORZYSTAJ CZAS NA ZASTANOWIENIE (Thinking / CoT): Jako Główny Reżyser Dubbingu i Script Doctor, przed zatwierdzeniem każdej kwestii przeprowadź TRZYETAPOWY AUDYT POZNAWCZY (THE 3-STAGE EDITORIAL FUNNEL / DWUETAPOWY AUDYT POZNAWCZY KREACJI I TRIANGULACJI):\n"
             "   KROK 1: AUTONOMICZNA ŚLEPA LEKTURA I KREACJA DIALOGU (THE DUBBING & STAGE FLOW - FILAR CLXVI):\n"
-            "     - KANON MANGOWY JAKO FUNDAMENT: Pojęcia z oficjalnych wydań polskich to formy syntetyczne bazowe — w zdaniu naturalnie odmieniaj je przez 7 polskich przypadków (np. 'z Demonem Krwi', 'o Czarnym Mieczniku', 'dla Oukiego').\n"
+            "     - KANON MANGOWY JAKO FUNDAMENT: Pojęcia z oficjalnych wydań polskich to formy syntetyczne bazowe — w zdaniu naturalnie podlegają pełnemu paradygmatowi odmiany przypadkowej.\n"
             "     - KONTRAKT POLSZCZYZNY BEZTERMINOWEJ (THE TIMELESS COLLOQUIAL CONTRACT):\n"
             "       * Twórz dialogi w estetyce polszczyzny bezterminowej: język żywy, organiczny, soczysty i miękki w ustach aktora, wolny od tymczasowych mód internetowych.\n"
             "       * Pisz tak, jak brzmią klasyki polskiego dubbingu kinowego: dialog ma brzmieć świeżo dzisiaj, naturalnie 30 lat temu i zrozumiale za 30 lat.\n"
@@ -186,7 +186,7 @@ class DialogueVerifier:
             "         - Reakcja na Intencję: odpowiadaj na intencję postaci (na ostrzeżenie gotowością: 'Zrozumiałem' / 'Uważam', na propozycję chęcią: 'Chętnie', na pytanie otwarte faktem).\n"
             "         - Etykieta Gestu: fizyczne podanie przedmiotu kwituj zwrotem grzecznościowym ('Proszę' / 'Trzymaj') lub elipsą.\n"
             "       * Współczesna, świeża polszczyzna bez sztucznego patosu i pretensjonalnych archaizmów (Filar CLXXII).\n"
-            "       * Żywa, naturalna fraza bez pretensjonalnych zwrotów (np. 'to nie tak, że', 'mam na myśli', 'widzisz', 'tutaj, weź to').\n"
+            "       * Żywa, naturalna fraza bez obcych konstrukcji syntaktycznych i zbędnych pleonazmów.\n"
             "     - PROTOKÓŁ AUTONOMICZNEJ KREACJI (ACTIVE GENERATION FIRST - ANTY-KOTWICZENIE):\n"
             "       * Najpierw sformułuj w CoT własne, suwerenne polskie zdanie, które idealnie 'leży w ustach' polskiego aktora i pasuje do energii sceny.\n"
             "       * Dopiero potem spójrz na szkic roboczy PL z Fazy 1.\n"
@@ -197,8 +197,8 @@ class DialogueVerifier:
             "     - AUDYT ROZBIEŻNOŚCI PIVOTU (JP-to-EN Pivot Discrepancy Gate - Filar CLXX):\n"
             "       * Głos seiyū stanowi nadrzędny autorytet w warstwie intencji i afektu.\n"
             "       * Oddaj intencję seiyū: gdy mówi 'urusai / urusai na' (poirytowanie zrzędzeniem), zastosuj polski akt uciszania ('Ale marudzisz...', 'Daj mi spokój...', 'Nie truj...').\n"
-            "       * Powitania domowe (aisatsu): po 'Wróciłem' postać wita naturalnie: 'Witaj w domu!', 'O, już jesteś?' lub 'Dobrze, że jesteś!'.\n"
-            "       * Tytulatura i imiona: zachowaj poprawną odmianę i wielkie litery imion (np. 'Mistrz Tonden Minoru nie zdążył').\n"
+            "       * Powitania domowe (aisatsu): formuły powitalne podlegają naturalnym konwencjom polszczyzny mówionej w rejestrze rodzinnym lub domowym.\n"
+            "       * Tytulatura i imiona: zachowaj poprawną fleksję przypadkową oraz kanoniczną ortografię antroponimów.\n"
             "     - Trzy soczewki weryfikacyjne:\n"
             "       * 👂 Ucho: oddech, CPS, dynamika ping-ponga (Filar CLIV).\n"
             "       * 🌍 Świat: relacje statusu, nienaruszalność formy Pan/Ty (Filar CLVII), perspektywa incognito (Filar CLXI).\n"
@@ -206,11 +206,11 @@ class DialogueVerifier:
             "   KROK 3: PROAKTYWNY AUDYT NEGATYWNY REJESTRU, PŁCI I REKCJI (NEGATIVE REGISTER, GENDER & CALQUE GATE - FILAR X, CLXXXVII, CLXXXVIII):\n"
             "     - Zgodność płciowa i cytaty: Upewnij się, że końcówki 1. osoby mówczyń (-am, -ałam, -łabym) oraz formy 2. osoby do adresatek (-aś, -ałaś, jesteś pewna) i grup żeńskich (-yście, one) są w pełni poprawne. Cytaty („...”) w dialogach zachowują płeć oryginalnego autora.\n"
             "     - Ścisła rekcja zaprzeczona (Genitive of Negation): Każdy czasownik przechodni podlegający negacji w KAŻDYM czasie (teraźniejszym, przeszłym i przyszłym: nie mam/nie miałam, nie widziałem, nie czułam, nie będę miał) ściśle wymaga dopełniacza również przy wtrąceniach (nie miałem już czasu, nie widzę w tym sensu, nie czułam strachu).\n"
-            "     - Prewencja mianownizacji kanonu i bariery AVT: Terminy kanoniczne odmieniaj swobodnie przez przypadki po przyimkach we wszystkich przypadkach zależnych (np. 'z Czarnym Rycerzem', 'przez Wielkiego Chana', 'o Królu Demonów'). Przestrzegaj twardych barier AVT: tempo czytania CPS <= 17 i długość wiersza CPL <= 38.\n"
-            "     - Twarda eliminacja błędów fleksyjnych, literówek i kalek leksykalnych jest dodatkowo w 100% asekurowana przez deterministyczny silnik EpisodeQualityGate (0.00 PLN).\n"
+            "     - Prewencja mianownizacji kanonu i bariery AVT: Terminy kanoniczne podlegają pełnej fleksji po przyimkach we wszystkich przypadkach zależnych. Przestrzegaj ograniczeń AVT: tempo czytania CPS <= 17 i długość wiersza CPL <= 38.\n"
+            "     - Twarda eliminacja usterek fleksyjnych, literówek i kalek leksykalnych jest dodatkowo w 100% asekurowana przez deterministyczny silnik EpisodeQualityGate (0.00 PLN).\n"
             "     - W swoim myśleniu skup się na autentyczności, szlachetności i żywości dialogu w świecie przedstawionym.\n"
         )
-        prompt_lines.append("W polu 'changes_made' dla KAŻDEJ poprawionej kwestii podaj DOKŁADNE uzasadnienie i numer Filaru AVT (np. '[Filar IV - Szyk Zdania] Usunięto kalkę angielską' lub '[Filar CLVII - Forma Adresatywna] Usunięto 'wygrał pan' -> 'wygrałeś''). Jeśli kwestia nie wymagała poprawek, wpisz null.")
+        prompt_lines.append("W polu 'changes_made' dla KAŻDEJ poprawionej kwestii podaj DOKŁADNE uzasadnienie i numer Filaru AVT (uzasadnienie weryfikatora ze wskazaniem reguły). Jeśli kwestia nie wymagała poprawek, wpisz null.")
         
         if focused_rules_str:
             prompt_lines.append(f"\n{focused_rules_str}\n")
@@ -407,7 +407,7 @@ class DialogueVerifier:
                 clean_notes = raw_notes
                 if item.get('third_person_subject') and item['third_person_subject'] in clean_notes:
                     clean_notes = clean_notes.replace(item['third_person_subject'], '').strip()
-                clean_notes = re.sub(r"\[(?:🎯|🚨|🎙️|⚠️)?\s*ALARM(?:\s+FILAR\s+[A-Z0-9]+|\s+[^\]]+)?\]", "", clean_notes).strip()
+                clean_notes = re.sub(r"\[(?:🎯|\U0001f6a8|🎙️|⚠️)?\s*ALARM(?:\s+FILAR\s+[A-Z0-9]+|\s+[^\]]+)?\]", "", clean_notes).strip()  # Standard 9.0 Invariant
                 clean_notes = re.sub(r"\s+", " ", clean_notes).strip()
                 if clean_notes:
                     directive_lines.append(f"    • Wytyczne redakcyjne: {clean_notes}")
@@ -581,7 +581,7 @@ class DialogueVerifier:
                 is_billing_exhausted = "prepayment" in err_str or "depleted" in err_str or ("billing" in err_str and "credit" in err_str)
                 if is_billing_exhausted:
                     print("\n" + "!" * 75)
-                    print("  [!] [BŁĄD KONTA GOOGLE AI STUDIO / PŁATNOŚCI]:")
+                    print("  [!] [AWARIA KONTA GOOGLE AI STUDIO / PŁATNOŚCI]:")
                     print("  Wyczerpały się środki przedpłacone (Prepayment Credits / Limit wydatków)!")
                     print("  Komunikat Google: 'Your prepayment credits are depleted.'")
                     print("  -> Wejdź na https://aistudio.google.com/ i doładuj środki, aby kontynuować.")
@@ -593,8 +593,8 @@ class DialogueVerifier:
                 max_allowed_attempts = max(25, num_keys * 8)
                 if attempt >= max_allowed_attempts:
                     raise RuntimeError(
-                        f"KATEGORYCZNA BLOKADA BEZPIECZEŃSTWA: Osiągnięto limit {attempt} prób dla partii w Fazie 2. "
-                        f"Ostatni błąd: {e}. Proces wstrzymano w celu ochrony budżetu przed niekontrolowanymi zapytaniami."
+                        f"ŚCISŁA BLOKADA BEZPIECZEŃSTWA: Osiągnięto limit {attempt} prób dla partii w Fazie 2. "
+                        f"Ostatni status awarii: {e}. Proces wstrzymano w celu ochrony budżetu przed niekontrolowanymi zapytaniami."
                     )
 
                 is_timeout = "504" in err_str or "deadline" in err_str or "timeout" in err_str or "timed out" in err_str

@@ -3,62 +3,151 @@
   "characters": {
     "Wataru Sajou": {
       "description": "MĘŻCZYZNA - chłopak (Główny bohater)",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Sajou",
+        "Wataru",
+        "Wataru Sajou"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Aika Natsukawa": {
-      "description": "KOBIETA - dziewczyna (Główna bohaterka)"
+      "description": "KOBIETA - dziewczyna (Główna bohaterka)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Aika",
+        "Aika Natsukawa",
+        "Natsukawa"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Kei Ashida": {
-      "description": "KOBIETA - kobieta (postać)"
+      "description": "KOBIETA - kobieta (postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Ashida",
+        "Kei Ashida"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Kaede Sajou": {
-      "description": "KOBIETA - dziewczyna (Drugoplanowa bohaterka)"
+      "description": "KOBIETA - dziewczyna (Drugoplanowa bohaterka)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Kaede",
+        "Kaede Sajou",
+        "Sajou"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Rin Shinomiya": {
-      "description": "KOBIETA - kobieta (16-17 lat, przewodnicząca Komitetu Dyscypliny, opanowana i dostojna senpai)"
+      "description": "KOBIETA - kobieta (16-17 lat, przewodnicząca Komitetu Dyscypliny, opanowana i dostojna senpai)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Rin Shinomiya",
+        "Shinomiya"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Kei Shinomiya": {
-      "description": "KOBIETA - dziewczyna (Drugoplanowa bohaterka)"
+      "description": "KOBIETA - dziewczyna (Drugoplanowa bohaterka)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Kei Shinomiya",
+        "Shinomiya"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Rin Ichinose": {
-      "description": "KOBIETA - dziewczyna (Drugoplanowa bohaterka)"
+      "description": "KOBIETA - dziewczyna (Drugoplanowa bohaterka)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Ichinose",
+        "Rin Ichinose"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Fuka Sasaki": {
-      "description": "KOBIETA - dziewczyna (Drugoplanowa bohaterka)"
+      "description": "KOBIETA - dziewczyna (Drugoplanowa bohaterka)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Fuka",
+        "Fuka Sasaki",
+        "Sasaki"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Hayato Ichinose": {
-      "description": "MĘŻCZYZNA - chłopak (Drugoplanowy bohater)"
+      "description": "MĘŻCZYZNA - chłopak (Drugoplanowy bohater)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Hayato",
+        "Hayato Ichinose",
+        "Ichinose"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Yuyu Inatomi": {
-      "description": "KOBIETA - kobieta (postać)"
+      "description": "KOBIETA - kobieta (postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Inatomi",
+        "Yuyu",
+        "Yuyu Inatomi"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Yamazaki": {
       "description": "MĘŻCZYZNA - mężczyzna (postać)",
-      "gender": "MALE"
-    },
-    "Wataru Sajou -> Aika Natsukawa": {
-      "description": "Zwrot: 'na ty / Natsukawa' (kolega z klasy (wymuszony dystans))"
-    },
-    "Aika Natsukawa -> Wataru Sajou": {
-      "description": "Zwrot: 'na ty / Sajo' (koleżanka z klasy (zdezorientowana brakiem atencji))"
-    },
-    "Kei Ashida -> Wataru Sajou": {
-      "description": "Zwrot: 'Sajotchi' (kumpelska relacja w klasie)"
-    },
-    "Kei Ashida -> Aika Natsukawa": {
-      "description": "Zwrot: 'Aichi' (bliskie przyjaciółki)"
-    },
-    "Wataru Sajou -> Kaede Sajou": {
-      "description": "Zwrot: 'siostra / siostrzyczka' (rodzeństwo)"
-    },
-    "Wataru Sajou -> Rin Shinomiya": {
-      "description": "Zwrot: 'przewodnicząca / panno Shinomiya' (młodszy uczeń -> szanowana starsza rocznikiem)"
-    },
-    "Rin Shinomiya -> Wataru Sajou": {
-      "description": "Zwrot: 'na ty / Sajo' (starsza uczennica -> młodszy kolega)"
-    },
-    "Kaede Sajou -> Wataru Sajou": {
-      "description": "Zwrot: 'na ty / Wataru / braciszku' (starsza siostra -> młodszy brat)"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Yamazaki"
+      ],
+      "entity_category": "ANTHROPONYM"
     }
   },
   "glossary": {
@@ -72,14 +161,24 @@
     "lunch break": "długa przerwa"
   },
   "relationships": {
-    "Wataru Sajou -> Aika Natsukawa": "Zwrot: 'na ty / Natsukawa' (kolega z klasy (wymuszony dystans))",
-    "Aika Natsukawa -> Wataru Sajou": "Zwrot: 'na ty / Sajo' (koleżanka z klasy (zdezorientowana brakiem atencji))",
-    "Kei Ashida -> Wataru Sajou": "Zwrot: 'Sajotchi' (kumpelska relacja w klasie)",
-    "Kei Ashida -> Aika Natsukawa": "Zwrot: 'Aichi' (bliskie przyjaciółki) [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]",
-    "Wataru Sajou -> Kaede Sajou": "Zwrot: 'siostra / siostrzyczka' (rodzeństwo)",
-    "Wataru Sajou -> Rin Shinomiya": "Zwrot: 'przewodnicząca / panno Shinomiya' (młodszy uczeń -> szanowana starsza rocznikiem)",
-    "Rin Shinomiya -> Wataru Sajou": "Zwrot: 'na ty / Sajo' (starsza uczennica -> młodszy kolega)",
-    "Kaede Sajou -> Wataru Sajou": "Zwrot: 'na ty / Wataru / braciszku' (starsza siostra -> młodszy brat)"
+    "Wataru Sajou -> Aika Natsukawa": "Zwrot: 'na ty / Natsukawa' (kolega z klasy (wymuszony dystans)) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Aika Natsukawa -> Wataru Sajou": "Zwrot: 'na ty / Sajo' (koleżanka z klasy (zdezorientowana brakiem atencji)) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Kei Ashida -> Wataru Sajou": "Zwrot: 'Sajotchi' (kumpelska relacja w klasie) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Kei Ashida -> Aika Natsukawa": "Zwrot: 'Aichi' (bliskie przyjaciółki) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
+    "Wataru Sajou -> Kaede Sajou": "Zwrot: 'siostra / siostrzyczka' (rodzeństwo) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Wataru Sajou -> Rin Shinomiya": "Zwrot: 'przewodnicząca / panno Shinomiya' (młodszy uczeń -> szanowana starsza rocznikiem) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Rin Shinomiya -> Wataru Sajou": "Zwrot: 'na ty / Sajo' (starsza uczennica -> młodszy kolega) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Kaede Sajou -> Wataru Sajou": "Zwrot: 'na ty / Wataru / braciszku' (starsza siostra -> młodszy brat) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+  },
+  "relations": {
+    "Wataru Sajou -> Aika Natsukawa": "Zwrot: 'na ty / Natsukawa' (kolega z klasy (wymuszony dystans)) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Aika Natsukawa -> Wataru Sajou": "Zwrot: 'na ty / Sajo' (koleżanka z klasy (zdezorientowana brakiem atencji)) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Kei Ashida -> Wataru Sajou": "Zwrot: 'Sajotchi' (kumpelska relacja w klasie) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Kei Ashida -> Aika Natsukawa": "Zwrot: 'Aichi' (bliskie przyjaciółki) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Wataru Sajou -> Kaede Sajou": "Zwrot: 'siostra / siostrzyczka' (rodzeństwo) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Wataru Sajou -> Rin Shinomiya": "Zwrot: 'przewodnicząca / panno Shinomiya' (młodszy uczeń -> szanowana starsza rocznikiem) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Rin Shinomiya -> Wataru Sajou": "Zwrot: 'na ty / Sajo' (starsza uczennica -> młodszy kolega) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Kaede Sajou -> Wataru Sajou": "Zwrot: 'na ty / Wataru / braciszku' (starsza siostra -> młodszy brat) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
   },
   "declensions": {
     "Wataru Sajou": {
@@ -191,80 +290,6 @@
       "Ms": "Yamazaki",
       "W": "Yamazaki",
       "gender": "MALE"
-    },
-    "Wataru Sajou -> Aika Natsukawa": {
-      "M": "Wataru Sajou -> Aika Natsukawa",
-      "D": "Wataru Sajou -> Aiki Natsukawy",
-      "C": "Wataru Sajou -> Aice Natsukawe",
-      "B": "Wataru Sajou -> Aikę Natsukawę",
-      "N": "Wataru Sajou -> Aiką Natsukawą",
-      "Ms": "Wataru Sajou -> Aice Natsukawe",
-      "W": "Wataru Sajou -> Aiko Natsukawo"
-    },
-    "Aika Natsukawa -> Wataru Sajou": {
-      "M": "Aika Natsukawa -> Wataru Sajou",
-      "D": "Aiki Natsukawy -> Wataru Sajou",
-      "C": "Aice Natsukawe -> Wataru Sajou",
-      "B": "Aikę Natsukawę -> Wataru Sajou",
-      "N": "Aiką Natsukawą -> Wataru Sajou",
-      "Ms": "Aice Natsukawe -> Wataru Sajou",
-      "W": "Aiko Natsukawo -> Wataru Sajou"
-    },
-    "Kei Ashida -> Wataru Sajou": {
-      "M": "Kei Ashida -> Wataru Sajou",
-      "D": "Kei Ashidy -> Wataru Sajou",
-      "C": "Kei Ashidzie -> Wataru Sajou",
-      "B": "Kei Ashidę -> Wataru Sajou",
-      "N": "Kei Ashidą -> Wataru Sajou",
-      "Ms": "Kei Ashidzie -> Wataru Sajou",
-      "W": "Kei Ashido -> Wataru Sajou"
-    },
-    "Kei Ashida -> Aika Natsukawa": {
-      "M": "Kei Ashida -> Aika Natsukawa",
-      "D": "Kei Ashidy -> Aiki Natsukawy",
-      "C": "Kei Ashidzie -> Aice Natsukawe",
-      "B": "Kei Ashidę -> Aikę Natsukawę",
-      "N": "Kei Ashidą -> Aiką Natsukawą",
-      "Ms": "Kei Ashidzie -> Aice Natsukawe",
-      "W": "Kei Ashido -> Aiko Natsukawo"
-    },
-    "Wataru Sajou -> Kaede Sajou": {
-      "M": "Wataru Sajou -> Kaede Sajou",
-      "D": "Wataru Sajou -> Kaede Sajou",
-      "C": "Wataru Sajou -> Kaede Sajou",
-      "B": "Wataru Sajou -> Kaede Sajou",
-      "N": "Wataru Sajou -> Kaede Sajou",
-      "Ms": "Wataru Sajou -> Kaede Sajou",
-      "W": "Wataru Sajou -> Kaede Sajou",
-      "gender": "FEMALE"
-    },
-    "Wataru Sajou -> Rin Shinomiya": {
-      "M": "Wataru Sajou -> Rin Shinomiya",
-      "D": "Wataru Sajou -> Rina Shinomiyy",
-      "C": "Wataru Sajou -> Rinowi Shinomiye",
-      "B": "Wataru Sajou -> Rina Shinomiyę",
-      "N": "Wataru Sajou -> Rinem Shinomiyą",
-      "Ms": "Wataru Sajou -> Rinie Shinomiye",
-      "W": "Wataru Sajou -> Rinie Shinomiyo"
-    },
-    "Rin Shinomiya -> Wataru Sajou": {
-      "M": "Rin Shinomiya -> Wataru Sajou",
-      "D": "Rina Shinomiyy -> Wataru Sajou",
-      "C": "Rinowi Shinomiye -> Wataru Sajou",
-      "B": "Rina Shinomiyę -> Wataru Sajou",
-      "N": "Rinem Shinomiyą -> Wataru Sajou",
-      "Ms": "Rinie Shinomiye -> Wataru Sajou",
-      "W": "Rinie Shinomiyo -> Wataru Sajou"
-    },
-    "Kaede Sajou -> Wataru Sajou": {
-      "M": "Kaede Sajou -> Wataru Sajou",
-      "D": "Kaede Sajou -> Wataru Sajou",
-      "C": "Kaede Sajou -> Wataru Sajou",
-      "B": "Kaede Sajou -> Wataru Sajou",
-      "N": "Kaede Sajou -> Wataru Sajou",
-      "Ms": "Kaede Sajou -> Wataru Sajou",
-      "W": "Kaede Sajou -> Wataru Sajou",
-      "gender": "FEMALE"
     }
   },
   "hypocorisms": {},

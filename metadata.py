@@ -467,7 +467,7 @@ Podaj w formacie JSON oficjalne metadane dla serii anime/mangi: "{title}":
   "title_english": "Oficjalny tytuł angielski",
   "genres": ["Gatunek 1", "Gatunek 2"],
   "setting_tags": ["Epoka", "Realia świata", "Czas i miejsce"],
-  "detected_domains": ["Specjalistyczna dziedzina jeśli występuje (np. wino, szachy, medycyna, alchemia, wojskowość)"],
+  "detected_domains": ["Specjalistyczna dziedzina wiedzy lub terminologia branżowa jeśli występuje"],
   "description": "Krótkie streszczenie tła fabularnego (2-3 zdania).",
   "characters": [
     {{

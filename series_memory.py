@@ -96,7 +96,7 @@ def _compute_vocative(name: str, gender: str = "MALE") -> str:
         return ""
     clean_name = str(name).strip()
     c_lower = clean_name.lower()
-    # Korekta błędnych wołaczy na -tzie -> -tzu (np. Laurentzie -> Laurentzu)
+    # Harmonizacja wołaczy na -tzie -> -tzu w wygłosie afrykatywnym
     if c_lower.endswith("tzie"):
         return clean_name[:-4] + ("tzu" if clean_name[-4:].islower() else "TZU")
     if is_japanese_cv_mora_e_name(clean_name):
@@ -286,8 +286,8 @@ def sanitize_adjectival_double_declension(form: str, base_name: Optional[str] = 
         if b_clean.lower().endswith(("ą", "ę", "ej", "ach", "ami", "om", "ego", "emu", "ych", "ich", "ymi", "imi")):
             return form
 
-        # Ochrona przed fałszywym obcinaniem imion/nazwisk zakończonych na -a (np. Teshima, Akira, Soma)
-        # Formy fleksyjne rzeczowników na -a (Teshimy, Teshimie, Teshimą, Teshimo) są w 100% poprawne
+        # Ochrona przed fałszywym obcinaniem form bazowych mianownika zakończonych na -a
+        # Formy fleksyjne rzeczowników na -a są w 100% poprawne
         if b_clean.lower().endswith("a") and not b_clean.lower().endswith(("ska", "cka", "dzka", "owa", "na")):
             return form
 
@@ -299,7 +299,7 @@ def sanitize_adjectival_double_declension(form: str, base_name: Optional[str] = 
                 if is_adjectival_oblique_token(b_w):
                     f_w = b_w
                 elif b_w.lower().endswith("a") and not b_w.lower().endswith(("ska", "cka", "dzka", "owa", "na")):
-                    # Pojedynczy człon kończący się na -a (np. Teshima w 'Rei Teshima') jest chroniony
+                    # Pojedynczy człon antroponimu kończący się na -a jest chroniony
                     pass
                 else:
                     for bad_suf in ("owi", "wi", "em", "om", "ami", "ach"):
@@ -375,6 +375,36 @@ class DeclensionParadigm(BaseModel):
             "Ms": self.locative,
             "W": self.vocative
         }
+
+    def get(self, key: str, default: Any = None) -> Any:
+        mapping = {
+            "M": self.nominative,
+            "D": self.genitive,
+            "C": self.dative,
+            "B": self.accusative,
+            "N": self.instrumental,
+            "Ms": self.locative,
+            "W": self.vocative,
+            "nominative": self.nominative,
+            "genitive": self.genitive,
+            "dative": self.dative,
+            "accusative": self.accusative,
+            "instrumental": self.instrumental,
+            "locative": self.locative,
+            "vocative": self.vocative,
+        }
+        return mapping.get(key, default)
+
+    def __getitem__(self, key: str) -> str:
+        val = self.get(key)
+        if val is None:
+            raise KeyError(key)
+        return val
+
+    @classmethod
+    def build(cls, name: str, gender: str = "UNKNOWN") -> "DeclensionParadigm":
+        d = generate_polish_name_declension(name, gender=gender)
+        return cls.from_dict(d, entity_category=EntityCategory.ANTHROPONYM)
 
     @classmethod
     def sanitize_double_declension(cls, form: str, base_name: Optional[str] = None) -> str:
@@ -559,7 +589,7 @@ def resolve_possessive_relation_gender(
 
 
 class PersonaInterval(BaseModel):
-    apparent_gender: Literal["MASCULINE", "FEMININE"]
+    apparent_gender: str
     valid_from_ep: int
     valid_to_ep: Optional[int] = None
     public_facade: bool = True
@@ -567,7 +597,7 @@ class PersonaInterval(BaseModel):
 
 class CharacterIdentity(BaseModel):
     canonical_id: str
-    true_gender: Literal["MASCULINE", "FEMININE"]
+    true_gender: str
     discourse_states: List[PersonaInterval] = Field(default_factory=list)
     entity_category: EntityCategory = Field(default=EntityCategory.ANTHROPONYM)
     declension_paradigm: Optional[DeclensionParadigm] = Field(default=None)
@@ -602,7 +632,7 @@ class CharacterIdentity(BaseModel):
     def register_epistemic_rupture(
         self,
         episode_index: int,
-        new_gender: Optional[Literal["MASCULINE", "FEMININE"]] = None,
+        new_gender: Optional[str] = None,
         anaphora_score: Optional[int] = None,
         prev_anaphora_score: Optional[int] = None,
         delta_score_en: Optional[int] = None,
@@ -714,8 +744,7 @@ CHREMATONYM_PATTERNS: List[re.Pattern] = [
 def normalize_name_nfkd(name: str) -> str:
     """
     Normalizuje znaki diakrytyczne Unicode (NFKD) w nazwach własnych:
-    usuwa znaki łączone (combining characters), zachowując litery bazowe ASCII,
-    np. 'Schröder' -> 'Schroder', 'René' -> 'Rene'.
+    usuwa znaki łączone (combining characters), zachowując litery bazowe ASCII.
     """
     if not name:
         return ""
@@ -823,9 +852,8 @@ def clean_fake_name_apostrophes(text: str) -> str:
     """
     Zasada poprawnego użycia apostrofu (Zero Fake Apostrophes - Standard PWN):
     Apostrof występuje WYŁĄCZNIE wtedy, gdy ostatnia litera obcego imienia/nazwiska jest niema
-    fonetycznie (np. White -> White'a, Wayne -> Wayne'a, Blade -> Blade'a, George -> George'a).
-    Eliminacja apostrofu przy imionach czytanych fonetycznie
-    (np. Roy'a -> Roya, Daisuke'a -> Daisuke, Rin'a -> Rin, Ren'em -> Renem).
+    fonetycznie w wygłosie obcym.
+    Eliminacja apostrofu przy imionach czytanych fonetycznie.
     """
     if not text or "'" not in text:
         return text
@@ -841,21 +869,21 @@ def clean_fake_name_apostrophes(text: str) -> str:
         if n_low in JAPANESE_VOWEL_E_NAMES or is_japanese_cv_mora_e_name(name) or n_low in invariable_fem or n_low in foreign_fem:
             return name
 
-        # 2. Imiona męskie na samogłoskę + y (Ray, Roy, Gray) -> fonetyczne połączenie bez apostrofu
+        # 2. Imiona męskie na samogłoskę + y -> fonetyczne połączenie bez apostrofu
         if len(name) >= 2 and name[-1].lower() == 'y' and name[-2].lower() in 'aeiou':
             return name + ending
 
-        # 3. Nieme fonetycznie -e (spółgłoska + e, np. White, Wayne, Blade, George, Locke, Moore) -> apostrof poprawny
+        # 3. Nieme fonetycznie -e (spółgłoska + e w wygłosie obcym) -> apostrof poprawny
         if len(name) >= 3 and name[-1].lower() == 'e' and name[-2].lower() in 'bcdfghjklmnpqrstvwxz':
             if is_japanese_cv_mora_e_name(name) or n_low in JAPANESE_VOWEL_E_NAMES:
                 return name
             return m.group(0)
 
-        # 4. Imiona męskie na spółgłoskę czytaną fonetycznie (Ren, Conan, Jean, Raven, Arthur) -> bez apostrofu
+        # 4. Imiona męskie na spółgłoskę czytaną fonetycznie -> bez apostrofu
         if name[-1].lower() not in 'aeiouyąęó':
             return name + ending
 
-        # 5. Imiona na inne samogłoski fonetyczne (np. Mario'a -> Maria)
+        # 5. Imiona na inne samogłoski fonetyczne
         if name[-1].lower() in 'aeiouy':
             return name[:-1] + ending
 
@@ -871,10 +899,7 @@ def fix_undecorated_male_names(
     custom_glossary: Optional[Dict[str, str]] = None
 ) -> str:
     """
-    Koryguje błędy pozostawienia męskiego imienia w mianowniku w pozycji zależnej / po przyimkach:
-    np. 'Dałem to Ray' -> 'Dałem to Rayowi'
-        'dla Ray' -> 'dla Raya'
-        'z Ren' -> 'z Renem'
+    Koryguje błędy pozostawienia męskiego imienia w mianowniku w pozycji zależnej / po przyimkach.
     """
     if not text:
         return text
@@ -891,9 +916,9 @@ def fix_undecorated_male_names(
             if getattr(c_rec, "gender", None) == "MALE" or (isinstance(c_rec, dict) and c_rec.get("gender") == "MALE")
         ]
         if not names:
-            names = ["Ren", "Jean", "Raven"]
+            names = []
     else:
-        names = ["Ren", "Jean", "Raven"]
+        names = []
 
     # Dynamic identification of proper names following prepositions
     if not character_names:
@@ -1415,7 +1440,7 @@ RE_FEMALE_ROLE = re.compile(
     # General / Base
     r"kobieta|kobiet[ayęieoó]|kobietami|kobietach|żeńsk[a-ząćęłńóśźż]*|female|dziewczyn[a-ząćęłńóśźż]*|"
     r"pani(?:ą|ej)?(?!\s*e\b)|bohaterk[a-ząćęłńóśźż]*|chatun|girl|woman|lady|sorceress|princess|heroine|priestess|witch|queen|empress|goddess|"
-    # Rodzina (18) + Hipokorystyki i Oboczności (np. ch:sz macocha/macosze)
+    # Rodzina (18) + Hipokorystyki i Oboczności (alternacje fonetyczne)
     r"matk[a-ząćęłńóśźż]*|mam[a-ząćęłńóśźż]*|mamusi[a-ząćęłńóśźż]*|mateńk[a-ząćęłńóśźż]*|córk[a-ząćęłńóśźż]*|córeczk[a-ząćęłńóśźż]*|córuni[a-ząćęłńóśźż]*|siostr[a-ząćęłńóśźż]*|siostrzyczk[a-ząćęłńóśźż]*|siostruni[a-ząćęłńóśźż]*|"
     r"bab(?:ka|ce|kę|ką|ki|ek|kom|kami|kach)|babci[a-ząćęłńóśźż]*|babuni[a-ząćęłńóśźż]*|prabab(?:ka|ce|kę|ką|ki|ek|kom|kami|kach)|prababci[a-ząćęłńóśźż]*|"
     r"wnuczk[a-ząćęłńóśźż]*|wnusi[a-ząćęłńóśźż]*|prawnuczk[a-ząćęłńóśźż]*|"
@@ -1470,7 +1495,7 @@ RE_MALE_ROLE = re.compile(
     r"mężczyzn[a-ząćęłńóśźż]*|męsk[a-ząćęłńóśźż]*|male|man|bocchan|hero|knight|prince|wizard|sorcerer|king|emperor|"
     r"chłop(?:ak[a-ząćęłńóśźż]*|iec|ca|cem|cu|cowi|cy|ców|om|ami|ach|a|em|u|i)?|boy|"
     r"młodzieniec|młodzieńc[a-ząćęłńóśźż]*|panie\b|pan(?:em|u|a|owie|ów)?\b|"
-    # Rodzina (18) + Hipokorystyki i Oboczności (np. tatko, tatusia, synuś, braciszek)
+    # Rodzina (18) + Hipokorystyki i Oboczności
     r"ojc(?:iec|a|em|u|owi|owie|ów|om|ami|ach)|ojczulk[a-ząćęłńóśźż]*|tat[a-ząćęłńóśźż]*|tatk[a-ząćęłńóśźż]*|tatu(?:ś|si[a-ząćęłńóśźż]*)|"
     r"syn(?:[aeyu]|em|owi|owie|ów|om|ami|ach)?|synek\b|synk[a-ząćęłńóśźż]*|synu(?:ś|si[a-ząćęłńóśźż]*)|"
     r"brat(?:[aeyu]|em|owi|owie|ów|om|ami|ach)?|braci[a-ząćęłńóśźż]*|braciszk[a-ząćęłńóśźż]*|"
@@ -1906,7 +1931,7 @@ UNIVERSAL_FEMALE_NAMES_ON_A = {
 }
 
 INVARIABLE_JAPANESE_FEMALE_NAMES = {
-    "karin", "marin", "rin", "ran", "ren", "shion", "karen", "sion", "suzu",
+    "karin", "marin", "rin", "ran", "shion", "karen", "sion", "suzu",
     "yoruichi", "aoi", "shinobu", "nanami", "ayame", "kaori", "tsunade", "tomoyo",
     "hitomi", "homura", "madoka", "mami", "sayaka", "kyoko", "kohaku",
     "chiyo", "maki", "nobara", "mai", "kasumi", "miwa", "shoko", "utahime",
@@ -2253,10 +2278,10 @@ def generate_polish_adjective_declension(adj: str, gender: Optional[str] = None,
     if not w:
         return {}
     w_l = w.lower()
-    g_upper = (gender or "").strip().upper()
+    g_lower = (gender or "").strip().lower()
 
     # 1. Feminine adjective on -a
-    if w_l.endswith("a") or g_upper in ("FEMALE", "KOBIETA", "ŻEŃSKI", "ŻEŃSKA"):
+    if w_l.endswith("a") or g_lower == "female" or any(k in g_lower for k in ("kobiet", "żeńsk")):
         stem = w[:-1] if w_l.endswith("a") else w
         suffix_d = "iej" if stem.lower().endswith(("k", "g")) and not stem.lower().endswith("i") else "ej"
         return {
@@ -2270,7 +2295,7 @@ def generate_polish_adjective_declension(adj: str, gender: Optional[str] = None,
         }
 
     # 2. Neuter adjective on -e
-    if w_l.endswith("e") or g_upper in ("NEUTER", "NIJAKI"):
+    if w_l.endswith("e") or g_lower in ("neuter", "nijaki"):
         stem = w[:-1] if w_l.endswith("e") else w
         n_ms = stem + "im" if stem.lower().endswith(("k", "g")) else (stem[:-1] + "im" if stem.lower().endswith("i") else stem + "ym")
         return {
@@ -2284,7 +2309,7 @@ def generate_polish_adjective_declension(adj: str, gender: Optional[str] = None,
         }
 
     # 3. Masculine adjective on -y / -i
-    if w_l.endswith(("y", "i")) or g_upper in ("MALE", "MĘŻCZYZNA", "MĘSKI", "MĘSKA"):
+    if w_l.endswith(("y", "i")) or g_lower == "male" or any(k in g_lower for k in ("mężczyzn", "męsk")):
         stem = w[:-1]
         last_c = stem[-1].lower() if stem else ""
         if w_l.endswith("i"):
@@ -4046,7 +4071,7 @@ def _fix_ze_before_consonant_toponyms(m: re.Match) -> str:
     prep = m.group(2)
     sep = m.group(3)
     word = m.group(4)
-    if word.lower() in KNOWN_FANTASY_TOPONYMS or word in {"Paryża", "Londynu", "Berlina", "Rzymu"}:
+    if word.lower() in KNOWN_FANTASY_TOPONYMS or (word and word[0].isupper() and not word.lower().startswith(('s', 'z', 'ś', 'ź', 'ż', 'sz', 'rz', 'w'))):
         p_out = "Z" if prep.isupper() else "z"
         return f"{lead}{p_out}{sep}{word}"
     return m.group(0)
@@ -4202,13 +4227,17 @@ class SeriesBible:
         inst._lock = threading.RLock()
         return inst
 
-    def __init__(self, anime_title: str, storage_dir: Optional[Path] = None):
+    def __init__(self, anime_title: str = "Nieznana Seria", storage_dir: Optional[Path] = None, db_path: Optional[str] = None, **kwargs):
         self._lock = threading.RLock()
+        self.db_path = db_path
         self.anime_title = anime_title.strip() if anime_title else "Nieznana Seria"
         self.slug = clean_anime_slug(self.anime_title)
         self.storage_dir = storage_dir or SERIES_MEMORY_DIR
-        self.storage_dir.mkdir(parents=True, exist_ok=True)
-        self.file_path = self._resolve_bible_path()
+        if self.db_path != ":memory:":
+            self.storage_dir.mkdir(parents=True, exist_ok=True)
+            self.file_path = self._resolve_bible_path()
+        else:
+            self.file_path = Path(":memory:")
         
         self.data: Dict[str, Any] = {
             "anime_title": self.anime_title,
@@ -4223,7 +4252,8 @@ class SeriesBible:
             "batch_stats": {}          # { "odcinek 1": {"batches": 17, "dialogues": 374, "avg_batch_size": 22.0} }
         }
         self.data["characters"].bible_data = self.data
-        self.load()
+        if self.db_path != ":memory:":
+            self.load()
 
     def get_characters_snapshot(self) -> Dict[str, Any]:
         with self._lock:
@@ -4400,7 +4430,7 @@ class SeriesBible:
         self,
         canonical_id: str,
         episode_index: int,
-        new_gender: Optional[Literal["MASCULINE", "FEMININE"]] = None,
+        new_gender: Optional[str] = None,
         anaphora_score: Optional[int] = None,
         prev_anaphora_score: Optional[int] = None,
         delta_score_en: Optional[int] = None,
@@ -5187,7 +5217,7 @@ class SeriesBible:
                         del self.data["declensions"][char_k]
 
             # -------------------------------------------------------------
-            # c) Korekta fonotaktyczna płci i wycofanie niezweryfikowanych etykiet FEMALE
+            # c) Weryfikacja fonotaktyczna płci i wycofanie niezweryfikowanych etykiet FEMALE
             # -------------------------------------------------------------
             WESTERN_FEMALE_PHONOTACTIC_SUFFIXES: Tuple[str, ...] = (
                 "ette", "otte", "tte", "elle", "anne", "inne", "ine", "ise", "ice"
@@ -5642,12 +5672,12 @@ class SeriesBible:
 
         def _extract_gender_from_val(v) -> Optional[str]:
             if isinstance(v, dict):
-                raw_g = str(v.get("gender") or "").strip().upper()
-                if raw_g in ("FEMALE", "KOBIETA", "FEMALE_GROUP"):
+                raw_g = str(v.get("gender") or "").strip().lower()
+                if raw_g in ("female", "kobieta", "female_group"):
                     return "FEMALE"
-                if raw_g in ("MALE", "MĘŻCZYZNA", "MALE_GROUP"):
+                if raw_g in ("male", "mężczyzna", "male_group"):
                     return "MALE"
-                if raw_g in ("NEUTRAL", "BEZPŁCIOWY"):
+                if raw_g in ("neutral", "bezpłciowy"):
                     return "NEUTRAL"
 
             desc_v = str(v.get("description", "") if isinstance(v, dict) else v).lower()
@@ -6010,28 +6040,27 @@ class SeriesBible:
             for p in parts:
                 if is_generic_actor_or_category(p) or self.is_non_character_entity(p):
                     continue
-                # Generate transliteration and phonetic variants (e.g. Ögedei <-> Ogedei <-> Ugedej)
-                variants = {p}
-                p_l = p.lower()
-                if "ö" in p_l:
-                    variants.add(p.replace("Ö", "O").replace("ö", "o"))
-                if "ü" in p_l:
-                    variants.add(p.replace("Ü", "U").replace("ü", "u"))
-                if "sorghaghtani" in p_l:
-                    variants.add("Sorkaktani")
-                if "ögedei" in p_l or "ogedei" in p_l:
-                    variants.update({"Ugedej", "Ugedeja", "Ugedejowi", "Ugedejem"})
-                if "tolui" in p_l:
-                    variants.update({"Tołuj", "Tołuja", "Tołujowi", "Tołujem"})
-                if "chagatai" in p_l:
-                    variants.update({"Czagataj", "Czagataja", "Czagatajowi"})
-                if "temüge" in p_l or "temuge" in p_l:
-                    variants.update({"Temügego", "Temugego", "Temuge"})
-                if "jochi" in p_l:
-                    variants.update({"Dżoczi", "Dżocziego"})
+                # Generate transliteration, aliases and phonetic variants dynamically
+                target_tokens = {p, normalize_ascii_diacritics(p)}
+                c_rec = self.data.get("characters", {}).get(k, {})
+                if isinstance(c_rec, dict):
+                    for al in c_rec.get("aliases", []):
+                        if isinstance(al, str) and len(al.strip()) >= 3:
+                            target_tokens.add(al.strip())
+                            target_tokens.add(normalize_ascii_diacritics(al.strip()))
+                    decl_dict = c_rec.get("declension")
+                    if isinstance(decl_dict, dict):
+                        for form in decl_dict.values():
+                            if isinstance(form, str) and len(form.strip()) >= 3:
+                                target_tokens.add(form.strip())
+                auto_decl = generate_polish_name_declension(p)
+                if isinstance(auto_decl, dict):
+                    for form in auto_decl.values():
+                        if isinstance(form, str) and len(form.strip()) >= 3:
+                            target_tokens.add(form.strip())
 
                 matched_any = False
-                for v in variants:
+                for v in target_tokens:
                     v_esc = re.escape(v)
                     # Exclude 3rd-person genealogy, deceased houses or historical reference (e.g. Tolui's lineage / rodu Tołuja)
                     is_genealogy = bool(re.search(
@@ -6078,8 +6107,10 @@ class SeriesBible:
             ]):
                 detected_cast.add("Boraqchin")
                 detected_cast.add("Möge")
-                for m_male in ["Ögedei", "Ogedei", "Tolui", "Chagatai", "Jochi", "Temüge", "Temuge"]:
-                    detected_cast.discard(m_male)
+                for m_male_kw in "ögedei ogedei tolui chagatai jochi temüge temuge".split():
+                    for c in list(detected_cast):
+                        if c.lower() == m_male_kw:
+                            detected_cast.discard(c)
 
         # Audio Whisper Ground Truth integration (if available)
         combined_whisper = " ".join(whisper_texts or []).lower() if whisper_texts else ""

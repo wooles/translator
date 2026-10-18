@@ -1,105 +1,256 @@
 {
   "anime_title": "Otome Kaijuu Carameliser",
   "characters": {
-    "Arata -> Kuroe": {
-      "description": "Zwrot: 'panno Akaishi (Akaishi-san)' (para zakochanych z dystansem szkolnym) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
-    },
     "Arata": {
-      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "mężczyzna (postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Arata"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Kuroe": {
-      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
-    },
-    "Kuroe -> Arata": {
-      "description": "Zwrot: 'Minami-kun' (para zakochanych)"
-    },
-    "Seina -> Arata": {
-      "description": "Zwrot: 'na ty / świeżaku / młody' (doświadczona gwiazda -> debiutant)"
+      "description": "kobieta (postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Kuroe"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Seina": {
-      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
-    },
-    "Raimu -> Kuroe": {
-      "description": "Zwrot: 'Kuroe' (bliskie koleżanki ze szkoły, bezpośredni styl rówieśniczy gyaru) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "kobieta (postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Seina"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Raimu": {
-      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
-    },
-    "Manatsu -> Kuroe": {
-      "description": "Zwrot: 'panno Kuroe (Kuroe-san)' (szkolna znajoma z dystyngowanym szacunkiem) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "kobieta (postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Raimu"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Manatsu": {
-      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "kobieta (postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Manatsu"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Taichi": {
-      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-      "gender": "MALE"
+      "description": "mężczyzna (postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Taichi"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Kuroe Kurozu": {
-      "description": "kobieta (16 lat, licealistka, pod wpływem emocji zmienia się w gigantycznego kaiju (Harugona)) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "kobieta (16 lat, licealistka, pod wpływem emocji zmienia się w gigantycznego kaiju (Harugona))",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Kuroe Kurozu",
+        "Kurozu"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Arata Inubaki": {
-      "description": "mężczyzna / chłopak (Główny bohater) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-      "gender": "MALE"
-    },
-    "Arata Minami (Inubaki)": {
-      "description": "MĘŻCZYZNA - mężczyzna (16 lat, popularny uczeń, chłopak Kuroe, wciągnięty w show-biznes) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
-      "gender": "MALE"
+      "description": "mężczyzna / chłopak (Główny bohater)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Arata Inubaki",
+        "Inubaki"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Seina Katsuragi": {
-      "description": "kobieta (Licealistka i profesjonalna aktorka, partnerka Araty na planie) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "kobieta (Licealistka i profesjonalna aktorka, partnerka Araty na planie)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Katsuragi",
+        "Seina Katsuragi"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Manatsu Tomita": {
-      "description": "kobieta (Bogata licealistka, fanatyczka kaiju, przyjaciółka Kuroe) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "kobieta (Bogata licealistka, fanatyczka kaiju, przyjaciółka Kuroe)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Manatsu Tomita",
+        "Tomita"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Raimu Kohno": {
-      "description": "kobieta (Licealistka w stylu gyaru, przyjaciółka Kuroe) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "kobieta (Licealistka w stylu gyaru, przyjaciółka Kuroe)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Kohno",
+        "Raimu Kohno"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Minami": {
-      "description": "KOBIETA - KOBIETA (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "KOBIETA - KOBIETA (postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Minami"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Akaishi": {
-      "description": "KOBIETA - kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "KOBIETA - kobieta (postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Akaishi"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Takamine": {
-      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "kobieta (postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Takamine"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Harugon": {
-      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "mężczyzna (postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Harugon"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Godolla": {
-      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "mężczyzna (postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Godolla"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Arata Minami": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Arata Minami",
+        "Minami"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Kuroe Akaishi": {
-      "description": "KOBIETA (wyodrębniono z relacji serii)"
+      "description": "KOBIETA (wyodrębniono z relacji serii)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Akaishi",
+        "Kuroe Akaishi"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Rinko Akaishi": {
-      "description": "KOBIETA (wyodrębniono z relacji serii)"
+      "description": "KOBIETA (wyodrębniono z relacji serii)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Akaishi",
+        "Rinko",
+        "Rinko Akaishi"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Kotaro Hibino": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
-      "gender": "MALE"
-    },
-    "Taichi -> Arata": {
-      "description": "Zwrot: 'na ty' (młodszy rywal o względy Kuroe)"
-    },
-    "Arata Minami -> Kuroe Akaishi": {
-      "description": "Zwrot: 'Akaishi / po imieniu' (sympatia / para licealistów)"
-    },
-    "Kuroe Akaishi -> Arata Minami": {
-      "description": "Zwrot: 'Minami' (sympatia / para licealistów)"
-    },
-    "Rinko Akaishi -> Kotaro Hibino": {
-      "description": "Zwrot: 'Kotaro / Profesorze Hibino' (byli współpracownicy / naukowcy)"
-    },
-    "Kotaro Hibino -> Rinko Akaishi": {
-      "description": "Zwrot: 'panno Akaishi / Rinko' (były student -> starsza koleżanka/mentorka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
-    },
-    "Kotaro -> Rinko": {
-      "description": "Zwrot: 'panno Akaishi / Rinko' (były student -> starsza koleżanka/mentorka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Hibino",
+        "Kotaro",
+        "Kotaro Hibino"
+      ],
+      "entity_category": "ANTHROPONYM"
     }
   },
   "glossary": {
@@ -164,15 +315,29 @@
   },
   "relationships": {
     "Arata -> Kuroe": "Zwrot: 'panno Akaishi (Akaishi-san)' (para zakochanych z dystansem szkolnym) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
-    "Kuroe -> Arata": "Zwrot: 'Minami-kun' (para zakochanych)",
-    "Seina -> Arata": "Zwrot: 'na ty / świeżaku / młody' (doświadczona gwiazda -> debiutant)",
-    "Raimu -> Kuroe": "Zwrot: 'Kuroe' (bliskie koleżanki ze szkoły, bezpośredni styl rówieśniczy gyaru) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]",
-    "Manatsu -> Kuroe": "Zwrot: 'panno Kuroe (Kuroe-san)' (szkolna znajoma z dystyngowanym szacunkiem) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]",
-    "Taichi -> Arata": "Zwrot: 'na ty' (młodszy rywal o względy Kuroe)",
-    "Arata Minami -> Kuroe Akaishi": "Zwrot: 'Akaishi / po imieniu' (sympatia / para licealistów) [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]",
-    "Rinko Akaishi -> Kotaro Hibino": "Zwrot: 'Kotaro / Profesorze Hibino' (byli współpracownicy / naukowcy)",
-    "Kotaro Hibino -> Rinko Akaishi": "Zwrot: 'panno Akaishi / Rinko' (były student -> starsza koleżanka/mentorka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
-    "Kotaro -> Rinko": "Zwrot: 'panno Akaishi / Rinko' (były student -> starsza koleżanka/mentorka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+    "Kuroe -> Arata": "Zwrot: 'Minami-kun' (para zakochanych) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Seina -> Arata": "Zwrot: 'na ty / świeżaku / młody' (doświadczona gwiazda -> debiutant) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Raimu -> Kuroe": "Zwrot: 'Kuroe' (bliskie koleżanki ze szkoły, bezpośredni styl rówieśniczy gyaru) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
+    "Manatsu -> Kuroe": "Zwrot: 'panno Kuroe (Kuroe-san)' (szkolna znajoma z dystyngowanym szacunkiem) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
+    "Taichi -> Arata": "Zwrot: 'na ty' (młodszy rywal o względy Kuroe) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Arata Minami -> Kuroe Akaishi": "Zwrot: 'Akaishi / po imieniu' (sympatia / para licealistów) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Rinko Akaishi -> Kotaro Hibino": "Zwrot: 'Kotaro / Profesorze Hibino' (byli współpracownicy / naukowcy) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Kotaro Hibino -> Rinko Akaishi": "Zwrot: 'panno Akaishi / Rinko' (były student -> starsza koleżanka/mentorka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Kotaro -> Rinko": "Zwrot: 'panno Akaishi / Rinko' (były student -> starsza koleżanka/mentorka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Kuroe Akaishi -> Arata Minami": "Zwrot: 'Minami' (sympatia / para licealistów)"
+  },
+  "relations": {
+    "Arata -> Kuroe": "Zwrot: 'panno Akaishi (Akaishi-san)' (para zakochanych z dystansem szkolnym) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Kuroe -> Arata": "Zwrot: 'Minami-kun' (para zakochanych) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Seina -> Arata": "Zwrot: 'na ty / świeżaku / młody' (doświadczona gwiazda -> debiutant) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Raimu -> Kuroe": "Zwrot: 'Kuroe' (bliskie koleżanki ze szkoły, bezpośredni styl rówieśniczy gyaru) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Manatsu -> Kuroe": "Zwrot: 'panno Kuroe (Kuroe-san)' (szkolna znajoma z dystyngowanym szacunkiem) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Taichi -> Arata": "Zwrot: 'na ty' (młodszy rywal o względy Kuroe) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Arata Minami -> Kuroe Akaishi": "Zwrot: 'Akaishi / po imieniu' (sympatia / para licealistów) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Kuroe Akaishi -> Arata Minami": "Zwrot: 'Minami' (sympatia / para licealistów)",
+    "Rinko Akaishi -> Kotaro Hibino": "Zwrot: 'Kotaro / Profesorze Hibino' (byli współpracownicy / naukowcy) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Kotaro Hibino -> Rinko Akaishi": "Zwrot: 'panno Akaishi / Rinko' (były student -> starsza koleżanka/mentorka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Kotaro -> Rinko": "Zwrot: 'panno Akaishi / Rinko' (były student -> starsza koleżanka/mentorka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]"
   },
   "declensions": {
     "Arata": {
@@ -253,16 +418,6 @@
       "N": "Aratą Inubaki",
       "Ms": "Aracie Inubaki",
       "W": "Arato Inubaki",
-      "gender": "MALE"
-    },
-    "Arata Minami (Inubaki)": {
-      "M": "Arata Minami (Inubaki)",
-      "D": "Aratej Minami (Inubaki)a",
-      "C": "Aratej Minami (Inubaki)owi",
-      "B": "Aratą Minami (Inubaki)a",
-      "N": "Aratą Minami (Inubaki)em",
-      "Ms": "Aratej Minami (Inubaki)ie",
-      "W": "Arata Minami (Inubaki)ie",
       "gender": "MALE"
     },
     "Seina Katsuragi": {
@@ -384,90 +539,6 @@
       "Ms": "Kotaro Hibino",
       "W": "Kotaro Hibino",
       "gender": "MALE"
-    },
-    "Arata -> Kuroe": {
-      "M": "Arata -> Kuroe",
-      "D": "Araty -> Kuroe",
-      "C": "Aracie -> Kuroe",
-      "B": "Aratę -> Kuroe",
-      "N": "Aratą -> Kuroe",
-      "Ms": "Aracie -> Kuroe",
-      "W": "Arato -> Kuroe",
-      "gender": "FEMALE"
-    },
-    "Kuroe -> Arata": {
-      "M": "Kuroe -> Arata",
-      "D": "Kuroe -> Araty",
-      "C": "Kuroe -> Aracie",
-      "B": "Kuroe -> Aratę",
-      "N": "Kuroe -> Aratą",
-      "Ms": "Kuroe -> Aracie",
-      "W": "Kuroe -> Arato"
-    },
-    "Seina -> Arata": {
-      "M": "Seina -> Arata",
-      "D": "Seiny -> Araty",
-      "C": "Seinie -> Aracie",
-      "B": "Seinę -> Aratę",
-      "N": "Seiną -> Aratą",
-      "Ms": "Seinie -> Aracie",
-      "W": "Seino -> Arato"
-    },
-    "Raimu -> Kuroe": {
-      "M": "Raimu -> Kuroe",
-      "D": "Raimu -> Kuroe",
-      "C": "Raimu -> Kuroe",
-      "B": "Raimu -> Kuroe",
-      "N": "Raimu -> Kuroe",
-      "Ms": "Raimu -> Kuroe",
-      "W": "Raimu -> Kuroe",
-      "gender": "FEMALE"
-    },
-    "Manatsu -> Kuroe": {
-      "M": "Manatsu -> Kuroe",
-      "D": "Manatsu -> Kuroe",
-      "C": "Manatsu -> Kuroe",
-      "B": "Manatsu -> Kuroe",
-      "N": "Manatsu -> Kuroe",
-      "Ms": "Manatsu -> Kuroe",
-      "W": "Manatsu -> Kuroe",
-      "gender": "FEMALE"
-    },
-    "Taichi -> Arata": {
-      "M": "Taichi -> Arata",
-      "D": "Taichi -> Araty",
-      "C": "Taichi -> Aracie",
-      "B": "Taichi -> Aratę",
-      "N": "Taichi -> Aratą",
-      "Ms": "Taichi -> Aracie",
-      "W": "Taichi -> Arato"
-    },
-    "Arata Minami -> Kuroe Akaishi": {
-      "M": "Arata Minami -> Kuroe Akaishi",
-      "D": "Araty Minami -> Kuroe Akaishi",
-      "C": "Aracie Minami -> Kuroe Akaishi",
-      "B": "Aratę Minami -> Kuroe Akaishi",
-      "N": "Aratą Minami -> Kuroe Akaishi",
-      "Ms": "Aracie Minami -> Kuroe Akaishi",
-      "W": "Arato Minami -> Kuroe Akaishi"
-    },
-    "Kuroe Akaishi -> Arata Minami": {
-      "M": "Kuroe Akaishi -> Arata Minami",
-      "D": "Kuroe Akaishi -> Araty Minami",
-      "C": "Kuroe Akaishi -> Aracie Minami",
-      "B": "Kuroe Akaishi -> Aratę Minami",
-      "N": "Kuroe Akaishi -> Aratą Minami",
-      "Ms": "Kuroe Akaishi -> Aracie Minami",
-      "W": "Kuroe Akaishi -> Arato Minami"
-    },
-    "Rinko Akaishi -> Kotaro Hibino": {
-      "M": "Rinko Akaishi -> Kotaro Hibino",
-      "D": "Rinko Akaishi -> Kotaro Hibino",
-      "C": "Rinko Akaishi -> Kotaro Hibino",
-      "B": "Rinko Akaishi -> Kotaro Hibino",
-      "N": "Rinko Akaishi -> Kotaro Hibino",
-      "Ms": "Rinko Akaishi -> Kotaro Hibino",
-      "W": "Rinko Akaishi -> Kotaro Hibino"
     }
   },
   "hypocorisms": {
@@ -495,7 +566,6 @@
     "Taichi": "ANTHROPONYM",
     "Kuroe Kurozu": "ANTHROPONYM",
     "Arata Inubaki": "ANTHROPONYM",
-    "Arata Minami (Inubaki)": "ANTHROPONYM",
     "Seina Katsuragi": "ANTHROPONYM",
     "Manatsu Tomita": "ANTHROPONYM",
     "Raimu Kohno": "ANTHROPONYM",
@@ -507,7 +577,14 @@
     "Arata Minami": "ANTHROPONYM",
     "Kuroe Akaishi": "ANTHROPONYM",
     "Rinko Akaishi": "ANTHROPONYM",
-    "Kotaro Hibino": "ANTHROPONYM"
+    "Kotaro Hibino": "ANTHROPONYM",
+    "Kaiju": "TOPONYM",
+    "Harumi": "TOPONYM",
+    "Kinara": "TOPONYM",
+    "Drago": "TOPONYM",
+    "Psycho-tan": "TOPONYM",
+    "Romance": "TOPONYM",
+    "Romantic Comedy": "TOPONYM"
   },
   "fansub_canon": {}
 }

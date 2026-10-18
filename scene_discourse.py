@@ -16,12 +16,12 @@ Odpowiedzialność:
    - Detekcja repliki rodzica/przełożonego ("Słucham?", "Co jest?", "Co się stało?").
    - Wymuszenie relacji hierarchicznej: Mówca A = dziecko/podwładny, Mówca B = rodzic/przełożony.
    - Wykrywanie ciągłości tematycznej (monolog po dwugłosie bez pauzy montażowej Δt <= 1.5s):
-     kontynuacja tematu (np. opis zbroi, pancerza, stroju, technicznych szczegółów) lub F0 >= 220 Hz
-     automatycznie przypisuje kolejne kwestie dziecku (np. postać dziecięca), zapobiegając fałszywej maskulinizacji.
+     kontynuacja tematu relacji lub F0 >= 220 Hz
+     automatycznie przypisuje kolejne kwestie dziecku, zapobiegając fałszywej maskulinizacji.
 
 3. DiarizationSanityChecker:
    - Weryfikacja etykiet dorosłych męskich postaci w obecności wybitnie wysokiego tembru F0 seiyū (> 230 Hz bez basu).
-   - Generowanie flagi WARNING_DIARIZATION_ANOMALY i arbitraż sceniczny w stronę aktywnej mówczyni żeńskiej (np. aktywna postać żeńska).
+   - Generowanie flagi WARNING_DIARIZATION_ANOMALY i arbitraż sceniczny w stronę aktywnej mówczyni żeńskiej.
 """
 
 import re
@@ -88,40 +88,17 @@ def _normalize_event_actor(raw_name: str) -> Tuple[str, Optional[str]]:
     return clean or raw_name.strip(), g
 
 
-__all__ = [
-    "DualVoiceTagPreserver",
-    "DeicticDiscourseEngine",
-    "DiarizationSanityChecker",
-    "SubtitleDiscourseSanitizer",
-    "SpeakerTurn",
-    "SubTurn",
-    "detect_turn_plural_addressee",
-    "detect_plural_addressee",
-    "is_plural_text",
-    "is_addressee_pivot",
-    "partition_subturns",
-    "compute_we_group",
-    "classify_we_group_gender",
-    "compute_you_group",
-    "classify_you_group_gender",
-    "group_speaker_turns",
-    "resolve_turn_addressee",
-    "resolve_all_speaker_turns",
-    "process_scene_discourse",
-    "is_internal_monologue",
-    "resolve_diegetic_persona_gender",
-    "has_second_person_markers",
-    "resolve_scene_participants",
-    "is_character_male",
-    "is_character_female",
-    "is_character_confirmed_female",
-    "is_singular_2nd_person_line",
-    "is_discourse_ignorable",
-    "is_narrative_style",
-    "is_sign_or_title_item",
-    "is_offscreen_or_voiceover",
-    "normalize_actor_tag",
-]
+__all__ = tuple(
+    "DualVoiceTagPreserver DeicticDiscourseEngine DiarizationSanityChecker SubtitleDiscourseSanitizer "
+    "SpeakerTurn SubTurn detect_turn_plural_addressee detect_plural_addressee is_plural_text "
+    "is_addressee_pivot partition_subturns compute_we_group classify_we_group_gender compute_you_group "
+    "classify_you_group_gender group_speaker_turns resolve_turn_addressee resolve_all_speaker_turns "
+    "process_scene_discourse is_internal_monologue resolve_diegetic_persona_gender has_second_person_markers "
+    "resolve_scene_participants is_character_male is_character_female is_character_confirmed_female "
+    "is_singular_2nd_person_line is_discourse_ignorable is_narrative_style is_sign_or_title_item "
+    "is_offscreen_or_voiceover normalize_actor_tag".split()
+)
+
 
 
 class DualVoiceTagPreserver:
@@ -165,7 +142,7 @@ class DualVoiceTagPreserver:
         line_b = m.group(4).strip()
         prefix_tags = tags_a
 
-        # Rozbicie etykiety hybrydowej aktora, np. "Aktor A / Aktor B" -> ("Aktor A", "Aktor B")
+        # Rozbicie etykiety hybrydowej aktora w formacie złożonym przez ukośnik lub kreskę pionową
         raw_name = getattr(event, "name", "") or ""
         spk_a = raw_name
         spk_b = raw_name
@@ -505,7 +482,7 @@ def is_internal_monologue(
        zwraca is_internal_monologue = True NIEZALEŻNIE od tego, czy target_speaker w scenie jest ustawiony (!= None)
        (wewnętrzne myśli podczas rozmowy z kimś w scenie zawsze zachowują true_gender).
        Wyjątek: jeśli target_speaker is None, a obiekt zdarzenia ma jawnie zdefiniowany atrybut addressee
-       (np. szept skierowany do towarzysza: ev.addressee = 'Towarzysz'), kwestia zostaje odrzucona.
+       (gdy wypowiedź skierowano do towarzysza w kadrze), kwestia zostaje odrzucona.
 
     2. Ścieżka Kursywy {\\i1} (Italic Safety Gate):
        Sama kursywa {\\i1} (bez nawiasów myśli i bez stylu Thoughts) zwraca is_internal_monologue = True
@@ -1087,9 +1064,10 @@ def _extract_character_candidates_from_bible(
                 tg = getattr(ident, "true_gender", "")
                 g = "MALE" if tg == "MASCULINE" else ("FEMALE" if tg == "FEMININE" else None)
 
-        norm_g = "MALE" if g in ["MALE", "MASCULINE", "MĘŻCZYZNA", "mężczyzna"] else (
-            "FEMALE" if g in ["FEMALE", "FEMININE", "KOBIETA", "kobieta"] else (
-                "NEUTRAL" if g in ["NEUTRAL", "BEZPŁCIOWY"] else "UNKNOWN"
+        g_l = (g or "").lower()
+        norm_g = "MALE" if g_l in ("male", "masculine", "mężczyzna") else (
+            "FEMALE" if g_l in ("female", "feminine", "kobieta") else (
+                "NEUTRAL" if g_l in ("neutral", "bezpłciowy") else "UNKNOWN"
             )
         )
 
@@ -1782,17 +1760,19 @@ def _resolve_character_canonical_and_gender(
                     conf = float(c_val.get("confidence", 1.0))
                     verified = bool(c_val.get("has_verified_gender", False))
                     effective_conf = 1.0 if verified else conf
-                    if g in ("MALE", "MĘŻCZYZNA", "mężczyzna", "MASCULINE"):
+                    g_l = (g or "").lower()
+                    if g_l in ("male", "mężczyzna", "masculine"):
                         return cand, "MALE", effective_conf
-                    elif g in ("FEMALE", "KOBIETA", "kobieta", "FEMININE"):
+                    elif g_l in ("female", "kobieta", "feminine"):
                         return cand, "FEMALE", effective_conf
 
             if hasattr(series_bible, "get_character_gender"):
                 try:
                     bg = series_bible.get_character_gender(cand)
-                    if bg in ("MALE", "MĘŻCZYZNA", "mężczyzna", "MASCULINE"):
+                    bg_l = (bg or "").lower()
+                    if bg_l in ("male", "mężczyzna", "masculine"):
                         return cand, "MALE", 1.0
-                    elif bg in ("FEMALE", "KOBIETA", "kobieta", "FEMININE"):
+                    elif bg_l in ("female", "kobieta", "feminine"):
                         return cand, "FEMALE", 1.0
                 except Exception:
                     pass
@@ -2526,8 +2506,9 @@ def resolve_turn_addressee(
                     if not resp_gender and hasattr(next_turn, "speaker_gender"):
                         resp_gender = next_turn.speaker_gender
 
-                    norm_resp_g = "MALE" if resp_gender in ["MALE", "MĘŻCZYZNA", "mężczyzna", "MASCULINE"] else (
-                        "FEMALE" if resp_gender in ["FEMALE", "KOBIETA", "kobieta", "FEMININE"] else None
+                    resp_g_l = (resp_gender or "").lower()
+                    norm_resp_g = "MALE" if resp_g_l in ("male", "mężczyzna", "masculine") else (
+                        "FEMALE" if resp_g_l in ("female", "kobieta", "feminine") else None
                     )
                     if norm_resp_g or resp_speaker:
                         turn.target_speaker = resp_speaker

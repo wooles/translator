@@ -2,263 +2,381 @@
   "anime_title": "Tenmaku no Jaadugar",
   "characters": {
     "Fatima / Sitara": {
-      "description": "postać (Postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "postać (Postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Fatima",
+        "Fatima / Sitara"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Töregene": {
-      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "kobieta (postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Töregene"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Ögedei": {
-      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-      "gender": "MALE"
+      "description": "mężczyzna (postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Ögedei"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Chagatai / Tolui": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać) [MĘŻCZYZNA]",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Chagatai",
+        "Chagatai / Tolui"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Chagatai / Tolui / Chinqai / Temüge": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Chagatai",
+        "Chagatai / Tolui / Chinqai / Temüge"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Boraqchin": {
-      "description": "kobieta (starsza kobieta, pierwsza małżonka Chana, dojrzały/ochrypły głos seiyū) [KOBIETA (Mówczyni/Adresat) - KATEGORYCZNY WYMÓG FORM ŻEŃSKICH w 1. os. (-łam/-łabym: miałam, miałabym, wiedziałam, zrobiłam) oraz 2. os. lp. 'ty' (-łaś: byłaś, zrobiłaś, jesteś pewna)]"
+      "description": "kobieta (starsza kobieta, pierwsza małżonka Chana, dojrzały/ochrypły głos seiyū)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Boraqchin"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Möge": {
-      "description": "KOBIETA (Wielka Chatun, żona Czyngis-chana i Ugedeja, z kategorycznym nakazem form żeńskich)"
+      "description": "KOBIETA (Wielka Chatun, żona Czyngis-chana i Ugedeja, z kategorycznym nakazem form żeńskich)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Möge"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Gujuk": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-      "gender": "MALE"
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Gujuk"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Güyük": {
-      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-      "gender": "MALE"
+      "description": "mężczyzna (postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Güyük"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Temüge": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Temüge"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Otai": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-      "gender": "MALE"
+      "description": "postać (Postać) [MĘŻCZYZNA]",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Otai"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Qadaq": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Qadaq"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Sitara": {
-      "description": "postać (Postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "postać (Postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Sitara"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Dayir": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-      "gender": "MALE"
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Dayir"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Khulan": {
-      "description": "postać (Postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "postać (Postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Khulan"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Chagatai": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-      "gender": "MALE"
+      "description": "postać (Postać) [MĘŻCZYZNA]",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Chagatai"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Tolui": {
-      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-      "gender": "MALE"
+      "description": "mężczyzna (postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Tolui"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Hulegu": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-      "gender": "MALE"
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Hulegu"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Sorghaghtani": {
-      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "kobieta (postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Sorghaghtani"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Subutai": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-      "gender": "MALE"
+      "description": "postać (Postać) [MĘŻCZYZNA]",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Subutai"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Dayir Usun": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Dayir Usun",
+        "Usun"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Chinqai": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Chinqai"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Fatima": {
-      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "kobieta (postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Fatima"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Shira": {
       "description": "MĘŻCZYZNA (młodzieniec z Samarkandy, tłumacz i strateg, seiyū: Miyu Irino). KATEGORYCZNY NAKAZ form męskich w czasie przeszłym: 'Shira mówił / ostrzegał / wiedział / pomógł / zrobił'. ZAKAZ form żeńskich ('ostrzegała')!",
-      "gender": "MALE"
-    },
-    "Fatima / Sitara -> Töregene": {
-      "description": "Zwrot: 'Pani Toregene / Wasza Dostojność' (służąca / zaufana doradczyni -> małżonka chana (chatun)) [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]"
-    },
-    "Töregene -> Fatima / Sitara": {
-      "description": "Zwrot: 'Fatimo / na ty' (pani -> zaufana służąca) [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]"
-    },
-    "Fatima / Sitara -> Boraqchin": {
-      "description": "Zwrot: 'Wielka Chatun / Wasza Dostojność' (służąca -> pierwsza małżonka chana (chatun)) [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', w 1. os. -łam/-łabym (zamierzałam, dopięłam, zrobiłam, miałabym), w 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna / wzburzona (KATEGORYCZNY ZAKAZ: 'wzburzonego')]"
-    },
-    "Boraqchin -> Fatima / Sitara": {
-      "description": "Zwrot: 'Fatimo / na ty' (pierwsza małżonka chana -> zaufana służąca) [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', w 1. os. -łam/-łabym (zamierzałam, dopięłam, zrobiłam, miałabym), w 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna / wzburzona]"
-    },
-    "Ögedei -> Chagatai / Tolui": {
-      "description": "Zwrot: 'po imieniu: Czagataju / Tołuju' (Wielki Chan -> młodsi/starsi bracia)"
-    },
-    "Chagatai / Tolui / Chinqai / Temüge -> Ögedei": {
-      "description": "Zwrot: 'Wielki Chanie / Wasza Dostojność' (wasale i bracia / urzędnicy -> władca Imperium)"
-    },
-    "Boraqchin -> Möge": {
-      "description": "Zwrot: 'Möge' (pierwsza żona -> czwarta żona) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
-    },
-    "Möge -> Boraqchin": {
-      "description": "Zwrot: 'Boraqchin' (współżona / bliska przyjaciółka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
-    },
-    "Temüge -> Otai": {
-      "description": "Zwrot: 'synu / na ty (błędnie przekręcając imię)' (ojciec (brat Czyngis-chana) -> syn) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
-    },
-    "Qadaq -> Fatima / Sitara": {
-      "description": "Zwrot: 'na ty / Fatimo' (wojownik / strażnik -> służąca)"
-    },
-    "Töregene -> Sitara": {
-      "description": "Zwrot: 'Fatima / na ty' (pani -> zaufana służąca) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama\\NOCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu zakaz opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?']"
-    },
-    "Sitara -> Töregene": {
-      "description": "Zwrot: 'Pani Toregene / Wasza Dostojność' (służąca / zaufana doradczyni -> małżonka chana (chatun)) [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)] [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [OCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu zakaz opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?']"
-    },
-    "Dayir -> Töregene": {
-      "description": "Zwrot: 'po imieniu: Töregene' (mąż -> żona) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
-    },
-    "Khulan -> Dayir": {
-      "description": "Zwrot: 'ojcze' (córka -> ojciec) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
-    },
-    "Ögedei -> Töregene": {
-      "description": "Zwrot: 'Töregene / na ty' (mąż/Wielki Chan -> żona/Druga Chatun) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
-    },
-    "Chagatai -> Ögedei": {
-      "description": "Zwrot: 'Wielki Chan Ögedei' (brat/poddany -> Wielki Chan) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
-    },
-    "Tolui -> Ögedei": {
-      "description": "Zwrot: 'bracie' (młodszy brat -> starszy brat / Wielki Chan) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
-    },
-    "Sitara -> Boraqchin": {
-      "description": "Zwrot: 'Wielka Chatun / Wasza Dostojność' (służąca -> pierwsza małżonka chana (chatun)) [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', w 1. os. -łam/-łabym (zamierzałam, dopięłam, zrobiłam, miałabym), w 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna / wzburzona (KATEGORYCZNY ZAKAZ: 'wzburzonego')] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]"
-    },
-    "Hulegu -> Sorghaghtani": {
-      "description": "Zwrot: 'Matko' (syn -> matka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
-    },
-    "Tolui -> Subutai": {
-      "description": "Zwrot: 'po imieniu / Subutai' (wodzowie / książę -> generał) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
-    },
-    "Boraqchin -> Sitara": {
-      "description": "Zwrot: 'Fatimo / na ty' (cesarzowa -> poddana/służąca) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]"
-    },
-    "Möge -> Sitara": {
-      "description": "Zwrot: 'dziewczyno / Fatimo' (księżna -> poddana) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
-    },
-    "Dayir Usun -> Töregene": {
-      "description": "Zwrot: 'po imieniu: Töregene' (mąż / wódz -> żona) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
-    },
-    "Khulan -> Töregene": {
-      "description": "Zwrot: 'matko / Töregene' (pasierbica -> macocha / przyjaciele) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
-    },
-    "Töregene -> Dayir": {
-      "description": "Zwrot: 'wodzu Dayirze / mężu' (żona -> wódz i mąż) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
-    },
-    "Chinqai -> Ögedei": {
-      "description": "Zwrot: 'Wielki Chanie' (wielki pisarz/kanclerz -> władca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
-    },
-    "Fatima -> Boraqchin": {
-      "description": "Zwrot: 'Wielka Chatuń / Wasza Wysokość' (poddana / doradczyni -> władczyni) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
-    },
-    "Fatima -> Töregene": {
-      "description": "Zwrot: 'pani Töregene / pani' (służąca/powiernica -> pani i sojuszniczka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]"
-    },
-    "Ögedei -> Tolui": {
-      "description": "Zwrot: 'Tołuju / bracie' (starszy brat -> młodszy brat) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
-    },
-    "Sitara -> Shira": {
-      "description": "Zwrot: 'Shira / na ty' (Shira to MĘŻCZYZNA / młodzieniec z Samarkandy, tłumacz w obozie Mongołów; bezwzględnie formy męskie: 'Shira mówił / ostrzegał / pomógł') [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
-    },
-    "Qadaq -> Güyük": {
-      "description": "Zwrot: 'książę Gujuk / panie' (wierny zarządca/sługa -> młody książę) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
-    },
-    "Sitara -> Sorghaghtani": {
-      "description": "Zwrot: 'Księżniczko Sorkaktani / pani' (posłanniczka / dawna podwładna -> arystokratka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]"
-    },
-    "Boraqchin -> Ögedei": {
-      "description": "Zwrot: 'Wielki Chanie / mój panie' (żona/cesarzowa -> mąż/władca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
-    },
-    "Töregene -> Fatima": {
-      "description": "Zwrot: 'Fatimo / ty' (arystokratka -> zaufana powiernica) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [OCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu zakaz opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?']"
-    },
-    "Ögedei -> Fatima": {
-      "description": "Zwrot: 'Fatimo / ty' (władca -> perska uczona branka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
-    },
-    "Fatima -> Ögedei": {
-      "description": "Zwrot: 'Wielki Chanie / wasza chagańska mość' (poddana -> imperator) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
-    },
-    "Töregene -> Güyük": {
-      "description": "Zwrot: 'Mój słodki Gujuku / Gujuku' (matka -> syn) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
-    },
-    "Güyük -> Töregene": {
-      "description": "Zwrot: 'Matko / pani' (syn -> matka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
-    },
-    "Güyük -> Ögedei": {
-      "description": "Zwrot: 'ojcze / Wielki Chanie' (syn -> ojciec/władca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
-    },
-    "Ögedei -> Chagatai": {
-      "description": "Zwrot: 'po imieniu: Czagataju / Tołuju' (Wielki Chan -> młodsi/starsi bracia) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
-    },
-    "Temüge -> Ögedei": {
-      "description": "Zwrot: 'Wielki Chanie / Wasza Dostojność' (wasale i bracia / urzędnicy -> władca Imperium) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
-    },
-    "Qadaq -> Fatima": {
-      "description": "Zwrot: 'na ty / Fatimo' (wojownik / strażnik -> służąca) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Shira"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Ilüge": {
-      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "mężczyzna (postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Ilüge"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Chulan": {
-      "description": "postać (Postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
-    },
-    "Töregene -> Gujuk": {
-      "description": "Zwrot: 'Gujuku / mój drogi Gujuku' (matka -> syn) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
-    },
-    "Gujuk -> Töregene": {
-      "description": "Zwrot: 'matko' (syn -> matka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
-    },
-    "Ugedej -> Fatima": {
-      "description": "Zwrot: 'na ty / Fatimo' (monarcha -> służąca) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]"
+      "description": "postać (Postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Chulan"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Ugedej": {
-      "description": "postać (Postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
-    },
-    "Fatima -> Ugedej": {
-      "description": "Zwrot: 'Wielki Chanie' (poddana -> monarcha) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
-    },
-    "Shira -> Fatima": {
-      "description": "Zwrot: 'Fatimo / na ty' (towarzysze niedoli / słudzy) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
-    },
-    "Ugedej (Ögedei)": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
-    },
-    "Gujuk (Güyük)": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Ugedej"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Sorkaktani": {
-      "description": "postać (Postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "postać (Postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Sorkaktani"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Tołuj": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Tołuj"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "mężczyzna": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
-    },
-    "Sorghaghtani -> Ögedei": {
-      "description": "Zwrot: 'Wielki Chanie' (arystokratka/bratowa -> chan) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "mężczyzna"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Sorghaghtani Beki": {
-      "description": "postać (Postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
-    },
-    "Möge -> Güyük": {
-      "description": "Zwrot: 'mój słodki Gujuku / Gujuku' (przybrana matka/cesarzowa -> książę pasierb) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
-    },
-    "Boraqchin -> Fatima": {
-      "description": "Zwrot: 'Fatimo / na ty' (pierwsza małżonka chana -> zaufana służąca) [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', w 1. os. -łam/-łabym (zamierzałam, dopięłam, zrobiłam, miałabym), w 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna / wzburzona] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [OCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu zakaz opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?']"
+      "description": "postać (Postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Beki",
+        "Sorghaghtani Beki"
+      ],
+      "entity_category": "ANTHROPONYM"
     }
   },
   "glossary": {
@@ -363,38 +481,38 @@
     "kams": "kamowie"
   },
   "relationships": {
-    "Fatima / Sitara -> Töregene": "Zwrot: 'Pani Toregene / Wasza Dostojność' (służąca / zaufana doradczyni -> małżonka chana (chatun)) [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]",
-    "Töregene -> Fatima / Sitara": "Zwrot: 'Fatimo / na ty' (pani -> zaufana służąca) [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]",
-    "Ögedei -> Chagatai / Tolui": "Zwrot: 'po imieniu: Czagataju / Tołuju' (Wielki Chan -> młodsi/starsi bracia)",
-    "Chagatai / Tolui / Chinqai / Temüge -> Ögedei": "Zwrot: 'Wielki Chanie / Wasza Dostojność' (wasale i bracia / urzędnicy -> władca Imperium)",
-    "Boraqchin -> Möge": "Zwrot: 'Möge' (pierwsza żona -> czwarta żona) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]",
-    "Möge -> Boraqchin": "Zwrot: 'Boraqchin' (współżona / bliska przyjaciółka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]",
+    "Fatima / Sitara -> Töregene": "Zwrot: 'Pani Toregene / Wasza Dostojność' (służąca / zaufana doradczyni -> małżonka chana (chatun)) [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)] [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [OCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu eliminacja opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?']",
+    "Töregene -> Fatima / Sitara": "Zwrot: 'Fatimo / na ty' (pani -> zaufana służąca) [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)] [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [OCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu eliminacja opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?']",
+    "Ögedei -> Chagatai / Tolui": "Zwrot: 'po imieniu: Czagataju / Tołuju' (Wielki Chan -> młodsi/starsi bracia) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Chagatai / Tolui / Chinqai / Temüge -> Ögedei": "Zwrot: 'Wielki Chanie / Wasza Dostojność' (wasale i bracia / urzędnicy -> władca Imperium) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Boraqchin -> Möge": "Zwrot: 'Möge' (pierwsza żona -> czwarta żona) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
+    "Möge -> Boraqchin": "Zwrot: 'Boraqchin' (współżona / bliska przyjaciółka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
     "Temüge -> Otai": "Zwrot: 'synu / na ty (błędnie przekręcając imię)' (ojciec (brat Czyngis-chana) -> syn) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Qadaq -> Fatima / Sitara": "Zwrot: 'na ty / Fatimo' (wojownik / strażnik -> służąca)",
-    "Töregene -> Sitara": "Zwrot: 'Fatima / na ty' (pani -> zaufana służąca) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama\\NOCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu zakaz opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?'] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]",
-    "Sitara -> Töregene": "Zwrot: 'Pani Toregene / Wasza Dostojność' (służąca / zaufana doradczyni -> małżonka chana (chatun)) [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)] [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [OCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu zakaz opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?']",
+    "Qadaq -> Fatima / Sitara": "Zwrot: 'na ty / Fatimo' (wojownik / strażnik -> służąca) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Töregene -> Sitara": "Zwrot: 'Fatima / na ty' (pani -> zaufana służąca) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama\\NOCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu zakaz opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?'] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
+    "Sitara -> Töregene": "Zwrot: 'Pani Toregene / Wasza Dostojność' (służąca / zaufana doradczyni -> małżonka chana (chatun)) [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)\\NKOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama\\NOCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu zakaz opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?']",
     "Dayir -> Töregene": "Zwrot: 'po imieniu: Töregene' (mąż -> żona) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Khulan -> Dayir": "Zwrot: 'ojcze' (córka -> ojciec) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Ögedei -> Töregene": "Zwrot: 'Töregene / na ty' (mąż/Wielki Chan -> żona/Druga Chatun) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Chagatai -> Ögedei": "Zwrot: 'Wielki Chan Ögedei' (brat/poddany -> Wielki Chan) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Tolui -> Ögedei": "Zwrot: 'bracie' (młodszy brat -> starszy brat / Wielki Chan) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Sitara -> Boraqchin": "Zwrot: 'Wielka Chatun / Wasza Dostojność' (służąca -> pierwsza małżonka chana (chatun)) [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', w 1. os. -łam/-łabym (zamierzałam, dopięłam, zrobiłam, miałabym), w 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna / wzburzona (KATEGORYCZNY ZAKAZ: 'wzburzonego')] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Sitara -> Boraqchin": "Zwrot: 'Wielka Chatun / Wasza Dostojność' (służąca -> pierwsza małżonka chana (chatun)) [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', w 1. os. -łam/-łabym (zamierzałam, dopięłam, zrobiłam, miałabym), w 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna / wzburzona (KATEGORYCZNY ZAKAZ: 'wzburzonego')\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
     "Hulegu -> Sorghaghtani": "Zwrot: 'Matko' (syn -> matka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Tolui -> Subutai": "Zwrot: 'po imieniu / Subutai' (wodzowie / książę -> generał) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Boraqchin -> Sitara": "Zwrot: 'Fatimo / na ty' (cesarzowa -> poddana/służąca) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]",
-    "Möge -> Sitara": "Zwrot: 'dziewczyno / Fatimo' (księżna -> poddana) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]",
+    "Boraqchin -> Sitara": "Zwrot: 'Fatimo / na ty' (cesarzowa -> poddana/służąca) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
+    "Möge -> Sitara": "Zwrot: 'dziewczyno / Fatimo' (księżna -> poddana) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
     "Dayir Usun -> Töregene": "Zwrot: 'po imieniu: Töregene' (mąż / wódz -> żona) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
-    "Khulan -> Töregene": "Zwrot: 'matko / Töregene' (pasierbica -> macocha / przyjaciele) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]",
+    "Khulan -> Töregene": "Zwrot: 'matko / Töregene' (pasierbica -> macocha / przyjaciele) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
     "Töregene -> Dayir": "Zwrot: 'wodzu Dayirze / mężu' (żona -> wódz i mąż) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Chinqai -> Ögedei": "Zwrot: 'Wielki Chanie' (wielki pisarz/kanclerz -> władca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Fatima -> Boraqchin": "Zwrot: 'Wielka Chatuń / Wasza Wysokość' (poddana / doradczyni -> władczyni) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]",
-    "Fatima -> Töregene": "Zwrot: 'pani Töregene / pani' (służąca/powiernica -> pani i sojuszniczka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]",
+    "Fatima -> Boraqchin": "Zwrot: 'Wielka Chatuń / Wasza Wysokość' (poddana / doradczyni -> władczyni) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
+    "Fatima -> Töregene": "Zwrot: 'pani Töregene / pani' (służąca/powiernica -> pani i sojuszniczka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
     "Ögedei -> Tolui": "Zwrot: 'Tołuju / bracie' (starszy brat -> młodszy brat) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Sitara -> Shira": "Zwrot: 'Shira / na ty' (Shira to MĘŻCZYZNA / młodzieniec z Samarkandy, tłumacz w obozie Mongołów; bezwzględnie formy męskie: 'Shira mówił / ostrzegał / pomógł') [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Qadaq -> Güyük": "Zwrot: 'książę Gujuk / panie' (wierny zarządca/sługa -> młody książę) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Sitara -> Sorghaghtani": "Zwrot: 'Księżniczko Sorkaktani / pani' (posłanniczka / dawna podwładna -> arystokratka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]",
+    "Sitara -> Sorghaghtani": "Zwrot: 'Księżniczko Sorkaktani / pani' (posłanniczka / dawna podwładna -> arystokratka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
     "Boraqchin -> Ögedei": "Zwrot: 'Wielki Chanie / mój panie' (żona/cesarzowa -> mąż/władca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Töregene -> Fatima": "Zwrot: 'Fatimo / ty' (arystokratka -> zaufana powiernica) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [OCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu zakaz opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?'] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]",
+    "Töregene -> Fatima": "Zwrot: 'Fatimo / ty' (arystokratka -> zaufana powiernica) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna\\NOCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu zakaz opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?'] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
     "Ögedei -> Fatima": "Zwrot: 'Fatimo / ty' (władca -> perska uczona branka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Fatima -> Ögedei": "Zwrot: 'Wielki Chanie / wasza chagańska mość' (poddana -> imperator) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Töregene -> Güyük": "Zwrot: 'Mój słodki Gujuku / Gujuku' (matka -> syn) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
@@ -402,27 +520,71 @@
     "Güyük -> Ögedei": "Zwrot: 'ojcze / Wielki Chanie' (syn -> ojciec/władca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Ögedei -> Chagatai": "Zwrot: 'po imieniu: Czagataju / Tołuju' (Wielki Chan -> młodsi/starsi bracia) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Temüge -> Ögedei": "Zwrot: 'Wielki Chanie / Wasza Dostojność' (wasale i bracia / urzędnicy -> władca Imperium) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Qadaq -> Fatima": "Zwrot: 'na ty / Fatimo' (wojownik / strażnik -> służąca) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Qadaq -> Fatima": "Zwrot: 'na ty / Fatimo' (wojownik / strażnik -> służąca) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
     "Töregene -> Gujuk": "Zwrot: 'Gujuku / mój drogi Gujuku' (matka -> syn) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Gujuk -> Töregene": "Zwrot: 'matko' (syn -> matka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
-    "Ugedej -> Fatima": "Zwrot: 'na ty / Fatimo' (monarcha -> służąca) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]",
-    "Fatima -> Ugedej": "Zwrot: 'Wielki Chanie' (poddana -> monarcha) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]",
+    "Ugedej -> Fatima": "Zwrot: 'na ty / Fatimo' (monarcha -> służąca) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
+    "Fatima -> Ugedej": "Zwrot: 'Wielki Chanie' (poddana -> monarcha) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
     "Shira -> Fatima": "Zwrot: 'Fatimo / na ty' (towarzysze niedoli / słudzy) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Sorghaghtani -> Ögedei": "Zwrot: 'Wielki Chanie' (arystokratka/bratowa -> chan) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Möge -> Güyük": "Zwrot: 'mój słodki Gujuku / Gujuku' (przybrana matka/cesarzowa -> książę pasierb) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Boraqchin -> Fatima": "Zwrot: 'Fatimo / na ty' (pierwsza małżonka chana -> zaufana służąca) [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', w 1. os. -łam/-łabym (zamierzałam, dopięłam, zrobiłam, miałabym), w 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna / wzburzona] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [OCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu zakaz opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?']"
+    "Boraqchin -> Fatima": "Zwrot: 'Fatimo / na ty' (pierwsza małżonka chana -> zaufana służąca) [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', w 1. os. -łam/-łabym (zamierzałam, dopięłam, zrobiłam, miałabym), w 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna / wzburzona\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama\\NOCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu zakaz opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?']",
+    "Fatima / Sitara -> Boraqchin": "Zwrot: 'Wielka Chatun / Wasza Dostojność' (służąca -> pierwsza małżonka chana (chatun)) [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', w 1. os. -łam/-łabym (zamierzałam, dopięłam, zrobiłam, miałabym), w 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna / wzburzona (KATEGORYCZNY ZAKAZ: 'wzburzonego')] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Boraqchin -> Fatima / Sitara": "Zwrot: 'Fatimo / na ty' (pierwsza małżonka chana -> zaufana służąca) [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', w 1. os. -łam/-łabym (zamierzałam, dopięłam, zrobiłam, miałabym), w 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna / wzburzona] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [OCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu eliminacja opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?']"
+  },
+  "relations": {
+    "Fatima / Sitara -> Töregene": "Zwrot: 'Pani Toregene / Wasza Dostojność' (służąca / zaufana doradczyni -> małżonka chana (chatun)) [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)] [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [OCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu eliminacja opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?']",
+    "Töregene -> Fatima / Sitara": "Zwrot: 'Fatimo / na ty' (pani -> zaufana służąca) [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)] [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [OCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu eliminacja opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?']",
+    "Fatima / Sitara -> Boraqchin": "Zwrot: 'Wielka Chatun / Wasza Dostojność' (służąca -> pierwsza małżonka chana (chatun)) [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', w 1. os. -łam/-łabym (zamierzałam, dopięłam, zrobiłam, miałabym), w 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna / wzburzona (KATEGORYCZNY ZAKAZ: 'wzburzonego')] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Boraqchin -> Fatima / Sitara": "Zwrot: 'Fatimo / na ty' (pierwsza małżonka chana -> zaufana służąca) [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', w 1. os. -łam/-łabym (zamierzałam, dopięłam, zrobiłam, miałabym), w 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna / wzburzona] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [OCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu eliminacja opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?']",
+    "Ögedei -> Chagatai / Tolui": "Zwrot: 'po imieniu: Czagataju / Tołuju' (Wielki Chan -> młodsi/starsi bracia) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Chagatai / Tolui / Chinqai / Temüge -> Ögedei": "Zwrot: 'Wielki Chanie / Wasza Dostojność' (wasale i bracia / urzędnicy -> władca Imperium) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Boraqchin -> Möge": "Zwrot: 'Möge' (pierwsza żona -> czwarta żona) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Möge -> Boraqchin": "Zwrot: 'Boraqchin' (współżona / bliska przyjaciółka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Temüge -> Otai": "Zwrot: 'synu / na ty (błędnie przekręcając imię)' (ojciec (brat Czyngis-chana) -> syn) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Qadaq -> Fatima / Sitara": "Zwrot: 'na ty / Fatimo' (wojownik / strażnik -> służąca) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Töregene -> Sitara": "Zwrot: 'Fatima / na ty' (pani -> zaufana służąca) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama\\NOCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu zakaz opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?']",
+    "Sitara -> Töregene": "Zwrot: 'Pani Toregene / Wasza Dostojność' (służąca / zaufana doradczyni -> małżonka chana (chatun)) [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)\\NKOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama\\NOCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu zakaz opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?']",
+    "Dayir -> Töregene": "Zwrot: 'po imieniu: Töregene' (mąż -> żona) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Khulan -> Dayir": "Zwrot: 'ojcze' (córka -> ojciec) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Ögedei -> Töregene": "Zwrot: 'Töregene / na ty' (mąż/Wielki Chan -> żona/Druga Chatun) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Chagatai -> Ögedei": "Zwrot: 'Wielki Chan Ögedei' (brat/poddany -> Wielki Chan) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Tolui -> Ögedei": "Zwrot: 'bracie' (młodszy brat -> starszy brat / Wielki Chan) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Sitara -> Boraqchin": "Zwrot: 'Wielka Chatun / Wasza Dostojność' (służąca -> pierwsza małżonka chana (chatun)) [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', w 1. os. -łam/-łabym (zamierzałam, dopięłam, zrobiłam, miałabym), w 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna / wzburzona (KATEGORYCZNY ZAKAZ: 'wzburzonego')\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Hulegu -> Sorghaghtani": "Zwrot: 'Matko' (syn -> matka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Tolui -> Subutai": "Zwrot: 'po imieniu / Subutai' (wodzowie / książę -> generał) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Boraqchin -> Sitara": "Zwrot: 'Fatimo / na ty' (cesarzowa -> poddana/służąca) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Möge -> Sitara": "Zwrot: 'dziewczyno / Fatimo' (księżna -> poddana) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Dayir Usun -> Töregene": "Zwrot: 'po imieniu: Töregene' (mąż / wódz -> żona) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Khulan -> Töregene": "Zwrot: 'matko / Töregene' (pasierbica -> macocha / przyjaciele) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Töregene -> Dayir": "Zwrot: 'wodzu Dayirze / mężu' (żona -> wódz i mąż) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Chinqai -> Ögedei": "Zwrot: 'Wielki Chanie' (wielki pisarz/kanclerz -> władca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Fatima -> Boraqchin": "Zwrot: 'Wielka Chatuń / Wasza Wysokość' (poddana / doradczyni -> władczyni) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Fatima -> Töregene": "Zwrot: 'pani Töregene / pani' (służąca/powiernica -> pani i sojuszniczka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Ögedei -> Tolui": "Zwrot: 'Tołuju / bracie' (starszy brat -> młodszy brat) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Sitara -> Shira": "Zwrot: 'Shira / na ty' (Shira to MĘŻCZYZNA / młodzieniec z Samarkandy, tłumacz w obozie Mongołów; bezwzględnie formy męskie: 'Shira mówił / ostrzegał / pomógł') [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Qadaq -> Güyük": "Zwrot: 'książę Gujuk / panie' (wierny zarządca/sługa -> młody książę) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Sitara -> Sorghaghtani": "Zwrot: 'Księżniczko Sorkaktani / pani' (posłanniczka / dawna podwładna -> arystokratka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Boraqchin -> Ögedei": "Zwrot: 'Wielki Chanie / mój panie' (żona/cesarzowa -> mąż/władca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Töregene -> Fatima": "Zwrot: 'Fatimo / ty' (arystokratka -> zaufana powiernica) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna\\NOCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu zakaz opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?']",
+    "Ögedei -> Fatima": "Zwrot: 'Fatimo / ty' (władca -> perska uczona branka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Fatima -> Ögedei": "Zwrot: 'Wielki Chanie / wasza chagańska mość' (poddana -> imperator) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Töregene -> Güyük": "Zwrot: 'Mój słodki Gujuku / Gujuku' (matka -> syn) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Güyük -> Töregene": "Zwrot: 'Matko / pani' (syn -> matka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Güyük -> Ögedei": "Zwrot: 'ojcze / Wielki Chanie' (syn -> ojciec/władca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Ögedei -> Chagatai": "Zwrot: 'po imieniu: Czagataju / Tołuju' (Wielki Chan -> młodsi/starsi bracia) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Temüge -> Ögedei": "Zwrot: 'Wielki Chanie / Wasza Dostojność' (wasale i bracia / urzędnicy -> władca Imperium) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Qadaq -> Fatima": "Zwrot: 'na ty / Fatimo' (wojownik / strażnik -> służąca) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Töregene -> Gujuk": "Zwrot: 'Gujuku / mój drogi Gujuku' (matka -> syn) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Gujuk -> Töregene": "Zwrot: 'matko' (syn -> matka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Ugedej -> Fatima": "Zwrot: 'na ty / Fatimo' (monarcha -> służąca) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Fatima -> Ugedej": "Zwrot: 'Wielki Chanie' (poddana -> monarcha) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Shira -> Fatima": "Zwrot: 'Fatimo / na ty' (towarzysze niedoli / słudzy) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Sorghaghtani -> Ögedei": "Zwrot: 'Wielki Chanie' (arystokratka/bratowa -> chan) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Möge -> Güyük": "Zwrot: 'mój słodki Gujuku / Gujuku' (przybrana matka/cesarzowa -> książę pasierb) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Boraqchin -> Fatima": "Zwrot: 'Fatimo / na ty' (pierwsza małżonka chana -> zaufana służąca) [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', w 1. os. -łam/-łabym (zamierzałam, dopięłam, zrobiłam, miałabym), w 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna / wzburzona\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama\\NOCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu zakaz opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?']"
   },
   "declensions": {
-    "Fatima / Sitara": {
-      "M": "Fatima / Sitara",
-      "D": "Fatimy / Sitary",
-      "C": "Fatimie / Sitarze",
-      "B": "Fatimę / Sitarę",
-      "N": "Fatimą / Sitarą",
-      "Ms": "Fatimie / Sitarze",
-      "W": "Fatimo / Sitaro",
-      "gender": "FEMALE"
-    },
     "Töregene": {
       "M": "Töregene",
       "D": "Töregene",
@@ -441,26 +603,6 @@
       "N": "Ögedei",
       "Ms": "Ögedei",
       "W": "Ögedei",
-      "gender": "MALE"
-    },
-    "Chagatai / Tolui": {
-      "M": "Chagatai / Tolui",
-      "D": "Chagatai / Tolui",
-      "C": "Chagatai / Tolui",
-      "B": "Chagatai / Tolui",
-      "N": "Chagatai / Tolui",
-      "Ms": "Chagatai / Tolui",
-      "W": "Chagatai / Tolui",
-      "gender": "MALE"
-    },
-    "Chagatai / Tolui / Chinqai / Temüge": {
-      "M": "Chagatai / Tolui / Chinqai / Temüge",
-      "D": "Chagatai / Tolui / Chinqai / Temüge",
-      "C": "Chagatai / Tolui / Chinqai / Temüge",
-      "B": "Chagatai / Tolui / Chinqai / Temüge",
-      "N": "Chagatai / Tolui / Chinqai / Temüge",
-      "Ms": "Chagatai / Tolui / Chinqai / Temüge",
-      "W": "Chagatai / Tolui / Chinqai / Temüge",
       "gender": "MALE"
     },
     "Boraqchin": {
@@ -663,312 +805,6 @@
       "W": "Shiro",
       "gender": "MALE"
     },
-    "Fatima / Sitara -> Töregene": {
-      "M": "Fatima / Sitara -> Töregene",
-      "D": "Fatimy / Sitary -> Töregene",
-      "C": "Fatimie / Sitarze -> Töregene",
-      "B": "Fatimę / Sitarę -> Töregene",
-      "N": "Fatimą / Sitarą -> Töregene",
-      "Ms": "Fatimie / Sitarze -> Töregene",
-      "W": "Fatimo / Sitaro -> Töregene",
-      "gender": "FEMALE"
-    },
-    "Töregene -> Fatima / Sitara": {
-      "M": "Töregene -> Fatima / Sitara",
-      "D": "Töregene -> Fatimy / Sitary",
-      "C": "Töregene -> Fatimie / Sitarze",
-      "B": "Töregene -> Fatimę / Sitarę",
-      "N": "Töregene -> Fatimą / Sitarą",
-      "Ms": "Töregene -> Fatimie / Sitarze",
-      "W": "Töregene -> Fatimo / Sitaro"
-    },
-    "Ögedei -> Chagatai / Tolui": {
-      "M": "Ögedei -> Chagatai / Tolui",
-      "D": "Ögedei -> Chagatai / Tolui",
-      "C": "Ögedei -> Chagatai / Tolui",
-      "B": "Ögedei -> Chagatai / Tolui",
-      "N": "Ögedei -> Chagatai / Tolui",
-      "Ms": "Ögedei -> Chagatai / Tolui",
-      "W": "Ögedei -> Chagatai / Tolui"
-    },
-    "Chagatai / Tolui / Chinqai / Temüge -> Ögedei": {
-      "M": "Chagatai / Tolui / Chinqai / Temüge -> Ögedei",
-      "D": "Chagatai / Tolui / Chinqai / Temüge -> Ögedei",
-      "C": "Chagatai / Tolui / Chinqai / Temüge -> Ögedei",
-      "B": "Chagatai / Tolui / Chinqai / Temüge -> Ögedei",
-      "N": "Chagatai / Tolui / Chinqai / Temüge -> Ögedei",
-      "Ms": "Chagatai / Tolui / Chinqai / Temüge -> Ögedei",
-      "W": "Chagatai / Tolui / Chinqai / Temüge -> Ögedei"
-    },
-    "Boraqchin -> Möge": {
-      "M": "Boraqchin -> Möge",
-      "D": "Boraqchin -> Möge",
-      "C": "Boraqchin -> Möge",
-      "B": "Boraqchin -> Möge",
-      "N": "Boraqchin -> Möge",
-      "Ms": "Boraqchin -> Möge",
-      "W": "Boraqchin -> Möge",
-      "gender": "FEMALE"
-    },
-    "Möge -> Boraqchin": {
-      "M": "Möge -> Boraqchin",
-      "D": "Möge -> Boraqchin",
-      "C": "Möge -> Boraqchin",
-      "B": "Möge -> Boraqchin",
-      "N": "Möge -> Boraqchin",
-      "Ms": "Möge -> Boraqchin",
-      "W": "Möge -> Boraqchin",
-      "gender": "FEMALE"
-    },
-    "Temüge -> Otai": {
-      "M": "Temüge -> Otai",
-      "D": "Temüge -> Otai",
-      "C": "Temüge -> Otai",
-      "B": "Temüge -> Otai",
-      "N": "Temüge -> Otai",
-      "Ms": "Temüge -> Otai",
-      "W": "Temüge -> Otai",
-      "gender": "MALE"
-    },
-    "Qadaq -> Fatima / Sitara": {
-      "M": "Qadaq -> Fatima / Sitara",
-      "D": "Qadaq -> Fatimy / Sitary",
-      "C": "Qadaq -> Fatimie / Sitarze",
-      "B": "Qadaq -> Fatimę / Sitarę",
-      "N": "Qadaq -> Fatimą / Sitarą",
-      "Ms": "Qadaq -> Fatimie / Sitarze",
-      "W": "Qadaq -> Fatimo / Sitaro"
-    },
-    "Töregene -> Sitara": {
-      "M": "Töregene -> Sitara",
-      "D": "Töregene -> Sitary",
-      "C": "Töregene -> Sitarze",
-      "B": "Töregene -> Sitarę",
-      "N": "Töregene -> Sitarą",
-      "Ms": "Töregene -> Sitarze",
-      "W": "Töregene -> Sitaro",
-      "gender": "FEMALE"
-    },
-    "Sitara -> Töregene": {
-      "M": "Sitara -> Töregene",
-      "D": "Sitary -> Töregene",
-      "C": "Sitarze -> Töregene",
-      "B": "Sitarę -> Töregene",
-      "N": "Sitarą -> Töregene",
-      "Ms": "Sitarze -> Töregene",
-      "W": "Sitaro -> Töregene",
-      "gender": "FEMALE"
-    },
-    "Dayir -> Töregene": {
-      "M": "Dayir -> Töregene",
-      "D": "Dayir -> Töregene",
-      "C": "Dayir -> Töregene",
-      "B": "Dayir -> Töregene",
-      "N": "Dayir -> Töregene",
-      "Ms": "Dayir -> Töregene",
-      "W": "Dayir -> Töregene",
-      "gender": "FEMALE"
-    },
-    "Khulan -> Dayir": {
-      "M": "Khulan -> Dayir",
-      "D": "Khulan -> Dayira",
-      "C": "Khulan -> Dayirowi",
-      "B": "Khulan -> Dayira",
-      "N": "Khulan -> Dayirem",
-      "Ms": "Khulan -> Dayirze",
-      "W": "Khulan -> Dayirze",
-      "gender": "FEMALE"
-    },
-    "Ögedei -> Töregene": {
-      "M": "Ögedei -> Töregene",
-      "D": "Ögedei -> Töregene",
-      "C": "Ögedei -> Töregene",
-      "B": "Ögedei -> Töregene",
-      "N": "Ögedei -> Töregene",
-      "Ms": "Ögedei -> Töregene",
-      "W": "Ögedei -> Töregene",
-      "gender": "FEMALE"
-    },
-    "Chagatai -> Ögedei": {
-      "M": "Chagatai -> Ögedei",
-      "D": "Chagatai -> Ögedei",
-      "C": "Chagatai -> Ögedei",
-      "B": "Chagatai -> Ögedei",
-      "N": "Chagatai -> Ögedei",
-      "Ms": "Chagatai -> Ögedei",
-      "W": "Chagatai -> Ögedei",
-      "gender": "MALE"
-    },
-    "Tolui -> Ögedei": {
-      "M": "Tolui -> Ögedei",
-      "D": "Tolui -> Ögedei",
-      "C": "Tolui -> Ögedei",
-      "B": "Tolui -> Ögedei",
-      "N": "Tolui -> Ögedei",
-      "Ms": "Tolui -> Ögedei",
-      "W": "Tolui -> Ögedei",
-      "gender": "MALE"
-    },
-    "Sitara -> Boraqchin": {
-      "M": "Sitara -> Boraqchin",
-      "D": "Sitary -> Boraqchin",
-      "C": "Sitarze -> Boraqchin",
-      "B": "Sitarę -> Boraqchin",
-      "N": "Sitarą -> Boraqchin",
-      "Ms": "Sitarze -> Boraqchin",
-      "W": "Sitaro -> Boraqchin",
-      "gender": "FEMALE"
-    },
-    "Hulegu -> Sorghaghtani": {
-      "M": "Hulegu -> Sorghaghtani",
-      "D": "Hulegu -> Sorghaghtani",
-      "C": "Hulegu -> Sorghaghtani",
-      "B": "Hulegu -> Sorghaghtani",
-      "N": "Hulegu -> Sorghaghtani",
-      "Ms": "Hulegu -> Sorghaghtani",
-      "W": "Hulegu -> Sorghaghtani",
-      "gender": "FEMALE"
-    },
-    "Tolui -> Subutai": {
-      "M": "Tolui -> Subutai",
-      "D": "Tolui -> Subutai",
-      "C": "Tolui -> Subutai",
-      "B": "Tolui -> Subutai",
-      "N": "Tolui -> Subutai",
-      "Ms": "Tolui -> Subutai",
-      "W": "Tolui -> Subutai",
-      "gender": "MALE"
-    },
-    "Boraqchin -> Sitara": {
-      "M": "Boraqchin -> Sitara",
-      "D": "Boraqchin -> Sitary",
-      "C": "Boraqchin -> Sitarze",
-      "B": "Boraqchin -> Sitarę",
-      "N": "Boraqchin -> Sitarą",
-      "Ms": "Boraqchin -> Sitarze",
-      "W": "Boraqchin -> Sitaro",
-      "gender": "FEMALE"
-    },
-    "Möge -> Sitara": {
-      "M": "Möge -> Sitara",
-      "D": "Möge -> Sitary",
-      "C": "Möge -> Sitarze",
-      "B": "Möge -> Sitarę",
-      "N": "Möge -> Sitarą",
-      "Ms": "Möge -> Sitarze",
-      "W": "Möge -> Sitaro",
-      "gender": "FEMALE"
-    },
-    "Dayir Usun -> Töregene": {
-      "M": "Dayir Usun -> Töregene",
-      "D": "Dayir Usun -> Töregene",
-      "C": "Dayir Usun -> Töregene",
-      "B": "Dayir Usun -> Töregene",
-      "N": "Dayir Usun -> Töregene",
-      "Ms": "Dayir Usun -> Töregene",
-      "W": "Dayir Usun -> Töregene",
-      "gender": "FEMALE"
-    },
-    "Khulan -> Töregene": {
-      "M": "Khulan -> Töregene",
-      "D": "Khulan -> Töregene",
-      "C": "Khulan -> Töregene",
-      "B": "Khulan -> Töregene",
-      "N": "Khulan -> Töregene",
-      "Ms": "Khulan -> Töregene",
-      "W": "Khulan -> Töregene",
-      "gender": "FEMALE"
-    },
-    "Töregene -> Dayir": {
-      "M": "Töregene -> Dayir",
-      "D": "Töregene -> Dayir",
-      "C": "Töregene -> Dayir",
-      "B": "Töregene -> Dayir",
-      "N": "Töregene -> Dayir",
-      "Ms": "Töregene -> Dayir",
-      "W": "Töregene -> Dayir",
-      "gender": "FEMALE"
-    },
-    "Chinqai -> Ögedei": {
-      "M": "Chinqai -> Ögedei",
-      "D": "Chinqai -> Ögedei",
-      "C": "Chinqai -> Ögedei",
-      "B": "Chinqai -> Ögedei",
-      "N": "Chinqai -> Ögedei",
-      "Ms": "Chinqai -> Ögedei",
-      "W": "Chinqai -> Ögedei",
-      "gender": "MALE"
-    },
-    "Fatima -> Boraqchin": {
-      "M": "Fatima -> Boraqchin",
-      "D": "Fatimy -> Boraqchin",
-      "C": "Fatimie -> Boraqchin",
-      "B": "Fatimę -> Boraqchin",
-      "N": "Fatimą -> Boraqchin",
-      "Ms": "Fatimie -> Boraqchin",
-      "W": "Fatimo -> Boraqchin",
-      "gender": "FEMALE"
-    },
-    "Fatima -> Töregene": {
-      "M": "Fatima -> Töregene",
-      "D": "Fatimy -> Töregene",
-      "C": "Fatimie -> Töregene",
-      "B": "Fatimę -> Töregene",
-      "N": "Fatimą -> Töregene",
-      "Ms": "Fatimie -> Töregene",
-      "W": "Fatimo -> Töregene",
-      "gender": "FEMALE"
-    },
-    "Ögedei -> Tolui": {
-      "M": "Ögedei -> Tolui",
-      "D": "Ögedei -> Tolui",
-      "C": "Ögedei -> Tolui",
-      "B": "Ögedei -> Tolui",
-      "N": "Ögedei -> Tolui",
-      "Ms": "Ögedei -> Tolui",
-      "W": "Ögedei -> Tolui",
-      "gender": "MALE"
-    },
-    "Sitara -> Shira": {
-      "M": "Sitara -> Shira",
-      "D": "Sitary -> Shiry",
-      "C": "Sitarze -> Shirze",
-      "B": "Sitarę -> Shirę",
-      "N": "Sitarą -> Shirą",
-      "Ms": "Sitarze -> Shirze",
-      "W": "Sitaro -> Shiro",
-      "gender": "MALE"
-    },
-    "Qadaq -> Güyük": {
-      "M": "Qadaq -> Güyük",
-      "D": "Qadaqa -> Güyüka",
-      "C": "Qadaqowi -> Güyükowi",
-      "B": "Qadaqa -> Güyüka",
-      "N": "Qadaqem -> Güyükem",
-      "Ms": "Qadaqie -> Güyüku",
-      "W": "Qadaqie -> Güyüku",
-      "gender": "MALE"
-    },
-    "Sitara -> Sorghaghtani": {
-      "M": "Sitara -> Sorghaghtani",
-      "D": "Sitary -> Sorghaghtani",
-      "C": "Sitarze -> Sorghaghtani",
-      "B": "Sitarę -> Sorghaghtani",
-      "N": "Sitarą -> Sorghaghtani",
-      "Ms": "Sitarze -> Sorghaghtani",
-      "W": "Sitaro -> Sorghaghtani",
-      "gender": "FEMALE"
-    },
-    "Boraqchin -> Ögedei": {
-      "M": "Boraqchin -> Ögedei",
-      "D": "Boraqchin -> Ögedei",
-      "C": "Boraqchin -> Ögedei",
-      "B": "Boraqchin -> Ögedei",
-      "N": "Boraqchin -> Ögedei",
-      "Ms": "Boraqchin -> Ögedei",
-      "W": "Boraqchin -> Ögedei",
-      "gender": "FEMALE"
-    },
     "Ilüge": {
       "M": "Ilüge",
       "D": "Ilüge",
@@ -988,26 +824,6 @@
       "Ms": "Ugedej",
       "W": "Ugedej",
       "gender": "FEMALE"
-    },
-    "Ugedej (Ögedei)": {
-      "M": "Ugedej (Ögedei)",
-      "D": "Ugedej (Ögedei)a",
-      "C": "Ugedej (Ögedei)owi",
-      "B": "Ugedej (Ögedei)a",
-      "N": "Ugedej (Ögedei)em",
-      "Ms": "Ugedej (Ögedei)ie",
-      "W": "Ugedej (Ögedei)ie",
-      "gender": "MALE"
-    },
-    "Gujuk (Güyük)": {
-      "M": "Gujuk (Güyük)",
-      "D": "Gujuka (Güyük)a",
-      "C": "Gujukowi (Güyük)owi",
-      "B": "Gujuka (Güyük)a",
-      "N": "Gujukiem (Güyük)em",
-      "Ms": "Gujuku (Güyük)ie",
-      "W": "Gujuku (Güyük)ie",
-      "gender": "MALE"
     },
     "Sorkaktani": {
       "M": "Sorkaktani",
@@ -1112,12 +928,31 @@
     "Ilüge": "ANTHROPONYM",
     "Chulan": "ANTHROPONYM",
     "Ugedej": "ANTHROPONYM",
-    "Ugedej (Ögedei)": "ANTHROPONYM",
-    "Gujuk (Güyük)": "ANTHROPONYM",
     "Sorkaktani": "ANTHROPONYM",
     "Tołuj": "ANTHROPONYM",
     "mężczyzna": "ANTHROPONYM",
-    "Sorghaghtani Beki": "ANTHROPONYM"
+    "Sorghaghtani Beki": "ANTHROPONYM",
+    "Kaifeng": "TOPONYM",
+    "Mergen": "TOPONYM",
+    "danyao": "TOPONYM",
+    "urum": "TOPONYM",
+    "Otchigin": "TOPONYM",
+    "Tengri": "TOPONYM",
+    "Selenge River": "TOPONYM",
+    "Mongol Empire": "TOPONYM",
+    "City of Tus": "TOPONYM",
+    "Karakorum": "TOPONYM",
+    "Nomads": "TOPONYM",
+    "Pastoralists / Shepherds": "TOPONYM",
+    "Mongols / Mongol people": "TOPONYM",
+    "Tumen": "TOPONYM",
+    "Merkit": "TOPONYM",
+    "Danyao": "TOPONYM",
+    "Tus": "TOPONYM",
+    "Nishapur": "TOPONYM",
+    "Orda": "TOPONYM",
+    "Deel": "TOPONYM",
+    "Urum": "TOPONYM"
   },
   "fansub_canon": {}
 }

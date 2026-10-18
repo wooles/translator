@@ -3,253 +3,426 @@
   "characters": {
     "Saichi Sugimoto": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Saichi",
+        "Saichi Sugimoto",
+        "Sugimoto"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Asirpa": {
-      "description": "KOBIETA (wyodrębniono z relacji serii)"
+      "description": "KOBIETA (wyodrębniono z relacji serii)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Asirpa"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Usami": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Usami"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Kadokura": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Kadokura"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Tsukishima": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Tsukishima"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Koito": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Koito"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Kikuta": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Kikuta"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Kirawus": {
-      "description": "KOBIETA (wyodrębniono z relacji serii)"
+      "description": "KOBIETA (wyodrębniono z relacji serii)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Kirawus"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Tsurumi": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Tsurumi"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Sugimoto": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Sugimoto"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Shiraishi": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Shiraishi"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Botaro": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Botaro"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Podwładni": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Podwładni"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Sofia": {
-      "description": "KOBIETA (wyodrębniono z relacji serii)"
+      "description": "KOBIETA (wyodrębniono z relacji serii)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Sofia"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Ariko": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Ariko"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Kikuta Mokutarou": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Kikuta Mokutarou",
+        "Mokutarou"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Kaneko Kaeko": {
-      "description": "KOBIETA (wyodrębniono z relacji serii)"
+      "description": "KOBIETA (wyodrębniono z relacji serii)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Kaeko",
+        "Kaneko",
+        "Kaneko Kaeko"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Tokushirou Tsurumi": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Tokushirou",
+        "Tokushirou Tsurumi",
+        "Tsurumi"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Hidenobu Okuda": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Hidenobu",
+        "Hidenobu Okuda",
+        "Okuda"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Shinpachi Nagakura": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Nagakura",
+        "Shinpachi",
+        "Shinpachi Nagakura"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Tatsuma Ushiyama": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Tatsuma",
+        "Tatsuma Ushiyama",
+        "Ushiyama"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Hijikata": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Hijikata"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Nagakura": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Nagakura"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Otonoshin Koito": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Koito",
+        "Otonoshin",
+        "Otonoshin Koito"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Toshizou Hijikata": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Hijikata",
+        "Toshizou",
+        "Toshizou Hijikata"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Tanigaki Genjiro": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Genjiro",
+        "Tanigaki",
+        "Tanigaki Genjiro"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Tokishige Usami": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Tokishige",
+        "Tokishige Usami",
+        "Usami"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Hajime Tsukishima": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Hajime",
+        "Hajime Tsukishima",
+        "Tsukishima"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Yoshitake Shiraishi": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Shiraishi",
+        "Yoshitake",
+        "Yoshitake Shiraishi"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Fusataro Oosawa": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Fusataro",
+        "Fusataro Oosawa",
+        "Oosawa"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Nikaido": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Nikaido"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Kaeko": {
-      "description": "KOBIETA (wyodrębniono z relacji serii)"
+      "description": "KOBIETA (wyodrębniono z relacji serii)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Kaeko"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Okuda": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
-      "gender": "MALE"
-    },
-    "Saichi Sugimoto -> Asirpa": {
-      "description": "Zwrot: 'panna Asirpa / Asirpa-san' (obrońca i partner)"
-    },
-    "Asirpa -> Saichi Sugimoto": {
-      "description": "Zwrot: 'na ty / po imieniu: Sugimoto' (partnerzy / towarzysze broni)"
-    },
-    "Usami -> Kadokura": {
-      "description": "Zwrot: 'ty prosiaczku / staruchu' (oprawca -> więzień/ofiara)"
-    },
-    "Tsukishima -> Koito": {
-      "description": "Zwrot: 'podporuczniku Koito' (podwładny -> przełożony)"
-    },
-    "Kikuta -> Koito": {
-      "description": "Zwrot: 'podporuczniku Koito' (starszy chorąży -> młodszy stopniem oficer)"
-    },
-    "Kirawus -> Saichi Sugimoto": {
-      "description": "Zwrot: 'panie Sugimoto / Sugimoto-nispa' (sprzymierzeniec Ajnu -> Sugimoto (zwrot z szacunkiem))"
-    },
-    "Tsurumi -> Usami": {
-      "description": "Zwrot: 'z imienia: Tokishige-kun / Szeregowy Usami' (dowódca -> podwładny / mistrz -> wyznawca)"
-    },
-    "Sugimoto -> Asirpa": {
-      "description": "Zwrot: 'Asirpa-san / na ty' (Towarzysze broni, opiekuńczo-partnerska więź)"
-    },
-    "Shiraishi -> Botaro": {
-      "description": "Zwrot: 'Botaro / Pirat' (Współwięźniowie i kompani)"
-    },
-    "Tsurumi -> Podwładni": {
-      "description": "Zwrot: 'Po stopniach wojskowych (np. poruczniku Koito)' (Dowódca wojskowy -> podwładni)"
-    },
-    "Tsurumi -> Asirpa": {
-      "description": "Zwrot: 'Asirpa / Asirpo' (porywacz / manipulator -> zakładniczka)"
-    },
-    "Tsurumi -> Sofia": {
-      "description": "Zwrot: 'pani Zoyo / Sofio Złotoręka' (przesłuchujący -> więźniarka / dawni znajomi)"
-    },
-    "Sugimoto -> Shiraishi": {
-      "description": "Zwrot: 'na ty / Shiraishi' (towarzysze broni)"
-    },
-    "Ariko -> Sugimoto": {
-      "description": "Zwrot: 'Sugimoto / na ty' (tymczasowy sojusznik wojenny)"
-    },
-    "Ariko -> Kikuta": {
-      "description": "Zwrot: 'panie chorąży / chorąży Kikuta' (podwładny -> starszy stopniem / weterani z jednego okopu)"
-    },
-    "Koito -> Tsurumi": {
-      "description": "Zwrot: 'poruczniku Tsurumi / panie poruczniku' (zaślepiony podwładny -> dowódca)"
-    },
-    "Kikuta Mokutarou -> Saichi Sugimoto": {
-      "description": "Zwrot: 'na ty / Norabo / chłopie' (sierżant -> rekrut / podopieczny)"
-    },
-    "Saichi Sugimoto -> Kikuta Mokutarou": {
-      "description": "Zwrot: 'panie sierżancie / sierżancie Kikuta' (rekrut -> przełożony)"
-    },
-    "Kaneko Kaeko -> Saichi Sugimoto": {
-      "description": "Zwrot: 'panie Yuusaku / panie Hanazawa' (kandydatka na żonę -> domniemany narzeczony)"
-    },
-    "Tokushirou Tsurumi -> Hidenobu Okuda": {
-      "description": "Zwrot: 'generale Okuda / panie generale' (podwładny -> dowódca dywizji)"
-    },
-    "Sugimoto -> Kikuta": {
-      "description": "Zwrot: 'panie sierżancie / panie Kikuta' (młodzieniec -> oficer/instruktor)"
-    },
-    "Kikuta -> Sugimoto": {
-      "description": "Zwrot: 'na ty / per Norabo' (sierżant / mentor -> młody włóczęga)"
-    },
-    "Tsurumi -> Kikuta": {
-      "description": "Zwrot: 'chorąży Kikuta / panie Kikuta' (przełożony -> szpieg/podwładny)"
-    },
-    "Tokushirou Tsurumi -> Shinpachi Nagakura": {
-      "description": "Zwrot: 'panie Nagakura (Nagakura-san)' (wrogowie / gracz polityczny i weteran)"
-    },
-    "Tatsuma Ushiyama -> Asirpa": {
-      "description": "Zwrot: 'Panienko' (obrońca -> podopieczna)"
-    },
-    "Tsurumi -> Tsukishima": {
-      "description": "Zwrot: 'sierżancie Tsukishima' (dowódca -> podwładny)"
-    },
-    "Hijikata -> Nagakura": {
-      "description": "Zwrot: 'Gamushin / Shinpachi / na ty' (wieloletni bracia broni z Shinsengumi)"
-    },
-    "Otonoshin Koito -> Tokushirou Tsurumi": {
-      "description": "Zwrot: 'panie poruczniku / poruczniku Tsurumi' (podwładny -> dowódca)"
-    },
-    "Shinpachi Nagakura -> Toshizou Hijikata": {
-      "description": "Zwrot: 'Hijikata / na ty' (bracia broni ze Shinsengumi)"
-    },
-    "Asirpa -> Tanigaki Genjiro": {
-      "description": "Zwrot: 'Tanigaki-Nispa' (szacunek łowczyni Ainu wobec honorowego towarzysza)"
-    },
-    "Hijikata -> Sugimoto": {
-      "description": "Zwrot: 'Sugimoto Saichi' (dawny dowódca samurajski szanujący determinację młodego żołnierza)"
-    },
-    "Usami -> Tsurumi": {
-      "description": "Zwrot: 'panie poruczniku / Tokushirou-san' (podwładny -> dowódca)"
-    },
-    "Tokishige Usami -> Tokushirou Tsurumi": {
-      "description": "Zwrot: 'poruczniku Tsurumi / panie poruczniku' (podwładny -> ubóstwiany dowódca)"
-    },
-    "Hajime Tsukishima -> Otonoshin Koito": {
-      "description": "Zwrot: 'panie poruczniku Koito' (podwładny -> przełożony)"
-    },
-    "Otonoshin Koito -> Hajime Tsukishima": {
-      "description": "Zwrot: 'Tsukishima' (dowódca -> podwładny)"
-    },
-    "Yoshitake Shiraishi -> Fusataro Oosawa": {
-      "description": "Zwrot: 'Botaro / Fusataro' (towarzysze niedoli)"
-    },
-    "Tsukishima -> Tsurumi": {
-      "description": "Zwrot: 'panie poruczniku / poruczniku Tsurumi' (podwładny -> przełożony (wojskowa))"
-    },
-    "Koito -> Tsukishima": {
-      "description": "Zwrot: 'sierżancie Tsukishima / Tsukishima' (oficer -> podoficer)"
-    },
-    "Nikaido -> Ariko": {
-      "description": "Zwrot: 'Szeregowy Ariko' (żołnierze z tej samej dywizji)"
-    },
-    "Kaeko -> Sugimoto": {
-      "description": "Zwrot: 'panie Yuusaku (Yuusaku-san)' (arystokratka -> rzekomy kandydat na męża)"
-    },
-    "Tsurumi -> Okuda": {
-      "description": "Zwrot: 'panie generale' (porucznik -> dowódca dywizji)"
-    },
-    "Shiraishi -> Hijikata": {
-      "description": "Zwrot: 'staruszku / panie Hijikata' (sojusznicy z przymusu, nuta komediowego lęku przed autorytetem)"
-    },
-    "Asirpa -> Hijikata": {
-      "description": "Zwrot: 'panie Hijikata / Hijikata-nispa' (Młoda Ajnuka wobec szanowanego starszego przywódcy)"
-    },
-    "Tsurumi -> Nagakura": {
-      "description": "Zwrot: 'panie Nagakura' (Oficer wywiadu wobec weterana Shinsengumi / przeciwnicy polityczni)"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Okuda"
+      ],
+      "entity_category": "ANTHROPONYM"
     }
   },
   "glossary": {
@@ -333,50 +506,96 @@
     "Wenkamuy": "Wenkamuj"
   },
   "relationships": {
-    "Saichi Sugimoto -> Asirpa": "Zwrot: 'panna Asirpa / Asirpa-san' (obrońca i partner)",
-    "Asirpa -> Saichi Sugimoto": "Zwrot: 'na ty / po imieniu: Sugimoto' (partnerzy / towarzysze broni)",
-    "Usami -> Kadokura": "Zwrot: 'ty prosiaczku / staruchu' (oprawca -> więzień/ofiara)",
-    "Tsukishima -> Koito": "Zwrot: 'podporuczniku Koito' (podwładny -> przełożony)",
-    "Kikuta -> Koito": "Zwrot: 'podporuczniku Koito' (starszy chorąży -> młodszy stopniem oficer)",
-    "Kirawus -> Saichi Sugimoto": "Zwrot: 'panie Sugimoto / Sugimoto-nispa' (sprzymierzeniec Ajnu -> Sugimoto (zwrot z szacunkiem))",
-    "Tsurumi -> Usami": "Zwrot: 'z imienia: Tokishige-kun / Szeregowy Usami' (dowódca -> podwładny / mistrz -> wyznawca)",
-    "Sugimoto -> Asirpa": "Zwrot: 'Asirpa-san / na ty' (Towarzysze broni, opiekuńczo-partnerska więź)",
-    "Shiraishi -> Botaro": "Zwrot: 'Botaro / Pirat' (Współwięźniowie i kompani)",
-    "Tsurumi -> Podwładni": "Zwrot: 'Po stopniach wojskowych (np. poruczniku Koito)' (Dowódca wojskowy -> podwładni)",
-    "Tsurumi -> Asirpa": "Zwrot: 'Asirpa / Asirpo' (porywacz / manipulator -> zakładniczka)",
-    "Tsurumi -> Sofia": "Zwrot: 'pani Zoyo / Sofio Złotoręka' (przesłuchujący -> więźniarka / dawni znajomi)",
-    "Sugimoto -> Shiraishi": "Zwrot: 'na ty / Shiraishi' (towarzysze broni)",
-    "Ariko -> Sugimoto": "Zwrot: 'Sugimoto / na ty' (tymczasowy sojusznik wojenny)",
-    "Ariko -> Kikuta": "Zwrot: 'panie chorąży / chorąży Kikuta' (podwładny -> starszy stopniem / weterani z jednego okopu)",
-    "Koito -> Tsurumi": "Zwrot: 'poruczniku Tsurumi / panie poruczniku' (zaślepiony podwładny -> dowódca)",
-    "Kikuta Mokutarou -> Saichi Sugimoto": "Zwrot: 'na ty / Norabo / chłopie' (sierżant -> rekrut / podopieczny)",
-    "Saichi Sugimoto -> Kikuta Mokutarou": "Zwrot: 'panie sierżancie / sierżancie Kikuta' (rekrut -> przełożony)",
-    "Kaneko Kaeko -> Saichi Sugimoto": "Zwrot: 'panie Yuusaku / panie Hanazawa' (kandydatka na żonę -> domniemany narzeczony)",
-    "Tokushirou Tsurumi -> Hidenobu Okuda": "Zwrot: 'generale Okuda / panie generale' (podwładny -> dowódca dywizji)",
-    "Sugimoto -> Kikuta": "Zwrot: 'panie sierżancie / panie Kikuta' (młodzieniec -> oficer/instruktor)",
-    "Kikuta -> Sugimoto": "Zwrot: 'na ty / per Norabo' (sierżant / mentor -> młody włóczęga)",
-    "Tsurumi -> Kikuta": "Zwrot: 'chorąży Kikuta / panie Kikuta' (przełożony -> szpieg/podwładny)",
-    "Tokushirou Tsurumi -> Shinpachi Nagakura": "Zwrot: 'panie Nagakura (Nagakura-san)' (wrogowie / gracz polityczny i weteran)",
-    "Tatsuma Ushiyama -> Asirpa": "Zwrot: 'Panienko' (obrońca -> podopieczna)",
-    "Tsurumi -> Tsukishima": "Zwrot: 'sierżancie Tsukishima' (dowódca -> podwładny)",
-    "Hijikata -> Nagakura": "Zwrot: 'Gamushin / Shinpachi / na ty' (wieloletni bracia broni z Shinsengumi)",
-    "Otonoshin Koito -> Tokushirou Tsurumi": "Zwrot: 'panie poruczniku / poruczniku Tsurumi' (podwładny -> dowódca)",
-    "Shinpachi Nagakura -> Toshizou Hijikata": "Zwrot: 'Hijikata / na ty' (bracia broni ze Shinsengumi)",
-    "Asirpa -> Tanigaki Genjiro": "Zwrot: 'Tanigaki-Nispa' (szacunek łowczyni Ainu wobec honorowego towarzysza)",
-    "Hijikata -> Sugimoto": "Zwrot: 'Sugimoto Saichi' (dawny dowódca samurajski szanujący determinację młodego żołnierza)",
-    "Usami -> Tsurumi": "Zwrot: 'panie poruczniku / Tokushirou-san' (podwładny -> dowódca)",
-    "Tokishige Usami -> Tokushirou Tsurumi": "Zwrot: 'poruczniku Tsurumi / panie poruczniku' (podwładny -> ubóstwiany dowódca)",
-    "Hajime Tsukishima -> Otonoshin Koito": "Zwrot: 'panie poruczniku Koito' (podwładny -> przełożony)",
-    "Otonoshin Koito -> Hajime Tsukishima": "Zwrot: 'Tsukishima' (dowódca -> podwładny)",
-    "Yoshitake Shiraishi -> Fusataro Oosawa": "Zwrot: 'Botaro / Fusataro' (towarzysze niedoli)",
-    "Tsukishima -> Tsurumi": "Zwrot: 'panie poruczniku / poruczniku Tsurumi' (podwładny -> przełożony (wojskowa))",
-    "Koito -> Tsukishima": "Zwrot: 'sierżancie Tsukishima / Tsukishima' (oficer -> podoficer)",
-    "Nikaido -> Ariko": "Zwrot: 'Szeregowy Ariko' (żołnierze z tej samej dywizji)",
-    "Kaeko -> Sugimoto": "Zwrot: 'panie Yuusaku (Yuusaku-san)' (arystokratka -> rzekomy kandydat na męża)",
-    "Tsurumi -> Okuda": "Zwrot: 'panie generale' (porucznik -> dowódca dywizji)",
-    "Shiraishi -> Hijikata": "Zwrot: 'staruszku / panie Hijikata' (sojusznicy z przymusu, nuta komediowego lęku przed autorytetem)",
-    "Asirpa -> Hijikata": "Zwrot: 'panie Hijikata / Hijikata-nispa' (Młoda Ajnuka wobec szanowanego starszego przywódcy)",
-    "Tsurumi -> Nagakura": "Zwrot: 'panie Nagakura' (Oficer wywiadu wobec weterana Shinsengumi / przeciwnicy polityczni)"
+    "Saichi Sugimoto -> Asirpa": "Zwrot: 'panna Asirpa / Asirpa-san' (obrońca i partner) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Asirpa -> Saichi Sugimoto": "Zwrot: 'na ty / po imieniu: Sugimoto' (partnerzy / towarzysze broni) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Usami -> Kadokura": "Zwrot: 'ty prosiaczku / staruchu' (oprawca -> więzień/ofiara) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Tsukishima -> Koito": "Zwrot: 'podporuczniku Koito' (podwładny -> przełożony) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Kikuta -> Koito": "Zwrot: 'podporuczniku Koito' (starszy chorąży -> młodszy stopniem oficer) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Kirawus -> Saichi Sugimoto": "Zwrot: 'panie Sugimoto / Sugimoto-nispa' (sprzymierzeniec Ajnu -> Sugimoto (zwrot z szacunkiem)) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Tsurumi -> Usami": "Zwrot: 'z imienia: Tokishige-kun / Szeregowy Usami' (dowódca -> podwładny / mistrz -> wyznawca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Sugimoto -> Asirpa": "Zwrot: 'Asirpa-san / na ty' (Towarzysze broni, opiekuńczo-partnerska więź) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Shiraishi -> Botaro": "Zwrot: 'Botaro / Pirat' (Współwięźniowie i kompani) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Tsurumi -> Podwładni": "Zwrot: 'Po stopniach wojskowych (np. poruczniku Koito)' (Dowódca wojskowy -> podwładni) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Tsurumi -> Asirpa": "Zwrot: 'Asirpa / Asirpo' (porywacz / manipulator -> zakładniczka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Tsurumi -> Sofia": "Zwrot: 'pani Zoyo / Sofio Złotoręka' (przesłuchujący -> więźniarka / dawni znajomi) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Sugimoto -> Shiraishi": "Zwrot: 'na ty / Shiraishi' (towarzysze broni) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Ariko -> Sugimoto": "Zwrot: 'Sugimoto / na ty' (tymczasowy sojusznik wojenny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Ariko -> Kikuta": "Zwrot: 'panie chorąży / chorąży Kikuta' (podwładny -> starszy stopniem / weterani z jednego okopu) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Koito -> Tsurumi": "Zwrot: 'poruczniku Tsurumi / panie poruczniku' (zaślepiony podwładny -> dowódca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Kikuta Mokutarou -> Saichi Sugimoto": "Zwrot: 'na ty / Norabo / chłopie' (sierżant -> rekrut / podopieczny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Saichi Sugimoto -> Kikuta Mokutarou": "Zwrot: 'panie sierżancie / sierżancie Kikuta' (rekrut -> przełożony) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Kaneko Kaeko -> Saichi Sugimoto": "Zwrot: 'panie Yuusaku / panie Hanazawa' (kandydatka na żonę -> domniemany narzeczony) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Tokushirou Tsurumi -> Hidenobu Okuda": "Zwrot: 'generale Okuda / panie generale' (podwładny -> dowódca dywizji) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Sugimoto -> Kikuta": "Zwrot: 'panie sierżancie / panie Kikuta' (młodzieniec -> oficer/instruktor) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Kikuta -> Sugimoto": "Zwrot: 'na ty / per Norabo' (sierżant / mentor -> młody włóczęga) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Tsurumi -> Kikuta": "Zwrot: 'chorąży Kikuta / panie Kikuta' (przełożony -> szpieg/podwładny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Tokushirou Tsurumi -> Shinpachi Nagakura": "Zwrot: 'panie Nagakura (Nagakura-san)' (wrogowie / gracz polityczny i weteran) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Tatsuma Ushiyama -> Asirpa": "Zwrot: 'Panienko' (obrońca -> podopieczna) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Tsurumi -> Tsukishima": "Zwrot: 'sierżancie Tsukishima' (dowódca -> podwładny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Hijikata -> Nagakura": "Zwrot: 'Gamushin / Shinpachi / na ty' (wieloletni bracia broni z Shinsengumi) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Otonoshin Koito -> Tokushirou Tsurumi": "Zwrot: 'panie poruczniku / poruczniku Tsurumi' (podwładny -> dowódca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Shinpachi Nagakura -> Toshizou Hijikata": "Zwrot: 'Hijikata / na ty' (bracia broni z Shinsengumi) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Asirpa -> Tanigaki Genjiro": "Zwrot: 'Tanigaki-Nispa' (szacunek łowczyni Ainu wobec honorowego towarzysza) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Hijikata -> Sugimoto": "Zwrot: 'Sugimoto Saichi' (dawny dowódca samurajski szanujący determinację młodego żołnierza) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Usami -> Tsurumi": "Zwrot: 'panie poruczniku / Tokushirou-san' (podwładny -> dowódca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Tokishige Usami -> Tokushirou Tsurumi": "Zwrot: 'poruczniku Tsurumi / panie poruczniku' (podwładny -> ubóstwiany dowódca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Hajime Tsukishima -> Otonoshin Koito": "Zwrot: 'panie poruczniku Koito' (podwładny -> przełożony) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Otonoshin Koito -> Hajime Tsukishima": "Zwrot: 'Tsukishima' (dowódca -> podwładny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Yoshitake Shiraishi -> Fusataro Oosawa": "Zwrot: 'Botaro / Fusataro' (towarzysze niedoli) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Tsukishima -> Tsurumi": "Zwrot: 'panie poruczniku / poruczniku Tsurumi' (podwładny -> przełożony (wojskowa)) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Koito -> Tsukishima": "Zwrot: 'sierżancie Tsukishima / Tsukishima' (oficer -> podoficer) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Nikaido -> Ariko": "Zwrot: 'Szeregowy Ariko' (żołnierze z tej samej dywizji) [GRUPA MĘŻCZYZN - Wymóg rodzaju męskoosobowego: -liście / byliście gotowi]",
+    "Kaeko -> Sugimoto": "Zwrot: 'panie Yuusaku (Yuusaku-san)' (arystokratka -> rzekomy kandydat na męża) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Tsurumi -> Okuda": "Zwrot: 'panie generale' (porucznik -> dowódca dywizji) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Shiraishi -> Hijikata": "Zwrot: 'staruszku / panie Hijikata' (sojusznicy z przymusu, nuta komediowego lęku przed autorytetem) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Asirpa -> Hijikata": "Zwrot: 'panie Hijikata / Hijikata-nispa' (Młoda Ajnuka wobec szanowanego starszego przywódcy) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Tsurumi -> Nagakura": "Zwrot: 'panie Nagakura' (Oficer wywiadu wobec weterana Shinsengumi / przeciwnicy polityczni) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+  },
+  "relations": {
+    "Saichi Sugimoto -> Asirpa": "Zwrot: 'panna Asirpa / Asirpa-san' (obrońca i partner) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Asirpa -> Saichi Sugimoto": "Zwrot: 'na ty / po imieniu: Sugimoto' (partnerzy / towarzysze broni) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Usami -> Kadokura": "Zwrot: 'ty prosiaczku / staruchu' (oprawca -> więzień/ofiara) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Tsukishima -> Koito": "Zwrot: 'podporuczniku Koito' (podwładny -> przełożony) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Kikuta -> Koito": "Zwrot: 'podporuczniku Koito' (starszy chorąży -> młodszy stopniem oficer) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Kirawus -> Saichi Sugimoto": "Zwrot: 'panie Sugimoto / Sugimoto-nispa' (sprzymierzeniec Ajnu -> Sugimoto (zwrot z szacunkiem)) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Tsurumi -> Usami": "Zwrot: 'z imienia: Tokishige-kun / Szeregowy Usami' (dowódca -> podwładny / mistrz -> wyznawca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Sugimoto -> Asirpa": "Zwrot: 'Asirpa-san / na ty' (Towarzysze broni, opiekuńczo-partnerska więź) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Shiraishi -> Botaro": "Zwrot: 'Botaro / Pirat' (Współwięźniowie i kompani) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Tsurumi -> Podwładni": "Zwrot: 'Po stopniach wojskowych (np. poruczniku Koito)' (Dowódca wojskowy -> podwładni) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Tsurumi -> Asirpa": "Zwrot: 'Asirpa / Asirpo' (porywacz / manipulator -> zakładniczka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Tsurumi -> Sofia": "Zwrot: 'pani Zoyo / Sofio Złotoręka' (przesłuchujący -> więźniarka / dawni znajomi) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Sugimoto -> Shiraishi": "Zwrot: 'na ty / Shiraishi' (towarzysze broni) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Ariko -> Sugimoto": "Zwrot: 'Sugimoto / na ty' (tymczasowy sojusznik wojenny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Ariko -> Kikuta": "Zwrot: 'panie chorąży / chorąży Kikuta' (podwładny -> starszy stopniem / weterani z jednego okopu) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Koito -> Tsurumi": "Zwrot: 'poruczniku Tsurumi / panie poruczniku' (zaślepiony podwładny -> dowódca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Kikuta Mokutarou -> Saichi Sugimoto": "Zwrot: 'na ty / Norabo / chłopie' (sierżant -> rekrut / podopieczny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Saichi Sugimoto -> Kikuta Mokutarou": "Zwrot: 'panie sierżancie / sierżancie Kikuta' (rekrut -> przełożony) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Kaneko Kaeko -> Saichi Sugimoto": "Zwrot: 'panie Yuusaku / panie Hanazawa' (kandydatka na żonę -> domniemany narzeczony) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Tokushirou Tsurumi -> Hidenobu Okuda": "Zwrot: 'generale Okuda / panie generale' (podwładny -> dowódca dywizji) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Sugimoto -> Kikuta": "Zwrot: 'panie sierżancie / panie Kikuta' (młodzieniec -> oficer/instruktor) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Kikuta -> Sugimoto": "Zwrot: 'na ty / per Norabo' (sierżant / mentor -> młody włóczęga) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Tsurumi -> Kikuta": "Zwrot: 'chorąży Kikuta / panie Kikuta' (przełożony -> szpieg/podwładny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Tokushirou Tsurumi -> Shinpachi Nagakura": "Zwrot: 'panie Nagakura (Nagakura-san)' (wrogowie / gracz polityczny i weteran) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Tatsuma Ushiyama -> Asirpa": "Zwrot: 'Panienko' (obrońca -> podopieczna) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Tsurumi -> Tsukishima": "Zwrot: 'sierżancie Tsukishima' (dowódca -> podwładny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Hijikata -> Nagakura": "Zwrot: 'Gamushin / Shinpachi / na ty' (wieloletni bracia broni z Shinsengumi) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Otonoshin Koito -> Tokushirou Tsurumi": "Zwrot: 'panie poruczniku / poruczniku Tsurumi' (podwładny -> dowódca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Shinpachi Nagakura -> Toshizou Hijikata": "Zwrot: 'Hijikata / na ty' (bracia broni z Shinsengumi) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Asirpa -> Tanigaki Genjiro": "Zwrot: 'Tanigaki-Nispa' (szacunek łowczyni Ainu wobec honorowego towarzysza) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Hijikata -> Sugimoto": "Zwrot: 'Sugimoto Saichi' (dawny dowódca samurajski szanujący determinację młodego żołnierza) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Usami -> Tsurumi": "Zwrot: 'panie poruczniku / Tokushirou-san' (podwładny -> dowódca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Tokishige Usami -> Tokushirou Tsurumi": "Zwrot: 'poruczniku Tsurumi / panie poruczniku' (podwładny -> ubóstwiany dowódca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Hajime Tsukishima -> Otonoshin Koito": "Zwrot: 'panie poruczniku Koito' (podwładny -> przełożony) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Otonoshin Koito -> Hajime Tsukishima": "Zwrot: 'Tsukishima' (dowódca -> podwładny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Yoshitake Shiraishi -> Fusataro Oosawa": "Zwrot: 'Botaro / Fusataro' (towarzysze niedoli) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Tsukishima -> Tsurumi": "Zwrot: 'panie poruczniku / poruczniku Tsurumi' (podwładny -> przełożony (wojskowa)) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Koito -> Tsukishima": "Zwrot: 'sierżancie Tsukishima / Tsukishima' (oficer -> podoficer) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Nikaido -> Ariko": "Zwrot: 'Szeregowy Ariko' (żołnierze z tej samej dywizji) [GRUPA MĘŻCZYZN - Wymóg rodzaju męskoosobowego: -liście / byliście gotowi]",
+    "Kaeko -> Sugimoto": "Zwrot: 'panie Yuusaku (Yuusaku-san)' (arystokratka -> rzekomy kandydat na męża) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Tsurumi -> Okuda": "Zwrot: 'panie generale' (porucznik -> dowódca dywizji) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Shiraishi -> Hijikata": "Zwrot: 'staruszku / panie Hijikata' (sojusznicy z przymusu, nuta komediowego lęku przed autorytetem) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Asirpa -> Hijikata": "Zwrot: 'panie Hijikata / Hijikata-nispa' (Młoda Ajnuka wobec szanowanego starszego przywódcy) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Tsurumi -> Nagakura": "Zwrot: 'panie Nagakura' (Oficer wywiadu wobec weterana Shinsengumi / przeciwnicy polityczni) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
   },
   "declensions": {
     "Saichi Sugimoto": {
@@ -708,402 +927,6 @@
       "Ms": "Okudzie",
       "W": "Okudo",
       "gender": "MALE"
-    },
-    "Saichi Sugimoto -> Asirpa": {
-      "M": "Saichi Sugimoto -> Asirpa",
-      "D": "Saichi Sugimoto -> Asirpy",
-      "C": "Saichi Sugimoto -> Asirpe",
-      "B": "Saichi Sugimoto -> Asirpę",
-      "N": "Saichi Sugimoto -> Asirpą",
-      "Ms": "Saichi Sugimoto -> Asirpe",
-      "W": "Saichi Sugimoto -> Asirpo"
-    },
-    "Asirpa -> Saichi Sugimoto": {
-      "M": "Asirpa -> Saichi Sugimoto",
-      "D": "Asirpy -> Saichi Sugimoto",
-      "C": "Asirpe -> Saichi Sugimoto",
-      "B": "Asirpę -> Saichi Sugimoto",
-      "N": "Asirpą -> Saichi Sugimoto",
-      "Ms": "Asirpe -> Saichi Sugimoto",
-      "W": "Asirpo -> Saichi Sugimoto"
-    },
-    "Usami -> Kadokura": {
-      "M": "Usami -> Kadokura",
-      "D": "Usami -> Kadokury",
-      "C": "Usami -> Kadokurze",
-      "B": "Usami -> Kadokurę",
-      "N": "Usami -> Kadokurą",
-      "Ms": "Usami -> Kadokurze",
-      "W": "Usami -> Kadokuro"
-    },
-    "Tsukishima -> Koito": {
-      "M": "Tsukishima -> Koito",
-      "D": "Tsukishimy -> Koito",
-      "C": "Tsukishimie -> Koito",
-      "B": "Tsukishimę -> Koito",
-      "N": "Tsukishimą -> Koito",
-      "Ms": "Tsukishimie -> Koito",
-      "W": "Tsukishimo -> Koito"
-    },
-    "Kikuta -> Koito": {
-      "M": "Kikuta -> Koito",
-      "D": "Kikuty -> Koito",
-      "C": "Kikucie -> Koito",
-      "B": "Kikutę -> Koito",
-      "N": "Kikutą -> Koito",
-      "Ms": "Kikucie -> Koito",
-      "W": "Kikuto -> Koito"
-    },
-    "Kirawus -> Saichi Sugimoto": {
-      "M": "Kirawus -> Saichi Sugimoto",
-      "D": "Kirawusa -> Saichi Sugimoto",
-      "C": "Kirawusowi -> Saichi Sugimoto",
-      "B": "Kirawusa -> Saichi Sugimoto",
-      "N": "Kirawusem -> Saichi Sugimoto",
-      "Ms": "Kirawusie -> Saichi Sugimoto",
-      "W": "Kirawusie -> Saichi Sugimoto"
-    },
-    "Tsurumi -> Usami": {
-      "M": "Tsurumi -> Usami",
-      "D": "Tsurumi -> Usami",
-      "C": "Tsurumi -> Usami",
-      "B": "Tsurumi -> Usami",
-      "N": "Tsurumi -> Usami",
-      "Ms": "Tsurumi -> Usami",
-      "W": "Tsurumi -> Usami"
-    },
-    "Sugimoto -> Asirpa": {
-      "M": "Sugimoto -> Asirpa",
-      "D": "Sugimoto -> Asirpy",
-      "C": "Sugimoto -> Asirpe",
-      "B": "Sugimoto -> Asirpę",
-      "N": "Sugimoto -> Asirpą",
-      "Ms": "Sugimoto -> Asirpe",
-      "W": "Sugimoto -> Asirpo"
-    },
-    "Shiraishi -> Botaro": {
-      "M": "Shiraishi -> Botaro",
-      "D": "Shiraishi -> Botaro",
-      "C": "Shiraishi -> Botaro",
-      "B": "Shiraishi -> Botaro",
-      "N": "Shiraishi -> Botaro",
-      "Ms": "Shiraishi -> Botaro",
-      "W": "Shiraishi -> Botaro"
-    },
-    "Tsurumi -> Podwładni": {
-      "M": "Tsurumi -> Podwładni",
-      "D": "Tsurumi -> Podwładni",
-      "C": "Tsurumi -> Podwładni",
-      "B": "Tsurumi -> Podwładni",
-      "N": "Tsurumi -> Podwładni",
-      "Ms": "Tsurumi -> Podwładni",
-      "W": "Tsurumi -> Podwładni"
-    },
-    "Tsurumi -> Asirpa": {
-      "M": "Tsurumi -> Asirpa",
-      "D": "Tsurumi -> Asirpy",
-      "C": "Tsurumi -> Asirpe",
-      "B": "Tsurumi -> Asirpę",
-      "N": "Tsurumi -> Asirpą",
-      "Ms": "Tsurumi -> Asirpe",
-      "W": "Tsurumi -> Asirpo"
-    },
-    "Tsurumi -> Sofia": {
-      "M": "Tsurumi -> Sofia",
-      "D": "Tsurumi -> Sofiy",
-      "C": "Tsurumi -> Sofie",
-      "B": "Tsurumi -> Sofię",
-      "N": "Tsurumi -> Sofią",
-      "Ms": "Tsurumi -> Sofie",
-      "W": "Tsurumi -> Sofio"
-    },
-    "Sugimoto -> Shiraishi": {
-      "M": "Sugimoto -> Shiraishi",
-      "D": "Sugimoto -> Shiraishi",
-      "C": "Sugimoto -> Shiraishi",
-      "B": "Sugimoto -> Shiraishi",
-      "N": "Sugimoto -> Shiraishi",
-      "Ms": "Sugimoto -> Shiraishi",
-      "W": "Sugimoto -> Shiraishi"
-    },
-    "Ariko -> Sugimoto": {
-      "M": "Ariko -> Sugimoto",
-      "D": "Ariko -> Sugimoto",
-      "C": "Ariko -> Sugimoto",
-      "B": "Ariko -> Sugimoto",
-      "N": "Ariko -> Sugimoto",
-      "Ms": "Ariko -> Sugimoto",
-      "W": "Ariko -> Sugimoto"
-    },
-    "Ariko -> Kikuta": {
-      "M": "Ariko -> Kikuta",
-      "D": "Ariko -> Kikuty",
-      "C": "Ariko -> Kikucie",
-      "B": "Ariko -> Kikutę",
-      "N": "Ariko -> Kikutą",
-      "Ms": "Ariko -> Kikucie",
-      "W": "Ariko -> Kikuto"
-    },
-    "Koito -> Tsurumi": {
-      "M": "Koito -> Tsurumi",
-      "D": "Koito -> Tsurumi",
-      "C": "Koito -> Tsurumi",
-      "B": "Koito -> Tsurumi",
-      "N": "Koito -> Tsurumi",
-      "Ms": "Koito -> Tsurumi",
-      "W": "Koito -> Tsurumi"
-    },
-    "Kikuta Mokutarou -> Saichi Sugimoto": {
-      "M": "Kikuta Mokutarou -> Saichi Sugimoto",
-      "D": "Kikuty Mokutarou -> Saichi Sugimoto",
-      "C": "Kikucie Mokutarou -> Saichi Sugimoto",
-      "B": "Kikutę Mokutarou -> Saichi Sugimoto",
-      "N": "Kikutą Mokutarou -> Saichi Sugimoto",
-      "Ms": "Kikucie Mokutarou -> Saichi Sugimoto",
-      "W": "Kikuto Mokutarou -> Saichi Sugimoto"
-    },
-    "Saichi Sugimoto -> Kikuta Mokutarou": {
-      "M": "Saichi Sugimoto -> Kikuta Mokutarou",
-      "D": "Saichi Sugimoto -> Kikuty Mokutarou",
-      "C": "Saichi Sugimoto -> Kikucie Mokutarou",
-      "B": "Saichi Sugimoto -> Kikutę Mokutarou",
-      "N": "Saichi Sugimoto -> Kikutą Mokutarou",
-      "Ms": "Saichi Sugimoto -> Kikucie Mokutarou",
-      "W": "Saichi Sugimoto -> Kikuto Mokutarou"
-    },
-    "Kaneko Kaeko -> Saichi Sugimoto": {
-      "M": "Kaneko Kaeko -> Saichi Sugimoto",
-      "D": "Kaneko Kaeko -> Saichi Sugimoto",
-      "C": "Kaneko Kaeko -> Saichi Sugimoto",
-      "B": "Kaneko Kaeko -> Saichi Sugimoto",
-      "N": "Kaneko Kaeko -> Saichi Sugimoto",
-      "Ms": "Kaneko Kaeko -> Saichi Sugimoto",
-      "W": "Kaneko Kaeko -> Saichi Sugimoto"
-    },
-    "Tokushirou Tsurumi -> Hidenobu Okuda": {
-      "M": "Tokushirou Tsurumi -> Hidenobu Okuda",
-      "D": "Tokushirou Tsurumi -> Hidenobu Okudy",
-      "C": "Tokushirou Tsurumi -> Hidenobu Okudzie",
-      "B": "Tokushirou Tsurumi -> Hidenobu Okudę",
-      "N": "Tokushirou Tsurumi -> Hidenobu Okudą",
-      "Ms": "Tokushirou Tsurumi -> Hidenobu Okudzie",
-      "W": "Tokushirou Tsurumi -> Hidenobu Okudo"
-    },
-    "Sugimoto -> Kikuta": {
-      "M": "Sugimoto -> Kikuta",
-      "D": "Sugimoto -> Kikuty",
-      "C": "Sugimoto -> Kikucie",
-      "B": "Sugimoto -> Kikutę",
-      "N": "Sugimoto -> Kikutą",
-      "Ms": "Sugimoto -> Kikucie",
-      "W": "Sugimoto -> Kikuto"
-    },
-    "Kikuta -> Sugimoto": {
-      "M": "Kikuta -> Sugimoto",
-      "D": "Kikuty -> Sugimoto",
-      "C": "Kikucie -> Sugimoto",
-      "B": "Kikutę -> Sugimoto",
-      "N": "Kikutą -> Sugimoto",
-      "Ms": "Kikucie -> Sugimoto",
-      "W": "Kikuto -> Sugimoto"
-    },
-    "Tsurumi -> Kikuta": {
-      "M": "Tsurumi -> Kikuta",
-      "D": "Tsurumi -> Kikuty",
-      "C": "Tsurumi -> Kikucie",
-      "B": "Tsurumi -> Kikutę",
-      "N": "Tsurumi -> Kikutą",
-      "Ms": "Tsurumi -> Kikucie",
-      "W": "Tsurumi -> Kikuto"
-    },
-    "Tokushirou Tsurumi -> Shinpachi Nagakura": {
-      "M": "Tokushirou Tsurumi -> Shinpachi Nagakura",
-      "D": "Tokushirou Tsurumi -> Shinpachi Nagakury",
-      "C": "Tokushirou Tsurumi -> Shinpachi Nagakurze",
-      "B": "Tokushirou Tsurumi -> Shinpachi Nagakurę",
-      "N": "Tokushirou Tsurumi -> Shinpachi Nagakurą",
-      "Ms": "Tokushirou Tsurumi -> Shinpachi Nagakurze",
-      "W": "Tokushirou Tsurumi -> Shinpachi Nagakuro"
-    },
-    "Tatsuma Ushiyama -> Asirpa": {
-      "M": "Tatsuma Ushiyama -> Asirpa",
-      "D": "Tatsumy Ushiyamy -> Asirpy",
-      "C": "Tatsumie Ushiyamie -> Asirpe",
-      "B": "Tatsumę Ushiyamę -> Asirpę",
-      "N": "Tatsumą Ushiyamą -> Asirpą",
-      "Ms": "Tatsumie Ushiyamie -> Asirpe",
-      "W": "Tatsumo Ushiyamo -> Asirpo"
-    },
-    "Tsurumi -> Tsukishima": {
-      "M": "Tsurumi -> Tsukishima",
-      "D": "Tsurumi -> Tsukishimy",
-      "C": "Tsurumi -> Tsukishimie",
-      "B": "Tsurumi -> Tsukishimę",
-      "N": "Tsurumi -> Tsukishimą",
-      "Ms": "Tsurumi -> Tsukishimie",
-      "W": "Tsurumi -> Tsukishimo"
-    },
-    "Hijikata -> Nagakura": {
-      "M": "Hijikata -> Nagakura",
-      "D": "Hijikaty -> Nagakury",
-      "C": "Hijikacie -> Nagakurze",
-      "B": "Hijikatę -> Nagakurę",
-      "N": "Hijikatą -> Nagakurą",
-      "Ms": "Hijikacie -> Nagakurze",
-      "W": "Hijikato -> Nagakuro"
-    },
-    "Otonoshin Koito -> Tokushirou Tsurumi": {
-      "M": "Otonoshin Koito -> Tokushirou Tsurumi",
-      "D": "Otonoshina Koito -> Tokushirou Tsurumi",
-      "C": "Otonoshinowi Koito -> Tokushirou Tsurumi",
-      "B": "Otonoshina Koito -> Tokushirou Tsurumi",
-      "N": "Otonoshinem Koito -> Tokushirou Tsurumi",
-      "Ms": "Otonoshinie Koito -> Tokushirou Tsurumi",
-      "W": "Otonoshinie Koito -> Tokushirou Tsurumi"
-    },
-    "Shinpachi Nagakura -> Toshizou Hijikata": {
-      "M": "Shinpachi Nagakura -> Toshizou Hijikata",
-      "D": "Shinpachi Nagakury -> Toshizou Hijikaty",
-      "C": "Shinpachi Nagakurze -> Toshizou Hijikacie",
-      "B": "Shinpachi Nagakurę -> Toshizou Hijikatę",
-      "N": "Shinpachi Nagakurą -> Toshizou Hijikatą",
-      "Ms": "Shinpachi Nagakurze -> Toshizou Hijikacie",
-      "W": "Shinpachi Nagakuro -> Toshizou Hijikato"
-    },
-    "Asirpa -> Tanigaki Genjiro": {
-      "M": "Asirpa -> Tanigaki Genjiro",
-      "D": "Asirpy -> Tanigaki Genjiro",
-      "C": "Asirpe -> Tanigaki Genjiro",
-      "B": "Asirpę -> Tanigaki Genjiro",
-      "N": "Asirpą -> Tanigaki Genjiro",
-      "Ms": "Asirpe -> Tanigaki Genjiro",
-      "W": "Asirpo -> Tanigaki Genjiro"
-    },
-    "Hijikata -> Sugimoto": {
-      "M": "Hijikata -> Sugimoto",
-      "D": "Hijikaty -> Sugimoto",
-      "C": "Hijikacie -> Sugimoto",
-      "B": "Hijikatę -> Sugimoto",
-      "N": "Hijikatą -> Sugimoto",
-      "Ms": "Hijikacie -> Sugimoto",
-      "W": "Hijikato -> Sugimoto"
-    },
-    "Usami -> Tsurumi": {
-      "M": "Usami -> Tsurumi",
-      "D": "Usami -> Tsurumi",
-      "C": "Usami -> Tsurumi",
-      "B": "Usami -> Tsurumi",
-      "N": "Usami -> Tsurumi",
-      "Ms": "Usami -> Tsurumi",
-      "W": "Usami -> Tsurumi"
-    },
-    "Tokishige Usami -> Tokushirou Tsurumi": {
-      "M": "Tokishige Usami -> Tokushirou Tsurumi",
-      "D": "Tokishige Usami -> Tokushirou Tsurumi",
-      "C": "Tokishige Usami -> Tokushirou Tsurumi",
-      "B": "Tokishige Usami -> Tokushirou Tsurumi",
-      "N": "Tokishige Usami -> Tokushirou Tsurumi",
-      "Ms": "Tokishige Usami -> Tokushirou Tsurumi",
-      "W": "Tokishige Usami -> Tokushirou Tsurumi"
-    },
-    "Hajime Tsukishima -> Otonoshin Koito": {
-      "M": "Hajime Tsukishima -> Otonoshin Koito",
-      "D": "Hajime Tsukishimy -> Otonoshina Koito",
-      "C": "Hajime Tsukishimie -> Otonoshinowi Koito",
-      "B": "Hajime Tsukishimę -> Otonoshina Koito",
-      "N": "Hajime Tsukishimą -> Otonoshinem Koito",
-      "Ms": "Hajime Tsukishimie -> Otonoshinie Koito",
-      "W": "Hajime Tsukishimo -> Otonoshinie Koito"
-    },
-    "Otonoshin Koito -> Hajime Tsukishima": {
-      "M": "Otonoshin Koito -> Hajime Tsukishima",
-      "D": "Otonoshina Koito -> Hajime Tsukishimy",
-      "C": "Otonoshinowi Koito -> Hajime Tsukishimie",
-      "B": "Otonoshina Koito -> Hajime Tsukishimę",
-      "N": "Otonoshinem Koito -> Hajime Tsukishimą",
-      "Ms": "Otonoshinie Koito -> Hajime Tsukishimie",
-      "W": "Otonoshinie Koito -> Hajime Tsukishimo"
-    },
-    "Yoshitake Shiraishi -> Fusataro Oosawa": {
-      "M": "Yoshitake Shiraishi -> Fusataro Oosawa",
-      "D": "Yoshitake Shiraishi -> Fusataro Oosawy",
-      "C": "Yoshitake Shiraishi -> Fusataro Oosawe",
-      "B": "Yoshitake Shiraishi -> Fusataro Oosawę",
-      "N": "Yoshitake Shiraishi -> Fusataro Oosawą",
-      "Ms": "Yoshitake Shiraishi -> Fusataro Oosawe",
-      "W": "Yoshitake Shiraishi -> Fusataro Oosawo"
-    },
-    "Tsukishima -> Tsurumi": {
-      "M": "Tsukishima -> Tsurumi",
-      "D": "Tsukishimy -> Tsurumi",
-      "C": "Tsukishimie -> Tsurumi",
-      "B": "Tsukishimę -> Tsurumi",
-      "N": "Tsukishimą -> Tsurumi",
-      "Ms": "Tsukishimie -> Tsurumi",
-      "W": "Tsukishimo -> Tsurumi"
-    },
-    "Koito -> Tsukishima": {
-      "M": "Koito -> Tsukishima",
-      "D": "Koito -> Tsukishimy",
-      "C": "Koito -> Tsukishimie",
-      "B": "Koito -> Tsukishimę",
-      "N": "Koito -> Tsukishimą",
-      "Ms": "Koito -> Tsukishimie",
-      "W": "Koito -> Tsukishimo"
-    },
-    "Nikaido -> Ariko": {
-      "M": "Nikaido -> Ariko",
-      "D": "Nikaido -> Ariko",
-      "C": "Nikaido -> Ariko",
-      "B": "Nikaido -> Ariko",
-      "N": "Nikaido -> Ariko",
-      "Ms": "Nikaido -> Ariko",
-      "W": "Nikaido -> Ariko"
-    },
-    "Kaeko -> Sugimoto": {
-      "M": "Kaeko -> Sugimoto",
-      "D": "Kaeko -> Sugimoto",
-      "C": "Kaeko -> Sugimoto",
-      "B": "Kaeko -> Sugimoto",
-      "N": "Kaeko -> Sugimoto",
-      "Ms": "Kaeko -> Sugimoto",
-      "W": "Kaeko -> Sugimoto"
-    },
-    "Tsurumi -> Okuda": {
-      "M": "Tsurumi -> Okuda",
-      "D": "Tsurumi -> Okudy",
-      "C": "Tsurumi -> Okudzie",
-      "B": "Tsurumi -> Okudę",
-      "N": "Tsurumi -> Okudą",
-      "Ms": "Tsurumi -> Okudzie",
-      "W": "Tsurumi -> Okudo"
-    },
-    "Shiraishi -> Hijikata": {
-      "M": "Shiraishi -> Hijikata",
-      "D": "Shiraishi -> Hijikaty",
-      "C": "Shiraishi -> Hijikacie",
-      "B": "Shiraishi -> Hijikatę",
-      "N": "Shiraishi -> Hijikatą",
-      "Ms": "Shiraishi -> Hijikacie",
-      "W": "Shiraishi -> Hijikato"
-    },
-    "Asirpa -> Hijikata": {
-      "M": "Asirpa -> Hijikata",
-      "D": "Asirpy -> Hijikaty",
-      "C": "Asirpe -> Hijikacie",
-      "B": "Asirpę -> Hijikatę",
-      "N": "Asirpą -> Hijikatą",
-      "Ms": "Asirpe -> Hijikacie",
-      "W": "Asirpo -> Hijikato"
-    },
-    "Tsurumi -> Nagakura": {
-      "M": "Tsurumi -> Nagakura",
-      "D": "Tsurumi -> Nagakury",
-      "C": "Tsurumi -> Nagakurze",
-      "B": "Tsurumi -> Nagakurę",
-      "N": "Tsurumi -> Nagakurą",
-      "Ms": "Tsurumi -> Nagakurze",
-      "W": "Tsurumi -> Nagakuro"
     }
   },
   "hypocorisms": {},
@@ -1157,7 +980,25 @@
     "Fusataro Oosawa": "ANTHROPONYM",
     "Nikaido": "ANTHROPONYM",
     "Kaeko": "ANTHROPONYM",
-    "Okuda": "ANTHROPONYM"
+    "Okuda": "ANTHROPONYM",
+    "Aca": "TOPONYM",
+    "Nispa": "TOPONYM",
+    "Ainu": "TOPONYM",
+    "Nopperabo": "TOPONYM",
+    "Kotan": "TOPONYM",
+    "Citatap": "TOPONYM",
+    "Osoma": "TOPONYM",
+    "Retar": "TOPONYM",
+    "Nagant": "TOPONYM",
+    "Wilk": "TOPONYM",
+    "Karafuto": "TOPONYM",
+    "Rokumeikan": "TOPONYM",
+    "Goryoukaku": "TOPONYM",
+    "Bastion fort": "TOPONYM",
+    "Shinsengumi": "TOPONYM",
+    "Satsuma": "TOPONYM",
+    "menaspa": "TOPONYM",
+    "zaibatsu": "TOPONYM"
   },
   "fansub_canon": {}
 }

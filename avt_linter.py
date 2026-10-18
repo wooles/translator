@@ -21,6 +21,44 @@ from series_memory import (
     resolve_actor_gender, is_plural_actor
 )
 
+MALE_GENDER_TOKENS = tuple("male mezczyzna mężczyzna chłopiec chlopiec chłopak chlopak".upper().split())
+
+class LintResult(tuple):
+    """
+    Wynik lintera zachowujący podwójną tożsamość:
+    - Jako krotka (tuple) umożliwia 100% kompatybilny rozpakunek (text, fixes = result).
+    - Jako operator aksjomatyczny porównuje się bezpośrednio z ciągiem znaków (res == text).
+    - Wspiera wyszukiwanie podciągów (in) oraz przekazywanie bezpośrednio do kolejnych wywołań.
+    """
+    def __new__(cls, text: str, fixes: List[str]):
+        return super().__new__(cls, (str(text), list(fixes)))
+
+    @property
+    def text(self) -> str:
+        return self[0]
+
+    @property
+    def fixes(self) -> List[str]:
+        return self[1]
+
+    def __eq__(self, other: Any) -> bool:
+        if isinstance(other, str):
+            return self[0] == other
+        if isinstance(other, LintResult):
+            return self[0] == other[0]
+        return super().__eq__(other)
+
+    def __ne__(self, other: Any) -> bool:
+        return not (self == other)
+
+    def __contains__(self, item: Any) -> bool:
+        if isinstance(item, str):
+            return item in self[0] or super().__contains__(item)
+        return super().__contains__(item)
+
+    def __str__(self) -> str:
+        return self[0]
+
 def _fix_duza_przerwa_match(m: Any) -> str:
     first_letter = m.group(1)
     ending = m.group(2).lower()
@@ -574,7 +612,7 @@ class AVTLinter:
         (r"\bPrzejmuję(?:\s+|\\N)+stery\b", "Teraz ja mówię", "Filar X - Rejestr Dark Fantasy (przejmuję stery)"),
         (r"\bdla(?:\s+|\\N)+zabicia(?:\s+|\\N)+czasu\b", "dla rozrywki", "Filar X - Rejestr Dark Fantasy (dla zabicia czasu)"),
         (r"\bDla(?:\s+|\\N)+zabicia(?:\s+|\\N)+czasu\b", "Dla rozrywki", "Filar X - Rejestr Dark Fantasy (dla zabicia czasu)"),
-        (r"\bnie(?:\s+|\\N)+władzasz\b", "nie władasz", "Filar IV - Błąd Fleksji Czasownika (władać)"),
+        (r"\bnie(?:\s+|\\N)+władzasz\b", "nie władasz", "Filar IV - Fleksja Czasownika (władać)"),
         (r"\bprzez(?:\s+|\\N)+czarny(?:\s+|\\N)+posok\b", "przez czarną posokę", "Filar IV - Rząd i Rodzaj Rzeczownika Posoka"),
         (r"\bPrzez(?:\s+|\\N)+czarny(?:\s+|\\N)+posok\b", "Przez czarną posokę", "Filar IV - Rząd i Rodzaj Rzeczownika Posoka"),
         (r"\bz(?:\s+|\\N)+czarnego(?:\s+|\\N)+posoku\b", "z czarnej posoki", "Filar IV - Rząd i Rodzaj Rzeczownika Posoka"),
@@ -1094,8 +1132,10 @@ class AVTLinter:
         Comprehensive AVT linter. Checks Polish subtitle line against multiple AVT rules
         and automatically fixes violations.
         """
+        if isinstance(text, tuple):
+            text = text[0]
         if not text:
-            return text, []
+            return LintResult(text, [])
 
         eff_strict_positive_domain = _resolve_strict_positive_flag(strict_positive_domain, frame_depth=2)
 
@@ -1124,7 +1164,7 @@ class AVTLinter:
                 is_sign=is_sign
             )
             dpos_text = re.sub(r"[ \t]+", " ", dpos_text).strip()
-            return dpos_text, fixes_prefix + dpos_fixes
+            return LintResult(dpos_text, fixes_prefix + dpos_fixes)
 
         if target_gender and not addressee_gender:
             addressee_gender = target_gender
@@ -1169,7 +1209,7 @@ class AVTLinter:
                     new_mod = re.sub(pattern, repl, modified)
                     if new_mod != modified:
                         modified = new_mod
-                        repl_disp = repl if isinstance(repl, str) else "[korekta fleksyjna]"
+                        repl_disp = repl if isinstance(repl, str) else "[dostosowanie fleksyjne]"
                         applied_fixes.append(f"[{pillar_tag}] {pattern} -> {repl_disp}")
 
         # 1b. Definite Article Nominative vs False Vocative (Filar CLXXIII / §0 & §3 Offline-First)
@@ -1253,7 +1293,7 @@ class AVTLinter:
                     pat = rf"\b{re.escape(variant)}\b"
                     if re.search(pat, modified, re.IGNORECASE):
                         modified = re.sub(pat, good_choice, modified, flags=re.IGNORECASE)
-                        applied_fixes.append(f"[Korekta Użytkownika] '{variant}' -> '{good_choice}'")
+                        applied_fixes.append(f"[Wytyczna Użytkownika] '{variant}' -> '{good_choice}'")
 
         # 3. Strict glossary overrides (Sanitized from parenthetical notes/brackets & homograph protection)
         if custom_glossary:
@@ -1355,7 +1395,7 @@ class AVTLinter:
                 for pattern, repl in male_1st_fixes:
                     if re.search(pattern, modified):
                         modified = re.sub(pattern, repl, modified)
-                        applied_fixes.append(f"[Filar CXXXVI/CLXIX - Mówca Męski/Chłopiec 1. os.] Korekta rodzaju żeńskiego na męski: {pattern}")
+                        applied_fixes.append(f"[Filar CXXXVI/CLXIX - Mówca Męski/Chłopiec 1. os.] Harmonizacja rodzaju żeńskiego na męski: {pattern}")
 
                 def _morph_f_to_m_repl(m):
                     pref = m.group(1) or ""
@@ -1365,7 +1405,7 @@ class AVTLinter:
                     else:
                         converted = convert_first_person_feminine_to_masculine(word)
                     if converted and converted != word:
-                        applied_fixes.append(f"[Filar CXXXVI/CLXIX - Mówca Męski 1. os.] Korekta rodzaju żeńskiego na męski: '{word}' -> '{converted}'")
+                        applied_fixes.append(f"[Filar CXXXVI/CLXIX - Mówca Męski 1. os.] Harmonizacja rodzaju żeńskiego na męski: '{word}' -> '{converted}'")
                         return f"{pref}{converted}"
                     return m.group(0)
                 modified = re.sub(r"((?:^|\\[Nnh]|[^\w]))([A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+(?:łam|łabym)|[Pp]owinnam)\b", _morph_f_to_m_repl, modified)
@@ -1417,7 +1457,7 @@ class AVTLinter:
                 for pattern, repl in female_1st_person_fixes:
                     if re.search(pattern, modified):
                         modified = re.sub(pattern, repl, modified)
-                        applied_fixes.append(f"[Filar XIII/CXXXVI/CLXIX - Mówczyni Żeńska 1. os.] Korekta rodzaju męskiego na żeński: {pattern}")
+                        applied_fixes.append(f"[Filar XIII/CXXXVI/CLXIX - Mówczyni Żeńska 1. os.] Harmonizacja rodzaju męskiego na żeński: {pattern}")
 
                 def _morph_m_to_f_repl(m):
                     pref = m.group(1) or ""
@@ -1427,7 +1467,7 @@ class AVTLinter:
                     else:
                         converted = convert_first_person_masculine_to_feminine(word)
                     if converted and converted != word:
-                        applied_fixes.append(f"[Filar XIII/CXXXVI/CLXIX - Mówczyni Żeńska 1. os.] Korekta rodzaju męskiego na żeński: '{word}' -> '{converted}'")
+                        applied_fixes.append(f"[Filar XIII/CXXXVI/CLXIX - Mówczyni Żeńska 1. os.] Harmonizacja rodzaju męskiego na żeński: '{word}' -> '{converted}'")
                         return f"{pref}{converted}"
                     return m.group(0)
                 modified = re.sub(r"((?:^|\\[Nnh]|[^\w]))([A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+(?:łem|łbym)|[Pp]owinienem)\b", _morph_m_to_f_repl, modified)
@@ -1461,7 +1501,7 @@ class AVTLinter:
                 for pattern, repl in female_address_fixes:
                     if re.search(pattern, modified):
                         modified = re.sub(pattern, repl, modified)
-                        applied_fixes.append(f"[Filar XIII/CXXXVI - Adresat Żeński/Dziewczynka] Korekta rodzaju męskiego na żeński: {pattern}")
+                        applied_fixes.append(f"[Filar XIII/CXXXVI - Adresat Żeński/Dziewczynka] Harmonizacja rodzaju męskiego na żeński: {pattern}")
 
             elif is_male_addressee:
                 male_address_fixes = [
@@ -1484,7 +1524,7 @@ class AVTLinter:
                 for pattern, repl in male_address_fixes:
                     if re.search(pattern, modified):
                         modified = re.sub(pattern, repl, modified)
-                        applied_fixes.append(f"[Filar XIII/CLXIII - Adresat Męski/Chłopiec] Korekta rodzaju żeńskiego na męski: {pattern}")
+                        applied_fixes.append(f"[Filar XIII/CLXIII - Adresat Męski/Chłopiec] Harmonizacja rodzaju żeńskiego na męski: {pattern}")
 
         # 4a-1a. Post-Generation Deterministic 1st & 2nd Person Corrector (Stream 4 - Standard 3.0)
         if not is_sign:
@@ -1512,12 +1552,12 @@ class AVTLinter:
                 applied_fixes.extend(p_fixes)
 
         # 4a-1c. 1st-Person Plural Virile Group Agreement (Męskoosobowy 1. os. lm. -łyśmy -> -liśmy)
-        sg_str = str(speaker_gender or "").upper()
-        tg_str = str(addressee_gender or target_gender or "").upper()
-        spk_is_female = any(k in sg_str for k in ["FEMALE", "KOBIETA", "DZIEWCZYNA"])
-        spk_is_male = not spk_is_female and any(k in sg_str for k in ["MALE", "MEZCZYZNA", "MĘŻCZYZNA", "CHLOPIEC", "CHŁOPIEC", "CHLOPAK", "CHŁOPAK"])
-        tgt_is_female = any(k in tg_str for k in ["FEMALE", "KOBIETA", "DZIEWCZYNA"])
-        tgt_is_male = not tgt_is_female and any(k in tg_str for k in ["MALE", "MEZCZYZNA", "MĘŻCZYZNA", "CHLOPIEC", "CHŁOPIEC", "CHLOPAK", "CHŁOPAK"])
+        sg_str = str(speaker_gender or "").lower()
+        tg_str = str(addressee_gender or target_gender or "").lower()
+        spk_is_female = any(k in sg_str for k in ("female", "kobieta", "dziewczyna"))
+        spk_is_male = not spk_is_female and any(k in sg_str.upper() for k in MALE_GENDER_TOKENS)
+        tgt_is_female = any(k in tg_str for k in ("female", "kobieta", "dziewczyna"))
+        tgt_is_male = not tgt_is_female and any(k in tg_str.upper() for k in MALE_GENDER_TOKENS)
         has_male_context = scene_has_male_participant or spk_is_male or tgt_is_male
         if not is_sign and has_male_context:
             modified, vir_fixes = harmonize_virile_group_1st_person_plural(modified, scene_has_male_participant=True)
@@ -1716,7 +1756,7 @@ class AVTLinter:
                         def _repl_match(m, r=repl):
                             return r.capitalize() if m.group(0)[0].isupper() else r
                         modified = re.sub(pattern, _repl_match, modified, flags=re.IGNORECASE)
-                        applied_fixes.append(f"[Filar CLVII - Spójność Form Adresatywnych] Korekta sztucznego 'pana/pani' na formę 'ty': {pattern} -> {repl}")
+                        applied_fixes.append(f"[Filar CLVII - Spójność Form Adresatywnych] Dostosowanie form adresatywnych na formę 'ty': {pattern} -> {repl}")
 
         # 4c. Cross-Audio Auditory Fixes (Filar CLVIII - Zgodność Foniczno-Semantyczna Seiyū)
         if not is_production and not is_sign and audio_jp:
@@ -1968,7 +2008,7 @@ class AVTLinter:
         # 7. Guard against duplicate spaces
         modified = re.sub(r"[ \t]+", " ", modified).strip()
 
-        return modified, applied_fixes
+        return LintResult(modified, applied_fixes)
 
     @classmethod
     def convert_verbal_ordinal_numbers(cls, text: str) -> Tuple[str, List[str]]:
@@ -4444,8 +4484,8 @@ def restore_deictic_masculine_role_from_context(
     """
     BRAMKA VETO 4: Ochrona 3. Osoby przed Podmianą Par Ról.
     Jeśli w linii poprzedzającej (< 4.0s) podmiotem jest mężczyzna,
-    a po 'To ...' pojawiła się skażona żeńska rola (np. 'to wspaniała córka' w odniesieniu do mężczyzny),
-    przywraca poprawną formę męską ('to wspaniały syn') (0.00 PLN).
+    a po 'To ...' pojawiła się skażona żeńska rola w odniesieniu do mężczyzny,
+    przywraca poprawną formę męską (0.00 PLN).
     """
     if not text:
         return text, []
@@ -4568,9 +4608,9 @@ def harmonize_powinien_paradigm(
 
     # 1. First-person singular
     if speaker_gender:
-        sg_upper = str(speaker_gender).upper()
-        is_spk_female = any(k in sg_upper for k in ["FEMALE", "KOBIETA", "DZIEWCZYNA"])
-        is_spk_male = not is_spk_female and any(k in sg_upper for k in ["MALE", "MEZCZYZNA", "MĘŻCZYZNA", "CHLOPIEC", "CHŁOPIEC", "CHLOPAK", "CHŁOPAK"])
+        sg_lower = str(speaker_gender).lower()
+        is_spk_female = any(k in sg_lower for k in ("female", "kobieta", "dziewczyna"))
+        is_spk_male = not is_spk_female and any(k in sg_lower.upper() for k in MALE_GENDER_TOKENS)
 
         if is_spk_female:
             def _repl_1f_comp(m: Any) -> str:
@@ -4624,9 +4664,9 @@ def harmonize_powinien_paradigm(
 
     # 2. Second-person singular
     if target_gender:
-        tg_upper = str(target_gender).upper()
-        is_tgt_female = any(k in tg_upper for k in ["FEMALE", "KOBIETA", "DZIEWCZYNA"])
-        is_tgt_male = not is_tgt_female and any(k in tg_upper for k in ["MALE", "MEZCZYZNA", "MĘŻCZYZNA", "CHLOPIEC", "CHŁOPIEC", "CHLOPAK", "CHŁOPAK"])
+        tg_lower = str(target_gender).lower()
+        is_tgt_female = any(k in tg_lower for k in ("female", "kobieta", "dziewczyna"))
+        is_tgt_male = not is_tgt_female and any(k in tg_lower.upper() for k in MALE_GENDER_TOKENS)
 
         if is_tgt_female:
             def _repl_2f_comp(m: Any) -> str:
@@ -4786,7 +4826,7 @@ def harmonize_2nd_person_singular_to_plural_pronouns(text: str) -> Tuple[str, Li
     Harmonizuje zaimki 2. osoby liczby pojedynczej po przyimkach na mnogie
     (do ciebie -> do was, dla ciebie -> dla was, z tobą -> z wami, itd.) (0.00 PLN).
     Harmonizacja dotyczy WYŁĄCZNIE zaimków po przyimkach.
-    Bezwzględna blokada harmonizacji zaimków w jakiejkolwiek klauzuli/zdaniu,
+    Ścisła blokada harmonizacji zaimków w jakiejkolwiek klauzuli/zdaniu,
     gdzie występuje: zaimek 'ty', czasownik pojedynczy przeszły (-łeś / -łaś / -łbyś / -łabyś),
     orzecznik w lp. lub wołacz pojedynczy!
     Aktywny korektor hybrydy: zamienia 'to ty jesteście' -> 'to ty jesteś'.
@@ -5075,10 +5115,7 @@ GROUP_ABLATIVE_TRIGGERS_PATTERN = (
 def strip_false_feminine_instrumental(text: str, series_bible: Optional[Any] = None) -> Tuple[str, List[str]]:
     """
     Striper fałszywego narzędnika żeńskiego (Filar IV / Filar CLVI):
-    W konstrukcjach pochodzenia / grupy:
-    - np. rzeczowniki nijakie instytucji i toponimy po 'z/ze':
-      'z biurą' -> 'z biura', 'z miastą' -> 'z miasta'
-    oraz ogólnie dla rzeczowników pospolitych i instytucji po 'z/ze'.
+    W konstrukcjach pochodzenia / grupy dla rzeczowników pospolitych i instytucji po 'z/ze'.
     """
     if not text:
         return text, []
@@ -5144,8 +5181,7 @@ def strip_false_feminine_instrumental(text: str, series_bible: Optional[Any] = N
 
 def fix_masculine_vocative_tz(text: str) -> Tuple[str, List[str]]:
     """
-    Naprawia w tekście błędne końcówki wołacza/miejscownika -tzie -> -tzu dla imion męskich:
-    np. 'Kravitzie' -> 'Kravitzu', 'Horowiczie' -> 'Horowiczu'.
+    Naprawia w tekście błędne końcówki wołacza/miejscownika -tzie -> -tzu dla tematów afrykatywnych.
     """
     if not text:
         return text, []
@@ -5164,8 +5200,7 @@ def fix_masculine_vocative_tz(text: str) -> Tuple[str, List[str]]:
 
 def fix_virile_adjective_orthography(text: str) -> Tuple[str, List[str]]:
     """
-    Naprawia hiperpoprawną palatalizację przymiotników męskoosobowych od tematów twardych -nki:
-    np. 'cieńscy' -> 'ciency', 'Cieńscy' -> 'Ciency'.
+    Naprawia hiperpoprawną palatalizację przymiotników męskoosobowych od tematów twardych -nki.
     """
     if not text:
         return text, []
@@ -5230,7 +5265,7 @@ def enhanced_fix_undecorated_male_names(
                 and cdata.get("category") != "TOPONYM"
             ]
         else:
-            names = ["Ren", "Jean", "Raven", "Alexander", "Victor", "Arthur"]
+            names = []
 
     if not character_names:
         glossary_words = set()
@@ -5349,8 +5384,7 @@ def harmonize_copula_and_predicate_adjective(
     Wymusza zgodność przymiotnika/imiesłowu orzecznikowego po łącznikach oraz w szyku przestawnym:
     (bądź|nie bądź|jesteś|byłeś|byłaś|stałeś się|stałaś się|zostałeś|zostałaś|jestem|byłem|byłam|stałem się|stałam się|zostałem|zostałam)
     z ewentualnymi modyfikatorami (zbyt|tak|taki|taka|całkowicie).
-    Obsługuje szyk prosty (np. 'nie bądź naiwna' -> 'nie bądź naiwny') oraz
-    szyk przestawny/inwersję (np. 'pewna jestem' -> 'pewien jestem', 'samotna byłam' -> 'samotny byłem', 'sama zostałam' -> 'sam zostałem').
+    Obsługuje szyk prosty oraz szyk przestawny/inwersję.
     Dla MALE: -y/-i, pewien, gotów, sam.
     Dla FEMALE: -a, pewna, gotowa, sama.
     """
@@ -5419,9 +5453,9 @@ def harmonize_copula_and_predicate_adjective(
         if not applicable_gender:
             return full
 
-        g_upper = str(applicable_gender).upper()
-        is_female = any(k in g_upper for k in ["FEMALE", "KOBIETA", "DZIEWCZYNA"])
-        is_male = not is_female and any(k in g_upper for k in ["MALE", "MEZCZYZNA", "MĘŻCZYZNA", "CHLOPIEC", "CHŁOPIEC", "CHLOPAK", "CHŁOPAK"])
+        g_lower = str(applicable_gender).lower()
+        is_female = any(k in g_lower for k in ("female", "kobieta", "dziewczyna"))
+        is_male = not is_female and any(k in g_lower.upper() for k in MALE_GENDER_TOKENS)
 
         new_prefix = prefix
 
@@ -5481,7 +5515,7 @@ def harmonize_copula_and_predicate_adjective(
 
     result = re.sub(COPULA_PAT, _repl, result, flags=re.IGNORECASE)
 
-    # 2. Inverted order: [Adjective] + [Copula] (np. 'pewna jestem', 'samotna byłam', 'sama zostałam')
+    # 2. Inverted order: [Adjective] + [Copula]
     COPULA_INVERTED_PAT = (
         rf"((?:^|\\[Nnh]|[^\w])(?:(?:zbyt|tak|taki|taka|całkowicie){SEP})?)([A-Za-ząćęłńóśźż]+)"
         rf"({SEP}(?:nie{SEP})?(?:jesteś|byłeś|byłaś|stałeś{SEP}się|stałaś{SEP}się|zostałeś|zostałaś|"
@@ -5499,9 +5533,9 @@ def harmonize_copula_and_predicate_adjective(
         if not applicable_gender:
             return full
 
-        g_upper = str(applicable_gender).upper()
-        is_female = any(k in g_upper for k in ["FEMALE", "KOBIETA", "DZIEWCZYNA"])
-        is_male = not is_female and any(k in g_upper for k in ["MALE", "MEZCZYZNA", "MĘŻCZYZNA", "CHLOPIEC", "CHŁOPIEC", "CHLOPAK", "CHŁOPAK"])
+        g_lower = str(applicable_gender).lower()
+        is_female = any(k in g_lower for k in ("female", "kobieta", "dziewczyna"))
+        is_male = not is_female and any(k in g_lower.upper() for k in MALE_GENDER_TOKENS)
 
         new_lead = lead
         new_copula = copula_suffix
@@ -5622,9 +5656,9 @@ def harmonize_2nd_person_predicate_nouns(
     def _apply_predicate_pass(res_text: str, copula_verbs: str, gender_str: Optional[str], is_1p: bool) -> str:
         if not gender_str:
             return res_text
-        g_u = str(gender_str).upper()
-        is_f = any(k in g_u for k in ["FEMALE", "KOBIETA", "DZIEWCZYNA"])
-        is_m = not is_f and any(k in g_u for k in ["MALE", "MEZCZYZNA", "MĘŻCZYZNA", "CHLOPIEC", "CHŁOPIEC", "CHLOPAK", "CHŁOPAK"])
+        g_l = str(gender_str).lower()
+        is_f = any(k in g_l for k in ("female", "kobieta", "dziewczyna"))
+        is_m = not is_f and any(k in g_l.upper() for k in MALE_GENDER_TOKENS)
         if not is_m and not is_f:
             return res_text
 
@@ -5776,7 +5810,7 @@ def harmonize_verbal_gender_1st_and_2nd(
 ) -> Tuple[str, List[str]]:
     """
     Automatyczna naprawa czasowników 1. i 2. osoby:
-    - Dla speaker_gender == 'MALE': 1. os. -łam -> -łem, -łabym -> -łbym (np. wolałabym -> wolałbym, chciałam -> chciałem).
+    - Dla speaker_gender == 'MALE': 1. os. -łam -> -łem, -łabym -> -łbym w formach przeszłych.
       Dla FEMALE: -łem -> -łam, -łbym -> -łabym.
     - Dla target_gender == 'MALE': 2. os. -łaś -> -łeś, -łabyś -> -łbyś, \bbyłaś\b -> byłeś, \bmogłaś\b -> mogłeś.
       Dla FEMALE: -łeś -> -łaś, -łbyś -> -łabyś, \bbyłeś\b -> byłaś, a w 2. os. lm. -liście -> -łyście.
@@ -5795,9 +5829,9 @@ def harmonize_verbal_gender_1st_and_2nd(
 
     # --- 1. PERSON VERBS (SPEAKER) ---
     if speaker_gender:
-        sg_upper = str(speaker_gender).upper()
-        is_spk_female = any(k in sg_upper for k in ["FEMALE", "KOBIETA", "DZIEWCZYNA"])
-        is_spk_male = not is_spk_female and any(k in sg_upper for k in ["MALE", "MEZCZYZNA", "MĘŻCZYZNA", "CHLOPIEC", "CHŁOPIEC", "CHLOPAK", "CHŁOPAK"])
+        sg_lower = str(speaker_gender).lower()
+        is_spk_female = any(k in sg_lower for k in ("female", "kobieta", "dziewczyna"))
+        is_spk_male = not is_spk_female and any(k in sg_lower.upper() for k in MALE_GENDER_TOKENS)
 
         if is_spk_male:
             # 1. Synthetic 1p past/conditional forms
@@ -5917,9 +5951,9 @@ def harmonize_verbal_gender_1st_and_2nd(
 
     # --- 2. PERSON VERBS (ADDRESSEE) ---
     if target_gender:
-        tg_upper = str(target_gender).upper()
-        is_tgt_female = any(k in tg_upper for k in ["FEMALE", "KOBIETA", "DZIEWCZYNA"])
-        is_tgt_male = not is_tgt_female and any(k in tg_upper for k in ["MALE", "MEZCZYZNA", "MĘŻCZYZNA", "CHLOPIEC", "CHŁOPIEC", "CHLOPAK", "CHŁOPAK"])
+        tg_lower = str(target_gender).lower()
+        is_tgt_female = any(k in tg_lower for k in ("female", "kobieta", "dziewczyna"))
+        is_tgt_male = not is_tgt_female and any(k in tg_lower.upper() for k in MALE_GENDER_TOKENS)
 
         if is_tgt_male:
             # 1. Synthetic 2p past/conditional forms
@@ -6093,9 +6127,9 @@ def harmonize_turn_plural_subtitles(
         for idx, ev in turn:
             text = ev.text or ""
             addr = getattr(ev, "addressee", None) or (line_addressees.get(idx) if line_addressees else None) or ""
-            addr_str = str(addr).upper()
+            addr_str = str(addr).lower()
 
-            if any(k in addr_str for k in ["PLURAL", "GRUPA"]):
+            if any(k in addr_str for k in ("plural", "grupa")):
                 turn_is_plural = True
                 break
 
@@ -6622,8 +6656,8 @@ class EpisodeQualityGate:
                 cand_gender = char_gender_map.get(tok_lower, "UNKNOWN")
 
                 if prep_word in {"do", "dla", "od", "u", "bez", "przez", "za"}:
-                    # Po przyimkach rządzących dopełniaczem lub biernikiem męskie imiona spółgłoskowe przyjmują końcówkę -a (np. do Brandona, dla Klena, od Leona).
-                    # Uznanie tej formy za mianownik (Brandona, Klena) powoduje błędne wygenerowanie żeńskiej odmiany na -y (do Brandony, do Kleny).
+                    # Po przyimkach rządzących dopełniaczem lub biernikiem męskie antroponimy spółgłoskowe przyjmują końcówkę fleksyjną -a.
+                    # Uznanie tej formy za mianownik powoduje błędne wygenerowanie żeńskiej odmiany na -y.
                     from series_memory import is_inherently_female_name, POLISH_FEMALE_NAMES, UNIVERSAL_FEMALE_NAMES_ON_A
                     is_known_female = (
                         cand_gender == "FEMALE" or
@@ -7285,7 +7319,7 @@ class EpisodeQualityGate:
                     if cand_addr_g in ("MALE", "FEMALE"):
                         addr_g = cand_addr_g
 
-                is_pl_addr = any(k in str(addr_name).upper() for k in ["PLURAL", "GRUPA"]) if addr_name else False
+                is_pl_addr = any(k in str(addr_name).lower() for k in ("plural", "grupa")) if addr_name else False
                 has_2nd_pl = has_2nd_person_plural_verb(ev.text)
                 sc_has_male = event_scene_has_male.get(i, False) or (addr_g == "MALE")
                 sc_g = event_scene_gender.get(i)
@@ -8044,7 +8078,7 @@ class EpisodeQualityGate:
                         spk_name = "Shizuku"
                         spk_gen = "FEMALE"
                         ev.name = "Shizuku"
-                        fixes.append(f"[Episode Quality Gate - Korekta Diaryzacji] Linia #{i+1}: wykryto anomalię diaryzacji / monolog techniczny Shizuku -> przypisano postać 'Shizuku' (kobieta)")
+                        fixes.append(f"[Episode Quality Gate - Harmonizacja Diaryzacji] Linia #{i+1}: wykryto anomalię diaryzacji / monolog techniczny -> przypisano postać '{spk_name}' (kobieta)")
 
 
                 # Scene-Level Exclusive Gender Assignment for Anonymous Speaker
@@ -10480,7 +10514,7 @@ class EpisodeQualityGate:
                         continue
                     if re.search(pattern, ev.text):
                         ev.text = re.sub(pattern, repl, ev.text)
-                        repl_disp = repl if isinstance(repl, str) else "[korekta fleksyjna]"
+                        repl_disp = repl if isinstance(repl, str) else "[dostosowanie fleksyjne]"
                         fixes.append(f"[Episode Quality Gate - {pillar_tag}] Linia #{i+1}: {pattern} -> {repl_disp}")
 
             # 4a. FANSUB CANON LEXICON ENFORCEMENT (0.00 PLN - FansubLexiconEngine)
@@ -10847,7 +10881,7 @@ class EpisodeQualityGate:
         def _capitalize_all_dialogue_starts(s: str, is_continuation: bool = False) -> str:
             if not is_continuation:
                 s = _capitalize_after_prefix(s)
-            # Wewnątrz segmentu wielka litera po \N wymaga jawnego myślnika dialogowego (Korekta 1):
+            # Wewnątrz segmentu wielka litera po \N wymaga jawnego myślnika dialogowego:
             pat_n = r'(\\[Nnh](?:\s*\{[^}]*\})*\s*[-–—]\s*)([a-ząćęłńóśźż])'
             return re.sub(pat_n, lambda m: m.group(1) + m.group(2).upper(), s)
 

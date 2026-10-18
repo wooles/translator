@@ -2,53 +2,100 @@
   "anime_title": "Rakudai Kenja no Gakuin Musou",
   "characters": {
     "Anastasia": {
-      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "kobieta (postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Anastasia"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Eftal": {
-      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-      "gender": "MALE"
+      "description": "mężczyzna (postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Eftal"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Merlin": {
-      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "kobieta (postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Merlin"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Gaius": {
-      "description": "chłopak (Główny bohater) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "chłopak (Główny bohater)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Gaius"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Cliff": {
-      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "mężczyzna (postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Cliff"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Seiryu": {
-      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "mężczyzna (postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Seiryu"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Genie": {
-      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "kobieta (postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Genie"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Maria": {
-      "description": "KOBIETA (wyodrębniono z relacji serii)"
-    },
-    "Anastasia -> Eftal": {
-      "description": "Zwrot: 'Mistrzu / na pan' (uczennica / ocalona -> wybawca i mentor)"
-    },
-    "Merlin -> Eftal": {
-      "description": "Zwrot: 'panie Eftalu' (lojalna powierniczka i była uczennica -> mistrz) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie Eftalu', zakaz poufałego wołacza 'Eftalu' oraz hybryd 'Eftalu... ma pan']"
-    },
-    "Eftal -> Anastasia": {
-      "description": "Zwrot: 'na ty / Anastasio' (opiekun i mistrz -> podopieczna)"
-    },
-    "Eftal -> Merlin": {
-      "description": "Zwrot: 'na ty / Merlin' (dawni towarzysze / zaufani partnerzy)"
-    },
-    "Merlin -> Maria": {
-      "description": "Zwrot: 'Siostrzyczko Mario' (udawane dziecko -> nauczycielka)"
-    },
-    "Anastasia -> Merlin": {
-      "description": "Zwrot: 'Merlin' (koleżanki / uczennice tego samego mistrza)"
-    },
-    "Seiryu -> Eftal": {
-      "description": "Zwrot: 'człowieku / nędzny śmiertelniku' (bóstwo paktu -> bezczelny buntownik)"
-    },
-    "Eftal -> Seiryu": {
-      "description": "Zwrot: 'na ty / przerośnięty gadzie' (pogromca paktów -> pokonana bestia)"
+      "description": "KOBIETA (wyodrębniono z relacji serii)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Maria"
+      ],
+      "entity_category": "ANTHROPONYM"
     }
   },
   "glossary": {
@@ -76,14 +123,24 @@
     "Four Holy Beasts": "Cztery Święte Bestie"
   },
   "relationships": {
-    "Anastasia -> Eftal": "Zwrot: 'Mistrzu / na pan' (uczennica / ocalona -> wybawca i mentor)",
-    "Merlin -> Eftal": "Zwrot: 'panie Eftalu' (lojalna powierniczka i była uczennica -> mistrz) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie Eftalu', zakaz poufałego wołacza 'Eftalu' oraz hybryd 'Eftalu... ma pan']",
-    "Eftal -> Anastasia": "Zwrot: 'na ty / Anastasio' (opiekun i mistrz -> podopieczna)",
-    "Eftal -> Merlin": "Zwrot: 'na ty / Merlin' (dawni towarzysze / zaufani partnerzy)",
-    "Merlin -> Maria": "Zwrot: 'Siostrzyczko Mario' (udawane dziecko -> nauczycielka) [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]",
-    "Anastasia -> Merlin": "Zwrot: 'Merlin' (koleżanki / uczennice tego samego mistrza) [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]",
-    "Seiryu -> Eftal": "Zwrot: 'człowieku / nędzny śmiertelniku' (bóstwo paktu -> bezczelny buntownik)",
-    "Eftal -> Seiryu": "Zwrot: 'na ty / przerośnięty gadzie' (pogromca paktów -> pokonana bestia)"
+    "Anastasia -> Eftal": "Zwrot: 'Mistrzu / na pan' (uczennica / ocalona -> wybawca i mentor) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Merlin -> Eftal": "Zwrot: 'panie Eftalu' (lojalna powierniczka i była uczennica -> mistrz) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie Eftalu', zakaz poufałego wołacza 'Eftalu' oraz hybryd 'Eftalu... ma pan'] [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Eftal -> Anastasia": "Zwrot: 'na ty / Anastasio' (opiekun i mistrz -> podopieczna) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Eftal -> Merlin": "Zwrot: 'na ty / Merlin' (dawni towarzysze / zaufani partnerzy) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [OCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu eliminacja opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?']",
+    "Merlin -> Maria": "Zwrot: 'Siostrzyczko Mario' (udawane dziecko -> nauczycielka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
+    "Anastasia -> Merlin": "Zwrot: 'Merlin' (koleżanki / uczennice tego samego mistrza) [GRUPA KOBIET - Wymóg form niemęskoosobowych: -łyście / byłyście gotowe] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
+    "Seiryu -> Eftal": "Zwrot: 'człowieku / nędzny śmiertelniku' (bóstwo paktu -> bezczelny buntownik) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Eftal -> Seiryu": "Zwrot: 'na ty / przerośnięty gadzie' (pogromca paktów -> pokonana bestia) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+  },
+  "relations": {
+    "Anastasia -> Eftal": "Zwrot: 'Mistrzu / na pan' (uczennica / ocalona -> wybawca i mentor) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Merlin -> Eftal": "Zwrot: 'panie Eftalu' (lojalna powierniczka i była uczennica -> mistrz) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie Eftalu', zakaz poufałego wołacza 'Eftalu' oraz hybryd 'Eftalu... ma pan'] [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Eftal -> Anastasia": "Zwrot: 'na ty / Anastasio' (opiekun i mistrz -> podopieczna) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Eftal -> Merlin": "Zwrot: 'na ty / Merlin' (dawni towarzysze / zaufani partnerzy) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [OCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu eliminacja opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?']",
+    "Merlin -> Maria": "Zwrot: 'Siostrzyczko Mario' (udawane dziecko -> nauczycielka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Anastasia -> Merlin": "Zwrot: 'Merlin' (koleżanki / uczennice tego samego mistrza) [GRUPA KOBIET - Wymóg form niemęskoosobowych: -łyście / byłyście gotowe] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Seiryu -> Eftal": "Zwrot: 'człowieku / nędzny śmiertelniku' (bóstwo paktu -> bezczelny buntownik) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Eftal -> Seiryu": "Zwrot: 'na ty / przerośnięty gadzie' (pogromca paktów -> pokonana bestia) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
   },
   "declensions": {
     "Anastasia": {
@@ -165,78 +222,6 @@
       "Ms": "Marii",
       "W": "Mario",
       "gender": "FEMALE"
-    },
-    "Anastasia -> Eftal": {
-      "M": "Anastasia -> Eftal",
-      "D": "Anastasiy -> Eftal",
-      "C": "Anastasie -> Eftal",
-      "B": "Anastasię -> Eftal",
-      "N": "Anastasią -> Eftal",
-      "Ms": "Anastasie -> Eftal",
-      "W": "Anastasio -> Eftal"
-    },
-    "Merlin -> Eftal": {
-      "M": "Merlin -> Eftal",
-      "D": "Merlina -> Eftala",
-      "C": "Merlinowi -> Eftalowi",
-      "B": "Merlina -> Eftala",
-      "N": "Merlinem -> Eftalem",
-      "Ms": "Merlinie -> Eftalu",
-      "W": "Merlinie -> Eftalu"
-    },
-    "Eftal -> Anastasia": {
-      "M": "Eftal -> Anastasia",
-      "D": "Eftal -> Anastasiy",
-      "C": "Eftal -> Anastasie",
-      "B": "Eftal -> Anastasię",
-      "N": "Eftal -> Anastasią",
-      "Ms": "Eftal -> Anastasie",
-      "W": "Eftal -> Anastasio"
-    },
-    "Eftal -> Merlin": {
-      "M": "Eftal -> Merlin",
-      "D": "Eftala -> Merlina",
-      "C": "Eftalowi -> Merlinowi",
-      "B": "Eftala -> Merlina",
-      "N": "Eftalem -> Merlinem",
-      "Ms": "Eftalu -> Merlinie",
-      "W": "Eftalu -> Merlinie"
-    },
-    "Merlin -> Maria": {
-      "M": "Merlin -> Maria",
-      "D": "Merlin -> Mariy",
-      "C": "Merlin -> Marie",
-      "B": "Merlin -> Marię",
-      "N": "Merlin -> Marią",
-      "Ms": "Merlin -> Marie",
-      "W": "Merlin -> Mario"
-    },
-    "Anastasia -> Merlin": {
-      "M": "Anastasia -> Merlin",
-      "D": "Anastasiy -> Merlin",
-      "C": "Anastasie -> Merlin",
-      "B": "Anastasię -> Merlin",
-      "N": "Anastasią -> Merlin",
-      "Ms": "Anastasie -> Merlin",
-      "W": "Anastasio -> Merlin"
-    },
-    "Seiryu -> Eftal": {
-      "M": "Seiryu -> Eftal",
-      "D": "Seiryu -> Eftala",
-      "C": "Seiryu -> Eftalowi",
-      "B": "Seiryu -> Eftala",
-      "N": "Seiryu -> Eftalem",
-      "Ms": "Seiryu -> Eftalu",
-      "W": "Seiryu -> Eftalu"
-    },
-    "Eftal -> Seiryu": {
-      "M": "Eftal -> Seiryu",
-      "D": "Eftala -> Seiryu",
-      "C": "Eftalowi -> Seiryu",
-      "B": "Eftala -> Seiryu",
-      "N": "Eftalem -> Seiryu",
-      "Ms": "Eftalu -> Seiryu",
-      "W": "Eftalu -> Seiryu"
     }
   },
   "hypocorisms": {},
@@ -258,7 +243,8 @@
     "Cliff": "ANTHROPONYM",
     "Seiryu": "ANTHROPONYM",
     "Genie": "ANTHROPONYM",
-    "Maria": "ANTHROPONYM"
+    "Maria": "ANTHROPONYM",
+    "Yunotron": "TOPONYM"
   },
   "fansub_canon": {}
 }

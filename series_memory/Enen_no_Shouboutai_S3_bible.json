@@ -3,87 +3,159 @@
   "characters": {
     "Shinra": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Shinra"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Haumea": {
-      "description": "KOBIETA (wyodrębniono z relacji serii)"
+      "description": "KOBIETA (wyodrębniono z relacji serii)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Haumea"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Sho": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Sho"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Obi": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Obi"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Maki": {
-      "description": "KOBIETA (wyodrębniono z relacji serii)"
+      "description": "KOBIETA (wyodrębniono z relacji serii)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Maki"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Licht": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Licht"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Vulcan": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Vulcan"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Obywatele": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Obywatele"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Arthur": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Arthur"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Charon": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Charon"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Inca": {
-      "description": "KOBIETA (wyodrębniono z relacji serii)"
+      "description": "KOBIETA (wyodrębniono z relacji serii)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Inca"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Iris": {
-      "description": "KOBIETA (wyodrębniono z relacji serii)"
+      "description": "KOBIETA (wyodrębniono z relacji serii)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Iris"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Hibana": {
-      "description": "KOBIETA (wyodrębniono z relacji serii)"
-    },
-    "Shinra -> Haumea": {
-      "description": "Zwrot: 'na ty / Haumea' (zbawca -> uratowana kapłanka)"
-    },
-    "Sho -> Shinra": {
-      "description": "Zwrot: 'bracie (Nii-san)' (młodszy brat -> starszy brat)"
-    },
-    "Shinra -> Sho": {
-      "description": "Zwrot: 'Sho / braciszku' (starszy brat -> młodszy brat)"
-    },
-    "Shinra -> Obi": {
-      "description": "Zwrot: 'Kapitanie Obi / Kapitan' (podwładny -> dowódca)"
-    },
-    "Maki -> Obi": {
-      "description": "Zwrot: 'kapitanie' (podwładna -> dowódca)"
-    },
-    "Licht -> Vulcan": {
-      "description": "Zwrot: 'Vulcan / po imieniu' (członkowie tego samego oddziału)"
-    },
-    "Licht -> Obi": {
-      "description": "Zwrot: 'kapitanie / panie kapitanie' (podwładny -> dowódca)"
-    },
-    "Haumea -> Shinra": {
-      "description": "Zwrot: 'Shinra Bansho Man / Boże' (antagonistka / wyznawczyni rozpaczy wobec zbawiciela)"
-    },
-    "Obi -> Obywatele": {
-      "description": "Zwrot: 'proszę państwa / spokojnie' (kapitan Brygady -> cywile)"
-    },
-    "Arthur -> Shinra": {
-      "description": "Zwrot: 'głupcze / diable / bohaterze' (rywal / przyjaciel)"
-    },
-    "Charon -> Haumea": {
-      "description": "Zwrot: 'Haumea / mała' (oddany strażnik -> podopieczna)"
-    },
-    "Inca -> Shinra": {
-      "description": "Zwrot: 'Shinra / Shinra-kun / Bohaterze' (natrętna adoratorka / rywalka -> zbawca)"
-    },
-    "Iris -> Shinra": {
-      "description": "Zwrot: 'panie Shinra (Shinra-san)' (towarzysze broni / wzajemna sympatia)"
-    },
-    "Hibana -> Iris": {
-      "description": "Zwrot: 'Iris / siostrzyczko' (starsza przybrana siostra -> młodsza siostra)"
+      "description": "KOBIETA (wyodrębniono z relacji serii)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Hibana"
+      ],
+      "entity_category": "ANTHROPONYM"
     }
   },
   "glossary": {
@@ -111,20 +183,36 @@
     "Excalibur": "Ekskalibur"
   },
   "relationships": {
-    "Shinra -> Haumea": "Zwrot: 'na ty / Haumea' (zbawca -> uratowana kapłanka)",
-    "Sho -> Shinra": "Zwrot: 'bracie (Nii-san)' (młodszy brat -> starszy brat)",
-    "Shinra -> Sho": "Zwrot: 'Sho / braciszku' (starszy brat -> młodszy brat)",
-    "Shinra -> Obi": "Zwrot: 'Kapitanie Obi / Kapitan' (podwładny -> dowódca)",
-    "Maki -> Obi": "Zwrot: 'kapitanie' (podwładna -> dowódca)",
-    "Licht -> Vulcan": "Zwrot: 'Vulcan / po imieniu' (członkowie tego samego oddziału)",
-    "Licht -> Obi": "Zwrot: 'kapitanie / panie kapitanie' (podwładny -> dowódca)",
-    "Haumea -> Shinra": "Zwrot: 'Shinra Bansho Man / Boże' (antagonistka / wyznawczyni rozpaczy wobec zbawiciela)",
-    "Obi -> Obywatele": "Zwrot: 'proszę państwa / spokojnie' (kapitan Brygady -> cywile)",
-    "Arthur -> Shinra": "Zwrot: 'głupcze / diable / bohaterze' (rywal / przyjaciel)",
-    "Charon -> Haumea": "Zwrot: 'Haumea / mała' (oddany strażnik -> podopieczna)",
-    "Inca -> Shinra": "Zwrot: 'Shinra / Shinra-kun / Bohaterze' (natrętna adoratorka / rywalka -> zbawca)",
-    "Iris -> Shinra": "Zwrot: 'panie Shinra (Shinra-san)' (towarzysze broni / wzajemna sympatia)",
-    "Hibana -> Iris": "Zwrot: 'Iris / siostrzyczko' (starsza przybrana siostra -> młodsza siostra) [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]"
+    "Shinra -> Haumea": "Zwrot: 'na ty / Haumea' (zbawca -> uratowana kapłanka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Sho -> Shinra": "Zwrot: 'bracie (Nii-san)' (młodszy brat -> starszy brat) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Shinra -> Sho": "Zwrot: 'Sho / braciszku' (starszy brat -> młodszy brat) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Shinra -> Obi": "Zwrot: 'Kapitanie Obi / Kapitan' (podwładny -> dowódca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Maki -> Obi": "Zwrot: 'kapitanie' (podwładna -> dowódca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Licht -> Vulcan": "Zwrot: 'Vulcan / po imieniu' (członkowie tego samego oddziału) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Licht -> Obi": "Zwrot: 'kapitanie / panie kapitanie' (podwładny -> dowódca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Haumea -> Shinra": "Zwrot: 'Shinra Bansho Man / Boże' (antagonistka / wyznawczyni rozpaczy wobec zbawiciela) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Obi -> Obywatele": "Zwrot: 'proszę państwa / spokojnie' (kapitan Brygady -> cywile) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Arthur -> Shinra": "Zwrot: 'głupcze / diable / bohaterze' (rywal / przyjaciel) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Charon -> Haumea": "Zwrot: 'Haumea / mała' (oddany strażnik -> podopieczna) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Inca -> Shinra": "Zwrot: 'Shinra / Shinra-kun / Bohaterze' (natrętna adoratorka / rywalka -> zbawca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Iris -> Shinra": "Zwrot: 'panie Shinra (Shinra-san)' (towarzysze broni / sympatia) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Hibana -> Iris": "Zwrot: 'Iris / siostrzyczko' (starsza przybrana siostra -> młodsza siostra) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]"
+  },
+  "relations": {
+    "Shinra -> Haumea": "Zwrot: 'na ty / Haumea' (zbawca -> uratowana kapłanka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Sho -> Shinra": "Zwrot: 'bracie (Nii-san)' (młodszy brat -> starszy brat) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Shinra -> Sho": "Zwrot: 'Sho / braciszku' (starszy brat -> młodszy brat) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Shinra -> Obi": "Zwrot: 'Kapitanie Obi / Kapitan' (podwładny -> dowódca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Maki -> Obi": "Zwrot: 'kapitanie' (podwładna -> dowódca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Licht -> Vulcan": "Zwrot: 'Vulcan / po imieniu' (członkowie tego samego oddziału) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Licht -> Obi": "Zwrot: 'kapitanie / panie kapitanie' (podwładny -> dowódca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Haumea -> Shinra": "Zwrot: 'Shinra Bansho Man / Boże' (antagonistka / wyznawczyni rozpaczy wobec zbawiciela) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Obi -> Obywatele": "Zwrot: 'proszę państwa / spokojnie' (kapitan Brygady -> cywile) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Arthur -> Shinra": "Zwrot: 'głupcze / diable / bohaterze' (rywal / przyjaciel) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Charon -> Haumea": "Zwrot: 'Haumea / mała' (oddany strażnik -> podopieczna) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Inca -> Shinra": "Zwrot: 'Shinra / Shinra-kun / Bohaterze' (natrętna adoratorka / rywalka -> zbawca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Iris -> Shinra": "Zwrot: 'panie Shinra (Shinra-san)' (towarzysze broni / sympatia) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Hibana -> Iris": "Zwrot: 'Iris / siostrzyczko' (starsza przybrana siostra -> młodsza siostra) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
   },
   "declensions": {
     "Shinra": {
@@ -256,134 +344,6 @@
       "Ms": "Hibanie",
       "W": "Hibano",
       "gender": "FEMALE"
-    },
-    "Shinra -> Haumea": {
-      "M": "Shinra -> Haumea",
-      "D": "Shinry -> Haumey",
-      "C": "Shinrze -> Haumee",
-      "B": "Shinrę -> Haumeę",
-      "N": "Shinrą -> Haumeą",
-      "Ms": "Shinrze -> Haumee",
-      "W": "Shinro -> Haumeo",
-      "gender": "FEMALE"
-    },
-    "Sho -> Shinra": {
-      "M": "Sho -> Shinra",
-      "D": "Sho -> Shinry",
-      "C": "Sho -> Shinrze",
-      "B": "Sho -> Shinrę",
-      "N": "Sho -> Shinrą",
-      "Ms": "Sho -> Shinrze",
-      "W": "Sho -> Shinro"
-    },
-    "Shinra -> Sho": {
-      "M": "Shinra -> Sho",
-      "D": "Shinry -> Sho",
-      "C": "Shinrze -> Sho",
-      "B": "Shinrę -> Sho",
-      "N": "Shinrą -> Sho",
-      "Ms": "Shinrze -> Sho",
-      "W": "Shinro -> Sho"
-    },
-    "Shinra -> Obi": {
-      "M": "Shinra -> Obi",
-      "D": "Shinry -> Obi",
-      "C": "Shinrze -> Obi",
-      "B": "Shinrę -> Obi",
-      "N": "Shinrą -> Obi",
-      "Ms": "Shinrze -> Obi",
-      "W": "Shinro -> Obi"
-    },
-    "Maki -> Obi": {
-      "M": "Maki -> Obi",
-      "D": "Maki -> Obi",
-      "C": "Maki -> Obi",
-      "B": "Maki -> Obi",
-      "N": "Maki -> Obi",
-      "Ms": "Maki -> Obi",
-      "W": "Maki -> Obi"
-    },
-    "Licht -> Vulcan": {
-      "M": "Licht -> Vulcan",
-      "D": "Lichta -> Vulcana",
-      "C": "Lichtowi -> Vulcanowi",
-      "B": "Lichta -> Vulcana",
-      "N": "Lichtem -> Vulcanem",
-      "Ms": "Lichcie -> Vulcanie",
-      "W": "Lichcie -> Vulcanie"
-    },
-    "Licht -> Obi": {
-      "M": "Licht -> Obi",
-      "D": "Lichta -> Obi",
-      "C": "Lichtowi -> Obi",
-      "B": "Lichta -> Obi",
-      "N": "Lichtem -> Obi",
-      "Ms": "Lichcie -> Obi",
-      "W": "Lichcie -> Obi"
-    },
-    "Haumea -> Shinra": {
-      "M": "Haumea -> Shinra",
-      "D": "Haumey -> Shinry",
-      "C": "Haumee -> Shinrze",
-      "B": "Haumeę -> Shinrę",
-      "N": "Haumeą -> Shinrą",
-      "Ms": "Haumee -> Shinrze",
-      "W": "Haumeo -> Shinro"
-    },
-    "Obi -> Obywatele": {
-      "M": "Obi -> Obywatele",
-      "D": "Obi -> Obywatele",
-      "C": "Obi -> Obywatele",
-      "B": "Obi -> Obywatele",
-      "N": "Obi -> Obywatele",
-      "Ms": "Obi -> Obywatele",
-      "W": "Obi -> Obywatele"
-    },
-    "Arthur -> Shinra": {
-      "M": "Arthur -> Shinra",
-      "D": "Arthura -> Shinry",
-      "C": "Arthurowi -> Shinrze",
-      "B": "Arthura -> Shinrę",
-      "N": "Arthurem -> Shinrą",
-      "Ms": "Arthurze -> Shinrze",
-      "W": "Arthurze -> Shinro"
-    },
-    "Charon -> Haumea": {
-      "M": "Charon -> Haumea",
-      "D": "Charon -> Haumey",
-      "C": "Charon -> Haumee",
-      "B": "Charon -> Haumeę",
-      "N": "Charon -> Haumeą",
-      "Ms": "Charon -> Haumee",
-      "W": "Charon -> Haumeo"
-    },
-    "Inca -> Shinra": {
-      "M": "Inca -> Shinra",
-      "D": "Inki -> Shinry",
-      "C": "Ince -> Shinrze",
-      "B": "Inkę -> Shinrę",
-      "N": "Inką -> Shinrą",
-      "Ms": "Ince -> Shinrze",
-      "W": "Inko -> Shinro"
-    },
-    "Iris -> Shinra": {
-      "M": "Iris -> Shinra",
-      "D": "Iris -> Shinry",
-      "C": "Iris -> Shinrze",
-      "B": "Iris -> Shinrę",
-      "N": "Iris -> Shinrą",
-      "Ms": "Iris -> Shinrze",
-      "W": "Iris -> Shinro"
-    },
-    "Hibana -> Iris": {
-      "M": "Hibana -> Iris",
-      "D": "Hibany -> Iris",
-      "C": "Hibanie -> Iris",
-      "B": "Hibanę -> Iris",
-      "N": "Hibaną -> Iris",
-      "Ms": "Hibanie -> Iris",
-      "W": "Hibano -> Iris",
-      "gender": "FEMALE"
     }
   },
   "hypocorisms": {},
@@ -411,7 +371,10 @@
     "Charon": "ANTHROPONYM",
     "Inca": "ANTHROPONYM",
     "Iris": "ANTHROPONYM",
-    "Hibana": "ANTHROPONYM"
+    "Hibana": "ANTHROPONYM",
+    "Amaterasu": "TOPONYM",
+    "Látom": "TOPONYM",
+    "42-42-564": "TOPONYM"
   },
   "fansub_canon": {}
 }

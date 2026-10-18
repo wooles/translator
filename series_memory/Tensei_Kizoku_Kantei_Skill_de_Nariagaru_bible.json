@@ -1,225 +1,708 @@
 {
   "anime_title": "Tensei Kizoku, Kantei Skill de Nariagaru",
   "characters": {
-    "Rietz -> Ars": {
-      "description": "Zwrot: 'panie Arsie / Lordzie Arsie' (wierny wasal -> pan lenny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
-    },
     "Rietz": {
       "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
       "source": "quality_gate",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Rietz"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Ars": {
       "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
       "source": "quality_gate",
-      "gender": "MALE"
-    },
-    "Charlotte -> Ars": {
-      "description": "Zwrot: 'na ty / Arsie' (bliska towarzyszka / przyjaciółka -> suweren) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Ars"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Charlotte": {
-      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
-    },
-    "Mireille -> Ars": {
-      "description": "Zwrot: 'młody / panie Arsie' (zastępczyni lorda -> młody senior) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "kobieta (postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Charlotte"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Mireille": {
-      "description": "postać (Postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
-    },
-    "Ars -> Mireille": {
-      "description": "Zwrot: 'pani Mireille / na ty' (suweren -> zaufana doradczyni) [OCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu zakaz opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?'\\NKOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
-    },
-    "Licia -> Ars": {
-      "description": "Zwrot: 'panie Arsie / Lordzie Arsie' (narzeczona -> narzeczony) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Mireille"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Licia": {
-      "description": "postać (Postać)"
-    },
-    "Zaht -> Braham": {
-      "description": "Zwrot: 'Kapitanie / Braham' (zastępca -> dowódca oddziału) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Licia"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Zaht": {
       "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
       "source": "quality_gate",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Zaht"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Braham": {
       "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
       "source": "quality_gate",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Braham"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Ars Louvent": {
-      "description": "mężczyzna (Młody lord Canarre, głowa rodu Louvent) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
-      "gender": "MALE"
+      "description": "mężczyzna (Młody lord Canarre, głowa rodu Louvent) ', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Ars Louvent",
+        "Louvent"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Rietz Muses": {
-      "description": "mężczyzna (Naczelny wódz sił Canarre, wasal Arsa Louventa) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-      "gender": "MALE"
+      "description": "mężczyzna (Naczelny wódz sił Canarre, wasal Arsa Louventa)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Muses",
+        "Rietz Muses"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Charlotte Wraith": {
-      "description": "postać (Postać)"
+      "description": "postać (Postać)",
+      "gender": "FEMALE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "grammatical_gender": "FEMININE",
+      "aliases": [
+        "Charlotte Wraith",
+        "Wraith"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Rosell Kischa": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Kischa",
+        "Rosell Kischa"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Lycia Plaid": {
-      "description": "postać (Główny bohater) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "postać (Główny bohater)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Lycia",
+        "Lycia Plaid",
+        "Plaid"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Raven Louvent": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Louvent",
+        "Raven",
+        "Raven Louvent"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Mireille Grangeon": {
-      "description": "postać (Postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "postać (Postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Grangeon",
+        "Mireille Grangeon"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Fam": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Fam"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Lumeire Pyres": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Lumeire",
+        "Lumeire Pyres",
+        "Pyres"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Sofia Louvent": {
-      "description": "postać (Postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "postać (Postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Louvent",
+        "Sofia",
+        "Sofia Louvent"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Krall Orslo": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Krall",
+        "Krall Orslo",
+        "Orslo"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Menas Lenard": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Lenard",
+        "Menas",
+        "Menas Lenard"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Hammond Plaid": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Hammond Plaid",
+        "Plaid"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Kreitz Louvent": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Kreitz",
+        "Kreitz Louvent",
+        "Louvent"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Ren Louvent": {
-      "description": "postać (Postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "postać (Postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Louvent",
+        "Ren",
+        "Ren Louvent"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Couran Salamakhia": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Couran Salamakhia",
+        "Salamakhia"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Zaht Brozud": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Brozud",
+        "Zaht Brozud"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Musia Trick": {
-      "description": "postać (Postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "postać (Postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Musia Trick",
+        "Trick"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Rosell": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Rosell"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Musia": {
-      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "kobieta (postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Musia"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Krantz": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Krantz"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Shin Seymarrow": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Seymarrow",
+        "Shin",
+        "Shin Seymarrow"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Vasmarque": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Vasmarque"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Guard Captain": {
       "description": "MĘŻCZYZNA (zweryfikowano z audio seiyū Whisper)",
-      "gender": "MALE"
-    },
-    "Ars -> Rietz": {
-      "description": "Zwrot: 'na ty / Rietz' (pan lenny -> prawa ręka) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]"
-    },
-    "Charlotte -> Musia": {
-      "description": "Zwrot: 'na ty / Musia' (starsza czarodziejka -> nowa rekrutka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
-    },
-    "Musia -> Charlotte": {
-      "description": "Zwrot: 'na ty / Charlotte' (podziwiająca uczennica -> mentorka) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Captain",
+        "Guard",
+        "Guard Captain"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Licia Plaid": {
-      "description": "postać (Postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "postać (Postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Licia Plaid",
+        "Plaid"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Hammond Pleide": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Hammond Pleide",
+        "Pleide"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Vasmarque Salamakhia": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Salamakhia",
+        "Vasmarque Salamakhia"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Grenda Domatheson": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Domatheson",
+        "Grenda Domatheson"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Borotz Heygand": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Borotz Heygand",
+        "Heygand"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Lantark Lodder": {
-      "description": "postać (Postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Lantark",
+        "Lantark Lodder",
+        "Lodder"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Pham": {
       "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
-      "source": "quality_gate"
+      "source": "quality_gate",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Pham"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "New Recruit A": {
-      "description": "MĘŻCZYZNA (zweryfikowano z audio seiyū Whisper)"
+      "description": "MĘŻCZYZNA (zweryfikowano z audio seiyū Whisper)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "New Recruit A",
+        "Recruit"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Musia's Mother": {
-      "description": "MĘŻCZYZNA (zweryfikowano z audio seiyū Whisper)"
+      "description": "MĘŻCZYZNA (zweryfikowano z audio seiyū Whisper)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Mother",
+        "Musia's",
+        "Musia's Mother"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "New Recruit E": {
-      "description": "MĘŻCZYZNA (zweryfikowano z audio seiyū Whisper)"
+      "description": "MĘŻCZYZNA (zweryfikowano z audio seiyū Whisper)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "New Recruit E",
+        "Recruit"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "New Recruit D": {
-      "description": "MĘŻCZYZNA (zweryfikowano z audio seiyū Whisper)"
+      "description": "MĘŻCZYZNA (zweryfikowano z audio seiyū Whisper)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "New Recruit D",
+        "Recruit"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Long-Range Captain": {
-      "description": "KOBIETA (zweryfikowano z audio seiyū Whisper)"
+      "description": "KOBIETA (zweryfikowano z audio seiyū Whisper)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Captain",
+        "Long-Range",
+        "Long-Range Captain"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Grenda": {
       "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
-      "source": "quality_gate"
+      "source": "quality_gate",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Grenda"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Couran": {
       "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
-      "source": "quality_gate"
-    },
-    "Braham -> Rietz": {
-      "description": "Zwrot: 'Mistrzu / Panie Rietzu' (uczeń -> mistrz wojskowy) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
-    },
-    "Rietz -> Braham": {
-      "description": "Zwrot: 'Brahamie / po imieniu na ty' (dowódca / mistrz -> uczeń) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]"
-    },
-    "Braham -> Zaht": {
-      "description": "Zwrot: 'Zaht / po imieniu na ty' (dowódca -> zastępca / towarzysz broni) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
-    },
-    "Lantorque -> Borotz": {
-      "description": "Zwrot: 'Dowódco Borotzu / Panie dowódco' (podwładny -> głównodowodzący) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+      "source": "quality_gate",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Couran"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Lantorque": {
       "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
-      "source": "quality_gate"
+      "source": "quality_gate",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Lantorque"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Borotz": {
       "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
       "source": "quality_gate",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Borotz"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Braham Joe": {
-      "description": "mężczyzna (17 lat, kapitan elitarnego oddziału uderzeniowego Canarre, porywczy wojownik) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-      "gender": "MALE"
+      "description": "mężczyzna (17 lat, kapitan elitarnego oddziału uderzeniowego Canarre, porywczy wojownik)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Braham Joe",
+        "Joe"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Canarre C": {
-      "description": "KOBIETA (zweryfikowano z audio seiyū Whisper)"
+      "description": "KOBIETA (zweryfikowano z audio seiyū Whisper)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Canarre C"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Canarre D": {
-      "description": "KOBIETA (zweryfikowano z audio seiyū Whisper)"
+      "description": "KOBIETA (zweryfikowano z audio seiyū Whisper)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Canarre D"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Clamant": {
-      "description": "MĘŻCZYZNA (zweryfikowano z audio seiyū Whisper)"
+      "description": "MĘŻCZYZNA (zweryfikowano z audio seiyū Whisper)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Clamant"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Elite A": {
-      "description": "MĘŻCZYZNA (zweryfikowano z audio seiyū Whisper)"
+      "description": "MĘŻCZYZNA (zweryfikowano z audio seiyū Whisper)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Elite",
+        "Elite A"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Mercenary A": {
       "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
-      "source": "quality_gate"
+      "source": "quality_gate",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Mercenary A"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Mercenary B": {
-      "description": "MĘŻCZYZNA (zweryfikowano z audio seiyū Whisper)"
+      "description": "MĘŻCZYZNA (zweryfikowano z audio seiyū Whisper)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Mercenary B"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Braham's Bro": {
       "description": "MĘŻCZYZNA (brat Brahama)",
@@ -232,11 +715,30 @@
         "N": "Braham's Bro",
         "Ms": "Braham's Bro",
         "W": "Braham's Bro"
-      }
+      },
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Braham's",
+        "Braham's Bro",
+        "Bro"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Braham Bro": {
       "description": "MĘŻCZYZNA (brat Brahama)",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Braham Bro",
+        "Bro"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Young Braham": {
       "description": "MĘŻCZYZNA (młody Braham w retrospekcji)",
@@ -249,11 +751,31 @@
         "N": "Young Brahamem",
         "Ms": "Young Brahamie",
         "W": "Young Brahamie"
-      }
+      },
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Braham",
+        "Young",
+        "Young Braham"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Verzud Captain": {
       "description": "MĘŻCZYZNA (zweryfikowano z audio seiyū Whisper)",
-      "gender": "MALE"
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Captain",
+        "Verzud",
+        "Verzud Captain"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Seitz Captain": {
       "description": "MĘŻCZYZNA (kapitan wojsk Seitz)",
@@ -266,7 +788,17 @@
         "N": "Seitz Captainem",
         "Ms": "Seitz Captainie",
         "W": "Seitz Captainie"
-      }
+      },
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Captain",
+        "Seitz",
+        "Seitz Captain"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Zaht's Kid": {
       "description": "MĘŻCZYZNA (syn Zahta, młody chłopiec)",
@@ -279,7 +811,17 @@
         "N": "Zaht's Kidem",
         "Ms": "Zaht's Kidzie",
         "W": "Zaht's Kidzie"
-      }
+      },
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Kid",
+        "Zaht's",
+        "Zaht's Kid"
+      ],
+      "entity_category": "ANTHROPONYM"
     }
   },
   "glossary": {
@@ -308,10 +850,25 @@
     "Licia -> Ars": "Zwrot: 'panie Arsie / Lordzie Arsie' (narzeczona -> narzeczony) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Zaht -> Braham": "Zwrot: 'Kapitanie / Braham' (zastępca -> dowódca oddziału) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Ars -> Rietz": "Zwrot: 'na ty / Rietz' (pan lenny -> prawa ręka) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
-    "Charlotte -> Musia": "Zwrot: 'na ty / Musia' (starsza czarodziejka -> nowa rekrutka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]",
-    "Musia -> Charlotte": "Zwrot: 'na ty / Charlotte' (podziwiająca uczennica -> mentorka) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', KATEGORYCZNY ZAKAZ 'oboje' (Filar CLXXIII)]",
+    "Charlotte -> Musia": "Zwrot: 'na ty / Musia' (starsza czarodziejka -> nowa rekrutka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
+    "Musia -> Charlotte": "Zwrot: 'na ty / Charlotte' (podziwiająca uczennica -> mentorka) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama\\NKOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
     "Braham -> Rietz": "Zwrot: 'Mistrzu / Panie Rietzu' (uczeń -> mistrz wojskowy) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Rietz -> Braham": "Zwrot: 'Brahamie / po imieniu na ty' (dowódca / mistrz -> uczeń) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Rietz -> Braham": "Zwrot: 'Brahamie / po imieniu na ty' (dowódca / mistrz -> uczeń) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Braham -> Zaht": "Zwrot: 'Zaht / po imieniu na ty' (dowódca -> zastępca / towarzysz broni) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Lantorque -> Borotz": "Zwrot: 'Dowódco Borotzu / Panie dowódco' (podwładny -> głównodowodzący) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+  },
+  "relations": {
+    "Rietz -> Ars": "Zwrot: 'panie Arsie / Lordzie Arsie' (wierny wasal -> pan lenny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Charlotte -> Ars": "Zwrot: 'na ty / Arsie' (bliska towarzyszka / przyjaciółka -> suweren) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Mireille -> Ars": "Zwrot: 'młody / panie Arsie' (zastępczyni lorda -> młody senior) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Ars -> Mireille": "Zwrot: 'pani Mireille / na ty' (suweren -> zaufana doradczyni) [OCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu zakaz opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?'\\NKOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Licia -> Ars": "Zwrot: 'panie Arsie / Lordzie Arsie' (narzeczona -> narzeczony) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Zaht -> Braham": "Zwrot: 'Kapitanie / Braham' (zastępca -> dowódca oddziału) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Ars -> Rietz": "Zwrot: 'na ty / Rietz' (pan lenny -> prawa ręka) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Charlotte -> Musia": "Zwrot: 'na ty / Musia' (starsza czarodziejka -> nowa rekrutka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Musia -> Charlotte": "Zwrot: 'na ty / Charlotte' (podziwiająca uczennica -> mentorka) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama\\NKOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Braham -> Rietz": "Zwrot: 'Mistrzu / Panie Rietzu' (uczeń -> mistrz wojskowy) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Rietz -> Braham": "Zwrot: 'Brahamie / po imieniu na ty' (dowódca / mistrz -> uczeń) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
     "Braham -> Zaht": "Zwrot: 'Zaht / po imieniu na ty' (dowódca -> zastępca / towarzysz broni) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Lantorque -> Borotz": "Zwrot: 'Dowódco Borotzu / Panie dowódco' (podwładny -> głównodowodzący) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
   },
@@ -407,12 +964,12 @@
     },
     "Charlotte Wraith": {
       "M": "Charlotte Wraith",
-      "D": "Charlotte'a Wraitha",
-      "C": "Charlotte'owi Wraithowi",
-      "B": "Charlotte'a Wraitha",
-      "N": "Charlotte'em Wraithem",
-      "Ms": "Charlotte'cie Wraithu",
-      "W": "Charlotte Wraithu"
+      "D": "Charlotte Wraith",
+      "C": "Charlotte Wraith",
+      "B": "Charlotte Wraith",
+      "N": "Charlotte Wraith",
+      "Ms": "Charlotte Wraith",
+      "W": "Charlotte Wraith"
     },
     "Rosell Kischa": {
       "M": "Rosell Kischa",
@@ -1036,7 +1593,13 @@
     "Young Braham": "ANTHROPONYM",
     "Verzud Captain": "ANTHROPONYM",
     "Seitz Captain": "ANTHROPONYM",
-    "Zaht's Kid": "ANTHROPONYM"
+    "Zaht's Kid": "ANTHROPONYM",
+    "Province of Missian": "TOPONYM",
+    "Summerforth Empire": "TOPONYM",
+    "Lamberg": "TOPONYM",
+    "Canarre": "TOPONYM",
+    "Seitz": "TOPONYM",
+    "Torbequista": "TOPONYM"
   },
   "fansub_canon": {}
 }

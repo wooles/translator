@@ -1,85 +1,314 @@
 {
   "anime_title": "Mahou Shoujo Ikusei Keikaku: restart",
   "characters": {
-    "Pechka -> Ninomiya": {
-      "description": "Zwrot: 'Ninomiya / po nazwisku' (uczennica -> szkolna miłość) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]"
-    },
     "Pechka": {
-      "description": "kobieta (Licealistka, początkująca czarodziejka potrafiąca przygotowywać pyszne jedzenie) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "kobieta (Licealistka, początkująca czarodziejka potrafiąca przygotowywać pyszne jedzenie)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Pechka"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Ninomiya": {
-      "description": "mężczyzna (postać) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
-    },
-    "Nokkochan -> Magical Daisy": {
-      "description": "Zwrot: 'Magical Daisy / po imieniu z podziwem' (młoda fanka -> starsza idolka)"
+      "description": "mężczyzna (postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Ninomiya"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Nokkochan": {
       "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
-      "source": "quality_gate"
+      "source": "quality_gate",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Nokkochan"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Magical Daisy": {
       "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
-      "source": "quality_gate"
-    },
-    "Kanoe Hitokouji -> Mamori Totoyama": {
-      "description": "Zwrot: 'Mamori' (liderka / arystokratka -> zaufana służąca) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [OCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu zakaz opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?']"
+      "source": "quality_gate",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Daisy",
+        "Magical",
+        "Magical Daisy"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Kanoe Hitokouji": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)"
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Hitokouji",
+        "Kanoe",
+        "Kanoe Hitokouji"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Mamori Totoyama": {
-      "description": "KOBIETA (wyodrębniono z relacji serii)"
+      "description": "KOBIETA (wyodrębniono z relacji serii)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Mamori Totoyama",
+        "Totoyama"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Koyuki Himekawa": {
-      "description": "kobieta / dziewczyna (Postać drugoplanowa) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "kobieta / dziewczyna (Postać drugoplanowa)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Himekawa",
+        "Koyuki",
+        "Koyuki Himekawa"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Noriko Nonohara": {
-      "description": "postać (Postać drugoplanowa)"
+      "description": "postać (Postać drugoplanowa)",
+      "gender": "UNKNOWN",
+      "grammatical_gender": "UNKNOWN",
+      "confidence": 0.5,
+      "priority": "P1",
+      "has_verified_gender": false,
+      "aliases": [
+        "Nonohara",
+        "Noriko",
+        "Noriko Nonohara"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Karin Sonoda": {
-      "description": "postać (Postać drugoplanowa)"
+      "description": "postać (Postać drugoplanowa)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Karin",
+        "Karin Sonoda",
+        "Sonoda"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Chika Tatehara": {
-      "description": "postać (Postać drugoplanowa)"
+      "description": "postać (Postać drugoplanowa)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Chika",
+        "Chika Tatehara",
+        "Tatehara"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Nene Ono": {
-      "description": "kobieta / dziewczyna (Postać drugoplanowa) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "kobieta / dziewczyna (Postać drugoplanowa)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Nene",
+        "Nene Ono",
+        "Ono"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Anna Sarizae": {
-      "description": "kobieta / dziewczyna (Postać drugoplanowa) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "kobieta / dziewczyna (Postać drugoplanowa)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Anna",
+        "Anna Sarizae",
+        "Sarizae"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Shinobu Hioka": {
-      "description": "kobieta / dziewczyna (Postać drugoplanowa) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "kobieta / dziewczyna (Postać drugoplanowa)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Hioka",
+        "Shinobu",
+        "Shinobu Hioka"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Kiku Yakumo": {
-      "description": "kobieta / dziewczyna (Postać drugoplanowa) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "kobieta / dziewczyna (Postać drugoplanowa)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Kiku",
+        "Kiku Yakumo",
+        "Yakumo"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Lapis Lazuline": {
-      "description": "kobieta / dziewczyna (Postać drugoplanowa) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "kobieta / dziewczyna (Postać drugoplanowa)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Lapis",
+        "Lapis Lazuline",
+        "Lazuline"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Keek": {
-      "description": "kobieta / dziewczyna (Postać drugoplanowa) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "kobieta / dziewczyna (Postać drugoplanowa)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Keek"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Fal": {
-      "description": "postać (Postać drugoplanowa); KOBIETA (zweryfikowano z audio seiyū Whisper)"
+      "description": "postać (Postać drugoplanowa); KOBIETA (zweryfikowano z audio seiyū Whisper)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Fal"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Konomi Mita": {
-      "description": "kobieta / dziewczyna (Postać drugoplanowa) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "kobieta / dziewczyna (Postać drugoplanowa)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Konomi",
+        "Konomi Mita",
+        "Mita"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Cherna Mouse": {
-      "description": "kobieta / dziewczyna (Postać drugoplanowa) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "kobieta / dziewczyna (Postać drugoplanowa)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Cherna",
+        "Cherna Mouse",
+        "Mouse"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Akane Fuwa": {
-      "description": "kobieta / dziewczyna (Postać drugoplanowa) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "kobieta / dziewczyna (Postać drugoplanowa)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Akane",
+        "Akane Fuwa",
+        "Fuwa"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Snow White": {
-      "description": "kobieta (Weteranka poprzedniego projektu wychowania czarodziejek, bezwzględna pogromczyni zła) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "kobieta (Weteranka poprzedniego projektu wychowania czarodziejek, bezwzględna pogromczyni zła)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Snow",
+        "Snow White",
+        "White"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Mamori": {
-      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "kobieta (postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Mamori"
+      ],
+      "entity_category": "ANTHROPONYM"
     },
     "Rionetta": {
-      "description": "kobieta (postać) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+      "description": "kobieta (postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Rionetta"
+      ],
+      "entity_category": "ANTHROPONYM"
     }
   },
   "glossary": {
@@ -89,9 +318,14 @@
     "Tutorial Mode": "Tryb samouczka"
   },
   "relationships": {
-    "Pechka -> Ninomiya": "Zwrot: 'Ninomiya / po nazwisku' (uczennica -> szkolna miłość) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
-    "Nokkochan -> Magical Daisy": "Zwrot: 'Magical Daisy / po imieniu z podziwem' (młoda fanka -> starsza idolka)",
-    "Kanoe Hitokouji -> Mamori Totoyama": "Zwrot: 'Mamori' (liderka / arystokratka -> zaufana służąca) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [OCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu zakaz opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?']"
+    "Pechka -> Ninomiya": "Zwrot: 'Ninomiya / po nazwisku' (uczennica -> szkolna miłość) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Nokkochan -> Magical Daisy": "Zwrot: 'Magical Daisy / po imieniu z podziwem' (młoda fanka -> starsza idolka) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Kanoe Hitokouji -> Mamori Totoyama": "Zwrot: 'Mamori' (liderka / arystokratka -> zaufana służąca) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama\\NOCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu zakaz opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?']"
+  },
+  "relations": {
+    "Pechka -> Ninomiya": "Zwrot: 'Ninomiya / po nazwisku' (uczennica -> szkolna miłość) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Nokkochan -> Magical Daisy": "Zwrot: 'Magical Daisy / po imieniu z podziwem' (młoda fanka -> starsza idolka) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Kanoe Hitokouji -> Mamori Totoyama": "Zwrot: 'Mamori' (liderka / arystokratka -> zaufana służąca) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama\\NOCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu zakaz opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?']"
   },
   "declensions": {
     "Pechka": {
@@ -397,7 +631,8 @@
     "Akane Fuwa": "ANTHROPONYM",
     "Snow White": "ANTHROPONYM",
     "Mamori": "ANTHROPONYM",
-    "Rionetta": "ANTHROPONYM"
+    "Rionetta": "ANTHROPONYM",
+    "Land of Magic": "TOPONYM"
   },
   "fansub_canon": {}
 }

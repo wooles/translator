@@ -130,7 +130,7 @@ def format_dry_telemetry_tag(
         if val is None:
             return False
         s = str(val).strip()
-        if not s or s.upper() in ("NONE", "AMBIGUOUS", "UNKNOWN", "NIEZNANA", "NIEZNANY"):
+        if not s or s.lower() in ("none", "ambiguous", "unknown", "nieznana", "nieznany"):
             return False
         return True
 
@@ -285,8 +285,7 @@ def detect_event_visual_type(event: pysubs2.SSAEvent, ts_prefix: str = "", style
 def is_isolated_paralinguistic_clutter(orig_en: str, translated_pl: str, is_sign: bool = False) -> bool:
     """
     Identifies isolated mimic/vocal grunts, sighs, and paralinguistic clutter
-    (e.g., 'Uh', 'Och!', 'Uch', 'Hmph', 'Ah', 'Gah', 'Tch') that do not carry
-    lexical meaning and pollute the screen against professional AVT standards.
+    that do not carry lexical meaning and pollute the screen against professional AVT standards.
     """
     if is_sign:
         return False
@@ -391,59 +390,60 @@ def detect_audio_discrepancy(jp_text: str, pl_text: str, en_text: str, prosody: 
         if any(w in pl_lower for w in ["genialne", "wspaniale", "doskonale", "świetnie", "bystry", "mądry"]):
             return "Sygnał audio JP: 'Wakaru' (empatyczne współodczuwanie i pełne zrozumienie stanu rozmówcy)"
 
-    # 13. Sore na / Sore! / Sore da (youth agreement / absolute validation) vs literal 'To to!' / 'Ta rzecz!'
+    # 13. Sore na / Sore da (potwierdzenie młodzieżowe)
     sorena_keys = ["sore na", "sore!", "sore da", "sore da yo", "sore da na"]
     if any(clean_jp.startswith(k) or clean_jp == k for k in ["それな", "それ！", "それだ", "それだよ"]) or any(k in rom_lower for k in sorena_keys):
         if any(w in pl_lower for w in ["ta rzecz", "to to", "właśnie to coś", "tamtą rzecz"]):
-            return "Sygnał audio JP: 'Sore na!' (młodzieżowa, pełna aprobata słów przedmówcy)"
+            return "Sygnał audio JP: Sore na (młodzieżowa aprobata wypowiedzi przedmówcy)"
 
-    # 14. Tashika ni / Tashika ni ne (conceding a point / admitting truth) vs stiff 'Z pewnością'
+    # 14. Tashika ni / Tashika ni ne (przyznanie racji)
     tashika_keys = ["tashika ni", "tashikani", "tashika ni ne", "tashikani ne"]
     if any(clean_jp.startswith(k) or clean_jp == k for k in ["確かに", "たしかに", "確かにね", "たしかにね"]) or any(k in rom_lower for k in tashika_keys):
         if pl_lower.startswith("z pewnością") or pl_lower.startswith("pewnie tak"):
-            return "Sygnał audio JP: 'Tashika ni' (racjonalne przyznanie racji argumentacji rozmówcy)"
+            return "Sygnał audio JP: Tashika ni (racjonalne przyznanie racji argumentacji rozmówcy)"
 
-    # 15. Naruhodo / Naruhodo ne (realization / understanding mechanics) vs stiff 'Rzeczywiście' / 'Rozumiem'
+    # 15. Naruhodo / Naruhodo ne (zrozumienie toku myślenia)
     naruhodo_keys = ["naruhodo", "naruhodone", "naruhodo na", "naruhodo ne"]
     if any(clean_jp.startswith(k) or clean_jp == k for k in ["なるほど", "なるほどね", "なるほどな"]) or any(k in rom_lower for k in naruhodo_keys):
         if pl_lower == "rzeczywiście." or pl_lower == "rozumiem.":
-            return "Sygnał audio JP: 'Naruhodo' (zrozumienie toku rozumowania / olśnienie poznawcze)"
+            return "Sygnał audio JP: Naruhodo (zrozumienie toku rozumowania)"
 
-    # 16. Sou iu koto ka / Sou iu koto ne (deducing the truth) vs literal 'Więc tak to jest'
+    # 16. Sou iu koto ka / Sou iu koto ne (dedukcja prawdy)
     souiukoto_keys = ["sou iu koto ka", "sou iu koto ne", "souiu koto ka", "souiukoto ka"]
     if any(k in clean_jp for k in ["そういうことか", "そういう事か", "そういうことね"]) or any(k in rom_lower for k in souiukoto_keys):
         if "więc tak to jest" in pl_lower or "taka to rzecz" in pl_lower:
-            return "Sygnał audio JP: 'Sou iu koto ka' (samodzielne domyślenie się ukrytego sedna sprawy)"
+            return "Sygnał audio JP: sou iu koto ka (samodzielne domyślenie się sedna sprawy)"
 
-    # 17. Uso / Uso desho / Masaka (disbelief / shock) vs literal 'Kłamstwo!'
+    # 17. Uso / Uso desho / Masaka (szok i niedowierzanie)
     uso_keys = ["uso", "uso-", "uso!", "uso desho", "uso daro", "usodesho", "masaka"]
     if clean_jp in ["嘘", "うそ", "うそー", "嘘でしょ", "うそでしょ", "まさか"] or rom_lower in uso_keys:
         if any(w in pl_lower for w in ["kłamstwo", "kłamiesz", "to kłamstwo", "kłamco"]):
-            return "Sygnał audio JP: 'Uso!' (emocjonalny szok i nagłe niedowierzanie)"
+            return "Sygnał audio JP: Uso (emocjonalny szok i nagłe niedowierzanie)"
 
-    # 18. Maji de? / Maji ka? (youth disbelief) vs stiff 'Czy to prawda?'
+    # 18. Maji de / Maji ka (młodzieżowe zwątpienie)
     maji_keys = ["maji de", "majide", "maji ka", "majika", "maji kayo", "majikayo"]
     if any(k in clean_jp for k in ["マジで", "まじで", "マジか", "まじか", "マジかよ"]) or any(k in rom_lower for k in maji_keys):
         if any(w in pl_lower for w in ["czy to prawda", "prawdziwie", "prawdziwe to"]):
-            return "Sygnał audio JP: 'Maji de?' (młodzieżowe zwątpienie: 'na serio?')"
+            return "Sygnał audio JP: Maji de (młodzieżowe zwątpienie i pytanie o powagę)"
 
-    # 19. Yappari / Yahari / Yappa (confirmation of suspicion) vs literal 'Po wszystkim' / 'Zgodnie z oczekiwaniami'
+    # 19. Yappari / Yahari / Yappa (potwierdzenie intuicji)
     yappari_keys = ["yappari", "yahari", "yappa", "yappari na", "yapparina"]
     if any(k in clean_jp for k in ["やっぱり", "やはり", "やっぱ", "やっぱな"]) or any(k in rom_lower for k in yappari_keys):
         if any(w in pl_lower for w in ["po wszystkim", "zgodnie z oczekiwaniami", "jak oczekiwano"]):
-            return "Sygnał audio JP: 'Yappari' (potwierdzenie wcześniejszych podejrzeń intuicyjnych)"
+            return "Sygnał audio JP: Yappari (potwierdzenie wcześniejszych podejrzeń)"
 
-    # 20. Desho? / Daro? (seeking validation / 'Told you so!') vs archaic 'Czyż nie?'
+    # 20. Desho / Daro (retoryczne potwierdzenie)
     desho_keys = ["desho", "deshou", "desho?", "daro", "darou", "daro?"]
     if clean_jp in ["でしょ", "でしょう", "でしょ？", "だろ", "だろう", "だろ？"] or rom_lower in desho_keys:
         if "czyż nie" in pl_lower:
-            return "Sygnał audio JP: 'Desho / Daro' (retoryczne potwierdzenie własnej racji)"
+            return "Sygnał audio JP: Desho / daro (retoryczne potwierdzenie własnej racji)"
 
-    # 21. Nani kore? (shock at bizarre situation/object) vs literal 'Co to za rzecz?'
+    # 21. Nani kore (zdumienie sytuacją)
     nanikore_keys = ["nani kore", "nanikore", "nanda kore", "nandakore"]
     if any(k in clean_jp for k in ["何これ", "なにこれ", "なんだこれ", "何だこれ"]) or any(k in rom_lower for k in nanikore_keys):
         if "co to za rzecz" in pl_lower or "czym jest ta rzecz" in pl_lower:
-            return "Sygnał audio JP: 'Nani kore?' (zdumienie kuriozalną sytuacją lub obiektem)"
+            return "Sygnał audio JP: Nani kore (zdumienie kuriozalną sytuacją lub obiektem)"
+
 
     # 22. Hybrydy honoryfikatywne (Pani Sensei / Panie Senpai / Panie Taichou)
     hybrid_patterns = ["pani sensei", "panie sensei", "pan sensei", "pani senpai", "panie senpai", "pan senpai", "panie taichou", "panie shishou", "panie buchou"]
@@ -477,30 +477,31 @@ def detect_audio_discrepancy(jp_text: str, pl_text: str, en_text: str, prosody: 
         if "powiedz mi o tym" in pl_lower:
             return "Sygnał audio JP: empatyczne potwierdzenie wspólnego doświadczenia ('nawet mi nie mów')"
 
-    # 27. Omae ga iu na ('Look who's talking' vs 'Spójrz, kto mówi')
+    # 27. Omae ga iu na (wytknięcie hipokryzji)
     if any(k in clean_jp for k in ["お前が言うな", "あんたが言うな", "お前もな", "omae ga iu na"]) or "omae ga iu" in rom_lower:
         if "spójrz kto mówi" in pl_lower or "spójrz, kto mówi" in pl_lower or "patrz kto mówi" in pl_lower:
-            return "Sygnał audio JP: 'Omae ga iu na!' (wytknięcie hipokryzji rozmówcy)"
+            return "Sygnał audio JP: Omae ga iu na (wytknięcie hipokryzji rozmówcy)"
 
-    # 28. Makasete / Ryoukai ('On it!' vs 'Na tym!')
+    # 28. Makasete / Ryoukai (gotowość zadania)
     if any(k in clean_jp for k in ["任せて", "まかせて", "了解", "りょうかい"]) or any(k in rom_lower for k in ["makasete", "ryoukai", "ryokai"]):
         if pl_lower.strip() in ["na tym!", "na tym.", "na tym"]:
-            return "Sygnał audio JP: 'Makasete / Ryoukai' (pewność podjęcia zadania: 'biorę to na siebie')"
+            return "Sygnał audio JP: Makasete / ryoukai (pewność podjęcia zadania: biorę to na siebie)"
 
-    # 29. Mochiron / Atarimae ('You bet!' vs 'Zakładasz się!')
+    # 29. Mochiron / Atarimae (oczywistość faktu)
     if any(k in clean_jp for k in ["もちろん", "当たり前", "あたりまえ", "勿論"]) or any(k in rom_lower for k in ["mochiron", "atarimae"]):
         if any(w in pl_lower for w in ["zakładasz się", "zakład!", "zakładaj się"]):
-            return "Sygnał audio JP: 'Mochiron / Atarimae' (niepodważalna oczywistość faktu)"
+            return "Sygnał audio JP: mochiron / atarimae (niepodważalna oczywistość faktu)"
 
-    # 30. Yokatta na ('Good for you!' vs 'Dobre dla ciebie!')
+    # 30. Yokatta na (radość z sukcesu)
     if any(k in clean_jp for k in ["よかったな", "よかったね", "良かったな", "良かったね"]) or any(k in rom_lower for k in ["yokatta na", "yokatta ne", "yokattana"]):
         if "dobre dla ciebie" in pl_lower:
-            return "Sygnał audio JP: 'Yokatta na' (szczera radość z czyjegoś sukcesu / gratulacje)"
+            return "Sygnał audio JP: yokatta na (szczera radość z czyjegoś sukcesu)"
 
-    # 31. Daijoubu / Ii desu ('I'm good / I'm fine' vs 'Jestem dobry!')
+    # 31. Daijoubu / Ii desu (odmowa pomocy)
     if any(k in clean_jp for k in ["大丈夫", "だいじょうぶ", "いいです", "結構です"]) or any(k in rom_lower for k in ["daijoubu", "ii desu", "kekkou desu"]):
         if "jestem dobry" in pl_lower:
-            return "Sygnał audio JP: 'Daijōbu' (powściągliwa odmowa / brak potrzeby pomocy: 'nie trzeba')"
+            return "Sygnał audio JP: daijōbu (powściągliwa odmowa pomocy: nie trzeba)"
+
 
     # 32. Betsu ni ('Not really' vs 'Nieszczególnie' / 'Oddzielnie')
     if any(k in clean_jp for k in ["別に", "べつに"]) or "betsu ni" in rom_lower or "betsuni" in rom_lower:
@@ -537,7 +538,7 @@ def detect_audio_discrepancy(jp_text: str, pl_text: str, en_text: str, prosody: 
         if any(w in pl_lower for w in ["na pewno", "z całą pewnością", "stuprocentowo", "wykluczone"]):
             return "Sygnał audio JP: 'Tabun / Osoraku' (wysoki stopień przypuszczenia i niepewności)"
 
-    # 39. Yappari / Yahari ('After all' vs 'Wiedziałem! / A jednak!')
+    # 39. Yappari / Yahari (potwierdzenie podejrzeń)
     if any(k in clean_jp for k in ["やっぱり", "やはり", "矢張り"]) or any(k in rom_lower for k in ["yappari", "yahari"]):
         if any(w in pl_lower for w in ["po wszystkim", "mimo wszystko"]):
             return "Sygnał audio JP: 'Yappari' (potwierdzenie wcześniejszych podejrzeń intuicyjnych)"
@@ -578,7 +579,8 @@ def detect_audio_discrepancy(jp_text: str, pl_text: str, en_text: str, prosody: 
         if "to boli" in pl_lower:
             return "Sygnał audio JP: itta (somatyczny okrzyk nagłego bólu mechanicznego)"
 
-    # 46. Hontō na no ka / Tashika na no ka / Makoto ka (Weryfikacja Wieści i Wiarygodności vs urzędowe 'To prawda?')
+    # 46. Hontō na no ka / Tashika na no ka / Makoto ka (weryfikacja wiarygodności raportu)
+
     if any(k in clean_jp for k in ["本当なのか", "本当か", "本当ね", "確かなのか", "誠か", "実か"]) or any(k in rom_lower for k in ["honto nano ka", "hontou na no ka", "honto ka", "tashika na no ka", "makoto ka"]):
         if any(w in pl_lower for w in ["to prawda?", "czy to prawda?"]):
             return "Sygnał audio JP: 'Hontō na no ka' (żołnierskie żądanie weryfikacji raportu faktograficznego)"
@@ -598,11 +600,11 @@ def detect_audio_discrepancy(jp_text: str, pl_text: str, en_text: str, prosody: 
         is_sarcastic = any(w in prosody_lower for w in ["sarkazm", "dystans"]) or "miro" in rom_lower or "ne" in rom_lower or "見ろ" in clean_jp
         if any(w in pl_lower for w in ["spójrz", "patrz ", "popatrz", "zobacz"]):
             if is_sarcastic or "hora miro" in rom_lower or "見ろ" in clean_jp:
-                return "Sygnał audio JP: 'Hora miro' (złośliwy lub pouczający triumf: 'a nie mówiłem?')"
+                return "Sygnał audio JP: Hora miro (złośliwy lub pouczający triumf)"
             elif is_shouting or any(w in en_text.lower() for w in ["come on", "hurry", "quick", "faster", "get moving"]):
-                return "Sygnał audio JP: 'Hora!' (energiczne popędzenie do działania lub przekazanie rekwizytu)"
+                return "Sygnał audio JP: Hora (energiczne popędzenie do działania lub przekazanie rekwizytu)"
             elif any(w in en_text.lower() for w in ["take this", "here", "catch"]):
-                return "Sygnał audio JP: 'Hora!' (energiczne popędzenie do działania lub przekazanie rekwizytu)"
+                return "Sygnał audio JP: Hora (energiczne popędzenie do działania lub przekazanie rekwizytu)"
 
     # 49. Rytualne Formuły Sytuacyjne Aisatsu (Ittekimasu, Tadaima, Ojama shimasu)
     if any(k in clean_jp for k in ["行ってきます", "行ってらっしゃい", "お邪魔します", "ただいま", "おかえり"]) or any(k in rom_lower for k in ["ittekimasu", "itterasshai", "ojama shimasu", "tadaima", "okaeri"]):
@@ -612,10 +614,10 @@ def detect_audio_discrepancy(jp_text: str, pl_text: str, en_text: str, prosody: 
     # 50. Abunai! & Tasukete! (Okrzyki Bojowe i Bezpośrednie Zagrożenie Życia)
     if any(k in clean_jp for k in ["危ない", "危ねえ", "危ねっ"]) or any(k in rom_lower for k in ["abunai", "abune", "abunee"]):
         if any(w in pl_lower for w in ["niebezpiecznie", "to jest niebezpieczne", "niebezpieczeństwo"]):
-            return "Sygnał audio JP: 'Abunai!' (krzyk bojowy ostrzegający przed bezpośrednim zagrożeniem życia)"
+            return "Sygnał audio JP: Abunai (krzyk bojowy ostrzegający przed bezpośrednim zagrożeniem życia)"
     if "助けて" in clean_jp or "tasukete" in rom_lower:
         if any(w in pl_lower for w in ["ocal mnie", "uratuj mnie"]):
-            return "Sygnał audio JP: 'Tasukete!' (dramatyczne wezwanie ratunku w śmiertelnym niebezpieczeństwie)"
+            return "Sygnał audio JP: Tasukete (dramatyczne wezwanie ratunku w śmiertelnym niebezpieczeństwie)"
 
     # 51. Yare yare & Mendokusai & Shouganai (Westchnienia Znużenia i Ciężaru)
     yare_keys = ["yare yare", "yareyare", "yare-yare", "yare yare daze", "yareyaredaze"]
@@ -642,11 +644,11 @@ def detect_audio_discrepancy(jp_text: str, pl_text: str, en_text: str, prosody: 
 
     if any(k in clean_jp for k in ["なんてこった", "なんて事だ"]) or any(k in rom_lower for k in ["nante kotta", "nante koto da"]):
         if any(w in pl_lower for w in ["co za rzecz", "co to za sprawa", "jaka to rzecz"]):
-            return "Sygnał audio JP: 'Nante kotta!' (ekspresyjny okrzyk bezsilności wobec katastrofy)"
+            return "Sygnał audio JP: nante kotta (ekspresyjny okrzyk bezsilności wobec katastrofy)"
 
     if any(k in clean_jp for k in ["いい加減にしろ", "いい加減にしなさい"]) or any(k in rom_lower for k in ["iikagen ni shiro", "iikagen"]):
         if any(w in pl_lower for w in ["zrób to z umiarem", "bądź umiarkowany", "umiarkowanie"]):
-            return "Sygnał audio JP: 'Iikagen ni shiro!' (ostateczne wyczerpanie cierpliwości mówcy)"
+            return "Sygnał audio JP: iikagen ni shiro (ostateczne wyczerpanie cierpliwości mówcy)"
 
     # 53. Yokatta & Yatta! (Ulga i Triumf)
     if any(k in clean_jp for k in ["よかった", "良かった"]) or any(k in rom_lower for k in ["yokatta", "yokattane", "yokatta na"]):
@@ -655,7 +657,7 @@ def detect_audio_discrepancy(jp_text: str, pl_text: str, en_text: str, prosody: 
 
     if any(k in clean_jp for k in ["やった", "やったー", "やったぜ", "やったぞ"]) or any(k in rom_lower for k in ["yatta", "yattaa", "yattaze", "yattazo"]):
         if pl_lower.strip() in ["zrobiłem to.", "zrobiłem to!", "zrobiłam to.", "zrobiłam to!"] and not any(w in en_text.lower() for w in ["i made it happen", "i manufactured"]):
-            return "Sygnał audio JP: 'Yatta!' (spontaniczny wybuch triumfu i radości z odniesionego sukcesu)"
+            return "Sygnał audio JP: Yatta (spontaniczny wybuch triumfu i radości z odniesionego sukcesu)"
 
     # 54. Logika Odpowiedzi na Przeczenia (Echo Agreement: Hai/Un vs Iie/Uun)
     is_neg_q = any(w in en_text.lower() for w in ["don't you", "aren't you", "didn't you", "can't you", "won't you", "haven't you", "isn't it"]) or any(k in clean_jp for k in ["ないの", "ないか", "ない？", "ないのか", "ないですか"]) or any(k in rom_lower for k in ["nai no", "nai ka", "nai desu ka"])
@@ -701,11 +703,12 @@ def detect_audio_discrepancy(jp_text: str, pl_text: str, en_text: str, prosody: 
 
     if any(k in clean_jp for k in ["助けて", "たすけて"]) or "tasukete" in rom_lower:
         if any(w in pl_lower for w in ["ocal mnie", "uratuj mnie"]):
-            return "Sygnał audio JP: 'Tasukete!' (dramatyczne wezwanie ratunku w śmiertelnym niebezpieczeństwie)"
+            return "Sygnał audio JP: Tasukete (dramatyczne wezwanie ratunku w śmiertelnym niebezpieczeństwie)"
 
     if any(k in clean_jp for k in ["やめろ", "やめて"]) or "yamero" in rom_lower or "yamete" in rom_lower:
         if any(w in pl_lower for w in ["nie rób tego", "nie czyń"]):
             return "Sygnał audio JP: 'Yamero / Yamete' (ostry sprzeciw, protest lub żądanie przerwania ataku)"
+
 
     # 61. Dysonans Afektywny i Sarkazm (Acoustic Incongruity Engine)
     is_sarcastic_prosody = any(w in prosody_lower for w in [
@@ -1158,15 +1161,15 @@ def create_adaptive_batches(
 
 class CharacterInfo(BaseModel):
     model_config = ConfigDict(extra="ignore")
-    name: str = Field(description="Imię lub określenie postaci (np. 'Arata', 'Minami', 'Nauczyciel')")
+    name: str = Field(description="Kanoniczne miano lub określenie postaci")
     gender: str = Field(description="Płeć postaci: 'mężczyzna', 'kobieta' lub 'inna'")
-    role: Optional[str] = Field(default=None, description="Krótka rola lub relacja, np. 'główny bohater', 'koleżanka z klasy'")
+    role: Optional[str] = Field(default=None, description="Krótki opis roli lub relacji fabularnej")
 
 class LineTranslation(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: int = Field(description="ID kwestii dialogowej z wejścia")
     polish_text: str = Field(description="Przetłumaczona kwestia na język polski z uwzględnieniem płci, sceny i eliminacji kalek")
-    speaker_name: Optional[str] = Field(default=None, description="Imię postaci z bazy AniList / kartoteki mówiącej tę kwestię (np. 'Kenji', 'Yui') lub null jeśli nieznana")
+    speaker_name: Optional[str] = Field(default=None, description="Miano postaci z bazy wiedzy / kartoteki mówiącej tę kwestię lub null jeśli nieznana")
     speaker_gender: Optional[str] = Field(default=None, description="Płeć mówcy: 'mężczyzna' lub 'kobieta'")
     speaker_grammatical_gender: Optional[str] = Field(
         default=None,
@@ -1202,7 +1205,8 @@ class LineTranslation(BaseModel):
     visual_subtext: Optional[str] = Field(default=None, description="Maks. 10-12 słów w formacie 'Stan: Emocja + Akcja fizyczna'. Podawaj TYLKO gdy mimika/gest przeczy słowom lub wnosi ukryty podtekst niewidoczny w tekście (asymetria obrazu i tekstu), w przeciwnym razie null.")
     literal_meaning: Optional[str] = Field(default=None, description="Dosłowny idiom JP (maks. 5 słów) tylko w razie potrzeby, inaczej null")
     notes: Optional[str] = Field(default=None, description="Kluczowa notatka (maks. 5 słów) tylko w razie potrzeby, inaczej null")
-    ambiguity_note: Optional[str] = Field(default=None, description="W razie wątpliwości (np. niejasny zaimek it/he, dwuznaczność słowa, brak pewności): krótka flaga dla Fazy 2 (maks. 6 słów), inaczej null")
+    ambiguity_note: Optional[str] = Field(default=None, description="W razie niejednoznaczności referencyjnej lub leksykalnej: krótka flaga dla Fazy 2 (maks. 6 słów), inaczej null")
+
 
 class BatchTranslationResponse(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -2080,7 +2084,7 @@ class MultimodalTranslator:
 
         Returns: (addressee_category, addressee_label)
         - addressee_category: "grupa_kobiet" | "grupa_mężczyzn" | "grupa_mieszana" | "kobieta" | "mężczyzna" | "brak" | None
-        - addressee_label: np. "Grupa Kobiet (L. mnoga niemęskoosobowa: -łyście)", "Naie (Kobieta)"
+        - addressee_label: zwięzła etykieta tożsamości lub liczby gramatycznej adresata
         """
         if isinstance(whisper_text, dict):
             whisper_text = str(whisper_text.get("text", ""))
@@ -2573,7 +2577,7 @@ class MultimodalTranslator:
                      "2. Liczba i płeć: w dialogach bezpośrednich forma 2. os. lp. ('ty'), formy przeszłe zgodne z wektorem stanu sceny i audio seiyū.\n"
                      "3. Triangulacja EN+JP+obraz: skrypt EN dostarcza treść i fakty, japońskie audio rejestr emocjonalny, a kadr obrazu napisy ekranowe.\n"
                      "4. Kwestie wielogłosu: wypowiedzi dwóch osób w jednej kwestii rozdzielane na osobne linie ('- Kwestia 1\\N- Kwestia 2').\n"
-                     "5. Naturalność: żywy język dialogowy zamiast kalek dosłownych (np. 'That bombed' -> 'Nie wyszło mi', 'I'm home' -> 'Wróciłam!', 'I see' -> 'Rozumiem'):")
+                     "5. Naturalność: żywy język dialogowy zamiast kalek dosłownych i struktur obcojęzycznych:")
 
         for idx, (original_idx, event, clean_text, ts_prefix) in enumerate(batch_events):
             start_str = pysubs2.time.ms_to_str(event.start)
@@ -2684,7 +2688,7 @@ class MultimodalTranslator:
                     elif prosody_tags and "Ac=SHOCK_DROP" in prosody_tags.get(idx + 1, ""):
                         relation_tag = f" [TELEMETRIA: załamanie_energii_seiyū (szok/zamilknięcie, Ac=SHOCK_DROP)]"
                     elif (is_shot_cut or time_gap_ms >= 3800) and (is_prev_private_request or is_curr_delayed_agreement):
-                        relation_tag = f" [🎬 CIĘCIE SCENY (FFmpeg) / DYSKONTINUITET CZASOWY: Nowe ujęcie (pauza {time_gap_ms/1000.0:.1f}s) / Zmiana sceny (Filar CLXV) – nowa rozmowa: 'Więc o co chodzi?' / 'Słucham cię']"
+                        relation_tag = f" [🎬 CIĘCIE SCENY (FFmpeg) / DYSKONTINUITET CZASOWY: Nowe ujęcie (pauza {time_gap_ms/1000.0:.1f}s) / Zmiana sceny (Filar CLXV) – nowa rozmowa, otwarcie interakcji]"
                     elif (is_shot_cut or time_gap_ms >= 3800) and not is_split_continuation:
                         relation_tag = f" [🎬 CIĘCIE SCENY (FFmpeg) / ZMIANA SCENY: Nowe ujęcie (pauza {time_gap_ms/1000.0:.1f}s) – nowa sekwencja (Filar CLXV); zachowaj świeży początek nowej sceny]"
                     else:
@@ -2917,9 +2921,9 @@ class MultimodalTranslator:
 
                 dry_telemetry = format_dry_telemetry_tag(
                     speaker_gender=contract_spk_gender,
-                    speaker_confidence=1.0 if contract_spk_gender in ("MASCULINE", "FEMININE") else 0.0,
+                    speaker_confidence=1.0 if str(contract_spk_gender).lower() in ("masculine", "feminine") else 0.0,
                     target_gender=contract_target_gender,
-                    target_confidence=1.0 if contract_target_gender in ("MASCULINE", "FEMININE") else 0.0,
+                    target_confidence=1.0 if str(contract_target_gender).lower() in ("masculine", "feminine") else 0.0,
                     plural_group_gender="VIRILE" if (line_addr_cat in ["grupa_mężczyzn", "mężczyzna_dual"] or (contract_addr_number == "PLURAL" and getattr(self, "scene_has_male", False))) else ("NON_VIRILE" if contract_addr_number == "PLURAL" else None),
                     plural_confidence=1.0 if contract_addr_number == "PLURAL" else 0.0
                 )
@@ -3145,7 +3149,7 @@ class MultimodalTranslator:
                 is_billing_exhausted = "prepayment" in err_str or "depleted" in err_str or ("billing" in err_str and "credit" in err_str)
                 if is_billing_exhausted:
                     print("\n" + "!" * 75)
-                    print("  [!] [BŁĄD KONTA GOOGLE AI STUDIO / PŁATNOŚCI]:")
+                    print("  [!] [AWARIA KONTA GOOGLE AI STUDIO / PŁATNOŚCI]:")
                     print("  Wyczerpały się środki przedpłacone (Prepayment Credits / Limit wydatków)!")
                     print("  Komunikat Google: 'Your prepayment credits are depleted.'")
                     print("  -> Wejdź na https://aistudio.google.com/ i doładuj środki, aby kontynuować.")
@@ -3157,8 +3161,8 @@ class MultimodalTranslator:
                 max_allowed_attempts = max(25, num_keys * 8)
                 if attempt >= max_allowed_attempts:
                     raise RuntimeError(
-                        f"KATEGORYCZNA BLOKADA BEZPIECZEŃSTWA: Osiągnięto limit {attempt} prób dla partii w Fazie 1. "
-                        f"Ostatni błąd: {e}. Proces wstrzymano w celu ochrony budżetu przed niekontrolowanymi zapytaniami."
+                        f"ŚCISŁA BLOKADA BEZPIECZEŃSTWA: Osiągnięto limit {attempt} prób dla partii w Fazie 1. "
+                        f"Ostatni wyjątek: {e}. Proces wstrzymano w celu ochrony budżetu przed niekontrolowanymi zapytaniami."
                     )
 
                 is_timeout = "504" in err_str or "deadline" in err_str or "timeout" in err_str or "timed out" in err_str
@@ -3702,7 +3706,7 @@ class MultimodalTranslator:
                     )
 
                     if is_shot_cut or (time_gap_ms >= 3800 and (is_prev_private_request or is_curr_delayed_agreement)):
-                        relation_tag = f"[🎬 CIĘCIE SCENY (FFmpeg) / DYSKONTINUITET CZASOWY: Pauza {time_gap_s:.1f}s / Nowa scena (Filar CLXV) – postacie zmieniły lokację; otwarcie rozmowy: 'Więc o co chodzi?' / 'No to o co chodzi?' / 'Słucham cię']"
+                        relation_tag = f"[🎬 CIĘCIE SCENY (FFmpeg) / DYSKONTINUITET CZASOWY: Pauza {time_gap_s:.1f}s / Nowa scena (Filar CLXV) – postacie zmieniły lokację; otwarcie nowej rozmowy]"
                     elif is_shot_cut or (time_gap_ms >= 3800 and not (prev_clean.endswith("...") or prev_clean.endswith("—") or prev_clean.endswith("-"))):
                         relation_tag = f"[🎬 CIĘCIE SCENY (FFmpeg) / ZMIANA SCENY: Pauza {time_gap_s:.1f}s – nowa sekwencja (Filar CLXV); zresetuj kontekst emocjonalny i spójniki z poprzedniej sceny]"
                     else:
@@ -3894,7 +3898,7 @@ class MultimodalTranslator:
             if has_formal_vocative and spk:
                 speakers_formal.add(spk)
 
-            # Detect true first-name vocative in PL or EN (bare name, e.g. "Mario, dlaczego?!", "Mary, why?!")
+            # Detect true first-name vocative in PL or EN (bare name direct address)
             # Must NOT be preceded by "Panie / Pani / Mr. / Ms." or formal titles
             first_name_match = re.search(r"(?<!\b[Pp]anie\s)(?<!\b[Pp]ani\s)(?<!\b[Pp]anno\s)(?<!\b[Pp]anu\s)(?<!\b[Mm]istrzu\s)(?<!\b[Ll]ordzie\s)\b([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]{2,})[,?!]", pl_cand) or re.search(r"(?<!\b[Mm]r\.\s)(?<!\b[Mm]s\.\s)(?<!\b[Mm]rs\.\s)(?<!\b[Ll]ord\s)(?<!\b[Mm]aster\s)(?<!\b[Ll]ady\s)\b([A-Z][a-z]{2,})[,?!]", en_txt)
             if first_name_match and not has_formal_vocative:
@@ -4397,7 +4401,7 @@ class MultimodalTranslator:
                     song_lines_preserved += 1
 
         if song_lines_preserved > 0:
-            print(f"  [Żelazna Reguła OP/ED]: Zachowano {song_lines_preserved} wersów piosenek (Opening/Ending) w oryginalnej wersji bez wysyłania do AI (0 PLN).")
+            print(f"  [Kanon OP/ED]: Zachowano {song_lines_preserved} wersów piosenek (Opening/Ending) w oryginalnej wersji bez wysyłania do AI (0 PLN).")
 
         # 0. Episode Profiler (Pre-pass Glossary & Relationship Matrix)
         profile_cache_path = None
@@ -4574,7 +4578,7 @@ class MultimodalTranslator:
                 if self.profile_line_alerts:
                     print(f"  [Pre-pass Line Resolver]: Dopięto wytyczne Profilera do {len(self.profile_line_alerts)} kwestii na osi czasu.")
             except Exception as e_res:
-                logger.warning(f"Błąd Pre-pass Line Resolvera ({e_res})")
+                logger.warning(f"Niepowodzenie Pre-pass Line Resolvera ({e_res})")
 
         # 0f. Bake static Episode Knowledge (Profile, Glossary, Series Bible, User Feedback) into Cached System Instructions
         episode_knowledge_blocks = []
@@ -4809,7 +4813,7 @@ class MultimodalTranslator:
                                     except Exception:
                                         pass
                             except Exception as e:
-                                pbar.write(f" 🔴 [Błąd Paczki]: {format_friendly_api_error(e)}")
+                                pbar.write(f" 🔴 [Niepowodzenie Paczki]: {format_friendly_api_error(e)}")
                                 pbar.refresh()
                 else:
                     print(f"\n  [Kolejka Paczek]: Płynne tłumaczenie sekwencyjne (1 paczka na raz / rotacja {active_keys_count} aktywnych kluczy API)...")
@@ -4904,7 +4908,7 @@ class MultimodalTranslator:
                                 except Exception:
                                     pass
                         except Exception as e:
-                            pbar.write(f" 🔴 [Błąd Paczki]: {format_friendly_api_error(e)}")
+                            pbar.write(f" 🔴 [Niepowodzenie Paczki]: {format_friendly_api_error(e)}")
                             pbar.refresh()
 
             # 6.9. Zero-Gap Healing Pass: uzupełnienie ewentualnych brakujących kwestii po awariach paczek
@@ -4963,7 +4967,7 @@ class MultimodalTranslator:
                             except Exception:
                                 pass
                     except Exception as h_err:
-                        pbar.write(f"  [Zero-Gap Guard]: Błąd paczki uzupełniającej ({h_err}). Próba ratunkowa linijka po linijce...")
+                        pbar.write(f"  [Zero-Gap Guard]: Niepowodzenie paczki uzupełniającej ({h_err}). Próba ratunkowa linijka po linijce...")
                         pbar.refresh()
                         for s_item in h_batch:
                             if s_item[0] in translated_results:
@@ -5052,7 +5056,7 @@ class MultimodalTranslator:
             if not clean_translated_text:
                 clean_translated_text = sanitize_sub_text(orig_event.text)
 
-            # Professional AVT Anti-Clutter: Drop isolated paralinguistic grunts ("Och!", "Uch!", "Uh!", "Hmph!")
+            # Professional AVT Anti-Clutter: Drop isolated paralinguistic grunts and interjections
             is_sign_flag = detect_event_visual_type(orig_event, ts_prefix, style_report=getattr(self, "style_report", None))["is_sign"]
             if is_isolated_paralinguistic_clutter(orig_event.text, clean_translated_text, is_sign=is_sign_flag):
                 continue
@@ -5223,7 +5227,7 @@ class MultimodalTranslator:
                         self.series_bible.assimilate_quality_gate_invariants(qg_fixes)
                         logger.info("[SeriesBible]: Pomyślnie zasymilowano trwałe niezmienniki z EpisodeQualityGate do Biblii Serialu.")
                     except Exception as e_sb:
-                        logger.warning(f"[SeriesBible]: Błąd asymilacji niezmienników ({e_sb})")
+                        logger.warning(f"[SeriesBible]: Niepowodzenie asymilacji niezmienników ({e_sb})")
         except Exception as e:
             logger.warning(f"EpisodeQualityGate: Pomijanie ({e})")
 
