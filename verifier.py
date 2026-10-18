@@ -169,7 +169,7 @@ class DialogueVerifier:
             return [] if not return_prompt else ""
 
         prompt_lines = []
-        prompt_lines.append("Zredaguj poniższe kwestie dialogowe. BEZWZGLĘDNIE wyeliminuj dosłowne tłumaczenie 1 do 1, sztuczne konstrukcje i kalki.")
+        prompt_lines.append("Zredaguj poniższe kwestie dialogowe. Koniecznie wyeliminuj dosłowne tłumaczenie 1 do 1, sztuczne konstrukcje i kalki.")
         prompt_lines.append("Zastąp drewniane sformułowania żywym, potoczystym językiem polskim mówionym (tak jak w profesjonalnym dubbingu / u polskich nastolatków):")
         prompt_lines.append(
             "WARSTWA 3 (GŁÓWNY MÓZG TŁUMACZENIA): Na Tobie opiera się główny ciężar przekładu. W oparciu o wszystkie potrzebne w danej chwili informacje (z nadrzędnego kanonu mangowego, profilera odcinka oraz wiedzy z Warstw 1 i 2), oddaj pełnię piękna języka polskiego.\n"
@@ -177,7 +177,7 @@ class DialogueVerifier:
             "ZASADA PRYMATU AFEKTU (DYNAMIC AFFECTIVE PRIMACY): Głos i emocjonalny afekt seiyū (drżenie, płacz, panika, szept, krzyk) ZAWSZE biją statyczny portret z Series Bible! Jeśli chłodna postać załamuje się i płacze, oddaj fizjologię rozpaczy (urwane słowa, chaos składniowy).\n"
             "WYKORZYSTAJ CZAS NA ZASTANOWIENIE (Thinking / CoT): Jako Główny Reżyser Dubbingu i Script Doctor, przed zatwierdzeniem każdej kwestii przeprowadź TRZYETAPOWY AUDYT POZNAWCZY (THE 3-STAGE EDITORIAL FUNNEL / DWUETAPOWY AUDYT POZNAWCZY KREACJI I TRIANGULACJI):\n"
             "   KROK 1: AUTONOMICZNA ŚLEPA LEKTURA I KREACJA DIALOGU (THE DUBBING & STAGE FLOW - FILAR CLXVI):\n"
-            "     - KANON MANGOWY JAKO FUNDAMENT: Pojęcia z oficjalnych wydań polskich to formy syntetyczne bazowe — w zdaniu BEZWZGLĘDNIE odmieniaj je przez 7 polskich przypadków (np. 'z Demonem Krwi', 'o Czarnym Mieczniku', 'dla Oukiego').\n"
+            "     - KANON MANGOWY JAKO FUNDAMENT: Pojęcia z oficjalnych wydań polskich to formy syntetyczne bazowe — w zdaniu naturalnie odmieniaj je przez 7 polskich przypadków (np. 'z Demonem Krwi', 'o Czarnym Mieczniku', 'dla Oukiego').\n"
             "     - KONTRAKT POLSZCZYZNY BEZTERMINOWEJ (THE TIMELESS COLLOQUIAL CONTRACT):\n"
             "       * Twórz dialogi w estetyce polszczyzny bezterminowej: język żywy, organiczny, soczysty i miękki w ustach aktora, wolny od tymczasowych mód internetowych.\n"
             "       * Pisz tak, jak brzmią klasyki polskiego dubbingu kinowego: dialog ma brzmieć świeżo dzisiaj, naturalnie 30 lat temu i zrozumiale za 30 lat.\n"
@@ -190,7 +190,7 @@ class DialogueVerifier:
             "     - PROTOKÓŁ AUTONOMICZNEJ KREACJI (ACTIVE GENERATION FIRST - ANTY-KOTWICZENIE):\n"
             "       * Najpierw sformułuj w CoT własne, suwerenne polskie zdanie, które idealnie 'leży w ustach' polskiego aktora i pasuje do energii sceny.\n"
             "       * Dopiero potem spójrz na szkic roboczy PL z Fazy 1.\n"
-            "       * Jeśli szkic z Fazy 1 powiela angielski szyk, zbędne zaimki osobowe ('ja', 'ty'), klisze lub potaknięcia ('Ta...', 'Więc...'), BEZWZGLĘDNIE go odrzuć na rzecz swojej autonomicznej kreacji!\n"
+            "       * Jeśli szkic z Fazy 1 powiela angielski szyk, zbędne zaimki osobowe ('ja', 'ty'), klisze lub potaknięcia ('Ta...', 'Więc...'), zdecydowanie go odrzuć na rzecz swojej autonomicznej kreacji!\n"
             "   KROK 2: MULTIMODALNA TRIANGULACJA I PRAWDA AKTORSKA (MULTIMODAL TRIANGULATION & ACTING CHECK):\n"
             "     - Skonfrontuj polszczyznę z japońskim audio seiyū i faktami ze skryptu EN (w tym wielkimi literami nazw własnych).\n"
             "     - Zbadaj ton, intonację F0 i ewentualną ironię seiyū (Filar CLVIII). Upewnij się, że nie pominięto kluczowych faktów ani liczb (Filar CLXXI).\n"
@@ -204,9 +204,9 @@ class DialogueVerifier:
             "       * 🌍 Świat: relacje statusu, nienaruszalność formy Pan/Ty (Filar CLVII), perspektywa incognito (Filar CLXI).\n"
             "       * 🎬 Obraz i Audio: afekt seiyū, gesty, napisy ekranowe vs dialog.\n"
             "   KROK 3: PROAKTYWNY AUDYT NEGATYWNY REJESTRU, PŁCI I REKCJI (NEGATIVE REGISTER, GENDER & CALQUE GATE - FILAR X, CLXXXVII, CLXXXVIII):\n"
-            "     - Zgodność płciowa i cytaty: Upewnij się, że końcówki 1. osoby mówczyń (-am, -ałam, -łabym) oraz formy 2. osoby do adresatek (-aś, -ałaś, jesteś pewna) i grup żeńskich (-yście, one) są bezwzględnie poprawne. Cytaty („...”) w dialogach zachowują płeć oryginalnego autora.\n"
-            "     - Ścisła rekcja zaprzeczona (Genitive of Negation): Każdy czasownik przechodni podlegający negacji w KAŻDYM czasie (teraźniejszym, przeszłym i przyszłym: nie mam/nie miałam, nie widziałem, nie czułam, nie będę miał) BEZWZGLĘDNIE wymaga dopełniacza również przy wtrąceniach (nie miałem już czasu, nie widzę w tym sensu, nie czułam strachu).\n"
-            "     - Prewencja mianownizacji kanonu i bariery AVT: Terminy kanoniczne odmieniaj swobodnie przez przypadki po przyimkach we wszystkich przypadkach zależnych (np. 'z Aurą Gilotyną', 'przez Wielkiego Chana', 'o Królu Demonów'). Przestrzegaj twardych barier AVT: tempo czytania CPS <= 17 i długość wiersza CPL <= 38.\n"
+            "     - Zgodność płciowa i cytaty: Upewnij się, że końcówki 1. osoby mówczyń (-am, -ałam, -łabym) oraz formy 2. osoby do adresatek (-aś, -ałaś, jesteś pewna) i grup żeńskich (-yście, one) są w pełni poprawne. Cytaty („...”) w dialogach zachowują płeć oryginalnego autora.\n"
+            "     - Ścisła rekcja zaprzeczona (Genitive of Negation): Każdy czasownik przechodni podlegający negacji w KAŻDYM czasie (teraźniejszym, przeszłym i przyszłym: nie mam/nie miałam, nie widziałem, nie czułam, nie będę miał) ściśle wymaga dopełniacza również przy wtrąceniach (nie miałem już czasu, nie widzę w tym sensu, nie czułam strachu).\n"
+            "     - Prewencja mianownizacji kanonu i bariery AVT: Terminy kanoniczne odmieniaj swobodnie przez przypadki po przyimkach we wszystkich przypadkach zależnych (np. 'z Czarnym Rycerzem', 'przez Wielkiego Chana', 'o Królu Demonów'). Przestrzegaj twardych barier AVT: tempo czytania CPS <= 17 i długość wiersza CPL <= 38.\n"
             "     - Twarda eliminacja błędów fleksyjnych, literówek i kalek leksykalnych jest dodatkowo w 100% asekurowana przez deterministyczny silnik EpisodeQualityGate (0.00 PLN).\n"
             "     - W swoim myśleniu skup się na autentyczności, szlachetności i żywości dialogu w świecie przedstawionym.\n"
         )
@@ -385,21 +385,21 @@ class DialogueVerifier:
             if item.get('ambiguity_note'):
                 directive_lines.append(f"    • Wątpliwość Fazy 1: {item['ambiguity_note'].strip()}")
             if item.get('addressee') == 'kobieta':
-                directive_lines.append(f"    • ADRESAT ({item.get('addressee_label', 'KOBIETA')}): Stosuj formy żeńskie w 2. os. lp. ('ty'): 'zrobiłaś / byłaś / poszłaś / wiedziałaś / jesteś pewna / byłaś gotowa' (Filar CLXIII)!")
+                directive_lines.append(f"    • Adresat: kobieta (2. os. lp. żeńska: -łaś, jesteś pewna - Filar CLXIII)")
             elif item.get('addressee') == 'mężczyzna':
-                directive_lines.append(f"    • ADRESAT ({item.get('addressee_label', 'MĘŻCZYZNA')}): Stosuj formy męskie w 2. os. lp. ('ty'): 'zrobiłeś / byłeś / poszedłeś / wiedziałeś / jesteś pewien / byłeś gotowy' (Filar CLXIII)!")
+                directive_lines.append(f"    • Adresat: mężczyzna (2. os. lp. męska: -łeś, jesteś pewien - Filar CLXIII)")
             elif item.get('addressee') == 'kobieta_dual':
-                directive_lines.append(f"    • ADRESAT ({item.get('addressee_label', 'DWIE KOBIETY')}): Liczba podwójna: 'obie / was dwie' / formy niemęskoosobowe: 'obie byłyście / zrobiłyście' (Filar CLXIII)!")
+                directive_lines.append(f"    • Adresat: dwie kobiety (liczba podwójna niemęskoosobowa: obie byłyście - Filar CLXIII)")
             elif item.get('addressee') == 'mężczyzna_dual':
-                directive_lines.append(f"    • ADRESAT ({item.get('addressee_label', 'DWÓCH MĘŻCZYZN')}): Liczba podwójna: 'obaj / was dwóch' / formy męskoosobowe: 'obaj byliście / zrobiliście' (Filar CLXIII)!")
+                directive_lines.append(f"    • Adresat: dwóch mężczyzn (liczba podwójna męskoosobowa: obaj byliście - Filar CLXIII)")
             elif item.get('addressee') == 'para_mieszana_dual':
-                directive_lines.append(f"    • ADRESAT ({item.get('addressee_label', 'PARA MIESZANA')}): Liczba podwójna / liczebnik zbiorowy: 'oboje / was oboje' / formy męskoosobowe: 'oboje byliście / zrobiliście' (Filar CLXIII)!")
+                directive_lines.append(f"    • Adresat: para mieszana (liczba podwójna męskoosobowa: oboje byliście - Filar CLXIII)")
             elif item.get('addressee') == 'grupa_kobiet':
-                directive_lines.append("    • ADRESAT (GRUPA KOBIET): Stosuj formy niemęskoosobowe: 'zrobiłyście / byłyście gotowe / widziałyście' (Filar CLXIII)!")
+                directive_lines.append("    • Adresat: grupa kobiet (liczba mnoga niemęskoosobowa: byłyście, zrobiłyście - Filar CLXIII)")
             elif item.get('addressee') in ['grupa_mężczyzn', 'grupa_mieszana']:
-                directive_lines.append(f"    • ADRESAT ({'GRUPA MĘŻCZYZN' if item.get('addressee') == 'grupa_mężczyzn' else 'GRUPA MIESZANA'}): Stosuj formy męskoosobowych: 'zrobiliście / byliście gotowi / widzieliście' (Filar CLXIII)!")
+                directive_lines.append(f"    • Adresat: {'grupa mężczyzn' if item.get('addressee') == 'grupa_mężczyzn' else 'grupa mieszana'} (liczba mnoga męskoosobowa: byliście, zrobiliście - Filar CLXIII)")
             if item.get('canonical_glossary_term'):
-                directive_lines.append(f"    • KANON MANGOWY (Nadrzędna baza): {item['canonical_glossary_term']} (forma syntetyczna bazowa – w dialogu BEZWZGLĘDNIE odmieniaj przez przypadki!)")
+                directive_lines.append(f"    • KANON MANGOWY (Nadrzędna baza): {item['canonical_glossary_term']} (forma syntetyczna bazowa – w dialogu odmieniaj przez przypadki!)")
 
             # SSOT Sanitizer: Clean notes from duplicates (remove third_person_subject and repeated alarm tags)
             raw_notes = (item.get('notes') or '').strip()
@@ -412,7 +412,7 @@ class DialogueVerifier:
                 if clean_notes:
                     directive_lines.append(f"    • Wytyczne redakcyjne: {clean_notes}")
 
-            directives_block = "  [🎯 KRYTYCZNE WYTYCZNE DO SZLIFU]:\n" + "\n".join(directive_lines) + "\n" if directive_lines else ""
+            directives_block = "  [TELEMETRIA: wytyczne_szlifu]:\n" + "\n".join(directive_lines) + "\n" if directive_lines else ""
 
             is_untranslated = item.get("is_missing_translation", False) or (
                 item.get("pl", "").strip().lower() == item.get("en", "").strip().lower()
@@ -420,7 +420,7 @@ class DialogueVerifier:
                 and not item.get("is_sign")
             )
             if is_untranslated:
-                pl_display = "  Szkic PL: [🚨 BRAK PRZEKŁADU W FAZIE 1 - PRZETŁUMACZ OD ZERA Z EN I AUDIO JP!]"
+                pl_display = "  Szkic PL: [TELEMETRIA: brak_przekładu_faza_1: przetłumacz od zera z EN i audio JP]"
             elif item.get("is_blind_draft"):
                 calque_sc = float(item.get("calque_score", 0.0) or 0.0)
                 if calque_sc >= 0.65:

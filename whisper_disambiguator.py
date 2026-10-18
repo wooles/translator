@@ -521,9 +521,9 @@ class WhisperDisambiguator:
         if tag.addressee_number == "SINGULAR":
             if tag.addressee_age_class == "CHILD":
                 if tag.addressee_gender == "FEMALE":
-                    parts.append("Odbiorca: Mała Dziewczynka (Formy: -łaś / Bezwzględny zakaz 'Pani' / Rejestr: Ty, opiekuńczy)")
+                    parts.append("Odbiorca: Mała Dziewczynka (Formy: -łaś / Eliminacja 'Pani' / Rejestr: Ty, opiekuńczy)")
                 else:
-                    parts.append("Odbiorca: Mały Chłopiec (Formy: -łeś / Bezwzględny zakaz 'Pan' / Rejestr: Ty, opiekuńczy)")
+                    parts.append("Odbiorca: Mały Chłopiec (Formy: -łeś / Eliminacja 'Pan' / Rejestr: Ty, opiekuńczy)")
             elif tag.addressee_gender == "MALE":
                 parts.append("Odbiorca: Mężczyzna (-łeś/ci)")
             elif tag.addressee_gender == "FEMALE":

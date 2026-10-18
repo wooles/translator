@@ -18,7 +18,8 @@ from pydantic import BaseModel, Field, ConfigDict
 from google import genai
 from google.genai import types
 from client_factory import format_friendly_api_error, patch_google_genai_schema_sanitizer
-from metadata import normalize_ascii_diacritics
+from metadata import normalize_ascii_diacritics, normalize_actor_tag
+from series_memory import is_valid_anthroponymic_phonotactics
 
 patch_google_genai_schema_sanitizer()
 
@@ -26,9 +27,9 @@ logger = logging.getLogger("profiler")
 
 
 class NameDeclension(BaseModel):
-    character_name: str = Field(description="Imię postaci, tytuł lub nazwa własna w mianowniku (np. 'Kenji', 'Yui', 'Księga Toaha', 'Nieśmiertelny Sugimoto')")
+    character_name: str = Field(description="Forma mianownikowa nazwy własnej, imienia postaci, tytułu lub syntagmy złożonej")
     gender: str = Field(description="'MALE' lub 'FEMALE'")
-    declension_summary: str = Field(description="Polska odmiana przez przypadki z uwzględnieniem syntagm (np. 'Księga Toaha -> D. Księgi Toaha, C. Księdze Toaha, N. Księgą Toaha' lub 'Nieśmiertelny Sugimoto -> N. Nieśmiertelnym Sugimoto')")
+    declension_summary: str = Field(description="Kanoniczny paradygmat odmiany przez przypadki w języku polskim z uwzględnieniem syntagm i przydawki (M, D, C, B, N, Ms, W)")
 
 
 class FirstPersonPronoun(BaseModel):
@@ -105,13 +106,13 @@ class ContinuityBridgeAlert(BaseModel):
 class CharacterDossier(BaseModel):
     name: str = Field(description="Imię postaci")
     gender: str = Field(description="'MALE', 'FEMALE' lub 'UNKNOWN'")
-    age_and_role: str = Field(description="Wiek, status społeczny i rola (np. '7 lat, młody arystokrata/kapłan, syn Yorishige')")
+    age_and_role: str = Field(description="Wiek, status społeczny i rola fabularna w relacjach postaci")
     age_class: Optional[str] = Field(default="ADULT", description="Kategoria wieku: 'CHILD' (dziecko, mała dziewczynka, chłopiec), 'ADULT' (dorosły), 'ELDERLY' (senior, staruszek, staruszka)")
     speech_style_pl: str = Field(description="Unikalny polski rejestr mowy (np. 'Chłodny, dumny, krótki, arystokratyczny bez poufałości')")
     first_person_pronoun: Optional[str] = Field(default=None, description="Japoński zaimek 'ja' (Ore, Boku, Watashi, Atashi) i profil ego")
-    speaker_entity_type: Optional[str] = Field(default="INDIVIDUAL", description="Typ tożsamości podmiotu: 'INDIVIDUAL' (pojedyncza postać), 'COLLECTIVE_VIRILE' (byt zbiorowy męskoosobowy / grupa mieszana, np. Louis Arneb w Re:Zero), 'COLLECTIVE_NONVIRILE' (byt zbiorowy żeński), 'MAJESTIC_MALE' (pluralis maiestatis monarchy męskiego), 'MAJESTIC_FEMALE' (pluralis maiestatis monarchini żeńskiej) (Filar CLXXVI)")
-    declension: Optional[str] = Field(default=None, description="Polska odmiana przez przypadki (np. 'Yoritsugu -> D. Yoritsugu, C. Yoritsugu, B. Yoritsugu')")
-    dialect_category: Optional[str] = Field(default="", description="Dialekt regionalny postaci jeśli występuje: 'Satsuma-ben', 'Kansai-ben', 'Kyoto-ben', 'Tohoku-ben', 'Hiroshima-ben', 'Hakata-ben', 'Nagoya-ben', 'Okinawa-ben', 'Hokkaido-ben' lub brak (Filar CXXXV)")
+    speaker_entity_type: Optional[str] = Field(default="INDIVIDUAL", description="Typ tożsamości podmiotu: 'INDIVIDUAL' (pojedyncza postać), 'COLLECTIVE_VIRILE' (byt zbiorowy męskoosobowy / grupa mieszana), 'COLLECTIVE_NONVIRILE' (byt zbiorowy żeński), 'MAJESTIC_MALE' (pluralis maiestatis monarchy męskiego), 'MAJESTIC_FEMALE' (pluralis maiestatis monarchini żeńskiej) (Filar CLXXVI)")
+    declension: Optional[str] = Field(default=None, description="Kanoniczny paradygmat odmiany przez przypadki w języku polskim (M, D, C, B, N, Ms, W)")
+    dialect_category: Optional[str] = Field(default="", description="Rejestr gwarowy postaci jeśli występuje (np. zachodni, południowy, północny prowincjonalny, wyspiarski, stołeczny itp.) lub brak (Filar CXXXV)")
     idiolect_matrix: Optional[str] = Field(default="", description="Matryca idiolektu: specyficzne nawyki leksykalne, zakazane/preferowane zwroty i rytm wypowiedzi dla tej postaci")
     vocal_profile: Optional[str] = Field(default="", description="Profil wokalny postaci (np. 'starsza kobieta, niski/ochrypły głos seiyū', 'młody chłopiec, wysoki głos żeńskiej seiyū')")
 
@@ -196,9 +197,9 @@ def format_episode_profile_for_prompt(profile: Optional[EpisodeProfile]) -> str:
             top_str = f" [Topologia: {seq.topology_type}]" if getattr(seq, "topology_type", None) else ""
             gender_tag = ""
             if getattr(seq, "female_only_scene", False):
-                gender_tag = " (🚨 SCENA WYŁĄCZNIE KOBIECA: bezwzględny wymóg form żeńskich w 1. i 2. os.!)"
+                gender_tag = " [Scena wyłącznie kobieca: formy żeńskie 1. i 2. os.]"
             elif getattr(seq, "male_only_scene", False):
-                gender_tag = " (SCENA WYŁĄCZNIE MĘSKA: bezwzględny wymóg form męskich!)"
+                gender_tag = " [Scena wyłącznie męska: formy męskie 1. i 2. os.]"
             lines.append(f"• [{seq.time_range}] {seq.sequence_name}: {seq.dramatic_summary} (Ton: {seq.dominant_tone}){top_str}{cast_str}{gender_tag}")
 
     if profile.character_dossiers:
@@ -214,24 +215,24 @@ def format_episode_profile_for_prompt(profile: Optional[EpisodeProfile]) -> str:
             lines.append(f"• {cd.name} ({cd.gender}, {cd.age_and_role}){age_t}{ent}{pron}{decl}{dial}{voc} -> Styl: {cd.speech_style_pl}{idio}")
 
     if profile.name_declensions:
-        lines.append("\nŻELAZNA TABELA ODMIANY IMION PRZEZ PRZYPADKI (FILAR XCI - BEZWZGLĘDNIE STOSUJ):")
+        lines.append("\nŻELAZNA TABELA ODMIANY IMION PRZEZ PRZYPADKI (FILAR XCI - PARADYGMATY DEKLINACYJNE):")
         for decl in profile.name_declensions:
             lines.append(f"- {decl.character_name} ({decl.gender}): {decl.declension_summary}")
 
     if profile.characters:
-        lines.append("\nRELACJE SPOŁECZNE I FORMY ZWROTU (BEZWZGLĘDNIE PRZESTRZEGAJ):")
+        lines.append("\nRELACJE SPOŁECZNE I FORMY ZWROTU (KANONICZNE ZWROTY ADRESATYWNE):")
         for rel in profile.characters:
             lines.append(f"- {rel.speaker} -> {rel.listener}: {rel.address_form} ({rel.relationship_type})")
 
     if profile.glossary:
         lines.append("\nUSTALONY SŁOWNICZEK POJĘĆ I TERMINOLOGII BRANŻOWEJ (BAZA KANONICZNA W MIANOWNIKU):")
         for g in profile.glossary:
-            lines.append(f"- '{g.term_en}' = '{g.translation_pl}' [Kontekst: {g.explanation} -> W zdaniu BEZWZGLĘDNIE ODMIENIAJ PRZEZ PRZYPADKI (np. 'w {g.translation_pl.lower()}'); wklejaj czystą polską nazwę bez dopisków w nawiasach!]")
+            lines.append(f"- '{g.term_en}' = '{g.translation_pl}' [Kontekst: {g.explanation} | Odmiana przez przypadki w zdaniu, czysta postać leksykalna bez metadanych]")
 
     if profile.yojijukugo_and_idioms:
         lines.append("\nEKWIWALENTY JAPOŃSKICH PRZYSŁÓW I IDIOMÓW (FILAR XCV):")
         for idi in profile.yojijukugo_and_idioms:
-            lines.append(f"- '{idi.term_en}' = '{idi.translation_pl}' [Kontekst: {idi.explanation} -> W zdaniu dopasuj gramatycznie i fleksyjnie do kontekstu; bez dopisków w nawiasach!]")
+            lines.append(f"- '{idi.term_en}' = '{idi.translation_pl}' [Kontekst: {idi.explanation} | Adaptacja kontekstowa i fleksyjna bez metadanych w nawiasach]")
 
     if profile.key_conventions:
         lines.append("\nWYTYCZNE SPECYFICZNE DLA TEGO ODCINKA:")
@@ -331,11 +332,11 @@ def format_lean_episode_brief(profile: Any) -> str:
                 lines.append(f"  - {t_en} = {t_pl}")
 
     lines.append("• TOPOLOGIA SCENY I UZGADNIANIE PŁCI:")
-    lines.append("  - Mówczyni (kobieta) w 1. os. lp. czasu przeszłego BEZWZGLĘDNIE stosuje formy żeńskie: -am, -ałam, -łabym, -obym (byłam, wiedziałam, zrobiłam, poszłam).")
-    lines.append("  - Zwracając się do kobiety w 2. os. lp. BEZWZGLĘDNIE stosuj formy żeńskie: -aś, -ałaś, jesteś pewna (byłaś, zrobiłaś, wiedziałaś).")
-    lines.append("  - Zwracając się do grupy kobiet (liczba mnoga niemęskoosobowa/żeńska) stosuj: -yście (np. przyszłyście, zrobiłyście, byłyście) i 'one', NIGDY męskoosobowego '-iście' (byliście).")
-    lines.append("  - ŚCISŁA REKCJA ZAPRZECZONA (Genitive of Negation): Czasowniki przechodnie podlegające negacji partykułą 'nie' w KAŻDYM czasie (teraźniejszym, przeszłym i przyszłym: nie mam/nie miałam/nie będę miał) bezwzględnie wymuszają dopełniacz również przy wtrąceniach przysłówkowych (nie miałem już czasu, nie widzę wcale sensu, nie czułam strachu).")
-    lines.append("  - OCHRONA CYTATÓW I DEKLINACJA KANONU: Cytowane wypowiedzi („...”) zachowują płeć oryginalnego autora. Terminy kanoniczne odmieniaj przez wszystkie przypadki po przyimkach (również Biernik 'przez' i Miejscownik 'o/przy'). Płeć z bazy serii ma bezwzględne pierwszeństwo.")
+    lines.append("  - Mówczyni (kobieta) w 1. os. lp. czasu przeszłego stosuje formy żeńskie: -am, -ałam, -łabym, -obym (byłam, wiedziałam, zrobiłam, poszłam).")
+    lines.append("  - Zwracając się do kobiety w 2. os. lp. stosuj formy żeńskie: -aś, -ałaś, jesteś pewna (byłaś, zrobiłaś, wiedziałaś).")
+    lines.append("  - Zwracając się do grupy kobiet (liczba mnoga niemęskoosobowa/żeńska) stosuj: -yście (np. przyszłyście, zrobiłyście, byłyście) i 'one', zamiast męskoosobowego '-iście' (byliście).")
+    lines.append("  - ŚCISŁA REKCJA ZAPRZECZONA (Genitive of Negation): Czasowniki przechodnie podlegające negacji partykułą 'nie' w każdym czasie (teraźniejszym, przeszłym i przyszłym: nie mam/nie miałam/nie będę miał) wymagają dopełniacza również przy wtrąceniach przysłówkowych (nie miałem już czasu, nie widzę wcale sensu, nie czułam strachu).")
+    lines.append("  - OCHRONA CYTATÓW I DEKLINACJA KANONU: Cytowane wypowiedzi („...”) zachowują płeć oryginalnego autora. Terminy kanoniczne odmieniaj przez wszystkie przypadki po przyimkach (również Biernik 'przez' i Miejscownik 'o/przy'). Płeć z bazy serii ma nadrzędne pierwszeństwo.")
 
 
     lines.append("================================================")
@@ -374,8 +375,8 @@ class EpisodeProfiler:
         prompt = f"""Jesteś Głównym Reżyserem, Konsultantem Merytorycznym i Script Doctorem Lokalizacji Anime (Profiler 4.0).
 Twoim zadaniem jest dogłębna, wszechstronna analiza 100% skryptu całego odcinka, aby przygotować dla zespołu tłumaczy i redaktorów kompletny PROFIL ODCINKA 4.0:
 
-1. OFICJALNY KANON POLSKIEGO WYDANIA MANGI (Filar XXIII, XCIV & XCVIII): Zidentyfikuj wydawnictwo (Waneko, J.P.Fantastica, Studio JG, Kotori, Hanami, Dango, Egmont) i podaj oficjalne nazwy z tomików papierowych.
-   - Przydomki postaci w polszczyźnie twórz przez apozycję mianownikową (np. 'Aura Gilotyna', dop. 'Aury Gilotyny') lub tradycyjny epitet, zamiast mechanicznego kalkowania 'X of the Y' jako 'X od Y' (POPRAWNY KANON Studio JG: 'Aura Gilotyna', nie 'Aura od Gilotyny'; 'Jack the Ripper' -> 'Kuba Rozpruwacz').
+1. OFICJALNY KANON POLSKIEGO WYDANIA MANGI (Filar XXIII, XCIV & XCVIII): Identyfikacja licencjonowanego wydawnictwa (Waneko, J.P.Fantastica, Studio JG, Kotori, Hanami, Dango, Egmont) i ustalenie oficjalnego nazewnictwa z wydań papierowych.
+   - Przydomki postaci w polszczyźnie twórz przez apozycję mianownikową lub tradycyjny epitet, zamiast mechanicznego kalkowania 'X of the Y' jako 'X od Y' (np. 'Jack the Ripper' -> 'Kuba Rozpruwacz', 'Mistrz Miecza', nie 'Mistrz od Miecza').
 2. SKANER MIN JĘZYKOWYCH, PUŁAPEK ŚRODOWISKOWYCH I PRAGMATYCZNYCH (danger_lines_prescan): Przeskanuj cały odcinek i wskaż zdradliwe kwestie angielskie:
    - Idiomy i odmowy: 'I\'m fine' jako odmowa 'Ja podziękuję' zamiast 'Nic mi nie jest', 'Bless you', 'That bombed', 'Kikanaide', 'Sumimasen', 'Kanojo-tachi'.
    - Paradoks pytań przeczących (Filar CXXXIX): 'Hai/Yes' po pytaniu przeczącym ('Didn't you go?') -> ostrzeż przed dosłownym 'Tak!', nakaż 'Nie, nie poszedłem!'.
@@ -389,39 +390,39 @@ Twoim zadaniem jest dogłębna, wszechstronna analiza 100% skryptu całego odcin
 6. KALAMBURY I GRY SŁOWNE (puns_and_wordplays): Przekształć japońskie Dajare i Goroawase na autonomiczne polskie gry słowne wg zasad Stanisława Barańczaka (bez przypisów [Przyp. tłum.]!).
 7. MOSTY CIĄGŁOŚCI (continuity_bridge_alerts): Wskaż terminy i wątki wymagające żelaznej spójności z całą serią.
 8. CHRONOLOGICZNA MAPA SEKWENCJI DRAMATURGICZNYCH (dramatic_sequences): Podziel odcinek na 3-4 akty/sekwencje czasowe z opisem napięcia i tonu.
-   - DLA KAŻDEJ SEKWENCJI BEZWZGLĘDNIE WSKAŻ characters_present (listę postaci rozmawiających w tej scenie, zwłaszcza gdy linie w skrypcie nie mają wpisanych nazwisk w polu Actor!).
-   - PRYMAT RZECZYWISTOŚCI SCENICZNEJ I AUDIO NAD SKAŻONYMI TAGAMI FANSUBÓW (FILAR CLXXIV): W zewnętrznych plikach napisów (fansubach) pole Actor/Name bywa fałszywie otagowane (np. wpisany męski tag aktora, podczas gdy na ekranie rozmawiają wyłącznie kobiety, a seiyū wymawia kwestię żeńskim głosem). W takich sytuacjach BEZWZGLĘDNIE zignoruj błędny tag aktora! Wskaż rzeczywistą obsadę obecną w scenie i ustaw female_only_scene = True WYŁĄCZNIE wtedy, gdy 100% aktywnych uczestników sceny to zweryfikowane kobiety (co najmniej dwie postacie w dialogu: N >= 2) ORAZ w audio nie występuje żaden głos męski ani męski narrator. W przypadku pojedynczej postaci (monolog, solilokwium, myśli: N = 1) flaga ta BEZWZGLĘDNIE wynosi False, aby nie narzucać fałszywej płci ewentualnemu słuchaczowi! Zabezpiecz sceny przed fałszywym dodawaniem wspominanych w dialogach postaci w 3. osobie.
-   - Jeśli w scenie rozmawiają udowodnieniowo wyłącznie kobiety (100% obsady, N >= 2 i brak męskich głosów w audio), BEZWZGLĘDNIE ustaw female_only_scene = True! W takich scenach 1. osoba liczby mnogiej BEZWZGLĘDNIE wymaga form niemęskoosobowych: -łyśmy, -łybyśmy, byłyśmy, my obie (FILAR CLXXV – formy niemęskoosobowe; unikaj form męskich: -liśmy, byliśmy gotowi!).
+   - DLA KAŻDEJ SEKWENCJI wskaż characters_present (listę postaci rozmawiających w tej scenie, zwłaszcza gdy linie w skrypcie nie mają wpisanych nazwisk w polu Actor!).
+   - PRYMAT RZECZYWISTOŚCI SCENICZNEJ I AUDIO NAD SKAŻONYMI TAGAMI FANSUBÓW (FILAR CLXXIV): W zewnętrznych plikach napisów (fansubach) pole Actor/Name bywa fałszywie otagowane (np. wpisany męski tag aktora, podczas gdy na ekranie rozmawiają wyłącznie kobiety, a seiyū wymawia kwestię żeńskim głosem). W takich sytuacjach zignoruj błędny tag aktora. Wskaż rzeczywistą obsadę obecną w scenie i ustaw female_only_scene = True WYŁĄCZNIE wtedy, gdy 100% aktywnych uczestników sceny to zweryfikowane kobiety (co najmniej dwie postacie w dialogu: N >= 2) ORAZ w audio nie występuje żaden głos męski ani męski narrator. W przypadku pojedynczej postaci (monolog, solilokwium, myśli: N = 1) flaga ta wynosi False, aby nie narzucać fałszywej płci ewentualnemu słuchaczowi. Zabezpiecz sceny przed fałszywym dodawaniem wspominanych w dialogach postaci w 3. osobie.
+   - Jeśli w scenie rozmawiają udowodnieniowo wyłącznie kobiety (100% obsady, N >= 2 i brak męskich głosów w audio), ustaw female_only_scene = True. W takich scenach 1. osoba liczby mnogiej wymaga form niemęskoosobowych: -łyśmy, -łybyśmy, byłyśmy, my obie (FILAR CLXXV – formy niemęskoosobowe; formy męskie: -liśmy, byliśmy gotowi są wykluczone).
    - Jeśli w scenie rozmawiają udowodnieniowo wyłącznie mężczyźni (100% obsady, N >= 2 i brak żeńskich głosów w audio), ustaw male_only_scene = True! W takich scenach 1. osoba liczby mnogiej wymaga form męskoosobowych: -liśmy, -libyśmy, byliśmy gotowi. Jeśli w scenie występuje jakakolwiek postać przeciwnej płci, pojedyncza postać (N = 1) lub brak pewności, pozostaw obie flagi jako False (stan neutralny).
 9. KARTOTEKA OBSADY I IDIOLEKTY YAKUWARIGO (character_dossiers): Określ wiek, status, japońskie zaimki (Ore/Boku/Watashi/Washi/Sessha), dialekt (Kansai-ben) i unikalny polski rejestr mowy (Ojou-sama salonowy, Starzec staroświecki, Samuraj rycerski, Yankii szorstki, Kansai gawędziarski).
 10. TABELA ODMIANY IMION PRZEZ PRZYPADKI (name_declensions) & MATRYCA RELACJI I TYTULATURY (characters):
-   - ŻELAZNA FLEKSJA IMION FANTASY I ZACHODNICH (FILAR XCI): W seriach fantasy i obcojęzycznych imiona męskie zakończone na spółgłoskę (np. Drel, Gart, Klen, Arthur, Roland, Thorfinn, Eren, Armin) BEZWZGLĘDNIE ODMIENIAMY przez wszystkie polskie przypadki!
+   - ŻELAZNA FLEKSJA IMION FANTASY I ZACHODNICH (FILAR XCI): W seriach fantasy i obcojęzycznych imiona męskie zakończone na spółgłoskę (np. Drel, Gart, Klen, Arthur, Roland, Thorfinn, Eren, Armin) odmieniamy regularnie przez wszystkie polskie przypadki!
    - W dopełniaczu dzierżawczym obce imiona regularnie odmieniaj: 'Drel\'s secrets' -> 'sekretów Drela' (zamiast kalki: 'sekretów Drel'); 'Gart\'s sword' -> 'miecz Garta'. W tabeli 'name_declensions' rejestruj WSZYSTKIE postacie (zarówno mówiące, jak i wspominane w dialogach w 3. osobie!) z ich pełną deklinacją.
-    - PUŁAPKA KOŃCÓWKI '-A' W IMIONACH MĘSKICH (FILAR CLVII & CLXII): Wiele imion japońskich i orientalnych kończy się na samogłoskę '-a' (np. Shira, Akira, Gaara, Ashitaka, Kiba, Soma, Kenta, Ryoma, Hanza) i są to POSTACIE MĘSKIE! Nie klasyfikuj postaci jako kobiety wyłącznie na podstawie litery '-a' na końcu imienia. Sprawdź rolę społeczną, zaimki (Ore/Boku) i kontekst wypowiedzi. W języku polskim dla postaci męskich orzeczenia w czasie przeszłym BEZWZGLĘDNIE wymagają formy męskiej: 'Shira mówił / ostrzegał / pomógł / zrobił', a NIE żeńskiej ('ostrzegała')!
-    - DOWÓDCY, SAMURAJOWIE, KUGE I SPÓJNOŚĆ MONOLOGÓW (FILAR CLXXXV): Dowódcy wojskowi buke, samurajowie, wasale, dostojnicy kuge i rycerze to bezwzględnie mężczyźni (MALE). Wypowiedzi o nich w 3. osobie (zwłaszcza strona bierna) bezwzględnie wymagają form męskich orzeczenia i imiesłowów ('został pojmany i stracony', unikaj form żeńskich lub hybryd: 'została pojmany'!). W monologach i kwestiach narracyjnych (zwłaszcza w kursywie) zachowaj 100% spójności rodzaju gramatycznego 1. osoby (męskie 'będę musiał' na końcu wymusza formy męskie na początku: 'Bałem się', 'przyszedłem', unikaj form żeńskich: 'Bałam się', 'przyszłam').
+    - PUŁAPKA KOŃCÓWKI '-A' W IMIONACH MĘSKICH (FILAR CLVII & CLXII): Wiele imion japońskich i orientalnych kończy się na samogłoskę '-a' (np. Shira, Akira, Gaara, Ashitaka, Kiba, Soma, Kenta, Ryoma, Hanza) i są to POSTACIE MĘSKIE! Nie klasyfikuj postaci jako kobiety wyłącznie na podstawie litery '-a' na końcu imienia. Sprawdź rolę społeczną, zaimki (Ore/Boku) i kontekst wypowiedzi. W języku polskim dla postaci męskich orzeczenia w czasie przeszłym wymagają formy męskiej: 'Shira mówił / ostrzegał / pomógł / zrobił', a NIE żeńskiej ('ostrzegała')!
+    - DOWÓDCY, SAMURAJOWIE, KUGE I SPÓJNOŚĆ MONOLOGÓW (FILAR CLXXXV): Dowódcy wojskowi buke, samurajowie, wasale, dostojnicy kuge i rycerze to standardowo mężczyźni (MALE). Wypowiedzi o nich w 3. osobie (zwłaszcza strona bierna) wymagają form męskich orzeczenia i imiesłowów ('został pojmany i stracony', unikaj form żeńskich lub hybryd: 'została pojmany'!). W monologach i kwestiach narracyjnych (zwłaszcza w kursywie) zachowaj 100% spójności rodzaju gramatycznego 1. osoby (męskie 'będę musiał' na końcu wymusza formy męskie na początku: 'Bałem się', 'przyszedłem', unikaj form żeńskich: 'Bałam się', 'przyszłam').
     - PUŁAPKA FONETYCZNA OBCYCH IMION MĘSKICH NA '-CA' (FILAR CLVII): Imiona męskie obcego pochodzenia zakończone na '-ca' (np. Luca, Petrarca, Seneca, Checa) w języku polskim wymawiane są z twardym [k] i odmieniają się ze zmianą na 'k': dopełniacz: 'do Luki' (zamiast formy żeńskiej: 'do Luci'); biernik: 'Lukę', narzędnik: 'z Luką', miejscownik: 'o Luce', wołacz: 'Luco / Luko'!
    - PUŁAPKA FAŁSZYWYCH IMION Z JAPOŃSKICH RZECZOWNIKÓW POSPOLITYCH I TYTUŁÓW (FILAR II & KANON): Japońskie rzeczowniki pospolite, role baśniowe i tytuły traktuj jako pojęcia pospolite, a nie imiona własne pisane wielką literą: 'ōji / ouji' (książę, a nie 'Ouji' jako imię), 'hime / oujo' (księżniczka), 'sensei' (nauczyciel / mistrz), 'senpai' (starszy kolega), 'kouhai', 'shishou', 'danna', 'aniki'. W dialogach i tabelach rejestruj ich poprawne polskie odpowiedniki!
-   - SPOLSZCZANIE HONORYFIKATORÓW 'SENPAI' I SLANGU (FILAR II & C): Japońskie relacje starszeństwa ('senpai') w polskim dialogu filmowym nie mogą być pozostawiane jako surowe słowo 'Senpai' wielką literą ani '[Nazwisko]-senpai' (BŁĄD: 'prawda, Senpai?' / 'Akaishi-senpai'). Zastępuj je imieniem/nazwiskiem rozmówcy ('Akaishi!', 'Rinko!'), zwrotem grzecznościowym ('pani Akaishi') lub usuwaj z zawołania. Służący za pieszczotliwy slang internetowy sufiks '-taso' (np. 'Kuro-taso') adaptuj jako kanoniczne imię / pieszczotliwe zdrobnienie ('Kuroe' / 'Kuro-tan').
-   - BEZWZGLĘDNA NADRZĘDNOŚĆ OFICJALNEGO KANONU MANGOWEGO (FILAR II & KANON): Jeśli seria posiada licencjonowane polskie wydanie papierowe (np. Studio JG dla 'Otome Kaijuu Carameliser' / 'Potworna słodycz'), oficjalne przydomki i pojęcia mają bezwzględny priorytet (np. 'Monster Prince' = 'Potworny Królewicz', a nie warianty typu 'Książę Kaiju').
-   - PROPAGACJA BIERNIKA PRZY WSPÓŁRZĘDNOŚCI (FILAR CLVII & XCI): Gdy czasownik rządzi biernikiem w konstrukcji z dwoma dopełnieniami połączonymi spójnikiem 'i' / 'oraz' (np. 'Przedstawiono Minamiego i Harugona'), oba człony BEZWZGLĘDNIE podlegają deklinacji w bierniku (np. 'Minamiego i Harugona', nie 'Minamiego i Harugon').
+   - SPOLSZCZANIE HONORYFIKATORÓW 'SENPAI' I SLANGU (FILAR II & C): Japońskie relacje starszeństwa ('senpai') w polskim dialogu filmowym nie mogą być pozostawiane jako surowe słowo 'Senpai' wielką literą ani '[Nazwisko]-senpai' (BŁĄD: 'prawda, Senpai?' / 'Akaishi-senpai'). Zastępuj je imieniem/nazwiskiem rozmówcy ('Akaishi!', 'Rinko!'), zwrotem grzecznościowym ('pani Akaishi') lub usuwaj z zawołania. Służący za pieszczotliwy slang internetowy sufiks '-taso' adaptuj jako kanoniczne imię bazowe lub pieszczotliwe zdrobnienie afektywne.
+   - NADRZĘDNOŚĆ OFICJALNEGO KANONU MANGOWEGO (FILAR II & KANON): Jeśli seria posiada licencjonowane polskie wydanie papierowe (np. Studio JG dla 'Otome Kaijuu Carameliser' / 'Potworna słodycz'), oficjalne przydomki i pojęcia mają nadrzędny priorytet (np. 'Monster Prince' = 'Potworny Królewicz', a nie warianty typu 'Książę Kaiju').
+   - PROPAGACJA BIERNIKA PRZY WSPÓŁRZĘDNOŚCI (FILAR CLVII & XCI): Gdy czasownik rządzi biernikiem w konstrukcji z dwoma dopełnieniami połączonymi spójnikiem 'i' / 'oraz' (np. 'Przedstawiono Minamiego i Harugona'), oba człony podlegają regularnej deklinacji w bierniku (np. 'Minamiego i Harugona', nie 'Minamiego i Harugon').
    - ELIMINACJA SAMOTNYCH MYŚLNIKÓW DIALOGOWYCH (FILAR XCI): W polskiej szkole AVT myślnik '- ' stosuje się wyłącznie przy dwóch mówcach w jednym kadrze (dialogue double). Kwestię jednoosobową rozpoczynaj bez myślnika ('Ocalę cię!', nie '- Ocalę cię!').
    - INTERPUNKCJA W ALTERNATYWIE ROZŁĄCZNEJ (FILAR XCI): W pytaniach rozłącznych typu 'w kapciach czy bez?', 'kawa czy herbata?' nie stawiaj przecinka przed 'czy'.
    - ZACIEKAWIONE 'AND SO? / SORE DE?' (FILAR IV & CLVI): W naturalnym dialogu dopytującym o ciąg dalszy, wyznanie miłości lub rozwój sytuacji, japońskie 'Sore de?' / angielskie 'And so?' tłumacz jako 'I co?', 'I jak?', 'Więc?' (zamiast wrogiego 'I co z tego?').
    - PUŁAPKA TYTUŁÓW I RÓL ZAWODOWYCH (FILAR CLXII): Tytuły i profesje (np. teacher/nauczyciel, professor/profesor, spy/szpieg, knight/rycerz, commander/dowódca, mage/mag) w języku angielskim i japońskim są bezpłciowe. Nigdy nie zakładaj domyślnie męskiej płci wyłącznie z powodu funkcji zawodowej! Zawsze zweryfikuj czy postać nie jest kobietą (nauczycielką, szpiegiem-kobietą) na podstawie relacji, głosu seiyū, kontekstu i zaimków.
    - ROZPOZNANIE ADRESATA: POJEDYNCZA KOBIETA/MĘŻCZYZNA ORAZ LICZBA MNOGA (FILAR CLXIII): W dialogach zwracaj uwagę na to, do kogo skierowana jest wypowiedź (adresat). W języku angielskim zaimek 'you' jest bezpłciowy i wieloznaczny (ty [kobieta/mężczyzna], wy [grupa kobiet/mężczyzn/mieszana], pan, pani):
-      * POJEDYNCZA KOBIETA ('kobieta'): Gdy w rozmowie 1-na-1 'you' skierowane jest do kobiety/dziewczyny (np. 'Are you sure?', 'Were you there?', 'You did well'), w języku polskim orzeczenia czasu przeszłego i przymiotniki BEZWZGLĘDNIE wymagają rodzaju żeńskiego: 'Jesteś pewna? / Byłaś tam? / Dobrze się spisałaś / Zrobiłaś to / Miałaś rację' (nie formy męskie: 'byłeś', 'zrobiłeś', 'miałeś', 'pewien')!
-      * POJEDYNCZY MĘŻCZYZNA ('mężczyzna'): Gdy wypowiedź skierowana jest do mężczyzny/chłopaka, bezwzględnie stosuj formy męskie: 'Jesteś pewien? / Byłeś tam? / Dobrze się spisałeś / Zrobiłeś to' (nie formy żeńskie: 'byłaś', 'zrobiłaś').
+      * POJEDYNCZA KOBIETA ('kobieta'): Gdy w rozmowie 1-na-1 'you' skierowane jest do kobiety/dziewczyny (np. 'Are you sure?', 'Were you there?', 'You did well'), w języku polskim orzeczenia czasu przeszłego i przymiotniki wymagają rodzaju żeńskiego: 'Jesteś pewna? / Byłaś tam? / Dobrze się spisałaś / Zrobiłaś to / Miałaś rację' (nie formy męskie: 'byłeś', 'zrobiłeś', 'miałeś', 'pewien')!
+      * POJEDYNCZY MĘŻCZYZNA ('mężczyzna'): Gdy wypowiedź skierowana jest do mężczyzny/chłopaka, stosuj formy męskie: 'Jesteś pewien? / Byłeś tam? / Dobrze się spisałeś / Zrobiłeś to' (nie formy żeńskie: 'byłaś', 'zrobiłaś').
       * GRUPA KOBIET ('grupa_kobiet'): Wymusza formy niemęskoosobowe ('zrobiłyście / byłyście gotowe / widziałyście').
       * GRUPA MĘŻCZYZN / MIESZANA ('grupa_mężczyzn' / 'grupa_mieszana'): Wymaga form męskoosobowych ('zrobiliście / byliście gotowi / widzieliście'). Ostrzegaj przed kalkowaniem 'you' w liczbie pojedynczej tam, gdzie w scenie lub audio seiyū (-tachi, minna, omae-ra) zwrot skierowany jest do grupy!
     - RELACYJNA STAŁOŚĆ REJESTRU (T-V INVARIANCE) I OCHRONA PRZED HYBRYDAMI WOŁACZA (FILAR C & CLVII):
        * KONSEKWENCJA WOŁACZA Z FORMĄ GRZECZNOŚCIOWĄ (INTRA-CLAUSE T-V HYBRID BAN): Unikaj łączenia w jednej wypowiedzi poufałego wołacza po imieniu z honoryfikatywną formą per pan/pani (POPRAWNIE: 'Panie Eftalu... ma pan zaczerwienioną twarz' LUB na 'ty': 'Eftalu... masz zaczerwienioną twarz'). Jeśli postać zwraca się per pan/pani, wołacz ZAWSZE zawiera tytuł: 'Panie [Imię]!' / 'Pani [Imię]!'.
-       * ODPORNOŚĆ NA ANGIELSKIE OPUSZCZANIE SUFIKSU -SAMA (ENGLISH '-SAMA' DROP IMMUNITY): W angielskich skryptach anime zachodni tłumacze nagminnie usuwają honoryfikatywny przyrostek '-sama' / '-dono' / '-sensei' w okrzykach i zawołaniach (np. w JP: 'Eftal-sama!', w EN: 'Ephtal!'). W polszczyźnie relacja uczeń-mistrz czy podwładny-pan jest stała: w zawołaniach BEZWZGLĘDNIE stosuj 'Panie [Imię]!' ('Co za kunszt, panie Eftalu!').
-       * KONSISTENTNOŚĆ TYTULATURY PODMIOTU (BRAK SKAŻENIA PRZYPADKA): Gdy tytulatura 'pan' występuje w mianowniku jako podmiot z czasownikiem w 3. osobie (np. 'pan [Imię] zniszczył / zrobił / pokonał'), męskie imię na spółgłoskę BEZWZGLĘDNIE pozostaje w mianowniku (POPRAWNIE: 'odkąd pan Eftal zniszczył', nie 'odkąd pan Eftala zniszczył').
+       * ODPORNOŚĆ NA ANGIELSKIE OPUSZCZANIE SUFIKSU -SAMA (ENGLISH '-SAMA' DROP IMMUNITY): W angielskich skryptach anime zachodni tłumacze nagminnie usuwają honoryfikatywny przyrostek '-sama' / '-dono' / '-sensei' w okrzykach i zawołaniach (np. w JP: 'Eftal-sama!', w EN: 'Ephtal!'). W polszczyźnie relacja uczeń-mistrz czy podwładny-pan jest stała: w zawołaniach stosuj 'Panie [Imię]!' ('Co za kunszt, panie Eftalu!').
+       * KONSISTENTNOŚĆ TYTULATURY PODMIOTU (BRAK SKAŻENIA PRZYPADKA): Gdy tytulatura 'pan' występuje w mianowniku jako podmiot z czasownikiem w 3. osobie (np. 'pan [Imię] zniszczył / zrobił / pokonał'), męskie imię na spółgłoskę pozostaje w mianowniku (POPRAWNIE: 'odkąd pan Eftal zniszczył', nie 'odkąd pan Eftala zniszczył').
     - PODWÓJNY RZĄD PRZYIMKA 'ZA' W KONSTRUKCJACH MAŁŻEŃSTWA I WYMIANY (FILAR CLXVII): W języku polskim 'wyjść za' kogoś rządzi BIERNIKIEM (np. 'wyjść za Gujuka' [Biernik od Gujuk], 'oddać za kogoś życie', 'zapłacić za brata', 'uznać za zmarłego'). Stosuj regularny biernik (nie narzędnik 'za Gujukiem' ani mianownik 'za Gujukę')!
     - PURYZM REJESTRU DRAMATU HISTORYCZNEGO I DARK FANTASY (FILAR CLXVII): W seriach historycznych i epickich dbaj o szlachetny rejestr konwersacyjny: 'Good question' -> 'Trudno powiedzieć / Ciekawe zagadnienie' (zamiast potocznego: 'Dobre pytanie!'), 'W sumie to nam na rękę' -> 'W istocie / W gruncie rzeczy to nam na rękę', 'Oj tam!' -> 'Daj spokój!'.
 11. SŁOWNICZEK POJĘĆ BRANŻOWYCH (glossary) ORAZ JAPOŃSKICH PRZYSŁÓW/IDIOMÓW (yojijukugo_and_idioms): Podawaj wyłącznie CZYSTE, DOCELOWE polskie nazwy własne i terminy bez żadnych dopisków w nawiasach.
 12. EPOKA, REALIA ŚWIATA I DZIEDZINA SPECJALISTYCZNA.
-13. ŻELAZNA CZYSTOŚĆ ORTOGRAFICZNA I BEZWZGLĘDNA ELIMINACJA LITERÓWEK (FILAR CLXIV):
+13. ŻELAZNA CZYSTOŚĆ ORTOGRAFICZNA I ELIMINACJA LITERÓWEK (FILAR CLXIV):
    - Dbaj o poprawność ortograficzną: eliminuj wszelkie zniekształcone, nieistniejące formy leksykalne i literówki w dialogach i glosariuszu.
    - Czasownik 'spytać / zapytać': w 1. os. lp. czasu przyszłego ma wyłącznie formę 'spytam' lub 'zapytam' (POPRAWNIE: 'spytam / zapytam', nie 'spyham').
    - Ostrzegaj przed wszelkimi deformacjami ortograficzno-fonetycznymi ('spyham' -> 'spytam', 'wziąść' -> 'wziąć', 'poszłem' -> 'poszedłem', 'włanczać' -> 'włączać').
@@ -439,7 +440,7 @@ Twoim zadaniem jest dogłębna, wszechstronna analiza 100% skryptu całego odcin
         -> traktuj to jako otwarcie rozmowy w nowej scenie: 'Więc o co chodzi?' / 'No to o co chodzi?' / 'Słucham cię' / 'O co chodzi?', a nie opóźnioną zgodę 'Jasne / Pewnie' (bohaterowie JUŻ tam stoją!).
       * WYCIEK SPÓJNIKÓW PO CIĘCIU (CONJUNCTION BLEED): po długiej pauzie unikaj zaczynania kwestii od spójników łączących ('I co z tego?', 'A więc...').
       * DRYF ZAIMKOWY I RESET EMOCJONALNY: Zaimki 'to/on' po zmianie kadru muszą być sprecyzowane; krzyk z walki nie może przenikać do cichej sceny po cięciu.
-      * W sekcji danger_lines_prescan bezwzględnie wskaż tego typu luki czasowe i nakaż właściwe otwarcie dialogu!
+      * W sekcji danger_lines_prescan precyzyjnie wskaż tego typu luki czasowe i oznacz właściwe otwarcie dialogu!
 
 16. PROTOKÓŁ ANTY-PIVOT I ELIMINACJA KLISZ FANSUBERSKICH (FILAR CLXVI):
        * 'Come back in one piece / Return in one piece' -> 'Wracaj cały i zdrowy!' / 'Wracaj cały!' (zamiast kalki: 'w jednym kawałku').
@@ -454,33 +455,33 @@ Twoim zadaniem jest dogłębna, wszechstronna analiza 100% skryptu całego odcin
        * 'There is no way (that)...' -> 'Wykluczone, by...', 'To niemożliwe, żeby...', 'Nie ma mowy, bym/byśmy/żeby/aby...'.
        * Tytulatura w relacjach szkolnych i mentorskich: unikaj archaizmu 'Panno [Imię/Nazwisko]'. W relacji uczeń -> nauczycielka/mentorka stosuj 'pani [Nazwisko]' (np. 'pani Teshimo'), 'pani profesor' lub 'Teshima-sensei' (nie 'panno Teshimo'). Nauczycielka do uczennicy mówi po nazwisku ('Yasumi') lub imieniu ('Ai') bądź 'Yasumi-san' (nie 'Panno Yasumi'). Wypowiedzi o nauczycielce w 3. osobie wymagają 'pani [Nazwisko]' (np. 'notes pani Teshimy', 'pani Teshima mówiła'; nie 'panny Teshimy', 'Panna Teshima').
        * Rejestr twórczy (Filar X & I): unikaj żargonu IT 'input / output' w odniesieniu do twórczości mangowej i pisarskiej (zamiast: 'cykl inputu i outputu', 'potrzebujesz więcej inputu' stosuj: 'czerpanie inspiracji / zbieranie doświadczeń / chłonięcie wrażeń' oraz 'tworzenie / przelewanie na papier / rysowanie').
-       * Fleksja zamówień gastronomicznych (Filar CXXXVII): Zwrot zamówienia w lokalu ('Dla mnie [co?]') bezwzględnie wymaga biernika (np. 'Dla mnie Gojinkę z wodą', 'Dla mnie herbatę'; nie mianownik: 'Dla mnie Gojinka').
-       * Lokalizacja japońskich okrzyków pirotechnicznych (Filar CLXIV): Japoński okrzyk festiwalowy 'Tamaya!' (tradycyjny okrzyk cechu pirotechników z Edo) bezwzględnie zlokalizuj na naturalny okrzyk zachwytu nad fajerwerkami ('Ale widok!', 'Cudo!', 'Ooo, jak pięknie!'; nie surowe 'Tamaya!').
+       * Fleksja zamówień gastronomicznych (Filar CXXXVII): Zwrot zamówienia w lokalu ('Dla mnie [co?]') wymaga biernika (np. 'Dla mnie kawę z mlekiem', 'Dla mnie herbatę'; nie mianownik: 'Dla mnie kawa').
+       * Lokalizacja japońskich okrzyków pirotechnicznych (Filar CLXIV): Japoński okrzyk festiwalowy 'Tamaya!' (tradycyjny okrzyk cechu pirotechników z Edo) zlokalizuj na naturalny okrzyk zachwytu nad fajerwerkami ('Ale widok!', 'Cudo!', 'Ooo, jak pięknie!'; nie surowe 'Tamaya!').
        * Zdrobnienia slangu: unikaj sztucznych fonetycznych potworków w rodzaju 'Kuro-tasia', 'Manacia' pod japońskie sufiksy '-taso' / '-cchin'.
        * Relacje rówieśnicze w szkole i klubie (Filar XXV & IX): unikaj form per 'Pan/Pani [Nazwisko]' i czasowników w 3. osobie grzecznościowej między uczniami i rówieśnikami z tej samej klasy/klubu szkolnego. Japoński grzeczny przyrostek '-san' używany przez licealistkę do koleżanki z klubu mangi to w polszczyźnie samo nazwisko lub imię w bezpośredniej relacji na 'ty' (POPRAWNIE: 'Fujimori, masz skaner?' / 'Fujimori, spokojnie!' / 'gdy Fujimori skończy').
-       * Żelazna niezmienniczość T-V w relacji wydawca-autor (Filar XXV & CLVI): W relacji redaktorki wydawnictwa z autorką mangi (np. Hana Kongouji <-> Rei Teshima) bezwzględnie utrzymuj jednolity rejestr grzecznościowy per 'Pani'. Angielskie 'Trust me!' to wyłącznie 'Proszę mi zaufać!' / 'Niech mi pani zaufa!' (nie poufałe 'Zaufaj mi!'). Pytania i zdania warunkowe redaktorki: 'Co pani zamierza?', 'Jeśli chce pani publikować... musi pani wprowadzić zmiany...', 'Wiem, że ma pani opory', 'Jeśli jest pani na to gotowa, w pełni pani pomogę'.
+       * Żelazna niezmienniczość T-V w relacji wydawca-autor (Filar XXV & CLVI): W relacji redaktorki wydawnictwa z autorką mangi (np. Hana Kongouji <-> Rei Teshima) utrzymuj jednolity rejestr grzecznościowy per 'Pani'. Angielskie 'Trust me!' to wyłącznie 'Proszę mi zaufać!' / 'Niech mi pani zaufa!' (nie poufałe 'Zaufaj mi!'). Pytania i zdania warunkowe redaktorki: 'Co pani zamierza?', 'Jeśli chce pani publikować... musi pani wprowadzić zmiany...', 'Wiem, że ma pani opory', 'Jeśli jest pani na to gotowa, w pełni pani pomogę'.
         * Typografia i czystość dialogowa AVT (Filar LX): unikaj japońskich tyld emocjonalnych ('~') oraz zwielokrotnionych wykrzykników/pytajników w dialogach (POPRAWNIE: 'odjechane!'). Maksymalnie jeden wykrzyknik lub pytajnik.
         * Typografia plansz tytułowych i szyldów (Filar XCVIII & LX): unikaj pakowania wieloczłonowych plansz w jedną niepodzieloną linię (>42 znaki) oraz notacji nawiasów kwadratowych [ A ] [ B ]. Plansze tytułowe dziel na zwięzłe wersy z \\N (maks. 36-40 znaków na wiersz).
-        * Wielogłos symultaniczny i kwestie dwugłosowe (Filar LVII): Kwestie dwóch różnych postaci połączone myślnikiem w jednej linii ('A - B') BEZWZGLĘDNIE rozbijaj na dwie osobne linie z myślnikiem i spacją na początku każdej ('- A\\N- B').
+        * Wielogłos symultaniczny i kwestie dwugłosowe (Filar LVII): Kwestie dwóch różnych postaci połączone myślnikiem w jednej linii ('A - B') rozbijaj na dwie osobne linie z myślnikiem i spacją na początku każdej ('- A\\N- B').
         * Tautologie i zacięcia słownikowe tytułów dzieł/kronik: unikaj dublowania słowa 'kronika' ('w Kronice Kronika Taiheiki' -> 'w Kronice Taiheiki', '[ KRONIKA Kronika Taiheiki ]' -> '[ KRONIKA TAIHEIKI ]').
         * Błędne związki frazeologiczne i inwersja afektywna (Filar X): idiom 'odchodzić od zmysłów' łączy się wyłącznie z negatywnymi stanami (rozpacz, lęk, żal). W radości stosuj: 'szaleć ze szczęścia' lub 'nie posiadać się z radości'.
         * Składnia związku zgody liczebników wielotysięcznych (Filar IV): Konstrukcje z podmiotem liczebnikowym w liczbie mnogiej wymagają orzeczenia w liczbie mnogiej (POPRAWNIE: 'Dwa tysiące w zupełności wystarczą'; nie: 'wystarczy').
         * Kalka auto-referencyjna z angielskiego: w monologu wewnętrznym stosuj naturalne polskie formy: 'moja ty mała', 'mała ja', 'taka ze mnie drobina' (zamiast angielskiej kalki 'my dear me' / 'moja droga ja').
-        * PROAKTYWNA MATRYCA REJESTRU DARK FANTASY (4 KLASY WSPÓŁCZESNEGO SLANGU): W uniwersach mrocznego i wysokiego fantasy (Clevatess, Frieren itp.) bezwzględnie obowiązuje podniosły, literacki rejestr dialogowy. Unikaj 4 klas współczesnego socjolektu:
+        * PROAKTYWNA MATRYCA REJESTRU DARK FANTASY (4 KLASY WSPÓŁCZESNEGO SLANGU): W uniwersach mrocznego i wysokiego fantasy obowiązuje podniosły, literacki rejestr dialogowy. Eliminacja 4 klas współczesnego socjolektu:
             - KLASA A (Slang młodzieżowy/potoczny): 'I gitara' -> 'Doskonale / Świetnie', 'spoko', 'siemanko', 'wchodzę w to' -> 'Zgadzam się / Przyjmuję ten układ', 'Bez jaj!' -> 'Niemożliwe! / To jakieś kpiny! / Chyba żartujesz!'.
             - KLASA B (Agresja podwórkowa i trywializacja): 'stul pysk' -> 'Zamilcz / Milcz', 'zamknij się', 'spuścić potworny łomot' -> 'zmiażdżyć bez trudu / rozgromić w pył', 'oberwę' -> 'poniosę karę / zginę', 'guzik mnie to obchodzi' -> 'nic mnie to nie obchodzi / niewiele mnie to obchodzi', 'pora stąd zwiewać / zwiewamy' -> 'pora stąd uciekać / uciekajmy'.
             - KLASA C (Współczesne metafory potoczne): 'przejmuję stery' -> 'teraz ja mówię / ja przejmuję kontrolę', 'dla zabicia czasu' -> 'dla rozrywki', 'kłamstwo jak byk' -> 'bezczelne kłamstwo / łgarstwo w żywe oczy', 'wylatuje ze szkoły' -> 'zostaje wydalony ze szkoły', 'utrzeć nosa' -> 'pokazać swoje miejsce'.
             - KLASA D (Trywializujące określenia osób i zaimki): 'ten typ' -> 'ten człowiek / ten nauczyciel', 'dzikuska / chuliganka' -> 'prostaczka / awanturnica', 'dzieciaki' -> 'uczniowie / młodzież', 'durna jestem' -> 'głupia jestem'.
-         * ELIMINACJA KALKI PRZYDOMKÓW 'X OD Y' (FILAR X & KANON): Japońskie przydomki bóstw i władców 'no' (np. Gensou no Zavthier, Enshou no Vordin) w polszczyźnie fantasy tłumaczymy przymiotnikowo lub czystym dopełniaczem, NIGDY kalką z przyimkiem 'od' ('Zavthier Pani Iluzji / Iluzoryczna Zavthier', nie 'Zavthier od Złudzeń'; 'Vordin Płomiennego Żaru / Płomienny Vordin', nie 'Vordin od Płomiennego Żaru'; jak w kanonie Frieren: 'Aura Gilotyna', nie 'od Gilotyny').
+         * ELIMINACJA KALKI PRZYDOMKÓW 'X OD Y' (FILAR X & KANON): Japońskie przydomki bóstw i władców 'no' w polszczyźnie fantasy tłumaczymy przymiotnikowo lub czystym dopełniaczem, bez kalki z przyimkiem 'od' (np. 'Władca Iluzji / Iluzoryczny Władca', nie 'Władca od Złudzeń'; 'Kuba Rozpruwacz', nie 'Kuba od Rozpruwacza').
          * RZĄD I RODZAJ GRAMATYCZNY RZECZOWNIKA 'POSOKA': 'Posoka' jest w języku polskim wyłącznie rodzaju żeńskiego (ta czarna posoka, tej czarnej posoki, tę czarną posokę). Stosuj: 'czarna posoka', 'przez czarną posokę', 'z czarnej posoki' (nie rodzaj męski: 'czarny posok').
-         * FLEKSJA I WOŁACZ TYTUŁÓW I NAZWISK OBCYCH: 'Święty Miecza Owenie Koath' -> 'Święty Miecza Owenie Koacie' (nazwisko Koath w wołaczu podlega regularnemu zmiękczeniu). 'Księga Toah' -> 'Księga Toaha'. 'Andrew' w wołaczu -> 'Andrewie'.
+         * FLEKSJA I WOŁACZ TYTUŁÓW I NAZWISK OBCYCH: 'Mistrzu Smith' -> 'Mistrzu Smicie' (obce nazwiska w wołaczu podlegają regularnemu zmiękczeniu). Obce imiona i tytuły reliktów podlegają regularnej deklinacji ('Księga Kael' -> 'Księga Kaela', 'Andrew' w wołaczu -> 'Andrewie').
          * Rząd przyimkowy dla urazu i traumy: w języku polskim: 'mam do czegoś uraz' lub 'mam przez to traumę' (zamiast kalki: 'mam przez coś uraz').
          * Związek zgody rodzaju gramatycznego dla rzeczownika 'sługa': rzeczownik sługa jest gramatycznie męskoosobowy. Jeśli mowa o kobiecie (np. Alicii jako podwładnej Klena), stosuj 'moja podwładna' lub 'moja służąca' ('by moja podwładna mogła uciec', nie 'moja sługa').
          * Kalka składniowa wykluczenia: stosuj czystą polszczyźnię: 'Nie ma litości dla niczego prócz X' lub 'Oszczędza wyłącznie X' (zamiast: 'dla wszystkiego poza X nie ma litości').
          * Łączenie idiomu ze sformułowaniem czasowym: 'W cztery oczy' oznacza rozmowę na osobności, a nie cezurę czasową. Stosuj: 'na osobności od czasów X' lub 'sam na sam od czasów X' (nie 'w cztery oczy od czasu X').
-         * ŚLEDZENIE PARTNERA DIALOGOWEGO (BRAK AUTO-ADRESACJI): Mówca nigdy nie zwraca się do siebie własnym imieniem! Przy adaptacji japońskich wołaczy ('Senpai', 'Sensei') w kwestiach jedno- i wieloliniowych, jeśli zwrot jest tłumaczony imieniem, należy bezwzględnie zidentyfikować partnera dialogowego (adresata), a NIE mówcę. W przypadku wątpliwości stosować formę bezimienną lub eliptyczną ('Prawda?', 'Słuchaj!', 'Nic ci nie jest?').
-         * ZDROBNIENIA SEIYŪ I SŁOWOTWÓRSTWO AFEKTYWNE ('-tan', '-taso', '-cchin'): w sekcji glossary oraz character_dossiers należy bezwzględnie powiązać hipokorystyki z pełnymi imionami kanonicznymi ('Kuroe', nie ucięte 'Kuro').
-         * KOREKTA POUFAŁOŚCI NA FORMĘ OFICJALNĄ ('[Nazwisko]-senpai'): Gdy postać wycofuje się z poufałego imienia do formy formalnej (np. 'Odpuść, Rinko' -> 'Nie ma mowy!' -> 'To znaczy... Akaishi-senpai'), w języku polskim należy bezwzględnie zastosować 'panno [Nazwisko]' (dla kobiety) lub 'panie [Nazwisko]' (dla mężczyzny), a NIE chłodne, obcesowe samo nazwisko bez tytułu ('To znaczy... panno Akaishi', nie: 'To znaczy... Akaishi').
+         * ŚLEDZENIE PARTNERA DIALOGOWEGO (BRAK AUTO-ADRESACJI): Mówca nigdy nie zwraca się do siebie własnym imieniem! Przy adaptacji japońskich wołaczy ('Senpai', 'Sensei') w kwestiach jedno- i wieloliniowych, jeśli zwrot jest tłumaczony imieniem, należy precyzyjnie zidentyfikować partnera dialogowego (adresata), a NIE mówcę. W przypadku wątpliwości stosować formę bezimienną lub eliptyczną ('Prawda?', 'Słuchaj!', 'Nic ci nie jest?').
+         * ZDROBNIENIA SEIYŪ I SŁOWOTWÓRSTWO AFEKTYWNE ('-tan', '-taso', '-cchin'): w sekcji glossary oraz character_dossiers należy powiązać hipokorystyki z pełnymi imionami kanonicznymi (pełne imię kanoniczne, nie ucięte zdrobnienie).
+         * KOREKTA POUFAŁOŚCI NA FORMĘ OFICJALNĄ ('[Nazwisko]-senpai'): Gdy postać wycofuje się z poufałego imienia do formy formalnej (np. 'Odpuść, Rinko' -> 'Nie ma mowy!' -> 'To znaczy... Akaishi-senpai'), w języku polskim należy zastosować 'panno [Nazwisko]' (dla kobiety) lub 'panie [Nazwisko]' (dla mężczyzny), a NIE chłodne, obcesowe samo nazwisko bez tytułu ('To znaczy... panno Akaishi', nie: 'To znaczy... Akaishi').
          * WOŁACZ PRZYDOMKÓW MEDIALNYCH I TYTUŁÓW: Gdy postacie zwracają się do bohatera jego oficjalnym przydomkiem (np. Arata jako 'Potworny Królewicz' w Otome Kaijuu Carameliser), zwrot bezpośredni w wołaczu musi brzmieć 'królewiczu!' lub 'Królewiczu!', a nie 'książę' (zgodnie z oficjalnym kanonem wydawnictwa papierowego Studio JG).
          * Gest podania rekwizytu z angielskim 'Here' -> 'Proszę' / 'Trzymaj' (zamiast dosłownego: 'Tutaj!').
  17. NATURALNA SKŁADNIA DEIKTYCZNO-TEMPORALNA I DEKOMPOZYCJA PRZYDAWKI CZASOWEJ (FILAR CLXVIII):
@@ -499,16 +500,16 @@ Twoim zadaniem jest dogłębna, wszechstronna analiza 100% skryptu całego odcin
       * Gdy matka w audio mówi 'Hikaru-chan', polskim ekwiwalentem jest 'Hikaru', 'Córeczko' lub 'Hikaruś' (zamiast: 'Hikarun, posłuchaj uważnie').
     - INHERENT GENDER & 1ST-PERSON MORPHOLOGY: Nazwy mówców ze stylami ASS (np. 'Girl\\Italic', 'Woman') to potwierdzone postacie żeńskie!
       * Dla mówczyń żeńskich konsekwentnie stosuj formy żeńskie czasowników 1. osoby czasu przeszłego: 'zraniłam', 'zrobiłam', 'byłam', 'powiedziałam' (nie formy męskie: 'zraniłem', 'zrobiłem', 'byłem').
-      * Dla mówców męskich (w tym młodych chłopców dubbingowanych przez żeńskie seiyū!) bezwzględnie stosuj formy męskie: 'zraniłem', 'zrobiłem', 'byłem', 'powiedziałem' (nie formy żeńskie: 'zraniłam', 'zrobiłam', 'byłam').
+      * Dla mówców męskich (w tym młodych chłopców dubbingowanych przez żeńskie seiyū!) stosuj formy męskie: 'zraniłem', 'zrobiłem', 'byłem', 'powiedziałem' (nie formy żeńskie: 'zraniłam', 'zrobiłam', 'byłam').
     - W mandatory_direction wymuś nadrzędność dramaturgii i japońskiego audio seiyū nad dosłownym skryptem angielskim.
  19. ODWRÓCENIE HIERARCHII ŹRÓDEŁ (INVERSION OF AUTHORITY / SEIYU VOICE SOVEREIGNTY), HARMONIZACJA AISATSU, APOZYCJA TYTULATURY PODMIOTU I AKTY MOWY SEIYŪ (FILAR CLXX):
     - INVERSION OF AUTHORITY (SEIYU VOICE SOVEREIGNTY): Głos seiyū jest PIERWOTNYM I NAJWYŻSZYM ŹRÓDŁEM PRAWDY (PIERWOTNE ŹRÓDŁO PRAWDY) semantycznej i emocjonalnej. Angielski skrypt fansubera jest jedynie wtórnym rusztowaniem czasowym! Opieraj się na głosie seiyū, unikając zamerykanizowanych parafraz fansubów, gdy stoją w sprzeczności ze słowami seiyū.
     - PRAGMATIC SPEECH ACT CATEGORIES (AKTY MOWY SEIYŪ):
-      * Akty Irytacji i Uciszania (urusai, urusai na, urusee, ussee, damare, shizuka ni): wyrażają poirytowanie gadaniem lub natręctwem rozmówcy! Unikaj dryfu semantycznego ku zażenowaniu/wstydowi i młodzieżowemu slangowi ('Ale żenada...', 'przypał', 'obciach'); stosuj naturalne polskie reakcje zniecierpliwienia: 'Ale marudzisz...', 'Daj mi spokój...', 'Nie truj...', 'Ale gadasz...', 'Ucisz się...'.
+      * Akty Irytacji i Uciszania (urusai, urusai na, urusee, ussee, damare, damatte): wyrażają poirytowanie gadaniem lub natręctwem rozmówcy; unikanie dryfu semantycznego ku zażenowaniu/wstydowi i młodzieżowemu slangowi ('Ale żenada...', 'przypał', 'obciach') na rzecz naturalnych polskich reakcji zniecierpliwienia: 'Ale marudzisz...', 'Daj mi spokój...', 'Nie truj...', 'Ale gadasz...', 'Ucisz się...'.
       * Akty Znużenia i Ciężaru (mendokusai, yare yare, shouganai): unikaj dosłownego bólu fizycznego ('co za ból') czy obojętności ('nie obchodzi mnie to') na rzecz 'Ale mi się nie chce...', 'Co za męczarnia...', 'Trudno...'.
       * Akty Dystansu i Emocjonalnego Odepchnięcia (betsuni, hitori ni shite): chłód i prośba o samotność ('Wcale nie', 'Zostaw mnie samą', unikaj 'To nic takiego').
     - DOMESTIC AISATSU ADJACENCY DIALOGUE: W formułach powitań domowych (Tadaima -> Okaeri) unikaj robotycznego echa czasownikowego ('Wróciłam.' -> 'Wróciłaś.'). Stosuj naturalne polskie powitanie domowników: 'Wróciłam!' -> 'Witaj w domu!' / 'O, już jesteś?' / 'Dobrze, że jesteś!'.
-    - TITLE NOMINATIVE APPOSITION & JAPANESE NAME CAPITALIZATION: Przy zestawieniu tytułu mistrzowskiego/zawodowego z imieniem i nazwiskiem w podmiocie zdania ('Mistrz', 'Pan', 'Profesor' + Nazwisko + Imię + Czasownik 3. os.), nazwisko ZAWSZE pozostaje w mianowniku: 'Mistrz Tonden Minoru nie zdążył' (nie: 'Mistrz Tondena minoru'). Każdy człon imienia i nazwiska bezwzględnie piszemy WIELKĄ LITERĄ ('Tonden Minoru', NIGDY małą 'minoru').
+    - TITLE NOMINATIVE APPOSITION & JAPANESE NAME CAPITALIZATION: Przy zestawieniu tytułu mistrzowskiego/zawodowego z imieniem i nazwiskiem w podmiocie zdania ('Mistrz', 'Pan', 'Profesor' + Nazwisko + Imię + Czasownik 3. os.), nazwisko ZAWSZE pozostaje w mianowniku: 'Mistrz Tonden Minoru nie zdążył' (nie: 'Mistrz Tondena minoru'). Każdy człon imienia i nazwiska standardowo piszemy WIELKĄ LITERĄ ('Tonden Minoru', NIGDY małą 'minoru').
     - W mandatory_direction wymuś nadrzędność dramaturgii i japońskiego audio seiyū nad dosłownym skryptem angielskim.
  20. INTEGRALNOŚĆ TOŻSAMOŚCI PODMIOTOWEJ MÓWCY, BYTÓW KOLEKTYWNYCH I PLURALIS MAIESTATIS (FILAR CLXXVI):
     - W character_dossiers dla każdej postaci określ speaker_entity_type:
@@ -523,12 +524,13 @@ Twoim zadaniem jest dogłębna, wszechstronna analiza 100% skryptu całego odcin
     - Pary Przylegania i Elipsy (Filar CLXXIX): W dialogach dynamicznych wyłapuj sztywne angielskie 'Yes, I did' / 'No, I wasn't' i nakazuj naturalną polską elipsę orzeczeniową ('Zrobiłem', 'Nie byłem') zamiast papierowego 'Tak, zrobiłem to'.
     - Wektory Deiktyczne Ruchu (Filar CLXXX): Przy japońskich okrzykach ruchu seiyū (iku / kuru / ima iku yo / iku zo) i angielskim 'I'm coming!' nakazuj 'Już idę!' / 'Zaraz będę!' / 'Ruszam!', zamiast sztucznego 'Już przychodzę!'.
     - Tłumienie Pleonazmów Zmysłowych (Filar CLXXXI): W scenach z wyraźnym sygnałem wizualnym i deskryptywnym angielskim skryptem ('Look at the rain pouring outside' -> 'Ale leje!') nakazuj zwięzłość AVT i likwidację pleonazmów ('spadać w dół', 'patrzeć na własne oczy', 'pada deszcz na zewnątrz').
-    - Pleonazmy Toponimiczne i Kategorialne (Filar CLXXXIV): Wyłapuj toponimy i nazwy dzieł, w których angielski skrypt lub słownik łączy deskryptor z nazwą ('province of Shimotsuke', 'chronicle of Taiheiki'). Bezwzględnie nakazuj unikanie dublowania deskryptorów w polszczyźnie ('z prowincji Shimotsuke', a nie dublowane 'z prowincji Prowincja Shimotsuke'; 'w Kronice Taiheiki', a nie 'w kronice Kronika Taiheiki').
-    - Rząd Pochodzenia Toponimów, Saksoński Dopełniacz i Syntagmy Reliktów (Filar CLXXXIV):
-      * Krainy i toponimy po przyimku 'z' określające pochodzenie ('from Hiden', 'Haiden's Book', 'knight from Boelate') bezwzględnie rządzą Dopełniaczem ('Księga Toaha z Hiden', 'z Boelate', 'z Eslinn', 'z Kanyou', 'z Ridill'), a KATEGORYCZNIE ODRZUCAJ Narzędnik towarzyszenia ('z Haidenem', 'z Boiratem').
-      * Angielski saksoński dopełniacz toponimów ('Haiden's Book of Toah', 'Solsein's students', 'Eslinn's knights') przekładaj jako dopełniacz pochodzenia ('Księga Toaha z Hiden', 'uczniowie z Solsein', 'rycerze z Eslinn'), kategorycznie odrzucając personifikację toponimów jako autorów lub towarzyszy!
-      * Złożone syntagmy reliktów i oręża ('Book of Toah', 'Sword of Elgar'): w języku polskim człon nadrzędny odmienia się swobodnie w zdaniu zależnym ('Szukam Księgi Toaha', 'z Księgą Toaha'), a przydawka imienna pozostaje bezwzględnie w dopełniaczu (eliminuj hiper-fleksję 'z Księgą Toahem'!).
-      * Wszelkie toponimy, krainy, miasta i artefakty oznaczaj z flagą is_character: false, mapując warianty fonetyczne fansubów na kanon (Haiden -> Hiden, Boirate -> Boelate, Esrin -> Eslinn).
+    - Pleonazmy Toponimiczne i Kategorialne (Filar CLXXXIV): Wyłapywanie toponimów i nazw dzieł, w których skrypt łączy deskryptor z nazwą ('province of Shimotsuke', 'chronicle of Taiheiki'); unikanie dublowania deskryptorów w polszczyźnie ('z prowincji Shimotsuke', a nie 'z prowincji Prowincja Shimotsuke'; 'w Kronice Taiheiki', a nie 'w kronice Kronika Taiheiki').
+    - Ontologiczna Kategoryzacja Bytów (ANTHROPONYM / TOPONYM / CHREMATONYM) i Syntagmy Przestrzenne (Filar CLXXXIV):
+      * Identyfikacja ontologiczna: klasyfikacja bytów na ANTHROPONYM (postacie osobowe), TOPONYM (krainy, miasta, prowincje, instytucje) oraz CHREMATONYM (artefakty, oręż, rekwizyty, księgi).
+      * Rząd pochodzenia toponimów: krainy i toponimy po przyimku 'z' określające pochodzenie ('from [Toponym]', 'knight from [Toponym]') regularnie rządzą dopełniaczem ('z krainy A', 'z krainy B'), z wykluczeniem fałszywego narzędnika towarzyszenia.
+      * Saksoński dopełniacz toponimów: konstrukcje dzierżawcze toponimów ('[Toponym]\'s students', '[Toponym]\'s knights') przekładane jako dopełniacz pochodzenia ('uczniowie z [Toponym]', 'rycerze z [Toponym]'), bez personifikacji toponimów jako autorów lub towarzyszy.
+      * Złożone syntagmy reliktów i oręża (CHREMATONYM, np. 'Sword of Justice'): w języku polskim człon nadrzędny odmienia się swobodnie w zdaniu zależnym, a przydawka imienna zachowuje stabilny dopełniacz (eliminacja hiperfleksji).
+      * Flagi ontologiczne: wszelkie toponimy, krainy, miasta i artefakty oznaczane z flagą is_character: false, z mapowaniem wariantów fonetycznych na kanon.
 
 METADANE Z BAZY ANILIST:
 {anime_metadata_str}
@@ -719,7 +721,7 @@ def resolve_profile_alerts_to_events(
                             best_idx = idx
 
             if best_idx is not None:
-                tag = f"[🚨 PUŁAPKA PROFILERA: {dl.contextual_trap} => DYREKTYWA: {dl.mandatory_direction}]"
+                tag = f"[TELEMETRIA: pułapka_profilera: {dl.contextual_trap} | dyrektywa: {dl.mandatory_direction}]"
                 if best_idx not in resolved_alerts:
                     resolved_alerts[best_idx] = []
                 if tag not in resolved_alerts[best_idx]:
@@ -1054,12 +1056,17 @@ def resolve_event_speaker_cascade(event: Any, prev_event: Optional[Any] = None, 
     # Krok A: event.name
     name = (getattr(event, "name", "") or "").strip()
     if name:
+        clean_name, _ = normalize_actor_tag(name)
+        if clean_name:
+            return clean_name
         return name
 
     # Krok B: event.style
     style = (getattr(event, "style", "") or "").strip()
     if style and style.lower() != "default":
         clean_style = re.sub(r"_(?:dialogue|speech|voice|line|text)$", "", style, flags=re.IGNORECASE).strip()
+        clean_style_name, _ = normalize_actor_tag(clean_style)
+        clean_style = clean_style_name or clean_style
         if clean_style and clean_style.lower() not in ("main", "italics", "flashback", "narration", "thoughts", "sign", "title", "top"):
             return clean_style
 
@@ -1090,6 +1097,73 @@ def resolve_event_speaker_cascade(event: Any, prev_event: Optional[Any] = None, 
                 return cand_name
 
     return None
+
+
+def verify_self_virility_morphology(text_or_lines: Union[str, List[Any]]) -> Tuple[bool, float, List[str]]:
+    r"""
+    Samoweryfikacja z polskiej i japońskiej morfologii własnej mówcy (Self-Virility Proof):
+    Jeśli postać w swoich własnych kwestiach używa form męskich 1. os. lp.
+    (-łem, -łbym, powinienem, stałem się) lub męskoosobowych 1. os. lm. (-liśmy, -libyśmy),
+    jej profil otrzymuje twardy wektor MALE (pewność 1.0, waga >= 10.0).
+    Zwraca krotkę: (has_proof: bool, virility_score: float, matched_forms: List[str]).
+    """
+    if not text_or_lines:
+        return False, 0.0, []
+
+    if isinstance(text_or_lines, str):
+        raw_text = text_or_lines
+    elif isinstance(text_or_lines, (list, tuple)):
+        collected = []
+        for item in text_or_lines:
+            if isinstance(item, str):
+                collected.append(item)
+            else:
+                txt = getattr(item, "text", "") or str(item)
+                collected.append(txt)
+        raw_text = " ".join(collected)
+    else:
+        raw_text = str(text_or_lines)
+
+    clean = re.sub(r"\{[^}]*\}", " ", raw_text)
+    clean = re.sub(r"\\[Nnh]+", " ", clean).strip()
+    if not clean:
+        return False, 0.0, []
+
+    matched = []
+
+    # 1. Twarde jednostki leksykalne 1. os. lp. męskiej
+    for m in re.finditer(r"\b(?:stałem\s+się|powinienem|chciałem|mogłem|wiedziałem|widziałem|byłem|miałem|czułem|bałem\s+się)\b", clean, re.IGNORECASE):
+        matched.append(m.group(0))
+
+    # 2. Formy warunkowe 1. os. lp. męskiej na -łbym
+    cond_1sg = re.findall(r"\b\w+łbym\b", clean, re.IGNORECASE)
+    if cond_1sg:
+        matched.extend(cond_1sg)
+
+    # 3. Formy oznajmujące 1. os. lp. męskiej na -łem (z wykluczeniem rzeczowników narzędnikowych)
+    NON_VERB_INSTRUMENTALS = {
+        "ciałem", "kołem", "strzałem", "działem", "szałem", "orłem", "królem",
+        "tytułem", "artykułem", "minerałem", "ideałem", "materiałem", "radykałem",
+        "postrzałem", "podziałem", "popiołem", "żywiołem", "aniołem", "diabłem"
+    }
+    past_1sg = re.findall(r"\b\w+(?:ałem|iłem|yłem|ełem|ołem|ułem|ąłem|edłem|głem|azłem)\b", clean, re.IGNORECASE)
+    for p in past_1sg:
+        if p.lower() not in NON_VERB_INSTRUMENTALS:
+            matched.append(p)
+
+    # 4. Formy męskoosobowe 1. os. lm. na -liśmy oraz -libyśmy
+    past_1pl_virile = re.findall(r"\b\w+(?:liśmy|libyśmy)\b", clean, re.IGNORECASE)
+    if past_1pl_virile:
+        matched.extend(past_1pl_virile)
+
+    # 5. Japońskie zaimki 1. osoby nacechowane męsko (yakuwarigo)
+    jp_male = re.findall(r"\b(?:ore|boku|sessha|washi|oira|wagahai)\b", clean, re.IGNORECASE)
+    if jp_male:
+        matched.extend(jp_male)
+
+    has_proof = len(matched) > 0
+    virility_score = float(len(matched) * 5.0) if has_proof else 0.0
+    return has_proof, virility_score, matched
 
 
 class SpaCyAnaphoraDiscourseAnalyzer:
@@ -1178,7 +1252,11 @@ class SpaCyAnaphoraDiscourseAnalyzer:
         if not raw:
             return None, 0.0
 
-        clean = normalize_ascii_diacritics(raw).lower()
+        clean_name, explicit_gender = normalize_actor_tag(raw)
+        if explicit_gender in ("MALE", "FEMALE"):
+            return explicit_gender, 10.0
+
+        clean = normalize_ascii_diacritics(clean_name or raw).lower()
         clean = re.sub(r"[^\w\s-]", "", clean).strip()
         tokens = [t.strip("-") for t in re.split(r"[\s_/-]+", clean) if t.strip("-")]
 
@@ -1213,6 +1291,23 @@ class SpaCyAnaphoraDiscourseAnalyzer:
                     if t.endswith(suf) and len(t) >= len(suf) + 2:
                         return "MALE", 5.0
 
+        # 3. Zachodnie imiona żeńskie na nieme -e po podwojonej spółgłosce i sufiksy romańsko-germańskie
+        # (-tte, -ette, -otte, -elle, -anne, -enne, -inne, -ine, -ise, -ice)
+        WESTERN_FEMALE_ENDINGS = (
+            "ette", "otte", "tte", "elle", "anne", "enne", "inne", "ine", "ise", "ice"
+        )
+        for t in tokens:
+            if len(t) >= 4:
+                for suf in WESTERN_FEMALE_ENDINGS:
+                    if t.endswith(suf) and len(t) >= len(suf) + 2:
+                        return "FEMALE", 5.0
+
+        # 4. Blokada domyślnej feminizacji dla imion na -i / -y:
+        # Krótkie lub obce imiona zakończone na samogłoskę -i lub -y nie otrzymują domyślnej płci FEMALE
+        for t in tokens:
+            if t.endswith(("i", "y")):
+                return None, 0.0
+
         return None, 0.0
 
     @classmethod
@@ -1220,7 +1315,7 @@ class SpaCyAnaphoraDiscourseAnalyzer:
         """
         Wykluczenie wołacza (Vocative Filter):
         Jeśli imię postaci występuje w strukturze z przecinkiem i zaimkiem 2. osoby
-        (np. 'Ray, you have to go', 'Look out, Ray!'), konstrukcja ta jest KATEGORYCZNIE WYKLUCZONA
+        (np. 'John, you have to go', 'Look out, John!'), konstrukcja ta jest wykluczona
         ze zliczania punktów w 3. osobie (to zwrot do adresata, a nie deklaracja podmiotu).
         """
         if not text or not character_name:
@@ -1590,12 +1685,40 @@ class SpaCyAnaphoraDiscourseAnalyzer:
         jp_gender = "MALE" if jp_score > 0 else ("FEMALE" if jp_score < 0 else None)
 
         name_target = title or character_name or ""
-        title_gender, title_weight = cls.classify_anthroponym_and_title(name_target)
+        clean_target_name, explicit_actor_gender = normalize_actor_tag(name_target)
+        title_gender, title_weight = cls.classify_anthroponym_and_title(clean_target_name or name_target)
+
+        # Filar 0: Samoweryfikacja z polskiej i japońskiej morfologii własnej mówcy (Self-Virility Proof)
+        self_text = (
+            kwargs.get("self_text")
+            or kwargs.get("speaker_lines")
+            or kwargs.get("dialogue")
+            or kwargs.get("text")
+            or kwargs.get("episode_dialogue")
+            or ""
+        )
+        has_self_virility, self_vir_score, self_vir_tokens = verify_self_virility_morphology(self_text)
+        if kwargs.get("self_virility_proof"):
+            has_self_virility = True
+            self_vir_score = max(10.0, self_vir_score)
 
         male_weight = 0.0
         female_weight = 0.0
         male_evidence_count = 0
         female_evidence_count = 0
+
+        # Filar 0: Self-Virility Proof
+        if has_self_virility:
+            male_weight += max(10.0, self_vir_score)
+            male_evidence_count += 2
+
+        # Jawny tag aktora: (M) / (F)
+        if explicit_actor_gender == "MALE":
+            male_weight += 10.0
+            male_evidence_count += 2
+        elif explicit_actor_gender == "FEMALE":
+            female_weight += 10.0
+            female_evidence_count += 2
 
         # Filar 1: Akustyka (asymetria fizjologiczna krtani)
         if f0_hard_masc:
@@ -1636,8 +1759,20 @@ class SpaCyAnaphoraDiscourseAnalyzer:
         archetype = "SPARSE_AMBI_BACKGROUND"
         is_transient = False
 
+        # 0. Jawny znacznik aktora (MALE / FEMALE)
+        if explicit_actor_gender in ("MALE", "FEMALE"):
+            resolved_gender = explicit_actor_gender
+            confidence = 1.0
+            archetype = "EXPLICIT_ACTOR_TAG"
+
+        # 0b. Samoweryfikacja z polskiej i japońskiej morfologii własnej mówcy (Self-Virility Proof)
+        elif has_self_virility:
+            resolved_gender = "MALE"
+            confidence = 1.0
+            archetype = "SELF_VIRILITY_PROOF"
+
         # 4. F0 Hard Masculine Veto (F0 <= 135 Hz)
-        if f0_hard_masc:
+        elif f0_hard_masc:
             if en_score <= -8:
                 resolved_gender = "FEMALE"
                 confidence = 0.85
@@ -1716,6 +1851,24 @@ class SpaCyAnaphoraDiscourseAnalyzer:
             archetype = "SPARSE_AMBI_BACKGROUND"
             is_transient = True
 
+        # Blokada domyślnej feminizacji imion na -i / -y:
+        # Krótkie lub obce imiona zakończone na samogłoskę -i lub -y nie mogą otrzymywać
+        # domyślnej płci FEMALE bez potwierdzenia w zaimkach anaforycznych (she/her)
+        # lub japońskich (atashi/ojo-sama).
+        clean_target_lower = (clean_target_name or name_target).lower().strip()
+        ends_with_i_or_y = clean_target_lower.endswith(("i", "y"))
+        has_female_confirmation = (
+            en_score < 0
+            or jp_gender == "FEMALE"
+            or explicit_actor_gender == "FEMALE"
+            or (title_gender == "FEMALE" and title_weight >= 5.0)
+        )
+        if ends_with_i_or_y and resolved_gender == "FEMALE" and not has_female_confirmation:
+            resolved_gender = "NEUTRAL"
+            confidence = 0.50
+            archetype = "SPARSE_AMBI_BACKGROUND"
+            is_transient = True
+
         # Directional Consensus Purity i Epistemiczna Pokora
         if resolved_gender in ("MALE", "FEMALE"):
             winning_evidence = male_evidence_count if resolved_gender == "MALE" else female_evidence_count
@@ -1738,6 +1891,7 @@ class SpaCyAnaphoraDiscourseAnalyzer:
             "purity": round(float(purity), 3),
             "male_weight": float(male_weight),
             "female_weight": float(female_weight),
+            "self_virility_proof": has_self_virility,
         }
         if is_transient or archetype == "SPARSE_AMBI_BACKGROUND":
             result["is_transient"] = True
@@ -1778,6 +1932,76 @@ def score_japanese_pronoun(pronoun: Optional[str] = None, text: Optional[str] = 
     return SpaCyAnaphoraDiscourseAnalyzer.score_japanese_pronoun(pronoun=pronoun, text=text)
 
 
+def classify_anthroponym_and_title(name_or_title: Optional[str] = None) -> Tuple[Optional[str], float]:
+    """
+    Modułowa funkcja klasyfikacji antroponimów i tytułów (deleguje do SpaCyAnaphoraDiscourseAnalyzer).
+    """
+    return SpaCyAnaphoraDiscourseAnalyzer.classify_anthroponym_and_title(name_or_title)
+
+
+def profile_character(
+    raw_name: str,
+    dialogue: Optional[Any] = None,
+    f0_hz: Optional[float] = None,
+    jp_pronoun: Optional[str] = None,
+    en_score: int = 0,
+    median_f0: Optional[float] = None,
+    **kwargs
+) -> Dict[str, Any]:
+    """
+    Profiluje postać na podstawie nazwy, etykiety aktora, dialogów i triangulacji epistemicznej:
+    1. Normalizuje etykietę aktora i ekstrahuje jawny znacznik płci (normalize_actor_tag).
+    2. Weryfikuje samoweryfikację morfosyntaktyczną mówcy (Self-Virility Proof z -łem/-łbym/-liśmy).
+    3. Klasyfikuje antroponim i tytulaturę (classify_anthroponym_and_title).
+    4. Przeprowadza pełną triangulację epistemiczną płci (triangulate_epistemic_gender).
+    """
+    clean_name, explicit_gender = normalize_actor_tag(raw_name)
+    is_valid_anthroponym = is_valid_anthroponymic_phonotactics(clean_name or raw_name)
+
+    has_self_vir, vir_score, vir_tokens = verify_self_virility_morphology(dialogue)
+    onomastic_gender, onomastic_weight = classify_anthroponym_and_title(clean_name or raw_name)
+
+    triang_res = triangulate_epistemic_gender(
+        f0_hz=f0_hz,
+        jp_pronoun=jp_pronoun,
+        en_score=en_score,
+        median_f0=median_f0,
+        character_name=clean_name,
+        self_text=dialogue,
+        self_virility_proof=has_self_vir,
+        **kwargs
+    )
+
+    resolved_gender = triang_res.get("resolved_gender", "UNKNOWN")
+    if explicit_gender in ("MALE", "FEMALE"):
+        resolved_gender = explicit_gender
+        triang_res["resolved_gender"] = explicit_gender
+        triang_res["confidence"] = 1.0
+        triang_res["archetype"] = "EXPLICIT_ACTOR_TAG"
+    elif has_self_vir:
+        resolved_gender = "MALE"
+        triang_res["resolved_gender"] = "MALE"
+        triang_res["confidence"] = 1.0
+        triang_res["archetype"] = "SELF_VIRILITY_PROOF"
+
+    return {
+        "raw_name": raw_name,
+        "clean_name": clean_name,
+        "gender": resolved_gender,
+        "inferred_gender": resolved_gender,
+        "confidence": float(triang_res.get("confidence", 0.0)),
+        "archetype": triang_res.get("archetype", "UNKNOWN"),
+        "is_valid_anthroponym": is_valid_anthroponym,
+        "self_virility_proof": has_self_vir,
+        "explicit_gender": explicit_gender,
+        "onomastic_gender": onomastic_gender,
+        "onomastic_weight": onomastic_weight,
+        "triangulation": triang_res,
+        "prevent_female_bias": (resolved_gender == "MALE"),
+        "prevent_default_feminization": (resolved_gender == "MALE"),
+    }
+
+
 def resolve_relational_actor_gender(
     actor_name: str,
     episode_dialogue: Optional[Any] = None,
@@ -1806,7 +2030,21 @@ def resolve_relational_actor_gender(
             "prevent_default_feminization": False,
         }
 
-    cleaned_name = normalize_ascii_diacritics(actor_name).strip()
+    clean_name, explicit_gender = normalize_actor_tag(actor_name)
+    cleaned_name = normalize_ascii_diacritics(clean_name or actor_name).strip()
+    if explicit_gender in ("MALE", "FEMALE"):
+        return {
+            "gender": explicit_gender,
+            "inferred_gender": explicit_gender,
+            "confidence": 1.0,
+            "owner": cleaned_name,
+            "base_name": cleaned_name,
+            "relation": "explicit_actor_tag",
+            "relation_type": "explicit_actor_tag",
+            "prevent_female_bias": (explicit_gender == "MALE"),
+            "prevent_default_feminization": (explicit_gender == "MALE"),
+        }
+
     if not is_flashback and any(fb in cleaned_name.lower() for fb in ("flashback", "retrospekcja", "past")):
         is_flashback = True
 
@@ -1816,18 +2054,19 @@ def resolve_relational_actor_gender(
         re.IGNORECASE
     )
     if not rel_m:
-        t_gender, t_w = SpaCyAnaphoraDiscourseAnalyzer.classify_anthroponym_and_title(cleaned_name)
+        prof = profile_character(actor_name, dialogue=episode_dialogue, is_flashback=is_flashback)
+        t_gender = prof.get("gender")
         if t_gender in ("MALE", "FEMALE"):
             return {
                 "gender": t_gender,
                 "inferred_gender": t_gender,
-                "confidence": 0.90,
+                "confidence": prof.get("confidence", 0.90),
                 "owner": cleaned_name,
                 "base_name": cleaned_name,
                 "relation": "title_or_onomastic",
                 "relation_type": "title_or_onomastic",
-                "prevent_female_bias": (t_gender == "MALE"),
-                "prevent_default_feminization": (t_gender == "MALE"),
+                "prevent_female_bias": (t_gender == "MALE") or cleaned_name.lower().endswith(("i", "y")),
+                "prevent_default_feminization": (t_gender == "MALE") or cleaned_name.lower().endswith(("i", "y")),
             }
         return {
             "gender": "UNKNOWN",
@@ -1837,8 +2076,8 @@ def resolve_relational_actor_gender(
             "base_name": cleaned_name,
             "relation": "",
             "relation_type": "",
-            "prevent_female_bias": False,
-            "prevent_default_feminization": False,
+            "prevent_female_bias": cleaned_name.lower().endswith(("i", "y")),
+            "prevent_default_feminization": cleaned_name.lower().endswith(("i", "y")),
         }
 
     owner = rel_m.group(1).strip()
@@ -1874,6 +2113,21 @@ def resolve_relational_actor_gender(
 
     # Neutral relation (Kid, Child, Apprentice, Student, Subordinate)
     if episode_dialogue is not None:
+        has_sv, sv_score, _ = verify_self_virility_morphology(episode_dialogue)
+        if has_sv:
+            return {
+                "gender": "MALE",
+                "inferred_gender": "MALE",
+                "confidence": 1.0,
+                "owner": owner,
+                "base_name": owner,
+                "relation": rel,
+                "relation_type": rel,
+                "prevent_female_bias": True,
+                "prevent_default_feminization": True,
+                "self_virility_proof": True,
+            }
+
         if isinstance(episode_dialogue, str):
             d_text = episode_dialogue
         elif isinstance(episode_dialogue, list):

@@ -9,7 +9,7 @@ import urllib.request
 import urllib.parse
 import unicodedata
 from pathlib import Path
-from typing import Optional, Dict, Any, List, Union
+from typing import Optional, Dict, Any, List, Union, Tuple
 
 _ANILIST_DISABLED: bool = False
 
@@ -27,6 +27,46 @@ def normalize_ascii_diacritics(text: str) -> str:
 normalize_diacritics = normalize_ascii_diacritics
 
 
+def normalize_actor_tag(raw_name: str, strip_diacritics: bool = False) -> Tuple[str, Optional[str]]:
+    r"""
+    Normalizuje etykietę aktora / postaci oraz ekstrahuje jawny znacznik płci z nawiasów:
+    a) Wykrywa jawny znacznik płci w nawiasie okrągłym, kwadratowym, klamrowym lub CJK po normalizacji diakrytycznej
+       (normalize_ascii_diacritics):
+       [\(\[\{（【［〔]\s*(M|Male|Mężczyzna|F|Female|K|Kobieta)\s*[\)\]\}）】］〕].
+       Jeśli wykryto M/Male/Mężczyzna -> gender = "MALE".
+       Jeśli wykryto F/Female/K/Kobieta -> gender = "FEMALE".
+       W przeciwnym razie gender = None.
+    b) Usuwa z nazwy aktora wszelkie adnotacje techniczne i sufiksy w nawiasach:
+       r"\s*[\(\[\{（【［〔].*?[\)\]\}）】］〕]"
+       oraz czyści znaki cudzysłowów, nawiasów i wielokrotne spacje.
+    c) Opcjonalnie (strip_diacritics=True) składa znaki diakrytyczne (normalize_ascii_diacritics).
+    """
+    if not raw_name or not isinstance(raw_name, str):
+        return "", None
+
+    gender: Optional[str] = None
+    raw_ascii = normalize_ascii_diacritics(raw_name)
+    gender_match = re.search(
+        r"[\(\[\{（【［〔]\s*(m|male|mezczyzna|mezczyzn|f|female|k|kobieta|kobiet)\s*(?:[,;/\|].*?)?[\)\]\}）】］〕]",
+        raw_ascii,
+        flags=re.IGNORECASE
+    )
+    if gender_match:
+        tag_val = gender_match.group(1).strip().lower()
+        if tag_val in ("m", "male", "mezczyzna", "mezczyzn"):
+            gender = "MALE"
+        elif tag_val in ("f", "female", "k", "kobieta", "kobiet"):
+            gender = "FEMALE"
+
+    clean_name = re.sub(r"\s*[\(\[\{（【［〔].*?[\)\]\}）】］〕]", "", raw_name).strip()
+    clean_name = re.sub(r"[\(\[\{（【［〔].*?[\)\]\}）】］〕]", "", clean_name).strip()
+    clean_name = re.sub(r"[\(\[\{（【［〔].*$", "", clean_name).strip()
+    clean_name = re.sub(r"\s+", " ", clean_name).strip(" \"'„”«»")
+    if strip_diacritics:
+        clean_name = normalize_ascii_diacritics(clean_name).strip()
+    return clean_name, gender
+
+
 def compare_character_names(name1: str, name2: str) -> bool:
     """
     Porównuje imiona postaci z odpornością na znaki diakrytyczne (Unicode NFKD ASCII-folding)
@@ -34,8 +74,10 @@ def compare_character_names(name1: str, name2: str) -> bool:
     """
     if not name1 or not name2:
         return False
-    norm1 = normalize_ascii_diacritics(name1).strip().lower()
-    norm2 = normalize_ascii_diacritics(name2).strip().lower()
+    clean1_raw, _ = normalize_actor_tag(name1)
+    clean2_raw, _ = normalize_actor_tag(name2)
+    norm1 = normalize_ascii_diacritics(clean1_raw or name1).strip().lower()
+    norm2 = normalize_ascii_diacritics(clean2_raw or name2).strip().lower()
     if norm1 == norm2:
         return True
     clean1 = re.sub(r"[^\w\s]", "", norm1).strip()
@@ -55,6 +97,9 @@ def match_character_in_metadata(
     if not character_name or not meta_or_characters:
         return None
 
+    clean_target, explicit_gender = normalize_actor_tag(character_name)
+    target_name = clean_target or character_name
+
     characters_list: List[Dict[str, Any]] = []
     if isinstance(meta_or_characters, dict):
         characters_list = meta_or_characters.get("characters", [])
@@ -66,20 +111,24 @@ def match_character_in_metadata(
 
     # 1. Dokładne dopasowanie po znormalizowanych diakrytykach
     for c in characters_list:
-        c_name = c.get("name") or ""
-        if compare_character_names(character_name, c_name):
+        raw_c_name = c.get("name") or ""
+        clean_c_name, _ = normalize_actor_tag(raw_c_name)
+        c_name = clean_c_name or raw_c_name
+        if compare_character_names(target_name, c_name):
             return c
         c_native = c.get("native_name") or ""
-        if c_native and character_name.strip() == c_native.strip():
+        if c_native and target_name.strip() == c_native.strip():
             return c
 
     # 2. Dopasowanie tokenowe (imię / nazwisko) po znormalizowanych diakrytykach
-    target_folded = normalize_ascii_diacritics(character_name).strip().lower()
+    target_folded = normalize_ascii_diacritics(target_name).strip().lower()
     target_tokens = set(re.findall(r"\b\w+\b", target_folded))
     sig_target = {t for t in target_tokens if len(t) >= 3}
 
     for c in characters_list:
-        c_name = c.get("name") or ""
+        raw_c_name = c.get("name") or ""
+        clean_c_name, _ = normalize_actor_tag(raw_c_name)
+        c_name = clean_c_name or raw_c_name
         c_folded = normalize_ascii_diacritics(c_name).strip().lower()
         c_tokens = set(re.findall(r"\b\w+\b", c_folded))
         sig_c = {t for t in c_tokens if len(t) >= 3}
@@ -482,12 +531,17 @@ def get_anime_context(filename_or_path: str, client: Any = None) -> Optional[Dic
             for c_name, c_val in bible_chars.items():
                 if "->" in c_name:
                     continue
-                if match_character_in_metadata(c_name, characters_list):
+                clean_c, explicit_g = normalize_actor_tag(c_name)
+                c_norm = clean_c or c_name
+                if match_character_in_metadata(c_norm, characters_list):
                     continue
                 c_desc = c_val.get("description", "") if isinstance(c_val, dict) else str(c_val)
-                gender_str = "kobieta" if any(w in c_desc.lower() for w in ["kobieta", "female", "dziewczyna"]) else "mężczyzna"
+                if explicit_g:
+                    gender_str = "kobieta" if explicit_g == "FEMALE" else "mężczyzna"
+                else:
+                    gender_str = "kobieta" if any(w in c_desc.lower() for w in ["kobieta", "female", "dziewczyna"]) else "mężczyzna"
                 characters_list.append({
-                    "name": c_name,
+                    "name": c_norm,
                     "gender": gender_str,
                     "gender_raw": "FEMALE" if gender_str == "kobieta" else "MALE",
                     "role": "Główny bohater" if any(w in c_desc.lower() for w in ["główny", "protagoni"]) else "Postać"
@@ -534,7 +588,7 @@ def format_anime_context_for_prompt(meta: Dict[str, Any]) -> str:
 
     if meta.get("detected_domains"):
         lines.append(f"[Dziedzina specjalistyczna / Tematyka]: {', '.join(meta['detected_domains'])}")
-        lines.append("(!) WYTYCZNA BRANŻOWA (FILAR XVI): Bezwzględny nakaz stosowania oficjalnej, profesjonalnej polskiej terminologii branżowej (np. w winie: 'szczep', 'rocznik', 'apelacja', 'taniny', 'kupaż', 'ciało wina'). ZAKAZ amatorskich kalek!")
+        lines.append("[Założenia domeny tematycznej]: Oficjalna polska terminologia branżowa i specjalistyczne słownictwo dziedzinowe zgodne z realiami świata serii.")
 
     if meta.get("description"):
         desc = meta["description"]
@@ -549,7 +603,7 @@ def format_anime_context_for_prompt(meta: Dict[str, Any]) -> str:
     )
     if is_historical:
         lines.append("(!) WYTYCZNA STYLIZACJI: Seria osadzona w realiach dawnych/historycznych!")
-        lines.append("   - Kategoryczny ZAKAZ współczesnego slangu młodzieżowego ('spoko', 'masakra', 'wkręcasz mnie').")
+        lines.append("   - Eliminacja współczesnego slangu młodzieżowego ('spoko', 'masakra', 'wkręcasz mnie').")
         lines.append("   - Stosuj szlachetny, epokowy rejestr języka polskiego, dopasowany do hierarchii społecznej i kultury tamtych czasów.")
 
     if meta.get("characters"):

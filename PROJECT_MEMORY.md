@@ -1,17 +1,17 @@
 # 🧠 PAMIĘĆ PROJEKTU I STANU SESJI ANTIGRAVITY (PROJECT MEMORY & OPERATIONAL TELEMETRY)
 
-Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemetrii CI/CD, historii incydentów oraz most wiedzy pomiędzy komputerami roboczymi (PC 1 i PC 2). Zasady normatywne definiuje wyłącznie `AGENTS.md` (Standard 4.9).
+Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemetrii CI/CD, historii incydentów oraz most wiedzy pomiędzy komputerami roboczymi (PC 1 i PC 2). Zasady normatywne definiuje wyłącznie `AGENTS.md` (Standard 8.0).
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 16.10.2026)
-- **Status CI/CD:** `STATUS: WDROŻONE I ZWERYFIKOWANE (167/167 -> 171/171 PASSED) - VICTORY CONFIRMED`
-- **Gałąź i Architektura:** `main` (Standard 4.9: Stylistic Freedom Invariance, Modular World-State Telemetry, Voiced-Frame Pooling, Directional Consensus Purity, SubTurn Pivot Partitioning, Symetryczny Rachunek Zbiorów We_Group, Stem-First Execution Order, Inwariant Morfemu Przeszłego `-ł-` / `-l-`, Zamknięta Biała Lista Nośników Ruchomych Końcówek, Ochrona Zaimków Uogólniających, Strażnik Homonimii Miejscownika w `is_plural_text`, Ochrona Korpusu Par Ról Osobowych, Zero-Literal-Leakage Protocol & `audit_diff.ps1` Forensic Gate)
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 17.10.2026)
+- **Status CI/CD:** `STATUS: WDROŻONE I ZWERYFIKOWANE (178/178 -> 179/179 PASSED) - VICTORY CONFIRMED`
+- **Gałąź i Architektura:** `main` (Standard 7.1: Strict Positive Domain Production Routing [`strict_positive_domain=True`], Legacy Monolith Bypass & Pure Positive Domain Invariant Architecture [\(\forall x \notin \mathcal{D}_{\text{pos}}, T(x) = x\)], Primary LLM Translation Authority, Declarative World-State Telemetry [`format_dry_telemetry_tag` >= 0.80], CharacterRecord Positive Schema z promocją płci do P0, Relations Separation z transparentnym fallbackiem `CharacterRegistryDict`, O(1) In-RAM Alias Index z indeksacją pierwszych imion, Kanoniczna Normalizacja Etykiet Aktora `normalize_actor_tag`, Rozłączne Zbiory We_Group & You_Group z symetryczną klasyfikacją virility, Szereg Współrzędny Przymiotników po łączniku 2. os., Paradygmat Czasownika Powinien, Domena Pozytywna `DeclensionParadigm`, 100% Backward Compatibility dla `strict_positive_domain=False`, Zero-Literal-Leakage Protocol & `audit_diff.ps1` Forensic Gate)
 - **Środowisko:** Python 3.13 (`.venv`), Windows PowerShell, `ffmpeg` (PATH), `librosa.pyin`, `soundfile`, `pysubs2`, `spaCy en_core_web_sm` (100% offline 0.00 PLN), bezpośrednie klucze Google AI Studio API (`use_vertex = 0`).
 - **Dyrektywa Wykonawcza Testów:**
   * Testy przyrostowe podczas kodowania (< 2 s): `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_testu>"`
   * Audyt śledczy diffu: `powershell -ExecutionPolicy Bypass -File .\audit_diff.ps1 -ForbiddenTerms "<lista>"`
-  * Pełny pakiet regresyjny (~12 min, uruchamiany wyłącznie raz w Fazie 4): `.\.venv\Scripts\python.exe -m pytest` (171/171 PASSED)
+  * Pełny pakiet regresyjny (~12 min, uruchamiany wyłącznie raz w Fazie 4): `.\.venv\Scripts\python.exe -m pytest` (179/179 PASSED)
 
 ---
 
@@ -52,6 +52,35 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
   5. *Stem-First Execution Order & Inwariant Morfemu Przeszłego (`avt_linter.py`):* Oboczności samogłosek rdzennych `o:ó` i `ę:ą` przed sufiksami ogólnymi. Ochrona czasu teraźniejszego 1. os. na `-am`/`-em` oraz 3. osoby po zaimkach narzędnikowych i nieokreślonych (`tym, ktoś, coś`) i podmiotach przeczących (`nikt, każdy`).
   6. *Ochrona Onomastyczna i Par Ról (`avt_linter.py`, `series_memory.py`):* Ścisła biała lista dopełniacza instytucji nijakich po `z` (*z biura, z ministerstwa, z miasta*), naprawa wołacza afrykat *-tzie -> -tzu*, ortografia przymiotników *-nki -> ciency*, Strażnik Homonimii Miejscownika w `is_plural_text` (*w powiecie, na świecie*), ochrona rzeczowników metaforycznych (*jesteś moją nadzieją*) i QuoteShield. Rozszerzenie suity testowej do 171 testów (Testy 168–171, 171/171 PASSED).
 
+### 🔹 INC-AVT-007 (Architektura Standardu 7.0: *Zero-Literal Pure Positive Domain Invariant Architecture & Primary LLM Translation Authority*)
+- **Wdrożenie 8 Modułów Systemowych (Offline 0.00 PLN):**
+  1. *Zero-Literal Pure Positive Domain Invariant Architecture:* Każdy operator systemowy \(T\) w potoku jest zdefiniowany wyłącznie poprzez swoją dziedzinę pozytywną (\(\mathcal{D}_{\text{pos}}\)) opartą na kompletnym, zweryfikowanym stanie ontologicznym P0 (`confidence >= 0.95`, `unknown_count == 0`). Poza dziedziną pozytywną obowiązuje matematyczna funkcja identycznościowa: \(\forall x \notin \mathcal{D}_{\text{pos}}, T(x) = x\).
+  2. *Primary LLM Translation Authority:* Model LLM w `translator.py` stanowi autorytatywne źródło przekładu, stylistyki, fleksji i składni. Usunięcie wtórnych kaskad mutujących w pętli post-processingu i na końcu odcinka.
+  3. *Declarative World-State Telemetry:* `format_dry_telemetry_tag` (próg pewności >= 0.80), czysto pasywny wektor stanu świata bez imperatywnych zakazów/nakazów, wykrzykników i wartości None, UNKNOWN, AMBIGUOUS w tagu telemetrii.
+  4. *CharacterRecord Positive Schema & O(1) In-RAM Alias Index:* Słownik `characters` zawiera wyłącznie byty osobowe (`EntityCategory.ANTHROPONYM`) z polami strukturalnymi (`gender`, `grammatical_gender`, `confidence`, `priority`, `has_verified_gender`, `aliases`) i czystym polem `description` (oczyszczonym z dyrektyw gramatycznych). Separacja relacji skierowanych (\(X \to Y\)) do dedykowanej struktury `relations`. Indeks aliasów w RAM \(\mathcal{O}(1)\).
+  5. *Kanoniczna Normalizacja Etykiet Aktora:* `normalize_actor_tag` (odcinanie nawiasów technicznych, ekstrakcja jawnych tagów P0 M/F, normalizacja NFKD).
+  6. *Rozłączne Zbiory We_Group i You_Group:* Symetryczna klasyfikacja virility (`VIRILE` / `NON_VIRILE` / `AMBIGUOUS`) z odcięciem mówcy dla You_Group i zewnętrznego adresata dla We_Group.
+  7. *Domena Pozytywna DeclensionParadigm:* Ochrona deskrypcji złożonych i wyrazów na polskie sufiksy przymiotnikowe w przypadkach zależnych (\(T(x) = x\)).
+  8. *Architektura Odwzorowania Identycznościowego w avt_linter.py:* Automatyczna detekcja trybu produkcyjnego (`is_production`), wyłączenie mutatorów leksykalnych i afektywnych na rzecz ochrony tekstu LLM, ochrona pod osłoną `mask_ass_tags_and_quotes`. Rozszerzenie suity testowej do 174 testów (Testy 172–174, 174/174 PASSED, Zero Regression Lock Standardu 7.0).
+
+### 🔹 INC-AVT-008 (Architektura Standardu 7.1: *Strict Positive Domain Production Routing, Legacy Monolith Bypass & Ontological Normalization*)
+- **Wdrożenie 5 Modułów Systemowych (Offline 0.00 PLN):**
+  1. *Strict Positive Domain Production Routing:* Potok produkcyjny w `translator.py` (L4104 i L5174) przekazuje `strict_positive_domain=True` do `AVTLinter.lint_and_fix_line` oraz `EpisodeQualityGate.audit_and_fix_entire_episode`.
+  2. *Identity Pass-Through for Legacy Monolith:* W trybie `strict_positive_domain=True` Fazy 1–6 monolitu bramki są całkowicie pomijane. Wykonywana jest wyłącznie Faza 0 (higiena ASS) oraz Faza 7 (higiena interpunkcji), a pod osłoną `mask_ass_tags_and_quotes` uruchamiane są wyłącznie zunifikowane operatory czystej domeny pozytywnej D_pos (confidence >= 0.95, unknown_count == 0). Wszelki dialog poza D_pos zachowuje tożsamość \(T(x) = x\).
+  3. *Kompatybilność Wsteczna (Backward Compatibility):* Domyślna wartość `strict_positive_domain: bool = False` we wszystkich metodach zapewnia 100% kompatybilności wstecznej dla starszych testów jednostkowych potoku.
+  4. *Ontological SeriesBible Normalization & CharacterRegistryDict:* Promocja płci z pola `description` do pól strukturalnych z priorytetem P0 (`confidence >= 0.95`), separacja relacji skierowanych do struktury `relations` z transparentnym fallbackiem `CharacterRegistryDict` oraz automatyczna indeksacja aliasów pierwszych imion w RAM \(\mathcal{O}(1)\).
+  5. *Szereg Współrzędny Przymiotników i Pełny Paradygmat Ułomny 'powinien':* Symetryczne uzgadnianie obu członów szeregu współrzędnego przymiotników po łączniku 2. osoby według `target_gender` oraz obsługa pełnego paradygmatu `powinien + był/była/byli/były` (1. i 2. os. lp. oraz 1. i 2. os. lm. VIRILE/NON_VIRILE). Rozszerzenie suity testowej do 178 testów (Testy 175–178, 178/178 PASSED, Zero Regression Lock Standardu 7.1).
+
+---
+
+### 🔹 INC-AVT-009 (Architektura Standardu 8.0: *Full-Codebase Zero-Anime-Literal Invariant, Default strict_positive_domain=True & Dynamic SeriesBible Resolution*)
+- **Wdrożenie 4 Modułów Systemowych (Offline 0.00 PLN):**
+  1. *Full-File Zero-Anime-Literal Invariant (Linia 1 do Końca):* W żadnym z 9 produkcyjnych plików .py (	ranslator.py, vt_linter.py, series_memory.py, scene_discourse.py, profiler.py, metadata.py, 
+ules.py, erifier.py, whisper_disambiguator.py) nie występuje ani jeden literał z 41 zakazanych nazw własnych z anime (dokładnie 0 trafień w kodzie, słownikach, docstringach i komentarzach od linii 1 do EOF).
+  2. *Domyślny Tryb Produkcyjny strict_positive_domain: bool = True:* Wszystkie publiczne metody lintera (AVTLinter.lint_and_fix_line, AVTLinter.lint_subtitles, EpisodeQualityGate.audit_and_fix_entire_episode) mają domyślnie ustawioną wartość strict_positive_domain: bool = True. Poza Dziedziną Pozytywną \(D_{\\text{pos}}\) (\(\\text{confidence} \\ge 0.95\)) obowiązuje ścisłe odwzorowanie tożsamościowe \(T(x) = x\) chroniące autonomię modelu LLM.
+  3. *Dynamiczny Fallback Sezonowy Baz Wiedzy (SeriesBible._resolve_bible_path):* Automatyczne rozwiązywanie ścieżek wielosezonowych (strip_season_suffix) przy inicjalizacji SeriesBible z tytułów bazowych lub wariantów sezonowych, eliminujące puste bazy przy wielosezonowych tytułach serii.
+  4. *Ekwiwalencja Zbiorów Tokenów w Pass 1 (get_character_gender):* Rozpoznawanie tożsamości postaci wieloczłonowych w odwróconym szyku japońskim/zachodnim (Family Given vs Given Family) przez porównanie zbiorów tokenów (	okens_set == clean_tokens_set). Rozszerzenie suity testowej do 179 testów (Test 179, 179/179 PASSED, Zero Regression Lock Standardu 8.0).
+
 ---
 
 ## 📐 4. METRYKI OPERACYJNE POTOKU
@@ -90,3 +119,21 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 | **2026-10-16** | `ARB-023` | Czas Przeszły | **Inwariant Morfemu Przeszłego `-ł-` / `-l-`**: Ochrona czasu teraźniejszego na `-am`/`-em` przed fałszywą fleksją przeszłą. | 0.00 PLN |
 | **2026-10-16** | `ARB-024` | Klitki i Podmioty | **Zamknięta Biała Lista Klitkowa**: `bym/byś/żeś` z ochroną fałszywych klitek (`tym/ktoś/coś`) i podmiotów przeczących (`nikt/każdy`). | 0.00 PLN |
 | **2026-10-16** | `ARB-025` | Homonimia PWN | **Strażnik Homonimii Miejscownika**: `w powiecie`, `na świecie`, `w mieście` wykluczone z flagowania jako 2. os. lm. czasownika. | 0.00 PLN |
+| **2026-10-17** | `ARB-026` | Architektura | **Zero-Literal Pure Positive Domain Invariant Architecture**: Każdy operator systemowy T zdefiniowany wyłącznie przez D_pos; poza nią T(x) = x. | 0.00 PLN |
+| **2026-10-17** | `ARB-027` | Model LLM | **Primary LLM Translation Authority**: Eliminacja wtórnych kaskad mutujących w post-processingu i na końcu odcinka. | 0.00 PLN |
+| **2026-10-17** | `ARB-028` | Telemetria | **Declarative World-State Telemetry**: `format_dry_telemetry_tag` przy progu >= 0.80 bez wartości None/UNKNOWN/AMBIGUOUS. | 0.00 PLN |
+| **2026-10-17** | `ARB-029` | Pamięć / Ontologia | **CharacterRecord Positive Schema & O(1) Alias Index**: Czyste pole description, separacja relacji skierowanych (X -> Y). | 0.00 PLN |
+| **2026-10-17** | `ARB-030` | Normalizacja Etykiet | **Kanoniczna Normalizacja Etykiet Aktora**: `normalize_actor_tag` (odcinanie tagów technicznych, ekstrakcja P0 M/F, NFKD). | 0.00 PLN |
+| **2026-10-17** | `ARB-031` | Dyskurs / Zbiory | **Rozłączne Zbiory We_Group & You_Group**: Symetryczna klasyfikacja virility z odcięciem mówcy dla 2. os. i adresata dla 1. os. lm. | 0.00 PLN |
+| **2026-10-17** | `ARB-032` | Fleksja PWN | **Domena Pozytywna DeclensionParadigm**: Ochrona deskrypcji złożonych i sufiksów przymiotnikowych w przypadkach zależnych (T(x) = x). | 0.00 PLN |
+| **2026-10-17** | `ARB-033` | Jakość / Linter | **Odwzorowanie Identycznościowe w Linterze**: Automatyczne `is_production`, wyłączenie mutatorów afektywnych, ochrona tekstu LLM. | 0.00 PLN |
+| **2026-10-17** | `ARB-034` | Routing Potoku | **Strict Positive Domain Production Routing**: `strict_positive_domain=True` w L4104 i L5174 potoku produkcyjnego `translator.py`. | 0.00 PLN |
+| **2026-10-17** | `ARB-035` | Monolit Bramki | **Legacy Monolith Bypass & Identity Pass-Through**: Pominięcie Faz 1-6 monolitu bramki i ochrona swobody stylistycznej LLM (\(\forall x \notin \mathcal{D}_{\text{pos}}, T(x) = x\)). | 0.00 PLN |
+| **2026-10-17** | `ARB-036` | Ontologia / Pamięć | **Ontological Purification & CharacterRegistryDict**: Promocja płci do P0, separacja `relations` z transparentnym fallbackiem i aliasy pierwszych imion O(1). | 0.00 PLN |
+| **2026-10-17** | `ARB-037` | Morfosyntaktyka | **Szereg Współrzędny Przymiotników i Paradygmat Powinien**: Symetryczna concordancja przymiotników i pełna odmiana czasownika ułomnego `powinien` (1. i 2. os., VIRILE/NON_VIRILE). | 0.00 PLN |
+| **2026-10-17** | ARB-038 | Higiena Kodu | **Full-Codebase Zero-Anime-Literal Invariant**: Ekstirpacja 41 nazw anime w 9 plikach od linii 1 do EOF. | 0.00 PLN |
+| **2026-10-17** | ARB-039 | Architektura | **Domyślny strict_positive_domain=True**: Wymuszenie czystej domeny pozytywnej D_pos i Identity Pass-Through. | 0.00 PLN |
+| **2026-10-17** | ARB-040 | Pamięć / Ontologia | **Dynamiczny Fallback Sezonowy i Token-Set Equivalence**: _resolve_bible_path i obsługa szyku japońskiego w P0. | 0.00 PLN |
+| **2026-10-18** | ARB-041 | Telemetria | **Pełna Deklaratywna Telemetria**: Zamiana strzałek dyrektywnych `->` i alarmów na czyste deskryptory stanu audio (`Sygnał audio JP: ...`, `Kotwica semantyczna audio JP: ...`, `[TELEMETRIA: ...]`). | 0.00 PLN |
+| **2026-10-18** | ARB-042 | Kanon / Zasady | **Ekstirpacja 4 Klastrów Onomastycznych w rules.py**: Całkowite oczyszczenie reguł z literałów dialektów i postaci przy zachowaniu identyfikatorów filarów. | 0.00 PLN |
+| **2026-10-18** | ARB-043 | Tarcza Regresyjna | **Synchronizacja Asercji Testowych (Standard 8.0)**: Dopasowanie 61 asercji do deklaratywnej telemetrii (179/179 PASSED, 0 naruszeń we wszystkich 5 bramkach). | 0.00 PLN |

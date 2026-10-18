@@ -17,15 +17,76 @@ Odpowiedzialność:
    - Wymuszenie relacji hierarchicznej: Mówca A = dziecko/podwładny, Mówca B = rodzic/przełożony.
    - Wykrywanie ciągłości tematycznej (monolog po dwugłosie bez pauzy montażowej Δt <= 1.5s):
      kontynuacja tematu (np. opis zbroi, pancerza, stroju, technicznych szczegółów) lub F0 >= 220 Hz
-     automatycznie przypisuje kolejne kwestie dziecku (np. Shizuku), zapobiegając fałszywej maskulinizacji.
+     automatycznie przypisuje kolejne kwestie dziecku (np. postać dziecięca), zapobiegając fałszywej maskulinizacji.
 
 3. DiarizationSanityChecker:
    - Weryfikacja etykiet dorosłych męskich postaci w obecności wybitnie wysokiego tembru F0 seiyū (> 230 Hz bez basu).
-   - Generowanie flagi WARNING_DIARIZATION_ANOMALY i arbitraż sceniczny w stronę aktywnej mówczyni żeńskiej (np. Shizuku).
+   - Generowanie flagi WARNING_DIARIZATION_ANOMALY i arbitraż sceniczny w stronę aktywnej mówczyni żeńskiej (np. aktywna postać żeńska).
 """
 
 import re
 from typing import List, Dict, Any, Tuple, Optional, Set
+
+try:
+    from metadata import normalize_actor_tag, normalize_ascii_diacritics
+except ImportError:
+    import unicodedata
+
+    def normalize_ascii_diacritics(text: str) -> str:
+        if not text:
+            return ""
+        nfkd = unicodedata.normalize("NFKD", str(text))
+        return "".join([c for c in nfkd if not unicodedata.combining(c)])
+
+    def normalize_actor_tag(actor_name: str) -> Tuple[str, Optional[str]]:
+        """
+        Normalizuje znacznik aktora (usuwa adnotacje nawiasowe)
+        oraz ekstrahuje jawną płeć jeśli obecna (MALE / FEMALE).
+        """
+        if not actor_name:
+            return "", None
+        raw = str(actor_name).strip()
+        gender = None
+        if re.search(r"[\(\[\{]\s*(?:m|male|mężczyzna)\s*[\)\]\}]", raw, re.IGNORECASE):
+            gender = "MALE"
+        elif re.search(r"[\(\[\{]\s*(?:f|female|kobieta)\s*[\)\]\}]", raw, re.IGNORECASE):
+            gender = "FEMALE"
+        clean = re.sub(r"[\(\[\{][^\)\]\}]*[\)\]\}]", "", raw).strip()
+        return (clean or raw), gender
+
+
+def _normalize_event_actor(raw_name: str) -> Tuple[str, Optional[str]]:
+    """Wywołuje normalize_actor_tag i zabezpiecza ekstrakcję czystej nazwy oraz płci P0."""
+    if not raw_name:
+        return "", None
+    try:
+        res = normalize_actor_tag(raw_name)
+        if isinstance(res, tuple):
+            c_name = res[0]
+            g = res[1] if len(res) > 1 else None
+            return (c_name or raw_name).strip(), g
+        elif isinstance(res, dict):
+            c_name = res.get("name", raw_name)
+            g = res.get("gender")
+            return (c_name or raw_name).strip(), g
+        elif isinstance(res, str):
+            g = None
+            if re.search(r"[\(\[\{]\s*(?:m|male|mężczyzna)\s*[\)\]\}]", raw_name, re.IGNORECASE):
+                g = "MALE"
+            elif re.search(r"[\(\[\{]\s*(?:f|female|kobieta)\s*[\)\]\}]", raw_name, re.IGNORECASE):
+                g = "FEMALE"
+            return res.strip() or raw_name.strip(), g
+    except Exception:
+        pass
+
+    g = None
+    if re.search(r"[\(\[\{]\s*(?:m|male|mężczyzna)\s*[\)\]\}]", raw_name, re.IGNORECASE):
+        g = "MALE"
+    elif re.search(r"[\(\[\{]\s*(?:f|female|kobieta)\s*[\)\]\}]", raw_name, re.IGNORECASE):
+        g = "FEMALE"
+    clean = re.sub(r"[\(\[\{][^\)\]\}]*[\)\]\}]", "", raw_name).strip()
+    return clean or raw_name.strip(), g
+
 
 __all__ = [
     "DualVoiceTagPreserver",
@@ -41,6 +102,8 @@ __all__ = [
     "partition_subturns",
     "compute_we_group",
     "classify_we_group_gender",
+    "compute_you_group",
+    "classify_you_group_gender",
     "group_speaker_turns",
     "resolve_turn_addressee",
     "resolve_all_speaker_turns",
@@ -51,10 +114,13 @@ __all__ = [
     "resolve_scene_participants",
     "is_character_male",
     "is_character_female",
+    "is_character_confirmed_female",
+    "is_singular_2nd_person_line",
     "is_discourse_ignorable",
     "is_narrative_style",
     "is_sign_or_title_item",
     "is_offscreen_or_voiceover",
+    "normalize_actor_tag",
 ]
 
 
@@ -99,7 +165,7 @@ class DualVoiceTagPreserver:
         line_b = m.group(4).strip()
         prefix_tags = tags_a
 
-        # Rozbicie etykiety hybrydowej aktora, np. "Yoritsugu Suwa / Yorishige Suwa" -> ("Yoritsugu Suwa", "Yorishige Suwa")
+        # Rozbicie etykiety hybrydowej aktora, np. "Aktor A / Aktor B" -> ("Aktor A", "Aktor B")
         raw_name = getattr(event, "name", "") or ""
         spk_a = raw_name
         spk_b = raw_name
@@ -201,14 +267,15 @@ class DeicticDiscourseEngine:
         text_a: str,
         text_b: str,
         hybrid_speaker: str = "",
-        candidate_child: str = "Shizuku",
-        candidate_parent: str = "Yorishige Suwa"
+        candidate_child: str = "",
+        candidate_parent: str = "",
+        series_bible: Optional[Any] = None
     ) -> Tuple[str, str, Dict[str, Any]]:
         """
         Rozpoznaje zwrot deiktyczny w dwugłosie:
         Głos A: apostrofa do rodzica/przełożonego ("Ojcze.")
         Głos B: replika/potwierdzenie ("Słucham?")
-        -> Głos A = dziecko/podwładny (np. Shizuku), Głos B = rodzic/przełożony (np. Yorishige Suwa).
+        -> Głos A = dziecko/podwładny, Głos B = rodzic/przełożony.
         """
         is_a_apostrophe = bool(cls.APOSTROPHE_PARENT_REGEX.search(text_a.strip()))
         is_b_ack = bool(cls.ACKNOWLEDGMENT_REGEX.search(text_b.strip()))
@@ -224,17 +291,35 @@ class DeicticDiscourseEngine:
             # Rozbicie hybrydy
             parts = [p.strip() for p in re.split(r"\s*(?:/|\|)\s*", hybrid_speaker) if p.strip()] if hybrid_speaker else []
             
-            # Jeśli w hybrydzie jest ojciec (np. Yorishige), przypisujemy go do Głosu B
+            # Hierarchia rodzic/przełożony vs dziecko/podwładny
             spk_b = candidate_parent
             spk_a = candidate_child
+
+            parent_keywords = ["ojciec", "parent", "father", "lord", "master", "przełożony", "rodzic"]
+            child_keywords = ["córka", "syn", "dziecko", "child", "daughter", "son", "podwładny", "uczeń"]
+
+            if series_bible and hasattr(series_bible, "data") and "characters" in series_bible.data:
+                chars = series_bible.data["characters"]
+                for p in parts:
+                    c_info = chars.get(p, {})
+                    desc = (c_info.get("description", "") if isinstance(c_info, dict) else str(c_info)).lower()
+                    if any(kw in desc for kw in parent_keywords):
+                        spk_b = p
+                    elif any(kw in desc for kw in child_keywords):
+                        spk_a = p
 
             if parts:
                 for p in parts:
                     p_low = p.lower()
-                    if any(k in p_low for k in ["yorishige", "ojciec", "parent", "father"]):
+                    if any(k in p_low for k in parent_keywords):
                         spk_b = p
-                    elif any(k in p_low for k in ["shizuku", "córka", "yoritsugu", "dziecko", "child"]):
+                    elif any(k in p_low for k in child_keywords):
                         spk_a = p
+
+            if not spk_b and parts:
+                spk_b = parts[1] if len(parts) > 1 else parts[0]
+            if not spk_a and parts:
+                spk_a = parts[0]
 
             discourse_meta["speaker_a"] = spk_a
             discourse_meta["speaker_b"] = spk_b
@@ -262,7 +347,7 @@ class DeicticDiscourseEngine:
         Weryfikuje ciągłość monologu technicznego po dwugłosie:
         Dwuwektorowa kotwica ciągłości (Topic & Voice Signature Anchor):
         1. Jeśli temat kontynuuje rzemiosło/zbroję (has_topic) lub tembr F0 >= 220 Hz wskazuje głos dziewczęcy,
-           utrzymuje tożsamość mówcy (np. Shizuku) niezależnie od przerw montażowych (w tym luki 8.77s).
+           utrzymuje tożsamość mówcy niezależnie od przerw montażowych (w tym luki 8.77s).
         2. W przeciwnym razie wymaga bezpośredniego następstwa po replice ojca (Δt <= max_delta_ms).
         """
         has_topic = bool(cls.ARMOR_CRAFTING_TOPIC_REGEX.search(text or ""))
@@ -289,7 +374,7 @@ class DiarizationSanityChecker:
         speaker_name: str,
         f0_hz: Optional[float],
         text: str = "",
-        active_scene_female: str = "Shizuku"
+        active_scene_female: str = ""
     ) -> Dict[str, Any]:
         """
         Sprawdza, czy przypisany dorosły mówca męski nie jest skażeniem błędnej diaryzacji.
@@ -303,9 +388,9 @@ class DiarizationSanityChecker:
         }
 
         spk_low = (speaker_name or "").lower()
-        # Ochrona kanonicznych chłopców (Tokiyuki, Conan, etc.)
+        # Ochrona kanonicznych ról chłopięcych (młodzi chłopcy z wysokim F0)
         from series_memory import BOY_ROLE_KEYWORDS
-        is_boy = any(k in spk_low for k in BOY_ROLE_KEYWORDS) or any(k in spk_low for k in ["tokiyuki", "chojumaru", "conan", "naruto"])
+        is_boy = any(k in spk_low for k in BOY_ROLE_KEYWORDS) or any(k in spk_low for k in ["chłopiec", "boy", "kid", "dziecko", "chojumaru", "conan"])
 
         if is_boy:
             # Chłopiec z wysokim F0 to norma biologiczna seiyū, nie anomalia diaryzacji
@@ -420,7 +505,7 @@ def is_internal_monologue(
        zwraca is_internal_monologue = True NIEZALEŻNIE od tego, czy target_speaker w scenie jest ustawiony (!= None)
        (wewnętrzne myśli podczas rozmowy z kimś w scenie zawsze zachowują true_gender).
        Wyjątek: jeśli target_speaker is None, a obiekt zdarzenia ma jawnie zdefiniowany atrybut addressee
-       (np. szept skierowany do towarzysza: ev.addressee = 'Braham'), kwestia zostaje odrzucona.
+       (np. szept skierowany do towarzysza: ev.addressee = 'Towarzysz'), kwestia zostaje odrzucona.
 
     2. Ścieżka Kursywy {\\i1} (Italic Safety Gate):
        Sama kursywa {\\i1} (bez nawiasów myśli i bez stylu Thoughts) zwraca is_internal_monologue = True
@@ -429,7 +514,7 @@ def is_internal_monologue(
        - styl nie oznacza głosu spoza kadru (Offscreen / Flashback / Retrospekcja / Narration / Voiceover),
        - a tekst nie zawiera wykrzykników ('!', '！') ani wołaczy skierowanych na zewnątrz.
 
-    Przed oceną obu ścieżek bezwzględnie odrzucane są:
+    Przed oceną obu ścieżek standardowo odrzucane są:
     - Japońskie cudzysłowy dialogowe 「 」 i 『 』 (mowa na głos),
     - Nawiasy skilli/statusu/szyldów 【 】, 《 》, ［ ］,
     - Tagi komunikacyjne [Radio], [Phone], [Comm],
@@ -622,7 +707,9 @@ PL_NON_VERB_CIE_WORDS: Set[str] = {
     "żywo", "wicie", "poszycie", "przebicie", "podbicie", "rozbicie", "wybicie",
     "nabicie", "zdobycie", "przybycie", "obycie", "zbycie", "trzecie",
     "uczucie", "poczucie", "wyczucie", "odczucie", "pojęcie", "zajęcie", "przyjęcie",
-    "ujęcie", "objęcie", "napięcie", "cięcie"
+    "ujęcie", "objęcie", "napięcie", "cięcie",
+    "wreszcie", "nareszcie", "jednocześnie", "osobiście", "rzeczywiście", "uroczyście",
+    "wieczyście", "ziemiście", "kwieciście", "chętnie", "prawomocnie"
 }
 
 POLISH_COMMON_NOUN_LOCATIVE_HOMONYMS: Set[str] = {
@@ -631,7 +718,12 @@ POLISH_COMMON_NOUN_LOCATIVE_HOMONYMS: Set[str] = {
     "przelocie", "grzbiecie", "pakiecie", "bilecie", "kobiecie", "swecie",
     "komitecie", "kolecie", "namiocie", "zamiecie", "korycie", "kopycie",
     "jelicie", "zenicie", "sekrecie", "konkrecie", "balecie", "szkielecie",
-    "facecie", "akcie", "kontakcie", "pakcie", "trakcie", "fakcie", "punkcie"
+    "facecie", "akcie", "kontakcie", "pakcie", "trakcie", "fakcie", "punkcie",
+    "momencie", "prezydencie", "studencie", "dokumencie", "projekcie", "obiekcie",
+    "internecie", "temacie", "klimacie", "froncie", "koncercie", "porcie",
+    "szczycie", "zeszycie", "suficie", "aparacie", "formacie", "kwadracie",
+    "buncie", "komplecie", "aspekcie", "efekcie", "tekście", "kontekście",
+    "respekcie", "gabinecie", "interwale"
 }
 
 PL_GENERAL_CIE_VERB_REGEX = re.compile(r"\b([a-ząćęłńóśźż]{3,})cie\b", re.IGNORECASE)
@@ -695,8 +787,8 @@ def detect_turn_plural_addressee(turn_or_text: Any) -> bool:
             start_idx = m.start()
             pre_ctx = clean[:start_idx].strip().lower()
             # Strażnik Homonimii Miejscownika:
-            # Wyklucz rzeczowniki w miejscowniku po przyimkach (w, we, o, na, po, przy, do, z, ze, od, dla)
-            if re.search(r"\b(?:w|we|o|na|po|przy|do|z|ze|od|dla)\s+(?:[a-ząćęłńóśźż]+\s+)*$", pre_ctx):
+            # Wyklucz rzeczowniki w miejscowniku po przyimkach (w, we, o, na, po, przy, do, z, ze, od, dla itd.)
+            if re.search(r"\b(?:w|we|o|na|po|przy|do|z|ze|od|dla|ku|bez|pod|nad|przed|za|między|pomiędzy|wobec|podczas|wskutek|dzięki|koło|obok|wśród|blisko|wzdłuż)\s+(?:[a-ząćęłńóśźż0-9„\"'«»–—-]+\s+)*$", pre_ctx):
                 continue
             if word in POLISH_COMMON_NOUN_LOCATIVE_HOMONYMS:
                 # Wymagaj jawnego kontekstu czasownikowego / pytającego / zaimkowego 2. osoby
@@ -736,8 +828,10 @@ class SpeakerTurn:
         scene_has_male_participant: bool = False,
         target_confidence: float = 0.0,
         plural_group_gender: str = "AMBIGUOUS",
+        you_group_gender: str = "AMBIGUOUS",
     ):
-        self.speaker: str = (speaker or "").strip()
+        clean_spk, tag_g = _normalize_event_actor(speaker)
+        self.speaker: str = (clean_spk or speaker or "").strip()
         self.events: List[Any] = list(events or [])
         self.addressee_number: str = addressee_number  # "SINGULAR" | "PLURAL" | "DUAL"
         self.target_speaker: Optional[str] = target_speaker
@@ -746,9 +840,22 @@ class SpeakerTurn:
         self.scene_id: Optional[str] = scene_id
         self.scene_participants: List[str] = list(scene_participants or [])
         self.scene_has_male_participant: bool = scene_has_male_participant
+        if tag_g == "MALE":
+            self.scene_has_male_participant = True
         self.target_confidence: float = target_confidence
         self.plural_group_gender: str = plural_group_gender
+        self.you_group_gender: str = you_group_gender
         self.sub_turns: List["SpeakerTurn"] = [self]
+
+        for ev in self.events:
+            ev_raw = getattr(ev, "name", getattr(ev, "speaker", "")) or ""
+            if ev_raw:
+                ev_clean, ev_g = _normalize_event_actor(ev_raw)
+                if ev_g in ("MALE", "FEMALE"):
+                    setattr(ev, "speaker_gender", ev_g)
+                    setattr(ev, "speaker_confidence", 1.0)
+                    if ev_g == "MALE":
+                        self.scene_has_male_participant = True
 
         # Automatyczna weryfikacja liczby mnogiej przy inicjalizacji
         if self.events and self.addressee_number == "SINGULAR":
@@ -796,6 +903,14 @@ class SpeakerTurn:
         return self.addressee_number == "PLURAL"
 
     def append(self, event: Any):
+        ev_raw = getattr(event, "name", getattr(event, "speaker", "")) or ""
+        if ev_raw:
+            ev_clean, ev_g = _normalize_event_actor(ev_raw)
+            if ev_g in ("MALE", "FEMALE"):
+                setattr(event, "speaker_gender", ev_g)
+                setattr(event, "speaker_confidence", 1.0)
+                if ev_g == "MALE":
+                    self.scene_has_male_participant = True
         self.events.append(event)
         if self.addressee_number != "PLURAL" and detect_plural_addressee(event):
             self.addressee_number = "PLURAL"
@@ -841,7 +956,7 @@ class SpeakerTurn:
             f"gender='{self.target_gender}' conf={self.target_confidence:.2f} "
             f"number='{self.addressee_number}' plural={self.is_plural} "
             f"lock={self.vocative_lock} male_in_scene={self.scene_has_male_participant} "
-            f"group_gender='{self.plural_group_gender}'>"
+            f"group_gender='{self.plural_group_gender}' you_group='{self.you_group_gender}'>"
         )
 
 
@@ -1029,7 +1144,204 @@ def _extract_character_candidates_from_bible(
             g = "MALE" if tg == "MASCULINE" else ("FEMALE" if tg == "FEMININE" else None)
             _register_cand(c_name, g)
 
+    # 4. Hypocorisms
+    data = getattr(series_bible, "data", {}) if hasattr(series_bible, "data") else {}
+    hypo = data.get("hypocorisms", {}) if isinstance(data, dict) else {}
+    if isinstance(hypo, dict):
+        for h_alias, h_canon in hypo.items():
+            if h_canon in candidates:
+                if h_alias not in candidates[h_canon]["forms"]:
+                    candidates[h_canon]["forms"].append(h_alias)
+            else:
+                _register_cand(h_canon)
+                if h_canon in candidates and h_alias not in candidates[h_canon]["forms"]:
+                    candidates[h_canon]["forms"].append(h_alias)
+
+    # 5. Character aliases
+    if isinstance(chars, dict):
+        for c_name, c_val in chars.items():
+            if isinstance(c_val, dict):
+                aliases = c_val.get("aliases") or []
+                if isinstance(aliases, list):
+                    for al in aliases:
+                        if c_name in candidates and al not in candidates[c_name]["forms"]:
+                            candidates[c_name]["forms"].append(al)
+
     return candidates
+
+
+_GENERIC_ROLE_TITLES: Set[str] = {
+    "pan", "pani", "lord", "lady", "sir", "kapitan", "król", "królowa", "książę",
+    "księżniczka", "mistrz", "mistrzyni", "doktor", "profesor", "ojciec", "matka",
+    "brat", "siostra", "generał", "von", "van", "de", "the", "san", "sama", "kun",
+    "chan", "senpai"
+}
+
+PL_1ST_PERSON_MASC_VERB_REGEX = re.compile(
+    r"\b(?:"
+    r"[a-ząćęłńóśźż]+(?:iłem|yłem|ałem|nąłem|ułem|szedłem|złem|głem|łbym)|"
+    r"byłem|miałem|chciałem|wiedziałem|widziałem|poszedłem|przyszedłem|wyszedłem|"
+    r"zrobiłem|mówiłem|myślałem|czekałem|słyszałem|znalazłem|mogłem|wziąłem|dałem|"
+    r"dostałem|zobaczyłem|poczułem|wróciłem|odszedłem|straciłem|zabiłem|uratowałem|"
+    r"doniósłbym|wiedziałbym|mógłbym|chciałbym|miałbym|zrobiłbym|byłbym|wolałbym|"
+    r"poszedłbym|rzekłem|rzekłbym"
+    r")\b",
+    re.IGNORECASE
+)
+
+PL_1ST_PERSON_FEM_VERB_REGEX = re.compile(
+    r"\b(?:"
+    r"[a-ząćęłńóśźż]+(?:iłam|yłam|ałam|nęłam|ułam|szłam|złam|głam|łabym)|"
+    r"byłam|miałam|chciałam|wiedziałam|widziałam|poszłam|przyszłam|wyszłam|"
+    r"zrobiłam|mówiłam|myślałam|czekałam|słyszałam|znalazłam|mogłam|wzięłam|dałam|"
+    r"dostałam|zobaczyłam|poczułam|wróciłam|odeszłam|straciłam|zabiłam|uratowałam|"
+    r"wiedziałabym|mogłabym|chciałabym|miałabym|zrobiłabym|byłabym|wolałabym|"
+    r"poszłabym|rzekłam|rzekłabym"
+    r")\b",
+    re.IGNORECASE
+)
+
+PL_1ST_PERSON_MASC_PREDICATE_REGEX = re.compile(
+    r"\b(?:jestem|byłem|będę)\s+(?:nie\s+)?[a-ząćęłńóśźż]+(?:ły|ł|ny|ty|owy|ski|cki|dzki|pewien|gotowy|świadom|zmuszony|zadowolony|gotów)\b",
+    re.IGNORECASE
+)
+
+PL_1ST_PERSON_FEM_PREDICATE_REGEX = re.compile(
+    r"\b(?:jestem|byłam|będę)\s+(?:nie\s+)?[a-ząćęłńóśźż]+(?:ła|na|ta|owa|ska|cka|dzka|pewna|gotowa|świadoma|zmuszona|zadowolona)\b",
+    re.IGNORECASE
+)
+
+JA_1ST_PERSON_MASC_REGEX = re.compile(
+    r"\b(?:ore|boku|jibun|sessha|washi|oresama)\b",
+    re.IGNORECASE
+)
+
+JA_1ST_PERSON_FEM_REGEX = re.compile(
+    r"\b(?:atashi|atai)\b",
+    re.IGNORECASE
+)
+
+PL_NON_VERB_LEM_WORDS: Set[str] = {
+    "stołem", "kołem", "dziełem", "ciałem", "gardłem", "skrzydłem", "źródłem",
+    "mydłem", "sadłem", "węzłem", "orłem", "diabłem", "karłem", "popiołem",
+    "kościołem", "tytułem", "artykułem", "kanałem", "sygnałem", "szałem", "kawałem",
+    "żywiołem", "badałem", "rozumem"
+}
+
+
+def _detect_first_person_speech_gender(text: str) -> Optional[str]:
+    """
+    Ekstrahuje jawną płeć gramatyczną mówcy na podstawie bezpośredniej morfologii 1. osoby
+    (czasowniki przeszłe -łem vs -łam, predykaty, japońskie zaimki 1. os.).
+    Zwraca 'MALE' | 'FEMALE' | None.
+    """
+    if not text:
+        return None
+    clean = SubtitleDiscourseSanitizer.ASS_TAGS_REGEX.sub("", str(text)).strip()
+    if not clean:
+        return None
+
+    # 1. Sprawdzenie form żeńskich
+    if PL_1ST_PERSON_FEM_VERB_REGEX.search(clean) or PL_1ST_PERSON_FEM_PREDICATE_REGEX.search(clean) or JA_1ST_PERSON_FEM_REGEX.search(clean):
+        return "FEMALE"
+
+    # 2. Sprawdzenie form męskich
+    if PL_1ST_PERSON_MASC_VERB_REGEX.search(clean) or PL_1ST_PERSON_MASC_PREDICATE_REGEX.search(clean) or JA_1ST_PERSON_MASC_REGEX.search(clean):
+        return "MALE"
+
+    # 3. Ogólne przeszłe formy na -łem z filtrem stoplisty rzeczowników narzędnika
+    for m in re.finditer(r"\b([a-ząćęłńóśźż]{3,}łem)\b", clean, re.IGNORECASE):
+        w = m.group(1).lower()
+        if w in PL_NON_VERB_LEM_WORDS:
+            continue
+        pre = clean[:m.start()].strip().lower()
+        if re.search(r"\b(?:z|ze|pod|nad|przed|za|między|pomiędzy)\s+(?:[a-ząćęłńóśźż]+\s+)*$", pre):
+            continue
+        return "MALE"
+
+    return None
+
+
+def _is_same_character(
+    name1: str,
+    name2: str,
+    series_bible: Optional[Any] = None
+) -> bool:
+    """
+    Sprawdza, czy dwa miana reprezentują tę samą postać na podstawie:
+    - ścisłej równości (po normalizacji normalize_actor_tag),
+    - unifikacji diakrytyków ASCII (normalize_ascii_diacritics),
+    - kanonicznej bazy tożsamości i indeksu aliasów SeriesBible,
+    - dopasowania pierwszego imienia / tokenów imienia własnego.
+    """
+    if not name1 or not name2:
+        return False
+    s1 = str(name1).strip()
+    s2 = str(name2).strip()
+    if s1.lower() == s2.lower():
+        return True
+
+    c1, _ = _normalize_event_actor(s1)
+    c2, _ = _normalize_event_actor(s2)
+    c1 = (c1 or s1).strip().lower()
+    c2 = (c2 or s2).strip().lower()
+    if c1 == c2:
+        return True
+
+    f1 = normalize_ascii_diacritics(c1).lower().strip()
+    f2 = normalize_ascii_diacritics(c2).lower().strip()
+    if f1 == f2:
+        return True
+
+    # Indeks aliasów i postaci w SeriesBible
+    if series_bible:
+        if hasattr(series_bible, "resolve_canonical_name"):
+            try:
+                can1 = series_bible.resolve_canonical_name(s1)
+                can2 = series_bible.resolve_canonical_name(s2)
+                if can1 and can2 and can1.lower() == can2.lower():
+                    return True
+            except Exception:
+                pass
+
+        aliases_idx = getattr(series_bible, "_actor_aliases_index", {})
+        if isinstance(aliases_idx, dict) and aliases_idx:
+            al1 = aliases_idx.get(c1) or aliases_idx.get(f1)
+            al2 = aliases_idx.get(c2) or aliases_idx.get(f2)
+            if al1 and al2 and al1.lower() == al2.lower():
+                return True
+            if al1 and al1.lower() in (c2, f2):
+                return True
+            if al2 and al2.lower() in (c1, f1):
+                return True
+
+        data = getattr(series_bible, "data", {}) if hasattr(series_bible, "data") else {}
+        chars = (
+            series_bible.get_characters_snapshot()
+            if hasattr(series_bible, "get_characters_snapshot")
+            else (data.get("characters", {}) if isinstance(data, dict) else {})
+        )
+        if isinstance(chars, dict):
+            for char_k, char_v in chars.items():
+                if not isinstance(char_v, dict):
+                    continue
+                al_list = [char_k] + list(char_v.get("aliases", []))
+                al_lows = {a.lower().strip() for a in al_list if a}
+                al_folds = {normalize_ascii_diacritics(a).lower().strip() for a in al_list if a}
+                all_al = al_lows | al_folds
+                if (c1 in all_al or f1 in all_al) and (c2 in all_al or f2 in all_al):
+                    return True
+
+    # Dopasowanie imion pierwszych (z wykluczeniem pospolitych tytułów)
+    t1 = [t for t in re.split(r"[\s\-_]+", c1) if len(t) >= 2 and t not in _GENERIC_ROLE_TITLES]
+    t2 = [t for t in re.split(r"[\s\-_]+", c2) if len(t) >= 2 and t not in _GENERIC_ROLE_TITLES]
+    if t1 and t2:
+        if t1[0] == t2[0]:
+            return True
+        if normalize_ascii_diacritics(t1[0]) == normalize_ascii_diacritics(t2[0]):
+            return True
+
+    return False
 
 
 def _detect_event_vocative(
@@ -1147,6 +1459,58 @@ CONTRASTIVE_ADDRESSEE_PIVOT_REGEX = re.compile(
     re.IGNORECASE
 )
 
+SECOND_PERSON_PAST_SINGULAR_REGEX = re.compile(
+    r"\b[a-ząćęłńóśźż]+(?:łeś|łaś|łbyś|łabyś)\b",
+    re.IGNORECASE
+)
+
+SECOND_PERSON_NOMINATIVE_TY_REGEX = re.compile(
+    r"\b(?:to\s+ty|ty)\b",
+    re.IGNORECASE
+)
+
+
+def is_singular_2nd_person_line(
+    event_or_text: Any,
+    series_bible: Optional[Any] = None,
+    current_speaker: str = ""
+) -> bool:
+    """
+    Weryfikuje, czy linia lub zdarzenie zawiera jawny wykładnik 2. osoby liczby pojedynczej:
+    - czasownik przeszły 2. os. lp. (-łeś / -łaś / -łbyś / -łabyś),
+    - zaimek podmiotu 'ty' lub 'to ty',
+    - pojedynczy wołacz imienia lub tytułu męskiego/żeńskiego,
+    pod warunkiem braku wykładników liczby mnogiej.
+    """
+    if event_or_text is None:
+        return False
+    raw = getattr(event_or_text, "text", str(event_or_text)) if event_or_text is not None else ""
+    if not raw:
+        return False
+    clean = SubtitleDiscourseSanitizer.ASS_TAGS_REGEX.sub("", raw).strip()
+    if not clean:
+        return False
+
+    # Jeśli linia zawiera wskaźnik liczby mnogiej, nie stanowi czystej liczby pojedynczej
+    if detect_plural_addressee(clean):
+        return False
+
+    # 1. Czasownik przeszły 2. os. lp. (-łeś, -łaś, -łbyś, -łabyś)
+    if SECOND_PERSON_PAST_SINGULAR_REGEX.search(clean):
+        return True
+
+    # 2. Zaimek podmiotu 2. os. lp. ('ty', 'to ty')
+    if SECOND_PERSON_NOMINATIVE_TY_REGEX.search(clean):
+        return True
+
+    # 3. Pojedynczy wołacz (imię lub tytuł)
+    spk = current_speaker or (getattr(event_or_text, "name", "") or getattr(event_or_text, "speaker", ""))
+    voc_actor, _ = _detect_event_vocative(clean, series_bible=series_bible, current_speaker=spk)
+    if voc_actor:
+        return True
+
+    return False
+
 
 def is_addressee_pivot(
     ev_prev: Any,
@@ -1157,7 +1521,8 @@ def is_addressee_pivot(
     Wykrywa znacznik zmiany adresata (Addressee Pivot) pomiędzy dwoma zdarzeniami:
     a) Nowy jawny wołacz lub tytuł do innej postaci niż w linii poprzedniej,
     b) Konstrukcja kontrastywna / spójnik przeciwstawny z zaimkiem 2. osoby przełączający odbiorcę,
-    c) Zmiana rejestru z mowy głośnej na myśl wewnętrzną (Default <-> Italics / Thoughts).
+    c) Zmiana rejestru z mowy głośnej na myśl wewnętrzną (Default <-> Italics / Thoughts),
+    d) Rozcięcie tury przy zmianie liczby gramatycznej (Singular-Plural SubTurn Split).
     """
     if ev_prev is None or ev_curr is None:
         return False
@@ -1173,13 +1538,19 @@ def is_addressee_pivot(
     clean_prev = SubtitleDiscourseSanitizer.ASS_TAGS_REGEX.sub("", text_prev).strip()
     clean_curr = SubtitleDiscourseSanitizer.ASS_TAGS_REGEX.sub("", text_curr).strip()
 
-    # a) Nowy jawny wołacz lub tytuł do innej postaci niż w linii poprzedniej
+    # d) Rozcięcie tury przy zmianie liczby gramatycznej (Singular-Plural SubTurn Split)
     spk = getattr(ev_curr, "speaker", getattr(ev_curr, "name", ""))
+    prev_plural = detect_plural_addressee(clean_prev)
+    curr_plural = detect_plural_addressee(clean_curr)
+    if prev_plural != curr_plural:
+        return True
+
+    # a) Nowy jawny wołacz lub tytuł do innej postaci niż w linii poprzedniej
     voc_prev, _ = _detect_event_vocative(clean_prev, series_bible=series_bible, current_speaker=spk)
     voc_curr, _ = _detect_event_vocative(clean_curr, series_bible=series_bible, current_speaker=spk)
 
     if voc_curr:
-        if voc_prev and voc_curr.strip().lower() != voc_prev.strip().lower():
+        if voc_prev and not _is_same_character(voc_curr, voc_prev, series_bible=series_bible):
             return True
         elif not voc_prev and CONTRASTIVE_ADDRESSEE_PIVOT_REGEX.search(clean_curr):
             return True
@@ -1197,7 +1568,8 @@ def partition_subturns(
 ) -> List[SpeakerTurn]:
     """
     Dzieli SpeakerTurn na niezależne pod-segmenty (SubTurn), jeśli wewnątrz tury wystąpi
-    Addressee Pivot (zmiana rejestru, inny wołacz lub spójnik przeciwstawny 2. osoby).
+    Addressee Pivot (zmiana rejestru, inny wołacz, spójnik przeciwstawny 2. osoby,
+    lub zmiana liczby gramatycznej Singular-Plural).
     """
     if not turn or not turn.events or len(turn.events) <= 1:
         return [turn]
@@ -1227,15 +1599,246 @@ def partition_subturns(
             scene_id=turn.scene_id,
             scene_participants=list(turn.scene_participants),
             scene_has_male_participant=turn.scene_has_male_participant,
+            plural_group_gender=turn.plural_group_gender,
+            you_group_gender=getattr(turn, "you_group_gender", "AMBIGUOUS"),
         )
         if st.detect_plural_addressee():
             st.addressee_number = "PLURAL"
+        else:
+            st.addressee_number = "SINGULAR"
+
+        voc_actor, voc_gender = _detect_turn_vocative(st, series_bible=series_bible)
+        if voc_actor:
+            if not voc_gender and series_bible:
+                _, voc_gender, _ = _resolve_character_canonical_and_gender(voc_actor, series_bible=series_bible)
+            if voc_gender:
+                st.target_speaker = voc_actor
+                st.target_gender = voc_gender
+                st.target_confidence = 0.98
+                st.vocative_lock = True
+        elif is_internal_monologue(st):
+            st.target_speaker = None
+            st.target_gender = None
+            st.target_confidence = 0.0
+            st.vocative_lock = False
+
+        for ev in st.events:
+            setattr(ev, "target_speaker", st.target_speaker)
+            setattr(ev, "target_actor", st.target_speaker)
+            setattr(ev, "target_gender", st.target_gender)
+            setattr(ev, "target_confidence", st.target_confidence)
+            setattr(ev, "addressee_number", st.addressee_number)
+            setattr(ev, "is_plural", st.is_plural)
+            setattr(ev, "vocative_lock", st.vocative_lock)
+            setattr(ev, "you_group_gender", st.you_group_gender)
+            setattr(ev, "plural_group_gender", st.plural_group_gender)
+            setattr(ev, "speaker_turn", st)
+
         if st.duration_ms >= 0:
             pass
         sub_turns.append(st)
 
     turn.sub_turns = sub_turns
     return sub_turns
+
+
+def _resolve_character_canonical_and_gender(
+    name: str,
+    series_bible: Optional[Any] = None,
+    context_item: Optional[Any] = None
+) -> Tuple[str, Optional[str], float]:
+    """
+    Spójna identyfikacja tożsamości i płci postaci w oparciu o zunifikowany indeks
+    kluczy głównych oraz aliasów w SeriesBible po normalizacji normalize_actor_tag,
+    a także poprzez bezpośrednią morfologię 1. osoby mówcy w bieżącej scenie.
+    Zwraca: (canonical_name, gender, confidence), gdzie gender in {"MALE", "FEMALE", None}.
+    """
+    if not name:
+        return "", None, 0.0
+
+    clean_name, tag_g = _normalize_event_actor(name)
+    if tag_g in ("MALE", "FEMALE"):
+        return (clean_name or name).strip(), tag_g, 1.0
+
+    target_name = (clean_name or name).strip()
+    if not target_name:
+        return "", None, 0.0
+
+    candidates: List[str] = [target_name]
+    if name and name not in candidates:
+        candidates.append(name)
+
+    t_folded = normalize_ascii_diacritics(target_name)
+    if t_folded and t_folded not in candidates:
+        candidates.append(t_folded)
+
+    t_tokens = [t for t in re.split(r"[\s\-_]+", target_name) if len(t) >= 2 and t.lower() not in _GENERIC_ROLE_TITLES]
+    if t_tokens:
+        first_tok = t_tokens[0]
+        if first_tok not in candidates:
+            candidates.append(first_tok)
+        first_folded = normalize_ascii_diacritics(first_tok)
+        if first_folded and first_folded not in candidates:
+            candidates.append(first_folded)
+
+    if series_bible:
+        data = getattr(series_bible, "data", {}) if hasattr(series_bible, "data") else {}
+        chars = (
+            series_bible.get_characters_snapshot()
+            if hasattr(series_bible, "get_characters_snapshot")
+            else (data.get("characters", {}) if isinstance(data, dict) else {})
+        )
+
+        # 1. Hypocorisms lookup
+        hypo = data.get("hypocorisms", {}) if isinstance(data, dict) else {}
+        if isinstance(hypo, dict):
+            t_low = target_name.lower()
+            for h_k, h_v in hypo.items():
+                if h_k.lower() == t_low:
+                    if h_v not in candidates:
+                        candidates.insert(0, h_v)
+
+        # 2. Canonical resolution via method
+        if hasattr(series_bible, "resolve_canonical_name"):
+            try:
+                canon = series_bible.resolve_canonical_name(target_name)
+                if canon and canon not in candidates:
+                    candidates.insert(0, canon)
+            except Exception:
+                pass
+            if t_tokens:
+                try:
+                    canon_tok = series_bible.resolve_canonical_name(t_tokens[0])
+                    if canon_tok and canon_tok not in candidates:
+                        candidates.append(canon_tok)
+                except Exception:
+                    pass
+
+        # 3. Fast direct alias matching via _actor_aliases_index
+        aliases_idx = getattr(series_bible, "_actor_aliases_index", {})
+        if isinstance(aliases_idx, dict) and aliases_idx:
+            for cand_cand in [target_name.lower(), t_folded.lower()] + ([t_tokens[0].lower()] if t_tokens else []):
+                matched = aliases_idx.get(cand_cand)
+                if matched and matched not in candidates:
+                    candidates.insert(0, matched)
+
+        # 4. Aliases in characters snapshot
+        if isinstance(chars, dict):
+            t_low = target_name.lower()
+            f_low = t_folded.lower()
+            first_low = t_tokens[0].lower() if t_tokens else ""
+            for c_k, c_v in chars.items():
+                if c_k.lower() in (t_low, f_low, first_low):
+                    if c_k not in candidates:
+                        candidates.insert(0, c_k)
+                if isinstance(c_v, dict):
+                    aliases = c_v.get("aliases") or []
+                    if isinstance(aliases, list):
+                        for a in aliases:
+                            a_str = str(a).lower().strip()
+                            a_fold = normalize_ascii_diacritics(a_str).lower().strip()
+                            if a_str in (t_low, f_low, first_low) or a_fold in (t_low, f_low, first_low):
+                                if c_k not in candidates:
+                                    candidates.insert(0, c_k)
+                                break
+                    c_tokens = [t for t in re.split(r"[\s\-_]+", c_k) if len(t) >= 2 and t.lower() not in _GENERIC_ROLE_TITLES]
+                    if c_tokens and first_low and c_tokens[0].lower() == first_low:
+                        if c_k not in candidates:
+                            candidates.append(c_k)
+
+        # 5. Character identities direct lookup
+        identities = getattr(series_bible, "character_identities", {})
+        if not identities and isinstance(data, dict):
+            identities = data.get("character_identities", {})
+        if isinstance(identities, dict):
+            t_low = target_name.lower()
+            for id_k in identities.keys():
+                if id_k.lower() == t_low and id_k not in candidates:
+                    candidates.insert(0, id_k)
+
+        # Check identities, characters, and get_character_gender for each candidate
+        for cand in candidates:
+            if hasattr(series_bible, "get_character_identity"):
+                try:
+                    ident = series_bible.get_character_identity(cand)
+                    if ident:
+                        tg = getattr(ident, "true_gender", "")
+                        if tg in ("MASCULINE", "MALE"):
+                            return getattr(ident, "canonical_id", cand) or cand, "MALE", 1.0
+                        elif tg in ("FEMININE", "FEMALE"):
+                            return getattr(ident, "canonical_id", cand) or cand, "FEMALE", 1.0
+                except Exception:
+                    pass
+
+            if isinstance(chars, dict):
+                c_val = chars.get(cand)
+                if not c_val:
+                    for k, v in chars.items():
+                        if k.lower() == cand.lower():
+                            c_val = v
+                            break
+                if isinstance(c_val, dict):
+                    g = c_val.get("gender")
+                    conf = float(c_val.get("confidence", 1.0))
+                    verified = bool(c_val.get("has_verified_gender", False))
+                    effective_conf = 1.0 if verified else conf
+                    if g in ("MALE", "MĘŻCZYZNA", "mężczyzna", "MASCULINE"):
+                        return cand, "MALE", effective_conf
+                    elif g in ("FEMALE", "KOBIETA", "kobieta", "FEMININE"):
+                        return cand, "FEMALE", effective_conf
+
+            if hasattr(series_bible, "get_character_gender"):
+                try:
+                    bg = series_bible.get_character_gender(cand)
+                    if bg in ("MALE", "MĘŻCZYZNA", "mężczyzna", "MASCULINE"):
+                        return cand, "MALE", 1.0
+                    elif bg in ("FEMALE", "KOBIETA", "kobieta", "FEMININE"):
+                        return cand, "FEMALE", 1.0
+                except Exception:
+                    pass
+
+    # Weryfikacja bezpośredniej morfologii 1. osoby mówcy w bieżącej scenie / kontekście
+    if context_item:
+        texts_to_check: List[str] = []
+        if hasattr(context_item, "events"):
+            for ev in context_item.events:
+                ev_spk = getattr(ev, "speaker", getattr(ev, "name", "")) or ""
+                if not ev_spk or _is_same_character(target_name, ev_spk, series_bible=series_bible):
+                    texts_to_check.append(getattr(ev, "text", "") or "")
+        elif hasattr(context_item, "text"):
+            c_spk = getattr(context_item, "speaker", getattr(context_item, "name", "")) or ""
+            if not c_spk or _is_same_character(target_name, c_spk, series_bible=series_bible):
+                texts_to_check.append(getattr(context_item, "text", "") or "")
+        elif isinstance(context_item, list):
+            for item in context_item:
+                i_spk = getattr(item, "speaker", getattr(item, "name", "")) or ""
+                if not i_spk or _is_same_character(target_name, i_spk, series_bible=series_bible):
+                    texts_to_check.append(getattr(item, "text", "") or "")
+
+        for txt in texts_to_check:
+            g_morph = _detect_first_person_speech_gender(txt)
+            if g_morph in ("MALE", "FEMALE"):
+                return target_name, g_morph, 1.0
+
+        spk_g = getattr(context_item, "speaker_gender", None)
+        spk_conf = float(getattr(context_item, "speaker_confidence", 1.0))
+        c_spk = getattr(context_item, "speaker", getattr(context_item, "name", "")) or ""
+        if c_spk and _is_same_character(target_name, c_spk, series_bible=series_bible):
+            if spk_g in ("MALE", "MASCULINE"):
+                return target_name, "MALE", spk_conf
+            elif spk_g in ("FEMALE", "FEMININE"):
+                return target_name, "FEMALE", spk_conf
+
+        tgt_g = getattr(context_item, "target_gender", None)
+        tgt_conf = float(getattr(context_item, "target_confidence", 1.0))
+        c_tgt = getattr(context_item, "target_speaker", getattr(context_item, "target_actor", "")) or ""
+        if c_tgt and _is_same_character(target_name, c_tgt, series_bible=series_bible):
+            if tgt_g in ("MALE", "MASCULINE"):
+                return target_name, "MALE", tgt_conf
+            elif tgt_g in ("FEMALE", "FEMININE"):
+                return target_name, "FEMALE", tgt_conf
+
+    return target_name, None, 0.0
 
 
 def is_character_male(
@@ -1246,21 +1849,14 @@ def is_character_male(
     """Sprawdza deterministycznie, czy dana postać ma płeć MALE."""
     if not name:
         return False
-    if series_bible:
-        if hasattr(series_bible, "get_character_gender"):
-            g = series_bible.get_character_gender(name)
-            if g in ("MALE", "MĘŻCZYZNA", "mężczyzna", "MASCULINE"):
-                return True
-        if hasattr(series_bible, "get_character_identity"):
-            ident = series_bible.get_character_identity(name)
-            if ident and getattr(ident, "true_gender", "") in ("MASCULINE", "MALE"):
-                return True
-    if context_item:
-        if getattr(context_item, "speaker_gender", None) in ("MALE", "MASCULINE"):
-            return True
-        if getattr(context_item, "target_gender", None) in ("MALE", "MASCULINE"):
-            return True
-    return False
+    clean_name, tag_g = _normalize_event_actor(name)
+    if tag_g == "MALE":
+        return True
+    if tag_g == "FEMALE":
+        return False
+    target_name = (clean_name or name).strip()
+    _, g, _ = _resolve_character_canonical_and_gender(target_name, series_bible=series_bible, context_item=context_item)
+    return g == "MALE"
 
 
 def is_character_female(
@@ -1271,21 +1867,35 @@ def is_character_female(
     """Sprawdza deterministycznie, czy dana postać ma płeć FEMALE."""
     if not name:
         return False
-    if series_bible:
-        if hasattr(series_bible, "get_character_gender"):
-            g = series_bible.get_character_gender(name)
-            if g in ("FEMALE", "KOBIETA", "kobieta", "FEMININE"):
-                return True
-        if hasattr(series_bible, "get_character_identity"):
-            ident = series_bible.get_character_identity(name)
-            if ident and getattr(ident, "true_gender", "") in ("FEMININE", "FEMALE"):
-                return True
-    if context_item:
-        if getattr(context_item, "speaker_gender", None) in ("FEMALE", "FEMININE"):
-            return True
-        if getattr(context_item, "target_gender", None) in ("FEMALE", "FEMININE"):
-            return True
-    return False
+    clean_name, tag_g = _normalize_event_actor(name)
+    if tag_g == "FEMALE":
+        return True
+    if tag_g == "MALE":
+        return False
+    target_name = (clean_name or name).strip()
+    _, g, _ = _resolve_character_canonical_and_gender(target_name, series_bible=series_bible, context_item=context_item)
+    return g == "FEMALE"
+
+
+def is_character_confirmed_female(
+    name: str,
+    series_bible: Optional[Any] = None,
+    context_item: Optional[Any] = None,
+    min_confidence: float = 0.95
+) -> bool:
+    """
+    Sprawdza deterministycznie, czy postać jest potwierdzoną kobietą o pewności >= min_confidence (0.95).
+    """
+    if not name:
+        return False
+    clean_name, tag_g = _normalize_event_actor(name)
+    if tag_g == "FEMALE":
+        return True
+    if tag_g == "MALE":
+        return False
+    target_name = (clean_name or name).strip()
+    _, g, conf = _resolve_character_canonical_and_gender(target_name, series_bible=series_bible, context_item=context_item)
+    return g == "FEMALE" and conf >= min_confidence
 
 
 def is_narrative_style(style_str: str) -> bool:
@@ -1340,7 +1950,8 @@ def is_discourse_ignorable(item_or_speaker: Any) -> bool:
 
 def compute_we_group(
     current: Any,
-    scene_participants: List[str]
+    scene_participants: List[str],
+    series_bible: Optional[Any] = None
 ) -> Set[str]:
     """
     Wylicza zbiór postaci wchodzących w skład grupy 'My' (We_Group) dla 1. os. lm.
@@ -1358,7 +1969,15 @@ def compute_we_group(
         re.search(r"\b(?:cię|ciebie|tobie|tobą|wam|was|wami|wasz)\b", text, re.IGNORECASE)
     )
     if t_actor and has_external_addressee:
+        to_remove = set()
+        for p in group:
+            if _is_same_character(p, t_actor, series_bible=series_bible):
+                to_remove.add(p)
         group.discard(t_actor)
+        clean_t, _ = _normalize_event_actor(t_actor)
+        if clean_t:
+            group.discard(clean_t)
+        group -= to_remove
 
     return group
 
@@ -1370,35 +1989,115 @@ def classify_we_group_gender(
 ) -> Tuple[str, bool]:
     """
     Klasyfikuje płeć gramatyczną grupy We_Group:
-    - min. 1 potwierdzony mężczyzna w We_Group -> plural_group_gender = 'VIRILE', scene_has_male_participant = True
-    - wyłącznie potwierdzone kobiety (zero mężczyzn) -> plural_group_gender = 'NON_VIRILE', scene_has_male_participant = False
-    - skład nieznany -> plural_group_gender = 'AMBIGUOUS', scene_has_male_participant = False
+    - min. 1 potwierdzony mężczyzna w We_Group (w SeriesBible po kluczu lub aliasie pierwszego imienia,
+      ze znacznika metadanych lub z użycia męskoosobowej formy 1. os. lm. -liśmy w tej scenie)
+      -> plural_group_gender = 'VIRILE', we_has_male = True
+    - zbiór liczy >= 2 uczestników i każdy element posiada zweryfikowaną w SeriesBible płeć FEMALE
+      (confidence >= 0.95) przy zerowej liczbie mężczyzn i zerowej liczbie nieznanych (unknown_count == 0)
+      -> plural_group_gender = 'NON_VIRILE', we_has_male = False
+    - w przeciwnym razie -> plural_group_gender = 'AMBIGUOUS' (odwzorowanie identycznościowe T(x) = x)
     """
     if not we_group:
-        if context_item:
-            if getattr(context_item, "scene_has_male_participant", False):
-                return "VIRILE", True
         return "AMBIGUOUS", False
 
+    # Sprawdzenie formy -liśmy w kontekście bieżącej kwestii / sceny
+    if context_item:
+        c_text = getattr(context_item, "text", "") or ""
+        if re.search(r"\b[a-ząćęłńóśźż]+liśmy\b", c_text, re.IGNORECASE):
+            return "VIRILE", True
+
     has_male = False
-    has_female = False
+    confirmed_females = 0
     unknown_count = 0
 
     for member in we_group:
         if is_character_male(member, series_bible=series_bible, context_item=context_item):
             has_male = True
             break
-        elif is_character_female(member, series_bible=series_bible, context_item=context_item):
-            has_female = True
+        elif is_character_confirmed_female(member, series_bible=series_bible, context_item=context_item):
+            confirmed_females += 1
         else:
             unknown_count += 1
 
     if has_male:
         return "VIRILE", True
-    elif has_female and unknown_count == 0:
+    elif len(we_group) >= 2 and confirmed_females >= 2 and unknown_count == 0 and not has_male:
         return "NON_VIRILE", False
     else:
         return "AMBIGUOUS", False
+
+
+def compute_you_group(
+    current: Any,
+    scene_participants: List[str],
+    series_bible: Optional[Any] = None
+) -> Set[str]:
+    """
+    Wylicza zbiór słuchaczy (You_Group) dla 2. os. lm.
+    Gdy mówca zwraca się w 2. os. lm. (-liście / -łyście / wy):
+        You_Group = scene_participants - {speaker}
+    """
+    group = set(scene_participants)
+    spk = (
+        getattr(current, "speaker", None)
+        or getattr(current, "name", None)
+        or ""
+    ).strip()
+    if spk:
+        to_remove = set()
+        for p in group:
+            if _is_same_character(p, spk, series_bible=series_bible):
+                to_remove.add(p)
+        group.discard(spk)
+        clean_spk, _ = _normalize_event_actor(spk)
+        if clean_spk:
+            group.discard(clean_spk)
+        group -= to_remove
+    return group
+
+
+def classify_you_group_gender(
+    you_group: Set[str],
+    series_bible: Optional[Any] = None,
+    context_item: Optional[Any] = None,
+    scene_has_male: bool = False
+) -> str:
+    """
+    Klasyfikuje płeć gramatyczną grupy You_Group (2. os. lm.):
+    - Status 'VIRILE': zbiór zawiera przynajmniej jednego uczestnika o potwierdzonej płci męskiej
+      (w SeriesBible po kluczu lub aliasie pierwszego imienia, ze znacznika metadanych lub z użycia -liście).
+    - Status 'NON_VIRILE': zbiór liczy >= 2 uczestników i każdy element posiada zweryfikowaną w SeriesBible
+      płeć FEMALE (confidence >= 0.95) przy zerowej liczbie mężczyzn i zerowej liczbie nieustalonej płci (unknown_count == 0).
+    - Wszystkie pozostałe konfiguracje przyjmują status 'AMBIGUOUS' (odwzorowanie identycznościowe T(x) = x).
+    """
+    if not you_group:
+        return "AMBIGUOUS"
+
+    # Sprawdzenie formy -liście w kontekście bieżącej kwestii
+    if context_item:
+        c_text = getattr(context_item, "text", "") or ""
+        if re.search(r"\b[a-ząćęłńóśźż]+liście\b", c_text, re.IGNORECASE):
+            return "VIRILE"
+
+    has_male = False
+    confirmed_females = 0
+    unknown_count = 0
+
+    for member in you_group:
+        if is_character_male(member, series_bible=series_bible, context_item=context_item):
+            has_male = True
+            break
+        elif is_character_confirmed_female(member, series_bible=series_bible, context_item=context_item):
+            confirmed_females += 1
+        else:
+            unknown_count += 1
+
+    if has_male:
+        return "VIRILE"
+    elif len(you_group) >= 2 and confirmed_females >= 2 and unknown_count == 0 and not has_male:
+        return "NON_VIRILE"
+    else:
+        return "AMBIGUOUS"
 
 
 def resolve_scene_participants(
@@ -1500,37 +2199,76 @@ def resolve_scene_participants(
 
         # Ekstrakcja fizycznych uczestników sceny
         participants: List[str] = []
+        scene_has_male = False
         for s_item in scene_items:
             s_spk = (getattr(s_item, "speaker", None) or getattr(s_item, "name", None) or "").strip()
+            s_clean_spk, s_tag_g = _normalize_event_actor(s_spk)
+            if s_tag_g == "MALE":
+                scene_has_male = True
+
+            # Sprawdzenie czy w kwestii użyto formy -liśmy (męskoosobowa 1. os. lm.) lub męskiej 1. os. lp.
             s_txt = getattr(s_item, "text", "") or ""
+            if re.search(r"\b[a-ząćęłńóśźż]+liśmy\b", s_txt, re.IGNORECASE) or _detect_first_person_speech_gender(s_txt) == "MALE":
+                scene_has_male = True
+
+            s_effective_spk = s_clean_spk or s_spk
+            if is_character_male(s_effective_spk, series_bible=series_bible, context_item=s_item):
+                scene_has_male = True
+
             s_style = getattr(s_item, "style", "") or ""
             s_is_italic = ("{\\i1}" in s_txt) or ("italic" in s_style.lower())
 
             if s_is_italic:
                 duration_s = max(0, getattr(s_item, "end", 0) - getattr(s_item, "start", 0)) / 1000.0
                 if duration_s < 2.0 and not is_offscreen_or_voiceover(s_item):
-                    if s_spk and s_spk not in participants:
-                        participants.append(s_spk)
+                    if s_effective_spk and not any(_is_same_character(s_effective_spk, p, series_bible=series_bible) for p in participants):
+                        participants.append(s_effective_spk)
             else:
-                if s_spk and not is_discourse_ignorable(s_item):
-                    if s_spk not in participants:
-                        participants.append(s_spk)
+                if s_effective_spk and not is_discourse_ignorable(s_item):
+                    if not any(_is_same_character(s_effective_spk, p, series_bible=series_bible) for p in participants):
+                        participants.append(s_effective_spk)
 
             s_target = getattr(s_item, "target_speaker", None) or getattr(s_item, "target_actor", None)
-            if s_target and not is_discourse_ignorable(s_target):
-                if s_target not in participants:
-                    participants.append(s_target)
+            if s_target:
+                s_clean_t, s_tag_tg = _normalize_event_actor(s_target)
+                if s_tag_tg == "MALE":
+                    scene_has_male = True
+                s_effective_t = s_clean_t or s_target
+                if is_character_male(s_effective_t, series_bible=series_bible, context_item=s_item):
+                    scene_has_male = True
+                if not is_discourse_ignorable(s_target):
+                    if s_effective_t and not any(_is_same_character(s_effective_t, p, series_bible=series_bible) for p in participants):
+                        participants.append(s_effective_t)
 
-        if c_speaker and not is_discourse_ignorable(current) and c_speaker not in participants:
-            participants.append(c_speaker)
+        c_clean, c_tag_g = _normalize_event_actor(c_speaker)
+        if c_tag_g == "MALE":
+            scene_has_male = True
+        c_effective = c_clean or c_speaker
+        if is_character_male(c_effective, series_bible=series_bible, context_item=current):
+            scene_has_male = True
+        if c_effective and not is_discourse_ignorable(current) and not any(_is_same_character(c_effective, p, series_bible=series_bible) for p in participants):
+            participants.append(c_effective)
 
         # Symetryczny rachunek We_Group
-        we_group = compute_we_group(current, participants)
-        p_group_gender, has_male = classify_we_group_gender(
+        we_group = compute_we_group(current, participants, series_bible=series_bible)
+        p_group_gender, we_has_male = classify_we_group_gender(
             we_group,
             series_bible=series_bible,
             context_item=current
         )
+        if we_has_male:
+            scene_has_male = True
+
+        # Rozdział You_Group (2. os. lm.)
+        you_group = compute_you_group(current, participants, series_bible=series_bible)
+        y_group_gender = classify_you_group_gender(
+            you_group,
+            series_bible=series_bible,
+            context_item=current,
+            scene_has_male=False
+        )
+        if y_group_gender == "VIRILE":
+            scene_has_male = True
 
         if hasattr(current, "is_plural"):
             pass
@@ -1543,20 +2281,26 @@ def resolve_scene_participants(
             setattr(current, "scene_participants", list(participants))
 
         if hasattr(current, "scene_has_male_participant"):
-            current.scene_has_male_participant = has_male
+            current.scene_has_male_participant = scene_has_male
         else:
-            setattr(current, "scene_has_male_participant", has_male)
+            setattr(current, "scene_has_male_participant", scene_has_male)
 
         if hasattr(current, "plural_group_gender"):
             current.plural_group_gender = p_group_gender
         else:
             setattr(current, "plural_group_gender", p_group_gender)
 
+        if hasattr(current, "you_group_gender"):
+            current.you_group_gender = y_group_gender
+        else:
+            setattr(current, "you_group_gender", y_group_gender)
+
         if hasattr(current, "events"):
             for ev in current.events:
                 setattr(ev, "scene_participants", list(participants))
-                setattr(ev, "scene_has_male_participant", has_male)
+                setattr(ev, "scene_has_male_participant", scene_has_male)
                 setattr(ev, "plural_group_gender", p_group_gender)
+                setattr(ev, "you_group_gender", y_group_gender)
 
     return items
 
@@ -1578,9 +2322,32 @@ def resolve_turn_addressee(
       WYŁĄCZNIE gdy potwierdzony jest aktywny Ping-Pong A -> B -> A lub poprzednia kwestia była pytaniem.
     - Krok 3 (Forward Lookahead < 2.0 s przy pytaniu 2. os. ?): wyznaczaj target_actor z postaci odpowiadającej w kolejnej linii
       gdy Delta_t < 2.0 s, mowa głośna, brak zwrotu do osoby trzeciej (pewność 0.95).
-    - Vocative-Predicate Lock: Obecność męskiego wołacza bezwzględnie wymusza target_gender = 'MALE' i vocative_lock = True.
+    - Vocative-Predicate Lock: Obecność męskiego wołacza jednoznacznie wyznacza target_gender = 'MALE' i vocative_lock = True.
     """
     if turn is None:
+        return turn
+
+    # Jeśli tura zawiera wiele zdarzeń, podziel na pod-segmenty SubTurn przed wyznaczeniem stanu adresata
+    if len(turn.events) > 1 and len(getattr(turn, "sub_turns", [])) <= 1:
+        turn.partition_subturns(series_bible=series_bible)
+
+    # Jeśli tura składa się z wielu pod-segmentów SubTurn, rozwiązuj stan adresata dla każdego SubTurn niezależnie
+    if hasattr(turn, "sub_turns") and len(turn.sub_turns) > 1:
+        for st in turn.sub_turns:
+            resolve_turn_addressee(
+                st,
+                previous_turn=previous_turn,
+                series_bible=series_bible,
+                max_exchange_gap_ms=max_exchange_gap_ms,
+                next_turn=next_turn,
+                prior_turns=prior_turns
+            )
+        first_st = turn.sub_turns[0]
+        turn.target_speaker = first_st.target_speaker
+        turn.target_gender = first_st.target_gender
+        turn.target_confidence = first_st.target_confidence
+        turn.vocative_lock = first_st.vocative_lock
+        turn.addressee_number = first_st.addressee_number
         return turn
 
     # Niewidzialność myśli dla dyskursu zewnętrznego
@@ -1601,10 +2368,13 @@ def resolve_turn_addressee(
             setattr(ev, "scene_participants", turn.scene_participants)
             setattr(ev, "scene_has_male_participant", turn.scene_has_male_participant)
             setattr(ev, "plural_group_gender", turn.plural_group_gender)
+            setattr(ev, "you_group_gender", turn.you_group_gender)
         return turn
 
     # Krok 1: Weryfikacja jawnego wołacza w obrębie pod-tury (pewność 0.98)
     voc_actor, voc_gender = _detect_turn_vocative(turn, series_bible=series_bible)
+    if voc_actor and not voc_gender and series_bible:
+        _, voc_gender, _ = _resolve_character_canonical_and_gender(voc_actor, series_bible=series_bible)
     if voc_actor and voc_gender:
         turn.target_speaker = voc_actor
         turn.target_gender = voc_gender
@@ -1637,12 +2407,19 @@ def resolve_turn_addressee(
                     history.append(previous_turn)
 
                 for prev in reversed(history):
-                    if not prev or is_discourse_ignorable(prev):
+                    if not prev or is_discourse_ignorable(prev) or is_internal_monologue(prev):
                         continue
+                    if is_discourse_ignorable(getattr(prev, "speaker", "")):
+                        continue
+                    if is_narrative_style(getattr(prev, "style", "")) != is_narrative_style(getattr(turn, "style", "")):
+                        break
+                    if is_sign_or_title_item(prev):
+                        break
+
                     gap_ms = max(0, turn.start - prev.end)
                     if gap_ms > max_exchange_gap_ms:
                         break
-                    if prev.speaker == turn.speaker:
+                    if _is_same_character(prev.speaker, turn.speaker, series_bible=series_bible):
                         prev_text = prev.text
                         if (
                             prev.target_gender == "MALE"
@@ -1663,47 +2440,55 @@ def resolve_turn_addressee(
                     history.append(previous_turn)
 
                 for prev in reversed(history):
-                    if not prev or is_discourse_ignorable(prev):
+                    if not prev or is_discourse_ignorable(prev) or is_internal_monologue(prev):
                         continue
-                    if prev.speaker != turn.speaker:
-                        gap_ms = max(0, turn.start - prev.end)
+                    if is_discourse_ignorable(getattr(prev, "speaker", "")):
+                        continue
+                    if is_narrative_style(getattr(prev, "style", "")) != is_narrative_style(getattr(turn, "style", "")):
+                        break
+                    if is_sign_or_title_item(prev):
+                        break
+
+                    gap_ms = max(0, turn.start - prev.end)
+                    if gap_ms > max_exchange_gap_ms:
+                        break
+
+                    if not _is_same_character(prev.speaker, turn.speaker, series_bible=series_bible):
+                        # Weryfikacja aktywnego ping-ponga
+                        is_ping_pong = False
+                        for earlier in reversed(history):
+                            if earlier is prev or earlier.end > prev.start:
+                                continue
+                            if _is_same_character(earlier.speaker, turn.speaker, series_bible=series_bible) and (prev.start - earlier.end) < 5000:
+                                is_ping_pong = True
+                                break
+
+                        # Ściana cięcia sceny (SceneBoundaryWall): cisza >= 3.5 s bez aktywnego ping-ponga
+                        if gap_ms >= 3500 and not is_ping_pong:
+                            break
+
                         if gap_ms < 2500:
                             # Styk Delta_t < 2.5 s: dziedzicz z poprzedniego mówcy głośnego
-                            is_ping_pong = False
-                            for earlier in reversed(history):
-                                if earlier is prev or earlier.end > prev.start:
-                                    continue
-                                if earlier.speaker == turn.speaker and (prev.start - earlier.end) < 5000:
-                                    is_ping_pong = True
-                                    break
-
                             turn.target_speaker = prev.speaker
                             turn.target_confidence = 0.95 if is_ping_pong else 0.85
-                            if series_bible and hasattr(series_bible, "get_character_gender"):
-                                turn.target_gender = series_bible.get_character_gender(prev.speaker)
-                            elif hasattr(prev, "speaker_gender") and prev.speaker_gender:
-                                turn.target_gender = prev.speaker_gender
+                            _, prev_g, _ = _resolve_character_canonical_and_gender(
+                                prev.speaker, series_bible=series_bible, context_item=prev
+                            )
+                            turn.target_gender = prev_g or getattr(prev, "speaker_gender", None)
                             lookback_resolved = True
                             break
                         elif 2500 <= gap_ms < max_exchange_gap_ms:
                             # Dla 2.5 s <= Delta_t < 5.0 s dziedzicz WYŁĄCZNIE gdy potwierdzony aktywny Ping-Pong
                             # lub poprzednia kwestia była pytaniem skierowanym do obecnego mówcy
-                            is_ping_pong = False
-                            for earlier in reversed(history):
-                                if earlier is prev or earlier.end > prev.start:
-                                    continue
-                                if earlier.speaker == turn.speaker and (prev.start - earlier.end) < 5000:
-                                    is_ping_pong = True
-                                    break
                             is_question_to_curr = ("?" in prev.text) and (_detect_turn_vocative(prev, series_bible)[0] is None)
 
                             if is_ping_pong or is_question_to_curr:
                                 turn.target_speaker = prev.speaker
                                 turn.target_confidence = 0.90
-                                if series_bible and hasattr(series_bible, "get_character_gender"):
-                                    turn.target_gender = series_bible.get_character_gender(prev.speaker)
-                                elif hasattr(prev, "speaker_gender") and prev.speaker_gender:
-                                    turn.target_gender = prev.speaker_gender
+                                _, prev_g, _ = _resolve_character_canonical_and_gender(
+                                    prev.speaker, series_bible=series_bible, context_item=prev
+                                )
+                                turn.target_gender = prev_g or getattr(prev, "speaker_gender", None)
                                 lookback_resolved = True
                             break
                         else:
@@ -1716,22 +2501,28 @@ def resolve_turn_addressee(
                 previous_turn is None
                 or not previous_turn.speaker
                 or is_discourse_ignorable(previous_turn)
+                or is_internal_monologue(previous_turn)
+                or is_discourse_ignorable(previous_turn.speaker)
                 or (turn.start - previous_turn.end > max_exchange_gap_ms)
             )
             if (
                 no_prior_speaker
                 and next_turn is not None
                 and next_turn.speaker
-                and next_turn.speaker != turn.speaker
+                and not _is_same_character(next_turn.speaker, turn.speaker, series_bible=series_bible)
                 and not is_discourse_ignorable(next_turn)
+                and not is_internal_monologue(next_turn)
+                and not is_discourse_ignorable(next_turn.speaker)
+                and not is_sign_or_title_item(next_turn)
+                and is_narrative_style(getattr(next_turn, "style", "")) == is_narrative_style(getattr(turn, "style", ""))
             ):
                 forward_gap_ms = next_turn.start - turn.end
                 next_voc, _ = _detect_turn_vocative(next_turn, series_bible=series_bible)
                 if 0 <= forward_gap_ms <= 3500 and not next_voc:
                     resp_speaker = next_turn.speaker
-                    resp_gender = None
-                    if series_bible and hasattr(series_bible, "get_character_gender"):
-                        resp_gender = series_bible.get_character_gender(resp_speaker)
+                    _, resp_gender, _ = _resolve_character_canonical_and_gender(
+                        resp_speaker, series_bible=series_bible, context_item=next_turn
+                    )
                     if not resp_gender and hasattr(next_turn, "speaker_gender"):
                         resp_gender = next_turn.speaker_gender
 
@@ -1749,17 +2540,21 @@ def resolve_turn_addressee(
             if (
                 previous_turn is not None
                 and previous_turn.speaker
-                and previous_turn.speaker != turn.speaker
+                and not _is_same_character(previous_turn.speaker, turn.speaker, series_bible=series_bible)
                 and not is_discourse_ignorable(previous_turn)
+                and not is_internal_monologue(previous_turn)
+                and not is_discourse_ignorable(previous_turn.speaker)
+                and not is_sign_or_title_item(previous_turn)
+                and is_narrative_style(getattr(previous_turn, "style", "")) == is_narrative_style(getattr(turn, "style", ""))
             ):
                 gap_ms = max(0, turn.start - previous_turn.end)
                 if gap_ms <= max_exchange_gap_ms:
                     turn.target_speaker = previous_turn.speaker
                     turn.target_confidence = 0.80
-                    if series_bible and hasattr(series_bible, "get_character_gender"):
-                        turn.target_gender = series_bible.get_character_gender(previous_turn.speaker)
-                    elif hasattr(previous_turn, "speaker_gender") and previous_turn.speaker_gender:
-                        turn.target_gender = previous_turn.speaker_gender
+                    _, prev_g, _ = _resolve_character_canonical_and_gender(
+                        previous_turn.speaker, series_bible=series_bible, context_item=previous_turn
+                    )
+                    turn.target_gender = prev_g or getattr(previous_turn, "speaker_gender", None)
 
     # Weryfikacja obecności uczestnika męskiego i klasyfikacja We_Group
     if not turn.scene_has_male_participant:
@@ -1774,18 +2569,20 @@ def resolve_turn_addressee(
         pass
 
     # Propagacja metadanych dyskursu na wszystkie zdarzenia tury
-    for ev in turn.events:
-        setattr(ev, "target_speaker", turn.target_speaker)
-        setattr(ev, "target_actor", turn.target_speaker)
-        setattr(ev, "target_gender", turn.target_gender)
-        setattr(ev, "target_confidence", turn.target_confidence)
-        setattr(ev, "addressee_number", turn.addressee_number)
-        setattr(ev, "is_plural", turn.is_plural)
-        setattr(ev, "vocative_lock", turn.vocative_lock)
-        setattr(ev, "speaker_turn", turn)
-        setattr(ev, "scene_participants", turn.scene_participants)
-        setattr(ev, "scene_has_male_participant", turn.scene_has_male_participant)
-        setattr(ev, "plural_group_gender", turn.plural_group_gender)
+    if not (hasattr(turn, "sub_turns") and len(turn.sub_turns) > 1):
+        for ev in turn.events:
+            setattr(ev, "target_speaker", turn.target_speaker)
+            setattr(ev, "target_actor", turn.target_speaker)
+            setattr(ev, "target_gender", turn.target_gender)
+            setattr(ev, "target_confidence", turn.target_confidence)
+            setattr(ev, "addressee_number", turn.addressee_number)
+            setattr(ev, "is_plural", turn.is_plural)
+            setattr(ev, "vocative_lock", turn.vocative_lock)
+            setattr(ev, "speaker_turn", turn)
+            setattr(ev, "scene_participants", turn.scene_participants)
+            setattr(ev, "scene_has_male_participant", turn.scene_has_male_participant)
+            setattr(ev, "plural_group_gender", turn.plural_group_gender)
+            setattr(ev, "you_group_gender", turn.you_group_gender)
 
     return turn
 
@@ -1806,29 +2603,51 @@ def group_speaker_turns(
     current_turn: Optional[SpeakerTurn] = None
 
     for ev in events:
-        spk = (
+        raw_spk = (
             getattr(ev, "name", "") or
             getattr(ev, "actor", "") or
             getattr(ev, "speaker", "") or
             ""
         ).strip()
+        # Wywołanie normalize_actor_tag(event.name) na wejściu każdej linii/zdarzenia
+        _ = normalize_actor_tag(raw_spk)
+        clean_spk, tag_gender = _normalize_event_actor(raw_spk)
+        if tag_gender in ("MALE", "FEMALE"):
+            setattr(ev, "speaker_gender", tag_gender)
+            setattr(ev, "speaker_confidence", 1.0)
+        setattr(ev, "normalized_name", clean_spk)
+        setattr(ev, "name", clean_spk or raw_spk)
+
+        spk = clean_spk or raw_spk
         start = getattr(ev, "start", 0)
 
         if current_turn is None:
             current_turn = SpeakerTurn(speaker=spk, events=[ev])
+            if tag_gender in ("MALE", "FEMALE"):
+                current_turn.speaker_gender = tag_gender
+                if tag_gender == "MALE":
+                    current_turn.scene_has_male_participant = True
         else:
             gap_ms = start - current_turn.end
             # Sprawdzenie ciągłości tego samego mówcy i progu czasowego
-            if spk == current_turn.speaker and gap_ms <= max_gap_ms:
+            if _is_same_character(spk, current_turn.speaker, series_bible=series_bible) and gap_ms <= max_gap_ms:
                 # Weryfikacja punktu obrotu adresata (Addressee Pivot)
                 if current_turn.events and is_addressee_pivot(current_turn.events[-1], ev, series_bible=series_bible):
                     turns.append(current_turn)
                     current_turn = SubTurn(speaker=spk, events=[ev])
+                    if tag_gender in ("MALE", "FEMALE"):
+                        current_turn.speaker_gender = tag_gender
+                        if tag_gender == "MALE":
+                            current_turn.scene_has_male_participant = True
                 else:
                     current_turn.append(ev)
             else:
                 turns.append(current_turn)
                 current_turn = SpeakerTurn(speaker=spk, events=[ev])
+                if tag_gender in ("MALE", "FEMALE"):
+                    current_turn.speaker_gender = tag_gender
+                    if tag_gender == "MALE":
+                        current_turn.scene_has_male_participant = True
 
     if current_turn is not None:
         turns.append(current_turn)
@@ -1843,6 +2662,7 @@ def resolve_all_speaker_turns(
 ) -> List[SpeakerTurn]:
     """Przetwarza sekwencję tur mówców stosując dyadic turn-taking, blokadę wołacza i inwariant grupy mieszanej."""
     for i, turn in enumerate(turns):
+        turn.partition_subturns(series_bible=series_bible)
         prev_turn = turns[i - 1] if i > 0 else None
         next_turn = turns[i + 1] if i + 1 < len(turns) else None
         resolve_turn_addressee(
