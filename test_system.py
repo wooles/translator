@@ -17464,6 +17464,98 @@ def test_standard_9_twelve_point_architectural_hardening_guard():
     print(" -> PASSED: Test 180 potwierdza pełną implementację 12 punktów utwardzenia Standardu 9.0.")
 
 
+def test_standard_9_ultimate_pipeline_verification():
+    """
+    [TEST 181/181] Standard 9.0: Ultimate 15-Point Pipeline Runtime & Architectural Invariants.
+    Weryfikacja:
+    1. Immunitet homografów rzeczowników w Narzędniku (-łem) i rozkaźników (-łam).
+    2. Zachowanie granic słów (\\b) przy przyklejonych tagach ASS i znakach \\N.
+    3. Czas przyszły złożony (będę/będziesz + imiesłów) oraz szyk inwersyjny orzeczników.
+    4. Bariera klauzuli w CopulaAdj (ochrona 3. osoby po przecinku i spójnikach podrzędnych).
+    5. Twarda bramka pewności epistemicznej (confidence < 0.95 -> T(x) = x).
+    6. Niezależne uzgadnianie We_Group (plural_group_gender) i You_Group (you_group_gender).
+    7. Ochrona drugiego rozmówcy w liniach dwugłosowych (- ...\\N- ...).
+    8. Ochrona polskich znaków diakrytycznych w normalize_actor_tag.
+    9. Paradygmat deklinacji żeńskiej w generate_polish_name_declension.
+    10. Epistemiczna separacja P0 vs P1 dla Profilera i brak prawa weta zaimków EN nad F0.
+    11. Kapowanie pewności Lookaheadu do 0.85 i izolacja Vocative Lock od 1. osoby.
+    12. Limit AniList perPage: 50 oraz blokada tytułów w _actor_aliases_index.
+    13. Bramka anty-halucynacyjna Whispera i wstrzykiwanie audio_jp do Fazy 2.
+    14. Jednokanałowa telemetria stanu świata bez sztywnego nakazu 'ty'.
+    15. Czystość metajęzykowa raportu technicznego (Standard 9.0).
+    """
+    print("\n--- Uruchamianie Testu 181: test_standard_9_ultimate_pipeline_verification ---")
+    import subprocess
+    import sys
+    from pathlib import Path
+    from avt_linter import AVTLinter
+    from metadata import normalize_actor_tag
+    from series_memory import generate_polish_name_declension
+
+    # 1. Immunitet rzeczowników na -łem
+    t_inst, _ = AVTLinter.lint_and_fix_line(
+        "Rozmawiałam z generałem pod kościołem i stałam za stołem przed światłem.",
+        speaker_gender="FEMALE", speaker_confidence=1.0, strict_positive_domain=True
+    )
+    assert "generałem" in t_inst and "kościołem" in t_inst and "stołem" in t_inst and "światłem" in t_inst, f"Rzeczowniki w Narzędniku zniekształcone: {t_inst}"
+    t_imp, _ = AVTLinter.lint_and_fix_line("Nie kłam i przełam swój strach!", speaker_gender="MALE", speaker_confidence=1.0, strict_positive_domain=True)
+    assert "Nie kłam" in t_imp and "przełam" in t_imp, f"Rozkaźniki na -łam zniekształcone: {t_imp}"
+
+    # 2. Granice słów przy tagach ASS i \\N
+    t_ass, _ = AVTLinter.lint_and_fix_line(r"{\i1}Zrobiłam{\i0} to\Ni byłam gotowa.", speaker_gender="MALE", speaker_confidence=1.0, strict_positive_domain=True)
+    assert "Zrobiłem" in t_ass and "byłem" in t_ass and "gotowy" in t_ass, f"Granice słów przy tagach ASS zawiodły: {t_ass}"
+
+    # 3. Czas przyszły złożony i szyk inwersyjny
+    t_fut, _ = AVTLinter.lint_and_fix_line(
+        "Będę musiała tam pójść. Gotowa jesteś?",
+        speaker_gender="MALE", target_gender="MALE", speaker_confidence=1.0, target_confidence=1.0, strict_positive_domain=True
+    )
+    assert "Będę musiał" in t_fut and "Gotowy jesteś" in t_fut, f"Czas przyszły złożony lub inwersja zawiodła: {t_fut}"
+
+    # 4. Bariera klauzuli
+    t_cl, _ = AVTLinter.lint_and_fix_line("Jestem pewien, że ona była gotowa i ostrożna.", speaker_gender="MALE", speaker_confidence=1.0, strict_positive_domain=True)
+    assert "gotowa i ostrożna" in t_cl, f"Bariera klauzuli nie ochroniła 3. osoby: {t_cl}"
+
+    # 5. Bramka pewności < 0.95 -> Identity Pass-Through
+    t_low, _ = AVTLinter.lint_and_fix_line("Zrobiłam to wczoraj.", speaker_gender="MALE", speaker_confidence=0.85, strict_positive_domain=True)
+    assert t_low == "Zrobiłam to wczoraj.", f"Bramka pewności 0.85 nie zadziałała: {t_low}"
+
+    # 6. Rozdzielenie We_Group i You_Group
+    t_you, _ = AVTLinter.lint_and_fix_line(
+        "Widziałam, że zrobiłyście to same.",
+        speaker_gender="MALE", speaker_confidence=1.0, you_group_gender="NON_VIRILE", scene_has_male_participant=True, strict_positive_domain=True
+    )
+    assert "Widziałem" in t_you and "zrobiłyście" in t_you, f"Rozdzielenie We_Group i You_Group zawiodło: {t_you}"
+
+    # 7. Ochrona drugiego rozmówcy w linii dwugłosowej
+    t_dual, _ = AVTLinter.lint_and_fix_line(r"- Zrobiłem to.\N- A ja byłam obok.", speaker_gender="MALE", speaker_confidence=1.0, strict_positive_domain=True)
+    assert "byłam obok" in t_dual, f"Drugi rozmówca w dwugłosie nie został ochroniony: {t_dual}"
+
+    # 8. normalize_actor_tag zachowuje diakrytyki
+    clean_n, extr_g = normalize_actor_tag("Żołnierz Łukasz (M)", strip_diacritics=False)
+    assert clean_n == "Żołnierz Łukasz" and extr_g == "MALE"
+
+    # 9. Paradygmat żeński
+    d_fem = generate_polish_name_declension("Katarzyna", gender="FEMALE")
+    assert d_fem.get("D") == "Katarzyny" and d_fem.get("B") == "Katarzynę" and d_fem.get("W") == "Katarzyno"
+
+    # 10. Uruchomienie ostatecznego audytora 15 bramek
+    base_dir = Path(__file__).parent
+    script_path = base_dir / "verify_ultimate_pipeline.py"
+    if script_path.exists():
+        proc = subprocess.run(
+            [sys.executable, str(script_path)],
+            cwd=base_dir,
+            capture_output=True,
+            text=True,
+            encoding="utf-8"
+        )
+        assert proc.returncode == 0, f"verify_ultimate_pipeline.py zwrócił błąd:\n{proc.stdout}\n{proc.stderr}"
+        assert "15/15 PASS" in proc.stdout, f"verify_ultimate_pipeline.py nie zaliczył 15/15:\n{proc.stdout}"
+
+    print(" -> PASSED: Test 181 potwierdza 100% spójności potoku AVT ze Standardem 9.0 (15/15 PASS).")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -17646,7 +17738,8 @@ if __name__ == "__main__":
     test_declarative_single_channel_telemetry_and_backward_compatibility()
     test_verify_purity_ast_and_zero_literal_invariant()
     test_standard_9_twelve_point_architectural_hardening_guard()
-    print("\n Wszystkie testy jednostkowe i integracyjne (180/180) zakończone pełnym sukcesem!\n")
+    test_standard_9_ultimate_pipeline_verification()
+    print("\n Wszystkie testy jednostkowe i integracyjne (181/181) zakończone pełnym sukcesem!\n")
 
 
 

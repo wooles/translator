@@ -5497,6 +5497,14 @@ class SeriesBible:
                 conf = float(entry.get("confidence") or 0.0)
                 return (is_p0, is_ver, conf)
 
+            TITLE_AND_ROLE_ALIAS_STOPWORDS = {
+                "lord", "lady", "prince", "princess", "king", "queen", "captain", "general",
+                "commander", "doctor", "master", "saint", "sister", "brother", "father",
+                "mother", "young", "kid", "old", "mr", "mrs", "ms", "książę", "księżniczka",
+                "król", "królowa", "kapitan", "generał", "dowódca", "mistrz", "doktor",
+                "święty", "święta", "siostra", "brat", "ojciec", "matka", "młody", "młoda",
+                "stary", "stara", "pan", "pani"
+            }
             sorted_chars = sorted(self.data["characters"].items(), key=_char_priority_key, reverse=True)
             for c_name, c_entry in sorted_chars:
                 if "->" in c_name or not isinstance(c_entry, dict):
@@ -5504,6 +5512,8 @@ class SeriesBible:
                 for al in c_entry.get("aliases", []):
                     al_low = al.lower().strip()
                     al_folded = normalize_ascii_diacritics(al).lower().strip()
+                    if al_low in TITLE_AND_ROLE_ALIAS_STOPWORDS or al_folded in TITLE_AND_ROLE_ALIAS_STOPWORDS:
+                        continue
                     if al_low and al_low not in self._actor_aliases_index:
                         self._actor_aliases_index[al_low] = c_name
                     if al_folded and al_folded not in self._actor_aliases_index:

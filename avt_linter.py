@@ -377,7 +377,7 @@ def load_subtitle_file_resilient(subs_file: Any) -> Any:
 
 def mask_ass_tags_and_quotes(text: str) -> Tuple[str, Dict[str, str]]:
     """
-    Masks ASS override tags {...} and quotation marks to protect them from morphological/syntactic mutation.
+    Masks ASS override tags {...}, quotation marks, and line breaks to protect them from morphological/syntactic mutation.
     Returns (masked_text, shield_map).
     """
     if not text:
@@ -385,22 +385,29 @@ def mask_ass_tags_and_quotes(text: str) -> Tuple[str, Dict[str, str]]:
     shield_map: Dict[str, str] = {}
 
     def _mask_ass_item(m: Any) -> str:
-        key = f"__ASS_TAG_SHIELD_{len(shield_map)}__"
+        key = f"\x02ASS_TAG_{len(shield_map)}\x03"
         shield_map[key] = m.group(0)
         return key
 
     res = re.sub(r"\{[^\}]*\}", _mask_ass_item, text)
 
     def _mask_quote_item(m: Any) -> str:
-        key = f"__QUOTE_SHIELD_{len(shield_map)}__"
+        key = f"\x02QUOTE_{len(shield_map)}\x03"
         shield_map[key] = m.group(0)
         return key
 
     res = re.sub(r'(?:„[^”]*”|"[^"]*"|»[^«]*«|«[^»]*»)', _mask_quote_item, res)
+
+    def _mask_nl_item(m: Any) -> str:
+        key = f"\x02ASS_NL_{len(shield_map)}\x03"
+        shield_map[key] = m.group(0)
+        return key
+
+    res = re.sub(r"\\[Nnh]", _mask_nl_item, res)
     return res, shield_map
 
 def unmask_ass_tags_and_quotes(text: str, shield_map: Dict[str, str]) -> str:
-    """Restores masked ASS tags and quotes in reverse order."""
+    """Restores masked ASS tags, quotes, and newlines in reverse order."""
     if not text or not shield_map:
         return text
     res = text
@@ -1156,6 +1163,51 @@ class AVTLinter:
             tgt_g = target_gender or addressee_gender
             eff_pl = plural_group_gender if plural_group_gender not in ("AMBIGUOUS", "UNKNOWN", None) else ("VIRILE" if scene_has_male_participant else "AMBIGUOUS")
             eff_you = you_group_gender if you_group_gender not in ("AMBIGUOUS", "UNKNOWN", None) else ("VIRILE" if (addressee_number == "PLURAL" and scene_has_male_participant) else "AMBIGUOUS")
+
+            # Dual dialogue (- Line 1\N- Line 2): isolate second speaker from primary speaker's gender
+            if re.search(r"^\s*[-–—].*(?:\\[Nnh]|\n)\s*[-–—]", text):
+                sub_parts = re.split(r"(\\[Nnh]|\n)", text)
+                reconstructed = []
+                first_dash_done = False
+                dpos_fixes = []
+                for sp in sub_parts:
+                    if re.match(r"^\s*[-–—]", sp):
+                        if not first_dash_done:
+                            sp_fixed, fixes_sub = apply_strict_positive_domain_pipeline(
+                                text=sp,
+                                speaker_gender=speaker_gender,
+                                target_gender=tgt_g,
+                                plural_group_gender=eff_pl,
+                                you_group_gender=eff_you,
+                                scene_has_male_participant=scene_has_male_participant,
+                                series_bible=series_bible,
+                                is_sign=is_sign,
+                                speaker_confidence=speaker_confidence,
+                                target_confidence=target_confidence
+                            )
+                            reconstructed.append(sp_fixed)
+                            dpos_fixes.extend(fixes_sub)
+                            first_dash_done = True
+                        else:
+                            sp_fixed, fixes_sub = apply_strict_positive_domain_pipeline(
+                                text=sp,
+                                speaker_gender=None,
+                                target_gender=None,
+                                plural_group_gender="AMBIGUOUS",
+                                you_group_gender="AMBIGUOUS",
+                                scene_has_male_participant=scene_has_male_participant,
+                                series_bible=series_bible,
+                                is_sign=is_sign,
+                                speaker_confidence=0.0,
+                                target_confidence=0.0
+                            )
+                            reconstructed.append(sp_fixed)
+                            dpos_fixes.extend(fixes_sub)
+                    else:
+                        reconstructed.append(sp)
+                dpos_text = "".join(reconstructed)
+                dpos_text = re.sub(r"[ \t]+", " ", dpos_text).strip()
+                return LintResult(dpos_text, fixes_prefix + dpos_fixes)
 
             dpos_text, dpos_fixes = apply_strict_positive_domain_pipeline(
                 text=text,
@@ -2508,7 +2560,14 @@ NON_VERBS_ON_LEM = {
     "zamysłem", "rozmysłem", "pomysłem", "wymysłem", "hasłem", "masłem", "krzesłem",
     "ciosłem", "przęsłem", "pomięsłem", "czółnem", "cokołem", "matołem", "generałem",
     "admirałem", "marszałkiem", "rywalem", "kaprałem", "postrzałem", "wystrzałem",
-    "odstrzałem", "ostrzałem"
+    "odstrzałem", "ostrzałem", "tłem", "złem", "dziwadłem", "kłem", "cłem", "płem",
+    "pędzlem", "figlem", "maglem", "sygnałem", "kowalem", "góralem", "oddziałem",
+    "strzałem", "upałem", "wałem"
+}
+
+FEMININE_ON_LAM_IMMUNE = {
+    "kłam", "przekłam", "złam", "przełam", "załam", "włam", "wyłam",
+    "odłam", "ułam", "nadłam", "podłam", "szlam", "chłam", "błam"
 }
 
 FIRST_PERSON_MASCULINE_IRREGULAR_TO_FEMININE = {
@@ -2623,6 +2682,8 @@ FIRST_PERSON_FEMININE_IRREGULAR_TO_MASCULINE = {
 
 def convert_first_person_masculine_to_feminine(verb: str) -> Optional[str]:
     v_lower = verb.lower()
+    if v_lower.endswith("ołem") or v_lower.endswith("ółem"):
+        return None
     if v_lower in NON_VERBS_ON_LEM:
         return None
     if v_lower in FIRST_PERSON_MASCULINE_IRREGULAR_TO_FEMININE:
@@ -2726,7 +2787,7 @@ def convert_first_person_masculine_to_feminine(verb: str) -> Optional[str]:
 
 def convert_first_person_feminine_to_masculine(verb: str) -> Optional[str]:
     v_lower = verb.lower()
-    if v_lower in {"błam"}:
+    if v_lower in FEMININE_ON_LAM_IMMUNE:
         return None
     if v_lower in FIRST_PERSON_FEMININE_IRREGULAR_TO_MASCULINE:
         res = FIRST_PERSON_FEMININE_IRREGULAR_TO_MASCULINE[v_lower]
@@ -4610,7 +4671,7 @@ def harmonize_powinien_paradigm(
     masked_text, shield_map = mask_ass_tags_and_quotes(text)
     res = masked_text
 
-    SEP = r"(?:\\[Nnh]|\s)+"
+    SEP = r"(?:\\[Nnh]|\x02ASS_NL_\d+\x03|\s)+"
 
     # 1. First-person singular
     if speaker_gender:
@@ -5043,7 +5104,7 @@ def strip_false_ablative_instrumental(text: str, series_bible: Optional[Any] = N
     masked_text, shield_map = mask_ass_tags_and_quotes(text)
     result = masked_text
 
-    SEP = r"(?:\\[Nnh]|\s)+"
+    SEP = r"(?:\\[Nnh]|\x02ASS_NL_\d+\x03|\s)+"
 
     # 1. Direct group-origin pattern:
     def _repl_group(m):
@@ -5158,7 +5219,7 @@ def strip_false_feminine_instrumental(text: str, series_bible: Optional[Any] = N
     masked_text, shield_map = mask_ass_tags_and_quotes(text)
     result = masked_text
 
-    SEP = r"(?:\\[Nnh]|\s)+"
+    SEP = r"(?:\\[Nnh]|\x02ASS_NL_\d+\x03|\s)+"
 
     # 1. Rzeczowniki pospolite / instytucje bezpośrednio po z/ze z fałszywym -ą
     for bad_w, good_w in NEUTER_INSTITUTIONS_FALSE_FEMININE_MAP.items():
@@ -5411,7 +5472,7 @@ def harmonize_copula_and_predicate_adjective(
     masked_text, shield_map = mask_ass_tags_and_quotes(text)
     result = masked_text
 
-    SEP = r"(?:\\[Nnh]|\s)+"
+    SEP = r"(?:\\[Nnh]|\x02ASS_NL_\d+\x03|\s)+"
 
     def _convert_single_adj(w: str, is_m: bool, is_f: bool) -> str:
         if not w:
@@ -5422,7 +5483,7 @@ def harmonize_copula_and_predicate_adjective(
         nw = w
         if is_m:
             if w_lower == "pewna": nw = "pewien"
-            elif w_lower == "gotowa": nw = "gotów"
+            elif w_lower == "gotowa": nw = "gotowy"
             elif w_lower == "sama": nw = "sam"
             elif w_lower in FEMININE_SG_ADJECTIVES_TO_MASCULINE:
                 nw = FEMININE_SG_ADJECTIVES_TO_MASCULINE[w_lower]
@@ -5677,7 +5738,7 @@ def harmonize_2nd_person_predicate_nouns(
     }
     MOD_MAP_M_TO_F = {v: k for k, v in MOD_MAP_F_TO_M.items()}
 
-    SEP = r"(?:\\[Nnh]|\s)+"
+    SEP = r"(?:\\[Nnh]|\x02ASS_NL_\d+\x03|\s)+"
 
     def _apply_predicate_pass(res_text: str, copula_verbs: str, gender_str: Optional[str], is_1p: bool) -> str:
         if not gender_str:
@@ -5862,7 +5923,7 @@ def harmonize_verbal_gender_1st_and_2nd(
     masked_text, shield_map = mask_ass_tags_and_quotes(text)
     result = masked_text
 
-    SEP = r"(?:\\[Nnh]|\s)+"
+    SEP = r"(?:\\[Nnh]|\x02ASS_NL_\d+\x03|\s)+"
 
     # --- 1. PERSON VERBS (SPEAKER) ---
     if speaker_gender:
@@ -5875,6 +5936,8 @@ def harmonize_verbal_gender_1st_and_2nd(
             def _repl_1p_m(m):
                 pref = m.group(1) or ""
                 w = m.group(2)
+                if w.lower() in FEMININE_ON_LAM_IMMUNE:
+                    return m.group(0)
                 if w.lower() == "powinnam":
                     converted = "Powinienem" if w[0].isupper() else "powinienem"
                 else:
@@ -5894,7 +5957,7 @@ def harmonize_verbal_gender_1st_and_2nd(
                     fixes.append(f"[Czas Przyszły Złożony 1. os. (MALE)] '{pref}{verb}' -> '{pref}{c_verb}'")
                     return f"{pref}{c_verb}"
                 return m.group(0)
-            result = re.sub(r"\b(będę(?:\\[Nnh]|\s)+)([a-ząćęłńóśźż]+(?:ła|szła|mogła|niosła|wiozła|wiodła|ł))\b", _repl_fut_1m, result, flags=re.IGNORECASE)
+            result = re.sub(rf"\b(będę{SEP})([a-ząćęłńóśźż]+(?:ła|szła|mogła|niosła|wiozła|wiodła|ł))\b", _repl_fut_1m, result, flags=re.IGNORECASE)
 
             def _repl_fut_1m_inv(m):
                 verb = m.group(1)
@@ -5904,7 +5967,7 @@ def harmonize_verbal_gender_1st_and_2nd(
                     fixes.append(f"[Czas Przyszły Złożony 1. os. (MALE Inwersja)] '{verb}{suf}' -> '{c_verb}{suf}'")
                     return f"{c_verb}{suf}"
                 return m.group(0)
-            result = re.sub(r"\b([a-ząćęłńóśźż]+(?:ła|szła|mogła|niosła|wiozła|wiodła))((?:\\[Nnh]|\s)+będę)\b", _repl_fut_1m_inv, result, flags=re.IGNORECASE)
+            result = re.sub(rf"\b([a-ząćęłńóśźż]+(?:ła|szła|mogła|niosła|wiozła|wiodła))({SEP}będę)\b", _repl_fut_1m_inv, result, flags=re.IGNORECASE)
 
             # 3. Separated clitic carriers per clause
             def _fix_clitic_clause_1m(clause: str) -> str:
@@ -5933,6 +5996,10 @@ def harmonize_verbal_gender_1st_and_2nd(
             def _repl_1p_f(m):
                 pref = m.group(1) or ""
                 w = m.group(2)
+                start_pos = m.start(2)
+                preceding = result[:start_pos]
+                if re.search(r"\b(?:z|ze|przed|nad|pod|za|między|poza)\s+(?:[a-ząćęłńóśźż]+(?:ym|im|em|ą)\s+)*$", preceding, re.IGNORECASE):
+                    return m.group(0)
                 if w.lower() == "powinienem":
                     converted = "Powinnam" if w[0].isupper() else "powinnam"
                 else:
@@ -5952,7 +6019,7 @@ def harmonize_verbal_gender_1st_and_2nd(
                     fixes.append(f"[Czas Przyszły Złożony 1. os. (FEMALE)] '{pref}{verb}' -> '{pref}{c_verb}'")
                     return f"{pref}{c_verb}"
                 return m.group(0)
-            result = re.sub(r"\b(będę(?:\\[Nnh]|\s)+)([a-ząćęłńóśźż]+(?:ł|szedł|mógł|niósł|wiózł|wiódł))\b", _repl_fut_1f, result, flags=re.IGNORECASE)
+            result = re.sub(rf"\b(będę{SEP})([a-ząćęłńóśźż]+(?:ł|szedł|mógł|niósł|wiózł|wiódł))\b", _repl_fut_1f, result, flags=re.IGNORECASE)
 
             def _repl_fut_1f_inv(m):
                 verb = m.group(1)
@@ -5962,7 +6029,7 @@ def harmonize_verbal_gender_1st_and_2nd(
                     fixes.append(f"[Czas Przyszły Złożony 1. os. (FEMALE Inwersja)] '{verb}{suf}' -> '{c_verb}{suf}'")
                     return f"{c_verb}{suf}"
                 return m.group(0)
-            result = re.sub(r"\b([a-ząćęłńóśźż]+(?:ł|szedł|mógł|niósł|wiózł|wiódł))((?:\\[Nnh]|\s)+będę)\b", _repl_fut_1f_inv, result, flags=re.IGNORECASE)
+            result = re.sub(rf"\b([a-ząćęłńóśźż]+(?:ł|szedł|mógł|niósł|wiózł|wiódł))({SEP}będę)\b", _repl_fut_1f_inv, result, flags=re.IGNORECASE)
 
             # 3. Separated clitic carriers per clause
             def _fix_clitic_clause_1f(clause: str) -> str:
@@ -6016,7 +6083,7 @@ def harmonize_verbal_gender_1st_and_2nd(
                     fixes.append(f"[Czas Przyszły Złożony 2. os. (MALE)] '{pref}{verb}' -> '{pref}{c_verb}'")
                     return f"{pref}{c_verb}"
                 return m.group(0)
-            result = re.sub(r"\b(będziesz(?:\\[Nnh]|\s)+)([a-ząćęłńóśźż]+(?:ła|szła|mogła|niosła|wiozła|wiodła|ł))\b", _repl_fut_2m, result, flags=re.IGNORECASE)
+            result = re.sub(rf"\b(będziesz{SEP})([a-ząćęłńóśźż]+(?:ła|szła|mogła|niosła|wiozła|wiodła|ł))\b", _repl_fut_2m, result, flags=re.IGNORECASE)
 
             def _repl_fut_2m_inv(m):
                 verb = m.group(1)
@@ -6026,7 +6093,7 @@ def harmonize_verbal_gender_1st_and_2nd(
                     fixes.append(f"[Czas Przyszły Złożony 2. os. (MALE Inwersja)] '{verb}{suf}' -> '{c_verb}{suf}'")
                     return f"{c_verb}{suf}"
                 return m.group(0)
-            result = re.sub(r"\b([a-ząćęłńóśźż]+(?:ła|szła|mogła|niosła|wiozła|wiodła))((?:\\[Nnh]|\s)+będziesz)\b", _repl_fut_2m_inv, result, flags=re.IGNORECASE)
+            result = re.sub(rf"\b([a-ząćęłńóśźż]+(?:ła|szła|mogła|niosła|wiozła|wiodła))({SEP}będziesz)\b", _repl_fut_2m_inv, result, flags=re.IGNORECASE)
 
             # 3. Separated clitic carriers per clause
             def _fix_clitic_clause_2m(clause: str) -> str:
@@ -6074,7 +6141,7 @@ def harmonize_verbal_gender_1st_and_2nd(
                     fixes.append(f"[Czas Przyszły Złożony 2. os. (FEMALE)] '{pref}{verb}' -> '{pref}{c_verb}'")
                     return f"{pref}{c_verb}"
                 return m.group(0)
-            result = re.sub(r"\b(będziesz(?:\\[Nnh]|\s)+)([a-ząćęłńóśźż]+(?:ł|szedł|mógł|niósł|wiózł|wiódł))\b", _repl_fut_2f, result, flags=re.IGNORECASE)
+            result = re.sub(rf"\b(będziesz{SEP})([a-ząćęłńóśźż]+(?:ł|szedł|mógł|niósł|wiózł|wiódł))\b", _repl_fut_2f, result, flags=re.IGNORECASE)
 
             def _repl_fut_2f_inv(m):
                 verb = m.group(1)
@@ -6084,7 +6151,7 @@ def harmonize_verbal_gender_1st_and_2nd(
                     fixes.append(f"[Czas Przyszły Złożony 2. os. (FEMALE Inwersja)] '{verb}{suf}' -> '{c_verb}{suf}'")
                     return f"{c_verb}{suf}"
                 return m.group(0)
-            result = re.sub(r"\b([a-ząćęłńóśźż]+(?:ł|szedł|mógł|niósł|wiózł|wiódł))((?:\\[Nnh]|\s)+będziesz)\b", _repl_fut_2f_inv, result, flags=re.IGNORECASE)
+            result = re.sub(rf"\b([a-ząćęłńóśźż]+(?:ł|szedł|mógł|niósł|wiózł|wiódł))({SEP}będziesz)\b", _repl_fut_2f_inv, result, flags=re.IGNORECASE)
 
             # 3. Separated clitic carriers per clause
             def _fix_clitic_clause_2f(clause: str) -> str:

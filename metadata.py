@@ -256,7 +256,7 @@ def _raw_fetch_anilist_metadata(title: str) -> Optional[Dict[str, Any]]:
         startDate {
           year
         }
-        characters(sort: [ROLE, RELEVANCE], perPage: 16) {
+        characters(sort: [ROLE, RELEVANCE], perPage: 50) {
           edges {
             role
             node {
