@@ -42,7 +42,7 @@ import contextlib
 import sqlite3
 import unicodedata
 import concurrent.futures
-from typing import List, Optional, Dict, Any, Tuple
+from typing import List, Optional, Dict, Any, Tuple, Union
 from pathlib import Path
 from PIL import Image
 from pydantic import BaseModel, Field, ConfigDict
@@ -99,6 +99,7 @@ from user_feedback import UserFeedbackManager
 from glossary_manager import GlossaryManager
 from scene_discourse import DualVoiceTagPreserver, DeicticDiscourseEngine, DiarizationSanityChecker
 from client_factory import format_friendly_api_error, patch_google_genai_schema_sanitizer
+from pipeline_logger import EpisodeFlightRecorder
 
 patch_google_genai_schema_sanitizer()
 
@@ -1541,7 +1542,9 @@ class MultimodalTranslator:
         keep_honorifics: bool = True,
         use_whisper: bool = True,
         whisper_model_size: str = "kotoba-tech/kotoba-whisper-v2.0-faster",
-        thinking_budget_phase2: Optional[int] = None
+        thinking_budget_phase2: Optional[int] = None,
+        trace_log: bool = True,
+        trace_dir: Optional[Union[str, Path]] = "logs"
     ):
         self.api_key = api_key or os.getenv("GEMINI_API_KEY")
         if not self.api_key:
@@ -1563,6 +1566,9 @@ class MultimodalTranslator:
         self.keep_honorifics = keep_honorifics
         self.phase1_thinking_budget = 0  # Phase 1 is guaranteed to run with CoT=0 for rapid triangulation
         self.thinking_budget_phase2 = thinking_budget_phase2
+        self.trace_log = trace_log
+        self.trace_dir = trace_dir
+        self.flight_recorder: Optional[EpisodeFlightRecorder] = None
         self.system_prompt = get_translation_system_prompt(keep_honorifics=keep_honorifics, lean=True)
         self.linter = AVTLinter
         
@@ -3418,6 +3424,15 @@ class MultimodalTranslator:
                 pbar.write(f" ├─ [Ostrzeżenie Audio/Whisper]: {e}")
                 pass
 
+        if self.flight_recorder:
+            try:
+                self.flight_recorder.log_acoustics_and_whisper(
+                    f0_metrics={"prosody_tags": prosody_tags, "speaker_tags": speaker_tags},
+                    whisper_results=whisper_transcriptions
+                )
+            except Exception:
+                pass
+
         # 3. Dynamic contextual rules, user golden feedback, and deterministic glossary
         batch_en_queries = [item[2] for item in untranslated_in_batch]
         relevant_feedback = self.user_feedback.find_relevant_feedback(
@@ -3508,6 +3523,18 @@ class MultimodalTranslator:
             contents=contents,
             schema_class=BatchTranslationResponse
         )
+
+        if self.flight_recorder:
+            try:
+                raw_resp = batch_response.model_dump() if hasattr(batch_response, "model_dump") else (batch_response.dict() if hasattr(batch_response, "dict") else str(batch_response))
+                self.flight_recorder.log_phase1_batch(
+                    batch_id=b_idx,
+                    prompt_dump=prompt_text,
+                    raw_response=raw_resp,
+                    response_time_sec=0.0
+                )
+            except Exception:
+                pass
 
         # Update global Character Registry with thread lock and safe registration
         with self.lock:
@@ -4084,6 +4111,18 @@ class MultimodalTranslator:
             refined_dict.update({r.id: sanitize_sub_text(r.refined_pl) for r in refined_lines})
             refined_region_dict.update({r.id: r.screen_region for r in refined_lines if getattr(r, 'screen_region', None)})
             refined_typesetting_dict.update({r.id: r.visual_typesetting for r in refined_lines if getattr(r, 'visual_typesetting', None)})
+
+            if self.flight_recorder:
+                try:
+                    self.flight_recorder.log_phase2_verifier(
+                        batch_id=b_idx,
+                        cot_budget=budget_val if 'budget_val' in locals() else 0,
+                        prompt_dump="",
+                        raw_response=[r.model_dump() if hasattr(r, "model_dump") else (r.dict() if hasattr(r, "dict") else str(r)) for r in refined_lines]
+                    )
+                except Exception:
+                    pass
+
             any_redaction_printed = False
             for r in refined_lines:
                 orig_item = next((it for it in pass1_items if it["id"] == r.id), None)
@@ -4234,6 +4273,26 @@ class MultimodalTranslator:
             eff_max_len = 42 if item.get("is_sign", False) else 38
             formatted_final = split_subtitle_syntactically(final_text, max_line_len=eff_max_len, is_ass=is_ass, is_sign=item.get("is_sign", False))
             batch_results[item["orig_idx"]] = formatted_final
+
+            if self.flight_recorder:
+                try:
+                    self.flight_recorder.log_line_evolution(
+                        line_id=item.get("orig_idx", item["id"]),
+                        start_ms=start_m,
+                        end_ms=end_m,
+                        actor=item.get("speaker_name") or item.get("speaker") or "",
+                        en_text=item.get("en", ""),
+                        jp_audio=item.get("audio_jp", ""),
+                        whisper_tags=str(item.get("whisper_disambiguation", "")),
+                        telemetry_tag=item.get("telemetry_tag", ""),
+                        phase1_pl=item.get("pl", ""),
+                        phase2_pl=refined_dict.get(item["id"], item["pl"]),
+                        linter_pl=final_text,
+                        fixes_applied=fixes + gloss_fixes
+                    )
+                except Exception:
+                    pass
+
             eff_reg = refined_region_dict.get(item["id"]) or item.get("screen_region")
             if eff_reg:
                 batch_regions[item["orig_idx"]] = eff_reg
@@ -4276,6 +4335,47 @@ class MultimodalTranslator:
         if self.verifier:
             self.verifier.current_episode_tokens = {"prompt": 0, "cached": 0, "output": 0, "model": self.verifier.model}
 
+        init_slug = subs_file.stem.split(" - ")[0].replace("[ASW]", "").replace("[Erai-raws]", "").strip() or "anime"
+        if getattr(self, "trace_log", True):
+            try:
+                self.flight_recorder = EpisodeFlightRecorder(
+                    anime_slug=init_slug,
+                    filename=subs_file.stem,
+                    trace_dir=getattr(self, "trace_dir", "logs"),
+                    enabled=True
+                )
+            except Exception:
+                self.flight_recorder = None
+        else:
+            self.flight_recorder = None
+
+        if self.flight_recorder:
+            try:
+                self.flight_recorder.log_cli_init(
+                    cli_args={
+                        "subs_path": subs_path,
+                        "video_path": video_path,
+                        "output_path": output_path,
+                        "batch_size": self.batch_size,
+                        "keep_honorifics": self.keep_honorifics,
+                        "enable_verifier": self.enable_verifier,
+                        "use_whisper": bool(self.whisper)
+                    },
+                    paths={
+                        "subs_file": str(subs_file),
+                        "video_path": video_path,
+                        "output_path": output_path
+                    },
+                    models={
+                        "phase1_model": self.model_phase1,
+                        "phase2_model": getattr(self.verifier, "model", None) if self.verifier else None
+                    },
+                    context_cache_info={"model": self.model_phase1},
+                    client_pool_info={"active_clients": len(getattr(self.client_pool, "clients", [1])) if getattr(self, "client_pool", None) else 1}
+                )
+            except Exception:
+                pass
+
         is_ass = not str(subs_file).lower().endswith(".srt")
 
         from avt_linter import load_subtitle_file_resilient
@@ -4285,6 +4385,31 @@ class MultimodalTranslator:
         from style_matrix import analyze_subtitles
         self.style_report = analyze_subtitles(subs)
         print(self.style_report.format_user_friendly_summary())
+
+        if self.flight_recorder:
+            try:
+                classified_sample = []
+                for idx_ev, ev_item in enumerate(subs.events[:50]):
+                    ts_pref_c, clean_c = extract_typesetting_tags(ev_item.text)
+                    v_info = detect_event_visual_type(ev_item, ts_pref_c, style_report=getattr(self, "style_report", None))
+                    classified_sample.append({
+                        "id": idx_ev + 1,
+                        "start": ev_item.start,
+                        "end": ev_item.end,
+                        "style": ev_item.style,
+                        "raw_actor_name": getattr(ev_item, "name", ""),
+                        "type_label": v_info.get("type_label", "DIALOG"),
+                        "is_sign": v_info.get("is_sign", False),
+                        "en_raw": clean_c or ev_item.text
+                    })
+                self.flight_recorder.log_ingestion(
+                    encoding="utf-8",
+                    total_events=len(subs.events),
+                    style_matrix=getattr(self.style_report, "styles", {}) if hasattr(self, "style_report") else {},
+                    events_classified=classified_sample
+                )
+            except Exception:
+                pass
 
         # 0. Retrieve anime metadata from AniList (with Gemini Parametric Knowledge Fallback)
         ref_filename = video_path if video_path else subs_path
@@ -4316,6 +4441,23 @@ class MultimodalTranslator:
                 elif c_name:
                     if c_name not in self.character_registry:
                         self.character_registry[c_name] = f"postać ({c.get('role', 'postać')})"
+
+        if self.flight_recorder:
+            try:
+                actor_map = {}
+                from metadata import normalize_actor_tag
+                for ev_it in subs.events:
+                    raw_spk = getattr(ev_it, "name", "")
+                    if raw_spk and raw_spk not in actor_map:
+                        cl_act, ex_gen = normalize_actor_tag(raw_spk)
+                        actor_map[raw_spk] = {"clean_name": cl_act, "extracted_gender": ex_gen}
+                self.flight_recorder.log_metadata(
+                    clean_slug=self.flight_recorder.anime_slug,
+                    anilist_meta=anime_meta,
+                    actor_mappings=actor_map
+                )
+            except Exception:
+                pass
 
         # 1. Clean events and compress frame-by-frame animations (FBF Animation Deduplication)
         raw_all_entries = []
@@ -4502,6 +4644,17 @@ class MultimodalTranslator:
         )
         episode_profile_str = format_lean_episode_brief(episode_profile) if episode_profile else ""
 
+        if self.flight_recorder:
+            try:
+                cache_st = "hit" if (profile_cache_path and os.path.exists(profile_cache_path)) else "computed"
+                self.flight_recorder.log_profile_prepass(
+                    cache_status=cache_st,
+                    episode_profile=episode_profile,
+                    profile_brief=episode_profile_str
+                )
+            except Exception:
+                pass
+
         # 0b. Initialize and load Series Bible (Cross-Episode Continuity)
         series_title = ""
         if anime_meta:
@@ -4614,6 +4767,27 @@ class MultimodalTranslator:
         self.combined_glossary = combined_glossary
         if combined_glossary:
             print(f"  [Słownik Deterministyczny]: Aktywnych {len(combined_glossary)} terminów (Hierarchia: Kanon Mangi > Biblia Serialu > Profiler > Słownik Użytkownika).")
+
+        if self.flight_recorder:
+            try:
+                char_reg = getattr(self.series_bible, "characters", {}) if hasattr(self, "series_bible") and self.series_bible else {}
+                rel_dict = getattr(self.series_bible, "relations", {}) if hasattr(self, "series_bible") and self.series_bible else {}
+                decl_dict = getattr(self.series_bible, "declensions", {}) if hasattr(self, "series_bible") and self.series_bible else {}
+                bible_sum = {
+                    "slug": getattr(self.series_bible, "slug", "") if hasattr(self, "series_bible") and self.series_bible else "",
+                    "characters_count": len(char_reg),
+                    "glossary_count": len(combined_glossary) if combined_glossary else 0,
+                    "relations_count": len(rel_dict),
+                    "declensions_count": len(decl_dict)
+                }
+                self.flight_recorder.log_series_bible(
+                    bible_summary=bible_sum,
+                    character_registry=char_reg,
+                    relations=rel_dict,
+                    declensions=decl_dict
+                )
+            except Exception:
+                pass
 
         user_rules_cnt = len(self.user_feedback.list_all())
         user_feedback_str = self.user_feedback.format_for_prompt()
@@ -4764,6 +4938,27 @@ class MultimodalTranslator:
             scene_threshold_ms=3800,
             coalesce_tail=True
         )
+
+        if self.flight_recorder:
+            try:
+                batches_sum = [
+                    {
+                        "batch_id": b_idx,
+                        "line_count": len(b),
+                        "first_id": b[0][0] if b else None,
+                        "last_id": b[-1][0] if b else None,
+                        "start_ms": b[0][3] if b else 0,
+                        "end_ms": b[-1][4] if b else 0
+                    }
+                    for b_idx, b in enumerate(batches)
+                ]
+                self.flight_recorder.log_scene_discourse(
+                    scene_boundaries=getattr(self, "scene_cuts_ms", []),
+                    turns=[],
+                    batches_summary=batches_sum
+                )
+            except Exception:
+                pass
 
         with tqdm(
             total=total_lines,
@@ -5382,6 +5577,17 @@ class MultimodalTranslator:
                     pass
         except Exception:
             pass
+
+        if self.flight_recorder:
+            try:
+                self.flight_recorder.log_quality_gate_and_pricing(
+                    quality_gate_fixes=qg_fixes if 'qg_fixes' in locals() else [],
+                    avt_metrics={"total_lines": total_lines, "events_count": len(final_subs.events)},
+                    pricing_summary=breakdown if 'breakdown' in locals() else {}
+                )
+                self.flight_recorder.finalize()
+            except Exception:
+                pass
 
         # Clean up server-side Context Cache objects across all clients in the pool to avoid storage fees
         try:

@@ -17556,6 +17556,178 @@ def test_standard_9_ultimate_pipeline_verification():
     print(" -> PASSED: Test 181 potwierdza 100% spójności potoku AVT ze Standardem 9.0 (15/15 PASS).")
 
 
+def test_episode_flight_recorder_full_pipeline_trace():
+    """
+    Test 182: Weryfikacja Rejestratora Przebiegu Tłumaczenia Odcinka (EpisodeFlightRecorder).
+    Sprawdza tworzenie plików .log i .jsonl, rejestrację wszystkich etapów potoku,
+    poprawność struktury JSONL oraz bezpieczeństwo wielowątkowe (threading.Lock).
+    """
+    import json
+    import threading
+    from pathlib import Path
+    import tempfile
+    from pipeline_logger import EpisodeFlightRecorder
+
+    print("\n[TEST 182] Weryfikacja Rejestratora Przebiegu Potoku (EpisodeFlightRecorder)...")
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        tmp_path = Path(tmp_dir)
+        recorder = EpisodeFlightRecorder(
+            anime_slug="test_series_title",
+            filename="test_ep01",
+            trace_dir=tmp_path,
+            enabled=True
+        )
+
+        assert recorder.log_path.exists(), f"Plik .log nie został utworzony: {recorder.log_path}"
+        assert recorder.jsonl_path.exists(), f"Plik .jsonl nie został utworzony: {recorder.jsonl_path}"
+
+        # 1. KROK 1: CLI & Inicjalizacja
+        recorder.log_cli_init(
+            cli_args={"subs": "test.ass", "video": "test.mp4", "model": "gemini-2.5-flash"},
+            paths={"subs_path": "test.ass", "video_path": "test.mp4"},
+            models={"model_phase1": "gemini-2.5-flash", "model_phase2": "gemini-2.5-pro"}
+        )
+
+        # 2. KROK 2: Ingestia i klasyfikacja wizualna
+        recorder.log_ingestion(
+            encoding="utf-8",
+            total_events=50,
+            style_matrix={"Default": 45, "Sign": 5},
+            events_classified=[{"id": 1, "start": 1000, "end": 3000, "style": "Default", "type_label": "DIALOG", "raw_actor_name": "Actor1", "en_raw": "Hello"}]
+        )
+
+        # 3. KROK 3: Metadane i normalizacja aktorów
+        recorder.log_metadata(
+            clean_slug="test_series_title",
+            anilist_meta={"title": "Test Series", "episodes": 12},
+            actor_mappings={"Actor1 (M)": ("Actor1", "MALE")}
+        )
+
+        # 4. KROK 4: Akustyka F0 i Whisper
+        recorder.log_acoustics_and_whisper(
+            f0_metrics={"f0_median_hz": 120.5, "male_weight": 0.95},
+            whisper_results={1: "Konnichiwa"}
+        )
+
+        # 5. KROK 5: Profiler pre-pass
+        recorder.log_profile_prepass(
+            cache_status="GENERATED",
+            episode_profile={"era": "Fantasy", "tone": "Dramatic"},
+            profile_brief="Realia świata: Fantasy | Ton: Poważny"
+        )
+
+        # 6. KROK 6: Pamięć serii i paradygmaty
+        recorder.log_series_bible(
+            bible_summary={"slug": "test_series_title", "characters_count": 5},
+            character_registry={"Actor1": {"gender": "MALE", "priority": "P0"}},
+            relations={"Actor1 -> Actor2": "Friends"},
+            declensions={"Actor1": {"M": "Actor1", "D": "Actor1a"}}
+        )
+
+        # 7. KROK 7: Graf dyskursu i paczki
+        recorder.log_scene_discourse(
+            scene_boundaries=[3500, 15000],
+            turns=[{"turn_id": 1, "speaker": "Actor1", "target": "Actor2"}],
+            batches_summary=[{"batch_id": 0, "line_count": 25, "start_ms": 1000, "end_ms": 35000}]
+        )
+
+        # 8. KROK 8: Faza 1
+        recorder.log_phase1_batch(
+            batch_id=0,
+            prompt_dump="Translate the following dialogues...",
+            raw_response={"translations": [{"id": 1, "polish_text": "Cześć"}]},
+            response_time_sec=1.45,
+            token_usage={"prompt": 500, "output": 50}
+        )
+
+        # 9. KROK 9: Faza 2
+        recorder.log_phase2_verifier(
+            batch_id=0,
+            cot_budget=2048,
+            prompt_dump="Verify dialogues...",
+            raw_response=[{"id": 1, "refined_pl": "Witaj", "changes_made": "Lepszy rejestr"}]
+        )
+
+        # 10. KROK 10: Ewolucja linii
+        recorder.log_line_evolution(
+            line_id=1,
+            start_ms=1000,
+            end_ms=3000,
+            actor="Actor1",
+            en_text="Hello",
+            jp_audio="Konnichiwa",
+            whisper_tags="K1",
+            telemetry_tag="[Mówca: Actor1 | Adresat: Actor2]",
+            phase1_pl="Cześć",
+            phase2_pl="Witaj",
+            linter_pl="Witaj",
+            fixes_applied=["D_pos check ok"]
+        )
+
+        # 11. KROK 11: Bramka jakości i rozliczenie
+        recorder.log_quality_gate_and_pricing(
+            quality_gate_fixes=["Brak uwag"],
+            avt_metrics={"total_lines": 50, "events_count": 50},
+            pricing_summary={"net_pln": 0.42, "savings_pln": 3.80}
+        )
+
+        # Test współbieżności wielowątkowej
+        threads = []
+        for t_idx in range(10):
+            def worker(w_id=t_idx):
+                recorder.record_event(
+                    stage=f"worker_stage_{w_id}",
+                    payload={"worker_id": w_id, "data": "concurrent_test"},
+                    message=f"Wpis wątku {w_id}"
+                )
+            t = threading.Thread(target=worker)
+            threads.append(t)
+            t.start()
+        for t in threads:
+            t.join()
+
+        # Zakończenie sesji
+        recorder.finalize()
+
+        # Asercja 1: Plik .log zawiera nagłówek, stopkę i sekcje kroków
+        log_content = recorder.log_path.read_text(encoding="utf-8")
+        assert "REJESTRATOR PRZEBIEGU POTOKU AVT" in log_content
+        assert "[KROK 1: CLI & INICJALIZACJA PROCESU]" in log_content
+        assert "[KROK 2: INGESTIA NAPISÓW I KLASYFIKACJA WIZUALNA]" in log_content
+        assert "[KROK 3: METADANE ZEWNĘTRZNE I NORMALIZACJA AKTORÓW]" in log_content
+        assert "[KROK 4: AKUSTYKA DSP, ESTYMACJA F0 I WHISPER ASR]" in log_content
+        assert "[KROK 5: PROFILER ODCINKA PRE-PASS]" in log_content
+        assert "[KROK 6: PAMIĘĆ SERII SERIESBIBLE I PARADYGMATY ODMIANY]" in log_content
+        assert "[KROK 7: GRAF DYSKURSU SCENICZNEGO I ADAPTACYJNE PACZKI]" in log_content
+        assert "[KROK 8: FAZA 1 - PIERWOTNE TŁUMACZENIE PRIMARY LLM (PACZKA 0)]" in log_content
+        assert "[KROK 9: FAZA 2 - WERYFIKACJA DIALOGUEVERIFIER (PACZKA 0)]" in log_content
+        assert "[KROK 11: EPISODEQUALITYGATE I ROZLICZENIE FINANSOWE PRICINGGUARD]" in log_content
+        assert "ZAKOŃCZENIE PRZEBIEGU POTOKU AVT" in log_content
+
+        # Asercja 2: Plik .jsonl zawiera poprawne obiekty JSON dla każdego etapu
+        jsonl_lines = [line.strip() for line in recorder.jsonl_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+        assert len(jsonl_lines) >= 20, f"Oczekiwano co najmniej 20 wpisów w JSONL, otrzymano {len(jsonl_lines)}"
+        stages_found = set()
+        for line in jsonl_lines:
+            entry = json.loads(line)
+            assert "timestamp_iso" in entry
+            assert "stage" in entry
+            assert "payload" in entry
+            stages_found.add(entry["stage"])
+
+        expected_stages = {
+            "cli_init", "ingestion", "metadata", "acoustics_whisper",
+            "profile_prepass", "series_bible", "scene_discourse",
+            "phase1_batch", "phase2_verifier", "line_evolution",
+            "quality_gate_pricing"
+        }
+        for st in expected_stages:
+            assert st in stages_found, f"Brak etapu {st} w zarejestrowanych zdarzeniach JSONL!"
+
+    print(" -> PASSED: Test 182 potwierdza 100% poprawności działania EpisodeFlightRecorder.")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -17739,7 +17911,8 @@ if __name__ == "__main__":
     test_verify_purity_ast_and_zero_literal_invariant()
     test_standard_9_twelve_point_architectural_hardening_guard()
     test_standard_9_ultimate_pipeline_verification()
-    print("\n Wszystkie testy jednostkowe i integracyjne (181/181) zakończone pełnym sukcesem!\n")
+    test_episode_flight_recorder_full_pipeline_trace()
+    print("\n Wszystkie testy jednostkowe i integracyjne (182/182) zakończone pełnym sukcesem!\n")
 
 
 

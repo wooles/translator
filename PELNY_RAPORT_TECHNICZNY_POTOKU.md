@@ -750,10 +750,46 @@ Audytor zmian w systemie kontroli wersji Git (VICTORY CONFIRMED):
 - **4/4 Test Integrity Gate:** Wymóg testów jednostkowych i wykluczenie mockowania logiki domenowej silnika (`unittest.mock.patch`).
 
 ### 4. Pakiet Testów Regresyjnych Pytest (`test_system.py`)
-- **179/179 PASSED (100% testów zielonych, Zero Regression Lock):**
+- **182/182 PASSED (100% testów zielonych, Zero Regression Lock):**
   * **Testy 1–171:** Testy historyczne kompatybilności wstecznej (morfosyntaktyka, deiksa, akustyka, QuoteShield, deklinacja onomastyczna).
   * **Testy 172–175:** Testy normalizacji aktorów, naprawy hybryd, koordynacji przymiotników i paradygmatu modalnego `powinien`.
   * **Testy 176–179:** Testy czystej domeny pozytywnej $D_{\text{pos}}$, promocji płci do P0, rygoru `EntityCategory.TOPONYM` oraz zero wycieku nazw do kodu produkcyjnego.
+  * **Testy 180–181:** Testy 12-punktowego utwardzenia Standardu 9.0 oraz weryfikacji ostatecznego audytora 15 bramek potoku.
+  * **Test 182:** Kompleksowa weryfikacja Rejestratora Przebiegu Tłumaczenia Odcinka (`EpisodeFlightRecorder`), weryfikacja spójności plików `.log` i `.jsonl`, struktury 11 etapów oraz współbieżności wielowątkowej.
+
+---
+
+## CZĘŚĆ X: CZARNA SKRZYNKA POTOKU — REJESTRATOR PRZEBIEGU ODCINKA (`EpisodeFlightRecorder`)
+
+W Standardzie 9.0 wprowadzono bezinwazyjny, wielowątkowo bezpieczny system pełnej telemetrii wykonawczej potoku: `EpisodeFlightRecorder` (`pipeline_logger.py`). Rejestrator zapisuje krok po kroku wszystkie dane wejściowe, pośrednie i wyjściowe dla każdego przetwarzanego odcinka.
+
+### 1. Dualna Architektura Plików Śledzenia
+Rejestrator generuje w katalogu wyjściowym (`logs/` lub wskazanym przez `--trace-dir`) dwa skorelowane pliki:
+1. **Plik czytelny dla człowieka (`.log`):**
+   `logs/{slug}_{plik}_{timestamp}_full_trace.log`
+   Zawiera chronologiczny, sformatowany raport podzielony na sekcje od kroku 1 do kroku 20, umożliwiający błyskawiczny audyt decyzji translatorskich, lingwistycznych i technicznych.
+2. **Plik maszynowy strumienia zdarzeń (`.jsonl`):**
+   `logs/{slug}_{plik}_{timestamp}_events.jsonl`
+   Każda linia reprezentuje ustrukturyzowany rekord JSON ze znacznikiem czasu `timestamp_iso`, nazwą etapu `stage`, opcjonalnymi identyfikatorami `batch_id` i `line_id` oraz kompletnym słownikiem danych `payload`.
+
+### 2. Zakres Rejestrowanych Danych (11 Etapów Potoku)
+1. **Etap 1 (`cli_init`):** Parametry wywołania CLI, ścieżki wejściowe/wyjściowe, konfiguracja modeli Gemini Fazy 1 i 2, stan `ContextCacheManager` oraz `ClientPool`.
+2. **Etap 2 (`ingestion`):** Kodowanie źródłowe, łączna liczba zdarzeń `SSAEvent`, matryca stylów ASS oraz próbka klasyfikacji wizualnej (`detect_event_visual_type`).
+3. **Etap 3 (`metadata`):** Znormalizowany slug serii, metadane AniList GraphQL API oraz tabela mapowania etykiet aktorów z `normalize_actor_tag`.
+4. **Etap 4 (`acoustics_whisper`):** Estymacja F0 (`librosa.pyin`), metryki prozodii oraz transkrypcje japońskiego audio z Faster-Whisper.
+5. **Etap 5 (`profile_prepass`):** Stan pamięci podręcznej profilera, obiekt `EpisodeProfile` oraz wygenerowane podsumowanie założeń świata serii.
+6. **Etap 6 (`series_bible`):** Stan bazy wiedzy `SeriesBible`, rejestr postaci `CharacterRecord Positive Schema`, relacje skierowane oraz paradygmaty deklinacyjne `DeclensionParadigm`.
+7. **Etap 7 (`scene_discourse`):** Wykryte cięcia scen, graf dyskursu scenicznego, tury i pod-tury `SpeakerTurn`/`SubTurn`, stan virility `We_Group`/`You_Group` oraz zestawienie paczek adaptacyjnych `create_adaptive_batches`.
+8. **Etap 8 (`phase1_batch`):** Prompt Fazy 1, czas odpowiedzi, zużycie tokenów oraz pełna surowa odpowiedź modelu Primary LLM (`BatchTranslationResponse`).
+9. **Etap 9 (`phase2_verifier`):** Budżet myślenia CoT, prompt Fazy 2 oraz surowa odpowiedź weryfikatora `DialogueVerifier` (`RefinedBatchResponse`).
+10. **Etap 10 (`line_evolution`):** Szczegółowa ewolucja każdej linii dialogowej: `EN -> Whisper JP Audio -> Telemetria -> Faza 1 PL -> Faza 2 PL -> AVTLinter D_pos PL` wraz z listą zastosowanych napraw fleksyjnych i słownikowych.
+11. **Etap 11 (`quality_gate_pricing`):** Audyt całego odcinka przez `EpisodeQualityGate` (Faza 0 + Faza 7), metryki AVT (CPL/CPS) oraz raport finansowy `PricingGuard` z rozliczeniem rabatu keszu kontekstu (-90%).
+
+### 3. Sterowanie z Poziomu CLI
+Potok wspiera flagi kontrolujące działanie rejestratora:
+- `--trace-log` (domyślnie aktywna): Włącza zapis pełnego przebiegu do plików `.log` i `.jsonl`.
+- `--no-trace-log`: Wyłącza rejestrator przebiegu.
+- `--trace-dir`: Wskazuje niestandardowy katalog zapisu logów śledzenia (domyślnie `logs`).
 
 ---
 **KONIEC PEŁNEGO RAPORTU TECHNICZNEGO POTOKU AVT — TRANSLATOR STANDARD 8.0 / 9.0**

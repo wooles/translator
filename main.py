@@ -324,6 +324,24 @@ def main():
         "--output", "-o",
         help="Ścieżka docelowa dla pliku z polskimi napisami (dotyczy tylko pojedynczego pliku)"
     )
+    parser.add_argument(
+        "--trace-log",
+        dest="trace_log",
+        action="store_true",
+        default=True,
+        help="Włącz rejestrator czarnej skrzynki potoku (EpisodeFlightRecorder)"
+    )
+    parser.add_argument(
+        "--no-trace-log",
+        dest="trace_log",
+        action="store_false",
+        help="Wyłącz rejestrator czarnej skrzynki potoku"
+    )
+    parser.add_argument(
+        "--trace-dir",
+        default="logs",
+        help="Katalog zapisu pełnych logów telemetrycznych (domyślnie: logs)"
+    )
 
     args = parser.parse_args()
 
@@ -478,7 +496,9 @@ def main():
             keep_honorifics=keep_honorifics,
             use_whisper=use_whisper,
             whisper_model_size=args.whisper_model,
-            thinking_budget_phase2=thinking_budget
+            thinking_budget_phase2=thinking_budget,
+            trace_log=getattr(args, "trace_log", True),
+            trace_dir=getattr(args, "trace_dir", "logs")
         )
     except ValueError as e:
         print(f"\n[Błąd Konfiguracji]: {e}")
