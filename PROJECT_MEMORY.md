@@ -4,14 +4,14 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 17.10.2026)
-- **Status CI/CD:** `STATUS: WDROŻONE I ZWERYFIKOWANE (178/178 -> 179/179 PASSED) - VICTORY CONFIRMED`
-- **Gałąź i Architektura:** `main` (Standard 7.1: Strict Positive Domain Production Routing [`strict_positive_domain=True`], Legacy Monolith Bypass & Pure Positive Domain Invariant Architecture [\(\forall x \notin \mathcal{D}_{\text{pos}}, T(x) = x\)], Primary LLM Translation Authority, Declarative World-State Telemetry [`format_dry_telemetry_tag` >= 0.80], CharacterRecord Positive Schema z promocją płci do P0, Relations Separation z transparentnym fallbackiem `CharacterRegistryDict`, O(1) In-RAM Alias Index z indeksacją pierwszych imion, Kanoniczna Normalizacja Etykiet Aktora `normalize_actor_tag`, Rozłączne Zbiory We_Group & You_Group z symetryczną klasyfikacją virility, Szereg Współrzędny Przymiotników po łączniku 2. os., Paradygmat Czasownika Powinien, Domena Pozytywna `DeclensionParadigm`, 100% Backward Compatibility dla `strict_positive_domain=False`, Zero-Literal-Leakage Protocol & `audit_diff.ps1` Forensic Gate)
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 19.10.2026)
+- **Status CI/CD:** `STATUS: WDROŻONE I ZWERYFIKOWANE (183/183 PASSED) - VICTORY CONFIRMED`
+- **Gałąź i Architektura:** `main` (Standard 9.0: Wariant (d) — Hybrydowa Straż Dowodowa [Hybrid Evidence Guard & Pipeline Hardening], Zero Morphosyntactic Mutation in Production [`VARIANT_D_PURE_LLM_MORPHOLOGY = True`, \(T(x) = x\)], Narrow Safety Net \(P_0 \cap \text{EN}\) w `EpisodeQualityGate.apply_narrow_safety_net_p0_en`, Pre-translacyjna Ingestia AniList P0 do `SeriesBible.characters` z paradygmatami odmiany nazw, Fonetyczna Normalizacja Aliasów `ph <-> f` w \(\mathcal{O}(1)\) z samoleczącym indeksem, Trwałe Wyeliminowanie Pętli Rewersji `authoritative_dialogue` w Kroku 18 `translator.py`, Reguła Wołacza Tytułów dla nazw obcych na `-tz` [`Kapitanie Moritz`, `Panie Fritz`], Programowa Bariera Regresji Fazy 2 `_guard_phase2_regressions` w `DialogueVerifier` [ochrona rodzaju czasowników i zakaz kalk ciągłych `być + -ący`], Rygorystyczna Higiena ASS [usuwanie spacji z tagów i przenoszenie wiszących spójników przed `\N`], Stabilna Identyfikacja Zdarzeń `[ID: {event_id}]`, Full-Codebase Zero-Anime-Literal Invariant & 11/11 w `verify_purity.py`, 4/4 w `audit_diff.ps1`)
 - **Środowisko:** Python 3.13 (`.venv`), Windows PowerShell, `ffmpeg` (PATH), `librosa.pyin`, `soundfile`, `pysubs2`, `spaCy en_core_web_sm` (100% offline 0.00 PLN), bezpośrednie klucze Google AI Studio API (`use_vertex = 0`).
 - **Dyrektywa Wykonawcza Testów:**
   * Testy przyrostowe podczas kodowania (< 2 s): `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_testu>"`
   * Audyt śledczy diffu: `powershell -ExecutionPolicy Bypass -File .\audit_diff.ps1 -ForbiddenTerms "<lista>"`
-  * Pełny pakiet regresyjny (~12 min, uruchamiany wyłącznie raz w Fazie 4): `.\.venv\Scripts\python.exe -m pytest` (179/179 PASSED)
+  * Pełny pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest` (183/183 PASSED)
 
 ---
 
@@ -137,3 +137,5 @@ ules.py, erifier.py, whisper_disambiguator.py) nie występuje ani jeden litera�
 | **2026-10-18** | ARB-041 | Telemetria | **Pełna Deklaratywna Telemetria**: Zamiana strzałek dyrektywnych `->` i alarmów na czyste deskryptory stanu audio (`Sygnał audio JP: ...`, `Kotwica semantyczna audio JP: ...`, `[TELEMETRIA: ...]`). | 0.00 PLN |
 | **2026-10-18** | ARB-042 | Kanon / Zasady | **Ekstirpacja 4 Klastrów Onomastycznych w rules.py**: Całkowite oczyszczenie reguł z literałów dialektów i postaci przy zachowaniu identyfikatorów filarów. | 0.00 PLN |
 | **2026-10-18** | ARB-043 | Tarcza Regresyjna | **Synchronizacja Asercji Testowych (Standard 8.0)**: Dopasowanie 61 asercji do deklaratywnej telemetrii (179/179 PASSED, 0 naruszeń we wszystkich 5 bramkach). | 0.00 PLN |
+| **2026-10-19** | `ARB-044` | Architektura Wariantu (d) | **Hybrydowa Straż Dowodowa (Standard 9.0)**: Odcięcie mutatorów lintera w produkcji ($T(x) = x$), Narrow Safety Net $P_0 \cap \text{EN}$, pre-translacyjna ingestia AniList $P_0$, aliasy $ph \leftrightarrow f$ w $\mathcal{O}(1)$, eliminacja pętli rewersji w Kroku 18, wołacz tytularny `-tz`, bariera regresji Fazy 2, higiena ASS i stabilne `[ID: event_id]` (183/183 PASSED). | 0.00 PLN |
+

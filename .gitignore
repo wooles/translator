@@ -19,6 +19,7 @@ models/
 # Temporary Media & Subtitles
 baza napisów/
 temp/
+logs/
 *.tmp
 *.log
 frames/

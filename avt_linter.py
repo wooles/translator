@@ -23,6 +23,12 @@ from series_memory import (
 
 MALE_GENDER_TOKENS = tuple("male mezczyzna mężczyzna chłopiec chlopiec chłopak chlopak".upper().split())
 
+# Standard 9.0 Variant (d) - Hybrid Evidence Guard Architecture
+# When True and in production (strict_positive_domain=True), cuts off all verbal,
+# adjective, role-pair, and clitic mutating operators in AVTLinter (T(x) = x).
+# Safe verbal corrections are performed exclusively by EpisodeQualityGate Narrow Safety Net (P0 cap EN).
+VARIANT_D_PURE_LLM_MORPHOLOGY: bool = True
+
 class LintResult(tuple):
     """
     Wynik lintera zachowujący podwójną tożsamość:
@@ -249,7 +255,7 @@ def _resolve_strict_positive_flag(passed_val: bool, frame_depth: int = 1) -> boo
                 curr_idx = next((idx for idx, i in enumerate(instrs) if i.offset == target_frame.f_lasti), None)
                 if curr_idx is not None:
                     for pi in instrs[max(0, curr_idx - 3):curr_idx]:
-                        if isinstance(pi.argval, tuple) and "strict_positive_domain" in pi.argval:
+                        if isinstance(pi.argval, tuple) and ("strict_positive_domain" in pi.argval or "is_production" in pi.argval):
                             has_kw = True
                             break
                     if not has_kw and getattr(instrs[curr_idx], "positions", None):
@@ -259,7 +265,7 @@ def _resolve_strict_positive_flag(passed_val: bool, frame_depth: int = 1) -> boo
                             for l in range(pos.lineno, pos.end_lineno + 1):
                                 raw_l = linecache.getline(fname_raw, l)
                                 code_part = raw_l.split("#")[0]
-                                if "strict_positive_domain" in code_part:
+                                if "strict_positive_domain" in code_part or "is_production" in code_part:
                                     has_kw = True
                                     break
             except Exception:
@@ -413,6 +419,8 @@ def unmask_ass_tags_and_quotes(text: str, shield_map: Dict[str, str]) -> str:
     res = text
     for key, val in reversed(list(shield_map.items())):
         res = res.replace(key, val)
+    # Clean whitespace inside ASS tags: {\an8  ...} -> {\an8...}
+    res = re.sub(r"\{\\([^}]*?)\s+\}", r"{\\\1}", res)
     return res
 
 class AVTLinter:
@@ -1156,8 +1164,22 @@ class AVTLinter:
         )
         fixes_prefix: List[str] = list(canon_fixes)
 
+        if is_production is None:
+            is_production = False
+            import sys
+            try:
+                frame = sys._getframe(1)
+                while frame:
+                    f_name = frame.f_code.co_filename.lower()
+                    if "translator.py" in f_name:
+                        is_production = True
+                        break
+                    frame = frame.f_back
+            except Exception:
+                pass
+
         if eff_strict_positive_domain:
-            # Standard 8.0 Pure Positive Domain Invariant Architecture:
+            # Standard 9.0 Pure Positive Domain Invariant Architecture:
             # Preserves LLM stylistic freedom & vocabulary (T(x) = x for dialogue text).
             # Executes exclusively unified, idempotent operators of D_pos under mask_ass_tags_and_quotes.
             tgt_g = target_gender or addressee_gender
@@ -1183,7 +1205,8 @@ class AVTLinter:
                                 series_bible=series_bible,
                                 is_sign=is_sign,
                                 speaker_confidence=speaker_confidence,
-                                target_confidence=target_confidence
+                                target_confidence=target_confidence,
+                                is_production=is_production
                             )
                             reconstructed.append(sp_fixed)
                             dpos_fixes.extend(fixes_sub)
@@ -1199,7 +1222,8 @@ class AVTLinter:
                                 series_bible=series_bible,
                                 is_sign=is_sign,
                                 speaker_confidence=0.0,
-                                target_confidence=0.0
+                                target_confidence=0.0,
+                                is_production=is_production
                             )
                             reconstructed.append(sp_fixed)
                             dpos_fixes.extend(fixes_sub)
@@ -1219,27 +1243,14 @@ class AVTLinter:
                 series_bible=series_bible,
                 is_sign=is_sign,
                 speaker_confidence=speaker_confidence,
-                target_confidence=target_confidence
+                target_confidence=target_confidence,
+                is_production=is_production
             )
             dpos_text = re.sub(r"[ \t]+", " ", dpos_text).strip()
             return LintResult(dpos_text, fixes_prefix + dpos_fixes)
 
         if target_gender and not addressee_gender:
             addressee_gender = target_gender
-
-        if is_production is None:
-            is_production = False
-            import sys
-            try:
-                frame = sys._getframe(1)
-                while frame:
-                    f_name = frame.f_code.co_filename.lower()
-                    if "translator.py" in f_name:
-                        is_production = True
-                        break
-                    frame = frame.f_back
-            except Exception:
-                pass
 
         modified = text
         applied_fixes = list(fixes_prefix)
@@ -5277,11 +5288,23 @@ def strip_false_feminine_instrumental(text: str, series_bible: Optional[Any] = N
 def fix_masculine_vocative_tz(text: str) -> Tuple[str, List[str]]:
     """
     Naprawia w tekście błędne końcówki wołacza/miejscownika -tzie -> -tzu dla tematów afrykatywnych.
+    Gdy nazwa na -tz występuje po odmienionym tytule wołaczowym,
+    zachowuje formę bazową mianownika.
     """
     if not text:
         return text, []
 
     fixes = []
+
+    # Po odmienionym tytule w wołaczu miana na -tz zachowują formę mianownika
+    title_pat = r"(\b(?:kapitanie|majorze|generale|pułkowniku|dowódco|panie|lordzie|komisarzu|oficerze|doktorze|profesorze|książę|królewiczu|mistrzu)\s+)([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]*tz)(?:u|ie)\b"
+    def _repl_title_tz(m):
+        title = m.group(1)
+        stem = m.group(2)
+        fixes.append(f"[Wołacz po Tytule - Mianownik Bazy] Skorygowano formę po tytule: '{m.group(0)}' -> '{title}{stem}'")
+        return f"{title}{stem}"
+    result = re.sub(title_pat, _repl_title_tz, text, flags=re.IGNORECASE)
+
     def _repl_tz(m):
         full = m.group(0)
         stem = m.group(1)
@@ -5290,7 +5313,7 @@ def fix_masculine_vocative_tz(text: str) -> Tuple[str, List[str]]:
         return fixed
 
     pat_tz = r"\b([A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]*tz)ie\b"
-    result = re.sub(pat_tz, _repl_tz, text)
+    result = re.sub(pat_tz, _repl_tz, result)
     return result, fixes
 
 
@@ -5387,6 +5410,12 @@ def enhanced_fix_undecorated_male_names(
             continue
         n_lower = name.lower()
         if any(n_lower.endswith(suf) for suf in OBLIQUE_OR_ADJ_ENDINGS):
+            continue
+        if n_lower in TOPONYMS_SET:
+            continue
+        if series_bible and hasattr(series_bible, "is_non_character_entity") and series_bible.is_non_character_entity(name):
+            continue
+        if series_bible and hasattr(series_bible, "get_entity_category") and str(series_bible.get_entity_category(name)).upper() == "TOPONYM":
             continue
         from series_memory import generate_polish_name_declension
         decl = generate_polish_name_declension(name, "MALE")
@@ -6271,16 +6300,16 @@ def apply_strict_positive_domain_pipeline(
     series_bible: Optional[Any] = None,
     is_sign: bool = False,
     speaker_confidence: float = 1.0,
-    target_confidence: float = 1.0
+    target_confidence: float = 1.0,
+    is_production: bool = False,
+    pure_llm_morphology: bool = False
 ) -> Tuple[str, List[str]]:
     """
-    Standard 7.1 Pure Positive Domain Invariant Architecture:
+    Standard 9.0 Pure Positive Domain Invariant Architecture:
     Executes exclusively verified ontological P0 operators (D_pos) under mask_ass_tags_and_quotes:
-    1. Verbal morphology (1st & 2nd person past, conditionals, future, clitics, powinien)
-    2. Predicate adjectives & copulas (1st & 2nd person)
-    3. Predicate nouns & social role pairs (1st & 2nd person)
-    4. Group virility (1st & 2nd person plural, VIRILE vs NON_VIRILE)
-    5. Toponymic / Onomastic & Orthographic hygiene (ablatyw, -tzu, -nki, rekcja toponimów)
+    1. Toponymic / Onomastic & Orthographic hygiene (ablatyw, -tzu, -nki, rekcja toponimów)
+    2. In production (VARIANT_D_PURE_LLM_MORPHOLOGY), cuts off verbal, copula, role-pair,
+       and clitic mutations (T(x) = x), delegating verification to EpisodeQualityGate P0 cap EN safety net.
     Preserves LLM stylistic freedom (T(x) = x for all dialogue outside D_pos).
     """
     if not text:
@@ -6308,48 +6337,52 @@ def apply_strict_positive_domain_pipeline(
     fixes.extend(voc_fixes)
 
     if not is_sign:
-        # Strict Positive Domain Gating: 1st person requires speaker_confidence >= 0.95; 2nd person requires target_confidence >= 0.95
-        eff_speaker_gender = speaker_gender if speaker_confidence >= 0.95 else None
-        eff_target_gender = target_gender if target_confidence >= 0.95 else None
+        # Standard 9.0 Variant (d): In production (or pure_llm_morphology), cut off
+        # all verbal, adjective, role-pair, and clitic mutating operators in AVTLinter (T(x) = x).
+        # Safe corrections are reserved for EpisodeQualityGate Narrow Safety Net (P0 cap EN).
+        if not (VARIANT_D_PURE_LLM_MORPHOLOGY and (is_production or pure_llm_morphology)):
+            # Strict Positive Domain Gating: 1st person requires speaker_confidence >= 0.95; 2nd person requires target_confidence >= 0.95
+            eff_speaker_gender = speaker_gender if speaker_confidence >= 0.95 else None
+            eff_target_gender = target_gender if target_confidence >= 0.95 else None
 
-        # 4. Verbal Morphology (1st & 2nd person past, conditionals, future, clitics, powinien)
-        res, v_fixes = harmonize_verbal_gender_1st_and_2nd(
-            res, speaker_gender=eff_speaker_gender, target_gender=eff_target_gender
-        )
-        fixes.extend(v_fixes)
-
-        # 5. Predicate Adjectives & Copulas (1st & 2nd person)
-        res, adj_fixes = harmonize_copula_and_predicate_adjective(
-            res, speaker_gender=eff_speaker_gender, target_gender=eff_target_gender
-        )
-        fixes.extend(adj_fixes)
-
-        # 6. Predicate Nouns & Social Role Pairs (1st & 2nd person)
-        res, noun_fixes = harmonize_2nd_person_predicate_nouns(
-            res, target_gender=eff_target_gender, speaker_gender=eff_speaker_gender
-        )
-        fixes.extend(noun_fixes)
-
-        # 7. Group Virility (1st & 2nd person plural, VIRILE vs NON_VIRILE)
-        # Operator D_pos(PluralGroup) for 1st person pl. is driven solely by plural_group_gender
-        if plural_group_gender in ("VIRILE", "NON_VIRILE"):
-            res, pl1_fixes = harmonize_plural_group_gender(
-                res,
-                plural_group_gender=plural_group_gender,
-                scene_has_male_participant=(plural_group_gender == "VIRILE"),
-                is_2nd_person=False
+            # 4. Verbal Morphology (1st & 2nd person past, conditionals, future, clitics, powinien)
+            res, v_fixes = harmonize_verbal_gender_1st_and_2nd(
+                res, speaker_gender=eff_speaker_gender, target_gender=eff_target_gender
             )
-            fixes.extend(pl1_fixes)
+            fixes.extend(v_fixes)
 
-        # Operator D_pos(PluralGroup) for 2nd person pl. is driven solely by you_group_gender
-        if you_group_gender in ("VIRILE", "NON_VIRILE"):
-            res, pl2_fixes = harmonize_plural_group_gender(
-                res,
-                plural_group_gender=you_group_gender,
-                scene_has_male_participant=(you_group_gender == "VIRILE"),
-                is_2nd_person=True
+            # 5. Predicate Adjectives & Copulas (1st & 2nd person)
+            res, adj_fixes = harmonize_copula_and_predicate_adjective(
+                res, speaker_gender=eff_speaker_gender, target_gender=eff_target_gender
             )
-            fixes.extend(pl2_fixes)
+            fixes.extend(adj_fixes)
+
+            # 6. Predicate Nouns & Social Role Pairs (1st & 2nd person)
+            res, noun_fixes = harmonize_2nd_person_predicate_nouns(
+                res, target_gender=eff_target_gender, speaker_gender=eff_speaker_gender
+            )
+            fixes.extend(noun_fixes)
+
+            # 7. Group Virility (1st & 2nd person plural, VIRILE vs NON_VIRILE)
+            # Operator D_pos(PluralGroup) for 1st person pl. is driven solely by plural_group_gender
+            if plural_group_gender in ("VIRILE", "NON_VIRILE"):
+                res, pl1_fixes = harmonize_plural_group_gender(
+                    res,
+                    plural_group_gender=plural_group_gender,
+                    scene_has_male_participant=(plural_group_gender == "VIRILE"),
+                    is_2nd_person=False
+                )
+                fixes.extend(pl1_fixes)
+
+            # Operator D_pos(PluralGroup) for 2nd person pl. is driven solely by you_group_gender
+            if you_group_gender in ("VIRILE", "NON_VIRILE"):
+                res, pl2_fixes = harmonize_plural_group_gender(
+                    res,
+                    plural_group_gender=you_group_gender,
+                    scene_has_male_participant=(you_group_gender == "VIRILE"),
+                    is_2nd_person=True
+                )
+                fixes.extend(pl2_fixes)
 
     return res, fixes
 
@@ -7447,10 +7480,33 @@ class EpisodeQualityGate:
                     you_group_gender=you_grp,
                     scene_has_male_participant=sc_has_male,
                     series_bible=series_bible,
+                    is_sign=is_sign,
+                    is_production=is_production,
+                    pure_llm_morphology=(VARIANT_D_PURE_LLM_MORPHOLOGY and is_production)
+                )
+                event_id = getattr(ev, "id", None) or getattr(ev, "index", None) or (i + 1)
+                line_lbl = f"[ID: {event_id}]" if eff_strict_positive_domain else f"Linia #{i+1}"
+                if dpos_fixes:
+                    fixes.extend([f"{line_lbl}: {fx}" for fx in dpos_fixes])
+
+                # Standard 9.0 Wariant (d): Wąska Siatka Bezpieczeństwa P0 cap EN
+                src_en_text = getattr(ev, "source_en", None) or ""
+                if not src_en_text and source_subs and hasattr(source_subs, "events") and i < len(source_subs.events):
+                    src_en_text = getattr(source_subs.events[i], "plaintext", None) or getattr(source_subs.events[i], "text", "") or ""
+
+                ev.text, safety_fixes = cls.apply_narrow_safety_net_p0_en(
+                    text=ev.text,
+                    event_id=event_id,
+                    speaker_name=spk_clean,
+                    addressee_name=addr_clean,
+                    source_en=src_en_text,
+                    series_bible=series_bible,
+                    character_registry=character_registry,
+                    event=ev,
                     is_sign=is_sign
                 )
-                if dpos_fixes:
-                    fixes.extend([f"Linia #{i+1}: {fx}" for fx in dpos_fixes])
+                if safety_fixes:
+                    fixes.extend(safety_fixes)
 
                 cls._run_phase_7_hygiene(
                     ev=ev,
@@ -10810,6 +10866,186 @@ class EpisodeQualityGate:
         return subs, fixes
 
     @classmethod
+    def apply_narrow_safety_net_p0_en(
+        cls,
+        text: str,
+        event_id: Any,
+        speaker_name: Optional[str] = None,
+        addressee_name: Optional[str] = None,
+        source_en: str = "",
+        series_bible: Optional[Any] = None,
+        character_registry: Optional[Dict[str, Any]] = None,
+        event: Optional[Any] = None,
+        is_sign: bool = False
+    ) -> Tuple[str, List[str]]:
+        """
+        Standard 9.0 Wariant (d) Wąska Siatka Bezpieczeństwa P0 cap EN:
+        Wykonuje korektę morfosyntaktyczną wyłącznie przy twardym dowodzie ontologicznym P0
+        lub jednoznacznych zaimkach w języku źródłowym angielskim.
+        Poza dziedziną P0 cap EN obowiązuje identyczność T(x) = x.
+        """
+        if not text or is_sign:
+            return text, []
+
+        fixes = []
+        masked_text, shield_map = mask_ass_tags_and_quotes(text)
+
+        # 1. Weryfikacja 1. osoby (mówca P0)
+        p0_spk_rec = None
+        if speaker_name:
+            if series_bible and hasattr(series_bible, "characters") and speaker_name in series_bible.characters:
+                p0_spk_rec = series_bible.characters[speaker_name]
+            elif series_bible and hasattr(series_bible, "data") and "characters" in series_bible.data and speaker_name in series_bible.data["characters"]:
+                p0_spk_rec = series_bible.data["characters"][speaker_name]
+            elif character_registry and speaker_name in character_registry:
+                p0_spk_rec = character_registry[speaker_name]
+
+        spk_p0_verified = False
+        spk_true_gender = None
+        if p0_spk_rec:
+            if isinstance(p0_spk_rec, dict):
+                is_p0 = (p0_spk_rec.get("priority") == "P0" or p0_spk_rec.get("has_verified_gender", False))
+                conf = float(p0_spk_rec.get("confidence", 0.0) or 0.0)
+                if is_p0 and conf >= 0.95:
+                    spk_p0_verified = True
+                    spk_true_gender = (p0_spk_rec.get("gender") or "").upper()
+            elif hasattr(p0_spk_rec, "priority"):
+                is_p0 = (getattr(p0_spk_rec, "priority", "") == "P0" or getattr(p0_spk_rec, "has_verified_gender", False))
+                conf = float(getattr(p0_spk_rec, "confidence", 0.0) or 0.0)
+                if is_p0 and conf >= 0.95:
+                    spk_p0_verified = True
+                    spk_true_gender = (getattr(p0_spk_rec, "gender", "") or "").upper()
+
+        is_camouflaged = False
+        if series_bible and hasattr(series_bible, "is_incognito_scene") and series_bible.is_incognito_scene(speaker_name):
+            is_camouflaged = True
+
+        if spk_p0_verified and not is_camouflaged:
+            if spk_true_gender == "MALE":
+                has_1p_fem = bool(re.search(r"\b([A-Za-ząćęłńóśźż]+(?:łam|łabym)|byłam|stałam\s+się|zostałam|poczułam|czułam)\b", masked_text, re.IGNORECASE))
+                if has_1p_fem:
+                    res_m, v_fix = harmonize_verbal_gender_1st_and_2nd(masked_text, speaker_gender="MALE")
+                    res_m, a_fix = harmonize_copula_and_predicate_adjective(res_m, speaker_gender="MALE")
+                    if res_m != masked_text:
+                        masked_text = res_m
+                        fixes.append(f"[Episode Quality Gate - Siatka P0 cap EN] [ID: {event_id}]: skorygowano rodzaj 1. osoby na męski dla zweryfikowanego mówcy P0 '{speaker_name}'")
+            elif spk_true_gender == "FEMALE":
+                has_1p_masc = bool(re.search(r"\b([A-Za-ząćęłńóśźż]+(?:łem|łbym)|byłem|stałem\s+się|zostałem|poczułem|czułem)\b", masked_text, re.IGNORECASE))
+                if has_1p_masc:
+                    res_f, v_fix = harmonize_verbal_gender_1st_and_2nd(masked_text, speaker_gender="FEMALE")
+                    res_f, a_fix = harmonize_copula_and_predicate_adjective(res_f, speaker_gender="FEMALE")
+                    if res_f != masked_text:
+                        masked_text = res_f
+                        fixes.append(f"[Episode Quality Gate - Siatka P0 cap EN] [ID: {event_id}]: skorygowano rodzaj 1. osoby na żeński dla zweryfikowanej mówczyni P0 '{speaker_name}'")
+
+        # 2. Weryfikacja 2. osoby (adresat P0)
+        p0_addr_rec = None
+        if addressee_name:
+            if series_bible and hasattr(series_bible, "characters") and addressee_name in series_bible.characters:
+                p0_addr_rec = series_bible.characters[addressee_name]
+            elif series_bible and hasattr(series_bible, "data") and "characters" in series_bible.data and addressee_name in series_bible.data["characters"]:
+                p0_addr_rec = series_bible.data["characters"][addressee_name]
+            elif character_registry and addressee_name in character_registry:
+                p0_addr_rec = character_registry[addressee_name]
+
+        if not p0_addr_rec and series_bible:
+            chars_dict = getattr(series_bible, "characters", None) or (series_bible.data.get("characters", {}) if hasattr(series_bible, "data") else {})
+            if isinstance(chars_dict, dict):
+                for c_cand_name, c_cand_rec in chars_dict.items():
+                    aliases = [c_cand_name] + (c_cand_rec.get("aliases", []) if isinstance(c_cand_rec, dict) else [])
+                    for al in aliases:
+                        if al and len(al) >= 2:
+                            voc_pat = rf"(?:^|[\s,–—])(?:(?:hej|ej|ty|słuchaj)[,\s]+)?{re.escape(al)}\s*[,!]"
+                            if re.search(voc_pat, masked_text, re.IGNORECASE):
+                                p0_addr_rec = c_cand_rec
+                                addressee_name = c_cand_name
+                                break
+                    if p0_addr_rec:
+                        break
+
+        addr_p0_verified = False
+        addr_true_gender = None
+        if p0_addr_rec:
+            if isinstance(p0_addr_rec, dict):
+                is_p0 = (p0_addr_rec.get("priority") == "P0" or p0_addr_rec.get("has_verified_gender", False))
+                conf = float(p0_addr_rec.get("confidence", 0.0) or 0.0)
+                if is_p0 and conf >= 0.95:
+                    addr_p0_verified = True
+                    addr_true_gender = (p0_addr_rec.get("gender") or "").upper()
+            elif hasattr(p0_addr_rec, "priority"):
+                is_p0 = (getattr(p0_addr_rec, "priority", "") == "P0" or getattr(p0_addr_rec, "has_verified_gender", False))
+                conf = float(getattr(p0_addr_rec, "confidence", 0.0) or 0.0)
+                if is_p0 and conf >= 0.95:
+                    addr_p0_verified = True
+                    addr_true_gender = (getattr(p0_addr_rec, "gender", "") or "").upper()
+
+        if addr_p0_verified and addr_true_gender in ("MALE", "FEMALE"):
+            if addr_true_gender == "MALE":
+                has_2p_fem = bool(re.search(r"\b([A-Za-ząćęłńóśźż]+(?:łaś|łabyś)|byłaś|bądź\s+ostrożna|jesteś\s+(?:pewna|gotowa|sama))\b", masked_text, re.IGNORECASE))
+                if has_2p_fem:
+                    res_m, v_fix = harmonize_verbal_gender_1st_and_2nd(masked_text, target_gender="MALE")
+                    res_m, a_fix = harmonize_copula_and_predicate_adjective(res_m, target_gender="MALE")
+                    if res_m != masked_text:
+                        masked_text = res_m
+                        fixes.append(f"[Episode Quality Gate - Siatka P0 cap EN] [ID: {event_id}]: skorygowano rodzaj 2. osoby na męski dla zweryfikowanego adresata P0 '{addressee_name}'")
+            elif addr_true_gender == "FEMALE":
+                has_2p_masc = bool(re.search(r"\b([A-Za-ząćęłńóśźż]+(?:łeś|łbyś)|byłeś|bądź\s+ostrożny|jesteś\s+(?:pewien|gotów|sam))\b", masked_text, re.IGNORECASE))
+                if has_2p_masc:
+                    res_f, v_fix = harmonize_verbal_gender_1st_and_2nd(masked_text, target_gender="FEMALE")
+                    res_f, a_fix = harmonize_copula_and_predicate_adjective(res_f, target_gender="FEMALE")
+                    if res_f != masked_text:
+                        masked_text = res_f
+                        fixes.append(f"[Episode Quality Gate - Siatka P0 cap EN] [ID: {event_id}]: skorygowano rodzaj 2. osoby na żeński dla zweryfikowanej adresatki P0 '{addressee_name}'")
+
+        # 3. Weryfikacja 3. osoby (zaimki angielskie)
+        if source_en:
+            has_he = bool(re.search(r"\b(he|him|his|himself)\b", source_en, re.IGNORECASE))
+            has_she = bool(re.search(r"\b(she|her|hers|herself)\b", source_en, re.IGNORECASE))
+            if has_he and not has_she:
+                fem_sub_noun = bool(re.search(r"\b(kobieta|dziewczyna|dziewczynka|matka|mama|siostra|córka|pani|królowa|księżniczka|wiedźma|bohaterka|wojowniczka)\b", masked_text, re.IGNORECASE))
+                if not fem_sub_noun:
+                    def _repl_3p_fem_to_masc(m):
+                        full = m.group(0)
+                        f_low = full.lower()
+                        m_map = {
+                            "była": "był", "mogła": "mógł", "chciała": "chciał", "miała": "miał",
+                            "wiedziała": "wiedział", "widziała": "widział", "zrobiła": "zrobił", "powiedziała": "powiedział",
+                            "poszła": "poszedł", "przyszła": "przyszedł", "wróciła": "wrócił", "uciekła": "uciekł",
+                            "zginęła": "zginął", "umarła": "umarł"
+                        }
+                        if f_low in m_map:
+                            corr = m_map[f_low]
+                            return corr.capitalize() if full[0].isupper() else corr
+                        return full
+                    res_3p = re.sub(r"\b([A-Za-ząćęłńóśźż]+ła)\b", _repl_3p_fem_to_masc, masked_text)
+                    if res_3p != masked_text:
+                        masked_text = res_3p
+                        fixes.append(f"[Episode Quality Gate - Siatka P0 cap EN] [ID: {event_id}]: skorygowano orzeczenie 3. osoby na rodzaj męski na podstawie zaimka 'he/him/his' w EN")
+            elif has_she and not has_he:
+                masc_sub_noun = bool(re.search(r"\b(mężczyzna|chłopak|chłopiec|ojciec|tata|brat|syn|pan|król|książę|czarnoksiężnik|bohater|wojownik)\b", masked_text, re.IGNORECASE))
+                if not masc_sub_noun:
+                    def _repl_3p_masc_to_fem(m):
+                        full = m.group(0)
+                        f_low = full.lower()
+                        f_map = {
+                            "był": "była", "mógł": "mogła", "chciał": "chciała", "miał": "miała",
+                            "wiedział": "wiedziała", "widział": "widziała", "zrobił": "zrobiła", "powiedziała": "powiedziała",
+                            "poszedł": "poszła", "przyszedł": "przyszła", "wrócił": "wróciła", "uciekł": "uciekła",
+                            "zginął": "zginęła", "umarł": "umarła"
+                        }
+                        if f_low in f_map:
+                            corr = f_map[f_low]
+                            return corr.capitalize() if full[0].isupper() else corr
+                        return full
+                    res_3p = re.sub(r"\b([A-Za-ząćęłńóśźż]+(?:ł|ógł|szedł))\b", _repl_3p_masc_to_fem, masked_text)
+                    if res_3p != masked_text:
+                        masked_text = res_3p
+                        fixes.append(f"[Episode Quality Gate - Siatka P0 cap EN] [ID: {event_id}]: skorygowano orzeczenie 3. osoby na rodzaj żeński na podstawie zaimka 'she/her' w EN")
+
+        result = unmask_ass_tags_and_quotes(masked_text, shield_map)
+        return result, fixes
+
+    @classmethod
     def _run_phase_7_hygiene(
         cls,
         ev: Any,
@@ -10825,13 +11061,22 @@ class EpisodeQualityGate:
         Phase 7: Punctuation, typography, CPL line-splitting, English sweep, and CPS monitoring.
         Extracted for zero-overhead execution in both legacy and strict positive domain modes.
         """
+        event_id = getattr(ev, "id", None) or getattr(ev, "index", None) or (i + 1)
+        line_lbl = f"[ID: {event_id}]" if strict_positive_domain else f"Linia #{i+1}"
+
+        # Standard 9.0 Wariant (d): Higiena techniczna ASS
+        # Usuwanie zbędnych spacji wewnątrz tagów ASS (np. {\an8  ...} -> {\an8...})
+        ev.text = re.sub(r"\{\\([^}]*?)\s+\}", r"{\\\1}", ev.text)
+        # Przenoszenie wiszących spójników i przyimków przed \N do nowego wiersza
+        ev.text = re.sub(r"\s+\b([iaouwzIAOUWZ]|że|bo|czy)\s*\\N\s*", r"\\N\1 ", ev.text)
+
         # 5. PUNCTUATION & TYPOGRAPHY HYGIENE
         # Purge punctuation collisions: exclamation mark immediately preceding comma (!,) -> comma
         if "!," in ev.text:
             old_punc_t = ev.text
             ev.text = re.sub(r"([A-Za-ząćęłńóśźż])!,\s*", r"\1, ", ev.text)
-            if ev.text != old_punc_t and not any(f"Linia #{i+1}:" in f for f in fixes):
-                fixes.append(f"[Episode Quality Gate - Higiena Interpunkcji] Linia #{i+1}: zlikwidowano kolizję interpunkcyjną '!,'")
+            if ev.text != old_punc_t and not any(f"{line_lbl}:" in f or f"Linia #{i+1}:" in f for f in fixes):
+                fixes.append(f"[Episode Quality Gate - Higiena Interpunkcji] {line_lbl}: zlikwidowano kolizję interpunkcyjną '!,'")
         # Clean accidental double dots (e.g. "To prawda..") -> "To prawda..." (excluding intentional AVT ?.. and !..)
         ev.text = re.sub(r"(?<![\.\?!])\.\.(?!\.)", "...", ev.text)
         # Normalize non-normative ellipsis clusters (e.g. ?... -> ?.., !... -> !..)
@@ -10839,8 +11084,8 @@ class EpisodeQualityGate:
             old_punc_t = ev.text
             ev.text = re.sub(r"\?\.{3,}", "?..", ev.text)
             ev.text = re.sub(r"!\.{3,}", "!..", ev.text)
-            if ev.text != old_punc_t and not any(f"Linia #{i+1}:" in f for f in fixes):
-                fixes.append(f"[Episode Quality Gate - Higiena Interpunkcji] Linia #{i+1}: znormalizowano nienormatywny wielokropek (?...) na standardowy AVT (?..)")
+            if ev.text != old_punc_t and not any(f"{line_lbl}:" in f or f"Linia #{i+1}:" in f for f in fixes):
+                fixes.append(f"[Episode Quality Gate - Higiena Interpunkcji] {line_lbl}: znormalizowano nienormatywny wielokropek (?...) na standardowy AVT (?..)")
         # Remove space before comma/period/exclamation/question mark
         ev.text = re.sub(r"\s+([,\.!\?…])", r"\1", ev.text)
         # Fix hanging comma after ASS line break (e.g. \N, co -> ,\Nco)
@@ -10853,11 +11098,11 @@ class EpisodeQualityGate:
             ev.text = re.sub(r"~[!]+", "!", ev.text)
             ev.text = re.sub(r"~", "", ev.text)
             if ev.text != old_t:
-                fixes.append(f"[Episode Quality Gate - Filar LX Typografia] Linia #{i+1}: usunięto japońską tyldę i znormalizowano wykrzykniki")
+                fixes.append(f"[Episode Quality Gate - Filar LX Typografia] {line_lbl}: usunięto japońską tyldę i znormalizowano wykrzykniki")
         # Remove comma before "czy" in direct binary alternatives (Filar LX)
         if re.search(r"\b([A-Za-ząćęłńóśźż0-9]+),\s+czy\s+(bez|nie|tak)\b", ev.text):
             ev.text = re.sub(r"\b([A-Za-ząćęłńóśźż0-9]+),\s+czy\s+(bez|nie|tak)\b", r"\1 czy \2", ev.text)
-            fixes.append(f"[Episode Quality Gate - Filar LX Interpunkcja] Linia #{i+1}: usunięto zbędny przecinek przed 'czy' w alternatywie rozłącznej")
+            fixes.append(f"[Episode Quality Gate - Filar LX Interpunkcja] {line_lbl}: usunięto zbędny przecinek przed 'czy' w alternatywie rozłącznej")
         # Replace trailing cut-off speech glued en-dash (e.g. "Rin–") with ellipsis "Rin..." (Filar LX)
         if re.search(r"([A-Za-ząćęłńóśźż])–(?=\s*\\N|\s*$|[!\?…])", ev.text):
             ev.text = re.sub(r"([A-Za-ząćęłńóśźż])–(?=\s*\\N|\s*$|[!\?…])", r"\1...", ev.text)

@@ -1395,9 +1395,14 @@ def _detect_event_vocative(
         matched_name = m_ai.group(1)
         low = matched_name.lower()
         if matched_name[0].isupper() and low not in POLISH_COMMON_INTERJECTIONS_STOPLIST and matched_name != current_speaker:
-            if low.endswith("a") and not low.endswith("ia"):
-                return matched_name, "FEMALE"
-            return matched_name, "MALE"
+            if series_bible and hasattr(series_bible, "get_character_gender"):
+                bg = series_bible.get_character_gender(matched_name)
+                bg_l = (bg or "").lower()
+                if bg_l in ("male", "mężczyzna", "masculine"):
+                    return matched_name, "MALE"
+                elif bg_l in ("female", "kobieta", "feminine"):
+                    return matched_name, "FEMALE"
+            return matched_name, None
 
     # 5. Sprawdzenie zakotwiczonych imion w wołaczu bez SeriesBible
     for m in VOCATIVE_PUNCT_ANCHOR_REGEX.finditer(clean):
@@ -1406,12 +1411,26 @@ def _detect_event_vocative(
             low = matched_name.lower()
             if low in POLISH_COMMON_INTERJECTIONS_STOPLIST:
                 continue
+            if series_bible and hasattr(series_bible, "get_character_gender"):
+                bg = series_bible.get_character_gender(matched_name)
+                bg_l = (bg or "").lower()
+                if bg_l in ("male", "mężczyzna", "masculine"):
+                    return matched_name, "MALE"
+                elif bg_l in ("female", "kobieta", "feminine"):
+                    return matched_name, "FEMALE"
             if low.endswith("ie") or low.endswith("u"):
                 base = re.sub(r"ie$", "", matched_name)
                 return (base if len(base) >= 2 else matched_name), "MALE"
             elif low.endswith("o"):
                 base = re.sub(r"o$", "a", matched_name)
-                return base, "FEMALE"
+                if series_bible and hasattr(series_bible, "get_character_gender"):
+                    bg = series_bible.get_character_gender(base)
+                    bg_l = (bg or "").lower()
+                    if bg_l in ("male", "mężczyzna", "masculine"):
+                        return base, "MALE"
+                    elif bg_l in ("female", "kobieta", "feminine"):
+                        return base, "FEMALE"
+                return base, None
 
     return None, None
 

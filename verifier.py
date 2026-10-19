@@ -29,6 +29,40 @@ class RefinedBatchResponse(BaseModel):
     scene_diagnosis: Optional[SceneDiagnosis] = Field(default=None, description="Diagnoza i weryfikacja intencji dramaturgicznych sceny")
     lines: List[RefinedLine] = Field(description="Lista zredagowanych i zweryfikowanych kwestii dialogowych")
 
+def _guard_phase2_regressions(
+    f1_pl: str,
+    refined_pl: str,
+    source_en: str = "",
+    speaker_p0_gender: Optional[str] = None
+) -> str:
+    """Programmatic barrier guarding against Phase 2 stylistic or grammatical regressions."""
+    if not refined_pl:
+        return f1_pl or ""
+
+    # 1. Calque guard: eliminate 'być + imiesłów czynny -ący/-ąca/-ące'
+    continuous_calque_re = re.compile(
+        r"\b(?:jestem|jesteś|jest|jesteśmy|jesteście|są|byłem|byłam|byłeś|byłaś|był|była|było|byli|były|będę|będziesz|będzie|będziemy|będziecie|będą)\s+[a-ząćęłńóśźż]+(?:ący|ąca|ące|ących|ącym|ącymi|ącą)\b",
+        re.IGNORECASE
+    )
+    if continuous_calque_re.search(refined_pl) and not continuous_calque_re.search(f1_pl):
+        return f1_pl
+
+    # 2. Verbal gender regression guard against Phase 1
+    f1_has_1st_masc = bool(re.search(r"\b[a-ząćęłńóśźż]+(?:łem|łbym)\b", f1_pl, re.IGNORECASE))
+    f1_has_1st_fem = bool(re.search(r"\b[a-ząćęłńóśźż]+(?:łam|łabym)\b", f1_pl, re.IGNORECASE))
+    ref_has_1st_masc = bool(re.search(r"\b[a-ząćęłńóśźż]+(?:łem|łbym)\b", refined_pl, re.IGNORECASE))
+    ref_has_1st_fem = bool(re.search(r"\b[a-ząćęłńóśźż]+(?:łam|łabym)\b", refined_pl, re.IGNORECASE))
+
+    spk_norm = (speaker_p0_gender or "").upper()
+    if spk_norm in ("MALE", "MASCULINE") or (f1_has_1st_masc and not f1_has_1st_fem):
+        if ref_has_1st_fem and not ref_has_1st_masc:
+            return f1_pl
+    elif spk_norm in ("FEMALE", "FEMININE") or (f1_has_1st_fem and not f1_has_1st_masc):
+        if ref_has_1st_masc and not ref_has_1st_fem:
+            return f1_pl
+
+    return refined_pl
+
 import os
 import threading
 
@@ -563,6 +597,24 @@ class DialogueVerifier:
                             changes_made="Zweryfikowano (zachowano szkic Fazy 1)"
                         ))
                     result_lines.sort(key=lambda x: x.id)
+
+                # Programmatic barrier guarding against Phase 2 regressions (calques and verbal gender)
+                items_by_id = {it.get("id"): it for it in batch_items}
+                for r in result_lines:
+                    orig_it = items_by_id.get(r.id)
+                    if orig_it:
+                        f1_text = orig_it.get("pl", "")
+                        src_en = orig_it.get("en", "")
+                        spk_g = orig_it.get("speaker_gender") or orig_it.get("speaker_p0_gender")
+                        guarded = _guard_phase2_regressions(
+                            f1_pl=f1_text,
+                            refined_pl=r.refined_pl,
+                            source_en=src_en,
+                            speaker_p0_gender=spk_g
+                        )
+                        if guarded != r.refined_pl:
+                            r.refined_pl = guarded
+                            r.changes_made = (r.changes_made or "") + " [Zabezpieczono przed regresją Fazy 2]"
 
                 with DialogueVerifier._STATUS_LOCK:
                     if DialogueVerifier._STATUS_ACTIVE:

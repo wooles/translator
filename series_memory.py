@@ -2807,6 +2807,18 @@ def generate_polish_name_declension(name: str, gender: str = "UNKNOWN") -> Dict[
                 case: " ".join(d.get(case, w) for d, w in zip(sub_decls, words))
                 for case in ["M", "D", "C", "B", "N", "Ms", "W"]
             }
+            if words[-1].lower().endswith("tz"):
+                title_words = {
+                    "kapitan", "kapitanie", "pan", "panie", "mistrz", "mistrzu", "doktor", "doktorze",
+                    "generał", "generale", "komandor", "komandorze", "major", "majorze",
+                    "pułkownik", "pułkowniku", "porucznik", "poruczniku", "lord", "lordzie",
+                    "ojciec", "ojcze", "brat", "bracie", "książę"
+                }
+                if any(w.lower() in title_words for w in words[:-1]):
+                    raw_multi["W"] = " ".join(
+                        (words[i] if i == len(words) - 1 else sub_decls[i].get("W", words[i]))
+                        for i in range(len(words))
+                    )
             return {case: sanitize_adjectival_double_declension(val, n) for case, val in raw_multi.items()}
 
     # Already inflected tokens or non-nominative plural/case endings
@@ -5487,37 +5499,7 @@ class SeriesBible:
                 c_val["entity_category"] = EntityCategory.ANTHROPONYM.value
 
             # Budowa globalnego indeksu aliasów O(1) w SeriesBible (z priorytetyzacją P0/verified)
-            self._actor_aliases_index = {}
-            def _char_priority_key(item):
-                name, entry = item
-                if not isinstance(entry, dict):
-                    return (0, 0, 0)
-                is_p0 = 1 if entry.get("priority") == "P0" else 0
-                is_ver = 1 if entry.get("has_verified_gender") else 0
-                conf = float(entry.get("confidence") or 0.0)
-                return (is_p0, is_ver, conf)
-
-            TITLE_AND_ROLE_ALIAS_STOPWORDS = {
-                "lord", "lady", "prince", "princess", "king", "queen", "captain", "general",
-                "commander", "doctor", "master", "saint", "sister", "brother", "father",
-                "mother", "young", "kid", "old", "mr", "mrs", "ms", "książę", "księżniczka",
-                "król", "królowa", "kapitan", "generał", "dowódca", "mistrz", "doktor",
-                "święty", "święta", "siostra", "brat", "ojciec", "matka", "młody", "młoda",
-                "stary", "stara", "pan", "pani"
-            }
-            sorted_chars = sorted(self.data["characters"].items(), key=_char_priority_key, reverse=True)
-            for c_name, c_entry in sorted_chars:
-                if "->" in c_name or not isinstance(c_entry, dict):
-                    continue
-                for al in c_entry.get("aliases", []):
-                    al_low = al.lower().strip()
-                    al_folded = normalize_ascii_diacritics(al).lower().strip()
-                    if al_low in TITLE_AND_ROLE_ALIAS_STOPWORDS or al_folded in TITLE_AND_ROLE_ALIAS_STOPWORDS:
-                        continue
-                    if al_low and al_low not in self._actor_aliases_index:
-                        self._actor_aliases_index[al_low] = c_name
-                    if al_folded and al_folded not in self._actor_aliases_index:
-                        self._actor_aliases_index[al_folded] = c_name
+            self._rebuild_actor_aliases_index()
 
             # Czyszczenie wpisów będących złożonymi deskrypcjami z declensions
             if "declensions" in self.data and isinstance(self.data["declensions"], dict):
@@ -5531,6 +5513,59 @@ class SeriesBible:
                     p_paradigm = self.get_declension_paradigm(c_k)
                     if p_paradigm:
                         _ = p_paradigm.to_reference_table(c_k)
+
+    def _rebuild_actor_aliases_index(self):
+        """Buduje globalny indeks aliasów O(1) w SeriesBible z priorytetyzacją P0 i normalizacją fonetyczną."""
+        self._actor_aliases_index = {}
+        if not hasattr(self, "data") or not isinstance(self.data, dict) or "characters" not in self.data:
+            return
+
+        def _char_priority_key(item):
+            name, entry = item
+            if not isinstance(entry, dict):
+                return (0, 0, 0)
+            is_p0 = 1 if entry.get("priority") == "P0" else 0
+            is_ver = 1 if entry.get("has_verified_gender") else 0
+            conf = float(entry.get("confidence") or 0.0)
+            return (is_p0, is_ver, conf)
+
+        title_and_role_stopwords = {
+            "lord", "lady", "prince", "princess", "king", "queen", "captain", "general",
+            "commander", "doctor", "master", "saint", "sister", "brother", "father",
+            "mother", "young", "kid", "old", "mr", "mrs", "ms", "książę", "księżniczka",
+            "król", "królowa", "kapitan", "generał", "dowódca", "mistrz", "doktor",
+            "święty", "święta", "siostra", "brat", "ojciec", "matka", "młody", "młoda",
+            "stary", "stara", "pan", "pani"
+        }
+        sorted_chars = sorted(self.data["characters"].items(), key=_char_priority_key, reverse=True)
+        for c_name, c_entry in sorted_chars:
+            if "->" in c_name or not isinstance(c_entry, dict):
+                continue
+            candidates = list(c_entry.get("aliases", []))
+            clean_c = extract_clean_speaker_name(c_name)
+            if clean_c and clean_c not in candidates:
+                candidates.append(clean_c)
+            for tok in clean_c.split():
+                tok_strip = tok.strip()
+                if tok_strip and tok_strip not in candidates:
+                    candidates.append(tok_strip)
+            for al in candidates:
+                al_low = al.lower().strip()
+                al_folded = normalize_ascii_diacritics(al).lower().strip()
+                if al_low in title_and_role_stopwords or al_folded in title_and_role_stopwords:
+                    continue
+                if len(al_low) < 2:
+                    continue
+                if al_low and al_low not in self._actor_aliases_index:
+                    self._actor_aliases_index[al_low] = c_name
+                if al_folded and al_folded not in self._actor_aliases_index:
+                    self._actor_aliases_index[al_folded] = c_name
+                al_low_f = al_low.replace("ph", "f")
+                if al_low_f and al_low_f not in self._actor_aliases_index:
+                    self._actor_aliases_index[al_low_f] = c_name
+                al_folded_f = al_folded.replace("ph", "f")
+                if al_folded_f and al_folded_f not in self._actor_aliases_index:
+                    self._actor_aliases_index[al_folded_f] = c_name
 
     def save(self):
         """Saves current Series Bible state to disk (Thread-Safe)."""
@@ -5756,29 +5791,50 @@ class SeriesBible:
         # Pass 1: Exact character names only (e.g. 'Tanaka', 'Kenji Tanaka')
         norm_nl = normalize_name_nfkd(n_l)
         tokens_set = set(n_l.split())
+        tokens_set_f = set(t.replace("ph", "f") for t in tokens_set)
         for k, v in chars_items:
             if "->" not in k:
                 k_l = k.lower()
                 clean_k = extract_clean_speaker_name(k_l)
                 clean_tokens_set = set(clean_k.split())
+                clean_tokens_set_f = set(t.replace("ph", "f") for t in clean_tokens_set)
                 if (
                     k_l == n_l
                     or clean_k == n_l
                     or normalize_name_nfkd(k_l) == norm_nl
                     or normalize_name_nfkd(clean_k) == norm_nl
+                    or k_l.replace("ph", "f") == n_l.replace("ph", "f")
+                    or clean_k.replace("ph", "f") == n_l.replace("ph", "f")
                     or (tokens_set and tokens_set == clean_tokens_set)
+                    or (tokens_set_f and tokens_set_f == clean_tokens_set_f)
                 ):
                     g = _extract_gender_from_val(v)
                     if g:
                         return g
 
         # Pass 1.5: O(1) Fast Direct Alias Matching
+        if not hasattr(self, "_actor_aliases_index") or not self._actor_aliases_index:
+            self._rebuild_actor_aliases_index()
+        matched_c = None
         if hasattr(self, "_actor_aliases_index") and self._actor_aliases_index:
-            matched_c = self._actor_aliases_index.get(n_l) or self._actor_aliases_index.get(norm_nl)
-            if matched_c and matched_c in self.data.get("characters", {}):
-                cand_g = _extract_gender_from_val(self.data["characters"][matched_c])
-                if cand_g:
-                    return cand_g
+            matched_c = (
+                self._actor_aliases_index.get(n_l)
+                or self._actor_aliases_index.get(norm_nl)
+                or self._actor_aliases_index.get(n_l.replace("ph", "f"))
+                or self._actor_aliases_index.get(norm_nl.replace("ph", "f"))
+            )
+        if not matched_c and hasattr(self, "data") and isinstance(self.data, dict) and "characters" in self.data:
+            self._rebuild_actor_aliases_index()
+            matched_c = (
+                self._actor_aliases_index.get(n_l)
+                or self._actor_aliases_index.get(norm_nl)
+                or self._actor_aliases_index.get(n_l.replace("ph", "f"))
+                or self._actor_aliases_index.get(norm_nl.replace("ph", "f"))
+            )
+        if matched_c and matched_c in self.data.get("characters", {}):
+            cand_g = _extract_gender_from_val(self.data["characters"][matched_c])
+            if cand_g:
+                return cand_g
 
         # Pass 2: Token / surname matches with collision detection (e.g. 'Tanaka' matching 'Kenji Tanaka' and 'Hanako Tanaka')
         token_matches = []

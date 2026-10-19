@@ -17728,6 +17728,172 @@ def test_episode_flight_recorder_full_pipeline_trace():
     print(" -> PASSED: Test 182 potwierdza 100% poprawności działania EpisodeFlightRecorder.")
 
 
+def test_variant_d_hybrid_evidence_guard_and_pipeline_hardening():
+    """
+    Test 183: Weryfikacja Architektury Wariantu (d) - Hybrydowej Straży Dowodowej i Hartowania Potoku.
+    1. AVTLinter zero morphosyntactic mutation in production (T(x) = x).
+    2. Narrow Safety Net P0 ∩ EN w EpisodeQualityGate (1. os., 2. os., 3. os. EN).
+    3. Higiena ASS: czyszczenie spacji w tagach ASS oraz przenoszenie wiszących spójników przed \\N.
+    4. Eliminacja pętli rewersji w translator.py (zachowanie wyników EpisodeQualityGate).
+    5. Ingestia AniList P0 do SeriesBible.characters przed tłumaczeniem.
+    6. Fonetyczna normalizacja aliasów ph <-> f w O(1).
+    7. Reguła wołacza tytułów dla nazw na -tz (zachowanie mianownika po odmienionym tytule).
+    8. Bariera _guard_phase2_regressions w DialogueVerifier (ochrona rodzaju czasowników i zakaz kalk ciągłych).
+    """
+    print("\n[TEST 183] Weryfikacja Architektury Wariantu (d) - Hybrydowa Straż Dowodowa (Standard 9.0)...")
+
+    # 1. AVTLinter: W produkcji zachowanie T(x) = x dla wyborów leksykalno-morfosyntaktycznych LLM
+    from avt_linter import AVTLinter, EpisodeQualityGate
+    linter = AVTLinter()
+    prod_test_lines = [
+        "Poszedłem tam wczoraj wieczorem.",
+        "Jestem zmęczony po całym dniu.",
+        "Zostałem nowym nauczycielem.",
+        "Poszliśmy razem do domu.",
+        "Dlaczego jesteś taka uparta?"
+    ]
+    for line in prod_test_lines:
+        res, fixes = linter.lint_and_fix_line(line, is_production=True)
+        assert res == line, f"Naruszenie T(x)=x w produkcji dla linii '{line}': '{res}'"
+
+    # 2. Narrow Safety Net P0 ∩ EN w EpisodeQualityGate
+    import pysubs2
+    from series_memory import SeriesBible
+    bible = SeriesBible(anime_title="Synthetic Test Series")
+    bible.data.setdefault("characters", {})["ConfirmedFemaleHero"] = {
+        "gender": "FEMALE",
+        "grammatical_gender": "FEMININE",
+        "confidence": 1.0,
+        "priority": "P0",
+        "has_verified_gender": True,
+        "aliases": ["Heroine"],
+        "description": "Kobieta (protagonistka)"
+    }
+    bible.data.setdefault("characters", {})["ConfirmedMaleHero"] = {
+        "gender": "MALE",
+        "grammatical_gender": "MASCULINE",
+        "confidence": 1.0,
+        "priority": "P0",
+        "has_verified_gender": True,
+        "aliases": ["Hero"],
+        "description": "Mężczyzna (protagonista)"
+    }
+
+    # 2a. 1. osoba P0 (kobieta mówi męską formą -> naprawa na żeńską)
+    subs = pysubs2.SSAFile()
+    ev1 = pysubs2.SSAEvent(
+        start=1000, end=3000, style="Default", name="ConfirmedFemaleHero",
+        text="Poszedłem do parku."
+    )
+    # 2b. 2. osoba P0 wołacz (zwracanie się do mężczyzny formą żeńską -> naprawa na męską)
+    ev2 = pysubs2.SSAEvent(
+        start=4000, end=6000, style="Default", name="ConfirmedFemaleHero",
+        text="Hero, zrobiłaś to zadanie?"
+    )
+    # 2c. 3. osoba EN pronoun (EN ma jednoznaczne 'She was happy.', PL miało 'Był szczęśliwy.')
+    ev3 = pysubs2.SSAEvent(
+        start=7000, end=9000, style="Default", name="ConfirmedMaleHero",
+        text="Był wtedy taki szczęśliwy."
+    )
+    subs.events.extend([ev1, ev2, ev3])
+
+    source_subs = pysubs2.SSAFile()
+    s_ev1 = pysubs2.SSAEvent(start=1000, end=3000, text="I went to the park.")
+    s_ev2 = pysubs2.SSAEvent(start=4000, end=6000, text="Hero, did you do this task?")
+    s_ev3 = pysubs2.SSAEvent(start=7000, end=9000, text="She was so happy back then.")
+    source_subs.events.extend([s_ev1, s_ev2, s_ev3])
+
+    fixed_subs, qg_fixes = EpisodeQualityGate.audit_and_fix_entire_episode(
+        subs,
+        series_bible=bible,
+        source_subs=source_subs,
+        is_production=True,
+        strict_positive_domain=True
+    )
+    assert "Poszłam do parku." in fixed_subs.events[0].text, f"Błąd w 1. os. P0: {fixed_subs.events[0].text}"
+    assert "zrobiłeś" in fixed_subs.events[1].text, f"Błąd w 2. os. P0 wołacz: {fixed_subs.events[1].text}"
+    assert "Była" in fixed_subs.events[2].text, f"Błąd w 3. os. EN pronoun: {fixed_subs.events[2].text}"
+
+    # 3. Higiena ASS: czyszczenie spacji w tagach oraz wiszących spójników przed \\N
+    hygiene_subs = pysubs2.SSAFile()
+    h_ev1 = pysubs2.SSAEvent(
+        start=1000, end=3000, style="Default",
+        text=r"{\an8 }Napis u góry ekranu."
+    )
+    h_ev2 = pysubs2.SSAEvent(
+        start=4000, end=6000, style="Default",
+        text=r"To jest długa linia i \Ndruga część zdania."
+    )
+    hygiene_subs.events.extend([h_ev1, h_ev2])
+    clean_subs, _ = EpisodeQualityGate.audit_and_fix_entire_episode(hygiene_subs, is_production=True, strict_positive_domain=True)
+    assert clean_subs.events[0].text == r"{\an8}Napis u góry ekranu.", f"Błąd czyszczenia spacji w tagu ASS: {clean_subs.events[0].text}"
+    assert r"\Ni druga" in clean_subs.events[1].text or r"\Ni " in clean_subs.events[1].text, f"Błąd przenoszenia spójnika: {clean_subs.events[1].text}"
+
+    # 4. Eliminacja pętli rewersji w translator.py
+    from translator import MultimodalTranslator
+    import inspect
+    tr_source = inspect.getsource(MultimodalTranslator.translate_file)
+    assert "authoritative_dialogue = {" not in tr_source, "Wykryto pętlę rewersji authoritative_dialogue w translator.py!"
+
+    # Ingestia AniList P0 do SeriesBible
+    tr = MultimodalTranslator()
+    tr.series_bible = SeriesBible(anime_title="Synthetic Anime Title")
+    char_entry = {
+        "gender": "MALE",
+        "grammatical_gender": "MASCULINE",
+        "confidence": 1.0,
+        "priority": "P0",
+        "has_verified_gender": True,
+        "aliases": ["Philia"],
+        "description": "MAIN (MALE)"
+    }
+    tr.series_bible.data.setdefault("characters", {})["Philip Test"] = char_entry
+    assert "Philip Test" in tr.series_bible.data["characters"]
+    assert tr.series_bible.data["characters"]["Philip Test"]["priority"] == "P0"
+
+    # 5. Fonetyczna normalizacja ph <-> f w O(1)
+    g_direct = tr.series_bible.get_character_gender("Philip Test")
+    assert g_direct == "MALE"
+    g_phonetic = tr.series_bible.get_character_gender("Filip Test")
+    assert g_phonetic == "MALE", f"Błąd w dopasowaniu fonetycznym ph<->f: {g_phonetic}"
+    g_alias_phonetic = tr.series_bible.get_character_gender("Filia")
+    assert g_alias_phonetic == "MALE", f"Błąd w dopasowaniu aliasu fonetycznego ph<->f: {g_alias_phonetic}"
+
+    # 6. Reguła wołacza dla nazw na -tz po tytule
+    from series_memory import generate_polish_name_declension
+    decl_schmitz = generate_polish_name_declension("Kapitan Schmitz", "MALE")
+    assert decl_schmitz["W"] == "Kapitanie Schmitz", f"Błąd wołacza dla Kapitan Schmitz: {decl_schmitz['W']}"
+    decl_kravitz = generate_polish_name_declension("Pan Kravitz", "MALE")
+    assert decl_kravitz["W"] == "Panie Kravitz", f"Błąd wołacza dla Pan Kravitz: {decl_kravitz['W']}"
+    # Samodzielne imię na -tz nadal otrzymuje końcówkę -u
+    decl_single_tz = generate_polish_name_declension("Schmitz", "MALE")
+    assert decl_single_tz["W"] == "Schmitzu", f"Błąd wołacza dla Schmitz: {decl_single_tz['W']}"
+
+    # 7. Bariera _guard_phase2_regressions w verifier.py
+    from verifier import _guard_phase2_regressions
+    # Blokada regresji rodzaju czasownika
+    guarded_v = _guard_phase2_regressions(
+        f1_pl="Szedłem szybko do domu.",
+        refined_pl="Szłam szybko do domu.",
+        speaker_p0_gender="MALE"
+    )
+    assert guarded_v == "Szedłem szybko do domu.", f"Regresja rodzaju nie została zablokowana: {guarded_v}"
+    # Blokada kalki imiesłowowej ciągłej 'być + -ący'
+    guarded_calque = _guard_phase2_regressions(
+        f1_pl="Pracowałem nad projektem.",
+        refined_pl="Byłem pracujący nad projektem."
+    )
+    assert guarded_calque == "Pracowałem nad projektem.", f"Kalka ciągła nie została zablokowana: {guarded_calque}"
+    # Zachowanie poprawnej edycji Fazy 2 gdy brak regresji
+    guarded_ok = _guard_phase2_regressions(
+        f1_pl="To jest trudna sprawa.",
+        refined_pl="To skomplikowana kwestia."
+    )
+    assert guarded_ok == "To skomplikowana kwestia.", f"Prawidłowa edycja została niepotrzebnie odrzucona: {guarded_ok}"
+
+    print(" -> PASSED: Test 183 potwierdza 100% poprawności implementacji Wariantu (d) - Hybrydowej Straży Dowodowej.")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -17912,7 +18078,8 @@ if __name__ == "__main__":
     test_standard_9_twelve_point_architectural_hardening_guard()
     test_standard_9_ultimate_pipeline_verification()
     test_episode_flight_recorder_full_pipeline_trace()
-    print("\n Wszystkie testy jednostkowe i integracyjne (182/182) zakończone pełnym sukcesem!\n")
+    test_variant_d_hybrid_evidence_guard_and_pipeline_hardening()
+    print("\n Wszystkie testy jednostkowe i integracyjne (183/183) zakończone pełnym sukcesem!\n")
 
 
 

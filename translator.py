@@ -4430,27 +4430,48 @@ class MultimodalTranslator:
                 print(f"[Baza AniList] [Dziedzina specjalistyczna]: {', '.join(anime_meta['detected_domains'])}")
             print(f"[Baza AniList] Wczytano opis fabuły oraz {char_count} postaci z ich płcią i rolami.")
             
-            # Pre-populate character registry from AniList (AniList SSOT rule):
-            # ONLY define character gender if explicitly verified in AniList (Male/Female).
-            # If missing/None, leave uncommitted so dynamic episode-level data resolves it.
+            # Standard 9.0 Wariant (d): Wczesna inicjalizacja i zasilenie SeriesBible oraz character_registry
+            from series_memory import SeriesBible, generate_polish_name_declension
+            if not getattr(self, "series_bible", None):
+                self.series_bible = SeriesBible(anime_title=title_name)
+
             for c in anime_meta.get("characters", []):
                 c_name = c.get("name")
                 c_gen = c.get("gender")
-                if c_name and c.get("has_verified_gender") and c_gen:
-                    self._register_character_safe(c_name, c_gen, c.get("role", "postać"))
-                elif c_name:
-                    if c_name not in self.character_registry:
-                        self.character_registry[c_name] = f"postać ({c.get('role', 'postać')})"
+                c_role = c.get("role", "postać")
+                if c_name:
+                    norm_gender = c_gen.upper() if c_gen else "UNKNOWN"
+                    gramm_gender = "MASCULINE" if norm_gender == "MALE" else ("FEMININE" if norm_gender == "FEMALE" else "UNKNOWN")
+                    has_ver = bool(c.get("has_verified_gender") or (c_gen and c_gen.upper() in ("MALE", "FEMALE")))
+                    char_entry = {
+                        "gender": norm_gender,
+                        "grammatical_gender": gramm_gender,
+                        "confidence": 1.0 if has_ver else 0.8,
+                        "priority": "P0",
+                        "has_verified_gender": has_ver,
+                        "aliases": c.get("aliases", []),
+                        "description": f"{c_role} ({c_gen or 'unknown'})"
+                    }
+                    self.series_bible.data.setdefault("characters", {})[c_name] = char_entry
+                    gender_pl = "mężczyzna" if norm_gender == "MALE" else ("kobieta" if norm_gender == "FEMALE" else "postać")
+                    self._register_character_safe(c_name, gender_pl, c_role)
+
+        # Generowanie paradygmatów odmiany dla wszystkich unikalnych aktorów
+        actor_map = {}
+        from metadata import normalize_actor_tag
+        from series_memory import generate_polish_name_declension
+        for ev_it in subs.events:
+            raw_spk = getattr(ev_it, "name", "")
+            if raw_spk and raw_spk not in actor_map:
+                cl_act, ex_gen = normalize_actor_tag(raw_spk)
+                actor_map[raw_spk] = {"clean_name": cl_act, "extracted_gender": ex_gen}
+                if getattr(self, "series_bible", None) and cl_act:
+                    a_decl = generate_polish_name_declension(cl_act, ex_gen or "UNKNOWN")
+                    if a_decl and a_decl.get("M"):
+                        self.series_bible.data.setdefault("declensions", {})[cl_act] = a_decl
 
         if self.flight_recorder:
             try:
-                actor_map = {}
-                from metadata import normalize_actor_tag
-                for ev_it in subs.events:
-                    raw_spk = getattr(ev_it, "name", "")
-                    if raw_spk and raw_spk not in actor_map:
-                        cl_act, ex_gen = normalize_actor_tag(raw_spk)
-                        actor_map[raw_spk] = {"clean_name": cl_act, "extracted_gender": ex_gen}
                 self.flight_recorder.log_metadata(
                     clean_slug=self.flight_recorder.anime_slug,
                     anilist_meta=anime_meta,
@@ -4663,7 +4684,8 @@ class MultimodalTranslator:
             ref_path = video_path or subs_path or ""
             if ref_path:
                 series_title = Path(ref_path).stem.split(" - ")[0].replace("[ASW]", "").replace("[Erai-raws]", "").strip()
-        self.series_bible = SeriesBible(anime_title=series_title)
+        if not getattr(self, "series_bible", None):
+            self.series_bible = SeriesBible(anime_title=series_title)
         # Pre-populate global Character Registry from persistent Series Bible
         if self.series_bible and hasattr(self.series_bible, "data"):
             bible_chars = self.series_bible.data.get("characters", {})
@@ -5450,7 +5472,6 @@ class MultimodalTranslator:
         # 7.3. Global Episode Quality Gate & Human-Eye Common Sense Audit (0.00 PLN)
         try:
             from avt_linter import EpisodeQualityGate
-            authoritative_dialogue = {idx: ev.text for idx, ev in enumerate(final_subs.events)}
             try:
                 final_subs, qg_fixes = EpisodeQualityGate.audit_and_fix_entire_episode(
                     final_subs,
@@ -5478,15 +5499,6 @@ class MultimodalTranslator:
                     whisper_transcriptions=episode_whisper_transcriptions,
                     enforce_line_split=True
                 )
-            # Standard 7.0 Pure Positive Domain: Primary Translation Authority
-            # Preserves authoritative LLM translations while retaining structural positioning adjustments (e.g. {\an8})
-            for idx, orig_text in authoritative_dialogue.items():
-                if idx < len(final_subs.events):
-                    cur_ev = final_subs.events[idx]
-                    if cur_ev.text.startswith(r"{\an8}") and not orig_text.startswith(r"{\an8}"):
-                        cur_ev.text = r"{\an8}" + orig_text
-                    else:
-                        cur_ev.text = orig_text
             if qg_fixes:
                 en_warnings = [f for f in qg_fixes if "nieprzetłumaczony angielski" in f]
                 if en_warnings:
