@@ -1,4 +1,8 @@
 import os, re, sys
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 from avt_linter import AVTLinter
 from metadata import normalize_actor_tag
 from series_memory import generate_polish_name_declension

@@ -17810,9 +17810,10 @@ def test_variant_d_hybrid_evidence_guard_and_pipeline_hardening():
         is_production=True,
         strict_positive_domain=True
     )
-    assert "Poszłam do parku." in fixed_subs.events[0].text, f"Błąd w 1. os. P0: {fixed_subs.events[0].text}"
-    assert "zrobiłeś" in fixed_subs.events[1].text, f"Błąd w 2. os. P0 wołacz: {fixed_subs.events[1].text}"
-    assert "Była" in fixed_subs.events[2].text, f"Błąd w 3. os. EN pronoun: {fixed_subs.events[2].text}"
+    # Standard 9.0: Primary LLM Translation Authority - EQG nie mutuje fleksji czasowników (Identity Pass-Through)
+    assert "Poszedłem do parku." in fixed_subs.events[0].text, f"Naruszenie Identity Pass-Through w 1. os.: {fixed_subs.events[0].text}"
+    assert "zrobiłaś" in fixed_subs.events[1].text, f"Naruszenie Identity Pass-Through w 2. os.: {fixed_subs.events[1].text}"
+    assert "Był" in fixed_subs.events[2].text, f"Naruszenie Identity Pass-Through w 3. os.: {fixed_subs.events[2].text}"
 
     # 3. Higiena ASS: czyszczenie spacji w tagach oraz wiszących spójników przed \\N
     hygiene_subs = pysubs2.SSAFile()
@@ -17892,6 +17893,415 @@ def test_variant_d_hybrid_evidence_guard_and_pipeline_hardening():
     assert guarded_ok == "To skomplikowana kwestia.", f"Prawidłowa edycja została niepotrzebnie odrzucona: {guarded_ok}"
 
     print(" -> PASSED: Test 183 potwierdza 100% poprawności implementacji Wariantu (d) - Hybrydowej Straży Dowodowej.")
+
+
+def test_standard_9_t1_series_bible_ingestion_synchronization():
+    """
+    TEST 184 (T1): Zasilenie SeriesBible (Sekcja 2 pkt 2, R3.2).
+    - characters_count > 0 oraz declensions_count > 0 w SeriesBible po synchronizacji.
+    - Priorytet MALE dla podmiotów o męskim zaimku autoreferencyjnym i męskim paradygmacie deklinacji przy gender: null.
+    - Pokrycie postaci obecnych i wspominanych oraz relacji społecznych.
+    """
+    print("\n[TEST 184 / T1] Zasilenie SeriesBible i synchronizacja mostu danych...")
+    from types import SimpleNamespace
+    from series_memory import SeriesBible
+
+    bible = SeriesBible(anime_title="Synthetic Guild Chronicles")
+    
+    # 1. Metadane z AniList z gender: None dla głównego bohatera
+    anilist_chars = [
+        {"name": "Bohater Glowny", "gender": None, "role": "MAIN"},
+        {"name": "Towarzyszka Mag", "gender": "FEMALE", "role": "SUPPORTING"}
+    ]
+    
+    # 2. EpisodeProfile z męskim paradygmatem deklinacji oraz zaimkiem autoreferencyjnym
+    profile = SimpleNamespace(
+        character_dossiers=[
+            SimpleNamespace(
+                name="Bohater Glowny",
+                gender=None,
+                apparent_gender="MALE",
+                age_and_role="Wojownik",
+                first_person_pronouns=["ore", "boku"]
+            )
+        ],
+        name_declensions=[
+            SimpleNamespace(
+                character_name="Bohater Glowny",
+                mianownik="Bohater Glowny",
+                dopelniacz="Bohatera Glownego",
+                celownik="Bohaterowi Glownemu",
+                biernik="Bohatera Glownego",
+                narzednik="Bohaterem Glownym",
+                miejscownik="Bohaterze Glownym",
+                wolacz="Bohaterze Glowny",
+                gender="MASCULINE"
+            )
+        ],
+        continuity_bridge_alerts=[
+            SimpleNamespace(
+                term_or_event="Wspominana Krolowa",
+                continuity_guidance="Władczyni krainy (kobieta, postać wspominana)"
+            )
+        ],
+        character_relationships=[
+            SimpleNamespace(
+                speaker="Bohater Glowny",
+                listener="Towarzyszka Mag",
+                address_form="Mag",
+                relationship_type="towarzyszka broni"
+            )
+        ]
+    )
+
+    bible.synchronize_from_metadata_and_profile(
+        anilist_meta={"characters": anilist_chars},
+        episode_profile=profile
+    )
+
+    # Asercje T1
+    assert len(bible.characters) >= 3, f"Brak zasilenia characters: {len(bible.characters)}"
+    assert len(bible.declensions) >= 1, f"Brak zasilenia declensions: {len(bible.declensions)}"
+    assert "Bohater Glowny" in bible.characters
+    assert bible.characters["Bohater Glowny"]["gender"] == "MALE", "Męski paradygmat nie nadał priorytetu MALE"
+    assert bible.characters["Bohater Glowny"]["priority"] == "P0"
+    assert bible.characters["Towarzyszka Mag"]["gender"] == "FEMALE"
+    assert "Wspominana Krolowa" in bible.characters
+    assert bible.characters["Wspominana Krolowa"]["gender"] == "FEMALE"
+    assert "Bohater Glowny->Towarzyszka Mag" in bible.relations
+    print(" -> PASSED: T1 potwierdza zasilenie SeriesBible, synchronizację mostu i priorytet MALE dla męskiego paradygmatu.")
+
+
+def test_standard_9_t2_semiotic_line_classification_all_caps_sign():
+    """
+    TEST 185 (T2): Klasyfikacja semiotyczna linii i segmentacja hybrydowa (Sekcja 2 pkt 3, R3.1).
+    - Linie bez małych liter (ALL CAPS) -> is_sign: true.
+    - Pola transkrypcji ASR i tagów akustycznych dla is_sign: true = puste.
+    - Segmentacja hybrydowa wielowarstwowa rozbija napis i dialog na osobne zdarzenia.
+    """
+    print("\n[TEST 185 / T2] Klasyfikacja semiotyczna linii i izolacja napisów ALL CAPS...")
+    import pysubs2
+    from translator import detect_event_visual_type, segment_hybrid_events
+
+    # 1. Linia bez małych liter (ALL CAPS) -> is_sign: True
+    ev_sign = pysubs2.SSAEvent(start=1000, end=4000, style="Default", text="CHAPTER ONE: THE SACRED CITADEL")
+    res_sign = detect_event_visual_type(ev_sign)
+    assert res_sign["is_sign"] is True, f"Linia ALL CAPS nie została sklasyfikowana jako napis: {res_sign}"
+
+    # 2. Zwykły dialog z małymi literami -> is_sign: False
+    ev_dialogue = pysubs2.SSAEvent(start=4500, end=7000, style="Default", text="We must hurry to the castle.")
+    res_dialogue = detect_event_visual_type(ev_dialogue)
+    assert res_dialogue["is_sign"] is False, f"Dialog został błędnie oznaczony jako napis: {res_dialogue}"
+
+    # 3. Weryfikacja pustych pól transkrypcji ASR i akustyki w translator.py
+    whisper_transcriptions = {0: "nanika no koe", 1: "hayaku shiro"}
+    prosody_tags = {0: "szybkie tempo", 1: "krzyk"}
+    speaker_tags = {0: "męski głos", 1: "męski głos"}
+
+    vtype_0 = detect_event_visual_type(ev_sign)
+    audio_jp_0 = (whisper_transcriptions.get(0, "") if not vtype_0["is_sign"] else "")
+    prosody_0 = (prosody_tags.get(0, "") if not vtype_0["is_sign"] else "")
+    voice_0 = (speaker_tags.get(0, "") if not vtype_0["is_sign"] else "")
+
+    assert audio_jp_0 == "", f"Napis otrzymał transkrypcję audio: '{audio_jp_0}'"
+    assert prosody_0 == "", f"Napis otrzymał tag prozodyczny: '{prosody_0}'"
+    assert voice_0 == "", f"Napis otrzymał tag głosu: '{voice_0}'"
+
+    # 4. Segmentacja hybrydowa
+    ev_hybrid = pysubs2.SSAEvent(start=8000, end=12000, style="Default", text=r"CITADEL ENTRANCE\NWatch your step, everyone.")
+    segmented = segment_hybrid_events([ev_hybrid])
+    assert len(segmented) == 2, f"Linia hybrydowa nie została rozdzielona: {len(segmented)}"
+    assert getattr(segmented[0], "is_sign", False) is True, f"Pierwsza warstwa powinna być napisem: {segmented[0].text}"
+    assert getattr(segmented[1], "is_sign", False) is False, f"Druga warstwa powinna być dialogiem: {segmented[1].text}"
+    print(" -> PASSED: T2 potwierdza klasyfikację semiotyczną ALL CAPS, wyczyszczenie ASR i segmentację hybrydową.")
+
+
+def test_standard_9_t3_verbal_inflection_identity_pass_through_eqg():
+    """
+    TEST 186 (T3): Fleksja w EpisodeQualityGate (Sekcja 2 pkt 1).
+    - Formy czasowników 1./2./3. osoby w wyjściu EpisodeQualityGate.audit_and_fix_entire_episode
+      są w 100% zgodne z wejściem Fazy 1/Fazy 2 (Identity Pass-Through dla fleksji czasownikowej).
+    - Brak wtórnych mutacji werbalnych w produkcji (Primary LLM Translation Authority).
+    """
+    print("\n[TEST 186 / T3] Identity Pass-Through fleksji czasownikowej w EpisodeQualityGate...")
+    import pysubs2
+    from series_memory import SeriesBible
+    from avt_linter import EpisodeQualityGate
+
+    bible = SeriesBible("Synthetic Cast")
+    bible.data.setdefault("characters", {})["Mistrzyni"] = {
+        "gender": "FEMALE",
+        "grammatical_gender": "FEMININE",
+        "confidence": 1.0,
+        "priority": "P0",
+        "has_verified_gender": True,
+        "aliases": []
+    }
+    bible.data.setdefault("characters", {})["Uczen"] = {
+        "gender": "MALE",
+        "grammatical_gender": "MASCULINE",
+        "confidence": 1.0,
+        "priority": "P0",
+        "has_verified_gender": True,
+        "aliases": []
+    }
+
+    # Testowe linie z autorytatywnymi formami czasowników 1., 2. i 3. osoby
+    subs = pysubs2.SSAFile()
+    ev1 = pysubs2.SSAEvent(start=1000, end=3000, name="Mistrzyni", text="Zrobiłem to według twoich wskazówek.")
+    ev2 = pysubs2.SSAEvent(start=3500, end=5500, name="Mistrzyni", text="Czy widziałaś już ten zamek?")
+    ev3 = pysubs2.SSAEvent(start=6000, end=8000, name="Uczen", text="Był niezwykle dumny ze swoich dokonań.")
+    subs.events.extend([ev1, ev2, ev3])
+
+    source_subs = pysubs2.SSAFile()
+    s_ev1 = pysubs2.SSAEvent(start=1000, end=3000, text="I did it according to your guidance.")
+    s_ev2 = pysubs2.SSAEvent(start=3500, end=5500, text="Have you seen this castle yet?")
+    s_ev3 = pysubs2.SSAEvent(start=6000, end=8000, text="She was extremely proud of her achievements.")
+    source_subs.events.extend([s_ev1, s_ev2, s_ev3])
+
+    fixed_subs, fixes = EpisodeQualityGate.audit_and_fix_entire_episode(
+        subs,
+        series_bible=bible,
+        source_subs=source_subs,
+        is_production=True,
+        strict_positive_domain=True
+    )
+
+    # Wszystkie formy czasownikowe muszą zachować 100% tożsamość T(x) = x
+    assert "Zrobiłem" in fixed_subs.events[0].text, f"Naruszenie Identity Pass-Through 1. os.: {fixed_subs.events[0].text}"
+    assert "widziałaś" in fixed_subs.events[1].text, f"Naruszenie Identity Pass-Through 2. os.: {fixed_subs.events[1].text}"
+    assert "Był" in fixed_subs.events[2].text, f"Naruszenie Identity Pass-Through 3. os.: {fixed_subs.events[2].text}"
+    print(" -> PASSED: T3 potwierdza wyłączenie mutacji werbalnej w EQG i pełny Identity Pass-Through.")
+
+
+def test_standard_9_t4_group_virility_pure_female_and_polylogue():
+    """
+    TEST 187 (T4): Status grupy w scenach o jednorodnym składzie P0 (Sekcja 2 pkt 4, R3.5).
+    - NON_VIRILE w scene_discourse.py = funkcja składu P0 grupy (brak mężczyzn, same kobiety).
+    - W scenach wyłącznie żeńskich flaga NON_VIRILE jest w 100% odporna na zanieczyszczenia sygnałów ASR.
+    - Znacznik POLYLOGUE (n=M) generowany dla characters_present >= 3.
+    """
+    print("\n[TEST 187 / T4] Virility grup w scenach czysto żeńskich i znacznik POLYLOGUE...")
+    from series_memory import SeriesBible
+    from scene_discourse import classify_we_group_gender, classify_you_group_gender
+    from translator import format_dry_telemetry_tag
+
+    bible = SeriesBible("Synthetic Sisterhood")
+    bible.data.setdefault("characters", {})["Kapłanka"] = {
+        "gender": "FEMALE",
+        "grammatical_gender": "FEMININE",
+        "confidence": 1.0,
+        "priority": "P0",
+        "has_verified_gender": True,
+        "aliases": []
+    }
+    bible.data.setdefault("characters", {})["Wojowniczka"] = {
+        "gender": "FEMALE",
+        "grammatical_gender": "FEMININE",
+        "confidence": 1.0,
+        "priority": "P0",
+        "has_verified_gender": True,
+        "aliases": []
+    }
+    bible.data.setdefault("characters", {})["Czarodziejka"] = {
+        "gender": "FEMALE",
+        "grammatical_gender": "FEMININE",
+        "confidence": 1.0,
+        "priority": "P0",
+        "has_verified_gender": True,
+        "aliases": []
+    }
+
+    # Grupa czysto żeńska P0 -> NON_VIRILE
+    female_group = {"Kapłanka", "Wojowniczka", "Czarodziejka"}
+    we_virility, we_has_m = classify_we_group_gender(female_group, series_bible=bible)
+    assert we_virility == "NON_VIRILE", f"Grupa żeńska nie otrzymała NON_VIRILE: {we_virility}"
+    assert we_has_m is False
+
+    you_virility = classify_you_group_gender(female_group, series_bible=bible)
+    assert you_virility == "NON_VIRILE", f"Adresatki żeńskie nie otrzymały NON_VIRILE: {you_virility}"
+
+    # Znacznik POLYLOGUE (n=3)
+    tag = format_dry_telemetry_tag(
+        speaker="Kapłanka",
+        speaker_gender="FEMALE",
+        plural_group_gender=we_virility,
+        polylogue="POLYLOGUE (n=3)"
+    )
+    assert "POLYLOGUE (n=3)" in tag, f"Brak znacznika POLYLOGUE w tagu telemetrii: {tag}"
+    assert "Grupa_1os_lm: NON_VIRILE" in tag, f"Brak NON_VIRILE w tagu telemetrii: {tag}"
+    print(" -> PASSED: T4 potwierdza czyste NON_VIRILE w scenach żeńskich P0 i emisję POLYLOGUE (n=M).")
+
+
+def test_standard_9_t5_newline_hygiene_preservation_and_event_splitting():
+    """
+    TEST 188 (T5): Zachowanie \\n w warstwie higieny i rozbijanie nadmiarowych linii (Sekcja 2 pkt 5).
+    - Znaki \\n z Fazy 2 są zachowywane i konwertowane 1:1 do \\N w .ass.
+    - Treść przekraczająca limity (> 2 wiersze) jest dzielona na kolejne zdarzenia Dialogue:.
+    """
+    print("\n[TEST 188 / T5] Zachowanie \\n, konwersja do \\N i rozbijanie wielowierszy w .ass...")
+    import pysubs2
+    from translator import split_oversized_ass_events
+    from avt_linter import AVTLinter
+
+    # 1. Sprawdzenie, że linter nie niszczy \n
+    linter = AVTLinter()
+    multi_line_text = "Pierwsza linijka tekstu.\nDruga linijka tekstu."
+    linted_text, _ = linter.lint_and_fix_line(multi_line_text, is_production=True, strict_positive_domain=True)
+    assert "\n" in linted_text, f"Linter wyciął znak nowej linii: '{linted_text}'"
+
+    # 2. split_oversized_ass_events: konwersja 1:1 do \N i dzielenie > 2 linii
+    ev_oversized = pysubs2.SSAEvent(
+        start=1000,
+        end=6000,
+        style="Default",
+        name="Przewodnik",
+        text="Punkt pierwszy wyprawy.\nPunkt drugi wyprawy.\nPunkt trzeci wyprawy.\nPunkt czwarty wyprawy."
+    )
+    result_events = split_oversized_ass_events([ev_oversized])
+    assert len(result_events) == 2, f"Wielowiersz (> 2) nie został podzielony na 2 zdarzenia: {len(result_events)}"
+    assert result_events[0].start == 1000
+    assert result_events[0].end == 3500
+    assert result_events[0].text == r"Punkt pierwszy wyprawy.\NPunkt drugi wyprawy."
+    assert result_events[1].start == 3500
+    assert result_events[1].end == 6000
+    assert result_events[1].text == r"Punkt trzeci wyprawy.\NPunkt czwarty wyprawy."
+    print(" -> PASSED: T5 potwierdza zachowanie \\n, konwersję 1:1 do \\N i poprawne rozbicie na zdarzenia.")
+
+
+def test_standard_9_t6_phase2_regression_guards_five_categories():
+    """
+    TEST 189 (T6): Kategorie blokad w _guard_phase2_regressions (Sekcja 2 pkt 6, R3.7).
+    Weryfikacja 5 kategorii blokad zwracających f1_pl przy naruszeniu:
+    1. Forma grzecznościowa zależna od płci adresata (pan/pani) bez P0.
+    2. Antroponim żeński nieodmienny zachowany w formie bazowej.
+    3. Osoba podmiotu przy jawnym zaimku pośredniczenia w EN.
+    4. Pierwszy człon dwugłosu kontynuowanego.
+    5. Forma czasownika 1. i 2. os. zgodna z P0.
+    """
+    print("\n[TEST 189 / T6] Weryfikacja 5 kategorii blokad w _guard_phase2_regressions...")
+    from verifier import _guard_phase2_regressions
+
+    # Kategoria 1: Honorific pan/pani bez P0 adresata
+    g1 = _guard_phase2_regressions(
+        f1_pl="Dzień dobry panu.",
+        refined_pl="Dzień dobry pani.",
+        addressee_p0_record=None
+    )
+    assert g1 == "Dzień dobry panu.", f"Kat. 1 zawiodła: {g1}"
+
+    # Kategoria 2: Antroponim żeński nieodmienny
+    g2 = _guard_phase2_regressions(
+        f1_pl="Widziałem dzielną Alice wczoraj.",
+        refined_pl="Widziałem dzielną Alicję wczoraj.",
+        invariable_female_names=["Alice"]
+    )
+    assert g2 == "Widziałem dzielną Alice wczoraj.", f"Kat. 2 zawiodła: {g2}"
+
+    # Kategoria 3: Osoba podmiotu przy jawnym zaimku pośredniczenia w EN
+    g3 = _guard_phase2_regressions(
+        f1_pl="On powiedział, że to kłamstwo.",
+        refined_pl="Powiedziałeś, że to kłamstwo.",
+        source_en="He said it was a lie."
+    )
+    assert g3 == "On powiedział, że to kłamstwo.", f"Kat. 3 zawiodła: {g3}"
+
+    # Kategoria 4: Pierwszy człon dwugłosu kontynuowanego
+    g4 = _guard_phase2_regressions(
+        f1_pl=r"- Dokładnie tak.\N- Zgadzam się z tobą.",
+        refined_pl=r"- Właśnie tak jest.\N- Zgadzam się z tobą.",
+        prev_line_f1="Dokładnie tak."
+    )
+    assert g4 == r"- Dokładnie tak.\N- Zgadzam się z tobą.", f"Kat. 4 zawiodła: {g4}"
+
+    # Kategoria 5: Zgodność czasownika 1. i 2. osoby z P0
+    g5_1 = _guard_phase2_regressions(
+        f1_pl="Napisałem cały ten raport.",
+        refined_pl="Napisałam cały ten raport.",
+        speaker_p0_gender="MALE"
+    )
+    assert g5_1 == "Napisałem cały ten raport.", f"Kat. 5 (1. os.) zawiodła: {g5_1}"
+
+    g5_2 = _guard_phase2_regressions(
+        f1_pl="Czy dokończyłeś swoje zadanie?",
+        refined_pl="Czy dokończyłaś swoje zadanie?",
+        target_p0_gender="MALE"
+    )
+    assert g5_2 == "Czy dokończyłeś swoje zadanie?", f"Kat. 5 (2. os.) zawiodła: {g5_2}"
+
+    # Kontrola negatywna: Poprawna edycja stylistyczna bez naruszeń przechodzi pomyślnie
+    g_ok = _guard_phase2_regressions(
+        f1_pl="Poszedłem szybko do zamku.",
+        refined_pl="Pobiegłem prędko do zamku.",
+        speaker_p0_gender="MALE"
+    )
+    assert g_ok == "Pobiegłem prędko do zamku.", f"Poprawna stylizacja została zablokowana: {g_ok}"
+    print(" -> PASSED: T6 potwierdza skuteczne działanie wszystkich 5 kategorii blokad regresji.")
+
+
+def test_standard_9_t7_ass_actor_name_sanitization():
+    """
+    TEST 190 (T7): Pole Name w eksporcie .ass (Sekcja 2 pkt 7, R3.9).
+    - Pole Name w każdym zdarzeniu Dialogue: = znormalizowana etykieta aktora lub puste.
+    - Znaki techniczne wielogłosu (/, |, &, +) oraz techniczne nawiasy są bezwzględnie usunięte.
+    """
+    print("\n[TEST 190 / T7] Oczyszczanie pola Name w eksporcie .ass...")
+    import pysubs2
+    from translator import split_oversized_ass_events
+
+    ev1 = pysubs2.SSAEvent(start=1000, end=3000, name="Warrior / Mage (M)", text="Atakujemy z lewej flanki!")
+    ev2 = pysubs2.SSAEvent(start=3500, end=5500, name="Knight & Paladin [S1E04]", text="Tarcze w górę!")
+    ev3 = pysubs2.SSAEvent(start=6000, end=8000, name="  Guard + Soldier | Patrol  ", text="Stać! Kto idzie?")
+    ev4 = pysubs2.SSAEvent(start=8500, end=10000, name="", text="Spokojna noc.")
+
+    processed = split_oversized_ass_events([ev1, ev2, ev3, ev4])
+    assert processed[0].name == "Warrior Mage", f"Niepoprawne oczyszczenie ev1: '{processed[0].name}'"
+    assert processed[1].name == "Knight Paladin", f"Niepoprawne oczyszczenie ev2: '{processed[1].name}'"
+    assert processed[2].name == "Guard Soldier Patrol", f"Niepoprawne oczyszczenie ev3: '{processed[2].name}'"
+    assert processed[3].name == "", f"Niepoprawne oczyszczenie ev4: '{processed[3].name}'"
+    print(" -> PASSED: T7 potwierdza usunięcie separatorów technicznych z pola Name w .ass.")
+
+
+def test_standard_9_t8_logger_hygiene_and_slug_normalization():
+    """
+    TEST 191 (T8): Higiena logowania i normalizacji slugu (Sekcja 2 pkt 7).
+    - Nagłówek i stopka logu EpisodeFlightRecorder występują dokładnie raz (idempotentność).
+    - Slug serii jest generowany z oczyszczonej nazwy pliku przez clean_anime_filename.
+    """
+    print("\n[TEST 191 / T8] Higiena rejestratora lotu i uniwersalna normalizacja slugu...")
+    import tempfile, os
+    from pipeline_logger import EpisodeFlightRecorder
+    from fansub_miner import normalize_anime_slug
+
+    # 1. Idempotentność nagłówka i stopki w EpisodeFlightRecorder
+    with tempfile.TemporaryDirectory() as td:
+        recorder = EpisodeFlightRecorder(anime_slug="Fantasy_Quest", filename="ep02", trace_dir=td)
+        # Próba wielokrotnej inicjalizacji i finalizacji
+        recorder._EpisodeFlightRecorder__initialize_log_file()
+        recorder._EpisodeFlightRecorder__initialize_log_file()
+        recorder.finalize()
+        recorder.finalize()
+
+        with open(recorder.log_path, "r", encoding="utf-8") as f:
+            log_content = f.read()
+
+        header_occurrences = log_content.count("REJESTRATOR PRZEBIEGU POTOKU AVT (EPISODE FLIGHT RECORDER)")
+        footer_occurrences = log_content.count("ZAKOŃCZENIE PRZEBIEGU POTOKU AVT")
+
+        assert header_occurrences == 1, f"Nagłówek logu wystąpił {header_occurrences} razy (wymagane dokładnie 1)"
+        assert footer_occurrences == 1, f"Stopka logu wystąpiła {footer_occurrences} razy (wymagane dokładnie 1)"
+
+    # 2. Uniwersalna normalizacja slugu z oczyszczonej nazwy pliku
+    filenames_and_expected_slugs = [
+        ("[SubsGroup] The Grand Adventure - 01 [1080p].mkv", "the_grand_adventure"),
+        ("Ancient_Kingdom_Chronicles_S02E05.ass", "ancient_kingdom_chronicles"),
+        ("[Fansub] Mystic Knights - Episode 12 [WEB-DL].srt", "mystic_knights")
+    ]
+    for fn, expected in filenames_and_expected_slugs:
+        slug = normalize_anime_slug(fn)
+        assert slug == expected, f"Błąd slugu dla '{fn}': oczekiwano '{expected}', otrzymano '{slug}'"
+
+    print(" -> PASSED: T8 potwierdza pojedyncze wystąpienie nagłówka/stopki oraz uniwersalny slug.")
 
 
 if __name__ == "__main__":
@@ -18079,7 +18489,15 @@ if __name__ == "__main__":
     test_standard_9_ultimate_pipeline_verification()
     test_episode_flight_recorder_full_pipeline_trace()
     test_variant_d_hybrid_evidence_guard_and_pipeline_hardening()
-    print("\n Wszystkie testy jednostkowe i integracyjne (183/183) zakończone pełnym sukcesem!\n")
+    test_standard_9_t1_series_bible_ingestion_synchronization()
+    test_standard_9_t2_semiotic_line_classification_all_caps_sign()
+    test_standard_9_t3_verbal_inflection_identity_pass_through_eqg()
+    test_standard_9_t4_group_virility_pure_female_and_polylogue()
+    test_standard_9_t5_newline_hygiene_preservation_and_event_splitting()
+    test_standard_9_t6_phase2_regression_guards_five_categories()
+    test_standard_9_t7_ass_actor_name_sanitization()
+    test_standard_9_t8_logger_hygiene_and_slug_normalization()
+    print("\n Wszystkie testy jednostkowe i integracyjne (191/191) zakończone pełnym sukcesem!\n")
 
 
 

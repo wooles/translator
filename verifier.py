@@ -33,13 +33,31 @@ def _guard_phase2_regressions(
     f1_pl: str,
     refined_pl: str,
     source_en: str = "",
-    speaker_p0_gender: Optional[str] = None
+    speaker_p0_gender: Optional[str] = None,
+    target_p0_gender: Optional[str] = None,
+    addressee_p0_record: Optional[Any] = None,
+    invariable_female_names: Optional[List[str]] = None,
+    prev_line_f1: Optional[str] = None,
+    series_bible: Optional[Any] = None
 ) -> str:
-    """Programmatic barrier guarding against Phase 2 stylistic or grammatical regressions."""
+    """
+    Standard 9.0 Programmatic barrier guarding against Phase 2 stylistic or grammatical regressions (Sekcja 2 pkt 6).
+    5 blocked categories (returning f1_pl whenever violated):
+    1. Honorific form dependent on addressee gender (pan/pani):
+       Preserved from Phase 1 when addressee P0 record does not exist or has has_verified_gender: false.
+    2. Invariable female anthroponym:
+       Preserved in base form from Phase 1.
+    3. Subject person with explicit mediation pronoun in source EN:
+       Preserved 3rd person subject from Phase 1 when source_en has mediation pronouns (he/she/they said/asked).
+    4. Continued dual-voice first part:
+       Preserved verbatim from previous line.
+    5. 1st and 2nd person verb forms matching P0 and EN:
+       Preserved from Phase 1 when Phase 1 was compliant with P0 and EN.
+    """
     if not refined_pl:
         return f1_pl or ""
 
-    # 1. Calque guard: eliminate 'być + imiesłów czynny -ący/-ąca/-ące'
+    # Calque guard: eliminate 'być + imiesłów czynny -ący/-ąca/-ące'
     continuous_calque_re = re.compile(
         r"\b(?:jestem|jesteś|jest|jesteśmy|jesteście|są|byłem|byłam|byłeś|byłaś|był|była|było|byli|były|będę|będziesz|będzie|będziemy|będziecie|będą)\s+[a-ząćęłńóśźż]+(?:ący|ąca|ące|ących|ącym|ącymi|ącą)\b",
         re.IGNORECASE
@@ -47,18 +65,86 @@ def _guard_phase2_regressions(
     if continuous_calque_re.search(refined_pl) and not continuous_calque_re.search(f1_pl):
         return f1_pl
 
-    # 2. Verbal gender regression guard against Phase 1
+    # 1. KATEGORIA 1: Forma grzecznościowa zależna od płci adresata (pan/pani)
+    # Zachowana z Fazy 1, gdy rekord P0 adresata nie istnieje lub ma has_verified_gender: false
+    addr_verified = False
+    if addressee_p0_record:
+        if isinstance(addressee_p0_record, dict):
+            addr_verified = bool(addressee_p0_record.get("has_verified_gender", False) or addressee_p0_record.get("priority") == "P0")
+        elif hasattr(addressee_p0_record, "has_verified_gender"):
+            addr_verified = bool(getattr(addressee_p0_record, "has_verified_gender", False) or getattr(addressee_p0_record, "priority", "") == "P0")
+    if not addr_verified:
+        pan_f1 = bool(re.search(r"\bpan(?:a|u|em)?\b", f1_pl, re.IGNORECASE))
+        pani_f1 = bool(re.search(r"\bpani(?:ą)?\b", f1_pl, re.IGNORECASE))
+        pan_ref = bool(re.search(r"\bpan(?:a|u|em)?\b", refined_pl, re.IGNORECASE))
+        pani_ref = bool(re.search(r"\bpani(?:ą)?\b", refined_pl, re.IGNORECASE))
+        if pan_f1 and not pani_f1 and pani_ref and not pan_ref:
+            return f1_pl
+        if pani_f1 and not pan_f1 and pan_ref and not pani_ref:
+            return f1_pl
+
+    # 2. KATEGORIA 2: Antroponim żeński sklasyfikowany jako nieodmienny
+    # Zachowana forma bazowa z Fazy 1
+    inv_names = list(invariable_female_names or [])
+    if series_bible and hasattr(series_bible, "characters"):
+        chars_map = getattr(series_bible, "characters", {}) or {}
+        if isinstance(chars_map, dict):
+            for c_name, c_rec in chars_map.items():
+                if isinstance(c_rec, dict) and (c_rec.get("gender") == "FEMALE" or c_rec.get("grammatical_gender") == "FEMININE"):
+                    if c_rec.get("declension") == "NIEODMIENNE" or c_rec.get("is_invariable", False):
+                        inv_names.append(c_name)
+    for iname in inv_names:
+        if iname and re.search(rf"\b{re.escape(iname)}\b", f1_pl):
+            # In Phase 1 it was in base form; if Phase 2 altered or declined it:
+            if not re.search(rf"\b{re.escape(iname)}\b", refined_pl):
+                return f1_pl
+
+    # 3. KATEGORIA 3: Osoba podmiotu przy jawnym zaimku pośredniczenia w EN
+    # Zachowana 3. osoba z Fazy 1, gdy source_en zawiera jawny zaimek osobowy pośredniczenia
+    if source_en:
+        has_mediation_en = bool(re.search(r"\b(he|she|they)\s+(?:said|says|asked|told|claimed|mentioned|thought|wanted|replied)\b", source_en, re.IGNORECASE))
+        if has_mediation_en:
+            f1_has_3rd = bool(re.search(r"\b(?:powiedział|powiedziała|mówi|twierdzi|zapytał|zapytała|chce|chciał|chciała)\b", f1_pl, re.IGNORECASE))
+            ref_has_2nd = bool(re.search(r"\b(?:powiedziałeś|powiedziałaś|mówisz|twierdzisz|zapytałeś|zapytałaś|chcesz|chciałeś|chciałaś)\b", refined_pl, re.IGNORECASE))
+            if f1_has_3rd and ref_has_2nd:
+                return f1_pl
+
+    # 4. KATEGORIA 4: Pierwszy człon dwugłosu kontynuowanego
+    # Pierwszy człon dwugłosu = tekst linii bezpośrednio poprzedzającej, w pełnej postaci
+    if prev_line_f1:
+        clean_prev = re.sub(r"^[–—\-]\s*", "", prev_line_f1).strip()
+        if clean_prev and re.search(r"^\s*[–—\-]", f1_pl):
+            f1_lines = [re.sub(r"^[–—\-]\s*", "", l).strip() for l in re.split(r"\\[Nnh]|\n", f1_pl) if l.strip()]
+            ref_lines = [re.sub(r"^[–—\-]\s*", "", l).strip() for l in re.split(r"\\[Nnh]|\n", refined_pl) if l.strip()]
+            if f1_lines and ref_lines:
+                if f1_lines[0].lower() == clean_prev.lower() and ref_lines[0].lower() != clean_prev.lower():
+                    return f1_pl
+
+    # 5. KATEGORIA 5: Forma czasownika 1. i 2. os. zgodna z P0 i EN
+    spk_norm = (speaker_p0_gender or "").upper()
     f1_has_1st_masc = bool(re.search(r"\b[a-ząćęłńóśźż]+(?:łem|łbym)\b", f1_pl, re.IGNORECASE))
     f1_has_1st_fem = bool(re.search(r"\b[a-ząćęłńóśźż]+(?:łam|łabym)\b", f1_pl, re.IGNORECASE))
     ref_has_1st_masc = bool(re.search(r"\b[a-ząćęłńóśźż]+(?:łem|łbym)\b", refined_pl, re.IGNORECASE))
     ref_has_1st_fem = bool(re.search(r"\b[a-ząćęłńóśźż]+(?:łam|łabym)\b", refined_pl, re.IGNORECASE))
 
-    spk_norm = (speaker_p0_gender or "").upper()
     if spk_norm in ("MALE", "MASCULINE") or (f1_has_1st_masc and not f1_has_1st_fem):
         if ref_has_1st_fem and not ref_has_1st_masc:
             return f1_pl
     elif spk_norm in ("FEMALE", "FEMININE") or (f1_has_1st_fem and not f1_has_1st_masc):
         if ref_has_1st_masc and not ref_has_1st_fem:
+            return f1_pl
+
+    tgt_norm = (target_p0_gender or "").upper()
+    f1_has_2nd_masc = bool(re.search(r"\b[a-ząćęłńóśźż]+(?:łeś|łbyś)\b", f1_pl, re.IGNORECASE))
+    f1_has_2nd_fem = bool(re.search(r"\b[a-ząćęłńóśźż]+(?:łaś|łabyś)\b", f1_pl, re.IGNORECASE))
+    ref_has_2nd_masc = bool(re.search(r"\b[a-ząćęłńóśźż]+(?:łeś|łbyś)\b", refined_pl, re.IGNORECASE))
+    ref_has_2nd_fem = bool(re.search(r"\b[a-ząćęłńóśźż]+(?:łaś|łabyś)\b", refined_pl, re.IGNORECASE))
+
+    if tgt_norm in ("MALE", "MASCULINE") or (f1_has_2nd_masc and not f1_has_2nd_fem):
+        if ref_has_2nd_fem and not ref_has_2nd_masc:
+            return f1_pl
+    elif tgt_norm in ("FEMALE", "FEMININE") or (f1_has_2nd_fem and not f1_has_2nd_masc):
+        if ref_has_2nd_masc and not ref_has_2nd_fem:
             return f1_pl
 
     return refined_pl
@@ -374,9 +460,9 @@ class DialogueVerifier:
             # Actor & Voice profile
             actor_cues = []
             if item.get('speaker_voice'):
-                actor_cues.append(f"Głos: {item['speaker_voice']}")
+                actor_cues.append(f"akustyka głosu mówcy bieżącej linii (wyłącznie mówca): {item['speaker_voice']}")
             if item.get('prosody'):
-                actor_cues.append(f"Ton: {item['prosody']}")
+                actor_cues.append(f"akustyka głosu mówcy bieżącej linii (wyłącznie mówca): {item['prosody']}")
             if item.get('pragmatic_register'):
                 actor_cues.append(f"Rejestr: {item['pragmatic_register']}")
             actor_line = f"  [Aktorstwo i Rejestr]: {', '.join(actor_cues)}\n" if actor_cues else ""
@@ -606,11 +692,17 @@ class DialogueVerifier:
                         f1_text = orig_it.get("pl", "")
                         src_en = orig_it.get("en", "")
                         spk_g = orig_it.get("speaker_gender") or orig_it.get("speaker_p0_gender")
+                        tgt_g = orig_it.get("target_gender") or orig_it.get("addressee_gender")
+                        addr_rec = orig_it.get("addressee_p0_record")
+                        prev_txt = orig_it.get("prev_line_f1") or ""
                         guarded = _guard_phase2_regressions(
                             f1_pl=f1_text,
                             refined_pl=r.refined_pl,
                             source_en=src_en,
-                            speaker_p0_gender=spk_g
+                            speaker_p0_gender=spk_g,
+                            target_p0_gender=tgt_g,
+                            addressee_p0_record=addr_rec,
+                            prev_line_f1=prev_txt
                         )
                         if guarded != r.refined_pl:
                             r.refined_pl = guarded

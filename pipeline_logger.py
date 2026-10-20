@@ -28,6 +28,10 @@ def _safe_json_default(obj: Any) -> Any:
     return str(obj)
 
 
+SEP_80 = "=" * 80
+SEP_78 = "-" * 78
+
+
 class EpisodeFlightRecorder:
     """
     Czarna skrzynka wykonania potoku tłumaczenia dla pojedynczego odcinka.
@@ -43,6 +47,8 @@ class EpisodeFlightRecorder:
     ) -> None:
         self.enabled: bool = enabled
         self._lock: threading.Lock = threading.Lock()
+        self._initialized: bool = False
+        self._finalized: bool = False
         self.anime_slug: str = anime_slug or "anime"
         self.filename: str = filename or "episode"
         self.trace_dir: Path = Path(trace_dir or "logs")
@@ -69,22 +75,26 @@ class EpisodeFlightRecorder:
                 pass
 
     def __initialize_log_file(self) -> None:
-        """Inicjalizuje nagłówek w pliku czytelnym dla człowieka."""
-        header = (
-            "=" * 80 + "\n"
-            f"REJESTRATOR PRZEBIEGU POTOKU AVT (EPISODE FLIGHT RECORDER)\n"
-            f"Seria: {self.anime_slug}\n"
-            f"Plik: {self.filename}\n"
-            f"Czas startu: {datetime.now().isoformat()}\n"
-            "=" * 80 + "\n\n"
-        )
-        try:
-            with open(self.log_path, "w", encoding="utf-8") as f:
-                f.write(header)
-            with open(self.jsonl_path, "a", encoding="utf-8") as jf:
+        """Inicjalizuje nagłówek w pliku czytelnym dla człowieka (dokładnie raz)."""
+        with self._lock:
+            if self._initialized:
+                return
+            header = (
+                f"{SEP_80}\n"
+                f"REJESTRATOR PRZEBIEGU POTOKU AVT (EPISODE FLIGHT RECORDER)\n"
+                f"Seria: {self.anime_slug}\n"
+                f"Plik: {self.filename}\n"
+                f"Czas startu: {datetime.now().isoformat()}\n"
+                f"{SEP_80}\n\n"
+            )
+            try:
+                with open(self.log_path, "w", encoding="utf-8") as f:
+                    f.write(header)
+                with open(self.jsonl_path, "a", encoding="utf-8") as jf:
+                    pass
+                self._initialized = True
+            except Exception:
                 pass
-        except Exception:
-            pass
 
     def record_event(
         self,
@@ -128,9 +138,9 @@ class EpisodeFlightRecorder:
         if not self.enabled:
             return
         section_text = (
-            "\n" + "-" * 78 + "\n"
+            f"\n{SEP_78}\n"
             f"{section_title}\n"
-            + "-" * 78 + "\n"
+            f"{SEP_78}\n"
             f"{content}\n"
         )
         with self._lock:
@@ -410,19 +420,22 @@ class EpisodeFlightRecorder:
         self.write_log_section("[KROK 11: EPISODEQUALITYGATE I ROZLICZENIE FINANSOWE PRICINGGUARD]", "\n".join(text_lines))
 
     def finalize(self) -> None:
-        """Zamyka sesję rejestratora i zapisuje podsumowanie końcowe."""
+        """Zamyka sesję rejestratora i zapisuje podsumowanie końcowe (dokładnie raz)."""
         if not self.enabled:
             return
-        footer = (
-            "\n" + "=" * 80 + "\n"
-            f"ZAKOŃCZENIE PRZEBIEGU POTOKU AVT: {datetime.now().isoformat()}\n"
-            f"Plik logu pełnego: {self.log_path}\n"
-            f"Plik zdarzeń JSONL: {self.jsonl_path}\n"
-            "=" * 80 + "\n"
-        )
         with self._lock:
+            if self._finalized:
+                return
+            footer = (
+                f"\n{SEP_80}\n"
+                f"ZAKOŃCZENIE PRZEBIEGU POTOKU AVT: {datetime.now().isoformat()}\n"
+                f"Plik logu pełnego: {self.log_path}\n"
+                f"Plik zdarzeń JSONL: {self.jsonl_path}\n"
+                f"{SEP_80}\n"
+            )
             try:
                 with open(self.log_path, "a", encoding="utf-8") as lf:
                     lf.write(footer)
+                self._finalized = True
             except Exception:
                 pass

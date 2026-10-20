@@ -911,12 +911,19 @@ def fix_undecorated_male_names(
     if character_names is not None:
         names = list(character_names)
     elif series_bible and hasattr(series_bible, "characters") and isinstance(series_bible.characters, dict):
+        names = []
+        for c_name, c_rec in series_bible.characters.items():
+            gen = getattr(c_rec, "gender", None) if not isinstance(c_rec, dict) else c_rec.get("gender")
+            g_gen = getattr(c_rec, "grammatical_gender", None) if not isinstance(c_rec, dict) else c_rec.get("grammatical_gender")
+            cat = getattr(c_rec, "category", None) if not isinstance(c_rec, dict) else c_rec.get("category")
+            if (gen in ("MALE", "MASCULINE") or g_gen in ("MALE", "MASCULINE")) and cat != "TOPONYM":
+                names.append(c_name)
+    elif series_bible and hasattr(series_bible, "data") and "characters" in series_bible.data:
         names = [
-            c_name for c_name, c_rec in series_bible.characters.items()
-            if getattr(c_rec, "gender", None) == "MALE" or (isinstance(c_rec, dict) and c_rec.get("gender") == "MALE")
+            c_name for c_name, c_rec in series_bible.data["characters"].items()
+            if isinstance(c_rec, dict) and (c_rec.get("gender") in ("MALE", "MASCULINE") or c_rec.get("grammatical_gender") in ("MALE", "MASCULINE"))
+            and c_rec.get("category") != "TOPONYM"
         ]
-        if not names:
-            names = []
     else:
         names = []
 
@@ -938,6 +945,24 @@ def fix_undecorated_male_names(
             d_n = generate_polish_name_declension(n, "MALE")
             if d_n:
                 existing_name_forms.update(val.lower() for val in d_n.values() if isinstance(val, str))
+        if series_bible:
+            all_chars = []
+            if hasattr(series_bible, "characters") and isinstance(series_bible.characters, dict):
+                all_chars = list(series_bible.characters.keys())
+            elif hasattr(series_bible, "data") and "characters" in series_bible.data:
+                all_chars = list(series_bible.data["characters"].keys())
+            for ch in all_chars:
+                existing_name_forms.add(ch.lower())
+                d_m = generate_polish_name_declension(ch, "MALE")
+                if d_m:
+                    existing_name_forms.update(val.lower() for val in d_m.values() if isinstance(val, str))
+                d_f = generate_polish_name_declension(ch, "FEMALE")
+                if d_f:
+                    existing_name_forms.update(val.lower() for val in d_f.values() if isinstance(val, str))
+            if hasattr(series_bible, "declensions") and isinstance(series_bible.declensions, dict):
+                for dec_val in series_bible.declensions.values():
+                    if isinstance(dec_val, dict):
+                        existing_name_forms.update(val.lower() for val in dec_val.values() if isinstance(val, str))
 
         cand_preps = rf"(?i:\b(?:{gen_preps}|{dat_preps}|{ins_preps})(?:\s+[a-ząćęłńóśźż]+)?\s+)([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+)\b"
         for m_cand in re.finditer(cand_preps, text):
@@ -4266,6 +4291,227 @@ class SeriesBible:
         self.data["characters"].bible_data = self.data
         if self.db_path != ":memory:":
             self.load()
+
+    @property
+    def characters(self) -> Dict[str, Any]:
+        with self._lock:
+            chars = self.data.get("characters")
+            if chars is None:
+                chars = CharacterRegistryDict({}, bible_data=self.data)
+                self.data["characters"] = chars
+            return chars
+
+    @characters.setter
+    def characters(self, val: Any) -> None:
+        with self._lock:
+            if isinstance(val, CharacterRegistryDict):
+                val.bible_data = self.data
+                self.data["characters"] = val
+            else:
+                self.data["characters"] = CharacterRegistryDict(val or {}, bible_data=self.data)
+
+    @property
+    def relations(self) -> Dict[str, Any]:
+        with self._lock:
+            return self.data.setdefault("relations", {})
+
+    @relations.setter
+    def relations(self, val: Any) -> None:
+        with self._lock:
+            self.data["relations"] = val or {}
+
+    @property
+    def declensions(self) -> Dict[str, Any]:
+        with self._lock:
+            return self.data.setdefault("declensions", {})
+
+    @declensions.setter
+    def declensions(self, val: Any) -> None:
+        with self._lock:
+            self.data["declensions"] = val or {}
+
+    @property
+    def glossary(self) -> Dict[str, Any]:
+        with self._lock:
+            return self.data.setdefault("glossary", {})
+
+    @glossary.setter
+    def glossary(self, val: Any) -> None:
+        with self._lock:
+            self.data["glossary"] = val or {}
+
+    def synchronize_from_metadata_and_profile(
+        self,
+        anilist_meta: Optional[Dict[str, Any]] = None,
+        episode_profile: Optional[Any] = None
+    ) -> None:
+        """
+        Synchronizuje struktury SeriesBible (characters, relations, declensions)
+        z danymi z metadanych serii (Krok 3) oraz profilera odcinka (Krok 5).
+        Zapewnia pełne pokrycie postaci obecnych i wspominanych oraz priorytet P0.
+        """
+        with self._lock:
+            # 1. Postacie z anilist_meta
+            if anilist_meta and isinstance(anilist_meta.get("characters"), list):
+                for c in anilist_meta["characters"]:
+                    if not isinstance(c, dict):
+                        continue
+                    c_name = c.get("name")
+                    if isinstance(c_name, dict):
+                        c_name = c_name.get("full") or c_name.get("userPreferred") or ""
+                    if not c_name or not is_valid_anthroponymic_phonotactics(c_name):
+                        continue
+                    c_gen = c.get("gender")
+                    c_role = c.get("role", "postać")
+                    c_desc = c.get("description", "")
+                    
+                    gen_norm = None
+                    if c_gen:
+                        c_gen_str = str(c_gen).upper()
+                        if "MALE" in c_gen_str and "FEMALE" not in c_gen_str:
+                            gen_norm = "MALE"
+                        elif "FEMALE" in c_gen_str:
+                            gen_norm = "FEMALE"
+                    
+                    existing = self.data["characters"].get(c_name)
+                    if not existing or not isinstance(existing, dict):
+                        self.data["characters"][c_name] = {
+                            "name": c_name,
+                            "gender": gen_norm,
+                            "grammatical_gender": "MASCULINE" if gen_norm == "MALE" else ("FEMININE" if gen_norm == "FEMALE" else None),
+                            "role": c_role,
+                            "description": c_desc,
+                            "confidence": 0.95 if gen_norm else 0.5,
+                            "priority": "P0" if gen_norm else "P1",
+                            "has_verified_gender": bool(gen_norm),
+                            "aliases": []
+                        }
+                    else:
+                        if gen_norm and not existing.get("has_verified_gender"):
+                            existing["gender"] = gen_norm
+                            existing["grammatical_gender"] = "MASCULINE" if gen_norm == "MALE" else "FEMININE"
+                            existing["has_verified_gender"] = True
+                            existing["confidence"] = 0.95
+                            existing["priority"] = "P0"
+
+            # 2. Postacie z EpisodeProfile.character_dossiers
+            if episode_profile and getattr(episode_profile, "character_dossiers", None):
+                for cd in episode_profile.character_dossiers:
+                    cd_name = getattr(cd, "name", None)
+                    if not cd_name or not is_valid_anthroponymic_phonotactics(cd_name):
+                        continue
+                    cd_gen_raw = str(getattr(cd, "gender", "") or getattr(cd, "apparent_gender", "") or "").upper()
+                    cd_pronouns = getattr(cd, "first_person_pronouns", []) or [getattr(cd, "first_person_pronoun", "")]
+                    is_male_pronoun = any(str(p).lower() in ("ore", "boku", "oira", "washi") for p in cd_pronouns if p)
+                    cd_is_male = ("MALE" in cd_gen_raw or "MASCULINE" in cd_gen_raw or is_male_pronoun) and "FEMALE" not in cd_gen_raw and "FEMININE" not in cd_gen_raw
+                    cd_is_female = ("FEMALE" in cd_gen_raw or "FEMININE" in cd_gen_raw)
+                    cd_gen = "MALE" if cd_is_male else ("FEMALE" if cd_is_female else None)
+                    cd_role = getattr(cd, "age_and_role", "postać") or "postać"
+                    
+                    curr = self.data["characters"].get(cd_name)
+                    if not curr or not isinstance(curr, dict):
+                        self.data["characters"][cd_name] = {
+                            "name": cd_name,
+                            "gender": cd_gen,
+                            "grammatical_gender": "MASCULINE" if cd_gen == "MALE" else ("FEMININE" if cd_gen == "FEMALE" else None),
+                            "role": cd_role,
+                            "description": cd_role,
+                            "confidence": 0.95 if cd_gen else 0.5,
+                            "priority": "P0" if cd_gen else "P1",
+                            "has_verified_gender": bool(cd_gen),
+                            "aliases": []
+                        }
+                    else:
+                        if cd_gen:
+                            curr["gender"] = cd_gen
+                            curr["grammatical_gender"] = "MASCULINE" if cd_gen == "MALE" else "FEMININE"
+                            curr["has_verified_gender"] = True
+                            curr["confidence"] = 0.95
+                            curr["priority"] = "P0"
+
+            # 3. Deklinacje i autoreferencja z EpisodeProfile.name_declensions
+            if episode_profile and getattr(episode_profile, "name_declensions", None):
+                for nd in episode_profile.name_declensions:
+                    nd_name = getattr(nd, "character_name", None)
+                    if not nd_name or not is_valid_anthroponymic_phonotactics(nd_name):
+                        continue
+                    paradigm = {
+                        "M": getattr(nd, "mianownik", None) or nd_name,
+                        "D": getattr(nd, "dopelniacz", None) or nd_name,
+                        "C": getattr(nd, "celownik", None) or nd_name,
+                        "B": getattr(nd, "biernik", None) or nd_name,
+                        "N": getattr(nd, "narzednik", None) or nd_name,
+                        "Ms": getattr(nd, "miejscownik", None) or nd_name,
+                        "W": getattr(nd, "wolacz", None) or nd_name,
+                    }
+                    self.data.setdefault("declensions", {})[nd_name] = paradigm
+                    
+                    # Weryfikacja męskiego paradygmatu / zaimka autoreferencyjnego
+                    nd_gen_raw = str(getattr(nd, "gender", "") or getattr(nd, "grammatical_gender", "") or "").upper()
+                    is_masc_decl = (
+                        (("MALE" in nd_gen_raw or "MASCULINE" in nd_gen_raw) and ("FEMALE" not in nd_gen_raw and "FEMININE" not in nd_gen_raw)) or
+                        bool(paradigm["N"] and (paradigm["N"].endswith("em") or paradigm["N"].endswith("im") or paradigm["N"].endswith("ym"))) or
+                        bool(paradigm["D"] and (paradigm["D"].endswith("a") or paradigm["D"].endswith("u") or paradigm["D"].endswith("ego") or paradigm["D"].endswith("emu")))
+                    )
+                    
+                    char_entry = self.data["characters"].get(nd_name)
+                    if not char_entry or not isinstance(char_entry, dict):
+                        c_gen = "MALE" if is_masc_decl else ("FEMALE" if "FEMALE" in nd_gen_raw else None)
+                        self.data["characters"][nd_name] = {
+                            "name": nd_name,
+                            "gender": c_gen,
+                            "grammatical_gender": "MASCULINE" if c_gen == "MALE" else ("FEMININE" if c_gen == "FEMALE" else None),
+                            "role": "postać",
+                            "description": "postać",
+                            "confidence": 0.95 if c_gen else 0.5,
+                            "priority": "P0" if c_gen else "P1",
+                            "has_verified_gender": bool(c_gen),
+                            "aliases": []
+                        }
+                    else:
+                        if is_masc_decl and (not char_entry.get("has_verified_gender") or not char_entry.get("gender")):
+                            char_entry["gender"] = "MALE"
+                            char_entry["grammatical_gender"] = "MASCULINE"
+                            char_entry["confidence"] = 0.95
+                            char_entry["priority"] = "P0"
+                            char_entry["has_verified_gender"] = True
+
+            # 4. Postacie wspominane z EpisodeProfile.continuity_bridge_alerts
+            if episode_profile and getattr(episode_profile, "continuity_bridge_alerts", None):
+                for cba in episode_profile.continuity_bridge_alerts:
+                    term = getattr(cba, "term_or_event", None)
+                    guide = getattr(cba, "continuity_guidance", "") or ""
+                    if term and is_valid_anthroponymic_phonotactics(term):
+                        if term not in self.data["characters"]:
+                            term_gen = "FEMALE" if any(w in guide.lower() for w in ["kobieta", "żeńsk", "pani", "bohaterka", "dziewczyna"]) else ("MALE" if any(w in guide.lower() for w in ["mężczyzna", "męsk", "pan", "bohater", "chłopak"]) else None)
+                            self.data["characters"][term] = {
+                                "name": term,
+                                "gender": term_gen,
+                                "grammatical_gender": "FEMININE" if term_gen == "FEMALE" else ("MASCULINE" if term_gen == "MALE" else None),
+                                "role": guide or "postać wspominana",
+                                "description": guide or "postać wspominana",
+                                "confidence": 0.95 if term_gen else 0.85,
+                                "priority": "P0",
+                                "has_verified_gender": bool(term_gen),
+                                "aliases": []
+                            }
+
+            # 5. Relacje z character_relationships
+            if episode_profile and getattr(episode_profile, "character_relationships", None):
+                for rel in episode_profile.character_relationships:
+                    spk = getattr(rel, "speaker", None)
+                    lis = getattr(rel, "listener", None)
+                    if spk and lis:
+                        rel_key = f"{spk}->{lis}"
+                        rel_val = f"{getattr(rel, 'address_form', '')} ({getattr(rel, 'relationship_type', '')})".strip()
+                        self.data.setdefault("relations", {})[rel_key] = rel_val
+                        self.data.setdefault("relationships", {})[rel_key] = rel_val
+
+            if hasattr(self, "_rebuild_actor_aliases_index"):
+                try:
+                    self._rebuild_actor_aliases_index()
+                except Exception:
+                    pass
 
     def get_characters_snapshot(self) -> Dict[str, Any]:
         with self._lock:

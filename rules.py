@@ -2372,6 +2372,16 @@ AKTYWNY KANON POZYTYWNEGO RZEMIOSŁA AVT (BARAŃCZAK, BELCZYK, SZARKOWSKA):
 - Korzystaj ze swobody polskiego szyku zdania, by dialog oddychał razem z aktorem na ekranie.
 """
 
+STANDARD_9_CORE_RULES_PROMPT = """
+STANDARD 9.0 — AUTORYTET TRANSLACYJNY I NIEZMIENNIKI DZIEDZINY POZYTYWNEJ:
+1. ŹRÓDŁO TREŚCI DLA WARSTWY NIE-DIALOGOWEJ: Dla każdej linii is_sign: true źródłem treści tłumaczenia jest wyłącznie tekst źródłowy EN. Tłumaczenie zachowuje pełną wierność wobec EN. Transkrypcja ASR i tagi prozodyczne są poza zbiorem sygnałów takiej linii.
+2. AUTORYTET PŁCI I OSOBY GRAMATYCZNEJ: Płeć adresata pochodzi wyłącznie z rekordu P0. Parametr F0 bieżącej linii opisuje wyłącznie mówcę i nie decyduje o płci adresata. Osoba gramatyczna podmiotu wynika z tekstu źródłowego EN (jawne zaimki osobowe 3. osoby w EN oznaczają pośredniczenie w rozmowie i definiują 3. osobę).
+3. AUTORYTET ANTROPONIMU ŻEŃSKIEGO: Rodzaj gramatyczny postaci wynika z rekordu P0. Antroponimy żeńskie sklasyfikowane jako nieodmienne pozostają w formie bazowej we wszystkich przypadkach zależnych i narzucają rodzaj gramatyczny zdania.
+4. AUTOREFERENCJA PODMIOTU SPECJALNEGO: Podmioty o męskim zaimku autoreferencyjnym i męskim paradygmacie deklinacji stosują męskie formy 1. os. lp.
+5. SKŁAD SCENY I LICZBA MNOGA: W scenach o składzie wyłącznie żeńskim (P0) formy 1. i 2. os. lm. są niemęskoosobowe. Znacznik POLYLOGUE (n=M) definiuje liczbę uczestników sceny; zaimki 1. i 2. os. lm. w linii z tym znacznikiem odnoszą się do pełnego składu sceny.
+6. SPÓJNOŚĆ DWUGŁOSU KONTYNUOWANEGO: Pierwszy człon dwugłosu kontynuowanego zachowuje pełną postać tekstu linii bezpośrednio poprzedzającej. Spójność dwugłosu ma pierwszeństwo wobec reguł kondensacji.
+"""
+
 def get_translation_system_prompt(keep_honorifics: bool = True, lean: bool = False) -> str:
     anime_guide = get_anime_conventions_guide(keep_honorifics)
     canon_block = ACTIVE_AVT_CRAFT_CANON if lean else f"{ACTIVE_AVT_CRAFT_CANON}\n\n{BELCZYK_AVT_MASTER_CANON}"
@@ -2386,6 +2396,8 @@ Twoim nadrzędnym celem jest przekład dialogów na ŻYWĄ, NATURALNĄ POLSZCZYZ
 {canon_block}
 
 {anime_guide}
+
+{STANDARD_9_CORE_RULES_PROMPT}
 
 POZYTYWNE ZASADY RZEMIOSŁA AVT I STANDARDU ODPOWIEDZI:
 - Naturalny tekst dialogowy dopasowany do żywej polszczyzny kinowej.
@@ -2406,11 +2418,13 @@ Twoim zadaniem jest harmonizacja stylistyczna, eliminacja sztywności, powtórze
 
 {CORE_AVT_MASTER_CANON}
 
+{STANDARD_9_CORE_RULES_PROMPT}
+
 ZOGNISKOWANY AUDYT DRAMATURGICZNY CoT (FOCUS SCRIPT DOCTOR):
 1. 👂 UCHO: Czy kwestia brzmi gładko, naturalnie i bez potknięć przy czytaniu na głos? Czy wyeliminowano kalki?
-2. 🏛️ SPÓJNOŚĆ SKŁADNIOWA I FLEKSYJNA: Czy zdania rozbite wielokropkiem mają kompletne orzeczenie osobowe? Czy tytulatura i miana (tytuł wojskowy przed imieniem, nieodmienne imiona obcych bohaterek, wielkie litery dynastii) mają właściwą formę przypadka?
+2. 🏛️ SPÓJNOŚĆ SKŁADNIOWA I FLEKSYJNA: Czy zdania rozbite wielokropkiem mają kompletne orzeczenie osobowe? Czy tytulatura i miana (tytuł wojskowy przed imieniem, nieodmienne imiona obcych bohaterek, wielkie litery dynastii) mają właściwą formę przypadka? Faza 2 nie regresuje autorytetu Fazy 1 w zakresie form grzecznościowych (pan/pani), antroponimów żeńskich, osoby gramatycznej z EN ani uzgodnień fleksyjnych zgodnych z P0.
 3. 🌍 REJESTR EPOKI: Czy w dialogach historycznych/fantasy dialogi zachowują godny, literacki ton?
-4. 🎙️ INTENCJA SEIYŪ: Czy fansub nie dokonał fałszywej parafrazy (akty mowy w roli uciszania lub powitania bez mechanicznego echa czasownikowego)?
+4. 🎙️ INTENCJA SEIYŪ: Czy fansub nie dokonał fałszywej parafrazy (akty mowy w roli uciszania lub powitania bez mechanicznego echa czasownikowego)? Akustyka głosu opisuje wyłącznie mówcę bieżącej linii i nie nadpisuje płci adresata.
 5. 👁️ WSTECZNA WERYFIKACJA PERCEPCYJNA (AUTONOMOUS BLIND-READING TEST): Odsuń na bok angielski skrypt i przeczytaj polską kwestię na zimno, z perspektywy polskiego widza w kinie. Czy kwestia brzmi tak, jakby została pierwotnie napisana po polsku przez wybitnego dramaturga? Ocena naturalności i płynności dialogowej w języku polskim.
 
 {canon_block}

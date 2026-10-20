@@ -2014,7 +2014,7 @@ def classify_we_group_gender(
 
     if has_male:
         return "VIRILE", True
-    elif len(we_group) >= 2 and confirmed_females >= 2 and unknown_count == 0 and not has_male:
+    elif len(we_group) >= 1 and confirmed_females == len(we_group) and unknown_count == 0 and not has_male:
         return "NON_VIRILE", False
     else:
         return "AMBIGUOUS", False
@@ -2081,7 +2081,7 @@ def classify_you_group_gender(
 
     if has_male:
         return "VIRILE"
-    elif len(you_group) >= 2 and confirmed_females >= 2 and unknown_count == 0 and not has_male:
+    elif len(you_group) >= 1 and confirmed_females == len(you_group) and unknown_count == 0 and not has_male:
         return "NON_VIRILE"
     else:
         return "AMBIGUOUS"

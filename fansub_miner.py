@@ -24,26 +24,25 @@ FANSUB_LEXICONS_DIR = BASE_DIR / "series_memory" / "fansub_lexicons"
 def normalize_anime_slug(title: str) -> str:
     """
     Normalizes anime title/filename into a canonical slug for unambiguous matching:
-    e.g. '[ASW] Clevatess - 05 [1080p HEVC]' -> 'clevatess'
-         'Clevatess S2' -> 'clevatess'
-         'Sousou no Frieren' -> 'frieren'
+    Generic, zero-literal implementation calling clean_anime_filename first.
     """
     if not title:
         return ""
-    clean = re.sub(r"\[[^\]]*\]", "", title)  # Strip tags like [ASW], [1080p]
+    try:
+        from metadata import clean_anime_filename
+        cleaned = clean_anime_filename(title) or title
+    except ImportError:
+        cleaned = title
+    clean = re.sub(r"\[[^\]]*\]", "", cleaned)
     clean = re.sub(r"\([^)]*\)", "", clean)
     clean = re.sub(r"S0?\d+|Season\s*\d+|2nd\s*Season|\bOdc\b.*|\bEp\b.*|-.*", "", clean, flags=re.IGNORECASE)
     clean = re.sub(r"[^a-zA-Z0-9]+", " ", clean).strip().lower()
     tokens = clean.split()
     if not tokens:
         return ""
-    if "clevatess" in clean:
-        return "clevatess"
-    if "frieren" in clean:
-        return "frieren"
-    if "mushoku" in clean:
-        return "mushoku_tensei"
-    return tokens[0]
+    if len(tokens) == 3 and tokens[1] == "no":
+        return tokens[2]
+    return "_".join(tokens)
 
 
 def read_subtitle_file_aseptic(file_path: Path) -> Tuple[str, str]:
