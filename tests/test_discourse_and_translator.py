@@ -89,3 +89,38 @@ def test_speaker_gender_arbitration_p0_priority_and_sign_isolation(tmp_path):
     events = [ev_male, ev_fem, ev_sign]
     turns = build_discourse_topology(events, series_bible=bible)
     assert len(turns) >= 2
+
+
+def test_telemetry_preserves_explicit_event_actor_and_verified_p0_gender():
+    from scene_discourse import SceneDiscourseGraph
+
+    bible = SeriesBible(slug="discourse_test_telemetry", db_path=":memory:")
+    bible.sync_verified_profile_entity(
+        name="Bohater",
+        gender="MALE",
+        has_verified_gender=True
+    )
+    event = pysubs2.SSAEvent(start=1000, end=3000, text="Tekst kwestii", name="Bohater")
+    
+    telemetry = SceneDiscourseGraph.arbitrate_event_telemetry(
+        event=event,
+        series_bible=bible,
+        aux_telemetry={"speaker_gender": "FEMALE"}  # Contradicted by auxiliary signal
+    )
+    assert telemetry["speaker_name"] == "Bohater"
+    assert telemetry["speaker_gender"] == "MALE"
+    assert telemetry["has_verified_gender"] is True
+
+
+def test_asr_window_isolation_and_empty_asr_for_is_sign_events():
+    from profiler import EpisodeProfiler
+
+    # 1. Signs receive empty ASR string regardless of raw audio
+    assert EpisodeProfiler.sanitize_event_asr("Tło rozmowy w karczmie", is_sign=True) == ""
+    assert EpisodeProfiler.sanitize_event_asr("Tytuł odcinka z audio", style="Ep Title") == ""
+    assert EpisodeProfiler.sanitize_event_asr("Napis ekranowy", style="Sign") == ""
+    assert EpisodeProfiler.sanitize_event_asr("Podpis pod planszą", style="Caption") == ""
+
+    # 2. Dialogue lines preserve strictly isolated speech window
+    speech = "Kwestia dialogowa bohatera"
+    assert EpisodeProfiler.sanitize_event_asr(speech, is_sign=False, style="Default") == speech

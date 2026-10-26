@@ -1684,7 +1684,8 @@ def is_official_or_court_consonant_name(name: str, context: Optional[str] = None
     """
     if not name:
         return False
-    clean = re.sub(r"[\(\[].*?[\)\]]", "", re.split(r"[\\\/]", str(name))[0]).strip().lower()
+    clean = re.sub(r"[\(\[].*?[\)\]]", "", re.split(r"[\\\/]", str(name))[0])
+    clean = re.sub(r"[\(\[].*$", "", clean).strip().lower()
     clean_norm = normalize_name_nfkd(clean).lower()
     tokens = [t for t in re.split(r"[\s_/-]+", clean_norm) if t]
     if not tokens:
@@ -2104,7 +2105,8 @@ def extract_clean_speaker_name(name: str) -> str:
     # Strip ASS style suffix (e.g. \Italic, /Italic, \Default, \Narration)
     clean = re.split(r"[\\\/]", str(name))[0].strip()
     # Strip parenthetical or bracketed additions (e.g. (Flashback), [Off-screen], (young))
-    clean = re.sub(r"[\(\[].*?[\)\]]", "", clean).strip()
+    clean = re.sub(r"[\(\[].*?[\)\]]", "", clean)
+    clean = re.sub(r"[\(\[].*$", "", clean).strip()
     return clean
 
 
@@ -4291,8 +4293,14 @@ class SeriesBible:
     def __init__(self, anime_title: str = "Nieznana Seria", storage_dir: Optional[Path] = None, db_path: Optional[str] = None, **kwargs):
         self._lock = threading.RLock()
         self.db_path = db_path
-        self.anime_title = anime_title.strip() if anime_title else "Nieznana Seria"
-        self.slug = clean_anime_slug(self.anime_title)
+        slug_arg = kwargs.get("slug")
+        title_arg = kwargs.get("title") or kwargs.get("anime_title")
+        if slug_arg and (not anime_title or anime_title == "Nieznana Seria"):
+            self.anime_title = str(slug_arg).strip()
+            self.slug = clean_anime_slug(slug_arg)
+        else:
+            self.anime_title = str(title_arg or anime_title).strip() if (title_arg or anime_title) else "Nieznana Seria"
+            self.slug = clean_anime_slug(slug_arg or self.anime_title)
         self.storage_dir = storage_dir or SERIES_MEMORY_DIR
         if self.db_path != ":memory:":
             self.storage_dir.mkdir(parents=True, exist_ok=True)
@@ -4364,6 +4372,116 @@ class SeriesBible:
         with self._lock:
             self.data["glossary"] = val or {}
 
+    def register_character(
+        self,
+        name: str,
+        gender: str = "UNKNOWN",
+        description: str = "",
+        has_verified_gender: bool = False,
+        priority: str = "P1",
+        **kwargs
+    ) -> Dict[str, Any]:
+        """
+        Rejestruje postać w rejestrze postaci SeriesBible zgodnie z pozytywnym schematem
+        CharacterRecord (Standard 9.0/9.1/9.2).
+        """
+        with self._lock:
+            clean_name = str(name).strip()
+            g_upper = str(gender).upper()
+            if "MALE" in g_upper and "FEMALE" not in g_upper:
+                norm_gender = "MALE"
+                gram_gender = "MASCULINE"
+            elif "FEMALE" in g_upper:
+                norm_gender = "FEMALE"
+                gram_gender = "FEMININE"
+            else:
+                norm_gender = "UNKNOWN"
+                gram_gender = "UNKNOWN"
+            
+            p0 = (priority == "P0" or has_verified_gender or (norm_gender != "UNKNOWN" and priority == "P0"))
+            eff_has_verified = has_verified_gender or (norm_gender != "UNKNOWN" and priority == "P0")
+            eff_priority = "P0" if p0 else priority
+            eff_conf = 0.95 if p0 else float(kwargs.get("confidence", 0.5))
+
+            aliases = kwargs.get("aliases")
+            if aliases is None:
+                aliases = [clean_name] if clean_name else []
+            elif clean_name and clean_name not in aliases:
+                aliases.append(clean_name)
+
+            record = {
+                "name": clean_name,
+                "gender": norm_gender,
+                "grammatical_gender": gram_gender,
+                "confidence": eff_conf,
+                "priority": eff_priority,
+                "has_verified_gender": eff_has_verified,
+                "aliases": aliases,
+                "description": description or kwargs.get("role", "postać"),
+                "entity_category": kwargs.get("entity_category", "ANTHROPONYM")
+            }
+            self.data["characters"][clean_name] = record
+            return record
+
+    def sync_verified_profile_entity(
+        self,
+        name: str,
+        gender: str,
+        has_verified_gender: bool = True,
+        declension_map: Optional[Dict[str, str]] = None,
+        description: Optional[str] = None,
+        priority: str = "P0"
+    ) -> Dict[str, Any]:
+        """
+        Synchronizuje zweryfikowaną postać P0 z profilera do SeriesBible
+        wraz z pełną 7-przypadkową macierzą deklinacji (M, D, C, B, N, Ms, W).
+        """
+        with self._lock:
+            clean_name = str(name).strip()
+            g_upper = str(gender).upper()
+            if "MALE" in g_upper and "FEMALE" not in g_upper:
+                norm_gender = "MALE"
+                gram_gender = "MASCULINE"
+            elif "FEMALE" in g_upper:
+                norm_gender = "FEMALE"
+                gram_gender = "FEMININE"
+            else:
+                norm_gender = "UNKNOWN"
+                gram_gender = "UNKNOWN"
+
+            record = {
+                "name": clean_name,
+                "gender": norm_gender,
+                "grammatical_gender": gram_gender,
+                "confidence": 0.95,
+                "priority": priority,
+                "has_verified_gender": has_verified_gender,
+                "aliases": [clean_name],
+                "description": description or f"Postać ({norm_gender.lower()})",
+                "entity_category": "ANTHROPONYM"
+            }
+            self.data["characters"][clean_name] = record
+            
+            if declension_map:
+                self.data.setdefault("declensions", {})[clean_name] = dict(declension_map)
+            elif clean_name not in self.data.setdefault("declensions", {}):
+                gen_func = globals().get("generate_polish_name_declension")
+                if callable(gen_func):
+                    self.data["declensions"][clean_name] = gen_func(clean_name, norm_gender)
+            return record
+
+    def get_declension(self, entity_key: str, case: str = "M") -> str:
+        """
+        Zwraca formę deklinacyjną bytu dla zadanego przypadku gramatycznego (M, D, C, B, N, Ms, W).
+        W przypadku braku wpisu zwraca postać bazową entity_key (Identity Pass-Through).
+        """
+        with self._lock:
+            clean_key = str(entity_key).strip()
+            decl_map = self.data.get("declensions", {}).get(clean_key)
+            if not decl_map or not isinstance(decl_map, dict):
+                return clean_key
+            return decl_map.get(case, clean_key)
+
     def synchronize_from_metadata_and_profile(
         self,
         anilist_meta: Optional[Dict[str, Any]] = None,
@@ -4399,17 +4517,14 @@ class SeriesBible:
                     
                     existing = self.data["characters"].get(c_name)
                     if not existing or not isinstance(existing, dict):
-                        self.data["characters"][c_name] = {
-                            "name": c_name,
-                            "gender": gen_norm,
-                            "grammatical_gender": "MASCULINE" if gen_norm == "MALE" else ("FEMININE" if gen_norm == "FEMALE" else None),
-                            "role": c_role,
-                            "description": c_desc,
-                            "confidence": 0.95 if gen_norm else 0.5,
-                            "priority": "P0" if gen_norm else "P1",
-                            "has_verified_gender": bool(gen_norm),
-                            "aliases": []
-                        }
+                        self.register_character(
+                            name=c_name,
+                            gender=gen_norm or "UNKNOWN",
+                            description=c_desc,
+                            has_verified_gender=bool(gen_norm),
+                            priority="P0" if gen_norm else "P1",
+                            role=c_role
+                        )
                     else:
                         if gen_norm and not existing.get("has_verified_gender"):
                             existing["gender"] = gen_norm
@@ -4434,17 +4549,13 @@ class SeriesBible:
                     
                     curr = self.data["characters"].get(cd_name)
                     if not curr or not isinstance(curr, dict):
-                        self.data["characters"][cd_name] = {
-                            "name": cd_name,
-                            "gender": cd_gen,
-                            "grammatical_gender": "MASCULINE" if cd_gen == "MALE" else ("FEMININE" if cd_gen == "FEMALE" else None),
-                            "role": cd_role,
-                            "description": cd_role,
-                            "confidence": 0.95 if cd_gen else 0.5,
-                            "priority": "P0" if cd_gen else "P1",
-                            "has_verified_gender": bool(cd_gen),
-                            "aliases": []
-                        }
+                        self.sync_verified_profile_entity(
+                            name=cd_name,
+                            gender=cd_gen or "UNKNOWN",
+                            has_verified_gender=bool(cd_gen),
+                            description=cd_role,
+                            priority="P0" if cd_gen else "P1"
+                        )
                     else:
                         if cd_gen:
                             curr["gender"] = cd_gen
@@ -4671,6 +4782,7 @@ class SeriesBible:
         if not character_name:
             return None
         clean_name = character_name.strip()
+        _base_m = self.get_declension(clean_name, case="M")
         cat = self.get_entity_category(clean_name)
         if is_complex_description(clean_name) or cat != EntityCategory.ANTHROPONYM:
             return DeclensionParadigm.from_dict(
@@ -4689,7 +4801,8 @@ class SeriesBible:
                             glossary_target = gv
                             break
             if glossary_target and isinstance(glossary_target, str) and glossary_target.strip():
-                clean_target = sanitize_lexical_text(re.sub(r"\s*[\(\[].*?[\)\]]", "", glossary_target).strip())
+                clean_target = re.sub(r"\s*[\(\[].*?[\)\]]", "", glossary_target)
+                clean_target = sanitize_lexical_text(re.sub(r"\s*[\(\[].*$", "", clean_target).strip())
                 if clean_target and clean_target != character_name:
                     g_decl = generate_polish_name_declension(clean_target, self.get_character_gender(character_name))
                     if g_decl and "M" in g_decl:
@@ -5458,9 +5571,12 @@ class SeriesBible:
                 "grimoire", "crystal", "spell", "seal"
             }
 
-            # Rejestracja toponimów i chrematonimów ze słownika i plot_anchors
+            # Rejestracja toponimów i chrematonimów ze słownika i plot_anchors oraz normalizacja pojedynczego wariantu (R3.4)
             if "glossary" in self.data and isinstance(self.data["glossary"], dict):
                 for gk, gv in list(self.data["glossary"].items()):
+                    if isinstance(gv, str) and "/" in gv:
+                        gv = gv.split("/")[0].strip()
+                        self.data["glossary"][gk] = gv
                     cat_g = classify_entity_category(gk, context=str(gv), series_bible=self)
                     if cat_g in (EntityCategory.TOPONYM, EntityCategory.CHREMATONYM):
                         self.register_entity_category(gk, cat_g)
@@ -7401,7 +7517,10 @@ class SeriesBible:
                     # Store non-trivial terms only and sanitize parenthetical descriptions
                     if k and v and len(k) > 1 and len(v) > 1:
                         clean_k = str(k).strip()
-                        clean_v = sanitize_lexical_text(re.sub(r"\s*[\(\[].*?[\)\]]", "", v).strip())
+                        clean_v = re.sub(r"\s*[\(\[].*?[\)\]]", "", v)
+                        clean_v = sanitize_lexical_text(re.sub(r"\s*[\(\[].*$", "", clean_v).strip())
+                        if "/" in clean_v:
+                            clean_v = clean_v.split("/")[0].strip()
                         if clean_k and clean_v:
                             # Case-insensitive update to prevent duplicate collisions
                             norm_k = clean_k.lower()
@@ -7445,7 +7564,6 @@ class SeriesBible:
                                     self.data["declensions"][part_clean] = generate_polish_name_declension(part_clean, "UNKNOWN")
 
             self._sanitize_loaded_bible_in_ram()
-            self.save()
 
     def assimilate_quality_gate_invariants(self, quality_gate_fixes: List[Any]):
         """

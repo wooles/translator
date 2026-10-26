@@ -99,3 +99,48 @@ def test_phase7_hygiene_clitic_binding_and_tag_deduplication():
     deduped = deduplicate_alignment_tags(text_dup_an, play_res_x=1920)
     assert deduped.count(r"\an") <= 1
     assert r"\an3" in deduped or r"\an9" in deduped or r"\an6" in deduped
+
+
+def test_linter_preserves_phase2_lexical_choice_over_slash_glossary():
+    linter = AVTLinter()
+    phase2_line = "Namiestnik podjął decyzję o wymarszu wojsk."
+    glossary_map = {"Governor": "namiestnik / gubernator"}
+    res = linter.lint_and_fix_line(
+        phase2_line,
+        glossary=glossary_map,
+        strict_positive_domain=True
+    )
+    fixed_text = res.text if hasattr(res, "text") else res[0]
+    assert fixed_text == phase2_line
+
+
+def test_eqg_respects_v4_styles_alignment_and_italic_attributes():
+    # 1. Top alignment on collision is ONLY applied when both styles have Alignment == 2
+    assert EpisodeQualityGate.should_apply_top_alignment_on_collision(2, 2) is True
+    assert EpisodeQualityGate.should_apply_top_alignment_on_collision(2, 8) is False
+    assert EpisodeQualityGate.should_apply_top_alignment_on_collision(8, 2) is False
+    assert EpisodeQualityGate.should_apply_top_alignment_on_collision(1, 2) is False
+    assert EpisodeQualityGate.should_apply_top_alignment_on_collision(7, 8) is False
+
+    # 2. Collision execution in EpisodeQualityGate
+    eqg = EpisodeQualityGate()
+    subs = pysubs2.SSAFile()
+    subs.styles["BottomStyle"] = pysubs2.SSAStyle(alignment=2)
+    subs.styles["TopStyle"] = pysubs2.SSAStyle(alignment=8)
+
+    ev1 = pysubs2.SSAEvent(start=1000, end=3000, text="Kwestia pierwsza na dole", style="BottomStyle")
+    ev2 = pysubs2.SSAEvent(start=1500, end=3500, text="Kwestia druga", style="BottomStyle")
+    subs.events = [ev1, ev2]
+
+    fixed_subs, fixes = eqg.audit_and_fix_entire_episode(subs, strict_positive_domain=True)
+    assert any(r"\an8" in ev.text for ev in fixed_subs.events)
+
+
+@pytest.mark.parametrize("input_text,is_sign,expected_text", [
+    (r"{(\an8}Tekst na górze", True, r"{\an8}Tekst na górze"),
+    (r"{\i1}Tekst wyróżniony{\i0}{\i0}", False, r"{\i1}Tekst wyróżniony{\i0}"),
+    (r"{\an8}Tytuł części:\NCzęść pierwsza\NCzęść druga", True, r"{\an8}Tytuł części: Część pierwsza\NCzęść druga"),
+])
+def test_phase7_hygiene_preserves_single_sign_event_and_normalizes_ass_tags(input_text, is_sign, expected_text):
+    normalized = EpisodeQualityGate.normalize_ass_tags_and_sign_layout(input_text, is_sign=is_sign)
+    assert normalized == expected_text

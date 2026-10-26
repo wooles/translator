@@ -59,3 +59,47 @@ def test_guard_phase2_regressions_authority_and_ass_tags():
         speaker_p0_gender="FEMALE"
     )
     assert guarded_prep == f1_prep, f"Oczekiwano zachowania rekcji przyimkowej z Fazy 1: {guarded_prep}"
+
+
+def test_verifier_guard_restores_phase1_on_continuation_and_tag_imbalance():
+    from verifier import DialogueVerifier
+
+    cases = [
+        (
+            "...nie popełnilibyśmy tego błędu.",
+            "...nie popełnić tego błędu.",
+            "",
+            "Gdybyśmy tylko wiedzieli...",
+            "...nie popełnilibyśmy tego błędu."
+        ),
+        (
+            "...naszego dowódcy.",
+            "...nasz dowódca.",
+            "",
+            "Zgodnie z rozkazem...",
+            "...naszego dowódcy."
+        ),
+        (
+            "Myślałem, że osobą za to odpowiedzialną będziesz ty.",
+            "Myślałem, że to ktoś inny.",
+            "I thought the person who was responsible would be you.",
+            None,
+            "Myślałem, że osobą za to odpowiedzialną będziesz ty."
+        ),
+        (
+            r"{\i1}Uwaga!{\i0}",
+            r"{\i1}Uwaga!{\i0}{\i0}",
+            "",
+            None,
+            r"{\i1}Uwaga!{\i0}"
+        ),
+    ]
+
+    for f1_pl, refined_pl, source_en, prev_line_pl, expected in cases:
+        result = DialogueVerifier._guard_phase2_regressions(
+            f1_pl=f1_pl,
+            refined_pl=refined_pl,
+            source_en=source_en,
+            prev_line_pl=prev_line_pl
+        )
+        assert result == expected

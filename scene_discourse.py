@@ -2711,3 +2711,92 @@ def build_discourse_topology(
         max_exchange_gap_ms=max_exchange_gap_ms
     )
 
+
+class SceneDiscourseGraph:
+    """
+    Graf dyskursu scenicznego i arbitrażu telemetrii zdarzeń (Standard 9.2).
+    Zapewnia absolutny prymat rekordu P0 i jawnej etykiety aktora z [Events].
+    """
+    @classmethod
+    def build_discourse_topology(
+        cls,
+        events: List[Any],
+        series_bible: Optional[Any] = None,
+        max_turn_gap_ms: int = 2500,
+        max_exchange_gap_ms: int = 5000
+    ) -> List[SpeakerTurn]:
+        return build_discourse_topology(
+            events=events,
+            series_bible=series_bible,
+            max_turn_gap_ms=max_turn_gap_ms,
+            max_exchange_gap_ms=max_exchange_gap_ms
+        )
+
+    @staticmethod
+    def arbitrate_event_telemetry(
+        event: Any,
+        series_bible: Optional[Any] = None,
+        episode_profiler: Optional[Any] = None,
+        aux_telemetry: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
+        """
+        Prymat Tożsamości Rodzajowej z Rekordu P0 i Etykiety Aktora Events (R1.4, R3.3):
+        Zachowuje jawnego aktora z sekcji [Events] oraz przypisuje rodzaj mówcy
+        na podstawie rekordu P0 (has_verified_gender: true), zapewniając
+        pierwszeństwo przed pomocniczymi etykietami telemetrii czy sygnałem F0.
+        """
+        telemetry = dict(aux_telemetry or {})
+        
+        # 1. Pobierz aktora ze zdarzenia
+        actor = getattr(event, "actor", None) or getattr(event, "speaker_name", None) or getattr(event, "name", None) or telemetry.get("speaker_name")
+        if not actor and isinstance(event, dict):
+            actor = event.get("actor") or event.get("speaker_name") or event.get("name")
+            
+        clean_actor = str(actor).strip() if actor else ""
+        if clean_actor:
+            telemetry["speaker_name"] = clean_actor
+            telemetry["actor"] = clean_actor
+
+        # 2. Sprawdź rekord P0 w series_bible / episode_profiler
+        p0_gender = None
+        has_verified = False
+
+        if series_bible and hasattr(series_bible, "characters") and clean_actor:
+            chars = series_bible.characters
+            char_rec = chars.get(clean_actor) if isinstance(chars, dict) else None
+            if not char_rec and isinstance(chars, dict):
+                for k, v in chars.items():
+                    if k.lower() == clean_actor.lower():
+                        char_rec = v
+                        break
+                    if isinstance(v, dict) and clean_actor.lower() in [str(a).lower() for a in v.get("aliases", [])]:
+                        char_rec = v
+                        break
+            if isinstance(char_rec, dict):
+                g = char_rec.get("gender")
+                if g and str(g).upper() != "UNKNOWN":
+                    p0_gender = str(g).upper()
+                    has_verified = bool(char_rec.get("has_verified_gender", False)) or char_rec.get("priority") == "P0"
+
+        if not p0_gender and episode_profiler and hasattr(episode_profiler, "character_dossiers") and clean_actor:
+            for cd in getattr(episode_profiler, "character_dossiers", []):
+                if getattr(cd, "name", "").lower() == clean_actor.lower():
+                    g = getattr(cd, "gender", None) or getattr(cd, "apparent_gender", None)
+                    if g and str(g).upper() != "UNKNOWN":
+                        p0_gender = str(g).upper()
+                        has_verified = True
+                        break
+
+        if p0_gender:
+            telemetry["speaker_gender"] = p0_gender
+            telemetry["p0_gender"] = p0_gender
+            telemetry["has_verified_gender"] = has_verified
+        else:
+            if "speaker_gender" not in telemetry:
+                telemetry["speaker_gender"] = "UNKNOWN"
+            if "has_verified_gender" not in telemetry:
+                telemetry["has_verified_gender"] = False
+
+        return telemetry
+
+

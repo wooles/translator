@@ -18537,6 +18537,155 @@ def test_standard_9_1_clean_slug_consistency_and_single_header_logging():
     print(" -> PASSED: TEST 198 potwierdza spójność clean_slug oraz pojedynczy nagłówek CLI.")
 
 
+
+def test_standard_9_2_avt_linter_preserves_lexical_choice_over_slash_glossary():
+    """TEST 199: Standard 9.2 AVTLinter zachowuje wybór leksykalny Fazy 2 wobec glosariusza ze slashem."""
+    print("\n[TEST 199] Standard 9.2: AVTLinter zachowuje wybór leksykalny Fazy 2...")
+    from avt_linter import AVTLinter
+    linter = AVTLinter()
+    phase2_line = "Namiestnik podjął decyzję o wymarszu wojsk."
+    glossary_map = {"Governor": "namiestnik / gubernator"}
+    res = linter.lint_and_fix_line(
+        phase2_line,
+        glossary=glossary_map,
+        strict_positive_domain=True
+    )
+    fixed_text = res.text if hasattr(res, "text") else res[0]
+    assert fixed_text == phase2_line
+    print(" -> PASSED: TEST 199 potwierdza brak mutacji słownikowych w strict_positive_domain.")
+
+
+def test_standard_9_2_eqg_respects_v4_styles_alignment_and_collision():
+    """TEST 200: Standard 9.2 EpisodeQualityGate podnosi kwestię na górę tylko dla Alignment == 2."""
+    print("\n[TEST 200] Standard 9.2: EpisodeQualityGate podnosi kwestię na górę tylko dla Alignment == 2...")
+    import pysubs2
+    from avt_linter import EpisodeQualityGate
+    assert EpisodeQualityGate.should_apply_top_alignment_on_collision(2, 2) is True
+    assert EpisodeQualityGate.should_apply_top_alignment_on_collision(2, 8) is False
+    assert EpisodeQualityGate.should_apply_top_alignment_on_collision(8, 2) is False
+    assert EpisodeQualityGate.should_apply_top_alignment_on_collision(1, 2) is False
+
+    eqg = EpisodeQualityGate()
+    subs = pysubs2.SSAFile()
+    subs.styles["BottomStyle"] = pysubs2.SSAStyle(alignment=2)
+    ev1 = pysubs2.SSAEvent(start=1000, end=3000, text="Kwestia pierwsza na dole", style="BottomStyle")
+    ev2 = pysubs2.SSAEvent(start=1500, end=3500, text="Kwestia druga", style="BottomStyle")
+    subs.events = [ev1, ev2]
+    fixed_subs, fixes = eqg.audit_and_fix_entire_episode(subs, strict_positive_domain=True)
+    assert any(r"\an8" in ev.text for ev in fixed_subs.events)
+    print(" -> PASSED: TEST 200 potwierdza prawidłową logikę podnoszenia nakładających się kwestii.")
+
+
+def test_standard_9_2_phase7_hygiene_and_ass_tags_normalization():
+    """TEST 201: Standard 9.2 Faza 7 higieny normalizuje zniekształcone znaczniki ASS i układ plansz."""
+    print("\n[TEST 201] Standard 9.2: Faza 7 higieny normalizuje znaczniki ASS i układ plansz...")
+    from avt_linter import EpisodeQualityGate
+    assert EpisodeQualityGate.normalize_ass_tags_and_sign_layout(r"{(\an8}Tekst na górze", is_sign=True) == r"{\an8}Tekst na górze"
+    assert EpisodeQualityGate.normalize_ass_tags_and_sign_layout(r"{\i1}Tekst wyróżniony{\i0}{\i0}", is_sign=False) == r"{\i1}Tekst wyróżniony{\i0}"
+    assert EpisodeQualityGate.normalize_ass_tags_and_sign_layout(r"{\an8}Tytuł części:\NCzęść pierwsza\NCzęść druga", is_sign=True) == r"{\an8}Tytuł części: Część pierwsza\NCzęść druga"
+    print(" -> PASSED: TEST 201 potwierdza poprawną normalizację znaczników ASS i plansz tytułowych.")
+
+
+def test_standard_9_2_verifier_guard_continuation_and_tag_balance():
+    """TEST 202: Standard 9.2 DialogueVerifier._guard_phase2_regressions chroni zdania kontynuowane i znaczniki."""
+    print("\n[TEST 202] Standard 9.2: DialogueVerifier chroni zdania kontynuowane i znaczniki...")
+    from verifier import DialogueVerifier
+    c1 = DialogueVerifier._guard_phase2_regressions(
+        f1_pl="...nie popełnilibyśmy tego błędu.",
+        refined_pl="...nie popełnić tego błędu.",
+        prev_line_pl="Gdybyśmy tylko wiedzieli..."
+    )
+    assert c1 == "...nie popełnilibyśmy tego błędu."
+
+    c2 = DialogueVerifier._guard_phase2_regressions(
+        f1_pl="...naszego dowódcy.",
+        refined_pl="...nasz dowódca.",
+        prev_line_pl="Zgodnie z rozkazem..."
+    )
+    assert c2 == "...naszego dowódcy."
+
+    c3 = DialogueVerifier._guard_phase2_regressions(
+        f1_pl="Myślałem, że osobą za to odpowiedzialną będziesz ty.",
+        refined_pl="Myślałem, że to ktoś inny.",
+        source_en="I thought the person who was responsible would be you."
+    )
+    assert c3 == "Myślałem, że osobą za to odpowiedzialną będziesz ty."
+
+    c4 = DialogueVerifier._guard_phase2_regressions(
+        f1_pl=r"{\i1}Uwaga!{\i0}",
+        refined_pl=r"{\i1}Uwaga!{\i0}{\i0}"
+    )
+    assert c4 == r"{\i1}Uwaga!{\i0}"
+    print(" -> PASSED: TEST 202 potwierdza deterministyczną ochronę reguł R1.2, R1.3 i R1.5.")
+
+
+def test_standard_9_2_series_bible_syncs_p0_and_compound_declension():
+    """TEST 203: Standard 9.2 SeriesBible synchronizuje zweryfikowane byty P0 i 7-przypadkową deklinację."""
+    print("\n[TEST 203] Standard 9.2: SeriesBible synchronizuje zweryfikowane byty P0...")
+    from series_memory import SeriesBible
+    bible = SeriesBible(slug="test_series_contract", db_path=":memory:")
+    decl_map = {
+        "M": "Generał Janusz Korwin",
+        "D": "Generała Janusza Korwina",
+        "C": "Generałowi Januszowi Korwinowi",
+        "B": "Generała Janusza Korwina",
+        "N": "Generałem Januszem Korwinem",
+        "Ms": "Generale Januszu Korwinie",
+        "W": "Generale Januszu Korwinie"
+    }
+    rec = bible.sync_verified_profile_entity(
+        name="Generał Janusz Korwin",
+        gender="MALE",
+        has_verified_gender=True,
+        declension_map=decl_map
+    )
+    assert rec["gender"] == "MALE"
+    assert rec["has_verified_gender"] is True
+    assert rec["priority"] == "P0"
+    assert rec["confidence"] >= 0.95
+    assert bible.get_declension("Generał Janusz Korwin", "M") == "Generał Janusz Korwin"
+    assert bible.get_declension("Generał Janusz Korwin", "Ms") == "Generale Januszu Korwinie"
+    assert bible.get_declension("Generał Janusz Korwin", "W") == "Generale Januszu Korwinie"
+    assert bible.get_declension("Nieznany Byt", "M") == "Nieznany Byt"
+    print(" -> PASSED: TEST 203 potwierdza poprawną synchronizację rekordów P0 i pobieranie przypadków.")
+
+
+def test_standard_9_2_discourse_graph_telemetry_and_verified_p0_gender():
+    """TEST 204: Standard 9.2 SceneDiscourseGraph zachowuje jawnego aktora i płeć zweryfikowaną P0."""
+    print("\n[TEST 204] Standard 9.2: SceneDiscourseGraph zachowuje jawnego aktora i płeć P0...")
+    import pysubs2
+    from series_memory import SeriesBible
+    from scene_discourse import SceneDiscourseGraph
+    bible = SeriesBible(slug="test_telemetry_slug", db_path=":memory:")
+    bible.sync_verified_profile_entity(
+        name="Bohater",
+        gender="MALE",
+        has_verified_gender=True
+    )
+    event = pysubs2.SSAEvent(start=1000, end=3000, text="Kwestia", name="Bohater")
+    telemetry = SceneDiscourseGraph.arbitrate_event_telemetry(
+        event=event,
+        series_bible=bible,
+        aux_telemetry={"speaker_gender": "FEMALE"}
+    )
+    assert telemetry["speaker_name"] == "Bohater"
+    assert telemetry["speaker_gender"] == "MALE"
+    assert telemetry["has_verified_gender"] is True
+    print(" -> PASSED: TEST 204 potwierdza prymat tożsamości rodzajowej z rekordu P0.")
+
+
+def test_standard_9_2_asr_window_isolation_and_empty_asr_for_signs():
+    """TEST 205: Standard 9.2 EpisodeProfiler zwraca pusty tekst ASR dla szyldów i izoluje okno mowy."""
+    print("\n[TEST 205] Standard 9.2: EpisodeProfiler izoluje ASR dla szyldów...")
+    from profiler import EpisodeProfiler
+    assert EpisodeProfiler.sanitize_event_asr("Tło rozmowy", is_sign=True) == ""
+    assert EpisodeProfiler.sanitize_event_asr("Tytuł z audio", style="Ep Title") == ""
+    assert EpisodeProfiler.sanitize_event_asr("Napis na ekranie", style="Sign") == ""
+    assert EpisodeProfiler.sanitize_event_asr("Podpis", style="Caption") == ""
+    speech = "Kwestia dialogowa bohatera"
+    assert EpisodeProfiler.sanitize_event_asr(speech, is_sign=False, style="Default") == speech
+    print(" -> PASSED: TEST 205 potwierdza izolację transkrypcji ASR dla napisów ekranowych.")
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -18734,10 +18883,15 @@ if __name__ == "__main__":
     test_standard_9_1_eqg_no_verb_mutation_and_normative_ellipsis()
     test_standard_9_1_phase7_hygiene_clitic_binding_and_tag_deduplication()
     test_standard_9_1_guard_phase2_regressions_authority_and_ass_tags()
+    test_standard_9_1_guard_phase2_regressions_authority_and_ass_tags()
     test_standard_9_1_series_bible_entity_filtering_and_glossary_priority()
     test_standard_9_1_speaker_gender_arbitration_p0_priority_and_sign_isolation()
     test_standard_9_1_clean_slug_consistency_and_single_header_logging()
-    print("\n Wszystkie testy jednostkowe i integracyjne (198/198) zakończone pełnym sukcesem!\n")
-
-
-
+    test_standard_9_2_avt_linter_preserves_lexical_choice_over_slash_glossary()
+    test_standard_9_2_eqg_respects_v4_styles_alignment_and_collision()
+    test_standard_9_2_phase7_hygiene_and_ass_tags_normalization()
+    test_standard_9_2_verifier_guard_continuation_and_tag_balance()
+    test_standard_9_2_series_bible_syncs_p0_and_compound_declension()
+    test_standard_9_2_discourse_graph_telemetry_and_verified_p0_gender()
+    test_standard_9_2_asr_window_isolation_and_empty_asr_for_signs()
+    print("\n Wszystkie testy jednostkowe i integracyjne (205/205) zakończone pełnym sukcesem!\n")

@@ -344,6 +344,26 @@ def format_lean_episode_brief(profile: Any) -> str:
 
 
 class EpisodeProfiler:
+    @staticmethod
+    def sanitize_event_asr(
+        raw_asr: Optional[str],
+        is_sign: bool = False,
+        style: Optional[str] = None
+    ) -> str:
+        """
+        Sanityzuje pomocniczą transkrypcję ASR dla zdarzenia dialogowego (Standard 9.2, R1.1, R3.5):
+        - Dla szyldów, tytułów odcinka (is_sign: true lub style w ("sign", "title", "ep title", "napis", "caption"))
+          zwraca pusty string "", zapobiegając zanieczyszczeniu przekładu obcym audio w tle.
+        - Dla linii dialogowych zwraca oczyszczony tekst ASR powiązany ściśle z oknem czasowym [start_ms, end_ms].
+        """
+        if is_sign or not raw_asr:
+            return ""
+        if style:
+            s_clean = str(style).strip().lower()
+            if any(token in s_clean for token in ("sign", "title", "napis", "caption", "szyld")):
+                return ""
+        return str(raw_asr).strip()
+
     def __init__(self, client: Any, model: str = "gemini-3.5-flash-lite"):
         self.client = client
         if hasattr(client, "clients") and hasattr(client, "get_client"):

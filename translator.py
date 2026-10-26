@@ -98,7 +98,8 @@ from speaker_diarizer import SpeakerVoiceClassifier
 from typesetting_matcher import TypesettingColorMatcher, VisualTypesettingData
 from user_feedback import UserFeedbackManager
 from glossary_manager import GlossaryManager
-from scene_discourse import DualVoiceTagPreserver, DeicticDiscourseEngine, DiarizationSanityChecker, build_discourse_topology
+from scene_discourse import DualVoiceTagPreserver, DeicticDiscourseEngine, DiarizationSanityChecker, build_discourse_topology, SceneDiscourseGraph
+from profiler import EpisodeProfiler
 from client_factory import format_friendly_api_error, patch_google_genai_schema_sanitizer
 from pipeline_logger import EpisodeFlightRecorder
 
@@ -2006,6 +2007,14 @@ class MultimodalTranslator:
                     for b_name, b_val in b_chars.items():
                         clean_b = extract_clean_speaker_name(b_name).lower()
                         if spk_lower == b_name.lower() or clean_b == spk_lower:
+                            if isinstance(b_val, dict):
+                                g_field = b_val.get("gender")
+                                if g_field == "MALE":
+                                    canonical_gender = "mężczyzna"
+                                    break
+                                elif g_field == "FEMALE":
+                                    canonical_gender = "kobieta"
+                                    break
                             b_desc = b_val.get("description", "") if isinstance(b_val, dict) else str(b_val)
                             b_lower = b_desc.lower()
                             if any(k in b_lower for k in self.FEMALE_ROLE_KEYWORDS):
@@ -2140,6 +2149,18 @@ class MultimodalTranslator:
         )
         if is_sign:
             return None, ["[TELEMETRIA: typ=napis_ekranowy]"]
+
+        # Telemetria dyskursu scenicznego (Standard 9.2)
+        _disc_telem = SceneDiscourseGraph.arbitrate_event_telemetry(
+            event=event,
+            series_bible=getattr(self, "series_bible", None),
+            aux_telemetry={"speaker_gender": canonical_gender}
+        )
+        _sanitized_whisper = EpisodeProfiler.sanitize_event_asr(
+            whisper_transcriptions.get(batch_id, "") if whisper_transcriptions else "",
+            is_sign=is_sign,
+            style=getattr(event, "style", None)
+        )
 
         # Check for verified P0 status
         has_verified_p0 = False
@@ -5145,7 +5166,7 @@ class MultimodalTranslator:
             coalesce_tail=True
         )
 
-        discourse_turns = build_discourse_topology([item[1] for item in raw_entries], series_bible=self.series_bible)
+        discourse_turns = SceneDiscourseGraph.build_discourse_topology([item[1] for item in raw_entries], series_bible=self.series_bible)
         if self.flight_recorder:
             try:
                 batches_sum = [

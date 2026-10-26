@@ -1200,6 +1200,7 @@ class AVTLinter:
         is_sign: bool = False,
         user_feedback_rules: Optional[List[Dict[str, Any]]] = None,
         custom_glossary: Optional[Dict[str, str]] = None,
+        glossary: Optional[Dict[str, str]] = None,
         is_informal_ty: bool = False,
         audio_jp: str = "",
         prev_line_text: str = "",
@@ -1214,7 +1215,8 @@ class AVTLinter:
         plural_group_gender: str = "AMBIGUOUS",
         you_group_gender: str = "AMBIGUOUS",
         speaker_confidence: float = 1.0,
-        target_confidence: float = 1.0
+        target_confidence: float = 1.0,
+        **kwargs
     ) -> Tuple[str, List[str]]:
         """
         Comprehensive AVT linter. Checks Polish subtitle line against multiple AVT rules
@@ -1224,6 +1226,9 @@ class AVTLinter:
             text = text[0]
         if not text:
             return LintResult(text, [])
+
+        if glossary is not None:
+            custom_glossary = glossary
 
         # Normalizacja jawnych znaków nowej linii \n -> \N (Sekcja 2 pkt 1)
         if "\n" in text:
@@ -1458,7 +1463,8 @@ class AVTLinter:
                 if raw_trg_clean.startswith("[") and raw_trg_clean.endswith("]"):
                     clean_trg = raw_trg_clean
                 else:
-                    clean_trg = re.sub(r"\s*[\(\[].*?[\)\]]", "", raw_trg).strip()
+                    clean_trg = re.sub(r"\s*[\(\[].*?[\)\]]", "", raw_trg)
+                    clean_trg = re.sub(r"\s*[\(\[].*$", "", clean_trg).strip()
                 if "/" in clean_trg:
                     clean_trg = clean_trg.split("/")[0].strip()
                 if not clean_trg or src.lower() == clean_trg.lower():
@@ -6509,6 +6515,51 @@ class EpisodeQualityGate:
     """
 
     @classmethod
+    def should_apply_top_alignment_on_collision(
+        cls,
+        style_a_alignment: int = 2,
+        style_b_alignment: int = 2
+    ) -> bool:
+        """
+        Sprawdza, czy należy podnieść nakładającą się kwestię dialogową na górę kadru ({\an8}):
+        Zwraca True wyłącznie wtedy, gdy OBA kolidujące style mają domyślne wyrównanie dolne (Alignment == 2).
+        W przypadku innego wyrównania stylów (górne 7/8/9 lub boczne), funkcja zwraca False,
+        zapobiegając błędnym przesunięciom i nadpisywaniu intencji zdefiniowanej w arkuszu [V4+ Styles].
+        """
+        try:
+            return int(style_a_alignment) == 2 and int(style_b_alignment) == 2
+        except (ValueError, TypeError):
+            return False
+
+    @staticmethod
+    def normalize_ass_tags_and_sign_layout(text: str, is_sign: bool = False) -> str:
+        """
+        Normalizuje znaczniki ASS i układ wielowierszowy napisów ekranowych (Standard 9.2, R1.5, R1.7, R3.6):
+        - Usuwa zniekształcenia otwarcia tagu {(\\an8} -> {\\an8}
+        - Deduplikuje nadmiarowe tagi zamykające kursywę {\\i0}{\\i0} -> {\\i0}
+        - W przypadku 3-wierszowych szyldów / tytułów (is_sign: true) łączy człon tytułowy z podtytułem w 2 wiersze.
+        """
+        if not text:
+            return text
+        res = text
+        # 1. Naprawa zniekształconego otwarcia tagu ASS {(\\an8} -> {\\an8}
+        res = re.sub(r"\{[\\\(]*\(+[\\/]*", r"{\\", res)
+        res = re.sub(r"\{[\\\(]+(?=[a-zA-Z])", r"{\\", res)
+
+        # 2. Deduplikacja nadmiarowych znaczników {\\i0}
+        res = re.sub(r"(?:\{\\i0\}\s*){2,}", r"{\\i0}", res)
+
+        # 3. Układ szyldów / tytułów (3 wiersze -> 2 wiersze)
+        if (is_sign or r":\N" in res or r": \N" in res) and r"\N" in res:
+            parts = re.split(r"\\[Nn]", res)
+            if len(parts) == 3:
+                p0, p1, p2 = parts[0].strip(), parts[1].strip(), parts[2].strip()
+                if p0.endswith(":") or is_sign:
+                    res = f"{p0} {p1}\\N{p2}"
+
+        return res
+
+    @classmethod
     def audit_and_fix_entire_episode(
         cls,
         subs: Any,  # pysubs2.SSAFile
@@ -6577,10 +6628,20 @@ class EpisodeQualityGate:
                 has_pos_a = bool(re.search(r"\\(pos|move|an[1-9])\b", ev_a.text))
                 has_pos_b = bool(re.search(r"\\(pos|move|an[1-9])\b", ev_b.text))
                 if not has_pos_a and not has_pos_b:
-                    target_ev = ev_b if len(ev_b.text) <= len(ev_a.text) else ev_a
-                    target_idx = idx_b if len(ev_b.text) <= len(ev_a.text) else idx_a
-                    target_ev.text = r"{\an8}" + target_ev.text
-                    fixes.append(f"[Episode Quality Gate - Filar LVII Kolizja Czasowa] Linia #{target_idx+1}: podniesiono nakładającą się kwestię dialogową na górę kadru (\\an8)")
+                    align_a = 2
+                    align_b = 2
+                    if hasattr(subs, "styles") and subs.styles:
+                        s_a = subs.styles.get(ev_a.style)
+                        if s_a and hasattr(s_a, "alignment"):
+                            align_a = s_a.alignment
+                        s_b = subs.styles.get(ev_b.style)
+                        if s_b and hasattr(s_b, "alignment"):
+                            align_b = s_b.alignment
+                    if cls.should_apply_top_alignment_on_collision(align_a, align_b):
+                        target_ev = ev_b if len(ev_b.text) <= len(ev_a.text) else ev_a
+                        target_idx = idx_b if len(ev_b.text) <= len(ev_a.text) else idx_a
+                        target_ev.text = r"{\an8}" + target_ev.text
+                        fixes.append(f"[Episode Quality Gate - Filar LVII Kolizja Czasowa] Linia #{target_idx+1}: podniesiono nakładającą się kwestię dialogową na górę kadru (\\an8)")
 
         # Step 0: Episode-Wide Character Gender Knowledge Base (Filar CLXII)
         from series_memory import CANONICAL_MALE_NAMES
@@ -6814,7 +6875,8 @@ class EpisodeQualityGate:
         for g_k, g_v in glossary_to_scan.items():
             cand_terms = [g_v] if isinstance(g_v, str) else []
             for raw_term in cand_terms:
-                term_clean = re.sub(r"\s*[\(\[].*?[\)\]]", "", raw_term).strip()
+                term_clean = re.sub(r"\s*[\(\[].*?[\)\]]", "", raw_term)
+                term_clean = re.sub(r"\s*[\(\[].*$", "", term_clean).strip()
                 if "/" in term_clean:
                     term_clean = term_clean.split("/")[0].strip()
                 if len(term_clean) >= 3 and term_clean[0].isupper() and not any(ch in term_clean for ch in "->/"):
@@ -10876,7 +10938,8 @@ class EpisodeQualityGate:
                     if raw_trg_clean.startswith("[") and raw_trg_clean.endswith("]"):
                         clean_trg = raw_trg_clean
                     else:
-                        clean_trg = re.sub(r"\s*[\(\[].*?[\)\]]", "", g_trg).strip()
+                        clean_trg = re.sub(r"\s*[\(\[].*?[\)\]]", "", g_trg)
+                        clean_trg = re.sub(r"\s*[\(\[].*$", "", clean_trg).strip()
                     if "/" in clean_trg:
                         clean_trg = clean_trg.split("/")[0].strip()
                     if not clean_trg or len(src_clean) < 3:
@@ -11070,7 +11133,8 @@ class EpisodeQualityGate:
         event_id = getattr(ev, "id", None) or getattr(ev, "index", None) or (i + 1)
         line_lbl = f"[ID: {event_id}]" if strict_positive_domain else f"Linia #{i+1}"
 
-        # Standard 9.0/9.1: Higiena techniczna ASS
+        # Standard 9.0/9.1/9.2: Higiena techniczna ASS
+        ev.text = cls.normalize_ass_tags_and_sign_layout(ev.text, is_sign=is_sign)
         # 1. Deduplikacja tagów wyrównania w blokach ASS (Sekcja 2 pkt 3)
         ev.text = deduplicate_alignment_tags(ev.text)
 

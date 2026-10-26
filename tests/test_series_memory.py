@@ -65,3 +65,34 @@ def test_series_bible_entity_filtering_and_glossary_priority(tmp_path):
     # Must use canonical translation target from glossary ("Mistrz Miecza"), not generic auto-declension
     assert "Mistrz Miecza" in p_paradigm.M
     assert "Mistrza Miecza" in p_paradigm.D
+
+
+def test_series_bible_syncs_verified_p0_gender_and_full_compound_declension():
+    bible = SeriesBible(slug="test_series_contract", db_path=":memory:")
+    
+    # 1. Sync verified profile entity with P0 gender and 7-case compound declension
+    decl_map = {
+        "M": "Generał Janusz Korwin",
+        "D": "Generała Janusza Korwina",
+        "C": "Generałowi Januszowi Korwinowi",
+        "B": "Generała Janusza Korwina",
+        "N": "Generałem Januszem Korwinem",
+        "Ms": "Generale Januszu Korwinie",
+        "W": "Generale Januszu Korwinie"
+    }
+    rec = bible.sync_verified_profile_entity(
+        name="Generał Janusz Korwin",
+        gender="MALE",
+        has_verified_gender=True,
+        declension_map=decl_map
+    )
+    assert rec["gender"] == "MALE"
+    assert rec["has_verified_gender"] is True
+    assert rec["priority"] == "P0"
+    assert rec["confidence"] >= 0.95
+
+    # 2. Assert full 7-case declension retrieval via get_declension
+    assert bible.get_declension("Generał Janusz Korwin", "M") == "Generał Janusz Korwin"
+    assert bible.get_declension("Generał Janusz Korwin", "Ms") == "Generale Januszu Korwinie"
+    assert bible.get_declension("Generał Janusz Korwin", "W") == "Generale Januszu Korwinie"
+    assert bible.get_declension("Nieznany Byt", "M") == "Nieznany Byt"

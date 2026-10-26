@@ -56,7 +56,9 @@ def _guard_phase2_regressions(
     addressee_p0_record: Optional[Any] = None,
     invariable_female_names: Optional[List[str]] = None,
     prev_line_f1: Optional[str] = None,
-    series_bible: Optional[Any] = None
+    series_bible: Optional[Any] = None,
+    prev_line_pl: Optional[str] = None,
+    **kwargs
 ) -> str:
     """
     Standard 9.0 Programmatic barrier guarding against Phase 2 stylistic or grammatical regressions (Sekcja 2 pkt 6).
@@ -224,6 +226,41 @@ def _guard_phase2_regressions(
                     if not re.search(rf"\b{re.escape(prep_word)}\s+{re.escape(name_token)}\b", refined_pl, re.IGNORECASE):
                         return f1_pl
 
+    # 10. KATEGORIA 10 (Standard 9.2, R1.5): Niezmiennik znaczników ASS i czystość typograficzna
+    f1_i1 = f1_pl.count(r"{\i1}")
+    f1_i0 = f1_pl.count(r"{\i0}")
+    ref_i1 = refined_pl.count(r"{\i1}")
+    ref_i0 = refined_pl.count(r"{\i0}")
+    if (ref_i0 != ref_i1 and f1_i0 == f1_i1) or (ref_i0 > ref_i1):
+        return f1_pl
+    if refined_pl.count("{") != refined_pl.count("}") and f1_pl.count("{") == f1_pl.count("}"):
+        return f1_pl
+    if "*" in refined_pl and "*" not in f1_pl and "*" not in (source_en or ""):
+        return f1_pl
+
+    # 11. KATEGORIA 11 (Standard 9.2, R1.3): Dopełnienie identyfikujące z tekstu źródłowego EN
+    if source_en and re.search(r"\b(?:would be you|that you|who was|who were|it was you)\b", source_en, re.IGNORECASE):
+        f1_has_id = bool(re.search(r"\b(?:ty|tobie|tobą|ciebie|cię)\b", f1_pl, re.IGNORECASE))
+        ref_has_id = bool(re.search(r"\b(?:ty|tobie|tobą|ciebie|cię)\b", refined_pl, re.IGNORECASE))
+        if f1_has_id and not ref_has_id:
+            return f1_pl
+
+    # 12. KATEGORIA 12 (Standard 9.2, R1.2): Ciągłość składniowa i rząd przypadków w zdaniach kontynuowanych
+    effective_prev = prev_line_pl or prev_line_f1
+    if effective_prev:
+        prev_s = effective_prev.strip()
+        f1_s = f1_pl.strip()
+        ref_s = refined_pl.strip()
+        if prev_s.endswith("...") or f1_s.startswith("...") or prev_s.endswith("…") or f1_s.startswith("…"):
+            f1_plural_cond = bool(re.search(r"\b[a-ząćęłńóśźż]+(?:libyśmy|łybyśmy|libyście|łybyście|liby|łyby)\b", f1_pl, re.IGNORECASE))
+            ref_plural_cond = bool(re.search(r"\b[a-ząćęłńóśźż]+(?:libyśmy|łybyśmy|libyście|łybyście|liby|łyby)\b", refined_pl, re.IGNORECASE))
+            if f1_plural_cond and not ref_plural_cond:
+                return f1_pl
+            f1_oblique = bool(re.search(r"\b[a-ząćęłńóśźż]+(?:ego|ej|ych|ich|em|ą)\s+[a-ząćęłńóśźż]+(?:y|a|ów|i|em|ą|e)\b", f1_pl, re.IGNORECASE))
+            ref_nom = bool(re.search(r"\b(?:nasz|ten|jakiś|jeden|mój|twój)\s+[a-ząćęłńóśźż]+(?<!ego)(?<!ej)\b", refined_pl, re.IGNORECASE))
+            if f1_oblique and ref_nom:
+                return f1_pl
+
     return refined_pl
 
 import os
@@ -231,6 +268,7 @@ import threading
 
 class DialogueVerifier:
     _STATUS_LOCK = threading.Lock()
+    _guard_phase2_regressions = staticmethod(_guard_phase2_regressions)
     _STATUS_ACTIVE: bool = False
     _LAST_STATUS_TIME: float = 0.0
 
