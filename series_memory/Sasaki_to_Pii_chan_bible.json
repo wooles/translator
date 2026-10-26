@@ -214,43 +214,6 @@
       ],
       "entity_category": "ANTHROPONYM"
     },
-    "Disciple B": {
-      "description": "MĘŻCZYZNA (zweryfikowano z audio seiyū Whisper)",
-      "gender": "MALE",
-      "grammatical_gender": "MASCULINE",
-      "has_verified_gender": true,
-      "confidence": 0.95,
-      "priority": "P0",
-      "aliases": [
-        "Disciple B"
-      ],
-      "entity_category": "ANTHROPONYM"
-    },
-    "Neighbor": {
-      "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
-      "source": "quality_gate",
-      "gender": "MALE",
-      "grammatical_gender": "MASCULINE",
-      "has_verified_gender": true,
-      "confidence": 0.95,
-      "priority": "P0",
-      "aliases": [
-        "Neighbor"
-      ],
-      "entity_category": "ANTHROPONYM"
-    },
-    "Disciple A": {
-      "description": "KOBIETA (zweryfikowano z audio seiyū Whisper)",
-      "gender": "FEMALE",
-      "grammatical_gender": "FEMININE",
-      "has_verified_gender": true,
-      "confidence": 0.95,
-      "priority": "P0",
-      "aliases": [
-        "Disciple A"
-      ],
-      "entity_category": "ANTHROPONYM"
-    },
     "Muller": {
       "description": "KOBIETA (zweryfikowano z audio seiyū Whisper)",
       "gender": "FEMALE",
@@ -260,18 +223,6 @@
       "priority": "P0",
       "aliases": [
         "Muller"
-      ],
-      "entity_category": "ANTHROPONYM"
-    },
-    "Guard": {
-      "description": "KOBIETA (zweryfikowano z audio seiyū Whisper)",
-      "gender": "FEMALE",
-      "grammatical_gender": "FEMININE",
-      "has_verified_gender": true,
-      "confidence": 0.95,
-      "priority": "P0",
-      "aliases": [
-        "Guard"
       ],
       "entity_category": "ANTHROPONYM"
     }
@@ -514,36 +465,6 @@
       "Ms": "Pierwszej konkubinie",
       "W": "Pierwsza konkubino"
     },
-    "Disciple B": {
-      "M": "Disciple B",
-      "D": "Disciple'a B",
-      "C": "Disciple'owi B",
-      "B": "Disciple'a B",
-      "N": "Disciple'em B",
-      "Ms": "Disciple'u B",
-      "W": "Disciple B",
-      "gender": "MALE"
-    },
-    "Neighbor": {
-      "M": "Neighbor",
-      "D": "Neighbora",
-      "C": "Neighborowi",
-      "B": "Neighbora",
-      "N": "Neighborem",
-      "Ms": "Neighborze",
-      "W": "Neighborze",
-      "gender": "MALE"
-    },
-    "Disciple A": {
-      "M": "Disciple A",
-      "D": "Disciple A",
-      "C": "Disciple A",
-      "B": "Disciple A",
-      "N": "Disciple A",
-      "Ms": "Disciple A",
-      "W": "Disciple A",
-      "gender": "FEMALE"
-    },
     "Muller": {
       "M": "Muller",
       "D": "Muller",
@@ -552,16 +473,6 @@
       "N": "Muller",
       "Ms": "Muller",
       "W": "Muller",
-      "gender": "FEMALE"
-    },
-    "Guard": {
-      "M": "Guard",
-      "D": "Guard",
-      "C": "Guard",
-      "B": "Guard",
-      "N": "Guard",
-      "Ms": "Guard",
-      "W": "Guard",
       "gender": "FEMALE"
     }
   },
@@ -599,11 +510,7 @@
     "Takayoshi": "ANTHROPONYM",
     "Naomi": "ANTHROPONYM",
     "Abaddon": "ANTHROPONYM",
-    "Disciple B": "ANTHROPONYM",
-    "Neighbor": "ANTHROPONYM",
-    "Disciple A": "ANTHROPONYM",
-    "Muller": "ANTHROPONYM",
-    "Guard": "ANTHROPONYM"
+    "Muller": "ANTHROPONYM"
   },
   "fansub_canon": {}
 }

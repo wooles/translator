@@ -9,7 +9,6 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
-        "Sajou",
         "Wataru",
         "Wataru Sajou"
       ],
@@ -51,8 +50,7 @@
       "priority": "P0",
       "aliases": [
         "Kaede",
-        "Kaede Sajou",
-        "Sajou"
+        "Kaede Sajou"
       ],
       "entity_category": "ANTHROPONYM"
     },
@@ -90,7 +88,6 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
-        "Ichinose",
         "Rin Ichinose"
       ],
       "entity_category": "ANTHROPONYM"
@@ -118,8 +115,7 @@
       "priority": "P0",
       "aliases": [
         "Hayato",
-        "Hayato Ichinose",
-        "Ichinose"
+        "Hayato Ichinose"
       ],
       "entity_category": "ANTHROPONYM"
     },

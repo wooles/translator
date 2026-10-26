@@ -353,18 +353,6 @@
       ],
       "entity_category": "ANTHROPONYM"
     },
-    "mężczyzna": {
-      "description": "postać (Postać)",
-      "gender": "MALE",
-      "grammatical_gender": "MASCULINE",
-      "has_verified_gender": true,
-      "confidence": 0.95,
-      "priority": "P0",
-      "aliases": [
-        "mężczyzna"
-      ],
-      "entity_category": "ANTHROPONYM"
-    },
     "Sorghaghtani Beki": {
       "description": "postać (Postać)",
       "gender": "FEMALE",
@@ -845,16 +833,6 @@
       "W": "Tołuju",
       "gender": "MALE"
     },
-    "mężczyzna": {
-      "M": "mężczyzna",
-      "D": "mężczyzny",
-      "C": "mężczyznie",
-      "B": "mężczyznę",
-      "N": "mężczyzną",
-      "Ms": "mężczyznie",
-      "W": "mężczyzno",
-      "gender": "MALE"
-    },
     "Sorghaghtani Beki": {
       "M": "Sorghaghtani Beki",
       "D": "Sorghaghtani Beki",
@@ -930,7 +908,6 @@
     "Ugedej": "ANTHROPONYM",
     "Sorkaktani": "ANTHROPONYM",
     "Tołuj": "ANTHROPONYM",
-    "mężczyzna": "ANTHROPONYM",
     "Sorghaghtani Beki": "ANTHROPONYM",
     "Kaifeng": "TOPONYM",
     "Mergen": "TOPONYM",

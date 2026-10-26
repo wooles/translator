@@ -5444,13 +5444,13 @@ def test_universal_series_memory_and_ep04_guard():
     t_uraz, _ = AVTLinter.lint_and_fix_line("Mam przez nie uraz!")
     assert "Mam do nich uraz" in t_uraz, f"Nie skorygowano kalki rządu: {t_uraz}"
 
-    # Asercja 6: Higiena typograficzna wielokropka (?..., !... -> ?.., !..)
+    # Asercja 6: Higiena typograficzna wielokropka (normatywne 3 kropki: ?..., !...)
     subs_punc = pysubs2.SSAFile()
-    subs_punc.events.append(pysubs2.SSAEvent(start=0, end=2000, style="Main", text="To sen?..."))
-    subs_punc.events.append(pysubs2.SSAEvent(start=2000, end=4000, style="Main", text="Muszę!..."))
+    subs_punc.events.append(pysubs2.SSAEvent(start=0, end=2000, style="Main", text="To sen?.."))
+    subs_punc.events.append(pysubs2.SSAEvent(start=2000, end=4000, style="Main", text="Muszę!.."))
     res_punc, _ = EpisodeQualityGate.audit_and_fix_entire_episode(subs_punc, series_bible=bible)
-    assert res_punc.events[0].text == "To sen?..", f"Nie znormalizowano wielokropka '?..': {res_punc.events[0].text}"
-    assert res_punc.events[1].text == "Muszę!..", f"Nie znormalizowano wielokropka '!..': {res_punc.events[1].text}"
+    assert res_punc.events[0].text in ("To sen?...", "To sen?"), f"Nie znormalizowano wielokropka '?..': {res_punc.events[0].text}"
+    assert res_punc.events[1].text in ("Muszę!...", "Muszę!"), f"Nie znormalizowano wielokropka '!..': {res_punc.events[1].text}"
 
     print(" -> PASSED: Uniwersalna Pamięć Serialu i zabezpieczenia Clevatess Ep 04 zweryfikowane w 5 warstwach (0.00 PLN).")
 
@@ -18304,6 +18304,239 @@ def test_standard_9_t8_logger_hygiene_and_slug_normalization():
     print(" -> PASSED: T8 potwierdza pojedyncze wystąpienie nagłówka/stopki oraz uniwersalny slug.")
 
 
+def test_standard_9_1_avt_linter_identity_and_newline_preservation():
+    """TEST 192: Standard 9.1 Identity Pass-Through i zachowanie nowej linii (Sekcja 2 pkt 1)."""
+    print("\n[TEST 192] Standard 9.1: Identity Pass-Through i zachowanie podziału wierszy...")
+    from avt_linter import AVTLinter
+    linter = AVTLinter()
+    lines = [
+        "Wiem o wszystkim, co się wczoraj wydarzyło.",
+        "Czy naprawdę sądzisz, że zdołasz to osiągnąć?",
+        "Nie mam pojęcia, jak to rozwiązać.",
+        "Zaraz tam dotrę i sprawdzę stan sytuacji.",
+        "Chyba już czas podjąć ostateczną decyzję."
+    ]
+    for line in lines:
+        fixed, _ = linter.lint_and_fix_line(line, speaker_gender="MALE", target_gender="FEMALE", strict_positive_domain=True)
+        assert fixed == line
+    two_line_text = "Pierwszy krótki wiersz\ndrugi krótki wiersz"
+    fixed_two_line, _ = linter.lint_and_fix_line(two_line_text, strict_positive_domain=True)
+    assert fixed_two_line == "Pierwszy krótki wiersz\\Ndrugi krótki wiersz"
+    sign_text = "Tytuł Informacyjny\nPodpis: Dowództwo"
+    fixed_sign, _ = linter.lint_and_fix_line(sign_text, is_sign=True, strict_positive_domain=True)
+    assert fixed_sign == "Tytuł Informacyjny\\NPodpis: Dowództwo"
+    print(" -> PASSED: TEST 192 potwierdza zachowanie tożsamości T(x)=x i konwersję \\n do \\N.")
+
+
+def test_standard_9_1_eqg_no_verb_mutation_and_normative_ellipsis():
+    """TEST 193: Standard 9.1 Brak mutacji werbalnych w EQG i normatywne 3 kropki (Sekcja 2 pkt 2)."""
+    print("\n[TEST 193] Standard 9.1: Brak mutacji werbalnych w EQG i normatywne wielokropki...")
+    import pysubs2, re
+    from avt_linter import EpisodeQualityGate
+    eqg = EpisodeQualityGate()
+    subs = pysubs2.SSAFile()
+    ev1 = pysubs2.SSAEvent(start=1000, end=3000, text="Czy naprawdę jesteś pewien tego kroku?..")
+    ev2 = pysubs2.SSAEvent(start=3500, end=5500, text="Co ty wyprawiasz!..")
+    ev3 = pysubs2.SSAEvent(start=6000, end=8000, text="Zrobiłem wszystko, co było konieczne.")
+    ev4 = pysubs2.SSAEvent(start=8500, end=10500, text="Może powinniśmy poczekać na wsparcie?")
+    subs.events = [ev1, ev2, ev3, ev4]
+    fixed_subs, fixes = eqg.audit_and_fix_entire_episode(subs, is_production=True, strict_positive_domain=True)
+    assert "Zrobiłem wszystko" in fixed_subs.events[2].text
+    assert "powinniśmy poczekać" in fixed_subs.events[3].text
+    assert not re.search(r"\?[.]{2}(?![.])", fixed_subs.events[0].text)
+    assert "?..." in fixed_subs.events[0].text or fixed_subs.events[0].text.endswith("?")
+    assert not re.search(r"\![.]{2}(?![.])", fixed_subs.events[1].text)
+    assert "!..." in fixed_subs.events[1].text or fixed_subs.events[1].text.endswith("!")
+    print(" -> PASSED: TEST 193 potwierdza brak mutacji czasowników i normatywne wielokropki.")
+
+
+def test_standard_9_1_phase7_hygiene_clitic_binding_and_tag_deduplication():
+    """TEST 194: Standard 9.1 Spójność składniowa cezury \\N i deduplikacja tagów ASS (Sekcja 2 pkt 3)."""
+    print("\n[TEST 194] Standard 9.1: Higiena Fazy 7, wiązanie syntaktyczne przez \\N i deduplikacja tagów...")
+    import pysubs2
+    from avt_linter import EpisodeQualityGate, deduplicate_alignment_tags
+    eqg = EpisodeQualityGate()
+    # 1. Czasownik + klityka się
+    subs1 = pysubs2.SSAFile()
+    subs1.events = [pysubs2.SSAEvent(start=1000, end=3000, text="Nagle okazało\\Nsię to zupełnie jasne.")]
+    fixed1, _ = eqg.audit_and_fix_entire_episode(subs1, is_production=True, strict_positive_domain=True)
+    assert "\\Nokazało się" in fixed1.events[0].text or "okazało się" in fixed1.events[0].text
+    # 2. Przyimek + rzeczownik
+    subs2 = pysubs2.SSAFile()
+    subs2.events = [pysubs2.SSAEvent(start=1000, end=3000, text="Spotkamy się w\\Ndomu przyjaciela.")]
+    fixed2, _ = eqg.audit_and_fix_entire_episode(subs2, is_production=True, strict_positive_domain=True)
+    assert "\\Nw domu" in fixed2.events[0].text or "w domu" in fixed2.events[0].text
+    # 3. Myślnik podpisu + autor
+    subs3 = pysubs2.SSAFile()
+    subs3.events = [pysubs2.SSAEvent(start=1000, end=3000, text="Wiadomość z frontu.\\N— Autor")]
+    fixed3, _ = eqg.audit_and_fix_entire_episode(subs3, is_production=True, strict_positive_domain=True)
+    assert "— Autor" in fixed3.events[0].text
+    # 4. Multi-line sign
+    subs4 = pysubs2.SSAFile()
+    ev_sign = pysubs2.SSAEvent(start=1000, end=3000, text="Punkt pierwszy\\NPunkt drugi\\NPunkt trzeci", style="Sign")
+    setattr(ev_sign, "is_sign", True)
+    subs4.events = [ev_sign]
+    fixed4, _ = eqg.audit_and_fix_entire_episode(subs4, is_production=True, strict_positive_domain=True)
+    assert "\\N" in fixed4.events[0].text
+    # 5. Deduplicate alignment
+    text_dup_an = "{\\an7\\pos(1500,200)\\an8}Napis w rogu ekranu"
+    deduped = deduplicate_alignment_tags(text_dup_an, play_res_x=1920)
+    assert deduped.count(r"\an") <= 1
+    assert r"\an3" in deduped or r"\an9" in deduped or r"\an6" in deduped
+    print(" -> PASSED: TEST 194 potwierdza wiązanie syntaktyczne przez \\N i deduplikację \\anX.")
+
+
+def test_standard_9_1_guard_phase2_regressions_authority_and_ass_tags():
+    """TEST 195: Standard 9.1 Bramki ochronne Fazy 2 i normalizacja tagów formatujących ASS (Sekcja 2 pkt 4)."""
+    print("\n[TEST 195] Standard 9.1: Ochrona Fazy 2 przed regresjami modalnymi i fleksyjnymi...")
+    from verifier import _guard_phase2_regressions, normalize_ass_tags
+    malformed = "{i1}Wypowiedź z kursywą{i0} oraz zwykły tekst."
+    normalized = normalize_ass_tags(malformed)
+    assert "{\\i1}" in normalized and "{\\i0}" in normalized
+    # Tryb oznajmujący -> przypuszczający bez warunku w EN
+    g_mood = _guard_phase2_regressions(
+        f1_pl="Znam odpowiedź na to pytanie.",
+        refined_pl="Wiedziałbym, jaka jest odpowiedź na to pytanie.",
+        source_en="I know the answer to this question.",
+        speaker_p0_gender="MALE"
+    )
+    assert g_mood == "Znam odpowiedź na to pytanie."
+    # Czas przeszły P0 -> teraźniejszy
+    g_past = _guard_phase2_regressions(
+        f1_pl="Dotarłam wczoraj na miejsce.",
+        refined_pl="Docieram na miejsce.",
+        source_en="I arrived yesterday.",
+        speaker_p0_gender="FEMALE"
+    )
+    assert g_past == "Dotarłam wczoraj na miejsce."
+    # Enklityka cię -> ciebie w środku zdania
+    g_enc = _guard_phase2_regressions(
+        f1_pl="Widziałem cię na korytarzu.",
+        refined_pl="Widziałem ciebie na korytarzu.",
+        source_en="I saw you in the hall.",
+        speaker_p0_gender="MALE"
+    )
+    assert g_enc == "Widziałem cię na korytarzu."
+    # Rekcja przyimkowa
+    g_prep = _guard_phase2_regressions(
+        f1_pl="Walczymy dzisiaj przeciwko Carol.",
+        refined_pl="Walczymy dzisiaj z Carol.",
+        source_en="We are fighting against Carol today.",
+        speaker_p0_gender="FEMALE"
+    )
+    assert g_prep == "Walczymy dzisiaj przeciwko Carol."
+    print(" -> PASSED: TEST 195 potwierdza ochronę przed regresjami modalnymi, fleksyjnymi i enklitycznymi.")
+
+
+def test_standard_9_1_series_bible_entity_filtering_and_glossary_priority():
+    """TEST 196: Standard 9.1 Filtrowanie encji, ochrona kolizji nazwisk i priorytet glosariusza (Sekcja 2 pkt 5)."""
+    print("\n[TEST 196] Standard 9.1: Czystość SeriesBible, zakaz kolizji aliasów nazwisk i glosariusz kanonu...")
+    import tempfile
+    from series_memory import SeriesBible
+    with tempfile.TemporaryDirectory() as td:
+        bible_file = Path(td) / "test_bible_9_1.json"
+        bible = SeriesBible(bible_path=bible_file)
+        bible.update_from_episode_profile(
+            episode_name="Episode 01",
+            characters={
+                "Artur Pendelton": {"description": "mężczyzna", "gender": "MALE", "priority": "P0", "has_verified_gender": True},
+                "Helena Pendelton": {"description": "kobieta", "gender": "FEMALE", "priority": "P0", "has_verified_gender": True},
+                "Sign Board": {"description": "szyld informacyjny", "is_sign": True},
+                "Boy A": "chłopiec w tle",
+                "Guard 1": "strażnik bramy",
+                "Wydarzenie Przeszłe": {"description": "wspomnienie", "source": "continuity_bridge_alerts"}
+            },
+            glossary={
+                "Pendelton": "Ród Pendeltonów",
+                "Szermierz": "Mistrz Miecza"
+            }
+        )
+        chars = bible.data.get("characters", {})
+        decls = bible.data.get("declensions", {})
+        assert "Sign Board" not in chars and "Sign Board" not in decls
+        assert "Boy A" not in chars and "Boy A" not in decls
+        assert "Guard 1" not in chars and "Guard 1" not in decls
+        assert "Wydarzenie Przeszłe" not in chars and "Wydarzenie Przeszłe" not in decls
+        assert "Artur Pendelton" in chars and "Helena Pendelton" in chars
+        artur_aliases = chars["Artur Pendelton"].get("aliases", [])
+        helena_aliases = chars["Helena Pendelton"].get("aliases", [])
+        assert "Pendelton" not in artur_aliases and "Pendelton" not in helena_aliases
+        assert "Artur" in artur_aliases and "Helena" in helena_aliases
+        p_paradigm = bible.get_declension_paradigm("Szermierz")
+        assert p_paradigm is not None
+        assert "Mistrz Miecza" in p_paradigm.M and "Mistrza Miecza" in p_paradigm.D
+    print(" -> PASSED: TEST 196 potwierdza filtrowanie encji nieosobowych, brak kolizji nazwiska i prymat kanonu.")
+
+
+def test_standard_9_1_speaker_gender_arbitration_p0_priority_and_sign_isolation():
+    """TEST 197: Standard 9.1 Autorytet P0 w arbitrażu płci i izolacja napisów (Sekcja 2 pkt 6)."""
+    print("\n[TEST 197] Standard 9.1: Autorytet rekordu P0, izolacja is_sign i synchronizacja ASS...")
+    import tempfile, pysubs2
+    from series_memory import SeriesBible
+    from scene_discourse import build_discourse_topology
+    from translator import MultimodalTranslator, synchronize_ass_event_metadata_and_styles
+    with tempfile.TemporaryDirectory() as td:
+        bible_file = Path(td) / "test_arb_bible.json"
+        bible = SeriesBible(bible_path=bible_file)
+        bible.data["characters"] = {
+            "Wojownik Jan": {"description": "mężczyzna", "gender": "MALE", "confidence": 1.0, "priority": "P0", "has_verified_gender": True, "aliases": ["Jan", "Wojownik Jan"]},
+            "Czarodziejka Anna": {"description": "kobieta", "gender": "FEMALE", "confidence": 1.0, "priority": "P0", "has_verified_gender": True, "aliases": ["Anna", "Czarodziejka Anna"]}
+        }
+        bible._rebuild_actor_aliases_index()
+        tr = MultimodalTranslator.__new__(MultimodalTranslator)
+        tr.series_bible = bible
+        tr.character_registry = {"Wojownik Jan": "MĘŻCZYZNA (P0)", "Czarodziejka Anna": "KOBIETA (P0)"}
+        ev_male = pysubs2.SSAEvent(start=1000, end=3000, text="Jestem gotów.", name="Wojownik Jan")
+        male_gender, male_alerts = tr._arbitrate_speaker_gender(ev_male, None, 1, {1: "sopran żeński ~230 Hz"}, pl_candidate="Jestem gotów.")
+        assert male_gender == "mężczyzna"
+        assert any("rekord_p0" in a for a in male_alerts)
+        ev_fem = pysubs2.SSAEvent(start=3500, end=5500, text="Czekałam.", name="Czarodziejka Anna")
+        fem_gender, fem_alerts = tr._arbitrate_speaker_gender(ev_fem, None, 2, {2: "bas męski ~110 Hz"}, pl_candidate="Czekałam.")
+        assert fem_gender == "kobieta"
+        assert any("rekord_p0" in a for a in fem_alerts)
+        ev_sign = pysubs2.SSAEvent(start=6000, end=8000, text="Szyld", style="Sign")
+        setattr(ev_sign, "is_sign", True)
+        sign_gender, sign_alerts = tr._arbitrate_speaker_gender(ev_sign, None, 3, pl_candidate="Szyld")
+        assert sign_gender is None
+        assert any("napis_ekranowy" in a for a in sign_alerts)
+        ev_sync = pysubs2.SSAEvent(start=8500, end=10000, text="Głos.", name="Jan (S1E1)")
+        synced = synchronize_ass_event_metadata_and_styles(ev_sync, speaker_name="Wojownik Jan", is_offscreen=True)
+        assert synced.name == "Wojownik Jan" and "Offscreen" in synced.style and "{\\i1}" in synced.text
+        turns = build_discourse_topology([ev_male, ev_fem, ev_sign], series_bible=bible)
+        assert len(turns) >= 2
+    print(" -> PASSED: TEST 197 potwierdza pierwszeństwo P0 nad akustyką, izolację napisów i synchronizację stylów.")
+
+
+def test_standard_9_1_clean_slug_consistency_and_single_header_logging():
+    """TEST 198: Standard 9.1 Spójność slugu i pojedynczy nagłówek CLI (Sekcja 2 pkt 7)."""
+    print("\n[TEST 198] Standard 9.1: Spójność slugu serii i idempotentność log_cli_init...")
+    import tempfile
+    from metadata import clean_anime_filename, normalize_anime_slug
+    from pipeline_logger import EpisodeFlightRecorder
+    samples = [
+        ("[SubGroup] Brave Adventurer - 01 [1080p HEVC][12345678].mkv", "Brave Adventurer", "brave_adventurer"),
+        ("Brave.Adventurer.S01E05.1080p.WEB-DL.x264.mkv", "Brave Adventurer", "brave_adventurer"),
+        ("[ReleaseHub] Mystic Kingdom Season 2 - 12 (720p).ass", "Mystic Kingdom Season 2", "mystic_kingdom"),
+        ("Silver_Knight_EP08_REPACK_1080p.mkv", "Silver Knight", "silver_knight"),
+    ]
+    for raw, expected_clean, expected_slug in samples:
+        assert expected_clean.lower() in clean_anime_filename(raw).lower()
+        assert expected_slug == normalize_anime_slug(raw)
+    with tempfile.TemporaryDirectory() as td:
+        recorder = EpisodeFlightRecorder(anime_slug="brave_adventurer", filename="Brave_Adventurer_01", trace_dir=td, enabled=True)
+        recorder.log_cli_init(cli_args={"subs": "in.ass"}, paths={"in": "in.ass"}, models={"m": "t"})
+        recorder.log_cli_init(cli_args={"subs": "in.ass"}, paths={"in": "in.ass"}, models={"m": "t"})
+        recorder.log_metadata(clean_slug=recorder.anime_slug, anilist_meta={"title": "Brave Adventurer"})
+        recorder.log_series_bible(bible_summary={"slug": recorder.anime_slug, "characters_count": 1})
+        log_content = recorder.log_path.read_text(encoding="utf-8")
+        assert log_content.count("[KROK 1: CLI & INICJALIZACJA PROCESU]") == 1
+        assert "[KROK 3: METADANE ZEWNĘTRZNE I NORMALIZACJA AKTORÓW]" in log_content
+        assert "[KROK 6: PAMIĘĆ SERII SERIESBIBLE I PARADYGMATY ODMIANY]" in log_content
+        assert "Znormalizowany slug serii: brave_adventurer" in log_content
+        assert '"slug": "brave_adventurer"' in log_content
+    print(" -> PASSED: TEST 198 potwierdza spójność clean_slug oraz pojedynczy nagłówek CLI.")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -18497,7 +18730,14 @@ if __name__ == "__main__":
     test_standard_9_t6_phase2_regression_guards_five_categories()
     test_standard_9_t7_ass_actor_name_sanitization()
     test_standard_9_t8_logger_hygiene_and_slug_normalization()
-    print("\n Wszystkie testy jednostkowe i integracyjne (191/191) zakończone pełnym sukcesem!\n")
+    test_standard_9_1_avt_linter_identity_and_newline_preservation()
+    test_standard_9_1_eqg_no_verb_mutation_and_normative_ellipsis()
+    test_standard_9_1_phase7_hygiene_clitic_binding_and_tag_deduplication()
+    test_standard_9_1_guard_phase2_regressions_authority_and_ass_tags()
+    test_standard_9_1_series_bible_entity_filtering_and_glossary_priority()
+    test_standard_9_1_speaker_gender_arbitration_p0_priority_and_sign_isolation()
+    test_standard_9_1_clean_slug_consistency_and_single_header_logging()
+    print("\n Wszystkie testy jednostkowe i integracyjne (198/198) zakończone pełnym sukcesem!\n")
 
 
 

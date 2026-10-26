@@ -97,8 +97,7 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
-        "Ars Louvent",
-        "Louvent"
+        "Ars Louvent"
       ],
       "entity_category": "ANTHROPONYM"
     },
@@ -150,8 +149,7 @@
       "priority": "P0",
       "aliases": [
         "Lycia",
-        "Lycia Plaid",
-        "Plaid"
+        "Lycia Plaid"
       ],
       "entity_category": "ANTHROPONYM"
     },
@@ -163,7 +161,6 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
-        "Louvent",
         "Raven",
         "Raven Louvent"
       ],
@@ -216,7 +213,6 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
-        "Louvent",
         "Sofia",
         "Sofia Louvent"
       ],
@@ -258,8 +254,7 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
-        "Hammond Plaid",
-        "Plaid"
+        "Hammond Plaid"
       ],
       "entity_category": "ANTHROPONYM"
     },
@@ -272,8 +267,7 @@
       "priority": "P0",
       "aliases": [
         "Kreitz",
-        "Kreitz Louvent",
-        "Louvent"
+        "Kreitz Louvent"
       ],
       "entity_category": "ANTHROPONYM"
     },
@@ -285,7 +279,6 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
-        "Louvent",
         "Ren",
         "Ren Louvent"
       ],
@@ -400,7 +393,6 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
-        "Captain",
         "Guard",
         "Guard Captain"
       ],
@@ -414,8 +406,7 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
-        "Licia Plaid",
-        "Plaid"
+        "Licia Plaid"
       ],
       "entity_category": "ANTHROPONYM"
     },
@@ -559,7 +550,6 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
-        "Captain",
         "Long-Range",
         "Long-Range Captain"
       ],
@@ -771,7 +761,6 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
-        "Captain",
         "Verzud",
         "Verzud Captain"
       ],
@@ -794,7 +783,6 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
-        "Captain",
         "Seitz",
         "Seitz Captain"
       ],

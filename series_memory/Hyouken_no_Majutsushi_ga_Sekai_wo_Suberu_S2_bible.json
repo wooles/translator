@@ -9,8 +9,7 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
-        "Ray White",
-        "White"
+        "Ray White"
       ],
       "entity_category": "ANTHROPONYM"
     },
@@ -205,8 +204,7 @@
       "priority": "P0",
       "aliases": [
         "Stella",
-        "Stella White",
-        "White"
+        "Stella White"
       ],
       "entity_category": "ANTHROPONYM"
     },

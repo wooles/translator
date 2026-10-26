@@ -2373,13 +2373,15 @@ AKTYWNY KANON POZYTYWNEGO RZEMIOSŁA AVT (BARAŃCZAK, BELCZYK, SZARKOWSKA):
 """
 
 STANDARD_9_CORE_RULES_PROMPT = """
-STANDARD 9.0 — AUTORYTET TRANSLACYJNY I NIEZMIENNIKI DZIEDZINY POZYTYWNEJ:
-1. ŹRÓDŁO TREŚCI DLA WARSTWY NIE-DIALOGOWEJ: Dla każdej linii is_sign: true źródłem treści tłumaczenia jest wyłącznie tekst źródłowy EN. Tłumaczenie zachowuje pełną wierność wobec EN. Transkrypcja ASR i tagi prozodyczne są poza zbiorem sygnałów takiej linii.
-2. AUTORYTET PŁCI I OSOBY GRAMATYCZNEJ: Płeć adresata pochodzi wyłącznie z rekordu P0. Parametr F0 bieżącej linii opisuje wyłącznie mówcę i nie decyduje o płci adresata. Osoba gramatyczna podmiotu wynika z tekstu źródłowego EN (jawne zaimki osobowe 3. osoby w EN oznaczają pośredniczenie w rozmowie i definiują 3. osobę).
-3. AUTORYTET ANTROPONIMU ŻEŃSKIEGO: Rodzaj gramatyczny postaci wynika z rekordu P0. Antroponimy żeńskie sklasyfikowane jako nieodmienne pozostają w formie bazowej we wszystkich przypadkach zależnych i narzucają rodzaj gramatyczny zdania.
-4. AUTOREFERENCJA PODMIOTU SPECJALNEGO: Podmioty o męskim zaimku autoreferencyjnym i męskim paradygmacie deklinacji stosują męskie formy 1. os. lp.
-5. SKŁAD SCENY I LICZBA MNOGA: W scenach o składzie wyłącznie żeńskim (P0) formy 1. i 2. os. lm. są niemęskoosobowe. Znacznik POLYLOGUE (n=M) definiuje liczbę uczestników sceny; zaimki 1. i 2. os. lm. w linii z tym znacznikiem odnoszą się do pełnego składu sceny.
-6. SPÓJNOŚĆ DWUGŁOSU KONTYNUOWANEGO: Pierwszy człon dwugłosu kontynuowanego zachowuje pełną postać tekstu linii bezpośrednio poprzedzającej. Spójność dwugłosu ma pierwszeństwo wobec reguł kondensacji.
+STANDARD 9.1 — AUTORYTET TRANSLACYJNY I NIEZMIENNIKI DZIEDZINY POZYTYWNEJ:
+1. ŹRÓDŁO TREŚCI DLA WARSTWY NIE-DIALOGOWEJ: Dla każdej linii is_sign: true źródłem treści tłumaczenia jest wyłącznie tekst źródłowy EN. Tłumaczenie zachowuje pełną wierność wobec EN, strukturę wielowierszową listy punktowanej oraz podpis po dywizie w nowym wierszu. Transkrypcja ASR i tagi prozodyczne są poza zbiorem sygnałów takiej linii.
+2. AUTORYTET FORM GRAMATYCZNYCH I MODALNYCH: Prawidłowy stan przekładu zachowuje tożsamość rodzaju gramatycznego, liczby, osoby oraz trybu czasownika ustalonego w Fazie 1. Zmiana trybu lub rodzaju wymaga jawnego potwierdzenia w rekordzie P0 lub jednoznacznej kategorii zaimka w tekście źródłowym EN.
+3. KATEGORIA RODZAJU PODMIOTU I OBIEKTU: Konstrukcje uogólniające i bezosobowe w tekście źródłowym EN odnoszące się do postaci o zweryfikowanym rodzaju żeńskim P0 są oddawane konstrukcjami bezosobowymi lub formami żeńskimi.
+4. PIERWSZEŃSTWO TERMINOLOGII KANONICZNEJ: Prawidłowy stan przekładu terminów zdefiniowanych w glosariuszu pre-passu jest tożsamy z formą kanoniczną wyznaczoną w profilu odcinka.
+5. JEDNOZNACZNOŚĆ PRZY NIEODMIENNYCH PARADYGMATACH: Zdania zawierające dwa nieodmienne antroponimy stosują konstrukcje przyimkowe jednoznacznie rozgraniczające agensa od obiektu.
+6. ZACHOWANIE FORM ENKLITYCZNYCH: W pozycji śródzdaniowej nieakcentowanej po czasowniku obowiązuje krótka forma enklityczna zaimka. Forma pełna występuje wyłącznie w nagłosie lub po przyimku.
+7. WIERNOŚĆ RELACJI PREDYKATYWNEJ I METAJĘZYKOWEJ: Wypowiedzi o charakterze definicyjnym zachowują relację inkluzji oraz pełny zbiór przetłumaczonych pojęć w języku docelowym.
+8. INTEGRALNOŚĆ FORMATOWANIA I STRUKTURY WIELOWIERSZOWEJ: Wszystkie znaczniki formatujące oraz struktury wielowierszowe plansz i podpisów po dywizie zachowują pełną składnię formatu napisów.
 """
 
 def get_translation_system_prompt(keep_honorifics: bool = True, lean: bool = False) -> str:

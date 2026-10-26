@@ -402,8 +402,7 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
-        "Mima Sasaki",
-        "Sasaki"
+        "Mima Sasaki"
       ],
       "entity_category": "ANTHROPONYM"
     },
@@ -566,8 +565,7 @@
       "priority": "P0",
       "aliases": [
         "Doyo",
-        "Doyo Sasaki",
-        "Sasaki"
+        "Doyo Sasaki"
       ],
       "entity_category": "ANTHROPONYM"
     },
@@ -653,18 +651,6 @@
       "aliases": [
         "Kusunoki Masashige",
         "Masashige"
-      ],
-      "entity_category": "ANTHROPONYM"
-    },
-    "kobieta": {
-      "description": "postać (Postać)",
-      "gender": "FEMALE",
-      "grammatical_gender": "FEMININE",
-      "has_verified_gender": true,
-      "confidence": 0.95,
-      "priority": "P0",
-      "aliases": [
-        "kobieta"
       ],
       "entity_category": "ANTHROPONYM"
     },
@@ -1427,16 +1413,6 @@
       "W": "Kusunoki Masashige",
       "gender": "MALE"
     },
-    "kobieta": {
-      "M": "kobieta",
-      "D": "kobiety",
-      "C": "kobiecie",
-      "B": "kobietę",
-      "N": "kobietą",
-      "Ms": "kobiecie",
-      "W": "kobieto",
-      "gender": "FEMALE"
-    },
     "Saionji": {
       "M": "Saionji",
       "D": "Saionji",
@@ -1677,7 +1653,6 @@
     "Kusunoki": "ANTHROPONYM",
     "Yoshisada": "ANTHROPONYM",
     "Kusunoki Masashige": "ANTHROPONYM",
-    "kobieta": "ANTHROPONYM",
     "Saionji": "ANTHROPONYM",
     "Hachiro Miura": "ANTHROPONYM",
     "Wiejska dziewczynka": "ANTHROPONYM",

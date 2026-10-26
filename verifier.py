@@ -29,6 +29,24 @@ class RefinedBatchResponse(BaseModel):
     scene_diagnosis: Optional[SceneDiagnosis] = Field(default=None, description="Diagnoza i weryfikacja intencji dramaturgicznych sceny")
     lines: List[RefinedLine] = Field(description="Lista zredagowanych i zweryfikowanych kwestii dialogowych")
 
+def normalize_ass_tags(text: str) -> str:
+    """
+    Normalizes malformed ASS formatting tags (e.g. {i1} -> {\\i1}, {i0} -> {\\i0},
+    {b1} -> {\\b1}, {b0} -> {\\b0}, {\\i} -> {\\i1}, {/i} -> {\\i0}).
+    """
+    if not text or "{" not in text:
+        return text
+    res = re.sub(r"\{(?:\s*\\?\s*)i1\s*\}", r"{\\i1}", text, flags=re.IGNORECASE)
+    res = re.sub(r"\{(?:\s*\\?\s*)i0\s*\}", r"{\\i0}", res, flags=re.IGNORECASE)
+    res = re.sub(r"\{(?:\s*\\?\s*)b1\s*\}", r"{\\b1}", res, flags=re.IGNORECASE)
+    res = re.sub(r"\{(?:\s*\\?\s*)b0\s*\}", r"{\\b0}", res, flags=re.IGNORECASE)
+    res = re.sub(r"\{(?:\s*\\?\s*)u1\s*\}", r"{\\u1}", res, flags=re.IGNORECASE)
+    res = re.sub(r"\{(?:\s*\\?\s*)u0\s*\}", r"{\\u0}", res, flags=re.IGNORECASE)
+    res = re.sub(r"\{\\?i\}", r"{\\i1}", res, flags=re.IGNORECASE)
+    res = re.sub(r"\{/?i\}", r"{\\i0}", res, flags=re.IGNORECASE)
+    return res
+
+
 def _guard_phase2_regressions(
     f1_pl: str,
     refined_pl: str,
@@ -56,6 +74,9 @@ def _guard_phase2_regressions(
     """
     if not refined_pl:
         return f1_pl or ""
+
+    # Normalize malformed ASS tags in refined text first
+    refined_pl = normalize_ass_tags(refined_pl)
 
     # Calque guard: eliminate 'być + imiesłów czynny -ący/-ąca/-ące'
     continuous_calque_re = re.compile(
@@ -146,6 +167,62 @@ def _guard_phase2_regressions(
     elif tgt_norm in ("FEMALE", "FEMININE") or (f1_has_2nd_fem and not f1_has_2nd_masc):
         if ref_has_2nd_masc and not ref_has_2nd_fem:
             return f1_pl
+
+    # 6. KATEGORIA 6: Ochrona trybu czasownika (przypuszczający <-> oznajmujący)
+    # Zmiana trybu jest dozwolona wyłącznie przy jawnej zmianie modalności w EN (would/could/should/might/if/wish)
+    re_cond_pl = re.compile(
+        r"\b(?:[a-ząćęłńóśźż]+(?:łbym|łabym|łbyś|łabyś|łby|łaby|łoby|libyśmy|łybyśmy|libyście|łybyście|liby|łyby)|bym|byś|by|byśmy|byście)\b",
+        re.IGNORECASE
+    )
+    re_cond_en = re.compile(r"\b(?:would|could|should|might|if|wish)\b", re.IGNORECASE)
+    f1_is_cond = bool(re_cond_pl.search(f1_pl))
+    ref_is_cond = bool(re_cond_pl.search(refined_pl))
+    en_has_cond = bool(re_cond_en.search(source_en)) if source_en else False
+
+    if f1_is_cond and not ref_is_cond and en_has_cond:
+        return f1_pl
+    if not f1_is_cond and ref_is_cond and not en_has_cond:
+        return f1_pl
+
+    # 7. KATEGORIA 7: Ochrona nacechowanego rodzaju czasu przeszłego P0 przed neutralizacją do czasu teraźniejszego
+    if spk_norm in ("MALE", "MASCULINE", "FEMALE", "FEMININE"):
+        re_past_1st = re.compile(r"\b[a-ząćęłńóśźż]+(?:łem|łam|łbym|łabym)\b", re.IGNORECASE)
+        if re_past_1st.search(f1_pl) and not re_past_1st.search(refined_pl):
+            en_past = bool(re.search(r"\b(?:was|were|had|did|went|came|saw|heard|found|told|said|arrived|\w+ed)\b", source_en, re.IGNORECASE)) if source_en else True
+            if en_past:
+                return f1_pl
+
+    if tgt_norm in ("MALE", "MASCULINE", "FEMALE", "FEMININE"):
+        re_past_2nd = re.compile(r"\b[a-ząćęłńóśźż]+(?:łeś|łaś|łbyś|łabyś)\b", re.IGNORECASE)
+        if re_past_2nd.search(f1_pl) and not re_past_2nd.search(refined_pl):
+            en_past = bool(re.search(r"\b(?:was|were|had|did|went|came|saw|heard|found|told|said|arrived|\w+ed)\b", source_en, re.IGNORECASE)) if source_en else True
+            if en_past:
+                return f1_pl
+
+    # 8. KATEGORIA 8: Ochrona nieakcentowanej enklityki zaimkowej w pozycji śródzdaniowej
+    clitic_enclitic_pairs = [
+        (r"\b[a-ząćęłńóśźż]+\s+cię\b", r"\b[a-ząćęłńóśźż]+\s+ciebie\b"),
+        (r"\b[a-ząćęłńóśźż]+\s+mi\b", r"\b[a-ząćęłńóśźż]+\s+mnie\b"),
+        (r"\b[a-ząćęłńóśźż]+\s+go\b", r"\b[a-ząćęłńóśźż]+\s+jego\b"),
+        (r"\b[a-ząćęłńóśźż]+\s+mu\b", r"\b[a-ząćęłńóśźż]+\s+jemu\b"),
+    ]
+    for encl_pat, orth_pat in clitic_enclitic_pairs:
+        if re.search(encl_pat, f1_pl, re.IGNORECASE) and re.search(orth_pat, refined_pl, re.IGNORECASE):
+            en_emphasis = bool(re.search(r"\b(YOU|HIM|HER|ME)\b", source_en))
+            if not en_emphasis:
+                return f1_pl
+
+    # 9. KATEGORIA 9: Ochrona jednoznacznej konstrukcji przyimkowej przy nieodmiennych antroponimach
+    prep_anthroponym_pat = r"\b(?:do|dla|od|z|ze|o|u|przeciwko|przeciw|wobec|obok|wzdłuż)\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+)\b"
+    m_prep_f1 = re.findall(prep_anthroponym_pat, f1_pl)
+    if m_prep_f1:
+        for name_token in m_prep_f1:
+            if not inv_names or name_token in inv_names:
+                m_exact = re.search(rf"\b(do|dla|od|z|ze|o|u|przeciwko|przeciw|wobec|obok|wzdłuż)\s+{re.escape(name_token)}\b", f1_pl, re.IGNORECASE)
+                if m_exact:
+                    prep_word = m_exact.group(1).lower()
+                    if not re.search(rf"\b{re.escape(prep_word)}\s+{re.escape(name_token)}\b", refined_pl, re.IGNORECASE):
+                        return f1_pl
 
     return refined_pl
 
@@ -689,8 +766,12 @@ class DialogueVerifier:
                 for r in result_lines:
                     orig_it = items_by_id.get(r.id)
                     if orig_it:
+                        r.refined_pl = normalize_ass_tags(r.refined_pl)
                         f1_text = orig_it.get("pl", "")
                         src_en = orig_it.get("en", "")
+                        if (r"{\i1}" in f1_text or r"<i>" in f1_text.lower() or r"{\i1}" in src_en or r"<i>" in src_en.lower() or orig_it.get("is_offscreen") or orig_it.get("is_thought")) and r"{\i1}" not in r.refined_pl:
+                            if not r.refined_pl.startswith(r"{\i1}"):
+                                r.refined_pl = r"{\i1}" + r.refined_pl + (r"{\i0}" if not r.refined_pl.endswith(r"{\i0}") else "")
                         spk_g = orig_it.get("speaker_gender") or orig_it.get("speaker_p0_gender")
                         tgt_g = orig_it.get("target_gender") or orig_it.get("addressee_gender")
                         addr_rec = orig_it.get("addressee_p0_record")

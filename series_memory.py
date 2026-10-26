@@ -13,7 +13,7 @@ import copy
 import unicodedata
 from pathlib import Path
 from typing import Dict, List, Any, Optional, Set, Tuple, Union, Literal
-from collections import Counter
+from collections import Counter, defaultdict
 from pydantic import BaseModel, Field, ConfigDict
 from enum import Enum
 from metadata import normalize_ascii_diacritics, normalize_actor_tag
@@ -1066,7 +1066,7 @@ def clean_anime_slug(title: str) -> str:
 
 INHERENT_FEMALE_NOUNS = {
     # Basic / Family / Age
-    "girl", "woman", "female", "lady", "miss", "mrs", "ms", "heroine", "witch",
+    "girl", "woman", "female", "lady", "miss", "mrs", "ms", "heroine", "witch", "princess", "sorceress", "queen", "empress", "duchess", "priestess",
     "dziewczyna", "dziewczynka", "kobieta", "matka", "mama", "mamusia", "mateczka", "mamunia", "macocha",
     "córka", "córeczka", "córunia", "siostra", "siostrzyczka", "siostrunia",
     "babcia", "babunia", "babka", "prababka", "staruszka", "starowinka", "starowina", "starucha", "seniorka", "matrona",
@@ -1128,7 +1128,7 @@ INHERENT_FEMALE_NOUNS = {
 
 INHERENT_MALE_NOUNS = {
     # Basic / Family / Age
-    "boy", "man", "male", "lord", "mr", "hero", "wizard",
+    "boy", "man", "male", "lord", "mr", "hero", "wizard", "prince", "knight", "king", "emperor", "duke", "priest",
     "chłopak", "chłopiec", "mężczyzna", "ojciec", "tata", "tatuś", "ojczym", "syn", "synek", "synuś", "pasierb",
     "brat", "braciszek", "dziadek", "dziadziuś", "starzec", "staruszek", "senior", "nestor", "starowina",
     "pradziadek", "wnuk", "wnuczek", "prawnuk", "wuj", "wujek", "stryj", "stryjek", "siostrzeniec", "bratanek",
@@ -2068,7 +2068,31 @@ def is_generic_actor_or_category(name: str) -> bool:
     if not name:
         return True
     clean = extract_clean_speaker_name(name).strip().lower()
-    return clean in GENERIC_CATEGORY_TAGS
+    if clean in GENERIC_CATEGORY_TAGS:
+        return True
+    generic_roles = (
+        r"man|male|boy|guy|woman|female|girl|lady|child|kid|villager|soldier|guard|student|"
+        r"citizen|passenger|driver|doctor|nurse|waiter|waitress|officer|policeman|detective|"
+        r"thug|bandit|disciple|escort|customer|guest|host|shopkeeper|clerk|bystander|passerby|"
+        r"servant|knight|warrior|elder|chief|king|queen|prince|princess|lord|teacher|principal|"
+        r"classmate|neighbor|crowd|voice|voices|narrator|announcer|caller|mob|"
+        r"wojownik|uczeń|uczen|nauczyciel|strażnik|straznik|służący|sluzacy|wieśniak|wiesniak|"
+        r"żołnierz|zolnierz|chłopiec|chlopiec|dziewczynka|przechodzień|przechodzien"
+    )
+    if re.match(rf"^(?:{generic_roles})(?:\s+[a-zA-Z]|\s+[0-9]+|\s*)$", clean, re.IGNORECASE):
+        return True
+    return False
+
+def is_sign_entity(name: str) -> bool:
+    """Sprawdza, czy nazwa odnosi się do napisu ekranowego, szyldu lub tytulu."""
+    if not name:
+        return False
+    cl = extract_clean_speaker_name(name).strip().lower()
+    if cl in ("sign", "signs", "napis", "napisy", "screen", "ekran", "title", "caption", "szyld", "szyldy"):
+        return True
+    if any(cl.startswith(p) for p in ("sign", "signs", "napis", "szyld", "screen ", "ekran ", "title ", "caption ")):
+        return True
+    return False
 
 def extract_clean_speaker_name(name: str) -> str:
     """
@@ -2745,7 +2769,7 @@ def generate_polish_name_declension(name: str, gender: str = "UNKNOWN") -> Dict[
     g = gender.upper()
     if not n:
         return {}
-    if len(n) <= 1 or not any(c.isalpha() for c in n):
+    if len(n) <= 1 or not any(c.isalpha() for c in n) or not is_valid_anthroponymic_phonotactics(n):
         return {"M": n, "D": n, "C": n, "B": n, "N": n, "Ms": n, "W": n}
 
     # Ochrona przed podwójną deklinacją: formy odmienione oraz złożone deskrypcje (T(x) = x)
@@ -4476,25 +4500,32 @@ class SeriesBible:
                             char_entry["priority"] = "P0"
                             char_entry["has_verified_gender"] = True
 
-            # 4. Postacie wspominane z EpisodeProfile.continuity_bridge_alerts
+            # 4. Synchronizacja EpisodeProfile.continuity_bridge_alerts i rejestracja postaci wspominanych
             if episode_profile and getattr(episode_profile, "continuity_bridge_alerts", None):
+                self.data.setdefault("continuity_bridge_alerts", {})
                 for cba in episode_profile.continuity_bridge_alerts:
                     term = getattr(cba, "term_or_event", None)
                     guide = getattr(cba, "continuity_guidance", "") or ""
-                    if term and is_valid_anthroponymic_phonotactics(term):
-                        if term not in self.data["characters"]:
-                            term_gen = "FEMALE" if any(w in guide.lower() for w in ["kobieta", "żeńsk", "pani", "bohaterka", "dziewczyna"]) else ("MALE" if any(w in guide.lower() for w in ["mężczyzna", "męsk", "pan", "bohater", "chłopak"]) else None)
-                            self.data["characters"][term] = {
-                                "name": term,
-                                "gender": term_gen,
-                                "grammatical_gender": "FEMININE" if term_gen == "FEMALE" else ("MASCULINE" if term_gen == "MALE" else None),
-                                "role": guide or "postać wspominana",
-                                "description": guide or "postać wspominana",
-                                "confidence": 0.95 if term_gen else 0.85,
-                                "priority": "P0",
-                                "has_verified_gender": bool(term_gen),
-                                "aliases": []
-                            }
+                    if term:
+                        self.data["continuity_bridge_alerts"][term] = guide
+                        if is_valid_anthroponymic_phonotactics(term):
+                            guide_lower = guide.lower()
+                            is_fem = any(w in guide_lower for w in ("kobieta", "żeńsk", "żeńska", "władczyni", "królowa", "księżniczka", "dziewczyna", "female"))
+                            is_masc = any(w in guide_lower for w in ("mężczyzna", "męsk", "męska", "władca", "król", "książę", "chłopak", "male")) and not is_fem
+                            if is_fem or is_masc or "postać" in guide_lower or "character" in guide_lower:
+                                gen = "FEMALE" if is_fem else ("MALE" if is_masc else None)
+                                if term not in self.data["characters"]:
+                                    self.data["characters"][term] = {
+                                        "name": term,
+                                        "gender": gen,
+                                        "grammatical_gender": "FEMININE" if gen == "FEMALE" else ("MASCULINE" if gen == "MALE" else None),
+                                        "role": "postać wspominana",
+                                        "description": guide,
+                                        "confidence": 0.95 if gen else 0.5,
+                                        "priority": "P0" if gen else "P1",
+                                        "has_verified_gender": bool(gen),
+                                        "aliases": []
+                                    }
 
             # 5. Relacje z character_relationships
             if episode_profile and getattr(episode_profile, "character_relationships", None):
@@ -4647,6 +4678,23 @@ class SeriesBible:
                 entity_category=cat
             )
         with self._lock:
+            # Canonical glossary definitions from EpisodeProfiler take absolute priority
+            glossary_target = None
+            if "glossary" in self.data and isinstance(self.data["glossary"], dict):
+                glossary_target = self.data["glossary"].get(character_name)
+                if not glossary_target:
+                    c_norm = normalize_name_nfkd(character_name).lower()
+                    for gk, gv in self.data["glossary"].items():
+                        if gk.lower() == character_name.lower() or normalize_name_nfkd(gk).lower() == c_norm:
+                            glossary_target = gv
+                            break
+            if glossary_target and isinstance(glossary_target, str) and glossary_target.strip():
+                clean_target = sanitize_lexical_text(re.sub(r"\s*[\(\[].*?[\)\]]", "", glossary_target).strip())
+                if clean_target and clean_target != character_name:
+                    g_decl = generate_polish_name_declension(clean_target, self.get_character_gender(character_name))
+                    if g_decl and "M" in g_decl:
+                        return DeclensionParadigm.from_dict(g_decl, entity_category=cat)
+
             decl = self.data.get("declensions", {}).get(character_name)
             if not decl:
                 c_norm = normalize_name_nfkd(character_name).lower()
@@ -5233,10 +5281,10 @@ class SeriesBible:
             for rel_k, rel_desc in rels.items():
                 if "->" in rel_k:
                     parts = [p.strip() for p in rel_k.split("->")]
-                    if len(parts) == 2:
-                        spk_part, tgt_part = parts
+                    if len(parts) >= 2:
                         desc_str = str(rel_desc.get("description", "") if isinstance(rel_desc, dict) else rel_desc)
-                        for cand_part, is_tgt in [(tgt_part, True), (spk_part, False)]:
+                        for idx_p, cand_part in enumerate(parts):
+                            is_tgt = (idx_p == len(parts) - 1)
                             cand_clean = extract_clean_speaker_name(cand_part).strip()
                             if "/" not in cand_clean and cand_clean and cand_clean not in self.data["characters"]:
                                 norm_cand = normalize_name_nfkd(cand_clean).lower()
@@ -5260,13 +5308,30 @@ class SeriesBible:
                                 if already_known:
                                     continue
 
+                                p_details = desc_str
+                                m_role = re.search(r"\(([^)]+)\)", desc_str)
+                                if m_role:
+                                    rc = m_role.group(1).strip()
+                                    for sep in ["->", "/", " i "]:
+                                        if sep in rc:
+                                            rc_parts = [r.strip() for r in rc.split(sep)]
+                                            if len(rc_parts) == len(parts):
+                                                p_details = rc_parts[idx_p]
+                                                break
+                                            elif len(rc_parts) >= 2 and idx_p == 0:
+                                                p_details = rc_parts[0]
+                                                break
+                                            elif len(rc_parts) >= 2 and is_tgt:
+                                                p_details = rc_parts[-1]
+                                                break
+
                                 if is_tgt:
-                                    has_f = (re.search(r"\[KOBIETA\s+\(Adresat[^\]]*\]", desc_str, re.IGNORECASE) is not None) or any(w in desc_str.lower() for w in ["matka", "żona", "córka", "kobieta", "pani"])
-                                    has_m = (re.search(r"\[MĘŻCZYZNA\s+\(Adresat[^\]]*\]", desc_str, re.IGNORECASE) is not None) or any(w in desc_str.lower() for w in ["ojciec", "mąż", "syn", "mężczyzna", "pan"])
+                                    has_f = (re.search(r"\[KOBIETA\s+\(Adresat[^\]]*\]", desc_str, re.IGNORECASE) is not None) or is_female_role_text(cand_clean) or is_female_role_text(p_details) or any(w in desc_str.lower() for w in ["matka", "żona", "córka", "kobieta", "pani"])
+                                    has_m = (re.search(r"\[MĘŻCZYZNA\s+\(Adresat[^\]]*\]", desc_str, re.IGNORECASE) is not None) or is_male_role_text(cand_clean) or is_male_role_text(p_details) or any(w in desc_str.lower() for w in ["ojciec", "mąż", "syn", "mężczyzna", "pan"])
                                 else:
-                                    spk_desc = re.sub(r"\[[^\]]*\bAdresat[^\]]*\]", "", desc_str, flags=re.IGNORECASE)
-                                    has_f = any(w in spk_desc.lower() for w in ["matka", "żona", "córka", "kobieta", "pani"])
-                                    has_m = any(w in spk_desc.lower() for w in ["ojciec", "mąż", "syn", "mężczyzna", "pan"])
+                                    spk_desc = re.sub(r"\[[^\]]*\bAdresat[^\]]*\]", "", p_details, flags=re.IGNORECASE)
+                                    has_f = is_female_role_text(cand_clean) or is_female_role_text(spk_desc) or any(w in spk_desc.lower() for w in ["matka", "żona", "córka", "kobieta", "pani"])
+                                    has_m = is_male_role_text(cand_clean) or is_male_role_text(spk_desc) or any(w in spk_desc.lower() for w in ["ojciec", "mąż", "syn", "mężczyzna", "pan"])
 
                                 if has_f and not has_m:
                                     self.data["characters"][cand_clean] = {
@@ -5275,7 +5340,9 @@ class SeriesBible:
                                         "description": "kobieta (postać)",
                                         "has_verified_gender": True,
                                         "confidence": 0.95,
-                                        "priority": "P0"
+                                        "priority": "P0",
+                                        "aliases": [cand_clean],
+                                        "entity_category": EntityCategory.ANTHROPONYM.value
                                     }
                                 elif has_m and not has_f:
                                     self.data["characters"][cand_clean] = {
@@ -5284,7 +5351,9 @@ class SeriesBible:
                                         "description": "mężczyzna (postać)",
                                         "has_verified_gender": True,
                                         "confidence": 0.95,
-                                        "priority": "P0"
+                                        "priority": "P0",
+                                        "aliases": [cand_clean],
+                                        "entity_category": EntityCategory.ANTHROPONYM.value
                                     }
 
             # -------------------------------------------------------------
@@ -5405,6 +5474,7 @@ class SeriesBible:
             for char_k in list(self.data["characters"].keys()):
                 if "->" in char_k:
                     continue
+                c_val = self.data["characters"][char_k]
                 clean_k = extract_clean_speaker_name(char_k).strip()
                 k_lower = clean_k.lower()
                 norm_lower = normalize_ascii_diacritics(clean_k).strip().lower()
@@ -5421,6 +5491,29 @@ class SeriesBible:
                 is_toponym = (cat == EntityCategory.TOPONYM)
                 is_chrematonym = (cat == EntityCategory.CHREMATONYM)
                 is_non_char = self.is_non_character_entity(char_k)
+
+                # Badanie szyldów, ról generycznych i powiadomień ciągłości (continuity_bridge_alerts)
+                is_sign = is_sign_entity(char_k) or is_sign_entity(clean_k)
+                is_in_relations = False
+                if hasattr(self, "data") and isinstance(self.data, dict):
+                    all_rels = list(self.data.get("relationships", {}).keys()) + list(self.data.get("relations", {}).keys())
+                    for rk in all_rels:
+                        if any(p.strip().lower() == clean_k.lower() for p in rk.split("->")):
+                            is_in_relations = True
+                            break
+
+                is_generic = is_generic_actor_or_category(clean_k) or is_generic_actor_or_category(char_k)
+                if (is_in_relations or (isinstance(c_val, dict) and (c_val.get("has_verified_gender") or c_val.get("priority") == "P0"))) and clean_k.lower() not in GENERIC_CATEGORY_TAGS:
+                    is_generic = False
+                is_continuity = False
+                if isinstance(c_val, dict):
+                    if c_val.get("is_sign") or c_val.get("role") in ("sign", "napis"):
+                        is_sign = True
+                    if c_val.get("source") == "continuity_bridge_alerts" or c_val.get("role") == "continuity_bridge_alert" or c_val.get("is_continuity_alert"):
+                        is_continuity = True
+                else:
+                    if is_sign_entity(char_k) or is_sign_entity(clean_k):
+                        is_sign = True
 
                 # Badanie chrematonimów i złożonych przydomków magicznych/tytularnych
                 is_chrematonym_compound = False
@@ -5459,7 +5552,11 @@ class SeriesBible:
                 ):
                     is_non_personal_plural = True
 
-                if is_toponym:
+                if is_sign or is_generic or is_continuity:
+                    del self.data["characters"][char_k]
+                    if "declensions" in self.data and char_k in self.data["declensions"]:
+                        del self.data["declensions"][char_k]
+                elif is_toponym:
                     self.register_entity_category(char_k, EntityCategory.TOPONYM)
                     del self.data["characters"][char_k]
                     if "declensions" in self.data and char_k in self.data["declensions"]:
@@ -5655,7 +5752,9 @@ class SeriesBible:
             # -------------------------------------------------------------
             # Zliczanie częstotliwości pierwszych członów imion w serii dla jednoznacznej identyfikacji O(1)
             first_name_counts = Counter()
-            for ch_k in self.data["characters"].keys():
+            # Zliczanie wystąpień nazwisk pod kątem konfliktów p0_gender
+            surname_genders = defaultdict(set)
+            for ch_k, c_ent in self.data["characters"].items():
                 if "->" in ch_k:
                     continue
                 cl_k = extract_clean_speaker_name(ch_k).strip()
@@ -5664,6 +5763,15 @@ class SeriesBible:
                     fn = toks[0].lower()
                     if len(fn) >= 2 and fn not in ("von", "van", "de", "del", "di", "da", "the", "san", "sama", "kun", "chan", "senpai"):
                         first_name_counts[fn] += 1
+                if len(toks) > 1:
+                    last_tok = toks[-1].lower()
+                    last_tok_norm = normalize_ascii_diacritics(last_tok)
+                    char_g = str(c_ent.get("gender") or "").upper() if isinstance(c_ent, dict) else ""
+                    if char_g in ("MALE", "FEMALE"):
+                        surname_genders[last_tok].add(char_g)
+                        surname_genders[last_tok_norm].add(char_g)
+
+            conflicting_surnames = {s_tok for s_tok, g_set in surname_genders.items() if len(g_set) > 1}
 
             for char_name, c_val in list(self.data["characters"].items()):
                 if "->" in char_name:
@@ -5734,10 +5842,20 @@ class SeriesBible:
 
                     for tok in c_tokens[1:]:
                         if len(tok) >= 2 and tok.lower() not in ("von", "van", "de", "del", "di", "da", "the", "san", "sama", "kun", "chan", "senpai"):
-                            aliases_set.add(tok)
-                            tok_folded = normalize_ascii_diacritics(tok)
-                            if tok_folded != tok:
-                                aliases_set.add(tok_folded)
+                            tok_norm = normalize_ascii_diacritics(tok.lower())
+                            if tok.lower() not in conflicting_surnames and tok_norm not in conflicting_surnames:
+                                aliases_set.add(tok)
+                                tok_folded = normalize_ascii_diacritics(tok)
+                                if tok_folded != tok:
+                                    aliases_set.add(tok_folded)
+
+                # Oczyszczenie istniejacych aliasow z jednowyrazowych nazwisk kolidujacych plcia
+                aliases_set = {
+                    a for a in aliases_set
+                    if len(a.split()) > 1 or (a.lower() not in conflicting_surnames and normalize_ascii_diacritics(a.lower()) not in conflicting_surnames)
+                }
+                aliases_set.add(char_name)
+                aliases_set.add(clean_c)
                 base_c = extract_base_canonical_name(clean_c)
                 if base_c and base_c != clean_c:
                     aliases_set.add(base_c)
@@ -5750,7 +5868,7 @@ class SeriesBible:
             # Czyszczenie wpisów będących złożonymi deskrypcjami z declensions
             if "declensions" in self.data and isinstance(self.data["declensions"], dict):
                 for d_k in list(self.data["declensions"].keys()):
-                    if is_complex_description(d_k):
+                    if is_sign_entity(d_k) or is_generic_actor_or_category(d_k) or is_complex_description(d_k) or not is_valid_anthroponymic_phonotactics(d_k):
                         del self.data["declensions"][d_k]
 
             # Pasywna weryfikacja paradygmatów fleksyjnych postaci
@@ -5783,6 +5901,22 @@ class SeriesBible:
             "święty", "święta", "siostra", "brat", "ojciec", "matka", "młody", "młoda",
             "stary", "stara", "pan", "pani"
         }
+
+        # Identyfikacja kolizyjnych nazwisk z rozbieżnymi płciami
+        surname_genders = defaultdict(set)
+        for c_n, c_e in self.data["characters"].items():
+            if "->" in c_n or not isinstance(c_e, dict):
+                continue
+            c_toks = extract_clean_speaker_name(c_n).split()
+            if len(c_toks) > 1:
+                s_tok = c_toks[-1].lower()
+                s_norm = normalize_ascii_diacritics(s_tok)
+                cg = str(c_e.get("gender") or "").upper()
+                if cg in ("MALE", "FEMALE"):
+                    surname_genders[s_tok].add(cg)
+                    surname_genders[s_norm].add(cg)
+        conflicting_surnames = {st for st, gs in surname_genders.items() if len(gs) > 1}
+
         sorted_chars = sorted(self.data["characters"].items(), key=_char_priority_key, reverse=True)
         for c_name, c_entry in sorted_chars:
             if "->" in c_name or not isinstance(c_entry, dict):
@@ -5793,8 +5927,9 @@ class SeriesBible:
                 candidates.append(clean_c)
             for tok in clean_c.split():
                 tok_strip = tok.strip()
-                if tok_strip and tok_strip not in candidates:
-                    candidates.append(tok_strip)
+                if tok_strip and tok_strip.lower() not in conflicting_surnames and normalize_ascii_diacritics(tok_strip.lower()) not in conflicting_surnames:
+                    if tok_strip not in candidates:
+                        candidates.append(tok_strip)
             for al in candidates:
                 al_low = al.lower().strip()
                 al_folded = normalize_ascii_diacritics(al).lower().strip()
@@ -5802,12 +5937,15 @@ class SeriesBible:
                     continue
                 if len(al_low) < 2:
                     continue
+                if len(al.split()) == 1 and (al_low in conflicting_surnames or al_folded in conflicting_surnames):
+                    continue
                 if al_low and al_low not in self._actor_aliases_index:
                     self._actor_aliases_index[al_low] = c_name
                 if al_folded and al_folded not in self._actor_aliases_index:
                     self._actor_aliases_index[al_folded] = c_name
                 al_low_f = al_low.replace("ph", "f")
                 if al_low_f and al_low_f not in self._actor_aliases_index:
+                    self._actor_aliases_index[al_low_f] = c_name
                     self._actor_aliases_index[al_low_f] = c_name
                 al_folded_f = al_folded.replace("ph", "f")
                 if al_folded_f and al_folded_f not in self._actor_aliases_index:
@@ -7099,6 +7237,14 @@ class SeriesBible:
                 for name, details in list(characters.items()):
                     if not name or not details:
                         continue
+                    # Filtrowanie szyldów, ról generycznych i powiadomień ciągłości
+                    if is_sign_entity(name) or is_generic_actor_or_category(name) or not is_valid_anthroponymic_phonotactics(name):
+                        continue
+                    if isinstance(details, dict):
+                        if details.get("is_sign") or details.get("role") in ("sign", "napis"):
+                            continue
+                        if details.get("source") == "continuity_bridge_alerts" or details.get("role") == "continuity_bridge_alert" or details.get("is_continuity_alert"):
+                            continue
                     clean_details = self._sanitize_character_entry(name, details)
                     if "->" in name:
                         self.data["relationships"][name] = clean_details
@@ -7166,7 +7312,16 @@ class SeriesBible:
                                             p_g = "MALE"
 
                                     g_str = "KOBIETA" if p_g == "FEMALE" else "MĘŻCZYZNA"
-                                    self.data["characters"][clean_p] = {"description": f"{g_str} (wyodrębniono z relacji serii)"}
+                                    self.data["characters"][clean_p] = {
+                                        "description": f"{g_str} (wyodrębniono z relacji serii)",
+                                        "gender": p_g,
+                                        "grammatical_gender": "FEMININE" if p_g == "FEMALE" else "MASCULINE",
+                                        "has_verified_gender": True,
+                                        "confidence": 0.95,
+                                        "priority": "P0",
+                                        "aliases": [clean_p],
+                                        "entity_category": EntityCategory.ANTHROPONYM.value
+                                    }
                                     self.data["declensions"][clean_p] = generate_polish_name_declension(clean_p, p_g)
                         continue
 
@@ -7258,6 +7413,7 @@ class SeriesBible:
                             if len(clean_v) >= 3 and not any(ch in clean_v for ch in "{}[]():;"):
                                 if "declensions" not in self.data:
                                     self.data["declensions"] = {}
+                                self.data["declensions"][clean_k] = generate_polish_name_declension(clean_v, "UNKNOWN")
                                 if clean_v not in self.data["declensions"] and clean_v[0].isupper() and not self.is_non_character_entity(clean_v):
                                     self.data["declensions"][clean_v] = generate_polish_name_declension(clean_v, "UNKNOWN")
 

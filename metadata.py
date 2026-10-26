@@ -172,6 +172,25 @@ def clean_anime_filename(filename_or_path: str) -> str:
     name = re.sub(r"\s+", " ", name).strip()
     return name
 
+def normalize_anime_slug(title: str) -> str:
+    """
+    Normalizuje tytul serii lub nazwe pliku do spojnego, deterministycznego sluga:
+    Usuwa nawiasy, oznaczenia sezonow i epizodow, przeksztalcajac tekst w format z malych liter i podkreslnikow.
+    """
+    if not title:
+        return ""
+    cleaned = clean_anime_filename(title) or title
+    clean = re.sub(r"\[[^\]]*\]", "", cleaned)
+    clean = re.sub(r"\([^)]*\)", "", clean)
+    clean = re.sub(r"S0?\d+|Season\s*\d+|2nd\s*Season|\bOdc\b.*|\bEp\b.*|-.*", "", clean, flags=re.IGNORECASE)
+    clean = re.sub(r"[^a-zA-Z0-9]+", " ", clean).strip().lower()
+    tokens = clean.split()
+    if not tokens:
+        return ""
+    if len(tokens) == 3 and tokens[1] == "no":
+        return tokens[2]
+    return "_".join(tokens)
+
 def strip_season_suffix(title: str) -> Optional[str]:
     """
     Strips season suffixes (e.g. S2, Season 2, 2nd Season, Part 2, Cour 2, Roman numerals)

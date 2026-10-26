@@ -126,8 +126,7 @@
       "priority": "P0",
       "aliases": [
         "Elsa",
-        "Elsa von Mueller",
-        "Mueller"
+        "Elsa von Mueller"
       ],
       "entity_category": "ANTHROPONYM"
     },
@@ -175,8 +174,7 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
-        "Hrabia Mueller",
-        "Mueller"
+        "Hrabia Mueller"
       ],
       "entity_category": "ANTHROPONYM"
     },
@@ -280,18 +278,6 @@
       "priority": "P0",
       "aliases": [
         "Herz"
-      ],
-      "entity_category": "ANTHROPONYM"
-    },
-    "Neighbor": {
-      "description": "KOBIETA (zweryfikowano z audio seiyū Whisper)",
-      "gender": "FEMALE",
-      "grammatical_gender": "FEMININE",
-      "has_verified_gender": true,
-      "confidence": 0.95,
-      "priority": "P0",
-      "aliases": [
-        "Neighbor"
       ],
       "entity_category": "ANTHROPONYM"
     },
@@ -612,16 +598,6 @@
       "Ms": "Cesarstwie Ohgen",
       "W": "Cesarstwo Ohgen"
     },
-    "Neighbor": {
-      "M": "Neighbor",
-      "D": "Neighbor",
-      "C": "Neighbor",
-      "B": "Neighbor",
-      "N": "Neighbor",
-      "Ms": "Neighbor",
-      "W": "Neighbor",
-      "gender": "FEMALE"
-    },
     "Mother": {
       "M": "Mother",
       "D": "Mother",
@@ -702,7 +678,6 @@
     "Hoshizaki": "ANTHROPONYM",
     "Równiny Rectan": "ANTHROPONYM",
     "Herz": "ANTHROPONYM",
-    "Neighbor": "ANTHROPONYM",
     "Mother": "ANTHROPONYM",
     "Boyfriend": "ANTHROPONYM",
     "Masayuki": "ANTHROPONYM",

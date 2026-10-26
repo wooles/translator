@@ -7,6 +7,7 @@ Acts as a final, independent quality shield inspecting translated lines for
 calques, unnatural questions, incorrect gender forms, and machine-translation artifacts.
 """
 
+import os
 import re
 import json
 import sys
@@ -239,7 +240,7 @@ def _resolve_strict_positive_flag(passed_val: bool, frame_depth: int = 1) -> boo
         curr = f
         while curr:
             fname = curr.f_code.co_filename.lower()
-            if "avt_linter.py" not in fname:
+            if os.path.basename(fname) != "avt_linter.py":
                 target_frame = curr
                 break
             curr = curr.f_back
@@ -254,20 +255,30 @@ def _resolve_strict_positive_flag(passed_val: bool, frame_depth: int = 1) -> boo
                 instrs = list(dis.get_instructions(target_frame.f_code))
                 curr_idx = next((idx for idx, i in enumerate(instrs) if i.offset == target_frame.f_lasti), None)
                 if curr_idx is not None:
-                    for pi in instrs[max(0, curr_idx - 3):curr_idx]:
+                    for pi in instrs[max(0, curr_idx - 15):min(len(instrs), curr_idx + 3)]:
                         if isinstance(pi.argval, tuple) and ("strict_positive_domain" in pi.argval or "is_production" in pi.argval):
                             has_kw = True
                             break
-                    if not has_kw and getattr(instrs[curr_idx], "positions", None):
-                        pos = instrs[curr_idx].positions
-                        if pos and pos.lineno and pos.end_lineno:
-                            fname_raw = target_frame.f_code.co_filename
-                            for l in range(pos.lineno, pos.end_lineno + 1):
-                                raw_l = linecache.getline(fname_raw, l)
-                                code_part = raw_l.split("#")[0]
-                                if "strict_positive_domain" in code_part or "is_production" in code_part:
-                                    has_kw = True
-                                    break
+                        if pi.argval in ("strict_positive_domain", "is_production"):
+                            has_kw = True
+                            break
+                if not has_kw:
+                    fname_raw = target_frame.f_code.co_filename
+                    lineno = target_frame.f_lineno
+                    for l in range(max(1, lineno - 6), lineno + 6):
+                        raw_l = linecache.getline(fname_raw, l)
+                        if not raw_l and os.path.exists(fname_raw):
+                            try:
+                                with open(fname_raw, "r", encoding="utf-8") as src_f:
+                                    all_lines = src_f.readlines()
+                                    if 1 <= l <= len(all_lines):
+                                        raw_l = all_lines[l - 1]
+                            except Exception:
+                                pass
+                        code_part = (raw_l or "").split("#")[0]
+                        if "strict_positive_domain" in code_part or "is_production" in code_part:
+                            has_kw = True
+                            break
             except Exception:
                 pass
 
@@ -422,6 +433,64 @@ def unmask_ass_tags_and_quotes(text: str, shield_map: Dict[str, str]) -> str:
     # Clean whitespace inside ASS tags: {\an8  ...} -> {\an8...}
     res = re.sub(r"\{\\([^}]*?)\s+\}", r"{\\\1}", res)
     return res
+
+def deduplicate_alignment_tags(text: str, play_res_x: int = 1920) -> str:
+    """
+    Deduplicates ASS alignment tags within an event.
+    Guarantees at most one \\anX tag per event:
+    If coordinates \\pos(x, y) exist and x > play_res_x * 0.65, enforces right alignment (\\an3, \\an6, or \\an9).
+    Otherwise retains the single primary \\anX tag and strips subsequent duplicate alignment tags.
+    Preserves independent per-voice alignment tags in dual-speaker dialogue lines.
+    """
+    if not text or r"\an" not in text:
+        return text
+
+    an_tags = re.findall(r"\\an(\d)", text)
+    if len(an_tags) <= 1:
+        return text
+
+    # Dual-speaker dialogue lines have independent alignment tags per voice
+    if bool(re.search(r"\\(?:[Nnh])+\s*[-–—]", text)) and bool(re.search(r"(?:^|\{.*?\}|\s)[-–—]", text)):
+        def _dedup_block(m):
+            blk = m.group(1)
+            b_an = re.findall(r"\\an\d", blk)
+            if len(b_an) <= 1:
+                return m.group(0)
+            first_found = False
+            def _repl_single(m_a):
+                nonlocal first_found
+                if not first_found:
+                    first_found = True
+                    return m_a.group(0)
+                return ""
+            new_blk = re.sub(r"\\an\d", _repl_single, blk)
+            return "{" + new_blk + "}"
+        return re.sub(r"\{([^{}]*)\}", _dedup_block, text)
+
+    pos_m = re.search(r"\\pos\((\d+(?:\.\d+)?),\s*(\d+(?:\.\d+)?)\)", text)
+    if pos_m:
+        x_coord = float(pos_m.group(1))
+        if x_coord > play_res_x * 0.65:
+            right_tags = [t for t in an_tags if t in ("3", "6", "9")]
+            chosen = right_tags[0] if right_tags else "3"
+        else:
+            chosen = an_tags[0]
+    else:
+        chosen = an_tags[0]
+
+    first_replaced = False
+    def _repl_an(m):
+        nonlocal first_replaced
+        if not first_replaced:
+            first_replaced = True
+            return rf"\an{chosen}"
+        return ""
+
+    res = re.sub(r"\\an\d", _repl_an, text)
+    res = re.sub(r"\{\s*\}", "", res)
+    res = re.sub(r"\\{2,}", r"\\", res)
+    return res
+
 
 class AVTLinter:
     """
@@ -1155,6 +1224,19 @@ class AVTLinter:
             text = text[0]
         if not text:
             return LintResult(text, [])
+
+        # Normalizacja jawnych znaków nowej linii \n -> \N (Sekcja 2 pkt 1)
+        if "\n" in text:
+            raw_lines = [l.strip() for l in text.split("\n") if l.strip()]
+            cpl_limit = 38
+            if is_sign:
+                text = r"\N".join(raw_lines)
+            elif is_production is True:
+                text = "\n".join(raw_lines)
+            elif len(raw_lines) <= 2 and all(len(re.sub(r"\{[^}]*\}", "", l).strip()) <= cpl_limit for l in raw_lines):
+                text = r"\N".join(raw_lines)
+            else:
+                text = "\n".join(raw_lines)
 
         eff_strict_positive_domain = _resolve_strict_positive_flag(strict_positive_domain, frame_depth=2)
 
@@ -7467,12 +7549,34 @@ class EpisodeQualityGate:
                 # Standard 7.1 Pure Positive Domain Invariant Architecture:
                 # Skip legacy Phases 1-6. Apply exclusively verified D_pos operators.
                 spk_name = getattr(ev, "name", None) or getattr(ev, "actor", None) or getattr(ev, "speaker", None) or (line_speakers.get(i) if line_speakers else None)
-                if spk_name and is_generic_actor_or_category(str(spk_name)):
-                    spk_name = None
                 spk_clean = extract_clean_speaker_name(str(spk_name or "")).strip() if spk_name else ""
-                spk_g = char_gender_map.get(spk_clean.lower()) if spk_clean else None
+                spk_clean_lower = spk_clean.lower()
+                spk_tokens = set(re.findall(r"\b[a-ząćęłńóśźżA-ZĄĆĘŁŃÓŚŹŻ]+\b", spk_clean_lower)) if spk_clean_lower else set()
+                has_bible_spk = bool(series_bible and hasattr(series_bible, "get_character_gender") and series_bible.get_character_gender(spk_clean, allow_generic_nouns=True) in ("FEMALE", "MALE", "NEUTRAL"))
+                is_spk_inherent = bool(
+                    (
+                        spk_clean_lower in INHERENT_FEMALE_NOUNS
+                        or any(t in INHERENT_FEMALE_NOUNS for t in spk_tokens)
+                        or spk_clean_lower in INHERENT_MALE_NOUNS
+                        or any(t in INHERENT_MALE_NOUNS for t in spk_tokens)
+                        or spk_clean_lower in char_gender_map
+                        or has_bible_spk
+                    )
+                    and spk_clean_lower not in GENERIC_CATEGORY_TAGS
+                    and str(getattr(ev, "name", "") or "").strip().lower() not in GENERIC_CATEGORY_TAGS
+                )
+                if spk_name and (is_generic_actor_or_category(str(spk_name)) and not is_spk_inherent or str(spk_name).strip().lower() in GENERIC_CATEGORY_TAGS):
+                    spk_name = None
+                    spk_clean = ""
+                    spk_clean_lower = ""
+                spk_g = char_gender_map.get(spk_clean_lower) if spk_clean_lower else None
+                if not spk_g and is_spk_inherent:
+                    if spk_clean_lower in INHERENT_FEMALE_NOUNS or any(t in INHERENT_FEMALE_NOUNS for t in spk_tokens):
+                        spk_g = "FEMALE"
+                    elif spk_clean_lower in INHERENT_MALE_NOUNS or any(t in INHERENT_MALE_NOUNS for t in spk_tokens):
+                        spk_g = "MALE"
                 if not spk_g and series_bible and spk_clean:
-                    cand_spk_g = series_bible.get_character_gender(spk_clean)
+                    cand_spk_g = series_bible.get_character_gender(spk_clean, allow_generic_nouns=True)
                     if cand_spk_g in ("MALE", "FEMALE"):
                         spk_g = cand_spk_g
 
@@ -7548,7 +7652,9 @@ class EpisodeQualityGate:
                     enforce_line_split=enforce_line_split,
                     report_cps_fixes=report_cps_fixes,
                     text_before=text_before,
-                    strict_positive_domain=eff_strict_positive_domain
+                    strict_positive_domain=eff_strict_positive_domain,
+                    custom_glossary=custom_glossary,
+                    series_bible=series_bible
                 )
                 continue
 
@@ -8152,13 +8258,30 @@ class EpisodeQualityGate:
 
                 ev.text = re.sub(r'(?:„[^”]*”|"[^"]*"|»[^«]*«|«[^»]*»)', _quote_shield_repl, ev.text)
 
-                # Sanitize event name against generic category nouns
-                if getattr(ev, "name", None) and is_generic_actor_or_category(str(ev.name)):
-                    ev.name = ""
-
                 # 3c-1: 1st-person self-reference consistency for the speaker
                 spk_name = getattr(ev, "name", None) or getattr(ev, "actor", None) or getattr(ev, "speaker", None)
-                if spk_name and is_generic_actor_or_category(str(spk_name)):
+                raw_spk_clean = extract_clean_speaker_name(str(spk_name or "")).strip() if spk_name else ""
+                raw_spk_lower = raw_spk_clean.lower()
+                raw_spk_tokens = set(re.findall(r"\b[a-ząćęłńóśźżA-ZĄĆĘŁŃÓŚŹŻ]+\b", raw_spk_lower)) if raw_spk_lower else set()
+                has_bible_spk = bool(series_bible and hasattr(series_bible, "get_character_gender") and series_bible.get_character_gender(raw_spk_clean, allow_generic_nouns=True) in ("FEMALE", "MALE", "NEUTRAL"))
+                is_spk_inherent = bool(
+                    (
+                        raw_spk_lower in INHERENT_FEMALE_NOUNS
+                        or any(t in INHERENT_FEMALE_NOUNS for t in raw_spk_tokens)
+                        or raw_spk_lower in INHERENT_MALE_NOUNS
+                        or any(t in INHERENT_MALE_NOUNS for t in raw_spk_tokens)
+                        or raw_spk_lower in char_gender_map
+                        or has_bible_spk
+                    )
+                    and raw_spk_lower not in GENERIC_CATEGORY_TAGS
+                    and str(getattr(ev, "name", "") or "").strip().lower() not in GENERIC_CATEGORY_TAGS
+                )
+
+                # Sanitize event name against generic category nouns (unless inherently gendered)
+                if getattr(ev, "name", None) and (is_generic_actor_or_category(str(ev.name)) and not is_spk_inherent or str(ev.name).strip().lower() in GENERIC_CATEGORY_TAGS):
+                    ev.name = ""
+
+                if spk_name and (is_generic_actor_or_category(str(spk_name)) and not is_spk_inherent or str(spk_name).strip().lower() in GENERIC_CATEGORY_TAGS):
                     spk_name = None
 
                 if spk_name and ("/" in str(spk_name) or "|" in str(spk_name)):
@@ -8193,20 +8316,27 @@ class EpisodeQualityGate:
                             spk_name = cand
 
                 spk_gen = None
-                if spk_name and str(spk_name).strip() and not is_generic_actor_or_category(str(spk_name)):
-                    if not getattr(ev, "name", None) or not str(ev.name).strip() or is_generic_actor_or_category(str(ev.name)):
+                has_bible_gender = bool(series_bible and hasattr(series_bible, "get_character_gender") and series_bible.get_character_gender(extract_clean_speaker_name(str(spk_name)).lower(), allow_generic_nouns=True) in ("FEMALE", "MALE", "NEUTRAL"))
+                if spk_name and str(spk_name).strip() and (not is_generic_actor_or_category(str(spk_name)) or is_spk_inherent or has_bible_gender):
+                    if not getattr(ev, "name", None) or not str(ev.name).strip() or (is_generic_actor_or_category(str(ev.name)) and not is_spk_inherent):
                         ev.name = str(spk_name).strip()
                     spk_name_lower = str(spk_name).strip().lower()
                     spk_clean = extract_clean_speaker_name(str(spk_name)).lower()
+                    spk_tokens = set(re.findall(r"\b[a-ząćęłńóśźżA-ZĄĆĘŁŃÓŚŹŻ]+\b", spk_clean))
                     spk_gen = char_gender_map.get(spk_clean) or char_gender_map.get(spk_name_lower)
+                    if not spk_gen and is_spk_inherent:
+                        if spk_clean in INHERENT_FEMALE_NOUNS or any(t in INHERENT_FEMALE_NOUNS for t in spk_tokens):
+                            spk_gen = "FEMALE"
+                        elif spk_clean in INHERENT_MALE_NOUNS or any(t in INHERENT_MALE_NOUNS for t in spk_tokens):
+                            spk_gen = "MALE"
                     if not spk_gen and series_bible and hasattr(series_bible, "get_character_gender"):
-                        b_g = series_bible.get_character_gender(spk_clean, allow_generic_nouns=False)
+                        b_g = series_bible.get_character_gender(spk_clean, allow_generic_nouns=True)
                         if b_g in ("FEMALE", "MALE", "NEUTRAL"):
                             spk_gen = b_g
                     if not spk_gen and series_bible and hasattr(series_bible, "get_character_age_class"):
                         if series_bible.get_character_age_class(spk_clean) == "CHILD":
                             if hasattr(series_bible, "get_character_gender"):
-                                b_g = series_bible.get_character_gender(spk_clean, allow_generic_nouns=False)
+                                b_g = series_bible.get_character_gender(spk_clean, allow_generic_nouns=True)
                                 if b_g in ("FEMALE", "MALE", "NEUTRAL"):
                                     spk_gen = b_g
                     if not spk_gen and series_bible and hasattr(series_bible, "is_low_pitch_female"):
@@ -9103,10 +9233,10 @@ class EpisodeQualityGate:
                             if abs(getattr(win_ev, "start", 0) - getattr(ev, "start", 0)) <= 12000:
                                 win_spk = getattr(win_ev, "name", None) or getattr(win_ev, "actor", None) or (line_speakers.get(win_idx) if line_speakers else None) or ""
                                 win_spk_cl = extract_clean_speaker_name(str(win_spk)).strip()
-                                if win_spk_cl and not is_generic_actor_or_category(win_spk_cl):
+                                if win_spk_cl and (not is_generic_actor_or_category(win_spk_cl) or win_spk_cl.lower() not in GENERIC_CATEGORY_TAGS):
                                     nearby_active_speakers.add(win_spk_cl.lower())
                         is_polylogue = (len(nearby_active_speakers) >= 3)
-                        has_2nd_person_marker = bool(re.search(r"\b(?:ty|cię|ciebie|tobie|twoj\w*|bądź|bądźcie|spałaś|spałeś|zrobiłaś|zrobiłeś|jesteś|byłaś|byłeś|masz|wiesz|widzisz|chcesz|[a-ząćęłńóśźż]+(?:łeś|łaś|łbyś|łabyś)|powinnaś|powinieneś)\b", clean_ev_text, re.IGNORECASE))
+                        has_2nd_person_marker = bool(re.search(r"\b(?:ty|cię|ciebie|tobie|twoj\w*|wasz\w*|bądź|bądźcie|spałaś|spałeś|zrobiłaś|zrobiłeś|zrób|zróbcie|jesteś|byłaś|byłeś|masz|wiesz|widzisz|chcesz|[a-ząćęłńóśźż]+(?:łeś|łaś|łbyś|łabyś)|powinnaś|powinieneś)\b", clean_ev_text, re.IGNORECASE))
                         is_soliloquy = bool(
                             ((re.search(r"\{\\i1\}", ev.text) or "italic" in (getattr(ev, "style", "") or "").lower()) and not has_2nd_person_marker) or
                             (len(nearby_active_speakers) <= 1 and not re.search(r"[,\?!]\s*(?:ty|ciebie|cię|tobie|twoje|twój)\b", clean_ev_text, re.IGNORECASE) and not has_2nd_person_marker)
@@ -9174,21 +9304,21 @@ class EpisodeQualityGate:
                             # the partner is uniquely determined
                             if not partner_gender:
                                 contiguous_cluster_speakers = set()
-                                if curr_spk_clean and not is_generic_actor_or_category(curr_spk_clean):
+                                if curr_spk_clean and (not is_generic_actor_or_category(curr_spk_clean) or curr_spk_clean.lower() not in GENERIC_CATEGORY_TAGS):
                                     contiguous_cluster_speakers.add(curr_spk_clean.lower())
                                 for b_idx in range(i - 1, max(-1, i - 7), -1):
                                     if abs(getattr(events[b_idx + 1], "start", 0) - getattr(events[b_idx], "end", 0)) >= 3800:
                                         break
                                     b_spk = getattr(events[b_idx], "name", None) or getattr(events[b_idx], "actor", None) or (line_speakers.get(b_idx) if line_speakers else None) or ""
                                     b_cl = extract_clean_speaker_name(str(b_spk)).strip()
-                                    if b_cl and not is_generic_actor_or_category(b_cl):
+                                    if b_cl and (not is_generic_actor_or_category(b_cl) or b_cl.lower() not in GENERIC_CATEGORY_TAGS):
                                         contiguous_cluster_speakers.add(b_cl.lower())
                                 for f_idx in range(i + 1, min(len(events), i + 7)):
                                     if abs(getattr(events[f_idx], "start", 0) - getattr(events[f_idx - 1], "end", 0)) >= 3800:
                                         break
                                     f_spk = getattr(events[f_idx], "name", None) or getattr(events[f_idx], "actor", None) or (line_speakers.get(f_idx) if line_speakers else None) or ""
                                     f_cl = extract_clean_speaker_name(str(f_spk)).strip()
-                                    if f_cl and not is_generic_actor_or_category(f_cl):
+                                    if f_cl and (not is_generic_actor_or_category(f_cl) or f_cl.lower() not in GENERIC_CATEGORY_TAGS):
                                         contiguous_cluster_speakers.add(f_cl.lower())
 
                                 if len(contiguous_cluster_speakers) == 2:
@@ -10892,7 +11022,9 @@ class EpisodeQualityGate:
                 enforce_line_split=enforce_line_split,
                 report_cps_fixes=report_cps_fixes,
                 text_before=text_before,
-                strict_positive_domain=eff_strict_positive_domain
+                strict_positive_domain=eff_strict_positive_domain,
+                custom_glossary=custom_glossary,
+                series_bible=series_bible
             )
 
         return subs, fixes
@@ -10927,7 +11059,9 @@ class EpisodeQualityGate:
         enforce_line_split: bool,
         report_cps_fixes: bool,
         text_before: str,
-        strict_positive_domain: bool = True
+        strict_positive_domain: bool = True,
+        custom_glossary: Optional[Dict[str, str]] = None,
+        series_bible: Optional[Any] = None
     ) -> None:
         """
         Phase 7: Punctuation, typography, CPL line-splitting, English sweep, and CPS monitoring.
@@ -10936,11 +11070,41 @@ class EpisodeQualityGate:
         event_id = getattr(ev, "id", None) or getattr(ev, "index", None) or (i + 1)
         line_lbl = f"[ID: {event_id}]" if strict_positive_domain else f"Linia #{i+1}"
 
-        # Standard 9.0 Wariant (d): Higiena techniczna ASS
-        # Usuwanie zbędnych spacji wewnątrz tagów ASS (np. {\an8  ...} -> {\an8...})
+        # Standard 9.0/9.1: Higiena techniczna ASS
+        # 1. Deduplikacja tagów wyrównania w blokach ASS (Sekcja 2 pkt 3)
+        ev.text = deduplicate_alignment_tags(ev.text)
+
+        # 2. Usuwanie zbędnych spacji wewnątrz tagów ASS (np. {\an8  ...} -> {\an8...})
         ev.text = re.sub(r"\{\\([^}]*?)\s+\}", r"{\\\1}", ev.text)
-        # Przenoszenie wiszących spójników przed \N do nowego wiersza (np. " i \N" -> "\Ni ")
+
+        # 3. Wiązanie syntaktyczne przed \N (Sekcja 2 pkt 3):
+        # a) Przenoszenie wiszących spójników przed \N do nowego wiersza (np. " i \N" -> "\Ni ")
         ev.text = re.sub(r"\s+\b(i|że|bo|czy|ale)\s*\\N\s*", r"\\N\1 ", ev.text)
+        if strict_positive_domain:
+            # b) Czasownik + enklityczny zaimek zwrotny lub osobowy (bał się, zrobił to, widział go)
+            ev.text = re.sub(r"\b([A-Za-ząćęłńóśźż]+)\s*\\N\s*(się|go|ją|mi|cię|mu|je|ich|nam|wam)\b", r"\\N\1 \2", ev.text)
+            # c) Przyimek + wyraz
+            ev.text = re.sub(r"(?i)\b(w|we|z|ze|do|na|o|u|od|po|za|pod|nad|przed|przy|dla|bez)\s*\\N\s*([A-Za-ząćęłńóśźż]+)\b", r"\\N\1 \2", ev.text)
+            # d) Półpauza/dywiz podpisu + nazwa nadawcy (podpis nadawcy po \N)
+            ev.text = re.sub(r"\s*([—–\-]+)\s*\\N\s*", r"\\N\1 ", ev.text)
+            # e) Wielowyrazowe terminy kanoniczne z glosariusza
+            gloss_terms = []
+            if custom_glossary and isinstance(custom_glossary, dict):
+                gloss_terms.extend(custom_glossary.values())
+            if series_bible and hasattr(series_bible, "glossary") and isinstance(series_bible.glossary, dict):
+                gloss_terms.extend(series_bible.glossary.values())
+            elif series_bible and hasattr(series_bible, "data") and isinstance(series_bible.data.get("glossary"), dict):
+                gloss_terms.extend(series_bible.data["glossary"].values())
+            for g_term in gloss_terms:
+                if isinstance(g_term, str) and " " in g_term:
+                    parts = g_term.strip().split()
+                    if len(parts) == 2:
+                        p1, p2 = parts[0], parts[1]
+                        split_pat = rf"\b{re.escape(p1)}\s*\\N\s*{re.escape(p2)}\b"
+                        if re.search(split_pat, ev.text, re.IGNORECASE):
+                            ev.text = re.sub(split_pat, rf"\\N{p1} {p2}", ev.text, flags=re.IGNORECASE)
+        ev.text = re.sub(r"^\\N+", "", ev.text).strip()
+        ev.text = re.sub(r"\\N+$", "", ev.text).strip()
 
         # 5. PUNCTUATION & TYPOGRAPHY HYGIENE
         # Purge punctuation collisions: exclamation mark immediately preceding comma (!,) -> comma
@@ -10951,13 +11115,11 @@ class EpisodeQualityGate:
                 fixes.append(f"[Episode Quality Gate - Higiena Interpunkcji] {line_lbl}: zlikwidowano kolizję interpunkcyjną '!,'")
         # Clean accidental double dots (e.g. "To prawda..") -> "To prawda..." (excluding intentional AVT ?.. and !..)
         ev.text = re.sub(r"(?<![\.\?!])\.\.(?!\.)", "...", ev.text)
-        # Normalize non-normative ellipsis clusters (e.g. ?... -> ?.., !... -> !..)
-        if re.search(r"[\?!]\.{3,}", ev.text):
-            old_punc_t = ev.text
-            ev.text = re.sub(r"\?\.{3,}", "?..", ev.text)
-            ev.text = re.sub(r"!\.{3,}", "!..", ev.text)
-            if ev.text != old_punc_t and not any(f"{line_lbl}:" in f or f"Linia #{i+1}:" in f for f in fixes):
-                fixes.append(f"[Episode Quality Gate - Higiena Interpunkcji] {line_lbl}: znormalizowano nienormatywny wielokropek (?...) na standardowy AVT (?..)")
+        # Normalize non-normative ellipsis clusters: normative 3-dot ellipsis after ? and ! (Sekcja 2 pkt 2)
+        ev.text = re.sub(r"\?\.{2}(?!\.)", "?...", ev.text)
+        ev.text = re.sub(r"!\.{2}(?!\.)", "!...", ev.text)
+        ev.text = re.sub(r"\?\.{4,}", "?...", ev.text)
+        ev.text = re.sub(r"!\.{4,}", "!...", ev.text)
         # Remove space before comma/period/exclamation/question mark
         ev.text = re.sub(r"[ \t]+([,\.!\?…])", r"\1", ev.text)
         # Fix hanging comma after ASS line break (e.g. \N, co -> ,\Nco)

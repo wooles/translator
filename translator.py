@@ -61,7 +61,7 @@ from google.genai import types
 from rules import get_translation_system_prompt, get_focused_rules_for_batch, SceneDiagnosis
 from verifier import DialogueVerifier, RefinedLine
 from extract import extract_frame_at_timestamp, extract_audio_slice
-from metadata import get_anime_context, format_anime_context_for_prompt
+from metadata import get_anime_context, format_anime_context_for_prompt, normalize_actor_tag, normalize_anime_slug
 from memory import TranslationMemory, format_translation_memory_for_prompt
 from profiler import EpisodeProfiler, EpisodeProfile, format_episode_profile_for_prompt, format_lean_episode_brief
 from whisper_engine import JapaneseWhisperEngine
@@ -79,7 +79,7 @@ from avt_linter import (
 from romaji_helper import to_romaji
 from series_memory import (
     SeriesBible, extract_clean_speaker_name, INHERENT_FEMALE_NOUNS, INHERENT_MALE_NOUNS,
-    GENERIC_CATEGORY_TAGS, is_generic_actor_or_category, FEMALE_ROLE_KEYWORDS,
+    GENERIC_CATEGORY_TAGS, is_generic_actor_or_category, is_sign_entity, FEMALE_ROLE_KEYWORDS,
     MALE_ROLE_KEYWORDS, BOY_ROLE_KEYWORDS, EntityCategory, DeclensionParadigm,
     classify_entity_category, generate_polish_name_declension, is_plural_actor
 )
@@ -98,7 +98,7 @@ from speaker_diarizer import SpeakerVoiceClassifier
 from typesetting_matcher import TypesettingColorMatcher, VisualTypesettingData
 from user_feedback import UserFeedbackManager
 from glossary_manager import GlossaryManager
-from scene_discourse import DualVoiceTagPreserver, DeicticDiscourseEngine, DiarizationSanityChecker
+from scene_discourse import DualVoiceTagPreserver, DeicticDiscourseEngine, DiarizationSanityChecker, build_discourse_topology
 from client_factory import format_friendly_api_error, patch_google_genai_schema_sanitizer
 from pipeline_logger import EpisodeFlightRecorder
 
@@ -197,6 +197,35 @@ def format_dry_telemetry_tag(
         return ""
 
     return f"[{' | '.join(segments)}]"
+
+def synchronize_ass_event_metadata_and_styles(
+    event: pysubs2.SSAEvent,
+    speaker_name: Optional[str] = None,
+    is_offscreen: bool = False
+) -> pysubs2.SSAEvent:
+    """
+    Synchronizuje pole event.name z wyznaczonym, kanonicznym speaker_name oraz
+    ustawia styl offscreen / formatowanie kursywy dla kwestii wypowiadanych spoza kadru.
+    """
+    if speaker_name:
+        clean_spk, _ = normalize_actor_tag(str(speaker_name))
+        if clean_spk and not is_generic_actor_or_category(clean_spk):
+            event.name = clean_spk
+    elif getattr(event, "name", None):
+        clean_ev_n, _ = normalize_actor_tag(str(event.name))
+        if clean_ev_n and not is_generic_actor_or_category(clean_ev_n):
+            event.name = clean_ev_n
+
+    if is_offscreen:
+        curr_style = str(getattr(event, "style", "") or "")
+        if "offscreen" not in curr_style.lower() and "narrat" not in curr_style.lower():
+            if curr_style:
+                event.style = f"{curr_style} - Offscreen"
+            else:
+                event.style = "Offscreen"
+        if not re.search(r"\{\\i1\}", event.text):
+            event.text = f"{{\\i1}}{event.text}{{\\i0}}"
+    return event
 
 def segment_hybrid_events(events: List[pysubs2.SSAEvent], style_report: Optional[Any] = None) -> List[pysubs2.SSAEvent]:
     """
@@ -1921,18 +1950,35 @@ class MultimodalTranslator:
         alerts = []
         canonical_gender = None
         raw_spk = (getattr(event, "name", None) or raw_speaker_name or "").strip()
-        if is_generic_actor_or_category(raw_spk):
-            raw_spk = ""
         spk_clean = extract_clean_speaker_name(raw_spk) or raw_spk
         spk_lower = spk_clean.lower()
-        tokens = set(re.findall(r"\b[a-ząćęłńóśźżA-ZĄĆĘŁŃÓŚŹŻ]+\b", spk_lower))
+        if spk_lower in GENERIC_CATEGORY_TAGS or raw_spk.lower() in GENERIC_CATEGORY_TAGS:
+            raw_spk = ""
+            spk_clean = ""
+            spk_lower = ""
+        tokens = set(re.findall(r"\b[a-ząćęłńóśźżA-ZĄĆĘŁŃÓŚŹŻ]+\b", spk_lower)) if spk_lower else set()
+        raw_tokens = set(re.findall(r"\b[a-ząćęłńóśźżA-ZĄĆĘŁŃÓŚŹŻ]+\b", raw_spk.lower())) if raw_spk else set()
 
-        # 0. Inherent lexical gender check (e.g. "Girl\\Italic", "Woman", "Boy")
-        if not is_generic_actor_or_category(spk_clean):
-            if spk_lower in INHERENT_FEMALE_NOUNS or any(t in INHERENT_FEMALE_NOUNS for t in tokens):
-                canonical_gender = "kobieta"
-            elif spk_lower in INHERENT_MALE_NOUNS or any(t in INHERENT_MALE_NOUNS for t in tokens):
-                canonical_gender = "mężczyzna"
+        # 0. Inherent lexical gender check (e.g. "Girl\Italic", "Woman", "Boy")
+        if (
+            spk_lower in INHERENT_FEMALE_NOUNS
+            or any(t in INHERENT_FEMALE_NOUNS for t in tokens)
+            or any(t in INHERENT_FEMALE_NOUNS for t in raw_tokens)
+        ):
+            canonical_gender = "kobieta"
+        elif (
+            spk_lower in INHERENT_MALE_NOUNS
+            or any(t in INHERENT_MALE_NOUNS for t in tokens)
+            or any(t in INHERENT_MALE_NOUNS for t in raw_tokens)
+        ):
+            canonical_gender = "mężczyzna"
+
+        if is_generic_actor_or_category(spk_clean):
+            if not canonical_gender:
+                spk_clean = ""
+        if is_generic_actor_or_category(raw_spk):
+            if not canonical_gender:
+                raw_spk = ""
 
         # 1. Canonical Authority Check
         if not canonical_gender and spk_clean:
@@ -2086,6 +2132,26 @@ class MultimodalTranslator:
         tag_is_fem = any(k in tag_text for k in ["żeńsk", "sopran", "kobieta", "alt"])
         has_female_audio = (acoustic_gender == "kobieta") or jp_female_marker or tag_is_fem
 
+        # Sign isolation: signs receive ungendered default telemetry
+        is_sign = (
+            getattr(event, "is_sign", False)
+            or (hasattr(event, "style") and str(event.style).lower() in ("sign", "signs", "napis", "napisy"))
+            or is_sign_entity(spk_clean)
+        )
+        if is_sign:
+            return None, ["[TELEMETRIA: typ=napis_ekranowy]"]
+
+        # Check for verified P0 status
+        has_verified_p0 = False
+        if spk_clean in self.character_registry:
+            desc_check = str(self.character_registry[spk_clean]).lower()
+            if "zweryfikowan" in desc_check or "p0" in desc_check or "anilist" in desc_check:
+                has_verified_p0 = True
+        if hasattr(self, "series_bible") and self.series_bible and hasattr(self.series_bible, "data"):
+            b_info = self.series_bible.data.get("characters", {}).get(spk_clean, {})
+            if isinstance(b_info, dict) and (b_info.get("has_verified_gender") or b_info.get("priority") == "P0"):
+                has_verified_p0 = True
+
         # Standard 9.0 Pure Positive Domain Invariant:
         # Verified P0 record from Series Bible or Character Registry is the SOLE authority.
         # Fallback to FEMININE, F0 heuristics, and ASR token guessing are completely removed.
@@ -2108,7 +2174,8 @@ class MultimodalTranslator:
                 return "mężczyzna", alerts
 
             # Acoustic Primacy Gate (Filar CLXXIV): Untrusted fansub tag contradicted by female audio or scene
-            if res_g == "mężczyzna" and not is_boy_or_crossgender and has_female_audio:
+            has_masc_self = bool(re.search(r"\b(gotów|pewien|świadom|byłem|miałem|widziałem|wiedziałem|zrobiłem|pomyślałem|chciałem|mogłem|poszedłem|powiedziałem|czułem|słyszałem|wróciłem|dostałem|znalazłem|oddałem|zgubiłem|uratowałem|przyszedłem)\b", pl_candidate, re.IGNORECASE))
+            if res_g == "mężczyzna" and not is_boy_or_crossgender and has_female_audio and not (has_verified_p0 and has_masc_self):
                 is_scene_female = False
                 check_idx = event_idx if event_idx is not None else batch_id
                 if hasattr(self, "episode_scene_genders") and self.episode_scene_genders:
@@ -3485,6 +3552,10 @@ class MultimodalTranslator:
                             events=events_tuples,
                             initial_prompt=initial_prompt_str
                         )
+                        # Sign isolation: signs receive empty ASR transcription
+                        for b_id, ev in events_tuples:
+                            if getattr(ev, "is_sign", False) or str(getattr(ev, "style", "")).lower() in ("sign", "signs", "napis", "napisy") or is_sign_entity(getattr(ev, "name", "")):
+                                whisper_transcriptions[b_id] = ""
 
                     # 2. Local prosody analysis (RMS dBFS / whisper / shout)
                     prosody_tags = AudioProsodyEngine.analyze_scene_prosody(
@@ -4433,7 +4504,7 @@ class MultimodalTranslator:
         if self.verifier:
             self.verifier.current_episode_tokens = {"prompt": 0, "cached": 0, "output": 0, "model": self.verifier.model}
 
-        init_slug = subs_file.stem.split(" - ")[0].replace("[ASW]", "").replace("[Erai-raws]", "").strip() or "anime"
+        init_slug = normalize_anime_slug(subs_file.stem) or "anime"
         if getattr(self, "trace_log", True):
             try:
                 self.flight_recorder = EpisodeFlightRecorder(
@@ -4909,7 +4980,7 @@ class MultimodalTranslator:
                 rel_dict = getattr(self.series_bible, "relations", {}) if hasattr(self, "series_bible") and self.series_bible else {}
                 decl_dict = getattr(self.series_bible, "declensions", {}) if hasattr(self, "series_bible") and self.series_bible else {}
                 bible_sum = {
-                    "slug": getattr(self.series_bible, "slug", "") if hasattr(self, "series_bible") and self.series_bible else "",
+                    "slug": getattr(self.series_bible, "slug", "") or (self.flight_recorder.anime_slug if self.flight_recorder else init_slug),
                     "characters_count": len(char_reg),
                     "glossary_count": len(combined_glossary) if combined_glossary else 0,
                     "relations_count": len(rel_dict),
@@ -5074,6 +5145,7 @@ class MultimodalTranslator:
             coalesce_tail=True
         )
 
+        discourse_turns = build_discourse_topology([item[1] for item in raw_entries], series_bible=self.series_bible)
         if self.flight_recorder:
             try:
                 batches_sum = [
@@ -5089,7 +5161,7 @@ class MultimodalTranslator:
                 ]
                 self.flight_recorder.log_scene_discourse(
                     scene_boundaries=getattr(self, "scene_cuts_ms", []),
-                    turns=[],
+                    turns=discourse_turns,
                     batches_summary=batches_sum
                 )
             except Exception:
@@ -5536,12 +5608,9 @@ class MultimodalTranslator:
             new_event = orig_event.copy()
             new_event.text = full_event_text
             new_event.addressee = translated_addressees.get(master_id)
-            if not getattr(new_event, "name", None) or not str(new_event.name).strip() or is_generic_actor_or_category(str(new_event.name)):
-                spk = translated_speakers.get(master_id)
-                if spk and not is_generic_actor_or_category(spk):
-                    new_event.name = spk
-                else:
-                    new_event.name = ""
+            spk = translated_speakers.get(master_id)
+            is_offs = getattr(orig_event, "is_offscreen", False) or "offscreen" in str(getattr(orig_event, "style", "")).lower()
+            new_event = synchronize_ass_event_metadata_and_styles(new_event, speaker_name=spk, is_offscreen=is_offs)
             new_event.source_en = getattr(orig_event, "plaintext", None) or orig_event.text
             final_subs.events.append(new_event)
 
@@ -5644,10 +5713,13 @@ class MultimodalTranslator:
             else:
                 output_path = str(subs_file.parent / f"{stem}{ext}")
 
-        # Standard 9.0 (Sekcja 2 pkt 5, pkt 7, R3.9):
+        # Standard 9.0/9.1 (Sekcja 2 pkt 5, pkt 6, pkt 7, R3.9):
         # 1. Konwersja znaków \n 1:1 do \N w .ass.
-        # 2. Czyszczenie pola Name (usunięcie technicznych separatorów wielogłosu).
+        # 2. Czyszczenie pola Name i synchronizacja z wyznaczonym speaker_name oraz offscreen/kursywa.
         # 3. Rozbicie kwestii przekraczających limity (> 2 wiersze) na kolejne zdarzenia Dialogue:
+        for ev in final_subs.events:
+            is_offs = getattr(ev, "is_offscreen", False) or "offscreen" in str(getattr(ev, "style", "")).lower()
+            ev = synchronize_ass_event_metadata_and_styles(ev, speaker_name=getattr(ev, "name", None), is_offscreen=is_offs)
         final_subs.events = split_oversized_ass_events(final_subs.events)
 
         final_subs.save(output_path, encoding="utf-8")
@@ -5737,3 +5809,4 @@ class MultimodalTranslator:
 
 # Alias for backwards compatibility
 TranslatorEngine = MultimodalTranslator
+Translator = MultimodalTranslator

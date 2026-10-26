@@ -46,9 +46,10 @@ class EpisodeFlightRecorder:
         enabled: bool = True
     ) -> None:
         self.enabled: bool = enabled
-        self._lock: threading.Lock = threading.Lock()
+        self._lock: threading.RLock = threading.RLock()
         self._initialized: bool = False
         self._finalized: bool = False
+        self._cli_init_logged: bool = False
         self.anime_slug: str = anime_slug or "anime"
         self.filename: str = filename or "episode"
         self.trace_dir: Path = Path(trace_dir or "logs")
@@ -158,22 +159,26 @@ class EpisodeFlightRecorder:
         context_cache_info: Optional[Dict[str, Any]] = None,
         client_pool_info: Optional[Dict[str, Any]] = None
     ) -> None:
-        """Rejestruje KROK 1: Inicjalizację procesu i parametry CLI."""
-        payload = {
-            "cli_args": cli_args,
-            "paths": paths,
-            "models": models,
-            "context_cache": context_cache_info or {},
-            "client_pool": client_pool_info or {}
-        }
-        text_lines = [
-            f"Parametry CLI: {json.dumps(cli_args, default=_safe_json_default, ensure_ascii=False)}",
-            f"Sciezki: {json.dumps(paths, default=_safe_json_default, ensure_ascii=False)}",
-            f"Modele: {json.dumps(models, default=_safe_json_default, ensure_ascii=False)}",
-            f"Pamięć podręczna kontekstu: {json.dumps(context_cache_info or {}, default=_safe_json_default, ensure_ascii=False)}",
-            f"Pula klientów: {json.dumps(client_pool_info or {}, default=_safe_json_default, ensure_ascii=False)}"
-        ]
-        self.record_event("cli_init", payload, message="\n".join(text_lines))
+        """Rejestruje KROK 1: Inicjalizację procesu i parametry CLI (idempotentnie, dokładnie jeden raz)."""
+        with self._lock:
+            if getattr(self, "_cli_init_logged", False):
+                return
+            self._cli_init_logged = True
+            payload = {
+                "cli_args": cli_args,
+                "paths": paths,
+                "models": models,
+                "context_cache": context_cache_info or {},
+                "client_pool": client_pool_info or {}
+            }
+            text_lines = [
+                f"Parametry CLI: {json.dumps(cli_args, default=_safe_json_default, ensure_ascii=False)}",
+                f"Sciezki: {json.dumps(paths, default=_safe_json_default, ensure_ascii=False)}",
+                f"Modele: {json.dumps(models, default=_safe_json_default, ensure_ascii=False)}",
+                f"Pamięć podręczna kontekstu: {json.dumps(context_cache_info or {}, default=_safe_json_default, ensure_ascii=False)}",
+                f"Pula klientów: {json.dumps(client_pool_info or {}, default=_safe_json_default, ensure_ascii=False)}"
+            ]
+        self.record_event("cli_init", payload)
         self.write_log_section("[KROK 1: CLI & INICJALIZACJA PROCESU]", "\n".join(text_lines))
 
     def log_ingestion(

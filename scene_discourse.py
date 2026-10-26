@@ -1905,6 +1905,8 @@ def is_narrative_style(style_str: str) -> bool:
 
 def is_sign_or_title_item(item: Any) -> bool:
     """Sprawdza, czy element jest szyldem lub tytułem."""
+    if getattr(item, "is_sign", False):
+        return True
     s = (getattr(item, "style", "") or "").lower()
     spk = (getattr(item, "speaker", getattr(item, "name", "")) or "").lower()
     return any(k in s or k in spk for k in ["sign", "title", "szyld", "card", "napis"])
@@ -2688,4 +2690,24 @@ def process_scene_discourse(
     turns = resolve_all_speaker_turns(turns, series_bible=series_bible, max_exchange_gap_ms=max_exchange_gap_ms)
     resolve_scene_participants(events, series_bible=series_bible, window_ms=15000)
     return turns
+
+
+def build_discourse_topology(
+    events: List[Any],
+    series_bible: Optional[Any] = None,
+    max_turn_gap_ms: int = 2500,
+    max_exchange_gap_ms: int = 5000
+) -> List[SpeakerTurn]:
+    """
+    Buduje pełną topologię dyskursu scenicznego (Standard 9.0/9.1):
+    - Przypisuje adresatów dialogu z izolacją kwestii wewnętrznych, narracji i napisów ekranowych (is_sign: true),
+    - Zapewnia absolutny priorytet rekordów P0 ze zweryfikowaną płcią (has_verified_gender: true),
+    - Izoluje zdarzenia typu is_sign: true od algebry We_Group i You_Group.
+    """
+    return process_scene_discourse(
+        events=events,
+        series_bible=series_bible,
+        max_turn_gap_ms=max_turn_gap_ms,
+        max_exchange_gap_ms=max_exchange_gap_ms
+    )
 

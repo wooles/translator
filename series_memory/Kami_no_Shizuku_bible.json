@@ -35,8 +35,7 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
-        "Issei Tomine",
-        "Tomine"
+        "Issei Tomine"
       ],
       "entity_category": "ANTHROPONYM"
     },
@@ -100,8 +99,7 @@
       "priority": "P0",
       "aliases": [
         "Honoka",
-        "Honoka Tomine",
-        "Tomine"
+        "Honoka Tomine"
       ],
       "entity_category": "ANTHROPONYM"
     },
@@ -202,8 +200,7 @@
       "priority": "P1",
       "has_verified_gender": false,
       "aliases": [
-        "Sara Tomine",
-        "Tomine"
+        "Sara Tomine"
       ],
       "entity_category": "ANTHROPONYM"
     },
@@ -343,19 +340,6 @@
       "priority": "P0",
       "aliases": [
         "Maki"
-      ],
-      "entity_category": "ANTHROPONYM"
-    },
-    "Man": {
-      "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
-      "source": "quality_gate",
-      "gender": "MALE",
-      "grammatical_gender": "MASCULINE",
-      "has_verified_gender": true,
-      "confidence": 0.95,
-      "priority": "P0",
-      "aliases": [
-        "Man"
       ],
       "entity_category": "ANTHROPONYM"
     }
@@ -703,16 +687,6 @@
       "Ms": "Maki",
       "W": "Maki",
       "gender": "MALE"
-    },
-    "Man": {
-      "M": "Man",
-      "D": "Mana",
-      "C": "Manowi",
-      "B": "Mana",
-      "N": "Manem",
-      "Ms": "Manie",
-      "W": "Manie",
-      "gender": "MALE"
     }
   },
   "hypocorisms": {},
@@ -767,7 +741,6 @@
     "Yutaka": "ANTHROPONYM",
     "Kiryu": "ANTHROPONYM",
     "Maki": "ANTHROPONYM",
-    "Man": "ANTHROPONYM",
     "sorbet": "TOPONYM"
   },
   "fansub_canon": {}

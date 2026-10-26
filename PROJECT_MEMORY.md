@@ -1,17 +1,17 @@
 # 🧠 PAMIĘĆ PROJEKTU I STANU SESJI ANTIGRAVITY (PROJECT MEMORY & OPERATIONAL TELEMETRY)
 
-Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemetrii CI/CD, historii incydentów oraz most wiedzy pomiędzy komputerami roboczymi (PC 1 i PC 2). Zasady normatywne definiuje wyłącznie `AGENTS.md` (Standard 8.0).
+Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemetrii CI/CD, historii incydentów oraz most wiedzy pomiędzy komputerami roboczymi (PC 1 i PC 2). Zasady normatywne definiuje wyłącznie `AGENTS.md` (Standard 9.1).
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 19.10.2026)
-- **Status CI/CD:** `STATUS: WDROŻONE I ZWERYFIKOWANE (183/183 PASSED) - VICTORY CONFIRMED`
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 22.10.2026)
+- **Status CI/CD:** `STATUS: WDROŻONE I ZWERYFIKOWANE (198/198 PASSED) - VICTORY CONFIRMED`
 - **Gałąź i Architektura:** `main` (Standard 9.0: Wariant (d) — Hybrydowa Straż Dowodowa [Hybrid Evidence Guard & Pipeline Hardening], Zero Morphosyntactic Mutation in Production [`VARIANT_D_PURE_LLM_MORPHOLOGY = True`, \(T(x) = x\)], Narrow Safety Net \(P_0 \cap \text{EN}\) w `EpisodeQualityGate.apply_narrow_safety_net_p0_en`, Pre-translacyjna Ingestia AniList P0 do `SeriesBible.characters` z paradygmatami odmiany nazw, Fonetyczna Normalizacja Aliasów `ph <-> f` w \(\mathcal{O}(1)\) z samoleczącym indeksem, Trwałe Wyeliminowanie Pętli Rewersji `authoritative_dialogue` w Kroku 18 `translator.py`, Reguła Wołacza Tytułów dla nazw obcych na `-tz` [`Kapitanie Moritz`, `Panie Fritz`], Programowa Bariera Regresji Fazy 2 `_guard_phase2_regressions` w `DialogueVerifier` [ochrona rodzaju czasowników i zakaz kalk ciągłych `być + -ący`], Rygorystyczna Higiena ASS [usuwanie spacji z tagów i przenoszenie wiszących spójników przed `\N`], Stabilna Identyfikacja Zdarzeń `[ID: {event_id}]`, Full-Codebase Zero-Anime-Literal Invariant & 11/11 w `verify_purity.py`, 4/4 w `audit_diff.ps1`)
 - **Środowisko:** Python 3.13 (`.venv`), Windows PowerShell, `ffmpeg` (PATH), `librosa.pyin`, `soundfile`, `pysubs2`, `spaCy en_core_web_sm` (100% offline 0.00 PLN), bezpośrednie klucze Google AI Studio API (`use_vertex = 0`).
 - **Dyrektywa Wykonawcza Testów:**
   * Testy przyrostowe podczas kodowania (< 2 s): `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_testu>"`
   * Audyt śledczy diffu: `powershell -ExecutionPolicy Bypass -File .\audit_diff.ps1 -ForbiddenTerms "<lista>"`
-  * Pełny pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest` (183/183 PASSED)
+  * Pełny pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest` (198/198 PASSED)
 
 ---
 
