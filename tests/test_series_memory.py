@@ -126,3 +126,77 @@ def test_sanitize_bible_in_ram_aligns_character_and_relation_gender_with_p0(
     bible._sanitize_loaded_bible_in_ram()
     assert bible.get_character_gender(entity_id) == verified_profile_gender
     assert "KOBIETA (Adresat)" in bible.data["relations"][relation_key]
+
+
+# Test dla Sekcji 2B.3
+@pytest.mark.parametrize(
+    "entity_name,profiler_paradigm,expected_vocative",
+    [
+        (
+            "HeroAlpha SurnameBeta",
+            {
+                "M": "HeroAlpha SurnameBeta",
+                "D": "HeroAlphaa SurnameBety",
+                "C": "HeroAlphaowi SurnameBecie",
+                "B": "HeroAlphaa SurnameBetę",
+                "N": "HeroAlphaem SurnameBetą",
+                "Ms": "HeroAlphie SurnameBecie",
+                "W": "HeroAlphie SurnameBecie",
+            },
+            "HeroAlphie SurnameBecie",
+        ),
+        (
+            "HeroGamma SurnameDelta",
+            {
+                "M": "HeroGamma SurnameDelta",
+                "D": "HeroGammy SurnameDelty",
+                "C": "HeroGammie SurnameDelcie",
+                "B": "HeroGammę SurnameDeltę",
+                "N": "HeroGammą SurnameDeltą",
+                "Ms": "HeroGammie SurnameDelcie",
+                "W": "HeroGammo SurnameDelto",
+            },
+            "HeroGammo SurnameDelto",
+        ),
+    ],
+)
+def test_sync_profile_entity_transfers_full_inflected_paradigm_over_frozen_nominative(
+    entity_name, profiler_paradigm, expected_vocative
+):
+    """Weryfikuje priorytet zdeklinowanego paradygmatu z EpisodeProfiler nad zamrożonym mianownikiem w SeriesBible."""
+    bible = SeriesBible(slug="test_paradigm_transfer")
+    bible.data["declensions"][entity_name] = {k: entity_name for k in ("M", "D", "C", "B", "N", "Ms", "W")}
+    bible.sync_verified_profile_entity(
+        name=entity_name,
+        gender="MALE",
+        has_verified_gender=True,
+        declension_map=profiler_paradigm,
+    )
+    assert bible.data["declensions"][entity_name]["W"] == expected_vocative
+
+
+# Test dla Sekcji 2C.1
+@pytest.mark.parametrize(
+    "entity_name,legacy_desc,profile_gender",
+    [
+        ("EntityOne", "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)", "FEMALE"),
+        ("EntityTwo", "MĘŻCZYZNA (wyodrębniono z relacji serii)", "FEMALE"),
+    ],
+)
+def test_sanitize_ram_overrides_legacy_eqg_and_relation_extracted_male_flags(
+    entity_name, legacy_desc, profile_gender
+):
+    """Weryfikuje nadpisanie w pamięci RAM historycznych flag MALE z adnotacją EQG/relacji stanem P0."""
+    bible = SeriesBible(slug="test_legacy_override")
+    bible.data["characters"][entity_name] = {
+        "description": legacy_desc,
+        "gender": "MALE",
+        "grammatical_gender": "MASCULINE",
+        "has_verified_gender": True,
+    }
+    bible.data["relations"][f"SpeakerX -> {entity_name}"] = "Zwrot [MĘŻCZYZNA (Adresat)]"
+    bible.sync_verified_profile_entity(name=entity_name, gender=profile_gender, has_verified_gender=True)
+    bible._sanitize_loaded_bible_in_ram()
+    assert bible.get_character_gender(entity_name) == profile_gender
+    assert "KOBIETA (Adresat)" in bible.data["relations"][f"SpeakerX -> {entity_name}"]
+

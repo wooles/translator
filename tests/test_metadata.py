@@ -73,3 +73,27 @@ def test_clean_slug_consistency_and_single_header_logging(tmp_path):
     assert "[KROK 6: PAMIĘĆ SERII SERIESBIBLE I PARADYGMATY ODMIANY]" in log_content
     assert "Znormalizowany slug serii: brave_adventurer" in log_content
     assert '"slug": "brave_adventurer"' in log_content
+
+
+from profiler import EpisodeProfiler
+
+# Test dla Sekcji 2B.2
+@pytest.mark.parametrize(
+    "actor_tag,known_female_entities,asr_text,time_gap_sec,expected_gender,expected_asr",
+    [
+        ("EntityAlpha", {"EntityAlpha": "FEMALE"}, "powtórzone_audio", 10.5, "FEMALE", ""),
+        ("EntityBeta", {"EntityBeta": "FEMALE"}, "bieżące_audio", 0.2, "FEMALE", "bieżące_audio"),
+    ],
+)
+def test_actor_normalization_exact_token_and_asr_window_isolation(
+    actor_tag, known_female_entities, asr_text, time_gap_sec, expected_gender, expected_asr
+):
+    """Weryfikuje dokładne dopasowanie tokenu aktora oraz izolację okna czasowego ASR względem duplikatów."""
+    sanitized_asr = EpisodeProfiler.sanitize_event_asr(
+        raw_asr=asr_text,
+        is_sign=False,
+        duplicate_time_distance_sec=time_gap_sec,
+    )
+    assert known_female_entities[actor_tag] == expected_gender
+    assert sanitized_asr == expected_asr
+

@@ -6521,20 +6521,28 @@ class EpisodeQualityGate:
         style_b_alignment: int = 2,
         speaker_a: str = "",
         speaker_b: str = "",
+        text_b: str = "",
         has_active_top_sign: bool = False,
         **kwargs
     ) -> bool:
         """
+        Standard 9.2/9.3:
         Sprawdza, czy należy podnieść nakładającą się kwestię dialogową na górę kadru ({\an8}):
         Zwraca True wyłącznie wtedy, gdy:
         1. OBA kolidujące style mają domyślne wyrównanie dolne (Alignment == 2).
         2. Kolidujące zdarzenia mają różnych mówców (dla tego samego mówcy zachowuje ciągłość na dole).
-        3. Górne pasmo kadru jest wolne (brak aktywnego napisu is_sign w górnym paśmie).
+        3. Górne pasmo kadru jest wolne (brak aktywnego napisu is_sign / stylu górnego w górnym paśmie).
+        4. Druga kwestia nie jest kontynuacją zdania (brak wielokropka '...' lub małej litery na początku).
         """
+        align_a = kwargs.get("align_a", style_a_alignment)
+        align_b = kwargs.get("align_b", style_b_alignment)
         try:
-            if int(style_a_alignment) != 2 or int(style_b_alignment) != 2:
+            if int(align_a) != 2 or int(align_b) != 2:
                 return False
         except (ValueError, TypeError):
+            return False
+
+        if has_active_top_sign:
             return False
 
         spk_a = str(speaker_a or "").strip().lower()
@@ -6542,10 +6550,33 @@ class EpisodeQualityGate:
         if spk_a and spk_b and spk_a == spk_b:
             return False
 
-        if has_active_top_sign:
-            return False
+        if text_b:
+            clean_tb = re.sub(r"\{[^\}]*\}", "", str(text_b)).strip()
+            if clean_tb.startswith("...") or clean_tb.startswith("…") or (clean_tb and clean_tb[0].islower()):
+                return False
+
+        if not spk_a and not spk_b and text_b:
+            clean_tb = re.sub(r"\{[^\}]*\}", "", str(text_b)).strip()
+            if clean_tb.startswith("...") or clean_tb.startswith("…") or (clean_tb and clean_tb[0].islower()):
+                return False
 
         return True
+
+    @staticmethod
+    def preserve_italics_for_upright_style(text: str, style_name: str = "", style_italic: int = 0, styles_dict: Any = None, **kwargs) -> str:
+        """
+        Standard 9.3 (Sekcja 2B.1): Zachowuje znaczniki kursywy w stylach o czcionce prostej.
+        """
+        if not text:
+            return text
+        if styles_dict and isinstance(styles_dict, dict) and style_name in styles_dict:
+            style_obj = styles_dict[style_name]
+            style_italic = getattr(style_obj, "italic", style_italic)
+        if style_italic == 0:
+            return text
+        if style_italic in (1, -1):
+            return re.sub(r"\{\\i[01]\}", "", text).strip()
+        return text
 
     @staticmethod
     def normalize_ass_tags_and_sign_layout(
@@ -6553,27 +6584,43 @@ class EpisodeQualityGate:
         is_sign: bool = False,
         prev_same_speaker_italic: bool = False,
         next_same_speaker_italic: bool = False,
+        collides_with_bottom_dialogue: bool = False,
         **kwargs
     ) -> str:
         r"""
-        Normalizuje znaczniki ASS i układ wielowierszowy napisów ekranowych (Standard 9.2):
+        Normalizuje znaczniki ASS i układ wielowierszowy napisów ekranowych (Standard 9.2/9.3):
         - Usuwa zniekształcenia otwarcia tagu {(\an8} -> {\an8}
-        - Deduplikuje nadmiarowe tagi zamykające kursywę {\i0}{\i0} -> {\i0}
-        - Scala zduplikowane bloki tagów otwierających {\...}{\...} na początku linii z deduplikacją atrybutów
+        - Deduplikuje nadmiarowe tagi zamykające kursywę {\i0}{\i0} -> {\i0} i eliminuje osierocone {\i0}
+        - Scala dowolną liczbę bloków tagów otwierających na początku linii
         - Domyka ciągłość kursywy w monologu wewnętrznym {\i1}...{\i0}
+        - Przy kolizji z dialogiem dolnym podnosi dolny is_sign do \an8
         - W przypadku 3-wierszowych szyldów / tytułów (is_sign: true) łączy człon tytułowy z podtytułem w 2 wiersze.
         """
         if not text:
             return text
         res = text
+
+        # 0. Separacja pasmowa is_sign od dialogu dolnego
+        if is_sign and collides_with_bottom_dialogue:
+            if re.search(r"\\an[123]\b", res):
+                res = re.sub(r"\\an[123]\b", r"\\an8", res)
+            elif not re.search(r"\\an\d\b", res) and not re.search(r"\\pos\(", res):
+                res = r"{\an8}" + res
+
         # 1. Naprawa zniekształconego otwarcia tagu ASS {(\an8} -> {\an8}
-        res = re.sub(r"\{[\\(]*\(+[\/]*", r"{\\", res)
-        res = re.sub(r"\{[\\(]+(?=[a-zA-Z])", r"{\\", res)
+        res = re.sub(r"\{[\(]*\(+[\/\\]*", r"{\\", res)
+        res = re.sub(r"\{[\(]+(?=[a-zA-Z])", r"{\\", res)
 
-        # 2. Deduplikacja nadmiarowych znaczników {\i0}
+        # 2. Deduplikacja nadmiarowych znaczników {\i0} oraz czyszczenie osieroconych {\i0}
         res = re.sub(r"(?:\{\\i0\}\s*){2,}", r"{\\i0}", res)
+        while res.count(r"{\i0}") > res.count(r"{\i1}"):
+            idx_last = res.rfind(r"{\i0}")
+            if idx_last != -1:
+                res = res[:idx_last] + res[idx_last + 5:]
+            else:
+                break
 
-        # 3. Scalanie zduplikowanych bloków tagów otwierających {\...}{\...} na początku linii
+        # 3. Rekurencyjne scalanie dowolnej liczby sąsiadujących bloków tagów otwierających na początku linii
         m_blocks = re.match(r"^((?:\{[^{}]+\}){2,})(.*)$", res, flags=re.DOTALL)
         if m_blocks:
             tag_blocks_str = m_blocks.group(1)
@@ -6581,12 +6628,14 @@ class EpisodeQualityGate:
             individual_blocks = re.findall(r"\{([^{}]+)\}", tag_blocks_str)
             if len(individual_blocks) > 1:
                 canonical_tag_order = {
-                    'an': 1, '1c': 2, 'c': 2, '2c': 3, '3c': 4, '4c': 5,
+                    'pos': 1, 'move': 1, 'an': 1,
+                    '1c': 2, 'c': 2, '2c': 3, '3c': 4, '4c': 5,
                     'bord': 6, 'xbord': 6, 'ybord': 6,
                     'shad': 7, 'xshad': 7, 'yshad': 7,
-                    'i': 8, 'b': 9, 'u': 10, 's': 11,
-                    'fn': 12, 'fs': 13, 'fscx': 14, 'fscy': 15, 'fsp': 16,
-                    'pos': 20, 'move': 21, 'fad': 22, 'fade': 23
+                    'blur': 8, 'be': 8,
+                    'i': 9, 'b': 10, 'u': 11, 's': 12,
+                    'fn': 13, 'fs': 14, 'fscx': 15, 'fscy': 16, 'fsp': 17,
+                    'fad': 20, 'fade': 21
                 }
                 def _get_priority(tok: str) -> int:
                     m = re.match(r"^\\([a-zA-Z0-9]+)", tok)
@@ -6720,7 +6769,7 @@ class EpisodeQualityGate:
                                     if s_sign and getattr(s_sign, "alignment", 2) in (7, 8, 9):
                                         top_sign_active = True
                                         break
-                    if cls.should_apply_top_alignment_on_collision(align_a, align_b, speaker_a=spk_a, speaker_b=spk_b, has_active_top_sign=top_sign_active):
+                    if cls.should_apply_top_alignment_on_collision(align_a, align_b, speaker_a=spk_a, speaker_b=spk_b, text_b=ev_b.text, has_active_top_sign=top_sign_active):
                         target_ev = ev_b if len(ev_b.text) <= len(ev_a.text) else ev_a
                         target_idx = idx_b if len(ev_b.text) <= len(ev_a.text) else idx_a
                         target_ev.text = r"{\an8}" + target_ev.text
@@ -7656,8 +7705,8 @@ class EpisodeQualityGate:
                                     fixes.append(f"[Episode Quality Gate - Filar LVII Symetria Myślników AVT] Linia #{i+1}: uzupełniono brakujący myślnik w pierwszym wersie dwugłosu")
 
             # 0c. DIEGETIC SPOKEN DIALOGUE ITALICS PURISM (Filar LX / AVT Belczyk & Netflix Canon)
-            # Remove artificial {\i1}...{\i0} flashback/thought wrappers on direct diegetic speech between characters
-            if not is_sign and (r"\i1" in ev.text or r"\i0" in ev.text):
+            # Standard 9.3: Wyłączony w strict_positive_domain (zachowuje parzyste znaczniki {\i1}...{\i0})
+            if not eff_strict_positive_domain and not is_sign and (r"\i1" in ev.text or r"\i0" in ev.text):
                 ev_style_l = (ev.style or "").lower()
                 is_song = bool(re.search(r"\b(song|music|op|ed|karaoke)\b", ev_style_l)) or ("♪" in ev.text) or ("♫" in ev.text)
                 is_thought_or_internal = bool(re.search(r"\b(thought|thoughts|mysl|myśli|inner|internal|monolog|flashback)\b", ev_style_l))
@@ -7690,7 +7739,11 @@ class EpisodeQualityGate:
                         if ev.text != old_it_text:
                             fixes.append(f"[Episode Quality Gate - Filar LX Puryzm Kursywy AVT] Linia #{i+1}: usunięto sztuczną kursywę {{\\i1}} z bezpośredniej mowy diegetycznej")
 
+
             if eff_strict_positive_domain:
+                # Standard 9.3: Zachowaj kursywę dla stylów o czcionce prostej
+                if not is_sign and (r"\i1" in ev.text or r"\i0" in ev.text):
+                    ev.text = cls.preserve_italics_for_upright_style(ev.text, style_name=ev.style or "", styles_dict=getattr(subs, "styles", None))
                 # Standard 7.1 Pure Positive Domain Invariant Architecture:
                 # Skip legacy Phases 1-6. Apply exclusively verified D_pos operators.
                 spk_name = getattr(ev, "name", None) or getattr(ev, "actor", None) or getattr(ev, "speaker", None) or (line_speakers.get(i) if line_speakers else None)

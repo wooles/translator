@@ -1,7 +1,7 @@
 import pytest
 import pysubs2
 from series_memory import SeriesBible
-from scene_discourse import build_discourse_topology
+from scene_discourse import build_discourse_topology, SceneDiscourseGraph
 from translator import MultimodalTranslator, synchronize_ass_event_metadata_and_styles
 
 
@@ -151,3 +151,27 @@ def test_arbitrate_telemetry_enforces_p0_gender_non_virile_and_polylogue_tag(
     assert telemetry_node["p0_gender"] == speaker_p0
     assert telemetry_node["addressee_gender"] == addressee_p0
     assert telemetry_node["group_virility"] == expected_group
+
+
+# Test dla Sekcji 2C.2
+@pytest.mark.parametrize(
+    "event_actor,inferred_actor,p0_gender,expected_actor,expected_gram_gender",
+    [
+        ("ExplicitSpeakerA", "NeighborSpeakerB", "FEMALE", "ExplicitSpeakerA", "FEMININE"),
+        ("ExplicitMaleHero", "ExplicitMaleHero", "MALE", "ExplicitMaleHero", "MASCULINE"),
+        ("/", "NeighborSpeakerB", "FEMALE", "POLYLOGUE", "FEMININE"),
+    ],
+)
+def test_arbitrate_telemetry_preserves_explicit_event_actor_and_male_p0(
+    event_actor, inferred_actor, p0_gender, expected_actor, expected_gram_gender
+):
+    """Weryfikuje zachowanie jawnego aktora z [Events], mapowanie MALE->MASCULINE oraz zamianę '/' na POLYLOGUE."""
+    node = SceneDiscourseGraph.arbitrate_event_telemetry(
+        raw_actor=event_actor,
+        inferred_actor=inferred_actor,
+        verified_p0_gender=p0_gender,
+        has_verified_gender=True,
+    )
+    assert node["speaker_name"] == expected_actor
+    assert node["grammatical_gender"] == expected_gram_gender
+

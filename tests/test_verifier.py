@@ -1,5 +1,5 @@
 import pytest
-from verifier import _guard_phase2_regressions, normalize_ass_tags
+from verifier import _guard_phase2_regressions, normalize_ass_tags, DialogueVerifier
 
 
 def test_guard_phase2_regressions_authority_and_ass_tags():
@@ -161,3 +161,82 @@ def test_guard_phase2_restores_person_number_epistemic_verb_and_dual_voice_line2
         prev_line_en=prev_en,
     )
     assert result == expected_restored
+
+
+# Test dla Sekcji 2C.3
+@pytest.mark.parametrize(
+    "prev_pl,f1_pl,f2_pl,en_src,prev_en,expected_pl",
+    [
+        (
+            "Kwestia poprzednia.",
+            "Ale to {\\i1}świetnie{\\i0} wygląda!",
+            "{\\i1}Ale to świetnie{\\i0} wygląda!{\\i0}",
+            "That is {\\i1}so{\\i0} cool!",
+            "Previous line.",
+            "Ale to {\\i1}świetnie{\\i0} wygląda!",
+        ),
+        (
+            "To bezcelowe!",
+            "- Chcę odejść...\n- To bezcelowe!",
+            "- Odejdę...\n- Bezcelowe!",
+            "- I want to leave...\n- That's pointless!",
+            "That's pointless!",
+            "- Odejdę...\n- To bezcelowe!",
+        ),
+        (
+            "Poprzednia.",
+            "...wiedziałem, że to ty, Rywalu.",
+            "{\\i1}Wiedziałem, Rywalu.{\\i0}",
+            "I knew it would be you, Rival.",
+            "Prev.",
+            "...wiedziałem, że to ty, Rywalu.",
+        ),
+    ],
+)
+def test_guard_phase2_rejects_orphan_i0_syncs_hyphen_dual_voice_and_keeps_clause(
+    prev_pl, f1_pl, f2_pl, en_src, prev_en, expected_pl
+):
+    """Weryfikuje odrzucanie osieroconego {\\i0}, synchronizację dwugłosu z '-' oraz ochronę zdania podrzędnego."""
+    res = DialogueVerifier._guard_phase2_regressions(
+        f1_pl=f1_pl,
+        refined_pl=f2_pl,
+        source_en=en_src,
+        prev_line_pl=prev_pl,
+        prev_line_en=prev_en,
+    )
+    assert res == expected_pl
+
+
+# Test dla Sekcji 2C.6
+@pytest.mark.parametrize(
+    "en_sign,f1_sign,f2_sign,glossary_map,expected_sign",
+    [
+        (
+            "MYSTERIOUS ITEM",
+            "TAJEMNICZY PRZEDMIOTOWY ARTEFAKT",
+            "TAJEMNICZY PRZEDMIOTOWY ARTEFAKT",
+            {"MYSTERIOUS ITEM": "TAJEMNICZY PRZEDMIOT"},
+            "TAJEMNICZY PRZEDMIOT",
+        ),
+        (
+            "SECRET PASS",
+            "TAJNY BILETOWY KLUCZ",
+            "TAJNY BILETOWY KLUCZ",
+            {"SECRET PASS": "TAJNY BILET"},
+            "TAJNY BILET",
+        ),
+    ],
+)
+def test_sign_orthography_enforces_strict_lexical_correspondence_with_en_text(
+    en_sign, f1_sign, f2_sign, glossary_map, expected_sign
+):
+    """Weryfikuje ścisłą odpowiedniość leksykalną 1:1 krótkich napisów is_sign względem en_text."""
+    res = DialogueVerifier.enforce_sign_nominative_orthography(
+        f1_pl=f1_sign,
+        refined_pl=f2_sign,
+        source_en=en_sign,
+        is_sign=True,
+        canonical_glossary=glossary_map,
+    )
+    assert res == expected_sign
+

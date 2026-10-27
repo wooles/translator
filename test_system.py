@@ -18845,6 +18845,200 @@ def test_standard_9_2_phase7_hygiene_merges_tag_blocks_and_bridges_italic():
     assert out_ell == r"{\i1}...ciąg dalszy myśli.{\i0}"
     print(" -> PASSED: TEST 211 potwierdza scalanie bloków tagów i mostkowanie kursywy.")
 
+
+
+def test_standard_9_3_eqg_preserves_italic_tags_on_upright_styles():
+    """TEST 212: Standard 9.3 EpisodeQualityGate zachowuje zbalansowane znaczniki kursywy na stylach prostych."""
+    print("\n[TEST 212] Standard 9.3: EpisodeQualityGate zachowuje kursywę na stylach prostych...")
+    import pysubs2
+    from avt_linter import EpisodeQualityGate
+
+    subs = pysubs2.SSAFile()
+    subs.styles["Default"] = pysubs2.SSAStyle(fontname="Arial", italic=0)
+    subs.styles["Main - Top"] = pysubs2.SSAStyle(fontname="Arial", italic=0)
+    subs.styles["ItalicStyle"] = pysubs2.SSAStyle(fontname="Arial", italic=1)
+
+    ev1 = pysubs2.SSAEvent(start=1000, end=3000, text=r"{\i1}Myśl wewnętrzna postaci A.{\i0}", style="Default", name="SpeakerA")
+    ev2 = pysubs2.SSAEvent(start=3500, end=5000, text=r"{\i1}Obserwacja postaci B.{\i0}", style="Main - Top", name="SpeakerB")
+    subs.events = [ev1, ev2]
+
+    eqg = EpisodeQualityGate()
+    fixed_subs, fixes = eqg.audit_and_fix_entire_episode(subs, strict_positive_domain=True)
+
+    assert r"{\i1}" in fixed_subs.events[0].text
+    assert r"{\i0}" in fixed_subs.events[0].text
+    assert r"{\i1}" in fixed_subs.events[1].text
+    assert r"{\i0}" in fixed_subs.events[1].text
+
+    p_text = EpisodeQualityGate.preserve_italics_for_upright_style(
+        r"{\i1}Tekst wyróżniony{\i0}", style_name="Default", styles_dict=subs.styles
+    )
+    assert p_text == r"{\i1}Tekst wyróżniony{\i0}"
+    print(" -> PASSED: TEST 212 potwierdza zachowanie kursywy na stylach prostych (Italic == 0).")
+
+
+def test_standard_9_3_collision_checks_top_style_alignment():
+    """TEST 213: Standard 9.3 should_apply_top_alignment_on_collision sprawdza styl top, inline an8 i kontynuację."""
+    print("\n[TEST 213] Standard 9.3: should_apply_top_alignment_on_collision bada styl top i kontynuację...")
+    from avt_linter import EpisodeQualityGate
+
+    assert EpisodeQualityGate.should_apply_top_alignment_on_collision(
+        align_a=2, align_b=8,
+        speaker_a="SpeakerA", speaker_b="SpeakerB",
+        text_b="Kwestia górnego stylu."
+    ) is False
+
+    assert EpisodeQualityGate.should_apply_top_alignment_on_collision(
+        align_a=2, align_b=2,
+        speaker_a="", speaker_b="",
+        text_b="...dalszy ciąg zdania."
+    ) is False
+
+    assert EpisodeQualityGate.should_apply_top_alignment_on_collision(
+        align_a=2, align_b=2,
+        speaker_a="SpeakerA", speaker_b="SpeakerB",
+        text_b="Odrębna kwestia."
+    ) is True
+    print(" -> PASSED: TEST 213 potwierdza sprawdzanie stylu top i kontynuacji przy kolizji.")
+
+
+def test_standard_9_3_phase7_merges_triple_tag_blocks():
+    """TEST 214: Standard 9.3 normalize_ass_tags_and_sign_layout scala 3 bloki tagów, usuwa orphan i0 i podnosi szyld."""
+    print("\n[TEST 214] Standard 9.3: Faza 7 scala potrójne bloki tagów i separuje pasmowo is_sign...")
+    from avt_linter import EpisodeQualityGate
+
+    raw_triple = r"{\3c&H000000&\bord3}{\shad1}{\pos(320,228)\3c&HED4CA1&\blur2}Plansza"
+    merged = EpisodeQualityGate.normalize_ass_tags_and_sign_layout(raw_triple, is_sign=False)
+    assert merged == r"{\pos(320,228)\3c&HED4CA1&\bord3\shad1\blur2}Plansza"
+
+    sign_colliding = r"{\an1\3c&H000000&\bord3\shad1}PLANSZA DOLNA"
+    lifted = EpisodeQualityGate.normalize_ass_tags_and_sign_layout(
+        sign_colliding, is_sign=True, collides_with_bottom_dialogue=True
+    )
+    assert r"\an8" in lifted
+    assert r"\an1" not in lifted
+    print(" -> PASSED: TEST 214 potwierdza scalanie bloków tagów i pasmową separację szyldów.")
+
+
+def test_standard_9_3_actor_normalization_and_asr_window_isolation():
+    """TEST 215: Standard 9.3 normalize_actor_tag, match_character_in_metadata i sanitize_event_asr."""
+    print("\n[TEST 215] Standard 9.3: Izolacja tokenów aktora i wygaszanie powtórzonego ASR...")
+    from metadata import normalize_actor_tag, match_character_in_metadata
+    from profiler import EpisodeProfiler
+
+    clean_name_f, gender_f = normalize_actor_tag("EntityAlpha (F)")
+    assert clean_name_f == "EntityAlpha"
+    assert gender_f == "FEMALE"
+
+    clean_name_m, gender_m = normalize_actor_tag("EntityBeta (M)")
+    assert clean_name_m == "EntityBeta"
+    assert gender_m == "MALE"
+
+    cast = [{"name": "EntityAlpha", "gender": "FEMALE"}]
+    assert match_character_in_metadata("EntityAlphaOther", cast) is None
+    assert match_character_in_metadata("EntityAlpha", cast) is not None
+
+    asr_sanitized = EpisodeProfiler.sanitize_event_asr(
+        raw_asr="powtórzone_audio",
+        is_sign=False,
+        duplicate_time_distance_sec=10.5
+    )
+    assert asr_sanitized == ""
+
+    asr_valid = EpisodeProfiler.sanitize_event_asr(
+        raw_asr="bieżące_audio",
+        is_sign=False,
+        duplicate_time_distance_sec=0.2
+    )
+    assert asr_valid == "bieżące_audio"
+    print(" -> PASSED: TEST 215 potwierdza izolację tokenów aktora i wygaszanie ASR po 1.5s.")
+
+
+def test_standard_9_3_series_bible_sync_paradigm_and_ram_sanitization():
+    """TEST 216: Standard 9.3 sync_verified_profile_entity i _sanitize_loaded_bible_in_ram."""
+    print("\n[TEST 216] Standard 9.3: SeriesBible synchronizuje paradygmat i sanuje pamięć RAM...")
+    import tempfile
+    from pathlib import Path
+    from series_memory import SeriesBible
+
+    with tempfile.TemporaryDirectory() as td:
+        tmp_dir = Path(td)
+        bible_path = tmp_dir / "bible_93.json"
+        bible = SeriesBible(bible_path=bible_path, storage_dir=tmp_dir)
+
+        bible.data["characters"] = {
+            "HeroAlpha SurnameBeta": {
+                "gender": "MALE",
+            }
+        }
+        bible.data["declensions"] = {
+            "HeroAlpha SurnameBeta": {k: "HeroAlpha SurnameBeta" for k in ("M", "D", "C", "B", "N", "Ms", "W")}
+        }
+        full_paradigm = {
+            "M": "HeroAlpha SurnameBeta",
+            "D": "HeroAlpha SurnameBety",
+            "C": "HeroAlphie SurnameBecie",
+            "B": "HeroAlpha SurnameBetę",
+            "N": "HeroAlphem SurnameBetą",
+            "Ms": "HeroAlphie SurnameBecie",
+            "W": "HeroAlphie SurnameBecie"
+        }
+        bible.sync_verified_profile_entity("HeroAlpha SurnameBeta", gender="MALE", declension_map=full_paradigm)
+        assert bible.data["declensions"]["HeroAlpha SurnameBeta"]["W"] == "HeroAlphie SurnameBecie"
+
+        bible.data["characters"]["EntityOne"] = {
+            "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
+            "gender": "MALE",
+            "grammatical_gender": "MASCULINE",
+            "has_verified_gender": True,
+        }
+        bible.data["relations"] = {
+            "SpeakerX -> EntityOne": "Zwrot [MĘŻCZYZNA (Adresat)]"
+        }
+        bible.sync_verified_profile_entity(name="EntityOne", gender="FEMALE", has_verified_gender=True)
+        bible._sanitize_loaded_bible_in_ram()
+
+        assert bible.get_character_gender("EntityOne") == "FEMALE"
+        assert "KOBIETA (Adresat)" in bible.data["relations"]["SpeakerX -> EntityOne"]
+    print(" -> PASSED: TEST 216 potwierdza synchronizację paradygmatu i sanitację RAM.")
+
+
+def test_standard_9_3_discourse_and_verifier_dual_voice_epistemic_clause():
+    """TEST 217: Standard 9.3 arbitrate_event_telemetry oraz _guard_phase2_regressions."""
+    print("\n[TEST 217] Standard 9.3: Telemetria dyskursu i ochrona zdań identyfikujących/dwugłosu...")
+    from scene_discourse import SceneDiscourseGraph
+    from verifier import DialogueVerifier
+
+    t1 = SceneDiscourseGraph.arbitrate_event_telemetry(
+        raw_actor="ExplicitSpeakerA",
+        verified_p0_gender="FEMALE",
+        has_verified_gender=True
+    )
+    assert t1["speaker_name"] == "ExplicitSpeakerA"
+    assert t1["grammatical_gender"] == "FEMININE"
+
+    t2 = SceneDiscourseGraph.arbitrate_event_telemetry(raw_actor="/", scene_female_only=True)
+    assert t2["speaker_name"] == "POLYLOGUE"
+    assert t2.get("group_virility") == "NON_VIRILE"
+
+    sync_res = DialogueVerifier._guard_phase2_regressions(
+        f1_pl="– To bezcelowe!\n– Chcę odejść...",
+        refined_pl="– Bezcelowe!\n– Odejdę...",
+        source_en="– That's pointless!\n– I want to leave...",
+        prev_line_en="That's pointless!",
+        prev_line_pl="– To bezcelowe!"
+    )
+    assert "– To bezcelowe!" in sync_res
+    assert "– Odejdę..." in sync_res
+
+    clause_res = DialogueVerifier._guard_phase2_regressions(
+        f1_pl="...wiedziałem, że to ty, Rywalu.",
+        refined_pl=r"{\i1}Wiedziałem, Rywalu.{\i0}",
+        source_en="I knew it would be you, Rival."
+    )
+    assert clause_res == "...wiedziałem, że to ty, Rywalu."
+    print(" -> PASSED: TEST 217 potwierdza telemetrię dyskursu, dwugłos i zdania identyfikujące.")
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -19059,4 +19253,10 @@ if __name__ == "__main__":
     test_standard_9_2_guard_phase2_person_number_epistemic_verb_dual_voice()
     test_standard_9_2_collision_alignment_same_speaker_and_top_sign()
     test_standard_9_2_phase7_hygiene_merges_tag_blocks_and_bridges_italic()
-    print("\n Wszystkie testy jednostkowe i integracyjne (211/211) zakończone pełnym sukcesem!\n")
+    test_standard_9_3_eqg_preserves_italic_tags_on_upright_styles()
+    test_standard_9_3_collision_checks_top_style_alignment()
+    test_standard_9_3_phase7_merges_triple_tag_blocks()
+    test_standard_9_3_actor_normalization_and_asr_window_isolation()
+    test_standard_9_3_series_bible_sync_paradigm_and_ram_sanitization()
+    test_standard_9_3_discourse_and_verifier_dual_voice_epistemic_clause()
+    print("\n Wszystkie testy jednostkowe i integracyjne (217/217) zakończone pełnym sukcesem!\n")

@@ -268,20 +268,24 @@ def _guard_phase2_regressions(
                     if not re.search(rf"\b{re.escape(prep_word)}\s+{re.escape(name_token)}\b", refined_pl, re.IGNORECASE):
                         return f1_pl
 
-    # 10. KATEGORIA 10 (Standard 9.2, R1.5): Niezmiennik znaczników ASS i czystość typograficzna
+    # 10. KATEGORIA 10 (Standard 9.2/9.3, R1.3, R1.5): Niezmiennik znaczników ASS i czystość typograficzna
     f1_i1 = f1_pl.count(r"{\i1}")
     f1_i0 = f1_pl.count(r"{\i0}")
     ref_i1 = refined_pl.count(r"{\i1}")
     ref_i0 = refined_pl.count(r"{\i0}")
-    if (ref_i0 != ref_i1 and f1_i0 == f1_i1) or (ref_i0 > ref_i1):
+    if ref_i0 != ref_i1 and f1_i0 == f1_i1:
+        return f1_pl
+    if ref_i0 > ref_i1:
         return f1_pl
     if refined_pl.count("{") != refined_pl.count("}") and f1_pl.count("{") == f1_pl.count("}"):
         return f1_pl
     if "*" in refined_pl and "*" not in f1_pl and "*" not in (source_en or ""):
         return f1_pl
 
-    # 11. KATEGORIA 11 (Standard 9.2, R1.3): Dopełnienie identyfikujące z tekstu źródłowego EN
-    if source_en and re.search(r"\b(?:would be you|that you|who was|who were|it was you)\b", source_en, re.IGNORECASE):
+    # 11. KATEGORIA 11 (Standard 9.2/9.3, R1.3): Dopełnienie identyfikujące z tekstu źródłowego EN
+    if source_en and re.search(r"\b(?:would be you|that you|who was|who were|it was you|it would be you)\b", source_en, re.IGNORECASE):
+        if re.search(r",\s*że\s+to\b", f1_pl, re.IGNORECASE) and not re.search(r",\s*że\s+to\b", refined_pl, re.IGNORECASE):
+            return f1_pl
         f1_has_id = bool(re.search(r"\b(?:ty|tobie|tobą|ciebie|cię)\b", f1_pl, re.IGNORECASE))
         ref_has_id = bool(re.search(r"\b(?:ty|tobie|tobą|ciebie|cię)\b", refined_pl, re.IGNORECASE))
         if f1_has_id and not ref_has_id:
@@ -302,7 +306,7 @@ def _guard_phase2_regressions(
             ref_nom = bool(re.search(r"\b(?:nasz|ten|jakiś|jeden|mój|twój)\s+[a-ząćęłńóśźż]+(?<!ego)(?<!ej)\b", refined_pl, re.IGNORECASE))
             if f1_oblique and ref_nom:
                 return f1_pl
-    # 13. KATEGORIA 13 (Standard 9.2, R1.4): Synchronizacja drugiego wiersza dwugłosu z linią poprzedzającą
+    # 13. KATEGORIA 13 (Standard 9.2/9.3, R1.4): Synchronizacja kontynuowanego wiersza dwugłosu z linią poprzedzającą
     effective_prev_en = (prev_line_en or "").strip().lower()
     effective_prev_pl = (prev_line_pl or prev_line_f1 or "").strip()
     if effective_prev_en and effective_prev_pl and source_en:
@@ -313,10 +317,14 @@ def _guard_phase2_regressions(
             for idx_p, en_part in enumerate(en_parts):
                 clean_en_part = re.sub(r"^[–—\-]\s*", "", en_part).strip().lower()
                 if clean_en_part == clean_prev_en:
-                    clean_ref_line = re.sub(r"^[–—\-]\s*", "", ref_parts[idx_p]).strip().lower()
-                    clean_prev_pl = re.sub(r"^[–—\-]\s*", "", effective_prev_pl).strip().lower()
-                    if clean_ref_line != clean_prev_pl:
-                        return f1_pl
+                    clean_prev_pl = re.sub(r"^[–—\-]\s*", "", effective_prev_pl).strip()
+                    m_dash = re.match(r"^([-–—]\s*)", ref_parts[idx_p])
+                    dash_prefix = m_dash.group(1) if m_dash else "- "
+                    ref_parts[idx_p] = f"{dash_prefix}{clean_prev_pl}"
+                    if r"\N" in refined_pl:
+                        refined_pl = r"\N".join(ref_parts)
+                    else:
+                        refined_pl = "\n".join(ref_parts)
 
     # 14. KATEGORIA 14 (Standard 9.2, R1.2): Ochrona osoby gramatycznej orzeczenia (1. ↔ 2. ↔ 3.)
     re_1st_pl = re.compile(r"\b(?:[a-ząćęłńóśźż]+(?:my|liśmy|łyśmy)|mamy|będziemy|jesteśmy)\b", re.IGNORECASE)

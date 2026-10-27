@@ -2372,16 +2372,16 @@ AKTYWNY KANON POZYTYWNEGO RZEMIOSŁA AVT (BARAŃCZAK, BELCZYK, SZARKOWSKA):
 - Korzystaj ze swobody polskiego szyku zdania, by dialog oddychał razem z aktorem na ekranie.
 """
 
-STANDARD_9_CORE_RULES_PROMPT = """
-STANDARD 9.2 — AUTORYTET TRANSLACYJNY I NIEZMIENNIKI DZIEDZINY POZYTYWNEJ (R1.1–R1.5, R3.1–R3.3):
-1. R1.1 (P0) — FORMY NIEMĘSKOOSOBOWE (NON_VIRILE) W ZBIOROWOŚCIACH ŻEŃSKICH: Dla scen, w których skład postaci (characters_present) obejmuje wyłącznie postacie o zweryfikowanej płci żeńskiej (p0_gender: FEMALE), prawidłowy stan w 1. i 2. osobie liczby mnogiej to wyłącznie formy niemęskoosobowe (-łyśmy, -łyście, one, wszystkie, razem).
-2. R1.2 (P0) — ZACHOWANIE OSOBY I LICZBY GRAMATYCZNEJ ORZECZENIA Z phase1_text + en_text: Prawidłowy stan orzeczenia w Fazie 2 = zachowanie osoby gramatycznej (1. vs 2. vs 3.) oraz liczby (lp. vs lm.) ustalonej w phase1_text w pełnej zgodzie z zaimkiem podmiotu w en_text (I/my -> 1. os. lp., you -> 2. os., he/she/they -> 3. os.). Pełna tożsamość osoby i liczby orzeczenia z phase1_text.
-3. R1.3 (P0) — ZACHOWANIE NADRZĘDNYCH PREDYKATÓW EPISTEMICZNYCH I CIĄGŁOŚCI KURSYWY: Prawidłowy stan phase2_text = zachowanie nadrzędnych czasowników epistemicznych (myślałam, sądziłem, wierzyłam, pamiętam) wprowadzających zdanie podrzędne obecnych w phase1_text i en_text oraz zachowanie znaczników kursywy {\\i1}...{\\i0} w liniach rozpoczynających się od wielokropka kontynuacji w monologu wewnętrznym.
-4. R1.4 (P1) — TOŻSAMOŚĆ TEKSTOWA DRUGIEGO WIERSZA DWUGŁOSU: W zdarzeniach dwugłosu (z \\N lub \\n), jeśli którykolwiek wiersz powtarza w en_text treść linii bezpośrednio poprzedzającej, zachowaj stuprocentową tożsamość leksykalną i gramatyczną z tekstem polskim linii poprzedzającej.
-5. R1.5 (P2) — KANONICZNA ORTOGRAFIA MIANOWNIKA DLA NAPISÓW EKRANOWYCH (is_sign: true): Na planszach i napisach ekranowych (is_sign: true) terminy ze słownika kanonicznego występują w ścisłej zgodności ortograficznej mianownika (M) z SeriesBible (w tym pełna ochrona samogłosek ruchomych w przyrostkach).
-6. R3.1 (PIPELINE) — PEŁNA SANITYZACJA PŁCI POSTACI I ADRESATÓW W PAMIĘCI RAM: Samolecząca sanitacja SeriesBible w pamięci RAM uzgadnia p0_gender postaci oraz etykiety adresatów w relations z rekordami zweryfikowanymi P0 z profilera odcinka bez modyfikacji plików dyskowych.
-7. R3.2 (PIPELINE) — CZYSTOŚĆ TELEMETRII I PRYMAT REKORDU P0 DLA MÓWCY I ADRESATA: Telemetria sceny nadaje speaker_gender i addressee_gender wyłącznie na podstawie rekordu P0 (has_verified_gender: true), ustawia NON_VIRILE w scenach wyłącznie kobiecych oraz oczyszcza pole aktora z technicznych znaków separatorów, zastępując je znacznikiem POLYLOGUE.
-8. R3.3 (PIPELINE) — DETERMINISTYCZNA BARIERA OCHRONY FAZY 1 W FAZIE 2: DialogueVerifier._guard_phase2_regressions deterministycznie przywraca stan phase1_text w razie nieuzasadnionej zmiany osoby, liczby (przy jawnym zaimku EN), redukcji czasownika epistemicznego lub desynchronizacji wiersza dwugłosu.
+STANDARD_9_CORE_RULES_PROMPT = r"""
+STANDARD 9.3 — AUTORYTET TRANSLACYJNY I NIEZMIENNIKI DZIEDZINY POZYTYWNEJ (R1.1–R1.8):
+1. R1.1 (P0) — FORMY NIEMĘSKOOSOBOWE (NON_VIRILE) W ZBIOROWOŚCIACH ŻEŃSKICH: Dla scen, w których skład postaci obejmuje wyłącznie postacie o zweryfikowanej płci żeńskiej (p0_gender: FEMALE), prawidłowy stan w 1. i 2. osobie liczby mnogiej to formy niemęskoosobowe (-łyśmy, -łyście, one, wszystkie, razem) oraz żeńskie formy ról.
+2. R1.2 (P0) — ZACHOWANIE OSOBY I LICZBY GRAMATYCZNEJ ORZECZENIA: Prawidłowy stan orzeczenia zachowuje osobę i liczbę gramatyczną ustaloną w phase1_text w pełnej zgodzie z zaimkiem podmiotu w en_text (podmiot 1. os. lp. w en_text zachowuje orzeczenie w 1. os. lp. niezależnie od formy dopełnienia).
+3. R1.3 (P0) — ZACHOWANIE PREDYKATÓW EPISTEMICZNYCH I ZDAŃ IDENTYFIKUJĄCYCH: Prawidłowy stan tekstu zachowuje nadrzędne czasowniki epistemiczne, zdania podrzędne dopełnieniowe identyfikujące oraz ciągłość znaczników {\i1}...{\i0} w monologu wewnętrznym.
+4. R1.4 (P1) — TOŻSAMOŚĆ TEKSTOWA POWTÓRZONEGO WIERSZA DWUGŁOSU: W zdarzeniach dwugłosu wiersz powtarzający treść linii poprzedzającej zachowuje pełną tożsamość leksykalną i gramatyczną z tekstem polskim linii poprzedzającej (w pierwszym oraz drugim wierszu).
+5. R1.5 (P2) — KANONICZNA ORTOGRAFIA I ODPOWIEDNIOŚĆ 1:1 DLA NAPISÓW EKRANOWYCH (is_sign: true): Na planszach i napisach ekranowych terminy zachowują zgodność ortograficzną formy mianownika (M) oraz odpowiedniość leksykalną 1:1 względem en_text.
+6. R1.6 (P0) — PIERWSZEŃSTWO SEMANTYCZNE en_text I JAWNEGO AKTORA [Events]: Tekst en_text oraz jawny aktor z kolumny Name w sekcji [Events] mają pierwszeństwo semantyczne wobec pomocniczej transkrypcji ASR.
+7. R1.7 (P0) — ZGODNOŚĆ RODZAJU 1. OSOBY CZASU PRZESZŁEGO Z REKORDEM P0: Końcówki 1. osoby czasu przeszłego (-łem / -łam) wykazują stuprocentową zgodność ze zweryfikowaną płcią p0_gender mówcy w SeriesBible / EpisodeProfiler.
+8. R1.8 (P1) — PEŁNA DEKLINACJA DWUCZŁONOWYCH ANTROPONIMÓW: Dwuczłonowe antroponimy podlegają pełnej odmianie obu członów w wołaczu (W) i przypadkach zależnych (D..Ms) zgodnie ze zdeklinowanym paradygmatem z EpisodeProfiler.
 """
 
 def get_translation_system_prompt(keep_honorifics: bool = True, lean: bool = False) -> str:

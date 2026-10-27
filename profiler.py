@@ -348,20 +348,26 @@ class EpisodeProfiler:
     def sanitize_event_asr(
         raw_asr: Optional[str],
         is_sign: bool = False,
-        style: Optional[str] = None
+        style: Optional[str] = None,
+        duplicate_time_distance_sec: Optional[float] = None,
+        **kwargs
     ) -> str:
         """
-        Sanityzuje pomocniczą transkrypcję ASR dla zdarzenia dialogowego (Standard 9.2, R1.1, R3.5):
+        Sanityzuje pomocniczą transkrypcję ASR dla zdarzenia dialogowego (Standard 9.2/9.3, R1.1, R3.5):
         - Dla szyldów, tytułów odcinka (is_sign: true lub style w ("sign", "title", "ep title", "napis", "caption"))
           zwraca pusty string "", zapobiegając zanieczyszczeniu przekładu obcym audio w tle.
+        - Jeśli identyczny ciąg ASR wystąpił w zdarzeniu oddalonym o > 1.5 s, zeruje duplikat ("").
         - Dla linii dialogowych zwraca oczyszczony tekst ASR powiązany ściśle z oknem czasowym [start_ms, end_ms].
         """
+        raw_asr = kwargs.get("asr_text", raw_asr)
         if is_sign or not raw_asr:
             return ""
         if style:
             s_clean = str(style).strip().lower()
             if any(token in s_clean for token in ("sign", "title", "napis", "caption", "szyld")):
                 return ""
+        if duplicate_time_distance_sec is not None and float(duplicate_time_distance_sec) > 1.5:
+            return ""
         return str(raw_asr).strip()
 
     def __init__(self, client: Any, model: str = "gemini-3.5-flash-lite"):

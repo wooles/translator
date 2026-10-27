@@ -202,11 +202,13 @@ def format_dry_telemetry_tag(
 def synchronize_ass_event_metadata_and_styles(
     event: pysubs2.SSAEvent,
     speaker_name: Optional[str] = None,
-    is_offscreen: bool = False
+    is_offscreen: bool = False,
+    style_italic: Optional[int] = None
 ) -> pysubs2.SSAEvent:
     """
     Synchronizuje pole event.name z wyznaczonym, kanonicznym speaker_name oraz
     ustawia styl offscreen / formatowanie kursywy dla kwestii wypowiadanych spoza kadru.
+    Standard 9.3: Zachowuje kursywę dla stylów o czcionce prostej (style_italic == 0).
     """
     if speaker_name:
         clean_spk, _ = normalize_actor_tag(str(speaker_name))
@@ -226,6 +228,8 @@ def synchronize_ass_event_metadata_and_styles(
                 event.style = "Offscreen"
         if not re.search(r"\{\\i1\}", event.text):
             event.text = f"{{\\i1}}{event.text}{{\\i0}}"
+    elif style_italic in (1, -1):
+        event.text = re.sub(r"\{\\i[01]\}", "", event.text).strip()
     return event
 
 def segment_hybrid_events(events: List[pysubs2.SSAEvent], style_report: Optional[Any] = None) -> List[pysubs2.SSAEvent]:

@@ -194,3 +194,76 @@ def test_phase7_hygiene_merges_duplicate_tag_blocks_and_bridges_italic_monologue
         next_same_speaker_italic=next_italic,
     )
     assert cleaned == expected_text
+
+
+# Test dla Sekcji 2B.1
+@pytest.mark.parametrize(
+    "style_name,style_italic_flag,dpos_line,expected_ass_line",
+    [
+        ("Default", 0, "{\\i1}Myśl wewnętrzna postaci A.{\\i0}", "{\\i1}Myśl wewnętrzna postaci A.{\\i0}"),
+        ("Main - Top", 0, "{\\i1}Obserwacja postaci B.{\\i0}", "{\\i1}Obserwacja postaci B.{\\i0}"),
+    ],
+)
+def test_eqg_preserves_italic_tags_on_upright_styles(
+    style_name, style_italic_flag, dpos_line, expected_ass_line
+):
+    """Weryfikuje zachowanie znaczników kursywy {\\i1}...{\\i0} na stylach o Italic == 0 w [V4+ Styles]."""
+    result = EpisodeQualityGate.preserve_italics_for_upright_style(
+        text=dpos_line,
+        style_name=style_name,
+        style_italic=style_italic_flag,
+    )
+    assert result == expected_ass_line
+
+
+# Test dla Sekcji 2C.4
+@pytest.mark.parametrize(
+    "style_a_align,style_b_align,speaker_a,speaker_b,text_b,inline_top_active,expected_lift",
+    [
+        (2, 8, "SpeakerA", "SpeakerB", "Kwestia górnego stylu.", False, False),
+        (2, 2, "", "", "...dalszy ciąg zdania.", True, False),
+        (2, 2, "SpeakerA", "SpeakerB", "Odrębna kwestia.", False, True),
+    ],
+)
+def test_collision_checks_top_style_alignment_inline_an8_and_ellipsis_continuation(
+    style_a_align, style_b_align, speaker_a, speaker_b, text_b, inline_top_active, expected_lift
+):
+    """Weryfikuje blokadę \\an8 przy kolizji ze stylem górnym (Alignment==8), przy inline \\an8 i przy kontynuacji '...'."""
+    lift = EpisodeQualityGate.should_apply_top_alignment_on_collision(
+        style_a_alignment=style_a_align,
+        style_b_alignment=style_b_align,
+        speaker_a=speaker_a,
+        speaker_b=speaker_b,
+        text_b=text_b,
+        has_active_top_sign=inline_top_active,
+    )
+    assert lift is expected_lift
+
+
+# Test dla Sekcji 2C.5
+@pytest.mark.parametrize(
+    "raw_ass_text,collides_with_bottom_dialogue,expected_normalized",
+    [
+        (
+            "{\\3c&H000000&\\bord3}{\\shad1}{\\pos(320,228)\\3c&HED4CA1&\\blur2}Plansza",
+            False,
+            "{\\pos(320,228)\\3c&HED4CA1&\\bord3\\shad1\\blur2}Plansza",
+        ),
+        (
+            "{\\an1\\3c&H000000&\\bord3\\shad1}PLANSZA DOLNA",
+            True,
+            "{\\an8\\3c&H000000&\\bord3\\shad1}PLANSZA DOLNA",
+        ),
+    ],
+)
+def test_phase7_merges_triple_tag_blocks_strips_orphan_i0_and_lifts_colliding_sign(
+    raw_ass_text, collides_with_bottom_dialogue, expected_normalized
+):
+    """Weryfikuje scalanie 3 bloków tagów {\\...} w jeden oraz podnoszenie dolnego is_sign przy kolizji z dialogiem."""
+    out = EpisodeQualityGate.normalize_ass_tags_and_sign_layout(
+        text=raw_ass_text,
+        is_sign=True,
+        collides_with_bottom_dialogue=collides_with_bottom_dialogue,
+    )
+    assert out == expected_normalized
+

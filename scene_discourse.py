@@ -2739,6 +2739,7 @@ class SceneDiscourseGraph:
         episode_profiler: Optional[Any] = None,
         aux_telemetry: Optional[Dict[str, Any]] = None,
         raw_actor: Optional[str] = None,
+        inferred_actor: Optional[str] = None,
         verified_p0_gender: Optional[str] = None,
         verified_addressee_p0_gender: Optional[str] = None,
         has_verified_gender: bool = False,
@@ -2756,19 +2757,23 @@ class SceneDiscourseGraph:
         telemetry = dict(aux_telemetry or {})
         
         # 1. Pobierz aktora ze zdarzenia lub raw_actor
-        actor = raw_actor or getattr(event, "actor", None) or getattr(event, "speaker_name", None) or getattr(event, "name", None) or telemetry.get("speaker_name")
-        if not actor and isinstance(event, dict):
-            actor = event.get("actor") or event.get("speaker_name") or event.get("name")
+        raw_name = raw_actor or getattr(event, "actor", None) or getattr(event, "speaker_name", None) or getattr(event, "name", None)
+        if not raw_name and isinstance(event, dict):
+            raw_name = event.get("actor") or event.get("speaker_name") or event.get("name")
             
-        clean_actor = str(actor).strip() if actor else ""
-        if clean_actor:
-            if any(sep in clean_actor for sep in ("/", "|", ",")):
-                spk_label = "POLYLOGUE"
-                telemetry["speaker_name"] = spk_label
-                telemetry["actor"] = spk_label
-            else:
-                telemetry["speaker_name"] = clean_actor
-                telemetry["actor"] = clean_actor
+        clean_raw = str(raw_name).strip() if raw_name else ""
+        if not clean_raw or clean_raw.lower() in ("txt", "title"):
+            clean_actor = str(inferred_actor or telemetry.get("speaker_name") or "").strip()
+        else:
+            clean_actor = clean_raw
+
+        if clean_actor in ("/", "|", ",") or clean_actor.lower() in ("all", "both") or any(sep in clean_actor for sep in ("/", "|")):
+            spk_label = "POLYLOGUE"
+            telemetry["speaker_name"] = spk_label
+            telemetry["actor"] = spk_label
+        else:
+            telemetry["speaker_name"] = clean_actor
+            telemetry["actor"] = clean_actor
 
         # 2. Sprawdź rekord P0 w parametrach, series_bible / episode_profiler
         p0_gender = verified_p0_gender
@@ -2801,21 +2806,36 @@ class SceneDiscourseGraph:
                         break
 
         if p0_gender:
-            telemetry["speaker_gender"] = p0_gender
-            telemetry["p0_gender"] = p0_gender
+            p0_u = str(p0_gender).upper()
+            telemetry["speaker_gender"] = p0_u
+            telemetry["p0_gender"] = p0_u
             telemetry["has_verified_gender"] = has_ver
+            if p0_u == "MALE":
+                telemetry["grammatical_gender"] = "MASCULINE"
+            elif p0_u == "FEMALE":
+                telemetry["grammatical_gender"] = "FEMININE"
         else:
             if "speaker_gender" not in telemetry:
                 telemetry["speaker_gender"] = "UNKNOWN"
             if "has_verified_gender" not in telemetry:
                 telemetry["has_verified_gender"] = False
+            if "grammatical_gender" not in telemetry:
+                telemetry["grammatical_gender"] = "UNKNOWN"
 
         if verified_addressee_p0_gender:
-            telemetry["addressee_gender"] = verified_addressee_p0_gender
+            addr_g = str(verified_addressee_p0_gender).upper()
+            telemetry["addressee_gender"] = addr_g
+            if addr_g == "FEMALE":
+                telemetry["target_gender"] = "FEMININE"
+            elif addr_g == "MALE":
+                telemetry["target_gender"] = "MASCULINE"
 
         if scene_female_only:
             telemetry["group_virility"] = "NON_VIRILE"
+            telemetry["we_virility"] = "NON_VIRILE"
+            telemetry["you_virility"] = "NON_VIRILE"
+            telemetry["target_gender"] = "FEMININE"
+            if "addressee_gender" not in telemetry or telemetry["addressee_gender"] == "UNKNOWN":
+                telemetry["addressee_gender"] = "FEMALE"
 
         return telemetry
-
-
