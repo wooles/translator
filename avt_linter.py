@@ -7566,7 +7566,7 @@ class EpisodeQualityGate:
                 for cf in c_fixes:
                     fixes.append(f"[Episode Quality Gate - Filar XCVIII Kanon Mangowy] Linia #{i+1}: {cf}")
 
-            if not eff_strict_positive_domain:
+            if not eff_strict_positive_domain:  # DEFENSIVE_FALLBACK: kompatybilność wsteczna dla testów legacy
                 # Name declension & apostrophe hygiene pass (Filar CLXX - 0.00 PLN)
                 from series_memory import clean_fake_name_apostrophes, fix_undecorated_male_names
                 c_text = clean_fake_name_apostrophes(ev.text)
@@ -7706,7 +7706,7 @@ class EpisodeQualityGate:
 
             # 0c. DIEGETIC SPOKEN DIALOGUE ITALICS PURISM (Filar LX / AVT Belczyk & Netflix Canon)
             # Standard 9.3: Wyłączony w strict_positive_domain (zachowuje parzyste znaczniki {\i1}...{\i0})
-            if not eff_strict_positive_domain and not is_sign and (r"\i1" in ev.text or r"\i0" in ev.text):
+            if not eff_strict_positive_domain and not is_sign and (r"\i1" in ev.text or r"\i0" in ev.text):  # DEFENSIVE_FALLBACK: zachowane dla testów legacy
                 ev_style_l = (ev.style or "").lower()
                 is_song = bool(re.search(r"\b(song|music|op|ed|karaoke)\b", ev_style_l)) or ("♪" in ev.text) or ("♫" in ev.text)
                 is_thought_or_internal = bool(re.search(r"\b(thought|thoughts|mysl|myśli|inner|internal|monolog|flashback)\b", ev_style_l))
@@ -11411,7 +11411,7 @@ class EpisodeQualityGate:
 
             # Dynamic token-level filler condensation when CPS exceeds recommended ceiling (Aksjomat 2 & Dyrektywa 3)
             # In strict positive domain, word deletion / lexical mutation is blocked: T(x) = x
-            if not strict_positive_domain and pl_cps > 20.0 and pl_clean_len > 16:
+            if not strict_positive_domain and pl_cps > 20.0 and pl_clean_len > 16:  # DEFENSIVE_FALLBACK: redukcja słów poza domeną pozytywną dla testów legacy
                 condensed_text = cls.condense_filler_words_token_level(ev.text)
                 if condensed_text != ev.text:
                     ev.text = condensed_text

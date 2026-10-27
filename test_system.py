@@ -3,6 +3,7 @@
 Verification test suite for Multimodal Subtitle Translator components.
 """
 
+import pytest
 import os
 os.environ.setdefault("GEMINI_API_KEY", "dummy_offline_test_key")
 import tempfile
@@ -411,6 +412,7 @@ def test_subtitle_parsing_and_saving():
     os.remove(srt_path)
     print(" -> PASSED: Parsowanie i zapis napisów działa bezbłędnie.")
 
+@pytest.mark.slow
 def test_ffmpeg_frame_extraction():
     print("[TEST 5/5] Test ekstrakcji klatki ffmpeg...")
     with tempfile.NamedTemporaryFile(suffix=".mp4", delete=False) as f:
@@ -458,6 +460,7 @@ from profiler import (
 )
 from whisper_engine import JapaneseWhisperEngine
 
+@pytest.mark.slow
 def test_profiler_and_whisper():
     print("[TEST 6/6] Test profilera odcinka 4.0 (Pivots, Catchphrases, Song Matrix, Puns, Continuity)...")
     profile = EpisodeProfile(
@@ -592,6 +595,7 @@ def test_profiler_and_whisper():
     print(" -> PASSED: Profiler 4.0 (Pivots, Catchphrases, Song Matrix, Puns, Continuity) i Kotoba-Whisper v2.0 działają w 100%.")
 from model_resolver import resolve_best_models, _extract_model_score, probe_model_health, probe_all_models_health
 
+@pytest.mark.slow
 def test_model_resolver():
     print("[TEST 7/7] Test automatycznego wykrywania najnowszych modeli Gemini i Sondy Obciążenia...")
     score_38 = _extract_model_score("gemini-3.8-flash")
@@ -675,6 +679,7 @@ from speaker_diarizer import SpeakerVoiceClassifier
 from typesetting_matcher import TypesettingColorMatcher, rgb_to_ass_hex
 import numpy as np
 
+@pytest.mark.slow
 def test_avt_linter():
     print("[TEST 8/12] Test automatycznego audytora polszczyzny AVT Linter...")
     # Test eliminacji sztucznego "Czy"
@@ -1051,6 +1056,7 @@ def test_avt_formatter_and_cps():
     assert len(adaptive_res) == 2  # 60 lines packed into 2 batches (32 + 28) instead of 3 rigid batches (24 + 24 + 12)!
     print(" -> PASSED: Podział linii AVT, CPS, Shot-Cut Snapping, Condensation, Sound-Wall i Adaptive Batching działają w 100%.")
 
+@pytest.mark.slow
 def test_prosody_and_diarizer():
     print("[TEST 11/12] Test lokalnej analizy prozodii i diarizacji fonicznej F0...")
     # Test szacowania F0 na syntetycznym sygnale sinusoidalnym (200Hz - żeński)
@@ -1200,6 +1206,8 @@ def test_batch_queue():
     assert len(res) == 1
     print(" -> PASSED: Kolejka Sezonowa i naturalny sorting odcinków działają bezbłędnie.")
 
+@pytest.mark.network
+@pytest.mark.slow
 def test_context_cache():
     print("[TEST 15/15] Test Inteligentnego Zarządzania Pamięcią Kontekstu (Google Context Caching)...")
     import hashlib
@@ -1522,6 +1530,7 @@ def test_dynamic_rule_dispatcher():
 
     print(" -> PASSED: Dyspozytor reguł precyzyjnie aktywuje właściwe filary AVT.")
 
+@pytest.mark.slow
 def test_fuzzy_and_dynamic_avt_linter():
     print("[TEST 21/22] Test Fleksyjnego i Dynamicznego Lintera (avt_linter)...")
     from avt_linter import AVTLinter
@@ -1593,6 +1602,7 @@ def test_gui_interactive_learning_components():
     assert len(gm.global_terms) >= 1
     print(" -> PASSED: Komponenty GUI interaktywnego uczenia są w 100% gotowe.")
 
+@pytest.mark.slow
 def test_extended_avt_pillars():
     print("[TEST 23/25] Test Filarów Paralingwistyki, Interpunkcji i Translationese...")
     from avt_linter import AVTLinter
@@ -1726,6 +1736,7 @@ def test_cognitive_prosody_and_narrative_pillars():
     assert "LXX" in f_meta
     print(" -> PASSED: Filary Kognitywistyki Prozodii i Narracji (LXV – LXX) w 100% zintegrowane.")
 
+@pytest.mark.slow
 def test_visual_discourse_and_transcreation_pillars():
     print("[TEST 27/28] Test Kognitywistyki Wizualnej, Dyskursu i Transkreacji (LXXI – LXXX)...")
     from rules import get_focused_rules_for_batch
@@ -1781,6 +1792,7 @@ def test_visual_discourse_and_transcreation_pillars():
     assert "LXXX" in f_punct
     print(" -> PASSED: Kanon Zunifikowany 80 Filarów AVT (Filary LXXI – LXXX) w 100% zintegrowany.")
 
+@pytest.mark.slow
 def test_masterpieces_and_semiotics_pillars():
     print("[TEST 28/28] Test Arcydzieł Światowej Translatoryki i Semiotyki (LXXXI – XC)...")
     from rules import get_focused_rules_for_batch
@@ -1839,6 +1851,7 @@ def test_masterpieces_and_semiotics_pillars():
     assert "XC" in f_somatic
     print(" -> PASSED: Kanon Zunifikowany 90 Filarów AVT (Filary LXXXI – XC) w 100% zintegrowany i sprawny.")
 
+@pytest.mark.slow
 def test_translator_logger_and_sign_detector():
     print("[TEST 29/29] Test odporności translator.py, audio alertów i spójności retrospekcji...")
     import translator
@@ -2356,6 +2369,8 @@ def test_translator_logger_and_sign_detector():
     assert "Watch out, master!" in prompt_res
     print(" -> PASSED: Logger w translator.py, audio alerty (Haragei, Aizuchi, Oyaji, Giri, Ii desu, Wakaru, Hybrydy, Kun, Chigaimasu), spójność retrospekcji 1:1 i _prepare_batch_prompt działają bezbłędnie.")
 
+@pytest.mark.network
+@pytest.mark.slow
 def test_masterclass_next_gen():
     print("[TEST 30/30] Test mechanizmów Masterclass (Pillar CXVIII Barańczak Song, Idiolect Matrix, SceneShotSnapper)...")
     from rules import get_focused_rules_for_batch
@@ -2554,6 +2569,8 @@ def test_adaptive_thinking_budget():
 
     print(" -> PASSED: Wielopoziomowy adaptacyjny budżet myślenia (Flash: 6144/3072/2048, Pro: 2048/1536/1024) działa w 100%.")
 
+@pytest.mark.network
+@pytest.mark.slow
 def test_cornerstone_invariants():
     print("[TEST 33/33] Test Żelaznych Kotwic Stabilności i Nienaruszalności Ceny/Wydajności (Cornerstone v2.0 Invariants)...")
     from client_factory import format_friendly_api_error
@@ -2581,6 +2598,7 @@ def test_cornerstone_invariants():
     
     print(" -> PASSED: Żelazne kotwice wydajności, pre-warmingu multi-key i ochrony kosztów są w 100% aktywne.")
 
+@pytest.mark.slow
 def test_episode_quality_gate():
     print("[TEST 34/34] Test Całościowego Strażnika Jakości Odcinka (Episode Quality Gate 0.00 PLN)...")
     from avt_linter import EpisodeQualityGate
@@ -2828,6 +2846,7 @@ def test_affective_incongruity_and_sarcasm_detector():
 
     print(" -> PASSED: Detektor Dysonansu Afektywnego i Sarkazmu (Acoustic Incongruity Engine) bezbłędnie chroni przed dosłownym przekładem ironii seiyū.")
 
+@pytest.mark.slow
 def test_quality_gate_name_declension_vocative_and_micro_lines():
     print("[TEST 38/38] Test Strażnika Deklinacji Imion, Wołacza i Mikro-Kwestii (< 0.5s) oraz Plot Anchors...")
     import tempfile
@@ -2892,6 +2911,7 @@ def test_quality_gate_name_declension_vocative_and_micro_lines():
     print(" -> PASSED: EpisodeQualityGate (deklinacja imion obcych, wołacz, mikro-kwestie <0.5s) i Biblia Serialu (Plot Anchors) działają w 100% przy koszcie 0.00 PLN.")
 
 
+@pytest.mark.slow
 def test_comprehensive_architecture_extensions():
     print("[TEST 39-42/42] Test Nowej Kompleksowej Architektury: StyleMatrixEngine, SQLite FTS5 BM25, Auto-Diff Ingestion i Matryca 7 Przypadków Deklinacji...")
 
@@ -3181,6 +3201,7 @@ def test_fansub_quality_pixel_perfect_typesetting():
     print(" -> PASSED: Fansub-Quality Pixel-Perfect Typesetting (Grounding 2D, \\pos, \\frz, \\1c, \\3c) działa w 100% harmonii.")
 
 
+@pytest.mark.slow
 def test_phase1_gender_hallucination_arbitration():
     print("[TEST 45/45] Test Wielopoziomowego Silnika Arbitrażu Płci (Ochrona przed Halucynacją Fazy 1)...")
     from translator import MultimodalTranslator
@@ -3241,6 +3262,7 @@ def test_phase1_gender_hallucination_arbitration():
     print(" -> PASSED: Wielopoziomowy Silnik Arbitrażu Płci (Ochrona przed Halucynacją Fazy 1, Weto Kanonu, Weto F0 i Linter 0.00 PLN) działa w 100% harmonii.")
 
 
+@pytest.mark.slow
 def test_multimodal_addressee_and_plural_group_resolution():
     print("[TEST 46/46] Test Multimodalnego Rozpoznawania Adresata i Morfologii Grup Liczby Mnogiej (Filar CLXIII)...")
     from translator import MultimodalTranslator, LineTranslation
@@ -3445,6 +3467,7 @@ def test_multimodal_addressee_and_plural_group_resolution():
     print(" -> PASSED: Multimodalne Rozpoznawanie Adresata, Triangulacja Whisper JP i Morfologia Grup (Filar CLXIII) działają w 100% harmonii (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_exception_driven_architecture_and_conflict_shields():
     print("[TEST 47/47] Test Architektury Sterowanej Wyjątkami (Blind-Drafting, Tarcza Wołacza, Nadrzędność Tłumu i Smart CPS)...")
     
@@ -3695,6 +3718,7 @@ def test_user_glossary_lowest_priority_guard():
     print(" -> PASSED: 4-poziomowa hierarchia terminologii, ochrona kanonu i tarcza słownika użytkownika działają w 100% harmonii (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_foreign_fantasy_name_declension_and_genitive_possession_guard():
     print("[TEST 50/50] Test Żelaznej Fleksji Imion Obcych/Fantasy, Dopełniacza Dzierżawczego i Episode Quality Gate...")
     from pathlib import Path
@@ -3774,6 +3798,7 @@ def test_foreign_fantasy_name_declension_and_genitive_possession_guard():
     print(" -> PASSED: Fleksja imion obcych/fantasy, dopełniacz dzierżawczy i twardy bezpiecznik EpisodeQualityGate działają w 100% harmonii (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_lexical_typo_correction_and_orthographic_integrity_guard():
     print("[TEST 51/51] Test Eliminacji Literówek, Integralności Ortograficznej (Filar CLXIV) i EpisodeQualityGate...")
     import pysubs2
@@ -3822,6 +3847,7 @@ def test_lexical_typo_correction_and_orthographic_integrity_guard():
     print(" -> PASSED: Eliminacja literówek, tarcza ortograficzna (Filar CLXIV) i EpisodeQualityGate działają w 100% harmonii (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_frieren_manga_canon_aura_gilotyna_and_calque_shield():
     print("[TEST 52/52] Test Kanonu Mangowego Frieren (Studio JG / Martyna Zdonek), Tarczy 'Aura Gilotyna' i Eliminacji Kalki 'od Gilotyny'...")
     import pysubs2
@@ -3890,6 +3916,7 @@ def test_frieren_manga_canon_aura_gilotyna_and_calque_shield():
     print(" -> PASSED: Kanon mangowy Frieren (Studio JG / Martyna Zdonek), tarcza 'Aura Gilotyna', eliminacja 'od Gilotyny' oraz audyt dokumentacji README działają w 100% harmonii (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_relational_tv_invariance_and_hybrid_vocative_guard():
     print("\n[TEST 53/53] Test Relacyjnej Nienaruszalności T-V, Tarczy Wołacza i Likwidacji Hybryd Pan/Ty...")
     import pysubs2
@@ -3978,6 +4005,7 @@ def test_relational_tv_invariance_and_hybrid_vocative_guard():
     print(" -> PASSED: Relacyjna nienaruszalność T-V, tarcza wołacza, eliminacja hybryd pan/ty, Anti-Sama-Drop i ochrona mianownika działają w 100% harmonii (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_linguistic_invariants_and_kakegoe_noise_elision():
     """
     Test 54: Weryfikacja bezwzględnych niezmienników leksykalnych, ortograficznych,
@@ -4045,6 +4073,7 @@ def test_linguistic_invariants_and_kakegoe_noise_elision():
     print(" -> PASSED: Bezwzględne niezmienniki językowe, likwidacja kalki 'Tutaj' i elipsa szumu Kakegoe działają ze 100% precyzją.")
 
 
+@pytest.mark.slow
 def test_temporal_discontinuity_and_scene_boundary_guard():
     print("[TEST 55] Test protokołu dyskontinuitetu czasowego, przeskoków scen i opóźnionego potwierdzenia (Filar CLXV)...")
     from avt_linter import EpisodeQualityGate
@@ -4114,6 +4143,7 @@ def test_temporal_discontinuity_and_scene_boundary_guard():
     print(" -> PASSED: Protokół dyskontinuitetu czasowego, przeskoki scen i eliminacja 'Jasne, o co chodzi?' (Filar CLXV) działają w 100% harmonii (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_anti_pivot_and_spatiotemporal_engine():
     print("[TEST 56] Test całościowego silnika czasoprzestrzennego, protokołu Anti-Pivot (Filar CLXVI) i 2-etapowej ślepej lektury CoT...")
     from avt_linter import EpisodeQualityGate, AVTLinter
@@ -4190,6 +4220,7 @@ def test_anti_pivot_and_spatiotemporal_engine():
     print(" -> PASSED: Całościowy silnik czasoprzestrzenny, protokół Anti-Pivot (Filar CLXVI), 2-etapowa ślepa lektura CoT i EpisodeQualityGate działają w 100% harmonii (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_holistic_domain_generalization_and_systemic_invariants():
     """
     Test 57: Weryfikacja Całościowego Uogólnienia Dziedziny (Holistic Domain Generalization).
@@ -4375,6 +4406,7 @@ def test_systemic_information_flow_and_scene_topology():
     print(" -> PASSED: Reforma przepływu informacji, topologia scen i asymilacja wiedzy działają w 100% harmonii (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_runtime_batch_pipeline_and_ast_integrity_guard():
     print("[TEST 59] Test integralności AST i odporności pętli montowania paczek...")
     import ast
@@ -4631,6 +4663,7 @@ def test_batch_density_scene_coalescence_and_cost_optimization():
     print(" -> PASSED: Optymalizacja partycjonowania, eliminacja mikro-paczek i koalescencja scen działają w 100% (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_anti_calque_morphology_and_single_char_actor_resilience():
     """
     Test 61: Protokół 5 Warstw eliminacji kalk fansuberskich, generalizacji morfologicznej
@@ -4750,6 +4783,8 @@ def test_anti_calque_morphology_and_single_char_actor_resilience():
     print(" -> PASSED: Protokół 5 Warstw, eliminacja kalk fansuberskich, uogólniona morfologia 1. os. oraz odporność na tokeny jednoznakowe działają w 100% (0.00 PLN).")
 
 
+@pytest.mark.network
+@pytest.mark.slow
 def test_database_integrity_anilist_resilience_and_slug_consolidation():
     """
     Test 62: Kompleksowy test integralności baz danych, konsolidacji slugów,
@@ -4846,6 +4881,7 @@ def test_database_integrity_anilist_resilience_and_slug_consolidation():
     print(" -> PASSED: Integralność baz danych, odporność na awarię AniList (Offline-First/Circuit-Breaker) i konsolidacja slugów działają w 100% (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_sayonara_lara_holistic_domain_declension_vocative_and_syntax_guard():
     print("[TEST 63/63] Holistyczna weryfikacja 5 domen: deklinacja obcych imion na -ca, wołacz gramatyczny, Ouji, kalki konwersacyjne i sanitizacja ASS...")
     
@@ -4925,6 +4961,7 @@ Dialogue: 0,0:11:54.89,0:11:56.28,Default,LARA,0,0,0,,To wy...
     print(" -> PASSED: Holistyczna ochrona 5 domen (deklinacja -ca, wołacz, Ouji, kalki, tagi ASS) zweryfikowana we wszystkich 5 warstwach (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_carameliser_holistic_domain_dashes_conjunction_and_canon_guard():
     print("[TEST 64/64] Holistyczna weryfikacja 6 domen: samotne myślniki, biernik współrzędny, honorofikatory i slang, kanon mangi, interpunkcja i clamping CPS...")
 
@@ -5026,6 +5063,7 @@ Dialogue: 0,0:16:32.44,0:16:34.28,Default,Kuroe,0,0,0,,Rin–
     print(" -> PASSED: Holistyczna ochrona 6 domen (samotne myślniki, biernik współrzędny, kanon mangi, slang/senpai, interpunkcja, CPS) zweryfikowana w 5 warstwach (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_kore_kaite_shine_ep08_holistic_domain_guard():
     print("[TEST 65/65] Test Holistycznej Ochrony Kore Kaite Shine Ep 08 (Tytulatura Szkolna, Żargon Twórczy, Fleksja Zamówień, Okrzyk Tamaya, Tarcza Ziemiąem)...")
     from avt_linter import EpisodeQualityGate, AVTLinter
@@ -5117,6 +5155,7 @@ def test_kore_kaite_shine_ep08_holistic_domain_guard():
     print(" -> PASSED: Holistyczna ochrona Kore Kaite Shine Ep 08 zweryfikowana w 5 warstwach (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_kore_kaite_shine_ep09_holistic_domain_guard():
     print("[TEST 66/66] Test Holistycznej Ochrony Kore Kaite Shine Ep 09 (Relacje Rówieśnicze, T-V Redaktorka-Autorka, Odporność Znaków, Higiena Interpunkcji)...")
     from avt_linter import EpisodeQualityGate, AVTLinter
@@ -5197,6 +5236,7 @@ def test_kore_kaite_shine_ep09_holistic_domain_guard():
     print(" -> PASSED: Holistyczna ochrona Kore Kaite Shine Ep 09 zweryfikowana w 5 warstwach (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_nige_jouzu_ep20_holistic_domain_guard():
     print("[TEST 67/67] Test Holistycznej Ochrony Nige Jouzu no Wakagimi Ep 20 (Rozszczepianie Dwugłosu, Normalizacja Tagów Formatowania, Tautologie Kronik, Zgodność Liczebników, Idiomatyka)...")
     from avt_linter import EpisodeQualityGate, AVTLinter
@@ -5271,6 +5311,7 @@ def test_nige_jouzu_ep20_holistic_domain_guard():
     print(" -> PASSED: Holistyczna ochrona Nige Jouzu no Wakagimi Ep 20 zweryfikowana w 5 warstwach (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_clevatess_ep05_holistic_domain_guard():
     print("[TEST 68/68] Test Holistycznej Ochrony Clevatess Ep 05 (Inwersja Czasowa, Matryca Narzędnika, Kalka Auto-Referencyjna, Rejestr Dark Fantasy, Spójność Imion)...")
     from avt_linter import EpisodeQualityGate, AVTLinter
@@ -5334,6 +5375,7 @@ def test_clevatess_ep05_holistic_domain_guard():
     print(" -> PASSED: Holistyczna ochrona Clevatess Ep 05 zweryfikowana w 5 warstwach (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_clevatess_ep03_proactive_governance_guard():
     print("[TEST 69/69] Test Proaktywnej Integralności Clevatess Ep 03 (Inwersja 10 min, Kalka Przydomków 'no', Rodzaj Posoki, 4 Klasy Slangu Dark Fantasy)...")
     from avt_linter import EpisodeQualityGate, AVTLinter
@@ -5392,6 +5434,7 @@ def test_clevatess_ep03_proactive_governance_guard():
     print(" -> PASSED: Proaktywna integralność Clevatess Ep 03 zweryfikowana w 5 warstwach (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_universal_series_memory_and_ep04_guard():
     """
     Test 70: Weryfikacja Uniwersalnego Zasilenia Pamięci Serialu (wszystkie serie),
@@ -5455,6 +5498,7 @@ def test_universal_series_memory_and_ep04_guard():
     print(" -> PASSED: Uniwersalna Pamięć Serialu i zabezpieczenia Clevatess Ep 04 zweryfikowane w 5 warstwach (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_tenmaku_ep11_holistic_domain_guard():
     print("Testing Tenmaku no Jaadugar Ep 11 Holistic Domain Guard (Filar CLXVII)...")
     from avt_linter import EpisodeQualityGate, AVTLinter, load_subtitle_file_resilient
@@ -5528,6 +5572,7 @@ def test_tenmaku_ep11_holistic_domain_guard():
     print(" -> PASSED: Tenmaku no Jaadugar Ep 11 Holistic Domain Guard zweryfikowany w 5 warstwach (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_carameliser_ep09_holistic_domain_guard():
     print("Testing Otome Kaijuu Carameliser Ep 09 Holistic Domain Guard (Filar XXVII, XXIII, LX)...")
     from avt_linter import EpisodeQualityGate, AVTLinter
@@ -5685,6 +5730,7 @@ def test_pipeline_none_type_immunity_and_edge_case_guard():
     print(" -> PASSED: Odporność potoku na NoneType, błędy kodowania, fonetykę imion i skrajne przypadki wejścia zweryfikowana w 5 warstwach (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_deictic_temporal_syntax_and_anti_adjectivization_guard():
     print("[TEST 74/74] Test Holistycznej Ochrony Składni Deiktyczno-Temporalnej (Filar CLXVIII: Zakaz Sztucznych Przydawkowych Określeń Czasu)...")
     from avt_linter import AVTLinter, EpisodeQualityGate
@@ -5741,6 +5787,7 @@ def test_deictic_temporal_syntax_and_anti_adjectivization_guard():
     print(" -> PASSED: Holistyczna ochrona składni deiktyczno-temporalnej (Filar CLXVIII) zweryfikowana w 5 warstwach (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_title_card_overflow_and_bracket_sanitization_guard():
     """
     TEST 75: Holistyczna Ochrona Plansz Tytułowych, Puryzmu Nawiasów [ ] i Eliminacji Przepełnienia Ekranu (Filar XCVIII & LX)
@@ -5808,6 +5855,7 @@ def test_title_card_overflow_and_bracket_sanitization_guard():
     print(" -> PASSED: Ochrona plansz tytułowych, puryzm nawiasów [ ] i eliminacja przepełnienia ekranu (Filar XCVIII & LX) w 100% harmonii (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_speaker_scoped_hypocorism_and_inherent_female_gender_guard():
     """
     Test 76: Holistyczna Ochrona Socjolektu, Zakaz Wycieku Ksywek Rówieśniczych oraz Morfologiczny Prymat Płci Postaci (Filar CLXIX).
@@ -5912,6 +5960,7 @@ def test_speaker_scoped_hypocorism_and_inherent_female_gender_guard():
     print(" -> PASSED: Socjolekt, zakaz wycieku ksywek rówieśniczych i morfologiczny prymat płci postaci (Filar CLXIX) działają w 100% harmonii (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_seiyu_voice_primacy_aisatsu_echo_and_title_nominative_guard():
     print("[TEST 77/77] Holistyczna weryfikacja 5 warstw: Prymat głosu seiyū nad pivotem EN, akty mowy, eliminacja echa powitań aisatsu i nienaruszalność mianownika tytulatury podmiotu (Filar CLXX)...")
 
@@ -6012,6 +6061,7 @@ def test_seiyu_voice_primacy_aisatsu_echo_and_title_nominative_guard():
     print(" -> PASSED: Prymat głosu seiyū, akty mowy, harmonizacja powitań aisatsu i nienaruszalność tytulatury podmiotu (Filar CLXX) działają w 100% (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_tenmaku_ep12_holistic_domain_guard():
     """
     Test 78: Kompleksowy audyt 5 Warstw Architektury po analizie Tenmaku no Jaadugar Odcinek 12:
@@ -6101,6 +6151,7 @@ def test_tenmaku_ep12_holistic_domain_guard():
     print(" -> PASSED: Całościowy audyt 5 Warstw (Tenmaku no Jaadugar Ep 12) działa w 100% z zerowym kosztem (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_lean_scene_context_and_tm_isolation_guard():
     """
     Test 79: Selektywne Przekazywanie Informacji Scenicznych i Eliminacja Kognitywnego Przesycenia Modeli LLM:
@@ -6206,6 +6257,7 @@ def test_lean_scene_context_and_tm_isolation_guard():
     print(" -> PASSED: Selektywne przekazywanie informacji scenicznych (JIT Character Scoping, Domain-Locked TM, Active Glossary Pinning) działa w 100% (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_vocal_isolation_cross_gender_and_cps_snapper_guard():
     print("\n[TEST 80] Vocal Isolation, Cross-Gender Voice Shield, CPS Snapper & Numerical Gate...")
     import inspect
@@ -6347,6 +6399,7 @@ def test_batch_coalescence_ssot_prompt_and_cot_streamlining_guard():
     print(" -> PASSED: Koalescencja resztkowa paczek, normalizacja SSOT i 3-etapowy lejek CoT działają w 100% (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_dynamic_affective_primacy_calque_scorer_and_timeless_craft_guard():
     print("\n[TEST 82] Dynamic Affective Primacy, Calque Scorer, Blind Masking & Timeless Craft Guard...")
     from inspect import getsource
@@ -6435,6 +6488,7 @@ def test_dynamic_affective_primacy_calque_scorer_and_timeless_craft_guard():
     print(" -> PASSED: Dynamiczny Prymat Afektu, Calque Scorer, Blind Masking i Polszczyzna Bezterminowa działają w 100% (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_offline_linguistic_and_anti_calque_engine_guard():
     """
     Test 83: Kompleksowy audyt silnika deterministycznego offline (0.00 PLN):
@@ -6561,6 +6615,7 @@ def test_offline_linguistic_and_anti_calque_engine_guard():
     print(" -> PASSED: Silnik deterministyczny offline (norma PWN, False Friends, kalki EN, zaimki somatyczne, Echo Agreement) działa w 100% (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_definite_article_exclamative_nominative_guard():
     print("[TEST 84/84] Holistyczna weryfikacja 5 warstw: Eliminacja fałszywego wołacza tytułów z przedimkiem określonym (The + Title -> Mianownik Wykrzyknikowy) w 100% offline (0.00 PLN)...")
 
@@ -6676,6 +6731,7 @@ def test_definite_article_exclamative_nominative_guard():
     print(" -> PASSED: Cała dziedzina Mianownika Wykrzyknikowego (The + Title -> Nominativus) działa w 100% deterministycznie offline (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_scored_attention_dispatcher_anti_shadowing():
     print("[TEST 85/85] Holistyczna weryfikacja 5 warstw: Scored Attention Dispatcher, eliminacja Trigger Shadowing i odciążenie modeli...")
     from rules import (
@@ -6769,6 +6825,8 @@ def test_scored_attention_dispatcher_anti_shadowing():
     print(" -> PASSED: Scored Attention Dispatcher, eliminacja Trigger Shadowing i odciążenie modeli działają w 100% (0.00 PLN).")
 
 
+@pytest.mark.network
+@pytest.mark.slow
 def test_elderly_female_raspy_voice_and_unnamed_speaker_defense():
     """
     TEST 86: Test Nienaruszalności Płci Dojrzałych Kobiet o Niskim Głosie (Filar CXXXVI, CLXXI)
@@ -6882,6 +6940,7 @@ def test_elderly_female_raspy_voice_and_unnamed_speaker_defense():
     print(" -> PASSED: Tarcza głosu starszych kobiet, formy przypuszczające (-łbym/-łabym) i detekcja mówcy bez metadanych działają w 100% (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_imperium_neuter_declension_ethnonym_soliloquy_and_dual_numeral_guard():
     """
     Test 87: Holistyczna weryfikacja 5 warstw:
@@ -6984,6 +7043,8 @@ def test_imperium_neuter_declension_ethnonym_soliloquy_and_dual_numeral_guard():
     print(" -> PASSED: Nienaruszalność rzeczowników na -um, etnonimy, solilokwia seiyū i liczebniki podwójne działają w 100% (0.00 PLN).")
 
 
+@pytest.mark.network
+@pytest.mark.slow
 def test_speaker_gender_attribution_and_turn_continuity_guard():
     """
     [TEST 88/88] Test 5 Warstw: Spójność Płci Postaci, Eliminacja Fałszywych Aktorów ('mężczyzna'/'kobieta'),
@@ -7133,6 +7194,7 @@ def test_speaker_gender_attribution_and_turn_continuity_guard():
     print(" -> PASSED: Spójność Płci Postaci, Odporność na Etykiety 'mężczyzna'/'kobieta' i Brama Spójności Monologu działają w 100% harmonii (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_dyadic_singular_primacy_and_audio_ground_truth_guard():
     """
     [TEST 89/89] Test 5 Warstw: Prymat Relacji Diadycznej, Audio Ground Truth i Harmonizacja Liczby Adresata (K1-K6):
@@ -7282,6 +7344,7 @@ def test_dyadic_singular_primacy_and_audio_ground_truth_guard():
 
     print(" -> PASSED: Prymat Relacji Diadycznej, Audio Ground Truth i Dyadic Concordance (K1-K6) działają w 100% harmonii (0.00 PLN).")
 
+@pytest.mark.slow
 def test_whisper_deterministic_disambiguator_k1_to_k8_guard():
     print("[TEST 90/90] Test Całościowej Eliminacji Pułapek Języka Angielskiego przez Deterministyczny Analizator Audio Whisper (K1-K8 Ground Truth)...")
     from whisper_disambiguator import WhisperDisambiguator, DisambiguationTag
@@ -7428,6 +7491,7 @@ def test_whisper_deterministic_disambiguator_k1_to_k8_guard():
     print(" -> PASSED: Deterministyczny Analizator Audio Whisper (K1-K8) i EpisodeQualityGate działają w 100% harmonii (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_gender_concordant_tv_drift_and_female_vocative_guard():
     """
     [TEST 91/91] Holistyczna weryfikacja 5 warstw: Rozpoznawanie Płci Imion Żeńskich (Onomastyka),
@@ -7496,6 +7560,7 @@ def test_gender_concordant_tv_drift_and_female_vocative_guard():
     print(" -> PASSED: Harmonizacja Płci Adresata T-V, Onomastyka Imion Żeńskich i Tarcza Wołacza na -o działają w 100% harmonii (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_systemic_knowledge_base_sanitization_and_litmus_paper_guard():
     print("[TEST 92] Test systemowej sanacji bazy wiedzy, etnonimów, puryzmu kursywy i papierka lakmusowego...")
     import pysubs2
@@ -7609,6 +7674,7 @@ def test_systemic_knowledge_base_sanitization_and_litmus_paper_guard():
     print(" -> PASSED: Systemowa sanacja bazy wiedzy, etnonimów, puryzmu kursywy i 4 papierków lakmusowych działają w 100% harmonii (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_holistic_scene_diarization_whisper_triangulation_and_unburdened_gender_guard():
     print("[TEST 93] Test Holistycznej Diaryzacji Scenicznej, Triangulacji Audio Whisper i Odciążenia Modeli Gemini...")
     import pysubs2
@@ -7759,6 +7825,7 @@ def test_holistic_scene_diarization_whisper_triangulation_and_unburdened_gender_
     print(" -> PASSED: Holistyczna diaryzacja sceniczna, triangulacja audio Whisper i pełna ochrona fleksyjna działają w 100% harmonii (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_holistic_unburdened_metadata_ffmpeg_whisper_and_anti_guessing_pipeline():
     print("\n[TEST 94] Holistyczna Eliminacja Zgadywania przez Gemini (Whisper + FFmpeg Ground Truth & SSOT Metadata)...")
     import pysubs2
@@ -7889,6 +7956,7 @@ def test_holistic_unburdened_metadata_ffmpeg_whisper_and_anti_guessing_pipeline(
     print(" -> PASSED: Holistyczna eliminacja zgadywania (FFmpeg cuts, Whisper SSOT line metadata, dyadic F0, unburdened LLM) działa w 100% (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_holistic_whisper_and_ffmpeg_telemetry_reserves_guard():
     print("\n[TEST 95] Holistic Whisper & FFmpeg Telemetry Reserves Guard (0.00 PLN & Unburdened LLM)...")
     from scene_snapper import SceneShotSnapper
@@ -7987,6 +8055,7 @@ def test_holistic_whisper_and_ffmpeg_telemetry_reserves_guard():
     print(" -> PASSED: Wykorzystanie rezerw Whisper i FFmpeg (Fade to Black, VAD, Loop Shield, Acoustic Breath Splitter, I-Frame Snapping) działa w 100% (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_acoustic_primacy_and_contaminated_metadata_guard():
     """
     [TEST 96] Filar CLXXIV: Prymat Sygnału Akustycznego nad Skażonymi Tagami Fansubów (.ass),
@@ -8120,6 +8189,7 @@ def test_acoustic_primacy_and_contaminated_metadata_guard():
     print(" -> PASSED: Filar CLXXIV (Prymat Sygnału Akustycznego, Sanacja Skażonych Tagów Fansubów i Eliminacja Jąkania) działa w 100% (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_first_person_plural_feminine_group_concordance_guard():
     print("[TEST 97/97] Test Zgodności 1. Osoby Liczby Mnogiej w Grupach Żeńskich (Filar CLXXV - 0.00 PLN)...")
     import pysubs2
@@ -8225,6 +8295,7 @@ def test_first_person_plural_feminine_group_concordance_guard():
     print(" -> PASSED: Filar CLXXV (Zgodność Morfologiczna 1. Osoby Liczby Mnogiej w Grupach Żeńskich) działa w 100% (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_speaker_entity_identity_and_collective_concordance_guard():
     """
     Test 98: Holistyczna weryfikacja 5 warstw: Integralność Tożsamości Podmiotowej Mówcy,
@@ -8314,6 +8385,7 @@ def test_speaker_entity_identity_and_collective_concordance_guard():
     print(" -> PASSED: Filar CLXXVI (Integralność Tożsamości Podmiotowej Mówcy, Bytów Kolektywnych i Pluralis Maiestatis) działa w 100% (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_pronominal_decoupling_guard():
     """
     Test 99: Filar CLXXVII – Pronominal Decoupling & Inalienable Somatic/Relational Possession (0.00 PLN).
@@ -8373,6 +8445,7 @@ def test_pronominal_decoupling_guard():
     print(" -> PASSED: Filar CLXXVII (Pronominal Decoupling i Somatyka Inalienabilna) działa w 100% (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_affective_shock_shift_guard():
     """
     Test 100: Filar CLXXVIII – Affective Shock Shift & Anti-Hysteresis Gate (0.00 PLN).
@@ -8426,6 +8499,7 @@ def test_affective_shock_shift_guard():
     print(" -> PASSED: Filar CLXXVIII (Reset Inercji Afektywnej i Bramka Pęknięcia Emocjonalnego) działa w 100% (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_adjacency_pair_elliptical_guard():
     """
     Test 101: Filar CLXXIX – Dialogowe Pary Przylegania i Elipsy Orzeczeniowe (0.00 PLN).
@@ -8480,6 +8554,7 @@ def test_adjacency_pair_elliptical_guard():
     print(" -> PASSED: Filar CLXXIX (Dialogowe Pary Przylegania i Elipsy Orzeczeniowe) działa w 100% (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_spatial_deixis_motion_vector_guard():
     """
     Test 102: Filar CLXXX – Cinematic Spatial Deixis & Directional Motion Verbs (0.00 PLN).
@@ -8524,6 +8599,7 @@ def test_spatial_deixis_motion_vector_guard():
     print(" -> PASSED: Filar CLXXX (Wektory Deiktyczne Ruchu) działa w 100% (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_sensory_pleonasm_compression_guard():
     """
     Test 103: Filar CLXXXI – Semiotic Image-Text Coexistence & Sensory Pleonasm Compression (0.00 PLN).
@@ -8649,6 +8725,7 @@ def test_rebalanced_attention_matrix_and_slot_quota_guard():
     print(" -> PASSED: Zbalansowana 5-Poziomowa Matryca Uwagi i Selekcja Slotowa działają w 100% (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_safe_offline_pruning_and_lean_phase1_guard():
     """
     Test 105: Safe Offline Pruning & Lean Phase 1 Guard (0.00 PLN).
@@ -8731,6 +8808,7 @@ def test_safe_offline_pruning_and_lean_phase1_guard():
     print(" -> PASSED: Bezpieczne Odciążenie Offline, Tryb Lean F1 i Ochrona Fleksji działają w 100% (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_androgynous_voice_prodrop_and_tv_transition_guard():
     """
     Test 106: Androgynous Voice, Pro-Drop Subject Resolution & T-V Narrative Transition Guard (0.00 PLN).
@@ -8809,6 +8887,7 @@ def test_androgynous_voice_prodrop_and_tv_transition_guard():
     print(" -> PASSED: Tarcza Ról Chłopięcych, Eliptyki Pro-Drop i Przejścia T-V działają w 100% (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_surname_collision_french_toponym_and_double_honorific_guard():
     print("[TEST 107/107] Holistyczna weryfikacja 4 domen: nieodmienne toponimy francuskie (Bordeaux), kolizja nazwisk rodowych (Tomine), kalki liczebnikowe (A wy dwie) oraz puryzm tytulatury (od pana Hayamy)...")
     import pysubs2
@@ -8924,6 +9003,7 @@ Dialogue: 0,0:17:02.03,0:17:06.53,Default,Miyabi,0,0,0,,Właściwie w Bordeaux\\
     print(" -> PASSED: Holistyczna ochrona 4 domen (toponimy Bordeaux, kolizja Tomine, A wy dwie, od pana Hayamy) zweryfikowana we wszystkich 5 warstwach (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_comprehensive_linter_and_quality_gate_safety_audit():
     """
     Test 108: Kompleksowy audyt bezpieczeństwa FIXED_REPLACEMENTS i EpisodeQualityGate (0.00 PLN).
@@ -9058,6 +9138,7 @@ def test_comprehensive_linter_and_quality_gate_safety_audit():
     print(" -> PASSED: Kompleksowy audyt bezpieczeństwa FIXED_REPLACEMENTS i EpisodeQualityGate zakończony sukcesem (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_offline_layers_deep_audit_and_anti_corruption_gate():
     """
     Test 109: Generalna weryfikacja i eliminacja 10 krytycznych bomb zegarowych w warstwach offline
@@ -9187,6 +9268,7 @@ def test_offline_layers_deep_audit_and_anti_corruption_gate():
     print(" -> PASSED: 10 domen bezpieczeństwa warstw offline (Smoking Gun 3b-3, ochrona imion 3b-4, rekcja, wołacz, spójniki) działa w 100% harmonii (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_toponymic_pleonasm_and_classifier_stuttering_guard():
     """
     Test 110: Filar CLXXXIV – Toponymic & Classifier Pleonasm and Identical Stuttering Guard (0.00 PLN).
@@ -9290,6 +9372,7 @@ def test_toponymic_pleonasm_and_classifier_stuttering_guard():
     print(" -> PASSED: Eliminacja pleonazmów toponimicznych, tautologii klasyfikatorów i jąkania słownikowego (Filar CLXXXIV) działa w 100% (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_monologue_gender_concordance_and_compound_passive_agreement_guard():
     print("\n[TEST 111] Holistyczna eliminacja fractury płciowej monologu, kolizji strony biernej i tarczy głosu towarzyszki (Filar CLXXXV - 0.00 PLN)...")
     import pysubs2
@@ -9428,6 +9511,7 @@ def test_monologue_gender_concordance_and_compound_passive_agreement_guard():
     print(" -> PASSED: Monologue concordance, compound passive agreement, and companion voice shield fully verified (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_dyadic_addressee_gender_concordance_guard():
     """
     [TEST 112/112] Test 5 Warstw: Harmonizacja Płci Adresata w Relacji Diadycznej (Filar CLXXXVI & EpisodeQualityGate 0.00 PLN):
@@ -9535,6 +9619,7 @@ def test_dyadic_addressee_gender_concordance_guard():
     print(" -> PASSED: Dyadic addressee gender concordance, 7 EN ambiguity classes, and LLM unburdening fully verified (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_holistic_llm_unburdening_and_telemetry_harmony_guard():
     """
     [TEST 113/113] Test 5 Warstw: Holistyczne Odciążenie Modeli Gemini (LLM Unburdening),
@@ -9683,6 +9768,7 @@ def test_holistic_llm_unburdening_and_telemetry_harmony_guard():
     print(" -> PASSED: Holistic LLM Unburdening, JIT Context Pruning & Concise Acoustic Telemetry fully verified (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_dyadic_prepositional_and_mechanical_concordance_guard():
     print("[TEST 114/114] Holistyczna weryfikacja 5 warstw: Deterministyczna tarcza przyimków diadycznych, rozszerzonych przymiotników i wieloczasowej strony biernej w Warstwie 4 bez zaśmiecania promptów LLM (0.00 PLN)...")
 
@@ -9770,6 +9856,7 @@ def test_dyadic_prepositional_and_mechanical_concordance_guard():
     print(" -> PASSED: Dyadic Prepositional Pronouns & Mechanical Concordance Guard fully operational at 0.00 PLN.")
 
 
+@pytest.mark.slow
 def test_holistic_translation_pipeline_architecture_manifesto_guard():
     print("\n[TEST 115/115] Test Holistycznego Wdrożenia 5-Punktowego Manifestu Architektury Tłumacza...")
     from unittest.mock import MagicMock
@@ -9895,6 +9982,7 @@ def test_holistic_translation_pipeline_architecture_manifesto_guard():
     print(" -> PASSED: 5-Punktowy Manifest Architektury Tłumacza w 100% zaimplementowany i spójny we wszystkich 5 warstwach (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_boy_voice_seiyu_disambiguation_and_addressee_clause_isolation_guard():
     print("[TEST 116/116] Test 5 Warstw: Triangulacja Głosów Seiyū Chłopców, Segmentacja Klauzul Adresata i Synekdocha Instytucjonalna (0.00 PLN)...")
     from whisper_disambiguator import WhisperDisambiguator, DisambiguationTag
@@ -10064,6 +10152,7 @@ def test_boy_voice_seiyu_disambiguation_and_addressee_clause_isolation_guard():
     print(" -> PASSED: Triangulacja seiyū chłopców, segmentacja klauzul adresata, synekdocha instytucjonalna i zgodność dystansowa działają w 100% (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_layer4_single_word_and_syntax_invariance_guard():
     print("[TEST 117/117] Test 5 Warstw: Nienaruszalność Szyku Zdania, Zasada Pojedynczych Słów i Ochrona Wyrazów Sąsiadujących w Warstwie 4 (0.00 PLN)...")
     from series_memory import SeriesBible
@@ -10213,6 +10302,7 @@ def test_layer4_single_word_and_syntax_invariance_guard():
     print(" -> PASSED: Nienaruszalność szyku zdania, zasada pojedynczych słów i ochrona wyrazów sąsiadujących w Warstwie 4 działają w 100% (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_holistic_gender_and_dual_plurality_enhancement_guard():
     """
     [TEST 118/118] Holistyczna weryfikacja 5 warstw: Rozszerzenie Określania Płci i Liczebności Mówcy i Odbiorcy (0.00 PLN).
@@ -10394,6 +10484,7 @@ def test_holistic_gender_and_dual_plurality_enhancement_guard():
     print(" -> PASSED: Holistyczne udoskonalenie płci i liczebności mówcy i odbiorcy działa w 100% harmonii na wszystkich 5 warstwach (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_toponymic_origin_genitive_and_non_name_actor_guard():
     print("[TEST 119/119] Test Eliminacji Błędu Dopełniacza Pochodzenia Toponimów vs Narzędnika Towarzyszenia (Protokół 5 Warstw, 0.00 PLN)...")
     from avt_linter import EpisodeQualityGate, AVTLinter
@@ -10481,6 +10572,7 @@ def test_toponymic_origin_genitive_and_non_name_actor_guard():
     print(" -> PASSED: Eliminacja błędu dopełniacza pochodzenia toponimów vs narzędnika towarzyszenia działa w 100% na wszystkich 5 warstwach (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_comprehensive_polish_language_traps_and_prepositional_governance():
     r"""
     TEST 120: Kompleksowa weryfikacja eliminacji wszystkich 10 rodzin pułapek języka polskiego
@@ -10637,6 +10729,7 @@ def test_comprehensive_polish_language_traps_and_prepositional_governance():
     print(" -> PASSED: Test 120 potwierdza całkowitą eliminację wszystkich 10 rodzin pułapek języka polskiego i perfekcyjny podział ról offline vs LLM (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_manga_canon_syntagmatic_declension_and_single_word_gender_invariance():
     """
     Test 121: Kompleksowa weryfikacja 5 warstw dla odmiany polskich syntagm
@@ -10865,6 +10958,7 @@ def test_manga_canon_syntagmatic_declension_and_single_word_gender_invariance():
     print(" -> PASSED: Test 121 w 100% potwierdza pełną ochronę odmiany syntagm kanonu mangowego, 7 klas oboczności fleksyjnej i jednotokenową niezmienniczość Wi -> W'i (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_comprehensive_speaker_addressee_and_topology_matrix():
     print("[TEST 122/122] Comprehensive Speaker/Addressee Topology, Age Class, Dualis/Pluralis, and Wi -> W'i Matrix Guard...")
     from avt_linter import EpisodeQualityGate
@@ -11093,6 +11187,7 @@ def test_comprehensive_speaker_addressee_and_topology_matrix():
     print(" -> PASSED: Test 122 w 100% potwierdza pełną topologię sceny (Solilokwium N=1, Diada N=2, Polilog N>=3), Dualis, Pluralis niemęskoosobowy, małą dziewczynkę i arbitraż cross-gender seiyū (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_end_to_end_vulnerability_and_lexical_governance():
     """
     TEST 123: Test Całościowy Zabezpieczeń Potoku Tłumaczenia i Zarządzania Leksykalno-Rejestrowego:
@@ -11288,6 +11383,7 @@ def test_end_to_end_vulnerability_and_lexical_governance():
     print(" -> PASSED: Test 123 w 100% potwierdza eliminację punktów zapalnych w 5 Warstwach (polskie słowniki ról, 7 przypadków nazw wieloczłonowych, Tarcza Cytatów, spójność partii i Zero-Drop CoT).")
 
 
+@pytest.mark.slow
 def test_holistic_systemic_lexical_governance_and_vulnerability_shields():
     """
     Test 124: Holistyczna Sanacja Systemowa i Kompletne Zasilenie Słownikowe (5 Warstw Architektury).
@@ -11460,6 +11556,7 @@ def test_holistic_systemic_lexical_governance_and_vulnerability_shields():
     print(" -> PASSED: Test 124 w 100% potwierdza holistyczną sanację systemową i kompletne zasilenie słownikowe (5 Warstw).")
 
 
+@pytest.mark.slow
 def test_exhaustive_polish_cases_and_all_prepositions_guard():
     """
     Test 125: Holistyczna weryfikacja Żelaznej Zasady 15 AGENTS.md (0.00 PLN):
@@ -11611,6 +11708,7 @@ def test_exhaustive_polish_cases_and_all_prepositions_guard():
     print(" -> PASSED: Test 125 w 100% potwierdza pełną kompletność fleksyjną, przyimkową i realizację Żelaznej Zasady 15 (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_comprehensive_machine_polish_traps_elimination():
     r"""
     Test 126: Holistyczna maszynowa eliminacja pułapek języka polskiego bez obciążania modeli Gemini (0.00 PLN):
@@ -11727,6 +11825,7 @@ def test_comprehensive_machine_polish_traps_elimination():
     print(" -> PASSED: Test 126 w 100% potwierdza holistyczną maszynową eliminację pułapek języka polskiego bez obciążania modeli Gemini (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_plural_anti_singularization_and_single_line_overflow():
     r"""
     Test 127: Bezpieczne utwardzenie potoku AVT (0.00 PLN):
@@ -11792,6 +11891,7 @@ def test_plural_anti_singularization_and_single_line_overflow():
     print(" -> PASSED: Test 127 w 100% potwierdza bezpieczeństwo tarczy liczby mnogiej, orzeczników lm. i podziału linii AVT (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_edge_case_limits_and_avt_hardening():
     print("\n--- Test 128: Ograniczenia Brzegowe Potoku i Utwardzenie Standardów AVT (0.00 PLN) ---")
     import pysubs2
@@ -11881,6 +11981,7 @@ def test_edge_case_limits_and_avt_hardening():
     print(" -> PASSED: Test 128 w 100% potwierdza deterministyczną elewację kolizji czasowych, tarczę homonimii, heurystykę ról i symetrię myślników AVT (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_exhaustive_homonym_and_social_role_universe():
     print("\n--- Test 129: Wyczerpujące Uniwersum Homonimów Nazw Własnych i Pełny Korpus Par Ról Społecznych (0.00 PLN) ---")
     import pysubs2
@@ -12149,6 +12250,7 @@ def test_exhaustive_stem_morphology_and_onomastic_iron_rule():
     print(" -> PASSED: Test 130 w 100% potwierdza Żelazną Zasadę 16, pełną morfologię 6 klas trzonów, separację -owa vs -owi/-owie oraz rozszerzone uniwersum onomastyczne (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_systemic_male_first_person_past_tense_concordance_guard():
     print("[TEST 131/131] Test Systemowej Eliminacji Błędów Rodzaju Męskiego w 1. Osobie Czasu Przeszłego (Nige Jouzu no Wakagimi, Chłopak w Masce, Tokiyuki Hojo, Dorosły Mężczyzna)...")
     import pysubs2
@@ -12227,6 +12329,7 @@ def test_systemic_male_first_person_past_tense_concordance_guard():
     print(" -> PASSED: Test 131 w 100% potwierdza eliminację błędów rodzaju męskiego w 1. os. czasu przeszłego na wszystkich warstwach (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_systemic_comprehensive_gender_interpretation_and_preposition_shield_guard():
     print("[TEST 132/132] Weryfikacja holistycznej eliminacji błędów interpretacji płci postaci, tarczy przyimkowej i rozdzielenia osób...")
     import pysubs2
@@ -12325,6 +12428,7 @@ def test_systemic_comprehensive_gender_interpretation_and_preposition_shield_gua
     print(" -> PASSED: Test 132 w 100% potwierdza integralność interpretacji płci postaci, tarczy przyimkowej i rozdzielenia osób (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_global_default_parameter_sanitization_and_hard_evidence_doctrine():
     """
     [TEST 133/133] Weryfikacja globalnej sanityzacji domyślnych parametrów i Doktryny Twardych Dowodów (0.00 PLN).
@@ -12457,6 +12561,7 @@ def test_global_default_parameter_sanitization_and_hard_evidence_doctrine():
     print(" -> PASSED: Test 133 w 100% potwierdza globalną sanityzację domyślnych parametrów i Doktrynę Twardych Dowodów (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_epistemic_certainty_and_zero_presumption_governance():
     """
     [TEST 134/134] Weryfikacja Doktryny Twardych Dowodów (Epistemic Certainty) i Pełnej Sanacji Zmiennych (0.00 PLN).
@@ -12684,6 +12789,7 @@ def test_epistemic_certainty_and_zero_presumption_governance():
     print(" -> PASSED: Test 134 w 100% potwierdza Doktrynę Twardych Dowodów (Epistemic Certainty) i Pełną Sanację Zmiennych (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_holistic_dialogue_mastery_and_pipeline_harmony_guard():
     """
     Test 135: Holistyczna weryfikacja czystości językowej promptów, odciążenia Fazy 2 (Lean=True),
@@ -12792,6 +12898,7 @@ def test_holistic_dialogue_mastery_and_pipeline_harmony_guard():
     print(" -> PASSED: Test 135 w 100% potwierdza Mistrzostwo Polskiego Dialogu, Lean Faza 2 i Harmonię Potoku (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_holistic_second_order_vulnerability_and_fail_safe_matrix():
     """
     [TEST 136/136] Holistyczna Eliminacja Podatności Drugiego Rzędu (Edge-Case & Regression Analysis w 5 Warstwach):
@@ -12974,6 +13081,7 @@ def test_holistic_second_order_vulnerability_and_fail_safe_matrix():
     print(" -> PASSED: Test 136 w 100% potwierdza eliminację podatności drugiego rzędu we wszystkich 6 domenach i 5 warstwach potoku (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_filler_condensation_and_ass_metric_stripping_guard():
     print("[TEST 137/138] Test Zdaniowej Higieny Kompresji, Ochrony Wielkości Liter i Strippingu Formatowania ASS (Dyrektywy 3 i 4)...")
     import re
@@ -13077,6 +13185,7 @@ def test_filler_condensation_and_ass_metric_stripping_guard():
     print(" -> PASSED: Test 137 w 100% potwierdza zdaniową higienę kompresji, ochronę wielkości liter i poprawny stripping metryk ASS (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_unsegmented_audio_and_two_axis_budget_guard():
     print("[TEST 138/138] Test Bezpieczeństwa Niesegmentowanego Audio JA, Parytetu Znaków i Dwuosiowego Budżetu Znakowego (Dyrektywy 2 i 5)...")
     from prosody_engine import AudioProsodyEngine
@@ -13172,6 +13281,7 @@ def test_unsegmented_audio_and_two_axis_budget_guard():
     print(" -> PASSED: Test 138 w 100% potwierdza bezpieczeństwo niesegmentowanego audio JA, parytet znaków kana i dwuosiowy budżet (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_fansub_lexicon_engine_and_clevatess_corpus_guard():
     """
     Test 139: FansubLexiconEngine & Vetted Corpus Mining Architecture (Aksjomaty 1, 2, 4, 6).
@@ -13275,6 +13385,7 @@ def test_fansub_lexicon_engine_and_clevatess_corpus_guard():
     print(" -> PASSED: Test 139 w 100% potwierdza działanie FansubLexiconEngine, korpusu ASW Clevatess i matrycy fleksyjnej 'wiedun' (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_speaker_addressee_topology_and_plural_feminine_concordance_guard():
     print("[TEST 139/142] Test Topologii Mówca-Odbiorca, Liczby Mnogiej Żeńskiej i QuoteShield (Filar CLXXXVII)...")
     from avt_linter import EpisodeQualityGate
@@ -13319,6 +13430,7 @@ def test_speaker_addressee_topology_and_plural_feminine_concordance_guard():
     print(" -> PASSED: Test 139 w 100% potwierdza działanie QuoteShield oraz uzgadniania topologii sceny i grup żeńskich.")
 
 
+@pytest.mark.slow
 def test_transitive_genitive_of_negation_and_case_preservation_guard():
     print("[TEST 140/142] Test Ścisłej Rekcji Zaprzeczonej i Ochrony Majuskuły (Filar CLXXXVIII)...")
     from series_memory import sanitize_genitive_of_negation, replace_with_case_preservation
@@ -13416,6 +13528,7 @@ def test_foreign_female_consonant_name_invariance_and_male_inflection_guard():
     print(" -> PASSED: Test 141 w 100% potwierdza nieodmienność obcych imion żeńskich na spółgłoskę i poprawną odmianę męską.")
 
 
+@pytest.mark.slow
 def test_canon_compound_oblique_preposition_and_nominative_unfreezing_guard():
     print("[TEST 142/142] Test Eliminacji Mianownizacji Terminów Kanonicznych po Przyimkach (Filar CLXXXVIII)...")
     from series_memory import sanitize_canon_compound_oblique_cases, generate_polish_name_declension
@@ -13464,6 +13577,7 @@ def test_canon_compound_oblique_preposition_and_nominative_unfreezing_guard():
     print(" -> PASSED: Test 142 w 100% potwierdza eliminację mianownizacji terminów kanonicznych po przyimkach (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_global_quote_shield_and_adverbial_negation_guard():
     print("[TEST 143/144] Test Globalnego QuoteShield w 3. Osobie oraz Dopełniacza Negacji z Wtrąceniami (0.00 PLN)...")
     from series_memory import sanitize_genitive_of_negation
@@ -13504,6 +13618,7 @@ def test_global_quote_shield_and_adverbial_negation_guard():
     print(" -> PASSED: Test 143 w 100% potwierdza działanie globalnego QuoteShield w 3. osobie oraz elastycznego dopełniacza negacji (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_series_bible_onomastic_precedence_and_2line_cpl_rebalancer_guard():
     print("[TEST 144/144] Test Hierarchii Prawdy Onomastycznej SeriesBible oraz Rebalancera Dwuwiersza Psi(CPL) (0.00 PLN)...")
     from series_memory import SeriesBible, is_inherently_female_name
@@ -13539,6 +13654,7 @@ def test_series_bible_onomastic_precedence_and_2line_cpl_rebalancer_guard():
     print(" -> PASSED: Test 144 w 100% potwierdza hierarchię prawdy onomastycznej SeriesBible oraz rebalancer dwuwiersza Psi(CPL) (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_full_tense_transitive_genitive_of_negation_guard():
     print("[TEST 145/146] Test Pełnoczasowej Rekcji Zaprzeczonej i Ochrony Nowych Dopełnień Bliższych (0.00 PLN)...")
     from series_memory import sanitize_genitive_of_negation
@@ -13608,6 +13724,7 @@ def test_full_tense_transitive_genitive_of_negation_guard():
     print(" -> PASSED: Test 145 w 100% potwierdza pełnoczasową rekcję zaprzeczoną i ochronę nowych obiektów (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_comprehensive_canon_oblique_prepositions_and_male_consonant_declension_guard():
     print("[TEST 146/146] Test Uniwersum Przyimków Terminów Kanonu oraz Męskiej Odmiany Imion Obcych na Spółgłoskę (0.00 PLN)...")
     from series_memory import sanitize_canon_compound_oblique_cases, generate_polish_name_declension
@@ -13689,6 +13806,7 @@ def test_comprehensive_canon_oblique_prepositions_and_male_consonant_declension_
     print(" -> PASSED: Test 146 w 100% potwierdza uniwersum przyimków kanonu i poprawną odmianę męskich imion obcych na spółgłoskę (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_multithreaded_concurrency_and_dictionary_mutation_safety_guard():
     """
     Test 148 (Filar CLXXXIX / Concurrency & Non-Destructive Invariance):
@@ -14086,6 +14204,7 @@ def test_script_doctor_anti_goodhart_best_of_n_selection():
     print(" -> PASSED: Test 149 w 100% potwierdza poprawność Fazy 2: Best-of-N Script Doctor, Asymmetric Dead-Band Potential i Anti-Goodhart Reward Function (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_tokiyuki_p0_cast_lock_and_shizuku_dual_voice_discourse_guard():
     """
     Test 150: Kompleksowa weryfikacja eliminacji awarii atrybucji płci i tożsamości
@@ -14314,6 +14433,7 @@ def test_avt_formatter_style_bleed_and_strict_cpl_38_guard():
     print(" -> PASSED: Test 151 w 100% potwierdza eliminację Style-Bleed w avt_formatter i twardy limit 38 znaków CPL (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_speaker_and_addressee_gender_concordance_and_copula_guard():
     """
     TEST 152: Weryfikacja orzeczników 1. os. (czas teraźniejszy/przyszły: jestem, nie jestem, będę, nie będę, stałem/stałam się)
@@ -14401,6 +14521,7 @@ def test_speaker_and_addressee_gender_concordance_and_copula_guard():
     print(" -> PASSED: Test 152 w 100% potwierdza zgodność orzeczników 1. os. (czas teraźniejszy/przyszły + przysłówki) oraz addressee dla grup kobiet (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_incident_response_protocol_2_ass_fuzzing_and_breathing_space_guard():
     r"""
     TEST 153: Weryfikacja Reform Potoku Incydentów 2.0:
@@ -14508,6 +14629,7 @@ def test_incident_response_protocol_2_ass_fuzzing_and_breathing_space_guard():
     print(" -> PASSED: Test 153 w 100% potwierdza Reformy Potoku Incydentów 2.0 (ASS-Fuzzing, Pydantic Contract, Anti-Goodhart, Anchor Scenes 100%).")
 
 
+@pytest.mark.slow
 def test_musia_female_gender_and_addressee_concordance_guard():
     """
     TEST 154: Weryfikacja Obsługi Incydentu INC-AVT-001 (Tensei Kizoku S03E02):
@@ -14553,6 +14675,7 @@ def test_musia_female_gender_and_addressee_concordance_guard():
     print(" -> PASSED: Test 154 potwierdza 100% spójności atrybucji płci Musii i brak regresji.")
 
 
+@pytest.mark.slow
 def test_sasaki_to_piichan_s2_holistic_incident_guard():
     """
     TEST 155: Weryfikacja Obsługi Incydentu INC-AVT-002 (Sasaki to Pii-chan S2):
@@ -14603,6 +14726,8 @@ def test_sasaki_to_piichan_s2_holistic_incident_guard():
     print(" -> PASSED: Test 155 potwierdza 100% eliminacji wszystkich 6 defektów incydentu INC-AVT-002.")
 
 
+@pytest.mark.network
+@pytest.mark.slow
 def test_hyouken_s2_root_cause_anilist_fallback_and_addressee_guard():
     """
     TEST 156: Weryfikacja Standardu 3.0 i Pełnej Eliminacji Źródłowej INC-AVT-003:
@@ -14795,6 +14920,7 @@ def test_hyouken_s2_root_cause_anilist_fallback_and_addressee_guard():
     print(" -> PASSED: Test 156 potwierdza 100% eliminacji fabryki błędów INC-AVT-003 i pełną zgodność ze Standardem 3.0.")
 
 
+@pytest.mark.slow
 def test_tensei_kizoku_s3_root_cause_vocative_and_audience_guard():
     """
     TEST 157: Root-Cause Remediation for INC-AVT-004 (Tensei Kizoku, Kantei Skill de Nariagaru).
@@ -14969,6 +15095,7 @@ def test_tensei_kizoku_s3_root_cause_vocative_and_audience_guard():
     print(" -> PASSED: Test 157 potwierdza 100% eliminacji przyczyn źródłowych INC-AVT-004 zgodnie ze Standardem 3.0 (0.00 PLN).")
 
 
+@pytest.mark.slow
 def test_epistemic_triangulation_and_audio_purity():
     """
     TEST 155: Epistemic Gender Triangulation, Audio Purity & NLP Anaphora Scoring.
@@ -15132,6 +15259,7 @@ def test_diegetic_persona_and_out_of_order_lifecycle():
     print(" -> PASSED: Test 156 potwierdza poprawność automatu tożsamości diegetycznej i odporność na asynchroniczność.")
 
 
+@pytest.mark.slow
 def test_subtitle_sanitizer_and_japanese_quote_gate():
     """
     TEST 157: Subtitle Discourse Sanitizer & CJK Quote Monologue Gate.
@@ -15182,6 +15310,7 @@ def test_subtitle_sanitizer_and_japanese_quote_gate():
     print(" -> PASSED: Test 157 potwierdza odporność na japońskie cudzysłowy i higienę napisów.")
 
 
+@pytest.mark.slow
 def test_sparse_dialogue_and_impersonal_syntax():
     """
     TEST 158: Sparse Dialogue Protocol & Impersonal Syntax Enforcement.
@@ -15229,6 +15358,7 @@ def test_sparse_dialogue_and_impersonal_syntax():
     print(" -> PASSED: Test 158 potwierdza protokół rzadkich dialogów i bezosobową składnię dla NEUTRAL.")
 
 
+@pytest.mark.slow
 def test_full_polish_morphosyntactic_agreement():
     """
     TEST 159: Full Polish Morphosyntactic Agreement & Gender Concordance.
@@ -15342,6 +15472,7 @@ def test_proper_name_declension_matrix_and_inflection_safety():
     print(" -> PASSED: Test 160 potwierdza 100% bezpieczeństwa fleksyjnego i matrycy deklinacji nazw własnych.")
 
 
+@pytest.mark.slow
 def test_acoustic_deadzone_and_spacy_dependency_isolation():
     """
     TEST 161: Acoustic Deadzone Weight 0% & SpaCy Dependency Tree nsubj Isolation.
@@ -15447,6 +15578,7 @@ def test_monologue_two_tier_gate_and_italic_safety():
     print(" -> PASSED: Test 162 potwierdza dwupoziomową bramkę monologu wewnętrznego i ochronę kursywy.")
 
 
+@pytest.mark.slow
 def test_diegetic_rupture_and_alias_relational_inheritance():
     """
     TEST 163: Epistemic Rupture Decoupled from High F0 & Relational Alias Inheritance.
@@ -15527,6 +15659,7 @@ def test_diegetic_rupture_and_alias_relational_inheritance():
     print(" -> PASSED: Test 163 potwierdza dekonspirację epistemiczną, dziedziczenie prefiksów i formy warunkowe 1. os.")
 
 
+@pytest.mark.slow
 def test_second_person_turn_taking_and_predicate_agreement():
     """
     TEST 164: Dyadic Turn-Taking, Vocative Lock & Second-Person Predicate Agreement.
@@ -15716,6 +15849,7 @@ def test_speaker_turn_plural_you_harmonization():
     print(" -> PASSED: Test 165 potwierdza detekcję liczby mnogiej w SpeakerTurn i wsteczną harmonizację tury.")
 
 
+@pytest.mark.slow
 def test_toponym_ablative_preposition_and_phonotactic_declension():
     """
     TEST 166: Toponym Ablative Stripping, Non-Speaking Classification & Phonotactic Declension.
@@ -15839,6 +15973,7 @@ def test_toponym_ablative_preposition_and_phonotactic_declension():
     print(" -> PASSED: Test 166 potwierdza usuwanie fałszywego narzędnika z toponimów i deklinację fonotaktyczną.")
 
 
+@pytest.mark.slow
 def test_isomorphic_batch_sasaki_s2_repairs_and_pipeline_harmony():
     """
     TEST 167: Isomorphic Batch Repairs & Pipeline Harmony (Sasaki to Pii-chan S2 Standard 4.0).
@@ -16109,6 +16244,7 @@ def test_isomorphic_batch_sasaki_s2_repairs_and_pipeline_harmony():
     print(" -> PASSED: Test 167 potwierdza pełną odporność izomorficzną Klastrów A, B, C, D (Sasaki S2).")
 
 
+@pytest.mark.slow
 def test_bidirectional_turn_taking_and_stem_vowel_alternation_2nd_person():
     """
     Test 168: Dwukierunkowe Turn-Taking 2. osoby, oboczności rdzenne samogłosek (o:ó, ę:ą),
@@ -16275,6 +16411,7 @@ def test_bidirectional_turn_taking_and_stem_vowel_alternation_2nd_person():
     print(" -> PASSED: Test 168 potwierdza pełną spójność Turn-Taking, oboczności rdzennych i ochrony 2. osoby.")
 
 
+@pytest.mark.slow
 def test_mixed_gender_scene_virile_plural_and_turn_you_harmonization():
     """
     Test 169: Wymuszenie form męskoosobowych w scenach mieszanych (We_Group == VIRILE),
@@ -16377,6 +16514,7 @@ def test_mixed_gender_scene_virile_plural_and_turn_you_harmonization():
     print(" -> PASSED: Test 169 potwierdza We_Group set algebra, virility oraz strażnika homonimii miejscownika.")
 
 
+@pytest.mark.slow
 def test_institutional_genitive_and_toponym_ablative_whitelist_guard():
     """
     Test 170: Ścisła biała lista dopełniacza instytucji po 'z' (z biura, z ministerstwa),
@@ -16451,6 +16589,7 @@ def test_institutional_genitive_and_toponym_ablative_whitelist_guard():
     print(" -> PASSED: Test 170 potwierdza dopełniacz instytucji, ablative stripper, ortografię -nki i wołacz -tzu.")
 
 
+@pytest.mark.slow
 def test_diacritic_folding_formal_pronoun_neutrality_and_adaptive_pooling():
     """
     Test 171: Normalizacja znaków diakrytycznych (Unicode NFKD ASCII-folding),
@@ -16587,6 +16726,7 @@ def test_diacritic_folding_formal_pronoun_neutrality_and_adaptive_pooling():
     print(" -> PASSED: Test 171 potwierdza diacritic folding, neutralność watakushi, pooling audio i dziedziczenie.")
 
 
+@pytest.mark.slow
 def test_standard_7_pure_positive_domain_llm_authority_preservation():
     """
     [TEST 172/174] Standard 7.0: Zero-Literal Pure Positive Domain Invariant Architecture
@@ -16905,6 +17045,7 @@ def test_standard_7_declarative_telemetry_and_scene_discourse_invariants():
     print(" -> PASSED: Test 174 potwierdza deklaratywną telemetrię, rozłączność grup We/You i normalizację etykiet aktora.")
 
 
+@pytest.mark.slow
 def test_strict_positive_domain_bypasses_legacy_monolith_mutations():
     """
     [TEST 175/178] Standard 7.1: Strict Positive Domain Legacy Monolith Bypass.
@@ -17041,6 +17182,7 @@ def test_strict_positive_domain_coordinated_adjectives_and_modal_paradigm():
     print(" -> PASSED: Test 176 potwierdza poprawność concordancji szeregu przymiotników i paradygmatu 'powinien'.")
 
 
+@pytest.mark.slow
 def test_series_bible_ontological_purification_and_given_name_alias_virility():
     """
     [TEST 177/178] Standard 7.1: SeriesBible Ontological Normalization, Relations Separation,
@@ -17153,6 +17295,7 @@ def test_series_bible_ontological_purification_and_given_name_alias_virility():
     print(" -> PASSED: Test 177 potwierdza oczyszczenie ontologiczne, aliasy pierwszych imion i virility adresata.")
 
 
+@pytest.mark.slow
 def test_declarative_single_channel_telemetry_and_backward_compatibility():
     """
     [TEST 178/178] Standard 7.1: Single-Channel Declarative Telemetry & 100% Backward Compatibility.
@@ -17235,6 +17378,7 @@ def test_declarative_single_channel_telemetry_and_backward_compatibility():
     print(" -> PASSED: Test 178 potwierdza jednokanałową telemetrię i pełną kompatybilność wsteczną potoku.")
 
 
+@pytest.mark.slow
 def test_verify_purity_ast_and_zero_literal_invariant():
     """
     [TEST 179/179] Standard 9.0: Full-Codebase Zero-Anime-Literal Invariant & AST Purity Certification.
@@ -17371,6 +17515,7 @@ def test_verify_purity_ast_and_zero_literal_invariant():
     print(" -> PASSED: Test 179 potwierdza pełną czystość kodu produkcyjnego (Zero-Anime-Literal) oraz certyfikację verify_purity.py (Standard 9.0).")
 
 
+@pytest.mark.slow
 def test_standard_9_twelve_point_architectural_hardening_guard():
     """
     [TEST 180/180] Standard 9.0: 12-Point Comprehensive Architectural Hardening Verification.
@@ -17464,6 +17609,8 @@ def test_standard_9_twelve_point_architectural_hardening_guard():
     print(" -> PASSED: Test 180 potwierdza pełną implementację 12 punktów utwardzenia Standardu 9.0.")
 
 
+@pytest.mark.network
+@pytest.mark.slow
 def test_standard_9_ultimate_pipeline_verification():
     """
     [TEST 181/181] Standard 9.0: Ultimate 15-Point Pipeline Runtime & Architectural Invariants.
@@ -17556,6 +17703,8 @@ def test_standard_9_ultimate_pipeline_verification():
     print(" -> PASSED: Test 181 potwierdza 100% spójności potoku AVT ze Standardem 9.0 (15/15 PASS).")
 
 
+@pytest.mark.network
+@pytest.mark.slow
 def test_episode_flight_recorder_full_pipeline_trace():
     """
     Test 182: Weryfikacja Rejestratora Przebiegu Tłumaczenia Odcinka (EpisodeFlightRecorder).
@@ -17728,6 +17877,8 @@ def test_episode_flight_recorder_full_pipeline_trace():
     print(" -> PASSED: Test 182 potwierdza 100% poprawności działania EpisodeFlightRecorder.")
 
 
+@pytest.mark.network
+@pytest.mark.slow
 def test_variant_d_hybrid_evidence_guard_and_pipeline_hardening():
     """
     Test 183: Weryfikacja Architektury Wariantu (d) - Hybrydowej Straży Dowodowej i Hartowania Potoku.
@@ -17895,6 +18046,8 @@ def test_variant_d_hybrid_evidence_guard_and_pipeline_hardening():
     print(" -> PASSED: Test 183 potwierdza 100% poprawności implementacji Wariantu (d) - Hybrydowej Straży Dowodowej.")
 
 
+@pytest.mark.network
+@pytest.mark.slow
 def test_standard_9_t1_series_bible_ingestion_synchronization():
     """
     TEST 184 (T1): Zasilenie SeriesBible (Sekcja 2 pkt 2, R3.2).
@@ -17972,6 +18125,7 @@ def test_standard_9_t1_series_bible_ingestion_synchronization():
     print(" -> PASSED: T1 potwierdza zasilenie SeriesBible, synchronizację mostu i priorytet MALE dla męskiego paradygmatu.")
 
 
+@pytest.mark.slow
 def test_standard_9_t2_semiotic_line_classification_all_caps_sign():
     """
     TEST 185 (T2): Klasyfikacja semiotyczna linii i segmentacja hybrydowa (Sekcja 2 pkt 3, R3.1).
@@ -18016,6 +18170,7 @@ def test_standard_9_t2_semiotic_line_classification_all_caps_sign():
     print(" -> PASSED: T2 potwierdza klasyfikację semiotyczną ALL CAPS, wyczyszczenie ASR i segmentację hybrydową.")
 
 
+@pytest.mark.slow
 def test_standard_9_t3_verbal_inflection_identity_pass_through_eqg():
     """
     TEST 186 (T3): Fleksja w EpisodeQualityGate (Sekcja 2 pkt 1).
@@ -18074,6 +18229,7 @@ def test_standard_9_t3_verbal_inflection_identity_pass_through_eqg():
     print(" -> PASSED: T3 potwierdza wyłączenie mutacji werbalnej w EQG i pełny Identity Pass-Through.")
 
 
+@pytest.mark.slow
 def test_standard_9_t4_group_virility_pure_female_and_polylogue():
     """
     TEST 187 (T4): Status grupy w scenach o jednorodnym składzie P0 (Sekcja 2 pkt 4, R3.5).
@@ -18328,6 +18484,7 @@ def test_standard_9_1_avt_linter_identity_and_newline_preservation():
     print(" -> PASSED: TEST 192 potwierdza zachowanie tożsamości T(x)=x i konwersję \\n do \\N.")
 
 
+@pytest.mark.slow
 def test_standard_9_1_eqg_no_verb_mutation_and_normative_ellipsis():
     """TEST 193: Standard 9.1 Brak mutacji werbalnych w EQG i normatywne 3 kropki (Sekcja 2 pkt 2)."""
     print("\n[TEST 193] Standard 9.1: Brak mutacji werbalnych w EQG i normatywne wielokropki...")
@@ -18350,6 +18507,7 @@ def test_standard_9_1_eqg_no_verb_mutation_and_normative_ellipsis():
     print(" -> PASSED: TEST 193 potwierdza brak mutacji czasowników i normatywne wielokropki.")
 
 
+@pytest.mark.slow
 def test_standard_9_1_phase7_hygiene_clitic_binding_and_tag_deduplication():
     """TEST 194: Standard 9.1 Spójność składniowa cezury \\N i deduplikacja tagów ASS (Sekcja 2 pkt 3)."""
     print("\n[TEST 194] Standard 9.1: Higiena Fazy 7, wiązanie syntaktyczne przez \\N i deduplikacja tagów...")
@@ -18507,6 +18665,8 @@ def test_standard_9_1_speaker_gender_arbitration_p0_priority_and_sign_isolation(
     print(" -> PASSED: TEST 197 potwierdza pierwszeństwo P0 nad akustyką, izolację napisów i synchronizację stylów.")
 
 
+@pytest.mark.network
+@pytest.mark.slow
 def test_standard_9_1_clean_slug_consistency_and_single_header_logging():
     """TEST 198: Standard 9.1 Spójność slugu i pojedynczy nagłówek CLI (Sekcja 2 pkt 7)."""
     print("\n[TEST 198] Standard 9.1: Spójność slugu serii i idempotentność log_cli_init...")
@@ -18555,6 +18715,7 @@ def test_standard_9_2_avt_linter_preserves_lexical_choice_over_slash_glossary():
     print(" -> PASSED: TEST 199 potwierdza brak mutacji słownikowych w strict_positive_domain.")
 
 
+@pytest.mark.slow
 def test_standard_9_2_eqg_respects_v4_styles_alignment_and_collision():
     """TEST 200: Standard 9.2 EpisodeQualityGate podnosi kwestię na górę tylko dla Alignment == 2."""
     print("\n[TEST 200] Standard 9.2: EpisodeQualityGate podnosi kwestię na górę tylko dla Alignment == 2...")
@@ -18619,6 +18780,7 @@ def test_standard_9_2_verifier_guard_continuation_and_tag_balance():
     print(" -> PASSED: TEST 202 potwierdza deterministyczną ochronę reguł R1.2, R1.3 i R1.5.")
 
 
+@pytest.mark.slow
 def test_standard_9_2_series_bible_syncs_p0_and_compound_declension():
     """TEST 203: Standard 9.2 SeriesBible synchronizuje zweryfikowane byty P0 i 7-przypadkową deklinację."""
     print("\n[TEST 203] Standard 9.2: SeriesBible synchronizuje zweryfikowane byty P0...")
@@ -18650,6 +18812,7 @@ def test_standard_9_2_series_bible_syncs_p0_and_compound_declension():
     print(" -> PASSED: TEST 203 potwierdza poprawną synchronizację rekordów P0 i pobieranie przypadków.")
 
 
+@pytest.mark.slow
 def test_standard_9_2_discourse_graph_telemetry_and_verified_p0_gender():
     """TEST 204: Standard 9.2 SceneDiscourseGraph zachowuje jawnego aktora i płeć zweryfikowaną P0."""
     print("\n[TEST 204] Standard 9.2: SceneDiscourseGraph zachowuje jawnego aktora i płeć P0...")
@@ -18713,6 +18876,7 @@ def test_standard_9_2_sign_nominative_orthography_restoration():
     print(" -> PASSED: TEST 206 potwierdza wymuszenie mianownika M dla szyldów.")
 
 
+@pytest.mark.slow
 def test_standard_9_2_ram_sanitization_aligns_gender_and_relations_with_p0():
     """TEST 207: Standard 9.2 SeriesBible._sanitize_loaded_bible_in_ram synchronizuje płeć i relacje z P0."""
     print("\n[TEST 207] Standard 9.2: SeriesBible synchronizuje płeć i relacje z P0 w RAM...")
@@ -18734,6 +18898,7 @@ def test_standard_9_2_ram_sanitization_aligns_gender_and_relations_with_p0():
     assert bible.get_character_gender("Helena") == "FEMALE"
     assert "KOBIETA (Adresat)" in bible.data["relations"]["Artur -> Helena"]
     print(" -> PASSED: TEST 207 potwierdza synchronizację postaci i relacji z P0 w RAM.")
+@pytest.mark.slow
 def test_standard_9_2_discourse_telemetry_p0_non_virile_and_polylogue():
     """TEST 208: Standard 9.2 SceneDiscourseGraph obsługuje P0, NON_VIRILE dla scen żeńskich i POLYLOGUE."""
     print("\n[TEST 208] Standard 9.2: SceneDiscourseGraph obsługuje P0, NON_VIRILE i POLYLOGUE...")
@@ -18847,6 +19012,7 @@ def test_standard_9_2_phase7_hygiene_merges_tag_blocks_and_bridges_italic():
 
 
 
+@pytest.mark.slow
 def test_standard_9_3_eqg_preserves_italic_tags_on_upright_styles():
     """TEST 212: Standard 9.3 EpisodeQualityGate zachowuje zbalansowane znaczniki kursywy na stylach prostych."""
     print("\n[TEST 212] Standard 9.3: EpisodeQualityGate zachowuje kursywę na stylach prostych...")
