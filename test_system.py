@@ -18686,6 +18686,165 @@ def test_standard_9_2_asr_window_isolation_and_empty_asr_for_signs():
     assert EpisodeProfiler.sanitize_event_asr(speech, is_sign=False, style="Default") == speech
     print(" -> PASSED: TEST 205 potwierdza izolację transkrypcji ASR dla napisów ekranowych.")
 
+
+
+def test_standard_9_2_sign_nominative_orthography_restoration():
+    """TEST 206: Standard 9.2 DialogueVerifier przywraca ortografię mianownika M dla is_sign: true."""
+    print("\n[TEST 206] Standard 9.2: DialogueVerifier przywraca ortografię mianownika M dla is_sign: true...")
+    from verifier import DialogueVerifier
+
+    fixed = DialogueVerifier.enforce_sign_nominative_orthography(
+        f1_pl="TAJEMNICZY CUKIERK",
+        refined_pl="TAJEMNICZY CUKIERK",
+        source_en="Mysterious Candy",
+        is_sign=True,
+        canonical_glossary={"Mysterious Candy": "TAJEMNICZY CUKIEREK"}
+    )
+    assert fixed == "TAJEMNICZY CUKIEREK"
+
+    fixed_diag = DialogueVerifier.enforce_sign_nominative_orthography(
+        f1_pl="TAJEMNICZY CUKIERK",
+        refined_pl="TAJEMNICZY CUKIERK",
+        source_en="Mysterious Candy",
+        is_sign=False,
+        canonical_glossary={"Mysterious Candy": "TAJEMNICZY CUKIEREK"}
+    )
+    assert fixed_diag == "TAJEMNICZY CUKIERK"
+    print(" -> PASSED: TEST 206 potwierdza wymuszenie mianownika M dla szyldów.")
+
+
+def test_standard_9_2_ram_sanitization_aligns_gender_and_relations_with_p0():
+    """TEST 207: Standard 9.2 SeriesBible._sanitize_loaded_bible_in_ram synchronizuje płeć i relacje z P0."""
+    print("\n[TEST 207] Standard 9.2: SeriesBible synchronizuje płeć i relacje z P0 w RAM...")
+    from series_memory import SeriesBible
+
+    bible = SeriesBible(slug="test_ram_sanitization", db_path=":memory:")
+    bible.data["characters"]["Helena"] = {
+        "gender": "MALE",
+        "grammatical_gender": "MASCULINE",
+        "has_verified_gender": True,
+    }
+    bible.data["relations"]["Artur -> Helena"] = "Relacja [MĘŻCZYZNA (Adresat)]"
+    bible.sync_verified_profile_entity(
+        name="Helena",
+        gender="FEMALE",
+        has_verified_gender=True,
+    )
+    bible._sanitize_loaded_bible_in_ram()
+    assert bible.get_character_gender("Helena") == "FEMALE"
+    assert "KOBIETA (Adresat)" in bible.data["relations"]["Artur -> Helena"]
+    print(" -> PASSED: TEST 207 potwierdza synchronizację postaci i relacji z P0 w RAM.")
+def test_standard_9_2_discourse_telemetry_p0_non_virile_and_polylogue():
+    """TEST 208: Standard 9.2 SceneDiscourseGraph obsługuje P0, NON_VIRILE dla scen żeńskich i POLYLOGUE."""
+    print("\n[TEST 208] Standard 9.2: SceneDiscourseGraph obsługuje P0, NON_VIRILE i POLYLOGUE...")
+    import pysubs2
+    from series_memory import SeriesBible
+    from scene_discourse import SceneDiscourseGraph
+
+    bible = SeriesBible(slug="test_poly_slug", db_path=":memory:")
+    bible.sync_verified_profile_entity(name="Heroine", gender="FEMALE", has_verified_gender=True)
+
+    ev_poly = pysubs2.SSAEvent(start=1000, end=2000, text="Kwestia chóralna", name="A / B")
+    res_poly = SceneDiscourseGraph.arbitrate_event_telemetry(
+        event=ev_poly,
+        series_bible=bible,
+        aux_telemetry={"speaker_gender": "MALE"}
+    )
+    assert res_poly["speaker_name"] == "POLYLOGUE"
+
+    ev_fem = pysubs2.SSAEvent(start=2100, end=3000, text="Dziewczęta, chodźmy!", name="Heroine")
+    res_fem = SceneDiscourseGraph.arbitrate_event_telemetry(
+        event=ev_fem,
+        series_bible=bible,
+        scene_female_only=True
+    )
+    assert res_fem["speaker_gender"] == "FEMALE"
+    assert res_fem["group_virility"] == "NON_VIRILE"
+    print(" -> PASSED: TEST 208 potwierdza obsługę POLYLOGUE, P0 oraz NON_VIRILE.")
+
+
+def test_standard_9_2_guard_phase2_person_number_epistemic_verb_dual_voice():
+    """TEST 209: Standard 9.2 DialogueVerifier._guard_phase2_regressions chroni 4 kategorie barier."""
+    print("\n[TEST 209] Standard 9.2: DialogueVerifier chroni osobę, liczbę, czasowniki epistemiczne i dwugłos...")
+    from verifier import DialogueVerifier
+
+    f1_dual = "– Nie traćmy czasu!\\N– To bezcelowe!"
+    ref_dual = "– Nie traćmy czasu!\\N– Nie ma to sensu!"
+    assert DialogueVerifier._guard_phase2_regressions(
+        f1_pl=f1_dual,
+        refined_pl=ref_dual,
+        source_en="– Don't waste time!\\N– That's pointless!",
+        prev_line_pl="– To bezcelowe!",
+        prev_line_en="That's pointless!"
+    ) == f1_dual
+
+    assert DialogueVerifier._guard_phase2_regressions(
+        f1_pl="Co macie zamiar zrobić?",
+        refined_pl="Co mamy zamiar zrobić?",
+        source_en="What do you plan to do?",
+        prev_line_pl="Zapytali o nasze plany.",
+        prev_line_en="They asked about our plans."
+    ) == "Co macie zamiar zrobić?"
+
+    assert DialogueVerifier._guard_phase2_regressions(
+        f1_pl="Zaraz przyślę ci raport.",
+        refined_pl="Zaraz prześlemy ci raport.",
+        source_en="I'll send you the report right away.",
+        prev_line_pl="Czekam na wiadomość.",
+        prev_line_en="I am waiting for news."
+    ) == "Zaraz przyślę ci raport."
+
+    assert DialogueVerifier._guard_phase2_regressions(
+        f1_pl="Myślałam, że wszystko pamiętasz.",
+        refined_pl="Wszystko pamiętasz.",
+        source_en="I thought you remembered everything.",
+        prev_line_pl="Dlaczego milczysz?",
+        prev_line_en="Why are you silent?"
+    ) == "Myślałam, że wszystko pamiętasz."
+    print(" -> PASSED: TEST 209 potwierdza 4 nowe bariery regresji Fazy 2.")
+def test_standard_9_2_collision_alignment_same_speaker_and_top_sign():
+    """TEST 210: Standard 9.2 should_apply_top_alignment_on_collision chroni ciągłość mówcy i sprawdza szyldy."""
+    print("\n[TEST 210] Standard 9.2: should_apply_top_alignment_on_collision sprawdza mówcę i szyld na górze...")
+    from avt_linter import EpisodeQualityGate
+
+    assert EpisodeQualityGate.should_apply_top_alignment_on_collision(
+        align_a=2, align_b=2,
+        speaker_a="Arthur", speaker_b="Arthur",
+        has_active_top_sign=False
+    ) is False
+
+    assert EpisodeQualityGate.should_apply_top_alignment_on_collision(
+        align_a=2, align_b=2,
+        speaker_a="Arthur", speaker_b="Merlin",
+        has_active_top_sign=False
+    ) is True
+
+    assert EpisodeQualityGate.should_apply_top_alignment_on_collision(
+        align_a=2, align_b=2,
+        speaker_a="Arthur", speaker_b="Merlin",
+        has_active_top_sign=True
+    ) is False
+    print(" -> PASSED: TEST 210 potwierdza ciągłość mówcy i blokowanie kolizji z szyldem górnym.")
+
+
+def test_standard_9_2_phase7_hygiene_merges_tag_blocks_and_bridges_italic():
+    """TEST 211: Standard 9.2 normalize_ass_tags_and_sign_layout łączy bloki tagów i mostkuje monolog w kursywie."""
+    print("\n[TEST 211] Standard 9.2: Faza 7 łączy sąsiadujące bloki tagów i mostkuje kursywę...")
+    from avt_linter import EpisodeQualityGate
+
+    input_tags = r"{\3c&H000000&\bord3}{\an1\1c&HFFFFFF&\3c&H000000&\shad1}Napis"
+    out_tags = EpisodeQualityGate.normalize_ass_tags_and_sign_layout(input_tags, is_sign=False)
+    assert out_tags == r"{\an1\1c&HFFFFFF&\3c&H000000&\bord3\shad1}Napis"
+
+    out_ell = EpisodeQualityGate.normalize_ass_tags_and_sign_layout(
+        "...ciąg dalszy myśli.",
+        is_sign=False,
+        prev_same_speaker_italic=True,
+        next_same_speaker_italic=True
+    )
+    assert out_ell == r"{\i1}...ciąg dalszy myśli.{\i0}"
+    print(" -> PASSED: TEST 211 potwierdza scalanie bloków tagów i mostkowanie kursywy.")
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -18894,4 +19053,10 @@ if __name__ == "__main__":
     test_standard_9_2_series_bible_syncs_p0_and_compound_declension()
     test_standard_9_2_discourse_graph_telemetry_and_verified_p0_gender()
     test_standard_9_2_asr_window_isolation_and_empty_asr_for_signs()
-    print("\n Wszystkie testy jednostkowe i integracyjne (205/205) zakończone pełnym sukcesem!\n")
+    test_standard_9_2_sign_nominative_orthography_restoration()
+    test_standard_9_2_ram_sanitization_aligns_gender_and_relations_with_p0()
+    test_standard_9_2_discourse_telemetry_p0_non_virile_and_polylogue()
+    test_standard_9_2_guard_phase2_person_number_epistemic_verb_dual_voice()
+    test_standard_9_2_collision_alignment_same_speaker_and_top_sign()
+    test_standard_9_2_phase7_hygiene_merges_tag_blocks_and_bridges_italic()
+    print("\n Wszystkie testy jednostkowe i integracyjne (211/211) zakończone pełnym sukcesem!\n")

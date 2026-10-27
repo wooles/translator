@@ -2734,34 +2734,47 @@ class SceneDiscourseGraph:
 
     @staticmethod
     def arbitrate_event_telemetry(
-        event: Any,
+        event: Any = None,
         series_bible: Optional[Any] = None,
         episode_profiler: Optional[Any] = None,
-        aux_telemetry: Optional[Dict[str, Any]] = None
+        aux_telemetry: Optional[Dict[str, Any]] = None,
+        raw_actor: Optional[str] = None,
+        verified_p0_gender: Optional[str] = None,
+        verified_addressee_p0_gender: Optional[str] = None,
+        has_verified_gender: bool = False,
+        scene_female_only: bool = False,
+        **kwargs
     ) -> Dict[str, Any]:
         """
-        Prymat Tożsamości Rodzajowej z Rekordu P0 i Etykiety Aktora Events (R1.4, R3.3):
+        Prymat Tożsamości Rodzajowej z Rekordu P0 i Etykiety Aktora Events (R1.4, R3.2):
         Zachowuje jawnego aktora z sekcji [Events] oraz przypisuje rodzaj mówcy
-        na podstawie rekordu P0 (has_verified_gender: true), zapewniając
+        i adresata na podstawie rekordu P0 (has_verified_gender: true), zapewniając
         pierwszeństwo przed pomocniczymi etykietami telemetrii czy sygnałem F0.
+        Dla scen wyłącznie kobiecych (scene_female_only=True) ustawia kategorię grupy NON_VIRILE.
+        Dla wielogłosu z surowymi separatorami ('/', '|', ',') ustawia znacznik POLYLOGUE.
         """
         telemetry = dict(aux_telemetry or {})
         
-        # 1. Pobierz aktora ze zdarzenia
-        actor = getattr(event, "actor", None) or getattr(event, "speaker_name", None) or getattr(event, "name", None) or telemetry.get("speaker_name")
+        # 1. Pobierz aktora ze zdarzenia lub raw_actor
+        actor = raw_actor or getattr(event, "actor", None) or getattr(event, "speaker_name", None) or getattr(event, "name", None) or telemetry.get("speaker_name")
         if not actor and isinstance(event, dict):
             actor = event.get("actor") or event.get("speaker_name") or event.get("name")
             
         clean_actor = str(actor).strip() if actor else ""
         if clean_actor:
-            telemetry["speaker_name"] = clean_actor
-            telemetry["actor"] = clean_actor
+            if any(sep in clean_actor for sep in ("/", "|", ",")):
+                spk_label = "POLYLOGUE"
+                telemetry["speaker_name"] = spk_label
+                telemetry["actor"] = spk_label
+            else:
+                telemetry["speaker_name"] = clean_actor
+                telemetry["actor"] = clean_actor
 
-        # 2. Sprawdź rekord P0 w series_bible / episode_profiler
-        p0_gender = None
-        has_verified = False
+        # 2. Sprawdź rekord P0 w parametrach, series_bible / episode_profiler
+        p0_gender = verified_p0_gender
+        has_ver = has_verified_gender
 
-        if series_bible and hasattr(series_bible, "characters") and clean_actor:
+        if not p0_gender and series_bible and hasattr(series_bible, "characters") and clean_actor:
             chars = series_bible.characters
             char_rec = chars.get(clean_actor) if isinstance(chars, dict) else None
             if not char_rec and isinstance(chars, dict):
@@ -2776,7 +2789,7 @@ class SceneDiscourseGraph:
                 g = char_rec.get("gender")
                 if g and str(g).upper() != "UNKNOWN":
                     p0_gender = str(g).upper()
-                    has_verified = bool(char_rec.get("has_verified_gender", False)) or char_rec.get("priority") == "P0"
+                    has_ver = bool(char_rec.get("has_verified_gender", False)) or char_rec.get("priority") == "P0"
 
         if not p0_gender and episode_profiler and hasattr(episode_profiler, "character_dossiers") and clean_actor:
             for cd in getattr(episode_profiler, "character_dossiers", []):
@@ -2784,18 +2797,24 @@ class SceneDiscourseGraph:
                     g = getattr(cd, "gender", None) or getattr(cd, "apparent_gender", None)
                     if g and str(g).upper() != "UNKNOWN":
                         p0_gender = str(g).upper()
-                        has_verified = True
+                        has_ver = True
                         break
 
         if p0_gender:
             telemetry["speaker_gender"] = p0_gender
             telemetry["p0_gender"] = p0_gender
-            telemetry["has_verified_gender"] = has_verified
+            telemetry["has_verified_gender"] = has_ver
         else:
             if "speaker_gender" not in telemetry:
                 telemetry["speaker_gender"] = "UNKNOWN"
             if "has_verified_gender" not in telemetry:
                 telemetry["has_verified_gender"] = False
+
+        if verified_addressee_p0_gender:
+            telemetry["addressee_gender"] = verified_addressee_p0_gender
+
+        if scene_female_only:
+            telemetry["group_virility"] = "NON_VIRILE"
 
         return telemetry
 

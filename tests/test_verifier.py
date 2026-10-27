@@ -103,3 +103,61 @@ def test_verifier_guard_restores_phase1_on_continuation_and_tag_imbalance():
             prev_line_pl=prev_line_pl
         )
         assert result == expected
+
+
+@pytest.mark.parametrize(
+    "f1_sign_text,f2_sign_text,source_en,glossary_nominative,expected_sign_text",
+    [
+        ("TAJEMNICZY CUKIERK", "TAJEMNICZY CUKIERK",
+         "Mysterious Candy", {"Mysterious Candy": "TAJEMNICZY CUKIEREK"},
+         "TAJEMNICZY CUKIEREK"),
+        ("ZŁOTY PIERŚCIEŃK", "ZŁOTY PIERŚCIEŃK",
+         "Golden Ring", {"Golden Ring": "ZŁOTY PIERŚCIEŃ"},
+         "ZŁOTY PIERŚCIEŃ"),
+    ],
+)
+def test_verifier_restores_canonical_nominative_orthography_on_is_sign(
+    f1_sign_text, f2_sign_text, source_en, glossary_nominative, expected_sign_text
+):
+    """Weryfikuje korektę ortograficzną formy mianownika M na planszach is_sign: true względem rekordu P0."""
+    from verifier import DialogueVerifier
+    result = DialogueVerifier.enforce_sign_nominative_orthography(
+        f1_pl=f1_sign_text,
+        refined_pl=f2_sign_text,
+        source_en=source_en,
+        is_sign=True,
+        canonical_glossary=glossary_nominative,
+    )
+    assert result == expected_sign_text
+
+
+@pytest.mark.parametrize(
+    "prev_pl,f1_pl,f2_mutated,en_src,prev_en,expected_restored",
+    [
+        # Kategoria 1: inwersja osoby 2. os. lm. ↔ 1. os. lm. w pytaniu przytoczonym.
+        ("Zapytali o nasze plany.", "Co macie zamiar zrobić?", "Co mamy zamiar zrobić?",
+         "What do you plan to do?", "They asked about our plans.", "Co macie zamiar zrobić?"),
+        # Kategoria 2: zmiana liczby 1. os. lp. → 1. os. lm. wbrew jawnemu zaimkowi EN.
+        ("Czekam na wiadomość.", "Zaraz przyślę ci raport.", "Zaraz prześlemy ci raport.",
+         "I'll send you the report right away.", "I am waiting for news.", "Zaraz przyślę ci raport."),
+        # Kategoria 3: redukcja nadrzędnego czasownika epistemicznego.
+        ("Dlaczego milczysz?", "Myślałam, że wszystko pamiętasz.", "Wszystko pamiętasz.",
+         "I thought you remembered everything.", "Why are you silent?", "Myślałam, że wszystko pamiętasz."),
+        # Kategoria 4: niesynchronizowany drugi wiersz dwugłosu.
+        ("– To bezcelowe!", "– Nie traćmy czasu!\\N– To bezcelowe!", "– Nie traćmy czasu!\\N– Nie ma to sensu!",
+         "– Don't waste time!\\N– That's pointless!", "That's pointless!", "– Nie traćmy czasu!\\N– To bezcelowe!"),
+    ],
+)
+def test_guard_phase2_restores_person_number_epistemic_verb_and_dual_voice_line2(
+    prev_pl, f1_pl, f2_mutated, en_src, prev_en, expected_restored
+):
+    """Weryfikuje ochronę osoby, liczby lp., czasownika epistemicznego oraz 2. wiersza dwugłosu w OPERACJI 14."""
+    from verifier import DialogueVerifier
+    result = DialogueVerifier._guard_phase2_regressions(
+        f1_pl=f1_pl,
+        refined_pl=f2_mutated,
+        source_en=en_src,
+        prev_line_pl=prev_pl,
+        prev_line_en=prev_en,
+    )
+    assert result == expected_restored

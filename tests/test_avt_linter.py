@@ -115,10 +115,12 @@ def test_linter_preserves_phase2_lexical_choice_over_slash_glossary():
 
 
 def test_eqg_respects_v4_styles_alignment_and_italic_attributes():
-    # 1. Top alignment on collision is ONLY applied when both styles have Alignment == 2
-    assert EpisodeQualityGate.should_apply_top_alignment_on_collision(2, 2) is True
-    assert EpisodeQualityGate.should_apply_top_alignment_on_collision(2, 8) is False
-    assert EpisodeQualityGate.should_apply_top_alignment_on_collision(8, 2) is False
+    # 1. Top alignment on collision is applied when styles Alignment == 2, different speakers, and top band free
+    assert EpisodeQualityGate.should_apply_top_alignment_on_collision(2, 2, speaker_a="Mówca 1", speaker_b="Mówca 2", has_active_top_sign=False) is True
+    assert EpisodeQualityGate.should_apply_top_alignment_on_collision(2, 2, speaker_a="Mówca 1", speaker_b="Mówca 1", has_active_top_sign=False) is False
+    assert EpisodeQualityGate.should_apply_top_alignment_on_collision(2, 2, speaker_a="Mówca 1", speaker_b="Mówca 2", has_active_top_sign=True) is False
+    assert EpisodeQualityGate.should_apply_top_alignment_on_collision(2, 8, speaker_a="Mówca 1", speaker_b="Mówca 2") is False
+    assert EpisodeQualityGate.should_apply_top_alignment_on_collision(8, 2, speaker_a="Mówca 1", speaker_b="Mówca 2") is False
     assert EpisodeQualityGate.should_apply_top_alignment_on_collision(1, 2) is False
     assert EpisodeQualityGate.should_apply_top_alignment_on_collision(7, 8) is False
 
@@ -128,8 +130,8 @@ def test_eqg_respects_v4_styles_alignment_and_italic_attributes():
     subs.styles["BottomStyle"] = pysubs2.SSAStyle(alignment=2)
     subs.styles["TopStyle"] = pysubs2.SSAStyle(alignment=8)
 
-    ev1 = pysubs2.SSAEvent(start=1000, end=3000, text="Kwestia pierwsza na dole", style="BottomStyle")
-    ev2 = pysubs2.SSAEvent(start=1500, end=3500, text="Kwestia druga", style="BottomStyle")
+    ev1 = pysubs2.SSAEvent(start=1000, end=3000, text="Kwestia pierwsza na dole", style="BottomStyle", name="Mówca 1")
+    ev2 = pysubs2.SSAEvent(start=1500, end=3500, text="Kwestia druga", style="BottomStyle", name="Mówca 2")
     subs.events = [ev1, ev2]
 
     fixed_subs, fixes = eqg.audit_and_fix_entire_episode(subs, strict_positive_domain=True)
@@ -144,3 +146,51 @@ def test_eqg_respects_v4_styles_alignment_and_italic_attributes():
 def test_phase7_hygiene_preserves_single_sign_event_and_normalizes_ass_tags(input_text, is_sign, expected_text):
     normalized = EpisodeQualityGate.normalize_ass_tags_and_sign_layout(input_text, is_sign=is_sign)
     assert normalized == expected_text
+
+
+@pytest.mark.parametrize(
+    "speaker_a,speaker_b,top_sign_active,expected_lift",
+    [
+        # Kategoria 1: ten sam mówca → NIE podnoś.
+        ("Jan", "Jan", False, False),
+        # Kategoria 2: różni mówcy, górne pasmo zajęte → NIE podnoś.
+        ("Jan", "Anna", True, False),
+        # Kategoria 3: różni mówcy, górne pasmo wolne → podnieś.
+        ("Jan", "Anna", False, True),
+    ],
+)
+def test_collision_alignment_keeps_same_speaker_continuity_and_checks_top_sign(
+    speaker_a, speaker_b, top_sign_active, expected_lift
+):
+    """Weryfikuje zachowanie ciągłości zdania tego samego mówcy na dole oraz blokadę przy zajętym paśmie górnym."""
+    from avt_linter import EpisodeQualityGate
+    should_lift = EpisodeQualityGate.should_apply_top_alignment_on_collision(
+        style_a_alignment=2,
+        style_b_alignment=2,
+        speaker_a=speaker_a,
+        speaker_b=speaker_b,
+        has_active_top_sign=top_sign_active,
+    )
+    assert should_lift is expected_lift
+
+
+@pytest.mark.parametrize(
+    "raw_text,prev_italic,next_italic,expected_text",
+    [
+        # Kategoria 1: scalanie zduplikowanych bloków {\...}{\...}.
+        (r"{\3c&H000000&\bord3}{\an1\1c&HFFFFFF&\3c&H000000&\shad1}Napis", False, False, r"{\an1\1c&HFFFFFF&\3c&H000000&\bord3\shad1}Napis"),
+        # Kategoria 2: domykanie kursywy w monologu wewnętrznym.
+        ("...ciąg dalszy myśli.", True, True, r"{\i1}...ciąg dalszy myśli.{\i0}"),
+    ],
+)
+def test_phase7_hygiene_merges_duplicate_tag_blocks_and_bridges_italic_monologue(
+    raw_text, prev_italic, next_italic, expected_text
+):
+    """Weryfikuje scalanie zduplikowanych bloków tagów {\...} oraz domykanie kursywy w monologu wewnętrznym."""
+    from avt_linter import EpisodeQualityGate
+    cleaned = EpisodeQualityGate.normalize_ass_tags_and_sign_layout(
+        text=raw_text,
+        prev_same_speaker_italic=prev_italic,
+        next_same_speaker_italic=next_italic,
+    )
+    assert cleaned == expected_text

@@ -4,7 +4,7 @@ from series_memory import SeriesBible, EntityCategory, generate_polish_name_decl
 
 def test_series_bible_entity_filtering_and_glossary_priority(tmp_path):
     bible_file = tmp_path / "test_series_bible.json"
-    bible = SeriesBible(bible_path=bible_file)
+    bible = SeriesBible(bible_path=bible_file, storage_dir=tmp_path)
 
     # 1. Update from episode profile with mixed entities:
     # - Real character
@@ -96,3 +96,33 @@ def test_series_bible_syncs_verified_p0_gender_and_full_compound_declension():
     assert bible.get_declension("Generał Janusz Korwin", "Ms") == "Generale Januszu Korwinie"
     assert bible.get_declension("Generał Janusz Korwin", "W") == "Generale Januszu Korwinie"
     assert bible.get_declension("Nieznany Byt", "M") == "Nieznany Byt"
+
+
+@pytest.mark.parametrize(
+    "entity_id,contaminated_gender,verified_profile_gender,relation_key",
+    [
+        # DANE TESTOWE: encja żeńska z historycznie zatrutym p0_gender=MALE + relacja z etykietą [MĘŻCZYZNA (Adresat)].
+        ("Helena", "MALE", "FEMALE", "Artur -> Helena"),
+        ("Anna", "MALE", "FEMALE", "Wojownik -> Anna"),
+    ],
+)
+def test_sanitize_bible_in_ram_aligns_character_and_relation_gender_with_p0(
+    entity_id, contaminated_gender, verified_profile_gender, relation_key
+):
+    """Weryfikuje oczyszczanie w pamięci RAM zatrutych flag płci postaci i adresatów relacji zgodnie z P0."""
+    from series_memory import SeriesBible
+    bible = SeriesBible(slug="test_ram_sanitization", db_path=":memory:")
+    bible.data["characters"][entity_id] = {
+        "gender": contaminated_gender,
+        "grammatical_gender": "MASCULINE",
+        "has_verified_gender": True,
+    }
+    bible.data["relations"][relation_key] = "Relacja [MĘŻCZYZNA (Adresat)]"
+    bible.sync_verified_profile_entity(
+        name=entity_id,
+        gender=verified_profile_gender,
+        has_verified_gender=True,
+    )
+    bible._sanitize_loaded_bible_in_ram()
+    assert bible.get_character_gender(entity_id) == verified_profile_gender
+    assert "KOBIETA (Adresat)" in bible.data["relations"][relation_key]

@@ -6518,38 +6518,105 @@ class EpisodeQualityGate:
     def should_apply_top_alignment_on_collision(
         cls,
         style_a_alignment: int = 2,
-        style_b_alignment: int = 2
+        style_b_alignment: int = 2,
+        speaker_a: str = "",
+        speaker_b: str = "",
+        has_active_top_sign: bool = False,
+        **kwargs
     ) -> bool:
         """
         Sprawdza, czy należy podnieść nakładającą się kwestię dialogową na górę kadru ({\an8}):
-        Zwraca True wyłącznie wtedy, gdy OBA kolidujące style mają domyślne wyrównanie dolne (Alignment == 2).
-        W przypadku innego wyrównania stylów (górne 7/8/9 lub boczne), funkcja zwraca False,
-        zapobiegając błędnym przesunięciom i nadpisywaniu intencji zdefiniowanej w arkuszu [V4+ Styles].
+        Zwraca True wyłącznie wtedy, gdy:
+        1. OBA kolidujące style mają domyślne wyrównanie dolne (Alignment == 2).
+        2. Kolidujące zdarzenia mają różnych mówców (dla tego samego mówcy zachowuje ciągłość na dole).
+        3. Górne pasmo kadru jest wolne (brak aktywnego napisu is_sign w górnym paśmie).
         """
         try:
-            return int(style_a_alignment) == 2 and int(style_b_alignment) == 2
+            if int(style_a_alignment) != 2 or int(style_b_alignment) != 2:
+                return False
         except (ValueError, TypeError):
             return False
 
+        spk_a = str(speaker_a or "").strip().lower()
+        spk_b = str(speaker_b or "").strip().lower()
+        if spk_a and spk_b and spk_a == spk_b:
+            return False
+
+        if has_active_top_sign:
+            return False
+
+        return True
+
     @staticmethod
-    def normalize_ass_tags_and_sign_layout(text: str, is_sign: bool = False) -> str:
-        """
-        Normalizuje znaczniki ASS i układ wielowierszowy napisów ekranowych (Standard 9.2, R1.5, R1.7, R3.6):
-        - Usuwa zniekształcenia otwarcia tagu {(\\an8} -> {\\an8}
-        - Deduplikuje nadmiarowe tagi zamykające kursywę {\\i0}{\\i0} -> {\\i0}
+    def normalize_ass_tags_and_sign_layout(
+        text: str,
+        is_sign: bool = False,
+        prev_same_speaker_italic: bool = False,
+        next_same_speaker_italic: bool = False,
+        **kwargs
+    ) -> str:
+        r"""
+        Normalizuje znaczniki ASS i układ wielowierszowy napisów ekranowych (Standard 9.2):
+        - Usuwa zniekształcenia otwarcia tagu {(\an8} -> {\an8}
+        - Deduplikuje nadmiarowe tagi zamykające kursywę {\i0}{\i0} -> {\i0}
+        - Scala zduplikowane bloki tagów otwierających {\...}{\...} na początku linii z deduplikacją atrybutów
+        - Domyka ciągłość kursywy w monologu wewnętrznym {\i1}...{\i0}
         - W przypadku 3-wierszowych szyldów / tytułów (is_sign: true) łączy człon tytułowy z podtytułem w 2 wiersze.
         """
         if not text:
             return text
         res = text
-        # 1. Naprawa zniekształconego otwarcia tagu ASS {(\\an8} -> {\\an8}
-        res = re.sub(r"\{[\\\(]*\(+[\\/]*", r"{\\", res)
-        res = re.sub(r"\{[\\\(]+(?=[a-zA-Z])", r"{\\", res)
+        # 1. Naprawa zniekształconego otwarcia tagu ASS {(\an8} -> {\an8}
+        res = re.sub(r"\{[\\(]*\(+[\/]*", r"{\\", res)
+        res = re.sub(r"\{[\\(]+(?=[a-zA-Z])", r"{\\", res)
 
-        # 2. Deduplikacja nadmiarowych znaczników {\\i0}
+        # 2. Deduplikacja nadmiarowych znaczników {\i0}
         res = re.sub(r"(?:\{\\i0\}\s*){2,}", r"{\\i0}", res)
 
-        # 3. Układ szyldów / tytułów (3 wiersze -> 2 wiersze)
+        # 3. Scalanie zduplikowanych bloków tagów otwierających {\...}{\...} na początku linii
+        m_blocks = re.match(r"^((?:\{[^{}]+\}){2,})(.*)$", res, flags=re.DOTALL)
+        if m_blocks:
+            tag_blocks_str = m_blocks.group(1)
+            rest_of_text = m_blocks.group(2)
+            individual_blocks = re.findall(r"\{([^{}]+)\}", tag_blocks_str)
+            if len(individual_blocks) > 1:
+                canonical_tag_order = {
+                    'an': 1, '1c': 2, 'c': 2, '2c': 3, '3c': 4, '4c': 5,
+                    'bord': 6, 'xbord': 6, 'ybord': 6,
+                    'shad': 7, 'xshad': 7, 'yshad': 7,
+                    'i': 8, 'b': 9, 'u': 10, 's': 11,
+                    'fn': 12, 'fs': 13, 'fscx': 14, 'fscy': 15, 'fsp': 16,
+                    'pos': 20, 'move': 21, 'fad': 22, 'fade': 23
+                }
+                def _get_priority(tok: str) -> int:
+                    m = re.match(r"^\\([a-zA-Z0-9]+)", tok)
+                    if not m:
+                        return 99
+                    k_tok = m.group(1).lower()
+                    for k in sorted(canonical_tag_order.keys(), key=lambda x: -len(x)):
+                        if k_tok == k or k_tok.startswith(k):
+                            return canonical_tag_order[k]
+                    return 99
+
+                attr_map = {}
+                for block in individual_blocks:
+                    tokens = re.findall(r"\\[a-zA-Z0-9]+(?:\([^)]*\)|&H[0-9a-fA-F]+&|[0-9.]+|[^\\}]*)", "\\" + block.lstrip("\\"))
+                    for tok in tokens:
+                        m_key = re.match(r"^(\\[a-zA-Z0-9]+)", tok)
+                        if m_key:
+                            key = m_key.group(1).lower()
+                            attr_map[key] = tok
+
+                sorted_tokens = sorted(attr_map.values(), key=_get_priority)
+                merged_content = "".join(sorted_tokens)
+                res = f"{{{merged_content}}}{rest_of_text}"
+
+        # 4. Domykanie ciągłości kursywy w monologu wewnętrznym (Standard 9.2, Zmiana 4)
+        if (res.startswith("...") or res.startswith("…")) and prev_same_speaker_italic and next_same_speaker_italic:
+            if not res.startswith(r"{\i1}") and not res.startswith(r"<i>"):
+                res = f"{{\\i1}}{res}{{\\i0}}"
+
+        # 5. Układ szyldów / tytułów (3 wiersze -> 2 wiersze)
         if (is_sign or r":\N" in res or r": \N" in res) and r"\N" in res:
             parts = re.split(r"\\[Nn]", res)
             if len(parts) == 3:
@@ -6637,7 +6704,23 @@ class EpisodeQualityGate:
                         s_b = subs.styles.get(ev_b.style)
                         if s_b and hasattr(s_b, "alignment"):
                             align_b = s_b.alignment
-                    if cls.should_apply_top_alignment_on_collision(align_a, align_b):
+                    spk_a = getattr(ev_a, "name", None) or getattr(ev_a, "actor", "")
+                    spk_b = getattr(ev_b, "name", None) or getattr(ev_b, "actor", "")
+                    top_sign_active = False
+                    col_start = max(ev_a.start, ev_b.start)
+                    col_end = min(ev_a.end, ev_b.end)
+                    for ev_sign_check in events:
+                        if getattr(ev_sign_check, "is_sign", False) or bool(re.search(r"\b(sign|title|caption|typeset|op|ed)\b", str(ev_sign_check.style).lower())):
+                            if ev_sign_check.start < col_end and ev_sign_check.end > col_start:
+                                if re.search(r"\\an[789]\b", ev_sign_check.text):
+                                    top_sign_active = True
+                                    break
+                                if hasattr(subs, "styles") and subs.styles:
+                                    s_sign = subs.styles.get(ev_sign_check.style)
+                                    if s_sign and getattr(s_sign, "alignment", 2) in (7, 8, 9):
+                                        top_sign_active = True
+                                        break
+                    if cls.should_apply_top_alignment_on_collision(align_a, align_b, speaker_a=spk_a, speaker_b=spk_b, has_active_top_sign=top_sign_active):
                         target_ev = ev_b if len(ev_b.text) <= len(ev_a.text) else ev_a
                         target_idx = idx_b if len(ev_b.text) <= len(ev_a.text) else idx_a
                         target_ev.text = r"{\an8}" + target_ev.text

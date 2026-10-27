@@ -5004,8 +5004,9 @@ class SeriesBible:
 
             # Auto-integrate verified Fansub Canon Lexicon from fansub_miner (0.00 PLN)
             try:
-                from fansub_miner import load_fansub_lexicon
-                fansub_lex = load_fansub_lexicon(self.anime_title)
+                if self.anime_title and self.anime_title != "Nieznana Seria" and getattr(self, "db_path", None) != ":memory:":
+                    from fansub_miner import load_fansub_lexicon
+                    fansub_lex = load_fansub_lexicon(self.anime_title)
                 if fansub_lex and "terms" in fansub_lex:
                     if "fansub_canon" not in self.data:
                         self.data["fansub_canon"] = {}
@@ -5993,6 +5994,55 @@ class SeriesBible:
                     p_paradigm = self.get_declension_paradigm(c_k)
                     if p_paradigm:
                         _ = p_paradigm.to_reference_table(c_k)
+
+            # -------------------------------------------------------------
+            # e) Synchronizacja płci postaci i adresatów w relations z rekordami P0 (Standard 9.2, Zmiana 5)
+            # -------------------------------------------------------------
+            for rel_dict_name in ("relations", "relationships"):
+                if rel_dict_name in self.data and isinstance(self.data[rel_dict_name], dict):
+                    for rel_k, rel_desc in list(self.data[rel_dict_name].items()):
+                        target_char = None
+                        if "->" in rel_k:
+                            target_char = rel_k.split("->")[-1].strip()
+                        else:
+                            for ch_name in self.data.get("characters", {}):
+                                if "->" not in ch_name and ch_name in rel_k:
+                                    target_char = ch_name
+                                    break
+
+                        if target_char:
+                            ch_entry = self.data.get("characters", {}).get(target_char)
+                            if not ch_entry:
+                                ch_entry = self.get_character(target_char)
+                            if ch_entry and isinstance(ch_entry, dict):
+                                is_ver = bool(ch_entry.get("has_verified_gender", False) or ch_entry.get("priority") == "P0")
+                                p0_g = str(ch_entry.get("gender", "")).upper()
+                                if is_ver and p0_g in ("FEMALE", "MALE"):
+                                    desc_val = rel_desc.get("description", "") if isinstance(rel_desc, dict) else str(rel_desc)
+                                    if p0_g == "FEMALE":
+                                        new_desc = re.sub(
+                                            r"\[MĘŻCZYZNA\s+\(Adresat[^\]]*\)\]",
+                                            "[KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+                                            desc_val,
+                                            flags=re.IGNORECASE
+                                        )
+                                        if new_desc != desc_val:
+                                            if isinstance(rel_desc, dict):
+                                                rel_desc["description"] = new_desc
+                                            else:
+                                                self.data[rel_dict_name][rel_k] = new_desc
+                                    elif p0_g == "MALE":
+                                        new_desc = re.sub(
+                                            r"\[KOBIETA\s+\(Adresat[^\]]*\)\]",
+                                            "[MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+                                            desc_val,
+                                            flags=re.IGNORECASE
+                                        )
+                                        if new_desc != desc_val:
+                                            if isinstance(rel_desc, dict):
+                                                rel_desc["description"] = new_desc
+                                            else:
+                                                self.data[rel_dict_name][rel_k] = new_desc
 
     def _rebuild_actor_aliases_index(self):
         """Buduje globalny indeks aliasów O(1) w SeriesBible z priorytetyzacją P0 i normalizacją fonetyczną."""

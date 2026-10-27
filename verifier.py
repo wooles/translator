@@ -47,6 +47,47 @@ def normalize_ass_tags(text: str) -> str:
     return res
 
 
+def enforce_sign_nominative_orthography(
+    f1_pl: str,
+    refined_pl: str,
+    source_en: str = "",
+    is_sign: bool = True,
+    canonical_glossary: Optional[Dict[str, str]] = None,
+    **kwargs
+) -> str:
+    """
+    Standard 9.2 (Sekcja 2B.1, R1.5):
+    Weryfikacja ortograficzna formy mianownika M na planszach i napisach ekranowych (is_sign: true)
+    względem kanonicznej formy słownikowej z SeriesBible.
+    """
+    if not is_sign or not canonical_glossary or not refined_pl:
+        return refined_pl
+
+    canon_match = None
+    if source_en in canonical_glossary:
+        canon_match = canonical_glossary[source_en]
+    else:
+        s_clean = source_en.strip().lower()
+        for k, v in canonical_glossary.items():
+            k_clean = str(k).strip().lower()
+            if k_clean == s_clean or k_clean in s_clean or s_clean in k_clean:
+                canon_match = v
+                break
+
+    if not canon_match or not isinstance(canon_match, str):
+        return refined_pl
+
+    clean_canon = re.sub(r"\{[^}]*\}", "", canon_match).strip()
+    clean_refined = re.sub(r"\{[^}]*\}", "", refined_pl).strip()
+
+    if clean_refined.lower() != clean_canon.lower():
+        prefix_tags = "".join(re.findall(r"^((?:\{[^}]+\})+)", refined_pl))
+        suffix_tags = "".join(re.findall(r"((?:\{[^}]+\})+$)", refined_pl))
+        return f"{prefix_tags}{clean_canon}{suffix_tags}"
+
+    return refined_pl
+
+
 def _guard_phase2_regressions(
     f1_pl: str,
     refined_pl: str,
@@ -58,6 +99,7 @@ def _guard_phase2_regressions(
     prev_line_f1: Optional[str] = None,
     series_bible: Optional[Any] = None,
     prev_line_pl: Optional[str] = None,
+    prev_line_en: Optional[str] = None,
     **kwargs
 ) -> str:
     """
@@ -260,6 +302,54 @@ def _guard_phase2_regressions(
             ref_nom = bool(re.search(r"\b(?:nasz|ten|jakiś|jeden|mój|twój)\s+[a-ząćęłńóśźż]+(?<!ego)(?<!ej)\b", refined_pl, re.IGNORECASE))
             if f1_oblique and ref_nom:
                 return f1_pl
+    # 13. KATEGORIA 13 (Standard 9.2, R1.4): Synchronizacja drugiego wiersza dwugłosu z linią poprzedzającą
+    effective_prev_en = (prev_line_en or "").strip().lower()
+    effective_prev_pl = (prev_line_pl or prev_line_f1 or "").strip()
+    if effective_prev_en and effective_prev_pl and source_en:
+        en_parts = [p.strip() for p in re.split(r"\\[Nn]|\n", source_en) if p.strip()]
+        ref_parts = [p.strip() for p in re.split(r"\\[Nn]|\n", refined_pl) if p.strip()]
+        clean_prev_en = re.sub(r"^[–—\-]\s*", "", effective_prev_en).strip().lower()
+        if len(en_parts) >= 2 and len(ref_parts) == len(en_parts):
+            for idx_p, en_part in enumerate(en_parts):
+                clean_en_part = re.sub(r"^[–—\-]\s*", "", en_part).strip().lower()
+                if clean_en_part == clean_prev_en:
+                    clean_ref_line = re.sub(r"^[–—\-]\s*", "", ref_parts[idx_p]).strip().lower()
+                    clean_prev_pl = re.sub(r"^[–—\-]\s*", "", effective_prev_pl).strip().lower()
+                    if clean_ref_line != clean_prev_pl:
+                        return f1_pl
+
+    # 14. KATEGORIA 14 (Standard 9.2, R1.2): Ochrona osoby gramatycznej orzeczenia (1. ↔ 2. ↔ 3.)
+    re_1st_pl = re.compile(r"\b(?:[a-ząćęłńóśźż]+(?:my|liśmy|łyśmy)|mamy|będziemy|jesteśmy)\b", re.IGNORECASE)
+    re_2nd_pl = re.compile(r"\b(?:[a-ząćęłńóśźż]+(?:cie|liście|łyście)|macie|będziecie|jesteście)\b", re.IGNORECASE)
+    re_en_2nd = re.compile(r"\b(?:you|your|yours)\b", re.IGNORECASE)
+    re_en_1st = re.compile(r"\b(?:we|our|ours|us)\b", re.IGNORECASE)
+
+    f1_is_2nd_pl = bool(re_2nd_pl.search(f1_pl))
+    f1_is_1st_pl = bool(re_1st_pl.search(f1_pl))
+    ref_is_2nd_pl = bool(re_2nd_pl.search(refined_pl))
+    ref_is_1st_pl = bool(re_1st_pl.search(refined_pl))
+
+    if f1_is_2nd_pl and not f1_is_1st_pl and ref_is_1st_pl and not ref_is_2nd_pl:
+        if source_en and re_en_2nd.search(source_en) and not re_en_1st.search(source_en):
+            return f1_pl
+    if f1_is_1st_pl and not f1_is_2nd_pl and ref_is_2nd_pl and not ref_is_1st_pl:
+        if source_en and re_en_1st.search(source_en) and not re_en_2nd.search(source_en):
+            return f1_pl
+
+    # 15. KATEGORIA 15 (Standard 9.2, R1.2): Ochrona liczby pojedynczej wobec mnogiej przy jawnym zaimku EN 1. os. lp.
+    re_en_1st_sg = re.compile(r"\b(?:I|I'll|I'm|I've|I'd|my|mine|me)\b")
+    re_pl_1st_sg = re.compile(r"\b(?:[a-ząćęłńóśźż]+(?:ę|m|łem|łam|łbym|łabym)|będę|jestem)\b", re.IGNORECASE)
+    if source_en and re_en_1st_sg.search(source_en) and not re_en_1st.search(source_en):
+        if re_pl_1st_sg.search(f1_pl) and not re_1st_pl.search(f1_pl):
+            if re_1st_pl.search(refined_pl) and not re_pl_1st_sg.search(refined_pl):
+                return f1_pl
+
+    # 16. KATEGORIA 16 (Standard 9.2, R1.3): Ochrona nadrzędnego czasownika epistemicznego
+    re_en_matrix = re.compile(r"\bI\s+(?:thought|believed|assumed|suspected|remembered|recalled|knew)\b", re.IGNORECASE)
+    re_pl_matrix = re.compile(r"\b(?:myślał(?:em|am|a|o)?|sądził(?:em|am|a|o)?|wierzył(?:em|am|a|o)?|przypuszczał(?:em|am|a|o)?)\b", re.IGNORECASE)
+    if source_en and re_en_matrix.search(source_en):
+        if re_pl_matrix.search(f1_pl) and not re_pl_matrix.search(refined_pl):
+            return f1_pl
 
     return refined_pl
 
@@ -269,6 +359,7 @@ import threading
 class DialogueVerifier:
     _STATUS_LOCK = threading.Lock()
     _guard_phase2_regressions = staticmethod(_guard_phase2_regressions)
+    enforce_sign_nominative_orthography = staticmethod(enforce_sign_nominative_orthography)
     _STATUS_ACTIVE: bool = False
     _LAST_STATUS_TIME: float = 0.0
 
@@ -814,6 +905,16 @@ class DialogueVerifier:
                         tgt_g = orig_it.get("target_gender") or orig_it.get("addressee_gender")
                         addr_rec = orig_it.get("addressee_p0_record")
                         prev_txt = orig_it.get("prev_line_f1") or ""
+                        if orig_it.get("is_sign"):
+                            gloss = orig_it.get("canonical_glossary") or orig_it.get("glossary") or {}
+                            r.refined_pl = enforce_sign_nominative_orthography(
+                                f1_pl=f1_text,
+                                refined_pl=r.refined_pl,
+                                source_en=src_en,
+                                is_sign=True,
+                                canonical_glossary=gloss
+                            )
+                        prev_en = orig_it.get("prev_line_en") or ""
                         guarded = _guard_phase2_regressions(
                             f1_pl=f1_text,
                             refined_pl=r.refined_pl,
@@ -821,7 +922,9 @@ class DialogueVerifier:
                             speaker_p0_gender=spk_g,
                             target_p0_gender=tgt_g,
                             addressee_p0_record=addr_rec,
-                            prev_line_f1=prev_txt
+                            prev_line_f1=prev_txt,
+                            prev_line_pl=prev_txt,
+                            prev_line_en=prev_en
                         )
                         if guarded != r.refined_pl:
                             r.refined_pl = guarded

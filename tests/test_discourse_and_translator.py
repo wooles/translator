@@ -7,7 +7,7 @@ from translator import MultimodalTranslator, synchronize_ass_event_metadata_and_
 
 def test_speaker_gender_arbitration_p0_priority_and_sign_isolation(tmp_path):
     bible_file = tmp_path / "discourse_test_bible.json"
-    bible = SeriesBible(bible_path=bible_file)
+    bible = SeriesBible(bible_path=bible_file, storage_dir=tmp_path)
     bible.data["characters"] = {
         "Wojownik Jan": {
             "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
@@ -124,3 +124,30 @@ def test_asr_window_isolation_and_empty_asr_for_is_sign_events():
     # 2. Dialogue lines preserve strictly isolated speech window
     speech = "Kwestia dialogowa bohatera"
     assert EpisodeProfiler.sanitize_event_asr(speech, is_sign=False, style="Default") == speech
+
+
+@pytest.mark.parametrize(
+    "raw_actor,speaker_p0,addressee_p0,expected_speaker_label,expected_group",
+    [
+        # DANE TESTOWE: kategoria — surowy separator "/" w polu aktora + scena żeńska (P0.3).
+        ("/", "FEMALE", "FEMALE", "POLYLOGUE", "NON_VIRILE"),
+        # Kategoria — postać o p0_gender=MALE w scenie żeńskiej (P0.3).
+        ("Artur", "MALE", "FEMALE", "Artur", "NON_VIRILE"),
+    ],
+)
+def test_arbitrate_telemetry_enforces_p0_gender_non_virile_and_polylogue_tag(
+    raw_actor, speaker_p0, addressee_p0, expected_speaker_label, expected_group
+):
+    """Weryfikuje prymat p0_gender mówcy i adresata, kategorię NON_VIRILE oraz czyszczenie separatora '/'."""
+    from scene_discourse import SceneDiscourseGraph
+    telemetry_node = SceneDiscourseGraph.arbitrate_event_telemetry(
+        raw_actor=raw_actor,
+        verified_p0_gender=speaker_p0,
+        verified_addressee_p0_gender=addressee_p0,
+        has_verified_gender=True,
+        scene_female_only=True,
+    )
+    assert telemetry_node["speaker_name"] == expected_speaker_label
+    assert telemetry_node["p0_gender"] == speaker_p0
+    assert telemetry_node["addressee_gender"] == addressee_p0
+    assert telemetry_node["group_virility"] == expected_group
