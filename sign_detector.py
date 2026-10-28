@@ -53,6 +53,43 @@ class VisualSignDetector:
     """
 
     @staticmethod
+    def detect_signs(event_or_events: Any) -> Any:
+        """
+        Klasyfikuje zdarzenie (lub listę zdarzeń) jako napis ekranowy (Standard 9.5, 2C.2, R3.4):
+        - Każde zdarzenie o Name w ("sign", "signs", "txt", "title", "board", "screen")
+        - LUB zawierające w tekście tag \\pos( / \\move( przy braku osobowego aktora w Name
+        otrzymuje bezwarunkowo flagę is_sign = True.
+        """
+        def _check_ev(ev: Any) -> bool:
+            if ev is None:
+                return False
+            if isinstance(ev, dict):
+                n = str(ev.get("name") or ev.get("actor") or "").strip().lower()
+                t = str(ev.get("text") or "").lower()
+                is_s = bool(ev.get("is_sign"))
+            else:
+                n = str(getattr(ev, "name", "") or getattr(ev, "actor", "") or "").strip().lower()
+                t = str(getattr(ev, "text", "") or "").lower()
+                is_s = bool(getattr(ev, "is_sign", False))
+            if is_s:
+                return True
+            if n in ("sign", "signs", "txt", "title", "board", "screen"):
+                return True
+            if (r"\pos(" in t or r"\move(" in t) and (not n or n in ("sign", "signs", "txt", "title", "board", "screen")):
+                return True
+            return False
+
+        if isinstance(event_or_events, list):
+            res = []
+            for item in event_or_events:
+                is_sgn = _check_ev(item)
+                if hasattr(item, "is_sign"):
+                    setattr(item, "is_sign", is_sgn)
+                res.append(is_sgn)
+            return res
+        return _check_ev(event_or_events)
+
+    @staticmethod
     def find_subtitle_gaps(
         subs: pysubs2.SSAFile,
         min_gap_ms: int = 3500,

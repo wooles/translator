@@ -19300,6 +19300,70 @@ def test_standard_9_4_suite():
     print(" -> PASSED: TEST 218 potwierdza integrację wszystkich 13 operacji Standardu 9.4.")
 
 
+def test_standard_9_5_suite():
+    """TEST 219: Standard 9.5 Kompletny zestaw testów integracyjnych potoku AVT (End-to-End Runtime Wiring)."""
+    print("\n[TEST 219] Standard 9.5: Integracja Runtime Wiring, Profiler ASR, SeriesBible, Bramka Jakości i Verifier...")
+    import pysubs2
+    from profiler import EpisodeProfiler
+    from series_memory import SeriesBible, generate_polish_name_declension
+    from translator import split_oversized_ass_events
+    from verifier import DialogueVerifier
+    from scene_discourse import SceneDiscourseGraph
+
+    # 1. Profiler ASR sanitization and deduplication (2C.3)
+    assert EpisodeProfiler.sanitize_event_asr("Youおじま", is_sign=False) == "おじま"
+    assert EpisodeProfiler.sanitize_event_asr("You youI,", is_sign=False) == ""
+    assert EpisodeProfiler.sanitize_event_asr("Cと", is_sign=False) == ""
+    assert EpisodeProfiler.sanitize_event_asr("おじま", is_sign=False, duplicate_time_distance_sec=2.0) == ""
+    assert EpisodeProfiler.sanitize_event_asr("おじま", is_sign=False, consecutive_streak=3) == ""
+
+    # 2. SeriesBible bilingual aliases & vocative orthography (2B.1, 2C.4)
+    bible = SeriesBible(slug="test_s95_integration")
+    bible.sync_verified_profile_entity("Sąsiadka", "FEMALE", has_verified_gender=True)
+    bible.map_bilingual_role_aliases(["Neighbor", "Nieznajomy"])
+    chars = bible.data.get("characters", {})
+    assert "Neighbor" in chars["Sąsiadka"].get("aliases", [])
+    assert bible.get_character("Neighbor") is not None
+    assert bible.get_character("Neighbor").get("gender") == "FEMALE"
+
+    # Vocative alignment
+    bible.sync_verified_profile_entity("Abaddon", "MALE", has_verified_gender=True)
+    decl_test = generate_polish_name_declension("Abaddon", "MALE")
+    bible.data.setdefault("declensions", {})["Abaddon"] = decl_test
+    aligned_voc = SeriesBible.align_vocative_orthography("Abadonie, stój!", declensions=bible.data["declensions"])
+    assert aligned_voc == "Abaddonie, stój!"
+
+    # 3. Sign protection in split_oversized_ass_events (2C.2)
+    sign_ev = pysubs2.SSAEvent(start=0, end=2000, text=r"{\pos(320,240)}Długi tekst napisowy który nie powinien być rozbity", name="sign")
+    split_res = split_oversized_ass_events([sign_ev])
+    assert len(split_res) == 1
+    assert r"\pos(320,240)" in split_res[0].text
+
+    # 4. Verifier regression guard P0 speaker gender & ellipsis continuation (2B.2, 2C.5)
+    v_res_m = DialogueVerifier._guard_phase2_regressions(
+        f1_pl="Zrobiłem to natychmiast.",
+        refined_pl="Zrobiłam to natychmiast.",
+        p0_gender="MALE"
+    )
+    assert v_res_m == "Zrobiłem to natychmiast."
+
+    v_res_ell = DialogueVerifier._guard_phase2_regressions(
+        f1_pl="nie mogłem w to uwierzyć.",
+        refined_pl="Nie mogłem w to uwierzyć.",
+        prev_line_pl="Widziałem to na własne oczy...",
+        prev_line_en="I saw it with my own eyes..."
+    )
+    assert v_res_ell.startswith("...")
+
+    # 5. SceneDiscourseGraph telemetry arbitrate (2C.1)
+    ev_dialogue = pysubs2.SSAEvent(start=1000, end=3000, text="Rozumiem.", name="Abaddon")
+    telem = SceneDiscourseGraph.arbitrate_event_telemetry(event=ev_dialogue, series_bible=bible)
+    assert telem["speaker_name"] == "Abaddon"
+    assert telem["grammatical_gender"] == "MASCULINE"
+
+    print(" -> PASSED: TEST 219 potwierdza integrację operacji Standardu 9.5.")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -19521,4 +19585,5 @@ if __name__ == "__main__":
     test_standard_9_3_series_bible_sync_paradigm_and_ram_sanitization()
     test_standard_9_3_discourse_and_verifier_dual_voice_epistemic_clause()
     test_standard_9_4_suite()
+    test_standard_9_5_suite()
     print("\n Wszystkie testy jednostkowe i integracyjne (218/218) zakończone pełnym sukcesem!\n")

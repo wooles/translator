@@ -294,3 +294,83 @@ def test_declension_preserves_genitive_modifier_in_compound_terms_and_transfers_
     for case in ("M", "D", "C", "B", "N", "Ms", "W"):
         assert saved_decl[case] == p0_paradigm[case]
         assert len(saved_decl[case]) > 0
+
+
+@pytest.mark.unit
+def test_validate_relation_strips_nested_bracket_clause_and_sanitizes_legacy_declensions(tmp_path):
+    """
+    T5.5 (Operacja 2C.4): Prawidłowy stan SeriesBible w RAM = czyste usunięcie
+    pełnej klauzuli RELACJA HIERARCHICZNA (... [Imię] ... -sama] we wpisie poufnym,
+    regeneracja uszkodzonych paradygmatów z dysku oraz korekta ortograficzna rdzenia wołacza W.
+    """
+    bible_file = tmp_path / "test_validate_relation_95.json"
+    bible = SeriesBible(bible_path=bible_file, storage_dir=tmp_path)
+
+    # 1. Sprawdzenie usunięcia zagnieżdżonej klauzuli hierarchicznej z relacji poufnej
+    bible.data["relations"]["Yorishige -> Tokiyuki"] = (
+        "[RELACJA HIERARCHICZNA (mistrz-uczeń: [Tokiyuki], eliminacja hybryd 'Tokiyuki... ma pan' "
+        "oraz odporność na opuszczanie -sama)] serdeczna rozmowa przyjaciół per ty"
+    )
+
+    # 2. Sprawdzenie usunięcia osieroconego ogona po dawnych regexach
+    bible.data["relations"]["Artur -> Helena"] = (
+        "poufna rozmowa per ty', eliminacja hybryd 'Helena... ma pan' oraz odporność na opuszczanie -sama]"
+    )
+
+    # 3. Sprawdzenie regeneracji uszkodzonych paradygmatów wczytanych z dysku (np. ńa, e'a)
+    bible.data["declensions"]["Przestrzeń"] = {
+        "M": "Przestrzeń",
+        "D": "Przestrzeńa",
+        "C": "Przestrzeńowi",
+        "B": "Przestrzeń",
+        "N": "Przestrzeńem",
+        "Ms": "Przestrzeńie",
+        "W": "Przestrzeń"
+    }
+    bible.data["declensions"]["Pole"] = {
+        "M": "Pole",
+        "D": "Pole'a",
+        "C": "Pole'owi",
+        "B": "Pole",
+        "N": "Pole'em",
+        "Ms": "Polu",
+        "W": "Pole"
+    }
+
+    # Wywołanie samoleczącej sanityzacji w RAM
+    bible._sanitize_loaded_bible_in_ram()
+
+    # Asercja 1: klauzula hierarchiczna całkowicie usunięta, reżim poufny zachowany
+    rel_yorishige = bible.data["relations"]["Yorishige -> Tokiyuki"]
+    assert "RELACJA HIERARCHICZNA" not in rel_yorishige
+    assert "-sama]" not in rel_yorishige
+    assert "eliminacja hybryd" not in rel_yorishige
+    assert "reżim: POUFNY" in rel_yorishige
+    assert "serdeczna rozmowa przyjaciół per ty" in rel_yorishige
+
+    # Asercja 2: osierocony ogon usunięty
+    rel_artur = bible.data["relations"]["Artur -> Helena"]
+    assert "eliminacja hybryd" not in rel_artur
+    assert "-sama]" not in rel_artur
+    assert "poufna rozmowa per ty" in rel_artur
+
+    # Asercja 3: uszkodzone sufiksy zregenerowane
+    decl_przestrzen = bible.data["declensions"]["Przestrzeń"]
+    assert decl_przestrzen["D"] != "Przestrzeńa"
+    assert "ńa" not in decl_przestrzen["D"]
+    assert "ńowi" not in decl_przestrzen["C"]
+
+    decl_pole = bible.data["declensions"]["Pole"]
+    assert decl_pole["D"] != "Pole'a"
+    assert "e'a" not in decl_pole["D"]
+    assert "e'owi" not in decl_pole["C"]
+
+    # 4. Sprawdzenie korekty ortograficznej rdzenia wołacza W (SeriesBible.align_vocative_orthography)
+    # Kanoniczny wołacz w bazie z podwójną spółgłoską: Abaddon -> Abaddonie
+    bible.data["declensions"]["Abaddon"] = {
+        "M": "Abaddon", "D": "Abaddona", "C": "Abaddonowi", "B": "Abaddona",
+        "N": "Abaddonem", "Ms": "Abaddonie", "W": "Abaddonie"
+    }
+    misspelled_vocative = "Poczekaj, Abadonie!"
+    corrected_vocative = SeriesBible.align_vocative_orthography(misspelled_vocative, declensions=bible.data["declensions"])
+    assert corrected_vocative == "Poczekaj, Abaddonie!"

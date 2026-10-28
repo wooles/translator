@@ -11,6 +11,7 @@ import json
 import threading
 import copy
 import unicodedata
+import functools
 from pathlib import Path
 from typing import Dict, List, Any, Optional, Set, Tuple, Union, Literal
 from collections import Counter, defaultdict
@@ -741,6 +742,7 @@ CHREMATONYM_PATTERNS: List[re.Pattern] = [
     re.compile(r"\b(?:book|sword|blade|amulet|shield|spear|scroll|crown|ring|relic|artifact|axe|dagger|scepter)\s+of\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźżA-Z0-9'-]+)\b", re.IGNORECASE),
 ]
 
+@functools.lru_cache(maxsize=8192)
 def normalize_name_nfkd(name: str) -> str:
     """
     Normalizuje znaki diakrytyczne Unicode (NFKD) w nazwach własnych:
@@ -1062,6 +1064,34 @@ def clean_anime_slug(title: str) -> str:
     slug = re.sub(r"[^\w\s-]", "", title_ascii, flags=re.UNICODE).strip()
     slug = re.sub(r"[-\s]+", "_", slug)
     return slug[:50] or "default_series"
+
+
+BILINGUAL_ROLE_EQUIVALENCES: Dict[str, str] = {
+    "neighbor": "sąsiadka",
+    "neighbour": "sąsiadka",
+    "boy": "chłopiec",
+    "girl": "dziewczynka",
+    "teacher": "nauczyciel",
+    "mother": "matka",
+    "mom": "mama",
+    "father": "ojciec",
+    "dad": "tata",
+    "boss": "szef",
+    "president": "prezydent",
+    "detective": "detektyw",
+    "doctor": "doktor",
+    "secretary": "sekretarka",
+    "subordinate": "podwładny",
+    "colleague": "kolega",
+    "classmate": "kolega z klasy",
+    "student": "uczeń",
+    "police": "policjant",
+    "policeman": "policjant",
+    "officer": "funkcjonariusz",
+    "magical girl": "magiczna dziewczyna",
+    "hero": "bohater",
+    "villain": "złoczyńca",
+}
 
 
 INHERENT_FEMALE_NOUNS = {
@@ -2769,6 +2799,8 @@ def generate_polish_name_declension(name: str, gender: str = "UNKNOWN") -> Dict[
     """
     n = name.strip()
     g = gender.upper()
+    is_male = (g == "MALE" or "MĘSK" in g or "MALE" in g)
+    is_female = (g == "FEMALE" or "KOBIETA" in g or "ŻEŃSK" in g)
     if not n:
         return {}
     if len(n) <= 1 or not any(c.isalpha() for c in n) or not is_valid_anthroponymic_phonotactics(n):
@@ -2822,13 +2854,14 @@ def generate_polish_name_declension(name: str, gender: str = "UNKNOWN") -> Dict[
             w1, w2 = words[0], words[1]
             w2_l = w2.lower()
             if not is_polish_adjective(w1) and not is_polish_adjective(w2):
-                if w2_l.endswith(("a", "i", "y", "ów", "ow", "eń", "ek", "om", "ycy")):
-                    head_decl = generate_polish_name_declension(w1, gender)
-                    if head_decl and head_decl.get("M"):
-                        return {
-                            case: f"{head_decl.get(case, w1)} {w2}"
-                            for case in ["M", "D", "C", "B", "N", "Ms", "W"]
-                        }
+                if not (w1.lower().endswith("a") and w2_l.endswith("a")) and not (is_female and w2_l.endswith("a")):
+                    if w2_l.endswith(("a", "i", "y", "ów", "ow", "eń", "ek", "om", "ycy")):
+                        head_decl = generate_polish_name_declension(w1, gender)
+                        if head_decl and head_decl.get("M"):
+                            return {
+                                case: f"{head_decl.get(case, w1)} {w2}"
+                                for case in ["M", "D", "C", "B", "N", "Ms", "W"]
+                            }
 
         # C. Check for Adjective + Noun (or Noun + Adjective)
         if len(words) == 2:
@@ -3027,6 +3060,17 @@ def generate_polish_name_declension(name: str, gender: str = "UNKNOWN") -> Dict[
     if not is_female and n.endswith("e") and len(n) >= 3 and n[-2].lower() in "bcdfghjklmnpqrstvwxz":
         if is_japanese_cv_mora_e_name(n) or n.lower() in JAPANESE_VOWEL_E_NAMES:
             return {"M": n, "D": n, "C": n, "B": n, "N": n, "Ms": n, "W": n}
+        if n.lower() in ("pole", "morze", "słońce", "serce", "miejsce", "życie", "powietrze", "światło"):
+            base = n[:-1]
+            return {
+                "M": n,
+                "D": base + "a",
+                "C": base + "u",
+                "B": n,
+                "N": base + "em",
+                "Ms": base + "u",
+                "W": n
+            }
         stem = n
         last_c = n[-2].lower()
         if last_c == "t":
@@ -3048,7 +3092,30 @@ def generate_polish_name_declension(name: str, gender: str = "UNKNOWN") -> Dict[
     # 2b. Male names ending in consonant or diphthong -y (pronounced /j/, e.g. Ray, Roy, Gray)
     is_diphthong_y = (not is_female and n.endswith("y") and len(n) >= 2 and n[-2].lower() in "aeiou")
     if (n[-1].lower() not in "aeiouyąęó") or is_diphthong_y:
+        if n.lower() in ("przestrzeń", "pieśń", "otchłań", "przystań", "baśń", "dłoń", "zieleń", "czerwień", "jesień"):
+            base = n[:-1] + "ni"
+            return {
+                "M": n,
+                "D": base,
+                "C": base,
+                "B": n,
+                "N": base + "ą",
+                "Ms": base,
+                "W": base
+            }
+        if n.lower() == "promień":
+            return {
+                "M": n,
+                "D": "Promienia",
+                "C": "Promieniowi",
+                "B": n,
+                "N": "Promieniem",
+                "Ms": "Promieniu",
+                "W": "Promieniu"
+            }
         stem = n
+        if stem.endswith("ń"):
+            stem = stem[:-1] + "ni"
         last_c = "j" if is_diphthong_y else n[-1].lower()
         last_2c = n[-2:].lower() if len(n) >= 2 else ""
 
@@ -6088,6 +6155,25 @@ class SeriesBible:
             # 4. Spójność relacji T/V i reżimu formalnego (Operacja 2C.5, R3.1)
             self._validate_relation_entry_consistency()
 
+            # 5. Sanitacja i regeneracja paradygmatów odmiany w RAM (Standard 9.5, 2C.4, R3.1)
+            decl_dict = self.data.get("declensions", {})
+            if isinstance(decl_dict, dict):
+                corrupt_indicators = ("ńa", "ńowi", "ńem", "ńie", "e'a", "e'owi", "e'em", "Promienii")
+                for decl_k, decl_cases in list(decl_dict.items()):
+                    if isinstance(decl_cases, dict):
+                        has_corrupt = False
+                        for case_k in ("D", "C", "B", "N", "Ms", "W"):
+                            case_str = str(decl_cases.get(case_k, ""))
+                            if any(ind in case_str for ind in corrupt_indicators):
+                                has_corrupt = True
+                                break
+                        if has_corrupt:
+                            ch_entry = self.get_character(decl_k)
+                            g = ch_entry.get("gender", "UNKNOWN") if isinstance(ch_entry, dict) else "UNKNOWN"
+                            regenerated = generate_polish_name_declension(decl_k, gender=g)
+                            if regenerated and regenerated.get("M"):
+                                decl_dict[decl_k] = regenerated
+
     def populate_secondary_actor_tags(self, raw_actor_tags: List[str]) -> None:
         """
         Zasila SeriesBible encjami drugoplanowymi (P1) i epizodycznymi (P2) z Kroku 3 (Standard 9.4, 2C.7, R3.1):
@@ -6135,6 +6221,123 @@ class SeriesBible:
                         "entity_category": "ANTHROPONYM"
                     }
 
+    def map_bilingual_role_aliases(self, raw_actor_tags: List[str]) -> None:
+        """
+        Automatyczne dwukierunkowe mapowanie znanych etykiet ról z sekcji [Events]
+        na ich polskie odpowiedniki w SeriesBible.data['characters'] (Standard 9.0 Positive Domain, 2B.1, R3.1):
+        Gdy w sekcji zdarzeń występuje rola w języku źródłowym, a w bazie wiedzy jej kanoniczny polski odpowiednik,
+        dopisuje nazwę roli z sekcji zdarzeń do listy 'aliases' tej encji. I odwrotnie.
+        """
+        with self._lock:
+            if not hasattr(self, "data") or not isinstance(self.data, dict):
+                return
+            chars = self.data.setdefault("characters", {})
+            for raw_tag in raw_actor_tags:
+                if not raw_tag:
+                    continue
+                clean_tag, _ = normalize_actor_tag(str(raw_tag))
+                clean_tag = clean_tag.strip()
+                if not clean_tag:
+                    continue
+                tag_l = clean_tag.lower()
+
+                # Jeśli tag jest znany w BILINGUAL_ROLE_EQUIVALENCES (EN -> PL)
+                if tag_l in BILINGUAL_ROLE_EQUIVALENCES:
+                    pl_role = BILINGUAL_ROLE_EQUIVALENCES[tag_l]
+                    for char_k, char_v in chars.items():
+                        if isinstance(char_v, dict):
+                            k_l = char_k.lower()
+                            aliases = [str(a).lower() for a in char_v.get("aliases", [])]
+                            if k_l == pl_role or pl_role in aliases:
+                                cur_aliases = char_v.setdefault("aliases", [])
+                                if clean_tag not in cur_aliases and tag_l not in [str(a).lower() for a in cur_aliases]:
+                                    cur_aliases.append(clean_tag)
+
+                # Odwrotnie: jeśli tag jest w języku polskim (PL -> EN)
+                for en_role, pl_role in BILINGUAL_ROLE_EQUIVALENCES.items():
+                    if pl_role == tag_l:
+                        for char_k, char_v in chars.items():
+                            if isinstance(char_v, dict):
+                                k_l = char_k.lower()
+                                aliases = [str(a).lower() for a in char_v.get("aliases", [])]
+                                if k_l == en_role or en_role in aliases:
+                                    cur_aliases = char_v.setdefault("aliases", [])
+                                    if clean_tag not in cur_aliases and tag_l not in [str(a).lower() for a in cur_aliases]:
+                                        cur_aliases.append(clean_tag)
+
+    @staticmethod
+    def _align_vocative_impl(text: str, declensions: Optional[Dict[str, Any]] = None) -> str:
+        if not text or not declensions:
+            return text
+
+        canon_w_forms = set()
+        decl_items = list(declensions.items()) if isinstance(declensions, dict) else []
+        for _, decl in decl_items:
+            if isinstance(decl, dict) and "W" in decl:
+                w_val = str(decl["W"]).strip()
+                if w_val and len(w_val) >= 4 and not w_val.isupper():
+                    if any(c * 2 in w_val.lower() for c in "bcdfghjklmnprstvwz"):
+                        canon_w_forms.add(w_val)
+
+        if not canon_w_forms:
+            return text
+
+        def _lev(s1: str, s2: str) -> int:
+            if s1 == s2:
+                return 0
+            if len(s1) < len(s2):
+                return _lev(s2, s1)
+            if len(s2) == 0:
+                return len(s1)
+            prev = range(len(s2) + 1)
+            for i, c1 in enumerate(s1):
+                cur = [i + 1]
+                for j, c2 in enumerate(s2):
+                    ins = prev[j + 1] + 1
+                    dels = cur[j] + 1
+                    subs = prev[j] + (c1 != c2)
+                    cur.append(min(ins, dels, subs))
+                prev = cur
+            return prev[-1]
+
+        tokens = re.finditer(r"\b([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+)\b", text)
+        replacements = []
+        for match in tokens:
+            word = match.group(1)
+            w_lower = word.lower()
+            for canon_w in canon_w_forms:
+                c_lower = canon_w.lower()
+                if c_lower[0] != w_lower[0]:
+                    continue
+                if abs(len(c_lower) - len(w_lower)) == 1 and _lev(w_lower, c_lower) == 1:
+                    has_double = any(c * 2 in c_lower for c in "bcdfghjklmnprstvwz")
+                    if has_double:
+                        repl_word = canon_w[0].upper() + canon_w[1:] if word[0].isupper() else canon_w.lower()
+                        replacements.append((match.start(1), match.end(1), repl_word))
+                        break
+
+        if not replacements:
+            return text
+
+        res = list(text)
+        for start, end, repl in sorted(replacements, key=lambda x: x[0], reverse=True):
+            res[start:end] = list(repl)
+        return "".join(res)
+
+    def align_vocative_orthography(self_or_text: Any, text: Optional[str] = None, declensions: Optional[Dict[str, Any]] = None) -> str:
+        """
+        Ochrona ortograficzna rdzenia antroponimu w wołaczu W (Standard 9.5, 2C.4, R1.8):
+        Wyrównuje pisownię rdzenia wołacza o uproszczonej spółgłosce podwójnej do formy kanonicznej W.
+        """
+        if isinstance(self_or_text, str):
+            target_text = self_or_text
+            target_decl = text if isinstance(text, dict) else declensions
+            return SeriesBible._align_vocative_impl(target_text, target_decl)
+        else:
+            target_text = text or ""
+            target_decl = declensions if declensions is not None else (self_or_text.data.get("declensions", {}) if hasattr(self_or_text, "data") and isinstance(self_or_text.data, dict) else {})
+            return SeriesBible._align_vocative_impl(target_text, target_decl)
+
     def _validate_relation_entry_consistency(self) -> None:
         """
         Weryfikuje i sanityzuje spójność rejestru relacji skierowanych (X -> Y) pod kątem asymetrii T/V (Standard 9.4, 2C.5, R3.1):
@@ -6164,8 +6367,16 @@ class SeriesBible:
                 is_hierarchical = "relacja hierarchiczna" in d_lower or "hierarchiczn" in d_lower
 
                 new_desc = desc_str
+                # Czyszczenie ewentualnych osieroconych fragmentów po dawnych uszkodzeniach regexu
+                if "-sama" in new_desc.lower():
+                    new_desc = re.sub(r"',?\s*eliminacja hybryd.*?-sama\s*\]?\)?\]?", "", new_desc, flags=re.IGNORECASE).strip()
+                new_desc = re.sub(r"',?\s*eliminacja hybryd[^]]*\]", "", new_desc, flags=re.IGNORECASE).strip()
                 if is_informal and is_hierarchical:
-                    new_desc = re.sub(r"\[?\bRELACJA HIERARCHICZNA\b\]?", "", new_desc, flags=re.IGNORECASE).strip()
+                    # Standard 9.5 (Operacja 2C.4): Dopasowanie pełnego bloku klauzuli hierarchicznej z zagnieżdżonym [Imię] aż do -sama]
+                    if "-sama" in new_desc.lower():
+                        new_desc = re.sub(r"(?:\\N|\s*\[)?RELACJA HIERARCHICZNA.*?-sama\s*\]?\)?\]?", "", new_desc, flags=re.IGNORECASE).strip()
+                    new_desc = re.sub(r"(?:\\N|\s*\[)?RELACJA HIERARCHICZNA[^]]*\]?", "", new_desc, flags=re.IGNORECASE).strip()
+                    new_desc = re.sub(r"\s+", " ", new_desc).strip()
                     if "reżim:" not in new_desc.lower():
                         new_desc = f"{new_desc} [reżim: POUFNY]".strip()
                     else:
@@ -6376,18 +6587,42 @@ class SeriesBible:
         """
         if not name:
             return None
-        chars = self.data.get("characters", {})
-        if name in chars and isinstance(chars[name], dict):
-            return chars[name]
-        name_l = name.strip().lower()
-        for k, v in chars.items():
-            if k.lower() == name_l and isinstance(v, dict):
-                return v
-            if isinstance(v, dict):
-                aliases = [str(a).lower() for a in v.get("aliases", [])]
-                if name_l in aliases:
+        lock = getattr(self, "_lock", None)
+        ctx = lock if lock is not None else contextlib.nullcontext()
+        with ctx:
+            chars = self.data.get("characters", {})
+            if name in chars and isinstance(chars[name], dict):
+                return chars[name]
+            name_l = name.strip().lower()
+            char_items = list(chars.items())
+            for k, v in char_items:
+                if k.lower() == name_l and isinstance(v, dict):
                     return v
-        return None
+                if isinstance(v, dict):
+                    aliases = [str(a).lower() for a in v.get("aliases", [])]
+                    if name_l in aliases:
+                        return v
+
+            # Standard 9.5 (Operacja 2B.1): Sprawdzenie dwujęzycznych ekwiwalencji ról
+            if name_l in BILINGUAL_ROLE_EQUIVALENCES:
+                pl_equiv = BILINGUAL_ROLE_EQUIVALENCES[name_l]
+                for k, v in char_items:
+                    if k.lower() == pl_equiv and isinstance(v, dict):
+                        return v
+                    if isinstance(v, dict):
+                        aliases = [str(a).lower() for a in v.get("aliases", [])]
+                        if pl_equiv in aliases:
+                            return v
+            for en_role, pl_role in BILINGUAL_ROLE_EQUIVALENCES.items():
+                if pl_role == name_l:
+                    for k, v in char_items:
+                        if k.lower() == en_role and isinstance(v, dict):
+                            return v
+                        if isinstance(v, dict):
+                            aliases = [str(a).lower() for a in v.get("aliases", [])]
+                            if en_role in aliases:
+                                return v
+            return None
 
     def get_character_gender(self, name: str, allow_generic_nouns: bool = True) -> str:
         """

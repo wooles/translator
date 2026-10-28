@@ -114,3 +114,44 @@ def test_step4_asr_deduplication_across_distant_events_and_consecutive_streaks(
         consecutive_streak=streak
     )
     assert res == expected_output
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "raw_input,time_dist,streak,expected_output",
+    [
+        # 1. Sklejony prefiks ASCII usunięty z japońskiego tekstu (Youおじま -> おじま)
+        ("Youおじま", None, 1, "おじま"),
+        # 2. Sklejony prefiks ASCII usunięty (Kアクマ -> アクマ)
+        ("Kアクマ", None, 1, "アクマ"),
+        # 3. Sklejone wtrącenie ASCII usunięte (a相手 -> 相手)
+        ("a相手", None, 1, "相手"),
+        # 4. Sklejone ASCII z pojedynczym znakiem CJK -> wyzerowanie segmentu (Cと -> "")
+        ("Cと", None, 1, ""),
+        # 5. Pojedynczy znak japoński -> wyzerowanie segmentu
+        ("ん", None, 1, ""),
+        # 6. Ciąg łaciński bez japońskiego audio -> wyzerowanie
+        ("You youI,", None, 1, ""),
+        # 7. Deduplikacja zdarzenia oddalonego o > 1.5s -> wyzerowanie
+        ("おじま", 2.0, 1, ""),
+        # 8. Seria powtórzeń > 2 -> wyzerowanie od 3. powtórzenia
+        ("おじま", None, 3, ""),
+        # 9. Prawidłowy segment powtórzony w dozwolonej serii (streak <= 2, dist <= 1.5s)
+        ("おじま", 0.8, 2, "おじま"),
+    ]
+)
+def test_sanitize_event_asr_strips_glued_ascii_prefixes_and_enforces_episode_loop_dedup(
+    raw_input, time_dist, streak, expected_output
+):
+    """
+    T5.4 (Operacja 2C.3): Prawidłowy stan asr_text = wycięcie prefiksów/wtrąceń ASCII
+    sklejonych ze znakami japońskimi oraz wyzerowanie pojedynczych znaków resztkowych i serii > 2 identycznych segmentów.
+    """
+    res = EpisodeProfiler.sanitize_event_asr(
+        raw_asr=raw_input,
+        is_sign=False,
+        style="Default",
+        duplicate_time_distance_sec=time_dist,
+        consecutive_streak=streak
+    )
+    assert res == expected_output

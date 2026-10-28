@@ -276,6 +276,21 @@ def split_oversized_ass_events(events: List[pysubs2.SSAEvent]) -> List[pysubs2.S
     """
     processed: List[pysubs2.SSAEvent] = []
     for ev in events:
+        # Standard 9.0 Positive Domain: Ochrona napisów ekranowych przed rozbijaniem (Standard 9.5, 2C.2, R3.4)
+        ev_name_clean = str(getattr(ev, "name", "") or "").strip().lower()
+        ev_text_raw = getattr(ev, "text", "") or ""
+        is_protected_sign = (
+            getattr(ev, "is_sign", False)
+            or ev_name_clean in ("sign", "signs", "txt", "title", "board", "screen")
+            or bool(re.search(r"\\(?:pos|move|fad|an[4-9])\(", ev_text_raw))
+            or any(tag in ev_text_raw.lower() for tag in (r"\pos(", r"\move(", r"\an5", r"\an7", r"\an8", r"\an9"))
+        )
+        if is_protected_sign:
+            text_with_N = ev_text_raw.replace("\r\n", r"\N").replace("\n", r"\N")
+            ev.text = text_with_N
+            processed.append(ev)
+            continue
+
         # 1. Clean Name field (T7 / R3.9)
         if getattr(ev, "name", None):
             raw_n = ev.name.strip()
@@ -374,6 +389,15 @@ def detect_event_visual_type(event: pysubs2.SSAEvent, ts_prefix: str = "", style
     is_top = False
     details = []
 
+    try:
+        from sign_detector import VisualSignDetector
+        sign_det = VisualSignDetector.detect_signs(event)
+        if isinstance(sign_det, dict) and sign_det.get("is_sign"):
+            is_sign = True
+            details.append("VisualSignDetector.detect_signs")
+    except Exception:
+        pass
+
     style_lower = (event.style or "").lower()
     name_lower = (event.name or "").lower()
     ts_lower = (ts_prefix or "").lower()
@@ -401,6 +425,10 @@ def detect_event_visual_type(event: pysubs2.SSAEvent, ts_prefix: str = "", style
         is_sign = True
         details.append(f"aktor='{event.name}'")
 
+    if name_lower.strip() in ("sign", "signs", "txt", "title", "board", "screen"):
+        is_sign = True
+        details.append(f"aktor='{event.name}' (sign)")
+
     if re.match(r"^(episode|odcinek|chapter|rozdział|act|akt|part|część)\s+(\d+|[ivxlcdm]+)", text_raw, re.IGNORECASE):
         is_sign = True
         details.append("plansza tytułowa odcinka/rozdziału")
@@ -409,9 +437,12 @@ def detect_event_visual_type(event: pysubs2.SSAEvent, ts_prefix: str = "", style
         is_sign = True
         details.append("obrócony/wklejony graficznie w perspektywę kadrów")
 
-    if r"\pos" in ts_lower and not is_sign:
-        # Check if it has custom graphic colors or rotation
-        if r"\c&h" in ts_lower or r"\1c&h" in ts_lower or r"\3c&h" in ts_lower:
+    if (r"\pos" in ts_lower or r"\move" in ts_lower or r"\pos" in text_raw.lower() or r"\move" in text_raw.lower()) and not is_sign:
+        # Standard 9.5 (2C.2): \pos lub \move bez osobowego aktora = bezwarunkowo is_sign = True
+        if not name_lower or name_lower.strip() in ("sign", "signs", "txt", "title", "board", "screen") or is_generic_actor_or_category(name_lower):
+            is_sign = True
+            details.append("pozycjonowany napis ekranowy (\\pos/\\move)")
+        elif r"\c&h" in ts_lower or r"\1c&h" in ts_lower or r"\3c&h" in ts_lower:
             is_sign = True
             details.append("pozycjonowany napis graficzny (\\pos)")
         else:
@@ -2999,6 +3030,9 @@ class MultimodalTranslator:
                     clean_display_text = re.sub(pattern, clean_ent, clean_display_text)
 
             if vtype["is_sign"]:
+                # Kondensacja krótkich plansz z punktorem (Standard 9.5, 2C.2)
+                if (event.end - event.start) <= 2500 and ("•" in clean_display_text or "●" in clean_display_text) and len(clean_display_text) > 120:
+                    clean_display_text = clean_display_text.split(r"\N")[0].split("\n")[0].strip()
                 lines.append(f"Kwestia [ID: {idx + 1}] [TYP: [NAPIS] {vtype['type_label']}] (Czas: {start_str} - {end_str}, Cechy: {vtype['visual_details']}):")
                 lines.append(f"  📄 SKRYPT PODSTAWOWY EN (TREŚĆ I MAJUSKUŁA): {clean_display_text}")
 
@@ -3014,16 +3048,31 @@ class MultimodalTranslator:
                 lines.append(f"  Położenie i typesetting: obiekt 'visual_typesetting' (detected_box_1000 [ymin, xmin, ymax, xmax], placement, rotation_deg, kolory HEX, screen_region).")
                 lines.append(f"  Typografia: treść napisu lub planszy w kadrze.")
             else:
-                line_spk_gender, _ = self._arbitrate_speaker_gender(
+                # Standard 9.5 (Operacja 2C.1, R3.2): Wywołanie arbitrate_event_telemetry
+                from scene_discourse import SceneDiscourseGraph
+                is_fem_scene_check = (getattr(self, "episode_scene_genders", {}).get(original_idx) == "kobieta") or getattr(self, "scene_is_female_only", False)
+                disc_telem = SceneDiscourseGraph.arbitrate_event_telemetry(
                     event=event,
-                    raw_phase1_gender=None,
-                    batch_id=idx + 1,
-                    speaker_tags=speaker_tags,
-                    whisper_transcriptions=whisper_transcriptions,
-                    pl_candidate="",
-                    raw_speaker_name=event.name,
-                    event_idx=original_idx
+                    series_bible=getattr(self, "series_bible", None),
+                    episode_profiler=getattr(self, "profiler", None),
+                    raw_actor=event.name,
+                    scene_female_only=is_fem_scene_check,
+                    is_sign=vtype["is_sign"]
                 )
+                p0_spk_gram = disc_telem.get("grammatical_gender")
+                if p0_spk_gram in ("MASCULINE", "FEMININE"):
+                    line_spk_gender = "mężczyzna" if p0_spk_gram == "MASCULINE" else "kobieta"
+                else:
+                    line_spk_gender, _ = self._arbitrate_speaker_gender(
+                        event=event,
+                        raw_phase1_gender=None,
+                        batch_id=idx + 1,
+                        speaker_tags=speaker_tags,
+                        whisper_transcriptions=whisper_transcriptions,
+                        pl_candidate="",
+                        raw_speaker_name=event.name,
+                        event_idx=original_idx
+                    )
                 line_addr_cat, line_addr_lbl = self._resolve_line_addressee(
                     event=event,
                     raw_phase1_addressee=None,
@@ -3078,9 +3127,11 @@ class MultimodalTranslator:
                 if is_internal_monologue:
                     lines.append("  💭 TRYB WYPOWIEDZI: MONOLOG WEWNĘTRZNY / MYŚLI (is_internal_monologue: true) — Wymagane tagi {\\i1}...{\\i0} w phase1_text.")
 
-                # Pre-Generation Morphosyntactic Contract (Stream 4 - Standard 3.0)
+                # Pre-Generation Morphosyntactic Contract (Stream 4 - Standard 3.0 / 9.5)
                 contract_spk_gender = "UNKNOWN"
-                if line_spk_gender:
+                if p0_spk_gram in ("MASCULINE", "FEMININE"):
+                    contract_spk_gender = p0_spk_gram
+                elif line_spk_gender:
                     g_l = line_spk_gender.lower()
                     if any(k in g_l for k in ["mężczyzna", "male", "chłopak", "boy"]):
                         contract_spk_gender = "MASCULINE"
@@ -3088,7 +3139,10 @@ class MultimodalTranslator:
                         contract_spk_gender = "FEMININE"
 
                 contract_target_gender = "UNKNOWN"
-                if line_addr_cat:
+                p0_tgt_gram = disc_telem.get("target_gender")
+                if p0_tgt_gram in ("MASCULINE", "FEMININE"):
+                    contract_target_gender = p0_tgt_gram
+                elif line_addr_cat:
                     a_l = line_addr_cat.lower()
                     if any(k in a_l for k in ["kobieta", "female", "dziewczyn", "kobieta_dual", "grupa_kobiet"]):
                         contract_target_gender = "FEMININE"
@@ -3155,7 +3209,7 @@ class MultimodalTranslator:
                     plural_confidence=1.0 if pl_grp_val else 0.0,
                     you_group_gender=you_grp_val,
                     you_group_confidence=1.0 if you_grp_val else 0.0,
-                    speaker_name=event.name or "UNKNOWN",
+                    speaker_name=disc_telem.get("speaker_name") or event.name or "UNKNOWN",
                     target_name=target_actor_name if target_actor_name else None,
                     register=reg_name if reg_name else None,
                     polylogue=poly_val
@@ -3603,10 +3657,49 @@ class MultimodalTranslator:
                             events=events_tuples,
                             initial_prompt=initial_prompt_str
                         )
-                        # Sign isolation: signs receive empty ASR transcription
+                        # Standard 9.5 (Operacja 2C.3, R3.5): Pętla sanityzacji i deduplikacji czasowej ASR w Kroku 4
+                        if not hasattr(self, "_asr_last_seen_end_sec") or self._asr_last_seen_end_sec is None:
+                            self._asr_last_seen_end_sec = {}
+                            self._asr_last_text = ""
+                            self._asr_consecutive_streak = 0
+
                         for b_id, ev in events_tuples:
                             if getattr(ev, "is_sign", False) or str(getattr(ev, "style", "")).lower() in ("sign", "signs", "napis", "napisy") or is_sign_entity(getattr(ev, "name", "")):
                                 whisper_transcriptions[b_id] = ""
+                                continue
+
+                            raw_txt = whisper_transcriptions.get(b_id, "")
+                            raw_s = raw_txt.get("text", "") if isinstance(raw_txt, dict) else str(raw_txt or "")
+                            san_txt = EpisodeProfiler.sanitize_event_asr(
+                                raw_s,
+                                is_sign=getattr(ev, "is_sign", False),
+                                style=getattr(ev, "style", None)
+                            )
+                            cur_start_sec = ev.start / 1000.0
+                            cur_end_sec = ev.end / 1000.0
+                            norm_jp = re.sub(r"\[.*?\]", "", san_txt).strip()
+                            norm_jp = re.sub(r"\s+", "", norm_jp)
+
+                            if norm_jp:
+                                if norm_jp == self._asr_last_text:
+                                    self._asr_consecutive_streak += 1
+                                else:
+                                    self._asr_last_text = norm_jp
+                                    self._asr_consecutive_streak = 1
+
+                                last_end = self._asr_last_seen_end_sec.get(norm_jp)
+                                if last_end is not None and (cur_start_sec - last_end) > 1.5:
+                                    san_txt = ""
+                                elif self._asr_consecutive_streak > 2:
+                                    san_txt = ""
+                                else:
+                                    self._asr_last_seen_end_sec[norm_jp] = cur_end_sec
+
+                            if isinstance(raw_txt, dict):
+                                raw_txt["text"] = san_txt
+                                whisper_transcriptions[b_id] = raw_txt
+                            else:
+                                whisper_transcriptions[b_id] = san_txt
 
                     # 2. Local prosody analysis (RMS dBFS / whisper / shout)
                     prosody_tags = AudioProsodyEngine.analyze_scene_prosody(
@@ -3810,6 +3903,27 @@ class MultimodalTranslator:
                 for tr in batch_response.translations:
                     if tr.id == batch_id:
                         pl_candidate = sanitize_sub_text(tr.polish_text)
+                        pl_candidate = pl_candidate.replace("\r\n", r"\N").replace("\n", r"\N")
+
+                        # Kondensacja krótkich plansz z punktorem (Standard 9.5, 2C.2, R1.5)
+                        if vtype.get("is_sign") and ((event.end - event.start) <= 2500):
+                            if ("•" in clean_en or "●" in clean_en) and len(clean_en) > 120:
+                                first_line_en = clean_en.split(r"\N")[0].split("\n")[0].strip()
+                                first_line_pl = pl_candidate.split(r"\N")[0].split("\n")[0].strip()
+                                if first_line_pl:
+                                    pl_candidate = first_line_pl
+
+                        # Deterministyczne otaczanie {\i1}...{\i0} dla stylu Italics / myśli (Standard 9.5, 2C.6, R1.9)
+                        st_ev_lower = str(getattr(event, "style", "")).lower()
+                        italic_attr = getattr(event, "italic", 0)
+                        has_italic_style = any(k in st_ev_lower for k in ["italic", "flashback_italic", "thoughts", "internal"]) or italic_attr in (1, -1)
+                        is_im = getattr(event, "is_internal_monologue", False) or has_italic_style
+
+                        if is_im and pl_candidate and not vtype.get("is_sign"):
+                            clean_im = re.sub(r"\{\\i[01]\}", "", pl_candidate).strip()
+                            clean_im = re.sub(r"\s*\\N\s*", r"\\N", clean_im)
+                            pl_candidate = f"{{\\i1}}{clean_im}{{\\i0}}"
+
                         speaker_gender = tr.speaker_gender
                         raw_addressee = getattr(tr, 'addressee', None)
                         raw_speaker_name = getattr(tr, 'speaker_name', None)
@@ -3828,21 +3942,6 @@ class MultimodalTranslator:
                 is_missing_tr = True
                 notes = f"{notes} [TELEMETRIA: luka_faza_1: kwestia pominięta w szkicu, wymagany przekład z EN i audio JP]".strip()
 
-            # Multi-Signal Gender Arbitration Engine (0.00 PLN)
-            resolved_gender, arb_alerts = self._arbitrate_speaker_gender(
-                event=event,
-                raw_phase1_gender=speaker_gender,
-                batch_id=batch_id,
-                speaker_tags=speaker_tags,
-                whisper_transcriptions=whisper_transcriptions,
-                pl_candidate=pl_candidate,
-                raw_speaker_name=raw_speaker_name,
-                event_idx=orig_idx
-            )
-            speaker_gender = resolved_gender
-            if arb_alerts:
-                notes = f"{notes} {' '.join(arb_alerts)}".strip()
-
             # Multimodal Addressee & Plural Group Resolution Engine (0.00 PLN)
             jp_curr_text = whisper_transcriptions.get(batch_id, "") if whisper_transcriptions else ""
             addressee_cat, addressee_label = self._resolve_line_addressee(
@@ -3858,12 +3957,44 @@ class MultimodalTranslator:
                 prosody_tags=prosody_tags
             )
 
-            is_spk_hypothesis = any("hipoteza_faza_1" in a for a in arb_alerts)
+            # Standard 9.5 (Operacja 2C.1, R3.2): Bezpośrednie wywołanie arbitrate_event_telemetry
+            from scene_discourse import SceneDiscourseGraph
+            is_fem_scene = (getattr(self, "episode_scene_genders", {}).get(orig_idx) == "kobieta") or getattr(self, "scene_is_female_only", False)
+            disc_telem = SceneDiscourseGraph.arbitrate_event_telemetry(
+                event=event,
+                series_bible=getattr(self, "series_bible", None),
+                episode_profiler=getattr(self, "profiler", None),
+                raw_actor=raw_speaker_name or event.name,
+                scene_female_only=is_fem_scene,
+                target_actor=addressee_label or addressee_cat,
+                is_sign=vtype.get("is_sign", False)
+            )
+            p0_spk_gram = disc_telem.get("grammatical_gender")
+            if p0_spk_gram in ("MASCULINE", "FEMININE"):
+                speaker_gender = "mężczyzna" if p0_spk_gram == "MASCULINE" else "kobieta"
+                spk_conf = 1.0
+                arb_alerts = []
+            else:
+                resolved_gender, arb_alerts = self._arbitrate_speaker_gender(
+                    event=event,
+                    raw_phase1_gender=speaker_gender,
+                    batch_id=batch_id,
+                    speaker_tags=speaker_tags,
+                    whisper_transcriptions=whisper_transcriptions,
+                    pl_candidate=pl_candidate,
+                    raw_speaker_name=raw_speaker_name,
+                    event_idx=orig_idx
+                )
+                speaker_gender = resolved_gender
+                is_spk_hypothesis = any("hipoteza_faza_1" in a for a in arb_alerts)
+                spk_conf = 0.70 if is_spk_hypothesis else (1.0 if speaker_gender else 0.0)
+
+            if arb_alerts:
+                notes = f"{notes} {' '.join(arb_alerts)}".strip()
+
             is_tgt_hypothesis = bool(addressee_label and "Hipoteza Faza 1" in addressee_label)
-            spk_conf = 0.70 if is_spk_hypothesis else (1.0 if speaker_gender else 0.0)
             tgt_conf = 0.70 if is_tgt_hypothesis else (1.0 if addressee_cat else 0.0)
 
-            is_fem_scene = (getattr(self, "episode_scene_genders", {}).get(orig_idx) == "kobieta") or getattr(self, "scene_is_female_only", False)
             if is_fem_scene:
                 line_pl_grp = "NON_VIRILE"
                 line_you_grp = "NON_VIRILE"
@@ -3876,17 +4007,32 @@ class MultimodalTranslator:
             if not poly_val_f2 and len(batch_actors_f2) >= 3:
                 poly_val_f2 = f"POLYLOGUE (n={len(batch_actors_f2)})"
 
-            # Declarative Scene State Telemetry Vector (Standard 7.0 SSOT)
+            # Declarative Scene State Telemetry Vector (Standard 7.0 SSOT / 9.5)
+            spk_gram_tag = p0_spk_gram if p0_spk_gram in ("MASCULINE", "FEMININE") else (
+                "MASCULINE" if speaker_gender and any(w in str(speaker_gender).lower() for w in ["male", "mężczyzna", "chłopak"]) else (
+                    "FEMININE" if speaker_gender and any(w in str(speaker_gender).lower() for w in ["female", "kobieta", "dziewczyna"]) else None
+                )
+            )
+            p0_tgt_gram = disc_telem.get("target_gender")
+            tgt_gram_tag = p0_tgt_gram if p0_tgt_gram in ("MASCULINE", "FEMININE") else (
+                "FEMININE" if addressee_cat in ["kobieta", "kobieta_dual", "grupa_kobiet"] else (
+                    "MASCULINE" if addressee_cat in ["mężczyzna", "mężczyzna_dual", "grupa_mężczyzn"] else None
+                )
+            )
+            resolved_spk_name = disc_telem.get("speaker_name") or raw_speaker_name or event.name or "UNKNOWN"
+            resolved_tgt_name = disc_telem.get("target_actor") or (addressee_label if addressee_label else None)
+
             line_dry_telemetry = format_dry_telemetry_tag(
-                speaker_gender="MASCULINE" if speaker_gender and any(w in str(speaker_gender).lower() for w in ["male", "mężczyzna", "chłopak"]) else ("FEMININE" if speaker_gender and any(w in str(speaker_gender).lower() for w in ["female", "kobieta", "dziewczyna"]) else None),
+                speaker_gender=spk_gram_tag,
                 speaker_confidence=spk_conf,
-                target_gender="FEMININE" if addressee_cat in ["kobieta", "kobieta_dual", "grupa_kobiet"] else ("MASCULINE" if addressee_cat in ["mężczyzna", "mężczyzna_dual", "grupa_mężczyzn"] else None),
-                target_confidence=tgt_conf,
+                target_gender=tgt_gram_tag,
+                target_confidence=1.0 if p0_tgt_gram in ("MASCULINE", "FEMININE") else tgt_conf,
                 plural_group_gender=line_pl_grp if line_pl_grp != "AMBIGUOUS" else None,
                 plural_confidence=1.0 if line_pl_grp != "AMBIGUOUS" else 0.0,
                 you_group_gender=line_you_grp if line_you_grp != "AMBIGUOUS" else None,
                 you_group_confidence=1.0 if line_you_grp != "AMBIGUOUS" else 0.0,
-                speaker_name=raw_speaker_name or event.name or "UNKNOWN",
+                speaker_name=resolved_spk_name,
+                target_name=resolved_tgt_name,
                 polylogue=poly_val_f2
             )
             if line_dry_telemetry:
@@ -4690,6 +4836,7 @@ class MultimodalTranslator:
                     a_decl = generate_polish_name_declension(cl_act, ex_gen or "UNKNOWN")
                     if a_decl and a_decl.get("M"):
                         self.series_bible.data.setdefault("declensions", {})[cl_act] = a_decl
+        self.actor_map = actor_map
         if getattr(self, "series_bible", None) and hasattr(self.series_bible, "populate_secondary_actor_tags"):
             self.series_bible.populate_secondary_actor_tags(list(actor_map.keys()))
 
@@ -5026,6 +5173,42 @@ class MultimodalTranslator:
         self.combined_glossary = combined_glossary
         if combined_glossary:
             print(f"  [Słownik Deterministyczny]: Aktywnych {len(combined_glossary)} terminów (Hierarchia: Kanon Mangi > Biblia Serialu > Profiler > Słownik Użytkownika).")
+
+        # Standard 9.5 (Operacja 2B.1, 2C.4, R3.1): Zasilenie i synchronizacja SeriesBible przed logowaniem Kroku 6
+        if hasattr(self, "series_bible") and self.series_bible:
+            actor_keys = list(getattr(self, "actor_map", {}).keys()) if hasattr(self, "actor_map") else []
+            if not actor_keys:
+                actor_keys = [getattr(ev, "name", "") for ev in subs.events if getattr(ev, "name", "")]
+            if hasattr(self.series_bible, "populate_secondary_actor_tags"):
+                self.series_bible.populate_secondary_actor_tags(actor_keys)
+            if hasattr(self.series_bible, "map_bilingual_role_aliases"):
+                self.series_bible.map_bilingual_role_aliases(actor_keys)
+
+            # Transfer paradygmatów z Kroku 5 (EpisodeProfiler) do SeriesBible
+            declension_map = {}
+            if episode_profile:
+                if getattr(episode_profile, "character_dossiers", None):
+                    for cd in episode_profile.character_dossiers:
+                        cd_name = getattr(cd, "name", "")
+                        cd_decl = getattr(cd, "declension", None) or getattr(cd, "paradigms", None)
+                        if cd_name and cd_decl and isinstance(cd_decl, dict):
+                            declension_map[cd_name] = cd_decl
+                if getattr(episode_profile, "name_declensions", None):
+                    for nd in episode_profile.name_declensions:
+                        nd_name = getattr(nd, "character_name", "")
+                        nd_cases = getattr(nd, "cases", None) or getattr(nd, "declension", None)
+                        if nd_name and nd_cases and isinstance(nd_cases, dict):
+                            declension_map[nd_name] = nd_cases
+
+            if declension_map:
+                self.series_bible.data.setdefault("declensions", {}).update(declension_map)
+                for cd_name, cd_cases in declension_map.items():
+                    if hasattr(self.series_bible, "sync_verified_profile_entity"):
+                        self.series_bible.sync_verified_profile_entity(cd_name, declension_map=cd_cases)
+
+            # Sanitacja i regeneracja paradygmatów w RAM
+            if hasattr(self.series_bible, "_sanitize_loaded_bible_in_ram"):
+                self.series_bible._sanitize_loaded_bible_in_ram()
 
         if self.flight_recorder:
             try:

@@ -246,3 +246,68 @@ def test_arbitrate_telemetry_enforces_p0_gender_for_inferred_and_explicit_speake
     )
     assert t4["is_sign"] is True
     assert t4["speaker_gender"] == "NEUTRAL"
+
+
+# ==============================================================================
+# STANDARD 9.5 TESTS (T5.1)
+# ==============================================================================
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "actor_name,expected_gender_tag",
+    [
+        ("Tokiyuki Hōjō", "MASCULINE"),
+        ("Neighbor", "FEMININE"),
+        ("Ayako", "FEMININE"),
+    ]
+)
+def test_translator_runtime_telemetry_uses_arbitrate_p0_and_bilingual_aliases(actor_name, expected_gender_tag):
+    """
+    T5.1 (Operacja 2B.1 + 2C.1): Prawidłowy stan ciągu Telemetria: w translator.py = 100% zgodności
+    MASCULINE/FEMININE z p0_gender (w tym przez dwujęzyczny alias roli) oraz zachowanie jawnego Name z [Events] ponad tagiem F0.
+    """
+    from series_memory import SeriesBible
+    from scene_discourse import SceneDiscourseGraph
+    from translator import format_dry_telemetry_tag
+    import pysubs2
+
+    bible = SeriesBible(anime_title="Nige Jouzu no Wakagimi")
+    bible.sync_verified_profile_entity(
+        name="Tokiyuki Hōjō",
+        gender="MALE",
+        has_verified_gender=True
+    )
+    bible.sync_verified_profile_entity(
+        name="Ayako",
+        gender="FEMALE",
+        has_verified_gender=True
+    )
+    bible.data.setdefault("characters", {})["Sąsiadka"] = {
+        "name": "Sąsiadka",
+        "gender": "FEMALE",
+        "grammatical_gender": "FEMININE",
+        "confidence": 1.0,
+        "priority": "P0",
+        "has_verified_gender": True,
+        "aliases": ["Sąsiadka"],
+        "description": "Sąsiadka (kobieta)"
+    }
+    # Mapuj dwujęzyczne aliasy ról
+    bible.map_bilingual_role_aliases(["Neighbor", "Tokiyuki Hōjō", "Ayako"])
+
+    ev = pysubs2.SSAEvent(start=1000, end=3000, text="Tekst wypowiedzi", name=actor_name)
+    telem = SceneDiscourseGraph.arbitrate_event_telemetry(
+        event=ev,
+        series_bible=bible,
+        aux_telemetry={"speaker_gender": "UNKNOWN"}
+    )
+    spk_gram = telem.get("grammatical_gender")
+    assert spk_gram == expected_gender_tag
+    assert telem.get("speaker_name") == actor_name
+
+    dry_tag = format_dry_telemetry_tag(
+        speaker_gender=spk_gram,
+        speaker_confidence=1.0,
+        speaker_name=telem.get("speaker_name")
+    )
+    assert f"Mówca: {actor_name} ({expected_gender_tag})" in dry_tag

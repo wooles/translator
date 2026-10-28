@@ -32,7 +32,8 @@ class RefinedBatchResponse(BaseModel):
 def normalize_ass_tags(text: str) -> str:
     """
     Normalizes malformed ASS formatting tags (e.g. {i1} -> {\\i1}, {i0} -> {\\i0},
-    {b1} -> {\\b1}, {b0} -> {\\b0}, {\\i} -> {\\i1}, {/i} -> {\\i0}).
+    {b1} -> {\\b1}, {b0} -> {\\b0}, {\\i} -> {\\i1}, {/i} -> {\\i0})
+    and merges split italic blocks across linebreaks (Standard 9.5, 2C.6).
     """
     if not text or "{" not in text:
         return text
@@ -44,6 +45,8 @@ def normalize_ass_tags(text: str) -> str:
     res = re.sub(r"\{(?:\s*\\?\s*)u0\s*\}", r"{\\u0}", res, flags=re.IGNORECASE)
     res = re.sub(r"\{\\?i\}", r"{\\i1}", res, flags=re.IGNORECASE)
     res = re.sub(r"\{/?i\}", r"{\\i0}", res, flags=re.IGNORECASE)
+    # Scalanie podwójnych bloków kursywy w dwóch wierszach
+    res = re.sub(r"\{\\i1\}(.*?)\{\\i0\}\s*\\N\s*\{\\i1\}(.*?)\{\\i0\}", r"{\\i1}\1\\N\2{\\i0}", res, flags=re.DOTALL)
     return res
 
 
@@ -212,6 +215,26 @@ def _guard_phase2_regressions(
         if ref_has_2nd_masc and not ref_has_2nd_fem:
             return f1_pl
 
+    # KATEGORIA 5b (Standard 9.5, 2B.2, R1.1, R1.7): p0_speaker_gender_concordance
+    has_ver_spk = kwargs.get("has_verified_gender", False) or bool(spk_norm in ("MALE", "MASCULINE", "FEMALE", "FEMININE"))
+    if has_ver_spk:
+        if spk_norm in ("MALE", "MASCULINE"):
+            if not f1_has_1st_fem and ref_has_1st_fem:
+                ref_fixed = re.sub(r"\b([a-ząćęłńóśźż]+)łabym\b", r"\1łbym", refined_pl, flags=re.IGNORECASE)
+                ref_fixed = re.sub(r"\b([a-ząćęłńóśźż]+)łam\b", r"\1łem", ref_fixed, flags=re.IGNORECASE)
+                if re.search(r"\b[a-ząćęłńóśźż]+(?:łem|łbym)\b", ref_fixed, re.IGNORECASE):
+                    refined_pl = ref_fixed
+                else:
+                    return f1_pl
+        elif spk_norm in ("FEMALE", "FEMININE"):
+            if not f1_has_1st_masc and ref_has_1st_masc:
+                ref_fixed = re.sub(r"\b([a-ząćęłńóśźż]+)łbym\b", r"\1łabym", refined_pl, flags=re.IGNORECASE)
+                ref_fixed = re.sub(r"\b([a-ząćęłńóśźż]+)łem\b", r"\1łam", ref_fixed, flags=re.IGNORECASE)
+                if re.search(r"\b[a-ząćęłńóśźż]+(?:łam|łabym)\b", ref_fixed, re.IGNORECASE):
+                    refined_pl = ref_fixed
+                else:
+                    return f1_pl
+
     # 6. KATEGORIA 6: Ochrona trybu czasownika (przypuszczający <-> oznajmujący)
     # Zmiana trybu jest dozwolona wyłącznie przy jawnej zmianie modalności w EN (would/could/should/might/if/wish)
     re_cond_pl = re.compile(
@@ -359,7 +382,7 @@ def _guard_phase2_regressions(
         if re_pl_matrix.search(f1_pl) and not re_pl_matrix.search(refined_pl):
             return f1_pl
 
-    # 17. KATEGORIA 17 (Standard 9.4, 2C.2, R3.3): Ochrona ciągłości zdań rozbitych wielokropkiem (ellipsis_continuation_syntax)
+    # 17. KATEGORIA 17 (Standard 9.4/9.5, 2C.2, 2C.5, R1.10, R3.3): Ochrona ciągłości zdań rozbitych wielokropkiem (ellipsis_continuation_syntax)
     if prev_line_pl and str(prev_line_pl).strip().endswith("..."):
         clean_f1_start = re.sub(r"^\{[^}]*\}", "", f1_pl.strip())
         clean_ref_start = re.sub(r"^\{[^}]*\}", "", refined_pl.strip())
@@ -369,6 +392,19 @@ def _guard_phase2_regressions(
                 if has_ital and not f1_pl.startswith(r"{\i1}"):
                     return r"{\i1}" + f1_pl + (r"{\i0}" if not f1_pl.endswith(r"{\i0}") else "")
                 return f1_pl
+        elif not clean_ref_start.startswith("..."):
+            prev_en_clean = str(prev_line_en or "").strip()
+            if not prev_en_clean or not re.search(r"(?<!\.)[.?!]\s*$", prev_en_clean):
+                if refined_pl.startswith(r"{\i1}"):
+                    rest = refined_pl[len(r"{\i1}"):].lstrip()
+                    if rest and rest[0].isupper() and not rest.startswith("I "):
+                        rest = rest[0].lower() + rest[1:]
+                    refined_pl = r"{\i1}... " + rest
+                else:
+                    rest = refined_pl.lstrip()
+                    if rest and rest[0].isupper() and not rest.startswith("I "):
+                        rest = rest[0].lower() + rest[1:]
+                    refined_pl = "... " + rest
 
     # 18. KATEGORIA 18 (Standard 9.4, 2C.2, R3.3): Ochrona trybu przypuszczającego i modalności 1. os. lp. (first_person_modal_and_conditional_loss)
     re_1st_cond = re.compile(r"\b[a-ząćęłńóśźż]+(?:łbym|łabym|bym)\b", re.IGNORECASE)
@@ -398,6 +434,16 @@ def _guard_phase2_regressions(
             stripped = clean_ref[len(r"{\i1}"):-len(r"{\i0}")].strip()
             if r"{\i" not in stripped:
                 refined_pl = stripped
+
+    # Wyrównanie ortograficzne rdzenia wołacza W do formy kanonicznej (Standard 9.5, 2C.4, R1.8)
+    decl_dict = kwargs.get("declensions")
+    if not decl_dict and series_bible and hasattr(series_bible, "data") and isinstance(series_bible.data, dict):
+        decl_dict = series_bible.data.get("declensions")
+    try:
+        from series_memory import SeriesBible
+        refined_pl = SeriesBible.align_vocative_orthography(refined_pl, decl_dict)
+    except Exception:
+        pass
 
     return refined_pl
 
@@ -943,7 +989,9 @@ class DialogueVerifier:
                 for r in result_lines:
                     orig_it = items_by_id.get(r.id)
                     if orig_it:
+                        r.refined_pl = str(r.refined_pl or "").replace("\r\n", r"\N").replace("\n", r"\N")
                         r.refined_pl = normalize_ass_tags(r.refined_pl)
+                        r.refined_pl = re.sub(r"\{\\i1\}(.*?)\{\\i0\}\s*\\N\s*\{\\i1\}(.*?)\{\\i0\}", r"{\\i1}\1\\N\2{\\i0}", r.refined_pl, flags=re.DOTALL)
                         f1_text = orig_it.get("pl", "")
                         src_en = orig_it.get("en", "")
                         if (r"{\i1}" in f1_text or r"<i>" in f1_text.lower() or r"{\i1}" in src_en or r"<i>" in src_en.lower() or orig_it.get("is_offscreen") or orig_it.get("is_thought")) and r"{\i1}" not in r.refined_pl:

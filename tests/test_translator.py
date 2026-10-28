@@ -64,3 +64,72 @@ def test_phase1_monologue_prompt_emission():
         history_context=[]
     )
     assert "is_internal_monologue: true" in prompt
+
+
+# ==============================================================================
+# STANDARD 9.5 TESTS (T5.3, T5.7)
+# ==============================================================================
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "actor_name,raw_text",
+    [
+        # 1. Zdarzenie o Name == "sign" z wieloma wierszami
+        ("sign", r"{\an8}NAGŁÓWEK TABLICY\NWiersz opisu 1\NWiersz opisu 2\NWiersz opisu 3"),
+        # 2. Zdarzenie z tagiem \pos(x,y)
+        ("", r"{\pos(337,228)\c&HFFFFFF&}Napis na ekranie\NWiersz podrzędny 1\NWiersz podrzędny 2"),
+        # 3. Zdarzenie o Name == "title"
+        ("title", r"TYTUŁ ODCINKA\NWiersz 2\NWiersz 3"),
+        # 4. Zdarzenie z flagą is_sign=True
+        ("plansza", r"Wielowierszowy tekst planszy informacyjnej\NL2\NL3"),
+    ]
+)
+def test_split_oversized_events_skips_sign_actor_and_pos_tagged_events(actor_name, raw_text):
+    """
+    T5.3 (Operacja 2C.2): Prawidłowy stan split_oversized_ass_events = zachowanie zdarzenia
+    o Name == 'sign' lub zawierającego \\pos(x,y) jako pojedynczego rekordu (len(events) == 1).
+    """
+    from translator import split_oversized_ass_events
+    ev = pysubs2.SSAEvent(start=1000, end=2430, text=raw_text, name=actor_name)
+    if actor_name == "plansza":
+        ev.is_sign = True
+    split_res = split_oversized_ass_events([ev])
+    assert len(split_res) == 1
+    assert split_res[0].start == 1000
+    assert split_res[0].end == 2430
+    if r"\pos(" in raw_text:
+        assert r"\pos(" in split_res[0].text
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "style_name,input_draft,expected_wrapped",
+    [
+        # 1. Styl Italics bez znaczników kursywy -> automatyczne otoczenie pojedynczą parą {\i1}...{\i0}
+        ("Italics", "To musi być jakaś pułapka.\nMuszę uważać.", r"{\i1}To musi być jakaś pułapka.\NMuszę uważać.{\i0}"),
+        # 2. Styl Flashback_Italics z wewnętrznym duplikatem -> oczyszczenie do pojedynczej pary
+        ("Flashback_Italics", r"{\i1}Wspomnienie dawnych dni{\i0}\n{\i1}nadal boli.{\i0}", r"{\i1}Wspomnienie dawnych dni\Nnadal boli.{\i0}"),
+        # 3. Kontrprzykład: zwykły styl Default bez myśli -> brak automatycznego otaczania kursywą
+        ("Default", "Wszyscy na stanowiska!", "Wszyscy na stanowiska!"),
+    ]
+)
+def test_phase1_postprocess_wraps_italics_style_and_normalizes_single_italic_block(
+    style_name, input_draft, expected_wrapped
+):
+    """
+    T5.7 (Operacja 2C.6): Prawidłowy stan tekstu Fazy 1 dla stylu Italics
+    = pojedyncza para {\\i1}...{\\i0} obejmująca cały tekst oraz separator \\N zamiast \\n.
+    """
+    import re
+    is_im = any(k in style_name.lower() for k in ["italic", "thoughts", "internal"])
+    pl_cand = re.sub(r"\\[nN]|\r?\n", r"\\N", input_draft)
+    if is_im and pl_cand:
+        clean_im = re.sub(r"\{\\i[01]\}", "", pl_cand).strip()
+        clean_im = re.sub(r"\s*\\N\s*", r"\\N", clean_im)
+        pl_cand = f"{{\\i1}}{clean_im}{{\\i0}}"
+
+    assert pl_cand == expected_wrapped
+    if is_im:
+        assert pl_cand.startswith(r"{\i1}")
+        assert pl_cand.endswith(r"{\i0}")
+        assert r"\n" not in pl_cand

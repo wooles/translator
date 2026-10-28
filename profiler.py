@@ -388,17 +388,37 @@ class EpisodeProfiler:
                 return ""
             text = cleaned
 
-        has_cjk = bool(re.search(r"[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]", text))
-        if has_cjk:
-            # Strip latin tokens outside brackets [a-zA-Z]{2,}
-            parts = re.split(r"(\[[^\]]*\]|\([^\)]*\))", text)
-            for i in range(0, len(parts), 2):
-                parts[i] = re.sub(r"\b[a-zA-Z]{2,}\b", "", parts[i])
-            text = "".join(parts).strip()
-            text = re.sub(r"\s+", " ", text).strip()
+        # Punctuation repetitions > 2 (e.g. just,,,)
+        if re.search(r"([,\.;:!?])\1{2,}", text):
+            cleaned = re.sub(r"([,\.;:!?])\1{2,}", "", text).strip()
+            if not cleaned or not re.search(r"[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]", cleaned):
+                return ""
+            text = cleaned
+
+        # Hallucinatory word repetition (e.g. You you...)
+        if re.search(r"\b([a-zA-Z]{2,})\s+\1", text, re.IGNORECASE):
             if not re.search(r"[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]", text):
                 return ""
-            return text
+
+        has_cjk = bool(re.search(r"[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]", text))
+        if has_cjk:
+            # Standard 9.5 (Operacja 2C.3): Usuwanie sklejonych i luźnych tokenów ASCII [A-Za-z]+ wraz z przyległą interpunkcją
+            parts = re.split(r"(\[[^\]]*\]|\([^\)]*\))", text)
+            for i in range(0, len(parts), 2):
+                # Usuń podciągi liter łacińskich wraz z przylegającą interpunkcją i spacjami
+                p = parts[i]
+                p = re.sub(r"[A-Za-z]+[,.;:!?\s]*", "", p)
+                p = re.sub(r"[,.;:!?\s]*[A-Za-z]+", "", p)
+                p = re.sub(r"^[,\.;:!?\s]+|[,\.;:!?\s]+$", "", p)
+                parts[i] = p
+            cleaned_text = "".join(parts).strip()
+            cleaned_text = re.sub(r"\s+", " ", cleaned_text).strip()
+
+            # Zlicz pozostałe znaki japońskie Kana/Kanji w segmencie
+            cjk_matches = re.findall(r"[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]", cleaned_text)
+            if len(cjk_matches) <= 1:
+                return ""
+            return cleaned_text
         else:
             # Filter known Whisper hallucination spam (subtitles, amara, watching, url, etc.)
             whisper_spam_pat = re.compile(

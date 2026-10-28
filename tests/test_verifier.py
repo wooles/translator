@@ -364,3 +364,83 @@ def test_guard_phase2_preserves_ellipsis_continuation_conditional_and_past_tense
         **kwargs
     )
     assert res == expected_output
+
+
+# ==============================================================================
+# STANDARD 9.5 TESTS (T5.2, T5.6)
+# ==============================================================================
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "f1_pl,refined_pl,spk_p0,has_ver,expected_output",
+    [
+        # 1. Mówca P0 męski: próba wprowadzenia formy żeńskiej -łam -> wymuszenie męskiej -łem
+        ("Wróciłem do domu przed zmrokiem.", "Wróciłam do domu przed zmrokiem.", "MALE", True, "Wróciłem do domu przed zmrokiem."),
+        # 2. Mówca P0 męski z formą przypuszczającą: -łabym -> -łbym
+        ("Zrobiłbym to inaczej.", "Zrobiłabym to inaczej.", "MASCULINE", True, "Zrobiłbym to inaczej."),
+        # 3. Mówca P0 żeński: próba wprowadzenia formy męskiej -łem -> wymuszenie żeńskiej -łam
+        ("Czekałam na ciebie pod bramą.", "Czekałem na ciebie pod bramą.", "FEMALE", True, "Czekałam na ciebie pod bramą."),
+        # 4. Kontrprzykład: mówca P0 męski i zachowana poprawna forma męska -> brak ingerencji
+        ("Znalazłem rozwiązanie.", "Odnazłem właściwe rozwiązanie.", "MALE", True, "Odnazłem właściwe rozwiązanie."),
+    ]
+)
+def test_guard_phase2_enforces_p0_speaker_gender_on_past_tense_shift(
+    f1_pl, refined_pl, spk_p0, has_ver, expected_output
+):
+    """
+    T5.2 (Operacja 2B.2): Prawidłowy stan wyjścia _guard_phase2_regressions dla mówcy o zweryfikowanym p0_gender
+    = zachowanie/wymuszenie formy zgodnej z p0_gender mówcy (źródło autorytetu: rekord P0).
+    """
+    res = DialogueVerifier._guard_phase2_regressions(
+        f1_pl=f1_pl,
+        refined_pl=refined_pl,
+        speaker_p0_gender=spk_p0,
+        has_verified_gender=has_ver
+    )
+    assert res == expected_output
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "prev_pl,prev_en,f1_pl,refined_pl,expected_output",
+    [
+        # 1. Poprzednia linia kończy się '...', bieżąca nie ma '...' w F1 ani F2 -> dodanie '... '
+        (
+            "Nasz plan...",
+            "Our plan...",
+            "Zostanie zrealizowany jutro.",
+            "Zostanie zrealizowany jutro.",
+            "... zostanie zrealizowany jutro."
+        ),
+        # 2. Linia z kursywą {\\i1}...{\\i0} -> '... ' wewnątrz znacznika kursywy
+        (
+            "Gdybyśmy tylko...",
+            "If only we...",
+            r"{\i1}Mieli więcej czasu.{\i0}",
+            r"{\i1}Mieli więcej czasu.{\i0}",
+            r"{\i1}... mieli więcej czasu.{\i0}"
+        ),
+        # 3. Kontrprzykład: poprzednia linia kończy się kropką w EN (nie jest zawieszonym zdaniem) -> brak dodawania '...'
+        (
+            "Koniec części pierwszej.",
+            "End of part one.",
+            "Rozpoczynamy naradę.",
+            "Rozpoczynamy naradę.",
+            "Rozpoczynamy naradę."
+        ),
+    ]
+)
+def test_guard_phase2_bridges_ellipsis_continuation_across_nominal_opening_line(
+    prev_pl, prev_en, f1_pl, refined_pl, expected_output
+):
+    """
+    T5.6 (Operacja 2C.5): Prawidłowy stan drugiej linii po linii zakończonej '...'
+    = obecność inicjalnego wielokropka '...' zapewniającego ciągłość składniową.
+    """
+    res = DialogueVerifier._guard_phase2_regressions(
+        f1_pl=f1_pl,
+        refined_pl=refined_pl,
+        prev_line_pl=prev_pl,
+        prev_line_en=prev_en
+    )
+    assert res == expected_output
