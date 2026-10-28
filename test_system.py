@@ -19205,6 +19205,101 @@ def test_standard_9_3_discourse_and_verifier_dual_voice_epistemic_clause():
     assert clause_res == "...wiedziałem, że to ty, Rywalu."
     print(" -> PASSED: TEST 217 potwierdza telemetrię dyskursu, dwugłos i zdania identyfikujące.")
 
+
+def test_standard_9_4_suite():
+    """TEST 218: Standard 9.4 Kompletny zestaw testów integracyjnych potoku AVT."""
+    print("\n[TEST 218] Standard 9.4: Integracja Profilera, Bramki Jakości, Weryfikatora i Pamięci Serii...")
+    import pysubs2
+    from profiler import EpisodeProfiler, DramaticSequence
+    from series_memory import SeriesBible, generate_polish_name_declension
+    from avt_linter import EpisodeQualityGate
+    from verifier import DialogueVerifier
+    from pipeline_logger import EpisodeFlightRecorder
+
+    # 1. Profiler ASR & Prepass (2B.8.a, 2B.9, 2C.10)
+    assert EpisodeProfiler.sanitize_event_asr("Subtitles by Amara.org", is_sign=False) == ""
+    assert EpisodeProfiler.sanitize_event_asr("Tekst audio", is_sign=False, duplicate_time_distance_sec=2.5) == ""
+    assert EpisodeProfiler.sanitize_event_asr("Tekst audio", is_sign=False, consecutive_streak=4) == ""
+
+    bible = SeriesBible(slug="test_s94_integration")
+    bible.sync_verified_profile_entity("Tokiyuki Hōjō", "MALE", has_verified_gender=True)
+    dseq = [
+        DramaticSequence(
+            sequence_name="Sekwencja 1",
+            time_range="00:00 - 05:00",
+            dramatic_summary="Ucieczka",
+            dominant_tone="Napięcie",
+            characters_present=["Tokiyuki Hōjō"],
+            female_only_scene=True,
+            male_only_scene=False
+        )
+    ]
+    reconciled = EpisodeProfiler.reconcile_prepass_with_p0(dseq, series_bible=bible)
+    assert reconciled[0].female_only_scene is False
+    assert reconciled[0].male_only_scene is True
+
+    # 2. EpisodeQualityGate (2B.10, 2C.4, 2C.8)
+    subs = pysubs2.SSAFile()
+    subs.events.append(pysubs2.SSAEvent(start=1000, end=3000, text="Tokiyuki, czy nie powinniśmy już ruszać?", style="Default"))
+    subs.events.append(pysubs2.SSAEvent(start=4000, end=6000, text="Pójdziesz tam dzisiaj, czy nie?", style="Default"))
+    subs.events.append(pysubs2.SSAEvent(start=7000, end=9000, text=r"{\an8\BLUE TEXT HEADER}Plansza", style="Sign"))
+    fixed_subs, fixes = EpisodeQualityGate.audit_and_fix_entire_episode(subs)
+    assert fixed_subs.events[0].text == "Tokiyuki, czy nie powinniśmy już ruszać?"
+    assert fixed_subs.events[1].text == "Pójdziesz tam dzisiaj czy nie?"
+    assert fixed_subs.events[2].text == r"{\an8}Plansza"
+    all_fixes = EpisodeQualityGate.get_all_fixes()
+    assert isinstance(all_fixes, list)
+
+    # 3. Verifier Regressions Guard (2C.2, 2C.6)
+    v_res1 = DialogueVerifier._guard_phase2_regressions(
+        f1_pl="...stracimy szansę na ucieczkę.",
+        refined_pl="Stracimy szansę na ucieczkę.",
+        source_en="We will lose our chance to escape.",
+        prev_line_pl="Jeśli nie zdążymy na czas..."
+    )
+    assert v_res1 == "...stracimy szansę na ucieczkę."
+
+    v_res2 = DialogueVerifier._guard_phase2_regressions(
+        f1_pl="Wolałbym tego nie robić w tej chwili.",
+        refined_pl="Lepiej tego nie robić w tej chwili.",
+        source_en="I would rather not do this right now."
+    )
+    assert v_res2 == "Wolałbym tego nie robić w tej chwili."
+
+    v_res3 = DialogueVerifier._guard_phase2_regressions(
+        f1_pl="Zrobiłem wszystko, o co prosiłeś.",
+        refined_pl="Robię wszystko, o co prosisz.",
+        source_en="I did everything you asked for."
+    )
+    assert v_res3 == "Zrobiłem wszystko, o co prosiłeś."
+
+    v_res4 = DialogueVerifier._guard_phase2_regressions(
+        f1_pl="Musimy natychmiast ruszać w drogę!",
+        refined_pl=r"{\i1}Musimy natychmiast ruszać w drogę!{\i0}",
+        source_en="We have to get moving immediately!",
+        is_internal_monologue=False,
+        target_gender="MALE"
+    )
+    assert v_res4 == "Musimy natychmiast ruszać w drogę!"
+
+    # 4. Series Memory & Declension (2C.5, 2C.7, 2C.9)
+    decl = generate_polish_name_declension("Władca Ciemności", "MALE")
+    assert decl["D"] == "Władcy Ciemności"
+    assert decl["N"] == "Władcą Ciemności"
+
+    bible.populate_secondary_actor_tags(["Gojirō (M)", "Shizuka (F)", "Żołnierz", "/", "Sign"])
+    chars = bible.data.get("characters", {})
+    assert chars["Gojirō"]["priority"] == "P1"
+    assert chars["Gojirō"]["gender"] == "MALE"
+    assert chars["Shizuka"]["priority"] == "P1"
+    assert chars["Shizuka"]["gender"] == "FEMALE"
+    assert chars["Żołnierz"]["priority"] == "P2"
+    assert "/" not in chars
+    assert "Sign" not in chars
+
+    print(" -> PASSED: TEST 218 potwierdza integrację wszystkich 13 operacji Standardu 9.4.")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -19425,4 +19520,5 @@ if __name__ == "__main__":
     test_standard_9_3_actor_normalization_and_asr_window_isolation()
     test_standard_9_3_series_bible_sync_paradigm_and_ram_sanitization()
     test_standard_9_3_discourse_and_verifier_dual_voice_epistemic_clause()
-    print("\n Wszystkie testy jednostkowe i integracyjne (217/217) zakończone pełnym sukcesem!\n")
+    test_standard_9_4_suite()
+    print("\n Wszystkie testy jednostkowe i integracyjne (218/218) zakończone pełnym sukcesem!\n")

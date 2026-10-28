@@ -1836,8 +1836,13 @@ class MultimodalTranslator:
         else:
             self.episode_scene_polylogues.clear()
 
-        # 1. Parse dramatic_sequences from EpisodeProfile (Pre-pass Profilera)
+        # 1. Parse dramatic_sequences from EpisodeProfile (Pre-pass Profilera z arbitrażem P0, 2B.9)
         if episode_profile and getattr(episode_profile, "dramatic_sequences", None):
+            from profiler import EpisodeProfiler
+            episode_profile.dramatic_sequences = EpisodeProfiler.reconcile_prepass_with_p0(
+                episode_profile.dramatic_sequences,
+                series_bible=getattr(self, "series_bible", None)
+            )
             def _parse_time_range_to_ms(tr_str: str) -> Optional[Tuple[int, int]]:
                 if not tr_str or ("-" not in tr_str and "–" not in tr_str):
                     return None
@@ -2596,6 +2601,10 @@ class MultimodalTranslator:
 
         return None, None
 
+    def build_phase1_prompt(self, *args, **kwargs):
+        """Alias dla _prepare_batch_prompt (Standard 9.4 P0.2 / 2C.6)."""
+        return self._prepare_batch_prompt(*args, **kwargs)
+
     def _prepare_batch_prompt(
         self,
         batch_events: List[Tuple[int, pysubs2.SSAEvent, str, str]],
@@ -3060,6 +3069,15 @@ class MultimodalTranslator:
                 lines.append(f"Kwestia [ID: {idx + 1}] [TYP: [DIALOG] {vtype['type_label']}]{relation_tag} (Czas: {start_str} - {end_str}) [MÓWCA: {spk_label} | ADRESAT: {addr_label} | REJESTR: {reg_desc}]{acoustic_str}:")
                 lines.append(f"  📄 SKRYPT PODSTAWOWY EN (TREŚĆ SEMANTYCZNA I FAKTY): {clean_display_text}")
 
+                # Detekcja monologu wewnętrznego (Standard 9.4, 2C.6)
+                st_lower = str(getattr(event, "style", "")).lower()
+                italic_attr = getattr(event, "italic", 0)
+                has_italic_style = any(k in st_lower for k in ["italic", "flashback_italic", "thoughts", "internal"]) or italic_attr in (1, -1)
+                has_whisper_monologue = "cichy szept / monolog wewnętrzny" in acoustic_str or "monolog wewnętrzny" in relation_tag
+                is_internal_monologue = has_italic_style or has_whisper_monologue
+                if is_internal_monologue:
+                    lines.append("  💭 TRYB WYPOWIEDZI: MONOLOG WEWNĘTRZNY / MYŚLI (is_internal_monologue: true) — Wymagane tagi {\\i1}...{\\i0} w phase1_text.")
+
                 # Pre-Generation Morphosyntactic Contract (Stream 4 - Standard 3.0)
                 contract_spk_gender = "UNKNOWN"
                 if line_spk_gender:
@@ -3200,6 +3218,12 @@ class MultimodalTranslator:
                     jp_text = str(raw_jp_item.get("text", "")).strip()
                 else:
                     jp_text = str(raw_jp_item).strip()
+                from profiler import EpisodeProfiler
+                jp_text = EpisodeProfiler.sanitize_event_asr(
+                    jp_text,
+                    is_sign=vtype["is_sign"],
+                    style=getattr(event, "style", None)
+                )
 
                 if is_phantom and not vtype["is_sign"]:
                     lines.append("  🎙️ GŁOS SEIYŪ: [Audio: Tło muzyczne / SFX / brak mowy seiyū]")
@@ -3247,6 +3271,8 @@ class MultimodalTranslator:
             lines.append("-----------------------------------------------------")
 
         return "\n".join(lines)
+
+    build_phase1_prompt = _prepare_batch_prompt
 
     def _call_gemini_with_retry(self, contents: List[Any], schema_class) -> Any:
         """
@@ -4664,6 +4690,8 @@ class MultimodalTranslator:
                     a_decl = generate_polish_name_declension(cl_act, ex_gen or "UNKNOWN")
                     if a_decl and a_decl.get("M"):
                         self.series_bible.data.setdefault("declensions", {})[cl_act] = a_decl
+        if getattr(self, "series_bible", None) and hasattr(self.series_bible, "populate_secondary_actor_tags"):
+            self.series_bible.populate_secondary_actor_tags(list(actor_map.keys()))
 
         if self.flight_recorder:
             try:

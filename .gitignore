@@ -48,6 +48,7 @@ gcp_key*
 *.disabled
 
 # Test artifacts
+Artefakty/*.ass
 series_memory/*Test*
 series_memory/*test*
 

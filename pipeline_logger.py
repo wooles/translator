@@ -406,23 +406,45 @@ class EpisodeFlightRecorder:
         avt_metrics: Optional[Dict[str, Any]] = None,
         pricing_summary: Optional[Dict[str, Any]] = None
     ) -> None:
-        """Rejestruje KROK 11: Końcowy audyt jakości odcinka oraz podsumowanie kosztów."""
+        """Rejestruje KROK 11: Końcowy audyt jakości odcinka oraz podsumowanie kosztów (Standard 9.4, 2C.8, R3.5)."""
+        all_fixes = quality_gate_fixes or []
+        reported_count = len(all_fixes)
+        collected_count = len(all_fixes)
+        try:
+            from avt_linter import EpisodeQualityGate
+            eqg_fixes = EpisodeQualityGate.get_all_fixes()
+            if eqg_fixes:
+                collected_count = len(eqg_fixes)
+        except Exception:
+            pass
+
+        consistency_status = "OK" if reported_count == collected_count else "MISMATCH"
+        consistency_check = {
+            "reported": reported_count,
+            "collected": collected_count,
+            "status": consistency_status
+        }
         payload = {
-            "quality_gate_fixes": quality_gate_fixes or [],
+            "quality_gate_fixes": all_fixes,
+            "consistency_check": consistency_check,
             "avt_metrics": avt_metrics or {},
             "pricing_summary": pricing_summary or {}
         }
-        fixes_summary = "\n".join(f"  ├─ {f}" for f in (quality_gate_fixes or [])[:15])
+        # Pełne wylistowanie poprawek (zniesienie limitu [:15], Operacja 2C.8)
+        fixes_summary = "\n".join(f"  ├─ {f}" for f in all_fixes)
         if not fixes_summary:
             fixes_summary = "  └─ Brak poprawek (pełna zgodność z bramką jakości)"
         text_lines = [
-            f"Łączna liczba poprawek bramki jakości: {len(quality_gate_fixes or [])}",
-            f"Wybrane poprawki:\n{fixes_summary}",
+            f"Łączna liczba poprawek bramki jakości: {len(all_fixes)}",
+            f"Lista wszystkich poprawek (spójność: {consistency_status}):\n{fixes_summary}",
             f"Metryki AVT (CPL/CPS): {json.dumps(avt_metrics or {}, default=_safe_json_default, ensure_ascii=False)}",
             f"Podsumowanie finansowe PricingGuard:\n{json.dumps(pricing_summary or {}, default=_safe_json_default, ensure_ascii=False, indent=2)}"
         ]
         self.record_event("quality_gate_pricing", payload)
         self.write_log_section("[KROK 11: EPISODEQUALITYGATE I ROZLICZENIE FINANSOWE PRICINGGUARD]", "\n".join(text_lines))
+
+    # Alias dla zgodności z nazewnictwem Kroku 11 w Standardzie 9.4 (Operacja 2C.8)
+    report_step_11_quality_gate = log_quality_gate_and_pricing
 
     def finalize(self) -> None:
         """Zamyka sesję rejestratora i zapisuje podsumowanie końcowe (dokładnie raz)."""

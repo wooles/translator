@@ -200,3 +200,97 @@ def test_sanitize_ram_overrides_legacy_eqg_and_relation_extracted_male_flags(
     assert bible.get_character_gender(entity_name) == profile_gender
     assert "KOBIETA (Adresat)" in bible.data["relations"][f"SpeakerX -> {entity_name}"]
 
+
+
+# ==============================================================================
+# STANDARD 9.4 TESTS (T4.8, T4.12)
+# ==============================================================================
+
+@pytest.mark.unit
+def test_sanitize_ram_cleans_character_descriptions_and_resolves_relation_tv_asymmetry(tmp_path):
+    """
+    T4.8 (Operacja 2C.5): Weryfikacja czyszczenia opisów postaci w RAM (eliminacja
+    sprzecznych znaczników płciowych) oraz sanityzacji asymetrii relacji T/V.
+    """
+    bible_file = tmp_path / "sanitize_ram_test.json"
+    bible = SeriesBible(bible_path=bible_file, storage_dir=tmp_path)
+    
+    # 1. Postać męska ze skażeniem "KOBIETA" w polu description
+    bible.data["characters"]["Tokiyuki Hōjō"] = {
+        "description": "KOBIETA (błędna flaga historyczna) - główny dziedzic rodu",
+        "gender": "MALE",
+        "grammatical_gender": "MASCULINE",
+        "has_verified_gender": True,
+        "priority": "P0"
+    }
+
+    # 2. Relacja z asymetrią: deskryptor "RELACJA HIERARCHICZNA" sprzeczny z "per ty" i "przyjaciel"
+    # oraz błędny znacznik adresata [KOBIETA (Adresat)] dla postaci męskiej P0
+    bible.data["relations"]["Yorishige -> Tokiyuki Hōjō"] = (
+        "[RELACJA HIERARCHICZNA] [KOBIETA (Adresat)] rozmawiają per ty jako serdeczni przyjaciele"
+    )
+
+    # Wykonanie samoleczącej sanityzacji w RAM
+    bible._sanitize_loaded_bible_in_ram()
+
+    # Asercja 1: pole description oczyszczone ze sprzecznej flagi KOBIETA
+    clean_desc = bible.data["characters"]["Tokiyuki Hōjō"]["description"]
+    assert "KOBIETA" not in clean_desc
+    assert bible.data["characters"]["Tokiyuki Hōjō"]["gender"] == "MALE"
+
+    # Asercja 2: relacja oczyszczona z błędnej hierarchii i oznaczona jako reżim POUFNY
+    rel_desc = bible.data["relations"]["Yorishige -> Tokiyuki Hōjō"]
+    assert "RELACJA HIERARCHICZNA" not in rel_desc
+    assert "reżim: POUFNY" in rel_desc
+    # Asercja 3: znacznik adresata zsynchronizowany z P0 męskim
+    assert "MĘŻCZYZNA (Adresat)" in rel_desc
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "compound_term,gender,expected_genitive,expected_instrumental",
+    [
+        # T4.12 (Operacja 2C.9): Złożenia dwuwyrazowe z przydawką dopełniaczową
+        ("Władca Ciemności", "MALE", "Władcy Ciemności", "Władcą Ciemności"),
+        ("Książę Piekieł", "MALE", "Księcia Piekieł", "Księciem Piekieł"),
+        ("Mistrz Miecza", "MALE", "Mistrza Miecza", "Mistrzem Miecza"),
+    ]
+)
+def test_declension_preserves_genitive_modifier_in_compound_terms_and_transfers_p0_paradigm(
+    compound_term, gender, expected_genitive, expected_instrumental, tmp_path
+):
+    """
+    T4.12 (Operacja 2C.9): Weryfikacja ochrony przydawki dopełniaczowej w terminach złożonych
+    oraz transferu pełnego 7-przypadkowego paradygmatu P0 do SeriesBible.
+    """
+    # 1. Zachowanie drugiego członu (przydawki dopełniaczowej)
+    decl = generate_polish_name_declension(compound_term, gender)
+    assert decl["M"] == compound_term
+    assert decl["D"] == expected_genitive
+    assert decl["N"] == expected_instrumental
+    # Drugi człon pozostaje nienaruszony w dopełniaczu i narzędniku
+    assert compound_term.split()[-1] in decl["D"]
+    assert compound_term.split()[-1] in decl["N"]
+
+    # 2. Bezwarunkowy transfer pełnego 7-przypadkowego paradygmatu P0
+    bible_file = tmp_path / "transfer_p0_test.json"
+    bible = SeriesBible(bible_path=bible_file, storage_dir=tmp_path)
+    p0_paradigm = {
+        "M": compound_term,
+        "D": expected_genitive,
+        "C": f"{expected_genitive[:-1]}i",
+        "B": expected_genitive,
+        "N": expected_instrumental,
+        "Ms": f"{expected_genitive[:-1]}y",
+        "W": compound_term
+    }
+    bible.sync_verified_profile_entity(
+        name=compound_term,
+        gender=gender,
+        has_verified_gender=True,
+        declension_map=p0_paradigm
+    )
+    saved_decl = bible.data["declensions"][compound_term]
+    for case in ("M", "D", "C", "B", "N", "Ms", "W"):
+        assert saved_decl[case] == p0_paradigm[case]
+        assert len(saved_decl[case]) > 0

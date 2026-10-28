@@ -3,20 +3,20 @@
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B%20%7C%203.13-blue.svg)](https://www.python.org/)
 [![Google GenAI SDK](https://img.shields.io/badge/LLM%20Orchestration-Gemini%202.5%20Flash%20%7C%202.5%20Pro-orange.svg)](https://ai.google.dev/)
 [![Acoustic Ingestion](https://img.shields.io/badge/Acoustic%20ASR-Kotoba--Whisper%20v2.0%20CTranslate2-green.svg)](https://huggingface.co/kotoba-tech/kotoba-whisper-v2.0-faster)
-[![Architecture](https://img.shields.io/badge/Architecture-Standard%209.3%20%7C%20Pure%20Positive%20Domain-purple.svg)]()
-[![CI/Test Suite](https://img.shields.io/badge/Test%20Harness-269%2F269%20Passing%20(10s%20Fast%20CI)-brightgreen.svg)]()
+[![Architecture](https://img.shields.io/badge/Architecture-Standard%209.4%20%7C%20Pure%20Positive%20Domain-purple.svg)]()
+[![CI/Test Suite](https://img.shields.io/badge/Test%20Harness-307%2F307%20Passing%20(15s%20Fast%20CI)-brightgreen.svg)]()
 [![Forensic Audit](https://img.shields.io/badge/AST%20Purity-100%25%20Zero--Literal-blueviolet.svg)]()
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 An industrial-grade, asynchronous, multimodal audiovisual translation and localization engine engineered in Python. It executes high-fidelity semantic translation from Japanese audio streams, video keyframes, and intermediate dialogue representations into target Polish dialogue scripts, strictly adhering to cinematographic subtitling standards (Belczyk AVT Matrix, Skopos Theory, Polysystem Theory, and Netflix AVT Timed Text Guidelines).
 
-Built upon **Architecture Standard 9.3**, the engine enforces a **Zero-Literal Pure Positive Domain Invariant Architecture** combined with **Primary LLM Translation Authority**: the model generates natural, expressive dialogue free of secondary mutating cascades, while deterministic offline post-processors operate as a passive, non-mutating safety net ($\mathcal{D}_{\text{pos}}$ identity pass-through: $\forall x \notin \mathcal{D}_{\text{pos}}, T(x) = x$).
+Built upon **Architecture Standard 9.4**, the engine enforces a **Zero-Literal Pure Positive Domain Invariant Architecture** combined with **Primary LLM Translation Authority**: the model generates natural, expressive dialogue free of secondary mutating cascades, while deterministic offline post-processors operate as a passive, non-mutating safety net ($\mathcal{D}_{\text{pos}}$ identity pass-through: $\forall x \notin \mathcal{D}_{\text{pos}}, T(x) = x$). Standard 9.4 strengthens P0 primacy across dramatic scene pre-passes, purges Whisper ASR timeline repetitions and ASCII hallucinations, extends Phase 2 regression guards (ellipsis syntax continuity, first-person conditional preservation, tense stability, and italics bounds), automates secondary actor P1/P2 registration, and guarantees Step 11 Quality Gate audit consistency.
 
 The system integrates **Large Multimodal Models (Gemini 2.5 Flash / Pro)** via structured Pydantic schemas, **fine-tuned Japanese ASR acoustic grounding (Kotoba-Whisper v2.0 CTranslate2)** with **Epistemic Gender Triangulation** ($F_0$ pitch extraction with voiced-frame pooling and directional consensus), **FFmpeg temporal and visual telemetry** (I-frame snapping, Fade to Black boundary isolation, native silence detection), **computer-vision spatial OCR & Pixel-Perfect Typesetting (Grounding 2D)**, a **171-Pillar AVT Constraint Solver**, **Profiler 4.0 Pre-Computation**, **Cross-Episode Series Memory & Ontology** (positive schema, $\mathcal{O}(1)$ alias index, diegetic identity automaton, SubTurn Pivot Partitioning, symmetric $We\_Group$ and $You\_Group$ set calculus with tri-state virility), and a **Deterministic Quality Gate (0.00 PLN)** offline post-processing safety net.
 
 ---
 
-## 🏛️ Architecture Standard 9.3: Core Principles
+## 🏛️ Architecture Standard 9.4: Core Principles
 
 1. **Zero-Literal Pure Positive Domain Invariant Architecture:**
    Every system operator $T$ in the pipeline is strictly defined over its verified **Positive Domain** ($\mathcal{D}_{\text{pos}}$) based on complete, verified P0 state (`confidence >= 0.95`, `unknown_count == 0`):
@@ -31,7 +31,7 @@ The system integrates **Large Multimodal Models (Gemini 2.5 Flash / Pro)** via s
    - **Layer 2 (Series Memory & Ontology — `series_memory.py`, `scene_discourse.py`):** Positive schema for `characters` (`EntityCategory.ANTHROPONYM` with structural fields `gender`, `grammatical_gender`, `confidence`, `priority`, `has_verified_gender`, `aliases`, and clean `description` stripped of grammar directives); directed relations ($X \to Y$) in a dedicated `relations` registry with transparent fallback; RAM $\mathcal{O}(1)$ alias indexing; self-healing memory sanitation; ontological classification (`ANTHROPONYM`, `TOPONYM`, `CHREMATONYM`); Diegetic Identity Automaton (`apparent_gender` vs `true_gender` with persona intervals); SubTurn Pivot Partitioning (splitting speaker turns upon addressee change); symmetric set calculus for $We\_Group$ and $You\_Group$ with tri-state virility (`VIRILE`, `NON_VIRILE`, `AMBIGUOUS`).
    - **Layer 3 (Canon & Translation Contract — `translator.py`, `rules.py`, `manga_canon.py`):** Official Polish manga publishing canon precedence; Stylistic Freedom Invariance (full LLM autonomy: ellipsis, inversion, mobile clitics, natural present tense); Declarative World-State Telemetry (`format_dry_telemetry_tag`, confidence $\ge 0.80$, no None/UNKNOWN/AMBIGUOUS); strict Pydantic contract (`speaker_gender`, `target_gender`, `addressee_number`, `DeclensionParadigm` with mandatory case declension).
    - **Layer 4 (Deterministic Quality Gate — `avt_linter.py`, `verifier.py`):** 100% deterministic morfosyntactic correction post-generation (0.00 PLN, zero LLM calls). Default production routing `strict_positive_domain=True`: non-strict phases are bypassed (Identity Pass-Through), executing exclusively unified positive domain operators under `QuoteShield` and ASS tag masking: verb inflection for 1st/2nd person, predicative adjectives/participles, social role pairs, $We/You$ group virility, modal defective paradigms, and toponymic hygiene. Dialogue outside $\mathcal{D}_{\text{pos}}$ maintains exact identity $T(x) = x$.
-   - **Layer 5 (Regression & CI/CD Shield — `test_system.py`, `tests/`):** 269 total tests across atomic isomorphic families (100% passing). Complete purity verification via `verify_purity.py`, `verify_ultimate_pipeline.py`, `verify_12_fixes.py`, and `audit_diff.ps1`. Fast default execution in ~10 seconds.
+   - **Layer 5 (Regression & CI/CD Shield — `test_system.py`, `tests/`):** 307 total tests across atomic isomorphic families (100% passing). Complete purity verification via `verify_purity.py`, `verify_ultimate_pipeline.py`, `verify_12_fixes.py`, and `audit_diff.ps1`. Fast default execution in ~15 seconds.
 
 ---
 
@@ -130,10 +130,10 @@ flowchart TD
 
 ## 📊 Verification Test Harness & CI/CD Performance
 
-Following the **Depuracja Legacy 1.0** overhaul, the test suite executes in **~10 seconds** in default mode while maintaining 100% test coverage across all 269 active architectural invariants:
+Following the **Standard 9.4** and **Depuracja Legacy 1.0** overhaul, the test suite executes in **~15 seconds** in default fast mode while maintaining 100% test coverage across all 307 active architectural invariants:
 
 ```powershell
-# 1. Default ultra-fast verification (116 tests in ~10 seconds):
+# 1. Default ultra-fast verification (154 tests in ~15 seconds):
 .\.venv\Scripts\python.exe -m pytest
 
 # 2. Complete slow / heavy resource suite (ffmpeg, Whisper, DSP, real bibles):
@@ -155,15 +155,15 @@ Following the **Depuracja Legacy 1.0** overhaul, the test suite executes in **~1
 powershell -ExecutionPolicy Bypass -File .\audit_diff.ps1 -BaseRef "HEAD~1"
 ```
 
-### Test Suite Structure (269 Tests Total)
+### Test Suite Structure (307 Tests Total)
 
 | Suite / Directory | Tests | Execution Time | Scope / Target |
 |---|:---:|:---:|---|
-| **`tests/` (Fast Unit Suite)** | 52 | **4.75 s** | Modular unit tests for Linter, Verifier, Series Memory, Metadata, Discourse, Profiler |
-| **`test_system.py` (Fast Unit Suite)** | 64 | **4.49 s** | Core engine unit tests (schemas, parsing, manga canon, formatting, rule dispatcher) |
+| **`tests/` (Fast Unit Suite)** | 89 | **7.5 s** | Modular unit tests for Linter, Verifier, Series Memory, Metadata, Discourse, Profiler, Translator, Flight Recorder |
+| **`test_system.py` (Fast Unit Suite)** | 65 | **7.3 s** | Core engine unit tests & E2E integration (TEST 218 Standard 9.4 suite) |
 | **`test_system.py` (Slow & Integration Suite)** | 153 | *Ad-hoc* (`@pytest.mark.slow`) | Heavy tests: Whisper ASR, ffmpeg keyframes, DSP pitch, 16 disk bibles, concurrency |
 | **`test_system.py` (Network Suite)** | 12 | **51.89 s** (`@pytest.mark.network`) | Gemini API integration, context caching leases, client pool hopping |
-| **Total Pipeline Test Coverage** | **269** | **100% PASS** | Zero regression lock for Standards 7.0 through 9.3 |
+| **Total Pipeline Test Coverage** | **307** | **100% PASS** | Zero regression lock for Standards 7.0 through 9.4 |
 
 ---
 

@@ -175,3 +175,74 @@ def test_arbitrate_telemetry_preserves_explicit_event_actor_and_male_p0(
     assert node["speaker_name"] == expected_actor
     assert node["grammatical_gender"] == expected_gram_gender
 
+
+
+# ==============================================================================
+# STANDARD 9.4 TESTS (T4.5)
+# ==============================================================================
+
+@pytest.mark.unit
+def test_arbitrate_telemetry_enforces_p0_gender_for_inferred_and_explicit_speakers(tmp_path):
+    """
+    T4.5 (Operacja 2C.1): Prawidłowy stan telemetrii speaker_gender = P0 gender
+    (series_bible.get_character(speaker).gender) dla wywnioskowanego mówcy
+    oraz jawnego mówcy, niezależnie od scene_female_only i defaultu sceny.
+    """
+    from series_memory import SeriesBible
+    from scene_discourse import SceneDiscourseGraph
+
+    bible_path = tmp_path / "telemetry_test_bible.json"
+    bible = SeriesBible(bible_path=bible_path, storage_dir=tmp_path)
+    bible.sync_verified_profile_entity(
+        name="Tokiyuki Hōjō",
+        gender="MALE",
+        has_verified_gender=True
+    )
+    bible.data["characters"]["Tokiyuki Hōjō"]["aliases"] = ["Tokiyuki"]
+    bible.sync_verified_profile_entity(
+        name="Ayako",
+        gender="FEMALE",
+        has_verified_gender=True
+    )
+    bible.data["characters"]["Ayako"]["aliases"] = ["Aya"]
+    bible._rebuild_actor_aliases_index()
+
+    # 1. Wywnioskowany mówca (inferred_actor) z pustym raw_actor w scenie pozornie wyłącznie kobiecej
+    t1 = SceneDiscourseGraph.arbitrate_event_telemetry(
+        event=pysubs2.SSAEvent(start=1000, end=3000, text="Musimy walczyć!", name=""),
+        inferred_actor="Tokiyuki Hōjō",
+        series_bible=bible,
+        scene_female_only=True,
+        aux_telemetry={"speaker_gender": "FEMALE"}
+    )
+    assert t1["speaker_name"] == "Tokiyuki Hōjō"
+    assert t1["speaker_gender"] == "MALE"
+    assert t1["grammatical_gender"] == "MASCULINE"
+    assert t1["has_verified_gender"] is True
+
+    # 2. Jawny mówca męski (raw_actor) w scenie z domyślnym rodzajem żeńskim
+    t2 = SceneDiscourseGraph.arbitrate_event_telemetry(
+        event=pysubs2.SSAEvent(start=4000, end=6000, text="Osłonię cię!", name="Tokiyuki"),
+        series_bible=bible,
+        scene_female_only=True,
+    )
+    assert t2["speaker_name"] == "Tokiyuki"
+    assert t2["speaker_gender"] == "MALE"
+    assert t2["has_verified_gender"] is True
+
+    # 3. Adresat z bazy wiedzy P0
+    t3 = SceneDiscourseGraph.arbitrate_event_telemetry(
+        event=pysubs2.SSAEvent(start=7000, end=9000, text="Dziękuję, Ayako.", name="Tokiyuki"),
+        series_bible=bible,
+        addressee="Ayako"
+    )
+    assert t3["addressee_gender"] == "FEMALE"
+
+    # 4. Izolacja napisów ekranowych (is_sign) - neutralna telemetria
+    t4 = SceneDiscourseGraph.arbitrate_event_telemetry(
+        event=pysubs2.SSAEvent(start=9500, end=11000, text="Kamień milowy", style="Sign"),
+        is_sign=True,
+        series_bible=bible
+    )
+    assert t4["is_sign"] is True
+    assert t4["speaker_gender"] == "NEUTRAL"

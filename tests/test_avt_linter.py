@@ -267,3 +267,56 @@ def test_phase7_merges_triple_tag_blocks_strips_orphan_i0_and_lifts_colliding_si
     )
     assert out == expected_normalized
 
+
+
+# ==============================================================================
+# STANDARD 9.4 TESTS (T4.3, T4.7)
+# ==============================================================================
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "raw_input,expected_output",
+    [
+        # T4.3 (2B.10): Inicjalny wołacz W przed partykułą pytajną czy - przecinek ZACHOWANY
+        ("Tokiyuki, czy nie powinniśmy już ruszać?", "Tokiyuki, czy nie powinniśmy już ruszać?"),
+        ("- Tokiyuki, czy nie powinniśmy już ruszać?\\N- Zaraz ruszamy.", "- Tokiyuki, czy nie powinniśmy już ruszać?\\N- Zaraz ruszamy."),
+        ("Ayako, czy tak miało być?", "Ayako, czy tak miało być?"),
+        # Kontrprzykład: binarna alternatywa rozłączna w środku zdania - przecinek usunięty
+        ("Pójdziesz tam dzisiaj, czy nie?", "Pójdziesz tam dzisiaj czy nie?"),
+        ("Zrobisz to, czy tak po prostu odejdziesz?", "Zrobisz to czy tak po prostu odejdziesz?"),
+    ]
+)
+def test_eqg_preserves_comma_after_initial_vocative_before_interrogative(raw_input, expected_output):
+    """
+    T4.3 (Operacja 2B.10): Weryfikacja ochrony przecinka po inicjalnym wołaczu W przed czy.
+    """
+    subs = pysubs2.SSAFile()
+    ev = pysubs2.SSAEvent(start=1000, end=3000, text=raw_input, style="Default")
+    subs.events.append(ev)
+
+    subs_fixed, _ = EpisodeQualityGate.audit_and_fix_entire_episode(subs)
+    assert subs_fixed.events[0].text == expected_output
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "raw_ass,expected_ass",
+    [
+        # T4.7 (2C.4): Usunięcie nieznanego pseudotagu ze spacjami przy zachowaniu dyrektyw ASS
+        (r"{\an8\BLUE TEXT HEADER}Napis", r"{\an8}Napis"),
+        (r"{\pos(960,100)\WHITE BOLD TEXT\c&H00FFFFFF&}Plansza", r"{\pos(960,100)\c&H00FFFFFF&}Plansza"),
+        # Poprawne tagi z czcionką ze spacją
+        (r"{\fnTimes New Roman\fs48}Koniec", r"{\fnTimes New Roman\fs48}Koniec"),
+        # Pełny paradygmat stylizacyjny
+        (
+            r"{\pos(960,100)\c&H00FFFFFF&\3c&H00000000&\shad2\blur1\fnArial\fs48}Tytuł",
+            r"{\pos(960,100)\c&H00FFFFFF&\3c&H00000000&\shad2\blur1\fnArial\fs48}Tytuł"
+        ),
+    ]
+)
+def test_phase7_strips_invalid_template_tags_and_preserves_valid_ass_directives(raw_ass, expected_ass):
+    """
+    T4.7 (Operacja 2C.4): Weryfikacja czyszczenia szablonowych pseudotagów w blokach {\\...}.
+    """
+    out = EpisodeQualityGate.normalize_ass_tags_and_sign_layout(raw_ass, is_sign=True)
+    assert out == expected_ass

@@ -1,3 +1,5 @@
+from unittest.mock import MagicMock
+from verifier import RefinedLine, RefinedBatchResponse
 import pytest
 from verifier import _guard_phase2_regressions, normalize_ass_tags, DialogueVerifier
 
@@ -240,3 +242,125 @@ def test_sign_orthography_enforces_strict_lexical_correspondence_with_en_text(
     )
     assert res == expected_sign
 
+
+
+# ==============================================================================
+# STANDARD 9.4 TESTS (T4.4, T4.6)
+# ==============================================================================
+
+@pytest.mark.unit
+def test_verify_batch_nullifies_changes_made_when_text_unchanged(monkeypatch):
+    from context_cache import ContextCacheManager
+    monkeypatch.setattr(ContextCacheManager, "get_or_create_cache", lambda *args, **kwargs: "mock_cache")
+    """
+    T4.4 (Operacja 2B.11): Prawidłowy stan changes_made = None,
+    gdy refined_pl po normalizacji białych znaków jest tożsamy z f1_pl.
+    """
+    mock_pool = MagicMock()
+    mock_client = MagicMock()
+    mock_pool.get_client.return_value = mock_client
+    mock_pool.clients = [mock_client]
+    mock_response = MagicMock()
+    mock_response.text = "{}"
+    mock_response.parsed = RefinedBatchResponse(lines=[
+        RefinedLine(
+            id=1,
+            refined_pl="Wiem o wszystkim, co się wczoraj wydarzyło.",
+            changes_made="[Filar IV] Zmiana szyku zdania"
+        ),
+        RefinedLine(
+            id=2,
+            refined_pl="Pójdziemy  tam   jutro rano.",
+            changes_made="[Filar LX] Usunięcie podwójnych spacji"
+        ),
+        RefinedLine(
+            id=3,
+            refined_pl="To absolutnie niedopuszczalne!",
+            changes_made="[Filar IV] Usunięcie dosłownej kalki"
+        ),
+    ])
+    mock_client.models.generate_content.return_value = mock_response
+
+    verifier = DialogueVerifier(client=mock_pool)
+    batch_items = [
+        {"id": 1, "en": "I know about everything that happened yesterday.", "pl": "Wiem o wszystkim, co się wczoraj wydarzyło."},
+        {"id": 2, "en": "We will go there tomorrow morning.", "pl": "Pójdziemy tam jutro rano."},
+        {"id": 3, "en": "That is completely unacceptable.", "pl": "To jest kompletnie nie do przyjęcia."},
+    ]
+
+    result = verifier.verify_batch(batch_items=batch_items)
+    assert len(result) == 3
+    # 1. Identyczny tekst -> changes_made zresetowane do None
+    assert result[0].changes_made is None
+    # 2. Tożsamy semantycznie / po normalizacji spacji -> changes_made zresetowane do None
+    assert result[1].changes_made is None
+    # 3. Rzeczywista zmiana leksykalna -> changes_made zachowane
+    assert result[2].changes_made == "[Filar IV] Usunięcie dosłownej kalki"
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "prev_pl,f1_pl,f2_pl,source_en,kwargs,expected_output",
+    [
+        # Kategoria 17: ellipsis_continuation_syntax - ochrona wielokropka i małej litery
+        (
+            "Jeśli nie zdążymy na czas...",
+            "...stracimy szansę na ucieczkę.",
+            "Stracimy szansę na ucieczkę.",
+            "We will lose our chance to escape.",
+            {},
+            "...stracimy szansę na ucieczkę."
+        ),
+        # Kategoria 18: first_person_modal_and_conditional_loss - ochrona trybu przypuszczającego 1. os.
+        (
+            None,
+            "Wolałbym tego nie robić w tej chwili.",
+            "Lepiej tego nie robić w tej chwili.",
+            "I would rather not do this right now.",
+            {},
+            "Wolałbym tego nie robić w tej chwili."
+        ),
+        # Kategoria 19: past_to_present_tense_shift - ochrona czasu przeszłego
+        (
+            None,
+            "Zrobiłem wszystko, o co prosiłeś.",
+            "Robię wszystko, o co prosisz.",
+            "I did everything you asked for.",
+            {},
+            "Zrobiłem wszystko, o co prosiłeś."
+        ),
+        # Kategoria 20: over_application_italics - usunięcie nadmiarowej kursywy w dialogu z adresatem
+        (
+            None,
+            "Musimy natychmiast ruszać w drogę!",
+            "{\\i1}Musimy natychmiast ruszać w drogę!{\\i0}",
+            "We have to get moving immediately!",
+            {"is_internal_monologue": False, "target_gender": "MALE"},
+            "Musimy natychmiast ruszać w drogę!"
+        ),
+        # Kontrprzykład: poprawna redakcja bez naruszenia invariantów zostaje zaakceptowana
+        (
+            None,
+            "To jest moja osobista sprawa.",
+            "To moja prywatna sprawa.",
+            "That is my personal matter.",
+            {},
+            "To moja prywatna sprawa."
+        ),
+    ]
+)
+def test_guard_phase2_preserves_ellipsis_continuation_conditional_and_past_tense(
+    prev_pl, f1_pl, f2_pl, source_en, kwargs, expected_output
+):
+    """
+    T4.6 (Operacja 2C.2 & 2C.6): Weryfikacja ochrony ciągłości zdań z wielokropkiem,
+    trybu przypuszczającego 1. os., czasu przeszłego oraz nadmiarowej kursywy.
+    """
+    res = DialogueVerifier._guard_phase2_regressions(
+        f1_pl=f1_pl,
+        refined_pl=f2_pl,
+        source_en=source_en,
+        prev_line_pl=prev_pl,
+        **kwargs
+    )
+    assert res == expected_output

@@ -2089,9 +2089,9 @@ def is_sign_entity(name: str) -> bool:
     if not name:
         return False
     cl = extract_clean_speaker_name(name).strip().lower()
-    if cl in ("sign", "signs", "napis", "napisy", "screen", "ekran", "title", "caption", "szyld", "szyldy"):
+    if cl in ("sign", "signs", "napis", "napisy", "screen", "ekran", "title", "caption", "szyld", "szyldy", "txt", "text"):
         return True
-    if any(cl.startswith(p) for p in ("sign", "signs", "napis", "szyld", "screen ", "ekran ", "title ", "caption ")):
+    if any(cl.startswith(p) for p in ("sign", "signs", "napis", "szyld", "screen ", "ekran ", "title ", "caption ", "txt", "text")):
         return True
     return False
 
@@ -2816,6 +2816,20 @@ def generate_polish_name_declension(name: str, gender: str = "UNKNOWN") -> Dict[
                 for case in ["M", "D", "C", "B", "N", "Ms", "W"]
             }
 
+        # B2. Check for 2-word compound with genitive modifier (Operacja 2C.9, T4.12)
+        # e.g. "Władca Ciemności", "Książę Piekieł", "Mistrz Miecza", "Rycerz Zakonu"
+        if len(words) == 2:
+            w1, w2 = words[0], words[1]
+            w2_l = w2.lower()
+            if not is_polish_adjective(w1) and not is_polish_adjective(w2):
+                if w2_l.endswith(("a", "i", "y", "ów", "ow", "eń", "ek", "om", "ycy")):
+                    head_decl = generate_polish_name_declension(w1, gender)
+                    if head_decl and head_decl.get("M"):
+                        return {
+                            case: f"{head_decl.get(case, w1)} {w2}"
+                            for case in ["M", "D", "C", "B", "N", "Ms", "W"]
+                        }
+
         # C. Check for Adjective + Noun (or Noun + Adjective)
         if len(words) == 2:
             w1, w2 = words[0], words[1]
@@ -3319,8 +3333,9 @@ TYPO_NORMALIZATIONS = [
     # Otaku slang adaptation: hypocorism (Filar II / Kanon)
     (r"(^|[^\w]|\\[Nnh])Kuro-?taso\b", r"\g<1>" + "".join([chr(75), "uroe"])),
     (r"(^|[^\w]|\\[Nnh])kuro-?taso\b", r"\g<1>" + "".join([chr(107), "uroe"])),
-    # Binary alternative comma eradication: 'w kapciach, czy bez' -> 'w kapciach czy bez' (Filar XCI)
-    (r"\b([A-Za-ząćęłńóśźż0-9]+),\s+czy\s+(bez|nie|tak)\b", r"\1 czy \2"),
+    # Binary alternative comma eradication: 'w kapciach, czy bez' -> 'w kapciach czy bez' (Filar XCI / Standard 9.4 2B.10 - ochrona wołacza W)
+    (r"\b([A-Za-ząćęłńóśźż0-9\-]+),\s+czy\s+(bez|nie|tak)\b",
+     lambda m: m.group(0) if (m.group(1)[0].isupper() and m.group(1).lower() not in ("tak", "nie", "bez", "to") and (not re.sub(r"\{[^}]*\}", "", m.string[:m.start(1)]).strip() or re.sub(r"\{[^}]*\}", "", m.string[:m.start(1)]).strip() in ("-", "–", "—", '"', "„", "...", "…") or re.search(r"(?:\\N|\\n|[.?!…])\s*[-–—]?\s*$", re.sub(r"\{[^}]*\}", "", m.string[:m.start(1)]).strip()))) else f"{m.group(1)} czy {m.group(2)}"),
     # Trailing cut-off speech attached dash: 'Rin–' -> 'Rin...' (Filar XCI)
     (r"([A-Za-ząćęłńóśźż])–(?=\s*\\N|\s*$|[!\?…])", r"\1..."),
     # Deictic temporal syntax normalizations (Filar CLXVIII)
@@ -4463,6 +4478,7 @@ class SeriesBible:
             self.data["characters"][clean_name] = record
             
             if declension_map:
+                # 2C.9: Bezwarunkowy transfer pełnego 7-przypadkowego paradygmatu M..W
                 self.data.setdefault("declensions", {})[clean_name] = dict(declension_map)
             else:
                 existing_decl = self.data.setdefault("declensions", {}).get(clean_name)
@@ -5934,6 +5950,13 @@ class SeriesBible:
                     c_val["has_verified_gender"] = True
                     c_val["confidence"] = max(float(c_val.get("confidence", 0.0)), 0.95)
                     c_val["priority"] = "P0"
+                    # Sanitacja description pod kątem zgodności z gender (Operacja 2C.5)
+                    if curr_g == "FEMALE" and "description" in c_val:
+                        desc = re.sub(r"\bMĘŻCZYZNA\b", "KOBIETA", str(c_val["description"]), flags=re.IGNORECASE)
+                        c_val["description"] = desc
+                    elif curr_g == "MALE" and "description" in c_val:
+                        desc = re.sub(r"\bKOBIETA\b", "MĘŻCZYZNA", str(c_val["description"]), flags=re.IGNORECASE)
+                        c_val["description"] = desc
                 else:
                     c_val.setdefault("gender", "UNKNOWN")
                     c_val.setdefault("grammatical_gender", "UNKNOWN")
@@ -5943,6 +5966,10 @@ class SeriesBible:
 
                 # 2. Oczyszczenie pola description z wszelkich instrukcji i dyrektyw gramatycznych
                 clean_desc = desc
+                if curr_g == "FEMALE":
+                    clean_desc = re.sub(r"\bMĘŻCZYZNA\b", "KOBIETA", clean_desc, flags=re.IGNORECASE)
+                elif curr_g == "MALE":
+                    clean_desc = re.sub(r"\bKOBIETA\b", "MĘŻCZYZNA", clean_desc, flags=re.IGNORECASE)
                 clean_desc = re.sub(r"\[[^\]]*\bAdresat(?:ka|ce|ki|ek|om|ami|ach|em|owi)?\b[^\]]*\]", "", clean_desc, flags=re.IGNORECASE)
                 clean_desc = re.sub(r"\[(?!GRUPA\s+(?:KOBIET|MĘŻCZYZN))[^\]]*(?:wymóg form|nakaz form|eliminacja form|blokada form|rejestr|zwrot do adresata|tytułuj|pan/pani|filar clxv|ochrona przeskoków|dyskontinuitet|relacja hierarchiczna|para dwóch kobiet|t-v invariance)[^\]]*\]", "", clean_desc, flags=re.IGNORECASE)
                 clean_desc = re.sub(r"\([^\)]*(?:wymóg form|nakaz form|eliminacja form|blokada form|rejestr|zwrot do adresata|w 2\.\s*os\.\s*lp\.)[^\)]*\)", "", clean_desc, flags=re.IGNORECASE)
@@ -6057,6 +6084,124 @@ class SeriesBible:
                                                 rel_desc["description"] = new_desc
                                             else:
                                                 self.data[rel_dict_name][rel_k] = new_desc
+
+            # 4. Spójność relacji T/V i reżimu formalnego (Operacja 2C.5, R3.1)
+            self._validate_relation_entry_consistency()
+
+    def populate_secondary_actor_tags(self, raw_actor_tags: List[str]) -> None:
+        """
+        Zasila SeriesBible encjami drugoplanowymi (P1) i epizodycznymi (P2) z Kroku 3 (Standard 9.4, 2C.7, R3.1):
+        - Wyodrębnia czyste etykiety aktora (normalize_actor_tag), odrzuca etykiety nieosobowe i separatory.
+        - Dla encji nieobecnych w SeriesBible tworzy wpisy:
+          * P1 dla postaci z rozpoznaną płcią (MALE/FEMALE)
+          * P2 dla postaci bez jednoznacznej płci (gender: UNKNOWN)
+        """
+        with self._lock:
+            if not hasattr(self, "data") or not isinstance(self.data, dict):
+                return
+            chars = self.data.setdefault("characters", {})
+            for raw_tag in raw_actor_tags:
+                if not raw_tag or "/" in str(raw_tag) or "\\" in str(raw_tag):
+                    continue
+                clean_tag, explicit_g = normalize_actor_tag(str(raw_tag))
+                clean_tag = clean_tag.strip()
+                if not clean_tag or len(clean_tag) < 2 or is_sign_entity(clean_tag) or clean_tag.lower() in ("txt", "text", "sign", "title", "caption", "szyld", "napis"):
+                    continue
+                if clean_tag in chars:
+                    continue
+
+                if explicit_g in ("MALE", "FEMALE"):
+                    chars[clean_tag] = {
+                        "name": clean_tag,
+                        "gender": explicit_g,
+                        "grammatical_gender": "MASCULINE" if explicit_g == "MALE" else "FEMININE",
+                        "confidence": 0.70,
+                        "priority": "P1",
+                        "has_verified_gender": False,
+                        "aliases": [clean_tag],
+                        "description": "Postać drugoplanowa",
+                        "entity_category": "ANTHROPONYM"
+                    }
+                else:
+                    chars[clean_tag] = {
+                        "name": clean_tag,
+                        "gender": "UNKNOWN",
+                        "grammatical_gender": "UNKNOWN",
+                        "confidence": 0.50,
+                        "priority": "P2",
+                        "has_verified_gender": False,
+                        "aliases": [clean_tag],
+                        "description": "Postać epizodyczna / tło",
+                        "entity_category": "ANTHROPONYM"
+                    }
+
+    def _validate_relation_entry_consistency(self) -> None:
+        """
+        Weryfikuje i sanityzuje spójność rejestru relacji skierowanych (X -> Y) pod kątem asymetrii T/V (Standard 9.4, 2C.5, R3.1):
+        - Weryfikacja zwrotów poufałych i zażyłości relacji w rejestrze dyskursu, usunięcie fałszywego deskryptora hierarchicznego i oznaczenie jako 'reżim: POUFNY'.
+        - Jeśli relacja jest oficjalna/formalna, oznacza jako 'reżim: FORMALNY'.
+        - Zapewnia spójność rodzajową znacznika [KOBIETA/MĘŻCZYZNA (Adresat)] z rekordem P0 adresata.
+        """
+        if not hasattr(self, "data") or not isinstance(self.data, dict):
+            return
+
+        for rel_dict_name in ("relations", "relationships"):
+            if rel_dict_name not in self.data or not isinstance(self.data[rel_dict_name], dict):
+                continue
+            for rel_k, rel_desc in list(self.data[rel_dict_name].items()):
+                if "->" not in rel_k:
+                    continue
+                parts = rel_k.split("->")
+                if len(parts) != 2:
+                    continue
+                source_char = parts[0].strip()
+                target_char = parts[1].strip()
+
+                desc_str = rel_desc.get("description", "") if isinstance(rel_desc, dict) else str(rel_desc)
+                d_lower = desc_str.lower()
+
+                is_informal = any(k in d_lower for k in ["per ty", "per-ty", "poufał", "koleżeńsk", "przyjaciel", "blisk", "nieformaln", "swobodn"])
+                is_hierarchical = "relacja hierarchiczna" in d_lower or "hierarchiczn" in d_lower
+
+                new_desc = desc_str
+                if is_informal and is_hierarchical:
+                    new_desc = re.sub(r"\[?\bRELACJA HIERARCHICZNA\b\]?", "", new_desc, flags=re.IGNORECASE).strip()
+                    if "reżim:" not in new_desc.lower():
+                        new_desc = f"{new_desc} [reżim: POUFNY]".strip()
+                    else:
+                        new_desc = re.sub(r"reżim:\s*\w+", "reżim: POUFNY", new_desc, flags=re.IGNORECASE)
+                elif is_informal:
+                    if "reżim:" not in new_desc.lower():
+                        new_desc = f"{new_desc} [reżim: POUFNY]".strip()
+                    else:
+                        new_desc = re.sub(r"reżim:\s*\w+", "reżim: POUFNY", new_desc, flags=re.IGNORECASE)
+                elif any(k in d_lower for k in ["formaln", "oficjaln", "pan/pani", "dystans"]):
+                    if "reżim:" not in new_desc.lower():
+                        new_desc = f"{new_desc} [reżim: FORMALNY]".strip()
+
+                ch_entry = self.get_character(target_char)
+                if ch_entry and isinstance(ch_entry, dict):
+                    p0_g = str(ch_entry.get("gender", "")).upper()
+                    if p0_g == "FEMALE":
+                        new_desc = re.sub(
+                            r"\[MĘŻCZYZNA\s+\(Adresat[^\]]*\]",
+                            "[KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+                            new_desc,
+                            flags=re.IGNORECASE
+                        )
+                    elif p0_g == "MALE":
+                        new_desc = re.sub(
+                            r"\[KOBIETA\s+\(Adresat[^\]]*\]",
+                            "[MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+                            new_desc,
+                            flags=re.IGNORECASE
+                        )
+
+                if new_desc != desc_str:
+                    if isinstance(rel_desc, dict):
+                        rel_desc["description"] = new_desc
+                    else:
+                        self.data[rel_dict_name][rel_k] = new_desc
 
     def _rebuild_actor_aliases_index(self):
         """Buduje globalny indeks aliasów O(1) w SeriesBible z priorytetyzacją P0 i normalizacją fonetyczną."""

@@ -2373,7 +2373,7 @@ AKTYWNY KANON POZYTYWNEGO RZEMIOSŁA AVT (BARAŃCZAK, BELCZYK, SZARKOWSKA):
 """
 
 STANDARD_9_CORE_RULES_PROMPT = r"""
-STANDARD 9.3 — AUTORYTET TRANSLACYJNY I NIEZMIENNIKI DZIEDZINY POZYTYWNEJ (R1.1–R1.8):
+STANDARD 9.4 — AUTORYTET TRANSLACYJNY I NIEZMIENNIKI DZIEDZINY POZYTYWNEJ (R1.1–R1.11):
 1. R1.1 (P0) — FORMY NIEMĘSKOOSOBOWE (NON_VIRILE) W ZBIOROWOŚCIACH ŻEŃSKICH: Dla scen, w których skład postaci obejmuje wyłącznie postacie o zweryfikowanej płci żeńskiej (p0_gender: FEMALE), prawidłowy stan w 1. i 2. osobie liczby mnogiej to formy niemęskoosobowe (-łyśmy, -łyście, one, wszystkie, razem) oraz żeńskie formy ról.
 2. R1.2 (P0) — ZACHOWANIE OSOBY I LICZBY GRAMATYCZNEJ ORZECZENIA: Prawidłowy stan orzeczenia zachowuje osobę i liczbę gramatyczną ustaloną w phase1_text w pełnej zgodzie z zaimkiem podmiotu w en_text (podmiot 1. os. lp. w en_text zachowuje orzeczenie w 1. os. lp. niezależnie od formy dopełnienia).
 3. R1.3 (P0) — ZACHOWANIE PREDYKATÓW EPISTEMICZNYCH I ZDAŃ IDENTYFIKUJĄCYCH: Prawidłowy stan tekstu zachowuje nadrzędne czasowniki epistemiczne, zdania podrzędne dopełnieniowe identyfikujące oraz ciągłość znaczników {\i1}...{\i0} w monologu wewnętrznym.
@@ -2382,6 +2382,9 @@ STANDARD 9.3 — AUTORYTET TRANSLACYJNY I NIEZMIENNIKI DZIEDZINY POZYTYWNEJ (R1.
 6. R1.6 (P0) — PIERWSZEŃSTWO SEMANTYCZNE en_text I JAWNEGO AKTORA [Events]: Tekst en_text oraz jawny aktor z kolumny Name w sekcji [Events] mają pierwszeństwo semantyczne wobec pomocniczej transkrypcji ASR.
 7. R1.7 (P0) — ZGODNOŚĆ RODZAJU 1. OSOBY CZASU PRZESZŁEGO Z REKORDEM P0: Końcówki 1. osoby czasu przeszłego (-łem / -łam) wykazują stuprocentową zgodność ze zweryfikowaną płcią p0_gender mówcy w SeriesBible / EpisodeProfiler.
 8. R1.8 (P1) — PEŁNA DEKLINACJA DWUCZŁONOWYCH ANTROPONIMÓW: Dwuczłonowe antroponimy podlegają pełnej odmianie obu członów w wołaczu (W) i przypadkach zależnych (D..Ms) zgodnie ze zdeklinowanym paradygmatem z EpisodeProfiler.
+9. R1.9 (P0) — STRUKTURALNY PRYMAT REKORDU P0 W TELEMETRII I PRE-PASSIE SCENICZNYM: Wszelka telemetria mówcy i adresata oraz statystyki obsady sceny bezwarunkowo odzwierciedlają płeć z rekordu P0 (SeriesBible), unieważniając estymację akustyczną F0 oraz domyślne założenia sceniczne dla postaci P0/P1.
+10. R1.10 (P0) — ZACHOWANIE CIĄGŁOŚCI ZDANIA ROZBITEGO I MODALNOŚCI: Faza 2 nie może niszczyć syntaktycznej ciągłości zdań rozbitych wielokropkiem (zamieniając inicjalny wielokropek na wielką literę), ani usuwać trybu przypuszczającego 1. os. lp. (-bym) lub cofać czasu przeszłego do teraźniejszego.
+11. R1.11 (P2) — CZYSTOŚĆ UZASADNIEŃ FAZY 2: Pole changes_made musi przyjmować wartość null (None), jeśli tekst merytoryczny nie uległ zmianie (Szkic == Szlif).
 """
 
 def get_translation_system_prompt(keep_honorifics: bool = True, lean: bool = False) -> str:

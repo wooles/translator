@@ -993,8 +993,10 @@ class AVTLinter:
         # Otaku slang & honorifics adaptation (Filar XXVII)
         (r"\b([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+)-(?:senpai|taso|tan)\b", r"\1", "Filar XXVII - Adaptacja Sufiksów Honoryfikatywnych"),
 
-        # Binary alternative comma eradication (Filar LX)
-        (r"\b([A-Za-ząćęłńóśźż0-9]+),\s+czy\s+(bez|nie|tak)\b", r"\1 czy \2", "Filar LX - Eliminacja Przecinka przed Czy w Alternatywie Rozłącznej"),
+        # Binary alternative comma eradication (Filar LX, Standard 9.4 2B.10 - ochrona wołacza inicjalnego W)
+        (r"\b([A-Za-ząćęłńóśźż0-9\-]+),\s+czy\s+(bez|nie|tak)\b",
+         lambda m: m.group(0) if (m.group(1)[0].isupper() and m.group(1).lower() not in ("tak", "nie", "bez", "to") and (not re.sub(r"\{[^}]*\}", "", m.string[:m.start(1)]).strip() or re.sub(r"\{[^}]*\}", "", m.string[:m.start(1)]).strip() in ("-", "–", "—", '"', "„", "...", "…") or re.search(r"(?:\\N|\\n|[.?!…])\s*[-–—]?\s*$", re.sub(r"\{[^}]*\}", "", m.string[:m.start(1)]).strip()))) else f"{m.group(1)} czy {m.group(2)}",
+         "Filar LX - Eliminacja Przecinka przed Czy w Alternatywie Rozłącznej"),
 
         # Trailing cut-off speech attached dash (Filar LX)
         (r"([A-Za-ząćęłńóśźż])[–—\-](?=\s*\\N|\s*$|[!\?…])", r"\1...", "Filar LX - Formatowanie Przerwania Wypowiedzi"),
@@ -6513,6 +6515,12 @@ class EpisodeQualityGate:
     (eliminating batch boundary blindspots) right before saving to disk.
     Guarantees zero-cost (0.00 PLN) elimination of trivial human-visible errors.
     """
+    _last_all_fixes: List[str] = []
+
+    @classmethod
+    def get_all_fixes(cls) -> List[str]:
+        """Zwraca pełną listę poprawek zarejestrowanych podczas ostatniego audytu odcinka (Standard 9.4, 2C.8)."""
+        return list(cls._last_all_fixes)
 
     @classmethod
     def should_apply_top_alignment_on_collision(
@@ -6610,6 +6618,41 @@ class EpisodeQualityGate:
         # 1. Naprawa zniekształconego otwarcia tagu ASS {(\an8} -> {\an8}
         res = re.sub(r"\{[\(]*\(+[\/\\]*", r"{\\", res)
         res = re.sub(r"\{[\(]+(?=[a-zA-Z])", r"{\\", res)
+
+        # 1b. Sanitacja nieznanych pseudotagów szablonowych ze spacjami w blokach {\...} (Operacja 2C.4, R3.4)
+        def _clean_ass_block(match):
+            block_content = match.group(1)
+            raw_tokens = [t for t in block_content.split("\\") if t]
+            valid_tokens = []
+            valid_cmds = (
+                "an", "pos", "move", "c", "1c", "2c", "3c", "4c", "bord", "xbord", "ybord",
+                "shad", "xshad", "yshad", "blur", "be", "fn", "fs", "fscx", "fscy", "fsp",
+                "frz", "frx", "fry", "fax", "fay", "i", "b", "u", "s", "fad", "fade",
+                "clip", "iclip", "t", "r", "q", "p", "k", "kf", "ko", "kt"
+            )
+            for rt in raw_tokens:
+                rt_clean = rt.strip()
+                if rt_clean.lower().startswith("fn"):
+                    valid_tokens.append("\\" + rt_clean)
+                    continue
+                m_cmd = re.match(r"^([a-zA-Z0-9]+)", rt_clean)
+                if m_cmd:
+                    cmd_name = m_cmd.group(1).lower()
+                    if " " in rt_clean:
+                        # Skip invalid template pseudotags with spaces (e.g. BLUE TEXT HEADER)
+                        continue
+                    else:
+                        if any(cmd_name == vc or cmd_name.startswith(vc) for vc in valid_cmds):
+                            valid_tokens.append("\\" + rt_clean)
+                        elif cmd_name.isupper() and len(cmd_name) > 4:
+                            continue
+                        else:
+                            valid_tokens.append("\\" + rt_clean)
+            if not valid_tokens:
+                return ""
+            return "{" + "".join(valid_tokens) + "}"
+
+        res = re.sub(r"\{([^{}]+)\}", _clean_ass_block, res)
 
         # 2. Deduplikacja nadmiarowych znaczników {\i0} oraz czyszczenie osieroconych {\i0}
         res = re.sub(r"(?:\{\\i0\}\s*){2,}", r"{\\i0}", res)
@@ -11226,6 +11269,7 @@ class EpisodeQualityGate:
                 series_bible=series_bible
             )
 
+        cls._last_all_fixes = list(fixes)
         return subs, fixes
 
     @classmethod
@@ -11333,10 +11377,24 @@ class EpisodeQualityGate:
             ev.text = re.sub(r"~", "", ev.text)
             if ev.text != old_t:
                 fixes.append(f"[Episode Quality Gate - Filar LX Typografia] {line_lbl}: usunięto japońską tyldę i znormalizowano wykrzykniki")
-        # Remove comma before "czy" in direct binary alternatives (Filar LX)
-        if re.search(r"\b([A-Za-ząćęłńóśźż0-9]+),\s+czy\s+(bez|nie|tak)\b", ev.text):
-            ev.text = re.sub(r"\b([A-Za-ząćęłńóśźż0-9]+),\s+czy\s+(bez|nie|tak)\b", r"\1 czy \2", ev.text)
-            fixes.append(f"[Episode Quality Gate - Filar LX Interpunkcja] {line_lbl}: usunięto zbędny przecinek przed 'czy' w alternatywie rozłącznej")
+        # Remove comma before "czy" in direct binary alternatives (Filar LX, Standard 9.4 2B.10 - ochrona wołacza W)
+        def _strip_alt_comma(m):
+            prefix_clean = re.sub(r"\{[^}]*\}", "", m.string[:m.start(1)]).strip()
+            word = m.group(1)
+            is_start_of_sentence = (
+                not prefix_clean
+                or prefix_clean in ("-", "–", "—", '"', "„", "...", "…")
+                or bool(re.search(r"(?:\\N|\\n|[.?!…])\s*[-–—]?\s*$", prefix_clean))
+            )
+            if word and word[0].isupper() and word.lower() not in ("tak", "nie", "bez", "to") and is_start_of_sentence:
+                return m.group(0)
+            return f"{m.group(1)} czy {m.group(2)}"
+
+        if re.search(r"\b([A-Za-ząćęłńóśźż0-9\-]+),\s+czy\s+(bez|nie|tak)\b", ev.text):
+            old_t = ev.text
+            ev.text = re.sub(r"\b([A-Za-ząćęłńóśźż0-9\-]+),\s+czy\s+(bez|nie|tak)\b", _strip_alt_comma, ev.text)
+            if ev.text != old_t:
+                fixes.append(f"[Episode Quality Gate - Filar LX Interpunkcja] {line_lbl}: usunięto zbędny przecinek przed 'czy' w alternatywie rozłącznej")
         # Replace trailing cut-off speech glued en-dash (e.g. "Rin–") with ellipsis "Rin..." (Filar LX)
         if re.search(r"([A-Za-ząćęłńóśźż])–(?=\s*\\N|\s*$|[!\?…])", ev.text):
             ev.text = re.sub(r"([A-Za-ząćęłńóśźż])–(?=\s*\\N|\s*$|[!\?…])", r"\1...", ev.text)

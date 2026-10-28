@@ -359,6 +359,46 @@ def _guard_phase2_regressions(
         if re_pl_matrix.search(f1_pl) and not re_pl_matrix.search(refined_pl):
             return f1_pl
 
+    # 17. KATEGORIA 17 (Standard 9.4, 2C.2, R3.3): Ochrona ciągłości zdań rozbitych wielokropkiem (ellipsis_continuation_syntax)
+    if prev_line_pl and str(prev_line_pl).strip().endswith("..."):
+        clean_f1_start = re.sub(r"^\{[^}]*\}", "", f1_pl.strip())
+        clean_ref_start = re.sub(r"^\{[^}]*\}", "", refined_pl.strip())
+        if re.match(r"^\.\.\.\s*[a-ząćęłńóśźż]", clean_f1_start):
+            if not clean_ref_start.startswith("...") and clean_ref_start and clean_ref_start[0].isupper():
+                has_ital = (r"{\i1}" in refined_pl and r"{\i0}" in refined_pl)
+                if has_ital and not f1_pl.startswith(r"{\i1}"):
+                    return r"{\i1}" + f1_pl + (r"{\i0}" if not f1_pl.endswith(r"{\i0}") else "")
+                return f1_pl
+
+    # 18. KATEGORIA 18 (Standard 9.4, 2C.2, R3.3): Ochrona trybu przypuszczającego i modalności 1. os. lp. (first_person_modal_and_conditional_loss)
+    re_1st_cond = re.compile(r"\b[a-ząćęłńóśźż]+(?:łbym|łabym|bym)\b", re.IGNORECASE)
+    re_1st_modal = re.compile(r"\b(?:wolałbym|wolałabym|chciałbym|chciałabym|mógłbym|mogłabym|musiałbym|musiałabym|powinienem|powinnam)\b", re.IGNORECASE)
+    has_f1_cond = bool(re_1st_cond.search(f1_pl) or re_1st_modal.search(f1_pl))
+    has_ref_cond = bool(re_1st_cond.search(refined_pl) or re_1st_modal.search(refined_pl))
+    if has_f1_cond and not has_ref_cond:
+        return f1_pl
+
+    # 19. KATEGORIA 19 (Standard 9.4, 2C.2, R3.3): Ochrona czasu przeszłego (past_to_present_tense_shift)
+    re_en_past = re.compile(r"\b(?:was|were|had|did|went|came|saw|felt|said|asked|took|made|got|knew|thought|could|would|wanted|[a-z]+ed)\b", re.IGNORECASE)
+    re_pl_past = re.compile(r"\b[a-ząćęłńóśźż]+(?:łem|łam|łeś|łaś|ł|ła|ło|liśmy|łyśmy|liście|łyście|li|ły)\b", re.IGNORECASE)
+    if source_en and re_en_past.search(source_en) and re_pl_past.search(f1_pl):
+        if not re_pl_past.search(refined_pl):
+            has_ital = (r"{\i1}" in refined_pl and r"{\i0}" in refined_pl)
+            if has_ital and not f1_pl.startswith(r"{\i1}"):
+                return r"{\i1}" + f1_pl + (r"{\i0}" if not f1_pl.endswith(r"{\i0}") else "")
+            return f1_pl
+
+    # 20. KATEGORIA 20 (Standard 9.4, 2C.6, R3.3): Ochrona przed nadmiarową kursywą w dialogu zewnętrznym (over_application_italics)
+    is_monologue = kwargs.get("is_internal_monologue", False)
+    target_addr = kwargs.get("target_gender") or kwargs.get("addressee") or target_p0_gender
+    has_target = bool(target_addr and str(target_addr).upper() not in ("NONE", "UNKNOWN", ""))
+    if not is_monologue and has_target:
+        clean_ref = refined_pl.strip()
+        if clean_ref.startswith(r"{\i1}") and clean_ref.endswith(r"{\i0}") and not f1_pl.strip().startswith(r"{\i1}"):
+            stripped = clean_ref[len(r"{\i1}"):-len(r"{\i0}")].strip()
+            if r"{\i" not in stripped:
+                refined_pl = stripped
+
     return refined_pl
 
 import os
@@ -923,6 +963,7 @@ class DialogueVerifier:
                                 canonical_glossary=gloss
                             )
                         prev_en = orig_it.get("prev_line_en") or ""
+                        is_monologue_it = bool(orig_it.get("is_thought") or orig_it.get("is_internal_monologue"))
                         guarded = _guard_phase2_regressions(
                             f1_pl=f1_text,
                             refined_pl=r.refined_pl,
@@ -932,11 +973,25 @@ class DialogueVerifier:
                             addressee_p0_record=addr_rec,
                             prev_line_f1=prev_txt,
                             prev_line_pl=prev_txt,
-                            prev_line_en=prev_en
+                            prev_line_en=prev_en,
+                            is_internal_monologue=is_monologue_it
                         )
                         if guarded != r.refined_pl:
                             r.refined_pl = guarded
                             r.changes_made = (r.changes_made or "") + " [Zabezpieczono przed regresją Fazy 2]"
+
+                        # Operacja 2B.11: eliminacja pozornych uzasadnień changes_made przy braku zmiany tekstu
+                        def _norm_cmp(t: str) -> str:
+                            t_clean = re.sub(r"\{[^}]*\}", "", str(t or ""))
+                            t_clean = re.sub(r"\\[nN]", " ", t_clean)
+                            return " ".join(t_clean.split()).strip()
+
+                        has_ital_f1 = (r"{\i1}" in f1_text)
+                        has_ital_ref = (r"{\i1}" in r.refined_pl)
+                        ital_changed = (has_ital_f1 != has_ital_ref)
+
+                        if _norm_cmp(f1_text) == _norm_cmp(r.refined_pl) and not ital_changed:
+                            r.changes_made = None
 
                 with DialogueVerifier._STATUS_LOCK:
                     if DialogueVerifier._STATUS_ACTIVE:

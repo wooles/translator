@@ -350,14 +350,16 @@ class EpisodeProfiler:
         is_sign: bool = False,
         style: Optional[str] = None,
         duplicate_time_distance_sec: Optional[float] = None,
+        consecutive_streak: int = 1,
         **kwargs
     ) -> str:
         """
-        Sanityzuje pomocniczą transkrypcję ASR dla zdarzenia dialogowego (Standard 9.2/9.3, R1.1, R3.5):
-        - Dla szyldów, tytułów odcinka (is_sign: true lub style w ("sign", "title", "ep title", "napis", "caption"))
+        Sanityzuje pomocniczą transkrypcję ASR dla zdarzenia dialogowego (Standard 9.4, 2B.8.a, 2C.10, R1.1, R3.5, R3.6):
+        - Dla szyldów, tytułów odcinka (is_sign: true lub style w ("sign", "title", "ep title", "napis", "caption", "szyld"))
           zwraca pusty string "", zapobiegając zanieczyszczeniu przekładu obcym audio w tle.
-        - Jeśli identyczny ciąg ASR wystąpił w zdarzeniu oddalonym o > 1.5 s, zeruje duplikat ("").
-        - Dla linii dialogowych zwraca oczyszczony tekst ASR powiązany ściśle z oknem czasowym [start_ms, end_ms].
+        - Jeśli identyczny ciąg ASR wystąpił w zdarzeniu oddalonym o > 1.5 s lub w serii > 2 kolejnych linii (consecutive_streak > 2), zeruje duplikat ("").
+        - Filtruje halucynacje Whisper: łacińskie tokeny ASCII w japońskim audio, ciągi powtórzeniowe > 2 oraz izolowane znaki/interpunkcję.
+        - Zachowuje en_text jako nadrzędny autorytet semantyczny.
         """
         raw_asr = kwargs.get("asr_text", raw_asr)
         if is_sign or not raw_asr:
@@ -368,7 +370,97 @@ class EpisodeProfiler:
                 return ""
         if duplicate_time_distance_sec is not None and float(duplicate_time_distance_sec) > 1.5:
             return ""
-        return str(raw_asr).strip()
+        if consecutive_streak > 2:
+            return ""
+
+        text = str(raw_asr).strip()
+        if not text:
+            return ""
+
+        # Isolated punctuation or single characters (. / k / n)
+        if re.fullmatch(r"[\W_]*[a-zA-Z0-9]?[\W_]*", text) and not re.search(r"[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]", text):
+            return ""
+
+        # Character repetitions > 2 (e.g. sss, aaasss)
+        if re.search(r"([a-zA-Z])\1{2,}", text):
+            cleaned = re.sub(r"([a-zA-Z])\1{2,}", "", text).strip()
+            if not cleaned or not re.search(r"[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]", cleaned):
+                return ""
+            text = cleaned
+
+        has_cjk = bool(re.search(r"[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]", text))
+        if has_cjk:
+            # Strip latin tokens outside brackets [a-zA-Z]{2,}
+            parts = re.split(r"(\[[^\]]*\]|\([^\)]*\))", text)
+            for i in range(0, len(parts), 2):
+                parts[i] = re.sub(r"\b[a-zA-Z]{2,}\b", "", parts[i])
+            text = "".join(parts).strip()
+            text = re.sub(r"\s+", " ", text).strip()
+            if not re.search(r"[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]", text):
+                return ""
+            return text
+        else:
+            # Filter known Whisper hallucination spam (subtitles, amara, watching, url, etc.)
+            whisper_spam_pat = re.compile(
+                r"\b(?:subtitles?|amara(?:\.org)?|translat\w+|copyright|watch\w*|subscri\w*|youtube|licensed|all rights reserved)\b",
+                re.IGNORECASE
+            )
+            if whisper_spam_pat.search(text):
+                return ""
+            return text
+
+    @staticmethod
+    def reconcile_prepass_with_p0(
+        dramatic_sequences: List[Any],
+        series_bible: Optional[Any] = None
+    ) -> List[Any]:
+        """
+        Uzgadnia statystyki obsady sekwencji dramaturgicznych pre-passu z rekordami P0 z SeriesBible (Operacja 2B.9, R3.2):
+        - Dla każdej postaci obecnej w danej sekwencji (characters_present) pobiera p0_gender z SeriesBible.
+        - Nadrzędny priorytet: p0_gender z SeriesBible (has_verified_gender: true lub priority P0/P1) ma pierwszeństwo
+          wobec estymacji akustycznej F0.
+        - Estymacja F0 służy wyłącznie jako fallback dla postaci spoza P0 (gender UNKNOWN / brak w SeriesBible).
+        - Wymusza spójne flagi female_only_scene / male_only_scene.
+        """
+        if not dramatic_sequences or not series_bible:
+            return dramatic_sequences or []
+
+        reconciled = []
+        for seq in dramatic_sequences:
+            is_model = hasattr(seq, "model_copy") or hasattr(seq, "copy")
+            chars_present = getattr(seq, "characters_present", None)
+            if chars_present is None and isinstance(seq, dict):
+                chars_present = seq.get("characters_present", [])
+            chars_present = chars_present or []
+
+            verified_genders = []
+            for ch_name in chars_present:
+                ch_entry = None
+                if hasattr(series_bible, "get_character"):
+                    ch_entry = series_bible.get_character(ch_name)
+                elif hasattr(series_bible, "characters") and isinstance(series_bible.characters, dict):
+                    ch_entry = series_bible.characters.get(ch_name)
+
+                if ch_entry:
+                    g = getattr(ch_entry, "gender", None) or (ch_entry.get("gender") if isinstance(ch_entry, dict) else None)
+                    prio = getattr(ch_entry, "priority", None) or (ch_entry.get("priority") if isinstance(ch_entry, dict) else None)
+                    has_v = getattr(ch_entry, "has_verified_gender", False) if hasattr(ch_entry, "has_verified_gender") else (ch_entry.get("has_verified_gender", False) if isinstance(ch_entry, dict) else False)
+                    if g in ("MALE", "FEMALE") and (has_v or prio in ("P0", "P1")):
+                        verified_genders.append(g)
+
+            if verified_genders:
+                fem_count = sum(1 for g in verified_genders if g == "FEMALE")
+                male_count = sum(1 for g in verified_genders if g == "MALE")
+                new_fem_only = (fem_count > 0 and male_count == 0)
+                new_male_only = (male_count > 0 and fem_count == 0)
+                if is_model:
+                    setattr(seq, "female_only_scene", new_fem_only)
+                    setattr(seq, "male_only_scene", new_male_only)
+                elif isinstance(seq, dict):
+                    seq["female_only_scene"] = new_fem_only
+                    seq["male_only_scene"] = new_male_only
+            reconciled.append(seq)
+        return reconciled
 
     def __init__(self, client: Any, model: str = "gemini-3.5-flash-lite"):
         self.client = client
