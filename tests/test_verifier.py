@@ -516,3 +516,37 @@ def test_verify_batch_normalizes_lowercase_newlines_to_ass_uppercase_before_comp
     assert norm_pl == expected_refined_pl
     assert "\n" not in norm_pl
     assert norm_reason is expected_changes_made
+
+
+# ==============================================================================
+# STANDARD 9.7 TESTS (T7.3)
+# ==============================================================================
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "f1_pl,f2_pl_with_linebreak,raw_reason,expected_changes_made",
+    [
+        (
+            "Nie wiem czy to prawda",
+            "Nie wiem\\Nczy to prawda",
+            None,
+            None,
+        ),
+        (
+            "{\\i1}Nie wiem czy to prawda{\\i0}",
+            "{\\i1}Nie wiem\\Nczy to prawda{\\i0}",
+            None,
+            None,
+        ),
+    ],
+)
+def test_normalize_phase2_treats_space_to_ass_newline_wrapping_as_lexical_identity(
+    f1_pl, f2_pl_with_linebreak, raw_reason, expected_changes_made
+):
+    from verifier import DialogueVerifier
+
+    norm_pl, norm_reason = DialogueVerifier.normalize_phase2_line_and_reason(
+        f1_pl=f1_pl, refined_pl=f2_pl_with_linebreak, changes_made=raw_reason
+    )
+    assert "\\N" in norm_pl
+    assert norm_reason is expected_changes_made
+    assert DialogueVerifier.is_lexically_identical_ignoring_linebreak(f1_pl, norm_pl) is True

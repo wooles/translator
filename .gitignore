@@ -22,6 +22,7 @@ temp/
 logs/
 *.tmp
 *.log
+*.jsonl
 frames/
 test_output/
 *.pl.srt

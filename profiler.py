@@ -377,6 +377,19 @@ class EpisodeProfiler:
         if not text:
             return ""
 
+        # Standard 9.7 (Operacja 2C.4): Wycinanie artefaktowych klastrów znaków zapytania i cyfr (.? ??000 / ???000)
+        has_cjk_init = bool(re.search(r"[぀-ヿ㐀-䶿一-鿿]", text))
+        if has_cjk_init:
+            text = re.sub(r"[.,!?\s]*\?+[\s?0-9.,!]*", "", text)
+            text = re.sub(r"0{2,}", "", text)
+            text = re.sub(r"\s+", " ", text).strip()
+        else:
+            text = re.sub(r"[.,!?\s]*\?+[\s?0-9.,!]*", " ", text)
+            text = re.sub(r"0{2,}", "", text)
+            text = re.sub(r"\s+", " ", text).strip()
+        if not text:
+            return ""
+
         # Isolated punctuation or single characters (. / k / n)
         if re.fullmatch(r"[\W_]*[a-zA-Z0-9]?[\W_]*", text) and not re.search(r"[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]", text):
             return ""
@@ -403,9 +416,12 @@ class EpisodeProfiler:
         has_cjk = bool(re.search(r"[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]", text))
         if has_cjk:
             # Standard 9.6 (Operacja 2C.3): Usuwanie sklejonych i luźnych tokenów ASCII [A-Za-z]+ oraz osieroconych partykuł nagłosowych
+            # Standard 9.7 (Operacja 2C.4): Wycinanie artefaktowych klastrów znaków zapytania i cyfr (.? ??000)
             parts = re.split(r"(\[[^\]]*\]|\([^\)]*\))", text)
             for i in range(0, len(parts), 2):
                 p = parts[i]
+                p = re.sub(r"[.,!?\s]*\?+[\s?0-9.,!]*", "", p)
+                p = re.sub(r"0{2,}", "", p)
                 # Krok 1: Usuń prefiks ASCII wraz z bezpośrednio przylegającą osieroconą partykułą enklityczną
                 p = re.sub(
                     r"^\s*[A-Za-z0-9_,\s.;:!?-]+[とのがはをにへで](?=[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF])",
@@ -426,6 +442,11 @@ class EpisodeProfiler:
                 return ""
             return cleaned_text
         else:
+            # Standard 9.7 (Operacja 2C.4): Wycinanie artefaktów zapytajnikowo-cyfrowych w segmencie bez CJK
+            text = re.sub(r"[.,!?\s]*\?+[\s?0-9.,!]*", "", text)
+            text = re.sub(r"0{2,}", "", text)
+            text = re.sub(r"^[,\.;:!?\s]+|[,\.;:!?\s]+$", "", text)
+            text = re.sub(r"\s+", " ", text).strip()
             # Standard 9.6 (Operacja 2C.3): Czysto łacińskie tokeny ASR (cjk_count == 0) oraz halucynacje Whisper
             whisper_spam_pat = re.compile(
                 r"\b(?:subtitles?|amara(?:\.org)?|translat\w+|copyright|watch\w*|subscri\w*|youtube|licensed|all rights reserved|episode|chapter)\b",

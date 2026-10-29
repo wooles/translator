@@ -433,3 +433,55 @@ def test_step5_dot_separator_paradigm_parsing_and_honorific_alias_canonical_decl
     )
     if entity_name == "Tokiyuki":
         assert res == "Może pójdę z Tokiyukim."
+
+
+# ==============================================================================
+# STANDARD 9.7 TESTS (T7.1)
+# ==============================================================================
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "source_en,f2_pl,expected_final_pl",
+    [
+        (
+            "What about Tokiyuki Hōjō.",
+            "{\\i1}Zastanawiam się,\\Nco z Tokiyukim Hōjō.{\\i0}",
+            "{\\i1}Zastanawiam się,\\Nco z Tokiyukim Hōjō.{\\i0}",
+        ),
+        (
+            "Looking at Tokiyuki Hōjō.",
+            "{\\i1}Spójrz tutaj\\Nz opisem Tokiyukiego Hōjō.{\\i0}",
+            "{\\i1}Spójrz tutaj\\Nz opisem Tokiyukiego Hōjō.{\\i0}",
+        ),
+    ],
+)
+def test_multi_token_anthroponym_immunity_against_component_alias_duplication_and_selective_title_alias(
+    source_en, f2_pl, expected_final_pl
+):
+    from series_memory import SeriesBible
+
+    bible = SeriesBible(slug="test_multi_token_immunity")
+    bible.sync_verified_profile_entity(
+        "Tokiyuki Hōjō",
+        "MALE",
+        has_verified_gender=True,
+        declension_map={
+            "M": "Tokiyuki Hōjō",
+            "D": "Tokiyukiego Hōjō",
+            "N": "Tokiyukim Hōjō",
+        },
+    )
+    bible.sync_verified_profile_entity(
+        "Tokiyuki",
+        "MALE",
+        has_verified_gender=True,
+        declension_map={"M": "Tokiyuki", "N": "Tokiyukim"},
+    )
+    bible.sync_verified_profile_entity("Kojirō", "MALE", has_verified_gender=True)
+    bible.map_bilingual_role_aliases(["Toki-chan"])
+
+    assert "Toki-chan" not in bible.data["characters"]["Kojirō"]["aliases"]
+    assert "Toki-chan" not in bible.data["characters"]["Tokiyuki Hōjō"]["aliases"]
+
+    out_pl = bible.apply_canonical_alias_declension(text=f2_pl, source_en=source_en, keep_honorifics=False)
+    assert out_pl == expected_final_pl
+    assert out_pl.count("Hōjō") == 1

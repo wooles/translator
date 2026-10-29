@@ -19428,6 +19428,81 @@ def test_standard_9_6_suite():
     print(" -> PASSED: TEST 220 potwierdza integrację operacji Standardu 9.6.")
 
 
+
+
+def test_standard_9_7_suite():
+    """TEST 221: Standard 9.7 Multi-token anthroponym immunity, secondary tag lexical gender, newline identity and ASR cluster stripping."""
+    print("\n[TEST 221] Standard 9.7: Odporność antroponimów wieloczłonowych, inferencja płci P2, tożsamość nowej linii i czyszczenie klastrów ASR...")
+    from profiler import EpisodeProfiler
+    from series_memory import SeriesBible
+    from verifier import DialogueVerifier
+    from scene_discourse import SceneDiscourseGraph
+
+    # 1. 2C.1: Multi-token anthroponym immunity and selective title alias attachment
+    bible = SeriesBible(slug="test_s97_integration")
+    bible.sync_verified_profile_entity(
+        "Tokiyuki Hōjō",
+        "MALE",
+        has_verified_gender=True,
+        declension_map={
+            "M": "Tokiyuki Hōjō",
+            "D": "Tokiyukiego Hōjō",
+            "N": "Tokiyukim Hōjō",
+        },
+    )
+    bible.sync_verified_profile_entity(
+        "Tokiyuki",
+        "MALE",
+        has_verified_gender=True,
+        declension_map={"M": "Tokiyuki", "N": "Tokiyukim"},
+    )
+    bible.sync_verified_profile_entity("Kojirō", "MALE", has_verified_gender=True)
+    bible.map_bilingual_role_aliases(["Toki-chan"])
+
+    assert "Toki-chan" not in bible.data["characters"]["Kojirō"]["aliases"]
+    assert "Toki-chan" not in bible.data["characters"]["Tokiyuki Hōjō"]["aliases"]
+
+    f2_pl = r"{\i1}Zastanawiam się,\Nco z Tokiyukim Hōjō.{\i0}"
+    source_en = "What about Tokiyuki Hōjō."
+    out_pl = bible.apply_canonical_alias_declension(text=f2_pl, source_en=source_en, keep_honorifics=False)
+    assert out_pl == f2_pl
+    assert out_pl.count("Hōjō") == 1
+
+    # 2. 2C.2: Secondary tag lexical gender inference for Boy and Girl
+    bible.populate_secondary_actor_tags(["Boy", "Girl"])
+    assert bible.get_character("Boy").get("gender") == "MALE"
+    assert bible.get_character("Boy").get("grammatical_gender") == "MASCULINE"
+    assert bible.get_character("Girl").get("gender") == "FEMALE"
+    assert bible.get_character("Girl").get("grammatical_gender") == "FEMININE"
+
+    res_boy = SceneDiscourseGraph.arbitrate_event_telemetry(
+        raw_actor="Ayako",
+        target_actor="Boy",
+        series_bible=bible,
+        is_internal_monologue=False,
+    )
+    assert res_boy.get("target_gender") == "MASCULINE"
+    assert res_boy.get("addressee_gender") in ("MALE", "MASCULINE")
+
+    # 3. 2C.3: DialogueVerifier is_lexically_identical_ignoring_linebreak and normalization
+    norm_pl, norm_reason = DialogueVerifier.normalize_phase2_line_and_reason(
+        f1_pl="Nie wiem czy to prawda",
+        refined_pl=r"Nie wiem\Nczy to prawda",
+        changes_made=None,
+    )
+    assert r"\N" in norm_pl
+    assert norm_reason is None
+    assert DialogueVerifier.is_lexically_identical_ignoring_linebreak("Nie wiem czy to prawda", norm_pl) is True
+
+    # 4. 2C.4: EpisodeProfiler strips .? ??000 and ???000 clusters inside JP/ASR segment
+    clean_asr1 = EpisodeProfiler.sanitize_event_asr("Dialogue speech text.? ??000 continuation", is_sign=False)
+    assert clean_asr1 == "Dialogue speech text continuation"
+    clean_asr2 = EpisodeProfiler.sanitize_event_asr("Dialogue speech text???000", is_sign=False)
+    assert clean_asr2 == "Dialogue speech text"
+
+    print(" -> PASSED: TEST 221 potwierdza integrację operacji Standardu 9.7.")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -19651,4 +19726,5 @@ if __name__ == "__main__":
     test_standard_9_4_suite()
     test_standard_9_5_suite()
     test_standard_9_6_suite()
-    print("\n Wszystkie testy jednostkowe i integracyjne (220/220) zakończone pełnym sukcesem!\n")
+    test_standard_9_7_suite()
+    print("\n Wszystkie testy jednostkowe i integracyjne (221/221) zakończone pełnym sukcesem!\n")

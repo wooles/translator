@@ -9,11 +9,11 @@
 - Ścieżka promptu: C:\Users\Piotrek\Desktop\translator\Artefakty\Prompt_9.6.md
 - Ścieżka raportu: C:\Users\Piotrek\Desktop\translator\Artefakty\Raport_wdrozenia_9.6.md
 - Data wdrożenia: 2026-10-29
-- Commit wdrożenia: HEAD (Wersja 9.6 End-to-End Runtime Wiring)
+- Commit wdrożenia: c87b22f (feat(pipeline): Wdrozenie Standardu 9.6)
 - Agent wdrażający: Antigravity AVT Orchestrator & Coding Agent (Wersja 9.6)
 - Wersja Depuracji Legacy w tle: 1.0 (commit 474fb64)
 - Materiały referencyjne wykorzystane: Raport_wdrozenia_9.5.md (commit 97d742c / 80d30e5), log konsolowy przebiegu tłumaczenia po wdrożeniu 9.5 (przebieg_tłumaczenia_2.txt), para plików .ass + _full_trace.log po wdrożeniu 9.5
-- Status wdrożenia: W TOKU (Phase 0 ukończona, w trakcie implementacji)
+- Status wdrożenia: FORMALNIE WDROŻONE (195/195 fast, 348/348 full, 4 bramki PASS), 4/5 BŁĘDÓW WYELIMINOWANE, 1 REGRESJA W 2B.1 (ID: 48, 52) — kontynuacja w 9.7
 
 ## 2. PHASE 0 — WYNIK WERYFIKACJI KODU
 
@@ -122,7 +122,7 @@
 |---|---|---|---|---|---|
 | **BŁĄD 1** | Skażenie pola `Adresat:` w `Telemetria:` nawiasami $F_0$ (`(Kobieta) (FEMININE)` dla mężczyzn P0) + licznik `0 żeńskich` w pre-passie | `2C.1` | >120 linii z błędnym `Adresat:`, `0 żeńskich` w pre-passie | Czyste pole `Adresat: [Imię]` bez nawiasów $F_0$; `Mówca: sign (NEUTRAL)` dla szyldów; pre-pass wykrył 13 kwestii żeńskich i 244 męskich | WYELIMINOWANY |
 | **BŁĄD 2** | Całoliniowa kursywa `{\i1}...{\i0}` na głośnym dialogu (`Default`) przy pojedynczym pochylonym zaimku w `en_text` | `2C.2` | 1 linia (`0:15:30.74`) z całoliniowym `{\i1}...{\i0}` | Linia 187 przetłumaczona bez całoliniowej kursywy: `"Ważne, że tobie nic nie jest!"`; brak fałszywego monologu wewnętrznego przy częściowym pochyleniu | WYELIMINOWANY |
-| **BŁĄD 3** | Obcięcie aliasu z `-chan` do nieodmienionego rdzenia (`0:07:04.65`), pominięcie separatora `M.` z Kroku 5 oraz brak encji drugoplanowych w Kroku 6 | `2B.1 + 2C.4` | Nieodmieniony rdzeń w `.ass`, 4 zamrożone mianowniki i `characters_count: 22` w Kroku 6 | Poprawna odmiana w narzędniku (`Peepsem`) w liniach 55 i 94; paradygmaty z separatorem `M.`/`D.` sparsowane w Kroku 6; `characters_count: 29` z encjami drugoplanowymi | WYELIMINOWANY |
+| **BŁĄD 3** | Obcięcie aliasu z `-chan` do nieodmienionego rdzenia (`0:07:04.65`), pominięcie separatora `M.` z Kroku 5 oraz brak encji drugoplanowych w Kroku 6 | `2B.1 + 2C.4` | Nieodmieniony rdzeń w `.ass`, 4 zamrożone mianowniki i `characters_count: 22` w Kroku 6 | Poprawna odmiana w narzędniku (`Peepsem`) w liniach 55 i 94; paradygmaty z separatorem `M.`/`D.` sparsowane w Kroku 6; `characters_count: 29` z encjami drugoplanowymi | CZĘŚCIOWO (naprawiono ID: 94 i Krok 6, lecz podmiana aliasów w 2B.1 zduplikowała dwuczłonowe imię w ID: 48 i ID: 52) |
 | **BŁĄD 4** | Mały znak `\n` zamiast `\N` w `phase2_text` i `dpos_text` w Paczkach 8, 11, 12, 13 oraz 14 pustych wpisów `[Redaktor Dialogów]` | `2C.5` | 29 linii z `\n` w `dpos_text`, 14 pustych wpisów w konsoli | 0 wystąpień małego `\n` w `.ass` oraz w `dpos_text`; brak pustych wpisów `[Redaktor Dialogów]` w logu konsolowym dzięki normalizacji znaków końca linii | WYELIMINOWANY |
 | **BŁĄD 5** | Pozostawienie tokenu o `cjk_count == 0` oraz osieroconej partykuły nagłosowej (`と`, `の`) po wycięciu prefiksu ASCII w ASR | `2C.3` | 1 token `cjk_count == 0` + 2 osierocone partykuły nagłosowe | 0 tokenów ASR o `cjk_count == 0` i 0 osieroconych partykuł nagłosowych po prefiksie łacińskim w transkrypcji ASR; halucynacje Whisper wyeliminowane | WYELIMINOWANY |
 
@@ -172,3 +172,11 @@ Wszystkie zaimplementowane testy T6.1–T6.5 zostały poddane weryfikacji pod k�
 - [x] Żadne pole nie zawiera literalnych danych z audytowanego odcinka
 - [x] Raport zapisany pod ścieżką: `C:\Users\Piotrek\Desktop\translator\Artefakty\Raport_wdrozenia_9.6.md`
 - [x] Raport jest spójny z plikiem `Prompt_9.6.md`
+
+## 12. UWAGI AUDYTOWE PO WERYFIKACJI EMPIRYCZNEJ 9.6
+
+Audyt empiryczny pary plików `post96.ass` + `post96_full_trace.log` (Etap 1/2 i Etap 2/2) potwierdził wyeliminowanie 4 z 5 błędów z audytu 9.5 (`BŁĄD 1`, `BŁĄD 2`, `BŁĄD 4`, `BŁĄD 5` oraz części składowych `BŁĘDU 3` w `ID: 94` i Kroku 6), lecz ujawnił **1 regresję krytyczną z operacji 2B.1 oraz 3 drobne luki brzegowe** przekazane do domknięcia w wersji **9.7** (`Prompt_9.7.md`):
+1. **Regresja w `ID: 48` i `ID: 52` oraz w `aliases` Kroku 6 (`2C.1` w 9.7):** Podmiana aliasów w `translator.py:5785-5800` rozwinęła człon nazwiskowy dwuczłonowego antroponimu P0 w poprawnie przetłumaczonych liniach `ID: 48` i `ID: 52`, tworząc czterokrotną duplikację w pliku `.ass`, a `map_bilingual_role_aliases` dopisało aliasy z tytułu do wszystkich 22 postaci P0.
+2. **Płeć leksykalna etykiet P2 (`2C.2` w 9.7):** Etykieta `Boy` otrzymała w Kroku 6 `gender: UNKNOWN`, co dało `Adresat: Boy (FEMININE)` w `ID: 58`.
+3. **Porównanie `\N` vs spacja (`2C.3` w 9.7):** 3 wpisy `[Redaktor Dialogów]` bez powodu dla linii różniących się wyłącznie wstawieniem `\N` w miejsce spacji.
+4. **Artefakt `.? ??000` w ASR (`2C.4` w 9.7):** Pozostawienie podciągu `.? ??000` przed partykułą końcową w `ID: 79`.

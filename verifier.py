@@ -475,9 +475,24 @@ class DialogueVerifier:
     _LAST_STATUS_TIME: float = 0.0
 
     @classmethod
+    def is_lexically_identical_ignoring_linebreak(cls, s1: str, s2: str) -> bool:
+        """
+        Zwraca True, jeśli oba ciągi tekstowe po usunięciu tagów ASS i zamianie łamań wiersza
+        (\\N, \\n, \n) na spację są identyczne leksykalnie (Standard 9.7, 2C.3).
+        """
+        def _strip_and_flatten(s: str) -> str:
+            t = re.sub(r"\{[^}]*\}", "", str(s or ""))
+            t = re.sub(r"\s*\\N\s*", " ", t)
+            t = re.sub(r"\s*\\[nN]\s*", " ", t)
+            t = re.sub(r"\s*[\r\n]+\s*", " ", t)
+            return " ".join(t.split()).strip()
+
+        return _strip_and_flatten(s1) == _strip_and_flatten(s2)
+
+    @classmethod
     def normalize_phase2_line_and_reason(cls, f1_pl: str, refined_pl: str, changes_made: Optional[str] = None) -> Tuple[str, Optional[str]]:
         """
-        Normalizuje nowe linie do formatu ASS \\N oraz czyści pozorne uzasadnienia changes_made (Standard 9.6, 2C.5).
+        Normalizuje nowe linie do formatu ASS \\N oraz czyści pozorne uzasadnienia changes_made (Standard 9.6, 2C.5; Standard 9.7, 2C.3).
         """
         ref_norm = (
             str(refined_pl or "")
@@ -486,17 +501,13 @@ class DialogueVerifier:
             .replace("\r\n", "\\N")
             .replace("\n", "\\N")
         )
-        def _norm_cmp(t: str) -> str:
-            t_clean = re.sub(r"\{[^}]*\}", "", str(t or ""))
-            t_clean = re.sub(r"\\[nN]", " ", t_clean)
-            return " ".join(t_clean.split()).strip()
 
         has_ital_f1 = (r"{\i1}" in (f1_pl or ""))
         has_ital_ref = (r"{\i1}" in ref_norm)
         ital_changed = (has_ital_f1 != has_ital_ref)
 
         final_reason = changes_made
-        if _norm_cmp(f1_pl) == _norm_cmp(ref_norm) and not ital_changed:
+        if cls.is_lexically_identical_ignoring_linebreak(f1_pl, ref_norm) and not ital_changed:
             final_reason = None
         return ref_norm, final_reason
 

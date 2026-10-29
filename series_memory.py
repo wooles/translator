@@ -6201,22 +6201,35 @@ class SeriesBible:
                                     new_decl["gender"] = "MALE"
                                     decl_dict[c_name] = new_decl
 
-            # 7. Rejestracja aliasów zdrobniałych z honoryfikatorem i obciętym rdzeniem (Operacja 2B.1)
+            # 7. Rejestracja aliasów zdrobniałych z honoryfikatorem i obciętym rdzeniem (Operacja 2B.1 / 2C.1)
             t_romaji = str(self.data.get("anime_title") or getattr(self, "anime_title", "") or "")
             anchor_text = " ".join([str(v) for v in self.data.get("plot_anchors", {}).values()])
             combined_corpus = f"{t_romaji} {anchor_text}"
             found_h_tokens = re.findall(r"\b([A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+)-(?:chan|kun|san|sama|senpai|dono|tan|pyon)\b", combined_corpus, flags=re.IGNORECASE)
             chars_map = self.data.get("characters", {})
             for raw_stem in set(found_h_tokens):
+                stem_lower = raw_stem.lower()
+                prefix2 = stem_lower[:2]
+                target_char_name = None
                 for char_k, char_v in chars_map.items():
                     if not isinstance(char_v, dict) or "->" in char_k:
                         continue
-                    desc_c = str(char_v.get("description", ""))
-                    if raw_stem.lower() in desc_c.lower() or raw_stem.lower() in anchor_text.lower():
-                        c_aliases = char_v.setdefault("aliases", [])
+                    c_name = str(char_v.get("name") or char_k).strip()
+                    if " " not in c_name and c_name.lower().startswith(prefix2):
+                        target_char_name = char_k
+                        break
+
+                for char_k, char_v in chars_map.items():
+                    if not isinstance(char_v, dict) or "->" in char_k:
+                        continue
+                    c_aliases = char_v.setdefault("aliases", [])
+                    stems_to_scrub = {f"{stem_lower}-chan", stem_lower, f"{stem_lower}-kun"}
+                    if char_k == target_char_name:
                         for al in (f"{raw_stem}-chan", raw_stem, f"{raw_stem}-kun"):
                             if al not in c_aliases:
                                 c_aliases.append(al)
+                    else:
+                        char_v["aliases"] = [a for a in c_aliases if str(a).lower() not in stems_to_scrub]
 
     def populate_secondary_actor_tags(self, raw_actor_tags: List[str]) -> None:
         """
@@ -6240,12 +6253,48 @@ class SeriesBible:
                 if clean_tag in chars:
                     continue
 
+                masculine_lexicon = {
+                    "boy", "man", "men", "guy", "male", "father", "dad", "brother", "son",
+                    "uncle", "grandfather", "waiter", "king", "prince", "lord",
+                    "chłopiec", "mężczyzna", "chłopak", "ojciec", "brat"
+                }
+                feminine_lexicon = {
+                    "girl", "woman", "women", "lady", "female", "mother", "mom", "sister",
+                    "daughter", "aunt", "grandmother", "waitress", "queen", "princess",
+                    "dziewczyna", "kobieta", "dziewczynka", "matka", "siostra"
+                }
+                tag_words = set(re.findall(r"\b\w+\b", clean_tag.lower()))
+
                 if explicit_g in ("MALE", "FEMALE"):
                     chars[clean_tag] = {
                         "name": clean_tag,
                         "gender": explicit_g,
                         "grammatical_gender": "MASCULINE" if explicit_g == "MALE" else "FEMININE",
                         "confidence": 0.70,
+                        "priority": "P1",
+                        "has_verified_gender": False,
+                        "aliases": [clean_tag],
+                        "description": "Postać drugoplanowa",
+                        "entity_category": "ANTHROPONYM"
+                    }
+                elif tag_words & masculine_lexicon:
+                    chars[clean_tag] = {
+                        "name": clean_tag,
+                        "gender": "MALE",
+                        "grammatical_gender": "MASCULINE",
+                        "confidence": 0.90,
+                        "priority": "P1",
+                        "has_verified_gender": False,
+                        "aliases": [clean_tag],
+                        "description": "Postać drugoplanowa",
+                        "entity_category": "ANTHROPONYM"
+                    }
+                elif tag_words & feminine_lexicon:
+                    chars[clean_tag] = {
+                        "name": clean_tag,
+                        "gender": "FEMALE",
+                        "grammatical_gender": "FEMININE",
+                        "confidence": 0.90,
                         "priority": "P1",
                         "has_verified_gender": False,
                         "aliases": [clean_tag],
@@ -6284,6 +6333,25 @@ class SeriesBible:
                 if not clean_tag:
                     continue
                 tag_l = clean_tag.lower()
+
+                # Obsługa aliasów z honoryfikatorami (-chan/-kun)
+                m_h = re.match(r"^([A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+)-(?:chan|kun|san|sama|senpai|dono|tan|pyon)$", clean_tag, flags=re.IGNORECASE)
+                if m_h:
+                    stem = m_h.group(1)
+                    stem_l = stem.lower()
+                    prefix2 = stem_l[:2]
+                    for char_k, char_v in chars.items():
+                        if isinstance(char_v, dict):
+                            c_name = str(char_v.get("name") or char_k).strip()
+                            if " " not in c_name and c_name.lower().startswith(prefix2):
+                                cur_aliases = char_v.setdefault("aliases", [])
+                                for al in (clean_tag, stem, f"{stem}-kun", f"{stem}-chan"):
+                                    if al not in cur_aliases:
+                                        cur_aliases.append(al)
+                            else:
+                                if "aliases" in char_v:
+                                    char_v["aliases"] = [a for a in char_v["aliases"] if str(a).lower() not in (clean_tag.lower(), stem_l, f"{stem_l}-kun", f"{stem_l}-chan")]
+                    continue
 
                 # Jeśli tag jest znany w BILINGUAL_ROLE_EQUIVALENCES (EN -> PL)
                 if tag_l in BILINGUAL_ROLE_EQUIVALENCES:
@@ -6407,13 +6475,14 @@ class SeriesBible:
         source_en: str,
         series_bible: Optional[Any] = None,
         declensions: Optional[Dict[str, Any]] = None,
-        characters: Optional[Dict[str, Any]] = None
+        characters: Optional[Dict[str, Any]] = None,
+        keep_honorifics: bool = False
     ) -> str:
         """
         Mapuje japońskie aliasy zdrobniałe z honoryfikatorami (-chan/-kun) lub obciętym rdzeniem
-        na kanoniczny paradygmat fleksyjny z SeriesBible (Standard 9.6, 2B.1).
+        na kanoniczny paradygmat fleksyjny z SeriesBible (Standard 9.6, 2B.1; Standard 9.7, 2C.1).
         """
-        if not text or not source_en:
+        if not text or not source_en or keep_honorifics:
             return text
 
         decl_map = declensions
@@ -6438,12 +6507,24 @@ class SeriesBible:
             if not re.search(pattern_src, source_en, re.IGNORECASE):
                 continue
 
+            # Standard 9.7 (Operacja 2C.1): Poszanowanie Primary LLM Translation Authority
+            # Jeśli w zdaniu polskim występuje już którykolwiek człon kanonicznej nazwy encji
+            # lub którykolwiek z jej odmienionych przypadków, nie wykonujemy żadnej podmiany dla tej encji
+            name_parts = [p.strip() for p in canon_name.split() if len(p.strip()) >= 2]
+            decl_forms = [str(v).strip() for v in decl.values() if v and isinstance(v, str) and len(str(v).strip()) >= 2]
+            text_lower = text.lower()
+            if any(re.search(rf"\b{re.escape(p.lower())}\b", text_lower) for p in name_parts) or \
+               any(re.search(rf"\b{re.escape(f.lower())}\b", text_lower) for f in decl_forms):
+                continue
+
+            is_multi_token = " " in canon_name
             for al in aliases:
                 if not al or al.lower() == canon_name.lower():
                     continue
                 stem = re.sub(r"-(?:senpai|kun|chan|san|sama|sensei|dono|tan|pyon)$", "", al, flags=re.IGNORECASE).strip()
                 al_patterns = [re.escape(al)]
-                if stem and stem.lower() != al.lower():
+                # Dla encji wieloczłonowych pojedyncze człony nie mogą być podmieniane jako gołe tokeny bez honoryfikatora
+                if not is_multi_token and stem and stem.lower() != al.lower():
                     al_patterns.append(re.escape(stem))
                 al_re = "|".join(al_patterns)
 
@@ -6464,20 +6545,40 @@ class SeriesBible:
                     res,
                     flags=re.IGNORECASE
                 )
-                # Mianownik / ogólny kontekst
+                # Mianownik / ogólny kontekst ze wskazanym honoryfikatorem
                 res = re.sub(
                     rf"\b(?:{al_re})(?:-(?:senpai|kun|chan|san|sama|sensei|dono|tan|pyon))\b",
                     form_m,
                     res,
                     flags=re.IGNORECASE
                 )
-                res = re.sub(
-                    rf"\b(?:{al_re})\b",
-                    form_m,
-                    res,
-                    flags=re.IGNORECASE
-                )
+                # Goły alias (wyłącznie dla encji jednoczłonowych)
+                if not is_multi_token:
+                    res = re.sub(
+                        rf"\b(?:{al_re})\b",
+                        form_m,
+                        res,
+                        flags=re.IGNORECASE
+                    )
         return res
+
+    def apply_canonical_alias_declension(
+        self,
+        text: str,
+        source_en: str = "",
+        keep_honorifics: bool = False
+    ) -> str:
+        """
+        Wrapper instancyjny na substitute_canonical_honorific_alias (Standard 9.7, 2C.1).
+        """
+        return self.substitute_canonical_honorific_alias(
+            text=text,
+            source_en=source_en,
+            series_bible=self,
+            declensions=self.data.get("declensions") if hasattr(self, "data") and isinstance(self.data, dict) else None,
+            characters=self.data.get("characters") if hasattr(self, "data") and isinstance(self.data, dict) else None,
+            keep_honorifics=keep_honorifics,
+        )
 
     def _validate_relation_entry_consistency(self) -> None:
         """

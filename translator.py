@@ -4565,13 +4565,15 @@ class MultimodalTranslator:
                 clean_ref = sanitize_sub_text(r.refined_pl)
                 ch_desc = (getattr(r, 'changes_made', '') or '').strip()
 
-                # Strip internal ASS tags (like {\i1}, {\i0}) and normalize newlines for pure, clean console display (Standard 9.6, 2C.5)
+                # Strip internal ASS tags (like {\i1}, {\i0}) and normalize newlines for pure, clean console display (Standard 9.6, 2C.5, Standard 9.7, 2C.3)
                 disp_orig = re.sub(r"\{[^\}]*\}", "", str(orig_pl or "")).replace("\\r\\n", "\\N").replace("\\n", "\\N").replace("\r\n", "\\N").replace("\n", "\\N").strip()
                 disp_ref = re.sub(r"\{[^\}]*\}", "", str(clean_ref or "")).replace("\\r\\n", "\\N").replace("\\n", "\\N").replace("\r\n", "\\N").replace("\n", "\\N").strip()
 
                 # Check if there is an actual textual modification or meaningful redaction note
-                has_text_change = bool(disp_orig and (disp_orig != disp_ref))
+                from verifier import DialogueVerifier
+                lexically_same = DialogueVerifier.is_lexically_identical_ignoring_linebreak(disp_orig, disp_ref)
                 has_meaningful_note = bool(ch_desc and "Zweryfikowano" not in ch_desc and ch_desc.lower() != "null")
+                has_text_change = bool(disp_orig and (disp_orig != disp_ref) and not (lexically_same and not has_meaningful_note))
 
                 if has_text_change:
                     any_redaction_printed = True
@@ -4621,11 +4623,10 @@ class MultimodalTranslator:
             raw_final = sanitize_sub_text(refined_dict.get(item["id"], item["pl"]))
             if not self.keep_honorifics and not item.get("is_sign", False):
                 if hasattr(self, "series_bible") and self.series_bible:
-                    from series_memory import SeriesBible
-                    raw_final = SeriesBible.substitute_canonical_honorific_alias(
+                    raw_final = self.series_bible.apply_canonical_alias_declension(
                         raw_final,
                         source_en=item.get("en", ""),
-                        series_bible=self.series_bible
+                        keep_honorifics=self.keep_honorifics
                     )
             # Triangulate effective gender from character registry, audio F0 voice, and pragmatic clues (Filar CXXXVI)
             spk_gen = item.get("speaker_gender")
@@ -5869,15 +5870,6 @@ class MultimodalTranslator:
                 continue
 
             if not self.keep_honorifics and not is_sign_flag:
-                # Standard 9.6 (Operacja 2B.1): Mapowanie aliasów zdrobniałych z honoryfikatorem na kanoniczny paradygmat fleksyjny
-                if hasattr(self, "series_bible") and self.series_bible:
-                    from series_memory import SeriesBible
-                    clean_translated_text = SeriesBible.substitute_canonical_honorific_alias(
-                        clean_translated_text,
-                        source_en=orig_event.text,
-                        series_bible=self.series_bible
-                    )
-
                 # Strip Japanese honorific suffixes (-senpai, -kun, -chan, -san, -sama, -sensei)
                 clean_translated_text = re.sub(
                     r"([A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+)-(?:senpai|kun|chan|san|sama|sensei|dono|tan|pyon)\b",

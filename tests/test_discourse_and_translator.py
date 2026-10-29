@@ -375,3 +375,36 @@ def test_arbitrate_telemetry_strips_f0_parentheses_from_target_actor_and_enforce
     assert res.get("target_gender") == expected_target_gender or res.get("addressee_gender") in (expected_target_gender, "MALE" if expected_target_gender == "MASCULINE" else "FEMALE")
     assert "(Kobieta) (MASCULINE)" not in res.get("dry_telemetry", "")
     assert "(Mężczyzna) (FEMININE)" not in res.get("dry_telemetry", "")
+
+
+# ==============================================================================
+# STANDARD 9.7 TESTS (T7.2)
+# ==============================================================================
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "secondary_tag,expected_gender,expected_grammatical_gender",
+    [
+        ("Boy", "MALE", "MASCULINE"),
+        ("Girl", "FEMALE", "FEMININE"),
+    ],
+)
+def test_populate_secondary_actor_tags_infers_lexical_gender_for_boy_and_girl_tags(
+    secondary_tag, expected_gender, expected_grammatical_gender
+):
+    from series_memory import SeriesBible
+    from scene_discourse import SceneDiscourseGraph
+
+    bible = SeriesBible(slug="test_secondary_lexical_gender")
+    bible.populate_secondary_actor_tags([secondary_tag])
+    char_entry = bible.get_character(secondary_tag)
+    assert char_entry is not None
+    assert char_entry.get("gender") == expected_gender
+    assert char_entry.get("grammatical_gender") == expected_grammatical_gender
+
+    res = SceneDiscourseGraph.arbitrate_event_telemetry(
+        raw_actor="Ayako",
+        target_actor=secondary_tag,
+        series_bible=bible,
+        is_internal_monologue=False,
+    )
+    assert res.get("target_gender") == expected_grammatical_gender or res.get("addressee_gender") == expected_grammatical_gender
