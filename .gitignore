@@ -50,6 +50,8 @@ gcp_key*
 
 # Test artifacts
 Artefakty/*.ass
+Artefakty/*.txt
+Artefakty/_AUDYT_*/
 series_memory/*Test*
 series_memory/*test*
 

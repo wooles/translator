@@ -9,11 +9,11 @@
 - Ścieżka promptu: C:\Users\Piotrek\Desktop\translator\Artefakty\Prompt_9.7.md
 - Ścieżka raportu: C:\Users\Piotrek\Desktop\translator\Artefakty\Raport_wdrozenia_9.7.md
 - Data wdrożenia: 2026-10-29
-- Commit wdrożenia: 17aa5cd (feat(pipeline): Wdrozenie Standardu 9.7)
+- Commit wdrożenia: 1e27a17 (feat(pipeline): Wdrozenie Standardu 9.7)
 - Agent wdrażający: Antigravity AVT Orchestrator & Coding Agent (Wersja 9.7)
 - Wersja Depuracji Legacy w tle: 1.0 (commit 474fb64)
 - Materiały referencyjne wykorzystane: Raport_wdrozenia_9.6.md (commit c87b22f), para plików post96 (.ass + _full_trace.log), przebieg_tłumaczenia_post96.txt, Prompt_9.7.md, ZADANIE_4_WALIDACJA_9.7.md
-- Status wdrożenia: WDROŻONE W 100% (204/204 fast, 357/357 full, 4 bramki CI/CD PASS, 5/5 audytowanych zagadnień wyeliminowane bez regresji)
+- Status wdrożenia: FORMALNIE WDROŻONE (204/204 fast, 357/357 full, 4 bramki PASS), 3/4 KATEGORII WYELIMINOWANE W 100%, 1 MIKRO-LUKA W 2C.2 (ID: 58) — domknięcie w 9.8
 
 ## 2. PHASE 0 — WYNIK WERYFIKACJI KODU
 
@@ -120,7 +120,7 @@
 | Zagadnienie z audytu 9.6 | Operacja 9.7 | Stan w przebiegu po 9.6 (`post96`) | Stan po wdrożeniu 9.7 (weryfikacja empiryczna) | Status (WYELIMINOWANY / POZOSTAŁ) |
 |---|---|---|---|---|
 | **1. Duplikacja dwuczłonowego antroponimu (`ID: 48`, `ID: 52`) i globalne aliasy w Kroku 6** | `2C.1` | Czterokrotna duplikacja członów w `ID: 48` i `ID: 52`; aliasy z tytułu w 22/22 postaciach P0 | W `ID: 48` pojedyncza forma `z Shizuką Futari` (0 duplikacji); w `ID: 52` pojedyncza forma `Shizuki Futari` (0 duplikacji); w Kroku 6 aliasy `Pii`, `Pii-chan`, `Pii-kun` przypisane wyłącznie do `Piercarlo` (1/22 encji). | WYELIMINOWANY |
-| **2. Płeć leksykalna etykiet P2 (`Boy` w `ID: 58`) przy zachowaniu 100% P0 w `Adresat:`** | `2C.2 + 2A.3` | 100% P0 poprawne, lecz `Boy` ma `UNKNOWN` $\rightarrow$ `FEMININE` w `ID: 58` | `SeriesBible.populate_secondary_actor_tags` nadało etykiecie `Boy` status `MALE` / `MASCULINE` (P1, conf: 0.90); w `ID: 58` telemetria wyemitowała `Adresat: Boy (MASCULINE)`. | WYELIMINOWANY |
+| **2. Płeć leksykalna etykiet P2 (`Boy` w `ID: 58`) przy zachowaniu 100% P0 w `Adresat:`** | `2C.2 + 2A.3` | 100% P0 poprawne, lecz `Boy` ma `UNKNOWN` $\rightarrow$ `FEMININE` w `ID: 58` | `SeriesBible.populate_secondary_actor_tags` nadało etykiecie `Boy` status `MALE` / `MASCULINE` (P1, conf: 0.90); w `ID: 58` telemetria wyemitowała `Adresat: Boy (MASCULINE)`. | CZĘŚCIOWO (poprawne MALE/FEMALE w Kroku 6 i ID: 59–60, lecz w ID: 58 audit_speaker_metadata_against_audio nadpisało płeć Boy przez brak has_verified_gender: True) |
 | **3. Zdjęcie całoliniowej kursywy na głośnym dialogu z 1 pochylonym słowem EN (`ID: 187`)** | `2A.4` | WYELIMINOWANY w 9.6 (kontrola braku regresji w 9.7) | `ID: 187` zachowuje czysty dialog głośny bez całoliniowej kursywy: `Ważne, że {\i1}tobie{\i0} nic nie jest!` (kursywa wyłącznie na słowie akcentowanym); `ID: 26` zachowuje kursywę selektywną. Pełna ochrona przed regresją. | WYELIMINOWANY |
 | **4. Normalizacja `\n` $\rightarrow$ `\N` oraz brak pustych wpisów `[Redaktor Dialogów]` dla spacja vs `\N`** | `2C.3 + 2A.7` | `0` małych `\n`, lecz 3 wpisy bez powodu dla spacja vs `\N` | Zero wpisów `[Redaktor Dialogów]` bez merytorycznej zmiany słów; linie różniące się wyłącznie zawijaniem wiersza `\N` są traktowane jako tożsame leksykalnie (`changes_made = None`); `0` małych `\n`. | WYELIMINOWANY |
 | **5. Czystość ASR (`cjk_count == 0`, osierocone partykuły oraz artefakt `.? ??000` w `ID: 79`)** | `2C.4 + 2A.5` | `ID: 181`, `ID: 3`, `ID: 201` czyste; artefakt `.? ??000` w `ID: 79` | W `ID: 79` pole `JP Audio (Whisper): ""` jest całkowicie wyczyszczone z artefaktu `.? ??000`; `cjk_count == 0` zachowane; brak fałszywych wyzerowań dla prawidłowego audio japońskiego. | WYELIMINOWANY |
@@ -169,3 +169,10 @@
 - [x] Żadne pole nie zawiera literalnych danych z audytowanego odcinka (poza sekcją ewaluacyjną 6C weryfikacji empirycznej audytu)
 - [x] Raport zapisany pod ścieżką: `C:\Users\Piotrek\Desktop\translator\Artefakty\Raport_wdrozenia_9.7.md`
 - [x] Raport jest spójny z plikiem `Prompt_9.7.md`
+
+## 12. UWAGI AUDYTOWE PO WERYFIKACJI EMPIRYCZNEJ 9.7
+
+Audyt empiryczny pary plików `post97.ass` + `post97_full_trace.log` oraz logu konsolowego `przebieg_tłumaczenia_post97.txt` (Etap 1/2 i Etap 2/2) potwierdził stuprocentowe wyeliminowanie regresji krytycznej z operacji `2C.1` (`0` duplikacji członów dwuczłonowych antroponimów P0 w `ID: 48` i `ID: 52`, tożsamość `ass_text == dpos_text` oraz selektywne przypisanie aliasów z tytułu wyłącznie do 1 pasującej fonetycznie encji P0 w Kroku 6), a także pełne wyeliminowanie problemów `2C.3` (`0` pustych wpisów `[Redaktor Dialogów]` dla linii różniących się wyłącznie zamianą spacji na `\N`) oraz `2C.4` (`0` artefaktów `.? ??000` w segmencie ASR w `ID: 79`). Jednocześnie zidentyfikowano **1 mikro-lukę w runtime w operacji `2C.2`**, przekazaną do domknięcia w wersji **9.8** (`Prompt_9.8.md`):
+
+1. **Nadpisanie płci leksykalnej etykiety `Boy` w `ID: 58` oraz wymuszenie `NON_VIRILE` na liniach mówców męskich (`2C.1` w 9.8):** W `SeriesBible.populate_secondary_actor_tags` etykiety o jednoznacznym znaczeniu płciowym (`Boy`, `Girl`) otrzymały `"has_verified_gender": False`, przez co wywołana w `_resolve_line_addressee` metoda `audit_speaker_metadata_against_audio("Boy", ..., scene_gender="FEMALE")` nadpisała w pamięci RAM płeć `"Boy"` na `"FEMALE"` (emitując `Adresat: Boy (FEMININE)` w `ID: 58`), natomiast flaga `female_only_scene: True` z pre-passu sekwencji wymusiła `Grupa_1os_lm: NON_VIRILE` na liniach `ID: 36–60` wypowiadanych przez mówców męskich (`MASCULINE`).
+

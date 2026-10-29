@@ -9,6 +9,7 @@ import os
 import re
 import json
 import threading
+import contextlib
 import copy
 import unicodedata
 import functools
@@ -1880,6 +1881,18 @@ def _load_dynamic_boy_keywords() -> List[str]:
 
 
 BOY_ROLE_KEYWORDS = _load_dynamic_boy_keywords()
+
+INHERENT_MALE_NOUNS: Set[str] = {
+    "boy", "man", "men", "guy", "male", "father", "dad", "brother", "son",
+    "uncle", "grandfather", "waiter", "king", "prince", "lord",
+    "chłopiec", "mężczyzna", "chłopak", "ojciec", "brat"
+}
+
+INHERENT_FEMALE_NOUNS: Set[str] = {
+    "girl", "woman", "women", "lady", "female", "mother", "mom", "sister",
+    "daughter", "aunt", "grandmother", "waitress", "queen", "princess",
+    "dziewczyna", "kobieta", "dziewczynka", "matka", "siostra"
+}
 
 GENERIC_CATEGORY_TAGS = {
     # Polish technical & crowd tags
@@ -6253,16 +6266,8 @@ class SeriesBible:
                 if clean_tag in chars:
                     continue
 
-                masculine_lexicon = {
-                    "boy", "man", "men", "guy", "male", "father", "dad", "brother", "son",
-                    "uncle", "grandfather", "waiter", "king", "prince", "lord",
-                    "chłopiec", "mężczyzna", "chłopak", "ojciec", "brat"
-                }
-                feminine_lexicon = {
-                    "girl", "woman", "women", "lady", "female", "mother", "mom", "sister",
-                    "daughter", "aunt", "grandmother", "waitress", "queen", "princess",
-                    "dziewczyna", "kobieta", "dziewczynka", "matka", "siostra"
-                }
+                masculine_lexicon = INHERENT_MALE_NOUNS
+                feminine_lexicon = INHERENT_FEMALE_NOUNS
                 tag_words = set(re.findall(r"\b\w+\b", clean_tag.lower()))
 
                 if explicit_g in ("MALE", "FEMALE"):
@@ -6282,9 +6287,9 @@ class SeriesBible:
                         "name": clean_tag,
                         "gender": "MALE",
                         "grammatical_gender": "MASCULINE",
-                        "confidence": 0.90,
+                        "confidence": 0.95,
                         "priority": "P1",
-                        "has_verified_gender": False,
+                        "has_verified_gender": True,
                         "aliases": [clean_tag],
                         "description": "Postać drugoplanowa",
                         "entity_category": "ANTHROPONYM"
@@ -6294,9 +6299,9 @@ class SeriesBible:
                         "name": clean_tag,
                         "gender": "FEMALE",
                         "grammatical_gender": "FEMININE",
-                        "confidence": 0.90,
+                        "confidence": 0.95,
                         "priority": "P1",
-                        "has_verified_gender": False,
+                        "has_verified_gender": True,
                         "aliases": [clean_tag],
                         "description": "Postać drugoplanowa",
                         "entity_category": "ANTHROPONYM"
@@ -7412,10 +7417,33 @@ class SeriesBible:
           or pre-pass scene exclusivity ('FEMALE') confirm female speaker, tag is demoted to 'UNTRUSTED_CONTRADICTION'
           and resolved_gender becomes 'FEMALE'.
         """
-        if not actor_name or is_generic_actor_or_category(actor_name):
+        if not actor_name:
             return (audio_gender or whisper_gender or scene_gender or "UNKNOWN"), False
 
         actor_clean = extract_clean_speaker_name(actor_name).strip()
+
+        # Ochrona encji o zweryfikowanej płci lub inherentnej płci leksykalnej (Standard 9.8, 2C.1)
+        if hasattr(self, "data") and isinstance(self.data, dict) and "characters" in self.data:
+            chars_dict = self.data["characters"]
+            char = chars_dict.get(actor_name) or chars_dict.get(actor_clean)
+            if not char:
+                norm_act = normalize_name_nfkd(actor_clean.lower())
+                for ck, cv in chars_dict.items():
+                    if ck.lower() == actor_clean.lower() or normalize_name_nfkd(ck.lower()) == norm_act:
+                        char = cv
+                        break
+            if isinstance(char, dict) and char.get("has_verified_gender") is True:
+                canonical_gender = char.get("gender", "UNKNOWN")
+                return canonical_gender, False
+
+        speaker_tokens = set(re.findall(r"\b\w+\b", actor_clean.lower()))
+        if speaker_tokens & (INHERENT_MALE_NOUNS | INHERENT_FEMALE_NOUNS):
+            canonical_gender = "MALE" if speaker_tokens & INHERENT_MALE_NOUNS else "FEMALE"
+            return canonical_gender, False
+
+        if is_generic_actor_or_category(actor_name):
+            return (audio_gender or whisper_gender or scene_gender or "UNKNOWN"), False
+
         canon_gender = self.get_character_gender(actor_clean, allow_generic_nouns=False)
 
         # Contamination condition: Canonical tag contradicted by objective physical acoustic evidence

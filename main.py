@@ -346,6 +346,8 @@ def main():
     args = parser.parse_args()
 
     raw_inputs = args.input if isinstance(args.input, list) and args.input else ([args.input] if args.input else [])
+    if not raw_inputs and getattr(args, "subs", None):
+        raw_inputs = [args.subs]
     if not raw_inputs:
         print("[Info] Nie podano pliku jako argumentu. Otwieram okno wyboru pliku...")
         chosen_input = pick_file_gui()
@@ -379,6 +381,8 @@ def main():
         keep_honorifics = False
     elif args.honorifics:
         keep_honorifics = True
+    elif not sys.stdin.isatty():
+        keep_honorifics = os.getenv("KEEP_HONORIFICS", "false").lower() == "true"
     else:
         default_env = os.getenv("KEEP_HONORIFICS", "true").lower() == "true"
         default_label = "1 (Zachowaj)" if default_env else "2 (Usuń)"

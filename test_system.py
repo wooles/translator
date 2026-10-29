@@ -19503,6 +19503,52 @@ def test_standard_9_7_suite():
     print(" -> PASSED: TEST 221 potwierdza integrację operacji Standardu 9.7.")
 
 
+def test_standard_9_8_suite():
+    """TEST 222: Standard 9.8 Secondary lexical gender immunity against scene override and male speaker non-virile ban."""
+    print("\n[TEST 222] Standard 9.8: Niezmienność płci leksykalnej etykiet P1 i blokada NON_VIRILE na mówcach męskich...")
+    from series_memory import SeriesBible
+    from scene_discourse import SceneDiscourseGraph
+
+    # 1. 2C.1: populate_secondary_actor_tags gives has_verified_gender=True for Boy and Girl
+    bible = SeriesBible(slug="test_s98_integration")
+    bible.populate_secondary_actor_tags(["Boy", "Girl"])
+    char_boy = bible.get_character("Boy")
+    assert char_boy is not None
+    assert char_boy.get("has_verified_gender") is True
+    assert char_boy.get("gender") == "MALE"
+    assert char_boy.get("grammatical_gender") == "MASCULINE"
+
+    char_girl = bible.get_character("Girl")
+    assert char_girl is not None
+    assert char_girl.get("has_verified_gender") is True
+    assert char_girl.get("gender") == "FEMALE"
+    assert char_girl.get("grammatical_gender") == "FEMININE"
+
+    # 2. 2C.1: audit_speaker_metadata_against_audio immunity
+    aud_boy, cont_boy = bible.audit_speaker_metadata_against_audio("Boy", audio_gender="FEMALE", scene_gender="FEMALE")
+    assert cont_boy is False
+    assert aud_boy == "MALE"
+    assert bible.get_character("Boy").get("gender") == "MALE"
+
+    aud_girl, cont_girl = bible.audit_speaker_metadata_against_audio("Girl", audio_gender="MALE", scene_gender="MALE")
+    assert cont_girl is False
+    assert aud_girl == "FEMALE"
+    assert bible.get_character("Girl").get("gender") == "FEMALE"
+
+    # 3. 2C.1: arbitrate_event_telemetry preserves MASCULINE target even with scene_female_only=True
+    res = SceneDiscourseGraph.arbitrate_event_telemetry(
+        raw_actor="Tokiyuki",
+        verified_p0_gender="MALE",
+        target_actor="Boy (Kobieta)",
+        series_bible=bible,
+        scene_female_only=True,
+        is_internal_monologue=False,
+    )
+    assert res.get("target_gender") == "MASCULINE"
+
+    print(" -> PASSED: TEST 222 potwierdza integrację operacji Standardu 9.8.")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -19727,4 +19773,5 @@ if __name__ == "__main__":
     test_standard_9_5_suite()
     test_standard_9_6_suite()
     test_standard_9_7_suite()
+    test_standard_9_8_suite()
     print("\n Wszystkie testy jednostkowe i integracyjne (221/221) zakończone pełnym sukcesem!\n")

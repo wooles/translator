@@ -1945,6 +1945,16 @@ class MultimodalTranslator:
                     if (ev_s >= seq_start_ms and ev_s <= seq_end_ms) or (ev_e >= seq_start_ms and ev_e <= seq_end_ms):
                         scene_genders[orig_idx] = target_g
 
+            # Weryfikacja płci aktora po dramatic_sequences (Standard 9.8, 2C.1):
+            # Pojedyncza kwestia wypowiadana przez mężczyznę nigdy nie ma scene_gender == "kobieta"
+            from series_memory import resolve_actor_gender
+            for orig_idx, ev in norm_entries:
+                act_name = getattr(ev, "name", "")
+                if act_name:
+                    act_gender = resolve_actor_gender(act_name, self.character_registry, getattr(self, "series_bible", None))
+                    if act_gender == "MALE":
+                        scene_genders[orig_idx] = "mężczyzna"
+
         # 2. Continuous scenes clustering & SeriesBible inference
         if getattr(self, "series_bible", None):
             scenes: List[List[Tuple[int, Any]]] = []
@@ -2006,19 +2016,22 @@ class MultimodalTranslator:
                     for idx in scene_indices:
                         scene_genders[idx] = "mężczyzna"
 
-            # Per-line fallback for explicit characters with verified P0 gender (Standard 9.6, 2C.1)
+            # Per-line fallback for explicit characters with verified P0/P1 gender (Standard 9.6/9.8, 2C.1)
             for orig_idx, ev in norm_entries:
-                if orig_idx not in scene_genders:
-                    raw_act = getattr(ev, "name", "")
-                    clean_act = re.sub(r"\s*\([^)]*\)", "", str(raw_act or "")).strip()
-                    if clean_act and not is_generic_actor_or_category(clean_act):
-                        char_rec = self.series_bible.get_character(clean_act)
-                        if isinstance(char_rec, dict):
-                            g_act = str(char_rec.get("gender") or "").upper()
-                            if g_act == "FEMALE":
-                                scene_genders[orig_idx] = "kobieta"
-                            elif g_act == "MALE":
-                                scene_genders[orig_idx] = "mężczyzna"
+                raw_act = getattr(ev, "name", "")
+                clean_act = re.sub(r"\s*\([^)]*\)", "", str(raw_act or "")).strip()
+                if clean_act and not is_generic_actor_or_category(clean_act):
+                    char_rec = self.series_bible.get_character(clean_act) if getattr(self, "series_bible", None) else None
+                    g_act = None
+                    if isinstance(char_rec, dict):
+                        g_act = str(char_rec.get("gender") or "").upper()
+                    elif hasattr(self, "character_registry") and self.character_registry:
+                        from series_memory import resolve_actor_gender
+                        g_act = resolve_actor_gender(clean_act, self.character_registry, getattr(self, "series_bible", None))
+                    if g_act == "MALE":
+                        scene_genders[orig_idx] = "mężczyzna"
+                    elif g_act == "FEMALE" and orig_idx not in scene_genders:
+                        scene_genders[orig_idx] = "kobieta"
 
         return scene_genders
 
@@ -3249,7 +3262,19 @@ class MultimodalTranslator:
                 reg_name = pragmatic_reg or (reg_desc if reg_desc and "Kontekstowy" not in reg_desc else getattr(event, "register", None))
 
                 is_fem_scene = (getattr(self, "episode_scene_genders", {}).get(original_idx) == "kobieta") or getattr(self, "scene_is_female_only", False)
-                pl_grp_val = "NON_VIRILE" if is_fem_scene else ("VIRILE" if (line_addr_cat in ["grupa_mężczyzn", "mężczyzna_dual"] or (contract_addr_number == "PLURAL" and getattr(self, "scene_has_male", False))) else ("NON_VIRILE" if contract_addr_number == "PLURAL" else None))
+                has_male_participant_in_line = (
+                    contract_spk_gender == "MASCULINE"
+                    or contract_target_gender == "MASCULINE"
+                    or line_spk_gender == "mężczyzna"
+                    or line_addr_cat in ["mężczyzna", "mężczyzna_dual", "grupa_mężczyzn"]
+                )
+                if has_male_participant_in_line:
+                    is_fem_scene = False
+
+                pl_grp_val = "NON_VIRILE" if is_fem_scene else ("VIRILE" if (has_male_participant_in_line or line_addr_cat in ["grupa_mężczyzn", "mężczyzna_dual"] or (contract_addr_number == "PLURAL" and getattr(self, "scene_has_male", False))) else ("NON_VIRILE" if contract_addr_number == "PLURAL" else None))
+                if has_male_participant_in_line and pl_grp_val == "NON_VIRILE":
+                    pl_grp_val = "VIRILE"
+
                 you_grp_val = "NON_VIRILE" if is_fem_scene else ("VIRILE" if line_addr_cat in ["grupa_mężczyzn", "mężczyzna_dual", "grupa_mieszana", "para_mieszana_dual"] else ("NON_VIRILE" if line_addr_cat in ["grupa_kobiet", "kobieta_dual"] else None))
 
                 batch_actors = {getattr(b_ev, "name", "") for _, b_ev, _, _ in batch_events if getattr(b_ev, "name", "") and not is_generic_actor_or_category(getattr(b_ev, "name", ""))}
@@ -4058,19 +4083,7 @@ class MultimodalTranslator:
             is_tgt_hypothesis = bool(addressee_label and "Hipoteza Faza 1" in addressee_label)
             tgt_conf = 0.70 if is_tgt_hypothesis else (1.0 if addressee_cat else 0.0)
 
-            if is_fem_scene:
-                line_pl_grp = "NON_VIRILE"
-                line_you_grp = "NON_VIRILE"
-            else:
-                line_pl_grp = "VIRILE" if (addressee_cat in ["grupa_mężczyzn", "mężczyzna_dual", "grupa_mieszana", "para_mieszana_dual"] or getattr(self, "scene_has_male", False)) else ("NON_VIRILE" if addressee_cat in ["grupa_kobiet", "kobieta_dual"] else "AMBIGUOUS")
-                line_you_grp = "VIRILE" if addressee_cat in ["grupa_mężczyzn", "mężczyzna_dual", "grupa_mieszana", "para_mieszana_dual"] else ("NON_VIRILE" if addressee_cat in ["grupa_kobiet", "kobieta_dual"] else "AMBIGUOUS")
-
-            batch_actors_f2 = {getattr(b_ev, "name", "") for _, b_ev, _, _ in untranslated_in_batch if getattr(b_ev, "name", "") and not is_generic_actor_or_category(getattr(b_ev, "name", ""))}
-            poly_val_f2 = getattr(self, "episode_scene_polylogues", {}).get(orig_idx)
-            if not poly_val_f2 and len(batch_actors_f2) >= 3:
-                poly_val_f2 = f"POLYLOGUE (n={len(batch_actors_f2)})"
-
-            # Declarative Scene State Telemetry Vector (Standard 7.0 SSOT / 9.5)
+            # Declarative Scene State Telemetry Vector (Standard 7.0 SSOT / 9.5 / 9.8)
             spk_gram_tag = p0_spk_gram if p0_spk_gram in ("MASCULINE", "FEMININE") else (
                 "MASCULINE" if speaker_gender and any(w in str(speaker_gender).lower() for w in ["male", "mężczyzna", "chłopak"]) else (
                     "FEMININE" if speaker_gender and any(w in str(speaker_gender).lower() for w in ["female", "kobieta", "dziewczyna"]) else None
@@ -4082,6 +4095,30 @@ class MultimodalTranslator:
                     "MASCULINE" if addressee_cat in ["mężczyzna", "mężczyzna_dual", "grupa_mężczyzn"] else None
                 )
             )
+
+            has_male_participant_in_line = (
+                spk_gram_tag == "MASCULINE"
+                or tgt_gram_tag == "MASCULINE"
+                or speaker_gender == "mężczyzna"
+                or addressee_cat in ["mężczyzna", "mężczyzna_dual", "grupa_mężczyzn"]
+            )
+            if has_male_participant_in_line:
+                is_fem_scene = False
+
+            if is_fem_scene:
+                line_pl_grp = "NON_VIRILE"
+                line_you_grp = "NON_VIRILE"
+            else:
+                line_pl_grp = "VIRILE" if (has_male_participant_in_line or addressee_cat in ["grupa_mężczyzn", "mężczyzna_dual", "grupa_mieszana", "para_mieszana_dual"] or getattr(self, "scene_has_male", False)) else ("NON_VIRILE" if addressee_cat in ["grupa_kobiet", "kobieta_dual"] else "AMBIGUOUS")
+                line_you_grp = "VIRILE" if addressee_cat in ["grupa_mężczyzn", "mężczyzna_dual", "grupa_mieszana", "para_mieszana_dual"] else ("NON_VIRILE" if addressee_cat in ["grupa_kobiet", "kobieta_dual"] else "AMBIGUOUS")
+
+            if has_male_participant_in_line and line_pl_grp == "NON_VIRILE":
+                line_pl_grp = "VIRILE"
+
+            batch_actors_f2 = {getattr(b_ev, "name", "") for _, b_ev, _, _ in untranslated_in_batch if getattr(b_ev, "name", "") and not is_generic_actor_or_category(getattr(b_ev, "name", ""))}
+            poly_val_f2 = getattr(self, "episode_scene_polylogues", {}).get(orig_idx)
+            if not poly_val_f2 and len(batch_actors_f2) >= 3:
+                poly_val_f2 = f"POLYLOGUE (n={len(batch_actors_f2)})"
             resolved_spk_name = disc_telem.get("speaker_name") or raw_speaker_name or event.name or "UNKNOWN"
             resolved_tgt_name = disc_telem.get("target_actor") or (addressee_label if addressee_label else None)
             if is_internal_monologue:
@@ -6133,3 +6170,8 @@ class MultimodalTranslator:
 # Alias for backwards compatibility
 TranslatorEngine = MultimodalTranslator
 Translator = MultimodalTranslator
+
+if __name__ == "__main__":
+    from main import main
+    main()
+

@@ -408,3 +408,44 @@ def test_populate_secondary_actor_tags_infers_lexical_gender_for_boy_and_girl_ta
         is_internal_monologue=False,
     )
     assert res.get("target_gender") == expected_grammatical_gender or res.get("addressee_gender") == expected_grammatical_gender
+
+
+# ==============================================================================
+# STANDARD 9.8 TESTS (T8.1)
+# ==============================================================================
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "secondary_tag,scene_gender_override,expected_audited_gender,expected_telemetry_gender",
+    [
+        ("Boy", "FEMALE", "MALE", "MASCULINE"),
+        ("Girl", "MALE", "FEMALE", "FEMININE"),
+    ],
+)
+def test_secondary_lexical_gender_immunity_against_scene_gender_override_and_male_speaker_non_virile_ban(
+    secondary_tag, scene_gender_override, expected_audited_gender, expected_telemetry_gender
+):
+    from series_memory import SeriesBible
+    from scene_discourse import SceneDiscourseGraph
+
+    bible = SeriesBible(slug="test_lexical_gender_immunity_98")
+    bible.populate_secondary_actor_tags([secondary_tag])
+    char_entry = bible.get_character(secondary_tag)
+    assert char_entry is not None
+    assert char_entry.get("has_verified_gender") is True
+
+    audited_g, is_cont = bible.audit_speaker_metadata_against_audio(
+        secondary_tag, audio_gender=scene_gender_override, scene_gender=scene_gender_override
+    )
+    assert is_cont is False
+    assert audited_g == expected_audited_gender
+    assert bible.get_character(secondary_tag).get("gender") == expected_audited_gender
+
+    res = SceneDiscourseGraph.arbitrate_event_telemetry(
+        raw_actor="Tokiyuki",
+        verified_p0_gender="MALE",
+        target_actor=f"{secondary_tag} (Kobieta)",
+        series_bible=bible,
+        scene_female_only=True,
+        is_internal_monologue=False,
+    )
+    assert res.get("target_gender") == expected_telemetry_gender
