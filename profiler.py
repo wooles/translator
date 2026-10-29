@@ -402,30 +402,39 @@ class EpisodeProfiler:
 
         has_cjk = bool(re.search(r"[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]", text))
         if has_cjk:
-            # Standard 9.5 (Operacja 2C.3): Usuwanie sklejonych i luźnych tokenów ASCII [A-Za-z]+ wraz z przyległą interpunkcją
+            # Standard 9.6 (Operacja 2C.3): Usuwanie sklejonych i luźnych tokenów ASCII [A-Za-z]+ oraz osieroconych partykuł nagłosowych
             parts = re.split(r"(\[[^\]]*\]|\([^\)]*\))", text)
             for i in range(0, len(parts), 2):
-                # Usuń podciągi liter łacińskich wraz z przylegającą interpunkcją i spacjami
                 p = parts[i]
+                # Krok 1: Usuń prefiks ASCII wraz z bezpośrednio przylegającą osieroconą partykułą enklityczną
+                p = re.sub(
+                    r"^\s*[A-Za-z0-9_,\s.;:!?-]+[とのがはをにへで](?=[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF])",
+                    "",
+                    p,
+                )
+                # Krok 2: Usuń pozostałe tokeny łacińskie ASCII
                 p = re.sub(r"[A-Za-z]+[,.;:!?\s]*", "", p)
                 p = re.sub(r"[,.;:!?\s]*[A-Za-z]+", "", p)
                 p = re.sub(r"^[,\.;:!?\s]+|[,\.;:!?\s]+$", "", p)
                 parts[i] = p
-            cleaned_text = "".join(parts).strip()
+            cleaned_text = " ".join([p.strip() for p in parts if p.strip()]).strip()
             cleaned_text = re.sub(r"\s+", " ", cleaned_text).strip()
 
             # Zlicz pozostałe znaki japońskie Kana/Kanji w segmencie
-            cjk_matches = re.findall(r"[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]", cleaned_text)
+            cjk_matches = re.findall(r"[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF]", cleaned_text)
             if len(cjk_matches) <= 1:
                 return ""
             return cleaned_text
         else:
-            # Filter known Whisper hallucination spam (subtitles, amara, watching, url, etc.)
+            # Standard 9.6 (Operacja 2C.3): Czysto łacińskie tokeny ASR (cjk_count == 0) oraz halucynacje Whisper
             whisper_spam_pat = re.compile(
-                r"\b(?:subtitles?|amara(?:\.org)?|translat\w+|copyright|watch\w*|subscri\w*|youtube|licensed|all rights reserved)\b",
+                r"\b(?:subtitles?|amara(?:\.org)?|translat\w+|copyright|watch\w*|subscri\w*|youtube|licensed|all rights reserved|episode|chapter)\b",
                 re.IGNORECASE
             )
-            if whisper_spam_pat.search(text):
+            if re.fullmatch(r"^[A-Za-z0-9_.,!?'\" -]+$", text):
+                if len(text.split()) <= 1 or whisper_spam_pat.search(text):
+                    return ""
+            elif whisper_spam_pat.search(text):
                 return ""
             return text
 

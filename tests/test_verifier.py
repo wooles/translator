@@ -444,3 +444,75 @@ def test_guard_phase2_bridges_ellipsis_continuation_across_nominal_opening_line(
         prev_line_en=prev_en
     )
     assert res == expected_output
+
+
+# ==============================================================================
+# STANDARD 9.6 TESTS (T6.2, T6.5)
+# ==============================================================================
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "source_en,f1_pl,refined_pl,is_internal_monologue,expected_pl",
+    [
+        (
+            r"I'm just glad that {\i1}you{\i0} are!",
+            "Cieszę się, że tobie nic nie jest",
+            r"{\i1}Cieszę się, że tobie nic nie jest{\i0}",
+            False,
+            "Cieszę się, że tobie nic nie jest",
+        ),
+        (
+            r"{\i1}Maybe this space is like magical girls.{\i0}",
+            r"{\i1}Cieszę się, że tobie nic nie jest{\i0}",
+            r"{\i1}Cieszę się, że tobie nic nie jest{\i0}",
+            True,
+            r"{\i1}Cieszę się, że tobie nic nie jest{\i0}",
+        ),
+    ],
+)
+def test_guard_phase2_strips_whole_line_italics_when_source_en_has_only_partial_emphasis(
+    source_en, f1_pl, refined_pl, is_internal_monologue, expected_pl
+):
+    from verifier import DialogueVerifier
+
+    out = DialogueVerifier._guard_phase2_regressions(
+        f1_pl=f1_pl,
+        refined_pl=refined_pl,
+        source_en=source_en,
+        is_internal_monologue=is_internal_monologue,
+        target_gender="FEMININE",
+    )
+    assert out == expected_pl
+
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "f1_pl,raw_f2_pl,raw_reason,expected_refined_pl,expected_changes_made",
+    [
+        (
+            r"{\i1}Może pójdę z Tokiyukim\NCieszę się, że tobie nic nie jest{\i0}",
+            "{\\i1}Może pójdę z Tokiyukim\nCieszę się, że tobie nic nie jest{\\i0}",
+            "[Filar I] Zmiana podziału wiersza.",
+            r"{\i1}Może pójdę z Tokiyukim\NCieszę się, że tobie nic nie jest{\i0}",
+            None,
+        ),
+        (
+            r"Może pójdę z Tokiyukim\NCieszę się, że tobie nic nie jest",
+            r"Może pójdę z Tokiyukim\nCieszę się, że tobie nic nie jest",
+            "[Filar II] Korekta.",
+            r"Może pójdę z Tokiyukim\NCieszę się, że tobie nic nie jest",
+            None,
+        ),
+    ],
+)
+def test_verify_batch_normalizes_lowercase_newlines_to_ass_uppercase_before_comparison(
+    f1_pl, raw_f2_pl, raw_reason, expected_refined_pl, expected_changes_made
+):
+    from verifier import DialogueVerifier
+
+    norm_pl, norm_reason = DialogueVerifier.normalize_phase2_line_and_reason(
+        f1_pl=f1_pl, refined_pl=raw_f2_pl, changes_made=raw_reason
+    )
+    assert norm_pl == expected_refined_pl
+    assert "\n" not in norm_pl
+    assert norm_reason is expected_changes_made

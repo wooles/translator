@@ -4508,7 +4508,7 @@ class SeriesBible:
     def sync_verified_profile_entity(
         self,
         name: str,
-        gender: str,
+        gender: Optional[str] = None,
         has_verified_gender: bool = True,
         declension_map: Optional[Dict[str, str]] = None,
         description: Optional[str] = None,
@@ -4520,17 +4520,25 @@ class SeriesBible:
         """
         with self._lock:
             clean_name = str(name).strip()
-            g_upper = str(gender).upper()
-            if "MALE" in g_upper and "FEMALE" not in g_upper:
-                norm_gender = "MALE"
-                gram_gender = "MASCULINE"
-            elif "FEMALE" in g_upper:
-                norm_gender = "FEMALE"
-                gram_gender = "FEMININE"
+            existing_char = self.data.get("characters", {}).get(clean_name, {})
+            if gender is None:
+                norm_gender = existing_char.get("gender", "UNKNOWN") if isinstance(existing_char, dict) else "UNKNOWN"
+                gram_gender = existing_char.get("grammatical_gender", "UNKNOWN") if isinstance(existing_char, dict) else "UNKNOWN"
             else:
-                norm_gender = "UNKNOWN"
-                gram_gender = "UNKNOWN"
+                g_upper = str(gender).upper()
+                if "MALE" in g_upper and "FEMALE" not in g_upper:
+                    norm_gender = "MALE"
+                    gram_gender = "MASCULINE"
+                elif "FEMALE" in g_upper:
+                    norm_gender = "FEMALE"
+                    gram_gender = "FEMININE"
+                else:
+                    norm_gender = "UNKNOWN"
+                    gram_gender = "UNKNOWN"
 
+            existing_char = self.data.get("characters", {}).get(clean_name, {})
+            existing_aliases = existing_char.get("aliases", []) if isinstance(existing_char, dict) else []
+            combined_aliases = list(dict.fromkeys([clean_name] + existing_aliases))
             record = {
                 "name": clean_name,
                 "gender": norm_gender,
@@ -4538,8 +4546,8 @@ class SeriesBible:
                 "confidence": 0.95,
                 "priority": priority,
                 "has_verified_gender": has_verified_gender,
-                "aliases": [clean_name],
-                "description": description or f"Postać ({norm_gender.lower()})",
+                "aliases": combined_aliases,
+                "description": description or existing_char.get("description") or f"Postać ({norm_gender.lower()})",
                 "entity_category": "ANTHROPONYM"
             }
             self.data["characters"][clean_name] = record
@@ -6174,6 +6182,42 @@ class SeriesBible:
                             if regenerated and regenerated.get("M"):
                                 decl_dict[decl_k] = regenerated
 
+            # 6. Automatyczne odmrażanie zamrożonych mianowników męskich P0 (Standard 9.6, 2C.4)
+            if isinstance(decl_dict, dict):
+                chars_map = self.data.get("characters", {})
+                for c_name, c_rec in list(chars_map.items()):
+                    if "->" in c_name or not isinstance(c_rec, dict):
+                        continue
+                    g_val = str(c_rec.get("gender") or "").upper()
+                    cat_val = c_rec.get("entity_category")
+                    is_anthro = (cat_val in ("ANTHROPONYM", getattr(EntityCategory.ANTHROPONYM, "value", "ANTHROPONYM")) or not cat_val)
+                    if g_val == "MALE" and is_anthro:
+                        cur_decl = decl_dict.get(c_name)
+                        if isinstance(cur_decl, dict):
+                            frozen = all(cur_decl.get(k) == c_name for k in ("M", "D", "C", "B", "N", "Ms", "W") if k in cur_decl)
+                            if frozen:
+                                new_decl = generate_polish_name_declension(c_name, "MALE")
+                                if new_decl and any(new_decl.get(k) != c_name for k in ("D", "C", "B", "N", "Ms", "W") if k in new_decl):
+                                    new_decl["gender"] = "MALE"
+                                    decl_dict[c_name] = new_decl
+
+            # 7. Rejestracja aliasów zdrobniałych z honoryfikatorem i obciętym rdzeniem (Operacja 2B.1)
+            t_romaji = str(self.data.get("anime_title") or getattr(self, "anime_title", "") or "")
+            anchor_text = " ".join([str(v) for v in self.data.get("plot_anchors", {}).values()])
+            combined_corpus = f"{t_romaji} {anchor_text}"
+            found_h_tokens = re.findall(r"\b([A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+)-(?:chan|kun|san|sama|senpai|dono|tan|pyon)\b", combined_corpus, flags=re.IGNORECASE)
+            chars_map = self.data.get("characters", {})
+            for raw_stem in set(found_h_tokens):
+                for char_k, char_v in chars_map.items():
+                    if not isinstance(char_v, dict) or "->" in char_k:
+                        continue
+                    desc_c = str(char_v.get("description", ""))
+                    if raw_stem.lower() in desc_c.lower() or raw_stem.lower() in anchor_text.lower():
+                        c_aliases = char_v.setdefault("aliases", [])
+                        for al in (f"{raw_stem}-chan", raw_stem, f"{raw_stem}-kun"):
+                            if al not in c_aliases:
+                                c_aliases.append(al)
+
     def populate_secondary_actor_tags(self, raw_actor_tags: List[str]) -> None:
         """
         Zasila SeriesBible encjami drugoplanowymi (P1) i epizodycznymi (P2) z Kroku 3 (Standard 9.4, 2C.7, R3.1):
@@ -6337,6 +6381,103 @@ class SeriesBible:
             target_text = text or ""
             target_decl = declensions if declensions is not None else (self_or_text.data.get("declensions", {}) if hasattr(self_or_text, "data") and isinstance(self_or_text.data, dict) else {})
             return SeriesBible._align_vocative_impl(target_text, target_decl)
+
+    @staticmethod
+    def parse_step5_declension_line(line_content: str) -> Dict[str, str]:
+        """
+        Parsuje paradygmat odmiany z sekcji Odmiana Imion i Tytułów (Krok 5 / EpisodeProfiler)
+        obsługując zarówno separator kropki (M., D.), jak i dwukropka (M:, D:) (Standard 9.6, 2C.4).
+        """
+        if not line_content:
+            return {}
+        case_matches = re.findall(
+            r"\b(M|D|C|B|N|Ms|W)[.:]\s*([^,;\n(]+)",
+            str(line_content),
+        )
+        res = {}
+        for case_tag, val in case_matches:
+            v = val.strip().strip("'\"")
+            if v:
+                res[case_tag] = v
+        return res
+
+    @staticmethod
+    def substitute_canonical_honorific_alias(
+        text: str,
+        source_en: str,
+        series_bible: Optional[Any] = None,
+        declensions: Optional[Dict[str, Any]] = None,
+        characters: Optional[Dict[str, Any]] = None
+    ) -> str:
+        """
+        Mapuje japońskie aliasy zdrobniałe z honoryfikatorami (-chan/-kun) lub obciętym rdzeniem
+        na kanoniczny paradygmat fleksyjny z SeriesBible (Standard 9.6, 2B.1).
+        """
+        if not text or not source_en:
+            return text
+
+        decl_map = declensions
+        if not decl_map and series_bible and hasattr(series_bible, "data") and isinstance(series_bible.data, dict):
+            decl_map = series_bible.data.get("declensions", {})
+        if not decl_map:
+            return text
+
+        char_map = characters
+        if not char_map and series_bible and hasattr(series_bible, "data") and isinstance(series_bible.data, dict):
+            char_map = series_bible.data.get("characters", {})
+        char_map = char_map or {}
+
+        res = text
+        for canon_name, decl in decl_map.items():
+            if not isinstance(decl, dict):
+                continue
+            char_rec = char_map.get(canon_name, {})
+            aliases = char_rec.get("aliases", []) if isinstance(char_rec, dict) else []
+            names_to_check = [canon_name] + [a for a in aliases if a]
+            pattern_src = r"\b(?:" + "|".join(re.escape(n) for n in names_to_check) + r")\b"
+            if not re.search(pattern_src, source_en, re.IGNORECASE):
+                continue
+
+            for al in aliases:
+                if not al or al.lower() == canon_name.lower():
+                    continue
+                stem = re.sub(r"-(?:senpai|kun|chan|san|sama|sensei|dono|tan|pyon)$", "", al, flags=re.IGNORECASE).strip()
+                al_patterns = [re.escape(al)]
+                if stem and stem.lower() != al.lower():
+                    al_patterns.append(re.escape(stem))
+                al_re = "|".join(al_patterns)
+
+                form_n = decl.get("N", canon_name)
+                form_m = decl.get("M", canon_name)
+
+                # Narzędnik ze spójnikiem i wcześniejszym rzeczownikiem (np. z Sasakim i Pii-chan)
+                res = re.sub(
+                    rf"\b(z|ze|przed|nad|pod|za|między)\s+([A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+(?:\s+(?:i|oraz|ani)\s+))(?:{al_re})(?:-[a-zA-Z]+)?(?:em|iem)?\b",
+                    rf"\g<1> \g<2>{form_n}",
+                    res,
+                    flags=re.IGNORECASE
+                )
+                # Narzędnik bezpośrednio po przyimku (np. z Pii-chan)
+                res = re.sub(
+                    rf"\b(z|ze|przed|nad|pod|za|między)\s+(?:{al_re})(?:-[a-zA-Z]+)?(?:em|iem)?\b",
+                    rf"\g<1> {form_n}",
+                    res,
+                    flags=re.IGNORECASE
+                )
+                # Mianownik / ogólny kontekst
+                res = re.sub(
+                    rf"\b(?:{al_re})(?:-(?:senpai|kun|chan|san|sama|sensei|dono|tan|pyon))\b",
+                    form_m,
+                    res,
+                    flags=re.IGNORECASE
+                )
+                res = re.sub(
+                    rf"\b(?:{al_re})\b",
+                    form_m,
+                    res,
+                    flags=re.IGNORECASE
+                )
+        return res
 
     def _validate_relation_entry_consistency(self) -> None:
         """

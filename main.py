@@ -277,9 +277,9 @@ def main():
     )
     parser.add_argument(
         "--profile",
-        choices=["standard", "studio", "pro"],
+        choices=["standard", "studio", "pro", "master", "cinema", "1", "2", "3", "4"],
         default=None,
-        help="Profil tłumaczenia: 'standard' (100% Flash), 'studio' (Flash + Pro Script Doctor), 'pro' (Full Pro)"
+        help="Profil tłumaczenia: 'standard' (100%% Flash), 'studio' (Flash + Pro Script Doctor), 'pro' (Full Pro)"
     )
     parser.add_argument(
         "--no-whisper",

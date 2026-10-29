@@ -2744,40 +2744,57 @@ class SceneDiscourseGraph:
         verified_addressee_p0_gender: Optional[str] = None,
         has_verified_gender: bool = False,
         scene_female_only: bool = False,
+        target_actor: Optional[str] = None,
+        is_internal_monologue: bool = False,
+        is_sign: bool = False,
         **kwargs
     ) -> Dict[str, Any]:
-        """
-        Prymat Tożsamości Rodzajowej z Rekordu P0 i Etykiety Aktora Events (R1.4, R3.2):
-        Zachowuje jawnego aktora z sekcji [Events] oraz przypisuje rodzaj mówcy
-        i adresata na podstawie rekordu P0 (has_verified_gender: true), zapewniając
-        pierwszeństwo przed pomocniczymi etykietami telemetrii czy sygnałem F0.
-        Dla scen wyłącznie kobiecych (scene_female_only=True) ustawia kategorię grupy NON_VIRILE.
-        Dla wielogłosu z surowymi separatorami ('/', '|', ',') ustawia znacznik POLYLOGUE.
+        r"""
+        Prymat Tożsamości Rodzajowej z Rekordu P0 i Etykiety Aktora Events (Standard 9.6, 2C.1, R1.4, R3.2):
+        - Czyści raw_actor i target_actor z wszelkich nawiasów F0: re.sub(r"\s*\([^)]*\)", "", ...)
+        - Wymusza p0_gender dla mówcy i adresata ze słownika P0 SeriesBible / EpisodeProfiler.
+        - Izoluje monologi wewnętrzne (is_internal_monologue: true) przed fałszywym adresatem zewnętrznym.
+        - Izoluje napisy ekranowe (is_sign: true) jako Mówca: sign (NEUTRAL).
         """
         telemetry = dict(aux_telemetry or {})
-        
-        # 0. Obsługa napisów ekranowych (is_sign) - brak płci osobowej (Operacja 2C.1)
+
+        # Oczyszczenie target_actor z nawiasowych adnotacji F0
+        raw_target_in = target_actor or telemetry.get("target_actor") or telemetry.get("addressee") or kwargs.get("addressee")
+        clean_target_actor = re.sub(r"\s*\([^)]*\)", "", str(raw_target_in or "")).strip()
+        clean_target_actor = re.sub(r"\s{2,}", " ", clean_target_actor)
+
+        # Oczyszczenie raw_actor ze zdarzenia
         raw_name = raw_actor or getattr(event, "actor", None) or getattr(event, "speaker_name", None) or getattr(event, "name", None)
         if not raw_name and isinstance(event, dict):
             raw_name = event.get("actor") or event.get("speaker_name") or event.get("name")
         clean_raw = str(raw_name).strip() if raw_name else ""
+        clean_raw = re.sub(r"\s*\([^)]*\)", "", clean_raw).strip()
+        clean_raw = re.sub(r"\s{2,}", " ", clean_raw)
 
+        # 0. Obsługa napisów ekranowych (is_sign) - brak płci osobowej (Operacja 2C.1)
         ev_is_sign = bool(
-            kwargs.get("is_sign")
+            is_sign
+            or kwargs.get("is_sign")
             or getattr(event, "is_sign", False)
-            or (clean_raw and clean_raw.lower() in ("sign", "txt", "title", "caption", "szyld", "napis"))
+            or (clean_raw and clean_raw.lower() in ("sign", "signs", "txt", "title", "caption", "szyld", "napis", "board", "screen"))
         )
         if ev_is_sign:
-            telemetry["speaker_name"] = clean_raw or "sign"
+            telemetry["speaker_name"] = "sign"
             telemetry["speaker_gender"] = "NEUTRAL"
             telemetry["grammatical_gender"] = "NEUTRAL"
             telemetry["has_verified_gender"] = False
             telemetry["is_sign"] = True
+            telemetry["target_actor"] = ""
+            telemetry["target_gender"] = None
+            telemetry["addressee_gender"] = None
+            telemetry["dry_telemetry"] = "[Mówca: sign (NEUTRAL)]"
             return telemetry
 
         # 1. Pobierz aktora ze zdarzenia lub inferred_actor
         if not clean_raw or clean_raw.lower() in ("txt", "title"):
             clean_actor = str(inferred_actor or telemetry.get("speaker_name") or "").strip()
+            clean_actor = re.sub(r"\s*\([^)]*\)", "", clean_actor).strip()
+            clean_actor = re.sub(r"\s{2,}", " ", clean_actor)
         else:
             clean_actor = clean_raw
 
@@ -2840,37 +2857,89 @@ class SceneDiscourseGraph:
             if "grammatical_gender" not in telemetry:
                 telemetry["grammatical_gender"] = "UNKNOWN"
 
-        # 3. Bezwarunkowy odczyt P0 dla adresata (Operacja 2C.1)
-        addr_candidate = verified_addressee_p0_gender
-        if not addr_candidate and series_bible:
-            cand_name = telemetry.get("addressee") or telemetry.get("target_actor") or kwargs.get("addressee") or kwargs.get("target_actor")
-            if cand_name:
+        # 3. Izolacja monologu wewnętrznego (Style: Italics / is_internal_monologue)
+        st_style = str(getattr(event, "style", "") or kwargs.get("style", "")).lower()
+        has_monologue_style = any(k in st_style for k in ["italic", "flashback_italic", "thoughts", "internal"])
+        ev_is_monologue = bool(
+            is_internal_monologue
+            or kwargs.get("is_internal_monologue")
+            or getattr(event, "is_internal_monologue", False)
+            or has_monologue_style
+        )
+
+        if ev_is_monologue:
+            telemetry["target_actor"] = ""
+            telemetry["target_gender"] = None
+            telemetry["addressee_gender"] = None
+            telemetry["is_internal_monologue"] = True
+        else:
+            # Gdy adresat jest tożsamy z mówcą w dialogu, wyznacz pusty lub drugiego rozmówcę
+            if clean_target_actor and clean_target_actor.lower() == clean_actor.lower():
+                clean_target_actor = ""
+
+            telemetry["target_actor"] = clean_target_actor
+            addr_candidate = verified_addressee_p0_gender
+
+            if not addr_candidate and series_bible and clean_target_actor:
                 ch_addr = None
                 if hasattr(series_bible, "get_character"):
-                    ch_addr = series_bible.get_character(str(cand_name))
+                    ch_addr = series_bible.get_character(clean_target_actor)
                 elif hasattr(series_bible, "characters") and isinstance(series_bible.characters, dict):
-                    ch_addr = series_bible.characters.get(str(cand_name))
+                    chars = series_bible.characters
+                    ch_addr = chars.get(clean_target_actor)
+                    if not ch_addr:
+                        for k, v in chars.items():
+                            if k.lower() == clean_target_actor.lower():
+                                ch_addr = v
+                                break
+                            if isinstance(v, dict) and clean_target_actor.lower() in [str(a).lower() for a in v.get("aliases", [])]:
+                                ch_addr = v
+                                break
                 if isinstance(ch_addr, dict):
                     ag = ch_addr.get("gender")
                     if ag and str(ag).upper() in ("MALE", "FEMALE"):
                         addr_candidate = str(ag).upper()
 
-        if addr_candidate:
-            addr_g = str(addr_candidate).upper()
-            telemetry["addressee_gender"] = addr_g
-            if addr_g == "FEMALE":
-                telemetry["target_gender"] = "FEMININE"
-            elif addr_g == "MALE":
-                telemetry["target_gender"] = "MASCULINE"
+            if not addr_candidate and episode_profiler and hasattr(episode_profiler, "character_dossiers") and clean_target_actor:
+                for cd in getattr(episode_profiler, "character_dossiers", []):
+                    if getattr(cd, "name", "").lower() == clean_target_actor.lower():
+                        ag = getattr(cd, "gender", None) or getattr(cd, "apparent_gender", None)
+                        if ag and str(ag).upper() in ("MALE", "FEMALE"):
+                            addr_candidate = str(ag).upper()
+                            break
+
+            if addr_candidate:
+                addr_g = str(addr_candidate).upper()
+                telemetry["addressee_gender"] = addr_g
+                if addr_g == "FEMALE":
+                    telemetry["target_gender"] = "FEMININE"
+                elif addr_g == "MALE":
+                    telemetry["target_gender"] = "MASCULINE"
+            else:
+                telemetry["target_gender"] = None
+                telemetry["addressee_gender"] = None
 
         # 4. Spójność sceny żeńskiej bez nadpisywania potwierdzonego mówcy męskiego (Operacja 2C.1)
         if scene_female_only:
             telemetry["group_virility"] = "NON_VIRILE"
             telemetry["we_virility"] = "NON_VIRILE"
             telemetry["you_virility"] = "NON_VIRILE"
-            if telemetry.get("target_gender") != "MASCULINE":
+            if not ev_is_monologue and clean_target_actor and telemetry.get("target_gender") != "MASCULINE":
                 telemetry["target_gender"] = "FEMININE"
-            if "addressee_gender" not in telemetry or telemetry["addressee_gender"] == "UNKNOWN":
                 telemetry["addressee_gender"] = "FEMALE"
+
+        # 5. Generowanie spójnego tagu dry_telemetry wolnego od nawiasów F0
+        dry_segs = []
+        spk_g_tag = telemetry.get("grammatical_gender")
+        if spk_g_tag in ("MASCULINE", "FEMININE"):
+            dry_segs.append(f"Mówca: {telemetry['speaker_name']} ({spk_g_tag})")
+        elif telemetry.get("speaker_name"):
+            dry_segs.append(f"Mówca: {telemetry['speaker_name']}")
+
+        if not ev_is_monologue and telemetry.get("target_actor") and telemetry.get("target_gender") in ("MASCULINE", "FEMININE"):
+            dry_segs.append(f"Adresat: {telemetry['target_actor']} ({telemetry['target_gender']})")
+
+        if dry_segs:
+            telemetry["dry_telemetry"] = f"[{' | '.join(dry_segs)}]"
 
         return telemetry

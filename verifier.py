@@ -49,6 +49,17 @@ def normalize_ass_tags(text: str) -> str:
     res = re.sub(r"\{\\i1\}(.*?)\{\\i0\}\s*\\N\s*\{\\i1\}(.*?)\{\\i0\}", r"{\\i1}\1\\N\2{\\i0}", res, flags=re.DOTALL)
     return res
 
+def _is_whole_line_italic(s: str) -> bool:
+    """
+    Sprawdza, czy cały ciąg jest otoczony pojedynczym całoliniowym blokiem kursywy (Standard 9.6, 2C.2).
+    Zwraca False dla kursywy częściowej lub emfatycznej obejmującej tylko pojedyncze słowo.
+    """
+    st = (s or "").strip()
+    if not (st.startswith(r"{\i1}") and st.endswith(r"{\i0}")):
+        return False
+    inner = st[len(r"{\i1}"):-len(r"{\i0}")]
+    return r"{\i0}" not in inner and r"{\i1}" not in inner
+
 
 def enforce_sign_nominative_orthography(
     f1_pl: str,
@@ -424,16 +435,14 @@ def _guard_phase2_regressions(
                 return r"{\i1}" + f1_pl + (r"{\i0}" if not f1_pl.endswith(r"{\i0}") else "")
             return f1_pl
 
-    # 20. KATEGORIA 20 (Standard 9.4, 2C.6, R3.3): Ochrona przed nadmiarową kursywą w dialogu zewnętrznym (over_application_italics)
+    # 20. KATEGORIA 20 (Standard 9.4/9.6, 2C.2, R3.3): Ochrona przed nadmiarową kursywą w dialogu zewnętrznym (over_application_italics)
     is_monologue = kwargs.get("is_internal_monologue", False)
-    target_addr = kwargs.get("target_gender") or kwargs.get("addressee") or target_p0_gender
-    has_target = bool(target_addr and str(target_addr).upper() not in ("NONE", "UNKNOWN", ""))
-    if not is_monologue and has_target:
-        clean_ref = refined_pl.strip()
-        if clean_ref.startswith(r"{\i1}") and clean_ref.endswith(r"{\i0}") and not f1_pl.strip().startswith(r"{\i1}"):
-            stripped = clean_ref[len(r"{\i1}"):-len(r"{\i0}")].strip()
-            if r"{\i" not in stripped:
-                refined_pl = stripped
+    if not is_monologue:
+        if _is_whole_line_italic(refined_pl) and not _is_whole_line_italic(source_en) and not _is_whole_line_italic(f1_pl):
+            if r"{\i1}" in f1_pl:
+                refined_pl = f1_pl
+            else:
+                refined_pl = refined_pl.strip()[len(r"{\i1}"):-len(r"{\i0}")].strip()
 
     # Wyrównanie ortograficzne rdzenia wołacza W do formy kanonicznej (Standard 9.5, 2C.4, R1.8)
     decl_dict = kwargs.get("declensions")
@@ -445,6 +454,14 @@ def _guard_phase2_regressions(
     except Exception:
         pass
 
+    if "\\N" in str(f1_pl or "") or "\n" not in str(f1_pl or ""):
+        refined_pl = (
+            str(refined_pl or "")
+            .replace("\\r\\n", "\\N")
+            .replace("\\n", "\\N")
+            .replace("\r\n", "\\N")
+            .replace("\n", "\\N")
+        )
     return refined_pl
 
 import os
@@ -456,6 +473,32 @@ class DialogueVerifier:
     enforce_sign_nominative_orthography = staticmethod(enforce_sign_nominative_orthography)
     _STATUS_ACTIVE: bool = False
     _LAST_STATUS_TIME: float = 0.0
+
+    @classmethod
+    def normalize_phase2_line_and_reason(cls, f1_pl: str, refined_pl: str, changes_made: Optional[str] = None) -> Tuple[str, Optional[str]]:
+        """
+        Normalizuje nowe linie do formatu ASS \\N oraz czyści pozorne uzasadnienia changes_made (Standard 9.6, 2C.5).
+        """
+        ref_norm = (
+            str(refined_pl or "")
+            .replace("\\r\\n", "\\N")
+            .replace("\\n", "\\N")
+            .replace("\r\n", "\\N")
+            .replace("\n", "\\N")
+        )
+        def _norm_cmp(t: str) -> str:
+            t_clean = re.sub(r"\{[^}]*\}", "", str(t or ""))
+            t_clean = re.sub(r"\\[nN]", " ", t_clean)
+            return " ".join(t_clean.split()).strip()
+
+        has_ital_f1 = (r"{\i1}" in (f1_pl or ""))
+        has_ital_ref = (r"{\i1}" in ref_norm)
+        ital_changed = (has_ital_f1 != has_ital_ref)
+
+        final_reason = changes_made
+        if _norm_cmp(f1_pl) == _norm_cmp(ref_norm) and not ital_changed:
+            final_reason = None
+        return ref_norm, final_reason
 
     def __init__(
         self,
@@ -989,12 +1032,21 @@ class DialogueVerifier:
                 for r in result_lines:
                     orig_it = items_by_id.get(r.id)
                     if orig_it:
-                        r.refined_pl = str(r.refined_pl or "").replace("\r\n", r"\N").replace("\n", r"\N")
+                        r.refined_pl = (
+                            str(r.refined_pl or "")
+                            .replace("\\r\\n", "\\N")
+                            .replace("\\n", "\\N")
+                            .replace("\r\n", "\\N")
+                            .replace("\n", "\\N")
+                        )
                         r.refined_pl = normalize_ass_tags(r.refined_pl)
                         r.refined_pl = re.sub(r"\{\\i1\}(.*?)\{\\i0\}\s*\\N\s*\{\\i1\}(.*?)\{\\i0\}", r"{\\i1}\1\\N\2{\\i0}", r.refined_pl, flags=re.DOTALL)
                         f1_text = orig_it.get("pl", "")
                         src_en = orig_it.get("en", "")
-                        if (r"{\i1}" in f1_text or r"<i>" in f1_text.lower() or r"{\i1}" in src_en or r"<i>" in src_en.lower() or orig_it.get("is_offscreen") or orig_it.get("is_thought")) and r"{\i1}" not in r.refined_pl:
+                        st_name_lower = str(orig_it.get("style", "")).lower()
+                        has_im_style = any(k in st_name_lower for k in ["italic", "flashback_italic", "thoughts", "internal"])
+                        is_monologue_it = bool(orig_it.get("is_internal_monologue") or has_im_style or _is_whole_line_italic(src_en) or _is_whole_line_italic(f1_text))
+                        if is_monologue_it and not _is_whole_line_italic(r.refined_pl):
                             if not r.refined_pl.startswith(r"{\i1}"):
                                 r.refined_pl = r"{\i1}" + r.refined_pl + (r"{\i0}" if not r.refined_pl.endswith(r"{\i0}") else "")
                         spk_g = orig_it.get("speaker_gender") or orig_it.get("speaker_p0_gender")
@@ -1011,7 +1063,7 @@ class DialogueVerifier:
                                 canonical_glossary=gloss
                             )
                         prev_en = orig_it.get("prev_line_en") or ""
-                        is_monologue_it = bool(orig_it.get("is_thought") or orig_it.get("is_internal_monologue"))
+                        is_monologue_guard = bool(orig_it.get("is_internal_monologue") or has_im_style or _is_whole_line_italic(src_en) or _is_whole_line_italic(f1_text))
                         guarded = _guard_phase2_regressions(
                             f1_pl=f1_text,
                             refined_pl=r.refined_pl,
@@ -1022,24 +1074,14 @@ class DialogueVerifier:
                             prev_line_f1=prev_txt,
                             prev_line_pl=prev_txt,
                             prev_line_en=prev_en,
-                            is_internal_monologue=is_monologue_it
+                            is_internal_monologue=is_monologue_guard
                         )
                         if guarded != r.refined_pl:
                             r.refined_pl = guarded
                             r.changes_made = (r.changes_made or "") + " [Zabezpieczono przed regresją Fazy 2]"
 
-                        # Operacja 2B.11: eliminacja pozornych uzasadnień changes_made przy braku zmiany tekstu
-                        def _norm_cmp(t: str) -> str:
-                            t_clean = re.sub(r"\{[^}]*\}", "", str(t or ""))
-                            t_clean = re.sub(r"\\[nN]", " ", t_clean)
-                            return " ".join(t_clean.split()).strip()
-
-                        has_ital_f1 = (r"{\i1}" in f1_text)
-                        has_ital_ref = (r"{\i1}" in r.refined_pl)
-                        ital_changed = (has_ital_f1 != has_ital_ref)
-
-                        if _norm_cmp(f1_text) == _norm_cmp(r.refined_pl) and not ital_changed:
-                            r.changes_made = None
+                        # Operacja 2B.11 / 2C.5: normalizacja znaków nowej linii oraz eliminacja pozornych uzasadnień
+                        r.refined_pl, r.changes_made = self.normalize_phase2_line_and_reason(f1_text, r.refined_pl, r.changes_made)
 
                 with DialogueVerifier._STATUS_LOCK:
                     if DialogueVerifier._STATUS_ACTIVE:

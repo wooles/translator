@@ -144,6 +144,9 @@ def clean_anime_filename(filename_or_path: str) -> str:
     """
     name = Path(filename_or_path).stem
 
+    # 0. Remove language prefixes (e.g. EN_, PL_, JA_)
+    name = re.sub(r"^(?:EN|PL|JA|JP|ENG|POL)[._\s-]+", "", name, flags=re.IGNORECASE)
+
     # 1. Remove bracketed prefix tags (e.g. [ASW], [SubsPlease], [Erai-raws])
     name = re.sub(r"^\[[^\]]+\]\s*", "", name)
 

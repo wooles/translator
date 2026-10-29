@@ -155,3 +155,30 @@ def test_sanitize_event_asr_strips_glued_ascii_prefixes_and_enforces_episode_loo
         consecutive_streak=streak
     )
     assert res == expected_output
+
+
+# ==============================================================================
+# STANDARD 9.6 TESTS (T6.3)
+# ==============================================================================
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "raw_asr_input,expected_sanitized_output",
+    [
+        ("Episode", ""),
+        (
+            "Episodeとおじま",
+            "おじま",
+        ),
+        (
+            "Episodeのまほうしょうじょ",
+            "まほうしょうじょ",
+        ),
+    ],
+)
+def test_sanitize_event_asr_zeros_zero_cjk_latin_words_and_strips_orphaned_initial_particles(
+    raw_asr_input, expected_sanitized_output
+):
+    from profiler import EpisodeProfiler
+
+    cleaned = EpisodeProfiler.sanitize_event_asr(raw_asr_input, is_sign=False)
+    assert cleaned == expected_sanitized_output

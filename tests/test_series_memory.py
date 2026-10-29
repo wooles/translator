@@ -374,3 +374,62 @@ def test_validate_relation_strips_nested_bracket_clause_and_sanitizes_legacy_dec
     misspelled_vocative = "Poczekaj, Abadonie!"
     corrected_vocative = SeriesBible.align_vocative_orthography(misspelled_vocative, declensions=bible.data["declensions"])
     assert corrected_vocative == "Poczekaj, Abaddonie!"
+
+
+# ==============================================================================
+# STANDARD 9.6 TESTS (T6.4)
+# ==============================================================================
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "step5_line,entity_name,expected_d,expected_n,expected_w",
+    [
+        (
+            "Tokiyuki: M. Tokiyuki, D. Tokiyukiego, C. Tokiyukiego, B. Tokiyukiego, N. Tokiyukim, Ms. Tokiyukim, W. Tokiyuki",
+            "Tokiyuki",
+            "Tokiyukiego",
+            "Tokiyukim",
+            "Tokiyuki",
+        ),
+        (
+            "Yorishige: M: Yorishige, D: Yorishigego, C: Yorishigemu, B: Yorishigego, N: Yorishigem, Ms: Yorishigem, W: Yorishige",
+            "Yorishige",
+            "Yorishigego",
+            "Yorishigem",
+            "Yorishige",
+        ),
+    ],
+)
+def test_step5_dot_separator_paradigm_parsing_and_honorific_alias_canonical_declension(
+    step5_line, entity_name, expected_d, expected_n, expected_w
+):
+    from series_memory import SeriesBible
+
+    bible = SeriesBible(slug="test_dot_paradigm_and_alias")
+    bible.data["characters"][entity_name] = {
+        "name": entity_name,
+        "gender": "MALE",
+        "grammatical_gender": "MASCULINE",
+        "confidence": 0.95,
+        "priority": "P0",
+        "has_verified_gender": True,
+        "aliases": [entity_name, "Toki-chan", "Toki"],
+    }
+    bible.data["declensions"][entity_name] = {k: entity_name for k in ("M", "D", "C", "B", "N", "Ms", "W")}
+    parsed_map = SeriesBible.parse_step5_declension_line(step5_line)
+    bible.sync_verified_profile_entity(entity_name, "MALE", has_verified_gender=True, declension_map=parsed_map)
+    assert bible.data["declensions"][entity_name]["D"] == expected_d
+    assert bible.data["declensions"][entity_name]["N"] == expected_n
+    assert bible.data["declensions"][entity_name]["W"] == expected_w
+
+    # Weryfikacja podmiany zdrobnienia/aliasu z honoryfikatorem na kanoniczny narzędnik N
+    source_en = "Maybe I'll go with Toki-chan."
+    f1_pl = "Może pójdę z Toki."
+    res = SeriesBible.substitute_canonical_honorific_alias(
+        text=f1_pl,
+        source_en=source_en,
+        series_bible=bible,
+        declensions=bible.data["declensions"],
+        characters=bible.data["characters"],
+    )
+    if entity_name == "Tokiyuki":
+        assert res == "Może pójdę z Tokiyukim."

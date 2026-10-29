@@ -19364,6 +19364,70 @@ def test_standard_9_5_suite():
     print(" -> PASSED: TEST 219 potwierdza integrację operacji Standardu 9.5.")
 
 
+def test_standard_9_6_suite():
+    """TEST 220: Standard 9.6 Kompletny zestaw testów integracyjnych potoku AVT (Runtime Wiring, F0-Cleaning, Italics & Newlines)."""
+    print("\n[TEST 220] Standard 9.6: Integracja F0-Cleaning, Kursywa Całoliniowa, ASR Partykuły, Paradygmaty Kropki i Normalizacja Newlines...")
+    from profiler import EpisodeProfiler
+    from series_memory import SeriesBible
+    from verifier import DialogueVerifier
+    from scene_discourse import SceneDiscourseGraph
+
+    # 1. 2C.1: SceneDiscourseGraph strips F0 parentheses and enforces P0 gender
+    bible = SeriesBible(slug="test_s96_integration")
+    bible.sync_verified_profile_entity("Tokiyuki", "MALE", has_verified_gender=True)
+    bible.sync_verified_profile_entity("Shizuku", "FEMALE", has_verified_gender=True)
+    res_telem = SceneDiscourseGraph.arbitrate_event_telemetry(
+        raw_actor="Shizuku",
+        target_actor="Tokiyuki (Kobieta)",
+        series_bible=bible,
+        is_internal_monologue=False,
+    )
+    assert res_telem.get("target_actor") == "Tokiyuki"
+    assert res_telem.get("target_gender") == "MASCULINE" or res_telem.get("addressee_gender") == "MALE"
+
+    # 2. 2C.2: DialogueVerifier strips whole-line italics when EN only has partial emphasis
+    out_it = DialogueVerifier._guard_phase2_regressions(
+        f1_pl="Cieszę się, że tobie nic nie jest",
+        refined_pl=r"{\i1}Cieszę się, że tobie nic nie jest{\i0}",
+        source_en=r"I'm just glad that {\i1}you{\i0} are!",
+        is_internal_monologue=False,
+        target_gender="FEMININE",
+    )
+    assert out_it == "Cieszę się, że tobie nic nie jest"
+
+    # 3. 2C.3: EpisodeProfiler zeroes <= 1 CJK and strips orphaned initial particles after ASCII
+    assert EpisodeProfiler.sanitize_event_asr("Episode", is_sign=False) == ""
+    assert EpisodeProfiler.sanitize_event_asr("Episodeとおじま", is_sign=False) == "おじま"
+    assert EpisodeProfiler.sanitize_event_asr("Episodeのまほうしょうじょ", is_sign=False) == "まほうしょうじょ"
+
+    # 4. 2C.4 & 2B.1: Step 5 dot paradigm parsing and canonical honorific alias declension
+    step5_line = "Tokiyuki: M. Tokiyuki, D. Tokiyukiego, C. Tokiyukiego, B. Tokiyukiego, N. Tokiyukim, Ms. Tokiyukim, W. Tokiyuki"
+    parsed_map = SeriesBible.parse_step5_declension_line(step5_line)
+    bible.data["characters"]["Tokiyuki"]["aliases"] = ["Tokiyuki", "Toki-chan", "Toki"]
+    bible.sync_verified_profile_entity("Tokiyuki", "MALE", has_verified_gender=True, declension_map=parsed_map)
+    assert bible.data["declensions"]["Tokiyuki"]["N"] == "Tokiyukim"
+
+    sub_alias = SeriesBible.substitute_canonical_honorific_alias(
+        text="Może pójdę z Toki.",
+        source_en="Maybe I'll go with Toki-chan.",
+        series_bible=bible,
+        declensions=bible.data["declensions"],
+        characters=bible.data["characters"],
+    )
+    assert sub_alias == "Może pójdę z Tokiyukim."
+
+    # 5. 2C.5: Lowercase newline normalization \n -> \N in verify_batch
+    norm_pl, norm_reason = DialogueVerifier.normalize_phase2_line_and_reason(
+        f1_pl=r"{\i1}Może pójdę z Tokiyukim\NCieszę się, że tobie nic nie jest{\i0}",
+        refined_pl="{\\i1}Może pójdę z Tokiyukim\nCieszę się, że tobie nic nie jest{\\i0}",
+        changes_made="[Filar I] Zmiana podziału wiersza.",
+    )
+    assert norm_pl == r"{\i1}Może pójdę z Tokiyukim\NCieszę się, że tobie nic nie jest{\i0}"
+    assert norm_reason is None
+
+    print(" -> PASSED: TEST 220 potwierdza integrację operacji Standardu 9.6.")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -19586,4 +19650,5 @@ if __name__ == "__main__":
     test_standard_9_3_discourse_and_verifier_dual_voice_epistemic_clause()
     test_standard_9_4_suite()
     test_standard_9_5_suite()
-    print("\n Wszystkie testy jednostkowe i integracyjne (218/218) zakończone pełnym sukcesem!\n")
+    test_standard_9_6_suite()
+    print("\n Wszystkie testy jednostkowe i integracyjne (220/220) zakończone pełnym sukcesem!\n")

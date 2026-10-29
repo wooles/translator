@@ -139,6 +139,25 @@ def format_dry_telemetry_tag(
 
     reg = register or kwargs.get("register") or kwargs.get("social_register") or kwargs.get("pragmatic_register") or kwargs.get("rejestr")
 
+    # Standard 9.6 (Operacja 2C.1): Oczyszczanie nawiasów F0 z nazw mówcy i adresata
+    if spk_n:
+        spk_n = re.sub(r"\s*\([^)]*\)", "", str(spk_n)).strip()
+        spk_n = re.sub(r"\s{2,}", " ", spk_n)
+    if tgt_n:
+        tgt_n = re.sub(r"\s*\([^)]*\)", "", str(tgt_n)).strip()
+        tgt_n = re.sub(r"\s{2,}", " ", tgt_n)
+
+    # Izolacja napisów ekranowych (is_sign: true)
+    is_sign = kwargs.get("is_sign", False) or (spk_n and spk_n.lower() in ("sign", "signs", "txt", "title", "caption", "szyld", "napis", "board", "screen"))
+    if is_sign:
+        return "[Mówca: sign (NEUTRAL)]"
+
+    # Izolacja monologu wewnętrznego i tożsamości mówcy z adresatem
+    is_internal_monologue = kwargs.get("is_internal_monologue", False) or kwargs.get("is_thought", False)
+    if is_internal_monologue or (tgt_n and spk_n and tgt_n.lower() == spk_n.lower()):
+        tgt = None
+        tgt_n = None
+
     segments = []
 
     def _is_valid_telemetry_val(val: Any) -> bool:
@@ -1957,14 +1976,49 @@ class MultimodalTranslator:
                 scene_texts = [getattr(ev, "text", "") for _, ev in sc if getattr(ev, "text", "")]
                 scene_whisper = [whisper_transcriptions.get(idx, "") for idx in scene_indices if whisper_transcriptions and idx in whisper_transcriptions]
 
+                sc_gender = None
                 if hasattr(self.series_bible, "infer_scene_cast_from_text"):
                     _, sc_gender = self.series_bible.infer_scene_cast_from_text(scene_texts, whisper_texts=scene_whisper)
-                    if sc_gender == "FEMALE":
-                        for idx in scene_indices:
-                            scene_genders[idx] = "kobieta"
-                    elif sc_gender == "MALE":
-                        for idx in scene_indices:
-                            scene_genders[idx] = "mężczyzna"
+
+                if not sc_gender:
+                    fem_count = 0
+                    male_count = 0
+                    for _, ev in sc:
+                        raw_act = getattr(ev, "name", "")
+                        clean_act = re.sub(r"\s*\([^)]*\)", "", str(raw_act or "")).strip()
+                        if clean_act and not is_generic_actor_or_category(clean_act):
+                            char_rec = self.series_bible.get_character(clean_act)
+                            if isinstance(char_rec, dict):
+                                g_act = str(char_rec.get("gender") or "").upper()
+                                if g_act == "FEMALE":
+                                    fem_count += 1
+                                elif g_act == "MALE":
+                                    male_count += 1
+                    if fem_count > 0 and male_count == 0:
+                        sc_gender = "FEMALE"
+                    elif male_count > 0 and fem_count == 0:
+                        sc_gender = "MALE"
+
+                if sc_gender == "FEMALE":
+                    for idx in scene_indices:
+                        scene_genders[idx] = "kobieta"
+                elif sc_gender == "MALE":
+                    for idx in scene_indices:
+                        scene_genders[idx] = "mężczyzna"
+
+            # Per-line fallback for explicit characters with verified P0 gender (Standard 9.6, 2C.1)
+            for orig_idx, ev in norm_entries:
+                if orig_idx not in scene_genders:
+                    raw_act = getattr(ev, "name", "")
+                    clean_act = re.sub(r"\s*\([^)]*\)", "", str(raw_act or "")).strip()
+                    if clean_act and not is_generic_actor_or_category(clean_act):
+                        char_rec = self.series_bible.get_character(clean_act)
+                        if isinstance(char_rec, dict):
+                            g_act = str(char_rec.get("gender") or "").upper()
+                            if g_act == "FEMALE":
+                                scene_genders[orig_idx] = "kobieta"
+                            elif g_act == "MALE":
+                                scene_genders[orig_idx] = "mężczyzna"
 
         return scene_genders
 
@@ -3188,6 +3242,9 @@ class MultimodalTranslator:
                         paradigm_strs.append(f"{ent}(D:{par.D}, C:{par.C}, B:{par.B}, N:{par.N}, Ms:{par.Ms}, W:{par.W})")
 
                 target_actor_name = line_addr_lbl if line_addr_lbl else (getattr(event, "target_actor", None) or getattr(event, "target_speaker", None))
+                if is_internal_monologue:
+                    target_actor_name = None
+                    contract_target_gender = "UNKNOWN"
                 pragmatic_reg = detect_japanese_pragmatic_register(jp_audio_line, clean_text) if (jp_audio_line and "detect_japanese_pragmatic_register" in globals()) else None
                 reg_name = pragmatic_reg or (reg_desc if reg_desc and "Kontekstowy" not in reg_desc else getattr(event, "register", None))
 
@@ -3528,7 +3585,8 @@ class MultimodalTranslator:
             for prev_orig_idx, prev_event, prev_clean_en, _ in prev_batch[-4:]:
                 prev_pl = translated_results.get(prev_orig_idx, "") if translated_results else ""
                 spk = prev_event.name.strip() if getattr(prev_event, "name", None) else ""
-                is_th = "italic" in (prev_event.style or "").lower() or r"\i1" in (prev_event.text or "")
+                from verifier import _is_whole_line_italic
+                is_th = "italic" in (prev_event.style or "").lower() or _is_whole_line_italic(prev_event.text or "")
                 lookback_history.append({
                     "en": prev_clean_en,
                     "pl": prev_pl,
@@ -3741,7 +3799,9 @@ class MultimodalTranslator:
             dur_s = max(0.05, (ev.end - ev.start) / 1000.0)
             cps_val, _ = calculate_cps(clean_txt, ev.start, ev.end)
             style_str = ev.style or ""
-            is_th = "italic" in style_str.lower() or r"\i1" in (ev.text or "")
+            from verifier import _is_whole_line_italic
+            is_th = "italic" in style_str.lower() or _is_whole_line_italic(ev.text or "")
+            is_internal_monologue = getattr(ev, "is_internal_monologue", False) or is_th
             vtype_info = detect_event_visual_type(ev, ts_pref, style_report=getattr(self, "style_report", None))
             batch_items_for_rules.append({
                 "id": b_id,
@@ -3750,6 +3810,7 @@ class MultimodalTranslator:
                 "audio_jp": (whisper_transcriptions.get(b_id, "") if whisper_transcriptions else "") if not vtype_info["is_sign"] else "",
                 "style": style_str,
                 "is_thought": is_th,
+                "is_internal_monologue": is_internal_monologue,
                 "duration_s": dur_s,
                 "cps": cps_val,
                 "is_sign": vtype_info["is_sign"],
@@ -3899,6 +3960,13 @@ class MultimodalTranslator:
             has_ambiguity_conflict = False
             has_severe_trap = False
             has_temporal_conflict = False
+
+            # Deterministyczne otaczanie {\i1}...{\i0} dla stylu Italics / myśli (Standard 9.5, 2C.6, R1.9)
+            st_ev_lower = str(getattr(event, "style", "")).lower()
+            italic_attr = getattr(event, "italic", 0)
+            has_italic_style = any(k in st_ev_lower for k in ["italic", "flashback_italic", "thoughts", "internal"]) or italic_attr in (1, -1)
+            is_internal_monologue = getattr(event, "is_internal_monologue", False) or has_italic_style
+
             if batch_response:
                 for tr in batch_response.translations:
                     if tr.id == batch_id:
@@ -3913,13 +3981,7 @@ class MultimodalTranslator:
                                 if first_line_pl:
                                     pl_candidate = first_line_pl
 
-                        # Deterministyczne otaczanie {\i1}...{\i0} dla stylu Italics / myśli (Standard 9.5, 2C.6, R1.9)
-                        st_ev_lower = str(getattr(event, "style", "")).lower()
-                        italic_attr = getattr(event, "italic", 0)
-                        has_italic_style = any(k in st_ev_lower for k in ["italic", "flashback_italic", "thoughts", "internal"]) or italic_attr in (1, -1)
-                        is_im = getattr(event, "is_internal_monologue", False) or has_italic_style
-
-                        if is_im and pl_candidate and not vtype.get("is_sign"):
+                        if is_internal_monologue and pl_candidate and not vtype.get("is_sign"):
                             clean_im = re.sub(r"\{\\i[01]\}", "", pl_candidate).strip()
                             clean_im = re.sub(r"\s*\\N\s*", r"\\N", clean_im)
                             pl_candidate = f"{{\\i1}}{clean_im}{{\\i0}}"
@@ -3967,7 +4029,8 @@ class MultimodalTranslator:
                 raw_actor=raw_speaker_name or event.name,
                 scene_female_only=is_fem_scene,
                 target_actor=addressee_label or addressee_cat,
-                is_sign=vtype.get("is_sign", False)
+                is_sign=vtype.get("is_sign", False),
+                is_internal_monologue=is_internal_monologue
             )
             p0_spk_gram = disc_telem.get("grammatical_gender")
             if p0_spk_gram in ("MASCULINE", "FEMININE"):
@@ -4021,6 +4084,9 @@ class MultimodalTranslator:
             )
             resolved_spk_name = disc_telem.get("speaker_name") or raw_speaker_name or event.name or "UNKNOWN"
             resolved_tgt_name = disc_telem.get("target_actor") or (addressee_label if addressee_label else None)
+            if is_internal_monologue:
+                resolved_tgt_name = None
+                tgt_gram_tag = None
 
             line_dry_telemetry = format_dry_telemetry_tag(
                 speaker_gender=spk_gram_tag,
@@ -4223,7 +4289,9 @@ class MultimodalTranslator:
 
             dur_s = max(0.05, (event.end - event.start) / 1000.0)
             style_str = event.style or ""
-            is_th = "italic" in style_str.lower() or r"\i1" in (event.text or "")
+            from verifier import _is_whole_line_italic
+            is_th = "italic" in style_str.lower() or _is_whole_line_italic(event.text or "")
+            is_internal_monologue = getattr(event, "is_internal_monologue", False) or is_th
 
             # Bariera Zmiany Mówcy i Stylu (Thought-to-Speech Firewall)
             if prev_is_thought and not is_th and audio_jp_str and not vtype["is_sign"]:
@@ -4300,6 +4368,7 @@ class MultimodalTranslator:
                 "event": event,
                 "style": style_str,
                 "is_thought": is_th,
+                "is_internal_monologue": is_internal_monologue,
                 "is_missing_translation": is_missing_tr,
                 "is_blind_draft": is_blind_draft,
                 "calque_score": calque_score,
@@ -4496,18 +4565,18 @@ class MultimodalTranslator:
                 clean_ref = sanitize_sub_text(r.refined_pl)
                 ch_desc = (getattr(r, 'changes_made', '') or '').strip()
 
+                # Strip internal ASS tags (like {\i1}, {\i0}) and normalize newlines for pure, clean console display (Standard 9.6, 2C.5)
+                disp_orig = re.sub(r"\{[^\}]*\}", "", str(orig_pl or "")).replace("\\r\\n", "\\N").replace("\\n", "\\N").replace("\r\n", "\\N").replace("\n", "\\N").strip()
+                disp_ref = re.sub(r"\{[^\}]*\}", "", str(clean_ref or "")).replace("\\r\\n", "\\N").replace("\\n", "\\N").replace("\r\n", "\\N").replace("\n", "\\N").strip()
+
                 # Check if there is an actual textual modification or meaningful redaction note
-                has_text_change = orig_pl and (orig_pl.strip() != clean_ref.strip())
+                has_text_change = bool(disp_orig and (disp_orig != disp_ref))
                 has_meaningful_note = bool(ch_desc and "Zweryfikowano" not in ch_desc and ch_desc.lower() != "null")
 
-                if has_text_change or has_meaningful_note:
+                if has_text_change:
                     any_redaction_printed = True
                     clean_note = ch_desc if ch_desc.startswith("[") else (f"[{ch_desc}]" if ch_desc else "")
                     pillar_note = f" {clean_note}" if clean_note else ""
-
-                    # Strip internal ASS tags (like {\i1}, {\i0}) for pure, clean console display
-                    disp_orig = re.sub(r"\{[^\}]*\}", "", orig_pl).strip()
-                    disp_ref = re.sub(r"\{[^\}]*\}", "", clean_ref).strip()
 
                     pbar.write(f" └─ [Redaktor Dialogów] #{r.id}{pillar_note}")
                     pbar.write(f"    ├─ Szkic:  \"{disp_orig}\"")
@@ -4550,6 +4619,14 @@ class MultimodalTranslator:
         prev_linted_line = (lookback_history[-1]["pl"] if lookback_history else "")
         for item in pass1_items:
             raw_final = sanitize_sub_text(refined_dict.get(item["id"], item["pl"]))
+            if not self.keep_honorifics and not item.get("is_sign", False):
+                if hasattr(self, "series_bible") and self.series_bible:
+                    from series_memory import SeriesBible
+                    raw_final = SeriesBible.substitute_canonical_honorific_alias(
+                        raw_final,
+                        source_en=item.get("en", ""),
+                        series_bible=self.series_bible
+                    )
             # Triangulate effective gender from character registry, audio F0 voice, and pragmatic clues (Filar CXXXVI)
             spk_gen = item.get("speaker_gender")
             spk_voice = item.get("speaker_voice", "")
@@ -5197,6 +5274,9 @@ class MultimodalTranslator:
                     for nd in episode_profile.name_declensions:
                         nd_name = getattr(nd, "character_name", "")
                         nd_cases = getattr(nd, "cases", None) or getattr(nd, "declension", None)
+                        if not nd_cases and getattr(nd, "declension_summary", None):
+                            from series_memory import SeriesBible
+                            nd_cases = SeriesBible.parse_step5_declension_line(nd.declension_summary)
                         if nd_name and nd_cases and isinstance(nd_cases, dict):
                             declension_map[nd_name] = nd_cases
 
@@ -5204,11 +5284,17 @@ class MultimodalTranslator:
                 self.series_bible.data.setdefault("declensions", {}).update(declension_map)
                 for cd_name, cd_cases in declension_map.items():
                     if hasattr(self.series_bible, "sync_verified_profile_entity"):
-                        self.series_bible.sync_verified_profile_entity(cd_name, declension_map=cd_cases)
+                        c_rec = self.series_bible.data.get("characters", {}).get(cd_name, {})
+                        c_gen = c_rec.get("gender") if isinstance(c_rec, dict) else None
+                        self.series_bible.sync_verified_profile_entity(cd_name, gender=c_gen, declension_map=cd_cases)
 
             # Sanitacja i regeneracja paradygmatów w RAM
             if hasattr(self.series_bible, "_sanitize_loaded_bible_in_ram"):
                 self.series_bible._sanitize_loaded_bible_in_ram()
+
+            # Trwałość populate_secondary_actor_tags bezpośrednio przed logowaniem Kroku 6 (Operacja 2C.4)
+            if hasattr(self.series_bible, "populate_secondary_actor_tags"):
+                self.series_bible.populate_secondary_actor_tags(actor_keys)
 
         if self.flight_recorder:
             try:
@@ -5783,6 +5869,15 @@ class MultimodalTranslator:
                 continue
 
             if not self.keep_honorifics and not is_sign_flag:
+                # Standard 9.6 (Operacja 2B.1): Mapowanie aliasów zdrobniałych z honoryfikatorem na kanoniczny paradygmat fleksyjny
+                if hasattr(self, "series_bible") and self.series_bible:
+                    from series_memory import SeriesBible
+                    clean_translated_text = SeriesBible.substitute_canonical_honorific_alias(
+                        clean_translated_text,
+                        source_en=orig_event.text,
+                        series_bible=self.series_bible
+                    )
+
                 # Strip Japanese honorific suffixes (-senpai, -kun, -chan, -san, -sama, -sensei)
                 clean_translated_text = re.sub(
                     r"([A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+)-(?:senpai|kun|chan|san|sama|sensei|dono|tan|pyon)\b",

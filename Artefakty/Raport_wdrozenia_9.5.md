@@ -13,7 +13,7 @@
 - Agent wdrażający: Antigravity AVT Orchestrator & Coding Agent (Wersja 9.5 End-to-End Runtime Wiring)
 - Wersja Depuracji Legacy w tle: 1.0 (commit 474fb64)
 - Materiały referencyjne wykorzystane: Raport_wdrozenia_9.4.md (commit 85ecedd), log konsolowy przebiegu tłumaczenia po wdrożeniu 9.4 (przebieg_tłumaczenia.txt), Prompt_9.5.md
-- Status wdrożenia: SUKCES (100% zaimplementowane, 182/182 testów fast, 335/335 testów full, 4 bramki CI/CD PASS)
+- Status wdrożenia: FORMALNIE WDROŻONE (182/182 fast, 335/335 full, 4 bramki PASS), 5 BŁĘDÓW POZOSTAŁO — kontynuacja w 9.6
 
 ## 2. PHASE 0 — WYNIK WERYFIKACJI KODU
 
@@ -155,3 +155,11 @@
 - [x] Żadne pole nie zawiera literalnych danych z audytowanego odcinka
 - [x] Raport zapisany pod ścieżką: `C:\Users\Piotrek\Desktop\translator\Artefakty\Raport_wdrozenia_9.5.md`
 - [x] Raport jest spójny z plikiem `Prompt_9.5.md`
+
+## 12. UWAGI AUDYTOWE PO WERYFIKACJI EMPIRYCZNEJ 9.5
+Podczas audytu empirycznego po wdrożeniu wersji 9.5 potwierdzono 100% poprawności przypisania płci mówców (`Mówca:` = 259/259 zgodnych z P0), brak rozbijania plansz ekranowych (`events_count == total_lines == 260`) oraz poprawność higieny ASS i podwojonych spółgłosek w wołaczu. Zidentyfikowano jednak 5 resztkowych błędów brzegowych, których rozwiązanie przekazano do Promptu Naprawczego 9.6:
+1. **BŁĄD 1 (Kategoria Błędu 1):** Skażenie pola `Adresat:` w `Telemetria:` nawiasowymi opisami $F_0$ przekazywanymi w `target_actor` (np. `"<Antroponim> (Kobieta)"`), brak czyszczenia klucza przed odpytaniem `SeriesBible`, emisja pozornego adresata na monologach (`Italics`), brak neutralności dla `sign` oraz licznik `0 żeńskich` w pre-passie.
+2. **BŁĄD 2 (Kategoria Błędu 2):** Rozszerzenie pojedynczego pochylonego słowa emfatycznego z `en_text` na całoliniową kursywę `{\\i1}...{\\i0}` w Fazie 2 na głośnym dialogu (`Default`) w wyniku braku rozróżnienia kursywy całoliniowej od częściowej w Kategorii 20 (`over_application_italics`).
+3. **BŁĄD 3 (Kategoria Błędu 3):** Mechaniczne obcięcie sufiksu `-chan` przy `keep_honorifics: false` tworzące nieodmieniony rdzeń zamiast kanonicznego narzędnika `N`; pominięcie w Kroku 6 paradygmatów z separatorem kropki `M.` z Kroku 5; brak trwałości etykiet drugoplanowych z `populate_secondary_actor_tags` w Kroku 6.
+4. **BŁĄD 4 (Kategoria Błędu 4):** Pozostawienie małego znaku nowej linii `\\n` zamiast `\\N` w `phase2_text` i `dpos_text` w Paczkach 8, 11, 12, 13 oraz generowanie 14 pustych wpisów `[Redaktor Dialogów]` w logu konsolowym.
+5. **BŁĄD 5 (Kategoria Błędu 5):** Przepuszczenie w buforze ASR pojedynczego słowa łacińskiego o `cjk_count == 0` oraz pozostawienie osieroconej japońskiej partykuły nagłosowej (`と`, `の`) po usunięciu sklejonego prefiksu ASCII.

@@ -311,3 +311,67 @@ def test_translator_runtime_telemetry_uses_arbitrate_p0_and_bilingual_aliases(ac
         speaker_name=telem.get("speaker_name")
     )
     assert f"Mówca: {actor_name} ({expected_gender_tag})" in dry_tag
+
+
+# ==============================================================================
+# STANDARD 9.6 TESTS (T6.1)
+# ==============================================================================
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "raw_actor,polluted_target_actor,speaker_p0,target_p0,is_monologue,expected_clean_target,expected_target_gender",
+    [
+        (
+            "Shizuku",
+            "Tokiyuki (Kobieta)",
+            "FEMALE",
+            "MALE",
+            False,
+            "Tokiyuki",
+            "MASCULINE",
+        ),
+        (
+            "Tokiyuki",
+            "Shizuku (Mężczyzna - Scena Wyłącznie Męska)",
+            "MALE",
+            "FEMALE",
+            False,
+            "Shizuku",
+            "FEMININE",
+        ),
+        (
+            "Tokiyuki",
+            "Tokiyuki (Mężczyzna - Scena Wyłącznie Męska)",
+            "MALE",
+            "MALE",
+            True,
+            "",
+            None,
+        ),
+    ],
+)
+def test_arbitrate_telemetry_strips_f0_parentheses_from_target_actor_and_enforces_p0(
+    raw_actor,
+    polluted_target_actor,
+    speaker_p0,
+    target_p0,
+    is_monologue,
+    expected_clean_target,
+    expected_target_gender,
+):
+    from series_memory import SeriesBible
+    from scene_discourse import SceneDiscourseGraph
+
+    bible = SeriesBible(slug="test_target_actor_clean_p0")
+    bible.sync_verified_profile_entity("Tokiyuki", "MALE", has_verified_gender=True)
+    bible.sync_verified_profile_entity("Shizuku", "FEMALE", has_verified_gender=True)
+
+    res = SceneDiscourseGraph.arbitrate_event_telemetry(
+        raw_actor=raw_actor,
+        target_actor=polluted_target_actor,
+        series_bible=bible,
+        is_internal_monologue=is_monologue,
+    )
+    assert res.get("target_actor", "") == expected_clean_target
+    assert res.get("target_gender") == expected_target_gender or res.get("addressee_gender") in (expected_target_gender, "MALE" if expected_target_gender == "MASCULINE" else "FEMALE")
+    assert "(Kobieta) (MASCULINE)" not in res.get("dry_telemetry", "")
+    assert "(Mężczyzna) (FEMININE)" not in res.get("dry_telemetry", "")
