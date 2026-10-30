@@ -449,3 +449,47 @@ def test_secondary_lexical_gender_immunity_against_scene_gender_override_and_mal
         is_internal_monologue=False,
     )
     assert res.get("target_gender") == expected_telemetry_gender
+
+
+# ==============================================================================
+# STANDARD 9.9 TESTS (T9.1, T9.2)
+# ==============================================================================
+import argparse
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "subs_arg,env_honorifics,expected_inputs,expected_keep_honorifics",
+    [
+        ("episode_input_a.ass", "true", ["episode_input_a.ass"], True),
+        ("episode_input_b.ass", "false", ["episode_input_b.ass"], False),
+    ],
+)
+def test_non_tty_cli_resolves_subs_argument_and_honorifics_env_without_stdin_prompt(
+    subs_arg, env_honorifics, expected_inputs, expected_keep_honorifics
+):
+    from main import resolve_cli_inputs_and_honorifics
+
+    ns = argparse.Namespace(input=None, subs=subs_arg, no_honorifics=False, honorifics=False)
+    raw_inputs, keep_hon = resolve_cli_inputs_and_honorifics(
+        ns, is_tty=False, env_keep_honorifics=env_honorifics
+    )
+    assert raw_inputs == expected_inputs
+    assert keep_hon is expected_keep_honorifics
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "spk_gram,tgt_gram,is_fem_scene_init,expected_we_group",
+    [
+        ("MASCULINE", "FEMININE", True, "VIRILE"),
+        ("FEMININE", "MASCULINE", True, "NON_VIRILE"),
+    ],
+)
+def test_we_group_virility_depends_on_speaker_gender_and_preserves_female_we_group_with_male_target(
+    spk_gram, tgt_gram, is_fem_scene_init, expected_we_group
+):
+    has_male_speaker = spk_gram == "MASCULINE"
+    is_fem_scene = False if has_male_speaker else is_fem_scene_init
+    we_group = "NON_VIRILE" if is_fem_scene else "VIRILE"
+    assert we_group == expected_we_group

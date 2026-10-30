@@ -19503,50 +19503,52 @@ def test_standard_9_7_suite():
     print(" -> PASSED: TEST 221 potwierdza integrację operacji Standardu 9.7.")
 
 
-def test_standard_9_8_suite():
+@pytest.mark.parametrize(
+    "target_tag,override_g,expected_aud_g,expected_telem_g",
+    [
+        ("Boy", "FEMALE", "MALE", "MASCULINE"),
+        ("Girl", "MALE", "FEMALE", "FEMININE"),
+    ],
+)
+def test_standard_9_8_suite(
+    target_tag: str,
+    override_g: str,
+    expected_aud_g: str,
+    expected_telem_g: str,
+):
     """TEST 222: Standard 9.8 Secondary lexical gender immunity against scene override and male speaker non-virile ban."""
-    print("\n[TEST 222] Standard 9.8: Niezmienność płci leksykalnej etykiet P1 i blokada NON_VIRILE na mówcach męskich...")
+    print(f"\n[TEST 222] Standard 9.8 ({target_tag}): Niezmienność płci leksykalnej etykiet P1 i blokada NON_VIRILE na mówcach męskich...")
     from series_memory import SeriesBible
     from scene_discourse import SceneDiscourseGraph
 
     # 1. 2C.1: populate_secondary_actor_tags gives has_verified_gender=True for Boy and Girl
     bible = SeriesBible(slug="test_s98_integration")
-    bible.populate_secondary_actor_tags(["Boy", "Girl"])
-    char_boy = bible.get_character("Boy")
-    assert char_boy is not None
-    assert char_boy.get("has_verified_gender") is True
-    assert char_boy.get("gender") == "MALE"
-    assert char_boy.get("grammatical_gender") == "MASCULINE"
-
-    char_girl = bible.get_character("Girl")
-    assert char_girl is not None
-    assert char_girl.get("has_verified_gender") is True
-    assert char_girl.get("gender") == "FEMALE"
-    assert char_girl.get("grammatical_gender") == "FEMININE"
+    bible.populate_secondary_actor_tags([target_tag])
+    char_entry = bible.get_character(target_tag)
+    assert char_entry is not None
+    assert char_entry.get("has_verified_gender") is True
+    assert char_entry.get("gender") == expected_aud_g
+    assert char_entry.get("grammatical_gender") == expected_telem_g
 
     # 2. 2C.1: audit_speaker_metadata_against_audio immunity
-    aud_boy, cont_boy = bible.audit_speaker_metadata_against_audio("Boy", audio_gender="FEMALE", scene_gender="FEMALE")
-    assert cont_boy is False
-    assert aud_boy == "MALE"
-    assert bible.get_character("Boy").get("gender") == "MALE"
+    aud_g, is_cont = bible.audit_speaker_metadata_against_audio(target_tag, audio_gender=override_g, scene_gender=override_g)
+    assert is_cont is False
+    assert aud_g == expected_aud_g
+    assert bible.get_character(target_tag).get("gender") == expected_aud_g
 
-    aud_girl, cont_girl = bible.audit_speaker_metadata_against_audio("Girl", audio_gender="MALE", scene_gender="MALE")
-    assert cont_girl is False
-    assert aud_girl == "FEMALE"
-    assert bible.get_character("Girl").get("gender") == "FEMALE"
-
-    # 3. 2C.1: arbitrate_event_telemetry preserves MASCULINE target even with scene_female_only=True
+    # 3. 2C.1: arbitrate_event_telemetry preserves target gender even with scene_female_only=True
+    opposite_label = "Kobieta" if expected_telem_g == "MASCULINE" else "Mężczyzna"
     res = SceneDiscourseGraph.arbitrate_event_telemetry(
         raw_actor="Tokiyuki",
         verified_p0_gender="MALE",
-        target_actor="Boy (Kobieta)",
+        target_actor=f"{target_tag} ({opposite_label})",
         series_bible=bible,
         scene_female_only=True,
         is_internal_monologue=False,
     )
-    assert res.get("target_gender") == "MASCULINE"
+    assert res.get("target_gender") == expected_telem_g
 
-    print(" -> PASSED: TEST 222 potwierdza integrację operacji Standardu 9.8.")
+    print(f" -> PASSED: TEST 222 ({target_tag}) potwierdza integrację operacji Standardu 9.8.")
 
 
 if __name__ == "__main__":
@@ -19773,5 +19775,6 @@ if __name__ == "__main__":
     test_standard_9_5_suite()
     test_standard_9_6_suite()
     test_standard_9_7_suite()
-    test_standard_9_8_suite()
-    print("\n Wszystkie testy jednostkowe i integracyjne (221/221) zakończone pełnym sukcesem!\n")
+    test_standard_9_8_suite("Boy", "FEMALE", "MALE", "MASCULINE")
+    test_standard_9_8_suite("Girl", "MALE", "FEMALE", "FEMININE")
+    print("\n Wszystkie testy jednostkowe i integracyjne (222/222) zakończone pełnym sukcesem!\n")

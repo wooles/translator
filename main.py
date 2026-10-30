@@ -242,6 +242,40 @@ def resolve_episode_files(
     return video_file, subs_file, temp_subs_extracted
 
 
+def resolve_cli_inputs_and_honorifics(
+    args: argparse.Namespace,
+    is_tty: bool,
+    env_keep_honorifics: str = "false"
+) -> Tuple[List[str], Optional[bool]]:
+    """
+    Resolve raw inputs (with --subs fallback) and honorifics mode (Standard 9.9, Operacja 2B.1).
+    If is_tty is True and no CLI flag (--honorifics / --no-honorifics) is passed,
+    keep_honorifics returns None to allow interactive menu prompt.
+    If not is_tty, keep_honorifics is determined non-interactively from env_keep_honorifics.
+    """
+    input_arg = getattr(args, "input", None)
+    if isinstance(input_arg, list) and input_arg:
+        raw_inputs = list(input_arg)
+    elif input_arg:
+        raw_inputs = [input_arg]
+    else:
+        raw_inputs = []
+
+    if not raw_inputs and getattr(args, "subs", None):
+        raw_inputs = [args.subs]
+
+    if getattr(args, "no_honorifics", False):
+        keep_honorifics = False
+    elif getattr(args, "honorifics", False):
+        keep_honorifics = True
+    elif not is_tty:
+        keep_honorifics = str(env_keep_honorifics).lower() == "true"
+    else:
+        keep_honorifics = None
+
+    return raw_inputs, keep_honorifics
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Multimodalny Tłumacz Napisów z angielskiego na polski z analizą klatek wideo (Gemini 3.7 Flash)"
@@ -345,9 +379,9 @@ def main():
 
     args = parser.parse_args()
 
-    raw_inputs = args.input if isinstance(args.input, list) and args.input else ([args.input] if args.input else [])
-    if not raw_inputs and getattr(args, "subs", None):
-        raw_inputs = [args.subs]
+    raw_inputs, keep_honorifics_cli = resolve_cli_inputs_and_honorifics(
+        args, is_tty=sys.stdin.isatty(), env_keep_honorifics=os.getenv("KEEP_HONORIFICS", "false")
+    )
     if not raw_inputs:
         print("[Info] Nie podano pliku jako argumentu. Otwieram okno wyboru pliku...")
         chosen_input = pick_file_gui()
@@ -377,12 +411,8 @@ def main():
     enable_verifier = not args.no_verify and os.getenv("ENABLE_VERIFIER", "true").lower() == "true"
 
     # Honorifics mode selection: CLI -> Interactive CMD menu -> .env
-    if args.no_honorifics:
-        keep_honorifics = False
-    elif args.honorifics:
-        keep_honorifics = True
-    elif not sys.stdin.isatty():
-        keep_honorifics = os.getenv("KEEP_HONORIFICS", "false").lower() == "true"
+    if keep_honorifics_cli is not None:
+        keep_honorifics = keep_honorifics_cli
     else:
         default_env = os.getenv("KEEP_HONORIFICS", "true").lower() == "true"
         default_label = "1 (Zachowaj)" if default_env else "2 (Usuń)"

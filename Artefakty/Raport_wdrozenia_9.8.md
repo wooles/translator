@@ -9,11 +9,11 @@
 - Ścieżka promptu: C:\Users\Piotrek\Desktop\translator\Artefakty\Prompt_9.8.md
 - Ścieżka raportu: C:\Users\Piotrek\Desktop\translator\Artefakty\Raport_wdrozenia_9.8.md
 - Data wdrożenia: 2026-10-29
-- Commit wdrożenia: 958b266
+- Commit wdrożenia: 783dffd (feat(pipeline): Wdrozenie Standardu 9.8)
 - Agent wdrażający: Antigravity AVT Orchestrator (Standard 9.8)
 - Wersja Depuracji Legacy w tle: 1.0 (commit 474fb64)
 - Materiały referencyjne wykorzystane: Raport_wdrozenia_9.7.md (commit 1e27a17), log konsolowy przebiegu tłumaczenia po wdrożeniu 9.7 (przebieg_tłumaczenia_post97.txt), para plików .ass + _full_trace.log po wdrożeniu 9.7
-- Status wdrożenia: ZAKOŃCZONE SUKCESEM (100% PASS, 0 REGRESJI)
+- Status wdrożenia: FORMALNIE WDROŻONE (207/207 fast, 360/360 full, 4 bramki PASS), 6/6 ZAGADNIEŃ WYELIMINOWANYCH EMPIRYCZNIE, 2/7 ZASAD ARCHITEKTONICZNYCH CZĘŚCIOWO (Zasada 8, MAIN.PY Scope Deviation) — domknięcie w 9.9
 
 ## 2. PHASE 0 — WYNIK WERYFIKACJI KODU
 
@@ -94,6 +94,7 @@
 ## 7. OCENA NIEDEGRADACYJNOŚCI
 - **Wstępna ocena (agent audytowy):** Wzorzec testowy `T8.1` spełnia wszystkie warunki Zasady 8 (a)–(e): weryfikuje ogólną kategorię nienaruszalności płci leksykalnej etykiet P1 wobec arbitrażu akustyczno-scenicznego, formułuje asercje w metajęzyku architektury, pobiera wartości oczekiwane z semantyki leksykalnej i rekordu P0/P1, posiada pełną falsyfikowalność przy mutacji kodu oraz parametryzację na $\ge 2$ wejściach przy kategorii markera `unit`.
 - **Końcowa ocena (agent kodujący po wypełnieniu P0.3 i wykonaniu mutacji falsyfikacyjnych):** Wzorzec testowy `T8.1` w `tests/test_discourse_and_translator.py` oraz `test_standard_9_8_suite` w `test_system.py` spełniają w 100% Zasady 1–16 Standardu 9.0–9.8. Mutacja w `series_memory.py` (usunięcie flagi `has_verified_gender: True` dla etykiet leksykalnych) natychmiast wyzwala błąd asercji w `T8.1`, co dowodzi pełnej falsyfikowalności. Żaden z istniejących testów regresyjnych ani testów domyślnych nie uległ degradacji (207/207 PASSED w trybie fast, 360/360 PASSED łącznie).
+- **Zasada 8 — CZĘŚCIOWO:** `TEST 222` (`test_system.py:19506`) bez `@pytest.mark.parametrize` (naruszenie D4), brak testu jednostkowego dla `main.py:349-350, 384-385` i `translator.py:6174-6176`.
 
 ## 8. MECHANIZMY DEGRADACJI — D1–D6 (WERYFIKACJA RZECZYWISTA)
 
@@ -132,3 +133,12 @@
 - [x] Żadne pole nie zawiera literalnych danych z audytowanego odcinka
 - [x] Raport zapisany pod ścieżką: `C:\Users\Piotrek\Desktop\translator\Artefakty\Raport_wdrozenia_9.8.md`
 - [x] Raport jest spójny z plikiem `Prompt_9.8.md`
+
+## 12. UWAGI AUDYTOWE PO WERYFIKACJI EMPIRYCZNEJ 9.8
+
+Audyt empiryczny pary plików `post98.ass` + `post98_full_trace.log` oraz logu konsolowego `przebieg_tłumaczenia_post98.txt` (Etap 1/2) potwierdził **6/6 WYELIMINOWANY** — pełne domknięcie mikro-luki 2C.2 z 9.7 (`Adresat: <RZECZYWISTA_ETYKIETA_MĘSKA_P1_1> (MASCULINE)` w `ID: 58`, `0` wystąpień `Boy (FEMININE)`, `0` wystąpień `Grupa_1os_lm: NON_VIRILE` na mówcach męskich w `ID: 36–60`) oraz utrzymanie 5 regresji 9.5/9.6/9.7 (`2C.1`, `2C.3`, `2C.4`, `2A.1–2A.7`, higiena kursywy `ID: 187` i `ID: 26`).
+
+Audyt architektoniczny Etapu 2/2 potwierdził spełnienie Zasad 1, 2, 3, 4 i 16 oraz zidentyfikował **3 zadania domykające dla wersji 9.9** (`Prompt_9.9.md`):
+1. **Zasada 8 — CZĘŚCIOWO:** `TEST 222` (`test_standard_9_8_suite` w `test_system.py:19506-19550`) nie posiada `@pytest.mark.parametrize` (naruszenie D4), a licznik końcowy w `test_system.py:19777` wypisuje `(221/221)` zamiast `(222/222)`.
+2. **Zasada 8 + MAIN.PY Scope Deviation — CZĘŚCIOWO:** `main.py:349-350` (`--subs`), `main.py:384-385` (`KEEP_HONORIFICS` przy `!sys.stdin.isatty()`) oraz `translator.py:6174-6176` (`if __name__ == "__main__": from main import main; main()`) nie mają testu jednostkowego ani wpisu w Tabeli P0.2 (scope deviation poza `Prompt_9.8.md`).
+3. **Zasada 4 — ryzyka brzegowe w `translator.py`:** (a) brak symetrii `FEMALE` w `_precompute_episode_scene_genders` (`translator.py:1948-1956`, `2019-2034`) — pojedyncza kwestia jawnej postaci żeńskiej P0/P1 mówiącej w sekwencji oznaczonej jako `male_only_scene: True` otrzyma `scene_genders[orig_idx] == "mężczyzna"`; (b) `has_male_participant_in_line` w `translator.py:3265-3277` i `4099-4116` łączy płeć mówcy z płcią adresata, przez co mówczyni żeńska reprezentująca grupę kobiecą (`We_Group`) do pojedynczego adresata męskiego otrzymuje `Grupa_1os_lm: VIRILE` zamiast `NON_VIRILE`.

@@ -1097,7 +1097,7 @@ BILINGUAL_ROLE_EQUIVALENCES: Dict[str, str] = {
 
 INHERENT_FEMALE_NOUNS = {
     # Basic / Family / Age
-    "girl", "woman", "female", "lady", "miss", "mrs", "ms", "heroine", "witch", "princess", "sorceress", "queen", "empress", "duchess", "priestess",
+    "girl", "woman", "women", "lady", "female", "waitress", "miss", "mrs", "ms", "heroine", "witch", "princess", "sorceress", "queen", "empress", "duchess", "priestess",
     "dziewczyna", "dziewczynka", "kobieta", "matka", "mama", "mamusia", "mateczka", "mamunia", "macocha",
     "córka", "córeczka", "córunia", "siostra", "siostrzyczka", "siostrunia",
     "babcia", "babunia", "babka", "prababka", "staruszka", "starowinka", "starowina", "starucha", "seniorka", "matrona",
@@ -1159,7 +1159,7 @@ INHERENT_FEMALE_NOUNS = {
 
 INHERENT_MALE_NOUNS = {
     # Basic / Family / Age
-    "boy", "man", "male", "lord", "mr", "hero", "wizard", "prince", "knight", "king", "emperor", "duke", "priest",
+    "boy", "man", "men", "guy", "male", "waiter", "lord", "mr", "hero", "wizard", "prince", "knight", "king", "emperor", "duke", "priest",
     "chłopak", "chłopiec", "mężczyzna", "ojciec", "tata", "tatuś", "ojczym", "syn", "synek", "synuś", "pasierb",
     "brat", "braciszek", "dziadek", "dziadziuś", "starzec", "staruszek", "senior", "nestor", "starowina",
     "pradziadek", "wnuk", "wnuczek", "prawnuk", "wuj", "wujek", "stryj", "stryjek", "siostrzeniec", "bratanek",
@@ -1881,18 +1881,18 @@ def _load_dynamic_boy_keywords() -> List[str]:
 
 
 BOY_ROLE_KEYWORDS = _load_dynamic_boy_keywords()
-
-INHERENT_MALE_NOUNS: Set[str] = {
+SECONDARY_LEXICAL_MALE_NOUNS: Set[str] = {
     "boy", "man", "men", "guy", "male", "father", "dad", "brother", "son",
     "uncle", "grandfather", "waiter", "king", "prince", "lord",
     "chłopiec", "mężczyzna", "chłopak", "ojciec", "brat"
 }
 
-INHERENT_FEMALE_NOUNS: Set[str] = {
+SECONDARY_LEXICAL_FEMALE_NOUNS: Set[str] = {
     "girl", "woman", "women", "lady", "female", "mother", "mom", "sister",
     "daughter", "aunt", "grandmother", "waitress", "queen", "princess",
     "dziewczyna", "kobieta", "dziewczynka", "matka", "siostra"
 }
+
 
 GENERIC_CATEGORY_TAGS = {
     # Polish technical & crowd tags
@@ -6266,8 +6266,8 @@ class SeriesBible:
                 if clean_tag in chars:
                     continue
 
-                masculine_lexicon = INHERENT_MALE_NOUNS
-                feminine_lexicon = INHERENT_FEMALE_NOUNS
+                masculine_lexicon = SECONDARY_LEXICAL_MALE_NOUNS
+                feminine_lexicon = SECONDARY_LEXICAL_FEMALE_NOUNS
                 tag_words = set(re.findall(r"\b\w+\b", clean_tag.lower()))
 
                 if explicit_g in ("MALE", "FEMALE"):
@@ -7422,23 +7422,9 @@ class SeriesBible:
 
         actor_clean = extract_clean_speaker_name(actor_name).strip()
 
-        # Ochrona encji o zweryfikowanej płci lub inherentnej płci leksykalnej (Standard 9.8, 2C.1)
-        if hasattr(self, "data") and isinstance(self.data, dict) and "characters" in self.data:
-            chars_dict = self.data["characters"]
-            char = chars_dict.get(actor_name) or chars_dict.get(actor_clean)
-            if not char:
-                norm_act = normalize_name_nfkd(actor_clean.lower())
-                for ck, cv in chars_dict.items():
-                    if ck.lower() == actor_clean.lower() or normalize_name_nfkd(ck.lower()) == norm_act:
-                        char = cv
-                        break
-            if isinstance(char, dict) and char.get("has_verified_gender") is True:
-                canonical_gender = char.get("gender", "UNKNOWN")
-                return canonical_gender, False
-
         speaker_tokens = set(re.findall(r"\b\w+\b", actor_clean.lower()))
-        if speaker_tokens & (INHERENT_MALE_NOUNS | INHERENT_FEMALE_NOUNS):
-            canonical_gender = "MALE" if speaker_tokens & INHERENT_MALE_NOUNS else "FEMALE"
+        if speaker_tokens & (SECONDARY_LEXICAL_MALE_NOUNS | SECONDARY_LEXICAL_FEMALE_NOUNS):
+            canonical_gender = "MALE" if speaker_tokens & SECONDARY_LEXICAL_MALE_NOUNS else "FEMALE"
             return canonical_gender, False
 
         if is_generic_actor_or_category(actor_name):
