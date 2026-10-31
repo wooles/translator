@@ -19551,6 +19551,51 @@ def test_standard_9_8_suite(
     print(f" -> PASSED: TEST 222 ({target_tag}) potwierdza integrację operacji Standardu 9.8.")
 
 
+def test_standard_9_10_suite():
+    """TEST 223: Standard 9.10 Generalization, structural gender protection, and declension hygiene."""
+    print("\n[TEST 223] Standard 9.10: Integralność strukturalnego p0_gender, higiena etykiet i paradygmaty glosariusza...")
+    from metadata import normalize_actor_tag
+    from series_memory import SeriesBible, generate_polish_name_declension
+
+    # 1. 2B.1: normalize_actor_tag strips punctuation and technical suffixes
+    clean_tag, _ = normalize_actor_tag("Violet?")
+    assert clean_tag == "Violet"
+    clean_tag2, _ = normalize_actor_tag("AnnaHeart")
+    assert clean_tag2 == "Anna"
+
+    # 2. 2B.1: SeriesBible structural gender inheritance
+    bible = SeriesBible(slug="test_s910_integration", db_path=":memory:")
+    bible.data["characters"]["Violet Evergarden"] = {
+        "name": "Violet Evergarden",
+        "gender": "FEMALE",
+        "grammatical_gender": "FEMININE",
+        "confidence": 0.95,
+        "priority": "P0",
+        "has_verified_gender": True,
+        "aliases": ["Violet Evergarden", "Violet"],
+        "description": "postać (Postać drugoplanowa)",
+    }
+    bible._sanitize_loaded_bible_in_ram()
+    assert bible.get_character_gender("Violet") == "FEMALE"
+
+    # 3. 2B.2: Tag filtering and declension
+    bible.populate_secondary_actor_tags(["Everyone", "crowd", "Violet?"])
+    assert "Everyone" not in bible.data["characters"]
+    assert "crowd" not in bible.data["characters"]
+    assert "Violet" in bible.data["characters"]
+
+    # 4. 2B.2: Declension for numeral genitive and adjective phrases
+    decl_num = generate_polish_name_declension("Czterech Jeźdźców", "MALE")
+    assert decl_num["D"] == "Czterech Jeźdźców"
+    assert decl_num["N"] == "Czterech Jeźdźców"
+
+    decl_adj = generate_polish_name_declension("system obronny", "MALE")
+    assert decl_adj["D"] == "systemu obronnego"
+    assert decl_adj["N"] == "systemem obronnym"
+
+    print(" -> PASSED: TEST 223 potwierdza integrację operacji Standardu 9.10.")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -19777,4 +19822,5 @@ if __name__ == "__main__":
     test_standard_9_7_suite()
     test_standard_9_8_suite("Boy", "FEMALE", "MALE", "MASCULINE")
     test_standard_9_8_suite("Girl", "MALE", "FEMALE", "FEMININE")
-    print("\n Wszystkie testy jednostkowe i integracyjne (222/222) zakończone pełnym sukcesem!\n")
+    test_standard_9_10_suite()
+    print("\n Wszystkie testy jednostkowe i integracyjne (223/223) zakończone pełnym sukcesem!\n")

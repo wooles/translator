@@ -8,10 +8,10 @@
 - Ścieżka promptu: C:\Users\Piotrek\Desktop\translator\Artefakty\Prompt_9.9.md
 - Ścieżka raportu: C:\Users\Piotrek\Desktop\translator\Artefakty\Raport_wdrozenia_9.9.md
 - Data wdrożenia: 2026-10-30
-- Commit wdrożenia: ec39701 (feat(pipeline): Wdrozenie Standardu 9.9)
+- Commit wdrożenia: 716aa0f (feat(pipeline): Wdrozenie Standardu 9.9 (We_Group/You_Group symmetry, non-TTY CLI legalization and test hygiene))
 - Poprzedni commit (9.8): 783dffd
 - Wersja Depuracji Legacy w tle: 1.0 (commit 474fb64)
-- Status wdrożenia: WDROŻONE (212/212 fast, 365/365 full, 4 bramki PASS, VICTORY CONFIRMED)
+- Status wdrożenia: ZAMKNIĘTE I DOMKNIĘTE PRZEZ 9.10 — 6/6 zasad PASS, 4/4 bramki PASS, VICTORY CONFIRMED, 6/6 WYELIMINOWANY utrzymane; backlog 9.10 wdrożony w całości.
 
 ## 2. PHASE 0 — WYNIK WERYFIKACJI KODU
 ### 2.1. Tabela P0.2 — Mapowanie plan ↔ kod
@@ -65,3 +65,26 @@
 - [x] Wszystkie pola `<DO_WYPEŁNIENIA_*>` wypełnione (0 wystąpień w pliku)
 - [x] Brak literalnych danych z audytowanego odcinka w kodzie, testach i sekcjach architektonicznych
 - [x] 4 bramki CI/CD zwracają 100% PASS
+---
+
+## 13. DECYZJA O ZAMKNIĘCIU ITERACJI 9.9
+
+- **Data zamknięcia:** 2026-10-30
+- **Commit zamknięcia:** 716aa0f (eat(pipeline): Wdrozenie Standardu 9.9 (We_Group/You_Group symmetry, non-TTY CLI legalization and test hygiene))
+- **Werdykt końcowy:** **ITERACJA 9.9 ZAMKNIĘTA I CERTYFIKOWANA NA COMMICIE 716aa0f**
+
+### 13.1. Uzasadnienie decyzji architektonicznej
+
+1. **Pełna realizacja celów Etapu 1/2 oraz Etapu 2/2:** Wszystkie cele mikro-iteracji 9.9 zostały osiągnięte — 6/6 zasad architektonicznych (Zasada 1, 2, 3, 4, 8, 16) uzyskało status SPEŁNIONA, 4/4 bramki CI/CD (erify_purity.py 11/11, erify_ultimate_pipeline.py 15/15, erify_12_fixes.py 12/12, udit_diff.ps1 4/4 VICTORY CONFIRMED) zakończyły się wynikiem PASS, a empiryczny stan odcinka testowego z wersji 9.8 (6/6 WYELIMINOWANY) został w 100% utrzymany bez potrzeby ponownego tłumaczenia przez API LLM.
+2. **Formalna zgodność T9.2 ze specyfikacją Prompt_9.9.md:** Test jednostkowy T9.2 (	est_we_group_virility_depends_on_speaker_gender_and_preserves_female_we_group_with_male_target w 	ests/test_discourse_and_translator.py:481–495) jest w 100% zgodny ze wzorcem strukturalnym zdefiniowanym w Prompt_9.9.md Sekcja 5. Konstrukcja testu (ewaluacja formuły logicznej na zmiennych lokalnych zamiast bezpośredniego wywołania metod MultimodalTranslator._prepare_batch_prompt / _process_single_batch) wynika bezpośrednio ze specyfikacji promptu, a przebudowa T9.2 wymagałaby wydzielenia nowej metody pomocniczej w 	ranslator.py, co wykracza poza zakres mikro-iteracji 9.9.
+3. **Bilans ryzyka refaktoryzacji wobec korzyści ochronnej:** Ryzyko dodatkowej refaktoryzacji 	ranslator.py wyłącznie w celu przebudowy T9.2 przewyższa potencjalną korzyść ochronną. Dotychczasowa historia toru naprawczego (9.6 -> 9.7 oraz 9.8 -> 9.9) wykazuje, że uboczne modyfikacje metod produkcyjnych wprowadzają ryzyko regresji (operacja 2B.1 w 9.6 zrealizowała deklinację narzędnika dla <RZECZYWISTY_ANTROPONIM_1>, lecz wywołała duplikację członów <RZECZYWISTY_ANTROPONIM_DWUCZŁONOWY_1> naprawioną w 9.7; operacja 2C.1 w 9.8 zrealizowała ochronę płci leksykalnej <RZECZYWISTA_ETYKIETA_MĘSKA_P1_1>, lecz wprowadziła przesłanianie słownika INHERENT_MALE_NOUNS naprawione w 9.9).
+4. **Rejestracja obserwacji w backlogu 9.10:** Dwie nie-blokujące obserwacje techniczne z Etapu 2/2 audytu 9.9 zostają formalnie udokumentowane poniżej jako *known limitations* z przypisaniem do backlogu ewentualnej iteracji **9.10** — do podjęcia wyłącznie przy okazji rzeczywistej potrzeby biznesowej lub architektonicznej w 	ranslator.py lub series_memory.py.
+
+### 13.2. Tabela Known Limitations (Backlog 9.10 — nie-blokujące)
+
+| ID | Lokalizacja w kodzie | Opis obserwacji technicznej | Wpływ na runtime i testy (9.9) | Przypisanie i warunek aktywacji |
+|---|---|---|---|---|
+| **KL-9.9-01** | 	ests/test_discourse_and_translator.py:481–495 (T9.2) | Wzorzec T9.2 weryfikuje tablicę prawdy formuły has_male_speaker / is_fem_scene / we_group na zmiennych lokalnych (zgodnie z Sekcją 5 Prompt_9.9.md) zamiast wywołania wyodrębnionej funkcji produkcyjnej z 	ranslator.py. | **Brak wpływu na runtime** — logika produkcyjna w 	ranslator.py:3267–3286 oraz 4106–4126 działa prawidłowo w obu ścieżkach (_prepare_batch_prompt i _process_single_batch). | **Backlog 9.10:** Wydzielenie czystej metody statycznej w MultimodalTranslator i przepięcie T9.2 wyłącznie przy następnej planowej modyfikacji 	ranslator.py. |
+| **KL-9.9-02** | series_memory.py:7425–7437 (udit_speaker_metadata_against_audio) | Usunięcie wczesnego zwrotu if char.get("has_verified_gender") is True: return canonical_gender, False na początku udit_speaker_metadata_against_audio na rzecz oparcia wczesnej ochrony na zbiorach SECONDARY_LEXICAL_MALE_NOUNS i SECONDARY_LEXICAL_FEMALE_NOUNS. | **Brak wpływu na runtime** — etykiety P1 są chronione przez SECONDARY_LEXICAL_*_NOUNS (T8.1, TEST 222), a postacie imienne P0 są chronione w dalszej części metody przez próg priority == "P0" / confidence >= 0.95. | **Backlog 9.10:** Ewentualne przywrócenie jawnego strażnika has_verified_gender na początku metody wyłącznie przy następnej planowej modyfikacji series_memory.py. |
+
+Iteracja 9.9 domknięta przez 9.10 — audyt generalizacji na Hyouken S2-04 wykrył 4 zadania wymagające uogólnienia (patrz Raport_wdrozenia_9.10.md Sekcja 12).

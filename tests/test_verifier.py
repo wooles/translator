@@ -550,3 +550,57 @@ def test_normalize_phase2_treats_space_to_ass_newline_wrapping_as_lexical_identi
     assert "\\N" in norm_pl
     assert norm_reason is expected_changes_made
     assert DialogueVerifier.is_lexically_identical_ignoring_linebreak(f1_pl, norm_pl) is True
+
+
+# ==============================================================================
+# STANDARD 9.10 TESTS (T10.4)
+# ==============================================================================
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "line1_pl,line2_f1,line2_f2_mutated,expected_line2",
+    [
+        (
+            "Jeśli tam pójdziemy...",
+            "...odkryjemy prawdę.",
+            "odkryjemy prawdę.",
+            "...odkryjemy prawdę.",
+        ),
+        (
+            "odkryjemy prawdę...",
+            "...Jeśli tam pójdziemy.",
+            "Jeśli tam pójdziemy.",
+            "...Jeśli tam pójdziemy.",
+        ),
+    ],
+)
+def test_verify_batch_passes_adjacent_prev_line_to_ellipsis_continuation_guard(
+    monkeypatch, line1_pl, line2_f1, line2_f2_mutated, expected_line2
+):
+    from unittest.mock import MagicMock
+    from verifier import DialogueVerifier, RefinedBatchResponse, RefinedLine
+    from context_cache import ContextCacheManager
+
+    monkeypatch.setattr(ContextCacheManager, "get_or_create_cache", lambda *a, **kw: "mock_cache")
+    mock_pool = MagicMock()
+    mock_client = MagicMock()
+    mock_pool.get_client.return_value = mock_client
+    mock_pool.clients = [mock_client]
+    mock_resp = MagicMock()
+    mock_resp.text = "{}"
+    mock_resp.parsed = RefinedBatchResponse(
+        lines=[
+            RefinedLine(id=1, refined_pl=line1_pl, changes_made=None),
+            RefinedLine(id=2, refined_pl=line2_f2_mutated, changes_made="[Filar I] Korekta"),
+        ]
+    )
+    mock_client.models.generate_content.return_value = mock_resp
+
+    verifier = DialogueVerifier(client=mock_pool)
+    batch_items = [
+        {"id": 1, "en": "If only we knew...", "pl": line1_pl},
+        {"id": 2, "en": "...we would have avoided this ambush.", "pl": line2_f1},
+    ]
+    res = verifier.verify_batch(batch_items=batch_items)
+    assert res[1].refined_pl == expected_line2

@@ -485,3 +485,97 @@ def test_multi_token_anthroponym_immunity_against_component_alias_duplication_an
     out_pl = bible.apply_canonical_alias_declension(text=f2_pl, source_en=source_en, keep_honorifics=False)
     assert out_pl == expected_final_pl
     assert out_pl.count("Hōjō") == 1
+
+
+# ==============================================================================
+# STANDARD 9.10 TESTS (T10.1, T10.2, T10.3)
+# ==============================================================================
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "full_name,short_name,gender,desc,expected_short_gender,expected_genitive",
+    [
+        (
+            "Violet Evergarden",
+            "Violet",
+            "FEMALE",
+            "postać (Postać drugoplanowa)",
+            "FEMALE",
+            "Violet",
+        ),
+        (
+            "Sister",
+            "Sister",
+            "FEMALE",
+            "postać drugoplanowa",
+            "FEMALE",
+            "Sister",
+        ),
+    ],
+)
+def test_structural_gender_preservation_and_short_alias_female_consonant_indeclinability(
+    full_name, short_name, gender, desc, expected_short_gender, expected_genitive
+):
+    from series_memory import SeriesBible, generate_polish_name_declension
+
+    bible = SeriesBible(slug="test_9_10_structural_gender", db_path=":memory:")
+    bible.data["characters"][full_name] = {
+        "name": full_name,
+        "gender": gender,
+        "grammatical_gender": "FEMININE",
+        "confidence": 0.95,
+        "priority": "P0",
+        "has_verified_gender": True,
+        "aliases": [full_name, short_name],
+        "description": desc,
+    }
+    bible._sanitize_loaded_bible_in_ram()
+    assert bible.get_character_gender(full_name) == expected_short_gender
+    assert bible.get_character_gender(short_name) == expected_short_gender
+    decl = generate_polish_name_declension(short_name, bible.get_character_gender(short_name))
+    assert decl["D"] == expected_genitive
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "raw_tag,expected_clean,should_be_filtered",
+    [
+        ("Everyone", "Everyone", True),
+        ("crowd", "crowd", True),
+        ("Violet?", "Violet", False),
+    ],
+)
+def test_actor_tag_ontological_filtering_strips_punctuation_and_rejects_non_personal_tags(
+    raw_tag, expected_clean, should_be_filtered
+):
+    from metadata import normalize_actor_tag
+    from series_memory import SeriesBible
+
+    clean_t, _ = normalize_actor_tag(raw_tag)
+    assert clean_t == expected_clean
+    bible = SeriesBible(slug="test_9_10_filtering", db_path=":memory:")
+    bible.populate_secondary_actor_tags([raw_tag])
+    if should_be_filtered:
+        assert raw_tag not in bible.data["characters"]
+        assert clean_t not in bible.data["characters"]
+    else:
+        assert clean_t in bible.data["characters"]
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "phrase,expected_d,expected_n",
+    [
+        ("Czterech Jeźdźców", "Czterech Jeźdźców", "Czterech Jeźdźców"),
+        ("system obronny", "systemu obronnego", "systemem obronnym"),
+    ],
+)
+def test_declension_generator_handles_ny_adjectives_and_plural_genitive_phrases(
+    phrase, expected_d, expected_n
+):
+    from series_memory import generate_polish_name_declension
+
+    decl = generate_polish_name_declension(phrase, "MALE")
+    assert decl["D"] == expected_d
+    assert decl["N"] == expected_n

@@ -7,10 +7,16 @@ if hasattr(sys.stderr, "reconfigure"):
 
 results = {}
 
+REPO_ROOT = os.path.dirname(os.path.abspath(__file__))
+
 def check(point_num, name, condition, details_pass, details_fail):
     results[point_num] = (condition, name, details_pass if condition else details_fail)
 
 def read_file(path):
+    if not os.path.isabs(path):
+        resolved = os.path.join(REPO_ROOT, path)
+        if os.path.exists(resolved):
+            path = resolved
     if not os.path.exists(path):
         return ""
     with open(path, "r", encoding="utf-8", errors="replace") as f:

@@ -397,12 +397,21 @@ def _guard_phase2_regressions(
     if prev_line_pl and str(prev_line_pl).strip().endswith("..."):
         clean_f1_start = re.sub(r"^\{[^}]*\}", "", f1_pl.strip())
         clean_ref_start = re.sub(r"^\{[^}]*\}", "", refined_pl.strip())
-        if re.match(r"^\.\.\.\s*[a-ząćęłńóśźż]", clean_f1_start):
-            if not clean_ref_start.startswith("...") and clean_ref_start and clean_ref_start[0].isupper():
-                has_ital = (r"{\i1}" in refined_pl and r"{\i0}" in refined_pl)
-                if has_ital and not f1_pl.startswith(r"{\i1}"):
-                    return r"{\i1}" + f1_pl + (r"{\i0}" if not f1_pl.endswith(r"{\i0}") else "")
-                return f1_pl
+        if clean_f1_start.startswith("...") or clean_f1_start.startswith("…"):
+            if not clean_ref_start.startswith("...") and not clean_ref_start.startswith("…"):
+                if clean_f1_start.lstrip(". …").strip() == clean_ref_start.lstrip(". …").strip() or (clean_ref_start and clean_ref_start[0].isupper()):
+                    has_ital = (r"{\i1}" in refined_pl and r"{\i0}" in refined_pl)
+                    if has_ital and not f1_pl.startswith(r"{\i1}"):
+                        return r"{\i1}" + f1_pl + (r"{\i0}" if not f1_pl.endswith(r"{\i0}") else "")
+                    return f1_pl
+                else:
+                    m_lead_dots = re.match(r"^(\.\.\.|…)\s*", clean_f1_start)
+                    dots = m_lead_dots.group(1) if m_lead_dots else "..."
+                    has_ital = (r"{\i1}" in refined_pl and r"{\i0}" in refined_pl)
+                    clean_core = re.sub(r"^\{[^}]*\}", "", refined_pl).lstrip()
+                    if has_ital:
+                        return r"{\i1}" + dots + clean_core + (r"{\i0}" if not clean_core.endswith(r"{\i0}") else "")
+                    return dots + clean_core
         elif not clean_ref_start.startswith("..."):
             prev_en_clean = str(prev_line_en or "").strip()
             if not prev_en_clean or not re.search(r"(?<!\.)[.?!]\s*$", prev_en_clean):
@@ -1064,6 +1073,19 @@ class DialogueVerifier:
                         tgt_g = orig_it.get("target_gender") or orig_it.get("addressee_gender")
                         addr_rec = orig_it.get("addressee_p0_record")
                         prev_txt = orig_it.get("prev_line_f1") or ""
+                        prev_en = orig_it.get("prev_line_en") or ""
+                        if not prev_txt:
+                            orig_idx_in_batch = next((i for i, b_it in enumerate(batch_items) if b_it.get("id") == r.id), -1)
+                            if orig_idx_in_batch > 0:
+                                prev_item = batch_items[orig_idx_in_batch - 1]
+                                prev_txt = prev_item.get("pl") or prev_item.get("refined_pl") or ""
+                                if not prev_en:
+                                    prev_en = prev_item.get("en") or ""
+                            elif history_context and len(history_context) > 0:
+                                prev_hist = history_context[-1]
+                                prev_txt = prev_hist.get("pl") or prev_hist.get("refined_pl") or ""
+                                if not prev_en:
+                                    prev_en = prev_hist.get("en") or ""
                         if orig_it.get("is_sign"):
                             gloss = orig_it.get("canonical_glossary") or orig_it.get("glossary") or {}
                             r.refined_pl = enforce_sign_nominative_orthography(
@@ -1073,7 +1095,6 @@ class DialogueVerifier:
                                 is_sign=True,
                                 canonical_glossary=gloss
                             )
-                        prev_en = orig_it.get("prev_line_en") or ""
                         is_monologue_guard = bool(orig_it.get("is_internal_monologue") or has_im_style or _is_whole_line_italic(src_en) or _is_whole_line_italic(f1_text))
                         guarded = _guard_phase2_regressions(
                             f1_pl=f1_text,

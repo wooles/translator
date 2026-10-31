@@ -4408,6 +4408,16 @@ class MultimodalTranslator:
                 if par:
                     p2_paradigms.append(f"{resolved_spk_name}(D:{par.D}, C:{par.C}, B:{par.B}, N:{par.N}, Ms:{par.Ms}, W:{par.W})")
 
+            if pass1_items:
+                prev_line_f1 = pass1_items[-1].get("pl", "")
+                prev_line_en = pass1_items[-1].get("en", "")
+            elif lookback_history:
+                prev_line_f1 = lookback_history[-1].get("pl", "")
+                prev_line_en = lookback_history[-1].get("en", "")
+            else:
+                prev_line_f1 = ""
+                prev_line_en = ""
+
             pass1_items.append({
                 "id": batch_id,
                 "orig_idx": orig_idx,
@@ -4426,6 +4436,8 @@ class MultimodalTranslator:
                 "end_ms": event.end,
                 "en": clean_en,
                 "pl": pl_candidate,
+                "prev_line_f1": prev_line_f1,
+                "prev_line_en": prev_line_en,
                 "speaker_name": resolved_spk_name,
                 "speaker_gender": speaker_gender if spk_conf >= 0.95 else None,
                 "speaker_confidence": spk_conf,
@@ -4821,6 +4833,9 @@ class MultimodalTranslator:
         subs_file = Path(subs_path)
         # Reset character registry and token counters for new episode
         self.character_registry = {}
+        self._asr_last_seen_end_sec = {}
+        self._asr_last_text = ""
+        self._asr_consecutive_streak = 0
         self.current_episode_tokens = {"prompt": 0, "cached": 0, "output": 0, "model": self.model}
         if self.verifier:
             self.verifier.current_episode_tokens = {"prompt": 0, "cached": 0, "output": 0, "model": self.verifier.model}
@@ -4950,16 +4965,27 @@ class MultimodalTranslator:
         # Generowanie paradygmatów odmiany dla wszystkich unikalnych aktorów
         actor_map = {}
         from metadata import normalize_actor_tag
-        from series_memory import generate_polish_name_declension
+        from series_memory import generate_polish_name_declension, COLLECTIVE_LABELS
         for ev_it in subs.events:
             raw_spk = getattr(ev_it, "name", "")
             if raw_spk and raw_spk not in actor_map:
                 cl_act, ex_gen = normalize_actor_tag(raw_spk)
                 actor_map[raw_spk] = {"clean_name": cl_act, "extracted_gender": ex_gen}
                 if getattr(self, "series_bible", None) and cl_act:
-                    a_decl = generate_polish_name_declension(cl_act, ex_gen or "UNKNOWN")
-                    if a_decl and a_decl.get("M"):
-                        self.series_bible.data.setdefault("declensions", {})[cl_act] = a_decl
+                    effective_gender = ex_gen
+                    if not effective_gender:
+                        sb_g = self.series_bible.get_character_gender(cl_act)
+                        if sb_g in ("MALE", "FEMALE"):
+                            effective_gender = sb_g
+                    is_invalid_tag = (
+                        cl_act.lower() in COLLECTIVE_LABELS
+                        or (len(cl_act.split()) == 1 and cl_act[0].islower())
+                        or self.series_bible.is_generic_actor_or_category(cl_act)
+                    )
+                    if not is_invalid_tag:
+                        a_decl = generate_polish_name_declension(cl_act, effective_gender or "UNKNOWN")
+                        if a_decl and a_decl.get("M"):
+                            self.series_bible.data.setdefault("declensions", {})[cl_act] = a_decl
         self.actor_map = actor_map
         if getattr(self, "series_bible", None) and hasattr(self.series_bible, "populate_secondary_actor_tags"):
             self.series_bible.populate_secondary_actor_tags(list(actor_map.keys()))

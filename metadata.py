@@ -62,6 +62,8 @@ def normalize_actor_tag(raw_name: str, strip_diacritics: bool = False) -> Tuple[
     clean_name = re.sub(r"[\(\[\{（【［〔].*?[\)\]\}）】］〕]", "", clean_name).strip()
     clean_name = re.sub(r"[\(\[\{（【［〔].*$", "", clean_name).strip()
     clean_name = re.sub(r"\s+", " ", clean_name).strip(" \"'„”«»")
+    clean_name = re.sub(r"[?!]+$", "", clean_name).strip()
+    clean_name = re.sub(r"(?<=[a-z])(?:Heart|Thought|Thoughts|Voice|Internal|Sign)$", "", clean_name).strip()
     if strip_diacritics:
         clean_name = normalize_ascii_diacritics(clean_name).strip()
     return clean_name, gender
@@ -558,14 +560,26 @@ def get_anime_context(filename_or_path: str, client: Any = None) -> Optional[Dic
                 if match_character_in_metadata(c_norm, characters_list):
                     continue
                 c_desc = c_val.get("description", "") if isinstance(c_val, dict) else str(c_val)
-                if explicit_g:
-                    gender_str = "kobieta" if explicit_g == "FEMALE" else "mężczyzna"
+                raw_g = str(c_val.get("gender") or c_val.get("grammatical_gender") or "").upper() if isinstance(c_val, dict) else ""
+                if raw_g in ("FEMALE", "KOBIETA", "FEMININE") or explicit_g == "FEMALE":
+                    gender_str = "kobieta"
+                    gender_raw = "FEMALE"
+                elif raw_g in ("MALE", "MĘŻCZYZNA", "MEZCZYZNA", "MASCULINE") or explicit_g == "MALE":
+                    gender_str = "mężczyzna"
+                    gender_raw = "MALE"
+                elif any(w in c_desc.lower() for w in ["kobieta", "female", "dziewczyna", "woman", "girl"]):
+                    gender_str = "kobieta"
+                    gender_raw = "FEMALE"
+                elif any(w in c_desc.lower() for w in ["mężczyzna", "male", "chłopak", "man", "boy"]):
+                    gender_str = "mężczyzna"
+                    gender_raw = "MALE"
                 else:
-                    gender_str = "kobieta" if any(w in c_desc.lower() for w in ["kobieta", "female", "dziewczyna"]) else "mężczyzna"
+                    gender_str = None
+                    gender_raw = None
                 characters_list.append({
                     "name": c_norm,
                     "gender": gender_str,
-                    "gender_raw": "FEMALE" if gender_str == "kobieta" else "MALE",
+                    "gender_raw": gender_raw,
                     "role": "Główny bohater" if any(w in c_desc.lower() for w in ["główny", "protagoni"]) else "Postać"
                 })
             if characters_list:

@@ -7,7 +7,13 @@ from avt_linter import AVTLinter
 from metadata import normalize_actor_tag
 from series_memory import generate_polish_name_declension
 
+REPO_ROOT = os.path.dirname(os.path.abspath(__file__))
+
 def read_f(p):
+    if not os.path.isabs(p):
+        resolved = os.path.join(REPO_ROOT, p)
+        if os.path.exists(resolved):
+            p = resolved
     return open(p, "r", encoding="utf-8", errors="replace").read() if os.path.exists(p) else ""
 
 trans_s = read_f("translator.py")
