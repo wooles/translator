@@ -4965,7 +4965,7 @@ class MultimodalTranslator:
         # Generowanie paradygmatów odmiany dla wszystkich unikalnych aktorów
         actor_map = {}
         from metadata import normalize_actor_tag
-        from series_memory import generate_polish_name_declension, COLLECTIVE_LABELS
+        from series_memory import generate_polish_name_declension, COLLECTIVE_LABELS, is_generic_actor_or_category
         for ev_it in subs.events:
             raw_spk = getattr(ev_it, "name", "")
             if raw_spk and raw_spk not in actor_map:
@@ -4980,7 +4980,7 @@ class MultimodalTranslator:
                     is_invalid_tag = (
                         cl_act.lower() in COLLECTIVE_LABELS
                         or (len(cl_act.split()) == 1 and cl_act[0].islower())
-                        or self.series_bible.is_generic_actor_or_category(cl_act)
+                        or is_generic_actor_or_category(cl_act)
                     )
                     if not is_invalid_tag:
                         a_decl = generate_polish_name_declension(cl_act, effective_gender or "UNKNOWN")

@@ -19593,6 +19593,13 @@ def test_standard_9_10_suite():
     assert decl_adj["D"] == "systemu obronnego"
     assert decl_adj["N"] == "systemem obronnym"
 
+    # 5. 2B.2: is_generic_actor_or_category available on SeriesBible and as standalone
+    from series_memory import is_generic_actor_or_category
+    assert is_generic_actor_or_category("Everyone") is True
+    assert bible.is_generic_actor_or_category("Everyone") is True
+    assert SeriesBible.is_generic_actor_or_category("Everyone") is True
+    assert bible.is_generic_actor_or_category("Violet") is False
+
     print(" -> PASSED: TEST 223 potwierdza integrację operacji Standardu 9.10.")
 
 

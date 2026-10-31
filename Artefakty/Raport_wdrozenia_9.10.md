@@ -6,7 +6,7 @@
 - **Wersja:** 9.10
 - **Poprzednia wersja:** 9.9 (commit 716aa0f)
 - **Wersja Depuracji Legacy:** 1.0 (commit 474fb64)
-- **Commit wdrożenia:** e29defc (feat(pipeline): Wdrozenie Standardu 9.10 (Generalizacja miedzyseryjna: ochrona p0_gender, higiena SeriesBible i ciaglosc wielokropka))
+- **Commit wdrożenia:** a246ba0 (feat(pipeline): Wdrozenie Standardu 9.10 (Generalizacja miedzyseryjna: ochrona p0_gender, higiena SeriesBible i ciaglosc wielokropka))
 - **Status wdrożenia:** WDROŻONY (100% PASS, 4/4 bramki PASS, VICTORY CONFIRMED, 5/5 kategorii wyeliminowanych)
 
 ## 2. PHASE 0 — WYNIK WERYFIKACJI KODU

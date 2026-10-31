@@ -579,3 +579,25 @@ def test_declension_generator_handles_ny_adjectives_and_plural_genitive_phrases(
     decl = generate_polish_name_declension(phrase, "MALE")
     assert decl["D"] == expected_d
     assert decl["N"] == expected_n
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "tag,expected_generic",
+    [
+        ("mężczyzna", True),
+        ("kobieta", True),
+        ("Everyone", True),
+        ("both", True),
+        ("Vali", False),
+        ("Violet", False),
+    ],
+)
+def test_series_bible_is_generic_actor_or_category_method_and_function_equivalence(tag, expected_generic):
+    from series_memory import SeriesBible, is_generic_actor_or_category
+
+    bible = SeriesBible(slug="test_generic_equiv", db_path=":memory:")
+    assert is_generic_actor_or_category(tag) is expected_generic
+    assert bible.is_generic_actor_or_category(tag) is expected_generic
+    assert SeriesBible.is_generic_actor_or_category(tag) is expected_generic
+

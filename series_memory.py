@@ -7796,6 +7796,10 @@ class SeriesBible:
             return "DUAL_MIXED"
         return "UNKNOWN"
 
+    @staticmethod
+    def is_generic_actor_or_category(name: str) -> bool:
+        return is_generic_actor_or_category(name)
+
     def is_non_character_entity(self, name: str) -> bool:
         """
         Determines whether a name refers to an organization, realm, institution, faction, location,
