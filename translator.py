@@ -5361,9 +5361,11 @@ class MultimodalTranslator:
                         c_gen = c_rec.get("gender") if isinstance(c_rec, dict) else None
                         self.series_bible.sync_verified_profile_entity(cd_name, gender=c_gen, declension_map=cd_cases)
 
-            # Sanitacja i regeneracja paradygmatów w RAM
+            # Sanitacja i regeneracja paradygmatów w RAM oraz zapis na dysk i synchronizacja z Artefakty/ (Operacja H4)
             if hasattr(self.series_bible, "_sanitize_loaded_bible_in_ram"):
                 self.series_bible._sanitize_loaded_bible_in_ram()
+            if hasattr(self.series_bible, "save"):
+                self.series_bible.save()
 
             # Trwałość populate_secondary_actor_tags bezpośrednio przed logowaniem Kroku 6 (Operacja 2C.4)
             if hasattr(self.series_bible, "populate_secondary_actor_tags"):

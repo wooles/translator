@@ -49,12 +49,12 @@
   },
   "relationships": {
     "Asystentka -> Kamui": "Zwrot: 'panie Kamui / mistrzu' (pomocnica -> egzorcysta / mistrz) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Kamui -> Asystentka": "Zwrot: 'mała / dziewczynko' (mistrz -> młodsza asystentka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Kamui -> Asystentka": "Zwrot: 'mała / dziewczynko' (mistrz -> młodsza asystentka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
     "Hanako ze Shimosunagawy -> Dziesięć Kwiatów (Rada Hanako)": "Zwrot: 'szanowne panie / starszyzno' (reprezentantka szkoly -> rada dostojników duchów) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
   },
   "relations": {
     "Asystentka -> Kamui": "Zwrot: 'panie Kamui / mistrzu' (pomocnica -> egzorcysta / mistrz) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Kamui -> Asystentka": "Zwrot: 'mała / dziewczynko' (mistrz -> młodsza asystentka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Kamui -> Asystentka": "Zwrot: 'mała / dziewczynko' (mistrz -> młodsza asystentka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
     "Hanako ze Shimosunagawy -> Dziesięć Kwiatów (Rada Hanako)": "Zwrot: 'szanowne panie / starszyzno' (reprezentantka szkoly -> rada dostojników duchów) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
   },
   "declensions": {

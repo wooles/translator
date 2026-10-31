@@ -7,7 +7,7 @@
 - **Poprzednia wersja:** 9.9 (commit 716aa0f)
 - **Wersja Depuracji Legacy:** 1.0 (commit 474fb64)
 - **Commit wdrożenia:** a246ba0 (feat(pipeline): Wdrozenie Standardu 9.10 (Generalizacja miedzyseryjna: ochrona p0_gender, higiena SeriesBible i ciaglosc wielokropka))
-- **Status wdrożenia:** WDROŻONY (100% PASS, 4/4 bramki PASS, VICTORY CONFIRMED, 5/5 kategorii wyeliminowanych)
+- **Status wdrożenia:** DOMKNIĘTE PRZEZ 9.10.1 (100% PASS, 4/4 bramki PASS, VICTORY CONFIRMED, 5/5 kategorii wyeliminowanych)
 
 ## 2. PHASE 0 — WYNIK WERYFIKACJI KODU
 ### 2.1. Tabela P0.2 — Mapowanie plan ↔ kod
@@ -124,3 +124,6 @@ Implementacja Standardu 9.10 domknęła wszystkie 4 wektory podatności zidentyf
 ## 13. DECYZJA O ZAMKNIĘCIU ITERACJI 9.10
 
 Wersja 9.10 zostaje uznana za w pełni wdrożoną, zweryfikowaną i gotową do zamknięcia operacyjnego. Spełniono 16/16 warunków ukończenia (a)–(p), 4/4 bramki CI/CD uzyskały status PASS (w tym audit_diff.ps1: VICTORY CONFIRMED), a pakiet testów przeszedł w 100% bez regresji.
+
+### 13.1. Aktualizacja post-wdrożeniowa (Hotfix 9.10.1)
+Wersja 9.10 została domknięta i ustabilizowana przez Hotfix 9.10.1, który usunął mikro-regresje brzegowe: zawęził regułę `-ne`/`-na` w `is_polish_adjective`, wdrożył nieodmienność żeńskich antroponimów obcych na spółgłoskę oraz dwuczłonowych, wdrożył propagację płci z `terminology`/`glossary` oraz zapewnił atomową synchronizację bazy wiedzy `bible.json` z katalogiem `Artefakty/`. Status: **DOMKNIĘTE PRZEZ 9.10.1**.

@@ -59,6 +59,7 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
+        "Hajime Tsukishima",
         "Tsukishima"
       ],
       "entity_category": "ANTHROPONYM"
@@ -71,7 +72,8 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
-        "Koito"
+        "Koito",
+        "Otonoshin Koito"
       ],
       "entity_category": "ANTHROPONYM"
     },
@@ -107,6 +109,7 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
+        "Tokushirou Tsurumi",
         "Tsurumi"
       ],
       "entity_category": "ANTHROPONYM"
@@ -119,6 +122,7 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
+        "Saichi Sugimoto",
         "Sugimoto"
       ],
       "entity_category": "ANTHROPONYM"
@@ -131,7 +135,8 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
-        "Shiraishi"
+        "Shiraishi",
+        "Yoshitake Shiraishi"
       ],
       "entity_category": "ANTHROPONYM"
     },
@@ -274,7 +279,8 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
-        "Hijikata"
+        "Hijikata",
+        "Toshizou Hijikata"
       ],
       "entity_category": "ANTHROPONYM"
     },
@@ -286,7 +292,8 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
-        "Nagakura"
+        "Nagakura",
+        "Shinpachi Nagakura"
       ],
       "entity_category": "ANTHROPONYM"
     },
@@ -423,6 +430,110 @@
         "Okuda"
       ],
       "entity_category": "ANTHROPONYM"
+    },
+    "Saichi": {
+      "description": "mężczyzna (postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Saichi",
+        "Saichi Sugimoto"
+      ],
+      "entity_category": "ANTHROPONYM",
+      "confidence": 0.95
+    },
+    "Yoshitake": {
+      "description": "mężczyzna (postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Yoshitake",
+        "Yoshitake Shiraishi"
+      ],
+      "entity_category": "ANTHROPONYM",
+      "confidence": 0.95
+    },
+    "Tokushirou": {
+      "description": "mężczyzna (postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Tokushirou",
+        "Tokushirou Tsurumi"
+      ],
+      "entity_category": "ANTHROPONYM",
+      "confidence": 0.95
+    },
+    "Hajime": {
+      "description": "mężczyzna (postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Hajime",
+        "Hajime Tsukishima"
+      ],
+      "entity_category": "ANTHROPONYM",
+      "confidence": 0.95
+    },
+    "Otonoshin": {
+      "description": "mężczyzna (postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Otonoshin",
+        "Otonoshin Koito"
+      ],
+      "entity_category": "ANTHROPONYM",
+      "confidence": 0.95
+    },
+    "Toshizou": {
+      "description": "mężczyzna (postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Toshizou",
+        "Toshizou Hijikata"
+      ],
+      "entity_category": "ANTHROPONYM",
+      "confidence": 0.95
+    },
+    "Shinpachi": {
+      "description": "mężczyzna (postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Shinpachi",
+        "Shinpachi Nagakura"
+      ],
+      "entity_category": "ANTHROPONYM",
+      "confidence": 0.95
+    },
+    "Ucieczek": {
+      "description": "mężczyzna (postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Escape King",
+        "Ucieczek"
+      ],
+      "entity_category": "ANTHROPONYM",
+      "confidence": 0.95
     }
   },
   "glossary": {
@@ -509,13 +620,13 @@
     "Saichi Sugimoto -> Asirpa": "Zwrot: 'panna Asirpa / Asirpa-san' (obrońca i partner) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Asirpa -> Saichi Sugimoto": "Zwrot: 'na ty / po imieniu: Sugimoto' (partnerzy / towarzysze broni) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Usami -> Kadokura": "Zwrot: 'ty prosiaczku / staruchu' (oprawca -> więzień/ofiara) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Tsukishima -> Koito": "Zwrot: 'podporuczniku Koito' (podwładny -> przełożony) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Tsukishima -> Koito": "Zwrot: 'podporuczniku Koito' (podwładny -> przełożony) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
     "Kikuta -> Koito": "Zwrot: 'podporuczniku Koito' (starszy chorąży -> młodszy stopniem oficer) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Kirawus -> Saichi Sugimoto": "Zwrot: 'panie Sugimoto / Sugimoto-nispa' (sprzymierzeniec Ajnu -> Sugimoto (zwrot z szacunkiem)) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Tsurumi -> Usami": "Zwrot: 'z imienia: Tokishige-kun / Szeregowy Usami' (dowódca -> podwładny / mistrz -> wyznawca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Tsurumi -> Usami": "Zwrot: 'z imienia: Tokishige-kun / Szeregowy Usami' (dowódca -> podwładny / mistrz -> wyznawca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
     "Sugimoto -> Asirpa": "Zwrot: 'Asirpa-san / na ty' (Towarzysze broni, opiekuńczo-partnerska więź) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Shiraishi -> Botaro": "Zwrot: 'Botaro / Pirat' (Współwięźniowie i kompani) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Tsurumi -> Podwładni": "Zwrot: 'Po stopniach wojskowych (np. poruczniku Koito)' (Dowódca wojskowy -> podwładni) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Tsurumi -> Podwładni": "Zwrot: 'Po stopniach wojskowych (np. poruczniku Koito)' (Dowódca wojskowy -> podwładni) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
     "Tsurumi -> Asirpa": "Zwrot: 'Asirpa / Asirpo' (porywacz / manipulator -> zakładniczka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Tsurumi -> Sofia": "Zwrot: 'pani Zoyo / Sofio Złotoręka' (przesłuchujący -> więźniarka / dawni znajomi) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Sugimoto -> Shiraishi": "Zwrot: 'na ty / Shiraishi' (towarzysze broni) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
@@ -527,11 +638,11 @@
     "Kaneko Kaeko -> Saichi Sugimoto": "Zwrot: 'panie Yuusaku / panie Hanazawa' (kandydatka na żonę -> domniemany narzeczony) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Tokushirou Tsurumi -> Hidenobu Okuda": "Zwrot: 'generale Okuda / panie generale' (podwładny -> dowódca dywizji) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Sugimoto -> Kikuta": "Zwrot: 'panie sierżancie / panie Kikuta' (młodzieniec -> oficer/instruktor) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Kikuta -> Sugimoto": "Zwrot: 'na ty / per Norabo' (sierżant / mentor -> młody włóczęga) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Kikuta -> Sugimoto": "Zwrot: 'na ty / per Norabo' (sierżant / mentor -> młody włóczęga) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
     "Tsurumi -> Kikuta": "Zwrot: 'chorąży Kikuta / panie Kikuta' (przełożony -> szpieg/podwładny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Tokushirou Tsurumi -> Shinpachi Nagakura": "Zwrot: 'panie Nagakura (Nagakura-san)' (wrogowie / gracz polityczny i weteran) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Tatsuma Ushiyama -> Asirpa": "Zwrot: 'Panienko' (obrońca -> podopieczna) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
-    "Tsurumi -> Tsukishima": "Zwrot: 'sierżancie Tsukishima' (dowódca -> podwładny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Tsurumi -> Tsukishima": "Zwrot: 'sierżancie Tsukishima' (dowódca -> podwładny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
     "Hijikata -> Nagakura": "Zwrot: 'Gamushin / Shinpachi / na ty' (wieloletni bracia broni z Shinsengumi) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Otonoshin Koito -> Tokushirou Tsurumi": "Zwrot: 'panie poruczniku / poruczniku Tsurumi' (podwładny -> dowódca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Shinpachi Nagakura -> Toshizou Hijikata": "Zwrot: 'Hijikata / na ty' (bracia broni z Shinsengumi) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
@@ -540,7 +651,7 @@
     "Usami -> Tsurumi": "Zwrot: 'panie poruczniku / Tokushirou-san' (podwładny -> dowódca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Tokishige Usami -> Tokushirou Tsurumi": "Zwrot: 'poruczniku Tsurumi / panie poruczniku' (podwładny -> ubóstwiany dowódca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Hajime Tsukishima -> Otonoshin Koito": "Zwrot: 'panie poruczniku Koito' (podwładny -> przełożony) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Otonoshin Koito -> Hajime Tsukishima": "Zwrot: 'Tsukishima' (dowódca -> podwładny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Otonoshin Koito -> Hajime Tsukishima": "Zwrot: 'Tsukishima' (dowódca -> podwładny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
     "Yoshitake Shiraishi -> Fusataro Oosawa": "Zwrot: 'Botaro / Fusataro' (towarzysze niedoli) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Tsukishima -> Tsurumi": "Zwrot: 'panie poruczniku / poruczniku Tsurumi' (podwładny -> przełożony (wojskowa)) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Koito -> Tsukishima": "Zwrot: 'sierżancie Tsukishima / Tsukishima' (oficer -> podoficer) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
@@ -555,13 +666,13 @@
     "Saichi Sugimoto -> Asirpa": "Zwrot: 'panna Asirpa / Asirpa-san' (obrońca i partner) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Asirpa -> Saichi Sugimoto": "Zwrot: 'na ty / po imieniu: Sugimoto' (partnerzy / towarzysze broni) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Usami -> Kadokura": "Zwrot: 'ty prosiaczku / staruchu' (oprawca -> więzień/ofiara) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Tsukishima -> Koito": "Zwrot: 'podporuczniku Koito' (podwładny -> przełożony) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Tsukishima -> Koito": "Zwrot: 'podporuczniku Koito' (podwładny -> przełożony) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
     "Kikuta -> Koito": "Zwrot: 'podporuczniku Koito' (starszy chorąży -> młodszy stopniem oficer) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Kirawus -> Saichi Sugimoto": "Zwrot: 'panie Sugimoto / Sugimoto-nispa' (sprzymierzeniec Ajnu -> Sugimoto (zwrot z szacunkiem)) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Tsurumi -> Usami": "Zwrot: 'z imienia: Tokishige-kun / Szeregowy Usami' (dowódca -> podwładny / mistrz -> wyznawca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Tsurumi -> Usami": "Zwrot: 'z imienia: Tokishige-kun / Szeregowy Usami' (dowódca -> podwładny / mistrz -> wyznawca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
     "Sugimoto -> Asirpa": "Zwrot: 'Asirpa-san / na ty' (Towarzysze broni, opiekuńczo-partnerska więź) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Shiraishi -> Botaro": "Zwrot: 'Botaro / Pirat' (Współwięźniowie i kompani) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Tsurumi -> Podwładni": "Zwrot: 'Po stopniach wojskowych (np. poruczniku Koito)' (Dowódca wojskowy -> podwładni) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Tsurumi -> Podwładni": "Zwrot: 'Po stopniach wojskowych (np. poruczniku Koito)' (Dowódca wojskowy -> podwładni) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
     "Tsurumi -> Asirpa": "Zwrot: 'Asirpa / Asirpo' (porywacz / manipulator -> zakładniczka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Tsurumi -> Sofia": "Zwrot: 'pani Zoyo / Sofio Złotoręka' (przesłuchujący -> więźniarka / dawni znajomi) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Sugimoto -> Shiraishi": "Zwrot: 'na ty / Shiraishi' (towarzysze broni) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
@@ -573,11 +684,11 @@
     "Kaneko Kaeko -> Saichi Sugimoto": "Zwrot: 'panie Yuusaku / panie Hanazawa' (kandydatka na żonę -> domniemany narzeczony) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Tokushirou Tsurumi -> Hidenobu Okuda": "Zwrot: 'generale Okuda / panie generale' (podwładny -> dowódca dywizji) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Sugimoto -> Kikuta": "Zwrot: 'panie sierżancie / panie Kikuta' (młodzieniec -> oficer/instruktor) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Kikuta -> Sugimoto": "Zwrot: 'na ty / per Norabo' (sierżant / mentor -> młody włóczęga) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Kikuta -> Sugimoto": "Zwrot: 'na ty / per Norabo' (sierżant / mentor -> młody włóczęga) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
     "Tsurumi -> Kikuta": "Zwrot: 'chorąży Kikuta / panie Kikuta' (przełożony -> szpieg/podwładny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Tokushirou Tsurumi -> Shinpachi Nagakura": "Zwrot: 'panie Nagakura (Nagakura-san)' (wrogowie / gracz polityczny i weteran) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Tatsuma Ushiyama -> Asirpa": "Zwrot: 'Panienko' (obrońca -> podopieczna) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
-    "Tsurumi -> Tsukishima": "Zwrot: 'sierżancie Tsukishima' (dowódca -> podwładny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Tsurumi -> Tsukishima": "Zwrot: 'sierżancie Tsukishima' (dowódca -> podwładny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
     "Hijikata -> Nagakura": "Zwrot: 'Gamushin / Shinpachi / na ty' (wieloletni bracia broni z Shinsengumi) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Otonoshin Koito -> Tokushirou Tsurumi": "Zwrot: 'panie poruczniku / poruczniku Tsurumi' (podwładny -> dowódca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Shinpachi Nagakura -> Toshizou Hijikata": "Zwrot: 'Hijikata / na ty' (bracia broni z Shinsengumi) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
@@ -586,7 +697,7 @@
     "Usami -> Tsurumi": "Zwrot: 'panie poruczniku / Tokushirou-san' (podwładny -> dowódca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Tokishige Usami -> Tokushirou Tsurumi": "Zwrot: 'poruczniku Tsurumi / panie poruczniku' (podwładny -> ubóstwiany dowódca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Hajime Tsukishima -> Otonoshin Koito": "Zwrot: 'panie poruczniku Koito' (podwładny -> przełożony) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Otonoshin Koito -> Hajime Tsukishima": "Zwrot: 'Tsukishima' (dowódca -> podwładny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Otonoshin Koito -> Hajime Tsukishima": "Zwrot: 'Tsukishima' (dowódca -> podwładny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
     "Yoshitake Shiraishi -> Fusataro Oosawa": "Zwrot: 'Botaro / Fusataro' (towarzysze niedoli) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Tsukishima -> Tsurumi": "Zwrot: 'panie poruczniku / poruczniku Tsurumi' (podwładny -> przełożony (wojskowa)) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Koito -> Tsukishima": "Zwrot: 'sierżancie Tsukishima / Tsukishima' (oficer -> podoficer) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
@@ -926,6 +1037,86 @@
       "N": "Okudą",
       "Ms": "Okudzie",
       "W": "Okudo",
+      "gender": "MALE"
+    },
+    "Saichi": {
+      "M": "Saichi",
+      "D": "Saichi",
+      "C": "Saichi",
+      "B": "Saichi",
+      "N": "Saichi",
+      "Ms": "Saichi",
+      "W": "Saichi",
+      "gender": "MALE"
+    },
+    "Yoshitake": {
+      "M": "Yoshitake",
+      "D": "Yoshitake",
+      "C": "Yoshitake",
+      "B": "Yoshitake",
+      "N": "Yoshitake",
+      "Ms": "Yoshitake",
+      "W": "Yoshitake",
+      "gender": "MALE"
+    },
+    "Tokushirou": {
+      "M": "Tokushirou",
+      "D": "Tokushirou",
+      "C": "Tokushirou",
+      "B": "Tokushirou",
+      "N": "Tokushirou",
+      "Ms": "Tokushirou",
+      "W": "Tokushirou",
+      "gender": "MALE"
+    },
+    "Hajime": {
+      "M": "Hajime",
+      "D": "Hajime",
+      "C": "Hajime",
+      "B": "Hajime",
+      "N": "Hajime",
+      "Ms": "Hajime",
+      "W": "Hajime",
+      "gender": "MALE"
+    },
+    "Otonoshin": {
+      "M": "Otonoshin",
+      "D": "Otonoshina",
+      "C": "Otonoshinowi",
+      "B": "Otonoshina",
+      "N": "Otonoshinem",
+      "Ms": "Otonoshinie",
+      "W": "Otonoshinie",
+      "gender": "MALE"
+    },
+    "Toshizou": {
+      "M": "Toshizou",
+      "D": "Toshizou",
+      "C": "Toshizou",
+      "B": "Toshizou",
+      "N": "Toshizou",
+      "Ms": "Toshizou",
+      "W": "Toshizou",
+      "gender": "MALE"
+    },
+    "Shinpachi": {
+      "M": "Shinpachi",
+      "D": "Shinpachi",
+      "C": "Shinpachi",
+      "B": "Shinpachi",
+      "N": "Shinpachi",
+      "Ms": "Shinpachi",
+      "W": "Shinpachi",
+      "gender": "MALE"
+    },
+    "Ucieczek": {
+      "M": "Ucieczek",
+      "D": "Ucieczeka",
+      "C": "Ucieczekowi",
+      "B": "Ucieczeka",
+      "N": "Ucieczekiem",
+      "Ms": "Ucieczeku",
+      "W": "Ucieczeku",
       "gender": "MALE"
     }
   },

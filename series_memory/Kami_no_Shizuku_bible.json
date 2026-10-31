@@ -194,11 +194,11 @@
     },
     "Sara Tomine": {
       "description": "postać (Postać)",
-      "gender": "UNKNOWN",
-      "grammatical_gender": "UNKNOWN",
-      "confidence": 0.5,
-      "priority": "P1",
-      "has_verified_gender": false,
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "confidence": 0.95,
+      "priority": "P0",
+      "has_verified_gender": true,
       "aliases": [
         "Sara Tomine"
       ],
@@ -369,7 +369,7 @@
     "Château Lafite": "Château Lafite",
     "Château Margaux": "Château Margaux",
     "Millennium vintage": "rocznik milenijny",
-    "Full-bodied": "pełne / o bogatej budowie",
+    "Full-bodied": "pełne",
     "vintage": "rocznik",
     "tannins": "taniny",
     "sorbet": "sorbet",
@@ -396,11 +396,11 @@
     "Mary -> Hayama": "Zwrot: 'tato / tatusiu' (córka -> ojciec) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Shizuku -> Hayama": "Zwrot: 'panie Hayama' (młody gość -> starszy kupiec) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Miyabi -> Shizuku": "Zwrot: 'panie Shizuku / Shizuku' (asystentka -> współpracownik) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Shizuku -> Miyabi": "Zwrot: 'Miyabi / Miyabi-chan' (przyjaciel -> koleżanka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Shizuku -> Miyabi": "Zwrot: 'Miyabi / Miyabi-chan' (przyjaciel -> koleżanka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: POUFNY]",
     "Robert Doi -> Shizuku Kanzaki": "Zwrot: 'panowie / wy / na ty' (arbiter i wykonawca testamentu -> rywalizujący pretendenci) [GRUPA MĘŻCZYZN - Wymóg rodzaju męskoosobowego: -liście / byliście gotowi]",
-    "Hayama -> Shizuku": "Zwrot: 'na ty / młodzieńcze' (starszy kupiec -> syn dawnego przyjaciela) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Robert -> Shizuku": "Zwrot: 'Shizuku' (arbiter / mentor -> zawodnik) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Robert -> Tomine": "Zwrot: 'Issei' (arbiter / mentor -> zawodnik) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Hayama -> Shizuku": "Zwrot: 'na ty / młodzieńcze' (starszy kupiec -> syn dawnego przyjaciela) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: POUFNY]",
+    "Robert -> Shizuku": "Zwrot: 'Shizuku' (arbiter / mentor -> zawodnik) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
+    "Robert -> Tomine": "Zwrot: 'Issei' (arbiter / mentor -> zawodnik) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
     "Loulan -> Tomine": "Zwrot: 'Issei' (towarzyszka / powiernica) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
   },
   "relations": {
@@ -421,11 +421,11 @@
     "Mary -> Hayama": "Zwrot: 'tato / tatusiu' (córka -> ojciec) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Shizuku -> Hayama": "Zwrot: 'panie Hayama' (młody gość -> starszy kupiec) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Miyabi -> Shizuku": "Zwrot: 'panie Shizuku / Shizuku' (asystentka -> współpracownik) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Shizuku -> Miyabi": "Zwrot: 'Miyabi / Miyabi-chan' (przyjaciel -> koleżanka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Shizuku -> Miyabi": "Zwrot: 'Miyabi / Miyabi-chan' (przyjaciel -> koleżanka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: POUFNY]",
     "Robert Doi -> Shizuku Kanzaki": "Zwrot: 'panowie / wy / na ty' (arbiter i wykonawca testamentu -> rywalizujący pretendenci) [GRUPA MĘŻCZYZN - Wymóg rodzaju męskoosobowego: -liście / byliście gotowi]",
-    "Hayama -> Shizuku": "Zwrot: 'na ty / młodzieńcze' (starszy kupiec -> syn dawnego przyjaciela) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Robert -> Shizuku": "Zwrot: 'Shizuku' (arbiter / mentor -> zawodnik) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Robert -> Tomine": "Zwrot: 'Issei' (arbiter / mentor -> zawodnik) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Hayama -> Shizuku": "Zwrot: 'na ty / młodzieńcze' (starszy kupiec -> syn dawnego przyjaciela) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: POUFNY]",
+    "Robert -> Shizuku": "Zwrot: 'Shizuku' (arbiter / mentor -> zawodnik) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
+    "Robert -> Tomine": "Zwrot: 'Issei' (arbiter / mentor -> zawodnik) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
     "Loulan -> Tomine": "Zwrot: 'Issei' (towarzyszka / powiernica) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
   },
   "declensions": {
@@ -536,7 +536,8 @@
       "B": "Sarę Tomine",
       "N": "Sarą Tomine",
       "Ms": "Sarze Tomine",
-      "W": "Saro Tomine"
+      "W": "Saro Tomine",
+      "gender": "FEMALE"
     },
     "Kenkichi Kiryu": {
       "M": "Kenkichi Kiryu",

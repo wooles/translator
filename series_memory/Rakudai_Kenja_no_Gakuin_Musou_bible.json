@@ -96,6 +96,32 @@
         "Maria"
       ],
       "entity_category": "ANTHROPONYM"
+    },
+    "Gromu": {
+      "description": "mężczyzna (postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Gromu",
+        "Lightning Emperor"
+      ],
+      "entity_category": "ANTHROPONYM",
+      "confidence": 0.95
+    },
+    "Ziemi": {
+      "description": "mężczyzna (postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Earth Emperor",
+        "Ziemi"
+      ],
+      "entity_category": "ANTHROPONYM",
+      "confidence": 0.95
     }
   },
   "glossary": {
@@ -123,22 +149,22 @@
     "Four Holy Beasts": "Cztery Święte Bestie"
   },
   "relationships": {
-    "Anastasia -> Eftal": "Zwrot: 'Mistrzu / na pan' (uczennica / ocalona -> wybawca i mentor) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
-    "Merlin -> Eftal": "Zwrot: 'panie Eftalu' (lojalna powierniczka i była uczennica -> mistrz) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie Eftalu', zakaz poufałego wołacza 'Eftalu' oraz hybryd 'Eftalu... ma pan'] [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Eftal -> Anastasia": "Zwrot: 'na ty / Anastasio' (opiekun i mistrz -> podopieczna) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Anastasia -> Eftal": "Zwrot: 'Mistrzu / na pan' (uczennica / ocalona -> wybawca i mentor) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
+    "Merlin -> Eftal": "Zwrot: 'panie Eftalu' (lojalna powierniczka i była uczennica -> mistrz) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: POUFNY]",
+    "Eftal -> Anastasia": "Zwrot: 'na ty / Anastasio' (opiekun i mistrz -> podopieczna) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
     "Eftal -> Merlin": "Zwrot: 'na ty / Merlin' (dawni towarzysze / zaufani partnerzy) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [OCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu eliminacja opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?']",
     "Merlin -> Maria": "Zwrot: 'Siostrzyczko Mario' (udawane dziecko -> nauczycielka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
-    "Anastasia -> Merlin": "Zwrot: 'Merlin' (koleżanki / uczennice tego samego mistrza) [GRUPA KOBIET - Wymóg form niemęskoosobowych: -łyście / byłyście gotowe] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
+    "Anastasia -> Merlin": "Zwrot: 'Merlin' (koleżanki / uczennice tego samego mistrza) [GRUPA KOBIET - Wymóg form niemęskoosobowych: -łyście / byłyście gotowe] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)] [reżim: FORMALNY]",
     "Seiryu -> Eftal": "Zwrot: 'człowieku / nędzny śmiertelniku' (bóstwo paktu -> bezczelny buntownik) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Eftal -> Seiryu": "Zwrot: 'na ty / przerośnięty gadzie' (pogromca paktów -> pokonana bestia) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
   },
   "relations": {
-    "Anastasia -> Eftal": "Zwrot: 'Mistrzu / na pan' (uczennica / ocalona -> wybawca i mentor) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
-    "Merlin -> Eftal": "Zwrot: 'panie Eftalu' (lojalna powierniczka i była uczennica -> mistrz) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie Eftalu', zakaz poufałego wołacza 'Eftalu' oraz hybryd 'Eftalu... ma pan'] [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Eftal -> Anastasia": "Zwrot: 'na ty / Anastasio' (opiekun i mistrz -> podopieczna) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Anastasia -> Eftal": "Zwrot: 'Mistrzu / na pan' (uczennica / ocalona -> wybawca i mentor) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
+    "Merlin -> Eftal": "Zwrot: 'panie Eftalu' (lojalna powierniczka i była uczennica -> mistrz) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: POUFNY]",
+    "Eftal -> Anastasia": "Zwrot: 'na ty / Anastasio' (opiekun i mistrz -> podopieczna) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
     "Eftal -> Merlin": "Zwrot: 'na ty / Merlin' (dawni towarzysze / zaufani partnerzy) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [OCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu eliminacja opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?']",
     "Merlin -> Maria": "Zwrot: 'Siostrzyczko Mario' (udawane dziecko -> nauczycielka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
-    "Anastasia -> Merlin": "Zwrot: 'Merlin' (koleżanki / uczennice tego samego mistrza) [GRUPA KOBIET - Wymóg form niemęskoosobowych: -łyście / byłyście gotowe] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Anastasia -> Merlin": "Zwrot: 'Merlin' (koleżanki / uczennice tego samego mistrza) [GRUPA KOBIET - Wymóg form niemęskoosobowych: -łyście / byłyście gotowe] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
     "Seiryu -> Eftal": "Zwrot: 'człowieku / nędzny śmiertelniku' (bóstwo paktu -> bezczelny buntownik) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Eftal -> Seiryu": "Zwrot: 'na ty / przerośnięty gadzie' (pogromca paktów -> pokonana bestia) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
   },
@@ -222,6 +248,26 @@
       "Ms": "Marii",
       "W": "Mario",
       "gender": "FEMALE"
+    },
+    "Gromu": {
+      "M": "Gromu",
+      "D": "Gromu",
+      "C": "Gromu",
+      "B": "Gromu",
+      "N": "Gromu",
+      "Ms": "Gromu",
+      "W": "Gromu",
+      "gender": "MALE"
+    },
+    "Ziemi": {
+      "M": "Ziemi",
+      "D": "Ziemi",
+      "C": "Ziemi",
+      "B": "Ziemi",
+      "N": "Ziemi",
+      "Ms": "Ziemi",
+      "W": "Ziemi",
+      "gender": "MALE"
     }
   },
   "hypocorisms": {},

@@ -81,7 +81,7 @@
       "entity_category": "ANTHROPONYM"
     },
     "Yang Duanhe": {
-      "description": "KOBIETA (wyodrębniono z relacji serii)",
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
       "gender": "MALE",
       "grammatical_gender": "MASCULINE",
       "has_verified_gender": true,
@@ -198,18 +198,20 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
+        "Bi",
         "Heki"
       ],
       "entity_category": "ANTHROPONYM"
     },
     "Yotanwa": {
-      "description": "KOBIETA (wyodrębniono z relacji serii)",
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
       "gender": "MALE",
       "grammatical_gender": "MASCULINE",
       "has_verified_gender": true,
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
+        "Yang Duanhe",
         "Yotanwa"
       ],
       "entity_category": "ANTHROPONYM"
@@ -332,6 +334,57 @@
         "Wei Ping"
       ],
       "entity_category": "ANTHROPONYM"
+    },
+    "Ousen": {
+      "description": "mężczyzna (postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Ousen",
+        "Wang Jian"
+      ],
+      "entity_category": "ANTHROPONYM",
+      "confidence": 0.95
+    },
+    "Feigo": {
+      "description": "mężczyzna (postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Danto",
+        "Feigo"
+      ],
+      "entity_category": "ANTHROPONYM",
+      "confidence": 0.95
+    },
+    "Toujou": {
+      "description": "mężczyzna (postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Toujou"
+      ],
+      "entity_category": "ANTHROPONYM",
+      "confidence": 0.95
+    },
+    "Ouken": {
+      "description": "mężczyzna (postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Ouken",
+        "Wang Jian (Qi)"
+      ],
+      "entity_category": "ANTHROPONYM",
+      "confidence": 0.95
     }
   },
   "glossary": {
@@ -590,23 +643,23 @@
   "relationships": {
     "Wang Ben -> Mǎ Nanci": "Zwrot: 'po imieniu: Mǎ Nanci / dowódco Zhao' (wrogowie / wrogowie na polu bitwy) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Fan Yang -> Wang Ben": "Zwrot: 'panie Ben / paniczu Ben' (podwładny -> dowódca / pan feudalny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Xin -> Wang Jian": "Zwrot: 'generale Wang Jian' (podwładny -> naczelny wódz) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Xin -> Wang Jian": "Zwrot: 'generale Wang Jian' (podwładny -> naczelny wódz) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
     "Wang Jian -> Xin": "Zwrot: 'na ty / bezpośrednio rozkazująco' (wielki generał -> dowódca oddziału) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Bi -> Yang Duanhe": "Zwrot: 'Wasza Wysokość / Pani' (sojusznik / dowódca niższy rangą -> Królowa Gór) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Bi -> Yang Duanhe": "Zwrot: 'Wasza Wysokość / Pani' (sojusznik / dowódca niższy rangą -> Królowa Gór) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Yang Duanhe -> Bi": "Zwrot: 'Generale Bi' (dowódczyni naczelna -> dowódca posiłków) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Shun Shuishu -> Lozo": "Zwrot: 'Królu Quanrong' (poseł/strateg -> niezależny władca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Lozo -> Shun Shuishu": "Zwrot: 'na ty / człowieku z nizin' (bezwzględny król plemienny -> obcy poseł) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Wang Ben -> Oddział Yu Feng": "Zwrot: 'Żołnierze Yu Feng / moi ludzie' (dowódca -> podwładni) [GRUPA MĘŻCZYZN - Wymóg rodzaju męskoosobowego: -liście / byliście gotowi] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Wang Ben -> Oddział Yu Feng": "Zwrot: 'Żołnierze Yu Feng / moi ludzie' (dowódca -> podwładni) [GRUPA MĘŻCZYZN - Wymóg rodzaju męskoosobowego: -liście / byliście gotowi] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
     "Han Chang -> Wang Ben": "Zwrot: 'Młody panie / dowódco Ben' (przyboczny -> dowódca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Xin -> Wei Ping / Song Zuo / Tian Yong": "Zwrot: 'po imieniu / wy, durnie' (dowódca -> towarzysze broni) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Ban You -> Ou Hon": "Zwrot: 'panie Hon / dziedzicu Hon' (sługa / zastępca -> młody pan) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Heki -> Yotanwa": "Zwrot: 'Królowo Yotanwo / Pani' (sojuszniczy generał nizin -> Królowa Gór) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Heki -> Yotanwa": "Zwrot: 'Królowo Yotanwo / Pani' (sojuszniczy generał nizin -> Królowa Gór) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Shun Sui Ju -> Rozo": "Zwrot: 'Królu Kenjuu' (poseł Zhao -> wrogi władca plemienny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Danto -> Heki": "Zwrot: 'nijaki generale z nizin' (wódz plemienia Feikong -> generał Qin) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Shin -> Mou Ten": "Zwrot: 'Mou Ten' (braterska rywalizacja / sojusznicy z równorzędnych oddziałów) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Shin -> Ri Boku": "Zwrot: 'Ri Boku' (zażarty wróg / śmiertelny przeciwnik) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Mou Ten -> Shin": "Zwrot: 'Shin' (towarzysz broni / przyjaciel) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Ri Boku -> Shin": "Zwrot: 'Dowódco Shin' (szacunek i chłodny dystans wobec obiecującego przeciwnika) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Mou Ten -> Shin": "Zwrot: 'Shin' (towarzysz broni / przyjaciel) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: POUFNY]",
+    "Ri Boku -> Shin": "Zwrot: 'Dowódco Shin' (szacunek i chłodny dystans wobec obiecującego przeciwnika) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
     "Meng Tian -> Xin": "Zwrot: 'na ty / po imieniu: Shin' (towarzysze broni / rywale) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Xin -> Meng Tian": "Zwrot: 'na ty / po imieniu: Mou Ten' (towarzysze broni / rywale) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Ding Yang -> Meng Tian": "Zwrot: 'Generale Mou Ten / Panie Mou Ten' (podwładny -> tymczasowy dowódca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
@@ -614,23 +667,23 @@
   "relations": {
     "Wang Ben -> Mǎ Nanci": "Zwrot: 'po imieniu: Mǎ Nanci / dowódco Zhao' (wrogowie / wrogowie na polu bitwy) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Fan Yang -> Wang Ben": "Zwrot: 'panie Ben / paniczu Ben' (podwładny -> dowódca / pan feudalny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Xin -> Wang Jian": "Zwrot: 'generale Wang Jian' (podwładny -> naczelny wódz) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Xin -> Wang Jian": "Zwrot: 'generale Wang Jian' (podwładny -> naczelny wódz) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
     "Wang Jian -> Xin": "Zwrot: 'na ty / bezpośrednio rozkazująco' (wielki generał -> dowódca oddziału) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Bi -> Yang Duanhe": "Zwrot: 'Wasza Wysokość / Pani' (sojusznik / dowódca niższy rangą -> Królowa Gór) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Bi -> Yang Duanhe": "Zwrot: 'Wasza Wysokość / Pani' (sojusznik / dowódca niższy rangą -> Królowa Gór) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Yang Duanhe -> Bi": "Zwrot: 'Generale Bi' (dowódczyni naczelna -> dowódca posiłków) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Shun Shuishu -> Lozo": "Zwrot: 'Królu Quanrong' (poseł/strateg -> niezależny władca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Lozo -> Shun Shuishu": "Zwrot: 'na ty / człowieku z nizin' (bezwzględny król plemienny -> obcy poseł) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Wang Ben -> Oddział Yu Feng": "Zwrot: 'Żołnierze Yu Feng / moi ludzie' (dowódca -> podwładni) [GRUPA MĘŻCZYZN - Wymóg rodzaju męskoosobowego: -liście / byliście gotowi] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Wang Ben -> Oddział Yu Feng": "Zwrot: 'Żołnierze Yu Feng / moi ludzie' (dowódca -> podwładni) [GRUPA MĘŻCZYZN - Wymóg rodzaju męskoosobowego: -liście / byliście gotowi] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
     "Han Chang -> Wang Ben": "Zwrot: 'Młody panie / dowódco Ben' (przyboczny -> dowódca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Xin -> Wei Ping / Song Zuo / Tian Yong": "Zwrot: 'po imieniu / wy, durnie' (dowódca -> towarzysze broni) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Ban You -> Ou Hon": "Zwrot: 'panie Hon / dziedzicu Hon' (sługa / zastępca -> młody pan) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Heki -> Yotanwa": "Zwrot: 'Królowo Yotanwo / Pani' (sojuszniczy generał nizin -> Królowa Gór) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Heki -> Yotanwa": "Zwrot: 'Królowo Yotanwo / Pani' (sojuszniczy generał nizin -> Królowa Gór) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Shun Sui Ju -> Rozo": "Zwrot: 'Królu Kenjuu' (poseł Zhao -> wrogi władca plemienny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Danto -> Heki": "Zwrot: 'nijaki generale z nizin' (wódz plemienia Feikong -> generał Qin) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Shin -> Mou Ten": "Zwrot: 'Mou Ten' (braterska rywalizacja / sojusznicy z równorzędnych oddziałów) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Shin -> Ri Boku": "Zwrot: 'Ri Boku' (zażarty wróg / śmiertelny przeciwnik) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Mou Ten -> Shin": "Zwrot: 'Shin' (towarzysz broni / przyjaciel) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Ri Boku -> Shin": "Zwrot: 'Dowódco Shin' (szacunek i chłodny dystans wobec obiecującego przeciwnika) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Mou Ten -> Shin": "Zwrot: 'Shin' (towarzysz broni / przyjaciel) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: POUFNY]",
+    "Ri Boku -> Shin": "Zwrot: 'Dowódco Shin' (szacunek i chłodny dystans wobec obiecującego przeciwnika) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
     "Meng Tian -> Xin": "Zwrot: 'na ty / po imieniu: Shin' (towarzysze broni / rywale) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Xin -> Meng Tian": "Zwrot: 'na ty / po imieniu: Mou Ten' (towarzysze broni / rywale) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Ding Yang -> Meng Tian": "Zwrot: 'Generale Mou Ten / Panie Mou Ten' (podwładny -> tymczasowy dowódca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
@@ -698,13 +751,13 @@
     },
     "Yang Duanhe": {
       "M": "Yang Duanhe",
-      "D": "Yang Duanhe",
-      "C": "Yang Duanhe",
-      "B": "Yang Duanhe",
-      "N": "Yang Duanhe",
-      "Ms": "Yang Duanhe",
-      "W": "Yang Duanhe",
-      "gender": "FEMALE"
+      "D": "Yanga Duanhe",
+      "C": "Yangowi Duanhe",
+      "B": "Yanga Duanhe",
+      "N": "Yangiem Duanhe",
+      "Ms": "Yangu Duanhe",
+      "W": "Yangu Duanhe",
+      "gender": "MALE"
     },
     "Shun Shuishu": {
       "M": "Shun Shuishu",
@@ -784,7 +837,7 @@
       "N": "Yotanwą",
       "Ms": "Yotanwie",
       "W": "Yotanwo",
-      "gender": "FEMALE"
+      "gender": "MALE"
     },
     "Shun Sui Ju": {
       "M": "Shun Sui Ju",
@@ -864,6 +917,46 @@
       "N": "Dingem Yangem",
       "Ms": "Dingu Yangu",
       "W": "Dingu Yangu",
+      "gender": "MALE"
+    },
+    "Ousen": {
+      "M": "Ousen",
+      "D": "Ousena",
+      "C": "Ousenowi",
+      "B": "Ousena",
+      "N": "Ousenem",
+      "Ms": "Ousenie",
+      "W": "Ousenie",
+      "gender": "MALE"
+    },
+    "Feigo": {
+      "M": "Feigo",
+      "D": "Feigo",
+      "C": "Feigo",
+      "B": "Feigo",
+      "N": "Feigo",
+      "Ms": "Feigo",
+      "W": "Feigo",
+      "gender": "MALE"
+    },
+    "Toujou": {
+      "M": "Toujou",
+      "D": "Toujou",
+      "C": "Toujou",
+      "B": "Toujou",
+      "N": "Toujou",
+      "Ms": "Toujou",
+      "W": "Toujou",
+      "gender": "MALE"
+    },
+    "Ouken": {
+      "M": "Ouken",
+      "D": "Oukena",
+      "C": "Oukenowi",
+      "B": "Oukena",
+      "N": "Oukenem",
+      "Ms": "Oukenie",
+      "W": "Oukenie",
       "gender": "MALE"
     }
   },

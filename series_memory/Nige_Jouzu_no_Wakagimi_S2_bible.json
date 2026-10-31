@@ -772,6 +772,19 @@
         "Suwy"
       ],
       "entity_category": "ANTHROPONYM"
+    },
+    "Go-Daigo": {
+      "description": "mężczyzna (postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Emperor Godaigo",
+        "Go-Daigo"
+      ],
+      "entity_category": "ANTHROPONYM",
+      "confidence": 0.95
     }
   },
   "glossary": {
@@ -830,7 +843,7 @@
     "[ KRONIKA Kronika\\NTaiheiki TOM DZIESIĄTY ]": "[ KRONIKA TAIHEIKI:\\NTOM DZIESIĄTY ]",
     "[ KRONIKA Kronika Taiheiki TOM DZIESIĄTY ]": "[ KRONIKA TAIHEIKI:\\NTOM DZIESIĄTY ]",
     "Kuge": "Arystokracja dworska",
-    "Buke": "Wojownicy / Samuraje",
+    "Buke": "Wojownicy",
     "Shimotsuke Province": "Prowincja Shimotsuke",
     "Shimotsuke": "Shimotsuke",
     "Kinkaku-ji": "Świątynia Złotego Pawilonu",
@@ -856,7 +869,7 @@
     "Cesarz Go-Daigo -> Kiyohara": "Zwrot: 'Kiyoharo' (cesarz -> poddany / urzędnik dworski) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Kiyohara -> Cesarz Go-Daigo": "Zwrot: 'Wasza Cesarska Mość / Panie' (urzędnik -> cesarz) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Mochizuki -> Tokiyuki Hojo": "Zwrot: 'młody panie / panie Tokiyuki' (generał Suwa -> młody pan) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Shokan -> Chojumaru": "Zwrot: 'na ty / Chojumaru' (dowódca / strateg -> podwładny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Shokan -> Chojumaru": "Zwrot: 'na ty / Chojumaru' (dowódca / strateg -> podwładny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [reżim: FORMALNY]",
     "Tokiyuki Suwa -> Sojusznicy / Mochizuki": "Zwrot: 'młody panie / panie Mochizuki' (młody dziedzic -> dowódcy i wasale) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Gubernator Kiyohara -> Cesarz Go-Daigo": "Zwrot: 'Wasza Cesarska Mość' (urzędnik cesarski -> cesarz) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Mochizuki -> Ród Shinomiya": "Zwrot: 'panie Shinomiya' (jeden z Trzech Wielkich Generałów -> sojusznicze rody) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
@@ -876,7 +889,7 @@
     "Yasuie -> Kinmune Saionji": "Zwrot: 'Wielki Radco / Panie Kinmune' (spiskowiec z Kamakury i dworski dostojnik cesarski) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Genba Kazama -> Yasuie Hōjō": "Zwrot: 'szefie / panie Yasuie' (shinobi/złodziej -> wuj młodego pana Tokiyukiego) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Tokiyuki Hōjō -> Masashige Kusunoki": "Zwrot: 'panie Kusunoki / panie Masashige' (uczeń/młodzieniec -> legendarny wódz) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Masashige Kusunoki -> Tokiyuki Hōjō": "Zwrot: 'chłopcze / młodzieńcze (na ty)' (mistrz taktyki -> tajemniczy chłopak) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Masashige Kusunoki -> Tokiyuki Hōjō": "Zwrot: 'chłopcze / młodzieńcze (na ty)' (mistrz taktyki -> tajemniczy chłopak) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [reżim: FORMALNY]",
     "Kojiro -> Tokiyuki Hōjō": "Zwrot: 'panie Tokiyuki / mój panie (Waka-sama)' (wasal -> młody pan) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Shizuku -> Mima": "Zwrot: 'Mima / na ty' (znajome rówieśniczki w Kyo) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
     "Mima -> Tokiyuki Hōjō": "Zwrot: 'chłopcze / mały' (miejska arystokratka -> tajemniczy chłopak z prowincji) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
@@ -886,7 +899,7 @@
     "Tokiyuki Hojo -> Mochizuki": "Zwrot: 'panie Mochizuki / panie Shinomiya' (młody pan / dziedzic -> dowódcy i wasale) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Tokiyuki Suwa -> Sojusznicy": "Zwrot: 'młody panie / panie Mochizuki' (młody dziedzic -> dowódcy i wasale) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Fubuki -> Tokiyuki Hōjō": "Zwrot: 'panie Tokiyuki / paniczu' (strateg i wasal -> młody lord) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Tokiyuki Hōjō -> Fubuki": "Zwrot: 'na ty / Fubuki' (młody lord -> towarzysz broni) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Tokiyuki Hōjō -> Fubuki": "Zwrot: 'na ty / Fubuki' (młody lord -> towarzysz broni) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [reżim: FORMALNY]",
     "Takauji Ashikaga -> Tokiyuki Hōjō": "Zwrot: 'chłopcze / mały' (wódz i dawny wasal -> nieznane dziecko (w rzeczywistości dziedzic Hōjō)) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Tokiyuki Hōjō -> Takauji Ashikaga": "Zwrot: 'Takauji Ashikaga / ty potworze' (mściciel -> śmiertelny wróg rodu) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Kinmune Saionji -> Yasuie Hōjō": "Zwrot: 'panie Yasuie / Yasuie' (arystokrata kuge -> samuraj buke / wspólnik spisku) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
@@ -911,7 +924,7 @@
     "Cesarz Go-Daigo -> Kiyohara": "Zwrot: 'Kiyoharo' (cesarz -> poddany / urzędnik dworski) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Kiyohara -> Cesarz Go-Daigo": "Zwrot: 'Wasza Cesarska Mość / Panie' (urzędnik -> cesarz) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Mochizuki -> Tokiyuki Hojo": "Zwrot: 'młody panie / panie Tokiyuki' (generał Suwa -> młody pan) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Shokan -> Chojumaru": "Zwrot: 'na ty / Chojumaru' (dowódca / strateg -> podwładny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Shokan -> Chojumaru": "Zwrot: 'na ty / Chojumaru' (dowódca / strateg -> podwładny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [reżim: FORMALNY]",
     "Tokiyuki Suwa -> Sojusznicy / Mochizuki": "Zwrot: 'młody panie / panie Mochizuki' (młody dziedzic -> dowódcy i wasale) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Gubernator Kiyohara -> Cesarz Go-Daigo": "Zwrot: 'Wasza Cesarska Mość' (urzędnik cesarski -> cesarz) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Mochizuki -> Ród Shinomiya": "Zwrot: 'panie Shinomiya' (jeden z Trzech Wielkich Generałów -> sojusznicze rody) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
@@ -931,7 +944,7 @@
     "Yasuie -> Kinmune Saionji": "Zwrot: 'Wielki Radco / Panie Kinmune' (spiskowiec z Kamakury i dworski dostojnik cesarski) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Genba Kazama -> Yasuie Hōjō": "Zwrot: 'szefie / panie Yasuie' (shinobi/złodziej -> wuj młodego pana Tokiyukiego) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Tokiyuki Hōjō -> Masashige Kusunoki": "Zwrot: 'panie Kusunoki / panie Masashige' (uczeń/młodzieniec -> legendarny wódz) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Masashige Kusunoki -> Tokiyuki Hōjō": "Zwrot: 'chłopcze / młodzieńcze (na ty)' (mistrz taktyki -> tajemniczy chłopak) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Masashige Kusunoki -> Tokiyuki Hōjō": "Zwrot: 'chłopcze / młodzieńcze (na ty)' (mistrz taktyki -> tajemniczy chłopak) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [reżim: FORMALNY]",
     "Kojiro -> Tokiyuki Hōjō": "Zwrot: 'panie Tokiyuki / mój panie (Waka-sama)' (wasal -> młody pan) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Shizuku -> Mima": "Zwrot: 'Mima / na ty' (znajome rówieśniczki w Kyo) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Mima -> Tokiyuki Hōjō": "Zwrot: 'chłopcze / mały' (miejska arystokratka -> tajemniczy chłopak z prowincji) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
@@ -941,7 +954,7 @@
     "Tokiyuki Hojo -> Mochizuki": "Zwrot: 'panie Mochizuki / panie Shinomiya' (młody pan / dziedzic -> dowódcy i wasale) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Tokiyuki Suwa -> Sojusznicy": "Zwrot: 'młody panie / panie Mochizuki' (młody dziedzic -> dowódcy i wasale) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Fubuki -> Tokiyuki Hōjō": "Zwrot: 'panie Tokiyuki / paniczu' (strateg i wasal -> młody lord) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Tokiyuki Hōjō -> Fubuki": "Zwrot: 'na ty / Fubuki' (młody lord -> towarzysz broni) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Tokiyuki Hōjō -> Fubuki": "Zwrot: 'na ty / Fubuki' (młody lord -> towarzysz broni) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [reżim: FORMALNY]",
     "Takauji Ashikaga -> Tokiyuki Hōjō": "Zwrot: 'chłopcze / mały' (wódz i dawny wasal -> nieznane dziecko (w rzeczywistości dziedzic Hōjō)) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Tokiyuki Hōjō -> Takauji Ashikaga": "Zwrot: 'Takauji Ashikaga / ty potworze' (mściciel -> śmiertelny wróg rodu) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Kinmune Saionji -> Yasuie Hōjō": "Zwrot: 'panie Yasuie / Yasuie' (arystokrata kuge -> samuraj buke / wspólnik spisku) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
@@ -1453,51 +1466,6 @@
       "W": "Tokitsugu",
       "gender": "MALE"
     },
-    "Partia z Kamakury": {
-      "M": "Partia z Kamakury",
-      "D": "Partii z Kamakury",
-      "C": "Partii z Kamakury",
-      "B": "Partię z Kamakury",
-      "N": "Partią z Kamakury",
-      "Ms": "Partii z Kamakury",
-      "W": "Partio z Kamakury"
-    },
-    "Zarządca posiadłości": {
-      "M": "Zarządca posiadłości",
-      "D": "Zarządcy posiadłości",
-      "C": "Zarządcy posiadłości",
-      "B": "Zarządcę posiadłości",
-      "N": "Zarządcą posiadłości",
-      "Ms": "Zarządcy posiadłości",
-      "W": "Zarządco posiadłości"
-    },
-    "Bliźniacze Ostrze Dwoistego Kła": {
-      "M": "Bliźniacze Ostrze Dwoistego Kła",
-      "D": "Bliźniaczego Ostrze Dwoistego Kły",
-      "C": "Bliźniaczemu Ostrze Dwoistego Kle",
-      "B": "Bliźniacze Ostrze Dwoistego Kłę",
-      "N": "Bliźniaczym Ostrze Dwoistego Kłą",
-      "Ms": "Bliźniaczym Ostrze Dwoistego Kle",
-      "W": "Bliźniacze Ostrze Dwoistego Kło"
-    },
-    "Ostrze Demona Przecinające Buddę": {
-      "M": "Ostrze Demona Przecinające Buddę",
-      "D": "Ostrze Demony Przecinającego Buddę",
-      "C": "Ostrze Demonie Przecinającemu Buddę",
-      "B": "Ostrze Demonę Przecinające Buddę",
-      "N": "Ostrze Demoną Przecinającym Buddę",
-      "Ms": "Ostrze Demonie Przecinającym Buddę",
-      "W": "Ostrze Demono Przecinające Buddę"
-    },
-    "Rozkaz cesarski": {
-      "M": "Rozkaz cesarski",
-      "D": "Rozkaza cesarskiego",
-      "C": "Rozkazowi cesarskiemu",
-      "B": "Rozkaza cesarskiego",
-      "N": "Rozkazem cesarskim",
-      "Ms": "Rozkazie cesarskim",
-      "W": "Rozkazie cesarski"
-    },
     "Yoritsugu Suwa": {
       "M": "Yoritsugu Suwa",
       "D": "Yoritsugu Suwy",
@@ -1547,6 +1515,16 @@
       "Ms": "Doradcy Suwy",
       "W": "Doradco Suwy",
       "gender": "FEMALE"
+    },
+    "Go-Daigo": {
+      "M": "Go-Daigo",
+      "D": "Go-Daigo",
+      "C": "Go-Daigo",
+      "B": "Go-Daigo",
+      "N": "Go-Daigo",
+      "Ms": "Go-Daigo",
+      "W": "Go-Daigo",
+      "gender": "MALE"
     }
   },
   "hypocorisms": {},

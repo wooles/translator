@@ -318,14 +318,14 @@
     "Tutorial Mode": "Tryb samouczka"
   },
   "relationships": {
-    "Pechka -> Ninomiya": "Zwrot: 'Ninomiya / po nazwisku' (uczennica -> szkolna miłość) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Pechka -> Ninomiya": "Zwrot: 'Ninomiya / po nazwisku' (uczennica -> szkolna miłość) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
     "Nokkochan -> Magical Daisy": "Zwrot: 'Magical Daisy / po imieniu z podziwem' (młoda fanka -> starsza idolka) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Kanoe Hitokouji -> Mamori Totoyama": "Zwrot: 'Mamori' (liderka / arystokratka -> zaufana służąca) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama\\NOCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu zakaz opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?']"
+    "Kanoe Hitokouji -> Mamori Totoyama": "Zwrot: 'Mamori' (liderka / arystokratka -> zaufana służąca) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama\\NOCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu zakaz opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?'] [reżim: FORMALNY]"
   },
   "relations": {
-    "Pechka -> Ninomiya": "Zwrot: 'Ninomiya / po nazwisku' (uczennica -> szkolna miłość) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Pechka -> Ninomiya": "Zwrot: 'Ninomiya / po nazwisku' (uczennica -> szkolna miłość) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
     "Nokkochan -> Magical Daisy": "Zwrot: 'Magical Daisy / po imieniu z podziwem' (młoda fanka -> starsza idolka) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Kanoe Hitokouji -> Mamori Totoyama": "Zwrot: 'Mamori' (liderka / arystokratka -> zaufana służąca) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama\\NOCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu zakaz opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?']"
+    "Kanoe Hitokouji -> Mamori Totoyama": "Zwrot: 'Mamori' (liderka / arystokratka -> zaufana służąca) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama\\NOCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu zakaz opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?'] [reżim: FORMALNY]"
   },
   "declensions": {
     "Pechka": {
@@ -414,7 +414,8 @@
       "B": "Karin Sonodę",
       "N": "Karin Sonodą",
       "Ms": "Karin Sonodzie",
-      "W": "Karin Sonodo"
+      "W": "Karin Sonodo",
+      "gender": "FEMALE"
     },
     "Chika Tatehara": {
       "M": "Chika Tatehara",
@@ -423,7 +424,8 @@
       "B": "Chikę Tateharę",
       "N": "Chiką Tateharą",
       "Ms": "Chice Tateharze",
-      "W": "Chiko Tateharo"
+      "W": "Chiko Tateharo",
+      "gender": "FEMALE"
     },
     "Nene Ono": {
       "M": "Nene Ono",
@@ -554,42 +556,6 @@
       "Ms": "Rionetcie",
       "W": "Rionetto",
       "gender": "FEMALE"
-    },
-    "Kraina Magii": {
-      "M": "Kraina Magii",
-      "D": "Krainy Magii",
-      "C": "Krainie Magii",
-      "B": "Krainę Magii",
-      "N": "Krainą Magii",
-      "Ms": "Krainie Magii",
-      "W": "Kraino Magii"
-    },
-    "Magiczne Cukierki": {
-      "M": "Magiczne Cukierki",
-      "D": "Magicznego Cukierki",
-      "C": "Magicznemu Cukierki",
-      "B": "Magiczne Cukierki",
-      "N": "Magicznym Cukierki",
-      "Ms": "Magicznym Cukierki",
-      "W": "Magiczne Cukierki"
-    },
-    "Projekt Wychowania Czarodziejek": {
-      "M": "Projekt Wychowania Czarodziejek",
-      "D": "Projekta Wychowanii Czarodziejeka",
-      "C": "Projektowi Wychowanii Czarodziejekowi",
-      "B": "Projekta Wychowanię Czarodziejeka",
-      "N": "Projektem Wychowanią Czarodziejekiem",
-      "Ms": "Projekcie Wychowanii Czarodziejeku",
-      "W": "Projekcie Wychowanio Czarodziejeku"
-    },
-    "Tryb samouczka": {
-      "M": "Tryb samouczka",
-      "D": "Tryba samouczki",
-      "C": "Trybowi samouczce",
-      "B": "Tryba samouczkę",
-      "N": "Trybem samouczką",
-      "Ms": "Trybie samouczce",
-      "W": "Trybie samouczko"
     }
   },
   "hypocorisms": {},

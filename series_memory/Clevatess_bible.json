@@ -15,8 +15,8 @@
     },
     "Alicia": {
       "description": "KOBIETA - Dziewczyna Rycerz / Bohaterka z 13 Bohaterów, która przeciwstawiła się bezmyślnej rzezi i zawarła pakt z Clevatessem",
-      "gender": "MALE",
-      "grammatical_gender": "MASCULINE",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
       "has_verified_gender": true,
       "confidence": 0.95,
       "priority": "P0",
@@ -210,9 +210,9 @@
       "entity_category": "ANTHROPONYM"
     },
     "Chiffonlits": {
-      "description": "MĘŻCZYZNA - MĘŻCZYZNA (postać)",
-      "gender": "MALE",
-      "grammatical_gender": "MASCULINE",
+      "description": "KOBIETA - KOBIETA (postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
       "has_verified_gender": true,
       "confidence": 0.95,
       "priority": "P0",
@@ -383,6 +383,97 @@
         "Vatiss"
       ],
       "entity_category": "ANTHROPONYM"
+    },
+    "Bestii": {
+      "description": "mężczyzna (postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Bestii",
+        "Demon King / King of Beasts"
+      ],
+      "entity_category": "ANTHROPONYM",
+      "confidence": 0.95
+    },
+    "Święty": {
+      "description": "mężczyzna (postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Owen Koath",
+        "Święty"
+      ],
+      "entity_category": "ANTHROPONYM",
+      "confidence": 0.95
+    },
+    "Miecza": {
+      "description": "mężczyzna (postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Miecza",
+        "Owen Koath"
+      ],
+      "entity_category": "ANTHROPONYM",
+      "confidence": 0.95
+    },
+    "Owen": {
+      "description": "mężczyzna (postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Owen",
+        "Owen Koath"
+      ],
+      "entity_category": "ANTHROPONYM",
+      "confidence": 0.95
+    },
+    "Koath": {
+      "description": "mężczyzna (postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Koath",
+        "Owen Koath"
+      ],
+      "entity_category": "ANTHROPONYM",
+      "confidence": 0.95
+    },
+    "Owenie": {
+      "description": "mężczyzna (postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Owen Koath",
+        "Owenie"
+      ],
+      "entity_category": "ANTHROPONYM",
+      "confidence": 0.95
+    },
+    "Koacie)": {
+      "description": "mężczyzna (postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Koacie)",
+        "Owen Koath"
+      ],
+      "entity_category": "ANTHROPONYM",
+      "confidence": 0.95
     }
   },
   "glossary": {
@@ -392,13 +483,13 @@
     "Hero Armament / Hero Weapon": "Oręż Bohatera",
     "Kingdom of Hiden": "Królestwo Hiden (kraina; zwrot 'z Hiden' to dopełniacz pochodzenia, zakaz 'z Hidenem')",
     "Kingdom of Haiden": "Królestwo Hiden (kraina; toponim; zwrot 'z Hiden' to dopełniacz pochodzenia, zakaz 'z Haidenem')",
-    "Hiden": "Hiden (królestwo / kraina; toponim; dopełniacz pochodzenia: z Hiden, zakaz 'z Hidenem')",
-    "Haiden": "Hiden (królestwo / kraina; toponim; dopełniacz pochodzenia: z Hiden, zakaz 'z Haidenem' i 'z Hidenem')",
-    "Boirate": "Boelate (cesarstwo / kraina; toponim; dopełniacz pochodzenia: z Boelate, zakaz 'z Boiratem')",
+    "Hiden": "Hiden (królestwo",
+    "Haiden": "Hiden (królestwo",
+    "Boirate": "Boelate (cesarstwo",
     "Esrin": "Eslinn (królestwo; toponim; dopełniacz pochodzenia: z Eslinn, zakaz 'z Esrinem')",
     "Haiderat": "Hyderat (stolica Hiden; toponim)",
-    "Elbe Shaft": "Szyb Elbe (kopalnia / lokacja)",
-    "Solsein": "Solsein (akademia / instytucja)",
+    "Elbe Shaft": "Szyb Elbe (kopalnia",
+    "Solsein": "Solsein (akademia",
     "Alyssa Sleihunt": "Alicia Sleihunt",
     "Demon King / King of Beasts": "Król Bestii",
     "Lord of Dark Beasts": "Władca Mrocznych Bestii",
@@ -415,8 +506,8 @@
     "arcanacite": "arkanacyt",
     "Garden Words": "Mowa Ogrodu",
     "strangling tree": "drzewo-dusiciel",
-    "Zavthier of Delusions": "Zavthier Pani Iluzji / Zavthier Iluzoryczna (Władczyni Zachodu; KATEGORYCZNY ZAKAZ 'Zavthier od Złudzeń')",
-    "Vordin of Flaming Embers": "Vordin Płomiennego Żaru / Płomienny Vordin (Władca Północy; KATEGORYCZNY ZAKAZ 'od Płomiennego Żaru')",
+    "Zavthier of Delusions": "Zavthier Pani Iluzji",
+    "Vordin of Flaming Embers": "Vordin Płomiennego Żaru",
     "Esleburg": "Esleburg (stolica Eslinn; toponim)",
     "Eslinn": "Eslinn (królestwo; toponim)",
     "Hyderat": "Hyderat (stolica Hiden; toponim)",
@@ -440,29 +531,29 @@
   "relationships": {
     "Clevatess -> Alicia": "Zwrot: Alicio / człowiecza dziewko / na ty (wyniosły władca bestii -> ludzka bohaterka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Alicia -> Clevatess": "Zwrot: Clevatessie / potworze / na ty (wojowniczka -> prastara bestia) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Alicia -> Naie": "Relacja: szantażystka -> zdemaskowana szpieg (zwrot formalny 'pani profesor' w masce uczennicy, przejście na 'ty' w bezpośrednim szantażu: 'nie wydałaś mnie / stoisz / dowiesz się pierwsza') [KATEGORYCZNY ZAKAZ 'panie profesorze/pan']",
-    "Alicia -> Klen": "Zwrot: 'Klenie / na ty' (wskrzeszona podwładna -> pan bestii) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Alicia -> Naie": "Relacja: szantażystka -> zdemaskowana szpieg (zwrot formalny 'pani profesor' w masce uczennicy, przejście na 'ty' w bezpośrednim szantażu: 'nie wydałaś mnie / stoisz / dowiesz się pierwsza') [KATEGORYCZNY ZAKAZ 'panie profesorze/pan'] [reżim: FORMALNY]",
+    "Alicia -> Klen": "Zwrot: 'Klenie / na ty' (wskrzeszona podwładna -> pan bestii) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
     "Leon i Tygel -> Alicia": "Zwrot: 'dziewczyno z Hiden / ty' (wzajemny sojusz taktyczny rywali) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Zavthier -> Clevatess": "Zwrot: 'Władco Mrocznych Bestii Południa / Clevatessie Księżycowego Blasku / na ty' (odwieczni równorzędni władcy potworów) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Rathwell -> Edison": "Zwrot: 'Eddy / ty' (pasożytnicze bóstwo -> sterroryzowany nosiciel) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Yuriel -> Owen Koath": "Zwrot: 'Święty Miecza Owenie Koath / ty' (król Eslinn -> podległy czempion militarny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Lang -> Chiffonlits": "Zwrot: 'pani profesor Chiffonlits' (dowódca polowy -> podwładna profesor) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
-    "Elro -> Ray Forester": "Zwrot: 'Rayu Foresterze / na ty' (dyrektor akademii -> uczeń) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
-    "Klen -> Zavthier": "Zwrot: 'stara wiedźmo / per ty' (starożytny władca -> dawna sojuszniczka bestia) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Lang -> Chiffonlits": "Zwrot: 'pani profesor Chiffonlits' (dowódca polowy -> podwładna profesor) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
+    "Elro -> Ray Forester": "Zwrot: 'Rayu Foresterze / na ty' (dyrektor akademii -> uczeń) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
+    "Klen -> Zavthier": "Zwrot: 'stara wiedźmo / per ty' (starożytny władca -> dawna sojuszniczka bestia) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: POUFNY]",
     "Andrew -> Alicia": "Zwrot: 'na ty (per szczur)' (oprawca -> ofiara)"
   },
   "relations": {
     "Clevatess -> Alicia": "Zwrot: Alicio / człowiecza dziewko / na ty (wyniosły władca bestii -> ludzka bohaterka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Alicia -> Clevatess": "Zwrot: Clevatessie / potworze / na ty (wojowniczka -> prastara bestia) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Alicia -> Naie": "Relacja: szantażystka -> zdemaskowana szpieg (zwrot formalny 'pani profesor' w masce uczennicy, przejście na 'ty' w bezpośrednim szantażu: 'nie wydałaś mnie / stoisz / dowiesz się pierwsza') [KATEGORYCZNY ZAKAZ 'panie profesorze/pan']",
-    "Alicia -> Klen": "Zwrot: 'Klenie / na ty' (wskrzeszona podwładna -> pan bestii) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Alicia -> Naie": "Relacja: szantażystka -> zdemaskowana szpieg (zwrot formalny 'pani profesor' w masce uczennicy, przejście na 'ty' w bezpośrednim szantażu: 'nie wydałaś mnie / stoisz / dowiesz się pierwsza') [KATEGORYCZNY ZAKAZ 'panie profesorze/pan'] [reżim: FORMALNY]",
+    "Alicia -> Klen": "Zwrot: 'Klenie / na ty' (wskrzeszona podwładna -> pan bestii) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
     "Leon i Tygel -> Alicia": "Zwrot: 'dziewczyno z Hiden / ty' (wzajemny sojusz taktyczny rywali) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Zavthier -> Clevatess": "Zwrot: 'Władco Mrocznych Bestii Południa / Clevatessie Księżycowego Blasku / na ty' (odwieczni równorzędni władcy potworów) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Rathwell -> Edison": "Zwrot: 'Eddy / ty' (pasożytnicze bóstwo -> sterroryzowany nosiciel) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Yuriel -> Owen Koath": "Zwrot: 'Święty Miecza Owenie Koath / ty' (król Eslinn -> podległy czempion militarny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Lang -> Chiffonlits": "Zwrot: 'pani profesor Chiffonlits' (dowódca polowy -> podwładna profesor) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
-    "Elro -> Ray Forester": "Zwrot: 'Rayu Foresterze / na ty' (dyrektor akademii -> uczeń) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
-    "Klen -> Zavthier": "Zwrot: 'stara wiedźmo / per ty' (starożytny władca -> dawna sojuszniczka bestia) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Lang -> Chiffonlits": "Zwrot: 'pani profesor Chiffonlits' (dowódca polowy -> podwładna profesor) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
+    "Elro -> Ray Forester": "Zwrot: 'Rayu Foresterze / na ty' (dyrektor akademii -> uczeń) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
+    "Klen -> Zavthier": "Zwrot: 'stara wiedźmo / per ty' (starożytny władca -> dawna sojuszniczka bestia) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: POUFNY]",
     "Andrew -> Alicia": "Zwrot: 'na ty (per szczur)' (oprawca -> ofiara)"
   },
   "declensions": {
@@ -571,20 +662,20 @@
       "D": "Langa",
       "C": "Langowi",
       "B": "Langa",
-      "N": "Langem",
+      "N": "Langiem",
       "Ms": "Langu",
       "W": "Langu",
       "gender": "MALE"
     },
     "Chiffonlits": {
       "M": "Chiffonlits",
-      "D": "Chiffonlitsa",
-      "C": "Chiffonlitsowi",
-      "B": "Chiffonlitsa",
-      "N": "Chiffonlitsem",
-      "Ms": "Chiffonlitsie",
-      "W": "Chiffonlitsie",
-      "gender": "MALE"
+      "D": "Chiffonlits",
+      "C": "Chiffonlits",
+      "B": "Chiffonlits",
+      "N": "Chiffonlits",
+      "Ms": "Chiffonlits",
+      "W": "Chiffonlits",
+      "gender": "FEMALE"
     },
     "Elro": {
       "M": "Elro",
@@ -738,12 +829,12 @@
     },
     "Ray": {
       "M": "Ray",
-      "D": "Ray",
-      "C": "Ray",
-      "B": "Ray",
-      "N": "Ray",
-      "Ms": "Ray",
-      "W": "Ray",
+      "D": "Raya",
+      "C": "Rayowi",
+      "B": "Raya",
+      "N": "Rayem",
+      "Ms": "Rayu",
+      "W": "Rayu",
       "gender": "MALE"
     },
     "Carson": {
@@ -764,6 +855,66 @@
       "N": "Klenem Vatissem (Clevatess)em",
       "Ms": "Klenie Vatissie (Clevatess)ie",
       "W": "Klenie Vatissie (Clevatess)ie",
+      "gender": "MALE"
+    },
+    "Bestii": {
+      "M": "Bestii",
+      "D": "Bestii",
+      "C": "Bestii",
+      "B": "Bestii",
+      "N": "Bestii",
+      "Ms": "Bestii",
+      "W": "Bestii",
+      "gender": "MALE"
+    },
+    "Święty": {
+      "M": "Święty",
+      "D": "Świętego",
+      "C": "Świętemu",
+      "B": "Świętego",
+      "N": "Świętym",
+      "Ms": "Świętym",
+      "W": "Święty",
+      "gender": "MALE"
+    },
+    "Miecza": {
+      "M": "Miecza",
+      "D": "Mieczy",
+      "C": "Mieczie",
+      "B": "Mieczę",
+      "N": "Mieczą",
+      "Ms": "Mieczie",
+      "W": "Mieczo",
+      "gender": "MALE"
+    },
+    "Owen": {
+      "M": "Owen",
+      "D": "Owena",
+      "C": "Owenowi",
+      "B": "Owena",
+      "N": "Owenem",
+      "Ms": "Owenie",
+      "W": "Owenie",
+      "gender": "MALE"
+    },
+    "Koath": {
+      "M": "Koath",
+      "D": "Koatha",
+      "C": "Koathowi",
+      "B": "Koatha",
+      "N": "Koathem",
+      "Ms": "Koathu",
+      "W": "Koathu",
+      "gender": "MALE"
+    },
+    "Owenie": {
+      "M": "Owenie",
+      "D": "Owenie",
+      "C": "Owenie",
+      "B": "Owenie",
+      "N": "Owenie",
+      "Ms": "Owenie",
+      "W": "Owenie",
       "gender": "MALE"
     }
   },

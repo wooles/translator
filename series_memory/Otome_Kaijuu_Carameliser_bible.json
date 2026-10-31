@@ -9,7 +9,8 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
-        "Arata"
+        "Arata",
+        "Arata Minami"
       ],
       "entity_category": "ANTHROPONYM"
     },
@@ -21,7 +22,8 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
-        "Kuroe"
+        "Kuroe",
+        "Kuroe Akaishi"
       ],
       "entity_category": "ANTHROPONYM"
     },
@@ -139,13 +141,14 @@
       "entity_category": "ANTHROPONYM"
     },
     "Minami": {
-      "description": "KOBIETA - KOBIETA (postać)",
-      "gender": "FEMALE",
-      "grammatical_gender": "FEMININE",
+      "description": "MĘŻCZYZNA - MĘŻCZYZNA (postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
       "has_verified_gender": true,
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
+        "Arata Minami",
         "Minami"
       ],
       "entity_category": "ANTHROPONYM"
@@ -158,7 +161,11 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
-        "Akaishi"
+        "Akaishi",
+        "Akaishi-chan",
+        "Akaishi-kun",
+        "Kuroe Akaishi",
+        "Rinko Akaishi"
       ],
       "entity_category": "ANTHROPONYM"
     },
@@ -194,7 +201,8 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
-        "Godolla"
+        "Godolla",
+        "King of Kaiju, Godolla"
       ],
       "entity_category": "ANTHROPONYM"
     },
@@ -219,7 +227,6 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
-        "Akaishi",
         "Kuroe Akaishi"
       ],
       "entity_category": "ANTHROPONYM"
@@ -232,7 +239,6 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
-        "Akaishi",
         "Rinko",
         "Rinko Akaishi"
       ],
@@ -314,40 +320,40 @@
     "Cabinet Disaster Task Force HQ": "Sztab Rządowego Zespołu Reagowania Kryzysowego"
   },
   "relationships": {
-    "Arata -> Kuroe": "Zwrot: 'panno Akaishi (Akaishi-san)' (para zakochanych z dystansem szkolnym) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Arata -> Kuroe": "Zwrot: 'panno Akaishi (Akaishi-san)' (para zakochanych z dystansem szkolnym) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: FORMALNY]",
     "Kuroe -> Arata": "Zwrot: 'Minami-kun' (para zakochanych) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Seina -> Arata": "Zwrot: 'na ty / świeżaku / młody' (doświadczona gwiazda -> debiutant) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Raimu -> Kuroe": "Zwrot: 'Kuroe' (bliskie koleżanki ze szkoły, bezpośredni styl rówieśniczy gyaru) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
+    "Raimu -> Kuroe": "Zwrot: 'Kuroe' (bliskie koleżanki ze szkoły, bezpośredni styl rówieśniczy gyaru) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)] [reżim: POUFNY]",
     "Manatsu -> Kuroe": "Zwrot: 'panno Kuroe (Kuroe-san)' (szkolna znajoma z dystyngowanym szacunkiem) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
     "Taichi -> Arata": "Zwrot: 'na ty' (młodszy rywal o względy Kuroe) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Arata Minami -> Kuroe Akaishi": "Zwrot: 'Akaishi / po imieniu' (sympatia / para licealistów) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Rinko Akaishi -> Kotaro Hibino": "Zwrot: 'Kotaro / Profesorze Hibino' (byli współpracownicy / naukowcy) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Kotaro Hibino -> Rinko Akaishi": "Zwrot: 'panno Akaishi / Rinko' (były student -> starsza koleżanka/mentorka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
-    "Kotaro -> Rinko": "Zwrot: 'panno Akaishi / Rinko' (były student -> starsza koleżanka/mentorka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Kotaro Hibino -> Rinko Akaishi": "Zwrot: 'panno Akaishi / Rinko' (były student -> starsza koleżanka/mentorka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
+    "Kotaro -> Rinko": "Zwrot: 'panno Akaishi / Rinko' (były student -> starsza koleżanka/mentorka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
     "Kuroe Akaishi -> Arata Minami": "Zwrot: 'Minami' (sympatia / para licealistów)"
   },
   "relations": {
-    "Arata -> Kuroe": "Zwrot: 'panno Akaishi (Akaishi-san)' (para zakochanych z dystansem szkolnym) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Arata -> Kuroe": "Zwrot: 'panno Akaishi (Akaishi-san)' (para zakochanych z dystansem szkolnym) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: FORMALNY]",
     "Kuroe -> Arata": "Zwrot: 'Minami-kun' (para zakochanych) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Seina -> Arata": "Zwrot: 'na ty / świeżaku / młody' (doświadczona gwiazda -> debiutant) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Raimu -> Kuroe": "Zwrot: 'Kuroe' (bliskie koleżanki ze szkoły, bezpośredni styl rówieśniczy gyaru) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Raimu -> Kuroe": "Zwrot: 'Kuroe' (bliskie koleżanki ze szkoły, bezpośredni styl rówieśniczy gyaru) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: POUFNY]",
     "Manatsu -> Kuroe": "Zwrot: 'panno Kuroe (Kuroe-san)' (szkolna znajoma z dystyngowanym szacunkiem) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Taichi -> Arata": "Zwrot: 'na ty' (młodszy rywal o względy Kuroe) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Arata Minami -> Kuroe Akaishi": "Zwrot: 'Akaishi / po imieniu' (sympatia / para licealistów) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Kuroe Akaishi -> Arata Minami": "Zwrot: 'Minami' (sympatia / para licealistów)",
     "Rinko Akaishi -> Kotaro Hibino": "Zwrot: 'Kotaro / Profesorze Hibino' (byli współpracownicy / naukowcy) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Kotaro Hibino -> Rinko Akaishi": "Zwrot: 'panno Akaishi / Rinko' (były student -> starsza koleżanka/mentorka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
-    "Kotaro -> Rinko": "Zwrot: 'panno Akaishi / Rinko' (były student -> starsza koleżanka/mentorka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]"
+    "Kotaro Hibino -> Rinko Akaishi": "Zwrot: 'panno Akaishi / Rinko' (były student -> starsza koleżanka/mentorka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
+    "Kotaro -> Rinko": "Zwrot: 'panno Akaishi / Rinko' (były student -> starsza koleżanka/mentorka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]"
   },
   "declensions": {
     "Arata": {
       "M": "Arata",
-      "D": "Araty",
-      "C": "Aracie",
-      "B": "Aratę",
+      "D": "Aratej",
+      "C": "Aratej",
+      "B": "Aratą",
       "N": "Aratą",
-      "Ms": "Aracie",
-      "W": "Arato",
+      "Ms": "Aratej",
+      "W": "Arata",
       "gender": "MALE"
     },
     "Kuroe": {
@@ -458,7 +464,7 @@
       "N": "Minami",
       "Ms": "Minami",
       "W": "Minami",
-      "gender": "FEMALE"
+      "gender": "MALE"
     },
     "Akaishi": {
       "M": "Akaishi",
@@ -492,11 +498,11 @@
     },
     "Godolla": {
       "M": "Godolla",
-      "D": "Godolly",
-      "C": "Godolle",
+      "D": "Godolli",
+      "C": "Godolli",
       "B": "Godollę",
       "N": "Godollą",
-      "Ms": "Godolle",
+      "Ms": "Godolli",
       "W": "Godollo",
       "gender": "MALE"
     },
@@ -584,7 +590,8 @@
     "Drago": "TOPONYM",
     "Psycho-tan": "TOPONYM",
     "Romance": "TOPONYM",
-    "Romantic Comedy": "TOPONYM"
+    "Romantic Comedy": "TOPONYM",
+    "Rinko": "TOPONYM"
   },
   "fansub_canon": {}
 }

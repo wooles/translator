@@ -86,7 +86,7 @@
   },
   "relationships": {
     "Ike -> Monica": "Zwrot: 'Monico / w myślach: wiewióreczko' (książę pod przykrywką -> nieśmiała znajoma / sekretna ochroniarka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [OCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu eliminacja opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?']",
-    "Monica -> Ike": "Zwrot: 'panie Ike' (nieśmiała dziewczyna -> szlachetny przyjaciel) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Monica -> Ike": "Zwrot: 'panie Ike' (nieśmiała dziewczyna -> szlachetny przyjaciel) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: POUFNY]",
     "Monica -> Nero": "Zwrot: 'Nero' (czarownica -> jej chowaniec) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Monica -> Felix": "Zwrot: 'Ike / na ty (w tej scenie)' (wspólnicy nocnej wyprawy incognito) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Felix -> Monica": "Zwrot: 'Monico / mała wiewiórko / na ty' (opiekun i towarzysz incognito) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
@@ -96,7 +96,7 @@
   },
   "relations": {
     "Ike -> Monica": "Zwrot: 'Monico / w myślach: wiewióreczko' (książę pod przykrywką -> nieśmiała znajoma / sekretna ochroniarka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [OCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu eliminacja opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?']",
-    "Monica -> Ike": "Zwrot: 'panie Ike' (nieśmiała dziewczyna -> szlachetny przyjaciel) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Monica -> Ike": "Zwrot: 'panie Ike' (nieśmiała dziewczyna -> szlachetny przyjaciel) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: POUFNY]",
     "Monica -> Nero": "Zwrot: 'Nero' (czarownica -> jej chowaniec) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Monica -> Felix": "Zwrot: 'Ike / na ty (w tej scenie)' (wspólnicy nocnej wyprawy incognito) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Felix -> Monica": "Zwrot: 'Monico / mała wiewiórko / na ty' (opiekun i towarzysz incognito) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",

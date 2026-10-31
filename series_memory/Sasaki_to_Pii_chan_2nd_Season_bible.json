@@ -325,7 +325,9 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
-        "Pii-chan"
+        "Pii",
+        "Pii-chan",
+        "Pii-kun"
       ],
       "entity_category": "ANTHROPONYM"
     },
@@ -356,10 +358,10 @@
     "Java sparrow": "ryżowiec siwy"
   },
   "relationships": {
-    "Sasaki -> Peeps": "Zwrot: 'na ty / Peepsie' (partnerzy, pakt magiczny z szacunkiem mentora) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Sasaki -> Peeps": "Zwrot: 'na ty / Peepsie' (partnerzy, pakt magiczny z szacunkiem mentora) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [reżim: FORMALNY]",
     "Futari Shizuka -> Sasaki": "Zwrot: 'na ty / Sasaki' (współpracownicy w biurze ds. zjawisk nadprzyrodzonych) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Shizuka -> Sasaki": "Zwrot: 'na ty / Sasaki' (współpracownicy w biurze ds. zjawisk nadprzyrodzonych) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Peeps -> Sasaki": "Zwrot: 'na ty / Sasaki' (mistrz i uczeń, powiernicy) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Peeps -> Sasaki": "Zwrot: 'na ty / Sasaki' (mistrz i uczeń, powiernicy) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [reżim: FORMALNY]",
     "Akutsu -> Sasaki": "Zwrot: 'panie Sasaki / Sasaki-kun' (przełożony -> podwładny w służbach specjalnych) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Akutsu -> Futari Shizuka": "Zwrot: 'Futari Shizuka / pani Shizuka' (przełożony -> zwerbowana agentka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Hrabia Müller -> Sasaki": "Zwrot: 'panie Sasaki / Sasaki-dono / baronie Sasaki' (arystokrata sojusznik -> nowo mianowany baron) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
@@ -367,8 +369,8 @@
     "Abaddon -> Otonari-san": "Zwrot: 'na ty / mała' (demon patron -> ludzka apostołka) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
   },
   "relations": {
-    "Sasaki -> Peeps": "Zwrot: 'na ty / Peepsie' (partnerzy, pakt magiczny z szacunkiem mentora) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
-    "Peeps -> Sasaki": "Zwrot: 'na ty / Sasaki' (mistrz i uczeń, powiernicy) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]",
+    "Sasaki -> Peeps": "Zwrot: 'na ty / Peepsie' (partnerzy, pakt magiczny z szacunkiem mentora) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [reżim: FORMALNY]",
+    "Peeps -> Sasaki": "Zwrot: 'na ty / Sasaki' (mistrz i uczeń, powiernicy) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [reżim: FORMALNY]",
     "Akutsu -> Sasaki": "Zwrot: 'panie Sasaki / Sasaki-kun' (przełożony -> podwładny w służbach specjalnych) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Akutsu -> Futari Shizuka": "Zwrot: 'Futari Shizuka / pani Shizuka' (przełożony -> zwerbowana agentka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Futari Shizuka -> Sasaki": "Zwrot: 'na ty / Sasaki' (współpracownicy w biurze ds. zjawisk nadprzyrodzonych) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
@@ -561,42 +563,6 @@
       "Ms": "Równiny Rectan",
       "W": "Równiny Rectan",
       "gender": "FEMALE"
-    },
-    "Wydział Specjalny Kancelarii Premiera": {
-      "M": "Wydział Specjalny Kancelarii Premiera",
-      "D": "Wydziała Specjalnego Kancelarii Premiery",
-      "C": "Wydziałowi Specjalnemu Kancelarii Premierze",
-      "B": "Wydziała Specjalnego Kancelarii Premierę",
-      "N": "Wydziałem Specjalnym Kancelarii Premierą",
-      "Ms": "Wydziałie Specjalnym Kancelarii Premierze",
-      "W": "Wydziałie Specjalny Kancelarii Premiero"
-    },
-    "Gwiezdny Mędrzec": {
-      "M": "Gwiezdny Mędrzec",
-      "D": "Gwiezdny Mędrzeca",
-      "C": "Gwiezdny Mędrzecowi",
-      "B": "Gwiezdny Mędrzeca",
-      "N": "Gwiezdny Mędrzecem",
-      "Ms": "Gwiezdny Mędrzecu",
-      "W": "Gwiezdny Mędrzecu"
-    },
-    "Królestwo Herz": {
-      "M": "Królestwo Herz",
-      "D": "Królestwa Herz",
-      "C": "Królestwu Herz",
-      "B": "Królestwo Herz",
-      "N": "Królestwem Herz",
-      "Ms": "Królestwie Herz",
-      "W": "Królestwo Herz"
-    },
-    "Cesarstwo Ohgen": {
-      "M": "Cesarstwo Ohgen",
-      "D": "Cesarstwa Ohgen",
-      "C": "Cesarstwu Ohgen",
-      "B": "Cesarstwo Ohgen",
-      "N": "Cesarstwem Ohgen",
-      "Ms": "Cesarstwie Ohgen",
-      "W": "Cesarstwo Ohgen"
     },
     "Mother": {
       "M": "Mother",

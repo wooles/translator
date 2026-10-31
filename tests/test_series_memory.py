@@ -601,3 +601,61 @@ def test_series_bible_is_generic_actor_or_category_method_and_function_equivalen
     assert bible.is_generic_actor_or_category(tag) is expected_generic
     assert SeriesBible.is_generic_actor_or_category(tag) is expected_generic
 
+
+# ============================================================================
+# HOTFIX 9.10.1 REGRESSION TESTS (T10.1.1 - T10.1.3)
+# ============================================================================
+
+
+# WZORZEC T10.1.1 (Operacja H1) -> tests/test_series_memory.py
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "name,gender,expected_n",
+    [
+        ("Töregene", "FEMALE", "Töregene"),
+        ("Chulan", "FEMALE", "Chulan"),
+        ("obronny", "MALE", "obronnym"),
+    ],
+)
+def test_female_consonant_historical_names_are_indeclinable(name, gender, expected_n):
+    from series_memory import generate_polish_name_declension
+    decl = generate_polish_name_declension(name, gender)
+    assert decl["N"] == expected_n
+
+
+# WZORZEC T10.1.2 (Operacja H3) -> tests/test_series_memory.py
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "name,expected_d",
+    [
+        ("Violet Evergarden", "Violet Evergarden"),
+        ("Rachel Green", "Rachel Green"),
+    ],
+)
+def test_bipartite_female_name_indeclinable(name, expected_d):
+    from series_memory import generate_polish_name_declension
+    decl = generate_polish_name_declension(name, "FEMALE")
+    assert decl["D"] == expected_d
+
+
+# WZORZEC T10.1.3 (Operacja H2) -> tests/test_series_memory.py
+@pytest.mark.unit
+@pytest.mark.parametrize("dict_key", ["terminology", "glossary"])
+def test_terminology_alias_propagates_female_gender(dict_key):
+    from series_memory import SeriesBible
+    bible = SeriesBible(slug="test_9_10_1_terminology", db_path=":memory:")
+    bible.data["characters"]["Khulan"] = {
+        "gender": "FEMALE",
+        "grammatical_gender": "FEMININE",
+        "priority": "P0",
+        "has_verified_gender": True,
+    }
+    bible.data[dict_key] = {
+        "Khulan": "cesarzowa Chulan"
+    }
+    bible._sanitize_loaded_bible_in_ram()
+    assert "Chulan" in bible.data["characters"]
+    assert bible.data["characters"]["Chulan"]["gender"] == "FEMALE"
+    assert bible.data["declensions"]["Chulan"]["gender"] == "FEMALE"
+
+

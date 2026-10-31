@@ -19600,6 +19600,14 @@ def test_standard_9_10_suite():
     assert SeriesBible.is_generic_actor_or_category("Everyone") is True
     assert bible.is_generic_actor_or_category("Violet") is False
 
+    # 6. Hotfix 9.10.1: zawężenie -ne/-na oraz dwuczłonowa deklinacja żeńska
+    from series_memory import is_polish_adjective
+    assert is_polish_adjective("Töregene") is False
+    assert is_polish_adjective("obronny") is True
+    assert is_polish_adjective("obronne") is True
+    decl_bipartite = generate_polish_name_declension("Violet Evergarden", "FEMALE")
+    assert decl_bipartite["D"] == "Violet Evergarden"
+
     print(" -> PASSED: TEST 223 potwierdza integrację operacji Standardu 9.10.")
 
 

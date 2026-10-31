@@ -75,7 +75,10 @@
       "priority": "P1",
       "has_verified_gender": false,
       "aliases": [
-        "Piercarlo"
+        "Piercarlo",
+        "Pii",
+        "Pii-chan",
+        "Pii-kun"
       ],
       "entity_category": "ANTHROPONYM"
     },
@@ -241,7 +244,7 @@
     "Magical Pink -> Sasaki": "Zwrot: 'panie Magiku' (chwilowy sojusznik z przymusu) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Sasaki -> Akutsu": "Zwrot: 'naczelniku / panie naczelniku' (podwładny -> przełożony) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Müller -> Sasaki": "Zwrot: 'panie Sasaki / baronie Sasaki' (arystokratyczna relacja partnerska) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Müller -> Peeps": "Zwrot: 'Czcigodny Mędrcu Gwiazd' (feudalny szacunek wobec arcymaga) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]"
+    "Müller -> Peeps": "Zwrot: 'Czcigodny Mędrcu Gwiazd' (feudalny szacunek wobec arcymaga) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [reżim: FORMALNY]"
   },
   "relations": {
     "Sasaki -> Shizuka Futari": "Zwrot: 'pani Shizuko / Futari-san' (współpracownicy / partnerzy z Biura) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
@@ -249,7 +252,7 @@
     "Magical Pink -> Sasaki": "Zwrot: 'panie Magiku' (chwilowy sojusznik z przymusu) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Sasaki -> Akutsu": "Zwrot: 'naczelniku / panie naczelniku' (podwładny -> przełożony) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Müller -> Sasaki": "Zwrot: 'panie Sasaki / baronie Sasaki' (arystokratyczna relacja partnerska) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Müller -> Peeps": "Zwrot: 'Czcigodny Mędrcu Gwiazd' (feudalny szacunek wobec arcymaga) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]"
+    "Müller -> Peeps": "Zwrot: 'Czcigodny Mędrcu Gwiazd' (feudalny szacunek wobec arcymaga) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [reżim: FORMALNY]"
   },
   "declensions": {
     "Sasaki": {
@@ -411,60 +414,6 @@
       "W": "Abaddonie",
       "gender": "MALE"
     },
-    "Przestrzeń kwarantanny": {
-      "M": "Przestrzeń kwarantanny",
-      "D": "Przestrzeńa kwarantanny",
-      "C": "Przestrzeńowi kwarantanny",
-      "B": "Przestrzeńa kwarantanny",
-      "N": "Przestrzeńem kwarantanny",
-      "Ms": "Przestrzeńie kwarantanny",
-      "W": "Przestrzeńie kwarantanny"
-    },
-    "Poplecznik": {
-      "M": "Poplecznik",
-      "D": "Poplecznika",
-      "C": "Poplecznikowi",
-      "B": "Poplecznika",
-      "N": "Poplecznikiem",
-      "Ms": "Popleczniku",
-      "W": "Popleczniku"
-    },
-    "Wojna zastępcza": {
-      "M": "Wojna zastępcza",
-      "D": "Wojny zastępczej",
-      "C": "Wojnie zastępczej",
-      "B": "Wojnę zastępczą",
-      "N": "Wojną zastępczą",
-      "Ms": "Wojnie zastępczej",
-      "W": "Wojno zastępcza"
-    },
-    "Pole magiczne": {
-      "M": "Pole magiczne",
-      "D": "Pole'a magicznego",
-      "C": "Pole'owi magicznemu",
-      "B": "Pole'a magiczne",
-      "N": "Pole'em magicznym",
-      "Ms": "Pole'u magicznym",
-      "W": "Pole magiczne"
-    },
-    "Magiczny Promień": {
-      "M": "Magiczny Promień",
-      "D": "Magicznego Promieńa",
-      "C": "Magicznemu Promieńowi",
-      "B": "Magicznego Promieńa",
-      "N": "Magicznym Promieńem",
-      "Ms": "Magicznym Promieńie",
-      "W": "Magiczny Promieńie"
-    },
-    "Pierwsza konkubina": {
-      "M": "Pierwsza konkubina",
-      "D": "Pierwszej konkubiny",
-      "C": "Pierwszej konkubinie",
-      "B": "Pierwszą konkubinę",
-      "N": "Pierwszą konkubiną",
-      "Ms": "Pierwszej konkubinie",
-      "W": "Pierwsza konkubino"
-    },
     "Muller": {
       "M": "Muller",
       "D": "Muller",
@@ -473,6 +422,16 @@
       "N": "Muller",
       "Ms": "Muller",
       "W": "Muller",
+      "gender": "FEMALE"
+    },
+    "Hoshizaki-san": {
+      "M": "Hoshizaki-san",
+      "D": "Hoshizaki-san",
+      "C": "Hoshizaki-san",
+      "B": "Hoshizaki-san",
+      "N": "Hoshizaki-san",
+      "Ms": "Hoshizaki-san",
+      "W": "Hoshizaki-san",
       "gender": "FEMALE"
     }
   },
