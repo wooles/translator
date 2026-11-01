@@ -57,3 +57,6 @@ series_memory/*test*
 
 # Agent teamwork metadata
 .agents/
+
+gcp_key.json
+*credentials*.json
