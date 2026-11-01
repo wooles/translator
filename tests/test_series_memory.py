@@ -443,14 +443,14 @@ def test_step5_dot_separator_paradigm_parsing_and_honorific_alias_canonical_decl
     "source_en,f2_pl,expected_final_pl",
     [
         (
-            "What about Kamil Nowak.",
-            "{\\i1}Zastanawiam się,\\Nco z Kamilem Nowakiem.{\\i0}",
-            "{\\i1}Zastanawiam się,\\Nco z Kamilem Nowakiem.{\\i0}",
+            "What about HeroAlpha SurnameBeta.",
+            "{\\i1}Zastanawiam się,\\Nco z HeroAlphą SurnameBetą.{\\i0}",
+            "{\\i1}Zastanawiam się,\\Nco z HeroAlphą SurnameBetą.{\\i0}",
         ),
         (
-            "Looking at Kamil Nowak.",
-            "{\\i1}Spójrz tutaj\\Nz opisem Kamila Nowaka.{\\i0}",
-            "{\\i1}Spójrz tutaj\\Nz opisem Kamila Nowaka.{\\i0}",
+            "Looking at HeroAlpha SurnameBeta.",
+            "{\\i1}Spójrz tutaj\\Nz opisem HeroAlphy SurnameBety.{\\i0}",
+            "{\\i1}Spójrz tutaj\\Nz opisem HeroAlphy SurnameBety.{\\i0}",
         ),
     ],
 )
@@ -461,30 +461,30 @@ def test_multi_token_anthroponym_immunity_against_component_alias_duplication_an
 
     bible = SeriesBible(slug="test_multi_token_immunity")
     bible.sync_verified_profile_entity(
-        "Kamil Nowak",
+        "HeroAlpha SurnameBeta",
         "MALE",
         has_verified_gender=True,
         declension_map={
-            "M": "Kamil Nowak",
-            "D": "Kamila Nowaka",
-            "N": "Kamilem Nowakiem",
+            "M": "HeroAlpha SurnameBeta",
+            "D": "HeroAlphy SurnameBety",
+            "N": "HeroAlphą SurnameBetą",
         },
     )
     bible.sync_verified_profile_entity(
-        "Kamil",
+        "HeroAlpha",
         "MALE",
         has_verified_gender=True,
-        declension_map={"M": "Kamil", "N": "Kamilem"},
+        declension_map={"M": "HeroAlpha", "N": "HeroAlphą"},
     )
-    bible.sync_verified_profile_entity("Kojirō", "MALE", has_verified_gender=True)
-    bible.map_bilingual_role_aliases(["Toki-chan"])
+    bible.sync_verified_profile_entity("EntityGamma", "MALE", has_verified_gender=True)
+    bible.map_bilingual_role_aliases(["Alpha-chan"])
 
-    assert "Toki-chan" not in bible.data["characters"]["Kojirō"]["aliases"]
-    assert "Toki-chan" not in bible.data["characters"]["Kamil Nowak"]["aliases"]
+    assert "Alpha-chan" not in bible.data["characters"]["EntityGamma"]["aliases"]
+    assert "Alpha-chan" not in bible.data["characters"]["HeroAlpha SurnameBeta"]["aliases"]
 
     out_pl = bible.apply_canonical_alias_declension(text=f2_pl, source_en=source_en, keep_honorifics=False)
     assert out_pl == expected_final_pl
-    assert "Nowak" in out_pl
+    assert "SurnameBet" in out_pl
 
 
 # ==============================================================================

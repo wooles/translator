@@ -4710,7 +4710,7 @@ class MultimodalTranslator:
                         keep_honorifics=self.keep_honorifics
                     )
                     if decl_final != raw_final:
-                        alias_fixes.append(f"Odmiana aliasu kanonicznego: '{raw_final}' -> '{decl_final}'")
+                        alias_fixes.append(f"[SeriesBible P0 Alias] Odmiana aliasu kanonicznego: '{raw_final}' -> '{decl_final}'")
                         raw_final = decl_final
             # Triangulate effective gender from character registry, audio F0 voice, and pragmatic clues (Filar CXXXVI)
             spk_gen = item.get("speaker_gender")
