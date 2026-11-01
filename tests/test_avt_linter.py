@@ -278,8 +278,8 @@ def test_phase7_merges_triple_tag_blocks_strips_orphan_i0_and_lifts_colliding_si
     "raw_input,expected_output",
     [
         # T4.3 (2B.10): Inicjalny wołacz W przed partykułą pytajną czy - przecinek ZACHOWANY
-        ("Tokiyuki, czy nie powinniśmy już ruszać?", "Tokiyuki, czy nie powinniśmy już ruszać?"),
-        ("- Tokiyuki, czy nie powinniśmy już ruszać?\\N- Zaraz ruszamy.", "- Tokiyuki, czy nie powinniśmy już ruszać?\\N- Zaraz ruszamy."),
+        ("Kamil, czy nie powinniśmy już ruszać?", "Kamil, czy nie powinniśmy już ruszać?"),
+        ("- Kamil, czy nie powinniśmy już ruszać?\\N- Zaraz ruszamy.", "- Kamil, czy nie powinniśmy już ruszać?\\N- Zaraz ruszamy."),
         ("Ayako, czy tak miało być?", "Ayako, czy tak miało być?"),
         # Kontrprzykład: binarna alternatywa rozłączna w środku zdania - przecinek usunięty
         ("Pójdziesz tam dzisiaj, czy nie?", "Pójdziesz tam dzisiaj czy nie?"),

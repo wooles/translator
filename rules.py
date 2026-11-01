@@ -303,7 +303,7 @@ FILAR XXVI: ZASADA YOBISUTE I NATURALNE FORMY ADRESATYWNE (ANTI-FALSE FORMALITY)
   * W relacjach ściśle formalnych i zawodowych utrzymuj jednolity rejestr grzecznościowy per 'Pan/Pani' we wszystkich kwestiach w obrębie sceny.
   * Utrzymuj konsekwentny dystans formalny w całej scenie, jeśli relacja wymaga dystansu.
 - KIEDY STOSUJEMY FORMĘ „PAN/PANI”:
-  * WYŁĄCZNIE przy formalnych zwrotach po NAZWISKU z honoryfikatorem (warianty: Sato-sensei -> "pan Sato", Kanzaki-san -> "pan Kanzaki") lub w oficjalnych relacjach urzędowych/kelner-klient.
+  * WYŁĄCZNIE przy formalnych zwrotach po NAZWISKU z honoryfikatorem (warianty: Sato-sensei -> "pan Sato", Tanaka-san -> "pan Tanaka") lub w oficjalnych relacjach urzędowych/kelner-klient.
 
 FILAR XXVII: HARMONIA TYTUŁÓW I ADAPTACJA HONORYFIKATYWÓW (HONORIFIC HARMONY):
 - HARMONIA TYTULATURY (JEDNOLITY REJESTR):
@@ -544,7 +544,7 @@ FILAR LVII: STANDARD WIELOGŁOSU I DIALOGÓW NAKŁADAJĄCYCH SIĘ (NETFLIX DUAL-
     "- Idziesz już?\\N- Daj mi chwilę."
   * W chaosie walki lub krzyku priorytetyzuj postać znajdującą się na pierwszym planie lub niosącą kluczową informację fabularną.
   * Eliminujemy kalkę STOSOWANIA POJEDYNCZEGO MYŚLNIKA (LONE DIALOGUE DASH): W kwestii pojedynczego mówcy (jeden wiersz lub dwa wiersze tego samego bohatera) Unikaj kalki umieszczania myślnika na początku! Półpauza/dywiz dialogowy przysługuje WYŁĄCZNIE scenom wielogłosu (dwóch mówców w jednym kadrze). Kwestia jednoosobowa zaczyna się bezpośrednio od wielkiej litery (Kalka: '- Ocalę cię, Harugonie.' Wariant kanoniczny: 'Ocalę cię, Harugonie.').
-  * Eliminujemy kalkę ŁĄCZENIA DWUGŁOSU W JEDNYM WIERSZU (IN-LINE DIALOGUE DASHES): unikamy łączenia wypowiedzi dwóch osób w jednej linijce za pomocą myślnika w środku zdania (kalka KARDYNALNY [niepoprawne]: 'Wspaniale. - Pomyśleć, że rodzony wuj...' / 'Genba! - Co to był za hałas' / 'Tej nocy?! - Tak prędko'). Zawsze rozbijaj kwestie na dwie osobne linie z myślnikami i spacją: '- Kwestia 1\\N- Kwestia 2'.
+  * Eliminujemy kalkę ŁĄCZENIA DWUGŁOSU W JEDNYM WIERSZU (IN-LINE DIALOGUE DASHES): unikamy łączenia wypowiedzi dwóch osób w jednej linijce za pomocą myślnika w środku zdania (kalka KARDYNALNY [niepoprawne]: 'Wspaniale. - Pomyśleć, że rodzony wuj...' / '[Imię]! - Co to był za hałas' / 'Tej nocy?! - Tak prędko'). Zawsze rozbijaj kwestie na dwie osobne linie z myślnikami i spacją: '- Kwestia 1\\N- Kwestia 2'.
 
 FILAR LVIII: KONWENCJE FORMATOWANIA PIOSENEK, MYŚLI I NARRACJI ZZA KADRU (GLOBAL ITALICS STANDARD):
 - Sformalizowany 6-punktowy standard użycia kursywy (Italics):
@@ -777,7 +777,7 @@ FILAR XCI: ŻELAZNA FLEKSJA I POLSKA ODMIANA JAPOŃSKICH ORAZ OBCYCH/FANTASY IMI
     -> "Drel's secrets / secrets of Drel" -> "sekrety Drela / tajemnice Drela" (KARDYNALNY Kalka: "sekretów Drel").
     -> "Gart's sword" -> "miecz Garta" (Kalka: "miecz Gart").
     -> "Klen's order" -> "rozkaz Klena" (Kalka: "rozkaz Klen").
-  * 3. Imiona żeńskie zakończone na -i, -u (Rei, Minami, Koharu) oraz zakończone na spółgłoskę pozostają nieodmienne, lecz zdanie musi zachować poprawną strukturę składniową (z Koharu, o Koharu). Imiona żeńskie na -a odmieniają się normalnie (Alicia -> Alicii, z Alicią).
+  * 3. Imiona żeńskie zakończone na -i, -u (Rei, Minami, Koharu) oraz zakończone na spółgłoskę pozostają nieodmienne, lecz zdanie musi zachować poprawną strukturę składniową (z Koharu, o Koharu). Imiona żeńskie na -a odmieniają się normalnie (Anna -> Anny, z Anną).
   * 4. Wołacze: imiona żeńskie i męskie zakończone na samogłoskę '-a' (warianty: Lara, Kota, Bianca, Luca) w polskim dialogu filmowym w bezpośrednich zwrotach adresatywnych (po przecinku na końcu zdania, przed wykrzyknikiem, po zawołaniu) w wariancie wołaczowym zyskują formant '-o' ("Laro", "Koto", "Luco"). Eliminujemy kalkę pozostawiania mianownika w funkcji wołacza (Kalka: "twoją naturę, Lara" Wariant kanoniczny: "twoją naturę, Laro!"; "Masz rację, Lara." Wariant kanoniczny: "Masz rację, Laro."). Pozostałe imiona męskie na spółgłoskę w wołaczu przyjmują końcówkę -u lub formę mianownikową z intonacją ("Issei", "Shin", "Drelu" / "Drel").
   * 5. Imiona męskie obcego pochodzenia zakończone na '-ca' (Luca, Petrarca, Seneca, Checa) wymawiane są z twardym [k] i w języku polskim odmieniają się ze zmianą litery na 'k': dopełniacz: 'do Luki' (KARDYNALNY Kalka: 'do Luci' [skażenie żeńskie / Łucja!]); biernik: 'Lukę', narzędnik: 'z Luką', miejscownik: 'o Luce / przy Luce', wołacz: 'Luco / Luko'!.
   * 6. Harmonia szyku przydomkowego TYTULARNYCH Z PRZYIMKIEM 'OD' (OF THE...):
@@ -883,12 +883,12 @@ FILAR C: JAPOŃSKIE YOBISUTE, SUFIKSY RÓWIEŚNICZE (-KUN, -CHAN, -SAN) I PEŁNA
   * -taichou / -buchou (隊長 / 部長) -> "Kapitanie", "Dowódco", "Kierowniku", "Prezesie".
 - 5. Eliminujemy kalkę HYBRYD FORMY WOŁACZOWEJ Z FORMĄ GRZECZNOŚCIOWĄ (INTRA-CLAUSE T-V HARMONY MANDATE):
   * Naturalnie unikamy łączenia w jednej wypowiedzi poufałego wołacza po samym imieniu z honoryfikatywną formą grzecznościową ("pan/pani").
-  * kalka KARDYNALNY [niepoprawne]: "Poza tym, Eftalu... ma pan zaczerwienioną twarz." (niedopuszczalna hybryda poufałego wołacza "Eftalu" z formą grzecznościową "ma pan").
-  * Wariant kanoniczny: "Poza tym, panie Eftalu... ma pan zaczerwienioną twarz." LUB (gdy relacja jest na "ty"): "Poza tym, Eftalu... masz zaczerwienioną twarz.".
+  * kalka KARDYNALNY [niepoprawne]: "Poza tym, mistrzu... ma pan zaczerwienioną twarz." (niedopuszczalna hybryda poufałego wołacza "Eftalu" z formą grzecznościową "ma pan").
+  * Wariant kanoniczny: "Poza tym, panie Janie... ma pan zaczerwienioną twarz." LUB (gdy relacja jest na "ty"): "Poza tym, Janie... masz zaczerwienioną twarz.".
   * Jeśli postać zwraca się per pan/pani, wołacz w języku polskim ZAWSZE musi zawierać tytuł: "Panie [Imię]" / "Pani [Imię]".
 - 6. ODPORNOŚĆ NA ANGIELSKIE OPUSZCZANIE SUFIKSU -SAMA (ENGLISH "-SAMA" DROP IMMUNITY):
   * W zachodnich/angielskich skryptach anime (Crunchyroll, fansuby) tłumacze nagminnie usuwają honoryfikatywny przyrostek "-sama" w okrzykach, zawołaniach i scenach dramatycznych (warianty: w JP: "Eftal-sama", a w EN jedynie: "Ephtal").
-  * Eliminujemy kalkę mechanicznego przepisywania tego jako poufałego wołacza (Kalka: "Co za kunszt, Eftalu" w ustach uczennicy/służącej).
+  * Eliminujemy kalkę mechanicznego przepisywania tego jako poufałego wołacza (Kalka: "Co za kunszt, mistrzu" w ustach uczennicy/służącej).
   * Relacja uczeń-mistrz czy podwładny-pan w polszczyźnie zachowuje stałość rejestru: w zawołaniach i okrzykach stosuj "Panie [Imię]" ("Co za kunszt, panie Eftalu"), a nie poufałe "Eftalu".
 
 FILAR CI: NADRZĘDNOŚĆ JAPOŃSKIEGO AUDIO I TRIANGULACJA PERSPEKTYWY MÓWCY (KIKANAIDE VS KIKITAKUNAI):
@@ -1538,8 +1538,8 @@ FILAR CLVII: ZASADA NIENARUSZALNOŚCI FORMY ADRESATYWNEJ (T-V INVARIANCE) I Unik
       - Wariant kanoniczny: „Przecież wiesz, kim jestem, a jakoś mnie nie wydałeś / nie wydałaś.” (jednolity rejestr w całej wypowiedzi).
 5. HARMONIA WOŁACZA Z FORMĄ PAN/PANI ORAZ ANTY-DRYF TYTULATURY: # Standard 9.0 Invariant
       - Jeśli postać zwraca się do rozmówcy per pan/pani ('ma pan', 'widzi pan', 'niech pan', 'chciał pan'), Naturalnie unikamy wołacza po samym imieniu ('Eftalu...'). W takich zdaniach dopuszczalne jest wyłącznie 'Panie [Imię]...'.
-      - kalka KARDYNALNY [niepoprawne]: „Poza tym, Eftalu... ma pan zaczerwienioną twarz.” Wariant kanoniczny: „Poza tym, panie Eftalu... ma pan zaczerwienioną twarz.”.
-      - W okrzykach i sytuacjach afektywnych nie ulegaj angielskiemu nawykowi usuwania -sama: „Co za kunszt, panie Eftalu!”.
+      - kalka KARDYNALNY [niepoprawne]: „Poza tym, mistrzu... ma pan zaczerwienioną twarz.” Wariant kanoniczny: „Poza tym, panie Janie... ma pan zaczerwienioną twarz.”.
+      - W okrzykach i sytuacjach afektywnych nie ulegaj angielskiemu nawykowi usuwania -sama: „Co za kunszt, panie Janie!”.
    6. ŻELAZNA DEKLINACJA OBCYCH IMION NA '-CA' [FONET. K]:
       - Imiona męskie obcego pochodzenia zakończone na '-ca' (warianty: Luca, Seneca, Petrarca, Checa) w języku polskim wymawiane są z twardym [k] i odmieniają się ze zmianą litery na 'k':
         * Mianownik: Luca
@@ -1784,7 +1784,7 @@ FILAR CLXX: SYSTEMOWY PRYMAT GŁOSU SEIYŪ NAD ANGIELSKIM PIVOTEM, KATEGORIE AKT
    4. NIENARUSZALNOŚĆ MIANOWNIKA TYTULATURY PODMIOTU I WIELKICH LITER IMION (TITLE APPOSITION & NAME INTEGRITY):
       - Przy zestawieniu tytułu mistrzowskiego, naukowego lub zawodowego z imieniem i nazwiskiem w podmiocie zdania ('Mistrz', 'Pan', 'Pani', 'Profesor', 'Doktor', 'Pisarz', 'Reżyser', 'Redaktor', 'Autor', 'Mangaka', 'Sensei' + Nazwisko + Imię + Czasownik 3. os.), nazwisko ZAWSZE pozostaje w mianowniku:
         * 'Mistrz Yamada Kenji nie zdążył z rozdziałem' (KARDYNALNY Kalka: 'Mistrz Yamady kenji nie zdążył').
-        * 'Pan Eftal zniszczył pieczęć' (Kalka: 'Pan Eftala zniszczył').
+        * 'Pan Jan zniszczył pieczęć' (Kalka: 'Pan Jana zniszczył').
       - Ścisły wymóg WIELKIEJ LITERY DLA WSZYSTKICH CZŁONÓW JAPOŃSKICH IMION I NAZWISK: 'Yamada Kenji' (KARDYNALNY Kalka: mała litera 'kenji').
 
 FILAR CLXXI: ZGODNOŚĆ LICZEBNIKÓW, WIERNOŚĆ FAKTOGRAFICZNA I PRYMAT ZAIMKÓW MĘSKICH NAD WYSOKIM F0 (NUMERICAL INTEGRITY, FACTUAL FIDELITY & CROSS-GENDER PRONOUN PRECEDENCE):
@@ -2312,7 +2312,7 @@ KOMPLEKSOWY RDZEŃ PRZEKŁADU AUDIOWIZUALNEGO (CORE AVT CANON - BELCZYK, BARAŃC
 
 16. ZGODNOŚĆ LICZBY W ZAIMKACH Z LICZEBNIKAMI, PURYZM TYTULATURY I TOPONIMY OBCOJĘZYCZNE (FILAR CLXXXIII):
 - Zgodność liczby w zaimkach z liczebnikami: Angielskie 'you two', 'you both', 'you three' to w polszczyźnie 2. osoba liczby mnogiej: 'wy dwie', 'wy dwaj', 'wy dwoje', 'wy troje', 'wy wszyscy'. Wystrzegaj się hybryd liczbowych 'ty dwie', 'ty dwaj', 'ty dwoje'!
-- Puryzm tytulatury w dopełnieniu: Zwrot grzecznościowy po przyimku wymaga czystego dopełniacza bez wycieku wołacza ('od pana Hayamy', 'dla pana Kanzakiego'). Wystrzegaj się zbitki 'od pana panie X'!
+- Puryzm tytulatury w dopełnieniu: Zwrot grzecznościowy po przyimku wymaga czystego dopełniacza bez wycieku wołacza ('od pana Hayamy', 'dla pana Nowaka'). Wystrzegaj się zbitki 'od pana panie X'!
 - Nieodmienność toponimów obcojęzycznych: Francuskie nazwy własne i apelacje winiarskie zakończone na nieme spółgłoski lub -eaux/-aux/-ais (Bordeaux, Margaux, Calais, Pau) są w polszczyźnie nieodmienne ('do Bordeaux', 'w Bordeaux', 'z Margaux', 'do Calais' - eliminujemy kalkę 'Bordeauxa', 'Margauxa').
 
 17. ELIMINACJA PLEONAZMÓW TOPONIMICZNYCH, TAUTOLOGII KLASYFIKATORÓW I JĄKANIA SŁOWNIKOWEGO (FILAR CLXXXIV):
@@ -2383,8 +2383,13 @@ STANDARD 9.4 — AUTORYTET TRANSLACYJNY I NIEZMIENNIKI DZIEDZINY POZYTYWNEJ (R1.
 7. R1.7 (P0) — ZGODNOŚĆ RODZAJU 1. OSOBY CZASU PRZESZŁEGO Z REKORDEM P0: Końcówki 1. osoby czasu przeszłego (-łem / -łam) wykazują stuprocentową zgodność ze zweryfikowaną płcią p0_gender mówcy w SeriesBible / EpisodeProfiler.
 8. R1.8 (P1) — PEŁNA DEKLINACJA DWUCZŁONOWYCH ANTROPONIMÓW: Dwuczłonowe antroponimy podlegają pełnej odmianie obu członów w wołaczu (W) i przypadkach zależnych (D..Ms) zgodnie ze zdeklinowanym paradygmatem z EpisodeProfiler.
 9. R1.9 (P0) — STRUKTURALNY PRYMAT REKORDU P0 W TELEMETRII I PRE-PASSIE SCENICZNYM: Wszelka telemetria mówcy i adresata oraz statystyki obsady sceny bezwarunkowo odzwierciedlają płeć z rekordu P0 (SeriesBible), unieważniając estymację akustyczną F0 oraz domyślne założenia sceniczne dla postaci P0/P1.
-10. R1.10 (P0) — ZACHOWANIE CIĄGŁOŚCI ZDANIA ROZBITEGO I MODALNOŚCI: Faza 2 nie może niszczyć syntaktycznej ciągłości zdań rozbitych wielokropkiem (zamieniając inicjalny wielokropek na wielką literę), ani usuwać trybu przypuszczającego 1. os. lp. (-bym) lub cofać czasu przeszłego do teraźniejszego.
+10. R1.10 (P0) — INTEGRALNOŚĆ SKŁADNIOWA I SEMANTYCZNA: Każda modyfikacja tekstu zachowuje pełną integralność struktury zdania rozbitego, modalności trybu przypuszczającego (-bym) oraz czasu gramatycznego zgodnego z intencją wypowiedzi.
 11. R1.11 (P2) — CZYSTOŚĆ UZASADNIEŃ FAZY 2: Pole changes_made musi przyjmować wartość null (None), jeśli tekst merytoryczny nie uległ zmianie (Szkic == Szlif).
+12. R3.1 (P0) — POZYTYWNY SCHEMAT REKORDU POSTACI: Każdy byt osobowy w bazie wiedzy jest instancją czystej klasy ontologicznej ze strukturalnymi polami tożsamości gramatycznej.
+13. R3.2 (P0) — TELEMETRIA PRZED ASR I AKUSTYKĄ: Zweryfikowany rekord P0 postaci ma nadrzędność ontologiczną nad sygnałami akustycznymi F0 oraz niedoskonałościami transkrypcji ASR.
+14. R3.3 (P0) — CZYSTA DOMENA POZYTYWNA D_pos: Wszystkie deterministyczne reguły bramki jakości operują wyłącznie w zweryfikowanej dziedzinie pozytywnej; poza nią obowiązuje tożsamość T(x) = x.
+15. R3.4 (P0) — NIEZMIENNIK PIERWOTNEGO AUTORYTETU LLM: Wybory dramaturgiczne, idiomatyczne i leksykalne modelu tłumaczącego są chronione przed destrukcyjnymi kaskadami mutującymi.
+16. R3.5 (P0) — SYMBOLE METALINGWISTYCZNE: Baza wiedzy, reguły i szablony testowe operują na abstrakcyjnych kategoriach gramatycznych i metalingwistycznych, bez hardkodowania nazw własnych.
 """
 
 def get_translation_system_prompt(keep_honorifics: bool = True, lean: bool = False) -> str:
@@ -3374,8 +3379,8 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Op
             "• [SKUP SIĘ NA: FILAR CLVII - Nienaruszalność Formy Adresatywnej, Harmonia Wołacza i -Sama Drop]: "
             "Jeśli postać zwraca się do rozmówcy po imieniu ('Ren, dlaczego') lub na 'ty' ('Przecież wiesz...'), w całej scenie KONSEKWENTNIE stosuj formę na 'ty'! "
             "W dialogu bezpośrednim stosuj naturalną 2. osobę bez sztucznego 'pan/pani' (unikaj formy 'wygrał pan'; należy stosować 'wygrałeś' lub 'wygrałaś' zależnie od płci adresata). "
-            "HARMONIA REJESTRU ADRESATYWNEGO: Zachowaj jednolitość rejestru w zdaniu: Niedopuszczalne jest łączenie poufałego wołacza imienia z honoryfikatywnym 'pan/pani' ('Poza tym, Eftalu... ma pan' - niespójność rejestru; wymagane: 'Poza tym, panie Eftalu... ma pan'). "
-            "ODPORNOŚĆ NA ANGIELSKIE OPUSZCZANIE -SAMA: W okrzykach i zawołaniach podwładnych/uczniów nie kopiuj angielskiego ucinania tytułów ('Co za kunszt, panie Eftalu', zamiast 'Co za kunszt, Eftalu')."
+            "HARMONIA REJESTRU ADRESATYWNEGO: Zachowaj jednolitość rejestru w zdaniu: Niedopuszczalne jest łączenie poufałego wołacza imienia z honoryfikatywnym 'pan/pani' ('Poza tym, mistrzu... ma pan' - spójność rejestru; wymagane formy grzecznościowe). "
+            "ODPORNOŚĆ NA ANGIELSKIE OPUSZCZANIE -SAMA: W okrzykach i zawołaniach podwładnych/uczniów nie kopiuj angielskiego ucinania tytułów ('Co za kunszt, panie Janie', zamiast 'Co za kunszt, mistrzu')."
         )
 
     # 98. Zgodność Foniczno-Semantyczna Seiyū i Test Ucha Widza (Filar CLVIII)
@@ -3813,8 +3818,8 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Op
 
     # 125. Eliminacja Pleonazmów Toponimicznych, Toponimów i Syntagm Reliktów (Filar CLXXXIV)
     has_toponymic_pleonasm_trigger = any(
-        bool(re.search(r"\b(?:province|prefecture|mountain|mount|river|chronicle|hiei|taiheiki|kanyou|kantan|kamakura|suwa|ridill|minerva|book|sword|shield|relic|artifact)\b", str(item.get("en", "")).lower()))
-        or bool(re.search(r"\b(?:prowincj|prefektur|gór|rzek|kronik|hiei|taiheiki|kanyou|kantan|kamakura|suwa|ridill|minerva|księg|miecz|oręż|tarcz|relikt|artefakt)\b", str(item.get("pl", "")).lower()))
+        bool(re.search(r"\b(?:province|prefecture|mountain|mount|river|chronicle|book|sword|shield|relic|artifact|kingdom|empire|castle|academy|order|knights|sorcery|magic)\b", str(item.get("en", "")).lower()))
+        or bool(re.search(r"\b(?:prowincj|prefektur|gór|rzek|kronik|księg|miecz|oręż|tarcz|relikt|artefakt|królestw|cesarstw|zamek|zamk|akademi|zakon|rycerz|magi)\b", str(item.get("pl", "")).lower()))
         for item in batch_items
     )
     if has_toponymic_pleonasm_trigger:

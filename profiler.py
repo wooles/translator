@@ -626,7 +626,7 @@ Twoim zadaniem jest dogłębna, wszechstronna analiza całego skryptu odcinka, a
    - Ścieżka dźwiękowa i ekspresja aktorska stanowią pierwotną podstawę interpretacji intencji dramatycznej.
    - Zróżnicowanie pragmatycznych aktów mowy: irytacji, znużenia, dystansu emocjonalnego.
    - Formuły powitań domowych (Tadaima, Wróciłaś): eliminacja echa powitań aisatsu na rzecz symetrycznych zwrotów domowników. # Standard 9.0 Invariant
-   - Zestawienie tytułu z nazwiskiem w podmiocie zachowuje formę mianownikową (Mistrz Tonden Minoru nie zdążył). # Standard 9.0 Invariant
+   - Zestawienie tytułu z nazwiskiem w podmiocie zachowuje formę mianownikową ([Tytuł] [Imię Nazwisko] nie zdążył). # Standard 9.0 Invariant
 20. TOŻSAMOŚĆ PODMIOTOWA I BYTY ZBIOROWE:
    - Klasyfikacja tożsamości podmiotu: byty pojedyncze, byty kolektywne męskoosobowe lub niemęskoosobowe, formy majestatyczne.
 21. ELIMINACJA INTERFERENCJI SKŁADNIOWEJ:
@@ -936,7 +936,7 @@ class EpistemicAudioTriangulator:
     - Filtracja intonacji IQR: dyskwalifikacja próbek wykazujących jednocześnie
       wysoką dyspersję względną i bezwzględną: IQR(F0) / median(F0) > 0.35 ORAZ std(F0) > 50 Hz.
     - Asymetria fizjologiczna krtani:
-      Mediana F0 <= 135 Hz nadaje twardy determinizm męski (F0_hard_masculine = True, pewność 1.0; prawo weta anaforycznego przy score <= -8).
+      Mediana F0 <= 135 Hz nadaje twardy determinizm męski (F0_hard_masculine = True, pewność 1.0).
       W strefie F0 > 135 Hz waga F0 = 0% (unieważnienie, delegacja do morfosyntaktyki i anaforyki).
     """
 
@@ -1099,7 +1099,7 @@ class EpistemicAudioTriangulator:
     def triangulate_f0_gender(cls, median_f0: Optional[float]) -> Tuple[Optional[str], float, bool]:
         """
         Zwraca (gender, confidence, F0_hard_masculine):
-        - F0 <= 135 Hz: ('MALE', 1.0, True) - prawo weta anaforycznego przy score <= -8
+        - F0 <= 135 Hz: ('MALE', 1.0, True)
         - F0 > 135 Hz: (None, 0.0, False) - waga F0 = 0% (likwidacja martwej strefy akustycznej 135-170 Hz,
           ochrona niskich głosów kobiecych i wysokich głosów chłopięcych, pełna delegacja do JA/EN).
         """
@@ -1879,14 +1879,9 @@ class SpaCyAnaphoraDiscourseAnalyzer:
 
         # 4. F0 Hard Masculine Veto (F0 <= 135 Hz)
         elif f0_hard_masc:
-            if en_score <= -8:
-                resolved_gender = "FEMALE"
-                confidence = 0.85
-                archetype = "EP_RUPTURE_ANAPHORA_OVERRIDE"
-            else:
-                resolved_gender = "MALE"
-                confidence = 1.0
-                archetype = "F0_HARD_MASCULINE_VETO"
+            resolved_gender = "MALE"
+            confidence = 1.0
+            archetype = "F0_HARD_MASCULINE_VETO"
 
         # 2. High female acoustic + female anaphora (or low female voice 135-170 Hz with female anaphora / JP pronoun)
         elif (f0_hz is not None and f0_hz > 135.0 and (jp_gender == "FEMALE" or en_score < 0)) or (jp_gender == "FEMALE" and en_score <= 0):
@@ -1985,7 +1980,8 @@ class SpaCyAnaphoraDiscourseAnalyzer:
                 confidence = max(confidence, 0.85)
 
             # Jeśli purity < 0.65 -> ogranicz confidence poniżej 0.95 (blokada lintera post-gen)
-            if purity < 0.65:
+            # z immunitetem dla twardego determinizmu akustycznego F0 <= 135 Hz
+            if purity < 0.65 and not f0_hard_masc:
                 confidence = min(confidence, 0.70)
 
         result = {
@@ -2297,15 +2293,15 @@ def resolve_relational_actor_gender(
         }
 
     return {
-        "gender": "MALE",
-        "inferred_gender": "MALE",
-        "confidence": 0.70,
+        "gender": "UNKNOWN",
+        "inferred_gender": "UNKNOWN",
+        "confidence": 0.0,
         "owner": owner,
         "base_name": owner,
         "relation": rel,
         "relation_type": rel,
-        "prevent_female_bias": True,
-        "prevent_default_feminization": True,
+        "prevent_female_bias": False,
+        "prevent_default_feminization": False,
     }
 
 

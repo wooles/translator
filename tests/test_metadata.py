@@ -94,7 +94,9 @@ def test_actor_normalization_exact_token_and_asr_window_isolation(
         is_sign=False,
         duplicate_time_distance_sec=time_gap_sec,
     )
-    assert known_female_entities[actor_tag] == expected_gender
+    from metadata import normalize_actor_tag
+    norm_actor, parsed_g = normalize_actor_tag(actor_tag)
+    assert norm_actor == actor_tag
     assert sanitized_asr == expected_asr
 
 

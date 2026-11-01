@@ -1,68 +1,6 @@
 {
   "anime_title": "Otome Kaijuu Carameliser",
   "characters": {
-    "Arata": {
-      "description": "mężczyzna (postać)",
-      "gender": "MALE",
-      "grammatical_gender": "MASCULINE",
-      "has_verified_gender": true,
-      "confidence": 0.95,
-      "priority": "P0",
-      "aliases": [
-        "Arata",
-        "Arata Minami"
-      ],
-      "entity_category": "ANTHROPONYM"
-    },
-    "Kuroe": {
-      "description": "kobieta (postać)",
-      "gender": "FEMALE",
-      "grammatical_gender": "FEMININE",
-      "has_verified_gender": true,
-      "confidence": 0.95,
-      "priority": "P0",
-      "aliases": [
-        "Kuroe",
-        "Kuroe Akaishi"
-      ],
-      "entity_category": "ANTHROPONYM"
-    },
-    "Seina": {
-      "description": "kobieta (postać)",
-      "gender": "FEMALE",
-      "grammatical_gender": "FEMININE",
-      "has_verified_gender": true,
-      "confidence": 0.95,
-      "priority": "P0",
-      "aliases": [
-        "Seina"
-      ],
-      "entity_category": "ANTHROPONYM"
-    },
-    "Raimu": {
-      "description": "kobieta (postać)",
-      "gender": "FEMALE",
-      "grammatical_gender": "FEMININE",
-      "has_verified_gender": true,
-      "confidence": 0.95,
-      "priority": "P0",
-      "aliases": [
-        "Raimu"
-      ],
-      "entity_category": "ANTHROPONYM"
-    },
-    "Manatsu": {
-      "description": "kobieta (postać)",
-      "gender": "FEMALE",
-      "grammatical_gender": "FEMININE",
-      "has_verified_gender": true,
-      "confidence": 0.95,
-      "priority": "P0",
-      "aliases": [
-        "Manatsu"
-      ],
-      "entity_category": "ANTHROPONYM"
-    },
     "Taichi": {
       "description": "mężczyzna (postać)",
       "gender": "MALE",
@@ -83,6 +21,7 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
+        "Kuroe",
         "Kuroe Kurozu",
         "Kurozu"
       ],
@@ -96,6 +35,7 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
+        "Arata",
         "Arata Inubaki",
         "Inubaki"
       ],
@@ -110,6 +50,7 @@
       "priority": "P0",
       "aliases": [
         "Katsuragi",
+        "Seina",
         "Seina Katsuragi"
       ],
       "entity_category": "ANTHROPONYM"
@@ -122,6 +63,7 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
+        "Manatsu",
         "Manatsu Tomita",
         "Tomita"
       ],
@@ -136,6 +78,7 @@
       "priority": "P0",
       "aliases": [
         "Kohno",
+        "Raimu",
         "Raimu Kohno"
       ],
       "entity_category": "ANTHROPONYM"
@@ -227,6 +170,7 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
+        "Kuroe",
         "Kuroe Akaishi"
       ],
       "entity_category": "ANTHROPONYM"
@@ -328,8 +272,8 @@
     "Taichi -> Arata": "Zwrot: 'na ty' (młodszy rywal o względy Kuroe) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Arata Minami -> Kuroe Akaishi": "Zwrot: 'Akaishi / po imieniu' (sympatia / para licealistów) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Rinko Akaishi -> Kotaro Hibino": "Zwrot: 'Kotaro / Profesorze Hibino' (byli współpracownicy / naukowcy) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Kotaro Hibino -> Rinko Akaishi": "Zwrot: 'panno Akaishi / Rinko' (były student -> starsza koleżanka/mentorka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
-    "Kotaro -> Rinko": "Zwrot: 'panno Akaishi / Rinko' (były student -> starsza koleżanka/mentorka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
+    "Kotaro Hibino -> Rinko Akaishi": "Zwrot: 'panno Akaishi / Rinko' (były student -> starsza koleżanka/mentorka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: FORMALNY]",
+    "Kotaro -> Rinko": "Zwrot: 'panno Akaishi / Rinko' (były student -> starsza koleżanka/mentorka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: FORMALNY]",
     "Kuroe Akaishi -> Arata Minami": "Zwrot: 'Minami' (sympatia / para licealistów)"
   },
   "relations": {
@@ -342,60 +286,10 @@
     "Arata Minami -> Kuroe Akaishi": "Zwrot: 'Akaishi / po imieniu' (sympatia / para licealistów) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Kuroe Akaishi -> Arata Minami": "Zwrot: 'Minami' (sympatia / para licealistów)",
     "Rinko Akaishi -> Kotaro Hibino": "Zwrot: 'Kotaro / Profesorze Hibino' (byli współpracownicy / naukowcy) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Kotaro Hibino -> Rinko Akaishi": "Zwrot: 'panno Akaishi / Rinko' (były student -> starsza koleżanka/mentorka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
-    "Kotaro -> Rinko": "Zwrot: 'panno Akaishi / Rinko' (były student -> starsza koleżanka/mentorka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]"
+    "Kotaro Hibino -> Rinko Akaishi": "Zwrot: 'panno Akaishi / Rinko' (były student -> starsza koleżanka/mentorka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: FORMALNY]",
+    "Kotaro -> Rinko": "Zwrot: 'panno Akaishi / Rinko' (były student -> starsza koleżanka/mentorka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: FORMALNY]"
   },
   "declensions": {
-    "Arata": {
-      "M": "Arata",
-      "D": "Aratej",
-      "C": "Aratej",
-      "B": "Aratą",
-      "N": "Aratą",
-      "Ms": "Aratej",
-      "W": "Arata",
-      "gender": "MALE"
-    },
-    "Kuroe": {
-      "M": "Kuroe",
-      "D": "Kuroe",
-      "C": "Kuroe",
-      "B": "Kuroe",
-      "N": "Kuroe",
-      "Ms": "Kuroe",
-      "W": "Kuroe",
-      "gender": "FEMALE"
-    },
-    "Seina": {
-      "M": "Seina",
-      "D": "Seiny",
-      "C": "Seinie",
-      "B": "Seinę",
-      "N": "Seiną",
-      "Ms": "Seinie",
-      "W": "Seino",
-      "gender": "FEMALE"
-    },
-    "Raimu": {
-      "M": "Raimu",
-      "D": "Raimu",
-      "C": "Raimu",
-      "B": "Raimu",
-      "N": "Raimu",
-      "Ms": "Raimu",
-      "W": "Raimu",
-      "gender": "FEMALE"
-    },
-    "Manatsu": {
-      "M": "Manatsu",
-      "D": "Manatsu",
-      "C": "Manatsu",
-      "B": "Manatsu",
-      "N": "Manatsu",
-      "Ms": "Manatsu",
-      "W": "Manatsu",
-      "gender": "FEMALE"
-    },
     "Taichi": {
       "M": "Taichi",
       "D": "Taichi",
@@ -564,11 +458,6 @@
   ],
   "batch_stats": {},
   "entity_categories": {
-    "Arata": "ANTHROPONYM",
-    "Kuroe": "ANTHROPONYM",
-    "Seina": "ANTHROPONYM",
-    "Raimu": "ANTHROPONYM",
-    "Manatsu": "ANTHROPONYM",
     "Taichi": "ANTHROPONYM",
     "Kuroe Kurozu": "ANTHROPONYM",
     "Arata Inubaki": "ANTHROPONYM",
@@ -585,13 +474,60 @@
     "Rinko Akaishi": "ANTHROPONYM",
     "Kotaro Hibino": "ANTHROPONYM",
     "Kaiju": "TOPONYM",
+    "JSDF": "ANTHROPONYM",
+    "Prince of Kaiju": "ANTHROPONYM",
+    "Kaiju Prince": "ANTHROPONYM",
+    "Książę Kaiju": "ANTHROPONYM",
+    "King of Kaiju, Godolla": "ANTHROPONYM",
     "Harumi": "TOPONYM",
+    "Raimu Kono": "ANTHROPONYM",
+    "Kotaro": "ANTHROPONYM",
     "Kinara": "TOPONYM",
     "Drago": "TOPONYM",
     "Psycho-tan": "TOPONYM",
+    "Monster Prince": "ANTHROPONYM",
+    "Giant Monster": "ANTHROPONYM",
+    "Flying Monster": "ANTHROPONYM",
+    "Malulani Island": "ANTHROPONYM",
+    "Tokyo": "ANTHROPONYM",
+    "High School": "ANTHROPONYM",
+    "Partial Transformation": "ANTHROPONYM",
+    "Full Transformation": "ANTHROPONYM",
+    "Monster Form": "ANTHROPONYM",
+    "Scaly Arm": "ANTHROPONYM",
+    "Scales": "ANTHROPONYM",
+    "Horns": "ANTHROPONYM",
+    "Dorsal Spines": "ANTHROPONYM",
+    "Heat Ray": "ANTHROPONYM",
+    "Rare Condition": "ANTHROPONYM",
+    "Strong Emotions": "ANTHROPONYM",
+    "Heartbeat": "ANTHROPONYM",
+    "Excitement": "ANTHROPONYM",
+    "Love": "ANTHROPONYM",
+    "Confession": "ANTHROPONYM",
+    "Date": "ANTHROPONYM",
+    "Amusement Park": "ANTHROPONYM",
+    "School Trip": "ANTHROPONYM",
+    "Outcast": "ANTHROPONYM",
+    "Track and Field Club": "ANTHROPONYM",
+    "School Life": "ANTHROPONYM",
+    "Classmate": "ANTHROPONYM",
     "Romance": "TOPONYM",
     "Romantic Comedy": "TOPONYM",
-    "Rinko": "TOPONYM"
+    "Tropical Island": "ANTHROPONYM",
+    "Birthplace": "ANTHROPONYM",
+    "Unrequited Love": "ANTHROPONYM",
+    "Monster Incident": "ANTHROPONYM",
+    "Television Star": "ANTHROPONYM",
+    "Media Frenzy": "ANTHROPONYM",
+    "Secret": "ANTHROPONYM",
+    "Roar": "ANTHROPONYM",
+    "Destruction": "ANTHROPONYM",
+    "First Love": "ANTHROPONYM",
+    "Monster Awakening": "ANTHROPONYM",
+    "Talk Time": "ANTHROPONYM",
+    "Cabinet Disaster Task Force HQ": "ANTHROPONYM",
+    "Akaishi-san": "ANTHROPONYM"
   },
   "fansub_canon": {}
 }

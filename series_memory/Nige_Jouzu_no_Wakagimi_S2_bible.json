@@ -1,5 +1,5 @@
 {
-  "anime_title": "Nige Jouzu no Wakagimi S2",
+  "anime_title": "Nige Jouzu no Wakagimi",
   "characters": {
     "Yorishige Suwa": {
       "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
@@ -10,7 +10,7 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
-        "Suwa",
+        "Yorishige",
         "Yorishige Suwa"
       ],
       "entity_category": "ANTHROPONYM"
@@ -25,7 +25,7 @@
       "priority": "P0",
       "aliases": [
         "Hojo",
-        "Hōjō",
+        "Tokiyuki",
         "Tokiyuki Hōjō"
       ],
       "entity_category": "ANTHROPONYM"
@@ -92,8 +92,7 @@
       "priority": "P0",
       "aliases": [
         "Lord",
-        "Lord Mochizuki",
-        "Mochizuki"
+        "Lord Mochizuki"
       ],
       "entity_category": "ANTHROPONYM"
     },
@@ -105,6 +104,7 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
+        "Muneie",
         "Muneie Tokoiwa",
         "Muneie Tokoiwa / Mochizuki",
         "Tokoiwa"
@@ -190,18 +190,6 @@
       ],
       "entity_category": "ANTHROPONYM"
     },
-    "Mochizuki": {
-      "description": "postać (Postać) [MĘŻCZYZNA]",
-      "gender": "MALE",
-      "grammatical_gender": "MASCULINE",
-      "has_verified_gender": true,
-      "confidence": 0.95,
-      "priority": "P0",
-      "aliases": [
-        "Mochizuki"
-      ],
-      "entity_category": "ANTHROPONYM"
-    },
     "Shokan": {
       "description": "postać (Postać) [MĘŻCZYZNA]",
       "gender": "MALE",
@@ -234,7 +222,7 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
-        "Suwa",
+        "Tokiyuki",
         "Tokiyuki Suwa"
       ],
       "entity_category": "ANTHROPONYM"
@@ -276,44 +264,7 @@
       "aliases": [
         "Rod",
         "Ród",
-        "Ród Shinomiya",
-        "Shinomiya"
-      ],
-      "entity_category": "ANTHROPONYM"
-    },
-    "Yoritsugu": {
-      "description": "postać (Postać)",
-      "gender": "MALE",
-      "grammatical_gender": "MASCULINE",
-      "has_verified_gender": true,
-      "confidence": 0.95,
-      "priority": "P0",
-      "aliases": [
-        "Yoritsugu"
-      ],
-      "entity_category": "ANTHROPONYM"
-    },
-    "Tokiyuki": {
-      "description": "postać (Postać) [MĘŻCZYZNA]",
-      "gender": "MALE",
-      "grammatical_gender": "MASCULINE",
-      "has_verified_gender": true,
-      "confidence": 0.95,
-      "priority": "P0",
-      "aliases": [
-        "Tokiyuki"
-      ],
-      "entity_category": "ANTHROPONYM"
-    },
-    "Yorishige": {
-      "description": "postać (Postać)",
-      "gender": "MALE",
-      "grammatical_gender": "MASCULINE",
-      "has_verified_gender": true,
-      "confidence": 0.95,
-      "priority": "P0",
-      "aliases": [
-        "Yorishige"
+        "Ród Shinomiya"
       ],
       "entity_category": "ANTHROPONYM"
     },
@@ -338,7 +289,7 @@
       "priority": "P0",
       "aliases": [
         "Hojo",
-        "Hōjō",
+        "Yasuie",
         "Yasuie Hōjō"
       ],
       "entity_category": "ANTHROPONYM"
@@ -351,6 +302,7 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
+        "Genba",
         "Genba Kazama",
         "Kazama"
       ],
@@ -402,31 +354,8 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
+        "Mima",
         "Mima Sasaki"
-      ],
-      "entity_category": "ANTHROPONYM"
-    },
-    "Kojiro": {
-      "description": "postać (Postać) [MĘŻCZYZNA]",
-      "gender": "MALE",
-      "grammatical_gender": "MASCULINE",
-      "has_verified_gender": true,
-      "confidence": 0.95,
-      "priority": "P0",
-      "aliases": [
-        "Kojiro"
-      ],
-      "entity_category": "ANTHROPONYM"
-    },
-    "Yasuie": {
-      "description": "postać (Postać)",
-      "gender": "MALE",
-      "grammatical_gender": "MASCULINE",
-      "has_verified_gender": true,
-      "confidence": 0.95,
-      "priority": "P0",
-      "aliases": [
-        "Yasuie"
       ],
       "entity_category": "ANTHROPONYM"
     },
@@ -438,6 +367,7 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
+        "Kinmune",
         "Kinmune Saionji",
         "Saionji"
       ],
@@ -454,18 +384,6 @@
         "Kusunoki",
         "Masashige",
         "Masashige Kusunoki"
-      ],
-      "entity_category": "ANTHROPONYM"
-    },
-    "Mima": {
-      "description": "postać (Postać)",
-      "gender": "FEMALE",
-      "grammatical_gender": "FEMININE",
-      "has_verified_gender": true,
-      "confidence": 0.95,
-      "priority": "P0",
-      "aliases": [
-        "Mima"
       ],
       "entity_category": "ANTHROPONYM"
     },
@@ -506,18 +424,6 @@
       ],
       "entity_category": "ANTHROPONYM"
     },
-    "Sojusznicy": {
-      "description": "postać (Postać) [MĘŻCZYZNA]",
-      "gender": "MALE",
-      "grammatical_gender": "MASCULINE",
-      "has_verified_gender": true,
-      "confidence": 0.95,
-      "priority": "P0",
-      "aliases": [
-        "Sojusznicy"
-      ],
-      "entity_category": "ANTHROPONYM"
-    },
     "Takauji Ashikaga": {
       "description": "postać (Postać) [MĘŻCZYZNA]",
       "gender": "MALE",
@@ -527,20 +433,8 @@
       "priority": "P0",
       "aliases": [
         "Ashikaga",
+        "Takauji",
         "Takauji Ashikaga"
-      ],
-      "entity_category": "ANTHROPONYM"
-    },
-    "Genba": {
-      "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
-      "source": "quality_gate",
-      "gender": "MALE",
-      "grammatical_gender": "MASCULINE",
-      "has_verified_gender": true,
-      "confidence": 0.95,
-      "priority": "P0",
-      "aliases": [
-        "Genba"
       ],
       "entity_category": "ANTHROPONYM"
     },
@@ -569,30 +463,6 @@
       ],
       "entity_category": "ANTHROPONYM"
     },
-    "Takauji": {
-      "description": "postać (Postać) [MĘŻCZYZNA]",
-      "gender": "MALE",
-      "grammatical_gender": "MASCULINE",
-      "has_verified_gender": true,
-      "confidence": 0.95,
-      "priority": "P0",
-      "aliases": [
-        "Takauji"
-      ],
-      "entity_category": "ANTHROPONYM"
-    },
-    "Kinmune": {
-      "description": "postać (Postać) [MĘŻCZYZNA]",
-      "gender": "MALE",
-      "grammatical_gender": "MASCULINE",
-      "has_verified_gender": true,
-      "confidence": 0.95,
-      "priority": "P0",
-      "aliases": [
-        "Kinmune"
-      ],
-      "entity_category": "ANTHROPONYM"
-    },
     "Moronao": {
       "description": "postać (Postać)",
       "gender": "MALE",
@@ -617,18 +487,6 @@
       ],
       "entity_category": "ANTHROPONYM"
     },
-    "Kusunoki": {
-      "description": "postać (Postać) [MĘŻCZYZNA]",
-      "gender": "MALE",
-      "grammatical_gender": "MASCULINE",
-      "has_verified_gender": true,
-      "confidence": 0.95,
-      "priority": "P0",
-      "aliases": [
-        "Kusunoki"
-      ],
-      "entity_category": "ANTHROPONYM"
-    },
     "Yoshisada": {
       "description": "postać (Postać)",
       "gender": "MALE",
@@ -649,6 +507,7 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
+        "Kusunoki",
         "Kusunoki Masashige",
         "Masashige"
       ],
@@ -714,7 +573,7 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
-        "Suwa",
+        "Yoritsugu",
         "Yoritsugu Suwa"
       ],
       "entity_category": "ANTHROPONYM"
@@ -727,8 +586,8 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
-        "Kojiro Nezu",
-        "Nezu"
+        "Kojiro",
+        "Kojiro Nezu"
       ],
       "entity_category": "ANTHROPONYM"
     },
@@ -869,7 +728,7 @@
     "Cesarz Go-Daigo -> Kiyohara": "Zwrot: 'Kiyoharo' (cesarz -> poddany / urzędnik dworski) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Kiyohara -> Cesarz Go-Daigo": "Zwrot: 'Wasza Cesarska Mość / Panie' (urzędnik -> cesarz) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Mochizuki -> Tokiyuki Hojo": "Zwrot: 'młody panie / panie Tokiyuki' (generał Suwa -> młody pan) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Shokan -> Chojumaru": "Zwrot: 'na ty / Chojumaru' (dowódca / strateg -> podwładny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [reżim: FORMALNY]",
+    "Shokan -> Chojumaru": "Zwrot: 'na ty / Chojumaru' (dowódca / strateg -> podwładny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [reżim: FORMALNY]",
     "Tokiyuki Suwa -> Sojusznicy / Mochizuki": "Zwrot: 'młody panie / panie Mochizuki' (młody dziedzic -> dowódcy i wasale) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Gubernator Kiyohara -> Cesarz Go-Daigo": "Zwrot: 'Wasza Cesarska Mość' (urzędnik cesarski -> cesarz) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Mochizuki -> Ród Shinomiya": "Zwrot: 'panie Shinomiya' (jeden z Trzech Wielkich Generałów -> sojusznicze rody) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
@@ -889,7 +748,7 @@
     "Yasuie -> Kinmune Saionji": "Zwrot: 'Wielki Radco / Panie Kinmune' (spiskowiec z Kamakury i dworski dostojnik cesarski) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Genba Kazama -> Yasuie Hōjō": "Zwrot: 'szefie / panie Yasuie' (shinobi/złodziej -> wuj młodego pana Tokiyukiego) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Tokiyuki Hōjō -> Masashige Kusunoki": "Zwrot: 'panie Kusunoki / panie Masashige' (uczeń/młodzieniec -> legendarny wódz) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Masashige Kusunoki -> Tokiyuki Hōjō": "Zwrot: 'chłopcze / młodzieńcze (na ty)' (mistrz taktyki -> tajemniczy chłopak) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [reżim: FORMALNY]",
+    "Masashige Kusunoki -> Tokiyuki Hōjō": "Zwrot: 'chłopcze / młodzieńcze (na ty)' (mistrz taktyki -> tajemniczy chłopak) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [reżim: FORMALNY]",
     "Kojiro -> Tokiyuki Hōjō": "Zwrot: 'panie Tokiyuki / mój panie (Waka-sama)' (wasal -> młody pan) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Shizuku -> Mima": "Zwrot: 'Mima / na ty' (znajome rówieśniczki w Kyo) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
     "Mima -> Tokiyuki Hōjō": "Zwrot: 'chłopcze / mały' (miejska arystokratka -> tajemniczy chłopak z prowincji) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
@@ -899,7 +758,7 @@
     "Tokiyuki Hojo -> Mochizuki": "Zwrot: 'panie Mochizuki / panie Shinomiya' (młody pan / dziedzic -> dowódcy i wasale) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Tokiyuki Suwa -> Sojusznicy": "Zwrot: 'młody panie / panie Mochizuki' (młody dziedzic -> dowódcy i wasale) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Fubuki -> Tokiyuki Hōjō": "Zwrot: 'panie Tokiyuki / paniczu' (strateg i wasal -> młody lord) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Tokiyuki Hōjō -> Fubuki": "Zwrot: 'na ty / Fubuki' (młody lord -> towarzysz broni) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [reżim: FORMALNY]",
+    "Tokiyuki Hōjō -> Fubuki": "Zwrot: 'na ty / Fubuki' (młody lord -> towarzysz broni) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [reżim: FORMALNY]",
     "Takauji Ashikaga -> Tokiyuki Hōjō": "Zwrot: 'chłopcze / mały' (wódz i dawny wasal -> nieznane dziecko (w rzeczywistości dziedzic Hōjō)) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Tokiyuki Hōjō -> Takauji Ashikaga": "Zwrot: 'Takauji Ashikaga / ty potworze' (mściciel -> śmiertelny wróg rodu) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Kinmune Saionji -> Yasuie Hōjō": "Zwrot: 'panie Yasuie / Yasuie' (arystokrata kuge -> samuraj buke / wspólnik spisku) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
@@ -924,7 +783,7 @@
     "Cesarz Go-Daigo -> Kiyohara": "Zwrot: 'Kiyoharo' (cesarz -> poddany / urzędnik dworski) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Kiyohara -> Cesarz Go-Daigo": "Zwrot: 'Wasza Cesarska Mość / Panie' (urzędnik -> cesarz) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Mochizuki -> Tokiyuki Hojo": "Zwrot: 'młody panie / panie Tokiyuki' (generał Suwa -> młody pan) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Shokan -> Chojumaru": "Zwrot: 'na ty / Chojumaru' (dowódca / strateg -> podwładny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [reżim: FORMALNY]",
+    "Shokan -> Chojumaru": "Zwrot: 'na ty / Chojumaru' (dowódca / strateg -> podwładny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [reżim: FORMALNY]",
     "Tokiyuki Suwa -> Sojusznicy / Mochizuki": "Zwrot: 'młody panie / panie Mochizuki' (młody dziedzic -> dowódcy i wasale) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Gubernator Kiyohara -> Cesarz Go-Daigo": "Zwrot: 'Wasza Cesarska Mość' (urzędnik cesarski -> cesarz) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Mochizuki -> Ród Shinomiya": "Zwrot: 'panie Shinomiya' (jeden z Trzech Wielkich Generałów -> sojusznicze rody) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
@@ -944,7 +803,7 @@
     "Yasuie -> Kinmune Saionji": "Zwrot: 'Wielki Radco / Panie Kinmune' (spiskowiec z Kamakury i dworski dostojnik cesarski) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Genba Kazama -> Yasuie Hōjō": "Zwrot: 'szefie / panie Yasuie' (shinobi/złodziej -> wuj młodego pana Tokiyukiego) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Tokiyuki Hōjō -> Masashige Kusunoki": "Zwrot: 'panie Kusunoki / panie Masashige' (uczeń/młodzieniec -> legendarny wódz) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Masashige Kusunoki -> Tokiyuki Hōjō": "Zwrot: 'chłopcze / młodzieńcze (na ty)' (mistrz taktyki -> tajemniczy chłopak) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [reżim: FORMALNY]",
+    "Masashige Kusunoki -> Tokiyuki Hōjō": "Zwrot: 'chłopcze / młodzieńcze (na ty)' (mistrz taktyki -> tajemniczy chłopak) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [reżim: FORMALNY]",
     "Kojiro -> Tokiyuki Hōjō": "Zwrot: 'panie Tokiyuki / mój panie (Waka-sama)' (wasal -> młody pan) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Shizuku -> Mima": "Zwrot: 'Mima / na ty' (znajome rówieśniczki w Kyo) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Mima -> Tokiyuki Hōjō": "Zwrot: 'chłopcze / mały' (miejska arystokratka -> tajemniczy chłopak z prowincji) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
@@ -954,7 +813,7 @@
     "Tokiyuki Hojo -> Mochizuki": "Zwrot: 'panie Mochizuki / panie Shinomiya' (młody pan / dziedzic -> dowódcy i wasale) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Tokiyuki Suwa -> Sojusznicy": "Zwrot: 'młody panie / panie Mochizuki' (młody dziedzic -> dowódcy i wasale) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Fubuki -> Tokiyuki Hōjō": "Zwrot: 'panie Tokiyuki / paniczu' (strateg i wasal -> młody lord) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Tokiyuki Hōjō -> Fubuki": "Zwrot: 'na ty / Fubuki' (młody lord -> towarzysz broni) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [reżim: FORMALNY]",
+    "Tokiyuki Hōjō -> Fubuki": "Zwrot: 'na ty / Fubuki' (młody lord -> towarzysz broni) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [reżim: FORMALNY]",
     "Takauji Ashikaga -> Tokiyuki Hōjō": "Zwrot: 'chłopcze / mały' (wódz i dawny wasal -> nieznane dziecko (w rzeczywistości dziedzic Hōjō)) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Tokiyuki Hōjō -> Takauji Ashikaga": "Zwrot: 'Takauji Ashikaga / ty potworze' (mściciel -> śmiertelny wróg rodu) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Kinmune Saionji -> Yasuie Hōjō": "Zwrot: 'panie Yasuie / Yasuie' (arystokrata kuge -> samuraj buke / wspólnik spisku) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
@@ -1066,16 +925,6 @@
       "W": "Kiyoharo",
       "gender": "MALE"
     },
-    "Mochizuki": {
-      "M": "Mochizuki",
-      "D": "Mochizuki",
-      "C": "Mochizuki",
-      "B": "Mochizuki",
-      "N": "Mochizuki",
-      "Ms": "Mochizuki",
-      "W": "Mochizuki",
-      "gender": "MALE"
-    },
     "Shokan": {
       "M": "Shokan",
       "D": "Shokana",
@@ -1124,36 +973,6 @@
       "N": "Rodem Shinomiya",
       "Ms": "Rodzie Shinomiya",
       "W": "Rodzie Shinomiya",
-      "gender": "MALE"
-    },
-    "Yoritsugu": {
-      "M": "Yoritsugu",
-      "D": "Yoritsugu",
-      "C": "Yoritsugu",
-      "B": "Yoritsugu",
-      "N": "Yoritsugu",
-      "Ms": "Yoritsugu",
-      "W": "Yoritsugu",
-      "gender": "MALE"
-    },
-    "Tokiyuki": {
-      "M": "Tokiyuki",
-      "D": "Tokiyuki",
-      "C": "Tokiyuki",
-      "B": "Tokiyuki",
-      "N": "Tokiyuki",
-      "Ms": "Tokiyuki",
-      "W": "Tokiyuki",
-      "gender": "MALE"
-    },
-    "Yorishige": {
-      "M": "Yorishige",
-      "D": "Yorishige",
-      "C": "Yorishige",
-      "B": "Yorishige",
-      "N": "Yorishige",
-      "Ms": "Yorishige",
-      "W": "Yorishige",
       "gender": "MALE"
     },
     "Moritaka": {
@@ -1226,26 +1045,6 @@
       "W": "Mimo Sasaki",
       "gender": "FEMALE"
     },
-    "Kojiro": {
-      "M": "Kojiro",
-      "D": "Kojiro",
-      "C": "Kojiro",
-      "B": "Kojiro",
-      "N": "Kojiro",
-      "Ms": "Kojiro",
-      "W": "Kojiro",
-      "gender": "MALE"
-    },
-    "Yasuie": {
-      "M": "Yasuie",
-      "D": "Yasuie",
-      "C": "Yasuie",
-      "B": "Yasuie",
-      "N": "Yasuie",
-      "Ms": "Yasuie",
-      "W": "Yasuie",
-      "gender": "MALE"
-    },
     "Kinmune Saionji": {
       "M": "Kinmune Saionji",
       "D": "Kinmune Saionji",
@@ -1265,16 +1064,6 @@
       "Ms": "Masashige Kusunoki",
       "W": "Masashige Kusunoki",
       "gender": "MALE"
-    },
-    "Mima": {
-      "M": "Mima",
-      "D": "Mimy",
-      "C": "Mimie",
-      "B": "Mimę",
-      "N": "Mimą",
-      "Ms": "Mimie",
-      "W": "Mimo",
-      "gender": "FEMALE"
     },
     "Shinomiya": {
       "M": "Shinomiya",
@@ -1306,16 +1095,6 @@
       "W": "Muneie Tokoiwo",
       "gender": "MALE"
     },
-    "Sojusznicy": {
-      "M": "Sojusznicy",
-      "D": "Sojusznicy",
-      "C": "Sojusznicy",
-      "B": "Sojusznicy",
-      "N": "Sojusznicy",
-      "Ms": "Sojusznicy",
-      "W": "Sojusznicy",
-      "gender": "MALE"
-    },
     "Takauji Ashikaga": {
       "M": "Takauji Ashikaga",
       "D": "Takauji Ashikagi",
@@ -1324,16 +1103,6 @@
       "N": "Takauji Ashikagą",
       "Ms": "Takauji Ashikadze",
       "W": "Takauji Ashikago",
-      "gender": "MALE"
-    },
-    "Genba": {
-      "M": "Genba",
-      "D": "Genby",
-      "C": "Genbie",
-      "B": "Genbę",
-      "N": "Genbą",
-      "Ms": "Genbie",
-      "W": "Genbo",
       "gender": "MALE"
     },
     "Tamonmaru": {
@@ -1356,26 +1125,6 @@
       "W": "Doyo Sasaki",
       "gender": "MALE"
     },
-    "Takauji": {
-      "M": "Takauji",
-      "D": "Takauji",
-      "C": "Takauji",
-      "B": "Takauji",
-      "N": "Takauji",
-      "Ms": "Takauji",
-      "W": "Takauji",
-      "gender": "MALE"
-    },
-    "Kinmune": {
-      "M": "Kinmune",
-      "D": "Kinmune",
-      "C": "Kinmune",
-      "B": "Kinmune",
-      "N": "Kinmune",
-      "Ms": "Kinmune",
-      "W": "Kinmune",
-      "gender": "MALE"
-    },
     "Moronao": {
       "M": "Moronao",
       "D": "Moronao",
@@ -1394,16 +1143,6 @@
       "N": "Moroyasu",
       "Ms": "Moroyasu",
       "W": "Moroyasu",
-      "gender": "MALE"
-    },
-    "Kusunoki": {
-      "M": "Kusunoki",
-      "D": "Kusunoki",
-      "C": "Kusunoki",
-      "B": "Kusunoki",
-      "N": "Kusunoki",
-      "Ms": "Kusunoki",
-      "W": "Kusunoki",
       "gender": "MALE"
     },
     "Yoshisada": {
@@ -1594,16 +1333,12 @@
     "Mochizuki / Shinomiya": "ANTHROPONYM",
     "Cesarz Go-Daigo": "ANTHROPONYM",
     "Kiyohara": "ANTHROPONYM",
-    "Mochizuki": "ANTHROPONYM",
     "Shokan": "ANTHROPONYM",
     "Chojumaru": "ANTHROPONYM",
     "Tokiyuki Suwa": "ANTHROPONYM",
     "Sojusznicy / Mochizuki": "ANTHROPONYM",
     "Gubernator Kiyohara": "ANTHROPONYM",
     "Ród Shinomiya": "ANTHROPONYM",
-    "Yoritsugu": "ANTHROPONYM",
-    "Tokiyuki": "ANTHROPONYM",
-    "Yorishige": "ANTHROPONYM",
     "Moritaka": "ANTHROPONYM",
     "Yasuie Hōjō": "ANTHROPONYM",
     "Genba Kazama": "ANTHROPONYM",
@@ -1611,24 +1346,16 @@
     "Suwa Yorishige": "ANTHROPONYM",
     "Shizuku": "ANTHROPONYM",
     "Mima Sasaki": "ANTHROPONYM",
-    "Kojiro": "ANTHROPONYM",
-    "Yasuie": "ANTHROPONYM",
     "Kinmune Saionji": "ANTHROPONYM",
     "Masashige Kusunoki": "ANTHROPONYM",
-    "Mima": "ANTHROPONYM",
     "Shinomiya": "ANTHROPONYM",
     "Nezu": "ANTHROPONYM",
     "Muneie Tokoiwa": "ANTHROPONYM",
-    "Sojusznicy": "ANTHROPONYM",
     "Takauji Ashikaga": "ANTHROPONYM",
-    "Genba": "ANTHROPONYM",
     "Tamonmaru": "ANTHROPONYM",
     "Doyo Sasaki": "ANTHROPONYM",
-    "Takauji": "ANTHROPONYM",
-    "Kinmune": "ANTHROPONYM",
     "Moronao": "ANTHROPONYM",
     "Moroyasu": "ANTHROPONYM",
-    "Kusunoki": "ANTHROPONYM",
     "Yoshisada": "ANTHROPONYM",
     "Kusunoki Masashige": "ANTHROPONYM",
     "Saionji": "ANTHROPONYM",
@@ -1640,20 +1367,81 @@
     "Shogen Hirano": "ANTHROPONYM",
     "Dworzanin": "ANTHROPONYM",
     "Doradca Suwy": "ANTHROPONYM",
+    "Go-Daigo": "ANTHROPONYM",
+    "Three Great Generals of the Suwa Sect": "ANTHROPONYM",
+    "Suwa Grand Shrine": "ANTHROPONYM",
+    "Hojo clan": "ANTHROPONYM",
+    "Fukashi Fort": "ANTHROPONYM",
+    "Young Lord": "ANTHROPONYM",
+    "Provincial Official": "ANTHROPONYM",
+    "Shinano Mask / Suwa Mask": "ANTHROPONYM",
+    "Pincer attack": "ANTHROPONYM",
+    "Elusive Samurai": "ANTHROPONYM",
+    "Suwa Shrine": "ANTHROPONYM",
+    "Suwa Sect": "ANTHROPONYM",
+    "Three Great Generals of Suwa": "ANTHROPONYM",
+    "Ashikaga clan": "ANTHROPONYM",
+    "Suwa clan": "ANTHROPONYM",
+    "Kamakura Shogunate": "ANTHROPONYM",
+    "Kenmu Restoration": "ANTHROPONYM",
+    "Nanboku-cho period": "ANTHROPONYM",
+    "Nakasendai Rebellion": "ANTHROPONYM",
     "Inuoumono": "TOPONYM",
     "Yabusame": "TOPONYM",
     "Kasagake": "TOPONYM",
+    "Lord of Kamakura": "ANTHROPONYM",
     "Fukashi Fortress": "TOPONYM",
     "Shinano Province": "TOPONYM",
+    "Mikoshi / Battle Mikoshi": "ANTHROPONYM",
+    "Provincial Official / Kokushi": "ANTHROPONYM",
+    "Emperor Godaigo": "ANTHROPONYM",
+    "Elusive Warriors": "ANTHROPONYM",
+    "Battle mikoshi": "ANTHROPONYM",
+    "Provincial Official (Kokushi)": "ANTHROPONYM",
+    "Suwa Myojin": "ANTHROPONYM",
     "Genpuku": "TOPONYM",
     "Eboshi-oya": "TOPONYM",
+    "Arahitogami": "ANTHROPONYM",
+    "Holy Pillar": "ANTHROPONYM",
+    "Ashikaga School": "ANTHROPONYM",
     "Tengu": "TOPONYM",
+    "Taiheiki": "ANTHROPONYM",
+    "Post town": "ANTHROPONYM",
     "Kyo": "TOPONYM",
     "Basara": "TOPONYM",
+    "Okuchi bakama": "ANTHROPONYM",
     "Kanmon": "TOPONYM",
+    "Willow (game)": "ANTHROPONYM",
+    "Holy power": "ANTHROPONYM",
+    "Major Counselor": "ANTHROPONYM",
     "Mount Hiei": "TOPONYM",
+    "Nozawana": "ANTHROPONYM",
+    "God of War": "ANTHROPONYM",
+    "Kusunoki style": "ANTHROPONYM",
+    "Golden Pavilion": "ANTHROPONYM",
+    "artery slash": "ANTHROPONYM",
+    "[ KRONIKA Kronika\\NTaiheiki TOM DZIESIĄTY ]": "ANTHROPONYM",
+    "[ KRONIKA Kronika Taiheiki TOM DZIESIĄTY ]": "ANTHROPONYM",
+    "Kuge": "ANTHROPONYM",
+    "Buke": "ANTHROPONYM",
     "Shimotsuke Province": "TOPONYM",
-    "Shimotsuke": "TOPONYM"
+    "Shimotsuke": "TOPONYM",
+    "Kinkaku-ji": "ANTHROPONYM",
+    "Kamakura Party": "ANTHROPONYM",
+    "Manor Steward": "ANTHROPONYM",
+    "Two-Fanged Bare Blade": "ANTHROPONYM",
+    "Demon-heart Buddha Blade": "ANTHROPONYM",
+    "Imperial Command": "ANTHROPONYM",
+    "Onbashira": "ANTHROPONYM",
+    "Lamellar plates (kozane)": "ANTHROPONYM",
+    "Przepowiednia Yorishigego o upadku planu wuja Yasuie": "ANTHROPONYM",
+    "Przeżycie Shōkana": "ANTHROPONYM",
+    "Zdrada i upadek Kamakury": "ANTHROPONYM",
+    "Kinkaku-ji (Złoty Pawilon)": "ANTHROPONYM",
+    "Kamakura Party (Kamakura-tō)": "ANTHROPONYM",
+    "Demon-heart Buddha Blade (Kishin Butsumetsutou)": "ANTHROPONYM",
+    "Powstanie Nakasendai (Nakasendai no Ran)": "ANTHROPONYM",
+    "Kłody Onbashira": "ANTHROPONYM"
   },
   "fansub_canon": {}
 }

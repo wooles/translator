@@ -52,7 +52,7 @@ def test_phase1_monologue_prompt_emission():
     """
     from translator import MultimodalTranslator
     ev = pysubs2.SSAEvent(start=1000, end=3000, text="I escaped from the pursuers!", style="Italics")
-    ev.name = "Tokiyuki Hōjō"
+    ev.name = "Kamil Nowak"
 
     translator = MultimodalTranslator.__new__(MultimodalTranslator)
     translator.character_registry = {}
@@ -120,13 +120,12 @@ def test_phase1_postprocess_wraps_italics_style_and_normalizes_single_italic_blo
     T5.7 (Operacja 2C.6): Prawidłowy stan tekstu Fazy 1 dla stylu Italics
     = pojedyncza para {\\i1}...{\\i0} obejmująca cały tekst oraz separator \\N zamiast \\n.
     """
-    import re
+    import pysubs2
+    from translator import format_phase1_candidate_text
+
+    event = pysubs2.SSAEvent(start=1000, end=3000, text=input_draft, style=style_name)
+    pl_cand = format_phase1_candidate_text(input_draft, event, is_sign=False)
     is_im = any(k in style_name.lower() for k in ["italic", "thoughts", "internal"])
-    pl_cand = re.sub(r"\\[nN]|\r?\n", r"\\N", input_draft)
-    if is_im and pl_cand:
-        clean_im = re.sub(r"\{\\i[01]\}", "", pl_cand).strip()
-        clean_im = re.sub(r"\s*\\N\s*", r"\\N", clean_im)
-        pl_cand = f"{{\\i1}}{clean_im}{{\\i0}}"
 
     assert pl_cand == expected_wrapped
     if is_im:

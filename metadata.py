@@ -586,10 +586,10 @@ def get_anime_context(filename_or_path: str, client: Any = None) -> Optional[Dic
                 return {
                     "title_romaji": bible.anime_title,
                     "title_english": bible.anime_title,
-                    "genres": [],
-                    "tags": [],
-                    "setting_tags": [],
-                    "detected_domains": [],
+                    "genres": bible.data.get("genres", []) if hasattr(bible, "data") and isinstance(bible.data, dict) else getattr(bible, "genres", []),
+                    "tags": bible.data.get("tags", []) if hasattr(bible, "data") and isinstance(bible.data, dict) else getattr(bible, "tags", []),
+                    "setting_tags": bible.data.get("setting_tags", []) if hasattr(bible, "data") and isinstance(bible.data, dict) else getattr(bible, "setting_tags", []),
+                    "detected_domains": bible.data.get("detected_domains", []) if hasattr(bible, "data") and isinstance(bible.data, dict) else getattr(bible, "detected_domains", []),
                     "description": f"Kontekst serii wczytany z lokalnej bazy wiedzy (SeriesBible): {bible.anime_title}",
                     "characters": characters_list,
                     "source": "local_series_bible"

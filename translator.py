@@ -1702,6 +1702,28 @@ def determine_blind_draft_status(
             return True
     return False
 
+def format_phase1_candidate_text(pl_candidate: str, event: Any, is_sign: bool = False) -> str:
+    r"""
+    Formatuje tekst kandydata Fazy 1: normalizuje separatory \r\n i \n do \N
+    oraz dla stylu Italics / myśli otacza pojedynczą parą {\i1}...{\i0} (Standard 9.5, 2C.6, R1.9).
+    """
+    if not pl_candidate:
+        return ""
+    cand = sanitize_sub_text(pl_candidate)
+    cand = re.sub(r"\\[nN]|\r?\n", r"\\N", cand)
+
+    st_ev_lower = str(getattr(event, "style", "")).lower()
+    italic_attr = getattr(event, "italic", 0)
+    has_italic_style = any(k in st_ev_lower for k in ["italic", "flashback_italic", "thoughts", "internal"]) or italic_attr in (1, -1)
+    is_internal_monologue = getattr(event, "is_internal_monologue", False) or has_italic_style
+
+    if is_internal_monologue and cand and not is_sign:
+        clean_im = re.sub(r"\{\\i[01]\}", "", cand).strip()
+        clean_im = re.sub(r"\s*\\N\s*", r"\\N", clean_im)
+        cand = f"{{\\i1}}{clean_im}{{\\i0}}"
+    return cand
+
+
 class MultimodalTranslator:
     _STATUS_LOCK = threading.Lock()
     _STATUS_ACTIVE: bool = False
@@ -4002,8 +4024,8 @@ class MultimodalTranslator:
             if batch_response:
                 for tr in batch_response.translations:
                     if tr.id == batch_id:
-                        pl_candidate = sanitize_sub_text(tr.polish_text)
-                        pl_candidate = pl_candidate.replace("\r\n", r"\N").replace("\n", r"\N")
+                        pl_candidate = format_phase1_candidate_text(tr.polish_text, event, is_sign=bool(vtype.get("is_sign")))
+
 
                         # Kondensacja krótkich plansz z punktorem (Standard 9.5, 2C.2, R1.5)
                         if vtype.get("is_sign") and ((event.end - event.start) <= 2500):
@@ -4013,10 +4035,10 @@ class MultimodalTranslator:
                                 if first_line_pl:
                                     pl_candidate = first_line_pl
 
-                        if is_internal_monologue and pl_candidate and not vtype.get("is_sign"):
-                            clean_im = re.sub(r"\{\\i[01]\}", "", pl_candidate).strip()
-                            clean_im = re.sub(r"\s*\\N\s*", r"\\N", clean_im)
-                            pl_candidate = f"{{\\i1}}{clean_im}{{\\i0}}"
+
+
+
+
 
                         speaker_gender = tr.speaker_gender
                         raw_addressee = getattr(tr, 'addressee', None)
@@ -4679,13 +4701,17 @@ class MultimodalTranslator:
         prev_linted_line = (lookback_history[-1]["pl"] if lookback_history else "")
         for item in pass1_items:
             raw_final = sanitize_sub_text(refined_dict.get(item["id"], item["pl"]))
+            alias_fixes = []
             if not self.keep_honorifics and not item.get("is_sign", False):
                 if hasattr(self, "series_bible") and self.series_bible:
-                    raw_final = self.series_bible.apply_canonical_alias_declension(
+                    decl_final = self.series_bible.apply_canonical_alias_declension(
                         raw_final,
                         source_en=item.get("en", ""),
                         keep_honorifics=self.keep_honorifics
                     )
+                    if decl_final != raw_final:
+                        alias_fixes.append(f"Odmiana aliasu kanonicznego: '{raw_final}' -> '{decl_final}'")
+                        raw_final = decl_final
             # Triangulate effective gender from character registry, audio F0 voice, and pragmatic clues (Filar CXXXVI)
             spk_gen = item.get("speaker_gender")
             spk_voice = item.get("speaker_voice", "")
@@ -4768,7 +4794,7 @@ class MultimodalTranslator:
                 clean_no_notes = re.sub(r"^[♪♫♬\s]+|[♪♫♬\s]+$", "", final_text).strip()
                 if clean_no_notes:
                     final_text = f"♪ {clean_no_notes} ♪"
-            for fix in fixes + gloss_fixes:
+            for fix in fixes + gloss_fixes + alias_fixes:
                 pbar.write(f"  [AVT Linter/Słownik] {fix}")
             start_m = item.get("start_ms", item["event"].start if "event" in item else 0)
             end_m = item.get("end_ms", item["event"].end if "event" in item else 1000)
@@ -4790,7 +4816,7 @@ class MultimodalTranslator:
                         phase1_pl=item.get("pl", ""),
                         phase2_pl=refined_dict.get(item["id"], item["pl"]),
                         linter_pl=final_text,
-                        fixes_applied=fixes + gloss_fixes
+                        fixes_applied=fixes + gloss_fixes + alias_fixes
                     )
                 except Exception:
                     pass

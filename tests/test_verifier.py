@@ -51,9 +51,9 @@ def test_guard_phase2_regressions_authority_and_ass_tags():
     assert guarded_enc == f1_enc, f"Oczekiwano zachowania enklityki z Fazy 1: {guarded_enc}"
 
     # 5. Regression guard: Loss of prepositional governance for invariable anthroponym
-    en_prep = "We are fighting against Carol today."
-    f1_prep = "Walczymy dzisiaj przeciwko Carol."
-    f2_lost = "Walczymy dzisiaj z Carol."
+    en_prep = "We are fighting against Monika today."
+    f1_prep = "Walczymy dzisiaj przeciwko Monika."
+    f2_lost = "Walczymy dzisiaj z Monika."
     guarded_prep = _guard_phase2_regressions(
         f1_pl=f1_prep,
         refined_pl=f2_lost,
@@ -490,17 +490,17 @@ def test_guard_phase2_strips_whole_line_italics_when_source_en_has_only_partial_
     "f1_pl,raw_f2_pl,raw_reason,expected_refined_pl,expected_changes_made",
     [
         (
-            r"{\i1}Może pójdę z Tokiyukim\NCieszę się, że tobie nic nie jest{\i0}",
-            "{\\i1}Może pójdę z Tokiyukim\nCieszę się, że tobie nic nie jest{\\i0}",
+            r"{\i1}Może pójdę z Kamilem\NCieszę się, że tobie nic nie jest{\i0}",
+            "{\\i1}Może pójdę z Kamilem\nCieszę się, że tobie nic nie jest{\\i0}",
             "[Filar I] Zmiana podziału wiersza.",
-            r"{\i1}Może pójdę z Tokiyukim\NCieszę się, że tobie nic nie jest{\i0}",
+            r"{\i1}Może pójdę z Kamilem\NCieszę się, że tobie nic nie jest{\i0}",
             None,
         ),
         (
-            r"Może pójdę z Tokiyukim\NCieszę się, że tobie nic nie jest",
-            r"Może pójdę z Tokiyukim\nCieszę się, że tobie nic nie jest",
+            r"Może pójdę z Kamilem\NCieszę się, że tobie nic nie jest",
+            r"Może pójdę z Kamilem\nCieszę się, że tobie nic nie jest",
             "[Filar II] Korekta.",
-            r"Może pójdę z Tokiyukim\NCieszę się, że tobie nic nie jest",
+            r"Może pójdę z Kamilem\NCieszę się, że tobie nic nie jest",
             None,
         ),
     ],

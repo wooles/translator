@@ -12,9 +12,9 @@ from profiler import EpisodeProfiler, DramaticSequence
 @pytest.mark.parametrize(
     "character_name,p0_gender,initial_female_only,initial_male_only,expected_female_only,expected_male_only",
     [
-        # Tokiyuki Hōjō / Ayako z Nige Jouzu no Wakagimi S2 (SeriesBible P0)
-        ("Ayako", "FEMALE", False, True, True, False),
-        ("Yorishige Suwa", "MALE", True, False, False, True),
+        # Weryfikacja bezwzględnego prymatu rekordu P0 w statystykach obsady pre-passu
+        ("Bohaterka", "FEMALE", False, True, True, False),
+        ("Bohater", "MALE", True, False, False, True),
     ]
 )
 def test_reconcile_prepass_with_p0_enforces_verified_cast_gender(
@@ -210,3 +210,28 @@ def test_sanitize_event_asr_strips_question_mark_and_zero_clusters_inside_jp_seg
     assert "000" not in cleaned
     assert "??" not in cleaned
     assert cleaned == expected_clean_asr
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "en_score,f0_hz,expected_gender,expected_confidence,expected_archetype",
+    [
+        (-10, 120.0, "MALE", 1.0, "F0_HARD_MASCULINE_VETO"),
+        (-8, 110.0, "MALE", 1.0, "F0_HARD_MASCULINE_VETO"),
+        (0, 130.0, "MALE", 1.0, "F0_HARD_MASCULINE_VETO"),
+    ],
+)
+def test_f0_hard_masculine_immunity_against_english_anaphora_score(
+    en_score, f0_hz, expected_gender, expected_confidence, expected_archetype
+):
+    from profiler import SpaCyAnaphoraDiscourseAnalyzer
+
+    res = SpaCyAnaphoraDiscourseAnalyzer.triangulate_epistemic_gender(
+        en_score=en_score,
+        f0_hz=f0_hz,
+        jp_gender="UNKNOWN",
+        f0_hard_masc=True,
+    )
+    assert res["resolved_gender"] == expected_gender
+    assert res["confidence"] == expected_confidence
+    assert res["archetype"] == expected_archetype

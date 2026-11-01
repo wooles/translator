@@ -149,22 +149,22 @@
     "Four Holy Beasts": "Cztery Święte Bestie"
   },
   "relationships": {
-    "Anastasia -> Eftal": "Zwrot: 'Mistrzu / na pan' (uczennica / ocalona -> wybawca i mentor) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
+    "Anastasia -> Eftal": "Zwrot: 'Mistrzu / na pan' (uczennica / ocalona -> wybawca i mentor) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
     "Merlin -> Eftal": "Zwrot: 'panie Eftalu' (lojalna powierniczka i była uczennica -> mistrz) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: POUFNY]",
-    "Eftal -> Anastasia": "Zwrot: 'na ty / Anastasio' (opiekun i mistrz -> podopieczna) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
+    "Eftal -> Anastasia": "Zwrot: 'na ty / Anastasio' (opiekun i mistrz -> podopieczna) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: FORMALNY]",
     "Eftal -> Merlin": "Zwrot: 'na ty / Merlin' (dawni towarzysze / zaufani partnerzy) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [OCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu eliminacja opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?']",
     "Merlin -> Maria": "Zwrot: 'Siostrzyczko Mario' (udawane dziecko -> nauczycielka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
-    "Anastasia -> Merlin": "Zwrot: 'Merlin' (koleżanki / uczennice tego samego mistrza) [GRUPA KOBIET - Wymóg form niemęskoosobowych: -łyście / byłyście gotowe] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)] [reżim: FORMALNY]",
+    "Anastasia -> Merlin": "Zwrot: 'Merlin' (koleżanki / uczennice tego samego mistrza) [GRUPA KOBIET - Wymóg form niemęskoosobowych: -łyście / byłyście gotowe] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)] [reżim: FORMALNY]",
     "Seiryu -> Eftal": "Zwrot: 'człowieku / nędzny śmiertelniku' (bóstwo paktu -> bezczelny buntownik) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Eftal -> Seiryu": "Zwrot: 'na ty / przerośnięty gadzie' (pogromca paktów -> pokonana bestia) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
   },
   "relations": {
-    "Anastasia -> Eftal": "Zwrot: 'Mistrzu / na pan' (uczennica / ocalona -> wybawca i mentor) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
+    "Anastasia -> Eftal": "Zwrot: 'Mistrzu / na pan' (uczennica / ocalona -> wybawca i mentor) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
     "Merlin -> Eftal": "Zwrot: 'panie Eftalu' (lojalna powierniczka i była uczennica -> mistrz) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: POUFNY]",
-    "Eftal -> Anastasia": "Zwrot: 'na ty / Anastasio' (opiekun i mistrz -> podopieczna) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
+    "Eftal -> Anastasia": "Zwrot: 'na ty / Anastasio' (opiekun i mistrz -> podopieczna) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: FORMALNY]",
     "Eftal -> Merlin": "Zwrot: 'na ty / Merlin' (dawni towarzysze / zaufani partnerzy) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [OCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu eliminacja opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?']",
     "Merlin -> Maria": "Zwrot: 'Siostrzyczko Mario' (udawane dziecko -> nauczycielka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
-    "Anastasia -> Merlin": "Zwrot: 'Merlin' (koleżanki / uczennice tego samego mistrza) [GRUPA KOBIET - Wymóg form niemęskoosobowych: -łyście / byłyście gotowe] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
+    "Anastasia -> Merlin": "Zwrot: 'Merlin' (koleżanki / uczennice tego samego mistrza) [GRUPA KOBIET - Wymóg form niemęskoosobowych: -łyście / byłyście gotowe] [reżim: FORMALNY]",
     "Seiryu -> Eftal": "Zwrot: 'człowieku / nędzny śmiertelniku' (bóstwo paktu -> bezczelny buntownik) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Eftal -> Seiryu": "Zwrot: 'na ty / przerośnięty gadzie' (pogromca paktów -> pokonana bestia) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
   },
@@ -290,7 +290,30 @@
     "Seiryu": "ANTHROPONYM",
     "Genie": "ANTHROPONYM",
     "Maria": "ANTHROPONYM",
-    "Yunotron": "TOPONYM"
-  },
-  "fansub_canon": {}
+    "Gromu": "ANTHROPONYM",
+    "Ziemi": "ANTHROPONYM",
+    "Contract-Breaker": "ANTHROPONYM",
+    "Lightning Emperor": "ANTHROPONYM",
+    "Flame Emperor": "ANTHROPONYM",
+    "Ice Emperor": "ANTHROPONYM",
+    "Earth Emperor": "ANTHROPONYM",
+    "Magia Monolith": "ANTHROPONYM",
+    "Magia Burst": "ANTHROPONYM",
+    "astral body": "ANTHROPONYM",
+    "Divine Domain": "ANTHROPONYM",
+    "X-Gravity": "ANTHROPONYM",
+    "Noble Inquisition Organization": "ANTHROPONYM",
+    "Special Slave Crest": "ANTHROPONYM",
+    "Seraph Dispel": "ANTHROPONYM",
+    "Yunotron": "TOPONYM",
+    "Four Emperors": "ANTHROPONYM",
+    "Mind Link": "ANTHROPONYM",
+    "Physical Enhancement": "ANTHROPONYM",
+    "Enhance Divine Domain": "ANTHROPONYM",
+    "Thor's Lance": "ANTHROPONYM",
+    "Contract beast": "ANTHROPONYM",
+    "Slave crest": "ANTHROPONYM",
+    "Four Holy Beasts": "ANTHROPONYM",
+    "Four Emperors (Lightning, Flame, Ice, Earth)": "ANTHROPONYM"
+  }
 }

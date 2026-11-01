@@ -1286,9 +1286,7 @@ INHERENT_PLURAL_NOUNS = {
 
 CANONICAL_MALE_NAMES = {
     "shira", "akira", "gaara", "ashitaka", "kiba", "soma", "kenta",
-    "ryoma", "hanza", "koba", "soya", "toma", "genga", "sinbad", "judar", "alibaba",
-    "masashige", "kusunoki", "saionji", "kinmune", "ashikaga", "takauji", "mochizuki",
-    "ou hon", "ouhon", "robert"
+    "ryoma", "hanza", "sinbad", "judar", "alibaba", "robert"
 }
 
 
@@ -2000,7 +1998,6 @@ UNIVERSAL_FEMALE_NAMES_ON_A = {
     "akane", "haruka", "nanami", "hina", "marin", "kanna", "alya", "tanya",
     "alisa", "fiona", "eliza", "clara", "teresa", "selena", "vanessa",
     "melissa", "natasha", "tatiana", "olga", "sveta", "katrina", "sabrina", "sarah",
-    "carla", "zuina", "dina", "stella", "rebecca", "lydia", "amelia",
     "olivia", "bianca", "mia"
 }
 
@@ -2020,16 +2017,13 @@ INVARIABLE_JAPANESE_FEMALE_NAMES = {
 FOREIGN_FEMALE_CONSONANT_NAMES = {
     "carmen", "miriam", "ines", "rachel", "astrid", "judith", "helen", "karen",
     "gwen", "karin", "marin", "rin", "shion", "sion", "helen", "ellen", "karen", "vivian",
-    "lyn", "lynn", "ann", "anne", "jean", "joan", "jill", "kim", "dawn", "megan", "beth",
-    "lily", "ariane", "lieselotte", "carol", "francoise"
+    "lyn", "lynn", "ann", "anne", "jean", "joan", "jill", "kim", "dawn", "megan", "beth"
 }
 
 FEMALE_LEXICON_NAMES: Set[str] = (
     INHERENT_FEMALE_NOUNS | SECONDARY_LEXICAL_FEMALE_NOUNS |
     POLISH_FEMALE_NAMES | UNIVERSAL_FEMALE_NAMES_ON_A |
-    FOREIGN_FEMALE_CONSONANT_NAMES | {
-        "lily", "carla", "zuina", "ariane", "lieselotte", "dina", "stella", "rebecca", "lydia", "amelia"
-    }
+    FOREIGN_FEMALE_CONSONANT_NAMES
 )
 
 def is_inherently_female_name(name: str, series_bible: Any = None) -> bool:
@@ -2139,7 +2133,7 @@ def is_generic_actor_or_category(name: str) -> bool:
     if clean in GENERIC_CATEGORY_TAGS:
         return True
     generic_roles = (
-        r"man|male|boy|guy|woman|female|girl|lady|child|kid|villager|soldier|guard|student|"
+        r"man|male|boy|guy|woman|female|girl|lady|child|kid|villager|soldier|guard|student|envoy|courier|messenger|emissary|posłaniec|wysłannik|"
         r"citizen|passenger|driver|doctor|nurse|waiter|waitress|officer|policeman|detective|"
         r"thug|bandit|disciple|escort|customer|guest|host|shopkeeper|clerk|bystander|passerby|"
         r"servant|knight|warrior|elder|chief|king|queen|prince|princess|lord|teacher|principal|"
@@ -3503,8 +3497,8 @@ TYPO_NORMALIZATIONS = [
     (r"(^|[^\w]|\\[Nnh])([Kk])sięciu\s+[Kk]aiju\b", lambda m: ("Potwornemu Królewiczowi" if m.group(2) == "K" else "potwornemu królewiczowi")),
     (r"(^|[^\w]|\\[Nnh])([Kk])sięciem\s+[Kk]aiju\b", lambda m: ("Potwornym Królewiczem" if m.group(2) == "K" else "potwornym królewiczem")),
     # Otaku slang adaptation: hypocorism (Filar II / Kanon)
-    (r"(^|[^\w]|\\[Nnh])Kuro-?taso\b", r"\g<1>" + "".join([chr(75), "uroe"])),
-    (r"(^|[^\w]|\\[Nnh])kuro-?taso\b", r"\g<1>" + "".join([chr(107), "uroe"])),
+    (r"(^|[^\w]|\\[Nnh])Kuro-?taso\b", r"\g<1>Kuroe"),
+    (r"(^|[^\w]|\\[Nnh])kuro-?taso\b", r"\g<1>kuroe"),
     # Binary alternative comma eradication: 'w kapciach, czy bez' -> 'w kapciach czy bez' (Filar XCI / Standard 9.4 2B.10 - ochrona wołacza W)
     (r"\b([A-Za-ząćęłńóśźż0-9\-]+),\s+czy\s+(bez|nie|tak)\b",
      lambda m: m.group(0) if (m.group(1)[0].isupper() and m.group(1).lower() not in ("tak", "nie", "bez", "to") and (not re.sub(r"\{[^}]*\}", "", m.string[:m.start(1)]).strip() or re.sub(r"\{[^}]*\}", "", m.string[:m.start(1)]).strip() in ("-", "–", "—", '"', "„", "...", "…") or re.search(r"(?:\\N|\\n|[.?!…])\s*[-–—]?\s*$", re.sub(r"\{[^}]*\}", "", m.string[:m.start(1)]).strip()))) else f"{m.group(1)} czy {m.group(2)}"),
@@ -4080,16 +4074,10 @@ def sanitize_toponymic_pleonasms_and_stuttering(text: str) -> str:
 
 
 _BASE_KNOWN_FANTASY_TOPONYMS: Set[str] = {
-    "hiden", "haiden",
-    "elbe", "erbe", "hyderat", "haiderat", "heiderat", "esleburg", "esreburg", "edsea", "edthea",
-    "kanyou", "kantan", "xianyang", "handan", "chouhei", "sanyou", "tonryuu", "sai", "zui",
-    "kamakura", "suwa", "kyoto", "shinano", "musashi", "hiei", "hieizan", "shimotsuke",
-    "ridill", "minerva", "felm", "carnelian",
     "samarkand", "karakorum", "bukhara", "nishapur", "baghdad", "tabriz", "herat",
-    "yamato", "owari", "mikawa", "echigo", "kai",
+    "kyoto", "yamato", "owari", "mikawa", "echigo", "kai",
     "otaru", "sapporo", "asahikawa", "abashiri", "karafuto", "nemuro", "yubari",
-    "melini",
-    "missian", "coumeire", "torbequista", "summerforth"
+    "paryż", "tokio", "londyn", "warszawa", "rzym", "berlin"
 }
 
 
@@ -6031,6 +6019,20 @@ class SeriesBible:
                 k_lower = clean_k.lower()
                 norm_lower = normalize_ascii_diacritics(clean_k).strip().lower()
 
+                _COLLECTIVE_NUMBERS = {
+                    "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten",
+                    "jeden", "dwa", "trzy", "cztery", "pięć", "sześć", "siedem", "ośm", "dziewięć", "dziesięć"
+                }
+                _COLLECTIVE_PLURALS = {
+                    "sorcerers", "knights", "witches", "magicians", "orders", "lords", "guardians",
+                    "warriors", "spirits", "gods", "demons", "dragons", "magów", "rycerzy", "czarodziejów"
+                }
+                tokens_chk = k_lower.split()
+                is_collective_head = (
+                    (tokens_chk and tokens_chk[0] in _COLLECTIVE_NUMBERS)
+                    or any(t in _COLLECTIVE_PLURALS for t in tokens_chk)
+                )
+
                 # P0 verified personal character fast-path (Zero-Overhead Invariance)
                 is_p0_person = (
                     isinstance(c_val, dict)
@@ -6038,6 +6040,8 @@ class SeriesBible:
                     and c_val.get("gender") in ("MALE", "FEMALE")
                     and k_lower not in COLLECTIVE_LABELS
                     and k_lower not in POLISH_COMMON_NOUN_HOMONYMS
+                    and not is_generic_actor_or_category(clean_k)
+                    and not is_collective_head
                 )
                 if is_p0_person:
                     continue
@@ -6066,10 +6070,9 @@ class SeriesBible:
                             break
 
                 is_generic = is_generic_actor_or_category(clean_k) or is_generic_actor_or_category(char_k)
-                if clean_k.lower() in COLLECTIVE_LABELS or (len(clean_k.split()) == 1 and clean_k[0].islower()):
-                    is_generic = True
-                elif (is_in_relations or (isinstance(c_val, dict) and (c_val.get("has_verified_gender") or c_val.get("priority") == "P0"))) and clean_k.lower() not in GENERIC_CATEGORY_TAGS:
-                    is_generic = False
+                if not is_generic:
+                    if clean_k.lower() in COLLECTIVE_LABELS or (len(clean_k.split()) == 1 and clean_k[0].islower()):
+                        is_generic = True
                 is_continuity = False
                 if isinstance(c_val, dict):
                     if c_val.get("is_sign") or c_val.get("role") in ("sign", "napis"):
@@ -6081,7 +6084,7 @@ class SeriesBible:
                         is_sign = True
 
                 # Badanie chrematonimów i złożonych przydomków magicznych/tytularnych
-                is_chrematonym_compound = False
+                is_chrematonym_compound = bool(is_collective_head)
                 tokens_k = k_lower.split()
                 if any(pat.search(clean_k) for pat in CHREMATONYM_PATTERNS):
                     is_chrematonym_compound = True
@@ -6571,6 +6574,87 @@ class SeriesBible:
                                 c_aliases.append(al)
                     else:
                         char_v["aliases"] = [a for a in c_aliases if str(a).lower() not in stems_to_scrub]
+
+            # 8. Strukturalna unifikacja postaci, eliminacja kolizji aliasów i higiena relacji (Standard 10.0, H-Z4-04)
+            bible_modified = False
+            chars = self.data.get("characters", {})
+
+            # 8a. Deduplikacja kolizji aliasów wspólnych nazwisk
+            surname_map = {}
+            for k, v in list(chars.items()):
+                if "->" in k or not isinstance(v, dict):
+                    continue
+                toks = k.split()
+                if len(toks) >= 2:
+                    surn = toks[-1].lower()
+                    surname_map.setdefault(surn, []).append((k, v))
+
+            for surn, char_list in surname_map.items():
+                if len(char_list) >= 2:
+                    for k, v in char_list:
+                        orig_aliases = list(v.get("aliases", []))
+                        new_aliases = [a for a in orig_aliases if a.lower() != surn]
+                        first_name = k.split()[0]
+                        if first_name not in new_aliases:
+                            new_aliases.append(first_name)
+                        if new_aliases != orig_aliases:
+                            v["aliases"] = sorted(list(set(new_aliases)))
+                            bible_modified = True
+
+            # 8b. Unifikacja rekordów jedno- i wieloczłonowych (skrócone miano -> pełny rekord)
+            for k in list(chars.keys()):
+                if "->" in k or not isinstance(chars[k], dict):
+                    continue
+                k_toks = k.split()
+                if len(k_toks) == 1 and k in chars:
+                    single_val = chars[k]
+                    # poszukaj rekordu nadrzędnego
+                    for full_k, full_val in list(chars.items()):
+                        if full_k != k and "->" not in full_k and isinstance(full_val, dict):
+                            full_toks = full_k.split()
+                            first_tok = full_toks[0].lower()
+                            match = (
+                                (len(full_toks) >= 2 and first_tok == k.lower())
+                                or (len(full_toks) >= 2 and first_tok.startswith(k.lower()) and len(k) >= 4)
+                                or (len(full_toks) == 1 and full_k.lower().startswith(k.lower()) and len(k) >= 4 and len(full_k) > len(k))
+                            )
+                            if match:
+                                if single_val.get("has_verified_gender") or single_val.get("priority") == "P0":
+                                    if not full_val.get("has_verified_gender") or full_val.get("priority") != "P0":
+                                        full_val["gender"] = single_val.get("gender", full_val.get("gender"))
+                                        full_val["grammatical_gender"] = single_val.get("grammatical_gender", full_val.get("grammatical_gender"))
+                                        full_val["has_verified_gender"] = True
+                                        full_val["confidence"] = max(float(full_val.get("confidence", 0.0)), float(single_val.get("confidence", 0.0)))
+                                        full_val["priority"] = "P0"
+                                if "aliases" not in full_val:
+                                    full_val["aliases"] = [full_k]
+                                if k not in full_val["aliases"]:
+                                    full_val["aliases"].append(k)
+                                    full_val["aliases"] = sorted(list(set(full_val["aliases"])))
+                                del chars[k]
+                                if "declensions" in self.data and k in self.data["declensions"]:
+                                    del self.data["declensions"][k]
+                                bible_modified = True
+                                break
+
+            # 8c. Higiena relacji - usuwanie przecieków promptów
+            for rel_name in ("relations", "relationships"):
+                if rel_name in self.data and isinstance(self.data[rel_name], dict):
+                    rels = self.data[rel_name]
+                    for rk, rv in list(rels.items()):
+                        if isinstance(rv, str):
+                            clean_v = re.sub(r"\\NRELACJA HIERARCHICZNA[^\]]*\]", "]", rv)
+                            clean_v = re.sub(r"\[RELACJA HIERARCHICZNA[^\]]*\]\s*", "", clean_v)
+                            clean_v = re.sub(r"\s{2,}", " ", clean_v).strip()
+                            if clean_v != rv:
+                                rels[rk] = clean_v
+                                bible_modified = True
+
+            if bible_modified:
+                try:
+                    self.save()
+                except Exception:
+                    pass
 
             # 8. Bezwarunkowa synchronizacja klucza "gender" i regeneracja paradygmatów FEMALE w declensions (Operacje H2 i H5)
             decl_dict = self.data.setdefault("declensions", {})
@@ -8245,7 +8329,7 @@ class SeriesBible:
 
         CANONICAL_MALE_NAMES = {
             "shira", "akira", "gaara", "ashitaka", "kiba", "soma", "kenta",
-            "ryoma", "hanza", "koba", "soya", "toma", "genga", "sinbad", "judar", "alibaba"
+            "ryoma", "hanza", "sinbad", "judar", "alibaba"
         }
 
         # Safely extract string description from details (supporting dict payloads)

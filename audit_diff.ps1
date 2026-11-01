@@ -1,4 +1,4 @@
-﻿param(
+param(
     [Parameter(Mandatory=$false)][string]$ForbiddenTerms = "",
     [Parameter(Mandatory=$false)][string]$NotesFile = "",
     [Parameter(Mandatory=$false)][string]$BaseRef = "HEAD"
@@ -44,7 +44,7 @@ try {
     }
 
     $coreEnginePy = $changedFiles | Where-Object {
-        $_ -match '\.py$' -and $_ -notmatch 'test_system\.py$' -and $_ -notmatch 'avt_linter\.py$'
+        $_ -match '\.py$' -and $_ -notmatch 'test_system\.py$' -and $_ -notmatch 'tests[/\\]'
     }
     $assOrSrtEdits = $changedFiles | Where-Object { $_ -match '\.(ass|srt)$' }
 
@@ -118,14 +118,14 @@ try {
     }
 
     # 4. TEST INTEGRITY GATE
-    $testDiffLines = git diff $BaseRef -- "test_system.py" 2>$null | Where-Object { $_ -match '^\+[^+]' }
+    $testDiffLines = git diff $BaseRef -- "test_system.py" "tests/test_*.py" 2>$null | Where-Object { $_ -match '^\+[^+]' }
     if (-not $testDiffLines) {
-        Write-Host "[REJECT] Brak nowych testow w test_system.py!" -ForegroundColor Red
+        Write-Host "[REJECT] Brak nowych testow w test_system.py lub tests/test_*.py!" -ForegroundColor Red
         $AuditFailed = $true
     } else {
         $illegalMocks = $testDiffLines | Where-Object { $_ -match 'patch\s*\(\s*[''"](?:pipeline\.|translator|series_memory|scene_discourse|profiler|character_profiler)' }
         if ($illegalMocks) {
-            Write-Host "[REJECT] Nielegalne mockowanie logiki domenowej w test_system.py!" -ForegroundColor Red
+            Write-Host "[REJECT] Nielegalne mockowanie logiki domenowej w testach!" -ForegroundColor Red
             $AuditFailed = $true
         } else {
             Write-Host "[PASS] 4/4 Test Integrity Gate" -ForegroundColor Green

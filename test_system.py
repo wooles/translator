@@ -19611,6 +19611,55 @@ def test_standard_9_10_suite():
     print(" -> PASSED: TEST 223 potwierdza integrację operacji Standardu 9.10.")
 
 
+
+def test_standard_10_0_suite():
+    """TEST 224: Standard 10.0 Five Pillars verification, onomastic de-leakage, and discourse telemetry invariants."""
+    print("\n[TEST 224] Standard 10.0: Weryfikacja 5 zasad, likwidacja wycieków onomastycznych i czysta telemetria...")
+    import pysubs2
+    from scene_discourse import SceneDiscourseGraph, normalize_actor_tag
+    from profiler import SpaCyAnaphoraDiscourseAnalyzer
+    from translator import format_phase1_candidate_text
+
+    # 1. H-Z4-03: Explicit actor gender extracted before parentheses strip
+    ev_actor = pysubs2.SSAEvent(start=1000, end=3000, text="Kwestia dialogowa.", name="Bohater (M)")
+    res_telem = SceneDiscourseGraph.arbitrate_event_telemetry(event=ev_actor)
+    assert res_telem.get("speaker_name") == "Bohater"
+    assert res_telem.get("speaker_gender") == "MALE"
+    assert res_telem.get("grammatical_gender") == "MASCULINE"
+
+    # 2. H-Z3-04: Male speaker in female scene yields VIRILE We_Group
+    res_vir = SceneDiscourseGraph.arbitrate_event_telemetry(
+        event=ev_actor,
+        aux_telemetry={"grammatical_gender": "MASCULINE", "speaker_gender": "MALE"},
+        scene_female_only=True
+    )
+    assert res_vir.get("we_virility") == "VIRILE"
+    assert res_vir.get("group_virility") == "NON_VIRILE"
+    assert res_vir.get("you_virility") == "NON_VIRILE"
+
+    # 3. H-Z3-05: F0 Hard Masculine Veto immunity against English anaphora score
+    res_f0 = SpaCyAnaphoraDiscourseAnalyzer.triangulate_epistemic_gender(
+        en_score=-10,
+        f0_hz=120.0,
+        jp_gender="UNKNOWN",
+        f0_hard_masc=True
+    )
+    assert res_f0["resolved_gender"] == "MALE"
+    assert res_f0["confidence"] == 1.0
+    assert res_f0["archetype"] == "F0_HARD_MASCULINE_VETO" 
+
+    # 4. H-Z2-03: Sign isolation returns NEUTRAL
+    ev_sign = pysubs2.SSAEvent(start=1000, end=3000, text="Szyld", style="Sign")
+    res_sign = SceneDiscourseGraph.arbitrate_event_telemetry(event=ev_sign, is_sign=True)
+    assert res_sign.get("speaker_gender") == "NEUTRAL"
+
+    # 5. H-Z3-01 / H-Z2-04: format_phase1_candidate_text italics formatting
+    ev_im = pysubs2.SSAEvent(start=1000, end=3000, text="Myślę...", style="Thoughts")
+    res_im = format_phase1_candidate_text("To musi być prawda.", ev_im)
+    assert res_im == r"{\i1}To musi być prawda.{\i0}"
+    print(" -> PASSED: TEST 224 potwierdza integrację operacji Standardu 10.0.")
+
+
 if __name__ == "__main__":
     print("\n--- Rozpoczynanie testów weryfikacyjnych ---")
     test_rules_and_prompts()
@@ -19838,4 +19887,5 @@ if __name__ == "__main__":
     test_standard_9_8_suite("Boy", "FEMALE", "MALE", "MASCULINE")
     test_standard_9_8_suite("Girl", "MALE", "FEMALE", "FEMININE")
     test_standard_9_10_suite()
-    print("\n Wszystkie testy jednostkowe i integracyjne (223/223) zakończone pełnym sukcesem!\n")
+    test_standard_10_0_suite()
+    print("\n Wszystkie testy jednostkowe i integracyjne (224/224) zakończone pełnym sukcesem!\n")

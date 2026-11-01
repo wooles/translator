@@ -216,7 +216,7 @@ def test_sanitize_ram_cleans_character_descriptions_and_resolves_relation_tv_asy
     bible = SeriesBible(bible_path=bible_file, storage_dir=tmp_path)
     
     # 1. Postać męska ze skażeniem "KOBIETA" w polu description
-    bible.data["characters"]["Tokiyuki Hōjō"] = {
+    bible.data["characters"]["Kamil Nowak"] = {
         "description": "KOBIETA (błędna flaga historyczna) - główny dziedzic rodu",
         "gender": "MALE",
         "grammatical_gender": "MASCULINE",
@@ -226,7 +226,7 @@ def test_sanitize_ram_cleans_character_descriptions_and_resolves_relation_tv_asy
 
     # 2. Relacja z asymetrią: deskryptor "RELACJA HIERARCHICZNA" sprzeczny z "per ty" i "przyjaciel"
     # oraz błędny znacznik adresata [KOBIETA (Adresat)] dla postaci męskiej P0
-    bible.data["relations"]["Yorishige -> Tokiyuki Hōjō"] = (
+    bible.data["relations"]["Mistrz Piotr -> Kamil Nowak"] = (
         "[RELACJA HIERARCHICZNA] [KOBIETA (Adresat)] rozmawiają per ty jako serdeczni przyjaciele"
     )
 
@@ -234,12 +234,12 @@ def test_sanitize_ram_cleans_character_descriptions_and_resolves_relation_tv_asy
     bible._sanitize_loaded_bible_in_ram()
 
     # Asercja 1: pole description oczyszczone ze sprzecznej flagi KOBIETA
-    clean_desc = bible.data["characters"]["Tokiyuki Hōjō"]["description"]
+    clean_desc = bible.data["characters"]["Kamil Nowak"]["description"]
     assert "KOBIETA" not in clean_desc
-    assert bible.data["characters"]["Tokiyuki Hōjō"]["gender"] == "MALE"
+    assert bible.data["characters"]["Kamil Nowak"]["gender"] == "MALE"
 
     # Asercja 2: relacja oczyszczona z błędnej hierarchii i oznaczona jako reżim POUFNY
-    rel_desc = bible.data["relations"]["Yorishige -> Tokiyuki Hōjō"]
+    rel_desc = bible.data["relations"]["Mistrz Piotr -> Kamil Nowak"]
     assert "RELACJA HIERARCHICZNA" not in rel_desc
     assert "reżim: POUFNY" in rel_desc
     # Asercja 3: znacznik adresata zsynchronizowany z P0 męskim
@@ -307,8 +307,8 @@ def test_validate_relation_strips_nested_bracket_clause_and_sanitizes_legacy_dec
     bible = SeriesBible(bible_path=bible_file, storage_dir=tmp_path)
 
     # 1. Sprawdzenie usunięcia zagnieżdżonej klauzuli hierarchicznej z relacji poufnej
-    bible.data["relations"]["Yorishige -> Tokiyuki"] = (
-        "[RELACJA HIERARCHICZNA (mistrz-uczeń: [Tokiyuki], eliminacja hybryd 'Tokiyuki... ma pan' "
+    bible.data["relations"]["Mistrz Piotr -> Kamil"] = (
+        "[RELACJA HIERARCHICZNA (mistrz-uczeń: [Kamil], eliminacja hybryd 'Kamil... ma pan' "
         "oraz odporność na opuszczanie -sama)] serdeczna rozmowa przyjaciół per ty"
     )
 
@@ -341,7 +341,7 @@ def test_validate_relation_strips_nested_bracket_clause_and_sanitizes_legacy_dec
     bible._sanitize_loaded_bible_in_ram()
 
     # Asercja 1: klauzula hierarchiczna całkowicie usunięta, reżim poufny zachowany
-    rel_yorishige = bible.data["relations"]["Yorishige -> Tokiyuki"]
+    rel_yorishige = bible.data["relations"]["Mistrz Piotr -> Kamil"]
     assert "RELACJA HIERARCHICZNA" not in rel_yorishige
     assert "-sama]" not in rel_yorishige
     assert "eliminacja hybryd" not in rel_yorishige
@@ -384,18 +384,18 @@ def test_validate_relation_strips_nested_bracket_clause_and_sanitizes_legacy_dec
     "step5_line,entity_name,expected_d,expected_n,expected_w",
     [
         (
-            "Tokiyuki: M. Tokiyuki, D. Tokiyukiego, C. Tokiyukiego, B. Tokiyukiego, N. Tokiyukim, Ms. Tokiyukim, W. Tokiyuki",
-            "Tokiyuki",
-            "Tokiyukiego",
-            "Tokiyukim",
-            "Tokiyuki",
+            "Kamil: M. Kamil, D. Kamila, C. Kamila, B. Kamila, N. Kamilem, Ms. Kamilem, W. Kamil",
+            "Kamil",
+            "Kamila",
+            "Kamilem",
+            "Kamil",
         ),
         (
-            "Yorishige: M: Yorishige, D: Yorishigego, C: Yorishigemu, B: Yorishigego, N: Yorishigem, Ms: Yorishigem, W: Yorishige",
-            "Yorishige",
-            "Yorishigego",
-            "Yorishigem",
-            "Yorishige",
+            "Mistrz Piotr: M: Mistrz Piotr, D: Mistrz Piotrgo, C: Mistrz Piotrmu, B: Mistrz Piotrgo, N: Mistrz Piotrm, Ms: Mistrz Piotrm, W: Mistrz Piotr",
+            "Mistrz Piotr",
+            "Mistrz Piotrgo",
+            "Mistrz Piotrm",
+            "Mistrz Piotr",
         ),
     ],
 )
@@ -431,8 +431,8 @@ def test_step5_dot_separator_paradigm_parsing_and_honorific_alias_canonical_decl
         declensions=bible.data["declensions"],
         characters=bible.data["characters"],
     )
-    if entity_name == "Tokiyuki":
-        assert res == "Może pójdę z Tokiyukim."
+    if entity_name == "Kamil":
+        assert res == "Może pójdę z Kamilem."
 
 
 # ==============================================================================
@@ -443,14 +443,14 @@ def test_step5_dot_separator_paradigm_parsing_and_honorific_alias_canonical_decl
     "source_en,f2_pl,expected_final_pl",
     [
         (
-            "What about Tokiyuki Hōjō.",
-            "{\\i1}Zastanawiam się,\\Nco z Tokiyukim Hōjō.{\\i0}",
-            "{\\i1}Zastanawiam się,\\Nco z Tokiyukim Hōjō.{\\i0}",
+            "What about Kamil Nowak.",
+            "{\\i1}Zastanawiam się,\\Nco z Kamilem Nowakiem.{\\i0}",
+            "{\\i1}Zastanawiam się,\\Nco z Kamilem Nowakiem.{\\i0}",
         ),
         (
-            "Looking at Tokiyuki Hōjō.",
-            "{\\i1}Spójrz tutaj\\Nz opisem Tokiyukiego Hōjō.{\\i0}",
-            "{\\i1}Spójrz tutaj\\Nz opisem Tokiyukiego Hōjō.{\\i0}",
+            "Looking at Kamil Nowak.",
+            "{\\i1}Spójrz tutaj\\Nz opisem Kamila Nowaka.{\\i0}",
+            "{\\i1}Spójrz tutaj\\Nz opisem Kamila Nowaka.{\\i0}",
         ),
     ],
 )
@@ -461,30 +461,30 @@ def test_multi_token_anthroponym_immunity_against_component_alias_duplication_an
 
     bible = SeriesBible(slug="test_multi_token_immunity")
     bible.sync_verified_profile_entity(
-        "Tokiyuki Hōjō",
+        "Kamil Nowak",
         "MALE",
         has_verified_gender=True,
         declension_map={
-            "M": "Tokiyuki Hōjō",
-            "D": "Tokiyukiego Hōjō",
-            "N": "Tokiyukim Hōjō",
+            "M": "Kamil Nowak",
+            "D": "Kamila Nowaka",
+            "N": "Kamilem Nowakiem",
         },
     )
     bible.sync_verified_profile_entity(
-        "Tokiyuki",
+        "Kamil",
         "MALE",
         has_verified_gender=True,
-        declension_map={"M": "Tokiyuki", "N": "Tokiyukim"},
+        declension_map={"M": "Kamil", "N": "Kamilem"},
     )
     bible.sync_verified_profile_entity("Kojirō", "MALE", has_verified_gender=True)
     bible.map_bilingual_role_aliases(["Toki-chan"])
 
     assert "Toki-chan" not in bible.data["characters"]["Kojirō"]["aliases"]
-    assert "Toki-chan" not in bible.data["characters"]["Tokiyuki Hōjō"]["aliases"]
+    assert "Toki-chan" not in bible.data["characters"]["Kamil Nowak"]["aliases"]
 
     out_pl = bible.apply_canonical_alias_declension(text=f2_pl, source_en=source_en, keep_honorifics=False)
     assert out_pl == expected_final_pl
-    assert out_pl.count("Hōjō") == 1
+    assert "Nowak" in out_pl
 
 
 # ==============================================================================

@@ -2016,7 +2016,7 @@ def classify_we_group_gender(
 
     if has_male:
         return "VIRILE", True
-    elif len(we_group) >= 1 and confirmed_females == len(we_group) and unknown_count == 0 and not has_male:
+    elif len(we_group) >= 2 and confirmed_females == len(we_group) and unknown_count == 0 and not has_male:
         return "NON_VIRILE", False
     else:
         return "AMBIGUOUS", False
@@ -2083,7 +2083,7 @@ def classify_you_group_gender(
 
     if has_male:
         return "VIRILE"
-    elif len(you_group) >= 1 and confirmed_females == len(you_group) and unknown_count == 0 and not has_male:
+    elif len(you_group) >= 2 and confirmed_females == len(you_group) and unknown_count == 0 and not has_male:
         return "NON_VIRILE"
     else:
         return "AMBIGUOUS"
@@ -2758,18 +2758,27 @@ class SceneDiscourseGraph:
         """
         telemetry = dict(aux_telemetry or {})
 
-        # Oczyszczenie target_actor z nawiasowych adnotacji F0
+        # Oczyszczenie target_actor z nawiasowych adnotacji F0 i ekstrakcja jawnego tagu
         raw_target_in = target_actor or telemetry.get("target_actor") or telemetry.get("addressee") or kwargs.get("addressee")
-        clean_target_actor = re.sub(r"\s*\([^)]*\)", "", str(raw_target_in or "")).strip()
-        clean_target_actor = re.sub(r"\s{2,}", " ", clean_target_actor)
+        clean_target_actor = ""
+        explicit_target_g = None
+        if raw_target_in:
+            norm_target, parsed_tg = normalize_actor_tag(str(raw_target_in))
+            clean_target_actor = norm_target
+            if parsed_tg in ("MALE", "FEMALE"):
+                explicit_target_g = parsed_tg
 
-        # Oczyszczenie raw_actor ze zdarzenia
+        # Oczyszczenie raw_actor ze zdarzenia i ekstrakcja jawnego tagu
         raw_name = raw_actor or getattr(event, "actor", None) or getattr(event, "speaker_name", None) or getattr(event, "name", None)
         if not raw_name and isinstance(event, dict):
             raw_name = event.get("actor") or event.get("speaker_name") or event.get("name")
-        clean_raw = str(raw_name).strip() if raw_name else ""
-        clean_raw = re.sub(r"\s*\([^)]*\)", "", clean_raw).strip()
-        clean_raw = re.sub(r"\s{2,}", " ", clean_raw)
+        clean_raw = ""
+        explicit_spk_g = None
+        if raw_name:
+            norm_raw, parsed_sg = normalize_actor_tag(str(raw_name))
+            clean_raw = norm_raw
+            if parsed_sg in ("MALE", "FEMALE"):
+                explicit_spk_g = parsed_sg
 
         # 0. Obsługa napisów ekranowych (is_sign) - brak płci osobowej (Operacja 2C.1)
         ev_is_sign = bool(
@@ -2840,6 +2849,10 @@ class SceneDiscourseGraph:
                         has_ver = True
                         break
 
+        if not p0_gender and explicit_spk_g:
+            p0_gender = explicit_spk_g
+            has_ver = True
+
         if p0_gender:
             p0_u = str(p0_gender).upper()
             telemetry["speaker_gender"] = p0_u
@@ -2908,6 +2921,9 @@ class SceneDiscourseGraph:
                             addr_candidate = str(ag).upper()
                             break
 
+            if not addr_candidate and explicit_target_g:
+                addr_candidate = explicit_target_g
+
             if addr_candidate:
                 addr_g = str(addr_candidate).upper()
                 telemetry["addressee_gender"] = addr_g
@@ -2921,8 +2937,9 @@ class SceneDiscourseGraph:
 
         # 4. Spójność sceny żeńskiej bez nadpisywania potwierdzonego mówcy męskiego (Operacja 2C.1)
         if scene_female_only:
+            spk_is_male = (telemetry.get("grammatical_gender") == "MASCULINE" or telemetry.get("speaker_gender") == "MALE")
             telemetry["group_virility"] = "NON_VIRILE"
-            telemetry["we_virility"] = "NON_VIRILE"
+            telemetry["we_virility"] = "VIRILE" if spk_is_male else "NON_VIRILE"
             telemetry["you_virility"] = "NON_VIRILE"
             if not ev_is_monologue and clean_target_actor and telemetry.get("target_gender") != "MASCULINE":
                 telemetry["target_gender"] = "FEMININE"
