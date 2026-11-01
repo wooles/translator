@@ -216,7 +216,7 @@ def test_sanitize_ram_cleans_character_descriptions_and_resolves_relation_tv_asy
     bible = SeriesBible(bible_path=bible_file, storage_dir=tmp_path)
     
     # 1. Postać męska ze skażeniem "KOBIETA" w polu description
-    bible.data["characters"]["Kamil Nowak"] = {
+    bible.data["characters"]["HeroAlpha SurnameBeta"] = {
         "description": "KOBIETA (błędna flaga historyczna) - główny dziedzic rodu",
         "gender": "MALE",
         "grammatical_gender": "MASCULINE",
@@ -226,7 +226,7 @@ def test_sanitize_ram_cleans_character_descriptions_and_resolves_relation_tv_asy
 
     # 2. Relacja z asymetrią: deskryptor "RELACJA HIERARCHICZNA" sprzeczny z "per ty" i "przyjaciel"
     # oraz błędny znacznik adresata [KOBIETA (Adresat)] dla postaci męskiej P0
-    bible.data["relations"]["Mistrz Piotr -> Kamil Nowak"] = (
+    bible.data["relations"]["MasterGamma -> HeroAlpha SurnameBeta"] = (
         "[RELACJA HIERARCHICZNA] [KOBIETA (Adresat)] rozmawiają per ty jako serdeczni przyjaciele"
     )
 
@@ -234,12 +234,12 @@ def test_sanitize_ram_cleans_character_descriptions_and_resolves_relation_tv_asy
     bible._sanitize_loaded_bible_in_ram()
 
     # Asercja 1: pole description oczyszczone ze sprzecznej flagi KOBIETA
-    clean_desc = bible.data["characters"]["Kamil Nowak"]["description"]
+    clean_desc = bible.data["characters"]["HeroAlpha SurnameBeta"]["description"]
     assert "KOBIETA" not in clean_desc
-    assert bible.data["characters"]["Kamil Nowak"]["gender"] == "MALE"
+    assert bible.data["characters"]["HeroAlpha SurnameBeta"]["gender"] == "MALE"
 
     # Asercja 2: relacja oczyszczona z błędnej hierarchii i oznaczona jako reżim POUFNY
-    rel_desc = bible.data["relations"]["Mistrz Piotr -> Kamil Nowak"]
+    rel_desc = bible.data["relations"]["MasterGamma -> HeroAlpha SurnameBeta"]
     assert "RELACJA HIERARCHICZNA" not in rel_desc
     assert "reżim: POUFNY" in rel_desc
     # Asercja 3: znacznik adresata zsynchronizowany z P0 męskim
@@ -307,8 +307,8 @@ def test_validate_relation_strips_nested_bracket_clause_and_sanitizes_legacy_dec
     bible = SeriesBible(bible_path=bible_file, storage_dir=tmp_path)
 
     # 1. Sprawdzenie usunięcia zagnieżdżonej klauzuli hierarchicznej z relacji poufnej
-    bible.data["relations"]["Mistrz Piotr -> Kamil"] = (
-        "[RELACJA HIERARCHICZNA (mistrz-uczeń: [Kamil], eliminacja hybryd 'Kamil... ma pan' "
+    bible.data["relations"]["MasterGamma -> HeroAlpha"] = (
+        "[RELACJA HIERARCHICZNA (mistrz-uczeń: [HeroAlpha], eliminacja hybryd 'HeroAlpha... ma pan' "
         "oraz odporność na opuszczanie -sama)] serdeczna rozmowa przyjaciół per ty"
     )
 
@@ -341,7 +341,7 @@ def test_validate_relation_strips_nested_bracket_clause_and_sanitizes_legacy_dec
     bible._sanitize_loaded_bible_in_ram()
 
     # Asercja 1: klauzula hierarchiczna całkowicie usunięta, reżim poufny zachowany
-    rel_yorishige = bible.data["relations"]["Mistrz Piotr -> Kamil"]
+    rel_yorishige = bible.data["relations"]["MasterGamma -> HeroAlpha"]
     assert "RELACJA HIERARCHICZNA" not in rel_yorishige
     assert "-sama]" not in rel_yorishige
     assert "eliminacja hybryd" not in rel_yorishige
@@ -384,18 +384,18 @@ def test_validate_relation_strips_nested_bracket_clause_and_sanitizes_legacy_dec
     "step5_line,entity_name,expected_d,expected_n,expected_w",
     [
         (
-            "Kamil: M. Kamil, D. Kamila, C. Kamila, B. Kamila, N. Kamilem, Ms. Kamilem, W. Kamil",
-            "Kamil",
-            "Kamila",
-            "Kamilem",
-            "Kamil",
+            "HeroAlphon: M. HeroAlphon, D. HeroAlphona, C. HeroAlphona, B. HeroAlphona, N. HeroAlphonem, Ms. HeroAlphonie, W. HeroAlphon",
+            "HeroAlphon",
+            "HeroAlphona",
+            "HeroAlphonem",
+            "HeroAlphon",
         ),
         (
-            "Mistrz Piotr: M: Mistrz Piotr, D: Mistrz Piotrgo, C: Mistrz Piotrmu, B: Mistrz Piotrgo, N: Mistrz Piotrm, Ms: Mistrz Piotrm, W: Mistrz Piotr",
-            "Mistrz Piotr",
-            "Mistrz Piotrgo",
-            "Mistrz Piotrm",
-            "Mistrz Piotr",
+            "MasterGamma: M: MasterGamma, D: MasterGammago, C: MasterGammamu, B: MasterGammago, N: MasterGammam, Ms: MasterGammam, W: MasterGamma",
+            "MasterGamma",
+            "MasterGammago",
+            "MasterGammam",
+            "MasterGamma",
         ),
     ],
 )
@@ -431,8 +431,8 @@ def test_step5_dot_separator_paradigm_parsing_and_honorific_alias_canonical_decl
         declensions=bible.data["declensions"],
         characters=bible.data["characters"],
     )
-    if entity_name == "Kamil":
-        assert res == "Może pójdę z Kamilem."
+    if entity_name == "HeroAlphon":
+        assert res == "Może pójdę z HeroAlphonem."
 
 
 # ==============================================================================
@@ -658,4 +658,111 @@ def test_terminology_alias_propagates_female_gender(dict_key):
     assert bible.data["characters"]["Chulan"]["gender"] == "FEMALE"
     assert bible.data["declensions"]["Chulan"]["gender"] == "FEMALE"
 
+# ==============================================================================
+# STANDARD 10.0.2 REGRESSION TESTS (A-01, A-02, A-04, A-13)
+# ==============================================================================
 
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "constant_attr,forbidden_terms",
+    [
+        ("CANONICAL_MALE_NAMES", {"hyouken", "sasaki", "clevatess", "pii", "peeps", "ray", "alicia"}),
+        ("UNIVERSAL_FEMALE_NAMES_ON_A", {"hyouken", "sasaki", "clevatess", "amelia", "rebecca", "lydia"}),
+        ("FEMALE_LEXICON_NAMES", {"hyouken", "sasaki", "clevatess", "amelia", "rebecca", "lydia"}),
+        ("FOREIGN_FEMALE_CONSONANT_NAMES", {"hyouken", "sasaki", "clevatess", "carol", "ariane"}),
+    ],
+)
+def test_onomastic_lists_purity(constant_attr, forbidden_terms):
+    import series_memory
+    items = getattr(series_memory, constant_attr, None)
+    assert items is not None, f"Constant {constant_attr} not found"
+    items_lower = {str(x).lower() for x in items}
+    intersection = items_lower & forbidden_terms
+    assert not intersection, f"Forbidden anime literals found in {constant_attr}: {intersection}"
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "forbidden_term",
+    ["hyouken", "sasaki", "clevatess", "pii", "peeps", "alicia", "lydia", "rebecca"],
+)
+def test_typo_normalizations_clean(forbidden_term):
+    import series_memory
+    typos = getattr(series_memory, "TYPO_NORMALIZATIONS", [])
+    for item in typos:
+        pat = item[0] if isinstance(item, (list, tuple)) else str(item)
+        assert forbidden_term not in pat.lower(), f"Forbidden term {forbidden_term} in typo pattern {pat}"
+        assert not pat.startswith("chr("), f"Obfuscation in {pat}"
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "raw_phrase,expected_sanitized",
+    [
+        ("chłopak z Kamakury", "chłopak z Kamakury"),
+        ("zbieg z Suwy", "zbieg z Suwy"),
+        ("uczeń z Minervy", "uczeń z Minervy"),
+        ("rycerz z Królestwa Boelate", "rycerz z Królestwa Boelate"),
+    ],
+)
+def test_toponyms_zero_literal(raw_phrase, expected_sanitized):
+    from series_memory import sanitize_toponymic_origin_and_companionship, _BASE_KNOWN_FANTASY_TOPONYMS
+    forbidden = {"kamakura", "shinano", "suwa", "kioto", "motomachi", "mihara", "ohshima", "hiden", "elbe", "hyderat", "ridill", "minerva", "felm", "carnelian"}
+    assert not (set(_BASE_KNOWN_FANTASY_TOPONYMS) & forbidden)
+    with open("avt_linter.py", encoding="utf-8") as f:
+        linter_src = f.read().lower()
+    for term in forbidden:
+        assert f"'{term}'" not in linter_src and f'"{term}"' not in linter_src
+    out = sanitize_toponymic_origin_and_companionship(raw_phrase)
+    assert out == expected_sanitized
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "rel_raw,expected_clean_rel",
+    [
+        (
+            "Zwrot: 'Rayu' [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [reżim: FORMALNY]",
+            "Zwrot: 'Rayu' [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
+        ),
+        (
+            "Zwrot: 'Amelio' [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
+            "Zwrot: 'Amelio' [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie']",
+        ),
+    ],
+)
+def test_bible_five_anomalies_sanitized(rel_raw, expected_clean_rel, tmp_path):
+    from series_memory import SeriesBible
+    bible = SeriesBible(slug="test_bible_anom", db_path=":memory:")
+    bible.data = {
+        "characters": {
+            "Soldiers": {"description": "żołnierze", "gender": "UNKNOWN"},
+            "Crowd": {"description": "tłum", "gender": "UNKNOWN"},
+            "FemaleHero SharedSurname": {"gender": "FEMALE", "aliases": ["SharedSurname", "Heroine"]},
+            "MaleHero SharedSurname": {"gender": "MALE", "aliases": ["SharedSurname", "Hero"]},
+            "Abbie Foreign": {"gender": "FEMALE", "aliases": ["Abbie"]},
+        },
+        "declensions": {
+            "Abbie Foreign": {"M": "Abbie Foreign", "D": "Abbie Foreigna", "N": "Abbie Foreignem", "gender": "FEMALE"},
+        },
+        "entity_categories": {
+            "Seven Grand Sorcerers": "CHREMATONYM"
+        },
+        "relations": {
+            "A -> B": rel_raw
+        },
+        "relationships": {
+            "A -> B": rel_raw
+        }
+    }
+    bible._sanitize_loaded_bible_in_ram()
+    chars = bible.data["characters"]
+    assert "Soldiers" not in chars
+    assert "Crowd" not in chars
+    assert "SharedSurname" not in chars["FemaleHero SharedSurname"]["aliases"]
+    assert "SharedSurname" not in chars["MaleHero SharedSurname"]["aliases"]
+    assert bible.data["declensions"]["Abbie Foreign"]["D"] == "Abbie Foreign"
+    assert bible.data["declensions"]["Abbie Foreign"]["N"] == "Abbie Foreign"
+    assert bible.data["entity_categories"]["Seven Grand Sorcerers"] == "CHREMATONYM"
+    assert bible.data["relations"]["A -> B"] == expected_clean_rel

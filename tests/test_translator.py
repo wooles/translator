@@ -52,7 +52,7 @@ def test_phase1_monologue_prompt_emission():
     """
     from translator import MultimodalTranslator
     ev = pysubs2.SSAEvent(start=1000, end=3000, text="I escaped from the pursuers!", style="Italics")
-    ev.name = "Kamil Nowak"
+    ev.name = "HeroAlpha SurnameBeta"
 
     translator = MultimodalTranslator.__new__(MultimodalTranslator)
     translator.character_registry = {}

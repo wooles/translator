@@ -1649,7 +1649,9 @@ INSTITUTIONAL_SUFFIXES: Tuple[str, ...] = ("stwo", "ctwo", "sko")
 
 ORIGIN_GROUP_NOUNS_PATTERN: str = (
     r"(?:ludzie|ci|tamci|agenci|pracownicy|oddział|oddziały|goście|koledzy|szef|"
-    r"żołnierze|rycerze|wojska|posłowie|przybysze|wojownicy|armia|zbieg|uciekinierzy)"
+    r"żołnierze|żołnierz|rycerze|rycerz|wojska|posłowie|posłaniec|przybysze|wojownicy|armia|"
+    r"zbieg|uciekinierzy|ucieczka|chłopak[a-ząćęłńóśźż]*|dziewczyn[a-ząćęłńóśźż]*|"
+    r"ucze[ńn][a-ząćęłńóśźż]*|uczennic[a-ząćęłńóśźż]*|akademia|wieści|wieść)"
 )
 
 ABLATIVE_MOTION_VERBS_PATTERN: str = (
@@ -4200,18 +4202,6 @@ def sanitize_toponymic_origin_and_companionship(text: str, custom_glossary: Opti
             inf = f"{re.escape(top_cap)}em"
         res = _fix_toponym_companionship(res, inf, top_cap)
 
-    # Specific phonetic transliterations
-    res = _fix_toponym_companionship(res, "Haidenem|Hidenem", "Hiden")
-    # Toponym companionship dynamically resolved from KNOWN_FANTASY_TOPONYMS and custom_glossary
-    res = _fix_toponym_companionship(res, "Haideratem|Heideratem", "Hyderatu")
-    res = _fix_toponym_companionship(res, "Kanyouem|Kanyōem", "Kanyou")
-    res = _fix_toponym_companionship(res, "Kantanem", "Kantan")
-    res = _fix_toponym_companionship(res, "Ridillem", "Ridill")
-    res = _fix_toponym_companionship(res, "Missianem", "Missian")
-    res = _fix_toponym_companionship(res, "Coumeirem", "Coumeire")
-    res = _fix_toponym_companionship(res, "Torbequistem", "Torbequista")
-    res = _fix_toponym_companionship(res, "Summerforthem", "Summerforth")
-
     # 1b. False Instrumental of origin for feminine-like toponyms and entities in origin contexts
     def _repl_origin_feminine_inst(m):
         prefix_lead = m.group(1) or ""
@@ -4229,7 +4219,7 @@ def sanitize_toponymic_origin_and_companionship(text: str, custom_glossary: Opti
         return m.group(0)
 
     pat_origin_fem = rf"(^|\\[Nnh]|[^\w])({ORIGIN_GROUP_NOUNS_PATTERN}|{ABLATIVE_MOTION_VERBS_PATTERN})((?:\s|\\[Nnh])+)([Zz])(?:e)?((?:\s|\\[Nnh])+)([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+ą)\b"
-    res = re.sub(pat_origin_fem, _repl_origin_feminine_inst, res)
+    res = re.sub(pat_origin_fem, _repl_origin_feminine_inst, res, flags=re.IGNORECASE)
 
     # 1b-2. False Instrumental of origin for institutional nouns after z
     INSTITUTION_GENITIVE_MAP = {
@@ -4244,10 +4234,6 @@ def sanitize_toponymic_origin_and_companionship(text: str, custom_glossary: Opti
     for bad_inst, good_inst in INSTITUTION_GENITIVE_MAP.items():
         pat_inst = rf"(^|\\[Nnh]|[^\w])({ORIGIN_GROUP_NOUNS_PATTERN}|{ABLATIVE_MOTION_VERBS_PATTERN})((?:\s|\\[Nnh])+)([Zz])(?:e)?((?:\s|\\[Nnh])+){bad_inst}\b"
         res = re.sub(pat_inst, rf"\g<1>\g<2>\g<3>\g<4>\g<5>{good_inst}", res, flags=re.IGNORECASE)
-
-    res = re.sub(r"(^|\\[Nnh]|[^\w])(pochodzi[a-ząćęłńóśźż]*|zbieg[a-ząćęłńóśźż]*|wieści|wieść|posłaniec|ucieczka|uciekł[a-ząćęłńóśźż]*|rycerz[a-ząćęłńóśźż]*|chłopak[a-ząćęłńóśźż]*|dziewczyn[a-ząćęłńóśźż]*)((?:\s|\\[Nnh])+)([Zz])(?:e)?((?:\s|\\[Nnh])+)Kamakurą\b", r"\g<1>\g<2>\g<3>\g<4>\g<5>Kamakury", res, flags=re.IGNORECASE)
-    res = re.sub(r"(^|\\[Nnh]|[^\w])(pochodzi[a-ząćęłńóśźż]*|zbieg[a-ząćęłńóśźż]*|wieści|wieść|posłaniec|ucieczka|uciekł[a-ząćęłńóśźż]*|rycerz[a-ząćęłńóśźż]*|chłopak[a-ząćęłńóśźż]*|dziewczyn[a-ząćęłńóśźż]*)((?:\s|\\[Nnh])+)([Zz])(?:e)?((?:\s|\\[Nnh])+)Suwą\b", r"\g<1>\g<2>\g<3>\g<4>\g<5>Suwy", res, flags=re.IGNORECASE)
-    res = re.sub(r"(^|\\[Nnh]|[^\w])(pochodzi[a-ząćęłńóśźż]*|uczeń|uczennica|uczniowie|akademia)((?:\s|\\[Nnh])+)([Zz])(?:e)?((?:\s|\\[Nnh])+)Minervą\b", r"\g<1>\g<2>\g<3>\g<4>\g<5>Minervy", res, flags=re.IGNORECASE)
 
     # 1c. False Instrumental of origin for realms preceded by origin / collective demonstratives
     DEMONSTRATIVE_ORIGIN_NOUNS = r"(ci|tamci|oni|ten|ta|to|ludzie|żołnierze|wojska|oddział|oddziały|armia|wojownicy|posłaniec|uciekinierzy|zbieg|pochodzi[a-ząćęłńóśźż]*|przybył[a-ząćęłńóśźż]*|wrócił[a-ząćęłńóśźż]*)"
@@ -4264,7 +4250,7 @@ def sanitize_toponymic_origin_and_companionship(text: str, custom_glossary: Opti
 
     # Dynamic integration of custom_glossary and fantasy toponyms
     if custom_glossary and isinstance(custom_glossary, dict):
-        TOPONYM_KEYWORDS = {"kraina", "prowincja", "domena", "królestwo", "cesarstwo", "miasto", "zamek", "okręg", "district", "province", "domain", "kingdom", "empire", "realm", "toponim", "miejsce", "twierdza"}
+        TOPONYM_KEYWORDS = {"kraina", "prowincja", "domena", "królestwo", "cesarstwo", "miasto", "zamek", "okręg", "district", "province", "domain", "kingdom", "empire", "realm", "toponim", "miejsce", "twierdza", "stolica"}
         for k, v in custom_glossary.items():
             k_clean = str(k).strip()
             v_clean = str(v).strip()
@@ -4276,24 +4262,30 @@ def sanitize_toponymic_origin_and_companionship(text: str, custom_glossary: Opti
                 any(kw in v_lower for kw in TOPONYM_KEYWORDS) or
                 any(kw in k_lower for kw in TOPONYM_KEYWORDS)
             )
-            if is_toponym and len(v_clean) >= 3 and v_clean[0].isupper():
-                cand_target = v_clean.split()[0]
-                if cand_target.endswith("e"):
-                    stem = cand_target[:-1]
-                    res = _fix_toponym_companionship(res, f"{re.escape(cand_target)}m|{re.escape(stem)}em|{re.escape(cand_target)}rem|{re.escape(cand_target)}tem", cand_target)
-                else:
-                    res = _fix_toponym_companionship(res, f"{re.escape(cand_target)}em", cand_target)
-
-    # 2. Canonical toponym transliteration normalization after prepositions (z, do, w, o) or in realm names
-    res = re.sub(r"\b([ZzWwOo]|do|dla|ku|przez|od)\s+Haiden\b", r"\g<1> Hiden", res)
-    res = re.sub(r"\b([ZzWwOo]|do|dla|ku|przez|od)\s+Haiderat\b", r"\g<1> Hyderat", res)
-
-    # 3. Specific compound realm constructions
-    res = re.sub(r"\b([Kk]rólestw[a-ząćęłńóśźż]*|[Cc]esarstw[a-ząćęłńóśźż]*|[Kk]rain[a-ząćęłńóśźż]*)\s+Haiden\b", r"\g<1> Hiden", res)
-
-    # 4. Canonical qualification of relics/titles and modifier hyper-inflection protection:
-    res = re.sub(r"\b([Zz]\s+[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+ą)\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+)em\b", r"\g<1> \g<2>a", res)
-    res = re.sub(r"\b([Zz]\s+[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+ą)\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+a)\s+([Zz]\s+)(?:Haidenem|Hidenem|Haiden)\b", r"\g<1> \g<2> \g<3>Hiden", res)
+            if is_toponym and len(v_clean) >= 3:
+                v_words = [w for w in re.split(r"[\s();,]+", v_clean) if w and w[0].isupper() and w.lower() not in {"królestwo", "cesarstwo", "kraina", "księstwo", "miasto", "zamek"}]
+                cand_target = v_words[0] if v_words else v_clean.split()[0]
+                if cand_target:
+                    targets = [cand_target]
+                    if k_clean and len(k_clean) >= 3 and k_clean != cand_target:
+                        k_words = [w for w in re.split(r"[\s();,]+", k_clean) if w and w[0].isupper() and w.lower() not in {"kingdom", "empire", "realm", "province", "city"}]
+                        k_base = k_words[0] if k_words else k_clean
+                        targets.append(k_base)
+                    pats = []
+                    for t in targets:
+                        if t.endswith("e"):
+                            stem = t[:-1]
+                            pats.append(f"{re.escape(t)}m|{re.escape(stem)}em|{re.escape(t)}rem|{re.escape(t)}tem")
+                        else:
+                            pats.append(f"{re.escape(t)}em")
+                    inf_pat = "|".join(pats)
+                    res = _fix_toponym_companionship(res, inf_pat, cand_target)
+                    for t in targets:
+                        if t != cand_target:
+                            res = re.sub(rf"\b([ZzWwOo]|do|dla|ku|przez|od)\s+{re.escape(t)}\b", rf"\g<1> {cand_target}", res)
+                            res = re.sub(rf"\b([Kk]rólestw[a-ząćęłńóśźż]*|[Cc]esarstw[a-ząćęłńóśźż]*|[Kk]rain[a-ząćęłńóśźż]*)\s+{re.escape(t)}\b", rf"\g<1> {cand_target}", res)
+                    relic_pat = "|".join([re.escape(t) for t in targets])
+                    res = re.sub(rf"\b([Zz]\s+[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+ą)\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+a)\s+([Zz]\s+)(?:{relic_pat})(?:em)?\b", rf"\g<1> \g<2> \g<3>{cand_target}", res)
     res = re.sub(
         r"\b([Zz]\s+)([Kk]sięga|[Tt]arcza|[Dd]olina|[Pp]ieczęć)\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+a)\b",
         lambda m: f"{m.group(1)}{m.group(2)[:-1] + 'ą' if m.group(2).endswith('a') else m.group(2)} {m.group(3)}",
@@ -7052,8 +7044,13 @@ class SeriesBible:
                 new_desc = desc_str
                 # Czyszczenie ewentualnych osieroconych fragmentów po dawnych uszkodzeniach regexu
                 if "-sama" in new_desc.lower():
-                    new_desc = re.sub(r"',?\s*eliminacja hybryd.*?-sama\s*\]?\)?\]?", "", new_desc, flags=re.IGNORECASE).strip()
-                new_desc = re.sub(r"',?\s*eliminacja hybryd[^]]*\]", "", new_desc, flags=re.IGNORECASE).strip()
+                    new_desc = re.sub(r"',?\s*(?:eliminacja|z[a]kaz)\s+hybryd.*?-sama\s*\]?\)?\]?", "", new_desc, flags=re.IGNORECASE).strip()
+                new_desc = re.sub(r"',?\s*(?:eliminacja|z[a]kaz)\s+hybryd[^]]*\]", "", new_desc, flags=re.IGNORECASE).strip()
+                new_desc = re.sub(r",?\s*(?:eliminacja|z[a]kaz)\s+hybryd[^]]*\]?", "", new_desc, flags=re.IGNORECASE).strip()
+                new_desc = re.sub(r",?\s*wykluczona forma\s+'[^']*'\s*\([^)]*\)\s*\]?", "]", new_desc, flags=re.IGNORECASE).strip()
+                new_desc = re.sub(r"\]\s*'", "]", new_desc).strip()
+                new_desc = re.sub(r"'\s*,", ",", new_desc).strip()
+                new_desc = re.sub(r"\s+", " ", new_desc).strip()
                 if is_informal and is_hierarchical:
                     # Standard 9.5 (Operacja 2C.4): Dopasowanie pełnego bloku klauzuli hierarchicznej z zagnieżdżonym [Imię] aż do -sama]
                     if "-sama" in new_desc.lower():

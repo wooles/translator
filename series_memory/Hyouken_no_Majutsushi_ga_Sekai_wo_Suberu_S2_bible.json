@@ -1,5 +1,5 @@
 {
-  "anime_title": "Hyouken no Majutsushi ga Sekai wo Suberu S2",
+  "anime_title": "Hyouken_no_Majutsushi_ga_Sekai_wo_Suberu_S2",
   "characters": {
     "Ray White": {
       "name": "Ray White",
@@ -382,19 +382,6 @@
       ],
       "entity_category": "ANTHROPONYM"
     },
-    "Waitress": {
-      "name": "Waitress",
-      "gender": "FEMALE",
-      "grammatical_gender": "FEMININE",
-      "confidence": 0.95,
-      "priority": "P0",
-      "has_verified_gender": true,
-      "aliases": [
-        "Waitress"
-      ],
-      "description": "Postać drugoplanowa",
-      "entity_category": "ANTHROPONYM"
-    },
     "Pukkapuka": {
       "description": "Postać epizodyczna / tło",
       "gender": "UNKNOWN",
@@ -432,23 +419,6 @@
       ],
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
       "entity_category": "ANTHROPONYM"
-    },
-    "Seven Grand Sorcerers": {
-      "name": "Seven Grand Sorcerers",
-      "gender": "MALE",
-      "grammatical_gender": "MASCULINE",
-      "role": "postać wspominana",
-      "description": "Siedmiu Wielkich Magów – elitarna grupa najpotężniejszych czarodziejów królestwa, do której w tajemnicy należy Ray (Mag Lodowego Ostrza).",
-      "confidence": 0.95,
-      "priority": "P0",
-      "has_verified_gender": true,
-      "aliases": [
-        "Grand",
-        "Seven",
-        "Seven Grand Sorcerers",
-        "Sorcerers"
-      ],
-      "entity_category": "ANTHROPONYM"
     }
   },
   "glossary": {
@@ -469,27 +439,27 @@
     "Ray White -> Amelia Rose": "Zwrot: 'na ty / po imieniu: Amelio / kadetko Amelio (w trybie musztry)' (przyjaciele z klasy / instruktor i rekrutka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: POUFNY]",
     "Amelia Rose -> Ray White": "Zwrot: 'na ty / po imieniu: Rayu' (bliska przyjaciółka / skryte uczucie) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: POUFNY]",
     "Ray White -> Ariane Olgren": "Zwrot: 'na ty / Ariane / kadetko Ariane Algren' (towarzysz z drużyny / surowy dowódca) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
-    "Ariane Olgren -> Ray White": "Zwrot: 'na ty / po imieniu: Rayu (z wojskowym respektem)' (podwładna w obozie / zafascynowana rywalka) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [reżim: FORMALNY]",
-    "Ray White -> Rebecca Bradley": "Zwrot: 'pani przewodnicząca / Rebecco-senpai (lub per starsza koleżanko)' (młodszy kolega z klubu -> starsza mentorka) ', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: FORMALNY]",
+    "Ariane Olgren -> Ray White": "Zwrot: 'na ty / po imieniu: Rayu (z wojskowym respektem)' (podwładna w obozie / zafascynowana rywalka) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
+    "Ray White -> Rebecca Bradley": "Zwrot: 'pani przewodnicząca / Rebecco-senpai (lub per starsza koleżanko)' (młodszy kolega z klubu -> starsza mentorka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: FORMALNY]",
     "Rebecca Bradley -> Ray White": "Zwrot: 'na ty / po imieniu: Rayu' (starsza koleżanka zakochana w młodszym koledze) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Ray White -> Lydia Ainsworth": "Zwrot: 'Mistrzyni / Shishou' (uczeń -> mistrzyni) ', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: FORMALNY]",
-    "Lydia Ainsworth -> Ray White": "Zwrot: 'na ty / Rayu' (mistrzyni -> uczeń) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [reżim: FORMALNY]",
-    "Rebecca Bradley -> Amelia Rose": "Zwrot: 'na ty / po imieniu: Amelio' (senpai -> kouhai / sojuszniczki w miłości) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
-    "Amelia Rose -> Rebecca Bradley": "Zwrot: 'panno Rebecco / przewodnicząca Rebecco' (kouhai -> senpai) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
-    "Amelia Rose -> Ariane Olgren": "Zwrot: 'Ariane (ty)' (Towarzyszki broni, bliskie przyjaciółki i zadeklarowane rywalki w miłości) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: POUFNY] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
+    "Ray White -> Lydia Ainsworth": "Zwrot: 'Mistrzyni / Shishou' (uczeń -> mistrzyni) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: FORMALNY]",
+    "Lydia Ainsworth -> Ray White": "Zwrot: 'na ty / Rayu' (mistrzyni -> uczeń) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
+    "Rebecca Bradley -> Amelia Rose": "Zwrot: 'na ty / po imieniu: Amelio' (senpai -> kouhai / sojuszniczki w miłości) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie']",
+    "Amelia Rose -> Rebecca Bradley": "Zwrot: 'panno Rebecco / przewodnicząca Rebecco' (kouhai -> senpai) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie']",
+    "Amelia Rose -> Ariane Olgren": "Zwrot: 'Ariane (ty)' (Towarzyszki broni, bliskie przyjaciółki i zadeklarowane rywalki w miłości) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: POUFNY] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie']",
     "Ray White -> Carol Caroline": "Zwrot: 'Carol (ty)' (Przyjaciele i sojusznicy; Ray traktuje ją z troską, Carol czuje rosnące zakłopotanie damsko-męskie) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: POUFNY]",
-    "Lydia Ainsworth -> Carol Caroline": "Zwrot: 'Różowy Pustaku' (Złośliwa, acz zażyła relacja koleżeńska) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: POUFNY] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
+    "Lydia Ainsworth -> Carol Caroline": "Zwrot: 'Różowy Pustaku' (Złośliwa, acz zażyła relacja koleżeńska) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: POUFNY] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie']",
     "Lucas Forst -> Ray White": "Zwrot: 'Rayu / ty' (Wzajemny głęboki szacunek utalentowanych szermierzy-magów) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
   },
   "relations": {
     "Ray White -> Amelia Rose": "Zwrot: 'na ty / po imieniu: Amelio / kadetko Amelio (w trybie musztry)' (przyjaciele z klasy / instruktor i rekrutka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: POUFNY]",
     "Amelia Rose -> Ray White": "Zwrot: 'na ty / po imieniu: Rayu' (bliska przyjaciółka / skryte uczucie) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: POUFNY]",
     "Ray White -> Ariane Olgren": "Zwrot: 'na ty / Ariane / kadetko Ariane Algren' (towarzysz z drużyny / surowy dowódca) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
-    "Ariane Olgren -> Ray White": "Zwrot: 'na ty / po imieniu: Rayu (z wojskowym respektem)' (podwładna w obozie / zafascynowana rywalka) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [reżim: FORMALNY]",
-    "Ray White -> Rebecca Bradley": "Zwrot: 'pani przewodnicząca / Rebecco-senpai (lub per starsza koleżanko)' (młodszy kolega z klubu -> starsza mentorka) ', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: FORMALNY]",
+    "Ariane Olgren -> Ray White": "Zwrot: 'na ty / po imieniu: Rayu (z wojskowym respektem)' (podwładna w obozie / zafascynowana rywalka) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
+    "Ray White -> Rebecca Bradley": "Zwrot: 'pani przewodnicząca / Rebecco-senpai (lub per starsza koleżanko)' (młodszy kolega z klubu -> starsza mentorka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: FORMALNY]",
     "Rebecca Bradley -> Ray White": "Zwrot: 'na ty / po imieniu: Rayu' (starsza koleżanka zakochana w młodszym koledze) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Ray White -> Lydia Ainsworth": "Zwrot: 'Mistrzyni / Shishou' (uczeń -> mistrzyni) ', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: FORMALNY]",
-    "Lydia Ainsworth -> Ray White": "Zwrot: 'na ty / Rayu' (mistrzyni -> uczeń) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [reżim: FORMALNY]",
+    "Ray White -> Lydia Ainsworth": "Zwrot: 'Mistrzyni / Shishou' (uczeń -> mistrzyni) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: FORMALNY]",
+    "Lydia Ainsworth -> Ray White": "Zwrot: 'na ty / Rayu' (mistrzyni -> uczeń) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
     "Rebecca Bradley -> Amelia Rose": "Zwrot: 'na ty / po imieniu: Amelio' (senpai -> kouhai / sojuszniczki w miłości) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Amelia Rose -> Rebecca Bradley": "Zwrot: 'panno Rebecco / przewodnicząca Rebecco' (kouhai -> senpai) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Amelia Rose -> Ariane Olgren": "Zwrot: 'Ariane (ty)' (Towarzyszki broni, bliskie przyjaciółki i zadeklarowane rywalki w miłości) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: POUFNY]",
@@ -505,7 +475,8 @@
       "B": "Raya White'a",
       "N": "Rayem White'em",
       "Ms": "Rayu White'cie",
-      "W": "Rayu White"
+      "W": "Rayu White",
+      "gender": "MALE"
     },
     "Amelia Rose": {
       "M": "Amelia Rose",
@@ -579,12 +550,13 @@
     },
     "Abbie Garnet": {
       "M": "Abbie Garnet",
-      "D": "Abbie Garneta",
-      "C": "Abbie Garnetowi",
-      "B": "Abbie Garneta",
-      "N": "Abbie Garnetem",
-      "Ms": "Abbie Garnecie",
-      "W": "Abbie Garnecie"
+      "D": "Abbie Garnet",
+      "C": "Abbie Garnet",
+      "B": "Abbie Garnet",
+      "N": "Abbie Garnet",
+      "Ms": "Abbie Garnet",
+      "W": "Abbie Garnet",
+      "gender": "FEMALE"
     },
     "Carol Caroline": {
       "M": "Carol Caroline",
@@ -623,7 +595,8 @@
       "B": "Lucasa Bradley",
       "N": "Lucasem Bradley",
       "Ms": "Lucasie Bradley",
-      "W": "Lucasie Bradley"
+      "W": "Lucasie Bradley",
+      "gender": "MALE"
     },
     "Wanda Wykes": {
       "M": "Wanda Wykes",
@@ -861,34 +834,18 @@
     "Zuina": "ANTHROPONYM",
     "Cusuechs": "ANTHROPONYM",
     "Takenoko": "ANTHROPONYM",
-    "Ray": "ANTHROPONYM",
-    "Albert": "ANTHROPONYM",
-    "Evi": "ANTHROPONYM",
-    "Amelia": "ANTHROPONYM",
-    "Ariane": "ANTHROPONYM",
-    "Lucas": "ANTHROPONYM",
-    "Carol": "ANTHROPONYM",
-    "Lydia": "ANTHROPONYM",
     "Francoise": "ANTHROPONYM",
-    "Fran": "ANTHROPONYM",
-    "Rebecca": "ANTHROPONYM",
-    "Elisa": "ANTHROPONYM",
-    "Claris": "ANTHROPONYM",
     "Olivia": "ANTHROPONYM",
-    "Stella": "ANTHROPONYM",
     "Maria": "ANTHROPONYM",
     "Kinoko": "ANTHROPONYM",
     "Bianca": "ANTHROPONYM",
-    "Abbie": "ANTHROPONYM",
-    "Wanda": "ANTHROPONYM",
     "Jeryl": "ANTHROPONYM",
     "Laquis": "ANTHROPONYM",
-    "Envoy": "ANTHROPONYM",
     "Waitress": "ANTHROPONYM",
     "Pukkapuka": "ANTHROPONYM",
     "Mia": "ANTHROPONYM",
     "Lucas Forst": "ANTHROPONYM",
-    "Seven Grand Sorcerers": "ANTHROPONYM",
+    "Seven Grand Sorcerers": "CHREMATONYM",
     "Iceblade Sorcerer": "ANTHROPONYM",
     "Magicks War": "ANTHROPONYM",
     "Grand Sorcerers": "ANTHROPONYM",
@@ -904,5 +861,6 @@
     "Magic Chevalier": "ANTHROPONYM",
     "Overheating (Przegrzanie rdzenia)": "ANTHROPONYM",
     "Eugenics": "ANTHROPONYM"
-  }
+  },
+  "fansub_canon": {}
 }

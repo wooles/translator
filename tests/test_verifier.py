@@ -490,17 +490,17 @@ def test_guard_phase2_strips_whole_line_italics_when_source_en_has_only_partial_
     "f1_pl,raw_f2_pl,raw_reason,expected_refined_pl,expected_changes_made",
     [
         (
-            r"{\i1}Może pójdę z Kamilem\NCieszę się, że tobie nic nie jest{\i0}",
-            "{\\i1}Może pójdę z Kamilem\nCieszę się, że tobie nic nie jest{\\i0}",
+            r"{\i1}Może pójdę z HeroAlphonem\NCieszę się, że tobie nic nie jest{\i0}",
+            "{\\i1}Może pójdę z HeroAlphonem\nCieszę się, że tobie nic nie jest{\\i0}",
             "[Filar I] Zmiana podziału wiersza.",
-            r"{\i1}Może pójdę z Kamilem\NCieszę się, że tobie nic nie jest{\i0}",
+            r"{\i1}Może pójdę z HeroAlphonem\NCieszę się, że tobie nic nie jest{\i0}",
             None,
         ),
         (
-            r"Może pójdę z Kamilem\NCieszę się, że tobie nic nie jest",
-            r"Może pójdę z Kamilem\nCieszę się, że tobie nic nie jest",
+            r"Może pójdę z HeroAlphonem\NCieszę się, że tobie nic nie jest",
+            r"Może pójdę z HeroAlphonem\nCieszę się, że tobie nic nie jest",
             "[Filar II] Korekta.",
-            r"Może pójdę z Kamilem\NCieszę się, że tobie nic nie jest",
+            r"Może pójdę z HeroAlphonem\NCieszę się, że tobie nic nie jest",
             None,
         ),
     ],

@@ -278,8 +278,8 @@ def test_phase7_merges_triple_tag_blocks_strips_orphan_i0_and_lifts_colliding_si
     "raw_input,expected_output",
     [
         # T4.3 (2B.10): Inicjalny wołacz W przed partykułą pytajną czy - przecinek ZACHOWANY
-        ("Kamil, czy nie powinniśmy już ruszać?", "Kamil, czy nie powinniśmy już ruszać?"),
-        ("- Kamil, czy nie powinniśmy już ruszać?\\N- Zaraz ruszamy.", "- Kamil, czy nie powinniśmy już ruszać?\\N- Zaraz ruszamy."),
+        ("Bohaterze, czy nie powinniśmy już ruszać?", "Bohaterze, czy nie powinniśmy już ruszać?"),
+        ("- Bohaterze, czy nie powinniśmy już ruszać?\\N- Zaraz ruszamy.", "- Bohaterze, czy nie powinniśmy już ruszać?\\N- Zaraz ruszamy."),
         ("Ayako, czy tak miało być?", "Ayako, czy tak miało być?"),
         # Kontrprzykład: binarna alternatywa rozłączna w środku zdania - przecinek usunięty
         ("Pójdziesz tam dzisiaj, czy nie?", "Pójdziesz tam dzisiaj czy nie?"),
@@ -320,3 +320,40 @@ def test_phase7_strips_invalid_template_tags_and_preserves_valid_ass_directives(
     """
     out = EpisodeQualityGate.normalize_ass_tags_and_sign_layout(raw_ass, is_sign=True)
     assert out == expected_ass
+
+# ==============================================================================
+# STANDARD 10.0.2 REGRESSION TESTS (A-08)
+# ==============================================================================
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "line_text,expected_out",
+    [
+        ("Idziemy do krainy Elden.", "Idziemy do krainy Elden."),
+        ("Wstąpmy do Zamku Elden.", "Wstąpmy do Zamku Elden."),
+    ],
+)
+def test_harmonize_canon_bypassed_in_strict_positive(line_text, expected_out):
+    from avt_linter import AVTLinter
+    linter = AVTLinter()
+    fixed_line, fixes = linter.lint_and_fix_line(
+        text=line_text,
+        speaker_gender="MALE",
+        strict_positive_domain=True
+    )
+    assert fixed_line == expected_out
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "passed_val,expected_flag",
+    [
+        (True, True),
+        (False, False),
+    ],
+)
+def test_resolve_strict_positive_flag_isolation(passed_val, expected_flag):
+    from avt_linter import _resolve_strict_positive_flag
+    res = _resolve_strict_positive_flag(passed_val)
+    assert res == expected_flag

@@ -157,3 +157,22 @@ def test_step3_secondary_actors_populate_p1_and_p2_entries_in_series_bible(tmp_p
     assert "/" not in chars
     assert "Sign" not in chars
     assert "Txt" not in chars
+
+# ==============================================================================
+# STANDARD 10.0.2 REGRESSION TESTS (A-12)
+# ==============================================================================
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "anime_title",
+    ["Clevatess", "Golden Kamuy", "Silent Witch"],
+)
+def test_get_anime_context_offline_bible(anime_title):
+    from metadata import get_anime_context
+    ctx = get_anime_context(f"[SubGroup] {anime_title} - 01.mkv")
+    assert ctx is not None
+    assert ctx.get("source") == "local_series_bible"
+    assert "genres" in ctx
+    assert "characters" in ctx
+    assert len(ctx["characters"]) >= 2

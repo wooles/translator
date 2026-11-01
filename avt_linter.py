@@ -7072,8 +7072,7 @@ class EpisodeQualityGate:
             "księżyc", "księżyca", "księżycu", "księżycem", "świat", "świata", "światu", "światem", "świecie",
             "niebo", "nieba", "niebios", "niebiosach", "bóg", "boga", "bogu", "bogiem", "bogowie", "bogów",
             "japonia", "japonii", "tokio", "bordeaux", "polska", "polski", "polsce", "polskę", "polską", "europa", "europy",
-            "motomachi", "mihara", "ohshima", "ōshima", "shiman", "wyspa", "wyspy", "wyspie", "wyspą", "morze", "morza", "morzem",
-            "shinano", "suwa", "kamakura", "kioto",
+            "wyspa", "wyspy", "wyspie", "wyspą", "morze", "morza", "morzem",
             "złudzeń", "złudzenia", "złudzenie", "płomiennego", "żaru", "początku", "kuźni", "świątynia",
             "imperium", "cesarstwo", "królestwo", "księstwo", "państwo", "republika", "federacja", "unia", "senat", "rada", "armia", "zakon", "klan", "ród", "dynastia", "plemię", "sojusz", "muzeum", "liceum", "technikum", "akwarium", "koloseum", "seminarium"
         }

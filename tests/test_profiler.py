@@ -235,3 +235,44 @@ def test_f0_hard_masculine_immunity_against_english_anaphora_score(
     assert res["resolved_gender"] == expected_gender
     assert res["confidence"] == expected_confidence
     assert res["archetype"] == expected_archetype
+
+# ==============================================================================
+# STANDARD 10.0.2 REGRESSION TESTS (A-03, A-11)
+# ==============================================================================
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "module_name,forbidden_term",
+    [
+        ("profiler", "hyouken"),
+        ("profiler", "clevatess"),
+        ("rules", "hyouken"),
+        ("rules", "clevatess"),
+        ("metadata", "hyouken"),
+        ("scene_discourse", "hyouken"),
+    ],
+)
+def test_profiler_rules_zero_literal(module_name, forbidden_term):
+    import importlib
+    mod = importlib.import_module(module_name)
+    with open(mod.__file__, encoding="utf-8") as f:
+        src = f.read().lower()
+    assert forbidden_term not in src, f"Forbidden term {forbidden_term} found in {module_name}"
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "relational_role,expected_gender,expected_confidence",
+    [
+        ("Neighbor's Kid", "UNKNOWN", 0.0),
+        ("Merchant's Child", "UNKNOWN", 0.0),
+        ("Captain's Apprentice", "UNKNOWN", 0.0),
+        ("Master's Student", "UNKNOWN", 0.0),
+    ],
+)
+def test_relational_role_neutral_fallback(relational_role, expected_gender, expected_confidence):
+    from profiler import resolve_relational_actor_gender
+    res = resolve_relational_actor_gender(relational_role)
+    assert res["gender"] == expected_gender
+    assert res["confidence"] == expected_confidence

@@ -194,11 +194,11 @@ def test_arbitrate_telemetry_enforces_p0_gender_for_inferred_and_explicit_speake
     bible_path = tmp_path / "telemetry_test_bible.json"
     bible = SeriesBible(bible_path=bible_path, storage_dir=tmp_path)
     bible.sync_verified_profile_entity(
-        name="Kamil Nowak",
+        name="HeroAlpha SurnameBeta",
         gender="MALE",
         has_verified_gender=True
     )
-    bible.data["characters"]["Kamil Nowak"]["aliases"] = ["Kamil"]
+    bible.data["characters"]["HeroAlpha SurnameBeta"]["aliases"] = ["HeroAlpha"]
     bible.sync_verified_profile_entity(
         name="Anna",
         gender="FEMALE",
@@ -210,29 +210,29 @@ def test_arbitrate_telemetry_enforces_p0_gender_for_inferred_and_explicit_speake
     # 1. Wywnioskowany mówca (inferred_actor) z pustym raw_actor w scenie pozornie wyłącznie kobiecej
     t1 = SceneDiscourseGraph.arbitrate_event_telemetry(
         event=pysubs2.SSAEvent(start=1000, end=3000, text="Musimy walczyć!", name=""),
-        inferred_actor="Kamil Nowak",
+        inferred_actor="HeroAlpha SurnameBeta",
         series_bible=bible,
         scene_female_only=True,
         aux_telemetry={"speaker_gender": "FEMALE"}
     )
-    assert t1["speaker_name"] == "Kamil Nowak"
+    assert t1["speaker_name"] == "HeroAlpha SurnameBeta"
     assert t1["speaker_gender"] == "MALE"
     assert t1["grammatical_gender"] == "MASCULINE"
     assert t1["has_verified_gender"] is True
 
     # 2. Jawny mówca męski (raw_actor) w scenie z domyślnym rodzajem żeńskim
     t2 = SceneDiscourseGraph.arbitrate_event_telemetry(
-        event=pysubs2.SSAEvent(start=4000, end=6000, text="Osłonię cię!", name="Kamil"),
+        event=pysubs2.SSAEvent(start=4000, end=6000, text="Osłonię cię!", name="HeroAlpha"),
         series_bible=bible,
         scene_female_only=True,
     )
-    assert t2["speaker_name"] == "Kamil"
+    assert t2["speaker_name"] == "HeroAlpha"
     assert t2["speaker_gender"] == "MALE"
     assert t2["has_verified_gender"] is True
 
     # 3. Adresat z bazy wiedzy P0
     t3 = SceneDiscourseGraph.arbitrate_event_telemetry(
-        event=pysubs2.SSAEvent(start=7000, end=9000, text="Dziękuję, Anna.", name="Kamil"),
+        event=pysubs2.SSAEvent(start=7000, end=9000, text="Dziękuję, Anna.", name="HeroAlpha"),
         series_bible=bible,
         addressee="Anna"
     )
@@ -256,7 +256,7 @@ def test_arbitrate_telemetry_enforces_p0_gender_for_inferred_and_explicit_speake
 @pytest.mark.parametrize(
     "actor_name,expected_gender_tag",
     [
-        ("Kamil Nowak", "MASCULINE"),
+        ("HeroAlpha SurnameBeta", "MASCULINE"),
         ("Neighbor", "FEMININE"),
         ("Anna", "FEMININE"),
     ]
@@ -273,7 +273,7 @@ def test_translator_runtime_telemetry_uses_arbitrate_p0_and_bilingual_aliases(ac
 
     bible = SeriesBible(anime_title="Nige Jouzu no Wakagimi")
     bible.sync_verified_profile_entity(
-        name="Kamil Nowak",
+        name="HeroAlpha SurnameBeta",
         gender="MALE",
         has_verified_gender=True
     )
@@ -293,7 +293,7 @@ def test_translator_runtime_telemetry_uses_arbitrate_p0_and_bilingual_aliases(ac
         "description": "Sąsiadka (kobieta)"
     }
     # Mapuj dwujęzyczne aliasy ról
-    bible.map_bilingual_role_aliases(["Neighbor", "Kamil Nowak", "Anna"])
+    bible.map_bilingual_role_aliases(["Neighbor", "HeroAlpha SurnameBeta", "Anna"])
 
     ev = pysubs2.SSAEvent(start=1000, end=3000, text="Tekst wypowiedzi", name=actor_name)
     telem = SceneDiscourseGraph.arbitrate_event_telemetry(
@@ -322,15 +322,15 @@ def test_translator_runtime_telemetry_uses_arbitrate_p0_and_bilingual_aliases(ac
     [
         (
             "Marta",
-            "Kamil (Kobieta)",
+            "HeroAlpha (Kobieta)",
             "FEMALE",
             "MALE",
             False,
-            "Kamil",
+            "HeroAlpha",
             "MASCULINE",
         ),
         (
-            "Kamil",
+            "HeroAlpha",
             "Marta (Mężczyzna - Scena Wyłącznie Męska)",
             "MALE",
             "FEMALE",
@@ -339,8 +339,8 @@ def test_translator_runtime_telemetry_uses_arbitrate_p0_and_bilingual_aliases(ac
             "FEMININE",
         ),
         (
-            "Kamil",
-            "Kamil (Mężczyzna - Scena Wyłącznie Męska)",
+            "HeroAlpha",
+            "HeroAlpha (Mężczyzna - Scena Wyłącznie Męska)",
             "MALE",
             "MALE",
             True,
@@ -362,7 +362,7 @@ def test_arbitrate_telemetry_strips_f0_parentheses_from_target_actor_and_enforce
     from scene_discourse import SceneDiscourseGraph
 
     bible = SeriesBible(slug="test_target_actor_clean_p0")
-    bible.sync_verified_profile_entity("Kamil", "MALE", has_verified_gender=True)
+    bible.sync_verified_profile_entity("HeroAlpha", "MALE", has_verified_gender=True)
     bible.sync_verified_profile_entity("Marta", "FEMALE", has_verified_gender=True)
 
     res = SceneDiscourseGraph.arbitrate_event_telemetry(
@@ -441,7 +441,7 @@ def test_secondary_lexical_gender_immunity_against_scene_gender_override_and_mal
     assert bible.get_character(secondary_tag).get("gender") == expected_audited_gender
 
     res = SceneDiscourseGraph.arbitrate_event_telemetry(
-        raw_actor="Kamil",
+        raw_actor="HeroAlpha",
         verified_p0_gender="MALE",
         target_actor=f"{secondary_tag} (Kobieta)",
         series_bible=bible,
@@ -525,3 +525,57 @@ def test_arbitrate_telemetry_extracts_explicit_actor_gender_before_f0_parenthese
     assert res.get("speaker_name") == expected_speaker_name
     assert res.get("speaker_gender") == expected_speaker_gender
     assert res.get("grammatical_gender") == expected_grammatical_gender
+
+
+# ==============================================================================
+# STANDARD 10.0.2 REGRESSION TESTS (A-09 Wzorzec 1, A-11)
+# ==============================================================================
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "speaker_actor,speaker_gender,target_actor,target_gender,scene_female_only,expected_we_virility",
+    [
+        ("HeroAlpha", "MALE", "HeroineBeta", "FEMALE", True, "VIRILE"),
+        ("HeroineBeta", "FEMALE", "HeroAlpha", "MALE", True, "NON_VIRILE"),
+    ],
+)
+def test_arbitrate_telemetry_we_virility_respects_speaker_p0_gender_in_female_scene(
+    speaker_actor, speaker_gender, target_actor, target_gender, scene_female_only, expected_we_virility
+):
+    from series_memory import SeriesBible
+    from scene_discourse import SceneDiscourseGraph
+    import pysubs2
+    bible = SeriesBible(slug="test_we_virility_p0", db_path=":memory:")
+    bible.sync_verified_profile_entity(speaker_actor, speaker_gender, has_verified_gender=True)
+    bible.sync_verified_profile_entity(target_actor, target_gender, has_verified_gender=True)
+    event = pysubs2.SSAEvent(start=1000, end=3000, text="Kwestia.", name=speaker_actor)
+    telem = SceneDiscourseGraph.arbitrate_event_telemetry(
+        event=event,
+        raw_actor=speaker_actor,
+        target_actor=target_actor,
+        series_bible=bible,
+        scene_female_only=scene_female_only,
+        is_internal_monologue=False,
+    )
+    assert telem["we_virility"] == expected_we_virility
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "group_participants,expected_virility",
+    [
+        ([("HeroineA", "FEMALE"), ("HeroineB", "FEMALE")], "NON_VIRILE"),
+        ([("HeroineA", "FEMALE")], "AMBIGUOUS"),
+        ([("HeroA", "MALE"), ("HeroineB", "FEMALE")], "VIRILE"),
+    ],
+)
+def test_virility_threshold_ge_2(group_participants, expected_virility):
+    from scene_discourse import classify_we_group_gender
+    from series_memory import SeriesBible
+    bible = SeriesBible(slug="test_virility_thresh", db_path=":memory:")
+    for name, g in group_participants:
+        bible.sync_verified_profile_entity(name, g, has_verified_gender=True)
+    names_set = {p[0] for p in group_participants}
+    virility, _ = classify_we_group_gender(names_set, series_bible=bible)
+    assert virility == expected_virility

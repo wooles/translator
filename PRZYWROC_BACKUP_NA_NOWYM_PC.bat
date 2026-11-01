@@ -39,13 +39,13 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command "if (-not (Get-Command py
 echo [3/4] Konfiguracja srodowiska wirtualnego .venv dla Tlumacza...
 cd /d "%DESKTOP_DIR%\translator"
 if exist ".venv\Scripts\python.exe" (
-    echo   -> Srodowisko .venv juz istnieje.
+    echo   -^> Srodowisko .venv juz istnieje.
 ) else (
-    echo   -> Tworzenie nowego srodowiska .venv...
+    echo   -^> Tworzenie nowego srodowiska .venv...
     python -m venv .venv
 )
 
-echo   -> Sprawdzanie i instalacja zaleznosci...
+echo   -^> Sprawdzanie i instalacja zaleznosci...
 "%DESKTOP_DIR%\translator\.venv\Scripts\python.exe" -m pip install --upgrade pip --quiet
 "%DESKTOP_DIR%\translator\.venv\Scripts\pip.exe" install -r requirements.txt --quiet
 
