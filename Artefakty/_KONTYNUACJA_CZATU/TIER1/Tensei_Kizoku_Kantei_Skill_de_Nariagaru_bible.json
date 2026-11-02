@@ -1,0 +1,1360 @@
+{
+  "anime_title": "Tensei_Kizoku_Kantei_Skill_de_Nariagaru",
+  "characters": {
+    "Ars Louvent": {
+      "name": "Ars Louvent",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "confidence": 0.95,
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Ars",
+        "Ars Louvent"
+      ],
+      "description": "mężczyzna (postać)",
+      "entity_category": "ANTHROPONYM"
+    },
+    "Rietz Muses": {
+      "name": "Rietz Muses",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "confidence": 0.95,
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Muses",
+        "Rietz",
+        "Rietz Muses"
+      ],
+      "description": "mężczyzna (postać)",
+      "entity_category": "ANTHROPONYM"
+    },
+    "Charlotte Wraith": {
+      "description": "postać (Postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Charlotte",
+        "Charlotte Wraith",
+        "Wraith"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Rosell Kischa": {
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Kischa",
+        "Rosell",
+        "Rosell Kischa"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Lycia Plaid": {
+      "description": "postać (Główny bohater)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Lycia",
+        "Lycia Plaid"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Raven Louvent": {
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Raven",
+        "Raven Louvent"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Mireille Grangeon": {
+      "description": "postać (Postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Grangeon",
+        "Mireille",
+        "Mireille Grangeon"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Fam": {
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Fam"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Lumeire Pyres": {
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Lumeire",
+        "Lumeire Pyres",
+        "Pyres"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Sofia Louvent": {
+      "description": "postać (Postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Sofia",
+        "Sofia Louvent"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Krall Orslo": {
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Krall",
+        "Krall Orslo",
+        "Orslo"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Menas Lenard": {
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Lenard",
+        "Menas",
+        "Menas Lenard"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Hammond Plaid": {
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Hammond",
+        "Hammond Plaid"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Kreitz Louvent": {
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Kreitz",
+        "Kreitz Louvent"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Ren Louvent": {
+      "description": "postać (Postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Ren",
+        "Ren Louvent"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Couran Salamakhia": {
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Couran",
+        "Couran Salamakhia"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Zaht Brozud": {
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Brozud",
+        "Zaht",
+        "Zaht Brozud"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Musia Trick": {
+      "description": "postać (Postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Musia",
+        "Musia Trick",
+        "Trick"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Krantz": {
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Krantz"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Shin Seymarrow": {
+      "name": "Shin Seymarrow",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "confidence": 0.95,
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Seymarrow",
+        "Shin",
+        "Shin Seymarrow"
+      ],
+      "description": "mężczyzna (postać)",
+      "entity_category": "ANTHROPONYM"
+    },
+    "Guard Captain": {
+      "description": "postać (Postać) [MĘŻCZYZNA]",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Guard",
+        "Guard Captain"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Licia Plaid": {
+      "name": "Licia Plaid",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "confidence": 0.95,
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Licia",
+        "Licia Plaid"
+      ],
+      "description": "kobieta (postać)",
+      "entity_category": "ANTHROPONYM"
+    },
+    "Hammond Pleide": {
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Hammond Pleide",
+        "Pleide"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Vasmarque Salamakhia": {
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Vasmarque",
+        "Vasmarque Salamakhia"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Grenda Domatheson": {
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Domatheson",
+        "Grenda",
+        "Grenda Domatheson"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Borotz Heygand": {
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Borotz",
+        "Borotz Heygand",
+        "Heygand"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Lantark Lodder": {
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Lantark",
+        "Lantark Lodder",
+        "Lodder"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Pham": {
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Pham"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "New Recruit A": {
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "New",
+        "New Recruit A",
+        "Recruit"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Musia's Mother": {
+      "description": "postać (Postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Mother",
+        "Musia's",
+        "Musia's Mother"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "New Recruit E": {
+      "description": "MĘŻCZYZNA (zweryfikowano z audio seiyū Whisper)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "New Recruit E",
+        "Recruit"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "New Recruit D": {
+      "description": "MĘŻCZYZNA (zweryfikowano z audio seiyū Whisper)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "New",
+        "New Recruit D",
+        "Recruit"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Long-Range Captain": {
+      "description": "postać (Postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Long-Range",
+        "Long-Range Captain"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Lantorque": {
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Lantorque"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Braham Joe": {
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Braham",
+        "Braham Joe",
+        "Joe"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Canarre C": {
+      "description": "postać (Postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Canarre C"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Canarre D": {
+      "description": "KOBIETA (zweryfikowano z audio seiyū Whisper)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Canarre",
+        "Canarre D"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Clamant": {
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Clamant"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Elite A": {
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Elite",
+        "Elite A"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Mercenary A": {
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Mercenary",
+        "Mercenary A"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Mercenary B": {
+      "description": "MĘŻCZYZNA (zweryfikowano z audio seiyū Whisper)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Mercenary B"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Braham's Bro": {
+      "description": "postać (Postać) [MĘŻCZYZNA]",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Braham's",
+        "Braham's Bro"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Braham Bro": {
+      "description": "MĘŻCZYZNA (brat Brahama)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Braham",
+        "Braham Bro"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Young Braham": {
+      "description": "postać (Postać) [MĘŻCZYZNA]",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Braham",
+        "Young",
+        "Young Braham"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Verzud Captain": {
+      "description": "postać (Postać) [MĘŻCZYZNA]",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Verzud",
+        "Verzud Captain"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Seitz Captain": {
+      "description": "postać (Postać) [MĘŻCZYZNA]",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Seitz",
+        "Seitz Captain"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Zaht's Kid": {
+      "description": "postać (Postać) [MĘŻCZYZNA]",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "has_verified_gender": true,
+      "confidence": 0.95,
+      "priority": "P0",
+      "aliases": [
+        "Kid",
+        "Zaht's",
+        "Zaht's Kid"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Maika Fujimiya": {
+      "name": "Maika Fujimiya",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "confidence": 0.95,
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Maika",
+        "Maika Fujimiya"
+      ],
+      "description": "KOBIETA (wyodrębniono z relacji serii)",
+      "entity_category": "ANTHROPONYM"
+    },
+    "Rikuya Fujimiya": {
+      "name": "Rikuya Fujimiya",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "confidence": 0.95,
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Rikuya",
+        "Rikuya Fujimiya"
+      ],
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "entity_category": "ANTHROPONYM"
+    },
+    "Takao Fujimiya": {
+      "name": "Takao Fujimiya",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "confidence": 0.95,
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Takao",
+        "Takao Fujimiya"
+      ],
+      "description": "mężczyzna (postać)",
+      "entity_category": "ANTHROPONYM"
+    }
+  },
+  "glossary": {
+    "Appraisal Skill": "umiejętność oceny",
+    "Headman": "namiestnik",
+    "Province of Missian": "prowincja Missian",
+    "Summerforth Empire": "Cesarstwo Summerforth",
+    "Lamberg": "Lamberg",
+    "Canarre": "Canarre",
+    "Appraisal": "Ocena",
+    "Flame magistone": "magiczny kamień płomienia",
+    "Seitz": "Seitz",
+    "Coumeire Domain": "domena Coumeire",
+    "Torbequista": "Torbequista",
+    "Rulla leaves": "liście rulla",
+    "Reaper of Louvent": "Żniwiarz z Louvent",
+    "aqua magia": "magia wody",
+    "rear guard": "ariergarda",
+    "catalyzer": "katalizator magii",
+    "Dragonslayer Blade": "Smokobójca",
+    "Kingdom of Yoh": "Królestwo Yoh",
+    "airship": "sterowiec",
+    "magistones": "kamienie magiczne"
+  },
+  "relationships": {
+    "Rietz -> Ars": "Zwrot: 'panie Arsie / Lordzie Arsie' (wierny wasal -> pan lenny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Charlotte -> Ars": "Zwrot: 'na ty / Arsie' (bliska towarzyszka / przyjaciółka -> suweren) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: POUFNY]",
+    "Mireille -> Ars": "Zwrot: 'młody / panie Arsie' (zastępczyni lorda -> młody senior) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Ars -> Mireille": "Zwrot: 'pani Mireille / na ty' (suweren -> zaufana doradczyni) [OCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu zakaz opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?'\\NKOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Licia -> Ars": "Zwrot: 'panie Arsie / Lordzie Arsie' (narzeczona -> narzeczony) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Zaht -> Braham": "Zwrot: 'Kapitanie / Braham' (zastępca -> dowódca oddziału) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Ars -> Rietz": "Zwrot: 'na ty / Rietz' (pan lenny -> prawa ręka) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
+    "Charlotte -> Musia": "Zwrot: 'na ty / Musia' (starsza czarodziejka -> nowa rekrutka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie']",
+    "Musia -> Charlotte": "Zwrot: 'na ty / Charlotte' (podziwiająca uczennica -> mentorka) \\NKOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie'] [reżim: FORMALNY]",
+    "Braham -> Rietz": "Zwrot: 'Mistrzu / Panie Rietzu' (uczeń -> mistrz wojskowy) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Rietz -> Braham": "Zwrot: 'Brahamie / po imieniu na ty' (dowódca / mistrz -> uczeń) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
+    "Braham -> Zaht": "Zwrot: 'Zaht / po imieniu na ty' (dowódca -> zastępca / towarzysz broni) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Lantorque -> Borotz": "Zwrot: 'Dowódco Borotzu / Panie dowódco' (podwładny -> głównodowodzący) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Rietz Muses -> Ars Louvent": "Zwrot: 'panie Arsie' (Oddany rycerz i doradca wobec swego suwerena) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Ars Louvent -> Shin Seymarrow": "Zwrot: 'Shinie / ty' (Młody feudał i wspierany przezeń inżynier-geniusz) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Licia Plaid -> Braham": "Zwrot: 'Brahamie / ty' (Zwierzchniczka wydająca twarde rozkazy generałowi) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Maika Fujimiya -> Rikuya Fujimiya": "Zwrot: 'bracie' (Młodsza siostra wobec starszego brata i suwerena klanu) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+  },
+  "relations": {
+    "Rietz -> Ars": "Zwrot: 'panie Arsie / Lordzie Arsie' (wierny wasal -> pan lenny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Charlotte -> Ars": "Zwrot: 'na ty / Arsie' (bliska towarzyszka / przyjaciółka -> suweren) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: POUFNY]",
+    "Mireille -> Ars": "Zwrot: 'młody / panie Arsie' (zastępczyni lorda -> młody senior) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Ars -> Mireille": "Zwrot: 'pani Mireille / na ty' (suweren -> zaufana doradczyni) [OCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu zakaz opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?'\\NKOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Licia -> Ars": "Zwrot: 'panie Arsie / Lordzie Arsie' (narzeczona -> narzeczony) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Zaht -> Braham": "Zwrot: 'Kapitanie / Braham' (zastępca -> dowódca oddziału) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Ars -> Rietz": "Zwrot: 'na ty / Rietz' (pan lenny -> prawa ręka) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
+    "Charlotte -> Musia": "Zwrot: 'na ty / Musia' (starsza czarodziejka -> nowa rekrutka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Musia -> Charlotte": "Zwrot: 'na ty / Charlotte' (podziwiająca uczennica -> mentorka) \\NKOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: FORMALNY]",
+    "Braham -> Rietz": "Zwrot: 'Mistrzu / Panie Rietzu' (uczeń -> mistrz wojskowy) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Rietz -> Braham": "Zwrot: 'Brahamie / po imieniu na ty' (dowódca / mistrz -> uczeń) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
+    "Braham -> Zaht": "Zwrot: 'Zaht / po imieniu na ty' (dowódca -> zastępca / towarzysz broni) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Lantorque -> Borotz": "Zwrot: 'Dowódco Borotzu / Panie dowódco' (podwładny -> głównodowodzący) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Rietz Muses -> Ars Louvent": "Zwrot: 'panie Arsie' (Oddany rycerz i doradca wobec swego suwerena) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Ars Louvent -> Shin Seymarrow": "Zwrot: 'Shinie / ty' (Młody feudał i wspierany przezeń inżynier-geniusz) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Licia Plaid -> Braham": "Zwrot: 'Brahamie / ty' (Zwierzchniczka wydająca twarde rozkazy generałowi) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Maika Fujimiya -> Rikuya Fujimiya": "Zwrot: 'bracie' (Młodsza siostra wobec starszego brata i suwerena klanu) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+  },
+  "declensions": {
+    "Ars Louvent": {
+      "M": "Ars Louvent",
+      "D": "Arsa Louventa",
+      "C": "Arsowi Louventowi",
+      "B": "Arsa Louventa",
+      "N": "Arsem Louventem",
+      "Ms": "Arsie Louvencie",
+      "W": "Arsie Louvencie",
+      "gender": "MALE"
+    },
+    "Rietz Muses": {
+      "M": "Rietz Muses",
+      "D": "Rietza Musesa",
+      "C": "Rietzowi Musesowi",
+      "B": "Rietza Musesa",
+      "N": "Rietzem Musesem",
+      "Ms": "Rietzie Musesie",
+      "W": "Rietzie Musesie",
+      "gender": "MALE"
+    },
+    "Charlotte Wraith": {
+      "M": "Charlotte Wraith",
+      "D": "Charlotte Wraith",
+      "C": "Charlotte Wraith",
+      "B": "Charlotte Wraith",
+      "N": "Charlotte Wraith",
+      "Ms": "Charlotte Wraith",
+      "W": "Charlotte Wraith",
+      "gender": "FEMALE"
+    },
+    "Rosell Kischa": {
+      "M": "Rosell Kischa",
+      "D": "Rosella Kischa",
+      "C": "Rosellowi Kischa",
+      "B": "Rosella Kischa",
+      "N": "Rosellem Kischa",
+      "Ms": "Rosellu Kischa",
+      "W": "Rosellu Kischa",
+      "gender": "MALE"
+    },
+    "Lycia Plaid": {
+      "M": "Lycia Plaid",
+      "D": "Lycii Plaid",
+      "C": "Lycii Plaid",
+      "B": "Lycię Plaid",
+      "N": "Lycią Plaid",
+      "Ms": "Lycii Plaid",
+      "W": "Lycio Plaid",
+      "gender": "FEMALE"
+    },
+    "Raven Louvent": {
+      "M": "Raven Louvent",
+      "D": "Ravena Louventa",
+      "C": "Ravenowi Louventowi",
+      "B": "Ravena Louventa",
+      "N": "Ravenem Louventem",
+      "Ms": "Ravenie Louvencie",
+      "W": "Ravenie Louvencie",
+      "gender": "MALE"
+    },
+    "Mireille Grangeon": {
+      "M": "Mireille Grangeon",
+      "D": "Mireille Grangeon",
+      "C": "Mireille Grangeon",
+      "B": "Mireille Grangeon",
+      "N": "Mireille Grangeon",
+      "Ms": "Mireille Grangeon",
+      "W": "Mireille Grangeon",
+      "gender": "FEMALE"
+    },
+    "Fam": {
+      "M": "Fam",
+      "D": "Fama",
+      "C": "Famowi",
+      "B": "Fama",
+      "N": "Famem",
+      "Ms": "Famie",
+      "W": "Famie",
+      "gender": "MALE"
+    },
+    "Lumeire Pyres": {
+      "M": "Lumeire Pyres",
+      "D": "Lumeire Pyresa",
+      "C": "Lumeire Pyresowi",
+      "B": "Lumeire Pyresa",
+      "N": "Lumeire Pyresem",
+      "Ms": "Lumeire Pyresie",
+      "W": "Lumeire Pyresie",
+      "gender": "MALE"
+    },
+    "Sofia Louvent": {
+      "M": "Sofia Louvent",
+      "D": "Sofii Louvent",
+      "C": "Sofii Louvent",
+      "B": "Sofię Louvent",
+      "N": "Sofią Louvent",
+      "Ms": "Sofii Louvent",
+      "W": "Sofio Louvent",
+      "gender": "FEMALE"
+    },
+    "Krall Orslo": {
+      "M": "Krall Orslo",
+      "D": "Kralla Orslo",
+      "C": "Krallowi Orslo",
+      "B": "Kralla Orslo",
+      "N": "Krallem Orslo",
+      "Ms": "Krallu Orslo",
+      "W": "Krallu Orslo",
+      "gender": "MALE"
+    },
+    "Menas Lenard": {
+      "M": "Menas Lenard",
+      "D": "Menasa Lenarda",
+      "C": "Menasowi Lenardowi",
+      "B": "Menasa Lenarda",
+      "N": "Menasem Lenardem",
+      "Ms": "Menasie Lenardzie",
+      "W": "Menasie Lenardzie",
+      "gender": "MALE"
+    },
+    "Hammond Plaid": {
+      "M": "Hammond Plaid",
+      "D": "Hammonda Plaida",
+      "C": "Hammondowi Plaidowi",
+      "B": "Hammonda Plaida",
+      "N": "Hammondem Plaidem",
+      "Ms": "Hammondzie Plaidzie",
+      "W": "Hammondzie Plaidzie",
+      "gender": "MALE"
+    },
+    "Kreitz Louvent": {
+      "M": "Kreitz Louvent",
+      "D": "Kreitza Louventa",
+      "C": "Kreitzowi Louventowi",
+      "B": "Kreitza Louventa",
+      "N": "Kreitzem Louventem",
+      "Ms": "Kreitzu Louvencie",
+      "W": "Kreitzu Louvencie",
+      "gender": "MALE"
+    },
+    "Ren Louvent": {
+      "M": "Ren Louvent",
+      "D": "Ren Louvent",
+      "C": "Ren Louvent",
+      "B": "Ren Louvent",
+      "N": "Ren Louvent",
+      "Ms": "Ren Louvent",
+      "W": "Ren Louvent",
+      "gender": "FEMALE"
+    },
+    "Couran Salamakhia": {
+      "M": "Couran Salamakhia",
+      "D": "Courana Salamakhia",
+      "C": "Couranowi Salamakhia",
+      "B": "Courana Salamakhia",
+      "N": "Couranem Salamakhia",
+      "Ms": "Couranie Salamakhia",
+      "W": "Couranie Salamakhia",
+      "gender": "MALE"
+    },
+    "Zaht Brozud": {
+      "M": "Zaht Brozud",
+      "D": "Zahta Brozuda",
+      "C": "Zahtowi Brozudowi",
+      "B": "Zahta Brozuda",
+      "N": "Zahtem Brozudem",
+      "Ms": "Zahcie Brozudzie",
+      "W": "Zahcie Brozudzie",
+      "gender": "MALE"
+    },
+    "Musia Trick": {
+      "M": "Musia Trick",
+      "D": "Musii Trick",
+      "C": "Musii Trick",
+      "B": "Musię Trick",
+      "N": "Musią Trick",
+      "Ms": "Musii Trick",
+      "W": "Musio Trick",
+      "gender": "FEMALE"
+    },
+    "Krantz": {
+      "M": "Krantz",
+      "D": "Krantza",
+      "C": "Krantzowi",
+      "B": "Krantza",
+      "N": "Krantzem",
+      "Ms": "Krantzu",
+      "W": "Krantzu",
+      "gender": "MALE"
+    },
+    "Shin Seymarrow": {
+      "M": "Shin Seymarrow",
+      "D": "Shina Seymarrowa",
+      "C": "Shinowi Seymarrowi",
+      "B": "Shina Seymarrowa",
+      "N": "Shinem Seymarrowem",
+      "Ms": "Shinie Seymarrowie",
+      "W": "Shinie Seymarrowie",
+      "gender": "MALE"
+    },
+    "Guard Captain": {
+      "M": "Guard Captain",
+      "D": "Guarda Captaina",
+      "C": "Guardowi Captainowi",
+      "B": "Guarda Captaina",
+      "N": "Guardem Captainem",
+      "Ms": "Guardzie Captainie",
+      "W": "Guardzie Captainie",
+      "gender": "MALE"
+    },
+    "Licia Plaid": {
+      "M": "Licia Plaid",
+      "D": "Licii Plaid",
+      "C": "Licii Plaid",
+      "B": "Licię Plaid",
+      "N": "Licią Plaid",
+      "Ms": "Licii Plaid",
+      "W": "Licio Plaid",
+      "gender": "FEMALE"
+    },
+    "Hammond Pleide": {
+      "M": "Hammond Pleide",
+      "D": "Hammonda Pleide",
+      "C": "Hammondowi Pleide",
+      "B": "Hammonda Pleide",
+      "N": "Hammondem Pleide",
+      "Ms": "Hammondzie Pleide",
+      "W": "Hammondzie Pleide",
+      "gender": "MALE"
+    },
+    "Vasmarque Salamakhia": {
+      "M": "Vasmarque Salamakhia",
+      "D": "Vasmarque Salamakhia",
+      "C": "Vasmarque Salamakhia",
+      "B": "Vasmarque Salamakhia",
+      "N": "Vasmarque Salamakhia",
+      "Ms": "Vasmarque Salamakhia",
+      "W": "Vasmarque Salamakhia",
+      "gender": "MALE"
+    },
+    "Grenda Domatheson": {
+      "M": "Grenda Domatheson",
+      "D": "Grendy Domathesona",
+      "C": "Grendzie Domathesonowi",
+      "B": "Grendę Domathesona",
+      "N": "Grendą Domathesonem",
+      "Ms": "Grendzie Domathesonie",
+      "W": "Grendo Domathesonie",
+      "gender": "MALE"
+    },
+    "Borotz Heygand": {
+      "M": "Borotz Heygand",
+      "D": "Borotza Heyganda",
+      "C": "Borotzowi Heygandowi",
+      "B": "Borotza Heyganda",
+      "N": "Borotzem Heygandem",
+      "Ms": "Borotzu Heygandzie",
+      "W": "Borotzu Heygandzie",
+      "gender": "MALE"
+    },
+    "Lantark Lodder": {
+      "M": "Lantark Lodder",
+      "D": "Lantarka Loddera",
+      "C": "Lantarkowi Lodderowi",
+      "B": "Lantarka Loddera",
+      "N": "Lantarkiem Lodderem",
+      "Ms": "Lantarku Lodderze",
+      "W": "Lantarku Lodderze",
+      "gender": "MALE"
+    },
+    "Pham": {
+      "M": "Pham",
+      "D": "Phama",
+      "C": "Phamowi",
+      "B": "Phama",
+      "N": "Phamem",
+      "Ms": "Phamie",
+      "W": "Phamie",
+      "gender": "MALE"
+    },
+    "New Recruit A": {
+      "M": "New Recruit A",
+      "D": "Newa Recruita A",
+      "C": "Newowi Recruitowi A",
+      "B": "Newa Recruita A",
+      "N": "Newem Recruitem A",
+      "Ms": "Newie Recruicie A",
+      "W": "Newie Recruicie A",
+      "gender": "MALE"
+    },
+    "Musia's Mother": {
+      "M": "Musia's Mother",
+      "D": "Musia's Mother",
+      "C": "Musia's Mother",
+      "B": "Musia's Mother",
+      "N": "Musia's Mother",
+      "Ms": "Musia's Mother",
+      "W": "Musia's Mother",
+      "gender": "FEMALE"
+    },
+    "New Recruit E": {
+      "M": "New Recruit E",
+      "D": "Newa Recruita E",
+      "C": "Newowi Recruitowi E",
+      "B": "Newa Recruita E",
+      "N": "Newem Recruitem E",
+      "Ms": "Newie Recruicie E",
+      "W": "Newie Recruicie E",
+      "gender": "MALE"
+    },
+    "New Recruit D": {
+      "M": "New Recruit D",
+      "D": "Newa Recruita D",
+      "C": "Newowi Recruitowi D",
+      "B": "Newa Recruita D",
+      "N": "Newem Recruitem D",
+      "Ms": "Newie Recruicie D",
+      "W": "Newie Recruicie D",
+      "gender": "MALE"
+    },
+    "Long-Range Captain": {
+      "M": "Long-Range Captain",
+      "D": "Long-Range Captain",
+      "C": "Long-Range Captain",
+      "B": "Long-Range Captain",
+      "N": "Long-Range Captain",
+      "Ms": "Long-Range Captain",
+      "W": "Long-Range Captain",
+      "gender": "FEMALE"
+    },
+    "Lantorque": {
+      "M": "Lantorque",
+      "D": "Lantorque",
+      "C": "Lantorque",
+      "B": "Lantorque",
+      "N": "Lantorque",
+      "Ms": "Lantorque",
+      "W": "Lantorque",
+      "gender": "MALE"
+    },
+    "Braham Joe": {
+      "M": "Braham Joe",
+      "D": "Brahama Joe",
+      "C": "Brahamowi Joe",
+      "B": "Brahama Joe",
+      "N": "Brahamem Joe",
+      "Ms": "Brahamie Joe",
+      "W": "Brahamie Joe",
+      "gender": "MALE"
+    },
+    "Canarre C": {
+      "M": "Canarre C",
+      "D": "Canarre C",
+      "C": "Canarre C",
+      "B": "Canarre C",
+      "N": "Canarre C",
+      "Ms": "Canarre C",
+      "W": "Canarre C",
+      "gender": "FEMALE"
+    },
+    "Canarre D": {
+      "M": "Canarre D",
+      "D": "Canarre D",
+      "C": "Canarre D",
+      "B": "Canarre D",
+      "N": "Canarre D",
+      "Ms": "Canarre D",
+      "W": "Canarre D",
+      "gender": "FEMALE"
+    },
+    "Clamant": {
+      "M": "Clamant",
+      "D": "Clamanta",
+      "C": "Clamantowi",
+      "B": "Clamanta",
+      "N": "Clamantem",
+      "Ms": "Clamancie",
+      "W": "Clamancie",
+      "gender": "MALE"
+    },
+    "Elite A": {
+      "M": "Elite A",
+      "D": "Elite A",
+      "C": "Elite A",
+      "B": "Elite A",
+      "N": "Elite A",
+      "Ms": "Elite A",
+      "W": "Elite A",
+      "gender": "MALE"
+    },
+    "Mercenary A": {
+      "M": "Mercenary A",
+      "D": "Mercenary A",
+      "C": "Mercenary A",
+      "B": "Mercenary A",
+      "N": "Mercenary A",
+      "Ms": "Mercenary A",
+      "W": "Mercenary A",
+      "gender": "MALE"
+    },
+    "Mercenary B": {
+      "M": "Mercenary B",
+      "D": "Mercenary B",
+      "C": "Mercenary B",
+      "B": "Mercenary B",
+      "N": "Mercenary B",
+      "Ms": "Mercenary B",
+      "W": "Mercenary B",
+      "gender": "MALE"
+    },
+    "Braham's Bro": {
+      "M": "Braham's Bro",
+      "D": "Braham'sa Bro",
+      "C": "Braham'sowi Bro",
+      "B": "Braham'sa Bro",
+      "N": "Braham'sem Bro",
+      "Ms": "Braham'sie Bro",
+      "W": "Braham'sie Bro",
+      "gender": "MALE"
+    },
+    "Braham Bro": {
+      "M": "Braham Bro",
+      "D": "Brahama Bro",
+      "C": "Brahamowi Bro",
+      "B": "Brahama Bro",
+      "N": "Brahamem Bro",
+      "Ms": "Brahamie Bro",
+      "W": "Brahamie Bro",
+      "gender": "MALE"
+    },
+    "Young Braham": {
+      "M": "Young Braham",
+      "D": "Young Brahama",
+      "C": "Young Brahamowi",
+      "B": "Young Brahama",
+      "N": "Young Brahamem",
+      "Ms": "Young Brahamie",
+      "W": "Young Brahamie",
+      "gender": "MALE"
+    },
+    "Verzud Captain": {
+      "M": "Verzud Captain",
+      "D": "Verzuda Captaina",
+      "C": "Verzudowi Captainowi",
+      "B": "Verzuda Captaina",
+      "N": "Verzudem Captainem",
+      "Ms": "Verzudzie Captainie",
+      "W": "Verzudzie Captainie",
+      "gender": "MALE"
+    },
+    "Seitz Captain": {
+      "M": "Seitz Captain",
+      "D": "Seitza Captaina",
+      "C": "Seitzowi Captainowi",
+      "B": "Seitza Captaina",
+      "N": "Seitzem Captainem",
+      "Ms": "Seitzu Captainie",
+      "W": "Seitzu Captainie",
+      "gender": "MALE"
+    },
+    "Zaht's Kid": {
+      "M": "Zaht's Kid",
+      "D": "Zaht'sa Kida",
+      "C": "Zaht'sowi Kidowi",
+      "B": "Zaht'sa Kida",
+      "N": "Zaht'sem Kidem",
+      "Ms": "Zaht'sie Kidzie",
+      "W": "Zaht'sie Kidzie",
+      "gender": "MALE"
+    },
+    "Maika Fujimiya": {
+      "M": "Maika Fujimiya",
+      "D": "Maiki Fujimiyi",
+      "C": "Maice Fujimiyi",
+      "B": "Maikę Fujimiyę",
+      "N": "Maiką Fujimiyą",
+      "Ms": "Maice Fujimiyi",
+      "W": "Maiko Fujimiyo",
+      "gender": "FEMALE"
+    },
+    "Rikuya Fujimiya": {
+      "M": "Rikuya Fujimiya",
+      "D": "Rikuyi Fujimiyi",
+      "C": "Rikuyi Fujimiyi",
+      "B": "Rikuyę Fujimiyę",
+      "N": "Rikuyą Fujimiyą",
+      "Ms": "Rikuyi Fujimiyi",
+      "W": "Rikuyo Fujimiyo",
+      "gender": "MALE"
+    },
+    "Takao Fujimiya": {
+      "M": "Takao Fujimiya",
+      "D": "Takao Fujimiyi",
+      "C": "Takao Fujimiyi",
+      "B": "Takao Fujimiyę",
+      "N": "Takao Fujimiyą",
+      "Ms": "Takao Fujimiyi",
+      "W": "Takao Fujimiyo",
+      "gender": "MALE"
+    }
+  },
+  "hypocorisms": {},
+  "plot_anchors": {
+    "Headman of Canarre District": "Stosuj jednolite określenie 'namiestnik okręgu Canarre' (lub zarządca Canarre), nie zmieniaj na wójta ani sołtysa.",
+    "Missian Succession War": "Konsekwentna nazwa konfliktu: 'wojna sukcesyjna w Missian'.",
+    "Ocena (Appraisal)": "Niezmienna nazwa unikalnego daru Arsa, rozpoznawanego przez wszystkich dostojników jako 'umiejętność Oceny' / 'dar Oceny'.",
+    "Magiczne kamienie płomienia (Flame magistone)": "Rzadki minerał wydobywany w Missian, dowodzący sojuszu Vasmarque'a z nowym rządem prowincji Seitz.",
+    "Katalizatory magii (catalyzers)": "Utrzymać termin 'katalizator magii' dla dużych urządzeń wzmacniających zaklęcia Charlotte i czarodziejów.",
+    "Żniwiarz z Louvent (Reaper of Louvent)": "Przydomek bojowy Rietza Musesa. Nie zmieniać na 'Kosiarz' ani inne warianty.",
+    "Wojna domowa w Missianie": "Egzekucja młodszego brata Vasmarque'a przez Courana i rozstrzygnięcie walk o władzę w prowincji.",
+    "Magiczne sterowce Shina": "Innowacje Seymarrowa oparte na technologii napędu kamieniami magicznymi, które przechyliły szalę w bitwie z Seitz."
+  },
+  "episodes_translated": [
+    "[DKB] Tensei Kizoku, Kantei Skill de Nariagaru - S03E01 [1080p][HEVC x265 10bit][Multi-Subs][30E39E34]",
+    "[DKB] Tensei Kizoku, Kantei Skill de Nariagaru - S03E02 [1080p][HEVC x265 10bit][Multi-Subs][6FFAB792]",
+    "[ASW] Tensei Kizoku, Kantei Skill de Nariagaru - 27 [1080p HEVC][619E51AE]",
+    "[ASW] Tensei Kizoku, Kantei Skill de Nariagaru - 30 [1080p HEVC][95CBE6D5]"
+  ],
+  "batch_stats": {
+    "[DKB] Tensei Kizoku, Kantei Skill de Nariagaru - S03E01 [1080p][HEVC x265 10bit][Multi-Subs][30E39E34]": {
+      "dialogues": 381,
+      "batches": 17,
+      "avg_batch_size": 22.4,
+      "cost_pln": 3.53
+    },
+    "[DKB] Tensei Kizoku, Kantei Skill de Nariagaru - S03E02 [1080p][HEVC x265 10bit][Multi-Subs][6FFAB792]": {
+      "dialogues": 346,
+      "batches": 15,
+      "avg_batch_size": 23.1,
+      "cost_pln": 3.05
+    },
+    "[ASW] Tensei Kizoku, Kantei Skill de Nariagaru - 27 [1080p HEVC][619E51AE]": {
+      "dialogues": 359,
+      "batches": 15,
+      "avg_batch_size": 23.9,
+      "cost_pln": 3.3
+    },
+    "[ASW] Tensei Kizoku, Kantei Skill de Nariagaru - 30 [1080p HEVC][95CBE6D5]": {
+      "dialogues": 331,
+      "batches": 17,
+      "avg_batch_size": 19.5,
+      "cost_pln": 3.72
+    }
+  },
+  "entity_categories": {
+    "Ars Louvent": "ANTHROPONYM",
+    "Rietz Muses": "ANTHROPONYM",
+    "Charlotte Wraith": "ANTHROPONYM",
+    "Rosell Kischa": "ANTHROPONYM",
+    "Lycia Plaid": "ANTHROPONYM",
+    "Raven Louvent": "ANTHROPONYM",
+    "Mireille Grangeon": "ANTHROPONYM",
+    "Fam": "ANTHROPONYM",
+    "Lumeire Pyres": "ANTHROPONYM",
+    "Sofia Louvent": "ANTHROPONYM",
+    "Krall Orslo": "ANTHROPONYM",
+    "Menas Lenard": "ANTHROPONYM",
+    "Hammond Plaid": "ANTHROPONYM",
+    "Kreitz Louvent": "ANTHROPONYM",
+    "Ren Louvent": "ANTHROPONYM",
+    "Couran Salamakhia": "ANTHROPONYM",
+    "Zaht Brozud": "ANTHROPONYM",
+    "Musia Trick": "ANTHROPONYM",
+    "Krantz": "ANTHROPONYM",
+    "Shin Seymarrow": "ANTHROPONYM",
+    "Guard Captain": "ANTHROPONYM",
+    "Licia Plaid": "ANTHROPONYM",
+    "Hammond Pleide": "ANTHROPONYM",
+    "Vasmarque Salamakhia": "ANTHROPONYM",
+    "Grenda Domatheson": "ANTHROPONYM",
+    "Borotz Heygand": "ANTHROPONYM",
+    "Lantark Lodder": "ANTHROPONYM",
+    "Pham": "ANTHROPONYM",
+    "New Recruit A": "ANTHROPONYM",
+    "Musia's Mother": "ANTHROPONYM",
+    "New Recruit E": "ANTHROPONYM",
+    "New Recruit D": "ANTHROPONYM",
+    "Long-Range Captain": "ANTHROPONYM",
+    "Lantorque": "ANTHROPONYM",
+    "Braham Joe": "ANTHROPONYM",
+    "Canarre C": "ANTHROPONYM",
+    "Canarre D": "ANTHROPONYM",
+    "Clamant": "ANTHROPONYM",
+    "Elite A": "ANTHROPONYM",
+    "Mercenary A": "ANTHROPONYM",
+    "Mercenary B": "ANTHROPONYM",
+    "Braham's Bro": "ANTHROPONYM",
+    "Braham Bro": "ANTHROPONYM",
+    "Young Braham": "ANTHROPONYM",
+    "Verzud Captain": "ANTHROPONYM",
+    "Seitz Captain": "ANTHROPONYM",
+    "Zaht's Kid": "ANTHROPONYM",
+    "Maika Fujimiya": "ANTHROPONYM",
+    "Rikuya Fujimiya": "ANTHROPONYM",
+    "Takao Fujimiya": "ANTHROPONYM",
+    "Appraisal Skill": "ANTHROPONYM",
+    "Headman": "ANTHROPONYM",
+    "Province of Missian": "TOPONYM",
+    "Summerforth Empire": "TOPONYM",
+    "Lamberg": "TOPONYM",
+    "Canarre": "TOPONYM",
+    "Appraisal": "ANTHROPONYM",
+    "Flame magistone": "ANTHROPONYM",
+    "Seitz": "TOPONYM",
+    "Coumeire Domain": "ANTHROPONYM",
+    "Torbequista": "TOPONYM",
+    "Rulla leaves": "ANTHROPONYM",
+    "Reaper of Louvent": "ANTHROPONYM",
+    "aqua magia": "ANTHROPONYM",
+    "rear guard": "ANTHROPONYM",
+    "Dragonslayer Blade": "ANTHROPONYM",
+    "Kingdom of Yoh": "TOPONYM",
+    "Headman of Canarre District": "ANTHROPONYM",
+    "Missian Succession War": "ANTHROPONYM",
+    "Ocena (Appraisal)": "ANTHROPONYM",
+    "Magiczne kamienie płomienia (Flame magistone)": "ANTHROPONYM",
+    "Katalizatory magii (catalyzers)": "ANTHROPONYM",
+    "Żniwiarz z Louvent (Reaper of Louvent)": "ANTHROPONYM",
+    "Wojna domowa w Missianie": "ANTHROPONYM",
+    "Magiczne sterowce Shina": "ANTHROPONYM",
+    "catalyzer": "ANTHROPONYM",
+    "airship": "ANTHROPONYM",
+    "magistones": "ANTHROPONYM"
+  },
+  "fansub_canon": {}
+}

@@ -1,0 +1,866 @@
+{
+  "anime_title": "Hyouken_no_Majutsushi_ga_Sekai_wo_Suberu_S2",
+  "characters": {
+    "Ray White": {
+      "name": "Ray White",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "confidence": 0.95,
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Ray",
+        "Ray White"
+      ],
+      "description": "Postać (mężczyzna)",
+      "entity_category": "ANTHROPONYM"
+    },
+    "Amelia Rose": {
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "confidence": 0.95,
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Amelia",
+        "Amelia Rose",
+        "Rose"
+      ],
+      "description": "Postać (kobieta)",
+      "entity_category": "ANTHROPONYM"
+    },
+    "Ariane Olgren": {
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "confidence": 0.95,
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Ariane",
+        "Ariane Olgren",
+        "Olgren"
+      ],
+      "description": "Postać (kobieta)",
+      "entity_category": "ANTHROPONYM"
+    },
+    "Rebecca Bradley": {
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "confidence": 0.95,
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Rebecca",
+        "Rebecca Bradley"
+      ],
+      "description": "Postać (kobieta)",
+      "entity_category": "ANTHROPONYM"
+    },
+    "Lydia Ainsworth": {
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "confidence": 0.95,
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Ainsworth",
+        "Lydia",
+        "Lydia Ainsworth"
+      ],
+      "description": "Postać (kobieta)",
+      "entity_category": "ANTHROPONYM"
+    },
+    "Elisa Griffith": {
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "confidence": 0.95,
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Elisa",
+        "Elisa Griffith",
+        "Griffith"
+      ],
+      "description": "Postać (kobieta)",
+      "entity_category": "ANTHROPONYM"
+    },
+    "Claris Cleveland": {
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "confidence": 0.95,
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Claris",
+        "Claris Cleveland",
+        "Cleveland"
+      ],
+      "description": "Postać (kobieta)",
+      "entity_category": "ANTHROPONYM"
+    },
+    "Evi Armstrong": {
+      "name": "Evi Armstrong",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "confidence": 0.95,
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Armstrong",
+        "Evi",
+        "Evi Armstrong"
+      ],
+      "description": "Postać (mężczyzna)",
+      "entity_category": "ANTHROPONYM"
+    },
+    "Abbie Garnet": {
+      "description": "postać (Postać)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "confidence": 0.95,
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Abbie",
+        "Abbie Garnet",
+        "Garnet"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Carol Caroline": {
+      "name": "Carol Caroline",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "confidence": 0.95,
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Carol",
+        "Carol Caroline",
+        "Caroline"
+      ],
+      "description": "Postać (kobieta)",
+      "entity_category": "ANTHROPONYM"
+    },
+    "Albert Alium": {
+      "name": "Albert Alium",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "confidence": 0.95,
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Albert",
+        "Albert Alium",
+        "Alium"
+      ],
+      "description": "Postać (mężczyzna)",
+      "entity_category": "ANTHROPONYM"
+    },
+    "Helena Grady": {
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "confidence": 0.95,
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Grady",
+        "Helena",
+        "Helena Grady"
+      ],
+      "description": "Postać (kobieta)",
+      "entity_category": "ANTHROPONYM"
+    },
+    "Lucas Bradley": {
+      "description": "postać (Postać)",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "confidence": 0.95,
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Lucas",
+        "Lucas Bradley"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Wanda Wykes": {
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "confidence": 0.95,
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Wanda",
+        "Wanda Wykes",
+        "Wykes"
+      ],
+      "description": "Postać (kobieta)",
+      "entity_category": "ANTHROPONYM"
+    },
+    "Stella White": {
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "confidence": 0.95,
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Stella",
+        "Stella White"
+      ],
+      "description": "Postać (kobieta)",
+      "entity_category": "ANTHROPONYM"
+    },
+    "Lieselotte": {
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "confidence": 0.95,
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Lieselotte"
+      ],
+      "description": "Postać (kobieta)",
+      "entity_category": "ANTHROPONYM"
+    },
+    "Dina": {
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "confidence": 0.95,
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Dina"
+      ],
+      "description": "Postać (kobieta)",
+      "entity_category": "ANTHROPONYM"
+    },
+    "Lily": {
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "confidence": 0.95,
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Lily"
+      ],
+      "description": "Postać (KOBIETA)",
+      "entity_category": "ANTHROPONYM"
+    },
+    "Carla": {
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "confidence": 0.95,
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Carla"
+      ],
+      "description": "Postać (KOBIETA)",
+      "entity_category": "ANTHROPONYM"
+    },
+    "Zuina": {
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "confidence": 0.95,
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Zuina"
+      ],
+      "description": "Postać (KOBIETA)",
+      "entity_category": "ANTHROPONYM"
+    },
+    "Cusuechs": {
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "confidence": 0.95,
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Cusuechs"
+      ],
+      "description": "Postać (mężczyzna)",
+      "entity_category": "ANTHROPONYM"
+    },
+    "Takenoko": {
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "confidence": 0.95,
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Takenoko"
+      ],
+      "description": "Postać (kobieta)",
+      "entity_category": "ANTHROPONYM"
+    },
+    "Francoise": {
+      "name": "Francoise",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "confidence": 0.95,
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Fran",
+        "Francoise"
+      ],
+      "description": "Postać epizodyczna / tło",
+      "entity_category": "ANTHROPONYM"
+    },
+    "Olivia": {
+      "description": "Postać epizodyczna / tło",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "confidence": 0.95,
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Olivia"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Maria": {
+      "name": "Maria",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "confidence": 0.95,
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Maria"
+      ],
+      "description": "Postać epizodyczna / tło",
+      "entity_category": "ANTHROPONYM"
+    },
+    "Kinoko": {
+      "description": "Postać epizodyczna / tło",
+      "gender": "UNKNOWN",
+      "grammatical_gender": "UNKNOWN",
+      "confidence": 0.5,
+      "priority": "P1",
+      "has_verified_gender": false,
+      "aliases": [
+        "Kinoko"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Bianca": {
+      "description": "Postać epizodyczna / tło",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "confidence": 0.95,
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Bianca"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Jeryl": {
+      "description": "Postać epizodyczna / tło",
+      "gender": "UNKNOWN",
+      "grammatical_gender": "UNKNOWN",
+      "confidence": 0.5,
+      "priority": "P1",
+      "has_verified_gender": false,
+      "aliases": [
+        "Jeryl"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Laquis": {
+      "description": "Postać epizodyczna / tło",
+      "gender": "UNKNOWN",
+      "grammatical_gender": "UNKNOWN",
+      "confidence": 0.5,
+      "priority": "P1",
+      "has_verified_gender": false,
+      "aliases": [
+        "Laquis"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Pukkapuka": {
+      "description": "Postać epizodyczna / tło",
+      "gender": "UNKNOWN",
+      "grammatical_gender": "UNKNOWN",
+      "confidence": 0.5,
+      "priority": "P1",
+      "has_verified_gender": false,
+      "aliases": [
+        "Pukkapuka"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Mia": {
+      "description": "Postać epizodyczna / tło; KOBIETA (zweryfikowano z audio seiyū Whisper)",
+      "gender": "FEMALE",
+      "grammatical_gender": "FEMININE",
+      "confidence": 0.95,
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Mia"
+      ],
+      "entity_category": "ANTHROPONYM"
+    },
+    "Lucas Forst": {
+      "name": "Lucas Forst",
+      "gender": "MALE",
+      "grammatical_gender": "MASCULINE",
+      "confidence": 0.95,
+      "priority": "P0",
+      "has_verified_gender": true,
+      "aliases": [
+        "Forst",
+        "Lucas Forst"
+      ],
+      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
+      "entity_category": "ANTHROPONYM"
+    }
+  },
+  "glossary": {
+    "Iceblade Sorcerer": "Mag Lodowego Miecza",
+    "Magicks War": "Wojna Magii",
+    "Grand Sorcerers": "Wielcy Magowie",
+    "Far East War": "Wojna na Dalekim Wschodzie",
+    "Ainsworth-style bootcamp": "obóz przetrwania szkoły Ainsworth",
+    "Overheating": "przegrzanie",
+    "Butterfly Effect": "Efekt Motyla",
+    "Aurum Reverse": "Aurum Reverse",
+    "inside code": "kod wewnętrzny",
+    "outside code": "kod zewnętrzny",
+    "Hymn Festival": "Festiwal Hymnów",
+    "Alphelia": "Alphelia"
+  },
+  "relationships": {
+    "Ray White -> Amelia Rose": "Zwrot: 'na ty / po imieniu: Amelio / kadetko Amelio (w trybie musztry)' (przyjaciele z klasy / instruktor i rekrutka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: POUFNY]",
+    "Amelia Rose -> Ray White": "Zwrot: 'na ty / po imieniu: Rayu' (bliska przyjaciółka / skryte uczucie) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: POUFNY]",
+    "Ray White -> Ariane Olgren": "Zwrot: 'na ty / Ariane / kadetko Ariane Algren' (towarzysz z drużyny / surowy dowódca) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Ariane Olgren -> Ray White": "Zwrot: 'na ty / po imieniu: Rayu (z wojskowym respektem)' (podwładna w obozie / zafascynowana rywalka) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
+    "Ray White -> Rebecca Bradley": "Zwrot: 'pani przewodnicząca / Rebecco-senpai (lub per starsza koleżanko)' (młodszy kolega z klubu -> starsza mentorka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: FORMALNY]",
+    "Rebecca Bradley -> Ray White": "Zwrot: 'na ty / po imieniu: Rayu' (starsza koleżanka zakochana w młodszym koledze) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Ray White -> Lydia Ainsworth": "Zwrot: 'Mistrzyni / Shishou' (uczeń -> mistrzyni) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: FORMALNY]",
+    "Lydia Ainsworth -> Ray White": "Zwrot: 'na ty / Rayu' (mistrzyni -> uczeń) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
+    "Rebecca Bradley -> Amelia Rose": "Zwrot: 'na ty / po imieniu: Amelio' (senpai -> kouhai / sojuszniczki w miłości) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie']",
+    "Amelia Rose -> Rebecca Bradley": "Zwrot: 'panno Rebecco / przewodnicząca Rebecco' (kouhai -> senpai) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie']",
+    "Amelia Rose -> Ariane Olgren": "Zwrot: 'Ariane (ty)' (Towarzyszki broni, bliskie przyjaciółki i zadeklarowane rywalki w miłości) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: POUFNY] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie']",
+    "Ray White -> Carol Caroline": "Zwrot: 'Carol (ty)' (Przyjaciele i sojusznicy; Ray traktuje ją z troską, Carol czuje rosnące zakłopotanie damsko-męskie) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: POUFNY]",
+    "Lydia Ainsworth -> Carol Caroline": "Zwrot: 'Różowy Pustaku' (Złośliwa, acz zażyła relacja koleżeńska) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: POUFNY] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie']",
+    "Lucas Forst -> Ray White": "Zwrot: 'Rayu / ty' (Wzajemny głęboki szacunek utalentowanych szermierzy-magów) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+  },
+  "relations": {
+    "Ray White -> Amelia Rose": "Zwrot: 'na ty / po imieniu: Amelio / kadetko Amelio (w trybie musztry)' (przyjaciele z klasy / instruktor i rekrutka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: POUFNY]",
+    "Amelia Rose -> Ray White": "Zwrot: 'na ty / po imieniu: Rayu' (bliska przyjaciółka / skryte uczucie) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: POUFNY]",
+    "Ray White -> Ariane Olgren": "Zwrot: 'na ty / Ariane / kadetko Ariane Algren' (towarzysz z drużyny / surowy dowódca) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Ariane Olgren -> Ray White": "Zwrot: 'na ty / po imieniu: Rayu (z wojskowym respektem)' (podwładna w obozie / zafascynowana rywalka) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
+    "Ray White -> Rebecca Bradley": "Zwrot: 'pani przewodnicząca / Rebecco-senpai (lub per starsza koleżanko)' (młodszy kolega z klubu -> starsza mentorka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: FORMALNY]",
+    "Rebecca Bradley -> Ray White": "Zwrot: 'na ty / po imieniu: Rayu' (starsza koleżanka zakochana w młodszym koledze) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Ray White -> Lydia Ainsworth": "Zwrot: 'Mistrzyni / Shishou' (uczeń -> mistrzyni) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: FORMALNY]",
+    "Lydia Ainsworth -> Ray White": "Zwrot: 'na ty / Rayu' (mistrzyni -> uczeń) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
+    "Rebecca Bradley -> Amelia Rose": "Zwrot: 'na ty / po imieniu: Amelio' (senpai -> kouhai / sojuszniczki w miłości) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Amelia Rose -> Rebecca Bradley": "Zwrot: 'panno Rebecco / przewodnicząca Rebecco' (kouhai -> senpai) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Amelia Rose -> Ariane Olgren": "Zwrot: 'Ariane (ty)' (Towarzyszki broni, bliskie przyjaciółki i zadeklarowane rywalki w miłości) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: POUFNY]",
+    "Ray White -> Carol Caroline": "Zwrot: 'Carol (ty)' (Przyjaciele i sojusznicy; Ray traktuje ją z troską, Carol czuje rosnące zakłopotanie damsko-męskie) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: POUFNY]",
+    "Lydia Ainsworth -> Carol Caroline": "Zwrot: 'Różowy Pustaku' (Złośliwa, acz zażyła relacja koleżeńska) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: POUFNY]",
+    "Lucas Forst -> Ray White": "Zwrot: 'Rayu / ty' (Wzajemny głęboki szacunek utalentowanych szermierzy-magów) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+  },
+  "declensions": {
+    "Ray White": {
+      "M": "Ray White",
+      "D": "Raya White'a",
+      "C": "Rayowi White'owi",
+      "B": "Raya White'a",
+      "N": "Rayem White'em",
+      "Ms": "Rayu White'cie",
+      "W": "Rayu White",
+      "gender": "MALE"
+    },
+    "Amelia Rose": {
+      "M": "Amelia Rose",
+      "D": "Amelii Rose",
+      "C": "Amelii Rose",
+      "B": "Amelię Rose",
+      "N": "Amelią Rose",
+      "Ms": "Amelii Rose",
+      "W": "Amelio Rose",
+      "gender": "FEMALE"
+    },
+    "Ariane Olgren": {
+      "M": "Ariane Olgren",
+      "D": "Ariane Olgren",
+      "C": "Ariane Olgren",
+      "B": "Ariane Olgren",
+      "N": "Ariane Olgren",
+      "Ms": "Ariane Olgren",
+      "W": "Ariane Olgren",
+      "gender": "FEMALE"
+    },
+    "Rebecca Bradley": {
+      "M": "Rebecca Bradley",
+      "D": "Rebeccy Bradley",
+      "C": "Rebeccy Bradley",
+      "B": "Rebeccę Bradley",
+      "N": "Rebeccą Bradley",
+      "Ms": "Rebeccy Bradley",
+      "W": "Rebecco Bradley",
+      "gender": "FEMALE"
+    },
+    "Lydia Ainsworth": {
+      "M": "Lydia Ainsworth",
+      "D": "Lydii Ainsworth",
+      "C": "Lydii Ainsworth",
+      "B": "Lydię Ainsworth",
+      "N": "Lydią Ainsworth",
+      "Ms": "Lydii Ainsworth",
+      "W": "Lydio Ainsworth",
+      "gender": "FEMALE"
+    },
+    "Elisa Griffith": {
+      "M": "Elisa Griffith",
+      "D": "Elisy Griffith",
+      "C": "Elisie Griffith",
+      "B": "Elisę Griffith",
+      "N": "Elisą Griffith",
+      "Ms": "Elisie Griffith",
+      "W": "Eliso Griffith",
+      "gender": "FEMALE"
+    },
+    "Claris Cleveland": {
+      "M": "Claris Cleveland",
+      "D": "Claris Cleveland",
+      "C": "Claris Cleveland",
+      "B": "Claris Cleveland",
+      "N": "Claris Cleveland",
+      "Ms": "Claris Cleveland",
+      "W": "Claris Cleveland",
+      "gender": "FEMALE"
+    },
+    "Evi Armstrong": {
+      "M": "Evi Armstrong",
+      "D": "Eviego Armstronga",
+      "C": "Eviemu Armstrongowi",
+      "B": "Eviego Armstronga",
+      "N": "Evim Armstrongiem",
+      "Ms": "Evim Armstrongu",
+      "W": "Evi Armstrongu",
+      "gender": "MALE"
+    },
+    "Abbie Garnet": {
+      "M": "Abbie Garnet",
+      "D": "Abbie Garnet",
+      "C": "Abbie Garnet",
+      "B": "Abbie Garnet",
+      "N": "Abbie Garnet",
+      "Ms": "Abbie Garnet",
+      "W": "Abbie Garnet",
+      "gender": "FEMALE"
+    },
+    "Carol Caroline": {
+      "M": "Carol Caroline",
+      "D": "Carol Caroline",
+      "C": "Carol Caroline",
+      "B": "Carol Caroline",
+      "N": "Carol Caroline",
+      "Ms": "Carol Caroline",
+      "W": "Carol Caroline",
+      "gender": "FEMALE"
+    },
+    "Albert Alium": {
+      "M": "Albert Alium",
+      "D": "Alberta Aliuma",
+      "C": "Albertowi Aliumowi",
+      "B": "Alberta Aliuma",
+      "N": "Albertem Aliumem",
+      "Ms": "Albercie Aliumie",
+      "W": "Albercie Aliumie",
+      "gender": "MALE"
+    },
+    "Helena Grady": {
+      "M": "Helena Grady",
+      "D": "Heleny Grady",
+      "C": "Helenie Grady",
+      "B": "Helenę Grady",
+      "N": "Heleną Grady",
+      "Ms": "Helenie Grady",
+      "W": "Heleno Grady",
+      "gender": "FEMALE"
+    },
+    "Lucas Bradley": {
+      "M": "Lucas Bradley",
+      "D": "Lucasa Bradley",
+      "C": "Lucasowi Bradley",
+      "B": "Lucasa Bradley",
+      "N": "Lucasem Bradley",
+      "Ms": "Lucasie Bradley",
+      "W": "Lucasie Bradley",
+      "gender": "MALE"
+    },
+    "Wanda Wykes": {
+      "M": "Wanda Wykes",
+      "D": "Wandy Wykes",
+      "C": "Wandzie Wykes",
+      "B": "Wandę Wykes",
+      "N": "Wandą Wykes",
+      "Ms": "Wandzie Wykes",
+      "W": "Wando Wykes",
+      "gender": "FEMALE"
+    },
+    "Stella White": {
+      "M": "Stella White",
+      "D": "Stelli White",
+      "C": "Stelli White",
+      "B": "Stellę White",
+      "N": "Stellą White",
+      "Ms": "Stelli White",
+      "W": "Stello White",
+      "gender": "FEMALE"
+    },
+    "Lieselotte": {
+      "M": "Lieselotte",
+      "D": "Lieselotte",
+      "C": "Lieselotte",
+      "B": "Lieselotte",
+      "N": "Lieselotte",
+      "Ms": "Lieselotte",
+      "W": "Lieselotte",
+      "gender": "FEMALE"
+    },
+    "Dina": {
+      "M": "Dina",
+      "D": "Diny",
+      "C": "Dinie",
+      "B": "Dinę",
+      "N": "Diną",
+      "Ms": "Dinie",
+      "W": "Dino",
+      "gender": "FEMALE"
+    },
+    "Lily": {
+      "M": "Lily",
+      "D": "Lily",
+      "C": "Lily",
+      "B": "Lily",
+      "N": "Lily",
+      "Ms": "Lily",
+      "W": "Lily",
+      "gender": "FEMALE"
+    },
+    "Carla": {
+      "M": "Carla",
+      "D": "Carli",
+      "C": "Carli",
+      "B": "Carlę",
+      "N": "Carlą",
+      "Ms": "Carli",
+      "W": "Carlo",
+      "gender": "FEMALE"
+    },
+    "Zuina": {
+      "M": "Zuina",
+      "D": "Zuiny",
+      "C": "Zuinie",
+      "B": "Zuinę",
+      "N": "Zuiną",
+      "Ms": "Zuinie",
+      "W": "Zuino",
+      "gender": "FEMALE"
+    },
+    "Cusuechs": {
+      "M": "Cusuechs",
+      "D": "Cusuechsa",
+      "C": "Cusuechsowi",
+      "B": "Cusuechsa",
+      "N": "Cusuechsem",
+      "Ms": "Cusuechsie",
+      "W": "Cusuechsie",
+      "gender": "MALE"
+    },
+    "Takenoko": {
+      "M": "Takenoko",
+      "D": "Takenoko",
+      "C": "Takenoko",
+      "B": "Takenoko",
+      "N": "Takenoko",
+      "Ms": "Takenoko",
+      "W": "Takenoko",
+      "gender": "FEMALE"
+    },
+    "Francoise": {
+      "M": "Francoise",
+      "D": "Francoise",
+      "C": "Francoise",
+      "B": "Francoise",
+      "N": "Francoise",
+      "Ms": "Francoise",
+      "W": "Francoise",
+      "gender": "FEMALE"
+    },
+    "Olivia": {
+      "M": "Olivia",
+      "D": "Olivii",
+      "C": "Olivii",
+      "B": "Olivię",
+      "N": "Olivią",
+      "Ms": "Olivii",
+      "W": "Olivio",
+      "gender": "FEMALE"
+    },
+    "Maria": {
+      "M": "Maria",
+      "D": "Marii",
+      "C": "Marii",
+      "B": "Marię",
+      "N": "Marią",
+      "Ms": "Marii",
+      "W": "Mario",
+      "gender": "FEMALE"
+    },
+    "Kinoko": {
+      "M": "Kinoko",
+      "D": "Kinoko",
+      "C": "Kinoko",
+      "B": "Kinoko",
+      "N": "Kinoko",
+      "Ms": "Kinoko",
+      "W": "Kinoko"
+    },
+    "Bianca": {
+      "M": "Bianca",
+      "D": "Biancy",
+      "C": "Biancy",
+      "B": "Biancę",
+      "N": "Biancą",
+      "Ms": "Biancy",
+      "W": "Bianco",
+      "gender": "FEMALE"
+    },
+    "Jeryl": {
+      "M": "Jeryl",
+      "D": "Jeryla",
+      "C": "Jerylowi",
+      "B": "Jeryla",
+      "N": "Jerylem",
+      "Ms": "Jerylu",
+      "W": "Jerylu"
+    },
+    "Laquis": {
+      "M": "Laquis",
+      "D": "Laquisa",
+      "C": "Laquisowi",
+      "B": "Laquisa",
+      "N": "Laquisem",
+      "Ms": "Laquisie",
+      "W": "Laquisie"
+    },
+    "Pukkapuka": {
+      "M": "Pukkapuka",
+      "D": "Pukkapuki",
+      "C": "Pukkapuce",
+      "B": "Pukkapukę",
+      "N": "Pukkapuką",
+      "Ms": "Pukkapuce",
+      "W": "Pukkapuko"
+    },
+    "Mia": {
+      "M": "Mia",
+      "D": "Mii",
+      "C": "Mii",
+      "B": "Mię",
+      "N": "Mią",
+      "Ms": "Mii",
+      "W": "Mio",
+      "gender": "FEMALE"
+    },
+    "Lucas Forst": {
+      "M": "Lucas Forst",
+      "D": "Lucasa Forsta",
+      "C": "Lucasowi Forstowi",
+      "B": "Lucasa Forsta",
+      "N": "Lucasem Forstem",
+      "Ms": "Lucasie Forście",
+      "W": "Lucasie Forście",
+      "gender": "MALE"
+    }
+  },
+  "hypocorisms": {},
+  "plot_anchors": {
+    "Magic Chevalier": "Utrzymać nazwę turnieju jako 'Magic Chevalier' (nie tłumaczyć jako 'Magiczny Rycerz'). Amelia jest jego aktualną mistrzynią.",
+    "Overheating (Przegrzanie rdzenia)": "Termin medyczno-magiczny oznaczający przeciążenie obwodu magii Raya po Wojnie na Dalekim Wschodzie. Tłumaczyć konsekwentnie jako 'przegrzanie'.",
+    "Seven Grand Sorcerers": "Siedmiu Wielkich Magów – elitarna grupa najpotężniejszych czarodziejów królestwa, do której w tajemnicy należy Ray (Mag Lodowego Ostrza).",
+    "Magicks War": "Wojna Magii / Turniej Magii – prestiżowy turniej drużynowy akademii, w którym stawką jest mistrzostwo.",
+    "Eugenics": "Eugenika – wroga, zbrodnicza organizacja czarnoksięska badająca nielegalne mutacje i kody magiczne."
+  },
+  "episodes_translated": [
+    "[ASW] Hyouken no Majutsushi ga Sekai wo Suberu S2 - 01 [1080p HEVC][84D39E5E]",
+    "[ASW] Hyouken no Majutsushi ga Sekai wo Suberu S2 - 04 [1080p HEVC][8C1AB84B]"
+  ],
+  "batch_stats": {
+    "[ASW] Hyouken no Majutsushi ga Sekai wo Suberu S2 - 01 [1080p HEVC][84D39E5E]": {
+      "dialogues": 466,
+      "batches": 19,
+      "avg_batch_size": 24.5,
+      "cost_pln": 3.98
+    },
+    "[ASW] Hyouken no Majutsushi ga Sekai wo Suberu S2 - 04 [1080p HEVC][8C1AB84B]": {
+      "dialogues": 454,
+      "batches": 20,
+      "avg_batch_size": 22.7,
+      "cost_pln": 4.5
+    }
+  },
+  "entity_categories": {
+    "Ray White": "ANTHROPONYM",
+    "Amelia Rose": "ANTHROPONYM",
+    "Ariane Olgren": "ANTHROPONYM",
+    "Rebecca Bradley": "ANTHROPONYM",
+    "Lydia Ainsworth": "ANTHROPONYM",
+    "Elisa Griffith": "ANTHROPONYM",
+    "Claris Cleveland": "ANTHROPONYM",
+    "Evi Armstrong": "ANTHROPONYM",
+    "Abbie Garnet": "ANTHROPONYM",
+    "Carol Caroline": "ANTHROPONYM",
+    "Albert Alium": "ANTHROPONYM",
+    "Helena Grady": "ANTHROPONYM",
+    "Lucas Bradley": "ANTHROPONYM",
+    "Wanda Wykes": "ANTHROPONYM",
+    "Stella White": "ANTHROPONYM",
+    "Lieselotte": "ANTHROPONYM",
+    "Dina": "ANTHROPONYM",
+    "Lily": "ANTHROPONYM",
+    "Carla": "ANTHROPONYM",
+    "Zuina": "ANTHROPONYM",
+    "Cusuechs": "ANTHROPONYM",
+    "Takenoko": "ANTHROPONYM",
+    "Francoise": "ANTHROPONYM",
+    "Olivia": "ANTHROPONYM",
+    "Maria": "ANTHROPONYM",
+    "Kinoko": "ANTHROPONYM",
+    "Bianca": "ANTHROPONYM",
+    "Jeryl": "ANTHROPONYM",
+    "Laquis": "ANTHROPONYM",
+    "Waitress": "ANTHROPONYM",
+    "Pukkapuka": "ANTHROPONYM",
+    "Mia": "ANTHROPONYM",
+    "Lucas Forst": "ANTHROPONYM",
+    "Seven Grand Sorcerers": "CHREMATONYM",
+    "Iceblade Sorcerer": "ANTHROPONYM",
+    "Magicks War": "ANTHROPONYM",
+    "Grand Sorcerers": "ANTHROPONYM",
+    "Far East War": "ANTHROPONYM",
+    "Ainsworth-style bootcamp": "ANTHROPONYM",
+    "Overheating": "ANTHROPONYM",
+    "Butterfly Effect": "ANTHROPONYM",
+    "Aurum Reverse": "ANTHROPONYM",
+    "inside code": "ANTHROPONYM",
+    "outside code": "ANTHROPONYM",
+    "Hymn Festival": "ANTHROPONYM",
+    "Alphelia": "TOPONYM",
+    "Magic Chevalier": "ANTHROPONYM",
+    "Overheating (Przegrzanie rdzenia)": "ANTHROPONYM",
+    "Eugenics": "ANTHROPONYM"
+  },
+  "fansub_canon": {}
+}

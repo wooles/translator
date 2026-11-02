@@ -1,0 +1,53 @@
+﻿MANIFEST KONTYNUACJI CZATU
+Wygenerowano: 2026-11-02 22:08:13
+Repo: C:\Users\Piotrek\Desktop\translator
+Katalog: C:\Users\Piotrek\Desktop\translator\Artefakty\_KONTYNUACJA_CZATU
+
+=== SKOPIOWANE PLIKI (25) ===
+TIER 1  TIER1\Prompt_10.0.3.md
+TIER 1  TIER1\Raport_wdrozenia_10.0.3.md
+TIER 1  TIER1\Tensei_Kizoku_Kantei_Skill_de_Nariagaru_bible.json
+TIER 1  TIER1\series_memory.py
+TIER 1  TIER1\scene_discourse.py
+TIER 1  TIER1\translator.py
+TIER 2  TIER2\Prompt_9.7.md
+TIER 2  TIER2\Prompt_9.10.md
+TIER 2  TIER2\Prompt_9.10.1.md
+TIER 2  TIER2\Raport_wdrozenia_9.10.md
+TIER 2  TIER2\Raport_wdrozenia_9.10.1.md
+TIER 2  TIER2\Raport_wdrozenia_10.0.md
+TIER 2  TIER2\Raport_wdrozenia_10.0a.md
+TIER 2  TIER2\Raport_wdrozenia_10.0.2.md
+TIER 2  TIER2\Raport_wdrozenia_10.0.2a.md
+TIER 1  TIER1_DODATKOWE\avt_linter.py
+TIER 1  TIER1_DODATKOWE\verifier.py
+TIER 1  TIER1_DODATKOWE\main.py
+TIER 1  TIER1_DODATKOWE\rules.py
+TIER 1  TIER1_DODATKOWE\metadata.py
+TIER 1  TIER1_DODATKOWE\profiler.py
+TIER 1  TIER1_DODATKOWE\pytest.ini
+TIER 1  TIER1_DODATKOWE\test_system.py
+TIER 1  TIER1_DODATKOWE\Hyouken_no_Majutsushi_ga_Sekai_wo_Suberu_S2_bible.json
+TIER 1  TIER1_DODATKOWE\Tenmaku_no_Jaadugar_bible.json
+
+=== BRAKUJACE PLIKI WYMAGANE (0) ===
+(brak - wszystkie wymagane pliki skopiowane)
+
+=== BRAKUJACE PLIKI OPCJONALNE (10) ===
+TIER 1  Artefakty\Wdrozenie_Standardu_10.0.3_10.1.txt
+TIER 2  Artefakty\Prompt_10.0.md
+TIER 3  Artefakty\cleanup_report.md
+TIER 3  Artefakty\cleanup_runtime_modules.txt
+TIER 3  Artefakty\cleanup_before_tracked.txt
+TIER 3  Artefakty\cleanup_before_py.txt
+TIER 3  Artefakty\cleanup_before_bibles.txt
+TIER 4  Artefakty\Prompt_audyt_kumulatywny_9_3_10_0_3.md
+TIER 5  Artefakty\Backlog_10.1.md
+TIER 5  Artefakty\Prompt_10.1.md
+
+=== INSTRUKCJA ===
+1. Otworz nowe okno czatu.
+2. Wklej tresc promptu kontynuacyjnego jako pierwsza wiadomosc.
+3. Zalacz pliki z katalogow TIER1 i TIER2.
+4. Jesli wracasz z raportem cleanupu - zalacz rowniez katalog TIER3.
+5. Jesli uruchamiasz audyt kumulatywny - zalacz katalog TIER4.
