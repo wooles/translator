@@ -766,3 +766,60 @@ def test_bible_five_anomalies_sanitized(rel_raw, expected_clean_rel, tmp_path):
     assert bible.data["declensions"]["Abbie Foreign"]["N"] == "Abbie Foreign"
     assert bible.data["entity_categories"]["Seven Grand Sorcerers"] == "CHREMATONYM"
     assert bible.data["relations"]["A -> B"] == expected_clean_rel
+
+
+# ==============================================================================
+# STANDARD 10.0.3 / 10.1 REGRESSION TESTS (2B.1, 2B.2)
+# ==============================================================================
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "short_name,full_name,p0_gender,expected_gram_gender",
+    [
+        ("HeroAlpha", "HeroAlpha Louventis", "MALE", "MASCULINE"),
+        ("InventorBeta", "InventorBeta Seymarrowis", "MALE", "MASCULINE"),
+        ("CommanderGamma", "CommanderGamma Musesis", "MALE", "MASCULINE"),
+        ("TacticianDelta", "TacticianDelta Fujimiyas", "FEMALE", "FEMININE"),
+        ("NobleEpsilon", "NobleEpsilon Plaidis", "FEMALE", "FEMININE"),
+    ],
+)
+def test_addressee_and_speaker_gender_use_p0_alias_priority_over_p2_duplicate(
+    short_name, full_name, p0_gender, expected_gram_gender
+):
+    from series_memory import SeriesBible
+    from scene_discourse import SceneDiscourseGraph
+
+    bible = SeriesBible(slug="test_p0_alias_priority", db_path=":memory:")
+    bible.sync_verified_profile_entity(
+        full_name,
+        p0_gender,
+        has_verified_gender=True,
+    )
+    # Symulacja duplikatu P2 UNKNOWN powstałego z krótkiego tagu .ass
+    bible.data["characters"][short_name] = {
+        "name": short_name,
+        "gender": "UNKNOWN",
+        "grammatical_gender": "UNKNOWN",
+        "priority": "P2",
+        "has_verified_gender": False,
+        "confidence": 0.5,
+        "aliases": [short_name],
+    }
+    bible._sanitize_loaded_bible_in_ram()
+
+    # 1. Duplikat P2 musi zostać usunięty z characters na rzecz P0 (Wariant A z U2)
+    assert short_name not in bible.data["characters"], \
+        f"Duplikat P2 '{short_name}' nie został usunięty z characters po _sanitize_loaded_bible_in_ram"
+
+    # 2. Arbitraż telemetrii dla krótkiego imienia w roli adresata musi zwrócić płeć P0
+    telem = SceneDiscourseGraph.arbitrate_event_telemetry(
+        raw_actor="OtherSpeaker",
+        target_actor=short_name,
+        series_bible=bible,
+        f0_hz=310.0 if p0_gender == "MALE" else 115.0,  # Kontr-F0 mówcy (test odporności na H2!)
+    )
+    assert telem["target_gender"] == expected_gram_gender
+    assert telem["addressee_gender"] == p0_gender, \
+        f"addressee_gender={telem['addressee_gender']!r}, oczekiwano {p0_gender!r} (płeć P0)"
+    assert telem["target_p0_verified"] is True

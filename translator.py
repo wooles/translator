@@ -4076,11 +4076,22 @@ class MultimodalTranslator:
             # Standard 9.5 (Operacja 2C.1, R3.2): Bezpośrednie wywołanie arbitrate_event_telemetry
             from scene_discourse import SceneDiscourseGraph
             is_fem_scene = (getattr(self, "episode_scene_genders", {}).get(orig_idx) == "kobieta") or getattr(self, "scene_is_female_only", False)
+
+            # Operacja 2B.5: Ochrona jawnego aktora z kolumny Name pliku .ass przed nadpisaniem
+            clean_ass_actor = (getattr(event, "name", None) or "").strip()
+            effective_raw_actor = raw_speaker_name or event.name
+            sb_inst = getattr(self, "series_bible", None)
+            if clean_ass_actor and not is_generic_actor_or_category(clean_ass_actor):
+                if sb_inst and hasattr(sb_inst, "resolve_character_record"):
+                    ass_rec = sb_inst.resolve_character_record(clean_ass_actor)
+                    if ass_rec is not None:
+                        effective_raw_actor = clean_ass_actor
+
             disc_telem = SceneDiscourseGraph.arbitrate_event_telemetry(
                 event=event,
-                series_bible=getattr(self, "series_bible", None),
+                series_bible=sb_inst,
                 episode_profiler=getattr(self, "profiler", None),
-                raw_actor=raw_speaker_name or event.name,
+                raw_actor=effective_raw_actor,
                 scene_female_only=is_fem_scene,
                 target_actor=addressee_label or addressee_cat,
                 is_sign=vtype.get("is_sign", False),

@@ -311,7 +311,7 @@
   },
   "relationships": {
     "Shizuku Kanzaki -> Miyabi Shinohara": "Zwrot: 'na ty / po imieniu: Miyabi-chan' (koleżanka z zespołu / partnerka w poszukiwaniach) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
-    "Miyabi Shinohara -> Shizuku Kanzaki": "Zwrot: 'na ty / Shizuku' (bliscy współpracownicy i partnerzy winiarscy; w dialogach wyłącznie na ty: 'wygrałeś', 'wiesz', kategoryczny zakaz mieszania 'Shizuku' z 'pan') [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Miyabi Shinohara -> Shizuku Kanzaki": "Zwrot: 'na ty / Shizuku' (bliscy współpracownicy i partnerzy winiarscy; w dialogach wyłącznie na ty: 'wygrałeś, 'wiesz, kategoryczny zakaz mieszania 'Shizuku' z 'pan') [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Issei Tomine -> Loulan": "Zwrot: 'po imieniu: Loulan' (przełożony -> asystentka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Loulan -> Issei Tomine": "Zwrot: 'Issei' (oddana towarzyszka i powierniczka) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Kawarage -> Shizuku Kanzaki": "Zwrot: 'panie Kanzaki / Kanzaki-kun' (szef działu -> podwładny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
@@ -330,13 +330,13 @@
     "Shizuku -> Miyabi": "Zwrot: 'Miyabi / Miyabi-chan' (przyjaciel -> koleżanka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: POUFNY]",
     "Robert Doi -> Shizuku Kanzaki": "Zwrot: 'panowie / wy / na ty' (arbiter i wykonawca testamentu -> rywalizujący pretendenci) [GRUPA MĘŻCZYZN - Wymóg rodzaju męskoosobowego: -liście / byliście gotowi]",
     "Hayama -> Shizuku": "Zwrot: 'na ty / młodzieńcze' (starszy kupiec -> syn dawnego przyjaciela) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: POUFNY]",
-    "Robert -> Shizuku": "Zwrot: 'Shizuku' (arbiter / mentor -> zawodnik) ', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
-    "Robert -> Tomine": "Zwrot: 'Issei' (arbiter / mentor -> zawodnik) ', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
+    "Robert -> Shizuku": "Zwrot: 'Shizuku' (arbiter / mentor -> zawodnik) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
+    "Robert -> Tomine": "Zwrot: 'Issei' (arbiter / mentor -> zawodnik) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
     "Loulan -> Tomine": "Zwrot: 'Issei' (towarzyszka / powiernica) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
   },
   "relations": {
     "Shizuku Kanzaki -> Miyabi Shinohara": "Zwrot: 'na ty / po imieniu: Miyabi-chan' (koleżanka z zespołu / partnerka w poszukiwaniach) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
-    "Miyabi Shinohara -> Shizuku Kanzaki": "Zwrot: 'na ty / Shizuku' (bliscy współpracownicy i partnerzy winiarscy; w dialogach wyłącznie na ty: 'wygrałeś', 'wiesz', kategoryczny zakaz mieszania 'Shizuku' z 'pan') [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Miyabi Shinohara -> Shizuku Kanzaki": "Zwrot: 'na ty / Shizuku' (bliscy współpracownicy i partnerzy winiarscy; w dialogach wyłącznie na ty: 'wygrałeś, 'wiesz, kategoryczny zakaz mieszania 'Shizuku' z 'pan') [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Issei Tomine -> Loulan": "Zwrot: 'po imieniu: Loulan' (przełożony -> asystentka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Loulan -> Issei Tomine": "Zwrot: 'Issei' (oddana towarzyszka i powierniczka) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Kawarage -> Shizuku Kanzaki": "Zwrot: 'panie Kanzaki / Kanzaki-kun' (szef działu -> podwładny) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
@@ -355,8 +355,8 @@
     "Shizuku -> Miyabi": "Zwrot: 'Miyabi / Miyabi-chan' (przyjaciel -> koleżanka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: POUFNY]",
     "Robert Doi -> Shizuku Kanzaki": "Zwrot: 'panowie / wy / na ty' (arbiter i wykonawca testamentu -> rywalizujący pretendenci) [GRUPA MĘŻCZYZN - Wymóg rodzaju męskoosobowego: -liście / byliście gotowi]",
     "Hayama -> Shizuku": "Zwrot: 'na ty / młodzieńcze' (starszy kupiec -> syn dawnego przyjaciela) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: POUFNY]",
-    "Robert -> Shizuku": "Zwrot: 'Shizuku' (arbiter / mentor -> zawodnik) ', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
-    "Robert -> Tomine": "Zwrot: 'Issei' (arbiter / mentor -> zawodnik) ', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
+    "Robert -> Shizuku": "Zwrot: 'Shizuku' (arbiter / mentor -> zawodnik) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
+    "Robert -> Tomine": "Zwrot: 'Issei' (arbiter / mentor -> zawodnik) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
     "Loulan -> Tomine": "Zwrot: 'Issei' (towarzyszka / powiernica) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
   },
   "declensions": {

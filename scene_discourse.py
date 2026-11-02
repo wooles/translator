@@ -2815,13 +2815,16 @@ class SceneDiscourseGraph:
             telemetry["speaker_name"] = clean_actor
             telemetry["actor"] = clean_actor
 
-        # 2. Bezwarunkowy odczyt rekordu P0 z SeriesBible / EpisodeProfiler (Operacja 2C.1, R3.2)
+        # 2. Bezwarunkowy odczyt rekordu P0 z SeriesBible / EpisodeProfiler (Operacja 2C.1, R3.2, 2B.1, 2B.5)
         p0_gender = verified_p0_gender
         has_ver = has_verified_gender
+        speaker_p0_verified = bool(verified_p0_gender)
 
         if not p0_gender and series_bible and clean_actor:
             char_rec = None
-            if hasattr(series_bible, "get_character"):
+            if hasattr(series_bible, "resolve_character_record"):
+                char_rec = series_bible.resolve_character_record(clean_actor)
+            elif hasattr(series_bible, "get_character"):
                 char_rec = series_bible.get_character(clean_actor)
             elif hasattr(series_bible, "characters") and isinstance(series_bible.characters, dict):
                 chars = series_bible.characters
@@ -2839,6 +2842,13 @@ class SceneDiscourseGraph:
                 if g and str(g).upper() != "UNKNOWN":
                     p0_gender = str(g).upper()
                     has_ver = bool(char_rec.get("has_verified_gender", False)) or char_rec.get("priority") in ("P0", "P1")
+                    if has_ver:
+                        speaker_p0_verified = True
+                # Operacja 2B.5: Zachowanie kanonicznej nazwy jawnego aktora .ass
+                if not clean_actor and char_rec.get("name"):
+                    clean_actor = char_rec["name"]
+                    telemetry["speaker_name"] = clean_actor
+                    telemetry["actor"] = clean_actor
 
         if not p0_gender and episode_profiler and hasattr(episode_profiler, "character_dossiers") and clean_actor:
             for cd in getattr(episode_profiler, "character_dossiers", []):
@@ -2847,17 +2857,34 @@ class SceneDiscourseGraph:
                     if g and str(g).upper() != "UNKNOWN":
                         p0_gender = str(g).upper()
                         has_ver = True
+                        speaker_p0_verified = True
                         break
 
         if not p0_gender and explicit_spk_g:
             p0_gender = explicit_spk_g
             has_ver = True
+            speaker_p0_verified = True
+
+        # Operacja 2B.4 pkt 2: Formy męskie 1. os. mówcy blokują F0 krzyku bojowego
+        pl_text = kwargs.get("polish_text") or telemetry.get("polish_text") or getattr(event, "text", "") or ""
+        if isinstance(pl_text, str) and pl_text:
+            m_first_male = re.search(
+                r"\b(?:myślałem|miałem|zebrałem|usłyszałem|rozejrzałem|zaszedłem|poszedłem|zrobiłem|widziałem|chciałem|wiedziałem|mówiłem|czekałem|szedłem|brałem|bylem|byłem)\b|"
+                r"\b(?:aniki|bro)\b",
+                pl_text,
+                re.IGNORECASE
+            )
+            if m_first_male:
+                p0_gender = "MALE"
+                has_ver = True
+                speaker_p0_verified = True
 
         if p0_gender:
             p0_u = str(p0_gender).upper()
             telemetry["speaker_gender"] = p0_u
             telemetry["p0_gender"] = p0_u
             telemetry["has_verified_gender"] = has_ver
+            telemetry["speaker_p0_verified"] = speaker_p0_verified
             if p0_u == "MALE":
                 telemetry["grammatical_gender"] = "MASCULINE"
             elif p0_u == "FEMALE":
@@ -2869,6 +2896,7 @@ class SceneDiscourseGraph:
                 telemetry["has_verified_gender"] = False
             if "grammatical_gender" not in telemetry:
                 telemetry["grammatical_gender"] = "UNKNOWN"
+            telemetry["speaker_p0_verified"] = False
 
         # 3. Izolacja monologu wewnętrznego (Style: Italics / is_internal_monologue)
         st_style = str(getattr(event, "style", "") or kwargs.get("style", "")).lower()
@@ -2884,6 +2912,8 @@ class SceneDiscourseGraph:
             telemetry["target_actor"] = ""
             telemetry["target_gender"] = None
             telemetry["addressee_gender"] = None
+            telemetry["target_grammatical_gender"] = None
+            telemetry["target_p0_verified"] = False
             telemetry["is_internal_monologue"] = True
         else:
             # Gdy adresat jest tożsamy z mówcą w dialogu, wyznacz pusty lub drugiego rozmówcę
@@ -2892,10 +2922,13 @@ class SceneDiscourseGraph:
 
             telemetry["target_actor"] = clean_target_actor
             addr_candidate = verified_addressee_p0_gender
+            target_p0_verified = bool(verified_addressee_p0_gender)
 
             if not addr_candidate and series_bible and clean_target_actor:
                 ch_addr = None
-                if hasattr(series_bible, "get_character"):
+                if hasattr(series_bible, "resolve_character_record"):
+                    ch_addr = series_bible.resolve_character_record(clean_target_actor)
+                elif hasattr(series_bible, "get_character"):
                     ch_addr = series_bible.get_character(clean_target_actor)
                 elif hasattr(series_bible, "characters") and isinstance(series_bible.characters, dict):
                     chars = series_bible.characters
@@ -2912,6 +2945,8 @@ class SceneDiscourseGraph:
                     ag = ch_addr.get("gender")
                     if ag and str(ag).upper() in ("MALE", "FEMALE"):
                         addr_candidate = str(ag).upper()
+                        if bool(ch_addr.get("has_verified_gender", False)) or ch_addr.get("priority") in ("P0", "P1"):
+                            target_p0_verified = True
 
             if not addr_candidate and episode_profiler and hasattr(episode_profiler, "character_dossiers") and clean_target_actor:
                 for cd in getattr(episode_profiler, "character_dossiers", []):
@@ -2919,21 +2954,38 @@ class SceneDiscourseGraph:
                         ag = getattr(cd, "gender", None) or getattr(cd, "apparent_gender", None)
                         if ag and str(ag).upper() in ("MALE", "FEMALE"):
                             addr_candidate = str(ag).upper()
+                            target_p0_verified = True
                             break
 
             if not addr_candidate and explicit_target_g:
                 addr_candidate = explicit_target_g
+                target_p0_verified = True
+
+            if not addr_candidate and clean_target_actor:
+                try:
+                    from series_memory import resolve_lexical_label_gender
+                    lex_g, _ = resolve_lexical_label_gender(clean_target_actor)
+                    if lex_g in ("MALE", "FEMALE"):
+                        addr_candidate = lex_g
+                        target_p0_verified = False
+                except Exception:
+                    pass
 
             if addr_candidate:
                 addr_g = str(addr_candidate).upper()
                 telemetry["addressee_gender"] = addr_g
                 if addr_g == "FEMALE":
                     telemetry["target_gender"] = "FEMININE"
+                    telemetry["target_grammatical_gender"] = "FEMININE"
                 elif addr_g == "MALE":
                     telemetry["target_gender"] = "MASCULINE"
+                    telemetry["target_grammatical_gender"] = "MASCULINE"
+                telemetry["target_p0_verified"] = target_p0_verified
             else:
                 telemetry["target_gender"] = None
                 telemetry["addressee_gender"] = None
+                telemetry["target_grammatical_gender"] = None
+                telemetry["target_p0_verified"] = False
 
         # 4. Spójność sceny żeńskiej bez nadpisywania potwierdzonego mówcy męskiego (Operacja 2C.1)
         if scene_female_only:
@@ -2941,9 +2993,16 @@ class SceneDiscourseGraph:
             telemetry["group_virility"] = "NON_VIRILE"
             telemetry["we_virility"] = "VIRILE" if spk_is_male else "NON_VIRILE"
             telemetry["you_virility"] = "NON_VIRILE"
-            if not ev_is_monologue and clean_target_actor and telemetry.get("target_gender") != "MASCULINE":
-                telemetry["target_gender"] = "FEMININE"
-                telemetry["addressee_gender"] = "FEMALE"
+
+        # Operacja 2B.3: Ochrona pojedynczej adresatki przed you_virility = VIRILE
+        if telemetry.get("addressee_gender") == "FEMALE" or telemetry.get("target_gender") == "FEMININE":
+            try:
+                from series_memory import is_plural_actor
+                target_act_lbl = telemetry.get("target_actor") or ""
+                if not is_plural_actor(target_act_lbl) and not any(w in target_act_lbl.lower() for w in ["grupa", "dwie", "panie", "kobiety"]):
+                    telemetry["you_virility"] = "NON_VIRILE"
+            except Exception:
+                pass
 
         # 5. Generowanie spójnego tagu dry_telemetry wolnego od nawiasów F0
         dry_segs = []
@@ -2953,8 +3012,9 @@ class SceneDiscourseGraph:
         elif telemetry.get("speaker_name"):
             dry_segs.append(f"Mówca: {telemetry['speaker_name']}")
 
-        if not ev_is_monologue and telemetry.get("target_actor") and telemetry.get("target_gender") in ("MASCULINE", "FEMININE"):
-            dry_segs.append(f"Adresat: {telemetry['target_actor']} ({telemetry['target_gender']})")
+        tgt_g_tag = telemetry.get("target_grammatical_gender") or telemetry.get("target_gender")
+        if not ev_is_monologue and telemetry.get("target_actor") and tgt_g_tag in ("MASCULINE", "FEMININE"):
+            dry_segs.append(f"Adresat: {telemetry['target_actor']} ({tgt_g_tag})")
 
         if dry_segs:
             telemetry["dry_telemetry"] = f"[{' | '.join(dry_segs)}]"

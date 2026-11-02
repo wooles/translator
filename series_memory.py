@@ -1894,6 +1894,76 @@ SECONDARY_LEXICAL_FEMALE_NOUNS: Set[str] = {
     "dziewczyna", "kobieta", "dziewczynka", "matka", "siostra"
 }
 
+def resolve_lexical_label_gender(label: str) -> Tuple[Optional[str], Optional[str]]:
+    """
+    Deterministyczny resolver inherentnej płci leksykalnej dla etykiet ról i grup (Standard 10.0.3, 2B.4):
+    Rozpoznaje polskie i angielskie leksemy męskie i żeńskie w etykietach mówców i adresatów,
+    zarówno w liczbie pojedynczej, jak i mnogiej/zbiorowej w relacji do ról syntaktycznych.
+    Zwraca: (gender, grammatical_gender), np. ('MALE', 'MASCULINE') lub ('FEMALE', 'FEMININE').
+    """
+    if not label:
+        return (None, None)
+    clean_lbl, explicit_g = normalize_actor_tag(str(label))
+    clean_lbl = extract_clean_speaker_name(clean_lbl).strip()
+    if not clean_lbl:
+        return (None, None)
+    if explicit_g in ("MALE", "FEMALE"):
+        return (explicit_g, "MASCULINE" if explicit_g == "MALE" else "FEMININE")
+
+    l_low = clean_lbl.lower()
+    words = re.findall(r"\b[a-ząćęłńóśźżA-ZĄĆĘŁŃÓŚŹŻ0-9]+\b", l_low)
+    if not words:
+        return (None, None)
+
+    # 1. Sprawdzenie grup i fraz wielowyrazowych
+    MALE_GROUP_PHRASES = {
+        "grupa mężczyzn", "grupa mezczyzn", "dwóch mężczyzn", "dwoch mezczyzn", "dwaj mężczyźni",
+        "trzech mężczyzn", "czterech mężczyzn", "panowie", "mężczyźni", "mezczyzni", "mężczyzn", "mezczyzn",
+        "men", "group of men", "two men", "boys", "group of boys"
+    }
+    FEMALE_GROUP_PHRASES = {
+        "grupa kobiet", "dwie kobiety", "trzy kobiety", "cztery kobiety", "panie", "kobiety", "kobiet",
+        "women", "group of women", "two women", "girls", "group of girls"
+    }
+    for mg in MALE_GROUP_PHRASES:
+        if mg in l_low:
+            return ("MALE", "MASCULINE")
+    for fg in FEMALE_GROUP_PHRASES:
+        if fg in l_low:
+            return ("FEMALE", "FEMININE")
+
+    # 2. Głowa składniowa wielowyrazowych ról syntaktycznych
+    head_word = words[0]
+    head_stems_male = {
+        "mężczyzna", "mezczyzna", "chłopak", "chlopak", "chłopiec", "chlopiec", "facet", "pan", "ojciec",
+        "syn", "brat", "dziadek", "wuj", "wujek", "strażnik", "straznik", "mieszkaniec", "żołnierz", "zolnierz",
+        "wojownik", "rycerz", "bandyta", "zbój", "zboj", "złodziej", "zlodziej", "kupiec", "dowódca", "dowodca",
+        "oficer", "kapitan", "generał", "general", "król", "krol", "książę", "ksiaze", "lord",
+        "man", "boy", "guy", "father", "son", "brother", "guard", "soldier", "bandit", "warrior", "knight",
+        "king", "prince", "citizen", "resident", "merchant"
+    }
+    head_stems_female = {
+        "kobieta", "dziewczyna", "dziewczynka", "pani", "matka", "córka", "corka", "siostra", "babcia",
+        "ciotka", "strażniczka", "strazniczka", "mieszkanka", "wojowniczka", "rycerka", "bandytka",
+        "złodziejka", "zlodziejka", "kupcowa", "królowa", "kroloawa", "księżniczka", "ksiezniczka", "lady",
+        "woman", "girl", "mother", "daughter", "sister", "queen", "princess"
+    }
+
+    if head_word in head_stems_male or head_word in INHERENT_MALE_NOUNS or head_word in SECONDARY_LEXICAL_MALE_NOUNS:
+        return ("MALE", "MASCULINE")
+    if head_word in head_stems_female or head_word in INHERENT_FEMALE_NOUNS or head_word in SECONDARY_LEXICAL_FEMALE_NOUNS:
+        return ("FEMALE", "FEMININE")
+
+    # 3. Sprawdzenie obecności tokenów w słownikach inherentnych
+    words_set = set(words)
+    if words_set & head_stems_male or words_set & INHERENT_MALE_NOUNS or words_set & SECONDARY_LEXICAL_MALE_NOUNS:
+        return ("MALE", "MASCULINE")
+    if words_set & head_stems_female or words_set & INHERENT_FEMALE_NOUNS or words_set & SECONDARY_LEXICAL_FEMALE_NOUNS:
+        return ("FEMALE", "FEMININE")
+
+    return (None, None)
+
+
 
 GENERIC_CATEGORY_TAGS = {
     # Polish technical & crowd tags
@@ -6629,7 +6699,51 @@ class SeriesBible:
                                 bible_modified = True
                                 break
 
-            # 8c. Higiena relacji - usuwanie przecieków promptów
+                        # 8d. Deduplikacja P2 względem aliasów i imion P0/P1 (Operacja 2B.2, Hipoteza H7)
+            p0_verified_aliases: Dict[str, str] = {}
+            for k, v in list(chars.items()):
+                if "->" in k or not isinstance(v, dict):
+                    continue
+                is_p0 = bool(v.get("has_verified_gender") or v.get("priority") in ("P0", "P1"))
+                g = str(v.get("gender") or "").upper()
+                if is_p0 and g in ("MALE", "FEMALE"):
+                    p0_verified_aliases[k.lower()] = k
+                    p0_verified_aliases[normalize_ascii_diacritics(k.lower())] = k
+                    for al in v.get("aliases", []):
+                        al_str = str(al).strip()
+                        al_low = al_str.lower()
+                        if len(al_str.split()) == 1 and (al_low in conflicting_surnames or normalize_ascii_diacritics(al_low) in conflicting_surnames):
+                            continue
+                        p0_verified_aliases[al_low] = k
+                        p0_verified_aliases[normalize_ascii_diacritics(al_low)] = k
+                    k_toks = extract_clean_speaker_name(k).split()
+                    if len(k_toks) >= 2:
+                        fn = k_toks[0].lower()
+                        if len(fn) >= 2 and fn not in ("von", "van", "de", "del", "di", "da", "the", "san", "sama", "kun", "chan", "senpai") and first_name_counts[fn] == 1:
+                            p0_verified_aliases[fn] = k
+                            p0_verified_aliases[normalize_ascii_diacritics(fn)] = k
+
+            for k in list(chars.keys()):
+                if "->" in k or not isinstance(chars[k], dict):
+                    continue
+                v = chars[k]
+                is_p2 = (v.get("priority") == "P2" or (not v.get("has_verified_gender") and v.get("gender") == "UNKNOWN"))
+                if is_p2:
+                    k_low = k.lower()
+                    k_norm = normalize_ascii_diacritics(k_low)
+                    matched_p0_key = p0_verified_aliases.get(k_low) or p0_verified_aliases.get(k_norm)
+                    if matched_p0_key and matched_p0_key != k and matched_p0_key in chars:
+                        p0_rec = chars[matched_p0_key]
+                        p0_als = p0_rec.setdefault("aliases", [])
+                        if k not in p0_als:
+                            p0_als.append(k)
+                            p0_rec["aliases"] = sorted(list(set(p0_als)))
+                        del chars[k]
+                        if "declensions" in self.data and k in self.data["declensions"]:
+                            del self.data["declensions"][k]
+                        bible_modified = True
+
+# 8c. Higiena relacji - usuwanie przecieków promptów
             for rel_name in ("relations", "relationships"):
                 if rel_name in self.data and isinstance(self.data[rel_name], dict):
                     rels = self.data[rel_name]
@@ -6692,6 +6806,30 @@ class SeriesBible:
                 if clean_tag.lower() in COLLECTIVE_LABELS or (len(clean_tag.split()) == 1 and clean_tag[0].islower()):
                     continue
                 if clean_tag in chars:
+                    continue
+
+                # Operacja 2B.2: Blokada tworzenia duplikatów P2 dla aliasów i nazw postaci P0/P1
+                existing_rec = self.resolve_character_record(clean_tag)
+                if existing_rec is not None and (existing_rec.get("has_verified_gender") or existing_rec.get("priority") in ("P0", "P1")):
+                    continue
+
+                clean_tag_low = clean_tag.lower()
+                clean_tag_norm = normalize_ascii_diacritics(clean_tag_low)
+                is_alias_of_existing = False
+                for c_k, c_v in chars.items():
+                    if "->" in c_k or not isinstance(c_v, dict):
+                        continue
+                    if c_k.lower() == clean_tag_low or normalize_ascii_diacritics(c_k.lower()) == clean_tag_norm:
+                        is_alias_of_existing = True
+                        break
+                    for al in c_v.get("aliases", []):
+                        al_low = str(al).lower()
+                        if al_low == clean_tag_low or normalize_ascii_diacritics(al_low) == clean_tag_norm:
+                            is_alias_of_existing = True
+                            break
+                    if is_alias_of_existing:
+                        break
+                if is_alias_of_existing:
                     continue
 
                 masculine_lexicon = SECONDARY_LEXICAL_MALE_NOUNS
@@ -7264,12 +7402,130 @@ class SeriesBible:
                     return True
         return False
 
+    def resolve_character_record(self, query_name: str) -> Optional[Dict[str, Any]]:
+        """
+        P0-First Canon Resolver (Standard 10.0.3, 2B.1, R1.9, R3.2):
+        Rozwiązuje nazwę postaci lub adresata z bezwzględnym prymatem zweryfikowanych rekordów P0/P1.
+        Krok 1: Przeszukuje characters pod kątem has_verified_gender=True lub priority in ('P0', 'P1')
+                oraz gender in ('MALE', 'FEMALE'):
+                - dopasowanie po kluczu głównym (i po normalizacji diakrytyków)
+                - dopasowanie po liście aliases
+                - dopasowanie po pierwszym tokenie (FirstName) jeśli nie koliduje z innymi postaciami.
+        Krok 2: Fallback do niezweryfikowanych wpisów P2.
+        """
+        if not query_name:
+            return None
+        clean_q, explicit_g = normalize_actor_tag(str(query_name))
+        clean_q = extract_clean_speaker_name(clean_q).strip()
+        if not clean_q or is_sign_entity(clean_q) or clean_q.lower() in ("txt", "text", "sign", "title", "caption", "szyld", "napis"):
+            return None
+
+        TITLE_STOPWORDS = {
+            "lord", "lady", "sir", "master", "pan", "pani", "książę", "ksiaze", "księżniczka", "ksiezniczka",
+            "król", "krol", "królowa", "krolowa", "captain", "kapitan", "general", "generał",
+            "commander", "dowódca", "dowodca", "doctor", "doktor", "mistrz", "mistrzyni",
+            "saint", "święty", "swiety", "święta", "swieta", "sister", "brother", "father", "mother",
+            "siostra", "brat", "ojciec", "matka", "young", "kid", "old", "mr", "mrs", "ms"
+        }
+        q_tokens = clean_q.split()
+        if len(q_tokens) >= 2 and q_tokens[0].lower() in TITLE_STOPWORDS:
+            clean_q = " ".join(q_tokens[1:]).strip()
+
+        q_low = clean_q.lower()
+        q_norm = normalize_ascii_diacritics(q_low)
+        q_norm_f = q_norm.replace("ph", "f")
+
+        ctx = getattr(self, "_lock", None)
+        if ctx is None:
+            ctx = contextlib.nullcontext()
+
+        with ctx:
+            chars = self.data.get("characters", {}) if hasattr(self, "data") and isinstance(self.data, dict) else {}
+            if not chars:
+                return None
+
+            # Krok 1: Przeszukanie zweryfikowanych rekordów P0/P1
+            p0_candidates = []
+            for k, v in chars.items():
+                if "->" in k or not isinstance(v, dict):
+                    continue
+                is_p0 = bool(v.get("has_verified_gender") or v.get("priority") in ("P0", "P1"))
+                g = str(v.get("gender") or "").upper()
+                if is_p0 and g in ("MALE", "FEMALE"):
+                    p0_candidates.append((k, v))
+
+            # 1a. Dokładne dopasowanie do klucza lub czystego klucza P0
+            for k, v in p0_candidates:
+                k_low = k.lower()
+                k_clean = extract_clean_speaker_name(k).strip().lower()
+                if q_low in (k_low, k_clean) or q_norm in (normalize_ascii_diacritics(k_low), normalize_ascii_diacritics(k_clean)):
+                    res = dict(v)
+                    res.setdefault("name", k)
+                    return res
+
+            # 1b. Dopasowanie do listy aliases P0
+            for k, v in p0_candidates:
+                aliases = v.get("aliases", [])
+                for al in aliases:
+                    al_s = str(al).strip().lower()
+                    al_norm = normalize_ascii_diacritics(al_s)
+                    if q_low == al_s or q_norm == al_norm or q_norm_f == al_norm.replace("ph", "f"):
+                        res = dict(v)
+                        res.setdefault("name", k)
+                        return res
+
+            # 1c. Dopasowanie pierwszego tokena (FirstName) do P0
+            if len(clean_q.split()) == 1 and len(clean_q) >= 2:
+                matching_p0_fn = []
+                for k, v in p0_candidates:
+                    k_toks = extract_clean_speaker_name(k).strip().split()
+                    if k_toks:
+                        fn = k_toks[0].lower()
+                        if q_low == fn or q_norm == normalize_ascii_diacritics(fn):
+                            matching_p0_fn.append((k, v))
+                if len(matching_p0_fn) == 1:
+                    k, v = matching_p0_fn[0]
+                    res = dict(v)
+                    res.setdefault("name", k)
+                    return res
+                elif len(matching_p0_fn) > 1:
+                    g_set = {mv.get("gender") for mk, mv in matching_p0_fn}
+                    if len(g_set) == 1:
+                        k, v = matching_p0_fn[0]
+                        res = dict(v)
+                        res.setdefault("name", k)
+                        return res
+
+            # Krok 2: Fallback do niezweryfikowanych wpisów P2
+            for k, v in chars.items():
+                if "->" in k or not isinstance(v, dict):
+                    continue
+                if v.get("priority") == "P2" or not v.get("has_verified_gender"):
+                    k_low = k.lower()
+                    k_clean = extract_clean_speaker_name(k).strip().lower()
+                    if q_low in (k_low, k_clean) or q_norm in (normalize_ascii_diacritics(k_low), normalize_ascii_diacritics(k_clean)):
+                        res = dict(v)
+                        res.setdefault("name", k)
+                        return res
+                    for al in v.get("aliases", []):
+                        al_s = str(al).strip().lower()
+                        if q_low == al_s or q_norm == normalize_ascii_diacritics(al_s):
+                            res = dict(v)
+                            res.setdefault("name", k)
+                            return res
+
+            return None
+
     def get_character(self, name: str) -> Optional[Dict[str, Any]]:
         """
         Zwraca rekord postaci z self.data['characters'] dla podanego imienia lub aliasu.
+        Używa P0-First Canon Resolver (resolve_character_record).
         """
         if not name:
             return None
+        rec = self.resolve_character_record(name)
+        if rec is not None:
+            return rec
         lock = getattr(self, "_lock", None)
         ctx = lock if lock is not None else contextlib.nullcontext()
         with ctx:
@@ -7337,7 +7593,14 @@ class SeriesBible:
             if base_gender in ("MALE", "FEMALE"):
                 return base_gender
 
-        # Pass 0b: Kinship / possessive relation suffixes ([Owner]'s Son/Daughter/Kid)
+                # Pass 0c: P0-First Canonical Character Resolution (Standard 10.0.3, 2B.1)
+        rec = self.resolve_character_record(clean or name)
+        if rec and isinstance(rec, dict):
+            g = str(rec.get("gender") or "").upper()
+            if g in ("MALE", "FEMALE"):
+                return g
+
+# Pass 0b: Kinship / possessive relation suffixes ([Owner]'s Son/Daughter/Kid)
         rel_gender, rel_conf = resolve_possessive_relation_gender(
             clean or name,
             is_flashback=any(fb in n_l for fb in ("flashback", "retrospekcj", "past")),

@@ -579,3 +579,86 @@ def test_virility_threshold_ge_2(group_participants, expected_virility):
     names_set = {p[0] for p in group_participants}
     virility, _ = classify_we_group_gender(names_set, series_bible=bible)
     assert virility == expected_virility
+
+
+# ==============================================================================
+# STANDARD 10.0.3 / 10.1 REGRESSION TESTS (2B.3, 2B.4, 2B.5)
+# ==============================================================================
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "speaker_gender,f0_val,generic_addressee,expected_target_gender,expected_gram_gender",
+    [
+        ("FEMALE", 295.0, "Mężczyzna", "MALE", "MASCULINE"),
+        ("FEMALE", 285.0, "Grupa Mężczyzn", "MALE", "MASCULINE"),
+        ("FEMALE", 270.0, "Dwóch Mężczyzn", "MALE", "MASCULINE"),
+        ("MALE", 115.0, "Kobieta", "FEMALE", "FEMININE"),
+        ("MALE", 120.0, "Grupa Kobiet", "FEMALE", "FEMININE"),
+        ("MALE", 280.0, "Strażnik Zamkowy", "MALE", "MASCULINE"),
+        ("MALE", 265.0, "Mieszkaniec Miasta", "MALE", "MASCULINE"),
+    ],
+)
+def test_generic_addressee_and_role_labels_immune_to_speaker_f0_contamination(
+    speaker_gender, f0_val, generic_addressee, expected_target_gender, expected_gram_gender
+):
+    from scene_discourse import SceneDiscourseGraph
+
+    telem = SceneDiscourseGraph.arbitrate_event_telemetry(
+        raw_actor="SpeakerAlpha",
+        verified_p0_gender=speaker_gender,
+        target_actor=generic_addressee,
+        f0_hz=f0_val,
+    )
+    assert telem["addressee_gender"] == expected_target_gender
+    assert "target_grammatical_gender" in telem, \
+        f"Brak klucza 'target_grammatical_gender' w telemetrii: {list(telem.keys())}"
+    assert telem["target_grammatical_gender"] == expected_gram_gender
+    assert telem["target_gender"] == expected_gram_gender
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "explicit_actor,p0_gender,expected_speaker_name",
+    [
+        ("HeroAlpha", "MALE", "HeroAlpha"),
+        ("HeroineBeta", "FEMALE", "HeroineBeta"),
+    ],
+)
+def test_explicit_ass_actor_not_overwritten_by_hallucinated_diarization(
+    explicit_actor, p0_gender, expected_speaker_name
+):
+    from series_memory import SeriesBible
+    from scene_discourse import SceneDiscourseGraph
+    bible = SeriesBible(slug="test_explicit_actor", db_path=":memory:")
+    bible.sync_verified_profile_entity(explicit_actor, p0_gender, has_verified_gender=True)
+    telem = SceneDiscourseGraph.arbitrate_event_telemetry(
+        raw_actor=explicit_actor,
+        target_actor="OtherSpeaker",
+        series_bible=bible,
+    )
+    assert telem["speaker_name"] == expected_speaker_name
+    assert telem["speaker_p0_verified"] is True
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "first_person_form,expected_gender",
+    [
+        ("myślałem, że to koniec", "MALE"),
+        ("miałem go na oku", "MALE"),
+        ("zebrałem ludzi", "MALE"),
+        ("usłyszałem hałas", "MALE"),
+    ],
+)
+def test_male_first_person_forms_override_acoustic_f0_feminine(
+    first_person_form, expected_gender
+):
+    from scene_discourse import SceneDiscourseGraph
+    telem = SceneDiscourseGraph.arbitrate_event_telemetry(
+        raw_actor="SoldierAlpha",
+        polish_text=first_person_form,
+        f0_hz=320.0,
+    )
+    assert telem["speaker_gender"] == expected_gender, \
+        f"Forma 1. os. '{first_person_form}' powinna dać {expected_gender}, otrzymano {telem['speaker_gender']}"
