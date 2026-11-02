@@ -75,3 +75,84 @@ kod_silnika.zip
 
 # Odpięte zasoby lokalne i skrypty prywatne
 *.bat
+
+# === Cleanup — odpięte od Git, zachowane lokalnie ===
+
+# Artefakty deweloperskie
+Artefakty/
+AGENTS.md
+ARCHITECTURE_ANCHOR.md
+CORNERSTONE.md
+PELNY_RAPORT_TECHNICZNY_POTOKU.md
+PELNY_RAPORT_TECHNICZNY_POTOKU_2.md
+PROJECT.md
+PROJECT_MEMORY.md
+TEST_INFRA.md
+
+# Skrypty audytowe, weryfikacyjne i testy
+audit_diff.ps1
+verify_purity.py
+verify_12_fixes.py
+verify_ultimate_pipeline.py
+verify_8_fixes.py
+test_system.py
+test_adversarial_challenger1.py
+test_adversarial_challenger2.py
+test_empirical_challenger2_2.py
+tests/
+pytest.ini
+
+# Nie-runtime moduły pomocnicze
+build_exe.py
+extract_subtitles.py
+feedback_extractor.py
+flight_recorder.py
+gui_app.py
+index_baza.py
+master_backup_engine.py
+script_doctor_selector.py
+sync_baza_napisow.py
+
+# Lokalne dane użytkownika
+baza napisów/
+POBIERZ_ZMIANY_Z_CHMURY.bat
+PRZYWROC_BACKUP_NA_NOWYM_PC.bat
+UTWORZ_BACKUP_CALOSCI.bat
+WYSLIJ_ZMIANY_DO_CHMURY.bat
+
+# Runtime artefacts
+logs/
+*.db
+*.sqlite
+*.sqlite3
+*.checkpoint.json
+*.profile.json
+*.jsonl
+__pycache__/
+.pytest_cache/
+*.pyc
+
+# Sekrety
+.env
+.env.*
+!.env.example
+*gcp_key*.json
+*credentials*.json
+*service-account*.json
+*service_account*.json
+*.pem
+*.key
+*.p12
+
+# Pliki pomocnicze cleanupu
+cleanup_before.txt
+cleanup_before_tracked.txt
+cleanup_before_py.txt
+cleanup_before_bibles.txt
+cleanup_before_disk_root.txt
+cleanup_runtime_modules.txt
+cleanup_report.md
+historia_ostatnich_dni.md
+implementation_plan.md
+install_all_projects.bat
+install_all_projects.ps1
