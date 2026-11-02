@@ -61,3 +61,17 @@ series_memory/*test*
 gcp_key.json
 *credentials*.json
 kod_silnika.zip
+
+# Poświadczenia i klucze API
+.env
+.env.*
+!.env.example
+*gcp_key*.json
+*credentials*.json
+*service-account*.json
+*service_account*.json
+*.pem
+*.key
+
+# Odpięte zasoby lokalne i skrypty prywatne
+*.bat
