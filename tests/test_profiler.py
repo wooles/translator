@@ -347,3 +347,112 @@ def test_t10_1_1_p2a_dialect_registry_guidance_in_episode_brief():
         character_audio_transcriptions={"SpeakerGamma": "honma ni akan de"}
     )
     assert "Rejestr: wyrazista gwara / stylizacja środowiskowa" in brief_with_audio
+
+
+def test_t10_2_1_zero_noise_ordinary_dialogue():
+    """
+    T10.2_1 (Standard 10.2, 2B.3, 2B.8):
+    Weryfikacja braku szumu w zwykłych kwestiach dialogowych (High-Threshold Selection):
+    Paczki bez nietypowych zjawisk (dialektów, archaizacji, tytulatury, F0, skrajnego afektu,
+    zdań rozbitych, żargonu fachowego czy plansz) zwracają pusty string "" (czysty fallback).
+    """
+    from rules import get_focused_rules_for_batch
+
+    ordinary_batches = [
+        [{"en": "I don't know, but they have 3 items in the store."}],
+        [{"en": "Look at that building over there."}],
+        [{"en": "What do you want to do next?"}],
+        [{"en": "I went to school yesterday and saw a cat."}],
+        [{"en": "Good morning. How are you doing today?"}],
+        [{"en": "Could you pass me the salt, please?"}],
+        [{"en": "Where is the nearest train station?"}],
+    ]
+
+    for idx, batch in enumerate(ordinary_batches, 1):
+        focused = get_focused_rules_for_batch(batch)
+        assert focused == "", f"Zwykły dialog (batch {idx}) wyzwolił zbędne reguły: {focused}"
+
+
+def test_t10_2_2_dynamic_category_selection_and_anti_smoothing():
+    """
+    T10.2_2 (Standard 10.2, 2B.4, 2B.7):
+    Weryfikacja dynamicznej selekcji kategorii oraz działania Anti-Smoothing Filter:
+    - Dla kwestii z gwarą wyzwala się DYN_1 (FILAR XIII) i zajmuje najwyższy priorytet (1. miejsce).
+    - Filary wygładzające styl (FILAR LXXI oraz FILAR CLXXII) są bezwzględnie tłumione.
+    - Dla kwestii z archaizacją wyzwala się DYN_2 (FILAR XIV) i tłumi FILAR LXXI.
+    """
+    from rules import get_focused_rules_for_batch
+
+    # Scena z dialektem i wysokim CPS
+    dialect_batch = [
+        {"en": "What are you saying, fella?", "audio_jp": "ora washi dabe", "cps": 18.5}
+    ]
+    focused_dialect = get_focused_rules_for_batch(dialect_batch)
+    assert "FILAR XIII" in focused_dialect, f"DYN_1 (FILAR XIII) nie aktywował się dla gwary: {focused_dialect}"
+    assert "FILAR LXXI " not in focused_dialect, f"FILAR LXXI nie został stłumiony w scenie gwarowej: {focused_dialect}"
+    assert "FILAR CLXXII " not in focused_dialect, f"FILAR CLXXII nie został stłumiony w scenie gwarowej: {focused_dialect}"
+
+    rule_lines = [l for l in focused_dialect.splitlines() if l.strip().startswith("•")]
+    assert len(rule_lines) >= 1, "Brak wygenerowanych reguł dla sceny gwarowej"
+    assert "FILAR XIII" in rule_lines[0], f"FILAR XIII nie zajął 1. miejsca w promptcie: {rule_lines[0]}"
+
+    # Scena z rejestrem dworskim/archaizacją
+    archaic_batch = [
+        {"en": "Your majesty, the army approaches.", "audio_jp": "de gozaru", "cps": 18.0}
+    ]
+    focused_archaic = get_focused_rules_for_batch(archaic_batch)
+    assert "FILAR XIV" in focused_archaic, f"DYN_2 (FILAR XIV) nie aktywował się dla rejestru dworskiego: {focused_archaic}"
+    assert "FILAR LXXI " not in focused_archaic, f"FILAR LXXI nie został stłumiony w scenie archaizowanej: {focused_archaic}"
+
+
+def test_t10_2_3_pure_positive_domain_in_focused_rules():
+    """
+    T10.2_3 (Standard 10.2, 2B.2):
+    Weryfikacja Czystej Domeny Pozytywnej (Zero-Negation) we wszystkich kategoriach dynamicznych:
+    - Brak tokenów zakazanych: 'nie' (jako słowo przeczące), 'zakaz', 'zabrania się', 'błąd', 'musi',
+      'zawsze', 'nigdy', 'unikaj', 'zamiast', 'usuń', 'niedopuszczalne'.
+    - Brak cytowań w apostrofach '...'.
+    - Brak form skrótowych 'np.'.
+    - Pełna zgodność z Z1 (Zero-Literal), Z2 (Pure Positive Domain) i Z4 (Instance-Free).
+    """
+    import re
+    from rules import get_focused_rules_for_batch
+
+    test_dyn_batches = [
+        [{"en": "ora washi dabe fella"}],  # DYN_1 (Dialekty)
+        [{"en": "your majesty milord"}],   # DYN_2 (Archaizacja)
+        [{"en": "sensei, please help me"}], # DYN_3 (Tytulatura)
+        [{"en": "kanojo-tachi", "is_low_pitch_female": True}], # DYN_4 (Wiek/Płeć)
+        [{"en": "aah! sob!", "prosody": "Ac=CRY"}], # DYN_5 (Afekt)
+        [{"en": "The truth is... I'm a demon.", "is_split_sentence": True}], # DYN_6 (Ciągłość)
+        [{"en": "tactical perimeter breach autopsy"}], # DYN_7 (Rejestr specjalistyczny)
+        [{"en": "Chapter 1", "is_sign": True}], # DYN_8 (Napisy ekranowe)
+    ]
+
+    forbidden_words = [
+        "zakaz", "zabrania się", "zabrania", "błąd", "musi", "zawsze", "nigdy",
+        "unikaj", "zamiast", "usuń", "niedopuszczalne", "niedopuszczalna", "niedopuszczalny"
+    ]
+
+    for idx, batch in enumerate(test_dyn_batches, 1):
+        focused = get_focused_rules_for_batch(batch)
+        assert focused != "", f"Paczka DYN_{idx} zwróciła pusty string!"
+        focused_lower = focused.lower()
+
+        # Weryfikacja braku partykuły przeczącej 'nie' jako odrębnego słowa
+        assert not bool(re.search(r"\bnie\b", focused_lower)), (
+            f"Wykryto zakazaną partykułę przeczącą 'nie' w kategorii DYN_{idx}: {focused}"
+        )
+
+        for fw in forbidden_words:
+            assert fw not in focused_lower, (
+                f"Wykryto zakazany token dyrektywny '{fw}' w kategorii DYN_{idx}: {focused}"
+            )
+
+        # Weryfikacja braku cytatów w apostrofach '...'
+        assert not bool(re.search(r"'[A-Za-z0-9żźćńółęąśŻŹĆĄŚĘŁÓŃ\s]+'", focused)), (
+            f"Wykryto cytat w apostrofie w kategorii DYN_{idx}: {focused}"
+        )
+
+        # Weryfikacja braku form skrótowych np.
+        assert "np." not in focused_lower, f"Wykryto 'np.' w kategorii DYN_{idx}: {focused}"

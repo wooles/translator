@@ -17,6 +17,7 @@ models/
 *.sqlite3
 
 # Temporary Media & Subtitles
+Artefakty/_KONTYNUACJA_*/
 baza napisów/
 temp/
 logs/

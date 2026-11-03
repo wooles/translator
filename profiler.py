@@ -356,11 +356,7 @@ def format_lean_episode_brief(profile: Any, character_audio_transcriptions: Opti
                 lines.append(f"  - {t_en} = {t_pl}")
 
     lines.append("• TOPOLOGIA SCENY I OCHRONA PŁCI:")
-    lines.append("  - Mówczyni (kobieta) w 1. os. lp. czasu przeszłego stosuje formy żeńskie: -am, -ałam, -łabym, -obym (byłam, wiedziałam, zrobiłam, poszłam).")
-    lines.append("  - Zwracając się do kobiety w 2. os. lp. stosuj formy żeńskie: -aś, -ałaś, jesteś pewna (byłaś, zrobiłaś, wiedziałaś).")
-    lines.append("  - Zwracając się do grupy kobiet (liczba mnoga niemęskoosobowa) stosuj formy niemęskoosobowe i zaimek one zamiast form męskoosobowych.")
-    lines.append("  - ŚCISŁA REKCJA ZAPRZECZONA (Genitive of Negation): Czasowniki przechodnie podlegające negacji partykułą 'nie' w każdym czasie (teraźniejszym, przeszłym i przyszłym: nie mam/nie miałam/nie będę miał) wymagają dopełniacza również przy wtrąceniach przysłówkowych (nie miałem już czasu, nie widzę wcale sensu, nie czułam strachu).")
-    lines.append("  - OCHRONA CYTATÓW I DEKLINACJA KANONU: Cytowane wypowiedzi („...”) zachowują płeć oryginalnego autora. Terminy kanoniczne odmieniaj przez wszystkie przypadki po przyimkach (również Biernik 'przez' i Miejscownik 'o/przy'). Płeć z bazy serii ma nadrzędne pierwszeństwo.")
+    lines.append("  - Spójność rodzaju gramatycznego mówcy i adresata: stosuj formy żeńskie (-łam, -łabym, -łaś) oraz niemęskoosobowe dla potwierdzonych postaci żeńskich z bazy serii.")
 
 
     lines.append("================================================")
