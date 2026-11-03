@@ -2505,13 +2505,26 @@ def calculate_rule_tier(rule_text: str) -> int:
     return TIER_DIALOGUE_FLOW
 
 
-def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Optional[int] = None) -> str:
+def get_focused_rules_for_batch(
+    batch_items_or_text: Any,
+    max_rules: Optional[int] = None,
+    batch_text_en: Optional[str] = None,
+    whisper_text_jp: str = ""
+) -> str:
     """
     Dynamiczny dyspozytor reguł AVT (Context-Aware Rule Dispatcher).
     Analizuje specyfikę bieżącej paczki kwestii i generuje wysoce skoncentrowaną
     listę priorytetowych zasad, eliminując problem rozproszenia uwagi modelu ('Lost in the Middle').
     """
-    if not batch_items:
+    if not batch_items_or_text:
+        return ""
+
+    if isinstance(batch_items_or_text, str):
+        batch_items = [{"en": batch_items_or_text, "audio_jp": whisper_text_jp}]
+    elif isinstance(batch_items_or_text, list):
+        batch_items = batch_items_or_text
+    else:
+        batch_items = [dict(batch_items_or_text)]
         return ""
 
     # Defensive input normalization: guarantee all text fields are non-None strings (immune to NoneType/null)
@@ -2545,7 +2558,36 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Op
 
     focused_pillars = ScoredPillarsCollector()
     combined_en = " ".join(item.get("en", "") for item in batch_items).lower()
+    if batch_text_en:
+        combined_en += " " + batch_text_en.lower()
     combined_jp = " ".join(str(item.get("audio_jp", "")) for item in batch_items).lower()
+    if whisper_text_jp:
+        combined_jp += " " + whisper_text_jp.lower()
+
+    # Filar XIII - Dialekty Regionalne, Gwara i Kontrast Rejestrów (Hotfix 10.1.1, 2B.4)
+    en_slang_pat = re.compile(
+        r"\b(?:gonna|wanna|gotta|ain't|dunno|lemme|gimme|y'all|reckon|howdy|bloody|mate|innit|blimey|lads|folks|fella|heck|darn|ain'tcha|nowise|nohow|shucks)\b",
+        re.IGNORECASE
+    )
+    jp_dialect_pat = re.compile(
+        r"\b(?:ya|yan|yade|yaro|nen|seya|akan|honma|dappe|dabe|ora|washi|atai|wai|wagahai|jaken|koraa|suitoo|nankurunaisa|haisai|namara|shibareru|べ|だべ|じゃけん|やん|やで|やろ|ねん|せや|あかん|ほんま|おら|わし|あたい|わい|吾輩)\b",
+        re.IGNORECASE
+    )
+    paraphrase_pat = re.compile(
+        r"\b(?:he means|she means|they mean|meaning|what (?:he|she|they) (?:said|meant)|in other words|he's trying to say|she's trying to say|znaczy|ma na myśli|innymi słowy|chodzi mu o|chodzi jej o)\b",
+        re.IGNORECASE
+    )
+    has_slang_en = bool(en_slang_pat.search(combined_en))
+    has_dialect_jp = bool(jp_dialect_pat.search(combined_jp)) or any(tok in combined_jp for tok in ["べ", "だべ", "じゃけん", "やん", "やで", "やろ", "ねん", "せや", "あかん", "ほんま", "おら", "わし", "あたい", "わい", "吾輩"])
+    has_paraphrase = bool(paraphrase_pat.search(combined_en)) or any(paraphrase_pat.search(item.get("pl", "")) for item in batch_items)
+
+    if has_slang_en or has_dialect_jp or has_paraphrase:
+        focused_pillars.append(
+            (TIER_ACTIVE_CRAFT + 5,
+            "• [SKUP SIĘ NA: FILAR XIII - Dialekty Regionalne, Gwara i Kontrast Rejestrów]: "
+            "Kwestie postaci posługującej się w oryginale gwarą, slangiem lub dialektem regionalnym oddawaj poprzez wyrazistą, szorstką polszczyznę potoczną i składnię środowiskową. "
+            "W scenach, w których kolejna postać parafrazuje i wyjaśnia te słowa reszcie grupy w języku ogólnym, utrzymuj wyraźny kontrast stylistyczny pomiędzy surowym idiolektem mówcy a gładką polszczyzną tłumacza wewnątrzscenicznego.")
+        )
     has_signs = any(item.get("is_sign", False) for item in batch_items)
     has_questions = any("?" in item.get("en", "") for item in batch_items)
     has_ellipsis = any("..." in item.get("en", "") or "…" in item.get("en", "") for item in batch_items)
@@ -3897,6 +3939,9 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Op
     # Deduplicate while preserving priority order
     seen = set()
     unique_rules: List[Tuple[int, str]] = []
+    # Anti-Smoothing Filter (Hotfix 10.1.1, 2B.4): Jeśli FILAR XIII jest obecny, wyklucz Filar LXXI i CLXXII
+    if any("FILAR XIII" in r[1] for r in sorted_scored):
+        sorted_scored = [r for r in sorted_scored if "FILAR LXXI " not in r[1] and "FILAR CLXXII " not in r[1]]
     for score, rule in sorted_scored:
         if rule not in seen:
             seen.add(rule)
@@ -3957,6 +4002,9 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Op
         final_rules = [txt for sc, txt in selected_sorted]
     else:
         final_rules = [txt for sc, txt in unique_rules]
+
+    if any("FILAR XIII" in r for r in final_rules):
+        final_rules = [r for r in final_rules if "FILAR LXXI " not in r and "FILAR CLXXII " not in r]
 
     lines = [
         "--- [!] SKONCENTROWANA UWAGA DLA TEJ SCENY (PRIORYTETOWE FILARY AVT) ---",

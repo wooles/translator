@@ -162,3 +162,51 @@ def test_resolve_line_addressee_does_not_use_f0_for_anonymous_speakers(speaker_f
     )
     assert cat is None
     assert "Naprzemienność F0" not in (lbl or "")
+
+
+# ==============================================================================
+# HOTFIX 10.1.1 REGRESSION TESTS (T10.1.1_P1a)
+# ==============================================================================
+
+@pytest.mark.unit
+def test_t10_1_1_p1a_short_spoken_reply_immunity_from_false_monologue():
+    """
+    T10.1.1_P1a (Hotfix 10.1.1, 2B.1, 2B.2):
+    Krótkie repliki mówione (<= 4 słowa, potoczne reakcje) nie mogą być oznaczane
+    ani formatowane jako monolog wewnętrzny (kursywa {\\i1}...{\\i0}) wyłącznie
+    z powodu obniżonej energii głosu seiyū (niski RMS).
+    """
+    from translator import is_short_spoken_reply, format_phase1_candidate_text
+    from prosody_engine import AudioProsodyEngine
+    import pysubs2
+
+    # 1. Weryfikacja AudioProsodyEngine._classify_rms_label
+    label_low = AudioProsodyEngine._classify_rms_label(100.0, 300.0)
+    assert label_low == "cichy głos / obniżona energia głosu (szept lub spokojna replika)"
+    label_norm = AudioProsodyEngine._classify_rms_label(200.0, 300.0)
+    assert label_norm == ""
+
+    # 2. Weryfikacja is_short_spoken_reply
+    assert is_short_spoken_reply("Yeah.") is True
+    assert is_short_spoken_reply("Got it.") is True
+    assert is_short_spoken_reply("Tak, oczywiście.") is True
+    assert is_short_spoken_reply("Rozumiem.") is True
+    assert is_short_spoken_reply("I'm back.") is True
+    # Kwestie w nawiasach myśli to monolog wewnętrzny, a nie krótka replika mówiona
+    assert is_short_spoken_reply("(What should I do?)") is False
+    assert is_short_spoken_reply("（どうしよう）") is False
+
+    # 3. Weryfikacja format_phase1_candidate_text na krótkiej replice ze stylem Default
+    ev = pysubs2.SSAEvent(start=1000, end=2000, text="Got it.", style="Default")
+    ev.name = "SpeakerAlpha"
+    ev.is_internal_monologue = True
+
+    formatted = format_phase1_candidate_text("Rozumiem.", ev, is_sign=False)
+    assert r"{\i1}" not in formatted
+    assert formatted == "Rozumiem."
+
+    # Dla stylu Italics / thoughts kursywa musi być zachowana
+    ev_thought = pysubs2.SSAEvent(start=1000, end=2000, text="Got it.", style="Thoughts")
+    ev_thought.name = "SpeakerAlpha"
+    formatted_th = format_phase1_candidate_text("Rozumiem.", ev_thought, is_sign=False)
+    assert formatted_th == r"{\i1}Rozumiem.{\i0}"

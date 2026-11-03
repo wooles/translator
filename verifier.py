@@ -61,6 +61,53 @@ def _is_whole_line_italic(s: str) -> bool:
     return r"{\i0}" not in inner and r"{\i1}" not in inner
 
 
+def _has_contiguous_non_italic_neighbor(pass1_items: List[Dict[str, Any]], idx: int) -> bool:
+    """
+    Sprawdza, czy linia o indeksie idx w paczce pass1_items sąsiaduje z nienaruszoną kwestią
+    dialogową bez kursywy (tego samego mówcy lub w tej samej turze dialogowej).
+    Chroni przed fałszywym monologiem wewnętrznym na krótkich replikach (Hotfix 10.1.1, 2B.3).
+    """
+    if not pass1_items or idx < 0 or idx >= len(pass1_items):
+        return False
+
+    curr_item = pass1_items[idx]
+    curr_spk = (curr_item.get("speaker_name") or curr_item.get("speaker") or "").strip()
+
+    # Sprawdzenie linii poprzedzającej
+    if idx > 0:
+        prev_it = pass1_items[idx - 1]
+        prev_spk = (prev_it.get("speaker_name") or prev_it.get("speaker") or "").strip()
+        prev_en = prev_it.get("en", "")
+        prev_pl = prev_it.get("pl", "") or prev_it.get("refined_pl", "")
+        prev_is_it = _is_whole_line_italic(prev_en) or _is_whole_line_italic(prev_pl) or bool(prev_it.get("is_thought"))
+        if not prev_is_it:
+            if not curr_spk or not prev_spk or curr_spk.lower() == prev_spk.lower():
+                return True
+            time_gap = 0.0
+            if "start_ms" in curr_item and "end_ms" in prev_it:
+                time_gap = (curr_item["start_ms"] - prev_it["end_ms"]) / 1000.0
+            if time_gap < 4.0:
+                return True
+
+    # Sprawdzenie linii następującej
+    if idx < len(pass1_items) - 1:
+        next_it = pass1_items[idx + 1]
+        next_spk = (next_it.get("speaker_name") or next_it.get("speaker") or "").strip()
+        next_en = next_it.get("en", "")
+        next_pl = next_it.get("pl", "") or next_it.get("refined_pl", "")
+        next_is_it = _is_whole_line_italic(next_en) or _is_whole_line_italic(next_pl) or bool(next_it.get("is_thought"))
+        if not next_is_it:
+            if not curr_spk or not next_spk or curr_spk.lower() == next_spk.lower():
+                return True
+            time_gap = 0.0
+            if "start_ms" in next_it and "end_ms" in curr_item:
+                time_gap = (next_it["start_ms"] - curr_item["end_ms"]) / 1000.0
+            if time_gap < 4.0:
+                return True
+
+    return False
+
+
 def enforce_sign_nominative_orthography(
     f1_pl: str,
     refined_pl: str,
@@ -698,6 +745,10 @@ class DialogueVerifier:
         
         if focused_rules_str:
             prompt_lines.append(f"\n{focused_rules_str}\n")
+            if "FILAR XIII" in focused_rules_str or any(k in focused_rules_str.lower() for k in ["gwara", "dialekt", "slang"]):
+                prompt_lines.append(
+                    "• [PARAFRAZA GWARY: Gdy postać A mówi gwarą/slangiem, a postać B tłumaczy lub parafrazuje jej słowa reszcie grupy, zachowaj wyrazisty kontrast stylistyczny — postać A ma brzmieć szorstko i potocznie, a postać B gładko w polszczyźnie ogólnej]."
+                )
 
         # Known Characters in episode for role and status continuity (Just-In-Time Scoped)
         if character_registry:
@@ -1065,8 +1116,25 @@ class DialogueVerifier:
                         src_en = orig_it.get("en", "")
                         st_name_lower = str(orig_it.get("style", "")).lower()
                         has_im_style = any(k in st_name_lower for k in ["italic", "flashback_italic", "thoughts", "internal"])
-                        is_monologue_it = bool(orig_it.get("is_internal_monologue") or has_im_style or _is_whole_line_italic(src_en) or _is_whole_line_italic(f1_text))
-                        if is_monologue_it and not _is_whole_line_italic(r.refined_pl):
+                        orig_idx_in_batch = next((i for i, b_it in enumerate(batch_items) if b_it.get("id") == r.id), -1)
+
+                        has_non_italic_neighbor = _has_contiguous_non_italic_neighbor(batch_items, orig_idx_in_batch)
+                        is_f1_false_italic = (
+                            _is_whole_line_italic(f1_text)
+                            and not _is_whole_line_italic(src_en)
+                            and not has_im_style
+                            and has_non_italic_neighbor
+                        )
+
+                        is_monologue_it = bool(
+                            orig_it.get("is_internal_monologue")
+                            or has_im_style
+                            or _is_whole_line_italic(src_en)
+                            or (_is_whole_line_italic(f1_text) and not is_f1_false_italic)
+                        )
+                        if is_f1_false_italic and not _is_whole_line_italic(r.refined_pl):
+                            pass
+                        elif is_monologue_it and not _is_whole_line_italic(r.refined_pl):
                             if not r.refined_pl.startswith(r"{\i1}"):
                                 r.refined_pl = r"{\i1}" + r.refined_pl + (r"{\i0}" if not r.refined_pl.endswith(r"{\i0}") else "")
                         spk_g = orig_it.get("speaker_gender") or orig_it.get("speaker_p0_gender")
@@ -1075,7 +1143,6 @@ class DialogueVerifier:
                         prev_txt = orig_it.get("prev_line_f1") or ""
                         prev_en = orig_it.get("prev_line_en") or ""
                         if not prev_txt:
-                            orig_idx_in_batch = next((i for i, b_it in enumerate(batch_items) if b_it.get("id") == r.id), -1)
                             if orig_idx_in_batch > 0:
                                 prev_item = batch_items[orig_idx_in_batch - 1]
                                 prev_txt = prev_item.get("pl") or prev_item.get("refined_pl") or ""
@@ -1095,7 +1162,12 @@ class DialogueVerifier:
                                 is_sign=True,
                                 canonical_glossary=gloss
                             )
-                        is_monologue_guard = bool(orig_it.get("is_internal_monologue") or has_im_style or _is_whole_line_italic(src_en) or _is_whole_line_italic(f1_text))
+                        is_monologue_guard = bool(
+                            orig_it.get("is_internal_monologue")
+                            or has_im_style
+                            or _is_whole_line_italic(src_en)
+                            or (_is_whole_line_italic(f1_text) and not is_f1_false_italic)
+                        )
                         guarded = _guard_phase2_regressions(
                             f1_pl=f1_text,
                             refined_pl=r.refined_pl,

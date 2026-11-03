@@ -604,3 +604,100 @@ def test_verify_batch_passes_adjacent_prev_line_to_ellipsis_continuation_guard(
     ]
     res = verifier.verify_batch(batch_items=batch_items)
     assert res[1].refined_pl == expected_line2
+
+
+# ==============================================================================
+# HOTFIX 10.1.1 REGRESSION TESTS (T10.1.1_P1b & T10.1.1_P2b)
+# ==============================================================================
+
+@pytest.mark.unit
+def test_t10_1_1_p1b_contiguous_non_italic_neighbor_protects_spoken_line(monkeypatch):
+    """
+    T10.1.1_P1b (Hotfix 10.1.1, 2B.3):
+    Weryfikacja ochrony przed fałszywym monologiem wewnętrznym:
+    Gdy linia ma sąsiada bez kursywy w dialogu zewnętrznym, a source_en nie ma kursywy,
+    weryfikator Phase 2 nie dokleja sztucznej kursywy ani nie wymusza powrotu fałszywej kursywy z Fazy 1.
+    """
+    from verifier import _has_contiguous_non_italic_neighbor, DialogueVerifier, RefinedLine
+    from unittest.mock import MagicMock
+
+    batch = [
+        {"id": 1, "en": "Where are you going?", "pl": "Dokąd idziesz?", "speaker_name": "SpeakerAlpha", "style": "Default", "start_ms": 1000, "end_ms": 2000},
+        {"id": 2, "en": "Just outside.", "pl": r"{\i1}Na zewnątrz.{\i0}", "speaker_name": "SpeakerAlpha", "style": "Default", "start_ms": 2500, "end_ms": 3500},
+        {"id": 3, "en": "Wait for me.", "pl": "Poczekaj na mnie.", "speaker_name": "SpeakerAlpha", "style": "Default", "start_ms": 4000, "end_ms": 5000},
+    ]
+
+    # 1. Sprawdzenie funkcji pomocniczej
+    assert _has_contiguous_non_italic_neighbor(batch, 1) is True
+    assert _has_contiguous_non_italic_neighbor([{"id": 1, "en": "thought", "pl": r"{\i1}myśl{\i0}"}], 0) is False
+
+    # 2. Mock verifier API call
+    from context_cache import ContextCacheManager
+    monkeypatch.setattr(ContextCacheManager, "get_or_create_cache", lambda *args, **kwargs: "mock_cache")
+
+    mock_pool = MagicMock()
+    mock_client = MagicMock()
+    mock_pool.get_client.return_value = mock_client
+    mock_pool.clients = [mock_client]
+
+    mock_resp = MagicMock()
+    mock_resp.text = ""
+    mock_resp.parsed = MagicMock(
+        lines=[
+            RefinedLine(id=1, refined_pl="Dokąd idziesz?", changes_made=None),
+            RefinedLine(id=2, refined_pl="Tylko na zewnątrz.", changes_made="Naturalna polszczyzna"),
+            RefinedLine(id=3, refined_pl="Poczekaj na mnie.", changes_made=None),
+        ]
+    )
+    mock_client.models.generate_content.return_value = mock_resp
+
+    verifier = DialogueVerifier(client=mock_pool)
+    res = verifier.verify_batch(batch_items=batch)
+
+    # Linia 2 w refined_pl nie może mieć doklejonej kursywy {\i1}...{\i0}
+    assert r"{\i1}" not in res[1].refined_pl
+    assert res[1].refined_pl == "Tylko na zewnątrz."
+
+
+@pytest.mark.unit
+def test_t10_1_1_p2b_focused_rules_dialect_and_paraphrase_contrast_prompt():
+    """
+    T10.1.1_P2b (Hotfix 10.1.1, 2B.4, 2B.6):
+    Weryfikacja wyboru FILAR XIII przy wystąpieniu slangu/gwary/parafrazy,
+    usunięcia reguł wygładzających (Filar LXXI i CLXXII) oraz wstrzyknięcia
+    bloku [PARAFRAZA GWARY: ...] do promptu Fazy 2.
+    """
+    from rules import get_focused_rules_for_batch
+    from verifier import DialogueVerifier
+    from unittest.mock import MagicMock
+
+    # 1. Wykrycie slangu angielskiego (ain't, gonna, mate)
+    batch_slang = [
+        {"id": 1, "en": "I ain't gonna do that, mate.", "pl": "Nie zrobię tego.", "audio_jp": ""},
+        {"id": 2, "en": "He means he refuses.", "pl": "Chodzi mu o to, że odmawia.", "audio_jp": ""},
+    ]
+    focused = get_focused_rules_for_batch(batch_slang, max_rules=3)
+    assert "FILAR XIII" in focused
+    assert "FILAR LXXI " not in focused
+    assert "FILAR CLXXII " not in focused
+
+    # 2. Wykrycie dialektu japońskiego (honma, ya nen)
+    batch_jp = [
+        {"id": 1, "en": "Is it true?", "pl": "Naprawdę?", "audio_jp": "honma ya nen"},
+    ]
+    focused_jp = get_focused_rules_for_batch(batch_jp, max_rules=3)
+    assert "FILAR XIII" in focused_jp
+    assert "FILAR LXXI " not in focused_jp
+    assert "FILAR CLXXII " not in focused_jp
+
+    # 3. Weryfikacja obecności dyrektywy parafrazowania gwary w prompcie Phase 2
+    mock_pool = MagicMock()
+    verifier = DialogueVerifier(client=mock_pool)
+    prompt = verifier.verify_batch(
+        batch_items=batch_slang,
+        focused_rules_str=focused,
+        return_prompt=True
+    )
+    assert "PARAFRAZA GWARY" in prompt
+    assert "szorstko i potocznie" in prompt
+    assert "gładko w polszczyźnie ogólnej" in prompt

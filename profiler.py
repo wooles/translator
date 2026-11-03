@@ -115,6 +115,13 @@ class CharacterDossier(BaseModel):
     dialect_category: Optional[str] = Field(default="", description="Kategoria rejestru gwarowego postaci jeśli występuje lub brak")
     idiolect_matrix: Optional[str] = Field(default="", description="Matryca idiolektu: specyficzne nawyki leksykalne, preferowane zwroty i rytm wypowiedzi dla tej postaci")
     vocal_profile: Optional[str] = Field(default="", description="Profil akustyczny i barwa głosu aktora")
+    audio_transcription: Optional[str] = Field(default="", description="Próbka transkrypcji kwestii postaci w audio seiyū")
+
+
+RE_JP_DIALECT_MARKERS = re.compile(
+    r"\b(?:ya|yan|yade|yaro|nen|seya|akan|honma|dappe|dabe|ora|washi|atai|wai|wagahai|jaken|koraa|suitoo|nankurunaisa|haisai|namara|shibareru)\b|べ|だべ|じゃけん|やん|やで|やろ|ねん|せや|あかん|ほんま|おら|わし|あたい|わい|吾輩",
+    re.IGNORECASE
+)
 
 
 class EpisodeProfile(BaseModel):
@@ -243,7 +250,7 @@ def format_episode_profile_for_prompt(profile: Optional[EpisodeProfile]) -> str:
     return "\n".join(lines)
 
 
-def format_lean_episode_brief(profile: Any) -> str:
+def format_lean_episode_brief(profile: Any, character_audio_transcriptions: Optional[Dict[str, str]] = None, **kwargs) -> str:
     """Formats episode profile into a lean, ultra-focused brief (< 400-500 words) to prevent cognitive saturation."""
     if not profile:
         return ""
@@ -290,6 +297,20 @@ def format_lean_episode_brief(profile: Any) -> str:
                     if not g and is_inherently_female_name(name):
                         g = "kobieta"
                     lines.append(f"  - {name}: {g} ({role})")
+                    dial_cat = _get(cd, "dialect_category", "")
+                    speech_style = _get(cd, "speech_style_pl", "")
+                    idiolect = _get(cd, "idiolect_matrix", "")
+                    audio_trans = _get(cd, "audio_transcription", "") or ""
+                    if character_audio_transcriptions and isinstance(character_audio_transcriptions, dict):
+                        audio_trans = audio_trans or character_audio_transcriptions.get(name, "") or ""
+                    has_dialect_indicator = (
+                        (dial_cat and any(k in str(dial_cat).lower() for k in ["gwara", "dialekt", "slang", "kansai", "tohoku", "hōgen", "yakuwarigo"]))
+                        or (speech_style and any(k in str(speech_style).lower() for k in ["gwara", "dialekt", "slang", "szorstka", "środowiskowa"]))
+                        or (idiolect and any(k in str(idiolect).lower() for k in ["gwara", "dialekt", "slang"]))
+                        or (audio_trans and bool(RE_JP_DIALECT_MARKERS.search(str(audio_trans))))
+                    )
+                    if has_dialect_indicator:
+                        lines.append("    Rejestr: wyrazista gwara / stylizacja środowiskowa")
                     if str(g).lower() in ("female", "kobieta") and (is_inherently_female_name(name) or any(w in (str(role) + " " + str(voc)).lower() for w in ["alt", "starsza", "dojrzała", "ochrypł", "babci", "matron", "cesarzow", "chatun", "służąc", "niewolnic", "powiernicz", "kobieta", "dziewczyn"])):
                         lines.append(f"    OCHRONA PŁCI ({name}): KOBIETA – konsekwentne stosowanie żeńskich końcówek czasu przeszłego i trybu przypuszczającego (-łam, -łabym, -łaś).") # Standard 9.0 Invariant
         if rels:
@@ -300,6 +321,9 @@ def format_lean_episode_brief(profile: Any) -> str:
                     if not g and is_inherently_female_name(spk):
                         g = "kobieta"
                     lines.append(f"  - {spk}: {g} ({role})")
+                    spk_audio = character_audio_transcriptions.get(spk, "") if character_audio_transcriptions and isinstance(character_audio_transcriptions, dict) else ""
+                    if spk_audio and RE_JP_DIALECT_MARKERS.search(str(spk_audio)):
+                        lines.append("    Rejestr: wyrazista gwara / stylizacja środowiskowa")
             else:
                 for rel in rels[:8]:
                     spk = _get(rel, "speaker")

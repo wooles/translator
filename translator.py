@@ -1702,6 +1702,47 @@ def determine_blind_draft_status(
             return True
     return False
 
+def is_short_spoken_reply(text: str, prev_text: str = "", same_speaker_neighbor_unitalicized: bool = False) -> bool:
+    """
+    Sprawdza, czy linia jest krótką repliką mówioną w dialogu (<= 4 słowa lub typowe potoczne potwierdzenie/negacja/reakcja),
+    która NIE powinna być oznaczana jako monolog wewnętrzny tylko ze względu na cichą prozodię (niski RMS).
+    """
+    if not text:
+        return False
+    clean_txt = re.sub(r"\{.*?\}", "", text)
+    clean_txt = re.sub(r"\\[nN]|\r?\n", " ", clean_txt).strip()
+    if (clean_txt.startswith("(") and clean_txt.endswith(")")) or (clean_txt.startswith("（") and clean_txt.endswith("）")):
+        return False
+
+    words = re.findall(r"\b[A-Za-z0-9ąćęłńóśźżĄĆĘŁŃÓŚŹŻ'-]+\b", clean_txt)
+    word_count = len(words)
+
+    conversational_tokens = {
+        "yes", "yeah", "yep", "no", "nope", "okay", "ok", "right", "sure", "got it", "i see",
+        "wait", "hey", "hello", "hi", "thanks", "thank you", "please", "sorry", "excuse me",
+        "really", "what", "huh", "hm", "hmm", "ah", "oh", "eh", "good morning", "good night",
+        "understood", "fine", "alright", "coming", "im back", "i'm back", "lets go", "let's go",
+        "tak", "nie", "jasne", "dobrze", "zgoda", "czekaj", "hej", "cześć", "dzięki", "dziękuję",
+        "proszę", "przepraszam", "naprawdę", "co", "aha", "mhm", "no", "chodźmy", "wróciłem", "wróciłam"
+    }
+
+    lower_txt = clean_txt.lower().strip(" .!?,:;-–—")
+    if lower_txt in conversational_tokens:
+        return True
+
+    if word_count <= 4:
+        if any(w.lower() in conversational_tokens for w in words):
+            return True
+        if same_speaker_neighbor_unitalicized:
+            return True
+        if word_count <= 2:
+            return True
+
+    if same_speaker_neighbor_unitalicized and word_count <= 5:
+        return True
+
+    return False
+
 def format_phase1_candidate_text(pl_candidate: str, event: Any, is_sign: bool = False) -> str:
     r"""
     Formatuje tekst kandydata Fazy 1: normalizuje separatory \r\n i \n do \N
@@ -1715,7 +1756,12 @@ def format_phase1_candidate_text(pl_candidate: str, event: Any, is_sign: bool = 
     st_ev_lower = str(getattr(event, "style", "")).lower()
     italic_attr = getattr(event, "italic", 0)
     has_italic_style = any(k in st_ev_lower for k in ["italic", "flashback_italic", "thoughts", "internal"]) or italic_attr in (1, -1)
+    ev_en = getattr(event, "text", "") or ""
     is_internal_monologue = getattr(event, "is_internal_monologue", False) or has_italic_style
+
+    if is_internal_monologue and not has_italic_style:
+        if is_short_spoken_reply(cand, ev_en):
+            is_internal_monologue = False
 
     if is_internal_monologue and cand and not is_sign:
         clean_im = re.sub(r"\{\\i[01]\}", "", cand).strip()
@@ -3174,12 +3220,20 @@ class MultimodalTranslator:
                 lines.append(f"Kwestia [ID: {idx + 1}] [TYP: [DIALOG] {vtype['type_label']}]{relation_tag} (Czas: {start_str} - {end_str}) [MÓWCA: {spk_label} | ADRESAT: {addr_label} | REJESTR: {reg_desc}]{acoustic_str}:")
                 lines.append(f"  📄 SKRYPT PODSTAWOWY EN (TREŚĆ SEMANTYCZNA I FAKTY): {clean_display_text}")
 
-                # Detekcja monologu wewnętrznego (Standard 9.4, 2C.6)
+                # Detekcja monologu wewnętrznego (Standard 9.4, 2C.6, Hotfix 10.1.1 2B.2)
                 st_lower = str(getattr(event, "style", "")).lower()
                 italic_attr = getattr(event, "italic", 0)
                 has_italic_style = any(k in st_lower for k in ["italic", "flashback_italic", "thoughts", "internal"]) or italic_attr in (1, -1)
-                has_whisper_monologue = "cichy szept / monolog wewnętrzny" in acoustic_str or "monolog wewnętrzny" in relation_tag
-                is_internal_monologue = has_italic_style or has_whisper_monologue
+                is_short_reply = is_short_spoken_reply(clean_display_text)
+                has_target = bool(disc_telem.get("target_actor") or (line_addr_cat and line_addr_cat.lower() not in ("unknown", "unknown_individual", "monologue", "unknown_plural", "monolog")))
+                is_spoken_style = any(st_lower == s or st_lower.startswith(s) for s in ["default", "normal", "main", "dialogue", "alt"])
+                has_thought_brackets = ("(" in clean_display_text and ")" in clean_display_text) or ("（" in clean_display_text and "）" in clean_display_text)
+
+                if is_short_reply or has_target or (is_spoken_style and not has_thought_brackets):
+                    is_internal_monologue = has_italic_style and not is_short_reply
+                else:
+                    has_whisper_monologue = "monolog wewnętrzny" in relation_tag
+                    is_internal_monologue = has_italic_style or has_whisper_monologue
                 if is_internal_monologue:
                     lines.append("  💭 TRYB WYPOWIEDZI: MONOLOG WEWNĘTRZNY / MYŚLI (is_internal_monologue: true) — Wymagane tagi {\\i1}...{\\i0} w phase1_text.")
 
@@ -3821,6 +3875,9 @@ class MultimodalTranslator:
             from verifier import _is_whole_line_italic
             is_th = "italic" in style_str.lower() or _is_whole_line_italic(ev.text or "")
             is_internal_monologue = getattr(ev, "is_internal_monologue", False) or is_th
+            if is_internal_monologue and not ("italic" in style_str.lower() or "thoughts" in style_str.lower()):
+                if is_short_spoken_reply(clean_txt):
+                    is_internal_monologue = False
             vtype_info = detect_event_visual_type(ev, ts_pref, style_report=getattr(self, "style_report", None))
             batch_items_for_rules.append({
                 "id": b_id,
@@ -3985,6 +4042,9 @@ class MultimodalTranslator:
             italic_attr = getattr(event, "italic", 0)
             has_italic_style = any(k in st_ev_lower for k in ["italic", "flashback_italic", "thoughts", "internal"]) or italic_attr in (1, -1)
             is_internal_monologue = getattr(event, "is_internal_monologue", False) or has_italic_style
+            if is_internal_monologue and not has_italic_style:
+                if is_short_spoken_reply(clean_en):
+                    is_internal_monologue = False
 
             if batch_response:
                 for tr in batch_response.translations:
@@ -4336,6 +4396,9 @@ class MultimodalTranslator:
             from verifier import _is_whole_line_italic
             is_th = "italic" in style_str.lower() or _is_whole_line_italic(event.text or "")
             is_internal_monologue = getattr(event, "is_internal_monologue", False) or is_th
+            if is_internal_monologue and not ("italic" in style_str.lower() or "thoughts" in style_str.lower()):
+                if is_short_spoken_reply(clean_en):
+                    is_internal_monologue = False
 
             # Bariera Zmiany Mówcy i Stylu (Thought-to-Speech Firewall)
             if prev_is_thought and not is_th and audio_jp_str and not vtype["is_sign"]:

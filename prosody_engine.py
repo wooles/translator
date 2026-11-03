@@ -17,6 +17,16 @@ class AudioProsodyEngine:
         pass
 
     @staticmethod
+    def _classify_rms_label(rms_val: float, median_rms: float) -> str:
+        """
+        Klasyfikuje obniżony poziom energii RMS jako cichy głos/szept lub spokojną replikę,
+        zabezpieczając przed błędną interpretacją cichej mowy jako monologu wewnętrznego (Hotfix 10.1.1, 2B.1).
+        """
+        if median_rms > 0 and rms_val < median_rms * 0.45:
+            return "cichy głos / obniżona energia głosu (szept lub spokojna replika)"
+        return ""
+
+    @staticmethod
     def read_wav_segment(wav_path: str, start_ms: int, end_ms: int) -> Optional[np.ndarray]:
         """Reads audio waveform segment from WAV file (16kHz mono)."""
         if not wav_path or not os.path.exists(wav_path):
@@ -125,6 +135,18 @@ class AudioProsodyEngine:
         results = {}
         prev_dbfs: Optional[float] = None
 
+        # Compute median RMS across scene events for relative dynamics
+        scene_rms_vals = []
+        for _, ev_item in events:
+            r_start = max(0, ev_item.start - batch_start_ms)
+            r_end = max(r_start + 200, ev_item.end - batch_start_ms)
+            seg_s = cls.read_wav_segment(wav_path, r_start, r_end)
+            if seg_s is not None and len(seg_s) >= 400:
+                seg_rms = float(np.sqrt(np.mean(seg_s ** 2)))
+                if seg_rms > 1.0:
+                    scene_rms_vals.append(seg_rms)
+        median_rms = float(np.median(scene_rms_vals)) if scene_rms_vals else 0.0
+
         for b_id, ev in events:
             # Relative timestamp in WAV slice
             rel_start = max(0, ev.start - batch_start_ms)
@@ -148,8 +170,9 @@ class AudioProsodyEngine:
 
             # Detect tone characteristics and emotional expression
             tags = []
-            if dbfs < -34.0:
-                tags.append("cichy szept / monolog wewnętrzny")
+            low_energy_lbl = cls._classify_rms_label(rms, median_rms)
+            if dbfs < -34.0 or low_energy_lbl:
+                tags.append(low_energy_lbl or "cichy głos / obniżona energia głosu (szept lub spokojna replika)")
             elif dbfs > -12.0 or peak_dbfs > -1.0:
                 tags.append("krzyk bojowy / silne wzburzenie emocjonalne")
 

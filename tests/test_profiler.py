@@ -291,3 +291,59 @@ def test_no_lk2_series_names_in_production_files(fname):
         for char_name in bdata.get("characters", {}):
             if " " in char_name and len(char_name) >= 8 and not any(w in char_name.lower() for w in ("captain", "recruit", "mercenary", "guard", "soldier", "mother", "kid", "bro")):
                 assert char_name not in src, f"Nazwa postaci {char_name} znaleziona w {fname}"
+
+
+# ==============================================================================
+# HOTFIX 10.1.1 REGRESSION TESTS (T10.1.1_P2a)
+# ==============================================================================
+
+@pytest.mark.unit
+def test_t10_1_1_p2a_dialect_registry_guidance_in_episode_brief():
+    """
+    T10.1.1_P2a (Hotfix 10.1.1, 2B.5):
+    Weryfikacja pozytywnej deskrypcji rejestru gwary w EPISODE BRIEF:
+    Gdy postać w transkrypcji audio lub dossier posługuje się wykładnikami gwary japońskiej,
+    format_lean_episode_brief dodaje 'Rejestr: wyrazista gwara / stylizacja środowiskowa'.
+    """
+    from profiler import EpisodeProfile, CharacterDossier, format_lean_episode_brief
+
+    # Postać z wykładnikiem gwary w audio_transcription
+    cd_dialect = CharacterDossier(
+        name="SpeakerAlpha",
+        gender="MALE",
+        age_and_role="Wojownik z prowincji",
+        speech_style_pl="Szorstka polszczyzna potoczna",
+        audio_transcription="ora washi no dabe"
+    )
+    # Postać o mowie ogólnej
+    cd_standard = CharacterDossier(
+        name="SpeakerBeta",
+        gender="FEMALE",
+        age_and_role="Uczennica",
+        speech_style_pl="Polszczyzna ogólna",
+        audio_transcription="watashi wa ikimasu"
+    )
+
+    profile = EpisodeProfile(
+        show_name="SeriesAlpha",
+        character_dossiers=[cd_dialect, cd_standard]
+    )
+
+    brief = format_lean_episode_brief(profile)
+    assert "Rejestr: wyrazista gwara / stylizacja środowiskowa" in brief
+
+    # Weryfikacja przez przekazanie słownika character_audio_transcriptions
+    profile_plain = EpisodeProfile(
+        show_name="SeriesAlpha",
+        character_dossiers=[
+            CharacterDossier(name="SpeakerGamma", gender="MALE", age_and_role="Mieszczanin", speech_style_pl="Mowa codzienna")
+        ]
+    )
+    brief_plain = format_lean_episode_brief(profile_plain)
+    assert "Rejestr: wyrazista gwara / stylizacja środowiskowa" not in brief_plain
+
+    brief_with_audio = format_lean_episode_brief(
+        profile_plain,
+        character_audio_transcriptions={"SpeakerGamma": "honma ni akan de"}
+    )
+    assert "Rejestr: wyrazista gwara / stylizacja środowiskowa" in brief_with_audio
