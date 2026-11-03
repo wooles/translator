@@ -4,14 +4,20 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 22.10.2026)
-- **Status CI/CD:** `STATUS: WDROŻONE I ZWERYFIKOWANE (198/198 PASSED) - VICTORY CONFIRMED`
-- **Gałąź i Architektura:** `main` (Standard 9.0: Wariant (d) — Hybrydowa Straż Dowodowa [Hybrid Evidence Guard & Pipeline Hardening], Zero Morphosyntactic Mutation in Production [`VARIANT_D_PURE_LLM_MORPHOLOGY = True`, \(T(x) = x\)], Narrow Safety Net \(P_0 \cap \text{EN}\) w `EpisodeQualityGate.apply_narrow_safety_net_p0_en`, Pre-translacyjna Ingestia AniList P0 do `SeriesBible.characters` z paradygmatami odmiany nazw, Fonetyczna Normalizacja Aliasów `ph <-> f` w \(\mathcal{O}(1)\) z samoleczącym indeksem, Trwałe Wyeliminowanie Pętli Rewersji `authoritative_dialogue` w Kroku 18 `translator.py`, Reguła Wołacza Tytułów dla nazw obcych na `-tz` [`Kapitanie Moritz`, `Panie Fritz`], Programowa Bariera Regresji Fazy 2 `_guard_phase2_regressions` w `DialogueVerifier` [ochrona rodzaju czasowników i zakaz kalk ciągłych `być + -ący`], Rygorystyczna Higiena ASS [usuwanie spacji z tagów i przenoszenie wiszących spójników przed `\N`], Stabilna Identyfikacja Zdarzeń `[ID: {event_id}]`, Full-Codebase Zero-Anime-Literal Invariant & 11/11 w `verify_purity.py`, 4/4 w `audit_diff.ps1`)
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 03.11.2026 — Standard 10.1 Certyfikowany Baseline)
+- **Aktualny certyfikowany standard produkcyjny:** `Standard 10.1 (Production Certified Baseline)`
+- **Commit certyfikacji kodu:** `b9b9e2a` (`b9b9e2a7c63bdf2f70711a5f9e5ed538debb35d7`)
+- **Commit ochrony Depuracji Legacy 1.0 (Z16):** `474fb64`
+- **Stan metryk:** `468 collected` (`315 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki (`verify_purity.py`, `verify_12_fixes.py`, `verify_ultimate_pipeline.py`, `audit_diff.ps1`) w stanie `PASS`.
+- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (315/315 FAST PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
+- **Zasada utrzymaniowa post-10.1:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 10.1` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
+- **Gałąź i Architektura:** `main` (Standard 10.1: Wariant (d) — Hybrydowa Straż Dowodowa [Hybrid Evidence Guard & Pipeline Hardening], Zero Morphosyntactic Mutation in Production [`VARIANT_D_PURE_LLM_MORPHOLOGY = True`, T(x) = x], Narrow Safety Net P0 and EN w `EpisodeQualityGate.apply_narrow_safety_net_p0_en`, Pre-translacyjna Ingestia AniList P0 do `SeriesBible.characters` z paradygmatami odmiany nazw, Fonetyczna Normalizacja Aliasów `ph <-> f` w O(1) z samoleczącym indeksem, Trwałe Wyeliminowanie Pętli Rewersji `authoritative_dialogue` w Kroku 18 `translator.py`, Reguła Wołacza Tytułów dla nazw obcych na `-tz` [`Kapitanie [Imię]`, `Panie [Imię]`], Programowa Bariera Regresji Fazy 2 `_guard_phase2_regressions` w `DialogueVerifier`, Rygorystyczna Higiena ASS [usuwanie spacji z tagów i przenoszenie wiszących spójników przed `\N`], Stabilna Identyfikacja Zdarzeń `[ID: {event_id}]`, Full-Codebase Zero-Anime-Literal Invariant & 12/12 w `verify_purity.py`, 4/4 w `audit_diff.ps1`)
 - **Środowisko:** Python 3.13 (`.venv`), Windows PowerShell, `ffmpeg` (PATH), `librosa.pyin`, `soundfile`, `pysubs2`, `spaCy en_core_web_sm` (100% offline 0.00 PLN), bezpośrednie klucze Google AI Studio API (`use_vertex = 0`).
 - **Dyrektywa Wykonawcza Testów:**
   * Testy przyrostowe podczas kodowania (< 2 s): `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_testu>"`
+  * Szybki pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest -q` (315 passed, 153 deselected)
   * Audyt śledczy diffu: `powershell -ExecutionPolicy Bypass -File .\audit_diff.ps1 -ForbiddenTerms "<lista>"`
-  * Pełny pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest` (198/198 PASSED)
+  * 4 bramki kwalifikacyjne: `python verify_purity.py`, `python verify_12_fixes.py`, `python verify_ultimate_pipeline.py`, `audit_diff.ps1`
 
 ---
 

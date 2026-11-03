@@ -1,6 +1,12 @@
-# 🏛️ KODEKS ZASAD POTOKU AVT (WORKSPACE RULES — TRANSLATOR STANDARD 9.1)
+# 🏛️ KODEKS ZASAD POTOKU AVT (WORKSPACE RULES — TRANSLATOR STANDARD 10.1 BASELINE)
 
 Dokument ten stanowi jedyne źródło prawdy (Single Source of Truth) definiujące nienaruszalne reguły architektoniczne, lingwistyczne i procesowe asystenta AI oraz zespołów wieloagentowych w repozytorium `translator`.
+
+- **Aktualny certyfikowany standard produkcyjny:** `Standard 10.1 (Production Certified Baseline)`
+- **Commit certyfikacji kodu:** `b9b9e2a` (`b9b9e2a7c63bdf2f70711a5f9e5ed538debb35d7`)
+- **Commit ochrony Depuracji Legacy 1.0 (Z16):** `474fb64`
+- **Stan metryk:** `468 collected` (`315 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki (`verify_purity.py`, `verify_12_fixes.py`, `verify_ultimate_pipeline.py`, `audit_diff.ps1`) w stanie `PASS`.
+- **Zasada utrzymaniowa post-10.1:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 10.1` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
 
 ---
 

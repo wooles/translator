@@ -1,9 +1,13 @@
-# 🏛️ KANONICZNA KOTWICA ARCHITEKTURY (GOLDEN CORNERSTONE ANCHOR v2.0)
-**Status:** NIENARUSZALNY PUNKT ODNIESIENIA (GOLD STANDARD)  
-**Wersja:** `cornerstone-v2.0`  
-**Data zablokowania:** 29 sierpnia 2026 r.
+# 🏛️ KANONICZNA KOTWICA ARCHITEKTURY (GOLDEN CORNERSTONE ANCHOR v2.0 / STANDARD 10.1 BASELINE)
+**Status:** NIENARUSZALNY PUNKT ODNIESIENIA (PRODUCTION CERTIFIED BASELINE)  
+**Wersja:** `Standard 10.1 (Production Certified Baseline)`  
+**Commit certyfikacji kodu:** `b9b9e2a` (`b9b9e2a7c63bdf2f70711a5f9e5ed538debb35d7`)  
+**Commit ochrony Depuracji Legacy 1.0 (Z16):** `474fb64`  
+**Data certyfikacji:** 3 listopada 2026 r.  
+**Stan metryk:** `468 collected` (`315 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki (`verify_purity.py`, `verify_12_fixes.py`, `verify_ultimate_pipeline.py`, `audit_diff.ps1`) w stanie `PASS`.  
+**Zasada utrzymaniowa post-10.1:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 10.1` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
 
-Dokument ten definiuje żelazne zasady, niezmienniki architektoniczne i standardy jakościowe, które **MUSZĄ** być bezwzględnie zachowane przy jakichkolwiek przyszłych modyfikacjach, refaktoryzacjach czy rozbudowie tłumacza.
+Dokument ten definiuje reguły, niezmienniki architektoniczne i standardy jakościowe, które stanowią fundament bezwzględnie zachowywany przy modyfikacjach, refaktoryzacjach czy rozbudowie potoku.
 
 ---
 
