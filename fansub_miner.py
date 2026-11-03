@@ -20,6 +20,15 @@ BASE_DIR = Path(__file__).parent
 BAZA_NAPISOW_DIR = BASE_DIR / "baza napisów"
 FANSUB_LEXICONS_DIR = BASE_DIR / "series_memory" / "fansub_lexicons"
 
+def _resolve_lexicon_cache_dir(base_dir: Optional[Path]) -> Path:
+    if not base_dir or base_dir == BAZA_NAPISOW_DIR:
+        return FANSUB_LEXICONS_DIR
+    if base_dir.name == "fansub_lexicons":
+        return base_dir
+    if (base_dir / "fansub_lexicons").exists() or base_dir.name == "series_memory":
+        return base_dir / "fansub_lexicons"
+    return base_dir
+
 
 def normalize_anime_slug(title: str) -> str:
     """
@@ -174,8 +183,17 @@ def scan_and_extract_fansub_lexicon(
     if not slug:
         return None
 
-    FANSUB_LEXICONS_DIR.mkdir(parents=True, exist_ok=True)
-    cache_path = FANSUB_LEXICONS_DIR / f"{slug}.json"
+    # Standard 10.1 (Operacja 2B.4): Guard blocking auto-save for synthetic test series
+    is_test_series = any(slug.startswith(prefix) for prefix in (
+        "test", "synthetic", "stale", "multiarrow", "dummy", "autolearn",
+        "syntaxseries", "fantasyrealm", "comprehensiveroletest", "antipivottestseries"
+    )) or any(anime_name.lower().startswith(prefix) for prefix in (
+        "test", "synthetic", "stale", "multiarrow", "dummy", "autolearn",
+        "syntaxseries", "fantasyrealm", "comprehensiveroletest", "antipivottestseries"
+    ))
+
+    target_cache_dir = _resolve_lexicon_cache_dir(base_dir)
+    cache_path = target_cache_dir / f"{slug}.json"
 
     # Return cached lexicon if available and not forced to rebuild
     if cache_path.exists() and not force_rebuild:
@@ -213,18 +231,24 @@ def scan_and_extract_fansub_lexicon(
             if group_match:
                 lexicon["fansub_group"] = group_match.group(1)
 
-    # Save compiled lexicon to cache
-    try:
-        with open(cache_path, "w", encoding="utf-8") as f:
-            json.dump(lexicon, f, ensure_ascii=False, indent=2)
-        logger.info(f"Compiled and cached fansub lexicon for '{slug}' -> {cache_path}")
-    except Exception as e:
-        logger.warning(f"Failed to write fansub lexicon cache {cache_path}: {e}")
+    # Save compiled lexicon to cache unless synthetic test series targeting repository directory
+    should_save = True
+    if is_test_series and target_cache_dir == FANSUB_LEXICONS_DIR:
+        should_save = False
+
+    if should_save:
+        try:
+            target_cache_dir.mkdir(parents=True, exist_ok=True)
+            with open(cache_path, "w", encoding="utf-8") as f:
+                json.dump(lexicon, f, ensure_ascii=False, indent=2)
+            logger.info(f"Compiled and cached fansub lexicon for '{slug}' -> {cache_path}")
+        except Exception as e:
+            logger.warning(f"Failed to write fansub lexicon cache {cache_path}: {e}")
 
     return lexicon
 
 
-def load_fansub_lexicon(anime_title: str) -> Optional[Dict[str, Any]]:
+def load_fansub_lexicon(anime_title: str, base_dir: Optional[Path] = None) -> Optional[Dict[str, Any]]:
     """
     High-speed O(1) loader for the compiled fansub lexicon (< 2ms).
     """
@@ -234,7 +258,8 @@ def load_fansub_lexicon(anime_title: str) -> Optional[Dict[str, Any]]:
     if not slug:
         return None
 
-    cache_path = FANSUB_LEXICONS_DIR / f"{slug}.json"
+    target_cache_dir = _resolve_lexicon_cache_dir(base_dir)
+    cache_path = target_cache_dir / f"{slug}.json"
     if cache_path.exists():
         try:
             with open(cache_path, "r", encoding="utf-8") as f:
@@ -242,7 +267,7 @@ def load_fansub_lexicon(anime_title: str) -> Optional[Dict[str, Any]]:
         except Exception:
             pass
 
-    return scan_and_extract_fansub_lexicon(anime_title)
+    return scan_and_extract_fansub_lexicon(anime_title, base_dir=base_dir)
 
 
 def format_fansub_lexicon_for_prompt(lexicon: Optional[Dict[str, Any]]) -> str:

@@ -367,7 +367,7 @@ class DiarizationSanityChecker:
         spk_low = (speaker_name or "").lower()
         # Ochrona kanonicznych ról chłopięcych (młodzi chłopcy z wysokim F0)
         from series_memory import BOY_ROLE_KEYWORDS
-        is_boy = any(k in spk_low for k in BOY_ROLE_KEYWORDS) or any(k in spk_low for k in ["chłopiec", "boy", "kid", "dziecko", "chojumaru", "conan"])
+        is_boy = any(k in spk_low for k in BOY_ROLE_KEYWORDS) or any(k in spk_low for k in ["chłopiec", "boy", "kid", "dziecko"])
 
         if is_boy:
             # Chłopiec z wysokim F0 to norma biologiczna seiyū, nie anomalia diaryzacji
@@ -2815,10 +2815,10 @@ class SceneDiscourseGraph:
             telemetry["speaker_name"] = clean_actor
             telemetry["actor"] = clean_actor
 
-        # 2. Bezwarunkowy odczyt rekordu P0 z SeriesBible / EpisodeProfiler (Operacja 2C.1, R3.2, 2B.1, 2B.5)
-        p0_gender = verified_p0_gender
-        has_ver = has_verified_gender
-        speaker_p0_verified = bool(verified_p0_gender)
+        # 2. Bezwarunkowy odczyt rekordu P0 z SeriesBible / EpisodeProfiler (Operacja 2C.1, R3.2, 2B.1, 2B.5, 2B.7)
+        p0_gender = verified_p0_gender or kwargs.get("speaker_p0_gender")
+        has_ver = has_verified_gender or bool(kwargs.get("speaker_p0_gender"))
+        speaker_p0_verified = bool(verified_p0_gender or kwargs.get("speaker_p0_gender"))
 
         if not p0_gender and series_bible and clean_actor:
             char_rec = None

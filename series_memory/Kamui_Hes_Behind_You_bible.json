@@ -1,5 +1,5 @@
 {
-  "anime_title": "Kamui: He's Behind You",
+  "anime_title": "Kamui_Hes_Behind_You",
   "characters": {
     "Asystentka": {
       "description": "KOBIETA (wyodrębniono z relacji serii)",
@@ -49,12 +49,12 @@
   },
   "relationships": {
     "Asystentka -> Kamui": "Zwrot: 'panie Kamui / mistrzu' (pomocnica -> egzorcysta / mistrz) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Kamui -> Asystentka": "Zwrot: 'mała / dziewczynko' (mistrz -> młodsza asystentka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
+    "Kamui -> Asystentka": "Zwrot: 'mała / dziewczynko' (mistrz -> młodsza asystentka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: FORMALNY]",
     "Hanako ze Shimosunagawy -> Dziesięć Kwiatów (Rada Hanako)": "Zwrot: 'szanowne panie / starszyzno' (reprezentantka szkoly -> rada dostojników duchów) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
   },
   "relations": {
     "Asystentka -> Kamui": "Zwrot: 'panie Kamui / mistrzu' (pomocnica -> egzorcysta / mistrz) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Kamui -> Asystentka": "Zwrot: 'mała / dziewczynko' (mistrz -> młodsza asystentka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
+    "Kamui -> Asystentka": "Zwrot: 'mała / dziewczynko' (mistrz -> młodsza asystentka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: FORMALNY]",
     "Hanako ze Shimosunagawy -> Dziesięć Kwiatów (Rada Hanako)": "Zwrot: 'szanowne panie / starszyzno' (reprezentantka szkoly -> rada dostojników duchów) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
   },
   "declensions": {
@@ -99,7 +99,10 @@
     "Asystentka": "ANTHROPONYM",
     "Kamui": "ANTHROPONYM",
     "Hanako ze Shimosunagawy": "ANTHROPONYM",
-    "Shikigami": "TOPONYM"
+    "Hanako Hunt": "TOPONYM",
+    "National Hanako Union": "TOPONYM",
+    "Shikigami": "TOPONYM",
+    "Spirited away": "TOPONYM"
   },
   "fansub_canon": {}
 }

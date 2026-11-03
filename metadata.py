@@ -336,7 +336,7 @@ def _raw_fetch_anilist_metadata(title: str) -> Optional[Dict[str, Any]]:
             domain_keywords = {
                 "Enologia i Sommelierstwo (Wino)": [
                     r"\bwine\b", r"\bsommelier\b", r"\bwinery\b", r"\bvintages?\b",
-                    r"\bkami no shizuku\b", r"\bdrops of god\b", r"\benology\b", r"\boenology\b"
+                    r"\benology\b", r"\boenology\b"
                 ],
                 "Kulinaria i Gastronomia": [
                     r"\bcooking\b", r"\bculinary\b", r"\bgourmet\b", r"\bchef\b",

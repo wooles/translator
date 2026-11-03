@@ -1,5 +1,5 @@
 {
-  "anime_title": "Sasaki to Pii-chan",
+  "anime_title": "Sasaki_to_Pii_chan",
   "characters": {
     "Sasaki": {
       "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
@@ -102,6 +102,7 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
+        "Elsa",
         "Elsa Müller",
         "Muller",
         "Müller"
@@ -153,18 +154,6 @@
       "priority": "P0",
       "aliases": [
         "Hoshizaki-san"
-      ],
-      "entity_category": "ANTHROPONYM"
-    },
-    "Elsa": {
-      "description": "kobieta (postać)",
-      "gender": "FEMALE",
-      "grammatical_gender": "FEMININE",
-      "has_verified_gender": true,
-      "confidence": 0.95,
-      "priority": "P0",
-      "aliases": [
-        "Elsa"
       ],
       "entity_category": "ANTHROPONYM"
     },
@@ -244,7 +233,7 @@
     "Magical Pink -> Sasaki": "Zwrot: 'panie Magiku' (chwilowy sojusznik z przymusu) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Sasaki -> Akutsu": "Zwrot: 'naczelniku / panie naczelniku' (podwładny -> przełożony) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Müller -> Sasaki": "Zwrot: 'panie Sasaki / baronie Sasaki' (arystokratyczna relacja partnerska) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Müller -> Peeps": "Zwrot: 'Czcigodny Mędrcu Gwiazd' (feudalny szacunek wobec arcymaga) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [reżim: FORMALNY]"
+    "Müller -> Peeps": "Zwrot: 'Czcigodny Mędrcu Gwiazd' (feudalny szacunek wobec arcymaga) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]"
   },
   "relations": {
     "Sasaki -> Shizuka Futari": "Zwrot: 'pani Shizuko / Futari-san' (współpracownicy / partnerzy z Biura) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
@@ -252,7 +241,7 @@
     "Magical Pink -> Sasaki": "Zwrot: 'panie Magiku' (chwilowy sojusznik z przymusu) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Sasaki -> Akutsu": "Zwrot: 'naczelniku / panie naczelniku' (podwładny -> przełożony) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Müller -> Sasaki": "Zwrot: 'panie Sasaki / baronie Sasaki' (arystokratyczna relacja partnerska) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Müller -> Peeps": "Zwrot: 'Czcigodny Mędrcu Gwiazd' (feudalny szacunek wobec arcymaga) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [reżim: FORMALNY]"
+    "Müller -> Peeps": "Zwrot: 'Czcigodny Mędrcu Gwiazd' (feudalny szacunek wobec arcymaga) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]"
   },
   "declensions": {
     "Sasaki": {
@@ -364,16 +353,6 @@
       "W": "Frenchu",
       "gender": "MALE"
     },
-    "Elsa": {
-      "M": "Elsa",
-      "D": "Elsy",
-      "C": "Elsie",
-      "B": "Elsę",
-      "N": "Elsą",
-      "Ms": "Elsie",
-      "W": "Elso",
-      "gender": "FEMALE"
-    },
     "Louis": {
       "M": "Louis",
       "D": "Louisa",
@@ -464,12 +443,19 @@
     "Marc": "ANTHROPONYM",
     "French": "ANTHROPONYM",
     "Hoshizaki-san": "ANTHROPONYM",
-    "Elsa": "ANTHROPONYM",
     "Louis": "ANTHROPONYM",
     "Takayoshi": "ANTHROPONYM",
     "Naomi": "ANTHROPONYM",
     "Abaddon": "ANTHROPONYM",
-    "Muller": "ANTHROPONYM"
+    "Muller": "ANTHROPONYM",
+    "Quarantine Space": "TOPONYM",
+    "Disciple": "TOPONYM",
+    "Proxy War": "TOPONYM",
+    "Magical Field": "TOPONYM",
+    "Magical Beam": "TOPONYM",
+    "First Concubine": "TOPONYM",
+    "Kariyushi / Psionic Power vs Magic": "TOPONYM",
+    "Awans Sasakiego": "TOPONYM"
   },
   "fansub_canon": {}
 }

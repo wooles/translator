@@ -15,30 +15,6 @@
       ],
       "entity_category": "ANTHROPONYM"
     },
-    "Hebichika": {
-      "description": "postać (Postać)",
-      "gender": "FEMALE",
-      "grammatical_gender": "FEMININE",
-      "has_verified_gender": true,
-      "confidence": 0.95,
-      "priority": "P0",
-      "aliases": [
-        "Hebichika"
-      ],
-      "entity_category": "ANTHROPONYM"
-    },
-    "Hana": {
-      "description": "postać (Postać)",
-      "gender": "FEMALE",
-      "grammatical_gender": "FEMININE",
-      "has_verified_gender": true,
-      "confidence": 0.95,
-      "priority": "P0",
-      "aliases": [
-        "Hana"
-      ],
-      "entity_category": "ANTHROPONYM"
-    },
     "Hana Kongouji": {
       "description": "kobieta (postać)",
       "gender": "FEMALE",
@@ -47,6 +23,7 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
+        "Hana",
         "Hana Kongouji",
         "Kongouji"
       ],
@@ -142,6 +119,7 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
+        "Hikaru",
         "Hikaru Sekiryu",
         "Sekiryu"
       ],
@@ -172,18 +150,6 @@
         "Minoru",
         "Tonden",
         "Tonden Minoru"
-      ],
-      "entity_category": "ANTHROPONYM"
-    },
-    "Hikaru": {
-      "description": "KOBIETA (wyodrębniono z relacji serii)",
-      "gender": "FEMALE",
-      "grammatical_gender": "FEMININE",
-      "has_verified_gender": true,
-      "confidence": 0.95,
-      "priority": "P0",
-      "aliases": [
-        "Hikaru"
       ],
       "entity_category": "ANTHROPONYM"
     },
@@ -248,22 +214,10 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
+        "Hebichika",
         "Hebichika-sensei"
       ],
       "entity_category": "ANTHROPONYM"
-    },
-    "Ai": {
-      "description": "kobieta (postać)",
-      "gender": "FEMALE",
-      "grammatical_gender": "FEMININE",
-      "priority": "P0",
-      "has_verified_gender": true,
-      "aliases": [
-        "Ai",
-        "Ai Yasumi"
-      ],
-      "entity_category": "ANTHROPONYM",
-      "confidence": 0.95
     },
     "Yasumi": {
       "description": "kobieta (postać)",
@@ -274,19 +228,6 @@
       "aliases": [
         "Ai Yasumi",
         "Yasumi"
-      ],
-      "entity_category": "ANTHROPONYM",
-      "confidence": 0.95
-    },
-    "Kokoro": {
-      "description": "kobieta (postać)",
-      "gender": "FEMALE",
-      "grammatical_gender": "FEMININE",
-      "priority": "P0",
-      "has_verified_gender": true,
-      "aliases": [
-        "Kokoro",
-        "Kokoro Teshima"
       ],
       "entity_category": "ANTHROPONYM",
       "confidence": 0.95
@@ -404,45 +345,45 @@
     "Salvia Maru": "Salvia Maru"
   },
   "relationships": {
-    "Rei Teshima -> Hebichika-sensei": "Zwrot: 'Pani Hebichiko' / 'Sensei' (asystentka -> autorka i mistrzyni) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama\\NMĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)] [reżim: FORMALNY]",
-    "Hebichika-sensei -> Rei Teshima": "Zwrot: 'nowicjuszka / Teshima-chan' (główna autorka -> nowa asystentka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
-    "Hana -> Rei Teshima": "Zwrot: 'Pani Teshimo / pani [forma per pani]' (redaktorka wydawnictwa Shogakukan -> autorka mangi; ścisła konsekwencja T-V, zakaz form poufałych 'ty' / 'Zaufaj mi') [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)] [reżim: POUFNY]",
-    "Rei Teshima -> Hana Kongouji": "Zwrot: 'Pani redaktor / pani Kongouji' (autorka -> redaktorka wydawnictwa, relacja formalna per 'Pani') [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)] [reżim: FORMALNY]",
-    "Nana Teramura -> Rei Teshima": "Zwrot: 'na ty / Rei-chan' (dawne znajomi po fachu, asystentki) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
-    "Harue Natsukusa -> Hebichika-sensei": "Zwrot: 'Sensei' (główna asystentka -> autorka mangi) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
-    "Ai Yasumi -> Rei Teshima": "Zwrot: 'pani Teshimo / pani profesor' (uczennica -> mentorka / nauczycielka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)] [reżim: FORMALNY]",
-    "Rei Teshima -> Ai Yasumi": "Zwrot: 'Yasumi / na ty' (nauczycielka -> uczennica) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)] [reżim: FORMALNY]",
-    "Ai Yasumi -> Kokoro Fujimori": "Zwrot: 'Fujimori / Kokoro' (znajomi z klasy liceum i klubu mangi, relacja rówieśnicza na 'ty', bezwzględny zakaz 'Pani Fujimori') [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
-    "Kokoro Fujimori -> Ai Yasumi": "Zwrot: 'Ai / na ty' (przyjaciele z klubu) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)] [reżim: POUFNY]",
+    "Rei Teshima -> Hebichika-sensei": "Zwrot: 'Pani Hebichiko' / 'Sensei' (asystentka -> autorka i mistrzyni) [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie'] [reżim: FORMALNY]",
+    "Hebichika-sensei -> Rei Teshima": "Zwrot: 'nowicjuszka / Teshima-chan' (główna autorka -> nowa asystentka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie']",
+    "Hana -> Rei Teshima": "Zwrot: 'Pani Teshimo / pani [forma per pani] (redaktorka wydawnictwa Shogakukan -> autorka mangi; ścisła konsekwencja T-V, wykluczone formy poufałych 'ty' / 'Zaufaj mi') [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie'] [reżim: POUFNY]",
+    "Rei Teshima -> Hana Kongouji": "Zwrot: 'Pani redaktor / pani Kongouji' (autorka -> redaktorka wydawnictwa, relacja formalna per 'Pani') [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie'] [reżim: FORMALNY]",
+    "Nana Teramura -> Rei Teshima": "Zwrot: 'na ty / Rei-chan' (dawne znajomi po fachu, asystentki) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie']",
+    "Harue Natsukusa -> Hebichika-sensei": "Zwrot: 'Sensei' (główna asystentka -> autorka mangi) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie']",
+    "Ai Yasumi -> Rei Teshima": "Zwrot: 'pani Teshimo / pani profesor' (uczennica -> mentorka / nauczycielka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie'] [reżim: FORMALNY]",
+    "Rei Teshima -> Ai Yasumi": "Zwrot: 'Yasumi / na ty' (nauczycielka -> uczennica) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie'] [reżim: FORMALNY]",
+    "Ai Yasumi -> Kokoro Fujimori": "Zwrot: 'Fujimori / Kokoro' (znajomi z klasy liceum i klubu mangi, relacja rówieśnicza na 'ty, wykluczono formę 'Pani Fujimori') [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie']",
+    "Kokoro Fujimori -> Ai Yasumi": "Zwrot: 'Ai / na ty' (przyjaciele z klubu) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie'] [reżim: POUFNY]",
     "Pokota -> Rei Teshima": "Zwrot: 'Pani Teshima / Teshima-sensei' (narrator/maskotka -> nauczycielka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
-    "Sachi Akafuku -> Rei Teshima": "Zwrot: 'Tessie / pani Teshimo' (uczennica -> nauczycielka (poufała))', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama\\NMĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)] [reżim: POUFNY]",
-    "Hikaru Sekiryu -> Rei Teshima": "Zwrot: 'pani Teshimo / pani profesor (po upomnieniu: Teshima-sensei)' (uczennica o niepokornym usposobieniu -> nauczycielka)', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama\\NMĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)] [reżim: FORMALNY]",
-    "Sachi Akafuku -> Hikaru Sekiryu": "Zwrot: 'na ty / per Hikarun' (koleżanka z klubu usiłująca nawiązać przyjaźń) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
-    "Hikaru Sekiryu -> Sachi Akafuku": "Zwrot: 'Akafuku / Mistrzyni Akafuku (później)' (początkowy dystans po nazwisku -> żartobliwe uznanie autorytetu)', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama\\NMĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)] [reżim: FORMALNY]",
-    "Miya Enma -> Rei Teshima": "Zwrot: 'pani Hoshino / pani Teshimo (per pani)' (redaktorka wydawnictwa -> autorka mangi) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
-    "Ai Yasumi -> Hana Kongouji": "Zwrot: 'pani Kongouji / pani redaktor' (początkująca autorka -> redaktorka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
-    "Hana Kongouji -> Ai Yasumi": "Zwrot: 'pani / panno Yasumi' (redaktorka wydawnictwa -> debiutantka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
-    "Hebichika -> Hikaru Sekiryu": "Zwrot: 'Hikaru / Córeczko / Hikaruś' (matka -> córka; w audio: 'Hikaru-chan') [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna\\NKATEGORYCZNY ZAKAZ szkolnego przydomka 'Hikarun'] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
-    "Hebichika -> Hikaru": "Zwrot: 'Hikaru / Córeczko / Hikaruś' (matka -> córka; w audio: 'Hikaru-chan') [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna\\NKATEGORYCZNY ZAKAZ szkolnego przydomka 'Hikarun'] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]"
+    "Sachi Akafuku -> Rei Teshima": "Zwrot: 'Tessie / pani Teshimo' (uczennica -> nauczycielka (poufała)) [reżim: POUFNY] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie']",
+    "Hikaru Sekiryu -> Rei Teshima": "Zwrot: 'pani Teshimo / pani profesor (po upomnieniu: Teshima-sensei)' (uczennica o niepokornym usposobieniu -> nauczycielka) [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie'] [reżim: FORMALNY]",
+    "Sachi Akafuku -> Hikaru Sekiryu": "Zwrot: 'na ty / per Hikarun' (koleżanka z klubu usiłująca nawiązać przyjaźń) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie']",
+    "Hikaru Sekiryu -> Sachi Akafuku": "Zwrot: 'Akafuku / Mistrzyni Akafuku (później)' (początkowy dystans po nazwisku -> żartobliwe uznanie autorytetu) [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie'] [reżim: FORMALNY]",
+    "Miya Enma -> Rei Teshima": "Zwrot: 'pani Hoshino / pani Teshimo (per pani)' (redaktorka wydawnictwa -> autorka mangi) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie']",
+    "Ai Yasumi -> Hana Kongouji": "Zwrot: 'pani Kongouji / pani redaktor' (początkująca autorka -> redaktorka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie']",
+    "Hana Kongouji -> Ai Yasumi": "Zwrot: 'pani / panno Yasumi' (redaktorka wydawnictwa -> debiutantka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie']",
+    "Hebichika -> Hikaru Sekiryu": "Zwrot: 'Hikaru / Córeczko / Hikaruś' (matka -> córka; w audio: 'Hikaru-chan') [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna\\NKATEGORYCZNYwykluczono formę szkolnego przydomka 'Hikarun'] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie']",
+    "Hebichika -> Hikaru": "Zwrot: 'Hikaru / Córeczko / Hikaruś' (matka -> córka; w audio: 'Hikaru-chan') [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna\\NKATEGORYCZNYwykluczono formę szkolnego przydomka 'Hikarun'] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie']"
   },
   "relations": {
-    "Rei Teshima -> Hebichika-sensei": "Zwrot: 'Pani Hebichiko' / 'Sensei' (asystentka -> autorka i mistrzyni) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama\\NMĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
+    "Rei Teshima -> Hebichika-sensei": "Zwrot: 'Pani Hebichiko' / 'Sensei' (asystentka -> autorka i mistrzyni) [reżim: FORMALNY]",
     "Hebichika-sensei -> Rei Teshima": "Zwrot: 'nowicjuszka / Teshima-chan' (główna autorka -> nowa asystentka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
-    "Hana -> Rei Teshima": "Zwrot: 'Pani Teshimo / pani [forma per pani]' (redaktorka wydawnictwa Shogakukan -> autorka mangi; ścisła konsekwencja T-V, zakaz form poufałych 'ty' / 'Zaufaj mi') [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: POUFNY]",
+    "Hana -> Rei Teshima": "Zwrot: 'Pani Teshimo / pani [forma per pani] (redaktorka wydawnictwa Shogakukan -> autorka mangi; ścisła konsekwencja T-V, wykluczone formy poufałych 'ty' / 'Zaufaj mi') [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: POUFNY]",
     "Rei Teshima -> Hana Kongouji": "Zwrot: 'Pani redaktor / pani Kongouji' (autorka -> redaktorka wydawnictwa, relacja formalna per 'Pani') [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: FORMALNY]",
     "Nana Teramura -> Rei Teshima": "Zwrot: 'na ty / Rei-chan' (dawne znajomi po fachu, asystentki) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Harue Natsukusa -> Hebichika-sensei": "Zwrot: 'Sensei' (główna asystentka -> autorka mangi) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
-    "Ai Yasumi -> Rei Teshima": "Zwrot: 'pani Teshimo / pani profesor' (uczennica -> mentorka / nauczycielka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [reżim: FORMALNY]",
-    "Rei Teshima -> Ai Yasumi": "Zwrot: 'Yasumi / na ty' (nauczycielka -> uczennica) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [reżim: FORMALNY]",
-    "Ai Yasumi -> Kokoro Fujimori": "Zwrot: 'Fujimori / Kokoro' (znajomi z klasy liceum i klubu mangi, relacja rówieśnicza na 'ty', bezwzględny zakaz 'Pani Fujimori') [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Ai Yasumi -> Rei Teshima": "Zwrot: 'pani Teshimo / pani profesor' (uczennica -> mentorka / nauczycielka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: FORMALNY]",
+    "Rei Teshima -> Ai Yasumi": "Zwrot: 'Yasumi / na ty' (nauczycielka -> uczennica) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: FORMALNY]",
+    "Ai Yasumi -> Kokoro Fujimori": "Zwrot: 'Fujimori / Kokoro' (znajomi z klasy liceum i klubu mangi, relacja rówieśnicza na 'ty, wykluczono formę 'Pani Fujimori') [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Kokoro Fujimori -> Ai Yasumi": "Zwrot: 'Ai / na ty' (przyjaciele z klubu) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: POUFNY]",
     "Pokota -> Rei Teshima": "Zwrot: 'Pani Teshima / Teshima-sensei' (narrator/maskotka -> nauczycielka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
-    "Sachi Akafuku -> Rei Teshima": "Zwrot: 'Tessie / pani Teshimo' (uczennica -> nauczycielka (poufała))', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama\\NMĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien [reżim: POUFNY]",
-    "Hikaru Sekiryu -> Rei Teshima": "Zwrot: 'pani Teshimo / pani profesor (po upomnieniu: Teshima-sensei)' (uczennica o niepokornym usposobieniu -> nauczycielka)', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama\\NMĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [reżim: FORMALNY]",
+    "Sachi Akafuku -> Rei Teshima": "Zwrot: 'Tessie / pani Teshimo' (uczennica -> nauczycielka (poufała)) [reżim: POUFNY]",
+    "Hikaru Sekiryu -> Rei Teshima": "Zwrot: 'pani Teshimo / pani profesor (po upomnieniu: Teshima-sensei)' (uczennica o niepokornym usposobieniu -> nauczycielka) [reżim: FORMALNY]",
     "Sachi Akafuku -> Hikaru Sekiryu": "Zwrot: 'na ty / per Hikarun' (koleżanka z klubu usiłująca nawiązać przyjaźń) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
-    "Hebichika -> Hikaru Sekiryu": "Zwrot: 'Hikaru / Córeczko / Hikaruś' (matka -> córka; w audio: 'Hikaru-chan') [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna\\NKATEGORYCZNY ZAKAZ szkolnego przydomka 'Hikarun']",
-    "Hebichika -> Hikaru": "Zwrot: 'Hikaru / Córeczko / Hikaruś' (matka -> córka; w audio: 'Hikaru-chan') [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna\\NKATEGORYCZNY ZAKAZ szkolnego przydomka 'Hikarun']",
-    "Hikaru Sekiryu -> Sachi Akafuku": "Zwrot: 'Akafuku / Mistrzyni Akafuku (później)' (początkowy dystans po nazwisku -> żartobliwe uznanie autorytetu)', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama\\NMĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [reżim: FORMALNY]",
+    "Hebichika -> Hikaru Sekiryu": "Zwrot: 'Hikaru / Córeczko / Hikaruś' (matka -> córka; w audio: 'Hikaru-chan') [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna\\NKATEGORYCZNYwykluczono formę szkolnego przydomka 'Hikarun']",
+    "Hebichika -> Hikaru": "Zwrot: 'Hikaru / Córeczko / Hikaruś' (matka -> córka; w audio: 'Hikaru-chan') [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna\\NKATEGORYCZNYwykluczono formę szkolnego przydomka 'Hikarun']",
+    "Hikaru Sekiryu -> Sachi Akafuku": "Zwrot: 'Akafuku / Mistrzyni Akafuku (później)' (początkowy dystans po nazwisku -> żartobliwe uznanie autorytetu) [reżim: FORMALNY]",
     "Miya Enma -> Rei Teshima": "Zwrot: 'pani Hoshino / pani Teshimo (per pani)' (redaktorka wydawnictwa -> autorka mangi) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Ai Yasumi -> Hana Kongouji": "Zwrot: 'pani Kongouji / pani redaktor' (początkująca autorka -> redaktorka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Hana Kongouji -> Ai Yasumi": "Zwrot: 'pani / panno Yasumi' (redaktorka wydawnictwa -> debiutantka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
@@ -456,26 +397,6 @@
       "N": "Rei Teshimą",
       "Ms": "Rei Teshimie",
       "W": "Rei Teshimo",
-      "gender": "FEMALE"
-    },
-    "Hebichika": {
-      "M": "Hebichika",
-      "D": "Hebichiki",
-      "C": "Hebichice",
-      "B": "Hebichikę",
-      "N": "Hebichiką",
-      "Ms": "Hebichice",
-      "W": "Hebichiko",
-      "gender": "FEMALE"
-    },
-    "Hana": {
-      "M": "Hana",
-      "D": "Hany",
-      "C": "Hanie",
-      "B": "Hanę",
-      "N": "Haną",
-      "Ms": "Hanie",
-      "W": "Hano",
       "gender": "FEMALE"
     },
     "Hana Kongouji": {
@@ -578,16 +499,6 @@
       "W": "Tondenie Minoru",
       "gender": "MALE"
     },
-    "Hikaru": {
-      "M": "Hikaru",
-      "D": "Hikaru",
-      "C": "Hikaru",
-      "B": "Hikaru",
-      "N": "Hikaru",
-      "Ms": "Hikaru",
-      "W": "Hikaru",
-      "gender": "FEMALE"
-    },
     "Ryoji Minagawa": {
       "M": "Ryoji Minagawa",
       "D": "Ryoji Minagawy",
@@ -618,16 +529,6 @@
       "W": "Bandzie Leaderze Cacie",
       "gender": "MALE"
     },
-    "Ai": {
-      "M": "Ai",
-      "D": "Ai",
-      "C": "Ai",
-      "B": "Ai",
-      "N": "Ai",
-      "Ms": "Ai",
-      "W": "Ai",
-      "gender": "FEMALE"
-    },
     "Yasumi": {
       "M": "Yasumi",
       "D": "Yasumi",
@@ -636,16 +537,6 @@
       "N": "Yasumi",
       "Ms": "Yasumi",
       "W": "Yasumi",
-      "gender": "FEMALE"
-    },
-    "Kokoro": {
-      "M": "Kokoro",
-      "D": "Kokoro",
-      "C": "Kokoro",
-      "B": "Kokoro",
-      "N": "Kokoro",
-      "Ms": "Kokoro",
-      "W": "Kokoro",
       "gender": "FEMALE"
     },
     "Teshima": {
@@ -702,7 +593,7 @@
   "hypocorisms": {},
   "plot_anchors": {
     "Pochodzenie notesu Ai": "Notes z pomysłami Ai otrzymała od Teshimy-sensei (dawnej autorki Hoshino Rei). Zawsze tłumaczyć jako 'notes od pani profesor / notes od Teshimy-sensei'.",
-    "Prawo Sturgeona (90% of everything is crap)": "Bezwzględna jednolitość przekładu maksymy w całym odcinku: 'Dziewięćdziesiąt procent wszystkiego to chłam / chłam stanowi dziewięćdziesiąt procent wszystkiego'. Kategoryczny zakaz zmieniania słowa 'chłam' na 'śmieci/bzdury'.",
+    "Prawo Sturgeona (90% of everything is crap)": "Bezwzględna jednolitość przekładu maksymy w całym odcinku: 'Dziewięćdziesiąt procent wszystkiego to chłam / chłam stanowi dziewięćdziesiąt procent wszystkiego'. wykluczono formę zmieniania słowa 'chłam' na 'śmieci/bzdury'.",
     "Wydawnictwo Shogakukan i impreza noworoczna": "Zachować oryginalną nazwę Shogakukan i oficjalny termin 'Noworoczne przyjęcie z podziękowaniami' (Kanshasai).",
     "Minagawa fade (fade-out w stylu Minagawy)": "Zachowaj spójną nazwę zabiegu komiksowego (przenikanie kadrów wg Ryojiego Minagawy).",
     "Salvia Maru (prom kursujący na wyspy Izu)": "Prawidłowa nazwa statku pasażerskiego to 'Salvia Maru' (w napisach na burtach: Salvia Maru).",
@@ -732,8 +623,6 @@
   },
   "entity_categories": {
     "Rei Teshima": "ANTHROPONYM",
-    "Hebichika": "ANTHROPONYM",
-    "Hana": "ANTHROPONYM",
     "Hana Kongouji": "ANTHROPONYM",
     "Nana Teramura": "ANTHROPONYM",
     "Harue Natsukusa": "ANTHROPONYM",
@@ -744,16 +633,88 @@
     "Hikaru Sekiryu": "ANTHROPONYM",
     "Miya Enma": "ANTHROPONYM",
     "Tonden Minoru": "ANTHROPONYM",
-    "Hikaru": "ANTHROPONYM",
     "Ryoji Minagawa": "ANTHROPONYM",
     "SFX": "ANTHROPONYM",
     "Alien": "ANTHROPONYM",
     "Band Leader Cat": "ANTHROPONYM",
     "Hebichika-sensei": "ANTHROPONYM",
+    "Yasumi": "ANTHROPONYM",
+    "Teshima": "ANTHROPONYM",
+    "Teshimo": "ANTHROPONYM",
+    "Teshimy": "ANTHROPONYM",
+    "Storyboard / Storyboards": "TOPONYM",
+    "One-shot": "TOPONYM",
+    "Serialization": "TOPONYM",
+    "Tones / Screentones": "TOPONYM",
+    "Mapping nib": "TOPONYM",
+    "Foreshortened / Foreshortening": "TOPONYM",
+    "Vanishing points": "TOPONYM",
+    "Chief Assistant": "TOPONYM",
+    "Sweet Snake Strawberries": "TOPONYM",
+    "Heartbeat Love Romance": "TOPONYM",
     "Comitia": "TOPONYM",
+    "Great Road Cut": "TOPONYM",
+    "Senzu no Kiritoshi": "TOPONYM",
+    "Ura-Sabaku Desert": "TOPONYM",
     "Mount Mihara": "TOPONYM",
+    "Gojinka": "TOPONYM",
+    "Input": "TOPONYM",
+    "Output": "TOPONYM",
+    "Tamaya": "TOPONYM",
+    "Dark Fuwa": "TOPONYM",
+    "Fujimori": "TOPONYM",
+    "Loup Garou": "TOPONYM",
+    "Panda Addict": "TOPONYM",
+    "Sturgeon's Law": "TOPONYM",
+    "Storyboard": "TOPONYM",
+    "Color spread": "TOPONYM",
+    "Bekko sushi": "TOPONYM",
+    "Kokoro Teshima": "TOPONYM",
+    "Rei Shizunami": "TOPONYM",
+    "Nami Minami": "TOPONYM",
+    "Nagisa Akaishi": "TOPONYM",
+    "Shingo Chiba": "TOPONYM",
+    "Izu Oshima": "TOPONYM",
+    "Manga Club": "TOPONYM",
+    "G-Pen": "TOPONYM",
+    "Maru-Pen": "TOPONYM",
+    "Screen Tone": "TOPONYM",
+    "Manuscript Paper": "TOPONYM",
+    "Panno Yasumi": "TOPONYM",
+    "panno Teshimo": "TOPONYM",
+    "Panno Teshimo": "TOPONYM",
+    "panny Teshimy": "TOPONYM",
+    "Panna Teshima": "TOPONYM",
+    "Panna Yasumi": "TOPONYM",
+    "cykl inputu i outputu": "TOPONYM",
+    "więcej inputu": "TOPONYM",
+    "Inputu": "TOPONYM",
+    "inputu": "TOPONYM",
+    "outputu": "TOPONYM",
+    "Gojinka z wodą": "TOPONYM",
+    "Tamaya!": "TOPONYM",
+    "Pani Fujimori, ma pani skaner?": "TOPONYM",
+    "Pani Fujimori, spokojnie!": "TOPONYM",
+    "Pani Fujimori": "TOPONYM",
+    "pani Fujimori": "TOPONYM",
+    "D-Dzień dobry, pani Yasumi...": "TOPONYM",
+    "pani Yasumi": "TOPONYM",
+    "Zaufaj mi.": "TOPONYM",
+    "Zaufaj mi": "TOPONYM",
+    "Jeśli chcesz publikować w naszym": "TOPONYM",
+    "musisz wprowadzić zmiany": "TOPONYM",
+    "Co zamierzasz?": "TOPONYM",
+    "zapisywałaś w takim pomysły": "TOPONYM",
+    "Minagawa fade": "TOPONYM",
     "Sunday": "TOPONYM",
-    "Shogakukan": "TOPONYM"
+    "Shogakukan": "TOPONYM",
+    "Salvia Maru": "TOPONYM",
+    "Pochodzenie notesu Ai": "TOPONYM",
+    "Prawo Sturgeona (90% of everything is crap)": "TOPONYM",
+    "Wydawnictwo Shogakukan i impreza noworoczna": "TOPONYM",
+    "Minagawa fade (fade-out w stylu Minagawy)": "TOPONYM",
+    "Salvia Maru (prom kursujący na wyspy Izu)": "TOPONYM",
+    "Robota & Pokota": "TOPONYM"
   },
   "fansub_canon": {}
 }

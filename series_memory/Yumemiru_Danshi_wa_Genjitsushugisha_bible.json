@@ -1,5 +1,5 @@
 {
-  "anime_title": "Yumemiru Danshi wa Genjitsushugisha",
+  "anime_title": "Yumemiru_Danshi_wa_Genjitsushugisha",
   "characters": {
     "Wataru Sajou": {
       "description": "MĘŻCZYZNA - chłopak (Główny bohater)",
@@ -62,8 +62,8 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
-        "Rin Shinomiya",
-        "Shinomiya"
+        "Rin",
+        "Rin Shinomiya"
       ],
       "entity_category": "ANTHROPONYM"
     },
@@ -75,8 +75,8 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
-        "Kei Shinomiya",
-        "Shinomiya"
+        "Kei",
+        "Kei Shinomiya"
       ],
       "entity_category": "ANTHROPONYM"
     },
@@ -88,6 +88,7 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
+        "Rin",
         "Rin Ichinose"
       ],
       "entity_category": "ANTHROPONYM"
@@ -160,10 +161,10 @@
     "Wataru Sajou -> Aika Natsukawa": "Zwrot: 'na ty / Natsukawa' (kolega z klasy (wymuszony dystans)) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: FORMALNY]",
     "Aika Natsukawa -> Wataru Sajou": "Zwrot: 'na ty / Sajo' (koleżanka z klasy (zdezorientowana brakiem atencji)) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Kei Ashida -> Wataru Sajou": "Zwrot: 'Sajotchi' (kumpelska relacja w klasie) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Kei Ashida -> Aika Natsukawa": "Zwrot: 'Aichi' (bliskie przyjaciółki) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)] [reżim: POUFNY]",
+    "Kei Ashida -> Aika Natsukawa": "Zwrot: 'Aichi' (bliskie przyjaciółki) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie'] [reżim: POUFNY]",
     "Wataru Sajou -> Kaede Sajou": "Zwrot: 'siostra / siostrzyczka' (rodzeństwo) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
-    "Wataru Sajou -> Rin Shinomiya": "Zwrot: 'przewodnicząca / panno Shinomiya' (młodszy uczeń -> szanowana starsza rocznikiem) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
-    "Rin Shinomiya -> Wataru Sajou": "Zwrot: 'na ty / Sajo' (starsza uczennica -> młodszy kolega) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
+    "Wataru Sajou -> Rin Shinomiya": "Zwrot: 'przewodnicząca / panno Shinomiya' (młodszy uczeń -> szanowana starsza rocznikiem) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: FORMALNY]",
+    "Rin Shinomiya -> Wataru Sajou": "Zwrot: 'na ty / Sajo' (starsza uczennica -> młodszy kolega) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
     "Kaede Sajou -> Wataru Sajou": "Zwrot: 'na ty / Wataru / braciszku' (starsza siostra -> młodszy brat) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
   },
   "relations": {
@@ -172,8 +173,8 @@
     "Kei Ashida -> Wataru Sajou": "Zwrot: 'Sajotchi' (kumpelska relacja w klasie) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Kei Ashida -> Aika Natsukawa": "Zwrot: 'Aichi' (bliskie przyjaciółki) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: POUFNY]",
     "Wataru Sajou -> Kaede Sajou": "Zwrot: 'siostra / siostrzyczka' (rodzeństwo) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
-    "Wataru Sajou -> Rin Shinomiya": "Zwrot: 'przewodnicząca / panno Shinomiya' (młodszy uczeń -> szanowana starsza rocznikiem) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
-    "Rin Shinomiya -> Wataru Sajou": "Zwrot: 'na ty / Sajo' (starsza uczennica -> młodszy kolega) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
+    "Wataru Sajou -> Rin Shinomiya": "Zwrot: 'przewodnicząca / panno Shinomiya' (młodszy uczeń -> szanowana starsza rocznikiem) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: FORMALNY]",
+    "Rin Shinomiya -> Wataru Sajou": "Zwrot: 'na ty / Sajo' (starsza uczennica -> młodszy kolega) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
     "Kaede Sajou -> Wataru Sajou": "Zwrot: 'na ty / Wataru / braciszku' (starsza siostra -> młodszy brat) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
   },
   "declensions": {
@@ -309,7 +310,17 @@
     "Fuka Sasaki": "ANTHROPONYM",
     "Hayato Ichinose": "ANTHROPONYM",
     "Yuyu Inatomi": "ANTHROPONYM",
-    "Yamazaki": "ANTHROPONYM"
+    "Yamazaki": "ANTHROPONYM",
+    "support and promote": "TOPONYM",
+    "divine punishment": "TOPONYM",
+    "Student Council": "TOPONYM",
+    "Morals and Discipline Committee": "TOPONYM",
+    "Student Guidance Room": "TOPONYM",
+    "Triangle Chocolate Pie": "TOPONYM",
+    "Villager A": "TOPONYM",
+    "lunch break": "TOPONYM",
+    "Nagła zmiana zachowania Wataru": "TOPONYM",
+    "Incydent z Yuyu Inatomi w korytarzu": "TOPONYM"
   },
   "fansub_canon": {}
 }

@@ -1,5 +1,5 @@
 {
-  "anime_title": "Enen no Shouboutai S3",
+  "anime_title": "Enen_no_Shouboutai_S3",
   "characters": {
     "Shinra": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
@@ -186,8 +186,8 @@
     "Shinra -> Haumea": "Zwrot: 'na ty / Haumea' (zbawca -> uratowana kapłanka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Sho -> Shinra": "Zwrot: 'bracie (Nii-san)' (młodszy brat -> starszy brat) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Shinra -> Sho": "Zwrot: 'Sho / braciszku' (starszy brat -> młodszy brat) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Shinra -> Obi": "Zwrot: 'Kapitanie Obi / Kapitan' (podwładny -> dowódca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
-    "Maki -> Obi": "Zwrot: 'kapitanie' (podwładna -> dowódca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
+    "Shinra -> Obi": "Zwrot: 'Kapitanie Obi / Kapitan' (podwładny -> dowódca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
+    "Maki -> Obi": "Zwrot: 'kapitanie' (podwładna -> dowódca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
     "Licht -> Vulcan": "Zwrot: 'Vulcan / po imieniu' (członkowie tego samego oddziału) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Licht -> Obi": "Zwrot: 'kapitanie / panie kapitanie' (podwładny -> dowódca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Haumea -> Shinra": "Zwrot: 'Shinra Bansho Man / Boże' (antagonistka / wyznawczyni rozpaczy wobec zbawiciela) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
@@ -196,14 +196,14 @@
     "Charon -> Haumea": "Zwrot: 'Haumea / mała' (oddany strażnik -> podopieczna) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Inca -> Shinra": "Zwrot: 'Shinra / Shinra-kun / Bohaterze' (natrętna adoratorka / rywalka -> zbawca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Iris -> Shinra": "Zwrot: 'panie Shinra (Shinra-san)' (towarzysze broni / sympatia) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Hibana -> Iris": "Zwrot: 'Iris / siostrzyczko' (starsza przybrana siostra -> młodsza siostra) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]"
+    "Hibana -> Iris": "Zwrot: 'Iris / siostrzyczko' (starsza przybrana siostra -> młodsza siostra) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie']"
   },
   "relations": {
     "Shinra -> Haumea": "Zwrot: 'na ty / Haumea' (zbawca -> uratowana kapłanka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Sho -> Shinra": "Zwrot: 'bracie (Nii-san)' (młodszy brat -> starszy brat) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Shinra -> Sho": "Zwrot: 'Sho / braciszku' (starszy brat -> młodszy brat) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Shinra -> Obi": "Zwrot: 'Kapitanie Obi / Kapitan' (podwładny -> dowódca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
-    "Maki -> Obi": "Zwrot: 'kapitanie' (podwładna -> dowódca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
+    "Shinra -> Obi": "Zwrot: 'Kapitanie Obi / Kapitan' (podwładny -> dowódca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
+    "Maki -> Obi": "Zwrot: 'kapitanie' (podwładna -> dowódca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
     "Licht -> Vulcan": "Zwrot: 'Vulcan / po imieniu' (członkowie tego samego oddziału) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Licht -> Obi": "Zwrot: 'kapitanie / panie kapitanie' (podwładny -> dowódca) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Haumea -> Shinra": "Zwrot: 'Shinra Bansho Man / Boże' (antagonistka / wyznawczyni rozpaczy wobec zbawiciela) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
@@ -372,9 +372,28 @@
     "Inca": "ANTHROPONYM",
     "Iris": "ANTHROPONYM",
     "Hibana": "ANTHROPONYM",
+    "Fire Force / Fire Soldiers": "TOPONYM",
+    "The Great Cataclysm": "TOPONYM",
+    "Evangelist": "TOPONYM",
+    "Collective Unconscious": "TOPONYM",
     "Amaterasu": "TOPONYM",
+    "Infernals": "TOPONYM",
     "Látom": "TOPONYM",
-    "42-42-564": "TOPONYM"
+    "Great Cataclysm": "TOPONYM",
+    "Pillar": "TOPONYM",
+    "Collective unconscious": "TOPONYM",
+    "Pillars": "TOPONYM",
+    "Fire Soldier": "TOPONYM",
+    "Despair Saintess / Saint": "TOPONYM",
+    "Adolla Burst": "TOPONYM",
+    "Shinra Bansho": "TOPONYM",
+    "Despair Saintess": "TOPONYM",
+    "Soul Resonance": "TOPONYM",
+    "Shinra Bansho Man": "TOPONYM",
+    "Spontaneous Human Combustion": "TOPONYM",
+    "World Hero Force": "TOPONYM",
+    "42-42-564": "TOPONYM",
+    "Excalibur": "TOPONYM"
   },
   "fansub_canon": {}
 }

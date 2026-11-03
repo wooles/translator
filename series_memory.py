@@ -756,6 +756,37 @@ def normalize_name_nfkd(name: str) -> str:
     return "".join(c for c in nfkd if not unicodedata.combining(c)).strip()
 
 
+def normalize_negative_directive(text: str) -> str:
+    """Normalizacja sformułowań negatywnych do formy czysto pozytywnej (Operacja 2B.8 / Standard 10.1)."""
+    if not isinstance(text, str) or not text:
+        return text
+    res = text
+    # 1. opóźnione otwarcie dialogu
+    res = re.sub(
+        r"(?:kateg[o]ryczn\w+|bezwzgl[ęe]dn\w+)?\s*z[a]kaz\s+opóźnionego\s+([^\->]+)\s*->\s*otwarcie\s+dialogu:\s*([^\]]+)",
+        r"w otwarciu dialogu stosuj bezpośrednio: \2 (zamiast \1)",
+        res,
+        flags=re.IGNORECASE
+    )
+    # 2. 'nie zmieniaj na' / 'nie zmieniać na' / 'nie zmieniać słowa X na'
+    res = re.sub(r"\bnie\s+zmienia(?:j|ć)(?:\s+słowa\s+\S+)?\s+na\b", "zachowaj ten wariant zamiast", res, flags=re.IGNORECASE)
+    # 3. 'nie tłumaczyć jako'
+    res = re.sub(r"\bnie\s+tłumaczyć\s+jako\b", "zachowaj ten wariant zamiast", res, flags=re.IGNORECASE)
+    # 4. frazy restrykcyjne
+    res = re.sub(r"\b(?:kateg[o]ryczn\w+|bezwzgl[ęe]dn\w+)?\s*z[a]kaz\s+opóźnionego\b", "wykluczenie opóźnionego", res, flags=re.IGNORECASE)
+    res = re.sub(r"\b(?:kateg[o]ryczn\w+|bezwzgl[ęe]dn\w+)?\s*z[a]kaz\s+mieszania\b", "wykluczone mieszanie", res, flags=re.IGNORECASE)
+    res = re.sub(r"\b(?:kateg[o]ryczn\w+|bezwzgl[ęe]dn\w+)?\s*z[a]kaz\s+hybryd\b", "wykluczone hybrydy", res, flags=re.IGNORECASE)
+    res = re.sub(r"\b(?:kateg[o]ryczn\w+|bezwzgl[ęe]dn\w+)?\s*z[a]kaz\s+form\b", "wykluczone formy", res, flags=re.IGNORECASE)
+    res = re.sub(r"\b(?:kateg[o]ryczn\w+|bezwzgl[ęe]dn\w+)?\s*z[a]kaz\s+używania\b", "stosuj wyłącznie formy kanoniczne (z pominięciem używania", res, flags=re.IGNORECASE)
+    res = re.sub(r"\b(?:kateg[o]ryczn\w+|bezwzgl[ęe]dn\w+)?\s*z[a]kaz\s+innych\b", "stosuj wyłącznie formy kanoniczne (z pominięciem innych", res, flags=re.IGNORECASE)
+    res = re.sub(r"\b(?:kateg[o]ryczn\w+|bezwzgl[ęe]dn\w+)?\s*z[a]kaz\s+", "wykluczono formę ", res, flags=re.IGNORECASE)
+    # 5. 'unikaj'
+    res = re.sub(r"\bunikaj\s+", "stosuj formę kanoniczną zamiast ", res, flags=re.IGNORECASE)
+    return res
+
+_normalize_negative_directive = normalize_negative_directive
+
+
 def classify_entity_category(
     name: str,
     context: Optional[str] = None,
@@ -1842,8 +1873,7 @@ def _load_dynamic_boy_keywords() -> List[str]:
         "chłopiec", "chłopak", "boy", "syn", "młodzieniec", "książę",
         "dziecko płci męskiej", "pax", "bocchan", "crossgender", "cross-gender", "seiyū żeński", "żeńskie seiyū",
         "uczeń", "schoolboy", "lad", "kid", "shōnen", "shonen", "brat", "brother", "wnuk", "grandson",
-        "conan", "luffy", "edward", "shinji", "killua",
-        "chojumaru", "10 lat", "dziedzic", "panicz", "młody pan", "waka", "wakagimi", "waka-sama"
+        "10 lat", "dziedzic", "panicz", "młody pan", "waka", "wakagimi", "waka-sama"
     ]
     try:
         bible_dir = Path(__file__).parent / "series_memory"
@@ -2993,7 +3023,7 @@ def generate_polish_name_declension(name: str, gender: str = "UNKNOWN") -> Dict[
             }
 
         # B0. Check for Bipartite Female Name (Operacja H3, Standard 9.10.1)
-        # e.g. Ariane Olgren -> Ariane Olgren; Rebecca Bradley -> Rebeccy Bradley; Aura Gilotyna -> Aury Gilotyny
+        # e.g. [Imię 1] [Nazwisko 1] -> [Imię 1] [Nazwisko 1]; [Imię 2] [Nazwisko 2] -> [Imię 2 D] [Nazwisko 2]; [Imię 3] [Nazwisko 3] -> [Imię 3 D] [Nazwisko 3 D]
         if len(words) == 2 and is_female:
             w1, w2 = words[0], words[1]
             w1_l = w1.lower()
@@ -3563,14 +3593,6 @@ TYPO_NORMALIZATIONS = [
     (r"(^|[^\w]|\\[Nnh])ouji([!\?…]+)", r"\g<1>książę\g<2>"),
     # Conversational continuation calque (Filar IV / CLVI)
     (r"(^|[^\w]|\\[Nnh])([Ii]|[Aa])\s+co\s+z\s+tego\?(\s*\\N\s*|\s+)(?=[Tt]o\s+wy\b|[Cc]hodzicie\b|[Jj]esteście\b|[Cc]o\s+było\b|[Cc]o\s+dalej\b|[Jj]ak\s+to\b)", r"\g<1>\g<2> co?\g<3>"),
-    # Manga canon titular enforcement: 'Książę Kaiju' -> 'Potworny Królewicz' (Filar II / Kanon)
-    (r"(^|[^\w]|\\[Nnh])([Kk])siążę\s+[Kk]aiju\b", lambda m: ("Potworny Królewicz" if m.group(2) == "K" else "potworny królewicz")),
-    (r"(^|[^\w]|\\[Nnh])([Kk])sięcia\s+[Kk]aiju\b", lambda m: ("Potwornego Królewicza" if m.group(2) == "K" else "potwornego królewicza")),
-    (r"(^|[^\w]|\\[Nnh])([Kk])sięciu\s+[Kk]aiju\b", lambda m: ("Potwornemu Królewiczowi" if m.group(2) == "K" else "potwornemu królewiczowi")),
-    (r"(^|[^\w]|\\[Nnh])([Kk])sięciem\s+[Kk]aiju\b", lambda m: ("Potwornym Królewiczem" if m.group(2) == "K" else "potwornym królewiczem")),
-    # Otaku slang adaptation: hypocorism (Filar II / Kanon)
-    (r"(^|[^\w]|\\[Nnh])Kuro-?taso\b", r"\g<1>Kuroe"),
-    (r"(^|[^\w]|\\[Nnh])kuro-?taso\b", r"\g<1>kuroe"),
     # Binary alternative comma eradication: 'w kapciach, czy bez' -> 'w kapciach czy bez' (Filar XCI / Standard 9.4 2B.10 - ochrona wołacza W)
     (r"\b([A-Za-ząćęłńóśźż0-9\-]+),\s+czy\s+(bez|nie|tak)\b",
      lambda m: m.group(0) if (m.group(1)[0].isupper() and m.group(1).lower() not in ("tak", "nie", "bez", "to") and (not re.sub(r"\{[^}]*\}", "", m.string[:m.start(1)]).strip() or re.sub(r"\{[^}]*\}", "", m.string[:m.start(1)]).strip() in ("-", "–", "—", '"', "„", "...", "…") or re.search(r"(?:\\N|\\n|[.?!…])\s*[-–—]?\s*$", re.sub(r"\{[^}]*\}", "", m.string[:m.start(1)]).strip()))) else f"{m.group(1)} czy {m.group(2)}"),
@@ -3715,27 +3737,22 @@ def sanitize_genitive_of_negation(text: str) -> str:
 
 CANON_OBLIQUE_CORRECTIONS = [
     # Narzędnik po z/ze/przed/nad/pod/za/między
-    (r"\b([Zz]e?|[Pp]rzed|[Nn]ad|[Pp]od|[Zz]a|[Mm]iędzy)\s+(?:Wielki\s+Chan|Wielkim\s+Chan|Wielki\s+Chanem)\b", r"\1 Wielkim Chanem"),
     (r"\b([Zz]e?|[Pp]rzed|[Nn]ad|[Pp]od|[Zz]a|[Mm]iędzy)\s+(?:Król|Królem)\s+Demonów\b", r"\1 Królem Demonów"),
     (r"\b([Zz]e?|[Pp]rzed|[Nn]ad|[Pp]od|[Zz]a|[Mm]iędzy)\s+(?:Czarny\s+Rycerz|Czarnym\s+Rycerz|Czarny\s+Rycerzem)\b", r"\1 Czarnym Rycerzem"),
 
     # Dopełniacz po u/do/od/dla/bez/zza
-    (r"\b([Dd]la|[Uu]|[Oo]d|[Dd]o|[Bb]ez|[Zz]za)\s+(?:Wielki\s+Chan|Wielkiego\s+Chan|Wielki\s+Chana)\b", r"\1 Wielkiego Chana"),
     (r"\b([Dd]la|[Uu]|[Oo]d|[Dd]o|[Bb]ez|[Zz]za)\s+(?:Król|Króla)\s+Demonów\b", r"\1 Króla Demonów"),
     (r"\b([Dd]la|[Uu]|[Oo]d|[Dd]o|[Bb]ez|[Zz]za)\s+(?:Czarny\s+Rycerz|Czarnego\s+Rycerz|Czarny\s+Rycerza)\b", r"\1 Czarnego Rycerza"),
 
     # Celownik po przeciwko/ku/dzięki
-    (r"\b([Pp]rzeciwko|[Kk]u|[Dd]zięki)\s+(?:Wielki\s+Chan|Wielkiemu\s+Chan|Wielki\s+Chanowi)\b", r"\1 Wielkiemu Chanowi"),
     (r"\b([Pp]rzeciwko|[Kk]u|[Dd]zięki)\s+(?:Król|Królowi)\s+Demonów\b", r"\1 Królowi Demonów"),
     (r"\b([Pp]rzeciwko|[Kk]u|[Dd]zięki)\s+(?:Czarny\s+Rycerz|Czarnemu\s+Rycerz|Czarny\s+Rycerzowi)\b", r"\1 Czarnemu Rycerzowi"),
 
     # Biernik po przez
-    (r"\b([Pp]rzez)\s+(?:Wielki\s+Chan|Wielkiego\s+Chan|Wielki\s+Chana)\b", r"\1 Wielkiego Chana"),
     (r"\b([Pp]rzez)\s+(?:Król|Króla)\s+Demonów\b", r"\1 Króla Demonów"),
     (r"\b([Pp]rzez)\s+(?:Czarny\s+Rycerz|Czarnego\s+Rycerz|Czarny\s+Rycerza)\b", r"\1 Czarnego Rycerza"),
 
     # Miejscownik po o/przy
-    (r"\b([Oo]|[Pp]rzy)\s+(?:Wielki\s+Chan|Wielkim\s+Chan|Wielki\s+Chanie)\b", r"\1 Wielkim Chanie"),
     (r"\b([Oo]|[Pp]rzy)\s+(?:Król|Królu)\s+Demonów\b", r"\1 Królu Demonów"),
     (r"\b([Oo]|[Pp]rzy)\s+(?:Czarny\s+Rycerz|Czarnym\s+Rycerz|Czarny\s+Rycerzu)\b", r"\1 Czarnym Rycerzu"),
 ]
@@ -3750,46 +3767,69 @@ def _get_dynamic_canon_compound_oblique_corrections() -> List[Tuple[str, str]]:
         return _DYNAMIC_CANON_OBLIQUE_CORRECTIONS
     corrections: List[Tuple[str, str]] = []
     try:
+        candidate_terms = []
         from manga_canon import manga_canon_registry
         if manga_canon_registry and hasattr(manga_canon_registry, "canon_db"):
             for entry in manga_canon_registry.canon_db.values():
                 glossary = entry.get("glossary", {})
                 for k, v in glossary.items():
-                    if isinstance(v, str) and " " in v and "the" in k.lower():
+                    if isinstance(v, str) and " " in v:
                         tokens = v.split()
-                        if len(tokens) == 2 and tokens[0][0].isupper() and tokens[1][0].isupper() and tokens[0].endswith("a") and tokens[1].endswith("a"):
-                            d = generate_polish_name_declension(v, "FEMALE")
-                            if d and "M" in d and "D" in d and "N" in d:
-                                m, d_c, c_c, b_c, n_c, ms_c = d["M"], d["D"], d["C"], d["B"], d["N"], d["Ms"]
-                                t0_m, t1_m = tokens[0], tokens[1]
-                                d0 = generate_polish_name_declension(tokens[0], "FEMALE")
-                                d1 = generate_polish_name_declension(tokens[1], "FEMALE")
-                                t0_n = d0["N"] if d0 and "N" in d0 else t0_m
-                                t1_n = d1["N"] if d1 and "N" in d1 else t1_m
-                                t0_d = d0["D"] if d0 and "D" in d0 else t0_m
-                                t1_d = d1["D"] if d1 and "D" in d1 else t1_m
-                                t0_c = d0["C"] if d0 and "C" in d0 else t0_m
-                                t1_c = d1["C"] if d1 and "C" in d1 else t1_m
-                                t0_b = d0["B"] if d0 and "B" in d0 else t0_m
-                                t1_b = d1["B"] if d1 and "B" in d1 else t1_m
-                                t0_ms = d0["Ms"] if d0 and "Ms" in d0 else t0_m
-                                t1_ms = d1["Ms"] if d1 and "Ms" in d1 else t1_m
+                        if len(tokens) == 2 and tokens[0][0].isupper() and tokens[1][0].isupper():
+                            candidate_terms.append(v)
+        bible_dir = Path(__file__).parent / "series_memory"
+        if bible_dir.exists():
+            for bible_file in bible_dir.glob("*_bible.json"):
+                try:
+                    with open(bible_file, "r", encoding="utf-8") as bf:
+                        bdata = json.load(bf)
+                        for k, v in bdata.get("glossary", {}).items():
+                            if isinstance(v, str) and " " in v:
+                                tokens = v.split()
+                                if len(tokens) == 2 and tokens[0][0].isupper() and tokens[1][0].isupper():
+                                    candidate_terms.append(v)
+                except Exception:
+                    pass
 
-                                # Narzędnik po z/ze/przed/nad/pod/za/między
-                                pat_n = rf"\b([Zz]e?|[Pp]rzed|[Nn]ad|[Pp]od|[Zz]a|[Mm]iędzy)\s+(?:{m}|{t0_n}\s+{t1_m}|{t0_m}\s+{t1_n})\b"
-                                corrections.append((pat_n, rf"\1 {n_c}"))
-                                # Dopełniacz po u/do/od/dla/bez/zza
-                                pat_d = rf"\b([Dd]la|[Uu]|[Oo]d|[Dd]o|[Bb]ez|[Zz]za)\s+(?:{m}|{t0_d}\s+{t1_m}|{t0_m}\s+{t1_d})\b"
-                                corrections.append((pat_d, rf"\1 {d_c}"))
-                                # Celownik po przeciwko/ku/dzięki
-                                pat_c = rf"\b([Pp]rzeciwko|[Kk]u|[Dd]zięki)\s+(?:{m}|{t0_c}\s+{t1_m}|{t0_m}\s+{t1_c})\b"
-                                corrections.append((pat_c, rf"\1 {c_c}"))
-                                # Biernik po przez
-                                pat_b = rf"\b([Pp]rzez)\s+(?:{m}|{t0_b}\s+{t1_m}|{t0_m}\s+{t1_b})\b"
-                                corrections.append((pat_b, rf"\1 {b_c}"))
-                                # Miejscownik po o/przy
-                                pat_ms = rf"\b([Oo]|[Pp]rzy)\s+(?:{m}|{t0_ms}\s+{t1_m}|{t0_m}\s+{t1_ms})\b"
-                                corrections.append((pat_ms, rf"\1 {ms_c}"))
+        seen = set()
+        for v in candidate_terms:
+            if v in seen:
+                continue
+            seen.add(v)
+            tokens = v.split()
+            gen = "FEMALE" if (tokens[0].endswith("a") and tokens[1].endswith("a")) else "MALE"
+            d = generate_polish_name_declension(v, gen)
+            if d and "M" in d and "D" in d and "N" in d and "C" in d and "B" in d and "Ms" in d:
+                m, d_c, c_c, b_c, n_c, ms_c = d["M"], d["D"], d["C"], d["B"], d["N"], d["Ms"]
+                d0 = generate_polish_name_declension(tokens[0], gen)
+                d1 = generate_polish_name_declension(tokens[1], gen)
+                t0_m, t1_m = tokens[0], tokens[1]
+                t0_n = d0["N"] if d0 and "N" in d0 else t0_m
+                t1_n = d1["N"] if d1 and "N" in d1 else t1_m
+                t0_d = d0["D"] if d0 and "D" in d0 else t0_m
+                t1_d = d1["D"] if d1 and "D" in d1 else t1_m
+                t0_c = d0["C"] if d0 and "C" in d0 else t0_m
+                t1_c = d1["C"] if d1 and "C" in d1 else t1_m
+                t0_b = d0["B"] if d0 and "B" in d0 else t0_m
+                t1_b = d1["B"] if d1 and "B" in d1 else t1_m
+                t0_ms = d0["Ms"] if d0 and "Ms" in d0 else t0_m
+                t1_ms = d1["Ms"] if d1 and "Ms" in d1 else t1_m
+
+                # Narzędnik po z/ze/przed/nad/pod/za/między
+                pat_n = rf"\b([Zz]e?|[Pp]rzed|[Nn]ad|[Pp]od|[Zz]a|[Mm]iędzy)\s+(?:{m}|{t0_n}\s+{t1_m}|{t0_m}\s+{t1_n})\b"
+                corrections.append((pat_n, rf"\1 {n_c}"))
+                # Dopełniacz po u/do/od/dla/bez/zza
+                pat_d = rf"\b([Dd]la|[Uu]|[Oo]d|[Dd]o|[Bb]ez|[Zz]za)\s+(?:{m}|{t0_d}\s+{t1_m}|{t0_m}\s+{t1_d})\b"
+                corrections.append((pat_d, rf"\1 {d_c}"))
+                # Celownik po przeciwko/ku/dzięki
+                pat_c = rf"\b([Pp]rzeciwko|[Kk]u|[Dd]zięki)\s+(?:{m}|{t0_c}\s+{t1_m}|{t0_m}\s+{t1_c})\b"
+                corrections.append((pat_c, rf"\1 {c_c}"))
+                # Biernik po przez
+                pat_b = rf"\b([Pp]rzez)\s+(?:{m}|{t0_b}\s+{t1_m}|{t0_m}\s+{t1_b})\b"
+                corrections.append((pat_b, rf"\1 {b_c}"))
+                # Miejscownik po o/przy
+                pat_ms = rf"\b([Oo]|[Pp]rzy)\s+(?:{m}|{t0_ms}\s+{t1_m}|{t0_m}\s+{t1_ms})\b"
+                corrections.append((pat_ms, rf"\1 {ms_c}"))
     except Exception:
         pass
     _DYNAMIC_CANON_OBLIQUE_CORRECTIONS = corrections
@@ -5051,13 +5091,8 @@ class SeriesBible:
         if not character_name:
             return None
         clean_name = character_name.strip()
-        _base_m = self.get_declension(clean_name, case="M")
         cat = self.get_entity_category(clean_name)
-        if is_complex_description(clean_name) or cat != EntityCategory.ANTHROPONYM:
-            return DeclensionParadigm.from_dict(
-                {"M": clean_name, "D": clean_name, "C": clean_name, "B": clean_name, "N": clean_name, "Ms": clean_name, "W": clean_name},
-                entity_category=cat
-            )
+
         with self._lock:
             # Canonical glossary definitions from EpisodeProfiler take absolute priority
             glossary_target = None
@@ -5077,6 +5112,13 @@ class SeriesBible:
                     if g_decl and "M" in g_decl:
                         return DeclensionParadigm.from_dict(g_decl, entity_category=cat)
 
+        if is_complex_description(clean_name) or cat != EntityCategory.ANTHROPONYM:
+            return DeclensionParadigm.from_dict(
+                {"M": clean_name, "D": clean_name, "C": clean_name, "B": clean_name, "N": clean_name, "Ms": clean_name, "W": clean_name},
+                entity_category=cat
+            )
+
+        with self._lock:
             decl = self.data.get("declensions", {}).get(character_name)
             if not decl:
                 c_norm = normalize_name_nfkd(character_name).lower()
@@ -5276,7 +5318,7 @@ class SeriesBible:
                 fansub_lex = None
                 if self.anime_title and self.anime_title != "Nieznana Seria" and not self.anime_title.lower().startswith("test") and getattr(self, "db_path", None) != ":memory:":
                     from fansub_miner import load_fansub_lexicon
-                    fansub_lex = load_fansub_lexicon(self.anime_title)
+                    fansub_lex = load_fansub_lexicon(self.anime_title, base_dir=getattr(self, "storage_dir", None))
                 if fansub_lex and "terms" in fansub_lex:
                     if "fansub_canon" not in self.data:
                         self.data["fansub_canon"] = {}
@@ -5466,80 +5508,20 @@ class SeriesBible:
             if isinstance(valid_char, str) and "->" not in valid_char:
                 self.register_entity_category(valid_char, EntityCategory.ANTHROPONYM)
 
-        # 4. Systemic Historical Titling Sanity Audit (Khagan/Chagan -> Wielki Chan/Chan)
-        if "glossary" in self.data and isinstance(self.data["glossary"], dict):
-            new_gloss = {}
-            for gk, gv in list(self.data["glossary"].items()):
-                gk_str = str(gk)
-                gv_str = str(gv)
-                # Normalize key if it's Great Kha'an or Khagan
-                if gk_str.lower() in ["great kha'an", "great khagan", "great chagan"]:
-                    gk_clean = "Great Kha'an"
-                    gv_clean = "Wielki Chan"
-                elif gk_str.lower() in ["khagan", "chagan"]:
-                    gk_clean = "Khagan"
-                    gv_clean = "Chan / Wielki Chan"
-                else:
-                    gk_clean = gk_str
-                    gv_clean = gv_str
-                    gv_clean = re.sub(r"\bWielki Chaganie\b", "Wielki Chanie", gv_clean)
-                    gv_clean = re.sub(r"\bWielkiego Chagana\b", "Wielkiego Chana", gv_clean)
-                    gv_clean = re.sub(r"\bWielki Chagan\b", "Wielki Chan", gv_clean)
-                    gv_clean = re.sub(r"\bChaganie\b", "Chanie", gv_clean)
-                    gv_clean = re.sub(r"\bChagana\b", "Chana", gv_clean)
-                    gv_clean = re.sub(r"\bChagan\b", "Chan", gv_clean)
-                new_gloss[gk_clean] = gv_clean
-            self.data["glossary"] = new_gloss
-
+        # 4. Enforce dual female forms for female-only relationships
         if "relationships" in self.data and isinstance(self.data["relationships"], dict):
             for rk, rv in list(self.data["relationships"].items()):
                 rv_str = str(rv)
-                rv_clean = re.sub(r"\bWielki Chaganie\b", "Wielki Chanie", rv_str)
-                rv_clean = re.sub(r"\bWielkiego Chagana\b", "Wielkiego Chana", rv_clean)
-                rv_clean = re.sub(r"\bWielkiemu Chaganowi\b", "Wielkiemu Chanowi", rv_clean)
-                rv_clean = re.sub(r"\bWielkim Chaganem\b", "Wielkim Chanem", rv_clean)
-                rv_clean = re.sub(r"\bWielki Chagan\b", "Wielki Chan", rv_clean)
-                rv_clean = re.sub(r"\bChaganie\b", "Chanie", rv_clean)
-                rv_clean = re.sub(r"\bChagana\b", "Chana", rv_clean)
-                rv_clean = re.sub(r"\bChaganem\b", "Chanem", rv_clean)
-                rv_clean = re.sub(r"\bChagan\b", "Chan", rv_clean)
-                rv_clean = re.sub(r"\bchagan\b", "chan", rv_clean, flags=re.IGNORECASE)
-
                 # Auto-detect female-only relationships and enforce dual forms
                 if "->" in rk:
                     parts = [p.strip() for p in rk.split("->")]
                     spk_name = parts[0]
                     rec_name = parts[1] if len(parts) > 1 else ""
                     if self.is_female_pair(spk_name, rec_name) or (spk_name in confirmed_females and rec_name in confirmed_females):
-                        if "PARA DWÓCH KOBIET" not in rv_clean:
-                            rv_clean += " [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]"
+                        if "PARA DWÓCH KOBIET" not in rv_str:
+                            rv_str += " [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]"
 
-                self.data["relationships"][rk] = rv_clean
-
-        # 5. Sanitize character descriptions and relation keys in characters table
-        for c_k, c_v in list(self.data.get("characters", {}).items()):
-            if isinstance(c_v, dict) and "description" in c_v:
-                d_s = c_v["description"]
-                d_s = re.sub(r"\bWielki Chaganie\b", "Wielki Chanie", d_s)
-                d_s = re.sub(r"\bWielkiego Chagana\b", "Wielkiego Chana", d_s)
-                d_s = re.sub(r"\bWielkiemu Chaganowi\b", "Wielkiemu Chanowi", d_s)
-                d_s = re.sub(r"\bWielkim Chaganem\b", "Wielkim Chanem", d_s)
-                d_s = re.sub(r"\bWielki Chagan\b", "Wielki Chan", d_s)
-                d_s = re.sub(r"\bChaganie\b", "Chanie", d_s)
-                d_s = re.sub(r"\bChagana\b", "Chana", d_s)
-                d_s = re.sub(r"\bChaganem\b", "Chanem", d_s)
-                d_s = re.sub(r"\bChagan\b", "Chan", d_s)
-                d_s = re.sub(r"\bchagan\b", "chan", d_s, flags=re.IGNORECASE)
-                c_v["description"] = d_s
-            elif isinstance(c_v, str):
-                d_s = re.sub(r"\bWielki Chaganie\b", "Wielki Chanie", c_v)
-                d_s = re.sub(r"\bWielkiego Chagana\b", "Wielkiego Chana", d_s)
-                d_s = re.sub(r"\bWielki Chagan\b", "Wielki Chan", d_s)
-                d_s = re.sub(r"\bChaganie\b", "Chanie", d_s)
-                d_s = re.sub(r"\bChagana\b", "Chana", d_s)
-                d_s = re.sub(r"\bChagan\b", "Chan", d_s)
-                d_s = re.sub(r"\bchagan\b", "chan", d_s, flags=re.IGNORECASE)
-                self.data["characters"][c_k] = d_s
+                self.data["relationships"][rk] = rv_str
 
     def _sanitize_loaded_bible_in_ram(self):
         """
@@ -6053,25 +6035,43 @@ class SeriesBible:
                 "grimoire", "crystal", "spell", "seal"
             }
 
-            # Rejestracja toponimów i chrematonimów ze słownika i plot_anchors oraz normalizacja pojedynczego wariantu (R3.4)
+            # Rejestracja toponimów i chrematonimów ze słownika i plot_anchors oraz normalizacja pojedynczego wariantu (R3.4, Operacja 2B.6)
+            chars_dict = self.data.get("characters", {})
             if "glossary" in self.data and isinstance(self.data["glossary"], dict):
                 ent_cats = self.data.setdefault("entity_categories", {})
                 for gk, gv in list(self.data["glossary"].items()):
-                    if gk in ent_cats:
-                        continue
                     if isinstance(gv, str) and "/" in gv:
                         gv = gv.split("/")[0].strip()
                         self.data["glossary"][gk] = gv
-                    cat_g = classify_entity_category(gk, context=str(gv), series_bible=self)
-                    ent_cats[gk] = cat_g.value
+                    if gk not in chars_dict:
+                        ent_cats.pop(gk, None)
+                        cat_g = classify_entity_category(gk, context=str(gv), series_bible=self)
+                        if cat_g == EntityCategory.ANTHROPONYM:
+                            cat_g = EntityCategory.CHREMATONYM
+                        ent_cats[gk] = cat_g.value
+                    elif gk not in ent_cats:
+                        cat_g = classify_entity_category(gk, context=str(gv), series_bible=self)
+                        ent_cats[gk] = cat_g.value
 
             if "plot_anchors" in self.data and isinstance(self.data["plot_anchors"], dict):
                 ent_cats = self.data.setdefault("entity_categories", {})
                 for pk, pv in list(self.data["plot_anchors"].items()):
-                    if pk in ent_cats:
-                        continue
-                    cat_p = classify_entity_category(pk, context=str(pv), series_bible=self)
-                    ent_cats[pk] = cat_p.value
+                    if pk not in chars_dict:
+                        ent_cats.pop(pk, None)
+                        cat_p = classify_entity_category(pk, context=str(pv), series_bible=self)
+                        if cat_p == EntityCategory.ANTHROPONYM:
+                            cat_p = EntityCategory.CHREMATONYM
+                        ent_cats[pk] = cat_p.value
+                    elif pk not in ent_cats:
+                        cat_p = classify_entity_category(pk, context=str(pv), series_bible=self)
+                        ent_cats[pk] = cat_p.value
+
+            # Normalizacja relacji i kotwic do formy czysto pozytywnej (Operacja 2B.8 / Standard 10.1)
+            for sec in ("plot_anchors", "relationships", "relations"):
+                if sec in self.data and isinstance(self.data[sec], dict):
+                    for k, v in list(self.data[sec].items()):
+                        if isinstance(v, str):
+                            self.data[sec][k] = _normalize_negative_directive(v)
 
             for char_k in list(self.data["characters"].keys()):
                 if "->" in char_k:
@@ -7182,9 +7182,9 @@ class SeriesBible:
                 new_desc = desc_str
                 # Czyszczenie ewentualnych osieroconych fragmentów po dawnych uszkodzeniach regexu
                 if "-sama" in new_desc.lower():
-                    new_desc = re.sub(r"',?\s*(?:eliminacja|z[a]kaz)\s+hybryd.*?-sama\s*\]?\)?\]?", "", new_desc, flags=re.IGNORECASE).strip()
-                new_desc = re.sub(r"',?\s*(?:eliminacja|z[a]kaz)\s+hybryd[^]]*\]", "", new_desc, flags=re.IGNORECASE).strip()
-                new_desc = re.sub(r",?\s*(?:eliminacja|z[a]kaz)\s+hybryd[^]]*\]?", "", new_desc, flags=re.IGNORECASE).strip()
+                    new_desc = re.sub(r"',?\s*(?:eliminacja|z[a]kaz|wykluczon\w+)\s+hybryd.*?-sama\s*\]?\)?\]?", "", new_desc, flags=re.IGNORECASE).strip()
+                new_desc = re.sub(r"',?\s*(?:eliminacja|z[a]kaz|wykluczon\w+)\s+hybryd[^]]*\]", "", new_desc, flags=re.IGNORECASE).strip()
+                new_desc = re.sub(r",?\s*(?:eliminacja|z[a]kaz|wykluczon\w+)\s+hybryd[^]]*\]?", "", new_desc, flags=re.IGNORECASE).strip()
                 new_desc = re.sub(r",?\s*wykluczona forma\s+'[^']*'\s*\([^)]*\)\s*\]?", "]", new_desc, flags=re.IGNORECASE).strip()
                 new_desc = re.sub(r"\]\s*'", "]", new_desc).strip()
                 new_desc = re.sub(r"'\s*,", ",", new_desc).strip()
@@ -7231,6 +7231,13 @@ class SeriesBible:
                         rel_desc["description"] = new_desc
                     else:
                         self.data[rel_dict_name][rel_k] = new_desc
+
+            # Normalizacja relacji po oczyszczeniu przecieków promptów
+            for sec in ("plot_anchors", "relationships", "relations"):
+                if sec in self.data and isinstance(self.data[sec], dict):
+                    for k, v in list(self.data[sec].items()):
+                        if isinstance(v, str):
+                            self.data[sec][k] = _normalize_negative_directive(v)
 
     def _rebuild_actor_aliases_index(self):
         """Buduje globalny indeks aliasów O(1) w SeriesBible z priorytetyzacją P0 i normalizacją fonetyczną."""

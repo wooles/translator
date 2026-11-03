@@ -1,5 +1,5 @@
 {
-  "anime_title": "Sayonara Lara",
+  "anime_title": "Sayonara_Lara",
   "characters": {
     "Lara": {
       "description": "kobieta (postać)",
@@ -25,18 +25,6 @@
       ],
       "entity_category": "ANTHROPONYM"
     },
-    "Mari": {
-      "description": "KOBIETA (postać)",
-      "gender": "FEMALE",
-      "grammatical_gender": "FEMININE",
-      "has_verified_gender": true,
-      "confidence": 0.95,
-      "priority": "P0",
-      "aliases": [
-        "Mari"
-      ],
-      "entity_category": "ANTHROPONYM"
-    },
     "Mari Otsu": {
       "description": "kobieta (Młoda dziewczynka mieszkająca na wybrzeżu (retrospekcja))",
       "gender": "FEMALE",
@@ -45,6 +33,7 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
+        "Mari",
         "Mari Otsu",
         "Otsu"
       ],
@@ -198,33 +187,33 @@
   "relationships": {
     "Lara -> Luca": "Zwrot: 'Luca' (nieśmiałe zakochani / przyjaciele) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: POUFNY]",
     "Luca -> Lara": "Zwrot: 'na ty / po imieniu (Lara)' (znajomi / rozwijające się uczucie) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
-    "Mari -> Lara": "Zwrot: 'na ty / Lara' (bliskie przyjaciółki) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)] [reżim: POUFNY]",
-    "Gon (Grace) -> Lara": "PŁEĆ: ŻEŃSKA (Wiedźma/mentorka w postaci rybki w akwarium). Zawsze formy ŻEŃSKIE (np. poszukałam, widziałam, mogłabym). Zwrot: 'na ty / po imieniu: Lara' [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)] [reżim: FORMALNY]",
-    "Gon (Grace) -> Mari": "PŁEĆ: ŻEŃSKA (Wiedźma/mentorka w akwarium mówiąca do leżącej na łóżku Mari). Obie to KOBIETY! Zawsze formy ŻEŃSKIE (np. 'Chcesz, żebym poszukała?' / 'Mam poszukać?'). Zwrot: 'Mari / na ty' [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)] [reżim: FORMALNY]",
-    "Gon (Grace) -> Luca": "PŁEĆ: ŻEŃSKA (Wiedźma/mentorka w akwarium). Zawsze formy ŻEŃSKIE (np. 'Chcesz, żebym poszukała?' / 'Mam poszukać?'). Zwrot: 'Luca / na ty' [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [reżim: FORMALNY]",
+    "Mari -> Lara": "Zwrot: 'na ty / Lara' (bliskie przyjaciółki) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie'] [reżim: POUFNY]",
+    "Gon (Grace) -> Lara": "PŁEĆ: ŻEŃSKA (Wiedźma/mentorka w postaci rybki w akwarium). Zawsze formy ŻEŃSKIE (np. poszukałam, widziałam, mogłabym). Zwrot: 'na ty / po imieniu: Lara [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie'] [reżim: FORMALNY]",
+    "Gon (Grace) -> Mari": "PŁEĆ: ŻEŃSKA (Wiedźma/mentorka w akwarium mówiąca do leżącej na łóżku Mari). Obie to KOBIETY! Zawsze formy ŻEŃSKIE (np. 'Chcesz, żebym poszukała?' / 'Mam poszukać?'). Zwrot: 'Mari / na ty [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie'] [reżim: FORMALNY]",
+    "Gon (Grace) -> Luca": "PŁEĆ: ŻEŃSKA (Wiedźma/mentorka w akwarium). Zawsze formy ŻEŃSKIE (np. 'Chcesz, żebym poszukała?' / 'Mam poszukać?'). Zwrot: 'Luca / na ty' [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
     "Leo -> Luca": "Zwrot: 'braciszku / bracie' (młodszy brat -> starszy brat) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Leo -> Lara": "Zwrot: 'Lara' (młodszy brat przyjaciela) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: POUFNY]",
-    "Lara -> Mari": "Zwrot: 'na ty / po imieniu (Mari)' (przyjaciółki) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
-    "Lisa -> Mari": "Zwrot: 'panieńskie / pełne (Mari Otsu)' (dystans / obca osoba z wrogiego świata) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: FORMALNY]",
+    "Lara -> Mari": "Zwrot: 'na ty / po imieniu (Mari)' (przyjaciółki) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie']",
+    "Lisa -> Mari": "Zwrot: 'panieńskie / pełne (Mari Otsu)' (dystans / obca osoba z wrogiego świata) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: FORMALNY] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie']",
     "Kusatsu -> Mari": "Zwrot: 'po nazwisku (Otsu)' (trener -> zawodniczka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Mari -> Luca": "Zwrot: 'po imieniu / na ty' (znajomi / opiekunowie Lary) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Grace -> Mari": "Zwrot: 'Mari' (wiedźma w akwarium -> opiekunka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
+    "Grace -> Mari": "Zwrot: 'Mari' (wiedźma w akwarium -> opiekunka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie']",
     "Lara -> Rowan": "Zwrot: 'ojcze' (córka -> ojciec / król) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Rowan -> Lara": "Zwrot: 'na ty / po imieniu: Laro' (ojciec -> córka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Luca -> Mari": "Zwrot: 'Otsu / na ty' (znajomi ze szkoły) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Yoshiya -> Mari": "Zwrot: 'Mari / na ty' (rodzeństwo (starszy brat -> młodsza siostra)) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Yoshiya -> Luca": "Zwrot: 'młody / na ty' (starszy chłopak -> intruz / młodszy kolega siostry) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Grace -> Rigmor": "Zwrot: 'na ty / po imieniu: Rigmor' (bliźniacze siostry) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
-    "Młoda Mari -> Gon (Grace)": "Zwrot: 'na ty / bezpośrednio' (wybawicielka -> znaleziona mała istotka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
-    "Lucian -> Grace": "Zwrot: 'na ty / pogardliwie: potworze' (człowiek -> odrzucona syrena) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]"
+    "Grace -> Rigmor": "Zwrot: 'na ty / po imieniu: Rigmor' (bliźniacze siostry) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie']",
+    "Młoda Mari -> Gon (Grace)": "Zwrot: 'na ty / bezpośrednio' (wybawicielka -> znaleziona mała istotka) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
+    "Lucian -> Grace": "Zwrot: 'na ty / pogardliwie: potworze' (człowiek -> odrzucona syrena) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie']"
   },
   "relations": {
     "Lara -> Luca": "Zwrot: 'Luca' (nieśmiałe zakochani / przyjaciele) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: POUFNY]",
     "Luca -> Lara": "Zwrot: 'na ty / po imieniu (Lara)' (znajomi / rozwijające się uczucie) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Mari -> Lara": "Zwrot: 'na ty / Lara' (bliskie przyjaciółki) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: POUFNY]",
-    "Gon (Grace) -> Lara": "PŁEĆ: ŻEŃSKA (Wiedźma/mentorka w postaci rybki w akwarium). Zawsze formy ŻEŃSKIE (np. poszukałam, widziałam, mogłabym). Zwrot: 'na ty / po imieniu: Lara' [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: FORMALNY]",
-    "Gon (Grace) -> Mari": "PŁEĆ: ŻEŃSKA (Wiedźma/mentorka w akwarium mówiąca do leżącej na łóżku Mari). Obie to KOBIETY! Zawsze formy ŻEŃSKIE (np. 'Chcesz, żebym poszukała?' / 'Mam poszukać?'). Zwrot: 'Mari / na ty' [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: FORMALNY]",
-    "Gon (Grace) -> Luca": "PŁEĆ: ŻEŃSKA (Wiedźma/mentorka w akwarium). Zawsze formy ŻEŃSKIE (np. 'Chcesz, żebym poszukała?' / 'Mam poszukać?'). Zwrot: 'Luca / na ty' [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [reżim: FORMALNY]",
+    "Gon (Grace) -> Lara": "PŁEĆ: ŻEŃSKA (Wiedźma/mentorka w postaci rybki w akwarium). Zawsze formy ŻEŃSKIE (np. poszukałam, widziałam, mogłabym). Zwrot: 'na ty / po imieniu: Lara [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: FORMALNY]",
+    "Gon (Grace) -> Mari": "PŁEĆ: ŻEŃSKA (Wiedźma/mentorka w akwarium mówiąca do leżącej na łóżku Mari). Obie to KOBIETY! Zawsze formy ŻEŃSKIE (np. 'Chcesz, żebym poszukała?' / 'Mam poszukać?'). Zwrot: 'Mari / na ty [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: FORMALNY]",
+    "Gon (Grace) -> Luca": "PŁEĆ: ŻEŃSKA (Wiedźma/mentorka w akwarium). Zawsze formy ŻEŃSKIE (np. 'Chcesz, żebym poszukała?' / 'Mam poszukać?'). Zwrot: 'Luca / na ty' [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
     "Leo -> Luca": "Zwrot: 'braciszku / bracie' (młodszy brat -> starszy brat) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Leo -> Lara": "Zwrot: 'Lara' (młodszy brat przyjaciela) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: POUFNY]",
     "Lara -> Mari": "Zwrot: 'na ty / po imieniu (Mari)' (przyjaciółki) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
@@ -238,7 +227,7 @@
     "Yoshiya -> Mari": "Zwrot: 'Mari / na ty' (rodzeństwo (starszy brat -> młodsza siostra)) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Yoshiya -> Luca": "Zwrot: 'młody / na ty' (starszy chłopak -> intruz / młodszy kolega siostry) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Grace -> Rigmor": "Zwrot: 'na ty / po imieniu: Rigmor' (bliźniacze siostry) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
-    "Młoda Mari -> Gon (Grace)": "Zwrot: 'na ty / bezpośrednio' (wybawicielka -> znaleziona mała istotka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
+    "Młoda Mari -> Gon (Grace)": "Zwrot: 'na ty / bezpośrednio' (wybawicielka -> znaleziona mała istotka) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Lucian -> Grace": "Zwrot: 'na ty / pogardliwie: potworze' (człowiek -> odrzucona syrena) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
   },
   "declensions": {
@@ -291,16 +280,6 @@
       "Ms": "Yoshiyi",
       "W": "Yoshiyo",
       "gender": "MALE"
-    },
-    "Mari": {
-      "M": "Mari",
-      "D": "Mari",
-      "C": "Mari",
-      "B": "Mari",
-      "N": "Mari",
-      "Ms": "Mari",
-      "W": "Mari",
-      "gender": "FEMALE"
     },
     "Lisa": {
       "M": "Lisa",
@@ -407,7 +386,6 @@
   "entity_categories": {
     "Lara": "ANTHROPONYM",
     "Luca": "ANTHROPONYM",
-    "Mari": "ANTHROPONYM",
     "Mari Otsu": "ANTHROPONYM",
     "Leo": "ANTHROPONYM",
     "Lisa": "ANTHROPONYM",
@@ -419,8 +397,30 @@
     "Młoda Mari": "ANTHROPONYM",
     "Lucian": "ANTHROPONYM",
     "Gon": "ANTHROPONYM",
+    "Lake Biwa": "TOPONYM",
+    "Biwako Terrace": "TOPONYM",
+    "Dagger": "TOPONYM",
+    "Lake Biwa Fireworks Festival": "TOPONYM",
+    "Cutting weight": "TOPONYM",
+    "Girls Bantamweight Division": "TOPONYM",
+    "Red corner / Blue corner": "TOPONYM",
+    "Omi's Lightning": "TOPONYM",
+    "Vanish into foam": "TOPONYM",
+    "True Love": "TOPONYM",
+    "Witch's potion": "TOPONYM",
+    "Chlorine Removal": "TOPONYM",
     "Zeze Castle": "TOPONYM",
-    "Okishima": "TOPONYM"
+    "Okishima": "TOPONYM",
+    "Mother Lake": "TOPONYM",
+    "light": "TOPONYM",
+    "merfolk": "TOPONYM",
+    "surface": "TOPONYM",
+    "Magic Mirror": "TOPONYM",
+    "foam": "TOPONYM",
+    "Białe kwiaty na tafli jeziora": "TOPONYM",
+    "Utrata światła i śmierć matki (Rigmor)": "TOPONYM",
+    "Prawdziwe pochodzenie Gona": "TOPONYM",
+    "Zakaz zbliżania się do ludzi i prawo Rowana": "TOPONYM"
   },
   "fansub_canon": {}
 }

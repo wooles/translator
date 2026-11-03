@@ -1,5 +1,5 @@
 {
-  "anime_title": "Mahou Shoujo Ikusei Keikaku: restart",
+  "anime_title": "Mahou_Shoujo_Ikusei_Keikaku_restart",
   "characters": {
     "Pechka": {
       "description": "kobieta (Licealistka, początkująca czarodziejka potrafiąca przygotowywać pyszne jedzenie)",
@@ -75,6 +75,7 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
+        "Mamori",
         "Mamori Totoyama",
         "Totoyama"
       ],
@@ -286,18 +287,6 @@
       ],
       "entity_category": "ANTHROPONYM"
     },
-    "Mamori": {
-      "description": "kobieta (postać)",
-      "gender": "FEMALE",
-      "grammatical_gender": "FEMININE",
-      "has_verified_gender": true,
-      "confidence": 0.95,
-      "priority": "P0",
-      "aliases": [
-        "Mamori"
-      ],
-      "entity_category": "ANTHROPONYM"
-    },
     "Rionetta": {
       "description": "kobieta (postać)",
       "gender": "FEMALE",
@@ -318,14 +307,14 @@
     "Tutorial Mode": "Tryb samouczka"
   },
   "relationships": {
-    "Pechka -> Ninomiya": "Zwrot: 'Ninomiya / po nazwisku' (uczennica -> szkolna miłość) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
+    "Pechka -> Ninomiya": "Zwrot: 'Ninomiya / po nazwisku' (uczennica -> szkolna miłość) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
     "Nokkochan -> Magical Daisy": "Zwrot: 'Magical Daisy / po imieniu z podziwem' (młoda fanka -> starsza idolka) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Kanoe Hitokouji -> Mamori Totoyama": "Zwrot: 'Mamori' (liderka / arystokratka -> zaufana służąca) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama\\NOCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu zakaz opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?'] [reżim: FORMALNY]"
+    "Kanoe Hitokouji -> Mamori Totoyama": "Zwrot: 'Mamori' (liderka / arystokratka -> zaufana służąca) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: FORMALNY]"
   },
   "relations": {
-    "Pechka -> Ninomiya": "Zwrot: 'Ninomiya / po nazwisku' (uczennica -> szkolna miłość) [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
+    "Pechka -> Ninomiya": "Zwrot: 'Ninomiya / po nazwisku' (uczennica -> szkolna miłość) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
     "Nokkochan -> Magical Daisy": "Zwrot: 'Magical Daisy / po imieniu z podziwem' (młoda fanka -> starsza idolka) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Kanoe Hitokouji -> Mamori Totoyama": "Zwrot: 'Mamori' (liderka / arystokratka -> zaufana służąca) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama\\NOCHRONA PRZESKOKÓW SCEN (Filar CLXV): w rozmowach na osobności po przejściu zakaz opóźnionego 'Jasne, o co chodzi?' -> otwarcie dialogu: 'Więc o co chodzi?'] [reżim: FORMALNY]"
+    "Kanoe Hitokouji -> Mamori Totoyama": "Zwrot: 'Mamori' (liderka / arystokratka -> zaufana służąca) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [reżim: FORMALNY]"
   },
   "declensions": {
     "Pechka": {
@@ -537,16 +526,6 @@
       "W": "Snow White",
       "gender": "FEMALE"
     },
-    "Mamori": {
-      "M": "Mamori",
-      "D": "Mamori",
-      "C": "Mamori",
-      "B": "Mamori",
-      "N": "Mamori",
-      "Ms": "Mamori",
-      "W": "Mamori",
-      "gender": "FEMALE"
-    },
     "Rionetta": {
       "M": "Rionetta",
       "D": "Rionetty",
@@ -596,9 +575,12 @@
     "Cherna Mouse": "ANTHROPONYM",
     "Akane Fuwa": "ANTHROPONYM",
     "Snow White": "ANTHROPONYM",
-    "Mamori": "ANTHROPONYM",
     "Rionetta": "ANTHROPONYM",
-    "Land of Magic": "TOPONYM"
+    "Land of Magic": "TOPONYM",
+    "Magical Girl Raising Project": "TOPONYM",
+    "Tutorial Mode": "TOPONYM",
+    "Magical Candies": "TOPONYM",
+    "Snow White / Biały Płatek Śniegu": "TOPONYM"
   },
   "fansub_canon": {}
 }

@@ -1,5 +1,5 @@
 {
-  "anime_title": "Silent Witch",
+  "anime_title": "Silent_Witch",
   "characters": {
     "Ike": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
@@ -179,7 +179,15 @@
     "Nero": "ANTHROPONYM",
     "Felix": "ANTHROPONYM",
     "Cyril": "ANTHROPONYM",
-    "Ryn": "ANTHROPONYM"
+    "Ryn": "ANTHROPONYM",
+    "Silent Witch": "TOPONYM",
+    "Starweaving Mira": "TOPONYM",
+    "The Fountain of Minerva": "TOPONYM",
+    "Unchanted magecraft": "TOPONYM",
+    "Seven Sages": "TOPONYM",
+    "Starseer Witch": "TOPONYM",
+    "Voiceless Magic": "TOPONYM",
+    "Silence Barrier": "TOPONYM"
   },
   "fansub_canon": {}
 }

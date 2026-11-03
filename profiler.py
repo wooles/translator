@@ -620,7 +620,7 @@ Twoim zadaniem jest dogłębna, wszechstronna analiza całego skryptu odcinka, a
 17. SKŁADNIA OKOLICZNIKOWA KONSTRUKCJI CZASOWYCH:
    - Dekompozycja obcych przydawek temporalnych na naturalne polskie wyrażenia okolicznikowe czasu.
 18. DYSCYPLINA IDIOLEKTU I PRYMAT MORFOLOGICZNY PŁCI (SPEAKER-SCOPED HYPOCORISM GUARD & INHERENT GENDER & 1ST-PERSON MORPHOLOGY): # Standard 9.0 Invariant
-   - Zdrobnienia afektywne ograniczone są do właściwych relacji między konkretnymi postaciami (eliminacja wycieku rówieśniczego Hikarun). # Standard 9.0 Invariant
+   - Zdrobnienia afektywne ograniczone są do właściwych relacji między konkretnymi postaciami (eliminacja wycieku rówieśniczego [Zdrobniała Ksywka]). # Standard 9.0 Invariant
    - Spójność morfologiczna form 1. osoby czasu przeszłego z potwierdzoną płcią postaci.
 19. PRYWAT GŁOSU SEIYU I AKTY MOWY:
    - Ścieżka dźwiękowa i ekspresja aktorska stanowią pierwotną podstawę interpretacji intencji dramatycznej.

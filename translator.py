@@ -2524,7 +2524,7 @@ class MultimodalTranslator:
                 elif bible_gen == "MALE" or cand_lower in MALE_EXCEPTIONS_ON_A:
                     return "mężczyzna", f"{cand_name} (Mężczyzna)"
 
-        # 2. 1-on-1 Dialogue Alternation (Ping-Pong Turn & Acoustic F0 Alternation)
+        # 2. 1-on-1 Dialogue Alternation (Ping-Pong Turn & Linguistic Context)
         curr_spk = (getattr(event, "name", None) or getattr(event, "actor", None) or "").strip()
         from series_memory import resolve_actor_gender, extract_clean_speaker_name, is_inherently_female_name, is_generic_actor_or_category
 
@@ -2623,41 +2623,6 @@ class MultimodalTranslator:
                     elif next_res == "MALE":
                         return "mężczyzna", f"{next_spk} (Mężczyzna)"
                     break
-
-        # 2a. Acoustic F0 Alternation in Anonymous Dialogue
-        if speaker_tags:
-            def _extract_voice_gender(tag_text: str) -> Optional[str]:
-                t = (tag_text or "").lower()
-                if any(k in t for k in ["żeński", "kobieta", "female", "alt", "sopran"]):
-                    return "kobieta"
-                if any(k in t for k in ["męski", "mężczyzna", "male", "bas", "baryton", "tenor"]):
-                    return "mężczyzna"
-                hz_matches = [int(m.group(1)) for m in re.finditer(r"(\d+)\s*hz", t)]
-                if hz_matches:
-                    avg_hz = sum(hz_matches) / len(hz_matches)
-                    if avg_hz >= 175:
-                        return "kobieta"
-                    elif avg_hz <= 155:
-                        return "mężczyzna"
-                return None
-
-            curr_tag = speaker_tags.get(event_idx + 1, "") or speaker_tags.get(orig_idx, "")
-            curr_v_gen = _extract_voice_gender(curr_tag)
-
-            adj_tag = ""
-            if event_idx > 0 and (event_idx in speaker_tags):
-                adj_tag = speaker_tags[event_idx]
-            elif (event_idx + 2) in speaker_tags:
-                adj_tag = speaker_tags[event_idx + 2]
-            elif lookback_history and lookback_history[-1].get("speaker_voice"):
-                adj_tag = lookback_history[-1]["speaker_voice"]
-
-            adj_v_gen = _extract_voice_gender(adj_tag)
-            if curr_v_gen and adj_v_gen and curr_v_gen != adj_v_gen:
-                if adj_v_gen == "kobieta":
-                    return "kobieta", "Kobieta (Rozmowa 1-na-1 / Naprzemienność F0)"
-                elif adj_v_gen == "mężczyzna":
-                    return "mężczyzna", "Mężczyzna (Rozmowa 1-na-1 / Naprzemienność F0)"
 
         # 2b. Scene-Cast Exclusive Gender Check (When all present characters are women or all are men)
         from series_memory import resolve_actor_gender

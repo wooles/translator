@@ -132,3 +132,33 @@ def test_phase1_postprocess_wraps_italics_style_and_normalizes_single_italic_blo
         assert pl_cand.startswith(r"{\i1}")
         assert pl_cand.endswith(r"{\i0}")
         assert r"\n" not in pl_cand
+
+
+# T10.1.1 (A-1) -> tests/test_translator.py
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "speaker_f0,adjacent_f0",
+    [
+        (240.0, 110.0),
+        (110.0, 240.0),
+        (240.0, 245.0),
+    ],
+)
+def test_resolve_line_addressee_does_not_use_f0_for_anonymous_speakers(speaker_f0, adjacent_f0):
+    from translator import MultimodalTranslator
+    import pysubs2
+    ev_prev = pysubs2.SSAEvent(start=0, end=1000, text="Linia A", name="")
+    ev_curr = pysubs2.SSAEvent(start=1000, end=2000, text="Linia B", name="")
+    speaker_tags = {1: f"wysoki tembr ~{int(speaker_f0)}hz", 2: f"niski tembr ~{int(adjacent_f0)}hz"}
+    t = MultimodalTranslator.__new__(MultimodalTranslator)
+    t.character_registry = {}
+    t.series_bible = None
+    t.episode_scene_genders = {}
+    cat, lbl = t._resolve_line_addressee(
+        event=ev_curr, raw_phase1_addressee=None,
+        batch_events=[(0, ev_prev, "Linia A", ""), (1, ev_curr, "Linia B", "")],
+        event_idx=1, whisper_text="", clean_text="Linia B",
+        speaker_tags=speaker_tags, prosody_tags={},
+    )
+    assert cat is None
+    assert "Naprzemienność F0" not in (lbl or "")

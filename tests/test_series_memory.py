@@ -823,3 +823,87 @@ def test_addressee_and_speaker_gender_use_p0_alias_priority_over_p2_duplicate(
     assert telem["addressee_gender"] == p0_gender, \
         f"addressee_gender={telem['addressee_gender']!r}, oczekiwano {p0_gender!r} (płeć P0)"
     assert telem["target_p0_verified"] is True
+
+
+# T10.1.2 (A-2) -> tests/test_series_memory.py
+@pytest.mark.unit
+def test_load_dynamic_boy_keywords_has_no_hardcoded_series_names(monkeypatch):
+    from pathlib import Path
+    import series_memory
+    # Wyłącz skanowanie plików *_bible.json z dysku, aby przetestować czystą listę statyczną w kodzie
+    monkeypatch.setattr(Path, "exists", lambda self: False)
+    kws = [k.lower() for k in series_memory._load_dynamic_boy_keywords()]
+    allowed_generic = {
+        "chłopiec", "chłopak", "boy", "syn", "młodzieniec", "książę",
+        "dziecko płci męskiej", "pax", "bocchan", "crossgender", "cross-gender",
+        "seiyū żeński", "żeńskie seiyū", "uczeń", "schoolboy", "lad", "kid",
+        "shōnen", "shonen", "brat", "brother", "wnuk", "grandson",
+        "10 lat", "dziedzic", "panicz", "młody pan", "waka", "wakagimi", "waka-sama",
+    }
+    unexpected = [k for k in kws if k not in allowed_generic]
+    assert not unexpected, f"Znaleziono zahardkodowane imiona własne w liście statycznej: {unexpected}"
+
+
+# T10.1.3 (A-3) -> tests/test_series_memory.py
+@pytest.mark.unit
+def test_static_series_specific_titles_migrated_from_code_to_bible():
+    import json
+    from pathlib import Path
+    src = Path("series_memory.py").read_text(encoding="utf-8")
+    # Żaden specyficzny termin kanoniczny z plików manga_canon/*.json nie może być zahardkodowany w series_memory.py
+    for p in Path("manga_canon").glob("*.json"):
+        if p.name.startswith("."):
+            continue
+        data = json.load(open(p, encoding="utf-8"))
+        for en_term, pl_term in data.get("glossary", {}).items():
+            if len(pl_term) >= 6 and " " in pl_term:
+                assert pl_term.lower() not in src.lower(), f"Termin {pl_term} nadal zahardkodowany w series_memory.py"
+
+
+# T10.1.4 (B-1) -> tests/test_series_memory.py
+@pytest.mark.unit
+def test_fansub_lexicon_no_synthetic_files_and_tmp_path_support(tmp_path):
+    from pathlib import Path
+    from series_memory import SeriesBible
+    lex_dir = Path("series_memory/fansub_lexicons")
+    before = set(lex_dir.glob("*.json")) if lex_dir.exists() else set()
+    # Instancjonowanie testowej serii nie może tworzyć pliku w series_memory/fansub_lexicons/
+    _ = SeriesBible(anime_title="TestSyntheticCleanerSeries", storage_dir=tmp_path)
+    after = set(lex_dir.glob("*.json")) if lex_dir.exists() else set()
+    assert before == after
+    bad_files = [f.name for f in after if f.name.lower().startswith(("test", "synthetic", "stale", "multiarrow"))]
+    assert not bad_files, f"Syntetyczne leksykony w repozytorium: {bad_files}"
+
+
+# T10.1.6 (C-1) -> tests/test_series_memory.py
+@pytest.mark.unit
+def test_glossary_terms_reclassified_to_chrematonym_or_toponym():
+    from pathlib import Path
+    import json
+    for p in sorted(Path("series_memory").glob("*_bible.json")):
+        d = json.load(open(p, encoding="utf-8"))
+        glossary = d.get("glossary", {})
+        characters = d.get("characters", {})
+        ent_cats = d.get("entity_categories", {})
+        for term in glossary:
+            if term in characters:
+                continue
+            if term in ent_cats:
+                assert ent_cats[term] in ("CHREMATONYM", "TOPONYM"), f"{p.name}/{term}: {ent_cats[term]}"
+
+
+# T10.1.8 (C-3) -> tests/test_series_memory.py
+@pytest.mark.unit
+@pytest.mark.parametrize("raw_anchor", [
+    "Nie zmieniaj na X, stosuj Y.",
+    "Zakaz używania terminu X.",
+    "Unikaj formy X w dialogu.",
+])
+def test_plot_anchors_negative_phrases_normalized_to_positive(raw_anchor):
+    from series_memory import SeriesBible
+    bible = SeriesBible(slug="test_plot_anchors_positive", db_path=":memory:")
+    bible.data["plot_anchors"] = {"[Rzeczownik]": raw_anchor}
+    bible._sanitize_loaded_bible_in_ram()
+    result = bible.data["plot_anchors"]["[Rzeczownik]"].lower()
+    has_negative = any(n in result for n in ["nie zmieniaj", "nie zmieniać", "zakaz ", "unikaj "])
+    assert not has_negative, f"Pozostała fraza negatywna: {result}"

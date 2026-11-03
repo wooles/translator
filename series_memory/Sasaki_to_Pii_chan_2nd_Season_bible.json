@@ -1,5 +1,5 @@
 {
-  "anime_title": "Sasaki to Pii-chan 2nd Season",
+  "anime_title": "Sasaki_to_Pii_chan_2nd_Season",
   "characters": {
     "Sasaki": {
       "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
@@ -68,18 +68,6 @@
       ],
       "entity_category": "ANTHROPONYM"
     },
-    "Otonari": {
-      "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
-      "gender": "MALE",
-      "grammatical_gender": "MASCULINE",
-      "has_verified_gender": true,
-      "confidence": 0.95,
-      "priority": "P0",
-      "aliases": [
-        "Otonari"
-      ],
-      "entity_category": "ANTHROPONYM"
-    },
     "Abaddon": {
       "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
       "source": "quality_gate",
@@ -101,6 +89,7 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
+        "Hoshizaki",
         "Hoshizaki-san"
       ],
       "entity_category": "ANTHROPONYM"
@@ -113,6 +102,7 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
+        "Otonari",
         "Otonari-san"
       ],
       "entity_category": "ANTHROPONYM"
@@ -174,6 +164,7 @@
       "confidence": 0.95,
       "priority": "P0",
       "aliases": [
+        "Hrabia",
         "Hrabia Mueller"
       ],
       "entity_category": "ANTHROPONYM"
@@ -239,18 +230,6 @@
       "aliases": [
         "Einhart",
         "Książę Einhart"
-      ],
-      "entity_category": "ANTHROPONYM"
-    },
-    "Hoshizaki": {
-      "description": "kobieta (postać)",
-      "gender": "FEMALE",
-      "grammatical_gender": "FEMININE",
-      "has_verified_gender": true,
-      "confidence": 0.95,
-      "priority": "P0",
-      "aliases": [
-        "Hoshizaki"
       ],
       "entity_category": "ANTHROPONYM"
     },
@@ -358,10 +337,10 @@
     "Java sparrow": "ryżowiec siwy"
   },
   "relationships": {
-    "Sasaki -> Peeps": "Zwrot: 'na ty / Peepsie' (partnerzy, pakt magiczny z szacunkiem mentora) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [reżim: FORMALNY]",
+    "Sasaki -> Peeps": "Zwrot: 'na ty / Peepsie' (partnerzy, pakt magiczny z szacunkiem mentora) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
     "Futari Shizuka -> Sasaki": "Zwrot: 'na ty / Sasaki' (współpracownicy w biurze ds. zjawisk nadprzyrodzonych) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Shizuka -> Sasaki": "Zwrot: 'na ty / Sasaki' (współpracownicy w biurze ds. zjawisk nadprzyrodzonych) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Peeps -> Sasaki": "Zwrot: 'na ty / Sasaki' (mistrz i uczeń, powiernicy) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [reżim: FORMALNY]",
+    "Peeps -> Sasaki": "Zwrot: 'na ty / Sasaki' (mistrz i uczeń, powiernicy) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
     "Akutsu -> Sasaki": "Zwrot: 'panie Sasaki / Sasaki-kun' (przełożony -> podwładny w służbach specjalnych) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Akutsu -> Futari Shizuka": "Zwrot: 'Futari Shizuka / pani Shizuka' (przełożony -> zwerbowana agentka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Hrabia Müller -> Sasaki": "Zwrot: 'panie Sasaki / Sasaki-dono / baronie Sasaki' (arystokrata sojusznik -> nowo mianowany baron) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
@@ -369,8 +348,8 @@
     "Abaddon -> Otonari-san": "Zwrot: 'na ty / mała' (demon patron -> ludzka apostołka) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
   },
   "relations": {
-    "Sasaki -> Peeps": "Zwrot: 'na ty / Peepsie' (partnerzy, pakt magiczny z szacunkiem mentora) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [reżim: FORMALNY]",
-    "Peeps -> Sasaki": "Zwrot: 'na ty / Sasaki' (mistrz i uczeń, powiernicy) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien\\NRELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [reżim: FORMALNY]",
+    "Sasaki -> Peeps": "Zwrot: 'na ty / Peepsie' (partnerzy, pakt magiczny z szacunkiem mentora) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
+    "Peeps -> Sasaki": "Zwrot: 'na ty / Sasaki' (mistrz i uczeń, powiernicy) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
     "Akutsu -> Sasaki": "Zwrot: 'panie Sasaki / Sasaki-kun' (przełożony -> podwładny w służbach specjalnych) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Akutsu -> Futari Shizuka": "Zwrot: 'Futari Shizuka / pani Shizuka' (przełożony -> zwerbowana agentka) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Futari Shizuka -> Sasaki": "Zwrot: 'na ty / Sasaki' (współpracownicy w biurze ds. zjawisk nadprzyrodzonych) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
@@ -428,16 +407,6 @@
       "N": "Hrabią Müller",
       "Ms": "Hrabim Müller",
       "W": "Hrabio Müller",
-      "gender": "MALE"
-    },
-    "Otonari": {
-      "M": "Otonari",
-      "D": "Otonari",
-      "C": "Otonari",
-      "B": "Otonari",
-      "N": "Otonari",
-      "Ms": "Otonari",
-      "W": "Otonari",
       "gender": "MALE"
     },
     "Abaddon": {
@@ -544,16 +513,6 @@
       "W": "Książę Einhart",
       "gender": "MALE"
     },
-    "Hoshizaki": {
-      "M": "Hoshizaki",
-      "D": "Hoshizaki",
-      "C": "Hoshizaki",
-      "B": "Hoshizaki",
-      "N": "Hoshizaki",
-      "Ms": "Hoshizaki",
-      "W": "Hoshizaki",
-      "gender": "FEMALE"
-    },
     "Równiny Rectan": {
       "M": "Równiny Rectan",
       "D": "Równiny Rectan",
@@ -627,7 +586,6 @@
     "Akutsu": "ANTHROPONYM",
     "Futari Shizuka": "ANTHROPONYM",
     "Hrabia Müller": "ANTHROPONYM",
-    "Otonari": "ANTHROPONYM",
     "Abaddon": "ANTHROPONYM",
     "Hoshizaki-san": "ANTHROPONYM",
     "Otonari-san": "ANTHROPONYM",
@@ -641,7 +599,6 @@
     "Maximilian": "ANTHROPONYM",
     "Książę Adonis": "ANTHROPONYM",
     "Książę Einhart": "ANTHROPONYM",
-    "Hoshizaki": "ANTHROPONYM",
     "Równiny Rectan": "ANTHROPONYM",
     "Herz": "ANTHROPONYM",
     "Mother": "ANTHROPONYM",
@@ -649,8 +606,18 @@
     "Masayuki": "ANTHROPONYM",
     "Pii-chan": "ANTHROPONYM",
     "Magical Pink": "ANTHROPONYM",
+    "Cabinet Office Special Division": "TOPONYM",
+    "Starsage": "TOPONYM",
+    "Quarantine space": "TOPONYM",
+    "Death game": "TOPONYM",
+    "Disciples": "TOPONYM",
+    "Rectan Plains": "TOPONYM",
     "Kingdom of Herz": "TOPONYM",
-    "Ohgen Empire": "TOPONYM"
+    "Ohgen Empire": "TOPONYM",
+    "Java sparrow": "TOPONYM",
+    "Incydent z jaszczuroludem (Lizardman incident)": "TOPONYM",
+    "Biuro ds. Zjawisk Nadprzyrodzonych (Cabinet Office Special Division / Naikaku)": "TOPONYM",
+    "Przymierze z Kompanią Handlową Marca i Keplera": "TOPONYM"
   },
   "fansub_canon": {}
 }

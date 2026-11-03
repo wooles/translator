@@ -407,9 +407,9 @@ FILAR XLI: PRZEKŁAD NAPISÓW EKRANOWYCH I STANDARD DUAL-TRACK SUBTITLING (SIGNS
   * BEZPIECZNIK ANTYKOLIZYJNY: Jeśli w pliku .ass istnieją już wystylizowane napisy dla notesu/plakatu, nie dubluj linii.
 
 FILAR XLII: PRECYZJA PERSPEKTYWY I PRZYNALEŻNOŚCI (3. OSOBA VS 1. OSOBA):
-- Kiedy w kwestii pojawia się imię postaci w dopełniaczu (warianty: "Akafuku's dad!", "Sensei's manga!", "Kokoro's house!"):
-  * Oznacza to DOKŁADNIE tę nazwaną postać w 3. osobie ("Tata Akafuku", "Ojciec Akafuku", "Manga pani Teshimy", "Dom Kokoro").
-  * Wypowiedzi o innych osobach tłumacz konsekwentnie w 3. osobie (Kalka: przetłumaczenie "Akafuku's dad!" na "to mój tata"!).
+- Kiedy w kwestii pojawia się imię postaci w dopełniaczu (warianty: "[Imię]'s dad!", "[Tytuł]'s manga!", "[Imię]'s house!"):
+  * Oznacza to DOKŁADNIE tę nazwaną postać w 3. osobie ("Tata [Imię D]", "Ojciec [Imię D]", "Manga pani [Tytuł D]", "Dom [Imię D]").
+  * Wypowiedzi o innych osobach tłumacz konsekwentnie w 3. osobie (Kalka: przetłumaczenie "[Imię]'s dad!" na "to mój tata"!).
 
 
 MODUŁ V: PRAGMATYKA DIALOGU I KONTEKST ROZMOWY (FILARY XLIII – LII)
@@ -867,8 +867,8 @@ FILAR C: JAPOŃSKIE YOBISUTE, SUFIKSY RÓWIEŚNICZE (-KUN, -CHAN, -SAN) I PEŁNA
 - 2. Sufiksy rówieśnicze i przyjacielskie (-kun, -chan):
   * -kun (君 / くん) w ustach rówieśników/dziewcząt/kolegów (warianty: Kenji-kun, Ren-kun):
     -> Eliminujemy kalkę "Pan Kenji / Panie Renie" -> bezpośrednie imię na "ty" ("Kenji", "Ren").
-  * -chan (ちゃん) w ustach przyjaciółek/rodziny (warianty: Hana-chan, Kokoro-chan, Akafuku-chan):
-    -> Eliminujemy kalkę "Pani Hana / Pani Kokoro" -> bezpośrednie imię lub zdrobnienie na "ty" ("Hana", "Kokoro", "Haneczko").
+  * -chan (ちゃん) w ustach przyjaciółek/rodziny (warianty: [Imię]-chan, [Imię]-chan):
+    -> Eliminujemy kalkę "Pani [Imię] / Pani [Imię]" -> bezpośrednie imię lub zdrobnienie na "ty" ("[Imię]", "[Imię]", "[Zdrobniałe Imię]").
 - 3. Sufiks -san (さん - dystans szkolny vs dorośli obcy):
   * Wśród uczniów/rówieśników w szkole (warianty: Komi-san, Miyabi-san):
     -> Tłumacz po samym imieniu na "ty" ("Komi, pożyczysz gumkę", "Miyabi, idziesz z nami").
@@ -883,13 +883,13 @@ FILAR C: JAPOŃSKIE YOBISUTE, SUFIKSY RÓWIEŚNICZE (-KUN, -CHAN, -SAN) I PEŁNA
   * -taichou / -buchou (隊長 / 部長) -> "Kapitanie", "Dowódco", "Kierowniku", "Prezesie".
 - 5. Eliminujemy kalkę HYBRYD FORMY WOŁACZOWEJ Z FORMĄ GRZECZNOŚCIOWĄ (INTRA-CLAUSE T-V HARMONY MANDATE):
   * Naturalnie unikamy łączenia w jednej wypowiedzi poufałego wołacza po samym imieniu z honoryfikatywną formą grzecznościową ("pan/pani").
-  * kalka KARDYNALNY [niepoprawne]: "Poza tym, mistrzu... ma pan zaczerwienioną twarz." (niedopuszczalna hybryda poufałego wołacza "Eftalu" z formą grzecznościową "ma pan").
+  * kalka KARDYNALNY [niepoprawne]: "Poza tym, mistrzu... ma pan zaczerwienioną twarz." (niedopuszczalna hybryda poufałego wołacza "[Imię W]" z formą grzecznościową "ma pan").
   * Wariant kanoniczny: "Poza tym, panie Janie... ma pan zaczerwienioną twarz." LUB (gdy relacja jest na "ty"): "Poza tym, Janie... masz zaczerwienioną twarz.".
   * Jeśli postać zwraca się per pan/pani, wołacz w języku polskim ZAWSZE musi zawierać tytuł: "Panie [Imię]" / "Pani [Imię]".
 - 6. ODPORNOŚĆ NA ANGIELSKIE OPUSZCZANIE SUFIKSU -SAMA (ENGLISH "-SAMA" DROP IMMUNITY):
-  * W zachodnich/angielskich skryptach anime (Crunchyroll, fansuby) tłumacze nagminnie usuwają honoryfikatywny przyrostek "-sama" w okrzykach, zawołaniach i scenach dramatycznych (warianty: w JP: "Eftal-sama", a w EN jedynie: "Ephtal").
+  * W zachodnich/angielskich skryptach anime (Crunchyroll, fansuby) tłumacze nagminnie usuwają honoryfikatywny przyrostek "-sama" w okrzykach, zawołaniach i scenach dramatycznych (warianty: w JP: "[Imię]-sama", a w EN jedynie: "[Imię]").
   * Eliminujemy kalkę mechanicznego przepisywania tego jako poufałego wołacza (Kalka: "Co za kunszt, mistrzu" w ustach uczennicy/służącej).
-  * Relacja uczeń-mistrz czy podwładny-pan w polszczyźnie zachowuje stałość rejestru: w zawołaniach i okrzykach stosuj "Panie [Imię]" ("Co za kunszt, panie Eftalu"), a nie poufałe "Eftalu".
+  * Relacja uczeń-mistrz czy podwładny-pan w polszczyźnie zachowuje stałość rejestru: w zawołaniach i okrzykach stosuj "Panie [Imię]" ("Co za kunszt, panie [Imię]"), a nie poufałe "[Imię W]".
 
 FILAR CI: NADRZĘDNOŚĆ JAPOŃSKIEGO AUDIO I TRIANGULACJA PERSPEKTYWY MÓWCY (KIKANAIDE VS KIKITAKUNAI):
 - Gdy tekst angielski jest wieloznaczny (warianty: "Don't even ask"), japońskie czasowniki i końcówki w audio jednoznacznie rozstrzygają perspektywę podmiotu:
@@ -1031,7 +1031,7 @@ FILAR CXIX: MATRYCA IDIOLEKTÓW I JĘZYK RÓL YAKUWARIGO (ANIMESUB.INFO CHARACTE
 
 FILAR CXX: IDENTYFIKACJA POSTACI TYPU TOMBOY / SPORTOWIEC ORAZ MÓWCÓW NIEWIDOCZNYCH (GENDER IDENTIFICATION & OFF-SCREEN SPEAKER COGNITION):
 - 1. Dziewczyny o Chłopięcym Wyglądzie (Tomboy / Bokserki / Krótkie Włosy):
-  * Postacie żeńskie z krótkimi czarnymi włosami, w luźnych koszulkach lub strojach sportowych (warianty: Mari Otsu) to w 100% KOBIETY / DZIEWCZYNY.
+  * Postacie żeńskie z krótkimi czarnymi włosami, w luźnych koszulkach lub strojach sportowych (warianty: [Imię Żeńskie]) to w 100% KOBIETY / DZIEWCZYNY.
   * Eliminujemy kalkę narzucania form męskich ('poszedł', 'zrobił', 'chciał') wyłącznie na podstawie krótkiej fryzury lub luźnego stroju w kadrze!
 - 2. Mówcy Niewidoczni / Głosy Nietypowe (Akwarium / Telefon / Zwierzątko / Duszek / Głos zza kadru):
   * Gdy w kadrze leży jedna postać, ale kwestię wypowiada ktoś inny (warianty: rybka-wiedźma Gon w akwarium, głos z telefonu), ZAWSZE weryfikuj tożsamość rzeczywistego mówcy z kartoteki i audio seiyū.
@@ -1537,7 +1537,7 @@ FILAR CLVII: ZASADA NIENARUSZALNOŚCI FORMY ADRESATYWNEJ (T-V INVARIANCE) I Unik
       - kalka KARDYNALNY [niepoprawne]: „Przecież wiesz, kim jestem, a jakoś mnie pan nie wydał.” (niedopuszczalny anacoluthon rejestru).
       - Wariant kanoniczny: „Przecież wiesz, kim jestem, a jakoś mnie nie wydałeś / nie wydałaś.” (jednolity rejestr w całej wypowiedzi).
 5. HARMONIA WOŁACZA Z FORMĄ PAN/PANI ORAZ ANTY-DRYF TYTULATURY: # Standard 9.0 Invariant
-      - Jeśli postać zwraca się do rozmówcy per pan/pani ('ma pan', 'widzi pan', 'niech pan', 'chciał pan'), Naturalnie unikamy wołacza po samym imieniu ('Eftalu...'). W takich zdaniach dopuszczalne jest wyłącznie 'Panie [Imię]...'.
+      - Jeśli postać zwraca się do rozmówcy per pan/pani ('ma pan', 'widzi pan', 'niech pan', 'chciał pan'), Naturalnie unikamy wołacza po samym imieniu ('[Imię W]...'). W takich zdaniach dopuszczalne jest wyłącznie 'Panie [Imię]...'.
       - kalka KARDYNALNY [niepoprawne]: „Poza tym, mistrzu... ma pan zaczerwienioną twarz.” Wariant kanoniczny: „Poza tym, panie Janie... ma pan zaczerwienioną twarz.”.
       - W okrzykach i sytuacjach afektywnych nie ulegaj angielskiemu nawykowi usuwania -sama: „Co za kunszt, panie Janie!”.
    6. ŻELAZNA DEKLINACJA OBCYCH IMION NA '-CA' [FONET. K]:
@@ -1730,17 +1730,17 @@ FILAR CLXVI: PROTOKÓŁ ELIMINACJI GRAWITACJI JĘZYKA ANGIELSKIEGO I KLISZ FANSU
 
 FILAR CLXVII: PURYZM REJESTRU DRAMATU HISTORYCZNEGO / DARK FANTASY I PODWÓJNY RZĄD PRZYIMKÓW (HISTORICAL REGISTER & DUAL-CASE PREPOSITION INTEGRITY):
    1. PURYZM REJESTRU DRAMATU HISTORYCZNEGO I EPICKIEGO (ANTI-CONTEMPORARY CALQUES):
-      - W seriach historycznych (Mongolia XIII w., Sengoku, Kamakura) i High/Dark Fantasy obowiązuje eliminujemy kalkę współczesnych kalek konwersacyjnych i potocznego slangu:
+      - W seriach historycznych (epoki feudalne) i High/Dark Fantasy obowiązuje eliminujemy kalkę współczesnych kalek konwersacyjnych i potocznego slangu:
         * "Good question" -> zamiast kalki 'Dobre pytanie' (angielska kalka korporacyjna); Wariant kanoniczny: "Trudno powiedzieć", "Ciekawe pytanie", "Dobre zagadnienie", "Cóż rzec...".
         * "In fact / As it happens / After all" -> zamiast kalki 'W sumie to nam na rękę'; Wariant kanoniczny: "W istocie to nam na rękę", "W gruncie rzeczy to nam na rękę", "Tak po prawdzie to nam sprzyja".
         * "Come on / There now" -> zamiast kalki 'Oj tam', "Spoko", "Siemanko"; Wariant kanoniczny: "Daj spokój", "Zostaw to", "Mniejsza z tym".
    2. PODWÓJNY RZĄD PRZYIMKA 'ZA' (BIERNIK VS NARZĘDZNIK):
       - W języku polskim przyimek 'za' rządzi dwoma różnymi przypadkami:
         * BIERNIK (Accusative: kogo? co?): w konstrukcjach małżeństwa, wymiany, odwetu, percepcji i substytucji:
-          -> "wyjść za Gujuka" (Biernik od 'Gujuk'!) - Eliminujemy kalkę narzędnika: "wyjść za Gujukiem", ani fałszywego mianownika: "wyjść za Gujukę"!
+          -> "wyjść za [Imię B]" (Biernik od imienia męskiego!) - Eliminujemy kalkę narzędnika: "wyjść za [Imię N]", ani fałszywego mianownika: "wyjść za [Imię M]"!
           -> "oddać za kogoś życie", "zapłacić za brata", "uznać za wroga", "uważać za zmarłego", "uchodzić za lekarstwo", "chwycić za rękę".
         * NARZĘDNIK (Instrumental: z kim? z czym?): w konstrukcjach przestrzennych / następstwa:
-          -> "iść za Gujukiem", "stać za drzwiami", "tęsknić za domem".
+          -> "iść za [Imię N]", "stać za drzwiami", "tęsknić za domem".
 
 FILAR CLXVIII: NATURALNA SKŁADNIA DEIKTYCZNO-TEMPORALNA I DEKOMPOZYCJA PRZYDAWKI CZASOWEJ (NATURAL DEICTIC & TEMPORAL SYNTAX):
    1. Eliminujemy kalkę SZTUCZNYCH PRZYMIOTNIKÓW TEMPORALNYCH W DIALOGACH:
@@ -1759,9 +1759,9 @@ FILAR CLXVIII: NATURALNA SKŁADNIA DEIKTYCZNO-TEMPORALNA I DEKOMPOZYCJA PRZYDAWK
 
 FILAR CLXIX: DYSCYPLINA SOCJOLEKTU I OCHRONA KSYWEK RÓWIEŚNICZYCH I MORFOLOGICZNY PRYMAT PŁCI POSTACI (SPEAKER-SCOPED IDIOLECT, HYPOCORISM BLEED ERADICATION & INHERENT GENDER MORPHOLOGY):
    1. ELIMINACJA EKSTERYTORIALNEGO WYCIEKU KSYWEK RÓWIEŚNICZYCH (SPEAKER-SCOPED HYPOCORISM GUARD):
-      - Specyficzne, slangowe lub pieszczotliwe ksywki rówieśnicze i gyaru (warianty: 'Hikarun', 'Aoi-chan') są ściśle ograniczone do postaci, która je nadała w danej relacji.
+      - Specyficzne, slangowe lub pieszczotliwe ksywki rówieśnicze i gyaru (warianty: '[Zdrobniała Ksywka]', '[Imię]-chan') są ściśle ograniczone do postaci, która je nadała w danej relacji.
       - Eliminujemy kalkę przypisywania ksywek szkolnych/gyaru rodzicom, ojcom, nauczycielom, mentorom oraz postaciom w retrospekcjach (Flashback)!
-      - Gdy matka w audio seiyū mówi 'Hikaru-chan', jedynym naturalnym polskim ekwiwalentem jest 'Hikaru', 'Córeczko' lub 'Hikaruś' (KARDYNALNY Kalka: 'Hikarun, posłuchaj uważnie').
+      - Gdy matka w audio seiyū mówi '[Imię]-chan', jedynym naturalnym polskim ekwiwalentem jest '[Imię]', 'Córeczko' lub '[Zdrobniałe Imię]' (Kalka: '[Zdrobniała Ksywka], posłuchaj uważnie').
    2. MORFOLOGICZNY PRYMAT PŁCI I SANITYZACJA ZNACZNIKÓW STYLU (INHERENT GENDER RECOGNITION):
       - Nazwy mówców w skryptach ASS często zawierają techniczne znaczniki stylów lub kontekstu ('Girl\\Italic', 'Woman\\Flashback', 'Girl (young)').
       - Rzeczowniki inherentnie żeńskie ('girl', 'woman', 'female', 'dziewczyna', 'kobieta', 'matka', 'lady', 'heroine') determinują płeć żeńską mówcy (FEMALE).
@@ -3563,7 +3563,7 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Op
             "'Good question' -> 'Trudno powiedzieć / Ciekawe zagadnienie'; "
             "'W sumie to nam na rękę' -> 'W istocie / W gruncie rzeczy to nam na rękę'; 'Oj tam' -> 'Daj spokój'. "
             "Żelazna kontrola rządu przyimka 'za': w małżeństwie i wymianie 'za' rządzi BIERNIKIEM: "
-            "'wyjść za Gujuka' (Biernik męski od Gujuk), zamiast kalki 'wyjść za Gujukę / za Gujukiem' stosuj naturalną polszczyznę!"
+            "'wyjść za [Imię B]' (Biernik męski), zamiast kalki 'wyjść za [Imię M] / za [Imię N]' stosuj naturalną polszczyznę!"
         )
 
     # 109. Śledzenie Rozmówcy, Hipokorystyki i Tytulatura (Filar XXVII)
@@ -3606,22 +3606,22 @@ def get_focused_rules_for_batch(batch_items: List[Dict[str, Any]], max_rules: Op
     # 111. Dyscyplina Socjolektu, Ochrona Ksywek i Żeńska Fleksja 1. Osoby (Filar CLXIX)
     has_hypocorism_or_inherent_gender_trigger = any(
         any(w in (str(item.get("speaker", "")) + " " + str(item.get("speaker_name", "")) + " " + str(item.get("notes", ""))).lower() for w in [
-            "girl", "woman", "female", "dziewczyn", "kobieta", "matk", "mama", "córk", "siostr", "hebichika", "filar clxix", "alarm korekty fleksyjnej", "mówczyni"
+            "girl", "woman", "female", "dziewczyn", "kobieta", "matk", "mama", "córk", "siostr", "filar clxix", "alarm korekty fleksyjnej", "mówczyni"
         ]) or
         any(w in str(item.get("en", "")).lower() for w in [
-            "hikarun", "tessie", "hurt her", "hurt him", "i hurt"
+            "hurt her", "hurt him", "i hurt"
         ]) or
         any(w in str(item.get("pl", "")).lower() for w in [
-            "hikarun", "tessie", "zraniłem", "skrzywdziłem", "zrobiłem", "byłem"
+            "zraniłem", "skrzywdziłem", "zrobiłem", "byłem"
         ])
         for item in batch_items
     )
     if has_hypocorism_or_inherent_gender_trigger:
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR CLXIX - Dyscyplina Socjolektu, Ochrona Ksywek i Żeńska Fleksja 1. Osoby]: "
-            "1. Ksywki rówieśnicze/gyaru ('Hikarun', 'Tessie') należą WYŁĄCZNIE do postaci je nadających (Sachi Akafuku). "
-            "Rodzice zwracają się do dzieci ich prawdziwym imieniem lub czułym zdrobnieniem, a nie ksywką szkolną (matce 'Hebichika' mówiącej w audio 'Hikaru-chan'), "
-            "nauczycielom czy w retrospekcjach ('Flashback')! Matka do córki mówi 'Hikaru', 'Córeczko' lub 'Hikaruś'. "
+            "1. Ksywki rówieśnicze/gyaru ('[Zdrobniała Ksywka]') należą WYŁĄCZNIE do postaci je nadających ([Imię Autorki Ksywki]). "
+            "Rodzice zwracają się do dzieci ich prawdziwym imieniem lub czułym zdrobnieniem, a nie ksywką szkolną (rodzicom mówiącym w audio '[Imię]-chan'), "
+            "nauczycielom czy w retrospekcjach ('Flashback')! Matka do córki mówi '[Imię]', 'Córeczko' lub '[Zdrobniałe Imię]'. "
             "2. Nazwy mówców typu 'Girl\\Italic', 'Woman' to potwierdzone postacie żeńskie! W 1. osobie czasu przeszłego "
             "mówczyni żeńska wymaga form żeńskich ('tak ją zraniłam', 'zrobiłam', 'byłam', 'powiedziałam'; zamiast kalki 'tak ją zraniłem')."
         )

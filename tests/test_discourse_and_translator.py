@@ -662,3 +662,19 @@ def test_male_first_person_forms_override_acoustic_f0_feminine(
     )
     assert telem["speaker_gender"] == expected_gender, \
         f"Forma 1. os. '{first_person_form}' powinna dać {expected_gender}, otrzymano {telem['speaker_gender']}"
+
+
+# T10.1.7 (C-2) -> tests/test_discourse_and_translator.py
+@pytest.mark.unit
+@pytest.mark.parametrize("speaker_p0_gender,expected_gender", [
+    ("MALE", "MALE"),
+    ("FEMALE", "FEMALE"),
+])
+def test_arbitrate_event_telemetry_honors_speaker_p0_gender_kwarg(speaker_p0_gender, expected_gender):
+    from scene_discourse import SceneDiscourseGraph
+    res = SceneDiscourseGraph.arbitrate_event_telemetry(
+        raw_actor="HeroAlpha",
+        speaker_p0_gender=speaker_p0_gender,
+        target_actor="HeroineBeta",
+    )
+    assert res.get("speaker_gender") == expected_gender

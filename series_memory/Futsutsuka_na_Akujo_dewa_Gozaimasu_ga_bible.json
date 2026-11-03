@@ -1,5 +1,5 @@
 {
-  "anime_title": "Futsutsuka na Akujo dewa Gozaimasu ga",
+  "anime_title": "Futsutsuka_na_Akujo_dewa_Gozaimasu_ga",
   "characters": {
     "Kou Tousetsu": {
       "description": "MĘŻCZYZNA (wyodrębniono z relacji serii)",
@@ -121,18 +121,18 @@
   },
   "relationships": {
     "Shu Keigetsu (dusza Reirin) -> Kou Kenshuu (Cesarzowa)": "Zwrot: 'Wasza Cesarska Mość' (Kandydatka klanowa -> Cesarzowa) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
-    "Kou Tousetsu -> Kou Kenshuu (Cesarzowa)": "Zwrot: 'Wasza Cesarska Mość' (Główna dama dworu -> Cesarzowa) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
-    "Kou Kenshuu (Cesarzowa) -> Shu Keigetsu": "Zwrot: 'Shu Keigetsu / po imieniu' (Władczyni -> Dama dworu) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
+    "Kou Tousetsu -> Kou Kenshuu (Cesarzowa)": "Zwrot: 'Wasza Cesarska Mość' (Główna dama dworu -> Cesarzowa) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie']",
+    "Kou Kenshuu (Cesarzowa) -> Shu Keigetsu": "Zwrot: 'Shu Keigetsu / po imieniu' (Władczyni -> Dama dworu) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie']",
     "Shin-U -> Kou Kenshuu": "Zwrot: 'Wasza Cesarska Mość' (Kapitan gwardii -> Cesarzowa) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Shin-U -> Shu Keigetsu": "Zwrot: 'Pani Shu Keigetsu' (dowódca straży -> szlachcianka) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Leelee -> Shu Keigetsu": "Zwrot: 'Moja Pani / Panienko Keigetsu' (służąca -> pani) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Ei Gyoumei -> Służba / Gwardia": "Zwrot: 'per wy / tryb rozkazujący' (Następca Tronu -> Podwładni) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
+    "Ei Gyoumei -> Służba / Gwardia": "Zwrot: 'per wy / tryb rozkazujący' (Następca Tronu -> Podwładni) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
     "Bunkou -> Shu Keigetsu": "Zwrot: 'Panienko Shu' (Eunuch -> Kandydatka klanu Shu) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Shu Keigetsu -> Kou Kenshuu (Cesarzowa)": "Zwrot: 'Wasza Cesarska Mość' (poddana / kandydatka na dwór -> władczyni) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
+    "Shu Keigetsu -> Kou Kenshuu (Cesarzowa)": "Zwrot: 'Wasza Cesarska Mość' (poddana / kandydatka na dwór -> władczyni) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie']",
     "Ei Gyoumei (Książę) -> Kou Kenshuu (Cesarzowa)": "Zwrot: 'Matko / Wasza Cesarska Mość' (Syn i Następca Tronu -> Cesarzowa) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Shin-U (Kapitan Jastrzębich Oczu) -> Shu Keigetsu": "Zwrot: 'Panienko Keigetsu / Panienko z rodu Shu' (Dowódca Straży -> Dama dworu) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Shu Keigetsu -> Ei Gyoumei (Następca Tronu)": "Zwrot: 'Wasza Wysokość' (poddana -> książę) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Kou Kenshuu (Cesarzowa) -> Kou Tousetsu": "Zwrot: 'Tousetsu' (cesarzowa -> Główna Dama Dworu) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]"
+    "Kou Kenshuu (Cesarzowa) -> Kou Tousetsu": "Zwrot: 'Tousetsu' (cesarzowa -> Główna Dama Dworu) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie']"
   },
   "relations": {
     "Shu Keigetsu (dusza Reirin) -> Kou Kenshuu (Cesarzowa)": "Zwrot: 'Wasza Cesarska Mość' (Kandydatka klanowa -> Cesarzowa) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
@@ -141,7 +141,7 @@
     "Shin-U -> Kou Kenshuu": "Zwrot: 'Wasza Cesarska Mość' (Kapitan gwardii -> Cesarzowa) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Shin-U -> Shu Keigetsu": "Zwrot: 'Pani Shu Keigetsu' (dowódca straży -> szlachcianka) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Leelee -> Shu Keigetsu": "Zwrot: 'Moja Pani / Panienko Keigetsu' (służąca -> pani) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
-    "Ei Gyoumei -> Służba / Gwardia": "Zwrot: 'per wy / tryb rozkazujący' (Następca Tronu -> Podwładni) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię] [reżim: FORMALNY]",
+    "Ei Gyoumei -> Służba / Gwardia": "Zwrot: 'per wy / tryb rozkazujący' (Następca Tronu -> Podwładni) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
     "Bunkou -> Shu Keigetsu": "Zwrot: 'Panienko Shu' (Eunuch -> Kandydatka klanu Shu) [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]",
     "Shu Keigetsu -> Kou Kenshuu (Cesarzowa)": "Zwrot: 'Wasza Cesarska Mość' (poddana / kandydatka na dwór -> władczyni) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
     "Ei Gyoumei (Książę) -> Kou Kenshuu (Cesarzowa)": "Zwrot: 'Matko / Wasza Cesarska Mość' (Syn i Następca Tronu -> Cesarzowa) [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]",
@@ -238,7 +238,18 @@
     "Ei Gyoumei": "ANTHROPONYM",
     "Służba / Gwardia": "ANTHROPONYM",
     "Bunkou": "ANTHROPONYM",
-    "Eunuch": "TOPONYM"
+    "Bow of Warding": "TOPONYM",
+    "Eagle Eyes": "TOPONYM",
+    "Court Lady / Maiden": "TOPONYM",
+    "Noble Consort": "TOPONYM",
+    "Water qi": "TOPONYM",
+    "Violet Dragon's Spring": "TOPONYM",
+    "Apothecary": "TOPONYM",
+    "Eunuch": "TOPONYM",
+    "water qi / fire qi / earth qi": "TOPONYM",
+    "Sogdian Whirl": "TOPONYM",
+    "Archery Vigil": "TOPONYM",
+    "Water qi / Fire qi / Earth qi": "TOPONYM"
   },
   "fansub_canon": {}
 }

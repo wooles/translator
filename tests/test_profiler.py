@@ -276,3 +276,18 @@ def test_relational_role_neutral_fallback(relational_role, expected_gender, expe
     res = resolve_relational_actor_gender(relational_role)
     assert res["gender"] == expected_gender
     assert res["confidence"] == expected_confidence
+
+
+# T10.1.5 (B-2) -> tests/test_profiler.py
+@pytest.mark.unit
+@pytest.mark.parametrize("fname", ["rules.py", "profiler.py", "scene_discourse.py", "metadata.py"])
+def test_no_lk2_series_names_in_production_files(fname):
+    import json
+    from pathlib import Path
+    src = Path(fname).read_text(encoding="utf-8")
+    # Sprawdź, że wieloczłonowe nazwy postaci z bibles nie występują jako literały w plikach reguł/kodzie
+    for bp in Path("series_memory").glob("*_bible.json"):
+        bdata = json.load(open(bp, encoding="utf-8"))
+        for char_name in bdata.get("characters", {}):
+            if " " in char_name and len(char_name) >= 8 and not any(w in char_name.lower() for w in ("captain", "recruit", "mercenary", "guard", "soldier", "mother", "kid", "bro")):
+                assert char_name not in src, f"Nazwa postaci {char_name} znaleziona w {fname}"
