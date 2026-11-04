@@ -657,3 +657,41 @@ def test_t10_3_4_r17_contains_polish_norm_14_15_and_cap_17():
     assert "17" in r17_text, f"Brak liczby 17 w R1.7: {r17_text}"
     assert "38" in r17_text, f"Brak liczby 38 w R1.7: {r17_text}"
     assert "CPS" in r17_text or "znaków na sekundę" in r17_text
+
+
+@pytest.mark.unit
+def test_t10_4_1_no_seiyu_in_active_runtime():
+    """
+    Weryfikuje, że w aktywnym runtime (STANDARD_9_CORE_RULES_PROMPT
+    oraz wszystkie 9 kategorii get_focused_rules_for_batch) nie występuje
+    japoński loanword `seiyū` / `seiyu` (niezależnie od wielkości liter).
+    Zgodnie z Zasadą 4 (Instance-Free) — termin zastąpiony polskim `aktor głosowy` / `aktora`.
+    """
+    import re
+    from rules import STANDARD_9_CORE_RULES_PROMPT, get_focused_rules_for_batch
+
+    seiyu_pat = re.compile(r"\bseiy[uū]\b", re.IGNORECASE)
+    assert not seiyu_pat.search(STANDARD_9_CORE_RULES_PROMPT), (
+        "Wykryto 'seiyū'/'SEIYŪ' w STANDARD_9_CORE_RULES_PROMPT (powinno być 'aktor głosowy'/'aktora')"
+    )
+    assert "RYTM AKTORA GŁOSOWEGO" in STANDARD_9_CORE_RULES_PROMPT
+    assert "czasu trwania głosu aktora" in STANDARD_9_CORE_RULES_PROMPT
+
+    test_inputs = [
+        ([{"text": "You ain't runnin' away, y'all!"}], ""),
+        ([{"text": "Forgive me, milord, Your Majesty."}], ""),
+        ([{"text": "The little boy and the old grandma are waiting with the girls."}], "kanojo-tachi"),
+        ([{"text": "Thank you-san, my master."}], ""),
+        ([{"text": "Attack! Dodge! Scream! Sob! Terrified! Ugh! Ottotto!"}], ""),
+        ([{"text": "Wait, wait, wait! Listen to me!"}], ""),
+        ([{"text": "Tears of sorrow and loneliness after our farewell."}], "namida"),
+        ([{"text": "The tactical commander ordered a medical autopsy and diagnosis."}], ""),
+        ([{"text": "That's a hilarious double meaning pun!"}], ""),
+    ]
+    for batch, jp_txt in test_inputs:
+        out = get_focused_rules_for_batch(batch, max_rules=10, whisper_text_jp=jp_txt)
+        assert out != ""
+        assert not seiyu_pat.search(out), (
+            f"Wykryto 'seiyū' w wyjściu get_focused_rules_for_batch: {out!r}"
+        )
+

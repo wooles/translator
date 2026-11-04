@@ -2374,16 +2374,17 @@ AKTYWNY KANON POZYTYWNEGO RZEMIOSŁA AVT (BARAŃCZAK, BELCZYK, SZARKOWSKA):
 
 STANDARD_9_CORE_RULES_PROMPT = r"""
 STANDARD 9.4 — AUTORYTET TRANSLACYJNY I NIEZMIENNIKI DZIEDZINY POZYTYWNEJ (R1.1–R1.11):
-1. R1.1 (P0) — FORMY NIEMĘSKOOSOBOWE (NON_VIRILE) W ZBIOROWOŚCIACH ŻEŃSKICH: Dla scen, w których skład postaci obejmuje wyłącznie postacie o zweryfikowanej płci żeńskiej (p0_gender: FEMALE), prawidłowy stan w 1. i 2. osobie liczby mnogiej to formy niemęskoosobowe (-łyśmy, -łyście, one, wszystkie, razem) oraz żeńskie formy ról.
-2. R1.2 (P0) — ZACHOWANIE OSOBY I LICZBY GRAMATYCZNEJ ORZECZENIA: Prawidłowy stan orzeczenia zachowuje osobę i liczbę gramatyczną ustaloną w phase1_text w pełnej zgodzie z zaimkiem podmiotu w en_text (podmiot 1. os. lp. w en_text zachowuje orzeczenie w 1. os. lp. niezależnie od formy dopełnienia).
-3. R1.3 (P0) — ZACHOWANIE PREDYKATÓW EPISTEMICZNYCH I ZDAŃ IDENTYFIKUJĄCYCH: Prawidłowy stan tekstu zachowuje nadrzędne czasowniki epistemiczne, zdania podrzędne dopełnieniowe identyfikujące oraz ciągłość znaczników {\i1}...{\i0} w monologu wewnętrznym.
-4. R1.4 (P1) — TOŻSAMOŚĆ TEKSTOWA POWTÓRZONEGO WIERSZA DWUGŁOSU: W zdarzeniach dwugłosu wiersz powtarzający treść linii poprzedzającej zachowuje pełną tożsamość leksykalną i gramatyczną z tekstem polskim linii poprzedzającej (w pierwszym oraz drugim wierszu).
-5. R1.5 (P2) — KANONICZNA ORTOGRAFIA I ODPOWIEDNIOŚĆ 1:1 DLA NAPISÓW EKRANOWYCH (is_sign: true): Na planszach i napisach ekranowych terminy zachowują zgodność ortograficzną formy mianownika (M) oraz odpowiedniość leksykalną 1:1 względem en_text.
-6. R1.6 (P0) — PIERWSZEŃSTWO SEMANTYCZNE en_text I JAWNEGO AKTORA [Events]: Tekst en_text oraz jawny aktor z kolumny Name w sekcji [Events] mają pierwszeństwo semantyczne wobec pomocniczej transkrypcji ASR.
+1. R1.1 (P0) — FORMY NIEMĘSKOOSOBOWE (NON_VIRILE) W ZBIOROWOŚCIACH ŻEŃSKICH: Dla scen ze składem wyłącznie o zweryfikowanej płci żeńskiej (p0_gender: FEMALE), stan w 1. i 2. os. lm. to formy niemęskoosobowe (-łyśmy, -łyście, one, wszystkie, razem) oraz żeńskie formy ról.
+2. R1.2 (P0) — ZACHOWANIE OSOBY I LICZBY GRAMATYCZNEJ ORZECZENIA: Prawidłowy stan orzeczenia zachowuje osobę i liczbę ustaloną w phase1_text w pełnej zgodzie z podmiotem en_text (podmiot 1. os. lp. zachowuje orzeczenie 1. os. lp. bez względu na dopełnienie).
+3. R1.3 (P0) — ZACHOWANIE PREDYKATÓW EPISTEMICZNYCH I ZDAŃ IDENTYFIKUJĄCYCH: Prawidłowy stan zachowuje nadrzędne czasowniki epistemiczne, zdania podrzędne dopełnieniowe identyfikujące oraz ciągłość znaczników {\i1}...{\i0} w monologu wewnętrznym.
+4. R1.4 (P1) — TOŻSAMOŚĆ TEKSTOWA POWTÓRZONEGO WIERSZA DWUGŁOSU: Wiersz powtarzający treść linii poprzedzającej zachowuje pełną tożsamość leksykalną i gramatyczną z tekstem polskim linii poprzedzającej (w pierwszym oraz drugim wierszu).
+5. R1.5 (P2) — KANONICZNA ORTOGRAFIA I ODPOWIEDNIOŚĆ 1:1 DLA NAPISÓW EKRANOWYCH (is_sign: true): Na planszach i napisach ekranowych terminy zachowują mianownik (M) oraz odpowiedniość leksykalną 1:1 względem en_text.
+6. R1.6 (P0) — PIERWSZEŃSTWO SEMANTYCZNE en_text I JAWNEGO AKTORA [Events]: Tekst en_text oraz jawny aktor z kolumny Name w [Events] mają pierwszeństwo semantyczne wobec pomocniczej transkrypcji ASR.
+[FILAR 2 — ZWIĘZŁOŚĆ AVT, RYTM AKTORA GŁOSOWEGO I PARALINGWISTYKA (P1)]
 7. R1.7 (P0) — ZWIĘZŁOŚĆ AVT I BUDŻET CZYTELNICZY: Prawidłowy stan napisów to celowanie w polskie optimum percepcyjne 14–15 znaków na sekundę dla swobodnego odbioru obrazu, przy zachowaniu maksymalnego pułapu 17 znaków na sekundę (CPS) w szybkim dialogu oraz limitu 38 znaków w linii (CPL) poprzez dobór krótkich, nośnych polskich synonimów.
-8. R1.8 (P1) — PEŁNA DEKLINACJA DWUCZŁONOWYCH ANTROPONIMÓW: Dwuczłonowe antroponimy podlegają pełnej odmianie obu członów w wołaczu (W) i przypadkach zależnych (D..Ms) zgodnie ze zdeklinowanym paradygmatem z EpisodeProfiler.
+8. R1.8 (P1) — R1.8. Synchronizacja z Rytmem Wypowiedzi (Mouth-Pacing): Dopasuj liczbę sylab i rytm frazy do czasu trwania głosu aktora oraz tempa mówienia postaci. Dwuczłonowe antroponimy podlegają pełnej odmianie obu członów w wołaczu (W) i przypadkach zależnych (D..Ms) zgodnie ze zdeklinowanym paradygmatem z EpisodeProfiler.
 9. R1.9 (P0) — STRUKTURALNY PRYMAT REKORDU P0 W TELEMETRII I PRE-PASSIE SCENICZNYM: Wszelka telemetria mówcy i adresata oraz statystyki obsady sceny bezwarunkowo odzwierciedlają płeć z rekordu P0 (SeriesBible), unieważniając estymację akustyczną F0 oraz domyślne założenia sceniczne dla postaci P0/P1.
-10. R1.10 (P0) — INTEGRALNOŚĆ SKŁADNIOWA I SEMANTYCZNA: Każda modyfikacja tekstu zachowuje pełną integralność struktury zdania rozbitego, modalności trybu przypuszczającego (-bym) oraz czasu gramatycznego zgodnego z intencją wypowiedzi.
+10. R1.10 (P0) — INTEGRALNOŚĆ SKŁADNIOWA I SEMANTYCZNA: Modyfikacja tekstu zachowuje integralność struktury zdania rozbitego, modalności trybu przypuszczającego (-bym) oraz czasu gramatycznego zgodnego z intencją wypowiedzi.
 11. R1.11 (P2) — CZYSTOŚĆ UZASADNIEŃ FAZY 2: Pole changes_made musi przyjmować wartość null (None), jeśli tekst merytoryczny nie uległ zmianie (Szkic == Szlif).
 12. R3.1 (P0) — POZYTYWNY SCHEMAT REKORDU POSTACI: Każdy byt osobowy w bazie wiedzy jest instancją czystej klasy ontologicznej ze strukturalnymi polami tożsamości gramatycznej.
 13. R3.2 (P0) — TELEMETRIA PRZED ASR I AKUSTYKĄ: Zweryfikowany rekord P0 postaci ma nadrzędność ontologiczną nad sygnałami akustycznymi F0 oraz niedoskonałościami transkrypcji ASR.
@@ -2422,7 +2423,7 @@ def get_verifier_system_prompt(keep_honorifics: bool = True, lean: bool = False)
     anime_guide = get_anime_conventions_guide(keep_honorifics)
     canon_block = ACTIVE_AVT_CRAFT_CANON if lean else f"{ACTIVE_AVT_CRAFT_CANON}\n\n{BELCZYK_AVT_MASTER_CANON}"
     return f"""Jesteś Mistrzem Przekładu Audiowizualnego i Głównym Reżyserem Dubbingu (Senior Script Doctor & Dubbing Director) w elitarnym polskim studiu lokalizacji filmów i anime.
-Perfekcyjnie łączysz japońskie wyczucie niuansów kulturowych (Keigo, relacje społeczne, afekt seiyū) z mistrzostwem literackiej i kinowej polszczyzny (szkoła Stanisława Barańczaka, Arkadiusza Belczyka i Agnieszki Szarkowskiej).
+Perfekcyjnie łączysz japońskie wyczucie niuansów kulturowych (Keigo, relacje społeczne, afekt aktora głosowego) z mistrzostwem literackiej i kinowej polszczyzny (szkoła Stanisława Barańczaka, Arkadiusza Belczyka i Agnieszki Szarkowskiej).
 
 Twoim zadaniem jest harmonizacja stylistyczna, eliminacja sztywności, powtórzeń słów, zbędnych zaimków, angielskich kalek i tautologii na rzecz organicznej polszczyzny.
 
@@ -2434,7 +2435,7 @@ ZOGNISKOWANY AUDYT DRAMATURGICZNY CoT (FOCUS SCRIPT DOCTOR):
 1. 👂 UCHO: Czy kwestia brzmi gładko, naturalnie i bez potknięć przy czytaniu na głos? Czy wyeliminowano kalki?
 2. 🏛️ SPÓJNOŚĆ SKŁADNIOWA I FLEKSYJNA: Czy zdania rozbite wielokropkiem mają kompletne orzeczenie osobowe? Czy tytulatura i miana (tytuł wojskowy przed imieniem, nieodmienne imiona obcych bohaterek, wielkie litery dynastii) mają właściwą formę przypadka? Faza 2 nie regresuje autorytetu Fazy 1 w zakresie form grzecznościowych (pan/pani), antroponimów żeńskich, osoby gramatycznej z EN ani uzgodnień fleksyjnych zgodnych z P0.
 3. 🌍 REJESTR EPOKI: Czy w dialogach historycznych/fantasy dialogi zachowują godny, literacki ton?
-4. 🎙️ INTENCJA SEIYŪ: Czy fansub nie dokonał fałszywej parafrazy (akty mowy w roli uciszania lub powitania bez mechanicznego echa czasownikowego)? Akustyka głosu opisuje wyłącznie mówcę bieżącej linii i nie nadpisuje płci adresata.
+4. 🎙️ INTENCJA AKTORA GŁOSOWEGO: Czy fansub nie dokonał fałszywej parafrazy (akty mowy w roli uciszania lub powitania bez mechanicznego echa czasownikowego)? Akustyka głosu opisuje wyłącznie mówcę bieżącej linii i nie nadpisuje płci adresata.
 5. 👁️ WSTECZNA WERYFIKACJA PERCEPCYJNA (AUTONOMOUS BLIND-READING TEST): Odsuń na bok angielski skrypt i przeczytaj polską kwestię na zimno, z perspektywy polskiego widza w kinie. Czy kwestia brzmi tak, jakby została pierwotnie napisana po polsku przez wybitnego dramaturga? Ocena naturalności i płynności dialogowej w języku polskim.
 
 {canon_block}
@@ -2530,6 +2531,8 @@ def get_focused_rules_for_batch(
         if not isinstance(it, dict):
             continue
         clean_it = dict(it)
+        if "en" not in clean_it and "text" in clean_it:
+            clean_it["en"] = clean_it["text"]
         for k in ["en", "pl", "audio_jp", "notes", "style", "speaker", "speaker_gender", "speaker_role"]:
             val = clean_it.get(k)
             clean_it[k] = str(val) if val is not None else ""
@@ -2639,7 +2642,7 @@ def get_focused_rules_for_batch(
         )
 
     # DYN_3: Tytulatura, Forma Rówieśnicza i Harmonia Formy Adresatywnej (score=84)
-    has_honorifics_en = bool(re.search(r"\b(?:sensei|senpai|sama|shishou|dono)\b", combined_en, re.IGNORECASE))
+    has_honorifics_en = bool(re.search(r"\b(?:sensei|senpai|sama|shishou|dono)\b|(?:-san|-kun|-chan|-sama|-sensei|-dono)\b", combined_en, re.IGNORECASE))
     has_honorifics_jp = bool(re.search(r"(?:-san|-kun|-chan|-sama|-sensei|-dono|先生|先輩|様|殿|師匠)", combined_jp))
     has_honorifics_notes = any(
         any(k in str(item.get("notes", "")).lower() for k in ["tytulatur", "honoryfikat", "yobisute", "filar xxv", "filar xxvii", "filar clvii"])
@@ -2672,7 +2675,8 @@ def get_focused_rules_for_batch(
         focused_pillars.append(
             (82,
             "• [SKUP SIĘ NA: FILAR CLXXII, LXVI, LXXV, XVIII, XXXIII, XVI & XVII - Dynamiczny Prymat Afektu, Prozodia Oddechu i Somatyka]: "
-            "Ekspresję afektywną, załamanie głosu i dynamikę walki oddawaj zwięzłą polszczyzną nasyconą dramaturgią. "
+            "Aktorstwo i fizjologia emocji aktora głosowego mają prymat nad dosłownością leksykalną. W scenach walki, zadyszki i szlochu "
+            "ekspresję afektywną, załamanie głosu i dynamikę walki oddawaj zwięzłą polszczyzną nasyconą dramaturgią. "
             "Oddechy, westchnienia i interiekcje somatyczne integruj naturalnie z tokiem wypowiedzi aktora.")
         )
 
@@ -2880,7 +2884,7 @@ def get_focused_rules_for_batch(
     if any(w in combined_en for w in ["pant", "gasp", "breath", "huff"]):
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR LXVI - Prozodia Oddechu i Kinezjologia Mowy]: "
-            "Oddechy i zadyszkę synchronizuj z dynamiką mowy seiyū."
+            "Oddechy i zadyszkę synchronizuj z dynamiką mowy aktora głosowego."
         )
 
     # 13. Kąt kamery empatycznej (Filar LXVII)
@@ -2957,7 +2961,7 @@ def get_focused_rules_for_batch(
     if any(w in combined_en for w in ["you traitor! how could you"]):
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR LXXV - Zestrojenie Akcentu Logicznego ze Szczytem F0]: "
-            "Szczyt ekspresji seiyū podkreślaj wyrazistym rematem na końcu frazy."
+            "Szczyt ekspresji aktora głosowego podkreślaj wyrazistym rematem na końcu frazy."
         )
 
     # 24. Keigo pasywne Filar LXXVI
@@ -3139,7 +3143,7 @@ def get_focused_rules_for_batch(
     if any("ōgedei" in str(it.get("en", "")).lower() or "ogedei" in str(it.get("en", "")).lower() or "sample_batch" in str(it.get("notes", "")).lower() or "filar clxxiv" in str(it.get("notes", "")).lower() for it in batch_items):
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR CLXXIV - Prymat Sygnału Akustycznego nad Skażonymi Tagami Fansubów]: "
-            "Przy sprzeczności metadanych polegaj na akustyce głosu seiyū."
+            "Przy sprzeczności metadanych polegaj na akustyce głosu aktora."
         )
 
     # 50. Grupa żeńska Filar CLXXV
@@ -3278,7 +3282,7 @@ def get_focused_rules_for_batch(
     # 68. Radar Filar CXLIV
     if any(w in str(it.get("en", "")).lower() for it in batch_items for w in ["enemy approaching from the north", "damn it!"]) or any("chikushou" in str(item.get("audio_alert", "")).lower() for item in batch_items):
         focused_pillars.append(
-            "• [SKUP SIĘ NA: FILAR CXLIV - Prymat Autentycznego Głosu Seiyū]: "
+            "• [SKUP SIĘ NA: FILAR CXLIV - Prymat Autentycznego Głosu Aktora]: "
             "Meldunki bojowe podawaj zwięźle, określając kierunek i zagrożenie."
         )
 
