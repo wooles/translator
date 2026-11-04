@@ -2380,7 +2380,7 @@ STANDARD 9.4 — AUTORYTET TRANSLACYJNY I NIEZMIENNIKI DZIEDZINY POZYTYWNEJ (R1.
 4. R1.4 (P1) — TOŻSAMOŚĆ TEKSTOWA POWTÓRZONEGO WIERSZA DWUGŁOSU: W zdarzeniach dwugłosu wiersz powtarzający treść linii poprzedzającej zachowuje pełną tożsamość leksykalną i gramatyczną z tekstem polskim linii poprzedzającej (w pierwszym oraz drugim wierszu).
 5. R1.5 (P2) — KANONICZNA ORTOGRAFIA I ODPOWIEDNIOŚĆ 1:1 DLA NAPISÓW EKRANOWYCH (is_sign: true): Na planszach i napisach ekranowych terminy zachowują zgodność ortograficzną formy mianownika (M) oraz odpowiedniość leksykalną 1:1 względem en_text.
 6. R1.6 (P0) — PIERWSZEŃSTWO SEMANTYCZNE en_text I JAWNEGO AKTORA [Events]: Tekst en_text oraz jawny aktor z kolumny Name w sekcji [Events] mają pierwszeństwo semantyczne wobec pomocniczej transkrypcji ASR.
-7. R1.7 (P0) — ZGODNOŚĆ RODZAJU 1. OSOBY CZASU PRZESZŁEGO Z REKORDEM P0: Końcówki 1. osoby czasu przeszłego (-łem / -łam) wykazują stuprocentową zgodność ze zweryfikowaną płcią p0_gender mówcy w SeriesBible / EpisodeProfiler.
+7. R1.7 (P0) — ZWIĘZŁOŚĆ AVT I BUDŻET CZYTELNICZY: Prawidłowy stan napisów to celowanie w polskie optimum percepcyjne 14–15 znaków na sekundę dla swobodnego odbioru obrazu, przy zachowaniu maksymalnego pułapu 17 znaków na sekundę (CPS) w szybkim dialogu oraz limitu 38 znaków w linii (CPL) poprzez dobór krótkich, nośnych polskich synonimów.
 8. R1.8 (P1) — PEŁNA DEKLINACJA DWUCZŁONOWYCH ANTROPONIMÓW: Dwuczłonowe antroponimy podlegają pełnej odmianie obu członów w wołaczu (W) i przypadkach zależnych (D..Ms) zgodnie ze zdeklinowanym paradygmatem z EpisodeProfiler.
 9. R1.9 (P0) — STRUKTURALNY PRYMAT REKORDU P0 W TELEMETRII I PRE-PASSIE SCENICZNYM: Wszelka telemetria mówcy i adresata oraz statystyki obsady sceny bezwarunkowo odzwierciedlają płeć z rekordu P0 (SeriesBible), unieważniając estymację akustyczną F0 oraz domyślne założenia sceniczne dla postaci P0/P1.
 10. R1.10 (P0) — INTEGRALNOŚĆ SKŁADNIOWA I SEMANTYCZNA: Każda modyfikacja tekstu zachowuje pełną integralność struktury zdania rozbitego, modalności trybu przypuszczającego (-bym) oraz czasu gramatycznego zgodnego z intencją wypowiedzi.
@@ -2562,7 +2562,7 @@ def get_focused_rules_for_batch(
         combined_jp += " " + whisper_text_jp.lower()
 
     # =========================================================================
-    # 8 ROZŁĄCZNYCH KATEGORII DYNAMICZNYCH STANDARDU 10.2 (DYN_1 - DYN_8)
+    # 9 ROZŁĄCZNYCH KATEGORII DYNAMICZNYCH STANDARDU 10.3 (DYN_1 - DYN_9)
     # =========================================================================
 
     # DYN_1: Dialekty Regionalne, Gwara, Sociolekty i Kontrast Rejestrów (score=95)
@@ -2571,31 +2571,41 @@ def get_focused_rules_for_batch(
         re.IGNORECASE
     )
     jp_dialect_pat = re.compile(
-        r"\b(?:ya|yan|yade|yaro|nen|seya|akan|honma|dappe|dabe|ora|washi|atai|wai|wagahai|jaken|koraa|suitoo|nankurunaisa|haisai|namara|shibareru|べ|だべ|じゃけん|やん|やde|やろ|ねん|せや|あかん|ほんま|おら|わし|あたい|わい|吾輩)\b",
+        r"\b(?:ya|yan|yade|yaro|nen|seya|akan|honma|dappe|dabe|ora|washi|atai|wai|wagahai|jaken|koraa|suitoo|nankurunaisa|haisai|namara|shibareru|べ|だべ|じゃけん|やん|やde|yaro|ねん|せや|あかん|ほんま|おら|わし|あたい|わい|吾輩)\b",
         re.IGNORECASE
     )
     paraphrase_pat = re.compile(
         r"\b(?:he means|she means|they mean|meaning|what (?:he|she|they) (?:said|meant)|in other words|he's trying to say|she's trying to say|znaczy|ma na myśli|innymi słowy|chodzi mu o|chodzi jej o)\b",
         re.IGNORECASE
     )
+    exalted_pat = re.compile(
+        r"\b(?:foolish mortals?|mere mortals?|dark abyss|eternal darkness|realm of shadows|sealed power|dark flame|wicked eye)\b",
+        re.IGNORECASE
+    )
+    character_suffix_pat = re.compile(
+        r"(?:^|[\s\-])(?:dechu|nyan|pyon|zura|gero|dabe)\b",
+        re.IGNORECASE
+    )
     has_slang_en = bool(en_slang_pat.search(combined_en))
     has_dialect_jp = bool(jp_dialect_pat.search(combined_jp)) or any(tok in combined_jp for tok in ["べ", "だべ", "じゃけん", "やん", "やde", "やろ", "ねん", "せや", "あかん", "ほんま", "おら", "わし", "あたい", "わい", "吾輩"])
     has_paraphrase = bool(paraphrase_pat.search(combined_en)) or any(paraphrase_pat.search(item.get("pl", "")) for item in batch_items)
+    has_exalted = bool(exalted_pat.search(combined_en)) or bool(character_suffix_pat.search(combined_en)) or bool(character_suffix_pat.search(combined_jp))
     has_dialect_indicator = any(
         any(k in str(item.get("notes", "")).lower() for k in ["gwara", "dialekt", "slang", "socjolekt", "szorstka", "kansai", "filar xiii"])
         or any(k in str(item.get("speech_style_pl", "")).lower() for k in ["gwara", "dialekt", "slang", "szorstka"])
         for item in batch_items
     )
 
-    if has_slang_en or has_dialect_jp or has_paraphrase or has_dialect_indicator:
+    if has_slang_en or has_dialect_jp or has_paraphrase or has_dialect_indicator or has_exalted:
         focused_pillars.append(
             (95,
             "• [SKUP SIĘ NA: FILAR XIII & XII - Dialekty Regionalne, Gwara, Sociolekty i Kontrast Rejestrów]: "
             "Kwestie postaci posługującej się gwarą, slangiem lub dialektem regionalnym oddawaj przez wyrazistą polszczyznę potoczną i stylizację środowiskową. "
-            "Przy parafrazie wypowiedzi przez inną postać zachowuj kontrast stylistyczny między surowym idiolektem a mową ogólną.")
+            "Przy parafrazie wypowiedzi przez inną postać zachowuj kontrast stylistyczny między surowym idiolektem a mową ogólną. "
+            "Prawidłowym stanem indywidualnego głosu postaci jest pełna ciągłość jej idiolektu, rejestru środowiskowego, egzaltowanej maniery retorycznej lub charakterystycznej maniery artykulacyjnej na przestrzeni całego odcinka poprzez dobór nacechowanej leksyki i szyku wyrazów przy zachowaniu pełnej czytelności polskiej ortografii.")
         )
 
-    # DYN_2: Archaizacja, Keigo Dworskie i Rejestr Wysoki (score=92)
+    # DYN_2: Archaizacja, Etykieta Dworska i Rejestr Wysoki (score=92)
     has_archaic_en = bool(re.search(r"\b(?:milord|my liege|your majesty|thou|thee|thy|thine|sire|highness|sovereign)\b", combined_en, re.IGNORECASE))
     has_archaic_jp = bool(re.search(r"\b(?:sessha|ojou|chichi-ue|haha-ue|gozaimasu|de gozaru)\b", combined_jp, re.IGNORECASE))
     has_archaic_notes = any(
@@ -2606,7 +2616,7 @@ def get_focused_rules_for_batch(
     if has_archaic_en or has_archaic_jp or has_archaic_notes:
         focused_pillars.append(
             (92,
-            "• [SKUP SIĘ NA: FILAR XIV & XXX - Archaizacja, Keigo Dworskie i Rejestr Wysoki]: "
+            "• [SKUP SIĘ NA: FILAR XIV & XXX - Archaizacja, Etykieta Dworska i Rejestr Wysoki]: "
             "W dialogach arystokracji, dworu i postaci historycznych stosuj podniosły rejestr szlachecki, stylizację staropolską oraz formy szacunku godne pozycji społecznej rozmówcy.")
         )
 
@@ -2628,7 +2638,7 @@ def get_focused_rules_for_batch(
             "W odniesieniu do grup złożonych wyłącznie z kobiet stosuj formy niemęskoosobowe.")
         )
 
-    # DYN_3: Tytulatura, Yobisute i Harmonia Formy Adresatywnej (score=84)
+    # DYN_3: Tytulatura, Forma Rówieśnicza i Harmonia Formy Adresatywnej (score=84)
     has_honorifics_en = bool(re.search(r"\b(?:sensei|senpai|sama|shishou|dono)\b", combined_en, re.IGNORECASE))
     has_honorifics_jp = bool(re.search(r"(?:-san|-kun|-chan|-sama|-sensei|-dono|先生|先輩|様|殿|師匠)", combined_jp))
     has_honorifics_notes = any(
@@ -2639,13 +2649,34 @@ def get_focused_rules_for_batch(
     if has_honorifics_en or has_honorifics_jp or has_honorifics_notes:
         focused_pillars.append(
             (84,
-            "• [SKUP SIĘ NA: FILAR XXV, XXVI, XXVII, XXVIII, XXIX & CLVII - Tytulatura, Yobisute i Harmonia Formy Adresatywnej]: "
+            "• [SKUP SIĘ NA: FILAR XXV, XXVI, XXVII, XXVIII, XXIX & CLVII - Tytulatura, Forma Rówieśnicza i Harmonia Formy Adresatywnej]: "
             "Tytuły i honoryfikatory adaptuj zgodnie z hierarchią diegetyczną i stopniem zażyłości. "
             "Do mistrzów i nauczycieli zwracaj się z należnym szacunkiem w wołaczu. "
             "W relacjach rówieśniczych i przyjacielskich stosuj naturalną formę po imieniu lub zaimek ty.")
         )
 
-    # DYN_6: Ciągłość Zdań Rozbitych, Przeskoki Scen i Riposty Dialogowe (score=80)
+    # DYN_5: Dynamiczny Prymat Afektu, Prozodia Oddechu i Somatyka (score=82)
+    battle_somatic_pat = re.compile(
+        r"\b(?:aah|aargh|screaming|crying hysterically|sob|pant|gasp|attack|dodge|stomp|crush|punch|strike|slash|blast|ugh|ottotto)\b",
+        re.IGNORECASE
+    )
+    has_extreme_affect = any(
+        any(w in str(it.get("prosody", "")).lower() for w in ["płacz", "drżenie", "panika", "szept", "shock", "cry", "shout", "ac=shock_drop"])
+        or any(k in str(it.get("notes", "")).lower() for k in ["afekt", "krzyk", "płacz", "załamanie", "kinezjologia", "filar clxxii", "filar lxvi"])
+        or bool(battle_somatic_pat.search(it.get("en", "")))
+        or "kakegoe" in str(it.get("audio_jp", "")).lower()
+        or "kakegoe" in str(it.get("en", "")).lower()
+        for it in batch_items
+    )
+    if has_extreme_affect:
+        focused_pillars.append(
+            (82,
+            "• [SKUP SIĘ NA: FILAR CLXXII, LXVI, LXXV, XVIII, XXXIII, XVI & XVII - Dynamiczny Prymat Afektu, Prozodia Oddechu i Somatyka]: "
+            "Ekspresję afektywną, załamanie głosu i dynamikę walki oddawaj zwięzłą polszczyzną nasyconą dramaturgią. "
+            "Oddechy, westchnienia i interiekcje somatyczne integruj naturalnie z tokiem wypowiedzi aktora.")
+        )
+
+    # DYN_6: Ciągłość Zdań Rozbitych, Szyk Rematyczny i Pary Przylegania (score=80)
     has_dual_speaker = any(
         r"\N-" in it.get("en", "") or
         r"\N -" in it.get("en", "") or
@@ -2654,8 +2685,15 @@ def get_focused_rules_for_batch(
         bool(re.search(r"[.!?…]+[\s\"']*(?:\\N|\n)?[-–—]\s*", it.get("en", "")))
         for it in batch_items
     )
+    triple_rep_pat = re.compile(r"\b([a-zA-Z]{2,})\s*[,!]\s*\1\s*[,!]\s*\1\b", re.IGNORECASE)
+    urgent_double_rep_pat = re.compile(r"\b(wait|stop|run|hurry|come|go|look|please|hey|help|no)\s*[,!]\s*\1\b", re.IGNORECASE)
+    has_repetitions = any(
+        bool(triple_rep_pat.search(it.get("en", ""))) or bool(urgent_double_rep_pat.search(it.get("en", "")))
+        for it in batch_items
+    )
     has_discourse_continuity = (
         has_dual_speaker
+        or has_repetitions
         or any(it.get("is_split_sentence", False) for it in batch_items)
         or any(it.get("scene_boundary", False) for it in batch_items)
         or any(any(k in str(it.get("notes", "")).lower() for k in ["para przylegania", "riposta", "broken sentence", "filar clxv", "filar clxix", "filar clxxix"]) for it in batch_items)
@@ -2665,24 +2703,37 @@ def get_focused_rules_for_batch(
     if has_discourse_continuity:
         focused_pillars.append(
             (80,
-            "• [SKUP SIĘ NA: FILAR CLXV, LXV, CLXIX & CLXXIX - Ciągłość Zdań Rozbitych, Przeskoki Scen i Riposty Dialogowe]: "
+            "• [SKUP SIĘ NA: FILAR CLXV, LXV, CLXIX & CLXXIX - Ciągłość Zdań Rozbitych, Szyk Rematyczny i Pary Przylegania]: "
             "Przy zdaniach rozbitych na kolejne plansze zachowuj ciągłość syntaktyczną i logiczną frazy. "
-            "W dialogu wielogłosowym stosuj myślnik na początku każdej kwestii, dopasowując ripostę do ładunku emocjonalnego pytania.")
+            "W dialogu wielogłosowym stosuj myślnik na początku każdej kwestii, dopasowując ripostę do ładunku emocjonalnego pytania. "
+            "Wielokrotne powtórzenia tego samego wyrazu lub wykrzyknienia wewnątrz jednej kwestii mówcy kondensuj do pojedynczego lub podwójnego naturalnego sformułowania wzmocnionego polską partykułą emfatyczną.")
         )
 
-    # DYN_5: Ekspresja Afektywna Seiyū, Prozodia Walki i Somatyka (score=120)
-    has_extreme_affect = any(
-        any(w in str(it.get("prosody", "")).lower() for w in ["płacz", "drżenie", "panika", "szept", "shock", "cry", "shout", "ac=shock_drop"])
-        or any(k in str(it.get("notes", "")).lower() for k in ["afekt", "krzyk", "płacz", "załamanie", "kinezjologia", "filar clxxii", "filar lxvi"])
-        or bool(re.search(r"\b(?:aah|aargh|screaming|crying hysterically|sob)\b", it.get("en", ""), re.IGNORECASE))
+    # DYN_9: Ładunek Afektywny Przekładu, Melancholia i Liryka Emocjonalna (score=74)
+    dyn9_high_conf_pat_en = re.compile(
+        r"\b(?:miss you|missed you|miss him|miss her|tears of|shed a tear|in tears|farewell|last words|final words|loneliness|all alone|so lonely|sorrow|grief|mourning)\b",
+        re.IGNORECASE
+    )
+    dyn9_high_conf_pat_jp = re.compile(
+        r"\b(?:namida|sayonara|sabishii|kanashii)\b",
+        re.IGNORECASE
+    )
+    dyn9_supporting_pat = re.compile(
+        r"\b(?:forgive me|sorry for everything|promise me|i promise you|my beloved|my dear|dearest|from the bottom of my heart|in my heart|in my soul|deep regret|full of regret|i regret|natsukashii|itoshii)\b",
+        re.IGNORECASE
+    )
+    has_dyn9_high = bool(dyn9_high_conf_pat_en.search(combined_en)) or bool(dyn9_high_conf_pat_jp.search(combined_jp))
+    supporting_matches = dyn9_supporting_pat.findall(combined_en + " " + combined_jp)
+    has_dyn9_supporting = len(set(m.lower() for m in supporting_matches)) >= 2
+    has_dyn9_notes = any(
+        any(k in str(it.get("notes", "")).lower() for k in ["liryka", "melancholia", "afekt liryczny", "filar xix", "filar lxxvi"])
         for it in batch_items
     )
-    if has_extreme_affect:
+    if has_dyn9_high or has_dyn9_supporting or has_dyn9_notes:
         focused_pillars.append(
-            (120,
-            "• [SKUP SIĘ NA: FILAR CLXXII - Dynamiczny Prymat Afektu, Ekspresja Seiyū i Prozodia Walki]: "
-            "Ekspresję afektywną, załamanie głosu i dynamikę walki oddawaj zwięzłą polszczyzną nasyconą dramaturgią. "
-            "Oddechy, westchnienia i interiekcje somatyczne integruj naturalnie z tokiem wypowiedzi seiyū.")
+            (74,
+            "• [SKUP SIĘ NA: FILAR XIX & LXXVI - Ładunek Afektywny Przekładu, Melancholia i Liryka Emocjonalna]: "
+            "Prawidłowy stan przekładu scen intymnych, wyznań, smutku, pożegnań i wzruszenia to pełne oddanie ładunku emocjonalnego poprzez dobór nacechowanego uczuciowo słownictwa, subtelnych partykuł modalnych, naturalnych zdrobnień oraz płynnego rytmu składniowego zharmonizowanego z barwą głosu aktora.")
         )
 
     # DYN_7: Rejestry Specjalistyczne: Taktyczno-Bojowy, Medyczny i Śledczy (score=72)
@@ -2701,19 +2752,24 @@ def get_focused_rules_for_batch(
             "W scenach operacji bojowych, zabiegów medycznych i procedur śledczych zachowuj precyzyjną terminologię fachową oraz dyscyplinę słownictwa właściwą dla danej profesji.")
         )
 
-    # DYN_8: Adaptacja Kulturowa, Kalambury, Onomatopeje i Napisy Ekranowe (score=70)
+    # DYN_8: Adaptacja Kulturowa, Gry Słowne, Onomatopeje i Napisy Ekranowe (score=70)
     has_signs = any(item.get("is_sign", False) for item in batch_items)
     has_cultural_signs = (
         has_signs
         or bool(re.search(r"\b(?:title card|chapter [0-9ivx]+|dajare|giongo|gitaigo)\b", combined_en, re.IGNORECASE))
         or any(any(k in str(it.get("notes", "")).lower() for k in ["napis ekranowy", "plansza", "kalambur", "onomatope", "filar xli", "filar lx", "filar civ", "filar cxviii"]) for it in batch_items)
     )
-    if has_cultural_signs:
+    has_humor_wordplay = bool(re.search(
+        r"\b(?:joke|joking|just kidding|wordplay|pun|riddle|irony|ironic|sarcasm|parody|double meaning|innuendo|teasing|hilarious|tsukkomi|boke|neta|gyagu|dajare)\b",
+        combined_en + " " + combined_jp,
+        re.IGNORECASE
+    ))
+    if has_cultural_signs or has_humor_wordplay:
         focused_pillars.append(
             (70,
-            "• [SKUP SIĘ NA: FILAR LXXVIII, LXXIX, LX, LXI, XLI, CIV, CV, CXVIII & CXIX - Adaptacja Kulturowa, Kalambury, Onomatopeje i Napisy Ekranowe]: "
-            "Napisy ekranowe i plansze tłumacz jako zwarte jednostki w nawiasach. "
-            "Gry słowne i kalambury transkreuj na funkcjonalne ekwiwalenty w polszczyźnie, oddając humor i asocjacje oryginału.")
+            "• [SKUP SIĘ NA: FILAR LXXVIII, LXXIX, LX, LXI, XLI, CIV, CV, CXVIII & CXIX - Adaptacja Kulturowa, Gry Słowne, Onomatopeje i Napisy Ekranowe]: "
+            "Prawidłowym stanem przekładu humoru, gier słownych, podtekstów tabu oraz aluzji intertekstualnych jest zachowanie efektu komicznego poprzez twórczą substytucję, adaptację funkcjonalną i kompensację w naturalnej polszczyźnie przy prymacie ekwiwalencji pragmatycznej nad dosłownością. "
+            "Napisy ekranowe i plansze tłumacz jako zwarte jednostki w nawiasach, a wyrazy dźwiękonaśladowcze i realia kulturowe oddawaj z zachowaniem naturalnego brzmienia sceny.")
         )
 
     # =========================================================================
@@ -2731,6 +2787,8 @@ def get_focused_rules_for_batch(
         if re.search(r"\b(?:what|where|when|why|how|who|which)\b", t, re.IGNORECASE):
             return False
         if re.search(r"\bplease\b", t, re.IGNORECASE):
+            return False
+        if "?!" in t or "!?" in t:
             return False
         if re.search(r"^\s*(?:are you|do you|did you|is (?:that|it|he|she)|have you|will you|was it|were you)\b", t, re.IGNORECASE):
             return True
@@ -3311,9 +3369,25 @@ def get_focused_rules_for_batch(
     # Sort descending by attention priority score; Python sort is stable
     sorted_scored = sorted(focused_pillars.items, key=lambda x: x[0], reverse=True)
 
-    # Anti-Smoothing Filter (Hotfix 10.1.1, 2B.4 + Standard 10.2): Jeśli FILAR XIII lub FILAR XIV jest obecny, wyklucz Filar LXXI i CLXXII
+    has_hard_battle_markers = bool(re.search(
+        r"\b(?:attack|dodge|stomp|crush|punch|strike|slash|blast|ottotto|kakegoe)\b",
+        combined_en + " " + combined_jp,
+        re.IGNORECASE
+    )) or any(
+        any(k in str(it.get("notes", "")).lower() for k in ["walka", "pojedynek", "starcie", "cios", "battle"])
+        for it in batch_items
+    )
+
+    # Anti-Smoothing Filter (Hotfix 10.1.1, 2B.4 + Standard 10.2 + Standard 10.3):
+    # 1. FILAR XIII (DYN_1) lub FILAR XIV (DYN_2): wyklucz FILAR LXXI i FILAR CLXXII
     if any("FILAR XIII" in r[1] or "FILAR XIV" in r[1] for r in sorted_scored):
-        sorted_scored = [r for r in sorted_scored if "FILAR LXXI " not in r[1] and "FILAR CLXXII " not in r[1]]
+        sorted_scored = [r for r in sorted_scored if not re.search(r"\bFILAR LXXI\b", r[1]) and not re.search(r"\bFILAR CLXXII\b", r[1])]
+
+    # 2. FILAR XIX & LXXVI (DYN_9): wyklucz FILAR LXXI; wyklucz FILAR CLXXII chyba że w paczce wystąpiły twarde markery walki
+    if any("FILAR XIX" in r[1] for r in sorted_scored):
+        sorted_scored = [r for r in sorted_scored if not re.search(r"\bFILAR LXXI\b", r[1])]
+        if not has_hard_battle_markers:
+            sorted_scored = [r for r in sorted_scored if not re.search(r"\bFILAR CLXXII\b", r[1])]
 
     # Deduplicate while preserving priority order
     seen = set()
@@ -3372,7 +3446,12 @@ def get_focused_rules_for_batch(
         final_rules = [txt for sc, txt in unique_rules]
 
     if any("FILAR XIII" in r or "FILAR XIV" in r for r in final_rules):
-        final_rules = [r for r in final_rules if "FILAR LXXI " not in r and "FILAR CLXXII " not in r]
+        final_rules = [r for r in final_rules if not re.search(r"\bFILAR LXXI\b", r) and not re.search(r"\bFILAR CLXXII\b", r)]
+
+    if any("FILAR XIX" in r for r in final_rules):
+        final_rules = [r for r in final_rules if not re.search(r"\bFILAR LXXI\b", r)]
+        if not has_hard_battle_markers:
+            final_rules = [r for r in final_rules if not re.search(r"\bFILAR CLXXII\b", r)]
 
     # Czysty fallback Standardu 10.2: dla zwykłego dialogu bez zjawisk specjalnych zwraca pusty string
     if not final_rules:

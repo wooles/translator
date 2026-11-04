@@ -456,3 +456,204 @@ def test_t10_2_3_pure_positive_domain_in_focused_rules():
 
         # Weryfikacja braku form skrótowych np.
         assert "np." not in focused_lower, f"Wykryto 'np.' w kategorii DYN_{idx}: {focused}"
+
+
+# =========================================================================
+# TESTY STANDARDU 10.3 (T10.3_1 - T10.3_4) — KATEGORIE AVT I NORMA STAW
+# =========================================================================
+
+@pytest.mark.unit
+@pytest.mark.parametrize("input_text,expected_category,expected_keyword", [
+    ("That's a hilarious double meaning pun!", "FILAR LXXVIII", "substytucj"),
+    ("Tears of sorrow and loneliness filled my heart after our farewell.", "FILAR XIX", "ładunk"),
+    ("Foolish mortals of the dark abyss!", "FILAR XIII", "ciągłość jej idiolektu"),
+    ("I am ready-dechu", "FILAR XIII", "ciągłość jej idiolektu"),
+    ("Wait, wait, wait! Listen to me!", "FILAR CLXV", "kondensuj"),
+    ("Stop, stop! You cannot go there!", "FILAR CLXV", "partykułą emfatyczną"),
+])
+def test_t10_3_1_new_and_expanded_categories_triggers(input_text, expected_category, expected_keyword):
+    """
+    T10.3_1 (Standard 10.3, Operacja 2B.6):
+    Weryfikacja wyzwalania nowych i rozszerzonych kategorii dynamicznych:
+    - Humor/gra słowna/kalambur (L-01) -> DYN_8 (FILAR LXXVIII)
+    - Liryka/melancholia/smutek (L-03) -> DYN_9 (FILAR XIX)
+    - Maniera egzaltowana / sufiks charakterystyczny (L-04) -> DYN_1 (FILAR XIII)
+    - Potrójne powtórzenie (L-05) -> DYN_6 (FILAR CLXV)
+    - Podwójne powtórzenie nagłe (L-05) -> DYN_6 (FILAR CLXV)
+    """
+    from rules import get_focused_rules_for_batch
+    focused = get_focused_rules_for_batch([{"en": input_text}])
+    assert expected_category in focused, f"Oczekiwano {expected_category} w wyjściu dla '{input_text}', otrzymano: {focused}"
+    assert expected_keyword.lower() in focused.lower(), f"Oczekiwano słowa kluczowego '{expected_keyword}' w wyjściu dla '{input_text}', otrzymano: {focused}"
+
+
+@pytest.mark.unit
+def test_t10_3_2_priority_hierarchy_zero_noise_and_false_positive_guards():
+    """
+    T10.3_2 (Standard 10.3, Operacja 2B.6):
+    Weryfikacja hierarchii priorytetów, braku fałszywych pozytywów i ochrony Anti-Smoothing Filter:
+    - (a) Neutralne kwestie z pojedynczymi słowami nie wyzwalają DYN_9, DYN_8 ani DYN_1 (zwracają "")
+    - (b) Idiomy potwierdzenia w podwójnym powtórzeniu nie aktywują DYN_6 (zwracają "")
+    - (c) Porządek priorytetów: DYN_1 (95) > DYN_2 (92) > DYN_4 (88) > DYN_3 (84) > DYN_5 (82) > DYN_6 (80) > DYN_9 (74) > DYN_7 (72) > DYN_8 (70)
+    - (d) Anti-Smoothing Filter poprawnie wyklucza FILAR CLXXII przy DYN_1, DYN_2 i czysto lirycznym DYN_9
+    - (e) W scenie walki z powtórzeniem aktywne są oba DYN_5 i DYN_6, z priorytetem DYN_5 > DYN_6
+    """
+    from rules import get_focused_rules_for_batch
+
+    # (a) Zwykłe zdania dialogowe z pojedynczymi słowami zwracają ""
+    innocent_lines = [
+        "I love this food!",
+        "My heart is beating fast",
+        "That is a precious memory",
+        "The warmth of the sun is nice",
+        "Are you kidding me?!",
+        "The darkness is falling",
+    ]
+    for line in innocent_lines:
+        res = get_focused_rules_for_batch([{"en": line}])
+        assert res == "", f"Fałszywa aktywacja dla neutralnej kwestii '{line}': {res}"
+
+    # (b) Idiomy potwierdzenia/acknowledgmentu w podwójnym powtórzeniu nie aktywują DYN_6
+    idiom_lines = [
+        "Yes, yes, I agree.",
+        "Well, well, look who is here.",
+        "Now, now, calm down.",
+        "There, there, it is alright.",
+        "Oh, oh, I see.",
+    ]
+    for line in idiom_lines:
+        res = get_focused_rules_for_batch([{"en": line}])
+        assert res == "", f"Fałszywa aktywacja DYN_6 dla idiomu '{line}': {res}"
+
+    # (c) Hierarchia priorytetów par sasiednich:
+    priority_pairs = [
+        ("FILAR XIII", [{"en": "y'all fella"}, {"en": "milord your majesty"}], "FILAR XIV"),
+        ("FILAR XIV", [{"en": "milord your majesty"}, {"en": "she", "target_gender": "FEMALE", "addressee_number": "PLURAL"}], "FILAR CXXXVI"),
+        ("FILAR CXXXVI", [{"en": "she", "target_gender": "FEMALE", "addressee_number": "PLURAL"}, {"en": "sensei"}], "FILAR XXV"),
+        ("FILAR XXV", [{"en": "sensei"}, {"en": "screaming sob", "prosody": "cry"}], "FILAR CLXXII"),
+        ("FILAR CLXXII", [{"en": "attack blast"}, {"en": "wait, wait, wait"}], "FILAR CLXV"),
+        ("FILAR CLXV", [{"en": "wait, wait, wait"}, {"en": "farewell tears of sorrow"}], "FILAR XIX"),
+        ("FILAR XIX", [{"en": "farewell tears of sorrow"}, {"en": "tactical perimeter"}], "FILAR XLIX"),
+        ("FILAR XLIX", [{"en": "tactical perimeter"}, {"en": "double meaning pun"}], "FILAR LXXVIII"),
+    ]
+    for higher_tag, batch, lower_tag in priority_pairs:
+        focused = get_focused_rules_for_batch(batch)
+        rule_lines = [l for l in focused.splitlines() if l.strip().startswith("•")]
+        assert len(rule_lines) >= 2, f"Oczekiwano co najmniej 2 reguł dla pary {higher_tag} i {lower_tag}: {focused}"
+        idx_higher = next(i for i, l in enumerate(rule_lines) if higher_tag in l)
+        idx_lower = next(i for i, l in enumerate(rule_lines) if lower_tag in l)
+        assert idx_higher < idx_lower, f"Priorytet naruszony: {higher_tag} (poz. {idx_higher}) nie wyprzedza {lower_tag} (poz. {idx_lower})"
+
+    # (d) Anti-Smoothing Filter poprawnie wyklucza FILAR CLXXII przy DYN_1, DYN_2 i czysto lirycznym DYN_9
+    # DYN_1 + prosody: shock -> FILAR CLXXII stłumiony
+    res_dyn1 = get_focused_rules_for_batch([{"en": "ora washi dabe fella", "prosody": "shock"}])
+    assert "FILAR XIII" in res_dyn1, f"DYN_1 nie aktywował się: {res_dyn1}"
+    assert "FILAR CLXXII" not in res_dyn1, f"FILAR CLXXII nie został wykluczony w obecności DYN_1: {res_dyn1}"
+
+    # DYN_2 + prosody: shock -> FILAR CLXXII stłumiony
+    res_dyn2 = get_focused_rules_for_batch([{"en": "milord your majesty", "prosody": "shock"}])
+    assert "FILAR XIV" in res_dyn2, f"DYN_2 nie aktywował się: {res_dyn2}"
+    assert "FILAR CLXXII" not in res_dyn2, f"FILAR CLXXII nie został wykluczony w obecności DYN_2: {res_dyn2}"
+
+    # Czysto liryczny DYN_9 + prosody: cry -> FILAR CLXXII stłumiony
+    res_dyn9 = get_focused_rules_for_batch([{"en": "Tears of sorrow and loneliness filled my heart after our farewell.", "prosody": "cry"}])
+    assert "FILAR XIX" in res_dyn9, f"DYN_9 nie aktywował się: {res_dyn9}"
+    assert "FILAR CLXXII" not in res_dyn9, f"FILAR CLXXII nie został wykluczony w czystej liryce DYN_9: {res_dyn9}"
+
+    # (e) W scenie walki z powtórzeniem ("Wait, wait, wait! Attack! Dodge! Ugh! Ottotto!") oba DYN_5 i DYN_6 aktywne, DYN_5 przed DYN_6
+    batch_battle = [{"en": "Wait, wait, wait! Attack! Dodge! Ugh! Ottotto!"}]
+    res_battle = get_focused_rules_for_batch(batch_battle)
+    assert "FILAR CLXXII" in res_battle, f"DYN_5 nieaktywny w scenie walki: {res_battle}"
+    assert "FILAR CLXV" in res_battle, f"DYN_6 nieaktywny w scenie powtórzeń walki: {res_battle}"
+    battle_lines = [l for l in res_battle.splitlines() if l.strip().startswith("•")]
+    idx_dyn5 = next(i for i, l in enumerate(battle_lines) if "FILAR CLXXII" in l)
+    idx_dyn6 = next(i for i, l in enumerate(battle_lines) if "FILAR CLXV" in l)
+    assert idx_dyn5 < idx_dyn6, f"DYN_5 (poz. {idx_dyn5}) nie występuje przed DYN_6 (poz. {idx_dyn6}): {battle_lines}"
+
+
+@pytest.mark.unit
+def test_t10_3_3_purity_domain_abstraction_and_size_invariant_of_all_13_categories():
+    """
+    T10.3_3 (Standard 10.3, Operacja 2B.6):
+    Weryfikacja rygoru Czystej Domeny Pozytywnej, braku przykładów, braku obcojęzycznych terminów-kotwic
+    oraz kontrola przyrostu rozmiaru promptu bazowego (<5%).
+    """
+    import re
+    from rules import get_focused_rules_for_batch, STANDARD_9_CORE_RULES_PROMPT
+
+    # 9 syntetycznych wejść aktywujących kolejno każdą z 9 kategorii dynamicznych
+    synthetic_batches = [
+        [{"en": "gonna fella"}],  # DYN_1
+        [{"en": "milord your majesty"}],  # DYN_2
+        [{"en": "sensei dono"}],  # DYN_3
+        [{"en": "kanojo-tachi", "is_low_pitch_female": True}],  # DYN_4
+        [{"en": "screaming sob", "prosody": "cry"}],  # DYN_5
+        [{"en": "Stop, stop! You cannot go there!"}],  # DYN_6
+        [{"en": "tactical perimeter breach"}],  # DYN_7
+        [{"en": "Chapter 1", "is_sign": True}],  # DYN_8
+        [{"en": "Tears of sorrow and loneliness filled my heart after our farewell."}],  # DYN_9
+    ]
+
+    forbidden_prescriptive = [
+        "zakaz", "zabrania", "zabrania się", "unikaj", "zamiast",
+        "niedopuszczalne", "niedopuszczalna", "niedopuszczalny", "usuń", "błąd",
+        "musi", "muszą", "zawsze", "nigdy", "bezwzględna", "bezwzględnie"
+    ]
+    foreign_anchors_pat = re.compile(
+        r"\b(?:dajare|giongo|gitaigo|chūnibyō|chunibyo|character voice|rōjin-go|rojin-go|keigo|yobisute|ottotto|kakegoe|kanojo-tachi|bento|onigiri|senpai)\b",
+        re.IGNORECASE
+    )
+
+    collected_rules = []
+    for idx, batch in enumerate(synthetic_batches, 1):
+        focused = get_focused_rules_for_batch(batch)
+        assert focused != "", f"Paczka DYN_{idx} zwróciła pusty string!"
+        rule_lines = [l for l in focused.splitlines() if l.strip().startswith("•")]
+        assert len(rule_lines) >= 1, f"Brak wyodrębnionej reguły w DYN_{idx}: {focused}"
+        collected_rules.append(rule_lines[0])
+
+    assert len(collected_rules) == 9, f"Oczekiwano 9 reguł dynamicznych, zebrano {len(collected_rules)}"
+
+    # (a) Rygor Czystej Domeny Pozytywnej
+    for idx, rule_text in enumerate(collected_rules, 1):
+        rule_lower = rule_text.lower()
+        # Brak partykuły przeczącej 'nie' jako odrębnego słowa
+        assert not bool(re.search(r"\bnie\b", rule_lower)), f"Wykryto słowo 'nie' w DYN_{idx}: {rule_text}"
+        for fw in forbidden_prescriptive:
+            assert fw not in rule_lower, f"Wykryto słowo preskryptywne '{fw}' w DYN_{idx}: {rule_text}"
+        assert "np." not in rule_lower, f"Wykryto 'np.' w DYN_{idx}: {rule_text}"
+        assert not bool(re.search(r"'[A-Za-z0-9żźćńółęąśŻŹĆĄŚĘŁÓŃ\s]+'", rule_text)), f"Wykryto cytat w apostrofie w DYN_{idx}: {rule_text}"
+
+        # (b) Brak obcojęzycznych terminów-kotwic
+        m = foreign_anchors_pat.search(rule_text)
+        assert m is None, f"Wykryto obcojęzyczny termin-kotwicę '{m.group(0) if m else ''}' w DYN_{idx}: {rule_text}"
+
+    # Weryfikacja BASE_1 - BASE_4 w STANDARD_9_CORE_RULES_PROMPT
+    base_lower = STANDARD_9_CORE_RULES_PROMPT.lower()
+    for fw in ["zakaz", "zabrania", "unikaj", "niedopuszczalne", "usuń"]:
+        assert fw not in base_lower, f"Wykryto słowo '{fw}' w STANDARD_9_CORE_RULES_PROMPT"
+
+    # (c) Rozmiar STANDARD_9_CORE_RULES_PROMPT wzrósł o mniej niż 5% względem 51dbe2d (3758 znaków)
+    baseline_len = 3758
+    current_len = len(STANDARD_9_CORE_RULES_PROMPT)
+    growth_ratio = (current_len - baseline_len) / baseline_len
+    assert growth_ratio < 0.05, f"Rozmiar STANDARD_9_CORE_RULES_PROMPT wzrósł o {growth_ratio:.2%} (limit 5%)"
+
+
+@pytest.mark.unit
+def test_t10_3_4_r17_contains_polish_norm_14_15_and_cap_17():
+    """
+    T10.3_4 (Standard 10.3, Operacja 2B.2 & 2B.6):
+    Weryfikacja polskiej normy czytelniczej STAW (14-15 CPS oraz pułap 17 CPS, 38 CPL) w R1.7.
+    """
+    from rules import STANDARD_9_CORE_RULES_PROMPT
+
+    r17_lines = [l for l in STANDARD_9_CORE_RULES_PROMPT.splitlines() if "R1.7" in l]
+    assert len(r17_lines) >= 1, "Nie znaleziono linii R1.7 w STANDARD_9_CORE_RULES_PROMPT"
+    r17_text = r17_lines[0]
+
+    assert "14" in r17_text, f"Brak liczby 14 w R1.7: {r17_text}"
+    assert "15" in r17_text, f"Brak liczby 15 w R1.7: {r17_text}"
+    assert "17" in r17_text, f"Brak liczby 17 w R1.7: {r17_text}"
+    assert "38" in r17_text, f"Brak liczby 38 w R1.7: {r17_text}"
+    assert "CPS" in r17_text or "znaków na sekundę" in r17_text
