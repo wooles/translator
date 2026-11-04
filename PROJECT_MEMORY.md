@@ -145,3 +145,43 @@ ules.py, erifier.py, whisper_disambiguator.py) nie występuje ani jeden litera�
 | **2026-10-18** | ARB-043 | Tarcza Regresyjna | **Synchronizacja Asercji Testowych (Standard 8.0)**: Dopasowanie 61 asercji do deklaratywnej telemetrii (179/179 PASSED, 0 naruszeń we wszystkich 5 bramkach). | 0.00 PLN |
 | **2026-10-19** | `ARB-044` | Architektura Wariantu (d) | **Hybrydowa Straż Dowodowa (Standard 9.0)**: Odcięcie mutatorów lintera w produkcji ($T(x) = x$), Narrow Safety Net $P_0 \cap \text{EN}$, pre-translacyjna ingestia AniList $P_0$, aliasy $ph \leftrightarrow f$ w $\mathcal{O}(1)$, eliminacja pętli rewersji w Kroku 18, wołacz tytularny `-tz`, bariera regresji Fazy 2, higiena ASS i stabilne `[ID: event_id]` (183/183 PASSED). | 0.00 PLN |
 
+---
+
+## Backlog 11.0 — N-05: Oczyszczenie regexów w `get_focused_rules_for_batch` z japońskich tokenów leksykalnych
+
+**Status:** `OPEN` (P2, dług techniczny, nie blokuje 10.4)
+**Zidentyfikowano:** Standard 10.3 (`9f4df49`), audyt czystości i rzetelności Filarów (`Raport_audytu_czystosci_i_rzetelnosci_filarow_SUPLEMENT.md`, FAZA 0)
+**Przeklasyfikowano:** z P1 na P2 przed hotfixem 10.4 (na podstawie analizy semantyki Z4)
+
+### Problem
+
+W funkcji `get_focused_rules_for_batch` (`rules.py`) wewnętrzne wzorce regularne (regex) zawierają japońskie tokeny leksykalne:
+
+- **`DYN_1`** (`en_slang_pat`, `jp_dialect_pat`): `wagahai`, `dechu`, `nyan`, `pyon`, `zura`, `gero`, `dabe`, `akan`, `chau`, `honma`, `yaro`, `seya`, `wakatten`, `shiran`, 8 znaków kana (`やん`, `やろ`, `ほんま`, `ちゃう`, `あかん`, `じゃけん`, `だべ`, `っす`)
+- **`DYN_2`** (`archaic_pat`): `ojou`, `washi`, `sessha`, `warawa`, `onushi`, `gozaru`
+- **`DYN_3`** (`honorific_pat`): `san`, `sama`, `kun`, `chan`, `sensei`, `senpai`, `dono`
+- **`DYN_4`** (`age_gender_pat`): `kanojo-tachi`, `onnatachi`, `shonen`, `baba`, `bba`
+- **`DYN_5`** (`combat_affect_pat`): `ottotto`, `kakegoe`
+- **`DYN_8`** (`culture_signs_pat`): `tsukkomi`, `boke`, `neta`, `gyagu`, `dajare`, `giongo`, `gitaigo`, `bento`, `onigiri`, `ramen`, `udon`, `soba`, `tempura`, `sushi`, `sake`, `mochi`, `takoyaki`, `okonomiyaki`, `kotatsu`, `yukata`, `kimono`
+- **`DYN_9`** (`lyric_high_pat`, `lyric_support_pat`): `namida`, `sayonara`, `sabishii`, `kanashii`, `natsukashii`, `itoshii`
+
+### Dlaczego to NIE jest naruszenie Z4
+
+Regex detekcji to **wewnętrzny mechanizm selekcji** (`True`/`False`), a nie **treść promptu** wysyłanego do LLM. LLM widzi wyłącznie **czysty** tekst reguły. Tokeny japońskie w regexach to **kategorie językowe** (partykuły dialektu, honoryfikatory), nie **instancje** (imiona, tytuły serii). Zasada 4 (Z4) zakazuje **instancji**, nie **kategorii**.
+
+### Rozwiązanie (11.0)
+
+**Opcja A (rekomendowana):** Przenieść japońskie tokeny z `rules.py` do `whisper_disambiguator.py` i przekazywać do `get_focused_rules_for_batch` **gotowe znaczniki** (`[ZNACZNIK_REJESTRU]`, `[ZNACZNIK_HONORYFIKATU]`, `[ZNACZNIK_SLANGU]`, `[ZNACZNIK_KULTUROWY]`, `[ZNACZNIK_EMOCJONALNY]`). Wtedy `rules.py` operuje **wyłącznie** na kategoriach metajęzykowych.
+
+**Opcja B (minimalna):** Zostawić regexy bez zmian, dodać test `T11.0_1`, który dokumentuje istniejący stan (dług) — bez naprawy. Nie rekomendowane (test dokumentujący bug bez naprawy jest bezsensowny).
+
+**Opcja C (odrzucona):** Usunąć japońskie tokeny z regexów bez przeniesienia ich do `whisper_disambiguator.py` — pogorszyłoby to precyzję triggerów (`DYN_1`, `DYN_5`, `DYN_8`, `DYN_9` przestałyby wykrywać japońskie markery).
+
+### Ryzyko
+
+- **Refaktoryzacja (Opcja A):** średnie. Zmiana logiki detekcji może wpłynąć na precyzję triggerów (fałszywe pozytywy/negatywy). Wymaga testów `T11.0_*` weryfikujących, że po refaktoryzacji `DYN_1`, `DYN_5`, `DYN_8`, `DYN_9` aktywują się na tych samych wejściach co przed.
+- **Bez naprawy (Opcja B):** zerowe. Kod działa poprawnie, dług jest świadomie zaakceptowany.
+
+### Priorytet
+
+**Niski (P2).** N-05 nie blokuje 10.4 ani kolejnych hotfixów. Może zostać odłożone do 11.0 lub pominięte, jeśli priorytety się zmienią.

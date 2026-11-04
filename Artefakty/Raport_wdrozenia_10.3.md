@@ -622,3 +622,22 @@ tests\test_verifier.py ....................................              [100%]
 
 ## 7. BACKLOG 10.4
 - **`L-06` (P2):** Rozbudowa generatora `EPISODE BRIEF` w `profiler.py` o automatyczną ekstrakcję adnotacji dla gier słownych i aluzji kulturowych na wzór szablonów STAW. Wpis w backlogu 10.4: `ODNOTOWANO (PRZENIESIONE DO STANDARDU 10.4)`.
+
+---
+
+## 8. ROZSZERZENIE ZAKRESU PRZEZ IMPLEMENTERA 10.3 (ODNOTOWANE PO AUDYCIE)
+
+Podczas wdrożenia Standardu 10.3 (commit `9f4df49`) agent kodujący samodzielnie rozszerzył zakres względem specyfikacji `Prompt_10.3_dopelnienie_filarow.md` o **oczyszczenie tekstów kategorii `DYN_1–DYN_8` z japońskich terminów-kotwic**:
+
+| Kategoria | Usunięte terminy japońskie | Źródło oczyszczenia |
+|---|---|---|
+| `DYN_1` | `chūnibyō`, `character voice` (zastąpione: `egzaltowana maniera retoryczna`, `indywidualny głos postaci`) | `git diff 51dbe2d..9f4df49` |
+| `DYN_2` | `Rōjin-go`, `Keigo` (zastąpione: `Rejestr Wysoki`) | `git diff 51dbe2d..9f4df49` |
+| `DYN_3` | `Yobisute`, `-san`, `-sama`, `-sensei`, `-senpai` (zastąpione: `Forma Rówieśnicza`, `zwroty grzecznościowe i tytuły`) | `git diff 51dbe2d..9f4df49` |
+| `DYN_4` | `kanojo-tachi` (zastąpione: `grupa złożona z kobiet`) | `git diff 51dbe2d..9f4df49` |
+| `DYN_5` | `ottotto`, `kakegoe` (zastąpione: `odruchy motoryczne, utrata równowagi i okrzyki wysiłkowe`) | `git diff 51dbe2d..9f4df49` |
+| `DYN_8` | `dajare`, `giongo`, `gitaigo`, `bento`, `onigiri` (zastąpione: `gry słowne`, `wyrazy dźwiękonaśladowcze`, `nazwy potraw i realiów kulturowych`) | `git diff 51dbe2d..9f4df49` |
+
+**Ocena:** Rozszerzenie jest **pozytywne** — zgodne z duchem Z4 (Instance-Free Metalinguistic Architecture). Wzmocniło spójność tekstów Filarów wysyłanych do LLM (usunięcie loanwordów z promptu). **Nie zostało odnotowane w oryginalnym `Prompt_10.3`** (który sam zawierał `chūnibyō` i `character voice` w treści `2B.4`). Rekomendacja: odnotować jako świadomą decyzję implementera.
+
+**Referencja:** pełna analiza w `Artefakty/Raport_audytu_czystosci_i_rzetelnosci_filarow_SUPLEMENT.md` (FAZA 3).
