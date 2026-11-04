@@ -2578,7 +2578,7 @@ def get_focused_rules_for_batch(
         re.IGNORECASE
     )
     paraphrase_pat = re.compile(
-        r"\b(?:he means|she means|they mean|meaning|what (?:he|she|they) (?:said|meant)|in other words|he's trying to say|she's trying to say|znaczy|ma na myśli|innymi słowy|chodzi mu o|chodzi jej o)\b",
+        r"\b(?:he means|she means|they mean|meaning that|what (?:he|she|they) (?:said|meant)|in other words|he's trying to say|she's trying to say|znaczy|ma na myśli|innymi słowy|chodzi mu o|chodzi jej o)\b",
         re.IGNORECASE
     )
     exalted_pat = re.compile(
@@ -2624,13 +2624,23 @@ def get_focused_rules_for_batch(
         )
 
     # DYN_4: Triangulacja Wieku i Płci oraz Grupy Niemęskoosobowe (score=88)
-    has_f0_gender_notes = any(
-        item.get("is_low_pitch_female", False)
-        or any(k in str(item.get("notes", "")).lower() for k in ["ochrona płci", "niski f0", "matrona", "starsza kobieta", "boraqchin", "filar cxxxvi"])
-        or (str(item.get("target_gender", "")).upper() == "FEMALE" and str(item.get("addressee_number", "")).upper() == "PLURAL")
-        or "kanojo-tachi" in combined_jp
-        or "kanojotachi" in combined_jp
-        for item in batch_items
+    age_gender_pat = re.compile(
+        r"\b(?:little boy|little girl|little kid|young child|grandma|grandpa|old woman|old man|elderly|childish|baby talk|"
+        r"all-female|us girls|you girls|you ladies|both girls|kanojo-tachi|onnatachi|"
+        r"brat|shonen|baba|bba)\b",
+        re.IGNORECASE,
+    )
+    has_f0_gender_notes = (
+        bool(age_gender_pat.search(combined_en))
+        or bool(age_gender_pat.search(combined_jp))
+        or any(
+            item.get("is_low_pitch_female", False)
+            or any(k in str(item.get("notes", "")).lower() for k in ["ochrona płci", "niski f0", "matrona", "starsza kobieta", "boraqchin", "filar cxxxvi"])
+            or (str(item.get("target_gender", "")).upper() == "FEMALE" and str(item.get("addressee_number", "")).upper() == "PLURAL")
+            or "kanojo-tachi" in combined_jp
+            or "kanojotachi" in combined_jp
+            for item in batch_items
+        )
     )
     if has_f0_gender_notes:
         focused_pillars.append(
@@ -2757,18 +2767,20 @@ def get_focused_rules_for_batch(
         )
 
     # DYN_8: Adaptacja Kulturowa, Gry Słowne, Onomatopeje i Napisy Ekranowe (score=70)
-    has_signs = any(item.get("is_sign", False) for item in batch_items)
+    culture_signs_pat = re.compile(
+        r"\b(?:joke|joking|just kidding|wordplay|pun|riddle|irony|ironic|sarcasm|parody|"
+        r"double meaning|innuendo|teasing|hilarious|tsukkomi|boke|neta|gyagu|dajare|"
+        r"bento|onigiri|ramen|udon|soba|tempura|sushi|sake|mochi|takoyaki|okonomiyaki|kotatsu|yukata|kimono|"
+        r"giongo|gitaigo)\b",
+        re.IGNORECASE,
+    )
+    has_sign_flag = any(item.get("is_sign", False) for item in batch_items)
     has_cultural_signs = (
-        has_signs
-        or bool(re.search(r"\b(?:title card|chapter [0-9ivx]+|dajare|giongo|gitaigo)\b", combined_en, re.IGNORECASE))
+        has_sign_flag
+        or bool(re.search(r"\b(?:title card|chapter [0-9ivx]+)\b", combined_en, re.IGNORECASE))
         or any(any(k in str(it.get("notes", "")).lower() for k in ["napis ekranowy", "plansza", "kalambur", "onomatope", "filar xli", "filar lx", "filar civ", "filar cxviii"]) for it in batch_items)
     )
-    has_humor_wordplay = bool(re.search(
-        r"\b(?:joke|joking|just kidding|wordplay|pun|riddle|irony|ironic|sarcasm|parody|double meaning|innuendo|teasing|hilarious|tsukkomi|boke|neta|gyagu|dajare)\b",
-        combined_en + " " + combined_jp,
-        re.IGNORECASE
-    ))
-    if has_cultural_signs or has_humor_wordplay:
+    if has_sign_flag or has_cultural_signs or bool(culture_signs_pat.search(combined_en)) or bool(culture_signs_pat.search(combined_jp)):
         focused_pillars.append(
             (70,
             "• [SKUP SIĘ NA: FILAR LXXVIII, LXXIX, LX, LXI, XLI, CIV, CV, CXVIII & CXIX - Adaptacja Kulturowa, Gry Słowne, Onomatopeje i Napisy Ekranowe]: "
@@ -2794,7 +2806,7 @@ def get_focused_rules_for_batch(
             return False
         if "?!" in t or "!?" in t:
             return False
-        if re.search(r"^\s*(?:are you|do you|did you|is (?:that|it|he|she)|have you|will you|was it|were you)\b", t, re.IGNORECASE):
+        if re.search(r"^\s*(?:are you|do you|is (?:that|it|he|she)|have you|will you|was it|were you)\b", t, re.IGNORECASE):
             return True
         return False
 
@@ -2810,7 +2822,7 @@ def get_focused_rules_for_batch(
         )
 
     # 2. Napisy ekranowe i plansze (Filar XLI)
-    if has_signs or any("title of chapter" in it.get("en", "").lower() for it in batch_items):
+    if has_sign_flag or any("title of chapter" in it.get("en", "").lower() for it in batch_items):
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR XLI & LX - Napisy Ekranowe, Plansze i AVT]: "
             "Napisy ekranowe i plansze tłumacz jako odrębne tytuły w nawiasach."
@@ -3403,7 +3415,7 @@ def get_focused_rules_for_batch(
 
     # Anti-Attention Dilution & Balanced Slot Quota:
     if max_rules is not None and max_rules > 0:
-        effective_max = min(max_rules, 2) if len(batch_items) <= 4 and max_rules > 2 else max_rules
+        effective_max = max_rules
 
         bucket_affect = [r for r in unique_rules if r[0] >= 100]
         bucket_craft = [r for r in unique_rules if 40 <= r[0] < 100]

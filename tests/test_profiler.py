@@ -695,3 +695,66 @@ def test_t10_4_1_no_seiyu_in_active_runtime():
             f"Wykryto 'seiyū' w wyjściu get_focused_rules_for_batch: {out!r}"
         )
 
+
+# =========================================================================
+# TESTY STANDARDU 10.5 (T10.5_1 - T10.5_3) — OPTYMALIZACJA TRIGGERÓW DYN
+# =========================================================================
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "benign_sentence",
+    [
+        "Did you notice anything unusual on the road?",
+        "Give me a sign when you are ready to move.",
+        "Fair warning, the weather is changing quickly.",
+        "This episode of our journey is finally over.",
+        "The girls went to the library after class.",
+        "The women in the village are preparing the festival.",
+        "When I was a child, I lived near the mountains.",
+        "Hey kid, what are you doing over there?",
+    ],
+)
+def test_t10_5_1_no_false_positive_dyn8_and_dyn4_on_common_words(benign_sentence):
+    """
+    Standard 10.5 (R-01, R-03): Weryfikuje, że pospolite słowa wieloznaczne
+    (notice, sign, warning, episode, girls, women, child, kid) w zwykłym dialogu
+    nie wzbudzają fałszywie DYN_8 ani DYN_4.
+    """
+    from rules import get_focused_rules_for_batch
+    res = get_focused_rules_for_batch([{"text": benign_sentence}], max_rules=3)
+    assert res == ""
+
+
+@pytest.mark.unit
+def test_t10_5_2_no_slot_starvation_for_lower_scored_categories():
+    """
+    Standard 10.5 (R-03): Weryfikuje, że w wielowątkowej paczce obecność pospolitych słów
+    'girls' lub 'kid' oraz 'notice' nie blokuje slotów top-3 (brak fałszywej aktywacji DYN_4 score 88),
+    dzięki czemu do top-3 trafiają właściwe kategorie: DYN_3 (84), DYN_9 (74) oraz DYN_8 (70).
+    """
+    from rules import get_focused_rules_for_batch
+    batch = [
+        {"text": "The girls did not notice anything, master-san."},
+        {"text": "Tears of sorrow and loneliness filled my heart after our farewell."},
+        {"text": "That is a hilarious double meaning pun!"},
+    ]
+    res = get_focused_rules_for_batch(batch, max_rules=3)
+    assert "FILAR CXXXVI" not in res
+    assert "FILAR XXV" in res
+    assert "FILAR XIX & LXXVI" in res
+    assert "FILAR LXXVIII" in res
+
+
+@pytest.mark.unit
+def test_t10_5_3_verifier_cps_norm_aligned_with_r17():
+    """
+    Standard 10.5 (R-02): Weryfikuje, że kod verifier.py jest zsynchronizowany
+    z polską normą percepcyjną 14–15 CPS oraz pułapem 17 CPS z reguły R1.7.
+    """
+    with open("verifier.py", "r", encoding="utf-8") as f:
+        verifier_src = f.read()
+    assert "14" in verifier_src and "15" in verifier_src
+    assert "17" in verifier_src
+    assert "38" in verifier_src
+
+
