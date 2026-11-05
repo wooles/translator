@@ -408,7 +408,7 @@ def test_guard_phase2_enforces_p0_speaker_gender_on_past_tense_shift(
         (
             "Nasz plan...",
             "Our plan...",
-            "Zostanie zrealizowany jutro.",
+            "... zostanie zrealizowany jutro.",
             "Zostanie zrealizowany jutro.",
             "... zostanie zrealizowany jutro."
         ),
@@ -416,7 +416,7 @@ def test_guard_phase2_enforces_p0_speaker_gender_on_past_tense_shift(
         (
             "Gdybyśmy tylko...",
             "If only we...",
-            r"{\i1}Mieli więcej czasu.{\i0}",
+            r"{\i1}... mieli więcej czasu.{\i0}",
             r"{\i1}Mieli więcej czasu.{\i0}",
             r"{\i1}... mieli więcej czasu.{\i0}"
         ),
@@ -701,3 +701,123 @@ def test_t10_1_1_p2b_focused_rules_dialect_and_paraphrase_contrast_prompt():
     assert "PARAFRAZA GWARY" in prompt
     assert "szorstko i potocznie" in prompt
     assert "gładko w polszczyźnie ogólnej" in prompt
+
+# ==============================================================================
+# STANDARD 10.6.2 TESTS (T10.6.2_1 – T10.6.2_4)
+# ==============================================================================
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "prev_f1,prev_f2,curr_en,curr_f1,curr_f2,expected_out",
+    [
+        # Wariant 1: imię własne na początku, poprzednia linia z wielokropkiem
+        ("Ale...", "Ale...", "Alpha?", "Alpho?", "Alpho?", "Alpho?"),
+        # Wariant 2: normalne zdanie pytające
+        ("Anno...", "Anno...", "Do you know something about this?", "Wiesz coś o tym?", "Wiesz coś o tym?", "Wiesz coś o tym?"),
+        # Wariant 3: krótkie potwierdzenie
+        ("Nie przyszłyśmy tu razem...", "Nie przyszłyśmy tu razem...", "I see.", "Rozumiem.", "Rozumiem.", "Rozumiem."),
+        # Wariant 4: pełne imię i nazwisko
+        ("Tak. A pan to...", "Tak. A pan to...?", "Beta Bassett.", "Beta Bassett.", "Beta Bassett.", "Beta Bassett."),
+        # Wariant 5: pojedyncze imię
+        ("To...", "To...", "Gamma?", "Gamma?", "Gamma?", "Gamma?"),
+    ],
+)
+def test_t10_6_2_1_guard_never_injects_ellipsis_when_f1_has_no_leading_ellipsis(
+    prev_f1, prev_f2, curr_en, curr_f1, curr_f2, expected_out
+):
+    """
+    Standard 10.6.2 (FIX-B.1): Weryfikuje, że _guard_phase2_regressions NIE wstrzykuje
+    '... ' ani małej litery na początku linii po linii zakończonej '...', jeśli szkic
+    Fazy 1 (curr_f1) nie zaczynał się od wielokropka.
+    """
+    from verifier import _guard_phase2_regressions
+
+    batch_items = [
+        {
+            "prev_f1": prev_f1,
+            "prev_f2": prev_f2,
+            "curr_en": curr_en,
+            "curr_f1": curr_f1,
+            "curr_f2": curr_f2,
+        }
+    ]
+    result = _guard_phase2_regressions(batch_items)
+    out_text = result[0]["curr_f2"] if isinstance(result, list) else result["curr_f2"]
+    changes_made = result[0].get("changes_made", "") if isinstance(result, list) else result.get("changes_made", "")
+    assert out_text == expected_out
+    assert "Zabezpieczono przed regresją Fazy 2" not in changes_made
+
+
+@pytest.mark.unit
+def test_t10_6_2_2_guard_restores_genuine_split_sentence_ellipsis_from_f1():
+    """
+    Standard 10.6.2 (FIX-B.1): Weryfikuje, że gdy linia 1 kończy się na '...', ORAZ
+    linia 2 w f1 ZACZYNAŁA SIĘ od wielokropka i małej litery, a f2 omyłkowo usunęło
+    wielokropek — tego typu prawdziwa regresja Fazy 2 jest nadal poprawnie przywracana
+    przez strażnika.
+    """
+    from verifier import _guard_phase2_regressions
+
+    batch_items = [
+        {
+            "prev_f1": "Dlatego...",
+            "prev_f2": "Dlatego...",
+            "curr_en": "So I don't need any friends.",
+            "curr_f1": "...nie potrzebuję przyjaciół.",
+            "curr_f2": "Nie potrzebuję przyjaciół.",
+        }
+    ]
+    result = _guard_phase2_regressions(batch_items)
+    out_text = result[0]["curr_f2"] if isinstance(result, list) else result["curr_f2"]
+    assert out_text.startswith("...")
+    assert out_text.lower().lstrip(".").lstrip() == "nie potrzebuję przyjaciół."
+
+
+@pytest.mark.unit
+def test_t10_6_2_3_guard_preserves_proper_noun_capitalization_after_ellipsis():
+    """
+    Standard 10.6.2 (FIX-B.2): Weryfikuje, że nawet gdy f1 zaczyna się od wielokropka
+    przed nazwą własną pisaną wielką literą, strażnik nigdy nie zamienia wielkiej
+    litery A na małą a.
+    """
+    from verifier import _guard_phase2_regressions
+
+    batch_items = [
+        {
+            "prev_f1": "Poczekaj...",
+            "prev_f2": "Poczekaj...",
+            "curr_en": "Alpho?",
+            "curr_f1": "...Alpho?",
+            "curr_f2": "Alpho?",
+        }
+    ]
+    result = _guard_phase2_regressions(batch_items)
+    out_text = result[0]["curr_f2"] if isinstance(result, list) else result["curr_f2"]
+    assert out_text.startswith("...")
+    assert "Alpho" in out_text
+    assert "alpho" not in out_text
+
+
+@pytest.mark.unit
+def test_t10_6_2_4_unchanged_line_has_no_regression_guard_flag():
+    """
+    Standard 10.6.2 (FIX-B.2): Weryfikuje, że gdy f1 == f2, wynik po
+    _guard_phase2_regressions zachowuje pusty powód zmiany (changes_made nie zawiera
+    '[Zabezpieczono przed regresją Fazy 2]').
+    """
+    from verifier import _guard_phase2_regressions
+
+    batch_items = [
+        {
+            "prev_f1": "Wybacz...",
+            "prev_f2": "Wybacz...",
+            "curr_en": "Sorry, Anna.",
+            "curr_f1": "Wybacz, Anno.",
+            "curr_f2": "Wybacz, Anno.",
+        }
+    ]
+    result = _guard_phase2_regressions(batch_items)
+    out_text = result[0]["curr_f2"] if isinstance(result, list) else result["curr_f2"]
+    changes_made = result[0].get("changes_made", "") if isinstance(result, list) else result.get("changes_made", "")
+    assert out_text == "Wybacz, Anno."
+    assert "Zabezpieczono przed regresją Fazy 2" not in changes_made
+

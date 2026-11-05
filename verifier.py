@@ -150,8 +150,8 @@ def enforce_sign_nominative_orthography(
 
 
 def _guard_phase2_regressions(
-    f1_pl: str,
-    refined_pl: str,
+    f1_pl: Union[str, List[Dict[str, Any]]],
+    refined_pl: str = "",
     source_en: str = "",
     speaker_p0_gender: Optional[str] = None,
     target_p0_gender: Optional[str] = None,
@@ -162,21 +162,54 @@ def _guard_phase2_regressions(
     prev_line_pl: Optional[str] = None,
     prev_line_en: Optional[str] = None,
     **kwargs
-) -> str:
+) -> Union[str, List[Dict[str, Any]]]:
     """
     Standard 9.0 Programmatic barrier guarding against Phase 2 stylistic or grammatical regressions (Sekcja 2 pkt 6).
-    5 blocked categories (returning f1_pl whenever violated):
-    1. Honorific form dependent on addressee gender (pan/pani):
-       Preserved from Phase 1 when addressee P0 record does not exist or has has_verified_gender: false.
-    2. Invariable female anthroponym:
-       Preserved in base form from Phase 1.
-    3. Subject person with explicit mediation pronoun in source EN:
-       Preserved 3rd person subject from Phase 1 when source_en has mediation pronouns (he/she/they said/asked).
-    4. Continued dual-voice first part:
-       Preserved verbatim from previous line.
-    5. 1st and 2nd person verb forms matching P0 and EN:
-       Preserved from Phase 1 when Phase 1 was compliant with P0 and EN.
+    Standard 10.6.2 (FIX-B.1, FIX-B.2): Ochrona przed fabrykowaniem wielokropka inicjalnego i utratą wielkich liter.
     """
+    if isinstance(f1_pl, list):
+        results = []
+        for item in f1_pl:
+            c_f1 = str(item.get("curr_f1") or item.get("f1_pl") or item.get("f1_text") or "")
+            c_f2 = str(item.get("curr_f2") or item.get("refined_pl") or item.get("f2_text") or "")
+            c_en = str(item.get("curr_en") or item.get("source_en") or "")
+            p_f1 = item.get("prev_f1") or item.get("prev_line_f1") or item.get("prev_line_pl")
+            p_f2 = item.get("prev_f2") or item.get("prev_line_pl") or p_f1
+            p_en = item.get("prev_en") or item.get("prev_line_en")
+
+            guarded_val = _guard_phase2_regressions(
+                f1_pl=c_f1,
+                refined_pl=c_f2,
+                source_en=c_en,
+                speaker_p0_gender=item.get("speaker_p0_gender") or speaker_p0_gender,
+                target_p0_gender=item.get("target_p0_gender") or target_p0_gender,
+                addressee_p0_record=item.get("addressee_p0_record") or addressee_p0_record,
+                invariable_female_names=item.get("invariable_female_names") or invariable_female_names,
+                prev_line_f1=p_f1,
+                series_bible=item.get("series_bible") or series_bible,
+                prev_line_pl=p_f2,
+                prev_line_en=p_en,
+                **kwargs
+            )
+            item_out = dict(item)
+            item_out["curr_f2"] = guarded_val
+            item_out["refined_pl"] = guarded_val
+
+            changes = item.get("changes_made", "")
+            if guarded_val != c_f2:
+                changes = (changes or "") + " [Zabezpieczono przed regresją Fazy 2]"
+
+            clean_s1 = " ".join(re.sub(r"\{[^}]*\}", "", c_f1).split()).strip()
+            clean_s2 = " ".join(re.sub(r"\{[^}]*\}", "", str(guarded_val or "")).split()).strip()
+            has_ital_f1 = (r"{\i1}" in c_f1)
+            has_ital_ref = (r"{\i1}" in str(guarded_val or ""))
+            if clean_s1 == clean_s2 and has_ital_f1 == has_ital_ref:
+                changes = None
+
+            item_out["changes_made"] = changes or ""
+            results.append(item_out)
+        return results
+
     if not refined_pl:
         return f1_pl or ""
 
@@ -440,38 +473,61 @@ def _guard_phase2_regressions(
         if re_pl_matrix.search(f1_pl) and not re_pl_matrix.search(refined_pl):
             return f1_pl
 
-    # 17. KATEGORIA 17 (Standard 9.4/9.5, 2C.2, 2C.5, R1.10, R3.3): Ochrona ciągłości zdań rozbitych wielokropkiem (ellipsis_continuation_syntax)
-    if prev_line_pl and str(prev_line_pl).strip().endswith("..."):
-        clean_f1_start = re.sub(r"^\{[^}]*\}", "", f1_pl.strip())
-        clean_ref_start = re.sub(r"^\{[^}]*\}", "", refined_pl.strip())
-        if clean_f1_start.startswith("...") or clean_f1_start.startswith("…"):
-            if not clean_ref_start.startswith("...") and not clean_ref_start.startswith("…"):
-                if clean_f1_start.lstrip(". …").strip() == clean_ref_start.lstrip(". …").strip() or (clean_ref_start and clean_ref_start[0].isupper()):
-                    has_ital = (r"{\i1}" in refined_pl and r"{\i0}" in refined_pl)
-                    if has_ital and not f1_pl.startswith(r"{\i1}"):
-                        return r"{\i1}" + f1_pl + (r"{\i0}" if not f1_pl.endswith(r"{\i0}") else "")
-                    return f1_pl
-                else:
-                    m_lead_dots = re.match(r"^(\.\.\.|…)\s*", clean_f1_start)
-                    dots = m_lead_dots.group(1) if m_lead_dots else "..."
-                    has_ital = (r"{\i1}" in refined_pl and r"{\i0}" in refined_pl)
-                    clean_core = re.sub(r"^\{[^}]*\}", "", refined_pl).lstrip()
-                    if has_ital:
-                        return r"{\i1}" + dots + clean_core + (r"{\i0}" if not clean_core.endswith(r"{\i0}") else "")
-                    return dots + clean_core
-        elif not clean_ref_start.startswith("..."):
-            prev_en_clean = str(prev_line_en or "").strip()
-            if not prev_en_clean or not re.search(r"(?<!\.)[.?!]\s*$", prev_en_clean):
-                if refined_pl.startswith(r"{\i1}"):
-                    rest = refined_pl[len(r"{\i1}"):].lstrip()
-                    if rest and rest[0].isupper() and not rest.startswith("I "):
-                        rest = rest[0].lower() + rest[1:]
-                    refined_pl = r"{\i1}... " + rest
-                else:
-                    rest = refined_pl.lstrip()
-                    if rest and rest[0].isupper() and not rest.startswith("I "):
-                        rest = rest[0].lower() + rest[1:]
-                    refined_pl = "... " + rest
+    # 17. KATEGORIA 17 (Standard 9.4/9.5, 2C.2, 2C.5, R1.10, R3.3; Standard 10.6.2, 2B.1, 2B.2):
+    # Ochrona ciągłości zdań rozbitych wielokropkiem (ellipsis_continuation_syntax)
+    effective_prev_line = prev_line_pl or prev_line_f1
+    prev_s_clean = str(effective_prev_line).strip() if effective_prev_line else ""
+    prev_has_dots = prev_s_clean.endswith("...") or prev_s_clean.endswith("…")
+
+    clean_f1_start = re.sub(r"^(?:\{[^}]*\}|<[^>]*>|\s+)+", "", str(f1_pl or "").strip())
+    clean_ref_start = re.sub(r"^(?:\{[^}]*\}|<[^>]*>|\s+)+", "", str(refined_pl or "").strip())
+    f1_has_dots = clean_f1_start.startswith("...") or clean_f1_start.startswith("…")
+    ref_has_dots = clean_ref_start.startswith("...") or clean_ref_start.startswith("…")
+
+    clean_en_start = re.sub(r"^(?:\{[^}]*\}|<[^>]*>|\s+)+", "", str(source_en or "").strip())
+    en_has_dots = clean_en_start.startswith("...") or clean_en_start.startswith("…")
+    en_starts_lower = clean_en_start[0].islower() if clean_en_start else False
+
+    # 17a (Standard 10.6.2, FIX-B.1, FIX-B.2): Przywrócenie wielokropka inicjalnego WYŁĄCZNIE gdy Faza 1 go posiadała
+    if prev_has_dots and f1_has_dots and not ref_has_dots:
+        m_lead_dots = re.match(r"^(\.\.\.|…)\s*", clean_f1_start)
+        dots_spacing = m_lead_dots.group(0) if m_lead_dots else "... "
+        after_f1_dots = clean_f1_start[len(m_lead_dots.group(0)):].strip() if m_lead_dots else clean_f1_start.lstrip(". …").strip()
+        f1_is_upper = after_f1_dots[0].isupper() if after_f1_dots else False
+        f1_is_lower = after_f1_dots[0].islower() if after_f1_dots else False
+
+        m_tags_ref = re.match(r"^(?:\{[^}]*\}|<[^>]*>|\s+)+", str(refined_pl or ""))
+        ref_tag_prefix = m_tags_ref.group(0) if m_tags_ref else ""
+        ref_content = str(refined_pl or "")[len(ref_tag_prefix):].strip()
+
+        if ref_content:
+            if f1_is_upper:
+                ref_content = ref_content[0].upper() + ref_content[1:]
+            elif f1_is_lower:
+                ref_content = ref_content[0].lower() + ref_content[1:]
+
+        has_ital = (r"{\i1}" in refined_pl and r"{\i0}" in refined_pl)
+        if clean_f1_start.lstrip(". …").strip().lower() == clean_ref_start.lstrip(". …").strip().lower():
+            if has_ital and not str(f1_pl or "").startswith(r"{\i1}"):
+                return r"{\i1}" + str(f1_pl or "") + (r"{\i0}" if not str(f1_pl or "").endswith(r"{\i0}") else "")
+            if f1_pl:
+                return f1_pl
+
+        refined_pl = ref_tag_prefix + dots_spacing + ref_content
+
+    # 17b (Standard 10.6.2, FIX-B.1, FIX-B.2): Eliminacja fałszywego wielokropka dodanego przez model w Fazie 2
+    elif not f1_has_dots and ref_has_dots:
+        f1_char = clean_f1_start[0] if clean_f1_start else ""
+        if f1_char.isupper() and not en_has_dots and not en_starts_lower:
+            m_lead_dots_ref = re.match(r"^(\.\.\.|…)\s*", clean_ref_start)
+            ref_after_dots = clean_ref_start[len(m_lead_dots_ref.group(0)):].strip() if m_lead_dots_ref else clean_ref_start.lstrip(". …").strip()
+            if ref_after_dots:
+                ref_restored = ref_after_dots[0].upper() + ref_after_dots[1:]
+            else:
+                ref_restored = clean_f1_start
+            m_tags_ref = re.match(r"^(?:\{[^}]*\}|<[^>]*>|\s+)+", str(refined_pl or ""))
+            ref_tag_prefix = m_tags_ref.group(0) if m_tags_ref else ""
+            refined_pl = ref_tag_prefix + ref_restored
 
     # 18. KATEGORIA 18 (Standard 9.4, 2C.2, R3.3): Ochrona trybu przypuszczającego i modalności 1. os. lp. (first_person_modal_and_conditional_loss)
     re_1st_cond = re.compile(r"\b[a-ząćęłńóśźż]+(?:łbym|łabym|bym)\b", re.IGNORECASE)
