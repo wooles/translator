@@ -15,6 +15,9 @@ Features:
 
 import os
 import sys
+import logging
+
+logger = logging.getLogger("translator")
 
 # Force full UTF-8 support (including Japanese Kanji/Kana characters)
 if sys.platform == "win32":
@@ -23,14 +26,14 @@ if sys.platform == "win32":
         ctypes.windll.kernel32.SetConsoleOutputCP(65001)
         ctypes.windll.kernel32.SetConsoleCP(65001)
     except Exception:
-        pass
+        logger.debug("Operacja ustawienia strony kodowej konsoli zakończona wyjątkiem", exc_info=True)
     try:
         if hasattr(sys.stdout, "reconfigure"):
             sys.stdout.reconfigure(encoding="utf-8", errors="replace")
         if hasattr(sys.stderr, "reconfigure"):
             sys.stderr.reconfigure(encoding="utf-8", errors="replace")
     except Exception:
-        pass
+        logger.debug("Operacja rekonfiguracji strumieni konsoli zakończona wyjątkiem", exc_info=True)
 
 import re
 import time
@@ -415,7 +418,7 @@ def detect_event_visual_type(event: pysubs2.SSAEvent, ts_prefix: str = "", style
             is_sign = True
             details.append("VisualSignDetector.detect_signs")
     except Exception:
-        pass
+        logger.debug("Wizualna detekcja napisów zakończona wyjątkiem", exc_info=True)
 
     style_lower = (event.style or "").lower()
     name_lower = (event.name or "").lower()
@@ -2807,7 +2810,7 @@ class MultimodalTranslator:
                 if tm_examples:
                     lines.append(format_translation_memory_for_prompt(tm_examples))
             except Exception:
-                pass
+                logger.debug("Formatowanie pamięci tłumaczeniowej zakończone wyjątkiem", exc_info=True)
 
         # 1. Just-In-Time Character Scoping (Scene-level isolation - Anti-Saturation)
         if self.character_registry:
@@ -3718,14 +3721,14 @@ class MultimodalTranslator:
                     )
                     temp_frames.append(frame_path)
                 except Exception:
-                    pass
+                    logger.debug("Zapis klatki referencyjnej zakończony wyjątkiem", exc_info=True)
 
             for fpath in temp_frames:
                 try:
                     img = Image.open(fpath)
                     image_contents.append(img)
                 except Exception:
-                    pass
+                    logger.debug("Wczytanie klatki obrazu zakończone wyjątkiem", exc_info=True)
 
         # 2b. Extract audio slice and run LOCAL Whisper transcription + Prosody + Diarization (100% offline)
         temp_audio_file = None
@@ -3856,7 +3859,7 @@ class MultimodalTranslator:
                     whisper_results=whisper_transcriptions
                 )
             except Exception:
-                pass
+                logger.debug("Zapis zdarzenia rejestratora fazy 1 zakończony wyjątkiem", exc_info=True)
 
         # 3. Dynamic contextual rules, user golden feedback, and deterministic glossary
         batch_en_queries = [item[2] for item in untranslated_in_batch]
@@ -3966,7 +3969,7 @@ class MultimodalTranslator:
                     response_time_sec=0.0
                 )
             except Exception:
-                pass
+                logger.debug("Rejestracja odpowiedzi modelu zakończona wyjątkiem", exc_info=True)
 
         # Update global Character Registry with thread lock and safe registration
         with self.lock:
@@ -4675,7 +4678,7 @@ class MultimodalTranslator:
                         raw_response=[r.model_dump() if hasattr(r, "model_dump") else (r.dict() if hasattr(r, "dict") else str(r)) for r in refined_lines]
                     )
                 except Exception:
-                    pass
+                    logger.debug("Rejestracja weryfikacji w locie zakończona wyjątkiem", exc_info=True)
 
             any_redaction_printed = False
             for r in refined_lines:
@@ -4858,7 +4861,7 @@ class MultimodalTranslator:
                         fixes_applied=fixes + gloss_fixes + alias_fixes
                     )
                 except Exception:
-                    pass
+                    logger.debug("Rejestracja wyników lintera zakończona wyjątkiem", exc_info=True)
 
             eff_reg = refined_region_dict.get(item["id"]) or item.get("screen_region")
             if eff_reg:
@@ -4944,7 +4947,7 @@ class MultimodalTranslator:
                     client_pool_info={"active_clients": len(getattr(self.client_pool, "clients", [1])) if getattr(self, "client_pool", None) else 1}
                 )
             except Exception:
-                pass
+                logger.debug("Inicjalizacja rejestratora zdarzeń zakończona wyjątkiem", exc_info=True)
 
         is_ass = not str(subs_file).lower().endswith(".srt")
 
@@ -4980,7 +4983,7 @@ class MultimodalTranslator:
                     events_classified=classified_sample
                 )
             except Exception:
-                pass
+                logger.debug("Rejestracja profilu stylów zakończona wyjątkiem", exc_info=True)
 
         # 0. Retrieve anime metadata from AniList (with Gemini Parametric Knowledge Fallback)
         ref_filename = video_path if video_path else subs_path
@@ -5063,7 +5066,7 @@ class MultimodalTranslator:
                     actor_mappings=actor_map
                 )
             except Exception:
-                pass
+                logger.debug("Rejestracja metadanych serii zakończona wyjątkiem", exc_info=True)
 
         # 1. Clean events and compress frame-by-frame animations (FBF Animation Deduplication)
         raw_all_entries = []
@@ -5198,7 +5201,7 @@ class MultimodalTranslator:
                                 found_checkpoint_path = cand
                                 break
                 except Exception:
-                    pass
+                    logger.debug("Odczyt punktu kontrolnego zakończony wyjątkiem", exc_info=True)
 
         if restored_f1_tokens and isinstance(restored_f1_tokens, dict):
             for k in ["prompt", "cached", "output"]:
@@ -5259,7 +5262,7 @@ class MultimodalTranslator:
                     profile_brief=episode_profile_str
                 )
             except Exception:
-                pass
+                logger.debug("Rejestracja profilu odcinka zakończona wyjątkiem", exc_info=True)
 
         # 0b. Initialize and load Series Bible (Cross-Episode Continuity)
         series_title = ""
@@ -5455,7 +5458,7 @@ class MultimodalTranslator:
                     declensions=decl_dict
                 )
             except Exception:
-                pass
+                logger.debug("Rejestracja bazy wiedzy serii zakończona wyjątkiem", exc_info=True)
 
         user_rules_cnt = len(self.user_feedback.list_all())
         user_feedback_str = self.user_feedback.format_for_prompt()
@@ -5566,7 +5569,7 @@ class MultimodalTranslator:
                     if self.enable_verifier and self.verifier:
                         ContextCacheManager.get_or_create_cache(client=c, model=self.verifier.model, system_instruction=self.verifier.system_prompt, tag="verifier")
             except Exception:
-                pass
+                logger.debug("Rozgrzewanie pamięci podręcznej kontekstu zakończone wyjątkiem", exc_info=True)
         else:
             print(f"  [Autozapis]: Wszystkie kwestie dialogowe ({len(translated_results)}) wczytane z checkpointu. Pomijanie rozgrzewania API.")
 
@@ -5627,7 +5630,7 @@ class MultimodalTranslator:
                     batches_summary=batches_sum
                 )
             except Exception:
-                pass
+                logger.debug("Rejestracja struktury dyskursu zakończona wyjątkiem", exc_info=True)
 
         with tqdm(
             total=total_lines,
@@ -5739,7 +5742,7 @@ class MultimodalTranslator:
                                         with open(checkpoint_path, "w", encoding="utf-8") as cp_file:
                                             json.dump(checkpoint_payload, cp_file, ensure_ascii=False)
                                     except Exception:
-                                        pass
+                                        logger.debug("Zapis punktu kontrolnego zakończony wyjątkiem", exc_info=True)
 
                                     if b_cot:
                                         pbar.set_postfix_str(f"{b_cot}...")
@@ -5758,7 +5761,7 @@ class MultimodalTranslator:
                                         ]
                                         progress_callback(len(translated_results), total_lines, recent_prev, cur_c)
                                     except Exception:
-                                        pass
+                                        logger.debug("Wywołanie funkcji postępu zakończone wyjątkiem", exc_info=True)
                             except Exception as e:
                                 pbar.write(f" 🔴 [Niepowodzenie Paczki]: {format_friendly_api_error(e)}")
                                 pbar.refresh()
@@ -5835,7 +5838,7 @@ class MultimodalTranslator:
                                     with open(checkpoint_path, "w", encoding="utf-8") as cp_file:
                                         json.dump(checkpoint_payload, cp_file, ensure_ascii=False)
                                 except Exception:
-                                    pass
+                                    logger.debug("Zapis punktu kontrolnego zakończony wyjątkiem", exc_info=True)
                                 if b_cot:
                                     pbar.set_postfix_str(f"{b_cot}...")
                                 pbar.update(len(untrans_items))
@@ -5853,7 +5856,7 @@ class MultimodalTranslator:
                                     ]
                                     progress_callback(len(translated_results), total_lines, recent_prev, cur_c)
                                 except Exception:
-                                    pass
+                                    logger.debug("Wywołanie funkcji postępu zakończone wyjątkiem", exc_info=True)
                         except Exception as e:
                             pbar.write(f" 🔴 [Niepowodzenie Paczki]: {format_friendly_api_error(e)}")
                             pbar.refresh()
@@ -5912,7 +5915,7 @@ class MultimodalTranslator:
                                 ]
                                 progress_callback(len(translated_results), total_lines, recent_prev, cur_c)
                             except Exception:
-                                pass
+                                logger.debug("Wywołanie funkcji postępu zakończone wyjątkiem", exc_info=True)
                     except Exception as h_err:
                         pbar.write(f"  [Zero-Gap Guard]: Niepowodzenie paczki uzupełniającej ({h_err}). Próba ratunkowa linijka po linijce...")
                         pbar.refresh()
@@ -6041,7 +6044,7 @@ class MultimodalTranslator:
                             if not getattr(item_ts_data, "screen_region", None) and item_region:
                                 setattr(item_ts_data, "screen_region", item_region)
                         except Exception:
-                            pass
+                            logger.debug("Przypisanie regionu ekranowego zakończone wyjątkiem", exc_info=True)
 
                     ts_prefix_applied = TypesettingColorMatcher.generate_pixel_perfect_ass_tags(
                         typesetting_data=item_ts_data,
@@ -6239,9 +6242,9 @@ class MultimodalTranslator:
                         cost_pln=actual_cost_pln
                     )
                 except Exception:
-                    pass
+                    logger.debug("Kalkulacja kosztów końcowych zakończona wyjątkiem", exc_info=True)
         except Exception:
-            pass
+            logger.debug("Finalizacja rozliczenia zadania zakończona wyjątkiem", exc_info=True)
 
         if self.flight_recorder:
             try:
@@ -6252,7 +6255,7 @@ class MultimodalTranslator:
                 )
                 self.flight_recorder.finalize()
             except Exception:
-                pass
+                logger.debug("Finalizacja rejestratora zdarzeń zakończona wyjątkiem", exc_info=True)
 
         # Clean up server-side Context Cache objects across all clients in the pool to avoid storage fees
         try:
@@ -6265,7 +6268,7 @@ class MultimodalTranslator:
             if self.verifier and hasattr(self.verifier, "client") and self.verifier.client != self.client:
                 ContextCacheManager.cleanup_all_active_caches(self.verifier.client)
         except Exception:
-            pass
+            logger.debug("Czyszczenie aktywnych obiektów pamięci podręcznej zakończone wyjątkiem", exc_info=True)
 
         return output_path
 

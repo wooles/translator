@@ -78,3 +78,38 @@ The AVT Pipeline core architecture enhancement operates across 5 defensive layer
 - Stream 4 (AGENT-4): `translator.py`, `avt_linter.py` (exclusive write).
 - Stream 5 (AGENT-5): `test_system.py` (exclusive write).
 - Quality Gate (Reviewers / Challengers / Auditor): Read-only on source files, writes to their respective `.agents/teamwork/` metadata directories.
+
+---
+
+## 📦 Moduły Runtime Potoku (30 plików `.py`)
+Potok produkcyjny opiera się dokładnie na 30 aktywnych modułach runtime:
+1. `avt_formatter.py` — Formater wyjścia napisów dialogowych i technicznych.
+2. `avt_linter.py` — Deterministyczny silnik lintera reguł AVT i bramka jakości.
+3. `client_factory.py` — Fabryka i rotacja klientów API modeli LLM.
+4. `context_cache.py` — Inteligentny menedżer pamięci podręcznej kontekstu Gemini API.
+5. `extract.py` — Ekstrakcja ścieżek audio, dialogowych i metadanych z kontenerów wideo.
+6. `fansub_miner.py` — Ekstrakcja i mining wiedzy ze społecznościowych leksykonów fansubberskich.
+7. `glossary_manager.py` — Menedżer glosariuszy terminologicznych i nazw własnych.
+8. `main.py` — Główny punkt wejścia CLI i orkiestrator potoku.
+9. `manga_canon.py` — Integracja oficjalnego polskiego kanonu mangowego.
+10. `memory.py` — Pomocnicze struktury pamięci operacyjnej i buforowania.
+11. `metadata.py` — Pobieranie i normalizacja metadanych serii i odcinków.
+12. `model_resolver.py` — Rozpoznawanie i dynamiczny routing modeli.
+13. `pipeline_logger.py` — Rejestrator zdarzeń potoku (zawiera również klasę `FlightRecorder`).
+14. `pricing_guard.py` — Strażnik budżetu i estymacja kosztów API.
+15. `profiler.py` — Profiler akustyczny i triangulacja cech mówców.
+16. `prosody_engine.py` — Silnik analizy prozodii mowy i energii akustycznej.
+17. `romaji_helper.py` — Normalizacja i transkrypcja form romaji/kana.
+18. `rules.py` — Baza reguł tłumaczeniowych, filary AVT i kategorie dynamiczne.
+19. `scene_discourse.py` — Graf dyskursu scenicznego, topologia tur i monologu.
+20. `scene_snapper.py` — Analiza cięć montażowych i izolacji scen.
+21. `series_memory.py` — Ontologiczna pamięć długoterminowa serii i rejestr bytów.
+22. `sign_detector.py` — Detekcja i klasyfikacja napisów ekranowych oraz stylów ASS.
+23. `speaker_diarizer.py` — Diaryzacja i śledzenie tożsamości mówców.
+24. `style_matrix.py` — Macierz stylów rejestru mowy i relacji społecznych.
+25. `translator.py` — Główny silnik tłumaczeniowy LLM i orkiestracja faz.
+26. `typesetting_matcher.py` — Dopasowywanie i zachowywanie formatowania ASS.
+27. `user_feedback.py` — Menedżer informacji zwrotnej operatora.
+28. `verifier.py` — Weryfikator poprawności i strażnik Fazy 2.
+29. `whisper_disambiguator.py` — Rozstrzyganie niejednoznaczności transkrypcyjnych Whisper.
+30. `whisper_engine.py` — Silnik transkrypcji ASR Whisper.

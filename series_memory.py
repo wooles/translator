@@ -14,7 +14,10 @@ import copy
 import shutil
 import unicodedata
 import functools
+import logging
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 from typing import Dict, List, Any, Optional, Set, Tuple, Union, Literal
 from collections import Counter, defaultdict
 from pydantic import BaseModel, Field, ConfigDict
@@ -829,7 +832,7 @@ def classify_entity_category(
             try:
                 return EntityCategory(saved_cat)
             except Exception:
-                pass
+                logger.warning("Odczyt kategorii bytu zakończony wyjątkiem", exc_info=True)
 
     # 3. Contextual evaluation: origin / geographic constructions
     if context:
@@ -1905,9 +1908,9 @@ def _load_dynamic_boy_keywords() -> List[str]:
                                             if len(tok) >= 4 and tok not in keywords:
                                                 keywords.append(tok)
                 except Exception:
-                    pass
+                    logger.warning("Ekstrakcja słów kluczowych encji zakończona wyjątkiem", exc_info=True)
     except Exception:
-        pass
+        logger.warning("Ekstrakcja słów kluczowych leksykonu zakończona wyjątkiem", exc_info=True)
     return keywords
 
 
@@ -3789,7 +3792,7 @@ def _get_dynamic_canon_compound_oblique_corrections() -> List[Tuple[str, str]]:
                                 if len(tokens) == 2 and tokens[0][0].isupper() and tokens[1][0].isupper():
                                     candidate_terms.append(v)
                 except Exception:
-                    pass
+                    logger.warning("Ekstrakcja dwutokenowych nazw własnych zakończona wyjątkiem", exc_info=True)
 
         seen = set()
         for v in candidate_terms:
@@ -3831,7 +3834,7 @@ def _get_dynamic_canon_compound_oblique_corrections() -> List[Tuple[str, str]]:
                 pat_ms = rf"\b([Oo]|[Pp]rzy)\s+(?:{m}|{t0_ms}\s+{t1_m}|{t0_m}\s+{t1_ms})\b"
                 corrections.append((pat_ms, rf"\1 {ms_c}"))
     except Exception:
-        pass
+        logger.warning("Generowanie dynamicznych korekt przypadków zależnych zakończone wyjątkiem", exc_info=True)
     _DYNAMIC_CANON_OBLIQUE_CORRECTIONS = corrections
     return _DYNAMIC_CANON_OBLIQUE_CORRECTIONS
 
@@ -3871,7 +3874,7 @@ def _get_dynamic_manga_canon_anti_calque_patterns() -> List[Tuple[str, str]]:
                                         pat_alt = rf"(^|[^\w]|\\[Nnh]){re.escape(c1)}\s+od\s+{re.escape(alt_c2)}\b"
                                         patterns.append((re.compile(pat_alt), repl))
     except Exception:
-        pass
+        logger.warning("Generowanie dynamicznych wzorców antykalkowych zakończone wyjątkiem", exc_info=True)
     _DYNAMIC_CANON_ANTI_CALQUES = patterns
     return _DYNAMIC_CANON_ANTI_CALQUES
 
@@ -4271,9 +4274,9 @@ def _load_dynamic_fantasy_toponyms() -> Set[str]:
                             if k not in chars_set and k_l not in rel_participants and k_norm not in rel_participants and k_ascii not in rel_participants:
                                 toponyms.add(k_l)
                 except Exception:
-                    pass
+                    logger.warning("Klasyfikacja toponimu ze słownika zakończona wyjątkiem", exc_info=True)
     except Exception:
-        pass
+        logger.warning("Pozyskiwanie toponimów z bazy wiedzy zakończone wyjątkiem", exc_info=True)
     return toponyms
 
 
@@ -4962,7 +4965,7 @@ class SeriesBible:
                 try:
                     self._rebuild_actor_aliases_index()
                 except Exception:
-                    pass
+                    logger.warning("Odbudowa indeksu aliasów aktora zakończona wyjątkiem", exc_info=True)
 
     def get_characters_snapshot(self) -> Dict[str, Any]:
         with self._lock:
@@ -5011,7 +5014,7 @@ class SeriesBible:
                 try:
                     return CharacterIdentity(**raw)
                 except Exception:
-                    pass
+                    logger.warning("Inicjalizacja tożsamości postaci zakończona wyjątkiem", exc_info=True)
 
             # Kanoniczne dziedziczenie dla prefiksów wiekowych, czasowych i stanowych
             base_name = extract_base_canonical_name(clean_id)
@@ -5029,7 +5032,7 @@ class SeriesBible:
                     try:
                         base_id = CharacterIdentity(**base_raw)
                     except Exception:
-                        pass
+                        logger.warning("Inicjalizacja bazowej tożsamości postaci zakończona wyjątkiem", exc_info=True)
 
                 if base_id:
                     inherited_decl = self.get_declension_paradigm(clean_id)
@@ -5311,7 +5314,7 @@ class SeriesBible:
                     self._sanitize_bible_integrity()
                     self._sanitize_loaded_bible_in_ram()
                 except Exception:
-                    pass
+                    logger.warning("Wczytanie i integracja bazy nadrzędnej zakończona wyjątkiem", exc_info=True)
 
             # Auto-integrate verified Fansub Canon Lexicon from fansub_miner (0.00 PLN)
             try:
@@ -5332,7 +5335,7 @@ class SeriesBible:
                                 if ek not in self.data["glossary"]:
                                     self.data["glossary"][ek] = t_val["canonical_pl"]
             except Exception:
-                pass
+                logger.warning("Integracja leksykonu fansubberskiego zakończona wyjątkiem", exc_info=True)
 
             self._sanitize_loaded_bible_in_ram()
 
@@ -6760,7 +6763,7 @@ class SeriesBible:
                 try:
                     self.save()
                 except Exception:
-                    pass
+                    logger.warning("Zapis zmodyfikowanej bazy serii zakończony wyjątkiem", exc_info=True)
 
             # 8. Bezwarunkowa synchronizacja klucza "gender" i regeneracja paradygmatów FEMALE w declensions (Operacje H2 i H5)
             decl_dict = self.data.setdefault("declensions", {})
@@ -7323,7 +7326,7 @@ class SeriesBible:
                 if art_p and art_p.parent.exists():
                     shutil.copy2(self.file_path, art_p)
             except Exception:
-                pass
+                logger.warning("Kopia bazy wiedzy do artefaktów zakończona wyjątkiem", exc_info=True)
 
     def register_episode_execution(
         self,
@@ -9405,5 +9408,5 @@ def sanitize_all_series_bibles(storage_dir: Optional[Path] = None) -> int:
             bible.save()
             count += 1
         except Exception:
-            pass
+            logger.warning("Inicjalizacja i zapis bazy serii zakończone wyjątkiem", exc_info=True)
     return count

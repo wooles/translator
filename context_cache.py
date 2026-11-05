@@ -137,6 +137,14 @@ class ContextCacheManager:
                 logger.debug(f"[Context Cache]: Error listing/cleaning cache: {e}")
 
             # 3. Create a new cache on Google servers - max 2 attempts with micro-wait
+            estimated_tokens = len(system_instruction) // 4
+            if estimated_tokens < 4096:
+                logger.debug(
+                    "Pominięto tworzenie cache Gemini: oszacowany rozmiar (%d tokenów) poniżej progu 4096 tokenów",
+                    estimated_tokens,
+                )
+                return None
+
             create_attempt = 0
             while create_attempt < 2:
                 create_attempt += 1
