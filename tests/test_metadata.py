@@ -176,3 +176,27 @@ def test_get_anime_context_offline_bible(anime_title):
     assert "genres" in ctx
     assert "characters" in ctx
     assert len(ctx["characters"]) >= 2
+
+# ==============================================================================
+# STANDARD 10.6.3 REGRESSION TESTS (T10.6.3_1)
+# ==============================================================================
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "title,expected_base,expected_season",
+    [
+        ("Synthetic Anime Base II", "synthetic_anime_base", 2),
+        ("Synthetic Anime Base S2", "synthetic_anime_base", 2),
+        ("Synthetic Anime Base Season 2", "synthetic_anime_base", 2),
+        ("Synthetic Anime Base 2nd Season", "synthetic_anime_base", 2),
+        ("Synthetic Anime Base III", "synthetic_anime_base", 3),
+        ("Synthetic Anime Base S3", "synthetic_anime_base", 3),
+        ("Synthetic Anime Base", "synthetic_anime_base", None),
+        ("Synthetic Anime Base Final Season", "synthetic_anime_base", None),
+    ],
+)
+def test_t10_6_3_1_extract_canonical_series_and_season(title, expected_base, expected_season):
+    from metadata import extract_canonical_series_and_season
+    base, season = extract_canonical_series_and_season(title)
+    assert base == expected_base
+    assert season == expected_season
+

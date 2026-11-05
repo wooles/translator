@@ -649,3 +649,85 @@ def format_anime_context_for_prompt(meta: Dict[str, Any]) -> str:
 
     lines.append("====================================================================\n")
     return "\n".join(lines)
+
+
+_ROMAN_SEASON_MAP: Dict[str, int] = {
+    "I": 1, "II": 2, "III": 3, "IV": 4, "V": 5,
+    "VI": 6, "VII": 7, "VIII": 8, "IX": 9, "X": 10,
+}
+
+
+def extract_canonical_series_and_season(title: str) -> Tuple[str, Optional[int]]:
+    """
+    Mapuje tytuł serii (z lub bez sufiksu sezonu) na kanoniczną parę (base_slug, season_num).
+
+    Przykłady:
+        "<SERIA_BASE> II"          -> ("<base_slug>", 2)
+        "<SERIA_BASE> S2"          -> ("<base_slug>", 2)
+        "<SERIA_BASE> Season 2"    -> ("<base_slug>", 2)
+        "<SERIA_BASE> 2nd Season"  -> ("<base_slug>", 2)
+        "<SERIA_BASE>"             -> ("<base_slug>", None)
+        "<SERIA_BASE> Final Season"-> ("<base_slug>", None)
+
+    Nie obcina base_slug do 50 znaków i nie stosuje destrukcyjnej reguły
+    3-tokenowego 'no' (cecha normalize_anime_slug).
+    """
+    if not title or not isinstance(title, str):
+        return ("", None)
+    raw = title.strip()
+    if raw.lower().endswith("_bible.json"):
+        raw = raw[:-11]
+    elif raw.lower().endswith("_bible"):
+        raw = raw[:-6]
+
+    target = re.sub(r"\.(?:mkv|mp4|avi|ts|ass|srt|m4v|flv|json)$", "", raw, flags=re.IGNORECASE).strip()
+    target = re.sub(r"^\[[^\]]+\]\s*", "", target)
+    target = re.sub(
+        r"\s*\[(?:1080p|720p|480p|2160p|4K|HEVC|x264|x265|AAC|FLAC|[0-9a-fA-F]{8})[^\]]*\]\s*$",
+        "",
+        target,
+        flags=re.IGNORECASE,
+    )
+    target = re.sub(
+        r"\s*\((?:1080p|720p|480p|2160p|4K|HEVC|x264|x265|AAC|FLAC)\)\s*$",
+        "",
+        target,
+        flags=re.IGNORECASE,
+    )
+    target_norm = target.replace("_", " ").strip()
+
+    season_num: Optional[int] = None
+    cleaned = target_norm
+
+    season_extract_patterns = [
+        (r"[\s\-_:]*[\(\[]\s*(?:Season|Part|Cour)\s*(\d+|[IVXLCDM]+)\s*[\)\]]\s*$", "num_or_roman"),
+        (r"[\s\-_:]*[\(\[]\s*(\d+)(?:st|nd|rd|th)\s+(?:Season|Cour|Part)\s*[\)\]]\s*$", "int"),
+        (r"[\s\-_:]*[\(\[]\s*S0?(\d+)\s*[\)\]]\s*$", "int"),
+        (r"[\s\-_:]+\bS0?(\d+)(?:E\d+)?\b\s*$", "int"),
+        (r"[\s\-_:]+\b(?:Season|Part|Cour)\s*(\d+|[IVXLCDM]+)\b\s*$", "num_or_roman"),
+        (r"[\s\-_:]+\b(\d+)(?:st|nd|rd|th)\s+(?:Season|Part|Cour)\b\s*$", "int"),
+        (r"[\s\-_:]+\b(?:The\s+)?Final\s+Season\b\s*$", "none"),
+        (r"[\s\-_:]+\b(II|III|IV|V|VI|VII|VIII|IX|X)\b\s*$", "roman"),
+    ]
+    for pat, kind in season_extract_patterns:
+        m = re.search(pat, cleaned, flags=re.IGNORECASE)
+        if m:
+            if kind == "int":
+                season_num = int(m.group(1))
+            elif kind == "roman":
+                season_num = _ROMAN_SEASON_MAP.get(m.group(1).upper())
+            elif kind == "num_or_roman":
+                tok = m.group(1).upper()
+                season_num = int(tok) if tok.isdigit() else _ROMAN_SEASON_MAP.get(tok)
+            elif kind == "none":
+                season_num = None
+            cleaned = cleaned[: m.start()].strip()
+            break
+
+    cleaned = re.sub(r"[\s\-_:]+$", "", cleaned).strip()
+    nfkd = unicodedata.normalize("NFKD", cleaned)
+    ascii_str = "".join(c for c in nfkd if not unicodedata.combining(c))
+    base_slug = re.sub(r"[^\w\s-]", "", ascii_str, flags=re.UNICODE).strip().lower()
+    base_slug = re.sub(r"[-\s_]+", "_", base_slug)
+    return (base_slug, season_num)
+

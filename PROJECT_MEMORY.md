@@ -185,3 +185,46 @@ Regex detekcji to **wewnętrzny mechanizm selekcji** (`True`/`False`), a nie **t
 ### Priorytet
 
 **Niski (P2).** N-05 nie blokuje 10.4 ani kolejnych hotfixów. Może zostać odłożone do 11.0 lub pominięte, jeśli priorytety się zmienią.
+
+
+## Backlog 11.0 — N-06: Kolizja homonimiczna TOPONYM vs ANTHROPONYM (<NAZWA_SZKOŁY_1>)
+
+**Status:** `OPEN` (P2, dług techniczny w telemetrii, nie wpływa na tekst wyjściowy .ass po 10.6.1, nie blokuje 10.6.3)
+**Zidentyfikowano:** `Raport_audytu_arnold_toponym_i_duplikacji_bible.md` (2026-11-05, Defekt C)
+
+### Problem
+
+W `series_bible` token `<NAZWA_SZKOŁY_1>` istnieje wyłącznie jako jednowyrazowy alias nazwiska rekordu ANTHROPONYM `<NAZWA_POSTACI_1>`, a nie jako osobny wpis TOPONYM w `entity_categories`. W efekcie `is_non_character_entity("<NAZWA_SZKOŁY_1>")` (`series_memory.py:8606–8617`) zwraca `False`, a telemetria w kwestii z `relations with <NAZWA_SZKOŁY_1>` przypisuje `Adresat: <NAZWA_SZKOŁY_1> (FEMININE)`.
+
+### Rozwiązanie (11.0)
+
+Wdrożenie operacji `FIX-C.1` (ekstrakcja nazw instytucji/lokacji z opisu serii do `entity_categories` jako `TOPONYM`), `FIX-C.2` (odpięcie kolidującego jednowyrazowego aliasu nazwiska w kroku `8f` `_sanitize_loaded_bible_in_ram`) oraz `FIX-C.3` (kontekstowa ochrona przyimków lokatywnych/relacyjnych w `is_non_character_entity`).
+
+
+## Backlog 11.0 — N-07: Adresowanie mówców tłumu Mob* i rozbijanie identyfikatorów CamelCase
+
+**Status:** `OPEN` (P2, dług techniczny w telemetrii, nie wpływa na tekst wyjściowy .ass, nie blokuje 10.6.3)
+**Zidentyfikowano:** `Raport_audytu_arnold_toponym_i_duplikacji_bible.md` (2026-11-05, Defekt E)
+
+### Problem
+
+1. `populate_secondary_actor_tags` (`series_memory.py:6941`) używa `re.findall(r"\b\w+\b", clean_tag.lower())`, co nie dzieli identyfikatorów CamelCase (`<GRUPA_TŁUMU_1>` typu `MobMan2`, `MobWoman`, `MeanGirl`), przez co mówcy tłumu otrzymują w `series_bible` `gender: "UNKNOWN"`.
+2. W `scene_discourse.py` (`resolve_turn_addressee`) przy braku zweryfikowanej płci poprzedniego mówcy tłumu Forward Lookahead przypisuje jako adresata mówcę kolejnej sceny po cięciu montażowym (`<BYT_KRÓLEWSKI_1>`).
+
+### Rozwiązanie (11.0)
+
+Wdrożenie operacji `FIX-E.1` (rozbijanie granic CamelCase i cyfr przed klasyfikacją leksykalną w `populate_secondary_actor_tags`) oraz `FIX-E.2` (izolacja mówców `Mob*`/`Crowd*` w `resolve_turn_addressee` przy braku wykładników 2. osoby).
+
+
+## Backlog 11.0 — N-08: Historyczne rozszczepienie odcinka S2-02 w pliku bazowym <SERIA_BASE>_bible.json
+
+**Status:** `OPEN` (P3, historyczny artefakt w metadanych `episodes_translated`, nie wpływa na jakość tłumaczenia, nie blokuje 10.6.3)
+**Zidentyfikowano:** `Raport_audytu_weryfikacyjnego_10_6_3_defekt_D.md` oraz aneks uzupełniający (2026-11-05)
+
+### Problem
+
+Przed naprawą `_resolve_bible_path` w 10.6.3 (`FIX-D.1`) odcinek `S2 - 02` serii `<SERIA_BASE>` został zapisany w pliku `<SERIA_BASE>_bible.json` (`season_num=None`), podczas gdy odcinek `S2 - 01` zapisał się w `<SERIA_BASE>_2nd_Season_bible.json` (`season_num=2`). Ponieważ oba pliki są śledzone w repozytorium git i objęte ochroną Z16, a `consolidate_split_bibles` celowo nie łączy różnych sezonów (`None` vs `2`, zgodnie z `T10.6.3_7`), wpis ten pozostaje nienaruszony w 10.6.3.
+
+### Rozwiązanie (11.0)
+
+Dodanie w `tools/consolidate_bibles.py` opcjonalnej flagi `--migrate-misplaced-season-episodes` (uruchamianej lokalnie przez operatora poza reżimem Z16), która przenosi wpisy `episodes_translated` i `batch_stats` zawierające jawny znacznik `S2` z pliku `<SERIA_BASE>_bible.json` do `<SERIA_BASE>_2nd_Season_bible.json`.

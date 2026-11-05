@@ -483,13 +483,14 @@ def _guard_phase2_regressions(
     clean_ref_start = re.sub(r"^(?:\{[^}]*\}|<[^>]*>|\s+)+", "", str(refined_pl or "").strip())
     f1_has_dots = clean_f1_start.startswith("...") or clean_f1_start.startswith("…")
     ref_has_dots = clean_ref_start.startswith("...") or clean_ref_start.startswith("…")
+    f1_starts_lower = clean_f1_start[0].islower() if clean_f1_start else False
 
     clean_en_start = re.sub(r"^(?:\{[^}]*\}|<[^>]*>|\s+)+", "", str(source_en or "").strip())
     en_has_dots = clean_en_start.startswith("...") or clean_en_start.startswith("…")
     en_starts_lower = clean_en_start[0].islower() if clean_en_start else False
 
-    # 17a (Standard 10.6.2, FIX-B.1, FIX-B.2): Przywrócenie wielokropka inicjalnego WYŁĄCZNIE gdy Faza 1 go posiadała
-    if prev_has_dots and f1_has_dots and not ref_has_dots:
+    # 17a (Standard 10.6.2, FIX-B.1, FIX-B.2): Przywrócenie wielokropka inicjalnego WYŁĄCZNIE gdy Faza 1 go posiadała lub zaczynała się małą literą
+    if prev_has_dots and (f1_has_dots or f1_starts_lower) and not ref_has_dots:
         m_lead_dots = re.match(r"^(\.\.\.|…)\s*", clean_f1_start)
         dots_spacing = m_lead_dots.group(0) if m_lead_dots else "... "
         after_f1_dots = clean_f1_start[len(m_lead_dots.group(0)):].strip() if m_lead_dots else clean_f1_start.lstrip(". …").strip()
@@ -503,15 +504,16 @@ def _guard_phase2_regressions(
         if ref_content:
             if f1_is_upper:
                 ref_content = ref_content[0].upper() + ref_content[1:]
-            elif f1_is_lower:
+            elif f1_is_lower or f1_starts_lower:
                 ref_content = ref_content[0].lower() + ref_content[1:]
 
         has_ital = (r"{\i1}" in refined_pl and r"{\i0}" in refined_pl)
         if clean_f1_start.lstrip(". …").strip().lower() == clean_ref_start.lstrip(". …").strip().lower():
-            if has_ital and not str(f1_pl or "").startswith(r"{\i1}"):
-                return r"{\i1}" + str(f1_pl or "") + (r"{\i0}" if not str(f1_pl or "").endswith(r"{\i0}") else "")
-            if f1_pl:
-                return f1_pl
+            if f1_has_dots:
+                if has_ital and not str(f1_pl or "").startswith(r"{\i1}"):
+                    return r"{\i1}" + str(f1_pl or "") + (r"{\i0}" if not str(f1_pl or "").endswith(r"{\i0}") else "")
+                if f1_pl:
+                    return f1_pl
 
         refined_pl = ref_tag_prefix + dots_spacing + ref_content
 

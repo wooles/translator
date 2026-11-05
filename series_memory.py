@@ -5306,27 +5306,42 @@ class SeriesBible:
                 return entry
     def _resolve_bible_path(self) -> Path:
         exact = self.storage_dir / f"{self.slug}_bible.json"
-        if exact.exists():
-            return exact
         for f in self.storage_dir.glob("*_bible.json"):
             if f.name.lower() == f"{self.slug.lower()}_bible.json":
                 return f
-        from metadata import strip_season_suffix
-        stripped_self = strip_season_suffix(self.anime_title)
-        if stripped_self:
-            stripped_slug = clean_anime_slug(stripped_self)
-            stripped_exact = self.storage_dir / f"{stripped_slug}_bible.json"
-            if stripped_exact.exists():
-                return stripped_exact
-            for f in self.storage_dir.glob("*_bible.json"):
-                if f.name.lower() == f"{stripped_slug.lower()}_bible.json":
-                    return f
-        for f in self.storage_dir.glob("*_bible.json"):
-            base_cand = f.stem[:-6] if f.stem.endswith("_bible") else f.stem
-            cand_title = base_cand.replace("_", " ")
-            cand_stripped = strip_season_suffix(cand_title)
-            if cand_stripped and clean_anime_slug(cand_stripped).lower() == self.slug.lower():
-                return f
+        if exact.exists():
+            return exact
+
+        from metadata import extract_canonical_series_and_season
+        self_base, self_season = extract_canonical_series_and_season(self.anime_title)
+        if not self_base:
+            self_base, self_season = extract_canonical_series_and_season(self.slug)
+
+        def _norm_wo(s: str) -> str:
+            return re.sub(r"_wo_", "_o_", s)
+
+        if self_base:
+            # Krok 1: Dokładna zgodność pary (base_slug, season_num)
+            # Chroni przed dopasowaniem Sezonu 1 (None) dla Sezonu 2 (2),
+            # a jednocześnie łączy S2 <-> II <-> 2nd Season.
+            for f in sorted(self.storage_dir.glob("*_bible.json")):
+                base_cand = f.stem[:-6] if f.stem.endswith("_bible") else f.stem
+                cand_base, cand_season = extract_canonical_series_and_season(base_cand)
+                if cand_base and (cand_base == self_base or _norm_wo(cand_base) == _norm_wo(self_base)):
+                    if cand_season == self_season:
+                        return f
+
+            # Krok 2 (Kompatybilność Z16 dla test_system.py:12283):
+            # Wyłącznie gdy zapytanie NIE podaje sufiksu sezonu (self_season is None)
+            # i brak pliku (base_slug, None), pozwól na dopasowanie jedynego
+            # istniejącego pliku serii sezonowej (<SERIA_BASE> -> ..._S2_bible.json).
+            if self_season is None:
+                for f in sorted(self.storage_dir.glob("*_bible.json")):
+                    base_cand = f.stem[:-6] if f.stem.endswith("_bible") else f.stem
+                    cand_base, _ = extract_canonical_series_and_season(base_cand)
+                    if cand_base and (cand_base == self_base or _norm_wo(cand_base) == _norm_wo(self_base)):
+                        return f
+
         return exact
 
     def load(self):
@@ -9581,3 +9596,129 @@ def sanitize_all_series_bibles(storage_dir: Optional[Path] = None) -> int:
 
 # Standard 10.6.1: Alias zgodności wstecznej dla menedżera pamięci serii
 SeriesMemoryManager = SeriesBible
+
+
+def consolidate_split_bibles(
+    storage_dir: Optional[Union[Path, str]] = None,
+    dry_run: bool = False,
+) -> List[Tuple[str, str]]:
+    """
+    Skanuje storage_dir w poszukiwaniu par plików *_bible.json o tej samej parze
+    (base_slug, season_num), gdzie season_num is not None.
+    Nie łączy różnych sezonów ani pliku bez sezonu z plikiem sezonowym.
+
+    Zwraca listę krotek (canonical_filename, secondary_filename).
+    Plik wtórny jest kopiowany do Artefakty/_KONSOLIDACJA_BIBLE/{filename}.bak
+    i usuwany z storage_dir (chyba że dry_run=True).
+    """
+    target_dir = Path(storage_dir) if storage_dir else SERIES_MEMORY_DIR
+    if not target_dir.exists():
+        return []
+
+    from metadata import extract_canonical_series_and_season
+
+    def _norm_wo(s: str) -> str:
+        return re.sub(r"_wo_", "_o_", s)
+
+    groups: Dict[Tuple[str, int], List[Path]] = defaultdict(list)
+    for f in sorted(target_dir.glob("*_bible.json")):
+        base_cand = f.stem[:-6] if f.stem.endswith("_bible") else f.stem
+        c_base, c_season = extract_canonical_series_and_season(base_cand)
+        if c_base and c_season is not None:
+            groups[(_norm_wo(c_base), c_season)].append(f)
+
+    consolidated_pairs: List[Tuple[str, str]] = []
+    repo_root = Path(__file__).resolve().parent
+    backup_dir = repo_root / "Artefakty" / "_KONSOLIDACJA_BIBLE"
+
+    for (_, season_num), files in groups.items():
+        if len(files) < 2:
+            continue
+
+        def _file_target_priority(p: Path) -> Tuple[int, int]:
+            stem_low = p.stem.lower()
+            has_s_num = 1 if re.search(rf"_s0?{season_num}_bible$", stem_low) else 0
+            return (has_s_num, -len(p.name))
+
+        files_sorted = sorted(files, key=_file_target_priority, reverse=True)
+        canonical_file = files_sorted[0]
+
+        try:
+            canon_data = json.loads(canonical_file.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+
+        for sec_file in files_sorted[1:]:
+            try:
+                sec_data = json.loads(sec_file.read_text(encoding="utf-8"))
+            except Exception:
+                continue
+
+            consolidated_pairs.append((canonical_file.name, sec_file.name))
+            if dry_run:
+                continue
+
+            # 1. Scalanie characters (bezstratna unia + prymat P0 + linkowanie aliasów po wspólnym imieniu)
+            canon_chars = canon_data.setdefault("characters", {})
+            sec_chars = sec_data.get("characters", {})
+            if isinstance(sec_chars, dict):
+                for c_k, c_v in sec_chars.items():
+                    if c_k not in canon_chars:
+                        canon_chars[c_k] = copy.deepcopy(c_v)
+                    elif isinstance(canon_chars[c_k], dict) and isinstance(c_v, dict):
+                        if c_v.get("has_verified_gender") and not canon_chars[c_k].get("has_verified_gender"):
+                            canon_chars[c_k].update(copy.deepcopy(c_v))
+                        al_set = set(canon_chars[c_k].get("aliases", [])) | set(c_v.get("aliases", []))
+                        if al_set:
+                            canon_chars[c_k]["aliases"] = sorted(list(al_set))
+
+                by_first_name: Dict[Tuple[str, str], List[str]] = defaultdict(list)
+                for c_k, c_v in canon_chars.items():
+                    if "->" in c_k or not isinstance(c_v, dict):
+                        continue
+                    toks = c_k.strip().split()
+                    g = str(c_v.get("gender") or "").upper()
+                    if len(toks) >= 2 and g in ("MALE", "FEMALE"):
+                        by_first_name[(toks[0].lower(), g)].append(c_k)
+                for _, same_fn_keys in by_first_name.items():
+                    if len(same_fn_keys) > 1:
+                        for k1 in same_fn_keys:
+                            als = set(canon_chars[k1].get("aliases", [k1]))
+                            als.update(same_fn_keys)
+                            canon_chars[k1]["aliases"] = sorted(list(als))
+
+            # 2. Scalanie słowników
+            for dict_key in (
+                "declensions", "relations", "relationships", "glossary",
+                "hypocorisms", "plot_anchors", "batch_stats", "entity_categories", "fansub_canon",
+            ):
+                sec_dict = sec_data.get(dict_key)
+                if isinstance(sec_dict, dict):
+                    target_dict = canon_data.setdefault(dict_key, {})
+                    for dk, dv in sec_dict.items():
+                        if dk not in target_dict:
+                            target_dict[dk] = copy.deepcopy(dv)
+
+            # 3. Scalanie episodes_translated (unia z zachowaniem kolejności)
+            canon_eps = canon_data.setdefault("episodes_translated", [])
+            for ep in sec_data.get("episodes_translated", []):
+                if ep not in canon_eps:
+                    canon_eps.append(ep)
+
+            # 4. Zapis pliku kanonicznego + archiwizacja pliku wtórnego
+            canonical_file.write_text(
+                json.dumps(canon_data, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+            try:
+                backup_dir.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(sec_file, backup_dir / f"{sec_file.name}.bak")
+            except Exception:
+                logger.warning(
+                    "Archiwizacja bazy wtórnej zakończona wyjątkiem: %s",
+                    sec_file,
+                    exc_info=True,
+                )
+            sec_file.unlink(missing_ok=True)
+
+    return consolidated_pairs

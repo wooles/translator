@@ -1096,3 +1096,114 @@ def test_t10_6_1_4_single_token_surname_toponym_not_expanded_to_full_person_name
     en_in = "This event is also supposed to deepen friendly relations with Kingdom,"
     out_pl, _ = sm.apply_canonical_alias_declension(pl_in, source_en=en_in, keep_honorifics=False)
     assert out_pl == pl_in
+
+# ==============================================================================
+# STANDARD 10.6.3 REGRESSION TESTS (T10.6.3_2 – T10.6.3_8)
+# ==============================================================================
+@pytest.mark.unit
+def test_t10_6_3_2_resolve_bible_path_finds_s2_for_ii(tmp_path):
+    import json
+    from series_memory import SeriesMemoryManager
+
+    (tmp_path / "synthetic_anime_base_s2_bible.json").write_text(
+        '{"anime_title": "Synthetic Anime Base S2", "characters": {}}', encoding="utf-8"
+    )
+    sm = SeriesMemoryManager(anime_title="Synthetic Anime Base II", storage_dir=tmp_path)
+    resolved = sm._resolve_bible_path()
+    assert resolved.name == "synthetic_anime_base_s2_bible.json"
+
+
+@pytest.mark.unit
+def test_t10_6_3_3_resolve_bible_path_finds_ii_for_s2(tmp_path):
+    import json
+    from series_memory import SeriesMemoryManager
+
+    (tmp_path / "synthetic_anime_base_ii_bible.json").write_text(
+        '{"anime_title": "Synthetic Anime Base II", "characters": {}}', encoding="utf-8"
+    )
+    sm = SeriesMemoryManager(anime_title="Synthetic Anime Base S2", storage_dir=tmp_path)
+    resolved = sm._resolve_bible_path()
+    assert resolved.name == "synthetic_anime_base_ii_bible.json"
+
+
+@pytest.mark.unit
+def test_t10_6_3_4_resolve_bible_path_does_not_match_season_1_for_season_2(tmp_path):
+    import json
+    from series_memory import SeriesMemoryManager
+
+    (tmp_path / "synthetic_anime_base_bible.json").write_text(
+        '{"anime_title": "Synthetic Anime Base", "characters": {}}', encoding="utf-8"
+    )
+    sm = SeriesMemoryManager(anime_title="Synthetic Anime Base S2", storage_dir=tmp_path)
+    resolved = sm._resolve_bible_path()
+    assert resolved.name != "synthetic_anime_base_bible.json"
+    assert not resolved.exists() or resolved.name.lower() == "synthetic_anime_base_s2_bible.json"
+
+
+@pytest.mark.unit
+def test_t10_6_3_5_resolve_bible_path_matches_season_1_for_bare_title(tmp_path):
+    import json
+    from series_memory import SeriesMemoryManager
+
+    (tmp_path / "synthetic_anime_base_bible.json").write_text(
+        '{"anime_title": "Synthetic Anime Base", "characters": {}}', encoding="utf-8"
+    )
+    sm = SeriesMemoryManager(anime_title="Synthetic Anime Base", storage_dir=tmp_path)
+    resolved = sm._resolve_bible_path()
+    assert resolved.name == "synthetic_anime_base_bible.json"
+
+
+@pytest.mark.unit
+def test_t10_6_3_6_consolidate_split_bibles_merges_characters(tmp_path):
+    import json
+    from series_memory import consolidate_split_bibles
+
+    bible_a = {
+        "anime_title": "Synthetic Anime Base S2",
+        "characters": {"Alpha Hero": {"gender": "MALE", "priority": "P0", "has_verified_gender": True, "aliases": ["Alpha Hero"]}},
+        "episodes_translated": ["ep01"],
+    }
+    bible_b = {
+        "anime_title": "Synthetic Anime Base II",
+        "characters": {"Beta Heroine": {"gender": "FEMALE", "priority": "P0", "has_verified_gender": True, "aliases": ["Beta Heroine"]}},
+        "episodes_translated": ["ep02"],
+    }
+    (tmp_path / "synthetic_anime_base_s2_bible.json").write_text(json.dumps(bible_a), encoding="utf-8")
+    (tmp_path / "synthetic_anime_base_ii_bible.json").write_text(json.dumps(bible_b), encoding="utf-8")
+    pairs = consolidate_split_bibles(tmp_path)
+    assert len(pairs) == 1
+    merged = json.loads((tmp_path / "synthetic_anime_base_s2_bible.json").read_text(encoding="utf-8"))
+    assert "Alpha Hero" in merged["characters"]
+    assert "Beta Heroine" in merged["characters"]
+    assert set(merged["episodes_translated"]) == {"ep01", "ep02"}
+
+
+@pytest.mark.unit
+def test_t10_6_3_7_consolidate_split_bibles_does_not_merge_different_seasons(tmp_path):
+    import json
+    from series_memory import consolidate_split_bibles
+
+    bible_s1 = {"anime_title": "Synthetic Anime Base", "characters": {}, "episodes_translated": ["ep01"]}
+    bible_s2 = {"anime_title": "Synthetic Anime Base 2nd Season", "characters": {}, "episodes_translated": ["ep01"]}
+    (tmp_path / "synthetic_anime_base_bible.json").write_text(json.dumps(bible_s1), encoding="utf-8")
+    (tmp_path / "synthetic_anime_base_2nd_season_bible.json").write_text(json.dumps(bible_s2), encoding="utf-8")
+    pairs = consolidate_split_bibles(tmp_path)
+    assert pairs == []
+    assert (tmp_path / "synthetic_anime_base_bible.json").exists()
+    assert (tmp_path / "synthetic_anime_base_2nd_season_bible.json").exists()
+
+
+@pytest.mark.unit
+def test_t10_6_3_8_consolidate_split_bibles_is_idempotent(tmp_path):
+    import json
+    from series_memory import consolidate_split_bibles
+
+    bible_a = {"anime_title": "Synthetic Anime Base S2", "characters": {}, "episodes_translated": ["ep01"]}
+    bible_b = {"anime_title": "Synthetic Anime Base II", "characters": {}, "episodes_translated": ["ep02"]}
+    (tmp_path / "synthetic_anime_base_s2_bible.json").write_text(json.dumps(bible_a), encoding="utf-8")
+    (tmp_path / "synthetic_anime_base_ii_bible.json").write_text(json.dumps(bible_b), encoding="utf-8")
+    pairs_first = consolidate_split_bibles(tmp_path)
+    assert len(pairs_first) == 1
+    pairs_second = consolidate_split_bibles(tmp_path)
+    assert pairs_second == []
+
