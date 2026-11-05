@@ -4566,6 +4566,34 @@ def resolve_definite_article_nominative(en_text: str, pl_text: str) -> Tuple[str
     return modified, changed
 
 
+_ACTOR_VARIANT_SUFFIXES: Tuple[str, ...] = tuple(
+    "Soul|Spirit|Ghost|Voice|Mind|Shadow|Echo|Clone|Projection|Illusion|Form|Mode|like|Mild".split("|")
+)
+_ACTOR_VARIANT_SUFFIXES_PAT = re.compile(
+    r"^([A-Z][a-zA-Z]{2,}?)(Soul|Spirit|Ghost|Voice|Mind|Shadow|Echo|Clone|Projection|Illusion|Form|Mode|like|Mild)$"
+)
+
+
+class DeclensionResult(str):
+    """
+    Wynik deklinacji kanonicznej zachowujący pełną zgodność z typem str,
+    a jednocześnie umożliwiający rozpakowanie dwuelementowe (tekst, fixes).
+    Standard 10.6.1 (Operacja 2B.3, FIX-A.2).
+    """
+    fixes: List[str]
+
+    def __new__(cls, text: str, fixes: Optional[List[str]] = None):
+        instance = super().__new__(cls, text)
+        instance.fixes = list(fixes) if fixes is not None else []
+        return instance
+
+    def __iter__(self):
+        return iter((str(self), self.fixes))
+
+    def __getitem__(self, item):
+        return str(super().__getitem__(item))
+
+
 class SeriesBible:
     _lock = threading.RLock()
 
@@ -4574,7 +4602,7 @@ class SeriesBible:
         inst._lock = threading.RLock()
         return inst
 
-    def __init__(self, anime_title: str = "Nieznana Seria", storage_dir: Optional[Path] = None, db_path: Optional[str] = None, **kwargs):
+    def __init__(self, anime_title: str = "Nieznana Seria", storage_dir: Optional[Union[Path, str]] = None, db_path: Optional[str] = None, **kwargs):
         self._lock = threading.RLock()
         self.db_path = db_path
         slug_arg = kwargs.get("slug")
@@ -4585,6 +4613,13 @@ class SeriesBible:
         else:
             self.anime_title = str(title_arg or anime_title).strip() if (title_arg or anime_title) else "Nieznana Seria"
             self.slug = clean_anime_slug(slug_arg or self.anime_title)
+        
+        mem_dir = kwargs.get("memory_dir") or kwargs.get("bible_dir") or kwargs.get("base_dir")
+        if mem_dir:
+            storage_dir = Path(mem_dir)
+        elif storage_dir and not isinstance(storage_dir, Path):
+            storage_dir = Path(storage_dir)
+
         self.storage_dir = storage_dir or SERIES_MEMORY_DIR
         if self.db_path != ":memory:":
             self.storage_dir.mkdir(parents=True, exist_ok=True)
@@ -6702,6 +6737,48 @@ class SeriesBible:
                                 bible_modified = True
                                 break
 
+            # 8e. Deduplikacja kolizji wariantów technicznych P0-vs-P0 (Operacja 2B.2, FIX-A.1b)
+            for char_k in list(chars.keys()):
+                if "->" in char_k or not isinstance(chars.get(char_k), dict):
+                    continue
+                m_var = _ACTOR_VARIANT_SUFFIXES_PAT.match(char_k)
+                if not m_var:
+                    continue
+                base_stem = m_var.group(1)
+                base_stem_low = base_stem.lower()
+                matching_base_key = None
+                for other_k, other_v in chars.items():
+                    if other_k == char_k or "->" in other_k or not isinstance(other_v, dict):
+                        continue
+                    other_clean = extract_clean_speaker_name(other_k).strip()
+                    other_toks = other_clean.split()
+                    is_match = False
+                    if other_toks and other_toks[0].lower() == base_stem_low:
+                        is_match = True
+                    elif other_clean.lower() == base_stem_low:
+                        is_match = True
+                    else:
+                        for al in other_v.get("aliases", []):
+                            if str(al).strip().lower() == base_stem_low:
+                                is_match = True
+                                break
+                    if is_match:
+                        matching_base_key = other_k
+                        break
+
+                if matching_base_key:
+                    var_rec = chars[char_k]
+                    orig_aliases = list(var_rec.get("aliases", []))
+                    var_rec["aliases"] = [a for a in orig_aliases if str(a).strip().lower() != base_stem_low]
+                    var_rec["priority"] = "P2"
+                    var_rec["has_verified_gender"] = False
+                    base_rec = chars[matching_base_key]
+                    base_als = base_rec.setdefault("aliases", [])
+                    if base_stem not in base_als:
+                        base_als.append(base_stem)
+                        base_rec["aliases"] = sorted(list(set(base_als)))
+                    bible_modified = True
+
                         # 8d. Deduplikacja P2 względem aliasów i imion P0/P1 (Operacja 2B.2, Hipoteza H7)
             p0_verified_aliases: Dict[str, str] = {}
             for k, v in list(chars.items()):
@@ -6799,7 +6876,12 @@ class SeriesBible:
             if not hasattr(self, "data") or not isinstance(self.data, dict):
                 return
             chars = self.data.setdefault("characters", {})
-            for raw_tag in raw_actor_tags:
+
+            # Standard 10.6.1 (FIX-A.1a): Posortuj tagi, aby formy bazowe były przetwarzane przed wariantami
+            tag_items = list(raw_actor_tags.keys()) if isinstance(raw_actor_tags, dict) else list(raw_actor_tags)
+            tag_items.sort(key=lambda t: 1 if _ACTOR_VARIANT_SUFFIXES_PAT.match(str(t).strip()) else 0)
+
+            for raw_tag in tag_items:
                 if not raw_tag or "/" in str(raw_tag) or "\\" in str(raw_tag):
                     continue
                 clean_tag, explicit_g = normalize_actor_tag(str(raw_tag))
@@ -6810,6 +6892,25 @@ class SeriesBible:
                     continue
                 if clean_tag in chars:
                     continue
+
+                # Operacja 2B.1 (FIX-A.1a): Normalizacja technicznych sufiksów stanu/formy aktora ASS
+                m_variant = _ACTOR_VARIANT_SUFFIXES_PAT.match(clean_tag)
+                if m_variant:
+                    base_stem = m_variant.group(1)
+                    base_rec = self.resolve_character_record(base_stem)
+                    if base_rec is None and base_stem in chars:
+                        base_rec = chars[base_stem]
+
+                    base_in_tags = (base_stem in raw_actor_tags) if isinstance(raw_actor_tags, dict) else any(str(t).strip() == base_stem for t in raw_actor_tags)
+                    if base_rec is not None or base_in_tags or base_stem in chars:
+                        if base_rec and isinstance(base_rec, dict) and "aliases" in base_rec and isinstance(base_rec["aliases"], list):
+                            if clean_tag not in base_rec["aliases"]:
+                                base_rec["aliases"].append(clean_tag)
+                        elif base_stem in chars and isinstance(chars[base_stem], dict):
+                            aliases = chars[base_stem].setdefault("aliases", [])
+                            if clean_tag not in aliases:
+                                aliases.append(clean_tag)
+                        continue
 
                 # Operacja 2B.2: Blokada tworzenia duplikatów P2 dla aliasów i nazw postaci P0/P1
                 existing_rec = self.resolve_character_record(clean_tag)
@@ -7071,10 +7172,30 @@ class SeriesBible:
         char_map = char_map or {}
 
         res = text
-        for canon_name, decl in decl_map.items():
+
+        # Standard 10.6.1 (FIX-A.1b): Deterministyczny ranking encji P0
+        def _decl_rank(it: Tuple[str, Any]) -> Tuple[int, int, int, int, float]:
+            c_name, _ = it
+            rec = char_map.get(c_name, {}) if isinstance(char_map, dict) else {}
+            desc = str(rec.get("description", "") or "").lower()
+            not_bg = 0 if ("postać epizodyczna / tło" in desc or "epizodyczn" in desc) else 1
+            not_var = 0 if (any(c_name.endswith(suf) for suf in _ACTOR_VARIANT_SUFFIXES) or bool(_ACTOR_VARIANT_SUFFIXES_PAT.match(c_name))) else 1
+            multi_tok = 1 if " " in c_name.strip() else 0
+            p0 = 2 if rec.get("priority") == "P0" else (1 if rec.get("priority") == "P1" else 0)
+            conf = float(rec.get("confidence", 0.0) or 0.0)
+            return (not_bg, not_var, multi_tok, p0, conf)
+
+        decl_items = sorted(decl_map.items(), key=_decl_rank, reverse=True)
+
+        for canon_name, decl in decl_items:
             if not isinstance(decl, dict):
                 continue
             char_rec = char_map.get(canon_name, {})
+            # Standard 10.6.1 (Operacja 2B.2 / 2B.3): Blokada zanieczyszczania encjami wariantowymi
+            is_variant_entity = any(canon_name.endswith(suf) for suf in _ACTOR_VARIANT_SUFFIXES) or bool(_ACTOR_VARIANT_SUFFIXES_PAT.match(canon_name))
+            if is_variant_entity and (char_rec.get("priority") == "P2" or "postać epizodyczna / tło" in str(char_rec.get("description", "")).lower()):
+                continue
+
             aliases = char_rec.get("aliases", []) if isinstance(char_rec, dict) else []
             names_to_check = [canon_name] + [a for a in aliases if a]
             pattern_src = r"\b(?:" + "|".join(re.escape(n) for n in names_to_check) + r")\b"
@@ -7095,6 +7216,22 @@ class SeriesBible:
             for al in aliases:
                 if not al or al.lower() == canon_name.lower():
                     continue
+
+                # Standard 10.6.1 (Operacja 2B.3 - Reguła 2): Blokada podmiany prostego imienia na identyfikator CamelCase
+                if is_variant_entity and re.match(r"^[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+$", al):
+                    continue
+
+                al_tokens = al.split()
+                is_al_single_token = (len(al_tokens) == 1)
+
+                # Standard 10.6.1 (Operacja 2B.3 - Reguła 1: Single-Token Scope Parity)
+                # Gdy alias jest jednowyrazowy, a docelowa encja kanoniczna wielowyrazowa:
+                if is_al_single_token and is_multi_token:
+                    has_full_canon_in_en = bool(re.search(rf"\b{re.escape(canon_name)}\b", source_en, re.IGNORECASE))
+                    if not has_full_canon_in_en:
+                        # W source_en występuje wyłącznie pojedynczy człon; nie rozszerzaj do pełnego imienia/nazwiska
+                        continue
+
                 stem = re.sub(r"-(?:senpai|kun|chan|san|sama|sensei|dono|tan|pyon)$", "", al, flags=re.IGNORECASE).strip()
                 al_patterns = [re.escape(al)]
                 # Dla encji wieloczłonowych pojedyncze człony nie mogą być podmieniane jako gołe tokeny bez honoryfikatora
@@ -7105,23 +7242,32 @@ class SeriesBible:
                 form_n = decl.get("N", canon_name)
                 form_m = decl.get("M", canon_name)
 
+                # Standard 10.6.1 (Operacja 2B.3 - Reguła 2): Blokada sufiksów wariantowych w formach docelowych
+                if (any(form_n.endswith(suf) for suf in _ACTOR_VARIANT_SUFFIXES) or bool(_ACTOR_VARIANT_SUFFIXES_PAT.match(form_n))):
+                    continue
+                if (any(form_m.endswith(suf) for suf in _ACTOR_VARIANT_SUFFIXES) or bool(_ACTOR_VARIANT_SUFFIXES_PAT.match(form_m))):
+                    continue
+
+                # Standard 10.6.1 (Operacja 2B.3 - Reguła 3): Ochrona pełnego antroponimu wieloczłonowego
+                # Negatywny lookahead (?!\s+[A-ZĄĆĘŁŃÓŚŹŻ]) zapobiega izolowanej podmianie pierwszego członu,
+                # po którym następuje drugi człon nazwy własnej
                 # Narzędnik ze spójnikiem i wcześniejszym rzeczownikiem (np. z Sasakim i Pii-chan)
                 res = re.sub(
-                    rf"\b(z|ze|przed|nad|pod|za|między)\s+([A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+(?:\s+(?:i|oraz|ani)\s+))(?:{al_re})(?:-[a-zA-Z]+)?(?:em|iem)?\b",
+                    rf"\b(z|ze|przed|nad|pod|za|między)\s+([A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+(?:\s+(?:i|oraz|ani)\s+))(?:{al_re})(?:-[a-zA-Z]+)?(?:em|iem)?\b(?!\s+[A-ZĄĆĘŁŃÓŚŹŻ])",
                     rf"\g<1> \g<2>{form_n}",
                     res,
                     flags=re.IGNORECASE
                 )
                 # Narzędnik bezpośrednio po przyimku (np. z Pii-chan)
                 res = re.sub(
-                    rf"\b(z|ze|przed|nad|pod|za|między)\s+(?:{al_re})(?:-[a-zA-Z]+)?(?:em|iem)?\b",
+                    rf"\b(z|ze|przed|nad|pod|za|między)\s+(?:{al_re})(?:-[a-zA-Z]+)?(?:em|iem)?\b(?!\s+[A-ZĄĆĘŁŃÓŚŹŻ])",
                     rf"\g<1> {form_n}",
                     res,
                     flags=re.IGNORECASE
                 )
                 # Mianownik / ogólny kontekst ze wskazanym honoryfikatorem
                 res = re.sub(
-                    rf"\b(?:{al_re})(?:-(?:senpai|kun|chan|san|sama|sensei|dono|tan|pyon))\b",
+                    rf"\b(?:{al_re})(?:-(?:senpai|kun|chan|san|sama|sensei|dono|tan|pyon))\b(?!\s+[A-ZĄĆĘŁŃÓŚŹŻ])",
                     form_m,
                     res,
                     flags=re.IGNORECASE
@@ -7129,7 +7275,7 @@ class SeriesBible:
                 # Goły alias (wyłącznie dla encji jednoczłonowych)
                 if not is_multi_token:
                     res = re.sub(
-                        rf"\b(?:{al_re})\b",
+                        rf"\b(?:{al_re})\b(?!\s+[A-ZĄĆĘŁŃÓŚŹŻ])",
                         form_m,
                         res,
                         flags=re.IGNORECASE
@@ -7141,11 +7287,14 @@ class SeriesBible:
         text: str,
         source_en: str = "",
         keep_honorifics: bool = False
-    ) -> str:
+    ) -> DeclensionResult:
         """
-        Wrapper instancyjny na substitute_canonical_honorific_alias (Standard 9.7, 2C.1).
+        Wrapper instancyjny na substitute_canonical_honorific_alias (Standard 9.7, 2C.1; Standard 10.6.1, 2B.3).
+        Zwraca DeclensionResult(str) umożliwiający zarówno użycie jako zwykły napis (str),
+        jak i rozpakowanie dwuelementowe (out_pl, fixes).
         """
-        return self.substitute_canonical_honorific_alias(
+        fixes: List[str] = []
+        new_text = self.substitute_canonical_honorific_alias(
             text=text,
             source_en=source_en,
             series_bible=self,
@@ -7153,6 +7302,9 @@ class SeriesBible:
             characters=self.data.get("characters") if hasattr(self, "data") and isinstance(self.data, dict) else None,
             keep_honorifics=keep_honorifics,
         )
+        if new_text != text:
+            fixes.append(f"[SeriesBible P0 Alias] Odmiana aliasu kanonicznego: '{text}' -> '{new_text}'")
+        return DeclensionResult(new_text, fixes)
 
     def _validate_relation_entry_consistency(self) -> None:
         """
@@ -7464,6 +7616,20 @@ class SeriesBible:
                 if is_p0 and g in ("MALE", "FEMALE"):
                     p0_candidates.append((k, v))
 
+            # Standard 10.6.1 (Operacja 2B.2, FIX-A.1b): Deterministyczny ranking kandydatów P0/P1
+            def _p0_sort_key(cand: Tuple[str, Dict[str, Any]]) -> Tuple[int, int, int, int, int, float]:
+                k_c, v_c = cand
+                desc_c = str(v_c.get("description", "") or "").lower()
+                not_bg = 0 if ("postać epizodyczna / tło" in desc_c or "epizodyczn" in desc_c) else 1
+                not_var = 0 if (any(k_c.endswith(suf) for suf in _ACTOR_VARIANT_SUFFIXES) or bool(_ACTOR_VARIANT_SUFFIXES_PAT.match(k_c))) else 1
+                multi_tok = 1 if " " in k_c.strip() else 0
+                p0_sc = 2 if v_c.get("priority") == "P0" else (1 if v_c.get("priority") == "P1" else 0)
+                ver_sc = 1 if v_c.get("has_verified_gender") else 0
+                conf_sc = float(v_c.get("confidence", 0.0) or 0.0)
+                return (not_bg, not_var, multi_tok, p0_sc, ver_sc, conf_sc)
+
+            p0_candidates.sort(key=_p0_sort_key, reverse=True)
+
             # 1a. Dokładne dopasowanie do klucza lub czystego klucza P0
             for k, v in p0_candidates:
                 k_low = k.lower()
@@ -7499,6 +7665,7 @@ class SeriesBible:
                     res.setdefault("name", k)
                     return res
                 elif len(matching_p0_fn) > 1:
+                    matching_p0_fn.sort(key=_p0_sort_key, reverse=True)
                     g_set = {mv.get("gender") for mk, mv in matching_p0_fn}
                     if len(g_set) == 1:
                         k, v = matching_p0_fn[0]
@@ -9410,3 +9577,7 @@ def sanitize_all_series_bibles(storage_dir: Optional[Path] = None) -> int:
         except Exception:
             logger.warning("Inicjalizacja i zapis bazy serii zakończone wyjątkiem", exc_info=True)
     return count
+
+
+# Standard 10.6.1: Alias zgodności wstecznej dla menedżera pamięci serii
+SeriesMemoryManager = SeriesBible

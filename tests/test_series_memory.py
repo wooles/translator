@@ -907,3 +907,192 @@ def test_plot_anchors_negative_phrases_normalized_to_positive(raw_anchor):
     result = bible.data["plot_anchors"]["[Rzeczownik]"].lower()
     has_negative = any(n in result for n in ["nie zmieniaj", "nie zmieniać", "zakaz ", "unikaj "])
     assert not has_negative, f"Pozostała fraza negatywna: {result}"
+
+
+# ==============================================================================
+# STANDARD 10.6.1 TESTS (T10.6.1_1, T10.6.1_2, T10.6.1_3, T10.6.1_4)
+# ==============================================================================
+
+
+@pytest.mark.unit
+def test_t10_6_1_1_variant_actor_suffix_soul_does_not_hijack_base_character(tmp_path):
+    """
+    Standard 10.6.1 (FIX-A.1): Weryfikuje, że techniczny tag aktora z sufiksem stanu
+    (np. HeroineSoul) nie przejmuje krótkiego aliasu ('Heroine') od głównej postaci P0
+    ('Heroine Royalhouse').
+    """
+    from series_memory import SeriesMemoryManager
+
+    sm = SeriesMemoryManager("test_series_10_6_1_1", memory_dir=str(tmp_path))
+    sm.data["characters"] = {
+        "HeroineSoul": {
+            "description": "Postać epizodyczna / tło",
+            "gender": "FEMALE",
+            "grammatical_gender": "FEMININE",
+            "has_verified_gender": True,
+            "confidence": 0.95,
+            "priority": "P0",
+            "aliases": ["Heroine", "HeroineSoul"],
+            "entity_category": "ANTHROPONYM",
+        },
+        "Heroine Royalhouse": {
+            "name": "Heroine Royalhouse",
+            "description": "KOBIETA (wyodrębniono z relacji serii)",
+            "gender": "FEMALE",
+            "grammatical_gender": "FEMININE",
+            "has_verified_gender": True,
+            "confidence": 0.95,
+            "priority": "P0",
+            "aliases": ["Royalhouse", "Heroine", "Heroine Royalhouse"],
+            "entity_category": "ANTHROPONYM",
+        },
+    }
+    sm.data["declensions"] = {
+        "HeroineSoul": {k: "HeroineSoul" for k in ("M", "D", "C", "B", "N", "Ms", "W")},
+        "Heroine Royalhouse": {k: "Heroine Royalhouse" for k in ("M", "D", "C", "B", "N", "Ms", "W")},
+    }
+    sm._sanitize_loaded_bible_in_ram()
+
+    rec = sm.resolve_character_record("Heroine")
+    assert rec is not None
+    assert rec.get("name") == "Heroine Royalhouse" or "Royalhouse" in rec.get("aliases", [])
+
+
+@pytest.mark.unit
+def test_t10_6_1_2_populate_secondary_actor_tags_strips_soul_suffix(tmp_path):
+    """
+    Standard 10.6.1 (FIX-A.1a): Weryfikuje, że populate_secondary_actor_tags nie tworzy
+    osobnej encji P0 dla tagu 'PrincessAlphaSoul', gdy istnieje 'PrincessAlpha Royal'.
+    """
+    from series_memory import SeriesMemoryManager
+
+    sm = SeriesMemoryManager("test_series_10_6_1_2", memory_dir=str(tmp_path))
+    sm.data["characters"] = {
+        "PrincessAlpha Royal": {
+            "name": "PrincessAlpha Royal",
+            "gender": "FEMALE",
+            "grammatical_gender": "FEMININE",
+            "priority": "P0",
+            "has_verified_gender": True,
+            "aliases": ["PrincessAlpha", "PrincessAlpha Royal"],
+            "entity_category": "ANTHROPONYM",
+        }
+    }
+    actor_mappings = {
+        "PrincessAlpha": {"clean_name": "PrincessAlpha", "extracted_gender": None},
+        "PrincessAlphaSoul": {"clean_name": "PrincessAlphaSoul", "extracted_gender": None},
+    }
+    sm.populate_secondary_actor_tags(actor_mappings)
+    assert "PrincessAlphaSoul" not in sm.data["characters"]
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "pl_in,en_in,expected_pl",
+    [
+        (
+            "Jestem Heroine, trzecia księżniczka.",
+            "I'm Heroine, the third princess.",
+            "Jestem Heroine, trzecia księżniczka.",
+        ),
+        (
+            "Księżniczko Heroine, to nie przystoi.",
+            "Princess Heroine, that expression is unbecoming.",
+            "Księżniczko Heroine, to nie przystoi.",
+        ),
+        (
+            "Oto ja, Heroine Royalhouse, urocza starsza siostra!",
+            "I am Heroine Royalhouse, adorable older sister.",
+            "Oto ja, Heroine Royalhouse, urocza starsza siostra!",
+        ),
+    ],
+)
+def test_t10_6_1_3_apply_canonical_alias_declension_never_injects_camel_case_soul(
+    tmp_path, pl_in, en_in, expected_pl
+):
+    """
+    Standard 10.6.1 (FIX-A.2): Weryfikuje, że apply_canonical_alias_declension nigdy nie
+    podmienia imienia 'Heroine' na techniczny klucz 'HeroineSoul'.
+    """
+    from series_memory import SeriesMemoryManager
+
+    sm = SeriesMemoryManager("test_series_10_6_1_3", memory_dir=str(tmp_path))
+    sm.data["characters"] = {
+        "HeroineSoul": {
+            "description": "Postać epizodyczna / tło",
+            "gender": "FEMALE",
+            "grammatical_gender": "FEMININE",
+            "has_verified_gender": True,
+            "confidence": 0.95,
+            "priority": "P0",
+            "aliases": ["Heroine", "HeroineSoul"],
+            "entity_category": "ANTHROPONYM",
+        },
+        "Heroine Royalhouse": {
+            "name": "Heroine Royalhouse",
+            "description": "KOBIETA",
+            "gender": "FEMALE",
+            "grammatical_gender": "FEMININE",
+            "has_verified_gender": True,
+            "confidence": 0.95,
+            "priority": "P0",
+            "aliases": ["Royalhouse", "Heroine", "Heroine Royalhouse"],
+            "entity_category": "ANTHROPONYM",
+        },
+    }
+    sm.data["declensions"] = {
+        "HeroineSoul": {k: "HeroineSoul" for k in ("M", "D", "C", "B", "N", "Ms", "W")},
+        "Heroine Royalhouse": {k: "Heroine Royalhouse" for k in ("M", "D", "C", "B", "N", "Ms", "W")},
+    }
+    sm._sanitize_loaded_bible_in_ram()
+
+    out_pl, fixes = sm.apply_canonical_alias_declension(pl_in, source_en=en_in, keep_honorifics=False)
+    assert out_pl == expected_pl
+    assert "HeroineSoul" not in out_pl
+
+
+@pytest.mark.unit
+def test_t10_6_1_4_single_token_surname_toponym_not_expanded_to_full_person_name(tmp_path):
+    """
+    Standard 10.6.1 (FIX-A.2): Weryfikuje, że jednowyrazowa nazwa własna w narzędniku
+    ('przyjazne relacje z Kingdomem', EN: 'friendly relations with Kingdom') nie zostaje
+    rozszerzona do pełnego imienia i nazwiska postaci ('z Lady Kingdom') posiadającej
+    alias 'Kingdom'.
+
+    Dane testowe są w 100% syntetyczne (rdzeń 'Kingdom' oznacza tu fikcyjne państwo/
+    akademię; 'Lady Kingdom' to fikcyjna postać używająca tego samego członu jako
+    nazwiska). Forma narzędnika 'Kingdomem' jest celowo niepoprawna fleksyjnie i służy
+    wyłącznie jako wejście do testowanego modułu.
+    """
+    from series_memory import SeriesMemoryManager
+
+    sm = SeriesMemoryManager("test_series_10_6_1_4", memory_dir=str(tmp_path))
+    sm.data["characters"] = {
+        "Lady Kingdom": {
+            "name": "Lady Kingdom",
+            "gender": "FEMALE",
+            "grammatical_gender": "FEMININE",
+            "has_verified_gender": True,
+            "confidence": 1.0,
+            "priority": "P0",
+            "aliases": ["Kingdom", "Lady", "Lady Kingdom"],
+            "entity_category": "ANTHROPONYM",
+        }
+    }
+    sm.data["declensions"] = {
+        "Lady Kingdom": {
+            "M": "Lady Kingdom",
+            "D": "Lady Kingdom",
+            "C": "Lady Kingdom",
+            "B": "Lady Kingdom",
+            "N": "Lady Kingdom",
+            "Ms": "Lady Kingdom",
+            "W": "Lady Kingdom",
+            "gender": "FEMALE",
+        }
+    }
+
+    pl_in = "To święto ma zacieśnić przyjazne relacje z Kingdomem,"
+    en_in = "This event is also supposed to deepen friendly relations with Kingdom,"
+    out_pl, _ = sm.apply_canonical_alias_declension(pl_in, source_en=en_in, keep_honorifics=False)
+    assert out_pl == pl_in
