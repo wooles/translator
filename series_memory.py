@@ -4594,6 +4594,33 @@ class DeclensionResult(str):
         return str(super().__getitem__(item))
 
 
+# Standard 11.0 (FIX-C.1): Neutralne wzorce składniowe nazw instytucji i jednostek terytorialnych (Zero-Literal Z1/Z4)
+_INSTITUTIONAL_TOPONYM_PATTERNS = (
+    re.compile(
+        r"\b([A-ZĄĆĘŁŃÓŚŹŻ][a-zA-Ząćęłńóśźż]{2,})\s+"
+        r"(?:Academy|University|College|School|Institute|Kingdom|Empire|Duchy|Principality|Republic)\b"
+    ),
+    re.compile(
+        r"\b(?:Akademi\w+|Uniwersytet\w*|Szkoł\w+|Liceum|Instytut\w*|Królestw\w+|Cesarstw\w+|Księstw\w+|Republik\w+|Imperi\w+)\s+"
+        r"(?:[a-ząćęłńóśźż]+\s+)?([A-ZĄĆĘŁŃÓŚŹŻ][a-zA-Ząćęłńóśźż]{2,})\b"
+    ),
+    re.compile(
+        r"\b([A-ZĄĆĘŁŃÓŚŹŻ][a-zA-Ząćęłńóśźż]{2,})\s+"
+        r"(?:Akademi\w+|Uniwersytet\w*|Szkoł\w+|Instytut\w*|Królestw\w+|Cesarstw\w+|Księstw\w+|Republik\w+|Imperi\w+)\b"
+    ),
+)
+
+# Neutralne słowa funkcyjne, kierunki i przymiotniki ogólne wykluczone z rejestracji jako nazwa własna
+_GENERIC_TOPONYM_BLOCKLIST = frozenset({
+    "the", "this", "that", "these", "those", "our", "your", "their", "his", "her", "its",
+    "north", "south", "east", "west", "northern", "southern", "eastern", "western", "central",
+    "high", "low", "old", "new", "first", "second", "third", "great", "grand", "royal", "imperial", "national",
+    "state", "public", "private", "local", "capital", "main", "middle", "upper", "lower", "inner", "outer",
+    "nasza", "wasza", "tutejsza", "stara", "nowa", "wielka", "główna", "centralna", "państwowa", "krajowa",
+    "północna", "południowa", "wschodnia", "zachodnia", "królewska", "cesarska", "książęca",
+})
+
+
 class SeriesBible:
     _lock = threading.RLock()
 
@@ -4995,6 +5022,29 @@ class SeriesBible:
                         rel_val = f"{getattr(rel, 'address_form', '')} ({getattr(rel, 'relationship_type', '')})".strip()
                         self.data.setdefault("relations", {})[rel_key] = rel_val
                         self.data.setdefault("relationships", {})[rel_key] = rel_val
+
+            # Standard 11.0 (FIX-C.1): Ekstrakcja institutional_toponyms z metadanych i profilu odcinka
+            extra_src: List[str] = []
+            if isinstance(anilist_meta, dict):
+                desc_meta = anilist_meta.get("description")
+                if isinstance(desc_meta, str) and desc_meta:
+                    extra_src.append(desc_meta)
+            if episode_profile is not None:
+                for attr in ("episode_summary", "setting_and_era"):
+                    val = getattr(episode_profile, attr, None)
+                    if isinstance(val, str) and val:
+                        extra_src.append(val)
+                ep_glossary = getattr(episode_profile, "glossary", None)
+                if isinstance(ep_glossary, dict):
+                    extra_src.extend(str(k) for k in ep_glossary.keys())
+                    extra_src.extend(str(v) for v in ep_glossary.values() if isinstance(v, str))
+                elif isinstance(ep_glossary, list):
+                    for g_item in ep_glossary:
+                        for g_attr in ("term_en", "translation_pl", "explanation"):
+                            g_val = getattr(g_item, g_attr, None)
+                            if isinstance(g_val, str) and g_val:
+                                extra_src.append(g_val)
+            self._register_institutional_toponyms_from_sources(extra_src)
 
             if hasattr(self, "_rebuild_actor_aliases_index"):
                 try:
@@ -5575,6 +5625,55 @@ class SeriesBible:
                             rv_str += " [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]"
 
                 self.data["relationships"][rk] = rv_str
+
+    def _extract_institutional_toponyms(self, sources: List[str]) -> List[str]:
+        """
+        Standard 11.0 (FIX-C.1): Ekstrahuje nazwy instytucji i jednostek terytorialnych ze źródeł tekstowych.
+        """
+        candidates: List[str] = []
+        seen: Set[str] = set()
+        for src in sources:
+            if not isinstance(src, str) or not src:
+                continue
+            for pat in _INSTITUTIONAL_TOPONYM_PATTERNS:
+                for m in pat.finditer(src):
+                    tok = m.group(1).strip()
+                    if len(tok) < 3:
+                        continue
+                    if tok.lower() in _GENERIC_TOPONYM_BLOCKLIST:
+                        continue
+                    if tok not in seen:
+                        seen.add(tok)
+                        candidates.append(tok)
+        return candidates
+
+    def _register_institutional_toponyms_from_sources(self, extra_sources: Optional[List[str]] = None) -> None:
+        """
+        Standard 11.0 (FIX-C.1): Rejestruje wyodrębnione toponimy instytucjonalne w self.data
+        z zachowaniem priorytetu istniejących kluczy głównych w characters.
+        """
+        sources: List[str] = list(extra_sources or [])
+        for key in ("glossary", "plot_anchors"):
+            d = self.data.get(key, {})
+            if isinstance(d, dict):
+                for gk, gv in d.items():
+                    if isinstance(gk, str):
+                        sources.append(gk)
+                    if isinstance(gv, str):
+                        sources.append(gv)
+        candidates = self._extract_institutional_toponyms(sources)
+        if not candidates:
+            return
+        chars_dict = self.data.get("characters", {})
+        existing = set(self.data.get("institutional_toponyms") or [])
+        for tok in candidates:
+            if tok in chars_dict:
+                continue
+            if tok not in existing:
+                existing.add(tok)
+                self.data.setdefault("entity_categories", {})[tok] = EntityCategory.TOPONYM.value
+        if existing:
+            self.data["institutional_toponyms"] = sorted(existing)
 
     def _sanitize_loaded_bible_in_ram(self):
         """
@@ -6433,6 +6532,9 @@ class SeriesBible:
                         if "declensions" in self.data and char_name in self.data["declensions"]:
                             self.data["declensions"][char_name] = generate_polish_name_declension(char_name, "UNKNOWN")
 
+            # Standard 11.0 (FIX-C.1): Rejestracja institutional_toponyms ze słownika i kotwic fabularnych
+            self._register_institutional_toponyms_from_sources()
+
             # -------------------------------------------------------------
             # d) Pozytywny schemat rekordu postaci (CharacterRecord Positive Schema) & Indeks Aliases
             # -------------------------------------------------------------
@@ -6457,7 +6559,15 @@ class SeriesBible:
                         surname_genders[last_tok].add(char_g)
                         surname_genders[last_tok_norm].add(char_g)
 
-            conflicting_surnames = {s_tok for s_tok, g_set in surname_genders.items() if len(g_set) > 1}
+            institutional_lower = {
+                str(t).strip().lower() for t in (self.data.get("institutional_toponyms") or []) if t
+            }
+            institutional_folded = {normalize_ascii_diacritics(t) for t in institutional_lower}
+            conflicting_surnames = (
+                {s_tok for s_tok, g_set in surname_genders.items() if len(g_set) > 1}
+                | institutional_lower
+                | institutional_folded
+            )
 
             for char_name, c_val in list(self.data["characters"].items()):
                 if "->" in char_name:
@@ -7446,7 +7556,15 @@ class SeriesBible:
                 if cg in ("MALE", "FEMALE"):
                     surname_genders[s_tok].add(cg)
                     surname_genders[s_norm].add(cg)
-        conflicting_surnames = {st for st, gs in surname_genders.items() if len(gs) > 1}
+        institutional_lower = {
+            str(t).strip().lower() for t in (self.data.get("institutional_toponyms") or []) if t
+        }
+        institutional_folded = {normalize_ascii_diacritics(t) for t in institutional_lower}
+        conflicting_surnames = (
+            {st for st, gs in surname_genders.items() if len(gs) > 1}
+            | institutional_lower
+            | institutional_folded
+        )
 
         sorted_chars = sorted(self.data["characters"].items(), key=_char_priority_key, reverse=True)
         for c_name, c_entry in sorted_chars:

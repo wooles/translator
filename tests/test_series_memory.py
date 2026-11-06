@@ -1207,3 +1207,90 @@ def test_t10_6_3_8_consolidate_split_bibles_is_idempotent(tmp_path):
     pairs_second = consolidate_split_bibles(tmp_path)
     assert pairs_second == []
 
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "text,expected",
+    [
+        ("Located at InstytucjaAlfa Academy, the cadets train.", ["InstytucjaAlfa"]),
+        ("The KrainaBeta Kingdom is at war.", ["KrainaBeta"]),
+        ("UczelniaGamma University hosts the tournament.", ["UczelniaGamma"]),
+        ("Akademia sztuk InstytucjaAlfa wita nowych uczniów.", ["InstytucjaAlfa"]),
+        ("No institutions here.", []),
+        ("Located at the city center.", []),
+    ],
+)
+def test_t11_0_c_1_extract_institutional_toponyms_patterns(tmp_path, text, expected):
+    """FIX-C.1: ekstrakcja institutional_toponyms z tekstu EN i PL."""
+    from series_memory import SeriesBible
+    sm = SeriesBible(anime_title="Seria Testowa", storage_dir=tmp_path)
+    result = sm._extract_institutional_toponyms([text])
+    assert result == expected
+
+
+@pytest.mark.unit
+def test_t11_0_c_2_institutional_toponym_not_overwrite_character_key(tmp_path):
+    """FIX-C.1: institutional_toponym nie nadpisuje istniejącego klucza głównego w characters."""
+    from series_memory import SeriesBible
+    sm = SeriesBible(anime_title="Seria Testowa", storage_dir=tmp_path)
+    sm.data["characters"] = {
+        "InstytucjaAlfa": {
+            "gender": "FEMALE",
+            "priority": "P0",
+            "has_verified_gender": True,
+            "aliases": ["InstytucjaAlfa"],
+        }
+    }
+    sm._register_institutional_toponyms_from_sources(["InstytucjaAlfa Academy"])
+    assert "InstytucjaAlfa" not in sm.data.get("institutional_toponyms", [])
+    assert "InstytucjaAlfa" in sm.data["characters"]
+
+
+@pytest.mark.unit
+def test_t11_0_c_3_multi_token_character_preserved_after_toponym_registration(tmp_path):
+    """FIX-C.1 + FIX-C.2: dwuczłonowa postać P0 pozostaje w characters i declensions po odpięciu nazwiska-toponimu."""
+    from series_memory import SeriesBible
+    sm = SeriesBible(anime_title="Seria Testowa", storage_dir=tmp_path)
+    sm.data["characters"] = {
+        "Bohaterka InstytucjaAlfa": {
+            "gender": "FEMALE",
+            "priority": "P0",
+            "has_verified_gender": True,
+            "aliases": ["Bohaterka", "InstytucjaAlfa", "Bohaterka InstytucjaAlfa"],
+        }
+    }
+    sm.data["declensions"] = {
+        "Bohaterka InstytucjaAlfa": {
+            "M": "Bohaterka InstytucjaAlfa",
+            "D": "Bohaterki InstytucjaAlfa",
+            "N": "Bohaterką InstytucjaAlfa",
+        }
+    }
+    sm._register_institutional_toponyms_from_sources(["InstytucjaAlfa Academy"])
+    sm._sanitize_loaded_bible_in_ram()
+    assert "Bohaterka InstytucjaAlfa" in sm.data["characters"]
+    assert "Bohaterka InstytucjaAlfa" in sm.data["declensions"]
+    assert "Bohaterka" in sm.data["characters"]["Bohaterka InstytucjaAlfa"]["aliases"]
+    assert "InstytucjaAlfa" not in sm.data["characters"]["Bohaterka InstytucjaAlfa"]["aliases"]
+    assert "instytucjaalfa" not in sm._actor_aliases_index
+
+
+@pytest.mark.unit
+def test_t11_0_c_4_conflicting_surnames_does_not_trigger_disk_save(tmp_path):
+    """FIX-C.2: filtrowanie kolizyjnego nazwiska w RAM nie wywołuje zapisu na dysk (ochrona Z16)."""
+    from series_memory import SeriesBible
+    sm = SeriesBible(anime_title="Seria Testowa", storage_dir=tmp_path)
+    sm.data["characters"] = {
+        "Bohater KrainaBeta": {
+            "gender": "MALE",
+            "priority": "P0",
+            "has_verified_gender": True,
+            "aliases": ["Bohater", "KrainaBeta", "Bohater KrainaBeta"],
+        }
+    }
+    sm.data["institutional_toponyms"] = ["KrainaBeta"]
+    sm.data["entity_categories"] = {"KrainaBeta": "TOPONYM"}
+    files_before = set(tmp_path.iterdir())
+    sm._sanitize_loaded_bible_in_ram()
+    files_after = set(tmp_path.iterdir())
+    assert files_before == files_after
