@@ -678,3 +678,48 @@ def test_arbitrate_event_telemetry_honors_speaker_p0_gender_kwarg(speaker_p0_gen
         target_actor="HeroineBeta",
     )
     assert res.get("speaker_gender") == expected_gender
+
+
+@pytest.mark.unit
+def test_t11_0_c_6_detect_event_vocative_rejects_prepositional_candidate(tmp_path):
+    """FIX-C.3b: nazwa własna poprzedzona przyimkiem ('with InstytucjaAlfa,') nie jest klasyfikowana jako wołacz."""
+    from series_memory import SeriesBible
+    from scene_discourse import _detect_event_vocative
+    sm = SeriesBible(anime_title="Seria Testowa", storage_dir=tmp_path)
+    sm.data["characters"] = {
+        "Bohaterka InstytucjaAlfa": {
+            "gender": "FEMALE",
+            "priority": "P0",
+            "has_verified_gender": True,
+            "aliases": ["Bohaterka", "InstytucjaAlfa"],
+        }
+    }
+    result = _detect_event_vocative(
+        "This event is also supposed to deepen friendly relations with InstytucjaAlfa,",
+        series_bible=sm,
+        current_speaker="MowcaPierwszy",
+    )
+    assert result == (None, None) or result[0] is None
+
+
+@pytest.mark.unit
+def test_t11_0_c_7_detect_event_vocative_accepts_true_vocative(tmp_path):
+    """FIX-C.3b: prawdziwy wołacz na początku zdania (bez przyimka) jest poprawnie rozpoznawany."""
+    from series_memory import SeriesBible
+    from scene_discourse import _detect_event_vocative
+    sm = SeriesBible(anime_title="Seria Testowa", storage_dir=tmp_path)
+    sm.data["characters"] = {
+        "BohaterAlfa": {
+            "gender": "MALE",
+            "priority": "P0",
+            "has_verified_gender": True,
+            "aliases": ["BohaterAlfa"],
+        }
+    }
+    result = _detect_event_vocative(
+        "BohaterAlfa, chodź tutaj!",
+        series_bible=sm,
+        current_speaker="MowcaDrugi",
+    )
+    assert result[0] == "BohaterAlfa"
+    assert result[1] == "MALE"

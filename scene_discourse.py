@@ -1322,6 +1322,22 @@ def _is_same_character(
     return False
 
 
+# Standard 11.0 (FIX-C.3b): Wykrywanie przyimka bezpośrednio przed kandydatem na wołacz
+_PREPOSITION_BEFORE_CAND_PAT = re.compile(
+    r"\b(?:with|in|at|from|to|into|of|for|by|about|between|among|against|towards|through|"
+    r"z|ze|w|we|do|od|o|po|na|przy|dla|bez|przez|między|przed|za|nad|pod)$",
+    re.IGNORECASE,
+)
+
+
+def _is_prepositional_context(text: str, candidate_match_start: int) -> bool:
+    """Sprawdza, czy bezpośrednio przed dopasowaniem kandydata stoi przyimek."""
+    prefix = text[:candidate_match_start].rstrip()
+    if not prefix:
+        return False
+    return bool(_PREPOSITION_BEFORE_CAND_PAT.search(prefix))
+
+
 def _detect_event_vocative(
     event_or_text: Any,
     series_bible: Optional[Any] = None,
@@ -1349,6 +1365,10 @@ def _detect_event_vocative(
                     if not cand or len(cand) < 2:
                         continue
 
+                    if series_bible and hasattr(series_bible, "is_non_character_entity"):
+                        if series_bible.is_non_character_entity(cand, context=clean):
+                            continue
+
                     # 1a. Wołacz LUB mianownik po wykrzyknikach adresatywnych (Hej, Ej, Ty, Słuchaj)
                     pat_interj = rf"(?:^|[\s,–—])(?:hej|ej|ty|słuchaj)[,\s]+(?:pana\s+|panie\s+)?{re.escape(cand)}(?:[,.!?…\s–—]|$)"
                     if re.search(pat_interj, clean, re.IGNORECASE):
@@ -1358,16 +1378,19 @@ def _detect_event_vocative(
                         return char_name, target_g
 
                     # 1b. Zawołanie w krótkim okrzyku zakończonym '!'
-                    pat_call = rf"(?:^|[\s,–—])(?:(?:hej|ej|ty|słuchaj)[,\s]+)?{re.escape(cand)}\s*!"
-                    if re.search(pat_call, clean, re.IGNORECASE):
+                    pat_call = rf"(?:^|[\s,–—])(?:(?:hej|ej|ty|słuchaj)[,\s]+)?({re.escape(cand)})\s*!"
+                    m_call = re.search(pat_call, clean, re.IGNORECASE)
+                    if m_call and not _is_prepositional_context(clean, m_call.start(1)):
                         target_g = "MALE" if char_gender == "MALE" else (
                             "FEMALE" if char_gender == "FEMALE" else "NEUTRAL"
                         )
                         return char_name, target_g
 
                     # 1c. Standardowa granica wołaczowa z interpunkcją lub początkiem/końcem wersu
-                    pat_voc = rf"(?:^|[\s,–—]){re.escape(cand)}(?:[,.!?…\s–—]|$)"
-                    if re.search(pat_voc, clean, re.IGNORECASE):
+                    pat_voc = rf"(?:^|[\s,–—])({re.escape(cand)})(?:[,.!?…\s–—]|$)"
+                    for m_voc in re.finditer(pat_voc, clean, re.IGNORECASE):
+                        if _is_prepositional_context(clean, m_voc.start(1)):
+                            continue
                         target_g = "MALE" if char_gender == "MALE" else (
                             "FEMALE" if char_gender == "FEMALE" else "NEUTRAL"
                         )
@@ -1406,8 +1429,12 @@ def _detect_event_vocative(
 
     # 5. Sprawdzenie zakotwiczonych imion w wołaczu bez SeriesBible
     for m in VOCATIVE_PUNCT_ANCHOR_REGEX.finditer(clean):
+        if _is_prepositional_context(clean, m.start()):
+            continue
         matched_name = m.group(1) or m.group(2) or m.group(3)
         if matched_name and matched_name != current_speaker:
+            if series_bible and hasattr(series_bible, "is_non_character_entity") and series_bible.is_non_character_entity(matched_name, context=clean):
+                continue
             low = matched_name.lower()
             if low in POLISH_COMMON_INTERJECTIONS_STOPLIST:
                 continue

@@ -8723,15 +8723,32 @@ class SeriesBible:
     def is_generic_actor_or_category(name: str) -> bool:
         return is_generic_actor_or_category(name)
 
-    def is_non_character_entity(self, name: str) -> bool:
+    def is_non_character_entity(self, name: str, context: Optional[str] = None) -> bool:
         """
         Determines whether a name refers to an organization, realm, institution, faction, location,
         ethnonym, or collective group, preventing it from ever being treated as a masculine/feminine character in name declension engines.
         """
         if not name:
             return False
-        n_l = name.strip().lower()
+        clean_n = name.strip()
+        n_l = clean_n.lower()
         norm_nl = normalize_name_nfkd(n_l)
+
+        # Standard 11.0 (FIX-C.3a): Kontekstowa ochrona przyimków dla institutional_toponyms
+        if context and clean_n and clean_n[0].isupper():
+            with self._lock:
+                inst_set = {
+                    str(t).strip().lower() for t in (self.data.get("institutional_toponyms") or []) if t
+                }
+            if n_l in inst_set or norm_nl in inst_set:
+                prep_pat = re.compile(
+                    r"\b(?:in|at|from|to|into|with|of|for|by|about|between|among|against|towards|through|"
+                    r"w|we|do|od|z|ze|o|po|na|przy|dla|bez|przez|między|przed|za|nad|pod)\s+"
+                    + re.escape(clean_n) + r"\b",
+                    re.IGNORECASE,
+                )
+                if prep_pat.search(context):
+                    return True
 
         # If explicitly registered in characters as a living character, protect from false toponym classification
         with self._lock:

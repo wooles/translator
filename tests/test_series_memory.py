@@ -1294,3 +1294,44 @@ def test_t11_0_c_4_conflicting_surnames_does_not_trigger_disk_save(tmp_path):
     sm._sanitize_loaded_bible_in_ram()
     files_after = set(tmp_path.iterdir())
     assert files_before == files_after
+
+
+@pytest.mark.unit
+def test_t11_0_c_5_is_non_character_entity_with_prepositional_context(tmp_path):
+    """FIX-C.3a: is_non_character_entity rozpoznaje kontekst przyimkowy dla toponimu instytucjonalnego."""
+    from series_memory import SeriesBible
+    sm = SeriesBible(anime_title="Seria Testowa", storage_dir=tmp_path)
+    sm.data["characters"] = {
+        "Bohater KrainaBeta": {
+            "gender": "MALE",
+            "priority": "P0",
+            "has_verified_gender": True,
+            "aliases": ["Bohater", "KrainaBeta"],
+        }
+    }
+    sm.data["institutional_toponyms"] = ["KrainaBeta"]
+    sm.data["entity_categories"] = {"KrainaBeta": "TOPONYM"}
+    assert sm.is_non_character_entity("KrainaBeta") is False
+    assert sm.is_non_character_entity("KrainaBeta", context="friendly relations with KrainaBeta,") is True
+    assert sm.is_non_character_entity("Bohater", context="Bohater arrived from KrainaBeta.") is False
+
+
+@pytest.mark.unit
+def test_t11_0_c_8_character_preserved_with_prepositional_context(tmp_path):
+    """FIX-C.3a: wywołanie is_non_character_entity z kontekstem zachowuje postać w characters i declensions."""
+    from series_memory import SeriesBible
+    sm = SeriesBible(anime_title="Seria Testowa", storage_dir=tmp_path)
+    sm.data["characters"] = {
+        "Bohaterka UczelniaGamma": {
+            "gender": "FEMALE",
+            "has_verified_gender": True,
+            "aliases": ["Bohaterka", "UczelniaGamma"],
+        }
+    }
+    sm.data["declensions"] = {
+        "Bohaterka UczelniaGamma": {"M": "Bohaterka UczelniaGamma", "D": "Bohaterki UczelniaGamma"}
+    }
+    sm.data["institutional_toponyms"] = ["UczelniaGamma"]
+    assert sm.is_non_character_entity("UczelniaGamma", context="w UczelniaGamma") is True
+    assert "Bohaterka UczelniaGamma" in sm.data["characters"]
+    assert "Bohaterka UczelniaGamma" in sm.data["declensions"]
