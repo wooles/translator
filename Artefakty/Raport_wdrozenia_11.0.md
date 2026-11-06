@@ -197,6 +197,41 @@ Wszystkie testy Standardu 11.0 operują wyłącznie na neutralnych, syntetycznyc
 
 - **Commit 1:** `941fe44` (`feat(series_memory): Standard 11.0 - institutional toponym detection and Z16-safe alias deduplication`)
 - **Commit 2:** `fb94a02` (`feat(series_memory,scene_discourse): Standard 11.0 - prepositional guard for vocative and toponym context`)
-- **Commit 3:** `HEAD` (`feat(series_memory,scene_discourse): Standard 11.0 - CamelCase split and Mob* speaker isolation`)
+- **Commit 3:** `8c0037f` (`feat(series_memory,scene_discourse): Standard 11.0 - CamelCase split and Mob* speaker isolation`)
 
 **WERDYKT FINALNY:** STANDARD 11.0 W PEŁNI CERTYFIKOWANY I GOTOWY DO OPERACJI PRODUKCYJNYCH.
+
+---
+
+## SEKCJA 8 — DOMYKANIE 11.0 (Commit 4, 2026-11-07)
+
+- **Status:** `CERTIFIED / CLOSED`
+- **Baseline przed domknięciem:** `8c0037f8303f50201e30dda68d992ee867c984d9` (`8c0037f`)
+
+### 8.1. Audyt weryfikacyjny 11.0
+- **Plik raportu:** `Artefakty/Raport_audytu_weryfikacyjnego_11_0_koncowy.md` (włączony do repozytorium w Commicie 4, UTF-8 bez mojibake)
+- **Werdykt:** `STANDARD 11.0 W PEŁNI BEZPIECZNY (5/5 operacji bezpiecznych, 13/13 warunków spełnionych)`
+- **Potwierdzone korekty w kodzie `8c0037f`:**
+  - `FIX-C.1` (`941fe44`): K1 + K2 (`BEZPIECZNA`)
+  - `FIX-C.2` (`941fe44`): K1 + K2 + K3 (`BEZPIECZNA`)
+  - `FIX-C.3` (`fb94a02`): K1 + K2 (`BEZPIECZNA`)
+  - `FIX-E.1` (`8c0037f`): K1 + K2 + K3 (`BEZPIECZNA`)
+  - `FIX-E.2` (`8c0037f`): K1 + K2 (`BEZPIECZNA`)
+
+### 8.2. Rozstrzygnięcia pozycji otwartych w `PROJECT_MEMORY.md` (Commit 4)
+- `INC-AVT-010` → przeniesione do backlogu 11.1 (opcja A: aktualizacja `test_system.py` w 11.1 po uzyskaniu zgody operatora w procedurze `Z16-amendment`).
+- `N-05` → przeniesione do backlogu 11.1 (poza zakresem 11.0, dotyczy `rules.py`).
+- `N-08` → przeniesione do backlogu 11.1 (poza zakresem 11.0, wymaga migracji lokalnej operatora).
+- `N-06`, `N-07` → `RESOLVED (Standard 11.0)` z odwołaniem do `Artefakty/Raport_audytu_weryfikacyjnego_11_0_koncowy.md`.
+
+### 8.3. Weryfikacja bramek i guardrails przed Commitem 4
+- **Faza 0 (8 komend diagnostycznych):** PASS (`HEAD = 8c0037f8303f50201e30dda68d992ee867c984d9`, `origin/main` zsynchronizowany, raport audytu UTF-8 OK / 0 mojibake / 17 checkboxów `[x]`).
+- **`G-Q2` golden corpus:** `G-Q2 PASS: 5/5 synthetic golden cases unchanged`.
+- **`G-Q3` Z16 traps + `test_system.py`:** `71 passed, 153 deselected` (5/5 pułapek Z16 PASS).
+- **`G-Q4` pliki `series_memory/*_bible.json`:** `0 B` zmian.
+- **`G-Q5` `apply_canonical_alias_declension` / `substitute_canonical_honorific_alias`:** `0 B` zmian.
+- **`G-Q6` `verifier.py`:** `0 B` zmian.
+- **Z16 diff (`8d3d299..HEAD`):** `0 B` zmian na wszystkich plikach chronionych Z16.
+- **4 bramki CI/CD:** `verify_purity.py` PASS, `verify_8_fixes.py` 8/8 PASS, `verify_12_fixes.py` 12/12 PASS, `verify_ultimate_pipeline.py` 15/15 PASS.
+- **Pełny pakiet `tests/`:** `330 passed`.
+- **Zakres Commita 4 (`docs:`):** wyłącznie 3 pliki dokumentacyjne (`Artefakty/Raport_audytu_weryfikacyjnego_11_0_koncowy.md`, `Artefakty/Raport_wdrozenia_11.0.md`, `PROJECT_MEMORY.md`), `0 B` zmian w `*.py`.
