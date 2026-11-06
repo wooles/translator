@@ -88,7 +88,26 @@ ules.py, erifier.py, whisper_disambiguator.py) nie występuje ani jeden litera�
   4. *Ekwiwalencja Zbiorów Tokenów w Pass 1 (get_character_gender):* Rozpoznawanie tożsamości postaci wieloczłonowych w odwróconym szyku japońskim/zachodnim (Family Given vs Given Family) przez porównanie zbiorów tokenów (	okens_set == clean_tokens_set). Rozszerzenie suity testowej do 179 testów (Test 179, 179/179 PASSED, Zero Regression Lock Standardu 8.0).
 
 ---
+## INC-AVT-010 (Standard 10.6.3) — Konflikt Z16-vs-Z3: `f1_starts_lower` w `verifier.py`
 
+**Status:** `OPEN` (do zamknięcia w 11.0)
+**Zidentyfikowano:** 2026-11-05, raport wykonawczy 10.6.3 (`ed226d0`)
+
+### Problem
+
+Test 219 (`test_standard_9_5_suite`) w `test_system.py` (Z16) wymaga, żeby `_guard_phase2_regressions` dodawał `...` gdy F1 zaczyna się małą literą bez dots. Warunek 17a z 10.6.2 (`f1_has_dots`) nie spełnia tego wymagania — test 219 failuje na `d3dfdee`.
+
+### Rozwiązanie (10.6.3)
+
+Dodano `f1_starts_lower` do warunku 17a, rozszerzając go do `(f1_has_dots or f1_starts_lower)`. To **świadome odstępstwo od Z3** (Primary LLM Authority), wymuszone przez Z16.
+
+### Zamknięcie (11.0)
+
+Dwie opcje:
+- **A:** Modyfikacja `test_system.py` (test 219 aktualizacja) — **narusza Z16**, wymaga zgody operatora.
+- **B:** Refaktor `_guard_phase2_regressions` — bez modyfikacji testu 219, z zachowaniem `f1_starts_lower` w wąskim zakresie (np. tylko dla F1 zaczynających się od małej litery i bez dots, ale z dodatkowym warunkiem długości lub kontekstu).
+
+---
 ## 📐 4. METRYKI OPERACYJNE POTOKU
 - **Ograniczenia Ekranu ASS:** `CPS_PL <= 17.0` (dyskwalifikacja `> 20.0`), `CPL <= 38`, max 2 wiersze.
 - **Podłoga Gęstości Seiyū:** `CPS_target(rho_x) = min(13.5, 7.5 + 0.5 * rho_x)` dla `rho_x >= 9.0 mor/s`.
@@ -228,3 +247,4 @@ Przed naprawą `_resolve_bible_path` w 10.6.3 (`FIX-D.1`) odcinek `S2 - 02` seri
 ### Rozwiązanie (11.0)
 
 Dodanie w `tools/consolidate_bibles.py` opcjonalnej flagi `--migrate-misplaced-season-episodes` (uruchamianej lokalnie przez operatora poza reżimem Z16), która przenosi wpisy `episodes_translated` i `batch_stats` zawierające jawny znacznik `S2` z pliku `<SERIA_BASE>_bible.json` do `<SERIA_BASE>_2nd_Season_bible.json`.
+
