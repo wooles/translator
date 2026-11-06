@@ -1338,6 +1338,37 @@ def _is_prepositional_context(text: str, candidate_match_start: int) -> bool:
     return bool(_PREPOSITION_BEFORE_CAND_PAT.search(prefix))
 
 
+_MOB_CROWD_PAT = re.compile(
+    r"^(?:mob|crowd|passerby|bystander|citizen|villager|spectator|onlooker|"
+    r"tłum|przechodzień|gapi\w*|statyst\w*)",
+    re.IGNORECASE,
+)
+
+
+def _is_mob_or_crowd_speaker(speaker: Optional[str]) -> bool:
+    """Standard 11.0 (FIX-E.2a): Rozpoznaje mówców tłumu i tła."""
+    if not speaker:
+        return False
+    return bool(_MOB_CROWD_PAT.match(str(speaker).strip()))
+
+
+_DEICTIC_3RD_PERSON_PAT = re.compile(
+    r"^\s*(?:is\s+that|isn't\s+(?:that|she|he|it)|look\s+at|they\s+say|that's|that\s+is|"
+    r"czy\s+to|to\s+przecież|spójrz(?:cie)?\s+na|podobno)\b",
+    re.IGNORECASE,
+)
+
+
+def _split_clauses(text: str) -> List[str]:
+    """Standard 11.0 (FIX-E.2b): Dzieli tekst wypowiedzi na pojedyncze zdania/klauzule."""
+    return [c.strip() for c in re.split(r"(?<=[.!?])\s+", text) if c and c.strip()]
+
+
+def _is_deictic_3rd_person_clause(clause: str) -> bool:
+    """Standard 11.0 (FIX-E.2b): Sprawdza, czy klauzula jest obserwacją deiktyczną 3. osoby."""
+    return bool(_DEICTIC_3RD_PERSON_PAT.match(clause))
+
+
 def _detect_event_vocative(
     event_or_text: Any,
     series_bible: Optional[Any] = None,
@@ -1352,6 +1383,11 @@ def _detect_event_vocative(
     clean = SubtitleDiscourseSanitizer.ASS_TAGS_REGEX.sub("", raw).strip()
     if not clean:
         return None, None
+
+    clauses = [c for c in _split_clauses(clean) if not _is_deictic_3rd_person_clause(c)]
+    if not clauses:
+        return None, None
+    clean = " ".join(clauses)
 
     # 1. Sprawdzenie zarejestrowanych postaci w SeriesBible (jeśli dostępne)
     if series_bible:
@@ -2545,25 +2581,31 @@ def resolve_turn_addressee(
                 forward_gap_ms = next_turn.start - turn.end
                 next_voc, _ = _detect_turn_vocative(next_turn, series_bible=series_bible)
                 if 0 <= forward_gap_ms <= 3500 and not next_voc:
-                    resp_speaker = next_turn.speaker
-                    _, resp_gender, _ = _resolve_character_canonical_and_gender(
-                        resp_speaker, series_bible=series_bible, context_item=next_turn
-                    )
-                    if not resp_gender and hasattr(next_turn, "speaker_gender"):
-                        resp_gender = next_turn.speaker_gender
+                    if not (_is_mob_or_crowd_speaker(turn.speaker) and not _is_mob_or_crowd_speaker(next_turn.speaker)):
+                        resp_speaker = next_turn.speaker
+                        _, resp_gender, _ = _resolve_character_canonical_and_gender(
+                            resp_speaker, series_bible=series_bible, context_item=next_turn
+                        )
+                        if not resp_gender and hasattr(next_turn, "speaker_gender"):
+                            resp_gender = next_turn.speaker_gender
 
-                    resp_g_l = (resp_gender or "").lower()
-                    norm_resp_g = "MALE" if resp_g_l in ("male", "mężczyzna", "masculine") else (
-                        "FEMALE" if resp_g_l in ("female", "kobieta", "feminine") else None
-                    )
-                    if norm_resp_g or resp_speaker:
-                        turn.target_speaker = resp_speaker
-                        turn.target_gender = norm_resp_g
-                        turn.target_confidence = 0.85
-                        lookahead_resolved = True
+                        resp_g_l = (resp_gender or "").lower()
+                        norm_resp_g = "MALE" if resp_g_l in ("male", "mężczyzna", "masculine") else (
+                            "FEMALE" if resp_g_l in ("female", "kobieta", "feminine") else None
+                        )
+                        if norm_resp_g or resp_speaker:
+                            turn.target_speaker = resp_speaker
+                            turn.target_gender = norm_resp_g
+                            turn.target_confidence = 0.85
+                            lookahead_resolved = True
 
         # Krok 4: Wymiana tur A <-> B (fallback przy braku wołacza, lookback i lookahead)
-        if not lookback_resolved and not lookahead_resolved and turn.target_speaker is None:
+        is_isolated_mob_turn = (
+            _is_mob_or_crowd_speaker(turn.speaker)
+            and not turn_has_2nd
+            and not getattr(turn, "vocative_lock", False)
+        )
+        if not lookback_resolved and not lookahead_resolved and turn.target_speaker is None and not is_isolated_mob_turn:
             if (
                 previous_turn is not None
                 and previous_turn.speaker

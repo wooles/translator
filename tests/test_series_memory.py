@@ -1335,3 +1335,56 @@ def test_t11_0_c_8_character_preserved_with_prepositional_context(tmp_path):
     assert sm.is_non_character_entity("UczelniaGamma", context="w UczelniaGamma") is True
     assert "Bohaterka UczelniaGamma" in sm.data["characters"]
     assert "Bohaterka UczelniaGamma" in sm.data["declensions"]
+
+
+
+@pytest.mark.unit
+def test_t11_0_e_1_camelcase_split_mob_man_2(tmp_path):
+    """FIX-E.1: MobMan i MobMan2 otrzymują gender=MALE i oba klucze przetrwają _sanitize_loaded_bible_in_ram."""
+    from series_memory import SeriesBible
+    sm = SeriesBible(anime_title="Seria Testowa", storage_dir=tmp_path)
+    sm.data["characters"] = {}
+    sm.populate_secondary_actor_tags(["MobMan", "MobMan2"])
+    sm._sanitize_loaded_bible_in_ram()
+    assert sm.data["characters"]["MobMan"]["gender"] == "MALE"
+    assert sm.data["characters"]["MobMan2"]["gender"] == "MALE"
+
+
+@pytest.mark.unit
+def test_t11_0_e_2_camelcase_split_mob_woman_and_mean_girl(tmp_path):
+    """FIX-E.1: MobWoman -> FEMALE, MeanGirl -> FEMALE (w SeriesBible oraz resolve_lexical_label_gender)."""
+    from series_memory import SeriesBible, resolve_lexical_label_gender
+    sm = SeriesBible(anime_title="Seria Testowa", storage_dir=tmp_path)
+    sm.data["characters"] = {}
+    sm.populate_secondary_actor_tags(["MobWoman", "MeanGirl"])
+    assert sm.data["characters"]["MobWoman"]["gender"] == "FEMALE"
+    assert sm.data["characters"]["MeanGirl"]["gender"] == "FEMALE"
+    assert resolve_lexical_label_gender("MobWoman")[0] == "FEMALE"
+    assert resolve_lexical_label_gender("MobMan2")[0] == "MALE"
+
+
+@pytest.mark.unit
+def test_t11_0_e_3_unknown_gender_can_be_updated(tmp_path):
+    """FIX-E.1: istniejący rekord MobWoman z gender=UNKNOWN zostaje zaktualizowany do FEMALE."""
+    from series_memory import SeriesBible
+    sm = SeriesBible(anime_title="Seria Testowa", storage_dir=tmp_path)
+    sm.data["characters"] = {"MobWoman": {"gender": "UNKNOWN", "priority": "P1", "aliases": ["MobWoman"]}}
+    sm.populate_secondary_actor_tags(["MobWoman"])
+    assert sm.data["characters"]["MobWoman"]["gender"] == "FEMALE"
+
+
+@pytest.mark.unit
+def test_t11_0_e_4_verified_p0_female_not_changed_by_camelcase_split(tmp_path):
+    """FIX-E.1: zweryfikowana postać P0 FEMALE pozostaje nienaruszona."""
+    from series_memory import SeriesBible
+    sm = SeriesBible(anime_title="Seria Testowa", storage_dir=tmp_path)
+    sm.data["characters"] = {
+        "Bohaterka Pierwsza": {
+            "gender": "FEMALE",
+            "has_verified_gender": True,
+            "priority": "P0",
+            "aliases": ["Bohaterka", "Pierwsza", "Bohaterka Pierwsza"],
+        }
+    }
+    sm.populate_secondary_actor_tags(["BohaterkaPierwsza"])
+    assert sm.data["characters"]["Bohaterka Pierwsza"]["gender"] == "FEMALE"

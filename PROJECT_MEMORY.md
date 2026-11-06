@@ -208,7 +208,7 @@ Regex detekcji to **wewnętrzny mechanizm selekcji** (`True`/`False`), a nie **t
 
 ## Backlog 11.0 — N-06: Kolizja homonimiczna TOPONYM vs ANTHROPONYM (<NAZWA_SZKOŁY_1>)
 
-**Status:** `OPEN` (P2, dług techniczny w telemetrii, nie wpływa na tekst wyjściowy .ass po 10.6.1, nie blokuje 10.6.3)
+**Status:** `RESOLVED (Standard 11.0, commity 941fe44, fb94a02)`
 **Zidentyfikowano:** `Raport_audytu_arnold_toponym_i_duplikacji_bible.md` (2026-11-05, Defekt C)
 
 ### Problem
@@ -217,12 +217,12 @@ W `series_bible` token `<NAZWA_SZKOŁY_1>` istnieje wyłącznie jako jednowyrazo
 
 ### Rozwiązanie (11.0)
 
-Wdrożenie operacji `FIX-C.1` (ekstrakcja nazw instytucji/lokacji z opisu serii do `entity_categories` jako `TOPONYM`), `FIX-C.2` (odpięcie kolidującego jednowyrazowego aliasu nazwiska w kroku `8f` `_sanitize_loaded_bible_in_ram`) oraz `FIX-C.3` (kontekstowa ochrona przyimków lokatywnych/relacyjnych w `is_non_character_entity`).
+Wdrożenie operacji `FIX-C.1` (ekstrakcja nazw instytucji/lokacji ze słownika, kotwic fabularnych i profilu odcinka do `entity_categories` jako `TOPONYM` pod kluczem `institutional_toponyms`, commit `941fe44`), `FIX-C.2` (odpięcie kolidującego jednowyrazowego nazwiska w RAM bez wywoływania zapisu na dysk, commit `941fe44`) oraz `FIX-C.3` (kontekstowa ochrona przyimków lokatywnych/relacyjnych w `is_non_character_entity` i filtr przyimkowy w `_detect_event_vocative`, commit `fb94a02`).
 
 
 ## Backlog 11.0 — N-07: Adresowanie mówców tłumu Mob* i rozbijanie identyfikatorów CamelCase
 
-**Status:** `OPEN` (P2, dług techniczny w telemetrii, nie wpływa na tekst wyjściowy .ass, nie blokuje 10.6.3)
+**Status:** `RESOLVED (Standard 11.0)`
 **Zidentyfikowano:** `Raport_audytu_arnold_toponym_i_duplikacji_bible.md` (2026-11-05, Defekt E)
 
 ### Problem
@@ -232,7 +232,7 @@ Wdrożenie operacji `FIX-C.1` (ekstrakcja nazw instytucji/lokacji z opisu serii 
 
 ### Rozwiązanie (11.0)
 
-Wdrożenie operacji `FIX-E.1` (rozbijanie granic CamelCase i cyfr przed klasyfikacją leksykalną w `populate_secondary_actor_tags`) oraz `FIX-E.2` (izolacja mówców `Mob*`/`Crowd*` w `resolve_turn_addressee` przy braku wykładników 2. osoby).
+Wdrożenie operacji `FIX-E.1` (rozbijanie granic CamelCase i cyfr w `_split_camel_case_tokens`, aktualizacja rekordów `UNKNOWN` w `populate_secondary_actor_tags`, podział w `resolve_lexical_label_gender` oraz ochrona par z sufiksem liczbowym w kroku `8b`) oraz `FIX-E.2` (izolacja mówców `Mob*`/`Crowd*` w Krokach 3 i 4 `resolve_turn_addressee` oraz filtr deiktyków 3. os. per klauzula w `_detect_event_vocative`).
 
 
 ## Backlog 11.0 — N-08: Historyczne rozszczepienie odcinka S2-02 w pliku bazowym <SERIA_BASE>_bible.json

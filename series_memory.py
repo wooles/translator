@@ -1927,6 +1927,18 @@ SECONDARY_LEXICAL_FEMALE_NOUNS: Set[str] = {
     "dziewczyna", "kobieta", "dziewczynka", "matka", "siostra"
 }
 
+
+def _split_camel_case_tokens(tag: str) -> List[str]:
+    """
+    Standard 11.0 (FIX-E.1): Rozbija identyfikatory CamelCase oraz przyrostki liczbowe na osobne tokeny.
+    """
+    if not tag:
+        return []
+    spaced = re.sub(r"([a-ząćęłńóśźż])([A-ZĄĆĘŁŃÓŚŹŻ])", r"\1 \2", str(tag))
+    spaced = re.sub(r"([a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ])(\d)", r"\1 \2", spaced)
+    return [t.lower() for t in re.findall(r"\b\w+\b", spaced.lower()) if t]
+
+
 def resolve_lexical_label_gender(label: str) -> Tuple[Optional[str], Optional[str]]:
     """
     Deterministyczny resolver inherentnej płci leksykalnej dla etykiet ról i grup (Standard 10.0.3, 2B.4):
@@ -1943,7 +1955,10 @@ def resolve_lexical_label_gender(label: str) -> Tuple[Optional[str], Optional[st
     if explicit_g in ("MALE", "FEMALE"):
         return (explicit_g, "MASCULINE" if explicit_g == "MALE" else "FEMININE")
 
-    l_low = clean_lbl.lower()
+    clean_spaced = re.sub(r"([a-ząćęłńóśźż])([A-ZĄĆĘŁŃÓŚŹŻ])", r"\1 \2", clean_lbl)
+    clean_spaced = re.sub(r"([a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ])(\d)", r"\1 \2", clean_spaced)
+    clean_l = clean_spaced.lower()
+    l_low = clean_l
     words = re.findall(r"\b[a-ząćęłńóśźżA-ZĄĆĘŁŃÓŚŹŻ0-9]+\b", l_low)
     if not words:
         return (None, None)
@@ -6838,10 +6853,20 @@ class SeriesBible:
                         if full_k != k and "->" not in full_k and isinstance(full_val, dict):
                             full_toks = full_k.split()
                             first_tok = full_toks[0].lower()
+                            is_numeric_suffix_pair = (
+                                bool(re.search(r"\d+$", full_k))
+                                and not bool(re.search(r"\d+$", k))
+                            )
                             match = (
                                 (len(full_toks) >= 2 and first_tok == k.lower())
                                 or (len(full_toks) >= 2 and first_tok.startswith(k.lower()) and len(k) >= 4)
-                                or (len(full_toks) == 1 and full_k.lower().startswith(k.lower()) and len(k) >= 4 and len(full_k) > len(k))
+                                or (
+                                    len(full_toks) == 1
+                                    and full_k.lower().startswith(k.lower())
+                                    and len(k) >= 4
+                                    and len(full_k) > len(k)
+                                    and not is_numeric_suffix_pair
+                                )
                             )
                             if match:
                                 if single_val.get("has_verified_gender") or single_val.get("priority") == "P0":
@@ -7015,8 +7040,9 @@ class SeriesBible:
                     continue
                 if clean_tag.lower() in COLLECTIVE_LABELS or (len(clean_tag.split()) == 1 and clean_tag[0].islower()):
                     continue
-                if clean_tag in chars:
-                    continue
+                if clean_tag in chars and isinstance(chars[clean_tag], dict):
+                    if str(chars[clean_tag].get("gender") or "").upper() in ("MALE", "FEMALE"):
+                        continue
 
                 # Operacja 2B.1 (FIX-A.1a): Normalizacja technicznych sufiksów stanu/formy aktora ASS
                 m_variant = _ACTOR_VARIANT_SUFFIXES_PAT.match(clean_tag)
@@ -7039,13 +7065,21 @@ class SeriesBible:
 
                 # Operacja 2B.2: Blokada tworzenia duplikatów P2 dla aliasów i nazw postaci P0/P1
                 existing_rec = self.resolve_character_record(clean_tag)
-                if existing_rec is not None and (existing_rec.get("has_verified_gender") or existing_rec.get("priority") in ("P0", "P1")):
+                if existing_rec is not None and (
+                    existing_rec.get("has_verified_gender")
+                    or (
+                        existing_rec.get("priority") in ("P0", "P1")
+                        and str(existing_rec.get("gender") or "").upper() in ("MALE", "FEMALE")
+                    )
+                ):
                     continue
 
                 clean_tag_low = clean_tag.lower()
                 clean_tag_norm = normalize_ascii_diacritics(clean_tag_low)
                 is_alias_of_existing = False
                 for c_k, c_v in chars.items():
+                    if c_k == clean_tag:
+                        continue
                     if "->" in c_k or not isinstance(c_v, dict):
                         continue
                     if c_k.lower() == clean_tag_low or normalize_ascii_diacritics(c_k.lower()) == clean_tag_norm:
@@ -7063,7 +7097,15 @@ class SeriesBible:
 
                 masculine_lexicon = SECONDARY_LEXICAL_MALE_NOUNS
                 feminine_lexicon = SECONDARY_LEXICAL_FEMALE_NOUNS
-                tag_words = set(re.findall(r"\b\w+\b", clean_tag.lower()))
+                tag_words = set(_split_camel_case_tokens(clean_tag))
+
+                existing_aliases = (
+                    chars[clean_tag].get("aliases", [clean_tag])
+                    if (clean_tag in chars and isinstance(chars[clean_tag], dict))
+                    else [clean_tag]
+                )
+                if clean_tag not in existing_aliases:
+                    existing_aliases.append(clean_tag)
 
                 if explicit_g in ("MALE", "FEMALE"):
                     chars[clean_tag] = {
@@ -7073,7 +7115,7 @@ class SeriesBible:
                         "confidence": 0.70,
                         "priority": "P1",
                         "has_verified_gender": False,
-                        "aliases": [clean_tag],
+                        "aliases": existing_aliases,
                         "description": "Postać drugoplanowa",
                         "entity_category": "ANTHROPONYM"
                     }
@@ -7085,7 +7127,7 @@ class SeriesBible:
                         "confidence": 0.95,
                         "priority": "P1",
                         "has_verified_gender": True,
-                        "aliases": [clean_tag],
+                        "aliases": existing_aliases,
                         "description": "Postać drugoplanowa",
                         "entity_category": "ANTHROPONYM"
                     }
@@ -7097,7 +7139,7 @@ class SeriesBible:
                         "confidence": 0.95,
                         "priority": "P1",
                         "has_verified_gender": True,
-                        "aliases": [clean_tag],
+                        "aliases": existing_aliases,
                         "description": "Postać drugoplanowa",
                         "entity_category": "ANTHROPONYM"
                     }
@@ -7109,7 +7151,7 @@ class SeriesBible:
                         "confidence": 0.50,
                         "priority": "P2",
                         "has_verified_gender": False,
-                        "aliases": [clean_tag],
+                        "aliases": existing_aliases,
                         "description": "Postać epizodyczna / tło",
                         "entity_category": "ANTHROPONYM"
                     }

@@ -723,3 +723,81 @@ def test_t11_0_c_7_detect_event_vocative_accepts_true_vocative(tmp_path):
     )
     assert result[0] == "BohaterAlfa"
     assert result[1] == "MALE"
+
+
+
+@pytest.mark.unit
+def test_t11_0_e_5_mob_man_vocative_works(tmp_path):
+    """FIX-E.2: jawny wołacz od MobMan ustawia target_speaker."""
+    import pysubs2
+    from series_memory import SeriesBible
+    from scene_discourse import SpeakerTurn, resolve_turn_addressee
+    sm = SeriesBible(anime_title="Seria Testowa", storage_dir=tmp_path)
+    sm.data["characters"] = {
+        "BohaterAlfa": {"gender": "MALE", "priority": "P0", "has_verified_gender": True, "aliases": ["BohaterAlfa"]}
+    }
+    turn = SpeakerTurn(speaker="MobMan", events=[pysubs2.SSAEvent(start=0, end=2000, text="BohaterAlfa, chodź tu!")])
+    result = resolve_turn_addressee(turn, previous_turn=None, series_bible=sm)
+    assert result.target_speaker == "BohaterAlfa"
+
+
+@pytest.mark.unit
+def test_t11_0_e_6_mob_deictic_3rd_person_not_vocative(tmp_path):
+    """FIX-E.2: zdania deiktyczne 3. osoby od Mob* nie przypisują monarchy ani księżniczki jako adresata."""
+    import pysubs2
+    from series_memory import SeriesBible
+    from scene_discourse import SpeakerTurn, resolve_all_speaker_turns
+    sm = SeriesBible(anime_title="Seria Testowa", storage_dir=tmp_path)
+    sm.data["characters"] = {
+        "KsiezniczkaBeta": {
+            "gender": "FEMALE",
+            "priority": "P0",
+            "has_verified_gender": True,
+            "aliases": ["KsiezniczkaBeta"],
+        },
+        "MonarchaAlfa": {
+            "gender": "MALE",
+            "priority": "P0",
+            "has_verified_gender": True,
+            "aliases": ["MonarchaAlfa"],
+        },
+    }
+    t1 = SpeakerTurn(
+        speaker="MobMan",
+        events=[pysubs2.SSAEvent(start=1000, end=3000, text="Is that the famous KsiezniczkaBeta?")],
+    )
+    t2 = SpeakerTurn(
+        speaker="MobWoman",
+        events=[pysubs2.SSAEvent(start=3500, end=5500, text="They say she's been in InstytucjaAlfa all this time.")],
+    )
+    t3 = SpeakerTurn(
+        speaker="MonarchaAlfa",
+        events=[pysubs2.SSAEvent(start=6400, end=9000, text="Welcome to the festival.")],
+    )
+    resolve_all_speaker_turns([t1, t2, t3], series_bible=sm)
+    assert t1.target_speaker != "KsiezniczkaBeta"
+    assert t2.target_speaker != "MonarchaAlfa"
+
+
+@pytest.mark.unit
+def test_t11_0_e_7_mob_deictic_per_clause_keeps_vocative(tmp_path):
+    """FIX-E.2: filtr deiktyków 3. os. działa per klauzula i zachowuje wołacz z pierwszego zdania."""
+    import pysubs2
+    from series_memory import SeriesBible
+    from scene_discourse import SpeakerTurn, resolve_turn_addressee
+    sm = SeriesBible(anime_title="Seria Testowa", storage_dir=tmp_path)
+    sm.data["characters"] = {
+        "BohaterAlfa": {"gender": "MALE", "priority": "P0", "has_verified_gender": True, "aliases": ["BohaterAlfa"]},
+        "KsiezniczkaBeta": {
+            "gender": "FEMALE",
+            "priority": "P0",
+            "has_verified_gender": True,
+            "aliases": ["KsiezniczkaBeta"],
+        },
+    }
+    turn = SpeakerTurn(
+        speaker="MobMan",
+        events=[pysubs2.SSAEvent(start=0, end=3000, text="BohaterAlfa, słyszałeś? Is that the famous KsiezniczkaBeta?")],
+    )
+    result = resolve_turn_addressee(turn, previous_turn=None, series_bible=sm)
+    assert result.target_speaker == "BohaterAlfa"
