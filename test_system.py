@@ -19353,7 +19353,9 @@ def test_standard_9_5_suite():
         prev_line_pl="Widziałem to na własne oczy...",
         prev_line_en="I saw it with my own eyes..."
     )
-    assert v_res_ell.startswith("...")
+    # Standard 11.1 (Z16-amendment #3, INC-AVT-010): Primary LLM Authority - F1 bez wielokropka nie otrzymuje sztucznych kropek
+    assert not v_res_ell.startswith("...")
+    assert v_res_ell == "Nie mogłem w to uwierzyć."
 
     # 5. SceneDiscourseGraph telemetry arbitrate (2C.1)
     ev_dialogue = pysubs2.SSAEvent(start=1000, end=3000, text="Rozumiem.", name="Abaddon")
