@@ -1,4 +1,4 @@
-﻿import ast, os, re, sys
+import ast, os, re, sys
 
 results = {}
 

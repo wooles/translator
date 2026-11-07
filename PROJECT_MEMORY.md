@@ -4,22 +4,22 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-07 — Standard 11.0 Certyfikowany Baseline)
-- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.0 (Production Certified Baseline)`
-- **Commity implementacyjne 11.0:** `941fe44` (Commit 1: `FIX-C.1` + `FIX-C.2`), `fb94a02` (Commit 2: `FIX-C.3`), `8c0037f` (Commit 3: `FIX-E.1` + `FIX-E.2`)
-- **Raport audytu weryfikacyjnego 11.0:** `Artefakty/Raport_audytu_weryfikacyjnego_11_0_koncowy.md` — werdykt `STANDARD 11.0 W PEŁNI BEZPIECZNY (5/5 operacji bezpiecznych, 13/13 warunków spełnionych)`
-- **Status 11.0:** `CERTIFIED / CLOSED (2026-11-07)`
-- **Commit ochrony Depuracji Legacy 1.0 (Z16):** `474fb64`
-- **Stan metryk:** `330 passed` w `tests/` (`310` bazowych + `20` items z `15` funkcji `T11.0_*`) oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `401 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py`, `verify_8_fixes.py`, `verify_12_fixes.py`, `verify_ultimate_pipeline.py`) oraz `audit_diff.ps1` w stanie `PASS`.
-- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (330/330 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
-- **Zasada utrzymaniowa post-11.0:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.0` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
-- **Gałąź i Architektura:** `main` (Standard 10.1: Wariant (d) — Hybrydowa Straż Dowodowa [Hybrid Evidence Guard & Pipeline Hardening], Zero Morphosyntactic Mutation in Production [`VARIANT_D_PURE_LLM_MORPHOLOGY = True`, T(x) = x], Narrow Safety Net P0 and EN w `EpisodeQualityGate.apply_narrow_safety_net_p0_en`, Pre-translacyjna Ingestia AniList P0 do `SeriesBible.characters` z paradygmatami odmiany nazw, Fonetyczna Normalizacja Aliasów `ph <-> f` w O(1) z samoleczącym indeksem, Trwałe Wyeliminowanie Pętli Rewersji `authoritative_dialogue` w Kroku 18 `translator.py`, Reguła Wołacza Tytułów dla nazw obcych na `-tz` [`Kapitanie [Imię]`, `Panie [Imię]`], Programowa Bariera Regresji Fazy 2 `_guard_phase2_regressions` w `DialogueVerifier`, Rygorystyczna Higiena ASS [usuwanie spacji z tagów i przenoszenie wiszących spójników przed `\N`], Stabilna Identyfikacja Zdarzeń `[ID: {event_id}]`, Full-Codebase Zero-Anime-Literal Invariant & 12/12 w `verify_purity.py`, 4/4 w `audit_diff.ps1`)
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-07 — Standard 11.1 Certyfikowany Baseline)
+- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.1 (Production Certified Baseline)`
+- **Commit certyfikacji kodu:** `218af2e` (`218af2e259caad1e0b57e754d92900cfa0b33a7e`)
+- **Commity implementacyjne 11.1:** `5b7306d` (Commit 1), `5b17ea7` (Commit 2), `2b4bc7d` (Commit 3), `8b72887` (Commit 4), `8a7dd31` (Commit 5), `218af2e` (Commit 6)
+- **Status 11.1:** `CERTIFIED / CLOSED (2026-11-07)`
+- **Nowy commit ochrony Depuracji Legacy 1.0 (Z16):** `8b72887` (`8b728876c4fa9ec9ef4ec4a29a0a0df255a6d36e` — po Z16-amendmentach #1, #2, #3)
+- **Stan metryk:** `336 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `407 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py`, `verify_8_fixes.py`, `verify_12_fixes.py`, `verify_ultimate_pipeline.py`) oraz `audit_diff.ps1` w stanie `PASS`.
+- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (336/336 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
+- **Zasada utrzymaniowa post-11.1:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.1` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
+- **Gałąź i Architektura:** `main` (Standard 11.1: Neutralność Całego Kodu, Uszczelnienie Verify_Purity z 3 nowymi bramkami AST, Dynamiczne Ładowanie Kanonu Mangowego z JSON, Eliminacja Luk Przepływu LUKA-E1-01..E8-01, Z16-amendmenty #1, #2, #3, Zero-Literal Pure Positive Domain Invariant Architecture & Primary LLM Translation Authority)
 - **Środowisko:** Python 3.13 (`.venv`), Windows PowerShell, `ffmpeg` (PATH), `librosa.pyin`, `soundfile`, `pysubs2`, `spaCy en_core_web_sm` (100% offline 0.00 PLN), bezpośrednie klucze Google AI Studio API (`use_vertex = 0`).
 - **Dyrektywa Wykonawcza Testów:**
   * Testy przyrostowe podczas kodowania (< 2 s): `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_testu>"`
-  * Szybki pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest -q` (330 passed w tests/, 71 passed i 153 deselected w test_system.py)
+  * Szybki pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest -q` (336 passed w tests/, 71 passed i 153 deselected w test_system.py)
   * Audyt śledczy diffu: `powershell -ExecutionPolicy Bypass -File .\audit_diff.ps1 -ForbiddenTerms "<lista>"`
-  * 4 bramki kwalifikacyjne: `python verify_purity.py`, `python verify_12_fixes.py`, `python verify_ultimate_pipeline.py`, `audit_diff.ps1`
+  * 4 bramki kwalifikacyjne: `python verify_purity.py`, `python verify_8_fixes.py`, `python verify_12_fixes.py`, `python verify_ultimate_pipeline.py`
 
 ---
 
@@ -90,26 +90,26 @@ ules.py, erifier.py, whisper_disambiguator.py) nie występuje ani jeden litera�
   4. *Ekwiwalencja Zbiorów Tokenów w Pass 1 (get_character_gender):* Rozpoznawanie tożsamości postaci wieloczłonowych w odwróconym szyku japońskim/zachodnim (Family Given vs Given Family) przez porównanie zbiorów tokenów (	okens_set == clean_tokens_set). Rozszerzenie suity testowej do 179 testów (Test 179, 179/179 PASSED, Zero Regression Lock Standardu 8.0).
 
 ---
-## INC-AVT-010 (Standard 10.6.3) — Konflikt Z16-vs-Z3: `f1_starts_lower` w `verifier.py`
+## INC-AVT-010 (Standard 11.1) — Konflikt Z16-vs-Z3: `f1_starts_lower` w `verifier.py`
 
-**Status:** `OPEN` (przeniesione do backlogu 11.1 — opcja A: aktualizacja `test_system.py` wymaga zgody operatora i zostanie rozpatrzona w 11.1)
+**Status:** `RESOLVED (Standard 11.1, Commit 4 — Z16-amendment #3)`
 **Zidentyfikowano:** 2026-11-05, raport wykonawczy 10.6.3 (`ed226d0`)
-**Zaktualizowano:** 2026-11-07 (Commit 4 domykający Standard 11.0)
+**Zamknięto:** 2026-11-07 (Commit 4 Standardu 11.1, hash `8b72887`)
 
-### Problem
+### Rozwiązanie (11.1)
+W ramach autoryzowanego `Z16-amendment #3` usunięto warunek `f1_starts_lower` z warunku 17a w `_guard_phase2_regressions` (`verifier.py`) oraz zsynchronizowano asercję Testu 219 w `test_system.py`, przywracając pełny prymat Primary LLM Authority (Z3) — brak sztucznego wstrzykiwania wielokropka w linii Fazy 1 rozpoczynającej się bez kropek.
 
-Test 219 (`test_standard_9_5_suite`) w `test_system.py` (Z16) wymaga, żeby `_guard_phase2_regressions` dodawał `...` gdy F1 zaczyna się małą literą bez dots. Warunek 17a z 10.6.2 (`f1_has_dots`) nie spełnia tego wymagania — test 219 failuje na `d3dfdee`.
+### 🔹 INC-AVT-011 (Standard 11.1: Uszczelnienie verify_purity.py — Z16-amendment #1)
+- **Status:** `RESOLVED (Standard 11.1, Commit 1 — Z16-amendment #1, hash 5b7306d)`
+- **Rozwiązanie:** Wprowadzenie 3 nowych rygorystycznych bramek AST w `verify_purity.py`: Bramka 8 (zakaz statycznych kolekcji nazw własnych w AST), Bramka 9 (zakaz ręcznych łat odmian `variants.update` i ciągów paradygmatów), Bramka 10 (czystość DSP/NumPy).
 
-### Rozwiązanie tymczasowe (10.6.3 / 11.0)
+### 🔹 INC-AVT-012 (Standard 11.1: Neutralizacja Kodu i Zasobów — Z16-amendment #2)
+- **Status:** `RESOLVED (Standard 11.1, Commit 3 — Z16-amendment #2, hash 2b4bc7d)`
+- **Rozwiązanie:** Całkowite oczyszczenie kodu z nazw własnych, dialektów i prescriptive phrases w `avt_linter.py`, `rules.py`, `series_memory.py`, `fansub_miner.py`, `glossary_manager.py`, `user_feedback.py` oraz `translator.py`. Dynamiczna detekcja dyskursu w `WhisperDisambiguator.detect_batch_discourse_categories` (zamknięcie `N-05`).
 
-Dodano `f1_starts_lower` do warunku 17a, rozszerzając go do `(f1_has_dots or f1_starts_lower)`. To **świadome odstępstwo od Z3** (Primary LLM Authority), wymuszone przez ochronę Z16.
-
-### Plan zamknięcia (11.1)
-
-Opcja A (wybrana przez operatora 2026-11-07): modyfikacja `test_system.py` — test 219 (`test_standard_9_5_suite`) zostanie zaktualizowany w Standardzie 11.1 po uzyskaniu zgody operatora na zmianę Z16. Wymaga to formalnej procedury `Z16-amendment` (analogicznej do wcześniejszych aktualizacji baseline'u Z16) oraz ponownej certyfikacji 5 pułapek Z16 na nowym baseline.
-
-Do czasu zamknięcia w 11.1 w `verifier.py` pozostaje świadome odstępstwo `f1_starts_lower` od Z3 (`Primary LLM Authority`).
-
+### 🔹 INC-AVT-013 (Standard 11.1: Autoryzowana Aktualizacja Testu 219 — Z16-amendment #3)
+- **Status:** `RESOLVED (Standard 11.1, Commit 4 — Z16-amendment #3, hash 8b72887)`
+- **Rozwiązanie:** Aktualizacja asercji Testu 219 w `test_system.py:19353` pod kątem Primary LLM Authority (Z3) i usunięcia `f1_starts_lower`, ustanawiając nowy nienaruszalny baseline Z16 (`8b72887`).
 ---
 ## 📐 4. METRYKI OPERACYJNE POTOKU
 - **Ograniczenia Ekranu ASS:** `CPS_PL <= 17.0` (dyskwalifikacja `> 20.0`), `CPL <= 38`, max 2 wiersze.
@@ -172,7 +172,7 @@ Do czasu zamknięcia w 11.1 w `verifier.py` pozostaje świadome odstępstwo `f1_
 
 ## Backlog 11.0 — N-05: Oczyszczenie regexów w `get_focused_rules_for_batch` z japońskich tokenów leksykalnych
 
-**Status:** `OPEN` (P2, przeniesione do backlogu 11.1 — poza zakresem 11.0; dotyczy `rules.py`, a nie `series_memory.py`/`scene_discourse.py`)
+**Status:** `RESOLVED (Standard 11.1, Commit 3 — Z16-amendment #2, hash 2b4bc7d)`
 **Zaktualizowano:** 2026-11-07 (Commit 4 domykający Standard 11.0)
 **Zidentyfikowano:** Standard 10.3 (`9f4df49`), audyt czystości i rzetelności Filarów (`Raport_audytu_czystosci_i_rzetelnosci_filarow_SUPLEMENT.md`, FAZA 0)
 **Przeklasyfikowano:** z P1 na P2 przed hotfixem 10.4 (na podstawie analizy semantyki Z4)
