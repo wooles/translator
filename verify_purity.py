@@ -39,7 +39,6 @@ LOGIC_FILES = [
 ]
 
 TEMPORARY_11_1_MIGRATION_ALLOWLIST = {
-    "manga_canon.py",
     "fansub_miner.py",
     "glossary_manager.py",
     "metadata.py",

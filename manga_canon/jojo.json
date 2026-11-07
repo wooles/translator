@@ -1,0 +1,36 @@
+{
+  "title": "JoJo's Bizarre Adventure",
+  "aliases": [
+    "jjba",
+    "jojo",
+    "jojo's bizarre adventure"
+  ],
+  "publisher": "Wydawnictwo J.P.Fantastica",
+  "glossary": {
+    "Jonathan Joestar": "Jonathan Joestar",
+    "Joseph Joestar": "Joseph Joestar",
+    "Jotaro Kujo": "Jotaro Kujo",
+    "Josuke Higashikata": "Josuke Higashikata",
+    "Giorno Giovanna": "Giorno Giovanna",
+    "Jolyne Cujoh": "Jolyne Cujoh",
+    "Johnny Joestar": "Johnny Joestar",
+    "Dio Brando": "Dio Brando",
+    "DIO": "Dio Brando",
+    "Kars": "Kars",
+    "Yoshikage Kira": "Yoshikage Kira",
+    "Diavolo": "Diavolo",
+    "Enrico Pucci": "Ojciec Enrico Pucci",
+    "Funny Valentine": "Prezydent Funny Valentine",
+    "Hamon": "Hamon",
+    "Ripple": "Hamon",
+    "Stand": "Stand",
+    "Star Platinum": "Star Platinum",
+    "The World": "The World",
+    "Crazy Diamond": "Crazy Diamond",
+    "Gold Experience": "Gold Experience",
+    "Stone Free": "Stone Free",
+    "Tusk": "Tusk",
+    "Stone Mask": "Kamienna Maska",
+    "Speedwagon Foundation": "Fundacja Speedwagona"
+  }
+}
