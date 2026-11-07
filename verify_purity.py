@@ -38,12 +38,7 @@ LOGIC_FILES = [
     "verifier.py", "whisper_disambiguator.py", "whisper_engine.py"
 ]
 
-TEMPORARY_11_1_MIGRATION_ALLOWLIST = {
-    "tests/test_metadata.py",
-    "tests/test_series_memory.py",
-    "tests/test_verifier.py",
-    "tests/test_discourse_and_translator.py",
-}
+TEMPORARY_11_1_MIGRATION_ALLOWLIST = set()
 
 # Bramka 2: Wprowadzanie przykładów nazewniczych (np. [Nazwa])
 RE_EXEMPLAR_INTRODUCERS = re.compile(

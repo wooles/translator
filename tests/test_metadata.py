@@ -109,9 +109,9 @@ def test_actor_normalization_exact_token_and_asr_window_isolation(
 def test_step3_secondary_actors_populate_p1_and_p2_entries_in_series_bible(tmp_path):
     """
     T4.10 (Operacja 2C.7): Populacja postaci drugoplanowych z raw_actor_tags:
-    - postacie z jawną płcią w nawiasie (np. 'Gojirō (M)') -> priority='P1', gender='MALE', confidence=0.70
-    - postacie żeńskie (np. 'Shizuka (F)') -> priority='P1', gender='FEMALE', confidence=0.70
-    - postacie bez płci (np. 'Żołnierz') -> priority='P2', gender='UNKNOWN', confidence=0.50
+    - postacie z jawną płcią w nawiasie ('Gojirō (M)') -> priority='P1', gender='MALE', confidence=0.70
+    - postacie żeńskie ('Shizuka (F)') -> priority='P1', gender='FEMALE', confidence=0.70
+    - postacie bez płci ('Żołnierz') -> priority='P2', gender='UNKNOWN', confidence=0.50
     - separatory ('/', '\\') i tagi techniczne (Sign, Txt) są odrzucane.
     """
     from series_memory import SeriesBible

@@ -918,7 +918,7 @@ def test_plot_anchors_negative_phrases_normalized_to_positive(raw_anchor):
 def test_t10_6_1_1_variant_actor_suffix_soul_does_not_hijack_base_character(tmp_path):
     """
     Standard 10.6.1 (FIX-A.1): Weryfikuje, że techniczny tag aktora z sufiksem stanu
-    (np. HeroineSoul) nie przejmuje krótkiego aliasu ('Heroine') od głównej postaci P0
+    (wariant HeroineSoul) nie przejmuje krótkiego aliasu ('Heroine') od głównej postaci P0
     ('Heroine Royalhouse').
     """
     from series_memory import SeriesMemoryManager
