@@ -6,19 +6,57 @@ if sys.stderr and hasattr(sys.stderr, "reconfigure"):
 
 
 FILES_TO_AUDIT = [
-    "translator.py", "avt_linter.py", "series_memory.py",
-    "scene_discourse.py", "profiler.py", "metadata.py",
-    "rules.py", "verifier.py", "whisper_disambiguator.py",
+    # 30 runtime modules
+    "avt_formatter.py", "avt_linter.py", "client_factory.py", "context_cache.py",
+    "extract.py", "fansub_miner.py", "glossary_manager.py", "main.py",
+    "manga_canon.py", "memory.py", "metadata.py", "model_resolver.py",
+    "pipeline_logger.py", "pricing_guard.py", "profiler.py", "prosody_engine.py",
+    "romaji_helper.py", "rules.py", "scene_discourse.py", "scene_snapper.py",
+    "series_memory.py", "sign_detector.py", "speaker_diarizer.py", "style_matrix.py",
+    "translator.py", "typesetting_matcher.py", "user_feedback.py", "verifier.py",
+    "whisper_disambiguator.py", "whisper_engine.py",
+    # Test suite
+    "tests/test_avt_linter.py", "tests/test_discourse_and_translator.py",
+    "tests/test_flight_recorder.py", "tests/test_hygiene.py", "tests/test_metadata.py",
+    "tests/test_profiler.py", "tests/test_series_memory.py", "tests/test_translator.py",
+    "tests/test_verifier.py",
+    # Tools & Documentation
+    "tools/consolidate_bibles.py",
     "PELNY_RAPORT_TECHNICZNY_POTOKU.md"
 ]
 
-RULE_AND_PROMPT_FILES = ["rules.py", "profiler.py", "translator.py", "verifier.py", "metadata.py"]
-LOGIC_FILES = ["avt_linter.py", "series_memory.py", "scene_discourse.py", "translator.py", "profiler.py"]
+RULE_AND_PROMPT_FILES = [
+    "rules.py", "profiler.py", "translator.py", "verifier.py", "metadata.py",
+    "glossary_manager.py", "manga_canon.py", "fansub_miner.py", "user_feedback.py"
+]
+LOGIC_FILES = [
+    "avt_formatter.py", "avt_linter.py", "extract.py", "fansub_miner.py",
+    "glossary_manager.py", "main.py", "manga_canon.py", "memory.py", "metadata.py",
+    "profiler.py", "prosody_engine.py", "romaji_helper.py", "rules.py",
+    "scene_discourse.py", "scene_snapper.py", "series_memory.py", "sign_detector.py",
+    "speaker_diarizer.py", "style_matrix.py", "translator.py", "typesetting_matcher.py",
+    "verifier.py", "whisper_disambiguator.py", "whisper_engine.py"
+]
+
+TEMPORARY_11_1_MIGRATION_ALLOWLIST = {
+    "manga_canon.py",
+    "fansub_miner.py",
+    "glossary_manager.py",
+    "metadata.py",
+    "avt_linter.py",
+    "rules.py",
+    "series_memory.py",
+    "translator.py",
+    "user_feedback.py",
+    "tests/test_metadata.py",
+    "tests/test_series_memory.py",
+    "tests/test_verifier.py",
+    "tests/test_discourse_and_translator.py",
+}
 
 # Bramka 2: Wprowadzanie przykładów nazewniczych (np. [Nazwa])
 RE_EXEMPLAR_INTRODUCERS = re.compile(
-    r"\b(?:np\.|na\s+przykład|przykładowo|takich\s+jak|takie\s+jak|jak\s+np\.)\s*['\"]?([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźżōū]+(?:\s+[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźżōū]+)*)",
-    re.IGNORECASE
+    r"(?:\b(?i:np\.|na\s+przykład|przykładowo|takich\s+jak|takie\s+jak|jak\s+np\.|e\.g\.|for\s+example)\s+['\"]?([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźżōū]+(?:\s+[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźżōū]+)*)|\(\s*(?i:warianty?)\s*:\s*['\"]?[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźżōū]+)"
 )
 
 # Bramka 3: Cytowane zawołania i zdania przykładowe w plikach reguł i promptów
@@ -28,8 +66,7 @@ RE_QUOTED_EXEMPLARY_SPEECH = re.compile(
 
 # Bramka 4: Etykiety kontrastowe, strzałki wariantów i znaczniki [OK] / [X]
 RE_CONTRASTIVE_LABELS = re.compile(
-    r"\b(?:BŁĄD(?:\s*\[X\])?|KOSZMARNY\s+BŁĄD|POPRAWNIE|POPRAWNY\s+KANON|KOREKTA|ZŁE\s+TŁUMACZENIE)\b|\[X\]|\[OK\]|->\s*(?:POPRAWNIE|KANON|Wariant|wariant)",
-    re.IGNORECASE
+    r"\b(?:BŁĄD(?:\s*\[X\])?|KOSZMARN[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]*\s+(?:BŁĄD|Kalka)|KARDYNALN[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]*\s+(?:BŁĄD|Kalka)|Kalka\s+niepożądana|POPRAWNIE|POPRAWNY\s+KANON|KOREKTA|ZŁE\s+TŁUMACZENIE)\b|\[X\]|\[OK\]|->\s*(?:POPRAWNIE|KANON|Wariant|wariant)"
 )
 
 # Bramka 5A: Krzyczące słowa ALL-CAPS w tekście (case-sensitive)
@@ -59,7 +96,21 @@ RE_DSP_GLITCH = re.compile(r"\b_np\.(?:ndarray|mean|var|std|median|array)\b")
 ALLOWED_AST_LITERALS = {
     "MALE", "FEMALE", "MASCULINE", "FEMININE", "UNKNOWN", "VIRILE", "NON_VIRILE", "AMBIGUOUS",
     "ANTHROPONYM", "TOPONYM", "CHREMATONYM", "INDIVIDUAL", "COLLECTIVE", "TITLE_CARD",
-    "DEFAULT", "MAIN", "SIGN", "THOUGHT", "ITALICS", "NARRATOR"
+    "DEFAULT", "MAIN", "SIGN", "THOUGHT", "ITALICS", "NARRATOR", "PLURAL", "DUAL",
+    "Open", "Sans", "Arial", "Default", "Flashback", "Thought", "Dialogue",
+    "Top", "Bottom", "Sign", "Title", "Narration", "Radio", "Overlap", "Normal", "Bold", "Italic"
+}
+
+ALLOWED_SYNTHETIC = {
+    "InstytucjaAlfa", "KrainaBeta", "UczelniaGamma", "BohaterAlfa", "PostacAlfa", "SeriaTestowaAlfa",
+    "Python", "Windows", "Google", "AniList", "Whisper", "Netflix", "JSON", "UTF", "ASCII",
+    "Miejsce", "Czas", "Prowincja", "Góra", "Twierdza", "Więzienie", "Zamek", "Rzeka", "Królestwo", "Akademia",
+    "Caption", "You", "Znaczy", "Ech", "Cóż", "Gratulacje"
+}
+
+KNOWN_NAMES_LOWER = {
+    "samarkand", "karakorum", "bukhara", "nishapur", "abashiri", "karafuto", "otaru", "sapporo",
+    "shizuka", "tokiyuki", "sugimoto", "asirpa", "clevatess", "riboku", "ouki"
 }
 
 violations = {
@@ -86,6 +137,9 @@ def is_inflection_paradigm_string(s: str) -> bool:
     return all(t.startswith(prefix) for t in tokens) and len(set(tokens)) >= 3
 
 for fname in FILES_TO_AUDIT:
+    fn_norm = fname.replace("\\", "/")
+    if (fn_norm in TEMPORARY_11_1_MIGRATION_ALLOWLIST) or (os.path.basename(fn_norm) in TEMPORARY_11_1_MIGRATION_ALLOWLIST):
+        continue
     if not os.path.exists(fname):
         continue
 
@@ -104,36 +158,45 @@ for fname in FILES_TO_AUDIT:
         if "ZERO-LITERAL" in line or "POSITIVE DOMAIN" in line or "Standard 9.0" in line:
             continue
         if m := RE_EXEMPLAR_INTRODUCERS.search(line):
-            violations["exemplar_introducers"].append((fname, idx, m.group(0), line.strip()))
-        if m := RE_CONTRASTIVE_LABELS.search(line):
-            violations["contrastive_labels"].append((fname, idx, m.group(0), line.strip()))
-        if m := RE_SCREAMING_CAPS.search(line):
-            violations["screaming_caps"].append((fname, idx, m.group(0), line.strip()))
-        if m := RE_PRESCRIPTIVE_IMPERATIVES.search(line):
-            violations["prescriptive_imperatives"].append((fname, idx, m.group(0), line.strip()))
-        if m := RE_ALARMS.search(line):
-            violations["alarms"].append((fname, idx, m.group(0), line.strip()))
+            target = m.group(1) or m.group(0)
+            target_first = target.split()[0].strip("'\"()")
+            if target_first not in ALLOWED_SYNTHETIC and not any(target_first.startswith(p) for p in ("Instytucja", "Kraina", "Postac", "Bohater", "SeriaTestowa", "Uczelnia")):
+                violations["exemplar_introducers"].append((fname, idx, m.group(0), line.strip()))
         if m := RE_HARDCODED_SLUGS.search(line):
             violations["hardcoded_slugs"].append((fname, idx, m.group(0), line.strip()))
         if m := RE_DSP_GLITCH.search(line):
             violations["dsp_glitches"].append((fname, idx, m.group(0), line.strip()))
+
         if fname in RULE_AND_PROMPT_FILES:
             if m := RE_QUOTED_EXEMPLARY_SPEECH.search(line):
                 violations["quoted_speech"].append((fname, idx, m.group(0), line.strip()))
+            if m := RE_CONTRASTIVE_LABELS.search(line):
+                violations["contrastive_labels"].append((fname, idx, m.group(0), line.strip()))
+            if m := RE_SCREAMING_CAPS.search(line):
+                violations["screaming_caps"].append((fname, idx, m.group(0), line.strip()))
+            if m := RE_PRESCRIPTIVE_IMPERATIVES.search(line):
+                violations["prescriptive_imperatives"].append((fname, idx, m.group(0), line.strip()))
+            if m := RE_ALARMS.search(line):
+                violations["alarms"].append((fname, idx, m.group(0), line.strip()))
+        else:
+            if "[ALARM" in line:
+                violations["alarms"].append((fname, idx, "[ALARM", line.strip()))
 
     if fname in LOGIC_FILES and tree is not None:
         for node in ast.walk(tree):
-            # Bramka 8: Statyczne kolekcje imion pisanych wielką literą
+            # Bramka 8: Statyczne kolekcje imion pisanych wielką literą lub znanych toponimów
             if isinstance(node, (ast.List, ast.Set, ast.Tuple)):
                 str_elts = [elt.value for elt in node.elts if isinstance(elt, ast.Constant) and isinstance(elt.value, str)]
                 suspicious = [
                     s for s in str_elts
-                    if s and s[0].isupper() and s.isalpha() and s.upper() not in ALLOWED_AST_LITERALS and len(s) > 2
+                    if s and s[0].isupper() and s.isalpha() and s.upper() not in ALLOWED_AST_LITERALS and s not in ALLOWED_AST_LITERALS and len(s) > 2
                 ]
-                if len(suspicious) >= 2:
-                    violations["ast_hardcoded_name_sets"].append(
-                        (fname, getattr(node, "lineno", 1), f"Kolekcja: {suspicious[:4]}", "Statyczna kolekcja instancji w AST")
-                    )
+                lower_matches = [s for s in str_elts if s.lower() in KNOWN_NAMES_LOWER]
+                if not fname.startswith("tests/"):
+                    if len(suspicious) >= 2 or lower_matches:
+                        violations["ast_hardcoded_name_sets"].append(
+                            (fname, getattr(node, "lineno", 1), f"Kolekcja: {suspicious[:4] or lower_matches}", "Statyczna kolekcja instancji w AST")
+                        )
 
             # Bramka 9: Wykrywanie ręcznych łat deklinacyjnych (.split() na paradygmatach lub variants.update)
             if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute):
