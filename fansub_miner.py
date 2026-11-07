@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 FansubLexiconEngine & Subtitle Corpus Miner Module.
-Automatically inspects the local 'baza napisów' corpus for vetted fansub groups (e.g., ASW),
-extracts anime-specific terminology, character titles, and localization choices (e.g., 'wiedun' in Clevatess),
+Automatically inspects the local 'baza napisów' corpus for vetted fansub groups,
+extracts anime-specific terminology, character titles, and localization choices,
 and serializes a compact Fansub Canon Lexicon for prompt injection and deterministic linter enforcement.
 Operates with 100% deterministic offline logic (cost: 0.00 PLN).
 """
@@ -80,93 +80,7 @@ def read_subtitle_file_aseptic(file_path: Path) -> Tuple[str, str]:
 
 
 # Pre-verified canonical dictionaries for established fan translations
-CURATED_FANSUB_CANON: Dict[str, Dict[str, Any]] = {
-    "clevatess": {
-        "anime_slug": "clevatess",
-        "anime_title": "Clevatess: Majū no Ō to Akago to Shikabane no Yūsha",
-        "fansub_group": "ASW",
-        "terms": {
-            "wizard": {
-                "en": ["wizard", "wizards"],
-                "canonical_pl": "wiedun",
-                "plural_pl": "wieduni",
-                "fem_pl": "wiedunka",
-                "gen_pl": "wiedunów",
-                "forms": {
-                    "nom_sg": "wiedun",
-                    "gen_sg": "wieduna",
-                    "dat_sg": "wiedunowi",
-                    "acc_sg": "wieduna",
-                    "ins_sg": "wiedunem",
-                    "loc_sg": "wiedunie",
-                    "voc_sg": "wiedunie",
-                    "nom_pl": "wieduni",
-                    "gen_pl": "wiedunów",
-                    "dat_pl": "wiedunom",
-                    "acc_pl": "wiedunów",
-                    "ins_pl": "wiedunami",
-                    "loc_pl": "wiedunach",
-                    "voc_pl": "wieduni",
-                    "fem_nom_sg": "wiedunka",
-                    "fem_gen_sg": "wiedunki",
-                    "fem_dat_sg": "wiedunce",
-                    "fem_acc_sg": "wiedunkę",
-                    "fem_ins_sg": "wiedunką",
-                    "fem_loc_sg": "wiedunce",
-                    "fem_nom_pl": "wiedunki",
-                    "fem_gen_pl": "wiedunek",
-                    "fem_ins_pl": "wiedunkami"
-                },
-                "instruction": "Kategoryczny zakaz 'czarodziej'/'mag' - w uniwersum Clevatess używaj wyłącznie form słowa 'wiedun' ('wieduni', 'wiedunka', 'wiedunów')."
-            },
-            "dark_beasts": {
-                "en": ["dark beast", "dark beasts"],
-                "canonical_pl": "magiczna bestia",
-                "plural_pl": "magiczne bestie",
-                "forms": {
-                    "nom_sg": "magiczna bestia",
-                    "gen_sg": "magicznej bestii",
-                    "nom_pl": "magiczne bestie",
-                    "gen_pl": "magicznych bestii",
-                    "ins_pl": "magicznymi bestiami"
-                },
-                "instruction": "Zakaz kalki 'mroczne bestie' - kanoniczne tłumaczenie to 'magiczne bestie'."
-            },
-            "four_lords": {
-                "en": ["Four Lords of Dark Beasts", "Four Lords"],
-                "canonical_pl": "czterej Monarchowie",
-                "instruction": "Tłumacz jako 'czterej Monarchowie' / 'Monarchowie magicznych bestii'."
-            },
-            "edthea": {
-                "en": ["Edthea"],
-                "canonical_pl": "Edsea",
-                "forms": {
-                    "nom": "Edsea",
-                    "gen": "Edsei",
-                    "dat": "Edsei",
-                    "acc": "Edseę",
-                    "ins": "Edseą",
-                    "loc": "Edsei"
-                },
-                "instruction": "Nazwa kontynentu to 'Edsea' (odmiana: 'wokół Edsei', 'poza Edseą')."
-            },
-            "boelate": {
-                "en": ["Boelate"],
-                "canonical_pl": "Boelate",
-                "adjective_pl": "boelacki",
-                "instruction": "Królestwo to 'Boelate' (dopełniacz pochodzenia: 'z Boelate', przymiotnik: 'boelacki', np. 'armia boelacka')."
-            },
-            "meynard_swan": {
-                "en": ["Meynard Swan"],
-                "canonical_pl": "Meynard Swan",
-                "forms": {
-                    "voc": "Meynardzie Swan"
-                },
-                "instruction": "Postać: Meynard Swan (w wołaczu: 'Meynardzie Swan')."
-            }
-        }
-    }
-}
+CURATED_FANSUB_CANON: Dict[str, Dict[str, Any]] = {}
 
 
 def scan_and_extract_fansub_lexicon(
@@ -283,7 +197,7 @@ def format_fansub_lexicon_for_prompt(lexicon: Optional[Dict[str, Any]]) -> str:
     group_tag = f" (GRUPA: {lexicon['fansub_group']})" if lexicon.get("fansub_group") and lexicon["fansub_group"] != "Unknown" else ""
     lines = [
         f"--- SPRAWDZONY KANON FANSUBERSKI DLA TEJ SERII{group_tag} ---",
-        "W uniwersum tej serii bezwzględnie stosuj poniższe kanoniczne słownictwo i tytulaturę:"
+        "W uniwersum tej serii stosuj poniższe kanoniczne słownictwo i tytulaturę:"
     ]
 
     for key, data in terms.items():

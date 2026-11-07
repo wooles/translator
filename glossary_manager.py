@@ -156,8 +156,8 @@ class GlossaryManager:
         lines = [
             "--- BEZWZGLĘDNY SŁOWNICZEK POJĘĆ I TERMINOLOGII (BAZA KANONICZNA W MIANOWNIKU) ---",
             "Poniższe pojęcia to kanoniczne polskie odpowiedniki (podane w mianowniku jako forma bazowa).",
-            "W zdaniach BEZWZGLĘDNIE ODMIENIAJ JE PRZEZ PRZYPADKI zgodnie z polską gramatyką i przyimkami (np. 'Twierdza Goryōkaku' -> 'w twierdzy Goryōkaku', 'do twierdzy Goryōkaku', 'Więzienie Akō' -> 'w więzieniu Akō', 'z więzienia Akō'; ZAKAZ sztywnego mianownika po przyimkach typu 'w Twierdza'!).",
-            "ZAKAZ PLEONAZMÓW DESKRYPTORÓW: jeśli w zdaniu występuje już deskryptor ('z prowincji', 'w twierdzy', 'na górze', 'w rzece', 'w kronice'), NIE DOKLEJAJ go powtórnie z bazy (napisz 'z prowincji Shimotsuke', a KATEGORYCZNIE NIE 'z prowincji Prowincja Shimotsuke'; 'na górze Hiei', a NIE 'na górze Góra Hiei')! ZAKAZ mechanicznego powtarzania tego samego słowa."
+            "W zdaniach odmieniaj je przez przypadki zgodnie z polską gramatyką i rekcją przyimkową (np. '<Deskryptor> <Nazwa>' przyjmuje właściwe formy fleksyjne w kontekście).",
+            "Harmonizacja deskryptorów: jeśli w zdaniu występuje już deskryptor, zachowaj pojedynczy deskryptor wraz z nazwą własną w odpowiednim przypadku bez powielania określenia kategorialnego."
         ]
         for src, raw_trg in (glossary_dict or {}).items():
             trg = self.clean_target_term(raw_trg)
@@ -175,7 +175,7 @@ class GlossaryManager:
 
     @classmethod
     def clean_target_term(cls, trg: str) -> str:
-        """Removes parenthetical clarifications (e.g., 'Tus (Miasto w Persji)' -> 'Tus', 'Płomień Adolli (Adolla Burst)' -> 'Płomień Adolli')."""
+        """Removes parenthetical clarifications and technical tags from target term."""
         if not trg:
             return ""
         cleaned = re.sub(r"\s*[\(\[].*?[\)\]]", "", trg).strip()
@@ -250,9 +250,9 @@ class GlossaryManager:
             pattern_src = re.compile(rf"\b{re.escape(src)}\b", re.IGNORECASE)
             if pattern_src.search(modified):
                 # Anti-Pleonasm Descriptor Guard:
-                # If target term starts with a descriptor (e.g. 'Prowincja Shimotsuke', 'Góra Hiei')
-                # and the word preceding the match in 'modified' is ALREADY that descriptor in any case
-                # (e.g. 'z prowincji Shimotsuke'), substitute only the core name to avoid 'z prowincji Prowincja Shimotsuke'.
+                # If target term starts with a descriptor ('<Deskryptor> <Nazwa>')
+                # and the word preceding the match in 'modified' is already that descriptor in any case,
+                # substitute only the core name to avoid descriptor repetition.
                 trg_parts = trg.split(" ", 1)
                 has_desc = False
                 desc_word = ""

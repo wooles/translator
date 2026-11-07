@@ -1479,7 +1479,7 @@ def detect_third_person_mentions(
             elif any(k in desc_lower for k in MALE_ROLE_KEYWORDS):
                 gen = "MALE"
             
-            # c_key might be "Sitara -> Shira" or "Shira"
+            # c_key might be "<Postac_A> -> <Postac_B>" or "<Postac_B>"
             names = re.findall(r"\b[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]{2,}\b", c_key)
             for n in names:
                 if n not in candidates:
@@ -1503,7 +1503,7 @@ def detect_third_person_mentions(
         if name_lower in seen_names:
             continue
 
-        # Match name as a whole word in English text (or possessive e.g. Shira's)
+        # Match name as a whole word in English text (or possessive <Postac>'s)
         if re.search(rf"\b{re.escape(name)}(?:'s)?\b", clean_text, re.IGNORECASE):
             seen_names.add(name_lower)
             if gender == "MALE":
@@ -1670,7 +1670,7 @@ def calculate_syntactic_calque_score(en_text: str, pl_text: str) -> float:
     elif en_clean.endswith("...") and pl_clean.endswith("..."):
         score += 0.05
 
-    # 4. Starting Token Calque Mirror (e.g. 'Wait,' -> 'Czekaj,', 'Listen,' -> 'Słuchaj,')
+    # 4. Starting Token Calque Mirror (starter matching)
     STARTERS = [("wait", "czekaj"), ("listen", "słuchaj"), ("look", "spójrz"), ("see", "widzisz"), ("hey", "hej")]
     for en_st, pl_st in STARTERS:
         if en_clean.startswith(en_st) and pl_clean.startswith(pl_st):
@@ -2140,7 +2140,7 @@ class MultimodalTranslator:
         tokens = set(re.findall(r"\b[a-ząćęłńóśźżA-ZĄĆĘŁŃÓŚŹŻ]+\b", spk_lower)) if spk_lower else set()
         raw_tokens = set(re.findall(r"\b[a-ząćęłńóśźżA-ZĄĆĘŁŃÓŚŹŻ]+\b", raw_spk.lower())) if raw_spk else set()
 
-        # 0. Inherent lexical gender check (e.g. "Girl\Italic", "Woman", "Boy")
+        # 0. Inherent lexical gender check (inherent nouns)
         if (
             spk_lower in INHERENT_FEMALE_NOUNS
             or any(t in INHERENT_FEMALE_NOUNS for t in tokens)
@@ -2558,7 +2558,7 @@ class MultimodalTranslator:
                 elif any(k in cdesc for k in self.MALE_ROLE_KEYWORDS):
                     return "mężczyzna", f"{cname} (Mężczyzna)"
 
-        # 1b. Onomastic Vocative Check (Direct address in English/Polish script, e.g. "Monika, ...", "Moniko, ...")
+        # 1b. Onomastic Vocative Check (Direct address in English/Polish script, vocative address)
         from series_memory import is_inherently_female_name, MALE_EXCEPTIONS_ON_A, is_generic_actor_or_category
         voc_m = re.search(r"(?<!\b[Pp]anie\s)(?<!\b[Pp]ani\s)(?<!\b[Pp]anno\s)(?<!\b[Pp]anu\s)(?<!\b[Mm]istrzu\s)(?<!\b[Ll]ordzie\s)\b([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]{2,})[,?!]", clean_text)
         if voc_m:

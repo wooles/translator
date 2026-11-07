@@ -142,7 +142,7 @@ def match_character_in_metadata(
 def clean_anime_filename(filename_or_path: str) -> str:
     """
     Cleans filename of fansub group tags, quality tags, hashes, and episode numbers
-    to extract a clean series title (e.g. 'Otome Kaijuu Carameliser').
+    to extract a clean series title.
     """
     name = Path(filename_or_path).stem
 

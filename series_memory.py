@@ -1029,7 +1029,7 @@ def fix_undecorated_male_names(
         if not decl or decl.get("M") != name:
             continue
 
-        # 1. Genitive check: "dla Ray" -> "dla Raya"
+        # 1. Genitive check: "dla <POSTAC_1>"
         result = re.sub(
             rf"\b({gen_preps})\s+{re.escape(name)}\b",
             lambda m, c=decl.get("D", name): f"{m.group(1)} {c}",
@@ -1037,7 +1037,7 @@ def fix_undecorated_male_names(
             flags=re.IGNORECASE
         )
 
-        # 2. Dative check: "ku Ray" -> "ku Rayowi", "dałem to Ray" -> "dałem to Rayowi", "podarowałem miecz Ray" -> "podarowałem miecz Rayowi"
+        # 2. Dative check: "ku <POSTAC_1>", "dałem to <POSTAC_1>"
         result = re.sub(
             rf"\b({dat_preps}(?:\s+[a-ząćęłńóśźż]+)?)\s+{re.escape(name)}\b",
             lambda m, c=decl.get("C", name): f"{m.group(1)} {c}",
@@ -1045,7 +1045,7 @@ def fix_undecorated_male_names(
             flags=re.IGNORECASE
         )
 
-        # 3. Instrumental check: "z Ren" -> "z Renem", "przed Ray" -> "przed Rayem"
+        # 3. Instrumental check: "z <POSTAC_2>", "przed <POSTAC_1>"
         def _ins_repl(m):
             prep = m.group(1)
             prep_lower = prep.lower()
@@ -1094,7 +1094,7 @@ def clean_anime_slug(title: str) -> str:
     """Creates a filesystem-safe identifier slug from anime title, normalizing diacritics."""
     if not title:
         return "default_series"
-    # Normalize unicode diacritics (e.g. Caraméliser -> Carameliser)
+    # Normalize unicode diacritics (usuwanie znaków diakrytycznych z liter łacińskich)
     nfkd = unicodedata.normalize('NFKD', title)
     title_ascii = "".join([c for c in nfkd if not unicodedata.combining(c)])
     slug = re.sub(r"[^\w\s-]", "", title_ascii, flags=re.UNICODE).strip()
@@ -1657,7 +1657,7 @@ def is_male_role_text(text: str) -> bool:
 def is_plural_actor(name: str) -> bool:
     """
     Determines whether an actor/speaker represents a plural group or collective
-    (e.g. 'Guards', 'Strażnicy', 'Villagers', 'Wieśniacy', 'Dziewczęta', 'Chłopcy').
+    (collective and plural generic groups).
     """
     if not name:
         return False
@@ -2279,7 +2279,7 @@ def is_sign_entity(name: str) -> bool:
 def extract_clean_speaker_name(name: str) -> str:
     """
     Sanitizes ASS speaker names by stripping style overrides, parenthetical notes,
-    and trailing context indicators (e.g. 'Girl\\Italic' -> 'Girl', 'Hebichika (Flashback)' -> 'Hebichika').
+    and trailing context indicators (bracketed styles and tags).
     """
     if not name:
         return ""
@@ -2449,7 +2449,7 @@ def is_polish_adjective(word: str) -> bool:
         return False
 
     # Explicit exclusion of common Japanese names ending in -ki, -gi, -na
-    # (e.g. Suzuki, Takahashi, Kawasaki, Miyazaki, Todoroki, Tanuki, Tomoe, Shina, etc.)
+    # (common Japanese onomastic stems)
     if any(w.endswith(jp_end) for jp_end in ("saki", "zuki", "zaki", "roki", "nuki", "buki", "muki", "tuki", "yuki", "yaki", "seki", "deki", "heki", "kiki", "giki")):
         return False
 
@@ -2457,7 +2457,7 @@ def is_polish_adjective(word: str) -> bool:
     if w.endswith(("yna", "ina", "anka", "arka", "anna", "otta", "etta")):
         return False
 
-    # Exclusion of common nouns ending in -na, -ta, -ka, -ga and foreign names in -ite (e.g. White, Snowwhite)
+    # Exclusion of common nouns ending in -na, -ta, -ka, -ga and foreign names in -ite
     if w.endswith("white") or w in {"kobieta", "dziewczyna", "pani", "chata", "brama", "tarcza", "lanca", "rana", "scena", "wojna", "korona", "strona", "ochrona", "obrona", "wrona", "rzeka", "książka", "ręka", "nauka", "matka", "córka", "dróżka", "papuga", "waga", "droga", "flaga", "saga", "manga", "planeta", "rakieta", "flota", "armata", "herbata", "gazeta", "white", "elite", "site", "bite", "mite", "kite"}:
         return False
 
@@ -2999,13 +2999,13 @@ def generate_polish_name_declension(name: str, gender: str = "UNKNOWN") -> Dict[
 
     words = n.split()
     if len(words) > 1:
-        # Check for Numeral + Plural Genitive Noun (e.g. Czterech Jeźdźców, Siedmiu Magów)
+        # Check for Numeral + Plural Genitive Noun
         NUMERAL_PREFIXES = {"dwóch", "trzech", "czterech", "pięciu", "sześciu", "siedmiu", "ośmiu", "dziewięciu", "dziesięciu", "dwunastu", "wielu"}
         if words[0].lower() in NUMERAL_PREFIXES and any(w.lower().endswith(("ów", "ow", "om", "ami", "ach")) for w in words[1:]):
             return {"M": n, "D": n, "C": n, "B": n, "N": n, "Ms": n, "W": n}
 
         # A. Check for prepositional complement: "X z Y", "X ze stali", "X do Y"
-        # e.g. "Księga Wiedzy z Krainy", "Miecz z Północy"
+        # compound syntagma with prepositional modifier
         for prep_idx, w_p in enumerate(words):
             if prep_idx > 0 and w_p.lower() in ("z", "ze", "od", "do", "w", "we", "o", "pod") and prep_idx < len(words) - 1:
                 head_part = " ".join(words[:prep_idx])
@@ -3018,7 +3018,7 @@ def generate_polish_name_declension(name: str, gender: str = "UNKNOWN") -> Dict[
                     }
 
         # B. Check for Noun + Genitive Attribute (Przydawka dopełniaczowa)
-        # e.g. "Księga Magii", "Zakon Feniksa", "Dolina Rozpaczy", "Miecz Prawdy", "Władca Złudzeń", "Demon Krwi"
+        # Noun + Genitive Attribute (Przydawka dopełniaczowa)
         first_lower = words[0].lower()
         if (first_lower in KNOWN_HEAD_NOUNS or first_lower in KNOWN_HEAD_NOUN_DECLENSIONS) and len(words) >= 2 and not (len(words) == 2 and is_polish_adjective(words[1])):
             if first_lower in KNOWN_HEAD_NOUN_DECLENSIONS:
@@ -3059,7 +3059,7 @@ def generate_polish_name_declension(name: str, gender: str = "UNKNOWN") -> Dict[
                 return {c: f"{d1[c]} {d2[c]}" for c in ("M", "D", "C", "B", "N", "Ms", "W")}
 
         # B2. Check for 2-word compound with genitive modifier (Operacja 2C.9, T4.12)
-        # e.g. "Władca Ciemności", "Książę Piekieł", "Mistrz Miecza", "Rycerz Zakonu"
+        # compound titular syntagma with genitive attribute
         if len(words) == 2:
             w1, w2 = words[0], words[1]
             w2_l = w2.lower()
@@ -3106,7 +3106,7 @@ def generate_polish_name_declension(name: str, gender: str = "UNKNOWN") -> Dict[
                     for case in ["M", "D", "C", "B", "N", "Ms", "W"]
                 }
 
-        # D. Default multi-word: decline each word (e.g. Brandon Heat, John Smith)
+        # D. Default multi-word: decline each word
         def _decline_sub_word(w):
             if is_adjectival_oblique_token(w):
                 return {"M": w, "D": w, "C": w, "B": w, "N": w, "Ms": w, "W": w}
@@ -3150,11 +3150,11 @@ def generate_polish_name_declension(name: str, gender: str = "UNKNOWN") -> Dict[
         if not n.endswith(("a", "A")):
             return {"M": n, "D": n, "C": n, "B": n, "N": n, "Ms": n, "W": n}
 
-    # 0a. Adjectives / adjectival names and titles (e.g. Wielka, Wielki, Czarna, Czarny, Nieśmiertelny, Sobieski)
+    # 0a. Adjectives / adjectival names and titles
     if is_polish_adjective(n):
         return generate_polish_adjective_declension(n, gender=g if g != "UNKNOWN" else None, is_animate=True)
 
-    # 0. Neuter nouns ending in -um (e.g. Imperium, Muzeum, Liceum, Akwarium, Koloseum, Seminarium):
+    # 0. Neuter nouns ending in -um:
     # In Polish singular, these borrowings from Latin are strictly indeclinable across all 7 cases (M=D=C=B=N=Ms=W).
     if n.lower().endswith("um"):
         return {"M": n, "D": n, "C": n, "B": n, "N": n, "Ms": n, "W": n}
@@ -3275,7 +3275,7 @@ def generate_polish_name_declension(name: str, gender: str = "UNKNOWN") -> Dict[
     if is_female:
         return {"M": n, "D": n, "C": n, "B": n, "N": n, "Ms": n, "W": n}
 
-    # 2a. Male foreign names ending in silent -e with apostrophe declension (e.g. White, Wayne, Blade, Locke, Moore)
+    # 2a. Male foreign names ending in silent -e with apostrophe declension
     if not is_female and n.endswith("e") and len(n) >= 3 and n[-2].lower() in "bcdfghjklmnpqrstvwxz":
         if is_japanese_cv_mora_e_name(n) or n.lower() in JAPANESE_VOWEL_E_NAMES:
             return {"M": n, "D": n, "C": n, "B": n, "N": n, "Ms": n, "W": n}
@@ -3308,7 +3308,7 @@ def generate_polish_name_declension(name: str, gender: str = "UNKNOWN") -> Dict[
             "W": n
         }
 
-    # 2b. Male names ending in consonant or diphthong -y (pronounced /j/, e.g. Ray, Roy, Gray)
+    # 2b. Male names ending in consonant or diphthong -y (pronounced /j/)
     is_diphthong_y = (not is_female and n.endswith("y") and len(n) >= 2 and n[-2].lower() in "aeiou")
     if (n[-1].lower() not in "aeiouyąęó") or is_diphthong_y:
         if n.lower() in ("przestrzeń", "pieśń", "otchłań", "przystań", "baśń", "dłoń", "zieleń", "czerwień", "jesień"):
@@ -3378,7 +3378,7 @@ def generate_polish_name_declension(name: str, gender: str = "UNKNOWN") -> Dict[
             "W": c_w
         }
 
-    # 2b. Adjectives / adjectival names and titles ending in -y / -i (e.g. Nieśmiertelny, Wielki, Sobieski, Czarny)
+    # 2b. Adjectives / adjectival names and titles ending in -y / -i
     if is_polish_adjective(n):
         return generate_polish_adjective_declension(n, gender=g if g != "UNKNOWN" else None, is_animate=True)
 
@@ -3897,7 +3897,7 @@ def _get_dynamic_manga_canon_anti_calque_patterns() -> List[Tuple[str, str]]:
 def sanitize_canon_compound_oblique_cases(text: str, series_bible: Optional[Any] = None) -> str:
     """
     Corrects frozen nominative compound canon syntagmas governed by prepositions (Filar CLXXXVIII / 0.00 PLN).
-    'dla Wielki Chan' -> 'dla Wielkiego Chana', 'z Czarny Rycerz' -> 'z Czarnym Rycerzem'.
+    'dla <Syntagma>' -> 'dla <Syntagmy>', 'z <Syntagma>' -> 'z <Syntagmą>'.
     """
     if not text:
         return ""
@@ -3937,7 +3937,7 @@ def sanitize_lexical_text(text: str) -> str:
         "szybko", "wolno", "także", "również", "jednak", "przecież", "wcale", "zawsze", "nigdy", "osobiście"
     }
 
-    # Case 1: Title + Surname + Given Name + Verb (e.g. 'Mistrz Tondena minoru\Nnie zdążył' -> 'Mistrz Tonden Minoru\Nnie zdążył')
+    # Case 1: Title + Surname + Given Name + Verb with line break
     def _fix_nominative_two_part_title_subject(m):
         prefix = m.group(1)
         title = m.group(2)
@@ -4155,13 +4155,7 @@ def sanitize_toponymic_pleonasms_and_stuttering(text: str) -> str:
 
     # 2. Repeated or multiple inflected/base category descriptors preceding a proper name
     # Accounts for Polish consonant alternations (k:c, k:cz, g:dz, r:rz, etc.):
-    # - 'z prowincji Prowincja Prowincja Shimotsuke' -> 'z prowincji Shimotsuke'
-    # - 'z prowincji Prowincja Shimotsuke' -> 'z prowincji Shimotsuke'
-    # - 'w kronice Kronika Taiheiki' -> 'w kronice Taiheiki'
-    # - 'na górze Góra Hiei' -> 'na górze Hiei'
-    # - 'w rzece Rzeka Kamogawa' -> 'w rzece Kamogawa'
-    # - 'w mieście Miasto Kioto' -> 'w mieście Kioto'
-    # - 'w prefekturze Prefektura Nagano' -> 'w prefekturze Nagano'
+    # - 'z deskryptora Deskryptor Nazwa' -> 'z deskryptora Nazwa'
     CATEGORY_STEM_GROUPS = [
         r"prowincj",
         r"prefektur",
@@ -4203,12 +4197,17 @@ def sanitize_toponymic_pleonasms_and_stuttering(text: str) -> str:
     return res
 
 
-_BASE_KNOWN_FANTASY_TOPONYMS: Set[str] = {
-    "samarkand", "karakorum", "bukhara", "nishapur", "baghdad", "tabriz", "herat",
-    "kyoto", "yamato", "owari", "mikawa", "echigo", "kai",
-    "otaru", "sapporo", "asahikawa", "abashiri", "karafuto", "nemuro", "yubari",
-    "paryż", "tokio", "londyn", "warszawa", "rzym", "berlin"
-}
+_BASE_KNOWN_FANTASY_TOPONYMS: Set[str] = set()
+
+_TOPONYM_STRUCTURAL_SUFFIXES = re.compile(
+    r"(?:burg|grad|gorod|ville|ton|ford|haven|port|land|shire|mount|peak|valley|dale|berg|dorf|stan|abad)\b",
+    re.IGNORECASE
+)
+
+def _is_likely_toponym_structural(token: str) -> bool:
+    if not token or len(token) < 4:
+        return False
+    return bool(_TOPONYM_STRUCTURAL_SUFFIXES.search(token))
 
 
 def _load_dynamic_fantasy_toponyms() -> Set[str]:
@@ -4538,11 +4537,11 @@ DEFINITE_TITLE_MAPPING: Dict[str, Dict[str, Any]] = {
 def resolve_definite_article_nominative(en_text: str, pl_text: str) -> Tuple[str, bool]:
     """
     Guards against False Vocative Drift (Filar CLXXIII / §0 & §3 Offline-First).
-    When English uses 'The [Title/Role]' (e.g. 'The king...!', 'The captain!'),
+    When English uses 'The [Title/Role]' with definite article,
     the definite article 'The' strictly marks 3rd-person reference (Nominativus Exclamativus).
     English direct address (vocative) NEVER takes a definite article.
-    If Polish mistakenly outputs a vocative form (e.g. 'Królu...!', 'Kapitanie!'),
-    this function deterministically restores the correct nominative form ('Król...!', 'Kapitan!').
+    If Polish mistakenly outputs a vocative form instead of nominative,
+    this function deterministically restores the correct nominative form.
     Returns (fixed_pl_text, was_changed).
     """
     if not en_text or not pl_text:
@@ -4682,13 +4681,13 @@ class SeriesBible:
         
         self.data: Dict[str, Any] = {
             "anime_title": self.anime_title,
-            "characters": CharacterRegistryDict({}, bible_data=None),          # { "Arata": {"gender": "męska", "role": "uczeń", "forms": "Arata"} }
-            "glossary": {},            # { "Choushi": "czara na sake", "Dragon Slayer": "Pogromca Smoków" }
-            "relationships": {},      # { "Kokoro->Arata": "po imieniu / na ty", "Uczniowie->Teshima": "pani Teshima" }
+            "characters": CharacterRegistryDict({}, bible_data=None),          # { "<Postac>": {"gender": "męska", "role": "rola", "forms": "<Postac>"} }
+            "glossary": {},            # { "<Term>": "<opis>" }
+            "relationships": {},      # { "<A->B>": "po imieniu / na ty" }
             "relations": {},          # { "X -> Y": "..." }
-            "declensions": {},        # { "Shira": {"M": "Shira", "D": "Shiry", "C": "Shirze", ...} }
-            "hypocorisms": {},        # { "Ren": "Renko", "Rin": "Rinko" }
-            "plot_anchors": {},        # { "kamień jada": "rytualny artefakt wywołujący deszcz", "zbieg z Samarkandy": "Shira" }
+            "declensions": {},        # { "<Postac>": {"M": "...", "D": "...", "C": "...", ...} }
+            "hypocorisms": {},        # { "<Postac>": "Zdrobnienie" }
+            "plot_anchors": {},        # { "<termin>": "<opis>", "<rola>": "<postać>" }
             "episodes_translated": [], # ["odcinek 1", "odcinek 2"]
             "batch_stats": {}          # { "odcinek 1": {"batches": 17, "dialogues": 374, "avg_batch_size": 22.0} }
         }
@@ -5490,7 +5489,7 @@ class SeriesBible:
                 # If marked as male, auto-repair to female
                 if any(m in d_lower for m in ["mężczyzna", "chłopak", "male"]):
                     clean_desc = re.sub(r"\bmężczyzna\b", "KOBIETA", desc, flags=re.IGNORECASE)
-                    clean_desc = re.sub(r"\[MĘŻCZYZNA \(Adresat(?:ka|ce|ki|ek|om|ami|ach|em|owi)?\)[^\]]*\]", "[KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]", clean_desc, flags=re.IGNORECASE)
+                    clean_desc = re.sub(r"\[MĘŻCZYZNA \(Adresat(?:ka|ce|ki|ek|om|ami|ach|em|owi)?\)[^\]]*\]", "[KOBIETA (Adresat) - W 2. os. lp. 'ty' uzgodnienie rodzaju żeńskiego: byłaś / zrobiłaś / jesteś pewna]", clean_desc, flags=re.IGNORECASE)
                     if isinstance(c_val, dict):
                         c_val["description"] = clean_desc
                     else:
@@ -7418,14 +7417,14 @@ class SeriesBible:
                 # Standard 10.6.1 (Operacja 2B.3 - Reguła 3): Ochrona pełnego antroponimu wieloczłonowego
                 # Negatywny lookahead (?!\s+[A-ZĄĆĘŁŃÓŚŹŻ]) zapobiega izolowanej podmianie pierwszego członu,
                 # po którym następuje drugi człon nazwy własnej
-                # Narzędnik ze spójnikiem i wcześniejszym rzeczownikiem (np. z Sasakim i Pii-chan)
+                # Narzędnik ze spójnikiem i wcześniejszym rzeczownikiem
                 res = re.sub(
                     rf"\b(z|ze|przed|nad|pod|za|między)\s+([A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+(?:\s+(?:i|oraz|ani)\s+))(?:{al_re})(?:-[a-zA-Z]+)?(?:em|iem)?\b(?!\s+[A-ZĄĆĘŁŃÓŚŹŻ])",
                     rf"\g<1> \g<2>{form_n}",
                     res,
                     flags=re.IGNORECASE
                 )
-                # Narzędnik bezpośrednio po przyimku (np. z Pii-chan)
+                # Narzędnik bezpośrednio po przyimku
                 res = re.sub(
                     rf"\b(z|ze|przed|nad|pod|za|między)\s+(?:{al_re})(?:-[a-zA-Z]+)?(?:em|iem)?\b(?!\s+[A-ZĄĆĘŁŃÓŚŹŻ])",
                     rf"\g<1> {form_n}",
@@ -7684,7 +7683,7 @@ class SeriesBible:
 
     def resolve_canonical_name(self, name_or_stem: str) -> str:
         """
-        Resolves hypocorisms, pet names, and truncated stems (e.g. 'Kuro-tan', 'Kuro')
+        Resolves hypocorisms, pet names, and truncated stems
         to the full canonical character name registered in the Series Bible.
         """
         if not name_or_stem:
@@ -8049,7 +8048,7 @@ class SeriesBible:
                         return "FEMALE" if f_pos[1] >= m_pos[1] else "MALE"
             return None
 
-        # Pass 1: Exact character names only (e.g. 'Tanaka', 'Kenji Tanaka')
+        # Pass 1: Exact character names only
         norm_nl = normalize_name_nfkd(n_l)
         tokens_set = set(n_l.split())
         tokens_set_f = set(t.replace("ph", "f") for t in tokens_set)
@@ -8097,7 +8096,7 @@ class SeriesBible:
             if cand_g:
                 return cand_g
 
-        # Pass 2: Token / surname matches with collision detection (e.g. 'Tanaka' matching 'Kenji Tanaka' and 'Hanako Tanaka')
+        # Pass 2: Token / surname matches with collision detection
         token_matches = []
         for k, v in chars_items:
             if "->" not in k:
@@ -8282,7 +8281,7 @@ class SeriesBible:
     def get_speaker_entity_type(self, speaker_name: str) -> str:
         """
         Retrieves speaker grammatical identity type (Filar CLXXVI - 0.00 PLN).
-        Recognizes canonical known entities (e.g. Louis Arneb -> COLLECTIVE_VIRILE).
+        Recognizes canonical known entities (collective virile speaker).
         """
         if not speaker_name:
             return "INDIVIDUAL"
@@ -8318,7 +8317,7 @@ class SeriesBible:
     def is_collective_virile_speaker(self, speaker_name: str) -> bool:
         """
         Returns True if the speaker represents a mixed/virile collective entity
-        (e.g. Louis Arneb in Re:Zero, speaking for Ley, Roy and herself).
+        (collective entity speaking for a group).
         Requires 1st-person plural virile agreement (-liśmy, byliśmy), immune to female scene overrides!
         """
         return self.get_speaker_entity_type(speaker_name) == "COLLECTIVE_VIRILE"
@@ -8395,7 +8394,7 @@ class SeriesBible:
                 matched_any = False
                 for v in target_tokens:
                     v_esc = re.escape(v)
-                    # Exclude 3rd-person genealogy, deceased houses or historical reference (e.g. Tolui's lineage / rodu Tołuja)
+                    # Exclude 3rd-person genealogy, deceased houses or historical reference
                     is_genealogy = bool(re.search(
                         rf"\b(?:houses?|lineages?|lineage|house|tomb|tombs|memory|death|grave|graves|ród|rodu|rody|rodów|grobu|grobów|pamięć|pamięci|wola|woli)\s+(?:of\s+|z\s+|wielkiego\s+chana\s+|grand\s+khan'?s?\s+)?[^.!?\n]*?\b{v_esc}\b|\b{v_esc}'s\s+(?:lineage|lineages|house|houses|memory|tomb|tombs|grave|graves|death|will)\b",
                         combined_text,
@@ -8816,6 +8815,8 @@ class SeriesBible:
 
         if n_l in KNOWN_FANTASY_TOPONYMS or norm_nl in KNOWN_FANTASY_TOPONYMS:
             return True
+        if _is_likely_toponym_structural(n_l) or _is_likely_toponym_structural(norm_nl):
+            return True
         if n_l in INDECLINABLE_FRENCH_TOPONYMS:
             return True
         if n_l.endswith("um"):
@@ -8863,7 +8864,7 @@ class SeriesBible:
 
     def get_ethnonym_canonical(self, ethnonym: str) -> Optional[Dict[str, str]]:
         """
-        Returns canonical Polish plural declension for an ethnonym/demonym (e.g. 'Mongołowie'),
+        Returns canonical Polish plural declension for an ethnonym/demonym,
         enforcing the rule that nation/ethnic references require plural, not English singularis pro plurali.
         """
         if not ethnonym:

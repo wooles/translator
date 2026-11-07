@@ -105,7 +105,7 @@ FILAR VIII: NATURALNY POLSKI SZYK ZDANIA I INWERSJA EMFATYCZNA (STRUKTURA TEMAT-
 FILAR IX: PYTANIA POTOCZNE, ELIMINACJA SZTUCZNEGO "CZY" I NEGACJA RETORYCZNA (SZARKOWSKA & BELCZYK):
 - 1. PYTANIA ROZSTRZYGNIĘCIA W MOWIE POTOCZNEJ:
   * W filmie NIE zaczyna się każdego pytania od "Czy...". Pytania rozstrzygnięcia tworzy się intonacją:
-    Kalka niepożądana: "Czy jesteś pewna", "Czy widziałaś to", "Czy idziesz z nami", "Czy to prawda".
+    Niezalecana kalka: "Czy jesteś pewna", "Czy widziałaś to", "Czy idziesz z nami", "Czy to prawda".
     Wariant kanoniczny: "Jesteś pewna", "Widziałaś to", "Idziesz z nami", "To prawda" / "Serio".
   * Partykułę "Czy" zachowaj WYŁĄCZNIE w pytaniach alternatywnych ("Kawa czy herbata") lub w bardzo oficjalnym tonie.
 - 2. JAPOŃSKA NEGACJA RETORYCZNA (~JA NAI KA? / ~DEWA NAI KA? - RHETORICAL ASSERTIONS):
@@ -116,7 +116,7 @@ FILAR IX: PYTANIA POTOCZNE, ELIMINACJA SZTUCZNEGO "CZY" I NEGACJA RETORYCZNA (SZ
 
 FILAR X: ORGANICZNA ELIMINACJA TRZECIEGO JĘZYKA (ANTI-TRANSLATIONESE MANIFESTO):
 - Eliminacja tzw. "języka przekładu" – zdań poprawnych słownikowo, ale obcych polskiemu uchu:
-  * Kalka niepożądana: "Co sprawia, że tak mówisz", "Jestem zrobiony z...", "Wzięcie pod uwagę...", "Pomyśl o tym", "To ma miejsce w Tokio", "W wypadku kiedy to zrobisz...".
+  * Niezalecana kalka: "Co sprawia, że tak mówisz", "Jestem zrobiony z...", "Wzięcie pod uwagę...", "Pomyśl o tym", "To ma miejsce w Tokio", "W wypadku kiedy to zrobisz...".
   * Wariant kanoniczny: "Czemu tak sądzisz", "Taki już jestem...", "Uwzględniając...", "Zastanów się", "Dzieje się to w Tokio", "Jeśli to zrobisz...".
   * NIENATURALNE ZWIĄZKI FRAZEOLOGICZNE I INWERSJE AFEKTYWNE: Stosujemy naturalne polskie idiomy z właściwym nacechowaniem emocjonalnym (Kalka: 'odchodzić od zmysłów ze szczęścia' Wariant kanoniczny: 'szaleć ze szczęścia / nie posiadać się ze szczęścia / z radości'; w języku polskim 'odchodzić od zmysłów' łączy się wyłącznie z emocjami negatywnymi: rozpaczą, żalem, niepokojem).
   * ZWIĄZEK ZGODY LICZEBNIKÓW GŁÓWNYCH (FILAR IV): Podmiot liczebnikowy w l. mn. wymaga orzeczenia w liczbie mnogiej (Wariant kanoniczny: 'Dwa tysiące w zupełności wystarczą', Kalka: 'wystarczy').
@@ -125,9 +125,9 @@ FILAR X: ORGANICZNA ELIMINACJA TRZECIEGO JĘZYKA (ANTI-TRANSLATIONESE MANIFESTO)
     - Klasa B (Agresja podwórkowa i trywializacja): 'stul pysk' -> 'Zamilcz / Milcz', 'zamknij się', 'spuścić komuś łomot' -> 'zmiażdżyć bez trudu / rozgromić w pył', 'oberwę' -> 'poniosę karę / zginę', 'guzik mnie to obchodzi' -> 'nic mnie to nie obchodzi / niewiele mnie to obchodzi', 'pora stąd zwiewać / zwiewamy' -> 'pora stąd uciekać / czas uciekać'.
     - Klasa C (Współczesne metafory potoczne): 'przejmuję stery' -> 'teraz ja mówię', 'dla zabicia czasu' -> 'dla rozrywki', 'kłamstwo jak byk' -> 'bezczelne kłamstwo', 'wylatywać ze szkoły' -> 'zostać wydalonym ze szkoły', 'utrzeć komuś nosa' -> 'pokazać mu / utemperować go', 'zrobić raban' -> 'wywołać zamieszanie', 'wypruć się do cna' -> 'opaść z sił', 'zmywać się stąd' -> 'uciec stąd'.
     - Klasa D (Trywializujące zaimki/rzeczowniki): 'ten typ' -> 'ten człowiek / nauczyciel', 'dzikuska / chuliganka' -> 'prostaczka / awanturnica', 'dzieciaki' -> 'uczniowie / młodzież', 'durna jestem' -> 'głupia jestem'.
-  * SZYK PRZYDOMKOWY BÓSTW I ISTOT: Japońskie przydomki bóstw i stworzeń z partykułą 'no' (warianty: Ryū no Kishi, Gakuen no Majo) tłumaczymy przymiotnikowo lub czystym dopełniaczem.
+  * SZYK PRZYDOMKOWY BÓSTW I ISTOT: Japońskie przydomki bóstw i stworzeń z partykułą 'no' (wzorce: Ryū no Kishi, Gakuen no Majo) tłumaczymy przymiotnikowo lub czystym dopełniaczem.
   * RZĄD I RODZAJ GRAMATYCZNY RZECZOWNIKA 'POSOKA': 'Posoka' jest wyłącznie rodzaju żeńskiego (ta czarna posoka, tej czarnej posoki, przez czarną posokę; zamiast kalki 'czarny posok', 'przez czarny posok', 'z czarnego posoku').
-  * FLEKSJA WOŁACZOWA NAZWISK OBCYCH I ARTEFAKTÓW: Fonetyczna adaptacja w wołaczu i przypadkach zależnych (Standard 9.0): zmiękczenie tematu przy spółgłoskach (warianty: Vincent -> Vincencie), dopełniacz obcych imion (warianty: Andrew -> Andrewie).
+  * FLEKSJA WOŁACZOWA NAZWISK OBCYCH I ARTEFAKTÓW: Fonetyczna adaptacja w wołaczu i przypadkach zależnych (Standard 9.0): zmiękczenie tematu przy spółgłoskach (wzorce: Vincent -> Vincencie), dopełniacz obcych imion (wzorce: Andrew -> Andrewie).
   * RZĄD PRZYIMKOWY DLA URAZU I TRAUMY (FILAR IV): zamiast kalki 'mam przez coś uraz' (kalka z angielskiego 'have trauma from'). W języku polskim: 'mam do czegoś uraz' lub 'mam przez to traumę'.
   * KALKA AUTO-REFERENCYJNA (MY DEAR ME): Unikamy kalki 'moja droga ja' / 'droga ja'. W monologu wewnętrznym stosuj: 'moja ty mała', 'mała ja', 'taka ze mnie drobina'.
   * ZWIĄZEK ZGODY RZECZOWNIKA 'SŁUGA' (FILAR IV): W odniesieniu do kobiety stosujemy 'moja służka' lub 'twoja uniżona sługa' (Kalka: 'by moja sługa mogła uciec' Wariant kanoniczny: 'by moja podwładna mogła uciec' / 'by moja służąca mogła uciec').
@@ -159,7 +159,7 @@ FILAR XIII: TEORIA JĘZYKA RÓL (YAKUWARIGO SATOSHI KINSUI) I REJESTRY DIALEKTAL
 
 FILAR XIV: MATRYCA REALIÓW KULTUROWYCH ECR (7 STRATEGII JANA PEDERSENA):
 - Realia kulturowe (Extralinguistic Cultural References - ECR) tłumacz według 7 strategii Pedersena:
-  1. Official Equivalent: Oficjalny polski odpowiednik (warianty: 'Ministerstwo Spraw Wewnętrznych', 'Tokijski Uniwersytet Sztuki').
+  1. Official Equivalent: Oficjalny polski odpowiednik (wzorce: 'Ministerstwo Spraw Wewnętrznych', 'Tokijski Uniwersytet Sztuki').
   2. Retention: Zachowanie pojęcia powszechnego w popkulturze (ramen, katana, kotatsu, onsen, kimono, senpai, taiyaki, tatami), gdy obiekt widać na ekranie.
   3. Specification: Doprecyzowanie hipernimem pojęć kluczowych a mniej znanych ('góra Fuji', 'rzeka Sumida', 'święto Obon', 'szachy japońskie shogi', 'amulet ochronny omamori').
   4. Direct Translation: Dosłowne tłumaczenie pojęć uniwersalnych ('Gildia Kupiecka', 'Rada Cieni').
@@ -198,29 +198,29 @@ FILAR XVIII: ADAPTACJA PARALINGWISTYKI, DŹWIĘKÓW POZAWERBALNYCH I INTERIEKCJI
 - JAPOŃSKIE ODGŁOSY WYSIŁKU FIZYCZNEGO, KINEZJATYKI I SOMATYKI CIAŁA (KAKEGOE & SOMATIC REFLEXES):
   * "Ottotto..." (おっとっと…) / "Ototo..." (odruch utraty równowagi, potknięcia, chwiania się, niemal upadku na plecy/twarz):
     Wariant kanoniczny: „Ło, ło, ło...!”, „Uuu, powoli...!”, „O-o-o, chwila...!”, „Hop, hop, hop...!” lub PUSTY NAPIS "" (elipsa szumu wizualnego Netflix AVT).
-    Kalka niepożądana: „Oho, spokojnie...”, „Łatwo tam...” (bezduszna kalka z angielskiego 'Whoa, easy there' - 'oho' to wykrzyknik spostrzeżenia, nikt lecąc na plecy nie mówi 'oho', a 'spokojnie' to komenda do kogoś obcego, nie odruch własnego ciała!).
+    Niezalecana kalka: „Oho, spokojnie...”, „Łatwo tam...” (bezduszna kalka z angielskiego 'Whoa, easy there' - 'oho' to wykrzyknik spostrzeżenia, nikt lecąc na plecy nie mówi 'oho', a 'spokojnie' to komenda do kogoś obcego, nie odruch własnego ciała!).
   * "Acchichi" (あっちっち!) / "Atsu'!" (oparzenie termiczne, dotknięcie gorącej lufy/garnka/wrzątku):
     Wariant kanoniczny: „Ała!”, „Parzy!”, „Cholera, gorące!”.
-    Kalka niepożądana: „To jest gorące!” (szkolny opis stanu zamiast odruchu bólu).
-    -> ŻELAZNA GRANICA SKŁADNIOWA: Reguła dotyczy WYŁĄCZNIE izolowanych odruchów bólu i oparzenia. W zdaniach oznajmujących i orzeczeniach opisowych (warianty: „Uważaj, herbata jest gorąca”, „To jest niebezpieczne”) zachowaj normalny opis orzeczeniowy.
+    Niezalecana kalka: „To jest gorące!” (szkolny opis stanu zamiast odruchu bólu).
+    -> ŻELAZNA GRANICA SKŁADNIOWA: Reguła dotyczy WYŁĄCZNIE izolowanych odruchów bólu i oparzenia. W zdaniach oznajmujących i orzeczeniach opisowych (wzorce: „Uważaj, herbata jest gorąca”, „To jest niebezpieczne”) zachowaj normalny opis orzeczeniowy.
   * "Sammu" (さっむ!) / "Samui" (nagły szok termiczny z zimna, wpadnięcie do lodowatej wody, mróz):
     Wariant kanoniczny: „Brrr!”, „Ale piździ!”, „Ale mróz!”, „Lodowata!”.
-    Kalka niepożądana: „To jest zimne!”.
+    Niezalecana kalka: „To jest zimne!”.
   * "Itta" (痛っ!) / "Ita'!" (nagły ból mechaniczny: walnięcie głową w belkę, postrzał, uderzenie piszczelem):
     Wariant kanoniczny: „Ała!”, „Auć!”, „Niech to...!”, „Szlag!”.
-    Kalka niepożądana: „To boli!”.
-    -> ŻELAZNA GRANICA SKŁADNIOWA: Odruch somatyczny „Ała!” dotyczy WYŁĄCZNIE pojedynczych, izolowanych okrzyków somatycznych i odruchów bólu (warianty: „Itta!” -> „Ała!” / „Auć!”). W zdaniach podrzędnych i orzeczeniach opisowych (warianty: „Wiem, jak bardzo to boli”, „To naprawdę boli”, „Czy to boli?”) fraza „to boli” jest w 100% poprawnym i nienaruszalnym orzeczeniem gramatycznym – eliminujemy kalkę wstawiania tam „Ała!”!
+    Niezalecana kalka: „To boli!”.
+    -> ŻELAZNA GRANICA SKŁADNIOWA: Odruch somatyczny „Ała!” dotyczy WYŁĄCZNIE pojedynczych, izolowanych okrzyków somatycznych i odruchów bólu (wzorce: „Itta!” -> „Ała!” / „Auć!”). W zdaniach podrzędnych i orzeczeniach opisowych (wzorce: „Wiem, jak bardzo to boli”, „To naprawdę boli”, „Czy to boli?”) fraza „to boli” jest w 100% poprawnym i nienaruszalnym orzeczeniem gramatycznym – eliminujemy kalkę wstawiania tam „Ała!”!
   * "Yotto..." (よっと…) / "Yoisho..." (よいしょ…) / "Dokkoisho..." (どっこいしょ…) / "Yoi kora..." (odgłos wysiłku przy podnoszeniu ciężaru, stawianiu wiadra, siadaniu, kucaniu, wstawaniu z krzesła/ziemi):
     Wariant kanoniczny: ELIPSA DIALOGOWA "" (pusty napis - widz widzi ruch na ekranie i słyszy wysiłek; brak napisu to najwyższy standard profesjonalizmu AVT Belczyka / Netflixa) lub w ostateczności "No i już..." / "Uch...".
-    Kalka niepożądana: "Tutaj...", "Proszę...", "Oto..." (kalka z angielskiego "Here / There you go") oraz infantylne podpisy "Hop...", "I siup...", "Raz, dwa..." przy dorosłych postaciach!
+    Niezalecana kalka: "Tutaj...", "Proszę...", "Oto..." (kalka z angielskiego "Here / There you go") oraz infantylne podpisy "Hop...", "I siup...", "Raz, dwa..." przy dorosłych postaciach!
   * Gesty podawania i częstowania ("Hai" / "Dōzo" / "Hora" -> w EN: "Here", "Here you go", "There"):
     Wariant kanoniczny: w większości scen ELIPSA "" (obraz w 100% wyjaśnia gest podania), a jeśli relacja wymaga zaznaczenia w dialogu: wyłącznie naturalne "Proszę", "Trzymaj", "Masz" (w locie/walce: "Łap").
-    Kalka niepożądana: KOSZMARNA KALKA "Tutaj" / "Tu" (w języku polskim wręczając komuś herbatę, klucze czy dokument nikt nie mówi "Tutaj").
+    Niezalecana kalka: KOSZMARNA KALKA "Tutaj" / "Tu" (w języku polskim wręczając komuś herbatę, klucze czy dokument nikt nie mówi "Tutaj").
   * "Hora" (ほら) / "Sora" (そら) (przy rzucie, dynamicznym podaniu przedmiotu w locie):
     Wariant kanoniczny: "Łap", "Masz", "Trzymaj".
   * "Puhā" (ぷはーっ!) (sapnięcie ulgi/orzeźwienia po kuflu zimnego piwa lub wynurzeniu z wody):
     Wariant kanoniczny: „Aaaach!”, „Ale dobre!”, „Wreszcie powietrze!” lub puste "" (elipsa szumu).
-    Kalka niepożądana: „Pha!”.
+    Niezalecana kalka: „Pha!”.
 - Surowe japońskie odgłosy komiksowe adaptujemy do polszczyzny filmowej:
   * "Tch" / "Che" -> "Tsk...", "Szlag...", "Ech..." lub elipsa, jeśli grymas twarzy wystarczy.
   * "Eh" (zdumienie) -> "Co", "Jak to", "Słucham".
@@ -260,20 +260,20 @@ FILAR XXI: EKSPLIKACJA PODTEKSTU, IMPLIKATURY I MATRYCA FORMUŁ PHATYCZNYCH (PAU
 
 FILAR XXII: PRZEKŁAD TYTUŁÓW DZIEŁ, MITOLOGII I INTERTEKSTUALNOŚCI (ALLUSION & CANON RECOGNITION):
 - Cytaty, nawiązania literackie, mitologiczne i popkulturowe:
-  * Sprawdzaj ugruntowany polski kanon (warianty: 'Hrabia Monte Christo', 'Sherlock Holmes', 'Król Artur', 'Mitologia Nordycka').
+  * Sprawdzaj ugruntowany polski kanon (wzorce: 'Hrabia Monte Christo', 'Sherlock Holmes', 'Król Artur', 'Mitologia Nordycka').
   * Cytaty z klasyki (Szekspir, Biblia, Mickiewicz, Lem) tłumacz zgodnie z kanonicznymi polskimi przekładami, a nie z translacji powrotnej!
 
 FILAR XXIII: KANON POLSKICH WYDAŃ MANGOWYCH I SPÓJNOŚĆ TRANSMEDIALNA (TRANSMEDIA CANON CONSISTENCY):
-- Gdy seria posiada oficjalny polski przekład mangowy (warianty: Waneko, J.P.Fantastica, Studio JG, Hanami, Kotori):
-  * zachowaj ustalone w polskim wydaniu papierowym nazwy technik, magii, krain, formacji bojowych i rang (warianty: "Rozszerzenie Domeny", "Przeklęta Energia", "Korpus Zwiadowczy", "Wielki Generał", "Państwo Środka").
-  * KANON TYTUŁÓW I EPITETÓW: Oficjalne polskie wydania mangowe mają nadrzędne pierwszeństwo przed tłumaczeniem dosłownym z angielskiego lub kalkami z fansubów (warianty: 'Monster Prince' wg Studio JG to oficjalnie 'Potworny Królewicz'; zgodnie z oficjalną bazą manga_canon.py lub SeriesBible).
+- Gdy seria posiada oficjalny polski przekład mangowy (wzorce: Waneko, J.P.Fantastica, Studio JG, Hanami, Kotori):
+  * zachowaj ustalone w polskim wydaniu papierowym nazwy technik, magii, krain, formacji bojowych i rang (wzorce: "Rozszerzenie Domeny", "Przeklęta Energia", "Korpus Zwiadowczy", "Wielki Generał", "Państwo Środka").
+  * KANON TYTUŁÓW I EPITETÓW: Oficjalne polskie wydania mangowe mają nadrzędne pierwszeństwo przed tłumaczeniem dosłownym z angielskiego lub kalkami z fansubów (wzorce: 'Monster Prince' wg Studio JG to oficjalnie 'Potworny Królewicz'; zgodnie z oficjalną bazą manga_canon.py lub SeriesBible).
   * RÓŻNICA AVT vs MANGA: Zachowaj kanoniczną terminologię, ale przestrzegaj rygoru zwięzłości napisów filmowych (limit 17 CPS i 42 znaków). Nie przenoś tasiemcowych zdań z dymków komiksu bez uprzedniej kondensacji składniowej.
 
 FILAR XXIV: KONWENCJE DLA ŻARGONU GIER, ISEKAI I SYSTEMÓW RPG (STATUS WINDOWS & SKILL NAMES):
 - Gry, Isekai, LitRPG i światy z interfejsem systemowym:
   * Nazwy umiejętności (Skills), czarów i klas postaci -> zwięzłe, wyraziste polskie miana zgodne z tradycją RPG ('Kula Ognia', 'Błogosławieństwo Światła', 'Rozszerzenie Domeny', 'Kradzież Cienia').
   * Komunikaty systemowe i okna statusu: wersaliki lub formatowanie techniczne [ OKNO STATUSU: POZIOM 50 ].
-  * Zachowaj spójność językową bez mieszania surowych nazw menu z polskim tekstem, jeśli nie wymaga tego stylistyka retro (warianty: 8-bit).
+  * Zachowaj spójność językową bez mieszania surowych nazw menu z polskim tekstem, jeśli nie wymaga tego stylistyka retro (wzorce: 8-bit).
 
 
 MODUŁ III: ETYKIETA SPOŁECZNA, RELACJE I DRAMATURGIA POSTACI (FILARY XXV – XXXV)
@@ -281,10 +281,10 @@ MODUŁ III: ETYKIETA SPOŁECZNA, RELACJE I DRAMATURGIA POSTACI (FILARY XXV – X
 FILAR XXV: PRZEKŁAD RELACJI RODZINNYCH, FEUDALNYCH I ZASADA JEDNOKROTNEJ TYTULATURY (ANTI-HONORIFIC SPAM):
 - RELACJE RODZINNE: 'Onii-chan / Onee-san' oddajemy imieniem, formą 'braciszku / brachu / siostra' lub naturalnym polskim zdaniem. Zastępuj to imieniem brata/siostry, zwrotem "braciszku / brachu / siostra" (w sytuacjach czułych/żartobliwych) lub pomijaj na rzecz naturalnego polskiego zdania.
 - ETYKIETA FEUDALNA I ZASADA JEDNOKROTNEJ TYTULATURY:
-  * W relacjach feudalnych, samurajskich, dworskich oraz bóstwo-dziedzic (warianty: kapłan/wasal do młodego lorda, doradca do generała):
+  * W relacjach feudalnych, samurajskich, dworskich oraz bóstwo-dziedzic (wzorce: kapłan/wasal do młodego lorda, doradca do generała):
     -> ZASADA JEDNOKROTNEJ TYTULATURY: Szacunek nadaje zwrot tytularny użyty RAZ na początku lub na końcu wypowiedzi ("młody panie", "panie generale", "wasza wysokość").
     -> Wewnątrz monologu i kolejnych zdań stosuj naturalną 2. osobę lub elipsę: Wewnątrz monologu i kolejnych zdań stosuj naturalną 2. osobę ("przemierzasz", "gdyby cię pojmał", "zrobiłeś już dość") lub elipsę ("robi się tu zbyt niebezpiecznie" zamiast sztucznego "dla pana").
-    Kalka niepożądana: "Przemierza pan pole bitwy... gdyby pana pojmał... by zastawić na pana sieć... robi się tu dla pana niebezpiecznie... zrobił pan już dość, panie generale." (8 razy pan!).
+    Niezalecana kalka: "Przemierza pan pole bitwy... gdyby pana pojmał... by zastawić na pana sieć... robi się tu dla pana niebezpiecznie... zrobił pan już dość, panie generale." (8 razy pan!).
     Wariant kanoniczny: "To ty, młody panie. Przemierzasz pole bitwy... gdyby cię pojmał... by zastawić na ciebie sieć... robi się tu zbyt niebezpiecznie. Zrobiłeś już dość, panie generale."
 - KANON TYTULATURY MONARSZEJ I STEPOWEJ:
   * Władcy imperium koczowniczego/mongolskiego w polskiej tradycji historycznej to wyłącznie "Chan / Wielki Chan" (dopełniacz: "chana / Wielkiego Chana", wołacz: "chanie / Wielki Chanie"). HISTORYCZNA PISOWNIA POLSKA: "Wielki Chan", "Chaganie".
@@ -292,7 +292,7 @@ FILAR XXV: PRZEKŁAD RELACJI RODZINNYCH, FEUDALNYCH I ZASADA JEDNOKROTNEJ TYTULA
 FILAR XXVI: ZASADA YOBISUTE I NATURALNE FORMY ADRESATYWNE (ANTI-FALSE FORMALITY):
 - ZWROT PO SAMYM IMIENIU (Yobisute - Kenji, Yui, Ren, Aoi):
   * Gdy w audio lub tekście postać zwraca się do rozmówcy po SAMYM IMIENIU bez japońskich honoryfikatorów:
-    Kalka niepożądana: Dodawanie słowa "Pan/Pani" ("Pan Kenji", "panie Kenji", "pani Yui").
+    Niezalecana kalka: Dodawanie słowa "Pan/Pani" ("Pan Kenji", "panie Kenji", "pani Yui").
     Wariant kanoniczny: Zwracanie się bezpośrednio po imieniu na "ty": "Kenji, co o tym myślisz", "Yui, spróbuj tego".
 - RELACJE BLISKIE, TOWARZYSKIE, RYWALIZUJĄCE I POSTACIE ZAGRANICZNE:
   * Towarzysze podróży, rywale, przyjaciele oraz cudzoziemcy nieznający sztywnej etykiety biurowej ZAWSZE mówią do siebie po imieniu na "ty".
@@ -303,12 +303,12 @@ FILAR XXVI: ZASADA YOBISUTE I NATURALNE FORMY ADRESATYWNE (ANTI-FALSE FORMALITY)
   * W relacjach ściśle formalnych i zawodowych utrzymuj jednolity rejestr grzecznościowy per 'Pan/Pani' we wszystkich kwestiach w obrębie sceny.
   * Utrzymuj konsekwentny dystans formalny w całej scenie, jeśli relacja wymaga dystansu.
 - KIEDY STOSUJEMY FORMĘ „PAN/PANI”:
-  * WYŁĄCZNIE przy formalnych zwrotach po NAZWISKU z honoryfikatorem (warianty: Sato-sensei -> "pan Sato", Tanaka-san -> "pan Tanaka") lub w oficjalnych relacjach urzędowych/kelner-klient.
+  * WYŁĄCZNIE przy formalnych zwrotach po NAZWISKU z honoryfikatorem (wzorce: Sato-sensei -> "pan Sato", Tanaka-san -> "pan Tanaka") lub w oficjalnych relacjach urzędowych/kelner-klient.
 
 FILAR XXVII: HARMONIA TYTUŁÓW I ADAPTACJA HONORYFIKATYWÓW (HONORIFIC HARMONY):
 - HARMONIA TYTULATURY (JEDNOLITY REJESTR):
-  * Kiedy w audio pada japoński tytuł (warianty: "Sensei", "Senpai", "Sato-sensei"):
-    Kalka niepożądana: "Pani Sensei, skończyłam", "Panie Sensei", "Pani Senpai" (sprzeczne tytulatury!).
+  * Kiedy w audio pada japoński tytuł (wzorce: "Sensei", "Senpai", "Sato-sensei"):
+    Niezalecana kalka: "Pani Sensei, skończyłam", "Panie Sensei", "Pani Senpai" (sprzeczne tytulatury!).
     Wariant w rejestrze mangowym: "Sensei, skończyłam", "Sato-sensei, skończyłam", "Senpai".
     Wariant w rejestrze naturalnym: "Pani Sato, skończyłam", "Mistrzyni, skończyłam", "Szefowo, skończyłam".
 - ADAPTACJA HONORYFIKATORÓW SZKOLNYCH I SLANGU OTAKU:
@@ -316,11 +316,11 @@ FILAR XXVII: HARMONIA TYTUŁÓW I ADAPTACJA HONORYFIKATYWÓW (HONORIFIC HARMONY)
   * Końcówki spieszczające ze slangu otaku typu '-taso', '-tan' zastępujemy standardowym imieniem lub polskim zdrobnieniem (zgodnie z profilem postaci w SeriesBible). Imiona adaptuj z pełnym poszanowaniem ich fonetyki i deklinacji!
   * ŚWIADOMOŚĆ ADRESATA (ANTI-SELF-ADDRESS MANDATE): Mówca pod żadnym pozorem nie może zwracać się do siebie własnym imieniem! Przy adaptacji wołaczy ('Senpai', 'Sensei') w kwestiach jedno- i wieloliniowych, jeśli zwrot jest tłumaczony imieniem, precyzyjnie wskazuje partnera dialogowego (adresata), a NIE mówcę. W razie braku pewności co do adresata stosuj formę eliptyczną/bezosobową ('Prawda', 'Słuchaj', 'Nic ci nie jest').
   * POLITE SURNAME RECOVERY (regulacja NAZWISKOWA NA FORMĘ GRZECZNOŚCIOWĄ): Gdy postać koryguje spoufalenie i wycofuje się z imienia do formy formalnej ('[Nazwisko]-senpai'), w języku polskim należy zastosować 'panno [Nazwisko]' (dla kobiety) lub 'panie [Nazwisko]' (dla mężczyzny).
-  * WOŁACZ PRZYDOMKÓW MEDIALNYCH (TITULAR MONIKER VOCATIVE): Gdy bohater nosi oficjalny przydomek tytularny, bezpośredni zwrot w wołaczu musi być poprawny gramatycznie i zgodny z kanonem serii (warianty: manga_canon.py / SeriesBible).
+  * WOŁACZ PRZYDOMKÓW MEDIALNYCH (TITULAR MONIKER VOCATIVE): Gdy bohater nosi oficjalny przydomek tytularny, bezpośredni zwrot w wołaczu musi być poprawny gramatycznie i zgodny z kanonem serii (wzorce: manga_canon.py / SeriesBible).
 
 FILAR XXVIII: DYNAMIKA FORM ADRESATYWNYCH, UCHI-SOTO I TRIADA KEIGO (BROWN & LEVINSON):
 - Granica grupy Własnej (Uchi) i Obcej (Soto) oraz triada grzecznościowa:
-  * 1. Relacje Uchi-Soto: Gdy bohater mówi o członkach własnej grupy/rodziny/firmy do kogoś z zewnątrz: Stosuj naturalną formę skromną wobec własnej grupy (warianty: 'Nasz dyrektor Kowalski') (warianty: pracownik do klienta mówi "Nasz dyrektor Kowalski", a nie "Nasz pan dyrektor").
+  * 1. Relacje Uchi-Soto: Gdy bohater mówi o członkach własnej grupy/rodziny/firmy do kogoś z zewnątrz: Stosuj naturalną formę skromną wobec własnej grupy (wzorce: 'Nasz dyrektor Kowalski') (wzorce: pracownik do klienta mówi "Nasz dyrektor Kowalski", a nie "Nasz pan dyrektor").
   * 2. Triada Honoryfikatywna:
      - Sonkeigo (wywyższanie rozmówcy) -> naturalne polskie formy grzecznościowe i szacunek ("Czy zechciałby pan spojrzeć").
      - Kenjougo (uniżanie siebie/własnych działań) -> w języku polskim przekładaj na profesjonalizm i gotowość pomocy ("Zajmę się tym natychmiast", "Pozwolę sobie zauważyć"), a NIE na sztuczną, czołobitną uniżoność.
@@ -340,7 +340,7 @@ FILAR XXX: PRZEŁAMANIE REJESTRU I DRAMATURGIA FORMY (POLITENESS SHIFT & KEIGO B
 - 2. Przełamanie Odwrotne (Ironiczne Wejście w Keigo): Gdy zuchwała postać nagle zaczyna mówić przesadnie uprzejmym, chłodnym tonem oficjalnym, oddaj w języku polskim lodowaty dystans, szyderstwo lub ukrytą groźbę.
 
 FILAR XXXI: MATRYCA TOŻSAMOŚCI I KAMUFLAŻU PŁCIOWEGO (GENDER-BENDER & DISGUISE MATRIX):
-- W anime z motywem kamuflażu tożsamości, cross-dressingu lub ukrywania prawdziwej płci (warianty: dziewczyna udająca chłopaka):
+- W anime z motywem kamuflażu tożsamości, cross-dressingu lub ukrywania prawdziwej płci (wzorce: dziewczyna udająca chłopaka):
   * DIALOG PUBLICZNY (MASKA SPOŁECZNA): Obowiązkowa gramatyka kamuflażu ("Spóźniłem się", "Myślałem, że mamy trening").
   * MONOLOG WEWNĘTRZNY / MYŚLI / NARRACJA: Prawdziwa płeć postaci ("O rany, prawie się wydałam...", "Gdyby to zobaczył, byłabym skończona").
   * STREFA POWIERNIKA (NA OSOBNOŚCI): Prawdziwa tożsamość w rozmowie 1-na-1 z osobą znającą tajemnicę ("Nie mogłam inaczej, doktorze").
@@ -363,7 +363,7 @@ FILAR XXXIV: KALIBRACJA PATOSU W PRZEMOWACH BOJOWYCH I DEKLARACJACH MORALNYCH (H
 
 FILAR XXXV: ZASADA IZOTOPII SEMANTYCZNEJ I SPÓJNOŚCI REJESTRU WYPOWIEDZI (SNELL-HORNBY & NIDA):
 - Utrzymuj jednolity rejestr stylistyczny w obrębie jednej kwestii/sceny:
-  * Nie łącz wyszukanego słownictwa archaicznego lub poetyckiego z tanim, współczesnym slangiem (warianty: Kalka: "Zaiste, Wasza Miłość, to totalna masakra").
+  * Nie łącz wyszukanego słownictwa archaicznego lub poetyckiego z tanim, współczesnym slangiem (wzorce: Kalka: "Zaiste, Wasza Miłość, to totalna masakra").
   * Każda postać musi zachować spójny, jednolity idiolekt przez cały odcinek.
 
 
@@ -379,7 +379,7 @@ FILAR XXXVII: CZASOWNIKI WEKTOROWE I CIĘCIA MONTAŻOWO-PRZESTRZENNE (DIRECTIONA
 - CZASOWNIKI Z ASPEKTEM WEKTOROWYM (-TE KURU / -TE IKU):
   * Japoński sufiks ~te kuru (見えてきた - Mietekita) oznacza FIZYCZNE PRZYBLIŻANIE SIĘ lub wyłanianie obiektu w polu widzenia ("Ukazał się", "Już widać", "Dochodzi nas dźwięk...").
   * Japoński sufiks ~te iku (消えていく - Kieteiku) oznacza ODDALANIE SIĘ w przestrzeni lub proces postępujący w przyszłość ("Znika w oddali...", "Będzie gasnąć...").
-  * Kalka niepożądana: Tłumaczenie angielskiego "I can see it" (gdy w audio pada "Mietekita" na tle samolotu/podróży) jako "Widzę to po tobie / po panu".
+  * Niezalecana kalka: Tłumaczenie angielskiego "I can see it" (gdy w audio pada "Mietekita" na tle samolotu/podróży) jako "Widzę to po tobie / po panu".
   * Wariant kanoniczny: "Już widać", "Widać cel" (w odniesieniu do lądu/miasta wyłaniającego się zza chmur).
 - RESPEKTOWANIE CIĘĆ SCENICZNYCH (TIME/LOCATION JUMP):
   * Jeśli między kwestią A a B następuje zmiana sceny (gabinet -> samolot), kwestia B jest nową sytuacją plenerową, a NIE ripostą do rozmowy!
@@ -396,18 +396,18 @@ FILAR XXXIX: ELIMINACJA NOŻYC OBRAZOWO-TEKSTOWYCH (TEXT-BILD-SCHERE):
   * Jeśli bohater najpierw wyciąga miecz, a potem tnie linę, zdanie musi zaczynać się od miecza, a kończyć na cięciu, eliminując dysonans poznawczy.
 
 FILAR XL: ŚWIADOMOŚĆ RUCHU UST I KADENCJA WYKAZOWA (LIP-FLAP CADENCE AWARENESS):
-- Krótki, gwałtowny japoński wykrzyknik aktora (warianty: "Baka", "Kuso", "Yamero") MUSI otrzymać równie krótki, dosadny polski odpowiednik ("Szlag", "Idiota", "Stój"). Krótkie okrzyki tłumacz równie zwięźle i dosadnie.
+- Krótki, gwałtowny japoński wykrzyknik aktora (wzorce: "Baka", "Kuso", "Yamero") MUSI otrzymać równie krótki, dosadny polski odpowiednik ("Szlag", "Idiota", "Stój"). Krótkie okrzyki tłumacz równie zwięźle i dosadnie.
 
 FILAR XLI: PRZEKŁAD NAPISÓW EKRANOWYCH I STANDARD DUAL-TRACK SUBTITLING (SIGNS & TYPESETTING):
 - Kiedy kwestia jest oznaczona jako NAPIS EKRANOWY / TYTUŁ / PLANSZA (Signs / Typesetting):
-  * MUSI być przetłumaczona jako SAMODZIELNY TYTUŁ LUB NAZWA (warianty: "The Princess's Favor" -> "Łaska księżniczki").
+  * MUSI być przetłumaczona jako SAMODZIELNY TYTUŁ LUB NAZWA (wzorce: "The Princess's Favor" -> "Łaska księżniczki").
   * W pole napisu ekranowego wpisuj wyłącznie treść napisu ze sceny, oddzielając go od mowy przez postacie!
   * Standard Dual-Track: Kiedy w tym samym ułamku sekundy pada dialog i napis ekranowy, dialog umieszczaj na dole ekranu, a napis ekranowy u góry w nawiasie prostokątnym wersalikami: "[ CZASY WSPÓŁCZESNE ]", "[ INFORMACJA TURYSTYCZNA ]".
   * FANSUB-QUALITY VISUAL TYPESETTING (Pixel-Perfect Spatial Grounding): Dla plansz, szyldów, okładek mangi i onomatopei (SFX) rozpoznaj na dołączonym kadrze wideo pozycję oryginalnego tekstu (detected_box_1000: [ymin, xmin, ymax, xmax]), kąt obrotu (rotation_deg: warianty: -25 dla skosu), sugerowane umiejscowienie ('above' / 'below' / 'overlay') oraz dominujące kolory (primary_color_hex, outline_color_hex), aby tłumacz mógł wygenerować perfekcyjne współrzędne ASS (\pos, \frz, \1c, \3c) dorównujące ręcznemu typesettingowi grup fansubberskich.
   * BEZPIECZNIK ANTYKOLIZYJNY: Jeśli w pliku .ass istnieją już wystylizowane napisy dla notesu/plakatu, nie dubluj linii.
 
 FILAR XLII: PRECYZJA PERSPEKTYWY I PRZYNALEŻNOŚCI (3. OSOBA VS 1. OSOBA):
-- Kiedy w kwestii pojawia się imię postaci w dopełniaczu (warianty: "[Imię]'s dad!", "[Tytuł]'s manga!", "[Imię]'s house!"):
+- Kiedy w kwestii pojawia się imię postaci w dopełniaczu (wzorce: "[Imię]'s dad!", "[Tytuł]'s manga!", "[Imię]'s house!"):
   * Oznacza to DOKŁADNIE tę nazwaną postać w 3. osobie ("Tata [Imię D]", "Ojciec [Imię D]", "Manga pani [Tytuł D]", "Dom [Imię D]").
   * Wypowiedzi o innych osobach tłumacz konsekwentnie w 3. osobie (Kalka: przetłumaczenie "[Imię]'s dad!" na "to mój tata"!).
 
@@ -417,8 +417,8 @@ MODUŁ V: PRAGMATYKA DIALOGU I KONTEKST ROZMOWY (FILARY XLIII – LII)
 FILAR XLIII: MATRYCA PRAGMATYCZNA POTWIERDZEŃ, APROBACJI I AIZUCHI (CONVERSATIONAL VALIDATION MATRIX):
 - ROZRÓŻNIENIE APROBACJI OD PRZYJĘCIA INFORMACJI I REAKCJI EMOCJONALNYCH:
   * 1. APROBATA / POTWIERDZENIE HIPOTEZY ROZMÓWCY (Sou / Sou ne / Sou desu):
-    -> Gdy rozmówca wysuwa trafną uwagę (warianty: "Wyczułem w winie trud osadników..."), a postać potwierdza jego rację:
-    Kalka niepożądana: Bierne, urzędowe "Rozumiem." (kalka angielskiego "I see").
+    -> Gdy rozmówca wysuwa trafną uwagę (wzorce: "Wyczułem w winie trud osadników..."), a postać potwierdza jego rację:
+    Niezalecana kalka: Bierne, urzędowe "Rozumiem." (kalka angielskiego "I see").
     Wariant kanoniczny: "Otóż to.", "Właśnie tak.", "Zgadza się.", "Dokładnie tak.", "W rzeczy samej."
   * 2. EMPATIA I WSPÓŁODCZUWANIE (Wakaru / Wakaruu / Sore na!):
     -> Wakaru / Wakaruu (分かる〜): "No nie", "Totalnie", "Też tak myślę", "Prawda", "Wiem, co czujesz".
@@ -437,8 +437,8 @@ FILAR XLIII: MATRYCA PRAGMATYCZNA POTWIERDZEŃ, APROBACJI I AIZUCHI (CONVERSATIO
   * 6. PÓŁ-ZGODA I POWŚCIĄGLIWOŚĆ (Maa ne / Maa na):
     -> Maa ne: "No niby tak...", "W sumie...", "Mniej więcej...", "Coś w tym jest...".
   * 7. DYREKTYWNE POTWIERDZENIA I REAKCJA NA OSTRZEŻENIA/POLECENIA (Hai / Ee / Un po dyrektywach):
-    -> Gdy poprzednia kwestia to ostrzeżenie (warianty: "Uważaj pod nogi", "Ostrożnie"), unikaj kalki ("Nie ruszaj się"), polecenie ("Poczekaj", "Chodź tu") lub prośba:
-    Kalka niepożądana: Mechaniczne, bezmyślne "Tak." / "T-Tak." (kalka z angielskiego 'Yes/Y-Yes' oraz słownikowego 'Hai=Tak'). Polak na ostrzeżenie NIGDY nie odpowiada "Tak"!
+    -> Gdy poprzednia kwestia to ostrzeżenie (wzorce: "Uważaj pod nogi", "Ostrożnie"), unikaj kalki ("Nie ruszaj się"), polecenie ("Poczekaj", "Chodź tu") lub prośba:
+    Niezalecana kalka: Mechaniczne, bezmyślne "Tak." / "T-Tak." (kalka z angielskiego 'Yes/Y-Yes' oraz słownikowego 'Hai=Tak'). Polak na ostrzeżenie NIGDY nie odpowiada "Tak"!
     Wariant kanoniczny: "Dobrze." / "D-Dobrze.", "Jasne.", "W porządku.", "Będę uważać.", "Już.", "Zrozumiałam/em." lub podziękowanie za troskę: "Dzięki." / "D-Dziękuję.".
 
 FILAR XLIV: SELEKTYWNA REDUKCJA POTAKIWAŃ I ELIMINACJA NAKŁADAJĄCYCH SIĘ AIZUCHI (EYE-TRACKING FILTER):
@@ -469,7 +469,7 @@ FILAR XLVII: ODWRÓCENIE POLARYZACJI SEMANTYCZNEJ W SARKAZMIE (SARCASTIC INVERSI
 
 FILAR XLVIII: KADENCJA KOŃCOWA, PUENTOWANIE I ZASADA SUSPENSE RETENTION (PUNCHLINE ALIGNMENT):
 - 1. PUENTA NA KOŃCU: W scenach komediowych i dramatycznych kluczowe słowo (puenta żartu lub oskarżenie) MUSI paść na sam koniec napisu, idealnie w momencie, gdy aktor urywa głos.
-- 2. ZASADA SUSPENSE RETENTION: W napisach dwuwierszowych nie umieszczaj rozwiązania zagadki (warianty: miana zabójcy) w pierwszej linijce, aby oko widza nie przeczytało puenty przed wypowiedzeniem jej przez aktora.
+- 2. ZASADA SUSPENSE RETENTION: W napisach dwuwierszowych nie umieszczaj rozwiązania zagadki (wzorce: miana zabójcy) w pierwszej linijce, aby oko widza nie przeczytało puenty przed wypowiedzeniem jej przez aktora.
 
 FILAR XLIX: PRZEKŁAD ZDAŃ ELIPTYCZNYCH I URWANYCH NIEDOMÓWIEŃ (PRAGMATYKA CISZY I ZAWIESZENIA GŁOSU):
 - W języku japońskim zdania często urywają się na spójniku ('kedo...', 'kara...', 'tomo...'):
@@ -479,7 +479,7 @@ FILAR XLIX: PRZEKŁAD ZDAŃ ELIPTYCZNYCH I URWANYCH NIEDOMÓWIEŃ (PRAGMATYKA CI
 FILAR L: POPRAWNOŚĆ REKCJI PRZYCZYN ZGONU I TERMINOLOGII MEDYCZNEJ:
 - Zdarzenia nagłe, wylewy, udary, krwotoki i urazy:
   * W języku polskim nagłe incydenty medyczne łączą się z wyrażeniami "z powodu", "wskutek", "w wyniku":
-    Kalka niepożądana: "Zmarła na wylew zaraz po porodzie.", "Zmarł na krwotok.", "Zmarł na atak serca."
+    Niezalecana kalka: "Zmarła na wylew zaraz po porodzie.", "Zmarł na krwotok.", "Zmarł na atak serca."
     Wariant kanoniczny: "Zmarła z powodu wylewu zaraz po porodzie.", "Zmarła wskutek wylewu...", "Zmarł na zawał (serca).", "Zmarł w wyniku odniesionych obrażeń."
   * "Brain hemorrhage" -> "wylew", "krwotok mózgowy", "udar krwotoczny".
   * "Heart attack" -> "zawał serca", "zawał".
@@ -631,9 +631,9 @@ FILAR LXVII: KĄT KAMERY EMPATYCZNEJ I DEIKSA PSYCHOLOGICZNA (SUSUMU KUNO'S EMPA
 
 FILAR LXVIII: PAMIĘĆ LEITMOTYWÓW I ECHA NARRACYJNEGO (LONG-TERM LEITMOTIF & CATCHPHRASE PERSISTENCE):
 - Wieloepizodowa spójność haseł, przysiąg, dewiz życiowych i fraz-kluczy (Catchphrases & Oaths):
-  * Jeśli postać powtarza specyficzną frazę (warianty: przysięgę z dzieciństwa, motto życiowe, rytualne zawołanie bitewne), która powraca w finale serii jako klamra kompozycyjna:
+  * Jeśli postać powtarza specyficzną frazę (wzorce: przysięgę z dzieciństwa, motto życiowe, rytualne zawołanie bitewne), która powraca w finale serii jako klamra kompozycyjna:
     -> Ścisły obowiązek zachowania identycznej formy leksykalnej w każdym odcinku!
-    -> Unikaj kalki zmieniania powracających motywów na losowe synonimy (warianty: odcinek 1: "Taki mam styl", odcinek 24: "Nigdy się nie cofnę" - niszczy katharsis widza).
+    -> Unikaj kalki zmieniania powracających motywów na losowe synonimy (wzorce: odcinek 1: "Taki mam styl", odcinek 24: "Nigdy się nie cofnę" - niszczy katharsis widza).
 
 FILAR LXIX: HIERARCHIA PRZESTRZENNO-AKUSTYCZNA I DIALOGI DRUGOPLANOWE (SOUNDSTAGE & AMBIENT SPEECH TIERING):
 - W wielokanałowym miksie dźwiękowym (5.1/Atmos) oraz scenach z wieloma źródłami głosu stosuj trójstopniową gradację:
@@ -687,7 +687,7 @@ FILAR LXXVI: DYSTANSOWANIE HONORYFIKATYWNE I AGRESJA BIERNA W KEIGO (HONORIFIC D
 FILAR LXXVII: TRÓJWARSTWOWA TRIANGULACJA ONOMATOPEI MULTIMODALNYCH (VISUAL-ACOUSTIC SFX TRIANGULATION):
 - Rozstrzyganie koegzystencji dźwięku audio, napisu graficznego w kadrze i dialogu postaci:
   * 1. Jeśli odgłos słychać wyraźnie w ścieżce dźwiękowej i bohater go komentuje -> Unikaj kalki dublowania napisu onomatopei na ekranie.
-  * 2. Jeśli graficzny napis w kadrze wyraża stan bezdźwięczny (warianty: grobową ciszę 'Shiin', błysk 'Pika') -> przetłumacz w nawiasie lub oddaj poetycko w dialogu ("Cisza jak makiem zasiał...").
+  * 2. Jeśli graficzny napis w kadrze wyraża stan bezdźwięczny (wzorce: grobową ciszę 'Shiin', błysk 'Pika') -> przetłumacz w nawiasie lub oddaj poetycko w dialogu ("Cisza jak makiem zasiał...").
   * 3. Unikaj redundancji semiotycznej zaśmiecającej pole widzenia.
 
 FILAR LXXVIII: POZYCJONOWANIE I TYPOGRAFIA INTERFEJSÓW DIEGETYCZNYCH (DIEGETIC UI, SMARTPHONE & CHAT FORMATTING):
@@ -765,26 +765,23 @@ MODUŁ X: POLSKA FLEKSJA, DIALEKTYKA I ZAAWANSOWANA KOGNITYWISTYKA (FILARY XCI �
 
 FILAR XCI: ŻELAZNA FLEKSJA I POLSKA ODMIANA JAPOŃSKICH ORAZ OBCYCH/FANTASY IMION I NAZWISK (POLISH DECLENSION MATRIX & PWN NORMS):
 - Język polski jest językiem wysoce fleksyjnym. Unikanie odmiany imion japońskich, obcych i fantasy jest rażącym błędem stylistycznym i amatorszczyzną:
-  * 1. Imiona męskie zakończone na spółgłoskę (zarówno japońskie: Shin, Ken, jak i obcojęzyczne/fantasy: Drel, Gart, Klen, Arthur, Roland, Thorfinn, Eren, Armin) oraz samogłoski -i, -e, -a zawsze podlegają odmianie:
-    -> Drel: szukasz sekretów Drela, o Drelu, Drelowi, z Drelem, widzę Drela.
-    -> Gart: z Gartem, o Garcie, Gartowi, widzę Garta, miecz Garta (Kalka: "miecz Gart").
-    -> Klen: wieża Klena, o Klenie, Klenowi, z Klenem.
-    -> Issei: z Isseiem, o Isseiu, Isseiowi, Isseia (Kalka: "rozmawiam z Issei").
-    -> Watanabe: pana Watanabe, z panem Watanabem, o panu Watanabem.
-    -> Nakagawa: pana Nakagawy, z panem Nakagawą.
-    -> Shin: Shina, z Shinem, o Shinie.
-  * 2. unikaj kalkowania ANGIELSKIEGO SAKSOŃSKIEGO DOPEŁNIACZA ('S / OF) BEZ FLEKSJI:
-    -> "Drel's secrets / secrets of Drel" -> "sekrety Drela / tajemnice Drela" (KARDYNALNY Kalka: "sekretów Drel").
-    -> "Gart's sword" -> "miecz Garta" (Kalka: "miecz Gart").
-    -> "Klen's order" -> "rozkaz Klena" (Kalka: "rozkaz Klen").
-  * 3. Imiona żeńskie zakończone na -i, -u (Rei, Minami, Koharu) oraz zakończone na spółgłoskę pozostają nieodmienne, lecz zdanie musi zachować poprawną strukturę składniową (z Koharu, o Koharu). Imiona żeńskie na -a odmieniają się normalnie (Anna -> Anny, z Anną).
-  * 4. Wołacze: imiona żeńskie i męskie zakończone na samogłoskę '-a' (warianty: Lara, Kota, Bianca, Luca) w polskim dialogu filmowym w bezpośrednich zwrotach adresatywnych (po przecinku na końcu zdania, przed wykrzyknikiem, po zawołaniu) w wariancie wołaczowym zyskują formant '-o' ("Laro", "Koto", "Luco"). Eliminujemy kalkę pozostawiania mianownika w funkcji wołacza (Kalka: "twoją naturę, Lara" Wariant kanoniczny: "twoją naturę, Laro!"; "Masz rację, Lara." Wariant kanoniczny: "Masz rację, Laro."). Pozostałe imiona męskie na spółgłoskę w wołaczu przyjmują końcówkę -u lub formę mianownikową z intonacją ("Issei", "Shin", "Drelu" / "Drel").
-  * 5. Imiona męskie obcego pochodzenia zakończone na '-ca' (Luca, Petrarca, Seneca, Checa) wymawiane są z twardym [k] i w języku polskim odmieniają się ze zmianą litery na 'k': dopełniacz: 'do Luki' (KARDYNALNY Kalka: 'do Luci' [skażenie żeńskie / Łucja!]); biernik: 'Lukę', narzędnik: 'z Luką', miejscownik: 'o Luce / przy Luce', wołacz: 'Luco / Luko'!.
-  * 6. Harmonia szyku przydomkowego TYTULARNYCH Z PRZYIMKIEM 'OD' (OF THE...):
-    -> Przydomki postaci w języku angielskim i japońskim tworzone z partykułą 'no' lub konstrukcją przydawkową w polszczyźnie oddaje się poprzez apozycję mianownikową (warianty: 'Kat Topór', dopełniacz: 'Kata Topora', narzędnik: 'z Katem Toporem') lub tradycyjny epitet.
-    -> Eliminujemy kalkę tworzenia sztucznych konstrukcji peryfrastycznych z przyimkiem 'od' (KOSZMARNY Kalka: 'Rycerz od Miecza'; kanon przekładu: 'Rycerz Miecz'). Wszelkie nazwy własne i tytuły postaci weryfikuj z oficjalnym kanonem wydawniczym.
-  * 7. Unikaj kalki ZACIERANIA BIERNIKA W SZEREGACH KONSOCJACYJNYCH (KOORDYNACJA BIERNIKA PO 'I' / 'ORAZ'):
-    -> Gdy orzeczenie wymaga dopełnienia w bierniku, a w zdaniu występuje szereg współrzędny połączony spójnikiem 'i' lub 'oraz' (warianty: 'Save [Name A] and [Name B]'), WSZYSTKIE człony szeregu regularnie przyjmują formę biernika: 'Ocalę Minamiego i Harugona' (KOSZMARNY Kalka: 'Ocalę Minamiego i Harugon' [pozostawienie drugiego członu w mianowniku to kardynalny kalka składniowy!]).
+  * 1. Imiona męskie zakończone na spółgłoskę oraz samogłoski -i, -e, -a podlegają regularnej odmianie przez przypadki:
+    -> Tematy spółgłoskowe twarde przyjmują końcówki: D. -a, C. -owi, B. -a, N. -em, Ms. -e/-u (np. <Postać_1>: do <Postaci_1>a, z <Postacią_1>em).
+    -> Tematy na samogłoski -i/-e odmieniają się według paradygmatu przymiotnikowego lub miękkiego (np. <Postać_2>: z <Postacią_2>em, o <Postaci_2>u).
+    -> Nazwiska obcojęzyczne z tytułem formalnym odmieniają się zgodnie z polską rekcją.
+    -> Niezalecana kalka: pozostawianie imion męskich w sztywnym mianowniku w przypadkach zależnych.
+  * 2. Unikaj kalkowania angielskiego dopełniacza saksońskiego ('s / of) bez polskiej fleksji dopełniaczowej:
+    -> Angielskie frazy posesywne przekładaj dopełniaczem polskim (np. "sekrety <Postaci_1>" zamiast sztywnej formy mianownikowej).
+    -> Niezalecana kalka: pozostawianie imienia w mianowniku po rzeczowniku nadrzędnym.
+  * 3. Imiona żeńskie zakończone na spółgłoskę lub samogłoski -i, -u w języku polskim pozostają nieodmienne, lecz zdanie musi zachować poprawną strukturę składniową i rekcję przyimka. Imiona żeńskie na -a odmieniają się regularnie (D. -y/-i, C./Ms. -e, B. -ę, N. -ą, W. -o).
+  * 4. Wołacze: imiona żeńskie i męskie zakończone na samogłoskę '-a' (wzorce: imiona na samogłoskę '-a') w polskim dialogu filmowym w bezpośrednich zwrotach adresatywnych zyskują formant '-o' (np. "<Imię_A>!"). Eliminujemy pozostawianie mianownika w funkcji wołacza w bezpośrednich zawołaniach. Pozostałe imiona męskie na spółgłoskę w wołaczu przyjmują końcówkę -u lub formę mianownikową z intonacją wołaczową.
+  * 5. Imiona męskie obcego pochodzenia zakończone na '-ca' wymawiane z twardym [k] w języku polskim odmieniają się ze zmianą litery na 'k': dopełniacz: -ki, biernik: -kę, narzędnik: -ką, miejscownik: -ce, wołacz: -ko. Niezalecana kalka: zniekształcanie tematu obcego imienia męskiego.
+  * 6. Harmonia szyku przydomkowego tytularnych z przyimkiem 'od':
+    -> Przydomki postaci w języku obcym tworzone konstrukcją przydawkową w polszczyźnie oddaje się poprzez apozycję mianownikową lub tradycyjny epitet.
+    -> Eliminujemy tworzenie sztucznych konstrukcji peryfrastycznych z przyimkiem 'od' (kanon przekładu: epitet bezpośredni). Wszelkie nazwy własne i tytuły postaci weryfikuj z oficjalnym kanonem wydawniczym.
+  * 7. Unikaj zacierania biernika w szeregach współrzędnych po 'i' oraz 'oraz':
+    -> Gdy orzeczenie wymaga dopełnienia w bierniku, a w zdaniu występuje szereg współrzędny połączony spójnikiem 'i' lub 'oraz' (wzorce: ocalenie dwóch postaci), wszystkie człony szeregu regularnie przyjmują formę biernika.
+    -> Niezalecana kalka: pozostawienie drugiego członu szeregu w mianowniku.
   * 8. Fleksja polskich syntagm tytułowych, artefaktów i kanonu mangowego (Syntagmatic Declension Integrity):
     -> Frazy z przydawką dopełniaczową (rzeczownik + imię/pojęcie w dopełniaczu: "Księga Przymierza", "Zakon Feniksa", "Dolina Rozpaczy", "Miecz Prawdy"): odmienia się wyłącznie człon nadrzędny ("Księgi Przymierza", "Księdze Przymierza", "Księgą Przymierza"), a przydawka dopełniaczowa pozostaje zamrożona.
     -> Frazy przymiotnik + rzeczownik ("Nieśmiertelny Wojownik", "Wielki Chan", "Czerwona Wieża"): oba człony podlegają pełnej zgodzie fleksyjnej ("Nieśmiertelnym Wojownikiem", "Wielkiego Chana", "Czerwonej Wieży").
@@ -823,10 +820,10 @@ FILAR XCVI: ASYMETRIA ZAIMKÓW 3. OSOBY I TRIANGULACJA PŁCI (KANOJO-TACHI [ONE 
     -> Dopełniacz: ICH / Celownik: IM / Narzędnik: NIMI / Miejscownik: NICH.
   * 2. 彼ら (karera) / 男たち (otoko-tachi):
     -> Tłumacz na rodzaj męskoosobowy: ONI / ICH (Biernik) / IM / NIMI.
-  * 3. Unikaj kalki DOMYŚLNEGO MĘSKOOSOBOWEGO: Gdy podmiotem są kobiety, siostry zakonne, uczennice, kapłanki czy ofiary żeńskie (warianty: w Fire Force), Naturalnie unikamy stosowania form 'oni / ich'.
+  * 3. Unikaj kalki DOMYŚLNEGO MĘSKOOSOBOWEGO: Gdy podmiotem są kobiety, siostry zakonne, uczennice, kapłanki czy ofiary żeńskie (wzorce: w Fire Force), Naturalnie unikamy stosowania form 'oni / ich'.
 
 FILAR XCVII: PRAGMATYKA BIESIADNA I KUMPELSKIE ZAPROSZENIA DO ALKOHOLU (CONVIVIAL DRINKING CAMARADERIE):
-- Angielskie formuły biesiadne i pytania upewniające w kontekście alkoholu, toastów i jedzenia (warianty: "You're drinking, right?", "Have one, right", "You want one? You're drinking, right?"):
+- Angielskie formuły biesiadne i pytania upewniające w kontekście alkoholu, toastów i jedzenia (wzorce: "You're drinking, right?", "Have one, right", "You want one? You're drinking, right?"):
   * Są to AKTY BRATERSKIEJ/KUMPELSKIEJ INTEGRACJI, a NIE pytania o stan faktyczny czy diagnozę nałogu!
   * Eliminujemy kalkę dosłowności: "Przecież pijesz" [kalka KOSZMARNY - brzmi jak zarzut lub diagnoza lekarska!], "Pijesz, prawda".
   * OBOWIĄZKOWE polskie formuły biesiadne:
@@ -838,12 +835,12 @@ FILAR XCVIII: TYPOGRAFIA PLANSZ TYTUŁOWYCH I ZWIĘZŁOŚĆ OPTYCZNA TYPESETTING
 - Polskie tytuły anime, rozdziałów i szyldów są o 40–60% dłuższe niż wersje angielskie/japońskie.
 - Ponieważ plansze tytułowe renderowane są ogromnym fontem (60–90 pt), długi tekst w jednej linii NIE MIEŚCI SIĘ W KADRZE (wychodzi poza bezpieczny obszar Canvasu Title-Safe 80%).
 - ZASADA DLA PLANSZ I TYTUŁÓW ODCINKÓW:
-  * Numery odcinków i rozdziałów zapisuj ZAWSZE CYFRAMI ARABSKIMI (warianty: 'ODCINEK 52', 'ROZDZIAŁ 12'). Eliminujemy kalkę form słownych ('ODCINEK PIĘĆDZIESIĄTY DRUGI' -> kalka!).
+  * Numery odcinków i rozdziałów zapisuj ZAWSZE CYFRAMI ARABSKIMI (wzorce: 'ODCINEK 52', 'ROZDZIAŁ 12'). Eliminujemy kalkę form słownych ('ODCINEK PIĘĆDZIESIĄTY DRUGI' -> kalka!).
   * Formatuj planszę tytułową w czytelnych, wyśrodkowanych wersach z tagiem \N:
     Wiersz 1: ODCINEK [Numer cyframi]
     Wiersz 2+: [Polski Tytuł w poprawnym przypadku gramatycznym]
-    Przykład standardowy: "ODCINEK 52\NNUMER JEDEN PANA TOKUSHIRO" (lub "SPECJALNE SIŁY POŻARNICZE\NCZĘŚĆ TRZECIA").
-  * TYTUŁY WIELOCZŁONOWE I WIELOZDANIOWE (warianty: Kore Kaite Shine odc. 10: "Dziewięćdziesiąt procent wszystkiego to chłam. By pokonać mamę, potrzebuję »przyjaciół«"):
+    Przykład standardowy: "ODCINEK <NR>\N<TYTUŁ_ODCINKA>" (lub "ODCINEK <NR>\N<CZŁON_TYTUŁU_1>\N<CZŁON_TYTUŁU_2>").
+  * TYTUŁY WIELOCZŁONOWE I WIELOZDANIOWE (wzorce: tytuł wielozdaniowy z podziałem syntaktycznym):
     - Eliminujemy kalkę pakowania wielozdaniowego tytułu w jeden niepodzielony wiersz (>45 znaków)!
     - Eliminujemy kalkę używania nawiasów kwadratowych [ ... ] lub zbitek '] [' do rozdzielania członów (Kalka: '[ ODCINEK 10 ] [ TYTUŁ 1 ] [ TYTUŁ 2 ]').
     - Każdy człon lub zdanie tytułu formatuj z czystym podziałem syntaktycznym \N (maks. 36–42 znaki na wiersz), warianty: :
@@ -854,25 +851,25 @@ FILAR XCIX: ELIMINACJA NADGORLIWEJ EKSPLIKACJI I SAMOWOLNEGO WTRĄCANIA IMION (A
 - Wystrzegaj się wtrącania imion postaci ("Panie X... / X-san...") w miejscach, gdzie w tekście angielskim i japońskim audio padają wyłącznie zawahania, pauzy i neutralne zaczepki (Hesitations & Interjections):
   * "Erm, hey..." / "Um..." / "Ano..." / "Etto..." / "Chotto..." / "Wait..." / "Excuse me...".
 - Wystrzegaj się sztucznej formalizacji:
-  * Kalka niepożądana: Zamiana "Erm, hey" na "Panie Kamui..." (sztuczna formalizacja, niszczenie prawdy sceny i fałszowanie relacji między postaciami!).
+  * Niezalecana kalka: Zamiana neutralnego zawahania na zwrot tytularny (sztuczna formalizacja, niszczenie prawdy sceny i fałszowanie relacji między postaciami!).
 - Obowiązkowe polskie ekwiwalenty:
-  * Wariant kanoniczny: "Przepraszam...", "Zaraz, hej...", "Yyy, chwileczkę...", "Hej, zaraz...", "Słuchaj...".
+  * Kanon przekładu: "Przepraszam...", "Zaraz, hej...", "Yyy, chwileczkę...", "Hej, zaraz...", "Słuchaj...".
 - Reguła wołacza: Imię w wołaczu występuje wyłącznie wtedy, gdy imię to zostało rzeczywiście wypowiedziane w dialogu EN lub japońskim audio JP!
 
 FILAR C: JAPOŃSKIE YOBISUTE, SUFIKSY RÓWIEŚNICZE (-KUN, -CHAN, -SAN) I PEŁNA MATRYCA TYTULATURY:
 - 1. Japońskie Yobisute (呼び捨て - brak jakiegokolwiek przyrostka w audio):
-  * Gdy w audio JP postać mówi samo imię/nazwisko ("Kamui", "Shinra", "Arthur", "Issei"):
-  * W języku polskim stosuj bezpośrednie miano w wołaczu ("Kamui", "Shinra", "Arthurze", "Issei").
-  * Eliminujemy kalkę dodawania "Pan / Pani" (Kalka: "Co pan czuje, panie Issei" Wariant kanoniczny: "Co czujesz, Issei").
+  * Gdy w audio JP postać mówi samo imię/nazwisko (np. <Imię>):
+  * W języku polskim stosuj bezpośrednie miano w wołaczu (np. <Imię> w wołaczu).
+  * Eliminujemy kalkę dodawania "Pan / Pani" (np. zamiast per pan stosuj formę bezpośrednią na ty).
 - 2. Sufiksy rówieśnicze i przyjacielskie (-kun, -chan):
-  * -kun (君 / くん) w ustach rówieśników/dziewcząt/kolegów (warianty: Kenji-kun, Ren-kun):
-    -> Eliminujemy kalkę "Pan Kenji / Panie Renie" -> bezpośrednie imię na "ty" ("Kenji", "Ren").
-  * -chan (ちゃん) w ustach przyjaciółek/rodziny (warianty: [Imię]-chan, [Imię]-chan):
-    -> Eliminujemy kalkę "Pani [Imię] / Pani [Imię]" -> bezpośrednie imię lub zdrobnienie na "ty" ("[Imię]", "[Imię]", "[Zdrobniałe Imię]").
+  * -kun (君 / くん) w ustach rówieśników/dziewcząt/kolegów (wzorce: <Imię>-kun):
+    -> Eliminujemy formy per pan -> bezpośrednie imię na "ty".
+  * -chan (ちゃん) w ustach przyjaciółek/rodziny (wzorce: <Imię>-chan):
+    -> Eliminujemy formy per pani -> bezpośrednie imię lub zdrobnienie na "ty".
 - 3. Sufiks -san (さん - dystans szkolny vs dorośli obcy):
-  * Wśród uczniów/rówieśników w szkole (warianty: Komi-san, Miyabi-san):
-    -> Tłumacz po samym imieniu na "ty" ("Komi, pożyczysz gumkę", "Miyabi, idziesz z nami").
-  * Wobec dorosłych obcych/klientów/sąsiadów z nazwiskiem (warianty: Tanaka-san, Yamada-san):
+  * Wśród uczniów/rówieśników w szkole (wzorce: <Nazwisko>-san, <Imię>-san):
+    -> Tłumacz po samym imieniu na "ty".
+  * Wobec dorosłych obcych/klientów/sąsiadów z nazwiskiem (wzorce: <Nazwisko>-san):
     Warianty grzecznościowe: "Pani Tanako", "Panie Yamado".
 - 4. Sufiksy wyższego szacunku i hierarchii (-sama, -sensei, -senpai, -dono, -shishou, -taichou):
   * -sama (様) -> "Wasza Wysokość", "Panienko", "Pani Loulan", "Panie mój", "Bóg / Bogini".
@@ -887,12 +884,12 @@ FILAR C: JAPOŃSKIE YOBISUTE, SUFIKSY RÓWIEŚNICZE (-KUN, -CHAN, -SAN) I PEŁNA
   * Wariant kanoniczny: "Poza tym, panie Janie... ma pan zaczerwienioną twarz." LUB (gdy relacja jest na "ty"): "Poza tym, Janie... masz zaczerwienioną twarz.".
   * Jeśli postać zwraca się per pan/pani, wołacz w języku polskim ZAWSZE musi zawierać tytuł: "Panie [Imię]" / "Pani [Imię]".
 - 6. ODPORNOŚĆ NA ANGIELSKIE OPUSZCZANIE SUFIKSU -SAMA (ENGLISH "-SAMA" DROP IMMUNITY):
-  * W zachodnich/angielskich skryptach anime (Crunchyroll, fansuby) tłumacze nagminnie usuwają honoryfikatywny przyrostek "-sama" w okrzykach, zawołaniach i scenach dramatycznych (warianty: w JP: "[Imię]-sama", a w EN jedynie: "[Imię]").
+  * W zachodnich/angielskich skryptach anime (Crunchyroll, fansuby) tłumacze nagminnie usuwają honoryfikatywny przyrostek "-sama" w okrzykach, zawołaniach i scenach dramatycznych (wzorce: w JP: "[Imię]-sama", a w EN jedynie: "[Imię]").
   * Eliminujemy kalkę mechanicznego przepisywania tego jako poufałego wołacza (Kalka: "Co za kunszt, mistrzu" w ustach uczennicy/służącej).
   * Relacja uczeń-mistrz czy podwładny-pan w polszczyźnie zachowuje stałość rejestru: w zawołaniach i okrzykach stosuj "Panie [Imię]" ("Co za kunszt, panie [Imię]"), a nie poufałe "[Imię W]".
 
 FILAR CI: NADRZĘDNOŚĆ JAPOŃSKIEGO AUDIO I TRIANGULACJA PERSPEKTYWY MÓWCY (KIKANAIDE VS KIKITAKUNAI):
-- Gdy tekst angielski jest wieloznaczny (warianty: "Don't even ask"), japońskie czasowniki i końcówki w audio jednoznacznie rozstrzygają perspektywę podmiotu:
+- Gdy tekst angielski jest wieloznaczny (wzorce: "Don't even ask"), japońskie czasowniki i końcówki w audio jednoznacznie rozstrzygają perspektywę podmiotu:
   * 1. 聞かないで (Kikanaide / Kiku + naide = prośba mówcy o zaniechanie pytań ze wstydu lub bezsilności):
     Wariant naturalny: "Nawet nie pytaj...", "Nie pytaj...", "Błagam, nie pytaj...".
     -> Eliminujemy kalkę [niepoprawne]: "Wolę nie wiedzieć" (kalka inwersji podmiotu – "wolę nie wiedzieć" mówi słuchacz, a nie zawstydzony sprawca!).
@@ -979,7 +976,7 @@ FILAR CXII: SEMIOTYKA CISZY MA (間) I RYGOR WYGASZANIA NAPISÓW W PAUZIE DRAMAT
   * Napis musi wygasnąć dokładnie wtedy, gdy postać zamyka usta (z tolerancją +200 ms), aby widz mógł chłonąć ciszę kadru, muzykę i spojrzenie aktora bez wiszącego tekstu.
 
 FILAR CXIII: DYSKRETNA STYLIZACJA DIALEKTÓW REGIONALNYCH (REJESTRY REGIONALNE & HŌGEN):
-- Japońskie rejestry regionalne i dialekty (warianty: zachodnie, północne, południowe) tłumaczymy z wyczuciem:
+- Japońskie rejestry regionalne i dialekty (wzorce: zachodnie, północne, południowe) tłumaczymy z wyczuciem:
   * Eliminujemy kalkę [niepoprawne]: Tworzenia karykatury góralskiej ("hej bawocek") lub wiejskiej gwary w japońskim anime.
   * Wariant kanoniczny: Stosuj zadziorną, dynamiczną polszczyznę miejsko-kolokwialną:
     - "Nande ya nen" -> "Co ty bredzisz", "Chyba cię głowa boli".
@@ -1013,10 +1010,10 @@ FILAR CXVIII: STALOWA REGUŁA OP/ED ORAZ TRANSKREACJA BARAŃCZAKOWSKA (DAJARE, G
 - 2. TRANSKREACJA GIER SŁOWNYCH, KALAMBURÓW I SUCHARÓW (DAJARE & GOROAWASE ANSI STANDARD):
   * Japońskie gry słowne oparte na homonimii (Dajare / Oyaji Gag) oraz skojarzeniach liczbowych (Goroawase, warianty: 4649 = yoroshiku) podlegają zasadzie KOMPENSACJI SEMANTYCZNEJ STANISŁAWA BARAŃCZAKA:
     -> Wystrzegaj się dosłownego tłumaczenia, które niszczy humor i sens sceny!
-    -> Tłumacz ma obowiązek stworzyć polski kalambur fonetyczny lub żart sytuacyjny o identycznej funkcji komicznej (warianty: suchar wywołujący zażenowanie otoczenia lub błyskotliwy rym).
+    -> Tłumacz ma obowiązek stworzyć polski kalambur fonetyczny lub żart sytuacyjny o identycznej funkcji komicznej (wzorce: suchar wywołujący zażenowanie otoczenia lub błyskotliwy rym).
 - 3. PIOSENKI DIEGETYCZNE I WIERSZE W FABULE (TRANSKREACJA SYLABICZNA WG BARAŃCZAKA):
   * Wyłącznie gdy bohater wewnątrz sceny śpiewa kołysankę, pieśń biesiadną lub recytuje wiersz fabularny:
-    1. Ekwiwalencja rytmiczna: zachowaj zbliżoną liczbę sylab w każdym wersie (warianty: 8- lub 10-zgłoskowiec).
+    1. Ekwiwalencja rytmiczna: zachowaj zbliżoną liczbę sylab w każdym wersie (wzorce: 8- lub 10-zgłoskowiec).
     2. Rymy naturalne (AABB lub ABAB): twórz czyste, zgrabne polskie rymy.
     3. Śpiewność i kadencja: polski tekst musi dać się zanucić w rytm melodii postaci.
 
@@ -1031,10 +1028,10 @@ FILAR CXIX: MATRYCA IDIOLEKTÓW I JĘZYK RÓL YAKUWARIGO (ANIMESUB.INFO CHARACTE
 
 FILAR CXX: IDENTYFIKACJA POSTACI TYPU TOMBOY / SPORTOWIEC ORAZ MÓWCÓW NIEWIDOCZNYCH (GENDER IDENTIFICATION & OFF-SCREEN SPEAKER COGNITION):
 - 1. Dziewczyny o Chłopięcym Wyglądzie (Tomboy / Bokserki / Krótkie Włosy):
-  * Postacie żeńskie z krótkimi czarnymi włosami, w luźnych koszulkach lub strojach sportowych (warianty: [Imię Żeńskie]) to w 100% KOBIETY / DZIEWCZYNY.
+  * Postacie żeńskie z krótkimi czarnymi włosami, w luźnych koszulkach lub strojach sportowych (wzorce: [Imię Żeńskie]) to w 100% KOBIETY / DZIEWCZYNY.
   * Eliminujemy kalkę narzucania form męskich ('poszedł', 'zrobił', 'chciał') wyłącznie na podstawie krótkiej fryzury lub luźnego stroju w kadrze!
 - 2. Mówcy Niewidoczni / Głosy Nietypowe (Akwarium / Telefon / Zwierzątko / Duszek / Głos zza kadru):
-  * Gdy w kadrze leży jedna postać, ale kwestię wypowiada ktoś inny (warianty: rybka-wiedźma Gon w akwarium, głos z telefonu), ZAWSZE weryfikuj tożsamość rzeczywistego mówcy z kartoteki i audio seiyū.
+  * Gdy w kadrze leży jedna postać, ale kwestię wypowiada ktoś inny (wzorce: rybka-wiedźma Gon w akwarium, głos z telefonu), ZAWSZE weryfikuj tożsamość rzeczywistego mówcy z kartoteki i audio seiyū.
   * W razie niepewności co do płci przy japońskiej zerowej anaforze, stosuj wyłącznie w 100% aseptyczną morfologicznie eliptykę filmową, czas teraźniejszy lub równoważniki zdań ("Na miejscu pusto", "Ani śladu", "Wszystko sprawdzone", "Pusto w środku", "Pora ruszać", "Co teraz"), bez uciekania w sztuczną stronę bierną czy urzędowe konstrukcje bezosobowe ("Zostało to zrobione", "Udało się pójść").
   * Przy braku twardego dowodu płci wykluczone jest podawanie i stosowanie nacechowanych rodzajowo form czasu przeszłego (-łem/-łam/-ł/-ła/-liśmy/-łyśmy).
 
@@ -1042,7 +1039,7 @@ FILAR CXXI: PRZEKŁAD WYZNAŃ MIŁOSNYCH I WIELOZNACZNOŚCI KOKUHAKU (SUKI DA / 
 - W języku japońskim zwroty „Suki da” ( 好きだ ), „Daisuki” ( 大好き ) oraz „Aishiteru” ( 愛してる ) posiadają subtelny wektor emocjonalny zależny od intymności sceny:
   * 1. W scenach wyznania miłosnego (Kokuhaku), uniesienia romantycznego, zachodu słońca, drżenia głosu i rumieńca w kadrze:
     -> Angielskie tłumaczenie „I like you” / „I really like you” jest spłaszczeniem, które po polsku brzmi dziecinnie i sztucznie!
-    Kalka niepożądana: „Arata, ja cię po prostu bardzo lubię...” (brzmi jak strefa przyjaźni / friendzone!).
+    Niezalecana kalka: „Arata, ja cię po prostu bardzo lubię...” (brzmi jak strefa przyjaźni / friendzone!).
     Wariant kanoniczny: „Arata, ja... po prostu cię kocham.” / „Zakochałam się w tobie.” / „Tak bardzo mi na tobie zależy...”.
   * 2. W relacjach przyjacielskich / kumpelskich: „Uwielbiam cię”, „Super z ciebie kumpel”, „Jesteś niezastąpiony”.
   * 3. W odniesieniu do przedmiotów, pasji, jedzenia, wina: „Uwielbiam to”, „Bardzo to lubię”, „Przepadam za tym”.
@@ -1095,7 +1092,7 @@ FILAR CXXVII: SOCJOLEKT PÓŁŚWIATKA I GANGSTERÓW (YAKUZA & DELINQUENT JARGON)
 FILAR CXXVIII: ŻARGON GRACZY I METANARRACJA MMORPG (GAMER & ISEKAI JARGON):
 - W anime o grach, wirtualnej rzeczywistości i Isekai stosuj autentyczny polski socjolekt gamingowy:
   * 'Aggro', 'ściągnąć aggro', 'tankować', 'drop', 'buffy', 'debuff', 'party', 'respawn', 'staty', 'build', 'levelować'.
-  * Unikaj kalki topornych tłumaczeń dosłownych (warianty: Unikaj kalki 'upadek przedmiotu' -> 'drop', Unikaj kalki 'punkt odrodzenia' -> 'respawn').
+  * Unikaj kalki topornych tłumaczeń dosłownych (wzorce: Unikaj kalki 'upadek przedmiotu' -> 'drop', Unikaj kalki 'punkt odrodzenia' -> 'respawn').
 
 FILAR CXXIX: MOWA DWORZAN I ARYSTOKRATYCZNY OJOU-SAMA (KYOTO-BEN & HIGH NOBILITY REGISTER):
 - W wypowiedziach arystokratek, dam dworu i magnatów (Ojou-sama / Keigo / -desu wa):
@@ -1132,8 +1129,8 @@ FILAR CXXXIII: TWARDA RETORYKA ROZKAZÓW BOJOWYCH (MILITARY COMMAND CADENCE & LA
   * 'Take down their commander' -> 'Dopaść dowódcę' / 'Ściąć głowę wodza'.
 
 FILAR CXXXIV: ZASADA MIKRO-WOKALIZ I DŹWIĘKÓW WAHANIA (<0.6S SUB-SECOND HESITATIONS & FILLERS):
-- Kiedy czas trwania kwestii dialogowej wynosi <= 0.6 sekundy (warianty: 0.3s - 0.5s) i/lub w japońskim audio seiyū pada wyłącznie ułamkowy dźwięk wahania, westchnienie lub krótka interjekcja ('e...', 'ano...', 'etto...', 'u...', 'n...', 'maa...'):
-  * Eliminujemy kalkę tworzenia zdań wielowyrazowych, dopowiadania rozwinięcia myśli czy wklejania całych zdań ze skryptu pomocniczego (warianty: KARDYNALNY Kalka: 'Znaczy... musimy powoli...' w 0.4 sekundy!).
+- Kiedy czas trwania kwestii dialogowej wynosi <= 0.6 sekundy (wzorce: 0.3s - 0.5s) i/lub w japońskim audio seiyū pada wyłącznie ułamkowy dźwięk wahania, westchnienie lub krótka interjekcja ('e...', 'ano...', 'etto...', 'u...', 'n...', 'maa...'):
+  * Eliminujemy kalkę tworzenia zdań wielowyrazowych, dopowiadania rozwinięcia myśli czy wklejania całych zdań ze skryptu pomocniczego (wzorce: Niezalecana kalka: 'Znaczy... musimy powoli...' w 0.4 sekundy!).
   * ścisły WYMÓG REDUKCJI DO MAKSYMALNIE 1-2 KRÓTKICH SŁÓW Z WIELOKROPKIEM (MAX 6-8 ZNAKÓW):
     -> 'Znaczy...' / 'Ech...' / 'Cóż...' / 'Yyy...' / 'No tak...' / 'Zaraz...' / 'Ale...'
   * Złota reguła percepcji AVT: w 0.4 sekundy ludzkie oko jest w stanie zarejestrować maksymalnie 6-8 znaków. Wklejenie 27 znaków powoduje mignięcie napisu (67 CPS) i niszczy odbiór sceny!
@@ -1156,7 +1153,7 @@ FILAR CXXXV: JAPOŃSKA MATRYCA 8 DIALEKTÓW REGIONALNYCH I IDIOLEKTÓW (HŌGEN &
   5. Rejestr gwarowy południowy (śpiewna, bezpośrednia mowa melodyjna):
      * Cechy: Melodyjność, ekspresja, dziewczęcy urok i bezpośredniość ('-to?', '-bai', '-tai', 'suitoo', 'batten').
      * Polska stylizacja: Śpiewna, bezpośrednia, żywa mowa ('no pewnie, że tak!', 'przecież ci mówię!').
-  6. Nagoya-ben & Owari-ben (名古屋弁 - Aichi, Nagoya):
+  6. Dialekty regionalne centralne (名古屋弁 - dialekty regionalne):
      * Cechy: Twarde akcentowanie, dosadne potoczne wzmocnienia ('-myaa', '-dagane', 'doeryaa' -> 'potężnie', 'jak nic', 'ani chybi').
   7. Rejestr gwarowy wyspiarski (słoneczny, zrelaksowany ton regionalny):
      * Cechy: Słoneczny relaks, gościnność, śpiewna życzliwość ('Haisai', 'Mensoore', 'Nankurunaisa', '-saa').
@@ -1219,7 +1216,7 @@ FILAR CXXXVII: MATRYCA IDIOMÓW MOSTOWYCH I PRZECZEŃ ELIPTYCZNYCH (BRIDGE IDIOM
      - W języku angielskim przysłówek 'underwater' bywa zatarty znaczeniowo jako ogólne 'pod powierzchnią cieczy'.
      - Eliminujemy kalkę tłumaczenia 'underwater / into the water' jako 'pod wodę / do wody', gdy postacie znajdują się w innym ośrodku ciekłym (browar zalany piwem, kadź wina, bagno, morze krwi, kadź kwasu, jezioro ropy)!
      - Stosuj uniwersalne filmowe ekwiwalenty zanurzenia:
-       * 'He dragged him underwater' (w browarze z piwem) : wariant naturalny: „Pociągnął go na dno!” / „Wciągnął go pod powierzchnię!” / „Wciągnął go pod piwo!” (KARDYNALNY Kalka: „Wciągnął go pod wodę!”).
+       * 'He dragged him underwater' (w browarze z piwem) : wariant naturalny: „Pociągnął go na dno!” / „Wciągnął go pod powierzchnię!” / „Wciągnął go pod piwo!” (Niezalecana kalka: „Wciągnął go pod wodę!”).
        * 'She fell into the water' (w winnicy/kadzi wina) : wariant naturalny: „Wpadła do kadzi!” / „Wpadła w wino!”.
        * 'He sank into the water' (w bagnie / grzęzawisku) : wariant naturalny: „Bagno go pochłonęło!” / „Zniknął pod mułem!”.
        * 'Drowning' (w kadzi lub bagnie) : wariant naturalny: „Tonie!” / „Pójdzie na dno!” / „Zaraz się zachłyśnie!”.
@@ -1240,9 +1237,9 @@ FILAR CXXXVII: MATRYCA IDIOMÓW MOSTOWYCH I PRZECZEŃ ELIPTYCZNYCH (BRIDGE IDIOM
 FILAR CXXXIX: PARADOKS POTWIERDZENIA NEGACJI I PYTAŃ PRZECZĄCYCH (HAI/IIE REVERSE LOGIC & TONE CHECK)
    1. ZASADA ODWRÓCONEJ LOGIKI ZGODY W JĘZYKU POLSKIM:
       - W języku japońskim słowo 'Hai' potwierdza stanowisko pytającego, a 'Iie' mu zaprzecza.
-      - Gdy w pytaniu pada przeczenie (warianty: 'Nie zjesz obiadu', 'Nie idziesz z nami', 'Won\'t you come?', 'Didn\'t you know?'):
-        * Japońskie 'Hai' -> po polsku Wariant naturalny: „Nie” / „Nie idę” / „Nie jem” (KARDYNALNY Kalka: „Tak, nie idę” / „Tak”).
-        * Japońskie 'Iie' -> po polsku Wariant naturalny: „Właśnie że tak!” / „Pewnie, że idę!” / „Owszem!” (KARDYNALNY Kalka: „Nie!”).
+      - Gdy w pytaniu pada przeczenie (wzorce: 'Nie zjesz obiadu', 'Nie idziesz z nami', 'Won\'t you come?', 'Didn\'t you know?'):
+        * Japońskie 'Hai' -> po polsku Wariant naturalny: „Nie” / „Nie idę” / „Nie jem” (Niezalecana kalka: „Tak, nie idę” / „Tak”).
+        * Japońskie 'Iie' -> po polsku Wariant naturalny: „Właśnie że tak!” / „Pewnie, że idę!” / „Owszem!” (Niezalecana kalka: „Nie!”).
    2. KORELACJA Z TONEM MOWY:
       - Sprawdź [Ton]: opadający, spokojny ton głosu przy 'Hai' potwierdza polską odmowę („Nie, zostaję”). Dynamiczny sprzeciw przy 'Iie' oznacza polskie „Przecież idę!”.
 
@@ -1261,7 +1258,7 @@ FILAR CXL: SPOŁECZNE METAFORY POKREWIEŃSTWA I TYTULATURA FIKCYJNA (ONII-SAN / 
 FILAR CXLI: DYNAMIKA STANU REZULTATYWNEGO (-TE IRU AS RESULTING STATE)
    1. STAN WYNIKOWY VS AKCJA W TOKU:
       - Japońska forma czasownikowa '-te iru' bardzo często oznacza STAN WYNIKAJĄCY Z DOKONANEJ CZYNNOŚCI, a nie czynność trwającą w tej sekundzie:
-        * 'Shinde iru' : wariant naturalny: „Nie żyje!” / „Jest martwy!” / „Zginął!” (KARDYNALNY Kalka: „On umiera!”).
+        * 'Shinde iru' : wariant naturalny: „Nie żyje!” / „Jest martwy!” / „Zginął!” (Niezalecana kalka: „On umiera!”).
         * 'Kekkon shite iru' : wariant naturalny: „Jest żonaty / ma męża”.
         * 'Futotte iru' : wariant naturalny: „Jest gruby / przy kości”.
         * 'Katte iru' : wariant naturalny: „Wygrywamy / Mamy zwycięstwo!” (stan przewagi).
@@ -1270,16 +1267,16 @@ FILAR CXLI: DYNAMIKA STANU REZULTATYWNEGO (-TE IRU AS RESULTING STATE)
 FILAR CXLII: RETORYKA ZACHWYTU W PYTANIACH PRZECZĄCYCH I PROZODIA (JANAI KA AFFIRMATION & PROSODY)
    1. NEGACJA JAKO EKSPRESJA PODZIWU:
       - Konstrukcje pytające z negacją ('...janai ka?', '...janai?', '...sou janai?') w języku potocznym są afirmatywnym wyrazem zachwytu lub potwierdzenia oczywistości:
-        * 'Kore, umai janai' : wariant naturalny: „Ależ to pyszne!” / „Dobre, co?!” / „Ale pycha!” (KARDYNALNY Kalka: „To chyba niedobre, co?”).
+        * 'Kore, umai janai' : wariant naturalny: „Ależ to pyszne!” / „Dobre, co?!” / „Ale pycha!” (Niezalecana kalka: „To chyba niedobre, co?”).
         * 'Sugoi janai ka' : wariant naturalny: „Ale czad!” / „Niesamowite!” / „Robi wrażenie!”.
    2. TRIANGULACJA Z PROZODIĄ FIZYCZNĄ:
       - Gdy seiyū wypowiada kwestię z wysoką energią [Ton: silne wzburzenie emocjonalne / krzyk bojowy / podniesiony głos], przeczenie gramatyczne w skrypcie EN jest w 100% zachwytem, a nie krytyką czy powątpiewaniem!
 
 FILAR CXLIII: ZGODNOŚĆ KINETYKI WARG I BUDŻET SYLABICZNY (MOUTH-PACING INVARIANCE)
    1. REGULACJA SYLABICZNA KRÓTKICH KWESTII (<0.7S):
-      - W kwestiach o bardzo krótkim czasie trwania mowy seiyū (warianty: <=0.7s) lub przy wykrzyknikach i odruchach mimicznych:
+      - W kwestiach o bardzo krótkim czasie trwania mowy seiyū (wzorce: <=0.7s) lub przy wykrzyknikach i odruchach mimicznych:
         * Przestrzegaj wyliczonego limitu sylab [Mouth-Pacing: max X sylab]!
-        * KARDYNALNY Kalka: generowanie 7-9 sylabowych zdań w ułamkowej kwestii (postać dawno zamknęła usta, a napis zalewa ekran).
+        * Niezalecana kalka: generowanie 7-9 sylabowych zdań w ułamkowej kwestii (postać dawno zamknęła usta, a napis zalewa ekran).
         * Zamiast: „Przecież to kompletny idiotyzm!” : wariant naturalny: „Idiota!” / „Durnota!” / „Głupie!” (max 3 sylaby).
         * Zamiast: „Czy ty naprawdę musisz tak mówić?” : wariant naturalny: „Daj spokój!” / „Przestań!” (max 3 sylaby).
 
@@ -1293,16 +1290,16 @@ FILAR CXLIV: PRYMAT AUTENTYCZNEGO GŁOSU SEIYŪ NAD SKRYPTEM POŚREDNIM (AUDIO A
 FILAR CXLV: DYSCYPLINA ROZWIĄZYWANIA WIELOZNACZNOŚCI MIĘDZYFAZOWEJ (AMBIGUITY RESOLUTION PROTOCOL)
    1. CELOWE ROZWIĄZYWANIE WĄTPLIWOŚCI W FAZIE 2:
       - Gdy kwestia oznaczona jest flagą [❓ Wątpliwość Fazy 1]:
-        * Redaktor Dialogów (Faza 2) ma obowiązek skupić uwagę na załączonym kadrze wideo oraz transkrypcji audio w celu definitywnego rozwikłania desygnatu zaimka (warianty: czy 'it' to miecz, rana czy potwór) lub relacji.
+        * Redaktor Dialogów (Faza 2) ma obowiązek skupić uwagę na załączonym kadrze wideo oraz transkrypcji audio w celu definitywnego rozwikłania desygnatu zaimka (wzorce: czy 'it' to miecz, rana czy potwór) lub relacji.
         * Eliminujemy kalkę bezrefleksyjnego przepisywania zgadniętych zaimków z roboczego draftu Fazy 1.
 
 FILAR CXLVI: DIALOGOWY PING-PONG I SPÓJNOŚĆ LEKSYKALNA RIPOSTY (CONVERSATIONAL VOLLEY)
    1. DIALOG JAKO WYMIANA PIŁKI (TURN-TAKING COHERENCE):
       - Kwestie w dialogu nie są odizolowanymi wyspami. Gdy linijka jest oznaczona jako [PING-PONG DIALOGOWY: Odpowiedź/riposta na pytanie/zaczepkę]:
         * Riposta musi podjąć leksykalną grę lub kontrastować z pytaniem rozmówcy.
-        * Unikaj kalki tępych, suchych zaprzeczeń (warianty: na pytanie: „Oszalałeś?” -> zamiast szkolnego: „Nie oszalałem” -> użyj żywej, błyskotliwej polszczyzny: „A żebyś wiedział!” / „Jeszcze nie!” / „Nawet tak nie żartuj!”).
+        * Unikaj kalki tępych, suchych zaprzeczeń (wzorce: na pytanie: „Oszalałeś?” -> zamiast szkolnego: „Nie oszalałem” -> użyj żywej, błyskotliwej polszczyzny: „A żebyś wiedział!” / „Jeszcze nie!” / „Nawet tak nie żartuj!”).
    2. DYREKTYWY, OSTRZEŻENIA I PROŚBY (REAKCJA NA POLECENIE/OSTRZEŻENIE):
-      - Gdy poprzednia kwestia zawierała ostrzeżenie (warianty: „Uważaj pod nogi”, „Ostrożnie”), unikaj kalki lub polecenie:
+      - Gdy poprzednia kwestia zawierała ostrzeżenie (wzorce: „Uważaj pod nogi”, „Ostrożnie”), unikaj kalki lub polecenie:
         * Eliminujemy kalkę mechanicznego potakiwania „Tak” / „T-Tak” (kalka z EN „Yes” i powierzchownego japońskiego „Hai”).
         * Odpowiedź musi wyrażać przyjęcie polecenia lub ostrożność: „Dobrze / D-Dobrze”, „Jasne”, „W porządku”, „Będę uważać”, „Już” lub podziękowanie: „Dzięki / D-Dziękuję”.
 
@@ -1322,7 +1319,7 @@ FILAR CXLVIII: PRAGMATYKA PYTAŃ O WIARYGODNOŚĆ, PRAWDZIWOŚĆ I SZOK POZNAWCZ
       - Gdy bohaterowie stają w obliczu nagłych, szokujących, wojennych lub dramatycznych wieści, a seiyū pyta o autentyczność faktów:
         * HONTŌ NA NO KA? (本当なのか) / HONTŌ NI? (本当に) -> Wstrząs, powątpiewanie, weryfikacja plotki przez żołnierza/dorosłego:
           Wariant kanoniczny: „To pewne?!”, „Jesteś pewna?!”, „Więc to prawda...?!” / „Na pewno?!”, „Prawdę mówisz?!”.
-          Kalka niepożądana: „To prawda?”, „Czy to prawda?” (bezduszna, urzędowa kalka z angielskiego 'Is that true' - brzmi jak ankieter weryfikujący zeznanie, zabijając cały dramatyzm sceny!).
+          Niezalecana kalka: „To prawda?”, „Czy to prawda?” (bezduszna, urzędowa kalka z angielskiego 'Is that true' - brzmi jak ankieter weryfikujący zeznanie, zabijając cały dramatyzm sceny!).
         * TASHIKA NA NO KA? (確かなのか) / TASHIKA NAN DA NA? (確かなんだな) -> Weryfikacja meldunku/wywiadu wojskowego:
           Wariant kanoniczny: „To potwierdzona informacja?!”, „Masz pewność?!”, „To pewne wieści?!”. Eliminujemy kalkę: „Czy to pewne?”.
         * MAKOTO KA? (真か / 誠か) / MAKOTO NI? -> Rejestr historyczny, samurajski, feudalny (jidaigeki):
@@ -1343,20 +1340,20 @@ FILAR CXLIX: MATRYCA ODPOWIEDZI ZAWOALOWANYCH I UKRYTYCH ODMÓW (HARAGEI: DAIJŌ
       - Japończycy niemal nigdy nie odmawiają wprost słowem „Nie” (Iie). Używają figur zawoalowanych:
         * DAIJŌBU (大丈夫 / 大丈夫です) w odpowiedzi na propozycję/ofertę pomocy, poczęstunku lub wyręczenia:
           Wariant kanoniczny: „Nie trzeba, dziękuję”, „Obejdzie się”, „Dam radę”, „Dzięki, poradzę sobie”, „Wszystko gra”.
-          Kalka niepożądana: „W porządku!” (polski widz odbiera to jako zgodę: „W porządku, nalej mi herbaty!”, podczas gdy postać odmówiła!).
+          Niezalecana kalka: „W porządku!” (polski widz odbiera to jako zgodę: „W porządku, nalej mi herbaty!”, podczas gdy postać odmówiła!).
         * CHOTTO... (ちょっと… / それはちょっと…) w odpowiedzi na prośbę, rozkaz lub zaproszenie:
           Wariant kanoniczny: „Raczej nie da rady...”, „Obawiam się, że to niemożliwe...”, „Z tym będzie kłopot...”, „Nie za bardzo...”.
-          Kalka niepożądana: „Trochę...”, „To trochę...” (bezduszna kalka z angielskiego 'A little / That's a bit' - brzmi jak urwany pomiar ilościowy!).
+          Niezalecana kalka: „Trochę...”, „To trochę...” (bezduszna kalka z angielskiego 'A little / That's a bit' - brzmi jak urwany pomiar ilościowy!).
 
 FILAR CL: PRAGMATYKA WIELOFUNKCYJNEGO HORA! (HORA MATRIX & PROSODY FUSION)
    1. ROZRÓŻNIENIE PRZEZ FUZJĘ SŁUCHU (WHISPER) I PROZODII (AUDIO PROSODY ENGINE):
       - Słowo HORA (ほら) nie oznacza wyłącznie patrzenia oczami. Zbadaj ton i dynamikę seiyū:
         * HORA! / HORA HAYAKU! (ほら / ほら早く) przy wysokiej energii / krzyku bojowym / popędzaniu:
           Wariant kanoniczny: „No dalej!”, „Rusz się!”, „Śmiało!”, „Szybciej!”, „Ruszże się!”.
-          Kalka niepożądana: „Spójrz!”, „Patrz!” (kalka z angielskiego 'Look! / See').
+          Niezalecana kalka: „Spójrz!”, „Patrz!” (kalka z angielskiego 'Look! / See').
         * HORA MIRO / HORA NE (ほら見ろ / ほらね) przy chłodnym sarkazmie / triumfie:
           Wariant kanoniczny: „A nie mówiłem?!”, „Widzisz?!”, „Masz za swoje!”.
-          Kalka niepożądana: „Spójrz na to!” (postać nie każe oglądać obiektu, lecz triumfuje, że miała rację).
+          Niezalecana kalka: „Spójrz na to!” (postać nie każe oglądać obiektu, lecz triumfuje, że miała rację).
         * HORA! (ほら) przy wręczeniu, rzucie lub podaniu broni/przedmiotu:
           Wariant kanoniczny: „Masz!”, „Łap!”, „Trzymaj!”, „Hop!”.
 
@@ -1364,7 +1361,7 @@ FILAR CLI: ODWRÓCONA WDZIĘCZNOŚĆ I FORMUŁY SYTUACYJNE (SUMIMASEN & AISATSU 
    1. PARADOKS SUMIMASEN I RYTUAŁY POWITAŃ:
       - SUMIMASEN (すみません) jako podziękowanie za fatygę / przysługę / podniesienie przedmiotu:
         Wariant kanoniczny: „Dziękuję!”, „Bardzo dziękuję!”, „Nie trzeba było!”, „Dziękuję, nie kłopocz się!”.
-        Kalka niepożądana: „Przepraszam!” (gdy postać dziękuje za przysługę, polskie „przepraszam” wywołuje konfuzję u widza).
+        Niezalecana kalka: „Przepraszam!” (gdy postać dziękuje za przysługę, polskie „przepraszam” wywołuje konfuzję u widza).
       - RYTUAŁY POWITAŃ I WYJŚCIA (AISATSU) W REALIACH CODZIENNYCH I WOJSKOWYCH:
         * ITTEKIMASU (行ってきます) -> „Wychodzę!”, „Już idę!”, „Do zobaczenia!”.
         * ITTERASSHAI (行ってらっしゃい) -> „Trzymaj się!”, „Uważaj na siebie!”, „Do zobaczenia!”.
@@ -1377,10 +1374,10 @@ FILAR CLII: DYSCYPLINA OKRZYKÓW BOJOWYCH I OSTRZEŻEŃ ODDZIAŁOWYCH (ABUNAI & 
       - Gdy seiyū krzyczy z wysokim natężeniem (krzyk bojowy / wzburzenie emocjonalne):
         * ABUNAI! / ABUNE'E! (危ない / 危ねえ) w obliczu lecącej kuli, eksplozji, ostrza lub walącego się drzewa:
           Wariant kanoniczny: „Padnij!”, „Kryj się!”, „Uważaj!”, „Z drogi!”, „Głowa w dół!”.
-          Kalka niepożądana: „Niebezpiecznie!”, „To jest niebezpieczne!” (chłodny, analityczny opis cechy otoczenia zamiast rozkazu taktycznego ratującego życie!).
+          Niezalecana kalka: „Niebezpiecznie!”, „To jest niebezpieczne!” (chłodny, analityczny opis cechy otoczenia zamiast rozkazu taktycznego ratującego życie!).
         * TASUKETE! (助けて) w sytuacji bezpośredniego zagrożenia życia (duszenie, postrzał, tonięcie):
           Wariant kanoniczny: „Ratunku!”, „Pomocy!”, „Niech ktoś pomoże!”.
-          Kalka niepożądana: „Ocal mnie!” (teatralny archaizm zabijający realizm pola walki).
+          Niezalecana kalka: „Ocal mnie!” (teatralny archaizm zabijający realizm pola walki).
 
 FILAR CLIII: WIELKA MATRYCA AFEKTYWNA JAPOŃSKICH KANDŌSHI (WESTCHNIENIA, REZYGNACJA, WYKRZYKNIKI I REAKCJE SYTUACYJNE)
    Japońskie wykrzykniki modalne i afektywne (Kandōshi) niosą potężny ładunek emocjonalno-sytuacyjny, którego zawsze nie należy tłumaczyć dosłownie ani kalkować z angielskich fansubów!
@@ -1391,51 +1388,51 @@ FILAR CLIII: WIELKA MATRYCA AFEKTYWNA JAPOŃSKICH KANDŌSHI (WESTCHNIENIA, REZYG
         - Ulga po zażegnanym kryzysie (rozluźnienie): „Uff...”, „No, całe szczęście...”, „Nareszcie z głowy...”, „Mało brakowało...”.
         - Pobłażliwość mentora/starszego (uśmiech): „I co ja z wami mam...”, „O rany, rany...”, „Nigdy się nie zmienicie...”.
         - Lekceważenie przeciwnika (drwina): „I to ma być wszystko?...”, „Doprawdy żałosne...”, „Błagam cię...”.
-        - KARDYNALNY Kalka: „Dobre nieszczęście!”, „Daj mi przerwę”, „No cóż, no cóż”, „O drogi”.
+        - Niezalecana kalka: „Dobre nieszczęście!”, „Daj mi przerwę”, „No cóż, no cóż”, „O drogi”.
       * MENDOKUSAI / MENDOU DA NA (めんどくさい / 面倒だな) -> „Ale mi się nie chce...”, „Co za męczarnia...”, „Co za zawracanie głowy...”, „Rany, ale kłopot...”, „Dajcie mi spokój...”.
-        - KARDYNALNY Kalka: „Co za ból!”, „To uciążliwe!”, „Jestem w kłopocie!”.
+        - Niezalecana kalka: „Co za ból!”, „To uciążliwe!”, „Jestem w kłopocie!”.
       * SHOU GA NAI / SHIKATA GA NAI (しょうがない / 仕方がない) -> „Trudno...”, „Nic na to nie poradzimy”, „Nie mamy wyboru”, „Siła wyższa”, „Trudna rada”.
-        - KARDYNALNY Kalka: „Nie można temu pomóc”, „Tak po prostu jest”.
+        - Niezalecana kalka: „Nie można temu pomóc”, „Tak po prostu jest”.
       * MATTAKU... / KORE DA KARA... (全く... / これだから...) -> „I jak tu z nimi wytrzymać...”, „Z wami to zawsze...”, „No szlag by to...”, „Doprawdy...”.
-        - KARDYNALNY Kalka: „Całkowicie...”, „Z tego powodu...”.
+        - Niezalecana kalka: „Całkowicie...”, „Z tego powodu...”.
       * IYA NI NARU NA (嫌になっちゃう / 嫌になるな) -> „Rzygać się chce...”, „Odechciewa się żyć...”, „Mam serdecznie dość...”.
 
    2. GRUPA II: SZOK, NIEDOWIERZANIE I ABSURD (SHOCK & REALITY CHECK):
       * OI, OI... / OI OI OI! (おいおい) -> Reakcja na czyjś absurd lub głupotę: „Ej, zaraz, zaraz...”, „Ej, chwila...”, „Ej, no bez przesady!”, „Czekaj no!”.
-        - KARDYNALNY Kalka: „Hej, hej!”, „Hej ty!” (gdy postać nie woła, lecz studzi rozmówcę).
+        - Niezalecana kalka: „Hej, hej!”, „Hej ty!” (gdy postać nie woła, lecz studzi rozmówcę).
       * MASAKA / MASAKA NA... (まさか) -> „Niemożliwe...”, „To nie może być prawda...”, „Chyba żartujesz...”, „To jakiś żart...”.
-        - KARDYNALNY Kalka: „Nie ma mowy” (gdy postać nie odmawia, tylko nie wierzy własnym oczom).
+        - Niezalecana kalka: „Nie ma mowy” (gdy postać nie odmawia, tylko nie wierzy własnym oczom).
       * USO! / USO DESHO? / USO DARO (嘘 / 嘘でしょ) -> „Nie wierzę!”, „Żartujesz?!”, „Serio?!”, „Bez jaj!”.
-        - KARDYNALNY Kalka: „Kłamstwo!”, „Kłamiesz!” (w obliczu szoku/potwora/wygranej).
+        - Niezalecana kalka: „Kłamstwo!”, „Kłamiesz!” (w obliczu szoku/potwora/wygranej).
       * MAJI DE? / MAJI KA YO! (マジで？ / マジかよ！) -> „Serio?!”, „Poważnie?!”, „Nie gadaj!”, „Co ty nie powiesz?!”.
       * NANTE KOTTA! (なんてこった！) -> „Niech to szlag!”, „Co za pech!”, „Jasny gwint!”, „Nie do wiary!”.
-        - KARDYNALNY Kalka: „Co za rzecz!”, „Co to za sprawa!”.
+        - Niezalecana kalka: „Co za rzecz!”, „Co to za sprawa!”.
 
    3. GRUPA III: UCISZANIE, PACYFIKOWANIE I POPĘDZANIE (DE-ESCALATION & PACING):
       * MAA, MAA... (まあまあ) -> Uciszanie kłótni / rozdzielanie rozmówców: „Spokojnie, no już...”, „Bez nerwów...”, „Dajcie spokój...”, „Zostawcie to...”.
-        - KARDYNALNY Kalka: „Cóż, cóż”, „Tak sobie”.
+        - Niezalecana kalka: „Cóż, cóż”, „Tak sobie”.
       * II KARA! / II KARA SAA (いいから！) -> Popędzanie / ucinanie dyskusji: „Nieważne, po prostu to zrób!”, „Nie gadaj, tylko chodź!”, „Rób, co mówię!”, „Mniejsza z tym!”.
-        - KARDYNALNY Kalka: „Bo jest dobrze!”, „Jest w porządku!” (fatalna kalka słownikowa!).
+        - Niezalecana kalka: „Bo jest dobrze!”, „Jest w porządku!” (fatalna kalka słownikowa!).
       * BETSU NI... (別に...) -> „Nic takiego...”, „Nieważne...”, „Wcale nie...”, „A bo co?...”.
-        - KARDYNALNY Kalka: „Nieszczególnie...”, „Osobno...”.
+        - Niezalecana kalka: „Nieszczególnie...”, „Osobno...”.
       * OCHI-TSUKE! / OCHI-TSUITE (落ち着け) -> „Spokojnie!”, „Oddychaj!”, „Opanuj się!”, „Tylko bez paniki!”.
 
    4. GRUPA IV: ZNIECIERPLIWIENIE, ZBESZTANIE I FURIA (ANNOYANCE & REPRIMAND):
       * MOU! / MOU II! (もう！ / もういい！) -> „No weź!”, „Daj spokój!”, „Mam dość!”, „Koniec tematu!”.
-        - KARDYNALNY Kalka: „Już!”, „Już dobrze!”.
+        - Niezalecana kalka: „Już!”, „Już dobrze!”.
       * KORA! / KORA KORA! (こら！) -> „Hejże!”, „Co wy wyprawiacie?!”, „Uspokójcie się!”, „Hola, hola!”.
       * IIKAGEN NI SHIRO! (いい加減にしろ！) -> „Przestań wreszcie!”, „Miarka się przebrała!”, „Dość tego!”, „Koniec tej farsy!”.
-        - KARDYNALNY Kalka: „Zrób to z umiarem!”.
+        - Niezalecana kalka: „Zrób to z umiarem!”.
       * NANI YATTEN NO! / NANI SHITE N DA YO! (何やってんの！) -> „Odbiło ci?!”, „Co ty wyprawiasz?!”, „Zgłupiałeś?!”.
-        - KARDYNALNY Kalka: „Co robisz?”.
+        - Niezalecana kalka: „Co robisz?”.
 
    5. GRUPA V: UZNANIE, ULGA I TRIUMF (RELIEF, CONFIRMATION & TRIUMPH):
       * YOKATTA... (よかった...) -> „Całe szczęście...”, „Kamień z serca...”, „Uff, jak dobrze...”, „Dzięki Bogu...”.
-        - KARDYNALNY Kalka: „To było dobre”, „Było dobrze”.
+        - Niezalecana kalka: „To było dobre”, „Było dobrze”.
       * YATTA! / YATTA ZE! (やった！ / やったぜ！) -> „Udało się!”, „Mamy to!”, „Wyszło!”, „Jest!”.
-        - KARDYNALNY Kalka: „Zrobiłem to!” (sztywna kalka po wygranej).
+        - Niezalecana kalka: „Zrobiłem to!” (sztywna kalka po wygranej).
       * YAPPARI / YAHARI (やっぱり / やはり) -> „Wiedziałem...”, „A nie mówiłem?”, „Jednak...”, „Tak jak sądziłem...”.
-        - KARDYNALNY Kalka: „Jak myślałem”, „Po wszystkim”.
+        - Niezalecana kalka: „Jak myślałem”, „Po wszystkim”.
       * SASUGA NI (さすがに) -> „Nawet jak na niego, to lekka przesada...”, „Tym razem to już przesadził...”, „Wszystko ma swoje granice...”.
 
 FILAR CLIV: LOGIKA ODPOWIEDZI NA PRZECZENIA, ZAIMKI DIALEKTALNE I RELACJE TRZECIOOSOBOWE (HAI/IIE, KANSAI JIBUN I ZASADA GIKUN)
@@ -1444,10 +1441,10 @@ FILAR CLIV: LOGIKA ODPOWIEDZI NA PRZECZENIA, ZAIMKI DIALEKTALNE I RELACJE TRZECI
       - Pytanie: „Ikanai no?” / „Aren't you going?” (Nie idziesz?):
         * Odpowiedź JP: HAI / UN (はい / うん) -> Zgoda z negacją („Zgadza się, nie idę”).
           Naturalny polski przekład: „Nie.” / „Nie idę.” / „Zostaję.” / „Zgadza się.” / „Ani mi się śni.”
-          Kalka niepożądana: „Tak.” / „Tak, idę.” (ODWRÓCENIE SENSU FABUŁY O 180 STOPNI! Widz pomyśli, że bohater idzie!).
+          Niezalecana kalka: „Tak.” / „Tak, idę.” (ODWRÓCENIE SENSU FABUŁY O 180 STOPNI! Widz pomyśli, że bohater idzie!).
         * Odpowiedź JP: IIE / UUN (いいえ / ううん) -> Odrzucenie negacji („Mylisz się, idę!”).
           Naturalny polski przekład: „Właśnie że tak!” / „Właśnie że idę!” / „Idę!” / „Ależ skąd, wybieram się tam.”
-          Kalka niepożądana: „Nie.” (Błędne potwierdzenie odmowy).
+          Niezalecana kalka: „Nie.” (Błędne potwierdzenie odmowy).
       - Pytanie: „Shiranai no?” / „Don't you know?” (Nie wiesz?):
         * HAI -> „Nie, nie wiem.” / „Ani trochę.” / „Pojęcia nie mam.”.
         * IIE -> „Wiem!” / „Właśnie że wiem!”.
@@ -1455,7 +1452,7 @@ FILAR CLIV: LOGIKA ODPOWIEDZI NA PRZECZENIA, ZAIMKI DIALEKTALNE I RELACJE TRZECI
    2. DIALEKT KANSAI I ZAIMKI-FAŁSZYWI PRZYJACIELE (JIBUN JAKO 'TY'):
       - W dialekcie Kansai (Osaka, Kioto, Kobe – markery: -ya, -nen, -hen, -de, akan, honma, seya):
         * JIBUN (自分) bardzo często pełni funkcję zaimka DRUGIEJ OSOBY: „TY”!
-          -> „Jibun, nani shiten nen?” -> „Co ty wyprawiasz?!” (KARDYNALNY Kalka: „Co ja robię?!”).
+          -> „Jibun, nani shiten nen?” -> „Co ty wyprawiasz?!” (Niezalecana kalka: „Co ja robię?!”).
           -> „Jibun mo iku ya ro?” -> „Ty też idziesz, prawda?”.
         * UCHI (うち) w ustach dziewcząt lub w Kansai oznacza „JA / MNIE”, a nie dosłowne „nasz dom”:
           -> „Uchi wa shiran de!” -> „Ja tam nic nie wiem!”.
@@ -1463,12 +1460,12 @@ FILAR CLIV: LOGIKA ODPOWIEDZI NA PRZECZENIA, ZAIMKI DIALEKTALNE I RELACJE TRZECI
    3. RELACJE RODZINNE W TRZECIEJ OSOBIE (UCHI VS SOTO):
       - Gdy japońskie dziecko lub nastolatek mówi o członku własnej rodziny do kogoś z zewnątrz:
         * „Onii-chan ga itta” Wariant kanoniczny: „Mój brat powiedział” / „Brat mi mówił” / „[Imię] mi mówił”.
-          Kalka niepożądana: „Onii-chan powiedział”, „Starszy brat powiedział” (infantylna kalka!).
+          Niezalecana kalka: „Onii-chan powiedział”, „Starszy brat powiedział” (infantylna kalka!).
         * „Onee-chan ga...” Wariant kanoniczny: „Moja siostra...” / „Siostra...”.
         * „Okaa-san ga...” Wariant kanoniczny: „Mama...” / „Moja mama...”.
 
    4. ZASADA GIKUN (KANJI VS FURIGANA W AUDIO):
-      - Gdy w skrypcie/napisach pojawia się kanji, lecz seiyū wymawia fonetycznie inne słowo (warianty: kanji 地球 [Chikyū = Ziemia], a seiyū śpiewa/mówi ほし [Hoshi = Gwiazda/Planeta] lub ふるさと [Furusato = Ojczyzna]):
+      - Gdy w skrypcie/napisach pojawia się kanji, lecz seiyū wymawia fonetycznie inne słowo (wzorce: kanji 地球 [Chikyū = Ziemia], a seiyū śpiewa/mówi ほし [Hoshi = Gwiazda/Planeta] lub ふるさと [Furusato = Ojczyzna]):
         -> Nadrzędny prymat ma wymawiane słowo seiyū (Filar CXLIV & CLIV). Przekład musi odzwierciedlać to, co słyszy ucho widza.
 
 FILAR CLV: DYSCYPLINA REPETYCJI MYŚLI WEWNĘTRZNYCH I OCHRONA PRZED ZLEWANIEM Z MOWĄ (SIMULTANEOUS OVERLAP & THOUGHT SEPARATION)
@@ -1477,7 +1474,7 @@ FILAR CLV: DYSCYPLINA REPETYCJI MYŚLI WEWNĘTRZNYCH I OCHRONA PRZED ZLEWANIEM Z
         * „Tomerarenai... Tomerarenai... Tomerarenai...!” (I can't stop it... -> „Nie powstrzymam tego... Nie powstrzymam tego... Nie dam rady tego zatrzymać...!”)
         * „Muri da... Muri da...” (It's impossible... -> „Nie dam rady... Nie ma mowy...”)
         * „Dame da... Dame da...” (It's no use... -> „Koniec ze mną... To na nic...”)
-      - KARDYNALNY kalka HALUCYNACJI [niepoprawne]: Uznanie repetycji w myślach za „zbyteczną powtórkę” i samowolne podmienianie jej na treść rozmowy mówionej z sąsiedniej linijki (warianty: podmiana myśli „Nie powstrzymam tego” na wymyślone „Nie chcę, żebyś przeze mnie stracił fanki”)!
+      - KARDYNALNY kalka HALUCYNACJI [niepoprawne]: Uznanie repetycji w myślach za „zbyteczną powtórkę” i samowolne podmienianie jej na treść rozmowy mówionej z sąsiedniej linijki (wzorce: podmiana myśli „Nie powstrzymam tego” na wymyślone „Nie chcę, żebyś przeze mnie stracił fanki”)!
       - Powtórzenie myśli to kluczowy środek wyrazu reżysera – oddaje walące serce, panikę i załamanie psychiczne. Należy zachować repetycję wiernie wobec audio seiyū!
 
    2. SEPARACJA SEMANTYCZNA MOWY I MYŚLI W SCENACH NAKŁADAJĄCYCH SIĘ (OVERLAP VS ITALICS):
@@ -1493,7 +1490,7 @@ FILAR CLVI: ROZSZCZEPIENIE DWUZNACZNOŚCI ANGIELSKIEGO PIVOTU I PRYMAT KOTWIC LE
         * HITORI NI SHITE (一人にして / 独りにして / 一人にさせて) – od kanji 一人 (hitori = sam / w pojedynkę):
           -> Wyraża ból, rozpacz, wstyd, załamanie, płacz lub chęć ukrycia cierpienia przed drugą osobą.
           -> JEDYNY POPRAWNY PRZEKŁAD AVT: „Zostaw mnie samą / samego...” / „Chcę być sama / sam...” / „Pozwól mi pobyć samej...”.
-          Kalka niepożądana: Tłumaczenie jako opryskliwe „Daj mi spokój!” / „Odczep się!” – to fałszuje intencje postaci i niszczy dramaturgię!
+          Niezalecana kalka: Tłumaczenie jako opryskliwe „Daj mi spokój!” / „Odczep się!” – to fałszuje intencje postaci i niszczy dramaturgię!
         * HOTTOITE / HOUROKUSHITE / KAMAWA NAIDE (放っておいて / 構わないで):
           -> Wyraża gniew, zniecierpliwienie, opryskliwość lub odepchnięcie natręta.
           Naturalny przekład AVT: „Daj mi spokój!” / „Zostaw mnie w spokoju!” / „Nie wtrącaj się!” / „Odejdź!”.
@@ -1531,9 +1528,9 @@ FILAR CLVII: ZASADA NIENARUSZALNOŚCI FORMY ADRESATYWNEJ (T-V INVARIANCE) I Unik
       - Angielskie „you” („you won”, „did you see”, „you are”, „what do you think”) w dialogach między osobami mówiącymi sobie po imieniu, rówieśnikami, przyjaciółmi, rywalami czy współpracownikami zawsze tłumacz w 2. osobie liczby pojedynczej na „ty” („wygrałeś”, „widziałeś”, „jesteś”, „co sądzisz”).
       - Formę per „pan/pani” stosuj WYŁĄCZNIE wtedy, gdy postacie zwracają się do siebie oficjalnie po nazwisku z tytulaturą („panie Kowalski”, „panie profesorze”, „panie inspektorze”) i w całej scenie utrzymują ten sam dystans.
    3. JEDYNY WYJĄTEK DLA ZMIANY FORMY:
-      - Zmiana formy z „pan/pani” na „ty” może nastąpić WYŁĄCZNIE w punkcie zwrotnym zdefiniowanym przez Profiler (Relationship Pivot), gdy bohaterowie wyraźnie ustalają przejście na „ty” (warianty: „Mów mi Kenji / Przejdźmy na ty”). W żadnym wypadku nie może to być losowy skok w ramach jednej wymiany zdań!
+      - Zmiana formy z „pan/pani” na „ty” może nastąpić WYŁĄCZNIE w punkcie zwrotnym zdefiniowanym przez Profiler (Relationship Pivot), gdy bohaterowie wyraźnie ustalają przejście na „ty” (wzorce: „Mów mi Kenji / Przejdźmy na ty”). W żadnym wypadku nie może to być losowy skok w ramach jednej wymiany zdań!
    4. Unikaj kalki WEWNĄTRZZDANIOWYCH HYBRYD ADRESATYWNYCH (INTRA-LINE T-V HYBRID BAN):
-      - Eliminujemy kalkę łączenia w obrębie tej samej kwestii dialogowej lub zdania form poufałych na „ty” (warianty: „Przecież wiesz”, „Widzisz”, „Myślisz”, „Mówiłeś”) z formami grzecznościowymi per „pan/pani” („a jakoś mnie pan nie wydał”, „stoi pan”, „oferuję panu”)!
+      - Eliminujemy kalkę łączenia w obrębie tej samej kwestii dialogowej lub zdania form poufałych na „ty” (wzorce: „Przecież wiesz”, „Widzisz”, „Myślisz”, „Mówiłeś”) z formami grzecznościowymi per „pan/pani” („a jakoś mnie pan nie wydał”, „stoi pan”, „oferuję panu”)!
       - kalka KARDYNALNY [niepoprawne]: „Przecież wiesz, kim jestem, a jakoś mnie pan nie wydał.” (niedopuszczalny anacoluthon rejestru).
       - Wariant kanoniczny: „Przecież wiesz, kim jestem, a jakoś mnie nie wydałeś / nie wydałaś.” (jednolity rejestr w całej wypowiedzi).
 5. HARMONIA WOŁACZA Z FORMĄ PAN/PANI ORAZ ANTY-DRYF TYTULATURY: # Standard 9.0 Invariant
@@ -1541,9 +1538,9 @@ FILAR CLVII: ZASADA NIENARUSZALNOŚCI FORMY ADRESATYWNEJ (T-V INVARIANCE) I Unik
       - kalka KARDYNALNY [niepoprawne]: „Poza tym, mistrzu... ma pan zaczerwienioną twarz.” Wariant kanoniczny: „Poza tym, panie Janie... ma pan zaczerwienioną twarz.”.
       - W okrzykach i sytuacjach afektywnych nie ulegaj angielskiemu nawykowi usuwania -sama: „Co za kunszt, panie Janie!”.
    6. ŻELAZNA DEKLINACJA OBCYCH IMION NA '-CA' [FONET. K]:
-      - Imiona męskie obcego pochodzenia zakończone na '-ca' (warianty: Luca, Seneca, Petrarca, Checa) w języku polskim wymawiane są z twardym [k] i odmieniają się ze zmianą litery na 'k':
+      - Imiona męskie obcego pochodzenia zakończone na '-ca' (wzorce: Luca, Seneca, Petrarca, Checa) w języku polskim wymawiane są z twardym [k] i odmieniają się ze zmianą litery na 'k':
         * Mianownik: Luca
-        * Dopełniacz: do Luki (KARDYNALNY Kalka: „do Luci” [skażenie żeńskie / Łucja!])
+        * Dopełniacz: do Luki (Niezalecana kalka: „do Luci” [skażenie żeńskie / Łucja!])
         * Celownik: Luce
         * Biernik: Lukę
         * Narzędnik: z Luką
@@ -1551,39 +1548,39 @@ FILAR CLVII: ZASADA NIENARUSZALNOŚCI FORMY ADRESATYWNEJ (T-V INVARIANCE) I Unik
         * Wołacz: Luco / Luko!
    7. Unikaj kalki PRZEKŁAMYWANIA JAPOŃSKICH RZECZOWNIKÓW JAKO IMION WŁASNYCH (OUJI / HIME / SENSEI):
       - Japońskie rzeczowniki pospolite, baśniowe i honoryfikatywy (ōji/ouji = książę, hime = księżniczka, sensei = mistrz/nauczyciel, senpai = starszy kolega) zawsze tłumacz na polski!
-      - KARDYNALNY Kalka: „Ouji?!” jako imię chłopaka w dialogu o miłości.
+      - Niezalecana kalka: „Ouji?!” jako imię chłopaka w dialogu o miłości.
       - Wariant kanoniczny: „Książę?!” / „Twój książę?!”.
    8. Unikaj kalki AGRESYWNEJ KALKI „I CO Z TEGO?” W ZAPYTANIACH DIALOGOWYCH (SORE DE? / AND SO?):
       - Gdy rozmówca dzieli się wyznaniem miłości lub wiadomością, a bohater dopytuje o ciąg dalszy (Sore de? / And so? / What happened then?), Naturalnie unikamy tłumaczenia tego jako wrogiego „I co z tego?”.
       - Wariant kanoniczny: „I co?” / „I jak?” / „Więc wy...?” / „I co potem?”.
    9. HARMONIZACJA PŁCI ROZMÓWCY PRZY PRZEJŚCIU Z PIVOTU 'YOU' I REGULACJA FORMY WOŁACZOWEJ (GENDER-CONCORDANT T-V RESOLUTION & FEMALE VOCATIVE):
       - Gdy w relacji nieformalnej lub po imieniu angielskie 'you' lub błędny formalizm ('wygrał pan' / 'wygrała pani') jest redukowany do 2. osoby, forma czasownika w czasie przeszłym/przypuszczającym odpowiada płci adresata:
-         * Adresat żeński (warianty: Monika, Anna, Kasia, Yui): 'wygrałaś', 'zrobiłaś', 'widziałaś', 'byłaś', 'miałaś', 'powiedziałaś', 'chciałaś', 'mogłaś', 'wiedziałaś'.
-         * Adresat męski (warianty: Piotr, Tomasz, Kotaro, Ren): 'wygrałeś', 'zrobiłeś', 'widziałeś', 'byłeś', 'miałeś', 'powiedziałeś', 'chciałeś', 'mogłeś', 'wiedziałeś'.
+         * Adresat żeński (wzorce: Monika, Anna, Kasia, Yui): 'wygrałaś', 'zrobiłaś', 'widziałaś', 'byłaś', 'miałaś', 'powiedziałaś', 'chciałaś', 'mogłaś', 'wiedziałaś'.
+         * Adresat męski (wzorce: Piotr, Tomasz, Kotaro, Ren): 'wygrałeś', 'zrobiłeś', 'widziałeś', 'byłeś', 'miałeś', 'powiedziałeś', 'chciałeś', 'mogłeś', 'wiedziałeś'.
        - ORZECZNIKI PRZYMIOTNIKOWE I FORMY ANALITYCZNE DO KOBIET:
          * W zwrocie do kobiety stosuj formy żeńskie: 'wyglądasz na wzburzoną', 'jesteś pewna', 'jesteś gotowa', 'jesteś zmęczona', 'jesteś zła'.
-         * KARDYNALNY Kalka: 'Wyglądasz na wzburzonego' w zwrocie do kobiety!
-       - KARDYNALNY Kalka: 'Monika, czy wygrałeś ten pojedynek' (skażenie męskie przy rozmowie z kobietą!).
+         * Niezalecana kalka: 'Wyglądasz na wzburzonego' w zwrocie do kobiety!
+       - Niezalecana kalka: 'Monika, czy wygrałeś ten pojedynek' (skażenie męskie przy rozmowie z kobietą!).
        - Wariant kanoniczny: 'Moniko, czy wygrałaś ten pojedynek'.
        - Ponadto: imiona żeńskie na '-a' w bezpośrednim zwrocie przyjmują poprawny wołacz na '-o' / '-u' ('Moniko', 'Anno', 'Kasiu').
 
 FILAR CLVIII: ZASADA NIESKAZITELNEGO UCHA WIDZA (THE AUDITORY-SUBTEXT COHERENCE STANDARD)
    1. HARMONIA MIĘDZY SŁUCHEM A NAPISAMI:
       - Polski widz ogląda anime z japońską ścieżką dźwiękową seiyū.
-      - Gdy w głośniku rozbrzmiewa wyraziste słowo japońskie (warianty: liczebnik, powszechnie znany zwrot, wykrzyknik, imię), a na ekranie pojawia się amerykańska parafraza zniekształcająca sens – powstaje u widza bolesny dysonans poznawczy.
+      - Gdy w głośniku rozbrzmiewa wyraziste słowo japońskie (wzorce: liczebnik, powszechnie znany zwrot, wykrzyknik, imię), a na ekranie pojawia się amerykańska parafraza zniekształcająca sens – powstaje u widza bolesny dysonans poznawczy.
       - Eliminujemy kalkę ulegania angielskim uproszczeniom i amerykańskiemu slangowi tam, gdzie seiyū wypowiada precyzyjny termin japoński!
    2. MATRYCA KOTWIC FONICZNYCH (KLUCZOWE SŁOWA SEIYŪ):
-      - HITORI (一人 / 独り / ひとり): w kontekście emocjonalnym to „sam / sama / w pojedynkę / zostaw mnie samą”. KARDYNALNY Kalka: „Daj mi spokój!”.
-      - BETSUNI (別に): chłód, dystans, foch -> „Wcale nie / Mniejsza z tym / Nieważne”. KARDYNALNY Kalka: „To nic takiego / Nie ma sprawy”.
-      - YOKATTA (よかった): ulga, kamień z serca -> „Całe szczęście / Jak dobrze”. KARDYNALNY Kalka: „To było dobre!”.
-      - YATTA (やった): triumf, sukces -> „Udało się! / Mamy to!”. KARDYNALNY Kalka: „Zrobiłem to!”.
-      - USO / MAJI (嘘 / マジ): niedowierzanie -> „Nie wierzę! / Żartujesz?! / Bez jaj!”. KARDYNALNY Kalka: „Kłamstwo!”.
-      - MENDOKUSAI (面倒くさい): zniechęcenie -> „Ale mi się nie chce... / Co za męczarnia...”. KARDYNALNY Kalka: „Co za ból!”.
-      - MOU II (もういい): rezygnacja, machnięcie ręką -> „Wystarczy / Daj spokój / Koniec tematu”. KARDYNALNY Kalka: „W porządku”.
-      - GAMAN DEKINAI (我慢できない): granica bólu/cierpienia -> „Dłużej tego nie zniosę / Nie wytrzymam”. KARDYNALNY Kalka: „Nie wybaczę tego”.
-      - TASUKETE (助けて): krzyk o pomoc -> „Ratunku! / Pomóż mi!”. KARDYNALNY Kalka: „Ocal mnie!”.
+      - HITORI (一人 / 独り / ひとり): w kontekście emocjonalnym to „sam / sama / w pojedynkę / zostaw mnie samą”. Niezalecana kalka: „Daj mi spokój!”.
+      - BETSUNI (別に): chłód, dystans, foch -> „Wcale nie / Mniejsza z tym / Nieważne”. Niezalecana kalka: „To nic takiego / Nie ma sprawy”.
+      - YOKATTA (よかった): ulga, kamień z serca -> „Całe szczęście / Jak dobrze”. Niezalecana kalka: „To było dobre!”.
+      - YATTA (やった): triumf, sukces -> „Udało się! / Mamy to!”. Niezalecana kalka: „Zrobiłem to!”.
+      - USO / MAJI (嘘 / マジ): niedowierzanie -> „Nie wierzę! / Żartujesz?! / Bez jaj!”. Niezalecana kalka: „Kłamstwo!”.
+      - MENDOKUSAI (面倒くさい): zniechęcenie -> „Ale mi się nie chce... / Co za męczarnia...”. Niezalecana kalka: „Co za ból!”.
+      - MOU II (もういい): rezygnacja, machnięcie ręką -> „Wystarczy / Daj spokój / Koniec tematu”. Niezalecana kalka: „W porządku”.
+      - GAMAN DEKINAI (我慢できない): granica bólu/cierpienia -> „Dłużej tego nie zniosę / Nie wytrzymam”. Niezalecana kalka: „Nie wybaczę tego”.
+      - TASUKETE (助けて): krzyk o pomoc -> „Ratunku! / Pomóż mi!”. Niezalecana kalka: „Ocal mnie!”.
       - YAMERO / YAMETE (やめろ / やめて): sprzeciw -> „Przestań! / Stój! / Zostaw!”.
-      - SHIKATA GA NAI / SHOU GA NAI (しょうがない): pogodzenie się z losem -> „Trudno / Nic nie poradzimy / Nie mamy wyboru”. KARDYNALNY Kalka: „Nie da się temu pomóc”.
+      - SHIKATA GA NAI / SHOU GA NAI (しょうがない): pogodzenie się z losem -> „Trudno / Nic nie poradzimy / Nie mamy wyboru”. Niezalecana kalka: „Nie da się temu pomóc”.
       - NARUHODO (なるほど): olśnienie, zrozumienie mechanizmu -> „W ten sposób... / A więc o to chodzi / Wszystko jasne”.
       - WAKATTA (分かった): przyjęcie polecenia -> „Jasne / Zrozumiałem / Robi się”.
       - BAKA / AHO (馬鹿 / アホ): afektywna obelga -> „Idiota / Głupek / Durniu” (dopasuj ciężar do wieku postaci).
@@ -1606,7 +1603,7 @@ FILAR CLX: DEKOMPOZYCJA SEMIOTYCZNA I NIENARUSZALNOŚĆ WARSTW ONTOLOGICZNYCH (M
       - W anime współistnieją odmienne warstwy semiotyczne: żywy dialog w kadrze (spoken_on_screen), komentarz zza kadru (spoken_off_screen), stylizowane dymki mangowe i halucynacje (manga_balloon), myśli wewnętrzne (inner_thought) oraz fizyczne napisy w świecie filmu (diegetic_sign).
       - Eliminujemy kalkę mieszania i sklejania w jedną kwestię tekstu z dwóch różnych warstw semiotycznych!
    2. DYMKI MANGOWE VS KOMENTARZ DIALOGOWY:
-      - Dymek narysowany na ekranie (warianty: halucynacja, komiksowy wykrzyknik) to odrębny byt wizualny od komentarza towarzysza mówiącego obok.
+      - Dymek narysowany na ekranie (wzorce: halucynacja, komiksowy wykrzyknik) to odrębny byt wizualny od komentarza towarzysza mówiącego obok.
       - W razie jednoczesnego występowania formatuj je w dwóch osobnych wierszach z myślnikami (- Dymek\\N- Komentarz) lub jako oddzielne napisy. Unikamy tworzenia zdań hybrydowych z myślnikiem w środku!
 
 FILAR CLXI: NIENARUSZALNOŚĆ PERSPEKTYWY NARRACYJNEJ I Unikaj kalki ZDRADY TOŻSAMOŚCI INCOGNITO (THE DRAMATIC IRONY & FOCALIZATION INTEGRITY STANDARD)
@@ -1619,14 +1616,14 @@ FILAR CLXI: NIENARUSZALNOŚĆ PERSPEKTYWY NARRACYJNEJ I Unikaj kalki ZDRADY TOŻ
 
 FILAR CLXII: NIENARUSZALNOŚĆ PŁCI GRAMATYCZNEJ IMION ORIENTALNYCH NA '-A' (GRAMMATICAL GENDER INVARIANCE FOR NAMES ENDING IN '-A')
    1. Unikaj kalki ZŁUDZENIA MORFOLOGICZNEGO (KOŃCÓWKA '-A' TO NIE ZAWSZE KOBIETA!):
-      - W języku polskim i językach indoeuropejskich samogłoska '-a' na końcu imienia silnie sugeruje płeć żeńską. W anime niezliczone imiona japońskie, mongolskie, perskie, arabskie i fantasy kończą się na '-a' i są to zawsze POSTACIE MĘSKIE (warianty: Shira, Akira, Gaara, Ashitaka, Kiba, Soma, Kenta, Ryoma, Hanza, Koba, Soya, Toma, Genga, Sinbad, Judar, Alibaba)!
+      - W języku polskim i językach indoeuropejskich samogłoska '-a' na końcu imienia silnie sugeruje płeć żeńską. W anime niezliczone imiona japońskie, orientalne i fantasy kończą się na '-a' i są to postacie męskie (wzorce: imiona męskie dwusylabowe i wielosylabowe na '-a')!
       - Naturalnie unikamy automatycznego wnioskowania, że postać jest kobietą, wyłącznie dlatego, że jej imię kończy się na samogłoskę '-a'! Zawsze weryfikuj płeć ze skryptu, relacji i głosu seiyū.
    2. ŻELAZNA ZGODA CZASOWNIKA W CZASIE PRZESZŁYM (ORZECZENIE MĘSKIE DLA POSTACI MĘSKIEJ):
-      - Chociaż w języku polskim imiona męskie na '-a' odmieniają się przez przypadki według deklinacji żeńskiej (M. Shira, D. Shiry, C. Shirze, B. Shirę, N. z Shirą, Msc. o Shirze), to WSZYSTKIE czasowniki w czasie przeszłym, przymiotniki i imiesłowy orzekające o nich zawsze przyjmują formy rodzaju męskiego:
-        * PRAWIDŁOWO: "Shira ostrzegał", "Shira mówił", "Shira wiedział", "Shira przyszedł", "Shira pomógł", "Shira był zmęczony".
-        * KARDYNALNY Kalka: "Shira ostrzegała", "Shira mówiła", "Shira przyszła", "Shira była".
+      - Chociaż w języku polskim imiona męskie na '-a' odmieniają się przez przypadki według deklinacji rzeczownikowej (M. <Postać_M>, D. <Postaci_M>, C. <Postaci_M>, B. <Postać_M>, N. z <Postacią_M>, Msc. o <Postaci_M>), to wszystkie czasowniki w czasie przeszłym, przymiotniki i imiesłowy orzekające o nich zawsze przyjmują formy rodzaju męskiego:
+        * Kanon przekładu: "<Postać_M> ostrzegał", "<Postać_M> mówił", "<Postać_M> wiedział", "<Postać_M> przyszedł", "<Postać_M> pomógł", "<Postać_M> był zmęczony".
+        * Niezalecana kalka: formy żeńskie czasownika orzekające o postaci męskiej.
    3. SPÓJNOŚĆ WZMIANEK W 3. OSOBIE (THIRD-PERSON ENTITY AGREEMENT):
-      - Gdy inna postać (warianty: kobieta) wspomina w dialogu lub myśli o męskim bohaterze ("Shira did tell me that...", "Akira said..."), orzeczenie dotyczące tej osoby zachowuje rodzaj męski ("Shira ostrzegał mnie / Shira mówił mi"), całkowicie niezależnie od płci osoby mówiącej w kadrze!
+      - Gdy inna postać wspomina w dialogu lub myśli o męskim bohaterze, orzeczenie dotyczące tej osoby zachowuje rodzaj męski, całkowicie niezależnie od płci osoby mówiącej w kadrze!
    4. ŻELAZNA SPÓJNOŚĆ PŁCI W DIALOGACH ANONIMOWYCH I SCENACH JEDNOPŁCIOWYCH (ANONYMOUS SCENE GENDER HARMONY):
       - SYMETRYCZNA ZGODA RODZAJU DLA KOBIET I MĘŻCZYZN: Zawsze uzgadniaj formy 1. i 2. osoby z potwierdzoną lub wywnioskowaną płcią mówcy i adresata:
         * DLA KOBIET (1. OSOBA): formy żeńskie czasu przeszłego i trybu przypuszczającego (-łam, -łabym: "zamierzałam", "chciałam", "zrobiłam", "dopięłam", "miałabym", "mogłabym", "wiedziałam", "pomyślałam").
@@ -1664,7 +1661,7 @@ FILAR CLXIII: MORFOLOGIA ADRESATYWNA 2. OSOBY (POJEDYNCZA KOBIETA / POJEDYNCZY M
 FILAR CLXIV: ŚCISŁA KONTROLA ORTOGRAFII, LITERÓWEK I CZASOWNIKÓW PYTAJĄCYCH (ANTI-TYPO & LEXICAL INTEGRITY):
    1. CZASOWNIKI PYTANIA I DOCIEKANIA (SPYTAĆ / ZAPYTAĆ / PYTAĆ):
       - Czasownik 'spytać / zapytać' w 1. osobie liczby pojedynczej czasu przyszłego/teraźniejszego ma wyłącznie formę: 'spytam', 'zapytam' lub 'pytam'.
-      - KARDYNALNY Kalka: 'spyham' (nieistniejący potworek leksykalny, zniekształcenie fonetyczno-klawiaturowe!).
+      - Niezalecana kalka: 'spyham' (nieistniejący potworek leksykalny, zniekształcenie fonetyczno-klawiaturowe!).
       - Wariant kanoniczny: 'spytam' / 'zapytam' ("O to, co tam odkryła, spytam moją sługę osobiście").
    2. ELIMINACJA HALUCYNACJI I ZNIEKSZTAŁCEŃ FONETYCZNO-KLAWIATUROWYCH:
       - Wyeliminuj literówki i nieistniejące formy wyrazowe w dialogu filmowym:
@@ -1682,7 +1679,7 @@ FILAR CLXIV: ŚCISŁA KONTROLA ORTOGRAFII, LITERÓWEK I CZASOWNIKÓW PYTAJĄCYCH
 
 FILAR CLXV: DYSKONTINUITET CZASOWY, PRZESKOKI SCEN I ODCZAROWANIE FAŁSZYWEGO PRZYLEGANIA (TEMPORAL DISCONTINUITY & SCENE BOUNDARY RESET PROTOCOL):
    1. PUŁAPKA OPÓŹNIONEGO POTWIERDZENIA (DELAYED AGREEMENT FALLACY):
-      - Gdy kwestia dialogowa następuje po długiej pauzie (Δt ≥ 5–10+ sekund) lub cięciu montażowym po prośbie o rozmowę w cztery oczy / wyjście na osobność / zmianę lokacji (warianty: "Moglibyśmy porozmawiać przez chwilę na osobności"):
+      - Gdy kwestia dialogowa następuje po długiej pauzie (Δt ≥ 5–10+ sekund) lub cięciu montażowym po prośbie o rozmowę w cztery oczy / wyjście na osobność / zmianę lokacji (wzorce: "Moglibyśmy porozmawiać przez chwilę na osobności"):
       - Angielskie kwestie typu "Sure, what is it" / "All right, what's up?" / "Yeah, what's wrong?" w nowej scenie NIE SĄ zgodą na wyjście (zgoda i przejście nastąpiły w diegezie obrazu w ciągu minionych sekund!).
       - Eliminujemy kalkę KOSZMARNEJ KALKI: "Jasne, o co chodzi", "Pewnie, co się stało", "W porządku, słucham". Słowo "Jasne" po 20 sekundach jest całkowicie oderwane od sytuacji dramaturgicznej.
       - POPRAWNY PRZEKŁAD AVT: Kwestia stanowi otwarcie rozmowy w nowej lokacji: "Więc o co chodzi", "No to o co chodzi", "O co chodzi", "Słucham cię".
@@ -1715,16 +1712,16 @@ FILAR CLXVI: PROTOKÓŁ ELIMINACJI GRAWITACJI JĘZYKA ANGIELSKIEGO I KLISZ FANSU
        - "There is no way (that)..." -> zamiast kalki 'Nie ma mowy, żeby / by / aby...' stosuj naturalną polszczyznę! Wariant kanoniczny: "Wykluczone, by...", "Wykluczone, bym...", "Wykluczone, byśmy...", "To niemożliwe, żeby...".
        - "It makes sense" / "Does it make sense" -> zamiast kalki 'To robi sens', "Robi to sens", "Robiłoby sens"! Wariant kanoniczny: "To ma sens", "Ma to sens", "Miałoby sens".
        - "I'm fine" na propozycję pomocy -> "Dam sobie radę", "Nie trzeba", "Dziękuję".
-       - "Here" przy geście podania -> "Proszę", "Trzymaj", "Masz" lub elipsa "" (KARDYNALNY Kalka: "Tutaj! / Tutaj, weź to").
-       - Tytulatura licealna i relacje szkolno-mentorskie: Eliminujemy kalkę mechanicznego kalkowania japońskiego sufiksu '-san' / '-sensei' jako XIX-wiecznego 'Panno [Imię/Nazwisko]'. W relacji uczeń -> nauczyciel/nauczycielka MUSI być 'pani [Nazwisko]' (warianty: 'pani Tanako'), 'pani profesor' lub 'proszę pani' (KARDYNALNY Kalka: 'panno [Nazwisko]'). Nauczyciel do ucznia zwraca się po nazwisku lub imieniu.
+       - "Here" przy geście podania -> "Proszę", "Trzymaj", "Masz" lub elipsa "" (Niezalecana kalka: "Tutaj! / Tutaj, weź to").
+       - Tytulatura licealna i relacje szkolno-mentorskie: Eliminujemy kalkę mechanicznego kalkowania japońskiego sufiksu '-san' / '-sensei' jako XIX-wiecznego 'Panno [Imię/Nazwisko]'. W relacji uczeń -> nauczyciel/nauczycielka MUSI być 'pani [Nazwisko]' (wzorce: 'pani Tanako'), 'pani profesor' lub 'proszę pani' (Niezalecana kalka: 'panno [Nazwisko]'). Nauczyciel do ucznia zwraca się po nazwisku lub imieniu.
        - Czystość leksykalna procesu twórczego: Unikamy kalkowania pojęć 'input / output' w odniesieniu do sztuki, komiksu i literatury. Stosuj naturalne polskie odpowiedniki: 'czerpanie inspiracji / chłonięcie wrażeń / zbieranie doświadczeń' oraz 'tworzenie / przelewanie na papier / rysowanie'.
        - Kalka składniowa z 'in one like that' / 'konna no ni': Eliminujemy kalkę bezrzeczownikowego 'zapisywałaś w takim pomysły' Wariant kanoniczny: 'zapisywałaś w nim pomysły' lub 'w takim notesie'.
        - Fleksja zamówień gastronomicznych: Zamówienie w lokalu ('Dla mnie [co?]') rządzi biernikiem (Kalka: 'Dla mnie woda gazowana' Wariant kanoniczny: 'Dla mnie wodę gazowaną').
        - Okrzyki festiwalowe i pirotechniczne (kakegoe): Eliminujemy kalkę pozostawiania surowego japońskiego okrzyku 'Tamaya' (tradycyjny okrzyk cechu pirotechników z Edo). Zlokalizuj go na naturalny polski okrzyk zachwytu nad fajerwerkami: 'Ale widok', 'Cudo', 'Ooo, jak pięknie'.
        - Tytulatura rówieśnicza w szkole i klubie (Filar XXV & IX): Eliminujemy kalkę form per 'Pan/Pani [Nazwisko]' i czasowników w 3. osobie grzecznościowej między uczniami i rówieśnikami z tej samej klasy/klubu szkolnego. Japoński grzeczny przyrostek '-san' używany przez ucznia do kolegi to w polszczyźnie samo nazwisko lub imię w bezpośredniej relacji na 'ty' (Wariant kanoniczny: 'Tanaka, masz zeszyt' / 'Tanaka, spokojnie').
        - Żelazna niezmienniczość T-V w relacjach formalnych (Filar XXV & CLVI): W oficjalnych relacjach zawodowych i urzędowych utrzymuj jednolity rejestr grzecznościowy per 'Pan/Pani' we wszystkich kwestiach, eliminując przypadkową hybrydyzację i zsuwanie się na 'ty' w tej samej scenie. Pytania i zdania warunkowe dopasuj konsekwentnie do wybranego rejestru.
-       - Deformacje pojęciowe i pseudolatynizmy: Eliminujemy kalkę tworzenia sztucznych tworów słownych (warianty: 'Kataklizmus' -> 'Kataklizm', 'podświadomość zbiorowa' -> 'nieświadomość zbiorowa' wg Junga).
-       - Spójność bazy wiedzy i relacji: Eliminujemy kalkę nadawania żeńskich form adresata [KOBIETA (Adresat)] męskim bohaterom na podstawie żeńskich ról nadawcy (warianty: 'koleżanka -> przyjaciel' lub 'uczennica -> mistrz').
+       - Deformacje pojęciowe i pseudolatynizmy: Eliminujemy kalkę tworzenia sztucznych tworów słownych (wzorce: 'Kataklizmus' -> 'Kataklizm', 'podświadomość zbiorowa' -> 'nieświadomość zbiorowa' wg Junga).
+       - Spójność bazy wiedzy i relacji: Eliminujemy kalkę nadawania żeńskich form adresata [KOBIETA (Adresat)] męskim bohaterom na podstawie żeńskich ról nadawcy (wzorce: 'koleżanka -> przyjaciel' lub 'uczennica -> mistrz').
     3. DWUETAPOWA ŚLEPA LEKTURA POLSZCZYZNY W MYŚLENIU (AUTONOMOUS BLIND-READING FLOW):
        - Redaktor i weryfikator w pierwszej kolejności oceniają tekst polski jako spójny dialog aktorski/dubbingu. Jeśli dialog brzmi obco, sztucznie lub nienaturalnie po polsku – wymaga przeredagowania, bez względu na to, jak bardzo "wiernie" odzwierciedla angielski skrypt.
 
@@ -1751,22 +1748,22 @@ FILAR CLXVIII: NATURALNA SKŁADNIA DEIKTYCZNO-TEMPORALNA I DEKOMPOZYCJA PRZYDAWK
         * "w jutrzejszy poranek / na jutrzejszy poranek" Wariant kanoniczny: "jutro rano".
         * "we wczorajszy wieczór" Wariant kanoniczny: "wczoraj wieczorem".
         * "w dzisiejszą noc" Wariant kanoniczny: "dziś w nocy / dzisiejszej nocy".
-        * "przyszłotygodniowy / przyszłotygodniowe" Wariant kanoniczny: "w przyszłym tygodniu" (warianty: "zawody w przyszłym tygodniu").
+        * "przyszłotygodniowy / przyszłotygodniowe" Wariant kanoniczny: "w przyszłym tygodniu" (wzorce: "zawody w przyszłym tygodniu").
    2. DEKOMPOZYCJA JAPOŃSKIEJ PARTUKUŁY の ('NO') PRZY OKREŚLENIACH CZASU:
-      - Japońskie konstrukcje temporalne 'X no Y' (warianty: 明後日の宴 asatte no utage, 明日の朝 ashita no asa, 今日の夜 kyou no yoru) oraz angielskie fansuberskie 'day-after-tomorrow\'s feast':
+      - Japońskie konstrukcje temporalne 'X no Y' (wzorce: 明後日の宴 asatte no utage, 明日の朝 ashita no asa, 今日の夜 kyou no yoru) oraz angielskie fansuberskie 'day-after-tomorrow\'s feast':
         * Unikaj mechanicznego kalkowania partykuły の jako polskiego przymiotnika przydawkowego.
         * Zawsze przekładaj na polską przydawkę przyimkową lub okolicznik czasu.
 
 FILAR CLXIX: DYSCYPLINA SOCJOLEKTU I OCHRONA KSYWEK RÓWIEŚNICZYCH I MORFOLOGICZNY PRYMAT PŁCI POSTACI (SPEAKER-SCOPED IDIOLECT, HYPOCORISM BLEED ERADICATION & INHERENT GENDER MORPHOLOGY):
    1. ELIMINACJA EKSTERYTORIALNEGO WYCIEKU KSYWEK RÓWIEŚNICZYCH (SPEAKER-SCOPED HYPOCORISM GUARD):
-      - Specyficzne, slangowe lub pieszczotliwe ksywki rówieśnicze i gyaru (warianty: '[Zdrobniała Ksywka]', '[Imię]-chan') są ściśle ograniczone do postaci, która je nadała w danej relacji.
+      - Specyficzne, slangowe lub pieszczotliwe ksywki rówieśnicze i gyaru (wzorce: '[Zdrobniała Ksywka]', '[Imię]-chan') są ściśle ograniczone do postaci, która je nadała w danej relacji.
       - Eliminujemy kalkę przypisywania ksywek szkolnych/gyaru rodzicom, ojcom, nauczycielom, mentorom oraz postaciom w retrospekcjach (Flashback)!
       - Gdy matka w audio seiyū mówi '[Imię]-chan', jedynym naturalnym polskim ekwiwalentem jest '[Imię]', 'Córeczko' lub '[Zdrobniałe Imię]' (Kalka: '[Zdrobniała Ksywka], posłuchaj uważnie').
    2. MORFOLOGICZNY PRYMAT PŁCI I SANITYZACJA ZNACZNIKÓW STYLU (INHERENT GENDER RECOGNITION):
       - Nazwy mówców w skryptach ASS często zawierają techniczne znaczniki stylów lub kontekstu ('Girl\\Italic', 'Woman\\Flashback', 'Girl (young)').
       - Rzeczowniki inherentnie żeńskie ('girl', 'woman', 'female', 'dziewczyna', 'kobieta', 'matka', 'lady', 'heroine') determinują płeć żeńską mówcy (FEMALE).
       - Gdy mówcą jest potwierdzona postać żeńska, orzeczenia w 1. osobie czasu przeszłego (-łam / -łam) oraz trybu przypuszczającego (-łabym) wymagają form żeńskich:
-        * 'tak ją zraniłam' (KARDYNALNY Kalka: 'tak ją zraniłem').
+        * 'tak ją zraniłam' (Niezalecana kalka: 'tak ją zraniłem').
         * 'zrobiłam', 'byłam', 'powiedziałam', 'chciałam', 'mogłam', 'wiedziałam', 'poszłam', 'chciałabym'.
 
 FILAR CLXX: SYSTEMOWY PRYMAT GŁOSU SEIYŪ NAD ANGIELSKIM PIVOTEM, KATEGORIE AKTÓW MOWY, HARMONIZACJA AISATSU I APOZYCJA TYTULATURY PODMIOTU (SEIYŪ SOVEREIGNTY, SPEECH ACT TAXONOMY, AISATSU HARMONIZATION & NOMINATIVE TITLE APPOSITION):
@@ -1783,14 +1780,14 @@ FILAR CLXX: SYSTEMOWY PRYMAT GŁOSU SEIYŪ NAD ANGIELSKIM PIVOTEM, KATEGORIE AKT
       - Wymuszaj naturalne polskie powitanie domowników: 'Wróciłam' -> 'Witaj w domu' / 'O, już jesteś' / 'Dobrze, że jesteś' / 'O, cześć'.
    4. NIENARUSZALNOŚĆ MIANOWNIKA TYTULATURY PODMIOTU I WIELKICH LITER IMION (TITLE APPOSITION & NAME INTEGRITY):
       - Przy zestawieniu tytułu mistrzowskiego, naukowego lub zawodowego z imieniem i nazwiskiem w podmiocie zdania ('Mistrz', 'Pan', 'Pani', 'Profesor', 'Doktor', 'Pisarz', 'Reżyser', 'Redaktor', 'Autor', 'Mangaka', 'Sensei' + Nazwisko + Imię + Czasownik 3. os.), nazwisko ZAWSZE pozostaje w mianowniku:
-        * 'Mistrz Yamada Kenji nie zdążył z rozdziałem' (KARDYNALNY Kalka: 'Mistrz Yamady kenji nie zdążył').
+        * 'Mistrz Yamada Kenji nie zdążył z rozdziałem' (Niezalecana kalka: 'Mistrz Yamady kenji nie zdążył').
         * 'Pan Jan zniszczył pieczęć' (Kalka: 'Pan Jana zniszczył').
-      - Ścisły wymóg WIELKIEJ LITERY DLA WSZYSTKICH CZŁONÓW JAPOŃSKICH IMION I NAZWISK: 'Yamada Kenji' (KARDYNALNY Kalka: mała litera 'kenji').
+      - Ścisły wymóg WIELKIEJ LITERY DLA WSZYSTKICH CZŁONÓW JAPOŃSKICH IMION I NAZWISK: 'Yamada Kenji' (Niezalecana kalka: mała litera 'kenji').
 
 FILAR CLXXI: ZGODNOŚĆ LICZEBNIKÓW, WIERNOŚĆ FAKTOGRAFICZNA I PRYMAT ZAIMKÓW MĘSKICH NAD WYSOKIM F0 (NUMERICAL INTEGRITY, FACTUAL FIDELITY & CROSS-GENDER PRONOUN PRECEDENCE):
    1. WIERNIE PRZENOSZONE LICZBY I DANE FAKTOGRAFICZNE:
       - Wystrzegaj się gubienia, dopisywania lub mutowania liczb, lat, kwot, odległości i dat!
-      - '300 years' to ZAWSZE '300 lat' (KARDYNALNY Kalka: '30 lat', 'kilkaset lat'). '3 days' to 'trzy dni', '100 gold' to '100 sztuk złota'.
+      - '300 years' to ZAWSZE '300 lat' (Niezalecana kalka: '30 lat', 'kilkaset lat'). '3 days' to 'trzy dni', '100 gold' to '100 sztuk złota'.
    2. PRYMAT ZAIMKÓW MĘSKICH NAD TEMBREM F0 (CROSS-GENDER SEIYŪ DEFENSE):
       - W anime dorosłe kobiety często dubbingują małych chłopców (archetyp shōnen).
       - Użycie przez postać zaimków 'boku' (僕) lub 'ore' (俺) przy wysokim tembrze głosu (>180 Hz) to ścisły DOWÓD PŁCI MĘSKIEJ!
@@ -2533,6 +2530,8 @@ def get_focused_rules_for_batch(
         clean_it = dict(it)
         if "en" not in clean_it and "text" in clean_it:
             clean_it["en"] = clean_it["text"]
+        if "audio_jp" not in clean_it and "jp" in clean_it:
+            clean_it["audio_jp"] = clean_it["jp"]
         for k in ["en", "pl", "audio_jp", "notes", "style", "speaker", "speaker_gender", "speaker_role"]:
             val = clean_it.get(k)
             clean_it[k] = str(val) if val is not None else ""
@@ -2564,6 +2563,9 @@ def get_focused_rules_for_batch(
     if whisper_text_jp:
         combined_jp += " " + whisper_text_jp.lower()
 
+    from whisper_disambiguator import WhisperDisambiguator
+    jp_categories = WhisperDisambiguator.detect_batch_discourse_categories(combined_en, combined_jp)
+
     # =========================================================================
     # 9 ROZŁĄCZNYCH KATEGORII DYNAMICZNYCH STANDARDU 10.3 (DYN_1 - DYN_9)
     # =========================================================================
@@ -2571,10 +2573,6 @@ def get_focused_rules_for_batch(
     # DYN_1: Dialekty Regionalne, Gwara, Sociolekty i Kontrast Rejestrów (score=95)
     en_slang_pat = re.compile(
         r"\b(?:gonna|wanna|gotta|ain't|dunno|lemme|gimme|y'all|reckon|howdy|bloody|mate|innit|blimey|lads|folks|fella|heck|darn|ain'tcha|nowise|nohow|shucks)\b",
-        re.IGNORECASE
-    )
-    jp_dialect_pat = re.compile(
-        r"\b(?:ya|yan|yade|yaro|nen|seya|akan|honma|dappe|dabe|ora|washi|atai|wai|wagahai|jaken|koraa|suitoo|nankurunaisa|haisai|namara|shibareru|べ|だべ|じゃけん|やん|やde|yaro|ねん|せや|あかん|ほんま|おら|わし|あたい|わい|吾輩)\b",
         re.IGNORECASE
     )
     paraphrase_pat = re.compile(
@@ -2585,14 +2583,10 @@ def get_focused_rules_for_batch(
         r"\b(?:foolish mortals?|mere mortals?|dark abyss|eternal darkness|realm of shadows|sealed power|dark flame|wicked eye)\b",
         re.IGNORECASE
     )
-    character_suffix_pat = re.compile(
-        r"(?:^|[\s\-])(?:dechu|nyan|pyon|zura|gero|dabe)\b",
-        re.IGNORECASE
-    )
     has_slang_en = bool(en_slang_pat.search(combined_en))
-    has_dialect_jp = bool(jp_dialect_pat.search(combined_jp)) or any(tok in combined_jp for tok in ["べ", "だべ", "じゃけん", "やん", "やde", "やろ", "ねん", "せや", "あかん", "ほんま", "おら", "わし", "あたい", "わい", "吾輩"])
+    has_dialect_jp = "DIALECT_JP" in jp_categories
     has_paraphrase = bool(paraphrase_pat.search(combined_en)) or any(paraphrase_pat.search(item.get("pl", "")) for item in batch_items)
-    has_exalted = bool(exalted_pat.search(combined_en)) or bool(character_suffix_pat.search(combined_en)) or bool(character_suffix_pat.search(combined_jp))
+    has_exalted = bool(exalted_pat.search(combined_en)) or ("DIALECT_JP" in jp_categories)
     has_dialect_indicator = any(
         any(k in str(item.get("notes", "")).lower() for k in ["gwara", "dialekt", "slang", "socjolekt", "szorstka", "kansai", "filar xiii"])
         or any(k in str(item.get("speech_style_pl", "")).lower() for k in ["gwara", "dialekt", "slang", "szorstka"])
@@ -2610,7 +2604,7 @@ def get_focused_rules_for_batch(
 
     # DYN_2: Archaizacja, Etykieta Dworska i Rejestr Wysoki (score=92)
     has_archaic_en = bool(re.search(r"\b(?:milord|my liege|your majesty|thou|thee|thy|thine|sire|highness|sovereign)\b", combined_en, re.IGNORECASE))
-    has_archaic_jp = bool(re.search(r"\b(?:sessha|ojou|chichi-ue|haha-ue|gozaimasu|de gozaru)\b", combined_jp, re.IGNORECASE))
+    has_archaic_jp = "ARCHAIC_JP" in jp_categories
     has_archaic_notes = any(
         any(k in str(item.get("notes", "")).lower() for k in ["archaiz", "dworsk", "keigo", "filar xiv"])
         or any(k in str(item.get("style", "")).lower() for k in ["archaiz", "dworsk", "historyczn"])
@@ -2626,19 +2620,17 @@ def get_focused_rules_for_batch(
     # DYN_4: Triangulacja Wieku i Płci oraz Grupy Niemęskoosobowe (score=88)
     age_gender_pat = re.compile(
         r"\b(?:little boy|little girl|little kid|young child|grandma|grandpa|old woman|old man|elderly|childish|baby talk|"
-        r"all-female|us girls|you girls|you ladies|both girls|kanojo-tachi|onnatachi|"
-        r"brat|shonen|baba|bba)\b",
+        r"all-female|us girls|you girls|you ladies|both girls|brat)\b",
         re.IGNORECASE,
     )
     has_f0_gender_notes = (
         bool(age_gender_pat.search(combined_en))
-        or bool(age_gender_pat.search(combined_jp))
+        or ("AGE_GENDER_JP" in jp_categories)
+        or ("FEMALE_GROUP_JP" in jp_categories)
         or any(
             item.get("is_low_pitch_female", False)
             or any(k in str(item.get("notes", "")).lower() for k in ["ochrona płci", "niski f0", "matrona", "starsza kobieta", "boraqchin", "filar cxxxvi"])
             or (str(item.get("target_gender", "")).upper() == "FEMALE" and str(item.get("addressee_number", "")).upper() == "PLURAL")
-            or "kanojo-tachi" in combined_jp
-            or "kanojotachi" in combined_jp
             for item in batch_items
         )
     )
@@ -2653,7 +2645,7 @@ def get_focused_rules_for_batch(
 
     # DYN_3: Tytulatura, Forma Rówieśnicza i Harmonia Formy Adresatywnej (score=84)
     has_honorifics_en = bool(re.search(r"\b(?:sensei|senpai|sama|shishou|dono)\b|(?:-san|-kun|-chan|-sama|-sensei|-dono)\b", combined_en, re.IGNORECASE))
-    has_honorifics_jp = bool(re.search(r"(?:-san|-kun|-chan|-sama|-sensei|-dono|先生|先輩|様|殿|師匠)", combined_jp))
+    has_honorifics_jp = "HONORIFIC_JP" in jp_categories
     has_honorifics_notes = any(
         any(k in str(item.get("notes", "")).lower() for k in ["tytulatur", "honoryfikat", "yobisute", "filar xxv", "filar xxvii", "filar clvii"])
         or any(k in str(item.get("relation_tag", "")).lower() for k in ["tytulatur", "szkoln", "rówieśnicz", "yobisute"])
@@ -2677,8 +2669,7 @@ def get_focused_rules_for_batch(
         any(w in str(it.get("prosody", "")).lower() for w in ["płacz", "drżenie", "panika", "szept", "shock", "cry", "shout", "ac=shock_drop"])
         or any(k in str(it.get("notes", "")).lower() for k in ["afekt", "krzyk", "płacz", "załamanie", "kinezjologia", "filar clxxii", "filar lxvi"])
         or bool(battle_somatic_pat.search(it.get("en", "")))
-        or "kakegoe" in str(it.get("audio_jp", "")).lower()
-        or "kakegoe" in str(it.get("en", "")).lower()
+        or ("AFFECT_JP" in jp_categories)
         for it in batch_items
     )
     if has_extreme_affect:
@@ -2696,7 +2687,7 @@ def get_focused_rules_for_batch(
         r"\N -" in it.get("en", "") or
         it.get("en", "").strip().startswith("-") or
         it.get("en", "").strip().startswith("–") or
-        bool(re.search(r"[.!?…]+[\s\"']*(?:\\N|\n)?[-–—]\s*", it.get("en", "")))
+        bool(re.search(r"""[.!?…]+[\s"']*(?:\\N|\n)?[-–—]\s*""", it.get("en", "")))
         for it in batch_items
     )
     triple_rep_pat = re.compile(r"\b([a-zA-Z]{2,})\s*[,!]\s*\1\s*[,!]\s*\1\b", re.IGNORECASE)
@@ -2728,17 +2719,13 @@ def get_focused_rules_for_batch(
         r"\b(?:miss you|missed you|miss him|miss her|tears of|shed a tear|in tears|farewell|last words|final words|loneliness|all alone|so lonely|sorrow|grief|mourning)\b",
         re.IGNORECASE
     )
-    dyn9_high_conf_pat_jp = re.compile(
-        r"\b(?:namida|sayonara|sabishii|kanashii)\b",
-        re.IGNORECASE
-    )
     dyn9_supporting_pat = re.compile(
-        r"\b(?:forgive me|sorry for everything|promise me|i promise you|my beloved|my dear|dearest|from the bottom of my heart|in my heart|in my soul|deep regret|full of regret|i regret|natsukashii|itoshii)\b",
+        r"\b(?:forgive me|sorry for everything|promise me|i promise you|my beloved|my dear|dearest|from the bottom of my heart|in my heart|in my soul|deep regret|full of regret|i regret)\b",
         re.IGNORECASE
     )
-    has_dyn9_high = bool(dyn9_high_conf_pat_en.search(combined_en)) or bool(dyn9_high_conf_pat_jp.search(combined_jp))
-    supporting_matches = dyn9_supporting_pat.findall(combined_en + " " + combined_jp)
-    has_dyn9_supporting = len(set(m.lower() for m in supporting_matches)) >= 2
+    has_dyn9_high = bool(dyn9_high_conf_pat_en.search(combined_en)) or ("LYRICAL_HIGH_JP" in jp_categories)
+    supporting_matches = dyn9_supporting_pat.findall(combined_en)
+    has_dyn9_supporting = len(set(m.lower() for m in supporting_matches)) >= 2 or ("LYRICAL_SUPPORT_JP" in jp_categories)
     has_dyn9_notes = any(
         any(k in str(it.get("notes", "")).lower() for k in ["liryka", "melancholia", "afekt liryczny", "filar xix", "filar lxxvi"])
         for it in batch_items
@@ -2769,9 +2756,7 @@ def get_focused_rules_for_batch(
     # DYN_8: Adaptacja Kulturowa, Gry Słowne, Onomatopeje i Napisy Ekranowe (score=70)
     culture_signs_pat = re.compile(
         r"\b(?:joke|joking|just kidding|wordplay|pun|riddle|irony|ironic|sarcasm|parody|"
-        r"double meaning|innuendo|teasing|hilarious|tsukkomi|boke|neta|gyagu|dajare|"
-        r"bento|onigiri|ramen|udon|soba|tempura|sushi|sake|mochi|takoyaki|okonomiyaki|kotatsu|yukata|kimono|"
-        r"giongo|gitaigo)\b",
+        r"double meaning|innuendo|teasing|hilarious)\b",
         re.IGNORECASE,
     )
     has_sign_flag = any(item.get("is_sign", False) for item in batch_items)
@@ -2780,14 +2765,13 @@ def get_focused_rules_for_batch(
         or bool(re.search(r"\b(?:title card|chapter [0-9ivx]+)\b", combined_en, re.IGNORECASE))
         or any(any(k in str(it.get("notes", "")).lower() for k in ["napis ekranowy", "plansza", "kalambur", "onomatope", "filar xli", "filar lx", "filar civ", "filar cxviii"]) for it in batch_items)
     )
-    if has_sign_flag or has_cultural_signs or bool(culture_signs_pat.search(combined_en)) or bool(culture_signs_pat.search(combined_jp)):
+    if has_sign_flag or has_cultural_signs or bool(culture_signs_pat.search(combined_en)) or ("CULTURE_JP" in jp_categories):
         focused_pillars.append(
             (70,
             "• [SKUP SIĘ NA: FILAR LXXVIII, LXXIX, LX, LXI, XLI, CIV, CV, CXVIII & CXIX - Adaptacja Kulturowa, Gry Słowne, Onomatopeje i Napisy Ekranowe]: "
             "Prawidłowym stanem przekładu humoru, gier słownych, podtekstów tabu oraz aluzji intertekstualnych jest zachowanie efektu komicznego poprzez twórczą substytucję, adaptację funkcjonalną i kompensację w naturalnej polszczyźnie przy prymacie ekwiwalencji pragmatycznej nad dosłownością. "
             "Napisy ekranowe i plansze tłumacz jako zwarte jednostki w nawiasach, a wyrazy dźwiękonaśladowcze i realia kulturowe oddawaj z zachowaniem naturalnego brzmienia sceny.")
         )
-
     # =========================================================================
     # DEDYKOWANE WERYFIKATORY DLA TESTÓW SYSTEMOWYCH TEST_SYSTEM.PY (Z16 COMPAT)
     # Wyzwalane WYŁĄCZNIE przy obecności jawnych markerów testowych!
@@ -3341,7 +3325,7 @@ def get_focused_rules_for_batch(
         )
 
     # 75. Aisatsu Filar CLI
-    if any(w in str(it.get("en", "")).lower() for it in batch_items for w in ["welcome home, master", "i'm home!"]) or any("tadaima" in str(item.get("audio_jp", "")).lower() for item in batch_items):
+    if any(w in str(it.get("en", "")).lower() for it in batch_items for w in ["welcome home, master", "i'm home!"]) or ("AISATSU_JP" in jp_categories):
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR CLI - Formuły Powitalne]: "
             "Etykietę powrotu tłumacz serdecznymi polskimi powitaniami."
@@ -3380,6 +3364,22 @@ def get_focused_rules_for_batch(
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR CLXI - Nienaruszalność Perspektywy Narracyjnej]: "
             "Proroctwa przekładaj uroczystą prozą o mitycznym zabarwieniu."
+        )
+
+    # 112. Seiyū Voice Primacy, Speech Act Taxonomy & Title Nominative Guard (Filar CLXX)
+    has_seiyu_primacy_trigger = (
+        ("SEIYU_SOVEREIGNTY_JP" in jp_categories)
+        or any(k in str(item.get("pl", "")).lower() for item in batch_items for k in ["żenada", "wróciłam"])
+        or any("master" in str(item.get("en", "")).lower() and "tonden" in str(item.get("en", "")).lower() for item in batch_items)
+        or any("filar clxx" in str(item.get("notes", "")).lower() for item in batch_items)
+    )
+    if has_seiyu_primacy_trigger:
+        focused_pillars.append(
+            (98,
+            "• [SKUP SIĘ NA: FILAR CLXX - Prymat Głosu Seiyū, Akty Mowy, Aisatsu i Tytulatura Podmiotu]: "
+            "Głos seiyū stanowi nadrzędny punkt odniesienia dla rejestru emocjonalnego i intonacji. "
+            "Akty uciszania i irytacji oddawaj naturalną polszczyzną sytuacyjną, "
+            "formuły powitalne tłumacz serdecznymi polskimi powitaniami, a tytulaturę podmiotu zachowuj w mianowniku.")
         )
 
     # Sort descending by attention priority score; Python sort is stable

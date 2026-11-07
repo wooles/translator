@@ -382,7 +382,7 @@ def load_subtitle_file_resilient(subs_file: Any) -> Any:
         return pysubs2.load(file_path)
 
     # Sanitize missing hour in ASS dialogue timestamps:
-    # e.g. "Dialogue: 0,10:10.79,10:12.79," -> "Dialogue: 0,0:10:10.79,0:10:12.79,"
+    # format: timestamp padding to 0:00:00.00
     sanitized = re.sub(r"(?m)(Dialogue:\s*\d+,)(\d{1,2}:\d{2}\.\d{2}),(\d{1,2}:\d{2}\.\d{2}),", r"\g<1>0:\2,0:\3,", raw_content)
     sanitized = re.sub(r"(?m)(Dialogue:\s*\d+,\d+:\d{2}:\d{2}\.\d{2},)(\d{1,2}:\d{2}\.\d{2}),", r"\g<1>0:\2,", sanitized)
     sanitized = re.sub(r"(?m)(Dialogue:\s*\d+,)(\d{1,2}:\d{2}\.\d{2}),", r"\g<1>0:\2,", sanitized)
@@ -1463,7 +1463,7 @@ class AVTLinter:
                     "ten", "pan", "tam", "dla", "bez", "jak", "sie", "się", "ale", "lub", "czy"
                 }):
                     continue
-                # Strip parenthetical clarifications e.g. "Tus (Miasto w Persji)" -> "Tus" (preserving bracketed signs like "[ KRONIKA ... ]")
+                # Strip parenthetical clarifications from target term (preserving bracketed signs)
                 raw_trg_clean = raw_trg.strip()
                 if raw_trg_clean.startswith("[") and raw_trg_clean.endswith("]"):
                     clean_trg = raw_trg_clean
@@ -1753,7 +1753,7 @@ class AVTLinter:
                 if any(tok in audio_jp_lower for tok in ["omae", "kimi", "kisama", "temee", "お前", "君", "貴様", "てめえ"]):
                     is_informal_ty = True
 
-            # Guard: If the line contains an explicit formal title or honorific address (e.g. "Panie Tanaka", "Pani Sato", "Panie doktorze"),
+            # Guard: If the line contains an explicit formal title or honorific address,
             # it is strictly formal and must NEVER be forced to "ty"!
             has_explicit_formal_vocative = bool(re.search(
                 r"\b(panie|pani|panno|panu|pana)\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+|doktorze|profesorze|inspektorze|prezesie|dyrektorze|kierowniku|komisarzu|mecenasie|oficerze|kapitanie|majorze|generale)\b",
@@ -1771,7 +1771,7 @@ class AVTLinter:
                     if first_w not in ["panie", "pani", "panno", "panu", "pana", "proszę", "przepraszam", "doktorze", "profesorze", "inspektorze", "zaraz", "chwila", "czekaj", "słuchaj", "patrz", "widzisz"]:
                         line_has_yobisute = True
 
-                # Also check vocative at the start of the line: e.g. "Moniko, ..." or "Anno, ..."
+                # Also check vocative at the start of the line (direct address)
                 if not line_has_yobisute:
                     start_voc_m = re.match(r"^([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]{2,})[,?!]", modified)
                     if start_voc_m:
@@ -2098,7 +2098,7 @@ class AVTLinter:
         applied_fixes.extend(num_fixes)
 
         # 6b. Title & Subtitle capitalization (Filar XLI & LX)
-        # In episode titles (e.g. "Odcinek 12\Nniezmienny step" -> "Odcinek 12\NNiezmienny step")
+        # In episode titles with lowercase second line
         # and signs, ensure title lines start with a capital letter.
         if is_sign or re.search(r"\b(?:Odcinek|Rozdział)\s+\d+\b", modified, re.IGNORECASE):
             def _cap_title_line(m):
@@ -5134,7 +5134,7 @@ GENITIVE_GOVERNING_VERBS_PATTERN = (
 def preserve_declension_casing(matched_text: str, target_form: str) -> str:
     """
     Preserves proper title/multi-word casing when replacing inflected forms.
-    Avoids Python's .capitalize() defect which lower-cases subsequent words (e.g. 'Księgi Magii' -> 'Księgi magii').
+    Avoids Python's .capitalize() defect which lower-cases subsequent words in multi-word titles.
     """
     if not target_form:
         return target_form
@@ -5535,7 +5535,7 @@ def enhanced_fix_undecorated_male_names(
         if not decl or decl.get("M") != name:
             continue
 
-        # 1. Genitive check: "dla Ray" -> "dla Raya"
+        # 1. Genitive check: "dla <POSTAC_1>"
         result = re.sub(
             rf"\b({gen_preps})\s+{re.escape(name)}\b",
             lambda m, c=decl.get("D", name): f"{m.group(1)} {c}",
@@ -5543,7 +5543,7 @@ def enhanced_fix_undecorated_male_names(
             flags=re.IGNORECASE
         )
 
-        # 2. Dative check: "ku Ray" -> "ku Rayowi", "dałem to Ray" -> "dałem to Rayowi"
+        # 2. Dative check: "ku <POSTAC_1>", "dałem to <POSTAC_1>"
         result = re.sub(
             rf"\b({dat_preps}(?:\s+[a-ząćęłńóśźż]+)?)\s+{re.escape(name)}\b",
             lambda m, c=decl.get("C", name): f"{m.group(1)} {c}",
@@ -5551,7 +5551,7 @@ def enhanced_fix_undecorated_male_names(
             flags=re.IGNORECASE
         )
 
-        # 3. Instrumental check: "z Ren" -> "z Renem", "przed Ray" -> "przed Rayem"
+        # 3. Instrumental check: "z <POSTAC_2>", "przed <POSTAC_1>"
         def _ins_repl(m: Any, n: str = name, c_inst: str = decl.get("N", name)) -> str:
             prep = m.group(1)
             prep_lower = prep.lower()
@@ -7413,7 +7413,7 @@ class EpisodeQualityGate:
                     rule["re_intro_voc"] = re.compile(rf"((?:^|[^\w]|\\[Nnh])(?:[Hh]ej|[Ee]j|[Aa]\s+więc|[Aa]\s+zatem|[Ss]łuchaj|[Pp]atrz|[Ss]pójrz|[Dd]obra|[Aa]le|[Nn]o)\s*,\s*)({re.escape(m_form)})\s*([,\.!\?…]+|\s*\\N|$)", re.IGNORECASE)
                     rule["re_lead_voc"] = re.compile(rf"(^|\\[Nnh])({re.escape(m_form)})\s*,\s*(?=[a-ząćęłńóśźż]*(?:aj|ajcie|yj|yjcie|ij|ijcie|my|myśl|zrób|patrz|słuchaj|uważaj|chodź|czekaj|stój|pospiesz|szybciej|nie\s+|daj|powiedz)\b)", re.IGNORECASE)
 
-                # Check for indeclinable female names ending in consonant (e.g. Khulan, Carmen, Ines)
+                # Check for indeclinable female names ending in consonant
                 char_gender = char_gender_map.get(c_name.lower()) or char_gender_map.get(m_form.lower()) or c_decl.get("gender")
                 is_fem = char_gender and any(w in str(char_gender).lower() for w in ["female", "kobieta", "żeński", "girl"])
                 if is_fem and not m_form.lower().endswith("a"):
@@ -7495,7 +7495,7 @@ class EpisodeQualityGate:
                     if r_addr:
                         r_lower = str(r_addr).lower()
                         if s_gender == "FEMALE" and any(w in r_lower for w in ["mężczyzna", "male", "chłopak"]):
-                            # Check if male addressee was derived from an audited contaminated tag (e.g. 'Actor (Mężczyzna)')
+                            # Check if male addressee was derived from an audited contaminated actor tag
                             cand_addr_name = re.sub(r"\s*\(.*?\)", "", str(r_addr)).strip()
                             is_cont_addr = False
                             if series_bible and hasattr(series_bible, "audit_speaker_metadata_against_audio") and cand_addr_name:
@@ -8407,7 +8407,7 @@ class EpisodeQualityGate:
                 if character_registry:
                     known_stems.update({k.lower() for k in list(character_registry.keys())})
 
-                # Case 1: Title + Surname + Given Name + Verb (e.g. 'Mistrz Tondena minoru\Nnie zdążył' -> 'Mistrz Tonden Minoru\Nnie zdążył')
+                # Case 1: Title + Surname + Given Name + Verb with line break
                 def _fix_nominative_two_part_title_apposition(m):
                     prefix = m.group(1)
                     title = m.group(2)
@@ -8455,7 +8455,7 @@ class EpisodeQualityGate:
                         fixes.append(f"[Episode Quality Gate - Filar CLVII/CLXX] Linia #{i+1}: skorygowano skażenie mianownika tytulatury '{title} {name_stem}a' -> '{title} {name_stem}'")
                         return f"{prefix}{title}{sep1}{name_stem}{sep2}{verb}"
                     
-                    # Name is invariant (e.g. Luca, Joshua, Sasha, Vegeta, Kiba, Katsura, Asura)
+                    # Name is invariant (foreign or anime name with invariant declension)
                     return m.group(0)
 
                 ev.text = re.sub(
@@ -9060,10 +9060,10 @@ class EpisodeQualityGate:
                         clause_prefix_match = re.search(r"[^\.,!\?;—–-]+$", prefix)
                         clause_prefix = clause_prefix_match.group(0) if clause_prefix_match else prefix
 
-                        # Shield 1: Prepositional object guard (e.g. "poszedł do Yui", "wiadomość od Shira")
+                        # Shield 1: Prepositional object guard (e.g. "poszedł do <POSTAC_F>", "wiadomość od <POSTAC_F>")
                         if re.search(prep_pattern, clause_prefix, re.IGNORECASE):
                             continue
-                        # Shield 2: Possessive attribute guard (e.g. "ojciec Yui", "matka Shira")
+                        # Shield 2: Possessive attribute guard (e.g. "ojciec <POSTAC_F>", "matka <POSTAC_F>")
                         if re.search(possessive_headwords_pattern, clause_prefix, re.IGNORECASE):
                             continue
 
@@ -9124,17 +9124,17 @@ class EpisodeQualityGate:
                         if clause_match:
                             clause_text = clause_match.group(0)
 
-                            # Shield 1: Direct Preposition Shield (e.g. "poszedł do Yui", "od Shira")
+                            # Shield 1: Direct Preposition Shield (e.g. "poszedł do <POSTAC_F>", "od <POSTAC_F>")
                             if re.search(prep_pattern, clause_text, re.IGNORECASE):
                                 continue
-                            # Shield 2: Possessive Headword Shield (e.g. "ojciec Yui", "matka Shira")
+                            # Shield 2: Possessive Headword Shield (e.g. "ojciec <POSTAC_F>", "matka <POSTAC_F>")
                             if re.search(possessive_headwords_pattern, clause_text, re.IGNORECASE):
                                 continue
 
                             tokens = list(re.finditer(r"\b[A-Za-ząćęłńóśźż]+\b", clause_text))
                             for tok in reversed(tokens[-4:]):  # check backwards within last 4 words in clause
                                 between_text = clause_text[tok.end():]
-                                # Shield 3: Preposition between verb and Name (e.g. "poszedł do ... Yui", "rozmawiał z ... Shirą")
+                                # Shield 3: Preposition between verb and Name (e.g. "poszedł do ... <POSTAC_F>", "rozmawiał z ... <POSTAC_F>")
                                 if re.search(any_prep_pattern, between_text, re.IGNORECASE):
                                     continue
 
@@ -10067,7 +10067,7 @@ class EpisodeQualityGate:
 
                         return t
 
-                    # Check for split addressees in the line (e.g. Elena, ... Marku, ...)
+                    # Check for split addressees in the line with vocatives
                     has_female_voc = bool(re.search(r"\b(dziewczyno|kobieto|panienko|siostro|mamo)\b", clean_ev_text, re.IGNORECASE))
                     has_male_voc = bool(re.search(r"\b(chłopcze|młodzieńcze|bracie|ojcze|tato)\b", clean_ev_text, re.IGNORECASE))
                     found_female_names = []
@@ -10829,7 +10829,7 @@ class EpisodeQualityGate:
                         fixes.append(f"[Episode Quality Gate - Jednolitość Wołacza] Linia #{i+1}: ujednolicono formę wołacza na '{dom_voc}' (dominująca konwencja w odcinku)")
 
             # 3d3. COORDINATED ACCUSATIVE PROPAGATION (Filar XCI / PWN Norm: Biernik po 'i' / 'oraz')
-            # e.g. "Minamiego i Harugon" -> "Minamiego i Harugona"
+            # Coordinate accusative coordination in name series
             if not is_sign and compiled_decl_rules:
                 for r in compiled_decl_rules:
                     if "b_form" in r:
@@ -10895,7 +10895,7 @@ class EpisodeQualityGate:
                         full_match = m.group(0)
                         suffix = full_match.split("-")[-1].lower()
 
-                        # 1. Check if SeriesBible has registered hypocorism (e.g. 'Ren' -> 'Renko')
+                        # 1. Check if SeriesBible has registered hypocorism
                         if series_bible and hasattr(series_bible, "resolve_canonical_name"):
                             canon = series_bible.resolve_canonical_name(raw_stem)
                             if canon and canon.lower() != raw_stem.lower():
@@ -11176,7 +11176,7 @@ class EpisodeQualityGate:
                         if ev.text != old_t:
                             fixes.append(f"[Episode Quality Gate - Glosariusz Serii] Linia #{i+1}: '{g_src}' -> '{clean_trg}'")
 
-            # Titular Vocative resolution driven by series glossary (e.g. 'Potworny Królewicz' -> 'królewiczu!')
+            # Titular Vocative resolution driven by series glossary
             if series_bible and hasattr(series_bible, "data") and not is_sign:
                 gloss = series_bible.data.get("glossary", {})
                 if any("królewicz" in str(v).lower() for v in gloss.values()):
@@ -11358,7 +11358,7 @@ class EpisodeQualityGate:
             ev.text = re.sub(r"([A-Za-ząćęłńóśźż])!,[ \t]*", r"\1, ", ev.text)
             if ev.text != old_punc_t and not any(f"{line_lbl}:" in f or f"Linia #{i+1}:" in f for f in fixes):
                 fixes.append(f"[Episode Quality Gate - Higiena Interpunkcji] {line_lbl}: zlikwidowano kolizję interpunkcyjną '!,'")
-        # Clean accidental double dots (e.g. "To prawda..") -> "To prawda..." (excluding intentional AVT ?.. and !..)
+        # Clean accidental double dots -> ellipsis (excluding intentional AVT ?.. and !..)
         ev.text = re.sub(r"(?<![\.\?!])\.\.(?!\.)", "...", ev.text)
         # Normalize non-normative ellipsis clusters: normative 3-dot ellipsis after ? and ! (Sekcja 2 pkt 2)
         ev.text = re.sub(r"\?\.{2}(?!\.)", "?...", ev.text)
@@ -11396,7 +11396,7 @@ class EpisodeQualityGate:
             ev.text = re.sub(r"\b([A-Za-ząćęłńóśźż0-9\-]+),\s+czy\s+(bez|nie|tak)\b", _strip_alt_comma, ev.text)
             if ev.text != old_t:
                 fixes.append(f"[Episode Quality Gate - Filar LX Interpunkcja] {line_lbl}: usunięto zbędny przecinek przed 'czy' w alternatywie rozłącznej")
-        # Replace trailing cut-off speech glued en-dash (e.g. "Rin–") with ellipsis "Rin..." (Filar LX)
+        # Replace trailing cut-off speech glued en-dash with ellipsis (Filar LX)
         if re.search(r"([A-Za-ząćęłńóśźż])–(?=\s*\\N|\s*$|[!\?…])", ev.text):
             ev.text = re.sub(r"([A-Za-ząćęłńóśźż])–(?=\s*\\N|\s*$|[!\?…])", r"\1...", ev.text)
             fixes.append(f"[Episode Quality Gate - Filar LX Interpunkcja] Linia #{i+1}: zamieniono przyklejony myślnik urwanej mowy na wielokropek")

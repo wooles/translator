@@ -37,7 +37,7 @@
         "fem_gen_pl": "wiedunek",
         "fem_ins_pl": "wiedunkami"
       },
-      "instruction": "Kategoryczny zakaz 'czarodziej'/'mag' - w uniwersum Clevatess używaj wyłącznie form słowa 'wiedun' ('wieduni', 'wiedunka', 'wiedunów')."
+      "instruction": "W uniwersum Clevatess zamiast 'czarodziej'/'mag' używaj form słowa 'wiedun' ('wieduni', 'wiedunka', 'wiedunów')."
     },
     "dark_beasts": {
       "en": [
@@ -53,7 +53,7 @@
         "gen_pl": "magicznych bestii",
         "ins_pl": "magicznymi bestiami"
       },
-      "instruction": "Zakaz kalki 'mroczne bestie' - kanoniczne tłumaczenie to 'magiczne bestie'."
+      "instruction": "Kanon przekładu: 'magiczne bestie' zamiast kalki 'mroczne bestie'."
     },
     "four_lords": {
       "en": [

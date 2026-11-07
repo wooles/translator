@@ -15,7 +15,7 @@ na rzecz ultrazwięzłej metadanej SSOT oraz zapewniając deterministyczny bezpi
 """
 
 from dataclasses import dataclass
-from typing import Optional, Dict, Any, List, Tuple
+from typing import Optional, Dict, Any, List, Tuple, Set
 import re
 
 
@@ -662,3 +662,126 @@ class WhisperDisambiguator:
                 elif lp > -0.3:
                     return "HIGH"
         return "NORMAL"
+
+    @classmethod
+    def detect_batch_discourse_categories(cls, combined_en: str, combined_jp: str) -> Set[str]:
+        """
+        N-05: Ekstrahuje kategorie dyskursu z tekstu japońskiego (i mieszanego)
+        dla modułu reguł dynamicznych rules.py bez naruszania Z1/Z4 w rules.py.
+        Zwraca neutralne znaczniki kategorii:
+        - "DIALECT_JP"
+        - "ARCHAIC_JP"
+        - "AGE_GENDER_JP"
+        - "FEMALE_GROUP_JP"
+        - "HONORIFIC_JP"
+        - "AFFECT_JP"
+        - "LYRICAL_HIGH_JP"
+        - "LYRICAL_SUPPORT_JP"
+        - "LYRICAL_JP"
+        - "CULTURE_JP"
+        - "AISATSU_JP"
+        - "SEIYU_SOVEREIGNTY_JP"
+        """
+        categories: Set[str] = set()
+        en_lower = (combined_en or "").lower()
+        jp_lower = (combined_jp or "").lower()
+        full_text = f"{en_lower} {jp_lower}"
+
+        # 1. DIALECT_JP (Dialekty, gwary, sociolekty)
+        jp_dialect_pat = re.compile(
+            r"\b(?:ya|yan|yade|yaro|nen|seya|akan|honma|dappe|dabe|ora|washi|atai|wai|wagahai|jaken|koraa|suitoo|nankurunaisa|haisai|namara|shibareru|べ|だべ|じゃけん|やん|やde|yaro|ねん|せや|あかん|ほんま|おら|わし|あたい|わい|吾輩)\b",
+            re.IGNORECASE
+        )
+        character_suffix_pat = re.compile(
+            r"(?:^|[\s\-])(?:dechu|nyan|pyon|zura|gero|dabe)\b",
+            re.IGNORECASE
+        )
+        jp_dialect_tokens = ["べ", "だべ", "じゃけん", "やん", "やde", "やろ", "ねん", "せや", "あかん", "ほんま", "おら", "わし", "あたい", "わい", "吾輩"]
+        if (
+            jp_dialect_pat.search(jp_lower)
+            or jp_dialect_pat.search(en_lower)
+            or any(tok in jp_lower for tok in jp_dialect_tokens)
+            or character_suffix_pat.search(jp_lower)
+            or character_suffix_pat.search(en_lower)
+        ):
+            categories.add("DIALECT_JP")
+
+        # 2. ARCHAIC_JP (Archaizacja, etykieta dworska)
+        jp_archaic_pat = re.compile(
+            r"\b(?:sessha|ojou|chichi-ue|haha-ue|gozaimasu|de gozaru)\b",
+            re.IGNORECASE
+        )
+        jp_archaic_tokens = ["拙者", "お嬢", "父上", "母上", "ござる", "ございます"]
+        if (
+            jp_archaic_pat.search(jp_lower)
+            or jp_archaic_pat.search(en_lower)
+            or any(tok in jp_lower for tok in jp_archaic_tokens)
+        ):
+            categories.add("ARCHAIC_JP")
+
+        # 3. AGE_GENDER_JP & FEMALE_GROUP_JP
+        jp_age_gender_pat = re.compile(
+            r"\b(?:kanojo-tachi|kanojotachi|onnatachi|shonen|baba|bba)\b",
+            re.IGNORECASE
+        )
+        jp_age_gender_tokens = ["彼女たち", "彼女達", "女たち", "女達", "少年", "ばばあ", "ババア"]
+        if (
+            jp_age_gender_pat.search(jp_lower)
+            or jp_age_gender_pat.search(en_lower)
+            or any(tok in jp_lower for tok in jp_age_gender_tokens)
+        ):
+            categories.add("AGE_GENDER_JP")
+            if any(k in full_text for k in ["kanojo-tachi", "kanojotachi", "onnatachi", "彼女たち", "彼女達", "女たち", "女達"]):
+                categories.add("FEMALE_GROUP_JP")
+
+        # 4. HONORIFIC_JP (Tytulatura i honoryfikatory)
+        jp_honorifics_pat = re.compile(
+            r"(?:-san|-kun|-chan|-sama|-sensei|-dono|先生|先輩|様|殿|師匠)",
+            re.IGNORECASE
+        )
+        if jp_honorifics_pat.search(jp_lower) or jp_honorifics_pat.search(en_lower):
+            categories.add("HONORIFIC_JP")
+
+        # 5. AFFECT_JP (Kakegoe, ekspresja afektywna)
+        if "kakegoe" in full_text:
+            categories.add("AFFECT_JP")
+
+        # 6. LYRICAL_JP (Liryka emocjonalna, melancholia)
+        dyn9_high_pat = re.compile(
+            r"\b(?:namida|sayonara|sabishii|kanashii)\b",
+            re.IGNORECASE
+        )
+        dyn9_support_pat = re.compile(
+            r"\b(?:natsukashii|itoshii)\b",
+            re.IGNORECASE
+        )
+        if dyn9_high_pat.search(full_text) or any(tok in jp_lower for tok in ["涙", "さようなら", "さよなら", "寂しい", "悲しい"]):
+            categories.add("LYRICAL_HIGH_JP")
+            categories.add("LYRICAL_JP")
+        if dyn9_support_pat.search(full_text) or any(tok in jp_lower for tok in ["懐かしい", "愛しい"]):
+            categories.add("LYRICAL_SUPPORT_JP")
+            categories.add("LYRICAL_JP")
+
+        # 7. CULTURE_JP (Realia kulturowe, humor, kalambury)
+        jp_culture_pat = re.compile(
+            r"\b(?:tsukkomi|boke|neta|gyagu|dajare|bento|onigiri|ramen|udon|soba|tempura|sushi|sake|mochi|takoyaki|okonomiyaki|kotatsu|yukata|kimono|giongo|gitaigo)\b",
+            re.IGNORECASE
+        )
+        jp_culture_tokens = ["ツッコミ", "ボケ", "ネタ", "ギャグ", "駄洒落", "弁当", "おにぎり", "ラーメン", "うどん", "そば", "天ぷら", "寿司", "酒", "餅", "たこ焼き", "お好み焼き", "こたつ", "浴衣", "着物"]
+        if jp_culture_pat.search(full_text) or any(tok in jp_lower for tok in jp_culture_tokens):
+            categories.add("CULTURE_JP")
+
+        # 8. AISATSU_JP
+        if "tadaima" in full_text or "ただいま" in jp_lower:
+            categories.add("AISATSU_JP")
+
+        # 9. SEIYU_SOVEREIGNTY_JP
+        jp_seiyu_pat = re.compile(
+            r"\b(?:urusai|urusee|ussee|damare|tadaima)\b",
+            re.IGNORECASE
+        )
+        jp_seiyu_tokens = ["うるさい", "うるせえ", "うっせえ", "黙れ", "ただいま"]
+        if jp_seiyu_pat.search(full_text) or any(tok in jp_lower for tok in jp_seiyu_tokens):
+            categories.add("SEIYU_SOVEREIGNTY_JP")
+
+        return categories

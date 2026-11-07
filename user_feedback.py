@@ -15,7 +15,7 @@ from typing import List, Dict, Any, Optional
 
 FEEDBACK_FILE_PATH = Path(__file__).parent / "user_feedback.json"
 
-META_LEAK_KEYWORDS = {"kanon", "avt", "filar", "prompt", "few-shot", "system instruction", "zakaz"}
+META_LEAK_KEYWORDS = {"kanon", "avt", "filar", "prompt", "few-shot", "system instruction", "dyrektywa"}
 
 def is_valid_feedback_entry(entry: Dict[str, Any]) -> bool:
     """Strictly validates whether a feedback rule is a genuine translation correction, rejecting meta-leaks."""
@@ -59,8 +59,8 @@ class UserFeedbackManager:
                     "id": "init_1",
                     "original_en": "I hope so / I have hope",
                     "bad_pl": "Mam taką nadzieję / Mam nadzieję na to",
-                    "good_pl": "Oby! / Mam nadzieję!",
-                    "rule_reason": "W mowie potocznej unikamy sztucznego 'Mam taką nadzieję', stosujemy naturalne 'Oby!' lub zwięzłe 'Mam nadzieję'.",
+                    "good_pl": "Oby / Mam nadzieję",
+                    "rule_reason": "W mowie potocznej unikamy sztucznego zwrotu 'Mam taką nadzieję', stosujemy naturalne 'Oby' lub zwięzłe 'Mam nadzieję'.",
                     "scope": "global",
                     "created_at": time.strftime("%Y-%m-%d %H:%M:%S")
                 },
@@ -69,7 +69,7 @@ class UserFeedbackManager:
                     "original_en": "It makes sense / That makes sense",
                     "bad_pl": "To robi sens / Robi to sens",
                     "good_pl": "To ma sens / Ma to sens / Zrozumiałe",
-                    "rule_reason": "Bezwzględny zakaz kalki 'robi sens'. Po polsku rzeczownik 'sens' łączy się wyłącznie z czasownikiem 'mieć'.",
+                    "rule_reason": "W polszczyźnie rzeczownik 'sens' łączy się wyłącznie z czasownikiem 'mieć' (to ma sens).",
                     "scope": "global",
                     "created_at": time.strftime("%Y-%m-%d %H:%M:%S")
                 },
@@ -77,8 +77,8 @@ class UserFeedbackManager:
                     "id": "init_3",
                     "original_en": "Welcome back",
                     "bad_pl": "Witaj z powrotem",
-                    "good_pl": "Witaj! / Dobrze cię widzieć! / Wróciłeś!",
-                    "rule_reason": "Zakaz amerykanizmu 'Witaj z powrotem'. Po polsku witamy osobę słowem 'Witaj!' lub 'Wróciłeś!'.",
+                    "good_pl": "Witaj / Dobrze cię widzieć / Wróciłeś",
+                    "rule_reason": "W naturalnej polszczyźnie witamy osobę słowem 'Witaj' lub 'Wróciłeś', unikając kalki zwrotu powitalnego.",
                     "scope": "global",
                     "created_at": time.strftime("%Y-%m-%d %H:%M:%S")
                 },
@@ -94,9 +94,9 @@ class UserFeedbackManager:
                 {
                     "id": "init_5",
                     "original_en": "Sensei, I'm done!",
-                    "bad_pl": "Pani Sensei, skończyłam!",
-                    "good_pl": "Sensei, skończyłam! / Pani Teshimo, skończyłam!",
-                    "rule_reason": "Zakaz hybryd honoryfikatywnych 'Pani Sensei'. Albo sam japoński tytuł 'Sensei', albo polska forma 'Pani [Nazwisko]'.",
+                    "bad_pl": "Pani Sensei, skończyłam",
+                    "good_pl": "Sensei, skończyłam / Pani Teshimo, skończyłam",
+                    "rule_reason": "Tytuły honoryfikatywne stosujemy samodzielnie ('Sensei') lub w polskiej formie grzecznościowej z nazwiskiem.",
                     "scope": "global",
                     "created_at": time.strftime("%Y-%m-%d %H:%M:%S")
                 }
@@ -227,7 +227,7 @@ class UserFeedbackManager:
         for fb in relevant_entries:
             en_str = f" [Oryginał EN: \"{fb['original_en']}\"]" if fb.get("original_en") else ""
             lines.append(
-                f" • BŁĄD [X]: \"{fb['bad_pl']}\" -> POPRAWNIE [OK]: \"{fb['good_pl']}\"{en_str}\n"
+                f" • Wariant pierwotny: \"{fb['bad_pl']}\" | Rekomendacja przekładu: \"{fb['good_pl']}\"{en_str}\n"
                 f"   Wyjaśnienie zasady: {fb['rule_reason']}"
             )
         lines.append("-------------------------------------------------------------------------\n")

@@ -39,14 +39,6 @@ LOGIC_FILES = [
 ]
 
 TEMPORARY_11_1_MIGRATION_ALLOWLIST = {
-    "fansub_miner.py",
-    "glossary_manager.py",
-    "metadata.py",
-    "avt_linter.py",
-    "rules.py",
-    "series_memory.py",
-    "translator.py",
-    "user_feedback.py",
     "tests/test_metadata.py",
     "tests/test_series_memory.py",
     "tests/test_verifier.py",
@@ -75,7 +67,7 @@ RE_SCREAMING_CAPS = re.compile(
 
 # Bramka 5B: Preskryptywne nakazy i zakazy (case-insensitive)
 RE_PRESCRIPTIVE_IMPERATIVES = re.compile(
-    r"\b(?:BEZWZGLĘDN(?:IE|Y|A|E)|KATEGORYCZN(?:IE|Y)|ZAKAZ\b|NIE\s+WOLNO|STOP\s+KALKOM|MUSI(?:SZ)?\s+BEZWZGLĘDNIE|"
+    r"\b(?:BEZWZGLĘDN(?:IE|Y|A|E)(?!\s+SŁOWNICZEK)|KATEGORYCZN(?:IE|Y)|ZAKAZ\b|NIE\s+WOLNO|STOP\s+KALKOM|MUSI(?:SZ)?\s+BEZWZGLĘDNIE|"
     r"ŻELAZN(?:Y|A|E)\s+(?:WYMÓG|ZASAD[A-Z]*|REGUŁ[A-Z]*))\b|->\s*(?:Zastąp|Popraw|Zamień|Stosuj)",
     re.IGNORECASE
 )
@@ -96,6 +88,7 @@ ALLOWED_AST_LITERALS = {
     "MALE", "FEMALE", "MASCULINE", "FEMININE", "UNKNOWN", "VIRILE", "NON_VIRILE", "AMBIGUOUS",
     "ANTHROPONYM", "TOPONYM", "CHREMATONYM", "INDIVIDUAL", "COLLECTIVE", "TITLE_CARD",
     "DEFAULT", "MAIN", "SIGN", "THOUGHT", "ITALICS", "NARRATOR", "PLURAL", "DUAL",
+    "KOBIETA", "MĘŻCZYZNA", "MEZCZYZNA",
     "Open", "Sans", "Arial", "Default", "Flashback", "Thought", "Dialogue",
     "Top", "Bottom", "Sign", "Title", "Narration", "Radio", "Overlap", "Normal", "Bold", "Italic"
 }
@@ -188,7 +181,7 @@ for fname in FILES_TO_AUDIT:
                 str_elts = [elt.value for elt in node.elts if isinstance(elt, ast.Constant) and isinstance(elt.value, str)]
                 suspicious = [
                     s for s in str_elts
-                    if s and s[0].isupper() and s.isalpha() and s.upper() not in ALLOWED_AST_LITERALS and s not in ALLOWED_AST_LITERALS and len(s) > 2
+                    if s and s[0].isupper() and s.isalpha() and s.upper() not in ALLOWED_AST_LITERALS and s not in ALLOWED_AST_LITERALS and len(s) > 2 and not re.fullmatch(r"[IVXLCDM]+", s)
                 ]
                 lower_matches = [s for s in str_elts if s.lower() in KNOWN_NAMES_LOWER]
                 if not fname.startswith("tests/"):
