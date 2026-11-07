@@ -12,6 +12,13 @@ from pathlib import Path
 from typing import Optional, Dict, Any, List, Union, Tuple
 
 _ANILIST_DISABLED: bool = False
+_ANILIST_CONSECUTIVE_FAILURES: int = 0
+
+def reset_anilist_circuit_breaker() -> None:
+    """Resets AniList consecutive failure counter and circuit breaker state."""
+    global _ANILIST_DISABLED, _ANILIST_CONSECUTIVE_FAILURES
+    _ANILIST_DISABLED = False
+    _ANILIST_CONSECUTIVE_FAILURES = 0
 
 def normalize_ascii_diacritics(text: str) -> str:
     """
@@ -257,7 +264,7 @@ def strip_season_suffix(title: str) -> Optional[str]:
 
 def _raw_fetch_anilist_metadata(title: str) -> Optional[Dict[str, Any]]:
     """Internal helper to execute AniList GraphQL query for a specific title string."""
-    global _ANILIST_DISABLED
+    global _ANILIST_DISABLED, _ANILIST_CONSECUTIVE_FAILURES
     if _ANILIST_DISABLED:
         return None
     query = """
@@ -416,9 +423,11 @@ def _raw_fetch_anilist_metadata(title: str) -> Optional[Dict[str, Any]]:
                 "description": desc_clean,
                 "characters": characters
             }
+            _ANILIST_CONSECUTIVE_FAILURES = 0
     except Exception as e:
         err_str = str(e).lower()
-        if "403" in err_str or "disabled" in err_str or "stability" in err_str or "forbidden" in err_str:
+        _ANILIST_CONSECUTIVE_FAILURES += 1
+        if _ANILIST_CONSECUTIVE_FAILURES >= 3 or "403" in err_str or "disabled" in err_str or "stability" in err_str or "forbidden" in err_str:
             _ANILIST_DISABLED = True
         return None
 
@@ -533,6 +542,7 @@ def get_anime_context(filename_or_path: str, client: Any = None) -> Optional[Dic
     Prioritizes local Series Bible (Offline-First / Zero Cost), then AniList GraphQL API,
     and finally Gemini parametric knowledge fallback using the highest Flash model.
     """
+    reset_anilist_circuit_breaker()
     clean_title = clean_anime_filename(filename_or_path)
     if not clean_title or len(clean_title) < 2:
         return None

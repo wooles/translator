@@ -521,9 +521,9 @@ class WhisperDisambiguator:
         if tag.addressee_number == "SINGULAR":
             if tag.addressee_age_class == "CHILD":
                 if tag.addressee_gender == "FEMALE":
-                    parts.append("Odbiorca: Mała Dziewczynka (Formy: -łaś / Eliminacja 'Pani' / Rejestr: Ty, opiekuńczy)")
+                    parts.append("Odbiorca: Mała Dziewczynka (Rejestr: Ty, opiekuńczy)")
                 else:
-                    parts.append("Odbiorca: Mały Chłopiec (Formy: -łeś / Eliminacja 'Pan' / Rejestr: Ty, opiekuńczy)")
+                    parts.append("Odbiorca: Mały Chłopiec (Rejestr: Ty, opiekuńczy)")
             elif tag.addressee_gender == "MALE":
                 parts.append("Odbiorca: Mężczyzna (-łeś/ci)")
             elif tag.addressee_gender == "FEMALE":
@@ -563,7 +563,7 @@ class WhisperDisambiguator:
             parts.append("Kierunek: Dla kogoś (ageru)")
 
         if getattr(tag, "pragmatic_attitude", None) == "HOSTILE":
-            parts.append("Dystans: Skrajnie wrogi/Konfrontacyjny (Kisama/Temee) -> oddaj pogardę i agresję!")
+            parts.append("Dystans: Skrajnie wrogi/Konfrontacyjny (Kisama/Temee)")
         elif tag.social_register == "FORMAL_PAN":
             parts.append("Dystans: Formalny (Pan/Pani)")
         elif tag.social_register == "INFORMAL_TY":

@@ -2168,6 +2168,14 @@ def resolve_scene_participants(
     if not items:
         return items
 
+    # Standard 11.1 (LUKA-E7-02): pobranie migawki postaci raz przed pętlą (brak deepcopy w pętli)
+    chars_snapshot = None
+    if series_bible and hasattr(series_bible, "get_characters_snapshot"):
+        try:
+            chars_snapshot = series_bible.get_characters_snapshot()
+        except Exception:
+            chars_snapshot = None
+
     sorted_indices = sorted(range(len(items)), key=lambda i: getattr(items[i], "start", 0))
 
     for idx_pos, curr_idx in enumerate(sorted_indices):
@@ -2652,6 +2660,30 @@ def resolve_turn_addressee(
             setattr(ev, "scene_has_male_participant", turn.scene_has_male_participant)
             setattr(ev, "plural_group_gender", turn.plural_group_gender)
             setattr(ev, "you_group_gender", turn.you_group_gender)
+    else:
+        # Standard 11.1 (LUKA-E7-01): propagacja metadanych ze specyficznego sub_turn na jego zdarzenia
+        for sub in turn.sub_turns:
+            sub_spk = getattr(sub, "target_speaker", None) or turn.target_speaker
+            sub_gender = getattr(sub, "target_gender", None) or turn.target_gender
+            sub_conf = getattr(sub, "target_confidence", None) or turn.target_confidence
+            sub_addr_num = getattr(sub, "addressee_number", None) or turn.addressee_number
+            sub_is_pl = getattr(sub, "is_plural", None) if getattr(sub, "is_plural", None) is not None else turn.is_plural
+            sub_voc = getattr(sub, "vocative_lock", None) if getattr(sub, "vocative_lock", None) is not None else turn.vocative_lock
+
+            for ev in getattr(sub, "events", []):
+                setattr(ev, "target_speaker", sub_spk)
+                setattr(ev, "target_actor", sub_spk)
+                setattr(ev, "target_gender", sub_gender)
+                setattr(ev, "target_confidence", sub_conf)
+                setattr(ev, "addressee_number", sub_addr_num)
+                setattr(ev, "is_plural", sub_is_pl)
+                setattr(ev, "vocative_lock", sub_voc)
+                setattr(ev, "speaker_turn", turn)
+                setattr(ev, "sub_turn", sub)
+                setattr(ev, "scene_participants", turn.scene_participants)
+                setattr(ev, "scene_has_male_participant", turn.scene_has_male_participant)
+                setattr(ev, "plural_group_gender", turn.plural_group_gender)
+                setattr(ev, "you_group_gender", turn.you_group_gender)
 
     return turn
 

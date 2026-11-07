@@ -3670,7 +3670,12 @@ class MultimodalTranslator:
                     "is_thought": is_th
                 })
         elif history:
-            lookback_history = list(history[-4:])
+            if hasattr(self, "lock"):
+                with self.lock:
+                    history_snapshot = list(history)
+            else:
+                history_snapshot = list(history)
+            lookback_history = list(history_snapshot[-4:])
 
         # 2. Extract 3-4 intelligent key video frames for the batch (Storyboard & Visual OCR)
         temp_frames: List[str] = []
@@ -3792,10 +3797,10 @@ class MultimodalTranslator:
                             initial_prompt=initial_prompt_str
                         )
                         # Standard 9.5 (Operacja 2C.3, R3.5): Pętla sanityzacji i deduplikacji czasowej ASR w Kroku 4
-                        if not hasattr(self, "_asr_last_seen_end_sec") or self._asr_last_seen_end_sec is None:
-                            self._asr_last_seen_end_sec = {}
-                            self._asr_last_text = ""
-                            self._asr_consecutive_streak = 0
+                        # Standard 11.1 (LUKA-E3-01): Lokalny stan deduplikacji ASR w obrębie paczki (brak wyścigu wątków)
+                        local_asr_last_seen_end_sec: Dict[str, float] = {}
+                        local_asr_last_text = ""
+                        local_asr_consecutive_streak = 0
 
                         for b_id, ev in events_tuples:
                             if getattr(ev, "is_sign", False) or str(getattr(ev, "style", "")).lower() in ("sign", "signs", "napis", "napisy") or is_sign_entity(getattr(ev, "name", "")):
@@ -3815,19 +3820,19 @@ class MultimodalTranslator:
                             norm_jp = re.sub(r"\s+", "", norm_jp)
 
                             if norm_jp:
-                                if norm_jp == self._asr_last_text:
-                                    self._asr_consecutive_streak += 1
+                                if norm_jp == local_asr_last_text:
+                                    local_asr_consecutive_streak += 1
                                 else:
-                                    self._asr_last_text = norm_jp
-                                    self._asr_consecutive_streak = 1
+                                    local_asr_last_text = norm_jp
+                                    local_asr_consecutive_streak = 1
 
-                                last_end = self._asr_last_seen_end_sec.get(norm_jp)
+                                last_end = local_asr_last_seen_end_sec.get(norm_jp)
                                 if last_end is not None and (cur_start_sec - last_end) > 1.5:
                                     san_txt = ""
-                                elif self._asr_consecutive_streak > 2:
+                                elif local_asr_consecutive_streak > 2:
                                     san_txt = ""
                                 else:
-                                    self._asr_last_seen_end_sec[norm_jp] = cur_end_sec
+                                    local_asr_last_seen_end_sec[norm_jp] = cur_end_sec
 
                             if isinstance(raw_txt, dict):
                                 raw_txt["text"] = san_txt
@@ -4909,6 +4914,12 @@ class MultimodalTranslator:
             self.verifier.current_episode_tokens = {"prompt": 0, "cached": 0, "output": 0, "model": self.verifier.model}
 
         init_slug = normalize_anime_slug(subs_file.stem) or "anime"
+        # Standard 11.1 (LUKA-E5-01): reset series_bible and style_report between episodes
+        if hasattr(self, "series_bible") and self.series_bible is not None:
+            bible_series = getattr(self.series_bible, "slug", None) or getattr(self.series_bible, "series_name", None)
+            if bible_series and bible_series != init_slug:
+                self.series_bible = None
+        self.style_report = None
         if getattr(self, "trace_log", True):
             try:
                 self.flight_recorder = EpisodeFlightRecorder(
@@ -4953,11 +4964,11 @@ class MultimodalTranslator:
 
         from avt_linter import load_subtitle_file_resilient
         subs = load_subtitle_file_resilient(subs_file)
-        subs.events = segment_hybrid_events(subs.events, style_report=getattr(self, "style_report", None))
 
-        # Initialize StyleMatrixEngine for geometric and semantic ASS classification
+        # Standard 11.1 (LUKA-E1-01): Initialize StyleMatrixEngine BEFORE segment_hybrid_events
         from style_matrix import analyze_subtitles
         self.style_report = analyze_subtitles(subs)
+        subs.events = segment_hybrid_events(subs.events, style_report=self.style_report)
         print(self.style_report.format_user_friendly_summary())
 
         if self.flight_recorder:
@@ -5708,6 +5719,17 @@ class MultimodalTranslator:
                                             translated_speakers[it["orig_idx"]] = it["speaker_name"]
                                         if it.get("audio_jp"):
                                             episode_whisper_transcriptions[it["orig_idx"]] = it["audio_jp"]
+                                            # Standard 11.1 (LUKA-E2-01): Odświeżenie wpisu w self.episode_scene_genders dla orig_idx
+                                            if hasattr(self, "episode_scene_genders") and self.episode_scene_genders is not None and getattr(self, "series_bible", None):
+                                                if hasattr(self.series_bible, "infer_scene_cast_from_text"):
+                                                    try:
+                                                        _, sc_g = self.series_bible.infer_scene_cast_from_text([it.get("en", "")], whisper_texts=[it["audio_jp"]])
+                                                        if sc_g == "FEMALE":
+                                                            self.episode_scene_genders[it["orig_idx"]] = "kobieta"
+                                                        elif sc_g == "MALE":
+                                                            self.episode_scene_genders[it["orig_idx"]] = "mężczyzna"
+                                                    except Exception:
+                                                        logger.debug("Błąd odświeżania płci sceny z audio_jp", exc_info=True)
                                         pl_final = batch_res.get(it["orig_idx"], it.get("pl", ""))
                                         if pl_final:
                                             history.append({

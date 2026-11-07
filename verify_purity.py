@@ -19,7 +19,7 @@ FILES_TO_AUDIT = [
     "tests/test_avt_linter.py", "tests/test_discourse_and_translator.py",
     "tests/test_flight_recorder.py", "tests/test_hygiene.py", "tests/test_metadata.py",
     "tests/test_profiler.py", "tests/test_series_memory.py", "tests/test_translator.py",
-    "tests/test_verifier.py",
+    "tests/test_verifier.py", "tests/test_pipeline_flow.py",
     # Tools & Documentation
     "tools/consolidate_bibles.py",
     "PELNY_RAPORT_TECHNICZNY_POTOKU.md"
@@ -123,123 +123,130 @@ def is_inflection_paradigm_string(s: str) -> bool:
     prefix = tokens[0][:4]
     return all(t.startswith(prefix) for t in tokens) and len(set(tokens)) >= 3
 
-for fname in FILES_TO_AUDIT:
-    fn_norm = fname.replace("\\", "/")
-    if (fn_norm in TEMPORARY_11_1_MIGRATION_ALLOWLIST) or (os.path.basename(fn_norm) in TEMPORARY_11_1_MIGRATION_ALLOWLIST):
-        continue
-    if not os.path.exists(fname):
-        continue
+def run_audit(verbose: bool = True) -> int:
+    for k in violations:
+        violations[k].clear()
 
-    with open(fname, "r", encoding="utf-8", errors="replace") as f:
-        src = f.read()
-
-    tree = None
-    if fname.endswith(".py"):
-        try:
-            tree = ast.parse(src)
-        except SyntaxError as e:
-            violations["ast_syntax"].append((fname, e.lineno, "SyntaxError", e.msg))
+    for fname in FILES_TO_AUDIT:
+        fn_norm = fname.replace("\\", "/")
+        if (fn_norm in TEMPORARY_11_1_MIGRATION_ALLOWLIST) or (os.path.basename(fn_norm) in TEMPORARY_11_1_MIGRATION_ALLOWLIST):
+            continue
+        if not os.path.exists(fname):
             continue
 
-    for idx, line in enumerate(src.splitlines(), 1):
-        if "ZERO-LITERAL" in line or "POSITIVE DOMAIN" in line or "Standard 9.0" in line:
-            continue
-        if m := RE_EXEMPLAR_INTRODUCERS.search(line):
-            target = m.group(1) or m.group(0)
-            target_first = target.split()[0].strip("'\"()")
-            if target_first not in ALLOWED_SYNTHETIC and not any(target_first.startswith(p) for p in ("Instytucja", "Kraina", "Postac", "Bohater", "SeriaTestowa", "Uczelnia")):
-                violations["exemplar_introducers"].append((fname, idx, m.group(0), line.strip()))
-        if m := RE_HARDCODED_SLUGS.search(line):
-            violations["hardcoded_slugs"].append((fname, idx, m.group(0), line.strip()))
-        if m := RE_DSP_GLITCH.search(line):
-            violations["dsp_glitches"].append((fname, idx, m.group(0), line.strip()))
+        with open(fname, "r", encoding="utf-8", errors="replace") as f:
+            src = f.read()
 
-        if fname in RULE_AND_PROMPT_FILES:
-            if m := RE_QUOTED_EXEMPLARY_SPEECH.search(line):
-                violations["quoted_speech"].append((fname, idx, m.group(0), line.strip()))
-            if m := RE_CONTRASTIVE_LABELS.search(line):
-                violations["contrastive_labels"].append((fname, idx, m.group(0), line.strip()))
-            if m := RE_SCREAMING_CAPS.search(line):
-                violations["screaming_caps"].append((fname, idx, m.group(0), line.strip()))
-            if m := RE_PRESCRIPTIVE_IMPERATIVES.search(line):
-                violations["prescriptive_imperatives"].append((fname, idx, m.group(0), line.strip()))
-            if m := RE_ALARMS.search(line):
-                violations["alarms"].append((fname, idx, m.group(0), line.strip()))
-        else:
-            if "[ALARM" in line:
-                violations["alarms"].append((fname, idx, "[ALARM", line.strip()))
+        tree = None
+        if fname.endswith(".py"):
+            try:
+                tree = ast.parse(src)
+            except SyntaxError as e:
+                violations["ast_syntax"].append((fname, e.lineno, "SyntaxError", e.msg))
+                continue
 
-    if fname in LOGIC_FILES and tree is not None:
-        for node in ast.walk(tree):
-            # Bramka 8: Statyczne kolekcje imion pisanych wielką literą lub znanych toponimów
-            if isinstance(node, (ast.List, ast.Set, ast.Tuple)):
-                str_elts = [elt.value for elt in node.elts if isinstance(elt, ast.Constant) and isinstance(elt.value, str)]
-                suspicious = [
-                    s for s in str_elts
-                    if s and s[0].isupper() and s.isalpha() and s.upper() not in ALLOWED_AST_LITERALS and s not in ALLOWED_AST_LITERALS and len(s) > 2 and not re.fullmatch(r"[IVXLCDM]+", s)
-                ]
-                lower_matches = [s for s in str_elts if s.lower() in KNOWN_NAMES_LOWER]
-                if not fname.startswith("tests/"):
-                    if len(suspicious) >= 2 or lower_matches:
-                        violations["ast_hardcoded_name_sets"].append(
-                            (fname, getattr(node, "lineno", 1), f"Kolekcja: {suspicious[:4] or lower_matches}", "Statyczna kolekcja instancji w AST")
-                        )
+        for idx, line in enumerate(src.splitlines(), 1):
+            if "ZERO-LITERAL" in line or "POSITIVE DOMAIN" in line or "Standard 9.0" in line:
+                continue
+            if m := RE_EXEMPLAR_INTRODUCERS.search(line):
+                target = m.group(1) or m.group(0)
+                target_first = target.split()[0].strip("'\"()")
+                if target_first not in ALLOWED_SYNTHETIC and not any(target_first.startswith(p) for p in ("Instytucja", "Kraina", "Postac", "Bohater", "SeriaTestowa", "Uczelnia")):
+                    violations["exemplar_introducers"].append((fname, idx, m.group(0), line.strip()))
+            if m := RE_HARDCODED_SLUGS.search(line):
+                violations["hardcoded_slugs"].append((fname, idx, m.group(0), line.strip()))
+            if m := RE_DSP_GLITCH.search(line):
+                violations["dsp_glitches"].append((fname, idx, m.group(0), line.strip()))
 
-            # Bramka 9: Wykrywanie ręcznych łat deklinacyjnych (.split() na paradygmatach lub variants.update)
-            if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute):
-                if node.func.attr == "split" and isinstance(node.func.value, ast.Constant) and isinstance(node.func.value.value, str):
-                    if is_inflection_paradigm_string(node.func.value.value):
-                        violations["ast_inflection_kludges"].append(
-                            (fname, getattr(node, "lineno", 1), node.func.value.value[:35], "Ręczny ciąg odmian przekazywany do .split()")
-                        )
-                if node.func.attr == "update" and isinstance(node.func.value, ast.Name) and node.func.value.id == "variants":
-                    if node.args and isinstance(node.args[0], (ast.Set, ast.List, ast.Tuple, ast.GeneratorExp)):
-                        violations["ast_inflection_kludges"].append(
-                            (fname, getattr(node, "lineno", 1), "variants.update(...)", "Ręczne wstrzykiwanie zbioru odmian")
-                        )
+            if fname in RULE_AND_PROMPT_FILES:
+                if m := RE_QUOTED_EXEMPLARY_SPEECH.search(line):
+                    violations["quoted_speech"].append((fname, idx, m.group(0), line.strip()))
+                if m := RE_CONTRASTIVE_LABELS.search(line):
+                    violations["contrastive_labels"].append((fname, idx, m.group(0), line.strip()))
+                if m := RE_SCREAMING_CAPS.search(line):
+                    violations["screaming_caps"].append((fname, idx, m.group(0), line.strip()))
+                if m := RE_PRESCRIPTIVE_IMPERATIVES.search(line):
+                    violations["prescriptive_imperatives"].append((fname, idx, m.group(0), line.strip()))
+                if m := RE_ALARMS.search(line):
+                    violations["alarms"].append((fname, idx, m.group(0), line.strip()))
+            else:
+                if "[ALARM" in line:
+                    violations["alarms"].append((fname, idx, "[ALARM", line.strip()))
 
-            # Bramka 11: Wymóg strict_positive_domain=True jako wartości domyślnej
-            if fname == "avt_linter.py" and isinstance(node, ast.FunctionDef) and node.name in [
-                "lint_and_fix_line", "audit_and_fix_entire_episode", "lint_subtitles"
-            ]:
-                for arg, default in zip(reversed(node.args.args), reversed(node.args.defaults)):
-                    if arg.arg == "strict_positive_domain" and not (isinstance(default, ast.Constant) and default.value is True):
-                        violations["strict_domain_defaults"].append((fname, node.lineno, node.name, "Domyślna wartość != True"))
+        if fname in LOGIC_FILES and tree is not None:
+            for node in ast.walk(tree):
+                # Bramka 8: Statyczne kolekcje imion pisanych wielką literą lub znanych toponimów
+                if isinstance(node, (ast.List, ast.Set, ast.Tuple)):
+                    str_elts = [elt.value for elt in node.elts if isinstance(elt, ast.Constant) and isinstance(elt.value, str)]
+                    suspicious = [
+                        s for s in str_elts
+                        if s and s[0].isupper() and s.isalpha() and s.upper() not in ALLOWED_AST_LITERALS and s not in ALLOWED_AST_LITERALS and len(s) > 2 and not re.fullmatch(r"[IVXLCDM]+", s)
+                    ]
+                    lower_matches = [s for s in str_elts if s.lower() in KNOWN_NAMES_LOWER]
+                    if not fname.startswith("tests/"):
+                        if len(suspicious) >= 2 or lower_matches:
+                            violations["ast_hardcoded_name_sets"].append(
+                                (fname, getattr(node, "lineno", 1), f"Kolekcja: {suspicious[:4] or lower_matches}", "Statyczna kolekcja instancji w AST")
+                            )
 
-total = sum(len(v) for v in violations.values())
+                # Bramka 9: Wykrywanie ręcznych łat deklinacyjnych (.split() na paradygmatach lub variants.update)
+                if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute):
+                    if node.func.attr == "split" and isinstance(node.func.value, ast.Constant) and isinstance(node.func.value.value, str):
+                        if is_inflection_paradigm_string(node.func.value.value):
+                            violations["ast_inflection_kludges"].append(
+                                (fname, getattr(node, "lineno", 1), node.func.value.value[:35], "Ręczny ciąg odmian przekazywany do .split()")
+                            )
+                    if node.func.attr == "update" and isinstance(node.func.value, ast.Name) and node.func.value.id == "variants":
+                        if node.args and isinstance(node.args[0], (ast.Set, ast.List, ast.Tuple, ast.GeneratorExp)):
+                            violations["ast_inflection_kludges"].append(
+                                (fname, getattr(node, "lineno", 1), "variants.update(...)", "Ręczne wstrzykiwanie zbioru odmian")
+                            )
 
-gates = [
-    ("Bramka 1: Składnia i integralność AST", "ast_syntax"),
-    ("Bramka 2: Zakaz instancji (np. [Nazwa])", "exemplar_introducers"),
-    ("Bramka 3: Zakaz cytowanych dialogów w regułach", "quoted_speech"),
-    ("Bramka 4: Zakaz etykiet kontrastowych i '[OK]'", "contrastive_labels"),
-    ("Bramka 5A: Zakaz słów ALL-CAPS w tekście", "screaming_caps"),
-    ("Bramka 5B: Zakaz preskryptywności i zakazów", "prescriptive_imperatives"),
-    ("Bramka 6: Zakaz alarmów w promptach i kodzie", "alarms"),
-    ("Bramka 7: Zakaz zahardkodowanych slugów serii", "hardcoded_slugs"),
-    ("Bramka 8: Zakaz statycznych kolekcji nazw w AST", "ast_hardcoded_name_sets"),
-    ("Bramka 9: Zakaz ręcznych łat odmian (variants.update)", "ast_inflection_kludges"),
-    ("Bramka 10: Czystość kodu DSP/NumPy (brak _np.)", "dsp_glitches"),
-    ("Bramka 11: Wymóg default strict_positive_domain=True", "strict_domain_defaults"),
-]
+                # Bramka 11: Wymóg strict_positive_domain=True jako wartości domyślnej
+                if fname == "avt_linter.py" and isinstance(node, ast.FunctionDef) and node.name in [
+                    "lint_and_fix_line", "audit_and_fix_entire_episode", "lint_subtitles"
+                ]:
+                    for arg, default in zip(reversed(node.args.args), reversed(node.args.defaults)):
+                        if arg.arg == "strict_positive_domain" and not (isinstance(default, ast.Constant) and default.value is True):
+                            violations["strict_domain_defaults"].append((fname, node.lineno, node.name, "Domyślna wartość != True"))
 
-print("\n" + "=" * 92)
-print("🛡️  CERTYFIKACJA ARCHITEKTURY: ZERO-LITERAL & INSTANCE-FREE METALINGUISTIC (STANDARD 9.0)")
-print("=" * 92)
+    total = sum(len(v) for v in violations.values())
 
-for title, key in gates:
-    items = violations[key]
-    status = "[PASS] Czysto" if not items else f"[REJECT] ({len(items)} naruszeń)"
-    print(f"{status:<32} | {title}")
-    for it in items[:4]:
-        print(f"   -> {it[0]}:L{it[1]} [{it[2]}]: {it[3][:85]}")
-    if len(items) > 4:
-        print(f"   ... oraz {len(items) - 4} dalszych wystąpień.")
+    gates = [
+        ("Bramka 1: Składnia i integralność AST", "ast_syntax"),
+        ("Bramka 2: Zakaz instancji (np. [Nazwa])", "exemplar_introducers"),
+        ("Bramka 3: Zakaz cytowanych dialogów w regułach", "quoted_speech"),
+        ("Bramka 4: Zakaz etykiet kontrastowych i '[OK]'", "contrastive_labels"),
+        ("Bramka 5A: Zakaz słów ALL-CAPS w tekście", "screaming_caps"),
+        ("Bramka 5B: Zakaz preskryptywności i zakazów", "prescriptive_imperatives"),
+        ("Bramka 6: Zakaz alarmów w promptach i kodzie", "alarms"),
+        ("Bramka 7: Zakaz zahardkodowanych slugów serii", "hardcoded_slugs"),
+        ("Bramka 8: Zakaz statycznych kolekcji nazw w AST", "ast_hardcoded_name_sets"),
+        ("Bramka 9: Zakaz ręcznych łat odmian (variants.update)", "ast_inflection_kludges"),
+        ("Bramka 10: Czystość kodu DSP/NumPy (brak _np.)", "dsp_glitches"),
+        ("Bramka 11: Wymóg default strict_positive_domain=True", "strict_domain_defaults"),
+    ]
 
-print("\n" + "=" * 92)
-if total == 0:
-    print("🏆 WERDYKT: [100% CZYSTY I ZGODNY Z STANDARDEM 9.0 — ZERO INSTANCJI I ZERO ŁAT]")
-    sys.exit(0)
-else:
-    print(f"🚨 WERDYKT: [WYKRYTO {total} STRUKTURALNYCH NARUSZEŃ]")
-    sys.exit(1)
+    print("\n" + "=" * 92)
+    print("🛡️  CERTYFIKACJA ARCHITEKTURY: ZERO-LITERAL & INSTANCE-FREE METALINGUISTIC (STANDARD 9.0)")
+    print("=" * 92)
+
+    for title, key in gates:
+        items = violations[key]
+        status = "[PASS] Czysto" if not items else f"[REJECT] ({len(items)} naruszeń)"
+        print(f"{status:<32} | {title}")
+        for it in items[:4]:
+            print(f"   -> {it[0]}:L{it[1]} [{it[2]}]: {it[3][:85]}")
+        if len(items) > 4:
+            print(f"   ... oraz {len(items) - 4} dalszych wystąpień.")
+
+    print("\n" + "=" * 92)
+    if total == 0:
+        print("🏆 WERDYKT: [100% CZYSTY I ZGODNY Z STANDARDEM 9.0 — ZERO INSTANCJI I ZERO ŁAT]")
+        return 0
+    else:
+        print(f"🚨 WERDYKT: [WYKRYTO {total} STRUKTURALNYCH NARUSZEŃ]")
+        return 1
+
+if __name__ == "__main__":
+    sys.exit(run_audit())

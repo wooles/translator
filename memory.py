@@ -57,7 +57,7 @@ class TranslationMemory:
             try:
                 conn.execute("""
                     CREATE VIRTUAL TABLE IF NOT EXISTS translation_pairs_fts USING fts5(
-                        en_clean, pl_text, anime_title, tokenize='unicode61'
+                        en_clean, pl_text, anime_title, en_text, tokenize='unicode61'
                     )
                 """)
                 cur = conn.cursor()
@@ -67,7 +67,7 @@ class TranslationMemory:
                 cnt_main = cur.fetchone()[0]
                 if cnt_fts < cnt_main:
                     cur.execute("DELETE FROM translation_pairs_fts")
-                    cur.execute("INSERT INTO translation_pairs_fts(en_clean, pl_text, anime_title) SELECT en_clean, pl_text, anime_title FROM translation_pairs")
+                    cur.execute("INSERT INTO translation_pairs_fts(en_clean, pl_text, anime_title, en_text) SELECT en_clean, pl_text, anime_title, en_text FROM translation_pairs")
                     conn.commit()
             except Exception:
                 pass
@@ -185,8 +185,8 @@ class TranslationMemory:
             try:
                 conn.execute("DELETE FROM translation_pairs_fts")
                 conn.executemany(
-                    "INSERT INTO translation_pairs_fts (en_clean, pl_text, anime_title) VALUES (?, ?, ?)",
-                    [(p[2], p[1], p[3]) for p in pairs_to_insert]
+                    "INSERT INTO translation_pairs_fts (en_clean, pl_text, anime_title, en_text) VALUES (?, ?, ?, ?)",
+                    [(p[2], p[1], p[3], p[0]) for p in pairs_to_insert]
                 )
             except Exception:
                 pass
@@ -243,7 +243,7 @@ class TranslationMemory:
                         # 2a. Phrase match via FTS5
                         phrase_q = '"' + " ".join(sanitized_tokens[:8]) + '"'
                         cursor.execute(
-                            "SELECT en_clean, pl_text, anime_title, bm25(translation_pairs_fts) FROM translation_pairs_fts WHERE translation_pairs_fts MATCH ? ORDER BY bm25(translation_pairs_fts) LIMIT 4",
+                            "SELECT coalesce(en_text, en_clean), pl_text, anime_title, bm25(translation_pairs_fts) FROM translation_pairs_fts WHERE translation_pairs_fts MATCH ? ORDER BY bm25(translation_pairs_fts) LIMIT 4",
                             (phrase_q,)
                         )
                         for row in cursor.fetchall():
@@ -262,7 +262,7 @@ class TranslationMemory:
                         if len(key_tokens) >= 2:
                             and_q = " AND ".join(key_tokens[:4])
                             cursor.execute(
-                                "SELECT en_clean, pl_text, anime_title, bm25(translation_pairs_fts) FROM translation_pairs_fts WHERE translation_pairs_fts MATCH ? ORDER BY bm25(translation_pairs_fts) LIMIT 4",
+                                "SELECT coalesce(en_text, en_clean), pl_text, anime_title, bm25(translation_pairs_fts) FROM translation_pairs_fts WHERE translation_pairs_fts MATCH ? ORDER BY bm25(translation_pairs_fts) LIMIT 4",
                                 (and_q,)
                             )
                             for row in cursor.fetchall():
@@ -312,7 +312,7 @@ def format_translation_memory_for_prompt(examples: List[Dict[str, Any]]) -> str:
     lines.append("Wzoruj się na poniższych autentycznych, naturalnych tłumaczeniach ludzkich:")
     for ex in examples:
         anime_tag = f"[{ex['anime']}] " if ex.get("anime") else ""
-        if ex.get("score") == 100:
+        if ex.get("score", 0) >= 100:
             lines.append(f" • {anime_tag}[DOKŁADNY CYTAT 1:1] EN: \"{ex['en']}\" -> PL: \"{ex['pl']}\" (Zachowaj to tłumaczenie dla spójności serii!)")
         else:
             lines.append(f" • {anime_tag}EN: \"{ex['en']}\" -> PL: \"{ex['pl']}\"")

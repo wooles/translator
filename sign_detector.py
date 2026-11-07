@@ -145,7 +145,7 @@ class VisualSignDetector:
         video_path: str,
         gaps: List[Tuple[int, int]],
         client: genai.Client,
-        model: str = "gemini-3.7-flash"
+        model: str = "gemini-2.5-flash"
     ) -> List[pysubs2.SSAEvent]:
         """
         Scans frames from designated safe gaps and generates ASS Sign events for detected cards.

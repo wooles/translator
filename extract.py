@@ -3,12 +3,16 @@ Subtitle and video frame extraction module using ffmpeg and Pillow.
 """
 
 import os
+import re
 import json
+import logging
 import subprocess
 import tempfile
 from pathlib import Path
 from typing import List, Dict, Optional, Any
 from PIL import Image
+
+logger = logging.getLogger(__name__)
 
 def get_video_streams_info(video_path: str) -> Dict[str, Any]:
     """
@@ -25,8 +29,32 @@ def get_video_streams_info(video_path: str) -> Dict[str, Any]:
     try:
         result = subprocess.run(cmd, capture_output=True, text=True, check=True)
         return json.loads(result.stdout)
-    except Exception:
-        # Fallback if ffprobe is unavailable in PATH: try ffmpeg
+    except Exception as e:
+        logger.debug(f"ffprobe stream probe failed for {video_path}: {e}")
+        # Standard 11.1 (LUKA-E1-03): Fallback parsing ffmpeg -i output
+        try:
+            ff_res = subprocess.run(["ffmpeg", "-i", video_path], capture_output=True, text=True)
+            streams = []
+            for line in (ff_res.stderr or "").splitlines():
+                if "Stream #0:" in line and "Audio:" in line:
+                    lang = "und"
+                    if "(" in line and ")" in line:
+                        lang_cand = line.split("(")[1].split(")")[0].strip().lower()
+                        if len(lang_cand) in (2, 3):
+                            lang = lang_cand
+                    stream_idx = 0
+                    m_idx = re.search(r"Stream #0:(\d+)", line)
+                    if m_idx:
+                        stream_idx = int(m_idx.group(1))
+                    streams.append({
+                        "index": stream_idx,
+                        "codec_type": "audio",
+                        "tags": {"language": lang}
+                    })
+            if streams:
+                return {"streams": streams}
+        except Exception as e2:
+            logger.debug(f"ffmpeg stream fallback failed for {video_path}: {e2}")
         return {}
 
 def list_subtitle_tracks(video_path: str) -> List[Dict[str, Any]]:
@@ -155,6 +183,19 @@ def extract_audio_slice(
     start_sec = max(0.0, (start_ms - 200) / 1000.0)  # 200ms voice onset buffer
     duration_sec = max(0.8, (end_ms - start_ms + 400) / 1000.0)  # release decay buffer
 
+    # Standard 11.1 (LUKA-E1-02): prefer Japanese audio stream if available
+    map_args = []
+    try:
+        streams_info = get_video_streams_info(video_path)
+        for s in streams_info.get("streams", []):
+            if s.get("codec_type") == "audio":
+                lang = s.get("tags", {}).get("language", "").lower()
+                if lang in ("jpn", "ja", "jp"):
+                    map_args = ["-map", f"0:{s.get('index', 0)}"]
+                    break
+    except Exception:
+        map_args = []
+
     # Fast seek with -ss before -i, 16kHz mono WAV
     cmd = [
         "ffmpeg",
@@ -163,11 +204,15 @@ def extract_audio_slice(
         "-t", f"{duration_sec:.3f}",
         "-i", video_path,
         "-vn",
+    ]
+    if map_args:
+        cmd.extend(map_args)
+    cmd.extend([
         "-af", "highpass=f=160,lowpass=f=3800",
         "-ac", "1",
         "-ar", "16000",
         output_path
-    ]
+    ])
     try:
         subprocess.run(cmd, capture_output=True, text=True, check=True)
         return output_path
