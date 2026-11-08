@@ -4,21 +4,22 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-08 — Standard 11.1 Certyfikowany Baseline — Hotfix 11.1.1)
-- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.1 (Production Certified Baseline)`
-- **Commit certyfikacji kodu:** `07c4684` (`07c46843f354662bb2a9799bad127134f3359ef0`)
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-08 — Standard 11.1.2 Certyfikowany Baseline)
+- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.1.2 (Production Certified Baseline)`
+- **Commit certyfikacji kodu:** `8313658` (`8313658604f64a6dd336d43d0d914117751685ab`)
 - **Commity implementacyjne 11.1:** `5b7306d` (Commit 1), `5b17ea7` (Commit 2), `2b4bc7d` (Commit 3), `8b72887` (Commit 4), `8a7dd31` (Commit 5), `218af2e` (Commit 6)
-- **Commity Hotfixu 11.1.1:**
-  * Commit 1 (`328729f`): `feat(verify_purity): Hotfix 11.1.1 - Z16-amendment #4 (remove KNOWN_NAMES_LOWER, seal Gate 8 for tests, add tests to LOGIC_FILES)`
-  * Commit 2 (`9de0b83`): `fix(series_memory,avt_linter,rules,translator,profiler,metadata,user_feedback): Hotfix 11.1.1 - Z16-amendment #5 (enforce 100% production code neutrality and extract .onomastic_lexicon.json)`
-  * Commit 3 (`07c4684`): `test(tests,test_system,verify_purity): Hotfix 11.1.1 - Z16-amendment #6 (neutralize 7 test files, fix T11.1 flow tests, add positive case to Test 219, empty migration allowlist)` — **NOWY BASELINE Z16 & CERTYFIKACJA KODU**
-  * Commit 4 (`HEAD`): `docs: Hotfix 11.1.1 - certification closure, SSOT hash synchronization, and implementation report`
-- **Status 11.1.1:** `CERTIFIED / CLOSED (2026-11-08)`
-- **Nowy commit ochrony Depuracji Legacy 1.0 (Z16):** `07c4684` (`07c46843f354662bb2a9799bad127134f3359ef0` — po Z16-amendmentach #4, #5, #6)
-- **Stan metryk:** `327 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `398 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py`, `verify_8_fixes.py`, `verify_12_fixes.py`, `verify_ultimate_pipeline.py`) oraz `audit_diff.ps1` w stanie `PASS`.
+- **Commity Hotfixu 11.1.1:** `328729f` (Commit 1), `9de0b83` (Commit 2), `07c4684` (Commit 3), `96acac7` (Commit 4)
+- **Commity Hotfixu 11.1.2:**
+  * Commit 1 (`74766d8`): `fix(avt_linter,rules,series_memory): Hotfix 11.1.2 - Z16-amendment #7 (neutralize executable literals in diarization block, FR toponyms, rule triggers, and boy-role check)`
+  * Commit 2 (`1b540e3`): `fix(verify_purity,avt_linter,rules,series_memory): Hotfix 11.1.2 - Z16-amendment #8 (widen Gate 2 regex and neutralize all remaining exemplars in rules, docstrings, and comments)` — **NOWY BASELINE Z16**
+  * Commit 3 (`8313658`): `test(tests): Hotfix 11.1.2 - neutralize remaining test literals in test_series_memory and test_discourse_and_translator` — **NOWY COMMIT CERTYFIKACJI KODU**
+  * Commit 4 (`HEAD`): `docs: Hotfix 11.1.2 - rewrite 11.1.1 report with real lexicon data (12 keys, 576 lexemes), create 11.1.2 report, and sync SSOT baselines`
+- **Status 11.1.2:** `CERTIFIED / CLOSED (2026-11-08)`
+- **Nowy commit ochrony Depuracji Legacy 1.0 (Z16):** `1b540e3` (`1b540e30fd2e109aceaa42fc0efcf1457afc42a6` — po Z16-amendmentach #7 i #8)
+- **Stan metryk:** `327 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `398 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 12/12, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
 - **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (327/327 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
 - **Zasada utrzymaniowa post-11.1:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.1` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
-- **Gałąź i Architektura:** `main` (Standard 11.1.1: Pełna Neutralność Całego Kodu i Testów, 100% Czystość Leksykonu Onomastycznego `.onomastic_lexicon.json`, Uszczelnienie Verify_Purity z objęciem testów i AST assign check, Ekstrakcja `_reset_episode_state_for_file`, Nowy Baseline Z16 `07c4684`, Zero-Literal Pure Positive Domain Invariant Architecture & Primary LLM Translation Authority)
+- **Gałąź i Architektura:** `main` (Standard 11.1.2: Pełna Neutralność Całego Kodu i Testów, 100% Czystość Leksykonu Onomastycznego `.onomastic_lexicon.json` [12 kluczy, 576 leksemów], Uszczelnienie Verify_Purity z rozszerzeniem Bramki 2 i objęciem testów, Nowy Baseline Z16 `1b540e3`, Certyfikacja Kodu `8313658`, Zero-Literal Pure Positive Domain Invariant Architecture & Primary LLM Translation Authority)
 - **Środowisko:** Python 3.13 (`.venv`), Windows PowerShell, `ffmpeg` (PATH), `librosa.pyin`, `soundfile`, `pysubs2`, `spaCy en_core_web_sm` (100% offline 0.00 PLN), bezpośrednie klucze Google AI Studio API (`use_vertex = 0`).
 - **Dyrektywa Wykonawcza Testów:**
   * Testy przyrostowe podczas kodowania (< 2 s): `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_testu>"`
@@ -106,7 +107,7 @@ W ramach autoryzowanego `Z16-amendment #3` usunięto warunek `f1_starts_lower` z
 
 ### 🔹 INC-AVT-011 (Standard 11.1: Uszczelnienie verify_purity.py — Z16-amendment #1)
 - **Status:** `RESOLVED (Standard 11.1, Commit 1 — Z16-amendment #1, hash 5b7306d)`
-- **Rozwiązanie:** Wprowadzenie 3 nowych rygorystycznych bramek AST w `verify_purity.py`: Bramka 8 (zakaz statycznych kolekcji nazw własnych w AST), Bramka 9 (zakaz ręcznych łat odmian `variants.update` i ciągów paradygmatów), Bramka 10 (czystość DSP/NumPy).
+- **Rozwiązanie:** Rozszerzenie `FILES_TO_AUDIT` (na 30 modułów runtime + testy + narzędzia) oraz uszczelnienie bramek AST w `verify_purity.py` (Bramka 2, 4 i 8).
 
 ### 🔹 INC-AVT-012 (Standard 11.1: Neutralizacja Kodu i Zasobów — Z16-amendment #2)
 - **Status:** `RESOLVED (Standard 11.1, Commit 3 — Z16-amendment #2, hash 2b4bc7d)`
@@ -122,11 +123,19 @@ W ramach autoryzowanego `Z16-amendment #3` usunięto warunek `f1_starts_lower` z
 
 ### 🔹 INC-AVT-015 (Hotfix 11.1.1: Neutralizacja Modułów Produkcyjnych i Ekstrakcja Leksykonu Onomastycznego — Z16-amendment #5)
 - **Status:** `RESOLVED (Hotfix 11.1.1, Commit 2 — Z16-amendment #5, hash 9de0b83)`
-- **Rozwiązanie:** Wyeksportowanie 11 zestawów onomastycznych (573 leksemy) z `series_memory.py` do zewnętrznego zasobu JSON `series_memory/.onomastic_lexicon.json` z dynamicznym ładowaniem `_load_onomastic_lexicon()`, wyeksportowanie `FANSUB_MALE_ROLES` z `avt_linter.py` do `series_memory/fansub_lexicons/fansub_male_roles.json`, neutralizacja prescriptive phrase w `rules.py` (DYN_7), dynamiczne bazy wiedzy w `profiler.py`, syntetyczne fixtures w `metadata.py`, dynamiczne serie w `user_feedback.py` oraz usunięcie wszystkich plików produkcyjnych z allowlisty migracyjnej (Pozycje 1–18).
+- **Rozwiązanie:** Wyeksportowanie 12 zestawów onomastycznych (576 leksemów, w tym klucz fansub_male_roles) do `series_memory/.onomastic_lexicon.json` z dynamicznym ładowaniem `_load_onomastic_lexicon()`, neutralizacja prescriptive phrase w `rules.py` (DYN_7), dynamiczne bazy wiedzy w `profiler.py`, syntetyczne fixtures w `metadata.py`, dynamiczne serie w `user_feedback.py` oraz usunięcie wszystkich plików produkcyjnych z allowlisty migracyjnej (Pozycje 1–18).
 
 ### 🔹 INC-AVT-016 (Hotfix 11.1.1: Neutralizacja Pakietu Testów, Nowy Baseline Z16 i Certyfikacja — Z16-amendment #6)
 - **Status:** `RESOLVED (Hotfix 11.1.1, Commit 3 — Z16-amendment #6, hash 07c4684)`
 - **Rozwiązanie:** Neutralizacja 7 plików testowych na syntetyczne nazwy (`tests/test_metadata.py`, `tests/test_discourse_and_translator.py`, `tests/test_verifier.py`, `tests/test_avt_linter.py`, `tests/test_translator.py`, `tests/test_profiler.py`, `tests/test_series_memory.py`), ekstrakcja `_reset_episode_state_for_file` w `translator.py` i naprawa Testu 2 oraz Testu 4 w `tests/test_pipeline_flow.py`, dodanie pod-przypadku pozytywnego dla wielokropka w Test 219 (`test_system.py:19358`), całkowite opróżnienie `TEMPORARY_11_1_MIGRATION_ALLOWLIST = set()` (0 naruszeń w 42 plikach) oraz ustanowienie nowego nienaruszalnego baseline'u Z16 na hashu `07c46843f354662bb2a9799bad127134f3359ef0` (Pozycje 19–26).
+
+### 🔹 INC-AVT-017 (Hotfix 11.1.2: Neutralizacja Literałów Wykonywalnych — Z16-amendment #7)
+- **Status:** `RESOLVED (Hotfix 11.1.2, Commit 1 — Z16-amendment #7, hash 74766d8)`
+- **Rozwiązanie:** Dynamiczna diaryzacja w `avt_linter.py:8620–8642` bez obiektu `self` z zachowaniem Testu 150, dynamiczne reguły dla nieodmiennych toponimów francuskich w `avt_linter.py:1027–1035, 7071` ze zbioru `INDECLINABLE_FRENCH_TOPONYMS` z zachowaniem Testu 107, uogólnienie wyzwalaczy w `rules.py:3077, 3182, 3360` oraz usunięcie tokenu z `series_memory.py:8431, 8500`.
+
+### 🔹 INC-AVT-018 (Hotfix 11.1.2: Rozszerzenie Bramki 2 i Neutralizacja Egzemplifikacji — Z16-amendment #8)
+- **Status:** `RESOLVED (Hotfix 11.1.2, Commit 2 — Z16-amendment #8, hash 1b540e3)`
+- **Rozwiązanie:** Rozszerzenie regexu `RE_EXEMPLAR_INTRODUCERS` w `verify_purity.py:49–51` bez globalnego `re.IGNORECASE` (użycie inline `(?i:...)`), neutralizacja przykładów i imion w regułach `rules.py` (linie 305, 992, 1041–1042, 1118, 1143, 1550–1552, 2239–2242, 2299–2300), komentarzach i etykietach `avt_linter.py` (linie 217, 1045, 2119, 7166, 7174) oraz docstringach i komentarzach `series_memory.py` (linie 2325, 2333, 2341, 3111, 3122, 3548, 3892, 4230–4232, 8388). Ustanowienie nowego baseline'u ochrony Z16 (`1b540e3`).
 
 ---
 ## 📐 4. METRYKI OPERACYJNE POTOKU

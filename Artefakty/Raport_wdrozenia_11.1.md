@@ -67,8 +67,8 @@ Przed przystąpieniem do modyfikacji kodu przeprowadzono pełną procedurę diag
 
 ### Zakres i realizacja
 1. **Ekstrakcja bazy kanonicznej (108 serii anime):**
-   - Całość monolitycznego słownika `BUILTIN_MANGA_CANON` (ponad 3700 linii w `manga_canon.py`) została wyeksportowana do 108 atomowych plików JSON w katalogu `series_memory/manga_canon/*.json`.
-   - Każdy plik zawiera dedykowane pola: `series_name`, `canonical_title_pl`, `source_url`, `characters`, `organizations`, `locations`, `terminology` oraz `glossary_sources`.
+   - Całość monolitycznego słownika `BUILTIN_MANGA_CANON` (ponad 3700 linii w `manga_canon.py`) została wyeksportowana do 108 atomowych plików JSON w katalogu `manga_canon/*.json`.
+   - Każdy plik zawiera klucze title, aliases, publisher, glossary (oraz opcjonalnie character_forms), natomiast pola source_url i glossary_sources obsługiwane są w get_or_discover_canon() dla nowo odkrywanych serii.
 2. **Dynamiczny loader w `manga_canon.py`:**
    - Zaimplementowano funkcję `_load_builtin_canon_from_json_dir()` ładującą pliki JSON on-demand z cache w pamięci RAM oraz obsługę `source_url` i `glossary_sources` w `get_or_discover_canon()`.
    - Zachowano pełną zgodność wsteczną referencji `BUILTIN_MANGA_CANON: Dict` na potrzeby testów Z16 (`test_system.py:1183, 9864`).
@@ -203,7 +203,7 @@ Wszystkie procedury weryfikacyjne i guardrails zostały wykonane i osiągnęły 
 
 - [x] **FAZA 0:** `HEAD = 419efbd2382b3985f3ba701bceb40d31e5051562`, `git status` clean, `F0.1`–`F0.12` w 100% zweryfikowane.
 - [x] **Commit 1 (`Z16-amendment #1`):** `verify_purity.py` rozszerzone na 30 modułów + `tests/` + `tools/`, uszczelnione Bramki 2, 4 i 8.
-- [x] **Commit 2 (`refactor manga_canon`):** 104 serie wyeksportowane do `manga_canon/*.json`, dynamiczny loader z RAM cache, dodane `source_url` i `glossary_sources`, oczyszczone prompty (`D4, D5, D6`).
+- [x] **Commit 2 (`refactor manga_canon`):** 108 serii wyeksportowanych do `manga_canon/*.json`, dynamiczny loader z RAM cache, dodane `source_url` i `glossary_sources`, oczyszczone prompty (`D4, D5, D6`).
 - [x] **Commit 3 (`Z16-amendment #2` + neutralność kodu + `N-05`):** oczyszczone `avt_linter.py`, `rules.py`, `series_memory.py` (`_BASE_KNOWN_FANTASY_TOPONYMS = set()` + klasyfikator strukturalny), `fansub_miner.py`, `glossary_manager.py`, `metadata.py`, `translator.py`, `user_feedback.py`; japońskie tokeny przeniesione do `whisper_disambiguator.py`.
 - [x] **Commit 4 (`Z16-amendment #3` — `INC-AVT-010`):** usunięto `or f1_starts_lower` z `verifier.py:493` i zaktualizowano Test 219 w `test_system.py:19350–19356` (`D7`). Ustanowiono nowy baseline Z16 (`8b72887`).
 - [x] **Commit 5 (neutralność `tests/`):** oczyszczono 4 pliki testowe (`test_metadata.py`, `test_series_memory.py`, `test_verifier.py`, `test_discourse_and_translator.py`) i trwale usunięto allowlistę migracyjną z `verify_purity.py`.
@@ -217,3 +217,9 @@ Wszystkie procedury weryfikacyjne i guardrails zostały wykonane i osiągnęły 
 ### 🏆 WERDYKT KOŃCOWY
 **STANDARD 11.1 W PEŁNI CERTYFIKOWANY I ZAMKNIĘTY (VICTORY CONFIRMED).**  
 Potok AVT osiągnął pełną neutralność onomastyczną, wyeliminował wszelkie luki przepływu, ustanowił odświeżony i certyfikowany baseline ochrony Z16 (`8b72887`) oraz zachował 100% stabilności funkcjonalnej przy 560 zebranych testach i 4/4 bramkach CI/CD w stanie PASS.
+
+---
+
+## SEKCJA 10 — DALSZE PRACE I DOMKNIĘCIA (HOTFIX 11.1.1 ORAZ 11.1.2)
+- Szczegółowe sprawozdanie z jednorazowej neutralizacji 28 pozycji mega-audytu znajduje się w: [Artefakty/Raport_wdrozenia_11.1.1.md](Raport_wdrozenia_11.1.1.md).
+- Ostateczne domknięcie kodu wykonywalnego, rozszerzenie Bramki 2 oraz synchronizacja SSOT: [Artefakty/Raport_wdrozenia_11.1.2.md](Raport_wdrozenia_11.1.2.md).
