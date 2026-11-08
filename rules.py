@@ -3074,7 +3074,7 @@ def get_focused_rules_for_batch(
         )
 
     # 42. Tytulatura Harmonia Wołacza Filar CLVII
-    if any("batch_drift_test" in str(it.get("notes", "")).lower() or "filar clvii" in str(it.get("notes", "")).lower() for it in batch_items) or any("panna kanoe" in str(it.get("pl", "")).lower() for it in batch_items):
+    if any("batch_drift_test" in str(it.get("notes", "")).lower() or "filar clvii" in str(it.get("notes", "")).lower() for it in batch_items) or any(re.search(r"\bpann[ao]\s+[A-ZĄĆĘŁŃÓŚŹŻ]", str(it.get("pl", ""))) for it in batch_items):
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR CLVII - Nienaruszalność Formy Adresatywnej i Harmonia Wołacza]: "
             "Tytuły i honoryfikatory harmonizuj z imieniem rozmówcy w wołaczu."
@@ -3179,7 +3179,7 @@ def get_focused_rules_for_batch(
         )
 
     # 57. Puryzm tytulatury Filar CLXXXIII
-    if any("filar clxxxiii" in str(it.get("notes", "")).lower() for it in batch_items):
+    if any("filar clxxxiii" in str(it.get("notes", "")).lower() for it in batch_items) or any(bool(re.search(r"\bty\s+(?:dwie|dwaj|dwa|dwoje|troje|trzej|trzy|czworo|cztery|oboje|obie|obaj|wszyscy)\b", str(it.get("pl", "")).lower())) or bool(re.search(r"\bpan(?:a|u|em)?\s+panie\b", str(it.get("pl", "")).lower())) for it in batch_items):
         focused_pillars.append(
             "• [SKUP SIĘ NA: FILAR CLXXXIII - Zgodność Liczby, Puryzm Tytulatury i Etykieta]: "
             "Tytuły rodowe łącz z imionami z zachowaniem reguł gramatycznych."
@@ -3357,7 +3357,7 @@ def get_focused_rules_for_batch(
     has_seiyu_primacy_trigger = (
         ("SEIYU_SOVEREIGNTY_JP" in jp_categories)
         or any(k in str(item.get("pl", "")).lower() for item in batch_items for k in ["żenada", "wróciłam"])
-        or any("master" in str(item.get("en", "")).lower() and "tonden" in str(item.get("en", "")).lower() for item in batch_items)
+        or any(re.search(r"\bmaster\s+[A-Z][a-z]+", str(item.get("en", ""))) for item in batch_items)
         or any("filar clxx" in str(item.get("notes", "")).lower() for item in batch_items)
     )
     if has_seiyu_primacy_trigger:

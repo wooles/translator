@@ -19,7 +19,8 @@ from series_memory import (
     extract_clean_speaker_name, INHERENT_FEMALE_NOUNS, INHERENT_MALE_NOUNS,
     GENERIC_CATEGORY_TAGS, is_generic_actor_or_category, ETHNONYMS_AND_COLLECTIVES,
     FEMALE_ROLE_KEYWORDS, MALE_ROLE_KEYWORDS, BOY_ROLE_KEYWORDS,
-    resolve_actor_gender, is_plural_actor
+    resolve_actor_gender, is_plural_actor,
+    INDECLINABLE_FRENCH_TOPONYMS, WORLD_CAPITAL_TOPONYMS
 )
 
 MALE_GENDER_TOKENS = tuple("male mezczyzna mężczyzna chłopiec chlopiec chłopak chlopak".upper().split())
@@ -1024,15 +1025,15 @@ class AVTLinter:
          lambda m: (f"{m.group(2)} w przyszłym tygodniu" if m.group(1) == "p" else f"{m.group(2).capitalize()} w przyszłym tygodniu"),
          "Filar CLXVIII - Dekompozycja 'Przyszłotygodniowy' -> 'W przyszłym tygodniu'"),
 
-        # Filar CLXXXIII: Nienaruszalność toponimów obcojęzycznych z niemymi głoskami (Bordeaux, Margaux, Calais)
-        (r"\b([Bb]ordeaux)(?:a|em|ie|owi)\b", r"\1",
-         "Filar CLXXXIII - Nieodmienne toponimy obcojęzyczne (Bordeaux)"),
-        (r"\b([Mm]argaux)a\b", r"\1",
-         "Filar CLXXXIII - Nieodmienne toponimy obcojęzyczne (Margaux)"),
-        (r"\b([Cc]alais)a\b", r"\1",
-         "Filar CLXXXIII - Nieodmienne toponimy obcojęzyczne (Calais)"),
-        (r"\b([Mm]eaux)a\b", r"\1",
-         "Filar CLXXXIII - Nieodmienne toponimy obcojęzyczne (Meaux)"),
+        # Filar CLXXXIII: Nienaruszalność toponimów obcojęzycznych z niemymi głoskami
+        *[
+            (
+                rf"\b([{t[0].upper()}{t[0].lower()}]{re.escape(t[1:])})(?:a|em|ie|owi)\b",
+                r"\1",
+                f"Filar CLXXXIII - Nieodmienne toponimy obcojęzyczne ({t.capitalize()})"
+            )
+            for t in sorted(INDECLINABLE_FRENCH_TOPONYMS) if len(t) >= 3
+        ],
 
         # Filar CLXXXIII: Zgodność liczby w zaimkach z liczebnikami (A ty dwie -> A wy dwie)
         (r"\b([Aa]\s+)?([Tt]y)\s+(dwie|dwaj|dwa|dwoje|troje|trzej|trzy|czworo|czterej|cztery|oboje|obie|obaj|wszyscy)\b",
@@ -7068,11 +7069,11 @@ class EpisodeQualityGate:
             "ziemia", "ziemią", "ziemi", "ziemię", "ziemiom", "ziemiach", "słońce", "słońca", "słońcu", "słońcem",
             "księżyc", "księżyca", "księżycu", "księżycem", "świat", "świata", "światu", "światem", "świecie",
             "niebo", "nieba", "niebios", "niebiosach", "bóg", "boga", "bogu", "bogiem", "bogowie", "bogów",
-            "japonia", "japonii", "tokio", "bordeaux", "polska", "polski", "polsce", "polskę", "polską", "europa", "europy",
+            "japonia", "japonii", "polska", "polski", "polsce", "polskę", "polską", "europa", "europy",
             "wyspa", "wyspy", "wyspie", "wyspą", "morze", "morza", "morzem",
             "złudzeń", "złudzenia", "złudzenie", "płomiennego", "żaru", "początku", "kuźni", "świątynia",
             "imperium", "cesarstwo", "królestwo", "księstwo", "państwo", "republika", "federacja", "unia", "senat", "rada", "armia", "zakon", "klan", "ród", "dynastia", "plemię", "sojusz", "muzeum", "liceum", "technikum", "akwarium", "koloseum", "seminarium"
-        }
+        } | INDECLINABLE_FRENCH_TOPONYMS | WORLD_CAPITAL_TOPONYMS
         if series_bible and hasattr(series_bible, "data") and "glossary" in series_bible.data:
             for g_k, g_v in series_bible.data["glossary"].items():
                 g_str = (str(g_k) + " " + str(g_v)).lower()
@@ -8617,27 +8618,48 @@ class EpisodeQualityGate:
                     from scene_discourse import DiarizationSanityChecker, DeicticDiscourseEngine
                     hz_match = re.search(r"~(\d+)\s*hz", pt_lower)
                     f0_val = float(hz_match.group(1)) if hz_match else (240.0 if has_female_prosody else None)
+                    # Wyznacz aktywną postać żeńską dynamicznie z character_registry lub series_bible (0 literałów)
+                    active_scene_female = ""
+                    if character_registry:
+                        reg_females = [
+                            cr_k for cr_k in character_registry.keys()
+                            if char_gender_map.get(extract_clean_speaker_name(str(cr_k)).lower()) == "FEMALE"
+                            or char_gender_map.get(str(cr_k).strip().lower()) == "FEMALE"
+                        ]
+                        if len(reg_females) == 1:
+                            active_scene_female = reg_females[0]
+                    if not active_scene_female and series_bible and hasattr(series_bible, "data") and isinstance(series_bible.data, dict):
+                        bible_females = [
+                            c_name for c_name, c_data in (series_bible.data.get("characters") or {}).items()
+                            if isinstance(c_data, dict)
+                            and c_data.get("gender") == "FEMALE"
+                            and c_data.get("priority") == "P0"
+                            and c_data.get("has_verified_gender")
+                        ]
+                        if len(bible_females) == 1:
+                            active_scene_female = bible_females[0]
+
                     d_audit = DiarizationSanityChecker.audit_speaker_against_prosody(
                         speaker_name=str(spk_name),
                         f0_hz=f0_val,
                         text=ev.text or "",
-                        active_scene_female="Shizuku"
+                        active_scene_female=active_scene_female
                     )
                     has_craft_topic = bool(DeicticDiscourseEngine.ARMOR_CRAFTING_TOPIC_REGEX.search(ev.text or ""))
-                    is_prev_shizuku_turn = False
+                    is_prev_female_turn = False
                     if i > 0:
                         prev_e = events[i - 1]
                         prev_delta = getattr(ev, "start", 0) - getattr(prev_e, "end", 0)
                         if prev_delta <= 1500:
                             prev_n = getattr(prev_e, "name", "") or ""
                             prev_t = getattr(prev_e, "text", "") or ""
-                            if "shizuku" in prev_n.lower() or "słucham" in prev_t.lower() or "- słucham" in prev_t.lower():
-                                is_prev_shizuku_turn = True
+                            if (active_scene_female and active_scene_female.lower() in prev_n.lower()) or "słucham" in prev_t.lower() or "- słucham" in prev_t.lower():
+                                is_prev_female_turn = True
 
-                    if d_audit["is_anomaly"] or (has_craft_topic and "yoritsugu" in spk_c) or (is_prev_shizuku_turn and "yoritsugu" in spk_c):
-                        spk_name = "Shizuku"
+                    if active_scene_female and (d_audit["is_anomaly"] or (has_craft_topic and spk_c and spk_c != active_scene_female.lower()) or (is_prev_female_turn and spk_c and spk_c != active_scene_female.lower())):
+                        spk_name = active_scene_female
                         spk_gen = "FEMALE"
-                        ev.name = "Shizuku"
+                        ev.name = active_scene_female
                         fixes.append(f"[Episode Quality Gate - Harmonizacja Diaryzacji] Linia #{i+1}: wykryto anomalię diaryzacji / monolog techniczny -> przypisano postać '{spk_name}' (kobieta)")
 
 

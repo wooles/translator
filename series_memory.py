@@ -8428,7 +8428,7 @@ class SeriesBible:
         is_p0 = bool(isinstance(b_val, dict) and (b_val.get("priority") == "P0" or b_val.get("has_verified_gender") is True))
         is_boy_or_crossgender = any(k in char_desc_lower for k in BOY_ROLE_KEYWORDS) or \
                                 any(k in actor_clean.lower() for k in BOY_ROLE_KEYWORDS) or \
-                                any(k in actor_clean.lower() for k in ["chłopiec", "chłopak", "boy", "bocchan", "lad", "kid", "chojumaru"])
+                                any(k in actor_clean.lower() for k in ["chłopiec", "chłopak", "boy", "bocchan", "lad", "kid"])
 
         is_female_space = (scene_gender == "FEMALE")
         is_male_space = (scene_gender == "MALE")
@@ -8497,7 +8497,7 @@ class SeriesBible:
         is_p0 = bool(isinstance(b_val, dict) and (b_val.get("priority") == "P0" or b_val.get("has_verified_gender") is True))
         is_boy_or_crossgender = any(k in char_desc_lower for k in BOY_ROLE_KEYWORDS) or \
                                 any(k in actor_clean.lower() for k in BOY_ROLE_KEYWORDS) or \
-                                any(k in actor_clean.lower() for k in ["chłopiec", "chłopak", "boy", "bocchan", "lad", "kid", "chojumaru"])
+                                any(k in actor_clean.lower() for k in ["chłopiec", "chłopak", "boy", "bocchan", "lad", "kid"])
 
         has_female_audio = (audio_gender == "FEMALE") or (f0_hz is not None and f0_hz >= 185.0) or (whisper_gender == "FEMALE")
         acoustic_rejected = bool(has_female_audio and res_g == "MALE" and (is_p0 or is_boy_or_crossgender))
