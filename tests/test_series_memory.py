@@ -45,8 +45,8 @@ def test_series_bible_entity_filtering_and_glossary_priority(tmp_path):
     assert "BohaterkaBeta WspolneNazwisko" in chars
 
     # 2. Surname alias collision prohibition:
-    # Artur (MALE) and Helena (FEMALE) share the surname "Pendelton".
-    # The bare surname "Pendelton" must NOT be assigned as an alias to either!
+    # BohaterAlfa (MALE) and BohaterkaBeta (FEMALE) share the surname "WspolneNazwisko".
+    # The bare surname "WspolneNazwisko" must NOT be assigned as an alias to either!
     artur_aliases = chars["BohaterAlfa WspolneNazwisko"].get("aliases", [])
     helena_aliases = chars["BohaterkaBeta WspolneNazwisko"].get("aliases", [])
     assert "WspolneNazwisko" not in artur_aliases
@@ -749,10 +749,10 @@ def test_bible_five_anomalies_sanitized(rel_raw, expected_clean_rel, tmp_path):
             "Crowd": {"description": "tłum", "gender": "UNKNOWN"},
             "FemaleHero SharedSurname": {"gender": "FEMALE", "aliases": ["SharedSurname", "Heroine"]},
             "MaleHero SharedSurname": {"gender": "MALE", "aliases": ["SharedSurname", "Hero"]},
-            "Abbie Foreign": {"gender": "FEMALE", "aliases": ["Abbie"]},
+            "PostacObcaE Foreign": {"gender": "FEMALE", "aliases": ["PostacObcaE"]},
         },
         "declensions": {
-            "Abbie Foreign": {"M": "Abbie Foreign", "D": "Abbie Foreigna", "N": "Abbie Foreignem", "gender": "FEMALE"},
+            "PostacObcaE Foreign": {"M": "PostacObcaE Foreign", "D": "PostacObcaE Foreigna", "N": "PostacObcaE Foreignem", "gender": "FEMALE"},
         },
         "entity_categories": {
             "Seven Grand Sorcerers": "CHREMATONYM"
@@ -770,8 +770,8 @@ def test_bible_five_anomalies_sanitized(rel_raw, expected_clean_rel, tmp_path):
     assert "Crowd" not in chars
     assert "SharedSurname" not in chars["FemaleHero SharedSurname"]["aliases"]
     assert "SharedSurname" not in chars["MaleHero SharedSurname"]["aliases"]
-    assert bible.data["declensions"]["Abbie Foreign"]["D"] == "Abbie Foreign"
-    assert bible.data["declensions"]["Abbie Foreign"]["N"] == "Abbie Foreign"
+    assert bible.data["declensions"]["PostacObcaE Foreign"]["D"] == "PostacObcaE Foreign"
+    assert bible.data["declensions"]["PostacObcaE Foreign"]["N"] == "PostacObcaE Foreign"
     assert bible.data["entity_categories"]["Seven Grand Sorcerers"] == "CHREMATONYM"
     assert bible.data["relations"]["A -> B"] == expected_clean_rel
 

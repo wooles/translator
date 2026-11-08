@@ -16,7 +16,7 @@ def test_speaker_gender_arbitration_p0_priority_and_sign_isolation(tmp_path):
             "confidence": 1.0,
             "priority": "P0",
             "has_verified_gender": True,
-            "aliases": ["Jan", "Wojownik MeskiAlfa"]
+            "aliases": ["MeskiAliasAlfa", "Wojownik MeskiAlfa"]
         },
         "Czarodziejka ZenskaBeta": {
             "description": "KOBIETA (zweryfikowano przez EpisodeQualityGate)",
@@ -25,7 +25,7 @@ def test_speaker_gender_arbitration_p0_priority_and_sign_isolation(tmp_path):
             "confidence": 1.0,
             "priority": "P0",
             "has_verified_gender": True,
-            "aliases": ["Anna", "Czarodziejka ZenskaBeta"]
+            "aliases": ["ZenskiAliasBeta", "Czarodziejka ZenskaBeta"]
         }
     }
     bible._rebuild_actor_aliases_index()
@@ -321,7 +321,7 @@ def test_translator_runtime_telemetry_uses_arbitrate_p0_and_bilingual_aliases(ac
     "raw_actor,polluted_target_actor,speaker_p0,target_p0,is_monologue,expected_clean_target,expected_target_gender",
     [
         (
-            "Marta",
+            "BohaterkaGamma",
             "HeroAlpha (Kobieta)",
             "FEMALE",
             "MALE",
@@ -331,11 +331,11 @@ def test_translator_runtime_telemetry_uses_arbitrate_p0_and_bilingual_aliases(ac
         ),
         (
             "HeroAlpha",
-            "Marta (Mężczyzna - Scena Wyłącznie Męska)",
+            "BohaterkaGamma (Mężczyzna - Scena Wyłącznie Męska)",
             "MALE",
             "FEMALE",
             False,
-            "Marta",
+            "BohaterkaGamma",
             "FEMININE",
         ),
         (
@@ -363,7 +363,7 @@ def test_arbitrate_telemetry_strips_f0_parentheses_from_target_actor_and_enforce
 
     bible = SeriesBible(slug="test_target_actor_clean_p0")
     bible.sync_verified_profile_entity("HeroAlpha", "MALE", has_verified_gender=True)
-    bible.sync_verified_profile_entity("Marta", "FEMALE", has_verified_gender=True)
+    bible.sync_verified_profile_entity("BohaterkaGamma", "FEMALE", has_verified_gender=True)
 
     res = SceneDiscourseGraph.arbitrate_event_telemetry(
         raw_actor=raw_actor,
