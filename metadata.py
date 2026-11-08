@@ -166,7 +166,7 @@ def clean_anime_filename(filename_or_path: str) -> str:
     name = re.sub(r"\[(?:1080p|720p|480p|2160p|4K|HEVC|x264|x265|AAC|FLAC)[^\]]*\]", "", name, flags=re.IGNORECASE)
 
     # 3. Handle scene/torrent release naming with dots/underscores BEFORE episode strip:
-    # e.g. KAMUI.Hes.Behind.You.S01E07.REPACK.1080p.UNCENSORED...
+    # Format: Seria.Testowa.S01E07.REPACK.1080p.UNCENSORED...
     name = re.sub(r"[._](?:S\d+)?(?:E|EP)\d+.*$", "", name, flags=re.IGNORECASE)
     name = re.sub(r"[._](?:1080p|720p|480p|2160p|4K|HEVC|x264|x265|AMZN|WEB-DL|UNCENSORED|REPACK|PROPER|CR|MultiSub|dual.audio).*$", "", name, flags=re.IGNORECASE)
     name = re.sub(r"\s*-\s*(?:Episode\s*)?(?:S\d+)?(?:E|EP)?\d+(?:v\d+)?.*$", "", name, flags=re.IGNORECASE)

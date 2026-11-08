@@ -44,7 +44,6 @@ LOGIC_FILES = [
 ]
 
 TEMPORARY_11_1_MIGRATION_ALLOWLIST = {
-    "series_memory.py", "avt_linter.py", "rules.py", "translator.py", "profiler.py", "metadata.py", "user_feedback.py",
     "tests/test_metadata.py", "tests/test_discourse_and_translator.py", "tests/test_verifier.py",
     "tests/test_avt_linter.py", "tests/test_translator.py", "tests/test_profiler.py", "tests/test_series_memory.py"
 }

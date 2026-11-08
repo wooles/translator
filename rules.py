@@ -127,7 +127,7 @@ FILAR X: ORGANICZNA ELIMINACJA TRZECIEGO JĘZYKA (ANTI-TRANSLATIONESE MANIFESTO)
     - Klasa D (Trywializujące zaimki/rzeczowniki): 'ten typ' -> 'ten człowiek / nauczyciel', 'dzikuska / chuliganka' -> 'prostaczka / awanturnica', 'dzieciaki' -> 'uczniowie / młodzież', 'durna jestem' -> 'głupia jestem'.
   * SZYK PRZYDOMKOWY BÓSTW I ISTOT: Japońskie przydomki bóstw i stworzeń z partykułą 'no' (wzorce: Ryū no Kishi, Gakuen no Majo) tłumaczymy przymiotnikowo lub czystym dopełniaczem.
   * RZĄD I RODZAJ GRAMATYCZNY RZECZOWNIKA 'POSOKA': 'Posoka' jest wyłącznie rodzaju żeńskiego (ta czarna posoka, tej czarnej posoki, przez czarną posokę; zamiast kalki 'czarny posok', 'przez czarny posok', 'z czarnego posoku').
-  * FLEKSJA WOŁACZOWA NAZWISK OBCYCH I ARTEFAKTÓW: Fonetyczna adaptacja w wołaczu i przypadkach zależnych (Standard 9.0): zmiękczenie tematu przy spółgłoskach (wzorce: Vincent -> Vincencie), dopełniacz obcych imion (wzorce: Andrew -> Andrewie).
+  * FLEKSJA WOŁACZOWA NAZWISK OBCYCH I ARTEFAKTÓW: Fonetyczna adaptacja w wołaczu i przypadkach zależnych (Standard 9.0): zmiękczenie tematu przy spółgłoskach funkcjonalnie miękkich lub twardych oraz regularna odmiana przez przypadki zależne.
   * RZĄD PRZYIMKOWY DLA URAZU I TRAUMY (FILAR IV): zamiast kalki 'mam przez coś uraz' (kalka z angielskiego 'have trauma from'). W języku polskim: 'mam do czegoś uraz' lub 'mam przez to traumę'.
   * KALKA AUTO-REFERENCYJNA (MY DEAR ME): Unikamy kalki 'moja droga ja' / 'droga ja'. W monologu wewnętrznym stosuj: 'moja ty mała', 'mała ja', 'taka ze mnie drobina'.
   * ZWIĄZEK ZGODY RZECZOWNIKA 'SŁUGA' (FILAR IV): W odniesieniu do kobiety stosujemy 'moja służka' lub 'twoja uniżona sługa' (Kalka: 'by moja sługa mogła uciec' Wariant kanoniczny: 'by moja podwładna mogła uciec' / 'by moja służąca mogła uciec').
@@ -290,14 +290,13 @@ FILAR XXV: PRZEKŁAD RELACJI RODZINNYCH, FEUDALNYCH I ZASADA JEDNOKROTNEJ TYTULA
   * Władcy imperium koczowniczego/mongolskiego w polskiej tradycji historycznej to wyłącznie "Chan / Wielki Chan" (dopełniacz: "chana / Wielkiego Chana", wołacz: "chanie / Wielki Chanie"). HISTORYCZNA PISOWNIA POLSKA: "Wielki Chan", "Chaganie".
 
 FILAR XXVI: ZASADA YOBISUTE I NATURALNE FORMY ADRESATYWNE (ANTI-FALSE FORMALITY):
-- ZWROT PO SAMYM IMIENIU (Yobisute - Kenji, Yui, Ren, Aoi):
-  * Gdy w audio lub tekście postać zwraca się do rozmówcy po SAMYM IMIENIU bez japońskich honoryfikatorów:
-    Niezalecana kalka: Dodawanie słowa "Pan/Pani" ("Pan Kenji", "panie Kenji", "pani Yui").
-    Wariant kanoniczny: Zwracanie się bezpośrednio po imieniu na "ty": "Kenji, co o tym myślisz", "Yui, spróbuj tego".
+- ZWROT PO SAMYM IMIENIU (Yobisute — bezpośredni zwrot bez przyrostków):
+  * Gdy w audio lub tekście postać zwraca się do rozmówcy po samym imieniu bez japońskich honoryfikatorów:
+    Wariant bezpośredni: Zwracanie się bezpośrednio po imieniu na "ty" ("<Imię>, co o tym myślisz").
 - RELACJE BLISKIE, TOWARZYSKIE, RYWALIZUJĄCE I POSTACIE ZAGRANICZNE:
   * Towarzysze podróży, rywale, przyjaciele oraz cudzoziemcy nieznający sztywnej etykiety biurowej ZAWSZE mówią do siebie po imieniu na "ty".
 - RELACJE RÓWIEŚNICZE W SZKOLE I KLUBIE (DE-FORMALIZACJA -SAN MIĘDZY UCZNIAMI):
-  * Między uczniami i rówieśnikami stosujemy naturalny zwrot po imieniu lub nazwisku na 'ty' i kolegami z klasy/klubu (Kalka: 'Panie Tanaka, ma pan zeszyt' Wariant kanoniczny: 'Tanaka, masz zeszyt').
+  * Między uczniami i rówieśnikami stosujemy naturalny zwrot po imieniu lub nazwisku na 'ty' ("<Nazwisko>, masz zeszyt").
   * Japoński grzeczny przyrostek '-san' używany przez ucznia do rówieśnika to w polszczyźnie samo nazwisko lub imię w bezpośredniej relacji na 'ty'.
 - SPÓJNOŚĆ REJESTRU W RELACJACH FORMALNYCH (T-V INVARIANCE):
   * W relacjach ściśle formalnych i zawodowych utrzymuj jednolity rejestr grzecznościowy per 'Pan/Pani' we wszystkich kwestiach w obrębie sceny.
@@ -1119,7 +1118,7 @@ FILAR CXXXII: PRAGMATYKA „SASUGA” I DUMY WSPÓLNOTOWEJ (SASUGA & COMMUNITY P
     -> 'Oto [plemię Mera] w całej krasie'
     -> 'W swoim żywiole'
     -> 'Nie bez powodu słyną z...'
-    -> 'Cały [Shin], nic się nie zmienił' (wyłącznie w odniesieniu do typowego nawyku pojedynczej osoby).
+    -> 'Cały [<Imię>], nic się nie zmienił' (wyłącznie w odniesieniu do typowego nawyku pojedynczej osoby).
 
 FILAR CXXXIII: TWARDA RETORYKA ROZKAZÓW BOJOWYCH (MILITARY COMMAND CADENCE & LACONIC IMPERATIVES):
 - Polskie rozkazy dowódców na polu bitwy muszą być krótkie, bezlitosne, lakoniczne i twarde (brak rozwlekłych, szkolnych form gramatycznych):
@@ -1517,35 +1516,23 @@ FILAR CLVI: ROZSZCZEPIENIE DWUZNACZNOŚCI ANGIELSKIEGO PIVOTU I PRYMAT KOTWIC LE
 
 FILAR CLVII: ZASADA NIENARUSZALNOŚCI FORMY ADRESATYWNEJ (T-V INVARIANCE) I Unikaj kalki SCHIZOFRENII FORM GRZECZNOŚCIOWYCH (PRONOMINAL ADDRESS DRIFT: YOBISUTE NA 'TY' VS PAN/PANI)
    1. KONSEKWENCJA REJESTRU ROZMÓWCY (ZASADA BRATERSTWA JĘZYKOWEGO):
-      - Jeśli postać A zwraca się do postaci B po imieniu (Yobisute: „Kenji”, „Yui”, „Ren”) lub na „ty”, w całej scenie OBOWIĄZUJE ŻELAZNA KONSEKWENCJA:
-        -> Eliminujemy kalkę przechodzenia w kolejnych zdaniach na formy per „pan/pani” („wygrał pan”, „pan wie”, „niech pan spojrzy”)!
-        -> KARDYNALNY kalka SCHIZOFRENII ADRESATYWNEJ [niepoprawne]:
-           Linijka 1: „Kenji, dlaczego?!” (po imieniu na „ty”)
-           Linijka 5: „Słucham? Przecież wygrał pan trzy z siedmiu starć!” (nagle per „pan”!)
-        Wariant kanoniczny:            Linijka 1: „Kenji, dlaczego?!”
-           Linijka 5: „Słucham? Przecież wygrałeś trzy z siedmiu starć!” (konsekwentnie na „ty”).
+      - Wymóg spójności rejestru adresatywnego:
+        Gdy wypowiedź zaczyna się zwrotem bezpośrednim po imieniu na „ty” („<Imię>, dlaczego?!”), w kolejnych kwestiach konsekwentnie zachowujemy formę na „ty”: „Słucham? Przecież wygrałeś trzy z siedmiu starć!”.
    2. DYSTRYBUCJA ANGIELSKIEGO PIVOTU „YOU”:
       - Angielskie „you” („you won”, „did you see”, „you are”, „what do you think”) w dialogach między osobami mówiącymi sobie po imieniu, rówieśnikami, przyjaciółmi, rywalami czy współpracownikami zawsze tłumacz w 2. osobie liczby pojedynczej na „ty” („wygrałeś”, „widziałeś”, „jesteś”, „co sądzisz”).
       - Formę per „pan/pani” stosuj WYŁĄCZNIE wtedy, gdy postacie zwracają się do siebie oficjalnie po nazwisku z tytulaturą („panie Kowalski”, „panie profesorze”, „panie inspektorze”) i w całej scenie utrzymują ten sam dystans.
    3. JEDYNY WYJĄTEK DLA ZMIANY FORMY:
-      - Zmiana formy z „pan/pani” na „ty” może nastąpić WYŁĄCZNIE w punkcie zwrotnym zdefiniowanym przez Profiler (Relationship Pivot), gdy bohaterowie wyraźnie ustalają przejście na „ty” (wzorce: „Mów mi Kenji / Przejdźmy na ty”). W żadnym wypadku nie może to być losowy skok w ramach jednej wymiany zdań!
+      - Zmiana formy z „pan/pani” na „ty” może nastąpić WYŁĄCZNIE w punkcie zwrotnym zdefiniowanym przez Profiler (Relationship Pivot), gdy bohaterowie wyraźnie ustalają przejście na „ty” (wzorce: „Mów mi po imieniu / Przejdźmy na ty”). W żadnym wypadku nie może to być losowy skok w ramach jednej wymiany zdań!
    4. Unikaj kalki WEWNĄTRZZDANIOWYCH HYBRYD ADRESATYWNYCH (INTRA-LINE T-V HYBRID BAN):
       - Eliminujemy kalkę łączenia w obrębie tej samej kwestii dialogowej lub zdania form poufałych na „ty” (wzorce: „Przecież wiesz”, „Widzisz”, „Myślisz”, „Mówiłeś”) z formami grzecznościowymi per „pan/pani” („a jakoś mnie pan nie wydał”, „stoi pan”, „oferuję panu”)!
-      - kalka KARDYNALNY [niepoprawne]: „Przecież wiesz, kim jestem, a jakoś mnie pan nie wydał.” (niedopuszczalny anacoluthon rejestru).
+      - Unikamy form niespójnych: „Przecież wiesz, kim jestem, a jakoś mnie pan nie wydał.” (niespójność rejestru).
       - Wariant kanoniczny: „Przecież wiesz, kim jestem, a jakoś mnie nie wydałeś / nie wydałaś.” (jednolity rejestr w całej wypowiedzi).
 5. HARMONIA WOŁACZA Z FORMĄ PAN/PANI ORAZ ANTY-DRYF TYTULATURY: # Standard 9.0 Invariant
       - Jeśli postać zwraca się do rozmówcy per pan/pani ('ma pan', 'widzi pan', 'niech pan', 'chciał pan'), Naturalnie unikamy wołacza po samym imieniu ('[Imię W]...'). W takich zdaniach dopuszczalne jest wyłącznie 'Panie [Imię]...'.
-      - kalka KARDYNALNY [niepoprawne]: „Poza tym, mistrzu... ma pan zaczerwienioną twarz.” Wariant kanoniczny: „Poza tym, panie Janie... ma pan zaczerwienioną twarz.”.
-      - W okrzykach i sytuacjach afektywnych nie ulegaj angielskiemu nawykowi usuwania -sama: „Co za kunszt, panie Janie!”.
-   6. ŻELAZNA DEKLINACJA OBCYCH IMION NA '-CA' [FONET. K]:
-      - Imiona męskie obcego pochodzenia zakończone na '-ca' (wzorce: Luca, Seneca, Petrarca, Checa) w języku polskim wymawiane są z twardym [k] i odmieniają się ze zmianą litery na 'k':
-        * Mianownik: Luca
-        * Dopełniacz: do Luki (Niezalecana kalka: „do Luci” [skażenie żeńskie / Łucja!])
-        * Celownik: Luce
-        * Biernik: Lukę
-        * Narzędnik: z Luką
-        * Miejscownik: o Luce / przy Luce
-        * Wołacz: Luco / Luko!
+      - Wariant bezpośredni: „Poza tym, mistrzu... ma pan zaczerwienioną twarz.” Wariant tytularny: „Poza tym, panie profesorze... ma pan zaczerwienioną twarz.”.
+      - W okrzykach i sytuacjach afektywnych zachowaj polski zwrot tytularny: „Co za kunszt, panie profesorze!”.
+   6. DEKLINACJA OBCYCH IMION MĘSKICH ZAKOŃCZONYCH NA '-CA':
+      - Imiona męskie obcego pochodzenia zakończone na '-ca' w języku polskim wymawiane są z twardym [k] i odmieniają się ze zmianą litery na 'k' w przypadkach zależnych (np. w dopełniaczu: do -ki, w celowniku: -ce, w bierniku: -kę, w narzędniku: z -ką, w miejscowniku: o -ce, w wołaczu: -ko / -ce).
    7. Unikaj kalki PRZEKŁAMYWANIA JAPOŃSKICH RZECZOWNIKÓW JAKO IMION WŁASNYCH (OUJI / HIME / SENSEI):
       - Japońskie rzeczowniki pospolite, baśniowe i honoryfikatywy (ōji/ouji = książę, hime = księżniczka, sensei = mistrz/nauczyciel, senpai = starszy kolega) zawsze tłumacz na polski!
       - Niezalecana kalka: „Ouji?!” jako imię chłopaka w dialogu o miłości.
@@ -1555,8 +1542,8 @@ FILAR CLVII: ZASADA NIENARUSZALNOŚCI FORMY ADRESATYWNEJ (T-V INVARIANCE) I Unik
       - Wariant kanoniczny: „I co?” / „I jak?” / „Więc wy...?” / „I co potem?”.
    9. HARMONIZACJA PŁCI ROZMÓWCY PRZY PRZEJŚCIU Z PIVOTU 'YOU' I REGULACJA FORMY WOŁACZOWEJ (GENDER-CONCORDANT T-V RESOLUTION & FEMALE VOCATIVE):
       - Gdy w relacji nieformalnej lub po imieniu angielskie 'you' lub błędny formalizm ('wygrał pan' / 'wygrała pani') jest redukowany do 2. osoby, forma czasownika w czasie przeszłym/przypuszczającym odpowiada płci adresata:
-         * Adresat żeński (wzorce: Monika, Anna, Kasia, Yui): 'wygrałaś', 'zrobiłaś', 'widziałaś', 'byłaś', 'miałaś', 'powiedziałaś', 'chciałaś', 'mogłaś', 'wiedziałaś'.
-         * Adresat męski (wzorce: Piotr, Tomasz, Kotaro, Ren): 'wygrałeś', 'zrobiłeś', 'widziałeś', 'byłeś', 'miałeś', 'powiedziałeś', 'chciałeś', 'mogłeś', 'wiedziałeś'.
+         * Adresat żeński: formy z końcówkami żeńskimi ('wygrałaś', 'zrobiłaś', 'widziałaś', 'byłaś', 'miałaś', 'powiedziałaś', 'chciałaś', 'mogłaś', 'wiedziałaś').
+         * Adresat męski: formy z końcówkami męskimi ('wygrałeś', 'zrobiłeś', 'widziałeś', 'byłeś', 'miałeś', 'powiedziałeś', 'chciałeś', 'mogłeś', 'wiedziałeś').
        - ORZECZNIKI PRZYMIOTNIKOWE I FORMY ANALITYCZNE DO KOBIET:
          * W zwrocie do kobiety stosuj formy żeńskie: 'wyglądasz na wzburzoną', 'jesteś pewna', 'jesteś gotowa', 'jesteś zmęczona', 'jesteś zła'.
          * Niezalecana kalka: 'Wyglądasz na wzburzonego' w zwrocie do kobiety!
@@ -1780,9 +1767,9 @@ FILAR CLXX: SYSTEMOWY PRYMAT GŁOSU SEIYŪ NAD ANGIELSKIM PIVOTEM, KATEGORIE AKT
       - Wymuszaj naturalne polskie powitanie domowników: 'Wróciłam' -> 'Witaj w domu' / 'O, już jesteś' / 'Dobrze, że jesteś' / 'O, cześć'.
    4. NIENARUSZALNOŚĆ MIANOWNIKA TYTULATURY PODMIOTU I WIELKICH LITER IMION (TITLE APPOSITION & NAME INTEGRITY):
       - Przy zestawieniu tytułu mistrzowskiego, naukowego lub zawodowego z imieniem i nazwiskiem w podmiocie zdania ('Mistrz', 'Pan', 'Pani', 'Profesor', 'Doktor', 'Pisarz', 'Reżyser', 'Redaktor', 'Autor', 'Mangaka', 'Sensei' + Nazwisko + Imię + Czasownik 3. os.), nazwisko ZAWSZE pozostaje w mianowniku:
-        * 'Mistrz Yamada Kenji nie zdążył z rozdziałem' (Niezalecana kalka: 'Mistrz Yamady kenji nie zdążył').
-        * 'Pan Jan zniszczył pieczęć' (Kalka: 'Pan Jana zniszczył').
-      - Ścisły wymóg WIELKIEJ LITERY DLA WSZYSTKICH CZŁONÓW JAPOŃSKICH IMION I NAZWISK: 'Yamada Kenji' (Niezalecana kalka: mała litera 'kenji').
+        * 'Mistrz <Nazwisko> <Imię> nie zdążył z terminem'.
+        * 'Pan <Imię> zniszczył pieczęć'.
+      - Ścisły wymóg wielkiej litery dla wszystkich członów imion i nazwisk: '<Nazwisko> <Imię>'.
 
 FILAR CLXXI: ZGODNOŚĆ LICZEBNIKÓW, WIERNOŚĆ FAKTOGRAFICZNA I PRYMAT ZAIMKÓW MĘSKICH NAD WYSOKIM F0 (NUMERICAL INTEGRITY, FACTUAL FIDELITY & CROSS-GENDER PRONOUN PRECEDENCE):
    1. WIERNIE PRZENOSZONE LICZBY I DANE FAKTOGRAFICZNE:
@@ -2313,7 +2300,7 @@ KOMPLEKSOWY RDZEŃ PRZEKŁADU AUDIOWIZUALNEGO (CORE AVT CANON - BELCZYK, BARAŃC
 - Nieodmienność toponimów obcojęzycznych: Francuskie nazwy własne i apelacje winiarskie zakończone na nieme spółgłoski lub -eaux/-aux/-ais (Bordeaux, Margaux, Calais, Pau) są w polszczyźnie nieodmienne ('do Bordeaux', 'w Bordeaux', 'z Margaux', 'do Calais' - eliminujemy kalkę 'Bordeauxa', 'Margauxa').
 
 17. ELIMINACJA PLEONAZMÓW TOPONIMICZNYCH, TAUTOLOGII KLASYFIKATORÓW I JĄKANIA SŁOWNIKOWEGO (FILAR CLXXXIV):
-- Prewencja pleonazmów toponimicznych i administracyjnych: Wystrzegaj się podwajania lub potrajania deskryptorów kategorialnych (prowincja, prefektura, góra, rzeka, miasto, zamek, kronika). Gdy w zdaniu występuje już odmieniony deskryptor ('z prowincji', 'na górze', 'w rzece', 'w mieście', 'w kronice'), nazwę własną podajemy bezpośrednio bez powtórzonego mianownika: wyłącznie 'z prowincji Kaga' (eliminujemy kalkę potworków 'z prowincji Prowincja Kaga' oraz 'z prowincji Prowincja Prowincja Kaga'!), 'na górze Hiei', 'w rzece Kamogawa', 'w Kronice Taiheiki'.
+- Prewencja pleonazmów toponimicznych i administracyjnych: Wystrzegaj się podwajania lub potrajania deskryptorów kategorialnych (prowincja, prefektura, góra, rzeka, miasto, zamek, kronika). Gdy w zdaniu występuje już odmieniony deskryptor ('z prowincji', 'na górze', 'w rzece', 'w mieście', 'w kronice'), nazwę własną podajemy bezpośrednio bez powtórzonego mianownika: wyłącznie 'z prowincji <Nazwa>' (eliminujemy kalkę podwojonego deskryptora 'z prowincji Prowincja <Nazwa>'), 'na górze <Nazwa>', 'w rzece <Nazwa>', 'w kronice <Nazwa>'.
 - Likwidacja mechanicznego jąkania słownikowego: Wyeliminuj powtarzanie tego samego tokenu bez interpunkcji ('Prowincja Prowincja' -> 'Prowincja', 'Kronika Kronika' -> 'Kronika').
 - Rząd przyimka pochodzenia z toponimami i syntagmy reliktów: Krainy i toponimy po przyimku 'z' określające pochodzenie obiektu, reliktu lub postaci w języku polskim rządzą dopełniaczem ('Księga Mistrza z Północy', 'chłopak z Północy', 'rycerz z Doliny'). W syntagmach artefaktów i oręża człon nadrzędny odmienia się swobodnie w zdaniu zależnym ('Szukam Księgi Mistrza', 'z Księgą Mistrza'), a przydawka imienna pozostaje w dopełniaczu.
 
@@ -2629,7 +2616,7 @@ def get_focused_rules_for_batch(
         or ("FEMALE_GROUP_JP" in jp_categories)
         or any(
             item.get("is_low_pitch_female", False)
-            or any(k in str(item.get("notes", "")).lower() for k in ["ochrona płci", "niski f0", "matrona", "starsza kobieta", "boraqchin", "filar cxxxvi"])
+            or any(k in str(item.get("notes", "")).lower() for k in ["ochrona płci", "niski f0", "matrona", "starsza kobieta", "starsza pani", "pierwsza małżonka", "filar cxxxvi"])
             or (str(item.get("target_gender", "")).upper() == "FEMALE" and str(item.get("addressee_number", "")).upper() == "PLURAL")
             for item in batch_items
         )

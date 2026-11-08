@@ -528,7 +528,7 @@ class AVTLinter:
         # Fansub Clichés & Pivot English Calques (Filar CLXVI)
         (r"(^|[^\w]|\\[Nnh])([Tt]ylko\s+)?([Ww]róć|[Ww]racaj|[Ww]róćcie|[Ww]racajcie)\s+w\s+jednym\s+kawałku\b", lambda m: f"{m.group(1)}{m.group(2) or ''}{m.group(3)} cały i zdrowy", "Filar CLXVI - Eliminacja Kalki Fansuberskiej 'w jednym kawałku' (in one piece)"),
         (r"(^|[^\w]|\\[Nnh])w\s+jednym\s+kawałku\b", r"\g<1>w całości", "Filar CLXVI - Eliminacja Kalki Fansuberskiej 'w jednym kawałku'"),
-        (r"(^|[^\w]|\\[Nnh])([Zz]ginąć\s+)z\s+ręki\s+(kaiju|potwora|bestii|monstrum)\b", r"\g<1>\g<2>od ciosu \g<3>", "Filar CLXVI - Eliminacja Kalki 'die at the hands of [monster]'"),
+        (r"(^|[^\w]|\\[Nnh])([Zz]ginąć\s+)z\s+ręki\s+(potwora|bestii|monstrum)\b", r"\g<1>\g<2>od ciosu \g<3>", "Filar CLXVI - Eliminacja Kalki 'die at the hands of [monster]'"),
         (r"(^|[^\w]|\\[Nnh])([Cc])zemu\s+po\s+prostu\s+jej\s+nie\s+wysłuchałem\b", lambda m: f"{m.group(1)}{'Dlaczego jej nie posłuchałem' if m.group(2).isupper() else 'dlaczego jej nie posłuchałem'}", "Filar CLXVI - Eliminacja Kalki 'Why didn't I just listen to her'"),
         (r"(^|[^\w]|\\[Nnh])([Zz])a\s+nic\s+z\s+tym\s+nie\s+zawalczę\b", lambda m: f"{m.group(1)}{'Za nic nie stanę do walki z czymś takim' if m.group(2).isupper() else 'za nic nie stanę do walki z czymś takim'}", "Filar CLXVI - Eliminacja Koślawej Składni Fansuberskiej"),
         
@@ -1107,64 +1107,67 @@ class AVTLinter:
         series_name = anime_title or lex_data.get("anime_slug", slug)
         tag_prefix = f"Filar CC - Kanon Fansuberski {fansub_group} ({series_name}"
 
-        # 1. Wizard / Magician term harmonization (e.g. wiedun / wieduni / wiedunka)
+        # 1. Wizard / Magician term harmonization
         if "wizard" in terms:
             w_info = terms["wizard"]
             forms = w_info.get("forms", {})
-            nom_sg = forms.get("nom_sg", "wiedun")
-            gen_sg = forms.get("gen_sg", "wieduna")
-            dat_sg = forms.get("dat_sg", "wiedunowi")
-            ins_sg = forms.get("ins_sg", "wiedunem")
-            loc_sg = forms.get("loc_sg", "wiedunie")
-            nom_pl = forms.get("nom_pl", "wieduni")
-            gen_pl = forms.get("gen_pl", "wiedunów")
-            dat_pl = forms.get("dat_pl", "wiedunom")
-            ins_pl = forms.get("ins_pl", "wiedunami")
-            loc_pl = forms.get("loc_pl", "wiedunach")
+            nom_sg = forms.get("nom_sg", "")
+            if nom_sg:
+                gen_sg = forms.get("gen_sg", f"{nom_sg}a")
+                dat_sg = forms.get("dat_sg", f"{nom_sg}owi")
+                ins_sg = forms.get("ins_sg", f"{nom_sg}em")
+                loc_sg = forms.get("loc_sg", nom_sg)
+                nom_pl = forms.get("nom_pl", nom_sg)
+                gen_pl = forms.get("gen_pl", f"{nom_sg}ów")
+                dat_pl = forms.get("dat_pl", f"{nom_sg}om")
+                ins_pl = forms.get("ins_pl", f"{nom_sg}ami")
+                loc_pl = forms.get("loc_pl", f"{nom_sg}ach")
 
-            fem_nom_sg = forms.get("fem_nom_sg", "wiedunka")
-            fem_gen_sg = forms.get("fem_gen_sg", "wiedunki")
-            fem_dat_sg = forms.get("fem_dat_sg", "wiedunce")
-            fem_acc_sg = forms.get("fem_acc_sg", "wiedunkę")
-            fem_ins_sg = forms.get("fem_ins_sg", "wiedunką")
-            fem_nom_pl = forms.get("fem_nom_pl", "wiedunki")
-            fem_gen_pl = forms.get("fem_gen_pl", "wiedunek")
-            fem_ins_pl = forms.get("fem_ins_pl", "wiedunkami")
+                fem_nom_sg = forms.get("fem_nom_sg", "")
+                fem_gen_sg = forms.get("fem_gen_sg", f"{fem_nom_sg[:-1]}i" if fem_nom_sg.endswith("a") else fem_nom_sg)
+                fem_dat_sg = forms.get("fem_dat_sg", fem_nom_sg)
+                fem_acc_sg = forms.get("fem_acc_sg", f"{fem_nom_sg[:-1]}ę" if fem_nom_sg.endswith("a") else fem_nom_sg)
+                fem_ins_sg = forms.get("fem_ins_sg", f"{fem_nom_sg[:-1]}ą" if fem_nom_sg.endswith("a") else fem_nom_sg)
+                fem_nom_pl = forms.get("fem_nom_pl", f"{fem_nom_sg[:-1]}i" if fem_nom_sg.endswith("a") else fem_nom_sg)
+                fem_gen_pl = forms.get("fem_gen_pl", fem_nom_sg)
+                fem_ins_pl = forms.get("fem_ins_pl", f"{fem_nom_sg[:-1]}ami" if fem_nom_sg.endswith("a") else fem_nom_sg)
+                fem_dat_pl = forms.get("fem_dat_pl", f"{fem_nom_sg[:-1]}om" if fem_nom_sg.endswith("a") else fem_nom_sg)
+                fem_loc_pl = forms.get("fem_loc_pl", f"{fem_nom_sg[:-1]}ach" if fem_nom_sg.endswith("a") else fem_nom_sg)
 
-            rules = [
-                # Dopełniacz/Biernik l.mn. (czarodziejów/magów -> wiedunów)
-                (r"\b([Cc]zarodziej|[Mm]ag|[Cc]zarnoksiężnik)ów\b", lambda m, t=gen_pl: t.capitalize() if m.group(1)[0].isupper() else t, f"{tag_prefix}: {gen_pl})"),
-                # Narzędnik l.mn. (czarodziejami/magami -> wiedunami)
-                (r"\b([Cc]zarodziej|[Mm]ag|[Cc]zarnoksiężnik)ami\b", lambda m, t=ins_pl: t.capitalize() if m.group(1)[0].isupper() else t, f"{tag_prefix}: {ins_pl})"),
-                # Celownik l.mn. (czarodziejom/magom -> wiedunom)
-                (r"\b([Cc]zarodziej|[Mm]ag|[Cc]zarnoksiężnik)om\b", lambda m, t=dat_pl: t.capitalize() if m.group(1)[0].isupper() else t, f"{tag_prefix}: {dat_pl})"),
-                # Miejscownik l.mn. (czarodziejach/magach -> wiedunach)
-                (r"\b([Cc]zarodziej|[Mm]ag|[Cc]zarnoksiężnik)ach\b", lambda m, t=loc_pl: t.capitalize() if m.group(1)[0].isupper() else t, f"{tag_prefix}: {loc_pl})"),
-                # Mianownik l.mn. (czarodzieje/magowie/czarnoksiężnicy -> wieduni)
-                (r"\b([Cc]zarodzieje|[Mm]agowie|[Cc]zarnoksiężnicy)\b", lambda m, t=nom_pl: t.capitalize() if m.group(1)[0].isupper() else t, f"{tag_prefix}: {nom_pl})"),
+                rules = [
+                    # Dopełniacz/Biernik l.mn.
+                    (r"\b([Cc]zarodziej|[Mm]ag|[Cc]zarnoksiężnik)ów\b", lambda m, t=gen_pl: t.capitalize() if m.group(1)[0].isupper() else t, f"{tag_prefix}: {gen_pl})"),
+                    # Narzędnik l.mn.
+                    (r"\b([Cc]zarodziej|[Mm]ag|[Cc]zarnoksiężnik)ami\b", lambda m, t=ins_pl: t.capitalize() if m.group(1)[0].isupper() else t, f"{tag_prefix}: {ins_pl})"),
+                    # Celownik l.mn.
+                    (r"\b([Cc]zarodziej|[Mm]ag|[Cc]zarnoksiężnik)om\b", lambda m, t=dat_pl: t.capitalize() if m.group(1)[0].isupper() else t, f"{tag_prefix}: {dat_pl})"),
+                    # Miejscownik l.mn.
+                    (r"\b([Cc]zarodziej|[Mm]ag|[Cc]zarnoksiężnik)ach\b", lambda m, t=loc_pl: t.capitalize() if m.group(1)[0].isupper() else t, f"{tag_prefix}: {loc_pl})"),
+                    # Mianownik l.mn.
+                    (r"\b([Cc]zarodzieje|[Mm]agowie|[Cc]zarnoksiężnicy)\b", lambda m, t=nom_pl: t.capitalize() if m.group(1)[0].isupper() else t, f"{tag_prefix}: {nom_pl})"),
 
-                # Żeńskie formy
-                (r"\b([Cc]zarodziejek|[Mm]agiń)\b", lambda m, t=fem_gen_pl: t.capitalize() if m.group(1)[0].isupper() else t, f"{tag_prefix}: {fem_gen_pl})"),
-                (r"\b([Cc]zarodziejk|[Mm]agin)iom\b", lambda m, t="Wiedunkom": t if m.group(1)[0].isupper() else t.lower(), f"{tag_prefix}: wiedunkom)"),
-                (r"\b([Cc]zarodziejk|[Mm]agin)iami\b", lambda m, t=fem_ins_pl: t.capitalize() if m.group(1)[0].isupper() else t, f"{tag_prefix}: {fem_ins_pl})"),
-                (r"\b([Cc]zarodziejk|[Mm]agin)iach\b", lambda m, t="Wiedunkach": t if m.group(1)[0].isupper() else t.lower(), f"{tag_prefix}: wiedunkach)"),
-                (r"\b([Cc]zarodziejki|[Mm]aginie)\b", lambda m, t=fem_nom_pl: t.capitalize() if m.group(1)[0].isupper() else t, f"{tag_prefix}: {fem_nom_pl})"),
-                (r"\b([Cc]zarodziejkę|[Mm]aginię)\b", lambda m, t=fem_acc_sg: t.capitalize() if m.group(1)[0].isupper() else t, f"{tag_prefix}: {fem_acc_sg})"),
-                (r"\b([Cc]zarodziejką|[Mm]aginią)\b", lambda m, t=fem_ins_sg: t.capitalize() if m.group(1)[0].isupper() else t, f"{tag_prefix}: {fem_ins_sg})"),
-                (r"\b([Cc]zarodziejce|[Mm]agini)\b", lambda m, t=fem_dat_sg: t.capitalize() if m.group(1)[0].isupper() else t, f"{tag_prefix}: {fem_dat_sg})"),
-                (r"\b([Cc]zarodziejka|[Mm]agini)\b", lambda m, t=fem_nom_sg: t.capitalize() if m.group(1)[0].isupper() else t, f"{tag_prefix}: {fem_nom_sg})"),
+                    # Żeńskie formy
+                    (r"\b([Cc]zarodziejek|[Mm]agiń)\b", lambda m, t=fem_gen_pl: t.capitalize() if m.group(1)[0].isupper() else t, f"{tag_prefix}: {fem_gen_pl})"),
+                    (r"\b([Cc]zarodziejk|[Mm]agin)iom\b", lambda m, t=fem_dat_pl: t.capitalize() if m.group(1)[0].isupper() else t, f"{tag_prefix}: {fem_dat_pl})"),
+                    (r"\b([Cc]zarodziejk|[Mm]agin)iami\b", lambda m, t=fem_ins_pl: t.capitalize() if m.group(1)[0].isupper() else t, f"{tag_prefix}: {fem_ins_pl})"),
+                    (r"\b([Cc]zarodziejk|[Mm]agin)iach\b", lambda m, t=fem_loc_pl: t.capitalize() if m.group(1)[0].isupper() else t, f"{tag_prefix}: {fem_loc_pl})"),
+                    (r"\b([Cc]zarodziejki|[Mm]aginie)\b", lambda m, t=fem_nom_pl: t.capitalize() if m.group(1)[0].isupper() else t, f"{tag_prefix}: {fem_nom_pl})"),
+                    (r"\b([Cc]zarodziejkę|[Mm]aginię)\b", lambda m, t=fem_acc_sg: t.capitalize() if m.group(1)[0].isupper() else t, f"{tag_prefix}: {fem_acc_sg})"),
+                    (r"\b([Cc]zarodziejką|[Mm]aginią)\b", lambda m, t=fem_ins_sg: t.capitalize() if m.group(1)[0].isupper() else t, f"{tag_prefix}: {fem_ins_sg})"),
+                    (r"\b([Cc]zarodziejce|[Mm]agini)\b", lambda m, t=fem_dat_sg: t.capitalize() if m.group(1)[0].isupper() else t, f"{tag_prefix}: {fem_dat_sg})"),
+                    (r"\b([Cc]zarodziejka|[Mm]agini)\b", lambda m, t=fem_nom_sg: t.capitalize() if m.group(1)[0].isupper() else t, f"{tag_prefix}: {fem_nom_sg})"),
 
-                # Pojedyncze męskie
-                (r"\b([Cc]zarodziejem|[Mm]agiem|[Cc]zarnoksiężnikiem)\b", lambda m, t=ins_sg: t.capitalize() if m.group(1)[0].isupper() else t, f"{tag_prefix}: {ins_sg})"),
-                (r"\b([Cc]zarodziejowi|[Mm]agowi|[Cc]zarnoksiężnikowi)\b", lambda m, t=dat_sg: t.capitalize() if m.group(1)[0].isupper() else t, f"{tag_prefix}: {dat_sg})"),
-                (r"\b([Cc]zarodzieju|[Mm]agu|[Cc]zarnoksiężniku)\b", lambda m, t=loc_sg: t.capitalize() if m.group(1)[0].isupper() else t, f"{tag_prefix}: {loc_sg})"),
-                (r"\b([Cc]zarodzieja|[Mm]aga|[Cc]zarnoksiężnika)\b", lambda m, t=gen_sg: t.capitalize() if m.group(1)[0].isupper() else t, f"{tag_prefix}: {gen_sg})"),
-                (r"\b([Cc]zarodziej|[Mm]ag|[Cc]zarnoksiężnik)\b", lambda m, t=nom_sg: t.capitalize() if m.group(1)[0].isupper() else t, f"{tag_prefix}: {nom_sg})"),
-            ]
-            for pat, repl, tag in rules:
-                if re.search(pat, modified):
-                    modified = re.sub(pat, repl, modified)
-                    fixes.append(tag)
+                    # Pojedyncze męskie
+                    (r"\b([Cc]zarodziejem|[Mm]agiem|[Cc]zarnoksiężnikiem)\b", lambda m, t=ins_sg: t.capitalize() if m.group(1)[0].isupper() else t, f"{tag_prefix}: {ins_sg})"),
+                    (r"\b([Cc]zarodziejowi|[Mm]agowi|[Cc]zarnoksiężnikowi)\b", lambda m, t=dat_sg: t.capitalize() if m.group(1)[0].isupper() else t, f"{tag_prefix}: {dat_sg})"),
+                    (r"\b([Cc]zarodzieju|[Mm]agu|[Cc]zarnoksiężniku)\b", lambda m, t=loc_sg: t.capitalize() if m.group(1)[0].isupper() else t, f"{tag_prefix}: {loc_sg})"),
+                    (r"\b([Cc]zarodzieja|[Mm]aga|[Cc]zarnoksiężnika)\b", lambda m, t=gen_sg: t.capitalize() if m.group(1)[0].isupper() else t, f"{tag_prefix}: {gen_sg})"),
+                    (r"\b([Cc]zarodziej|[Mm]ag|[Cc]zarnoksiężnik)\b", lambda m, t=nom_sg: t.capitalize() if m.group(1)[0].isupper() else t, f"{tag_prefix}: {nom_sg})"),
+                ]
+                for pat, repl, tag in rules:
+                    if re.search(pat, modified):
+                        modified = re.sub(pat, repl, modified)
+                        fixes.append(tag)
 
         # 2. Four Lords / Monarchs
         if "four_lords" in terms:
@@ -5429,10 +5432,8 @@ def enhanced_fix_undecorated_male_names(
     if not text:
         return text
 
-    TOPONYMS_SET = {
-        "tokyo", "kyoto", "berlin", "london",
-        "paris", "paryż", "rzym", "rome"
-    }
+    from series_memory import WORLD_CAPITAL_TOPONYMS
+    TOPONYMS_SET = set(WORLD_CAPITAL_TOPONYMS)
     if series_bible and hasattr(series_bible, "data") and isinstance(series_bible.data, dict):
         chars = series_bible.data.get("characters", {})
         for cname, cdata in chars.items():
@@ -6822,11 +6823,7 @@ class EpisodeQualityGate:
                         fixes.append(f"[Episode Quality Gate - Filar LVII Kolizja Czasowa] Linia #{target_idx+1}: podniesiono nakładającą się kwestię dialogową na górę kadru (\\an8)")
 
         # Step 0: Episode-Wide Character Gender Knowledge Base (Filar CLXII)
-        from series_memory import CANONICAL_MALE_NAMES
-        CANONICAL_MALE_NAMES_ON_A = {
-            "shira", "akira", "gaara", "ashitaka", "kiba", "soma", "kenta",
-            "ryoma", "hanza", "koba", "soya", "toma", "genga", "sinbad", "judar", "alibaba"
-        }
+        from series_memory import CANONICAL_MALE_NAMES, CANONICAL_MALE_NAMES_ON_A
         char_gender_map: Dict[str, str] = {}  # char_name_lower -> "MALE" or "FEMALE"
 
         # 0. Inherent Lexical Gender Pre-pass from Event Names (Filar CLXIX)
@@ -8440,7 +8437,7 @@ class EpisodeQualityGate:
                     ev.text
                 )
 
-                # Case 2: Title + Single Name + Verb (e.g. 'pan Eftala zniszczył' -> 'pan Eftal zniszczył')
+                # Case 2: Title + Single Name + Verb ('<Tytuł> <Imię>a <Czasownik>' -> '<Tytuł> <Imię> <Czasownik>')
                 def _fix_nominative_title_apposition(m):
                     prefix = m.group(1)
                     title = m.group(2)

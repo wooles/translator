@@ -87,7 +87,7 @@ class UserFeedbackManager:
                     "original_en": "It's you, Young Lord",
                     "bad_pl": "To pan, Młody Panie.",
                     "good_pl": "To ty, młody panie.",
-                    "rule_reason": "Tautologia 'pan... Panie' jest błędem. Używamy zaimka 'ty' i małej litery w wołaczu tytularnym.",
+                    "rule_reason": "W bezpośrednim zwrocie tytularnym stosujemy zaimek 'ty' i małą literę w wołaczu.",
                     "scope": "global",
                     "created_at": time.strftime("%Y-%m-%d %H:%M:%S")
                 },
@@ -95,7 +95,7 @@ class UserFeedbackManager:
                     "id": "init_5",
                     "original_en": "Sensei, I'm done!",
                     "bad_pl": "Pani Sensei, skończyłam",
-                    "good_pl": "Sensei, skończyłam / Pani Teshimo, skończyłam",
+                    "good_pl": "Sensei, skończyłam / Pani Profesor, skończyłam",
                     "rule_reason": "Tytuły honoryfikatywne stosujemy samodzielnie ('Sensei') lub w polskiej formie grzecznościowej z nazwiskiem.",
                     "scope": "global",
                     "created_at": time.strftime("%Y-%m-%d %H:%M:%S")

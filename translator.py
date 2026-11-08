@@ -1421,10 +1421,7 @@ class BatchTranslationResponse(BaseModel):
     translations: List[LineTranslation] = Field(description="Lista przetłumaczonych kwestii")
     characters_identified: Optional[List[CharacterInfo]] = Field(default=None, description="Zidentyfikowane lub nowo odkryte postacie i ich płeć")
 
-CANONICAL_MALE_NAMES_ON_A = {
-    "shira", "akira", "gaara", "ashitaka", "kiba", "soma", "kenta",
-    "ryoma", "hanza", "koba", "soya", "toma", "genga", "sinbad", "judar", "alibaba"
-}
+from series_memory import CANONICAL_MALE_NAMES_ON_A
 
 def detect_third_person_mentions(
     clean_text: str,
@@ -1461,7 +1458,7 @@ def detect_third_person_mentions(
             elif any(k in desc_lower for k in MALE_ROLE_KEYWORDS):
                 gen = "MALE"
             
-            # Split multi-name slashes like "Fatima / Sitara"
+            # Split multi-name slashes like "<Postac_A> / <Postac_B>"
             parts = [p.strip() for p in re.split(r"[/,]", full_name) if p.strip()]
             for p in parts:
                 if len(p) >= 3 and gen:

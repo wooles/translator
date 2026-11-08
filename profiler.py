@@ -607,7 +607,7 @@ Twoim zadaniem jest dogłębna, wszechstronna analiza całego skryptu odcinka, a
    - Spójność rejestru tytularnego:
       * Jednolitość formuły adresatywnej (INTRA-CLAUSE T-V HYBRID BAN): unikanie łączenia bezpośredniego wołacza imiennego z formami grzecznościowymi w obrębie tej samej klauzuli.
       * Ochrona relacji hierarchicznych (ENGLISH '-SAMA' DROP IMMUNITY): zawołania i apele respektują stały dystans społeczny między rozmówcami.
-      * Stabilność formy podmiotu przy tytulaturze (odkąd pan Eftal zniszczył): rzeczownik tytularny w pozycji podmiotu zachowuje mianownikową formę imienia. # Standard 9.0 Invariant
+      * Stabilność formy podmiotu przy tytulaturze: rzeczownik tytularny w pozycji podmiotu zachowuje mianownikową formę imienia. # Standard 9.0 Invariant
    - Rekcja w konstrukcjach matrymonialnych i wymiany: związki frazeologiczne z przyimkiem za rządzą biernikiem.
    - Dostosowanie rejestru stylistycznego: gatunki historyczne i wysokie fantasy wymagają literackiej polszczyzny dialogowej wolnej od kolokwializmów.
 11. SŁOWNIK POJĘĆ BRANŻOWYCH ORAZ FRAZEOLOGIZMÓW: Podawaj czyste, docelowe ekwiwalenty polskie bez technicznych dopisków nawiasowych.

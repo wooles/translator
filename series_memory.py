@@ -39,14 +39,23 @@ JAPANESE_OPEN_E_MORAS: Tuple[str, ...] = (
     "ke", "te", "ne", "me", "re", "se", "ze", "be", "ge", "de", "he", "pe"
 )
 
-KNOWN_SILENT_E_NAMES: Set[str] = {
-    "white", "wayne", "blade", "george", "locke", "moore", "clarke", "stone", "drake",
-    "chase", "cole", "bruce", "luke", "mike", "pete", "steve", "dave", "dale"
-}
+def _load_onomastic_lexicon() -> Dict[str, Set[str]]:
+    lex_path = Path(__file__).parent / "series_memory" / ".onomastic_lexicon.json"
+    if not lex_path.exists():
+        lex_path = Path(__file__).parent / ".onomastic_lexicon.json"
+    if lex_path.exists():
+        try:
+            with open(lex_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                return {k: set(v) for k, v in data.items()}
+        except (OSError, json.JSONDecodeError) as e:
+            logger.debug('Blad onomastic: %s', e)
+    return {}
 
-JAPANESE_VOWEL_E_NAMES: Set[str] = {
-    "daisuke", "ryunosuke", "shusuke", "sosuke", "akane", "kaede", "sanosuke", "kotone", "sakurae"
-}
+_ONOMASTIC_LEXICON: Dict[str, Set[str]] = _load_onomastic_lexicon()
+
+KNOWN_SILENT_E_NAMES: Set[str] = _ONOMASTIC_LEXICON.get("known_silent_e_names", set())
+JAPANESE_VOWEL_E_NAMES: Set[str] = _ONOMASTIC_LEXICON.get("japanese_vowel_e_names", set())
 
 def is_japanese_cv_mora_e_name(name: str) -> bool:
     """
@@ -55,7 +64,7 @@ def is_japanese_cv_mora_e_name(name: str) -> bool:
     wh, th, gh, ph, cl, st, ld, br, cr oraz wygłos na otwartą morę
     -ke, -te, -ne, -me, -re, -se, -ze, -be, -ge, -de, -he, -pe po samogłosce lub n),
     traktuje końcowe -e jako wymawianą samogłoskę fonetyczną i blokuje wstawianie apostrofu.
-    Apostrof dozwolony wyłącznie dla niemego fonetycznie -e (White'a, Wayne'a, George'a).
+    Apostrof dozwolony wyłącznie dla niemego fonetycznie -e (w obcych nazwiskach zakończonych na nieme -e po spółgłosce).
     """
     if not name or len(name) < 3:
         return False
@@ -1192,7 +1201,9 @@ INHERENT_FEMALE_NOUNS = {
     "sanitariuszka", "pielęgniarka", "siostra miłosierdzia", "salowa", "ratowniczka", "pacjentka", "chora", "ranna", "ozdrowieńcza"
 }
 
-INHERENT_MALE_NOUNS = {
+FANSUB_MALE_ROLES: Set[str] = _ONOMASTIC_LEXICON.get("fansub_male_roles", set())
+
+INHERENT_MALE_NOUNS = FANSUB_MALE_ROLES | {
     # Basic / Family / Age
     "boy", "man", "men", "guy", "male", "waiter", "lord", "mr", "hero", "wizard", "prince", "knight", "king", "emperor", "duke", "priest",
     "chłopak", "chłopiec", "mężczyzna", "ojciec", "tata", "tatuś", "ojczym", "syn", "synek", "synuś", "pasierb",
@@ -1220,7 +1231,7 @@ INHERENT_MALE_NOUNS = {
     "halabardnik", "pikinier", "muszkieter", "dragon", "ułan", "husarz", "kirasjer", "lansjer", "kawalerzysta",
     "grenadier", "weteran", "inwalida", "dezerter", "partyzant", "powstaniec", "dywersant", "komandos", "snajper",
     # Religion / Magic / Science
-    "czarodziej", "czarnoksiężnik", "mag", "arcymag", "wiedun", "wieduni", "wiedunowie", "kapłan", "arcykapłan", "mnich", "zakonnik", "brat zakonny",
+    "czarodziej", "czarnoksiężnik", "mag", "arcymag", "kapłan", "arcykapłan", "mnich", "zakonnik", "brat zakonny",
     "nowicjusz", "kleryk", "seminarzysta", "opat", "przeor", "biskup", "arcybiskup", "patriarcha", "kardynał", "papież",
     "prałat", "kanonik", "proboszcz", "wikary", "wikariusz", "misjonarz", "kaznodzieja", "teolog", "katecheta",
     "prorok", "wieszcz", "jasnowidz", "wyrocznia", "wróżbita", "astrolog", "chiromanta", "guślarz", "szaman", "druid",
@@ -1318,10 +1329,7 @@ INHERENT_PLURAL_NOUNS = {
     "company", "unit", "units", "troop", "troops", "bystanders", "guests", "spectators", "audience", "passengers"
 }
 
-CANONICAL_MALE_NAMES = {
-    "shira", "akira", "gaara", "ashitaka", "kiba", "soma", "kenta",
-    "ryoma", "hanza", "sinbad", "judar", "alibaba", "robert"
-}
+CANONICAL_MALE_NAMES: Set[str] = _ONOMASTIC_LEXICON.get("canonical_male_names", set())
 
 
 FEMALE_ROLE_KEYWORDS = [
@@ -2027,61 +2035,9 @@ GENERIC_CATEGORY_TAGS = {
     "caller", "announcer"
 }
 
-POLISH_FEMALE_NAMES = {
-    "monika", "anna", "maria", "katarzyna", "małgorzata", "malgorzata", "agnieszka",
-    "barbara", "ewa", "magdalena", "elżbieta", "elzbieta", "krystyna", "joanna",
-    "aleksandra", "zofia", "danuta", "irena", "jadwiga", "teresa", "halina",
-    "karolina", "natalia", "julia", "paulina", "beata", "dorota", "justyna",
-    "iwona", "renata", "jolanta", "urszula", "alicja", "sylwia", "patrycja",
-    "marta", "dominika", "aneta", "edyta", "izabela", "kinga", "wioletta",
-    "kamila", "bogumiła", "bogumila", "wiesława", "wieslawa", "stanisława", "stanislawa",
-    "janina", "czesława", "czeslawa", "wanda", "władysława", "wladyslawa", "grażyna", "grazyna",
-    "bożena", "bozena", "marzena", "lucyna", "mariola", "henryka", "kazimiera",
-    "genowefa", "bronislawa", "bronisława", "stefania", "cecylia", "emilia", "klaudia",
-    "weronika", "oliwia", "wiktoria", "maja", "zuzanna", "pola", "antonina",
-    "laura", "nadia", "liliana", "klara", "nina", "jagoda", "malwina",
-    "kornelia", "kalina", "daria", "diana", "judyta", "fatima", "agata", "alina",
-    "anita", "celina", "felicja", "gloria", "helena", "ida", "iga", "ilona",
-    "karina", "lena", "lidia", "lila", "lucja", "łucja", "marika", "marlena",
-    "martyna", "milena", "miranda", "nikola", "regina", "roksana", "sabina",
-    "sara", "sonia", "stella", "tamara", "tola", "żaneta",
-    "ada", "adriana", "anastazja", "apolonia", "aurelia", "bernadeta", "blanka",
-    "dagmara", "dobrawa", "dobrochna", "eleonora", "eliza", "eugenia", "faustyna",
-    "florentyna", "franciszka", "gabriela", "gaja", "gertruda", "gizela", "honorata",
-    "hortensja", "inga", "irmina", "izolda", "jagienka", "klementyna", "konstancja",
-    "kordelia", "krystiana", "leokadia", "lilianna", "liwia", "ludmiła", "luiza",
-    "marcelina", "matylda", "melania", "michalina", "mirosława", "nadzieja", "noemi",
-    "otylia", "pelagia", "petronela", "rozalia", "róża", "roza", "salomea", "seweryna",
-    "sławomira", "slawomira", "sydonia", "sybilla", "tekla", "teodora", "waleria",
-    "wiola", "wirginia",
-    # Hypocoristics and popular variants (for vocative conversion)
-    "kasia", "basia", "asia", "ania", "ola", "gosia", "madzia", "zosia",
-    "marysia", "natalka", "julka", "krysia", "danka", "ala", "magda",
-    "agatka", "agnisia", "agusia", "anetka", "andzia", "anitka", "anka", "anusia",
-    "tosia", "tośka", "beatka", "bogusia", "celinka", "domisia", "dorotka", "edytka",
-    "ela", "elka", "elunia", "emilka", "ewka", "ewunia", "halka", "halinka", "helka",
-    "helenka", "iza", "izka", "jadzia", "jadźka", "joasia", "aśka", "juleczka",
-    "justynka", "kamilka", "karolka", "kaśka", "kasiunia", "kingusia", "kryśka",
-    "lucynka", "łucka", "lucka", "madźka", "gośka", "małgośka", "malgoska", "maryśka",
-    "marychna", "martka", "martusia", "martynka", "marzenka", "monia", "moniczka",
-    "natka", "oliwka", "paulinka", "renatka", "roksa", "sylwka", "terenia", "tesia",
-    "ula", "ulka", "ulusia", "werka", "weronisia", "wika", "wikusia", "wiolka",
-    "zośka", "zosieńka", "zuzia", "zuza", "zuźka", "zuzka",
-    "tusia", "lusia", "dusia", "stasia", "frania", "mania", "danusia", "halszka"
-}
-
-MALE_EXCEPTIONS_ON_A = {
-    "kuba", "barnaba", "kosma", "bonawentura", "jarema", "zawisza",
-    "sasza", "mustafa", "joshua", "akira", "luka", "luca",
-    "shira", "gaara", "kiba", "soma", "kenta", "ryoma", "hanza", "koba", "soya",
-    "toma", "genga", "seneca", "kaligula", "sparta", "spinoza", "buddha", "budda",
-    "dante", "petrarka", "torquemada", "zapata", "garcia", "elijah", "noah", "ezra",
-    "micah", "hosea", "jeremiah", "jonah", "isaiah", "sasha", "misha", "ilja", "kolja",
-    "wania", "alosza", "foma", "grisha", "toya", "shota", "souta", "kota", "shouta",
-    "yuuta", "yuta", "renga", "hakuya", "byakuya", "genya", "katsura"
-}
-
-CANONICAL_MALE_NAMES_ON_A = MALE_EXCEPTIONS_ON_A
+POLISH_FEMALE_NAMES: Set[str] = _ONOMASTIC_LEXICON.get("polish_female_names", set())
+MALE_EXCEPTIONS_ON_A: Set[str] = _ONOMASTIC_LEXICON.get("male_exceptions_on_a", set())
+CANONICAL_MALE_NAMES_ON_A: Set[str] = MALE_EXCEPTIONS_ON_A
 
 ETHNONYMS_AND_COLLECTIVES = {
     # English plural and singular ethnonyms / collectives / polities
@@ -2108,37 +2064,12 @@ ETHNONYMS_AND_COLLECTIVES = {
     "orkowie", "orków", "bestie", "duchy", "potwory"
 }
 
-INDECLINABLE_FRENCH_TOPONYMS = {
-    "bordeaux", "margaux", "calais", "meaux", "pau", "chamonix", "angers", "versailles", "reims", "brest", "nantes"
-}
-
-UNIVERSAL_FEMALE_NAMES_ON_A = {
-    "asuka", "sakura", "elena", "fatima", "sonia", "hinata", "mikasa", "historia",
-    "erza", "ayaka", "kaori", "yuka", "ayame", "kana", "chika", "rika",
-    "akane", "haruka", "nanami", "hina", "marin", "kanna", "alya", "tanya",
-    "alisa", "fiona", "eliza", "clara", "teresa", "selena", "vanessa",
-    "melissa", "natasha", "tatiana", "olga", "sveta", "katrina", "sabrina", "sarah",
-    "olivia", "bianca", "mia"
-}
-
-INVARIABLE_JAPANESE_FEMALE_NAMES = {
-    "karin", "marin", "rin", "ran", "shion", "karen", "sion", "suzu",
-    "yoruichi", "aoi", "shinobu", "nanami", "ayame", "kaori", "tsunade", "tomoyo",
-    "hitomi", "homura", "madoka", "mami", "sayaka", "kyoko", "kohaku",
-    "chiyo", "maki", "nobara", "mai", "kasumi", "miwa", "shoko", "utahime",
-    "mei", "kanna", "koko", "sakurako", "hanako", "fumiko", "yukiko", "yoko",
-    "naoko", "mariko", "keiko", "reiko", "aiko", "riko", "miko", "ririka",
-    "kikyo", "kagome", "sango", "kushina", "mikoto", "kurenai", "anko",
-    "temari", "tenten", "konan", "mito", "tsuchigumo", "suzumebachi", "nemu",
-    "unohana", "isane", "kiyone", "soi-fon", "soifon", "mashiro", "hiyori",
-    "himeko", "seele", "bronya", "raiden", "yae"
-}
-
-FOREIGN_FEMALE_CONSONANT_NAMES = {
-    "carmen", "miriam", "ines", "rachel", "astrid", "judith", "helen", "karen",
-    "gwen", "karin", "marin", "rin", "shion", "sion", "helen", "ellen", "karen", "vivian",
-    "lyn", "lynn", "ann", "anne", "jean", "joan", "jill", "kim", "dawn", "megan", "beth"
-}
+INDECLINABLE_FRENCH_TOPONYMS: Set[str] = _ONOMASTIC_LEXICON.get("indeclinable_french_toponyms", set())
+UNIVERSAL_FEMALE_NAMES_ON_A: Set[str] = _ONOMASTIC_LEXICON.get("universal_female_names_on_a", set())
+INVARIABLE_JAPANESE_FEMALE_NAMES: Set[str] = _ONOMASTIC_LEXICON.get("invariable_japanese_female_names", set())
+FOREIGN_FEMALE_CONSONANT_NAMES: Set[str] = _ONOMASTIC_LEXICON.get("foreign_female_consonant_names", set())
+CANONICAL_A_NAMES: Set[str] = _ONOMASTIC_LEXICON.get("canonical_a_names", set())
+WORLD_CAPITAL_TOPONYMS: Set[str] = _ONOMASTIC_LEXICON.get("world_capital_toponyms", set())
 
 FEMALE_LEXICON_NAMES: Set[str] = (
     INHERENT_FEMALE_NOUNS | SECONDARY_LEXICAL_FEMALE_NOUNS |
@@ -3159,14 +3090,14 @@ def generate_polish_name_declension(name: str, gender: str = "UNKNOWN") -> Dict[
     if n.lower().endswith("um"):
         return {"M": n, "D": n, "C": n, "B": n, "N": n, "Ms": n, "W": n}
 
-    # 1. Names ending in -a (both female and male like Akira, Soma, Luca, Seneca, Alicia, Maria)
+    # 1. Names ending in -a (both female and male)
     if n.endswith("a"):
         stem = n[:-1]
         if not stem:
             return {"M": n, "D": n, "C": n, "B": n, "N": n, "Ms": n, "W": n}
 
         # Phonological alternations in Polish:
-        # -ia (Maria, Alicia, Julia, Silvia) -> D./C./Ms. -ii; B. -ię; N. -ią; W. -io
+        # -ia -> D./C./Ms. -ii; B. -ię; N. -ią; W. -io
         if stem.endswith("i"):
             return {
                 "M": n,
@@ -3923,14 +3854,9 @@ def sanitize_lexical_text(text: str) -> str:
             else:
                 res = re.sub(pat, repl, res)
 
-    # Subject nominative title repair: 'pan Eftala zniszczył' -> 'pan Eftal zniszczył', 'Mistrz Tondena minoru nie zdążył' -> 'Mistrz Tonden Minoru nie zdążył'
+    # Subject nominative title repair: '<Tytuł> <Nazwisko>a <Czasownik>' -> '<Tytuł> <Nazwisko> <Czasownik>'
     TITLES_SUBJECT_PAT = r"[Pp]an|[Pp]ani|[Mm]istrz|[Pp]rofesor|[Dd]oktor|[Pp]isarz|[Rr]eżyser|[Rr]edaktor|[Aa]utor|[Mm]angaka|[Ss]ensei"
-    CANONICAL_A_NAMES = {
-        "akira", "shira", "soma", "gaara", "ashitaka", "kiba", "kenta",
-        "ryoma", "hanza", "koba", "soya", "toma", "genga", "teshima",
-        "yamada", "maeda", "takeda", "matsuda", "kuroda", "sanada",
-        "shimada", "okada", "ishida", "kawada", "ueda", "baba", "honda", "oda", "aida"
-    }
+
     POLISH_ADVERBS = {
         "faktycznie", "naprawdę", "bardzo", "właśnie", "wczoraj", "dzisiaj", "jutro",
         "wtedy", "teraz", "zaraz", "nagle", "znowu", "ponownie", "dobrze", "źle",
@@ -8432,17 +8358,7 @@ class SeriesBible:
                             detected_cast.add(p_to_clean)
 
 
-        # Series-scoped plot anchors and context for anonymous historical scenes (0.00 PLN)
-        if getattr(self, "anime_title", None) and "tenmaku" in str(self.anime_title).lower():
-            if any(kw in combined_lower for kw in [
-                "sorkaktani", "sorghaghtani", "cztery tysiące jurt", "four thousand tents"
-            ]):
-                detected_cast.add("Boraqchin")
-                detected_cast.add("Möge")
-                for m_male_kw in "ögedei ogedei tolui chagatai jochi temüge temuge".split():
-                    for c in list(detected_cast):
-                        if c.lower() == m_male_kw:
-                            detected_cast.discard(c)
+
 
         # Audio Whisper Ground Truth integration (if available)
         combined_whisper = " ".join(whisper_texts or []).lower() if whisper_texts else ""
@@ -8957,10 +8873,7 @@ class SeriesBible:
         if not details:
             return ""
 
-        CANONICAL_MALE_NAMES = {
-            "shira", "akira", "gaara", "ashitaka", "kiba", "soma", "kenta",
-            "ryoma", "hanza", "sinbad", "judar", "alibaba"
-        }
+
 
         # Safely extract string description from details (supporting dict payloads)
         if isinstance(details, dict):
