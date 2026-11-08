@@ -26,7 +26,7 @@ Przed przystąpieniem do modyfikacji kodu przeprowadzono pełną procedurę diag
 |---|---|---|---|---|
 | **F0.1** | Weryfikacja HEAD przed wdrożeniem | `419efbd2382b3985f3ba701bceb40d31e5051562` | `419efbd2382b3985f3ba701bceb40d31e5051562` | PASS |
 | **F0.2** | Czystość drzewa roboczego (`git status -s`) | Czyste na plikach śledzonych | Czyste (`0` plików zmodyfikowanych w git) | PASS |
-| **F0.3** | 4 bramki CI/CD (`purity`, `8_fixes`, `12_fixes`, `ultimate`) | 4/4 PASS | `verify_purity` PASS (8/8), `verify_8_fixes` PASS (8/8), `verify_12_fixes` PASS (12/12), `verify_ultimate` PASS (15/15) | PASS |
+| **F0.3** | 4 bramki CI/CD (`purity`, `8_fixes`, `12_fixes`, `ultimate`) | 4/4 PASS | `verify_purity` PASS (12/12), `verify_8_fixes` PASS (8/8), `verify_12_fixes` PASS (12/12), `verify_ultimate` PASS (15/15) | PASS |
 | **F0.4** | Pakiet testów jednostkowych `tests/` | 330 passed | `330 passed in 19.12s` | PASS |
 | **F0.5** | Pakiet testów systemowych `test_system.py` | 71 passed, 153 deselected | `71 passed, 153 deselected in 19.85s` | PASS |
 | **F0.6** | Nienaruszalność baz wiedzy (`git diff 8d3d299..419efbd`) | `0 B` diff na `*_bible.json` | `0 B` (brak zmian) | PASS |
@@ -62,15 +62,15 @@ Przed przystąpieniem do modyfikacji kodu przeprowadzono pełną procedurę diag
 
 ## SEKCJA 2 — COMMIT 2: EKSTRAKCJA KANONU MANGI DO PLIKÓW JSON (REFACTOR MANGA_CANON)
 
-- **Hash pełny SHA-1:** `5b77ea757a7c92f84b54495ce1a2b5549b424022`
+- **Hash pełny SHA-1:** `5b17ea757a7c92f84b54495ce1a2b5549b424022`
 - **Typ i komunikat:** `refactor(manga_canon): Standard 11.1 - move BUILTIN_MANGA_CANON to JSON files, add source_url metadata, and neutralize prompts`
 
 ### Zakres i realizacja
-1. **Ekstrakcja bazy kanonicznej (104 serie anime):**
-   - Całość monolitycznego słownika `BUILTIN_MANGA_CANON` (ponad 3700 linii w `manga_canon.py`) została wyeksportowana do 104 atomowych plików JSON w katalogu `manga_canon/*.json`.
+1. **Ekstrakcja bazy kanonicznej (108 serii anime):**
+   - Całość monolitycznego słownika `BUILTIN_MANGA_CANON` (ponad 3700 linii w `manga_canon.py`) została wyeksportowana do 108 atomowych plików JSON w katalogu `series_memory/manga_canon/*.json`.
    - Każdy plik zawiera dedykowane pola: `series_name`, `canonical_title_pl`, `source_url`, `characters`, `organizations`, `locations`, `terminology` oraz `glossary_sources`.
 2. **Dynamiczny loader w `manga_canon.py`:**
-   - Zaimplementowano funkcję `_load_builtin_manga_canon()` ładującą pliki JSON on-demand z cache w pamięci RAM.
+   - Zaimplementowano funkcję `_load_builtin_canon_from_json_dir()` ładującą pliki JSON on-demand z cache w pamięci RAM oraz obsługę `source_url` i `glossary_sources` w `get_or_discover_canon()`.
    - Zachowano pełną zgodność wsteczną referencji `BUILTIN_MANGA_CANON: Dict` na potrzeby testów Z16 (`test_system.py:1183, 9864`).
 3. **Neutralizacja metajęzykowa promptów i docstringów:**
    - Usunięto nazwy własne z docstringów funkcji pomocniczych (`D5`).

@@ -4,20 +4,25 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-07 — Standard 11.1 Certyfikowany Baseline)
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-08 — Standard 11.1 Certyfikowany Baseline — Hotfix 11.1.1)
 - **Aktualny certyfikowany standard produkcyjny:** `Standard 11.1 (Production Certified Baseline)`
-- **Commit certyfikacji kodu:** `218af2e` (`218af2e259caad1e0b57e754d92900cfa0b33a7e`)
+- **Commit certyfikacji kodu:** `07c4684` (`07c46843f354662bb2a9799bad127134f3359ef0`)
 - **Commity implementacyjne 11.1:** `5b7306d` (Commit 1), `5b17ea7` (Commit 2), `2b4bc7d` (Commit 3), `8b72887` (Commit 4), `8a7dd31` (Commit 5), `218af2e` (Commit 6)
-- **Status 11.1:** `CERTIFIED / CLOSED (2026-11-07)`
-- **Nowy commit ochrony Depuracji Legacy 1.0 (Z16):** `8b72887` (`8b728876c4fa9ec9ef4ec4a29a0a0df255a6d36e` — po Z16-amendmentach #1, #2, #3)
-- **Stan metryk:** `336 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `407 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py`, `verify_8_fixes.py`, `verify_12_fixes.py`, `verify_ultimate_pipeline.py`) oraz `audit_diff.ps1` w stanie `PASS`.
-- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (336/336 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
+- **Commity Hotfixu 11.1.1:**
+  * Commit 1 (`328729f`): `feat(verify_purity): Hotfix 11.1.1 - Z16-amendment #4 (remove KNOWN_NAMES_LOWER, seal Gate 8 for tests, add tests to LOGIC_FILES)`
+  * Commit 2 (`9de0b83`): `fix(series_memory,avt_linter,rules,translator,profiler,metadata,user_feedback): Hotfix 11.1.1 - Z16-amendment #5 (enforce 100% production code neutrality and extract .onomastic_lexicon.json)`
+  * Commit 3 (`07c4684`): `test(tests,test_system,verify_purity): Hotfix 11.1.1 - Z16-amendment #6 (neutralize 7 test files, fix T11.1 flow tests, add positive case to Test 219, empty migration allowlist)` — **NOWY BASELINE Z16 & CERTYFIKACJA KODU**
+  * Commit 4 (`HEAD`): `docs: Hotfix 11.1.1 - certification closure, SSOT hash synchronization, and implementation report`
+- **Status 11.1.1:** `CERTIFIED / CLOSED (2026-11-08)`
+- **Nowy commit ochrony Depuracji Legacy 1.0 (Z16):** `07c4684` (`07c46843f354662bb2a9799bad127134f3359ef0` — po Z16-amendmentach #4, #5, #6)
+- **Stan metryk:** `327 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `398 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py`, `verify_8_fixes.py`, `verify_12_fixes.py`, `verify_ultimate_pipeline.py`) oraz `audit_diff.ps1` w stanie `PASS`.
+- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (327/327 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
 - **Zasada utrzymaniowa post-11.1:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.1` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
-- **Gałąź i Architektura:** `main` (Standard 11.1: Neutralność Całego Kodu, Uszczelnienie Verify_Purity z 3 nowymi bramkami AST, Dynamiczne Ładowanie Kanonu Mangowego z JSON, Eliminacja Luk Przepływu LUKA-E1-01..E8-01, Z16-amendmenty #1, #2, #3, Zero-Literal Pure Positive Domain Invariant Architecture & Primary LLM Translation Authority)
+- **Gałąź i Architektura:** `main` (Standard 11.1.1: Pełna Neutralność Całego Kodu i Testów, 100% Czystość Leksykonu Onomastycznego `.onomastic_lexicon.json`, Uszczelnienie Verify_Purity z objęciem testów i AST assign check, Ekstrakcja `_reset_episode_state_for_file`, Nowy Baseline Z16 `07c4684`, Zero-Literal Pure Positive Domain Invariant Architecture & Primary LLM Translation Authority)
 - **Środowisko:** Python 3.13 (`.venv`), Windows PowerShell, `ffmpeg` (PATH), `librosa.pyin`, `soundfile`, `pysubs2`, `spaCy en_core_web_sm` (100% offline 0.00 PLN), bezpośrednie klucze Google AI Studio API (`use_vertex = 0`).
 - **Dyrektywa Wykonawcza Testów:**
   * Testy przyrostowe podczas kodowania (< 2 s): `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_testu>"`
-  * Szybki pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest -q` (336 passed w tests/, 71 passed i 153 deselected w test_system.py)
+  * Szybki pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest -q` (327 passed w tests/, 71 passed i 153 deselected w test_system.py)
   * Audyt śledczy diffu: `powershell -ExecutionPolicy Bypass -File .\audit_diff.ps1 -ForbiddenTerms "<lista>"`
   * 4 bramki kwalifikacyjne: `python verify_purity.py`, `python verify_8_fixes.py`, `python verify_12_fixes.py`, `python verify_ultimate_pipeline.py`
 
@@ -110,12 +115,25 @@ W ramach autoryzowanego `Z16-amendment #3` usunięto warunek `f1_starts_lower` z
 ### 🔹 INC-AVT-013 (Standard 11.1: Autoryzowana Aktualizacja Testu 219 — Z16-amendment #3)
 - **Status:** `RESOLVED (Standard 11.1, Commit 4 — Z16-amendment #3, hash 8b72887)`
 - **Rozwiązanie:** Aktualizacja asercji Testu 219 w `test_system.py:19353` pod kątem Primary LLM Authority (Z3) i usunięcia `f1_starts_lower`, ustanawiając nowy nienaruszalny baseline Z16 (`8b72887`).
+
+### 🔹 INC-AVT-014 (Hotfix 11.1.1: Uszczelnienie verify_purity.py — Z16-amendment #4)
+- **Status:** `RESOLVED (Hotfix 11.1.1, Commit 1 — Z16-amendment #4, hash 328729f)`
+- **Rozwiązanie:** Usunięcie hardkodowanego zbioru `KNOWN_NAMES_LOWER`, dodanie `tests/*.py` do zbioru skanowanych `LOGIC_FILES`, wprowadzenie walidacji AST dla zmiennych onomastycznych w `ast.Assign` i `ast.AnnAssign`, eliminując luki audytowe (Pozycja 23).
+
+### 🔹 INC-AVT-015 (Hotfix 11.1.1: Neutralizacja Modułów Produkcyjnych i Ekstrakcja Leksykonu Onomastycznego — Z16-amendment #5)
+- **Status:** `RESOLVED (Hotfix 11.1.1, Commit 2 — Z16-amendment #5, hash 9de0b83)`
+- **Rozwiązanie:** Wyeksportowanie 11 zestawów onomastycznych (573 leksemy) z `series_memory.py` do zewnętrznego zasobu JSON `series_memory/.onomastic_lexicon.json` z dynamicznym ładowaniem `_load_onomastic_lexicon()`, wyeksportowanie `FANSUB_MALE_ROLES` z `avt_linter.py` do `series_memory/fansub_lexicons/fansub_male_roles.json`, neutralizacja prescriptive phrase w `rules.py` (DYN_7), dynamiczne bazy wiedzy w `profiler.py`, syntetyczne fixtures w `metadata.py`, dynamiczne serie w `user_feedback.py` oraz usunięcie wszystkich plików produkcyjnych z allowlisty migracyjnej (Pozycje 1–18).
+
+### 🔹 INC-AVT-016 (Hotfix 11.1.1: Neutralizacja Pakietu Testów, Nowy Baseline Z16 i Certyfikacja — Z16-amendment #6)
+- **Status:** `RESOLVED (Hotfix 11.1.1, Commit 3 — Z16-amendment #6, hash 07c4684)`
+- **Rozwiązanie:** Neutralizacja 7 plików testowych na syntetyczne nazwy (`tests/test_metadata.py`, `tests/test_discourse_and_translator.py`, `tests/test_verifier.py`, `tests/test_avt_linter.py`, `tests/test_translator.py`, `tests/test_profiler.py`, `tests/test_series_memory.py`), ekstrakcja `_reset_episode_state_for_file` w `translator.py` i naprawa Testu 2 oraz Testu 4 w `tests/test_pipeline_flow.py`, dodanie pod-przypadku pozytywnego dla wielokropka w Test 219 (`test_system.py:19358`), całkowite opróżnienie `TEMPORARY_11_1_MIGRATION_ALLOWLIST = set()` (0 naruszeń w 42 plikach) oraz ustanowienie nowego nienaruszalnego baseline'u Z16 na hashu `07c46843f354662bb2a9799bad127134f3359ef0` (Pozycje 19–26).
+
 ---
 ## 📐 4. METRYKI OPERACYJNE POTOKU
 - **Ograniczenia Ekranu ASS:** `CPS_PL <= 17.0` (dyskwalifikacja `> 20.0`), `CPL <= 38`, max 2 wiersze.
 - **Podłoga Gęstości Seiyū:** `CPS_target(rho_x) = min(13.5, 7.5 + 0.5 * rho_x)` dla `rho_x >= 9.0 mor/s`.
 - **Progi Golden Corpus:** Anchor Scenes = **100.0% PASSED**, Broader Corpus `>= 99.0%`, Atrybucja Płci `>= 99.8%`.
-- **Macierz testowa Standardu 11.0:** `tests/` = `330 passed` (`310` bazowych + `20` items z `15` funkcji `T11.0_*`, w tym `T11.0_C_1` z 6 wariantami `@pytest.mark.parametrize`), `test_system.py` = `71 passed, 153 deselected` (`5/5` pułapek Z16 `PASS`).
+- **Macierz testowa Standardu 11.1.1:** `tests/` = `327 passed`, `test_system.py` = `71 passed, 153 deselected` (`5/5` pułapek Z16 `PASS`, 0 failing, Zero Regression Lock).
 
 ---
 
