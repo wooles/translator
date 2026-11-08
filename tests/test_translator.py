@@ -15,9 +15,9 @@ from verifier import _guard_phase2_regressions
         (
             False,
             "FEMININE",
-            "Musimy już ruszać, Ayako.",
-            r"{\i1}Musimy już ruszać, Ayako.{\i0}",
-            "Musimy już ruszać, Ayako."
+            "Musimy już ruszać, Bohaterko.",
+            r"{\i1}Musimy już ruszać, Bohaterko.{\i0}",
+            "Musimy już ruszać, Bohaterko."
         ),
         # Monolog wewnętrzny (is_internal_monologue=True): całoliniowa kursywa zachowana
         (
@@ -38,7 +38,7 @@ def test_phase1_monologue_detection_and_phase2_over_application_italics_guard(
     guarded = _guard_phase2_regressions(
         f1_pl=f1_pl,
         refined_pl=refined_pl,
-        source_en="We need to move now, Ayako.",
+        source_en="We need to move now, Heroine.",
         target_p0_gender=target_gender,
         is_internal_monologue=is_monologue
     )

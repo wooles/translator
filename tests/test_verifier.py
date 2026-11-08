@@ -51,9 +51,9 @@ def test_guard_phase2_regressions_authority_and_ass_tags():
     assert guarded_enc == f1_enc, f"Oczekiwano zachowania enklityki z Fazy 1: {guarded_enc}"
 
     # 5. Regression guard: Loss of prepositional governance for invariable anthroponym
-    en_prep = "We are fighting against Monika today."
-    f1_prep = "Walczymy dzisiaj przeciwko Monika."
-    f2_lost = "Walczymy dzisiaj z Monika."
+    en_prep = "We are fighting against Bohaterka today."
+    f1_prep = "Walczymy dzisiaj przeciwko Bohaterka."
+    f2_lost = "Walczymy dzisiaj z Bohaterka."
     guarded_prep = _guard_phase2_regressions(
         f1_pl=f1_prep,
         refined_pl=f2_lost,
@@ -712,11 +712,11 @@ def test_t10_1_1_p2b_focused_rules_dialect_and_paraphrase_contrast_prompt():
         # Wariant 1: imię własne na początku, poprzednia linia z wielokropkiem
         ("Ale...", "Ale...", "Alpha?", "Alpho?", "Alpho?", "Alpho?"),
         # Wariant 2: normalne zdanie pytające
-        ("Anno...", "Anno...", "Do you know something about this?", "Wiesz coś o tym?", "Wiesz coś o tym?", "Wiesz coś o tym?"),
+        ("Bohaterko...", "Bohaterko...", "Do you know something about this?", "Wiesz coś o tym?", "Wiesz coś o tym?", "Wiesz coś o tym?"),
         # Wariant 3: krótkie potwierdzenie
         ("Nie przyszłyśmy tu razem...", "Nie przyszłyśmy tu razem...", "I see.", "Rozumiem.", "Rozumiem.", "Rozumiem."),
         # Wariant 4: pełne imię i nazwisko
-        ("Tak. A pan to...", "Tak. A pan to...?", "Beta Bassett.", "Beta Bassett.", "Beta Bassett.", "Beta Bassett."),
+        ("Tak. A pan to...", "Tak. A pan to...?", "PostacBeta NazwiskoBeta.", "PostacBeta NazwiskoBeta.", "PostacBeta NazwiskoBeta.", "PostacBeta NazwiskoBeta."),
         # Wariant 5: pojedyncze imię
         ("To...", "To...", "Gamma?", "Gamma?", "Gamma?", "Gamma?"),
     ],
@@ -810,14 +810,14 @@ def test_t10_6_2_4_unchanged_line_has_no_regression_guard_flag():
         {
             "prev_f1": "Wybacz...",
             "prev_f2": "Wybacz...",
-            "curr_en": "Sorry, Anna.",
-            "curr_f1": "Wybacz, Anno.",
-            "curr_f2": "Wybacz, Anno.",
+            "curr_en": "Sorry, Heroine.",
+            "curr_f1": "Wybacz, Bohaterko.",
+            "curr_f2": "Wybacz, Bohaterko.",
         }
     ]
     result = _guard_phase2_regressions(batch_items)
     out_text = result[0]["curr_f2"] if isinstance(result, list) else result["curr_f2"]
     changes_made = result[0].get("changes_made", "") if isinstance(result, list) else result.get("changes_made", "")
-    assert out_text == "Wybacz, Anno."
+    assert out_text == "Wybacz, Bohaterko."
     assert "Zabezpieczono przed regresją Fazy 2" not in changes_made
 

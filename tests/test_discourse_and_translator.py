@@ -9,23 +9,23 @@ def test_speaker_gender_arbitration_p0_priority_and_sign_isolation(tmp_path):
     bible_file = tmp_path / "discourse_test_bible.json"
     bible = SeriesBible(bible_path=bible_file, storage_dir=tmp_path)
     bible.data["characters"] = {
-        "Wojownik Jan": {
+        "Wojownik MeskiAlfa": {
             "description": "MĘŻCZYZNA (zweryfikowano przez EpisodeQualityGate)",
             "gender": "MALE",
             "grammatical_gender": "MASCULINE",
             "confidence": 1.0,
             "priority": "P0",
             "has_verified_gender": True,
-            "aliases": ["Jan", "Wojownik Jan"]
+            "aliases": ["Jan", "Wojownik MeskiAlfa"]
         },
-        "Czarodziejka Anna": {
+        "Czarodziejka ZenskaBeta": {
             "description": "KOBIETA (zweryfikowano przez EpisodeQualityGate)",
             "gender": "FEMALE",
             "grammatical_gender": "FEMININE",
             "confidence": 1.0,
             "priority": "P0",
             "has_verified_gender": True,
-            "aliases": ["Anna", "Czarodziejka Anna"]
+            "aliases": ["Anna", "Czarodziejka ZenskaBeta"]
         }
     }
     bible._rebuild_actor_aliases_index()
@@ -33,13 +33,13 @@ def test_speaker_gender_arbitration_p0_priority_and_sign_isolation(tmp_path):
     translator = MultimodalTranslator.__new__(MultimodalTranslator)
     translator.series_bible = bible
     translator.character_registry = {
-        "Wojownik Jan": "MĘŻCZYZNA (P0 zweryfikowano)",
-        "Czarodziejka Anna": "KOBIETA (P0 zweryfikowano)"
+        "Wojownik MeskiAlfa": "MĘŻCZYZNA (P0 zweryfikowano)",
+        "Czarodziejka ZenskaBeta": "KOBIETA (P0 zweryfikowano)"
     }
 
-    # 1. P0 record immunity: Wojownik Jan (MALE P0) voiced with female acoustic pitch F0 (~230 Hz / sopran)
+    # 1. P0 record immunity: Wojownik MeskiAlfa (MALE P0) voiced with female acoustic pitch F0 (~230 Hz / sopran)
     # The verified P0 record MUST prevail over the acoustic pitch!
-    ev_male = pysubs2.SSAEvent(start=1000, end=3000, text="Jestem gotów do drogi.", name="Wojownik Jan")
+    ev_male = pysubs2.SSAEvent(start=1000, end=3000, text="Jestem gotów do drogi.", name="Wojownik MeskiAlfa")
     male_gender, male_alerts = translator._arbitrate_speaker_gender(
         event=ev_male,
         raw_phase1_gender=None,
@@ -50,8 +50,8 @@ def test_speaker_gender_arbitration_p0_priority_and_sign_isolation(tmp_path):
     assert male_gender == "mężczyzna"
     assert any("rekord_p0" in a for a in male_alerts)
 
-    # Czarodziejka Anna (FEMALE P0) with male acoustic pitch (bas ~110 Hz)
-    ev_fem = pysubs2.SSAEvent(start=3500, end=5500, text="Czekałam na ten moment.", name="Czarodziejka Anna")
+    # Czarodziejka ZenskaBeta (FEMALE P0) with male acoustic pitch (bas ~110 Hz)
+    ev_fem = pysubs2.SSAEvent(start=3500, end=5500, text="Czekałam na ten moment.", name="Czarodziejka ZenskaBeta")
     fem_gender, fem_alerts = translator._arbitrate_speaker_gender(
         event=ev_fem,
         raw_phase1_gender=None,
@@ -75,13 +75,13 @@ def test_speaker_gender_arbitration_p0_priority_and_sign_isolation(tmp_path):
     assert any("napis_ekranowy" in a for a in sign_alerts)
 
     # 3. Synchronize ASS event.name with verified speaker_name and offscreen styles
-    ev_sync = pysubs2.SSAEvent(start=8500, end=10000, text="Głos spoza kadru.", name="Jan (S1E1)")
+    ev_sync = pysubs2.SSAEvent(start=8500, end=10000, text="Głos spoza kadru.", name="MeskiAlfa (S1E1)")
     synced = synchronize_ass_event_metadata_and_styles(
         ev_sync,
-        speaker_name="Wojownik Jan",
+        speaker_name="Wojownik MeskiAlfa",
         is_offscreen=True
     )
-    assert synced.name == "Wojownik Jan"
+    assert synced.name == "Wojownik MeskiAlfa"
     assert "Offscreen" in synced.style
     assert "{\\i1}" in synced.text
 
@@ -132,7 +132,7 @@ def test_asr_window_isolation_and_empty_asr_for_is_sign_events():
         # DANE TESTOWE: kategoria — surowy separator "/" w polu aktora + scena żeńska (P0.3).
         ("/", "FEMALE", "FEMALE", "POLYLOGUE", "NON_VIRILE"),
         # Kategoria — postać o p0_gender=MALE w scenie żeńskiej (P0.3).
-        ("Artur", "MALE", "FEMALE", "Artur", "NON_VIRILE"),
+        ("BohaterAlfa", "MALE", "FEMALE", "BohaterAlfa", "NON_VIRILE"),
     ],
 )
 def test_arbitrate_telemetry_enforces_p0_gender_non_virile_and_polylogue_tag(
@@ -200,11 +200,11 @@ def test_arbitrate_telemetry_enforces_p0_gender_for_inferred_and_explicit_speake
     )
     bible.data["characters"]["HeroAlpha SurnameBeta"]["aliases"] = ["HeroAlpha"]
     bible.sync_verified_profile_entity(
-        name="Anna",
+        name="BohaterkaGamma",
         gender="FEMALE",
         has_verified_gender=True
     )
-    bible.data["characters"]["Anna"]["aliases"] = ["Aya"]
+    bible.data["characters"]["BohaterkaGamma"]["aliases"] = ["BohaterkaG"]
     bible._rebuild_actor_aliases_index()
 
     # 1. Wywnioskowany mówca (inferred_actor) z pustym raw_actor w scenie pozornie wyłącznie kobiecej
@@ -232,9 +232,9 @@ def test_arbitrate_telemetry_enforces_p0_gender_for_inferred_and_explicit_speake
 
     # 3. Adresat z bazy wiedzy P0
     t3 = SceneDiscourseGraph.arbitrate_event_telemetry(
-        event=pysubs2.SSAEvent(start=7000, end=9000, text="Dziękuję, Anna.", name="HeroAlpha"),
+        event=pysubs2.SSAEvent(start=7000, end=9000, text="Dziękuję, BohaterkaGamma.", name="HeroAlpha"),
         series_bible=bible,
-        addressee="Anna"
+        addressee="BohaterkaGamma"
     )
     assert t3["addressee_gender"] == "FEMALE"
 
@@ -258,10 +258,10 @@ def test_arbitrate_telemetry_enforces_p0_gender_for_inferred_and_explicit_speake
     [
         ("HeroAlpha SurnameBeta", "MASCULINE"),
         ("Neighbor", "FEMININE"),
-        ("Anna", "FEMININE"),
+        ("BohaterkaBeta", "FEMININE"),
     ]
 )
-def test_translator_runtime_telemetry_uses_arbitrate_p0_and_bilingual_aliases(actor_name, expected_gender_tag):
+def test_translator_runtime_telemetry_uses_arbitrate_p0_and_bilingual_aliases(actor_name, expected_gender_tag, tmp_path):
     """
     T5.1 (Operacja 2B.1 + 2C.1): Prawidłowy stan ciągu Telemetria: w translator.py = 100% zgodności
     MASCULINE/FEMININE z p0_gender (w tym przez dwujęzyczny alias roli) oraz zachowanie jawnego Name z [Events] ponad tagiem F0.
@@ -271,14 +271,14 @@ def test_translator_runtime_telemetry_uses_arbitrate_p0_and_bilingual_aliases(ac
     from translator import format_dry_telemetry_tag
     import pysubs2
 
-    bible = SeriesBible(anime_title="Nige Jouzu no Wakagimi")
+    bible = SeriesBible(anime_title="SeriaTestowaAlfa", storage_dir=tmp_path)
     bible.sync_verified_profile_entity(
         name="HeroAlpha SurnameBeta",
         gender="MALE",
         has_verified_gender=True
     )
     bible.sync_verified_profile_entity(
-        name="Anna",
+        name="BohaterkaBeta",
         gender="FEMALE",
         has_verified_gender=True
     )
@@ -293,7 +293,7 @@ def test_translator_runtime_telemetry_uses_arbitrate_p0_and_bilingual_aliases(ac
         "description": "Sąsiadka (kobieta)"
     }
     # Mapuj dwujęzyczne aliasy ról
-    bible.map_bilingual_role_aliases(["Neighbor", "HeroAlpha SurnameBeta", "Anna"])
+    bible.map_bilingual_role_aliases(["Neighbor", "HeroAlpha SurnameBeta", "BohaterkaBeta"])
 
     ev = pysubs2.SSAEvent(start=1000, end=3000, text="Tekst wypowiedzi", name=actor_name)
     telem = SceneDiscourseGraph.arbitrate_event_telemetry(
@@ -402,7 +402,7 @@ def test_populate_secondary_actor_tags_infers_lexical_gender_for_boy_and_girl_ta
     assert char_entry.get("grammatical_gender") == expected_grammatical_gender
 
     res = SceneDiscourseGraph.arbitrate_event_telemetry(
-        raw_actor="Anna",
+        raw_actor="BohaterkaDelta",
         target_actor=secondary_tag,
         series_bible=bible,
         is_internal_monologue=False,

@@ -152,11 +152,11 @@ def test_phase7_hygiene_preserves_single_sign_event_and_normalizes_ass_tags(inpu
     "speaker_a,speaker_b,top_sign_active,expected_lift",
     [
         # Kategoria 1: ten sam mówca → NIE podnoś.
-        ("Jan", "Jan", False, False),
+        ("MowcaPierwszy", "MowcaPierwszy", False, False),
         # Kategoria 2: różni mówcy, górne pasmo zajęte → NIE podnoś.
-        ("Jan", "Anna", True, False),
+        ("MowcaPierwszy", "MowcaDrugi", True, False),
         # Kategoria 3: różni mówcy, górne pasmo wolne → podnieś.
-        ("Jan", "Anna", False, True),
+        ("MowcaPierwszy", "MowcaDrugi", False, True),
     ],
 )
 def test_collision_alignment_keeps_same_speaker_continuity_and_checks_top_sign(
@@ -280,7 +280,7 @@ def test_phase7_merges_triple_tag_blocks_strips_orphan_i0_and_lifts_colliding_si
         # T4.3 (2B.10): Inicjalny wołacz W przed partykułą pytajną czy - przecinek ZACHOWANY
         ("Bohaterze, czy nie powinniśmy już ruszać?", "Bohaterze, czy nie powinniśmy już ruszać?"),
         ("- Bohaterze, czy nie powinniśmy już ruszać?\\N- Zaraz ruszamy.", "- Bohaterze, czy nie powinniśmy już ruszać?\\N- Zaraz ruszamy."),
-        ("Ayako, czy tak miało być?", "Ayako, czy tak miało być?"),
+        ("Bohaterko, czy tak miało być?", "Bohaterko, czy tak miało być?"),
         # Kontrprzykład: binarna alternatywa rozłączna w środku zdania - przecinek usunięty
         ("Pójdziesz tam dzisiaj, czy nie?", "Pójdziesz tam dzisiaj czy nie?"),
         ("Zrobisz to, czy tak po prostu odejdziesz?", "Zrobisz to czy tak po prostu odejdziesz?"),

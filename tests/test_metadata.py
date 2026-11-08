@@ -109,8 +109,8 @@ def test_actor_normalization_exact_token_and_asr_window_isolation(
 def test_step3_secondary_actors_populate_p1_and_p2_entries_in_series_bible(tmp_path):
     """
     T4.10 (Operacja 2C.7): Populacja postaci drugoplanowych z raw_actor_tags:
-    - postacie z jawną płcią w nawiasie ('Gojirō (M)') -> priority='P1', gender='MALE', confidence=0.70
-    - postacie żeńskie ('Shizuka (F)') -> priority='P1', gender='FEMALE', confidence=0.70
+    - postacie z jawną płcią w nawiasie ('PostacMeskaAlfa (M)') -> priority='P1', gender='MALE', confidence=0.70
+    - postacie żeńskie ('PostacZenskaAlfa (F)') -> priority='P1', gender='FEMALE', confidence=0.70
     - postacie bez płci ('Żołnierz') -> priority='P2', gender='UNKNOWN', confidence=0.50
     - separatory ('/', '\\') i tagi techniczne (Sign, Txt) są odrzucane.
     """
@@ -120,8 +120,8 @@ def test_step3_secondary_actors_populate_p1_and_p2_entries_in_series_bible(tmp_p
     bible = SeriesBible(bible_path=bible_file, storage_dir=tmp_path)
 
     raw_tags = [
-        "Gojirō (M)",
-        "Shizuka (F)",
+        "PostacMeskaAlfa (M)",
+        "PostacZenskaAlfa (F)",
         "Żołnierz",
         "/",
         "Sign",
@@ -133,19 +133,19 @@ def test_step3_secondary_actors_populate_p1_and_p2_entries_in_series_bible(tmp_p
     chars = bible.data.get("characters", {})
 
     # 1. Postać męska z jawnym tagiem -> P1 MALE
-    assert "Gojirō" in chars
-    assert chars["Gojirō"]["priority"] == "P1"
-    assert chars["Gojirō"]["gender"] == "MALE"
-    assert chars["Gojirō"]["grammatical_gender"] == "MASCULINE"
-    assert chars["Gojirō"]["confidence"] == 0.70
-    assert chars["Gojirō"]["has_verified_gender"] is False
+    assert "PostacMeskaAlfa" in chars
+    assert chars["PostacMeskaAlfa"]["priority"] == "P1"
+    assert chars["PostacMeskaAlfa"]["gender"] == "MALE"
+    assert chars["PostacMeskaAlfa"]["grammatical_gender"] == "MASCULINE"
+    assert chars["PostacMeskaAlfa"]["confidence"] == 0.70
+    assert chars["PostacMeskaAlfa"]["has_verified_gender"] is False
 
     # 2. Postać żeńska z jawnym tagiem -> P1 FEMALE
-    assert "Shizuka" in chars
-    assert chars["Shizuka"]["priority"] == "P1"
-    assert chars["Shizuka"]["gender"] == "FEMALE"
-    assert chars["Shizuka"]["grammatical_gender"] == "FEMININE"
-    assert chars["Shizuka"]["confidence"] == 0.70
+    assert "PostacZenskaAlfa" in chars
+    assert chars["PostacZenskaAlfa"]["priority"] == "P1"
+    assert chars["PostacZenskaAlfa"]["gender"] == "FEMALE"
+    assert chars["PostacZenskaAlfa"]["grammatical_gender"] == "FEMININE"
+    assert chars["PostacZenskaAlfa"]["confidence"] == 0.70
 
     # 3. Postać bez płci -> P2 UNKNOWN
     assert "Żołnierz" in chars
@@ -166,10 +166,30 @@ def test_step3_secondary_actors_populate_p1_and_p2_entries_in_series_bible(tmp_p
 @pytest.mark.unit
 @pytest.mark.parametrize(
     "anime_title",
-    ["Clevatess", "Golden Kamuy", "Silent Witch"],
+    ["SeriaTestowaAlfa", "SeriaTestowaBeta", "SeriaTestowaGamma"],
 )
-def test_get_anime_context_offline_bible(anime_title):
+def test_get_anime_context_offline_bible(anime_title, tmp_path, monkeypatch):
+    import json
+    from series_memory import SeriesBible
     from metadata import get_anime_context
+
+    dummy_data = {
+        "series_title": anime_title,
+        "genres": ["akcja", "przygodowe"],
+        "characters": {
+            "PostacA": {"gender": "MALE", "description": "Opis postaci A"},
+            "PostacB": {"gender": "FEMALE", "description": "Opis postaci B"}
+        }
+    }
+    bible_file = tmp_path / f"{anime_title.lower()}_bible.json"
+    bible_file.write_text(json.dumps(dummy_data, ensure_ascii=False), encoding="utf-8")
+
+    orig_init = SeriesBible.__init__
+    def patched_init(self, anime_title=None, bible_path=None, storage_dir=None, **kwargs):
+        orig_init(self, anime_title=anime_title, bible_path=bible_path, storage_dir=str(tmp_path), **kwargs)
+
+    monkeypatch.setattr(SeriesBible, "__init__", patched_init)
+
     ctx = get_anime_context(f"[SubGroup] {anime_title} - 01.mkv")
     assert ctx is not None
     assert ctx.get("source") == "local_series_bible"

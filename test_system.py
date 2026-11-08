@@ -19357,6 +19357,15 @@ def test_standard_9_5_suite():
     assert not v_res_ell.startswith("...")
     assert v_res_ell == "Nie mogłem w to uwierzyć."
 
+    # Standard 11.1 (Z16-amendment #6, INC-AVT-016): F1 z wielokropkiem zachowuje wielokropek (pod-przypadek pozytywny)
+    v_res_ell_pos = DialogueVerifier._guard_phase2_regressions(
+        f1_pl="...nie mogłem w to uwierzyć.",
+        refined_pl="Nie mogłem w to uwierzyć.",
+        prev_line_pl="Widziałem to na własne oczy...",
+        prev_line_en="I saw it with my own eyes..."
+    )
+    assert v_res_ell_pos.startswith("...")
+
     # 5. SceneDiscourseGraph telemetry arbitrate (2C.1)
     ev_dialogue = pysubs2.SSAEvent(start=1000, end=3000, text="Rozumiem.", name="Abaddon")
     telem = SceneDiscourseGraph.arbitrate_event_telemetry(event=ev_dialogue, series_bible=bible)

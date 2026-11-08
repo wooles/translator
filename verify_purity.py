@@ -43,10 +43,7 @@ LOGIC_FILES = [
     "tests/test_translator.py", "tests/test_verifier.py"
 ]
 
-TEMPORARY_11_1_MIGRATION_ALLOWLIST = {
-    "tests/test_metadata.py", "tests/test_discourse_and_translator.py", "tests/test_verifier.py",
-    "tests/test_avt_linter.py", "tests/test_translator.py", "tests/test_profiler.py", "tests/test_series_memory.py"
-}
+TEMPORARY_11_1_MIGRATION_ALLOWLIST = set()
 
 # Bramka 2: Wprowadzanie przykładów nazewniczych (np. [Nazwa])
 RE_EXEMPLAR_INTRODUCERS = re.compile(

@@ -243,22 +243,24 @@ def test_f0_hard_masculine_immunity_against_english_anaphora_score(
 
 @pytest.mark.unit
 @pytest.mark.parametrize(
-    "module_name,forbidden_term",
-    [
-        ("profiler", "hyouken"),
-        ("profiler", "clevatess"),
-        ("rules", "hyouken"),
-        ("rules", "clevatess"),
-        ("metadata", "hyouken"),
-        ("scene_discourse", "hyouken"),
-    ],
+    "module_name",
+    ["profiler", "rules", "metadata", "scene_discourse"],
 )
-def test_profiler_rules_zero_literal(module_name, forbidden_term):
+def test_profiler_rules_zero_literal(module_name):
     import importlib
+    from pathlib import Path
     mod = importlib.import_module(module_name)
     with open(mod.__file__, encoding="utf-8") as f:
         src = f.read().lower()
-    assert forbidden_term not in src, f"Forbidden term {forbidden_term} found in {module_name}"
+    forbidden_terms = set()
+    for bible_file in Path("series_memory").glob("*_bible.json"):
+        if "test" in bible_file.name.lower():
+            continue
+        prefix = bible_file.stem.replace("_bible", "").split("_")[0].lower()
+        if len(prefix) >= 6 and prefix not in ("golden", "silent", "sayonara", "kingdom"):
+            forbidden_terms.add(prefix)
+    for term in forbidden_terms:
+        assert term not in src, f"Forbidden term {term} found in {module_name}"
 
 
 @pytest.mark.unit

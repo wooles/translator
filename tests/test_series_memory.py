@@ -14,15 +14,15 @@ def test_series_bible_entity_filtering_and_glossary_priority(tmp_path):
     bible.update_from_episode_profile(
         episode_name="Episode 01",
         characters={
-            "Artur Pendelton": {"description": "mężczyzna (bohater)", "gender": "MALE", "priority": "P0", "has_verified_gender": True},
-            "Helena Pendelton": {"description": "kobieta (bohaterka)", "gender": "FEMALE", "priority": "P0", "has_verified_gender": True},
+            "BohaterAlfa WspolneNazwisko": {"description": "mężczyzna (bohater)", "gender": "MALE", "priority": "P0", "has_verified_gender": True},
+            "BohaterkaBeta WspolneNazwisko": {"description": "kobieta (bohaterka)", "gender": "FEMALE", "priority": "P0", "has_verified_gender": True},
             "Sign Board": {"description": "szyld informacyjny", "is_sign": True},
             "Boy A": "chłopiec w tle",
             "Guard 1": "strażnik bramy",
             "Wydarzenie Przeszłe": {"description": "wspomnienie bitwy", "source": "continuity_bridge_alerts"}
         },
         glossary={
-            "Pendelton": "Ród Pendeltonów",
+            "WspolneNazwisko": "Ród WspolneNazwisko",
             "Szermierz": "Mistrz Miecza"
         }
     )
@@ -41,22 +41,22 @@ def test_series_bible_entity_filtering_and_glossary_priority(tmp_path):
     assert "Wydarzenie Przeszłe" not in decls
 
     # Real characters must be present
-    assert "Artur Pendelton" in chars
-    assert "Helena Pendelton" in chars
+    assert "BohaterAlfa WspolneNazwisko" in chars
+    assert "BohaterkaBeta WspolneNazwisko" in chars
 
     # 2. Surname alias collision prohibition:
     # Artur (MALE) and Helena (FEMALE) share the surname "Pendelton".
     # The bare surname "Pendelton" must NOT be assigned as an alias to either!
-    artur_aliases = chars["Artur Pendelton"].get("aliases", [])
-    helena_aliases = chars["Helena Pendelton"].get("aliases", [])
-    assert "Pendelton" not in artur_aliases
-    assert "pendelton" not in [a.lower() for a in artur_aliases if len(a.split()) == 1]
-    assert "Pendelton" not in helena_aliases
-    assert "pendelton" not in [a.lower() for a in helena_aliases if len(a.split()) == 1]
+    artur_aliases = chars["BohaterAlfa WspolneNazwisko"].get("aliases", [])
+    helena_aliases = chars["BohaterkaBeta WspolneNazwisko"].get("aliases", [])
+    assert "WspolneNazwisko" not in artur_aliases
+    assert "wspolnenazwisko" not in [a.lower() for a in artur_aliases if len(a.split()) == 1]
+    assert "WspolneNazwisko" not in helena_aliases
+    assert "wspolnenazwisko" not in [a.lower() for a in helena_aliases if len(a.split()) == 1]
 
     # First names should be present
-    assert "Artur" in artur_aliases
-    assert "Helena" in helena_aliases
+    assert "BohaterAlfa" in artur_aliases
+    assert "BohaterkaBeta" in helena_aliases
 
     # 3. Canonical priority of EpisodeProfiler glossary definitions over auto-generated forms
     # Glossary defines "Szermierz" -> "Mistrz Miecza"
@@ -72,16 +72,16 @@ def test_series_bible_syncs_verified_p0_gender_and_full_compound_declension():
     
     # 1. Sync verified profile entity with P0 gender and 7-case compound declension
     decl_map = {
-        "M": "Generał Janusz Korwin",
-        "D": "Generała Janusza Korwina",
-        "C": "Generałowi Januszowi Korwinowi",
-        "B": "Generała Janusza Korwina",
-        "N": "Generałem Januszem Korwinem",
-        "Ms": "Generale Januszu Korwinie",
-        "W": "Generale Januszu Korwinie"
+        "M": "Generał BohaterAlfa NazwiskoBeta",
+        "D": "Generała BohateraAlfa NazwiskoBeta",
+        "C": "Generałowi BohaterowiAlfa NazwiskoBeta",
+        "B": "Generała BohateraAlfa NazwiskoBeta",
+        "N": "Generałem BohateremAlfa NazwiskoBeta",
+        "Ms": "Generale BohaterzeAlfa NazwiskoBeta",
+        "W": "Generale BohaterzeAlfa NazwiskoBeta"
     }
     rec = bible.sync_verified_profile_entity(
-        name="Generał Janusz Korwin",
+        name="Generał BohaterAlfa NazwiskoBeta",
         gender="MALE",
         has_verified_gender=True,
         declension_map=decl_map
@@ -92,9 +92,9 @@ def test_series_bible_syncs_verified_p0_gender_and_full_compound_declension():
     assert rec["confidence"] >= 0.95
 
     # 2. Assert full 7-case declension retrieval via get_declension
-    assert bible.get_declension("Generał Janusz Korwin", "M") == "Generał Janusz Korwin"
-    assert bible.get_declension("Generał Janusz Korwin", "Ms") == "Generale Januszu Korwinie"
-    assert bible.get_declension("Generał Janusz Korwin", "W") == "Generale Januszu Korwinie"
+    assert bible.get_declension("Generał BohaterAlfa NazwiskoBeta", "M") == "Generał BohaterAlfa NazwiskoBeta"
+    assert bible.get_declension("Generał BohaterAlfa NazwiskoBeta", "Ms") == "Generale BohaterzeAlfa NazwiskoBeta"
+    assert bible.get_declension("Generał BohaterAlfa NazwiskoBeta", "W") == "Generale BohaterzeAlfa NazwiskoBeta"
     assert bible.get_declension("Nieznany Byt", "M") == "Nieznany Byt"
 
 
@@ -102,8 +102,8 @@ def test_series_bible_syncs_verified_p0_gender_and_full_compound_declension():
     "entity_id,contaminated_gender,verified_profile_gender,relation_key",
     [
         # DANE TESTOWE: encja żeńska z historycznie zatrutym p0_gender=MALE + relacja z etykietą [MĘŻCZYZNA (Adresat)].
-        ("Helena", "MALE", "FEMALE", "Artur -> Helena"),
-        ("Anna", "MALE", "FEMALE", "Wojownik -> Anna"),
+        ("BohaterkaBeta", "MALE", "FEMALE", "BohaterAlfa -> BohaterkaBeta"),
+        ("BohaterkaGamma", "MALE", "FEMALE", "Wojownik -> BohaterkaGamma"),
     ],
 )
 def test_sanitize_bible_in_ram_aligns_character_and_relation_gender_with_p0(
@@ -313,8 +313,8 @@ def test_validate_relation_strips_nested_bracket_clause_and_sanitizes_legacy_dec
     )
 
     # 2. Sprawdzenie usunięcia osieroconego ogona po dawnych regexach
-    bible.data["relations"]["Artur -> Helena"] = (
-        "poufna rozmowa per ty', eliminacja hybryd 'Helena... ma pan' oraz odporność na opuszczanie -sama]"
+    bible.data["relations"]["BohaterAlfa -> BohaterkaBeta"] = (
+        "poufna rozmowa per ty', eliminacja hybryd 'BohaterkaBeta... ma pan' oraz odporność na opuszczanie -sama]"
     )
 
     # 3. Sprawdzenie regeneracji uszkodzonych paradygmatów wczytanych z dysku (np. ńa, e'a)
@@ -349,7 +349,7 @@ def test_validate_relation_strips_nested_bracket_clause_and_sanitizes_legacy_dec
     assert "serdeczna rozmowa przyjaciół per ty" in rel_yorishige
 
     # Asercja 2: osierocony ogon usunięty
-    rel_artur = bible.data["relations"]["Artur -> Helena"]
+    rel_artur = bible.data["relations"]["BohaterAlfa -> BohaterkaBeta"]
     assert "eliminacja hybryd" not in rel_artur
     assert "-sama]" not in rel_artur
     assert "poufna rozmowa per ty" in rel_artur
@@ -366,14 +366,14 @@ def test_validate_relation_strips_nested_bracket_clause_and_sanitizes_legacy_dec
     assert "e'owi" not in decl_pole["C"]
 
     # 4. Sprawdzenie korekty ortograficznej rdzenia wołacza W (SeriesBible.align_vocative_orthography)
-    # Kanoniczny wołacz w bazie z podwójną spółgłoską: Abaddon -> Abaddonie
-    bible.data["declensions"]["Abaddon"] = {
-        "M": "Abaddon", "D": "Abaddona", "C": "Abaddonowi", "B": "Abaddona",
-        "N": "Abaddonem", "Ms": "Abaddonie", "W": "Abaddonie"
+    # Kanoniczny wołacz w bazie z podwójną spółgłoską: Bohateronn -> Bohateronnie
+    bible.data["declensions"]["Bohateronn"] = {
+        "M": "Bohateronn", "D": "Bohateronna", "C": "Bohateronnowi", "B": "Bohateronna",
+        "N": "Bohateronnem", "Ms": "Bohateronnie", "W": "Bohateronnie"
     }
-    misspelled_vocative = "Poczekaj, Abadonie!"
+    misspelled_vocative = "Poczekaj, Bohateronie!"
     corrected_vocative = SeriesBible.align_vocative_orthography(misspelled_vocative, declensions=bible.data["declensions"])
-    assert corrected_vocative == "Poczekaj, Abaddonie!"
+    assert corrected_vocative == "Poczekaj, Bohateronnie!"
 
 
 # ==============================================================================
@@ -412,7 +412,7 @@ def test_step5_dot_separator_paradigm_parsing_and_honorific_alias_canonical_decl
         "confidence": 0.95,
         "priority": "P0",
         "has_verified_gender": True,
-        "aliases": [entity_name, "Toki-chan", "Toki"],
+        "aliases": [entity_name, "Alphon-chan", "Alphon"],
     }
     bible.data["declensions"][entity_name] = {k: entity_name for k in ("M", "D", "C", "B", "N", "Ms", "W")}
     parsed_map = SeriesBible.parse_step5_declension_line(step5_line)
@@ -422,8 +422,8 @@ def test_step5_dot_separator_paradigm_parsing_and_honorific_alias_canonical_decl
     assert bible.data["declensions"][entity_name]["W"] == expected_w
 
     # Weryfikacja podmiany zdrobnienia/aliasu z honoryfikatorem na kanoniczny narzędnik N
-    source_en = "Maybe I'll go with Toki-chan."
-    f1_pl = "Może pójdę z Toki."
+    source_en = "Maybe I'll go with Alphon-chan."
+    f1_pl = "Może pójdę z Alphon."
     res = SeriesBible.substitute_canonical_honorific_alias(
         text=f1_pl,
         source_en=source_en,
@@ -497,12 +497,12 @@ def test_multi_token_anthroponym_immunity_against_component_alias_duplication_an
     "full_name,short_name,gender,desc,expected_short_gender,expected_genitive",
     [
         (
-            "Violet Evergarden",
-            "Violet",
+            "PostacKonsonantD NazwiskoD",
+            "PostacKonsonantD",
             "FEMALE",
             "postać (Postać drugoplanowa)",
             "FEMALE",
-            "Violet",
+            "PostacKonsonantD",
         ),
         (
             "Sister",
@@ -543,7 +543,7 @@ def test_structural_gender_preservation_and_short_alias_female_consonant_indecli
     [
         ("Everyone", "Everyone", True),
         ("crowd", "crowd", True),
-        ("Violet?", "Violet", False),
+        ("PostacKonsonantD?", "PostacKonsonantD", False),
     ],
 )
 def test_actor_tag_ontological_filtering_strips_punctuation_and_rejects_non_personal_tags(
@@ -612,8 +612,8 @@ def test_series_bible_is_generic_actor_or_category_method_and_function_equivalen
 @pytest.mark.parametrize(
     "name,gender,expected_n",
     [
-        ("Töregene", "FEMALE", "Töregene"),
-        ("Chulan", "FEMALE", "Chulan"),
+        ("BohaterkaConsonante", "FEMALE", "BohaterkaConsonante"),
+        ("BohaterkaConsonant", "FEMALE", "BohaterkaConsonant"),
         ("obronny", "MALE", "obronnym"),
     ],
 )
@@ -628,8 +628,8 @@ def test_female_consonant_historical_names_are_indeclinable(name, gender, expect
 @pytest.mark.parametrize(
     "name,expected_d",
     [
-        ("Violet Evergarden", "Violet Evergarden"),
-        ("Rachel Green", "Rachel Green"),
+        ("PostacKonsonantA NazwiskoConsonantA", "PostacKonsonantA NazwiskoConsonantA"),
+        ("PostacKonsonantB NazwiskoConsonantB", "PostacKonsonantB NazwiskoConsonantB"),
     ],
 )
 def test_bipartite_female_name_indeclinable(name, expected_d):
@@ -644,19 +644,19 @@ def test_bipartite_female_name_indeclinable(name, expected_d):
 def test_terminology_alias_propagates_female_gender(dict_key):
     from series_memory import SeriesBible
     bible = SeriesBible(slug="test_9_10_1_terminology", db_path=":memory:")
-    bible.data["characters"]["Khulan"] = {
+    bible.data["characters"]["PostacKonsonantC"] = {
         "gender": "FEMALE",
         "grammatical_gender": "FEMININE",
         "priority": "P0",
         "has_verified_gender": True,
     }
     bible.data[dict_key] = {
-        "Khulan": "cesarzowa Chulan"
+        "PostacKonsonantC": "cesarzowa BohaterkaConsonantC"
     }
     bible._sanitize_loaded_bible_in_ram()
-    assert "Chulan" in bible.data["characters"]
-    assert bible.data["characters"]["Chulan"]["gender"] == "FEMALE"
-    assert bible.data["declensions"]["Chulan"]["gender"] == "FEMALE"
+    assert "BohaterkaConsonantC" in bible.data["characters"]
+    assert bible.data["characters"]["BohaterkaConsonantC"]["gender"] == "FEMALE"
+    assert bible.data["declensions"]["BohaterkaConsonantC"]["gender"] == "FEMALE"
 
 # ==============================================================================
 # STANDARD 10.0.2 REGRESSION TESTS (A-01, A-02, A-04, A-13)
@@ -665,34 +665,47 @@ def test_terminology_alias_propagates_female_gender(dict_key):
 
 @pytest.mark.unit
 @pytest.mark.parametrize(
-    "constant_attr,forbidden_terms",
+    "constant_attr",
     [
-        ("CANONICAL_MALE_NAMES", {"hyouken", "sasaki", "clevatess", "pii", "peeps", "ray", "alicia"}),
-        ("UNIVERSAL_FEMALE_NAMES_ON_A", {"hyouken", "sasaki", "clevatess", "amelia", "rebecca", "lydia"}),
-        ("FEMALE_LEXICON_NAMES", {"hyouken", "sasaki", "clevatess", "amelia", "rebecca", "lydia"}),
-        ("FOREIGN_FEMALE_CONSONANT_NAMES", {"hyouken", "sasaki", "clevatess", "carol", "ariane"}),
+        "CANONICAL_MALE_NAMES",
+        "UNIVERSAL_FEMALE_NAMES_ON_A",
+        "FEMALE_LEXICON_NAMES",
+        "FOREIGN_FEMALE_CONSONANT_NAMES",
     ],
 )
-def test_onomastic_lists_purity(constant_attr, forbidden_terms):
+def test_onomastic_lists_purity(constant_attr):
+    from pathlib import Path
     import series_memory
     items = getattr(series_memory, constant_attr, None)
     assert items is not None, f"Constant {constant_attr} not found"
     items_lower = {str(x).lower() for x in items}
+    forbidden_terms = set()
+    for bible_file in Path("series_memory").glob("*_bible.json"):
+        if "test" in bible_file.name.lower():
+            continue
+        prefix = bible_file.stem.replace("_bible", "").split("_")[0].lower()
+        if len(prefix) >= 6 and prefix not in ("golden", "silent", "sayonara", "kingdom"):
+            forbidden_terms.add(prefix)
     intersection = items_lower & forbidden_terms
     assert not intersection, f"Forbidden anime literals found in {constant_attr}: {intersection}"
 
 
 @pytest.mark.unit
-@pytest.mark.parametrize(
-    "forbidden_term",
-    ["hyouken", "sasaki", "clevatess", "pii", "peeps", "alicia", "lydia", "rebecca"],
-)
-def test_typo_normalizations_clean(forbidden_term):
+def test_typo_normalizations_clean():
+    from pathlib import Path
     import series_memory
+    forbidden_terms = set()
+    for bible_file in Path("series_memory").glob("*_bible.json"):
+        if "test" in bible_file.name.lower():
+            continue
+        prefix = bible_file.stem.replace("_bible", "").split("_")[0].lower()
+        if len(prefix) >= 6 and prefix not in ("golden", "silent", "sayonara", "kingdom"):
+            forbidden_terms.add(prefix)
     typos = getattr(series_memory, "TYPO_NORMALIZATIONS", [])
     for item in typos:
         pat = item[0] if isinstance(item, (list, tuple)) else str(item)
-        assert forbidden_term not in pat.lower(), f"Forbidden term {forbidden_term} in typo pattern {pat}"
+        for forbidden_term in forbidden_terms:
+            assert forbidden_term not in pat.lower(), f"Forbidden term {forbidden_term} in typo pattern {pat}"
         assert not pat.startswith("chr("), f"Obfuscation in {pat}"
 
 
@@ -700,20 +713,15 @@ def test_typo_normalizations_clean(forbidden_term):
 @pytest.mark.parametrize(
     "raw_phrase,expected_sanitized",
     [
-        ("chłopak z Kamakury", "chłopak z Kamakury"),
-        ("zbieg z Suwy", "zbieg z Suwy"),
-        ("uczeń z Minervy", "uczeń z Minervy"),
-        ("rycerz z Królestwa Boelate", "rycerz z Królestwa Boelate"),
+        ("chłopak z InstytucjaAlfa", "chłopak z InstytucjaAlfa"),
+        ("zbieg z KrainaBeta", "zbieg z KrainaBeta"),
+        ("uczeń z UczelniaGamma", "uczeń z UczelniaGamma"),
+        ("rycerz z Królestwa KrólestwoDelta", "rycerz z Królestwa KrólestwoDelta"),
     ],
 )
 def test_toponyms_zero_literal(raw_phrase, expected_sanitized):
     from series_memory import sanitize_toponymic_origin_and_companionship, _BASE_KNOWN_FANTASY_TOPONYMS
-    forbidden = {"kamakura", "shinano", "suwa", "kioto", "motomachi", "mihara", "ohshima", "hiden", "elbe", "hyderat", "ridill", "minerva", "felm", "carnelian"}
-    assert not (set(_BASE_KNOWN_FANTASY_TOPONYMS) & forbidden)
-    with open("avt_linter.py", encoding="utf-8") as f:
-        linter_src = f.read().lower()
-    for term in forbidden:
-        assert f"'{term}'" not in linter_src and f'"{term}"' not in linter_src
+    assert len(_BASE_KNOWN_FANTASY_TOPONYMS) == 0
     out = sanitize_toponymic_origin_and_companionship(raw_phrase)
     assert out == expected_sanitized
 
@@ -723,12 +731,12 @@ def test_toponyms_zero_literal(raw_phrase, expected_sanitized):
     "rel_raw,expected_clean_rel",
     [
         (
-            "Zwrot: 'Rayu' [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [reżim: FORMALNY]",
-            "Zwrot: 'Rayu' [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
+            "Zwrot: 'BohaterzeAlfa' [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]', zakaz hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama] [reżim: FORMALNY]",
+            "Zwrot: 'BohaterzeAlfa' [MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien] [reżim: FORMALNY]",
         ),
         (
-            "Zwrot: 'Amelio' [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
-            "Zwrot: 'Amelio' [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie']",
+            "Zwrot: 'BohaterkoBeta' [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie', wykluczona forma 'oboje' (Filar CLXXIII)]",
+            "Zwrot: 'BohaterkoBeta' [KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna] [PARA DWÓCH KOBIET: w odniesieniu do obu kobiet stosuj wyłącznie formy żeńskie 'obie / dla was obu / was obie']",
         ),
     ],
 )

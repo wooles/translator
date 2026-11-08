@@ -11,7 +11,7 @@ from unittest.mock import MagicMock, patch
 
 from memory import format_translation_memory_for_prompt
 from manga_canon import BUILTIN_MANGA_CANON, MangaCanonRegistry
-from scene_discourse import SpeakerTurn, SubTurn, resolve_turn_addressee
+from scene_discourse import SpeakerTurn, SubTurn, resolve_turn_addressee, resolve_scene_participants
 from translator import segment_hybrid_events
 import verify_purity
 
@@ -58,16 +58,11 @@ def test_t11_1_series_bible_reset_between_episodes(tmp_path):
     new_subs = tmp_path / "SeriaTestowaB_01.ass"
     new_subs.write_text("[Script Info]\nTitle: Test\n[Events]\nFormat: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\nDialogue: 0,0:00:01.00,0:00:03.00,Default,,0,0,0,,Czesc.\n", encoding="utf-8")
 
-    init_slug = normalize_anime_slug(new_subs.stem) or "anime"
-
-    if hasattr(translator, "series_bible") and translator.series_bible is not None:
-        bible_series = getattr(translator.series_bible, "slug", None) or getattr(translator.series_bible, "series_name", None)
-        if bible_series and bible_series != init_slug:
-            translator.series_bible = None
-    translator.style_report = None
+    init_slug = translator._reset_episode_state_for_file(new_subs)
 
     assert translator.series_bible is None
     assert translator.style_report is None
+    assert "seriatestowab" in init_slug
 
 
 @pytest.mark.unit
@@ -124,6 +119,7 @@ def test_t11_1_subturn_target_speaker_preserved_in_scene_participants():
     turn.sub_turns = [sub_a, sub_b]
 
     resolved_turn = resolve_turn_addressee(turn)
+    resolve_scene_participants([ev_a, ev_b])
 
     assert getattr(ev_a, "target_speaker") == "Mistrzu"
     assert getattr(ev_b, "target_speaker") == "Wojowniku"

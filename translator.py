@@ -4889,6 +4889,16 @@ class MultimodalTranslator:
 
         return b_idx, batch_results, batch_regions, untranslated_in_batch, pass1_items, scene_desc, cot_info_str
 
+    def _reset_episode_state_for_file(self, subs_file: Path) -> str:
+        """Standard 11.1 (LUKA-E5-01): Resetuje series_bible i style_report między odcinkami różnych serii."""
+        init_slug = normalize_anime_slug(subs_file.stem) or "anime"
+        if hasattr(self, "series_bible") and self.series_bible is not None:
+            bible_series = getattr(self.series_bible, "slug", None) or getattr(self.series_bible, "series_name", None)
+            if bible_series and bible_series != init_slug:
+                self.series_bible = None
+        self.style_report = None
+        return init_slug
+
     def translate_file(
         self,
         subs_path: str,
@@ -4910,13 +4920,7 @@ class MultimodalTranslator:
         if self.verifier:
             self.verifier.current_episode_tokens = {"prompt": 0, "cached": 0, "output": 0, "model": self.verifier.model}
 
-        init_slug = normalize_anime_slug(subs_file.stem) or "anime"
-        # Standard 11.1 (LUKA-E5-01): reset series_bible and style_report between episodes
-        if hasattr(self, "series_bible") and self.series_bible is not None:
-            bible_series = getattr(self.series_bible, "slug", None) or getattr(self.series_bible, "series_name", None)
-            if bible_series and bible_series != init_slug:
-                self.series_bible = None
-        self.style_report = None
+        init_slug = self._reset_episode_state_for_file(subs_file)
         if getattr(self, "trace_log", True):
             try:
                 self.flight_recorder = EpisodeFlightRecorder(
