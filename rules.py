@@ -306,10 +306,10 @@ FILAR XXVI: ZASADA YOBISUTE I NATURALNE FORMY ADRESATYWNE (ANTI-FALSE FORMALITY)
 
 FILAR XXVII: HARMONIA TYTUŁÓW I ADAPTACJA HONORYFIKATYWÓW (HONORIFIC HARMONY):
 - HARMONIA TYTULATURY (JEDNOLITY REJESTR):
-  * Kiedy w audio pada japoński tytuł (wzorce: "Sensei", "Senpai", "Sato-sensei"):
+  * Kiedy w audio pada japoński tytuł (wzorce: "Sensei", "Senpai", "<Nazwisko>-sensei"):
     Niezalecana kalka: "Pani Sensei, skończyłam", "Panie Sensei", "Pani Senpai" (sprzeczne tytulatury!).
-    Wariant w rejestrze mangowym: "Sensei, skończyłam", "Sato-sensei, skończyłam", "Senpai".
-    Wariant w rejestrze naturalnym: "Pani Sato, skończyłam", "Mistrzyni, skończyłam", "Szefowo, skończyłam".
+    Wariant w rejestrze mangowym: "Sensei, skończyłam", "<Nazwisko>-sensei, skończyłam", "Senpai".
+    Wariant w rejestrze naturalnym: "Pani <Nazwisko>, skończyłam", "Mistrzyni, skończyłam", "Szefowo, skończyłam".
 - ADAPTACJA HONORYFIKATORÓW SZKOLNYCH I SLANGU OTAKU:
   * 'Senpai' w dialogu szkolnym/towarzyskim adaptujemy do naturalnej polszczyzny: używamy imienia rozmówcy w wołaczu lub zwrotu bezpośredniego na 'ty'. W relacjach codziennych zastępuj 'senpai' formą bezpośrednią lub imieniem.
   * Końcówki spieszczające ze slangu otaku typu '-taso', '-tan' zastępujemy standardowym imieniem lub polskim zdrobnieniem (zgodnie z profilem postaci w SeriesBible). Imiona adaptuj z pełnym poszanowaniem ich fonetyki i deklinacji!
@@ -1114,7 +1114,7 @@ FILAR CXXXII: PRAGMATYKA „SASUGA” I DUMY WSPÓLNOTOWEJ (SASUGA & COMMUNITY P
 - Japońskie 'Sasuga' (さすが) oraz angielskie 'That's [niepoprawne] for you' w kontekście uznania dla kunsztu, waleczności lub niezawodności formacji / postaci:
   * Unikamy kalki 'Całe plemię X...' lub 'Oto masz całe X' (co w polszczyźnie brzmi złośliwie/ironicznie)!
   * zawsze TŁUMACZ JAKO PEŁEN DUMY ZWROT UZNANIA:
-    -> 'Jak przystało na [plemię Mera / kapitana]'
+    -> 'Jak przystało na [plemię <Nazwa> / kapitana]'
     -> 'Oto [plemię <Nazwa>] w całej krasie'
     -> 'W swoim żywiole'
     -> 'Nie bez powodu słyną z...'
