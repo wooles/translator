@@ -4,22 +4,25 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-08 — Standard 11.1.2 Certyfikowany Baseline)
-- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.1.2 (Production Certified Baseline)`
-- **Commit certyfikacji kodu:** `8313658` (`8313658604f64a6dd336d43d0d914117751685ab`)
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-08 — Standard 11.1.2a Certyfikowany Baseline)
+- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.1.2a (Production Certified Baseline)`
+- **Commit certyfikacji kodu:** `d31096945a977d6a179891d87dcfd2a05c0c5bca`
 - **Commity implementacyjne 11.1:** `5b7306d` (Commit 1), `5b17ea7` (Commit 2), `2b4bc7d` (Commit 3), `8b72887` (Commit 4), `8a7dd31` (Commit 5), `218af2e` (Commit 6)
 - **Commity Hotfixu 11.1.1:** `328729f` (Commit 1), `9de0b83` (Commit 2), `07c4684` (Commit 3), `96acac7` (Commit 4)
 - **Commity Hotfixu 11.1.2:**
-  * Commit 1 (`74766d8`): `fix(avt_linter,rules,series_memory): Hotfix 11.1.2 - Z16-amendment #7 (neutralize executable literals in diarization block, FR toponyms, rule triggers, and boy-role check)`
-  * Commit 2 (`1b540e3`): `fix(verify_purity,avt_linter,rules,series_memory): Hotfix 11.1.2 - Z16-amendment #8 (widen Gate 2 regex and neutralize all remaining exemplars in rules, docstrings, and comments)` — **NOWY BASELINE Z16**
-  * Commit 3 (`8313658`): `test(tests): Hotfix 11.1.2 - neutralize remaining test literals in test_series_memory and test_discourse_and_translator` — **NOWY COMMIT CERTYFIKACJI KODU**
-  * Commit 4 (`HEAD`): `docs: Hotfix 11.1.2 - rewrite 11.1.1 report with real lexicon data (12 keys, 576 lexemes), create 11.1.2 report, and sync SSOT baselines`
-- **Status 11.1.2:** `CERTIFIED / CLOSED (2026-11-08)`
-- **Nowy commit ochrony Depuracji Legacy 1.0 (Z16):** `1b540e3` (`1b540e30fd2e109aceaa42fc0efcf1457afc42a6` — po Z16-amendmentach #7 i #8)
+  * Commit 1 (`74766d80a06e0dbb880dc75c5d14cecea2afb766`): `fix(avt_linter,rules,series_memory): Hotfix 11.1.2 - Z16-amendment #7 (neutralize executable literals in diarization block, FR toponyms, rule triggers, and boy-role check)`
+  * Commit 2 (`1b540e30fd2e109aceaa42fc0efcf1457afc42a6`): `fix(verify_purity,avt_linter,rules,series_memory): Hotfix 11.1.2 - Z16-amendment #8 (widen Gate 2 regex and neutralize all remaining exemplars in rules, docstrings, and comments)`
+  * Commit 3 (`8313658604f64a6dd336d43d0d914117751685ab`): `test(tests): Hotfix 11.1.2 - neutralize remaining test literals in test_series_memory and test_discourse_and_translator`
+  * Commit 4 (`326b7e04bdb3c0dcfe0f9babd62f04a4a7c3bafb`): `docs: Hotfix 11.1.2 - rewrite 11.1.1 report with real lexicon data (12 keys, 576 lexemes), create 11.1.2 report, and sync SSOT baselines`
+- **Commity Hotfixu 11.1.2a:**
+  * Commit 1 (`d31096945a977d6a179891d87dcfd2a05c0c5bca`): `fix(rules): Hotfix 11.1.2a - Z16-amendment #9 (neutralize Sato and Mera literals in Filar XXVII and Filar CXXXII)` — **NOWY BASELINE Z16 & CERTYFIKACJA KODU**
+  * Commit 2 (`HEAD`): `docs: Hotfix 11.1.2a - reclassify 11.1.2 verdict, unify Commit 1 SHA, sync Z16 baseline and incident registry`
+- **Status 11.1.2a:** `CERTIFIED / CLOSED (2026-11-08)`
+- **Nowy commit ochrony Depuracji Legacy 1.0 (Z16):** `d31096945a977d6a179891d87dcfd2a05c0c5bca` (po `Z16-amendment #9`)
 - **Stan metryk:** `327 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `398 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 12/12, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
 - **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (327/327 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
 - **Zasada utrzymaniowa post-11.1:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.1` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
-- **Gałąź i Architektura:** `main` (Standard 11.1.2: Pełna Neutralność Całego Kodu i Testów, 100% Czystość Leksykonu Onomastycznego `.onomastic_lexicon.json` [12 kluczy, 576 leksemów], Uszczelnienie Verify_Purity z rozszerzeniem Bramki 2 i objęciem testów, Nowy Baseline Z16 `1b540e3`, Certyfikacja Kodu `8313658`, Zero-Literal Pure Positive Domain Invariant Architecture & Primary LLM Translation Authority)
+- **Gałąź i Architektura:** `main` (Standard 11.1.2a: Pełna Neutralność Całego Kodu i Testów, 100% Czystość Leksykonu Onomastycznego `.onomastic_lexicon.json` [12 kluczy, 576 leksemów], Mikro-domknięcie Z1 w rules.py, Nowy Baseline Z16 `d31096945a977d6a179891d87dcfd2a05c0c5bca`, Certyfikacja Kodu `d31096945a977d6a179891d87dcfd2a05c0c5bca`, Zero-Literal Pure Positive Domain Invariant Architecture & Primary LLM Translation Authority)
 - **Środowisko:** Python 3.13 (`.venv`), Windows PowerShell, `ffmpeg` (PATH), `librosa.pyin`, `soundfile`, `pysubs2`, `spaCy en_core_web_sm` (100% offline 0.00 PLN), bezpośrednie klucze Google AI Studio API (`use_vertex = 0`).
 - **Dyrektywa Wykonawcza Testów:**
   * Testy przyrostowe podczas kodowania (< 2 s): `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_testu>"`
@@ -130,12 +133,16 @@ W ramach autoryzowanego `Z16-amendment #3` usunięto warunek `f1_starts_lower` z
 - **Rozwiązanie:** Neutralizacja 7 plików testowych na syntetyczne nazwy (`tests/test_metadata.py`, `tests/test_discourse_and_translator.py`, `tests/test_verifier.py`, `tests/test_avt_linter.py`, `tests/test_translator.py`, `tests/test_profiler.py`, `tests/test_series_memory.py`), ekstrakcja `_reset_episode_state_for_file` w `translator.py` i naprawa Testu 2 oraz Testu 4 w `tests/test_pipeline_flow.py`, dodanie pod-przypadku pozytywnego dla wielokropka w Test 219 (`test_system.py:19358`), całkowite opróżnienie `TEMPORARY_11_1_MIGRATION_ALLOWLIST = set()` (0 naruszeń w 42 plikach) oraz ustanowienie nowego nienaruszalnego baseline'u Z16 na hashu `07c46843f354662bb2a9799bad127134f3359ef0` (Pozycje 19–26).
 
 ### 🔹 INC-AVT-017 (Hotfix 11.1.2: Neutralizacja Literałów Wykonywalnych — Z16-amendment #7)
-- **Status:** `RESOLVED (Hotfix 11.1.2, Commit 1 — Z16-amendment #7, hash 74766d8)`
+- **Status:** `RESOLVED (Hotfix 11.1.2, Commit 1 — Z16-amendment #7, hash 74766d80a06e0dbb880dc75c5d14cecea2afb766)`
 - **Rozwiązanie:** Dynamiczna diaryzacja w `avt_linter.py:8620–8642` bez obiektu `self` z zachowaniem Testu 150, dynamiczne reguły dla nieodmiennych toponimów francuskich w `avt_linter.py:1027–1035, 7071` ze zbioru `INDECLINABLE_FRENCH_TOPONYMS` z zachowaniem Testu 107, uogólnienie wyzwalaczy w `rules.py:3077, 3182, 3360` oraz usunięcie tokenu z `series_memory.py:8431, 8500`.
 
 ### 🔹 INC-AVT-018 (Hotfix 11.1.2: Rozszerzenie Bramki 2 i Neutralizacja Egzemplifikacji — Z16-amendment #8)
-- **Status:** `RESOLVED (Hotfix 11.1.2, Commit 2 — Z16-amendment #8, hash 1b540e3)`
+- **Status:** `RESOLVED (Hotfix 11.1.2, Commit 2 — Z16-amendment #8, hash 1b540e30fd2e109aceaa42fc0efcf1457afc42a6)`
 - **Rozwiązanie:** Rozszerzenie regexu `RE_EXEMPLAR_INTRODUCERS` w `verify_purity.py:49–51` bez globalnego `re.IGNORECASE` (użycie inline `(?i:...)`), neutralizacja przykładów i imion w regułach `rules.py` (linie 305, 992, 1041–1042, 1118, 1143, 1550–1552, 2239–2242, 2299–2300), komentarzach i etykietach `avt_linter.py` (linie 217, 1045, 2119, 7166, 7174) oraz docstringach i komentarzach `series_memory.py` (linie 2325, 2333, 2341, 3111, 3122, 3548, 3892, 4230–4232, 8388). Ustanowienie nowego baseline'u ochrony Z16 (`1b540e3`).
+
+### 🔹 INC-AVT-019 (Hotfix 11.1.2a: Mikro-domknięcie Literałów Z1 w rules.py — Z16-amendment #9)
+- **Status:** `RESOLVED (Hotfix 11.1.2a, Commit 1 — Z16-amendment #9, hash d31096945a977d6a179891d87dcfd2a05c0c5bca)`
+- **Rozwiązanie:** Neutralizacja przykładów w `FILAR XXVII` (`rules.py:309, 311, 312` -> `<Nazwisko>-sensei`, `Pani <Nazwisko>`) oraz w `FILAR CXXXII` (`rules.py:1117` -> `[plemię <Nazwa> / kapitana]`) w ramach formalnego `Z16-amendment #9` z re-certyfikacją 5 pułapek Z16 i testem negatywnym Bramki 8. Reklasyfikacja werdyktu Hotfixu 11.1.2 do `ZGODNY Z ZASTRZEŻENIAMI` i ustanowienie nowego baseline'u Z16 (`d31096945a977d6a179891d87dcfd2a05c0c5bca`).
 
 ---
 ## 📐 4. METRYKI OPERACYJNE POTOKU
@@ -194,6 +201,7 @@ W ramach autoryzowanego `Z16-amendment #3` usunięto warunek `f1_starts_lower` z
 | **2026-10-18** | ARB-042 | Kanon / Zasady | **Ekstirpacja 4 Klastrów Onomastycznych w rules.py**: Całkowite oczyszczenie reguł z literałów dialektów i postaci przy zachowaniu identyfikatorów filarów. | 0.00 PLN |
 | **2026-10-18** | ARB-043 | Tarcza Regresyjna | **Synchronizacja Asercji Testowych (Standard 8.0)**: Dopasowanie 61 asercji do deklaratywnej telemetrii (179/179 PASSED, 0 naruszeń we wszystkich 5 bramkach). | 0.00 PLN |
 | **2026-10-19** | `ARB-044` | Architektura Wariantu (d) | **Hybrydowa Straż Dowodowa (Standard 9.0)**: Odcięcie mutatorów lintera w produkcji ($T(x) = x$), Narrow Safety Net $P_0 \cap \text{EN}$, pre-translacyjna ingestia AniList $P_0$, aliasy $ph \leftrightarrow f$ w $\mathcal{O}(1)$, eliminacja pętli rewersji w Kroku 18, wołacz tytularny `-tz`, bariera regresji Fazy 2, higiena ASS i stabilne `[ID: event_id]` (183/183 PASSED). | 0.00 PLN |
+| **2026-11-08** | `ARB-045` | Higiena Kodu | **Z16-amendment #9**: Neutralizacja ostatnich przykładów Z1 w `rules.py` (`FILAR XXVII` L309–312, `FILAR CXXXII` L1117) i re-certyfikacja baseline'u Z16 (`d310969`). | 0.00 PLN |
 
 ---
 

@@ -2,9 +2,9 @@
 
 Dokument ten stanowi jedyne źródło prawdy (Single Source of Truth) definiujące nienaruszalne reguły architektoniczne, lingwistyczne i procesowe asystenta AI oraz zespołów wieloagentowych w repozytorium `translator`.
 
-- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.1 (Production Certified Baseline)`
-- **Commit certyfikacji kodu:** `8313658` (`8313658604f64a6dd336d43d0d914117751685ab`)
-- **Commit ochrony Depuracji Legacy 1.0 (Z16):** `1b540e3` (`1b540e30fd2e109aceaa42fc0efcf1457afc42a6`)
+- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.1.2a (Production Certified Baseline)`
+- **Commit certyfikacji kodu:** `d310969` (`d31096945a977d6a179891d87dcfd2a05c0c5bca`)
+- **Commit ochrony Depuracji Legacy 1.0 (Z16):** `d310969` (`d31096945a977d6a179891d87dcfd2a05c0c5bca`)
 - **Stan metryk:** `551 collected` (`398 passed` fast unit/integration [327 tests/ + 71 test_system.py] + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki (`verify_purity.py`, `verify_8_fixes.py`, `verify_12_fixes.py`, `verify_ultimate_pipeline.py`) oraz `audit_diff.ps1` w stanie `PASS`.
 - **Zasada utrzymaniowa post-11.1:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.1` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
 

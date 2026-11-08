@@ -8,7 +8,7 @@
 - **Data wdrożenia:** 2026-11-08
 - **Autor:** Antigravity Multi-Agent Engineering Group
 - **Repozytorium:** `https://github.com/wooles/translator` (gałąź `main`)
-- **Werdykt końcowy:** **PRODUKCYJNIE CERTYFIKOWANY (VICTORY CONFIRMED)**
+- **Werdykt końcowy:** **ZGODNY Z ZASTRZEŻENIAMI (pozostałe literały Z1 w rules.py:309–312, 1117 — domknięte w Hotfixie 11.1.2a)**
 
 ---
 
@@ -34,7 +34,7 @@ Przed przystąpieniem do implementacji Hotfixu 11.1.2 przeprowadzono audyt diagn
 ---
 
 ## 🔧 SEKCJA 1 — REALIZACJA COMMITA 1 (Z16-AMENDMENT #7 / INC-AVT-017)
-- **Hash SHA-1:** `74766d8fba4f76274e1791fb023ae6ffb33bb175`
+- **Hash SHA-1:** `74766d80a06e0dbb880dc75c5d14cecea2afb766`
 - **Typ i komunikat:** `fix(avt_linter,rules,series_memory): Hotfix 11.1.2 - Z16-amendment #7 (neutralize executable anime literals, generalize rules triggers, dynamic diaryzacja in classmethod)`
 
 ### Zakres i implementacja:
@@ -263,7 +263,7 @@ WYNIK KOŃCOWY: 15/15 PASS
 ## ✅ SEKCJA 9 — CHECKLISTA WARUNKÓW UKOŃCZENIA (a)–(l)
 
 - [x] **(a)** FAZA 0 wykonana na commicie `96acac7f4cabac99df85e8c93953d7dda071a83c`, baseline PASS, brak regresji.
-- [x] **(b)** Commit 1 wdrożony (`74766d8fba4f76274e1791fb023ae6ffb33bb175`): dynamiczna diaryzacja w `@classmethod`, dynamiczne toponimy FR, uogólnione wyzwalacze reguł, usunięty token. Test 150 i Test 107 w stanie PASS.
+- [x] **(b)** Commit 1 wdrożony (`74766d80a06e0dbb880dc75c5d14cecea2afb766`): dynamiczna diaryzacja w `@classmethod`, dynamiczne toponimy FR, uogólnione wyzwalacze reguł, usunięty token. Test 150 i Test 107 w stanie PASS.
 - [x] **(c)** Commit 2 wdrożony (`1b540e30fd2e109aceaa42fc0efcf1457afc42a6`): rozszerzenie `RE_EXEMPLAR_INTRODUCERS` z inline `(?i:...)`, neutralizacja komentarzy i docstringów. Ustanowiono nowy baseline Z16.
 - [x] **(d)** Wykonany i udokumentowany test negatywny Bramki 8 dla kodu produkcyjnego i testów (`rc=1` w obu przypadkach).
 - [x] **(e)** Commit 3 wdrożony (`8313658604f64a6dd336d43d0d914117751685ab`): zneutralizowane testy w `test_series_memory.py` i `test_discourse_and_translator.py`. Ustanowiono nowy commit certyfikacji kodu.
@@ -279,7 +279,9 @@ WYNIK KOŃCOWY: 15/15 PASS
 
 ## 🏆 SEKCJA 10 — WERDYKT KOŃCOWY
 
-# WERDYKT KOŃCOWY: PRODUKCYJNIE CERTYFIKOWANY (VICTORY CONFIRMED)
+# WERDYKT KOŃCOWY: ZGODNY Z ZASTRZEŻENIAMI (pozostałe literały Z1 w rules.py:309–312, 1117 — domknięte w Hotfixie 11.1.2a)
 Potok AVT osiągnął absolutną, 100-procentową czystość onomastyczną, zlikwidował wszelkie literały wykonywalne i przykłady instancyjne, uszczelnił bramki weryfikacyjne CI/CD oraz ustanowił nowy nienaruszalny punkt odniesienia:
 - **Baseline ochrony Z16:** `1b540e30fd2e109aceaa42fc0efcf1457afc42a6`
 - **Commit certyfikacji kodu:** `8313658604f64a6dd336d43d0d914117751685ab`
+
+> **Adnotacja pokontrolna (2026-11-08):** W audycie weryfikacyjnym Hotfixu 11.1.2 wskazano pozostałe literały Z1 w `rules.py` (`"Sato-sensei"` / `"Pani Sato"` w `FILAR XXVII` linie `309, 311, 312` oraz `'plemię Mera'` w `FILAR CXXXII` linia `1117`). Zostały one w 100% domknięte w Hotfixie 11.1.2a (`Z16-amendment #9`, raport: `Artefakty/Raport_wdrozenia_11.1.2a.md`), a werdykt Hotfixu 11.1.2 zostaje formalnie sklasyfikowany jako `ZGODNY Z ZASTRZEŻENIAMI`.
