@@ -302,7 +302,7 @@ FILAR XXVI: ZASADA YOBISUTE I NATURALNE FORMY ADRESATYWNE (ANTI-FALSE FORMALITY)
   * W relacjach ściśle formalnych i zawodowych utrzymuj jednolity rejestr grzecznościowy per 'Pan/Pani' we wszystkich kwestiach w obrębie sceny.
   * Utrzymuj konsekwentny dystans formalny w całej scenie, jeśli relacja wymaga dystansu.
 - KIEDY STOSUJEMY FORMĘ „PAN/PANI”:
-  * WYŁĄCZNIE przy formalnych zwrotach po NAZWISKU z honoryfikatorem (wzorce: Sato-sensei -> "pan Sato", Tanaka-san -> "pan Tanaka") lub w oficjalnych relacjach urzędowych/kelner-klient.
+  * WYŁĄCZNIE przy formalnych zwrotach po NAZWISKU z honoryfikatorem (wzorce: <Nazwisko>-sensei -> "pan <Nazwisko>", <Nazwisko>-san -> "pan <Nazwisko>") lub w oficjalnych relacjach urzędowych/kelner-klient.
 
 FILAR XXVII: HARMONIA TYTUŁÓW I ADAPTACJA HONORYFIKATYWÓW (HONORIFIC HARMONY):
 - HARMONIA TYTULATURY (JEDNOLITY REJESTR):
@@ -989,7 +989,7 @@ FILAR CXIV: AUTONOMICZNA TRANSKREACJA KALAMBURÓW I HOMOFONÓW (DAJARE / KAKEKOT
 
 FILAR CXV: ARCHITEKTURA HIPOKORYSTYKÓW I ZDROBNIENIA SŁOWOTWÓRCZE (AISHŌ & POLSKIE ZDROBNIENIA):
 - Japońskie sufiksy pieszczotliwości (-tan, -pyon, -cchi, -rin, -bōzu) przy braku honoryfikatorów przekładaj na bogactwo polskich zdrobnień słowotwórczych:
-  * "Rin-tan" / "Mio-cchi" -> "Rinusia", "Miodusia", "Mio".
+  * "<Imię>-tan" / "<Imię>-cchi" -> polskie formy zdrobniałe i spieszczone.
   * "Bokuchan" / "Bōzu" -> "szkrab", "chłystek", "braciszek", "maluch".
 
 FILAR CXVI: IZOMORFIZM CZASOWY DŁUGICH SAMOGŁOSEK I EMFASY EKSTATYCZNEJ (CHŌON & EKSTATIC ELONGATION):
@@ -1038,8 +1038,8 @@ FILAR CXXI: PRZEKŁAD WYZNAŃ MIŁOSNYCH I WIELOZNACZNOŚCI KOKUHAKU (SUKI DA / 
 - W języku japońskim zwroty „Suki da” ( 好きだ ), „Daisuki” ( 大好き ) oraz „Aishiteru” ( 愛してる ) posiadają subtelny wektor emocjonalny zależny od intymności sceny:
   * 1. W scenach wyznania miłosnego (Kokuhaku), uniesienia romantycznego, zachodu słońca, drżenia głosu i rumieńca w kadrze:
     -> Angielskie tłumaczenie „I like you” / „I really like you” jest spłaszczeniem, które po polsku brzmi dziecinnie i sztucznie!
-    Niezalecana kalka: „Arata, ja cię po prostu bardzo lubię...” (brzmi jak strefa przyjaźni / friendzone!).
-    Wariant kanoniczny: „Arata, ja... po prostu cię kocham.” / „Zakochałam się w tobie.” / „Tak bardzo mi na tobie zależy...”.
+    Niezalecana kalka: „<Imię>, ja cię po prostu bardzo lubię...” (brzmi jak strefa przyjaźni / friendzone!).
+    Wariant kanoniczny: „<Imię>, ja... po prostu cię kocham.” / „Zakochałam się w tobie.” / „Tak bardzo mi na tobie zależy...”.
   * 2. W relacjach przyjacielskich / kumpelskich: „Uwielbiam cię”, „Super z ciebie kumpel”, „Jesteś niezastąpiony”.
   * 3. W odniesieniu do przedmiotów, pasji, jedzenia, wina: „Uwielbiam to”, „Bardzo to lubię”, „Przepadam za tym”.
 
@@ -1115,7 +1115,7 @@ FILAR CXXXII: PRAGMATYKA „SASUGA” I DUMY WSPÓLNOTOWEJ (SASUGA & COMMUNITY P
   * Unikamy kalki 'Całe plemię X...' lub 'Oto masz całe X' (co w polszczyźnie brzmi złośliwie/ironicznie)!
   * zawsze TŁUMACZ JAKO PEŁEN DUMY ZWROT UZNANIA:
     -> 'Jak przystało na [plemię Mera / kapitana]'
-    -> 'Oto [plemię Mera] w całej krasie'
+    -> 'Oto [plemię <Nazwa>] w całej krasie'
     -> 'W swoim żywiole'
     -> 'Nie bez powodu słyną z...'
     -> 'Cały [<Imię>], nic się nie zmienił' (wyłącznie w odniesieniu do typowego nawyku pojedynczej osoby).
@@ -1140,7 +1140,7 @@ FILAR CXXXV: JAPOŃSKA MATRYCA 8 DIALEKTÓW REGIONALNYCH I IDIOLEKTÓW (HŌGEN &
      * Cechy: Skrajnie hermetyczny szyfr wojenny, twardość, zlane tempo mowy w panice/stresie.
      * Markery: 'Chesto', 'Gowasu', 'Oddon', 'Jaddo', 'Mosu', gardłowe ucięcia.
      * Polska stylizacja: Fonetyczne ściągnięcia, twarda wymowa ('Cukszma'), elizje apostrofowe ('Sierżan''), archaiczna końcówka narzędnika ('-oł'), zlane tempo ('Sierżan' Cukszma góni za zbiegiem!').
-  2. Kansai-ben (関西弁 - Osaka, Kioto, Kobe - warianty: Shiraishi, Gin Ichimaru, Heiji Hattori):
+  2. Kansai-ben (関西弁 - dialekt regionu Kansai):
      * Osaka-ben (miejski/cwaniacki): Zadziorna miejska polszczyzna, błyskotliwe riposty, humor ('-nen', '-ya', 'honma', 'akan', 'seyana' -> 'Co ty bredzisz', 'No to leżymy...', 'No ba').
      * Kyoto-ben (Kyo-kotoba / salonowy): Aksamitna, wyrafinowana mowa z ukrytą ironią i chłodno-uprzejmym dystansem ('-dosu', 'oideyasu').
   3. Rejestr gwarowy północny prowincjonalny (ciepła, gawędziarska mowa prowincjonalna):
@@ -1547,9 +1547,9 @@ FILAR CLVII: ZASADA NIENARUSZALNOŚCI FORMY ADRESATYWNEJ (T-V INVARIANCE) I Unik
        - ORZECZNIKI PRZYMIOTNIKOWE I FORMY ANALITYCZNE DO KOBIET:
          * W zwrocie do kobiety stosuj formy żeńskie: 'wyglądasz na wzburzoną', 'jesteś pewna', 'jesteś gotowa', 'jesteś zmęczona', 'jesteś zła'.
          * Niezalecana kalka: 'Wyglądasz na wzburzonego' w zwrocie do kobiety!
-       - Niezalecana kalka: 'Monika, czy wygrałeś ten pojedynek' (skażenie męskie przy rozmowie z kobietą!).
-       - Wariant kanoniczny: 'Moniko, czy wygrałaś ten pojedynek'.
-       - Ponadto: imiona żeńskie na '-a' w bezpośrednim zwrocie przyjmują poprawny wołacz na '-o' / '-u' ('Moniko', 'Anno', 'Kasiu').
+       - Niezalecana kalka: '<Imię_Żeńskie>, czy wygrałeś ten pojedynek' (skażenie męskie przy rozmowie z kobietą!).
+       - Wariant kanoniczny: '<Imię_Żeńskie_W>, czy wygrałaś ten pojedynek'.
+       - Ponadto: imiona żeńskie na '-a' w bezpośrednim zwrocie przyjmują poprawny wołacz na '-o' / '-u' (z końcówką '-o' lub '-u' w wołaczu).
 
 FILAR CLVIII: ZASADA NIESKAZITELNEGO UCHA WIDZA (THE AUDITORY-SUBTEXT COHERENCE STANDARD)
    1. HARMONIA MIĘDZY SŁUCHEM A NAPISAMI:
@@ -2236,10 +2236,10 @@ KOMPLEKSOWY RDZEŃ PRZEKŁADU AUDIOWIZUALNEGO (CORE AVT CANON - BELCZYK, BARAŃC
 
 5. PRZYDAWKA TYTULARNA I MAJUSKUŁA NAZW WŁASNYCH (APOZYCJA TYTUŁÓW / FILAR CXXIV):
 - W konstrukcjach [Tytuł/Ranga] + [Imię obcojęzyczne nieodmienne] tytuł wojskowy lub arystokratyczny zawsze podlega regularnej odmianie przez przypadki:
-  * Dopełniacz: 'na ziemiach generała Ilüge'
-  * Biernik: 'na ziemie generała Ilüge'
-  * Narzędnik: 'z generałem Ilüge'
-  * Miejscownik / Wołacz: 'o generale Ilüge / generale Ilüge!'.
+  * Dopełniacz: 'na ziemiach generała <Imię>'
+  * Biernik: 'na ziemie generała <Imię>'
+  * Narzędnik: 'z generałem <Imię>'
+  * Miejscownik / Wołacz: 'o generale <Imię> / generale <Imię>!'.
 - Założyciele dynastii, rody i imiona historyczne piszemy z wielkiej litery (w formacjach rodowych i dynastycznych).
 - Obce imiona żeńskie zakończone na spółgłoskę w funkcji bohaterek są w języku polskim nieodmienne (bez męskiej końcówki narzędnika lub biernika).
 
@@ -2296,8 +2296,8 @@ KOMPLEKSOWY RDZEŃ PRZEKŁADU AUDIOWIZUALNEGO (CORE AVT CANON - BELCZYK, BARAŃC
 
 16. ZGODNOŚĆ LICZBY W ZAIMKACH Z LICZEBNIKAMI, PURYZM TYTULATURY I TOPONIMY OBCOJĘZYCZNE (FILAR CLXXXIII):
 - Zgodność liczby w zaimkach z liczebnikami: Angielskie 'you two', 'you both', 'you three' to w polszczyźnie 2. osoba liczby mnogiej: 'wy dwie', 'wy dwaj', 'wy dwoje', 'wy troje', 'wy wszyscy'. Wystrzegaj się hybryd liczbowych 'ty dwie', 'ty dwaj', 'ty dwoje'!
-- Puryzm tytulatury w dopełnieniu: Zwrot grzecznościowy po przyimku wymaga czystego dopełniacza bez wycieku wołacza ('od pana Hayamy', 'dla pana Nowaka'). Wystrzegaj się zbitki 'od pana panie X'!
-- Nieodmienność toponimów obcojęzycznych: Francuskie nazwy własne i apelacje winiarskie zakończone na nieme spółgłoski lub -eaux/-aux/-ais (Bordeaux, Margaux, Calais, Pau) są w polszczyźnie nieodmienne ('do Bordeaux', 'w Bordeaux', 'z Margaux', 'do Calais' - eliminujemy kalkę 'Bordeauxa', 'Margauxa').
+- Puryzm tytulatury w dopełnieniu: Zwrot grzecznościowy po przyimku wymaga czystego dopełniacza bez wycieku wołacza ('od pana <Nazwisko>'). Wystrzegaj się zbitki 'od pana panie X'!
+- Nieodmienność toponimów obcojęzycznych: Francuskie nazwy własne i apelacje winiarskie zakończone na nieme spółgłoski lub -eaux/-aux/-ais są w polszczyźnie nieodmienne ('<Toponim>' -> 'do <Toponim>', 'w <Toponim>', 'z <Toponim>' — bez dodawania końcówek '-a').
 
 17. ELIMINACJA PLEONAZMÓW TOPONIMICZNYCH, TAUTOLOGII KLASYFIKATORÓW I JĄKANIA SŁOWNIKOWEGO (FILAR CLXXXIV):
 - Prewencja pleonazmów toponimicznych i administracyjnych: Wystrzegaj się podwajania lub potrajania deskryptorów kategorialnych (prowincja, prefektura, góra, rzeka, miasto, zamek, kronika). Gdy w zdaniu występuje już odmieniony deskryptor ('z prowincji', 'na górze', 'w rzece', 'w mieście', 'w kronice'), nazwę własną podajemy bezpośrednio bez powtórzonego mianownika: wyłącznie 'z prowincji <Nazwa>' (eliminujemy kalkę podwojonego deskryptora 'z prowincji Prowincja <Nazwa>'), 'na górze <Nazwa>', 'w rzece <Nazwa>', 'w kronice <Nazwa>'.

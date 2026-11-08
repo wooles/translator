@@ -215,7 +215,7 @@ def _fix_honorific_kun_chan_match(m: Any) -> str:
     if honorific.lower() == "pani" and (name.lower() in POLISH_FEMALE_NAMES or is_inherently_female_name(name)):
         return m.group(0)
 
-    # Japońskie nazwiska na -da (Yamada, Kuroda, Maeda, Honda, Yoshida) z tytułem Pan/Pani
+    # Japońskie nazwiska zakończone na sylabę -da z tytułem Pan/Pani
     if name.lower().endswith("da"):
         return m.group(0)
 
@@ -1043,7 +1043,7 @@ class AVTLinter:
         # Filar CLXXXIII: Puryzm tytulatury w dopełnieniu (od pana panie X -> od pana X)
         (r"\b(od|dla|u|do|wobec)\s+[Pp]an(?:a|u|em)?\s+panie\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+)\b",
          lambda m: f"{m.group(1)} pana {m.group(2)}",
-         "Filar CLXXXIII - Puryzm tytulatury w dopełnieniu (od pana Hayamy)"),
+         "Filar CLXXXIII - Puryzm tytulatury w dopełnieniu (od pana <Nazwisko>)"),
         (r"\b([Zz]|ze)\s+[Pp]an(?:a|u|em)?\s+panie\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+)\b",
          lambda m: f"{m.group(1)} panem {m.group(2)}",
          "Filar CLXXXIII - Puryzm tytulatury w narzędniku (z panem Hayamą)"),
@@ -2117,7 +2117,7 @@ class AVTLinter:
         # 6c. Title Apposition Case Agreement (Filar CXXIV & CLVII)
         # When a title in Nominative (generał, pułkownik, major, kapitan, admirał, książę, król, chan, baron, hrabia, wódz)
         # is preceded by a Genitive/Accusative-governing preposition/phrase (e.g. na ziemiach, do rąk, w rękach, u boku, pod wodzą)
-        # and precedes a proper name (e.g. 'na ziemiach generał Ilüge'), inflect title to Genitive/Accusative.
+        # and precedes a proper name ('na ziemiach generała <Imię>'), inflect title to Genitive/Accusative.
         TITLE_GEN_MAP = {
             "generał": "generała",
             "pułkownik": "pułkownika",
@@ -7164,7 +7164,7 @@ class EpisodeQualityGate:
                         cand_nom = prop_tok[:-1]
                         cand_gender = "MALE"
                 elif prep_word in {"z", "ze", "przed", "nad", "pod"}:
-                    # Po przyimkach narzędnika męskie imiona przyjmują końcówkę -em/-iem (np. z Brandonem, z Klenem)
+                    # Po przyimkach narzędnika męskie imiona przyjmują końcówkę -em/-iem
                     if tok_lower.endswith("iem") and len(tok_lower) > 4 and cand_gender != "FEMALE":
                         cand_nom = prop_tok[:-3]
                         cand_gender = "MALE"
@@ -7172,7 +7172,7 @@ class EpisodeQualityGate:
                         cand_nom = prop_tok[:-2]
                         cand_gender = "MALE"
                 elif prep_word in {"o", "przy"}:
-                    # Po przyimkach miejscownika męskie imiona przyjmują końcówkę -ie (np. o Brandonie, o Klenie)
+                    # Po przyimkach miejscownika męskie imiona przyjmują końcówkę -ie
                     if tok_lower.endswith("ie") and len(tok_lower) > 3 and cand_gender != "FEMALE":
                         cand_nom = prop_tok[:-2]
                         cand_gender = "MALE"

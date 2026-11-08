@@ -45,9 +45,9 @@ LOGIC_FILES = [
 
 TEMPORARY_11_1_MIGRATION_ALLOWLIST = set()
 
-# Bramka 2: Wprowadzanie przykładów nazewniczych (np. [Nazwa])
+# Bramka 2: Wprowadzanie przykładów nazewniczych (np. [Nazwa], e.g. 'pan [Nazwa]', - warianty: [Nazwa])
 RE_EXEMPLAR_INTRODUCERS = re.compile(
-    r"(?:\b(?i:np\.|na\s+przykład|przykładowo|takich\s+jak|takie\s+jak|jak\s+np\.|e\.g\.|for\s+example)\s+['\"]?([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźżōū]+(?:\s+[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźżōū]+)*)|\(\s*(?i:warianty?)\s*:\s*['\"]?[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźżōū]+)"
+    r"(?:\b(?i:np\.|na\s+przykład|przykładowo|takich\s+jak|takie\s+jak|jak\s+np\.|e\.g\.|for\s+example)\s+['\"]?(?:(?:na\s+ziemiach|do\s+rąk|w\s+rękach|z|ze|o|do|od|dla|u|po|na|w|we|generał[a]?|pan[a]?|pani|mistrz[a]?)\s+)*([A-ZĄĆĘŁŃÓŚŹŻŌŪĀĒĪÖÜÄÉ][a-ząćęłńóśźżōūāēīöüäé]+(?:\s+[A-ZĄĆĘŁŃÓŚŹŻŌŪĀĒĪÖÜÄÉ][a-ząćęłńóśźżōūāēīöüäé]+)*)|[\(\-\–\—]\s*(?i:warianty?)\s*:\s*['\"]?[A-ZĄĆĘŁŃÓŚŹŻŌŪĀĒĪÖÜÄÉ][a-ząćęłńóśźżōūāēīöüäé]+)"
 )
 
 # Bramka 3: Cytowane zawołania i zdania przykładowe w plikach reguł i promptów

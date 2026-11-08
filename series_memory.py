@@ -2322,7 +2322,7 @@ def fix_undecorated_female_names(
         if not decl or decl.get("M") != name:
             continue
 
-        # 1. Dopełniacz: "dla Asuka" -> "dla Asuki"
+        # 1. Dopełniacz: "dla <Imię>" -> "dla <Imię_D>"
         result = re.sub(
             rf"\b({gen_preps})\s+{re.escape(name)}\b",
             lambda m, c=decl.get("D", name): f"{m.group(1)} {c}",
@@ -2330,7 +2330,7 @@ def fix_undecorated_female_names(
             flags=re.IGNORECASE
         )
 
-        # 2. Celownik: "dzięki Asuka" -> "dzięki Asuce"
+        # 2. Celownik: "dzięki <Imię>" -> "dzięki <Imię_C>"
         result = re.sub(
             rf"\b({dat_preps}(?:\s+[a-ząćęłńóśźż]+)?)\s+{re.escape(name)}\b",
             lambda m, c=decl.get("C", name): f"{m.group(1)} {c}",
@@ -2338,7 +2338,7 @@ def fix_undecorated_female_names(
             flags=re.IGNORECASE
         )
 
-        # 3. Narzędnik: "z Asuka" -> "z Asuką" z dwupoziomową blokadą
+        # 3. Narzędnik: "z <Imię>" -> "z <Imię_N>" z dwupoziomową blokadą
         def _ins_repl(m, n=name, d=decl):
             prep = m.group(1)
             prep_lower = prep.lower()
@@ -3108,7 +3108,7 @@ def generate_polish_name_declension(name: str, gender: str = "UNKNOWN") -> Dict[
                 "Ms": stem + "i",
                 "W": stem + "o"
             }
-        # -ya (Freya, Maya, Anya, Kaya) -> D./C./Ms. -i; B. -ę; N. -ą; W. -o
+        # -ya foreign and Japanese female names -> D./C./Ms. -i; B. -ę; N. -ą; W. -o
         elif stem.endswith("y"):
             return {
                 "M": n,
@@ -3119,7 +3119,7 @@ def generate_polish_name_declension(name: str, gender: str = "UNKNOWN") -> Dict[
                 "Ms": stem + "i",
                 "W": stem + "o"
             }
-        # -ca foreign names (Luca, Seneca, Petrarca, Mica) -> hard k stem in D/B/N
+        # -ca foreign masculine names -> hard k stem in D/B/N
         # vs Polish agent nouns in -ca (władca, dowódca, obrońca, zabójca, zdrajca, łowca, stwórca):
         elif stem.endswith("c"):
             if stem.lower() in ("władc", "dowódc", "dowodc", "obrońc", "obronc", "zabójc", "zabojc", "zdrajc", "łowc", "lowc", "stwórc", "stworc", "twórc", "tworc", "znawc", "morderc", "wykonawc") or len(stem) > 4:
@@ -3545,7 +3545,7 @@ TYPO_NORMALIZATIONS = [
     # Binary alternative comma eradication: 'w kapciach, czy bez' -> 'w kapciach czy bez' (Filar XCI / Standard 9.4 2B.10 - ochrona wołacza W)
     (r"\b([A-Za-ząćęłńóśźż0-9\-]+),\s+czy\s+(bez|nie|tak)\b",
      lambda m: m.group(0) if (m.group(1)[0].isupper() and m.group(1).lower() not in ("tak", "nie", "bez", "to") and (not re.sub(r"\{[^}]*\}", "", m.string[:m.start(1)]).strip() or re.sub(r"\{[^}]*\}", "", m.string[:m.start(1)]).strip() in ("-", "–", "—", '"', "„", "...", "…") or re.search(r"(?:\\N|\\n|[.?!…])\s*[-–—]?\s*$", re.sub(r"\{[^}]*\}", "", m.string[:m.start(1)]).strip()))) else f"{m.group(1)} czy {m.group(2)}"),
-    # Trailing cut-off speech attached dash: 'Rin–' -> 'Rin...' (Filar XCI)
+    # Trailing cut-off speech attached dash: '<Imię>–' -> '<Imię>...' (Filar XCI)
     (r"([A-Za-ząćęłńóśźż])–(?=\s*\\N|\s*$|[!\?…])", r"\1..."),
     # Deictic temporal syntax normalizations (Filar CLXVIII)
     (r"\b([Pp])ojutrzejsz(?:y|ą|a|e|ego|ej|emu|ym|ych|ymi)?\s+([a-ząćęłńóśźż]+)\b",
@@ -3889,7 +3889,7 @@ def sanitize_lexical_text(text: str) -> str:
         res
     )
 
-    # Case 2: Title + Single Name + Verb (e.g. 'pan Eftala zniszczył' -> 'pan Eftal zniszczył')
+    # Case 2: Title + Single Name + Verb ('<Tytuł> <Imię>a <Czasownik>' -> '<Tytuł> <Imię> <Czasownik>')
     def _fix_nominative_title_subject(m):
         prefix = m.group(1)
         title = m.group(2)
@@ -4227,9 +4227,9 @@ def sanitize_toponymic_origin_and_companionship(text: str, custom_glossary: Opti
     """
     Sanitizes toponymic origin vs animate companionship errors (Filar CLXXXIV / 0.00 PLN).
     When a toponym (realm, city, location) qualifies an artifact, object, or person of origin
-    ('from Hiden', 'knight from realm', 'people from province'), Polish preposition 'z'
-    strictly governs Genitive (Dopełniacz pochodzenia: 'z Hiden', 'z Kanyou', 'z Ridill'),
-    NEVER Instrumental (Narzędnik towarzyszenia: '*z Hidenem', '*z Kanyouem').
+    ('from <Toponim>', 'knight from realm', 'people from province'), Polish preposition 'z'
+    strictly governs Genitive (Dopełniacz pochodzenia: 'z <Toponim>'),
+    NEVER Instrumental (Narzędnik towarzyszenia: '*z <Toponim>em').
     Also handles compound artifact title syntagmas and prevents modifier hyper-inflection,
     strictly adhering to the Single-Word Invariance Principle (W_i -> W'_i).
     """
@@ -8385,7 +8385,7 @@ class SeriesBible:
         """
         Audits untrusted actor tag from external fansub (.ass) against physical audio ground truth (0.00 PLN).
         Returns: (resolved_gender, is_contaminated)
-        - If tag indicates MALE (e.g. 'Ögedei'), but audio F0 (>=185Hz / alt żeński), Whisper markers ('FEMALE'),
+        - If tag indicates MALE (for a male character tag), but audio F0 (>=185Hz / alt żeński), Whisper markers ('FEMALE'),
           or pre-pass scene exclusivity ('FEMALE') confirm female speaker, tag is demoted to 'UNTRUSTED_CONTRADICTION'
           and resolved_gender becomes 'FEMALE'.
         """
