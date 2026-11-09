@@ -2908,11 +2908,13 @@ class SceneDiscourseGraph:
         else:
             clean_actor = clean_raw
 
-        if clean_actor in ("/", "|", ",") or clean_actor.lower() in ("all", "both") or any(sep in clean_actor for sep in ("/", "|")):
+        is_composite_actor = any(sep in (clean_raw or clean_actor) for sep in ("/", "|", "&", "+"))
+        if clean_actor in ("/", "|", ",") or clean_actor.lower() in ("all", "both") or is_composite_actor:
             spk_label = "POLYLOGUE"
             telemetry["speaker_name"] = spk_label
             telemetry["actor"] = spk_label
         else:
+            spk_label = clean_actor
             telemetry["speaker_name"] = clean_actor
             telemetry["actor"] = clean_actor
 
@@ -2920,6 +2922,54 @@ class SceneDiscourseGraph:
         p0_gender = verified_p0_gender or kwargs.get("speaker_p0_gender")
         has_ver = has_verified_gender or bool(kwargs.get("speaker_p0_gender"))
         speaker_p0_verified = bool(verified_p0_gender or kwargs.get("speaker_p0_gender"))
+
+        # P3-A: Rozstrzyganie płci i virility dla diad i grup złożonych (POLYLOGUE z separatorem)
+        if not p0_gender and spk_label == "POLYLOGUE" and is_composite_actor:
+            comp_src = clean_raw if clean_raw and any(sep in clean_raw for sep in ("/", "|", "&", "+")) else clean_actor
+            sub_actors = [p.strip() for p in re.split(r"[/|&+,]\s*", comp_src) if p.strip()]
+            found_m = 0
+            found_f = 0
+            for sub_a in sub_actors:
+                sub_rec = None
+                if series_bible:
+                    if hasattr(series_bible, "resolve_character_record"):
+                        sub_rec = series_bible.resolve_character_record(sub_a)
+                    elif hasattr(series_bible, "get_character"):
+                        sub_rec = series_bible.get_character(sub_a)
+                    elif hasattr(series_bible, "characters") and isinstance(series_bible.characters, dict):
+                        sub_rec = series_bible.characters.get(sub_a)
+                        if not sub_rec:
+                            for k, v in series_bible.characters.items():
+                                if k.lower() == sub_a.lower():
+                                    sub_rec = v
+                                    break
+                sub_g = None
+                if isinstance(sub_rec, dict):
+                    sub_g = sub_rec.get("gender")
+                if not sub_g and episode_profiler and hasattr(episode_profiler, "character_dossiers"):
+                    for cd in getattr(episode_profiler, "character_dossiers", []):
+                        if getattr(cd, "name", "").lower() == sub_a.lower():
+                            sub_g = getattr(cd, "gender", None) or getattr(cd, "apparent_gender", None)
+                            break
+                if sub_g:
+                    sub_gu = str(sub_g).upper()
+                    if sub_gu == "MALE":
+                        found_m += 1
+                    elif sub_gu == "FEMALE":
+                        found_f += 1
+
+            if found_m >= 1:
+                p0_gender = "MALE"
+                has_ver = True
+                speaker_p0_verified = True
+                telemetry["we_virility"] = "VIRILE"
+                telemetry["group_virility"] = "VIRILE"
+            elif found_f >= 1 and found_m == 0:
+                p0_gender = "FEMALE"
+                has_ver = True
+                speaker_p0_verified = True
+                telemetry["we_virility"] = "NON_VIRILE"
+                telemetry["group_virility"] = "NON_VIRILE"
 
         if not p0_gender and series_bible and clean_actor:
             char_rec = None

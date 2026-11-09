@@ -1926,13 +1926,22 @@ BOY_ROLE_KEYWORDS = _load_dynamic_boy_keywords()
 SECONDARY_LEXICAL_MALE_NOUNS: Set[str] = {
     "boy", "man", "men", "guy", "male", "father", "dad", "brother", "son",
     "uncle", "grandfather", "waiter", "king", "prince", "lord",
-    "chłopiec", "mężczyzna", "chłopak", "ojciec", "brat"
+    "chłopiec", "mężczyzna", "chłopak", "ojciec", "brat",
+    "bandit", "brigand", "thug", "rebel", "retainer", "lookout", "soldier", "guard",
+    "mercenary", "warrior", "knight", "henchman", "bandyta", "zbój", "buntownik",
+    "sługa", "zwiadowca", "żołnierz", "strażnik", "najemnik"
 }
 
 SECONDARY_LEXICAL_FEMALE_NOUNS: Set[str] = {
     "girl", "woman", "women", "lady", "female", "mother", "mom", "sister",
     "daughter", "aunt", "grandmother", "waitress", "queen", "princess",
     "dziewczyna", "kobieta", "dziewczynka", "matka", "siostra"
+}
+
+EPISODIC_MARTIAL_ROLES: Set[str] = {
+    "bandit", "brigand", "thug", "rebel", "retainer", "lookout", "soldier", "guard",
+    "mercenary", "warrior", "knight", "henchman", "bandyta", "zbój", "buntownik",
+    "sługa", "zwiadowca", "żołnierz", "strażnik", "najemnik"
 }
 
 
@@ -7020,7 +7029,7 @@ class SeriesBible:
                 if is_alias_of_existing:
                     continue
 
-                masculine_lexicon = SECONDARY_LEXICAL_MALE_NOUNS
+                masculine_lexicon = SECONDARY_LEXICAL_MALE_NOUNS - EPISODIC_MARTIAL_ROLES
                 feminine_lexicon = SECONDARY_LEXICAL_FEMALE_NOUNS
                 tag_words = set(_split_camel_case_tokens(clean_tag))
 

@@ -801,3 +801,138 @@ def test_t11_0_e_7_mob_deictic_per_clause_keeps_vocative(tmp_path):
     )
     result = resolve_turn_addressee(turn, previous_turn=None, series_bible=sm)
     assert result.target_speaker == "BohaterAlfa"
+
+
+
+@pytest.mark.unit
+def test_t11_1_3_3_episodic_male_roles_lexical_and_registry_arbitration(tmp_path):
+    """
+    T11.1.3_3 (INC-AVT-021): Weryfikacja rozszerzenia SECONDARY_LEXICAL_MALE_NOUNS o role epizodyczne
+    (w tym ról Bandit A, Lookout, Rebel) oraz pierwszenstwa rejestru postaci przed zerowaniem generycznym.
+    """
+    import pysubs2
+    from series_memory import SECONDARY_LEXICAL_MALE_NOUNS, SeriesBible
+    from translator import MultimodalTranslator
+
+    for expected_role in ["bandit", "brigand", "thug", "rebel", "retainer", "lookout", "soldier", "guard", "mercenary", "warrior"]:
+        assert expected_role in SECONDARY_LEXICAL_MALE_NOUNS
+
+    tr = MultimodalTranslator.__new__(MultimodalTranslator)
+    tr.character_registry = {}
+    tr.FEMALE_ROLE_KEYWORDS = ["kobieta", "dziewczyna", "female", "girl", "woman"]
+    tr.MALE_ROLE_KEYWORDS = ["mezczyzna", "chlopak", "male", "boy", "man"]
+    tr.BOY_ROLE_KEYWORDS = ["chlopiec", "boy", "kid"]
+    tr.series_bible = SeriesBible(anime_title="SeriaTestowaAlfa", storage_dir=tmp_path)
+
+    ev_bandit = pysubs2.SSAEvent(start=1000, end=3000, text="Hand over your money!")
+    ev_bandit.name = "Bandit A"
+    g_bandit, alerts_bandit = tr._arbitrate_speaker_gender(ev_bandit, raw_speaker_name="Bandit A")
+    assert g_bandit == "mężczyzna"
+
+    ev_lookout = pysubs2.SSAEvent(start=3500, end=5000, text="Enemy approaching!")
+    ev_lookout.name = "Lookout"
+    g_lookout, _ = tr._arbitrate_speaker_gender(ev_lookout, raw_speaker_name="Lookout")
+    assert g_lookout == "mężczyzna"
+
+    tr.character_registry["Rebel"] = "mezczyzna (partyzant)"
+    ev_rebel = pysubs2.SSAEvent(start=5500, end=7000, text="We fight for freedom.")
+    ev_rebel.name = "Rebel"
+    g_rebel, _ = tr._arbitrate_speaker_gender(ev_rebel, raw_speaker_name="Rebel")
+    assert g_rebel == "mężczyzna"
+
+
+@pytest.mark.unit
+def test_t11_1_3_4_low_pitch_elderly_female_vs_deep_male_f0_shield(tmp_path):
+    """
+    T11.1.3_4 (INC-AVT-021): Tarcza krtaniowa F0 <= 135 Hz vs F0 > 135 Hz, ochrona altu kobiecego
+    oraz weto wizualne Fazy 1 dla meskich okrzykow bojowych o wysokim F0.
+    """
+    import pysubs2
+    from series_memory import SeriesBible
+    from translator import MultimodalTranslator
+
+    tr = MultimodalTranslator.__new__(MultimodalTranslator)
+    tr.character_registry = {}
+    tr.FEMALE_ROLE_KEYWORDS = ["kobieta", "dziewczyna", "female", "girl", "woman"]
+    tr.MALE_ROLE_KEYWORDS = ["mezczyzna", "chlopak", "male", "boy", "man"]
+    tr.BOY_ROLE_KEYWORDS = ["chlopiec", "boy", "kid"]
+    tr.series_bible = SeriesBible(anime_title="SeriaTestowaAlfa", storage_dir=tmp_path)
+
+    ev_alto = pysubs2.SSAEvent(start=1000, end=3000, text="Hear my wisdom.")
+    ev_alto.name = "StarszaKobietaAlfa"
+    tags_alto = {0: "glos zenski, niski alt (~145 Hz)"}
+    g_alto, _ = tr._arbitrate_speaker_gender(
+        ev_alto,
+        raw_speaker_name="StarszaKobietaAlfa",
+        speaker_tags=tags_alto,
+        batch_id=0,
+        raw_phase1_gender="kobieta"
+    )
+    assert g_alto == "kobieta"
+
+    ev_deep = pysubs2.SSAEvent(start=3500, end=5000, text="Halt.")
+    ev_deep.name = "StraznikAlfa"
+    tags_deep = {0: "glos meski, niski (~110 Hz)"}
+    g_deep, _ = tr._arbitrate_speaker_gender(
+        ev_deep,
+        raw_speaker_name="StraznikAlfa",
+        speaker_tags=tags_deep,
+        batch_id=0
+    )
+    assert g_deep == "mężczyzna"
+
+    ev_shout = pysubs2.SSAEvent(start=5500, end=7000, text="Uwooooogh!")
+    ev_shout.name = "WojownikAlfa"
+    tags_shout = {0: "sopran (~240 Hz)"}
+    g_shout, alerts_shout = tr._arbitrate_speaker_gender(
+        ev_shout,
+        raw_speaker_name="WojownikAlfa",
+        speaker_tags=tags_shout,
+        batch_id=0,
+        raw_phase1_gender="mężczyzna"
+    )
+    assert g_shout == "mężczyzna"
+    assert any("weto_krzyku_f0" in a for a in alerts_shout)
+
+
+@pytest.mark.unit
+def test_t11_1_3_5_slash_dyad_mixed_gender_virile_telemetry(tmp_path):
+    """
+    T11.1.3_5 (P3-A): Weryfikacja arbitrazu virility dla diad i grup laczonych separatorem (POLYLOGUE).
+    """
+    import pysubs2
+    from series_memory import SeriesBible
+    from scene_discourse import SceneDiscourseGraph
+
+    sm = SeriesBible(anime_title="SeriaTestowaAlfa", storage_dir=tmp_path)
+    sm.data["characters"] = {
+        "BohaterAlfa": {"gender": "MALE", "priority": "P0", "has_verified_gender": True, "aliases": ["BohaterAlfa"]},
+        "BohaterkaBeta": {"gender": "FEMALE", "priority": "P0", "has_verified_gender": True, "aliases": ["BohaterkaBeta"]},
+        "PostacGamma": {"gender": "FEMALE", "priority": "P0", "has_verified_gender": True, "aliases": ["PostacGamma"]},
+    }
+
+    ev_mixed = pysubs2.SSAEvent(start=1000, end=4000, text="We are coming!")
+    ev_mixed.name = "BohaterAlfa / BohaterkaBeta"
+    telem_mixed = SceneDiscourseGraph.arbitrate_event_telemetry(
+        event=ev_mixed,
+        series_bible=sm
+    )
+    assert telem_mixed["speaker_name"] == "POLYLOGUE"
+    assert telem_mixed["speaker_gender"] == "MALE"
+    assert telem_mixed["grammatical_gender"] == "MASCULINE"
+    assert telem_mixed["we_virility"] == "VIRILE"
+    assert telem_mixed["group_virility"] == "VIRILE"
+    assert "[Mówca: POLYLOGUE (MASCULINE)]" in telem_mixed.get("dry_telemetry", "")
+
+    ev_female = pysubs2.SSAEvent(start=4500, end=7000, text="We will do our best!")
+    ev_female.name = "BohaterkaBeta / PostacGamma"
+    telem_fem = SceneDiscourseGraph.arbitrate_event_telemetry(
+        event=ev_female,
+        series_bible=sm
+    )
+    assert telem_fem["speaker_name"] == "POLYLOGUE"
+    assert telem_fem["speaker_gender"] == "FEMALE"
+    assert telem_fem["grammatical_gender"] == "FEMININE"
+    assert telem_fem["we_virility"] == "NON_VIRILE"
+    assert telem_fem["group_virility"] == "NON_VIRILE"
+    assert "[Mówca: POLYLOGUE (FEMININE)]" in telem_fem.get("dry_telemetry", "")
