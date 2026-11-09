@@ -1863,6 +1863,7 @@ class MultimodalTranslator:
 
         # Real token counter for the current episode
         self.current_episode_tokens: Dict[str, Any] = {"prompt": 0, "cached": 0, "output": 0, "model": self.model}
+        self._last_batch_token_usage: Dict[str, Any] = {}
         import threading
         self.lock = threading.RLock()
         # Smart Batch Queueing & Pacing:
@@ -3538,12 +3539,21 @@ class MultimodalTranslator:
                 if hasattr(response, "usage_metadata") and response.usage_metadata:
                     um = response.usage_metadata
                     with self.lock:
-                        self.current_episode_tokens["prompt"] += getattr(um, "prompt_token_count", 0) or 0
-                        self.current_episode_tokens["cached"] += getattr(um, "cached_content_token_count", 0) or 0
+                        p_cnt = getattr(um, "prompt_token_count", 0) or 0
+                        c_cnt = getattr(um, "cached_content_token_count", 0) or 0
                         cands = getattr(um, "candidates_token_count", 0) or 0
                         thoughts = getattr(um, "thoughts_token_count", 0) or 0
-                        self.current_episode_tokens["output"] += (cands + thoughts)
+                        out_cnt = (cands + thoughts)
+                        self.current_episode_tokens["prompt"] += p_cnt
+                        self.current_episode_tokens["cached"] += c_cnt
+                        self.current_episode_tokens["output"] += out_cnt
                         self.current_episode_tokens["model"] = current_model
+                        self._last_batch_token_usage = {
+                            "prompt": p_cnt,
+                            "cached": c_cnt,
+                            "output": out_cnt,
+                            "model": current_model,
+                        }
 
                 if hasattr(response, "parsed") and response.parsed is not None:
                     with MultimodalTranslator._STATUS_LOCK:
@@ -3956,19 +3966,26 @@ class MultimodalTranslator:
         contents.append(prompt_text)
 
         pbar.set_postfix_str("Faza 1 (Wizja + Audio)...")
+        t0_phase1 = time.perf_counter()
         batch_response = self._call_gemini_with_retry(
             contents=contents,
             schema_class=BatchTranslationResponse
         )
+        elapsed_phase1 = round(max(0.0, time.perf_counter() - t0_phase1), 2)
 
         if self.flight_recorder:
             try:
                 raw_resp = batch_response.model_dump() if hasattr(batch_response, "model_dump") else (batch_response.dict() if hasattr(batch_response, "dict") else str(batch_response))
+                p1_tok_usage = None
+                with self.lock:
+                    if getattr(self, "_last_batch_token_usage", None):
+                        p1_tok_usage = dict(self._last_batch_token_usage)
                 self.flight_recorder.log_phase1_batch(
                     batch_id=b_idx,
                     prompt_dump=prompt_text,
                     raw_response=raw_resp,
-                    response_time_sec=0.0
+                    response_time_sec=elapsed_phase1,
+                    token_usage=p1_tok_usage
                 )
             except Exception:
                 logger.debug("Rejestracja odpowiedzi modelu zakończona wyjątkiem", exc_info=True)
@@ -4917,6 +4934,7 @@ class MultimodalTranslator:
         self._asr_last_text = ""
         self._asr_consecutive_streak = 0
         self.current_episode_tokens = {"prompt": 0, "cached": 0, "output": 0, "model": self.model}
+        self._last_batch_token_usage = {}
         if self.verifier:
             self.verifier.current_episode_tokens = {"prompt": 0, "cached": 0, "output": 0, "model": self.verifier.model}
 
@@ -4988,10 +5006,15 @@ class MultimodalTranslator:
                         "is_sign": v_info.get("is_sign", False),
                         "en_raw": clean_c or ev_item.text
                     })
+                style_summary_dict = (
+                    self.style_report.get_summary()
+                    if getattr(self, "style_report", None) and hasattr(self.style_report, "get_summary")
+                    else (getattr(self.style_report, "styles", {}) if hasattr(self, "style_report") else {})
+                )
                 self.flight_recorder.log_ingestion(
                     encoding="utf-8",
                     total_events=len(subs.events),
-                    style_matrix=getattr(self.style_report, "styles", {}) if hasattr(self, "style_report") else {},
+                    style_matrix=style_summary_dict,
                     events_classified=classified_sample
                 )
             except Exception:
@@ -5631,8 +5654,8 @@ class MultimodalTranslator:
                         "line_count": len(b),
                         "first_id": b[0][0] if b else None,
                         "last_id": b[-1][0] if b else None,
-                        "start_ms": b[0][3] if b else 0,
-                        "end_ms": b[-1][4] if b else 0
+                        "start_ms": int(getattr(b[0][1], "start", 0)) if b and len(b[0]) > 1 else 0,
+                        "end_ms": int(getattr(b[-1][1], "end", 0)) if b and len(b[-1]) > 1 else 0
                     }
                     for b_idx, b in enumerate(batches)
                 ]
