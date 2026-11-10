@@ -844,11 +844,12 @@ def test_t11_1_3_3_episodic_male_roles_lexical_and_registry_arbitration(tmp_path
 @pytest.mark.unit
 def test_t11_1_3_4_low_pitch_elderly_female_vs_deep_male_f0_shield(tmp_path):
     """
-    T11.1.3_4 (INC-AVT-021): Tarcza krtaniowa F0 <= 135 Hz vs F0 > 135 Hz, ochrona altu kobiecego
-    oraz weto wizualne Fazy 1 dla meskich okrzykow bojowych o wysokim F0.
+    T11.1.3_4 (INC-AVT-021 / P2-1 / P3-1): Tarcza krtaniowa F0 <= 135 Hz vs F0 > 135 Hz na rzeczywistych
+    etykietach SpeakerVoiceClassifier.classify_pitch_register, ochrona altu kobiecego oraz weto Fazy 1.
     """
     import pysubs2
     from series_memory import SeriesBible
+    from speaker_diarizer import SpeakerVoiceClassifier
     from translator import MultimodalTranslator
 
     tr = MultimodalTranslator.__new__(MultimodalTranslator)
@@ -860,7 +861,7 @@ def test_t11_1_3_4_low_pitch_elderly_female_vs_deep_male_f0_shield(tmp_path):
 
     ev_alto = pysubs2.SSAEvent(start=1000, end=3000, text="Hear my wisdom.")
     ev_alto.name = "StarszaKobietaAlfa"
-    tags_alto = {0: "glos zenski, niski alt (~145 Hz)"}
+    tags_alto = {0: SpeakerVoiceClassifier.classify_pitch_register(142.0)}
     g_alto, _ = tr._arbitrate_speaker_gender(
         ev_alto,
         raw_speaker_name="StarszaKobietaAlfa",
@@ -872,18 +873,19 @@ def test_t11_1_3_4_low_pitch_elderly_female_vs_deep_male_f0_shield(tmp_path):
 
     ev_deep = pysubs2.SSAEvent(start=3500, end=5000, text="Halt.")
     ev_deep.name = "StraznikAlfa"
-    tags_deep = {0: "glos meski, niski (~110 Hz)"}
+    tags_deep = {0: SpeakerVoiceClassifier.classify_pitch_register(110.0)}
     g_deep, _ = tr._arbitrate_speaker_gender(
         ev_deep,
         raw_speaker_name="StraznikAlfa",
         speaker_tags=tags_deep,
-        batch_id=0
+        batch_id=0,
+        raw_phase1_gender=None
     )
     assert g_deep == "mężczyzna"
 
     ev_shout = pysubs2.SSAEvent(start=5500, end=7000, text="Uwooooogh!")
     ev_shout.name = "WojownikAlfa"
-    tags_shout = {0: "sopran (~240 Hz)"}
+    tags_shout = {0: SpeakerVoiceClassifier.classify_pitch_register(240.0)}
     g_shout, alerts_shout = tr._arbitrate_speaker_gender(
         ev_shout,
         raw_speaker_name="WojownikAlfa",

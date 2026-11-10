@@ -107,11 +107,21 @@ def test_t11_1_3_1_scene_discourse_batch_summary_from_4_tuples(tmp_path):
 
 def test_t11_1_3_2_style_matrix_summary_and_phase1_telemetry(tmp_path):
     """
-    T11.1.3_2 (INC-AVT-022): Weryfikacja telemetrii stylow (log_ingestion z get_summary())
-    oraz czasu wykonania i zuzycia tokenow w log_phase1_batch.
+    T11.1.3_2 (INC-AVT-022 / P3-B / P3-1): Weryfikacja telemetrii stylow na rzeczywistym obiekcie
+    StyleMatrixReport.get_summary(), czasu i tokenow w log_phase1_batch oraz estymatora PricingGuard.
     """
     import json
+    import pysubs2
     from flight_recorder import EpisodeFlightRecorder
+    from style_matrix import analyze_subtitles
+    from pricing_guard import PricingGuard
+
+    subs = pysubs2.SSAFile()
+    subs.events.append(pysubs2.SSAEvent(start=1000, end=3000, style="Default", name="PostacAlfa", text="First line."))
+    subs.events.append(pysubs2.SSAEvent(start=3500, end=5500, style="Default", name="BohaterAlfa", text="Second line."))
+    style_report = analyze_subtitles(subs)
+    style_summary = style_report.get_summary()
+    assert isinstance(style_summary, dict) and style_summary.get("DIALOGUE_BOTTOM", 0) == 2
 
     rec = EpisodeFlightRecorder(
         anime_slug="test_anime",
@@ -120,10 +130,9 @@ def test_t11_1_3_2_style_matrix_summary_and_phase1_telemetry(tmp_path):
         enabled=True
     )
 
-    style_summary = {"dialogue": 42, "screen_sign": 5, "song": 2}
     rec.log_ingestion(
         encoding="utf-8",
-        total_events=49,
+        total_events=len(subs.events),
         style_matrix=style_summary,
         events_classified=[{"id": 1, "style": "Default", "type_label": "DIALOG", "raw_actor_name": "PostacAlfa"}]
     )
@@ -143,9 +152,15 @@ def test_t11_1_3_2_style_matrix_summary_and_phase1_telemetry(tmp_path):
 
     ingest_ev = next(e for e in events if e["stage"] == "ingestion")
     assert ingest_ev["payload"]["style_matrix"] == style_summary
-    assert ingest_ev["payload"]["total_events"] == 49
+    assert ingest_ev["payload"]["style_matrix"]["DIALOGUE_BOTTOM"] == 2
+    assert ingest_ev["payload"]["total_events"] == 2
 
     p1_ev = next(e for e in events if e["stage"] == "phase1_batch")
     assert p1_ev["payload"]["response_time_sec"] == 4.25
     assert p1_ev["payload"]["token_usage"] == tok_usage
     assert p1_ev["payload"]["token_usage"]["model"] == "gemini-2.5-flash"
+
+    est_p3_default = PricingGuard.estimate_episode_cost_pln("3")
+    est_p3_364 = PricingGuard.estimate_episode_cost_pln("3", lines_count=364)
+    assert 3.60 <= est_p3_default <= 3.80
+    assert est_p3_364 >= 3.80
