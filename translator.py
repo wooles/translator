@@ -1864,8 +1864,9 @@ class MultimodalTranslator:
 
         # Real token counter for the current episode
         self.current_episode_tokens: Dict[str, Any] = {"prompt": 0, "cached": 0, "output": 0, "model": self.model}
-        self._last_batch_token_usage: Dict[str, Any] = {}
         import threading
+        self._thread_local = threading.local()
+        self._thread_local.last_batch_token_usage = {}
         self.lock = threading.RLock()
         # Smart Batch Queueing & Pacing:
         # Default to 1-by-1 streaming pacing mode (eliminates TPU congestion and provides live instant updates)
@@ -1876,6 +1877,7 @@ class MultimodalTranslator:
     MALE_ROLE_KEYWORDS = MALE_ROLE_KEYWORDS
     BOY_ROLE_KEYWORDS = BOY_ROLE_KEYWORDS
     lock = threading.RLock()
+    _thread_local = threading.local()
 
     def get_character_registry_snapshot(self) -> Dict[str, str]:
         """Returns a thread-safe atomic snapshot copy of character_registry."""
@@ -2295,7 +2297,9 @@ class MultimodalTranslator:
 
         if not acoustic_gender and speaker_tags and batch_id in speaker_tags:
             v_tag = speaker_tags[batch_id].lower()
-            if "alt" not in v_tag and "ochrypł" not in v_tag and "sopran" not in v_tag:
+            # Hotfix 11.1.3a (P2-1): dopuszczenie etykiet "niski tembr" z SpeakerVoiceClassifier
+            # przy zachowaniu progu krtaniowego <= 135 Hz i ochrony deklaracji żeńskiej z Fazy 1.
+            if "niski tembr" in v_tag or ("alt" not in v_tag and "ochrypł" not in v_tag and "sopran" not in v_tag):
                 hz_match = re.search(r"~(\d+)\s*hz", v_tag)
                 if hz_match:
                     hz_val = int(hz_match.group(1))
@@ -3562,24 +3566,27 @@ class MultimodalTranslator:
                     fut = ex.submit(_single_generate)
                     response = fut.result(timeout=95.0)
 
+                if not hasattr(self, "_thread_local") or self._thread_local is None:
+                    self._thread_local = threading.local()
+                self._thread_local.last_batch_token_usage = {}
                 if hasattr(response, "usage_metadata") and response.usage_metadata:
                     um = response.usage_metadata
+                    p_cnt = getattr(um, "prompt_token_count", 0) or 0
+                    c_cnt = getattr(um, "cached_content_token_count", 0) or 0
+                    cands = getattr(um, "candidates_token_count", 0) or 0
+                    thoughts = getattr(um, "thoughts_token_count", 0) or 0
+                    out_cnt = (cands + thoughts)
+                    self._thread_local.last_batch_token_usage = {
+                        "prompt": p_cnt,
+                        "cached": c_cnt,
+                        "output": out_cnt,
+                        "model": current_model,
+                    }
                     with self.lock:
-                        p_cnt = getattr(um, "prompt_token_count", 0) or 0
-                        c_cnt = getattr(um, "cached_content_token_count", 0) or 0
-                        cands = getattr(um, "candidates_token_count", 0) or 0
-                        thoughts = getattr(um, "thoughts_token_count", 0) or 0
-                        out_cnt = (cands + thoughts)
                         self.current_episode_tokens["prompt"] += p_cnt
                         self.current_episode_tokens["cached"] += c_cnt
                         self.current_episode_tokens["output"] += out_cnt
                         self.current_episode_tokens["model"] = current_model
-                        self._last_batch_token_usage = {
-                            "prompt": p_cnt,
-                            "cached": c_cnt,
-                            "output": out_cnt,
-                            "model": current_model,
-                        }
 
                 if hasattr(response, "parsed") and response.parsed is not None:
                     with MultimodalTranslator._STATUS_LOCK:
@@ -4003,9 +4010,10 @@ class MultimodalTranslator:
             try:
                 raw_resp = batch_response.model_dump() if hasattr(batch_response, "model_dump") else (batch_response.dict() if hasattr(batch_response, "dict") else str(batch_response))
                 p1_tok_usage = None
-                with self.lock:
-                    if getattr(self, "_last_batch_token_usage", None):
-                        p1_tok_usage = dict(self._last_batch_token_usage)
+                _tl = getattr(self, "_thread_local", None)
+                _last_tu = getattr(_tl, "last_batch_token_usage", None) if _tl is not None else None
+                if _last_tu:
+                    p1_tok_usage = dict(_last_tu)
                 self.flight_recorder.log_phase1_batch(
                     batch_id=b_idx,
                     prompt_dump=prompt_text,
@@ -4960,7 +4968,9 @@ class MultimodalTranslator:
         self._asr_last_text = ""
         self._asr_consecutive_streak = 0
         self.current_episode_tokens = {"prompt": 0, "cached": 0, "output": 0, "model": self.model}
-        self._last_batch_token_usage = {}
+        if not hasattr(self, "_thread_local") or self._thread_local is None:
+            self._thread_local = threading.local()
+        self._thread_local.last_batch_token_usage = {}
         if self.verifier:
             self.verifier.current_episode_tokens = {"prompt": 0, "cached": 0, "output": 0, "model": self.verifier.model}
 
