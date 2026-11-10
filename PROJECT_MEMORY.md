@@ -4,27 +4,28 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-09 — Standard 11.1.3 Certyfikowany Baseline)
-- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.1.3 (Production Certified Baseline)`
-- **Commit certyfikacji kodu:** `ed9dc5f33c0ea341db5b0a34c73413f135401bda`
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-10 — Standard 11.1.3a Certyfikowany Baseline)
+- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.1.3a (Production Certified Baseline)`
+- **Commit certyfikacji kodu:** `842b9e945cfed4bab04e2d3864a1cd657e50f832`
 - **Commity implementacyjne 11.1:** `5b7306d` (Commit 1), `5b17ea7` (Commit 2), `2b4bc7d` (Commit 3), `8b72887` (Commit 4), `8a7dd31` (Commit 5), `218af2e` (Commit 6)
 - **Commity Hotfixu 11.1.1:** `328729f` (Commit 1), `9de0b83` (Commit 2), `07c4684` (Commit 3), `96acac7` (Commit 4)
 - **Commity Hotfixu 11.1.2:** `74766d8` (Commit 1), `1b540e3` (Commit 2), `8313658` (Commit 3), `326b7e0` (Commit 4)
 - **Commity Hotfixu 11.1.2a:** `d310969` (Commit 1), `a928569` (Commit 2)
-- **Commity Hotfixu 11.1.3:**
-  * Commit 1 (`25e93008061e89cf2bb52554e2eb27ef5c9528d2`): `fix(translator,pricing_guard): Hotfix 11.1.3 - resolve INC-AVT-020 tuple indexing in log_scene_discourse, INC-AVT-022 telemetry metrics, and P3-B cost estimate`
-  * Commit 2 (`ed9dc5f33c0ea341db5b0a34c73413f135401bda`): `fix(translator,series_memory,scene_discourse): Hotfix 11.1.3 - resolve INC-AVT-021 episodic P2 male role arbitration and P3-A mixed dyad virility` — **NOWY COMMIT CERTYFIKACJI KODU**
-  * Commit 3 (`HEAD`): `docs: Hotfix 11.1.3 - register INC-AVT-020..022 and ARB-046, sync SSOT certification hash, and publish implementation report`
-- **Status 11.1.3:** `CERTIFIED / CLOSED (2026-11-09)`
+- **Commity Hotfixu 11.1.3:** `25e9300` (Commit 1), `ed9dc5f` (Commit 2), `879fb04` (Commit 3)
+- **Commity Hotfixu 11.1.3a:**
+  * Commit 1 (`4be5ab0996bfe5a6196fbb60b87814458205162a`): `fix(translator): Hotfix 11.1.3a - unblock F0 <= 135 Hz shield for SpeakerVoiceClassifier tags (P2-1) and isolate per-thread token usage (P3-2A)`
+  * Commit 2 (`842b9e945cfed4bab04e2d3864a1cd657e50f832`): `test(tests): Hotfix 11.1.3a - use real pipeline objects in T11.1.3_2 and T11.1.3_4 (P3-1)` — **NOWY COMMIT CERTYFIKACJI KODU**
+  * Commit 3 (`HEAD`): `docs: Hotfix 11.1.3a - sync SSOT to 11.1.3a, register INC-AVT-021a and ARB-047, commit operational audit and 11.1.3a report (P3-2B)`
+- **Status 11.1.3a:** `CERTIFIED / CLOSED (2026-11-10)`
 - **Commit ochrony Depuracji Legacy 1.0 (Z16):** `d31096945a977d6a179891d87dcfd2a05c0c5bca` (nienaruszony, 0 B zmian)
 - **Stan metryk:** `332 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `403 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 12/12, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
 - **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (332/332 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
 - **Zasada utrzymaniowa post-11.1:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.1` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
-- **Gałąź i Architektura:** `main` (Standard 11.1.2a: Pełna Neutralność Całego Kodu i Testów, 100% Czystość Leksykonu Onomastycznego `.onomastic_lexicon.json` [12 kluczy, 576 leksemów], Mikro-domknięcie Z1 w rules.py, Nowy Baseline Z16 `d31096945a977d6a179891d87dcfd2a05c0c5bca`, Certyfikacja Kodu `d31096945a977d6a179891d87dcfd2a05c0c5bca`, Zero-Literal Pure Positive Domain Invariant Architecture & Primary LLM Translation Authority)
+- **Gałąź i Architektura:** `main` (Standard 11.1.3a: Pełna Neutralność Całego Kodu i Testów, 100% Czystość Leksykonu Onomastycznego `.onomastic_lexicon.json` [12 kluczy, 576 leksemów], Mikro-domknięcie Z1 w rules.py, Nowy Baseline Z16 `d31096945a977d6a179891d87dcfd2a05c0c5bca`, Certyfikacja Kodu `842b9e945cfed4bab04e2d3864a1cd657e50f832`, Zero-Literal Pure Positive Domain Invariant Architecture & Primary LLM Translation Authority)
 - **Środowisko:** Python 3.13 (`.venv`), Windows PowerShell, `ffmpeg` (PATH), `librosa.pyin`, `soundfile`, `pysubs2`, `spaCy en_core_web_sm` (100% offline 0.00 PLN), bezpośrednie klucze Google AI Studio API (`use_vertex = 0`).
 - **Dyrektywa Wykonawcza Testów:**
   * Testy przyrostowe podczas kodowania (< 2 s): `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_testu>"`
-  * Szybki pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest -q` (327 passed w tests/, 71 passed i 153 deselected w test_system.py)
+  * Szybki pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest -q` (332 passed w tests/, 71 passed i 153 deselected w test_system.py)
   * Audyt śledczy diffu: `powershell -ExecutionPolicy Bypass -File .\audit_diff.ps1 -ForbiddenTerms "<lista>"`
   * 4 bramki kwalifikacyjne: `python verify_purity.py`, `python verify_8_fixes.py`, `python verify_12_fixes.py`, `python verify_ultimate_pipeline.py`
 
@@ -154,12 +155,16 @@ W ramach autoryzowanego `Z16-amendment #3` usunięto warunek `f1_starts_lower` z
 - **Status:** `RESOLVED (Hotfix 11.1.3, Commit 1 — hash 25e93008061e89cf2bb52554e2eb27ef5c9528d2)`
 - **Rozwiązanie:** Przekazywanie `response_time_sec` i `token_usage` do `log_phase1_batch` w `translator.py:3971` z pomiarem czasu `time.perf_counter()` oraz przekazywanie słownikowego zestawienia `style_report.get_summary()` do `log_ingestion` w `translator.py:4994`.
 
+### 🔹 INC-AVT-021a (Hotfix 11.1.3a: Domknięcie P2-1, P3-1 i P3-2 — tarcza F0 <= 135 Hz dla SpeakerVoiceClassifier i izolacja wątkowa tokenów)
+- **Status:** `RESOLVED (Hotfix 11.1.3a, Commity 1–2 — certyfikacja kodu: 842b9e945cfed4bab04e2d3864a1cd657e50f832)`
+- **Rozwiązanie:** Dopuszczenie przedrostka `"niski tembr"` w `translator.py:2302` odblokowujące tarczę krtaniową F0 <= 135 Hz dla rzeczywistych etykiet `SpeakerVoiceClassifier.classify_pitch_register(f0)` przy `raw_phase1_gender=None`, izolacja wątkowa `_thread_local.last_batch_token_usage` w `translator.py` oraz ujednolicenie testów `T11.1.3_2` i `T11.1.3_4` z rzeczywistymi obiektami potoku.
+
 ---
 ## 📐 4. METRYKI OPERACYJNE POTOKU
 - **Ograniczenia Ekranu ASS:** `CPS_PL <= 17.0` (dyskwalifikacja `> 20.0`), `CPL <= 38`, max 2 wiersze.
 - **Podłoga Gęstości Seiyū:** `CPS_target(rho_x) = min(13.5, 7.5 + 0.5 * rho_x)` dla `rho_x >= 9.0 mor/s`.
 - **Progi Golden Corpus:** Anchor Scenes = **100.0% PASSED**, Broader Corpus `>= 99.0%`, Atrybucja Płci `>= 99.8%`.
-- **Macierz testowa Standardu 11.1.3:** `tests/` = `332 passed`, `test_system.py` = `71 passed, 153 deselected` (`5/5` pułapek Z16 `PASS`, 0 failing, Zero Regression Lock).
+- **Macierz testowa Standardu 11.1.3a:** `tests/` = `332 passed`, `test_system.py` = `71 passed, 153 deselected` (`5/5` pułapek Z16 `PASS`, 0 failing, Zero Regression Lock).
 
 ---
 
@@ -213,6 +218,7 @@ W ramach autoryzowanego `Z16-amendment #3` usunięto warunek `f1_starts_lower` z
 | **2026-10-19** | `ARB-044` | Architektura Wariantu (d) | **Hybrydowa Straż Dowodowa (Standard 9.0)**: Odcięcie mutatorów lintera w produkcji ($T(x) = x$), Narrow Safety Net $P_0 \cap \text{EN}$, pre-translacyjna ingestia AniList $P_0$, aliasy $ph \leftrightarrow f$ w $\mathcal{O}(1)$, eliminacja pętli rewersji w Kroku 18, wołacz tytularny `-tz`, bariera regresji Fazy 2, higiena ASS i stabilne `[ID: event_id]` (183/183 PASSED). | 0.00 PLN |
 | **2026-11-08** | `ARB-045` | Higiena Kodu | **Z16-amendment #9**: Neutralizacja ostatnich przykładów Z1 w `rules.py` (`FILAR XXVII` L309–312, `FILAR CXXXII` L1117) i re-certyfikacja baseline'u Z16 (`d310969`). | 0.00 PLN |
 | **2026-11-09** | `ARB-046` | Telemetria / Dyskurs | **Telemetria Dyskursu i Arbitraż Ról Epizodycznych P2 (Standard 11.1.3)**: Naprawa indeksowania krotek w `log_scene_discourse` (INC-AVT-020), metryki czasu i zużycia tokenów Fazy 1 (INC-AVT-022), estymator kosztu P3-B (3150 tokenów), arbitraż płci ról epizodycznych P2 z ochroną F0 krzyku bojowego (INC-AVT-021) oraz rozstrzyganie virility diad mieszanych w POLYLOGUE (P3-A). | 0.00 PLN |
+| **2026-11-10** | `ARB-047` | Telemetria / Testy | **Domknięcie Hotfixu 11.1.3a (P2-1, P3-1, P3-2)**: Odblokowanie tarczy F0 `<= 135 Hz` dla rzeczywistych etykiet `SpeakerVoiceClassifier`, izolacja wątkowa `_thread_local.last_batch_token_usage` w `translator.py` oraz ujednolicenie testów `T11.1.3_2` i `T11.1.3_4` z rzeczywistymi obiektami potoku. | 0.00 PLN |
 
 ---
 

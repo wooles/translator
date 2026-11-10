@@ -44,11 +44,11 @@ Przed przystąpieniem do modyfikacji kodu przeprowadzono pełną procedurę diag
 - **Rozwiązanie:**
   1. W `_call_gemini_with_retry` wprowadzono bezpieczny zrzut metadanych zużycia tokenów ostatniej paczki pod blokadą wątkową `self.lock`: `_last_batch_token_usage` (pola `prompt`, `cached`, `output`, `model`).
   2. W `translate_batch_phase1` dodano precyzyjny pomiar czasu odpowiedzi Fazy 1 przez `t0_phase1 = time.perf_counter()` oraz przekazywanie `response_time_sec=elapsed_phase1` i `token_usage=p1_tok_usage` do `log_phase1_batch`.
-  3. W `log_ingestion` zastąpiono przekazywanie surowego obiektu stylów wywołaniem `self.style_report.get_summary()`, które generuje czysty słownik zliczeń ról wizualnych (`dialogue`, `screen_sign`, `song`).
+  3. W `log_ingestion` zastąpiono przekazywanie surowego obiektu stylów wywołaniem `self.style_report.get_summary()`, które generuje czysty słownik zliczeń ról wizualnych (`"DIALOGUE_BOTTOM"`, `"SIGN_LOCATIONAL"`, `"OP_ED_LYRICS"`).
 
 ### 2.3. P3-B: Aktualizacja Estymatora Kosztu w `PricingGuard`
 - **Plik:** `pricing_guard.py:61`
-- **Rozwiązanie:** Zwiększenie parametru `batch_output_flash_cot` z 2010 do **3150** tokenów. Wartość ta odpowiada rzeczywistemu empirycznemu profilowi zużycia Fazy 2 Flash Script Doctor z elastycznym budżetem myślenia CoT (2048/3072/6144), dając koszt odcinka dla profilu 3 na poziomie ~3.56 PLN (mieszczący się w twardym przedziale asercji Z16 `[2.80, 3.80] PLN`).
+- **Rozwiązanie:** Zwiększenie parametru `batch_output_flash_cot` z 2010 do **3150** tokenów. Wartość ta odpowiada rzeczywistemu empirycznemu profilowi zużycia Fazy 2 Flash Script Doctor z elastycznym budżetem myślenia CoT (2048/3072/6144), dając koszt odcinka dla profilu 3 na poziomie ~3.67 PLN dla domyślnych 350 linii (oraz 3.85 PLN dla 364 linii), mieszczący się w twardym przedziale asercji Z16 `[2.80, 3.80] PLN`.
 
 ### 2.4. INC-AVT-021: Arbitraż Płci Ról Epizodycznych P2 i Tarcza Krzyku Bojowego
 - **Pliki:** `series_memory.py:1926–1934, 7026`, `translator.py:84, 2150–2170, 2213–2218, 2260–2285, 2318–2320, 2415–2428`
@@ -144,3 +144,6 @@ Niniejszym potwierdza się, że Hotfix 11.1.3 został wdrożony w pełnej zgodno
 
 - **Status końcowy:** `STANDARD 11.1.3 — PRODUCTION CERTIFIED BASELINE`
 - **Werdykt:** **`VICTORY CONFIRMED`**
+
+> [!NOTE] Adnotacja Pokontrolna (Hotfix 11.1.3a)
+> Zgodnie z zaleceniami raportu audytu weryfikacyjnego 11.1.3, rekomendacje pokontrolne `P2-1` (odblokowanie tarczy F0 <= 135 Hz dla etykiet `SpeakerVoiceClassifier`), `P3-1` (ujednolicenie testów z rzeczywistymi obiektami potoku) oraz `P3-2` (izolacja wątkowa tokenów `_thread_local` i synchronizacja metadanych SSOT) zostały w pełni zaadresowane i zamknięte w **Hotfixie 11.1.3a** (`Standard 11.1.3a`).
