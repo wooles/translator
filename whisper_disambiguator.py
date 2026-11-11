@@ -690,7 +690,7 @@ class WhisperDisambiguator:
 
         # 1. DIALECT_JP (Dialekty, gwary, sociolekty, yakuwarigo)
         jp_dialect_pat = re.compile(
-            r"\b(?:ya|yan|yade|yaro|nen|seya|akan|honma|dappe|dabe|washi|atai|wai|wagahai|jaken|koraa|suitoo|nankurunaisa|haisai|namara|shibareru|だべ|じゃけん|やん|やde|yaro|ねん|せや|あかん|ほんま|わし|あたい|わい|吾輩|desu\s*wa|masu\s*wa|desu\s*koto|arimasen\s*koto|masu\s*no\s*yo|naissu|ssu\s*kedo|ssu\s*ne|ssu\s*yo|ttanano|danano|kuretamae)\b",
+            r"\b(?:ya|yan|yade|yaro|nen|seya|akan|honma|dappe|dabe|washi|atai|wai|wagahai|jaken|koraa|suitoo|nankurunaisa|haisai|namara|shibareru|だべ|じゃけん|やん|やで|yaro|ねん|せや|あかん|ほんま|わし|あたい|わい|吾輩|desu\s*wa|masu\s*wa|desu\s*koto|arimasen\s*koto|masu\s*no\s*yo|naissu|ssu\s*kedo|ssu\s*ne|ssu\s*yo|ttanano|danano|kuretamae)\b",
             re.IGNORECASE
         )
         character_suffix_pat = re.compile(
@@ -701,7 +701,7 @@ class WhisperDisambiguator:
             r"(?:(?:いく|行(?:く)?|すっ|やる|だ)べ(?:[！？!?。、\s]|$)|(?:^|[、。\s])おら(?:は|が|の|に|を|も|たち|っち)|(?:てる|でる|はず|だけ|こと|いい|ない|な)ある(?:よ|ね|か|な)*(?:[！？!?。、\s]|$)|(?:いい|ない|な|何)やる(?:か|ね|よ)*(?:[！？!?。、\s]|$))"
         )
         jp_dialect_tokens = [
-            "だべ", "じゃけん", "やん", "やde", "やろ", "ねん", "せや", "あかん", "ほんま",
+            "だべ", "じゃけん", "やん", "やで", "やろ", "ねん", "せや", "あかん", "ほんま",
             "わし", "あたい", "わい", "吾輩", "ですわ", "ますわ", "ですこと", "ありませんこと",
             "ますのよ", "ないっす", "っすけど", "っすね", "っすよ", "ったなの", "だなの", "くれたまえ"
         ]

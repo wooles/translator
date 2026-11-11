@@ -390,6 +390,20 @@ def detect_event_visual_type(event: pysubs2.SSAEvent, ts_prefix: str = "", style
     on-screen text (manga titles, signs, posters, boards, episode titles) from standard spoken dialogue (including top dialogue).
     Uses StyleMatrixEngine when available for geometric certainty.
     """
+    clean_t_early = re.sub(r"\{[^}]*\}", "", (getattr(event, "plaintext", None) or getattr(event, "text", None) or "")).strip()
+    name_lower_early = (getattr(event, "name", None) or "").strip().lower()
+    is_point_listing_sign = (
+        not name_lower_early or name_lower_early in ("sign", "signs", "txt", "title", "board", "screen")
+    ) and bool(re.match(r"^\d[\d,.\s]*\s*(?:points?|pts|pkt|punkt(?:y|ów)?|cand(?:y|ies)|coins?|gold|g|yen|¥)\s*:\s*\S+", clean_t_early, re.IGNORECASE))
+
+    if is_point_listing_sign:
+        return {
+            "is_sign": True,
+            "is_top": False,
+            "type_label": "NAPIS EKRANOWY / TYTUŁ (Sign/Typesetting)",
+            "visual_details": "plansza wyliczenia punktowego / cennika"
+        }
+
     if style_report is not None:
         from style_matrix import EventRole
         role, detail = style_report.classify_single_event(event)
@@ -976,64 +990,64 @@ def detect_japanese_pragmatic_register(jp_text: str, en_text: str = "") -> Optio
     if any(k in clean_jp for k in ["ですわ", "ますわ", "ですこと", "ありませんこと", "ますのよ", "かしら", "あそばせ", "わたくし"]) or any(k in rom_lower for k in ["desu wa", "masu wa", "desu koto", "arimasen koto", "masu no yo", "kashira", "asobase", "watakushi"]):
         return "Arystokratyczny / Ojou-sama (elegancka, dystyngowana polszczyzna damy)"
         
-    # 3. Tough Soldier / Battle Slang (-ze, -zo, temee, kisama, ore)
-    if any(k in clean_jp for k in ["ぜ", "ぞ", "てめえ", "貴様", "野郎", "俺"]) or any(k in rom_lower for k in ["-ze", " ze", "-zo", " zo", "temee", "kisama", "yarou", "ore"]):
-        return "Szorstki żołnierski / Bojowy (męski, twardy rejestr wojskowy, brak zmiękczeń)"
-
-    # 4. Rejestr młodzieńczy / chłopięcy (Boku, Ore, Oira, Boku-chan, Niichan, Neechan)
-    if any(k in clean_jp for k in ["ぼく", "ボク", "おいら", "ボクちゃん", "ぼくちゃん", "にいちゃん", "ねえちゃん"]) or any(k in rom_lower for k in ["boku ", "boku,", "boku-", "oira", "niichan", "neechan", "boku wa", "boku ga"]):
-        return "Rejestr młodzieńczy / chłopięcy (głos dziecięcy seiyū, tożsamość podmiotu: rodzaj męski)"
-
-    # 5. Rejestr dziewczęcy (Atashi, Uchi, Onii-chan, Onee-chan, -na no, -ttanano, -danano)
-    if any(k in clean_jp for k in ["あたち", "あたし", "ウチ", "お兄ちゃん", "お姉ちゃん", "おにいちゃん", "おねえちゃん", "ったなの", "だなの"]) or any(k in rom_lower for k in ["atashi", "atachi", "onii-chan", "onee-chan", "oniichan", "oneechan", "ttanano", "danano", "sorotta nano"]):
-        return "Rejestr dziewczęcy (wysoki tembr seiyū, tożsamość podmiotu: rodzaj żeński)"
-
-    # 6. Youth / Casual Slang (-ssu, -yatsu, -chatt, -tteba)
-    if any(k in clean_jp for k in ["っす", "やつ", "ちゃった", "ってば"]) or any(k in rom_lower for k in ["-ssu", " ssu", "yatsu", "chatta", "tteba"]):
-        return "Młodzieżowy / Swobodny (luźny styl potoczny, dynamiczne skróty)"
-        
-    # 7. Romantic Intimate / Kokuhaku (daisuki, aishiteru, zutto issho)
-    if any(k in clean_jp for k in ["大好き", "愛してる", "ずっと一緒"]) or any(k in rom_lower for k in ["daisuki", "aishiteru", "zutto issho"]):
-        return "Czuły miłosny / Kokuhaku (wyznanie miłosne 'Kocham cię', eliminacja friendzone)"
-
-    # 8. Rejestr gwarowy południowo-zachodni (Chesto, Gowasu, Oddon, Jaddo, Mosu)
-    if any(k in clean_jp for k in ["チェスト", "ごわす", "でごわす", "おっどん", "じゃっど", "もす"]) or any(k in rom_lower for k in ["chesto", "gowasu", "oddon", "jaddo", "mosu"]):
-        return "Rejestr gwarowy południowo-zachodni (fonetyczne ściągnięcia, twarda archaiczna artykulacja)"
-
-    # 9. Rejestr gwarowy zachodni (-nen, -yaro, honma, akan, seyana, -dosu, oideyasu)
-    if any(k in clean_jp for k in ["ねん", "やろ", "ほんま", "あかん", "せやな", "どす", "おいでやす"]) or any(k in rom_lower for k in ["-nen", "honma", "akan", "seyana", "nande ya", "dosu", "oideyasu"]):
-        return "Rejestr gwarowy zachodni (zadziorna, błyskotliwa ekspresja potoczna)"
-
-    # 10. Rejestr gwarowy północny prowincjonalny (-dabe, -daccha, ora, nda, -zura, nashite)
-    if any(k in clean_jp for k in ["だべ", "だっちゃ", "おら", "ずら", "なして"]) or any(k in rom_lower for k in ["-dabe", "-daccha", "dappe", "zura", "nashite"]):
-        return "Rejestr gwarowy północny prowincjonalny (ciepła, gawędziarska mowa prowincjonalna)"
-
-    # 11. Rejestr szorstki półświatka (-jaken, -jakee, -noo, buchi, taigii)
-    if any(k in clean_jp for k in ["じゃけん", "じゃけえ", "たいぎい", "ぶち"]) or any(k in rom_lower for k in ["jaken", "jakee", "taigii", "buchi"]):
-        return "Rejestr szorstki półświatka (bezkompromisowy żargon uliczny)"
-
-    # 12. Rejestr gwarowy południowy (-to?, -bai, -tai, suitoo, batten)
-    if any(k in clean_jp for k in ["ばい", "たい", "好いとー", "ばってん"]) or any(k in rom_lower for k in ["-bai", "-tai", "suitoo", "batten"]):
-        return "Rejestr gwarowy południowy (śpiewna, bezpośrednia mowa melodyjna)"
-
-    # 13. Rejestr gwarowy wyspiarski (Haisai, Mensoore, Nankurunaisa, -saa)
-    if any(k in clean_jp for k in ["はいさい", "はいたい", "めんそーれ", "なんくるないさ"]) or any(k in rom_lower for k in ["haisai", "haitai", "mensoore", "nankurunaisa"]):
-        return "Rejestr gwarowy wyspiarski (słoneczny, zrelaksowany ton regionalny)"
-
-    # 14. Rejestr gwarowy surowy (Namara, Shibareru, Shitakke)
-    if any(k in clean_jp for k in ["なまら", "しばれる", "したっけ"]) or any(k in rom_lower for k in ["namara", "shibareru", "shitakke"]):
-        return "Rejestr gwarowy surowy (lakoniczna, powściągliwa ekspresja północy)"
-
-    # 15. Rejestr wojowniczki / potoczysty (-aru/-yaru)
-    if any(k in clean_jp for k in ["あるよ", "あるね", "あるな", "やるか", "やるね", "やるよ", "くれ給え", "くれたまえ"]) or any(k in rom_lower for k in ["-aru", " aru yo", " aru ne", " aru na", "yaru ka", "yaru ne", "kuretamae"]):
+    # 3. Stylizowany rejestr wojowniczki / potoczysty (-aru/-yaru)
+    if any(k in clean_jp for k in ["あるよ", "あるね", "あるな", "やるか", "やるね", "やるよ", "くれ給え", "くれたまえ", "頼んでるある", "はずある", "だけある", "ことある", "何やるか", "いいやる", "いけなやる", "ないやるね", "なおらないやる"]) or any(k in rom_lower for k in ["-aru", " aru yo", " aru ne", " aru na", "yaru ka", "yaru ne", "kuretamae", "tanonderu aru", "hazu aru", "dake aru", "koto aru", "ii yaru", "ikena yaru", "nai yaru ne", "naoranai yaru"]):
         return "Stylizowany rejestr wojowniczki (-aru/-yaru: wyrazista, cięta, potoczysta składnia indywidualna)"
 
-    # 16. Code-switching JA+EN
+    # 4. Code-switching JA+EN
     jp_cs_pat = re.compile(r"(?:[ァ-ヶー]{4,}(?:します|した|して|する)|オーケーオッケ|オッケーオッケ|テンション上げ|\b(?:rifurekuto\s*shimasu|tenshon\s*age|ookee\s*okkee|ookeeokke)\b)", re.IGNORECASE)
     if jp_cs_pat.search(clean_jp) or jp_cs_pat.search(rom_lower):
         excluded_loanwords = ("クリア", "装備", "ガード", "チェック", "スタート", "セーブ", "ロード", "スキップ")
         if not any(excl in clean_jp for excl in excluded_loanwords):
             return "Code-switching JA+EN (celowe wtrącenie angielskie w wypowiedzi japońskiej – zachowaj zabarwienie komiczne/stylistyczne)"
+
+    # 5. Tough Soldier / Battle Slang (-ze, -zo, temee, kisama, ore)
+    if any(k in clean_jp for k in ["ぜ", "ぞ", "てめえ", "貴様", "野郎", "俺"]) or any(k in rom_lower for k in ["-ze", " ze", "-zo", " zo", "temee", "kisama", "yarou", "ore"]):
+        return "Szorstki żołnierski / Bojowy (męski, twardy rejestr wojskowy, brak zmiękczeń)"
+
+    # 6. Rejestr młodzieńczy / chłopięcy (Boku, Ore, Oira, Boku-chan, Niichan, Neechan)
+    if any(k in clean_jp for k in ["ぼく", "ボク", "おいら", "ボクちゃん", "ぼくちゃん", "にいちゃん", "ねえちゃん"]) or any(k in rom_lower for k in ["boku ", "boku,", "boku-", "oira", "niichan", "neechan", "boku wa", "boku ga"]):
+        return "Rejestr młodzieńczy / chłopięcy (głos dziecięcy seiyū, tożsamość podmiotu: rodzaj męski)"
+
+    # 7. Rejestr dziewczęcy (Atashi, Uchi, Onii-chan, Onee-chan, -na no, -ttanano, -danano)
+    if any(k in clean_jp for k in ["あたち", "あたし", "ウチ", "お兄ちゃん", "お姉ちゃん", "おにいちゃん", "おねえちゃん", "ったなの", "だなの"]) or any(k in rom_lower for k in ["atashi", "atachi", "onii-chan", "onee-chan", "oniichan", "oneechan", "ttanano", "danano", "sorotta nano"]):
+        return "Rejestr dziewczęcy (wysoki tembr seiyū, tożsamość podmiotu: rodzaj żeński)"
+
+    # 8. Youth / Casual Slang (-ssu, -yatsu, -chatt, -tteba)
+    if any(k in clean_jp for k in ["っす", "やつ", "ちゃった", "ってば"]) or any(k in rom_lower for k in ["-ssu", " ssu", "yatsu", "chatta", "tteba"]):
+        return "Młodzieżowy / Swobodny (luźny styl potoczny, dynamiczne skróty)"
+        
+    # 9. Romantic Intimate / Kokuhaku (daisuki, aishiteru, zutto issho)
+    if any(k in clean_jp for k in ["大好き", "愛してる", "ずっと一緒"]) or any(k in rom_lower for k in ["daisuki", "aishiteru", "zutto issho"]):
+        return "Czuły miłosny / Kokuhaku (wyznanie miłosne 'Kocham cię', eliminacja friendzone)"
+
+    # 10. Rejestr gwarowy południowo-zachodni (Chesto, Gowasu, Oddon, Jaddo, Mosu)
+    if any(k in clean_jp for k in ["チェスト", "ごわす", "でごわす", "おっどん", "じゃっど", "もす"]) or any(k in rom_lower for k in ["chesto", "gowasu", "oddon", "jaddo", "mosu"]):
+        return "Rejestr gwarowy południowo-zachodni (fonetyczne ściągnięcia, twarda archaiczna artykulacja)"
+
+    # 11. Rejestr gwarowy zachodni (-nen, -yaro, honma, akan, seyana, -dosu, oideyasu)
+    if any(k in clean_jp for k in ["ねん", "やろ", "ほんま", "あかん", "せやな", "どす", "おいでやす"]) or any(k in rom_lower for k in ["-nen", "honma", "akan", "seyana", "nande ya", "dosu", "oideyasu"]):
+        return "Rejestr gwarowy zachodni (zadziorna, błyskotliwa ekspresja potoczna)"
+
+    # 12. Rejestr gwarowy północny prowincjonalny (-dabe, -daccha, ora, nda, -zura, nashite)
+    if any(k in clean_jp for k in ["だべ", "だっちゃ", "おら", "ずら", "なして"]) or any(k in rom_lower for k in ["-dabe", "-daccha", "dappe", "zura", "nashite"]):
+        return "Rejestr gwarowy północny prowincjonalny (ciepła, gawędziarska mowa prowincjonalna)"
+
+    # 13. Rejestr szorstki półświatka (-jaken, -jakee, -noo, buchi, taigii)
+    if any(k in clean_jp for k in ["じゃけん", "じゃけえ", "たいぎい", "ぶち"]) or any(k in rom_lower for k in ["jaken", "jakee", "taigii", "buchi"]):
+        return "Rejestr szorstki półświatka (bezkompromisowy żargon uliczny)"
+
+    # 14. Rejestr gwarowy południowy (-to?, -bai, -tai, suitoo, batten)
+    if any(k in clean_jp for k in ["ばい", "たい", "好いとー", "ばってん"]) or any(k in rom_lower for k in ["-bai", "-tai", "suitoo", "batten"]):
+        return "Rejestr gwarowy południowy (śpiewna, bezpośrednia mowa melodyjna)"
+
+    # 15. Rejestr gwarowy wyspiarski (Haisai, Mensoore, Nankurunaisa, -saa)
+    if any(k in clean_jp for k in ["はいさい", "はいたい", "めんそーれ", "なんくるないさ"]) or any(k in rom_lower for k in ["haisai", "haitai", "mensoore", "nankurunaisa"]):
+        return "Rejestr gwarowy wyspiarski (słoneczny, zrelaksowany ton regionalny)"
+
+    # 16. Rejestr gwarowy surowy (Namara, Shibareru, Shitakke)
+    if any(k in clean_jp for k in ["なまら", "しばれる", "したっけ"]) or any(k in rom_lower for k in ["namara", "shibareru", "shitakke"]):
+        return "Rejestr gwarowy surowy (lakoniczna, powściągliwa ekspresja północy)"
         
     return None
 
@@ -2534,7 +2548,7 @@ class MultimodalTranslator:
         # 0a. Strict Dual Addressee Check (Dual Audio Ground Truth & Both/Two Vocative Gate)
         is_dual_address = (wdd_tag.addressee_number == "DUAL") or bool(re.search(
             r"\b(?:both\s+of\s+you|you\s+two|two\s+of\s+you|the\s+two\s+of\s+you)\b", clean_lower
-        ))
+        )) or any(m in jp_lower for m in ["お二人", "おふたり", "二人とも", "ふたりとも", "ofutari", "futari tomo"])
         if is_dual_address:
             curr_spk_str = (getattr(event, "name", None) or getattr(event, "actor", None) or "").strip().lower()
             other_chars = []
@@ -4264,13 +4278,53 @@ class MultimodalTranslator:
                 )
             )
 
+            # Zadanie 2 (P2-RES-02): Arbitraż kwantyfikatora dualnego ("you two" / "お二人") w scenach mieszanych
+            has_dual_2p = bool(re.search(r"\b(?:you\s+two|both\s+of\s+you|the\s+two\s+of\s+you)\b", clean_en, re.IGNORECASE))
+            if not has_dual_2p and not vtype.get("is_sign"):
+                raw_jp_peek = whisper_transcriptions.get(batch_id, "") if whisper_transcriptions else ""
+                jp_peek_text = str(raw_jp_peek.get("text", "")).lower() if isinstance(raw_jp_peek, dict) else str(raw_jp_peek or "").lower()
+                has_dual_2p = any(k in jp_peek_text for k in ["お二人", "おふたり", "二人とも", "ふたりとも", "ofutari", "futari tomo"])
+
+            if has_dual_2p and not vtype.get("is_sign"):
+                curr_spk_act = (getattr(event, "name", None) or getattr(event, "actor", None) or "").strip()
+                scene_has_male_part = getattr(self, "scene_has_male", False)
+                scene_has_female_part = is_fem_scene
+
+                for _, b_ev_d, _, _ in untranslated_in_batch:
+                    b_act_d = (getattr(b_ev_d, "name", None) or getattr(b_ev_d, "actor", None) or "").strip()
+                    if not b_act_d or b_act_d == curr_spk_act or is_generic_actor_or_category(b_act_d):
+                        continue
+                    b_rec_d = sb_inst.resolve_character_record(b_act_d) if sb_inst and hasattr(sb_inst, "resolve_character_record") else None
+                    if b_rec_d:
+                        bg_d = getattr(b_rec_d, "gender", None) or getattr(b_rec_d, "grammatical_gender", None)
+                        if bg_d:
+                            bg_d_str = str(bg_d).lower()
+                            if any(m in bg_d_str for m in ["masculine", "mężczyzna", "chłopak", "male"]):
+                                scene_has_male_part = True
+                            elif any(f in bg_d_str for f in ["feminine", "kobieta", "dziewczyna", "female"]):
+                                scene_has_female_part = True
+                    elif hasattr(self, "character_registry") and self.character_registry and b_act_d in self.character_registry:
+                        c_entry_d = self.character_registry[b_act_d]
+                        cg_d = getattr(c_entry_d, "gender", None) or getattr(c_entry_d, "grammatical_gender", None) or (c_entry_d.get("gender") if isinstance(c_entry_d, dict) else None)
+                        if cg_d:
+                            cg_d_str = str(cg_d).lower()
+                            if any(m in cg_d_str for m in ["masculine", "mężczyzna", "chłopak", "male"]):
+                                scene_has_male_part = True
+                            elif any(f in cg_d_str for f in ["feminine", "kobieta", "dziewczyna", "female"]):
+                                scene_has_female_part = True
+
+                if scene_has_male_part and scene_has_female_part:
+                    has_male_addressee_in_line = True
+                    addressee_cat = "para_mieszana_dual"
+
             has_male_speaker_in_line = (
                 spk_gram_tag == "MASCULINE"
                 or speaker_gender == "mężczyzna"
             )
             has_male_addressee_in_line = (
-                tgt_gram_tag == "MASCULINE"
-                or addressee_cat in ["mężczyzna", "mężczyzna_dual", "grupa_mężczyzn"]
+                (has_dual_2p and addressee_cat == "para_mieszana_dual")
+                or tgt_gram_tag == "MASCULINE"
+                or addressee_cat in ["mężczyzna", "mężczyzna_dual", "grupa_mężczyzn", "para_mieszana_dual"]
             )
             if has_male_speaker_in_line:
                 is_fem_scene = False
@@ -4285,6 +4339,9 @@ class MultimodalTranslator:
             if has_male_speaker_in_line and line_pl_grp == "NON_VIRILE":
                 line_pl_grp = "VIRILE"
 
+            if has_dual_2p and addressee_cat == "para_mieszana_dual":
+                line_you_grp = "VIRILE"
+
             batch_actors_f2 = {getattr(b_ev, "name", "") for _, b_ev, _, _ in untranslated_in_batch if getattr(b_ev, "name", "") and not is_generic_actor_or_category(getattr(b_ev, "name", ""))}
             poly_val_f2 = getattr(self, "episode_scene_polylogues", {}).get(orig_idx)
             if not poly_val_f2 and len(batch_actors_f2) >= 3:
@@ -4294,6 +4351,21 @@ class MultimodalTranslator:
             if is_internal_monologue:
                 resolved_tgt_name = None
                 tgt_gram_tag = None
+
+            # Zadanie 1 (P2-RES-01): Ewaluacja rejestru socjopragmatycznego przed formatowaniem telemetrii i notes
+            if vtype.get("is_sign"):
+                raw_jp_cand = ""
+                jp_text = ""
+                romaji_str = ""
+                audio_jp_str = ""
+            else:
+                raw_jp_cand = whisper_transcriptions.get(batch_id, "") if whisper_transcriptions else ""
+                jp_text = str(raw_jp_cand.get("text", "")).strip() if isinstance(raw_jp_cand, dict) else str(raw_jp_cand or "").strip()
+                romaji_str = to_romaji(jp_text) if jp_text else ""
+                audio_jp_str = f"{jp_text} [{romaji_str}]" if romaji_str and romaji_str != jp_text else jp_text
+
+            pragmatic_reg = detect_japanese_pragmatic_register(audio_jp_str, clean_en)
+            short_reg = pragmatic_reg.split("(")[0].strip() if (pragmatic_reg and not vtype.get("is_sign")) else None
 
             line_dry_telemetry = format_dry_telemetry_tag(
                 speaker_gender=spk_gram_tag,
@@ -4306,8 +4378,17 @@ class MultimodalTranslator:
                 you_group_confidence=1.0 if line_you_grp != "AMBIGUOUS" else 0.0,
                 speaker_name=resolved_spk_name,
                 target_name=resolved_tgt_name,
+                register=short_reg,
                 polylogue=poly_val_f2
             )
+            if short_reg and line_dry_telemetry and "Rejestr:" not in line_dry_telemetry:
+                if line_dry_telemetry.endswith("]"):
+                    line_dry_telemetry = line_dry_telemetry[:-1] + f" | Rejestr: {short_reg}]"
+                elif not line_dry_telemetry:
+                    line_dry_telemetry = f"[Rejestr: {short_reg}]"
+            elif short_reg and not line_dry_telemetry:
+                line_dry_telemetry = f"[Rejestr: {short_reg}]"
+
             if line_dry_telemetry:
                 notes = f"{notes} {line_dry_telemetry}".strip()
 
@@ -4346,29 +4427,11 @@ class MultimodalTranslator:
             )
             subj_3p_str = " ".join(subj_3p) if subj_3p else ""
 
-            if vtype["is_sign"]:
-                raw_jp_cand = ""
-                jp_text = ""
-                romaji_str = ""
-                audio_jp_str = ""
-            else:
-                raw_jp_cand = whisper_transcriptions.get(batch_id, "") if whisper_transcriptions else ""
-                jp_text = str(raw_jp_cand.get("text", "")).strip() if isinstance(raw_jp_cand, dict) else str(raw_jp_cand or "").strip()
-                romaji_str = to_romaji(jp_text) if jp_text else ""
-                audio_jp_str = f"{jp_text} [{romaji_str}]" if romaji_str and romaji_str != jp_text else jp_text
-
             semantic_anchor = get_audio_semantic_anchor(jp_text, clean_en)
             if semantic_anchor and not lit_mean:
                 lit_mean = f"[KOTWICA AUDIO]: {semantic_anchor}"
 
             audio_discrepancy_msg = detect_audio_discrepancy(audio_jp_str, pl_candidate, clean_en, prosody=prosody_tags.get(batch_id, ""))
-            pragmatic_reg = detect_japanese_pragmatic_register(audio_jp_str, clean_en)
-            if pragmatic_reg and not vtype["is_sign"]:
-                short_reg = pragmatic_reg.split("(")[0].strip()
-                if line_dry_telemetry and line_dry_telemetry.endswith("]"):
-                    line_dry_telemetry = line_dry_telemetry[:-1] + f" | Rejestr: {short_reg}]"
-                elif not line_dry_telemetry:
-                    line_dry_telemetry = f"[Rejestr: {short_reg}]"
 
             # Ping-pong dialogowy (Filar CXLVI & XLIII) oraz Ciągłość Międzybatchowa
             relation_tag = ""
