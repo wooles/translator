@@ -210,3 +210,36 @@ def test_t10_1_1_p1a_short_spoken_reply_immunity_from_false_monologue():
     ev_thought.name = "SpeakerAlpha"
     formatted_th = format_phase1_candidate_text("Rozumiem.", ev_thought, is_sign=False)
     assert formatted_th == r"{\i1}Rozumiem.{\i0}"
+
+
+@pytest.mark.unit
+def test_code_switching_detection_and_prompt_guidance():
+    """Hotfix 11.1.4: Detekcja hybrydowych zapożyczeń code-switchingu oraz wyzwalanie wskazówki DYN_1."""
+    from translator import detect_japanese_pragmatic_register
+    from whisper_disambiguator import WhisperDisambiguator
+    from rules import get_focused_rules_for_batch
+
+    # 1. detect_japanese_pragmatic_register wykrywa code-switching
+    res_cs = detect_japanese_pragmatic_register("リフレクトしますよ", "Reflecting now")
+    assert res_cs is not None
+    assert "Code-switching JA+EN" in res_cs
+
+    # 2. Powszechne terminy systemowe nie dają fałszywego code-switchingu
+    res_sys = detect_japanese_pragmatic_register("ゲームをクリアした", "Cleared the game")
+    assert res_sys is None or "Code-switching" not in res_sys
+
+    # 3. WhisperDisambiguator rozpoznaje kategorię CODE_SWITCH_EN
+    cats = WhisperDisambiguator.detect_batch_discourse_categories("Reflecting now", "リフレクトしますよ")
+    assert "CODE_SWITCH_EN" in cats
+
+    # 4. get_focused_rules_for_batch emituje wytyczną dla code-switchingu
+    batch_items = [{
+        "id": 1,
+        "en": "Reflecting now",
+        "audio_jp": "リフレクトしますよ",
+        "notes": "",
+        "speech_style_pl": ""
+    }]
+    focused = get_focused_rules_for_batch(batch_items, max_rules=3)
+    assert "FILAR XIII" in focused
+    assert "angielskie słowa lub hybrydowe zwroty katakanowe" in focused

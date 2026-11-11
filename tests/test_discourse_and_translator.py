@@ -938,3 +938,37 @@ def test_t11_1_3_5_slash_dyad_mixed_gender_virile_telemetry(tmp_path):
     assert telem_fem["we_virility"] == "NON_VIRILE"
     assert telem_fem["group_virility"] == "NON_VIRILE"
     assert "[Mówca: POLYLOGUE (FEMININE)]" in telem_fem.get("dry_telemetry", "")
+
+
+@pytest.mark.unit
+def test_whisper_disambiguator_no_false_positive_dialect_on_common_verbs():
+    """Hotfix 11.1.4: Powszechne czasowniki z 'べ' i 'おら' nie wyzwalają fałszywego DIALECT_JP."""
+    from whisper_disambiguator import WhisperDisambiguator
+    false_positives = [
+        ("He stated that truth.", "彼はそう述べた"),
+        ("If you compare them both.", "比べれば分かる"),
+        ("Everything was finished.", "全て終わった"),
+        ("It cannot be cured.", "直らない傷だ"),
+        ("A pure and noble stream.", "清らかな川だ"),
+    ]
+    for en, jp in false_positives:
+        cats = WhisperDisambiguator.detect_batch_discourse_categories(en, jp)
+        assert "DIALECT_JP" not in cats, f"Fałszywy DIALECT_JP dla: {jp}"
+
+
+@pytest.mark.unit
+def test_whisper_disambiguator_detects_yakuwarigo_aru_yaru_desuwa_ssu_nano():
+    """Hotfix 11.1.4: Formy Yakuwarigo (-aru/-yaru, -desu wa, -ssu, -nano) wyzwalają DIALECT_JP."""
+    from whisper_disambiguator import WhisperDisambiguator
+    yakuwarigo_cases = [
+        ("Let's go then.", "行くべ！"),
+        ("I will go there.", "おらは行くぞ"),
+        ("What are you doing?", "何やるかね"),
+        ("I am right here.", "てるあるよ"),
+        ("Good afternoon to you.", "ご機嫌よう、ですわ"),
+        ("That is impossible.", "無理っすよ"),
+        ("It has all gathered.", "揃ったなの"),
+    ]
+    for en, jp in yakuwarigo_cases:
+        cats = WhisperDisambiguator.detect_batch_discourse_categories(en, jp)
+        assert "DIALECT_JP" in cats, f"Brak DIALECT_JP dla formy: {jp}"

@@ -1396,3 +1396,52 @@ def test_t11_0_e_4_verified_p0_female_not_changed_by_camelcase_split(tmp_path):
     }
     sm.populate_secondary_actor_tags(["BohaterkaPierwsza"])
     assert sm.data["characters"]["Bohaterka Pierwsza"]["gender"] == "FEMALE"
+
+
+@pytest.mark.unit
+def test_series_bible_character_record_persists_speech_register(tmp_path):
+    """Hotfix 11.1.4: SeriesBible zapisuje speech_register, formatuje go w scoped context i nadpisuje relację przy P0."""
+    from series_memory import SeriesBible
+
+    sm = SeriesBible(anime_title="Seria Testowa", storage_dir=tmp_path)
+    sm.data["characters"] = {}
+
+    # 1. Rejestracja postaci z rejestrem mowy
+    rec = sm.register_character(
+        name="WojowniczkaAlfa",
+        gender="FEMALE",
+        description="Mistrzyni miecza",
+        speech_register="Stylizowany rejestr wojowniczki (-aru/-yaru)"
+    )
+    assert rec.get("speech_register") == "Stylizowany rejestr wojowniczki (-aru/-yaru)"
+    assert sm.data["characters"]["WojowniczkaAlfa"]["speech_register"] == "Stylizowany rejestr wojowniczki (-aru/-yaru)"
+
+    # 2. format_scoped_for_batch wypisuje [Rejestr: ...]
+    scoped_txt = sm.format_scoped_for_batch("WojowniczkaAlfa wyciąga miecz.")
+    assert "WojowniczkaAlfa" in scoped_txt
+    assert "[Rejestr: Stylizowany rejestr wojowniczki (-aru/-yaru)]" in scoped_txt
+
+    # 3. Postać z heurystyką relacji zostaje zaktualizowana przez sync_verified_profile_entity
+    sm.data["characters"]["PostacRelacyjna"] = {
+        "name": "PostacRelacyjna",
+        "gender": "UNKNOWN",
+        "grammatical_gender": "UNKNOWN",
+        "confidence": 0.5,
+        "priority": "P2",
+        "has_verified_gender": False,
+        "aliases": ["PostacRelacyjna"],
+        "description": "Postać (wyodrębniono z relacji serii)",
+        "entity_category": "ANTHROPONYM"
+    }
+    updated = sm.sync_verified_profile_entity(
+        name="PostacRelacyjna",
+        gender="FEMALE",
+        has_verified_gender=True,
+        description="Główna dowódczyni",
+        speech_register="Dystyngowany rejestr arystokratyczny"
+    )
+    assert updated["gender"] == "FEMALE"
+    assert updated["has_verified_gender"] is True
+    assert updated["description"] == "Główna dowódczyni"
+    assert updated.get("speech_register") == "Dystyngowany rejestr arystokratyczny"
+    assert "wyodrębniono z relacji serii" not in updated["description"]

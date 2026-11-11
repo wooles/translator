@@ -760,3 +760,31 @@ def test_t10_5_3_verifier_cps_norm_aligned_with_r17():
     assert "38" in verifier_src
 
 
+@pytest.mark.unit
+def test_format_lean_episode_brief_includes_character_speech_style_and_idiolect():
+    """Hotfix 11.1.4: format_lean_episode_brief wypisuje styl i idiolekt postaci w zwięzłym briefie."""
+    from profiler import EpisodeProfile, CharacterDossier, format_lean_episode_brief
+
+    dossier = CharacterDossier(
+        name="BohaterkaAlfa",
+        gender="FEMALE",
+        age_and_role="wojowniczka",
+        speech_style_pl="cięta, lakoniczna polszczyzna wojskowa",
+        idiolect_matrix="charakterystyczne partykuły potoczyste, zwroty rozkazujące"
+    )
+    profile = EpisodeProfile(
+        episode_summary="Misja rozpoznawcza w lesie.",
+        setting_and_era="Świat fantasy",
+        domain_expertise="Taktyka wojskowa",
+        dialogue_stylization="Stylizowany rejestr wojskowy",
+        tone_and_genre="Akcja, dramat",
+        character_dossiers=[dossier]
+    )
+
+    brief = format_lean_episode_brief(profile)
+    assert "BohaterkaAlfa" in brief
+    assert "Styl i idiolekt:" in brief
+    assert "cięta, lakoniczna polszczyzna wojskowa" in brief
+    assert "charakterystyczne partykuły potoczyste, zwroty rozkazujące" in brief
+
+
