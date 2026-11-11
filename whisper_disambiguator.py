@@ -812,3 +812,136 @@ class WhisperDisambiguator:
                 categories.add("CODE_SWITCH_EN")
 
         return categories
+
+    @classmethod
+    def validate_pragmatic_register_against_speaker(
+        cls,
+        register: Optional[str],
+        speaker_name: str = "",
+        character_dossier: Optional[Any] = None,
+        character_registry_entry: Optional[Any] = None,
+        audio_jp: str = "",
+        clean_en: str = "",
+        prosody_tags: str = "",
+        setting_era: str = "",
+        series_bible: Optional[Any] = None,
+        **kwargs: Any
+    ) -> Optional[str]:
+        """
+        Hotfix 11.1.5 (P1-1 / INC-AVT-026 / E-04):
+        Weryfikuje zgodność wykrytego rejestru socjopragmatycznego z metadanymi mówcy.
+        Działa deterministycznie w domenie pozytywnej (0.00 PLN).
+        """
+        if not register or not str(register).strip():
+            return None
+
+        reg_str = str(register).strip()
+        reg_low = reg_str.lower()
+
+        dossiers = kwargs.get("character_dossiers")
+        if not character_dossier and dossiers and isinstance(dossiers, list):
+            for d in dossiers:
+                d_name = getattr(d, "name", None) or (d.get("name") if isinstance(d, dict) else None)
+                if d_name and speaker_name and str(d_name).lower() == str(speaker_name).lower():
+                    character_dossier = d
+                    break
+            if not character_dossier and len(dossiers) == 1:
+                character_dossier = dossiers[0]
+
+        reg_dict = kwargs.get("character_registry")
+        if not character_registry_entry and reg_dict and isinstance(reg_dict, dict) and speaker_name:
+            character_registry_entry = reg_dict.get(speaker_name)
+
+        spk_gender = None
+        spk_age_class = None
+        spk_speech_style = ""
+        spk_dialect = ""
+        spk_desc = ""
+
+        if character_dossier:
+            if isinstance(character_dossier, dict):
+                spk_gender = character_dossier.get("gender") or character_dossier.get("apparent_gender")
+                spk_age_class = character_dossier.get("age_class")
+                spk_speech_style = character_dossier.get("speech_style_pl", "") or ""
+                spk_dialect = character_dossier.get("dialect_category", "") or ""
+                spk_desc = character_dossier.get("age_and_role", "") or character_dossier.get("description", "") or ""
+            else:
+                spk_gender = getattr(character_dossier, "gender", None) or getattr(character_dossier, "apparent_gender", None)
+                spk_age_class = getattr(character_dossier, "age_class", None)
+                spk_speech_style = getattr(character_dossier, "speech_style_pl", "") or ""
+                spk_dialect = getattr(character_dossier, "dialect_category", "") or ""
+                spk_desc = getattr(character_dossier, "age_and_role", "") or ""
+
+        if not spk_gender and character_registry_entry:
+            if isinstance(character_registry_entry, dict):
+                spk_gender = character_registry_entry.get("gender")
+                spk_age_class = spk_age_class or character_registry_entry.get("age_class")
+                spk_desc = spk_desc or character_registry_entry.get("description", "")
+                spk_speech_style = spk_speech_style or character_registry_entry.get("speech_style_pl", "")
+                spk_dialect = spk_dialect or character_registry_entry.get("dialect_category", "")
+            else:
+                spk_desc = spk_desc or str(character_registry_entry)
+
+        if not spk_gender and series_bible and speaker_name:
+            if hasattr(series_bible, "get_character_gender"):
+                spk_gender = series_bible.get_character_gender(speaker_name)
+            if hasattr(series_bible, "get_character_age_class") and not spk_age_class:
+                spk_age_class = series_bible.get_character_age_class(speaker_name)
+
+        gen_norm = str(spk_gender or "").upper()
+        is_male = gen_norm in ("MALE", "MASCULINE") or any(w in spk_desc.lower() for w in ["mężczyzna", "chłopak", "boy", "male"])
+        is_female = gen_norm in ("FEMALE", "FEMININE") or any(w in spk_desc.lower() for w in ["kobieta", "dziewczyna", "girl", "female"])
+        age_str = str(spk_age_class or "").upper()
+        is_elderly = "ELDERLY" in age_str or any(w in spk_desc.lower() for w in ["staruszek", "starzec", "senior", "elderly"])
+
+        # 1. Rejestr dziewczęcy
+        if "dziewcz" in reg_low:
+            if is_male or is_elderly:
+                return None
+            if not is_female:
+                return None
+            if is_elderly or "SENIOR" in age_str:
+                return None
+
+        # 2. Szorstki żołnierski / Bojowy
+        if any(k in reg_low for k in ["żołnierski", "zolnierski", "bojowy", "szorstki"]):
+            combined_style_notes = f"{spk_speech_style} {spk_dialect} {spk_desc}".lower()
+            is_courtly_or_high = any(w in combined_style_notes for w in [
+                "dworski", "arystokrat", "wysoki", "formaln", "urzędow", "szlacheck", "eleganck", "noble", "court", "formal"
+            ])
+            has_battle_cry = any(w in str(prosody_tags).lower() for w in [
+                "krzyk bojowy", "silne wzburzenie", "wzburzenie emocjonalne", "krzyk", "shout", "battle cry", "high arousal"
+            ])
+            if is_courtly_or_high and not has_battle_cry:
+                return None
+
+        # 3. Feudalny poddańczy / Wasal
+        if any(k in reg_low for k in ["feudalny", "poddańcz", "poddancz", "wasal"]):
+            audio_jp_low = (audio_jp or "").lower()
+            clean_en_low = (clean_en or "").lower()
+            is_polite_formula = any(k in audio_jp_low for k in [
+                "ohayou", "gozaimasu", "moushiwake", "shitsurei", "おはよう", "申し訳", "失礼", "arigatou", "ありがとう"
+            ]) or any(k in clean_en_low for k in ["good morning", "excuse me", "pardon", "sorry", "thank you"])
+            if is_polite_formula:
+                has_feudal_archaisms = any(k in audio_jp_low for k in [
+                    "-dono", "dono", "殿", "koushaku", "公爵", "danshaku", "男爵", "sessha", "拙者", "de gozaru", "gozaru", "でござる", "kashikomari", "畏まり", "uesama", "上様"
+                ])
+                is_hist_or_fantasy = any(w in str(setting_era).lower() for w in [
+                    "fantasy", "historyczn", "feudal", "średniowiecz", "medieval", "dwór", "dwor", "court"
+                ])
+                if not (has_feudal_archaisms and is_hist_or_fantasy):
+                    return None
+
+        # 4. Rejestr gwarowy południowy / zachodni
+        if re.search(r"gwarowy\s*(południowy|poludniowy|zachodni)", reg_low):
+            dialect_cat_low = str(spk_dialect or "").lower()
+            has_standard_polish = any(w in dialect_cat_low for w in [
+                "standardowa polszczyzna literacka", "polszczyzna literacka", "archaizowana polszczyzna dworska", "polszczyzna dworska"
+            ])
+            audio_jp_low = (audio_jp or "").lower()
+            has_idiolect = any(k in audio_jp_low for k in ["douja", "noja", "どうじゃ", "のじゃ"]) or any(w in dialect_cat_low for w in ["południow", "zachodni", "kansai"])
+            if has_standard_polish and not has_idiolect:
+                return None
+
+        return reg_str
+

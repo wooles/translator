@@ -927,13 +927,21 @@ class SpeakerTurn:
         return self.scene_participants
 
     def __repr__(self) -> str:
+        tgt_val = self.target_speaker if self.target_speaker is not None else "UNSPECIFIED"
+        gen_val = self.target_gender if self.target_gender is not None else "UNSPECIFIED"
+        you_val = self.you_group_gender
+        if you_val in (None, "AMBIGUOUS"):
+            you_val = "VIRILE" if self.scene_has_male_participant else "UNSPECIFIED"
+        grp_val = self.plural_group_gender
+        if grp_val in (None, "AMBIGUOUS"):
+            grp_val = "VIRILE" if self.scene_has_male_participant else "UNSPECIFIED"
         return (
             f"<SpeakerTurn speaker='{self.speaker}' events={len(self.events)} "
-            f"duration={self.duration_ms}ms target='{self.target_speaker}' "
-            f"gender='{self.target_gender}' conf={self.target_confidence:.2f} "
+            f"duration={self.duration_ms}ms target='{tgt_val}' "
+            f"gender='{gen_val}' conf={self.target_confidence:.2f} "
             f"number='{self.addressee_number}' plural={self.is_plural} "
             f"lock={self.vocative_lock} male_in_scene={self.scene_has_male_participant} "
-            f"group_gender='{self.plural_group_gender}' you_group='{self.you_group_gender}'>"
+            f"group_gender='{grp_val}' you_group='{you_val}'>"
         )
 
 
@@ -1338,6 +1346,69 @@ def _is_prepositional_context(text: str, candidate_match_start: int) -> bool:
     return bool(_PREPOSITION_BEFORE_CAND_PAT.search(prefix))
 
 
+_TITLE_PAT = r"(?:Duke|Prince|Count|Lord|Lady|Baron|Viscount|King|Queen|Master|Doctor|General|Captain|Princess|Baroness|Countess)"
+_3RD_PERSON_PREPOSITIONS_PAT = re.compile(
+    rf"\b(?:of|on\s+behalf\s+of|for|from|under|about|with|by|to|worthy\s+of)\s+(?:{_TITLE_PAT}\s*)*$",
+    re.IGNORECASE
+)
+_3RD_PERSON_VERBS_PAT = re.compile(
+    r"^\s*(?:acknowledges|hopes|is|was|has|said|says|thinks|believes|wants|knows|declared|smiled|nodded|agreed|commanded|ruled|reigns|spoke)\b",
+    re.IGNORECASE
+)
+
+
+def _is_third_person_syntactic_context(text: str, candidate_match_start: int, candidate_match_end: int) -> bool:
+    """
+    Hotfix 11.1.5 (P2-1 / INC-AVT-027 / E-06): Filtr składniowy 3. osoby.
+    Wykrywa konstrukcje referencyjne 3. osoby (przyimki, dopełniacz saksoński, orzeczenie 3. os.),
+    które wykluczają interpretację jako bezpośredni zwrot adresatywny.
+    """
+    prefix = text[:candidate_match_start].rstrip()
+    if prefix:
+        if _PREPOSITION_BEFORE_CAND_PAT.search(prefix) or _3RD_PERSON_PREPOSITIONS_PAT.search(prefix):
+            return True
+        if re.search(rf"\b(?:on\s+behalf\s+of|under|about|worthy\s+of|for|from|by|of|to)\s+(?:{_TITLE_PAT}\s*)*$", prefix, re.IGNORECASE):
+            return True
+
+    suffix = text[candidate_match_end:].lstrip()
+    if suffix:
+        if suffix.startswith("'s") or suffix.startswith("’s"):
+            return True
+        if _3RD_PERSON_VERBS_PAT.search(suffix):
+            return True
+
+    return False
+
+
+def _is_event_in_time_range(event: Any, time_range_str: str) -> bool:
+    """Sprawdza, czy zdarzenie mieści się w zadanym przedziale czasowym (np. '01:20-03:45')."""
+    if not event or not time_range_str:
+        return False
+    ev_s = getattr(event, "start", None)
+    ev_e = getattr(event, "end", None)
+    if ev_s is None or ev_e is None:
+        return False
+    parts = re.split(r"[-–]", time_range_str)
+    if len(parts) != 2:
+        return False
+    def _to_ms(t_part: str) -> Optional[int]:
+        subparts = t_part.strip().split(":")
+        try:
+            if len(subparts) == 2:
+                return int(float(subparts[0])) * 60000 + int(float(subparts[1])) * 1000
+            elif len(subparts) == 3:
+                return int(float(subparts[0])) * 3600000 + int(float(subparts[1])) * 60000 + int(float(subparts[2])) * 1000
+        except Exception:
+            return None
+        return None
+    s_ms = _to_ms(parts[0])
+    e_ms = _to_ms(parts[1])
+    if s_ms is None or e_ms is None:
+        return False
+    return (ev_s >= s_ms and ev_s <= e_ms) or (ev_e >= s_ms and ev_e <= e_ms) or (ev_s <= s_ms and ev_e >= e_ms)
+
+
+
 _MOB_CROWD_PAT = re.compile(
     r"^(?:mob|crowd|passerby|bystander|citizen|villager|spectator|onlooker|"
     r"tłum|przechodzień|gapi\w*|statyst\w*)",
@@ -1407,7 +1478,8 @@ def _detect_event_vocative(
 
                     # 1a. Wołacz LUB mianownik po wykrzyknikach adresatywnych (Hej, Ej, Ty, Słuchaj)
                     pat_interj = rf"(?:^|[\s,–—])(?:hej|ej|ty|słuchaj)[,\s]+(?:pana\s+|panie\s+)?{re.escape(cand)}(?:[,.!?…\s–—]|$)"
-                    if re.search(pat_interj, clean, re.IGNORECASE):
+                    m_inj = re.search(pat_interj, clean, re.IGNORECASE)
+                    if m_inj and not _is_third_person_syntactic_context(clean, m_inj.start(), m_inj.end()):
                         target_g = "MALE" if char_gender == "MALE" else (
                             "FEMALE" if char_gender == "FEMALE" else "NEUTRAL"
                         )
@@ -1416,7 +1488,7 @@ def _detect_event_vocative(
                     # 1b. Zawołanie w krótkim okrzyku zakończonym '!'
                     pat_call = rf"(?:^|[\s,–—])(?:(?:hej|ej|ty|słuchaj)[,\s]+)?({re.escape(cand)})\s*!"
                     m_call = re.search(pat_call, clean, re.IGNORECASE)
-                    if m_call and not _is_prepositional_context(clean, m_call.start(1)):
+                    if m_call and not _is_prepositional_context(clean, m_call.start(1)) and not _is_third_person_syntactic_context(clean, m_call.start(1), m_call.end(1)):
                         target_g = "MALE" if char_gender == "MALE" else (
                             "FEMALE" if char_gender == "FEMALE" else "NEUTRAL"
                         )
@@ -1425,7 +1497,7 @@ def _detect_event_vocative(
                     # 1c. Standardowa granica wołaczowa z interpunkcją lub początkiem/końcem wersu
                     pat_voc = rf"(?:^|[\s,–—])({re.escape(cand)})(?:[,.!?…\s–—]|$)"
                     for m_voc in re.finditer(pat_voc, clean, re.IGNORECASE):
-                        if _is_prepositional_context(clean, m_voc.start(1)):
+                        if _is_prepositional_context(clean, m_voc.start(1)) or _is_third_person_syntactic_context(clean, m_voc.start(1), m_voc.end(1)):
                             continue
                         target_g = "MALE" if char_gender == "MALE" else (
                             "FEMALE" if char_gender == "FEMALE" else "NEUTRAL"
@@ -1465,7 +1537,7 @@ def _detect_event_vocative(
 
     # 5. Sprawdzenie zakotwiczonych imion w wołaczu bez SeriesBible
     for m in VOCATIVE_PUNCT_ANCHOR_REGEX.finditer(clean):
-        if _is_prepositional_context(clean, m.start()):
+        if _is_prepositional_context(clean, m.start()) or _is_third_person_syntactic_context(clean, m.start(), m.end()):
             continue
         matched_name = m.group(1) or m.group(2) or m.group(3)
         if matched_name and matched_name != current_speaker:
@@ -2418,6 +2490,25 @@ def resolve_turn_addressee(
             turn.addressee_number = first_st.addressee_number
         return turn
 
+    # Hotfix 11.1.5 (P2-1 / E-05a): Izolacja napisów ekranowych (is_sign == True lub speaker.lower() == 'sign')
+    is_sign_turn = (
+        getattr(turn, "is_sign", False)
+        or str(getattr(turn, "speaker", "")).lower() in ("sign", "szyld", "napis")
+        or any(getattr(ev, "is_sign", False) or str(getattr(ev, "name", "")).lower() in ("sign", "szyld", "napis") for ev in getattr(turn, "events", []))
+    )
+    if is_sign_turn:
+        turn.target_speaker = None
+        turn.target_gender = None
+        turn.target_confidence = 0.0
+        turn.vocative_lock = False
+        for ev in turn.events:
+            setattr(ev, "target_speaker", None)
+            setattr(ev, "target_actor", None)
+            setattr(ev, "target_gender", None)
+            setattr(ev, "target_confidence", 0.0)
+            setattr(ev, "vocative_lock", False)
+        return turn
+
     # Niewidzialność myśli dla dyskursu zewnętrznego
     if is_internal_monologue(turn):
         turn.target_speaker = None
@@ -2443,6 +2534,24 @@ def resolve_turn_addressee(
     voc_actor, voc_gender = _detect_turn_vocative(turn, series_bible=series_bible)
     if voc_actor and not voc_gender and series_bible:
         _, voc_gender, _ = _resolve_character_canonical_and_gender(voc_actor, series_bible=series_bible)
+
+    # Hotfix 11.1.5 (P2-1 / INC-AVT-027 / E-06): Weryfikacja obecności w scenie na podstawie dramatic_sequences
+    if voc_actor and hasattr(turn, "events") and turn.events:
+        dram_seqs = getattr(series_bible, "dramatic_sequences", None) if series_bible else None
+        if not dram_seqs and hasattr(turn, "dramatic_sequences"):
+            dram_seqs = turn.dramatic_sequences
+        if dram_seqs:
+            first_ev = turn.events[0]
+            for seq in dram_seqs:
+                tr_str = getattr(seq, "time_range", "")
+                if _is_event_in_time_range(first_ev, tr_str):
+                    chars_pres = [str(c).lower().strip() for c in (getattr(seq, "characters_present", []) or []) if c]
+                    active_speakers = [str(t.speaker).lower().strip() for t in (prior_turns or []) if getattr(t, "speaker", None)]
+                    if chars_pres and (voc_actor.lower().strip() not in chars_pres and voc_actor.lower().strip() not in active_speakers):
+                        voc_actor = None
+                        voc_gender = None
+                    break
+
     if voc_actor and voc_gender:
         turn.target_speaker = voc_actor
         turn.target_gender = voc_gender
@@ -2824,13 +2933,87 @@ class SceneDiscourseGraph:
         events: List[Any],
         series_bible: Optional[Any] = None,
         max_turn_gap_ms: int = 2500,
-        max_exchange_gap_ms: int = 5000
+        max_exchange_gap_ms: int = 5000,
+        f0_by_line: Optional[Dict[int, float]] = None
     ) -> List[SpeakerTurn]:
+        actor_consensus = cls.compute_actor_gender_consensus(events, f0_by_line=f0_by_line, series_bible=series_bible)
         return build_discourse_topology(
             events=events,
             series_bible=series_bible,
             max_turn_gap_ms=max_turn_gap_ms,
             max_exchange_gap_ms=max_exchange_gap_ms
+        )
+
+    @classmethod
+    def compute_actor_gender_consensus(
+        cls,
+        events: List[Any],
+        f0_by_line: Optional[Dict[int, float]] = None,
+        series_bible: Optional[Any] = None
+    ) -> Dict[str, str]:
+        """
+        Hotfix 11.1.5 (P1-3 / E-03): Konsensus płci per aktor w odcinku (Actor Gender Consensus).
+        Dla każdego aktora o statusie UNKNOWN wyznacza stałą płeć na podstawie mediany F0
+        ze wszystkich jego kwestii w odcinku.
+        """
+        import numpy as np
+        actor_f0: Dict[str, List[float]] = {}
+        for idx, ev in enumerate(events):
+            act = getattr(ev, "name", "") or getattr(ev, "actor", "")
+            if not act:
+                continue
+            act_low = act.lower()
+            if any(k in act_low for k in ("sign", "szyld", "napis", "title", "caption")):
+                continue
+            act_clean = re.sub(r"\s*\([^)]*\)", "", act).strip()
+            if series_bible and hasattr(series_bible, "get_character_gender"):
+                known_g = series_bible.get_character_gender(act_clean)
+                if known_g and str(known_g).upper() not in ("UNKNOWN", "NONE"):
+                    continue
+            f0_val = None
+            if f0_by_line and idx in f0_by_line:
+                f0_val = f0_by_line[idx]
+            elif hasattr(ev, "f0") and getattr(ev, "f0"):
+                try:
+                    f0_val = float(getattr(ev, "f0"))
+                except Exception:
+                    f0_val = None
+            if f0_val and f0_val > 0:
+                actor_f0.setdefault(act_clean, []).append(f0_val)
+
+        consensus: Dict[str, str] = {}
+        for act, f0_list in actor_f0.items():
+            if f0_list:
+                med = float(np.median(f0_list))
+                if med <= 150.0:
+                    consensus[act] = "MALE"
+                elif med >= 165.0:
+                    consensus[act] = "FEMALE"
+        return consensus
+
+    @staticmethod
+    def validate_pragmatic_register_against_speaker(
+        register: Optional[str],
+        speaker_name: str = "",
+        character_dossier: Optional[Any] = None,
+        character_registry_entry: Optional[Any] = None,
+        audio_jp: str = "",
+        clean_en: str = "",
+        prosody_tags: str = "",
+        setting_era: str = "",
+        series_bible: Optional[Any] = None,
+    ) -> Optional[str]:
+        from whisper_disambiguator import WhisperDisambiguator
+        return WhisperDisambiguator.validate_pragmatic_register_against_speaker(
+            register=register,
+            speaker_name=speaker_name,
+            character_dossier=character_dossier,
+            character_registry_entry=character_registry_entry,
+            audio_jp=audio_jp,
+            clean_en=clean_en,
+            prosody_tags=prosody_tags,
+            setting_era=setting_era,
+            series_bible=series_bible,
         )
 
     @staticmethod
@@ -2909,10 +3092,15 @@ class SceneDiscourseGraph:
             clean_actor = clean_raw
 
         is_composite_actor = any(sep in (clean_raw or clean_actor) for sep in ("/", "|", "&", "+"))
-        if clean_actor in ("/", "|", ",") or clean_actor.lower() in ("all", "both") or is_composite_actor:
+        if clean_actor in ("/", "|", ",") or clean_actor.lower() in ("all", "both"):
             spk_label = "POLYLOGUE"
             telemetry["speaker_name"] = spk_label
             telemetry["actor"] = spk_label
+        elif is_composite_actor:
+            spk_label = clean_actor
+            telemetry["speaker_name"] = clean_actor
+            telemetry["actor"] = clean_actor
+            telemetry["polylogue"] = "POLYLOGUE"
         else:
             spk_label = clean_actor
             telemetry["speaker_name"] = clean_actor
@@ -2924,7 +3112,7 @@ class SceneDiscourseGraph:
         speaker_p0_verified = bool(verified_p0_gender or kwargs.get("speaker_p0_gender"))
 
         # P3-A: Rozstrzyganie płci i virility dla diad i grup złożonych (POLYLOGUE z separatorem)
-        if not p0_gender and spk_label == "POLYLOGUE" and is_composite_actor:
+        if not p0_gender and (spk_label == "POLYLOGUE" or is_composite_actor) and is_composite_actor:
             comp_src = clean_raw if clean_raw and any(sep in clean_raw for sep in ("/", "|", "&", "+")) else clean_actor
             sub_actors = [p.strip() for p in re.split(r"[/|&+,]\s*", comp_src) if p.strip()]
             found_m = 0
@@ -3030,6 +3218,45 @@ class SceneDiscourseGraph:
                 has_ver = True
                 speaker_p0_verified = True
 
+        # Hotfix 11.1.5 (P1-3 / E-03): Egzekwowanie male_only_scene / female_only_scene z dramatic_sequences
+        scene_male_only = bool(kwargs.get("scene_male_only"))
+        scene_female_only_val = bool(scene_female_only or kwargs.get("scene_female_only"))
+        dram_seqs = kwargs.get("dramatic_sequences")
+        if not dram_seqs and episode_profiler and hasattr(episode_profiler, "dramatic_sequences"):
+            dram_seqs = episode_profiler.dramatic_sequences
+        if not dram_seqs and series_bible and hasattr(series_bible, "dramatic_sequences"):
+            dram_seqs = series_bible.dramatic_sequences
+
+        if dram_seqs and event:
+            for seq in dram_seqs:
+                tr_str = getattr(seq, "time_range", "")
+                if _is_event_in_time_range(event, tr_str):
+                    if getattr(seq, "male_only_scene", False) and not getattr(seq, "female_only_scene", False):
+                        scene_male_only = True
+                    elif getattr(seq, "female_only_scene", False) and not getattr(seq, "male_only_scene", False):
+                        scene_female_only_val = True
+                    break
+
+        if scene_male_only:
+            if not p0_gender or p0_gender == "UNKNOWN":
+                p0_gender = "MALE"
+                has_ver = True
+                speaker_p0_verified = True
+        elif scene_female_only_val:
+            if not p0_gender or p0_gender == "UNKNOWN":
+                p0_gender = "FEMALE"
+                has_ver = True
+                speaker_p0_verified = True
+
+        # Hotfix 11.1.5 (P1-3 / E-03): Konsensus płci per aktor w odcinku (Actor Gender Consensus)
+        actor_gender_consensus = kwargs.get("actor_gender_consensus")
+        if (not p0_gender or p0_gender == "UNKNOWN") and actor_gender_consensus:
+            cand_spk_key = clean_actor
+            if cand_spk_key in actor_gender_consensus:
+                p0_gender = actor_gender_consensus[cand_spk_key]
+                has_ver = True
+                speaker_p0_verified = True
+
         if p0_gender:
             p0_u = str(p0_gender).upper()
             telemetry["speaker_gender"] = p0_u
@@ -3122,6 +3349,18 @@ class SceneDiscourseGraph:
                 except Exception:
                     pass
 
+            if not addr_candidate and clean_target_actor:
+                actor_gender_consensus = kwargs.get("actor_gender_consensus")
+                if actor_gender_consensus and clean_target_actor in actor_gender_consensus:
+                    addr_candidate = actor_gender_consensus[clean_target_actor]
+                    target_p0_verified = True
+                elif scene_male_only:
+                    addr_candidate = "MALE"
+                    target_p0_verified = True
+                elif scene_female_only_val:
+                    addr_candidate = "FEMALE"
+                    target_p0_verified = True
+
             if addr_candidate:
                 addr_g = str(addr_candidate).upper()
                 telemetry["addressee_gender"] = addr_g
@@ -3139,7 +3378,7 @@ class SceneDiscourseGraph:
                 telemetry["target_p0_verified"] = False
 
         # 4. Spójność sceny żeńskiej bez nadpisywania potwierdzonego mówcy męskiego (Operacja 2C.1)
-        if scene_female_only:
+        if scene_female_only or scene_female_only_val:
             spk_is_male = (telemetry.get("grammatical_gender") == "MASCULINE" or telemetry.get("speaker_gender") == "MALE")
             telemetry["group_virility"] = "NON_VIRILE"
             telemetry["we_virility"] = "VIRILE" if spk_is_male else "NON_VIRILE"
@@ -3167,7 +3406,11 @@ class SceneDiscourseGraph:
         if not ev_is_monologue and telemetry.get("target_actor") and tgt_g_tag in ("MASCULINE", "FEMININE"):
             dry_segs.append(f"Adresat: {telemetry['target_actor']} ({tgt_g_tag})")
 
+        if telemetry.get("polylogue"):
+            dry_segs.append(f"Scena: {telemetry['polylogue']}")
+
         if dry_segs:
             telemetry["dry_telemetry"] = f"[{' | '.join(dry_segs)}]"
+            telemetry["telemetry_tag"] = telemetry["dry_telemetry"]
 
         return telemetry

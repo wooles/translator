@@ -1779,6 +1779,8 @@ def format_phase1_candidate_text(pl_candidate: str, event: Any, is_sign: bool = 
     r"""
     Formatuje tekst kandydata Fazy 1: normalizuje separatory \r\n i \n do \N
     oraz dla stylu Italics / myśli otacza pojedynczą parą {\i1}...{\i0} (Standard 9.5, 2C.6, R1.9).
+    Hotfix 11.1.5 (P3-1 / E-09): Dla stylów z rodziny Italics usuwa znaczniki HTML <i>...</i>
+    oraz zbędne tagi {\i1}...{\i0} i normalizuje podwójne backslashe \\i1 -> \i1, \\N -> \N.
     """
     if not pl_candidate:
         return ""
@@ -1795,8 +1797,13 @@ def format_phase1_candidate_text(pl_candidate: str, event: Any, is_sign: bool = 
         if is_short_spoken_reply(cand, ev_en):
             is_internal_monologue = False
 
-    if is_internal_monologue and cand and not is_sign:
-        clean_im = re.sub(r"\{\\i[01]\}", "", cand).strip()
+    if has_italic_style:
+        cand = re.sub(r"</?i>", "", cand, flags=re.IGNORECASE)
+        cand = re.sub(r"\{\\i[01]\}", "", cand)
+        cand = cand.replace(r"\\i1", r"\i1").replace(r"\\i0", r"\i0").replace(r"\\N", r"\N")
+    elif is_internal_monologue and cand and not is_sign:
+        clean_im = re.sub(r"</?i>", "", cand, flags=re.IGNORECASE)
+        clean_im = re.sub(r"\{\\i[01]\}", "", clean_im).strip()
         clean_im = re.sub(r"\s*\\N\s*", r"\\N", clean_im)
         cand = f"{{\\i1}}{clean_im}{{\\i0}}"
     return cand
@@ -3223,7 +3230,8 @@ class MultimodalTranslator:
                     episode_profiler=getattr(self, "profiler", None),
                     raw_actor=event.name,
                     scene_female_only=is_fem_scene_check,
-                    is_sign=vtype["is_sign"]
+                    is_sign=vtype["is_sign"],
+                    actor_gender_consensus=getattr(self, "actor_gender_consensus", None)
                 )
                 p0_spk_gram = disc_telem.get("grammatical_gender")
                 if p0_spk_gram in ("MASCULINE", "FEMININE"):
@@ -3366,6 +3374,25 @@ class MultimodalTranslator:
                     target_actor_name = None
                     contract_target_gender = "UNKNOWN"
                 pragmatic_reg = detect_japanese_pragmatic_register(jp_audio_line, clean_text) if (jp_audio_line and "detect_japanese_pragmatic_register" in globals()) else None
+                if pragmatic_reg:
+                    spk_dossier = None
+                    if episode_profile and getattr(episode_profile, "character_dossiers", None):
+                        for cd in episode_profile.character_dossiers:
+                            if getattr(cd, "name", "").lower() == str(event.name or "").lower():
+                                spk_dossier = cd
+                                break
+                    spk_reg_entry = self.character_registry.get(event.name) if hasattr(self, "character_registry") else None
+                    from whisper_disambiguator import WhisperDisambiguator
+                    pragmatic_reg = WhisperDisambiguator.validate_pragmatic_register_against_speaker(
+                        register=pragmatic_reg,
+                        speaker_name=event.name or "",
+                        character_dossier=spk_dossier,
+                        character_registry_entry=spk_reg_entry,
+                        audio_jp=jp_audio_line,
+                        clean_en=clean_text,
+                        setting_era=getattr(episode_profile, "setting_and_era", "") if episode_profile else "",
+                        series_bible=getattr(self, "series_bible", None)
+                    )
                 reg_name = pragmatic_reg or (reg_desc if reg_desc and "Kontekstowy" not in reg_desc else getattr(event, "register", None))
 
                 is_fem_scene = (getattr(self, "episode_scene_genders", {}).get(original_idx) == "kobieta") or getattr(self, "scene_is_female_only", False)
@@ -4237,7 +4264,8 @@ class MultimodalTranslator:
                 scene_female_only=is_fem_scene,
                 target_actor=addressee_label or addressee_cat,
                 is_sign=vtype.get("is_sign", False),
-                is_internal_monologue=is_internal_monologue
+                is_internal_monologue=is_internal_monologue,
+                actor_gender_consensus=getattr(self, "actor_gender_consensus", None)
             )
             p0_spk_gram = disc_telem.get("grammatical_gender")
             if p0_spk_gram in ("MASCULINE", "FEMININE"):
@@ -4365,6 +4393,28 @@ class MultimodalTranslator:
                 audio_jp_str = f"{jp_text} [{romaji_str}]" if romaji_str and romaji_str != jp_text else jp_text
 
             pragmatic_reg = detect_japanese_pragmatic_register(audio_jp_str, clean_en)
+            if pragmatic_reg and not vtype.get("is_sign"):
+                spk_dossier = None
+                if episode_profile and getattr(episode_profile, "character_dossiers", None):
+                    for cd in episode_profile.character_dossiers:
+                        if getattr(cd, "name", "").lower() == str(resolved_spk_name or "").lower():
+                            spk_dossier = cd
+                            break
+                spk_reg_entry = self.character_registry.get(resolved_spk_name) if hasattr(self, "character_registry") else None
+                spk_prosody = prosody_tags.get(batch_id, "") if prosody_tags else ""
+                setting_era_str = getattr(episode_profile, "setting_and_era", "") if episode_profile else ""
+                from whisper_disambiguator import WhisperDisambiguator
+                pragmatic_reg = WhisperDisambiguator.validate_pragmatic_register_against_speaker(
+                    register=pragmatic_reg,
+                    speaker_name=resolved_spk_name or "",
+                    character_dossier=spk_dossier,
+                    character_registry_entry=spk_reg_entry,
+                    audio_jp=audio_jp_str,
+                    clean_en=clean_en,
+                    prosody_tags=spk_prosody,
+                    setting_era=setting_era_str,
+                    series_bible=getattr(self, "series_bible", None)
+                )
             short_reg = pragmatic_reg.split("(")[0].strip() if (pragmatic_reg and not vtype.get("is_sign")) else None
 
             line_dry_telemetry = format_dry_telemetry_tag(
@@ -4838,6 +4888,40 @@ class MultimodalTranslator:
             refined_region_dict.update({r.id: r.screen_region for r in refined_lines if getattr(r, 'screen_region', None)})
             refined_typesetting_dict.update({r.id: r.visual_typesetting for r in refined_lines if getattr(r, 'visual_typesetting', None)})
 
+            # Hotfix 11.1.5 (P3-2 / E-11): Ochrona zablokowanego glosariusza przed dryfem synonimicznym Fazy 2
+            glossary_items = []
+            if episode_profile and getattr(episode_profile, "glossary", None):
+                glossary_items = episode_profile.glossary
+            elif hasattr(self, "series_bible") and self.series_bible and getattr(self.series_bible, "data", None):
+                g_dict = self.series_bible.data.get("glossary", {})
+                if isinstance(g_dict, dict):
+                    glossary_items = [{"term_en": k, "translation_pl": v} for k, v in g_dict.items()]
+
+            for r_line in refined_lines:
+                orig_item = next((it for it in pass1_items if it["id"] == r_line.id), None)
+                if not orig_item:
+                    continue
+                r_en = (orig_item.get("en", "") or "").lower()
+                p1_pl = orig_item.get("pl", "") or ""
+                r_pl = refined_dict.get(r_line.id, p1_pl) or ""
+
+                for g_entry in glossary_items:
+                    term_en = getattr(g_entry, "term_en", None) if not isinstance(g_entry, dict) else g_entry.get("term_en")
+                    trans_pl = getattr(g_entry, "translation_pl", None) if not isinstance(g_entry, dict) else g_entry.get("translation_pl")
+                    if not term_en or not trans_pl:
+                        continue
+                    term_en_low = str(term_en).strip().lower()
+                    trans_pl_str = str(trans_pl).strip()
+                    trans_pl_low = trans_pl_str.lower()
+
+                    if re.search(rf"\b{re.escape(term_en_low)}\b", r_en) or term_en_low in r_en:
+                        trans_stem = trans_pl_low[:max(4, len(trans_pl_low) - 2)]
+                        has_p1_canon = trans_pl_low in p1_pl.lower() or trans_stem in p1_pl.lower()
+                        has_ref_canon = trans_pl_low in r_pl.lower() or trans_stem in r_pl.lower()
+                        if has_p1_canon and not has_ref_canon:
+                            refined_dict[r_line.id] = p1_pl
+                            break
+
             if self.flight_recorder:
                 try:
                     self.flight_recorder.log_phase2_verifier(
@@ -4912,6 +4996,11 @@ class MultimodalTranslator:
         prev_linted_line = (lookback_history[-1]["pl"] if lookback_history else "")
         for item in pass1_items:
             raw_final = sanitize_sub_text(refined_dict.get(item["id"], item["pl"]))
+            st_item = str(item.get("style", "")).lower()
+            if any(k in st_item for k in ["italic", "flashback_italic", "thoughts", "internal"]):
+                raw_final = re.sub(r"</?i>", "", raw_final, flags=re.IGNORECASE)
+                raw_final = re.sub(r"\{\\i[01]\}", "", raw_final)
+                raw_final = raw_final.replace(r"\\i1", r"\i1").replace(r"\\i0", r"\i0").replace(r"\\N", r"\N")
             alias_fixes = []
             if not self.keep_honorifics and not item.get("is_sign", False):
                 if hasattr(self, "series_bible") and self.series_bible:
@@ -5797,7 +5886,13 @@ class MultimodalTranslator:
             coalesce_tail=True
         )
 
-        discourse_turns = SceneDiscourseGraph.build_discourse_topology([item[1] for item in raw_entries], series_bible=self.series_bible)
+        all_events = [item[1] for item in raw_entries]
+        self.actor_gender_consensus = SceneDiscourseGraph.compute_actor_gender_consensus(
+            all_events,
+            f0_by_line=getattr(self, "f0_by_line", None),
+            series_bible=self.series_bible
+        )
+        discourse_turns = SceneDiscourseGraph.build_discourse_topology(all_events, series_bible=self.series_bible)
         if self.flight_recorder:
             try:
                 batches_sum = [

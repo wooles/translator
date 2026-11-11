@@ -5011,6 +5011,9 @@ class SeriesBible:
                             if isinstance(g_val, str) and g_val:
                                 extra_src.append(g_val)
             self._register_institutional_toponyms_from_sources(extra_src)
+            self._reconcile_registry_gender_in_memory(episode_profile)
+            self._sanitize_entity_categories_in_memory(episode_profile)
+            self._enrich_declensions_from_profile(episode_profile)
 
             if hasattr(self, "_rebuild_actor_aliases_index"):
                 try:
@@ -6964,6 +6967,208 @@ class SeriesBible:
                 elif c_gen == "MALE":
                     if c_name in decl_dict and isinstance(decl_dict[c_name], dict):
                         decl_dict[c_name]["gender"] = "MALE"
+
+            # Hotfix 11.1.5 (P1-2 / E-01 / E-02 / E-07): In-memory sanitacja SeriesBible w RAM
+            self._reconcile_registry_gender_in_memory()
+            self._sanitize_entity_categories_in_memory()
+            self._enrich_declensions_from_profile()
+
+    def _reconcile_registry_gender_in_memory(self, episode_profile: Optional[Any] = None) -> None:
+        """
+        Hotfix 11.1.5 (P1-2 / E-01): Reconcyliacja płci w pamięci operacyjnej RAM (0 B diff na dysku).
+        Synchronizuje płeć postaci z profilera odcinka oraz relacji serii, aktualizując
+        rekordy character_registry niezależnie od wcześniejszych flag P0.
+        """
+        with self._lock:
+            if not hasattr(self, "data") or not isinstance(self.data, dict):
+                return
+            chars = self.data.get("characters", {})
+            if not isinstance(chars, dict):
+                return
+
+            profile_genders: Dict[str, str] = {}
+            if episode_profile:
+                if getattr(episode_profile, "character_dossiers", None):
+                    for cd in episode_profile.character_dossiers:
+                        c_name = getattr(cd, "name", "")
+                        c_gen = getattr(cd, "gender", None) or getattr(cd, "apparent_gender", None)
+                        if c_name and c_gen:
+                            profile_genders[c_name.strip().lower()] = str(c_gen).upper()
+                if getattr(episode_profile, "name_declensions", None):
+                    for nd in episode_profile.name_declensions:
+                        c_name = getattr(nd, "character_name", "")
+                        nd_gen = getattr(nd, "gender", None) or getattr(nd, "grammatical_gender", None)
+                        if c_name and nd_gen:
+                            gen_u = str(nd_gen).upper()
+                            if "FEMALE" in gen_u or "FEMININE" in gen_u:
+                                profile_genders[c_name.strip().lower()] = "FEMALE"
+                            elif "MALE" in gen_u or "MASCULINE" in gen_u:
+                                profile_genders[c_name.strip().lower()] = "MALE"
+
+            rels = dict(self.data.get("relations", {}))
+            rels.update(self.data.get("relationships", {}))
+
+            for char_name, char_val in list(chars.items()):
+                if "->" in char_name or not isinstance(char_val, dict):
+                    continue
+                c_low = char_name.strip().lower()
+
+                rel_indicated_gender = None
+                for r_key, r_desc in rels.items():
+                    if "->" in r_key:
+                        parts = [p.strip() for p in r_key.split("->")]
+                        if len(parts) >= 2 and parts[-1].strip().lower() == c_low:
+                            desc_str = str(r_desc.get("description", "") if isinstance(r_desc, dict) else r_desc).lower()
+                            if "[kobieta (adresat" in desc_str or "wymóg form żeńskich" in desc_str:
+                                rel_indicated_gender = "FEMALE"
+                                break
+                            elif "[mężczyzna (adresat" in desc_str or "wymóg form męskich" in desc_str:
+                                rel_indicated_gender = "MALE"
+                                break
+
+                target_gender = profile_genders.get(c_low)
+                resolved_gender = None
+                if target_gender and rel_indicated_gender and target_gender == rel_indicated_gender:
+                    resolved_gender = target_gender
+                elif rel_indicated_gender and not target_gender:
+                    resolved_gender = rel_indicated_gender
+                elif target_gender and not rel_indicated_gender:
+                    if target_gender in ("FEMALE", "MALE"):
+                        resolved_gender = target_gender
+
+                if resolved_gender:
+                    char_val["gender"] = resolved_gender
+                    char_val["grammatical_gender"] = "FEMININE" if resolved_gender == "FEMALE" else "MASCULINE"
+                    char_val["has_verified_gender"] = True
+                    char_val["confidence"] = 0.95
+                    char_val["priority"] = "P0"
+                    if "declensions" in self.data and isinstance(self.data["declensions"], dict):
+                        if char_name in self.data["declensions"] and isinstance(self.data["declensions"][char_name], dict):
+                            self.data["declensions"][char_name]["gender"] = resolved_gender
+
+    def _sanitize_entity_categories_in_memory(self, episode_profile: Optional[Any] = None) -> None:
+        """
+        Hotfix 11.1.5 (P1-2 / E-02): Rewalidacja kategorii encji w pamięci operacyjnej RAM (0 B diff na dysku).
+        Wykrywa toponimy i nazwy geograficzne w słownikach encji i klasyfikuje je jako EntityCategory.TOPONYM,
+        wykluczając z listy osobowych uczestników sceny oraz adresatów dialogu.
+        """
+        with self._lock:
+            if not hasattr(self, "data") or not isinstance(self.data, dict):
+                return
+            chars = self.data.get("characters", {})
+            if not isinstance(chars, dict):
+                return
+
+            self.data.setdefault("entity_categories", {})
+
+            context_text = ""
+            if episode_profile:
+                for attr in ("setting_and_era", "episode_summary"):
+                    val = getattr(episode_profile, attr, "") or ""
+                    if isinstance(val, str) and val:
+                        context_text += " " + val
+
+            m_toponyms = set()
+            if context_text:
+                for pat in [
+                    r"\b(?:Królestwo|Cesarstwo|Imperium|Księstwo|Góry|Równiny)\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+)",
+                    r"\b([A-Z][a-z]+)\s+(?:Kingdom|Empire|Principality|Mountains|Plains|Valley)\b"
+                ]:
+                    for m in re.finditer(pat, context_text):
+                        m_toponyms.add(m.group(1).strip().lower())
+
+            toponym_keywords_pat = re.compile(
+                r"\b(?:równin[yae]|królestw[oa]|cesarstw[oa]|imperium|księstw[oa]|gór[ya]|las[uy]?|"
+                r"plains?|kingdoms?|empires?|principality|valleys?|cit(?:y|ies))\b",
+                re.IGNORECASE
+            )
+
+            for char_name, char_val in list(chars.items()):
+                if "->" in char_name:
+                    continue
+                name_clean = extract_clean_speaker_name(char_name).strip()
+                name_low = name_clean.lower()
+
+                aliases = []
+                if isinstance(char_val, dict):
+                    aliases = [str(a).lower() for a in char_val.get("aliases", []) if a]
+
+                is_toponym = (
+                    bool(toponym_keywords_pat.search(name_clean))
+                    or any(bool(toponym_keywords_pat.search(a)) for a in aliases)
+                    or name_low in m_toponyms
+                    or any(a in m_toponyms for a in aliases)
+                )
+
+                if is_toponym:
+                    self.data["entity_categories"][char_name] = EntityCategory.TOPONYM.value
+                    self.data["entity_categories"][name_clean] = EntityCategory.TOPONYM.value
+                    if isinstance(char_val, dict):
+                        char_val["entity_category"] = EntityCategory.TOPONYM.value
+                        char_val["is_anthroponym"] = False
+                    del chars[char_name]
+                    if "declensions" in self.data and char_name in self.data["declensions"]:
+                        del self.data["declensions"][char_name]
+
+    def _enrich_declensions_from_profile(self, episode_profile: Optional[Any] = None) -> None:
+        """
+        Hotfix 11.1.5 (P1-2 / E-07): Aktualizacja paradygmatów odmiany w pamięci operacyjnej RAM (0 B diff na dysku).
+        Zastępuje zdegenerowane paradygmaty (D=C=B=N=Ms=M) bogatymi paradygmatami z profilera odcinka.
+        """
+        with self._lock:
+            if not hasattr(self, "data") or not isinstance(self.data, dict):
+                return
+            decl_dict = self.data.setdefault("declensions", {})
+            if not episode_profile or not getattr(episode_profile, "name_declensions", None):
+                return
+
+            for nd in episode_profile.name_declensions:
+                nd_name = getattr(nd, "character_name", None) or (nd.get("character_name") if isinstance(nd, dict) else None)
+                if not nd_name:
+                    continue
+                m_val = getattr(nd, "mianownik", None) or (nd.get("mianownik") if isinstance(nd, dict) else None) or (nd.get("M") if isinstance(nd, dict) else None) or nd_name
+                d_val = getattr(nd, "dopelniacz", None) or (nd.get("dopelniacz") if isinstance(nd, dict) else None) or (nd.get("D") if isinstance(nd, dict) else None) or nd_name
+                c_val = getattr(nd, "celownik", None) or (nd.get("celownik") if isinstance(nd, dict) else None) or (nd.get("C") if isinstance(nd, dict) else None) or nd_name
+                b_val = getattr(nd, "biernik", None) or (nd.get("biernik") if isinstance(nd, dict) else None) or (nd.get("B") if isinstance(nd, dict) else None) or nd_name
+                n_val = getattr(nd, "narzednik", None) or (nd.get("narzednik") if isinstance(nd, dict) else None) or (nd.get("N") if isinstance(nd, dict) else None) or nd_name
+                ms_val = getattr(nd, "miejscownik", None) or (nd.get("miejscownik") if isinstance(nd, dict) else None) or (nd.get("Ms") if isinstance(nd, dict) else None) or nd_name
+                w_val = getattr(nd, "wolacz", None) or (nd.get("wolacz") if isinstance(nd, dict) else None) or (nd.get("W") if isinstance(nd, dict) else None) or nd_name
+
+                decl_sum = getattr(nd, "declension_summary", "") or (nd.get("declension_summary", "") if isinstance(nd, dict) else "")
+                if decl_sum and d_val == nd_name:
+                    for part in re.split(r"[,;\n]", str(decl_sum)):
+                        m_part = re.match(r"^\s*(M|D|C|B|N|Ms|W)\.?\s*[:=\s]\s*(\S+)", part.strip(), re.IGNORECASE)
+                        if m_part:
+                            c_k = m_part.group(1).upper()
+                            c_v = m_part.group(2).strip()
+                            if c_k == "M": m_val = c_v
+                            elif c_k == "D": d_val = c_v
+                            elif c_k == "C": c_val = c_v
+                            elif c_k == "B": b_val = c_v
+                            elif c_k == "N": n_val = c_v
+                            elif c_k in ("MS", "MIEJSCOWNIK"): ms_val = c_v
+                            elif c_k in ("W", "WOLACZ"): w_val = c_v
+
+                is_profile_rich = any(val != m_val for val in (d_val, c_val, b_val, n_val, ms_val, w_val))
+                if not is_profile_rich:
+                    continue
+
+                existing = decl_dict.get(nd_name)
+                is_degenerate = True
+                if isinstance(existing, dict):
+                    ex_m = existing.get("M", nd_name)
+                    is_degenerate = all(existing.get(case, ex_m) == ex_m for case in ("D", "C", "B", "N", "Ms"))
+
+                if is_degenerate:
+                    decl_dict[nd_name] = {
+                        "M": m_val,
+                        "D": d_val,
+                        "C": c_val,
+                        "B": b_val,
+                        "N": n_val,
+                        "Ms": ms_val,
+                        "W": w_val
+                    }
 
     def populate_secondary_actor_tags(self, raw_actor_tags: List[str]) -> None:
         """
