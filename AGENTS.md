@@ -2,10 +2,10 @@
 
 Dokument ten stanowi jedyne źródło prawdy (Single Source of Truth) definiujące nienaruszalne reguły architektoniczne, lingwistyczne i procesowe asystenta AI oraz zespołów wieloagentowych w repozytorium `translator`.
 
-- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.1.4a (Sociolinguistic & Dual-Quantifier Certified Baseline)`
-- **Commit certyfikacji kodu:** `d4a456c` (`d4a456cf95d7c002bec9c0a18d1eb69070d78424`)
+- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.1.4b (CUDA Thread-Safety & Kotoba-Whisper Stability Certified Baseline)`
+- **Commit certyfikacji kodu:** `bd52c4c` (`bd52c4c88e859b86e864ab9db96b8233a0be7d3e`)
 - **Commit ochrony Depuracji Legacy 1.0 (Z16):** `1b4d52a` (`1b4d52a7b61326e503a3961e9c7257fcc6665a13`)
-- **Stan metryk:** `565 collected` (`412 passed` fast unit/integration [341 tests/ + 71 test_system.py] + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki (`verify_purity.py`, `verify_8_fixes.py`, `verify_12_fixes.py`, `verify_ultimate_pipeline.py`) oraz `audit_diff.ps1` w stanie `PASS`.
+- **Stan metryk:** `566 collected` (`413 passed` fast unit/integration [342 tests/ + 71 test_system.py] + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki (`verify_purity.py`, `verify_8_fixes.py`, `verify_12_fixes.py`, `verify_ultimate_pipeline.py`) oraz `audit_diff.ps1` w stanie `PASS`.
 - **Zasada utrzymaniowa post-11.1:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.1` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
 
 ---

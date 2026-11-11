@@ -4,9 +4,9 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-11 — Standard 11.1.4a Certyfikowany Baseline)
-- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.1.4a (Sociolinguistic & Dual-Quantifier Certified Baseline)`
-- **Commit certyfikacji kodu:** `d4a456cf95d7c002bec9c0a18d1eb69070d78424` (`d4a456c`)
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-11 — Standard 11.1.4b Certyfikowany Baseline)
+- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.1.4b (CUDA Thread-Safety & Kotoba-Whisper Stability Certified Baseline)`
+- **Commit certyfikacji kodu:** `bd52c4c88e859b86e864ab9db96b8233a0be7d3e` (`bd52c4c`)
 - **Commity implementacyjne 11.1:** `5b7306d` (Commit 1), `5b17ea7` (Commit 2), `2b4bc7d` (Commit 3), `8b72887` (Commit 4), `8a7dd31` (Commit 5), `218af2e` (Commit 6)
 - **Commity Hotfixu 11.1.1:** `328729f` (Commit 1), `9de0b83` (Commit 2), `07c4684` (Commit 3), `96acac7` (Commit 4)
 - **Commity Hotfixu 11.1.2:** `74766d8` (Commit 1), `1b540e3` (Commit 2), `8313658` (Commit 3), `326b7e0` (Commit 4)
@@ -14,16 +14,17 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 - **Commity Hotfixu 11.1.3:** `25e9300` (Commit 1), `ed9dc5f` (Commit 2), `879fb04` (Commit 3)
 - **Commity Hotfixu 11.1.3a:** `4be5ab0` (Commit 1), `842b9e9` (Commit 2), `7011407` (Commit 3)
 - **Commity Hotfixu 11.1.4:** `a6d40bb` (Commit 1), `38ad629` (Commit 2), `3057e97` (Commit 3)
-- **Commity Hotfixu 11.1.4a:**
-  * Commit 1 (`1b4d52a7b61326e503a3961e9c7257fcc6665a13`): `fix(translator,whisper): Hotfix 11.1.4a - yakuwarigo priority, dual quantifier virile arbitration, yade token fix, point listing signs (Z16-amendment #11)` — **NOWY BASELINE OCHRONY Z16**
-  * Commit 2 (`d4a456cf95d7c002bec9c0a18d1eb69070d78424`): `test(tests): Hotfix 11.1.4a - regression tests for yakuwarigo priority, dual quantifier virile, yade token, and point listing sign detection` — **NOWY COMMIT CERTYFIKACJI KODU**
-  * Commit 3 (`HEAD`): `docs: Hotfix 11.1.4a - sync SSOT to 11.1.4a, register INC-AVT-026..028 and ARB-049, update Z16 baseline to Commit 1, and publish implementation report`
-- **Status 11.1.4a:** `CERTIFIED / CLOSED (2026-11-11)`
-- **Commit ochrony Depuracji Legacy 1.0 (Z16):** `1b4d52a7b61326e503a3961e9c7257fcc6665a13` (po autoryzowanym Z16-amendment #11)
-- **Stan metryk:** `341 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `412 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 12/12, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
-- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (341/341 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
+- **Commity Hotfixu 11.1.4a:** `1b4d52a` (Commit 1), `d4a456c` (Commit 2), `4eb863c` (Commit 3)
+- **Commity Hotfixu 11.1.4b:**
+  * Commit 1 (`03db1000502f3c016361efc9e87643fceffa3af1`): `fix(whisper): Hotfix 11.1.4b - serialize CUDA inference with _infer_lock and disable unstable CTranslate2 align on distil/kotoba models`
+  * Commit 2 (`bd52c4c88e859b86e864ab9db96b8233a0be7d3e`): `test(tests): Hotfix 11.1.4b - regression test for multithreaded Whisper CUDA lock and kotoba word_timestamps guard` — **NOWY COMMIT CERTYFIKACJI KODU**
+  * Commit 3 (`HEAD`): `docs: Hotfix 11.1.4b - sync SSOT to 11.1.4b and register INC-AVT-029`
+- **Status 11.1.4b:** `CERTIFIED / CLOSED (2026-11-11)`
+- **Commit ochrony Depuracji Legacy 1.0 (Z16):** `1b4d52a7b61326e503a3961e9c7257fcc6665a13` (pozostaje BEZ ZMIAN — 0 B diffu na plikach Z16)
+- **Stan metryk:** `342 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `413 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 12/12, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
+- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (342/342 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
 - **Zasada utrzymaniowa post-11.1:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.1` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
-- **Gałąź i Architektura:** `main` (Standard 11.1.4a: Priorytetyzacja Rejestru Yakuwarigo -aru/-yaru i Telemetrii Fazy 2, Arbitraż Kwantyfikatora Dualnego, Korekta Tokenu Hiragany やで, Detekcja Plansz Cennika, Nowy Baseline Z16 `1b4d52a7b61326e503a3961e9c7257fcc6665a13`, Certyfikacja Kodu `d4a456cf95d7c002bec9c0a18d1eb69070d78424`, Zero-Literal Pure Positive Domain Invariant Architecture & Primary LLM Translation Authority)
+- **Gałąź i Architektura:** `main` (Standard 11.1.4b: Serializacja Inferencji CUDA z _infer_lock, Ochrona Przed Crashem CTranslate2 align na Modelach Kotoba/Distil, Certyfikacja Kodu `bd52c4c88e859b86e864ab9db96b8233a0be7d3e`, Nienaruszalny Baseline Z16 `1b4d52a7b61326e503a3961e9c7257fcc6665a13`, Zero-Literal Pure Positive Domain Invariant Architecture & Primary LLM Translation Authority)
 - **Środowisko:** Python 3.13 (`.venv`), Windows PowerShell, `ffmpeg` (PATH), `librosa.pyin`, `soundfile`, `pysubs2`, `spaCy en_core_web_sm` (100% offline 0.00 PLN), bezpośrednie klucze Google AI Studio API (`use_vertex = 0`).
 - **Dyrektywa Wykonawcza Testów:**
   * Testy przyrostowe podczas kodowania (< 2 s): `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_testu>"`
@@ -185,12 +186,16 @@ W ramach autoryzowanego `Z16-amendment #3` usunięto warunek `f1_starts_lower` z
 - **Status:** `RESOLVED (Hotfix 11.1.4a, Commity 1–2 — certyfikacja kodu: d4a456cf95d7c002bec9c0a18d1eb69070d78424)`
 - **Rozwiązanie:** Naprawa literówki w tokenie zachodniojapońskim `"やde"` -> `"やで"` w `WhisperDisambiguator.detect_batch_discourse_categories` oraz dodanie weryfikacji strukturalnej plansz wyliczenia punktowego / cennika (`^\d[\d,.\s]*\s*(?:points?|pts|candies|coins|gold|yen|¥)\s*:\s*\S+`) w `detect_event_visual_type` uniemożliwiającej błędną klasyfikację planszy jako dialogu w stylu Default.
 
+### 🔹 INC-AVT-029 (Hotfix 11.1.4b: Serializacja Inferencji CUDA `_infer_lock` i Ochrona Przed Crashem CTranslate2 align w `whisper_engine.py`)
+- **Status:** `RESOLVED (Hotfix 11.1.4b, Commity 1–2 — certyfikacja kodu: bd52c4c88e859b86e864ab9db96b8233a0be7d3e)`
+- **Rozwiązanie:** Otoczenie wywołań `model.transcribe` oraz konsumpcji generatora `list(segments)` blokiem `with self._infer_lock:` w `transcribe_audio_slice` oraz `transcribe_batch_scene` (eliminacja kolizji wielowątkowej i błędu Access Violation 0xC0000005 w CTranslate2) oraz wyłączenie `word_timestamps=False` dla modeli o architekturze `kotoba`/`distil` (ochrona przed niestabilną funkcją C++ `Whisper::align` na 2-warstwowym dekoderze Distil-Whisper w float16).
+
 ---
 ## 📐 4. METRYKI OPERACYJNE POTOKU
 - **Ograniczenia Ekranu ASS:** `CPS_PL <= 17.0` (dyskwalifikacja `> 20.0`), `CPL <= 38`, max 2 wiersze.
 - **Podłoga Gęstości Seiyū:** `CPS_target(rho_x) = min(13.5, 7.5 + 0.5 * rho_x)` dla `rho_x >= 9.0 mor/s`.
 - **Progi Golden Corpus:** Anchor Scenes = **100.0% PASSED**, Broader Corpus `>= 99.0%`, Atrybucja Płci `>= 99.8%`.
-- **Macierz testowa Standardu 11.1.4a:** `tests/` = `341 passed`, `test_system.py` = `71 passed, 153 deselected` (`5/5` pułapek Z16 `PASS`, 0 failing, Zero Regression Lock).
+- **Macierz testowa Standardu 11.1.4b:** `tests/` = `342 passed`, `test_system.py` = `71 passed, 153 deselected` (`5/5` pułapek Z16 `PASS`, 0 failing, Zero Regression Lock).
 
 ---
 
@@ -247,6 +252,7 @@ W ramach autoryzowanego `Z16-amendment #3` usunięto warunek `f1_starts_lower` z
 | **2026-11-10** | `ARB-047` | Telemetria / Testy | **Domknięcie Hotfixu 11.1.3a (P2-1, P3-1, P3-2)**: Odblokowanie tarczy F0 `<= 135 Hz` dla rzeczywistych etykiet `SpeakerVoiceClassifier`, izolacja wątkowa `_thread_local.last_batch_token_usage` w `translator.py` oraz ujednolicenie testów `T11.1.3_2` i `T11.1.3_4` z rzeczywistymi obiektami potoku. | 0.00 PLN |
 | **2026-11-11** | `ARB-048` | Socjolingwistyka / ASR | **Wdrożenie Hotfixu 11.1.4 (P1-1..P1-6)**: Odkotwiczenie fałszywych dopasowań dialektu na czasownikach pospolitych, obsługa rejestru wojowniczki (-aru/-yaru), ojou-sama (-masu wa, -desu koto) oraz dziewczęcego (-nano), detekcja code-switchingu JA/EN (CODE_SWITCH_EN), most idiolektów CharacterDossier -> brief, persystencja speech_register w SeriesBible, word-level ASR Whisper z dedupem prefiksów i ochrona etykiet @Handle w translator.py (Z16-amendment #10). | 0.00 PLN |
 | **2026-11-11** | `ARB-049` | Yakuwarigo / Dual / Cennik | **Wdrożenie Mikro-Hotfixu 11.1.4a (P2-RES-01, P2-RES-02, P3-RES-01, P3-RES-02)**: Priorytetyzacja rejestru -aru/-yaru i code-switchingu przed zaimkiem ore, wczesna synchronizacja rejestru do notes, arbitraż virility kwantyfikatora dualnego ('you two' / 'お二人') w diadach mieszanych, korekta tokenu hiragany やで oraz detekcja plansz wyliczeń punktowych w stylu Default (Z16-amendment #11). | 0.00 PLN |
+| **2026-11-11** | `ARB-050` | Whisper / CUDA Thread-Safety | **Wdrożenie Mikro-Hotfixu 11.1.4b**: Serializacja inferencji GPU `with self._infer_lock:`, wyłączenie niestabilnego CTranslate2::Whisper::align (`word_timestamps=False`) dla modeli Kotoba/Distil-Whisper i czulszy VAD min_silence_duration_ms=140. | 0.00 PLN |
 
 ---
 
