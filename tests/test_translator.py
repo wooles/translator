@@ -105,34 +105,36 @@ def test_split_oversized_events_skips_sign_actor_and_pos_tagged_events(actor_nam
 @pytest.mark.parametrize(
     "style_name,input_draft,expected_wrapped",
     [
-        # 1. Styl Italics bez znaczników kursywy -> automatyczne otoczenie pojedynczą parą {\i1}...{\i0}
-        ("Italics", "To musi być jakaś pułapka.\nMuszę uważać.", r"{\i1}To musi być jakaś pułapka.\NMuszę uważać.{\i0}"),
-        # 2. Styl Flashback_Italics z wewnętrznym duplikatem -> oczyszczenie do pojedynczej pary
-        ("Flashback_Italics", r"{\i1}Wspomnienie dawnych dni{\i0}\n{\i1}nadal boli.{\i0}", r"{\i1}Wspomnienie dawnych dni\Nnadal boli.{\i0}"),
-        # 3. Kontrprzykład: zwykły styl Default bez myśli -> brak automatycznego otaczania kursywą
+        # 1. Styl Italics bez znacznikow kursywy -> brak redundantnych tagow {\i1}...{\i0} (Hotfix 11.1.5 P3-1)
+        ("Italics", "To musi być jakaś pułapka.\nMuszę uważać.", r"To musi być jakaś pułapka.\NMuszę uważać."),
+        # 2. Styl Flashback_Italics z wewnetrznym duplikatem -> oczyszczenie do czystego tekstu (Hotfix 11.1.5 P3-1)
+        ("Flashback_Italics", r"{\i1}Wspomnienie dawnych dni{\i0}\n{\i1}nadal boli.{\i0}", r"Wspomnienie dawnych dni\Nnadal boli."),
+        # 3. Styl Thoughts bez kursywy w stylu ASS -> automatyczne otoczenie pojedyncza para {\i1}...{\i0}
+        ("Thoughts", "To musi być jakaś pułapka.\nMuszę uważać.", r"{\i1}To musi być jakaś pułapka.\NMuszę uważać.{\i0}"),
+        # 4. Kontrprzyklad: zwykly styl Default bez mysli -> brak automatycznego otaczania kursywa
         ("Default", "Wszyscy na stanowiska!", "Wszyscy na stanowiska!"),
     ]
 )
 def test_phase1_postprocess_wraps_italics_style_and_normalizes_single_italic_block(
     style_name, input_draft, expected_wrapped
 ):
-    """
-    T5.7 (Operacja 2C.6): Prawidłowy stan tekstu Fazy 1 dla stylu Italics
-    = pojedyncza para {\\i1}...{\\i0} obejmująca cały tekst oraz separator \\N zamiast \\n.
+    r"""
+    T5.7 (Operacja 2C.6) & Hotfix 11.1.5 (P3-1): Prawidlowy stan tekstu Fazy 1:
+    - Dla stylu Thoughts otacza pojedyncza para {\i1}...{\i0} oraz separator \N zamiast \n.
+    - Dla stylow z rodziny Italics usuwa redundantne tagi {\i1}...{\i0}.
     """
     import pysubs2
     from translator import format_phase1_candidate_text
 
     event = pysubs2.SSAEvent(start=1000, end=3000, text=input_draft, style=style_name)
     pl_cand = format_phase1_candidate_text(input_draft, event, is_sign=False)
-    is_im = any(k in style_name.lower() for k in ["italic", "thoughts", "internal"])
+    is_im = any(k in style_name.lower() for k in ["thoughts", "internal"])
 
     assert pl_cand == expected_wrapped
     if is_im:
         assert pl_cand.startswith(r"{\i1}")
         assert pl_cand.endswith(r"{\i0}")
-        assert r"\n" not in pl_cand
-
+    assert r"\n" not in pl_cand
 
 # T10.1.1 (A-1) -> tests/test_translator.py
 @pytest.mark.unit

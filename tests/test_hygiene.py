@@ -202,3 +202,36 @@ def test_T11_1_5_italics_style_tag_normalization_and_glossary_preservation():
 
     assert refined_dict[1] == "Weź ze sobą ten kamień magiczny."
 
+
+@pytest.mark.unit
+def test_t11_1_6_b1_glossary_enforced_when_phase1_uses_synonym_or_plural():
+    """
+    Standard 11.1.6 (BŁĄD-1 / E-11):
+    Weryfikuje, że dla zablokowanego terminu glosariusza 'Lord Starsage' -> 'Mędrzec Gwiazd'
+    oraz kwestii EN w liczbie mnogiej bez prefiksu tytularnego ('starsages'),
+    odwrócona kalka przymiotnikowa 'Gwiezdnego Mędrca' zostaje skorygowana na 'Mędrca Gwiazd'.
+    """
+    from translator import enforce_locked_glossary_terms
+
+    glossary_items = [{"term_en": "Lord Starsage", "translation_pl": "Mędrzec Gwiazd"}]
+    line_en = "*Do not feed meat to sparrows that aren't reincarnations of starsages!*"
+    candidate_pl = "*Nie karmić mięsem wróbli poza reinkarnacją Gwiezdnego Mędrca!*"
+
+    result_phase1 = enforce_locked_glossary_terms(
+        en_text=line_en,
+        candidate_pl=candidate_pl,
+        glossary_entries=glossary_items,
+        phase1_pl=None
+    )
+    expected = "*Nie karmić mięsem wróbli poza reinkarnacją Mędrca Gwiazd!*"
+    assert result_phase1 == expected
+
+    result_phase2 = enforce_locked_glossary_terms(
+        en_text=line_en,
+        candidate_pl=result_phase1,
+        glossary_entries=glossary_items,
+        phase1_pl=result_phase1
+    )
+    assert result_phase2 == expected
+
+

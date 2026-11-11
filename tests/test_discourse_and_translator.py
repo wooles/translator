@@ -1209,3 +1209,97 @@ def test_T11_1_5_third_person_title_mention_not_locked_as_addressee_and_sign_iso
     assert "Scena: POLYLOGUE" in tag_str
 
 
+@pytest.mark.unit
+def test_t11_1_6_b3_whisper_cross_speaker_hallucination_dedup():
+    """
+    Standard 11.1.6 (BŁĄD-3 / DEFEKT 2):
+    Weryfikuje WhisperDisambiguator.sanitize_aligned_whisper_transcripts:
+    (a) czyszczenie wycieku ASR (>12 znaków JP) dla 1-słowej mikro-kwestii ('Here.', 880ms).
+    (b) deduplikację między dwoma różnymi mówcami (zachowanie tylko dla kwestii o pasującym budżecie sylabicznym).
+    """
+    from whisper_disambiguator import WhisperDisambiguator
+
+    events_meta = [
+        {"id": 1, "en_text": "Here.", "duration_ms": 880, "speaker": "Worker_Alpha"},
+        {"id": 2, "en_text": "Are you really going there right now?", "duration_ms": 3200, "speaker": "Worker_Alpha"},
+        {"id": 3, "en_text": "Yes.", "duration_ms": 1100, "speaker": "Worker_Beta"}
+    ]
+    whisper_results = {
+        1: "それでは本日の作戦を開始するぞ (soredewa honjitsu no sakusen)",
+        2: "本当に今からそこへ行くつもりなのか",
+        3: "本当に今からそこへ行くつもりなのか"
+    }
+
+    sanitized = WhisperDisambiguator.sanitize_aligned_whisper_transcripts(events_meta, whisper_results)
+
+    # (a) Mikro-kwestia zostaje wyczyszczona z wycieku
+    assert sanitized[1] == ""
+
+    # (b) Między mówcami A i B transkrypcja zostaje zachowana tylko u mówcy A
+    assert sanitized[2] == "本当に今からそこへ行くつもりなのか"
+    assert sanitized[3] == ""
+
+
+@pytest.mark.unit
+def test_t11_1_6_b4_offscreen_addressee_isolation_and_compound_actor_ass():
+    """
+    Standard 11.1.6 (BŁĄD-4 / E-05b):
+    Weryfikuje, że:
+    1. Mówca ze stylu 'Italics - Top' spoza characters_present nie staje się adresatem kwestii Default.
+    2. Generyczny string 'Mężczyzna' nie trafia do 'Adresat:' w telemetry_tag.
+    3. Nazwa aktora złożonego 'Worker A/B' zachowuje ukośnik '/' w SSAEvent.name.
+    """
+    import pysubs2
+    from scene_discourse import SpeakerTurn, resolve_turn_addressee, SceneDiscourseGraph
+
+    class MockSequence:
+        def __init__(self, time_range, characters_present):
+            self.time_range = time_range
+            self.characters_present = characters_present
+
+    class MockBible:
+        def __init__(self):
+            self.dramatic_sequences = [
+                MockSequence(time_range="00:01:00-00:02:00", characters_present=["Hero_Alpha", "Hero_Beta"])
+            ]
+
+    bible = MockBible()
+
+    # 1. Mówca ze stylu 'Italics - Top' (Offscreen_Guy) nie może zostać wybrany jako adresat dla kwestii Default
+    ev_turn = pysubs2.SSAEvent(start=70000, end=72000, text="Where are you going?", style="Default", name="Hero_Alpha")
+    turn_curr = SpeakerTurn(speaker="Hero_Alpha", events=[ev_turn])
+    turn_curr.style = "Default"
+
+    ev_next = pysubs2.SSAEvent(start=72200, end=74000, text="Breaking news report.", style="Italics - Top", name="Offscreen_Guy")
+    turn_next = SpeakerTurn(speaker="Offscreen_Guy", events=[ev_next])
+    turn_next.style = "Italics - Top"
+
+    resolved_turn = resolve_turn_addressee(
+        turn_curr,
+        previous_turn=None,
+        series_bible=bible,
+        next_turn=turn_next,
+        prior_turns=[]
+    )
+    assert resolved_turn.target_speaker != "Offscreen_Guy"
+
+    # 2. Blokada generycznego 'Mężczyzna' w Adresat:
+    sdg = SceneDiscourseGraph()
+    ev_generic = pysubs2.SSAEvent(start=1000, end=2000, text="Hello.", name="Speaker_Alpha")
+    telem = sdg.arbitrate_event_telemetry(
+        event=ev_generic,
+        actor="Speaker_Alpha",
+        target_actor="Mężczyzna",
+        target_gender="MASCULINE"
+    )
+    telemetry_tag = telem.get("telemetry_tag", "")
+    assert "Adresat: Mężczyzna" not in telemetry_tag
+
+    # 3. Zachowanie ukośnika '/' dla 'Worker A/B' w SSAEvent
+    from translator import split_oversized_ass_events
+    ev_worker = pysubs2.SSAEvent(start=1000, end=2000, text="Working hard.", name="Worker A/B")
+    cleaned_events = split_oversized_ass_events([ev_worker])
+    assert cleaned_events[0].name == "Worker A/B"
+
+
+

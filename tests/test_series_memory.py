@@ -1518,3 +1518,67 @@ def test_T11_1_5_in_memory_gender_reconciliation_and_toponym_filtering():
     assert sm.data["declensions"]["Leader_Alpha"]["D"] == "Leader_Alphy"
     assert sm.data["declensions"]["Leader_Alpha"]["C"] == "Leader_Alphie"
 
+
+@pytest.mark.unit
+def test_t11_1_6_b2_relations_role_noun_gender_reconciliation():
+    """
+    Standard 11.1.6 (BŁĄD-2 / E-01):
+    Weryfikuje, że postać z błędnym wpisem P0 MALE (nieobecna w episode_profile)
+    posiadająca w relacjach role żeńskie ('ludzka apostołka' oraz 'sąsiadka z gimnazjum')
+    zostaje zrekoncyliowana in-memory na FEMALE / FEMININE, a tag relacji
+    [MĘŻCZYZNA (Adresat)...] zostaje skorygowany na [KOBIETA (Adresat)...].
+    """
+    from series_memory import SeriesBible
+
+    sm = SeriesBible(anime_title="Synthetic_Test_Series")
+    sm.data = {
+        "characters": {
+            "Apostle_Alpha": {
+                "gender": "MALE",
+                "grammatical_gender": "MASCULINE",
+                "has_verified_gender": True,
+                "confidence": 0.95,
+                "priority": "P0",
+                "aliases": []
+            },
+            "Patron_Beta": {
+                "gender": "MALE",
+                "grammatical_gender": "MASCULINE",
+                "has_verified_gender": True,
+                "confidence": 0.95,
+                "priority": "P0",
+                "aliases": []
+            },
+            "Neighbor_Gamma": {
+                "gender": "MALE",
+                "grammatical_gender": "MASCULINE",
+                "has_verified_gender": True,
+                "confidence": 0.95,
+                "priority": "P0",
+                "aliases": []
+            }
+        },
+        "relations": {
+            "Patron_Beta -> Apostle_Alpha": (
+                "(demon patron -> ludzka apostołka) "
+                "[MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+            ),
+            "Apostle_Alpha -> Neighbor_Gamma": (
+                "(sąsiadka z gimnazjum -> dorosły sąsiad)"
+            )
+        }
+    }
+
+    sm._reconcile_registry_gender_in_memory(episode_profile=None)
+
+    char_record = sm.data["characters"]["Apostle_Alpha"]
+    assert char_record["gender"] == "FEMALE"
+    assert char_record["grammatical_gender"] == "FEMININE"
+    assert char_record["has_verified_gender"] is True
+
+    rel_tag = sm.relations["Patron_Beta -> Apostle_Alpha"]
+    assert "[KOBIETA (Adresat)" in rel_tag
+    assert "byłaś / zrobiłaś / jesteś pewna" in rel_tag
+    assert "[MĘŻCZYZNA (Adresat)" not in rel_tag
+
+
