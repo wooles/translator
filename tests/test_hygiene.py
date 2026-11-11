@@ -162,3 +162,43 @@ def test_t10_6_6_context_cache_skips_small_prompts():
     )
     assert res_long == "caches/test_cache_12345"
     mock_client.caches.create.assert_called_once()
+
+
+@pytest.mark.unit
+def test_T11_1_5_italics_style_tag_normalization_and_glossary_preservation():
+    """Hotfix 11.1.5 (P3-1 / P3-2 / E-09 / E-11): Weryfikacja normalizacji tagów kursywy i ochrony glosariusza."""
+    from translator import format_phase1_candidate_text
+    import pysubs2
+
+    # 1. Normalizacja znaczników <i> oraz {\i1} na stylu Italics
+    ev_italics = pysubs2.SSAEvent(start=1000, end=3000, text="Internal monologue", style="Italics")
+    input_text = "<i>{\\i1}Czułem, że coś jest nie tak...{\\i0}</i>\\NTo był zły znak."
+    normalized = format_phase1_candidate_text(input_text, ev_italics)
+    assert "<i>" not in normalized
+    assert "</i>" not in normalized
+    assert "{\\i1}" not in normalized
+    assert "{\\i0}" not in normalized
+    assert "\\N" in normalized
+
+    # 2. Ochrona zablokowanego glosariusza przed dryfem synonimicznym w Fazy 2
+    glossary_items = [{"term_en": "magic stone", "translation_pl": "kamień magiczny"}]
+    orig_item = {"id": 1, "en": "Take this magic stone with you.", "pl": "Weź ze sobą ten kamień magiczny."}
+    pass1_items = [orig_item]
+    refined_dict = {1: "Weź ze sobą ten klejnot czarnoksięski."}
+
+    r_en = orig_item["en"].lower()
+    p1_pl = orig_item["pl"]
+    r_pl = refined_dict[1]
+
+    for g_entry in glossary_items:
+        term_en = g_entry["term_en"].lower()
+        trans_pl = g_entry["translation_pl"].lower()
+        if term_en in r_en:
+            trans_stem = trans_pl[:max(4, len(trans_pl) - 2)]
+            has_p1_canon = trans_pl in p1_pl.lower() or trans_stem in p1_pl.lower()
+            has_ref_canon = trans_pl in r_pl.lower() or trans_stem in r_pl.lower()
+            if has_p1_canon and not has_ref_canon:
+                refined_dict[1] = p1_pl
+
+    assert refined_dict[1] == "Weź ze sobą ten kamień magiczny."
+

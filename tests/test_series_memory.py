@@ -1445,3 +1445,76 @@ def test_series_bible_character_record_persists_speech_register(tmp_path):
     assert updated["description"] == "Główna dowódczyni"
     assert updated.get("speech_register") == "Dystyngowany rejestr arystokratyczny"
     assert "wyodrębniono z relacji serii" not in updated["description"]
+
+
+@pytest.mark.unit
+def test_T11_1_5_in_memory_gender_reconciliation_and_toponym_filtering():
+    """Hotfix 11.1.5 (P1-2 / E-01 / E-02 / E-07): Weryfikacja in-memory sanitacji SeriesBible."""
+    from series_memory import SeriesBible, EntityCategory
+    from profiler import EpisodeProfile, NameDeclension
+
+    sm = SeriesBible(series_name="Series_Alpha")
+    sm.data = {
+        "characters": {
+            "Protagonist_Girl": {
+                "name": "Protagonist_Girl",
+                "gender": "MALE",
+                "grammatical_gender": "MASCULINE",
+                "confidence": 0.95,
+                "priority": "P0",
+                "has_verified_gender": True,
+                "aliases": ["Protagonist_Girl"],
+                "description": "Young maiden",
+                "entity_category": "ANTHROPONYM"
+            },
+            "Northern_Kingdom": {
+                "name": "Northern_Kingdom",
+                "gender": "UNKNOWN",
+                "aliases": ["Northern Plains"],
+                "description": "Distant land",
+                "entity_category": "ANTHROPONYM"
+            }
+        },
+        "relations": {
+            "Companion": {
+                "Protagonist_Girl": "Przyjaciółka [KOBIETA (Adresat)]"
+            }
+        },
+        "declensions": {
+            "Leader_Alpha": {
+                "M": "Leader_Alpha", "D": "Leader_Alpha", "C": "Leader_Alpha",
+                "B": "Leader_Alpha", "N": "Leader_Alpha", "Ms": "Leader_Alpha", "W": "Leader_Alpha"
+            }
+        }
+    }
+
+    profile = EpisodeProfile(
+        name_declensions=[
+            NameDeclension(
+                character_name="Protagonist_Girl",
+                gender="FEMALE",
+                declension_summary="M. Protagonist_Girl, D. Protagonist_Girl, C. Protagonist_Girl, B. Protagonist_Girl, N. Protagonist_Girl, Ms. Protagonist_Girl, W. Protagonist_Girl"
+            ),
+            NameDeclension(
+                character_name="Leader_Alpha",
+                gender="MALE",
+                declension_summary="M. Leader_Alpha, D. Leader_Alphy, C. Leader_Alphie, B. Leader_Alphę, N. Leader_Alphą, Ms. Leader_Alphie, W. Leader_Alpho"
+            )
+        ]
+    )
+
+    # 1. Reconcyliacja płci w pamięci
+    sm._reconcile_registry_gender_in_memory(profile)
+    assert sm.data["characters"]["Protagonist_Girl"]["gender"] == "FEMALE"
+    assert sm.data["characters"]["Protagonist_Girl"]["grammatical_gender"] == "FEMININE"
+
+    # 2. Rewalidacja kategorii encji w pamięci
+    sm._sanitize_entity_categories_in_memory()
+    assert sm.data["entity_categories"]["Northern_Kingdom"] == EntityCategory.TOPONYM.value
+    assert "Northern_Kingdom" not in sm.data["characters"]
+
+    # 3. Wzbogacenie zdegenerowanych paradygmatów z profilu
+    sm._enrich_declensions_from_profile(profile)
+    assert sm.data["declensions"]["Leader_Alpha"]["D"] == "Leader_Alphy"
+    assert sm.data["declensions"]["Leader_Alpha"]["C"] == "Leader_Alphie"
+

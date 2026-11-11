@@ -1045,3 +1045,167 @@ def test_whisper_disambiguator_detects_kansai_yade_hiragana():
         c = WhisperDisambiguator.detect_batch_discourse_categories("It is true.", s)
         assert "DIALECT_JP" in c, f"Brak DIALECT_JP dla formy: {s}"
 
+
+@pytest.mark.unit
+def test_T11_1_5_sociolinguistic_register_gated_by_character_dossier():
+    """Hotfix 11.1.5 (P1-1 / INC-AVT-026 / E-04): Weryfikacja bramkowania tagu socjolingwistycznego przez profil postaci."""
+    from whisper_disambiguator import WhisperDisambiguator
+
+    # 1. Rejestr dziewczęcy zablokowany dla starszego lub męskiego mówcy
+    reg_girl = "Rejestr: Rejestr dziewczęcy"
+    dossier_elder_male = {"name": "Speaker_Alpha", "gender": "MALE", "age_class": "ELDERLY"}
+    res1 = WhisperDisambiguator.validate_pragmatic_register_against_speaker(
+        register=reg_girl,
+        speaker_name="Speaker_Alpha",
+        character_dossier=dossier_elder_male
+    )
+    assert res1 is None
+
+    dossier_girl = {"name": "Speaker_Beta", "gender": "FEMALE", "age_class": "CHILD"}
+    res2 = WhisperDisambiguator.validate_pragmatic_register_against_speaker(
+        register=reg_girl,
+        speaker_name="Speaker_Beta",
+        character_dossier=dossier_girl
+    )
+    assert res2 == reg_girl
+
+    # 2. Szorstki żołnierski / Bojowy pomijany dla arystokraty bez krzyku bojowego w prozodii
+    reg_soldier = "Rejestr: Szorstki żołnierski / Bojowy"
+    dossier_noble = {"name": "Speaker_Gamma", "gender": "FEMALE", "dialect_category": "arystokratyczny styl dworski"}
+    res_noble = WhisperDisambiguator.validate_pragmatic_register_against_speaker(
+        register=reg_soldier,
+        speaker_name="Speaker_Gamma",
+        character_dossier=dossier_noble,
+        prosody_tags="spokojny ton konwersacyjny"
+    )
+    assert res_noble is None
+
+    res_noble_battle = WhisperDisambiguator.validate_pragmatic_register_against_speaker(
+        register=reg_soldier,
+        speaker_name="Speaker_Gamma",
+        character_dossier=dossier_noble,
+        prosody_tags="krzyk bojowy / silne wzburzenie"
+    )
+    assert res_noble_battle == reg_soldier
+
+    # 3. Feudalny poddańczy / Wasal pomijany dla standardowego powitania w settingu współczesnym
+    reg_feudal = "Rejestr: Feudalny poddańczy / Wasal"
+    res_office = WhisperDisambiguator.validate_pragmatic_register_against_speaker(
+        register=reg_feudal,
+        speaker_name="Speaker_Delta",
+        audio_jp="ohayou gozaimasu",
+        clean_en="Good morning",
+        setting_era="Modern Office"
+    )
+    assert res_office is None
+
+    res_feudal_knight = WhisperDisambiguator.validate_pragmatic_register_against_speaker(
+        register=reg_feudal,
+        speaker_name="Speaker_Delta",
+        audio_jp="ohayou gozaimasu, -dono",
+        clean_en="Good morning, my lord",
+        setting_era="Fantasy kingdom"
+    )
+    assert res_feudal_knight == reg_feudal
+
+    # 4. Gwarowy południowy pomijany dla standardowej polszczyzny literackiej bez idiolektu
+    reg_dialect = "Rejestr: Rejestr gwarowy południowy"
+    dossier_std = {"name": "Speaker_Epsilon", "dialect_category": "standardowa polszczyzna literacka"}
+    res_std = WhisperDisambiguator.validate_pragmatic_register_against_speaker(
+        register=reg_dialect,
+        speaker_name="Speaker_Epsilon",
+        character_dossier=dossier_std
+    )
+    assert res_std is None
+
+    res_idiolect = WhisperDisambiguator.validate_pragmatic_register_against_speaker(
+        register=reg_dialect,
+        speaker_name="Speaker_Epsilon",
+        character_dossier=dossier_std,
+        audio_jp="douja"
+    )
+    assert res_idiolect == reg_dialect
+
+
+@pytest.mark.unit
+def test_T11_1_5_unknown_actor_scene_gender_stability_and_male_only_constraint():
+    """Hotfix 11.1.5 (P1-3 / E-03): Weryfikacja stałości rodzaju gramatycznego aktora i egzekwowania male_only_scene."""
+    from scene_discourse import SceneDiscourseGraph
+    import pysubs2
+
+    # 1. Konsensus płci per aktor w odcinku
+    events = [
+        pysubs2.SSAEvent(start=1000, end=3000, text="First statement", name="Speaker_Alpha"),
+        pysubs2.SSAEvent(start=4000, end=6000, text="Second statement", name="Speaker_Alpha"),
+        pysubs2.SSAEvent(start=7000, end=9000, text="Third statement", name="Speaker_Beta"),
+    ]
+    f0_map = {0: 125.0, 1: 130.0, 2: 230.0}
+    consensus = SceneDiscourseGraph.compute_actor_gender_consensus(events, f0_by_line=f0_map)
+    assert consensus.get("Speaker_Alpha") == "MALE"
+    assert consensus.get("Speaker_Beta") == "FEMALE"
+
+    # 2. Ograniczenie z topologii sekwencji dramatycznej (male_only_scene)
+    sdg = SceneDiscourseGraph()
+    ev_test = pysubs2.SSAEvent(start=1500, end=2500, text="Line in male scene", name="Speaker_Unknown")
+    class DummySeq:
+        time_range = "00:01-00:05"
+        male_only_scene = True
+        female_only_scene = False
+
+    telemetry = sdg.arbitrate_event_telemetry(
+        event=ev_test,
+        actor="Speaker_Unknown",
+        dramatic_sequences=[DummySeq()]
+    )
+    assert telemetry.get("speaker_gender") == "MALE"
+
+
+@pytest.mark.unit
+def test_T11_1_5_third_person_title_mention_not_locked_as_addressee_and_sign_isolation():
+    """Hotfix 11.1.5 (P2-1 / INC-AVT-027 / E-05 / E-06 / E-10): Weryfikacja filtru składniowego 3. osoby i izolacji napisów ekranowych."""
+    from scene_discourse import _detect_event_vocative, resolve_turn_addressee, SpeakerTurn, SceneDiscourseGraph
+    import pysubs2
+
+    class DummySeriesBible:
+        def __init__(self):
+            self.data = {"characters": {"Target_Hero": {"name": "Target_Hero", "aliases": ["Duke Target_Hero"]}}}
+            self.alias_to_canonical = {"duke target_hero": "Target_Hero", "target_hero": "Target_Hero"}
+        def resolve_alias(self, a):
+            return self.alias_to_canonical.get(a.lower(), a)
+        def get_character_gender(self, name):
+            return "MALE"
+
+    sb = DummySeriesBible()
+
+    # 1. Konstrukcja referencyjna 3. osoby nie blokuje postaci jako bezpośredniego adresata
+    ev_3rd = pysubs2.SSAEvent(start=1000, end=3000, text="I came on behalf of Duke Target_Hero.")
+    voc_name, voc_g = _detect_event_vocative(ev_3rd, series_bible=sb)
+    assert voc_name is None
+    assert voc_g is None
+
+    # Bezpośredni zwrot wołaczowy zostaje prawidłowo wykryty
+    ev_direct = pysubs2.SSAEvent(start=1000, end=3000, text="Target_Hero, please listen carefully!")
+    voc_dir, voc_dir_g = _detect_event_vocative(ev_direct, series_bible=sb)
+    assert voc_dir == "Target_Hero"
+
+    # 2. Izolacja napisów ekranowych (is_sign)
+    turn_sign = SpeakerTurn(speaker="sign", events=[pysubs2.SSAEvent(start=100, end=200, text="Sign content")])
+    turn_sign.is_sign = True
+    resolved_sign = resolve_turn_addressee(turn_sign, prior_turns=[], series_bible=sb)
+    assert resolved_sign.target_speaker is None
+    assert resolved_sign.target_confidence == 0.0
+
+    # 3. Czysta reprezentacja SpeakerTurn.__repr__
+    repr_str = repr(resolved_sign)
+    assert "None" not in repr_str
+    assert "AMBIGUOUS" not in repr_str
+
+    # 4. Zachowanie etykiety aktora złożonego w telemetry_tag
+    sdg = SceneDiscourseGraph()
+    ev_compound = pysubs2.SSAEvent(start=1000, end=2000, text="Reporting for duty.", name="Worker A/B")
+    comp_telem = sdg.arbitrate_event_telemetry(event=ev_compound, actor="Worker A/B")
+    tag_str = comp_telem.get("telemetry_tag", "")
+    assert "Mówca: Worker A/B" in tag_str
+    assert "Scena: POLYLOGUE" in tag_str
+
+
