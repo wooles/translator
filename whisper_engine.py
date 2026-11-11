@@ -192,20 +192,15 @@ class JapaneseWhisperEngine:
 
         try:
             self._initialize_model()
-            segments, info = self.model.transcribe(
-                wav_path,
-                language="ja",
-                beam_size=1,
-                vad_filter=True,
-                vad_parameters=dict(min_silence_duration_ms=200)
-            )
-            
-            transcribed_parts = []
-            for segment in segments:
-                text = segment.text.strip()
-                if text:
-                    transcribed_parts.append(text)
-            
+            with self._infer_lock:
+                segments, info = self.model.transcribe(
+                    wav_path,
+                    language="ja",
+                    beam_size=1,
+                    vad_filter=True,
+                    vad_parameters=dict(min_silence_duration_ms=200)
+                )
+                transcribed_parts = [segment.text.strip() for segment in segments if segment.text.strip()]
             return "".join(transcribed_parts).strip()
         except Exception as e:
             logger.warning(f"Whisper transcription error for {wav_path}: {e}")
@@ -228,25 +223,28 @@ class JapaneseWhisperEngine:
 
         try:
             self._initialize_model()
+            is_distil_or_kotoba = any(k in str(self.model_size).lower() for k in ("kotoba", "distil"))
+            use_word_ts = (os.getenv("WHISPER_WORD_TIMESTAMPS", "0") == "1") if is_distil_or_kotoba else (os.getenv("WHISPER_WORD_TIMESTAMPS", "1") == "1")
             transcribe_kwargs = {
                 "language": "ja",
                 "beam_size": 1,
                 "vad_filter": True,
-                "vad_parameters": dict(min_silence_duration_ms=200),
+                "vad_parameters": dict(min_silence_duration_ms=140, speech_pad_ms=80),
                 "condition_on_previous_text": False,
                 "repetition_penalty": 1.2,
                 "no_repeat_ngram_size": 3,
                 "compression_ratio_threshold": 2.4,
-                "word_timestamps": True
+                "word_timestamps": use_word_ts
             }
             if initial_prompt:
                 transcribe_kwargs["initial_prompt"] = initial_prompt
 
-            segments, info = self.model.transcribe(
-                scene_wav_path,
-                **transcribe_kwargs
-            )
-            segments_list = list(segments)
+            with self._infer_lock:
+                segments, info = self.model.transcribe(
+                    scene_wav_path,
+                    **transcribe_kwargs
+                )
+                segments_list = list(segments)
 
             result_words: Dict[int, List[str]] = {b_id: [] for b_id, _ in events}
             result_segs: Dict[int, List[str]] = {b_id: [] for b_id, _ in events}
