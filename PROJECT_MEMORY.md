@@ -4,25 +4,26 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-11 — Standard 11.1.4 Certyfikowany Baseline)
-- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.1.4 (Sociolinguistic & Code-Switching Certified Baseline)`
-- **Commit certyfikacji kodu:** `38ad629ae1ec343d3dfeb9d4e57691339dc2ffb5` (`38ad629`)
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-11 — Standard 11.1.4a Certyfikowany Baseline)
+- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.1.4a (Sociolinguistic & Dual-Quantifier Certified Baseline)`
+- **Commit certyfikacji kodu:** `d4a456cf95d7c002bec9c0a18d1eb69070d78424` (`d4a456c`)
 - **Commity implementacyjne 11.1:** `5b7306d` (Commit 1), `5b17ea7` (Commit 2), `2b4bc7d` (Commit 3), `8b72887` (Commit 4), `8a7dd31` (Commit 5), `218af2e` (Commit 6)
 - **Commity Hotfixu 11.1.1:** `328729f` (Commit 1), `9de0b83` (Commit 2), `07c4684` (Commit 3), `96acac7` (Commit 4)
 - **Commity Hotfixu 11.1.2:** `74766d8` (Commit 1), `1b540e3` (Commit 2), `8313658` (Commit 3), `326b7e0` (Commit 4)
 - **Commity Hotfixu 11.1.2a:** `d310969` (Commit 1), `a928569` (Commit 2)
 - **Commity Hotfixu 11.1.3:** `25e9300` (Commit 1), `ed9dc5f` (Commit 2), `879fb04` (Commit 3)
 - **Commity Hotfixu 11.1.3a:** `4be5ab0` (Commit 1), `842b9e9` (Commit 2), `7011407` (Commit 3)
-- **Commity Hotfixu 11.1.4:**
-  * Commit 1 (`a6d40bb09d60b2d986d919de98044c6e2d9c838b`): `fix(translator,rules,verifier,avt_linter,profiler,series_memory,whisper): Hotfix 11.1.4 - code-switching (JA/EN), yakuwarigo idiolect bridge, and word-level ASR separation (Z16-amendment #10)` — **NOWY BASELINE OCHRONY Z16**
-  * Commit 2 (`38ad629ae1ec343d3dfeb9d4e57691339dc2ffb5`): `test(tests): Hotfix 11.1.4 - regression tests for code-switching, yakuwarigo detection, idiolect bridge, and speech register persistence` — **NOWY COMMIT CERTYFIKACJI KODU**
-  * Commit 3 (`HEAD`): `docs: Hotfix 11.1.4 - sync SSOT to 11.1.4, register INC-AVT-023..025 and ARB-048, update Z16 baseline to Commit 1, and publish implementation report`
-- **Status 11.1.4:** `CERTIFIED / CLOSED (2026-11-11)`
-- **Commit ochrony Depuracji Legacy 1.0 (Z16):** `a6d40bb09d60b2d986d919de98044c6e2d9c838b` (po autoryzowanym Z16-amendment #10)
-- **Stan metryk:** `337 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `408 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 12/12, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
-- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (337/337 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
+- **Commity Hotfixu 11.1.4:** `a6d40bb` (Commit 1), `38ad629` (Commit 2), `3057e97` (Commit 3)
+- **Commity Hotfixu 11.1.4a:**
+  * Commit 1 (`1b4d52a7b61326e503a3961e9c7257fcc6665a13`): `fix(translator,whisper): Hotfix 11.1.4a - yakuwarigo priority, dual quantifier virile arbitration, yade token fix, point listing signs (Z16-amendment #11)` — **NOWY BASELINE OCHRONY Z16**
+  * Commit 2 (`d4a456cf95d7c002bec9c0a18d1eb69070d78424`): `test(tests): Hotfix 11.1.4a - regression tests for yakuwarigo priority, dual quantifier virile, yade token, and point listing sign detection` — **NOWY COMMIT CERTYFIKACJI KODU**
+  * Commit 3 (`HEAD`): `docs: Hotfix 11.1.4a - sync SSOT to 11.1.4a, register INC-AVT-026..028 and ARB-049, update Z16 baseline to Commit 1, and publish implementation report`
+- **Status 11.1.4a:** `CERTIFIED / CLOSED (2026-11-11)`
+- **Commit ochrony Depuracji Legacy 1.0 (Z16):** `1b4d52a7b61326e503a3961e9c7257fcc6665a13` (po autoryzowanym Z16-amendment #11)
+- **Stan metryk:** `341 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `412 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 12/12, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
+- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (341/341 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
 - **Zasada utrzymaniowa post-11.1:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.1` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
-- **Gałąź i Architektura:** `main` (Standard 11.1.4: Obsługa Code-Switchingu JA/EN, Most Idiolektów Yakuwarigo, Separacja Słowna ASR Whisper, Nowy Baseline Z16 `a6d40bb09d60b2d986d919de98044c6e2d9c838b`, Certyfikacja Kodu `38ad629ae1ec343d3dfeb9d4e57691339dc2ffb5`, Zero-Literal Pure Positive Domain Invariant Architecture & Primary LLM Translation Authority)
+- **Gałąź i Architektura:** `main` (Standard 11.1.4a: Priorytetyzacja Rejestru Yakuwarigo -aru/-yaru i Telemetrii Fazy 2, Arbitraż Kwantyfikatora Dualnego, Korekta Tokenu Hiragany やで, Detekcja Plansz Cennika, Nowy Baseline Z16 `1b4d52a7b61326e503a3961e9c7257fcc6665a13`, Certyfikacja Kodu `d4a456cf95d7c002bec9c0a18d1eb69070d78424`, Zero-Literal Pure Positive Domain Invariant Architecture & Primary LLM Translation Authority)
 - **Środowisko:** Python 3.13 (`.venv`), Windows PowerShell, `ffmpeg` (PATH), `librosa.pyin`, `soundfile`, `pysubs2`, `spaCy en_core_web_sm` (100% offline 0.00 PLN), bezpośrednie klucze Google AI Studio API (`use_vertex = 0`).
 - **Dyrektywa Wykonawcza Testów:**
   * Testy przyrostowe podczas kodowania (< 2 s): `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_testu>"`
@@ -172,12 +173,24 @@ W ramach autoryzowanego `Z16-amendment #3` usunięto warunek `f1_starts_lower` z
 - **Status:** `RESOLVED (Hotfix 11.1.4, Commity 1–2 — certyfikacja kodu: 38ad629ae1ec343d3dfeb9d4e57691339dc2ffb5)`
 - **Rozwiązanie:** Włączenie `word_timestamps=True` i przypisywanie słów po środkach czasowych `[start, end]` w `whisper_engine.py`, odcinanie powtórzonych prefiksów ASR z poprzedniej linii w pętli sanityzacji `translator.py`, dopuszczenie nazw mówców z prefiksem `@` w normalizatorze majuskuły oraz ochrona wysokiego rejestru dam/ojou-sama przed slangiem gamingowym w promptcie weryfikatora.
 
+### 🔹 INC-AVT-026 (Hotfix 11.1.4a: Priorytetyzacja Rejestru Yakuwarigo -aru/-yaru i Code-Switchingu oraz Synchronizacja Telemetrii do Notes)
+- **Status:** `RESOLVED (Hotfix 11.1.4a, Commity 1–2 — certyfikacja kodu: d4a456cf95d7c002bec9c0a18d1eb69070d78424)`
+- **Rozwiązanie:** Przeniesienie ewaluacji `-aru/-yaru` oraz `Code-switching JA+EN` przed szorstki żargon z zaimkiem `ore` w `detect_japanese_pragmatic_register` (rozszerzenie leksyki o formy `頼んでるある`, `はずある`, `何やるか`, etc.), a także wczesna ewaluacja audio JP i rejestru socjopragmatycznego w `_process_single_batch` przed wygenerowaniem mikro-tagu `line_dry_telemetry` i doklejeniem do `notes`.
+
+### 🔹 INC-AVT-027 (Hotfix 11.1.4a: Arbitraż Kwantyfikatora Dualnego „you two” / „お二人” w Scenach Mieszanych)
+- **Status:** `RESOLVED (Hotfix 11.1.4a, Commity 1–2 — certyfikacja kodu: d4a456cf95d7c002bec9c0a18d1eb69070d78424)`
+- **Rozwiązanie:** Wykrywanie wykładników podwójności w 2. osobie (`you two`, `both of you`, `お二人`, `二人とも`) w `_resolve_line_addressee` oraz `_process_single_batch`; weryfikacja płci uczestników sceny w `untranslated_in_batch` i wymuszenie męskoosobowej liczby mnogiej (`line_you_grp = "VIRILE"` i `has_male_addressee_in_line = True`) przy obecności co najmniej jednego mężczyzny i jednej kobiety.
+
+### 🔹 INC-AVT-028 (Hotfix 11.1.4a: Korekta Tokenu Hiragany „やで” w WhisperDisambiguator i Detekcja Plansz Cennika)
+- **Status:** `RESOLVED (Hotfix 11.1.4a, Commity 1–2 — certyfikacja kodu: d4a456cf95d7c002bec9c0a18d1eb69070d78424)`
+- **Rozwiązanie:** Naprawa literówki w tokenie zachodniojapońskim `"やde"` -> `"やで"` w `WhisperDisambiguator.detect_batch_discourse_categories` oraz dodanie weryfikacji strukturalnej plansz wyliczenia punktowego / cennika (`^\d[\d,.\s]*\s*(?:points?|pts|candies|coins|gold|yen|¥)\s*:\s*\S+`) w `detect_event_visual_type` uniemożliwiającej błędną klasyfikację planszy jako dialogu w stylu Default.
+
 ---
 ## 📐 4. METRYKI OPERACYJNE POTOKU
 - **Ograniczenia Ekranu ASS:** `CPS_PL <= 17.0` (dyskwalifikacja `> 20.0`), `CPL <= 38`, max 2 wiersze.
 - **Podłoga Gęstości Seiyū:** `CPS_target(rho_x) = min(13.5, 7.5 + 0.5 * rho_x)` dla `rho_x >= 9.0 mor/s`.
 - **Progi Golden Corpus:** Anchor Scenes = **100.0% PASSED**, Broader Corpus `>= 99.0%`, Atrybucja Płci `>= 99.8%`.
-- **Macierz testowa Standardu 11.1.4:** `tests/` = `337 passed`, `test_system.py` = `71 passed, 153 deselected` (`5/5` pułapek Z16 `PASS`, 0 failing, Zero Regression Lock).
+- **Macierz testowa Standardu 11.1.4a:** `tests/` = `341 passed`, `test_system.py` = `71 passed, 153 deselected` (`5/5` pułapek Z16 `PASS`, 0 failing, Zero Regression Lock).
 
 ---
 
@@ -233,6 +246,7 @@ W ramach autoryzowanego `Z16-amendment #3` usunięto warunek `f1_starts_lower` z
 | **2026-11-09** | `ARB-046` | Telemetria / Dyskurs | **Telemetria Dyskursu i Arbitraż Ról Epizodycznych P2 (Standard 11.1.3)**: Naprawa indeksowania krotek w `log_scene_discourse` (INC-AVT-020), metryki czasu i zużycia tokenów Fazy 1 (INC-AVT-022), estymator kosztu P3-B (3150 tokenów), arbitraż płci ról epizodycznych P2 z ochroną F0 krzyku bojowego (INC-AVT-021) oraz rozstrzyganie virility diad mieszanych w POLYLOGUE (P3-A). | 0.00 PLN |
 | **2026-11-10** | `ARB-047` | Telemetria / Testy | **Domknięcie Hotfixu 11.1.3a (P2-1, P3-1, P3-2)**: Odblokowanie tarczy F0 `<= 135 Hz` dla rzeczywistych etykiet `SpeakerVoiceClassifier`, izolacja wątkowa `_thread_local.last_batch_token_usage` w `translator.py` oraz ujednolicenie testów `T11.1.3_2` i `T11.1.3_4` z rzeczywistymi obiektami potoku. | 0.00 PLN |
 | **2026-11-11** | `ARB-048` | Socjolingwistyka / ASR | **Wdrożenie Hotfixu 11.1.4 (P1-1..P1-6)**: Odkotwiczenie fałszywych dopasowań dialektu na czasownikach pospolitych, obsługa rejestru wojowniczki (-aru/-yaru), ojou-sama (-masu wa, -desu koto) oraz dziewczęcego (-nano), detekcja code-switchingu JA/EN (CODE_SWITCH_EN), most idiolektów CharacterDossier -> brief, persystencja speech_register w SeriesBible, word-level ASR Whisper z dedupem prefiksów i ochrona etykiet @Handle w translator.py (Z16-amendment #10). | 0.00 PLN |
+| **2026-11-11** | `ARB-049` | Yakuwarigo / Dual / Cennik | **Wdrożenie Mikro-Hotfixu 11.1.4a (P2-RES-01, P2-RES-02, P3-RES-01, P3-RES-02)**: Priorytetyzacja rejestru -aru/-yaru i code-switchingu przed zaimkiem ore, wczesna synchronizacja rejestru do notes, arbitraż virility kwantyfikatora dualnego ('you two' / 'お二人') w diadach mieszanych, korekta tokenu hiragany やで oraz detekcja plansz wyliczeń punktowych w stylu Default (Z16-amendment #11). | 0.00 PLN |
 
 ---
 
