@@ -302,3 +302,83 @@ def test_detect_event_visual_type_point_listing_sign_in_default_style():
     vtype_dlg = detect_event_visual_type(ev_dialogue)
     assert vtype_dlg["is_sign"] is False
 
+
+@pytest.mark.unit
+def test_whisper_engine_thread_safe_infer_lock_and_kotoba_word_timestamps_guard(tmp_path):
+    """Hotfix 11.1.4b: Weryfikacja blokady wątkowej _infer_lock oraz wyłączenia word_timestamps dla modeli distil/kotoba."""
+    import time
+    import threading
+    from concurrent.futures import ThreadPoolExecutor
+    import pysubs2
+    import whisper_engine
+    from whisper_engine import JapaneseWhisperEngine
+
+    dummy_wav = tmp_path / "scene_audio.wav"
+    dummy_wav.write_bytes(b"RIFF dummy 16khz wav data")
+
+    engine = JapaneseWhisperEngine(model_size="kotoba-tech/kotoba-whisper-v2.0-faster")
+    engine._is_initialized = True
+
+    active_threads = 0
+    max_concurrent_threads = 0
+    concurrency_lock = threading.Lock()
+    captured_kwargs = []
+
+    class MockSegment:
+        def __init__(self, start: float, end: float, text: str):
+            self.start = start
+            self.end = end
+            self.text = text
+            self.words = None
+
+    class MockModel:
+        def transcribe(self, audio_path, **kwargs):
+            nonlocal active_threads, max_concurrent_threads
+            with concurrency_lock:
+                captured_kwargs.append(kwargs)
+
+            def segment_generator():
+                nonlocal active_threads, max_concurrent_threads
+                with concurrency_lock:
+                    active_threads += 1
+                    if active_threads > max_concurrent_threads:
+                        max_concurrent_threads = active_threads
+                try:
+                    time.sleep(0.015)
+                    yield MockSegment(start=1.0, end=3.0, text="テスト音声")
+                finally:
+                    with concurrency_lock:
+                        active_threads -= 1
+
+            return segment_generator(), None
+
+    engine.model = MockModel()
+
+    ev1 = pysubs2.SSAEvent(start=1000, end=3000, text="Test line")
+    ev1.name = "SpeakerAlpha"
+    events = [(1, ev1)]
+
+    # Wywołanie równoległe z 6 wątków roboczych
+    results = []
+    with ThreadPoolExecutor(max_workers=6) as executor:
+        futures = [
+            executor.submit(engine.transcribe_batch_scene, str(dummy_wav), 0, events)
+            for _ in range(6)
+        ]
+        for f in futures:
+            results.append(f.result())
+
+    # 1. Dokładnie 1 wątek jednocześnie w sekcji krytycznej modelu (100% thread-safety)
+    assert max_concurrent_threads == 1, f"Wykryto kolizję wątków w inferencji GPU: {max_concurrent_threads}"
+
+    # 2. Wszystkie wątki zwróciły poprawnie przypisany segment
+    for res in results:
+        assert res == {1: "テスト音声"}
+
+    # 3. Bezpieczne wyłączenie word_timestamps dla architektury kotoba/distil
+    assert len(captured_kwargs) == 6
+    for kw in captured_kwargs:
+        assert kw.get("word_timestamps") is False
+        assert kw.get("vad_parameters") == dict(min_silence_duration_ms=140, speech_pad_ms=80)
+
+
