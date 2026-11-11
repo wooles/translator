@@ -4,28 +4,29 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-10 — Standard 11.1.3a Certyfikowany Baseline)
-- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.1.3a (Production Certified Baseline)`
-- **Commit certyfikacji kodu:** `842b9e945cfed4bab04e2d3864a1cd657e50f832`
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-11 — Standard 11.1.4 Certyfikowany Baseline)
+- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.1.4 (Sociolinguistic & Code-Switching Certified Baseline)`
+- **Commit certyfikacji kodu:** `38ad629ae1ec343d3dfeb9d4e57691339dc2ffb5` (`38ad629`)
 - **Commity implementacyjne 11.1:** `5b7306d` (Commit 1), `5b17ea7` (Commit 2), `2b4bc7d` (Commit 3), `8b72887` (Commit 4), `8a7dd31` (Commit 5), `218af2e` (Commit 6)
 - **Commity Hotfixu 11.1.1:** `328729f` (Commit 1), `9de0b83` (Commit 2), `07c4684` (Commit 3), `96acac7` (Commit 4)
 - **Commity Hotfixu 11.1.2:** `74766d8` (Commit 1), `1b540e3` (Commit 2), `8313658` (Commit 3), `326b7e0` (Commit 4)
 - **Commity Hotfixu 11.1.2a:** `d310969` (Commit 1), `a928569` (Commit 2)
 - **Commity Hotfixu 11.1.3:** `25e9300` (Commit 1), `ed9dc5f` (Commit 2), `879fb04` (Commit 3)
-- **Commity Hotfixu 11.1.3a:**
-  * Commit 1 (`4be5ab0996bfe5a6196fbb60b87814458205162a`): `fix(translator): Hotfix 11.1.3a - unblock F0 <= 135 Hz shield for SpeakerVoiceClassifier tags (P2-1) and isolate per-thread token usage (P3-2A)`
-  * Commit 2 (`842b9e945cfed4bab04e2d3864a1cd657e50f832`): `test(tests): Hotfix 11.1.3a - use real pipeline objects in T11.1.3_2 and T11.1.3_4 (P3-1)` — **NOWY COMMIT CERTYFIKACJI KODU**
-  * Commit 3 (`HEAD`): `docs: Hotfix 11.1.3a - sync SSOT to 11.1.3a, register INC-AVT-021a and ARB-047, commit operational audit and 11.1.3a report (P3-2B)`
-- **Status 11.1.3a:** `CERTIFIED / CLOSED (2026-11-10)`
-- **Commit ochrony Depuracji Legacy 1.0 (Z16):** `d31096945a977d6a179891d87dcfd2a05c0c5bca` (nienaruszony, 0 B zmian)
-- **Stan metryk:** `332 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `403 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 12/12, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
-- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (332/332 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
+- **Commity Hotfixu 11.1.3a:** `4be5ab0` (Commit 1), `842b9e9` (Commit 2), `7011407` (Commit 3)
+- **Commity Hotfixu 11.1.4:**
+  * Commit 1 (`a6d40bb09d60b2d986d919de98044c6e2d9c838b`): `fix(translator,rules,verifier,avt_linter,profiler,series_memory,whisper): Hotfix 11.1.4 - code-switching (JA/EN), yakuwarigo idiolect bridge, and word-level ASR separation (Z16-amendment #10)` — **NOWY BASELINE OCHRONY Z16**
+  * Commit 2 (`38ad629ae1ec343d3dfeb9d4e57691339dc2ffb5`): `test(tests): Hotfix 11.1.4 - regression tests for code-switching, yakuwarigo detection, idiolect bridge, and speech register persistence` — **NOWY COMMIT CERTYFIKACJI KODU**
+  * Commit 3 (`HEAD`): `docs: Hotfix 11.1.4 - sync SSOT to 11.1.4, register INC-AVT-023..025 and ARB-048, update Z16 baseline to Commit 1, and publish implementation report`
+- **Status 11.1.4:** `CERTIFIED / CLOSED (2026-11-11)`
+- **Commit ochrony Depuracji Legacy 1.0 (Z16):** `a6d40bb09d60b2d986d919de98044c6e2d9c838b` (po autoryzowanym Z16-amendment #10)
+- **Stan metryk:** `337 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `408 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 12/12, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
+- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (337/337 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
 - **Zasada utrzymaniowa post-11.1:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.1` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
-- **Gałąź i Architektura:** `main` (Standard 11.1.3a: Pełna Neutralność Całego Kodu i Testów, 100% Czystość Leksykonu Onomastycznego `.onomastic_lexicon.json` [12 kluczy, 576 leksemów], Mikro-domknięcie Z1 w rules.py, Nowy Baseline Z16 `d31096945a977d6a179891d87dcfd2a05c0c5bca`, Certyfikacja Kodu `842b9e945cfed4bab04e2d3864a1cd657e50f832`, Zero-Literal Pure Positive Domain Invariant Architecture & Primary LLM Translation Authority)
+- **Gałąź i Architektura:** `main` (Standard 11.1.4: Obsługa Code-Switchingu JA/EN, Most Idiolektów Yakuwarigo, Separacja Słowna ASR Whisper, Nowy Baseline Z16 `a6d40bb09d60b2d986d919de98044c6e2d9c838b`, Certyfikacja Kodu `38ad629ae1ec343d3dfeb9d4e57691339dc2ffb5`, Zero-Literal Pure Positive Domain Invariant Architecture & Primary LLM Translation Authority)
 - **Środowisko:** Python 3.13 (`.venv`), Windows PowerShell, `ffmpeg` (PATH), `librosa.pyin`, `soundfile`, `pysubs2`, `spaCy en_core_web_sm` (100% offline 0.00 PLN), bezpośrednie klucze Google AI Studio API (`use_vertex = 0`).
 - **Dyrektywa Wykonawcza Testów:**
   * Testy przyrostowe podczas kodowania (< 2 s): `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_testu>"`
-  * Szybki pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest -q` (332 passed w tests/, 71 passed i 153 deselected w test_system.py)
+  * Szybki pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest -q` (337 passed w tests/, 71 passed i 153 deselected w test_system.py)
   * Audyt śledczy diffu: `powershell -ExecutionPolicy Bypass -File .\audit_diff.ps1 -ForbiddenTerms "<lista>"`
   * 4 bramki kwalifikacyjne: `python verify_purity.py`, `python verify_8_fixes.py`, `python verify_12_fixes.py`, `python verify_ultimate_pipeline.py`
 
@@ -159,12 +160,24 @@ W ramach autoryzowanego `Z16-amendment #3` usunięto warunek `f1_starts_lower` z
 - **Status:** `RESOLVED (Hotfix 11.1.3a, Commity 1–2 — certyfikacja kodu: 842b9e945cfed4bab04e2d3864a1cd657e50f832)`
 - **Rozwiązanie:** Dopuszczenie przedrostka `"niski tembr"` w `translator.py:2302` odblokowujące tarczę krtaniową F0 <= 135 Hz dla rzeczywistych etykiet `SpeakerVoiceClassifier.classify_pitch_register(f0)` przy `raw_phase1_gender=None`, izolacja wątkowa `_thread_local.last_batch_token_usage` w `translator.py` oraz ujednolicenie testów `T11.1.3_2` i `T11.1.3_4` z rzeczywistymi obiektami potoku.
 
+### 🔹 INC-AVT-023 (Hotfix 11.1.4: Detekcja Yakuwarigo, Code-Switchingu JA/EN i Ochrona Przed Fałszywym Dialektem)
+- **Status:** `RESOLVED (Hotfix 11.1.4, Commity 1–2 — certyfikacja kodu: 38ad629ae1ec343d3dfeb9d4e57691339dc2ffb5)`
+- **Rozwiązanie:** Usunięcie niezakotwiczonych pojedynczych znaków `"べ"` i `"おら"` z `jp_dialect_tokens` w `whisper_disambiguator.py` eliminujące fałszywą klasyfikację pospolitych czasowników (`述べた`, `比べれば`, `全て`, `直らない`). Rozszerzenie wzorców o formy zakotwiczone oraz rejestry *Yakuwarigo* (`-aru`, `-yaru`, `-desu wa`, `-masu wa`, `-desu koto`, `-ssu`, `-nano`). Dodanie kategorii `CODE_SWITCH_EN` dla hybrydowych zapożyczeń katakanowych z wykluczeniem terminów systemowych i aktywacja wytycznej DYN_1 w `rules.py`.
+
+### 🔹 INC-AVT-024 (Hotfix 11.1.4: Most Idiolektów CharacterDossier -> Lean Brief i Persystencja Speech Register w SeriesBible)
+- **Status:** `RESOLVED (Hotfix 11.1.4, Commity 1–2 — certyfikacja kodu: 38ad629ae1ec343d3dfeb9d4e57691339dc2ffb5)`
+- **Rozwiązanie:** Przenoszenie `speech_style_pl` i `idiolect_matrix` z profilera do zwięzłego briefu w `profiler.py` (`Styl i idiolekt: ...`), zasilanie metadanych partii `speech_style_pl` i `notes` w `translator.py`, zapis i persystencja pola `speech_register` w `SeriesBible` z formatowaniem `[Rejestr: ...]` w `format_scoped_for_batch` oraz nadpisywanie notki relacji (`wyodrębniono z relacji serii`) przy nadejściu zweryfikowanej tożsamości P0.
+
+### 🔹 INC-AVT-025 (Hotfix 11.1.4: Word-Level ASR Whisper, Deduplikacja Prefiksów i Normalizacja Etykiet @Handle)
+- **Status:** `RESOLVED (Hotfix 11.1.4, Commity 1–2 — certyfikacja kodu: 38ad629ae1ec343d3dfeb9d4e57691339dc2ffb5)`
+- **Rozwiązanie:** Włączenie `word_timestamps=True` i przypisywanie słów po środkach czasowych `[start, end]` w `whisper_engine.py`, odcinanie powtórzonych prefiksów ASR z poprzedniej linii w pętli sanityzacji `translator.py`, dopuszczenie nazw mówców z prefiksem `@` w normalizatorze majuskuły oraz ochrona wysokiego rejestru dam/ojou-sama przed slangiem gamingowym w promptcie weryfikatora.
+
 ---
 ## 📐 4. METRYKI OPERACYJNE POTOKU
 - **Ograniczenia Ekranu ASS:** `CPS_PL <= 17.0` (dyskwalifikacja `> 20.0`), `CPL <= 38`, max 2 wiersze.
 - **Podłoga Gęstości Seiyū:** `CPS_target(rho_x) = min(13.5, 7.5 + 0.5 * rho_x)` dla `rho_x >= 9.0 mor/s`.
 - **Progi Golden Corpus:** Anchor Scenes = **100.0% PASSED**, Broader Corpus `>= 99.0%`, Atrybucja Płci `>= 99.8%`.
-- **Macierz testowa Standardu 11.1.3a:** `tests/` = `332 passed`, `test_system.py` = `71 passed, 153 deselected` (`5/5` pułapek Z16 `PASS`, 0 failing, Zero Regression Lock).
+- **Macierz testowa Standardu 11.1.4:** `tests/` = `337 passed`, `test_system.py` = `71 passed, 153 deselected` (`5/5` pułapek Z16 `PASS`, 0 failing, Zero Regression Lock).
 
 ---
 
@@ -219,6 +232,7 @@ W ramach autoryzowanego `Z16-amendment #3` usunięto warunek `f1_starts_lower` z
 | **2026-11-08** | `ARB-045` | Higiena Kodu | **Z16-amendment #9**: Neutralizacja ostatnich przykładów Z1 w `rules.py` (`FILAR XXVII` L309–312, `FILAR CXXXII` L1117) i re-certyfikacja baseline'u Z16 (`d310969`). | 0.00 PLN |
 | **2026-11-09** | `ARB-046` | Telemetria / Dyskurs | **Telemetria Dyskursu i Arbitraż Ról Epizodycznych P2 (Standard 11.1.3)**: Naprawa indeksowania krotek w `log_scene_discourse` (INC-AVT-020), metryki czasu i zużycia tokenów Fazy 1 (INC-AVT-022), estymator kosztu P3-B (3150 tokenów), arbitraż płci ról epizodycznych P2 z ochroną F0 krzyku bojowego (INC-AVT-021) oraz rozstrzyganie virility diad mieszanych w POLYLOGUE (P3-A). | 0.00 PLN |
 | **2026-11-10** | `ARB-047` | Telemetria / Testy | **Domknięcie Hotfixu 11.1.3a (P2-1, P3-1, P3-2)**: Odblokowanie tarczy F0 `<= 135 Hz` dla rzeczywistych etykiet `SpeakerVoiceClassifier`, izolacja wątkowa `_thread_local.last_batch_token_usage` w `translator.py` oraz ujednolicenie testów `T11.1.3_2` i `T11.1.3_4` z rzeczywistymi obiektami potoku. | 0.00 PLN |
+| **2026-11-11** | `ARB-048` | Socjolingwistyka / ASR | **Wdrożenie Hotfixu 11.1.4 (P1-1..P1-6)**: Odkotwiczenie fałszywych dopasowań dialektu na czasownikach pospolitych, obsługa rejestru wojowniczki (-aru/-yaru), ojou-sama (-masu wa, -desu koto) oraz dziewczęcego (-nano), detekcja code-switchingu JA/EN (CODE_SWITCH_EN), most idiolektów CharacterDossier -> brief, persystencja speech_register w SeriesBible, word-level ASR Whisper z dedupem prefiksów i ochrona etykiet @Handle w translator.py (Z16-amendment #10). | 0.00 PLN |
 
 ---
 
