@@ -4,9 +4,9 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-11 — Standard 11.1.4b Certyfikowany Baseline)
-- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.1.4b (CUDA Thread-Safety & Kotoba-Whisper Stability Certified Baseline)`
-- **Commit certyfikacji kodu:** `bd52c4c88e859b86e864ab9db96b8233a0be7d3e` (`bd52c4c`)
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-11 — Standard 11.1.5 Certyfikowany Baseline)
+- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.1.5 (Discourse Telemetry & Sociolinguistic Gate Certified Baseline)`
+- **Commit certyfikacji kodu:** `3c70a557b77ce2b83bf9bcf5875bf6fe57f70db7` (`3c70a55`)
 - **Commity implementacyjne 11.1:** `5b7306d` (Commit 1), `5b17ea7` (Commit 2), `2b4bc7d` (Commit 3), `8b72887` (Commit 4), `8a7dd31` (Commit 5), `218af2e` (Commit 6)
 - **Commity Hotfixu 11.1.1:** `328729f` (Commit 1), `9de0b83` (Commit 2), `07c4684` (Commit 3), `96acac7` (Commit 4)
 - **Commity Hotfixu 11.1.2:** `74766d8` (Commit 1), `1b540e3` (Commit 2), `8313658` (Commit 3), `326b7e0` (Commit 4)
@@ -15,16 +15,17 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 - **Commity Hotfixu 11.1.3a:** `4be5ab0` (Commit 1), `842b9e9` (Commit 2), `7011407` (Commit 3)
 - **Commity Hotfixu 11.1.4:** `a6d40bb` (Commit 1), `38ad629` (Commit 2), `3057e97` (Commit 3)
 - **Commity Hotfixu 11.1.4a:** `1b4d52a` (Commit 1), `d4a456c` (Commit 2), `4eb863c` (Commit 3)
-- **Commity Hotfixu 11.1.4b:**
-  * Commit 1 (`03db1000502f3c016361efc9e87643fceffa3af1`): `fix(whisper): Hotfix 11.1.4b - serialize CUDA inference with _infer_lock and disable unstable CTranslate2 align on distil/kotoba models`
-  * Commit 2 (`bd52c4c88e859b86e864ab9db96b8233a0be7d3e`): `test(tests): Hotfix 11.1.4b - regression test for multithreaded Whisper CUDA lock and kotoba word_timestamps guard` — **NOWY COMMIT CERTYFIKACJI KODU**
-  * Commit 3 (`HEAD`): `docs: Hotfix 11.1.4b - sync SSOT to 11.1.4b and register INC-AVT-029`
-- **Status 11.1.4b:** `CERTIFIED / CLOSED (2026-11-11)`
-- **Commit ochrony Depuracji Legacy 1.0 (Z16):** `1b4d52a7b61326e503a3961e9c7257fcc6665a13` (pozostaje BEZ ZMIAN — 0 B diffu na plikach Z16)
-- **Stan metryk:** `342 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `413 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 12/12, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
-- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (342/342 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
+- **Commity Hotfixu 11.1.4b:** `03db100` (Commit 1), `bd52c4c` (Commit 2), `dd950ba` (Commit 3)
+- **Commity Hotfixu 11.1.5:**
+  * Commit 1 (`13afb4226d9c6ca1605ecf9116e107df4923f669`): `fix(translator,whisper,discourse,series_memory): Hotfix 11.1.5 - discourse telemetry gating, register validation, and in-memory SeriesBible sanitization`
+  * Commit 2 (`3c70a557b77ce2b83bf9bcf5875bf6fe57f70db7`): `test(tests): Hotfix 11.1.5 - regression tests for register gating, in-memory sanitization, gender stability, and italics tag normalization` — **NOWY COMMIT CERTYFIKACJI KODU**
+  * Commit 3 (`HEAD`): `docs: Hotfix 11.1.5 - sync SSOT to 11.1.5, record INC-AVT-026..027 and publish implementation report`
+- **Status 11.1.5:** `CERTIFIED / CLOSED (2026-11-11)`
+- **Commit ochrony Depuracji Legacy 1.0 (Z16):** `a6d40bb09d60b2d986d919de98044c6e2d9c838b` (`a6d40bb` — nienaruszalne 0 B diffu na plikach chronionych)
+- **Stan metryk:** `347 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `418 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 12/12, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
+- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (347/347 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
 - **Zasada utrzymaniowa post-11.1:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.1` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
-- **Gałąź i Architektura:** `main` (Standard 11.1.4b: Serializacja Inferencji CUDA z _infer_lock, Ochrona Przed Crashem CTranslate2 align na Modelach Kotoba/Distil, Certyfikacja Kodu `bd52c4c88e859b86e864ab9db96b8233a0be7d3e`, Nienaruszalny Baseline Z16 `1b4d52a7b61326e503a3961e9c7257fcc6665a13`, Zero-Literal Pure Positive Domain Invariant Architecture & Primary LLM Translation Authority)
+- **Gałąź i Architektura:** `main` (Standard 11.1.5: Bramkowanie Tagów Rejestru przez Metadane Mówcy, In-Memory Reconcyliacja i Sanitacja Bazy Serii, Filtr Składniowy 3. Osoby Adresata, Normalizacja Kursywy i Ochrona Glosariusza, Certyfikacja Kodu `3c70a557b77ce2b83bf9bcf5875bf6fe57f70db7`, Nienaruszalny Baseline Z16 `a6d40bb09d60b2d986d919de98044c6e2d9c838b`, Zero-Literal Pure Positive Domain Invariant Architecture & Primary LLM Translation Authority)
 - **Środowisko:** Python 3.13 (`.venv`), Windows PowerShell, `ffmpeg` (PATH), `librosa.pyin`, `soundfile`, `pysubs2`, `spaCy en_core_web_sm` (100% offline 0.00 PLN), bezpośrednie klucze Google AI Studio API (`use_vertex = 0`).
 - **Dyrektywa Wykonawcza Testów:**
   * Testy przyrostowe podczas kodowania (< 2 s): `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_testu>"`
@@ -190,12 +191,25 @@ W ramach autoryzowanego `Z16-amendment #3` usunięto warunek `f1_starts_lower` z
 - **Status:** `RESOLVED (Hotfix 11.1.4b, Commity 1–2 — certyfikacja kodu: bd52c4c88e859b86e864ab9db96b8233a0be7d3e)`
 - **Rozwiązanie:** Otoczenie wywołań `model.transcribe` oraz konsumpcji generatora `list(segments)` blokiem `with self._infer_lock:` w `transcribe_audio_slice` oraz `transcribe_batch_scene` (eliminacja kolizji wielowątkowej i błędu Access Violation 0xC0000005 w CTranslate2) oraz wyłączenie `word_timestamps=False` dla modeli o architekturze `kotoba`/`distil` (ochrona przed niestabilną funkcją C++ `Whisper::align` na 2-warstwowym dekoderze Distil-Whisper w float16).
 
+### 🔹 INC-AVT-030 (Hotfix 11.1.5 / INC-AVT-026 z audytu 20261111_211338: Bramkowanie tagów socjolingwistycznych Rejestr: przez profil postaci)
+- **Status:** `RESOLVED (Hotfix 11.1.5, Commity 1–2 — certyfikacja kodu: 3c70a557b77ce2b83bf9bcf5875bf6fe57f70db7)`
+- **Rozwiązanie:** Wdrożenie deterministycznej metody `WhisperDisambiguator.validate_pragmatic_register_against_speaker` weryfikującej zgodność wykrytych dynamicznych etykiet pragmatycznych z `character_dossiers`, `character_registry` oraz cechami mówcy: blokada `Rejestr dziewczęcy` dla mężczyzn i seniorów, blokada `Szorstki żołnierski / Bojowy` dla rejestru dworskiego bez krzyku bojowego w prozodii, neutralizacja `Feudalny poddańczy / Wasal` dla standardowego keigo bez archaizmów feudalnych oraz walidacja rejestrów gwarowych (0.00 PLN).
+
+### 🔹 INC-AVT-031 (Hotfix 11.1.5 / INC-AVT-027 z audytu 20261111_211338: Filtr składniowy 3. osoby adresata, in-memory sanitacja SeriesBible i ochrona glosariusza)
+- **Status:** `RESOLVED (Hotfix 11.1.5, Commity 1–2 — certyfikacja kodu: 3c70a557b77ce2b83bf9bcf5875bf6fe57f70db7)`
+- **Rozwiązanie:**
+  1. Wdrożenie `_is_third_person_syntactic_context` w `scene_discourse.py` eliminującego fałszywy `lock=True` po zwrotach 3. osoby (`on behalf of`, `under`, `worthy of`, `of`, `to`, dopełniacz saksoński `'s`, orzeczenia 3. os.) oraz filtr obecności w scenie z `dramatic_sequences.characters_present`.
+  2. Izolacja napisów ekranowych `is_sign` przed dziedziczeniem adresatów i czysta reprezentacja `SpeakerTurn` (eliminacja `'None'` i `'AMBIGUOUS'`).
+  3. Konsensus płci per aktor w odcinku (`compute_actor_gender_consensus`) i egzekwowanie `male_only_scene` / `female_only_scene` z topologii sekwencji dramatycznych.
+  4. In-memory reconcyliacja płci (`_reconcile_registry_gender_in_memory`), rewalidacja toponimów (`_sanitize_entity_categories_in_memory`) i wzbogacanie zdegenerowanych paradygmatów (`_enrich_declensions_from_profile`) w `series_memory.py` z zachowaniem 0 B diffu na dysku (Z16).
+  5. Normalizacja znaczników `<i>...</i>` i zbędnych tagów kursywy na stylach `Italics` oraz ochrona zablokowanego glosariusza przed dryfem synonimicznym Fazy 2 w `translator.py`.
+
 ---
 ## 📐 4. METRYKI OPERACYJNE POTOKU
 - **Ograniczenia Ekranu ASS:** `CPS_PL <= 17.0` (dyskwalifikacja `> 20.0`), `CPL <= 38`, max 2 wiersze.
 - **Podłoga Gęstości Seiyū:** `CPS_target(rho_x) = min(13.5, 7.5 + 0.5 * rho_x)` dla `rho_x >= 9.0 mor/s`.
 - **Progi Golden Corpus:** Anchor Scenes = **100.0% PASSED**, Broader Corpus `>= 99.0%`, Atrybucja Płci `>= 99.8%`.
-- **Macierz testowa Standardu 11.1.4b:** `tests/` = `342 passed`, `test_system.py` = `71 passed, 153 deselected` (`5/5` pułapek Z16 `PASS`, 0 failing, Zero Regression Lock).
+- **Macierz testowa Standardu 11.1.5:** `tests/` = `347 passed`, `test_system.py` = `71 passed, 153 deselected` (`5/5` pułapek Z16 `PASS`, 0 failing, Zero Regression Lock).
 
 ---
 
@@ -253,6 +267,7 @@ W ramach autoryzowanego `Z16-amendment #3` usunięto warunek `f1_starts_lower` z
 | **2026-11-11** | `ARB-048` | Socjolingwistyka / ASR | **Wdrożenie Hotfixu 11.1.4 (P1-1..P1-6)**: Odkotwiczenie fałszywych dopasowań dialektu na czasownikach pospolitych, obsługa rejestru wojowniczki (-aru/-yaru), ojou-sama (-masu wa, -desu koto) oraz dziewczęcego (-nano), detekcja code-switchingu JA/EN (CODE_SWITCH_EN), most idiolektów CharacterDossier -> brief, persystencja speech_register w SeriesBible, word-level ASR Whisper z dedupem prefiksów i ochrona etykiet @Handle w translator.py (Z16-amendment #10). | 0.00 PLN |
 | **2026-11-11** | `ARB-049` | Yakuwarigo / Dual / Cennik | **Wdrożenie Mikro-Hotfixu 11.1.4a (P2-RES-01, P2-RES-02, P3-RES-01, P3-RES-02)**: Priorytetyzacja rejestru -aru/-yaru i code-switchingu przed zaimkiem ore, wczesna synchronizacja rejestru do notes, arbitraż virility kwantyfikatora dualnego ('you two' / 'お二人') w diadach mieszanych, korekta tokenu hiragany やで oraz detekcja plansz wyliczeń punktowych w stylu Default (Z16-amendment #11). | 0.00 PLN |
 | **2026-11-11** | `ARB-050` | Whisper / CUDA Thread-Safety | **Wdrożenie Mikro-Hotfixu 11.1.4b**: Serializacja inferencji GPU `with self._infer_lock:`, wyłączenie niestabilnego CTranslate2::Whisper::align (`word_timestamps=False`) dla modeli Kotoba/Distil-Whisper i czulszy VAD min_silence_duration_ms=140. | 0.00 PLN |
+| **2026-11-11** | `ARB-051` | Dyskurs / Rejestr / Glosariusz | **Wdrożenie Hotfixu 11.1.5 (P1-1..P3-2)**: Bramkowanie telemetrii `Rejestr:` przez profil postaci (INC-AVT-030), in-memory reconcyliacja płci, toponimów i paradygmatów w `series_memory.py` (0 B diff na Z16), filtr składniowy 3. osoby `_is_third_person_syntactic_context` oraz obecności w scenie z `dramatic_sequences.characters_present` (INC-AVT-031), izolacja `is_sign`, konsensus płci aktora w odcinku, normalizacja znaczników `<i>` i ochrona zablokowanego glosariusza przed dryfem Fazy 2. | 0.00 PLN |
 
 ---
 
