@@ -4685,6 +4685,7 @@ class SeriesBible:
         description: str = "",
         has_verified_gender: bool = False,
         priority: str = "P1",
+        speech_register: Optional[str] = None,
         **kwargs
     ) -> Dict[str, Any]:
         """
@@ -4715,6 +4716,8 @@ class SeriesBible:
             elif clean_name and clean_name not in aliases:
                 aliases.append(clean_name)
 
+            speech_reg = speech_register or kwargs.get("speech_style_pl") or kwargs.get("speech_register")
+
             record = {
                 "name": clean_name,
                 "gender": norm_gender,
@@ -4726,6 +4729,8 @@ class SeriesBible:
                 "description": description or kwargs.get("role", "postać"),
                 "entity_category": kwargs.get("entity_category", "ANTHROPONYM")
             }
+            if speech_reg:
+                record["speech_register"] = str(speech_reg).strip()
             self.data["characters"][clean_name] = record
             return record
 
@@ -4736,7 +4741,9 @@ class SeriesBible:
         has_verified_gender: bool = True,
         declension_map: Optional[Dict[str, str]] = None,
         description: Optional[str] = None,
-        priority: str = "P0"
+        priority: str = "P0",
+        speech_register: Optional[str] = None,
+        **kwargs
     ) -> Dict[str, Any]:
         """
         Synchronizuje zweryfikowaną postać P0 z profilera do SeriesBible
@@ -4760,9 +4767,17 @@ class SeriesBible:
                     norm_gender = "UNKNOWN"
                     gram_gender = "UNKNOWN"
 
-            existing_char = self.data.get("characters", {}).get(clean_name, {})
             existing_aliases = existing_char.get("aliases", []) if isinstance(existing_char, dict) else []
             combined_aliases = list(dict.fromkeys([clean_name] + existing_aliases))
+            
+            existing_desc = existing_char.get("description", "") if isinstance(existing_char, dict) else ""
+            if "wyodrębniono z relacji serii" in existing_desc and (norm_gender in ("FEMALE", "MALE") or has_verified_gender):
+                final_desc = description or f"Postać ({norm_gender.lower()})"
+            else:
+                final_desc = description or existing_desc or f"Postać ({norm_gender.lower()})"
+
+            speech_reg = speech_register or kwargs.get("speech_style_pl") or kwargs.get("speech_register") or (existing_char.get("speech_register") if isinstance(existing_char, dict) else None)
+
             record = {
                 "name": clean_name,
                 "gender": norm_gender,
@@ -4771,9 +4786,11 @@ class SeriesBible:
                 "priority": priority,
                 "has_verified_gender": has_verified_gender,
                 "aliases": combined_aliases,
-                "description": description or existing_char.get("description") or f"Postać ({norm_gender.lower()})",
+                "description": final_desc,
                 "entity_category": "ANTHROPONYM"
             }
+            if speech_reg:
+                record["speech_register"] = str(speech_reg).strip()
             self.data["characters"][clean_name] = record
             
             if declension_map:
@@ -9537,7 +9554,11 @@ class SeriesBible:
                 lines.append("• Postacie obecne w scenie:")
                 for name, info in scoped_chars.items():
                     desc = info.get("description", "") if isinstance(info, dict) else str(info)
-                    lines.append(f"  - {name}: {desc}")
+                    sp_reg = info.get("speech_register") if isinstance(info, dict) else None
+                    if sp_reg:
+                        lines.append(f"  - {name}: {desc} [Rejestr: {sp_reg}]")
+                    else:
+                        lines.append(f"  - {name}: {desc}")
                 has_content = True
 
             if scoped_rels:

@@ -806,6 +806,10 @@ class DialogueVerifier:
                 prompt_lines.append(
                     "• [PARAFRAZA GWARY: Gdy postać A mówi gwarą/slangiem, a postać B tłumaczy lub parafrazuje jej słowa reszcie grupy, zachowaj wyrazisty kontrast stylistyczny — postać A ma brzmieć szorstko i potocznie, a postać B gładko w polszczyźnie ogólnej]."
                 )
+            if any(k in focused_rules_str.lower() for k in ["ojou", "arystokrat", "dystyngow", "rejestr wysoki", "filar xiv", "dama"]):
+                prompt_lines.append(
+                    "• [OCHRONA WYSOKIEGO REJESTRU: Gdy postać posługuje się rejestrem arystokratycznym lub ojou-sama, terminy ekwipunku i losowości wyrażaj polszczyzną literacką i dystyngowaną (ekwipunek, rynsztunek, szczęście), zachowując czystość wysokiego rejestru wypowiedzi]."
+                )
 
         # Known Characters in episode for role and status continuity (Just-In-Time Scoped)
         if character_registry:

@@ -1663,6 +1663,7 @@ FILAR CLXIV: ŚCISŁA KONTROLA ORTOGRAFII, LITERÓWEK I CZASOWNIKÓW PYTAJĄCYCH
         * 'narazie' -> 'na razie'
         * 'z przed' -> 'sprzed'
         * 'z poza' -> 'spoza'
+        * 'kope lat' -> 'kopę lat'
 
 FILAR CLXV: DYSKONTINUITET CZASOWY, PRZESKOKI SCEN I ODCZAROWANIE FAŁSZYWEGO PRZYLEGANIA (TEMPORAL DISCONTINUITY & SCENE BOUNDARY RESET PROTOCOL):
    1. PUŁAPKA OPÓŹNIONEGO POTWIERDZENIA (DELAYED AGREEMENT FALLACY):
@@ -1745,6 +1746,7 @@ FILAR CLXIX: DYSCYPLINA SOCJOLEKTU I OCHRONA KSYWEK RÓWIEŚNICZYCH I MORFOLOGIC
    1. ELIMINACJA EKSTERYTORIALNEGO WYCIEKU KSYWEK RÓWIEŚNICZYCH (SPEAKER-SCOPED HYPOCORISM GUARD):
       - Specyficzne, slangowe lub pieszczotliwe ksywki rówieśnicze i gyaru (wzorce: '[Zdrobniała Ksywka]', '[Imię]-chan') są ściśle ograniczone do postaci, która je nadała w danej relacji.
       - Eliminujemy kalkę przypisywania ksywek szkolnych/gyaru rodzicom, ojcom, nauczycielom, mentorom oraz postaciom w retrospekcjach (Flashback)!
+      - Zdrobnienia i ksywki rówieśnicze z przyrostkiem '-cchi' używane w relacji rówieśniczej zachowują końcówkę '-cchi' w mianowniku i wołaczu jako element idiolektu mówcy.
       - Gdy matka w audio seiyū mówi '[Imię]-chan', jedynym naturalnym polskim ekwiwalentem jest '[Imię]', 'Córeczko' lub '[Zdrobniałe Imię]' (Kalka: '[Zdrobniała Ksywka], posłuchaj uważnie').
    2. MORFOLOGICZNY PRYMAT PŁCI I SANITYZACJA ZNACZNIKÓW STYLU (INHERENT GENDER RECOGNITION):
       - Nazwy mówców w skryptach ASS często zawierają techniczne znaczniki stylów lub kontekstu ('Girl\\Italic', 'Woman\\Flashback', 'Girl (young)').
@@ -2572,6 +2574,7 @@ def get_focused_rules_for_batch(
     )
     has_slang_en = bool(en_slang_pat.search(combined_en))
     has_dialect_jp = "DIALECT_JP" in jp_categories
+    has_code_switch = "CODE_SWITCH_EN" in jp_categories
     has_paraphrase = bool(paraphrase_pat.search(combined_en)) or any(paraphrase_pat.search(item.get("pl", "")) for item in batch_items)
     has_exalted = bool(exalted_pat.search(combined_en)) or ("DIALECT_JP" in jp_categories)
     has_dialect_indicator = any(
@@ -2580,14 +2583,18 @@ def get_focused_rules_for_batch(
         for item in batch_items
     )
 
-    if has_slang_en or has_dialect_jp or has_paraphrase or has_dialect_indicator or has_exalted:
-        focused_pillars.append(
-            (95,
+    if has_slang_en or has_dialect_jp or has_code_switch or has_paraphrase or has_dialect_indicator or has_exalted:
+        msg_dyn1 = (
             "• [SKUP SIĘ NA: FILAR XIII & XII - Dialekty Regionalne, Gwara, Sociolekty i Kontrast Rejestrów]: "
             "Kwestie postaci posługującej się gwarą, slangiem lub dialektem regionalnym oddawaj przez wyrazistą polszczyznę potoczną i stylizację środowiskową. "
             "Przy parafrazie wypowiedzi przez inną postać zachowuj kontrast stylistyczny między surowym idiolektem a mową ogólną. "
-            "Prawidłowym stanem indywidualnego głosu postaci jest pełna ciągłość jej idiolektu, rejestru środowiskowego, egzaltowanej maniery retorycznej lub charakterystycznej maniery artykulacyjnej na przestrzeni całego odcinka poprzez dobór nacechowanej leksyki i szyku wyrazów przy zachowaniu pełnej czytelności polskiej ortografii.")
+            "Prawidłowym stanem indywidualnego głosu postaci jest pełna ciągłość jej idiolektu, rejestru środowiskowego, egzaltowanej maniery retorycznej lub charakterystycznej maniery artykulacyjnej na przestrzeni całego odcinka poprzez dobór nacechowanej leksyki i szyku wyrazów przy zachowaniu pełnej czytelności polskiej ortografii."
         )
+        if has_code_switch:
+            msg_dyn1 += (
+                " Gdy w japońskim audio postać celowo wplata pojedyncze angielskie słowa lub hybrydowe zwroty katakanowe dla efektu humorystycznego bądź charakterologicznego, zachowaj ten rejestr i ładunek komiczny w polskiej ripoście."
+            )
+        focused_pillars.append((95, msg_dyn1))
 
     # DYN_2: Archaizacja, Etykieta Dworska i Rejestr Wysoki (score=92)
     has_archaic_en = bool(re.search(r"\b(?:milord|my liege|your majesty|thou|thee|thy|thine|sire|highness|sovereign)\b", combined_en, re.IGNORECASE))

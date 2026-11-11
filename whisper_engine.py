@@ -236,7 +236,8 @@ class JapaneseWhisperEngine:
                 "condition_on_previous_text": False,
                 "repetition_penalty": 1.2,
                 "no_repeat_ngram_size": 3,
-                "compression_ratio_threshold": 2.4
+                "compression_ratio_threshold": 2.4,
+                "word_timestamps": True
             }
             if initial_prompt:
                 transcribe_kwargs["initial_prompt"] = initial_prompt
@@ -247,7 +248,8 @@ class JapaneseWhisperEngine:
             )
             segments_list = list(segments)
 
-            result: Dict[int, List[str]] = {b_id: [] for b_id, _ in events}
+            result_words: Dict[int, List[str]] = {b_id: [] for b_id, _ in events}
+            result_segs: Dict[int, List[str]] = {b_id: [] for b_id, _ in events}
             
             for seg in segments_list:
                 seg_text = seg.text.strip()
@@ -256,19 +258,48 @@ class JapaneseWhisperEngine:
                 # Segment timestamp in milliseconds in episode timeline
                 seg_start_abs = batch_start_ms + int(seg.start * 1000)
                 seg_end_abs = batch_start_ms + int(seg.end * 1000)
+                seg_dur = max(1, seg_end_abs - seg_start_abs)
 
-                for b_id, ev in events:
-                    # Sign isolation: signs receive empty ASR transcription
-                    if getattr(ev, "is_sign", False) or str(getattr(ev, "style", "")).lower() in ("sign", "signs", "napis", "napisy"):
-                        continue
-                    # Strict event boundary checking [start, end]
-                    overlap_start = max(ev.start, seg_start_abs)
-                    overlap_end = min(ev.end, seg_end_abs)
-                    if (overlap_end - overlap_start) > 80 or (ev.start <= seg_start_abs and ev.end >= seg_end_abs):
-                        if seg_text not in result[b_id]:
-                            result[b_id].append(seg_text)
+                seg_words = getattr(seg, "words", None) or []
+                if seg_words:
+                    for w in seg_words:
+                        w_text = getattr(w, "word", "")
+                        if not w_text:
+                            continue
+                        w_start_abs = batch_start_ms + int(getattr(w, "start", 0.0) * 1000)
+                        w_end_abs = batch_start_ms + int(getattr(w, "end", 0.0) * 1000)
+                        w_mid_abs = (w_start_abs + w_end_abs) // 2
+                        w_dur = max(1, w_end_abs - w_start_abs)
 
-            return {b_id: "".join(texts).strip() for b_id, texts in result.items() if texts}
+                        for b_id, ev in events:
+                            if getattr(ev, "is_sign", False) or str(getattr(ev, "style", "")).lower() in ("sign", "signs", "napis", "napisy"):
+                                continue
+                            overlap_w_start = max(ev.start, w_start_abs)
+                            overlap_w_end = min(ev.end, w_end_abs)
+                            overlap_w_dur = max(0, overlap_w_end - overlap_w_start)
+                            if (ev.start - 120 <= w_mid_abs <= ev.end + 120) or (overlap_w_dur / w_dur >= 0.5):
+                                result_words[b_id].append(w_text)
+                else:
+                    for b_id, ev in events:
+                        # Sign isolation: signs receive empty ASR transcription
+                        if getattr(ev, "is_sign", False) or str(getattr(ev, "style", "")).lower() in ("sign", "signs", "napis", "napisy"):
+                            continue
+                        # Strict event boundary checking [start, end]
+                        event_dur = max(1, ev.end - ev.start)
+                        overlap_start = max(ev.start, seg_start_abs)
+                        overlap_end = min(ev.end, seg_end_abs)
+                        overlap_dur = overlap_end - overlap_start
+                        if overlap_dur > 80 and (overlap_dur >= 0.25 * event_dur or overlap_dur >= 0.35 * seg_dur or (ev.start <= seg_start_abs and ev.end >= seg_end_abs)):
+                            if seg_text not in result_segs[b_id]:
+                                result_segs[b_id].append(seg_text)
+
+            final_res: Dict[int, str] = {}
+            for b_id, _ in events:
+                if result_words[b_id]:
+                    final_res[b_id] = "".join(result_words[b_id]).strip()
+                elif result_segs[b_id]:
+                    final_res[b_id] = "".join(result_segs[b_id]).strip()
+            return final_res
         except Exception as e:
             logger.warning(f"Batch Whisper transcription error: {e}")
             return {}

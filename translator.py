@@ -430,9 +430,15 @@ def detect_event_visual_type(event: pysubs2.SSAEvent, ts_prefix: str = "", style
     clean_t = re.sub(r"\{[^}]*\}", "", text_raw).strip()
     has_letters = bool(re.search(r"[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ]", clean_t))
     has_lowercase = bool(re.search(r"[a-ząćęłńóśźż]", clean_t))
+    has_geom_tag = bool(re.search(r"\\(?:pos|an[789]|frz|clip|org|move)\b", text_raw))
+    is_dialogue_style = style_lower in ("default", "dialogue", "main", "alt", "normal", "speech")
+    is_short_spoken_call = (getattr(event, "duration", 0) <= 2500 or (event.end - event.start) <= 2500) and not has_geom_tag
     if has_letters and not has_lowercase:
-        is_sign = True
-        details.append("Tekst bez małych liter (ALL CAPS)")
+        if is_dialogue_style and is_short_spoken_call:
+            pass
+        else:
+            is_sign = True
+            details.append("Tekst bez małych liter (ALL CAPS)")
 
     style_is_sub = bool(re.search(r"\bsubtitles?\b", style_lower))
     if not style_is_sub and (
@@ -966,8 +972,8 @@ def detect_japanese_pragmatic_register(jp_text: str, en_text: str = "") -> Optio
     if any(k in clean_jp for k in ["ござる", "でございます", "ございます", "申す", "仕る", "殿", "上様", "かしこまり", "畏まり"]) or any(k in rom_lower for k in ["gozaru", "gozaimasu", "mousu", "tsukamatsuru", "dono", "uesama", "kashikomari"]):
         return "Feudalny poddańczy / Wasal (stylizacja na 'Panie mój / Wasza Miłość', szacunek poddańczy)"
         
-    # 2. Aristocratic / Ojou-sama / Noble Lady (-desu wa, -kashira, -asobase)
-    if any(k in clean_jp for k in ["ですわ", "かしら", "あそばせ", "わたくし"]) or any(k in rom_lower for k in ["desu wa", "kashira", "asobase", "watakushi"]):
+    # 2. Aristocratic / Ojou-sama / Noble Lady (-desu wa, -masu wa, -desu koto, -kashira, -asobase)
+    if any(k in clean_jp for k in ["ですわ", "ますわ", "ですこと", "ありませんこと", "ますのよ", "かしら", "あそばせ", "わたくし"]) or any(k in rom_lower for k in ["desu wa", "masu wa", "desu koto", "arimasen koto", "masu no yo", "kashira", "asobase", "watakushi"]):
         return "Arystokratyczny / Ojou-sama (elegancka, dystyngowana polszczyzna damy)"
         
     # 3. Tough Soldier / Battle Slang (-ze, -zo, temee, kisama, ore)
@@ -978,8 +984,8 @@ def detect_japanese_pragmatic_register(jp_text: str, en_text: str = "") -> Optio
     if any(k in clean_jp for k in ["ぼく", "ボク", "おいら", "ボクちゃん", "ぼくちゃん", "にいちゃん", "ねえちゃん"]) or any(k in rom_lower for k in ["boku ", "boku,", "boku-", "oira", "niichan", "neechan", "boku wa", "boku ga"]):
         return "Rejestr młodzieńczy / chłopięcy (głos dziecięcy seiyū, tożsamość podmiotu: rodzaj męski)"
 
-    # 5. Rejestr dziewczęcy (Atashi, Uchi, Onii-chan, Onee-chan, -na no)
-    if any(k in clean_jp for k in ["あたち", "あたし", "ウチ", "お兄ちゃん", "お姉ちゃん", "おにいちゃん", "おねえちゃん"]) or any(k in rom_lower for k in ["atashi", "atachi", "onii-chan", "onee-chan", "oniichan", "oneechan"]):
+    # 5. Rejestr dziewczęcy (Atashi, Uchi, Onii-chan, Onee-chan, -na no, -ttanano, -danano)
+    if any(k in clean_jp for k in ["あたち", "あたし", "ウチ", "お兄ちゃん", "お姉ちゃん", "おにいちゃん", "おねえちゃん", "ったなの", "だなの"]) or any(k in rom_lower for k in ["atashi", "atachi", "onii-chan", "onee-chan", "oniichan", "oneechan", "ttanano", "danano", "sorotta nano"]):
         return "Rejestr dziewczęcy (wysoki tembr seiyū, tożsamość podmiotu: rodzaj żeński)"
 
     # 6. Youth / Casual Slang (-ssu, -yatsu, -chatt, -tteba)
@@ -1017,6 +1023,17 @@ def detect_japanese_pragmatic_register(jp_text: str, en_text: str = "") -> Optio
     # 14. Rejestr gwarowy surowy (Namara, Shibareru, Shitakke)
     if any(k in clean_jp for k in ["なまら", "しばれる", "したっけ"]) or any(k in rom_lower for k in ["namara", "shibareru", "shitakke"]):
         return "Rejestr gwarowy surowy (lakoniczna, powściągliwa ekspresja północy)"
+
+    # 15. Rejestr wojowniczki / potoczysty (-aru/-yaru)
+    if any(k in clean_jp for k in ["あるよ", "あるね", "あるな", "やるか", "やるね", "やるよ", "くれ給え", "くれたまえ"]) or any(k in rom_lower for k in ["-aru", " aru yo", " aru ne", " aru na", "yaru ka", "yaru ne", "kuretamae"]):
+        return "Stylizowany rejestr wojowniczki (-aru/-yaru: wyrazista, cięta, potoczysta składnia indywidualna)"
+
+    # 16. Code-switching JA+EN
+    jp_cs_pat = re.compile(r"(?:[ァ-ヶー]{4,}(?:します|した|して|する)|オーケーオッケ|オッケーオッケ|テンション上げ|\b(?:rifurekuto\s*shimasu|tenshon\s*age|ookee\s*okkee|ookeeokke)\b)", re.IGNORECASE)
+    if jp_cs_pat.search(clean_jp) or jp_cs_pat.search(rom_lower):
+        excluded_loanwords = ("クリア", "装備", "ガード", "チェック", "スタート", "セーブ", "ロード", "スキップ")
+        if not any(excl in clean_jp for excl in excluded_loanwords):
+            return "Code-switching JA+EN (celowe wtrącenie angielskie w wypowiedzi japońskiej – zachowaj zabarwienie komiczne/stylistyczne)"
         
     return None
 
@@ -3151,7 +3168,7 @@ class MultimodalTranslator:
                 canonical_entities.update(list(self.series_bible.data.get("characters", {}).keys()))
             for ent in canonical_entities:
                 clean_ent = extract_clean_speaker_name(ent).strip()
-                if clean_ent and len(clean_ent) >= 3 and clean_ent[0].isupper() and "->" not in clean_ent:
+                if clean_ent and len(clean_ent) >= 3 and (clean_ent[0].isupper() or clean_ent.startswith("@")) and "->" not in clean_ent:
                     pattern_parts = []
                     for c in clean_ent:
                         base = unicodedata.normalize("NFD", c)[0]
@@ -3159,7 +3176,9 @@ class MultimodalTranslator:
                             pattern_parts.append(f"[{re.escape(c)}{re.escape(base)}]")
                         else:
                             pattern_parts.append(re.escape(c))
-                    pattern = r"(?i)\b" + "".join(pattern_parts) + r"\b"
+                    prefix_bound = r"(?<!\w)" if clean_ent.startswith("@") else r"\b"
+                    suffix_bound = r"\b"
+                    pattern = r"(?i)" + prefix_bound + "".join(pattern_parts) + suffix_bound
                     clean_display_text = re.sub(pattern, clean_ent, clean_display_text)
 
             if vtype["is_sign"]:
@@ -3841,6 +3860,7 @@ class MultimodalTranslator:
                         local_asr_last_seen_end_sec: Dict[str, float] = {}
                         local_asr_last_text = ""
                         local_asr_consecutive_streak = 0
+                        prev_raw_jp_kanji = ""
 
                         for b_id, ev in events_tuples:
                             if getattr(ev, "is_sign", False) or str(getattr(ev, "style", "")).lower() in ("sign", "signs", "napis", "napisy") or is_sign_entity(getattr(ev, "name", "")):
@@ -3849,11 +3869,19 @@ class MultimodalTranslator:
 
                             raw_txt = whisper_transcriptions.get(b_id, "")
                             raw_s = raw_txt.get("text", "") if isinstance(raw_txt, dict) else str(raw_txt or "")
+
+                            # Usuwanie powtórzonego prefiksu ASR z poprzedniej linii przy sklejeniu wypowiedzi
+                            if prev_raw_jp_kanji and len(prev_raw_jp_kanji) >= 4 and raw_s.startswith(prev_raw_jp_kanji) and len(raw_s) > len(prev_raw_jp_kanji):
+                                raw_s = raw_s[len(prev_raw_jp_kanji):].strip()
+
                             san_txt = EpisodeProfiler.sanitize_event_asr(
                                 raw_s,
                                 is_sign=getattr(ev, "is_sign", False),
                                 style=getattr(ev, "style", None)
                             )
+                            cur_clean_k = re.sub(r"\[.*?\]", "", san_txt).strip()
+                            if cur_clean_k:
+                                prev_raw_jp_kanji = cur_clean_k
                             cur_start_sec = ev.start / 1000.0
                             cur_end_sec = ev.end / 1000.0
                             norm_jp = re.sub(r"\[.*?\]", "", san_txt).strip()
@@ -3927,11 +3955,28 @@ class MultimodalTranslator:
                 if is_short_spoken_reply(clean_txt):
                     is_internal_monologue = False
             vtype_info = detect_event_visual_type(ev, ts_pref, style_report=getattr(self, "style_report", None))
+            spk_ev_name = ev.name or ""
+            sp_style = ""
+            if episode_profile and getattr(episode_profile, "character_dossiers", None):
+                for cd in episode_profile.character_dossiers:
+                    cd_n = getattr(cd, "name", "")
+                    if cd_n and (cd_n.lower() == spk_ev_name.lower() or extract_clean_speaker_name(cd_n).lower() == extract_clean_speaker_name(spk_ev_name).lower()):
+                        sp_style = getattr(cd, "speech_style_pl", "") or getattr(cd, "idiolect_matrix", "")
+                        break
+            if not sp_style and getattr(self, "series_bible", None) and hasattr(self.series_bible, "data"):
+                spk_char_data = self.series_bible.data.get("characters", {}).get(spk_ev_name, {})
+                if isinstance(spk_char_data, dict):
+                    sp_style = spk_char_data.get("speech_register", "")
+
+            audio_jp_val = (whisper_transcriptions.get(b_id, "") if whisper_transcriptions else "") if not vtype_info["is_sign"] else ""
+            jp_raw_text = str(audio_jp_val.get("text", "")).strip() if isinstance(audio_jp_val, dict) else str(audio_jp_val or "").strip()
+            prag_note = detect_japanese_pragmatic_register(jp_raw_text, clean_txt) if jp_raw_text else ""
+
             batch_items_for_rules.append({
                 "id": b_id,
                 "orig_idx": orig_idx,
                 "en": clean_txt,
-                "audio_jp": (whisper_transcriptions.get(b_id, "") if whisper_transcriptions else "") if not vtype_info["is_sign"] else "",
+                "audio_jp": audio_jp_val,
                 "style": style_str,
                 "is_thought": is_th,
                 "is_internal_monologue": is_internal_monologue,
@@ -3943,7 +3988,9 @@ class MultimodalTranslator:
                 "speaker_name": ev.name or "UNKNOWN",
                 "prosody": (prosody_tags.get(b_id, "") if not vtype_info["is_sign"] else ""),
                 "speaker_voice": (speaker_tags.get(b_id, "") if not vtype_info["is_sign"] else ""),
-                "is_song": is_song_line(ev, clean_txt)
+                "is_song": is_song_line(ev, clean_txt),
+                "speech_style_pl": sp_style,
+                "notes": prag_note or ""
             })
         focused_rules_str = get_focused_rules_for_batch(batch_items_for_rules, max_rules=3)
 
@@ -4316,6 +4363,12 @@ class MultimodalTranslator:
 
             audio_discrepancy_msg = detect_audio_discrepancy(audio_jp_str, pl_candidate, clean_en, prosody=prosody_tags.get(batch_id, ""))
             pragmatic_reg = detect_japanese_pragmatic_register(audio_jp_str, clean_en)
+            if pragmatic_reg and not vtype["is_sign"]:
+                short_reg = pragmatic_reg.split("(")[0].strip()
+                if line_dry_telemetry and line_dry_telemetry.endswith("]"):
+                    line_dry_telemetry = line_dry_telemetry[:-1] + f" | Rejestr: {short_reg}]"
+                elif not line_dry_telemetry:
+                    line_dry_telemetry = f"[Rejestr: {short_reg}]"
 
             # Ping-pong dialogowy (Filar CXLVI & XLIII) oraz Ciągłość Międzybatchowa
             relation_tag = ""

@@ -119,7 +119,13 @@ class CharacterDossier(BaseModel):
 
 
 RE_JP_DIALECT_MARKERS = re.compile(
-    r"\b(?:ya|yan|yade|yaro|nen|seya|akan|honma|dappe|dabe|ora|washi|atai|wai|wagahai|jaken|koraa|suitoo|nankurunaisa|haisai|namara|shibareru)\b|べ|だべ|じゃけん|やん|やで|やろ|ねん|せや|あかん|ほんま|おら|わし|あたい|わい|吾輩",
+    r"\b(?:ya|yan|yade|yaro|nen|seya|akan|honma|dappe|dabe|washi|atai|wai|wagahai|jaken|koraa|suitoo|nankurunaisa|haisai|namara|shibareru|"
+    r"desu\s*wa|masu\s*wa|desu\s*koto|arimasen\s*koto|masu\s*no\s*yo|naissu|ssu\s*kedo|ssu\s*ne|ssu\s*yo|ttanano|danano|kuretamae)\b|"
+    r"だべ|じゃけん|やん|やで|やろ|ねん|せや|あかん|ほんま|わし|あたい|わい|吾輩|"
+    r"(?:(?:いく|行(?:く)?|すっ|やる|だ)べ(?:[！？!?。、\s]|$)|(?:^|[、。\s])おら(?:は|が|の|に|を|も|たち|っち)|"
+    r"(?:てる|でる|はず|だけ|こと|いい|ない|な)ある(?:よ|ね|か|な)*(?:[！？!?。、\s]|$)|"
+    r"(?:いい|ない|な|何)やる(?:か|ね|よ)*(?:[！？!?。、\s]|$))|"
+    r"ですわ|ますわ|ですこと|ありませんこと|ますのよ|ないっす|っすけど|っすね|っすよ|ったなの|だなの|くれたまえ",
     re.IGNORECASE
 )
 
@@ -309,6 +315,16 @@ def format_lean_episode_brief(profile: Any, character_audio_transcriptions: Opti
                         or (idiolect and any(k in str(idiolect).lower() for k in ["gwara", "dialekt", "slang"]))
                         or (audio_trans and bool(RE_JP_DIALECT_MARKERS.search(str(audio_trans))))
                     )
+                    style_parts = []
+                    if speech_style:
+                        style_parts.append(str(speech_style).strip())
+                    if idiolect and idiolect != speech_style:
+                        style_parts.append(str(idiolect).strip())
+                    if style_parts:
+                        combined_style = " | ".join(style_parts)
+                        if len(combined_style) > 180:
+                            combined_style = combined_style[:177] + "..."
+                        lines.append(f"    Styl i idiolekt: {combined_style}")
                     if has_dialect_indicator:
                         lines.append("    Rejestr: wyrazista gwara / stylizacja środowiskowa")
                     if str(g).lower() in ("female", "kobieta") and (is_inherently_female_name(name) or any(w in (str(role) + " " + str(voc)).lower() for w in ["alt", "starsza", "dojrzała", "ochrypł", "babci", "matron", "cesarzow", "chatun", "służąc", "niewolnic", "powiernicz", "kobieta", "dziewczyn"])):

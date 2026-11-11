@@ -727,6 +727,8 @@ class AVTLinter:
         (r"\b([Pp])omiędzy\s+tobą\s+i\s+mną\b", lambda m: "Między nami" if m.group(1)[0].isupper() else "między nami", "PWN - Związek Przyimkowy (między nami)"),
         (r"\b([Pp])omiędzy\s+nami\b", lambda m: "Między nami" if m.group(1)[0].isupper() else "między nami", "PWN - Związek Przyimkowy (między nami)"),
         (r"\b([Ww])\s+mrugnięciu\s+oka\b", lambda m: "W mgnieniu oka" if m.group(1)[0].isupper() else "w mgnieniu oka", "PWN - Frazeologia (w mgnieniu oka)"),
+        (r"\bKope\s+lat\b", "Kopę lat", "Filar CLXIV - Ortografia (Kopę lat)"),
+        (r"\bkope\s+lat\b", "kopę lat", "Filar CLXIV - Ortografia (kopę lat)"),
 
         # Real-time Invariant Safeguards (Deterministyczne Normy Morfologiczne i Afekt Seiyū - 0.00 PLN)
         (r"\b([Ii])mperiuma\b", r"\1mperium", "Rzeczowniki Nieodmienne na -um (Imperium)"),

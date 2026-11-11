@@ -681,28 +681,37 @@ class WhisperDisambiguator:
         - "CULTURE_JP"
         - "AISATSU_JP"
         - "SEIYU_SOVEREIGNTY_JP"
+        - "CODE_SWITCH_EN"
         """
         categories: Set[str] = set()
         en_lower = (combined_en or "").lower()
         jp_lower = (combined_jp or "").lower()
         full_text = f"{en_lower} {jp_lower}"
 
-        # 1. DIALECT_JP (Dialekty, gwary, sociolekty)
+        # 1. DIALECT_JP (Dialekty, gwary, sociolekty, yakuwarigo)
         jp_dialect_pat = re.compile(
-            r"\b(?:ya|yan|yade|yaro|nen|seya|akan|honma|dappe|dabe|ora|washi|atai|wai|wagahai|jaken|koraa|suitoo|nankurunaisa|haisai|namara|shibareru|べ|だべ|じゃけん|やん|やde|yaro|ねん|せや|あかん|ほんま|おら|わし|あたい|わい|吾輩)\b",
+            r"\b(?:ya|yan|yade|yaro|nen|seya|akan|honma|dappe|dabe|washi|atai|wai|wagahai|jaken|koraa|suitoo|nankurunaisa|haisai|namara|shibareru|だべ|じゃけん|やん|やde|yaro|ねん|せや|あかん|ほんま|わし|あたい|わい|吾輩|desu\s*wa|masu\s*wa|desu\s*koto|arimasen\s*koto|masu\s*no\s*yo|naissu|ssu\s*kedo|ssu\s*ne|ssu\s*yo|ttanano|danano|kuretamae)\b",
             re.IGNORECASE
         )
         character_suffix_pat = re.compile(
             r"(?:^|[\s\-])(?:dechu|nyan|pyon|zura|gero|dabe)\b",
             re.IGNORECASE
         )
-        jp_dialect_tokens = ["べ", "だべ", "じゃけん", "やん", "やde", "やろ", "ねん", "せや", "あかん", "ほんま", "おら", "わし", "あたい", "わい", "吾輩"]
+        jp_anchored_dialect_re = re.compile(
+            r"(?:(?:いく|行(?:く)?|すっ|やる|だ)べ(?:[！？!?。、\s]|$)|(?:^|[、。\s])おら(?:は|が|の|に|を|も|たち|っち)|(?:てる|でる|はず|だけ|こと|いい|ない|な)ある(?:よ|ね|か|な)*(?:[！？!?。、\s]|$)|(?:いい|ない|な|何)やる(?:か|ね|よ)*(?:[！？!?。、\s]|$))"
+        )
+        jp_dialect_tokens = [
+            "だべ", "じゃけん", "やん", "やde", "やろ", "ねん", "せや", "あかん", "ほんま",
+            "わし", "あたい", "わい", "吾輩", "ですわ", "ますわ", "ですこと", "ありませんこと",
+            "ますのよ", "ないっす", "っすけど", "っすね", "っすよ", "ったなの", "だなの", "くれたまえ"
+        ]
         if (
             jp_dialect_pat.search(jp_lower)
             or jp_dialect_pat.search(en_lower)
             or any(tok in jp_lower for tok in jp_dialect_tokens)
             or character_suffix_pat.search(jp_lower)
             or character_suffix_pat.search(en_lower)
+            or jp_anchored_dialect_re.search(jp_lower)
         ):
             categories.add("DIALECT_JP")
 
@@ -783,5 +792,23 @@ class WhisperDisambiguator:
         jp_seiyu_tokens = ["うるさい", "うるせえ", "うっせえ", "黙れ", "ただいま"]
         if jp_seiyu_pat.search(full_text) or any(tok in jp_lower for tok in jp_seiyu_tokens):
             categories.add("SEIYU_SOVEREIGNTY_JP")
+
+        # 10. CODE_SWITCH_EN (Code-switching JA+EN w dialogu japońskim)
+        jp_codeswitch_pat = re.compile(
+            r"(?:[ァ-ヶー]{4,}(?:します|した|して|する)|オーケーオッケ|オッケーオッケ|テンション上げ|\b(?:rifurekuto\s*shimasu|tenshon\s*age|ookee\s*okkee|ookeeokke)\b)",
+            re.IGNORECASE
+        )
+        excluded_loanwords = ("クリア", "装備", "ガード", "チェック", "スタート", "セーブ", "ロード", "スキップ")
+        if jp_codeswitch_pat.search(jp_lower) or jp_codeswitch_pat.search(en_lower):
+            matched_str = ""
+            m_jp = jp_codeswitch_pat.search(jp_lower)
+            if m_jp:
+                matched_str = m_jp.group(0)
+            else:
+                m_en = jp_codeswitch_pat.search(en_lower)
+                if m_en:
+                    matched_str = m_en.group(0)
+            if not any(excl in matched_str for excl in excluded_loanwords):
+                categories.add("CODE_SWITCH_EN")
 
         return categories
