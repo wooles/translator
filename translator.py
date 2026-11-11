@@ -198,7 +198,9 @@ def format_dry_telemetry_tag(
         else:
             segments.append(f"Mówca: {spk}")
 
-    if _is_valid_telemetry_val(tgt) and tgt_c >= 0.80:
+    tgt_name_clean = str(tgt_n or "").strip()
+    is_generic_tgt = tgt_name_clean.lower() in {"mężczyzna", "kobieta", "mężczyźni", "kobiety", "brak", "none", "unspecified"}
+    if _is_valid_telemetry_val(tgt) and tgt_c >= 0.80 and not is_generic_tgt:
         if _is_valid_telemetry_val(tgt_n):
             segments.append(f"Adresat: {tgt_n} ({tgt})")
         else:
@@ -221,6 +223,104 @@ def format_dry_telemetry_tag(
         return ""
 
     return f"[{' | '.join(segments)}]"
+
+
+def enforce_locked_glossary_terms(
+    en_text: str,
+    candidate_pl: str,
+    glossary_entries: Optional[List[Any]] = None,
+    phase1_pl: Optional[str] = None
+) -> str:
+    """
+    Hotfix 11.1.6 (Zadanie 1.1 / E-11):
+    Egzekwuje kanoniczne wpisy glosariusza (episode_profile.glossary / combined_glossary)
+    zarówno na etapie Fazy 1, jak i po Fazie 2 weryfikacji.
+    1. Rozpoznaje rdzenie EN bez prefiksów tytularnych (Lord, Lady, Sir, etc.) oraz formy lm.
+    2. Koryguje odwrócone synonimy przymiotnikowe do kanonicznej konstrukcji Rzeczownik + Dopełniacz.
+    3. Zabezpiecza formę z Fazy 1 przed degradacją w Fazie 2.
+    """
+    if not candidate_pl or not glossary_entries:
+        return candidate_pl
+
+    TITLE_PREFIXES = {
+        "lord", "lady", "sir", "master", "duke", "prince", "count", "viscount",
+        "king", "queen", "saint", "grandmaster", "archmage"
+    }
+
+    def _get_noun_stem(noun: str) -> str:
+        n = noun.lower().strip()
+        if n.endswith("rzec"):
+            return n[:-4] + "r"
+        if n.endswith("ec") or n.endswith("ek") or n.endswith("ca") or n.endswith("ka"):
+            return n[:-2]
+        if n.endswith("ik") or n.endswith("nik"):
+            return re.sub(r"n?ik$", "", n)
+        return re.sub(r"[aąeęioóuy]$", "", n)
+
+    updated_pl = candidate_pl
+
+    for g_entry in glossary_entries:
+        term_en = getattr(g_entry, "term_en", None) if not isinstance(g_entry, dict) else g_entry.get("term_en")
+        trans_pl = getattr(g_entry, "translation_pl", None) if not isinstance(g_entry, dict) else g_entry.get("translation_pl")
+        if not term_en or not trans_pl:
+            continue
+        term_en_str = str(term_en).strip()
+        trans_pl_str = str(trans_pl).strip()
+        if not term_en_str or not trans_pl_str:
+            continue
+
+        # 1. Dopasowanie term_en w en_text (odcięcie prefiksu tytularnego i dopasowanie lm)
+        tokens_en = term_en_str.split()
+        if len(tokens_en) > 1 and tokens_en[0].lower() in TITLE_PREFIXES:
+            stem_en_base = " ".join(tokens_en[1:])
+        else:
+            stem_en_base = term_en_str
+
+        stem_parts = [re.escape(p) for p in re.split(r"[-\s]+", stem_en_base) if p]
+        stem_en_pattern = r"[-\s]*".join(stem_parts)
+        full_pattern = rf"\b(?:(?:{'|'.join(TITLE_PREFIXES)})\s+)?{stem_en_pattern}(?:s|es)?\b"
+
+        matched_en = bool(re.search(full_pattern, en_text, re.IGNORECASE))
+        if not matched_en:
+            matched_en = term_en_str.lower() in en_text.lower() or stem_en_base.lower() in en_text.lower()
+        if not matched_en:
+            continue
+
+        # 2. Korekta odwróconego synonimu przymiotnikowego do formy kanonicznej
+        pl_words = trans_pl_str.split()
+        if len(pl_words) == 2:
+            canon_noun, canon_gen = pl_words[0], pl_words[1]
+            gen_stem = canon_gen.lower()[:max(3, len(canon_gen) - 2)]
+            alt_stems = {gen_stem, gen_stem.replace("ia", "ie"), gen_stem.replace("ó", "o"), gen_stem.replace("ą", "ę")}
+            if "ie" in gen_stem:
+                alt_stems.add(gen_stem.replace("ie", "ia"))
+
+            noun_stem = _get_noun_stem(canon_noun)
+
+            if canon_gen.lower() not in updated_pl.lower():
+                adj_regex = rf"\b([A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]*(?:{'|'.join(re.escape(s) for s in alt_stems)})[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]*(?:ego|emu|ym|im|a|ej|ą|e|y|i|ych|ich|ymi|imi))\s+([A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]*{re.escape(noun_stem)}[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]*)\b"
+
+                def repl(m: re.Match) -> str:
+                    adj_word = m.group(1)
+                    noun_word = m.group(2)
+                    if adj_word[0].isupper() and not noun_word[0].isupper():
+                        noun_word = noun_word.capitalize()
+                    return f"{noun_word} {canon_gen}"
+
+                updated_pl = re.sub(adj_regex, repl, updated_pl, flags=re.IGNORECASE)
+
+        # 3. Fallback: ochrona formy z Fazy 1
+        if phase1_pl:
+            p1_low = phase1_pl.lower()
+            cand_low = updated_pl.lower()
+            trans_low = trans_pl_str.lower()
+            stem_trans = trans_low[:max(4, len(trans_low) - 2)]
+            has_p1 = trans_low in p1_low or stem_trans in p1_low
+            has_cand = trans_low in cand_low or stem_trans in cand_low
+            if has_p1 and not has_cand:
+                updated_pl = phase1_pl
+
+    return updated_pl
 
 def synchronize_ass_event_metadata_and_styles(
     event: pysubs2.SSAEvent,
@@ -319,7 +419,7 @@ def split_oversized_ass_events(events: List[pysubs2.SSAEvent]) -> List[pysubs2.S
             raw_n = ev.name.strip()
             from metadata import normalize_actor_tag
             clean_n, _ = normalize_actor_tag(raw_n)
-            clean_n = re.sub(r"[/|&+]+", " ", clean_n).strip()
+            clean_n = re.sub(r"\s+/\s+|[|&+]+", " ", clean_n).strip()
             clean_n = re.sub(r"\s+", " ", clean_n).strip()
             ev.name = clean_n
 
@@ -1789,11 +1889,16 @@ def format_phase1_candidate_text(pl_candidate: str, event: Any, is_sign: bool = 
 
     st_ev_lower = str(getattr(event, "style", "")).lower()
     italic_attr = getattr(event, "italic", 0)
-    has_italic_style = any(k in st_ev_lower for k in ["italic", "flashback_italic", "thoughts", "internal"]) or italic_attr in (1, -1)
+    has_italic_style = any(k in st_ev_lower for k in ["italic", "flashback_italic"]) or italic_attr in (1, -1)
+    has_thought_style = any(k in st_ev_lower for k in ["thoughts", "internal"])
     ev_en = getattr(event, "text", "") or ""
-    is_internal_monologue = getattr(event, "is_internal_monologue", False) or has_italic_style
+    is_internal_monologue = (
+        getattr(event, "is_internal_monologue", False)
+        or has_thought_style
+        or has_italic_style
+    )
 
-    if is_internal_monologue and not has_italic_style:
+    if is_internal_monologue and not (has_italic_style or has_thought_style):
         if is_short_spoken_reply(cand, ev_en):
             is_internal_monologue = False
 
@@ -3009,6 +3114,7 @@ class MultimodalTranslator:
             is_prev_wh = False
             is_prev_neg_q = False
             time_gap_ms = 0
+            jp_audio_line = ""
 
             try:
                 prev_ev_end = None
@@ -3777,6 +3883,20 @@ class MultimodalTranslator:
                 history_snapshot = list(history)
             lookback_history = list(history_snapshot[-4:])
 
+        # Hotfix 11.1.6 (Zadanie 1.1): Przygotowanie listy zablokowanych wpisów glosariusza
+        batch_glossary_items: List[Any] = []
+        if episode_profile and getattr(episode_profile, "glossary", None):
+            batch_glossary_items = list(episode_profile.glossary)
+        elif hasattr(self, "series_bible") and self.series_bible and getattr(self.series_bible, "data", None):
+            g_dict = self.series_bible.data.get("glossary", {})
+            if isinstance(g_dict, dict):
+                batch_glossary_items = [{"term_en": k, "translation_pl": v} for k, v in g_dict.items()]
+        if combined_glossary and isinstance(combined_glossary, dict):
+            known_terms = {getattr(g, "term_en", None) if not isinstance(g, dict) else g.get("term_en") for g in batch_glossary_items}
+            for k, v in combined_glossary.items():
+                if k not in known_terms:
+                    batch_glossary_items.append({"term_en": k, "translation_pl": v})
+
         # 2. Extract 3-4 intelligent key video frames for the batch (Storyboard & Visual OCR)
         temp_frames: List[str] = []
         image_contents = []
@@ -3948,6 +4068,21 @@ class MultimodalTranslator:
                                 whisper_transcriptions[b_id] = raw_txt
                             else:
                                 whisper_transcriptions[b_id] = san_txt
+
+                    # Hotfix 11.1.6 (Zadanie 1.3): Deduplikacja między-mówcowa i filtr gęstości dla ASR
+                    events_meta = []
+                    for idx, (orig_idx, event, clean_en, ts_prefix) in enumerate(untranslated_in_batch):
+                        b_id = idx + 1
+                        events_meta.append({
+                            "id": b_id,
+                            "en_text": clean_en,
+                            "duration_ms": max(0, event.end - event.start),
+                            "speaker": (getattr(event, "name", "") or "").strip(),
+                        })
+                    whisper_transcriptions = WhisperDisambiguator.sanitize_aligned_whisper_transcripts(
+                        events_meta,
+                        whisper_transcriptions
+                    )
 
                     # 2. Local prosody analysis (RMS dBFS / whisper / shout)
                     prosody_tags = AudioProsodyEngine.analyze_scene_prosody(
@@ -4203,6 +4338,15 @@ class MultimodalTranslator:
                                 first_line_pl = pl_candidate.split(r"\N")[0].split("\n")[0].strip()
                                 if first_line_pl:
                                     pl_candidate = first_line_pl
+
+                        # Hotfix 11.1.6 (Zadanie 1.1): Strażnik zablokowanej terminologii po Fazie 1
+                        if batch_glossary_items:
+                            pl_candidate = enforce_locked_glossary_terms(
+                                en_text=clean_en,
+                                candidate_pl=pl_candidate,
+                                glossary_entries=batch_glossary_items,
+                                phase1_pl=None
+                            )
 
 
 
@@ -4888,39 +5032,29 @@ class MultimodalTranslator:
             refined_region_dict.update({r.id: r.screen_region for r in refined_lines if getattr(r, 'screen_region', None)})
             refined_typesetting_dict.update({r.id: r.visual_typesetting for r in refined_lines if getattr(r, 'visual_typesetting', None)})
 
-            # Hotfix 11.1.5 (P3-2 / E-11): Ochrona zablokowanego glosariusza przed dryfem synonimicznym Fazy 2
-            glossary_items = []
-            if episode_profile and getattr(episode_profile, "glossary", None):
-                glossary_items = episode_profile.glossary
-            elif hasattr(self, "series_bible") and self.series_bible and getattr(self.series_bible, "data", None):
-                g_dict = self.series_bible.data.get("glossary", {})
-                if isinstance(g_dict, dict):
-                    glossary_items = [{"term_en": k, "translation_pl": v} for k, v in g_dict.items()]
+            # Hotfix 11.1.6 (Zadanie 1.1 / E-11): Strażnik zablokowanej terminologii po Fazie 2
+            active_gloss_entries = batch_glossary_items if 'batch_glossary_items' in locals() and batch_glossary_items else []
+            if not active_gloss_entries:
+                if episode_profile and getattr(episode_profile, "glossary", None):
+                    active_gloss_entries = list(episode_profile.glossary)
+                elif hasattr(self, "series_bible") and self.series_bible and getattr(self.series_bible, "data", None):
+                    g_dict = self.series_bible.data.get("glossary", {})
+                    if isinstance(g_dict, dict):
+                        active_gloss_entries = [{"term_en": k, "translation_pl": v} for k, v in g_dict.items()]
 
             for r_line in refined_lines:
                 orig_item = next((it for it in pass1_items if it["id"] == r_line.id), None)
                 if not orig_item:
                     continue
-                r_en = (orig_item.get("en", "") or "").lower()
+                r_en = orig_item.get("en", "") or ""
                 p1_pl = orig_item.get("pl", "") or ""
                 r_pl = refined_dict.get(r_line.id, p1_pl) or ""
-
-                for g_entry in glossary_items:
-                    term_en = getattr(g_entry, "term_en", None) if not isinstance(g_entry, dict) else g_entry.get("term_en")
-                    trans_pl = getattr(g_entry, "translation_pl", None) if not isinstance(g_entry, dict) else g_entry.get("translation_pl")
-                    if not term_en or not trans_pl:
-                        continue
-                    term_en_low = str(term_en).strip().lower()
-                    trans_pl_str = str(trans_pl).strip()
-                    trans_pl_low = trans_pl_str.lower()
-
-                    if re.search(rf"\b{re.escape(term_en_low)}\b", r_en) or term_en_low in r_en:
-                        trans_stem = trans_pl_low[:max(4, len(trans_pl_low) - 2)]
-                        has_p1_canon = trans_pl_low in p1_pl.lower() or trans_stem in p1_pl.lower()
-                        has_ref_canon = trans_pl_low in r_pl.lower() or trans_stem in r_pl.lower()
-                        if has_p1_canon and not has_ref_canon:
-                            refined_dict[r_line.id] = p1_pl
-                            break
+                refined_dict[r_line.id] = enforce_locked_glossary_terms(
+                    en_text=r_en,
+                    candidate_pl=r_pl,
+                    glossary_entries=active_gloss_entries,
+                    phase1_pl=p1_pl
+                )
 
             if self.flight_recorder:
                 try:

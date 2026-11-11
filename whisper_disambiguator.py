@@ -945,3 +945,86 @@ class WhisperDisambiguator:
 
         return reg_str
 
+    @classmethod
+    def sanitize_aligned_whisper_transcripts(
+        cls,
+        events_meta: List[Dict[str, Any]],
+        whisper_results: Dict[Any, Any]
+    ) -> Dict[Any, Any]:
+        """
+        Sanityzuje i deduplikuje dopasowane transkrypcje ASR Whisper w oknach czasowych.
+        1. Oczyszcza wycieki zdań ASR dla mikro-kwestii (czas <= 2200 ms, <= 2 słowa EN, > 12 znaków JP).
+        2. Usuwa zduplikowane transkrypcje między różnymi mówcami, zachowując tekst dla kwestii
+           o najbardziej zbliżonym budżecie sylabicznym.
+        """
+        if not events_meta or not whisper_results:
+            return whisper_results
+
+        # 1. Filtr nadmiarowej gęstości dla mikro-kwestii
+        for ev in events_meta:
+            k = ev.get("id")
+            val = whisper_results.get(k)
+            if val is None:
+                val = whisper_results.get(str(k))
+            if val is None:
+                continue
+            raw_txt = val.get("text", "") if isinstance(val, dict) else str(val)
+            clean_jp = re.sub(r"\(.*?\)", "", raw_txt).strip()
+            en_txt = ev.get("en_text") or ev.get("en") or ""
+            words_en = len(re.findall(r"\b\w+\b", re.sub(r"\{.*?\}", "", en_txt)))
+            dur_ms = ev.get("duration_ms", 0)
+            if words_en <= 2 and dur_ms <= 2200 and len(clean_jp) > 12:
+                if isinstance(val, dict):
+                    val["text"] = ""
+                    whisper_results[k] = val
+                else:
+                    whisper_results[k] = ""
+
+        # 2. Deduplikacja między różnymi mówcami (cross-speaker duplicate bleed)
+        groups: List[List[Tuple[Dict[str, Any], str, Any]]] = []
+        cur_group: List[Tuple[Dict[str, Any], str, Any]] = []
+
+        for ev in events_meta:
+            k = ev.get("id")
+            val = whisper_results.get(k)
+            if val is None:
+                val = whisper_results.get(str(k))
+            raw_txt = (val.get("text", "") if isinstance(val, dict) else str(val)) if val is not None else ""
+            norm_jp = re.sub(r"[\s、。！？,.!?()（）]", "", raw_txt)
+
+            if not cur_group:
+                cur_group.append((ev, norm_jp, k))
+            else:
+                if norm_jp and norm_jp == cur_group[-1][1]:
+                    cur_group.append((ev, norm_jp, k))
+                else:
+                    groups.append(cur_group)
+                    cur_group = [(ev, norm_jp, k)]
+        if cur_group:
+            groups.append(cur_group)
+
+        for grp in groups:
+            if len(grp) > 1 and grp[0][1] and len(grp[0][1]) >= 6:
+                speakers = {str(ev.get("speaker") or ev.get("speaker_name") or "").strip().lower() for ev, _, _ in grp}
+                if len(speakers) > 1:
+                    def _syl_dev(item: Tuple[Dict[str, Any], str, Any]) -> float:
+                        ev_item, norm_text, _ = item
+                        en_t = ev_item.get("en_text") or ev_item.get("en") or ""
+                        w_count = len(re.findall(r"\b\w+\b", re.sub(r"\{.*?\}", "", en_t)))
+                        return abs(len(norm_text) - 2.2 * w_count)
+
+                    best_item = min(grp, key=_syl_dev)
+                    best_k = best_item[2]
+                    for ev_item, _, item_k in grp:
+                        if item_k != best_k:
+                            cur_val = whisper_results.get(item_k)
+                            if cur_val is None:
+                                cur_val = whisper_results.get(str(item_k))
+                            if isinstance(cur_val, dict):
+                                cur_val["text"] = ""
+                                whisper_results[item_k] = cur_val
+                            else:
+                                whisper_results[item_k] = ""
+
+        return whisper_results
+

@@ -7005,6 +7005,93 @@ class SeriesBible:
                             elif "MALE" in gen_u or "MASCULINE" in gen_u:
                                 profile_genders[c_name.strip().lower()] = "MALE"
 
+            FEMALE_ROLE_NOUNS = {
+                "sąsiadka", "apostołka", "uczennica", "koleżanka", "córka", "siostra",
+                "matka", "ciotka", "babcia", "wnuczka", "kuzynka", "narzeczona",
+                "żona", "dziewczyna", "kobieta", "dama", "księżniczka", "królowa",
+                "cesarzowa", "hrabina", "baronówna", "pokojówka", "służąca", "agentka",
+                "mistrzyni", "czarodziejka", "wiedźma", "kapłanka", "święta", "bohaterka",
+                "przyjaciółka", "towarzyszka", "właścicielka", "gospodyni"
+            }
+            MALE_ROLE_NOUNS = {
+                "sąsiad", "apostoł", "uczeń", "kolega", "syn", "brat",
+                "ojciec", "wujek", "dziadek", "wnuk", "kuzyn", "narzeczony",
+                "mąż", "chłopak", "mężczyzna", "dżentelmen", "książę", "król",
+                "cesarz", "hrabia", "baron", "lokaj", "służący", "agent",
+                "mistrz", "czarodziej", "czarnoksiężnik", "kapłan", "święty", "bohater",
+                "przyjaciel", "towarzysz", "właściciel", "gospodarz"
+            }
+
+            # Hotfix 11.1.6 (Zadanie 1.2): Reconcyliacja płci na podstawie rzeczowników ról w relacjach
+            rel_containers = [self.relations]
+            if "relationships" in self.data and isinstance(self.data["relationships"], dict):
+                rel_containers.append(self.data["relationships"])
+
+            for r_dict in rel_containers:
+                for r_key in list(r_dict.keys()):
+                    if "->" not in r_key:
+                        continue
+                    parts = [p.strip() for p in r_key.split("->")]
+                    if len(parts) < 2:
+                        continue
+                    name_a, name_b = parts[0], parts[1]
+                    r_val = r_dict[r_key]
+                    desc_str = str(r_val.get("description", "") if isinstance(r_val, dict) else r_val)
+                    m_roles = re.search(r"\(([^)]+?)\s*->\s*([^)]+?)\)", desc_str)
+                    if not m_roles:
+                        continue
+                    role_a, role_b = m_roles.group(1).lower(), m_roles.group(2).lower()
+                    words_a = set(re.findall(r"\b[a-ząćęłńóśźż]+\b", role_a))
+                    words_b = set(re.findall(r"\b[a-ząćęłńóśźż]+\b", role_b))
+
+                    if (words_a & FEMALE_ROLE_NOUNS) and not (words_a & MALE_ROLE_NOUNS):
+                        char_a = chars.get(name_a) or next((v for k, v in chars.items() if k.lower() == name_a.lower()), None)
+                        if char_a and isinstance(char_a, dict):
+                            char_a["gender"] = "FEMALE"
+                            char_a["grammatical_gender"] = "FEMININE"
+                            char_a["has_verified_gender"] = True
+                            char_a["confidence"] = 0.95
+                            char_a["priority"] = "P0"
+                    elif (words_a & MALE_ROLE_NOUNS) and not (words_a & FEMALE_ROLE_NOUNS):
+                        char_a = chars.get(name_a) or next((v for k, v in chars.items() if k.lower() == name_a.lower()), None)
+                        if char_a and isinstance(char_a, dict):
+                            char_a["gender"] = "MALE"
+                            char_a["grammatical_gender"] = "MASCULINE"
+                            char_a["has_verified_gender"] = True
+                            char_a["confidence"] = 0.95
+                            char_a["priority"] = "P0"
+
+                    has_fem_address = any(addr in desc_str.lower() for addr in ["'mała'", "'pani ", "'panienko "])
+                    if ((words_b & FEMALE_ROLE_NOUNS) or has_fem_address) and not (words_b & MALE_ROLE_NOUNS):
+                        char_b = chars.get(name_b) or next((v for k, v in chars.items() if k.lower() == name_b.lower()), None)
+                        if char_b and isinstance(char_b, dict):
+                            char_b["gender"] = "FEMALE"
+                            char_b["grammatical_gender"] = "FEMININE"
+                            char_b["has_verified_gender"] = True
+                            char_b["confidence"] = 0.95
+                            char_b["priority"] = "P0"
+
+                        fem_tag = "[KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+                        new_desc = re.sub(
+                            r"\[MĘŻCZYZNA \(Adresat\)[^\]]*\]",
+                            fem_tag,
+                            desc_str,
+                            flags=re.IGNORECASE
+                        )
+                        if isinstance(r_val, dict):
+                            r_val["description"] = new_desc
+                            r_dict[r_key] = r_val
+                        else:
+                            r_dict[r_key] = new_desc
+                    elif (words_b & MALE_ROLE_NOUNS) and not (words_b & FEMALE_ROLE_NOUNS):
+                        char_b = chars.get(name_b) or next((v for k, v in chars.items() if k.lower() == name_b.lower()), None)
+                        if char_b and isinstance(char_b, dict):
+                            char_b["gender"] = "MALE"
+                            char_b["grammatical_gender"] = "MASCULINE"
+                            char_b["has_verified_gender"] = True
+                            char_b["confidence"] = 0.95
+                            char_b["priority"] = "P0"
+
             rels = dict(self.data.get("relations", {}))
             rels.update(self.data.get("relationships", {}))
 

@@ -2437,6 +2437,64 @@ def resolve_scene_participants(
     return items
 
 
+def _is_offscreen_speaker_excluded(
+    cand_turn: Any,
+    curr_turn: Any,
+    series_bible: Optional[Any] = None
+) -> bool:
+    """
+    Weryfikuje, czy mówca cand_turn jest mówcą off-screen (np. styl 'Italics - Top' lub 'Italics'),
+    który nie znajduje się w characters_present aktywnej sceny dramatycznej.
+    Taki mówca nie jest przypisywany jako adresat dla kwestii na stylu Default.
+    """
+    if not cand_turn or not curr_turn:
+        return False
+    curr_style = str(getattr(curr_turn, "style", "") or "").lower()
+    cand_style = str(getattr(cand_turn, "style", "") or "").lower()
+
+    if "italic" in curr_style:
+        return False
+
+    is_cand_offscreen = "italics - top" in cand_style or "top" in cand_style or (
+        "italic" in cand_style and "default" not in cand_style
+    )
+    if not is_cand_offscreen:
+        return False
+
+    cand_speaker = str(getattr(cand_turn, "speaker", "") or "").strip().lower()
+    if not cand_speaker:
+        return False
+
+    dram_seqs = getattr(series_bible, "dramatic_sequences", None) if series_bible else None
+    if not dram_seqs and hasattr(curr_turn, "dramatic_sequences"):
+        dram_seqs = curr_turn.dramatic_sequences
+    if not dram_seqs and hasattr(cand_turn, "dramatic_sequences"):
+        dram_seqs = cand_turn.dramatic_sequences
+
+    chars_present = set()
+    if dram_seqs and hasattr(curr_turn, "events") and curr_turn.events:
+        ev0 = curr_turn.events[0]
+        for seq in dram_seqs:
+            tr_str = getattr(seq, "time_range", "")
+            if _is_event_in_time_range(ev0, tr_str):
+                for c in getattr(seq, "characters_present", []) or []:
+                    if c:
+                        chars_present.add(str(c).strip().lower())
+                break
+    elif hasattr(curr_turn, "characters_present") and curr_turn.characters_present:
+        chars_present = {str(c).strip().lower() for c in curr_turn.characters_present if c}
+    elif hasattr(cand_turn, "characters_present") and cand_turn.characters_present:
+        chars_present = {str(c).strip().lower() for c in cand_turn.characters_present if c}
+
+    if chars_present and cand_speaker not in chars_present:
+        return True
+
+    if "italics - top" in cand_style and not chars_present:
+        return True
+
+    return False
+
+
 def resolve_turn_addressee(
     turn: SpeakerTurn,
     previous_turn: Optional[SpeakerTurn] = None,
@@ -2592,6 +2650,8 @@ def resolve_turn_addressee(
                         break
                     if is_sign_or_title_item(prev):
                         break
+                    if _is_offscreen_speaker_excluded(prev, turn, series_bible=series_bible):
+                        continue
 
                     gap_ms = max(0, turn.start - prev.end)
                     if gap_ms > max_exchange_gap_ms:
@@ -2625,6 +2685,8 @@ def resolve_turn_addressee(
                         break
                     if is_sign_or_title_item(prev):
                         break
+                    if _is_offscreen_speaker_excluded(prev, turn, series_bible=series_bible):
+                        continue
 
                     gap_ms = max(0, turn.start - prev.end)
                     if gap_ms > max_exchange_gap_ms:
@@ -2693,6 +2755,7 @@ def resolve_turn_addressee(
                 and not is_internal_monologue(next_turn)
                 and not is_discourse_ignorable(next_turn.speaker)
                 and not is_sign_or_title_item(next_turn)
+                and not _is_offscreen_speaker_excluded(next_turn, turn, series_bible=series_bible)
                 and is_narrative_style(getattr(next_turn, "style", "")) == is_narrative_style(getattr(turn, "style", ""))
             ):
                 forward_gap_ms = next_turn.start - turn.end
@@ -2731,6 +2794,7 @@ def resolve_turn_addressee(
                 and not is_internal_monologue(previous_turn)
                 and not is_discourse_ignorable(previous_turn.speaker)
                 and not is_sign_or_title_item(previous_turn)
+                and not _is_offscreen_speaker_excluded(previous_turn, turn, series_bible=series_bible)
                 and is_narrative_style(getattr(previous_turn, "style", "")) == is_narrative_style(getattr(turn, "style", ""))
             ):
                 gap_ms = max(0, turn.start - previous_turn.end)
@@ -3108,8 +3172,10 @@ class SceneDiscourseGraph:
 
         # 2. Bezwarunkowy odczyt rekordu P0 z SeriesBible / EpisodeProfiler (Operacja 2C.1, R3.2, 2B.1, 2B.5, 2B.7)
         p0_gender = verified_p0_gender or kwargs.get("speaker_p0_gender")
+        if p0_gender and str(p0_gender).upper() in ("UNKNOWN", "NEUTRAL"):
+            p0_gender = None
         has_ver = has_verified_gender or bool(kwargs.get("speaker_p0_gender"))
-        speaker_p0_verified = bool(verified_p0_gender or kwargs.get("speaker_p0_gender"))
+        speaker_p0_verified = bool(p0_gender and has_ver)
 
         # P3-A: Rozstrzyganie płci i virility dla diad i grup złożonych (POLYLOGUE z separatorem)
         if not p0_gender and (spk_label == "POLYLOGUE" or is_composite_actor) and is_composite_actor:
@@ -3152,12 +3218,20 @@ class SceneDiscourseGraph:
                 speaker_p0_verified = True
                 telemetry["we_virility"] = "VIRILE"
                 telemetry["group_virility"] = "VIRILE"
+                if found_m + found_f >= 2:
+                    spk_label = "POLYLOGUE"
+                    telemetry["speaker_name"] = "POLYLOGUE"
+                    telemetry["actor"] = "POLYLOGUE"
             elif found_f >= 1 and found_m == 0:
                 p0_gender = "FEMALE"
                 has_ver = True
                 speaker_p0_verified = True
                 telemetry["we_virility"] = "NON_VIRILE"
                 telemetry["group_virility"] = "NON_VIRILE"
+                if found_f >= 2:
+                    spk_label = "POLYLOGUE"
+                    telemetry["speaker_name"] = "POLYLOGUE"
+                    telemetry["actor"] = "POLYLOGUE"
 
         if not p0_gender and series_bible and clean_actor:
             char_rec = None
@@ -3203,6 +3277,11 @@ class SceneDiscourseGraph:
             p0_gender = explicit_spk_g
             has_ver = True
             speaker_p0_verified = True
+
+        if not p0_gender and telemetry.get("speaker_gender") and str(telemetry.get("speaker_gender")).upper() not in ("UNKNOWN", "NEUTRAL"):
+            p0_gender = str(telemetry.get("speaker_gender")).upper()
+            has_ver = bool(telemetry.get("has_verified_gender"))
+            speaker_p0_verified = has_ver
 
         # Operacja 2B.4 pkt 2: Formy męskie 1. os. mówcy blokują F0 krzyku bojowego
         pl_text = kwargs.get("polish_text") or telemetry.get("polish_text") or getattr(event, "text", "") or ""
@@ -3403,10 +3482,12 @@ class SceneDiscourseGraph:
             dry_segs.append(f"Mówca: {telemetry['speaker_name']}")
 
         tgt_g_tag = telemetry.get("target_grammatical_gender") or telemetry.get("target_gender")
-        if not ev_is_monologue and telemetry.get("target_actor") and tgt_g_tag in ("MASCULINE", "FEMININE"):
-            dry_segs.append(f"Adresat: {telemetry['target_actor']} ({tgt_g_tag})")
+        tgt_act = str(telemetry.get("target_actor") or "").strip()
+        is_generic_tgt = tgt_act.lower() in {"mężczyzna", "kobieta", "mężczyźni", "kobiety", "brak", "none", "unspecified"}
+        if not ev_is_monologue and tgt_act and not is_generic_tgt and tgt_g_tag in ("MASCULINE", "FEMININE"):
+            dry_segs.append(f"Adresat: {tgt_act} ({tgt_g_tag})")
 
-        if telemetry.get("polylogue"):
+        if telemetry.get("polylogue") and telemetry.get("speaker_name") != "POLYLOGUE":
             dry_segs.append(f"Scena: {telemetry['polylogue']}")
 
         if dry_segs:
