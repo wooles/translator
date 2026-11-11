@@ -243,3 +243,62 @@ def test_code_switching_detection_and_prompt_guidance():
     focused = get_focused_rules_for_batch(batch_items, max_rules=3)
     assert "FILAR XIII" in focused
     assert "angielskie słowa lub hybrydowe zwroty katakanowe" in focused
+
+
+@pytest.mark.unit
+def test_yakuwarigo_aru_yaru_and_codeswitch_priority_over_ore_in_pragmatic_register():
+    """Hotfix 11.1.4a: Priorytetyzacja rejestru Yakuwarigo (-aru/-yaru) oraz code-switchingu przed zaimkiem ore."""
+    from translator import detect_japanese_pragmatic_register
+
+    # 1. Kwestia ze słowem 'ore' oraz końcówką Yakuwarigo -aru/-yaru
+    res_aru = detect_japanese_pragmatic_register("俺の頼んでるあるよ", "I am asking you.")
+    assert res_aru is not None
+    assert "Stylizowany rejestr wojowniczki" in res_aru
+    assert "-aru/-yaru" in res_aru
+
+    res_yaru = detect_japanese_pragmatic_register("俺は何やるかね", "What am I doing?")
+    assert res_yaru is not None
+    assert "Stylizowany rejestr wojowniczki" in res_yaru
+
+    # 2. Kwestia ze słowem 'ore' oraz zwrotem code-switching JA+EN
+    res_cs = detect_japanese_pragmatic_register("俺がリフレクトします", "I will reflect it.")
+    assert res_cs is not None
+    assert "Code-switching JA+EN" in res_cs
+
+    # 3. Dodatkowe rozszerzone warianty leksykalne -aru/-yaru
+    variants = [
+        "はずある", "だけある", "ことある", "いいやる", "いけなやる", "ないやるね", "なおらないやる"
+    ]
+    for v in variants:
+        res_v = detect_japanese_pragmatic_register(v, "Sample utterance")
+        assert res_v is not None
+        assert "Stylizowany rejestr wojowniczki" in res_v
+
+
+@pytest.mark.unit
+def test_detect_event_visual_type_point_listing_sign_in_default_style():
+    """Hotfix 11.1.4a: Detekcja planszy wyliczenia punktowego lub cennika w stylu Default."""
+    import pysubs2
+    from translator import detect_event_visual_type
+
+    listing_samples = [
+        "10,000 candies: Magical Phone",
+        "500 points: Sacred Shield",
+        "100 pkt: Mikstura lecząca",
+        "1,000 coins: Ancient Armor",
+        "50 pts: Speed Boost",
+    ]
+    for text in listing_samples:
+        ev = pysubs2.SSAEvent(start=1000, end=4000, text=text, style="Default")
+        ev.name = ""
+        vtype = detect_event_visual_type(ev)
+        assert vtype["is_sign"] is True, f"Brak detekcji napisu dla: {text}"
+        assert vtype["is_top"] is False
+        assert "plansza wyliczenia punktowego / cennika" in vtype["visual_details"]
+
+    # Dialog postaci nie jest klasyfikowany jako plansza
+    ev_dialogue = pysubs2.SSAEvent(start=1000, end=4000, text="We have to move forward together.", style="Default")
+    ev_dialogue.name = "SpeakerAlpha"
+    vtype_dlg = detect_event_visual_type(ev_dialogue)
+    assert vtype_dlg["is_sign"] is False
+

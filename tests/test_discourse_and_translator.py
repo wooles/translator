@@ -972,3 +972,76 @@ def test_whisper_disambiguator_detects_yakuwarigo_aru_yaru_desuwa_ssu_nano():
     for en, jp in yakuwarigo_cases:
         cats = WhisperDisambiguator.detect_batch_discourse_categories(en, jp)
         assert "DIALECT_JP" in cats, f"Brak DIALECT_JP dla formy: {jp}"
+
+
+@pytest.mark.unit
+def test_dual_quantifier_you_two_in_mixed_gender_scene_resolves_virile():
+    """Hotfix 11.1.4a: Arbitraż kwantyfikatora dualnego ('you two' / 'お二人') w scenie mieszanej jako męskoosobowy (VIRILE)."""
+    import pysubs2
+    from translator import MultimodalTranslator
+    from series_memory import SeriesBible
+
+    sm = SeriesBible(slug="test_dual_virile", db_path=":memory:")
+    sm.sync_verified_profile_entity("BohaterMęski", "MALE", has_verified_gender=True)
+    sm.sync_verified_profile_entity("BohaterkaŻeńska", "FEMALE", has_verified_gender=True)
+
+    tr = MultimodalTranslator(api_key="mock_key")
+    tr.series_bible = sm
+    tr.character_registry = {
+        "BohaterMęski": {"gender": "MALE", "grammatical_gender": "MASCULINE"},
+        "BohaterkaŻeńska": {"gender": "FEMALE", "grammatical_gender": "FEMININE"}
+    }
+
+    # 1. Test detekcji dual w _resolve_line_addressee dla angielskiego 'you two'
+    ev_spk = pysubs2.SSAEvent(start=1000, end=3000, text="You two should get ready.")
+    ev_spk.name = "SpeakerAlpha"
+    batch_evs = [
+        (1, ev_spk, "You two should get ready.", ""),
+        (2, pysubs2.SSAEvent(start=3100, end=4000, text="Yes.", name="BohaterMęski"), "Yes.", ""),
+        (3, pysubs2.SSAEvent(start=4100, end=5000, text="Understood.", name="BohaterkaŻeńska"), "Understood.", "")
+    ]
+
+    cat_en, label_en = tr._resolve_line_addressee(
+        event=ev_spk,
+        raw_phase1_addressee=None,
+        batch_events=batch_evs,
+        event_idx=0,
+        whisper_text="",
+        clean_text="You two should get ready."
+    )
+    assert cat_en == "para_mieszana_dual"
+    assert "Para Mieszana" in label_en
+
+    # 2. Test detekcji dual w _resolve_line_addressee dla japońskiego 'お二人'
+    cat_jp, label_jp = tr._resolve_line_addressee(
+        event=ev_spk,
+        raw_phase1_addressee=None,
+        batch_events=batch_evs,
+        event_idx=0,
+        whisper_text="お二人は準備してください",
+        clean_text="Please get ready."
+    )
+    assert cat_jp == "para_mieszana_dual"
+    assert "Para Mieszana" in label_jp
+
+
+@pytest.mark.unit
+def test_whisper_disambiguator_detects_kansai_yade_hiragana():
+    """Hotfix 11.1.4a: WhisperDisambiguator poprawnie rozpoznaje dialektalny znacznik 'やで' w zapisie hiragany."""
+    from whisper_disambiguator import WhisperDisambiguator
+
+    en_text = "That's how it is."
+    jp_text = "そうやで"
+    cats = WhisperDisambiguator.detect_batch_discourse_categories(en_text, jp_text)
+    assert "DIALECT_JP" in cats, f"Brak DIALECT_JP dla japońskiego tekstu: {jp_text}"
+
+    # Weryfikacja dodatkowych form z hiraganą 'やで'
+    more_samples = [
+        "ほんまやで",
+        "あかんやで",
+        "知らんやで"
+    ]
+    for s in more_samples:
+        c = WhisperDisambiguator.detect_batch_discourse_categories("It is true.", s)
+        assert "DIALECT_JP" in c, f"Brak DIALECT_JP dla formy: {s}"
+
