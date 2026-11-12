@@ -1388,7 +1388,7 @@ class AVTLinter:
                 applied_fixes.append(f"[Filar CLXXIII - Mianownik Wykrzyknikowy] Przywrócono mianownik dla '{source_en.strip()}'")
 
         # 1c. Token Punctuation Stutter Sanitizer (Filar CLXXIV - 0.00 PLN)
-        stutter_pat = r"\b([A-Za-ząćęłńóśźżA-ZĄĆĘŁŃÓŚŹŻ]{2,}[\.!\?…]+)\s*\1(?!\w)"
+        stutter_pat = r"\b([A-Za-ząćęłńóśźżA-ZĄĆĘŁŃÓŚŹŻ]{2,}[\.!\?…]+)\1(?!\w)"
         if re.search(stutter_pat, modified):
             modified = re.sub(stutter_pat, r"\1", modified)
             applied_fixes.append("[Filar CLXXIV - Higiena Tokenów] Usunięto zacięcie/jąkanie tokenu z interpunkcją")
@@ -7596,7 +7596,7 @@ class EpisodeQualityGate:
 
             # Token Punctuation Stutter Sanitizer (Filar CLXXIV - 0.00 PLN)
             # Eliminates immediate token repetitions with punctuation (e.g. 'odebrać.odebrać.' -> 'odebrać.', 'tak.tak.' -> 'tak.')
-            stutter_pat = r"\b([A-Za-ząćęłńóśźżA-ZĄĆĘŁŃÓŚŹŻ]{2,}[\.!\?…]+)\s*\1(?!\w)"
+            stutter_pat = r"\b([A-Za-ząćęłńóśźżA-ZĄĆĘŁŃÓŚŹŻ]{2,}[\.!\?…]+)\1(?!\w)"
             if re.search(stutter_pat, ev.text):
                 old_stutter_t = ev.text
                 ev.text = re.sub(stutter_pat, r"\1", ev.text)
@@ -11422,7 +11422,8 @@ class EpisodeQualityGate:
             ev.text = re.sub(r"([A-Za-ząćęłńóśźż])–(?=\s*\\N|\s*$|[!\?…])", r"\1...", ev.text)
             fixes.append(f"[Episode Quality Gate - Filar LX Interpunkcja] Linia #{i+1}: zamieniono przyklejony myślnik urwanej mowy na wielokropek")
         # Remove misplaced question mark on pure affirmative statements like "Rozumiem?" -> "Rozumiem."
-        if not is_sign and re.match(r"^(\s*\{[^\}]*\})*(?:Rozumiem|Jasne|D-Dobrze|Dobrze|W porządku|Oczywiście)\?+(\{[^\}]*\}\s*)*$", ev.text.strip()):
+        src_en_q = str(getattr(ev, "source_en", "") or "")
+        if not is_sign and "?" not in src_en_q and re.match(r"^(\s*\{[^\}]*\})*(?:Rozumiem|Jasne|D-Dobrze|Dobrze|Oczywiście)\?+(\{[^\}]*\}\s*)*$", ev.text.strip()):
             ev.text = re.sub(r"\?+", ".", ev.text)
             fixes.append(f"[Episode Quality Gate - Higiena Pytajnika] Linia #{i+1}: usunięto pytajnik z potwierdzenia twierdzącego")
         # 6. ENGLISH REMAINDER SWEEP (Zero Untranslated English Lines Guarantee)
@@ -11447,7 +11448,7 @@ class EpisodeQualityGate:
         # Ensure no individual line in a sign/title exceeds 45 characters, and purge chained bracket leaks '] ['
         if is_sign:
             clean_lines = [re.sub(r"\{[^}]*\}", "", p).strip() for p in ev.text.split(r"\N")]
-            if any(len(l) > 45 for l in clean_lines) or re.search(r"\]\s*\[", ev.text):
+            if any(len(l) > 38 for l in clean_lines) or re.search(r"\]\s*\[", ev.text):
                 from avt_formatter import split_subtitle_syntactically
                 ev.text = split_subtitle_syntactically(ev.text, max_line_len=38, is_ass=True, is_sign=True)
                 fixes.append(f"[Episode Quality Gate - Filar XCVIII (Plansze i Szyldy)] Linia #{i+1}: sformatowano napis ekranowy zapobiegając przepełnieniu kadru")

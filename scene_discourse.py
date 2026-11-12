@@ -48,7 +48,9 @@ except ImportError:
         raw = str(actor_name).strip()
         gender = None
         if re.search(r"[\(\[\{]\s*(?:m|male|mężczyzna)\s*[\)\]\}]", raw, re.IGNORECASE):
-            gender = "MALE"
+            is_glued_single_m = bool(re.search(r"[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ]\(\s*m\s*\)$", raw, re.IGNORECASE))
+            if not is_glued_single_m:
+                gender = "MALE"
         elif re.search(r"[\(\[\{]\s*(?:f|female|kobieta)\s*[\)\]\}]", raw, re.IGNORECASE):
             gender = "FEMALE"
         clean = re.sub(r"[\(\[\{][^\)\]\}]*[\)\]\}]", "", raw).strip()
@@ -72,7 +74,9 @@ def _normalize_event_actor(raw_name: str) -> Tuple[str, Optional[str]]:
         elif isinstance(res, str):
             g = None
             if re.search(r"[\(\[\{]\s*(?:m|male|mężczyzna)\s*[\)\]\}]", raw_name, re.IGNORECASE):
-                g = "MALE"
+                is_glued_single_m = bool(re.search(r"[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ]\(\s*m\s*\)$", raw_name.strip(), re.IGNORECASE))
+                if not is_glued_single_m:
+                    g = "MALE"
             elif re.search(r"[\(\[\{]\s*(?:f|female|kobieta)\s*[\)\]\}]", raw_name, re.IGNORECASE):
                 g = "FEMALE"
             return res.strip() or raw_name.strip(), g
@@ -81,7 +85,9 @@ def _normalize_event_actor(raw_name: str) -> Tuple[str, Optional[str]]:
 
     g = None
     if re.search(r"[\(\[\{]\s*(?:m|male|mężczyzna)\s*[\)\]\}]", raw_name, re.IGNORECASE):
-        g = "MALE"
+        is_glued_single_m = bool(re.search(r"[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ]\(\s*m\s*\)$", raw_name.strip(), re.IGNORECASE))
+        if not is_glued_single_m:
+            g = "MALE"
     elif re.search(r"[\(\[\{]\s*(?:f|female|kobieta)\s*[\)\]\}]", raw_name, re.IGNORECASE):
         g = "FEMALE"
     clean = re.sub(r"[\(\[\{][^\)\]\}]*[\)\]\}]", "", raw_name).strip()

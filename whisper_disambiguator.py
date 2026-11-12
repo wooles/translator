@@ -1004,9 +1004,18 @@ class WhisperDisambiguator:
             groups.append(cur_group)
 
         for grp in groups:
-            if len(grp) > 1 and grp[0][1] and len(grp[0][1]) >= 6:
+            if len(grp) > 1 and grp[0][1]:
+                norm_len = len(grp[0][1])
                 speakers = {str(ev.get("speaker") or ev.get("speaker_name") or "").strip().lower() for ev, _, _ in grp}
-                if len(speakers) > 1:
+                distinct_en = {
+                    re.sub(r"\{.*?\}", "", str(ev.get("en_text") or ev.get("en") or "")).strip().lower()
+                    for ev, _, _ in grp
+                }
+                should_dedup = (
+                    (len(speakers) > 1 and (norm_len >= 6 or (norm_len >= 3 and len(distinct_en) > 1)))
+                    or (len(speakers) == 1 and norm_len >= 6 and len(distinct_en) > 1)
+                )
+                if should_dedup:
                     def _syl_dev(item: Tuple[Dict[str, Any], str, Any]) -> float:
                         ev_item, norm_text, _ = item
                         en_t = ev_item.get("en_text") or ev_item.get("en") or ""

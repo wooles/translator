@@ -308,6 +308,16 @@ def enforce_locked_glossary_terms(
                     return f"{noun_word} {canon_gen}"
 
                 updated_pl = re.sub(adj_regex, repl, updated_pl, flags=re.IGNORECASE)
+        elif len(pl_words) == 3:
+            canon_noun, canon_mid, canon_gen = pl_words[0], pl_words[1], pl_words[2]
+            noun_stem = _get_noun_stem(canon_noun)
+            target_tail = f"{canon_mid} {canon_gen}".lower()
+            if target_tail not in updated_pl.lower():
+                three_word_pat = rf"\b([A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]*{re.escape(noun_stem)}[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]*)\s+[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+(?:ego|emu|ym|im|iej|ą|e|y|i)\s+[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+\b"
+                def repl_3w(m: re.Match) -> str:
+                    noun_w = m.group(1)
+                    return f"{noun_w} {canon_mid} {canon_gen}"
+                updated_pl = re.sub(three_word_pat, repl_3w, updated_pl, flags=re.IGNORECASE)
 
         # 3. Fallback: ochrona formy z Fazy 1
         if phase1_pl:
@@ -465,6 +475,11 @@ def extract_typesetting_tags(raw_text: str) -> Tuple[str, str]:
         # Ensure it is a valid tag block with ASS command characters
         if "\\" in tag_prefix and not tag_prefix.endswith("\\"):
             remaining = raw_text[len(tag_prefix):]
+            if r"\i1" in tag_prefix and r"\i0" in remaining:
+                tag_prefix = re.sub(r"\{\\i1\}", "", tag_prefix)
+                tag_prefix = re.sub(r"\\i1(?=[\\\}])", "", tag_prefix)
+                tag_prefix = re.sub(r"\{\s*\}", "", tag_prefix)
+                remaining = re.sub(r"\{\\i0\}", "", remaining)
             clean_remaining = sanitize_sub_text(remaining)
             return tag_prefix, clean_remaining
 
@@ -5448,13 +5463,14 @@ class MultimodalTranslator:
             raw_spk = getattr(ev_it, "name", "")
             if raw_spk and raw_spk not in actor_map:
                 cl_act, ex_gen = normalize_actor_tag(raw_spk)
-                actor_map[raw_spk] = {"clean_name": cl_act, "extracted_gender": ex_gen}
+                sb_g = None
                 if getattr(self, "series_bible", None) and cl_act:
-                    effective_gender = ex_gen
-                    if not effective_gender:
-                        sb_g = self.series_bible.get_character_gender(cl_act)
-                        if sb_g in ("MALE", "FEMALE"):
-                            effective_gender = sb_g
+                    sb_g = self.series_bible.get_character_gender(cl_act)
+                    if sb_g not in ("MALE", "FEMALE"):
+                        sb_g = None
+                effective_gender = sb_g or ex_gen
+                actor_map[raw_spk] = {"clean_name": cl_act, "extracted_gender": effective_gender if ex_gen else None}
+                if getattr(self, "series_bible", None) and cl_act:
                     is_invalid_tag = (
                         cl_act.lower() in COLLECTIVE_LABELS
                         or (len(cl_act.split()) == 1 and cl_act[0].islower())

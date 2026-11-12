@@ -61,7 +61,14 @@ def normalize_actor_tag(raw_name: str, strip_diacritics: bool = False) -> Tuple[
     if gender_match:
         tag_val = gender_match.group(1).strip().lower()
         if tag_val in ("m", "male", "mezczyzna", "mezczyzn"):
-            gender = "MALE"
+            is_glued_single_m = (
+                tag_val == "m"
+                and bool(re.search(r"[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ]\(\s*m\s*\)$", raw_name.strip(), flags=re.IGNORECASE))
+            )
+            if is_glued_single_m:
+                gender = None
+            else:
+                gender = "MALE"
         elif tag_val in ("f", "female", "k", "kobieta", "kobiet"):
             gender = "FEMALE"
 
