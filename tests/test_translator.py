@@ -384,3 +384,43 @@ def test_whisper_engine_thread_safe_infer_lock_and_kotoba_word_timestamps_guard(
         assert kw.get("vad_parameters") == dict(min_silence_duration_ms=140, speech_pad_ms=80)
 
 
+# ==============================================================================
+# STANDARD 11.1.7 REGRESSION TESTS (T11.1.7_B4)
+# ==============================================================================
+@pytest.mark.unit
+def test_t11_1_7_b4_extract_typesetting_tags_and_three_word_glossary_guard():
+    """Weryfikacja równowagi tagów kursywy w extract_typesetting_tags oraz obsługi 3-wyrazowych haseł glosariusza."""
+    from translator import extract_typesetting_tags, enforce_locked_glossary_terms
+
+    # 1. Równowaga tagów {\i1}...{\i0} w extract_typesetting_tags
+    prefix, clean_dialogue = extract_typesetting_tags(r"{\an8\i1}Two{\i0}!")
+    assert prefix == r"{\an8}"
+    assert clean_dialogue == "Two!"
+
+    prefix2, clean_dialogue2 = extract_typesetting_tags(r"{\an8}{\i1}Episode Title{\i0}!")
+    assert prefix2 == r"{\an8}"
+    assert clean_dialogue2 == "Episode Title!"
+
+    # 2. Korekta 3-wyrazowych terminów kanonicznych w enforce_locked_glossary_terms
+    glossary = [
+        {"term_en": "Ice Sword Mage", "translation_pl": "Mag Lodowego Miecza"}
+    ]
+
+    # Mianownik
+    res_nom = enforce_locked_glossary_terms(
+        en_text="He is the Ice Sword Mage.",
+        candidate_pl="On jest Mag Magicznego Lodu.",
+        glossary_entries=glossary
+    )
+    assert res_nom == "On jest Mag Lodowego Miecza."
+
+    # Dopełniacz / Biernik (odmiana członu nadrzędnego)
+    res_gen = enforce_locked_glossary_terms(
+        en_text="I saw the Ice Sword Mage yesterday.",
+        candidate_pl="Widziałem wczoraj Maga Magicznego Lodu.",
+        glossary_entries=glossary
+    )
+    assert res_gen == "Widziałem wczoraj Maga Lodowego Miecza."
+
+
+

@@ -1302,4 +1302,41 @@ def test_t11_1_6_b4_offscreen_addressee_isolation_and_compound_actor_ass():
     assert cleaned_events[0].name == "Worker A/B"
 
 
+# ==============================================================================
+# STANDARD 11.1.7 REGRESSION TESTS (T11.1.7_B2)
+# ==============================================================================
+@pytest.mark.unit
+def test_t11_1_7_b2_whisper_same_speaker_consecutive_duplicate_dedup():
+    """Weryfikacja deduplikacji segmentów ASR dla kolejnych kwestii tego samego oraz różnych mówców."""
+    from whisper_disambiguator import WhisperDisambiguator
+
+    # 1. Ten sam mówca: dwie kolejne kwestie z różnymi tekstami EN i identycznym japońskim segmentem ASR
+    events_same_spk = [
+        {"id": 1, "speaker": "SpeakerAlpha", "en_text": "This is a very long sentence spoken by the main character.", "duration_ms": 3000},
+        {"id": 2, "speaker": "SpeakerAlpha", "en_text": "Short line.", "duration_ms": 800},
+    ]
+    # Segment o długości 17 znaków: lepiej pasuje do id: 1 (10 słów * 2.2 = 22 vs len 17) niż do id: 2 (2 słowa * 2.2 = 4.4 vs len 17)
+    whisper_results_same = {
+        1: "長い日本語の文章がここにありますよ",
+        2: "長い日本語の文章がここにありますよ",
+    }
+    sanitized_same = WhisperDisambiguator.sanitize_aligned_whisper_transcripts(events_same_spk, whisper_results_same)
+    assert sanitized_same[1] == "長い日本語の文章がここにありますよ"
+    assert sanitized_same[2] == ""
+
+    # 2. Różni mówcy: krótki 4-znakowy przeciek ASR między dwoma różnymi mówcami o różnych tekstach EN
+    events_diff_spk = [
+        {"id": 10, "speaker": "SpeakerAlpha", "en_text": "Wait for me right now!", "duration_ms": 1500},
+        {"id": 11, "speaker": "SpeakerBeta", "en_text": "No.", "duration_ms": 500},
+    ]
+    whisper_results_diff = {
+        10: "待ってよ",  # 4 znaki, 5 słów EN: abs(4 - 11) = 7
+        11: "待ってよ",  # 4 znaki, 1 słowo EN: abs(4 - 2.2) = 1.8 -> lepiej pasuje do id: 11
+    }
+    sanitized_diff = WhisperDisambiguator.sanitize_aligned_whisper_transcripts(events_diff_spk, whisper_results_diff)
+    assert sanitized_diff[10] == ""
+    assert sanitized_diff[11] == "待ってよ"
+
+
+
 

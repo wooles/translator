@@ -186,7 +186,7 @@ def test_collision_alignment_keeps_same_speaker_continuity_and_checks_top_sign(
 def test_phase7_hygiene_merges_duplicate_tag_blocks_and_bridges_italic_monologue(
     raw_text, prev_italic, next_italic, expected_text
 ):
-    """Weryfikuje scalanie zduplikowanych bloków tagów {\...} oraz domykanie kursywy w monologu wewnętrznym."""
+    r"""Weryfikuje scalanie zduplikowanych bloków tagów {\...} oraz domykanie kursywy w monologu wewnętrznym."""
     from avt_linter import EpisodeQualityGate
     cleaned = EpisodeQualityGate.normalize_ass_tags_and_sign_layout(
         text=raw_text,
@@ -357,3 +357,48 @@ def test_resolve_strict_positive_flag_isolation(passed_val, expected_flag):
     from avt_linter import _resolve_strict_positive_flag
     res = _resolve_strict_positive_flag(passed_val)
     assert res == expected_flag
+
+
+# ==============================================================================
+# STANDARD 11.1.7 REGRESSION TESTS (T11.1.7_B3)
+# ==============================================================================
+@pytest.mark.unit
+def test_t11_1_7_b3_eqg_preserves_question_mark_and_intentional_repetition_when_present_in_source_en():
+    """Weryfikacja ochrony pytajnika przy obecności w source_en oraz celowych powtórzeń ze spacją."""
+    import pysubs2
+    from avt_linter import EpisodeQualityGate
+
+    eqg = EpisodeQualityGate()
+
+    # 1. Pytajnik w kwestii 'W porządku?' i 'Dobrze?' z pytaniem w source_en
+    ev1 = pysubs2.SSAEvent(start=1000, end=2000, text="W porządku?", style="Default")
+    setattr(ev1, "source_en", "Are you okay?")
+    ev2 = pysubs2.SSAEvent(start=2500, end=3500, text="Dobrze?", style="Default")
+    setattr(ev2, "source_en", "Alright?")
+
+    # Kontrprzykład: 'Rozumiem?' bez pytania w source_en zamienia się na 'Rozumiem.'
+    ev3 = pysubs2.SSAEvent(start=4000, end=5000, text="Rozumiem?", style="Default")
+    setattr(ev3, "source_en", "I see.")
+
+    # 2. Celowe powtórzenia ze spacją (zawołanie, onomatopeja)
+    ev4 = pysubs2.SSAEvent(start=6000, end=7000, text="HeroineAlpha? HeroineAlpha?", style="Default")
+    ev5 = pysubs2.SSAEvent(start=7500, end=8500, text=r"{\i1}Bum... bum... bum...{\i0}", style="Default")
+
+    # Sklejone zacięcie bez spacji (deduplikowane)
+    ev6 = pysubs2.SSAEvent(start=9000, end=10000, text="Chcę to odebrać.odebrać.", style="Default")
+
+    subs = pysubs2.SSAFile()
+    subs.events = [ev1, ev2, ev3, ev4, ev5, ev6]
+    fixed_subs, fixes = EpisodeQualityGate.audit_and_fix_entire_episode(
+        subs,
+        strict_positive_domain=True
+    )
+    fixed_events = fixed_subs.events
+
+    assert fixed_events[0].text == "W porządku?"
+    assert fixed_events[1].text == "Dobrze?"
+    assert fixed_events[2].text == "Rozumiem."
+    assert fixed_events[3].text == "HeroineAlpha? HeroineAlpha?"
+    assert fixed_events[4].text == r"{\i1}Bum... bum... bum...{\i0}"
+    assert fixed_events[5].text == "Chcę to odebrać."
+

@@ -220,3 +220,48 @@ def test_t10_6_3_1_extract_canonical_series_and_season(title, expected_base, exp
     assert base == expected_base
     assert season == expected_season
 
+
+# ==============================================================================
+# STANDARD 11.1.7 REGRESSION TESTS (T11.1.7_B1)
+# ==============================================================================
+@pytest.mark.unit
+def test_t11_1_7_b1_monologue_m_tag_does_not_override_female_character_gender():
+    """Weryfikacja rozróżnienia tagu monologu Imię(M) od jawnego znacznika płci ze spacją."""
+    from metadata import normalize_actor_tag
+    import pysubs2
+    from series_memory import SeriesBible
+    from scene_discourse import SceneDiscourseGraph
+
+    # 1. Doklejony bez spacji sufiks (M) na imionach żeńskich zwraca brak przypisania płci
+    c_name1, g1 = normalize_actor_tag("HeroineAlpha(M)")
+    assert c_name1 == "HeroineAlpha"
+    assert g1 is None
+
+    c_name2, g2 = normalize_actor_tag("LadyBeta(M)")
+    assert c_name2 == "LadyBeta"
+    assert g2 is None
+
+    # 2. Tag ze spacją przed (M) poprawnie przypisuje płeć męską
+    c_name3, g3 = normalize_actor_tag("SoldierAlpha (M)")
+    assert c_name3 == "SoldierAlpha"
+    assert g3 == "MALE"
+
+    # 3. Postać z bazy wiedzy zachowuje płeć żeńską mimo etykiety zdarzenia HeroineAlpha(M)
+    bible = SeriesBible()
+    bible.data["characters"]["HeroineAlpha"] = {
+        "gender": "FEMALE",
+        "priority": "P0",
+        "has_verified_gender": True,
+        "aliases": ["HeroineAlpha"]
+    }
+
+    event = pysubs2.SSAEvent(start=1000, end=3000, text="Rozważam opcje...", name="HeroineAlpha(M)", style="Italics")
+    telemetry = SceneDiscourseGraph.arbitrate_event_telemetry(
+        event=event,
+        series_bible=bible
+    )
+    assert telemetry["speaker_name"] == "HeroineAlpha"
+    assert telemetry["speaker_gender"] == "FEMALE"
+    assert telemetry["grammatical_gender"] == "FEMININE"
+
+
