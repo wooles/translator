@@ -4,9 +4,9 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-11 — Standard 11.1.5 Certyfikowany Baseline)
-- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.1.5 (Discourse Telemetry & Sociolinguistic Gate Certified Baseline)`
-- **Commit certyfikacji kodu:** `3c70a557b77ce2b83bf9bcf5875bf6fe57f70db7` (`3c70a55`)
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-12 — Standard 11.1.6 Certyfikowany Baseline)
+- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.1.6 (Full Glossary Inflection Guard, Cross-Speaker ASR Dedup & Off-Screen Discourse Isolation Baseline)`
+- **Commit certyfikacji kodu:** `0651e17ed250bf9be31b9670695b8e0f86d481b3` (`0651e17`)
 - **Commity implementacyjne 11.1:** `5b7306d` (Commit 1), `5b17ea7` (Commit 2), `2b4bc7d` (Commit 3), `8b72887` (Commit 4), `8a7dd31` (Commit 5), `218af2e` (Commit 6)
 - **Commity Hotfixu 11.1.1:** `328729f` (Commit 1), `9de0b83` (Commit 2), `07c4684` (Commit 3), `96acac7` (Commit 4)
 - **Commity Hotfixu 11.1.2:** `74766d8` (Commit 1), `1b540e3` (Commit 2), `8313658` (Commit 3), `326b7e0` (Commit 4)
@@ -16,16 +16,17 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 - **Commity Hotfixu 11.1.4:** `a6d40bb` (Commit 1), `38ad629` (Commit 2), `3057e97` (Commit 3)
 - **Commity Hotfixu 11.1.4a:** `1b4d52a` (Commit 1), `d4a456c` (Commit 2), `4eb863c` (Commit 3)
 - **Commity Hotfixu 11.1.4b:** `03db100` (Commit 1), `bd52c4c` (Commit 2), `dd950ba` (Commit 3)
-- **Commity Hotfixu 11.1.5:**
-  * Commit 1 (`13afb4226d9c6ca1605ecf9116e107df4923f669`): `fix(translator,whisper,discourse,series_memory): Hotfix 11.1.5 - discourse telemetry gating, register validation, and in-memory SeriesBible sanitization`
-  * Commit 2 (`3c70a557b77ce2b83bf9bcf5875bf6fe57f70db7`): `test(tests): Hotfix 11.1.5 - regression tests for register gating, in-memory sanitization, gender stability, and italics tag normalization` — **NOWY COMMIT CERTYFIKACJI KODU**
-  * Commit 3 (`HEAD`): `docs: Hotfix 11.1.5 - sync SSOT to 11.1.5, record INC-AVT-026..027 and publish implementation report`
-- **Status 11.1.5:** `CERTIFIED / CLOSED (2026-11-11)`
+- **Commity Hotfixu 11.1.5:** `13afb42` (Commit 1), `3c70a55` (Commit 2), `79f6e69` (Commit 3)
+- **Commity Hotfixu 11.1.6:**
+  * Commit 1 (`d69d3f3004104ddad01cf9455c534a3dcb8b9664`): `fix(pipeline): enforce phase1/2 inflected glossary canon, relation role gender reconciliation, ASR cross-speaker dedup, and off-screen addressee isolation (11.1.6)`
+  * Commit 2 (`0651e17ed250bf9be31b9670695b8e0f86d481b3`): `test(regression): add 4 end-to-end unit tests for 11.1.6 glossary inflection, relation roles, ASR dedup, and off-screen discourse` — **NOWY COMMIT CERTYFIKACJI KODU**
+  * Commit 3 (`HEAD`): `docs(release): certify Standard 11.1.6 baseline in AGENTS.md, PROJECT_MEMORY.md, and implementation report`
+- **Status 11.1.6:** `CERTIFIED / CLOSED (2026-11-12)`
 - **Commit ochrony Depuracji Legacy 1.0 (Z16):** `a6d40bb09d60b2d986d919de98044c6e2d9c838b` (`a6d40bb` — nienaruszalne 0 B diffu na plikach chronionych)
-- **Stan metryk:** `347 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `418 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 12/12, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
-- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (347/347 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
+- **Stan metryk:** `352 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `423 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 12/12, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
+- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (352/352 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
 - **Zasada utrzymaniowa post-11.1:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.1` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
-- **Gałąź i Architektura:** `main` (Standard 11.1.5: Bramkowanie Tagów Rejestru przez Metadane Mówcy, In-Memory Reconcyliacja i Sanitacja Bazy Serii, Filtr Składniowy 3. Osoby Adresata, Normalizacja Kursywy i Ochrona Glosariusza, Certyfikacja Kodu `3c70a557b77ce2b83bf9bcf5875bf6fe57f70db7`, Nienaruszalny Baseline Z16 `a6d40bb09d60b2d986d919de98044c6e2d9c838b`, Zero-Literal Pure Positive Domain Invariant Architecture & Primary LLM Translation Authority)
+- **Gałąź i Architektura:** `main` (Standard 11.1.6: Strażnik Glosariusza Fazy 1 i 2, Odwracanie Synonimów Przymiotnikowych, Reconcyliacja Ról Relacyjnych P0 w RAM, Cross-Speaker ASR Whisper Deduplikacja i Filtr Mikro-Kwestii, Izolacja Mówców Off-Screen 'Italics - Top' oraz Zachowanie Nazw Aktorów Złożonych w ASS, Certyfikacja Kodu `0651e17ed250bf9be31b9670695b8e0f86d481b3`, Nienaruszalny Baseline Z16 `a6d40bb09d60b2d986d919de98044c6e2d9c838b`, Zero-Literal Pure Positive Domain Invariant Architecture & Primary LLM Translation Authority)
 - **Środowisko:** Python 3.13 (`.venv`), Windows PowerShell, `ffmpeg` (PATH), `librosa.pyin`, `soundfile`, `pysubs2`, `spaCy en_core_web_sm` (100% offline 0.00 PLN), bezpośrednie klucze Google AI Studio API (`use_vertex = 0`).
 - **Dyrektywa Wykonawcza Testów:**
   * Testy przyrostowe podczas kodowania (< 2 s): `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_testu>"`
