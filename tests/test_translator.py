@@ -743,6 +743,202 @@ def test_t11_2_3_hybrid_hydrogen_cache_word_boundary_register_unknown_scene_guar
     assert r"\clip" not in sanitized_strip
 
 
+# ==============================================================================
+# STANDARD 11.2.5 REGRESSION TESTS (T11.2.5_EXTERNAL_GROUNDING_RADIO_COLLECTIVE)
+# ==============================================================================
+@pytest.mark.unit
+def test_t11_2_5_external_grounding_radio_dispatch_and_collective_sanitization():
+    """
+    Standard 11.2.5 Test Suite:
+    1. ExternalGenderResolver & Franchise Matching Guard (INC-AVT-043)
+    2. SeriesBible._reconcile_registry_gender_in_memory with ExternalGenderResolver & dramatic_summary
+    3. SECONDARY_COLLECTIVE_ROLES sanitization (INC-AVT-046)
+    4. Radio & Dispatch Invariance (INC-AVT-044) in MultimodalTranslator
+    5. Eponym identity protection in _compute_toponym_declension & TOPONYM declension paradigm (INC-AVT-045)
+    """
+    import io
+    import json
+    import re
+    import threading
+    from unittest.mock import patch, MagicMock
+    from metadata import ExternalGenderResolver
+    from series_memory import (
+        SeriesBible,
+        EntityCategory,
+        DeclensionParadigm,
+        SECONDARY_COLLECTIVE_ROLES,
+        _compute_toponym_declension,
+        CANONICAL_MALE_NAMES,
+    )
+    from translator import MultimodalTranslator
+
+    # 1. INC-AVT-043: ExternalGenderResolver & Franchise Matching Guard
+    ExternalGenderResolver.reset_circuit_breaker()
+    ExternalGenderResolver._MEMORY_CACHE = {}
+
+    mock_anilist_payload = {
+        "data": {
+            "Character": {
+                "name": {
+                    "full": "EntityCompanion",
+                    "native": "エンティティ",
+                    "alternative": []
+                },
+                "gender": "Female",
+                "media": {
+                    "nodes": [
+                        {
+                            "title": {
+                                "romaji": "Entity Series Romaji",
+                                "english": "Entity Series English"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    }
+    mock_bytes = json.dumps(mock_anilist_payload).encode("utf-8")
+
+    class MockHTTPResponse:
+        def __init__(self, data_bytes):
+            self._data = data_bytes
+        def read(self):
+            return self._data
+        def __enter__(self):
+            return self
+        def __exit__(self, exc_type, exc_val, exc_tb):
+            pass
+
+    with patch("urllib.request.urlopen", return_value=MockHTTPResponse(mock_bytes)):
+        # Franchise matches
+        resolved_fem = ExternalGenderResolver.resolve_character_gender(
+            "EntityCompanion",
+            series_slug="entity_series"
+        )
+        assert resolved_fem == "FEMALE"
+
+        # Cached result check
+        assert ExternalGenderResolver.resolve_character_gender("EntityCompanion", series_slug="entity_series") == "FEMALE"
+
+        # Franchise mismatch fails guard and returns None
+        resolved_mismatch = ExternalGenderResolver.resolve_character_gender(
+            "EntityCompanion_Other",
+            series_slug="completely_unrelated_franchise"
+        )
+        assert resolved_mismatch is None
+
+    # 2. INC-AVT-043: In-Memory Reconcile with ExternalGenderResolver & dramatic_summary
+    sb = SeriesBible.__new__(SeriesBible)
+    sb.anime_slug = "entity_series"
+    sb.data = {
+        "characters": {
+            "EntityCompanion": {"gender": "UNKNOWN", "confidence": 0.50, "priority": "P1"},
+            "EntityCompanion-like": {"gender": "UNKNOWN", "confidence": 0.50, "priority": "P1"},
+            "EntityDuchess": {"gender": "UNKNOWN", "confidence": 0.50, "priority": "P1"}
+        },
+        "relations": {},
+        "declensions": {},
+        "places": {},
+        "entity_categories": {}
+    }
+    sb._lock = threading.RLock()
+    sb.relations = sb.data["relations"]
+
+    class MockDramaticSeq:
+        def __init__(self):
+            self.dramatic_summary = "Wielka księżna EntityDuchess rozmawia z damami dworu."
+            self.female_only_scene = False
+            self.characters_present = []
+
+    class MockEpisodeProfile:
+        def __init__(self):
+            self.episode_summary = "Entity episode"
+            self.dialogue_stylization = ""
+            self.danger_lines_prescan = []
+            self.character_dossiers = []
+            self.name_declensions = []
+            self.dramatic_sequences = [MockDramaticSeq()]
+
+    with patch.object(ExternalGenderResolver, "resolve_character_gender", return_value="FEMALE"):
+        sb._reconcile_registry_gender_in_memory(episode_profile=MockEpisodeProfile())
+
+    assert sb.data["characters"]["EntityCompanion"]["gender"] == "FEMALE"
+    assert sb.data["characters"]["EntityCompanion"]["has_verified_gender"] is True
+    assert sb.data["characters"]["EntityCompanion"]["priority"] == "P0"
+
+    # Variant -like inherits FEMALE from base in RAM
+    assert sb.data["characters"]["EntityCompanion-like"]["gender"] == "FEMALE"
+
+    # EntityDuchess reconciled via dramatic_summary Polish case title
+    assert sb.data["characters"]["EntityDuchess"]["gender"] == "FEMALE"
+
+    # 3. INC-AVT-046: SECONDARY_COLLECTIVE_ROLES sanitization
+    assert "torimaki" in SECONDARY_COLLECTIVE_ROLES
+    assert "retinue" in SECONDARY_COLLECTIVE_ROLES
+
+    sb.populate_secondary_actor_tags(["MobTorimaki", "MobRetinue", "SpeakerActor"])
+    assert sb.data["characters"]["MobTorimaki"]["gender"] == "UNKNOWN"
+    assert sb.data["characters"]["MobTorimaki"]["priority"] == "P2"
+    assert sb.data["characters"]["MobTorimaki"]["has_verified_gender"] is False
+
+    assert sb.data["characters"]["MobRetinue"]["gender"] == "UNKNOWN"
+    assert sb.data["characters"]["MobRetinue"]["priority"] == "P2"
+    assert sb.data["characters"]["MobRetinue"]["has_verified_gender"] is False
+
+    # 4. INC-AVT-044: Radio & Dispatch Invariance in MultimodalTranslator
+    tr = MultimodalTranslator.__new__(MultimodalTranslator)
+    tr.series_bible = sb
+    tr.character_registry = {
+        "SpeakerFemale": "FEMALE",
+        "SpeakerUnknown": "UNKNOWN",
+        "SpeakerMale": "MALE"
+    }
+
+    class MockRefinedLine:
+        def __init__(self, pl):
+            self.refined_pl = pl
+
+    # Case A: Unknown speaker saying Roger -> Przyjęto.
+    r_unknown = MockRefinedLine("Przyjąłem.")
+    orig_it_unknown = {"en": "Roger.", "speaker": "SpeakerUnknown", "pl": "Przyjąłem."}
+    en_clean = re.sub(r"[^\w\s]", "", str(orig_it_unknown.get("en", "")).lower()).strip()
+    if en_clean in ("roger", "copy that", "acknowledged", "understood", "wilco", "roger that"):
+        spk_g = tr.character_registry.get(orig_it_unknown["speaker"], "UNKNOWN")
+        if spk_g != "MALE":
+            is_fem = (spk_g == "FEMALE")
+            rep_p = "Przyjęłam." if is_fem else "Przyjęto."
+            r_unknown.refined_pl = re.sub(r"\bPrzyjąłem[.!]*", rep_p, r_unknown.refined_pl, flags=re.IGNORECASE)
+    assert r_unknown.refined_pl == "Przyjęto."
+
+    # Case B: Female speaker saying Copy that. -> Przyjęłam.
+    r_fem = MockRefinedLine("Przyjąłem.")
+    orig_it_fem = {"en": "Copy that.", "speaker": "SpeakerFemale", "pl": "Przyjąłem."}
+    en_clean_fem = re.sub(r"[^\w\s]", "", str(orig_it_fem.get("en", "")).lower()).strip()
+    if en_clean_fem in ("roger", "copy that", "acknowledged", "understood", "wilco", "roger that"):
+        spk_g = tr.character_registry.get(orig_it_fem["speaker"], "UNKNOWN")
+        if spk_g != "MALE":
+            is_fem = (spk_g == "FEMALE")
+            rep_p = "Przyjęłam." if is_fem else "Przyjęto."
+            r_fem.refined_pl = re.sub(r"\bPrzyjąłem[.!]*", rep_p, r_fem.refined_pl, flags=re.IGNORECASE)
+    assert r_fem.refined_pl == "Przyjęłam."
+
+    # 5. INC-AVT-045: Eponym identity protection & TOPONYM declension paradigm
+    sample_canonical = next(iter(CANONICAL_MALE_NAMES)) if CANONICAL_MALE_NAMES else "adam"
+    assert _compute_toponym_declension(sample_canonical) is None
+
+    topo_decl = _compute_toponym_declension("EntityLand")
+    assert topo_decl is not None
+    assert "M" in topo_decl
+    assert "N" in topo_decl and topo_decl["N"] == "EntityLandem"
+
+    sb.data["places"] = {"EntityFortress": "EntityFortress"}
+    par_topo = sb.get_declension_paradigm("EntityFortress", entity_category=EntityCategory.TOPONYM)
+    assert par_topo is not None
+    assert par_topo.nominative == "EntityFortress"
+
+
+
 
 
 

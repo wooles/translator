@@ -5239,12 +5239,12 @@ class SeriesBible:
 
             return None
 
-    def get_declension_paradigm(self, character_name: str) -> Optional[DeclensionParadigm]:
+    def get_declension_paradigm(self, character_name: str, entity_category: Optional[EntityCategory] = None) -> Optional[DeclensionParadigm]:
         """Zwraca lub generuje 7-przypadkowy paradygmat fleksyjny dla postaci."""
         if not character_name:
             return None
         clean_name = character_name.strip()
-        cat = self.get_entity_category(clean_name)
+        cat = entity_category or self.get_entity_category(clean_name)
 
         with self._lock:
             # Canonical glossary definitions from EpisodeProfiler take absolute priority
