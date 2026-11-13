@@ -423,4 +423,65 @@ def test_t11_1_7_b4_extract_typesetting_tags_and_three_word_glossary_guard():
     assert res_gen == "Widziałem wczoraj Maga Lodowego Miecza."
 
 
+# ==============================================================================
+# STANDARD 11.2.0 REGRESSION TESTS (T11.2.0_HYDROGEN)
+# ==============================================================================
+@pytest.mark.unit
+def test_t11_2_0_hydrogen_master_engine_implicit_cache_95_and_lean_schema_cost_invariance():
+    """Weryfikacja silnika Gemini 4 Hydrogen, 95% implicit cache, Lean JSON Schema i niezmiennika kosztowego."""
+    from unittest.mock import MagicMock
+    from model_resolver import resolve_best_models, build_thinking_config, is_gemini_4_or_hydrogen_model
+    from pricing_guard import PricingGuard, GOOGLE_API_RATES
+    from context_cache import ContextCacheManager
+    from verifier import DialogueVerifier, LeanRefinedBatchResponse, LeanRefinedLine, RefinedBatchResponse, RefinedLine
+    from translator import LeanBatchTranslationResponse, LeanLineTranslation, BatchTranslationResponse
+
+    # 1. Rozwiązywanie modeli domyślnych
+    models = resolve_best_models(None)
+    assert models["hydrogen"] == "gemini-4-hydrogen"
+    assert models["flash"] == "gemini-3.8-flash"
+    assert is_gemini_4_or_hydrogen_model("gemini-4-hydrogen") is True
+    assert is_gemini_4_or_hydrogen_model("gemini-3.8-flash") is False
+
+    # 2. Cennik i estymacja kosztu odcinka (~3.68 PLN dla profilu 3 przy 350 kwestiach, 3.93 PLN przy 364 kwestiach)
+    assert GOOGLE_API_RATES["hydrogen"]["input_cached"] == 0.075
+    est_350 = PricingGuard.estimate_episode_cost_pln("3", lines_count=350)
+    assert est_350 == 3.68
+    est_364 = PricingGuard.estimate_episode_cost_pln("3", lines_count=364)
+    assert est_364 == 3.93
+
+    # 3. Konfiguracja myślenia (ThinkingConfig) bez wielkich krotek w AST
+    cfg_low = build_thinking_config("gemini-4-hydrogen", 0)
+    assert getattr(cfg_low, "thinking_level", None) == "LOW"
+    cfg_med = build_thinking_config("gemini-4-hydrogen", 3072)
+    assert getattr(cfg_med, "thinking_level", None) == "MEDIUM"
+    cfg_high = build_thinking_config("gemini-4-hydrogen", 6144)
+    assert getattr(cfg_high, "thinking_level", None) == "HIGH"
+    cfg_flash = build_thinking_config("gemini-3.8-flash", 0)
+    assert getattr(cfg_flash, "thinking_budget", None) == 0
+
+    # 4. Implicit context caching (-95%) w ContextCacheManager
+    cache_token = ContextCacheManager.get_or_create_cache(object(), "gemini-4-hydrogen", "A" * 20000)
+    assert cache_token == "__IMPLICIT_CACHE_95__"
+    assert ContextCacheManager.ensure_cache_ready(object(), "gemini-4-hydrogen", "A" * 20000) is True
+
+    # 5. Dynamiczny budżet myślenia DialogueVerifier w Fazie 2
+    mock_pool = MagicMock()
+    verifier_hydrogen = DialogueVerifier(client=mock_pool, model="gemini-4-hydrogen")
+    budget_std = verifier_hydrogen.calculate_effective_budget([{"id": 1, "en": "Standard line", "pl": "Zwykła linia"}])
+    assert budget_std == 2048
+    budget_song = verifier_hydrogen.calculate_effective_budget([{"id": 1, "en": "Song lyric", "pl": "Tekst pieśni", "is_song": True}])
+    assert budget_song == 3072
+
+    # 6. Kompatybilność odchudzonych schematów Pydantic (Lean JSON Schema)
+    lean_trans = LeanBatchTranslationResponse(translations=[LeanLineTranslation(id=1, polish_text="Zwykła linia")])
+    full_trans = BatchTranslationResponse.model_validate(lean_trans.model_dump())
+    assert full_trans.translations[0].polish_text == "Zwykła linia"
+
+    lean_ref = LeanRefinedBatchResponse(lines=[LeanRefinedLine(id=1, refined_pl="Doskonała linia")])
+    full_ref = RefinedBatchResponse(lines=[RefinedLine(id=l.id, refined_pl=l.refined_pl, changes_made=l.changes_made) for l in lean_ref.lines])
+    assert full_ref.lines[0].refined_pl == "Doskonała linia"
+
+
+
 
