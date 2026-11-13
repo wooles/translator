@@ -4,9 +4,9 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-13 — Standard 11.2.2 Certyfikowany Baseline)
-- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.2 (Strict Hydrogen Tier Isolation & Retired 2.x Model Guard Baseline)`
-- **Commit certyfikacji kodu:** `1c18bef29e64f06867d66303e35e04752ae3db60` (`1c18bef`)
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-13 — Standard 11.2.3 Certyfikowany Baseline)
+- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.3 (Hydrogen Hybrid Context Cache, Pragmatic Word-Boundary Guard, Unknown-Safe Scene Cast & Toponym/Typesetting Integrity Baseline)`
+- **Commit certyfikacji kodu:** `d6f7355e28e038dea105dd34da57514053395e96` (`d6f7355`)
 - **Commity implementacyjne 11.1:** `5b7306d` (Commit 1), `5b17ea7` (Commit 2), `2b4bc7d` (Commit 3), `8b72887` (Commit 4), `8a7dd31` (Commit 5), `218af2e` (Commit 6)
 - **Commity Hotfixu 11.1.1:** `328729f` (Commit 1), `9de0b83` (Commit 2), `07c4684` (Commit 3), `96acac7` (Commit 4)
 - **Commity Hotfixu 11.1.2:** `74766d8` (Commit 1), `1b540e3` (Commit 2), `8313658` (Commit 3), `326b7e0` (Commit 4)
@@ -21,16 +21,17 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 - **Commity Hotfixu 11.1.7:** `854a4b3` (Commit 1), `a733c06` (Commit 2), `928fa55` (Commit 3)
 - **Commity Standardu 11.2.0:** `c197db7` (Commit 1), `b113308` (Commit 2), `1772034` (Commit 3)
 - **Commity Hotfixu 11.2.1:** `bf03d84` (Commit 1), `5e11cc9` (Commit 2), `208388c` (Commit 3)
-- **Commity Hotfixu 11.2.2:**
-  * Commit 1 (`bacb2d9`): `fix(models): isolate gemini-4-hydrogen from gemini-4-argon and filter out retired 2.x models in model_resolver.py (11.2.2)`
-  * Commit 2 (`1c18bef29e64f06867d66303e35e04752ae3db60`): `test(models): add regression test for hydrogen vs argon tier isolation and retired 2.x model filtering` — **NOWY COMMIT CERTYFIKACJI KODU**
-  * Commit 3 (`HEAD`): `docs(release): certify Standard 11.2.2 baseline in AGENTS.md, PROJECT_MEMORY.md, and implementation report`
-- **Status 11.2.2:** `CERTIFIED / CLOSED (2026-11-13)`
+- **Commity Hotfixu 11.2.2:** `bacb2d9` (Commit 1), `1c18bef` (Commit 2), `24b4a51` (Commit 3)
+- **Commity Hotfixu 11.2.3:**
+  * Commit 1 (`2ae94bf`): `fix(pipeline): enable hybrid server context cache for hydrogen, tighten pragmatic register boundaries, enforce unknown_count invariant, and preserve toponym/clip integrity (11.2.3)`
+  * Commit 2 (`d6f7355e28e038dea105dd34da57514053395e96`): `test(pipeline): add regression test for hybrid hydrogen context cache, register word boundaries, unknown scene guard, toponym declension, and clip preservation` — **NOWY COMMIT CERTYFIKACJI KODU**
+  * Commit 3 (`HEAD`): `docs(release): certify Standard 11.2.3 baseline in AGENTS.md, PROJECT_MEMORY.md, and implementation report`
+- **Status 11.2.3:** `CERTIFIED / CLOSED (2026-11-13)`
 - **Commit ochrony Depuracji Legacy 1.0 (Z16):** `c197db73c3dabf887dddbf2337dc3a1d8cff598c` (`c197db7` — bezwzględne 0 B diffu na wszystkich plikach chronionych)
-- **Stan metryk:** `359 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `430 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 12/12, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
-- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (359/359 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
-- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.2` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
-- **Gałąź i Architektura:** `main` (Standard 11.2.2: Ścisła izolacja modelu gemini-4-hydrogen od gemini-4-argon w model_resolver.py, eliminacja kolizji alfabetycznej Timsort, przypisanie argon i carbon do pro_candidates i stawek pro w pricing_guard.py, odfiltrowanie wycofanych modeli 1.x i 2.x np. gemini-2.5-pro zwracających 404, Certyfikacja Kodu `1c18bef29e64f06867d66303e35e04752ae3db60`, Baseline Z16 `c197db73c3dabf887dddbf2337dc3a1d8cff598c`, Zero-Literal Pure Positive Domain Invariant Architecture & Primary LLM Translation Authority)
+- **Stan metryk:** `360 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `431 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 12/12, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
+- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (360/360 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
+- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.3` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
+- **Gałąź i Architektura:** `main` (Standard 11.2.3: Hybrydowy Context Cache dla Gemini 4 Hydrogen z fallbackiem __IMPLICIT_CACHE_95__, uszczelnienie granic słów \b w rejestrze pragmatycznym yakuwarigo, poszanowanie niezmiennika unknown_count == 0 w precompute scene genders i promocja płci z tytułów w profilu, 7-przypadkowa fleksja toponimów spółgłoskowych w RAM, ochrona tagów \clip(...) i pozycjonowania plansz \an8, Certyfikacja Kodu `d6f7355e28e038dea105dd34da57514053395e96`, Baseline Z16 `c197db73c3dabf887dddbf2337dc3a1d8cff598c`, Zero-Literal Pure Positive Domain Invariant Architecture & Primary LLM Translation Authority)
 - **Środowisko:** Python 3.13 (`.venv`), Windows PowerShell, `ffmpeg` (PATH), `librosa.pyin`, `soundfile`, `pysubs2`, `spaCy en_core_web_sm` (100% offline 0.00 PLN), bezpośrednie klucze Google AI Studio API (`use_vertex = 0`).
 - **Dyrektywa Wykonawcza Testów:**
   * Testy przyrostowe podczas kodowania (< 2 s): `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_testu>"`
@@ -386,4 +387,24 @@ Przed naprawą `_resolve_bible_path` w 10.6.3 (`FIX-D.1`) odcinek `S2 - 02` seri
 ### Rozwiązanie (11.0)
 
 Dodanie w `tools/consolidate_bibles.py` opcjonalnej flagi `--migrate-misplaced-season-episodes` (uruchamianej lokalnie przez operatora poza reżimem Z16), która przenosi wpisy `episodes_translated` i `batch_stats` zawierające jawny znacznik `S2` z pliku `<SERIA_BASE>_bible.json` do `<SERIA_BASE>_2nd_Season_bible.json`.
+
+
+## 🏛️ ARB-056 / INC-AVT-038..042: Hotfix 11.2.3 — Hybrydowy Context Cache Gemini 4 Hydrogen, Granice Słów Rejestru, Pre-pass Scen, Fleksja Toponimów i Integralność Typograficzna ASS
+
+- **Status:** `RESOLVED (Standard 11.2.3, commity 2ae94bf, d6f7355)`
+- **Zidentyfikowano:** Produkcyjny audyt wykonawczy modelu `gemini-4-hydrogen` i logi telemetryczne potoku
+- **Commit certyfikacji kodu:** `d6f7355e28e038dea105dd34da57514053395e96` (`d6f7355`)
+
+### Składowe Wdrożenia:
+1. **INC-AVT-038 (Hybrydowy Context Cache dla Gemini 4 Hydrogen):**
+   W `context_cache.py` wprowadzono pełną obsługę tworzenia i wyszukiwania serwerowego `CachedContent` (`cachedContents/...`) dla modeli `gemini-4-hydrogen` na rzeczywistym kliencie API (`client.caches.create`), z automatycznym awaryjnym fallbackiem do niejawnego tokenu `"__IMPLICIT_CACHE_95__"` w przypadku braku obsługi lub przekroczenia limitów.
+2. **INC-AVT-039 (Uszczelnienie Granic Słów \b w Rejestrze Pragmatycznym Yakuwarigo):**
+   W `translator.py` dodano rygorystyczne granice słów `\b` dla zaimków i leksemów rejestru żołnierskiego/bojowego (`\b(?:ore|oresama|temee|kisama|yarou|kono\s*yarou)\b`), wycięto fałszywe dopasowania cząstek (`"どうぞ"`, `"想像"`), a w dialekcie południowym wykluczono japońskie formy desideratywne czasowników (`"たい"`). W `whisper_disambiguator.py` zablokowano narzucanie rejestru żołnierskiego dla potwierdzonych postaci żeńskich bez stylu bitewnego.
+3. **INC-AVT-042 (Niezmiennik unknown_count == 0 w Pre-passie Scen i Promocja Płci z Tytułów):**
+   W `translator.py` (`_precompute_episode_scene_genders`) wprowadzono licznik `unknown_count`, blokując przypisywanie jednolitej płci sceny, gdy chociaż jeden niebędący planszą mówca ma status nieznany. Dodatkowo w `series_memory.py` wprowadzono skanowanie prefiksów tytularnych (księżniczka, królowa, król, książę) w profilu odcinka w RAM.
+4. **INC-AVT-040 (7-przypadkowa Fleksja Toponimów Spółgłoskowych w RAM):**
+   W `series_memory.py` dodano deterministyczne generowanie 7-przypadkowego paradygmatu dla toponimów jednowyrazowych na spółgłoski twarde i wargowe oraz na `-ia`/`-ja`, integrując je z `DeclensionParadigm` i słownikiem `places` bez zapisu na dysk.
+5. **INC-AVT-041 (Ochrona Tagów \clip(...) i Pozycjonowania Plansz):**
+   W `translator.py` rozszerzono `sanitize_ts_prefix_for_translation` o parametr `preserve_clip: bool = False`, aktywowany dla plansz wielowarstwowych frame-by-frame (`\pos` + `\clip`). Dodano także ochronę tagu wyrównania górnego `\an8` dla napisów stylizowanych w górnej części ekranu.
+
 
