@@ -1,12 +1,12 @@
-# 🏛️ KODEKS ZASAD POTOKU AVT (WORKSPACE RULES — TRANSLATOR STANDARD 11.1 BASELINE)
+# 🏛️ KODEKS ZASAD POTOKU AVT (WORKSPACE RULES — TRANSLATOR STANDARD 11.2 BASELINE)
 
 Dokument ten stanowi jedyne źródło prawdy (Single Source of Truth) definiujące nienaruszalne reguły architektoniczne, lingwistyczne i procesowe asystenta AI oraz zespołów wieloagentowych w repozytorium `translator`.
 
-- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.1.7 (Monologue Tag Disambiguation, Intra-Speaker ASR Dedup, Question & Repetition Authority Guard & 3-Word Glossary Canon Baseline)`
-- **Commit certyfikacji kodu:** `a733c06` (`a733c068d2c1bf29af517bbb0a5059826bb7e5c7`)
-- **Commit ochrony Depuracji Legacy 1.0 (Z16):** `854a4b3` (`854a4b35929c06b22fc0329fe469e01d0616ccd8`)
-- **Stan metryk:** `580 collected` (`427 passed` fast unit/integration [356 tests/ + 71 test_system.py] + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki (`verify_purity.py`, `verify_8_fixes.py`, `verify_12_fixes.py`, `verify_ultimate_pipeline.py`) oraz `audit_diff.ps1` w stanie `PASS`.
-- **Zasada utrzymaniowa post-11.1:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.1` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
+- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.0 (Gemini 4 Hydrogen Master, Implicit Caching -95%, Thinking LOW/MEDIUM & Lean Schema Baseline)`
+- **Commit certyfikacji kodu:** `b113308` (`b113308dbf957cd6ecf4da2d934c21eb84c6dbb6`)
+- **Commit ochrony Depuracji Legacy 1.0 (Z16):** `c197db7` (`c197db73c3dabf887dddbf2337dc3a1d8cff598c`)
+- **Stan metryk:** `581 collected` (`428 passed` fast unit/integration [357 tests/ + 71 test_system.py] + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki (`verify_purity.py`, `verify_8_fixes.py`, `verify_12_fixes.py`, `verify_ultimate_pipeline.py`) oraz `audit_diff.ps1` w stanie `PASS`.
+- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.0` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
 
 ---
 
