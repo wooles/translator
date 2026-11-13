@@ -18,7 +18,7 @@ import logging
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
-from typing import Dict, List, Any, Optional, Set, Tuple, Union, Literal
+from typing import Dict, List, Any, Optional, Set, Tuple, Union, Literal, FrozenSet
 from collections import Counter, defaultdict
 from pydantic import BaseModel, Field, ConfigDict
 from enum import Enum
@@ -387,6 +387,10 @@ def _compute_toponym_declension(name: str) -> Optional[Dict[str, str]]:
     if " " in clean_n or not clean_n[0].isupper():
         return None
     clean_low = clean_n.lower()
+    canonical_male = globals().get("CANONICAL_MALE_NAMES", set())
+    foreign_fem = globals().get("FOREIGN_FEMALE_CONSONANT_NAMES", set())
+    if clean_low in canonical_male or clean_low in foreign_fem:
+        return None
 
     if clean_low.endswith("ia"):
         base = clean_n[:-2]
@@ -2030,6 +2034,11 @@ EPISODIC_MARTIAL_ROLES: Set[str] = {
     "mercenary", "warrior", "knight", "henchman", "bandyta", "zbój", "buntownik",
     "sługa", "zwiadowca", "żołnierz", "strażnik", "najemnik"
 }
+
+SECONDARY_COLLECTIVE_ROLES: FrozenSet[str] = frozenset({
+    "torimaki", "torimakis", "retinue", "followers", "servants", "attendants",
+    "guards", "soldiers", "squad", "escort", "unit", "crowd"
+})
 
 
 def _split_camel_case_tokens(tag: str) -> List[str]:
@@ -5256,13 +5265,34 @@ class SeriesBible:
                     if g_decl and "M" in g_decl:
                         return DeclensionParadigm.from_dict(g_decl, entity_category=cat)
 
-        if is_complex_description(clean_name) or cat != EntityCategory.ANTHROPONYM:
+        if is_complex_description(clean_name) or cat not in (EntityCategory.ANTHROPONYM, EntityCategory.TOPONYM):
             return DeclensionParadigm.from_dict(
                 {"M": clean_name, "D": clean_name, "C": clean_name, "B": clean_name, "N": clean_name, "Ms": clean_name, "W": clean_name},
                 entity_category=cat
             )
 
         with self._lock:
+            if cat == EntityCategory.TOPONYM:
+                places_dict = self.data.get("places", {})
+                decl_dict = self.data.get("declensions", {})
+                place_decl = None
+                if isinstance(places_dict, dict):
+                    place_decl = places_dict.get(clean_name)
+                    if not place_decl:
+                        for pk, pv in places_dict.items():
+                            if pk.lower() == clean_name.lower():
+                                place_decl = pv
+                                break
+                if not place_decl and isinstance(decl_dict, dict):
+                    place_decl = decl_dict.get(clean_name)
+                    if not place_decl:
+                        for dk, dv in decl_dict.items():
+                            if dk.lower() == clean_name.lower():
+                                place_decl = dv
+                                break
+                if isinstance(place_decl, dict) and "M" in place_decl:
+                    return DeclensionParadigm.from_dict(dict(place_decl), entity_category=EntityCategory.TOPONYM)
+                return DeclensionParadigm.create_for_name(clean_name, entity_category=EntityCategory.TOPONYM)
             decl = self.data.get("declensions", {}).get(character_name)
             if not decl:
                 c_norm = normalize_name_nfkd(character_name).lower()
@@ -7104,14 +7134,42 @@ class SeriesBible:
                                 profile_texts.append(item)
                             elif hasattr(item, "text"):
                                 profile_texts.append(str(item.text))
+
+                if getattr(episode_profile, "dramatic_sequences", None):
+                    for seq in episode_profile.dramatic_sequences:
+                        d_sum = getattr(seq, "dramatic_summary", "")
+                        if isinstance(d_sum, str) and d_sum:
+                            profile_texts.append(d_sum)
+                        is_fem = getattr(seq, "female_only_scene", False)
+                        is_male = getattr(seq, "male_only_scene", False)
+                        if is_fem and not is_male:
+                            chars_pres = getattr(seq, "characters_present", []) or []
+                            for cp in chars_pres:
+                                if isinstance(cp, str) and cp.strip():
+                                    cp_clean = extract_clean_speaker_name(cp).strip()
+                                    cp_low = cp_clean.lower()
+                                    char_rec = chars.get(cp_clean) or next((v for k, v in chars.items() if k.lower() == cp_low or cp_low in k.lower()), None)
+                                    if char_rec is None or not isinstance(char_rec, dict):
+                                        profile_genders[cp_low] = "FEMALE"
+                                    else:
+                                        g = char_rec.get("gender")
+                                        vh = char_rec.get("has_verified_gender", False)
+                                        if not vh or g in (None, "", "UNKNOWN"):
+                                            profile_genders[cp_low] = "FEMALE"
+
                 combined_prof_text = "\n".join(profile_texts)
 
                 fem_title_pattern = re.compile(
-                    r"\b(?:księżniczk[aięo]|królow[aąej]|pann[ayęo]|pani|siostr[ayęo]|matk[aię]|córk[aię]|princess|queen|lady|sister)\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+)",
+                    r"\b(?:księżnicz(?:ka|ki|ce|kę|ką|ko)|królow(?:a|ej|ę|ą|o)|pann(?:a|y|ie|ę|ą|o)|"
+                    r"panien(?:ka|ki|ce|kę|ką|ko)|pani(?:ą)?|siostr(?:a|y|ze|ę|ą|o)|mat(?:ka|ki|ce|kę|ką)|"
+                    r"cór(?:ka|ki|ce|kę|ką)|hrabin(?:a|y|ie|ę|ą)|baronówn(?:a|y|ie|ę|ą)|"
+                    r"princess|queen|lady|sister)\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+)",
                     re.IGNORECASE
                 )
                 male_title_pattern = re.compile(
-                    r"\b(?:król(?:a|em|owi|u)?|książę|księci[au]|brat(?:a|em|u)?|ojciec|ojc[au]|syn(?:a|em)?|king|prince|lord|brother)\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+)",
+                    r"\b(?:król(?:a|em|owi|u)?|książę|księci(?:a|u|em)|brat(?:a|em|u)?|ojciec|ojc(?:a|u|em)|"
+                    r"syn(?:a|em|owi|u)?|hrabi(?:a|ego|emu|ą|m|o)|wicehrabi(?:a|ego|emu|ą|m|o)|"
+                    r"baron(?:a|owi|em|ie)?|king|prince|lord|duke|viscount|baron|count|brother)\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+)",
                     re.IGNORECASE
                 )
 
@@ -7221,12 +7279,33 @@ class SeriesBible:
                 if "->" in char_name or not isinstance(char_val, dict):
                     continue
                 c_low = char_name.strip().lower()
+                c_stripped = re.sub(r"-(?:san|kun|chan|sama|sensei|senpai|dono|like|clone|spirit|ghost|form)\b", "", c_low, flags=re.IGNORECASE).strip()
+                candidate_keys = {c_low, c_stripped} - {""}
+                if isinstance(char_val, dict):
+                    for al in char_val.get("aliases", []):
+                        if isinstance(al, str) and al.strip():
+                            al_low = al.strip().lower()
+                            al_strip = re.sub(r"-(?:san|kun|chan|sama|sensei|senpai|dono|like|clone|spirit|ghost|form)\b", "", al_low, flags=re.IGNORECASE).strip()
+                            candidate_keys.add(al_low)
+                            if al_strip:
+                                candidate_keys.add(al_strip)
+
+                variant_inherited_gender = None
+                if re.search(r"-(?:like|clone)\b", c_low, flags=re.IGNORECASE):
+                    base_c = re.sub(r"-(?:like|clone)\b.*", "", c_low, flags=re.IGNORECASE).strip()
+                    for bk, bv in chars.items():
+                        if "->" in bk or not isinstance(bv, dict):
+                            continue
+                        if bk.lower() == base_c or extract_clean_speaker_name(bk).strip().lower() == base_c:
+                            if bv.get("has_verified_gender") and bv.get("gender") in ("FEMALE", "MALE"):
+                                variant_inherited_gender = bv.get("gender")
+                                break
 
                 rel_indicated_gender = None
                 for r_key, r_desc in rels.items():
                     if "->" in r_key:
                         parts = [p.strip() for p in r_key.split("->")]
-                        if len(parts) >= 2 and parts[-1].strip().lower() == c_low:
+                        if len(parts) >= 2 and parts[-1].strip().lower() in candidate_keys:
                             desc_str = str(r_desc.get("description", "") if isinstance(r_desc, dict) else r_desc).lower()
                             if "[kobieta (adresat" in desc_str or "wymóg form żeńskich" in desc_str:
                                 rel_indicated_gender = "FEMALE"
@@ -7235,7 +7314,12 @@ class SeriesBible:
                                 rel_indicated_gender = "MALE"
                                 break
 
-                target_gender = profile_genders.get(c_low)
+                target_gender = None
+                for cand in candidate_keys:
+                    if cand in profile_genders:
+                        target_gender = profile_genders[cand]
+                        break
+
                 resolved_gender = None
                 if target_gender and rel_indicated_gender and target_gender == rel_indicated_gender:
                     resolved_gender = target_gender
@@ -7244,6 +7328,19 @@ class SeriesBible:
                 elif target_gender and not rel_indicated_gender:
                     if target_gender in ("FEMALE", "MALE"):
                         resolved_gender = target_gender
+                elif variant_inherited_gender:
+                    resolved_gender = variant_inherited_gender
+
+                # Zadanie 6: Zewnętrzne ugruntowanie ontologiczne dla postaci o statusie UNKNOWN
+                if not resolved_gender:
+                    curr_g = char_val.get("gender")
+                    if curr_g in (None, "", "UNKNOWN") or not char_val.get("has_verified_gender"):
+                        from metadata import ExternalGenderResolver
+                        stem_name = extract_clean_speaker_name(char_name).strip()
+                        series_slug = getattr(self, "anime_slug", None) or getattr(self, "slug", "") or getattr(self, "anime_title", "")
+                        ext_gender = ExternalGenderResolver.resolve_character_gender(stem_name, series_slug=series_slug)
+                        if ext_gender in ("FEMALE", "MALE"):
+                            resolved_gender = ext_gender
 
                 if resolved_gender:
                     char_val["gender"] = resolved_gender
@@ -7252,8 +7349,9 @@ class SeriesBible:
                     char_val["confidence"] = 0.95
                     char_val["priority"] = "P0"
                     if "declensions" in self.data and isinstance(self.data["declensions"], dict):
-                        if char_name in self.data["declensions"] and isinstance(self.data["declensions"][char_name], dict):
-                            self.data["declensions"][char_name]["gender"] = resolved_gender
+                        keys_to_update = [char_name] + char_val.get("aliases", [])
+                        for k_to_up in keys_to_update:
+                            self.data["declensions"][k_to_up] = generate_polish_name_declension(k_to_up, resolved_gender)
 
     def _sanitize_entity_categories_in_memory(self, episode_profile: Optional[Any] = None) -> None:
         """
@@ -7476,6 +7574,12 @@ class SeriesBible:
                 if clean_tag not in existing_aliases:
                     existing_aliases.append(clean_tag)
 
+                is_collective_tag = (
+                    clean_tag.lower() in SECONDARY_COLLECTIVE_ROLES
+                    or bool(tag_words & SECONDARY_COLLECTIVE_ROLES)
+                    or any(r in clean_tag.lower() for r in SECONDARY_COLLECTIVE_ROLES)
+                )
+
                 if explicit_g in ("MALE", "FEMALE"):
                     chars[clean_tag] = {
                         "name": clean_tag,
@@ -7486,6 +7590,18 @@ class SeriesBible:
                         "has_verified_gender": False,
                         "aliases": existing_aliases,
                         "description": "Postać drugoplanowa",
+                        "entity_category": "ANTHROPONYM"
+                    }
+                elif is_collective_tag:
+                    chars[clean_tag] = {
+                        "name": clean_tag,
+                        "gender": "UNKNOWN",
+                        "grammatical_gender": "UNKNOWN",
+                        "confidence": 0.50,
+                        "priority": "P2",
+                        "has_verified_gender": False,
+                        "aliases": existing_aliases,
+                        "description": "Rola zbiorowa / orszak / tło",
                         "entity_category": "ANTHROPONYM"
                     }
                 elif tag_words & masculine_lexicon:
@@ -9574,25 +9690,48 @@ class SeriesBible:
                                     else:
                                         p_lower = clean_p.lower()
                                         p_tokens = p_lower.split()
-                                        if p_lower in CANONICAL_MALE_NAMES or any(t in CANONICAL_MALE_NAMES for t in p_tokens):
+                                        is_coll = (
+                                            p_lower in SECONDARY_COLLECTIVE_ROLES
+                                            or bool(set(p_tokens) & SECONDARY_COLLECTIVE_ROLES)
+                                            or any(r in p_lower for r in SECONDARY_COLLECTIVE_ROLES)
+                                        )
+                                        if is_coll:
+                                            p_g = "UNKNOWN"
+                                            if any(w in p_details.lower() for w in ["kobieta", "dama", "księżniczka", "królowa", "lady", "princess", "queen"]):
+                                                p_g = "FEMALE"
+                                            elif any(w in p_details.lower() for w in ["mężczyzna", "lord", "książę", "król", "baron", "hrabia", "king", "prince"]):
+                                                p_g = "MALE"
+                                        elif p_lower in CANONICAL_MALE_NAMES or any(t in CANONICAL_MALE_NAMES for t in p_tokens):
                                             p_g = "MALE"
                                         elif (p_lower.endswith("a") or (p_tokens and p_tokens[0].endswith("a"))) and (p_lower not in CANONICAL_MALE_NAMES and not any(t in CANONICAL_MALE_NAMES for t in p_tokens)):
                                             p_g = "FEMALE"
                                         else:
                                             p_g = "MALE"
 
-                                    g_str = "KOBIETA" if p_g == "FEMALE" else "MĘŻCZYZNA"
-                                    self.data["characters"][clean_p] = {
-                                        "description": f"{g_str} (wyodrębniono z relacji serii)",
-                                        "gender": p_g,
-                                        "grammatical_gender": "FEMININE" if p_g == "FEMALE" else "MASCULINE",
-                                        "has_verified_gender": True,
-                                        "confidence": 0.95,
-                                        "priority": "P0",
-                                        "aliases": [clean_p],
-                                        "entity_category": EntityCategory.ANTHROPONYM.value
-                                    }
-                                    self.data["declensions"][clean_p] = generate_polish_name_declension(clean_p, p_g)
+                                    if p_g == "UNKNOWN":
+                                        self.data["characters"][clean_p] = {
+                                            "description": "Rola zbiorowa / orszak / tło (wyodrębniono z relacji serii)",
+                                            "gender": "UNKNOWN",
+                                            "grammatical_gender": "UNKNOWN",
+                                            "has_verified_gender": False,
+                                            "confidence": 0.50,
+                                            "priority": "P2",
+                                            "aliases": [clean_p],
+                                            "entity_category": EntityCategory.ANTHROPONYM.value
+                                        }
+                                    else:
+                                        g_str = "KOBIETA" if p_g == "FEMALE" else "MĘŻCZYZNA"
+                                        self.data["characters"][clean_p] = {
+                                            "description": f"{g_str} (wyodrębniono z relacji serii)",
+                                            "gender": p_g,
+                                            "grammatical_gender": "FEMININE" if p_g == "FEMALE" else "MASCULINE",
+                                            "has_verified_gender": True,
+                                            "confidence": 0.95,
+                                            "priority": "P0",
+                                            "aliases": [clean_p],
+                                            "entity_category": EntityCategory.ANTHROPONYM.value
+                                        }
+                                        self.data["declensions"][clean_p] = generate_polish_name_declension(clean_p, p_g)
                         continue
 
                     if name not in self.data["characters"]:

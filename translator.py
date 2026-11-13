@@ -2003,6 +2003,13 @@ class MultimodalTranslator:
         self.trace_dir = trace_dir
         self.flight_recorder: Optional[EpisodeFlightRecorder] = None
         self.system_prompt = get_translation_system_prompt(keep_honorifics=keep_honorifics, lean=True)
+        radio_dispatch_rule = (
+            "\n\n### Protokół Łączności i Meldunków (Radio & Dispatch Invariance)\n"
+            "Krótkie komunikaty radiowe, meldunki i potwierdzenia rozkazów (roger, copy that, acknowledged, wilco, understood) "
+            "tłumacz bezosobowo: „Przyjęto.” lub „Zrozumiano.”. W przypadku gdy mówca nie jest potwierdzonym mężczyzną, "
+            "wyklucza się formy osobowe czasu przeszłego."
+        )
+        self.system_prompt += radio_dispatch_rule
         self.linter = AVTLinter
         
         # Episode Profiler (Pre-pass Glossary & Character Matrix)
@@ -2024,6 +2031,8 @@ class MultimodalTranslator:
                 keep_honorifics=keep_honorifics,
                 thinking_budget=self.thinking_budget_phase2
             )
+            if hasattr(self.verifier, "system_prompt"):
+                self.verifier.system_prompt += radio_dispatch_rule
         
         # In-episode character memory (Character Registry)
         self.character_registry: Dict[str, str] = {}
@@ -4417,6 +4426,22 @@ class MultimodalTranslator:
                                 phase1_pl=None
                             )
 
+                        # INC-AVT-044: Bezosobowa ochrona łączności radiowej i meldunków wojskowych
+                        en_clean_r = re.sub(r"[^\w\s]", "", str(clean_en).lower()).strip()
+                        if en_clean_r in ("roger", "copy that", "acknowledged", "understood", "wilco", "roger that"):
+                            spk_n = str(getattr(event, "name", "")).strip()
+                            spk_g_check = ""
+                            if hasattr(self, "series_bible") and self.series_bible:
+                                spk_g_check = self.series_bible.get_character_gender(spk_n)
+                            if not spk_g_check:
+                                spk_g_check = self.character_registry.get(spk_n, "UNKNOWN")
+                            if spk_g_check != "MALE":
+                                is_fem_r = (spk_g_check == "FEMALE")
+                                rep_p = "Przyjęłam." if is_fem_r else "Przyjęto."
+                                rep_z = "Zrozumiałam." if is_fem_r else "Zrozumiano."
+                                pl_candidate = re.sub(r"\bPrzyjąłem[.!]*", rep_p, pl_candidate, flags=re.IGNORECASE)
+                                pl_candidate = re.sub(r"\bZrozumiałem[.!]*", rep_z, pl_candidate, flags=re.IGNORECASE)
+
 
 
 
@@ -5102,7 +5127,23 @@ class MultimodalTranslator:
                     it_style = str(orig_it.get("style", "")).lower()
                     if any(k in it_style for k in ["italic", "flashback_italic", "thoughts", "internal"]):
                         r.refined_pl = re.sub(r"\{\\i[01]\}", "", r.refined_pl)
-                    
+
+                    # INC-AVT-044: Bezosobowa ochrona łączności radiowej i meldunków wojskowych
+                    en_clean_radio = re.sub(r"[^\w\s]", "", str(orig_it.get("en", "")).lower()).strip()
+                    if en_clean_radio in ("roger", "copy that", "acknowledged", "understood", "wilco", "roger that"):
+                        spk_name = str(orig_it.get("speaker", "")).strip()
+                        spk_g = ""
+                        if hasattr(self, "series_bible") and self.series_bible:
+                            spk_g = self.series_bible.get_character_gender(spk_name)
+                        if not spk_g:
+                            spk_g = self.character_registry.get(spk_name, "UNKNOWN")
+                        if spk_g != "MALE":
+                            is_female = (spk_g == "FEMALE")
+                            rep_przyjalem = "Przyjęłam." if is_female else "Przyjęto."
+                            rep_zrozumialem = "Zrozumiałam." if is_female else "Zrozumiano."
+                            r.refined_pl = re.sub(r"\bPrzyjąłem[.!]*", rep_przyjalem, r.refined_pl, flags=re.IGNORECASE)
+                            r.refined_pl = re.sub(r"\bZrozumiałem[.!]*", rep_zrozumialem, r.refined_pl, flags=re.IGNORECASE)
+
                     orig_pl_strip = str(orig_it.get("pl", "")).rstrip()
                     orig_en_strip = str(orig_it.get("en", "")).rstrip()
                     if orig_pl_strip.endswith(".") and orig_en_strip.endswith("."):

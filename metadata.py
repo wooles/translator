@@ -8,8 +8,14 @@ import json
 import urllib.request
 import urllib.parse
 import unicodedata
+import os
+import time
+import threading
+import logging
 from pathlib import Path
 from typing import Optional, Dict, Any, List, Union, Tuple
+
+logger = logging.getLogger(__name__)
 
 _ANILIST_DISABLED: bool = False
 _ANILIST_CONSECUTIVE_FAILURES: int = 0
@@ -19,6 +25,7 @@ def reset_anilist_circuit_breaker() -> None:
     global _ANILIST_DISABLED, _ANILIST_CONSECUTIVE_FAILURES
     _ANILIST_DISABLED = False
     _ANILIST_CONSECUTIVE_FAILURES = 0
+    ExternalGenderResolver.reset_circuit_breaker()
 
 def normalize_ascii_diacritics(text: str) -> str:
     """
@@ -747,4 +754,195 @@ def extract_canonical_series_and_season(title: str) -> Tuple[str, Optional[int]]
     base_slug = re.sub(r"[^\w\s-]", "", ascii_str, flags=re.UNICODE).strip().lower()
     base_slug = re.sub(r"[-\s_]+", "_", base_slug)
     return (base_slug, season_num)
+
+
+def _normalize_franchise_slug(text: str) -> str:
+    """Normalizuje tytul lub slug serii do porownania uniwersum franczyzy."""
+    if not text:
+        return ""
+    ascii_str = normalize_ascii_diacritics(text)
+    clean = re.sub(r"[^\w\s-]", " ", ascii_str, flags=re.UNICODE).strip().lower()
+    return re.sub(r"[-\s_]+", "_", clean)
+
+
+class ExternalGenderResolver:
+    """
+    Zarzadza zewnetrzna weryfikacja tozsamosci ontologicznej postaci (AniList Character GraphQL)
+    z ochrona franczyzy (Franchise Matching Guard) oraz buforem dyskowym .external_character_cache.json.
+    """
+    _LOCK = threading.Lock()
+    _MEMORY_CACHE: Optional[Dict[str, Any]] = None
+    _FAILURES: int = 0
+    _CIRCUIT_OPEN: bool = False
+    CACHE_FILE: Path = Path(__file__).resolve().parent / "series_memory" / ".external_character_cache.json"
+
+    @classmethod
+    def reset_circuit_breaker(cls) -> None:
+        """Resetuje stan wylacznika awaryjnego (Circuit Breaker)."""
+        with cls._LOCK:
+            cls._FAILURES = 0
+            cls._CIRCUIT_OPEN = False
+
+    @classmethod
+    def _load_cache(cls) -> Dict[str, Any]:
+        """Laduje cache dyskowy do pamieci operacyjnej RAM."""
+        if cls._MEMORY_CACHE is not None:
+            return cls._MEMORY_CACHE
+        with cls._LOCK:
+            if cls._MEMORY_CACHE is not None:
+                return cls._MEMORY_CACHE
+            cache: Dict[str, Any] = {}
+            if cls.CACHE_FILE.exists():
+                try:
+                    with open(cls.CACHE_FILE, "r", encoding="utf-8") as f:
+                        cache = json.load(f)
+                except Exception as e:
+                    logger.debug(f"[ExternalGenderResolver] Nieudany odczyt cache: {e}")
+                    cache = {}
+            cls._MEMORY_CACHE = cache
+            return cls._MEMORY_CACHE
+
+    @classmethod
+    def _save_cache(cls) -> None:
+        """Zapisuje bufor dyskowy w sposob atomowy."""
+        if cls._MEMORY_CACHE is None:
+            return
+        try:
+            cls.CACHE_FILE.parent.mkdir(parents=True, exist_ok=True)
+            tmp_file = cls.CACHE_FILE.with_suffix(".tmp")
+            with open(tmp_file, "w", encoding="utf-8") as f:
+                json.dump(cls._MEMORY_CACHE, f, indent=2, ensure_ascii=False)
+            tmp_file.replace(cls.CACHE_FILE)
+        except Exception as e:
+            logger.debug(f"[ExternalGenderResolver] Nieudany atomowy zapis cache: {e}")
+
+    @classmethod
+    def resolve_character_gender(
+        cls,
+        character_name: str,
+        series_slug: str = ""
+    ) -> Optional[str]:
+        """
+        Weryfikuje plec postaci przez AniList GraphQL z rygorem Franchise Matching Guard.
+        Zwraca 'FEMALE', 'MALE' lub None.
+        """
+        if not character_name or not isinstance(character_name, str):
+            return None
+
+        # Flaga srodowiskowa ENABLE_EXTERNAL_GENDER_RESOLVER (domyslnie true)
+        env_val = os.environ.get("ENABLE_EXTERNAL_GENDER_RESOLVER", "true").strip().lower()
+        if env_val not in ("true", "1", "yes"):
+            return None
+
+        clean_c = character_name.strip()
+        c_low = clean_c.lower()
+        s_low = (series_slug or "").strip().lower()
+        cache_key = f"{c_low}::{s_low}" if s_low else c_low
+
+        cache = cls._load_cache()
+        if cache_key in cache:
+            entry = cache[cache_key]
+            if isinstance(entry, dict):
+                return entry.get("gender")
+            elif isinstance(entry, str):
+                return entry
+            return None
+
+        if cls._CIRCUIT_OPEN:
+            return None
+
+        query = """
+        query ($search: String) {
+          Character (search: $search) {
+            name { full native alternative }
+            gender
+            media (sort: [FAVOURITES_DESC], page: 1, perPage: 5) {
+              nodes { title { romaji english } }
+            }
+          }
+        }
+        """
+        payload = json.dumps({"query": query, "variables": {"search": clean_c}}).encode("utf-8")
+        headers = {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "User-Agent": "MultimodalAnimeTranslator/1.0"
+        }
+        req = urllib.request.Request("https://graphql.anilist.co", data=payload, headers=headers)
+
+        try:
+            with urllib.request.urlopen(req, timeout=3.0) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                with cls._LOCK:
+                    cls._FAILURES = 0
+        except Exception as e:
+            with cls._LOCK:
+                cls._FAILURES += 1
+                if cls._FAILURES >= 3:
+                    cls._CIRCUIT_OPEN = True
+                    logger.warning(f"[ExternalGenderResolver] Wylacznik awaryjny aktywny po 3 bledach: {e}")
+                else:
+                    logger.debug(f"[ExternalGenderResolver] Blad zapytania dla '{clean_c}': {e}")
+            return None
+
+        char_data = data.get("data", {}).get("Character")
+        if not char_data or not isinstance(char_data, dict):
+            with cls._LOCK:
+                cls._MEMORY_CACHE[cache_key] = {"gender": None, "timestamp": time.time()}
+                cls._save_cache()
+            return None
+
+        # Franchise Matching Guard: Wynik jest akceptowany wylacznie wtedy, gdy przynajmniej jeden
+        # tytul z media.nodes po znormalizowaniu odpowiada slugowi biezacej serii.
+        media_nodes = char_data.get("media", {}).get("nodes", []) or []
+        franchise_matched = False
+        if not s_low:
+            franchise_matched = True
+        else:
+            norm_slug = _normalize_franchise_slug(s_low)
+            stop_tokens = {"no", "ga", "wo", "wa", "to", "de", "ni", "ii", "the", "2nd", "season", "part"}
+            slug_tokens = set(norm_slug.split("_")) - stop_tokens
+            for node in media_nodes:
+                titles = [
+                    node.get("title", {}).get("romaji", ""),
+                    node.get("title", {}).get("english", "")
+                ]
+                for t in titles:
+                    if not t:
+                        continue
+                    norm_t = _normalize_franchise_slug(t)
+                    t_tokens = set(norm_t.split("_")) - stop_tokens
+                    if norm_slug in norm_t or norm_t in norm_slug:
+                        franchise_matched = True
+                        break
+                    if slug_tokens and (slug_tokens.issubset(t_tokens) or len(slug_tokens & t_tokens) >= max(1, int(len(slug_tokens) * 0.5))):
+                        franchise_matched = True
+                        break
+                if franchise_matched:
+                    break
+
+        if not franchise_matched:
+            logger.debug(f"[ExternalGenderResolver] Odrzucono postac '{clean_c}' (brak zgodnosci z franczyza '{s_low}')")
+            with cls._LOCK:
+                cls._MEMORY_CACHE[cache_key] = {"gender": None, "timestamp": time.time(), "reason": "franchise_mismatch"}
+                cls._save_cache()
+            return None
+
+        raw_gender = (char_data.get("gender") or "").strip().lower()
+        resolved_g = None
+        if raw_gender in ("female", "woman", "girl"):
+            resolved_g = "FEMALE"
+        elif raw_gender in ("male", "man", "boy"):
+            resolved_g = "MALE"
+
+        with cls._LOCK:
+            cls._MEMORY_CACHE[cache_key] = {
+                "gender": resolved_g,
+                "canonical_name": char_data.get("name", {}).get("full", clean_c),
+                "timestamp": time.time()
+            }
+            cls._save_cache()
+
+        return resolved_g
+
 
