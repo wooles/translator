@@ -617,6 +617,132 @@ def test_t11_2_2_strict_hydrogen_vs_argon_isolation_and_retired_2x_model_guard()
     assert cost_a["net_pln"] == cost_c["net_pln"]
 
 
+# ==============================================================================
+# STANDARD 11.2.3 REGRESSION TESTS (T11.2.3_HYBRID_CACHE_REGISTER_TOPONYM_CLIP)
+# ==============================================================================
+@pytest.mark.unit
+def test_t11_2_3_hybrid_hydrogen_cache_word_boundary_register_unknown_scene_guard_toponym_and_clip():
+    """Weryfikacja hybrydowego cache dla hydrogen, granic rejestru yakuwarigo, unknown_count == 0, toponimów i clip."""
+    import threading
+    from unittest.mock import MagicMock
+    from context_cache import ContextCacheManager
+    from translator import detect_japanese_pragmatic_register, sanitize_ts_prefix_for_translation, MultimodalTranslator
+    from whisper_disambiguator import WhisperDisambiguator
+    from series_memory import DeclensionParadigm, EntityCategory, SeriesBible
+    import pysubs2
+
+    # 1. INC-AVT-038: Hybrydowy Context Cache dla gemini-4-hydrogen
+    class MockServerCache:
+        def __init__(self, name: str, display_name: str = ""):
+            self.name = name
+            self.display_name = display_name
+
+    class MockClientWithCaches:
+        def __init__(self):
+            self.caches = MagicMock()
+            self.caches.list.return_value = []
+            self.caches.create.return_value = MockServerCache("cachedContents/synthetic_hydrogen_cache_123")
+            self._client_id = "test_key_1"
+
+    client_with_caches = MockClientWithCaches()
+    res_server = ContextCacheManager.get_or_create_cache(
+        client=client_with_caches,
+        model="gemini-4-hydrogen",
+        system_instruction="A" * 20000,
+        tag="translator"
+    )
+    assert res_server == "cachedContents/synthetic_hydrogen_cache_123"
+    assert client_with_caches.caches.create.called
+
+    # Klient bez caches (np. mock object()) bezpiecznie zwraca token niejawny
+    res_implicit = ContextCacheManager.get_or_create_cache(
+        client=object(),
+        model="gemini-4-hydrogen",
+        system_instruction="A" * 20000,
+        tag="translator"
+    )
+    assert res_implicit == "__IMPLICIT_CACHE_95__"
+
+    # 2. INC-AVT-039: Uszczelnienie granic słów w rejestrze pragmatycznym i filtr żeński
+    test_phrases = [
+        "これはなるほど [kore ha naruhodo]",
+        "おぼれますの [oboremasuno]",
+        "どうぞ [douzo]",
+        "想像すらできない [souzou sura dekinai]",
+        "言いたいのか [iitai no ka]"
+    ]
+    for ph in test_phrases:
+        reg = detect_japanese_pragmatic_register(ph, en_text="Synthetic text")
+        assert reg is None, f"Fałszywe dopasowanie rejestru dla frazy: {ph} -> {reg}"
+
+    fem_dossier = {"gender": "FEMALE", "speech_style_pl": "Uprzejma i delikatna"}
+    reg_val = WhisperDisambiguator.validate_pragmatic_register_against_speaker(
+        register="Szorstki żołnierski / Bojowy (męski, twardy rejestr wojskowy, brak zmiękczeń)",
+        speaker_name="Heroine_A",
+        character_dossier=fem_dossier
+    )
+    assert reg_val is None
+
+    # 3. INC-AVT-042: Poszanowanie unknown_count == 0 i promocja płci z tytułów
+    sb = SeriesBible.__new__(SeriesBible)
+    sb.data = {
+        "characters": {
+            "Speaker_Female": {"gender": "FEMALE", "confidence": 0.95, "priority": "P0"},
+            "Speaker_Unknown": {"gender": "UNKNOWN", "confidence": 0.50, "priority": "P1"},
+            "SyntheticPrincess": {"gender": "UNKNOWN", "confidence": 0.50, "priority": "P1"}
+        },
+        "relations": {},
+        "declensions": {},
+        "entity_categories": {}
+    }
+    sb._lock = threading.RLock()
+    sb.relations = sb.data["relations"]
+
+    tr = MultimodalTranslator.__new__(MultimodalTranslator)
+    tr.series_bible = sb
+    tr.character_registry = {}
+    tr.episode_scene_genders = {}
+    tr.episode_scene_polylogues = {}
+    tr.style_report = None
+
+    ev1 = pysubs2.SSAEvent(start=1000, end=3000, text="Linia 1", name="Speaker_Female")
+    ev2 = pysubs2.SSAEvent(start=3500, end=5000, text="Linia 2", name="Speaker_Unknown")
+    norm_entries = [(0, ev1), (1, ev2)]
+
+    scene_genders = tr._precompute_episode_scene_genders(norm_entries)
+    # Speaker_Unknown nie otrzymuje narzuconej płci "kobieta"
+    assert scene_genders.get(1) != "kobieta"
+
+    # Promocja płci z profilu odcinka
+    class SyntheticProfile:
+        def __init__(self):
+            self.episode_summary = "W tym odcinku księżniczka SyntheticPrincess odwiedza zamek."
+            self.dialogue_stylization = ""
+            self.danger_lines_prescan = []
+            self.character_dossiers = []
+            self.name_declensions = []
+
+    sb._reconcile_registry_gender_in_memory(episode_profile=SyntheticProfile())
+    char_rec = sb.data["characters"]["SyntheticPrincess"]
+    assert char_rec["gender"] == "FEMALE"
+    assert char_rec["has_verified_gender"] is True
+
+    # 4. INC-AVT-040: Paradygmat fleksyjny dla EntityCategory.TOPONYM
+    par = DeclensionParadigm.create_for_name("Syntheticland", entity_category=EntityCategory.TOPONYM)
+    assert par.nominative == "Syntheticland"
+    assert par.genitive != "Syntheticland"
+    assert par.locative != "Syntheticland"
+    assert par.instrumental == "Syntheticlandem"
+
+    # 5. INC-AVT-041: Ochrona tagów clip i pozycjonowania
+    prefix_with_clip = r"{\pos(320,228)\clip(0,225,640,236)}"
+    sanitized_preserve = sanitize_ts_prefix_for_translation(prefix_with_clip, preserve_clip=True)
+    assert r"\clip(0,225,640,236)" in sanitized_preserve
+
+    sanitized_strip = sanitize_ts_prefix_for_translation(prefix_with_clip, preserve_clip=False)
+    assert r"\clip" not in sanitized_strip
+
+
 
 
 
