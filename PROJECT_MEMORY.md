@@ -4,9 +4,9 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-13 — Standard 11.2.1 Certyfikowany Baseline)
-- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.1 (WhisperDisambiguator Scope Fix & Live Hydrogen Server Probe Menu Restoration Baseline)`
-- **Commit certyfikacji kodu:** `5e11cc9105864fca1c9132d43f4825f51bc5a4d2` (`5e11cc9`)
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-13 — Standard 11.2.2 Certyfikowany Baseline)
+- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.2 (Strict Hydrogen Tier Isolation & Retired 2.x Model Guard Baseline)`
+- **Commit certyfikacji kodu:** `1c18bef29e64f06867d66303e35e04752ae3db60` (`1c18bef`)
 - **Commity implementacyjne 11.1:** `5b7306d` (Commit 1), `5b17ea7` (Commit 2), `2b4bc7d` (Commit 3), `8b72887` (Commit 4), `8a7dd31` (Commit 5), `218af2e` (Commit 6)
 - **Commity Hotfixu 11.1.1:** `328729f` (Commit 1), `9de0b83` (Commit 2), `07c4684` (Commit 3), `96acac7` (Commit 4)
 - **Commity Hotfixu 11.1.2:** `74766d8` (Commit 1), `1b540e3` (Commit 2), `8313658` (Commit 3), `326b7e0` (Commit 4)
@@ -20,20 +20,21 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 - **Commity Hotfixu 11.1.6:** `d69d3f3` (Commit 1), `0651e17` (Commit 2), `79e5960` (Commit 3)
 - **Commity Hotfixu 11.1.7:** `854a4b3` (Commit 1), `a733c06` (Commit 2), `928fa55` (Commit 3)
 - **Commity Standardu 11.2.0:** `c197db7` (Commit 1), `b113308` (Commit 2), `1772034` (Commit 3)
-- **Commity Hotfixu 11.2.1:**
-  * Commit 1 (`bf03d8465d64ffc9a897fa0f671c5ec37e408ec2`): `fix(pipeline): remove shadowing local imports of WhisperDisambiguator in translator.py and restore live server health probe menu in main.py (11.2.1)`
-  * Commit 2 (`5e11cc9105864fca1c9132d43f4825f51bc5a4d2`): `test(pipeline): add regression test for WhisperDisambiguator scope integrity and interactive server probe menu` — **NOWY COMMIT CERTYFIKACJI KODU**
-  * Commit 3 (`HEAD`): `docs(release): certify Standard 11.2.1 baseline in AGENTS.md, PROJECT_MEMORY.md, and implementation report`
-- **Status 11.2.1:** `CERTIFIED / CLOSED (2026-11-13)`
+- **Commity Hotfixu 11.2.1:** `bf03d84` (Commit 1), `5e11cc9` (Commit 2), `208388c` (Commit 3)
+- **Commity Hotfixu 11.2.2:**
+  * Commit 1 (`bacb2d9`): `fix(models): isolate gemini-4-hydrogen from gemini-4-argon and filter out retired 2.x models in model_resolver.py (11.2.2)`
+  * Commit 2 (`1c18bef29e64f06867d66303e35e04752ae3db60`): `test(models): add regression test for hydrogen vs argon tier isolation and retired 2.x model filtering` — **NOWY COMMIT CERTYFIKACJI KODU**
+  * Commit 3 (`HEAD`): `docs(release): certify Standard 11.2.2 baseline in AGENTS.md, PROJECT_MEMORY.md, and implementation report`
+- **Status 11.2.2:** `CERTIFIED / CLOSED (2026-11-13)`
 - **Commit ochrony Depuracji Legacy 1.0 (Z16):** `c197db73c3dabf887dddbf2337dc3a1d8cff598c` (`c197db7` — bezwzględne 0 B diffu na wszystkich plikach chronionych)
-- **Stan metryk:** `358 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `429 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 12/12, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
-- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (358/358 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
-- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.1` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
-- **Gałąź i Architektura:** `main` (Standard 11.2.1: Likwidacja UnboundLocalError WhisperDisambiguator i EpisodeProfiler w translator.py przez usunięcie zagnieżdżonych importów, przywrócenie Sondy Serwerów Google na żywo oraz interaktywnego menu wyboru profilu w main.py przez deterministyczną detekcję flagi -m w sys.argv, dedykowany tag latencji tag_hydrogen w Profilu 3, równoległe odpytywanie 5 klastrów w probe_all_models_health, Certyfikacja Kodu `5e11cc9105864fca1c9132d43f4825f51bc5a4d2`, Baseline Z16 `c197db73c3dabf887dddbf2337dc3a1d8cff598c`, Zero-Literal Pure Positive Domain Invariant Architecture & Primary LLM Translation Authority)
+- **Stan metryk:** `359 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `430 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 12/12, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
+- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (359/359 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
+- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.2` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
+- **Gałąź i Architektura:** `main` (Standard 11.2.2: Ścisła izolacja modelu gemini-4-hydrogen od gemini-4-argon w model_resolver.py, eliminacja kolizji alfabetycznej Timsort, przypisanie argon i carbon do pro_candidates i stawek pro w pricing_guard.py, odfiltrowanie wycofanych modeli 1.x i 2.x np. gemini-2.5-pro zwracających 404, Certyfikacja Kodu `1c18bef29e64f06867d66303e35e04752ae3db60`, Baseline Z16 `c197db73c3dabf887dddbf2337dc3a1d8cff598c`, Zero-Literal Pure Positive Domain Invariant Architecture & Primary LLM Translation Authority)
 - **Środowisko:** Python 3.13 (`.venv`), Windows PowerShell, `ffmpeg` (PATH), `librosa.pyin`, `soundfile`, `pysubs2`, `spaCy en_core_web_sm` (100% offline 0.00 PLN), bezpośrednie klucze Google AI Studio API (`use_vertex = 0`).
 - **Dyrektywa Wykonawcza Testów:**
   * Testy przyrostowe podczas kodowania (< 2 s): `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_testu>"`
-  * Szybki pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest -q` (337 passed w tests/, 71 passed i 153 deselected w test_system.py)
+  * Szybki pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest -q` (359 passed w tests/, 71 passed i 153 deselected w test_system.py)
   * Audyt śledczy diffu: `powershell -ExecutionPolicy Bypass -File .\audit_diff.ps1 -ForbiddenTerms "<lista>"`
   * 4 bramki kwalifikacyjne: `python verify_purity.py`, `python verify_8_fixes.py`, `python verify_12_fixes.py`, `python verify_ultimate_pipeline.py`
 
@@ -296,6 +297,7 @@ W ramach autoryzowanego `Z16-amendment #3` usunięto warunek `f1_starts_lower` z
 | **2026-11-12** | `ARB-052` | Dyskurs / ASR / EQG / Glosariusz | **Wdrożenie Mikro-Hotfixu 11.1.7 (BŁĄD-HIST-1..4 / INC-AVT-032..035)**: Rozróżnienie tagu monologu Imię(M) od jawnej płci (M) ze spacją (INC-AVT-032), deduplikacja Whisper ASR dla kolejnych kwestii tego samego mówcy oraz przecieków >= 3 znaki (INC-AVT-033), ochrona intencji pytajnej z source_en i celowych powtórzeń ze spacją w EQG (INC-AVT-034, Z16-amendment #12), równowaga tagów {\i1}...{\i0} w extract_typesetting_tags, wsparcie 3-wyrazowych terminów glosariusza i próg 38 CPL plansz (INC-AVT-035). | 0.00 PLN |
 | **2026-11-13** | `ARB-053` | Modele / Koszt / Schemat | **Aktywna Migracja Profilu [3] Mistrzowski na Gemini 4 Hydrogen (Standard 11.2.0)**: Pełne przejście z `gemini-3.8-flash` na `gemini-4-hydrogen` dla Profilu 3 (`hydrogen` jako model domyślny), aktywacja Implicit Context Caching (-95% zniżki na input tokens), mapowanie budżetów myślenia na natywne `thinking_level="LOW"/"MEDIUM"` (Google GenAI SDK 3.3.0), odchudzenie schematów Pydantic (`LeanBatchTranslationResponse`, `LeanRefinedBatchResponse`) z redukcją tokenów wyjściowych o 40%, powiększenie rozmiaru paczki dialogowej do `--batch-size 30` (12-15 paczek na odcinek) oraz zabezpieczenie niezmiennika kosztowego (3.68 PLN netto za 350 linii) z zachowaniem 0 B diffu na plikach chronionych Z16 (Z16-amendment #13 wyłącznie dla verifier.py). | 0.00 PLN |
 | **2026-11-13** | `ARB-054` | Import Scope / CLI Menu | **Likwidacja UnboundLocalError WhisperDisambiguator i Przywrócenie Sondy Menu (Standard 11.2.1 / INC-AVT-036)**: Usunięcie zagnieżdżonych lokalnych importów `WhisperDisambiguator` i `EpisodeProfiler` w `translator.py` zaciemniających importy modułowe, globalny import `_is_whole_line_italic` z `verifier.py`, usunięcie sztucznej listy `old_default_models` w `main.py` na rzecz deterministycznej detekcji jawnej flagi `-m`/`--model` w `sys.argv`, przywrócenie wyświetlania sondy latencji klastrów i tagu `tag_hydrogen` w Profilu 3 oraz równoległe sondowanie 5 modeli (`max_workers=5`). | 0.00 PLN |
+| **2026-11-13** | `ARB-055` | Modele / Taryfikacja / Bezpieczeństwo | **Ścisła Izolacja gemini-4-hydrogen od gemini-4-argon i Blokada Wycofanych Modeli 2.x w model_resolver.py (Standard 11.2.2 / INC-AVT-037)**: Ścisła izolacja `hydrogen_candidates` (wymóg `hydrogen` oraz brak `argon`, `carbon`, `pro`), eliminacja kolizji alfabetycznej w Timsort z droższym `gemini-4-argon`, przekierowanie `argon` i `carbon` do `pro_candidates` i taryfikatora `GOOGLE_API_RATES["pro"]` w `pricing_guard.py`, oraz twarda filtracja wycofanych modeli 1.x i 2.x (`score[0] > 0 and score[0] < 3: continue`) eliminująca błędy 404 z `gemini-2.5-pro` z bezpiecznym fallbackiem do stabilnego `defaults["pro"]` (`gemini-3.1-pro-preview`). | 0.00 PLN |
 
 ---
 
