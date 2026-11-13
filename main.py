@@ -446,11 +446,7 @@ def main():
     best_models = resolve_best_models(temp_client)
 
     has_explicit_model = any(arg in sys.argv for arg in ["-m", "--model"]) or any(arg.startswith("--model=") for arg in sys.argv)
-    old_default_models = ("gemini-3.5-flash-lite", "gemini-3.6-flash", "gemini-3.7-flash", "gemini-3.8-flash")
-    if not has_explicit_model and args.model in old_default_models:
-        model_p1 = None
-    else:
-        model_p1 = args.model if args.model not in old_default_models else None
+    model_p1 = args.model if has_explicit_model else None
     model_p2 = args.model_phase2
     thinking_budget = 4096
 
@@ -482,7 +478,7 @@ def main():
         health_probe = probe_all_models_health(temp_client, best_models)
         tag_lite = health_probe.get("flash_lite", {}).get("tag", "🟢")
         tag_flash = health_probe.get("flash", {}).get("tag", "🟢")
-        tag_flash_p1 = health_probe.get("flash", {}).get("tag", "🟢")
+        tag_hydrogen = health_probe.get("hydrogen", {}).get("tag") or tag_flash
         tag_pro = health_probe.get("pro", {}).get("tag", "🟢")
 
         p1_model_name = best_models.get("hydrogen", "gemini-4-hydrogen")
@@ -492,7 +488,7 @@ def main():
         print("  WYBÓR PROFILU JAKOŚCI TŁUMACZENIA (Status Serwerów Google na Żywo):")
         print(f"  [1] STANDARDOWY   [{best_models['flash_lite']}] {tag_lite}")
         print(f"  [2] STUDYJNY      [{best_models['flash']}] {tag_flash}")
-        print(f"  [3] MISTRZOWSKI ⭐ [{p1_model_name} (LOW) + {p2_model_name} (Elastic LOW/MEDIUM)] {tag_flash}")
+        print(f"  [3] MISTRZOWSKI ⭐ [{p1_model_name} (LOW) + {p2_model_name} (Elastic LOW/MEDIUM)] {tag_hydrogen}")
         print(f"  [4] KINOWY 👑     [{best_models['flash']} + {best_models['pro']} CoT] {tag_pro}")
         print("─" * 74)
         print(PricingGuard.get_pricing_status_banner())

@@ -240,7 +240,7 @@ def probe_all_models_health(client: Optional[genai.Client], models_dict: Dict[st
     import concurrent.futures
 
     results = {}
-    with concurrent.futures.ThreadPoolExecutor(max_workers=min(4, len(models_dict))) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=min(5, len(models_dict))) as executor:
         future_to_key = {
             executor.submit(probe_model_health, client, model_name): key
             for key, model_name in models_dict.items()

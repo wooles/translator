@@ -62,7 +62,7 @@ from google import genai
 from google.genai import types
 
 from rules import get_translation_system_prompt, get_focused_rules_for_batch, SceneDiagnosis
-from verifier import DialogueVerifier, RefinedLine
+from verifier import DialogueVerifier, RefinedLine, _is_whole_line_italic
 from extract import extract_frame_at_timestamp, extract_audio_slice
 from metadata import get_anime_context, format_anime_context_for_prompt, normalize_actor_tag, normalize_anime_slug
 from memory import TranslationMemory, format_translation_memory_for_prompt
@@ -103,7 +103,6 @@ from typesetting_matcher import TypesettingColorMatcher, VisualTypesettingData
 from user_feedback import UserFeedbackManager
 from glossary_manager import GlossaryManager
 from scene_discourse import DualVoiceTagPreserver, DeicticDiscourseEngine, DiarizationSanityChecker, build_discourse_topology, SceneDiscourseGraph
-from profiler import EpisodeProfiler
 from client_factory import format_friendly_api_error, patch_google_genai_schema_sanitizer
 from pipeline_logger import EpisodeFlightRecorder
 
@@ -2134,7 +2133,6 @@ class MultimodalTranslator:
 
         # 1. Parse dramatic_sequences from EpisodeProfile (Pre-pass Profilera z arbitrażem P0, 2B.9)
         if episode_profile and getattr(episode_profile, "dramatic_sequences", None):
-            from profiler import EpisodeProfiler
             episode_profile.dramatic_sequences = EpisodeProfiler.reconcile_prepass_with_p0(
                 episode_profile.dramatic_sequences,
                 series_bible=getattr(self, "series_bible", None)
@@ -2978,6 +2976,7 @@ class MultimodalTranslator:
         - CPS reading speed warnings
         """
         lines = []
+        from scene_snapper import SceneShotSnapper
 
         # 00c. Focused Scene Rules (Dynamic per-batch - always included)
         if focused_rules_str:
@@ -3165,13 +3164,11 @@ class MultimodalTranslator:
                 is_shot_cut = False
                 cuts_list = getattr(self, "scene_cuts_ms", None) or []
                 if cuts_list and prev_ev_end is not None:
-                    from scene_snapper import SceneShotSnapper
                     is_shot_cut = SceneShotSnapper.is_shot_boundary(event.start, prev_ev_end, cuts_list)
 
                 is_black_fade = False
                 black_list = getattr(self, "black_intervals_ms", None) or []
                 if black_list and prev_ev_end is not None:
-                    from scene_snapper import SceneShotSnapper
                     is_black_fade = SceneShotSnapper.is_black_fade_boundary(event.start, prev_ev_end, black_list)
 
                 raw_whisper_item = whisper_transcriptions.get(idx + 1, "") if whisper_transcriptions else ""
@@ -3359,7 +3356,6 @@ class MultimodalTranslator:
                 lines.append(f"  Typografia: treść napisu lub planszy w kadrze.")
             else:
                 # Standard 9.5 (Operacja 2C.1, R3.2): Wywołanie arbitrate_event_telemetry
-                from scene_discourse import SceneDiscourseGraph
                 is_fem_scene_check = (getattr(self, "episode_scene_genders", {}).get(original_idx) == "kobieta") or getattr(self, "scene_is_female_only", False)
                 disc_telem = SceneDiscourseGraph.arbitrate_event_telemetry(
                     event=event,
@@ -3519,7 +3515,6 @@ class MultimodalTranslator:
                                 spk_dossier = cd
                                 break
                     spk_reg_entry = self.character_registry.get(event.name) if hasattr(self, "character_registry") else None
-                    from whisper_disambiguator import WhisperDisambiguator
                     pragmatic_reg = WhisperDisambiguator.validate_pragmatic_register_against_speaker(
                         register=pragmatic_reg,
                         speaker_name=event.name or "",
@@ -3630,7 +3625,6 @@ class MultimodalTranslator:
                     jp_text = str(raw_jp_item.get("text", "")).strip()
                 else:
                     jp_text = str(raw_jp_item).strip()
-                from profiler import EpisodeProfiler
                 jp_text = EpisodeProfiler.sanitize_event_asr(
                     jp_text,
                     is_sign=vtype["is_sign"],
@@ -3915,7 +3909,6 @@ class MultimodalTranslator:
             for prev_orig_idx, prev_event, prev_clean_en, _ in prev_batch[-4:]:
                 prev_pl = translated_results.get(prev_orig_idx, "") if translated_results else ""
                 spk = prev_event.name.strip() if getattr(prev_event, "name", None) else ""
-                from verifier import _is_whole_line_italic
                 is_th = "italic" in (prev_event.style or "").lower() or _is_whole_line_italic(prev_event.text or "")
                 lookback_history.append({
                     "en": prev_clean_en,
@@ -4172,7 +4165,6 @@ class MultimodalTranslator:
             dur_s = max(0.05, (ev.end - ev.start) / 1000.0)
             cps_val, _ = calculate_cps(clean_txt, ev.start, ev.end)
             style_str = ev.style or ""
-            from verifier import _is_whole_line_italic
             is_th = "italic" in style_str.lower() or _is_whole_line_italic(ev.text or "")
             is_internal_monologue = getattr(ev, "is_internal_monologue", False) or is_th
             if is_internal_monologue and not ("italic" in style_str.lower() or "thoughts" in style_str.lower()):
@@ -4435,7 +4427,6 @@ class MultimodalTranslator:
             )
 
             # Standard 9.5 (Operacja 2C.1, R3.2): Bezpośrednie wywołanie arbitrate_event_telemetry
-            from scene_discourse import SceneDiscourseGraph
             is_fem_scene = (getattr(self, "episode_scene_genders", {}).get(orig_idx) == "kobieta") or getattr(self, "scene_is_female_only", False)
 
             # Operacja 2B.5: Ochrona jawnego aktora z kolumny Name pliku .ass przed nadpisaniem
@@ -4595,7 +4586,6 @@ class MultimodalTranslator:
                 spk_reg_entry = self.character_registry.get(resolved_spk_name) if hasattr(self, "character_registry") else None
                 spk_prosody = prosody_tags.get(batch_id, "") if prosody_tags else ""
                 setting_era_str = getattr(episode_profile, "setting_and_era", "") if episode_profile else ""
-                from whisper_disambiguator import WhisperDisambiguator
                 pragmatic_reg = WhisperDisambiguator.validate_pragmatic_register_against_speaker(
                     register=pragmatic_reg,
                     speaker_name=resolved_spk_name or "",
@@ -4807,7 +4797,6 @@ class MultimodalTranslator:
 
             dur_s = max(0.05, (event.end - event.start) / 1000.0)
             style_str = event.style or ""
-            from verifier import _is_whole_line_italic
             is_th = "italic" in style_str.lower() or _is_whole_line_italic(event.text or "")
             is_internal_monologue = getattr(event, "is_internal_monologue", False) or is_th
             if is_internal_monologue and not ("italic" in style_str.lower() or "thoughts" in style_str.lower()):
@@ -5127,7 +5116,6 @@ class MultimodalTranslator:
                 disp_ref = re.sub(r"\{[^\}]*\}", "", str(clean_ref or "")).replace("\\r\\n", "\\N").replace("\\n", "\\N").replace("\r\n", "\\N").replace("\n", "\\N").strip()
 
                 # Check if there is an actual textual modification or meaningful redaction note
-                from verifier import DialogueVerifier
                 lexically_same = DialogueVerifier.is_lexically_identical_ignoring_linebreak(disp_orig, disp_ref)
                 has_meaningful_note = bool(ch_desc and "Zweryfikowano" not in ch_desc and ch_desc.lower() != "null")
                 has_text_change = bool(disp_orig and (disp_orig != disp_ref) and not (lexically_same and not has_meaningful_note))
