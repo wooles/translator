@@ -34,16 +34,55 @@ def _extract_model_score(model_name: str) -> Tuple[int, int, int]:
     return (0, 0, 0)
 
 
+def is_gemini_4_or_hydrogen_model(model_name: str) -> bool:
+    """Rozpoznaje modele rodziny gemini-4 / hydrogen korzystające z thinking_level oraz Implicit Caching."""
+    if not model_name:
+        return False
+    clean = str(model_name).replace("models/", "").lower().strip()
+    if "hydrogen" in clean or "carbon" in clean or "argon" in clean:
+        return True
+    if re.search(r"gemini-4(?:\b|[-_.])", clean) and "flash" not in clean:
+        return True
+    return False
+
+
+def build_thinking_config(model_name: str, budget_tokens: int) -> Any:
+    """Tworzy obiekt konfiguracji myślenia dostosowany do rodziny modelu."""
+    from google.genai import types
+
+    if is_gemini_4_or_hydrogen_model(model_name):
+        budget = int(budget_tokens)
+        if budget <= 2048:
+            level_str = "LOW"
+        elif budget <= 4500:
+            level_str = "MEDIUM"
+        elif budget <= 6144:
+            level_str = "HIGH"
+        else:
+            level_str = "XHIGH"
+
+        try:
+            return types.ThinkingConfig(thinking_level=level_str)
+        except Exception:
+            cfg = types.ThinkingConfig()
+            object.__setattr__(cfg, "thinking_level", level_str)
+            return cfg
+
+    return types.ThinkingConfig(thinking_budget=int(budget_tokens))
+
+
 def resolve_best_models(client: Optional[genai.Client] = None) -> Dict[str, str]:
     """
     Automatically inspects available models in Google AI Studio for the provided API client
     and returns a dictionary with the newest versions for each tier:
+    - 'hydrogen': Flagship Gemini 4 Hydrogen model
     - 'flash': Latest flagship Flash model (e.g. gemini-3.8-flash or gemini-3.7-flash)
     - 'flash_lite': Fastest lightweight Flash-Lite model (e.g. gemini-3.5-flash-lite)
     - 'pro': Flagship Pro class model (e.g. gemini-3.1-pro-preview)
     """
     # Default verified base models (highest quality baseline)
     defaults = {
+        "hydrogen": "gemini-4-hydrogen",
         "flash": "gemini-3.8-flash",
         "flash_backup": "gemini-3.7-flash",
         "flash_lite": "gemini-3.5-flash-lite",
@@ -56,6 +95,7 @@ def resolve_best_models(client: Optional[genai.Client] = None) -> Dict[str, str]
     try:
         raw_models = list(client.models.list())
         
+        hydrogen_candidates = []
         flash_candidates = []
         flash_lite_candidates = []
         pro_candidates = []
@@ -71,11 +111,13 @@ def resolve_best_models(client: Optional[genai.Client] = None) -> Dict[str, str]
             if any(k in name_lower for k in excluded_keywords):
                 continue
 
-            if "gemini" not in name_lower:
+            if "gemini" not in name_lower and "hydrogen" not in name_lower and "carbon" not in name_lower:
                 continue
 
             # Classify into tier categories
-            if "flash-lite" in name_lower:
+            if "hydrogen" in name_lower or "carbon" in name_lower or (re.search(r"gemini-4(?:\b|[-_.])", name_lower) and "flash" not in name_lower):
+                hydrogen_candidates.append(name)
+            elif "flash-lite" in name_lower:
                 flash_lite_candidates.append(name)
             elif "flash" in name_lower:
                 flash_candidates.append(name)
@@ -83,16 +125,19 @@ def resolve_best_models(client: Optional[genai.Client] = None) -> Dict[str, str]
                 pro_candidates.append(name)
 
         # Sort by highest version score
+        hydrogen_sorted = sorted(hydrogen_candidates, key=_extract_model_score, reverse=True)
         flash_sorted = sorted(flash_candidates, key=_extract_model_score, reverse=True)
         flash_lite_sorted = sorted(flash_lite_candidates, key=_extract_model_score, reverse=True)
         pro_sorted = sorted(pro_candidates, key=_extract_model_score, reverse=True)
 
+        best_hydrogen = hydrogen_sorted[0] if hydrogen_sorted else defaults["hydrogen"]
         best_flash = flash_sorted[0] if flash_sorted else defaults["flash"]
         backup_flash = flash_sorted[1] if len(flash_sorted) > 1 else "gemini-3.6-flash"
         best_flash_lite = flash_lite_sorted[0] if flash_lite_sorted else defaults["flash_lite"]
         best_pro = pro_sorted[0] if pro_sorted else defaults["pro"]
 
         return {
+            "hydrogen": best_hydrogen,
             "flash": best_flash,
             "flash_backup": backup_flash,
             "flash_lite": best_flash_lite,
@@ -102,6 +147,7 @@ def resolve_best_models(client: Optional[genai.Client] = None) -> Dict[str, str]
     except Exception as e:
         logger.warning(f"Could not dynamically list models ({e}). Using verified fallback defaults.")
         return {
+            "hydrogen": defaults["hydrogen"],
             "flash": defaults["flash"],
             "flash_backup": "gemini-3.6-flash",
             "flash_lite": defaults["flash_lite"],
@@ -125,7 +171,10 @@ def probe_model_health(client: Optional[genai.Client], model_name: str) -> Dict[
             "max_output_tokens": 10,
             "http_options": types.HttpOptions(timeout=25000)
         }
-        if "pro" in model_name.lower() or "3.1" in model_name.lower():
+        if is_gemini_4_or_hydrogen_model(model_name):
+            cfg_kwargs["max_output_tokens"] = 64
+            cfg_kwargs["thinking_config"] = build_thinking_config(model_name, 0)
+        elif "pro" in model_name.lower() or "3.1" in model_name.lower():
             cfg_kwargs["max_output_tokens"] = 600
             cfg_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=512)
         elif "lite" not in model_name.lower() and any(k in model_name.lower() for k in ["3.7", "3.8", "flash"]):

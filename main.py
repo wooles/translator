@@ -329,8 +329,8 @@ def main():
     parser.add_argument(
         "--batch-size", "-b",
         type=int,
-        default=int(os.getenv("BATCH_SIZE", "24")),
-        help="Liczba kwestii dialogowych w jednej paczce (domyślnie: 24)"
+        default=int(os.getenv("BATCH_SIZE", "30")),
+        help="Liczba kwestii dialogowych w jednej paczce (domyślnie: 30)"
     )
     parser.add_argument(
         "--no-verify",
@@ -378,6 +378,10 @@ def main():
     )
 
     args = parser.parse_args()
+
+    has_explicit_batch_size = any(arg in sys.argv for arg in ["-b", "--batch-size"]) or any(arg.startswith("--batch-size=") for arg in sys.argv)
+    if not has_explicit_batch_size and args.batch_size == 24:
+        args.batch_size = 30
 
     raw_inputs, keep_honorifics_cli = resolve_cli_inputs_and_honorifics(
         args, is_tty=sys.stdin.isatty(), env_keep_honorifics=os.getenv("KEEP_HONORIFICS", "false")
@@ -441,7 +445,12 @@ def main():
     temp_client = get_genai_client(api_key=api_key_check, timeout_sec=35.0) if api_key_check else None
     best_models = resolve_best_models(temp_client)
 
-    model_p1 = args.model if args.model != "gemini-3.5-flash-lite" else None
+    has_explicit_model = any(arg in sys.argv for arg in ["-m", "--model"]) or any(arg.startswith("--model=") for arg in sys.argv)
+    old_default_models = ("gemini-3.5-flash-lite", "gemini-3.6-flash", "gemini-3.7-flash", "gemini-3.8-flash")
+    if not has_explicit_model and args.model in old_default_models:
+        model_p1 = None
+    else:
+        model_p1 = args.model if args.model not in old_default_models else None
     model_p2 = args.model_phase2
     thinking_budget = 4096
 
@@ -450,11 +459,11 @@ def main():
         model_p2 = best_models["pro"]
         enable_verifier = True
         thinking_budget = 1600
-    elif args.profile in ["pro", "master", "3", "flash_reasoning"]:
-        model_p1 = best_models["flash"]
-        model_p2 = best_models["flash"]
+    elif args.profile in ["pro", "master", "3", "flash_reasoning", "hydrogen", "hydrogen_master"]:
+        model_p1 = best_models.get("hydrogen", "gemini-4-hydrogen")
+        model_p2 = best_models.get("hydrogen", "gemini-4-hydrogen")
         enable_verifier = True
-        thinking_budget = 6144
+        thinking_budget = 2048
     elif args.profile in ["studio", "2"]:
         model_p1 = best_models["flash"]
         model_p2 = None
@@ -476,14 +485,14 @@ def main():
         tag_flash_p1 = health_probe.get("flash", {}).get("tag", "🟢")
         tag_pro = health_probe.get("pro", {}).get("tag", "🟢")
 
-        p1_model_name = best_models["flash"]
-        p2_model_name = best_models["flash"]
+        p1_model_name = best_models.get("hydrogen", "gemini-4-hydrogen")
+        p2_model_name = best_models.get("hydrogen", "gemini-4-hydrogen")
 
         print("\n" + "═" * 74)
         print("  WYBÓR PROFILU JAKOŚCI TŁUMACZENIA (Status Serwerów Google na Żywo):")
         print(f"  [1] STANDARDOWY   [{best_models['flash_lite']}] {tag_lite}")
         print(f"  [2] STUDYJNY      [{best_models['flash']}] {tag_flash}")
-        print(f"  [3] MISTRZOWSKI ⭐ [{p1_model_name} (CoT 0) + {p2_model_name} CoT 6144] {tag_flash}")
+        print(f"  [3] MISTRZOWSKI ⭐ [{p1_model_name} (LOW) + {p2_model_name} (Elastic LOW/MEDIUM)] {tag_flash}")
         print(f"  [4] KINOWY 👑     [{best_models['flash']} + {best_models['pro']} CoT] {tag_pro}")
         print("─" * 74)
         print(PricingGuard.get_pricing_status_banner())
@@ -503,21 +512,21 @@ def main():
                 model_p2 = best_models["pro"]
                 enable_verifier = True
                 thinking_budget = 2048
-            else:  # Profile 3: Highest Flash (F1 CoT 0) + Highest Flash (F2 CoT 6144)
-                model_p1 = best_models["flash"]
-                model_p2 = best_models["flash"]
+            else:  # Profile 3: Gemini 4 Hydrogen Master Engine
+                model_p1 = best_models.get("hydrogen", "gemini-4-hydrogen")
+                model_p2 = best_models.get("hydrogen", "gemini-4-hydrogen")
                 enable_verifier = True
-                thinking_budget = 6144
+                thinking_budget = 2048
         except (EOFError, KeyboardInterrupt):
-            model_p1 = best_models["flash"]
-            model_p2 = best_models["flash"]
+            model_p1 = best_models.get("hydrogen", "gemini-4-hydrogen")
+            model_p2 = best_models.get("hydrogen", "gemini-4-hydrogen")
             enable_verifier = True
-            thinking_budget = 6144
+            thinking_budget = 2048
     else:
-        model_p1 = model_p1 or best_models["flash"]
-        model_p2 = model_p2 or best_models["flash"]
+        model_p1 = model_p1 or best_models.get("hydrogen", "gemini-4-hydrogen")
+        model_p2 = model_p2 or best_models.get("hydrogen", "gemini-4-hydrogen")
         enable_verifier = True
-        thinking_budget = 6144
+        thinking_budget = 2048
 
     use_whisper = not args.no_whisper
 

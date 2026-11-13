@@ -20,6 +20,7 @@ from google.genai import types
 from client_factory import format_friendly_api_error, patch_google_genai_schema_sanitizer
 from metadata import normalize_ascii_diacritics, normalize_actor_tag
 from series_memory import is_valid_anthroponymic_phonotactics
+from model_resolver import is_gemini_4_or_hydrogen_model, build_thinking_config
 
 patch_google_genai_schema_sanitizer()
 
@@ -690,10 +691,13 @@ Zwróć wynik w formacie JSON zgodnym ze schematem EpisodeProfile."""
                 gen_config_kwargs = {
                     "response_mime_type": "application/json",
                     "response_schema": EpisodeProfile,
-                    "temperature": 0.2,
                 }
-                if any(k in self.model.lower() for k in ["3.7", "3.8", "flash", "pro"]) and "lite" not in self.model.lower():
-                    gen_config_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=0)
+                if is_gemini_4_or_hydrogen_model(self.model):
+                    gen_config_kwargs["thinking_config"] = build_thinking_config(self.model, 0)
+                else:
+                    gen_config_kwargs["temperature"] = 0.2
+                    if any(k in self.model.lower() for k in ["3.7", "3.8", "flash", "pro"]) and "lite" not in self.model.lower():
+                        gen_config_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=0)
 
                 active_client = self.client_pool.get_client() if self.client_pool else self.client
                 response = active_client.models.generate_content(

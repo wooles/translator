@@ -1568,6 +1568,22 @@ class BatchTranslationResponse(BaseModel):
     translations: List[LineTranslation] = Field(description="Lista przetłumaczonych kwestii")
     characters_identified: Optional[List[CharacterInfo]] = Field(default=None, description="Zidentyfikowane lub nowo odkryte postacie i ich płeć")
 
+
+class LeanLineTranslation(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: int = Field(description="ID kwestii dialogowej z wejścia")
+    polish_text: str = Field(description="Przetłumaczona kwestia na język polski")
+    speaker_name: Optional[str] = Field(default=None, description="Miano postaci mówiącej tę kwestię lub null")
+    screen_region: Optional[str] = Field(default=None, description="Położenie napisu ekranowego dla plansz lub null dla dialogu")
+    ambiguity_note: Optional[str] = Field(default=None, description="Krótka flaga dla Fazy 2 przy niejednoznaczności (maks. 5 słów) lub null")
+
+
+class LeanBatchTranslationResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    scene_diagnosis: Optional[SceneDiagnosis] = Field(default=None, description="Zwięzła diagnoza sytuacji sceny (1-2 zdania)")
+    translations: List[LeanLineTranslation] = Field(description="Lista przetłumaczonych kwestii")
+    characters_identified: Optional[List[CharacterInfo]] = Field(default=None, description="Nowo odkryte postacie i ich płeć lub null")
+
 from series_memory import CANONICAL_MALE_NAMES_ON_A
 
 def detect_third_person_mentions(
@@ -3677,7 +3693,7 @@ class MultimodalTranslator:
         (e.g., Gemini 3.7 Flash and Gemini 3.6 Flash) for optimal throughput and quota distribution,
         while maintaining the absolute highest model version for Phase 2 verification.
         """
-        from model_resolver import resolve_best_models
+        from model_resolver import resolve_best_models, is_gemini_4_or_hydrogen_model, build_thinking_config
         active_models = resolve_best_models(self.client)
 
         current_model = self.model
@@ -3688,17 +3704,20 @@ class MultimodalTranslator:
             cached_name = None
             try:
                 from context_cache import ContextCacheManager
+                is_hydrogen = is_gemini_4_or_hydrogen_model(current_model)
+                effective_schema = LeanBatchTranslationResponse if (is_hydrogen and schema_class is BatchTranslationResponse) else schema_class
                 gen_config_kwargs = {
                     "response_mime_type": "application/json",
-                    "response_schema": schema_class,
-                    "temperature": 0.25,
+                    "response_schema": effective_schema,
                 }
-                # Phase 1: Always enforce thinking_budget=0 (CoT=0) for any Flash/Pro models (regardless of version)
-                # ensuring rapid triangulation with zero thinking token cost.
-                is_reasoning_capable = ("flash" in current_model.lower() or "pro" in current_model.lower() or "thinking" in current_model.lower() or "reasoning" in current_model.lower()) and "lite" not in current_model.lower()
+                if not is_hydrogen:
+                    gen_config_kwargs["temperature"] = 0.25
+
+                # Faza 1: Ustawienie CoT=0 lub thinking_level LOW dla szybkiej triangulacji
+                budget_p1 = getattr(self, "phase1_thinking_budget", 0)
+                is_reasoning_capable = is_hydrogen or (("flash" in current_model.lower() or "pro" in current_model.lower() or "thinking" in current_model.lower() or "reasoning" in current_model.lower()) and "lite" not in current_model.lower())
                 if is_reasoning_capable:
-                    budget_p1 = getattr(self, "phase1_thinking_budget", 0)
-                    gen_config_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=budget_p1)
+                    gen_config_kwargs["thinking_config"] = build_thinking_config(current_model, budget_p1)
 
                 import concurrent.futures
 
@@ -3716,10 +3735,12 @@ class MultimodalTranslator:
                         tag="translator"
                     )
                     cfg_kwargs = dict(gen_config_kwargs)
-                    if cached_name:
+                    if cached_name == "__IMPLICIT_CACHE_95__":
+                        cfg_kwargs["system_instruction"] = self.system_prompt
+                    elif cached_name:
                         cfg_kwargs["cached_content"] = cached_name
                     else:
-                        is_paid = ("flash" in current_model.lower() or "pro" in current_model.lower()) and "lite" not in current_model.lower()
+                        is_paid = ("flash" in current_model.lower() or "pro" in current_model.lower() or is_hydrogen) and "lite" not in current_model.lower()
                         if is_paid:
                             cached_name = ContextCacheManager.get_or_create_cache(
                                 client=active_c,
@@ -3727,13 +3748,15 @@ class MultimodalTranslator:
                                 system_instruction=self.system_prompt,
                                 tag="translator"
                             )
-                            if cached_name:
+                            if cached_name == "__IMPLICIT_CACHE_95__":
+                                cfg_kwargs["system_instruction"] = self.system_prompt
+                            elif cached_name:
                                 cfg_kwargs["cached_content"] = cached_name
                             else:
                                 raise RuntimeError(
                                     f"KATEGORYCZNA BLOKADA FINANSOWA: Zablokowano próbę wysłania 33k tokenów bez aktywnego rabatu -90% dla {current_model}."
                                 )
-                        if "cached_content" not in cfg_kwargs:
+                        if "cached_content" not in cfg_kwargs and "system_instruction" not in cfg_kwargs:
                             cfg_kwargs["system_instruction"] = self.system_prompt
                     cfg = types.GenerateContentConfig(**cfg_kwargs)
                     return active_c.models.generate_content(
@@ -3770,20 +3793,21 @@ class MultimodalTranslator:
                         self.current_episode_tokens["model"] = current_model
 
                 if hasattr(response, "parsed") and response.parsed is not None:
-                    with MultimodalTranslator._STATUS_LOCK:
-                        if MultimodalTranslator._STATUS_ACTIVE:
-                            print(f"  └─ [OK / Faza 1]: Połączenie z Google API przywrócone.")
-                            MultimodalTranslator._STATUS_ACTIVE = False
-                            MultimodalTranslator._LAST_STATUS_TIME = 0.0
-                    return response.parsed
+                    raw_res = response.parsed
                 else:
-                    res = schema_class.model_validate(json.loads(response.text))
-                    with MultimodalTranslator._STATUS_LOCK:
-                        if MultimodalTranslator._STATUS_ACTIVE:
-                            print(f"  └─ [OK / Faza 1]: Połączenie z Google API przywrócone.")
-                            MultimodalTranslator._STATUS_ACTIVE = False
-                            MultimodalTranslator._LAST_STATUS_TIME = 0.0
-                    return res
+                    raw_res = effective_schema.model_validate(json.loads(response.text))
+
+                if schema_class is BatchTranslationResponse and isinstance(raw_res, LeanBatchTranslationResponse):
+                    res = BatchTranslationResponse.model_validate(raw_res.model_dump())
+                else:
+                    res = raw_res
+
+                with MultimodalTranslator._STATUS_LOCK:
+                    if MultimodalTranslator._STATUS_ACTIVE:
+                        print(f"  └─ [OK / Faza 1]: Połączenie z Google API przywrócone.")
+                        MultimodalTranslator._STATUS_ACTIVE = False
+                        MultimodalTranslator._LAST_STATUS_TIME = 0.0
+                return res
 
             except Exception as e:
                 err_str = str(e).lower()
@@ -3822,6 +3846,15 @@ class MultimodalTranslator:
                 is_timeout = "504" in err_str or "deadline" in err_str or "timeout" in err_str or "timed out" in err_str
                 is_unavailable = "503" in err_str or "unavailable" in err_str or "high demand" in err_str
                 is_rate_limit = "429" in err_str or "quota" in err_str or "resource_exhausted" in err_str or "rate" in err_str
+                is_not_found = "404" in err_str or "not found" in err_str
+
+                if is_gemini_4_or_hydrogen_model(current_model):
+                    if is_not_found or (attempt >= max(2, num_keys * 2) and (is_unavailable or is_timeout)):
+                        fallback_model = active_models.get("flash", "gemini-3.8-flash")
+                        print(f"\n[Fallback Model Faza 1]: Przełączenie z {current_model} na {fallback_model} (próba {attempt})...")
+                        current_model = fallback_model
+                        time.sleep(0.5)
+                        continue
 
                 import random
                 import time as _time

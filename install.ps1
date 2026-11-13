@@ -1,4 +1,4 @@
-# ==============================================================================
+﻿# ==============================================================================
 #  UNIVERSAL 1-COMMAND INSTALLER FOR MULTIMODAL TRANSLATOR
 #  Uruchomienie: irm https://raw.githubusercontent.com/wooles/translator/main/install.ps1 | iex
 # ==============================================================================
@@ -112,7 +112,7 @@ if (-not $ApiKey -or $ApiKey -eq "twój_klucz_api_tutaj") {
     Write-Host "  Wpisz swój klucz GEMINI_API_KEY (z https://aistudio.google.com/):" -ForegroundColor Cyan
     $ApiKey = Read-Host "  GEMINI_API_KEY"
     if ($ApiKey) {
-        $EnvContent = "GEMINI_API_KEY=$ApiKey`nGEMINI_MODEL=gemini-3.7-flash`nBATCH_SIZE=24`nENABLE_VERIFIER=true`nKEEP_HONORIFICS=true"
+        $EnvContent = "GEMINI_API_KEY=$ApiKey`nGEMINI_MODEL=gemini-4-hydrogen`nBATCH_SIZE=30`nENABLE_VERIFIER=true`nKEEP_HONORIFICS=true"
         Set-Content -Path $EnvFile -Value $EnvContent -Encoding UTF8
         Write-Host "  -> Zapisano klucz w pliku .env" -ForegroundColor Green
     }

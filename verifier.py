@@ -13,6 +13,7 @@ from google.genai import types
 from rules import get_verifier_system_prompt, SceneDiagnosis
 from client_factory import format_friendly_api_error, patch_google_genai_schema_sanitizer
 from typesetting_matcher import VisualTypesettingData
+from model_resolver import is_gemini_4_or_hydrogen_model, build_thinking_config
 
 patch_google_genai_schema_sanitizer()
 
@@ -28,6 +29,18 @@ class RefinedBatchResponse(BaseModel):
     model_config = ConfigDict(extra="ignore")
     scene_diagnosis: Optional[SceneDiagnosis] = Field(default=None, description="Diagnoza i weryfikacja intencji dramaturgicznych sceny")
     lines: List[RefinedLine] = Field(description="Lista zredagowanych i zweryfikowanych kwestii dialogowych")
+
+
+class LeanRefinedLine(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: int = Field(description="ID kwestii dialogowej zgodne z wejściem")
+    refined_pl: str = Field(description="Ostatecznie zredagowana kwestia w języku polskim")
+    changes_made: Optional[str] = Field(default=None, description="Krótki tag filaru AVT (maks. 4 słowa) przy zmianie lub null")
+
+
+class LeanRefinedBatchResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    lines: List[LeanRefinedLine] = Field(description="Lista zweryfikowanych kwestii dialogowych")
 
 def normalize_ass_tags(text: str) -> str:
     """
@@ -672,7 +685,11 @@ class DialogueVerifier:
 
         # Separate adaptive CoT tiers for Pro Model ($12/1M output rate) vs Flash Model ($3.75/1M output rate)
         n_lines = len(batch_items)
-        if "pro" in self.model.lower():
+        if is_gemini_4_or_hydrogen_model(self.model):
+            if has_song or has_audio_alert or has_ambiguity:
+                return 3072
+            return 2048
+        elif "pro" in self.model.lower():
             # PRO MODEL DEDICATED TIERS (Level 4: High Literary Depth without token bloating)
             # Tier 1 (Pro): Piosenki OP/ED, gry słowne, zawiłe metafory, alarmy Whisper, wątpliwości Fazy 1
             if has_song or has_audio_alert or has_ambiguity:
@@ -1069,13 +1086,15 @@ class DialogueVerifier:
             cached_name = None
             try:
                 from context_cache import ContextCacheManager
+                is_hydrogen = is_gemini_4_or_hydrogen_model(self.model)
+                effective_schema = LeanRefinedBatchResponse if is_hydrogen else RefinedBatchResponse
                 gen_config_kwargs = {
                     "response_mime_type": "application/json",
-                    "response_schema": RefinedBatchResponse,
+                    "response_schema": effective_schema,
                 }
-                is_reasoning_capable = any(k in self.model.lower() for k in ["2.", "3.", "4.", "5.", "pro", "thinking", "reasoning"]) and "lite" not in self.model.lower()
+                is_reasoning_capable = is_hydrogen or (any(k in self.model.lower() for k in ["2.", "3.", "4.", "5.", "pro", "thinking", "reasoning"]) and "lite" not in self.model.lower())
                 if is_reasoning_capable:
-                    gen_config_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=effective_budget)
+                    gen_config_kwargs["thinking_config"] = build_thinking_config(self.model, effective_budget)
 
                 import concurrent.futures
 
@@ -1093,10 +1112,12 @@ class DialogueVerifier:
                         tag="verifier"
                     )
                     cfg_kwargs = dict(gen_config_kwargs)
-                    if cached_name:
+                    if cached_name == "__IMPLICIT_CACHE_95__":
+                        cfg_kwargs["system_instruction"] = self.system_prompt
+                    elif cached_name:
                         cfg_kwargs["cached_content"] = cached_name
                     else:
-                        is_paid = ("flash" in self.model.lower() or "pro" in self.model.lower()) and "lite" not in self.model.lower()
+                        is_paid = ("flash" in self.model.lower() or "pro" in self.model.lower() or is_hydrogen) and "lite" not in self.model.lower()
                         if is_paid:
                             cached_name = ContextCacheManager.get_or_create_cache(
                                 client=active_c,
@@ -1104,13 +1125,15 @@ class DialogueVerifier:
                                 system_instruction=self.system_prompt,
                                 tag="verifier"
                             )
-                            if cached_name:
+                            if cached_name == "__IMPLICIT_CACHE_95__":
+                                cfg_kwargs["system_instruction"] = self.system_prompt
+                            elif cached_name:
                                 cfg_kwargs["cached_content"] = cached_name
                             else:
                                 raise RuntimeError(
                                     f"KATEGORYCZNA BLOKADA FINANSOWA: Zablokowano próbę wysłania 33k tokenów bez aktywnego rabatu -90% dla {self.model}."
                                 )
-                        if "cached_content" not in cfg_kwargs:
+                        if "cached_content" not in cfg_kwargs and "system_instruction" not in cfg_kwargs:
                             cfg_kwargs["system_instruction"] = self.system_prompt
                     cfg = types.GenerateContentConfig(**cfg_kwargs)
                     return active_c.models.generate_content(
@@ -1136,14 +1159,24 @@ class DialogueVerifier:
 
                 # Retrieve parsed structured output
                 result_lines: List[RefinedLine] = []
+                raw_lines = []
                 if hasattr(response, "parsed") and response.parsed is not None:
-                    parsed_obj: RefinedBatchResponse = response.parsed
-                    result_lines = parsed_obj.lines
+                    raw_lines = response.parsed.lines
                 else:
                     # Fallback to response.text if SDK returned raw string
                     data = json.loads(response.text)
-                    batch_resp = RefinedBatchResponse.model_validate(data)
-                    result_lines = batch_resp.lines
+                    batch_resp = effective_schema.model_validate(data)
+                    raw_lines = batch_resp.lines
+
+                for r in raw_lines:
+                    if isinstance(r, LeanRefinedLine):
+                        result_lines.append(RefinedLine(
+                            id=r.id,
+                            refined_pl=r.refined_pl,
+                            changes_made=r.changes_made
+                        ))
+                    else:
+                        result_lines.append(r)
 
                 # Zero-Drop Line Verifier Gate (0.00 PLN):
                 # Verify that all line IDs from batch_items are present in result_lines.
@@ -1292,6 +1325,16 @@ class DialogueVerifier:
                 is_timeout = "504" in err_str or "deadline" in err_str or "timeout" in err_str or "timed out" in err_str
                 is_unavailable = "503" in err_str or "unavailable" in err_str or "high demand" in err_str
                 is_rate_limit = "429" in err_str or "quota" in err_str or "resource_exhausted" in err_str
+                is_not_found = "404" in err_str or "not found" in err_str
+
+                if is_gemini_4_or_hydrogen_model(self.model):
+                    if is_not_found or (attempt >= max(2, num_keys * 2) and (is_unavailable or is_timeout)):
+                        fallback_model = "gemini-3.8-flash"
+                        print(f"\n[Fallback Model Verifier]: Przełączenie z {self.model} na {fallback_model} (próba {attempt})...")
+                        self.model = fallback_model
+                        effective_budget = self.calculate_effective_budget(batch_items)
+                        time.sleep(0.5)
+                        continue
 
                 import random
                 import time as _time

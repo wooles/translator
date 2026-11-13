@@ -20,6 +20,7 @@ from PIL import Image
 from google import genai
 from google.genai import types
 from extract import extract_frame_at_timestamp
+from model_resolver import is_gemini_4_or_hydrogen_model, build_thinking_config
 
 logger = logging.getLogger("sign_detector")
 
@@ -193,10 +194,13 @@ Zwróć wynik w formacie JSON zgodnym ze schematem DetectedSign."""
                     gen_cfg_kwargs = {
                         "response_mime_type": "application/json",
                         "response_schema": DetectedSign,
-                        "temperature": 0.1,
                     }
-                    if any(k in model.lower() for k in ["3.7", "3.8", "flash", "pro"]) and "lite" not in model.lower():
-                        gen_cfg_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=0)
+                    if is_gemini_4_or_hydrogen_model(model):
+                        gen_cfg_kwargs["thinking_config"] = build_thinking_config(model, 0)
+                    else:
+                        gen_cfg_kwargs["temperature"] = 0.1
+                        if any(k in model.lower() for k in ["3.7", "3.8", "flash", "pro"]) and "lite" not in model.lower():
+                            gen_cfg_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=0)
 
                     response = client.models.generate_content(
                         model=model,

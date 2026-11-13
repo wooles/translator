@@ -1,4 +1,4 @@
-# ==============================================================================
+﻿# ==============================================================================
 #  SKRYPT AUTOMATYCZNEJ KONFIGURACJI PROJEKTU NA NOWYM KOMPUTERZE (1-CLICK SETUP)
 #  Automatycznie instaluje zależności, tworzy .venv, konfiguruje klucz API i testuje
 # ==============================================================================
@@ -93,7 +93,7 @@ if (-not $ApiKey -or $ApiKey -eq "twój_klucz_api_tutaj") {
     Write-Host "  Podaj swój klucz GEMINI_API_KEY (uzyskany z https://aistudio.google.com/):" -ForegroundColor Cyan
     $ApiKey = Read-Host "  Klucz API"
     if ($ApiKey) {
-        $EnvContent = "GEMINI_API_KEY=$ApiKey`nGEMINI_MODEL=gemini-3.8-flash`nBATCH_SIZE=24`nENABLE_VERIFIER=true`nKEEP_HONORIFICS=true"
+        $EnvContent = "GEMINI_API_KEY=$ApiKey`nGEMINI_MODEL=gemini-4-hydrogen`nBATCH_SIZE=30`nENABLE_VERIFIER=true`nKEEP_HONORIFICS=true"
         Set-Content -Path $EnvFile -Value $EnvContent -Encoding UTF8
         Write-Host "  -> Zapisano klucz w pliku .env" -ForegroundColor Green
     }

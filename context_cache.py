@@ -92,6 +92,10 @@ class ContextCacheManager:
         if not client or not system_instruction:
             return None
 
+        from model_resolver import is_gemini_4_or_hydrogen_model
+        if is_gemini_4_or_hydrogen_model(model) and (len(system_instruction) // 4 >= 4096):
+            return "__IMPLICIT_CACHE_95__"
+
         with cls._LOCK:
             content_hash = cls.get_content_hash(model, system_instruction, client=client, tag=tag)
 
@@ -196,6 +200,10 @@ class ContextCacheManager:
         if not client or not system_instruction:
             return None
 
+        from model_resolver import is_gemini_4_or_hydrogen_model
+        if is_gemini_4_or_hydrogen_model(model):
+            return True
+
         prompt_tag = cls._get_prompt_tag(system_instruction, tag)
         if hasattr(client, "clients") and client.clients:
             first_name = None
@@ -215,7 +223,7 @@ class ContextCacheManager:
     @classmethod
     def touch_cache(cls, client: genai.Client, cache_name: str, ttl_seconds: int = DEFAULT_CACHE_TTL_SECONDS):
         """Extends rolling TTL window by 20 minutes from current second (Rolling Heartbeat)."""
-        if not client or not cache_name:
+        if not client or not cache_name or cache_name == "__IMPLICIT_CACHE_95__":
             return
         try:
             if hasattr(client, "caches") and hasattr(client.caches, "update"):

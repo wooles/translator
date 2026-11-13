@@ -13,6 +13,15 @@ DEFAULT_USD_PLN = float(os.getenv("USD_PLN_RATE", os.getenv("USD_PLN", "4.00")))
 
 # Official Google API rates per 1M (1,000,000) tokens in USD (supports .env override)
 GOOGLE_API_RATES: Dict[str, Dict[str, float]] = {
+    "hydrogen": {
+        "name": "Gemini 4 Hydrogen",
+        "input_uncached": float(os.getenv("RATE_HYDROGEN_IN", "1.50")),
+        "input_cached": float(os.getenv("RATE_HYDROGEN_CACHE", "0.075")),  # -95% discount with Implicit Context Caching
+        "output": float(os.getenv("RATE_HYDROGEN_OUT", "7.50")),           # Output token rate including thinking_level traces
+        "storage_per_hour": 0.00,                                          # Implicit caching has 0.00 USD storage fee
+        "cache_discount_pct": 95,
+        "is_free_tier": False
+    },
     "flash_lite": {
         "name": "Gemini 3.5 Flash-Lite",
         "input_uncached": float(os.getenv("RATE_FLASH_LITE_IN", "0.0375")),
@@ -83,30 +92,33 @@ class PricingGuard:
             total_pln = (cost_p1_usd + storage_active_usd + profiler_usd) * usd_pln
             return round(total_pln, 2)
 
-        elif profile in ["3", "master", "flash_reasoning", "pro_level3"]:
-            rate_flash = GOOGLE_API_RATES["flash"]
+        elif profile in ["3", "master", "flash_reasoning", "hydrogen", "hydrogen_master", "pro_level3"]:
+            rate_h = GOOGLE_API_RATES["hydrogen"]
+            batches_h = max(1, (lines_count + 23) // 24)
+            lean_output_f1_tokens = 2150
+            lean_output_f2_tokens = 1500
 
-            # Phase 1: Vision + Flash
-            p1_cached_in = (batches * system_prompt_tokens) if has_cache else 0
-            p1_uncached_in = batches * (batch_input_tokens + 256) + (0 if has_cache else batches * system_prompt_tokens)
-            p1_out = batches * batch_output_f1_tokens
+            # Phase 1: Vision + Hydrogen
+            p1_cached_in = (batches_h * system_prompt_tokens) if has_cache else 0
+            p1_uncached_in = batches_h * (batch_input_tokens + 256) + (0 if has_cache else batches_h * system_prompt_tokens)
+            p1_out = batches_h * lean_output_f1_tokens
             cost_p1_usd = (
-                (p1_cached_in / 1_000_000) * rate_flash["input_cached"] +
-                (p1_uncached_in / 1_000_000) * rate_flash["input_uncached"] +
-                (p1_out / 1_000_000) * rate_flash["output"]
+                (p1_cached_in / 1_000_000) * rate_h["input_cached"] +
+                (p1_uncached_in / 1_000_000) * rate_h["input_uncached"] +
+                (p1_out / 1_000_000) * rate_h["output"]
             )
 
-            # Phase 2: Flash Refinement with Elastic Adaptive CoT Budget (100% batches)
-            p2_cached_in = (batches * system_prompt_tokens) if has_cache else 0
-            p2_uncached_in = (batches * batch_input_tokens) + (0 if has_cache else batches * system_prompt_tokens)
-            p2_out = batches * batch_output_flash_cot
+            # Phase 2: Hydrogen Refinement with LOW/MEDIUM thinking_level
+            p2_cached_in = (batches_h * system_prompt_tokens) if has_cache else 0
+            p2_uncached_in = (batches_h * batch_input_tokens) + (0 if has_cache else batches_h * system_prompt_tokens)
+            p2_out = batches_h * lean_output_f2_tokens
             cost_p2_usd = (
-                (p2_cached_in / 1_000_000) * rate_flash["input_cached"] +
-                (p2_uncached_in / 1_000_000) * rate_flash["input_uncached"] +
-                (p2_out / 1_000_000) * rate_flash["output"]
+                (p2_cached_in / 1_000_000) * rate_h["input_cached"] +
+                (p2_uncached_in / 1_000_000) * rate_h["input_uncached"] +
+                (p2_out / 1_000_000) * rate_h["output"]
             )
 
-            storage_active_usd = 0.0064 # 20 min active Flash storage
+            storage_active_usd = 0.00  # Implicit caching has 0.00 USD storage fee
             profiler_usd = 0.002
             total_pln = (cost_p1_usd + cost_p2_usd + storage_active_usd + profiler_usd) * usd_pln
             return round(total_pln, 2)
@@ -156,9 +168,11 @@ class PricingGuard:
         # Phase 1
         m1 = f1_stats.get("model", "flash")
         rate1 = GOOGLE_API_RATES["flash"]
-        if "pro" in m1.lower():
+        if "hydrogen" in str(m1).lower() or "carbon" in str(m1).lower():
+            rate1 = GOOGLE_API_RATES["hydrogen"]
+        elif "pro" in str(m1).lower():
             rate1 = GOOGLE_API_RATES["pro"]
-        elif "lite" in m1.lower():
+        elif "lite" in str(m1).lower():
             rate1 = GOOGLE_API_RATES["flash_lite"]
 
         cached1 = f1_stats.get("cached", 0)
@@ -183,7 +197,9 @@ class PricingGuard:
         if f2_stats:
             m2 = f2_stats.get("model") or f1_stats.get("model", "flash")
             rate2 = GOOGLE_API_RATES["flash"]
-            if "pro" in str(m2).lower():
+            if "hydrogen" in str(m2).lower() or "carbon" in str(m2).lower():
+                rate2 = GOOGLE_API_RATES["hydrogen"]
+            elif "pro" in str(m2).lower():
                 rate2 = GOOGLE_API_RATES["pro"]
             elif "lite" in str(m2).lower():
                 rate2 = GOOGLE_API_RATES["flash_lite"]
