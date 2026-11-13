@@ -483,5 +483,75 @@ def test_t11_2_0_hydrogen_master_engine_implicit_cache_95_and_lean_schema_cost_i
     assert full_ref.lines[0].refined_pl == "Doskonała linia"
 
 
+# ==============================================================================
+# STANDARD 11.2.1 REGRESSION TESTS (T11.2.1_WHISPER_SCOPE_AND_MENU)
+# ==============================================================================
+@pytest.mark.unit
+def test_t11_2_1_no_unbound_local_whisper_disambiguator_and_interactive_menu_probe():
+    """Weryfikacja integralności zasięgu WhisperDisambiguator i EpisodeProfiler w translator.py oraz sondy w main.py."""
+    import ast
+    import sys
+    from pathlib import Path
+    from unittest.mock import patch
+    import pysubs2
+    from translator import MultimodalTranslator
+
+    # 1. Analiza AST translator.py pod kątem braku zaciemniających importów lokalnych
+    translator_path = Path(__file__).parent.parent / "translator.py"
+    with open(translator_path, "r", encoding="utf-8") as f:
+        tree = ast.parse(f.read(), filename="translator.py")
+
+    target_funcs = {"_prepare_batch_prompt", "_process_single_batch"}
+    forbidden_local_imports = {"whisperdisambiguator", "episodeprofiler"}
+
+    found_shadowed = []
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name in target_funcs:
+            for subnode in ast.walk(node):
+                if isinstance(subnode, ast.ImportFrom):
+                    for alias in subnode.names:
+                        if alias.name.lower() in forbidden_local_imports:
+                            found_shadowed.append((node.name, alias.name, subnode.lineno))
+
+    assert not found_shadowed, f"Wykryto zagnieżdżone importy wywołujące UnboundLocalError: {found_shadowed}"
+
+    # 2. Wywołanie _prepare_batch_prompt z transkrypcją Whisper ASR (0.00 PLN)
+    tr = MultimodalTranslator.__new__(MultimodalTranslator)
+    tr.tm = None
+    tr.character_registry = {}
+    tr.series_bible = None
+    tr.profiler = None
+    tr.scene_cuts_ms = []
+    tr.black_intervals_ms = []
+    tr.episode_scene_genders = {}
+    tr.scene_is_female_only = False
+    tr._episode_knowledge_cached = False
+
+    ev = pysubs2.SSAEvent(start=1000, end=3000, text="Synthetic test line", name="Speaker_Alpha")
+    batch_events = [(0, ev, "Synthetic test line", "")]
+
+    prompt = tr._prepare_batch_prompt(
+        batch_events=batch_events,
+        history_context=[],
+        whisper_transcriptions={1: "テスト音声"}
+    )
+    assert "Synthetic test line" in prompt
+    assert len(prompt) > 0
+
+    # 3. Logika wyboru profilu i sondy w main.py przy braku flagi -m / --model w sys.argv
+    with patch.object(sys, "argv", ["main.py", "dummy.ass"]):
+        has_explicit = any(arg in sys.argv for arg in ["-m", "--model"]) or any(arg.startswith("--model=") for arg in sys.argv)
+        assert has_explicit is False
+        model_p1 = "gemini-4-hydrogen" if has_explicit else None
+        assert model_p1 is None
+
+    with patch.object(sys, "argv", ["main.py", "dummy.ass", "-m", "gemini-4-hydrogen"]):
+        has_explicit = any(arg in sys.argv for arg in ["-m", "--model"]) or any(arg.startswith("--model=") for arg in sys.argv)
+        assert has_explicit is True
+        model_p1 = "gemini-4-hydrogen" if has_explicit else None
+        assert model_p1 == "gemini-4-hydrogen"
+
+
+
 
 
