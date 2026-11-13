@@ -114,21 +114,35 @@ def resolve_best_models(client: Optional[genai.Client] = None) -> Dict[str, str]
             if "gemini" not in name_lower and "hydrogen" not in name_lower and "carbon" not in name_lower:
                 continue
 
+            score = _extract_model_score(name)
+            # Pomijanie wycofanych modeli generacji 1.x oraz 2.x (np. gemini-2.5-pro zwracających 404)
+            if score[0] > 0 and score[0] < 3:
+                continue
+
             # Classify into tier categories
-            if "hydrogen" in name_lower or "carbon" in name_lower or (re.search(r"gemini-4(?:\b|[-_.])", name_lower) and "flash" not in name_lower):
+            if "hydrogen" in name_lower and "argon" not in name_lower and "carbon" not in name_lower and "pro" not in name_lower:
                 hydrogen_candidates.append(name)
             elif "flash-lite" in name_lower:
                 flash_lite_candidates.append(name)
             elif "flash" in name_lower:
                 flash_candidates.append(name)
-            elif "pro" in name_lower:
-                pro_candidates.append(name)
+            elif "pro" in name_lower or "argon" in name_lower or "carbon" in name_lower:
+                if score >= (3, 1, 0) or "argon" in name_lower or "carbon" in name_lower:
+                    pro_candidates.append(name)
 
         # Sort by highest version score
-        hydrogen_sorted = sorted(hydrogen_candidates, key=_extract_model_score, reverse=True)
+        hydrogen_sorted = sorted(
+            hydrogen_candidates,
+            key=lambda n: (_extract_model_score(n), 1 if n.lower() == "gemini-4-hydrogen" else 0),
+            reverse=True
+        )
         flash_sorted = sorted(flash_candidates, key=_extract_model_score, reverse=True)
         flash_lite_sorted = sorted(flash_lite_candidates, key=_extract_model_score, reverse=True)
-        pro_sorted = sorted(pro_candidates, key=_extract_model_score, reverse=True)
+        pro_sorted = sorted(
+            pro_candidates,
+            key=lambda n: (_extract_model_score(n), 1 if "pro" in n.lower() else 0),
+            reverse=True
+        )
 
         best_hydrogen = hydrogen_sorted[0] if hydrogen_sorted else defaults["hydrogen"]
         best_flash = flash_sorted[0] if flash_sorted else defaults["flash"]

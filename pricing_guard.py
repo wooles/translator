@@ -168,9 +168,9 @@ class PricingGuard:
         # Phase 1
         m1 = f1_stats.get("model", "flash")
         rate1 = GOOGLE_API_RATES["flash"]
-        if "hydrogen" in str(m1).lower() or "carbon" in str(m1).lower():
+        if "hydrogen" in str(m1).lower():
             rate1 = GOOGLE_API_RATES["hydrogen"]
-        elif "pro" in str(m1).lower():
+        elif "pro" in str(m1).lower() or "argon" in str(m1).lower() or "carbon" in str(m1).lower():
             rate1 = GOOGLE_API_RATES["pro"]
         elif "lite" in str(m1).lower():
             rate1 = GOOGLE_API_RATES["flash_lite"]
@@ -197,9 +197,9 @@ class PricingGuard:
         if f2_stats:
             m2 = f2_stats.get("model") or f1_stats.get("model", "flash")
             rate2 = GOOGLE_API_RATES["flash"]
-            if "hydrogen" in str(m2).lower() or "carbon" in str(m2).lower():
+            if "hydrogen" in str(m2).lower():
                 rate2 = GOOGLE_API_RATES["hydrogen"]
-            elif "pro" in str(m2).lower():
+            elif "pro" in str(m2).lower() or "argon" in str(m2).lower() or "carbon" in str(m2).lower():
                 rate2 = GOOGLE_API_RATES["pro"]
             elif "lite" in str(m2).lower():
                 rate2 = GOOGLE_API_RATES["flash_lite"]
