@@ -4,9 +4,9 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-13 — Standard 11.2.0 Certyfikowany Baseline)
-- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.0 (Gemini 4 Hydrogen Master, Implicit Caching -95%, Thinking LOW/MEDIUM & Lean Schema Baseline)`
-- **Commit certyfikacji kodu:** `b113308dbf957cd6ecf4da2d934c21eb84c6dbb6` (`b113308`)
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-13 — Standard 11.2.1 Certyfikowany Baseline)
+- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.1 (WhisperDisambiguator Scope Fix & Live Hydrogen Server Probe Menu Restoration Baseline)`
+- **Commit certyfikacji kodu:** `5e11cc9105864fca1c9132d43f4825f51bc5a4d2` (`5e11cc9`)
 - **Commity implementacyjne 11.1:** `5b7306d` (Commit 1), `5b17ea7` (Commit 2), `2b4bc7d` (Commit 3), `8b72887` (Commit 4), `8a7dd31` (Commit 5), `218af2e` (Commit 6)
 - **Commity Hotfixu 11.1.1:** `328729f` (Commit 1), `9de0b83` (Commit 2), `07c4684` (Commit 3), `96acac7` (Commit 4)
 - **Commity Hotfixu 11.1.2:** `74766d8` (Commit 1), `1b540e3` (Commit 2), `8313658` (Commit 3), `326b7e0` (Commit 4)
@@ -19,16 +19,17 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 - **Commity Hotfixu 11.1.5:** `13afb42` (Commit 1), `3c70a55` (Commit 2), `79f6e69` (Commit 3)
 - **Commity Hotfixu 11.1.6:** `d69d3f3` (Commit 1), `0651e17` (Commit 2), `79e5960` (Commit 3)
 - **Commity Hotfixu 11.1.7:** `854a4b3` (Commit 1), `a733c06` (Commit 2), `928fa55` (Commit 3)
-- **Commity Standardu 11.2.0:**
-  * Commit 1 (`c197db73c3dabf887dddbf2337dc3a1d8cff598c`): `feat(models): migrate profile 3 to gemini-4-hydrogen with 95% implicit cache, thinking config, and lean schemas (11.2.0, Z16-amendment #13)`
-  * Commit 2 (`b113308dbf957cd6ecf4da2d934c21eb84c6dbb6`): `test(models): add unit tests for Gemini 4 Hydrogen Master engine, 95% implicit cache, Lean Schema, and cost invariance` — **NOWY COMMIT CERTYFIKACJI KODU**
-  * Commit 3 (`HEAD`): `docs(release): certify Standard 11.2.0 Gemini 4 Hydrogen baseline in AGENTS.md, PROJECT_MEMORY.md, and implementation report`
-- **Status 11.2.0:** `CERTIFIED / CLOSED (2026-11-13)`
-- **Commit ochrony Depuracji Legacy 1.0 (Z16):** `c197db73c3dabf887dddbf2337dc3a1d8cff598c` (`c197db7` — po autoryzacji Z16-amendment #13 dla verifier.py; bezwzględne 0 B diffu na pozostałych plikach chronionych)
-- **Stan metryk:** `357 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `428 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 12/12, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
-- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (357/357 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
-- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.0` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
-- **Gałąź i Architektura:** `main` (Standard 11.2.0: Pełna migracja Profilu 3 na Gemini 4 Hydrogen, aktywacja 95% rabatu na implicit context cache dla promptu systemowego >= 4096 tokenów, natywne sterowanie budżetem myślenia przez thinking_level 'LOW'/'MEDIUM' w SDK 3.3.0, odchudzone schematy JSON Pydantic LeanBatchTranslationResponse i LeanRefinedBatchResponse, powiększony rozmiar paczki dialogowej do batch-size 30, ścisły niezmiennik kosztu ~3.68 PLN netto za 350 linii, Certyfikacja Kodu `b113308dbf957cd6ecf4da2d934c21eb84c6dbb6`, Baseline Z16 `c197db73c3dabf887dddbf2337dc3a1d8cff598c`, Zero-Literal Pure Positive Domain Invariant Architecture & Primary LLM Translation Authority)
+- **Commity Standardu 11.2.0:** `c197db7` (Commit 1), `b113308` (Commit 2), `1772034` (Commit 3)
+- **Commity Hotfixu 11.2.1:**
+  * Commit 1 (`bf03d8465d64ffc9a897fa0f671c5ec37e408ec2`): `fix(pipeline): remove shadowing local imports of WhisperDisambiguator in translator.py and restore live server health probe menu in main.py (11.2.1)`
+  * Commit 2 (`5e11cc9105864fca1c9132d43f4825f51bc5a4d2`): `test(pipeline): add regression test for WhisperDisambiguator scope integrity and interactive server probe menu` — **NOWY COMMIT CERTYFIKACJI KODU**
+  * Commit 3 (`HEAD`): `docs(release): certify Standard 11.2.1 baseline in AGENTS.md, PROJECT_MEMORY.md, and implementation report`
+- **Status 11.2.1:** `CERTIFIED / CLOSED (2026-11-13)`
+- **Commit ochrony Depuracji Legacy 1.0 (Z16):** `c197db73c3dabf887dddbf2337dc3a1d8cff598c` (`c197db7` — bezwzględne 0 B diffu na wszystkich plikach chronionych)
+- **Stan metryk:** `358 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `429 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 12/12, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
+- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (358/358 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
+- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.1` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
+- **Gałąź i Architektura:** `main` (Standard 11.2.1: Likwidacja UnboundLocalError WhisperDisambiguator i EpisodeProfiler w translator.py przez usunięcie zagnieżdżonych importów, przywrócenie Sondy Serwerów Google na żywo oraz interaktywnego menu wyboru profilu w main.py przez deterministyczną detekcję flagi -m w sys.argv, dedykowany tag latencji tag_hydrogen w Profilu 3, równoległe odpytywanie 5 klastrów w probe_all_models_health, Certyfikacja Kodu `5e11cc9105864fca1c9132d43f4825f51bc5a4d2`, Baseline Z16 `c197db73c3dabf887dddbf2337dc3a1d8cff598c`, Zero-Literal Pure Positive Domain Invariant Architecture & Primary LLM Translation Authority)
 - **Środowisko:** Python 3.13 (`.venv`), Windows PowerShell, `ffmpeg` (PATH), `librosa.pyin`, `soundfile`, `pysubs2`, `spaCy en_core_web_sm` (100% offline 0.00 PLN), bezpośrednie klucze Google AI Studio API (`use_vertex = 0`).
 - **Dyrektywa Wykonawcza Testów:**
   * Testy przyrostowe podczas kodowania (< 2 s): `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_testu>"`
@@ -294,6 +295,7 @@ W ramach autoryzowanego `Z16-amendment #3` usunięto warunek `f1_starts_lower` z
 | **2026-11-11** | `ARB-051` | Dyskurs / Rejestr / Glosariusz | **Wdrożenie Hotfixu 11.1.5 (P1-1..P3-2)**: Bramkowanie telemetrii `Rejestr:` przez profil postaci (INC-AVT-030), in-memory reconcyliacja płci, toponimów i paradygmatów w `series_memory.py` (0 B diff na Z16), filtr składniowy 3. osoby `_is_third_person_syntactic_context` oraz obecności w scenie z `dramatic_sequences.characters_present` (INC-AVT-031), izolacja `is_sign`, konsensus płci aktora w odcinku, normalizacja znaczników `<i>` i ochrona zablokowanego glosariusza przed dryfem Fazy 2. | 0.00 PLN |
 | **2026-11-12** | `ARB-052` | Dyskurs / ASR / EQG / Glosariusz | **Wdrożenie Mikro-Hotfixu 11.1.7 (BŁĄD-HIST-1..4 / INC-AVT-032..035)**: Rozróżnienie tagu monologu Imię(M) od jawnej płci (M) ze spacją (INC-AVT-032), deduplikacja Whisper ASR dla kolejnych kwestii tego samego mówcy oraz przecieków >= 3 znaki (INC-AVT-033), ochrona intencji pytajnej z source_en i celowych powtórzeń ze spacją w EQG (INC-AVT-034, Z16-amendment #12), równowaga tagów {\i1}...{\i0} w extract_typesetting_tags, wsparcie 3-wyrazowych terminów glosariusza i próg 38 CPL plansz (INC-AVT-035). | 0.00 PLN |
 | **2026-11-13** | `ARB-053` | Modele / Koszt / Schemat | **Aktywna Migracja Profilu [3] Mistrzowski na Gemini 4 Hydrogen (Standard 11.2.0)**: Pełne przejście z `gemini-3.8-flash` na `gemini-4-hydrogen` dla Profilu 3 (`hydrogen` jako model domyślny), aktywacja Implicit Context Caching (-95% zniżki na input tokens), mapowanie budżetów myślenia na natywne `thinking_level="LOW"/"MEDIUM"` (Google GenAI SDK 3.3.0), odchudzenie schematów Pydantic (`LeanBatchTranslationResponse`, `LeanRefinedBatchResponse`) z redukcją tokenów wyjściowych o 40%, powiększenie rozmiaru paczki dialogowej do `--batch-size 30` (12-15 paczek na odcinek) oraz zabezpieczenie niezmiennika kosztowego (3.68 PLN netto za 350 linii) z zachowaniem 0 B diffu na plikach chronionych Z16 (Z16-amendment #13 wyłącznie dla verifier.py). | 0.00 PLN |
+| **2026-11-13** | `ARB-054` | Import Scope / CLI Menu | **Likwidacja UnboundLocalError WhisperDisambiguator i Przywrócenie Sondy Menu (Standard 11.2.1 / INC-AVT-036)**: Usunięcie zagnieżdżonych lokalnych importów `WhisperDisambiguator` i `EpisodeProfiler` w `translator.py` zaciemniających importy modułowe, globalny import `_is_whole_line_italic` z `verifier.py`, usunięcie sztucznej listy `old_default_models` w `main.py` na rzecz deterministycznej detekcji jawnej flagi `-m`/`--model` w `sys.argv`, przywrócenie wyświetlania sondy latencji klastrów i tagu `tag_hydrogen` w Profilu 3 oraz równoległe sondowanie 5 modeli (`max_workers=5`). | 0.00 PLN |
 
 ---
 

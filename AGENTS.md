@@ -2,11 +2,11 @@
 
 Dokument ten stanowi jedyne źródło prawdy (Single Source of Truth) definiujące nienaruszalne reguły architektoniczne, lingwistyczne i procesowe asystenta AI oraz zespołów wieloagentowych w repozytorium `translator`.
 
-- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.0 (Gemini 4 Hydrogen Master, Implicit Caching -95%, Thinking LOW/MEDIUM & Lean Schema Baseline)`
-- **Commit certyfikacji kodu:** `b113308` (`b113308dbf957cd6ecf4da2d934c21eb84c6dbb6`)
+- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.1 (WhisperDisambiguator Scope Fix & Live Hydrogen Server Probe Menu Restoration Baseline)`
+- **Commit certyfikacji kodu:** `5e11cc9` (`5e11cc9105864fca1c9132d43f4825f51bc5a4d2`)
 - **Commit ochrony Depuracji Legacy 1.0 (Z16):** `c197db7` (`c197db73c3dabf887dddbf2337dc3a1d8cff598c`)
-- **Stan metryk:** `581 collected` (`428 passed` fast unit/integration [357 tests/ + 71 test_system.py] + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki (`verify_purity.py`, `verify_8_fixes.py`, `verify_12_fixes.py`, `verify_ultimate_pipeline.py`) oraz `audit_diff.ps1` w stanie `PASS`.
-- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.0` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
+- **Stan metryk:** `582 collected` (`429 passed` fast unit/integration [358 tests/ + 71 test_system.py] + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki (`verify_purity.py`, `verify_8_fixes.py`, `verify_12_fixes.py`, `verify_ultimate_pipeline.py`) oraz `audit_diff.ps1` w stanie `PASS`.
+- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.1` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
 
 ---
 
