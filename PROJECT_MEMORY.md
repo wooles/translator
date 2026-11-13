@@ -4,9 +4,9 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-13 — Standard 11.2.3 Certyfikowany Baseline)
-- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.3 (Hydrogen Hybrid Context Cache, Pragmatic Word-Boundary Guard, Unknown-Safe Scene Cast & Toponym/Typesetting Integrity Baseline)`
-- **Commit certyfikacji kodu:** `d6f7355e28e038dea105dd34da57514053395e96` (`d6f7355`)
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-14 — Standard 11.2.5 Certyfikowany Baseline)
+- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.5 (External Ontological Grounding, Impersonal Dispatch Guard, Eponym Identity Protection & Collective Role Sanitization Baseline)`
+- **Commit certyfikacji kodu:** `37029a4c9713fbe376699512e9100f5599ce7e0a` (`37029a4`)
 - **Commity implementacyjne 11.1:** `5b7306d` (Commit 1), `5b17ea7` (Commit 2), `2b4bc7d` (Commit 3), `8b72887` (Commit 4), `8a7dd31` (Commit 5), `218af2e` (Commit 6)
 - **Commity Hotfixu 11.1.1:** `328729f` (Commit 1), `9de0b83` (Commit 2), `07c4684` (Commit 3), `96acac7` (Commit 4)
 - **Commity Hotfixu 11.1.2:** `74766d8` (Commit 1), `1b540e3` (Commit 2), `8313658` (Commit 3), `326b7e0` (Commit 4)
@@ -22,16 +22,17 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 - **Commity Standardu 11.2.0:** `c197db7` (Commit 1), `b113308` (Commit 2), `1772034` (Commit 3)
 - **Commity Hotfixu 11.2.1:** `bf03d84` (Commit 1), `5e11cc9` (Commit 2), `208388c` (Commit 3)
 - **Commity Hotfixu 11.2.2:** `bacb2d9` (Commit 1), `1c18bef` (Commit 2), `24b4a51` (Commit 3)
-- **Commity Hotfixu 11.2.3:**
-  * Commit 1 (`2ae94bf`): `fix(pipeline): enable hybrid server context cache for hydrogen, tighten pragmatic register boundaries, enforce unknown_count invariant, and preserve toponym/clip integrity (11.2.3)`
-  * Commit 2 (`d6f7355e28e038dea105dd34da57514053395e96`): `test(pipeline): add regression test for hybrid hydrogen context cache, register word boundaries, unknown scene guard, toponym declension, and clip preservation` — **NOWY COMMIT CERTYFIKACJI KODU**
-  * Commit 3 (`HEAD`): `docs(release): certify Standard 11.2.3 baseline in AGENTS.md, PROJECT_MEMORY.md, and implementation report`
-- **Status 11.2.3:** `CERTIFIED / CLOSED (2026-11-13)`
+- **Commity Hotfixu 11.2.3:** `2ae94bf` (Commit 1), `d6f7355` (Commit 2), `0132db0` (Commit 3)
+- **Commity Standardu 11.2.5:**
+  * Commit 1 (`dcbbe50`): `feat(pipeline): external gender resolver, impersonal radio dispatch, eponym guard and collective role sanitization (11.2.5)`
+  * Commit 2 (`37029a4c9713fbe376699512e9100f5599ce7e0a`): `test(pipeline): add regression tests for external gender resolver, radio dispatches, and eponym routing` — **NOWY COMMIT CERTYFIKACJI KODU**
+  * Commit 3 (`HEAD`): `docs(release): certify Standard 11.2.5 baseline in AGENTS.md, PROJECT_MEMORY.md, and implementation report`
+- **Status 11.2.5:** `CERTIFIED / CLOSED (2026-11-14)`
 - **Commit ochrony Depuracji Legacy 1.0 (Z16):** `c197db73c3dabf887dddbf2337dc3a1d8cff598c` (`c197db7` — bezwzględne 0 B diffu na wszystkich plikach chronionych)
-- **Stan metryk:** `360 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `431 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 12/12, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
-- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (360/360 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
-- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.3` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
-- **Gałąź i Architektura:** `main` (Standard 11.2.3: Hybrydowy Context Cache dla Gemini 4 Hydrogen z fallbackiem __IMPLICIT_CACHE_95__, uszczelnienie granic słów \b w rejestrze pragmatycznym yakuwarigo, poszanowanie niezmiennika unknown_count == 0 w precompute scene genders i promocja płci z tytułów w profilu, 7-przypadkowa fleksja toponimów spółgłoskowych w RAM, ochrona tagów \clip(...) i pozycjonowania plansz \an8, Certyfikacja Kodu `d6f7355e28e038dea105dd34da57514053395e96`, Baseline Z16 `c197db73c3dabf887dddbf2337dc3a1d8cff598c`, Zero-Literal Pure Positive Domain Invariant Architecture & Primary LLM Translation Authority)
+- **Stan metryk:** `361 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `432 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 11/11, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
+- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (361/361 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
+- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.5` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
+- **Gałąź i Architektura:** `main` (Standard 11.2.5: Zewnętrzne ugruntowanie ontologiczne AniList GraphQL w `ExternalGenderResolver` z Franchise Matching Guard, buforem dyskowym `.external_character_cache.json` i bezpiecznikiem Circuit Breaker, ochrona łączności radiowej i meldunków wojskowych "Radio & Dispatch Invariance" w Fazie 1 i Fazie 2, ochrona tożsamości eponimów `_compute_toponym_declension` i odblokowanie paradygmatów toponimów w `SeriesBible.get_declension_paradigm`, sanitacja ról zbiorowych `SECONDARY_COLLECTIVE_ROLES` `torimaki`, `retinue`, `guards` do stanu UNKNOWN/P2, Certyfikacja Kodu `37029a4c9713fbe376699512e9100f5599ce7e0a`, Baseline Z16 `c197db73c3dabf887dddbf2337dc3a1d8cff598c`, Zero-Literal Pure Positive Domain Invariant Architecture & Primary LLM Translation Authority)
 - **Środowisko:** Python 3.13 (`.venv`), Windows PowerShell, `ffmpeg` (PATH), `librosa.pyin`, `soundfile`, `pysubs2`, `spaCy en_core_web_sm` (100% offline 0.00 PLN), bezpośrednie klucze Google AI Studio API (`use_vertex = 0`).
 - **Dyrektywa Wykonawcza Testów:**
   * Testy przyrostowe podczas kodowania (< 2 s): `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_testu>"`
@@ -406,5 +407,23 @@ Dodanie w `tools/consolidate_bibles.py` opcjonalnej flagi `--migrate-misplaced-s
    W `series_memory.py` dodano deterministyczne generowanie 7-przypadkowego paradygmatu dla toponimów jednowyrazowych na spółgłoski twarde i wargowe oraz na `-ia`/`-ja`, integrując je z `DeclensionParadigm` i słownikiem `places` bez zapisu na dysk.
 5. **INC-AVT-041 (Ochrona Tagów \clip(...) i Pozycjonowania Plansz):**
    W `translator.py` rozszerzono `sanitize_ts_prefix_for_translation` o parametr `preserve_clip: bool = False`, aktywowany dla plansz wielowarstwowych frame-by-frame (`\pos` + `\clip`). Dodano także ochronę tagu wyrównania górnego `\an8` dla napisów stylizowanych w górnej części ekranu.
+
+
+## 🏛️ ARB-057 / INC-AVT-043..046: Standard 11.2.5 — Zewnętrzne Ugruntowanie Ontologiczne (AniList GraphQL), Ochrona Łączności Radiowej i Meldunków, Ochrona Eponimów i Sanitacja Ról Zbiorowych
+
+- **Status:** `RESOLVED (Standard 11.2.5, commity dcbbe50, 37029a4)`
+- **Zidentyfikowano:** Produkcyjne zgłoszenia awarii ontologicznych, meldunków wojskowych oraz ról zbiorowych
+- **Commit certyfikacji kodu:** `37029a4c9713fbe376699512e9100f5599ce7e0a` (`37029a4`)
+
+### Składowe Wdrożenia:
+1. **INC-AVT-043 (Zewnętrzne Ugruntowanie Ontologiczne AniList GraphQL & In-Memory Reconcile):**
+   W `metadata.py` zaimplementowano klasę `ExternalGenderResolver` odpytującą punkt końcowy AniList Character GraphQL z rygorem `Franchise Matching Guard` (porównanie znormalizowanego sluga franczyzy z tytułami romaji i english powiązanych mediów), buforem dyskowym `series_memory/.external_character_cache.json` z atomowym zapisem, bezpiecznikiem awaryjnym `Circuit Breaker` (3 kolejne błędy otwierają bezpiecznik) oraz flagą środowiskową `ENABLE_EXTERNAL_GENDER_RESOLVER`. W `series_memory.py` rozszerzono `_reconcile_registry_gender_in_memory` o skanowanie `dramatic_summary`, `female_only_scene`, pełną fleksję polskich tytułów tytularnych, dziedziczenie płci wariantów `-like`/`-clone` oraz fallback do `ExternalGenderResolver`.
+2. **INC-AVT-044 (Ochrona Łączności Radiowej i Meldunków Wojskowych — Radio & Dispatch Invariance):**
+   W `translator.py` zaimplementowano regułę *Radio & Dispatch Invariance* w promptach systemowych Fazy 1 i Fazy 2 (DialogVerifier), nakazującą przekładanie wojskowych potwierdzeń odbioru (`"Roger."`, `"Copy that."`, `"Understood."`, `"Acknowledged."`) w formie bezosobowej (`"Przyjęto."`, `"Zrozumiano."`) lub żeńskiej (`"Przyjęłam."`, `"Zrozumiałam."`), eliminując fałszywą maskulinizację (`"Przyjąłem."`) przy braku zweryfikowanego mężczyzny jako mówcy.
+3. **INC-AVT-045 (Ochrona Tożsamości Eponimów i Odblokowanie Paradygmatów TOPONYM):**
+   W `series_memory.py` w funkcji `_compute_toponym_declension` zaimplementowano strażnika eponimów: w przypadku wykrycia leksemu należącego do kanonicznych imion męskich (`CANONICAL_MALE_NAMES`) lub spółgłoskowych żeńskich (`FOREIGN_FEMALE_CONSONANT_NAMES`), funkcja zwraca `None` (Identity Pass-Through), zapobiegając błędnej deklinacji imienia jako toponimu. Ponadto w `SeriesBible.get_declension_paradigm` odblokowano kategorię `EntityCategory.TOPONYM` z przeszukiwaniem słowników `places` i `declensions` oraz fallbackiem do `DeclensionParadigm.create_for_name`.
+4. **INC-AVT-046 (Sanitacja Ról Zbiorowych i Orszaku — SECONDARY_COLLECTIVE_ROLES):**
+   W `series_memory.py` zdefiniowano zbiór `SECONDARY_COLLECTIVE_ROLES` (`torimaki`, `retinue`, `followers`, `servants`, `attendants`, `guards`, `soldiers`, `squad`, `escort`, `unit`, `crowd`). W funkcjach `populate_secondary_actor_tags` oraz pętli relacji `clean_p` zablokowano fałszywą feminizację i maskulinizację orszaku/straży, wymuszając dla bytów zbiorowych stan `gender: "UNKNOWN"`, `priority: "P2"`, `has_verified_gender: False`.
+
 
 
