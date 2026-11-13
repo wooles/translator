@@ -552,6 +552,72 @@ def test_t11_2_1_no_unbound_local_whisper_disambiguator_and_interactive_menu_pro
         assert model_p1 == "gemini-4-hydrogen"
 
 
+# ==============================================================================
+# STANDARD 11.2.2 REGRESSION TESTS (T11.2.2_HYDROGEN_TIER_ISOLATION_AND_2X_GUARD)
+# ==============================================================================
+@pytest.mark.unit
+def test_t11_2_2_strict_hydrogen_vs_argon_isolation_and_retired_2x_model_guard():
+    """Weryfikacja ścisłej izolacji gemini-4-hydrogen od gemini-4-argon oraz blokady modeli 2.x w model_resolver.py."""
+    from unittest.mock import MagicMock
+    from model_resolver import resolve_best_models
+    from pricing_guard import PricingGuard, GOOGLE_API_RATES
+
+    class SyntheticModel:
+        def __init__(self, name: str):
+            self.name = name
+
+    # 1. API zwraca modele posortowane alfabetycznie (argon przed hydrogen) oraz wycofany gemini-2.5-pro
+    mock_client_argon = MagicMock()
+    mock_client_argon.models.list.return_value = [
+        SyntheticModel("models/gemini-2.5-pro"),
+        SyntheticModel("models/gemini-3.5-flash-lite"),
+        SyntheticModel("models/gemini-3.8-flash"),
+        SyntheticModel("models/gemini-4-argon"),
+        SyntheticModel("models/gemini-4-hydrogen"),
+    ]
+
+    resolved_argon = resolve_best_models(mock_client_argon)
+    # Ścisła izolacja: hydrogen_candidates zawiera wyłącznie hydrogen, a nie argon
+    assert resolved_argon["hydrogen"] == "gemini-4-hydrogen"
+    assert "argon" not in resolved_argon["hydrogen"].lower()
+    # gemini-4-argon trafia do pro_candidates
+    assert resolved_argon["pro"] == "gemini-4-argon"
+    assert "2.5" not in resolved_argon["pro"]
+    assert resolved_argon["flash"] == "gemini-3.8-flash"
+    assert resolved_argon["flash_lite"] == "gemini-3.5-flash-lite"
+
+    # 2. API zwraca wyłącznie wycofany 2.5-pro (brak modeli pro >= 3.1)
+    mock_client_retired = MagicMock()
+    mock_client_retired.models.list.return_value = [
+        SyntheticModel("models/gemini-2.5-pro"),
+        SyntheticModel("models/gemini-2.0-flash"),
+        SyntheticModel("models/gemini-3.5-flash-lite"),
+        SyntheticModel("models/gemini-3.8-flash"),
+        SyntheticModel("models/gemini-4-hydrogen"),
+    ]
+
+    resolved_retired = resolve_best_models(mock_client_retired)
+    assert resolved_retired["hydrogen"] == "gemini-4-hydrogen"
+    # Modele 2.x są odfiltrowane -> fallback do stabilnego defaults["pro"]
+    assert resolved_retired["pro"] == "gemini-3.1-pro-preview"
+    assert "2.5" not in resolved_retired["pro"]
+    assert "2.0" not in resolved_retired["flash"]
+
+    # 3. Weryfikacja taryfikatora w pricing_guard.py dla hydrogen vs argon/carbon/pro
+    f1_stats_h = {"model": "gemini-4-hydrogen", "prompt": 100000, "cached": 95000, "output": 2000}
+    f1_stats_a = {"model": "gemini-4-argon", "prompt": 100000, "cached": 95000, "output": 2000}
+    f1_stats_c = {"model": "gemini-4-carbon", "prompt": 100000, "cached": 95000, "output": 2000}
+
+    cost_h = PricingGuard.calculate_actual_cost_breakdown(f1_stats_h)
+    cost_a = PricingGuard.calculate_actual_cost_breakdown(f1_stats_a)
+    cost_c = PricingGuard.calculate_actual_cost_breakdown(f1_stats_c)
+
+    # Argon i Carbon podlegają stawkom pro, więc ich koszt jest wyższy niż dla hydrogen
+    assert cost_a["net_pln"] > cost_h["net_pln"]
+    assert cost_a["net_pln"] == cost_c["net_pln"]
+
+
+
 
 
 
