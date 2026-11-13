@@ -484,16 +484,19 @@ def extract_typesetting_tags(raw_text: str) -> Tuple[str, str]:
 
     return "", sanitize_sub_text(raw_text)
 
-def sanitize_ts_prefix_for_translation(ts_prefix: str) -> str:
+def sanitize_ts_prefix_for_translation(ts_prefix: str, preserve_clip: bool = False) -> str:
     """
     Sanitizes ASS typesetting tag prefixes before reattaching to translated Polish text:
-    - Strips restrictive \\clip(...) / \\iclip(...) bounding boxes that crop/hide longer Polish translations.
+    - Strips restrictive \\clip(...) / \\iclip(...) bounding boxes that crop/hide longer Polish translations (unless preserve_clip=True for multi-layer FBF/pos clips).
     - Cleans empty or malformed tag blocks e.g. "{}".
     """
     if not ts_prefix:
         return ""
-    # Strip restrictive clip/iclip bounding boxes designed for shorter English text
-    cleaned = re.sub(r"\\i?clip\([^)]*\)", "", ts_prefix)
+    if not preserve_clip:
+        # Strip restrictive clip/iclip bounding boxes designed for shorter English text
+        cleaned = re.sub(r"\\i?clip\([^)]*\)", "", ts_prefix)
+    else:
+        cleaned = ts_prefix
     # Clean empty tag braces {}
     cleaned = re.sub(r"\{\s*\}", "", cleaned)
     return cleaned
@@ -1116,7 +1119,13 @@ def detect_japanese_pragmatic_register(jp_text: str, en_text: str = "") -> Optio
             return "Code-switching JA+EN (celowe wtrącenie angielskie w wypowiedzi japońskiej – zachowaj zabarwienie komiczne/stylistyczne)"
 
     # 5. Tough Soldier / Battle Slang (-ze, -zo, temee, kisama, ore)
-    if any(k in clean_jp for k in ["ぜ", "ぞ", "てめえ", "貴様", "野郎", "俺"]) or any(k in rom_lower for k in ["-ze", " ze", "-zo", " zo", "temee", "kisama", "yarou", "ore"]):
+    soldier_rom = bool(re.search(r"\b(?:ore|oresama|temee|kisama|yarou|kono\s*yarou)\b|(?:^|\s)(?:ze|zo)(?:\b|[!.?])", rom_lower))
+    jp_clean_no_douzo = clean_jp.replace("どうぞ", "").replace("想像", "")
+    soldier_jp = (
+        any(k in clean_jp for k in ["てめえ", "貴様", "野郎", "俺"]) or
+        bool(re.search(r"(?:だぞ|るぞ|くぞ|うぞ|いぞ|だぜ|るぜ|くぜ|うぜ)(?:[。！？!\?\s]|$)", jp_clean_no_douzo))
+    )
+    if soldier_rom or soldier_jp:
         return "Szorstki żołnierski / Bojowy (męski, twardy rejestr wojskowy, brak zmiękczeń)"
 
     # 6. Rejestr młodzieńczy / chłopięcy (Boku, Ore, Oira, Boku-chan, Niichan, Neechan)
@@ -1152,7 +1161,13 @@ def detect_japanese_pragmatic_register(jp_text: str, en_text: str = "") -> Optio
         return "Rejestr szorstki półświatka (bezkompromisowy żargon uliczny)"
 
     # 14. Rejestr gwarowy południowy (-to?, -bai, -tai, suitoo, batten)
-    if any(k in clean_jp for k in ["ばい", "たい", "好いとー", "ばってん"]) or any(k in rom_lower for k in ["-bai", "-tai", "suitoo", "batten"]):
+    desiderative_verbs = ("言いたい", "行きたい", "見たい", "したい", "なりたい", "食べたい", "飲みたい", "聞きたい", "知りたい", "居たい", "いたい")
+    south_dialect_jp = any(k in clean_jp for k in ["ばい", "好いとー", "ばってん", "たいね", "たいな", "だたい", "やたい"])
+    if not south_dialect_jp and "たい" in clean_jp and not any(v in clean_jp for v in desiderative_verbs):
+        if re.search(r"(?:だ|や|の)たい(?:\b|[。！？!\?\s]|$)", clean_jp):
+            south_dialect_jp = True
+    south_dialect_rom = any(k in rom_lower for k in ["-bai", "bai ", "suitoo", "batten", "tai ne", "tai na", "datai"])
+    if south_dialect_jp or south_dialect_rom:
         return "Rejestr gwarowy południowy (śpiewna, bezpośrednia mowa melodyjna)"
 
     # 15. Rejestr gwarowy wyspiarski (Haisai, Mensoore, Nankurunaisa, -saa)
@@ -2239,28 +2254,38 @@ class MultimodalTranslator:
                 if not sc_gender:
                     fem_count = 0
                     male_count = 0
+                    unknown_count = 0
                     for _, ev in sc:
                         raw_act = getattr(ev, "name", "")
                         clean_act = re.sub(r"\s*\([^)]*\)", "", str(raw_act or "")).strip()
-                        if clean_act and not is_generic_actor_or_category(clean_act):
+                        if clean_act and not is_generic_actor_or_category(clean_act) and not is_sign_entity(clean_act):
+                            char_rec = self.series_bible.get_character(clean_act)
+                            g_act = ""
+                            if isinstance(char_rec, dict):
+                                g_act = str(char_rec.get("gender") or "").upper()
+                            if g_act == "FEMALE":
+                                fem_count += 1
+                            elif g_act == "MALE":
+                                male_count += 1
+                            else:
+                                unknown_count += 1
+                    if fem_count > 0 and male_count == 0 and unknown_count == 0:
+                        sc_gender = "FEMALE"
+                    elif male_count > 0 and fem_count == 0 and unknown_count == 0:
+                        sc_gender = "MALE"
+
+                if sc_gender in ("FEMALE", "MALE"):
+                    target_g = "kobieta" if sc_gender == "FEMALE" else "mężczyzna"
+                    for idx, ev in sc:
+                        raw_act = getattr(ev, "name", "")
+                        clean_act = re.sub(r"\s*\([^)]*\)", "", str(raw_act or "")).strip()
+                        if clean_act and getattr(self, "series_bible", None):
                             char_rec = self.series_bible.get_character(clean_act)
                             if isinstance(char_rec, dict):
                                 g_act = str(char_rec.get("gender") or "").upper()
-                                if g_act == "FEMALE":
-                                    fem_count += 1
-                                elif g_act == "MALE":
-                                    male_count += 1
-                    if fem_count > 0 and male_count == 0:
-                        sc_gender = "FEMALE"
-                    elif male_count > 0 and fem_count == 0:
-                        sc_gender = "MALE"
-
-                if sc_gender == "FEMALE":
-                    for idx in scene_indices:
-                        scene_genders[idx] = "kobieta"
-                elif sc_gender == "MALE":
-                    for idx in scene_indices:
-                        scene_genders[idx] = "mężczyzna"
+                                if g_act not in ("FEMALE", "MALE"):
+                                    continue
+                        scene_genders[idx] = target_g
 
             # Per-line fallback for explicit characters with verified P0/P1 gender (Standard 9.6/9.8, 2C.1)
             for orig_idx, ev in norm_entries:
@@ -3510,8 +3535,10 @@ class MultimodalTranslator:
                 if pragmatic_reg:
                     spk_dossier = None
                     if episode_profile and getattr(episode_profile, "character_dossiers", None):
+                        ev_clean_n = extract_clean_speaker_name(str(event.name or "")).strip().lower()
                         for cd in episode_profile.character_dossiers:
-                            if getattr(cd, "name", "").lower() == str(event.name or "").lower():
+                            cd_n = str(getattr(cd, "name", "") or "").strip()
+                            if cd_n and (cd_n.lower() == ev_clean_n or extract_clean_speaker_name(cd_n).strip().lower() == ev_clean_n):
                                 spk_dossier = cd
                                 break
                     spk_reg_entry = self.character_registry.get(event.name) if hasattr(self, "character_registry") else None
@@ -3774,6 +3801,8 @@ class MultimodalTranslator:
                     cands = getattr(um, "candidates_token_count", 0) or 0
                     thoughts = getattr(um, "thoughts_token_count", 0) or 0
                     out_cnt = (cands + thoughts)
+                    if cached_name == "__IMPLICIT_CACHE_95__" and c_cnt == 0:
+                        logger.debug("[Context Cache]: Status bufora telemetrii - oczekiwanie na aktywację pamięci podręcznej (cached_content_token_count == 0).")
                     self._thread_local.last_batch_token_usage = {
                         "prompt": p_cnt,
                         "cached": c_cnt,
@@ -4258,8 +4287,8 @@ class MultimodalTranslator:
 
         # 4. Call Gemini (Vision + Text)
         contents: List[Any] = []
-        contents.extend(image_contents)
         contents.append(prompt_text)
+        contents.extend(image_contents)
 
         pbar.set_postfix_str("Faza 1 (Wizja + Audio)...")
         t0_phase1 = time.perf_counter()
@@ -4579,8 +4608,10 @@ class MultimodalTranslator:
             if pragmatic_reg and not vtype.get("is_sign"):
                 spk_dossier = None
                 if episode_profile and getattr(episode_profile, "character_dossiers", None):
+                    spk_clean_n = extract_clean_speaker_name(str(resolved_spk_name or "")).strip().lower()
                     for cd in episode_profile.character_dossiers:
-                        if getattr(cd, "name", "").lower() == str(resolved_spk_name or "").lower():
+                        cd_n = str(getattr(cd, "name", "") or "").strip()
+                        if cd_n and (cd_n.lower() == spk_clean_n or extract_clean_speaker_name(cd_n).strip().lower() == spk_clean_n):
                             spk_dossier = cd
                             break
                 spk_reg_entry = self.character_registry.get(resolved_spk_name) if hasattr(self, "character_registry") else None
@@ -5065,6 +5096,20 @@ class MultimodalTranslator:
                 character_registry=self.character_registry,
                 scene_diagnosis=getattr(batch_response, "scene_diagnosis", None) if batch_response else None
             )
+            for r in refined_lines:
+                orig_it = next((it for it in pass1_items if it.get("id") == r.id), None)
+                if orig_it:
+                    it_style = str(orig_it.get("style", "")).lower()
+                    if any(k in it_style for k in ["italic", "flashback_italic", "thoughts", "internal"]):
+                        r.refined_pl = re.sub(r"\{\\i[01]\}", "", r.refined_pl)
+                    
+                    orig_pl_strip = str(orig_it.get("pl", "")).rstrip()
+                    orig_en_strip = str(orig_it.get("en", "")).rstrip()
+                    if orig_pl_strip.endswith(".") and orig_en_strip.endswith("."):
+                        ref_strip = r.refined_pl.rstrip()
+                        if not re.search(r"[.!?…\"”»\-\—]$", ref_strip) and not orig_it.get("is_sign"):
+                            r.refined_pl = ref_strip + "."
+
             refined_dict.update({r.id: sanitize_sub_text(r.refined_pl) for r in refined_lines})
             refined_region_dict.update({r.id: r.screen_region for r in refined_lines if getattr(r, 'screen_region', None)})
             refined_typesetting_dict.update({r.id: r.visual_typesetting for r in refined_lines if getattr(r, 'visual_typesetting', None)})
@@ -5877,6 +5922,12 @@ class MultimodalTranslator:
                         self.series_bible.sync_verified_profile_entity(cd_name, gender=c_gen, declension_map=cd_cases)
 
             # Sanitacja i regeneracja paradygmatów w RAM oraz zapis na dysk i synchronizacja z Artefakty/ (Operacja H4)
+            if hasattr(self.series_bible, "_reconcile_registry_gender_in_memory"):
+                self.series_bible._reconcile_registry_gender_in_memory(episode_profile=episode_profile)
+            if hasattr(self.series_bible, "_sanitize_entity_categories_in_memory"):
+                self.series_bible._sanitize_entity_categories_in_memory(episode_profile=episode_profile)
+            if hasattr(self.series_bible, "_enrich_declensions_from_profile"):
+                self.series_bible._enrich_declensions_from_profile(episode_profile=episode_profile)
             if hasattr(self.series_bible, "_sanitize_loaded_bible_in_ram"):
                 self.series_bible._sanitize_loaded_bible_in_ram()
             if hasattr(self.series_bible, "save"):
@@ -6486,7 +6537,9 @@ class MultimodalTranslator:
 
             # Typesetting Proximity 2.0: Anchor signs/titles to the detected visual quadrant or fallback to top
             clean_check = clean_translated_text.strip()
-            ts_prefix_applied = sanitize_ts_prefix_for_translation(ts_prefix or "")
+            is_fbf_or_grouped = (sub_to_master.get(orig_idx) != orig_idx) or any(m == orig_idx and k != orig_idx for k, m in sub_to_master.items())
+            is_multi_layer_clip = is_fbf_or_grouped or (r"\pos(" in (ts_prefix or ""))
+            ts_prefix_applied = sanitize_ts_prefix_for_translation(ts_prefix or "", preserve_clip=is_multi_layer_clip)
             item_region = translated_regions.get(master_id)
             style_clean = (orig_event.style or "").lower()
             style_is_sub = bool(re.search(r"\bsubtitles?\b", style_clean))
@@ -6522,9 +6575,17 @@ class MultimodalTranslator:
                         # Preserve original subtitle's custom coordinates without corrupting
                         pass
                     elif item_region:
-                        pos_tag = TypesettingColorMatcher.calculate_optimal_sign_position(region=item_region)
-                        ts_prefix_applied = re.sub(r"\{\\an\d\}|\\an\d", "", ts_prefix_applied).strip()
-                        ts_prefix_applied = f"{pos_tag}{ts_prefix_applied}"
+                        has_top_align = (
+                            bool(re.search(r"\\an[789]\b", ts_prefix_applied))
+                            or (target_style is not None and getattr(target_style, "alignment", 2) in (7, 8, 9))
+                        )
+                        if has_top_align:
+                            if not re.search(r"\\an[789]\b", ts_prefix_applied):
+                                ts_prefix_applied = r"{\an8}" + ts_prefix_applied
+                        else:
+                            pos_tag = TypesettingColorMatcher.calculate_optimal_sign_position(region=item_region)
+                            ts_prefix_applied = re.sub(r"\{\\an\d\}|\\an\d", "", ts_prefix_applied).strip()
+                            ts_prefix_applied = f"{pos_tag}{ts_prefix_applied}"
                     elif not (r"\an" in ts_prefix_applied or r"\pos" in ts_prefix_applied):
                         ts_prefix_applied = r"{\an8}" + ts_prefix_applied
 

@@ -94,7 +94,8 @@ class ContextCacheManager:
 
         from model_resolver import is_gemini_4_or_hydrogen_model
         if is_gemini_4_or_hydrogen_model(model) and (len(system_instruction) // 4 >= 4096):
-            return "__IMPLICIT_CACHE_95__"
+            if not hasattr(client, "caches") or not hasattr(client.caches, "create"):
+                return "__IMPLICIT_CACHE_95__"
 
         with cls._LOCK:
             content_hash = cls.get_content_hash(model, system_instruction, client=client, tag=tag)
@@ -102,6 +103,8 @@ class ContextCacheManager:
             # 1. Check in-process local memory
             if content_hash in _LOCAL_CACHE_REGISTRY:
                 cached_name = _LOCAL_CACHE_REGISTRY[content_hash]
+                if cached_name == "__IMPLICIT_CACHE_95__":
+                    return cached_name
                 import time
                 now = time.monotonic()
                 if now - cls._LAST_TOUCH.get(cached_name, 0) > 120.0:
@@ -169,8 +172,11 @@ class ContextCacheManager:
                 except Exception as e:
                     err_msg = str(e).lower()
                     # 1. Permanent inability to cache (e.g. prompt below 32,768 token threshold)
-                    if "minimum" in err_msg or "at least" in err_msg or "32768" in err_msg or "too small" in err_msg:
-                        logger.debug(f"[Context Cache]: Prompt below minimum server cache threshold: {e}")
+                    if "minimum" in err_msg or "at least" in err_msg or "32768" in err_msg or "too small" in err_msg or "not supported" in err_msg or "unsupported" in err_msg:
+                        logger.debug(f"[Context Cache]: Prompt below minimum server cache threshold or unsupported: {e}")
+                        if is_gemini_4_or_hydrogen_model(model) and estimated_tokens >= 4096:
+                            _LOCAL_CACHE_REGISTRY[content_hash] = "__IMPLICIT_CACHE_95__"
+                            return "__IMPLICIT_CACHE_95__"
                         return None
 
                     # 2. Account / API key error (insufficient funds, bad key)
@@ -182,6 +188,11 @@ class ContextCacheManager:
                     import time
                     if create_attempt < 2:
                         time.sleep(1.0)
+
+            if is_gemini_4_or_hydrogen_model(model) and estimated_tokens >= 4096:
+                _LOCAL_CACHE_REGISTRY[content_hash] = "__IMPLICIT_CACHE_95__"
+                return "__IMPLICIT_CACHE_95__"
+
             return None
 
     @classmethod
@@ -201,7 +212,7 @@ class ContextCacheManager:
             return None
 
         from model_resolver import is_gemini_4_or_hydrogen_model
-        if is_gemini_4_or_hydrogen_model(model):
+        if is_gemini_4_or_hydrogen_model(model) and not hasattr(client, "clients") and not hasattr(client, "caches"):
             return True
 
         prompt_tag = cls._get_prompt_tag(system_instruction, tag)
@@ -213,11 +224,15 @@ class ContextCacheManager:
                     first_name = res
             if verbose and first_name:
                 print(f"  [Context Cache]: Locked -90% server discount for {model} ({prompt_tag}) across {len(client.clients)} API keys.")
+            if is_gemini_4_or_hydrogen_model(model):
+                return True
             return first_name or "cached_ready"
         else:
             cache_name = cls.get_or_create_cache(client, model, system_instruction, tag=tag)
             if cache_name and verbose:
                 print(f"  [Context Cache]: Locked -90% server discount for {model} ({prompt_tag}).")
+            if is_gemini_4_or_hydrogen_model(model):
+                return True
             return cache_name or "cached_ready"
 
     @classmethod

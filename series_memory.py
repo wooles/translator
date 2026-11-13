@@ -343,6 +343,87 @@ def sanitize_adjectival_double_declension(form: str, base_name: Optional[str] = 
     return pat.sub(_strip_double_suf, form)
 
 
+def _compute_locative_toponym(name: str) -> str:
+    """Oblicza formę miejscownika (Ms) dla toponimu o zakończeniu spółgłoskowym."""
+    clean_low = name.lower()
+    if clean_low.endswith("d"):
+        return name[:-1] + "dzie"
+    elif clean_low.endswith("t"):
+        return name[:-1] + "cie"
+    elif clean_low.endswith("r"):
+        return name[:-1] + "rze"
+    elif clean_low.endswith("n"):
+        return name[:-1] + "nie"
+    elif clean_low.endswith("m"):
+        return name[:-1] + "mie"
+    elif clean_low.endswith("b"):
+        return name[:-1] + "bie"
+    elif clean_low.endswith("p"):
+        return name[:-1] + "pie"
+    elif clean_low.endswith("w"):
+        return name[:-1] + "wie"
+    elif clean_low.endswith("f"):
+        return name[:-1] + "fie"
+    elif clean_low.endswith("s"):
+        return name[:-1] + "sie"
+    elif clean_low.endswith("z"):
+        return name[:-1] + "zie"
+    elif clean_low.endswith("l"):
+        return name + "u"
+    elif clean_low.endswith("k"):
+        return name + "u"
+    elif clean_low.endswith("g"):
+        return name + "u"
+    elif clean_low.endswith("ch"):
+        return name + "u"
+    return name + "ie"
+
+
+def _compute_toponym_declension(name: str) -> Optional[Dict[str, str]]:
+    """Generuje 7-przypadkowy paradygmat dla jednowyrazowego toponimu."""
+    if not name or not isinstance(name, str):
+        return None
+    clean_n = name.strip()
+    if " " in clean_n or not clean_n[0].isupper():
+        return None
+    clean_low = clean_n.lower()
+
+    if clean_low.endswith("ia"):
+        base = clean_n[:-2]
+        return {
+            "M": clean_n,
+            "D": f"{base}ii",
+            "C": f"{base}ii",
+            "B": f"{base}ię",
+            "N": f"{base}ią",
+            "Ms": f"{base}ii",
+            "W": clean_n
+        }
+    elif clean_low.endswith("ja"):
+        base = clean_n[:-2]
+        return {
+            "M": clean_n,
+            "D": f"{base}ji",
+            "C": f"{base}ji",
+            "B": f"{base}ję",
+            "N": f"{base}ją",
+            "Ms": f"{base}ji",
+            "W": clean_n
+        }
+    elif clean_low[-1] in "dtrnmbpwfslzkg" or clean_low.endswith("ch"):
+        loc = _compute_locative_toponym(clean_n)
+        return {
+            "M": clean_n,
+            "D": f"{clean_n}u",
+            "C": f"{clean_n}owi",
+            "B": clean_n,
+            "N": f"{clean_n}em",
+            "Ms": loc,
+            "W": clean_n
+        }
+    return None
+
+
 class DeclensionParadigm(BaseModel):
     nominative: str = Field(description="Mianownik (M)")
     genitive: str = Field(description="Dopełniacz (D)")
@@ -442,7 +523,7 @@ class DeclensionParadigm(BaseModel):
         if (
             is_complex_description(base_m)
             or is_adjectival_oblique_token(base_m)
-            or (entity_category is not None and entity_category != EntityCategory.ANTHROPONYM)
+            or (entity_category is not None and entity_category not in (EntityCategory.ANTHROPONYM, EntityCategory.TOPONYM))
             or base_m.lower().endswith(("ą", "ę", "ej", "ach", "ami", "om", "ego", "emu", "ych", "ich", "ymi", "imi"))
         ):
             return cls(
@@ -478,12 +559,18 @@ class DeclensionParadigm(BaseModel):
     ) -> "DeclensionParadigm":
         """
         Tworzy 7-przypadkowy paradygmat fleksyjny.
-        Operuje wyłącznie na kanonicznych formach bazowych Mianownika pojedynczych antroponimów (EntityCategory.ANTHROPONYM).
+        Operuje na kanonicznych formach bazowych Mianownika pojedynczych antroponimów oraz toponimów.
         Dla wszystkich form już odmienionych oraz złożonych deskrypcji zachowuje pełną identyczność T(x) = x.
         """
         if not name or not isinstance(name, str):
             return cls.from_dict({"M": "", "D": "", "C": "", "B": "", "N": "", "Ms": "", "W": ""})
         clean_n = name.strip()
+
+        if entity_category == EntityCategory.TOPONYM and not is_complex_description(clean_n) and not is_adjectival_oblique_token(clean_n):
+            top_decl = _compute_toponym_declension(clean_n)
+            if top_decl:
+                return cls.from_dict(top_decl, entity_category=entity_category)
+
         if (
             is_complex_description(clean_n)
             or is_adjectival_oblique_token(clean_n)
@@ -7005,6 +7092,41 @@ class SeriesBible:
                             elif "MALE" in gen_u or "MASCULINE" in gen_u:
                                 profile_genders[c_name.strip().lower()] = "MALE"
 
+                # Rozszerzenie 11.2.3: Skanowanie tekstu profilu pod kątem prefiksów tytularnych i relacyjnych
+                profile_texts = []
+                for attr_name in ("episode_summary", "dialogue_stylization", "danger_lines_prescan", "danger_lines"):
+                    val = getattr(episode_profile, attr_name, "")
+                    if isinstance(val, str) and val:
+                        profile_texts.append(val)
+                    elif isinstance(val, list):
+                        for item in val:
+                            if isinstance(item, str):
+                                profile_texts.append(item)
+                            elif hasattr(item, "text"):
+                                profile_texts.append(str(item.text))
+                combined_prof_text = "\n".join(profile_texts)
+
+                fem_title_pattern = re.compile(
+                    r"\b(?:księżniczk[aięo]|królow[aąej]|pann[ayęo]|pani|siostr[ayęo]|matk[aię]|córk[aię]|princess|queen|lady|sister)\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+)",
+                    re.IGNORECASE
+                )
+                male_title_pattern = re.compile(
+                    r"\b(?:król(?:a|em|owi|u)?|książę|księci[au]|brat(?:a|em|u)?|ojciec|ojc[au]|syn(?:a|em)?|king|prince|lord|brother)\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+)",
+                    re.IGNORECASE
+                )
+
+                for m in fem_title_pattern.finditer(combined_prof_text):
+                    found_name = m.group(1).strip().lower()
+                    for ch_key in chars.keys():
+                        if ch_key.strip().lower() == found_name or found_name in ch_key.strip().lower():
+                            profile_genders[ch_key.strip().lower()] = "FEMALE"
+
+                for m in male_title_pattern.finditer(combined_prof_text):
+                    found_name = m.group(1).strip().lower()
+                    for ch_key in chars.keys():
+                        if ch_key.strip().lower() == found_name or found_name in ch_key.strip().lower():
+                            profile_genders[ch_key.strip().lower()] = "MALE"
+
             FEMALE_ROLE_NOUNS = {
                 "sąsiadka", "apostołka", "uczennica", "koleżanka", "córka", "siostra",
                 "matka", "ciotka", "babcia", "wnuczka", "kuzynka", "narzeczona",
@@ -7158,10 +7280,10 @@ class SeriesBible:
             m_toponyms = set()
             if context_text:
                 for pat in [
-                    r"\b(?:Królestwo|Cesarstwo|Imperium|Księstwo|Góry|Równiny)\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+)",
-                    r"\b([A-Z][a-z]+)\s+(?:Kingdom|Empire|Principality|Mountains|Plains|Valley)\b"
+                    r"\b(?:Królestwo|Cesarstwo|Imperium|Księstwo|Góry|Równiny|w\s+królestwie|z\s+królestwa|w\s+akademii|z\s+akademii)\s+([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+)",
+                    r"\b([A-Z][a-z]+)\s+(?:Kingdom|Empire|Principality|Mountains|Plains|Valley|Academy)\b"
                 ]:
-                    for m in re.finditer(pat, context_text):
+                    for m in re.finditer(pat, context_text, re.IGNORECASE):
                         m_toponyms.add(m.group(1).strip().lower())
 
             toponym_keywords_pat = re.compile(
@@ -7194,8 +7316,12 @@ class SeriesBible:
                         char_val["entity_category"] = EntityCategory.TOPONYM.value
                         char_val["is_anthroponym"] = False
                     del chars[char_name]
-                    if "declensions" in self.data and char_name in self.data["declensions"]:
-                        del self.data["declensions"][char_name]
+                    top_paradigm = DeclensionParadigm.create_for_name(name_clean, entity_category=EntityCategory.TOPONYM).to_dict()
+                    self.data.setdefault("places", {})[name_clean] = top_paradigm
+                    if "declensions" in self.data:
+                        self.data["declensions"][name_clean] = top_paradigm
+                        if char_name != name_clean and char_name in self.data["declensions"]:
+                            del self.data["declensions"][char_name]
 
     def _enrich_declensions_from_profile(self, episode_profile: Optional[Any] = None) -> None:
         """

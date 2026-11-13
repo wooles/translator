@@ -914,6 +914,8 @@ class WhisperDisambiguator:
             ])
             if is_courtly_or_high and not has_battle_cry:
                 return None
+            if is_female and not any(w in combined_style_notes for w in ["żołnier", "wojownicz", "szorstk", "chłopczyc", "delinkwent", "tomboy", "rough"]) and not has_battle_cry:
+                return None
 
         # 3. Feudalny poddańczy / Wasal
         if any(k in reg_low for k in ["feudalny", "poddańcz", "poddancz", "wasal"]):
