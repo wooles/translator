@@ -4,9 +4,9 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-14 — Standard 11.2.6 Certyfikowany Baseline)
-- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.6 (Cost Ceiling Guard, Hybrid Cache Prefix Anchor, In-Batch Deduplication & Phase 2 Telemetry Baseline)`
-- **Commit certyfikacji kodu:** `35aefe909faffbe8ee7a400cc778feb99b2e678a` (`35aefe9`)
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-14 — Standard 11.2.7 Certyfikowany Baseline)
+- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.7 (Real Server CachedContent >= 32k Threshold, Phase 1 JSON Truncation Guard & Dynamic Prompt Compaction Baseline)`
+- **Commit certyfikacji kodu:** `e63204e4fffc3066ebcd7abe2eb89e5f882657df` (`e63204e`)
 - **Commity implementacyjne 11.1:** `5b7306d` (Commit 1), `5b17ea7` (Commit 2), `2b4bc7d` (Commit 3), `8b72887` (Commit 4), `8a7dd31` (Commit 5), `218af2e` (Commit 6)
 - **Commity Hotfixu 11.1.1:** `328729f` (Commit 1), `9de0b83` (Commit 2), `07c4684` (Commit 3), `96acac7` (Commit 4)
 - **Commity Hotfixu 11.1.2:** `74766d8` (Commit 1), `1b540e3` (Commit 2), `8313658` (Commit 3), `326b7e0` (Commit 4)
@@ -24,16 +24,17 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 - **Commity Hotfixu 11.2.2:** `bacb2d9` (Commit 1), `1c18bef` (Commit 2), `24b4a51` (Commit 3)
 - **Commity Hotfixu 11.2.3:** `2ae94bf` (Commit 1), `d6f7355` (Commit 2), `0132db0` (Commit 3)
 - **Commity Standardu 11.2.5:** `dcbbe50` (Commit 1), `37029a4` (Commit 2), `f132841` (Commit 3)
-- **Commity Standardu 11.2.6:**
-  * Commit 1 (`c0361b8`): `fix(pipeline): enforce hybrid cache config anchor, deduplicate in-batch paradigms, add phase2 batch token telemetry and workload cost estimator (11.2.6)`
-  * Commit 2 (`35aefe909faffbe8ee7a400cc778feb99b2e678a`): `test(pipeline): add T11.2.6 regression suite for cost ceiling G-Q11, in-batch deduplication and phase2 telemetry (11.2.6)` — **NOWY COMMIT CERTYFIKACJI KODU**
-  * Commit 3 (`HEAD`): `docs(release): certify Standard 11.2.6 Cost Ceiling, In-Batch Deduplication & Phase 2 Telemetry Baseline`
-- **Status 11.2.6:** `CERTIFIED / CLOSED (2026-11-14)`
+- **Commity Standardu 11.2.6:** `c0361b8` (Commit 1), `35aefe9` (Commit 2), `9e5c8e6` (Commit 3)
+- **Commity Standardu 11.2.7:**
+  * Commit 1 (`e501090`): `fix(pipeline): enforce real server cache threshold >= 32k, lift phase 1 output token cap to 16k, and compact prompt metadata (11.2.7)`
+  * Commit 2 (`e63204e4fffc3066ebcd7abe2eb89e5f882657df`): `test(pipeline): add regression suite for real server cache threshold, output token limit, and prompt compaction (11.2.7)` — **NOWY COMMIT CERTYFIKACJI KODU**
+  * Commit 3 (`HEAD`): `docs(release): certify Standard 11.2.7 Real Server Cache Threshold, Phase 1 JSON Truncation Guard & Dynamic Prompt Compaction Baseline`
+- **Status 11.2.7:** `CERTIFIED / CLOSED (2026-11-14)`
 - **Commit ochrony Depuracji Legacy 1.0 (Z16):** `c197db73c3dabf887dddbf2337dc3a1d8cff598c` (`c197db7` — bezwzględne 0 B diffu na wszystkich plikach chronionych)
-- **Stan metryk:** `362 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `433 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 11/11, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
-- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (362/362 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
-- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.6` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
-- **Gałąź i Architektura:** `main` (Standard 11.2.6: Estymator obciążenia roboczego odcinka `estimate_loaded_workload_cost_pln` w `pricing_guard.py` i `translator.py` z zachowaniem sufitu budżetowego G-Q11 <= 3.50 PLN dla 350 linii / 12 paczek i <= 3.80 PLN dla 518 linii / 19 paczek, kotwiczenie prefiksu kontekstowego `contents` w konfiguracji cache `ContextCacheManager.get_or_create_cache`, deduplikacja paradygmatów odmiany `seen_paradigms_in_batch` i glosariusza `seen_glossary_in_batch` w `translator.py`, granularna telemetria czasu odpowiedzi Fazy 2 `response_time_sec` i zużycia tokenów `token_usage` w `pipeline_logger.py` i `translator.py`, reguły warsztatu dialogowego w promptach systemowych, Certyfikacja Kodu `35aefe909faffbe8ee7a400cc778feb99b2e678a`, Baseline Z16 `c197db73c3dabf887dddbf2337dc3a1d8cff598c`, Zero-Literal Pure Positive Domain Invariant Architecture & Primary LLM Translation Authority)
+- **Stan metryk:** `363 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `434 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 11/11, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
+- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (363/363 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
+- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.7` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
+- **Gałąź i Architektura:** `main` (Standard 11.2.7: Gwarancja przekroczenia progu serwerowego 32 768 tokenów dla CachedContent w `context_cache.py` i `translator.py` poprzez lean=False i dołączanie pełnego kanonu w `anchor_content`, usunięcie ucinania JSON Fazy 1 przez sufit `max_output_tokens = 16384` w `_call_gemini_with_retry`, reguła ekonomiki syntezy Fazy 1, dynamiczna kompakcja wierszy planszowych w `_prepare_batch_prompt` [cps > 14.5 lub napis], deduplikacja cech akustycznych `speaker_voice` i `prosody` dla powtarzających się kwestii tego samego mówcy w `_process_single_batch`, kalibracja estymatora `PricingGuard` na `system_prompt_tokens = 55000` z zachowaniem sufitu G-Q11, Certyfikacja Kodu `e63204e4fffc3066ebcd7abe2eb89e5f882657df`, Baseline Z16 `c197db73c3dabf887dddbf2337dc3a1d8cff598c`, Zero-Literal Pure Positive Domain Invariant Architecture & Primary LLM Translation Authority)
 - **Środowisko:** Python 3.13 (`.venv`), Windows PowerShell, `ffmpeg` (PATH), `librosa.pyin`, `soundfile`, `pysubs2`, `spaCy en_core_web_sm` (100% offline 0.00 PLN), bezpośrednie klucze Google AI Studio API (`use_vertex = 0`).
 - **Dyrektywa Wykonawcza Testów:**
   * Testy przyrostowe podczas kodowania (< 2 s): `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_testu>"`

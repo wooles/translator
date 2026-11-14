@@ -792,4 +792,4 @@ Potok wspiera flagi kontrolujące działanie rejestratora:
 - `--trace-dir`: Wskazuje niestandardowy katalog zapisu logów śledzenia (domyślnie `logs`).
 
 ---
-**KONIEC PEŁNEGO RAPORTU TECHNICZNEGO POTOKU AVT — TRANSLATOR STANDARD 11.2.6 BASELINE**
+**KONIEC PEŁNEGO RAPORTU TECHNICZNEGO POTOKU AVT — TRANSLATOR STANDARD 11.2.7 BASELINE**
