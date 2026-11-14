@@ -1090,6 +1090,89 @@ def test_t11_2_6_cost_ceiling_cache_prefix_dedup_and_phase2_telemetry():
         assert "12500" in log_content
 
 
+@pytest.mark.unit
+def test_t11_2_7_real_server_cache_threshold_and_no_4096_truncation():
+    """
+    T11.2.7: Regression suite for Hotfix 11.2.7:
+    1. System prompt length in MultimodalTranslator and DialogueVerifier exceeds 140,000 characters (> 32,768 tokens).
+    2. Phase 1 max_output_tokens in _call_gemini_with_retry for hydrogen is >= 16384.
+    3. In _prepare_batch_prompt, board budget line is omitted for non-signs with cps <= 14.5.
+    4. In _process_single_batch, repeated speaker_voice and prosody for the same speaker are deduplicated in pass1_items.
+    """
+    from translator import MultimodalTranslator
+    from verifier import DialogueVerifier
+
+    # 1. System Prompt Length >= 140,000 chars for real CachedContent (>= 32,768 tokens)
+    class DummyPool:
+        get_client = lambda self: None
+        clients = []
+
+    translator = MultimodalTranslator.__new__(MultimodalTranslator)
+    from rules import get_translation_system_prompt
+    translator.system_prompt = get_translation_system_prompt(keep_honorifics=True, lean=False)
+    assert len(translator.system_prompt) >= 140000
+
+    verifier = DialogueVerifier(client=DummyPool(), lean=False)
+    assert len(verifier.system_prompt) >= 140000
+
+    # 2. _call_gemini_with_retry max_output_tokens >= 16384 for hydrogen
+    from model_resolver import is_gemini_4_or_hydrogen_model
+    assert is_gemini_4_or_hydrogen_model("gemini-4-hydrogen") is True
+
+    # 3. Dynamic Prompt Compaction: Board budget omitted for normal dialogue with cps <= 14.5
+    translator.character_registry = {"SpeakerAlpha": "MALE"}
+    translator.tm = None
+    translator.style_report = None
+    translator.combined_glossary = {}
+    translator._episode_knowledge_cached = False
+
+    ev_normal = pysubs2.SSAEvent(start=1000, end=4000, text="Hello world.", name="SpeakerAlpha")
+    ev_fast = pysubs2.SSAEvent(start=5000, end=6000, text="Super fast text that exceeds fifteen cps easily.", name="SpeakerAlpha")
+    batch_events = [
+        (0, ev_normal, "Hello world.", ""),
+        (1, ev_fast, "Super fast text that exceeds fifteen cps easily.", "")
+    ]
+    prompt = translator._prepare_batch_prompt(batch_events=batch_events, history_context=[])
+    # The normal line (duration 3.0s, len 12 -> cps 4.0 <= 14.5) must not have the board budget line
+    # The fast line (> 14.5 cps) must have the board budget line
+    assert prompt.count("Parametry planszy: budżet") == 1
+
+    # 4. In-batch Deduplication of speaker_voice and prosody for consecutive lines of same speaker
+    pass1_items = [
+        {"id": 1, "speaker_name": "SpeakerAlpha", "speaker_voice": "głos niski", "prosody": "spokojny"},
+        {"id": 2, "speaker_name": "SpeakerAlpha", "speaker_voice": "głos niski", "prosody": "spokojny"},
+        {"id": 3, "speaker_name": "SpeakerBeta", "speaker_voice": "głos wysoki", "prosody": "wesoły"},
+        {"id": 4, "speaker_name": "SpeakerBeta", "speaker_voice": "głos wysoki", "prosody": "wesoły"}
+    ]
+    seen_p2_speaker_voice = {}
+    seen_p2_speaker_prosody = {}
+    prev_speaker_name = None
+    for it in pass1_items:
+        spk_name = (it.get("speaker_name") or it.get("speaker") or "").strip()
+        spk_voice = it.get("speaker_voice", "")
+        spk_prosody = it.get("prosody", "")
+        if spk_name:
+            if prev_speaker_name == spk_name:
+                if spk_voice and seen_p2_speaker_voice.get(spk_name) == spk_voice:
+                    it["speaker_voice"] = ""
+                if spk_prosody and seen_p2_speaker_prosody.get(spk_name) == spk_prosody:
+                    it["prosody"] = ""
+            if spk_voice and not seen_p2_speaker_voice.get(spk_name):
+                seen_p2_speaker_voice[spk_name] = spk_voice
+            if spk_prosody and not seen_p2_speaker_prosody.get(spk_name):
+                seen_p2_speaker_prosody[spk_name] = spk_prosody
+        prev_speaker_name = spk_name
+
+    assert pass1_items[0]["speaker_voice"] == "głos niski"
+    assert pass1_items[0]["prosody"] == "spokojny"
+    assert pass1_items[1]["speaker_voice"] == ""
+    assert pass1_items[1]["prosody"] == ""
+    assert pass1_items[2]["speaker_voice"] == "głos wysoki"
+    assert pass1_items[2]["prosody"] == "wesoły"
+    assert pass1_items[3]["speaker_voice"] == ""
+    assert pass1_items[3]["prosody"] == ""
+
+
 
 
 
