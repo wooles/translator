@@ -938,6 +938,159 @@ def test_t11_2_5_external_grounding_radio_dispatch_and_collective_sanitization()
     assert par_topo.nominative == "EntityFortress"
 
 
+@pytest.mark.unit
+def test_t11_2_6_cost_ceiling_cache_prefix_dedup_and_phase2_telemetry():
+    """
+    T11.2.6: Regression suite for Standard 11.2.6:
+    1. PricingGuard episode and workload cost estimation ceiling.
+    2. ContextCacheManager config content anchor.
+    3. In-batch deduplication of declension paradigms and canonical glossary terms.
+    4. EpisodeFlightRecorder Phase 2 token usage & response time telemetry.
+    """
+    import tempfile
+    import json
+    from pathlib import Path
+    from pricing_guard import PricingGuard
+    from pipeline_logger import EpisodeFlightRecorder
+    from translator import MultimodalTranslator
+    from series_memory import SeriesBible, DeclensionParadigm
+    from context_cache import ContextCacheManager
+
+    # 1. PricingGuard Cost Ceiling Checks
+    cost_350 = PricingGuard.estimate_episode_cost_pln("3", lines_count=350)
+    assert cost_350 == 3.68
+    assert cost_350 <= 3.80
+
+    cost_364 = PricingGuard.estimate_episode_cost_pln("3", lines_count=364)
+    assert cost_364 == 3.93
+
+    workload_350 = PricingGuard.estimate_loaded_workload_cost_pln("3", lines_count=350, batches_count=12)
+    assert workload_350["net_pln"] <= 3.50
+    assert 2.0 <= workload_350["net_pln"] <= 2.50
+
+    workload_518 = PricingGuard.estimate_loaded_workload_cost_pln("3", lines_count=518, batches_count=19)
+    assert workload_518["net_pln"] <= 3.80
+    assert 3.20 <= workload_518["net_pln"] <= 3.70
+
+    # 2. ContextCacheManager Configuration & Anchor Inspection
+    manager = ContextCacheManager()
+    assert ContextCacheManager.get_content_hash("gemini-4-hydrogen", "test_content") is not None
+    assert ContextCacheManager._clean_model_name("models/gemini-4-hydrogen-preview") == "gemini_4_hydrogen"
+    class DummyClient:
+        pass
+    dummy = DummyClient()
+    long_instruction = "test instruction " * 1200
+    assert ContextCacheManager.get_or_create_cache(dummy, "gemini-4-hydrogen", long_instruction) == "__IMPLICIT_CACHE_95__"
+
+    # 3. In-Batch Prompt Deduplication
+    tr = MultimodalTranslator.__new__(MultimodalTranslator)
+    tr.character_registry = {"SpeakerAlpha": "MALE"}
+    tr.tm = None
+    tr.style_report = None
+    sb = SeriesBible.__new__(SeriesBible)
+    sb.data = {
+        "characters": {
+            "SpeakerAlpha": {
+                "gender": "MALE",
+                "declension": {
+                    "D": "SpeakerAlphy",
+                    "C": "SpeakerAlphie",
+                    "B": "SpeakerAlphę",
+                    "N": "SpeakerAlphą",
+                    "Ms": "SpeakerAlphie",
+                    "W": "SpeakerAlpho"
+                }
+            }
+        },
+        "glossary": {"SyntheticTerm": "SyntetycznyTermin"}
+    }
+    sb._alias_index = {}
+    sb._cache_first_name_aliases = {}
+    tr.series_bible = sb
+    tr.combined_glossary = {"SyntheticTerm": "SyntetycznyTermin"}
+    tr._episode_knowledge_cached = False
+
+    ev1 = pysubs2.SSAEvent(start=1000, end=3000, text="Report on SyntheticTerm.", name="SpeakerAlpha")
+    ev2 = pysubs2.SSAEvent(start=3500, end=5500, text="Acknowledged SyntheticTerm.", name="SpeakerAlpha")
+    ev3 = pysubs2.SSAEvent(start=6000, end=8000, text="Executing SyntheticTerm.", name="SpeakerAlpha")
+    batch_events = [
+        (0, ev1, "Report on SyntheticTerm.", ""),
+        (1, ev2, "Acknowledged SyntheticTerm.", ""),
+        (2, ev3, "Executing SyntheticTerm.", "")
+    ]
+
+    prompt = tr._prepare_batch_prompt(
+        batch_events=batch_events,
+        history_context=[]
+    )
+
+    # In-batch deduplication: paradigm and glossary term must be output exactly once
+    assert prompt.count("📖 Paradygmat odmiany:") == 1
+    assert prompt.count("📖 SŁOWNIK KANONICZNY:") == 1
+
+    # 4. Phase 2 Items Deduplication Logic
+    pass1_items = [
+        {"id": 1, "speaker": "SpeakerAlpha", "declension_paradigms": ["SpeakerAlpha(D:A)"], "canonical_glossary_term": "SyntheticTerm"},
+        {"id": 2, "speaker": "SpeakerAlpha", "declension_paradigms": ["SpeakerAlpha(D:A)"], "canonical_glossary_term": "SyntheticTerm"},
+        {"id": 3, "speaker": "SpeakerAlpha", "declension_paradigms": ["SpeakerAlpha(D:A)"], "canonical_glossary_term": "SyntheticTerm"},
+    ]
+    seen_paradigms_phase2 = set()
+    seen_glossary_phase2 = set()
+    for it in pass1_items:
+        if "declension_paradigms" in it and it["declension_paradigms"]:
+            unique_p = [p for p in it["declension_paradigms"] if p not in seen_paradigms_phase2]
+            seen_paradigms_phase2.update(it["declension_paradigms"])
+            it["declension_paradigms"] = unique_p
+        if "canonical_glossary_term" in it and it["canonical_glossary_term"]:
+            g_key = str(it["canonical_glossary_term"]).strip().lower()
+            if g_key in seen_glossary_phase2:
+                it["canonical_glossary_term"] = None
+            else:
+                seen_glossary_phase2.add(g_key)
+
+    assert pass1_items[0]["declension_paradigms"] == ["SpeakerAlpha(D:A)"]
+    assert pass1_items[1]["declension_paradigms"] == []
+    assert pass1_items[2]["declension_paradigms"] == []
+    assert pass1_items[0]["canonical_glossary_term"] == "SyntheticTerm"
+    assert pass1_items[1]["canonical_glossary_term"] is None
+    assert pass1_items[2]["canonical_glossary_term"] is None
+
+    # 5. Granular Phase 2 Flight Recorder Telemetry
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        recorder = EpisodeFlightRecorder(tmp_dir, "test_episode")
+        test_tokens = {
+            "prompt": 12500,
+            "cached": 10500,
+            "output": 1200,
+            "model": "gemini-4-hydrogen"
+        }
+        recorder.log_phase2_verifier(
+            batch_id=1,
+            cot_budget=512,
+            prompt_dump="Phase 2 prompt dump",
+            raw_response={"status": "ok"},
+            response_time_sec=4.25,
+            token_usage=test_tokens
+        )
+
+        assert recorder.jsonl_path.exists()
+        assert recorder.log_path.exists()
+
+        with open(recorder.jsonl_path, "r", encoding="utf-8") as f:
+            lines = [json.loads(line) for line in f if line.strip()]
+
+        phase2_entries = [entry for entry in lines if entry.get("stage") == "phase2_verifier"]
+        assert len(phase2_entries) == 1
+        p2_entry = phase2_entries[0]
+        assert p2_entry["payload"]["response_time_sec"] == 4.25
+        assert p2_entry["payload"]["token_usage"] == test_tokens
+
+        log_content = recorder.log_path.read_text(encoding="utf-8")
+        assert "4.25s" in log_content
+        assert "12500" in log_content
+
+
+
 
 
 
