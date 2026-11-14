@@ -93,9 +93,10 @@ class ContextCacheManager:
             return None
 
         from model_resolver import is_gemini_4_or_hydrogen_model
-        if is_gemini_4_or_hydrogen_model(model) and (len(system_instruction) // 4 >= 4096):
-            if not hasattr(client, "caches") or not hasattr(client.caches, "create"):
+        if not hasattr(client, "caches") or not hasattr(client.caches, "create"):
+            if is_gemini_4_or_hydrogen_model(model):
                 return "__IMPLICIT_CACHE_95__"
+            return None
 
         with cls._LOCK:
             content_hash = cls.get_content_hash(model, system_instruction, client=client, tag=tag)
@@ -166,7 +167,15 @@ class ContextCacheManager:
                         create_config = None
                         if hasattr(types, "Content") and hasattr(types, "Part"):
                             try:
-                                anchor_part = types.Part.from_text(text="AVT Context Cache Prefix Anchor") if hasattr(types.Part, "from_text") else types.Part(text="AVT Context Cache Prefix Anchor")
+                                anchor_text = "AVT Context Cache Prefix Anchor"
+                                if len(system_instruction) < 140000:
+                                    try:
+                                        from rules import get_translation_system_prompt
+                                        full_canon = get_translation_system_prompt(keep_honorifics=True, lean=False)
+                                        anchor_text = f"AVT Context Cache Prefix Anchor\n\n{full_canon}"
+                                    except Exception:
+                                        pass
+                                anchor_part = types.Part.from_text(text=anchor_text) if hasattr(types.Part, "from_text") else types.Part(text=anchor_text)
                                 anchor_content = [types.Content(role="user", parts=[anchor_part])]
                                 create_config = types.CreateCachedContentConfig(
                                     contents=anchor_content,

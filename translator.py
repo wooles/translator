@@ -2002,7 +2002,7 @@ class MultimodalTranslator:
         self.trace_log = trace_log
         self.trace_dir = trace_dir
         self.flight_recorder: Optional[EpisodeFlightRecorder] = None
-        self.system_prompt = get_translation_system_prompt(keep_honorifics=keep_honorifics, lean=True)
+        self.system_prompt = get_translation_system_prompt(keep_honorifics=keep_honorifics, lean=False)
         radio_dispatch_rule = (
             "\n\n### Protokół Łączności i Meldunków (Radio & Dispatch Invariance)\n"
             "Krótkie komunikaty radiowe, meldunki i potwierdzenia rozkazów (roger, copy that, acknowledged, wilco, understood) "
@@ -2016,7 +2016,8 @@ class MultimodalTranslator:
             "2. Spójność wielokropków: kontynuacje myśli urwanej wielokropkiem zachowują małą literę i ciągłość zdania.\n"
             "3. Liczba i płeć: w dialogach bezpośrednich forma adresatywna oraz formy fleksyjne zgodne z relacją postaci, wektorem stanu sceny i rejestrem seiyū.\n"
             "4. Kondensacja i tempo: zachowaj zwięzłość (do 17.0 znaków na sekundę, do 38 znaków w wierszu, maksymalnie 2 wiersze na planszę).\n"
-            "5. Naturalność: żywy język dialogowy zamiast kalek dosłownych i struktur obcojęzycznych."
+            "5. Naturalność: żywy język dialogowy zamiast kalek dosłownych i struktur obcojęzycznych.\n"
+            "6. Ekonomika syntezy Fazy 1: przeprowadzaj błyskawiczną analizę w maksymalnie 2-3 krótkich zdaniach, kierując całą energię na precyzyjny wynikowy obiekt JSON."
         )
         self.system_prompt += dialogue_craft_rules
         self.linter = AVTLinter
@@ -2038,7 +2039,8 @@ class MultimodalTranslator:
                 client=self.client_pool or self.client,
                 model=self.model_phase2,
                 keep_honorifics=keep_honorifics,
-                thinking_budget=self.thinking_budget_phase2
+                thinking_budget=self.thinking_budget_phase2,
+                lean=False
             )
             if hasattr(self.verifier, "system_prompt"):
                 self.verifier.system_prompt += radio_dispatch_rule
@@ -3663,7 +3665,8 @@ class MultimodalTranslator:
                     lines.append(f"  Informacja o tempie: tempo CPS ({cps:.1f} z/s, czas {duration_s:.1f}s) – szybka kwestia (kondensacja AVT).")
 
                 max_pl_chars = min(76, int(max(0.5, duration_s) * 17.0))
-                lines.append(f"  Parametry planszy: budżet {max_pl_chars} znaków (tempo czytania do 17.0 z/s, max 2 wiersze).")
+                if vtype.get("is_sign") or cps > 14.5:
+                    lines.append(f"  Parametry planszy: budżet {max_pl_chars} znaków (tempo czytania do 17.0 z/s, max 2 wiersze).")
 
             if whisper_transcriptions and idx + 1 in whisper_transcriptions:
                 raw_jp_item = whisper_transcriptions[idx + 1]
@@ -3757,8 +3760,8 @@ class MultimodalTranslator:
                     "response_schema": effective_schema,
                 }
                 if is_hydrogen:
-                    if gen_config_kwargs.get("max_output_tokens") is None or gen_config_kwargs["max_output_tokens"] < 4096:
-                        gen_config_kwargs["max_output_tokens"] = 4096
+                    if gen_config_kwargs.get("max_output_tokens") is None or gen_config_kwargs["max_output_tokens"] < 16384:
+                        gen_config_kwargs["max_output_tokens"] = 16384
                 if not is_hydrogen:
                     gen_config_kwargs["temperature"] = 0.25
 
@@ -5128,6 +5131,9 @@ class MultimodalTranslator:
 
             seen_p2_paradigms = set()
             seen_p2_glossary = set()
+            seen_p2_speaker_voice = {}
+            seen_p2_speaker_prosody = {}
+            prev_speaker_name = None
             for it in pass1_items:
                 paradigms = it.get("declension_paradigms")
                 if paradigms:
@@ -5153,6 +5159,21 @@ class MultimodalTranslator:
                         it["canonical_glossary_term"] = None
                     else:
                         seen_p2_glossary.add(g_key)
+
+                spk_name = (it.get("speaker_name") or it.get("speaker") or "").strip()
+                spk_voice = it.get("speaker_voice", "")
+                spk_prosody = it.get("prosody", "")
+                if spk_name:
+                    if prev_speaker_name == spk_name:
+                        if spk_voice and seen_p2_speaker_voice.get(spk_name) == spk_voice:
+                            it["speaker_voice"] = ""
+                        if spk_prosody and seen_p2_speaker_prosody.get(spk_name) == spk_prosody:
+                            it["prosody"] = ""
+                    if spk_voice and not seen_p2_speaker_voice.get(spk_name):
+                        seen_p2_speaker_voice[spk_name] = spk_voice
+                    if spk_prosody and not seen_p2_speaker_prosody.get(spk_name):
+                        seen_p2_speaker_prosody[spk_name] = spk_prosody
+                prev_speaker_name = spk_name
 
             p2_before = dict(getattr(self.verifier, "current_episode_tokens", {}) or {})
             t0_phase2 = time.perf_counter()

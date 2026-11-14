@@ -180,11 +180,11 @@ class PricingGuard:
 
         elif profile in ["3", "master", "flash_reasoning", "hydrogen", "hydrogen_master", "pro_level3"]:
             rate_h = GOOGLE_API_RATES["hydrogen"]
-            system_prompt_tokens = 22000
-            batch_input_tokens = 7800
-            lean_output_f1_tokens = 1950
-            lean_output_f2_tokens = 1550
-            p2_input_tokens = 2800
+            system_prompt_tokens = 55000
+            batch_input_tokens = 7100
+            lean_output_f1_tokens = 1750
+            lean_output_f2_tokens = 1500
+            p2_input_tokens = 1800
 
             # Phase 1: Vision + Hydrogen
             p1_cached_in = (batches * system_prompt_tokens) if has_cache else 0
