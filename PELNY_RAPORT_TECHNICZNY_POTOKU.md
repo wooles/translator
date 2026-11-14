@@ -781,9 +781,9 @@ Rejestrator generuje w katalogu wyjściowym (`logs/` lub wskazanym przez `--trac
 6. **Etap 6 (`series_bible`):** Stan bazy wiedzy `SeriesBible`, rejestr postaci `CharacterRecord Positive Schema`, relacje skierowane oraz paradygmaty deklinacyjne `DeclensionParadigm`.
 7. **Etap 7 (`scene_discourse`):** Wykryte cięcia scen, graf dyskursu scenicznego, tury i pod-tury `SpeakerTurn`/`SubTurn`, stan virility `We_Group`/`You_Group` oraz zestawienie paczek adaptacyjnych `create_adaptive_batches`.
 8. **Etap 8 (`phase1_batch`):** Prompt Fazy 1, czas odpowiedzi, zużycie tokenów oraz pełna surowa odpowiedź modelu Primary LLM (`BatchTranslationResponse`).
-9. **Etap 9 (`phase2_verifier`):** Budżet myślenia CoT, prompt Fazy 2 oraz surowa odpowiedź weryfikatora `DialogueVerifier` (`RefinedBatchResponse`).
+9. **Etap 9 (`phase2_verifier`):** Budżet myślenia CoT, czas odpowiedzi Fazy 2 (`response_time_sec`), zużycie tokenów zbuforowanych i wyjściowych (`token_usage`), prompt Fazy 2 oraz surowa odpowiedź weryfikatora `DialogueVerifier` (`RefinedBatchResponse`).
 10. **Etap 10 (`line_evolution`):** Szczegółowa ewolucja każdej linii dialogowej: `EN -> Whisper JP Audio -> Telemetria -> Faza 1 PL -> Faza 2 PL -> AVTLinter D_pos PL` wraz z listą zastosowanych napraw fleksyjnych i słownikowych.
-11. **Etap 11 (`quality_gate_pricing`):** Audyt całego odcinka przez `EpisodeQualityGate` (Faza 0 + Faza 7), metryki AVT (CPL/CPS) oraz raport finansowy `PricingGuard` z rozliczeniem rabatu keszu kontekstu (-90%).
+11. **Etap 11 (`quality_gate_pricing`):** Audyt całego odcinka przez `EpisodeQualityGate` (Faza 0 + Faza 7), metryki AVT (CPL/CPS) oraz raport finansowy `PricingGuard` z estymatorem obciążenia roboczego (`estimate_loaded_workload_cost_pln`) i rozliczeniem rabatu keszu kontekstu (-95% dla `gemini-4-hydrogen`).
 
 ### 3. Sterowanie z Poziomu CLI
 Potok wspiera flagi kontrolujące działanie rejestratora:
@@ -792,4 +792,4 @@ Potok wspiera flagi kontrolujące działanie rejestratora:
 - `--trace-dir`: Wskazuje niestandardowy katalog zapisu logów śledzenia (domyślnie `logs`).
 
 ---
-**KONIEC PEŁNEGO RAPORTU TECHNICZNEGO POTOKU AVT — TRANSLATOR STANDARD 8.0 / 9.0**
+**KONIEC PEŁNEGO RAPORTU TECHNICZNEGO POTOKU AVT — TRANSLATOR STANDARD 11.2.6 BASELINE**

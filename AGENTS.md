@@ -2,11 +2,11 @@
 
 Dokument ten stanowi jedyne źródło prawdy (Single Source of Truth) definiujące nienaruszalne reguły architektoniczne, lingwistyczne i procesowe asystenta AI oraz zespołów wieloagentowych w repozytorium `translator`.
 
-- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.5 (External Ontological Grounding, Impersonal Dispatch Guard, Eponym Identity Protection & Collective Role Sanitization Baseline)`
-- **Commit certyfikacji kodu:** `37029a4` (`37029a4c9713fbe376699512e9100f5599ce7e0a`)
+- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.6 (Cost Ceiling Guard, Hybrid Cache Prefix Anchor, In-Batch Deduplication & Phase 2 Telemetry Baseline)`
+- **Commit certyfikacji kodu:** `35aefe9` (`35aefe909faffbe8ee7a400cc778feb99b2e678a`)
 - **Commit ochrony Depuracji Legacy 1.0 (Z16):** `c197db7` (`c197db73c3dabf887dddbf2337dc3a1d8cff598c`)
-- **Stan metryk:** `585 collected` (`432 passed` fast unit/integration [361 tests/ + 71 test_system.py] + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki (`verify_purity.py`, `verify_8_fixes.py`, `verify_12_fixes.py`, `verify_ultimate_pipeline.py`) oraz `audit_diff.ps1` w stanie `PASS`.
-- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.5` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
+- **Stan metryk:** `586 collected` (`433 passed` fast unit/integration [362 tests/ + 71 test_system.py] + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki (`verify_purity.py`, `verify_8_fixes.py`, `verify_12_fixes.py`, `verify_ultimate_pipeline.py`) oraz `audit_diff.ps1` w stanie `PASS`.
+- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.6` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
 
 ---
 

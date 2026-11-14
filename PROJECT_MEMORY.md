@@ -4,9 +4,9 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-14 — Standard 11.2.5 Certyfikowany Baseline)
-- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.5 (External Ontological Grounding, Impersonal Dispatch Guard, Eponym Identity Protection & Collective Role Sanitization Baseline)`
-- **Commit certyfikacji kodu:** `37029a4c9713fbe376699512e9100f5599ce7e0a` (`37029a4`)
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-14 — Standard 11.2.6 Certyfikowany Baseline)
+- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.6 (Cost Ceiling Guard, Hybrid Cache Prefix Anchor, In-Batch Deduplication & Phase 2 Telemetry Baseline)`
+- **Commit certyfikacji kodu:** `35aefe909faffbe8ee7a400cc778feb99b2e678a` (`35aefe9`)
 - **Commity implementacyjne 11.1:** `5b7306d` (Commit 1), `5b17ea7` (Commit 2), `2b4bc7d` (Commit 3), `8b72887` (Commit 4), `8a7dd31` (Commit 5), `218af2e` (Commit 6)
 - **Commity Hotfixu 11.1.1:** `328729f` (Commit 1), `9de0b83` (Commit 2), `07c4684` (Commit 3), `96acac7` (Commit 4)
 - **Commity Hotfixu 11.1.2:** `74766d8` (Commit 1), `1b540e3` (Commit 2), `8313658` (Commit 3), `326b7e0` (Commit 4)
@@ -23,16 +23,17 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 - **Commity Hotfixu 11.2.1:** `bf03d84` (Commit 1), `5e11cc9` (Commit 2), `208388c` (Commit 3)
 - **Commity Hotfixu 11.2.2:** `bacb2d9` (Commit 1), `1c18bef` (Commit 2), `24b4a51` (Commit 3)
 - **Commity Hotfixu 11.2.3:** `2ae94bf` (Commit 1), `d6f7355` (Commit 2), `0132db0` (Commit 3)
-- **Commity Standardu 11.2.5:**
-  * Commit 1 (`dcbbe50`): `feat(pipeline): external gender resolver, impersonal radio dispatch, eponym guard and collective role sanitization (11.2.5)`
-  * Commit 2 (`37029a4c9713fbe376699512e9100f5599ce7e0a`): `test(pipeline): add regression tests for external gender resolver, radio dispatches, and eponym routing` — **NOWY COMMIT CERTYFIKACJI KODU**
-  * Commit 3 (`HEAD`): `docs(release): certify Standard 11.2.5 baseline in AGENTS.md, PROJECT_MEMORY.md, and implementation report`
-- **Status 11.2.5:** `CERTIFIED / CLOSED (2026-11-14)`
+- **Commity Standardu 11.2.5:** `dcbbe50` (Commit 1), `37029a4` (Commit 2), `f132841` (Commit 3)
+- **Commity Standardu 11.2.6:**
+  * Commit 1 (`c0361b8`): `fix(pipeline): enforce hybrid cache config anchor, deduplicate in-batch paradigms, add phase2 batch token telemetry and workload cost estimator (11.2.6)`
+  * Commit 2 (`35aefe909faffbe8ee7a400cc778feb99b2e678a`): `test(pipeline): add T11.2.6 regression suite for cost ceiling G-Q11, in-batch deduplication and phase2 telemetry (11.2.6)` — **NOWY COMMIT CERTYFIKACJI KODU**
+  * Commit 3 (`HEAD`): `docs(release): certify Standard 11.2.6 Cost Ceiling, In-Batch Deduplication & Phase 2 Telemetry Baseline`
+- **Status 11.2.6:** `CERTIFIED / CLOSED (2026-11-14)`
 - **Commit ochrony Depuracji Legacy 1.0 (Z16):** `c197db73c3dabf887dddbf2337dc3a1d8cff598c` (`c197db7` — bezwzględne 0 B diffu na wszystkich plikach chronionych)
-- **Stan metryk:** `361 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `432 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 11/11, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
-- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (361/361 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
-- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.5` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
-- **Gałąź i Architektura:** `main` (Standard 11.2.5: Zewnętrzne ugruntowanie ontologiczne AniList GraphQL w `ExternalGenderResolver` z Franchise Matching Guard, buforem dyskowym `.external_character_cache.json` i bezpiecznikiem Circuit Breaker, ochrona łączności radiowej i meldunków wojskowych "Radio & Dispatch Invariance" w Fazie 1 i Fazie 2, ochrona tożsamości eponimów `_compute_toponym_declension` i odblokowanie paradygmatów toponimów w `SeriesBible.get_declension_paradigm`, sanitacja ról zbiorowych `SECONDARY_COLLECTIVE_ROLES` `torimaki`, `retinue`, `guards` do stanu UNKNOWN/P2, Certyfikacja Kodu `37029a4c9713fbe376699512e9100f5599ce7e0a`, Baseline Z16 `c197db73c3dabf887dddbf2337dc3a1d8cff598c`, Zero-Literal Pure Positive Domain Invariant Architecture & Primary LLM Translation Authority)
+- **Stan metryk:** `362 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `433 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 11/11, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
+- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (362/362 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
+- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.6` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
+- **Gałąź i Architektura:** `main` (Standard 11.2.6: Estymator obciążenia roboczego odcinka `estimate_loaded_workload_cost_pln` w `pricing_guard.py` i `translator.py` z zachowaniem sufitu budżetowego G-Q11 <= 3.50 PLN dla 350 linii / 12 paczek i <= 3.80 PLN dla 518 linii / 19 paczek, kotwiczenie prefiksu kontekstowego `contents` w konfiguracji cache `ContextCacheManager.get_or_create_cache`, deduplikacja paradygmatów odmiany `seen_paradigms_in_batch` i glosariusza `seen_glossary_in_batch` w `translator.py`, granularna telemetria czasu odpowiedzi Fazy 2 `response_time_sec` i zużycia tokenów `token_usage` w `pipeline_logger.py` i `translator.py`, reguły warsztatu dialogowego w promptach systemowych, Certyfikacja Kodu `35aefe909faffbe8ee7a400cc778feb99b2e678a`, Baseline Z16 `c197db73c3dabf887dddbf2337dc3a1d8cff598c`, Zero-Literal Pure Positive Domain Invariant Architecture & Primary LLM Translation Authority)
 - **Środowisko:** Python 3.13 (`.venv`), Windows PowerShell, `ffmpeg` (PATH), `librosa.pyin`, `soundfile`, `pysubs2`, `spaCy en_core_web_sm` (100% offline 0.00 PLN), bezpośrednie klucze Google AI Studio API (`use_vertex = 0`).
 - **Dyrektywa Wykonawcza Testów:**
   * Testy przyrostowe podczas kodowania (< 2 s): `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_testu>"`
