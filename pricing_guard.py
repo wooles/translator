@@ -154,6 +154,134 @@ class PricingGuard:
 
         return 0.16
 
+    @staticmethod
+    def estimate_loaded_workload_cost_pln(
+        profile: str,
+        lines_count: int,
+        batches_count: int,
+        has_cache: bool = True,
+        usd_pln: float = DEFAULT_USD_PLN,
+        vat_rate: float = 0.23
+    ) -> Dict[str, float]:
+        """
+        Oblicza realistyczny koszt netto i brutto dla faktycznej liczby utworzonych paczek
+        i kwestii, z uwzględnieniem zdeduplikowanego promptu oraz bufora kontekstowego.
+        """
+        profile = (profile or "").lower()
+        batches = max(1, batches_count)
+
+        if profile in ["1", "standard", "flash_lite"]:
+            return {
+                "net_pln": 0.00,
+                "gross_pln": 0.00,
+                "batches": batches_count,
+                "lines": lines_count
+            }
+
+        elif profile in ["3", "master", "flash_reasoning", "hydrogen", "hydrogen_master", "pro_level3"]:
+            rate_h = GOOGLE_API_RATES["hydrogen"]
+            system_prompt_tokens = 22000
+            batch_input_tokens = 7800
+            lean_output_f1_tokens = 1950
+            lean_output_f2_tokens = 1550
+            p2_input_tokens = 2800
+
+            # Phase 1: Vision + Hydrogen
+            p1_cached_in = (batches * system_prompt_tokens) if has_cache else 0
+            p1_uncached_in = (batches * batch_input_tokens) + (0 if has_cache else batches * system_prompt_tokens)
+            p1_out = batches * lean_output_f1_tokens
+            cost_p1_usd = (
+                (p1_cached_in / 1_000_000) * rate_h["input_cached"] +
+                (p1_uncached_in / 1_000_000) * rate_h["input_uncached"] +
+                (p1_out / 1_000_000) * rate_h["output"]
+            )
+
+            # Phase 2: Hydrogen Refinement
+            p2_cached_in = (batches * system_prompt_tokens) if has_cache else 0
+            p2_uncached_in = (batches * p2_input_tokens) + (0 if has_cache else batches * system_prompt_tokens)
+            p2_out = batches * lean_output_f2_tokens
+            cost_p2_usd = (
+                (p2_cached_in / 1_000_000) * rate_h["input_cached"] +
+                (p2_uncached_in / 1_000_000) * rate_h["input_uncached"] +
+                (p2_out / 1_000_000) * rate_h["output"]
+            )
+
+            profiler_usd = 0.002
+            total_usd = cost_p1_usd + cost_p2_usd + profiler_usd
+            net_pln = round(total_usd * usd_pln, 2)
+            gross_pln = round(net_pln * (1.0 + vat_rate), 2)
+            return {
+                "net_pln": net_pln,
+                "gross_pln": gross_pln,
+                "batches": batches_count,
+                "lines": lines_count
+            }
+
+        elif profile in ["4", "ultra", "ultra_pro", "cinema", "pro", "pro_level4"]:
+            rate_flash = GOOGLE_API_RATES["flash"]
+            rate_pro = GOOGLE_API_RATES["pro"]
+            system_prompt_tokens = 22000
+            batch_input_tokens = 7800
+            f1_out_tokens = 3200
+            f2_out_tokens = 2200
+
+            p1_cached_in = (batches * system_prompt_tokens) if has_cache else 0
+            p1_uncached_in = (batches * batch_input_tokens) + (0 if has_cache else batches * system_prompt_tokens)
+            p1_out = batches * f1_out_tokens
+            cost_p1_usd = (
+                (p1_cached_in / 1_000_000) * rate_flash["input_cached"] +
+                (p1_uncached_in / 1_000_000) * rate_flash["input_uncached"] +
+                (p1_out / 1_000_000) * rate_flash["output"]
+            )
+
+            p2_cached_in = (batches * system_prompt_tokens) if has_cache else 0
+            p2_uncached_in = (batches * 2800) + (0 if has_cache else batches * system_prompt_tokens)
+            p2_out = batches * f2_out_tokens
+            cost_p2_usd = (
+                (p2_cached_in / 1_000_000) * rate_pro["input_cached"] +
+                (p2_uncached_in / 1_000_000) * rate_pro["input_uncached"] +
+                (p2_out / 1_000_000) * rate_pro["output"]
+            )
+
+            storage_usd = 0.04
+            profiler_usd = 0.002
+            total_usd = cost_p1_usd + cost_p2_usd + storage_usd + profiler_usd
+            net_pln = round(total_usd * usd_pln, 2)
+            gross_pln = round(net_pln * (1.0 + vat_rate), 2)
+            return {
+                "net_pln": net_pln,
+                "gross_pln": gross_pln,
+                "batches": batches_count,
+                "lines": lines_count
+            }
+
+        else:  # Profile 2: Studio / Flash
+            rate_f = GOOGLE_API_RATES["flash"]
+            system_prompt_tokens = 22000
+            batch_input_tokens = 7800
+            f1_out_tokens = 3200
+
+            p1_cached_in = (batches * system_prompt_tokens) if has_cache else 0
+            p1_uncached_in = (batches * batch_input_tokens) + (0 if has_cache else batches * system_prompt_tokens)
+            p1_out = batches * f1_out_tokens
+            cost_p1_usd = (
+                (p1_cached_in / 1_000_000) * rate_f["input_cached"] +
+                (p1_uncached_in / 1_000_000) * rate_f["input_uncached"] +
+                (p1_out / 1_000_000) * rate_f["output"]
+            )
+
+            storage_usd = 0.005
+            profiler_usd = 0.002
+            total_usd = cost_p1_usd + storage_usd + profiler_usd
+            net_pln = round(total_usd * usd_pln, 2)
+            gross_pln = round(net_pln * (1.0 + vat_rate), 2)
+            return {
+                "net_pln": net_pln,
+                "gross_pln": gross_pln,
+                "batches": batches_count,
+                "lines": lines_count
+            }
+
     @classmethod
     def calculate_actual_cost_breakdown(
         cls,

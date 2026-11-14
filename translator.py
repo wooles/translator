@@ -2010,6 +2010,15 @@ class MultimodalTranslator:
             "wyklucza się formy osobowe czasu przeszłego."
         )
         self.system_prompt += radio_dispatch_rule
+        dialogue_craft_rules = (
+            "\n\n### Wytyczne Rzemiosła Dialogowego\n"
+            "1. Syntaktyka i ciągłość: całe zdania rozbite na linijki tworzą spójną całość z naturalnym polskim szykiem wyrazów.\n"
+            "2. Spójność wielokropków: kontynuacje myśli urwanej wielokropkiem zachowują małą literę i ciągłość zdania.\n"
+            "3. Liczba i płeć: w dialogach bezpośrednich forma adresatywna oraz formy fleksyjne zgodne z relacją postaci, wektorem stanu sceny i rejestrem seiyū.\n"
+            "4. Kondensacja i tempo: zachowaj zwięzłość (do 17.0 znaków na sekundę, do 38 znaków w wierszu, maksymalnie 2 wiersze na planszę).\n"
+            "5. Naturalność: żywy język dialogowy zamiast kalek dosłownych i struktur obcojęzycznych."
+        )
+        self.system_prompt += dialogue_craft_rules
         self.linter = AVTLinter
         
         # Episode Profiler (Pre-pass Glossary & Character Matrix)
@@ -3148,12 +3157,13 @@ class MultimodalTranslator:
             lines.append("-------------------------------------------------------------------\n")
 
         # 3. Lines to translate
-        lines.append("Przekład kwestii na naturalną, żywą polszczyznę mówioną z zachowaniem filmowego rytmu dialogu:\n"
-                     "1. Syntaktyka i ciągłość: całe zdania rozbite na linijki tworzą spójną całość z naturalnym polskim szykiem wyrazów.\n"
-                     "2. Liczba i płeć: w dialogach bezpośrednich forma adresatywna (bezpośrednia lub grzecznościowa) oraz formy fleksyjne zgodne z relacją społeczną postaci, wektorem stanu sceny i rejestrem seiyū.\n"
-                     "3. Triangulacja EN+JP+obraz: skrypt EN dostarcza treść i fakty, japońskie audio rejestr emocjonalny, a kadr obrazu napisy ekranowe.\n"
-                     "4. Kwestie wielogłosu: wypowiedzi dwóch osób w jednej kwestii rozdzielane na osobne linie ('- Kwestia 1\\N- Kwestia 2').\n"
-                     "5. Naturalność: żywy język dialogowy zamiast kalek dosłownych i struktur obcojęzycznych:")
+        lines.append(
+            "Przekład kwestii na naturalną, żywą polszczyznę mówioną z zachowaniem "
+            "filmowego rytmu dialogu i wytycznych z instrukcji systemowej:\n"
+        )
+
+        seen_paradigms_in_batch = set()
+        seen_glossary_in_batch = set()
 
         for idx, (original_idx, event, clean_text, ts_prefix) in enumerate(batch_events):
             start_str = pysubs2.time.ms_to_str(event.start)
@@ -3606,7 +3616,10 @@ class MultimodalTranslator:
                 if dry_telemetry:
                     lines.append(f"  📡 TELEMETRIA: {dry_telemetry}")
                 if paradigm_strs:
-                    lines.append(f"  📖 Paradygmat odmiany: {'; '.join(paradigm_strs)}")
+                    new_paradigm_strs = [p for p in paradigm_strs if p not in seen_paradigms_in_batch]
+                    if new_paradigm_strs:
+                        lines.append(f"  📖 Paradygmat odmiany: {'; '.join(new_paradigm_strs)}")
+                        seen_paradigms_in_batch.update(new_paradigm_strs)
                 elif entity_cat_strs:
                     lines.append(f"  🏷️ Kategorie encji: {', '.join(entity_cat_strs)}")
                 if compact_wdd_tag:
@@ -3630,7 +3643,10 @@ class MultimodalTranslator:
                     clean_lower = clean_text.lower()
                     for term_en, term_pl in active_gloss.items():
                         if term_en and len(term_en) >= 3 and term_en.lower() in clean_lower:
-                            lines.append(f"  📖 SŁOWNIK KANONICZNY: '{term_en}' => '{term_pl}' (forma bazowa – w dialogu ZAWSZE odmieniaj przez polskie przypadki!)")
+                            term_key = term_en.lower().strip()
+                            if term_key not in seen_glossary_in_batch:
+                                lines.append(f"  📖 SŁOWNIK KANONICZNY: '{term_en}' => '{term_pl}' (forma bazowa – w dialogu ZAWSZE odmieniaj przez polskie przypadki!)")
+                                seen_glossary_in_batch.add(term_key)
                 if vtype.get("is_top"):
                     lines.append(f"  Dialog górny: dialog w tle lub oddali – naturalny dialog mówiony.")
                 is_split_part = (
@@ -3740,6 +3756,9 @@ class MultimodalTranslator:
                     "response_mime_type": "application/json",
                     "response_schema": effective_schema,
                 }
+                if is_hydrogen:
+                    if gen_config_kwargs.get("max_output_tokens") is None or gen_config_kwargs["max_output_tokens"] < 4096:
+                        gen_config_kwargs["max_output_tokens"] = 4096
                 if not is_hydrogen:
                     gen_config_kwargs["temperature"] = 0.25
 
@@ -5106,6 +5125,37 @@ class MultimodalTranslator:
             stagger_sec = (b_idx % max(1, self.concurrent_batches)) * 0.35
             if stagger_sec > 0:
                 time.sleep(stagger_sec)
+
+            seen_p2_paradigms = set()
+            seen_p2_glossary = set()
+            for it in pass1_items:
+                paradigms = it.get("declension_paradigms")
+                if paradigms:
+                    if isinstance(paradigms, list):
+                        new_pars = []
+                        for p in paradigms:
+                            p_key = str(p).strip()
+                            if p_key not in seen_p2_paradigms:
+                                seen_p2_paradigms.add(p_key)
+                                new_pars.append(p)
+                        it["declension_paradigms"] = new_pars
+                    else:
+                        p_key = str(paradigms).strip()
+                        if p_key in seen_p2_paradigms:
+                            it["declension_paradigms"] = []
+                        else:
+                            seen_p2_paradigms.add(p_key)
+
+                gloss_term = it.get("canonical_glossary_term")
+                if gloss_term:
+                    g_key = str(gloss_term).strip().lower()
+                    if g_key in seen_p2_glossary:
+                        it["canonical_glossary_term"] = None
+                    else:
+                        seen_p2_glossary.add(g_key)
+
+            p2_before = dict(getattr(self.verifier, "current_episode_tokens", {}) or {})
+            t0_phase2 = time.perf_counter()
             phase2_focused_rules = get_focused_rules_for_batch(pass1_items, max_rules=3)
             refined_lines: List[RefinedLine] = self.verifier.verify_batch(
                 batch_items=pass1_items,
@@ -5121,6 +5171,14 @@ class MultimodalTranslator:
                 character_registry=self.character_registry,
                 scene_diagnosis=getattr(batch_response, "scene_diagnosis", None) if batch_response else None
             )
+            elapsed_phase2 = round(max(0.0, time.perf_counter() - t0_phase2), 2)
+            p2_after = dict(getattr(self.verifier, "current_episode_tokens", {}) or {})
+            p2_tok_usage = {
+                "prompt": max(0, p2_after.get("prompt", 0) - p2_before.get("prompt", 0)),
+                "cached": max(0, p2_after.get("cached", 0) - p2_before.get("cached", 0)),
+                "output": max(0, p2_after.get("output", 0) - p2_before.get("output", 0)),
+                "model": p2_after.get("model") or getattr(self.verifier, "model", ""),
+            }
             for r in refined_lines:
                 orig_it = next((it for it in pass1_items if it.get("id") == r.id), None)
                 if orig_it:
@@ -5184,8 +5242,10 @@ class MultimodalTranslator:
                     self.flight_recorder.log_phase2_verifier(
                         batch_id=b_idx,
                         cot_budget=budget_val if 'budget_val' in locals() else 0,
-                        prompt_dump="",
-                        raw_response=[r.model_dump() if hasattr(r, "model_dump") else (r.dict() if hasattr(r, "dict") else str(r)) for r in refined_lines]
+                        prompt_dump=getattr(self.verifier, "last_prompt", "") or "",
+                        raw_response=[r.model_dump() if hasattr(r, "model_dump") else (r.dict() if hasattr(r, "dict") else str(r)) for r in refined_lines],
+                        response_time_sec=elapsed_phase2,
+                        token_usage=p2_tok_usage
                     )
                 except Exception:
                     logger.debug("Rejestracja weryfikacji w locie zakończona wyjątkiem", exc_info=True)
@@ -6147,6 +6207,21 @@ class MultimodalTranslator:
             leap_threshold_ms=8000,
             scene_threshold_ms=3800,
             coalesce_tail=True
+        )
+
+        total_lines = len(raw_entries)
+        from pricing_guard import PricingGuard
+        from model_resolver import is_gemini_4_or_hydrogen_model
+        p_profile = "3" if is_gemini_4_or_hydrogen_model(self.model_phase1) else "2"
+        workload_est = PricingGuard.estimate_loaded_workload_cost_pln(
+            p_profile,
+            lines_count=total_lines,
+            batches_count=len(batches)
+        )
+        print(
+            f"  [Budżet Odcinka ({total_lines} kwestii / {len(batches)} paczek)]: "
+            f"Szacowany koszt z Context Cache: ~{workload_est['net_pln']:.2f} PLN netto "
+            f"(~{workload_est['gross_pln']:.2f} PLN brutto)."
         )
 
         all_events = [item[1] for item in raw_entries]

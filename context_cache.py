@@ -158,13 +158,32 @@ class ContextCacheManager:
                 try:
                     if hasattr(client, "caches") and hasattr(client.caches, "create"):
                         ttl_str = f"{ttl_seconds}s"
+                        cache_cfg_kwargs = {
+                            "system_instruction": system_instruction,
+                            "ttl": ttl_str,
+                            "display_name": display_name,
+                        }
+                        create_config = None
+                        if hasattr(types, "Content") and hasattr(types, "Part"):
+                            try:
+                                anchor_part = types.Part.from_text(text="AVT Context Cache Prefix Anchor") if hasattr(types.Part, "from_text") else types.Part(text="AVT Context Cache Prefix Anchor")
+                                anchor_content = [types.Content(role="user", parts=[anchor_part])]
+                                create_config = types.CreateCachedContentConfig(
+                                    contents=anchor_content,
+                                    **cache_cfg_kwargs
+                                )
+                            except Exception:
+                                create_config = None
+
+                        if create_config is None:
+                            try:
+                                create_config = types.CreateCachedContentConfig(**cache_cfg_kwargs)
+                            except Exception:
+                                create_config = cache_cfg_kwargs
+
                         cache = client.caches.create(
                             model=model,
-                            config=types.CreateCachedContentConfig(
-                                system_instruction=system_instruction,
-                                ttl=ttl_str,
-                                display_name=display_name,
-                            )
+                            config=create_config
                         )
                         _LOCAL_CACHE_REGISTRY[content_hash] = cache.name
                         logger.info(f"[Context Cache]: Created safe cache for {model}: {cache.name} (Rolling window: {ttl_seconds}s)")

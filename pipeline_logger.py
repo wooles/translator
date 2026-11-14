@@ -340,17 +340,23 @@ class EpisodeFlightRecorder:
         batch_id: int,
         cot_budget: int,
         prompt_dump: str,
-        raw_response: Any
+        raw_response: Any,
+        response_time_sec: float = 0.0,
+        token_usage: Optional[Dict[str, Any]] = None
     ) -> None:
         """Rejestruje KROK 9: Wykonanie Fazy 2 weryfikatora dialogów."""
         payload = {
             "batch_id": batch_id,
             "cot_budget": cot_budget,
-            "raw_response": raw_response
+            "raw_response": raw_response,
+            "response_time_sec": response_time_sec,
+            "token_usage": token_usage or {}
         }
         text_lines = [
             f"Paczka ID: {batch_id}",
             f"Budżet myślenia CoT: {cot_budget}",
+            f"Czas odpowiedzi Fazy 2: {response_time_sec:.2f}s",
+            f"Zużycie tokenów Fazy 2: {json.dumps(token_usage or {}, default=_safe_json_default, ensure_ascii=False)}",
             f"Wyrenderowany prompt Fazy 2 (fragment):\n{prompt_dump[:800]}...",
             f"Surowa odpowiedź weryfikatora:\n{json.dumps(raw_response, default=_safe_json_default, ensure_ascii=False)[:1000]}..."
         ]
