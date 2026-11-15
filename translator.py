@@ -3103,10 +3103,10 @@ class MultimodalTranslator:
         lines = []
         from scene_snapper import SceneShotSnapper
 
-        # 00c. Focused Scene Rules (Dynamic per-batch - always included)
-        if focused_rules_str:
-            lines.append(focused_rules_str)
-
+        # =========================================================================
+        # 1. STABLE PREFIX CONTRACT (Filar A - Standard 11.2.10)
+        # Bajtowo identyczny prefiks dla 100% paczek odcinka (Context Cache >= 32k)
+        # =========================================================================
         # Static Episode Knowledge (Only appended if not already baked into Cached System Instructions)
         if not getattr(self, "_episode_knowledge_cached", False):
             if user_feedback_str:
@@ -3122,7 +3122,7 @@ class MultimodalTranslator:
             elif anime_context_str:
                 lines.append(anime_context_str)
 
-        # 0c. Translation Memory golden examples (Domain-Locked to current series)
+        # Translation Memory golden examples (Domain-Locked to current series)
         if self.tm:
             try:
                 batch_queries = [item[2] for item in batch_events]
@@ -3138,63 +3138,28 @@ class MultimodalTranslator:
             except Exception:
                 logger.debug("Formatowanie pamięci tłumaczeniowej zakończone wyjątkiem", exc_info=True)
 
-        # 1. Just-In-Time Character Scoping (Scene-level isolation - Anti-Saturation)
+        # Full deterministic character registry sorted alphabetically (Zero-JIT Scoping)
         if self.character_registry:
-            batch_corpus = " ".join([
-                clean_t for _, _, clean_t, _ in batch_events
-            ]).lower()
-            if history_context:
-                batch_corpus += " " + " ".join([(h.get("en") or "") + " " + (h.get("pl") or "") for h in history_context]).lower()
-            if lookahead_events:
-                batch_corpus += " " + " ".join([str(item[2] if len(item) > 2 else "") for item in lookahead_events]).lower()
+            lines.append("--- ZNANE POSTACIE W ODCINKU (spójność ról, statusu i płci) ---")
+            for name in sorted(self.character_registry.keys()):
+                det_str = str(self.character_registry[name])
+                clean_det = re.sub(r"\[(?:KOBIETA|MĘŻCZYZNA|PARA DWÓCH|RELACJA HIERARCHICZNA|OCHRONA PRZESKOKÓW|GRUPA|W 2\. os\.|Wymóg|Filar|T-V Invariance)[^\]]*\]", "", det_str, flags=re.IGNORECASE)
+                clean_det = re.sub(r"\s+", " ", clean_det).strip()
+                lines.append(f"• {name}: {clean_det or det_str}")
+            lines.append("-----------------------------------------------------------------\n")
 
-            active_speakers = {
-                extract_clean_speaker_name(ev.name).strip().lower() for _, ev, _, _ in batch_events if getattr(ev, "name", None)
-            }
-            if history_context:
-                for h in history_context[-4:]:
-                    spk = extract_clean_speaker_name(h.get("speaker") or h.get("speaker_name") or "").strip().lower()
-                    if spk:
-                        active_speakers.add(spk)
+        # =========================================================================
+        # 2. DYNAMIC USER SUFFIX (Dołączany wyłącznie po stałym prefiksie)
+        # =========================================================================
+        # Focused Scene Rules (Dynamic per-batch)
+        if focused_rules_str:
+            lines.append("--- REGULARNE WYTYCZNE I REGUŁY SCENY (REZYDUALNE) ---")
+            lines.append(focused_rules_str)
+            lines.append("------------------------------------------------------\n")
 
-            def _is_entity_present(ent_name: str) -> bool:
-                cl = extract_clean_speaker_name(ent_name).strip().lower()
-                if not cl or len(cl) < 3:
-                    return False
-                for p in re.split(r"[/,]", cl):
-                    p_clean = p.strip()
-                    if len(p_clean) >= 3:
-                        p_stem = p_clean[:max(3, len(p_clean) - 2)]
-                        if p_clean in active_speakers or any(s in p_clean or p_clean in s for s in active_speakers if len(s) >= 3):
-                            return True
-                        if p_stem in batch_corpus:
-                            return True
-                return False
-
-            active_chars = {}
-            for name, details in list(self.character_registry.items()):
-                if "->" in name:
-                    # Relationship: require both participants to be present in scene
-                    parts = [p.strip() for p in name.split("->", 1)]
-                    if len(parts) == 2 and _is_entity_present(parts[0]) and _is_entity_present(parts[1]):
-                        active_chars[name] = details
-                else:
-                    # Individual character: require presence in scene
-                    if _is_entity_present(name):
-                        active_chars[name] = details
-
-            if active_chars:
-                lines.append("--- ZNANE POSTACIE W BIEŻĄCEJ SCENIE (spójność ról i płci) ---")
-                for name, details in active_chars.items():
-                    det_str = str(details)
-                    clean_det = re.sub(r"\[(?:KOBIETA|MĘŻCZYZNA|PARA DWÓCH|RELACJA HIERARCHICZNA|OCHRONA PRZESKOKÓW|GRUPA|W 2\. os\.|Wymóg|Filar|T-V Invariance)[^\]]*\]", "", det_str, flags=re.IGNORECASE)
-                    clean_det = re.sub(r"\s+", " ", clean_det).strip()
-                    lines.append(f"• {name}: {clean_det or det_str}")
-                lines.append("-------------------------------------------------------------\n")
-
-        # 2. Previous dialogue history
+        # Previous dialogue history
+        lines.append("--- POPRZEDNIE KWESTIE W SCENIE (kontekst przeszły) ---")
         if history_context:
-            lines.append("--- POPRZEDNIE KWESTIE W SCENIE (kontekst przeszły) ---")
             history_slice = []
             if len(history_context) >= 5:
                 last_spk = (history_context[-1].get("speaker") or history_context[-1].get("speaker_name") or "").strip().lower()
@@ -3224,6 +3189,8 @@ class MultimodalTranslator:
                 else:
                     lines.append(f"{prefix_label}{spk_label}{mode_label} EN: {h['en']}")
             lines.append("-------------------------------------------------------\n")
+        else:
+            lines.append("(Brak — początek sceny lub pierwsza paczka odcinka)\n-------------------------------------------------------\n")
 
         # 2b. Dynamic Crowd vs 1-on-1 (Uchi-Soto & Crowd Density Tracker)
         social_context = detect_scene_social_context(

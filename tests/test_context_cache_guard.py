@@ -333,3 +333,34 @@ def test_canary_warmup_retry_on_zero_cache(monkeypatch):
     # Weryfikacja: os._exit(1) NIE zostało wywołane
     assert exit_calls == [], "os._exit(1) nie powinno zostać wywołane po udanym ponowieniu!"
     assert translator._batch0_cache_telemetry_reported is True
+
+
+@pytest.mark.unit
+def test_prefix_invariance_f1():
+    """Weryfikuje Kontrakt Niezmiennego Prefiksu F1 (Filar A)."""
+    import hashlib, pysubs2
+    from translator import MultimodalTranslator
+
+    translator = MultimodalTranslator(api_key="mock_key", model="gemini-4-hydrogen", enable_verifier=False)
+    translator.character_registry = {"Postac B": "Opis B", "Postac A": "Opis A"}
+
+    ev0 = pysubs2.SSAEvent(start=1000, end=2000, text="L0", name="Postac A")
+    ev1 = pysubs2.SSAEvent(start=3000, end=4000, text="L1", name="Postac B")
+
+    prompt0 = translator._prepare_batch_prompt(
+        batch_events=[(0, ev0, "Hi", "")],
+        history_context=[],
+        glossary_str="=== GLOSSARY ===",
+        focused_rules_str=""
+    )
+    prompt1 = translator._prepare_batch_prompt(
+        batch_events=[(1, ev1, "There", "")],
+        history_context=[{"en": "Prev", "pl": "Poprz"}],
+        glossary_str="=== GLOSSARY ===",
+        focused_rules_str="=== SCENE RULES ==="
+    )
+
+    prefix0 = prompt0.split("--- POPRZEDNIE KWESTIE")[0].strip()
+    prefix1 = prompt1.split("--- REGULARNE WYTYCZNE")[0].strip()
+    assert hashlib.sha256(prefix0.encode()).hexdigest() == hashlib.sha256(prefix1.encode()).hexdigest()
+
