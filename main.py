@@ -54,7 +54,9 @@ except ImportError:
             pass
 
 from extract import list_subtitle_tracks, extract_embedded_subtitles
-from translator import MultimodalTranslator
+from translator import MultimodalTranslator, ContextCacheDiscountError
+
+logger = logging.getLogger("main")
 
 VIDEO_EXTENSIONS = {".mkv", ".mp4", ".avi", ".webm", ".mov", ".m4v"}
 SUBTITLE_EXTENSIONS = {".srt", ".ass", ".ssa", ".vtt", ".sub"}
@@ -614,6 +616,11 @@ def main():
             )
             completed_files.append((target_path.name, result_subs_path))
             print(f"\n[Sukces odcinka {ep_idx}/{total_episodes}]: Zapisano w -> {result_subs_path}")
+        except ContextCacheDiscountError as e:
+            print(f"\n[Błąd budżetowy podczas tłumaczenia {target_path.name}]: {e}")
+            logger.error(f"[Budget Halt] Zatrzymano potok ze względu na brak rabatu Context Cache: {e}")
+            preload_executor.shutdown(wait=False)
+            sys.exit(1)
         except Exception as e:
             print(f"\n[Błąd podczas tłumaczenia {target_path.name}]: {e}")
         finally:

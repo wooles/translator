@@ -1970,6 +1970,11 @@ def format_phase1_candidate_text(pl_candidate: str, event: Any, is_sign: bool = 
     return cand
 
 
+class ContextCacheDiscountError(RuntimeError):
+    """Zgłaszany w przypadku braku potwierdzenia rabatu Context Cache na Paczce 0."""
+    pass
+
+
 class MultimodalTranslator:
     _STATUS_LOCK = threading.Lock()
     _STATUS_ACTIVE: bool = False
@@ -2063,22 +2068,6 @@ class MultimodalTranslator:
         self.combined_glossary: Dict[str, str] = {}
         self.series_bible = None
 
-    def resolve_f1_thinking_budget(self, total_lines: int) -> int:
-        """
-        Wyznacza budżet myślenia CoT dla Fazy 1 (Adaptive F1 Thinking).
-        W trybie 'medium': 3072 CoT.
-        W trybie 'low': 0 CoT.
-        W trybie 'auto': 3072 CoT dla <= 360 linii (koszt <= 3.40 PLN netto), 0 CoT dla > 360 linii.
-        """
-        if self.thinking_f1_mode == "medium":
-            self.phase1_thinking_budget = 3072
-        elif self.thinking_f1_mode == "low":
-            self.phase1_thinking_budget = 0
-        else:  # auto
-            self.phase1_thinking_budget = 3072 if total_lines <= 360 else 0
-        return self.phase1_thinking_budget
-
-        
         # Translation Memory from subtitle corpus
         try:
             self.tm = TranslationMemory()
@@ -2109,6 +2098,57 @@ class MultimodalTranslator:
         # Default to 1-by-1 streaming pacing mode (eliminates TPU congestion and provides live instant updates)
         default_concurrency = 1
         self.concurrent_batches = int(os.getenv("CONCURRENT_BATCHES", str(default_concurrency)))
+
+    def resolve_f1_thinking_budget(self, total_lines: int) -> int:
+        """
+        Wyznacza budżet myślenia CoT dla Fazy 1 (Adaptive F1 Thinking).
+        W trybie 'medium': 3072 CoT.
+        W trybie 'low': 0 CoT.
+        W trybie 'auto': 3072 CoT dla <= 360 linii (koszt <= 3.40 PLN netto), 0 CoT dla > 360 linii.
+        """
+        if self.thinking_f1_mode == "medium":
+            self.phase1_thinking_budget = 3072
+        elif self.thinking_f1_mode == "low":
+            self.phase1_thinking_budget = 0
+        else:  # auto
+            self.phase1_thinking_budget = 3072 if total_lines <= 360 else 0
+        return self.phase1_thinking_budget
+
+    def _audit_batch0_context_cache(self, cached_tokens: int) -> None:
+        """
+        Audyt telemetrii Context Cache na Paczce 0 (INC-AVT-057).
+        Potwierdza rabat -95% przy cached_tokens >= 32768 lub wyzwala Fail-Fast Cost Circuit Breaker przy 0.
+        """
+        if cached_tokens >= 32768:
+            print(f"\n  💰 [Context Cache AKTYWNY]: Serwer potwierdził CachedContent: {cached_tokens} tokenów (Rabat -95% aktywny) [Context Cache ACTIVE].")
+            logger.info(f"[Context Cache CONFIRMED]: Server confirmed CachedContent token count: {cached_tokens} (-95% input discount active)")
+        elif cached_tokens == 0:
+            print(
+                "\n  ⚠️ [Context Cache WARN / INC-AVT-057]: Serwer zwrócił 0 tokenów cache! Rabat serwerowy NIEAKTYWNY.\n"
+                "  🛑 [Context Cache HALT / INC-AVT-057]: Serwer zwrócił 0 tokenów cache! Rabat serwerowy NIEAKTYWNY.\n"
+                "     Kontynuacja tłumaczenia odcinka spowodowałaby naliczenie pełnej stawki 100% (~10-20 PLN zamiast ~0.50 PLN).\n"
+                "     Tłumacz natychmiast zatrzymuje pracę w celu ochrony budżetu.\n\n"
+                "     Diagnostyka:\n"
+                "     - Upewnij się, że długość promptu systemowego przekracza próg 32 768 tokenów.\n"
+                "     - Sprawdź status Google Context Caching API.\n"
+                "     - Aby wymusić tłumaczenie bez rabatu, uruchom z flagą: AVT_ALLOW_UNCACHED_BILLING=1"
+            )
+            logger.error("[Context Cache HALT / INC-AVT-057]: Google API returned 0 cached tokens for batch 0! Halting execution to prevent runaway costs.")
+            try:
+                from context_cache import ContextCacheManager
+                client_to_clean = getattr(self, "client", None)
+                if client_to_clean:
+                    ContextCacheManager.cleanup_all_active_caches(client_to_clean)
+            except Exception as e:
+                logger.debug(f"[Context Cache] Czyszczenie pamięci podręcznej zakończone wyjątkiem: {e}")
+
+            allow_uncached = os.getenv("AVT_ALLOW_UNCACHED_BILLING", "0").strip().lower() in ("1", "true", "yes")
+            if allow_uncached:
+                logger.warning("[Context Cache BYPASS / INC-AVT-057]: AVT_ALLOW_UNCACHED_BILLING aktywny. Kontynuacja tłumaczenia pomimo braku rabatu serwerowego.")
+            else:
+                raise ContextCacheDiscountError(
+                    "Brak aktywnego rabatu Context Cache (-95%) na Paczce 0. Tłumaczenie przerwane w celu ochrony budżetu."
+                )
 
     FEMALE_ROLE_KEYWORDS = FEMALE_ROLE_KEYWORDS
     MALE_ROLE_KEYWORDS = MALE_ROLE_KEYWORDS
@@ -4371,12 +4411,7 @@ class MultimodalTranslator:
                     _tl = getattr(self, "_thread_local", None)
                     _last_tu = getattr(_tl, "last_batch_token_usage", None) if _tl is not None else None
                     cached_tokens = _last_tu.get("cached", 0) if _last_tu else 0
-                    if cached_tokens >= 32768:
-                        print(f"\n  💰 [Context Cache AKTYWNY]: Serwer potwierdził CachedContent: {cached_tokens} tokenów (Rabat -95% aktywny) [Context Cache ACTIVE].")
-                        logger.info(f"[Context Cache CONFIRMED]: Server confirmed CachedContent token count: {cached_tokens} (-95% input discount active)")
-                    elif cached_tokens == 0:
-                        print("\n  ⚠️ [Context Cache OSTRZEŻENIE / INC-AVT-057]: Serwer zwrócił 0 tokenów cache! Rabat serwerowy NIEAKTYWNY (rozliczenie 100% stawki bazowej) [Context Cache WARN / INC-AVT-057].")
-                        logger.warning("[Context Cache WARN / INC-AVT-057]: Google API returned 0 cached tokens for batch 0! Billing at full rate.")
+                    self._audit_batch0_context_cache(cached_tokens)
 
         if self.flight_recorder:
             try:
@@ -6484,6 +6519,10 @@ class MultimodalTranslator:
                                         progress_callback(len(translated_results), total_lines, recent_prev, cur_c)
                                     except Exception:
                                         logger.debug("Wywołanie funkcji postępu zakończone wyjątkiem", exc_info=True)
+                            except ContextCacheDiscountError:
+                                for f in future_to_bidx:
+                                    f.cancel()
+                                raise
                             except Exception as e:
                                 pbar.write(f" 🔴 [Niepowodzenie Paczki]: {format_friendly_api_error(e)}")
                                 pbar.refresh()
@@ -6579,6 +6618,8 @@ class MultimodalTranslator:
                                     progress_callback(len(translated_results), total_lines, recent_prev, cur_c)
                                 except Exception:
                                     logger.debug("Wywołanie funkcji postępu zakończone wyjątkiem", exc_info=True)
+                        except ContextCacheDiscountError:
+                            raise
                         except Exception as e:
                             pbar.write(f" 🔴 [Niepowodzenie Paczki]: {format_friendly_api_error(e)}")
                             pbar.refresh()

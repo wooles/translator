@@ -4,8 +4,9 @@ Testy regresyjne i integracyjne Standardu 11.2.8 (T11.2.8):
 1. test_t11_2_8_adaptive_f1_thinking_budget: Adaptacyjny poziom myślenia Fazy 1 (3072 CoT dla <=360 linii, 0 CoT dla >360 linii).
 2. test_t11_2_8_anilist_resilience_and_lexicon_fallback: Nagłówki User-Agent/Origin/Referer i fallback do leksykonów (INC-AVT-056).
 3. test_t11_2_8_pricing_guard_f1_thinking_sync: Synchronizacja PricingGuard z poziomem CoT Fazy 1 (LOW ~2.21 PLN, MEDIUM ~3.32 PLN).
-4. test_t11_2_8_cache_ui_telemetry_gate: Bramka telemetrii rzeczywistego cache i eliminacja Phantom Cache Discount (INC-AVT-057).
-5. test_t11_2_8_multi_season_bible_hygiene: Izolacja wielosezonowa w _resolve_bible_path i higiena baz SeriesBible (INC-AVT-058).
+4. test_t11_2_8_cache_ui_telemetry_gate: Bramka telemetrii rzeczywistego cache, Hard Halt (ContextCacheDiscountError) i eliminacja Phantom Cache Discount (INC-AVT-057).
+5. test_t11_2_8_cache_ui_telemetry_bypass: Weryfikacja flagi obejścia AVT_ALLOW_UNCACHED_BILLING=1.
+6. test_t11_2_8_multi_season_bible_hygiene: Izolacja wielosezonowa w _resolve_bible_path i higiena baz SeriesBible (INC-AVT-058).
 """
 
 import json
@@ -20,7 +21,7 @@ import pytest
 from metadata import ExternalGenderResolver
 from pricing_guard import PricingGuard
 from series_memory import SeriesBible
-from translator import MultimodalTranslator, _resolve_bible_path
+from translator import MultimodalTranslator, ContextCacheDiscountError, _resolve_bible_path
 
 
 @pytest.mark.unit
@@ -215,8 +216,8 @@ def test_t11_2_8_pricing_guard_f1_thinking_sync():
 def test_t11_2_8_cache_ui_telemetry_gate(capsys):
     """
     Weryfikuje, że w przypadku braku potwierdzenia tokenów buforowanych na Paczce 0
-    (cached_content_token_count == 0) wyzwalane jest jawne ostrzeżenie INC-AVT-057,
-    a fałszywy komunikat o rabacie -95% jest blokowany.
+    (cached_content_token_count == 0) wyzwalane jest jawne zatrzymanie INC-AVT-057
+    (ContextCacheDiscountError), a fałszywy komunikat o rabacie -95% jest blokowany.
     """
     translator = MultimodalTranslator(
         api_key="dummy_api_key_test_12345",
@@ -224,7 +225,7 @@ def test_t11_2_8_cache_ui_telemetry_gate(capsys):
         enable_verifier=False
     )
 
-    # 1. Symulacja Paczki 0 z cached == 0 (awaria serwerowego buforowania)
+    # 1. Symulacja Paczki 0 z cached == 0 (awaria serwerowego buforowania -> Hard Halt)
     translator._thread_local.last_batch_token_usage = {
         "prompt": 55000,
         "cached": 0,
@@ -233,40 +234,42 @@ def test_t11_2_8_cache_ui_telemetry_gate(capsys):
     }
     translator._batch0_cache_telemetry_reported = False
 
-    # Wywołanie audytu na Paczce 0
-    _tl = getattr(translator, "_thread_local", None)
-    _last_tu = getattr(_tl, "last_batch_token_usage", None)
-    cached_tokens = _last_tu.get("cached", 0) if _last_tu else 0
+    with pytest.raises(ContextCacheDiscountError) as exc_info:
+        translator._audit_batch0_context_cache(0)
+    assert "Brak aktywnego rabatu Context Cache" in str(exc_info.value)
 
-    if not translator._batch0_cache_telemetry_reported:
-        translator._batch0_cache_telemetry_reported = True
-        if cached_tokens >= 32768:
-            print(f"\n  [Context Cache ACTIVE]: Server confirmed CachedContent token count: {cached_tokens} (-95% input discount active)")
-        elif cached_tokens == 0:
-            print("\n  [Context Cache WARN / INC-AVT-057]: Google API returned 0 cached tokens! Server discount INACTIVE (billing at full 100% rate). Check prompt length!")
-
-    captured_warn = capsys.readouterr().out
-    assert "[Context Cache WARN / INC-AVT-057]" in captured_warn
-    assert "(-95% input discount active)" not in captured_warn
+    captured_halt = capsys.readouterr().out
+    assert "[Context Cache HALT / INC-AVT-057]" in captured_halt or "[Context Cache WARN / INC-AVT-057]" in captured_halt
+    assert "(-95% input discount active)" not in captured_halt
 
     # 2. Symulacja Paczki 0 z aktywnym CachedContent >= 32768
     translator._batch0_cache_telemetry_reported = False
     translator._thread_local.last_batch_token_usage["cached"] = 53400
-    _last_tu = translator._thread_local.last_batch_token_usage
-    cached_tokens = _last_tu.get("cached", 0)
 
-    if not translator._batch0_cache_telemetry_reported:
-        translator._batch0_cache_telemetry_reported = True
-        if cached_tokens >= 32768:
-            print(f"\n  [Context Cache ACTIVE]: Server confirmed CachedContent token count: {cached_tokens} (-95% input discount active)")
-        elif cached_tokens == 0:
-            print("\n  [Context Cache WARN / INC-AVT-057]: Google API returned 0 cached tokens! Server discount INACTIVE (billing at full 100% rate). Check prompt length!")
-
+    translator._audit_batch0_context_cache(53400)
     captured_active = capsys.readouterr().out
-    assert "[Context Cache ACTIVE]" in captured_active
+    assert "[Context Cache ACTIVE]" in captured_active or "[Context Cache AKTYWNY]" in captured_active
     assert "53400" in captured_active
-    assert "(-95% input discount active)" in captured_active
-    assert "WARN" not in captured_active
+    assert "(-95% input discount active)" in captured_active or "Rabat -95% aktywny" in captured_active
+    assert "HALT" not in captured_active
+
+
+@pytest.mark.unit
+def test_t11_2_8_cache_ui_telemetry_bypass(monkeypatch, capsys):
+    """
+    Weryfikuje, że flaga środowiskowa AVT_ALLOW_UNCACHED_BILLING=1
+    pozwala pominąć twarde zatrzymanie potoku przy cached == 0.
+    """
+    monkeypatch.setenv("AVT_ALLOW_UNCACHED_BILLING", "1")
+    translator = MultimodalTranslator(
+        api_key="dummy_api_key_test_12345",
+        model="gemini-4-hydrogen",
+        enable_verifier=False
+    )
+    translator._audit_batch0_context_cache(0)
+    captured = capsys.readouterr().out
+    assert "[Context Cache HALT / INC-AVT-057]" in captured or "[Context Cache WARN / INC-AVT-057]" in captured
+    assert "AVT_ALLOW_UNCACHED_BILLING" in captured
 
 
 @pytest.mark.unit
