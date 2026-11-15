@@ -4,9 +4,9 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-15 — Standard 11.2.9 Certyfikowany Baseline)
-- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.9 (Permanent Resolution of INC-AVT-057 Context Cache HALT on Gemini 4 Hydrogen, MultiKey Implicit Replication & Canary Retry Gate)`
-- **Commit certyfikacji kodu:** `792cb97` (`792cb97a213e2bbddfba002bf0922883f3e9a184`)
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-15 — Standard 11.2.10 Certyfikowany Baseline)
+- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.10 (Comprehensive MultiKey Prefix & Continuous Sentinel Architecture — F1 + F2 Invariance, Deterministic Key-Affinity, Continuous Sentinel & Savings Ratio Governance)`
+- **Commit certyfikacji kodu:** `3539a8a` (`3539a8a7dbdca5db1cb64b22fec829391104e797`)
 - **Commity implementacyjne 11.1:** `5b7306d` (Commit 1), `5b17ea7` (Commit 2), `2b4bc7d` (Commit 3), `8b72887` (Commit 4), `8a7dd31` (Commit 5), `218af2e` (Commit 6)
 - **Commity Hotfixu 11.1.1:** `328729f` (Commit 1), `9de0b83` (Commit 2), `07c4684` (Commit 3), `96acac7` (Commit 4)
 - **Commity Hotfixu 11.1.2:** `74766d8` (Commit 1), `1b540e3` (Commit 2), `8313658` (Commit 3), `326b7e0` (Commit 4)
@@ -27,20 +27,24 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 - **Commity Standardu 11.2.6:** `c0361b8` (Commit 1), `35aefe9` (Commit 2), `9e5c8e6` (Commit 3)
 - **Commity Standardu 11.2.7:** `e501090` (Commit 1), `e63204e` (Commit 2), `ef6f884` (Commit 3)
 - **Commity Standardu 11.2.8:** `fcffa05` (Commit 1), `097054a` (Commit 2), `dfb73ad` (Commit 3)
-- **Commity Standardu 11.2.9:**
-  * Commit 1 (`e17e563`): `fix(cache): resolve Hydrogen implicit caching, add pool replication, warm-up ping and canary retry (11.2.9)`
-  * Commit 2 (`792cb97`): `test(cache): certify implicit cache warm-up and canary retry resilience (11.2.9)` — **NOWY COMMIT CERTYFIKACJI KODU**
-  * Commit 3 (`HEAD`): `docs(release): certify Standard 11.2.9 and document INC-AVT-057 permanent resolution`
-- **Status 11.2.9:** `CERTIFIED / CLOSED (2026-11-15)`
-- **Commit ochrony Depuracji Legacy 1.0 (Z16):** `c197db73c3dabf887dddbf2337dc3a1d8cff598c` (`c197db7` — bezwzględne 0 B diffu na wszystkich plikach chronionych)
-- **Stan metryk:** `369 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `440 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 11/11, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
-- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (369/369 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
-- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.9` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
-- **Gałąź i Architektura:** `main` (Standard 11.2.9: Trwałe wyeliminowanie INC-AVT-057 Context Cache HALT na gemini-4-hydrogen poprzez ominięcie jawnego caches.create, pełną replikację implicit cache w MultiKeyClientPool, Pre-flight Warm-Up Ping w ensure_cache_ready, adaptacyjny Canary Warmup Retry w _process_single_batch, Certyfikacja Kodu `792cb97`, Baseline Z16 `c197db73c3dabf887dddbf2337dc3a1d8cff598c`, Zero-Literal Pure Positive Domain Invariant Architecture & Primary LLM Translation Authority)
+- **Commity Standardu 11.2.9:** `e17e563` (Commit 1), `792cb97` (Commit 2), `a4f8f30` (Commit 3)
+- **Commity Standardu 11.2.10:**
+  * Commit 1 (`195f151`): `feat(translator): enforce stable prefix contract for F1 (Filar A)`
+  * Commit 2 (`4a5620b`): `feat(client_factory): implement deterministic key-affinity and sequential warm-up (Filar C)`
+  * Commit 3 (`d3ccbbb`): `feat(translator): implement continuous cache sentinel with per-batch fail-fast (Filar B)`
+  * Commit 4 (`4373b99`): `feat(verifier): enforce F2 stable prefix, context growth cap and thread-safe telemetry (Filar D)`
+  * Commit 5 (`3539a8a`): `feat(pricing_guard): add end-to-end savings_ratio governance and cost audit` — **NOWY COMMIT CERTYFIKACJI KODU**
+  * Commit 6 (`HEAD`): `docs(release): certify Standard 11.2.10 — comprehensive cache architecture (F1 + F2, all keys, all batches)`
+- **Status 11.2.10:** `CERTIFIED / CLOSED (2026-11-15)`
+- **Commit ochrony Depuracji Legacy 1.0 (Z16):** `c197db73c3dabf887dddbf2337dc3a1d8cff598c` (`c197db7` — autoryzowany Z16-amendment #14 dla `verifier.py`, bezwzględne 0 B diffu na wszystkich pozostałych plikach chronionych)
+- **Stan metryk:** `385 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `456 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 11/11, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
+- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (385/385 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
+- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.10` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
+- **Gałąź i Architektura:** `main` (Standard 11.2.10: Kompleksowa architektura Context Cache dla F1 i F2: Filar A - Niezmienny Prefiks F1 >= 32k tok, Filar B - Ciągły Strażnik Bufora na każdej paczce z fail-fast i JIT retry, Filar C - Deterministyczny Key-Affinity Dispatcher i sekwencyjny rozgrzewacz, Filar D - Prefiks i sufit kontekstu F2 w DialogueVerifier pod Z16-amendment #14 z thread-local telemetrią, Filar E - Cost Governance PricingGuard z ratio >= 0.85 i celem <= 4.00 PLN netto)
 - **Środowisko:** Python 3.13 (`.venv`), Windows PowerShell, `ffmpeg` (PATH), `librosa.pyin`, `soundfile`, `pysubs2`, `spaCy en_core_web_sm` (100% offline 0.00 PLN), bezpośrednie klucze Google AI Studio API (`use_vertex = 0`).
 - **Dyrektywa Wykonawcza Testów:**
   * Testy przyrostowe podczas kodowania (< 2 s): `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_testu>"`
-  * Szybki pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest -q` (359 passed w tests/, 71 passed i 153 deselected w test_system.py)
+  * Szybki pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest -q` (385 passed w tests/, 71 passed i 153 deselected w test_system.py)
   * Audyt śledczy diffu: `powershell -ExecutionPolicy Bypass -File .\audit_diff.ps1 -ForbiddenTerms "<lista>"`
   * 4 bramki kwalifikacyjne: `python verify_purity.py`, `python verify_8_fixes.py`, `python verify_12_fixes.py`, `python verify_ultimate_pipeline.py`
 
@@ -476,6 +480,30 @@ Dodanie w `tools/consolidate_bibles.py` opcjonalnej flagi `--migrate-misplaced-s
   2. `client_factory.py`: Rejestracja `__IMPLICIT_CACHE_95__` w mapie cache `MultiKeyClientPool.init_replicated_cache` dla każdego klucza w puli.
   3. `context_cache.py`: Pre-flight Warm-Up Ping w `ensure_cache_ready` (1-tokenowe mikro-zapytanie z pełnym `system_instruction` rozgrzewające prefiks na każdym kluczu w puli).
   4. `translator.py`: Adaptacyjny Canary Warmup Retry na Paczce 0 w `_process_single_batch` (automatyczne jednorazowe ponowienie zapytania przy `cached_tokens == 0` na modelach Hydrogen przed audytem kosztowym).
+
+
+## 🏛️ ARB-061 / INC-AVT-059: Standard 11.2.10 — Kompleksowa Architektura Cache (F1 + F2, Key-Affinity, Continuous Sentinel & Savings Ratio Governance)
+
+- **Status:** `RESOLVED (Standard 11.2.10, commity 195f151, 4a5620b, d3ccbbb, 4373b99, 3539a8a, HEAD)`
+- **Zidentyfikowano:** Utrata rabatu Context Cache (-95%) w trakcie tłumaczenia pełnego odcinka (koszt rzeczywisty 18.48 PLN zamiast $\le 4.00$ PLN netto). Przyczyny źródłowe:
+  1. Zmienny prefiks F1 przez JIT character scoping i wstrzykiwanie reguł/historii przed rejestrem.
+  2. Brak key-affinity: losowy round-robin w MultiKeyClientPool kierował paczki na sloty bez rozgrzanego bufora.
+  3. Wybiórczy audyt telemetrii (wyłącznie Paczka 0 `b_idx == 0`); brak nadzoru nad paczkami $1..N$ i Fazą 2.
+  4. Niekontrolowany wzrost prefiksu F2 w `DialogueVerifier` (akumulacja historii i redundancja promptu systemowego).
+- **Commit certyfikacji kodu:** `3539a8a7dbdca5db1cb64b22fec829391104e797` (`3539a8a`)
+
+### Składowe Wdrożenia:
+1. **Filar A (Niezmienny Prefiks Promptu Fazy 1 — `translator.py`):**
+   Przeniesiono wszystkie statyczne bloki kontekstowe na początek promptu Fazy 1. Zastąpiono zmienny JIT Scoping alfabetycznie posortowanym rejestrem `self.character_registry`, gwarantując stabilny bajtowo prefiks o rozmiarze $\ge 33\,500$ tokenów. Wszystkie elementy zmienne per paczka (`focused_rules_str`, `history_context`, `lookahead_events`) przeniesiono za prefiks do sekcji `DYNAMIC_USER_SUFFIX`.
+2. **Filar B (Ciągły Strażnik Bufora — Continuous Cache Sentinel — `translator.py`):**
+   Zaimplementowano metodę `_audit_batch_context_cache(b_idx, cached_tokens, phase)` audytującą KAŻDĄ paczkę $0..N$ w Fazie 1 oraz Fazie 2. Usunięto flagę jednorazowości audytu. W przypadku `cached_tokens == 0` na modelach z rodziny Hydrogen uruchamiany jest automatyczny JIT Warmup Retry (1.2 s), a w razie niepowodzenia — natychmiastowe zatrzymanie potoku przez `os._exit(1)`.
+3. **Filar C (Deterministyczny Key-Affinity Dispatcher — `client_factory.py`, `context_cache.py`, `translator.py`):**
+   W `MultiKeyClientPool.get_client` wprowadzono parametr `affinity_idx`, deterministycznie mapujący paczkę na stały klucz w puli (`available_indices[affinity_idx % len(available_indices)]`). W `context_cache.py` wdrożono sekwencyjny rozgrzewacz Hydrogen pingujący każdy klucz z logowaniem `[MultiKey Warm-Up]`.
+4. **Filar D (Niezmienny Prefiks i Sufit Kontekstu F2 — `verifier.py`, `translator.py` / Z16-amendment #14):**
+   W `DialogueVerifier.verify_batch` ograniczono `history_context` do ostatnich 4 kwestii dialogowych i usunięto ~2.5k tokenów zduplikowanej doktryny reżyserskiej z `prompt_lines` (pozostawionej w `system_instruction`). Wprowadzono `self._thread_local = threading.local()` do izolacji telemetrii tokenów per wątek roboczy oraz przekazywanie `batch_idx` dla key-affinity.
+5. **Filar E / Governance (Audyt Efektywności i Sufit Kosztowy — `pricing_guard.py`, `translator.py`):**
+   W `PricingGuard.calculate_actual_cost_breakdown` dodano kalkulację wskaźnika efektywności `savings_ratio = round(savings_pln / max(0.01, standard_net_pln), 4)` oraz logowanie błędu krytycznego przy `savings_ratio < 0.85 and total_net_pln > 4.00`. W banerze końcowym potoku wyświetlana jest precyzyjna efektywność rabatu wraz z alertem nadzorczym.
+
 
 
 
