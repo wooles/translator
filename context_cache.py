@@ -185,8 +185,14 @@ class ContextCacheManager:
     def _get_client_id(client: Optional[Any]) -> str:
         """Extracts unique client identifier (API key hash or object id)."""
         if client:
-            if hasattr(client, "_api_client") and hasattr(client._api_client, "api_key") and client._api_client.api_key:
-                return hashlib.sha256(client._api_client.api_key.encode("utf-8")).hexdigest()[:8]
+            if hasattr(client, "_api_client") and hasattr(client._api_client, "api_key"):
+                k = getattr(client._api_client, "api_key", None)
+                if isinstance(k, str) and k.strip():
+                    return hashlib.sha256(k.encode("utf-8")).hexdigest()[:8]
+            if hasattr(client, "_api_key"):
+                k = getattr(client, "_api_key", None)
+                if isinstance(k, str) and k.strip():
+                    return hashlib.sha256(k.encode("utf-8")).hexdigest()[:8]
             return str(id(client))
         return "default"
 
@@ -240,19 +246,21 @@ class ContextCacheManager:
 
         from model_resolver import is_gemini_4_or_hydrogen_model
         if is_gemini_4_or_hydrogen_model(model):
-            # Ensure prompt meets the minimum token floor (>= 33,500 tokens) for Gemini 4 Hydrogen
-            system_instruction = ensure_cache_token_floor(system_instruction, client, model)
-        else:
-            estimated_tokens = len(system_instruction) // 4
-            if estimated_tokens < 4096:
-                logger.debug(
-                    "Pominięto tworzenie cache Gemini: oszacowany rozmiar (%d tokenów) poniżej progu 4096 tokenów",
-                    estimated_tokens,
-                )
-                return None
+            # Modele Hydrogen wspierają wyłącznie implicit caching - natychmiastowe mapowanie
+            content_hash = cls.get_content_hash(model, system_instruction, client=client, tag=tag)
+            with cls._LOCK:
+                _LOCAL_CACHE_REGISTRY[content_hash] = "__IMPLICIT_CACHE_95__"
+            return "__IMPLICIT_CACHE_95__"
+
+        estimated_tokens = len(system_instruction) // 4
+        if estimated_tokens < 4096:
+            logger.debug(
+                "Pominięto tworzenie cache Gemini: oszacowany rozmiar (%d tokenów) poniżej progu 4096 tokenów",
+                estimated_tokens,
+            )
+            return None
+
         if not hasattr(client, "caches") or not hasattr(client.caches, "create"):
-            if is_gemini_4_or_hydrogen_model(model):
-                return "__IMPLICIT_CACHE_95__"
             return None
 
         with cls._LOCK:
@@ -409,9 +417,26 @@ class ContextCacheManager:
 
         if hasattr(client, "init_replicated_cache"):
             mapping = client.init_replicated_cache(model, padded_instruction, tag=prompt_tag)
+            # Rozgrzewka implicit cache (Warm-Up Ping) na każdym kluczu w puli dla modeli Hydrogen
+            if is_gemini_4_or_hydrogen_model(model):
+                active_clients = client.get_active_clients() if hasattr(client, "get_active_clients") else [client]
+                for c in active_clients:
+                    try:
+                        warmup_cfg = types.GenerateContentConfig(
+                            system_instruction=padded_instruction,
+                            max_output_tokens=1,
+                            temperature=0.0
+                        )
+                        c.models.generate_content(
+                            model=model,
+                            contents="OK",
+                            config=warmup_cfg
+                        )
+                    except Exception as e:
+                        logger.debug(f"[Context Cache Warmup]: Błąd mikro-rozgrzewki klucza: {e}")
             first_name = next(iter(mapping.values()), None)
             if verbose and first_name:
-                print(f"  [Context Cache]: Zablokowano rabat serwerowy dla {model} ({prompt_tag}) na {len(mapping)} kluczach API.")
+                print(f"  [Context Cache]: Zablokowano i rozgrzano rabat serwerowy dla {model} ({prompt_tag}) na {len(mapping)} kluczach API.")
             return first_name or "cached_ready"
 
         if hasattr(client, "clients") and client.clients:

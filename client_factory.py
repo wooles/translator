@@ -328,7 +328,7 @@ class MultiKeyClientPool:
                 ttl_seconds=ttl_seconds,
                 tag=tag
             )
-            if cache_name and cache_name != "__IMPLICIT_CACHE_95__":
+            if cache_name:
                 self.register_cache(c, cache_name, tag=tag)
                 kh = self.get_client_key_hash(c)
                 mapping[kh] = cache_name

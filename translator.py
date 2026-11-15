@@ -4405,14 +4405,29 @@ class MultimodalTranslator:
         )
         elapsed_phase1 = round(max(0.0, time.perf_counter() - t0_phase1), 2)
 
-        # Dynamiczny audyt Context Cache na Paczce 0 / Canary Run (INC-AVT-057)
+        # Dynamiczny audyt Context Cache na Paczce 0 / Canary Run z filtrem Canary Warmup Retry (INC-AVT-057)
         if not getattr(self, "_batch0_cache_telemetry_reported", False):
             with self.lock:
                 if not getattr(self, "_batch0_cache_telemetry_reported", False):
-                    self._batch0_cache_telemetry_reported = True
                     _tl = getattr(self, "_thread_local", None)
                     _last_tu = getattr(_tl, "last_batch_token_usage", None) if _tl is not None else None
                     cached_tokens = _last_tu.get("cached", 0) if _last_tu else 0
+
+                    if cached_tokens == 0:
+                        from model_resolver import is_gemini_4_or_hydrogen_model
+                        if is_gemini_4_or_hydrogen_model(self.model_phase1):
+                            logger.info("[Context Cache Canary]: Wykryto cold-start na Paczce 0. Ponawianie zapytania w celu aktywacji rabatu serwerowego...")
+                            time.sleep(1.2)
+                            retry_resp = self._call_gemini_with_retry(
+                                contents=contents,
+                                schema_class=BatchTranslationResponse
+                            )
+                            _tl = getattr(self, "_thread_local", None)
+                            _last_tu = getattr(_tl, "last_batch_token_usage", None) if _tl is not None else None
+                            cached_tokens = _last_tu.get("cached", 0) if _last_tu else 0
+                            batch_response = retry_resp
+
+                    self._batch0_cache_telemetry_reported = True
                     self._audit_batch0_context_cache(cached_tokens)
 
         if self.flight_recorder:
@@ -4497,6 +4512,7 @@ class MultimodalTranslator:
             ambiguity_note = ""
             semiotic_layer = "spoken_on_screen"
             raw_addressee = None
+            raw_speaker_name = None
             has_audio_conflict = False
             has_ambiguity_conflict = False
             has_severe_trap = False
