@@ -3782,7 +3782,7 @@ class MultimodalTranslator:
 
     build_phase1_prompt = _prepare_batch_prompt
 
-    def _call_gemini_with_retry(self, contents: List[Any], schema_class) -> Any:
+    def _call_gemini_with_retry(self, contents: List[Any], schema_class, batch_idx: Optional[int] = None) -> Any:
         """
         Reliable API call with automated handling of rate limits (429) and server overloads (503).
         In Phase 1, seamlessly alternates and switches between the two highest Flash models
@@ -3825,7 +3825,10 @@ class MultimodalTranslator:
                     nonlocal cached_name, last_used_client
                     from client_factory import global_rate_limiter
                     global_rate_limiter.acquire()
-                    active_c = self.client_pool.get_client() if hasattr(self, "client_pool") and self.client_pool else self.client
+                    if hasattr(self, "client_pool") and self.client_pool:
+                        active_c = self.client_pool.get_client(affinity_idx=batch_idx)
+                    else:
+                        active_c = self.client
                     last_used_client = active_c
 
                     # Replikacja Cache per Klucz w MultiKeyPool (INC-AVT-057)
@@ -4368,7 +4371,8 @@ class MultimodalTranslator:
         t0_phase1 = time.perf_counter()
         batch_response = self._call_gemini_with_retry(
             contents=contents,
-            schema_class=BatchTranslationResponse
+            schema_class=BatchTranslationResponse,
+            batch_idx=b_idx
         )
         elapsed_phase1 = round(max(0.0, time.perf_counter() - t0_phase1), 2)
 
@@ -4387,7 +4391,8 @@ class MultimodalTranslator:
                             time.sleep(1.2)
                             retry_resp = self._call_gemini_with_retry(
                                 contents=contents,
-                                schema_class=BatchTranslationResponse
+                                schema_class=BatchTranslationResponse,
+                                batch_idx=b_idx
                             )
                             _tl = getattr(self, "_thread_local", None)
                             _last_tu = getattr(_tl, "last_batch_token_usage", None) if _tl is not None else None

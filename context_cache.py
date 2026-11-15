@@ -420,7 +420,7 @@ class ContextCacheManager:
             # Rozgrzewka implicit cache (Warm-Up Ping) na każdym kluczu w puli dla modeli Hydrogen
             if is_gemini_4_or_hydrogen_model(model):
                 active_clients = client.get_active_clients() if hasattr(client, "get_active_clients") else [client]
-                for c in active_clients:
+                for idx, c in enumerate(active_clients):
                     try:
                         warmup_cfg = types.GenerateContentConfig(
                             system_instruction=padded_instruction,
@@ -429,11 +429,12 @@ class ContextCacheManager:
                         )
                         c.models.generate_content(
                             model=model,
-                            contents="OK",
+                            contents="PING_WARMUP_INIT",
                             config=warmup_cfg
                         )
+                        logger.info(f"[Context Cache Warmup]: Pomyślnie rozgrzano bufor dla klucza {idx + 1}/{len(active_clients)} ({model}, {prompt_tag}).")
                     except Exception as e:
-                        logger.debug(f"[Context Cache Warmup]: Błąd mikro-rozgrzewki klucza: {e}")
+                        logger.debug(f"[Context Cache Warmup]: Błąd mikro-rozgrzewki klucza {idx + 1}: {e}")
             first_name = next(iter(mapping.values()), None)
             if verbose and first_name:
                 print(f"  [Context Cache]: Zablokowano i rozgrzano rabat serwerowy dla {model} ({prompt_tag}) na {len(mapping)} kluczach API.")

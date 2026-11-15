@@ -364,3 +364,14 @@ def test_prefix_invariance_f1():
     prefix1 = prompt1.split("--- REGULARNE WYTYCZNE")[0].strip()
     assert hashlib.sha256(prefix0.encode()).hexdigest() == hashlib.sha256(prefix1.encode()).hexdigest()
 
+
+@pytest.mark.unit
+def test_key_affinity_deterministic():
+    """Weryfikuje deterministyczne Key-Affinity w MultiKeyClientPool (Filar C)."""
+    from client_factory import MultiKeyClientPool
+    pool = MultiKeyClientPool(raw_keys="key_A,key_B,key_C")
+    assert pool.get_client(affinity_idx=0) is pool.get_client(affinity_idx=3)
+    assert pool.get_client(affinity_idx=1) is pool.get_client(affinity_idx=4)
+    assert pool.get_client(affinity_idx=0) is not pool.get_client(affinity_idx=1)
+
+

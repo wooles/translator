@@ -233,8 +233,8 @@ class MultiKeyClientPool:
                         self._cooldowns[idx] = time.monotonic() + 180.0
                         break
 
-    def get_client(self) -> genai.Client:
-        """Returns next healthy client in round-robin sequence."""
+    def get_client(self, affinity_idx: Optional[int] = None) -> genai.Client:
+        """Returns next healthy client in round-robin sequence or deterministically by affinity index."""
         import time
         with self._lock:
             now = time.monotonic()
@@ -245,8 +245,11 @@ class MultiKeyClientPool:
 
             available_indices = [i for i in range(len(self.clients)) if i not in self._cooldowns]
             if available_indices:
-                chosen_idx = available_indices[self._idx % len(available_indices)]
-                self._idx += 1
+                if affinity_idx is not None:
+                    chosen_idx = available_indices[affinity_idx % len(available_indices)]
+                else:
+                    chosen_idx = available_indices[self._idx % len(available_indices)]
+                    self._idx += 1
                 return self.clients[chosen_idx]
 
             # If all are cooling down, pick the one expiring soonest
