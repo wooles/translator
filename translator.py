@@ -2130,7 +2130,7 @@ class MultimodalTranslator:
             allow_uncached = os.getenv("AVT_ALLOW_UNCACHED_BILLING", "0").strip().lower() in ("1", "true", "yes")
             if allow_uncached:
                 print(
-                    f"\n  ⚠️ [Context Cache WARN / INC-AVT-057]: Serwer zwrócił 0 tokenów cache dla {phase} (paczka {b_idx})!\n"
+                    f"\n  ⚠️ [Context Cache WARN / INC-AVT-057]: Serwer zwrócił 0 tokenów cache! ({phase}, paczka {b_idx})\n"
                     "     Wykryto flagę AVT_ALLOW_UNCACHED_BILLING=1. Kontynuacja tłumaczenia pomimo braku rabatu serwerowego."
                 )
                 logger.warning(f"[Context Cache BYPASS / INC-AVT-057]: AVT_ALLOW_UNCACHED_BILLING aktywny. Kontynuacja tłumaczenia {phase} paczka {b_idx} pomimo braku rabatu serwerowego.")
@@ -2139,7 +2139,7 @@ class MultimodalTranslator:
             err_msg = (
                 "\n"
                 "========================================================================================\n"
-                f"  🛑 [Context Cache HALT / INC-AVT-057]: Serwer zwrócił 0 tokenów cache dla {phase} (paczka {b_idx})! Rabat serwerowy NIEAKTYWNY.\n"
+                f"  🛑 [Context Cache HALT / INC-AVT-057]: Serwer zwrócił 0 tokenów cache! Rabat serwerowy NIEAKTYWNY ({phase}, paczka {b_idx}).\n"
                 "     Kontynuacja tłumaczenia odcinka spowodowałaby naliczenie pełnej stawki 100% (~10-20 PLN zamiast ~0.50 PLN).\n"
                 "     Tłumacz natychmiast zatrzymuje pracę na poziomie jądra (os._exit(1)) w celu ochrony budżetu i eliminacji zombie workers.\n\n"
                 "     Diagnostyka:\n"
@@ -5254,7 +5254,6 @@ class MultimodalTranslator:
                         seen_p2_speaker_prosody[spk_name] = spk_prosody
                 prev_speaker_name = spk_name
 
-            p2_before = dict(getattr(self.verifier, "current_episode_tokens", {}) or {})
             t0_phase2 = time.perf_counter()
             phase2_focused_rules = get_focused_rules_for_batch(pass1_items, max_rules=3)
             refined_lines: List[RefinedLine] = self.verifier.verify_batch(
@@ -5269,16 +5268,14 @@ class MultimodalTranslator:
                 history_context=lookback_history,
                 lookahead_events=lookahead_events,
                 character_registry=self.character_registry,
-                scene_diagnosis=getattr(batch_response, "scene_diagnosis", None) if batch_response else None
+                scene_diagnosis=getattr(batch_response, "scene_diagnosis", None) if batch_response else None,
+                batch_idx=b_idx
             )
             elapsed_phase2 = round(max(0.0, time.perf_counter() - t0_phase2), 2)
-            p2_after = dict(getattr(self.verifier, "current_episode_tokens", {}) or {})
-            p2_tok_usage = {
-                "prompt": max(0, p2_after.get("prompt", 0) - p2_before.get("prompt", 0)),
-                "cached": max(0, p2_after.get("cached", 0) - p2_before.get("cached", 0)),
-                "output": max(0, p2_after.get("output", 0) - p2_before.get("output", 0)),
-                "model": p2_after.get("model") or getattr(self.verifier, "model", ""),
-            }
+            _vtl = getattr(self.verifier, "_thread_local", None)
+            p2_tok_usage = getattr(_vtl, "last_batch_token_usage", None) if _vtl else {}
+            p2_cached = p2_tok_usage.get("cached", 0) if p2_tok_usage else 0
+            self._audit_batch_context_cache(b_idx=b_idx, cached_tokens=p2_cached, phase="phase2")
             for r in refined_lines:
                 orig_it = next((it for it in pass1_items if it.get("id") == r.id), None)
                 if orig_it:

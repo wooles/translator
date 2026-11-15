@@ -394,4 +394,29 @@ def test_continuous_cache_sentinel_batch1_halt(monkeypatch):
     assert exit_calls == [1]
 
 
+@pytest.mark.unit
+def test_f2_context_growth_cap_and_sentinel(monkeypatch):
+    """Weryfikuje Filar D i Z16-amendment #14."""
+    import os
+    from verifier import DialogueVerifier
+    from translator import MultimodalTranslator, ContextCacheDiscountError
+
+    verifier = DialogueVerifier(model="gemini-4-hydrogen", lean=True)
+    long_history = [{"en": f"S{i}", "pl": f"Z{i}", "speaker": "A"} for i in range(10)]
+    prompt_text = verifier.verify_batch(batch_items=[{"id": 1, "en": "T", "pl": "T"}], history_context=long_history, return_prompt=True)
+    assert "S9" in prompt_text and "S6" in prompt_text and "S5" not in prompt_text
+
+    exit_calls = []
+    monkeypatch.setattr(os, "_exit", lambda code: exit_calls.append(code))
+    translator = MultimodalTranslator(api_key="mock_key", model="gemini-4-hydrogen", enable_verifier=False)
+    with pytest.raises(ContextCacheDiscountError):
+        translator._audit_batch_context_cache(b_idx=0, cached_tokens=0, phase="phase2")
+    assert exit_calls == [1]
+
+
+
+
+
+
+
 

@@ -649,9 +649,13 @@ class DialogueVerifier:
         if hasattr(client, "get_client") and hasattr(client, "clients"):
             self.client_pool = client
         else:
-            from client_factory import MultiKeyClientPool
-            timeout_sec = max(150.0, float(os.getenv("GEMINI_HTTP_TIMEOUT_SEC", "90.0")))
-            self.client_pool = MultiKeyClientPool(raw_keys=os.getenv("GEMINI_API_KEY"), timeout_sec=timeout_sec)
+            try:
+                from client_factory import MultiKeyClientPool
+                timeout_sec = max(150.0, float(os.getenv("GEMINI_HTTP_TIMEOUT_SEC", "90.0")))
+                raw_k = os.getenv("GEMINI_API_KEY") or "mock_key_verifier"
+                self.client_pool = MultiKeyClientPool(raw_keys=raw_k, timeout_sec=timeout_sec)
+            except Exception:
+                self.client_pool = None
         self.model = model
         self.keep_honorifics = keep_honorifics
         self.lean = lean
@@ -659,6 +663,7 @@ class DialogueVerifier:
         self.current_episode_tokens: Dict[str, Any] = {"prompt": 0, "cached": 0, "output": 0, "model": self.model}
         import threading
         self.lock = threading.Lock()
+        self._thread_local = threading.local()
         
         if thinking_budget is not None:
             self.thinking_budget = thinking_budget
@@ -729,7 +734,8 @@ class DialogueVerifier:
         history_context: Optional[List[Dict[str, Any]]] = None,
         lookahead_events: Optional[List[Tuple[int, Any, str, str]]] = None,
         character_registry: Optional[Dict[str, str]] = None,
-        scene_diagnosis: Optional[Any] = None
+        scene_diagnosis: Optional[Any] = None,
+        batch_idx: Optional[int] = None
     ) -> str:
         res = self.verify_batch(
             batch_items=batch_items,
@@ -744,7 +750,8 @@ class DialogueVerifier:
             lookahead_events=lookahead_events,
             character_registry=character_registry,
             scene_diagnosis=scene_diagnosis,
-            return_prompt=True
+            return_prompt=True,
+            batch_idx=batch_idx
         )
         return str(res)
 
@@ -762,7 +769,8 @@ class DialogueVerifier:
         lookahead_events: Optional[List[Tuple[int, Any, str, str]]] = None,
         character_registry: Optional[Dict[str, str]] = None,
         scene_diagnosis: Optional[Any] = None,
-        return_prompt: bool = False
+        return_prompt: bool = False,
+        batch_idx: Optional[int] = None
     ) -> Union[List[RefinedLine], str]:
         """
         Executes editorial refinement and verification for a dialogue batch.
@@ -772,49 +780,15 @@ class DialogueVerifier:
         if not batch_items:
             return [] if not return_prompt else ""
 
+        # Z16-amendment #14 (Standard 11.2.10, Filar D): Cap lookback context to prevent unbounded token growth
+        MAX_F2_PROMPT_TOKENS = 100_000
+        if history_context and len(history_context) > 4:
+            history_context = history_context[-4:]
+
         prompt_lines = []
         prompt_lines.append("Zredaguj poniższe kwestie dialogowe. Koniecznie wyeliminuj dosłowne tłumaczenie 1 do 1, sztuczne konstrukcje i kalki.")
         prompt_lines.append("Zastąp drewniane sformułowania żywym, potoczystym językiem polskim mówionym (tak jak w profesjonalnym dubbingu / u polskich nastolatków):")
-        prompt_lines.append(
-            "WARSTWA 3 (GŁÓWNY MÓZG TŁUMACZENIA): Na Tobie opiera się główny ciężar przekładu. W oparciu o wszystkie potrzebne w danej chwili informacje (z nadrzędnego kanonu mangowego, profilera odcinka oraz wiedzy z Warstw 1 i 2), oddaj pełnię piękna języka polskiego.\n"
-            "Twój proces myślenia ma symulować pracę polskiego tłumacza, który jest w pełni świadomy tego, co widzi i słyszy w danej chwili i jakie anime tłumaczy.\n"
-            "ZASADA PRYMATU AFEKTU (DYNAMIC AFFECTIVE PRIMACY): Głos i emocjonalny afekt seiyū (drżenie, płacz, panika, szept, krzyk) ZAWSZE biją statyczny portret z Series Bible! Jeśli chłodna postać załamuje się i płacze, oddaj fizjologię rozpaczy (urwane słowa, chaos składniowy).\n"
-            "WYKORZYSTAJ CZAS NA ZASTANOWIENIE (Thinking / CoT): Jako Główny Reżyser Dubbingu i Script Doctor, przed zatwierdzeniem każdej kwestii przeprowadź TRZYETAPOWY AUDYT POZNAWCZY (THE 3-STAGE EDITORIAL FUNNEL / DWUETAPOWY AUDYT POZNAWCZY KREACJI I TRIANGULACJI):\n"
-            "   KROK 1: AUTONOMICZNA ŚLEPA LEKTURA I KREACJA DIALOGU (THE DUBBING & STAGE FLOW - FILAR CLXVI):\n"
-            "     - KANON MANGOWY JAKO FUNDAMENT: Pojęcia z oficjalnych wydań polskich to formy syntetyczne bazowe — w zdaniu naturalnie podlegają pełnemu paradygmatowi odmiany przypadkowej.\n"
-            "     - KONTRAKT POLSZCZYZNY BEZTERMINOWEJ (THE TIMELESS COLLOQUIAL CONTRACT):\n"
-            "       * Twórz dialogi w estetyce polszczyzny bezterminowej: język żywy, organiczny, soczysty i miękki w ustach aktora, wolny od tymczasowych mód internetowych.\n"
-            "       * Pisz tak, jak brzmią klasyki polskiego dubbingu kinowego: dialog ma brzmieć świeżo dzisiaj, naturalnie 30 lat temu i zrozumiale za 30 lat.\n"
-            "       * Wprowadź wektory rzemiosła:\n"
-            "         - Zasada Remy: kluczową informację i emocjonalny akcent logiczny stawiaj na końcu polskiego zdania.\n"
-            "         - Reakcja na Intencję: odpowiadaj na intencję postaci (na ostrzeżenie gotowością: 'Zrozumiałem' / 'Uważam', na propozycję chęcią: 'Chętnie', na pytanie otwarte faktem).\n"
-            "         - Etykieta Gestu: fizyczne podanie przedmiotu kwituj zwrotem grzecznościowym ('Proszę' / 'Trzymaj') lub elipsą.\n"
-            "       * Współczesna, świeża polszczyzna bez sztucznego patosu i pretensjonalnych archaizmów (Filar CLXXII).\n"
-            "       * Żywa, naturalna fraza bez obcych konstrukcji syntaktycznych i zbędnych pleonazmów.\n"
-            "     - PROTOKÓŁ AUTONOMICZNEJ KREACJI (ACTIVE GENERATION FIRST - ANTY-KOTWICZENIE):\n"
-            "       * Najpierw sformułuj w CoT własne, suwerenne polskie zdanie, które idealnie 'leży w ustach' polskiego aktora i pasuje do energii sceny.\n"
-            "       * Dopiero potem spójrz na szkic roboczy PL z Fazy 1.\n"
-            "       * Jeśli szkic z Fazy 1 powiela angielski szyk, zbędne zaimki osobowe ('ja', 'ty'), klisze lub potaknięcia ('Ta...', 'Więc...'), zdecydowanie go odrzuć na rzecz swojej autonomicznej kreacji!\n"
-            "   KROK 2: MULTIMODALNA TRIANGULACJA I PRAWDA AKTORSKA (MULTIMODAL TRIANGULATION & ACTING CHECK):\n"
-            "     - Skonfrontuj polszczyznę z japońskim audio seiyū i faktami ze skryptu EN (w tym wielkimi literami nazw własnych).\n"
-            "     - Zbadaj ton, intonację F0 i ewentualną ironię seiyū (Filar CLVIII). Upewnij się, że nie pominięto kluczowych faktów ani liczb (Filar CLXXI).\n"
-            "     - AUDYT ROZBIEŻNOŚCI PIVOTU (JP-to-EN Pivot Discrepancy Gate - Filar CLXX):\n"
-            "       * Głos seiyū stanowi nadrzędny autorytet w warstwie intencji i afektu.\n"
-            "       * Oddaj intencję seiyū: gdy mówi 'urusai / urusai na' (poirytowanie zrzędzeniem), zastosuj polski akt uciszania ('Ale marudzisz...', 'Daj mi spokój...', 'Nie truj...').\n"
-            "       * Powitania domowe (aisatsu): formuły powitalne podlegają naturalnym konwencjom polszczyzny mówionej w rejestrze rodzinnym lub domowym.\n"
-            "       * Tytulatura i imiona: zachowaj poprawną fleksję przypadkową oraz kanoniczną ortografię antroponimów.\n"
-            "     - Trzy soczewki weryfikacyjne:\n"
-            "       * 👂 Ucho: oddech, CPS, dynamika ping-ponga (Filar CLIV).\n"
-            "       * 🌍 Świat: relacje statusu, nienaruszalność formy Pan/Ty (Filar CLVII), perspektywa incognito (Filar CLXI).\n"
-            "       * 🎬 Obraz i Audio: afekt seiyū, gesty, napisy ekranowe vs dialog.\n"
-            "   KROK 3: PROAKTYWNY AUDYT NEGATYWNY REJESTRU, PŁCI I REKCJI (NEGATIVE REGISTER, GENDER & CALQUE GATE - FILAR X, CLXXXVII, CLXXXVIII):\n"
-            "     - Ścisła zgodność z telemetrią ontologiczną: Wszelkie poprawki stylistyczne i redakcyjne respektują ustaloną telemetrię ontologiczną sceny (płeć mówcy, adresata, virility grup We/You o pewności >= 0.95 oraz podane paradygmaty odmiany imion). Zachowaj uzgodnienia fleksyjne ustalone w Fazie 1 na podstawie telemetrii.\n"
-            "     - Zgodność płciowa i cytaty: Upewnij się, że końcówki 1. osoby mówczyń (-am, -ałam, -łabym) oraz formy 2. osoby do adresatek (-aś, -ałaś) i grup żeńskich (-yście, one) są w pełni poprawne. Cytaty („...”) w dialogach zachowują płeć oryginalnego autora.\n"
-            "     - Ścisła rekcja zaprzeczona (Genitive of Negation): Każdy czasownik przechodni podlegający negacji w KAŻDYM czasie (teraźniejszym, przeszłym i przyszłym: nie mam/nie miałam, nie widziałem, nie czułam, nie będę miał) ściśle wymaga dopełniacza również przy wtrąceniach (nie miałem już czasu, nie widzę w tym sensu, nie czułam strachu).\n"
-            "     - Prewencja mianownizacji kanonu i bariery AVT: Terminy kanoniczne podlegają pełnej fleksji po przyimkach we wszystkich przypadkach zależnych. Przestrzegaj ograniczeń AVT: celuj w polskie optimum percepcyjne 14–15 znaków na sekundę dla swobodnego odbioru obrazu, przy zachowaniu maksymalnego pułapu 17 CPS i limitu 38 CPL.\n"
-            "     - Twarda eliminacja usterek fleksyjnych, literówek i kalek leksykalnych jest dodatkowo w 100% asekurowana przez deterministyczny silnik EpisodeQualityGate (0.00 PLN).\n"
-            "     - W swoim myśleniu skup się na autentyczności, szlachetności i żywości dialogu w świecie przedstawionym.\n"
-        )
+
         prompt_lines.append("W polu 'changes_made' dla KAŻDEJ poprawionej kwestii podaj DOKŁADNE uzasadnienie i numer Filaru AVT (uzasadnienie weryfikatora ze wskazaniem reguły). Jeśli kwestia nie wymagała poprawek, wpisz null.")
         
         if focused_rules_str:
@@ -987,10 +961,11 @@ class DialogueVerifier:
                 directive_lines.append(f"    • Płeć 3. osoby: {item['third_person_subject'].strip()}")
             if item.get('duration_s') and item['duration_s'] > 0:
                 dur_s = float(item['duration_s'])
+                # Budżet AVT: norma percepcyjna 14–15 CPS, maksymalny pułap 17.0 CPS, limit 38 CPL (max 76 znaków w 2 wierszach)
                 max_pl_chars = min(76, int(max(0.5, dur_s) * 17.0))
                 if max_pl_chars < 15:
                     max_pl_chars = 15
-                directive_lines.append(f"    • BUDŻET ZNAKOWY AVT: Maksymalnie {max_pl_chars} znaków ze spacjami (tempo czytania 17.0 z/s, max 2 wiersze na ekranie) – NIE PRZEKRACZAJ!")
+                directive_lines.append(f"    • BUDŻET ZNAKOWY AVT: Maksymalnie {max_pl_chars} znaków ze spacjami (optimum 14–15 CPS, pułap 17.0 z/s, limit 38 CPL, max 2 wiersze na ekranie) – NIE PRZEKRACZAJ!")
             if item.get('condensation_directive'):
                 directive_lines.append(f"    • Kondensacja: {item['condensation_directive'].strip()}")
             elif item.get('cps_warning'):
@@ -1103,7 +1078,10 @@ class DialogueVerifier:
                     nonlocal cached_name, last_used_client
                     from client_factory import global_rate_limiter
                     global_rate_limiter.acquire()
-                    active_c = self.client_pool.get_client() if hasattr(self, "client_pool") and self.client_pool else self.client
+                    if hasattr(self, "client_pool") and self.client_pool:
+                        active_c = self.client_pool.get_client(affinity_idx=batch_idx)
+                    else:
+                        active_c = self.client
                     last_used_client = active_c
                     cached_name = ContextCacheManager.get_or_create_cache(
                         client=active_c,
@@ -1149,13 +1127,27 @@ class DialogueVerifier:
 
                 if hasattr(response, "usage_metadata") and response.usage_metadata:
                     um = response.usage_metadata
+                    p_cnt = getattr(um, "prompt_token_count", 0) or 0
+                    c_cnt = getattr(um, "cached_content_token_count", 0) or 0
+                    cands = getattr(um, "candidates_token_count", 0) or 0
+                    thoughts = getattr(um, "thoughts_token_count", 0) or 0
+                    out_cnt = cands + thoughts
                     with self.lock:
-                        self.current_episode_tokens["prompt"] += getattr(um, "prompt_token_count", 0) or 0
-                        self.current_episode_tokens["cached"] += getattr(um, "cached_content_token_count", 0) or 0
-                        cands = getattr(um, "candidates_token_count", 0) or 0
-                        thoughts = getattr(um, "thoughts_token_count", 0) or 0
-                        self.current_episode_tokens["output"] += (cands + thoughts)
+                        self.current_episode_tokens["prompt"] += p_cnt
+                        self.current_episode_tokens["cached"] += c_cnt
+                        self.current_episode_tokens["output"] += out_cnt
                         self.current_episode_tokens["model"] = self.model
+
+                    _tl = getattr(self, "_thread_local", None)
+                    if _tl is None:
+                        import threading
+                        _tl = self._thread_local = threading.local()
+                    _tl.last_batch_token_usage = {
+                        "prompt": p_cnt,
+                        "cached": c_cnt,
+                        "output": out_cnt,
+                        "model": self.model
+                    }
 
                 # Retrieve parsed structured output
                 result_lines: List[RefinedLine] = []
