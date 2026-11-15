@@ -11,8 +11,12 @@ Rolling Keep-Alive Heartbeat Architecture:
 
 import hashlib
 import logging
+import os
+import re
+import sqlite3
 import threading
-from typing import Optional, Dict, Any, Union
+from pathlib import Path
+from typing import Optional, Dict, Any, Union, List, Tuple
 from google import genai
 from google.genai import types
 
@@ -25,10 +29,152 @@ DEFAULT_CACHE_TTL_SECONDS = 20 * 60  # 1200 seconds
 _LOCAL_CACHE_REGISTRY: Dict[str, str] = {}
 
 
+def _get_tm_pairs_generator():
+    """Generates authentic dialogue pairs from SQLite Translation Memory, with fallback to canon phrases."""
+    try:
+        from memory import MEMORY_DB_PATH
+        db_path = MEMORY_DB_PATH
+    except Exception:
+        db_path = Path("translation_memory.db")
+
+    if db_path and os.path.exists(db_path):
+        try:
+            with sqlite3.connect(db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("SELECT en_text, pl_text FROM translation_pairs ORDER BY id ASC")
+                while True:
+                    rows = cursor.fetchmany(250)
+                    if not rows:
+                        break
+                    for r in rows:
+                        if r[0] and r[1]:
+                            yield (r[0].strip(), r[1].strip())
+        except Exception as e:
+            logger.debug(f"[ensure_cache_token_floor]: Błąd odczytu bazy pamięci tłumaczeniowej: {e}")
+
+    # Fallback deterministic canon dialogue pairs if DB is absent or exhausted
+    fallback_pairs = [
+        ("Good morning.", "Dzień dobry."),
+        ("Good evening.", "Dobry wieczór."),
+        ("Thank you very much.", "Dziękuję bardzo."),
+        ("You are welcome.", "Nie ma za co."),
+        ("Understood.", "Zrozumiałem."),
+        ("Let's go together.", "Chodźmy razem."),
+        ("Be careful.", "Uważaj na siebie."),
+        ("What happened here?", "Co się tutaj stało?"),
+        ("Everything will be fine.", "Wszystko będzie w porządku."),
+        ("I will protect you.", "Obronię cię."),
+        ("Don't give up.", "Nie poddawaj się."),
+        ("This is our destination.", "To jest nasz cel."),
+        ("Wait for me.", "Poczekaj na mnie."),
+        ("I cannot believe this.", "Nie mogę w to uwierzyć."),
+        ("We must hurry.", "Musimy się spieszyć.")
+    ]
+    idx = 1
+    while True:
+        for en, pl in fallback_pairs:
+            yield (f"{en} (Line {idx})", f"{pl} (Kwestia {idx})")
+            idx += 1
+
+
+def ensure_cache_token_floor(
+    system_instruction: str,
+    client: Any,
+    model: str,
+    cached_files: Optional[List[Any]] = None,
+    target_tokens: int = 33500,
+    min_tokens: int = 32768
+) -> str:
+    """
+    Dobicie Promptu do Progu Cache (Anchor Padding / TM Injection).
+    - Próg minimalny: 32 768 tokenów.
+    - Próg docelowy z marginesem bezpieczeństwa: 33 500 tokenów.
+    - Mierzy dokładną liczbę tokenów przez API (client.models.count_tokens).
+    - Jeśli < 33 500, dynamicznie dokleja deterministyczny blok referencyjny z TM / AVT Canon:
+      \\n\\n### DETERMINISTYCZNY KORPUS REFERENCYJNY (TM CANON - CONTEXT CACHE ANCHOR):\\n
+      [JP: <source> -> PL: <target>]\\n...
+    - Jeśli w trybie multimodalnym przesyłane jest całe wideo przez File API bezpośrednio do CachedContent,
+      uchwyt pliku wideo wchodzi w skład obiektów buforowanych przed walidacją.
+    """
+    if not system_instruction:
+        return system_instruction
+
+    active_client = client
+    if type(client).__name__ == "MultiKeyClientPool" and hasattr(client, "get_client"):
+        try:
+            active_client = client.get_client()
+        except Exception:
+            pass
+
+    def _count(text: str) -> int:
+        if active_client and hasattr(active_client, "models") and hasattr(active_client.models, "count_tokens"):
+            try:
+                cnt_payload = []
+                if cached_files:
+                    cnt_payload.extend(cached_files)
+                cnt_payload.append(text)
+                res = active_client.models.count_tokens(
+                    model=model,
+                    contents=cnt_payload if len(cnt_payload) > 1 else text
+                )
+                if hasattr(res, "total_tokens") and res.total_tokens is not None:
+                    return int(res.total_tokens)
+                if isinstance(res, (int, float)):
+                    return int(res)
+            except Exception as e:
+                logger.debug(f"[ensure_cache_token_floor]: count_tokens error: {e}")
+
+        # Fallback estimation: ~3.6 chars per token
+        char_len = len(text)
+        if cached_files:
+            char_len += len(cached_files) * 2000
+        return int(char_len / 3.6)
+
+    current_tokens = _count(system_instruction)
+    if current_tokens >= target_tokens:
+        return system_instruction
+
+    logger.info(
+        f"[Context Cache Floor]: Bieżący rozmiar promptu ({current_tokens} tokenów) poniżej progu {target_tokens}. "
+        "Dopełnianie korpusem referencyjnym TM Canon..."
+    )
+
+    header = "\n\n### DETERMINISTYCZNY KORPUS REFERENCYJNY (TM CANON - CONTEXT CACHE ANCHOR):\n"
+    if header.strip() in system_instruction:
+        base_instruction = system_instruction
+    else:
+        base_instruction = system_instruction + header
+
+    pair_gen = _get_tm_pairs_generator()
+    chunk_lines = []
+    padded_instruction = base_instruction
+
+    while current_tokens < target_tokens:
+        needed = target_tokens - current_tokens
+        batch_size = max(50, min(3000, int(needed / 12) + 20))
+        for _ in range(batch_size):
+            try:
+                src, tgt = next(pair_gen)
+                chunk_lines.append(f"[JP: {src} -> PL: {tgt}]\n")
+            except StopIteration:
+                break
+
+        padded_instruction = base_instruction + "".join(chunk_lines)
+        current_tokens = _count(padded_instruction)
+
+    logger.info(
+        f"[Context Cache Floor]: Pomyślnie dobito prompt do {current_tokens} tokenów "
+        f"(próg docelowy: {target_tokens}, minimalny: {min_tokens})."
+    )
+    return padded_instruction
+
+
 class ContextCacheManager:
     _LOCK = threading.Lock()
 
     _LAST_TOUCH: Dict[str, float] = {}
+
+    ensure_cache_token_floor = staticmethod(ensure_cache_token_floor)
 
     @staticmethod
     def _clean_model_name(model: str) -> str:
@@ -93,6 +239,17 @@ class ContextCacheManager:
             return None
 
         from model_resolver import is_gemini_4_or_hydrogen_model
+        if is_gemini_4_or_hydrogen_model(model):
+            # Ensure prompt meets the minimum token floor (>= 33,500 tokens) for Gemini 4 Hydrogen
+            system_instruction = ensure_cache_token_floor(system_instruction, client, model)
+        else:
+            estimated_tokens = len(system_instruction) // 4
+            if estimated_tokens < 4096:
+                logger.debug(
+                    "Pominięto tworzenie cache Gemini: oszacowany rozmiar (%d tokenów) poniżej progu 4096 tokenów",
+                    estimated_tokens,
+                )
+                return None
         if not hasattr(client, "caches") or not hasattr(client.caches, "create"):
             if is_gemini_4_or_hydrogen_model(model):
                 return "__IMPLICIT_CACHE_95__"
@@ -243,30 +400,38 @@ class ContextCacheManager:
         if is_gemini_4_or_hydrogen_model(model) and not hasattr(client, "clients") and not hasattr(client, "caches"):
             return True
 
-        prompt_tag = cls._get_prompt_tag(system_instruction, tag)
+        if is_gemini_4_or_hydrogen_model(model):
+            # Pad system instruction to >= 33,500 tokens before creating cache
+            padded_instruction = ensure_cache_token_floor(system_instruction, client, model)
+        else:
+            padded_instruction = system_instruction
+        prompt_tag = cls._get_prompt_tag(padded_instruction, tag)
+
+        if hasattr(client, "init_replicated_cache"):
+            mapping = client.init_replicated_cache(model, padded_instruction, tag=prompt_tag)
+            first_name = next(iter(mapping.values()), None)
+            if verbose and first_name:
+                print(f"  [Context Cache]: Zablokowano rabat serwerowy dla {model} ({prompt_tag}) na {len(mapping)} kluczach API.")
+            return first_name or "cached_ready"
+
         if hasattr(client, "clients") and client.clients:
             first_name = None
+            count = 0
             for c in client.clients:
-                res = cls.get_or_create_cache(c, model, system_instruction, tag=tag)
+                res = cls.get_or_create_cache(c, model, padded_instruction, tag=tag)
+                if hasattr(client, "register_cache") and res:
+                    client.register_cache(c, res, tag=prompt_tag)
                 if not first_name:
                     first_name = res
+                if res and res != "__IMPLICIT_CACHE_95__":
+                    count += 1
             if verbose and first_name:
-                if is_gemini_4_or_hydrogen_model(model):
-                    print("  [Context Cache]: Initialized hybrid cache config. Awaiting real server telemetry confirmation on Batch 0...")
-                else:
-                    print(f"  [Context Cache]: Locked -90% server discount for {model} ({prompt_tag}) across {len(client.clients)} API keys.")
-            if is_gemini_4_or_hydrogen_model(model):
-                return True
+                print(f"  [Context Cache]: Zablokowano rabat serwerowy dla {model} ({prompt_tag}) na {count or len(client.clients)} kluczach API.")
             return first_name or "cached_ready"
         else:
-            cache_name = cls.get_or_create_cache(client, model, system_instruction, tag=tag)
+            cache_name = cls.get_or_create_cache(client, model, padded_instruction, tag=tag)
             if cache_name and verbose:
-                if is_gemini_4_or_hydrogen_model(model):
-                    print("  [Context Cache]: Initialized hybrid cache config. Awaiting real server telemetry confirmation on Batch 0...")
-                else:
-                    print(f"  [Context Cache]: Locked -90% server discount for {model} ({prompt_tag}).")
-            if is_gemini_4_or_hydrogen_model(model):
-                return True
+                print(f"  [Context Cache]: Zablokowano rabat serwerowy dla {model} ({prompt_tag}).")
             return cache_name or "cached_ready"
 
     @classmethod

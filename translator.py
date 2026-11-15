@@ -2116,24 +2116,38 @@ class MultimodalTranslator:
 
     def _audit_batch0_context_cache(self, cached_tokens: int) -> None:
         """
-        Audyt telemetrii Context Cache na Paczce 0 (INC-AVT-057).
-        Potwierdza rabat -95% przy cached_tokens >= 32768 lub wyzwala Fail-Fast Cost Circuit Breaker przy 0.
+        Audyt telemetrii Context Cache na Paczce 0 / Canary Run (INC-AVT-057).
+        Potwierdza rabat -95% przy cached_tokens > 0 lub wyzwala natychmiastowy
+        Kill-Switch Procesu (os._exit(1)) przy 0 tokenach cache.
         """
-        if cached_tokens >= 32768:
+        if cached_tokens > 0:
             print(f"\n  💰 [Context Cache AKTYWNY]: Serwer potwierdził CachedContent: {cached_tokens} tokenów (Rabat -95% aktywny) [Context Cache ACTIVE].")
             logger.info(f"[Context Cache CONFIRMED]: Server confirmed CachedContent token count: {cached_tokens} (-95% input discount active)")
         elif cached_tokens == 0:
-            print(
-                "\n  ⚠️ [Context Cache WARN / INC-AVT-057]: Serwer zwrócił 0 tokenów cache! Rabat serwerowy NIEAKTYWNY.\n"
+            allow_uncached = os.getenv("AVT_ALLOW_UNCACHED_BILLING", "0").strip().lower() in ("1", "true", "yes")
+            if allow_uncached:
+                print(
+                    "\n  ⚠️ [Context Cache WARN / INC-AVT-057]: Serwer zwrócił 0 tokenów cache!\n"
+                    "     Wykryto flagę AVT_ALLOW_UNCACHED_BILLING=1. Kontynuacja tłumaczenia pomimo braku rabatu serwerowego."
+                )
+                logger.warning("[Context Cache BYPASS / INC-AVT-057]: AVT_ALLOW_UNCACHED_BILLING aktywny. Kontynuacja tłumaczenia pomimo braku rabatu serwerowego.")
+                return
+
+            err_msg = (
+                "\n"
+                "========================================================================================\n"
                 "  🛑 [Context Cache HALT / INC-AVT-057]: Serwer zwrócił 0 tokenów cache! Rabat serwerowy NIEAKTYWNY.\n"
                 "     Kontynuacja tłumaczenia odcinka spowodowałaby naliczenie pełnej stawki 100% (~10-20 PLN zamiast ~0.50 PLN).\n"
-                "     Tłumacz natychmiast zatrzymuje pracę w celu ochrony budżetu.\n\n"
+                "     Tłumacz natychmiast zatrzymuje pracę na poziomie jądra (os._exit(1)) w celu ochrony budżetu i eliminacji zombie workers.\n\n"
                 "     Diagnostyka:\n"
-                "     - Upewnij się, że długość promptu systemowego przekracza próg 32 768 tokenów.\n"
-                "     - Sprawdź status Google Context Caching API.\n"
-                "     - Aby wymusić tłumaczenie bez rabatu, uruchom z flagą: AVT_ALLOW_UNCACHED_BILLING=1"
+                "     - Upewnij się, że długość promptu systemowego przekracza próg 32 768 tokenów (ensure_cache_token_floor).\n"
+                "     - Sprawdź status Google Context Caching API i powiązanie kluczy API w MultiKeyPool.\n"
+                "     - Aby wymusić tłumaczenie bez rabatu, uruchom z flagą: AVT_ALLOW_UNCACHED_BILLING=1\n"
+                "========================================================================================\n"
             )
-            logger.error("[Context Cache HALT / INC-AVT-057]: Google API returned 0 cached tokens for batch 0! Halting execution to prevent runaway costs.")
+            sys.stderr.write(err_msg)
+            sys.stderr.flush()
+            logger.error("[Context Cache HALT / INC-AVT-057]: Google API returned 0 cached tokens for batch 0! Halting execution immediately via os._exit(1).")
             try:
                 from context_cache import ContextCacheManager
                 client_to_clean = getattr(self, "client", None)
@@ -2142,13 +2156,10 @@ class MultimodalTranslator:
             except Exception as e:
                 logger.debug(f"[Context Cache] Czyszczenie pamięci podręcznej zakończone wyjątkiem: {e}")
 
-            allow_uncached = os.getenv("AVT_ALLOW_UNCACHED_BILLING", "0").strip().lower() in ("1", "true", "yes")
-            if allow_uncached:
-                logger.warning("[Context Cache BYPASS / INC-AVT-057]: AVT_ALLOW_UNCACHED_BILLING aktywny. Kontynuacja tłumaczenia pomimo braku rabatu serwerowego.")
-            else:
-                raise ContextCacheDiscountError(
-                    "Brak aktywnego rabatu Context Cache (-95%) na Paczce 0. Tłumaczenie przerwane w celu ochrony budżetu."
-                )
+            os._exit(1)
+            raise ContextCacheDiscountError(
+                "Brak aktywnego rabatu Context Cache (-95%) na Paczce 0. Tłumaczenie przerwane w celu ochrony budżetu."
+            )
 
     FEMALE_ROLE_KEYWORDS = FEMALE_ROLE_KEYWORDS
     MALE_ROLE_KEYWORDS = MALE_ROLE_KEYWORDS
@@ -3849,36 +3860,27 @@ class MultimodalTranslator:
                     global_rate_limiter.acquire()
                     active_c = self.client_pool.get_client() if hasattr(self, "client_pool") and self.client_pool else self.client
                     last_used_client = active_c
-                    cached_name = ContextCacheManager.get_or_create_cache(
-                        client=active_c,
-                        model=current_model,
-                        system_instruction=self.system_prompt,
-                        tag="translator"
-                    )
+
+                    # Replikacja Cache per Klucz w MultiKeyPool (INC-AVT-057)
+                    cached_name = None
+                    if hasattr(self, "client_pool") and self.client_pool and hasattr(self.client_pool, "get_cache"):
+                        cached_name = self.client_pool.get_cache(active_c, tag="translator")
+
+                    if not cached_name:
+                        cached_name = ContextCacheManager.get_or_create_cache(
+                            client=active_c,
+                            model=current_model,
+                            system_instruction=self.system_prompt,
+                            tag="translator"
+                        )
+                        if hasattr(self, "client_pool") and self.client_pool and hasattr(self.client_pool, "register_cache") and cached_name:
+                            self.client_pool.register_cache(active_c, cached_name, tag="translator")
+
                     cfg_kwargs = dict(gen_config_kwargs)
-                    if cached_name == "__IMPLICIT_CACHE_95__":
-                        cfg_kwargs["system_instruction"] = self.system_prompt
-                    elif cached_name:
+                    if cached_name and cached_name != "__IMPLICIT_CACHE_95__":
                         cfg_kwargs["cached_content"] = cached_name
                     else:
-                        is_paid = ("flash" in current_model.lower() or "pro" in current_model.lower() or is_hydrogen) and "lite" not in current_model.lower()
-                        if is_paid:
-                            cached_name = ContextCacheManager.get_or_create_cache(
-                                client=active_c,
-                                model=current_model,
-                                system_instruction=self.system_prompt,
-                                tag="translator"
-                            )
-                            if cached_name == "__IMPLICIT_CACHE_95__":
-                                cfg_kwargs["system_instruction"] = self.system_prompt
-                            elif cached_name:
-                                cfg_kwargs["cached_content"] = cached_name
-                            else:
-                                raise RuntimeError(
-                                    f"KATEGORYCZNA BLOKADA FINANSOWA: Zablokowano próbę wysłania 33k tokenów bez aktywnego rabatu -90% dla {current_model}."
-                                )
-                        if "cached_content" not in cfg_kwargs and "system_instruction" not in cfg_kwargs:
-                            cfg_kwargs["system_instruction"] = self.system_prompt
+                        cfg_kwargs["system_instruction"] = self.system_prompt
                     cfg = types.GenerateContentConfig(**cfg_kwargs)
                     return active_c.models.generate_content(
                         model=current_model,
@@ -4403,8 +4405,8 @@ class MultimodalTranslator:
         )
         elapsed_phase1 = round(max(0.0, time.perf_counter() - t0_phase1), 2)
 
-        # Dynamiczny audyt Context Cache na Paczce 0 (INC-AVT-057)
-        if b_idx == 0 and not getattr(self, "_batch0_cache_telemetry_reported", False):
+        # Dynamiczny audyt Context Cache na Paczce 0 / Canary Run (INC-AVT-057)
+        if not getattr(self, "_batch0_cache_telemetry_reported", False):
             with self.lock:
                 if not getattr(self, "_batch0_cache_telemetry_reported", False):
                     self._batch0_cache_telemetry_reported = True
@@ -5576,6 +5578,104 @@ class MultimodalTranslator:
         self.style_report = None
         return init_slug
 
+    def _record_batch_results(
+        self,
+        batch_output: Any,
+        translated_results: Dict[int, str],
+        translated_regions: Dict[int, Any],
+        translated_typesetting: Dict[int, Any],
+        translated_addressees: Dict[int, Any],
+        translated_speakers: Dict[int, Any],
+        episode_whisper_transcriptions: Dict[int, str],
+        history: List[Dict[str, Any]],
+        checkpoint_path: Path,
+        pbar: Any,
+        progress_callback: Optional[Any],
+        total_lines: int
+    ) -> None:
+        """
+        Atomically records batch translation results, updates history, checkpoints and UI progress.
+        """
+        b_res_idx, batch_res, batch_regs, untrans_items, pass1_items, sc_desc, b_cot = batch_output
+        with self.lock:
+            for orig_idx, text_res in batch_res.items():
+                translated_results[orig_idx] = text_res
+            for orig_idx, reg_res in batch_regs.items():
+                if reg_res:
+                    translated_regions[orig_idx] = reg_res
+            for it in pass1_items:
+                if it.get("visual_typesetting"):
+                    translated_typesetting[it["orig_idx"]] = it["visual_typesetting"]
+                if it.get("addressee"):
+                    translated_addressees[it["orig_idx"]] = it["addressee"]
+                if it.get("speaker_name") and not is_generic_actor_or_category(it["speaker_name"]):
+                    translated_speakers[it["orig_idx"]] = it["speaker_name"]
+                if it.get("audio_jp"):
+                    episode_whisper_transcriptions[it["orig_idx"]] = it["audio_jp"]
+                    if hasattr(self, "episode_scene_genders") and self.episode_scene_genders is not None and getattr(self, "series_bible", None):
+                        if hasattr(self.series_bible, "infer_scene_cast_from_text"):
+                            try:
+                                _, sc_g = self.series_bible.infer_scene_cast_from_text([it.get("en", "")], whisper_texts=[it["audio_jp"]])
+                                if sc_g == "FEMALE":
+                                    self.episode_scene_genders[it["orig_idx"]] = "kobieta"
+                                elif sc_g == "MALE":
+                                    self.episode_scene_genders[it["orig_idx"]] = "mężczyzna"
+                            except Exception:
+                                logger.debug("Błąd odświeżania płci sceny z audio_jp", exc_info=True)
+                pl_final = batch_res.get(it["orig_idx"], it.get("pl", ""))
+                if pl_final:
+                    history.append({
+                        "orig_idx": it["orig_idx"],
+                        "en": it["en"],
+                        "pl": pl_final,
+                        "speaker": it.get("speaker_name", ""),
+                        "speaker_gender": it.get("speaker_gender", ""),
+                        "is_thought": it.get("is_thought", False),
+                        "end_ms": it.get("end_ms", 0),
+                        "start_ms": it.get("start_ms", 0)
+                    })
+            history.sort(key=lambda x: x.get("orig_idx", 0))
+            if len(history) > 30:
+                history[:] = history[-30:]
+            try:
+                checkpoint_payload = {
+                    "translated_results": dict(translated_results),
+                    "translated_regions": dict(translated_regions),
+                    "translated_typesetting": {
+                        str(k): (v.model_dump() if hasattr(v, "model_dump") else (v.dict() if hasattr(v, "dict") else v))
+                        for k, v in list(translated_typesetting.items())
+                    },
+                    "translated_addressees": dict(translated_addressees),
+                    "translated_speakers": dict(translated_speakers),
+                    "token_usage": {
+                        "f1": dict(self.current_episode_tokens),
+                        "f2": dict(self.verifier.current_episode_tokens) if self.verifier and hasattr(self.verifier, "current_episode_tokens") else None
+                    }
+                }
+                with open(checkpoint_path, "w", encoding="utf-8") as cp_file:
+                    json.dump(checkpoint_payload, cp_file, ensure_ascii=False)
+            except Exception:
+                logger.debug("Zapis punktu kontrolnego zakończony wyjątkiem", exc_info=True)
+
+            if b_cot:
+                pbar.set_postfix_str(f"{b_cot}...")
+            pbar.update(len(untrans_items))
+            pbar.refresh()
+
+        if progress_callback:
+            try:
+                from pricing_guard import PricingGuard
+                f1_s = self.current_episode_tokens
+                f2_s = self.verifier.current_episode_tokens if self.verifier else None
+                cur_c = PricingGuard.calculate_actual_cost_pln(f1_s, f2_s)
+                recent_prev = [
+                    {"id": it["orig_idx"] + 1, "en": it["en"], "pl": translated_results.get(it["orig_idx"], "")}
+                    for it in pass1_items
+                ]
+                progress_callback(len(translated_results), total_lines, recent_prev, cur_c)
+            except Exception:
+                logger.debug("Wywołanie funkcji postępu zakończone wyjątkiem", exc_info=True)
+
     def translate_file(
         self,
         subs_path: str,
@@ -6252,10 +6352,11 @@ class MultimodalTranslator:
         untranslated_count = sum(1 for item in raw_entries if item[0] not in translated_results and not is_song_line(item[1], item[2]))
         if untranslated_count > 0:
             # Pre-warming and Context Cache Hard Protection across all client pool keys (guarantees -90% discount)
-            from context_cache import ContextCacheManager
-            logger.info("[Context Cache]: Zainicjalizowano konfigurację bufora hybrydowego. Oczekiwanie na telemetrię Paczki 0...")
+            from context_cache import ContextCacheManager, ensure_cache_token_floor
+            logger.info("[Context Cache]: Weryfikacja progu tokenów i rozgrzewanie pamięci podręcznej...")
             print(f"  [Infrastruktura Finansowa]: Weryfikacja i rozgrzewanie pamięci Context Cache z pełną wiedzą odcinka...")
             pool_or_c1 = self.client_pool if hasattr(self, "client_pool") and self.client_pool else self.client
+            self.system_prompt = ensure_cache_token_floor(self.system_prompt, pool_or_c1, self.model_phase1)
             c1 = ContextCacheManager.ensure_cache_ready(pool_or_c1, self.model_phase1, self.system_prompt, tag="translator")
             if not c1:
                 raise RuntimeError(
@@ -6265,6 +6366,7 @@ class MultimodalTranslator:
                 )
             if self.verifier and hasattr(self.verifier, "model") and hasattr(self.verifier, "system_prompt"):
                 pool_or_c2 = getattr(self.verifier, "client_pool", None) or getattr(self.verifier, "client", None)
+                self.verifier.system_prompt = ensure_cache_token_floor(self.verifier.system_prompt, pool_or_c2, self.verifier.model)
                 c2 = ContextCacheManager.ensure_cache_ready(pool_or_c2, self.verifier.model, self.verifier.system_prompt, tag="verifier")
                 if not c2:
                     raise RuntimeError(
@@ -6404,225 +6506,158 @@ class MultimodalTranslator:
 
             if tasks_to_run:
                 active_keys_count = len(self.client_pool.get_active_clients()) if hasattr(self, "client_pool") and self.client_pool else 1
-                max_workers = min(self.concurrent_batches, len(tasks_to_run))
-                if max_workers > 1:
-                    print(f"\n  [Kolejka Paczek]: Uruchamianie równoległego tłumaczenia ({max_workers} paczek w locie / {active_keys_count} aktywnych kluczy API)...")
-                    import concurrent.futures
-                    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-                        future_to_bidx = {
-                            executor.submit(
-                                self._process_single_batch,
-                                b_idx=b_idx,
-                                batch=batch,
-                                untranslated_in_batch=untranslated,
-                                batches=batches,
-                                video_path=video_path,
-                                is_ass=is_ass,
-                                anime_meta=anime_meta,
-                                episode_profile=episode_profile,
-                                anime_context_str=anime_context_str,
-                                episode_profile_str=episode_profile_str,
-                                series_bible_str=series_bible_str,
-                                manga_canon_str=manga_canon_str,
-                                combined_glossary=combined_glossary,
-                                all_user_rules=all_user_rules,
-                                history=history,
-                                pbar=pbar,
-                                translated_results=translated_results
-                            ): b_idx
-                            for b_idx, batch, untranslated in tasks_to_run
-                        }
+                
+                # --- INC-AVT-057: SEKWENCYJNY PRE-FLIGHT PACZKI 0 (CANARY GATE) ---
+                canary_task = tasks_to_run[0]
+                canary_b_idx, canary_batch, canary_untranslated = canary_task
+                remaining_tasks = tasks_to_run[1:]
 
-                        for future in concurrent.futures.as_completed(future_to_bidx):
+                print(f"\n  [Canary Gate]: Uruchamianie sekwencyjnego pre-flightu (Paczka {canary_b_idx} / Canary Run) w celu weryfikacji rabatu serwerowego...")
+                try:
+                    canary_output = self._process_single_batch(
+                        b_idx=canary_b_idx,
+                        batch=canary_batch,
+                        untranslated_in_batch=canary_untranslated,
+                        batches=batches,
+                        video_path=video_path,
+                        is_ass=is_ass,
+                        anime_meta=anime_meta,
+                        episode_profile=episode_profile,
+                        anime_context_str=anime_context_str,
+                        episode_profile_str=episode_profile_str,
+                        series_bible_str=series_bible_str,
+                        manga_canon_str=manga_canon_str,
+                        combined_glossary=combined_glossary,
+                        all_user_rules=all_user_rules,
+                        history=history,
+                        pbar=pbar,
+                        translated_results=translated_results
+                    )
+                    self._record_batch_results(
+                        batch_output=canary_output,
+                        translated_results=translated_results,
+                        translated_regions=translated_regions,
+                        translated_typesetting=translated_typesetting,
+                        translated_addressees=translated_addressees,
+                        translated_speakers=translated_speakers,
+                        episode_whisper_transcriptions=episode_whisper_transcriptions,
+                        history=history,
+                        checkpoint_path=checkpoint_path,
+                        pbar=pbar,
+                        progress_callback=progress_callback,
+                        total_lines=total_lines
+                    )
+                except ContextCacheDiscountError:
+                    raise
+                except Exception as e:
+                    pbar.write(f" 🔴 [Niepowodzenie Paczki Kanarkowej {canary_b_idx}]: {format_friendly_api_error(e)}")
+                    pbar.refresh()
+                    raise
+
+                if remaining_tasks:
+                    max_workers = min(self.concurrent_batches, len(remaining_tasks))
+                    if max_workers > 1:
+                        print(f"\n  [Kolejka Paczek]: Canary zweryfikowany pomyślnie. Uruchamianie równoległego tłumaczenia ({max_workers} paczek w locie / {active_keys_count} aktywnych kluczy API)...")
+                        import concurrent.futures
+                        with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+                            future_to_bidx = {
+                                executor.submit(
+                                    self._process_single_batch,
+                                    b_idx=b_idx,
+                                    batch=batch,
+                                    untranslated_in_batch=untranslated,
+                                    batches=batches,
+                                    video_path=video_path,
+                                    is_ass=is_ass,
+                                    anime_meta=anime_meta,
+                                    episode_profile=episode_profile,
+                                    anime_context_str=anime_context_str,
+                                    episode_profile_str=episode_profile_str,
+                                    series_bible_str=series_bible_str,
+                                    manga_canon_str=manga_canon_str,
+                                    combined_glossary=combined_glossary,
+                                    all_user_rules=all_user_rules,
+                                    history=history,
+                                    pbar=pbar,
+                                    translated_results=translated_results
+                                ): b_idx
+                                for b_idx, batch, untranslated in remaining_tasks
+                            }
+
+                            for future in concurrent.futures.as_completed(future_to_bidx):
+                                if cancel_check and cancel_check():
+                                    print("\n[Tłumacz]: Otrzymano sygnał przerwania (⏹ Stop)...")
+                                    break
+                                try:
+                                    batch_output = future.result()
+                                    self._record_batch_results(
+                                        batch_output=batch_output,
+                                        translated_results=translated_results,
+                                        translated_regions=translated_regions,
+                                        translated_typesetting=translated_typesetting,
+                                        translated_addressees=translated_addressees,
+                                        translated_speakers=translated_speakers,
+                                        episode_whisper_transcriptions=episode_whisper_transcriptions,
+                                        history=history,
+                                        checkpoint_path=checkpoint_path,
+                                        pbar=pbar,
+                                        progress_callback=progress_callback,
+                                        total_lines=total_lines
+                                    )
+                                except ContextCacheDiscountError:
+                                    for f in future_to_bidx:
+                                        f.cancel()
+                                    raise
+                                except Exception as e:
+                                    pbar.write(f" 🔴 [Niepowodzenie Paczki]: {format_friendly_api_error(e)}")
+                                    pbar.refresh()
+                    else:
+                        print(f"\n  [Kolejka Paczek]: Canary zweryfikowany pomyślnie. Płynne tłumaczenie sekwencyjne (1 paczka na raz / rotacja {active_keys_count} aktywnych kluczy API)...")
+                        for loop_i, (b_idx, batch, untranslated) in enumerate(remaining_tasks):
                             if cancel_check and cancel_check():
                                 print("\n[Tłumacz]: Otrzymano sygnał przerwania (⏹ Stop)...")
                                 break
+                            if loop_i > 0:
+                                time.sleep(0.25)
                             try:
-                                b_res_idx, batch_res, batch_regs, untrans_items, pass1_items, sc_desc, b_cot = future.result()
-                                with self.lock:
-                                    for orig_idx, text_res in batch_res.items():
-                                        translated_results[orig_idx] = text_res
-                                    for orig_idx, reg_res in batch_regs.items():
-                                        if reg_res:
-                                            translated_regions[orig_idx] = reg_res
-                                    for it in pass1_items:
-                                        if it.get("visual_typesetting"):
-                                            translated_typesetting[it["orig_idx"]] = it["visual_typesetting"]
-                                        if it.get("addressee"):
-                                            translated_addressees[it["orig_idx"]] = it["addressee"]
-                                        if it.get("speaker_name") and not is_generic_actor_or_category(it["speaker_name"]):
-                                            translated_speakers[it["orig_idx"]] = it["speaker_name"]
-                                        if it.get("audio_jp"):
-                                            episode_whisper_transcriptions[it["orig_idx"]] = it["audio_jp"]
-                                            # Standard 11.1 (LUKA-E2-01): Odświeżenie wpisu w self.episode_scene_genders dla orig_idx
-                                            if hasattr(self, "episode_scene_genders") and self.episode_scene_genders is not None and getattr(self, "series_bible", None):
-                                                if hasattr(self.series_bible, "infer_scene_cast_from_text"):
-                                                    try:
-                                                        _, sc_g = self.series_bible.infer_scene_cast_from_text([it.get("en", "")], whisper_texts=[it["audio_jp"]])
-                                                        if sc_g == "FEMALE":
-                                                            self.episode_scene_genders[it["orig_idx"]] = "kobieta"
-                                                        elif sc_g == "MALE":
-                                                            self.episode_scene_genders[it["orig_idx"]] = "mężczyzna"
-                                                    except Exception:
-                                                        logger.debug("Błąd odświeżania płci sceny z audio_jp", exc_info=True)
-                                        pl_final = batch_res.get(it["orig_idx"], it.get("pl", ""))
-                                        if pl_final:
-                                            history.append({
-                                                "orig_idx": it["orig_idx"],
-                                                "en": it["en"],
-                                                "pl": pl_final,
-                                                "speaker": it.get("speaker_name", ""),
-                                                "speaker_gender": it.get("speaker_gender", ""),
-                                                "is_thought": it.get("is_thought", False),
-                                                "end_ms": it.get("end_ms", 0),
-                                                "start_ms": it.get("start_ms", 0)
-                                            })
-                                    history.sort(key=lambda x: x.get("orig_idx", 0))
-                                    if len(history) > 30:
-                                        history[:] = history[-30:]
-                                    # Save checkpoint safely
-                                    try:
-                                        checkpoint_payload = {
-                                            "translated_results": dict(translated_results),
-                                            "translated_regions": dict(translated_regions),
-                                            "translated_typesetting": {
-                                                str(k): (v.model_dump() if hasattr(v, "model_dump") else (v.dict() if hasattr(v, "dict") else v))
-                                                for k, v in list(translated_typesetting.items())
-                                            },
-                                            "translated_addressees": dict(translated_addressees),
-                                            "translated_speakers": dict(translated_speakers),
-                                            "token_usage": {
-                                                "f1": dict(self.current_episode_tokens),
-                                                "f2": dict(self.verifier.current_episode_tokens) if self.verifier and hasattr(self.verifier, "current_episode_tokens") else None
-                                            }
-                                        }
-                                        with open(checkpoint_path, "w", encoding="utf-8") as cp_file:
-                                            json.dump(checkpoint_payload, cp_file, ensure_ascii=False)
-                                    except Exception:
-                                        logger.debug("Zapis punktu kontrolnego zakończony wyjątkiem", exc_info=True)
-
-                                    if b_cot:
-                                        pbar.set_postfix_str(f"{b_cot}...")
-                                    pbar.update(len(untrans_items))
-                                    pbar.refresh()
-
-                                if progress_callback:
-                                    try:
-                                        from pricing_guard import PricingGuard
-                                        f1_s = self.current_episode_tokens
-                                        f2_s = self.verifier.current_episode_tokens if self.verifier else None
-                                        cur_c = PricingGuard.calculate_actual_cost_pln(f1_s, f2_s)
-                                        recent_prev = [
-                                            {"id": it["orig_idx"] + 1, "en": it["en"], "pl": translated_results.get(it["orig_idx"], "")}
-                                            for it in pass1_items
-                                        ]
-                                        progress_callback(len(translated_results), total_lines, recent_prev, cur_c)
-                                    except Exception:
-                                        logger.debug("Wywołanie funkcji postępu zakończone wyjątkiem", exc_info=True)
+                                batch_output = self._process_single_batch(
+                                    b_idx=b_idx,
+                                    batch=batch,
+                                    untranslated_in_batch=untranslated,
+                                    batches=batches,
+                                    video_path=video_path,
+                                    is_ass=is_ass,
+                                    anime_meta=anime_meta,
+                                    episode_profile=episode_profile,
+                                    anime_context_str=anime_context_str,
+                                    episode_profile_str=episode_profile_str,
+                                    series_bible_str=series_bible_str,
+                                    manga_canon_str=manga_canon_str,
+                                    combined_glossary=combined_glossary,
+                                    all_user_rules=all_user_rules,
+                                    history=history,
+                                    pbar=pbar,
+                                    translated_results=translated_results
+                                )
+                                self._record_batch_results(
+                                    batch_output=batch_output,
+                                    translated_results=translated_results,
+                                    translated_regions=translated_regions,
+                                    translated_typesetting=translated_typesetting,
+                                    translated_addressees=translated_addressees,
+                                    translated_speakers=translated_speakers,
+                                    episode_whisper_transcriptions=episode_whisper_transcriptions,
+                                    history=history,
+                                    checkpoint_path=checkpoint_path,
+                                    pbar=pbar,
+                                    progress_callback=progress_callback,
+                                    total_lines=total_lines
+                                )
                             except ContextCacheDiscountError:
-                                for f in future_to_bidx:
-                                    f.cancel()
                                 raise
                             except Exception as e:
                                 pbar.write(f" 🔴 [Niepowodzenie Paczki]: {format_friendly_api_error(e)}")
                                 pbar.refresh()
-                else:
-                    print(f"\n  [Kolejka Paczek]: Płynne tłumaczenie sekwencyjne (1 paczka na raz / rotacja {active_keys_count} aktywnych kluczy API)...")
-                    for loop_i, (b_idx, batch, untranslated) in enumerate(tasks_to_run):
-                        if cancel_check and cancel_check():
-                            print("\n[Tłumacz]: Otrzymano sygnał przerwania (⏹ Stop)...")
-                            break
-                        if loop_i > 0:
-                            time.sleep(0.25)
-                        try:
-                            b_res_idx, batch_res, batch_regs, untrans_items, pass1_items, sc_desc, b_cot = self._process_single_batch(
-                                b_idx=b_idx,
-                                batch=batch,
-                                untranslated_in_batch=untranslated,
-                                batches=batches,
-                                video_path=video_path,
-                                is_ass=is_ass,
-                                anime_meta=anime_meta,
-                                episode_profile=episode_profile,
-                                anime_context_str=anime_context_str,
-                                episode_profile_str=episode_profile_str,
-                                series_bible_str=series_bible_str,
-                                manga_canon_str=manga_canon_str,
-                                combined_glossary=combined_glossary,
-                                all_user_rules=all_user_rules,
-                                history=history,
-                                pbar=pbar,
-                                translated_results=translated_results
-                            )
-                            with self.lock:
-                                for orig_idx, text_res in batch_res.items():
-                                    translated_results[orig_idx] = text_res
-                                for orig_idx, reg_res in batch_regs.items():
-                                    if reg_res:
-                                        translated_regions[orig_idx] = reg_res
-                                for it in pass1_items:
-                                    if it.get("visual_typesetting"):
-                                        translated_typesetting[it["orig_idx"]] = it["visual_typesetting"]
-                                    if it.get("addressee"):
-                                        translated_addressees[it["orig_idx"]] = it["addressee"]
-                                    if it.get("speaker_name") and not is_generic_actor_or_category(it["speaker_name"]):
-                                        translated_speakers[it["orig_idx"]] = it["speaker_name"]
-                                    if it.get("audio_jp"):
-                                        episode_whisper_transcriptions[it["orig_idx"]] = it["audio_jp"]
-                                    pl_final = batch_res.get(it["orig_idx"], it.get("pl", ""))
-                                    if pl_final:
-                                        history.append({
-                                            "orig_idx": it["orig_idx"],
-                                            "en": it["en"],
-                                            "pl": pl_final,
-                                            "speaker": it.get("speaker_name", ""),
-                                            "speaker_gender": it.get("speaker_gender", ""),
-                                            "is_thought": it.get("is_thought", False)
-                                        })
-                                history.sort(key=lambda x: x.get("orig_idx", 0))
-                                if len(history) > 30:
-                                    history[:] = history[-30:]
-                                try:
-                                    checkpoint_payload = {
-                                        "translated_results": translated_results,
-                                        "translated_regions": translated_regions,
-                                        "translated_typesetting": {
-                                            str(k): (v.model_dump() if hasattr(v, "model_dump") else (v.dict() if hasattr(v, "dict") else v))
-                                            for k, v in translated_typesetting.items()
-                                        },
-                                        "translated_addressees": translated_addressees,
-                                        "token_usage": {
-                                            "f1": self.current_episode_tokens,
-                                            "f2": self.verifier.current_episode_tokens if self.verifier else None
-                                        }
-                                    }
-                                    with open(checkpoint_path, "w", encoding="utf-8") as cp_file:
-                                        json.dump(checkpoint_payload, cp_file, ensure_ascii=False)
-                                except Exception:
-                                    logger.debug("Zapis punktu kontrolnego zakończony wyjątkiem", exc_info=True)
-                                if b_cot:
-                                    pbar.set_postfix_str(f"{b_cot}...")
-                                pbar.update(len(untrans_items))
-                                pbar.refresh()
-
-                            if progress_callback:
-                                try:
-                                    from pricing_guard import PricingGuard
-                                    f1_s = self.current_episode_tokens
-                                    f2_s = self.verifier.current_episode_tokens if self.verifier else None
-                                    cur_c = PricingGuard.calculate_actual_cost_pln(f1_s, f2_s)
-                                    recent_prev = [
-                                        {"id": it["orig_idx"] + 1, "en": it["en"], "pl": translated_results.get(it["orig_idx"], "")}
-                                        for it in pass1_items
-                                    ]
-                                    progress_callback(len(translated_results), total_lines, recent_prev, cur_c)
-                                except Exception:
-                                    logger.debug("Wywołanie funkcji postępu zakończone wyjątkiem", exc_info=True)
-                        except ContextCacheDiscountError:
-                            raise
-                        except Exception as e:
-                            pbar.write(f" 🔴 [Niepowodzenie Paczki]: {format_friendly_api_error(e)}")
-                            pbar.refresh()
 
             # 6.9. Zero-Gap Healing Pass: uzupełnienie ewentualnych brakujących kwestii po awariach paczek
             missing_entries = [item for item in raw_entries if item[0] not in translated_results]

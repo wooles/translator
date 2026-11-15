@@ -6,6 +6,7 @@ and European Enterprise Vertex AI endpoints (europe-west1 / Belgia).
 """
 
 import os
+import hashlib
 import logging
 from typing import Optional, Dict, Any, Tuple, List
 from google import genai
@@ -161,8 +162,12 @@ class MultiKeyClientPool:
         self._lock = threading.Lock()
         self._idx = 0
         self._cooldowns: Dict[int, float] = {}  # client index -> expiry monotonic time
-        raw = raw_keys or os.environ.get("GEMINI_API_KEY", "").strip()
-        keys_list = [k.strip() for k in raw.replace(";", ",").split(",") if k.strip()]
+        self.cache_map: Dict[str, str] = {}  # {api_key_hash / index: cache_resource_name}
+        if isinstance(raw_keys, list):
+            keys_list = [str(k).strip() for k in raw_keys if str(k).strip()]
+        else:
+            raw = raw_keys or os.environ.get("GEMINI_API_KEY", "").strip()
+            keys_list = [k.strip() for k in raw.replace(";", ",").split(",") if k.strip()]
         if not keys_list:
             keys_list = [""]
 
@@ -255,6 +260,80 @@ class MultiKeyClientPool:
             now = time.monotonic()
             active = [c for idx, c in enumerate(self.clients) if self._cooldowns.get(idx, 0) <= now]
             return active if active else self.clients
+
+    def get_client_key_hash(self, client: genai.Client) -> str:
+        """Returns deterministic hash or index identifier for client."""
+        if hasattr(client, "_api_client") and hasattr(client._api_client, "api_key"):
+            k = getattr(client._api_client, "api_key", None)
+            if isinstance(k, str) and k.strip():
+                return hashlib.sha256(k.encode("utf-8")).hexdigest()[:8]
+        if hasattr(client, "_api_key"):
+            k = getattr(client, "_api_key", None)
+            if isinstance(k, str) and k.strip():
+                return hashlib.sha256(k.encode("utf-8")).hexdigest()[:8]
+        for idx, c in enumerate(self.clients):
+            if c is client:
+                return f"key_{idx}"
+        return str(id(client))
+
+    def register_cache(self, client: genai.Client, cache_name: str, tag: str = "translator") -> None:
+        """Maps cache resource name to the specific client key."""
+        kh = self.get_client_key_hash(client)
+        with self._lock:
+            self.cache_map[kh] = cache_name
+            self.cache_map[f"{kh}_{tag}"] = cache_name
+            for idx, c in enumerate(self.clients):
+                if c is client:
+                    self.cache_map[str(idx)] = cache_name
+                    self.cache_map[f"{idx}_{tag}"] = cache_name
+                    break
+
+    def get_cache(self, client: genai.Client, tag: str = "translator") -> Optional[str]:
+        """Retrieves cache resource name created by this exact client key."""
+        kh = self.get_client_key_hash(client)
+        with self._lock:
+            val = self.cache_map.get(f"{kh}_{tag}")
+            if val:
+                return val
+            val_base = self.cache_map.get(kh)
+            if val_base:
+                return val_base
+            for idx, c in enumerate(self.clients):
+                if c is client:
+                    val_idx = self.cache_map.get(f"{idx}_{tag}") or self.cache_map.get(str(idx))
+                    if val_idx:
+                        return val_idx
+            return None
+
+    def init_replicated_cache(
+        self,
+        model: str,
+        system_instruction: str,
+        tag: str = "translator",
+        ttl_seconds: int = 1200
+    ) -> Dict[str, str]:
+        """
+        Initializes a dedicated CachedContent resource on Google servers for EACH active client in the pool,
+        with identical payload and model. Stores and returns the mapping: {api_key_hash / index: cache_resource_name}.
+        """
+        from context_cache import ContextCacheManager, ensure_cache_token_floor
+        padded_instruction = ensure_cache_token_floor(system_instruction, self, model)
+        mapping: Dict[str, str] = {}
+        active_clients = self.get_active_clients()
+        for idx, c in enumerate(active_clients):
+            cache_name = ContextCacheManager.get_or_create_cache(
+                client=c,
+                model=model,
+                system_instruction=padded_instruction,
+                ttl_seconds=ttl_seconds,
+                tag=tag
+            )
+            if cache_name and cache_name != "__IMPLICIT_CACHE_95__":
+                self.register_cache(c, cache_name, tag=tag)
+                kh = self.get_client_key_hash(c)
+                mapping[kh] = cache_name
+                mapping[str(idx)] = cache_name
+        return mapping
 
 
 class TokenBucketLimiter:

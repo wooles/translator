@@ -213,12 +213,15 @@ def test_t11_2_8_pricing_guard_f1_thinking_sync():
 
 
 @pytest.mark.unit
-def test_t11_2_8_cache_ui_telemetry_gate(capsys):
+def test_t11_2_8_cache_ui_telemetry_gate(monkeypatch, capsys):
     """
     Weryfikuje, że w przypadku braku potwierdzenia tokenów buforowanych na Paczce 0
     (cached_content_token_count == 0) wyzwalane jest jawne zatrzymanie INC-AVT-057
-    (ContextCacheDiscountError), a fałszywy komunikat o rabacie -95% jest blokowany.
+    (os._exit(1) / ContextCacheDiscountError), a fałszywy komunikat o rabacie -95% jest blokowany.
     """
+    exits = []
+    monkeypatch.setattr(os, "_exit", lambda code: exits.append(code))
+
     translator = MultimodalTranslator(
         api_key="dummy_api_key_test_12345",
         model="gemini-4-hydrogen",
@@ -236,9 +239,10 @@ def test_t11_2_8_cache_ui_telemetry_gate(capsys):
 
     with pytest.raises(ContextCacheDiscountError) as exc_info:
         translator._audit_batch0_context_cache(0)
+    assert exits == [1], f"Oczekiwano wywołania os._exit(1), zarejestrowano: {exits}"
     assert "Brak aktywnego rabatu Context Cache" in str(exc_info.value)
 
-    captured_halt = capsys.readouterr().out
+    captured_halt = capsys.readouterr().err + capsys.readouterr().out
     assert "[Context Cache HALT / INC-AVT-057]" in captured_halt or "[Context Cache WARN / INC-AVT-057]" in captured_halt
     assert "(-95% input discount active)" not in captured_halt
 
