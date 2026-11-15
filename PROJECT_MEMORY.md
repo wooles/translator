@@ -4,9 +4,9 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-15 — Standard 11.2.8 Certyfikowany Baseline)
-- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.8 (AniList GraphQL Resilience & Lexicon Fallback, Real-Cache UI Telemetry, Multi-Season Bible Hygiene & INC Registry Gap Closure)`
-- **Commit certyfikacji kodu:** `097054a17aa60d58d22ce706c9c82b53dc42928d` (`097054a`)
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-15 — Standard 11.2.9 Certyfikowany Baseline)
+- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.9 (Permanent Resolution of INC-AVT-057 Context Cache HALT on Gemini 4 Hydrogen, MultiKey Implicit Replication & Canary Retry Gate)`
+- **Commit certyfikacji kodu:** `792cb97` (`792cb97a213e2bbddfba002bf0922883f3e9a184`)
 - **Commity implementacyjne 11.1:** `5b7306d` (Commit 1), `5b17ea7` (Commit 2), `2b4bc7d` (Commit 3), `8b72887` (Commit 4), `8a7dd31` (Commit 5), `218af2e` (Commit 6)
 - **Commity Hotfixu 11.1.1:** `328729f` (Commit 1), `9de0b83` (Commit 2), `07c4684` (Commit 3), `96acac7` (Commit 4)
 - **Commity Hotfixu 11.1.2:** `74766d8` (Commit 1), `1b540e3` (Commit 2), `8313658` (Commit 3), `326b7e0` (Commit 4)
@@ -26,16 +26,17 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 - **Commity Standardu 11.2.5:** `dcbbe50` (Commit 1), `37029a4` (Commit 2), `f132841` (Commit 3)
 - **Commity Standardu 11.2.6:** `c0361b8` (Commit 1), `35aefe9` (Commit 2), `9e5c8e6` (Commit 3)
 - **Commity Standardu 11.2.7:** `e501090` (Commit 1), `e63204e` (Commit 2), `ef6f884` (Commit 3)
-- **Commity Standardu 11.2.8:**
-  * Commit 1 (`fcffa05`): `fix(pipeline): resolve AniList endpoint, add real cache telemetry, multi-season bible hygiene and close INC registry gap (11.2.8)`
-  * Commit 2 (`097054a17aa60d58d22ce706c9c82b53dc42928d`): `test(pipeline): add regression suite for 11.2.8 AniList fallback, cache telemetry gate and multi-season hygiene (11.2.8)` — **NOWY COMMIT CERTYFIKACJI KODU**
-  * Commit 3 (`HEAD`): `docs(release): certify Standard 11.2.8 release and update PROJECT_MEMORY (11.2.8)`
-- **Status 11.2.8:** `CERTIFIED / CLOSED (2026-11-15)`
+- **Commity Standardu 11.2.8:** `fcffa05` (Commit 1), `097054a` (Commit 2), `dfb73ad` (Commit 3)
+- **Commity Standardu 11.2.9:**
+  * Commit 1 (`e17e563`): `fix(cache): resolve Hydrogen implicit caching, add pool replication, warm-up ping and canary retry (11.2.9)`
+  * Commit 2 (`792cb97`): `test(cache): certify implicit cache warm-up and canary retry resilience (11.2.9)` — **NOWY COMMIT CERTYFIKACJI KODU**
+  * Commit 3 (`HEAD`): `docs(release): certify Standard 11.2.9 and document INC-AVT-057 permanent resolution`
+- **Status 11.2.9:** `CERTIFIED / CLOSED (2026-11-15)`
 - **Commit ochrony Depuracji Legacy 1.0 (Z16):** `c197db73c3dabf887dddbf2337dc3a1d8cff598c` (`c197db7` — bezwzględne 0 B diffu na wszystkich plikach chronionych)
-- **Stan metryk:** `366 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `437 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 11/11, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
-- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (366/366 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
-- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.8` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
-- **Gałąź i Architektura:** `main` (Standard 11.2.8: Sanityzacja nagłówków GraphQL i lokalny fallback onomastyczny do fansub_lexicons w ExternalGenderResolver, likwidacja pozornego rabatu bufora i dynamiczny audyt serwerowego CachedContent na Paczce 0, izolacja wielosezonowa w _resolve_bible_path oraz higiena baz SeriesBible w save() i update_after_episode() chroniąca bazy Sezonu 1, domknięcie rejestru INC dla Standardu 11.2.6 ARB-058 i Standardu 11.2.8 ARB-059, Certyfikacja Kodu `097054a17aa60d58d22ce706c9c82b53dc42928d`, Baseline Z16 `c197db73c3dabf887dddbf2337dc3a1d8cff598c`, Zero-Literal Pure Positive Domain Invariant Architecture & Primary LLM Translation Authority)
+- **Stan metryk:** `369 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `440 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 11/11, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
+- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (369/369 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
+- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.9` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
+- **Gałąź i Architektura:** `main` (Standard 11.2.9: Trwałe wyeliminowanie INC-AVT-057 Context Cache HALT na gemini-4-hydrogen poprzez ominięcie jawnego caches.create, pełną replikację implicit cache w MultiKeyClientPool, Pre-flight Warm-Up Ping w ensure_cache_ready, adaptacyjny Canary Warmup Retry w _process_single_batch, Certyfikacja Kodu `792cb97`, Baseline Z16 `c197db73c3dabf887dddbf2337dc3a1d8cff598c`, Zero-Literal Pure Positive Domain Invariant Architecture & Primary LLM Translation Authority)
 - **Środowisko:** Python 3.13 (`.venv`), Windows PowerShell, `ffmpeg` (PATH), `librosa.pyin`, `soundfile`, `pysubs2`, `spaCy en_core_web_sm` (100% offline 0.00 PLN), bezpośrednie klucze Google AI Studio API (`use_vertex = 0`).
 - **Dyrektywa Wykonawcza Testów:**
   * Testy przyrostowe podczas kodowania (< 2 s): `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_testu>"`
@@ -457,12 +458,24 @@ Dodanie w `tools/consolidate_bibles.py` opcjonalnej flagi `--migrate-misplaced-s
    Formalne domknięcie rejestru w `PROJECT_MEMORY.md` poprzez rejestrację bloku ARB-058 obejmującego incydenty INC-AVT-047..050 dla Standardu 11.2.6.
 2. **INC-AVT-056 (Odporność AniList GraphQL i Lokalny Fallback Fansub Lexicon):**
    W `metadata.py` w klasie `ExternalGenderResolver.resolve_character_gender` zaktualizowano nagłówki HTTP żądania GraphQL o pełny nagłówek przeglądarkowy `User-Agent` (Chrome/130 na Windows), `Origin: https://anilist.co` oraz `Referer: https://anilist.co/`, eliminując odrzucanie zapytań kodem 403/404 przez węzły brzegowe Cloudflare. Ponadto w przypadku awarii sieciowej (`HTTPError`, `URLError`, timeout) lub aktywnego bezpiecznika `_CIRCUIT_OPEN`, wdrożono deterministyczny fallback lokalny przeszukujący słowniki fansuberskie w `series_memory/fansub_lexicons/*.json` i zapisujący wynik w pamięci RAM pod kluczem `source: local_fansub_lexicon`.
-3. **INC-AVT-057 (Likwidacja Pozornego Rabatu Cache w Konsoli — Real-Cache UI Telemetry):**
-   W `context_cache.py` i `translator.py` usunięto przedwczesny komunikat informujący o zablokowaniu rabatu -90%/-95% przed nawiązaniem połączenia z API. Zastąpiono go komunikatem oczekiwania na telemetrię serwerową: `[Context Cache]: Zainicjalizowano konfigurację bufora hybrydowego. Oczekiwanie na telemetrię Paczki 0...`. W `_process_single_batch` zaimplementowano dynamiczny audyt na Paczce 0: w przypadku potwierdzenia `cached_content_token_count >= 32768` emitowany jest komunikat `[Context Cache ACTIVE]`, a w przypadku `0` wyzwalane jest jawne ostrzeżenie konsolowe i logowe `[Context Cache WARN / INC-AVT-057]`.
+3. **INC-AVT-057 (Likwidacja Pozornego Rabatu Cache w Konsoli — Real-Cache UI Telemetry & Permanent Hydrogen Resolution):**
+   - **Status:** RESOLVED (Standard 11.2.9: ominięcie explicit cache dla Hydrogen, Warm-Up Ping per klucz w puli, Canary Warmup Retry na Paczce 0).
+   W `context_cache.py` i `translator.py` usunięto przedwczesny komunikat informujący o zablokowaniu rabatu -90%/-95% przed nawiązaniem połączenia z API. Zastąpiono go komunikatem oczekiwania na telemetrię serwerową: `[Context Cache]: Zainicjalizowano konfigurację bufora hybrydowego. Oczekiwanie na telemetrię Paczki 0...`. W `_process_single_batch` zaimplementowano dynamiczny audyt na Paczce 0: w przypadku potwierdzenia `cached_content_token_count >= 32768` emitowany jest komunikat `[Context Cache ACTIVE]`, a w przypadku `0` wyzwalane jest jawne ostrzeżenie konsolowe i logowe `[Context Cache WARN / INC-AVT-057]`. W Standardzie 11.2.9 trwale zlikwidowano cold-start poprzez ominięcie `caches.create`, rejestrację implicit cache w `MultiKeyClientPool`, Warm-Up Ping per klucz w `ensure_cache_ready` oraz automatyczny retry na Paczce 0.
 4. **INC-AVT-058 (Dług Weryfikacji Empirycznej i Higiena Baz Wielosezonowych SeriesBible):**
    W `series_memory.py` oraz `translator.py` zaimplementowano metodę `update_after_episode` oraz uszczelniono `_resolve_bible_path` i `save()`: wykrycie w ścieżce pliku lub tytule znacznika kolejnego sezonu (`S2`, `Season 2`, `2nd Season`, `S3` itp.) deterministycznie kieruje do dedykowanej bazy sezonowej, zapobiegając zanieczyszczaniu pól `episodes_translated` i `batch_stats` pliku bazowego (Sezonu 1).
 5. **Adaptive F1 Thinking & Synchronizacja PricingGuard:**
    W `main.py` dodano flagę CLI `--thinking-f1` (`auto`, `low`, `medium`), a w `translator.py` zaimplementowano metodę `resolve_f1_thinking_budget`: w trybie `auto` dla odcinków $\le 360$ linii przydzielany jest budżet `3072` (MEDIUM CoT, koszt $\le 3.40$ PLN netto), a dla odcinków $> 360$ linii budżet `0` (LOW CoT). W `pricing_guard.py` zsynchronizowano estymator `estimate_loaded_workload_cost_pln` z parametrem `f1_thinking_level`, gwarantując dokładne wyliczanie kosztów tokenowych F1 (LOW: 1750 tok / ~2.21 PLN netto, MEDIUM: 4822 tok / ~3.32 PLN netto dla 350 linii / 12 paczek oraz ~5.25 PLN netto dla 518 linii / 19 paczek).
+
+
+## 🏛️ ARB-060 / INC-AVT-057: Standard 11.2.9 — Permanent Resolution of INC-AVT-057 Context Cache HALT on Gemini 4 Hydrogen, MultiKey Implicit Replication & Canary Retry Gate
+
+- **Status:** `RESOLVED (Standard 11.2.9: ominięcie explicit cache dla Hydrogen, Warm-Up Ping per klucz w puli, Canary Warmup Retry na Paczce 0)`
+- **Zidentyfikowano:** Model `gemini-4-hydrogen` nie obsługuje jawnego tworzenia zasobów cache (`client.caches.create`), a w trybie buforowania automatycznego (implicit caching) punkt buforowania na serwerach Google jest tworzony dopiero po przetworzeniu pierwszego żądania. Skutkowało to odrzucaniem żądań i wyzwalaniem bezpiecznika kosztowego `_audit_batch0_context_cache`.
+- **Komponenty naprawy:**
+  1. `context_cache.py`: Natychmiastowe mapowanie `__IMPLICIT_CACHE_95__` w `_LOCAL_CACHE_REGISTRY` dla modeli z rodziny `gemini-4-hydrogen` z pominięciem `client.caches.create`.
+  2. `client_factory.py`: Rejestracja `__IMPLICIT_CACHE_95__` w mapie cache `MultiKeyClientPool.init_replicated_cache` dla każdego klucza w puli.
+  3. `context_cache.py`: Pre-flight Warm-Up Ping w `ensure_cache_ready` (1-tokenowe mikro-zapytanie z pełnym `system_instruction` rozgrzewające prefiks na każdym kluczu w puli).
+  4. `translator.py`: Adaptacyjny Canary Warmup Retry na Paczce 0 w `_process_single_batch` (automatyczne jednorazowe ponowienie zapytania przy `cached_tokens == 0` na modelach Hydrogen przed audytem kosztowym).
 
 
 

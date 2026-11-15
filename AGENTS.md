@@ -2,11 +2,11 @@
 
 Dokument ten stanowi jedyne źródło prawdy (Single Source of Truth) definiujące nienaruszalne reguły architektoniczne, lingwistyczne i procesowe asystenta AI oraz zespołów wieloagentowych w repozytorium `translator`.
 
-- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.8 (Adaptive F1 Thinking, AniList GraphQL Resilience & Lexicon Fallback, Real-Cache UI Telemetry, PricingGuard Sync & Multi-Season Bible Hygiene)`
-- **Commit certyfikacji kodu:** `18f9000` (`18f900066d6772ce442ed7b9d3ac316b205513e8`)
+- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.9 (Permanent Resolution of INC-AVT-057 Context Cache HALT on Gemini 4 Hydrogen, MultiKey Implicit Replication & Canary Retry Gate)`
+- **Commit certyfikacji kodu:** `792cb97` (`792cb97a213e2bbddfba002bf0922883f3e9a184`)
 - **Commit ochrony Depuracji Legacy 1.0 (Z16):** `c197db7` (`c197db73c3dabf887dddbf2337dc3a1d8cff598c`)
-- **Stan metryk:** `594 collected` (`441 passed` fast unit/integration [370 tests/ + 71 test_system.py] + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki (`verify_purity.py`, `verify_8_fixes.py`, `verify_12_fixes.py`, `verify_ultimate_pipeline.py`) oraz `audit_diff.ps1` w stanie `PASS`.
-- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.8` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
+- **Stan metryk:** `597 collected` (`444 passed` fast unit/integration [373 tests/ + 71 test_system.py] + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki (`verify_purity.py`, `verify_8_fixes.py`, `verify_12_fixes.py`, `verify_ultimate_pipeline.py`) oraz `audit_diff.ps1` w stanie `PASS`.
+- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.9` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
 
 ---
 
