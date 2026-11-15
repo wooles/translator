@@ -218,3 +218,118 @@ def test_canary_gate_prevents_subsequent_batches_on_batch0_failure(monkeypatch):
 
     # Weryfikacja: wykonano wyłącznie paczkę 0
     assert executed_batches == [0], f"Oczekiwano tylko paczki 0, wykonano: {executed_batches}"
+
+
+@pytest.mark.unit
+def test_hydrogen_skips_explicit_cache_create():
+    """
+    Standard 11.2.9: Weryfikuje, że dla modelu gemini-4-hydrogen funkcja
+    ContextCacheManager.get_or_create_cache natychmiast zwraca __IMPLICIT_CACHE_95__
+    i nie wywołuje client.caches.create.
+    """
+    mock_client = MagicMock()
+    res = ContextCacheManager.get_or_create_cache(
+        client=mock_client,
+        model="gemini-4-hydrogen",
+        system_instruction="System prompt for testing implicit cache",
+        tag="translator"
+    )
+    assert res == "__IMPLICIT_CACHE_95__"
+    mock_client.caches.create.assert_not_called()
+
+
+@pytest.mark.unit
+def test_multikey_pool_registers_implicit_cache():
+    """
+    Standard 11.2.9: Weryfikuje, że MultiKeyClientPool.init_replicated_cache
+    poprawnie zapisuje __IMPLICIT_CACHE_95__ w mapie cache dla każdego klucza.
+    """
+    keys = ["key_alpha_111", "key_beta_222"]
+    pool = MultiKeyClientPool(keys)
+
+    # Replikacja cache dla modeli Hydrogen
+    cache_map = pool.init_replicated_cache(
+        model="gemini-4-hydrogen",
+        system_instruction="Instrukcja systemowa Hydrogen",
+        tag="translator"
+    )
+
+    assert len(cache_map) >= len(keys)
+    for c in pool.clients:
+        cached = pool.get_cache(c, tag="translator")
+        assert cached == "__IMPLICIT_CACHE_95__"
+
+
+@pytest.mark.unit
+def test_canary_warmup_retry_on_zero_cache(monkeypatch):
+    """
+    Standard 11.2.9: Symuluje zwrócenie cached_content_token_count = 0 na pierwszej próbie
+    i > 0 po ponowieniu, potwierdzając brak wywołania os._exit(1).
+    """
+    exit_calls = []
+    monkeypatch.setattr(os, "_exit", lambda code: exit_calls.append(code))
+
+    translator = MultimodalTranslator(
+        api_key="mock_test_key_12345",
+        model="gemini-4-hydrogen",
+        enable_verifier=False
+    )
+
+    # Symulacja wywołań _call_gemini_with_retry:
+    # 1. próba -> token usage cached = 0
+    # 2. próba (retry) -> token usage cached = 45000
+    attempt = 0
+    def mock_call(*args, **kwargs):
+        nonlocal attempt
+        attempt += 1
+        mock_resp = MagicMock()
+        mock_resp.translations = []
+        mock_resp.characters_identified = []
+        mock_resp.visual_events = []
+        mock_resp.typesetting_notes = []
+        mock_resp.speaker_identifications = []
+        mock_resp.raw_thoughts = ""
+        mock_resp.model_dump.return_value = {}
+
+        _tl = getattr(translator, "_thread_local", None)
+        if _tl is None:
+            _tl = translator._thread_local = MagicMock()
+        if attempt == 1:
+            _tl.last_batch_token_usage = {"prompt": 50000, "cached": 0, "output": 200, "model": "gemini-4-hydrogen"}
+        else:
+            _tl.last_batch_token_usage = {"prompt": 50000, "cached": 45000, "output": 200, "model": "gemini-4-hydrogen"}
+        return mock_resp
+
+    monkeypatch.setattr(translator, "_call_gemini_with_retry", mock_call)
+    monkeypatch.setattr("time.sleep", lambda s: None)
+
+    # Uruchomienie _process_single_batch dla Paczki 0
+    import pysubs2
+    ev = pysubs2.SSAEvent(text="Line 1", start=0, end=1000, style="Default", name="Actor")
+    batch_item = (0, ev, "Line 1", "")
+
+    translator._process_single_batch(
+        b_idx=0,
+        batch=[batch_item],
+        untranslated_in_batch=[batch_item],
+        batches=[[batch_item]],
+        video_path=None,
+        is_ass=True,
+        anime_meta=None,
+        episode_profile=None,
+        anime_context_str="",
+        episode_profile_str="",
+        series_bible_str="",
+        manga_canon_str="",
+        combined_glossary={},
+        all_user_rules=[],
+        history=[],
+        pbar=MagicMock(),
+        translated_results={}
+    )
+
+    # Weryfikacja: wykonano 2 próby (1 początkowa + 1 retry)
+    assert attempt == 2, f"Oczekiwano 2 prób, wykonano: {attempt}"
+    # Weryfikacja: os._exit(1) NIE zostało wywołane
+    assert exit_calls == [], "os._exit(1) nie powinno zostać wywołane po udanym ponowieniu!"
+    assert translator._batch0_cache_telemetry_reported is True
