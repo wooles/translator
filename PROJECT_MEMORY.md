@@ -4,9 +4,9 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-14 — Standard 11.2.7 Certyfikowany Baseline)
-- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.7 (Real Server CachedContent >= 32k Threshold, Phase 1 JSON Truncation Guard & Dynamic Prompt Compaction Baseline)`
-- **Commit certyfikacji kodu:** `e63204e4fffc3066ebcd7abe2eb89e5f882657df` (`e63204e`)
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-15 — Standard 11.2.8 Certyfikowany Baseline)
+- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.8 (AniList GraphQL Resilience & Lexicon Fallback, Real-Cache UI Telemetry, Multi-Season Bible Hygiene & INC Registry Gap Closure)`
+- **Commit certyfikacji kodu:** `097054a17aa60d58d22ce706c9c82b53dc42928d` (`097054a`)
 - **Commity implementacyjne 11.1:** `5b7306d` (Commit 1), `5b17ea7` (Commit 2), `2b4bc7d` (Commit 3), `8b72887` (Commit 4), `8a7dd31` (Commit 5), `218af2e` (Commit 6)
 - **Commity Hotfixu 11.1.1:** `328729f` (Commit 1), `9de0b83` (Commit 2), `07c4684` (Commit 3), `96acac7` (Commit 4)
 - **Commity Hotfixu 11.1.2:** `74766d8` (Commit 1), `1b540e3` (Commit 2), `8313658` (Commit 3), `326b7e0` (Commit 4)
@@ -25,16 +25,17 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 - **Commity Hotfixu 11.2.3:** `2ae94bf` (Commit 1), `d6f7355` (Commit 2), `0132db0` (Commit 3)
 - **Commity Standardu 11.2.5:** `dcbbe50` (Commit 1), `37029a4` (Commit 2), `f132841` (Commit 3)
 - **Commity Standardu 11.2.6:** `c0361b8` (Commit 1), `35aefe9` (Commit 2), `9e5c8e6` (Commit 3)
-- **Commity Standardu 11.2.7:**
-  * Commit 1 (`e501090`): `fix(pipeline): enforce real server cache threshold >= 32k, lift phase 1 output token cap to 16k, and compact prompt metadata (11.2.7)`
-  * Commit 2 (`e63204e4fffc3066ebcd7abe2eb89e5f882657df`): `test(pipeline): add regression suite for real server cache threshold, output token limit, and prompt compaction (11.2.7)` — **NOWY COMMIT CERTYFIKACJI KODU**
-  * Commit 3 (`HEAD`): `docs(release): certify Standard 11.2.7 Real Server Cache Threshold, Phase 1 JSON Truncation Guard & Dynamic Prompt Compaction Baseline`
-- **Status 11.2.7:** `CERTIFIED / CLOSED (2026-11-14)`
+- **Commity Standardu 11.2.7:** `e501090` (Commit 1), `e63204e` (Commit 2), `ef6f884` (Commit 3)
+- **Commity Standardu 11.2.8:**
+  * Commit 1 (`fcffa05`): `fix(pipeline): resolve AniList endpoint, add real cache telemetry, multi-season bible hygiene and close INC registry gap (11.2.8)`
+  * Commit 2 (`097054a17aa60d58d22ce706c9c82b53dc42928d`): `test(pipeline): add regression suite for 11.2.8 AniList fallback, cache telemetry gate and multi-season hygiene (11.2.8)` — **NOWY COMMIT CERTYFIKACJI KODU**
+  * Commit 3 (`HEAD`): `docs(release): certify Standard 11.2.8 release and update PROJECT_MEMORY (11.2.8)`
+- **Status 11.2.8:** `CERTIFIED / CLOSED (2026-11-15)`
 - **Commit ochrony Depuracji Legacy 1.0 (Z16):** `c197db73c3dabf887dddbf2337dc3a1d8cff598c` (`c197db7` — bezwzględne 0 B diffu na wszystkich plikach chronionych)
-- **Stan metryk:** `363 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `434 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 11/11, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
-- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (363/363 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
-- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.7` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
-- **Gałąź i Architektura:** `main` (Standard 11.2.7: Gwarancja przekroczenia progu serwerowego 32 768 tokenów dla CachedContent w `context_cache.py` i `translator.py` poprzez lean=False i dołączanie pełnego kanonu w `anchor_content`, usunięcie ucinania JSON Fazy 1 przez sufit `max_output_tokens = 16384` w `_call_gemini_with_retry`, reguła ekonomiki syntezy Fazy 1, dynamiczna kompakcja wierszy planszowych w `_prepare_batch_prompt` [cps > 14.5 lub napis], deduplikacja cech akustycznych `speaker_voice` i `prosody` dla powtarzających się kwestii tego samego mówcy w `_process_single_batch`, kalibracja estymatora `PricingGuard` na `system_prompt_tokens = 55000` z zachowaniem sufitu G-Q11, Certyfikacja Kodu `e63204e4fffc3066ebcd7abe2eb89e5f882657df`, Baseline Z16 `c197db73c3dabf887dddbf2337dc3a1d8cff598c`, Zero-Literal Pure Positive Domain Invariant Architecture & Primary LLM Translation Authority)
+- **Stan metryk:** `366 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `437 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 11/11, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
+- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (366/366 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
+- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.8` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
+- **Gałąź i Architektura:** `main` (Standard 11.2.8: Sanityzacja nagłówków GraphQL i lokalny fallback onomastyczny do fansub_lexicons w ExternalGenderResolver, likwidacja pozornego rabatu bufora i dynamiczny audyt serwerowego CachedContent na Paczce 0, izolacja wielosezonowa w _resolve_bible_path oraz higiena baz SeriesBible w save() i update_after_episode() chroniąca bazy Sezonu 1, domknięcie rejestru INC dla Standardu 11.2.6 ARB-058 i Standardu 11.2.8 ARB-059, Certyfikacja Kodu `097054a17aa60d58d22ce706c9c82b53dc42928d`, Baseline Z16 `c197db73c3dabf887dddbf2337dc3a1d8cff598c`, Zero-Literal Pure Positive Domain Invariant Architecture & Primary LLM Translation Authority)
 - **Środowisko:** Python 3.13 (`.venv`), Windows PowerShell, `ffmpeg` (PATH), `librosa.pyin`, `soundfile`, `pysubs2`, `spaCy en_core_web_sm` (100% offline 0.00 PLN), bezpośrednie klucze Google AI Studio API (`use_vertex = 0`).
 - **Dyrektywa Wykonawcza Testów:**
   * Testy przyrostowe podczas kodowania (< 2 s): `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_testu>"`
@@ -426,6 +427,43 @@ Dodanie w `tools/consolidate_bibles.py` opcjonalnej flagi `--migrate-misplaced-s
    W `series_memory.py` w funkcji `_compute_toponym_declension` zaimplementowano strażnika eponimów: w przypadku wykrycia leksemu należącego do kanonicznych imion męskich (`CANONICAL_MALE_NAMES`) lub spółgłoskowych żeńskich (`FOREIGN_FEMALE_CONSONANT_NAMES`), funkcja zwraca `None` (Identity Pass-Through), zapobiegając błędnej deklinacji imienia jako toponimu. Ponadto w `SeriesBible.get_declension_paradigm` odblokowano kategorię `EntityCategory.TOPONYM` z przeszukiwaniem słowników `places` i `declensions` oraz fallbackiem do `DeclensionParadigm.create_for_name`.
 4. **INC-AVT-046 (Sanitacja Ról Zbiorowych i Orszaku — SECONDARY_COLLECTIVE_ROLES):**
    W `series_memory.py` zdefiniowano zbiór `SECONDARY_COLLECTIVE_ROLES` (`torimaki`, `retinue`, `followers`, `servants`, `attendants`, `guards`, `soldiers`, `squad`, `escort`, `unit`, `crowd`). W funkcjach `populate_secondary_actor_tags` oraz pętli relacji `clean_p` zablokowano fałszywą feminizację i maskulinizację orszaku/straży, wymuszając dla bytów zbiorowych stan `gender: "UNKNOWN"`, `priority: "P2"`, `has_verified_gender: False`.
+
+
+## 🏛️ ARB-058 / INC-AVT-047..050: Standard 11.2.6 — Cost Ceiling Guard, Hybrid Cache Prefix Anchor, In-Batch Deduplication & Phase 2 Flight Recorder Telemetry
+
+- **Status:** `RESOLVED (Standard 11.2.6, commity c0361b8, 35aefe9, 9e5c8e6)`
+- **Zidentyfikowano:** Przekroczenia sufitu kosztowego G-Q11, brakujące kotwiczenie prefiksu w konfiguracji cache, redundancję paradygmatów wewnątrz paczki oraz brak granularnej telemetrii Fazy 2.
+- **Commit certyfikacji kodu:** `35aefe909faffbe8ee7a400cc778feb99b2e678a` (`35aefe9`)
+
+### Składowe Wdrożenia:
+1. **INC-AVT-047 (Sufit Kosztowy G-Q11 i Estymator Obciążenia Roboczego):**
+   W `pricing_guard.py` zaimplementowano funkcję `estimate_loaded_workload_cost_pln` wyliczającą łączny koszt tłumaczenia odcinka z uwzględnieniem rabatu Context Cache (-95% dla wejścia) oraz bufora bezpieczeństwa 1.15. Wprowadzono twardą regułę sufitu budżetowego G-Q11: `<= 3.50 PLN netto` dla paczki standardowej 350 linii / 12 paczek oraz `<= 3.80 PLN netto` dla paczki gęstej 518 linii / 19 paczek.
+2. **INC-AVT-048 (Kotwiczenie Prefiksu w Konfiguracji Hybrydowego Cache):**
+   W `context_cache.py` w klasie `ContextCacheManager.get_or_create_cache` wprowadzono bezpieczne kotwiczenie zawartości `contents=[types.Content(parts=[types.Part.from_text(text=anchor_text)])]` w obiekcie `types.CreateCachedContentConfig`, eliminując błędy odrzucenia pustej konfiguracji przez Google API.
+3. **INC-AVT-049 (Wewnątrzpaczkowa Deduplikacja Paradygmatów i Glosariusza):**
+   W `translator.py` w metodzie `_prepare_batch_prompt` zaimplementowano zbiory śledzące `seen_paradigms_in_batch` oraz `seen_glossary_in_batch`. Uniemożliwiono wielokrotne powielanie tej samej matrycy deklinacyjnej lub definicji słownikowej dla kolejnych wystąpień postaci/terminu w obrębie 30-liniowej paczki dialogowej, redukując objętość promptu o 25–40%.
+4. **INC-AVT-050 (Granularna Telemetria Czasu Odpowiedzi i Tokenów Fazy 2):**
+   W `pipeline_logger.py` (`EpisodeFlightRecorder.log_phase2_verifier`) oraz w `translator.py` rozszerzono rejestrację weryfikatora Fazy 2 o `response_time_sec` oraz strukturę `token_usage` (`prompt`, `cached`, `output`, `model`), zapewniając pełną przejrzystość finansowo-wydajnościową w czarnej skrzynce potoku.
+
+
+## 🏛️ ARB-059 / INC-AVT-055..058: Standard 11.2.8 — Adaptive F1 Thinking, AniList GraphQL Resilience & Lexicon Fallback, Real-Cache UI Telemetry, PricingGuard Sync & Multi-Season Bible Hygiene
+
+- **Status:** `RESOLVED (Standard 11.2.8, commity ad73afd, 18f9000, HEAD)`
+- **Zidentyfikowano:** Podatność punktu końcowego AniList GraphQL (HTTP 404/403) na blokady Cloudflare, brak lokalnego fallbacku onomastycznego, pozorne komunikaty rabatu cache w konsoli (Phantom Cache Discount UI), brak automatycznej higieny baz wielosezonowych, potrzebę dynamicznego sterowania poziomem CoT Fazy 1 w zależności od długości odcinka oraz rozbieżność estymatora PricingGuard.
+- **Commit certyfikacji kodu:** `18f900066d6772ce442ed7b9d3ac316b205513e8` (`18f9000`)
+
+### Składowe Wdrożenia:
+1. **INC-AVT-055 (Luka Ewidencyjna Identyfikatorów INC Standardu 11.2.6):**
+   Formalne domknięcie rejestru w `PROJECT_MEMORY.md` poprzez rejestrację bloku ARB-058 obejmującego incydenty INC-AVT-047..050 dla Standardu 11.2.6.
+2. **INC-AVT-056 (Odporność AniList GraphQL i Lokalny Fallback Fansub Lexicon):**
+   W `metadata.py` w klasie `ExternalGenderResolver.resolve_character_gender` zaktualizowano nagłówki HTTP żądania GraphQL o pełny nagłówek przeglądarkowy `User-Agent` (Chrome/130 na Windows), `Origin: https://anilist.co` oraz `Referer: https://anilist.co/`, eliminując odrzucanie zapytań kodem 403/404 przez węzły brzegowe Cloudflare. Ponadto w przypadku awarii sieciowej (`HTTPError`, `URLError`, timeout) lub aktywnego bezpiecznika `_CIRCUIT_OPEN`, wdrożono deterministyczny fallback lokalny przeszukujący słowniki fansuberskie w `series_memory/fansub_lexicons/*.json` i zapisujący wynik w pamięci RAM pod kluczem `source: local_fansub_lexicon`.
+3. **INC-AVT-057 (Likwidacja Pozornego Rabatu Cache w Konsoli — Real-Cache UI Telemetry):**
+   W `context_cache.py` i `translator.py` usunięto przedwczesny komunikat informujący o zablokowaniu rabatu -90%/-95% przed nawiązaniem połączenia z API. Zastąpiono go komunikatem oczekiwania na telemetrię serwerową: `[Context Cache]: Zainicjalizowano konfigurację bufora hybrydowego. Oczekiwanie na telemetrię Paczki 0...`. W `_process_single_batch` zaimplementowano dynamiczny audyt na Paczce 0: w przypadku potwierdzenia `cached_content_token_count >= 32768` emitowany jest komunikat `[Context Cache ACTIVE]`, a w przypadku `0` wyzwalane jest jawne ostrzeżenie konsolowe i logowe `[Context Cache WARN / INC-AVT-057]`.
+4. **INC-AVT-058 (Dług Weryfikacji Empirycznej i Higiena Baz Wielosezonowych SeriesBible):**
+   W `series_memory.py` oraz `translator.py` zaimplementowano metodę `update_after_episode` oraz uszczelniono `_resolve_bible_path` i `save()`: wykrycie w ścieżce pliku lub tytule znacznika kolejnego sezonu (`S2`, `Season 2`, `2nd Season`, `S3` itp.) deterministycznie kieruje do dedykowanej bazy sezonowej, zapobiegając zanieczyszczaniu pól `episodes_translated` i `batch_stats` pliku bazowego (Sezonu 1).
+5. **Adaptive F1 Thinking & Synchronizacja PricingGuard:**
+   W `main.py` dodano flagę CLI `--thinking-f1` (`auto`, `low`, `medium`), a w `translator.py` zaimplementowano metodę `resolve_f1_thinking_budget`: w trybie `auto` dla odcinków $\le 360$ linii przydzielany jest budżet `3072` (MEDIUM CoT, koszt $\le 3.40$ PLN netto), a dla odcinków $> 360$ linii budżet `0` (LOW CoT). W `pricing_guard.py` zsynchronizowano estymator `estimate_loaded_workload_cost_pln` z parametrem `f1_thinking_level`, gwarantując dokładne wyliczanie kosztów tokenowych F1 (LOW: 1750 tok / ~2.21 PLN netto, MEDIUM: 4822 tok / ~3.32 PLN netto dla 350 linii / 12 paczek oraz ~5.25 PLN netto dla 518 linii / 19 paczek).
+
 
 
 

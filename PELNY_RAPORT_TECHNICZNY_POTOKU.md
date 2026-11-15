@@ -23,6 +23,7 @@ Proces uruchamiania potoku translacji rozpoczyna się od sparsowania argumentów
 - `--honorifics` / `--no-honorifics`: Wymuszenie zachowania lub spolszczenia japońskich przyrostków honoryfikatywnych (`-san`, `-kun`, `-chan`, `-senpai`).
 - `--play` (`bool`, flaga `action="store_true"`): Automatyczne odtworzenie pliku w odtwarzaczu MPV po zakończeniu translacji.
 - `--output` (`Optional[str]`, domyślnie `None`): Niestandardowa ścieżka zapisu gotowego pliku napisów.
+- `--thinking-f1` (`str`, wartości: `auto`, `low`, `medium`, domyślnie `auto`): Adaptacyjny poziom myślenia CoT dla Fazy 1 modelu Hydrogen (3072 CoT dla <=360 linii, 0 CoT dla >360 linii).
 
 #### B. Mapowanie profili jakościowych i resolwer modeli (`model_resolver.py`)
 W przypadku braku jawnego wskazania modeli w CLI, funkcja `resolve_best_models(profile)` dobiera pary modeli Fazy 1 i Fazy 2:
@@ -792,4 +793,4 @@ Potok wspiera flagi kontrolujące działanie rejestratora:
 - `--trace-dir`: Wskazuje niestandardowy katalog zapisu logów śledzenia (domyślnie `logs`).
 
 ---
-**KONIEC PEŁNEGO RAPORTU TECHNICZNEGO POTOKU AVT — TRANSLATOR STANDARD 11.2.7 BASELINE**
+**KONIEC PEŁNEGO RAPORTU TECHNICZNEGO POTOKU AVT — TRANSLATOR STANDARD 11.2.8 BASELINE**
