@@ -2114,29 +2114,32 @@ class MultimodalTranslator:
             self.phase1_thinking_budget = 3072 if total_lines <= 360 else 0
         return self.phase1_thinking_budget
 
-    def _audit_batch0_context_cache(self, cached_tokens: int) -> None:
+    def _audit_batch_context_cache(self, b_idx: int, cached_tokens: int, phase: str = "phase1") -> None:
         """
-        Audyt telemetrii Context Cache na Paczce 0 / Canary Run (INC-AVT-057).
-        Potwierdza rabat -95% przy cached_tokens > 0 lub wyzwala natychmiastowy
-        Kill-Switch Procesu (os._exit(1)) przy 0 tokenach cache.
+        Uniwersalny audyt telemetrii Context Cache per-batch (INC-AVT-057, Standard 11.2.10 Filar B).
+        Potwierdza rabat -95% przy cached_tokens >= 32768, ostrzega przy partial hit,
+        lub wyzwala natychmiastowy Kill-Switch Procesu (os._exit(1)) przy 0 tokenach cache.
         """
-        if cached_tokens > 0:
-            print(f"\n  💰 [Context Cache AKTYWNY]: Serwer potwierdził CachedContent: {cached_tokens} tokenów (Rabat -95% aktywny) [Context Cache ACTIVE].")
-            logger.info(f"[Context Cache CONFIRMED]: Server confirmed CachedContent token count: {cached_tokens} (-95% input discount active)")
+        if cached_tokens >= 32768:
+            if b_idx == 0 or getattr(self, "verbose", False):
+                print(f"\n  💰 [Context Cache AKTYWNY]: Serwer potwierdził CachedContent ({phase}, paczka {b_idx}): {cached_tokens} tokenów (Rabat -95% aktywny) [Context Cache ACTIVE].")
+            logger.info(f"[Context Cache CONFIRMED]: Server confirmed CachedContent token count for {phase} batch {b_idx}: {cached_tokens} (-95% input discount active)")
+        elif 0 < cached_tokens < 32768:
+            logger.warning(f"[Context Cache PARTIAL_HIT]: Server confirmed partial CachedContent ({phase}, paczka {b_idx}): {cached_tokens} tokenów (< 32768).")
         elif cached_tokens == 0:
             allow_uncached = os.getenv("AVT_ALLOW_UNCACHED_BILLING", "0").strip().lower() in ("1", "true", "yes")
             if allow_uncached:
                 print(
-                    "\n  ⚠️ [Context Cache WARN / INC-AVT-057]: Serwer zwrócił 0 tokenów cache!\n"
+                    f"\n  ⚠️ [Context Cache WARN / INC-AVT-057]: Serwer zwrócił 0 tokenów cache dla {phase} (paczka {b_idx})!\n"
                     "     Wykryto flagę AVT_ALLOW_UNCACHED_BILLING=1. Kontynuacja tłumaczenia pomimo braku rabatu serwerowego."
                 )
-                logger.warning("[Context Cache BYPASS / INC-AVT-057]: AVT_ALLOW_UNCACHED_BILLING aktywny. Kontynuacja tłumaczenia pomimo braku rabatu serwerowego.")
+                logger.warning(f"[Context Cache BYPASS / INC-AVT-057]: AVT_ALLOW_UNCACHED_BILLING aktywny. Kontynuacja tłumaczenia {phase} paczka {b_idx} pomimo braku rabatu serwerowego.")
                 return
 
             err_msg = (
                 "\n"
                 "========================================================================================\n"
-                "  🛑 [Context Cache HALT / INC-AVT-057]: Serwer zwrócił 0 tokenów cache! Rabat serwerowy NIEAKTYWNY.\n"
+                f"  🛑 [Context Cache HALT / INC-AVT-057]: Serwer zwrócił 0 tokenów cache dla {phase} (paczka {b_idx})! Rabat serwerowy NIEAKTYWNY.\n"
                 "     Kontynuacja tłumaczenia odcinka spowodowałaby naliczenie pełnej stawki 100% (~10-20 PLN zamiast ~0.50 PLN).\n"
                 "     Tłumacz natychmiast zatrzymuje pracę na poziomie jądra (os._exit(1)) w celu ochrony budżetu i eliminacji zombie workers.\n\n"
                 "     Diagnostyka:\n"
@@ -2147,7 +2150,7 @@ class MultimodalTranslator:
             )
             sys.stderr.write(err_msg)
             sys.stderr.flush()
-            logger.error("[Context Cache HALT / INC-AVT-057]: Google API returned 0 cached tokens for batch 0! Halting execution immediately via os._exit(1).")
+            logger.error(f"[Context Cache HALT / INC-AVT-057]: Google API returned 0 cached tokens for {phase} batch {b_idx}! Halting execution immediately via os._exit(1).")
             try:
                 from context_cache import ContextCacheManager
                 client_to_clean = getattr(self, "client", None)
@@ -2158,8 +2161,12 @@ class MultimodalTranslator:
 
             os._exit(1)
             raise ContextCacheDiscountError(
-                "Brak aktywnego rabatu Context Cache (-95%) na Paczce 0. Tłumaczenie przerwane w celu ochrony budżetu."
+                f"Brak aktywnego rabatu Context Cache (-95%) na {phase} (paczka {b_idx}). Tłumaczenie przerwane w celu ochrony budżetu."
             )
+
+    def _audit_batch0_context_cache(self, cached_tokens: int) -> None:
+        """Wstecznie kompatybilna delegacja dla Paczki 0."""
+        self._audit_batch_context_cache(b_idx=0, cached_tokens=cached_tokens, phase="phase1")
 
     FEMALE_ROLE_KEYWORDS = FEMALE_ROLE_KEYWORDS
     MALE_ROLE_KEYWORDS = MALE_ROLE_KEYWORDS
@@ -4376,31 +4383,29 @@ class MultimodalTranslator:
         )
         elapsed_phase1 = round(max(0.0, time.perf_counter() - t0_phase1), 2)
 
-        # Dynamiczny audyt Context Cache na Paczce 0 / Canary Run z filtrem Canary Warmup Retry (INC-AVT-057)
-        if not getattr(self, "_batch0_cache_telemetry_reported", False):
-            with self.lock:
-                if not getattr(self, "_batch0_cache_telemetry_reported", False):
-                    _tl = getattr(self, "_thread_local", None)
-                    _last_tu = getattr(_tl, "last_batch_token_usage", None) if _tl is not None else None
-                    cached_tokens = _last_tu.get("cached", 0) if _last_tu else 0
+        # Ciągły audyt Context Cache (Continuous Sentinel per-batch, Filar B - Standard 11.2.10)
+        _tl = getattr(self, "_thread_local", None)
+        _last_tu = getattr(_tl, "last_batch_token_usage", None) if _tl is not None else None
+        cached_tokens = _last_tu.get("cached", 0) if _last_tu else 0
 
-                    if cached_tokens == 0:
-                        from model_resolver import is_gemini_4_or_hydrogen_model
-                        if is_gemini_4_or_hydrogen_model(self.model_phase1):
-                            logger.info("[Context Cache Canary]: Wykryto cold-start na Paczce 0. Ponawianie zapytania w celu aktywacji rabatu serwerowego...")
-                            time.sleep(1.2)
-                            retry_resp = self._call_gemini_with_retry(
-                                contents=contents,
-                                schema_class=BatchTranslationResponse,
-                                batch_idx=b_idx
-                            )
-                            _tl = getattr(self, "_thread_local", None)
-                            _last_tu = getattr(_tl, "last_batch_token_usage", None) if _tl is not None else None
-                            cached_tokens = _last_tu.get("cached", 0) if _last_tu else 0
-                            batch_response = retry_resp
+        if cached_tokens == 0:
+            from model_resolver import is_gemini_4_or_hydrogen_model
+            if is_gemini_4_or_hydrogen_model(self.model_phase1):
+                logger.info(f"[Context Cache Canary]: Wykryto 0 tokenów cache na paczce {b_idx}. JIT Warmup Retry po 1.2s...")
+                time.sleep(1.2)
+                retry_resp = self._call_gemini_with_retry(
+                    contents=contents,
+                    schema_class=BatchTranslationResponse,
+                    batch_idx=b_idx
+                )
+                _tl = getattr(self, "_thread_local", None)
+                _last_tu = getattr(_tl, "last_batch_token_usage", None) if _tl is not None else None
+                cached_tokens = _last_tu.get("cached", 0) if _last_tu else 0
+                batch_response = retry_resp
 
-                    self._batch0_cache_telemetry_reported = True
-                    self._audit_batch0_context_cache(cached_tokens)
+        if b_idx == 0:
+            self._batch0_cache_telemetry_reported = True
+        self._audit_batch_context_cache(b_idx=b_idx, cached_tokens=cached_tokens, phase="phase1")
 
         if self.flight_recorder:
             try:

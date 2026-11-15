@@ -375,3 +375,23 @@ def test_key_affinity_deterministic():
     assert pool.get_client(affinity_idx=0) is not pool.get_client(affinity_idx=1)
 
 
+@pytest.mark.unit
+def test_continuous_cache_sentinel_batch1_halt(monkeypatch):
+    """Weryfikuje natychmiastowe zatrzymanie potoku przy zerowym cache na Paczce 1 (Filar B)."""
+    import os
+    from translator import MultimodalTranslator, ContextCacheDiscountError
+
+    monkeypatch.delenv("AVT_ALLOW_UNCACHED_BILLING", raising=False)
+    exit_calls = []
+    monkeypatch.setattr(os, "_exit", lambda code: exit_calls.append(code))
+
+    translator = MultimodalTranslator(api_key="mock_key", model="gemini-4-hydrogen", enable_verifier=False)
+    translator._audit_batch_context_cache(b_idx=0, cached_tokens=89546, phase="phase1")
+    assert exit_calls == []
+
+    with pytest.raises(ContextCacheDiscountError):
+        translator._audit_batch_context_cache(b_idx=1, cached_tokens=0, phase="phase1")
+    assert exit_calls == [1]
+
+
+
