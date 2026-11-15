@@ -6,7 +6,10 @@ and provides transparent cost summaries and budget safety checks.
 """
 
 import os
+import logging
 from typing import Dict, Any, Tuple, Optional
+
+logger = logging.getLogger("pricing_guard")
 
 # Base USD/PLN exchange rate (supports .env override)
 DEFAULT_USD_PLN = float(os.getenv("USD_PLN_RATE", os.getenv("USD_PLN", "4.00")))
@@ -370,6 +373,14 @@ class PricingGuard:
         standard_net_pln = round(total_without_cache_usd * usd_pln, 2)
         standard_gross_pln = round(standard_net_pln * (1.0 + vat_rate), 2)
         savings_pln = round(max(0.0, standard_net_pln - total_net_pln), 2)
+        savings_ratio = round(savings_pln / max(0.01, standard_net_pln), 4)
+
+        if savings_ratio < 0.85 and total_net_pln > 4.00:
+            logger.error(
+                f"[CostGovernance CRITICAL]: Realizacja rabatu Context Cache wyniosła zaledwie {savings_ratio * 100:.1f}% "
+                f"(< 85.0%). Koszt rzeczywisty {total_net_pln:.2f} PLN przekroczył sufit 4.00 PLN! "
+                f"Wymagana weryfikacja stabilności prefiksu promptu i rozgrzewania kluczy w puli."
+            )
 
         return {
             "net_pln": total_net_pln,
@@ -379,6 +390,7 @@ class PricingGuard:
             "standard_net_pln": standard_net_pln,
             "standard_gross_pln": standard_gross_pln,
             "savings_pln": savings_pln,
+            "savings_ratio": savings_ratio,
             "vat_rate": vat_rate
         }
 

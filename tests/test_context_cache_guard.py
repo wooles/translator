@@ -414,6 +414,24 @@ def test_f2_context_growth_cap_and_sentinel(monkeypatch):
     assert exit_calls == [1]
 
 
+@pytest.mark.unit
+def test_cost_governance_savings_ratio(caplog):
+    """Weryfikuje Cost Governance w PricingGuard."""
+    import logging
+    from pricing_guard import PricingGuard
+
+    # Sesja z awarią bufora (<85% rabatu)
+    fail_f1 = {"model": "gemini-4-hydrogen", "prompt": 1307090, "cached": 89546, "output": 72908}
+    fail_f2 = {"model": "gemini-4-hydrogen", "prompt": 1236170, "cached": 0, "output": 51355}
+
+    with caplog.at_level(logging.ERROR):
+        res = PricingGuard.calculate_actual_cost_breakdown(fail_f1, fail_f2)
+
+    assert res["savings_ratio"] < 0.05
+    assert any("[CostGovernance CRITICAL]" in r.message for r in caplog.records)
+
+
+
 
 
 

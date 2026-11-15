@@ -4405,7 +4405,9 @@ class MultimodalTranslator:
 
         if b_idx == 0:
             self._batch0_cache_telemetry_reported = True
-        self._audit_batch_context_cache(b_idx=b_idx, cached_tokens=cached_tokens, phase="phase1")
+            self._audit_batch0_context_cache(cached_tokens)
+        else:
+            self._audit_batch_context_cache(b_idx=b_idx, cached_tokens=cached_tokens, phase="phase1")
 
         if self.flight_recorder:
             try:
@@ -7026,7 +7028,10 @@ class MultimodalTranslator:
             if f2_stats:
                 print(f"  ├─ Faza 2 (Reżyseria & Elastic CoT): {cost_f2_pln:.2f} PLN netto")
                 print(f"  │   └─ Wejście: {f2_stats.get('prompt',0):,} tok (Cached: {f2_stats.get('cached',0):,}) | Wyjście+CoT: {f2_stats.get('output',0):,} tok")
-            print(f"  ├─ 🛡️ Rabat Context Cache (-90%): Zaoszczędzono ~{cache_savings_pln:.2f} PLN (Standardowo bez rabatu: ~{std_gross_pln:.2f} PLN brutto)")
+            savings_ratio = breakdown.get("savings_ratio", 0.0)
+            print(f"  ├─ 🛡️ Rabat Context Cache: Zaoszczędzono ~{cache_savings_pln:.2f} PLN (Efektywność: {savings_ratio * 100:.1f}%) [Standardowo: ~{std_gross_pln:.2f} PLN brutto]")
+            if savings_ratio < 0.85 and actual_cost_pln > 4.00:
+                print(f"  ⚠️ [Cost Governance ALERT]: Efektywność rabatu Context Cache ({savings_ratio * 100:.1f}%) poniżej progu 85%! Sprawdź stabilność prefiksu promptu.")
             print(f"  └─ ℹ️ Rozliczenia Google Cloud: Wyciągi bankowe zawierają 23% VAT i sumują wszystkie próby oraz testy z danego dnia.")
             print("═" * 72 + "\n")
 
