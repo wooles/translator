@@ -748,6 +748,29 @@ def extract_canonical_series_and_season(title: str) -> Tuple[str, Optional[int]]
             cleaned = cleaned[: m.start()].strip()
             break
 
+    # Jeśli nie wykryto sezonu na końcu, sprawdź czy na końcu jest numer odcinka maskujący sezon
+    if season_num is None:
+        cleaned_no_ep = re.sub(r"[\s\-_:]+(?:E|EP|Odcinek|Episode)?\s*\d{1,4}(?:v\d+)?\s*$", "", cleaned, flags=re.IGNORECASE).strip()
+        if cleaned_no_ep and cleaned_no_ep != cleaned:
+            matched_season = False
+            for pat, kind in season_extract_patterns:
+                m = re.search(pat, cleaned_no_ep, flags=re.IGNORECASE)
+                if m:
+                    if kind == "int":
+                        season_num = int(m.group(1))
+                    elif kind == "roman":
+                        season_num = _ROMAN_SEASON_MAP.get(m.group(1).upper())
+                    elif kind == "num_or_roman":
+                        tok = m.group(1).upper()
+                        season_num = int(tok) if tok.isdigit() else _ROMAN_SEASON_MAP.get(tok)
+                    elif kind == "none":
+                        season_num = None
+                    cleaned = cleaned_no_ep[: m.start()].strip()
+                    matched_season = True
+                    break
+            if not matched_season:
+                cleaned = cleaned_no_ep
+
     cleaned = re.sub(r"[\s\-_:]+$", "", cleaned).strip()
     nfkd = unicodedata.normalize("NFKD", cleaned)
     ascii_str = "".join(c for c in nfkd if not unicodedata.combining(c))
@@ -817,6 +840,112 @@ class ExternalGenderResolver:
             logger.debug(f"[ExternalGenderResolver] Nieudany atomowy zapis cache: {e}")
 
     @classmethod
+    def _resolve_from_local_fansub_lexicons(
+        cls,
+        character_name: str,
+        series_slug: str = ""
+    ) -> Optional[str]:
+        """
+        Deterministyczny lokalny fallback onomastyczny do leksykonów fansuberskich (INC-AVT-056).
+        Przeszukuje pliki w series_memory/fansub_lexicons/*.json pod kątem znormalizowanego imienia.
+        """
+        if not character_name or not isinstance(character_name, str):
+            return None
+        clean_c = character_name.strip().lower()
+        if not clean_c:
+            return None
+
+        lexicons_dir = Path(__file__).resolve().parent / "series_memory" / "fansub_lexicons"
+        if not lexicons_dir.exists():
+            return None
+
+        files_to_check: List[Path] = []
+        if series_slug:
+            norm_s = _normalize_franchise_slug(series_slug)
+            for f in sorted(lexicons_dir.glob("*.json")):
+                stem_norm = _normalize_franchise_slug(f.stem)
+                if norm_s and (norm_s in stem_norm or stem_norm in norm_s):
+                    files_to_check.insert(0, f)
+                else:
+                    files_to_check.append(f)
+        else:
+            files_to_check = sorted(lexicons_dir.glob("*.json"))
+
+        for lex_path in files_to_check:
+            try:
+                with open(lex_path, "r", encoding="utf-8") as f:
+                    lex_data = json.load(f)
+                if not isinstance(lex_data, dict):
+                    continue
+
+                entries_to_scan: List[Tuple[Any, Any]] = []
+                terms = lex_data.get("terms")
+                if isinstance(terms, dict):
+                    entries_to_scan.extend(terms.items())
+                characters = lex_data.get("characters")
+                if isinstance(characters, dict):
+                    entries_to_scan.extend(characters.items())
+
+                for term_key, term_val in entries_to_scan:
+                    matched = False
+                    if str(term_key).strip().lower() == clean_c:
+                        matched = True
+
+                    val_dict = term_val if isinstance(term_val, dict) else {}
+                    if not matched and val_dict:
+                        en_list = val_dict.get("en", [])
+                        if isinstance(en_list, list):
+                            for en_str in en_list:
+                                if str(en_str).strip().lower() == clean_c:
+                                    matched = True
+                                    break
+                        can_pl = str(val_dict.get("canonical_pl", "")).strip().lower()
+                        if can_pl and can_pl == clean_c:
+                            matched = True
+                        aliases = val_dict.get("aliases", [])
+                        if isinstance(aliases, list):
+                            for a in aliases:
+                                if str(a).strip().lower() == clean_c:
+                                    matched = True
+                                    break
+
+                    if matched:
+                        raw_g = ""
+                        if val_dict:
+                            raw_g = str(val_dict.get("gender") or val_dict.get("apparent_gender") or val_dict.get("grammatical_gender") or "").strip().lower()
+                            if not raw_g:
+                                instr = str(val_dict.get("instruction") or val_dict.get("description") or "").lower()
+                                if re.search(r"\b(kobieta|dziewczyna|żeńska|córka|matka)\b", instr):
+                                    raw_g = "female"
+                                elif re.search(r"\b(mężczyzna|chłopak|męska|syn|ojciec)\b", instr):
+                                    raw_g = "male"
+                        elif isinstance(term_val, str):
+                            instr = term_val.lower()
+                            if re.search(r"\b(kobieta|dziewczyna|żeńska|córka|matka)\b", instr):
+                                raw_g = "female"
+                            elif re.search(r"\b(mężczyzna|chłopak|męska|syn|ojciec)\b", instr):
+                                raw_g = "male"
+
+                        if raw_g in ("female", "feminine", "woman", "girl", "kobieta"):
+                            return "FEMALE"
+                        elif raw_g in ("male", "masculine", "man", "boy", "mężczyzna", "mezczyzna"):
+                            return "MALE"
+            except Exception:
+                continue
+
+        return None
+
+    @classmethod
+    def _fallback_lookup_in_fansub_lexicons(
+        cls,
+        character_name: str
+    ) -> Optional[str]:
+        """
+        Pomocnicza metoda fallbacku do lokalnych leksykonów fansuberskich (INC-AVT-056).
+        """
+        return cls._resolve_from_local_fansub_lexicons(character_name, "")
+
+    @classmethod
     def resolve_character_gender(
         cls,
         character_name: str,
@@ -849,6 +978,16 @@ class ExternalGenderResolver:
             return None
 
         if cls._CIRCUIT_OPEN:
+            local_g = cls._resolve_from_local_fansub_lexicons(clean_c, s_low) or cls._fallback_lookup_in_fansub_lexicons(clean_c)
+            if local_g:
+                with cls._LOCK:
+                    cls._MEMORY_CACHE[cache_key] = {
+                        "gender": local_g,
+                        "source": "local_fansub_lexicon",
+                        "timestamp": time.time()
+                    }
+                    cls._save_cache()
+                return local_g
             return None
 
         query = """
@@ -866,7 +1005,9 @@ class ExternalGenderResolver:
         headers = {
             "Content-Type": "application/json",
             "Accept": "application/json",
-            "User-Agent": "MultimodalAnimeTranslator/1.0"
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
+            "Origin": "https://anilist.co",
+            "Referer": "https://anilist.co/"
         }
         req = urllib.request.Request("https://graphql.anilist.co", data=payload, headers=headers)
 
@@ -883,10 +1024,30 @@ class ExternalGenderResolver:
                     logger.warning(f"[ExternalGenderResolver] Wylacznik awaryjny aktywny po 3 bledach: {e}")
                 else:
                     logger.debug(f"[ExternalGenderResolver] Blad zapytania dla '{clean_c}': {e}")
+            local_g = cls._resolve_from_local_fansub_lexicons(clean_c, s_low) or cls._fallback_lookup_in_fansub_lexicons(clean_c)
+            if local_g:
+                with cls._LOCK:
+                    cls._MEMORY_CACHE[cache_key] = {
+                        "gender": local_g,
+                        "source": "local_fansub_lexicon",
+                        "timestamp": time.time()
+                    }
+                    cls._save_cache()
+                return local_g
             return None
 
         char_data = data.get("data", {}).get("Character")
         if not char_data or not isinstance(char_data, dict):
+            local_g = cls._resolve_from_local_fansub_lexicons(clean_c, s_low) or cls._fallback_lookup_in_fansub_lexicons(clean_c)
+            if local_g:
+                with cls._LOCK:
+                    cls._MEMORY_CACHE[cache_key] = {
+                        "gender": local_g,
+                        "source": "local_fansub_lexicon",
+                        "timestamp": time.time()
+                    }
+                    cls._save_cache()
+                return local_g
             with cls._LOCK:
                 cls._MEMORY_CACHE[cache_key] = {"gender": None, "timestamp": time.time()}
                 cls._save_cache()

@@ -376,6 +376,12 @@ def main():
         default="logs",
         help="Katalog zapisu pełnych logów telemetrycznych (domyślnie: logs)"
     )
+    parser.add_argument(
+        "--thinking-f1",
+        choices=["auto", "low", "medium"],
+        default="auto",
+        help="Poziom myślenia CoT dla Fazy 1 modelu Hydrogen: 'auto' (MEDIUM dla <=360 linii, LOW dla >360 linii), 'low' (0 CoT), 'medium' (3072 CoT). Domyślnie: auto."
+    )
 
     args = parser.parse_args()
 
@@ -537,7 +543,8 @@ def main():
             whisper_model_size=args.whisper_model,
             thinking_budget_phase2=thinking_budget,
             trace_log=getattr(args, "trace_log", True),
-            trace_dir=getattr(args, "trace_dir", "logs")
+            trace_dir=getattr(args, "trace_dir", "logs"),
+            thinking_f1=getattr(args, "thinking_f1", "auto")
         )
     except ValueError as e:
         print(f"\n[Błąd Konfiguracji]: {e}")

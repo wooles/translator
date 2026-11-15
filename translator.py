@@ -224,6 +224,17 @@ def format_dry_telemetry_tag(
     return f"[{' | '.join(segments)}]"
 
 
+def _resolve_bible_path(title_or_path: str, storage_dir: Optional[Union[Path, str]] = None) -> Path:
+    """
+    Deterministycznie rozstrzyga ścieżkę do bazy SeriesBible dla danego tytułu lub ścieżki pliku (INC-AVT-058).
+    Wykrywa znaczniki kolejnych sezonów (S2, Season 2, 2nd Season, S3 itp.) i preferuje bazę
+    dedykowaną dla danego sezonu, zapobiegając kolizji z bazą sezonu bazowego (Sezon 1).
+    """
+    from series_memory import SeriesBible
+    bible = SeriesBible(anime_title=title_or_path, storage_dir=storage_dir)
+    return bible._resolve_bible_path()
+
+
 def enforce_locked_glossary_terms(
     en_text: str,
     candidate_pl: str,
@@ -1977,7 +1988,8 @@ class MultimodalTranslator:
         whisper_model_size: str = "kotoba-tech/kotoba-whisper-v2.0-faster",
         thinking_budget_phase2: Optional[int] = None,
         trace_log: bool = True,
-        trace_dir: Optional[Union[str, Path]] = "logs"
+        trace_dir: Optional[Union[str, Path]] = "logs",
+        thinking_f1: str = "auto"
     ):
         self.api_key = api_key or os.getenv("GEMINI_API_KEY")
         if not self.api_key:
@@ -1997,7 +2009,8 @@ class MultimodalTranslator:
         self.enable_verifier = enable_verifier
         self.max_image_width = max_image_width
         self.keep_honorifics = keep_honorifics
-        self.phase1_thinking_budget = 0  # Phase 1 is guaranteed to run with CoT=0 for rapid triangulation
+        self.thinking_f1_mode = (thinking_f1 or "auto").lower()
+        self.phase1_thinking_budget = 0
         self.thinking_budget_phase2 = thinking_budget_phase2
         self.trace_log = trace_log
         self.trace_dir = trace_dir
@@ -2049,6 +2062,22 @@ class MultimodalTranslator:
         self.character_registry: Dict[str, str] = {}
         self.combined_glossary: Dict[str, str] = {}
         self.series_bible = None
+
+    def resolve_f1_thinking_budget(self, total_lines: int) -> int:
+        """
+        Wyznacza budżet myślenia CoT dla Fazy 1 (Adaptive F1 Thinking).
+        W trybie 'medium': 3072 CoT.
+        W trybie 'low': 0 CoT.
+        W trybie 'auto': 3072 CoT dla <= 360 linii (koszt <= 3.40 PLN netto), 0 CoT dla > 360 linii.
+        """
+        if self.thinking_f1_mode == "medium":
+            self.phase1_thinking_budget = 3072
+        elif self.thinking_f1_mode == "low":
+            self.phase1_thinking_budget = 0
+        else:  # auto
+            self.phase1_thinking_budget = 3072 if total_lines <= 360 else 0
+        return self.phase1_thinking_budget
+
         
         # Translation Memory from subtitle corpus
         try:
@@ -3930,6 +3959,11 @@ class MultimodalTranslator:
 
                 time.sleep(wait_time)
 
+    def _resolve_bible_path(self, title_or_path: str) -> Path:
+        """Deterministycznie rozstrzyga ścieżkę do bazy SeriesBible dla instancji tłumacza."""
+        s_dir = getattr(self.series_bible, "storage_dir", None) if getattr(self, "series_bible", None) else None
+        return _resolve_bible_path(title_or_path, storage_dir=s_dir)
+
     def _process_single_batch(
         self,
         b_idx: int,
@@ -4328,6 +4362,21 @@ class MultimodalTranslator:
             schema_class=BatchTranslationResponse
         )
         elapsed_phase1 = round(max(0.0, time.perf_counter() - t0_phase1), 2)
+
+        # Dynamiczny audyt Context Cache na Paczce 0 (INC-AVT-057)
+        if b_idx == 0 and not getattr(self, "_batch0_cache_telemetry_reported", False):
+            with self.lock:
+                if not getattr(self, "_batch0_cache_telemetry_reported", False):
+                    self._batch0_cache_telemetry_reported = True
+                    _tl = getattr(self, "_thread_local", None)
+                    _last_tu = getattr(_tl, "last_batch_token_usage", None) if _tl is not None else None
+                    cached_tokens = _last_tu.get("cached", 0) if _last_tu else 0
+                    if cached_tokens >= 32768:
+                        print(f"\n  💰 [Context Cache AKTYWNY]: Serwer potwierdził CachedContent: {cached_tokens} tokenów (Rabat -95% aktywny) [Context Cache ACTIVE].")
+                        logger.info(f"[Context Cache CONFIRMED]: Server confirmed CachedContent token count: {cached_tokens} (-95% input discount active)")
+                    elif cached_tokens == 0:
+                        print("\n  ⚠️ [Context Cache OSTRZEŻENIE / INC-AVT-057]: Serwer zwrócił 0 tokenów cache! Rabat serwerowy NIEAKTYWNY (rozliczenie 100% stawki bazowej) [Context Cache WARN / INC-AVT-057].")
+                        logger.warning("[Context Cache WARN / INC-AVT-057]: Google API returned 0 cached tokens for batch 0! Billing at full rate.")
 
         if self.flight_recorder:
             try:
@@ -5619,8 +5668,13 @@ class MultimodalTranslator:
             
             # Standard 9.0 Wariant (d): Wczesna inicjalizacja i zasilenie SeriesBible oraz character_registry
             from series_memory import SeriesBible, generate_polish_name_declension
+            from metadata import extract_canonical_series_and_season
+            ref_stem = Path(ref_filename).stem if ref_filename else ""
+            _, ref_season = extract_canonical_series_and_season(ref_stem) if ref_stem else ("", None)
+            _, title_season = extract_canonical_series_and_season(title_name) if title_name else ("", None)
+            effective_title = f"{title_name} S{ref_season}" if (ref_season is not None and title_season is None) else title_name
             if not getattr(self, "series_bible", None):
-                self.series_bible = SeriesBible(anime_title=title_name)
+                self.series_bible = SeriesBible(anime_title=effective_title)
 
             for c in anime_meta.get("characters", []):
                 c_name = c.get("name")
@@ -5882,10 +5936,18 @@ class MultimodalTranslator:
         series_title = ""
         if anime_meta:
             series_title = anime_meta.get("title_romaji") or anime_meta.get("title_english") or ""
+        ref_path = video_path or subs_path or ""
         if not series_title:
-            ref_path = video_path or subs_path or ""
             if ref_path:
                 series_title = Path(ref_path).stem.split(" - ")[0].replace("[ASW]", "").replace("[Erai-raws]", "").strip()
+
+        from metadata import extract_canonical_series_and_season
+        ref_stem = Path(ref_path).stem if ref_path else ""
+        _, ref_season = extract_canonical_series_and_season(ref_stem) if ref_stem else ("", None)
+        _, title_season = extract_canonical_series_and_season(series_title) if series_title else ("", None)
+        if ref_season is not None and title_season is None and series_title:
+            series_title = f"{series_title} S{ref_season}"
+
         if not getattr(self, "series_bible", None):
             self.series_bible = SeriesBible(anime_title=series_title)
         # Pre-populate global Character Registry from persistent Series Bible
@@ -6156,6 +6218,7 @@ class MultimodalTranslator:
         if untranslated_count > 0:
             # Pre-warming and Context Cache Hard Protection across all client pool keys (guarantees -90% discount)
             from context_cache import ContextCacheManager
+            logger.info("[Context Cache]: Zainicjalizowano konfigurację bufora hybrydowego. Oczekiwanie na telemetrię Paczki 0...")
             print(f"  [Infrastruktura Finansowa]: Weryfikacja i rozgrzewanie pamięci Context Cache z pełną wiedzą odcinka...")
             pool_or_c1 = self.client_pool if hasattr(self, "client_pool") and self.client_pool else self.client
             c1 = ContextCacheManager.ensure_cache_ready(pool_or_c1, self.model_phase1, self.system_prompt, tag="translator")
@@ -6231,13 +6294,20 @@ class MultimodalTranslator:
         )
 
         total_lines = len(raw_entries)
+        self.resolve_f1_thinking_budget(total_lines)
+        f1_level_label = "MEDIUM (3072 CoT)" if self.phase1_thinking_budget > 2048 else "LOW (Szybka triangulacja)"
+        logger.info(f"[Adaptive Thinking F1]: Tryb: {self.thinking_f1_mode.upper()} -> Wybrany poziom: {f1_level_label} dla {total_lines} linii.")
+
         from pricing_guard import PricingGuard
         from model_resolver import is_gemini_4_or_hydrogen_model
         p_profile = "3" if is_gemini_4_or_hydrogen_model(self.model_phase1) else "2"
+        f1_level_str = "MEDIUM" if getattr(self, "phase1_thinking_budget", 0) > 2048 else "LOW"
         workload_est = PricingGuard.estimate_loaded_workload_cost_pln(
             p_profile,
             lines_count=total_lines,
-            batches_count=len(batches)
+            batches_count=len(batches),
+            has_cache=True,
+            f1_thinking_level=f1_level_str
         )
         print(
             f"  [Budżet Odcinka ({total_lines} kwestii / {len(batches)} paczek)]: "
@@ -6897,7 +6967,7 @@ class MultimodalTranslator:
             if getattr(self, "series_bible", None):
                 ref_name = Path(video_path).stem if video_path else (Path(subs_path).stem if subs_path else "Odcinek")
                 try:
-                    self.series_bible.register_episode_execution(
+                    self.series_bible.update_after_episode(
                         episode_name=ref_name,
                         batch_count=len(batches),
                         dialogue_count=total_lines,

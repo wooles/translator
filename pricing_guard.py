@@ -154,35 +154,44 @@ class PricingGuard:
 
         return 0.16
 
-    @staticmethod
+    @classmethod
     def estimate_loaded_workload_cost_pln(
+        cls,
         profile: str,
         lines_count: int,
         batches_count: int,
         has_cache: bool = True,
+        f1_thinking_level: str = "LOW",
         usd_pln: float = DEFAULT_USD_PLN,
         vat_rate: float = 0.23
-    ) -> Dict[str, float]:
+    ) -> Dict[str, Any]:
         """
         Oblicza realistyczny koszt netto i brutto dla faktycznej liczby utworzonych paczek
         i kwestii, z uwzględnieniem zdeduplikowanego promptu oraz bufora kontekstowego.
         """
         profile = (profile or "").lower()
         batches = max(1, batches_count)
+        f1_th = (f1_thinking_level or "LOW").upper()
 
         if profile in ["1", "standard", "flash_lite"]:
             return {
                 "net_pln": 0.00,
                 "gross_pln": 0.00,
                 "batches": batches_count,
-                "lines": lines_count
+                "lines": lines_count,
+                "f1_thinking_level": f1_th
             }
 
         elif profile in ["3", "master", "flash_reasoning", "hydrogen", "hydrogen_master", "pro_level3"]:
             rate_h = GOOGLE_API_RATES["hydrogen"]
             system_prompt_tokens = 55000
             batch_input_tokens = 7100
-            lean_output_f1_tokens = 1750
+            if f1_th == "MEDIUM":
+                lean_output_f1_tokens = 4822  # 1750 (JSON) + 3072 (CoT)
+            elif f1_th == "HIGH":
+                lean_output_f1_tokens = 7894  # 1750 (JSON) + 6144 (CoT)
+            else:
+                lean_output_f1_tokens = 1750  # LOW: 1750 (JSON + minimalny CoT)
             lean_output_f2_tokens = 1500
             p2_input_tokens = 1800
 
@@ -214,7 +223,8 @@ class PricingGuard:
                 "net_pln": net_pln,
                 "gross_pln": gross_pln,
                 "batches": batches_count,
-                "lines": lines_count
+                "lines": lines_count,
+                "f1_thinking_level": f1_th
             }
 
         elif profile in ["4", "ultra", "ultra_pro", "cinema", "pro", "pro_level4"]:
@@ -252,7 +262,8 @@ class PricingGuard:
                 "net_pln": net_pln,
                 "gross_pln": gross_pln,
                 "batches": batches_count,
-                "lines": lines_count
+                "lines": lines_count,
+                "f1_thinking_level": f1_th
             }
 
         else:  # Profile 2: Studio / Flash
@@ -279,7 +290,8 @@ class PricingGuard:
                 "net_pln": net_pln,
                 "gross_pln": gross_pln,
                 "batches": batches_count,
-                "lines": lines_count
+                "lines": lines_count,
+                "f1_thinking_level": f1_th
             }
 
     @classmethod

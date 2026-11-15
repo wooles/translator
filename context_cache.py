@@ -251,14 +251,20 @@ class ContextCacheManager:
                 if not first_name:
                     first_name = res
             if verbose and first_name:
-                print(f"  [Context Cache]: Locked -90% server discount for {model} ({prompt_tag}) across {len(client.clients)} API keys.")
+                if is_gemini_4_or_hydrogen_model(model):
+                    print("  [Context Cache]: Initialized hybrid cache config. Awaiting real server telemetry confirmation on Batch 0...")
+                else:
+                    print(f"  [Context Cache]: Locked -90% server discount for {model} ({prompt_tag}) across {len(client.clients)} API keys.")
             if is_gemini_4_or_hydrogen_model(model):
                 return True
             return first_name or "cached_ready"
         else:
             cache_name = cls.get_or_create_cache(client, model, system_instruction, tag=tag)
             if cache_name and verbose:
-                print(f"  [Context Cache]: Locked -90% server discount for {model} ({prompt_tag}).")
+                if is_gemini_4_or_hydrogen_model(model):
+                    print("  [Context Cache]: Initialized hybrid cache config. Awaiting real server telemetry confirmation on Batch 0...")
+                else:
+                    print(f"  [Context Cache]: Locked -90% server discount for {model} ({prompt_tag}).")
             if is_gemini_4_or_hydrogen_model(model):
                 return True
             return cache_name or "cached_ready"

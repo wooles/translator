@@ -8132,6 +8132,36 @@ class SeriesBible:
         with self._lock:
             try:
                 dump_data = copy.deepcopy(self.data)
+                # Multi-Season Hygiene (INC-AVT-058): jeśli plik bazowy (sezon 1 / brak sezonu), nie zapisuj zanieczyszczeń z sequeli
+                from metadata import extract_canonical_series_and_season
+                file_stem = self.file_path.stem if hasattr(self, "file_path") and self.file_path else ""
+                _, file_season = extract_canonical_series_and_season(file_stem)
+
+                if file_season is None and isinstance(dump_data, dict):
+                    if "episodes_translated" in dump_data and isinstance(dump_data["episodes_translated"], list):
+                        clean_eps = []
+                        for ep in dump_data["episodes_translated"]:
+                            _, ep_s = extract_canonical_series_and_season(str(ep))
+                            if ep_s is None:
+                                m_s = re.search(r"\bS0?(\d+)\b|\bSeason\s*(\d+)\b|\b(\d+)(?:st|nd|rd|th)\s+Season\b", str(ep), flags=re.IGNORECASE)
+                                if m_s:
+                                    ep_s = int(m_s.group(1) or m_s.group(2) or m_s.group(3))
+                            if ep_s is None or ep_s == file_season:
+                                clean_eps.append(ep)
+                        dump_data["episodes_translated"] = clean_eps
+
+                    if "batch_stats" in dump_data and isinstance(dump_data["batch_stats"], dict):
+                        clean_bs = {}
+                        for ep_key, bs_val in dump_data["batch_stats"].items():
+                            _, ep_s = extract_canonical_series_and_season(str(ep_key))
+                            if ep_s is None:
+                                m_s = re.search(r"\bS0?(\d+)\b|\bSeason\s*(\d+)\b|\b(\d+)(?:st|nd|rd|th)\s+Season\b", str(ep_key), flags=re.IGNORECASE)
+                                if m_s:
+                                    ep_s = int(m_s.group(1) or m_s.group(2) or m_s.group(3))
+                            if ep_s is None or ep_s == file_season:
+                                clean_bs[ep_key] = bs_val
+                        dump_data["batch_stats"] = clean_bs
+
                 with open(self.file_path, "w", encoding="utf-8") as f:
                     json.dump(dump_data, f, ensure_ascii=False, indent=2)
                 art_p = getattr(self, "artefakty_path", None)
@@ -8139,6 +8169,24 @@ class SeriesBible:
                     shutil.copy2(self.file_path, art_p)
             except Exception:
                 logger.warning("Kopia bazy wiedzy do artefaktów zakończona wyjątkiem", exc_info=True)
+
+    def update_after_episode(
+        self,
+        episode_name: str,
+        batch_count: int = 0,
+        dialogue_count: int = 0,
+        cost_pln: Optional[float] = None
+    ) -> None:
+        """
+        Aktualizuje statystyki i stan bazy po zakończeniu odcinka (INC-AVT-058).
+        Zapewnia higienę baz wielosezonowych i zapobiega zanieczyszczaniu baz bazowych (Sezon 1).
+        """
+        self.register_episode_execution(
+            episode_name=episode_name,
+            batch_count=batch_count,
+            dialogue_count=dialogue_count,
+            cost_pln=cost_pln
+        )
 
     def register_episode_execution(
         self,
@@ -8149,12 +8197,35 @@ class SeriesBible:
     ):
         """
         Records execution density and batch stats in Series Bible to monitor and prevent financial/fragmentation drift.
+        Multi-season hygiene (INC-AVT-058): Prevents polluting base season 1 bible with sequel episodes.
         """
         with self._lock:
             if not hasattr(self, "data") or "episodes_translated" not in self.data:
                 return
             entry = episode_name.strip()
-            if entry and entry not in self.data["episodes_translated"]:
+            if not entry:
+                return
+
+            # Weryfikacja zgodności sezonowej (Multi-Season Hygiene)
+            from metadata import extract_canonical_series_and_season
+            file_stem = self.file_path.stem if hasattr(self, "file_path") and self.file_path else ""
+            _, file_season = extract_canonical_series_and_season(file_stem)
+            _, ep_season = extract_canonical_series_and_season(entry)
+
+            if ep_season is None:
+                m_s = re.search(r"\bS0?(\d+)\b|\bSeason\s*(\d+)\b|\b(\d+)(?:st|nd|rd|th)\s+Season\b", entry, flags=re.IGNORECASE)
+                if m_s:
+                    ep_season = int(m_s.group(1) or m_s.group(2) or m_s.group(3))
+
+            # Jeśli odcinek jawnie wskazuje na inny sezon niż plik docelowy (np. S2 w bazie S1):
+            if ep_season is not None and ep_season != file_season:
+                logger.warning(
+                    f"[SeriesBible Multi-Season Hygiene]: Zablokowano zanieczyszczenie bazy '{file_stem}' "
+                    f"statystykami odcinka '{entry}' (sezon odcinka {ep_season} != sezon bazy {file_season})"
+                )
+                return
+
+            if entry not in self.data["episodes_translated"]:
                 self.data["episodes_translated"].append(entry)
 
             if "batch_stats" not in self.data:
