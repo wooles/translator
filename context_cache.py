@@ -395,11 +395,14 @@ class ContextCacheManager:
         model: str,
         system_instruction: str,
         verbose: bool = True,
-        tag: Optional[str] = None
+        tag: Optional[str] = None,
+        thinking_config: Optional[Any] = None,
+        response_schema: Optional[Any] = None,
+        response_mime_type: Optional[str] = None
     ) -> Optional[str]:
         """
-        Guarantees that server cache is active and locked across all client pool keys before translation begins,
-        protecting against unauthorized full-rate billing.
+        Gwarantuje aktywację bufora serwerowego z pełną symetrią sygnatury dekodera (H4 + H5 fix).
+        Rozgrzewa bufor z identycznym thinking_config i response_schema jak realne zapytanie produkcyjne.
         """
         if not client or not system_instruction:
             return None
@@ -417,24 +420,32 @@ class ContextCacheManager:
 
         if hasattr(client, "init_replicated_cache"):
             mapping = client.init_replicated_cache(model, padded_instruction, tag=prompt_tag)
-            # Rozgrzewka implicit cache (Warm-Up Ping) na każdym kluczu w puli dla modeli Hydrogen
+            # Rozgrzewka implicit cache z pełną sygnaturą dekodera (Thinking + JSON Schema)
             if is_gemini_4_or_hydrogen_model(model):
                 active_clients = client.get_active_clients() if hasattr(client, "get_active_clients") else [client]
                 for idx, c in enumerate(active_clients):
                     try:
-                        warmup_cfg = types.GenerateContentConfig(
-                            system_instruction=padded_instruction,
-                            max_output_tokens=1,
-                            temperature=0.0
-                        )
+                        cfg_kwargs = {
+                            "system_instruction": padded_instruction,
+                            "max_output_tokens": 1,
+                            "temperature": 0.0
+                        }
+                        if thinking_config is not None:
+                            cfg_kwargs["thinking_config"] = thinking_config
+                        if response_schema is not None:
+                            cfg_kwargs["response_schema"] = response_schema
+                        if response_mime_type is not None:
+                            cfg_kwargs["response_mime_type"] = response_mime_type
+
+                        warmup_cfg = types.GenerateContentConfig(**cfg_kwargs)
                         c.models.generate_content(
                             model=model,
-                            contents="PING_WARMUP_INIT",
+                            contents=["PING_WARMUP_INIT"],
                             config=warmup_cfg
                         )
-                        logger.info(f"[Context Cache Warmup]: Pomyślnie rozgrzano bufor dla klucza {idx + 1}/{len(active_clients)} ({model}, {prompt_tag}).")
+                        logger.info(f"[Context Cache Sequential Warmup]: Pomyślnie rozgrzano bufor dla klucza #{idx} ({model}, {prompt_tag}).")
                     except Exception as e:
-                        logger.debug(f"[Context Cache Warmup]: Błąd mikro-rozgrzewki klucza {idx + 1}: {e}")
+                        logger.debug(f"[Context Cache Warmup]: Błąd mikro-rozgrzewki klucza #{idx}: {e}")
             first_name = next(iter(mapping.values()), None)
             if verbose and first_name:
                 print(f"  [Context Cache]: Zablokowano i rozgrzano rabat serwerowy dla {model} ({prompt_tag}) na {len(mapping)} kluczach API.")

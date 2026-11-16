@@ -5277,6 +5277,32 @@ class MultimodalTranslator:
             _vtl = getattr(self.verifier, "_thread_local", None)
             p2_tok_usage = getattr(_vtl, "last_batch_token_usage", None) if _vtl else {}
             p2_cached = p2_tok_usage.get("cached", 0) if p2_tok_usage else 0
+
+            # FILAR B / H6 FIX: Automatyczny JIT Warmup Retry dla Fazy 2 przed rzutem Fail-Fast
+            if p2_cached == 0:
+                from model_resolver import is_gemini_4_or_hydrogen_model
+                if is_gemini_4_or_hydrogen_model(getattr(self.verifier, "model", "")):
+                    logger.warning(f"[Context Cache F2 Sentinel]: Wykryto 0 tokenów cache w Fazie 2 na paczce {b_idx}. JIT Warmup Retry po 1.2s...")
+                    time.sleep(1.2)
+                    refined_lines = self.verifier.verify_batch(
+                        batch_items=pass1_items,
+                        scene_summary=scene_desc or "",
+                        episode_profile_str=episode_profile_str,
+                        user_feedback_str=user_feedback_str,
+                        glossary_str=glossary_str,
+                        focused_rules_str=phase2_focused_rules,
+                        series_bible_str=scoped_series_bible_str,
+                        manga_canon_str=manga_canon_str,
+                        history_context=lookback_history,
+                        lookahead_events=lookahead_events,
+                        character_registry=self.character_registry,
+                        scene_diagnosis=getattr(batch_response, "scene_diagnosis", None) if batch_response else None,
+                        batch_idx=b_idx
+                    )
+                    _vtl = getattr(self.verifier, "_thread_local", None)
+                    p2_tok_usage = getattr(_vtl, "last_batch_token_usage", None) if _vtl else {}
+                    p2_cached = p2_tok_usage.get("cached", 0) if p2_tok_usage else 0
+
             self._audit_batch_context_cache(b_idx=b_idx, cached_tokens=p2_cached, phase="phase2")
             for r in refined_lines:
                 orig_it = next((it for it in pass1_items if it.get("id") == r.id), None)
@@ -6357,9 +6383,22 @@ class MultimodalTranslator:
                     "Sprawdź połączenie z Google API lub stan konta i spróbuj ponownie."
                 )
             if self.verifier and hasattr(self.verifier, "model") and hasattr(self.verifier, "system_prompt"):
+                from verifier import LeanRefinedBatchResponse
+                from model_resolver import build_thinking_config
                 pool_or_c2 = getattr(self.verifier, "client_pool", None) or getattr(self.verifier, "client", None)
                 self.verifier.system_prompt = ensure_cache_token_floor(self.verifier.system_prompt, pool_or_c2, self.verifier.model)
-                c2 = ContextCacheManager.ensure_cache_ready(pool_or_c2, self.verifier.model, self.verifier.system_prompt, tag="verifier")
+                
+                # Budowa symetrycznej konfiguracji F2 dla warm-up pingu (H4 + H5 fix)
+                f2_thinking = build_thinking_config(self.verifier.model, getattr(self.verifier, "thinking_budget", 2048))
+                c2 = ContextCacheManager.ensure_cache_ready(
+                    client=pool_or_c2,
+                    model=self.verifier.model,
+                    system_instruction=self.verifier.system_prompt,
+                    tag="verifier",
+                    thinking_config=f2_thinking,
+                    response_schema=LeanRefinedBatchResponse,
+                    response_mime_type="application/json"
+                )
                 if not c2:
                     raise RuntimeError(
                         f"KATEGORYCZNA BLOKADA FINANSOWA: Nie udało się aktywować serwerowego Context Cache dla weryfikatora ({self.verifier.model}). "
