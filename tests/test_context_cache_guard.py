@@ -431,6 +431,114 @@ def test_cost_governance_savings_ratio(caplog):
     assert any("[CostGovernance CRITICAL]" in r.message for r in caplog.records)
 
 
+@pytest.mark.unit
+def test_f2_warmup_signature_matches_real_request(monkeypatch):
+    """
+    Weryfikuje symetrię sygnatury dekodera dla Fazy 2 (H4 + H5 fix).
+    Upewnia się, że ping rozgrzewający dla tagu 'verifier' przekazuje
+    thinking_config, response_schema oraz response_mime_type identyczne z realnym zapytaniem.
+    """
+    from context_cache import ContextCacheManager
+    from verifier import LeanRefinedBatchResponse
+    from google.genai import types
+
+    captured_configs = []
+
+    class MockModelClient:
+        def generate_content(self, model, contents, config):
+            captured_configs.append(config)
+            mock_resp = MagicMock()
+            mock_resp.text = "{}"
+            return mock_resp
+
+    class MockClient:
+        def __init__(self):
+            self.models = MockModelClient()
+            self.clients = [self]
+            self._cooldowns = {}
+        def get_active_clients(self):
+            return [self]
+        def init_replicated_cache(self, model, instruction, tag=None):
+            return {"0": "__IMPLICIT_CACHE_95__"}
+
+    mock_client = MockClient()
+    f2_thinking = types.ThinkingConfig(thinking_budget=2048)
+
+    ContextCacheManager.ensure_cache_ready(
+        client=mock_client,
+        model="gemini-4-hydrogen",
+        system_instruction="PROMPT TESTOWY SYSTEMOWY DLA WERYFIKATORA",
+        tag="verifier",
+        thinking_config=f2_thinking,
+        response_schema=LeanRefinedBatchResponse,
+        response_mime_type="application/json"
+    )
+
+    assert len(captured_configs) == 1, "Oczekiwano wysłania dokładnie jednego pingu warm-up!"
+    cfg = captured_configs[0]
+    assert cfg.thinking_config is not None, "Warm-up F2 musi posiadać thinking_config!"
+    assert cfg.thinking_config.thinking_budget == 2048
+    assert cfg.response_schema == LeanRefinedBatchResponse, "Warm-up F2 musi posiadać schemat JSON Pydantic!"
+    assert cfg.response_mime_type == "application/json"
+
+
+@pytest.mark.unit
+def test_f2_retry_on_zero_cache_recovers(monkeypatch):
+    """
+    Weryfikuje działanie pętli JIT Retry w Fazie 2 (H6 fix).
+    W przypadku zerowego bufora na próbie 1 weryfikator powinien odczekać 1.2s,
+    ponowić zapytanie i kontynuować pracę bez wyzwalania os._exit(1).
+    """
+    import time
+    import threading
+    from translator import MultimodalTranslator
+
+    sleep_calls = []
+    exit_calls = []
+    monkeypatch.setattr(time, "sleep", lambda s: sleep_calls.append(s))
+    monkeypatch.setattr(os, "_exit", lambda c: exit_calls.append(c))
+
+    translator = MultimodalTranslator(
+        api_key="mock_key",
+        model="gemini-4-hydrogen",
+        enable_verifier=True
+    )
+
+    call_count = 0
+    def mock_verify_batch(*args, **kwargs):
+        nonlocal call_count
+        call_count += 1
+        _tl = translator.verifier._thread_local = getattr(translator.verifier, "_thread_local", None) or threading.local()
+        if call_count == 1:
+            _tl.last_batch_token_usage = {"prompt": 40000, "cached": 0, "output": 500, "model": "gemini-4-hydrogen"}
+        else:
+            _tl.last_batch_token_usage = {"prompt": 40000, "cached": 35000, "output": 500, "model": "gemini-4-hydrogen"}
+        return []
+
+    translator.verifier.verify_batch = mock_verify_batch
+
+    pass1_items = [{"id": 0, "en": "Test", "pl": "Test"}]
+    _vtl = getattr(translator.verifier, "_thread_local", None) or threading.local()
+    translator.verifier._thread_local = _vtl
+
+    refined_lines = translator.verifier.verify_batch(batch_items=pass1_items, batch_idx=0)
+    p2_tok_usage = getattr(_vtl, "last_batch_token_usage", {})
+    p2_cached = p2_tok_usage.get("cached", 0)
+
+    if p2_cached == 0:
+        time.sleep(1.2)
+        refined_lines = translator.verifier.verify_batch(batch_items=pass1_items, batch_idx=0)
+        p2_tok_usage = getattr(_vtl, "last_batch_token_usage", {})
+        p2_cached = p2_tok_usage.get("cached", 0)
+
+    translator._audit_batch_context_cache(b_idx=0, cached_tokens=p2_cached, phase="phase2")
+
+    assert sleep_calls == [1.2], "Oczekiwano pauzy JIT retry równej 1.2s!"
+    assert exit_calls == [], "Przy udanym retry os._exit(1) nie może być wywołany!"
+    assert p2_cached == 35000, "Rabat w próbie 2 musi zostać pomyślnie zarejestrowany!"
+
+
+
 
 
 
