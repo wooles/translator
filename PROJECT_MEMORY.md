@@ -4,9 +4,9 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-15 — Standard 11.2.10 Certyfikowany Baseline)
-- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.10 (Comprehensive MultiKey Prefix & Continuous Sentinel Architecture — F1 + F2 Invariance, Deterministic Key-Affinity, Continuous Sentinel & Savings Ratio Governance)`
-- **Commit certyfikacji kodu:** `3539a8a` (`3539a8a7dbdca5db1cb64b22fec829391104e797`)
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-16 — Standard 11.2.11 Certyfikowany Baseline)
+- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.11 (Permanent F2 Cache Decoder Symmetry & Zero-HALT Resilience)`
+- **Commit certyfikacji kodu:** `93cc90b` (`93cc90bb24a2614b62db190d7974bc2eb8e7a030`)
 - **Commity implementacyjne 11.1:** `5b7306d` (Commit 1), `5b17ea7` (Commit 2), `2b4bc7d` (Commit 3), `8b72887` (Commit 4), `8a7dd31` (Commit 5), `218af2e` (Commit 6)
 - **Commity Hotfixu 11.1.1:** `328729f` (Commit 1), `9de0b83` (Commit 2), `07c4684` (Commit 3), `96acac7` (Commit 4)
 - **Commity Hotfixu 11.1.2:** `74766d8` (Commit 1), `1b540e3` (Commit 2), `8313658` (Commit 3), `326b7e0` (Commit 4)
@@ -28,23 +28,21 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 - **Commity Standardu 11.2.7:** `e501090` (Commit 1), `e63204e` (Commit 2), `ef6f884` (Commit 3)
 - **Commity Standardu 11.2.8:** `fcffa05` (Commit 1), `097054a` (Commit 2), `dfb73ad` (Commit 3)
 - **Commity Standardu 11.2.9:** `e17e563` (Commit 1), `792cb97` (Commit 2), `a4f8f30` (Commit 3)
-- **Commity Standardu 11.2.10:**
-  * Commit 1 (`195f151`): `feat(translator): enforce stable prefix contract for F1 (Filar A)`
-  * Commit 2 (`4a5620b`): `feat(client_factory): implement deterministic key-affinity and sequential warm-up (Filar C)`
-  * Commit 3 (`d3ccbbb`): `feat(translator): implement continuous cache sentinel with per-batch fail-fast (Filar B)`
-  * Commit 4 (`4373b99`): `feat(verifier): enforce F2 stable prefix, context growth cap and thread-safe telemetry (Filar D)`
-  * Commit 5 (`3539a8a`): `feat(pricing_guard): add end-to-end savings_ratio governance and cost audit` — **NOWY COMMIT CERTYFIKACJI KODU**
-  * Commit 6 (`HEAD`): `docs(release): certify Standard 11.2.10 — comprehensive cache architecture (F1 + F2, all keys, all batches)`
-- **Status 11.2.10:** `CERTIFIED / CLOSED (2026-11-15)`
+- **Commity Standardu 11.2.10:** `195f151` (Commit 1), `4a5620b` (Commit 2), `d3ccbbb` (Commit 3), `4373b99` (Commit 4), `3539a8a` (Commit 5), `3394289` (Commit 6)
+- **Commity Standardu 11.2.11:**
+  * Commit 1 (`b1536fd`): `fix(cache): enforce decoder symmetry in verifier warmup and add F2 JIT retry`
+  * Commit 2 (`93cc90b`): `test(cache): certify F2 warmup decoder symmetry and retry circuit` — **NOWY COMMIT CERTYFIKACJI KODU**
+  * Commit 3 (`HEAD`): `docs(release): certify Standard 11.2.11 — permanent F2 cache symmetry & zero-halt resilience`
+- **Status 11.2.11:** `CERTIFIED / CLOSED (2026-11-16)`
 - **Commit ochrony Depuracji Legacy 1.0 (Z16):** `c197db73c3dabf887dddbf2337dc3a1d8cff598c` (`c197db7` — autoryzowany Z16-amendment #14 dla `verifier.py`, bezwzględne 0 B diffu na wszystkich pozostałych plikach chronionych)
-- **Stan metryk:** `385 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `456 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 11/11, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
-- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (385/385 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
-- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.10` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
-- **Gałąź i Architektura:** `main` (Standard 11.2.10: Kompleksowa architektura Context Cache dla F1 i F2: Filar A - Niezmienny Prefiks F1 >= 32k tok, Filar B - Ciągły Strażnik Bufora na każdej paczce z fail-fast i JIT retry, Filar C - Deterministyczny Key-Affinity Dispatcher i sekwencyjny rozgrzewacz, Filar D - Prefiks i sufit kontekstu F2 w DialogueVerifier pod Z16-amendment #14 z thread-local telemetrią, Filar E - Cost Governance PricingGuard z ratio >= 0.85 i celem <= 4.00 PLN netto)
+- **Stan metryk:** `387 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `458 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 11/11, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
+- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (387/387 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
+- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.11` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
+- **Gałąź i Architektura:** `main` (Standard 11.2.11: Trwała likwidacja asymetrii sygnatury weryfikatora dla Fazy 2 z pełnym thinking_config i response_schema w warm-up pingu, sekwencyjny warm-up z contents jako lista, oraz automatyczny obwód Canary JIT Retry 1.2s dla Fazy 2 przed rzutem Fail-Fast os._exit(1))
 - **Środowisko:** Python 3.13 (`.venv`), Windows PowerShell, `ffmpeg` (PATH), `librosa.pyin`, `soundfile`, `pysubs2`, `spaCy en_core_web_sm` (100% offline 0.00 PLN), bezpośrednie klucze Google AI Studio API (`use_vertex = 0`).
 - **Dyrektywa Wykonawcza Testów:**
   * Testy przyrostowe podczas kodowania (< 2 s): `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_testu>"`
-  * Szybki pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest -q` (385 passed w tests/, 71 passed i 153 deselected w test_system.py)
+  * Szybki pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest -q` (387 passed w tests/, 71 passed i 153 deselected w test_system.py)
   * Audyt śledczy diffu: `powershell -ExecutionPolicy Bypass -File .\audit_diff.ps1 -ForbiddenTerms "<lista>"`
   * 4 bramki kwalifikacyjne: `python verify_purity.py`, `python verify_8_fixes.py`, `python verify_12_fixes.py`, `python verify_ultimate_pipeline.py`
 
@@ -503,6 +501,18 @@ Dodanie w `tools/consolidate_bibles.py` opcjonalnej flagi `--migrate-misplaced-s
    W `DialogueVerifier.verify_batch` ograniczono `history_context` do ostatnich 4 kwestii dialogowych i usunięto ~2.5k tokenów zduplikowanej doktryny reżyserskiej z `prompt_lines` (pozostawionej w `system_instruction`). Wprowadzono `self._thread_local = threading.local()` do izolacji telemetrii tokenów per wątek roboczy oraz przekazywanie `batch_idx` dla key-affinity.
 5. **Filar E / Governance (Audyt Efektywności i Sufit Kosztowy — `pricing_guard.py`, `translator.py`):**
    W `PricingGuard.calculate_actual_cost_breakdown` dodano kalkulację wskaźnika efektywności `savings_ratio = round(savings_pln / max(0.01, standard_net_pln), 4)` oraz logowanie błędu krytycznego przy `savings_ratio < 0.85 and total_net_pln > 4.00`. W banerze końcowym potoku wyświetlana jest precyzyjna efektywność rabatu wraz z alertem nadzorczym.
+
+
+## 🏛️ ARB-062 / INC-AVT-060: Standard 11.2.11 — Symetria Dekodera Fazy 2 i Obwód F2 Canary JIT Retry
+
+- **Status:** `RESOLVED (Standard 11.2.11, commity b1536fd, 93cc90b, HEAD)`
+- **Zidentyfikowano:** W trakcie rzeczywistego przebiegu odcinka 327 linii F1 uzyskała rabat (94 380 tokenów), ale F2 wywołała HALT na Paczce 0 (cached: 0). Przyczynami były: (1) asymetria sygnatury rozgrzewki pingu weryfikatora (brak thinking_config oraz response_schema w ensure_cache_ready dla tagu "verifier"), co sprawiło, że serwery Google nie dopasowały bufora tekstowego do zlecenia z aktywnym CoT i JSON; (2) brak pętli Canary JIT Retry w Fazie 2, co powodowało natychmiastowy rzut os._exit(1) przy pojedynczym opóźnieniu TPU.
+- **Komponenty Naprawy:**
+  1. `context_cache.py`: Rozszerzenie `ensure_cache_ready` o parametry `thinking_config`, `response_schema` oraz `response_mime_type`, ujednolicenie `contents=["PING_WARMUP_INIT"]`.
+  2. `translator.py`: Zbudowanie i przekazanie pełnej konfiguracji F2 do warm-upu weryfikatora.
+  3. `translator.py`: Wdrożenie bloku 1.2s sleep + retry dla Fazy 2 przed rzutem Fail-Fast.
+  4. `tests/test_context_cache_guard.py`: Dedykowane testy jednostkowe symetrii i retry F2.
+
 
 
 
