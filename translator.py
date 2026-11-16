@@ -5258,6 +5258,8 @@ class MultimodalTranslator:
 
             t0_phase2 = time.perf_counter()
             phase2_focused_rules = get_focused_rules_for_batch(pass1_items, max_rules=3)
+            # INC-AVT-060: Offset klucza dla Fazy 2 zapobiegający kolizji pamięci TPU z Fazą 1
+            f2_affinity_idx = b_idx + 1 if hasattr(self, "client_pool") and self.client_pool else b_idx
             refined_lines: List[RefinedLine] = self.verifier.verify_batch(
                 batch_items=pass1_items,
                 scene_summary=scene_desc or "",
@@ -5271,7 +5273,7 @@ class MultimodalTranslator:
                 lookahead_events=lookahead_events,
                 character_registry=self.character_registry,
                 scene_diagnosis=getattr(batch_response, "scene_diagnosis", None) if batch_response else None,
-                batch_idx=b_idx
+                batch_idx=f2_affinity_idx
             )
             elapsed_phase2 = round(max(0.0, time.perf_counter() - t0_phase2), 2)
             _vtl = getattr(self.verifier, "_thread_local", None)
@@ -5297,7 +5299,7 @@ class MultimodalTranslator:
                         lookahead_events=lookahead_events,
                         character_registry=self.character_registry,
                         scene_diagnosis=getattr(batch_response, "scene_diagnosis", None) if batch_response else None,
-                        batch_idx=b_idx
+                        batch_idx=f2_affinity_idx
                     )
                     _vtl = getattr(self.verifier, "_thread_local", None)
                     p2_tok_usage = getattr(_vtl, "last_batch_token_usage", None) if _vtl else {}
@@ -6584,6 +6586,9 @@ class MultimodalTranslator:
                     pbar.write(f" 🔴 [Niepowodzenie Paczki Kanarkowej {canary_b_idx}]: {format_friendly_api_error(e)}")
                     pbar.refresh()
                     raise
+
+                # Pauza stabilizacyjna gwarantująca zakończenie indeksacji snapshotu TPU
+                time.sleep(1.5)
 
                 if remaining_tasks:
                     max_workers = min(self.concurrent_batches, len(remaining_tasks))
