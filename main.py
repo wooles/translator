@@ -381,8 +381,8 @@ def main():
     parser.add_argument(
         "--thinking-f1",
         choices=["auto", "low", "medium"],
-        default="auto",
-        help="Poziom myślenia CoT dla Fazy 1 modelu Hydrogen: 'auto' (MEDIUM dla <=360 linii, LOW dla >360 linii), 'low' (0 CoT), 'medium' (3072 CoT). Domyślnie: auto."
+        default="low",
+        help="Poziom myślenia CoT dla Fazy 1 modelu Hydrogen: 'auto', 'low' (0 CoT), 'medium' (3072 CoT). Domyślnie: low."
     )
 
     args = parser.parse_args()
