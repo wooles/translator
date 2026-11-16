@@ -538,6 +538,78 @@ def test_f2_retry_on_zero_cache_recovers(monkeypatch):
     assert p2_cached == 35000, "Rabat w próbie 2 musi zostać pomyślnie zarejestrowany!"
 
 
+@pytest.mark.unit
+def test_f2_affinity_offset_prevents_collision(monkeypatch):
+    """
+    Weryfikuje separację slotów kluczy API pomiędzy Fazą 1 a Fazą 2.
+    Zapobiega Cross-Phase Cache Thrashing na klastrach Google TPU.
+    """
+    from translator import MultimodalTranslator
+    from unittest.mock import MagicMock
+
+    translator = MultimodalTranslator(
+        api_key="key1,key2,key3",
+        model="gemini-4-hydrogen",
+        enable_verifier=True
+    )
+
+    captured_f1_affinities = []
+    captured_f2_affinities = []
+
+    def mock_call_gemini(contents, schema_class, batch_idx=None):
+        captured_f1_affinities.append(batch_idx)
+        return MagicMock()
+
+    def mock_verify_batch(*args, **kwargs):
+        captured_f2_affinities.append(kwargs.get("batch_idx"))
+        return []
+
+    monkeypatch.setattr(translator, "_call_gemini_with_retry", mock_call_gemini)
+    monkeypatch.setattr(translator.verifier, "verify_batch", mock_verify_batch)
+
+    for b_idx in range(3):
+        f2_idx = b_idx + 1 if translator.client_pool else b_idx
+        translator._call_gemini_with_retry([], None, batch_idx=b_idx)
+        translator.verifier.verify_batch([], batch_idx=f2_idx)
+
+    assert captured_f1_affinities == [0, 1, 2]
+    assert captured_f2_affinities == [1, 2, 3]
+    assert (captured_f1_affinities[0] % 3) != (captured_f2_affinities[0] % 3)
+
+
+@pytest.mark.unit
+def test_f1_thinking_default_low():
+    """
+    Standard 11.2.12:
+    Weryfikuje, że domyślny poziom myślenia Fazy 1 to 'low' (0 CoT),
+    oraz że resolve_f1_thinking_budget zwraca 0 tokenów zarówno dla 'low',
+    jak i 'auto', niezależnie od długości odcinka.
+    """
+    from translator import MultimodalTranslator
+
+    translator = MultimodalTranslator(
+        api_key="mock_key",
+        model="gemini-4-hydrogen",
+        enable_verifier=False
+    )
+
+    # Domyślny tryb to 'low'
+    assert translator.thinking_f1_mode == "low"
+    assert translator.resolve_f1_thinking_budget(total_lines=150) == 0
+    assert translator.resolve_f1_thinking_budget(total_lines=500) == 0
+
+    # Jawne 'auto' w Standardzie 11.2.12 również zwraca 0 CoT
+    translator.thinking_f1_mode = "auto"
+    assert translator.resolve_f1_thinking_budget(total_lines=150) == 0
+    assert translator.resolve_f1_thinking_budget(total_lines=500) == 0
+
+    # Jawne 'medium' zachowuje 3072 CoT dla zaawansowanego wnioskowania
+    translator.thinking_f1_mode = "medium"
+    assert translator.resolve_f1_thinking_budget(total_lines=150) == 3072
+    assert translator.resolve_f1_thinking_budget(total_lines=500) == 3072
+
+
+
 
 
 
