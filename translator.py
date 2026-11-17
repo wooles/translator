@@ -5381,11 +5381,11 @@ class MultimodalTranslator:
             p2_tok_usage = getattr(_vtl, "last_batch_token_usage", None) if _vtl else {}
             p2_cached = p2_tok_usage.get("cached", 0) if p2_tok_usage else 0
 
-            # FILAR B / H6 FIX: Automatyczny JIT Warmup Retry dla Fazy 2 przed rzutem Fail-Fast
-            if p2_cached == 0:
+            # Standard 11.2.14: Obwód asekuracyjny JIT Warmup Retry (aktywny wyłącznie na bramce Canary Paczki 0)
+            if p2_cached == 0 and b_idx == 0:
                 from model_resolver import is_gemini_4_or_hydrogen_model
                 if is_gemini_4_or_hydrogen_model(getattr(self.verifier, "model", "")):
-                    logger.warning(f"[Context Cache F2 Sentinel]: Wykryto 0 tokenów cache w Fazie 2 na paczce {b_idx}. JIT Warmup Retry po 1.2s...")
+                    logger.warning(f"[Context Cache F2 Sentinel]: Wykryto 0 tokenów cache w Fazie 2 na paczce Canary {b_idx}. JIT Warmup Retry po 1.2s...")
                     time.sleep(1.2)
                     refined_lines = self.verifier.verify_batch(
                         batch_items=pass1_items,
@@ -5400,7 +5400,7 @@ class MultimodalTranslator:
                         lookahead_events=lookahead_events,
                         character_registry=self.character_registry,
                         scene_diagnosis=getattr(batch_response, "scene_diagnosis", None) if batch_response else None,
-                        batch_idx=f2_affinity_idx
+                        batch_idx=b_idx
                     )
                     _vtl = getattr(self.verifier, "_thread_local", None)
                     p2_tok_usage = getattr(_vtl, "last_batch_token_usage", None) if _vtl else {}
@@ -6849,25 +6849,89 @@ class MultimodalTranslator:
                                 logger.warning(f"[RE-WARM WARN] Niepowodzenie re-warmu K2: {warm_err}")
                             time.sleep(1.5)
 
-                        # --- ETAP 2: FAZA 2 REDAKCJA / WERYFIKACJA (Dedykowany K2) ---
-                        max_workers_f2 = min(2, len(phase1_outputs)) if self.concurrent_batches > 1 else 1
+                        # --- STANDARD 11.2.14: ETAP 2 - FAZA 2 REDAKCJA (F2 SEQUENTIAL CANARY GATE NA K2) ---
                         sorted_p1_keys = sorted(phase1_outputs.keys())
-                        if max_workers_f2 > 1:
-                            print(f"\n  [Kolejka Paczek / Faza 2]: Rozpoczynanie redakcji Fazy 2 na dedykowanym kluczu K2 ({max_workers_f2} paczek w locie)...")
-                            with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers_f2) as executor_f2:
-                                fut_to_bidx_f2 = {
-                                    executor_f2.submit(
-                                        self._process_phase2_only,
-                                        phase1_data=phase1_outputs[b_idx]
-                                    ): b_idx
-                                    for b_idx in sorted_p1_keys
-                                }
-                                for future in concurrent.futures.as_completed(fut_to_bidx_f2):
+
+                        # 1. Sekwencyjny Pre-flight Fazy 2 (Paczka 0 jako F2 Canary Gate)
+                        if sorted_p1_keys:
+                            if cancel_check and cancel_check():
+                                print("\n[Tłumacz]: Otrzymano sygnał przerwania (⏹ Stop)...")
+                                remaining_f2_keys = []
+                            else:
+                                canary_f2_bidx = sorted_p1_keys[0]
+                                logger.info(f"[Canary Gate F2]: Uruchamianie sekwencyjnego ugruntowania K2 (Paczka {canary_f2_bidx} / F2 Canary Run)...")
+                                print(f"\n  [Canary Gate F2]: Uruchamianie sekwencyjnego ugruntowania K2 (Paczka {canary_f2_bidx} / F2 Canary Run)...")
+                                canary_f2_output = self._process_phase2_only(phase1_data=phase1_outputs[canary_f2_bidx])
+                                self._record_batch_results(
+                                    batch_output=canary_f2_output,
+                                    translated_results=translated_results,
+                                    translated_regions=translated_regions,
+                                    translated_typesetting=translated_typesetting,
+                                    translated_addressees=translated_addressees,
+                                    translated_speakers=translated_speakers,
+                                    episode_whisper_transcriptions=episode_whisper_transcriptions,
+                                    history=history,
+                                    checkpoint_path=checkpoint_path,
+                                    pbar=pbar,
+                                    progress_callback=progress_callback,
+                                    total_lines=total_lines
+                                )
+                                # Pauza ugruntowująca snapshot TPU po realnym payloadzie F2
+                                time.sleep(1.0)
+                                remaining_f2_keys = sorted_p1_keys[1:]
+                        else:
+                            remaining_f2_keys = []
+
+                        # 2. Współbieżne przetworzenie pozostałych paczek (K2 w 100% zindeksowany w TPU)
+                        max_workers_f2 = min(2, len(remaining_f2_keys)) if self.concurrent_batches > 1 else 1
+                        if remaining_f2_keys:
+                            if max_workers_f2 > 1:
+                                print(f"  [Kolejka Paczek / Faza 2]: Rozpoczynanie redakcji Fazy 2 na ugruntowanym K2 ({max_workers_f2} paczek w locie)...")
+                                with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers_f2) as executor_f2:
+                                    fut_to_bidx_f2 = {
+                                        executor_f2.submit(
+                                            self._process_phase2_only,
+                                            phase1_data=phase1_outputs[b_idx]
+                                        ): b_idx
+                                        for b_idx in remaining_f2_keys
+                                    }
+                                    for future in concurrent.futures.as_completed(fut_to_bidx_f2):
+                                        if cancel_check and cancel_check():
+                                            print("\n[Tłumacz]: Otrzymano sygnał przerwania (⏹ Stop)...")
+                                            break
+                                        try:
+                                            batch_output = future.result()
+                                            self._record_batch_results(
+                                                batch_output=batch_output,
+                                                translated_results=translated_results,
+                                                translated_regions=translated_regions,
+                                                translated_typesetting=translated_typesetting,
+                                                translated_addressees=translated_addressees,
+                                                translated_speakers=translated_speakers,
+                                                episode_whisper_transcriptions=episode_whisper_transcriptions,
+                                                history=history,
+                                                checkpoint_path=checkpoint_path,
+                                                pbar=pbar,
+                                                progress_callback=progress_callback,
+                                                total_lines=total_lines
+                                            )
+                                        except ContextCacheDiscountError:
+                                            for f in fut_to_bidx_f2:
+                                                f.cancel()
+                                            raise
+                                        except Exception as e:
+                                            pbar.write(f" 🔴 [Niepowodzenie Fazy 2 Paczki]: {format_friendly_api_error(e)}")
+                                            pbar.refresh()
+                            else:
+                                print(f"  [Kolejka Paczek / Faza 2]: Płynna redakcja Fazy 2 na ugruntowanym K2 (1 paczka na raz)...")
+                                for loop_i, b_idx in enumerate(remaining_f2_keys):
                                     if cancel_check and cancel_check():
                                         print("\n[Tłumacz]: Otrzymano sygnał przerwania (⏹ Stop)...")
                                         break
+                                    if loop_i > 0:
+                                        time.sleep(0.25)
                                     try:
-                                        batch_output = future.result()
+                                        batch_output = self._process_phase2_only(phase1_data=phase1_outputs[b_idx])
                                         self._record_batch_results(
                                             batch_output=batch_output,
                                             translated_results=translated_results,
@@ -6883,41 +6947,10 @@ class MultimodalTranslator:
                                             total_lines=total_lines
                                         )
                                     except ContextCacheDiscountError:
-                                        for f in fut_to_bidx_f2:
-                                            f.cancel()
                                         raise
                                     except Exception as e:
                                         pbar.write(f" 🔴 [Niepowodzenie Fazy 2 Paczki]: {format_friendly_api_error(e)}")
                                         pbar.refresh()
-                        else:
-                            print(f"\n  [Kolejka Paczek / Faza 2]: Płynna redakcja Fazy 2 na dedykowanym kluczu K2 (1 paczka na raz)...")
-                            for loop_i, b_idx in enumerate(sorted_p1_keys):
-                                if cancel_check and cancel_check():
-                                    print("\n[Tłumacz]: Otrzymano sygnał przerwania (⏹ Stop)...")
-                                    break
-                                if loop_i > 0:
-                                    time.sleep(0.25)
-                                try:
-                                    batch_output = self._process_phase2_only(phase1_data=phase1_outputs[b_idx])
-                                    self._record_batch_results(
-                                        batch_output=batch_output,
-                                        translated_results=translated_results,
-                                        translated_regions=translated_regions,
-                                        translated_typesetting=translated_typesetting,
-                                        translated_addressees=translated_addressees,
-                                        translated_speakers=translated_speakers,
-                                        episode_whisper_transcriptions=episode_whisper_transcriptions,
-                                        history=history,
-                                        checkpoint_path=checkpoint_path,
-                                        pbar=pbar,
-                                        progress_callback=progress_callback,
-                                        total_lines=total_lines
-                                    )
-                                except ContextCacheDiscountError:
-                                    raise
-                                except Exception as e:
-                                    pbar.write(f" 🔴 [Niepowodzenie Fazy 2 Paczki]: {format_friendly_api_error(e)}")
-                                    pbar.refresh()
 
             # 6.9. Zero-Gap Healing Pass: uzupełnienie ewentualnych brakujących kwestii po awariach paczek
             missing_entries = [item for item in raw_entries if item[0] not in translated_results]
