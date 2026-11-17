@@ -2005,8 +2005,17 @@ class MultimodalTranslator:
         
         timeout_sec = float(os.getenv("GEMINI_HTTP_TIMEOUT_SEC", "90.0"))
         from client_factory import get_genai_client, MultiKeyClientPool
-        self.client_pool = MultiKeyClientPool(raw_keys=self.api_key, timeout_sec=timeout_sec)
-        self.client = self.client_pool.get_client()
+        raw_k_list = [k.strip() for k in self.api_key.replace(";", ",").split(",") if k.strip()]
+        if len(raw_k_list) >= 3:
+            keys_f1 = raw_k_list[:2]
+            keys_f2 = [raw_k_list[2]]
+        else:
+            keys_f1 = raw_k_list
+            keys_f2 = raw_k_list
+        self.client_pool_f1 = MultiKeyClientPool(raw_keys=keys_f1, timeout_sec=timeout_sec)
+        self.client_pool_f2 = MultiKeyClientPool(raw_keys=keys_f2, timeout_sec=timeout_sec)
+        self.client_pool = self.client_pool_f1
+        self.client = self.client_pool_f1.get_client()
         self.model = model
         self.model_phase1 = model
         self.model_phase2 = model_phase2 or model
@@ -2041,7 +2050,7 @@ class MultimodalTranslator:
         self.linter = AVTLinter
         
         # Episode Profiler (Pre-pass Glossary & Character Matrix)
-        self.profiler = EpisodeProfiler(client=self.client_pool or self.client, model=self.model_phase1)
+        self.profiler = EpisodeProfiler(client=self.client_pool_f1 or self.client, model=self.model_phase1)
         
         # Optional local Japanese Whisper engine (Speech-to-Text)
         self.whisper = None
@@ -2054,7 +2063,7 @@ class MultimodalTranslator:
         # Phase 2 - Script Doctor / Editorial Verifier
         if self.enable_verifier:
             self.verifier = DialogueVerifier(
-                client=self.client_pool or self.client,
+                client=self.client_pool_f2 or self.client,
                 model=self.model_phase2,
                 keep_honorifics=keep_honorifics,
                 thinking_budget=self.thinking_budget_phase2,
@@ -3846,16 +3855,17 @@ class MultimodalTranslator:
                     nonlocal cached_name, last_used_client
                     from client_factory import global_rate_limiter
                     global_rate_limiter.acquire()
-                    if hasattr(self, "client_pool") and self.client_pool:
-                        active_c = self.client_pool.get_client(affinity_idx=batch_idx)
+                    pool_f1 = getattr(self, "client_pool_f1", None) or getattr(self, "client_pool", None)
+                    if pool_f1:
+                        active_c = pool_f1.get_client(affinity_idx=batch_idx)
                     else:
                         active_c = self.client
                     last_used_client = active_c
 
                     # Replikacja Cache per Klucz w MultiKeyPool (INC-AVT-057)
                     cached_name = None
-                    if hasattr(self, "client_pool") and self.client_pool and hasattr(self.client_pool, "get_cache"):
-                        cached_name = self.client_pool.get_cache(active_c, tag="translator")
+                    if pool_f1 and hasattr(pool_f1, "get_cache"):
+                        cached_name = pool_f1.get_cache(active_c, tag="translator")
 
                     if not cached_name:
                         cached_name = ContextCacheManager.get_or_create_cache(
@@ -3864,8 +3874,8 @@ class MultimodalTranslator:
                             system_instruction=self.system_prompt,
                             tag="translator"
                         )
-                        if hasattr(self, "client_pool") and self.client_pool and hasattr(self.client_pool, "register_cache") and cached_name:
-                            self.client_pool.register_cache(active_c, cached_name, tag="translator")
+                        if pool_f1 and hasattr(pool_f1, "register_cache") and cached_name:
+                            pool_f1.register_cache(active_c, cached_name, tag="translator")
 
                     cfg_kwargs = dict(gen_config_kwargs)
                     if cached_name and cached_name != "__IMPLICIT_CACHE_95__":
@@ -3927,8 +3937,9 @@ class MultimodalTranslator:
 
             except Exception as e:
                 err_str = str(e).lower()
-                if hasattr(self, "client_pool") and self.client_pool and last_used_client:
-                    self.client_pool.report_error(last_used_client, err_str)
+                pool_f1 = getattr(self, "client_pool_f1", None) or getattr(self, "client_pool", None)
+                if pool_f1 and last_used_client:
+                    pool_f1.report_error(last_used_client, err_str)
 
                 is_cache_err = "403" in err_str or "cachedcontent" in err_str or "permission" in err_str
                 if is_cache_err and cached_name:
@@ -3951,7 +3962,7 @@ class MultimodalTranslator:
                     raise RuntimeError("Wyczerpane środki na koncie Google AI Studio (Prepayment Credits Depleted).")
 
                 # Anti-Spin-Lock Circuit Breaker: Hard stop to protect quota and funds
-                num_keys = len(self.client_pool.clients) if hasattr(self, "client_pool") and self.client_pool else 1
+                num_keys = len(pool_f1.clients) if pool_f1 and hasattr(pool_f1, "clients") else 1
                 max_allowed_attempts = max(25, num_keys * 8)
                 if attempt >= max_allowed_attempts:
                     raise RuntimeError(
@@ -3997,7 +4008,7 @@ class MultimodalTranslator:
         s_dir = getattr(self.series_bible, "storage_dir", None) if getattr(self, "series_bible", None) else None
         return _resolve_bible_path(title_or_path, storage_dir=s_dir)
 
-    def _process_single_batch(
+    def _process_phase1_only(
         self,
         b_idx: int,
         batch: List[Any],
@@ -4016,13 +4027,35 @@ class MultimodalTranslator:
         history: List[Dict[str, str]],
         pbar: Any,
         translated_results: Optional[Dict[int, str]] = None
-    ) -> Tuple[int, Dict[int, str], Dict[int, str], List[Any], List[Dict[str, Any]], str, str]:
+    ) -> Dict[str, Any]:
         """
-        Translates and refines a single batch of dialogue lines (Thread-Safe).
+        Translates a single batch of dialogue lines in Phase 1 (Thread-Safe drafting).
+        Returns phase1_data dictionary containing all intermediate state for Phase 2.
         """
         # Micro-stagger entry across worker threads to avoid burst gateway collisions on Google TPUs
         if self.concurrent_batches > 1:
             time.sleep((b_idx % self.concurrent_batches) * 0.4)
+
+        # Normalize untranslated_in_batch to handle both 4-tuples and dicts from test mocks
+        norm_untranslated = []
+        for it in untranslated_in_batch:
+            if isinstance(it, (list, tuple)) and len(it) >= 4:
+                norm_untranslated.append(it)
+            elif isinstance(it, dict):
+                orig_idx = it.get("orig_idx", it.get("id", 0))
+                ev = it.get("event")
+                if ev is None:
+                    ev = pysubs2.SSAEvent(
+                        start=it.get("start", it.get("start_ms", 0)),
+                        end=it.get("end", it.get("end_ms", 1000)),
+                        text=it.get("text", it.get("en", ""))
+                    )
+                clean_en = it.get("clean_en", it.get("en", getattr(ev, "text", "")))
+                ts_prefix = it.get("ts_prefix", "")
+                norm_untranslated.append((orig_idx, ev, clean_en, ts_prefix))
+            else:
+                norm_untranslated.append(it)
+        untranslated_in_batch = norm_untranslated
 
         # Retrieve upcoming lines (Lookahead Window)
         lookahead_events = []
@@ -5203,6 +5236,58 @@ class MultimodalTranslator:
                     unsolicited_italics_alert = "[TELEMETRIA: dialog_diegetyczny: mowa na głos bez kursywy]"
                     it["notes"] = f"{it.get('notes', '')} {unsolicited_italics_alert}".strip()
 
+        phase1_data: Dict[str, Any] = {
+            "b_idx": b_idx,
+            "pass1_items": pass1_items,
+            "untranslated_in_batch": untranslated_in_batch,
+            "scene_desc": scene_desc,
+            "batch_response": batch_response,
+            "lookback_history": lookback_history,
+            "lookahead_events": lookahead_events,
+            "scoped_series_bible_str": scoped_series_bible_str,
+            "user_feedback_str": user_feedback_str,
+            "glossary_str": glossary_str,
+            "episode_profile_str": episode_profile_str,
+            "manga_canon_str": manga_canon_str,
+            "batch_glossary_items": batch_glossary_items,
+            "speakers_on_ty": speakers_on_ty,
+            "scene_has_first_name_vocative": scene_has_first_name_vocative,
+            "is_ass": is_ass,
+            "pbar": pbar,
+            "combined_glossary": combined_glossary,
+            "all_user_rules": all_user_rules,
+            "episode_profile": episode_profile,
+        }
+        return phase1_data
+
+    def _process_phase2_only(
+        self,
+        phase1_data: Dict[str, Any]
+    ) -> Tuple[int, Dict[int, str], Dict[int, str], List[Any], List[Dict[str, Any]], str, str]:
+        """
+        Executes Phase 2 Script Doctor / Verifier and morphological post-processing on Phase 1 output.
+        """
+        b_idx = phase1_data["b_idx"]
+        pass1_items = phase1_data["pass1_items"]
+        untranslated_in_batch = phase1_data["untranslated_in_batch"]
+        scene_desc = phase1_data.get("scene_desc", "")
+        batch_response = phase1_data.get("batch_response")
+        lookback_history = phase1_data.get("lookback_history", [])
+        lookahead_events = phase1_data.get("lookahead_events", [])
+        scoped_series_bible_str = phase1_data.get("scoped_series_bible_str", "")
+        user_feedback_str = phase1_data.get("user_feedback_str", "")
+        glossary_str = phase1_data.get("glossary_str", "")
+        episode_profile_str = phase1_data.get("episode_profile_str", "")
+        manga_canon_str = phase1_data.get("manga_canon_str", "")
+        batch_glossary_items = phase1_data.get("batch_glossary_items", [])
+        speakers_on_ty = phase1_data.get("speakers_on_ty", set())
+        scene_has_first_name_vocative = phase1_data.get("scene_has_first_name_vocative", False)
+        is_ass = phase1_data.get("is_ass", False)
+        pbar = phase1_data.get("pbar")
+        combined_glossary = phase1_data.get("combined_glossary", {})
+        all_user_rules = phase1_data.get("all_user_rules", [])
+        episode_profile = phase1_data.get("episode_profile")
+
         # 6. Optional Phase 2 Verifier (Script Doctor - 100% Guaranteed Verification)
         batch_results: Dict[int, str] = {}
         batch_regions: Dict[int, str] = {}
@@ -5211,14 +5296,16 @@ class MultimodalTranslator:
         refined_typesetting_dict: Dict[int, Any] = {it["id"]: it.get("visual_typesetting") for it in pass1_items if it.get("visual_typesetting")}
 
         cot_info_str = ""
-        if self.enable_verifier and hasattr(self, 'verifier'):
+        if self.enable_verifier and hasattr(self, 'verifier') and self.verifier:
             budget_val = getattr(self.verifier, "calculate_effective_budget", lambda items: getattr(self.verifier, "thinking_budget", 2048))(pass1_items)
             model_tag = "Flash" if "flash" in getattr(self.verifier, "model", "").lower() else "Pro"
             cot_info_str = f"Faza 2 (Redakcja {model_tag} CoT: {budget_val})"
-            with self.lock:
-                pbar.set_postfix_str(f"{cot_info_str}...")
-                pbar.refresh()
-            pbar.write(f" ├─ [{cot_info_str}]")
+            if pbar and hasattr(pbar, "set_postfix_str"):
+                with self.lock:
+                    pbar.set_postfix_str(f"{cot_info_str}...")
+                    pbar.refresh()
+            if pbar and hasattr(pbar, "write"):
+                pbar.write(f" ├─ [{cot_info_str}]")
             # Staggered entry (350ms per thread) to prevent simultaneous TPU burst collisions on 503
             stagger_sec = (b_idx % max(1, self.concurrent_batches)) * 0.35
             if stagger_sec > 0:
@@ -5601,6 +5688,51 @@ class MultimodalTranslator:
                     batch_results[item["orig_idx"]] = en_to_best_pl[en_norm]
 
         return b_idx, batch_results, batch_regions, untranslated_in_batch, pass1_items, scene_desc, cot_info_str
+
+    def _process_single_batch(
+        self,
+        b_idx: int,
+        batch: List[Any],
+        untranslated_in_batch: List[Any],
+        batches: List[List[Any]],
+        video_path: Optional[str],
+        is_ass: bool,
+        anime_meta: Optional[Dict[str, Any]],
+        episode_profile: Optional[Any],
+        anime_context_str: str,
+        episode_profile_str: str,
+        series_bible_str: str,
+        manga_canon_str: str,
+        combined_glossary: Dict[str, str],
+        all_user_rules: List[Any],
+        history: List[Dict[str, str]],
+        pbar: Any,
+        translated_results: Optional[Dict[int, str]] = None
+    ) -> Tuple[int, Dict[int, str], Dict[int, str], List[Any], List[Dict[str, Any]], str, str]:
+        """
+        Translates and refines a single batch of dialogue lines (Thread-Safe).
+        Executes Phase 1 drafting followed immediately by Phase 2 refinement.
+        """
+        phase1_data = self._process_phase1_only(
+            b_idx=b_idx,
+            batch=batch,
+            untranslated_in_batch=untranslated_in_batch,
+            batches=batches,
+            video_path=video_path,
+            is_ass=is_ass,
+            anime_meta=anime_meta,
+            episode_profile=episode_profile,
+            anime_context_str=anime_context_str,
+            episode_profile_str=episode_profile_str,
+            series_bible_str=series_bible_str,
+            manga_canon_str=manga_canon_str,
+            combined_glossary=combined_glossary,
+            all_user_rules=all_user_rules,
+            history=history,
+            pbar=pbar,
+            translated_results=translated_results
+        )
+        return self._process_phase2_only(phase1_data)
 
     def _reset_episode_state_for_file(self, subs_file: Path) -> str:
         """Standard 11.1 (LUKA-E5-01): Resetuje series_bible i style_report między odcinkami różnych serii."""
@@ -6389,7 +6521,7 @@ class MultimodalTranslator:
             from context_cache import ContextCacheManager, ensure_cache_token_floor
             logger.info("[Context Cache]: Weryfikacja progu tokenów i rozgrzewanie pamięci podręcznej...")
             print(f"  [Infrastruktura Finansowa]: Weryfikacja i rozgrzewanie pamięci Context Cache z pełną wiedzą odcinka...")
-            pool_or_c1 = self.client_pool if hasattr(self, "client_pool") and self.client_pool else self.client
+            pool_or_c1 = getattr(self, "client_pool_f1", None) or getattr(self, "client_pool", None) or self.client
             self.system_prompt = ensure_cache_token_floor(self.system_prompt, pool_or_c1, self.model_phase1)
             c1 = ContextCacheManager.ensure_cache_ready(pool_or_c1, self.model_phase1, self.system_prompt, tag="translator")
             if not c1:
@@ -6401,7 +6533,7 @@ class MultimodalTranslator:
             if self.verifier and hasattr(self.verifier, "model") and hasattr(self.verifier, "system_prompt"):
                 from verifier import LeanRefinedBatchResponse
                 from model_resolver import build_thinking_config
-                pool_or_c2 = getattr(self.verifier, "client_pool", None) or getattr(self.verifier, "client", None)
+                pool_or_c2 = getattr(self.verifier, "client_pool", None) or getattr(self, "client_pool_f2", None) or getattr(self.verifier, "client", None)
                 self.verifier.system_prompt = ensure_cache_token_floor(self.verifier.system_prompt, pool_or_c2, self.verifier.model)
                 
                 # Budowa symetrycznej konfiguracji F2 dla warm-up pingu (H4 + H5 fix)
@@ -6430,10 +6562,12 @@ class MultimodalTranslator:
             # Pre-warm Context Cache sequentially for all clients before parallel threads start (Zero-Race Lock)
             try:
                 from context_cache import ContextCacheManager
-                clients_to_warm = self.client_pool.clients if hasattr(self, "client_pool") and self.client_pool else [self.client]
-                for c in clients_to_warm:
+                clients_to_warm_f1 = self.client_pool_f1.clients if hasattr(self, "client_pool_f1") and self.client_pool_f1 else (self.client_pool.clients if hasattr(self, "client_pool") and self.client_pool else [self.client])
+                for c in clients_to_warm_f1:
                     ContextCacheManager.get_or_create_cache(client=c, model=self.model_phase1, system_instruction=self.system_prompt, tag="translator")
-                    if self.enable_verifier and self.verifier:
+                if self.enable_verifier and self.verifier:
+                    clients_to_warm_f2 = self.client_pool_f2.clients if hasattr(self, "client_pool_f2") and self.client_pool_f2 else []
+                    for c in clients_to_warm_f2:
                         ContextCacheManager.get_or_create_cache(client=c, model=self.verifier.model, system_instruction=self.verifier.system_prompt, tag="verifier")
             except Exception:
                 logger.debug("Rozgrzewanie pamięci podręcznej kontekstu zakończone wyjątkiem", exc_info=True)
@@ -6605,14 +6739,18 @@ class MultimodalTranslator:
                 time.sleep(1.5)
 
                 if remaining_tasks:
-                    max_workers = min(self.concurrent_batches, len(remaining_tasks))
-                    if max_workers > 1:
-                        print(f"\n  [Kolejka Paczek]: Canary zweryfikowany pomyślnie. Uruchamianie równoległego tłumaczenia ({max_workers} paczek w locie / {active_keys_count} aktywnych kluczy API)...")
+                    active_keys_count = len(self.client_pool.get_active_clients()) if hasattr(self, "client_pool") and self.client_pool else 1
+                    max_workers_f1 = min(self.concurrent_batches, len(remaining_tasks))
+                    phase1_outputs: Dict[int, Dict[str, Any]] = {}
+
+                    # --- ETAP 1: FAZA 1 DRAFTING (Równoległy drafting na K0, K1) ---
+                    if max_workers_f1 > 1:
+                        print(f"\n  [Kolejka Paczek / Faza 1]: Canary zweryfikowany pomyślnie. Równoległy drafting Fazy 1 ({max_workers_f1} paczek w locie / {active_keys_count} aktywnych kluczy API)...")
                         import concurrent.futures
-                        with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-                            future_to_bidx = {
-                                executor.submit(
-                                    self._process_single_batch,
+                        with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers_f1) as executor_f1:
+                            fut_to_bidx_f1 = {
+                                executor_f1.submit(
+                                    self._process_phase1_only,
                                     b_idx=b_idx,
                                     batch=batch,
                                     untranslated_in_batch=untranslated,
@@ -6633,36 +6771,22 @@ class MultimodalTranslator:
                                 ): b_idx
                                 for b_idx, batch, untranslated in remaining_tasks
                             }
-
-                            for future in concurrent.futures.as_completed(future_to_bidx):
+                            for future in concurrent.futures.as_completed(fut_to_bidx_f1):
                                 if cancel_check and cancel_check():
                                     print("\n[Tłumacz]: Otrzymano sygnał przerwania (⏹ Stop)...")
                                     break
                                 try:
-                                    batch_output = future.result()
-                                    self._record_batch_results(
-                                        batch_output=batch_output,
-                                        translated_results=translated_results,
-                                        translated_regions=translated_regions,
-                                        translated_typesetting=translated_typesetting,
-                                        translated_addressees=translated_addressees,
-                                        translated_speakers=translated_speakers,
-                                        episode_whisper_transcriptions=episode_whisper_transcriptions,
-                                        history=history,
-                                        checkpoint_path=checkpoint_path,
-                                        pbar=pbar,
-                                        progress_callback=progress_callback,
-                                        total_lines=total_lines
-                                    )
+                                    p1_data = future.result()
+                                    phase1_outputs[p1_data["b_idx"]] = p1_data
                                 except ContextCacheDiscountError:
-                                    for f in future_to_bidx:
+                                    for f in fut_to_bidx_f1:
                                         f.cancel()
                                     raise
                                 except Exception as e:
-                                    pbar.write(f" 🔴 [Niepowodzenie Paczki]: {format_friendly_api_error(e)}")
+                                    pbar.write(f" 🔴 [Niepowodzenie Fazy 1 Paczki]: {format_friendly_api_error(e)}")
                                     pbar.refresh()
                     else:
-                        print(f"\n  [Kolejka Paczek]: Canary zweryfikowany pomyślnie. Płynne tłumaczenie sekwencyjne (1 paczka na raz / rotacja {active_keys_count} aktywnych kluczy API)...")
+                        print(f"\n  [Kolejka Paczek / Faza 1]: Canary zweryfikowany pomyślnie. Sekwencyjny drafting Fazy 1 (1 paczka na raz / rotacja {active_keys_count} kluczy)...")
                         for loop_i, (b_idx, batch, untranslated) in enumerate(remaining_tasks):
                             if cancel_check and cancel_check():
                                 print("\n[Tłumacz]: Otrzymano sygnał przerwania (⏹ Stop)...")
@@ -6670,7 +6794,7 @@ class MultimodalTranslator:
                             if loop_i > 0:
                                 time.sleep(0.25)
                             try:
-                                batch_output = self._process_single_batch(
+                                p1_data = self._process_phase1_only(
                                     b_idx=b_idx,
                                     batch=batch,
                                     untranslated_in_batch=untranslated,
@@ -6689,25 +6813,111 @@ class MultimodalTranslator:
                                     pbar=pbar,
                                     translated_results=translated_results
                                 )
-                                self._record_batch_results(
-                                    batch_output=batch_output,
-                                    translated_results=translated_results,
-                                    translated_regions=translated_regions,
-                                    translated_typesetting=translated_typesetting,
-                                    translated_addressees=translated_addressees,
-                                    translated_speakers=translated_speakers,
-                                    episode_whisper_transcriptions=episode_whisper_transcriptions,
-                                    history=history,
-                                    checkpoint_path=checkpoint_path,
-                                    pbar=pbar,
-                                    progress_callback=progress_callback,
-                                    total_lines=total_lines
-                                )
+                                phase1_outputs[b_idx] = p1_data
                             except ContextCacheDiscountError:
                                 raise
                             except Exception as e:
-                                pbar.write(f" 🔴 [Niepowodzenie Paczki]: {format_friendly_api_error(e)}")
+                                pbar.write(f" 🔴 [Niepowodzenie Fazy 1 Paczki]: {format_friendly_api_error(e)}")
                                 pbar.refresh()
+
+                    # --- PHASE BARRIER & RE-WARM K2 ---
+                    if phase1_outputs:
+                        logger.info("[PHASE BARRIER] Faza 1 zakończona dla wszystkich paczek. Re-warm bufora K2 w toku...")
+                        print(f"\n  [Phase Barrier]: Faza 1 zakończona pomyślnie ({len(phase1_outputs)} paczek). Re-warm bufora weryfikatora K2...")
+                        if self.enable_verifier and hasattr(self, "verifier") and self.verifier:
+                            time.sleep(1.0)
+                            try:
+                                from context_cache import ContextCacheManager
+                                from verifier import LeanRefinedBatchResponse
+                                from model_resolver import build_thinking_config
+                                f2_thinking = build_thinking_config(self.verifier.model, getattr(self.verifier, "thinking_budget", 2048))
+                                effective_schema = getattr(self.verifier, "_schema_for_cache", None) or getattr(self.verifier, "_effective_schema", None)
+                                if effective_schema is None:
+                                    effective_schema = LeanRefinedBatchResponse
+                                pool_or_c2 = getattr(self.verifier, "client_pool", None) or getattr(self, "client_pool_f2", None) or getattr(self.verifier, "client", None)
+                                ContextCacheManager.ensure_cache_ready(
+                                    client=pool_or_c2,
+                                    model=self.verifier.model,
+                                    system_instruction=self.verifier.system_prompt,
+                                    tag="verifier",
+                                    verbose=True,
+                                    thinking_config=f2_thinking,
+                                    response_schema=effective_schema,
+                                    response_mime_type="application/json"
+                                )
+                            except Exception as warm_err:
+                                logger.warning(f"[RE-WARM WARN] Niepowodzenie re-warmu K2: {warm_err}")
+                            time.sleep(1.5)
+
+                        # --- ETAP 2: FAZA 2 REDAKCJA / WERYFIKACJA (Dedykowany K2) ---
+                        max_workers_f2 = min(2, len(phase1_outputs)) if self.concurrent_batches > 1 else 1
+                        sorted_p1_keys = sorted(phase1_outputs.keys())
+                        if max_workers_f2 > 1:
+                            print(f"\n  [Kolejka Paczek / Faza 2]: Rozpoczynanie redakcji Fazy 2 na dedykowanym kluczu K2 ({max_workers_f2} paczek w locie)...")
+                            with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers_f2) as executor_f2:
+                                fut_to_bidx_f2 = {
+                                    executor_f2.submit(
+                                        self._process_phase2_only,
+                                        phase1_data=phase1_outputs[b_idx]
+                                    ): b_idx
+                                    for b_idx in sorted_p1_keys
+                                }
+                                for future in concurrent.futures.as_completed(fut_to_bidx_f2):
+                                    if cancel_check and cancel_check():
+                                        print("\n[Tłumacz]: Otrzymano sygnał przerwania (⏹ Stop)...")
+                                        break
+                                    try:
+                                        batch_output = future.result()
+                                        self._record_batch_results(
+                                            batch_output=batch_output,
+                                            translated_results=translated_results,
+                                            translated_regions=translated_regions,
+                                            translated_typesetting=translated_typesetting,
+                                            translated_addressees=translated_addressees,
+                                            translated_speakers=translated_speakers,
+                                            episode_whisper_transcriptions=episode_whisper_transcriptions,
+                                            history=history,
+                                            checkpoint_path=checkpoint_path,
+                                            pbar=pbar,
+                                            progress_callback=progress_callback,
+                                            total_lines=total_lines
+                                        )
+                                    except ContextCacheDiscountError:
+                                        for f in fut_to_bidx_f2:
+                                            f.cancel()
+                                        raise
+                                    except Exception as e:
+                                        pbar.write(f" 🔴 [Niepowodzenie Fazy 2 Paczki]: {format_friendly_api_error(e)}")
+                                        pbar.refresh()
+                        else:
+                            print(f"\n  [Kolejka Paczek / Faza 2]: Płynna redakcja Fazy 2 na dedykowanym kluczu K2 (1 paczka na raz)...")
+                            for loop_i, b_idx in enumerate(sorted_p1_keys):
+                                if cancel_check and cancel_check():
+                                    print("\n[Tłumacz]: Otrzymano sygnał przerwania (⏹ Stop)...")
+                                    break
+                                if loop_i > 0:
+                                    time.sleep(0.25)
+                                try:
+                                    batch_output = self._process_phase2_only(phase1_data=phase1_outputs[b_idx])
+                                    self._record_batch_results(
+                                        batch_output=batch_output,
+                                        translated_results=translated_results,
+                                        translated_regions=translated_regions,
+                                        translated_typesetting=translated_typesetting,
+                                        translated_addressees=translated_addressees,
+                                        translated_speakers=translated_speakers,
+                                        episode_whisper_transcriptions=episode_whisper_transcriptions,
+                                        history=history,
+                                        checkpoint_path=checkpoint_path,
+                                        pbar=pbar,
+                                        progress_callback=progress_callback,
+                                        total_lines=total_lines
+                                    )
+                                except ContextCacheDiscountError:
+                                    raise
+                                except Exception as e:
+                                    pbar.write(f" 🔴 [Niepowodzenie Fazy 2 Paczki]: {format_friendly_api_error(e)}")
+                                    pbar.refresh()
 
             # 6.9. Zero-Gap Healing Pass: uzupełnienie ewentualnych brakujących kwestii po awariach paczek
             missing_entries = [item for item in raw_entries if item[0] not in translated_results]
@@ -7121,12 +7331,24 @@ class MultimodalTranslator:
         # Clean up server-side Context Cache objects across all clients in the pool to avoid storage fees
         try:
             from context_cache import ContextCacheManager
-            if hasattr(self, "client_pool") and self.client_pool and hasattr(self.client_pool, "clients"):
-                for c in self.client_pool.clients:
-                    ContextCacheManager.cleanup_all_active_caches(c)
-            else:
+            all_pools = []
+            if hasattr(self, "client_pool_f1") and self.client_pool_f1:
+                all_pools.append(self.client_pool_f1)
+            if hasattr(self, "client_pool_f2") and self.client_pool_f2:
+                all_pools.append(self.client_pool_f2)
+            if not all_pools and hasattr(self, "client_pool") and self.client_pool:
+                all_pools.append(self.client_pool)
+
+            seen_clients = set()
+            for pool in all_pools:
+                if hasattr(pool, "clients"):
+                    for c in pool.clients:
+                        if c not in seen_clients:
+                            seen_clients.add(c)
+                            ContextCacheManager.cleanup_all_active_caches(c)
+            if not seen_clients:
                 ContextCacheManager.cleanup_all_active_caches(self.client)
-            if self.verifier and hasattr(self.verifier, "client") and self.verifier.client != self.client:
+            if self.verifier and hasattr(self.verifier, "client") and self.verifier.client not in seen_clients:
                 ContextCacheManager.cleanup_all_active_caches(self.verifier.client)
         except Exception:
             logger.debug("Czyszczenie aktywnych obiektów pamięci podręcznej zakończone wyjątkiem", exc_info=True)
