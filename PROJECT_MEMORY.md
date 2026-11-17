@@ -4,9 +4,9 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-16 — Standard 11.2.12 Certyfikowany Baseline)
-- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.12 (Zero-Thrashing Cache Affinity & F1 LOW Baseline)`
-- **Commit certyfikacji kodu:** `6875bdb` (`6875bdb1e8c9649d13dc3cdca38a8f42ded75582`)
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-17 — Standard 11.2.13 Certyfikowany Baseline)
+- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.13 (Fix D.1 — Asymmetric Key Partitioning 2:1 & Phase-Decoupled Zero-Thrashing)`
+- **Commit certyfikacji kodu:** `b08c42e` (`b08c42e88a0e9fcb94d03612d7b57ad5656bb0d5`)
 - **Commity implementacyjne 11.1:** `5b7306d` (Commit 1), `5b17ea7` (Commit 2), `2b4bc7d` (Commit 3), `8b72887` (Commit 4), `8a7dd31` (Commit 5), `218af2e` (Commit 6)
 - **Commity Hotfixu 11.1.1:** `328729f` (Commit 1), `9de0b83` (Commit 2), `07c4684` (Commit 3), `96acac7` (Commit 4)
 - **Commity Hotfixu 11.1.2:** `74766d8` (Commit 1), `1b540e3` (Commit 2), `8313658` (Commit 3), `326b7e0` (Commit 4)
@@ -30,20 +30,21 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 - **Commity Standardu 11.2.9:** `e17e563` (Commit 1), `792cb97` (Commit 2), `a4f8f30` (Commit 3)
 - **Commity Standardu 11.2.10:** `195f151` (Commit 1), `4a5620b` (Commit 2), `d3ccbbb` (Commit 3), `4373b99` (Commit 4), `3539a8a` (Commit 5), `3394289` (Commit 6)
 - **Commity Standardu 11.2.11:** `b1536fd` (Commit 1), `93cc90b` (Commit 2), `252aee4` (Commit 3)
-- **Commity Standardu 11.2.12:**
-  * Commit 1 (`88e771f`): `fix(cache): resolve cross-phase TPU cache thrashing via phase key offset and canary stabilization`
-  * Commit 2 (`6875bdb`): `fix(cli): default phase 1 thinking to LOW for deterministic cache affinity` — **NOWY COMMIT CERTYFIKACJI KODU**
-  * Commit 3 (`HEAD`): `test(pipeline): certify Standard 11.2.12 — zero-thrashing cache affinity and LOW F1 baseline`
-- **Status 11.2.12:** `CERTIFIED / CLOSED (2026-11-16)`
+- **Commity Standardu 11.2.12:** `88e771f` (Commit 1), `6875bdb` (Commit 2), `518ea55` (Commit 3)
+- **Commity Standardu 11.2.13:**
+  * Commit 1 (`b08c42e`): `fix(pipeline): implement 2:1 asymmetric key partitioning and phase-decoupled pipeline with K2 re-warm` — **NOWY COMMIT CERTYFIKACJI KODU**
+  * Commit 2 (`d3fe0ec`): `test(pipeline): add unit tests for 2:1 key isolation, fallback boundaries and phase barrier`
+  * Commit 3 (`HEAD`): `docs(release): certify Standard 11.2.13 — asymmetric 2:1 key isolation and Phase-Decoupled architecture`
+- **Status 11.2.13:** `CERTIFIED / CLOSED (2026-11-17)`
 - **Commit ochrony Depuracji Legacy 1.0 (Z16):** `c197db73c3dabf887dddbf2337dc3a1d8cff598c` (`c197db7` — autoryzowany Z16-amendment #14 dla `verifier.py`, bezwzględne 0 B diffu na wszystkich pozostałych plikach chronionych)
-- **Stan metryk:** `389 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `460 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 11/11, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
-- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (389/389 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
-- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.12` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
-- **Gałąź i Architektura:** `main` (Standard 11.2.12: Likwidacja Cross-Phase Cache Thrashing w klastrach TPU poprzez offset klucza dla Fazy 2 `f2_affinity_idx = b_idx + 1` w puli wielu kluczy, pauzę stabilizacyjną 1.5s po Canary Gate oraz stały poziom myślenia LOW dla Fazy 1)
+- **Stan metryk:** `393 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `464 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 11/11, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
+- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (393/393 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
+- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.13` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
+- **Gałąź i Architektura:** `main` (Standard 11.2.13: Likwidacja Cross-Phase Cache Thrashing w klastrach TPU poprzez asymetryczne partycjonowanie 2:1 puli kluczy API [K0, K1 dla F1; K2 dla F2], dwufazową barierę potoku [Phase-Decoupled Pipeline], jawny re-warm K2 po zakończeniu Fazy 1 oraz gwarancję 100% cache retention z kosztem odcinka <= 6.00 PLN [worst-case 5.23 PLN netto])
 - **Środowisko:** Python 3.13 (`.venv`), Windows PowerShell, `ffmpeg` (PATH), `librosa.pyin`, `soundfile`, `pysubs2`, `spaCy en_core_web_sm` (100% offline 0.00 PLN), bezpośrednie klucze Google AI Studio API (`use_vertex = 0`).
 - **Dyrektywa Wykonawcza Testów:**
   * Testy przyrostowe podczas kodowania (< 2 s): `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_testu>"`
-  * Szybki pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest -q` (387 passed w tests/, 71 passed i 153 deselected w test_system.py)
+  * Szybki pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest -q` (393 passed w tests/, 71 passed i 153 deselected w test_system.py)
   * Audyt śledczy diffu: `powershell -ExecutionPolicy Bypass -File .\audit_diff.ps1 -ForbiddenTerms "<lista>"`
   * 4 bramki kwalifikacyjne: `python verify_purity.py`, `python verify_8_fixes.py`, `python verify_12_fixes.py`, `python verify_ultimate_pipeline.py`
 
@@ -517,13 +518,27 @@ Dodanie w `tools/consolidate_bibles.py` opcjonalnej flagi `--migrate-misplaced-s
 
 ## 🏛️ ARB-063 / INC-AVT-061: Standard 11.2.12 — Likwidacja Cross-Phase Cache Thrashing i Baseline F1 LOW Thinking
 
-- **Status:** `RESOLVED (Standard 11.2.12, commity 88e771f, 6875bdb, HEAD)`
+- **Status:** `RESOLVED (Standard 11.2.12, commity 88e771f, 6875bdb, 518ea55)`
 - **Zidentyfikowano:** W puli wielu kluczy (`MultiKeyClientPool`), gdy Faza 1 i Faza 2 były wywoływane z tym samym indeksem `b_idx`, obie fazy kierowane były na ten sam klucz i slot bufora TPU. Powodowało to wzajemną eksmisję snapshotu bufora tekstowego (cross-phase cache thrashing) w węzłach TPU, skutkując koniecznością powtarzania zapytań przez obwód F2 JIT retry. Dodatkowo, uruchamianie równoległej puli wątków natychmiast po Paczce Kanarkowej nie dawało backendowi Google wystarczającego czasu na zakończenie indeksacji bufora TPU, a domyślny tryb myślenia `auto` dla Fazy 1 alokował 3072 tokeny CoT, generując niepotrzebne koszty.
 - **Komponenty Naprawy:**
   1. `translator.py`: Wprowadzenie offsetu indeksu klucza dla Fazy 2: `f2_affinity_idx = b_idx + 1 if hasattr(self, "client_pool") and self.client_pool else b_idx`, co separuje sloty kluczy API i węzły TPU między F1 a F2.
   2. `translator.py`: Wdrożenie pauzy stabilizacyjnej `time.sleep(1.5)` po sekwencyjnej Paczce Kanarkowej przed uruchomieniem równoległego `ThreadPoolExecutor`.
   3. `main.py` & `translator.py`: Przestawienie domyślnego poziomu myślenia CoT Fazy 1 na stały `LOW` (`budget = 0`) w parserze CLI (`--thinking-f1 default="low"`) oraz w `resolve_f1_thinking_budget`.
   4. `tests/test_context_cache_guard.py`: Dedykowane testy jednostkowe `test_f2_affinity_offset_prevents_collision` oraz `test_f1_thinking_default_low`.
+
+
+## 🏛️ ARB-064 / INC-AVT-062: Standard 11.2.13 — Asymetryczne Partycjonowanie 2:1 i Dwufazowa Bariera Potoku (Fix D.1)
+
+- **Status:** `RESOLVED (Standard 11.2.13, commity b08c42e, d3fe0ec, HEAD)`
+- **Zidentyfikowano:** W konfiguracji z równoległym przetwarzaniem paczek w locie (Faza 1 i Faza 2 przeplatające się w czasie na klastrach TPU) dochodziło do zjawiska Cross-Phase Buffer Collision — zlecenia Fazy 2 (Redakcja z CoT i JSON) wysyłane równocześnie z draftingiem Fazy 1 wywoływały rotację i unieważnianie snapshotów bufora tekstowego (prefix cache) na serwerach Google, co skutkowało stratą rabatu -95% i wzrostem kosztu odcinka z oczekiwanych ~3–4 PLN do kilkunastu PLN.
+- **Komponenty Naprawy:**
+  1. `translator.py:__init__`: Wdrożenie asymetrycznego partycjonowania puli wielu kluczy 2:1. W konfiguracji $\ge 3$ kluczy, $K_0, K_1$ są przypisane wyłącznie do Fazy 1 (`client_pool_f1`), a $K_2$ wyłącznie do Fazy 2 (`client_pool_f2`). Weryfikator (`DialogueVerifier`) otrzymuje bezpośrednio `self.client_pool_f2`.
+  2. `translator.py`: Dekompozycja metody `_process_single_batch` na `_process_phase1_only` (drafting F1 z normalizacją wejściowych krotek/słowników i zwrotem `phase1_data`) oraz `_process_phase2_only` (redakcja F2 na dedykowanym kluczu $K_2$ ze zwrotem 7-krotki). Zachowano pełną zgodność wsteczną `_process_single_batch`.
+  3. `translator.py:translate_subtitles`: Wdrożenie architektury Phase-Decoupled Pipeline z barierą fazową:
+     - Etap 1: Wszystkie paczki wykonują drafting Fazy 1 równolegle na kluczach $K_0, K_1$.
+     - Phase Barrier & Re-warm K2: Po zakończeniu Fazy 1 dla wszystkich paczek następuje pauza stabilizacyjna oraz jawne rozgrzanie pamięci podręcznej weryfikatora wyłącznie na kluczu $K_2$ (`ContextCacheManager.ensure_cache_ready(client=self.client_pool_f2, tag="verifier", ...)`).
+     - Etap 2: Wszystkie paczki wykonują redakcję Fazy 2 na dedykowanym kluczu $K_2$ (`max_workers_f2 = min(2, len(phase1_outputs))`) z zachowaniem 100% retencji bufora i rabatu -95%.
+  4. `tests/test_context_cache_guard.py`: Dodanie 4 atomowych testów jednostkowych: `test_phase_decoupled_execution_order`, `test_f1_never_touches_k2`, `test_f2_uses_only_k2`, `test_f1_fallback_blocks_on_k2_unavailable` (22/22 tests passing).
 
 
 
