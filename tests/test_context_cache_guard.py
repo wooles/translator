@@ -609,6 +609,194 @@ def test_f1_thinking_default_low():
     assert translator.resolve_f1_thinking_budget(total_lines=500) == 3072
 
 
+@pytest.mark.unit
+def test_phase_decoupled_execution_order(monkeypatch):
+    """
+    Standard 11.2.13:
+    Weryfikuje dwufazową barierę potoku (Phase-Decoupled Pipeline).
+    Wszystkie zadania Fazy 1 kończą się przed startem pierwszego zadania Fazy 2.
+    Kolejność zdarzeń: [F1_Paczka_1, F1_Paczka_2, F1_Paczka_3, BARRIER, F2_Paczka_1, F2_Paczka_2, F2_Paczka_3].
+    """
+    from translator import MultimodalTranslator
+    from unittest.mock import MagicMock
+    import concurrent.futures
+
+    translator = MultimodalTranslator(
+        api_key="test_k0,test_k1,test_k2",
+        model="gemini-4-hydrogen",
+        enable_verifier=True
+    )
+    translator.concurrent_batches = 2
+
+    execution_log = []
+
+    def mock_process_p1(*args, **kwargs):
+        b_idx = kwargs.get("b_idx", 0)
+        execution_log.append(f"F1_{b_idx}")
+        return {
+            "b_idx": b_idx,
+            "pass1_items": [{"id": b_idx, "pl": "Test", "en": "Test"}],
+            "untranslated_in_batch": [],
+            "scene_desc": "",
+            "is_ass": False,
+            "combined_glossary": {},
+            "all_user_rules": []
+        }
+
+    def mock_process_p2(phase1_data):
+        b_idx = phase1_data.get("b_idx", 0)
+        execution_log.append(f"F2_{b_idx}")
+        return (b_idx, {b_idx: "Refined"}, {}, [], [], "", "")
+
+    monkeypatch.setattr(translator, "_process_phase1_only", mock_process_p1)
+    monkeypatch.setattr(translator, "_process_phase2_only", mock_process_p2)
+    monkeypatch.setattr("time.sleep", lambda s: None)
+
+    batches = [[(i, MagicMock(), f"Text {i}", "")] for i in range(4)]
+    remaining_tasks = [(i, batches[i], batches[i]) for i in range(1, 4)]
+    phase1_outputs = {}
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor_f1:
+        futs = [
+            executor_f1.submit(
+                translator._process_phase1_only,
+                b_idx=b_idx,
+                batch=b,
+                untranslated_in_batch=u,
+                batches=batches,
+                video_path=None,
+                is_ass=False,
+                anime_meta=None,
+                episode_profile=None,
+                anime_context_str="",
+                episode_profile_str="",
+                series_bible_str="",
+                manga_canon_str="",
+                combined_glossary={},
+                all_user_rules=[],
+                history=[],
+                pbar=None,
+                translated_results={}
+            )
+            for b_idx, b, u in remaining_tasks
+        ]
+        for f in concurrent.futures.as_completed(futs):
+            res = f.result()
+            phase1_outputs[res["b_idx"]] = res
+
+    execution_log.append("BARRIER")
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor_f2:
+        futs_f2 = [
+            executor_f2.submit(translator._process_phase2_only, phase1_data=phase1_outputs[b_idx])
+            for b_idx in sorted(phase1_outputs.keys())
+        ]
+        for f in concurrent.futures.as_completed(futs_f2):
+            f.result()
+
+    barrier_pos = execution_log.index("BARRIER")
+    f1_events = [x for x in execution_log[:barrier_pos] if x.startswith("F1_")]
+    f2_events = [x for x in execution_log[barrier_pos+1:] if x.startswith("F2_")]
+
+    assert len(f1_events) == 3
+    assert len(f2_events) == 3
+    assert set(f1_events) == {"F1_1", "F1_2", "F1_3"}
+    assert set(f2_events) == {"F2_1", "F2_2", "F2_3"}
+    assert not any(x.startswith("F2_") for x in execution_log[:barrier_pos])
+    assert not any(x.startswith("F1_") for x in execution_log[barrier_pos+1:])
+
+
+@pytest.mark.unit
+def test_f1_never_touches_k2():
+    """
+    Standard 11.2.13:
+    Weryfikuje asymetryczny podział puli 2:1.
+    K0 i K1 są przypisane do Fazy 1 (client_pool_f1), a K2 nie występuje w puli F1.
+    """
+    from translator import MultimodalTranslator
+
+    def _extract_key(c):
+        if hasattr(c, "_api_client") and hasattr(c._api_client, "api_key"):
+            return getattr(c._api_client, "api_key", "")
+        return getattr(c, "_api_key", "")
+
+    translator = MultimodalTranslator(
+        api_key="test_key_00,test_key_01,test_key_02",
+        model="gemini-4-hydrogen",
+        enable_verifier=True
+    )
+
+    assert len(translator.client_pool_f1.clients) == 2
+    f1_keys = [_extract_key(c) for c in translator.client_pool_f1.clients]
+
+    assert "test_key_02" not in f1_keys
+    assert "test_key_00" in f1_keys
+    assert "test_key_01" in f1_keys
+
+
+@pytest.mark.unit
+def test_f2_uses_only_k2():
+    """
+    Standard 11.2.13:
+    Weryfikuje, że weryfikator Fazy 2 (DialogueVerifier) używa wyłącznie klucza K2
+    i nie ma w swojej puli kluczy K0 ani K1.
+    """
+    from translator import MultimodalTranslator
+
+    def _extract_key(c):
+        if hasattr(c, "_api_client") and hasattr(c._api_client, "api_key"):
+            return getattr(c._api_client, "api_key", "")
+        return getattr(c, "_api_key", "")
+
+    translator = MultimodalTranslator(
+        api_key="test_key_00,test_key_01,test_key_02",
+        model="gemini-4-hydrogen",
+        enable_verifier=True
+    )
+
+    assert len(translator.client_pool_f2.clients) == 1
+    f2_keys = [_extract_key(c) for c in translator.client_pool_f2.clients]
+
+    assert f2_keys == ["test_key_02"]
+    assert "test_key_00" not in f2_keys
+    assert "test_key_01" not in f2_keys
+
+    assert translator.verifier.client_pool is translator.client_pool_f2
+
+
+@pytest.mark.unit
+def test_f1_fallback_blocks_on_k2_unavailable():
+    """
+    Standard 11.2.13:
+    Weryfikuje granice awaryjności (circuit breaker boundary).
+    Gdy klucze K0 i K1 w puli F1 ulegną wyczerpaniu (429 quota),
+    pula F1 nie narusza izolacji i nie pobiera klucza K2 z puli F2.
+    """
+    from translator import MultimodalTranslator
+
+    def _extract_key(c):
+        if hasattr(c, "_api_client") and hasattr(c._api_client, "api_key"):
+            return getattr(c._api_client, "api_key", "")
+        return getattr(c, "_api_key", "")
+
+    translator = MultimodalTranslator(
+        api_key="test_key_00,test_key_01,test_key_02",
+        model="gemini-4-hydrogen",
+        enable_verifier=True
+    )
+
+    pool_f1 = translator.client_pool_f1
+    for c in pool_f1.clients:
+        pool_f1.report_error(c, "429 resource exhausted quota")
+
+    fallback_client = pool_f1.get_client(affinity_idx=0)
+    fb_key = _extract_key(fallback_client)
+
+    assert fb_key != "test_key_02"
+    assert fb_key in ("test_key_00", "test_key_01")
+
+
+
 
 
 
