@@ -5381,31 +5381,8 @@ class MultimodalTranslator:
             p2_tok_usage = getattr(_vtl, "last_batch_token_usage", None) if _vtl else {}
             p2_cached = p2_tok_usage.get("cached", 0) if p2_tok_usage else 0
 
-            # Standard 11.2.14: Obwód asekuracyjny JIT Warmup Retry (aktywny wyłącznie na bramce Canary Paczki 0)
-            if p2_cached == 0 and b_idx == 0:
-                from model_resolver import is_gemini_4_or_hydrogen_model
-                if is_gemini_4_or_hydrogen_model(getattr(self.verifier, "model", "")):
-                    logger.warning(f"[Context Cache F2 Sentinel]: Wykryto 0 tokenów cache w Fazie 2 na paczce Canary {b_idx}. JIT Warmup Retry po 1.2s...")
-                    time.sleep(1.2)
-                    refined_lines = self.verifier.verify_batch(
-                        batch_items=pass1_items,
-                        scene_summary=scene_desc or "",
-                        episode_profile_str=episode_profile_str,
-                        user_feedback_str=user_feedback_str,
-                        glossary_str=glossary_str,
-                        focused_rules_str=phase2_focused_rules,
-                        series_bible_str=scoped_series_bible_str,
-                        manga_canon_str=manga_canon_str,
-                        history_context=lookback_history,
-                        lookahead_events=lookahead_events,
-                        character_registry=self.character_registry,
-                        scene_diagnosis=getattr(batch_response, "scene_diagnosis", None) if batch_response else None,
-                        batch_idx=b_idx
-                    )
-                    _vtl = getattr(self.verifier, "_thread_local", None)
-                    p2_tok_usage = getattr(_vtl, "last_batch_token_usage", None) if _vtl else {}
-                    p2_cached = p2_tok_usage.get("cached", 0) if p2_tok_usage else 0
-
+            # Standard 11.2.15 (Zero-Variance Baseline): Fizyczna eliminacja JIT Retry z Fazy 2.
+            # Wyklucza ryzyko podwójnego generowania wyjścia CoT. Każda paczka F2 wykonuje dokładnie 1 wywołanie API.
             self._audit_batch_context_cache(b_idx=b_idx, cached_tokens=p2_cached, phase="phase2")
             for r in refined_lines:
                 orig_it = next((it for it in pass1_items if it.get("id") == r.id), None)
@@ -6820,23 +6797,28 @@ class MultimodalTranslator:
                                 pbar.write(f" 🔴 [Niepowodzenie Fazy 1 Paczki]: {format_friendly_api_error(e)}")
                                 pbar.refresh()
 
-                    # --- PHASE BARRIER & RE-WARM K2 ---
+                    # --- STANDARD 11.2.15: BARIERA FAZOWA Z AKTYWNĄ SONDĄ UGRUNTOWANIA K2 ---
                     if phase1_outputs:
-                        logger.info("[PHASE BARRIER] Faza 1 zakończona dla wszystkich paczek. Re-warm bufora K2 w toku...")
-                        print(f"\n  [Phase Barrier]: Faza 1 zakończona pomyślnie ({len(phase1_outputs)} paczek). Re-warm bufora weryfikatora K2...")
+                        logger.info("[PHASE BARRIER] Faza 1 zakończona dla wszystkich paczek. Inicjalizacja aktywnego ugruntowania bufora K2...")
+                        print(f"\n  [Phase Barrier]: Faza 1 zakończona pomyślnie ({len(phase1_outputs)} paczek). Inicjalizacja aktywnego ugruntowania bufora K2...")
                         if self.enable_verifier and hasattr(self, "verifier") and self.verifier:
                             time.sleep(1.0)
+                            from context_cache import ContextCacheManager
+                            from model_resolver import build_thinking_config, is_gemini_4_or_hydrogen_model
+                            from verifier import LeanRefinedBatchResponse, RefinedBatchResponse
+
+                            is_hydrogen = is_gemini_4_or_hydrogen_model(self.verifier.model)
+                            effective_schema = LeanRefinedBatchResponse if is_hydrogen else RefinedBatchResponse
+                            f2_warmup_budget = getattr(self.verifier, "thinking_budget", 2048)
+                            f2_thinking = build_thinking_config(self.verifier.model, f2_warmup_budget)
+
+                            pool_k2 = self.client_pool_f2 if hasattr(self, "client_pool_f2") and self.client_pool_f2 else (getattr(self.verifier, "client_pool", None) or self.client)
+                            k2_client = pool_k2.get_client(affinity_idx=0) if hasattr(pool_k2, "get_client") else pool_k2
+
+                            # 1. Inicjalizacja bufora weryfikatora na dedykowanym kluczu K2
                             try:
-                                from context_cache import ContextCacheManager
-                                from verifier import LeanRefinedBatchResponse
-                                from model_resolver import build_thinking_config
-                                f2_thinking = build_thinking_config(self.verifier.model, getattr(self.verifier, "thinking_budget", 2048))
-                                effective_schema = getattr(self.verifier, "_schema_for_cache", None) or getattr(self.verifier, "_effective_schema", None)
-                                if effective_schema is None:
-                                    effective_schema = LeanRefinedBatchResponse
-                                pool_or_c2 = getattr(self.verifier, "client_pool", None) or getattr(self, "client_pool_f2", None) or getattr(self.verifier, "client", None)
                                 ContextCacheManager.ensure_cache_ready(
-                                    client=pool_or_c2,
+                                    client=pool_k2,
                                     model=self.verifier.model,
                                     system_instruction=self.verifier.system_prompt,
                                     tag="verifier",
@@ -6847,7 +6829,40 @@ class MultimodalTranslator:
                                 )
                             except Exception as warm_err:
                                 logger.warning(f"[RE-WARM WARN] Niepowodzenie re-warmu K2: {warm_err}")
-                            time.sleep(1.5)
+
+                            # 2. Aktywna pętla weryfikacji ugruntowania TPU (Zero-Variance Confirmation Loop)
+                            k2_confirmed = False
+                            for ping_attempt in range(1, 4):
+                                if cancel_check and cancel_check():
+                                    break
+                                time.sleep(1.0)
+                                try:
+                                    from google.genai import types
+                                    probe_cfg_kwargs = {
+                                        "system_instruction": self.verifier.system_prompt,
+                                        "max_output_tokens": 1,
+                                        "temperature": 0.0,
+                                        "thinking_config": f2_thinking,
+                                        "response_schema": effective_schema,
+                                        "response_mime_type": "application/json"
+                                    }
+                                    probe_resp = k2_client.models.generate_content(
+                                        model=self.verifier.model,
+                                        contents=["PING_CACHE_VERIFY"],
+                                        config=types.GenerateContentConfig(**probe_cfg_kwargs)
+                                    )
+                                    c_cnt = getattr(getattr(probe_resp, "usage_metadata", None), "cached_content_token_count", 0) or 0
+                                    if c_cnt >= 32768:
+                                        logger.info(f"[Phase Barrier]: Ugruntowanie K2 potwierdzone telemetrią TPU (próba {ping_attempt}, {c_cnt:,} tok cache).")
+                                        print(f"  [Context Cache K2]: Serwer potwierdził aktywny rabat TPU ({c_cnt:,} tokenów).")
+                                        k2_confirmed = True
+                                        break
+                                except Exception as probe_err:
+                                    logger.debug(f"[Phase Barrier]: Sonda telemetrii K2 próba {ping_attempt}: {probe_err}")
+
+                            if not k2_confirmed:
+                                logger.warning("[Phase Barrier]: Brak potwierdzenia telemetrii w 3 próbach - przejście do Fazy 2 z domyślnym ugruntowaniem.")
+                            time.sleep(0.5)
 
                         # --- STANDARD 11.2.14: ETAP 2 - FAZA 2 REDAKCJA (F2 SEQUENTIAL CANARY GATE NA K2) ---
                         sorted_p1_keys = sorted(phase1_outputs.keys())
