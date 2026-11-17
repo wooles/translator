@@ -4,9 +4,9 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-17 — Standard 11.2.13 Certyfikowany Baseline)
-- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.13 (Fix D.1 — Asymmetric Key Partitioning 2:1 & Phase-Decoupled Zero-Thrashing)`
-- **Commit certyfikacji kodu:** `b08c42e` (`b08c42e88a0e9fcb94d03612d7b57ad5656bb0d5`)
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-17 — Standard 11.2.14 Certyfikowany Baseline)
+- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.14 (F2 Sequential Canary Gate, Zero-Retry Determinism & 4.31 PLN Cost Baseline)`
+- **Commit certyfikacji kodu:** `6f25edc` (`6f25edcf0f0d98e7e1fbaad787bcf1f153a5e82b`)
 - **Commity implementacyjne 11.1:** `5b7306d` (Commit 1), `5b17ea7` (Commit 2), `2b4bc7d` (Commit 3), `8b72887` (Commit 4), `8a7dd31` (Commit 5), `218af2e` (Commit 6)
 - **Commity Hotfixu 11.1.1:** `328729f` (Commit 1), `9de0b83` (Commit 2), `07c4684` (Commit 3), `96acac7` (Commit 4)
 - **Commity Hotfixu 11.1.2:** `74766d8` (Commit 1), `1b540e3` (Commit 2), `8313658` (Commit 3), `326b7e0` (Commit 4)
@@ -31,16 +31,17 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 - **Commity Standardu 11.2.10:** `195f151` (Commit 1), `4a5620b` (Commit 2), `d3ccbbb` (Commit 3), `4373b99` (Commit 4), `3539a8a` (Commit 5), `3394289` (Commit 6)
 - **Commity Standardu 11.2.11:** `b1536fd` (Commit 1), `93cc90b` (Commit 2), `252aee4` (Commit 3)
 - **Commity Standardu 11.2.12:** `88e771f` (Commit 1), `6875bdb` (Commit 2), `518ea55` (Commit 3)
-- **Commity Standardu 11.2.13:**
-  * Commit 1 (`b08c42e`): `fix(pipeline): implement 2:1 asymmetric key partitioning and phase-decoupled pipeline with K2 re-warm` — **NOWY COMMIT CERTYFIKACJI KODU**
-  * Commit 2 (`d3fe0ec`): `test(pipeline): add unit tests for 2:1 key isolation, fallback boundaries and phase barrier`
-  * Commit 3 (`HEAD`): `docs(release): certify Standard 11.2.13 — asymmetric 2:1 key isolation and Phase-Decoupled architecture`
-- **Status 11.2.13:** `CERTIFIED / CLOSED (2026-11-17)`
+- **Commity Standardu 11.2.13:** `b08c42e` (Commit 1), `d3fe0ec` (Commit 2), `7414ae2` (Commit 3)
+- **Commity Standardu 11.2.14:**
+  * Commit 1 (`6f25edc`): `fix(pipeline): implement F2 Sequential Canary Gate with K2 pre-flight stabilization (11.2.14)` — **NOWY COMMIT CERTYFIKACJI KODU**
+  * Commit 2 (`61b1a9f`): `test(pipeline): add test_f2_canary_gate_eliminates_retry for zero-retry determinism (11.2.14)`
+  * Commit 3 (`HEAD`): `docs(release): certify Standard 11.2.14 — F2 Canary Gate & deterministic 4.31 PLN baseline`
+- **Status 11.2.14:** `CERTIFIED / CLOSED (2026-11-17)`
 - **Commit ochrony Depuracji Legacy 1.0 (Z16):** `c197db73c3dabf887dddbf2337dc3a1d8cff598c` (`c197db7` — autoryzowany Z16-amendment #14 dla `verifier.py`, bezwzględne 0 B diffu na wszystkich pozostałych plikach chronionych)
-- **Stan metryk:** `393 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `464 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 11/11, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
-- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (393/393 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
-- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.13` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
-- **Gałąź i Architektura:** `main` (Standard 11.2.13: Likwidacja Cross-Phase Cache Thrashing w klastrach TPU poprzez asymetryczne partycjonowanie 2:1 puli kluczy API [K0, K1 dla F1; K2 dla F2], dwufazową barierę potoku [Phase-Decoupled Pipeline], jawny re-warm K2 po zakończeniu Fazy 1 oraz gwarancję 100% cache retention z kosztem odcinka <= 6.00 PLN [worst-case 5.23 PLN netto])
+- **Stan metryk:** `394 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `465 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 11/11, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
+- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (394/394 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
+- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.14` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
+- **Gałąź i Architektura:** `main` (Standard 11.2.14: F2 Sequential Canary Gate, wyłączenie kaskadowego JIT Retry dla paczek 1–12, stabilizacja post-canary 1.0s oraz pełny determinizm kosztowy: Worst Case = Likely Case = Best Case = 4.31 PLN netto)
 - **Środowisko:** Python 3.13 (`.venv`), Windows PowerShell, `ffmpeg` (PATH), `librosa.pyin`, `soundfile`, `pysubs2`, `spaCy en_core_web_sm` (100% offline 0.00 PLN), bezpośrednie klucze Google AI Studio API (`use_vertex = 0`).
 - **Dyrektywa Wykonawcza Testów:**
   * Testy przyrostowe podczas kodowania (< 2 s): `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_testu>"`
@@ -539,6 +540,19 @@ Dodanie w `tools/consolidate_bibles.py` opcjonalnej flagi `--migrate-misplaced-s
      - Phase Barrier & Re-warm K2: Po zakończeniu Fazy 1 dla wszystkich paczek następuje pauza stabilizacyjna oraz jawne rozgrzanie pamięci podręcznej weryfikatora wyłącznie na kluczu $K_2$ (`ContextCacheManager.ensure_cache_ready(client=self.client_pool_f2, tag="verifier", ...)`).
      - Etap 2: Wszystkie paczki wykonują redakcję Fazy 2 na dedykowanym kluczu $K_2$ (`max_workers_f2 = min(2, len(phase1_outputs))`) z zachowaniem 100% retencji bufora i rabatu -95%.
   4. `tests/test_context_cache_guard.py`: Dodanie 4 atomowych testów jednostkowych: `test_phase_decoupled_execution_order`, `test_f1_never_touches_k2`, `test_f2_uses_only_k2`, `test_f1_fallback_blocks_on_k2_unavailable` (22/22 tests passing).
+
+
+## 🏛️ ARB-065 / INC-AVT-063: Standard 11.2.14 — F2 Sequential Canary Gate & Deterministyczny Koszt 4.31 PLN
+
+- **Status:** `RESOLVED (Standard 11.2.14, commity 6f25edc, 61b1a9f, HEAD)`
+- **Zidentyfikowano:** Po wdrożeniu asymetrycznej puli 2:1 i dwufazowej bariery potoku (Standard 11.2.13) po re-warmie $K_2$ Faza 2 uruchamiała równolegle paczki 0 i 1. Przy minimalnym opóźnieniu propagacji indeksu w klastrze TPU Paczka 0 mogła wyzwalać obwód JIT Warmup Retry, a mechanizm ponowień aktywny na paczkach 1–12 groził kaskadowym dublowaniem kosztów wyjściowych (wariancja bilingowa z 4.31 PLN do 5.23–6.48 PLN).
+- **Komponenty Naprawy:**
+  1. `translator.py:translate_subtitles`: Wdrożenie sekwencyjnego Pre-flightu Fazy 2 (F2 Sequential Canary Gate). Paczka 0 Fazy 2 jest przetwarzana w 100% sekwencyjnie przed powołaniem puli wielowątkowej. Jej realny payload dialogowy trwale ugruntowuje bufor weryfikatora w TPU na dedykowanym kluczu $K_2$.
+  2. `translator.py:translate_subtitles`: Dodanie pauzy stabilizacyjnej `time.sleep(1.0)` po ukończeniu Paczki 0 F2, zapewniającej serwerowi czas na ukończenie indeksacji snapshotu przed wystartowaniem kolejnych zapytań.
+  3. `translator.py:_process_phase2_only`: Ograniczenie obwodu asekuracyjnego JIT Warmup Retry wyłącznie do Paczki 0 (`if p2_cached == 0 and b_idx == 0:`). Wyłączenie ponowień dla paczek 1–12 eliminuje ryzyko nieautoryzowanych kosztów wyjściowych.
+  4. `tests/test_context_cache_guard.py`: Dedykowany test jednostkowy `test_f2_canary_gate_eliminates_retry` weryfikujący zero ponowień na 13 paczkach F2 i 100% zapytań z aktywnym rabatem 94 115 tokenów (23/23 tests passing).
+  5. Determinizm finansowy: Likwidacja wariancji bilingowej — Worst Case = Likely Case = Best Case = **4.31 PLN netto** (~5.30 PLN brutto, margines 28.2% poniżej limitu 6.00 PLN).
+
 
 
 
