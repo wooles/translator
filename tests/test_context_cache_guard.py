@@ -881,6 +881,60 @@ def test_f2_canary_gate_eliminates_retry(monkeypatch):
     assert f2_call_records.count(94115) == 13
 
 
+@pytest.mark.unit
+def test_f2_zero_retry_enforcement(monkeypatch):
+    """
+    Standard 11.2.15:
+    Weryfikuje fizyczną eliminację mechanizmu JIT Retry z Fazy 2.
+    Nawet w przypadku zwrócenia cached_content_token_count == 0,
+    metoda _process_phase2_only wykonuje dokładnie 1 wywołanie API per paczka,
+    zapobiegając podwojeniu kosztów wyjściowych CoT.
+    """
+    from translator import MultimodalTranslator
+    from unittest.mock import MagicMock
+
+    monkeypatch.setenv("AVT_ALLOW_UNCACHED_BILLING", "1")
+
+    translator = MultimodalTranslator(
+        api_key="key_0,key_1,key_2",
+        model="gemini-4-hydrogen",
+        enable_verifier=True
+    )
+
+    call_counter = {"f2_calls": 0}
+
+    def mock_verify_batch(*args, **kwargs):
+        call_counter["f2_calls"] += 1
+        # Symulacja odpowiedzi z usage_metadata zawierającym cached = 0
+        vtl = getattr(translator.verifier, "_thread_local", None)
+        if vtl:
+            vtl.last_batch_token_usage = {"prompt": 102653, "cached": 0, "output": 3765}
+        return [MagicMock(id=0, refined_pl="Przetłumaczony tekst.")]
+
+    monkeypatch.setattr(translator.verifier, "verify_batch", mock_verify_batch)
+
+    # Inicjalizacja danych wejściowych Paczki 0
+    phase1_mock_data = {
+        "b_idx": 0,
+        "batch": [(0, MagicMock(name="", style="Default", text="Hello"), "Hello", None)],
+        "untranslated_in_batch": [(0, MagicMock(name="", style="Default", text="Hello"), "Hello", None)],
+        "pass1_items": [{"id": 0, "orig_idx": 0, "en": "Hello", "pl": "Cześć"}],
+        "scene_desc": "",
+        "lookback_history": [],
+        "lookahead_events": [],
+        "batch_response": MagicMock(scene_diagnosis=None),
+        "pbar": MagicMock()
+    }
+
+    # Wykonanie Paczki 0 F2
+    res = translator._process_phase2_only(phase1_data=phase1_mock_data)
+
+    # Asercja: verify_batch wywołane DOKŁADNIE RAZ (brak JIT Retry pomimo cached == 0)
+    assert call_counter["f2_calls"] == 1, "Standard 11.2.15 zabrania powtórnego wywołania verify_batch!"
+    assert res is not None
+
+
+
 
 
 
