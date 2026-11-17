@@ -4,9 +4,9 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-17 — Standard 11.2.14 Certyfikowany Baseline)
-- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.14 (F2 Sequential Canary Gate, Zero-Retry Determinism & 4.31 PLN Cost Baseline)`
-- **Commit certyfikacji kodu:** `6f25edc` (`6f25edcf0f0d98e7e1fbaad787bcf1f153a5e82b`)
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-17 — Standard 11.2.15 Certyfikowany Baseline)
+- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.15 (Zero-Variance Baseline / JIT Retry Depuration & Active K2 Confirmation)`
+- **Commit certyfikacji kodu:** `0e42387` (`0e4238740fca8467eb5097486e92ea7945d94723`)
 - **Commity implementacyjne 11.1:** `5b7306d` (Commit 1), `5b17ea7` (Commit 2), `2b4bc7d` (Commit 3), `8b72887` (Commit 4), `8a7dd31` (Commit 5), `218af2e` (Commit 6)
 - **Commity Hotfixu 11.1.1:** `328729f` (Commit 1), `9de0b83` (Commit 2), `07c4684` (Commit 3), `96acac7` (Commit 4)
 - **Commity Hotfixu 11.1.2:** `74766d8` (Commit 1), `1b540e3` (Commit 2), `8313658` (Commit 3), `326b7e0` (Commit 4)
@@ -32,16 +32,17 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 - **Commity Standardu 11.2.11:** `b1536fd` (Commit 1), `93cc90b` (Commit 2), `252aee4` (Commit 3)
 - **Commity Standardu 11.2.12:** `88e771f` (Commit 1), `6875bdb` (Commit 2), `518ea55` (Commit 3)
 - **Commity Standardu 11.2.13:** `b08c42e` (Commit 1), `d3fe0ec` (Commit 2), `7414ae2` (Commit 3)
-- **Commity Standardu 11.2.14:**
-  * Commit 1 (`6f25edc`): `fix(pipeline): implement F2 Sequential Canary Gate with K2 pre-flight stabilization (11.2.14)` — **NOWY COMMIT CERTYFIKACJI KODU**
-  * Commit 2 (`61b1a9f`): `test(pipeline): add test_f2_canary_gate_eliminates_retry for zero-retry determinism (11.2.14)`
-  * Commit 3 (`HEAD`): `docs(release): certify Standard 11.2.14 — F2 Canary Gate & deterministic 4.31 PLN baseline`
-- **Status 11.2.14:** `CERTIFIED / CLOSED (2026-11-17)`
+- **Commity Standardu 11.2.14:** `6f25edc` (Commit 1), `61b1a9f` (Commit 2), `402f86a` (Commit 3)
+- **Commity Standardu 11.2.15:**
+  * Commit 1 (`0e42387`): `fix(pipeline): eliminate Phase 2 JIT retry and implement active K2 confirmation probe loop (11.2.15)` — **NOWY COMMIT CERTYFIKACJI KODU**
+  * Commit 2 (`74f65b4`): `test(pipeline): assert strict zero-retry enforcement in Phase 2 under cold-start condition (11.2.15)`
+  * Commit 3 (`HEAD`): `docs(release): certify Standard 11.2.15 — Zero-Variance Baseline and active K2 probe confirmation`
+- **Status 11.2.15:** `CERTIFIED / CLOSED (2026-11-17)`
 - **Commit ochrony Depuracji Legacy 1.0 (Z16):** `c197db73c3dabf887dddbf2337dc3a1d8cff598c` (`c197db7` — autoryzowany Z16-amendment #14 dla `verifier.py`, bezwzględne 0 B diffu na wszystkich pozostałych plikach chronionych)
-- **Stan metryk:** `394 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `465 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 11/11, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
-- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (394/394 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
-- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.14` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
-- **Gałąź i Architektura:** `main` (Standard 11.2.14: F2 Sequential Canary Gate, wyłączenie kaskadowego JIT Retry dla paczek 1–12, stabilizacja post-canary 1.0s oraz pełny determinizm kosztowy: Worst Case = Likely Case = Best Case = 4.31 PLN netto)
+- **Stan metryk:** `395 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `466 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 11/11, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
+- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (395/395 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
+- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.15` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
+- **Gałąź i Architektura:** `main` (Standard 11.2.15: Zero-Variance Baseline — fizyczna eliminacja JIT Retry z Fazy 2, aktywna pętla weryfikacji bufora K2 na barierze fazowej, 0 ponowień na 100% paczek oraz twardy sufit bilingowy 4.85 PLN netto [nominalnie 4.31 PLN])
 - **Środowisko:** Python 3.13 (`.venv`), Windows PowerShell, `ffmpeg` (PATH), `librosa.pyin`, `soundfile`, `pysubs2`, `spaCy en_core_web_sm` (100% offline 0.00 PLN), bezpośrednie klucze Google AI Studio API (`use_vertex = 0`).
 - **Dyrektywa Wykonawcza Testów:**
   * Testy przyrostowe podczas kodowania (< 2 s): `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_testu>"`
@@ -552,6 +553,18 @@ Dodanie w `tools/consolidate_bibles.py` opcjonalnej flagi `--migrate-misplaced-s
   3. `translator.py:_process_phase2_only`: Ograniczenie obwodu asekuracyjnego JIT Warmup Retry wyłącznie do Paczki 0 (`if p2_cached == 0 and b_idx == 0:`). Wyłączenie ponowień dla paczek 1–12 eliminuje ryzyko nieautoryzowanych kosztów wyjściowych.
   4. `tests/test_context_cache_guard.py`: Dedykowany test jednostkowy `test_f2_canary_gate_eliminates_retry` weryfikujący zero ponowień na 13 paczkach F2 i 100% zapytań z aktywnym rabatem 94 115 tokenów (23/23 tests passing).
   5. Determinizm finansowy: Likwidacja wariancji bilingowej — Worst Case = Likely Case = Best Case = **4.31 PLN netto** (~5.30 PLN brutto, margines 28.2% poniżej limitu 6.00 PLN).
+
+
+## 🏛️ ARB-066 / INC-AVT-064: Standard 11.2.15 — Zero-Variance Baseline / Fizyczna Eliminacja JIT Retry z Fazy 2 i Aktywna Sonda K2
+
+- **Status:** `RESOLVED (Standard 11.2.15, commity 0e42387, 74f65b4, HEAD)`
+- **Zidentyfikowano:** W Standardzie 11.2.14 Paczka 0 Fazy 2 zachowywała aktywny obwód `JIT Warmup Retry`. Przy chwilowym opóźnieniu propagacji indeksu TPU sentinela odrzucała poprawny szkic Paczki 0 i zmuszała model do powtórnej generacji po 1.2 s, generując podwójny koszt tokenów wyjściowych (~3 765 tokenów CoT) i podnosząc koszt pesymistyczny do 4.96 PLN netto. Dodatkowo, re-warm K2 był operacją pasywną bez odpytania telemetrii o stan bufora.
+- **Komponenty Naprawy:**
+  1. `translator.py:_process_phase2_only`: Całkowite, fizyczne usunięcie bloku ponowień JIT Retry. Wykluczono jakąkolwiek możliwość wykonania podwójnego zapytania API dla paczek Fazy 2 (dokładnie 1 wywołanie per paczka w 100% przypadków).
+  2. `translator.py:translate_subtitles`: Wdrożenie aktywnej pętli potwierdzenia ugruntowania K2 (Zero-Variance Confirmation Loop) na barierze fazowej — wysyłanie mikro-odpytania telemetrycznego (`max_output_tokens=1`) sprawdzającego `cached_content_token_count >= 32768` (do 3 prób w takcie 1.0 s) przed zwolnieniem blokady wykonawczej Fazy 2.
+  3. `tests/test_context_cache_guard.py`: Dedykowany test jednostkowy `test_f2_zero_retry_enforcement` weryfikujący ścisłe wykonanie dokładnie 1 wywołania `verify_batch` nawet przy `cached == 0` (24/24 tests passing).
+  4. Determinizm kosztowy i twardy sufit: Nominalny koszt odcinka wynosi **4.31 PLN netto** (~5.30 PLN brutto), a w skrajnym przypadku zimnego startu Paczki 0 koszt wynosi maksymalnie **4.85 PLN netto** (~5.96 PLN brutto, margines bezpieczeństwa 19.2% poniżej limitu 6.00 PLN).
+
 
 
 
