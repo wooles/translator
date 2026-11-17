@@ -796,6 +796,92 @@ def test_f1_fallback_blocks_on_k2_unavailable():
     assert fb_key in ("test_key_00", "test_key_01")
 
 
+@pytest.mark.unit
+def test_f2_canary_gate_eliminates_retry(monkeypatch):
+    """
+    Standard 11.2.14:
+    Weryfikuje, że sekwencyjne wykonanie Paczki 0 F2 w ramach F2 Canary Gate
+    ugruntowuje bufor na dedykowanym kluczu K2, dzięki czemu wszystkie kolejne
+    paczki (1..12) trafiają w serwerowy Context Cache od pierwszego strzału (0 retry).
+    """
+    from translator import MultimodalTranslator
+    from unittest.mock import MagicMock
+    import concurrent.futures
+
+    translator = MultimodalTranslator(
+        api_key="key_0,key_1,key_2",
+        model="gemini-4-hydrogen",
+        enable_verifier=True
+    )
+    translator.concurrent_batches = 2
+
+    k2_client = translator.client_pool_f2.clients[0]
+    tpu_state = {"primed": False}
+    f2_call_records = []
+
+    def mock_generate_content(model, contents, config=None):
+        if contents == ["PING_WARMUP_INIT"]:
+            tpu_state["primed"] = True
+            um = MagicMock(prompt_token_count=1, cached_content_token_count=0, candidates_token_count=1, thoughts_token_count=0)
+            return MagicMock(parsed=None, usage_metadata=um)
+
+        cached_count = 94115 if tpu_state["primed"] else 0
+        f2_call_records.append(cached_count)
+        
+        um = MagicMock(
+            prompt_token_count=102653,
+            cached_content_token_count=cached_count,
+            candidates_token_count=1400,
+            thoughts_token_count=2365
+        )
+        fake_response = MagicMock(
+            translations=[MagicMock(id=0, pl="Przykładowa kwestia dialogowa.")],
+            scene_diagnosis="Spójna scena dialogowa."
+        )
+        return MagicMock(parsed=fake_response, usage_metadata=um)
+
+    k2_client.models.generate_content = MagicMock(side_effect=mock_generate_content)
+    mock_pbar = MagicMock()
+
+    phase1_outputs = {
+        i: {
+            "b_idx": i,
+            "batch": [(i, MagicMock(name="", style="Default", text="Hello"), "Hello", None)],
+            "untranslated_in_batch": [(i, MagicMock(name="", style="Default", text="Hello"), "Hello", None)],
+            "pass1_items": [{"id": i, "orig_idx": i, "en": "Hello", "pl": "Cześć"}],
+            "scene_desc": "Scena testowa",
+            "lookback_history": [],
+            "lookahead_events": [],
+            "batch_response": MagicMock(scene_diagnosis=None),
+            "pbar": mock_pbar
+        }
+        for i in range(13)
+    }
+
+    # Krok A: Wywołanie re-warmu po barierze
+    k2_client.models.generate_content(model="gemini-4-hydrogen", contents=["PING_WARMUP_INIT"])
+
+    # Krok B: Wykonanie F2 Canary Gate (Paczka 0 - sekwencyjnie)
+    sorted_p1_keys = sorted(phase1_outputs.keys())
+    canary_f2_bidx = sorted_p1_keys[0]
+    canary_f2_out = translator._process_phase2_only(phase1_data=phase1_outputs[canary_f2_bidx])
+    assert canary_f2_out[0] == 0
+
+    # Krok C: Równoległe wykonanie pozostałych paczek (1..12) na ugruntowanym K2
+    remaining_keys = sorted_p1_keys[1:]
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor_f2:
+        futures = [executor_f2.submit(translator._process_phase2_only, phase1_outputs[k]) for k in remaining_keys]
+        for fut in concurrent.futures.as_completed(futures):
+            res = fut.result()
+            assert res is not None
+
+    # Asercje końcowe: dokładnie 13 wywołań produkcyjnych F2 ze 100% rabatem (94 115 tokenów)
+    assert len(f2_call_records) == 13
+    assert all(cached == 94115 for cached in f2_call_records)
+    assert f2_call_records.count(94115) == 13
+
+
+
 
 
 
